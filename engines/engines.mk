@@ -47,8 +47,8 @@ MODULES += engines/drascula
 endif
 
 ifdef ENABLE_GARGOYLE
-DEFINES += -DENABLE_GOB=$(ENABLE_GARGOYLE)
-MODULES += engines/gob
+DEFINES += -DENABLE_GARGOYLE=$(ENABLE_GARGOYLE)
+MODULES += engines/gargoyle
 endif
 
 ifdef ENABLE_GOB
