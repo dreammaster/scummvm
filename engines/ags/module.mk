@@ -5,7 +5,8 @@ MODULE_OBJS := \
 	detection.o \
 	gamefile.o \
 	metaengine.o \
-	resourceman.o
+	resourceman.o \
+	script.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AGS), DYNAMIC_PLUGIN)

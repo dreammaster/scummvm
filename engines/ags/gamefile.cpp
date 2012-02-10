@@ -26,6 +26,7 @@
 #include "ags/constants.h"
 #include "ags/gamefile.h"
 #include "ags/resourceman.h"
+#include "ags/script.h"
 
 namespace AGS {
 
@@ -259,9 +260,11 @@ bool GameFile::init(const ResourceManager &resMan) {
 			_dict._words[i]._word = decryptString(dta);
 			_dict._words[i]._id = dta->readUint16LE();
 		}
-		// FIXME: dict
-		error("don't support dict yet");
 	}
+
+	// FIXME
+	ccScript gameScript;
+	gameScript.readFrom(dta);
 
 	delete dta;
 
