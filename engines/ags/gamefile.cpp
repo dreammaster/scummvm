@@ -19,9 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "common/debug.h"
 #include "common/stream.h"
 #include "common/textconsole.h"
 
+#include "ags/constants.h"
 #include "ags/gamefile.h"
 #include "ags/resourceman.h"
 
@@ -55,16 +57,29 @@ bool GameFile::init(const ResourceManager &resMan) {
 	dta->skip(30); // "Adventure Creator Game File v2"
 
 	readVersion(*dta);
+	if (_version > kAGSVer321)
+		error("AGS version %d ('%s') is not supported", _version, _versionString.c_str());
 
+	// now we read GameSetupStruct
+
+	// game name
 	char gameName[51];
 	dta->read(gameName, 50);
 	gameName[50] = '\0';
-
 	_gameName = gameName;
+	dta->skip(2); // padding
 
+	debug(1, "AGS game file for '%s' has version %d ('%s')", _gameName.c_str(), _version, _versionString.c_str());
+
+	// options
 	for (uint32 i = 0; i < 100; i++)
-		_options[i] = (int32) dta->readUint32LE();
+		_options[i] = dta->readUint32LE();
+	if (_version <= kAGSVer300) {
+		// from PSP branch: fix animation speed for old formats
+		_options[OPT_OLDTALKANIMSPD] = 1;
+	}
 
+	// palette
 	for (uint32 i = 0; i < 256; i++)
 		_palUses[i] = (uint8) dta->readByte();
 	for (uint32 i = 0; i < 256; i++) {
@@ -75,46 +90,119 @@ bool GameFile::init(const ResourceManager &resMan) {
 		dta->skip(1); // Pad
 	}
 
-	_viewCount   = (int32) dta->readUint32LE();
-	_charCount   = (int32) dta->readUint32LE();
-	_playerChars = (int32) dta->readUint32LE();
+	_viewCount = dta->readUint32LE();
+	_charCount = dta->readUint32LE();
+	_playerChars = dta->readUint32LE();
 
-	warning("%d, %d, %d", _viewCount, _charCount, _playerChars);
-	_totalScore = (int32) dta->readUint32LE();
+	_totalScore = dta->readSint32LE();
 
-	_invItemCount = (int16) dta->readUint16LE();
+	_invItemCount = dta->readUint16LE();
+	dta->skip(2); // padding
 
-	_dialogCount = (int32) dta->readUint32LE();
-	_dlgMsgCount = (int32) dta->readUint32LE();
+	_dialogCount = dta->readUint32LE();
+	_dlgMsgCount = dta->readUint32LE();
+	_fontCount = dta->readUint32LE();
 
-	_fontCount = (int32) dta->readUint32LE();
+	_colorDepth = dta->readUint32LE();
 
-	_colorDepth = (int32) dta->readUint32LE();
+	_targetWin = dta->readUint32LE();
+	_dialogBullet = dta->readUint32LE();
 
-	_targetWin    = (int32) dta->readUint32LE();
-	_dialogBullet = (int32) dta->readUint32LE();
-
-	_hotDot      = dta->readUint16LE();
+	_hotDot = dta->readUint16LE();
 	_hotDotOuter = dta->readUint16LE();
 
-	_uniqueID = (int32) dta->readUint32LE();
+	_uniqueID = dta->readUint32LE();
 
-	_guiCount    = (int32) dta->readUint32LE();
-	_cursorCount = (int32) dta->readUint32LE();
+	_guiCount = dta->readUint32LE();
+	_cursorCount = dta->readUint32LE();
 
-	_defaultResolution   = (int32) dta->readUint32LE();
-	_defaultLipSyncFrame = (int32) dta->readUint32LE();
+	_defaultResolution = dta->readUint32LE();
+	_defaultLipSyncFrame = dta->readUint32LE();
 
-	_invHotDotSprite = (int32) dta->readUint32LE();
+	_invHotDotSprite = dta->readUint32LE();
 
-	dta->skip(17 * 4); // Reserved
+	// reserved
+	dta->skip(17 * 4);
 
-	dta->skip(500 * 4); // messages
+	// messages
+	dta->skip(500 * 4);
 
-	dta->skip(4); // dict
-	dta->skip(4); // globalscript
-	dta->skip(4); // chars
-	dta->skip(4); // compiled_script
+	// dict
+	dta->skip(4);
+	// globalscript
+	_globalScript = dta->readUint32LE();
+	// chars
+	dta->skip(4);
+	// compiled_script
+	_compiledScript = dta->readUint32LE();
+	if (!_compiledScript)
+		error("missing compiledScript");
+
+	if (_version > kAGSVer272) {
+		// FIXME: guid, save game extension/folder
+		error("3.x not supported yet");
+	}
+
+	// fonts
+	_fontFlags.resize(_fontCount);
+	for (uint32 i = 0; i < _fontCount; ++i)
+		_fontFlags[i] = dta->readByte();
+	_fontOutline.resize(_fontCount);
+	for (uint32 i = 0; i < _fontCount; ++i)
+		_fontOutline[i] = dta->readByte();
+
+	// TODO: PSP version fixes up fontOutlines here...
+
+	// sprite flags
+	uint32 spriteFlagCount = dta->readUint32LE();
+	_spriteFlags.resize(spriteFlagCount);
+	for (uint32 i = 0; i < spriteFlagCount; ++i)
+		_spriteFlags[i] = dta->readByte();
+
+	// inventory info
+	_invItemInfo.resize(_invItemCount);
+	for (uint32 i = 0; i < _invItemCount; ++i) {
+		InventoryItemInfo &info = _invItemInfo[i];
+
+		char invName[26];
+		dta->read(invName, 25);
+		invName[25] = '\0';
+		info._name = invName;
+		dta->skip(3); // padding
+
+		info._pic = dta->readUint32LE();
+		info._cursorPic = dta->readUint32LE();
+		info._hotX = dta->readUint32LE();
+		info._hotY = dta->readUint32LE();
+		dta->skip(5 * 4); // reserved
+		info._flags = dta->readByte();
+		dta->skip(3); // padding
+	}
+
+	// cursors
+	_cursors.resize(_cursorCount);
+	for (uint32 i = 0; i < _cursorCount; ++i) {
+		MouseCursor &cursor = _cursors[i];
+
+		cursor._pic = dta->readUint32LE();
+		cursor._hotX = dta->readUint16LE();
+		cursor._hotY = dta->readUint16LE();
+		cursor._view = dta->readSint16LE();
+
+		char cursorName[11];
+		dta->read(cursorName, 10);
+		cursorName[10] = '\0';
+		cursor._name = cursorName;
+
+		cursor._flags = dta->readByte();
+		dta->skip(3); // padding
+
+		if (_version <= kAGSVer272) {
+			// convert old value for 'not set'
+			if (cursor._view == 0)
+				cursor._view = -1;
+		}
+	}
 
 	delete dta;
 

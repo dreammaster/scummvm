@@ -22,9 +22,27 @@
 #ifndef AGS_GAMEFILE_H
 #define AGS_GAMEFILE_H
 
+#include "common/array.h"
+
 namespace AGS {
 
 class ResourceManager;
+
+struct InventoryItemInfo {
+	Common::String _name;
+	uint32 _pic;
+	uint32 _cursorPic;
+	uint32 _hotX, _hotY;
+	uint8 _flags;
+};
+
+struct MouseCursor {
+	uint32 _pic;
+	uint16 _hotX, _hotY;
+	int16 _view;
+	Common::String _name;
+	uint8 _flags;
+};
 
 class GameFile {
 public:
@@ -39,43 +57,51 @@ private:
 	Common::String _versionString;
 	Common::String _gameName;
 
-	int32 _options[100];
+	uint32 _options[100];
 
 	uint8 _palUses[256];
 	byte  _defPal[768];
 
-	int32 _viewCount;
-	int32 _charCount;
-	int32 _playerChars;
+	uint32 _viewCount;
+	uint32 _charCount;
+	uint32 _playerChars;
 
-	int32 _totalScore;
+	uint32 _totalScore;
 
-	int16 _invItemCount;
+	uint16 _invItemCount;
+	Common::Array<InventoryItemInfo> _invItemInfo;
 
-	int32 _dialogCount;
-	int32 _dlgMsgCount;
+	uint32 _dialogCount;
+	uint32 _dlgMsgCount;
 
-	int32 _fontCount;
+	uint32 _fontCount;
 
-	int32 _colorDepth;
+	uint32 _colorDepth;
 
-	int32 _targetWin;
-	int32 _dialogBullet;
+	uint32 _targetWin;
+	uint32 _dialogBullet;
 
 	uint16 _hotDot;
 	uint16 _hotDotOuter;
 
-	int32 _uniqueID;
+	uint32 _uniqueID;
 
-	int32 _guiCount;
-	int32 _cursorCount;
+	uint32 _guiCount;
+	uint32 _cursorCount;
+	Common::Array<MouseCursor> _cursors;
 
-	int32 _defaultResolution;
-	int32 _defaultLipSyncFrame;
+	uint32 _defaultResolution;
+	uint32 _defaultLipSyncFrame;
 
-	int32 _invHotDotSprite;
+	uint32 _invHotDotSprite;
 
+	uint32 _globalScript;
+	uint32 _compiledScript;
 
+	Common::Array<byte> _fontFlags;
+	Common::Array<byte> _fontOutline;
+
+	Common::Array<byte> _spriteFlags;
 
 	void readVersion(Common::SeekableReadStream &dta);
 };
