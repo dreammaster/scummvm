@@ -92,6 +92,23 @@ struct WordsDictionary {
 
 struct ccScript;
 
+struct ViewFrame {
+	uint32 _pic;
+	uint16 _xOffs, _yOffs;
+	uint16 _speed;
+	uint32 _flags;
+	uint32 _sound;
+};
+
+struct ViewLoopNew {
+	uint32 _flags;
+	Common::Array<ViewFrame> _frames;
+};
+
+struct ViewStruct {
+	Common::Array<ViewLoopNew> _loops;
+};
+
 class GameFile {
 public:
 	GameFile();
@@ -103,6 +120,7 @@ private:
 	InteractionVariable readInteractionVariable(Common::SeekableReadStream *dta);
 	NewInteraction *readNewInteraction(Common::SeekableReadStream *dta);
 	NewInteractionCommandList *readCommandList(Common::SeekableReadStream *dta);
+	ViewFrame readViewFrame(Common::SeekableReadStream *dta);
 
 	uint32 _version;
 
@@ -164,6 +182,8 @@ private:
 	ccScript *_gameScript;
 	ccScript *_dialogScriptsScript;
 	Common::Array<ccScript *> _scriptModules;
+
+	Common::Array<ViewStruct> _views;
 
 	void readVersion(Common::SeekableReadStream &dta);
 	void decryptText(uint8 *str, uint32 max);
