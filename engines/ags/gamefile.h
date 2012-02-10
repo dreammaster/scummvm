@@ -81,6 +81,15 @@ struct NewInteraction {
 	Common::Array<NewInteractionEvent> _events;
 };
 
+struct DictionaryWord {
+	Common::String _word;
+	uint16 _id;
+};
+
+struct WordsDictionary {
+	Common::Array<DictionaryWord> _words;
+};
+
 class GameFile {
 public:
 	GameFile();
@@ -148,7 +157,11 @@ private:
 	Common::Array<NewInteraction *> _interactionsInv;
 	Common::Array<InteractionVariable> _globalVars;
 
+	WordsDictionary _dict;
+
 	void readVersion(Common::SeekableReadStream &dta);
+	void decryptText(uint8 *str, uint32 max);
+	Common::String decryptString(Common::SeekableReadStream *dta);
 };
 
 } // End of namespace AGS

@@ -63,7 +63,6 @@ void ResourceManager::decryptText(uint8 *str, uint32 max) {
 		if (!*str)
 			break;
 
-		max--;
 		str++;
 
 		passPos = (passPos + 1) % 11;

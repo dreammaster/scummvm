@@ -49,6 +49,34 @@ void GameFile::readVersion(Common::SeekableReadStream &dta) {
 	delete[] versionString;
 }
 
+void GameFile::decryptText(uint8 *str, uint32 max) {
+	static const char *kSecretPassword = "Avis Durgan";
+
+	uint passPos = 0;
+	while (max-- > 0) {
+		*str -= (uint8) kSecretPassword[passPos];
+		if (!*str)
+			break;
+
+		str++;
+
+		passPos = (passPos + 1) % 11;
+	}
+}
+
+Common::String GameFile::decryptString(Common::SeekableReadStream *dta) {
+	uint32 stringLen = dta->readUint32LE();
+	if (stringLen > 5000000)
+		error("invalid value in decryptString");
+	byte *string = new byte[stringLen + 1];
+	dta->read(string, stringLen);
+	string[stringLen] = 0;
+	decryptText(string, stringLen);
+	Common::String newString((char *)string);
+	delete[] string;
+	return newString;
+}
+
 bool GameFile::init(const ResourceManager &resMan) {
 	Common::SeekableReadStream *dta = resMan.getFile("ac2game.dta");
 	if (!dta)
@@ -225,6 +253,12 @@ bool GameFile::init(const ResourceManager &resMan) {
 	}
 
 	if (hasDict) {
+		uint32 wordsCount = dta->readUint32LE();
+		_dict._words.resize(wordsCount);
+		for (uint i = 0; i < wordsCount; ++i) {
+			_dict._words[i]._word = decryptString(dta);
+			_dict._words[i]._id = dta->readUint16LE();
+		}
 		// FIXME: dict
 		error("don't support dict yet");
 	}
