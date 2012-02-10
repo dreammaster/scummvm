@@ -128,7 +128,7 @@ bool GameFile::init(const ResourceManager &resMan) {
 	dta->skip(500 * 4);
 
 	// dict
-	dta->skip(4);
+	bool hasDict = (bool)dta->readUint32LE();
 	// globalscript
 	_globalScript = dta->readUint32LE();
 	// chars
@@ -204,9 +204,123 @@ bool GameFile::init(const ResourceManager &resMan) {
 		}
 	}
 
+	if (_version > kAGSVer272) {
+		// FIXME: character and inventory scripts
+		error("3.x not supported yet");
+	} else {
+		debug(1, "char interactions");
+		_interactionsChar.resize(_charCount);
+		for (uint32 i = 0; i < _charCount; i++)
+			_interactionsChar[i] = readNewInteraction(dta);
+		debug(1, "inv interactions");
+		_interactionsInv.resize(_invItemCount);
+		for (uint32 i = 0; i < _invItemCount; i++)
+			_interactionsInv[i] = readNewInteraction(dta);
+
+		uint32 globalVarsCount = dta->readUint32LE();
+		_globalVars.resize(globalVarsCount);
+		for (uint32 i = 0; i < globalVarsCount; ++i) {
+			_globalVars[i] = readInteractionVariable(dta);
+		}
+	}
+
+	if (hasDict) {
+		// FIXME: dict
+		error("don't support dict yet");
+	}
+
 	delete dta;
 
 	return true;
+}
+
+InteractionVariable GameFile::readInteractionVariable(Common::SeekableReadStream *dta) {
+	InteractionVariable var;
+
+	char varName[24];
+	dta->read(varName, 23);
+	varName[23] = '\0';
+	var._name = varName;
+
+	var._type = dta->readByte();
+	var._value = dta->readSint32LE();
+
+	return var;
+}
+
+#define MAX_NEWINTERACTION_EVENTS 30
+
+NewInteraction *GameFile::readNewInteraction(Common::SeekableReadStream *dta) {
+	uint32 unknown = dta->readUint32LE();
+	if (unknown != 1) {
+		if (unknown != 0)
+			error("invalid interaction? (%d)", unknown);
+		return NULL;
+	}
+	debug(1, "new interaction");
+
+	NewInteraction *interaction = new NewInteraction();
+
+	uint32 numEvents = dta->readUint32LE();
+	if (numEvents >= MAX_NEWINTERACTION_EVENTS)
+		error("too many new interaction events (%d)", numEvents);
+	interaction->_events.resize(numEvents);
+	for (uint32 i = 0; i < numEvents; i++) {
+		interaction->_events[i]._type = dta->readUint32LE();
+		interaction->_events[i]._timesRun = 0;
+		interaction->_events[i]._response = NULL;
+	}
+
+	Common::Array<bool> hasResponse;
+	hasResponse.resize(numEvents);
+	for (uint32 i = 0; i < numEvents; ++i)
+		hasResponse[i] = (bool)dta->readUint32LE();
+	for (uint32 i = 0; i < numEvents; ++i) {
+		if (!hasResponse[i])
+			continue;
+
+		debug(1, "reading response");
+		interaction->_events[i]._response = readCommandList(dta);
+	}
+
+	return interaction;
+}
+
+#define MAX_ACTION_ARGS 5
+
+NewInteractionCommandList *GameFile::readCommandList(Common::SeekableReadStream *dta) {
+	NewInteractionCommandList *list = new NewInteractionCommandList();
+	uint32 commandsCount = dta->readUint32LE();
+	list->_timesRun = dta->readUint32LE();
+
+	Common::Array<bool> hasChildren;
+	Common::Array<bool> hasParent;
+	list->_commands.resize(commandsCount);
+	for (uint32 i = 0; i < commandsCount; ++i) {
+		dta->skip(4); // vtable ptr
+		list->_commands[i]._type = dta->readUint32LE();
+
+		list->_commands[i]._args.resize(MAX_ACTION_ARGS);
+		for (uint j = 0; j < MAX_ACTION_ARGS; ++j) {
+			list->_commands[i]._args[j]._type = dta->readByte();
+			dta->skip(3);
+			list->_commands[i]._args[j]._val = dta->readUint32LE();
+			list->_commands[i]._args[j]._extra = dta->readUint32LE();
+		}
+
+		hasChildren.push_back((bool)dta->readUint32LE());
+		/*bool hasParent = (bool)*/ dta->readUint32LE();
+		list->_commands[i]._parent = list;
+	}
+
+	list->_commands.resize(commandsCount);
+	for (uint32 i = 0; i < commandsCount; ++i) {
+		if (!hasChildren[i])
+			continue;
+		list->_commands[i]._children = readCommandList(dta);
+	}
+
+	return list;
 }
 
 } // End of namespace AGS
