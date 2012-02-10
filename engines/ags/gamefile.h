@@ -90,6 +90,8 @@ struct WordsDictionary {
 	Common::Array<DictionaryWord> _words;
 };
 
+struct ccScript;
+
 class GameFile {
 public:
 	GameFile();
@@ -158,6 +160,10 @@ private:
 	Common::Array<InteractionVariable> _globalVars;
 
 	WordsDictionary _dict;
+
+	ccScript *_gameScript;
+	ccScript *_dialogScriptsScript;
+	Common::Array<ccScript *> _scriptModules;
 
 	void readVersion(Common::SeekableReadStream &dta);
 	void decryptText(uint8 *str, uint32 max);

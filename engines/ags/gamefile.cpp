@@ -78,6 +78,8 @@ Common::String GameFile::decryptString(Common::SeekableReadStream *dta) {
 	return newString;
 }
 
+#define MAX_SCRIPT_MODULES 50
+
 bool GameFile::init(const ResourceManager &resMan) {
 	Common::SeekableReadStream *dta = resMan.getFile("ac2game.dta");
 	if (!dta)
@@ -127,6 +129,9 @@ bool GameFile::init(const ResourceManager &resMan) {
 
 	_invItemCount = dta->readUint16LE();
 	dta->skip(2); // padding
+
+	debug(2, "%d views, %d characters, %d player characters, %d inventory items",
+		_viewCount, _charCount, _playerChars, _invItemCount);
 
 	_dialogCount = dta->readUint32LE();
 	_dlgMsgCount = dta->readUint32LE();
@@ -262,9 +267,28 @@ bool GameFile::init(const ResourceManager &resMan) {
 		}
 	}
 
-	// FIXME
-	ccScript gameScript;
-	gameScript.readFrom(dta);
+	_gameScript = new ccScript();
+	_gameScript->readFrom(dta);
+
+	_dialogScriptsScript = NULL;
+	if (_version > kAGSVer300) {
+		// 3.1.1+ dialog script
+		_dialogScriptsScript = new ccScript();
+		_dialogScriptsScript->readFrom(dta);
+	}
+
+	if (_version >= kAGSVer270) {
+		// 2.7.0+ script modules
+		uint32 scriptModuleCount = dta->readUint32LE();
+		if (scriptModuleCount >= MAX_SCRIPT_MODULES)
+			error("too many script modules (%d)", scriptModuleCount);
+
+		_scriptModules.resize(scriptModuleCount);
+		for (uint i = 0; i < scriptModuleCount; ++i) {
+			_scriptModules[i] = new ccScript();
+			_scriptModules[i]->readFrom(dta);
+		}
+	}
 
 	delete dta;
 

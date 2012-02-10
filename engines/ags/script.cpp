@@ -92,6 +92,10 @@ void ccScript::readFrom(Common::SeekableReadStream *dta) {
 			_sections[i]._offset = dta->readUint32LE();
 		}
 	}
+
+	uint32 endsig = dta->readUint32LE();
+	if (endsig != 0xbeefcafe)
+		error("incorrect end signature %x for script", endsig);
 }
 
 } // End of namespace AGS
