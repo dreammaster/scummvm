@@ -312,41 +312,7 @@ bool GameFile::init(const ResourceManager &resMan) {
 		error("3.x not supported yet");
 	} else {
 		// 2.x views
-
-		_views.resize(_viewCount);
-		for (uint n = 0; n < _viewCount; ++n) {
-			// read the old 2.x view data
-			uint16 numLoops = dta->readUint16LE();
-			uint16 numFrames[16];
-			for (uint i = 0; i < 16; ++i) {
-				numFrames[i] = dta->readUint16LE();
-				if (numFrames[i] >= 20)
-					error("too many frames (%d) in 2.x view", numFrames[i]);
-			}
-			dta->skip(2); // padding
-			uint32 loopFlags[16];
-			for (uint i = 0; i < 16; ++i)
-				loopFlags[i] = dta->readUint32LE();
-			ViewFrame frames[16][20];
-			for (uint j = 0; j < 16; ++j)
-				for (uint i = 0; i < 20; ++i)
-					frames[j][i] = readViewFrame(dta);
-
-			// create a new 3.x view from it
-			_views[n]._loops.resize(numLoops);
-			for (uint i = 0; i < numLoops; ++i) {
-				ViewLoopNew &loop = _views[n]._loops[i];
-				if (numFrames[i] > 0 && frames[i][numFrames[i] - 1]._pic == 0xffffffff) {
-					// rewrite to use a flag rather than an invalid last frame
-					loop._flags = LOOPFLAG_RUNNEXTLOOP;
-					numFrames[i]--;
-				} else
-					loop._flags = 0;
-
-				for (uint j = 0; j < numFrames[i]; ++j)
-					loop._frames.push_back(frames[i][j]);
-			}
-		}
+		readOldViews(dta);
 	}
 
 	_chars.resize(_charCount);
@@ -566,6 +532,43 @@ ViewFrame GameFile::readViewFrame(Common::SeekableReadStream *dta) {
 	dta->skip(2 * 4); // reserved_for_future
 
 	return frame;
+}
+
+void GameFile::readOldViews(Common::SeekableReadStream *dta) {
+	_views.resize(_viewCount);
+	for (uint n = 0; n < _viewCount; ++n) {
+		// read the old 2.x view data
+		uint16 numLoops = dta->readUint16LE();
+		uint16 numFrames[16];
+		for (uint i = 0; i < 16; ++i) {
+			numFrames[i] = dta->readUint16LE();
+			if (numFrames[i] >= 20)
+				error("too many frames (%d) in 2.x view", numFrames[i]);
+		}
+		dta->skip(2); // padding
+		uint32 loopFlags[16];
+		for (uint i = 0; i < 16; ++i)
+			loopFlags[i] = dta->readUint32LE();
+		ViewFrame frames[16][20];
+		for (uint j = 0; j < 16; ++j)
+			for (uint i = 0; i < 20; ++i)
+				frames[j][i] = readViewFrame(dta);
+
+		// create a new 3.x view from it
+		_views[n]._loops.resize(numLoops);
+		for (uint i = 0; i < numLoops; ++i) {
+			ViewLoopNew &loop = _views[n]._loops[i];
+			if (numFrames[i] > 0 && frames[i][numFrames[i] - 1]._pic == 0xffffffff) {
+				// rewrite to use a flag rather than an invalid last frame
+				loop._flags = LOOPFLAG_RUNNEXTLOOP;
+				numFrames[i]--;
+			} else
+				loop._flags = 0;
+
+			for (uint j = 0; j < numFrames[i]; ++j)
+				loop._frames.push_back(frames[i][j]);
+		}
+	}
 }
 
 CharacterInfo *GameFile::readCharacter(Common::SeekableReadStream *dta) {

@@ -192,6 +192,7 @@ private:
 	NewInteraction *readNewInteraction(Common::SeekableReadStream *dta);
 	NewInteractionCommandList *readCommandList(Common::SeekableReadStream *dta);
 	ViewFrame readViewFrame(Common::SeekableReadStream *dta);
+	void readOldViews(Common::SeekableReadStream *dta);
 	CharacterInfo *readCharacter(Common::SeekableReadStream *dta);
 	void setDefaultMessages();
 
