@@ -376,15 +376,37 @@ bool GameFile::init(const ResourceManager &resMan) {
 
 	readPlugins(dta);
 
-	readProperties(dta);
+	readPropertyData(dta);
 
-	// TODO: view names
-	// TODO: inv script names
-	// TODO: dialog script names
+	for (uint i = 0; i < _views.size(); ++i) {
+		_views[i]._name = readString(dta);
+		debug(5, "view %d is '%s'", i, _views[i]._name.c_str());
+	}
+	for (uint i = 0; i < _invItemInfo.size(); ++i) {
+		_invItemInfo[i]._scriptName = readString(dta);
+		debug(5, "inventory item %d has script '%s'", i, _invItemInfo[i]._scriptName.c_str());
+	}
+	for (uint i = 0; i < _dialogs.size(); ++i) {
+		_dialogs[i]._name = readString(dta);
+		debug(5, "dialog %d is '%s'", i, _dialogs[i]._name.c_str());
+	}
 
-	// TODO: audio clips
+	if (_version >= kAGSVer320) {
+		// FIXME
+		error("3.x not supported yet");
+	} else {
+		// TODO: audio clips
+	}
 
-	// TODO: room ids/names
+	if ((_version >= kAGSVer300b) && _options[OPT_DEBUGMODE]) {
+		uint32 roomCount = dta->readUint32LE();
+		for (uint i = 0; i < roomCount; ++i) {
+			// TODO: store these
+			uint32 roomNumber = dta->readUint32LE();
+			Common::String roomName = readString(dta);
+			debug(5, "room %d (number %d) is '%s'", i, roomNumber, roomName.c_str());
+		}
+	}
 
 	delete dta;
 
@@ -759,10 +781,45 @@ void GameFile::readPlugins(Common::SeekableReadStream *dta) {
 	}
 }
 
-void GameFile::readProperties(Common::SeekableReadStream *dta) {
-	// TODO: prop schema
-	// TODO: char props
-	// TODO: inv props
+void GameFile::readPropertyData(Common::SeekableReadStream *dta) {
+	// custom property schema
+	uint32 schemaVersion = dta->readUint32LE();
+	if (schemaVersion != 1)
+		error("invalid schema version %d", schemaVersion);
+	uint32 numProperties = dta->readUint32LE();
+	_schemaProperties.resize(numProperties);
+	for (uint i = 0; i < numProperties; ++i) {
+		CustomPropertySchemaProperty &property = _schemaProperties[i];
+		property._name = readString(dta);
+		property._description = readString(dta);
+		property._defaultValue = readString(dta);
+		property._type = dta->readUint32LE();
+		debug(7, "schema property '%s' ('%s'), default '%s'", property._name.c_str(),
+			property._description.c_str(), property._defaultValue.c_str());
+	}
+
+	// character properties
+	for (uint i = 0; i < _chars.size(); ++i) {
+		readProperties(dta, _chars[i]->_properties);
+	}
+
+	// inventory item properties
+	for (uint i = 0; i < _invItemInfo.size(); ++i) {
+		readProperties(dta, _invItemInfo[i]._properties);
+	}
+}
+
+void GameFile::readProperties(Common::SeekableReadStream *dta, Common::StringMap &map) {
+	uint32 propVersion = dta->readUint32LE();
+	if (propVersion != 1)
+		error("invalid properties version %d", propVersion);
+	uint32 numProperties = dta->readUint32LE();
+	for (uint i = 0; i < numProperties; ++i) {
+		Common::String key = readString(dta);
+		Common::String value = readString(dta);
+		map[key] = value;
+		debug(7, "property '%s'='%s'", key.c_str(), value.c_str());
+	}
 }
 
 } // End of namespace AGS

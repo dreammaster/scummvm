@@ -32,6 +32,7 @@ enum AGSVersion {
 	kAGSVer262 = 27,
 	kAGSVer270 = 31,
 	kAGSVer272 = 32,
+	kAGSVer300b = 36, // ???
 	kAGSVer300 = 37,
 	kAGSVer311 = 39,
 	kAGSVer312 = 40,

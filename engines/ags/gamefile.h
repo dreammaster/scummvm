@@ -24,6 +24,7 @@
 
 #include "ags/gui.h"
 #include "common/array.h"
+#include "common/hash-str.h"
 
 namespace AGS {
 
@@ -35,6 +36,9 @@ struct InventoryItemInfo {
 	uint32 _cursorPic;
 	uint32 _hotX, _hotY;
 	uint8 _flags;
+
+	Common::StringMap _properties;
+	Common::String _scriptName;
 };
 
 struct MouseCursor {
@@ -108,6 +112,8 @@ struct ViewLoopNew {
 
 struct ViewStruct {
 	Common::Array<ViewLoopNew> _loops;
+
+	Common::String _name;
 };
 
 struct CharacterInfo {
@@ -165,6 +171,8 @@ struct CharacterInfo {
 	Common::String _scriptName;
 
 	byte _on;
+
+	Common::StringMap _properties;
 };
 
 struct DialogOption {
@@ -179,6 +187,15 @@ struct DialogTopic {
 
 	uint16 _startupEntryPoint;
 	uint32 _flags;
+
+	Common::String _name;
+};
+
+struct CustomPropertySchemaProperty {
+	Common::String _name;
+	Common::String _description;
+	Common::String _defaultValue;
+	uint32 _type;
 };
 
 class AGSEngine;
@@ -199,7 +216,8 @@ private:
 	CharacterInfo *readCharacter(Common::SeekableReadStream *dta);
 	void readGui(Common::SeekableReadStream *dta);
 	void readPlugins(Common::SeekableReadStream *dta);
-	void readProperties(Common::SeekableReadStream *dta);
+	void readPropertyData(Common::SeekableReadStream *dta);
+	void readProperties(Common::SeekableReadStream *dta, Common::StringMap &map);
 	void setDefaultMessages();
 
 public:
@@ -282,6 +300,8 @@ public:
 	Common::Array<GUISlider *> _guiSliders;
 	Common::Array<GUITextBox *> _guiTextBoxes;
 	Common::Array<GUIListBox *> _guiListBoxes;
+
+	Common::Array<CustomPropertySchemaProperty> _schemaProperties;
 
 private:
 	AGSEngine *_vm;
