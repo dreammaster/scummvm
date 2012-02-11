@@ -66,6 +66,14 @@ enum AGSRoomVersion {
 
 // from acroom.h of AGS source
 
+#define MAX_SPRITES         30000
+#define MAX_CURSOR          20
+#define PAL_GAMEWIDE        0
+#define PAL_LOCKED          1
+#define PAL_BACKGROUND      2
+#define MAXGLOBALMES        500
+#define MAXLANGUAGE         5
+#define MAX_FONTS           15
 #define OPT_DEBUGMODE       0
 #define OPT_SCORESOUND      1
 #define OPT_WALKONLOOK      2
@@ -130,6 +138,34 @@ enum AGSRoomVersion {
 #define FONT_OUTLINE_AUTO -10
 
 #define LOOPFLAG_RUNNEXTLOOP 1
+
+// CharacterInfo
+#define MAX_INV             301
+#define CHF_MANUALSCALING   1
+#define CHF_FIXVIEW         2     // between SetCharView and ReleaseCharView
+#define CHF_NOINTERACT      4
+#define CHF_NODIAGONAL      8
+#define CHF_ALWAYSIDLE      0x10
+#define CHF_NOLIGHTING      0x20
+#define CHF_NOTURNING       0x40
+#define CHF_NOWALKBEHINDS   0x80
+#define CHF_FLIPSPRITE      0x100  // ?? Is this used??
+#define CHF_NOBLOCKING      0x200
+#define CHF_SCALEMOVESPEED  0x400
+#define CHF_NOBLINKANDTHINK 0x800
+#define CHF_SCALEVOLUME     0x1000
+#define CHF_HASTINT         0x2000   // engine only
+#define CHF_BEHINDSHEPHERD  0x4000   // engine only
+#define CHF_AWAITINGMOVE    0x8000   // engine only
+#define CHF_MOVENOTWALK     0x10000   // engine only - do not do walk anim
+#define CHF_ANTIGLIDE       0x20000
+// Speechcol is no longer part of the flags as of v2.5
+#define OCHF_SPEECHCOL      0xff000000
+#define OCHF_SPEECHCOLSHIFT 24
+#define UNIFORM_WALK_SPEED  0
+#define FOLLOW_ALWAYSONTOP  0x7ffe
+
+#define MAX_SCRIPT_NAME_LEN 20
 
 } // End of namespace AGS
 

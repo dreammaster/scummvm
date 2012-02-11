@@ -50,6 +50,17 @@ void GameFile::readVersion(Common::SeekableReadStream &dta) {
 	delete[] versionString;
 }
 
+static Common::String readString(Common::SeekableReadStream *dta) {
+	Common::String str;
+	while (true) {
+		char c = (char)dta->readByte();
+		if (!c)
+			break;
+		str += c;
+	}
+	return str;
+}
+
 void GameFile::decryptText(uint8 *str, uint32 max) {
 	static const char *kSecretPassword = "Avis Durgan";
 
@@ -79,6 +90,7 @@ Common::String GameFile::decryptString(Common::SeekableReadStream *dta) {
 }
 
 #define MAX_SCRIPT_MODULES 50
+#define MAXLIPSYNCFRAMES  20
 
 bool GameFile::init(const ResourceManager &resMan) {
 	Common::SeekableReadStream *dta = resMan.getFile("ac2game.dta");
@@ -159,7 +171,10 @@ bool GameFile::init(const ResourceManager &resMan) {
 	dta->skip(17 * 4);
 
 	// messages
-	dta->skip(500 * 4);
+	Common::Array<bool> hasMessages;
+	hasMessages.resize(MAXGLOBALMES);
+	for (uint i = 0; i < MAXGLOBALMES; i++)
+		hasMessages[i] = (bool)dta->readUint32LE();
 
 	// dict
 	bool hasDict = (bool)dta->readUint32LE();
@@ -334,8 +349,54 @@ bool GameFile::init(const ResourceManager &resMan) {
 		}
 	}
 
-	// numloops
-	// numframes[16]
+	_chars.resize(_charCount);
+	for (uint i = 0; i < _charCount; ++i)
+		_chars[i] = readCharacter(dta);
+
+	// FIXME: PSP version fixes up character script names here
+	// FIXME: PSP version fixes up ANTIGLIDE here
+
+	// FIXME: lip sync data
+	for (uint i = 0; i < MAXLIPSYNCFRAMES; ++i)
+		dta->skip(50);
+
+	_messages.resize(MAXGLOBALMES);
+	setDefaultMessages();
+	for (uint i = 0; i < MAXGLOBALMES; ++i) {
+		if (!hasMessages[i])
+			continue;
+
+		// global messages are not encrypted on < 2.61
+		if (_version < kAGSVer261)
+			_messages[i] = readString(dta);
+		else
+			_messages[i] = decryptString(dta);
+
+		debug(5, "message %d is '%s'", i, _messages[i].c_str());
+	}
+
+	// TODO: global messages
+	// TODO: global message defaults
+
+	// TODO: dialog topics
+
+	// TODO: dialog scripts
+
+	// TODO: gui
+	// TODO: gui labels
+
+	// TODO: prop schema
+	// TODO: char props
+	// TODO: inv props
+
+	// TODO: view names
+	// TODO: inv script names
+	// TODO: dialog script names
+
+	// TODO: audio clips
+
+	// TODO: room ids/names
+
 	delete dta;
 
 	return true;
@@ -443,6 +504,87 @@ ViewFrame GameFile::readViewFrame(Common::SeekableReadStream *dta) {
 	dta->skip(2 * 4); // reserved_for_future
 
 	return frame;
+}
+
+CharacterInfo *GameFile::readCharacter(Common::SeekableReadStream *dta) {
+	CharacterInfo *chr = new CharacterInfo();
+
+	chr->_defView = dta->readUint32LE();
+	chr->_talkView = dta->readUint32LE();
+	chr->_view = dta->readUint32LE();
+	chr->_room = dta->readUint32LE();
+	chr->_prevRoom = dta->readUint32LE();
+	chr->_x = dta->readUint32LE();
+	chr->_y = dta->readUint32LE();
+	chr->_wait = dta->readUint32LE();
+	chr->_flags = dta->readUint32LE();
+	chr->_following = dta->readUint16LE();
+	chr->_followInfo = dta->readUint16LE();
+	chr->_idleView = dta->readUint32LE();
+	chr->_idleTime = dta->readUint16LE();
+	chr->_idleLeft = dta->readUint16LE();
+	chr->_transparency = dta->readUint16LE();
+	chr->_baseLine = dta->readUint16LE();
+	chr->_activeInv = dta->readUint32LE();
+	chr->_talkColor = dta->readUint32LE();
+	chr->_thinkView = dta->readUint32LE();
+	chr->_blinkView = dta->readUint16LE();
+	chr->_blinkInterval = dta->readUint16LE();
+	chr->_blinkTimer = dta->readUint16LE();
+	chr->_blinkFrame = dta->readUint16LE();
+	chr->_walkSpeedY = dta->readUint16LE();
+	chr->_picYOffs = dta->readUint16LE();
+	chr->_z = dta->readUint32LE();
+	dta->skip(2 * 4); // reserved
+	chr->_blockingWidth = dta->readUint16LE();
+	chr->_blockingHeight = dta->readUint16LE();
+	chr->_indexId = dta->readUint32LE();
+	chr->_picXOffs = dta->readUint16LE();
+	chr->_walkWaitCounter = dta->readUint16LE();
+	chr->_loop = dta->readUint16LE();
+	chr->_frame = dta->readUint16LE();
+	chr->_walking = dta->readUint16LE();
+	chr->_animating = dta->readUint16LE();
+	chr->_walkSpeed = dta->readUint16LE();
+	chr->_animSpeed = dta->readUint16LE();
+	chr->_inventory.resize(MAX_INV);
+	for (uint i = 0; i < MAX_INV; ++i)
+		chr->_inventory[i] = dta->readUint16LE();
+	chr->_actX = dta->readUint16LE();
+	chr->_actY = dta->readUint16LE();
+
+	char ourName[41];
+	dta->read(ourName, 40);
+	ourName[40] = '\0';
+	chr->_name = ourName;
+
+	char scriptName[MAX_SCRIPT_NAME_LEN + 1];
+	dta->read(scriptName, MAX_SCRIPT_NAME_LEN);
+	scriptName[MAX_SCRIPT_NAME_LEN] = '\0';
+	chr->_scriptName = scriptName;
+
+	chr->_on = dta->readByte();
+	dta->skip(1); // padding
+
+	debug(2, "read char '%s', script name '%s'", ourName, scriptName);
+
+	return chr;
+}
+
+void GameFile::setDefaultMessages() {
+	_messages[483] = "Sorry, not now.";
+	_messages[484] = "Restore";
+	_messages[485] = "Cancel";
+	_messages[486] = "Select a game to restore:";
+	_messages[487] = "Save";
+	_messages[488] = "Type a name to save as:";
+	_messages[489] = "Replace";
+	_messages[490] = "The save directory is full. You must replace an existing game:";
+	_messages[491] = "Replace:";
+	_messages[492] = "With:";
+	_messages[493] = "Quit";
+	_messages[494] = "Play";
+	_messages[495] = "Are you sure you want to quit?";
 }
 
 } // End of namespace AGS

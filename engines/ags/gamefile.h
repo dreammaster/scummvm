@@ -109,6 +109,63 @@ struct ViewStruct {
 	Common::Array<ViewLoopNew> _loops;
 };
 
+struct CharacterInfo {
+	uint32 _defView, _talkView, _view;
+	uint32 _room, _prevRoom;
+
+	int32 _x, _y;
+
+	uint32 _wait;
+	uint32 _flags;
+
+	uint16 _following;
+	uint16 _followInfo;
+
+	uint32 _idleView; // the loop will be randomly picked
+	uint16 _idleTime, _idleLeft; // num seconds idle before playing anim
+
+	uint16 _transparency; // if character is transparent
+	uint16 _baseLine;
+
+	uint32 _activeInv;
+	uint32 _talkColor;
+	uint32 _thinkView;
+
+	uint16 _blinkView, _blinkInterval; // design time
+	uint16 _blinkTimer, _blinkFrame; // run time
+
+	uint16 _walkSpeedY, _picYOffs;
+
+	int32 _z;
+
+	uint32 _walkWait;
+
+	uint16 _speechAnimSpeed;
+	uint16 _blockingWidth, _blockingHeight;
+
+	uint32 _indexId; // used for object functions to know the id
+
+	uint16 _picXOffs;
+	uint16 _walkWaitCounter;
+
+	uint16 _loop;
+	uint16 _frame;
+
+	uint16 _walking;
+	uint16 _animating;
+
+	uint16 _walkSpeed, _animSpeed;
+
+	Common::Array<uint16> _inventory;
+
+	int16 _actX, _actY;
+
+	Common::String _name;
+	Common::String _scriptName;
+
+	byte _on;
+};
+
 class GameFile {
 public:
 	GameFile();
@@ -121,6 +178,8 @@ private:
 	NewInteraction *readNewInteraction(Common::SeekableReadStream *dta);
 	NewInteractionCommandList *readCommandList(Common::SeekableReadStream *dta);
 	ViewFrame readViewFrame(Common::SeekableReadStream *dta);
+	CharacterInfo *readCharacter(Common::SeekableReadStream *dta);
+	void setDefaultMessages();
 
 	uint32 _version;
 
@@ -184,6 +243,10 @@ private:
 	Common::Array<ccScript *> _scriptModules;
 
 	Common::Array<ViewStruct> _views;
+
+	Common::Array<Common::String> _messages;
+
+	Common::Array<CharacterInfo *> _chars;
 
 	void readVersion(Common::SeekableReadStream &dta);
 	void decryptText(uint8 *str, uint32 max);
