@@ -83,6 +83,14 @@ Common::Error AGSEngine::run() {
 	return Common::kNoError;
 }
 
+uint32 AGSEngine::getGameFileVersion() const {
+	return _gameFile->_version;
+}
+
+uint32 AGSEngine::getGUIVersion() const {
+	return _gameFile->_guiVersion;
+}
+
 Common::String AGSEngine::getMasterArchive() const {
 	const ADGameFileDescription *gameFiles = getGameFiles();
 
@@ -99,7 +107,7 @@ bool AGSEngine::init() {
 		return false;
 
 	// Load the game file
-	_gameFile = new GameFile();
+	_gameFile = new GameFile(this);
 	if (!_gameFile->init(*_resourceMan))
 		return false;
 

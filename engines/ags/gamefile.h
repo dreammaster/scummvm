@@ -22,6 +22,7 @@
 #ifndef AGS_GAMEFILE_H
 #define AGS_GAMEFILE_H
 
+#include "ags/gui.h"
 #include "common/array.h"
 
 namespace AGS {
@@ -180,9 +181,11 @@ struct DialogTopic {
 	uint32 _flags;
 };
 
+class AGSEngine;
+
 class GameFile {
 public:
-	GameFile();
+	GameFile(AGSEngine *vm);
 	~GameFile();
 
 	bool init(const ResourceManager &resMan);
@@ -194,6 +197,9 @@ private:
 	ViewFrame readViewFrame(Common::SeekableReadStream *dta);
 	void readOldViews(Common::SeekableReadStream *dta);
 	CharacterInfo *readCharacter(Common::SeekableReadStream *dta);
+	void readGui(Common::SeekableReadStream *dta);
+	void readPlugins(Common::SeekableReadStream *dta);
+	void readProperties(Common::SeekableReadStream *dta);
 	void setDefaultMessages();
 
 public:
@@ -267,10 +273,20 @@ public:
 	Common::Array<DialogTopic> _dialogs;
 	Common::Array<Common::String> _speechLines;
 
+	uint32 _guiVersion;
+	Common::Array<GUIGroup> _guiGroups;
+
+	Common::Array<GUIButton *> _guiButtons;
+	Common::Array<GUILabel *> _guiLabels;
+	Common::Array<GUIInvControl *> _guiInvControls;
+	Common::Array<GUISlider *> _guiSliders;
+	Common::Array<GUITextBox *> _guiTextBoxes;
+	Common::Array<GUIListBox *> _guiListBoxes;
+
 private:
+	AGSEngine *_vm;
+
 	void readVersion(Common::SeekableReadStream &dta);
-	void decryptText(uint8 *str, uint32 max);
-	Common::String decryptString(Common::SeekableReadStream *dta);
 };
 
 } // End of namespace AGS

@@ -27,10 +27,11 @@
 #include "ags/gamefile.h"
 #include "ags/resourceman.h"
 #include "ags/script.h"
+#include "ags/util.h"
 
 namespace AGS {
 
-GameFile::GameFile() {
+GameFile::GameFile(AGSEngine *vm) : _vm(vm) {
 }
 
 GameFile::~GameFile() {
@@ -48,45 +49,6 @@ void GameFile::readVersion(Common::SeekableReadStream &dta) {
 	_versionString = (const char *) versionString;
 
 	delete[] versionString;
-}
-
-static Common::String readString(Common::SeekableReadStream *dta) {
-	Common::String str;
-	while (true) {
-		char c = (char)dta->readByte();
-		if (!c)
-			break;
-		str += c;
-	}
-	return str;
-}
-
-void GameFile::decryptText(uint8 *str, uint32 max) {
-	static const char *kSecretPassword = "Avis Durgan";
-
-	uint passPos = 0;
-	while (max-- > 0) {
-		*str -= (uint8) kSecretPassword[passPos];
-		if (!*str)
-			break;
-
-		str++;
-
-		passPos = (passPos + 1) % 11;
-	}
-}
-
-Common::String GameFile::decryptString(Common::SeekableReadStream *dta) {
-	uint32 stringLen = dta->readUint32LE();
-	if (stringLen > 5000000)
-		error("invalid value in decryptString");
-	byte *string = new byte[stringLen + 1];
-	dta->read(string, stringLen);
-	string[stringLen] = 0;
-	decryptText(string, stringLen);
-	Common::String newString((char *)string);
-	delete[] string;
-	return newString;
 }
 
 #define MAX_SCRIPT_MODULES 50
@@ -410,12 +372,11 @@ bool GameFile::init(const ResourceManager &resMan) {
 			error("bad magic %x for GUI", magic);
 	}
 
-	// TODO: gui
-	// TODO: gui labels
+	readGui(dta);
 
-	// TODO: prop schema
-	// TODO: char props
-	// TODO: inv props
+	readPlugins(dta);
+
+	readProperties(dta);
 
 	// TODO: view names
 	// TODO: inv script names
@@ -650,6 +611,158 @@ void GameFile::setDefaultMessages() {
 	_messages[493] = "Quit";
 	_messages[494] = "Play";
 	_messages[495] = "Are you sure you want to quit?";
+}
+
+#define GUI_VERSION 115
+
+void GameFile::readGui(Common::SeekableReadStream *dta) {
+	_guiVersion = dta->readUint32LE();
+	uint32 guiCount;
+	if (_guiVersion < 100) {
+		guiCount = _guiVersion;
+	} else if (_guiVersion <= GUI_VERSION) {
+		guiCount = dta->readUint32LE();
+	} else {
+		error("GUI version %d is too new?", _guiVersion);
+	}
+
+	if (guiCount > 1000)
+		error("GUI is corrupt? (%d entries)", guiCount);
+
+	debug(2, "GUI version %d, with %d groups", _guiVersion, guiCount);
+
+	_guiGroups.resize(guiCount);
+	for (uint i = 0; i < guiCount; ++i) {
+		GUIGroup &group = _guiGroups[i];
+
+		dta->read(group._vText, 4);
+
+		char name[16 + 1];
+		dta->read(name, 16);
+		name[16] = '\0';
+		group._name = name;
+		if (_version <= kAGSVer272 && !group._name.empty()) {
+			// Fix names for 2.x: "GUI" -> "gGui"
+			group._name.toLowercase();
+			group._name.setChar(toupper(_guiGroups[i]._name[0]), 0);
+			group._name.insertChar('g', 0);
+		}
+		debug(4, "gui group '%s'", group._name.c_str());
+
+		char clickEventHandler[20 + 1];
+		dta->read(clickEventHandler, 20);
+		clickEventHandler[20] = '\0';
+		group._clickEventHandler = clickEventHandler;
+
+		group._x = dta->readUint32LE();
+		group._y = dta->readUint32LE();
+		group._width = dta->readUint32LE();
+		group._height = dta->readUint32LE();
+		group._focus = dta->readUint32LE();
+		uint32 objectsCount = dta->readUint32LE();
+		group._popup = dta->readUint32LE();
+		group._popupYP = dta->readUint32LE();
+		group._bgColor = dta->readUint32LE();
+		group._bgPic = dta->readUint32LE();
+		group._fgColor = dta->readUint32LE();
+		group._mouseOver = dta->readUint32LE();
+		group._mouseWasX = dta->readUint32LE();
+		group._mouseWasY = dta->readUint32LE();
+		group._mouseDownOn = dta->readUint32LE();
+		group._highlightObj = dta->readUint32LE();
+		group._flags = dta->readUint32LE();
+		group._transparency = dta->readUint32LE();
+		group._zorder = dta->readUint32LE();
+		group._id = dta->readUint32LE();
+		dta->skip(6 * 4); // reserved
+		group._on = dta->readUint32LE();
+
+		dta->skip(MAX_OBJS_ON_GUI * 4); // obj pointers
+		group._objectRefPtrs.resize(MAX_OBJS_ON_GUI);
+		for (uint j = 0; j < MAX_OBJS_ON_GUI; ++j)
+			group._objectRefPtrs[j] = dta->readUint32LE();
+
+		// fixes/upgrades
+		if (group._height < 2)
+			group._height = 2;
+		if (_guiVersion < 103)
+			group._name = Common::String::format("GUI%d", i);
+		if (_guiVersion < 105)
+			group._zorder = i;
+		group._id = i;
+	}
+
+	uint32 buttonCount = dta->readUint32LE();
+	_guiButtons.resize(buttonCount);
+	for (uint i = 0; i < buttonCount; ++i) {
+		_guiButtons[i] = new GUIButton(_vm);
+		_guiButtons[i]->readFrom(dta);
+	}
+
+	uint32 labelCount = dta->readUint32LE();
+	_guiLabels.resize(labelCount);
+	for (uint i = 0; i < labelCount; ++i) {
+		_guiLabels[i] = new GUILabel(_vm);
+		_guiLabels[i]->readFrom(dta);
+	}
+
+	uint32 invControlCount = dta->readUint32LE();
+	_guiInvControls.resize(invControlCount);
+	for (uint i = 0; i < invControlCount; ++i) {
+		_guiInvControls[i] = new GUIInvControl(_vm);
+		_guiInvControls[i]->readFrom(dta);
+	}
+
+	if (_guiVersion >= 100) {
+		uint32 sliderCount = dta->readUint32LE();
+		_guiSliders.resize(sliderCount);
+		for (uint i = 0; i < sliderCount; ++i) {
+			_guiSliders[i] = new GUISlider(_vm);
+			_guiSliders[i]->readFrom(dta);
+		}
+	}
+
+	if (_guiVersion >= 101) {
+		uint32 textboxCount = dta->readUint32LE();
+		_guiTextBoxes.resize(textboxCount);
+		for (uint i = 0; i < textboxCount; ++i) {
+			_guiTextBoxes[i] = new GUITextBox(_vm);
+			_guiTextBoxes[i]->readFrom(dta);
+		}
+	}
+
+	if (_guiVersion >= 102) {
+		uint32 listboxCount = dta->readUint32LE();
+		_guiListBoxes.resize(listboxCount);
+		for (uint i = 0; i < listboxCount; ++i) {
+			_guiListBoxes[i] = new GUIListBox(_vm);
+			_guiListBoxes[i]->readFrom(dta);
+		}
+	}
+
+	// TODO: setup the gui lookup array etc
+
+	// TODO: draw order?
+}
+
+void GameFile::readPlugins(Common::SeekableReadStream *dta) {
+	uint pluginsVersion = dta->readUint32LE();
+	if (pluginsVersion != 1)
+		error("invalid plugins version %d", pluginsVersion);
+	uint32 pluginsCount = dta->readUint32LE();
+
+	for (uint i = 0; i < pluginsCount; ++i) {
+		Common::String name = readString(dta);
+		warning("ignoring plugin '%s'", name.c_str());
+		uint32 pluginSize = dta->readUint32LE();
+		dta->skip(pluginSize);
+	}
+}
+
+void GameFile::readProperties(Common::SeekableReadStream *dta) {
+	// TODO: prop schema
+	// TODO: char props
+	// TODO: inv props
 }
 
 } // End of namespace AGS
