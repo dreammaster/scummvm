@@ -142,12 +142,12 @@ bool GameFile::init(const ResourceManager &resMan) {
 	_invItemCount = dta->readUint16LE();
 	dta->skip(2); // padding
 
-	debug(2, "%d views, %d characters, %d player characters, %d inventory items",
-		_viewCount, _charCount, _playerChars, _invItemCount);
-
 	_dialogCount = dta->readUint32LE();
 	_dlgMsgCount = dta->readUint32LE();
 	_fontCount = dta->readUint32LE();
+
+	debug(2, "%d views, %d characters, %d player characters, %d inventory items, %d dialog topics",
+		_viewCount, _charCount, _playerChars, _invItemCount, _dialogCount);
 
 	_colorDepth = dta->readUint32LE();
 
@@ -375,9 +375,74 @@ bool GameFile::init(const ResourceManager &resMan) {
 		debug(5, "message %d is '%s'", i, _messages[i].c_str());
 	}
 
-	// TODO: dialog topics
+	// dialog topics
+	Common::Array<uint16> dialogCodeSizes;
+	_dialogs.resize(_dialogCount);
+	dialogCodeSizes.resize(_dialogCount);
+	for (uint i = 0; i < _dialogCount; ++i) {
+		char optionNames[MAXTOPICOPTIONS][150 + 1];
+		for (uint j = 0; j < MAXTOPICOPTIONS; ++j) {
+			dta->read(optionNames[j], 150);
+			optionNames[j][150] = '\0';
+		}
+		int optionFlags[MAXTOPICOPTIONS];
+		for (uint j = 0; j < MAXTOPICOPTIONS; ++j)
+			optionFlags[j] = dta->readUint32LE();
+		bool hasScripts = (bool)dta->readUint32LE();
+		uint16 entryPoints[MAXTOPICOPTIONS];
+		for (uint j = 0; j < MAXTOPICOPTIONS; ++j)
+			entryPoints[j] = dta->readUint16LE();
+		_dialogs[i]._startupEntryPoint = dta->readUint16LE();
+		dialogCodeSizes[i] = dta->readUint16LE();
+		uint32 numOptions = dta->readUint32LE();
+		_dialogs[i]._flags = dta->readUint32LE();
 
-	// TODO: dialog scripts
+		if (numOptions > MAXTOPICOPTIONS)
+			error("too many options (%d) in dialog topic", numOptions);
+		_dialogs[i]._options.resize(numOptions);
+		for (uint j = 0; j < numOptions; ++j) {
+			_dialogs[i]._options[j]._name = optionNames[j];
+			_dialogs[i]._options[j]._flags = optionFlags[j];
+			_dialogs[i]._options[j]._entryPoint = entryPoints[j];
+			debug(5, "dialog option '%s'", optionNames[j]);
+		}
+	}
+
+	if (_version <= kAGSVer300) {
+		// <= 3.0: dialog scripts
+		for (uint i = 0; i < _dialogCount; ++i) {
+			if (dialogCodeSizes[i] == 0)
+				continue;
+
+			_dialogs[i]._code.resize(dialogCodeSizes[i]);
+			dta->read(&_dialogs[i]._code[0], dialogCodeSizes[i]);
+
+			// we can just discard this..
+			Common::String dialogTextScript = decryptString(dta);
+			debug(9, "dialog script text was %s", dialogTextScript.c_str());
+		}
+
+		while (true) {
+			uint32 stringLen = dta->readUint32LE();
+			if (dta->eos())
+				error("corrupt data file while reading speech lines");
+			if (stringLen == 0xcafebeef)
+				break;
+
+			byte *string = new byte[stringLen + 1];
+			dta->read(string, stringLen);
+			string[stringLen] = 0;
+			decryptText(string, stringLen);
+			_speechLines.push_back(Common::String((char *)string));
+			delete[] string;
+
+			debug(5, "speech line '%s'", _speechLines.back().c_str());
+		}
+	} else {
+		uint32 magic = dta->readUint16LE();
+		if (magic != 0xcafebeef)
+			error("bad magic %x for GUI", magic);
+	}
 
 	// TODO: gui
 	// TODO: gui labels

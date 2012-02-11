@@ -166,6 +166,20 @@ struct CharacterInfo {
 	byte _on;
 };
 
+struct DialogOption {
+	Common::String _name;
+	uint32 _flags;
+	uint16 _entryPoint;
+};
+
+struct DialogTopic {
+	Common::Array<DialogOption> _options;
+	Common::Array<byte> _code;
+
+	uint16 _startupEntryPoint;
+	uint32 _flags;
+};
+
 class GameFile {
 public:
 	GameFile();
@@ -248,6 +262,9 @@ public:
 	Common::Array<Common::String> _messages;
 
 	Common::Array<CharacterInfo *> _chars;
+
+	Common::Array<DialogTopic> _dialogs;
+	Common::Array<Common::String> _speechLines;
 
 private:
 	void readVersion(Common::SeekableReadStream &dta);
