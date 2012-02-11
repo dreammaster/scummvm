@@ -181,6 +181,7 @@ private:
 	CharacterInfo *readCharacter(Common::SeekableReadStream *dta);
 	void setDefaultMessages();
 
+public:
 	uint32 _version;
 
 	Common::String _versionString;
@@ -248,6 +249,7 @@ private:
 
 	Common::Array<CharacterInfo *> _chars;
 
+private:
 	void readVersion(Common::SeekableReadStream &dta);
 	void decryptText(uint8 *str, uint32 max);
 	Common::String decryptString(Common::SeekableReadStream *dta);

@@ -375,9 +375,6 @@ bool GameFile::init(const ResourceManager &resMan) {
 		debug(5, "message %d is '%s'", i, _messages[i].c_str());
 	}
 
-	// TODO: global messages
-	// TODO: global message defaults
-
 	// TODO: dialog topics
 
 	// TODO: dialog scripts

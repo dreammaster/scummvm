@@ -32,6 +32,7 @@
 
 // AGS subsystems
 #include "ags/ags.h"
+#include "ags/constants.h"
 #include "ags/resourceman.h"
 #include "ags/gamefile.h"
 
@@ -39,7 +40,7 @@ namespace AGS {
 
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
-	_width(0), _height(0), _resourceMan(0) {
+	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false) {
 
 	_rnd = new Common::RandomSource("ags");
 }
@@ -110,7 +111,6 @@ bool AGSEngine::init() {
 	if (!initGraphics())
 		return false;
 
-
 	syncSoundSettings();
 
 	_engineStartTime = g_system->getMillis();
@@ -119,8 +119,40 @@ bool AGSEngine::init() {
 }
 
 bool AGSEngine::getScreenSize() {
-	_width  = 320;
-	_height = 200;
+	_baseWidth = 320;
+	_baseHeight = 200;
+	_textMultiply = 2;
+
+	switch (_gameFile->_defaultResolution) {
+	case 0:
+		_textMultiply = 1;
+		break;
+	case 1:
+	case 2:
+		_width = 640;
+		_height = 480;
+		break;
+	case 3:
+	case 4:
+		_width = 640;
+		_height = 400;
+		break;
+	case 5:
+		_baseWidth = 400;
+		_baseHeight = 300;
+		break;
+	default:
+		_baseWidth = 512;
+		_baseHeight = 384;
+		break;
+	}
+
+	if (_gameFile->_defaultResolution >= 5) {
+		_width = _baseWidth * 2;
+		_height = _baseHeight * 2;
+		_gameFile->_options[OPT_LETTERBOX] = 0;
+		_forceLetterbox = false;
+	}
 
 	return true;
 }
