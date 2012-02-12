@@ -200,6 +200,33 @@ enum AGSRoomVersion {
 #define DCHAR_PLAYER    998
 #define MAX_DIALOG          500
 
+// MouseCursor
+#define MCF_ANIMMOVE 1
+#define MCF_DISABLED 2
+#define MCF_STANDARD 4
+#define MCF_HOTSPOT  8  // only animate when over hotspot
+
+#define CHANIM_REPEAT    2
+#define CHANIM_BACKWARDS 4
+#define ANIM_BACKWARDS 10
+#define ANIM_ONCE      1
+#define ANIM_REPEAT    2
+#define ANIM_ONCERESET 3
+#define FONT_STATUSBAR  0
+#define FONT_NORMAL     play.normal_font
+//#define FONT_SPEECHBACK 1
+#define FONT_SPEECH     play.speech_font
+#define MODE_WALK 0
+#define MODE_LOOK 1
+#define MODE_HAND 2
+#define MODE_TALK 3
+#define MODE_USE  4
+#define MODE_PICKUP 5
+#define CURS_ARROW  6
+#define CURS_WAIT   7
+#define MODE_CUSTOM1 8
+#define MODE_CUSTOM2 9
+
 } // End of namespace AGS
 
 #endif // AGS_CONSTANTS_H

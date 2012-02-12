@@ -185,8 +185,8 @@ bool GameFile::init() {
 
 		info._pic = dta->readUint32LE();
 		info._cursorPic = dta->readUint32LE();
-		info._hotX = dta->readUint32LE();
-		info._hotY = dta->readUint32LE();
+		info._hotspotX = dta->readUint32LE();
+		info._hotspotY = dta->readUint32LE();
 		dta->skip(5 * 4); // reserved
 		info._flags = dta->readByte();
 		dta->skip(3); // padding
@@ -198,8 +198,8 @@ bool GameFile::init() {
 		MouseCursor &cursor = _cursors[i];
 
 		cursor._pic = dta->readUint32LE();
-		cursor._hotX = dta->readUint16LE();
-		cursor._hotY = dta->readUint16LE();
+		cursor._hotspotX = dta->readUint16LE();
+		cursor._hotspotY = dta->readUint16LE();
 		cursor._view = dta->readSint16LE();
 
 		char cursorName[11];

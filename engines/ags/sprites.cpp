@@ -150,4 +150,9 @@ bool SpriteSet::loadSpriteIndexFile(uint32 spriteFileID) {
 	return true;
 }
 
+Sprite *SpriteSet::getSprite(uint32 spriteId) {
+	// FIXME
+	return NULL;
+}
+
 } // End of namespace AGS

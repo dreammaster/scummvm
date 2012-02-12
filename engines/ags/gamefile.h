@@ -38,7 +38,7 @@ struct InventoryItemInfo {
 	Common::String _name;
 	uint32 _pic;
 	uint32 _cursorPic;
-	uint32 _hotX, _hotY;
+	uint32 _hotspotX, _hotspotY;
 	uint8 _flags;
 
 	Common::StringMap _properties;
@@ -47,7 +47,7 @@ struct InventoryItemInfo {
 
 struct MouseCursor {
 	uint32 _pic;
-	uint16 _hotX, _hotY;
+	uint16 _hotspotX, _hotspotY;
 	int16 _view;
 	Common::String _name;
 	uint8 _flags;

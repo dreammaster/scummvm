@@ -45,7 +45,8 @@ namespace AGS {
 
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
-	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false) {
+	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true),
+	_mouseFrame(0), _mouseDelay(0) {
 
 	_rnd = new Common::RandomSource("ags");
 }
@@ -84,6 +85,10 @@ const ADGameFileDescription *AGSEngine::getGameFiles() const {
 Common::Error AGSEngine::run() {
 	if (!init())
 		return Common::kUnknownError;
+
+	setCursorMode(MODE_WALK);
+	// FIXME: filter->setMousePosition(160, 100);
+	// FIXME: newMusic(0);
 
 	return Common::kNoError;
 }
@@ -190,6 +195,123 @@ bool AGSEngine::initGraphics() {
 
 void AGSEngine::pauseEngineIntern(bool pause) {
 	_mixer->pauseAll(pause);
+}
+
+// reset the visible cursor to the one for the current mode
+void AGSEngine::setDefaultCursor() {
+	setMouseCursor(_cursorMode);
+}
+
+// TODO: rename to something which indicates it sets too?
+uint AGSEngine::findNextEnabledCursor(uint32 startWith) {
+	if (startWith >= _gameFile->_cursors.size())
+		startWith = 0;
+
+	// loop through all cursors until we find one we can use
+	uint32 testing = startWith;
+	do {
+		if (!(_gameFile->_cursors[testing]._flags & MCF_DISABLED)) {
+			if (testing == MODE_USE) {
+				// inventory cursor - use it if the player has an active item
+				// FIXME: inventory logic
+				// if (_playerChar->_activeInv != 0xffffffff)
+				// 	break;
+			} else if (_gameFile->_cursors[testing]._flags & MCF_STANDARD) {
+				// standard enabled cursor - use this one
+				break;
+			}
+		}
+
+		if (++testing >= _gameFile->_cursors.size())
+			testing = 0;
+	} while (testing != startWith);
+
+	if (testing != startWith)
+		setCursorMode(testing);
+
+	return testing;
+}
+
+void AGSEngine::setCursorMode(uint32 newMode) {
+	if (newMode >= _gameFile->_cursors.size())
+		error("setCursorMode: invalid cursor mode %d (only %d cursors)", newMode, _gameFile->_cursors.size());
+	_needsUpdate = true;
+
+	if (_gameFile->_cursors[newMode]._flags & MCF_DISABLED) {
+		findNextEnabledCursor(newMode);
+		return;
+	}
+
+	if (newMode == MODE_USE) {
+		// FIXME: inventory logic
+		// if (_playerChar->_activeInv == 0xffffffff) {
+		// 	findNextEnabledCursor(0);
+		// 	return;
+		// }
+		// updateInvCursor(_playerChar->_activeInv);
+	}
+
+	_cursorMode = newMode;
+	setDefaultCursor();
+
+	debug(1, "cursor mode set to %d", newMode);
+}
+
+void AGSEngine::setMouseCursor(uint32 cursor) {
+	assert(cursor < _gameFile->_cursors.size());
+
+	MouseCursor &cursorInfo = _gameFile->_cursors[cursor];
+
+	setCursorGraphic(cursorInfo._pic);
+	/* FIXME if (_dottedMouseCursor) {
+		delete _dottedMouseCursor;
+		_dottedMouseCursor = NULL;
+	} */
+
+	if ((cursor == MODE_USE) && cursorInfo._pic && (_gameFile->_hotDot || _gameFile->_invHotDotSprite)) {
+		// create a copy of cursor with the hotspot dot onto it, if needed
+		/* FIXME: duplicate active mouse cursor onto _dottedMouseCursor */
+
+		if (_gameFile->_invHotDotSprite) {
+			// FIXME: draw invHotDotSprite centered on hotspot
+		} else {
+			// FIXME: draw pixel
+			if (_gameFile->_hotDotOuter) {
+				// FIXME: draw pixels
+			}
+		}
+
+		// FIXME: replace active mouse cursor with _dottedMouseCursor
+		updateCachedMouseCursor();
+	}
+
+	mouseSetHotspot(cursorInfo._hotspotX, cursorInfo._hotspotY);
+
+	if (cursor != _currentCursor) {
+		_currentCursor = cursor;
+		_mouseFrame = 0;
+		_mouseDelay = 0;
+	}
+}
+
+void AGSEngine::setCursorGraphic(uint32 spriteId) {
+	_cursorSprite = _sprites->getSprite(spriteId);
+
+	if (!spriteId || !_cursorSprite) {
+		// FIXME
+	}
+
+	_alphaBlendCursor = (bool)(_gameFile->_spriteFlags[spriteId] & SPF_ALPHACHANNEL);
+
+	updateCachedMouseCursor();
+}
+
+void AGSEngine::updateCachedMouseCursor() {
+	// FIXME: set the mouse cursor
+}
+
+void AGSEngine::mouseSetHotspot(uint32 x, uint32 y) {
+	// FIXME: set the hotspot!
 }
 
 } // End of namespace AGS

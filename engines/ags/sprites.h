@@ -42,6 +42,8 @@ class SpriteSet {
 public:
 	SpriteSet(AGSEngine *vm, Common::SeekableReadStream *stream);
 
+	Sprite *getSprite(uint32 spriteId);
+
 protected:
 	AGSEngine *_vm;
 	Common::SeekableReadStream *_stream;

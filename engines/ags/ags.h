@@ -44,6 +44,7 @@ struct AGSGameDescription;
 
 class ResourceManager;
 class GameFile;
+class Sprite;
 class SpriteSet;
 
 class AGSEngine : public Engine {
@@ -62,6 +63,15 @@ public:
 
 	Common::SeekableReadStream *getFile(const Common::String &filename) const;
 
+	void setDefaultCursor();
+	uint32 findNextEnabledCursor(uint32 startWith);
+	void setCursorMode(uint32 newMode);
+	void setMouseCursor(uint32 cursor);
+
+	void setCursorGraphic(uint32 spriteId);
+	void mouseSetHotspot(uint32 x, uint32 y);
+	void updateCachedMouseCursor();
+
 private:
 	const AGSGameDescription *_gameDescription;
 
@@ -78,6 +88,14 @@ private:
 	ResourceManager *_resourceMan;
 	GameFile *_gameFile;
 	SpriteSet *_sprites;
+
+	bool _needsUpdate;
+	uint32 _cursorMode;
+
+	Sprite *_cursorSprite;
+	bool _alphaBlendCursor;
+	uint32 _currentCursor;
+	uint32 _mouseFrame, _mouseDelay;
 
 	Common::String getMasterArchive() const;
 
