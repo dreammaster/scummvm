@@ -257,7 +257,7 @@ bool GameFile::init(const ResourceManager &resMan) {
 	if (_version >= kAGSVer270) {
 		// 2.7.0+ script modules
 		uint32 scriptModuleCount = dta->readUint32LE();
-		if (scriptModuleCount >= MAX_SCRIPT_MODULES)
+		if (scriptModuleCount > MAX_SCRIPT_MODULES)
 			error("too many script modules (%d)", scriptModuleCount);
 
 		_scriptModules.resize(scriptModuleCount);
@@ -441,7 +441,7 @@ NewInteraction *GameFile::readNewInteraction(Common::SeekableReadStream *dta) {
 	NewInteraction *interaction = new NewInteraction();
 
 	uint32 numEvents = dta->readUint32LE();
-	if (numEvents >= MAX_NEWINTERACTION_EVENTS)
+	if (numEvents > MAX_NEWINTERACTION_EVENTS)
 		error("too many new interaction events (%d)", numEvents);
 	interaction->_events.resize(numEvents);
 	for (uint32 i = 0; i < numEvents; i++) {
@@ -525,7 +525,7 @@ void GameFile::readOldViews(Common::SeekableReadStream *dta) {
 		uint16 numFrames[16];
 		for (uint i = 0; i < 16; ++i) {
 			numFrames[i] = dta->readUint16LE();
-			if (numFrames[i] >= 20)
+			if (numFrames[i] > 20)
 				error("too many frames (%d) in 2.x view", numFrames[i]);
 		}
 		dta->skip(2); // padding

@@ -52,14 +52,16 @@ void ccScript::readFrom(Common::SeekableReadStream *dta) {
 	uint32 stringsSize = dta->readUint32LE();
 
 	_globalData.resize(globalDataSize);
-	dta->read(&_globalData[0], globalDataSize);
+	if (globalDataSize)
+		dta->read(&_globalData[0], globalDataSize);
 
 	_code.resize(codeSize);
 	for (uint i = 0; i < codeSize; ++i)
 		_code[i] = dta->readUint32LE();
 
 	_strings.resize(stringsSize);
-	dta->read(&_strings[0], stringsSize);
+	if (stringsSize)
+		dta->read(&_strings[0], stringsSize);
 
 	uint32 fixupsCount = dta->readUint32LE();
 	_fixups.resize(fixupsCount);
