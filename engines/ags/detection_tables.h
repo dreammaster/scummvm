@@ -21,6 +21,10 @@
 
 #include "ags/detection.h"
 
+/* Based on the Adventure Game Studio source code, copyright 1999-2011 Chris Jones,
+ * which is licensed under the Artistic License 2.0.
+ */
+
 namespace AGS {
 
 static const PlainGameDescriptor GAMES[] = {
