@@ -38,6 +38,7 @@
 #include "ags/ags.h"
 #include "ags/constants.h"
 #include "ags/resourceman.h"
+#include "ags/sprites.h"
 #include "ags/gamefile.h"
 
 namespace AGS {
@@ -95,6 +96,10 @@ uint32 AGSEngine::getGUIVersion() const {
 	return _gameFile->_guiVersion;
 }
 
+Common::SeekableReadStream *AGSEngine::getFile(const Common::String &filename) const {
+	return _resourceMan->getFile(filename);
+}
+
 Common::String AGSEngine::getMasterArchive() const {
 	const ADGameFileDescription *gameFiles = getGameFiles();
 
@@ -112,8 +117,13 @@ bool AGSEngine::init() {
 
 	// Load the game file
 	_gameFile = new GameFile(this);
-	if (!_gameFile->init(*_resourceMan))
+	if (!_gameFile->init())
 		return false;
+
+	Common::SeekableReadStream *spritesStream = getFile("acsprset.spr");
+	if (!spritesStream)
+		return false;
+	_sprites = new SpriteSet(this, spritesStream);
 
 	// Init graphics
 

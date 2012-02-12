@@ -209,7 +209,7 @@ public:
 	GameFile(AGSEngine *vm);
 	~GameFile();
 
-	bool init(const ResourceManager &resMan);
+	bool init();
 
 private:
 	InteractionVariable readInteractionVariable(Common::SeekableReadStream *dta);

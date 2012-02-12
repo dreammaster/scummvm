@@ -27,9 +27,9 @@
 #include "common/stream.h"
 #include "common/textconsole.h"
 
+#include "ags/ags.h"
 #include "ags/constants.h"
 #include "ags/gamefile.h"
-#include "ags/resourceman.h"
 #include "ags/script.h"
 #include "ags/util.h"
 
@@ -58,10 +58,8 @@ void GameFile::readVersion(Common::SeekableReadStream &dta) {
 #define MAX_SCRIPT_MODULES 50
 #define MAXLIPSYNCFRAMES  20
 
-bool GameFile::init(const ResourceManager &resMan) {
-	Common::SeekableReadStream *dta = resMan.getFile("ac2game.dta");
-	if (!dta)
-		return false;
+bool GameFile::init() {
+	Common::SeekableReadStream *dta = _vm->getFile("ac2game.dta");
 
 	dta->skip(30); // "Adventure Creator Game File v2"
 

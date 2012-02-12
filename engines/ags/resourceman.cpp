@@ -23,6 +23,7 @@
  * which is licensed under the Artistic License 2.0.
  */
 
+#include "common/debug.h"
 #include "common/endian.h"
 #include "common/stream.h"
 #include "common/textconsole.h"
@@ -294,6 +295,7 @@ bool ResourceManager::readArchiveList_v10(MasterArchive &master) {
 			decryptText(fileName, 25);
 
 		file->name = (const char *) fileName;
+		debug(5, "file %s", fileName);
 	}
 
 	// File offsets

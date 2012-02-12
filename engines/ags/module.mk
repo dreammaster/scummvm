@@ -8,6 +8,7 @@ MODULE_OBJS := \
 	metaengine.o \
 	resourceman.o \
 	script.o \
+	sprites.o \
 	util.o
 
 # This module can be built as a plugin
