@@ -83,6 +83,8 @@ void ccScript::readFrom(Common::SeekableReadStream *dta) {
 	for (uint i = 0; i < fixupsCount; ++i) {
 		// this is the code array index (i.e. not bytes)
 		uint32 fixupIndex = dta->readUint32LE();
+		if (fixupIndex >= _code.size())
+			error("fixup for %d is beyond code size %d", fixupIndex, _code.size());
 
 		if (fixupTypes[i] == FIXUP_DATADATA) {
 			// patch to global data
@@ -108,6 +110,14 @@ void ccScript::readFrom(Common::SeekableReadStream *dta) {
 	for (uint i = 0; i < importsCount; ++i) {
 		_imports[i] = readString(dta);
 		debug(5, "script import '%s'", _imports[i].c_str());
+	}
+
+	for (uint i = 0; i < _code.size(); ++i) {
+		if (_code[i]._fixupType == FIXUP_IMPORT) {
+			uint32 importId = _code[i]._data;
+			if (importId >= _imports.size())
+				error("invalid fixup import (at %d, for import %d)", i, importId);
+		}
 	}
 
 	uint32 exportsCount = dta->readUint32LE();
@@ -261,11 +271,11 @@ static InstructionInfo instructionInfo[NUM_INSTRUCTIONS + 1] = {
 	{ "$add", 2, iatRegisterInt, iatInteger },
 	{ "$sub", 2, iatRegisterInt, iatInteger },
 	{ "$$mov", 2, iatRegister, iatRegister },
-	{ "memwritelit", 2, iatAny, iatAny }, // TODO
+	{ "memwritelit", 2, iatInteger, iatAny },
 	{ "ret", 0, iatNone, iatNone },
 	{ "$mov", 2, iatRegister, iatAny },
-	{ "$memread", 1, iatAny, iatAny }, // TODO
-	{ "$memwrite", 1, iatAny, iatAny }, // TODO
+	{ "$memread", 1, iatRegister, iatNone },
+	{ "$memwrite", 1, iatRegister, iatNone },
 	{ "$$mul", 2, iatRegisterInt, iatRegisterInt },
 	{ "$$div", 2, iatRegisterInt, iatRegisterInt },
 	{ "$$add", 2, iatRegisterInt, iatRegisterInt },
@@ -280,21 +290,21 @@ static InstructionInfo instructionInfo[NUM_INSTRUCTIONS + 1] = {
 	{ "$$lte", 2, iatRegisterInt, iatRegisterInt },
 	{ "$$and", 2, iatRegisterInt, iatRegisterInt },
 	{ "$$or", 2, iatRegisterInt, iatRegisterInt },
-	{ "$call", 1, iatAny, iatAny }, // TODO
-	{ "$memread.b", 1, iatAny, iatAny }, // TODO
-	{ "$memread.w", 1, iatAny, iatAny }, // TODO
-	{ "$memwrite.b", 1, iatAny, iatAny }, // TODO
-	{ "$memwrite.w", 1, iatAny, iatAny }, // TODO
+	{ "$call", 1, iatRegister, iatNone },
+	{ "$memread.b", 1, iatRegister, iatNone },
+	{ "$memread.w", 1, iatRegister, iatNone },
+	{ "$memwrite.b", 1, iatRegister, iatNone },
+	{ "$memwrite.w", 1, iatRegister, iatNone },
 	{ "jz", 1, iatInteger, iatNone },
 	{ "$push", 1, iatRegister, iatNone },
 	{ "$pop", 1, iatRegister, iatNone },
 	{ "jmp", 1, iatInteger, iatNone },
 	{ "$mul", 2, iatRegister, iatInteger },
-	{ "$farcall", 1, iatAny, iatAny }, // TODO
-	{ "$farpush", 1, iatAny, iatAny }, // TODO
-	{ "farsubsp", 1, iatAny, iatAny }, // TODO
+	{ "$farcall", 1, iatAny, iatNone }, // TODO
+	{ "$farpush", 1, iatAny, iatNone }, // TODO
+	{ "farsubsp", 1, iatAny, iatNone }, // TODO
 	{ "sourceline", 1, iatInteger, iatNone },
-	{ "$callscr", 1, iatAny, iatAny }, // TODO
+	{ "$callscr", 1, iatAny, iatNone }, // TODO
 	{ "thisaddr", 1, iatInteger, iatNone },
 	{ "setfuncargs", 1, iatInteger, iatNone },
 	{ "$$mod", 2, iatRegisterInt, iatRegisterInt },
@@ -302,13 +312,13 @@ static InstructionInfo instructionInfo[NUM_INSTRUCTIONS + 1] = {
 	{ "$not", 1, iatRegisterInt, iatRegisterInt },
 	{ "$$shl", 2, iatRegisterInt, iatRegisterInt },
 	{ "$$shr", 2, iatRegisterInt, iatRegisterInt },
-	{ "$callobj", 1, iatAny, iatAny }, // TODO
+	{ "$callobj", 1, iatAny, iatNone }, // TODO
 	{ "$checkbounds", 2, iatRegisterInt, iatInteger },
-	{ "$memwrite.ptr", 1, iatAny, iatAny }, // TODO
-	{ "$memread.ptr", 1, iatAny, iatAny }, // TODO
-	{ "memwrite.ptr.0", 0, iatAny, iatAny }, // TODO
-	{ "$meminit.ptr", 1, iatAny, iatAny }, // TODO
-	{ "load.sp.offs", 1, iatAny, iatAny }, // TODO
+	{ "$memwrite.ptr", 1, iatAny, iatNone }, // TODO
+	{ "$memread.ptr", 1, iatAny, iatNone }, // TODO
+	{ "memwrite.ptr.0", 0, iatNone, iatNone },
+	{ "$meminit.ptr", 1, iatAny, iatNone }, // TODO
+	{ "load.sp.offs", 1, iatAny, iatNone }, // TODO
 	{ "checknull.ptr", 0, iatNone, iatNone },
 	{ "$f.add", 2, iatRegisterFloat, iatRegisterFloat },
 	{ "$f.sub", 2, iatRegisterFloat, iatRegisterFloat },
@@ -320,19 +330,22 @@ static InstructionInfo instructionInfo[NUM_INSTRUCTIONS + 1] = {
 	{ "$$f.lt", 2, iatRegisterFloat, iatRegisterFloat },
 	{ "$$f.gte", 2, iatRegisterFloat, iatRegisterFloat },
 	{ "$$f.lte", 2, iatRegisterFloat, iatRegisterFloat },
-	{ "zeromem", 1, iatAny, iatAny }, // TODO
-	{ "$newstring", 1, iatAny, iatAny }, // TODO
+	{ "zeromem", 1, iatAny, iatNone }, // TODO
+	{ "$newstring", 1, iatAny, iatNone }, // TODO
 	{ "$$strcmp", 2, iatAny, iatAny }, // TODO
 	{ "$$strnotcmp", 2, iatAny, iatAny }, // TODO
-	{ "$checknull", 1, iatAny, iatAny }, // TODO
+	{ "$checknull", 1, iatAny, iatNone }, // TODO
 	{ "loopcheckoff", 0, iatNone, iatNone },
 	{ "memwrite.ptr.0.nd", 0, iatNone, iatNone },
 	{ "jnz", 1, iatInteger, iatNone },
-	{ "$dynamicbounds", 1, iatAny, iatAny }, // TODO
+	{ "$dynamicbounds", 1, iatAny, iatNone }, // TODO
 	{ "$newarray", 3, iatAny, iatAny } // TODO
 };
 
 static const char *regnames[] = { "null", "sp", "mar", "ax", "bx", "cx", "op", "dx" };
+
+#define MAX_FUNC_PARAMS 20 // maximum size of externalStack
+#define MAXNEST 50 // number of recursive function calls allowed
 
 void ccInstance::runCodeFrom(uint32 start) {
 	assert(start < _script->_code.size());
@@ -341,6 +354,9 @@ void ccInstance::runCodeFrom(uint32 start) {
 
 	// this allows scripts to disable the loop iteration sanity check
 	uint32 loopIterationCheckDisabledCount = 0;
+
+	Common::Stack<RuntimeValue> externalStack;
+	uint32 funcArgumentCount = 0xffffffff;
 
 	Common::Stack<uint32> currentBase;
 	currentBase.push(0);
@@ -361,7 +377,6 @@ void ccInstance::runCodeFrom(uint32 start) {
 		debugN(2, "%s", info.name);
 
 		ScriptCodeEntry arg[2];
-		uint32 intVal[2] = { 0, 0 };
 		RuntimeValue argVal[2];
 		for (uint v = 0; v < neededArgs && v < 2; ++v) {
 			arg[v] = code[_pc + 1 + v];
@@ -374,22 +389,30 @@ void ccInstance::runCodeFrom(uint32 start) {
 			argVal[v]._value = arg[v]._data;
 			switch (arg[v]._fixupType) {
 			case FIXUP_NONE:
-				debugN(2, " %d", argVal[v]._value);
+				if (argType == iatRegister || argType == iatRegisterInt || argType == iatRegisterFloat)
+					debugN(2, " reg%d", argVal[v]._value);
+				else
+					debugN(2, " %d", argVal[v]._value);
 				break;
 			case FIXUP_GLOBALDATA:
 				argVal[v]._type = rvtGlobalData;
+				debugN(2, " data@%d", argVal[v]._value);
 				break;
 			case FIXUP_FUNCTION:
 				argVal[v]._type = rvtFunction;
+				debugN(2, " func@%d", argVal[v]._value);
 				break;
 			case FIXUP_STRING:
 				argVal[v]._type = rvtString;
+				debugN(2, " string@%d", argVal[v]._value);
 				break;
 			case FIXUP_IMPORT:
 				argVal[v]._type = rvtImport;
+				debugN(2, " import@%d:%s", argVal[v]._value, _script->_imports[argVal[v]._value].c_str());
 				break;
 			case FIXUP_STACK:
 				argVal[v]._type = rvtStackPointer;
+				debugN(2, " stack@%d", argVal[v]._value);
 				break;
 			case FIXUP_DATADATA:
 			default:
@@ -404,16 +427,17 @@ void ccInstance::runCodeFrom(uint32 start) {
 			if (arg[v]._fixupType)
 				error("expected integer for param %d of %s on line %d, got fixup (type %d)",
 					v + 1, info.name, _lineNumber, arg[v]._fixupType);
-			if (argType == iatRegister && intVal[v] >= _registers.size())
+			if (argType == iatRegister && arg[v]._data >= _registers.size())
 				error("expected valid register for param %d of %s on line %d, got %d",
-					v + 1, info.name, _lineNumber, intVal[v]);
+					v + 1, info.name, _lineNumber, arg[v]._data);
 			// FIXME: check iatRegisterInt, iatRegisterFloat
 		}
 		debug(2, " ");
 
 		const RuntimeValue &val1 = argVal[0], &val2 = argVal[1];
-		uint32 int1 = argVal[0]._value, int2 = argVal[1]._value;
+		int32 int1 = (int)argVal[0]._value, int2 = (int)argVal[1]._value;
 
+		RuntimeValue tempVal;
 		switch (instruction) {
 		case SCMD_LINENUM:
 			_lineNumber = int1;
@@ -438,13 +462,12 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_RET:
 			// return from subroutine
 
-			// only sabotage the sanity check until we return
-			// from the original function which disabled it
+			// only sabotage the sanity check until returning from the function which disabled it
 			if (loopIterationCheckDisabledCount)
 				loopIterationCheckDisabledCount--;
 
 			// pop return address
-			_pc = popValue();
+			_pc = popIntValue();
 			if (_pc == 0) {
 				// FIXME: store SREG_AX?
 				return;
@@ -457,16 +480,31 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_MEMREAD:
 			// reg1 = m[MAR]
-			error("no MEMREAD yet");
+			tempVal = _registers[SREG_MAR];
+			switch (tempVal._type) {
+			case rvtStackPointer:
+				if (tempVal._value + 4 >= _stack.size())
+					error("script tried to MEMREAD from out-of-bounds stack@%d on line %d",
+						tempVal._value, _lineNumber);
+				if (_stack[tempVal._value]._type == rvtInvalid)
+					error("script tried to MEMREAD from invalid stack@%d on line %d",
+						tempVal._value, _lineNumber);
+				_registers[int1] = _stack[tempVal._value];
+				break;
+			default:
+				error("script tried to MEMREAD from runtime value of type %d (value %d) on line %d",
+					tempVal._type, tempVal._value, _lineNumber);
+			}
 			break;
 		case SCMD_MEMWRITE:
 			// m[MAR] = reg1
+			// FIXME
 			error("no MEMWRITE yet");
 			break;
 		case SCMD_LOADSPOFFS:
 			// MAR = SP - arg1 (optimization for local var access)
 			_registers[SREG_MAR] = _registers[SREG_SP];
-			if (int1 > _registers[SREG_SP]._value - 4)
+			if ((uint32)int1 > _registers[SREG_SP]._value - 4)
 				error("load.sp.offs tried going %d back in a stack of size %d on line %d",
 					int1, _registers[SREG_SP]._value, _lineNumber);
 			_registers[SREG_MAR]._value -= int1;
@@ -545,22 +583,69 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_CALL:
 			// jump to subroutine at reg1
-			error("no CALL yet");
+			if (_registers[int1]._type != rvtFunction)
+				error("script tried to CALL non-function runtime value of type %d (value %d) on line %d",
+					tempVal._type, tempVal._value, _lineNumber);
+
+			if (currentStart.size() > MAXNEST - 1)
+				error("too many nested script calls on line %d, infinite recursion?", _lineNumber);
+
+			// FIXME: store call stack
+
+			// push return value onto stack
+			pushValue(_pc + neededArgs + 1);
+
+			_pc = _registers[int1]._value;
+			if (currentBase.top() != 0) {
+				_pc += currentStart.top();
+				_pc -= currentBase.top();
+			}
+
+			// FIXME: next call needs object?
+
+			// sabotage the sanity check until returning from the function which disabled it
+			if (loopIterationCheckDisabledCount)
+				loopIterationCheckDisabledCount++;
+
+			currentBase.push(0);
+			currentStart.push(_pc);
 			break;
 		case SCMD_MEMREADB:
+			// reg1 = m[MAR] (1 byte)
 		case SCMD_MEMREADW:
+			// reg1 = m[MAR] (2 bytes)
 		case SCMD_MEMWRITEB:
+			// m[MAR] = reg1 (1 byte)
 		case SCMD_MEMWRITEW:
-		case SCMD_JZ:
-		case SCMD_JNZ:
+			// m[MAR] = reg1 (2 bytes)
 			error("unimplemented %s", info.name);
+		case SCMD_JZ:
+			// jump if ax==0 by arg1
+			if (_registers[SREG_AX]._value == 0)
+				_pc += int1;
+			break;
+		case SCMD_JNZ:
+			// jump by arg1 if ax!=0
+			if (_registers[SREG_AX]._value != 0)
+				_pc += int1;
 			break;
 		case SCMD_PUSHREG:
 			// m[sp]=reg1; sp++
 			pushValue(_registers[int1]);
 			break;
 		case SCMD_POPREG:
+			// sp--; reg1=m[sp]
+			_registers[int1] = popValue();
+			break;
 		case SCMD_JMP:
+			_pc += int1;
+			// check whether the script is stuck in a loop
+			if (loopIterationCheckDisabledCount)
+				continue;
+			if (int1 > 0)
+				continue;
+			// FIXME: make sure the script isn't stuck in a loop
+			break;
 		case SCMD_MUL:
 		case SCMD_CHECKBOUNDS:
 		case SCMD_DYNAMICBOUNDS:
@@ -571,18 +656,48 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_MEMZEROPTRND:
 		case SCMD_CHECKNULL:
 		case SCMD_CHECKNULLREG:
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_NUMFUNCARGS:
+			// setfuncargs: number of arguments for ext func call
+			funcArgumentCount = int1;
+			break;
 		case SCMD_CALLAS:
+			// $callscr: call external script function
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_CALLEXT:
+			// farcall: call external (imported) function reg1
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_PUSHREAL:
+			// farpush: push reg1 onto real stack
+			if (externalStack.size() >= MAX_FUNC_PARAMS)
+				error("external call stack overflow at line %d", _lineNumber);
+			externalStack.push(_registers[int1]);
+			break;
 		case SCMD_SUBREALSTACK:
+			// farsubsp
+			// FIXME
+			error("unimplemented %s", info.name);
 		case SCMD_CALLOBJ:
+			// $callobj: next call is member function of reg1
+			// FIXME
+			error("unimplemented %s", info.name);
 		case SCMD_SHIFTLEFT:
+			// reg1 = reg1 << reg2
+			// FIXME
+			error("unimplemented %s", info.name);
 		case SCMD_SHIFTRIGHT:
+			// reg1 = reg1 >> reg2
+			// FIXME
 			error("unimplemented %s", info.name);
 			break;
 		case SCMD_THISBASE:
-			// current relative address
+			// thisaddr: current relative address
 			currentBase.pop();
 			currentBase.push(int1);
 			break;
@@ -601,6 +716,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_CREATESTRING:
 		case SCMD_STRINGSEQUAL:
 		case SCMD_STRINGSNOTEQ:
+			// FIXME
 			error("unimplemented %s", info.name);
 			break;
 		case SCMD_LOOPCHECKOFF:
@@ -637,16 +753,25 @@ void ccInstance::pushValue(const RuntimeValue &value) {
 	_registers[SREG_SP]._value += 4;
 }
 
-uint32 ccInstance::popValue() {
+RuntimeValue ccInstance::popValue() {
 	assert(_registers[SREG_SP]._type == rvtStackPointer && _registers[SREG_SP]._value >= 4);
 
-	_registers[SREG_SP]._value -= 4;
 	uint32 stackValue = _registers[SREG_SP]._value;
+	_registers[SREG_SP]._value -= 4;
 	if (stackValue + 4 > _stack.size())
 		error("script caused VM stack underflow(?!) on line %d", _lineNumber);
-	if (_stack[stackValue]._type != rvtInteger)
-		error("expected to pop an integer value off the stack (got type %d) on line %d", _stack[stackValue]._type, _lineNumber);
-	return _stack[stackValue]._value;
+	if (_stack[stackValue]._type == rvtInvalid)
+		error("script tried to pop invalid value from stack on line %d", _lineNumber);
+
+	return _stack[stackValue];
+}
+
+uint32 ccInstance::popIntValue() {
+	RuntimeValue val = popValue();
+
+	if (val._type != rvtInteger)
+		error("expected to pop an integer value off the stack (got type %d) on line %d", val._type, _lineNumber);
+	return val._value;
 }
 
 } // End of namespace AGS
