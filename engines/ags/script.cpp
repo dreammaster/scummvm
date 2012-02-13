@@ -308,7 +308,7 @@ static InstructionInfo instructionInfo[NUM_INSTRUCTIONS + 1] = {
 	{ "$memread.ptr", 1, iatAny, iatAny }, // TODO
 	{ "memwrite.ptr.0", 0, iatAny, iatAny }, // TODO
 	{ "$meminit.ptr", 1, iatAny, iatAny }, // TODO
-	{ "load.ps.offs", 1, iatAny, iatAny }, // TODO
+	{ "load.sp.offs", 1, iatAny, iatAny }, // TODO
 	{ "checknull.ptr", 0, iatNone, iatNone },
 	{ "$f.add", 2, iatRegisterFloat, iatRegisterFloat },
 	{ "$f.sub", 2, iatRegisterFloat, iatRegisterFloat },
@@ -407,6 +407,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 			if (argType == iatRegister && intVal[v] >= _registers.size())
 				error("expected valid register for param %d of %s on line %d, got %d",
 					v + 1, info.name, _lineNumber, intVal[v]);
+			// FIXME: check iatRegisterInt, iatRegisterFloat
 		}
 		debug(2, " ");
 
@@ -417,17 +418,26 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_LINENUM:
 			_lineNumber = int1;
 			break;
-		case SCMD_LITTOREG:
-			_registers[int1] = val2;
+		case SCMD_ADD:
+			// reg1 += arg2
+			_registers[int1]._value += int2;
 			break;
-		case SCMD_PUSHREG:
-			pushValue(_registers[int1]);
+		case SCMD_SUB:
+			// reg1 -= arg2
+			_registers[int1]._value -= int2;
 			break;
-		case SCMD_THISBASE:
-			currentBase.pop();
-			currentBase.push(int1);
+		case SCMD_REGTOREG:
+			// reg2 = reg1;
+			_registers[int2] = _registers[int1];
+			break;
+		case SCMD_WRITELIT:
+			// m[MAR] = arg2 (copy arg1 bytes)
+			// "poss something dodgy about this routine"
+			error("no WRITELIT yet");
 			break;
 		case SCMD_RET:
+			// return from subroutine
+
 			// only sabotage the sanity check until we return
 			// from the original function which disabled it
 			if (loopIterationCheckDisabledCount)
@@ -440,6 +450,163 @@ void ccInstance::runCodeFrom(uint32 start) {
 				return;
 			}
 			// FIXME: set current instance?
+			break;
+		case SCMD_LITTOREG:
+			// set reg1 to literal value arg2
+			_registers[int1] = val2;
+			break;
+		case SCMD_MEMREAD:
+			// reg1 = m[MAR]
+			error("no MEMREAD yet");
+			break;
+		case SCMD_MEMWRITE:
+			// m[MAR] = reg1
+			error("no MEMWRITE yet");
+			break;
+		case SCMD_LOADSPOFFS:
+			// MAR = SP - arg1 (optimization for local var access)
+			_registers[SREG_MAR] = _registers[SREG_SP];
+			if (int1 > _registers[SREG_SP]._value - 4)
+				error("load.sp.offs tried going %d back in a stack of size %d on line %d",
+					int1, _registers[SREG_SP]._value, _lineNumber);
+			_registers[SREG_MAR]._value -= int1;
+			break;
+		case SCMD_MULREG:
+			// reg1 *= reg2
+			_registers[int1]._value *= _registers[int2]._value;
+			break;
+		case SCMD_DIVREG:
+			// reg1 /= reg2
+			if (_registers[int2]._value == 0)
+				error("script tried to divide by zero on line %d", _lineNumber);
+			_registers[int1]._value /= _registers[int2]._value;
+			break;
+		case SCMD_ADDREG:
+			// reg1 += reg2
+			_registers[int1]._value += _registers[int2]._value;
+			break;
+		case SCMD_SUBREG:
+			// reg1 -= reg2
+			_registers[int1]._value -= _registers[int2]._value;
+			break;
+		case SCMD_BITAND:
+			// reg1 &= reg2
+			_registers[int1]._value &= _registers[int2]._value;
+			break;
+		case SCMD_BITOR:
+			// reg1 |= reg2
+			_registers[int1]._value |= _registers[int2]._value;
+			break;
+		case SCMD_ISEQUAL:
+			// reg1 == reg2   reg1=1 if true, =0 if not
+			_registers[int1]._value = (_registers[int1]._value == _registers[int2]._value);
+			break;
+		case SCMD_NOTEQUAL:
+			// reg1 != reg2
+			_registers[int1]._value = (_registers[int1]._value == _registers[int2]._value);
+			break;
+		case SCMD_GREATER:
+			// reg1 > reg2
+			_registers[int1]._value = (_registers[int1]._value > _registers[int2]._value);
+			break;
+		case SCMD_LESSTHAN:
+			// reg1 < reg2
+			_registers[int1]._value = (_registers[int1]._value < _registers[int2]._value);
+			break;
+		case SCMD_GTE:
+			// reg1 >= reg2
+			_registers[int1]._value = (_registers[int1]._value >= _registers[int2]._value);
+			break;
+		case SCMD_LTE:
+			// reg1 <= reg2
+			_registers[int1]._value = (_registers[int1]._value <= _registers[int2]._value);
+			break;
+		case SCMD_AND:
+			// (reg1!=0) && (reg2!=0) -> reg1
+			_registers[int1]._value = (_registers[int1]._value && _registers[int2]._value);
+			break;
+		case SCMD_OR:
+			// (reg1!=0) || (reg2!=0) -> reg1
+			_registers[int1]._value = (_registers[int1]._value || _registers[int2]._value);
+			break;
+		case SCMD_XORREG:
+			// reg1 ^= reg2
+			_registers[int1]._value ^= _registers[int2]._value;
+			break;
+		case SCMD_MODREG:
+			// reg1 %= reg2
+			if (_registers[int2]._value == 0)
+				error("script tried to divide (modulo) by zero on line %d", _lineNumber);
+			_registers[int1]._value %= _registers[int2]._value;
+			break;
+		case SCMD_NOTREG:
+			// reg1 = !reg1
+			_registers[int1]._value = !_registers[int1]._value;
+			break;
+		case SCMD_CALL:
+			// jump to subroutine at reg1
+			error("no CALL yet");
+			break;
+		case SCMD_MEMREADB:
+		case SCMD_MEMREADW:
+		case SCMD_MEMWRITEB:
+		case SCMD_MEMWRITEW:
+		case SCMD_JZ:
+		case SCMD_JNZ:
+			error("unimplemented %s", info.name);
+			break;
+		case SCMD_PUSHREG:
+			// m[sp]=reg1; sp++
+			pushValue(_registers[int1]);
+			break;
+		case SCMD_POPREG:
+		case SCMD_JMP:
+		case SCMD_MUL:
+		case SCMD_CHECKBOUNDS:
+		case SCMD_DYNAMICBOUNDS:
+		case SCMD_MEMREADPTR:
+		case SCMD_MEMWRITEPTR:
+		case SCMD_MEMINITPTR:
+		case SCMD_MEMZEROPTR:
+		case SCMD_MEMZEROPTRND:
+		case SCMD_CHECKNULL:
+		case SCMD_CHECKNULLREG:
+		case SCMD_NUMFUNCARGS:
+		case SCMD_CALLAS:
+		case SCMD_CALLEXT:
+		case SCMD_PUSHREAL:
+		case SCMD_SUBREALSTACK:
+		case SCMD_CALLOBJ:
+		case SCMD_SHIFTLEFT:
+		case SCMD_SHIFTRIGHT:
+			error("unimplemented %s", info.name);
+			break;
+		case SCMD_THISBASE:
+			// current relative address
+			currentBase.pop();
+			currentBase.push(int1);
+			break;
+		case SCMD_NEWARRAY:
+		case SCMD_FADD:
+		case SCMD_FSUB:
+		case SCMD_FMULREG:
+		case SCMD_FDIVREG:
+		case SCMD_FADDREG:
+		case SCMD_FSUBREG:
+		case SCMD_FGREATER:
+		case SCMD_FLESSTHAN:
+		case SCMD_FGTE:
+		case SCMD_FLTE:
+		case SCMD_ZEROMEMORY:
+		case SCMD_CREATESTRING:
+		case SCMD_STRINGSEQUAL:
+		case SCMD_STRINGSNOTEQ:
+			error("unimplemented %s", info.name);
+			break;
+		case SCMD_LOOPCHECKOFF:
+			// no loop checking for this function
+			if (loopIterationCheckDisabledCount == 0)
+				loopIterationCheckDisabledCount++;
 			break;
 		default:
 			// FIXME
