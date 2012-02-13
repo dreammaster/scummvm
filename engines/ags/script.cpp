@@ -24,22 +24,21 @@
  */
 
 #include "engines/ags/script.h"
+#include "engines/ags/util.h"
 #include "common/debug.h"
 
 namespace AGS {
 
 #define SCOM_VERSION 89
 
-static Common::String readString(Common::SeekableReadStream *dta) {
-	Common::String str;
-	while (true) {
-		char c = (char)dta->readByte();
-		if (!c)
-			break;
-		str += c;
-	}
-	return str;
-}
+#define FIXUP_GLOBALDATA  1     // code[fixup] += &globaldata[0]
+#define FIXUP_FUNCTION    2     // code[fixup] += &code[0]
+#define FIXUP_STRING      3     // code[fixup] += &strings[0]
+#define FIXUP_IMPORT      4     // code[fixup] = &imported_thing[code[fixup]]
+#define FIXUP_DATADATA    5     // globaldata[fixup] += &globaldata[0]
+#define FIXUP_STACK       6     // code[fixup] += &stack[0]
+#define EXPORT_FUNCTION   1
+#define EXPORT_DATA       2
 
 void ccScript::readFrom(Common::SeekableReadStream *dta) {
 	_instances = 0;
@@ -60,19 +59,45 @@ void ccScript::readFrom(Common::SeekableReadStream *dta) {
 		dta->read(&_globalData[0], globalDataSize);
 
 	_code.resize(codeSize);
-	for (uint i = 0; i < codeSize; ++i)
-		_code[i] = dta->readUint32LE();
+	for (uint i = 0; i < codeSize; ++i) {
+		_code[i]._data = dta->readUint32LE();
+		_code[i]._fixupType = 0;
+	}
 
 	_strings.resize(stringsSize);
 	if (stringsSize)
 		dta->read(&_strings[0], stringsSize);
 
 	uint32 fixupsCount = dta->readUint32LE();
-	_fixups.resize(fixupsCount);
+	Common::Array<byte> fixupTypes;
+	fixupTypes.resize(fixupsCount);
 	for (uint i = 0; i < fixupsCount; ++i)
-		_fixups[i]._type = dta->readByte();
-	for (uint i = 0; i < fixupsCount; ++i)
-		_fixups[i]._index = dta->readUint32LE();
+		fixupTypes[i] = dta->readByte();
+
+	// AGS uses the fixups to patch the code 'live' by adding pointer values.
+	// We don't want to do that, so we store the fixups for use at runtime.
+	// (This also allows us to share the code among different instances.)
+	// TODO: We can probably optimise this by just setting high bits of the
+	//       code data, if memory usage turns out to be a problem.
+	for (uint i = 0; i < fixupsCount; ++i) {
+		// this is the code array index (i.e. not bytes)
+		uint32 fixupIndex = dta->readUint32LE();
+
+		if (fixupTypes[i] == FIXUP_DATADATA) {
+			// patch to global data
+			// (usually strings, there aren't many of these)
+			_globalFixups.push_back(fixupIndex);
+		} else if (fixupTypes[i] && fixupTypes[i] <= 6) {
+			// patch to code
+			_code[fixupIndex]._fixupType = fixupTypes[i];
+		} else {
+			// invalid/unknown type
+			error("invalid fixup type %d", fixupTypes[i]);
+		}
+	}
+	Common::sort(_globalFixups.begin(), _globalFixups.end());
+
+	debug(1, "script has %d fixups for %d code entries", fixupsCount, codeSize);
 
 	uint32 importsCount = dta->readUint32LE();
 	_imports.resize(importsCount);
@@ -102,6 +127,46 @@ void ccScript::readFrom(Common::SeekableReadStream *dta) {
 	uint32 endsig = dta->readUint32LE();
 	if (endsig != 0xbeefcafe)
 		error("incorrect end signature %x for script", endsig);
+}
+
+#define CC_NUM_REGISTERS  8
+#define INSTF_SHAREDATA   1
+#define INSTF_ABORTED     2
+#define INSTF_FREE        4
+#define INSTF_RUNNING     8   // set by main code to confirm script isn't stuck
+#define CC_STACK_SIZE     4000
+#define MAX_CALL_STACK    100
+
+ccInstance::ccInstance(AGSEngine *vm, ccScript *script, bool autoImport, ccInstance *fork) : _vm(vm), _script(script) {
+	_flags = 0;
+
+	if (fork) {
+		// share memory space with an existing instance (ie. this is a thread/fork)
+		_globalData = fork->_globalData;
+		_flags |= INSTF_SHAREDATA;
+	} else {
+		// create our own memory space
+		_globalData = new Common::Array<byte>(script->_globalData);
+	}
+
+	_stack.resize(CC_STACK_SIZE);
+
+	_registers.resize(CC_NUM_REGISTERS);
+	for (uint i = 0; i < _registers.size(); ++i) {
+		_registers[i]._value = 0;
+	}
+
+	// FIXME: check all imports can be resolved?
+
+	_pc = 0;
+	_script->_instances++;
+	if ((_script->_instances == 1) && autoImport) {
+		// FIXME: import all the exported stuff from this script
+	}
+}
+
+void ccInstance::runTextScript(const Common::String &name) {
+	// FIXME
 }
 
 } // End of namespace AGS

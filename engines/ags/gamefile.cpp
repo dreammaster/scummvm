@@ -99,7 +99,7 @@ bool GameFile::init() {
 
 	_viewCount = dta->readUint32LE();
 	_charCount = dta->readUint32LE();
-	_playerChars = dta->readUint32LE();
+	_playerChar = dta->readUint32LE();
 
 	_totalScore = dta->readSint32LE();
 
@@ -110,8 +110,8 @@ bool GameFile::init() {
 	_dlgMsgCount = dta->readUint32LE();
 	_fontCount = dta->readUint32LE();
 
-	debug(2, "%d views, %d characters, %d player characters, %d inventory items, %d dialog topics",
-		_viewCount, _charCount, _playerChars, _invItemCount, _dialogCount);
+	debug(2, "%d views, %d characters (player is %d), %d inventory items, %d dialog topics",
+		_viewCount, _charCount, _playerChar, _invItemCount, _dialogCount);
 
 	_colorDepth = dta->readUint32LE();
 
@@ -438,7 +438,7 @@ NewInteraction *GameFile::readNewInteraction(Common::SeekableReadStream *dta) {
 			error("invalid interaction? (%d)", unknown);
 		return NULL;
 	}
-	debug(1, "new interaction");
+	debug(8, "new interaction");
 
 	NewInteraction *interaction = new NewInteraction();
 
@@ -460,7 +460,7 @@ NewInteraction *GameFile::readNewInteraction(Common::SeekableReadStream *dta) {
 		if (!hasResponse[i])
 			continue;
 
-		debug(1, "reading response");
+		debug(8, "reading response");
 		interaction->_events[i]._response = readCommandList(dta);
 	}
 

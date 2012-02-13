@@ -37,16 +37,18 @@
 // AGS subsystems
 #include "ags/ags.h"
 #include "ags/constants.h"
-#include "ags/resourceman.h"
-#include "ags/sprites.h"
 #include "ags/gamefile.h"
+#include "ags/resourceman.h"
+#include "ags/script.h"
+#include "ags/sprites.h"
 
 namespace AGS {
 
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
 	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true),
-	_mouseFrame(0), _mouseDelay(0) {
+	_mouseFrame(0), _mouseDelay(0), _startingRoom(0xffffffff), _displayedRoom(0xffffffff),
+	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL) {
 
 	_rnd = new Common::RandomSource("ags");
 }
@@ -86,11 +88,76 @@ Common::Error AGSEngine::run() {
 	if (!init())
 		return Common::kUnknownError;
 
+	// TODO: check for recording/playback?
+	if (_displayedRoom == 0xffffffff)
+		startNewGame();
+
+	while (!shouldQuit()) {
+		Common::Event event;
+
+		while (_eventMan->pollEvent(event)) {
+		}
+	}
+
+	return Common::kNoError;
+}
+
+void AGSEngine::startNewGame() {
 	setCursorMode(MODE_WALK);
 	// FIXME: filter->setMousePosition(160, 100);
 	// FIXME: newMusic(0);
 
-	return Common::kNoError;
+	// run startup scripts
+	for (uint i = 0; i < _scriptModules.size(); ++i)
+		_scriptModules[i]->runTextScript("game_start");
+	_gameScript->runTextScript("game_start");
+
+	// FIXME: setRestartPoint() to make an autosave
+
+	if (_displayedRoom == 0xffffffff) {
+		// FIXME: currentFadeOutEffect();
+		loadNewRoom(_playerChar->_room, _playerChar);
+
+		// loadNewRoom updates _prevRoom, reset it
+		_playerChar->_prevRoom = 0xffffffff;
+	}
+
+	firstRoomInitialization();
+}
+
+void AGSEngine::setupPlayerCharacter(uint32 charId) {
+	_gameFile->_playerChar = charId;
+	_playerChar = _gameFile->_chars[charId];
+}
+
+void AGSEngine::createGlobalScript() {
+	assert(_scriptModules.empty());
+
+	for (uint i = 0; i < _gameFile->_scriptModules.size(); ++i) {
+		// create an instance for the script module
+		_scriptModules.push_back(new ccInstance(this, _gameFile->_scriptModules[i], true));
+		// fork an instance for repeatedly_execute_always to run in
+		_scriptModuleForks.push_back(new ccInstance(this, _gameFile->_scriptModules[i], true, _scriptModules[i]));
+	}
+
+	// create an instance for the game script
+	_gameScript = new ccInstance(this, _gameFile->_gameScript, true);
+	// fork an instance for repeatedly_execute_always to run in
+	_gameScriptFork = new ccInstance(this, _gameFile->_gameScript, true, _gameScript);
+
+	if (_gameFile->_dialogScriptsScript) {
+		// create an instance for the 3.1.1+ dialog scripts if present
+		_dialogScriptsScript = new ccInstance(this, _gameFile->_dialogScriptsScript, true);
+	}
+}
+
+void AGSEngine::firstRoomInitialization() {
+	_startingRoom = _displayedRoom;
+	_loopCounter = 0;
+}
+
+void AGSEngine::loadNewRoom(uint32 id, CharacterInfo *forChar) {
+	// FIXME
 }
 
 uint32 AGSEngine::getGameFileVersion() const {
@@ -124,6 +191,22 @@ bool AGSEngine::init() {
 	_gameFile = new GameFile(this);
 	if (!_gameFile->init())
 		return false;
+
+	// FIXME: register script objects
+
+	// FIXME: load fonts
+
+	// TODO: wtexttransparent(TEXTFG);
+	// TODO: fade_effect=OPT_FADETYPE
+
+	// FIXME: register audio script objects
+	// FIXME: other script objects
+	setupPlayerCharacter(_gameFile->_playerChar);
+
+	// TODO: start plugins
+
+	// TODO: scripty bits
+	createGlobalScript();
 
 	Common::SeekableReadStream *spritesStream = getFile("acsprset.spr");
 	if (!spritesStream)

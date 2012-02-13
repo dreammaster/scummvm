@@ -31,9 +31,9 @@
 
 namespace AGS {
 
-struct ScriptFixup {
-	uint32 _index; // code array index to fixup (in longs)
-	byte _type; // global data/string area/ etc
+struct ScriptCodeEntry {
+	uint32 _data;
+	byte _fixupType; // global data/string area/ etc
 };
 
 struct ScriptExport {
@@ -48,17 +48,53 @@ struct ScriptSection {
 	uint32 _offset;
 };
 
+// the data for a script
 struct ccScript {
 	void readFrom(Common::SeekableReadStream *dta);
 
 	Common::Array<byte> _globalData;
-	Common::Array<uint32> _code;
+	Common::Array<ScriptCodeEntry> _code;
 	Common::Array<byte> _strings;
-	Common::Array<ScriptFixup> _fixups;
+	Common::Array<uint32> _globalFixups;
 	Common::Array<Common::String> _imports;
 	Common::Array<ScriptExport> _exports;
 	uint32 _instances;
 	Common::Array<ScriptSection> _sections;
+};
+
+struct Register {
+	uint32 _value;
+};
+
+struct CallStackEntry {
+	uint32 _lineNumber;
+	uint32 _address;
+	class ccInstance *_instance;
+};
+
+class AGSEngine;
+
+// a running instance of a script
+class ccInstance {
+public:
+	ccInstance(AGSEngine *vm, ccScript *script, bool autoImport = false, ccInstance *fork = NULL);
+
+	void runTextScript(const Common::String &name);
+
+protected:
+	AGSEngine *_vm;
+	ccScript *_script;
+	uint32 _flags;
+
+	Common::Array<byte> *_globalData;
+
+	uint32 _pc;
+	uint32 _lineNumber;
+	Common::Array<Register> _registers;
+	Common::Array<CallStackEntry> _callStack;
+	Common::Array<uint32> _stack;
+	// might point to another instance if in far call
+	ccInstance *_runningInst;
 };
 
 } // End of namespace AGS

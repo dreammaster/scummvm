@@ -237,7 +237,7 @@ public:
 
 	uint32 _viewCount;
 	uint32 _charCount;
-	uint32 _playerChars;
+	uint32 _playerChar;
 
 	uint32 _totalScore;
 

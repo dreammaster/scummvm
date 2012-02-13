@@ -46,6 +46,8 @@ class ResourceManager;
 class GameFile;
 class Sprite;
 class SpriteSet;
+struct CharacterInfo;
+class ccInstance;
 
 class AGSEngine : public Engine {
 public:
@@ -79,6 +81,7 @@ private:
 
 	uint32 _engineStartTime;
 	uint32 _playTime;
+	uint32 _loopCounter;
 
 	uint16 _width, _height;
 	uint16 _baseWidth, _baseHeight;
@@ -97,9 +100,26 @@ private:
 	uint32 _currentCursor;
 	uint32 _mouseFrame, _mouseDelay;
 
+	uint32 _startingRoom;
+	uint32 _displayedRoom;
+
+	CharacterInfo *_playerChar;
+
+	// script instances
+	ccInstance *_gameScript, *_gameScriptFork;
+	Common::Array<ccInstance *> _scriptModules;
+	Common::Array<ccInstance *> _scriptModuleForks;
+	ccInstance *_dialogScriptsScript;
+
 	Common::String getMasterArchive() const;
 
 	bool init();
+
+	void startNewGame();
+	void setupPlayerCharacter(uint32 charId);
+	void createGlobalScript();
+	void firstRoomInitialization();
+	void loadNewRoom(uint32 id, CharacterInfo *forChar);
 	bool getScreenSize();
 	bool initGraphics();
 
