@@ -84,6 +84,10 @@ const ADGameFileDescription *AGSEngine::getGameFiles() const {
 	return _gameDescription->desc.filesDescriptions;
 }
 
+const char *AGSEngine::getDetectedGameFile() const {
+	return _gameDescription->filename;
+}
+
 Common::Error AGSEngine::run() {
 	if (!init())
 		return Common::kUnknownError;
@@ -174,9 +178,12 @@ Common::SeekableReadStream *AGSEngine::getFile(const Common::String &filename) c
 
 Common::String AGSEngine::getMasterArchive() const {
 	const ADGameFileDescription *gameFiles = getGameFiles();
+	const char *gameFile = getDetectedGameFile();
 
 	if (gameFiles[0].fileName)
 		return gameFiles[0].fileName;
+	else if (gameFile[0])
+		return gameFile;
 
 	return "ac2game.dat";
 }

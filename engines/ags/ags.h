@@ -141,6 +141,7 @@ private:
 	bool prepareTextScript(ccInstance *instance, const Common::String &name);
 
 	const ADGameFileDescription *getGameFiles() const;
+	const char *getDetectedGameFile() const;
 	const char *getGameId() const;
 	Common::Language getLanguage() const;
 	Common::Platform getPlatform() const;

@@ -28,6 +28,9 @@ namespace AGS {
 
 struct AGSGameDescription {
 	ADGameDescription desc;
+
+	const char *title;
+	const char *filename;
 };
 
 } // End of namespace AGS

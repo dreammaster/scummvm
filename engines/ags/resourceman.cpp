@@ -129,7 +129,7 @@ bool ResourceManager::init(const Common::String &masterArchive) {
 	MasterArchive master(masterArchive);
 
 	if (!openMasterArchive(master)) {
-		warning("ResourceManager::init(): Failed to open master archive \"%s\"",
+		debug(1, "ResourceManager::init(): Failed to open master archive \"%s\"",
 		        master.name.c_str());
 		return false;
 	}

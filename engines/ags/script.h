@@ -105,6 +105,7 @@ public:
 
 protected:
 	void runCodeFrom(uint32 start);
+	RuntimeValue callImportedFunction(uint32 importId, const Common::Array<RuntimeValue> &params);
 
 	AGSEngine *_vm;
 	ccScript *_script;

@@ -49,6 +49,8 @@ static const AGSGameDescription GAME_DESCRIPTIONS[] = {
 			ADGF_NO_FLAGS,
 			GUIO1(GUIO_NOASPECT)
 		},
+		"",
+		""
 	},
 	{
 		{
@@ -60,6 +62,8 @@ static const AGSGameDescription GAME_DESCRIPTIONS[] = {
 			ADGF_NO_FLAGS,
 			GUIO1(GUIO_NOASPECT)
 		},
+		"",
+		""
 	},
 	{
 		{
@@ -71,6 +75,8 @@ static const AGSGameDescription GAME_DESCRIPTIONS[] = {
 			ADGF_NO_FLAGS,
 			GUIO1(GUIO_NOASPECT)
 		},
+		"",
+		""
 	},
 	{
 		{
@@ -82,6 +88,8 @@ static const AGSGameDescription GAME_DESCRIPTIONS[] = {
 			ADGF_NO_FLAGS,
 			GUIO1(GUIO_NOASPECT)
 		},
+		"",
+		""
 	},
 	{
 		{
@@ -93,6 +101,8 @@ static const AGSGameDescription GAME_DESCRIPTIONS[] = {
 			ADGF_NO_FLAGS,
 			GUIO1(GUIO_NOASPECT)
 		},
+		"",
+		""
 	},
 	{
 		{
@@ -104,6 +114,8 @@ static const AGSGameDescription GAME_DESCRIPTIONS[] = {
 			ADGF_NO_FLAGS,
 			GUIO1(GUIO_NOASPECT)
 		},
+		"",
+		""
 	},
 	{
 		{
@@ -115,6 +127,8 @@ static const AGSGameDescription GAME_DESCRIPTIONS[] = {
 			ADGF_NO_FLAGS,
 			GUIO1(GUIO_NOASPECT)
 		},
+		"",
+		""
 	},
 	{
 		{
@@ -126,6 +140,8 @@ static const AGSGameDescription GAME_DESCRIPTIONS[] = {
 			ADGF_NO_FLAGS,
 			GUIO1(GUIO_NOASPECT)
 		},
+		"",
+		""
 	},
 	{
 		{
@@ -137,27 +153,25 @@ static const AGSGameDescription GAME_DESCRIPTIONS[] = {
 			ADGF_NO_FLAGS,
 			GUIO1(GUIO_NOASPECT)
 		},
+		"",
+		""
 	},
-	{ AD_TABLE_END_MARKER }
+
+	{ AD_TABLE_END_MARKER, "", "" }
 };
 
-static const AGSGameDescription fallbackDescs[] = {
-	{ //0
-		{
-			"ags",
-			"unknown",
-			AD_ENTRY1(0, 0),
-			Common::UNK_LANG,
-			Common::kPlatformUnknown,
-			ADGF_NO_FLAGS,
-			GUIO_NONE
-		},
-	}
-};
-
-static const ADFileBasedFallback fileBased[] = {
-	{ &fallbackDescs[ 0].desc, { "ac2game.dat", 0 } },
-	{ 0, { 0 } }
+static AGSGameDescription g_fallbackDesc = {
+	{
+		"ags",
+		"unknown",
+		AD_ENTRY1(0, 0),
+		Common::UNK_LANG,
+		Common::kPlatformUnknown,
+		ADGF_NO_FLAGS,
+		GUIO_NONE
+	},
+	"",
+	""
 };
 
 } // End of namespace AGS
