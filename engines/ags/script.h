@@ -62,8 +62,28 @@ struct ccScript {
 	Common::Array<ScriptSection> _sections;
 };
 
-struct Register {
+enum RuntimeValueType {
+	rvtInvalid,
+	rvtInteger,
+	rvtGlobalData,
+	rvtFunction,
+	rvtString,
+	rvtImport,
+	rvtStackPointer
+};
+
+struct RuntimeValue {
+	RuntimeValue() : _type(rvtInteger), _value(0) { }
+	RuntimeValue(uint32 intValue) : _type(rvtInteger), _value(intValue) { }
+
+	RuntimeValueType _type;
 	uint32 _value;
+
+	RuntimeValue &operator=(uint32 intValue) {
+		_type = rvtInteger;
+		_value = intValue;
+		return *this;
+	}
 };
 
 struct CallStackEntry {
@@ -79,9 +99,13 @@ class ccInstance {
 public:
 	ccInstance(AGSEngine *vm, ccScript *script, bool autoImport = false, ccInstance *fork = NULL);
 
-	void runTextScript(const Common::String &name);
+	bool isRunning() { return (_pc != 0); }
+	bool exportsSymbol(const Common::String &name);
+	void call(const Common::String &name, const Common::Array<uint32> &params);
 
 protected:
+	void runCodeFrom(uint32 start);
+
 	AGSEngine *_vm;
 	ccScript *_script;
 	uint32 _flags;
@@ -90,11 +114,14 @@ protected:
 
 	uint32 _pc;
 	uint32 _lineNumber;
-	Common::Array<Register> _registers;
+	Common::Array<RuntimeValue> _registers;
 	Common::Array<CallStackEntry> _callStack;
-	Common::Array<uint32> _stack;
+	Common::Array<RuntimeValue> _stack;
 	// might point to another instance if in far call
 	ccInstance *_runningInst;
+
+	void pushValue(const RuntimeValue &value);
+	uint32 popValue();
 };
 
 } // End of namespace AGS

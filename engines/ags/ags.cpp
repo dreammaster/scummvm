@@ -48,7 +48,7 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
 	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true),
 	_mouseFrame(0), _mouseDelay(0), _startingRoom(0xffffffff), _displayedRoom(0xffffffff),
-	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL) {
+	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL) {
 
 	_rnd = new Common::RandomSource("ags");
 }
@@ -109,8 +109,8 @@ void AGSEngine::startNewGame() {
 
 	// run startup scripts
 	for (uint i = 0; i < _scriptModules.size(); ++i)
-		_scriptModules[i]->runTextScript("game_start");
-	_gameScript->runTextScript("game_start");
+		runTextScript(_scriptModules[i], "game_start");
+	runTextScript(_gameScript, "game_start");
 
 	// FIXME: setRestartPoint() to make an autosave
 
@@ -395,6 +395,64 @@ void AGSEngine::updateCachedMouseCursor() {
 
 void AGSEngine::mouseSetHotspot(uint32 x, uint32 y) {
 	// FIXME: set the hotspot!
+}
+
+#define REP_EXEC_NAME "repeatedly_execute"
+
+void AGSEngine::runTextScript(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {
+	// first, check for special cases
+	switch (params.size()) {
+	case 0:
+		if (name != REP_EXEC_NAME)
+			break;
+		// repeatedly_execute
+		for (uint i = 0; i < _scriptModules.size(); ++i) {
+			// FIXME: original checks whether the symbol exists first, unnecessary?
+			runScriptFunction(_scriptModules[i], name, params);
+		}
+		break;
+	}
+
+	if (!runScriptFunction(instance, name, params)) {
+		if (instance == _roomScript)
+			error("failed to run room script '%s' (room %d)", name.c_str(), _displayedRoom);
+	}
+}
+
+bool AGSEngine::runScriptFunction(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {
+	if (!prepareTextScript(instance, name))
+		return false;
+
+	instance->call(name, params);
+
+	// FIXME: check return value
+
+	// FIXME: post script cleanup
+
+	// FIXME: sabotage any running scripts in the event of restored game
+
+	return true;
+}
+
+bool AGSEngine::prepareTextScript(ccInstance *instance, const Common::String &name) {
+	if (!instance->exportsSymbol(name))
+		return false;
+
+	if (instance->isRunning()) {
+		warning("script was already running, when trying to run '%s'", name.c_str());
+		return false;
+	}
+
+	// FIXME: original code has code which forks an instance if it was running
+	// (but it's unreachable due to the check above..)
+
+	_runningScripts.push_back(ExecutingScript(instance));
+	// FIXME: updateScriptMouseCoords();
+
+	return true;
+}
+
+ExecutingScript::ExecutingScript(ccInstance *instance) : _instance(instance) {
 }
 
 } // End of namespace AGS
