@@ -135,6 +135,7 @@ bool ResourceManager::init(const Common::String &masterArchive) {
 	}
 
 	master.version = master.file.readByte();
+	debug(4, "master archive has version %d", master.version);
 
 	// We only support these versions
 	if ((master.version !=  6) && (master.version != 10) &&

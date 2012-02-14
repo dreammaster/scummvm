@@ -50,7 +50,7 @@ public:
 	}
 
 	const char *getOriginalCopyright() const override {
-		return "Copyright (C) Chris Jones";;
+		return "Copyright (C) 1999-2011 Chris Jones";
 	}
 
 	ADDetectedGame fallbackDetect(const FileMap &allFiles, const Common::FSList &fslist) const override;

@@ -39,6 +39,7 @@
 #include "ags/constants.h"
 #include "ags/gamefile.h"
 #include "ags/resourceman.h"
+#include "ags/room.h"
 #include "ags/script.h"
 #include "ags/sprites.h"
 
@@ -48,7 +49,8 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
 	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true),
 	_mouseFrame(0), _mouseDelay(0), _startingRoom(0xffffffff), _displayedRoom(0xffffffff),
-	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL) {
+	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL),
+	_currentRoom(NULL) {
 
 	_rnd = new Common::RandomSource("ags");
 }
@@ -161,6 +163,22 @@ void AGSEngine::firstRoomInitialization() {
 }
 
 void AGSEngine::loadNewRoom(uint32 id, CharacterInfo *forChar) {
+	debug(2, "loading new room %d", id);
+
+	delete _currentRoom;
+	_displayedRoom = id;
+
+	Common::String filename = Common::String::format("room%d.crm", id);
+	Common::SeekableReadStream *stream = getFile(filename);
+	if ((!stream) && (id == 0)) {
+		filename = "intro.crm";
+		stream = getFile(filename);
+	}
+	if (!stream)
+		error("failed to open room file for room %d", id);
+
+	_currentRoom = new Room(stream);
+
 	// FIXME
 }
 

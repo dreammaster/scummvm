@@ -233,7 +233,7 @@ bool GameFile::init() {
 		uint32 globalVarsCount = dta->readUint32LE();
 		_globalVars.resize(globalVarsCount);
 		for (uint32 i = 0; i < globalVarsCount; ++i) {
-			_globalVars[i] = readInteractionVariable(dta);
+			_globalVars[i].readFrom(dta);
 		}
 	}
 
@@ -415,18 +415,14 @@ bool GameFile::init() {
 	return true;
 }
 
-InteractionVariable GameFile::readInteractionVariable(Common::SeekableReadStream *dta) {
-	InteractionVariable var;
-
+void InteractionVariable::readFrom(Common::SeekableReadStream *dta) {
 	char varName[24];
 	dta->read(varName, 23);
 	varName[23] = '\0';
-	var._name = varName;
+	_name = varName;
 
-	var._type = dta->readByte();
-	var._value = dta->readSint32LE();
-
-	return var;
+	_type = dta->readByte();
+	_value = dta->readSint32LE();
 }
 
 #define MAX_NEWINTERACTION_EVENTS 30

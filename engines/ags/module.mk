@@ -7,6 +7,7 @@ MODULE_OBJS := \
 	gui.o \
 	metaengine.o \
 	resourceman.o \
+	room.o \
 	script.o \
 	sprites.o \
 	util.o
