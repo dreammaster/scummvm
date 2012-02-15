@@ -26,6 +26,7 @@
 #include "common/debug.h"
 #include "common/endian.h"
 #include "common/stream.h"
+#include "common/substream.h"
 #include "common/textconsole.h"
 
 #include "ags/resourceman.h"
@@ -38,7 +39,7 @@ static const uint32 kSigE = MKTAG('S', 'I', 'G', 'E');
 // as "ac2game.ags".
 static const char *kMasterArchiveName = "ac2game.ags";
 
-static const char *kSecretPassword = "My\x1\xde\x4Jibzle";
+static const char *kSecretArchivePassword = "My\x1\xde\x4Jibzle";
 
 namespace AGS {
 
@@ -64,7 +65,7 @@ ResourceManager::~ResourceManager() {
 void ResourceManager::decryptText(uint8 *str, uint32 max) {
 	int passPos = 0;
 	while (max-- > 0) {
-		*str -= (uint8) kSecretPassword[passPos];
+		*str -= (uint8) kSecretArchivePassword[passPos];
 		if (!*str)
 			break;
 
@@ -411,10 +412,7 @@ Common::SeekableReadStream *ResourceManager::getFile(const Common::String &file)
 
 	File &f = *it->_value;
 
-	if (!_archives[f.archive]->seek(f.offset))
-		return 0;
-
-	return _archives[f.archive]->readStream(f.size);
+	return new Common::SeekableSubReadStream(_archives[f.archive], f.offset, f.offset + f.size);
 }
 
 bool ResourceManager::dumpFile(const Common::String &file) const {

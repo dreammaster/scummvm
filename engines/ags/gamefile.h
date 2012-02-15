@@ -83,6 +83,8 @@ struct NewInteractionCommandList : public NewInteractionAction {
 };
 
 struct NewInteractionEvent {
+	NewInteractionEvent() : _response(NULL) { }
+
 	uint32 _type;
 	uint32 _timesRun;
 	NewInteractionCommandList *_response;
@@ -90,6 +92,7 @@ struct NewInteractionEvent {
 
 struct NewInteraction {
 	static NewInteraction *createFrom(Common::SeekableReadStream *dta);
+	~NewInteraction();
 
 	Common::Array<NewInteractionEvent> _events;
 

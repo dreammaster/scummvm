@@ -35,10 +35,32 @@
 
 namespace AGS {
 
-GameFile::GameFile(AGSEngine *vm) : _vm(vm) {
+GameFile::GameFile(AGSEngine *vm) : _vm(vm), _gameScript(NULL) {
 }
 
 GameFile::~GameFile() {
+	for (uint i = 0; i < _chars.size(); ++i)
+		delete _chars[i];
+
+	for (uint i = 0; i < _guiButtons.size(); ++i)
+		delete _guiButtons[i];
+	for (uint i = 0; i < _guiLabels.size(); ++i)
+		delete _guiLabels[i];
+	for (uint i = 0; i < _guiInvControls.size(); ++i)
+		delete _guiInvControls[i];
+	for (uint i = 0; i < _guiSliders.size(); ++i)
+		delete _guiSliders[i];
+	for (uint i = 0; i < _guiTextBoxes.size(); ++i)
+		delete _guiTextBoxes[i];
+	for (uint i = 0; i < _guiListBoxes.size(); ++i)
+		delete _guiListBoxes[i];
+
+	for (uint i = 0; i < _interactionsChar.size(); ++i)
+		delete _interactionsChar[i];
+	for (uint i = 0; i < _interactionsInv.size(); ++i)
+		delete _interactionsInv[i];
+
+	delete _gameScript;
 }
 
 void GameFile::readVersion(Common::SeekableReadStream &dta) {
@@ -462,6 +484,11 @@ NewInteraction *NewInteraction::createFrom(Common::SeekableReadStream *dta) {
 	}
 
 	return interaction;
+}
+
+NewInteraction::~NewInteraction() {
+	for (uint i = 0; i < _events.size(); ++i)
+		delete _events[i]._response;
 }
 
 #define MAX_ACTION_ARGS 5

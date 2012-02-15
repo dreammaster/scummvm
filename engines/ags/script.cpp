@@ -164,6 +164,11 @@ ccInstance::ccInstance(AGSEngine *vm, ccScript *script, bool autoImport, ccInsta
 	}
 }
 
+ccInstance::~ccInstance() {
+	if (!(_flags & INSTF_SHAREDATA))
+		delete _globalData;
+}
+
 bool ccInstance::exportsSymbol(const Common::String &name) {
 	Common::String mangledName = name + '$';
 

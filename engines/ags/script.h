@@ -98,6 +98,7 @@ class AGSEngine;
 class ccInstance {
 public:
 	ccInstance(AGSEngine *vm, ccScript *script, bool autoImport = false, ccInstance *fork = NULL);
+	~ccInstance();
 
 	bool isRunning() { return (_pc != 0); }
 	bool exportsSymbol(const Common::String &name);

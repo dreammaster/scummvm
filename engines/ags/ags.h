@@ -74,6 +74,8 @@ public:
 
 	Common::SeekableReadStream *getFile(const Common::String &filename) const;
 
+	Graphics::PixelFormat getPixelFormat() const;
+
 	void setDefaultCursor();
 	uint32 findNextEnabledCursor(uint32 startWith);
 	void setCursorMode(uint32 newMode);

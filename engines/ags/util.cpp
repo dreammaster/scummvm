@@ -39,9 +39,9 @@ Common::String readString(Common::SeekableReadStream *dta) {
 	return str;
 }
 
-void decryptText(uint8 *str, uint32 max) {
-	static const char *kSecretPassword = "Avis Durgan";
+const char *kSecretPassword = "Avis Durgan";
 
+void decryptText(uint8 *str, uint32 max) {
 	uint passPos = 0;
 	while (max-- > 0) {
 		*str -= (uint8) kSecretPassword[passPos];

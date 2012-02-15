@@ -50,12 +50,25 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true),
 	_mouseFrame(0), _mouseDelay(0), _startingRoom(0xffffffff), _displayedRoom(0xffffffff),
 	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL),
-	_currentRoom(NULL) {
+	_currentRoom(NULL), _currentCursor(0xffffffff) {
 
 	_rnd = new Common::RandomSource("ags");
 }
 
 AGSEngine::~AGSEngine() {
+	delete _currentRoom;
+
+	for (uint i = 0; i < _scriptModules.size(); ++i)
+		delete _scriptModules[i];
+	for (uint i = 0; i < _scriptModuleForks.size(); ++i)
+		delete _scriptModuleForks[i];
+	delete _gameScript;
+	delete _gameScriptFork;
+	delete _dialogScriptsScript;
+	delete _roomScript;
+
+	delete _sprites;
+
 	delete _gameFile;
 	delete _resourceMan;
 
@@ -192,6 +205,20 @@ uint32 AGSEngine::getGUIVersion() const {
 
 uint32 AGSEngine::getGameUniqueID() const {
 	return _gameFile->_uniqueID;
+}
+
+Graphics::PixelFormat AGSEngine::getPixelFormat() const {
+	switch (_gameFile->_colorDepth) {
+	case 1:
+		// 8bpp
+		return Graphics::PixelFormat::createFormatCLUT8();
+	case 2:
+		// 16bpp: 565
+		return Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0);
+	default:
+		// 24bpp: RGB888
+		return Graphics::PixelFormat(3, 8, 8, 8, 0, 16, 8, 0, 0);
+	}
 }
 
 Common::SeekableReadStream *AGSEngine::getFile(const Common::String &filename) const {
