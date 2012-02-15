@@ -177,7 +177,7 @@ void AGSEngine::loadNewRoom(uint32 id, CharacterInfo *forChar) {
 	if (!stream)
 		error("failed to open room file for room %d", id);
 
-	_currentRoom = new Room(stream);
+	_currentRoom = new Room(this, stream);
 
 	// FIXME
 }
@@ -188,6 +188,10 @@ uint32 AGSEngine::getGameFileVersion() const {
 
 uint32 AGSEngine::getGUIVersion() const {
 	return _gameFile->_guiVersion;
+}
+
+uint32 AGSEngine::getGameUniqueID() const {
+	return _gameFile->_uniqueID;
 }
 
 Common::SeekableReadStream *AGSEngine::getFile(const Common::String &filename) const {

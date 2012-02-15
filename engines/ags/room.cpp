@@ -23,11 +23,130 @@
  * which is licensed under the Artistic License 2.0.
  */
 
+#include "engines/ags/ags.h"
 #include "engines/ags/constants.h"
 #include "engines/ags/room.h"
 #include "engines/ags/util.h"
 
 namespace AGS {
+
+static void decompressLZSS(Common::SeekableReadStream *stream, byte *outBuf, uint32 destSize) {
+	const uint32 N = 4096; // history buffer size (2^12)
+	const uint32 F = 16;
+	const uint32 THRESHOLD = 3; // base threshold for encoded strings
+
+	byte buffer[N];
+
+	uint32 bufPos = N - F;
+	uint32 outPos = 0;
+
+	while (outPos < destSize && !stream->eos()) {
+		byte flagBits = stream->readByte();
+
+		// 8 bits
+		for (uint32 i = 1; (i <= 8) && (outPos < destSize); i++) {
+			if ((flagBits & 1) == 1) {
+				// string from history buffer
+				uint16 data = stream->readUint16LE();
+
+				uint32 length = ((data >> 12) & 0xF) + THRESHOLD;
+				uint32 inPos = (bufPos - data - 1) & (N - 1);
+
+				while ((outPos < destSize) && length--) {
+					byte val = buffer[inPos];
+					outBuf[outPos++] = val;
+					buffer[bufPos] = val;
+					inPos = (inPos + 1) & (N - 1);
+					bufPos = (bufPos + 1) & (N - 1);
+				}
+			} else {
+				// byte (to add to history buffer)
+				byte val = stream->readByte();
+				outBuf[outPos++] = val;
+				buffer[bufPos] = val;
+				bufPos = (bufPos + 1) & (N - 1);
+			}
+
+			// next bit
+			flagBits = flagBits >> 1;
+		}
+	}
+}
+
+static Graphics::Surface readLZSSImage(Common::SeekableReadStream *stream, byte *destPalette) {
+	Graphics::Surface surf;
+
+	stream->read(destPalette, 256 * 4);
+
+	uint32 uncompressedSize = stream->readUint32LE();
+	uint32 compressedSize = stream->readUint32LE();
+	if (uncompressedSize < 8)
+		error("readLZSSImage: %d uncompressed bytes is insufficient (%d compressed)", uncompressedSize, compressedSize);
+
+	byte *buffer = new byte[uncompressedSize];
+	uint32 oldPos = stream->pos();
+	decompressLZSS(stream, buffer, uncompressedSize);
+	if (stream->eos() || (uint32)stream->pos() != oldPos + compressedSize)
+		error("readLZSSImage: failed to read %d compressed bytes of image (started at %d, got to %d)", compressedSize, oldPos, stream->pos());
+
+	// FIXME: XXX
+	Graphics::PixelFormat format = Graphics::PixelFormat::createFormatCLUT8();
+
+	uint32 widthBytes = READ_LE_UINT32(buffer);
+	uint32 height = READ_LE_UINT32(buffer + 4);
+	if (widthBytes * height != uncompressedSize - 8)
+		error("readLZSSImage: %d bytes width and %d height doesn't match %d size", widthBytes, height, uncompressedSize);
+	if (widthBytes % format.bytesPerPixel != 0)
+		error("readLZSSImage: %d bytes width doesn't divide into %d bpp", widthBytes, format.bytesPerPixel);
+	surf.create(widthBytes / format.bytesPerPixel, height, format);
+
+	// FIXME: convert to correct format
+	memcpy(surf.getPixels(), buffer + 8, uncompressedSize - 8);
+
+	delete[] buffer;
+	return surf;
+}
+
+static void unpackBits(Common::SeekableReadStream *stream, byte *dest, uint32 size) {
+	uint32 offset = 0;
+
+	while (!stream->eos() && (offset < size)) {
+		signed char n = (signed char)stream->readByte();
+
+		if (n == -128)
+			n = 0;
+
+		if (n < 0) {
+			// run of a single byte
+			uint32 count = 1 - n;
+			byte data = stream->readByte();
+			while (count-- && (offset < size)) {
+				dest[offset++] = data;
+			}
+		} else {
+			// run of non-encoded bytes
+			uint32 count = 1 + n;
+			while (count-- && (offset < size)) {
+				dest[offset++] = stream->readByte();
+			}
+		}
+	}
+}
+
+static Graphics::Surface readRLEImage(Common::SeekableReadStream *stream) {
+	Graphics::Surface surf;
+
+	uint16 width = stream->readUint16LE();
+	uint16 height = stream->readUint16LE();
+	surf.create(width, height, Graphics::PixelFormat::createFormatCLUT8());
+
+	for (uint i = 0; i < height; ++i)
+		unpackBits(stream, (byte *)surf.getBasePtr(0, i), width);
+
+	stream->skip(256 * 3); // skip palette
+
+	return surf;
+}
 
 #define ROOM_FILE_VERSION kAGSRoomVer303x // 29
 
@@ -44,9 +163,9 @@ namespace AGS {
 #define BLOCKTYPE_OBJECTSCRIPTNAMES 9
 #define BLOCKTYPE_EOF         0xff
 
-Room::Room(Common::SeekableReadStream *dta) {
-	// FIXME: num_bscenes = 1
-	// FIXME: bscene_anim_speed = 5
+Room::Room(AGSEngine *vm, Common::SeekableReadStream *dta) : _vm(vm) {
+	_backgroundSceneAnimSpeed = 5;
+	// FIXME: copy main background scene palette
 
 	_version = dta->readUint16LE();
 
@@ -139,6 +258,9 @@ Room::Room(Common::SeekableReadStream *dta) {
 	// FIXME
 }
 
+#define NO_GAME_ID_IN_ROOM_FILE 16325
+#define MAX_WALK_AREAS 15
+
 void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	_bytesPerPixel = 1;
 	if (_version >= kAGSRoomVer208)
@@ -148,6 +270,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 
 	// walk-behind base lines
 	uint16 walkBehindsCount = dta->readUint16LE();
+	debug(5, "Room: %d walk-behinds", walkBehindsCount);
 	if (walkBehindsCount > 16)
 		error("Room: too many walk-behinds (%d)", walkBehindsCount);
 	_walkBehindBaselines.resize(walkBehindsCount);
@@ -156,6 +279,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 
 	// hotspots
 	uint32 hotspotCount = dta->readUint32LE();
+	debug(5, "Room: %d hotspots", hotspotCount);
 	if (!hotspotCount)
 		hotspotCount = 20;
 	if (hotspotCount > 50) // MAX_HOTSPOTS: v2.62 increased from 20 to 30; v2.8 to 50
@@ -173,6 +297,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 			dta->read(hotspotName, 30);
 			hotspotName[30] = '\0';
 			_hotspots[i]._name = hotspotName;
+			debug(7, "hotspot %d: '%s'", i, hotspotName);
 		}
 	}
 	if (_version >= kAGSRoomVer270) {
@@ -181,15 +306,19 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 			dta->read(hotspotName, MAX_SCRIPT_NAME_LEN);
 			hotspotName[MAX_SCRIPT_NAME_LEN] = '\0';
 			_hotspots[i]._scriptName = hotspotName;
+			debug(7, "hotspot %d script '%s'", i, hotspotName);
 		}
 	}
 
 	// walk area wall points
-	uint32 walkAreaCount = dta->readUint32LE();
-	_walkAreas.resize(walkAreaCount);
-	for (uint i = 0; i < _walkAreas.size(); ++i) {
-		_walkAreas[i]._wallPoint.x = dta->readUint32LE();
-		_walkAreas[i]._wallPoint.y = dta->readUint32LE();
+	uint32 wallPointCount = dta->readUint32LE();
+	debug(5, "Room: %d wall points", wallPointCount);
+	if (wallPointCount > MAX_WALK_AREAS)
+		error("Room: too many wall points (%d)", wallPointCount);
+	_wallPoints.resize(wallPointCount);
+	for (uint i = 0; i < _wallPoints.size(); ++i) {
+		_wallPoints[i].x = dta->readUint32LE();
+		_wallPoints[i].y = dta->readUint32LE();
 	}
 
 	// room boundary
@@ -200,6 +329,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 
 	// objects
 	uint32 objectCount = dta->readUint16LE();
+	debug(5, "Room: %d objects", objectCount);
 	if (objectCount > 40)
 		error("Room: too many objects (%d)", objectCount);
 	_objects.resize(objectCount);
@@ -216,16 +346,200 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	if (_version >= kAGSRoomVer253) {
 		// local variables
 		uint32 localVarCount = dta->readUint32LE();
+		debug(5, "Room: %d local variables", localVarCount);
 		_localVars.resize(localVarCount);
 		for (uint i = 0; i < _localVars.size(); ++i)
 			_localVars[i].readFrom(dta);
 	}
 
 	if (_version >= kAGSRoomVer241) {
-		// FIXME
+		// 2.x interactions
+		if (_version < kAGSRoomVer300) {
+			for (uint i = 0; i < _hotspots.size(); ++i) {
+				_hotspots[i]._interaction = NewInteraction::createFrom(dta);
+			}
+			for (uint i = 0; i < _objects.size(); ++i) {
+				_objects[i]._interaction = NewInteraction::createFrom(dta);
+			}
+		}
+
+		if (_version < kAGSRoomVer300)
+			_interaction = NewInteraction::createFrom(dta);
+
+		if (_version >= kAGSRoomVer255r) {
+			// regions
+			uint32 regionCount = dta->readUint32LE();
+			debug(5, "Room: %d regions", regionCount);
+			if (regionCount > 16)
+				error("Room: too many regions (%d)", regionCount);
+			_regions.resize(regionCount);
+
+			// 2.x interactions
+			if (_version < kAGSRoomVer300) {
+				for (uint i = 0; i < _regions.size(); ++i) {
+					_regions[i]._interaction = NewInteraction::createFrom(dta);
+				}
+			}
+		}
+
+		if (_version >= kAGSRoomVer300) {
+			// 3.x scripts
+
+			// FIXME
+			error("3.x not supported yet");
+		}
 	}
 
-	// FIXME
+	if (_version >= kAGSRoomVer2a) {
+		for (uint i = 0; i < _objects.size(); ++i)
+			_objects[i]._baseLine = dta->readUint32LE();
+		_width = dta->readUint16LE();
+		_height = dta->readUint16LE();
+		debug(4, "Room: width %d, height %d", _width, _height);
+	}
+
+	// object flags
+	if (_version >= kAGSRoomVer262) {
+		for (uint i = 0; i < _objects.size(); ++i)
+			_objects[i]._flags = dta->readUint16LE();
+	}
+
+	// (relative) resolution
+	_resolution = 1;
+	if (_version >= kAGSRoomVer200)
+		_resolution = dta->readUint16LE();
+
+	// walk area header
+	uint32 walkAreaCount = MAX_WALK_AREAS;
+	if (_version >= kAGSRoomVer240) {
+		walkAreaCount = dta->readUint32LE();
+		debug(5, "Room: %d walk areas", walkAreaCount);
+	}
+	if (walkAreaCount > MAX_WALK_AREAS + 1)
+		error("Room: too many walk areas (%d)", walkAreaCount);
+	_walkAreas.resize(walkAreaCount);
+
+	// walk area zoom level
+	if (_version >= kAGSRoomVer2a7) {
+		for (uint i = 0; i < _walkAreas.size(); ++i)
+			_walkAreas[i]._zoom = dta->readUint16LE();
+	}
+
+	// walk area light level
+	if (_version >= kAGSRoomVer214) {
+		for (uint i = 0; i < _walkAreas.size(); ++i)
+			_walkAreas[i]._light = dta->readUint16LE();
+	}
+
+	// walk area vector scaling
+	if (_version >= kAGSRoomVer251) {
+		for (uint i = 0; i < _walkAreas.size(); ++i) {
+			_walkAreas[i]._zoom2 = dta->readUint16LE();
+
+			// if this is a continuously scaled area with the same zoom
+			// level at both ends, change it to a normal scaled area
+			if (_walkAreas[i]._zoom == _walkAreas[i]._zoom2)
+				_walkAreas[i]._zoom2 = NOT_VECTOR_SCALED;
+		}
+		for (uint i = 0; i < _walkAreas.size(); ++i)
+			_walkAreas[i]._top = dta->readUint16LE();
+		for (uint i = 0; i < _walkAreas.size(); ++i)
+			_walkAreas[i]._bottom = dta->readUint16LE();
+	}
+
+	dta->skip(11); // FIXME: password (+demangling)
+
+	// options
+	_options.resize(10);
+	for (uint i = 0; i < 10; ++i)
+		_options[i] = dta->readByte();
+
+	// message count
+	uint16 messageCount = dta->readUint16LE();
+	debug(5, "Room: %d messages", messageCount);
+	if (messageCount > 100)
+		error("Room: too many messages (%d)", messageCount);
+	_messages.resize(messageCount);
+
+	// owning game id
+	_gameId = NO_GAME_ID_IN_ROOM_FILE; // FIXME: good?
+	if (_version >= kAGSRoomVer272)
+		_gameId = dta->readUint32LE();
+	if ((_gameId != NO_GAME_ID_IN_ROOM_FILE) && (_gameId != _vm->getGameUniqueID()))
+		error("Room: room game id %d doesn't match main game id %d", _gameId, _vm->getGameUniqueID());
+
+	// actual messages
+	if (_version >= 3) {
+		for (uint i = 0; i < _messages.size(); ++i) {
+			_messages[i]._displayAs = dta->readByte();
+			_messages[i]._flags = dta->readByte();
+		}
+	}
+
+	for (uint i = 0; i < _messages.size(); ++i) {
+		Common::String &text = _messages[i]._text;
+
+		if (_version >= kAGSRoomVer261)
+			text = decryptString(dta);
+		else
+			text = readString(dta);
+
+		debug(7, "Room: message %d: '%s'", i, text.c_str());
+
+		if (text.empty())
+			continue;
+		if (text[text.size() - 1] == (char)200) {
+			// convert old-style terminator into new-style flag
+			text.deleteLastChar();
+			_messages[i]._flags |= MSG_DISPLAYNEXT;
+		}
+	}
+
+	if (_version >= 6) {
+		uint16 animationCount = dta->readUint16LE();
+
+		if (animationCount)
+			warning("Room: ignoring %d animations", animationCount);
+		// FIXME: read these?
+		dta->skip(animationCount * (4 + (24 * 10)));
+	}
+
+	if ((_version >= 4) && (_version < kAGSRoomVer250)) {
+		// FIXME
+		error("don't support pre-2.5 graphical scripts yet");
+	}
+
+	if (_version >= kAGSRoomVer114) {
+		_shadingInfo.resize(16);
+		for (uint i = 0; i < 16; ++i)
+			_shadingInfo[i] = dta->readUint16LE();
+	}
+
+	if (_version >= kAGSRoomVer255r) {
+		for (uint i = 0; i < _regions.size(); ++i)
+			_regions[i]._lightLevel = dta->readUint16LE();
+		for (uint i = 0; i < _regions.size(); ++i)
+			_regions[i]._tintLevel = dta->readUint32LE();
+	}
+
+	BackgroundScene scene;
+	_backgroundScenes.push_back(scene);
+	if (_version >= 5)
+		_backgroundScenes[0]._scene = readLZSSImage(dta, _backgroundScenes[0]._palette);
+	else
+		_backgroundScenes[0]._scene = readRLEImage(dta);
+
+	_walkableMask = readRLEImage(dta);
+	_walkBehindMask = readRLEImage(dta);
+	_hotspotMask = readRLEImage(dta);
+	_regionsMask = readRLEImage(dta);
+
+	if (_version < kAGSRoomVer255r) {
+		// old version - copy the walkable areas to regions
+
+		// FIXME
+		error("Room: too old, fixme");
+	}
 }
 
 } // End of namespace AGS

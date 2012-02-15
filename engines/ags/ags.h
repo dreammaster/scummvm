@@ -70,6 +70,7 @@ public:
 
 	uint32 getGameFileVersion() const;
 	uint32 getGUIVersion() const;
+	uint32 getGameUniqueID() const;
 
 	Common::SeekableReadStream *getFile(const Common::String &filename) const;
 

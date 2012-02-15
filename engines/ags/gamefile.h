@@ -89,7 +89,12 @@ struct NewInteractionEvent {
 };
 
 struct NewInteraction {
+	static NewInteraction *createFrom(Common::SeekableReadStream *dta);
+
 	Common::Array<NewInteractionEvent> _events;
+
+protected:
+	NewInteractionCommandList *readCommandList(Common::SeekableReadStream *dta);
 };
 
 struct DictionaryWord {
@@ -214,8 +219,6 @@ public:
 	bool init();
 
 private:
-	NewInteraction *readNewInteraction(Common::SeekableReadStream *dta);
-	NewInteractionCommandList *readCommandList(Common::SeekableReadStream *dta);
 	ViewFrame readViewFrame(Common::SeekableReadStream *dta);
 	void readOldViews(Common::SeekableReadStream *dta);
 	CharacterInfo *readCharacter(Common::SeekableReadStream *dta);

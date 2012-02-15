@@ -122,6 +122,7 @@ bool GameFile::init() {
 	_hotDotOuter = dta->readUint16LE();
 
 	_uniqueID = dta->readUint32LE();
+	debug(4, "game ID: %d", _uniqueID);
 
 	_guiCount = dta->readUint32LE();
 	_cursorCount = dta->readUint32LE();
@@ -224,11 +225,11 @@ bool GameFile::init() {
 		debug(1, "char interactions");
 		_interactionsChar.resize(_charCount);
 		for (uint32 i = 0; i < _charCount; i++)
-			_interactionsChar[i] = readNewInteraction(dta);
+			_interactionsChar[i] = NewInteraction::createFrom(dta);
 		debug(1, "inv interactions");
 		_interactionsInv.resize(_invItemCount);
 		for (uint32 i = 0; i < _invItemCount; i++)
-			_interactionsInv[i] = readNewInteraction(dta);
+			_interactionsInv[i] = NewInteraction::createFrom(dta);
 
 		uint32 globalVarsCount = dta->readUint32LE();
 		_globalVars.resize(globalVarsCount);
@@ -427,7 +428,7 @@ void InteractionVariable::readFrom(Common::SeekableReadStream *dta) {
 
 #define MAX_NEWINTERACTION_EVENTS 30
 
-NewInteraction *GameFile::readNewInteraction(Common::SeekableReadStream *dta) {
+NewInteraction *NewInteraction::createFrom(Common::SeekableReadStream *dta) {
 	uint32 unknown = dta->readUint32LE();
 	if (unknown != 1) {
 		if (unknown != 0)
@@ -457,7 +458,7 @@ NewInteraction *GameFile::readNewInteraction(Common::SeekableReadStream *dta) {
 			continue;
 
 		debug(8, "reading response");
-		interaction->_events[i]._response = readCommandList(dta);
+		interaction->_events[i]._response = interaction->readCommandList(dta);
 	}
 
 	return interaction;
@@ -465,7 +466,7 @@ NewInteraction *GameFile::readNewInteraction(Common::SeekableReadStream *dta) {
 
 #define MAX_ACTION_ARGS 5
 
-NewInteractionCommandList *GameFile::readCommandList(Common::SeekableReadStream *dta) {
+NewInteractionCommandList *NewInteraction::readCommandList(Common::SeekableReadStream *dta) {
 	NewInteractionCommandList *list = new NewInteractionCommandList();
 	uint32 commandsCount = dta->readUint32LE();
 	list->_timesRun = dta->readUint32LE();

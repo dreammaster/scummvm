@@ -63,6 +63,8 @@ struct FullAnimation {
 };
 
 struct RoomRegion {
+	RoomRegion() : _interaction(NULL), _lightLevel(0), _tintLevel(0) { }
+
 	NewInteraction *_interaction;
 	Common::Array<Common::String> *_scripts;
 	uint16 _lightLevel;
@@ -70,6 +72,8 @@ struct RoomRegion {
 };
 
 struct RoomObject {
+	RoomObject() : _interaction(NULL), _flags(0) { }
+
 	SpriteStruct _sprite;
 	NewInteraction *_interaction;
 	Common::Array<Common::String> *_scripts;
@@ -82,14 +86,18 @@ struct RoomObject {
 
 #define MSG_DISPLAYNEXT 1 // supercedes using alt-200 at end of message
 #define MSG_TIMELIMIT   2
-struct RoomMessage {
+struct MessageInfo {
+	MessageInfo() : _displayAs(0), _flags(0) { }
+
 	Common::String _text;
 	byte _displayAs; // 0 = normal window, 1 = as speech
 	byte _flags;
 };
 
+#define NOT_VECTOR_SCALED ((uint16)-10000)
 struct RoomWalkArea {
-	PolyPoint _wallPoint;
+	RoomWalkArea() : _light(0), _top(0xffff), _bottom(0xffff), _zoom(0), _zoom2(NOT_VECTOR_SCALED) { }
+
 	int16 _zoom; // 0 = 100%, 1 = 101%, -1 = 99%
 	int16 _zoom2; // for vector scaled areas
 	int16 _light; // 0 = normal, + lighter, - darker
@@ -97,6 +105,8 @@ struct RoomWalkArea {
 };
 
 struct RoomHotspot {
+	RoomHotspot() : _interaction(NULL) { }
+
 	Common::Point _walkToPos;
 	Common::String _name;
 	Common::String _scriptName;
@@ -106,16 +116,22 @@ struct RoomHotspot {
 };
 
 struct BackgroundScene {
+	BackgroundScene() : _sharedPalette(false) { }
+
 	Graphics::Surface _scene;
 	bool _sharedPalette;
-	byte _palette[256 * 3];
+	byte _palette[256 * 4];
 };
+
+class AGSEngine;
 
 class Room {
 public:
-	Room(Common::SeekableReadStream *dta);
+	Room(AGSEngine *vm, Common::SeekableReadStream *dta);
 
 protected:
+	AGSEngine *_vm;
+
 	void readMainBlock(Common::SeekableReadStream *dta);
 
 public:
@@ -126,7 +142,7 @@ public:
 	Graphics::Surface _hotspotMask; // lookat
 	Graphics::Surface _regionsMask; // regions
 
-	byte *_palette[256 * 3];
+	byte *_palette[256 * 4];
 
 	Common::Array<uint16> _walkBehindBaselines; // objyval: baselines of walkbehind areas
 
@@ -138,15 +154,18 @@ public:
 	Common::String _password;
 	Common::Array<byte> _options;
 
-	Common::Array<Common::String> _messages;
+	Common::Array<MessageInfo> _messages;
 
 	uint16 _version; // wasversion: when loaded from file
+	uint32 _gameId;
 	uint16 _flagStates;
 	Common::Array<FullAnimation> _anims;
 
-	uint16 _shadingInfo; // walkable area-specific view number
+	Common::Array<uint16> _shadingInfo; // walkable area-specific view number
 
 	// v2.x
+	Common::Array<PolyPoint> _wallPoints;
+
 	Common::Array<RoomWalkArea> _walkAreas;
 	Common::Array<RoomHotspot> _hotspots;
 
