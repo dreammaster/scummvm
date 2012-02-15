@@ -96,6 +96,13 @@ void ccScript::readFrom(Common::SeekableReadStream *dta) {
 				error("duplicate fixup (index %d, old type %d, new type %d)", fixupIndex,
 					_code[fixupIndex]._fixupType, fixupTypes[i]);
 			_code[fixupIndex]._fixupType = fixupTypes[i];
+
+			// do some in-range sanity checks (note that imports are handled below)
+			uint32 data = _code[fixupIndex]._data;
+			if ((fixupTypes[i] == FIXUP_GLOBALDATA) && (data >= _globalData.size()))
+				error("out-of-range global data fixup (at %d, for data at %d)", fixupIndex, data);
+			else if ((fixupTypes[i] == FIXUP_STRING) && (data >= _strings.size()))
+				error("out-of-range string fixup (at %d, for data at %d)", fixupIndex, data);
 		} else {
 			// invalid/unknown type
 			error("invalid fixup type %d", fixupTypes[i]);
@@ -410,7 +417,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 				break;
 			case FIXUP_STRING:
 				argVal[v]._type = rvtString;
-				debugN(2, " string@%d", argVal[v]._value);
+				debugN(2, " string@%d\"%s\"", argVal[v]._value, &_script->_strings[argVal[v]._value]);
 				break;
 			case FIXUP_IMPORT:
 				argVal[v]._type = rvtImport;
@@ -719,7 +726,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_SUBREALSTACK:
 			// farsubsp
 			// FIXME: CALLAS handling
-			for (uint i = 0; i < int1; ++i)
+			for (uint i = 0; i < (uint32)int1; ++i)
 				externalStack.pop();
 			break;
 		case SCMD_CALLOBJ:
