@@ -41,6 +41,7 @@
 #include "ags/resourceman.h"
 #include "ags/room.h"
 #include "ags/script.h"
+#include "ags/scripting/scripting.h"
 #include "ags/sprites.h"
 
 namespace AGS {
@@ -53,6 +54,7 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_currentRoom(NULL), _currentCursor(0xffffffff) {
 
 	_rnd = new Common::RandomSource("ags");
+	_scriptState = new GlobalScriptState();
 }
 
 AGSEngine::~AGSEngine() {
@@ -72,6 +74,7 @@ AGSEngine::~AGSEngine() {
 	delete _gameFile;
 	delete _resourceMan;
 
+	delete _scriptState;
 	delete _rnd;
 }
 
@@ -248,6 +251,7 @@ bool AGSEngine::init() {
 	if (!_gameFile->init())
 		return false;
 
+	addSystemScripting(_scriptState);
 	// FIXME: register script objects
 
 	// FIXME: load fonts
@@ -473,6 +477,36 @@ void AGSEngine::runTextScript(ccInstance *instance, const Common::String &name, 
 		if (instance == _roomScript)
 			error("failed to run room script '%s' (room %d)", name.c_str(), _displayedRoom);
 	}
+}
+
+ScriptImport AGSEngine::resolveImport(const Common::String &name) {
+	if (name.empty()) {
+		// no such import
+		ScriptImport import;
+		import._type = sitInvalid;
+		return import;
+	}
+
+	if (_scriptState->_imports.contains(name))
+		return _scriptState->_imports[name];
+
+	// try resolving it without the parameter count (i.e. FunctionName^3 -> FunctionName)
+	if (name.size() >= 3) {
+		Common::String mangledName = name;
+		while (mangledName[mangledName.size() - 1] != '^' && mangledName.size() >= 2)
+			mangledName.deleteLastChar();
+		if (mangledName[mangledName.size() - 1] == '^') {
+			mangledName.deleteLastChar();
+			if (_scriptState->_imports.contains(mangledName))
+				return _scriptState->_imports[mangledName];
+		}
+	}
+
+	// FIXME: -> error
+	warning("unresolved script import '%s'", name.c_str());
+	ScriptImport import;
+	import._type = sitInvalid;
+	return import;
 }
 
 bool AGSEngine::runScriptFunction(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {

@@ -23,6 +23,7 @@
  * which is licensed under the Artistic License 2.0.
  */
 
+#include "engines/ags/ags.h"
 #include "engines/ags/script.h"
 #include "engines/ags/util.h"
 #include "engines/ags/vm.h"
@@ -162,7 +163,11 @@ ccInstance::ccInstance(AGSEngine *vm, ccScript *script, bool autoImport, ccInsta
 		_globalData = new Common::Array<byte>(script->_globalData);
 	}
 
-	// FIXME: check all imports can be resolved?
+	// resolve all the imports
+	_resolvedImports.resize(script->_imports.size());
+	for (uint i = 0; i < script->_imports.size(); ++i) {
+		_resolvedImports[i] = _vm->resolveImport(script->_imports[i]);
+	}
 
 	_pc = 0;
 	_script->_instances++;

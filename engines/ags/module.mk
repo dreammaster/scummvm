@@ -9,6 +9,17 @@ MODULE_OBJS := \
 	resourceman.o \
 	room.o \
 	script.o \
+	scripting/audio.o \
+	scripting/character.o \
+	scripting/game.o \
+	scripting/graphics.o \
+	scripting/gui.o \
+	scripting/input.o \
+	scripting/inventory.o \
+	scripting/misc.o \
+	scripting/room.o \
+	scripting/scripting.o \
+	scripting/strings.o \
 	sprites.o \
 	util.o
 

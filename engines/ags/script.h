@@ -27,6 +27,7 @@
 #define AGS_SCRIPT_H
 
 #include "common/array.h"
+#include "common/hash-str.h"
 #include "common/stream.h"
 
 namespace AGS {
@@ -86,13 +87,36 @@ struct RuntimeValue {
 	}
 };
 
+enum ScriptImportType {
+	sitInvalid,
+	sitSystemFunction,
+	sitSystemData,
+	sitScriptFunction,
+	sitScriptData
+};
+
+class AGSEngine;
+class ccInstance;
+
+typedef RuntimeValue ScriptAPIFunction(AGSEngine *vm, const Common::Array<RuntimeValue> &params);
+
+struct ScriptImport {
+	ScriptImportType _type;
+
+	// function pointer (system)
+	ScriptAPIFunction *_function;
+
+	// script instance (script)
+	ccInstance *_owner;
+	// code/data offset (script)
+	uint32 _offset;
+};
+
 struct CallStackEntry {
 	uint32 _lineNumber;
 	uint32 _address;
 	class ccInstance *_instance;
 };
-
-class AGSEngine;
 
 // a running instance of a script
 class ccInstance {
@@ -119,6 +143,7 @@ protected:
 	Common::Array<RuntimeValue> _registers;
 	Common::Array<CallStackEntry> _callStack;
 	Common::Array<RuntimeValue> _stack;
+	Common::Array<ScriptImport> _resolvedImports;
 	// might point to another instance if in far call
 	ccInstance *_runningInst;
 

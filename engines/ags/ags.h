@@ -88,6 +88,8 @@ public:
 	void runTextScript(ccInstance *instance, const Common::String &name,
 		const Common::Array<uint32> &params = Common::Array<uint32>());
 
+	struct ScriptImport resolveImport(const Common::String &name);
+
 private:
 	const AGSGameDescription *_gameDescription;
 
@@ -128,6 +130,8 @@ private:
 	Common::Array<ccInstance *> _scriptModuleForks;
 	ccInstance *_dialogScriptsScript;
 	ccInstance *_roomScript;
+
+	class GlobalScriptState *_scriptState;
 
 	Common::String getMasterArchive() const;
 
