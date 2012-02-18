@@ -32,8 +32,11 @@ RuntimeValue Script_UnimplementedStub(AGSEngine *vm, const Common::Array<Runtime
 }
 
 void GlobalScriptState::addImport(const Common::String &name, const ScriptImport &import) {
-	if (_imports.contains(name))
-		error("duplicate exported '%s'", name.c_str());
+	// FIXME: allow overriding of script imports by system
+	if (_imports.contains(name)) {
+		warning("duplicate exported '%s'", name.c_str());
+		return;
+	}
 
 	_imports[name] = import;
 }
@@ -46,6 +49,16 @@ void GlobalScriptState::addSystemFunctionImport(const Common::String &name, Scri
 
 	addImport(name, import);
 }
+
+void GlobalScriptState::addSystemObjectImport(const Common::String &name, ScriptObject *object) {
+	ScriptImport import;
+
+	import._type = sitSystemObject;
+	import._object = object;
+
+	addImport(name, import);
+}
+
 extern void addAudioSystemScripting(GlobalScriptState *state);
 extern void addCharacterSystemScripting(GlobalScriptState *state);
 extern void addGameSystemScripting(GlobalScriptState *state);

@@ -28,6 +28,9 @@
 namespace AGS {
 
 void addGraphicsSystemScripting(GlobalScriptState *state) {
+	// graphics Game functions
+	state->addSystemFunctionImport("Game::GetColorFromRGB^3", &Script_UnimplementedStub);
+
 	// Overlay functions
 	state->addSystemFunctionImport("Overlay::CreateGraphical^4", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("Overlay::CreateTextual^106", &Script_UnimplementedStub);
@@ -104,9 +107,11 @@ void addGraphicsSystemScripting(GlobalScriptState *state) {
 	state->addSystemFunctionImport("FadeIn", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("FadeOut", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("FlipScreen", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("GetTextHeight", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("GetTextWidth", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("GetViewportX", &Script_UnimplementedStub);
-	state->addSystemFunctionImport("IsOverlayValid", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("GetViewportY", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("IsOverlayValid", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("MoveOverlay", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("RawClearScreen", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("RawDrawCircle", &Script_UnimplementedStub);
@@ -129,6 +134,10 @@ void addGraphicsSystemScripting(GlobalScriptState *state) {
 	state->addSystemFunctionImport("SetAmbientTint", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetFadeColor", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetPalRGB", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetNormalFont", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetNextScreenTransition", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetScreenTransition", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetSpeechFont", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetTextOverlay", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("ShakeScreen", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("ShakeScreenBackground", &Script_UnimplementedStub);

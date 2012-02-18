@@ -89,6 +89,7 @@ public:
 		const Common::Array<uint32> &params = Common::Array<uint32>());
 
 	struct ScriptImport resolveImport(const Common::String &name);
+	class GlobalScriptState *getScriptState();
 
 private:
 	const AGSGameDescription *_gameDescription;

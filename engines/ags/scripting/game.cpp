@@ -27,7 +27,78 @@
 
 namespace AGS {
 
+class ScriptGameObject : public ScriptObject {
+public:
+};
+
+class ScriptSaveGameIndexesObject : public ScriptObject {
+public:
+};
+
 void addGameSystemScripting(GlobalScriptState *state) {
+	// Game functions
+	state->addSystemFunctionImport("Game::ChangeTranslation^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::DoOnceOnly^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::GetFrameCountForLoop^2", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::GetLocationName^2", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::GetLoopCountForView^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::GetRunNextSettingForLoop^2", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::GetSaveSlotDescription^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::GetViewFrame^3", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::InputBox^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::SetSaveGameDirectory^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_CharacterCount", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_DialogCount", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_FileName", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_FontCount", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::geti_GlobalMessages", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::geti_GlobalStrings", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::seti_GlobalStrings", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_GUICount", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_IgnoreUserInputAfterTextTimeoutMs", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::set_IgnoreUserInputAfterTextTimeoutMs", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_InSkippableCutscene", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_InventoryItemCount", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_MinimumTextDisplayTimeMs", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::set_MinimumTextDisplayTimeMs", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_MouseCursorCount", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_Name", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::set_Name", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_NormalFont", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::set_NormalFont", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_SkippingCutscene", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_SpeechFont", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::set_SpeechFont", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::geti_SpriteWidth", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::geti_SpriteHeight", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_TextReadingSpeed", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::set_TextReadingSpeed", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_TranslationFilename", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_UseNativeCoordinates", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Game::get_ViewCount", &Script_UnimplementedStub);
+
+	// Dialog functions
+	state->addSystemFunctionImport("Dialog::get_ID", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Dialog::get_OptionCount", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Dialog::get_ShowTextParser", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Dialog::DisplayOptions^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Dialog::GetOptionState^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Dialog::GetOptionText^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Dialog::HasOptionBeenChosen^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Dialog::SetOptionState^2", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Dialog::Start^0", &Script_UnimplementedStub);
+
+	// dialog static functions
+	state->addSystemFunctionImport("GetDialogOption", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("RunDialog", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetDialogOption", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("StopDialog", &Script_UnimplementedStub);
+
+	// translation functions
+	state->addSystemFunctionImport("GetTranslation", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("GetTranslationName", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("IsTranslationAvailable", &Script_UnimplementedStub);
+
 	// text parser functions
 	state->addSystemFunctionImport("Parser::FindWordID^1", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("Parser::ParseText^1", &Script_UnimplementedStub);
@@ -64,9 +135,13 @@ void addGameSystemScripting(GlobalScriptState *state) {
 	state->addSystemFunctionImport("SetGlobalInt", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetGlobalString", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetGraphicalVariable", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetInvDimensions", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetRestartPoint", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("StartCutscene", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("UnPauseGame", &Script_UnimplementedStub);
+
+	state->addSystemObjectImport("game", new ScriptGameObject);
+	state->addSystemObjectImport("savegameindex", new ScriptSaveGameIndexesObject);
 }
 
 } // End of namespace AGS

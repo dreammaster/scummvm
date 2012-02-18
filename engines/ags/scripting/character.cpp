@@ -27,6 +27,13 @@
 
 namespace AGS {
 
+class ScriptCharacterArray : public ScriptArray {
+public:
+	ScriptObject *getObjectAt(uint32 &offset) {
+		error("ScriptCharacterArray unimplemented"); // FIXME
+	}
+};
+
 RuntimeValue Script_AddInventory(AGSEngine *vm, const Common::Array<RuntimeValue> &params) {
 	// FIXME
 	warning("AddInventory unimplemented");
@@ -166,21 +173,52 @@ void addCharacterSystemScripting(GlobalScriptState *state) {
 	state->addSystemFunctionImport("AddInventoryToCharacter", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("AnimateCharacter", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("AnimateCharacterEx", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("AreCharactersColliding", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("AreCharObjColliding", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("ChangeCharacterView", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("FaceCharacter", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("FaceLocation", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("FollowCharacter", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("FollowCharacterEx", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("GetCharacterAt", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("GetCharacterProperty", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("GetCharacterPropertyText", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("LoseInventory", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("LoseInventoryFromCharacter", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("MoveCharacter", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("MoveCharacterBlocking", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("MoveCharacterDirect", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("MoveCharacterPath", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("MoveCharacterStraight", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("MoveCharacterToHotspot", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("MoveCharacterToObject", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("ReleaseCharacterView", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetActiveInventory", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetCharacterBaseline", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetCharacterBlinkView", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetCharacterClickable", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetCharacterFrame", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetCharacterIdle", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetCharacterIgnoreLight", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetCharacterIgnoreWalkbehinds", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetCharacterProperty", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetCharacterSpeechView", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetCharacterSpeed", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetCharacterSpeedEx", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetCharacterTransparency", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetCharacterView", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetCharacterViewEx", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetCharacterViewOffset", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetPlayerCharacter", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("StopMoving", &Script_UnimplementedStub);
 
 	// character-related functions
 	state->addSystemFunctionImport("GetPlayerCharacter", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("NewRoom", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("NewRoomEx", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("NewRoomNPC", &Script_UnimplementedStub);
+
+	state->addSystemObjectImport("character", new ScriptCharacterArray);
 }
 
 } // End of namespace AGS

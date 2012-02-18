@@ -32,14 +32,23 @@
 
 namespace AGS {
 
+enum ScriptImportType {
+	sitInvalid,
+	sitSystemFunction,
+	sitSystemObject,
+	sitScriptFunction,
+	sitScriptData
+};
+
 struct ScriptCodeEntry {
 	uint32 _data;
 	byte _fixupType; // global data/string area/ etc
 };
 
 struct ScriptExport {
-	Common::String _name; // name of export
-	uint32 _address; // high byte is type; low 24-bits are offset
+	Common::String _name;
+	ScriptImportType _type;
+	uint32 _address;
 };
 
 // 'sections' allow the interpreter to find out which bit
@@ -65,20 +74,43 @@ struct ccScript {
 
 enum RuntimeValueType {
 	rvtInvalid = 0,
+	// constants
 	rvtInteger,
+	rvtFloat,
+	// local data/code
 	rvtGlobalData,
 	rvtFunction,
 	rvtString,
-	rvtImport,
+	// imports
+	rvtScriptFunction,
+	rvtScriptData,
+	rvtSystemFunction,
+	rvtSystemObject,
+	// local stack
 	rvtStackPointer
 };
+
+class AGSEngine;
+class ccInstance;
+struct RuntimeValue;
+class ScriptObject;
+
+typedef RuntimeValue ScriptAPIFunction(AGSEngine *vm, const Common::Array<RuntimeValue> &params);
 
 struct RuntimeValue {
 	RuntimeValue() : _type(rvtInteger), _value(0) { }
 	RuntimeValue(uint32 intValue) : _type(rvtInteger), _value(intValue) { }
 
 	RuntimeValueType _type;
-	uint32 _value;
+	union {
+		uint32 _value;
+		int32 _signedValue;
+	};
+	union {
+		ccInstance *_instance;
+		ScriptObject *_object;
+		ScriptAPIFunction *_function;
+	};
 
 	RuntimeValue &operator=(uint32 intValue) {
 		_type = rvtInteger;
@@ -87,24 +119,14 @@ struct RuntimeValue {
 	}
 };
 
-enum ScriptImportType {
-	sitInvalid,
-	sitSystemFunction,
-	sitSystemData,
-	sitScriptFunction,
-	sitScriptData
-};
-
-class AGSEngine;
-class ccInstance;
-
-typedef RuntimeValue ScriptAPIFunction(AGSEngine *vm, const Common::Array<RuntimeValue> &params);
-
 struct ScriptImport {
 	ScriptImportType _type;
 
 	// function pointer (system)
-	ScriptAPIFunction *_function;
+	union {
+		ScriptAPIFunction *_function;
+		class ScriptObject *_object;
+	};
 
 	// script instance (script)
 	ccInstance *_owner;
@@ -130,7 +152,7 @@ public:
 
 protected:
 	void runCodeFrom(uint32 start);
-	RuntimeValue callImportedFunction(uint32 importId, const Common::Array<RuntimeValue> &params);
+	RuntimeValue callImportedFunction(ScriptAPIFunction *function, const Common::Array<RuntimeValue> &params);
 
 	AGSEngine *_vm;
 	ccScript *_script;
@@ -150,6 +172,18 @@ protected:
 	void pushValue(const RuntimeValue &value);
 	RuntimeValue popValue();
 	uint32 popIntValue();
+};
+
+class ScriptObject {
+public:
+	virtual ~ScriptObject() { }
+
+	virtual ScriptObject *getObjectAt(uint32 &offset) { return this; }
+};
+
+class ScriptArray : public ScriptObject {
+public:
+	virtual ScriptObject *getObjectAt(uint32 &offset) = 0;
 };
 
 } // End of namespace AGS

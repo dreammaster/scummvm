@@ -27,8 +27,66 @@
 
 namespace AGS {
 
+class ScriptObjectArray : public ScriptArray {
+public:
+	ScriptObject *getObjectAt(uint32 &offset) {
+		error("ScriptObjectArray unimplemented"); // FIXME
+	}
+};
+
 void addRoomSystemScripting(GlobalScriptState *state) {
+	// Object functions
+	state->addSystemFunctionImport("Object::Animate^5", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::IsCollidingWithObject^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::GetName^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::GetProperty^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::GetPropertyText^2", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::GetTextProperty^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::MergeIntoBackground^0", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::Move^5", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::RemoveTint^0", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::RunInteraction^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::SetPosition^2", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::SetView^3", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::StopAnimating^0", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::StopMoving^0", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::Tint^5", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::GetAtScreenXY^2", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Animating", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Baseline", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_Baseline", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_BlockingHeight", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_BlockingHeight", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_BlockingWidth", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_BlockingWidth", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Clickable", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_Clickable", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Frame", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Graphic", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_Graphic", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_ID", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_IgnoreScaling", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_IgnoreScaling", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_IgnoreWalkbehinds", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_IgnoreWalkbehinds", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Loop", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Moving", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Name", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Solid", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_Solid", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Transparency", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_Transparency", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_View", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Visible", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_Visible", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_X", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_X", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::get_Y", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("Object::set_Y", &Script_UnimplementedStub);
+
 	// static room functions
+	state->addSystemFunctionImport("AnimateObject", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("AnimateObjectEx", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("CallRoomScript", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("DisableGroundLevelAreas", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("DisableRegion", &Script_UnimplementedStub);
@@ -62,6 +120,8 @@ void addRoomSystemScripting(GlobalScriptState *state) {
 	state->addSystemFunctionImport("MoveObject", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("MoveObjectDirect", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("MoveToWalkableArea", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("ObjectOff", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("ObjectOn", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("RemoveObjectTint", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("RemoveWalkableArea", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("RunHotspotInteraction", &Script_UnimplementedStub);
@@ -82,6 +142,8 @@ void addRoomSystemScripting(GlobalScriptState *state) {
 	state->addSystemFunctionImport("SetRegionTint", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetWalkBehindBase", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("StopObjectMoving", &Script_UnimplementedStub);
+
+	state->addSystemObjectImport("object", new ScriptObjectArray);
 }
 
 } // End of namespace AGS

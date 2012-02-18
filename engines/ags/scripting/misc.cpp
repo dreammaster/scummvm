@@ -28,6 +28,29 @@
 namespace AGS {
 
 void addMiscSystemScripting(GlobalScriptState *state) {
+	// File functions
+	state->addSystemFunctionImport("File::Delete^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::Exists^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::Open^2", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::Close^0", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::ReadInt^0", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::ReadRawChar^0", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::ReadRawInt^0", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::ReadRawLine^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::ReadRawLineBack^0", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::ReadString^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::ReadStringBack^0", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::WriteInt^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::WriteRawChar^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::WriteRawLine^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::WriteString^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::get_EOF", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("File::get_Error", &Script_UnimplementedStub);
+
+	// timer functions
+	state->addSystemFunctionImport("IsTimerExpired", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("SetTimer", &Script_UnimplementedStub);
+
 	// misc functions
 	state->addSystemFunctionImport("FloatToInt", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("IntToFloat", &Script_UnimplementedStub);

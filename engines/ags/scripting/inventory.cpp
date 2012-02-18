@@ -27,16 +27,43 @@
 
 namespace AGS {
 
+class ScriptInventoryArray : public ScriptArray {
+public:
+	ScriptObject *getObjectAt(uint32 &offset) {
+		error("ScriptInventoryArray unimplemented"); // FIXME
+	}
+};
+
 void addInventorySystemScripting(GlobalScriptState *state) {
+	// InventoryItem functions
+	state->addSystemFunctionImport("InventoryItem::GetAtScreenXY^2", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::IsInteractionAvailable^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::GetName^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::GetProperty^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::GetPropertyText^2", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::GetTextProperty^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::RunInteraction^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::SetName^1", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::get_CursorGraphic", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::set_CursorGraphic", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::get_Graphic", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::set_Graphic", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::get_ID", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::get_Name", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("InventoryItem::set_Name", &Script_UnimplementedStub);
+
 	// inventory functions
 	state->addSystemFunctionImport("GetInvAt", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("GetInvGraphic", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("GetInvName", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("GetInvProperty", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("GetInvPropertyText", &Script_UnimplementedStub);
+	state->addSystemFunctionImport("RunInventoryInteraction", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetInvItemName", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetInvItemPic", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("UpdateInventory", &Script_UnimplementedStub);
+
+	state->addSystemObjectImport("inventory", new ScriptInventoryArray);
 }
 
 } // End of namespace AGS

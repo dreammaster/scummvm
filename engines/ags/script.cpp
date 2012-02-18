@@ -25,6 +25,7 @@
 
 #include "engines/ags/ags.h"
 #include "engines/ags/script.h"
+#include "engines/ags/scripting/scripting.h"
 #include "engines/ags/util.h"
 #include "engines/ags/vm.h"
 #include "common/debug.h"
@@ -132,8 +133,26 @@ void ccScript::readFrom(Common::SeekableReadStream *dta) {
 	_exports.resize(exportsCount);
 	for (uint i = 0; i < exportsCount; ++i) {
 		_exports[i]._name = readString(dta);
-		_exports[i]._address = dta->readUint32LE();
-		debug(5, "script export '%s'", _exports[i]._name.c_str());
+		uint32 exportAddress = dta->readUint32LE();
+		// high byte is type
+		_exports[i]._address = exportAddress & 0xffffff;
+		byte exportType = (exportAddress >> 24) & 0xff;
+		switch (exportType) {
+		case EXPORT_FUNCTION:
+			debug(5, "script function export '%s'", _exports[i]._name.c_str());
+			if (_exports[i]._address >= _code.size())
+				error("out-of-range script function export '%s' (%d)", _exports[i]._name.c_str(), _exports[i]._address);
+			_exports[i]._type = sitScriptFunction;
+			break;
+		case EXPORT_DATA:
+			debug(5, "script data export '%s'", _exports[i]._name.c_str());
+			if (_exports[i]._address >= _globalData.size())
+				error("out-of-range script data export '%s' (%d)", _exports[i]._name.c_str(), _exports[i]._address);
+			_exports[i]._type = sitScriptData;
+			break;
+		default:
+			error("script export '%s' had unknown type %d", _exports[i]._name.c_str(), exportType);
+		}
 	}
 
 	if (version >= 83) {
@@ -172,7 +191,28 @@ ccInstance::ccInstance(AGSEngine *vm, ccScript *script, bool autoImport, ccInsta
 	_pc = 0;
 	_script->_instances++;
 	if ((_script->_instances == 1) && autoImport) {
-		// FIXME: import all the exported stuff from this script
+		// import all the exported stuff from this script
+		GlobalScriptState *state = _vm->getScriptState();
+		for (uint i = 0; i < _script->_exports.size(); ++i) {
+			ScriptImport import;
+
+			import._type = _script->_exports[i]._type;
+			import._owner = this;
+			import._offset = _script->_exports[i]._address;
+
+			state->addImport(_script->_exports[i]._name, import);
+
+			if (!_script->_exports[i]._name.contains('$'))
+				continue;
+
+			// if the name is mangled, we also want to export the non-mangled version
+			Common::String mangledName = _script->_exports[i]._name;
+			while (mangledName[mangledName.size() - 1] != '$')
+				mangledName.deleteLastChar();
+			mangledName.deleteLastChar();
+
+			state->addImport(mangledName, import);
+		}
 	}
 }
 
@@ -218,9 +258,9 @@ void ccInstance::call(const Common::String &name, const Common::Array<uint32> &p
 			continue;
 		}
 
-		if (((symbol._address >> 24) & 0xff) != EXPORT_FUNCTION)
+		if (symbol._type != sitScriptFunction)
 			error("attempt to call() '%s' which isn't a function", symbol._name.c_str());
-		codeLoc = symbol._address & 0xffffff;
+		codeLoc = symbol._address;
 		break;
 	}
 
@@ -329,7 +369,7 @@ static InstructionInfo instructionInfo[NUM_INSTRUCTIONS + 1] = {
 	{ "$not", 1, iatRegisterInt, iatRegisterInt },
 	{ "$$shl", 2, iatRegisterInt, iatRegisterInt },
 	{ "$$shr", 2, iatRegisterInt, iatRegisterInt },
-	{ "$callobj", 1, iatAny, iatNone }, // TODO
+	{ "$callobj", 1, iatRegister, iatNone },
 	{ "$checkbounds", 2, iatRegisterInt, iatInteger },
 	{ "$memwrite.ptr", 1, iatAny, iatNone }, // TODO
 	{ "$memread.ptr", 1, iatAny, iatNone }, // TODO
@@ -405,32 +445,57 @@ void ccInstance::runCodeFrom(uint32 start) {
 				argType = info.arg2Type;
 
 			argVal[v]._value = arg[v]._data;
+			uint32 argValue = arg[v]._data;
 			switch (arg[v]._fixupType) {
 			case FIXUP_NONE:
 				if (argType == iatRegister || argType == iatRegisterInt || argType == iatRegisterFloat)
-					debugN(2, " %s", regnames[argVal[v]._value]);
+					debugN(2, " %s", regnames[argValue]);
 				else
-					debugN(2, " %d", argVal[v]._value);
+					debugN(2, " %d", argValue);
 				break;
 			case FIXUP_GLOBALDATA:
 				argVal[v]._type = rvtGlobalData;
-				debugN(2, " data@%d", argVal[v]._value);
+				debugN(2, " data@%d", argValue);
 				break;
 			case FIXUP_FUNCTION:
 				argVal[v]._type = rvtFunction;
-				debugN(2, " func@%d", argVal[v]._value);
+				debugN(2, " func@%d", argValue);
 				break;
 			case FIXUP_STRING:
 				argVal[v]._type = rvtString;
-				debugN(2, " string@%d\"%s\"", argVal[v]._value, &_script->_strings[argVal[v]._value]);
+				debugN(2, " string@%d\"%s\"", argValue, &_script->_strings[argValue]);
 				break;
 			case FIXUP_IMPORT:
-				argVal[v]._type = rvtImport;
-				debugN(2, " import@%d:%s", argVal[v]._value, _script->_imports[argVal[v]._value].c_str());
+				switch (_resolvedImports[argValue]._type) {
+				case sitSystemFunction:
+					argVal[v]._type = rvtSystemFunction;
+					argVal[v]._function = _resolvedImports[argValue]._function;
+					// preserve the import index for debugging purposes
+					argVal[v]._value = argValue;
+					break;
+				case sitSystemObject:
+					argVal[v]._type = rvtSystemObject;
+					argVal[v]._object = _resolvedImports[argValue]._object;
+					argVal[v]._value = 0;
+					break;
+				case sitScriptFunction:
+					argVal[v]._type = rvtScriptFunction;
+					argVal[v]._value = _resolvedImports[argValue]._offset;
+					argVal[v]._instance = _resolvedImports[argValue]._owner;
+					break;
+				case sitScriptData:
+					argVal[v]._type = rvtScriptData;
+					argVal[v]._value = _resolvedImports[argValue]._offset;
+					argVal[v]._instance = _resolvedImports[argValue]._owner;
+					break;
+				default:
+					error("internal inconsistency (got import fixup type %d)", _resolvedImports[argValue]._type);
+				}
+				debugN(2, " import@%d:%s", argValue, _script->_imports[argValue].c_str());
 				break;
 			case FIXUP_STACK:
 				argVal[v]._type = rvtStackPointer;
-				debugN(2, " stack@%d", argVal[v]._value);
+				debugN(2, " stack@%d", argValue);
 				break;
 			case FIXUP_DATADATA:
 			default:
@@ -465,11 +530,11 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_ADD:
 			// reg1 += arg2
-			_registers[int1]._value += int2;
+			_registers[int1]._signedValue += int2;
 			break;
 		case SCMD_SUB:
 			// reg1 -= arg2
-			_registers[int1]._value -= int2;
+			_registers[int1]._signedValue -= int2;
 			break;
 		case SCMD_REGTOREG:
 			// reg2 = reg1;
@@ -504,6 +569,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_MEMREAD:
 			// reg1 = m[MAR]
 			tempVal = _registers[SREG_MAR];
+			// FIXME: other cases
 			switch (tempVal._type) {
 			case rvtStackPointer:
 				if (tempVal._value + 4 >= _stack.size())
@@ -521,8 +587,31 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_MEMWRITE:
 			// m[MAR] = reg1
-			// FIXME
-			error("no MEMWRITE yet");
+			tempVal = _registers[SREG_MAR];
+			// FIXME: make sure it's an int?
+			switch (tempVal._type) {
+			case rvtScriptData:
+				// FIXME: bounds checks
+				WRITE_LE_UINT32(&tempVal._instance->_globalData[tempVal._value], _registers[int1]._value);
+				break;
+			case rvtSystemObject:
+				// FIXME: !!!
+				warning("script tried to MEMWRITE to system object (value %d) on line %d",
+					tempVal._value, _lineNumber);
+				break;
+			case rvtStackPointer:
+				if (tempVal._value + 4 >= _stack.size())
+					error("script tried to MEMWRITE to out-of-bounds stack@%d on line %d",
+						tempVal._value, _lineNumber);
+				_stack[tempVal._value] = _registers[int1];
+				_stack[tempVal._value + 1]._type = rvtInvalid;
+				_stack[tempVal._value + 2]._type = rvtInvalid;
+				_stack[tempVal._value + 3]._type = rvtInvalid;
+				break;
+			default:
+				error("script tried to MEMWRITE to runtime value of type %d (value %d) on line %d",
+					tempVal._type, tempVal._value, _lineNumber);
+			}
 			break;
 		case SCMD_LOADSPOFFS:
 			// MAR = SP - arg1 (optimization for local var access)
@@ -534,21 +623,21 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_MULREG:
 			// reg1 *= reg2
-			_registers[int1]._value *= _registers[int2]._value;
+			_registers[int1]._signedValue *= _registers[int2]._signedValue;
 			break;
 		case SCMD_DIVREG:
 			// reg1 /= reg2
-			if (_registers[int2]._value == 0)
+			if (_registers[int2]._signedValue == 0)
 				error("script tried to divide by zero on line %d", _lineNumber);
-			_registers[int1]._value /= _registers[int2]._value;
+			_registers[int1]._signedValue /= _registers[int2]._signedValue;
 			break;
 		case SCMD_ADDREG:
 			// reg1 += reg2
-			_registers[int1]._value += _registers[int2]._value;
+			_registers[int1]._signedValue += _registers[int2]._signedValue;
 			break;
 		case SCMD_SUBREG:
 			// reg1 -= reg2
-			_registers[int1]._value -= _registers[int2]._value;
+			_registers[int1]._signedValue -= _registers[int2]._signedValue;
 			break;
 		case SCMD_BITAND:
 			// reg1 &= reg2
@@ -568,19 +657,19 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_GREATER:
 			// reg1 > reg2
-			_registers[int1]._value = (_registers[int1]._value > _registers[int2]._value);
+			_registers[int1]._signedValue = (_registers[int1]._signedValue > _registers[int2]._signedValue);
 			break;
 		case SCMD_LESSTHAN:
 			// reg1 < reg2
-			_registers[int1]._value = (_registers[int1]._value < _registers[int2]._value);
+			_registers[int1]._signedValue = (_registers[int1]._signedValue < _registers[int2]._signedValue);
 			break;
 		case SCMD_GTE:
 			// reg1 >= reg2
-			_registers[int1]._value = (_registers[int1]._value >= _registers[int2]._value);
+			_registers[int1]._signedValue = (_registers[int1]._signedValue >= _registers[int2]._signedValue);
 			break;
 		case SCMD_LTE:
 			// reg1 <= reg2
-			_registers[int1]._value = (_registers[int1]._value <= _registers[int2]._value);
+			_registers[int1]._signedValue = (_registers[int1]._signedValue <= _registers[int2]._signedValue);
 			break;
 		case SCMD_AND:
 			// (reg1!=0) && (reg2!=0) -> reg1
@@ -677,7 +766,16 @@ void ccInstance::runCodeFrom(uint32 start) {
 			// FIXME: make sure the script isn't stuck in a loop
 			break;
 		case SCMD_MUL:
+			// reg1 *= arg2
+			_registers[int1]._signedValue *= int2;
+			break;
 		case SCMD_CHECKBOUNDS:
+			// check reg1 is between 0 and arg2
+			if (_registers[int1]._type != rvtInteger)
+				error("script error: checkbounds got value of type %d (not integer)", _registers[int1]._type);
+			if (_registers[int1]._value >= (uint32)int2)
+				error("script error: checkbounds value %d was not in range to %d", _registers[int1]._value, int2);
+			break;
 		case SCMD_DYNAMICBOUNDS:
 		case SCMD_MEMREADPTR:
 		case SCMD_MEMWRITEPTR:
@@ -700,9 +798,10 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_CALLEXT:
 			// farcall: call external (imported) function reg1
-			if (_registers[int1]._type != rvtImport)
-				error("script tried to CALLEXT non-import runtime value of type %d (value %d) on line %d",
+			if (_registers[int1]._type != rvtSystemFunction)
+				error("script tried to CALLEXT non-system-function runtime value of type %d (value %d) on line %d",
 					tempVal._type, tempVal._value, _lineNumber);
+			debug(2, "calling external function '%s'", _script->_imports[_registers[int1]._value].c_str());
 
 			if (funcArgumentCount == 0xffffffff)
 				funcArgumentCount = externalStack.size();
@@ -713,10 +812,21 @@ void ccInstance::runCodeFrom(uint32 start) {
 				params[i] = externalStack[externalStack.size() - i - 1];
 
 			if (nextCallNeedsObject) {
+				// FIXME: resolve array here?
+				if (_registers[SREG_OP]._type != rvtSystemObject)
+					error("script tried to CALLOBJ non-system-object runtime value of type %d (value %d) on line %d",
+						tempVal._type, tempVal._value, _lineNumber);
+				uint32 offset = _registers[SREG_OP]._value;
+				ScriptObject *object = _registers[SREG_OP]._object->getObjectAt(offset);
+				if (offset != 0)
+					error("script tried to CALLOBJ system-object with offset %d (resolved to %d) on line %d",
+						_registers[SREG_OP]._value, offset, _lineNumber);
+
 				// FIXME
-				error("don't support object calls yet");
+				warning("don't support object calls yet");
+				_registers[SREG_AX] = callImportedFunction(_registers[int1]._function, params);
 			} else {
-				_registers[SREG_AX] = callImportedFunction(_registers[int1]._value, params);
+				_registers[SREG_AX] = callImportedFunction(_registers[int1]._function, params);
 			}
 
 			// FIXME: unfinished
@@ -736,8 +846,8 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_CALLOBJ:
 			// $callobj: next call is member function of reg1
-			// FIXME
-			error("unimplemented %s", info.name);
+			nextCallNeedsObject = true;
+			_registers[SREG_OP] = _registers[int1];
 			break;
 		case SCMD_SHIFTLEFT:
 			// reg1 = reg1 << reg2
@@ -765,7 +875,25 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_FLESSTHAN:
 		case SCMD_FGTE:
 		case SCMD_FLTE:
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_ZEROMEMORY:
+			// m[MAR]..m[MAR+(arg1-1)] = 0
+			tempVal = _registers[SREG_MAR];
+			switch (tempVal._type) {
+			case rvtStackPointer:
+				if (tempVal._value + (uint32)int1 >= _stack.size())
+					error("script tried to ZEROMEMORY out-of-bounds stack@%d-%d on line %d",
+						tempVal._value, int1, _lineNumber);
+				for (uint i = 0; i < (uint32)int1; ++i)
+					_stack[tempVal._value + i] = 0;
+				break;
+			default:
+				error("script tried to ZEROMEMORY using runtime value of type %d (value %d) on line %d",
+					tempVal._type, tempVal._value, _lineNumber);
+			}
+			break;
 		case SCMD_CREATESTRING:
 		case SCMD_STRINGSEQUAL:
 		case SCMD_STRINGSNOTEQ:
@@ -791,12 +919,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 	}
 }
 
-RuntimeValue ccInstance::callImportedFunction(uint32 importId, const Common::Array<RuntimeValue> &params) {
-	assert(importId < _script->_imports.size());
-
-	Common::String name = _script->_imports[importId];
-	debug(2, "trying to call import '%s'", name.c_str());
-
+RuntimeValue ccInstance::callImportedFunction(ScriptAPIFunction *function, const Common::Array<RuntimeValue> &params) {
 	// FIXME: actually do the call
 	return RuntimeValue();
 }
