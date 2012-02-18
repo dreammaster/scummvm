@@ -708,6 +708,8 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 		group._height = dta->readUint32LE();
 		group._focus = dta->readUint32LE();
 		uint32 objectsCount = dta->readUint32LE();
+		if (objectsCount > MAX_OBJS_ON_GUI)
+			error("too many GUI controls (%d)", objectsCount);
 		group._popup = dta->readUint32LE();
 		group._popupYP = dta->readUint32LE();
 		group._bgColor = dta->readUint32LE();
@@ -738,6 +740,8 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 		if (_guiVersion < 105)
 			group._zorder = i;
 		group._id = i;
+
+		group._objects.resize(objectsCount);
 	}
 
 	uint32 buttonCount = dta->readUint32LE();
@@ -788,7 +792,39 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 		}
 	}
 
-	// TODO: setup the gui lookup array etc
+	for (uint n = 0; n < _guiGroups.size(); ++n) {
+		GUIGroup &group = _guiGroups[n];
+
+		// set up the reverse-lookup array
+		for (uint i = 0; i < group._objects.size(); ++i) {
+			uint16 type = (group._objectRefPtrs[i] >> 16) & 0xffff;
+			uint16 id = group._objectRefPtrs[i] & 0xffff;
+
+			// TODO: bounds-checking?
+			switch (type) {
+			case GOBJ_BUTTON:
+				group._objects[i] = _guiButtons[id];
+				break;
+			case GOBJ_LABEL:
+				group._objects[i] = _guiLabels[id];
+				break;
+			case GOBJ_INVENTORY:
+				group._objects[i] = _guiInvControls[id];
+				break;
+			case GOBJ_SLIDER:
+				group._objects[i] = _guiSliders[id];
+				break;
+			case GOBJ_TEXTBOX:
+				group._objects[i] = _guiTextBoxes[id];
+				break;
+			case GOBJ_LISTBOX:
+				group._objects[i] = _guiListBoxes[id];
+				break;
+			default:
+				error("invalid GUI control type %d", type);
+			}
+		}
+	}
 
 	// TODO: draw order?
 }
