@@ -71,7 +71,7 @@ struct RoomRegion {
 	uint32 _tintLevel;
 };
 
-struct RoomObject {
+struct RoomObject : public ScriptObject {
 	RoomObject() : _interaction(NULL), _flags(0) { }
 
 	SpriteStruct _sprite;

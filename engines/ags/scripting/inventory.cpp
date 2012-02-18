@@ -27,14 +27,9 @@
 
 namespace AGS {
 
-class ScriptInventoryArray : public ScriptArray {
-public:
-	ScriptObject *getObjectAt(uint32 &offset) {
-		error("ScriptInventoryArray unimplemented"); // FIXME
-	}
-};
+void addInventorySystemScripting(AGSEngine *vm) {
+	GlobalScriptState *state = vm->getScriptState();
 
-void addInventorySystemScripting(GlobalScriptState *state) {
 	// InventoryItem functions
 	state->addSystemFunctionImport("InventoryItem::GetAtScreenXY^2", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("InventoryItem::IsInteractionAvailable^1", &Script_UnimplementedStub);
@@ -62,8 +57,6 @@ void addInventorySystemScripting(GlobalScriptState *state) {
 	state->addSystemFunctionImport("SetInvItemName", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetInvItemPic", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("UpdateInventory", &Script_UnimplementedStub);
-
-	state->addSystemObjectImport("inventory", new ScriptInventoryArray);
 }
 
 } // End of namespace AGS

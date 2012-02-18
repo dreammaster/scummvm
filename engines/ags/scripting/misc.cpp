@@ -27,7 +27,9 @@
 
 namespace AGS {
 
-void addMiscSystemScripting(GlobalScriptState *state) {
+void addMiscSystemScripting(AGSEngine *vm) {
+	GlobalScriptState *state = vm->getScriptState();
+
 	// File functions
 	state->addSystemFunctionImport("File::Delete^1", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("File::Exists^1", &Script_UnimplementedStub);

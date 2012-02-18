@@ -23,27 +23,25 @@
  * which is licensed under the Artistic License 2.0.
  */
 
-#ifndef AGS_SCRIPTING_H
-#define AGS_SCRIPTING_H
+#ifndef AGS_INVENTORY_H
+#define AGS_INVENTORY_H
 
-#include "engines/ags/ags.h"
-#include "engines/ags/script.h"
+#include "common/hash-str.h"
+#include "engines/ags/scriptobj.h"
 
 namespace AGS {
 
-void addSystemScripting(AGSEngine *vm);
+struct InventoryItemInfo : public ScriptObject {
+	Common::String _name;
+	uint32 _pic;
+	uint32 _cursorPic;
+	uint32 _hotspotX, _hotspotY;
+	uint8 _flags;
 
-RuntimeValue Script_UnimplementedStub(AGSEngine *vm, const Common::Array<RuntimeValue> &params);
-
-class GlobalScriptState {
-public:
-	Common::HashMap<Common::String, ScriptImport, Common::CaseSensitiveString_Hash, Common::CaseSensitiveString_EqualTo> _imports;
-
-	void addImport(const Common::String &name, const ScriptImport &import, bool forceReplace = false);
-	void addSystemFunctionImport(const Common::String &name, ScriptAPIFunction *function);
-	void addSystemObjectImport(const Common::String &name, ScriptObject *object, bool forceReplace = false);
+	Common::StringMap _properties;
+	Common::String _scriptName;
 };
 
 } // End of namespace AGS
 
-#endif // AGS_SCRIPTING_H
+#endif // AGS_INVENTORY_H

@@ -27,7 +27,9 @@
 
 namespace AGS {
 
-void addGraphicsSystemScripting(GlobalScriptState *state) {
+void addGraphicsSystemScripting(AGSEngine *vm) {
+	GlobalScriptState *state = vm->getScriptState();
+
 	// graphics Game functions
 	state->addSystemFunctionImport("Game::GetColorFromRGB^3", &Script_UnimplementedStub);
 

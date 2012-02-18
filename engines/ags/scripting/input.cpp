@@ -31,7 +31,9 @@ class ScriptMouseObject : public ScriptObject {
 public:
 };
 
-void addInputSystemScripting(GlobalScriptState *state) {
+void addInputSystemScripting(AGSEngine *vm) {
+	GlobalScriptState *state = vm->getScriptState();
+
 	// static Mouse functions
 	state->addSystemFunctionImport("Mouse::ChangeModeGraphic^2", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("Mouse::ChangeModeHotspot^3", &Script_UnimplementedStub);

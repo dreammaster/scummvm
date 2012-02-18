@@ -23,27 +23,20 @@
  * which is licensed under the Artistic License 2.0.
  */
 
-#ifndef AGS_SCRIPTING_H
-#define AGS_SCRIPTING_H
+#ifndef AGS_SCRIPTOBJ_H
+#define AGS_SCRIPTOBJ_H
 
-#include "engines/ags/ags.h"
-#include "engines/ags/script.h"
+#include "common/scummsys.h"
 
 namespace AGS {
 
-void addSystemScripting(AGSEngine *vm);
-
-RuntimeValue Script_UnimplementedStub(AGSEngine *vm, const Common::Array<RuntimeValue> &params);
-
-class GlobalScriptState {
+class ScriptObject {
 public:
-	Common::HashMap<Common::String, ScriptImport, Common::CaseSensitiveString_Hash, Common::CaseSensitiveString_EqualTo> _imports;
+	virtual ~ScriptObject() { }
 
-	void addImport(const Common::String &name, const ScriptImport &import, bool forceReplace = false);
-	void addSystemFunctionImport(const Common::String &name, ScriptAPIFunction *function);
-	void addSystemObjectImport(const Common::String &name, ScriptObject *object, bool forceReplace = false);
+	virtual ScriptObject *getObjectAt(uint32 &offset) { return this; }
 };
 
 } // End of namespace AGS
 
-#endif // AGS_SCRIPTING_H
+#endif // AGS_SCRIPTOBJ_H

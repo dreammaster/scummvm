@@ -195,6 +195,8 @@ void AGSEngine::loadNewRoom(uint32 id, CharacterInfo *forChar) {
 
 	_currentRoom = new Room(this, stream);
 
+	_scriptState->addSystemObjectImport("object", new ScriptObjectArray<RoomObject>(_currentRoom->_objects, 8), true);
+
 	// FIXME
 }
 
@@ -251,8 +253,11 @@ bool AGSEngine::init() {
 	if (!_gameFile->init())
 		return false;
 
-	addSystemScripting(_scriptState);
-	// FIXME: register script objects
+	addSystemScripting(this);
+
+	_scriptState->addSystemObjectImport("character", new ScriptObjectArray<CharacterInfo *>(_gameFile->_chars, 780));
+	_scriptState->addSystemObjectImport("gui", new ScriptObjectArray<GUIGroup>(_gameFile->_guiGroups, 8));
+	_scriptState->addSystemObjectImport("inventory", new ScriptObjectArray<InventoryItemInfo>(_gameFile->_invItemInfo, 68));
 
 	// FIXME: load fonts
 

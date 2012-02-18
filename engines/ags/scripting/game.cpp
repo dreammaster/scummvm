@@ -35,7 +35,9 @@ class ScriptSaveGameIndexesObject : public ScriptObject {
 public:
 };
 
-void addGameSystemScripting(GlobalScriptState *state) {
+void addGameSystemScripting(AGSEngine *vm) {
+	GlobalScriptState *state = vm->getScriptState();
+
 	// Game functions
 	state->addSystemFunctionImport("Game::ChangeTranslation^1", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("Game::DoOnceOnly^1", &Script_UnimplementedStub);

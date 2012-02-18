@@ -27,14 +27,9 @@
 
 namespace AGS {
 
-class ScriptObjectArray : public ScriptArray {
-public:
-	ScriptObject *getObjectAt(uint32 &offset) {
-		error("ScriptObjectArray unimplemented"); // FIXME
-	}
-};
+void addRoomSystemScripting(AGSEngine *vm) {
+	GlobalScriptState *state = vm->getScriptState();
 
-void addRoomSystemScripting(GlobalScriptState *state) {
 	// Object functions
 	state->addSystemFunctionImport("Object::Animate^5", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("Object::IsCollidingWithObject^1", &Script_UnimplementedStub);
@@ -142,8 +137,6 @@ void addRoomSystemScripting(GlobalScriptState *state) {
 	state->addSystemFunctionImport("SetRegionTint", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("SetWalkBehindBase", &Script_UnimplementedStub);
 	state->addSystemFunctionImport("StopObjectMoving", &Script_UnimplementedStub);
-
-	state->addSystemObjectImport("object", new ScriptObjectArray);
 }
 
 } // End of namespace AGS

@@ -29,6 +29,8 @@
 #include "common/array.h"
 #include "common/stream.h"
 
+#include "engines/ags/scriptobj.h"
+
 namespace AGS {
 
 #define MAX_OBJS_ON_GUI 30
@@ -85,7 +87,7 @@ namespace AGS {
 
 class AGSEngine;
 
-class GUIObject {
+class GUIObject : public ScriptObject {
 public:
 	GUIObject(AGSEngine *vm) : _vm(vm) { }
 	virtual ~GUIObject() { }
@@ -231,7 +233,7 @@ protected:
 	uint32 getMaxNumEvents() { return 1; }
 };
 
-struct GUIGroup {
+struct GUIGroup : public ScriptObject {
 	char _vText[4]; // ??? - for compatibility
 	Common::String _name;
 	Common::String _clickEventHandler;
