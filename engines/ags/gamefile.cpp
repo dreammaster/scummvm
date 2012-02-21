@@ -306,7 +306,16 @@ bool GameFile::init() {
 	for (uint i = 0; i < _charCount; ++i)
 		_chars[i] = readCharacter(dta);
 
-	// FIXME: PSP version fixes up character script names here
+	if (_version <= kAGSVer272) {
+		// fixup character script names for 2.x (EGO -> cEgo)
+
+		for (uint i = 0; i < _chars.size(); ++i) {
+			_chars[i]->_scriptName.toLowercase();
+			_chars[i]->_scriptName.setChar(toupper(_chars[i]->_scriptName[0]), 0);
+			_chars[i]->_scriptName.insertChar('c', 0);
+		}
+	}
+
 	// FIXME: PSP version fixes up ANTIGLIDE here
 
 	// FIXME: lip sync data
@@ -692,7 +701,7 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 		if (_version <= kAGSVer272 && !group._name.empty()) {
 			// Fix names for 2.x: "GUI" -> "gGui"
 			group._name.toLowercase();
-			group._name.setChar(toupper(_guiGroups[i]._name[0]), 0);
+			group._name.setChar(toupper(group._name[0]), 0);
 			group._name.insertChar('g', 0);
 		}
 		debug(4, "gui group '%s'", group._name.c_str());
