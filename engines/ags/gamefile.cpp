@@ -39,9 +39,6 @@ GameFile::GameFile(AGSEngine *vm) : _vm(vm), _gameScript(NULL) {
 }
 
 GameFile::~GameFile() {
-	for (uint i = 0; i < _chars.size(); ++i)
-		delete _chars[i];
-
 	for (uint i = 0; i < _guiButtons.size(); ++i)
 		delete _guiButtons[i];
 	for (uint i = 0; i < _guiLabels.size(); ++i)
@@ -302,19 +299,19 @@ bool GameFile::init() {
 		readOldViews(dta);
 	}
 
-	_chars.resize(_charCount);
+	_vm->_characters.resize(_charCount);
 	for (uint i = 0; i < _charCount; ++i)
-		_chars[i] = readCharacter(dta);
+		_vm->_characters[i] = readCharacter(dta);
 
 	if (_version <= kAGSVer272) {
 		// fixup character script names for 2.x (EGO -> cEgo)
 
-		for (uint i = 0; i < _chars.size(); ++i) {
-			if (_chars[i]->_scriptName.empty())
+		for (uint i = 0; i < _vm->_characters.size(); ++i) {
+			if (_vm->_characters[i]->_scriptName.empty())
 				continue;
-			_chars[i]->_scriptName.toLowercase();
-			_chars[i]->_scriptName.setChar(toupper(_chars[i]->_scriptName[0]), 0);
-			_chars[i]->_scriptName.insertChar('c', 0);
+			_vm->_characters[i]->_scriptName.toLowercase();
+			_vm->_characters[i]->_scriptName.setChar(toupper(_vm->_characters[i]->_scriptName[0]), 0);
+			_vm->_characters[i]->_scriptName.insertChar('c', 0);
 		}
 	}
 
@@ -872,8 +869,8 @@ void GameFile::readPropertyData(Common::SeekableReadStream *dta) {
 	}
 
 	// character properties
-	for (uint i = 0; i < _chars.size(); ++i) {
-		readProperties(dta, _chars[i]->_properties);
+	for (uint i = 0; i < _vm->_characters.size(); ++i) {
+		readProperties(dta, _vm->_characters[i]->_properties);
 	}
 
 	// inventory item properties

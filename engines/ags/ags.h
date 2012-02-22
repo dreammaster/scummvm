@@ -93,6 +93,8 @@ public:
 
 	Common::RandomSource *getRandomSource() { return _rnd; }
 
+	Common::Array<Character *> _characters;
+
 private:
 	const AGSGameDescription *_gameDescription;
 

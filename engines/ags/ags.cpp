@@ -60,6 +60,9 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 AGSEngine::~AGSEngine() {
 	delete _currentRoom;
 
+	for (uint i = 0; i < _characters.size(); ++i)
+		delete _characters[i];
+
 	for (uint i = 0; i < _scriptModules.size(); ++i)
 		delete _scriptModules[i];
 	for (uint i = 0; i < _scriptModuleForks.size(); ++i)
@@ -149,7 +152,7 @@ void AGSEngine::startNewGame() {
 
 void AGSEngine::setupPlayerCharacter(uint32 charId) {
 	_gameFile->_playerChar = charId;
-	_playerChar = _gameFile->_chars[charId];
+	_playerChar = _characters[charId];
 }
 
 void AGSEngine::createGlobalScript() {
@@ -255,10 +258,10 @@ bool AGSEngine::init() {
 
 	addSystemScripting(this);
 
-	_scriptState->addSystemObjectImport("character", new ScriptObjectArray<Character *>(_gameFile->_chars, 780));
-	_scriptState->addSystemObjectImport("player", _gameFile->_chars[_gameFile->_playerChar]);
-	for (uint i = 0; i < _gameFile->_chars.size(); ++i) {
-		Character *charInfo = _gameFile->_chars[i];
+	_scriptState->addSystemObjectImport("character", new ScriptObjectArray<Character *>(_characters, 780));
+	_scriptState->addSystemObjectImport("player", _characters[_gameFile->_playerChar]);
+	for (uint i = 0; i < _characters.size(); ++i) {
+		Character *charInfo = _characters[i];
 		if (charInfo->_scriptName.empty())
 			continue;
 		_scriptState->addSystemObjectImport(charInfo->_scriptName, charInfo);
