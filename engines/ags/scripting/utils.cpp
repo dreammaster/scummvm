@@ -24,6 +24,7 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "common/random.h"
 
 namespace AGS {
 
@@ -72,6 +73,14 @@ RuntimeValue Script_IntToFloat(AGSEngine *vm, ScriptObject *, const Common::Arra
 	error("IntToFloat unimplemented");
 
 	return RuntimeValue();
+}
+
+// import int Random(int max)
+// Returns a random number between 0 and MAX, inclusive.
+RuntimeValue Script_Random(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
+	int max = params[0]._signedValue;
+
+	return vm->getRandomSource()->getRandomNumber(max);
 }
 
 // Maths: import static float ArcCos(float value)
@@ -368,6 +377,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "GetRawTime", (ScriptAPIFunction *)&Script_GetRawTime, "", sotNone },
 	{ "FloatToInt", (ScriptAPIFunction *)&Script_FloatToInt, "fi", sotNone },
 	{ "IntToFloat", (ScriptAPIFunction *)&Script_IntToFloat, "i", sotNone },
+	{ "Random", (ScriptAPIFunction *)&Script_Random, "i", sotNone },
 	{ "Maths::ArcCos^1", (ScriptAPIFunction *)&Script_Maths_ArcCos, "f", sotNone },
 	{ "Maths::ArcSin^1", (ScriptAPIFunction *)&Script_Maths_ArcSin, "f", sotNone },
 	{ "Maths::ArcTan^1", (ScriptAPIFunction *)&Script_Maths_ArcTan, "f", sotNone },

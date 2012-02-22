@@ -1541,18 +1541,6 @@ RuntimeValue Script_SetAmbientTint(AGSEngine *vm, ScriptObject *, const Common::
 	return RuntimeValue();
 }
 
-// import int Random(int max)
-// Returns a random number between 0 and MAX, inclusive.
-RuntimeValue Script_Random(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int max = params[0]._signedValue;
-	UNUSED(max);
-
-	// FIXME
-	error("Random unimplemented");
-
-	return RuntimeValue();
-}
-
 // import void SetBackgroundFrame(int frame)
 // Locks the current room to the specified background.
 RuntimeValue Script_SetBackgroundFrame(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
@@ -1793,7 +1781,6 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "UpdatePalette", (ScriptAPIFunction *)&Script_UpdatePalette, "", sotNone },
 	{ "TintScreen", (ScriptAPIFunction *)&Script_TintScreen, "iii", sotNone },
 	{ "SetAmbientTint", (ScriptAPIFunction *)&Script_SetAmbientTint, "iiiii", sotNone },
-	{ "Random", (ScriptAPIFunction *)&Script_Random, "i", sotNone },
 	{ "SetBackgroundFrame", (ScriptAPIFunction *)&Script_SetBackgroundFrame, "i", sotNone },
 	{ "GetBackgroundFrame", (ScriptAPIFunction *)&Script_GetBackgroundFrame, "", sotNone },
 	{ "ShakeScreen", (ScriptAPIFunction *)&Script_ShakeScreen, "i", sotNone },
