@@ -31,7 +31,7 @@
 
 namespace AGS {
 
-struct InventoryItemInfo : public ScriptObject {
+struct InventoryItem : public ScriptObject {
 	Common::String _name;
 	uint32 _pic;
 	uint32 _cursorPic;

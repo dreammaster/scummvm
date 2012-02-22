@@ -198,7 +198,7 @@ bool GameFile::init() {
 	// inventory info
 	_invItemInfo.resize(_invItemCount);
 	for (uint32 i = 0; i < _invItemCount; ++i) {
-		InventoryItemInfo &info = _invItemInfo[i];
+		InventoryItem &info = _invItemInfo[i];
 
 		char invName[26];
 		dta->read(invName, 25);
@@ -310,6 +310,8 @@ bool GameFile::init() {
 		// fixup character script names for 2.x (EGO -> cEgo)
 
 		for (uint i = 0; i < _chars.size(); ++i) {
+			if (_chars[i]->_scriptName.empty())
+				continue;
 			_chars[i]->_scriptName.toLowercase();
 			_chars[i]->_scriptName.setChar(toupper(_chars[i]->_scriptName[0]), 0);
 			_chars[i]->_scriptName.insertChar('c', 0);
@@ -589,8 +591,8 @@ void GameFile::readOldViews(Common::SeekableReadStream *dta) {
 	}
 }
 
-CharacterInfo *GameFile::readCharacter(Common::SeekableReadStream *dta) {
-	CharacterInfo *chr = new CharacterInfo();
+Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
+	Character *chr = new Character();
 
 	chr->_defView = dta->readUint32LE();
 	chr->_talkView = dta->readUint32LE();
@@ -737,9 +739,9 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 		group._on = dta->readUint32LE();
 
 		dta->skip(MAX_OBJS_ON_GUI * 4); // obj pointers
-		group._objectRefPtrs.resize(MAX_OBJS_ON_GUI);
+		group._controlRefPtrs.resize(MAX_OBJS_ON_GUI);
 		for (uint j = 0; j < MAX_OBJS_ON_GUI; ++j)
-			group._objectRefPtrs[j] = dta->readUint32LE();
+			group._controlRefPtrs[j] = dta->readUint32LE();
 
 		// fixes/upgrades
 		if (group._height < 2)
@@ -750,7 +752,7 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 			group._zorder = i;
 		group._id = i;
 
-		group._objects.resize(objectsCount);
+		group._controls.resize(objectsCount);
 	}
 
 	uint32 buttonCount = dta->readUint32LE();
@@ -805,29 +807,29 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 		GUIGroup &group = _guiGroups[n];
 
 		// set up the reverse-lookup array
-		for (uint i = 0; i < group._objects.size(); ++i) {
-			uint16 type = (group._objectRefPtrs[i] >> 16) & 0xffff;
-			uint16 id = group._objectRefPtrs[i] & 0xffff;
+		for (uint i = 0; i < group._controls.size(); ++i) {
+			uint16 type = (group._controlRefPtrs[i] >> 16) & 0xffff;
+			uint16 id = group._controlRefPtrs[i] & 0xffff;
 
 			// TODO: bounds-checking?
 			switch (type) {
 			case GOBJ_BUTTON:
-				group._objects[i] = _guiButtons[id];
+				group._controls[i] = _guiButtons[id];
 				break;
 			case GOBJ_LABEL:
-				group._objects[i] = _guiLabels[id];
+				group._controls[i] = _guiLabels[id];
 				break;
 			case GOBJ_INVENTORY:
-				group._objects[i] = _guiInvControls[id];
+				group._controls[i] = _guiInvControls[id];
 				break;
 			case GOBJ_SLIDER:
-				group._objects[i] = _guiSliders[id];
+				group._controls[i] = _guiSliders[id];
 				break;
 			case GOBJ_TEXTBOX:
-				group._objects[i] = _guiTextBoxes[id];
+				group._controls[i] = _guiTextBoxes[id];
 				break;
 			case GOBJ_LISTBOX:
-				group._objects[i] = _guiListBoxes[id];
+				group._controls[i] = _guiListBoxes[id];
 				break;
 			default:
 				error("invalid GUI control type %d", type);

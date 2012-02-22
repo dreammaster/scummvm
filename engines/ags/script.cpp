@@ -293,6 +293,8 @@ void ccInstance::call(const Common::String &name, const Common::Array<uint32> &p
 	// push return address onto stack
 	pushValue(0);
 
+	_runningInst = this;
+
 	runCodeFrom(codeLoc);
 
 	// check the stack was left in a sane state
@@ -405,15 +407,19 @@ static const char *regnames[] = { "null", "sp", "mar", "ax", "bx", "cx", "op", "
 #define MAXNEST 50 // number of recursive function calls allowed
 
 void ccInstance::runCodeFrom(uint32 start) {
-	assert(start < _script->_code.size());
+	ccInstance *inst = _runningInst;
+	ccScript *script = inst->_script;
+
+	assert(start < script->_code.size());
 	_pc = start;
-	const Common::Array<ScriptCodeEntry> &code = _script->_code;
+	const Common::Array<ScriptCodeEntry> &code = script->_code;
 
 	// this allows scripts to disable the loop iteration sanity check
 	uint32 loopIterationCheckDisabledCount = 0;
 
 	Common::Stack<RuntimeValue> externalStack;
 	bool nextCallNeedsObject = false;
+	bool recoverFromCallAs = false;
 	uint32 funcArgumentCount = 0xffffffff;
 
 	Common::Stack<uint32> currentBase;
@@ -432,7 +438,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 			error("runCodeFrom(): needed %d arguments for %s on line %d", neededArgs,
 				info.name, _lineNumber);
 
-		debugN(2, "%06d: %s", _pc, info.name);
+		debugN(4, "%06d: %s", _pc, info.name);
 
 		ScriptCodeEntry arg[2];
 		RuntimeValue argVal[2];
@@ -449,53 +455,56 @@ void ccInstance::runCodeFrom(uint32 start) {
 			switch (arg[v]._fixupType) {
 			case FIXUP_NONE:
 				if (argType == iatRegister || argType == iatRegisterInt || argType == iatRegisterFloat)
-					debugN(2, " %s", regnames[argValue]);
+					debugN(4, " %s", regnames[argValue]);
 				else
-					debugN(2, " %d", argValue);
+					debugN(4, " %d", argValue);
 				break;
 			case FIXUP_GLOBALDATA:
 				argVal[v]._type = rvtGlobalData;
-				debugN(2, " data@%d", argValue);
+				debugN(4, " data@%d", argValue);
 				break;
 			case FIXUP_FUNCTION:
 				argVal[v]._type = rvtFunction;
-				debugN(2, " func@%d", argValue);
+				debugN(4, " func@%d", argValue);
 				break;
 			case FIXUP_STRING:
-				argVal[v]._type = rvtString;
-				debugN(2, " string@%d\"%s\"", argValue, &_script->_strings[argValue]);
+				argVal[v] = new ScriptConstString(Common::String((const char *)&script->_strings[argValue]));
+				debugN(4, " string@%d\"%s\"", argValue, &script->_strings[argValue]);
 				break;
 			case FIXUP_IMPORT:
-				switch (_resolvedImports[argValue]._type) {
+				switch (inst->_resolvedImports[argValue]._type) {
 				case sitSystemFunction:
 					argVal[v]._type = rvtSystemFunction;
-					argVal[v]._function = _resolvedImports[argValue]._function;
+					argVal[v]._function = inst->_resolvedImports[argValue]._function;
 					// preserve the import index for debugging purposes
 					argVal[v]._value = argValue;
 					break;
 				case sitSystemObject:
-					argVal[v]._type = rvtSystemObject;
-					argVal[v]._object = _resolvedImports[argValue]._object;
-					argVal[v]._value = 0;
+					argVal[v] = inst->_resolvedImports[argValue]._object;
 					break;
 				case sitScriptFunction:
 					argVal[v]._type = rvtScriptFunction;
-					argVal[v]._value = _resolvedImports[argValue]._offset;
-					argVal[v]._instance = _resolvedImports[argValue]._owner;
+					argVal[v]._value = inst->_resolvedImports[argValue]._offset;
+					argVal[v]._instance = inst->_resolvedImports[argValue]._owner;
+
+					// if the next instruction is a system call instruction (CALLEXT), change it to a script one instead
+					// TODO: this is what the original engine does, but can't we fix it up in CALLEXT instead?
+					if (code[_pc + v + 2]._data == SCMD_CALLEXT)
+						script->_code[_pc + v + 2]._data = SCMD_CALLAS;
 					break;
 				case sitScriptData:
 					argVal[v]._type = rvtScriptData;
-					argVal[v]._value = _resolvedImports[argValue]._offset;
-					argVal[v]._instance = _resolvedImports[argValue]._owner;
+					argVal[v]._value = inst->_resolvedImports[argValue]._offset;
+					argVal[v]._instance = inst->_resolvedImports[argValue]._owner;
 					break;
 				default:
-					error("internal inconsistency (got import fixup with import type %d)", _resolvedImports[argValue]._type);
+					error("internal inconsistency (got import fixup with import type %d)", inst->_resolvedImports[argValue]._type);
 				}
-				debugN(2, " import@%d:%s", argValue, _script->_imports[argValue].c_str());
+				debugN(4, " import@%d:%s", argValue, script->_imports[argValue].c_str());
 				break;
 			case FIXUP_STACK:
 				argVal[v]._type = rvtStackPointer;
-				debugN(2, " stack@%d", argValue);
+				debugN(4, " stack@%d", argValue);
 				break;
 			case FIXUP_DATADATA:
 			default:
@@ -515,7 +524,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 					v + 1, info.name, _lineNumber, arg[v]._data);
 			// FIXME: check iatRegisterInt, iatRegisterFloat
 		}
-		debug(2, " ");
+		debug(4, " ");
 
 		const RuntimeValue &val1 = argVal[0], &val2 = argVal[1];
 		int32 int1 = (int)argVal[0]._value, int2 = (int)argVal[1]._value;
@@ -560,6 +569,9 @@ void ccInstance::runCodeFrom(uint32 start) {
 			}
 			// FIXME: set current instance?
 
+			currentBase.pop();
+			currentStart.pop();
+
 			// continue so that the PC doesn't get overwritten
 			continue;
 		case SCMD_LITTOREG:
@@ -571,6 +583,13 @@ void ccInstance::runCodeFrom(uint32 start) {
 			tempVal = _registers[SREG_MAR];
 			// FIXME: other cases
 			switch (tempVal._type) {
+			case rvtGlobalData:
+				// FIXME: bounds checks
+				_registers[int1] = READ_LE_UINT32(&(*_globalData)[tempVal._value]);
+				break;
+			case rvtScriptData:
+				_registers[int1] = READ_LE_UINT32(&(*tempVal._instance->_globalData)[tempVal._value]);
+				break;
 			case rvtStackPointer:
 				if (tempVal._value + 4 >= _stack.size())
 					error("script tried to MEMREAD from out-of-bounds stack@%d on line %d",
@@ -590,6 +609,10 @@ void ccInstance::runCodeFrom(uint32 start) {
 			tempVal = _registers[SREG_MAR];
 			// FIXME: make sure it's an int?
 			switch (tempVal._type) {
+			case rvtGlobalData:
+				// FIXME: bounds checks
+				WRITE_LE_UINT32(&(*_globalData)[tempVal._value], _registers[int1]._value);
+				break;
 			case rvtScriptData:
 				// FIXME: bounds checks
 				WRITE_LE_UINT32(&tempVal._instance->_globalData[tempVal._value], _registers[int1]._value);
@@ -793,16 +816,50 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_CALLAS:
 			// $callscr: call external script function
-			// FIXME
-			error("unimplemented %s", info.name);
+			{
+			if (_registers[int1]._type != rvtScriptFunction)
+				error("script tried to CALLAS non-script-function runtime value of type %d (value %d) on line %d",
+					_registers[int1]._type, _registers[int1]._value, _lineNumber);
+			// save current state
+			ccInstance *wasRunning = _runningInst;
+			uint32 oldpc = _pc;
+			uint32 oldsp = _registers[SREG_SP]._value;
+
+			// push the parameters on the stack
+			uint startArg = 0;
+			if (funcArgumentCount != 0xffffffff) {
+				// only push arguments for this call
+				// (there might be nested CALLAS calls?)
+				startArg = externalStack.size() - funcArgumentCount;
+			}
+			for (uint i = startArg; i < externalStack.size(); ++i) {
+				pushValue(externalStack[i]);
+			}
+
+			// push 0, so that the runCodeFrom returns
+			pushValue(0);
+
+			// call the script function
+			_runningInst = _registers[int1]._instance;
+			runCodeFrom(_registers[int1]._value);
+
+			// restore previous state
+			if (_registers[SREG_SP]._value != oldsp)
+				error("stack corrupt after CALLAS on line %d (was %d, now %d)", _lineNumber, oldsp, _registers[SREG_SP]._value);
+			_pc = oldpc;
+			_runningInst = wasRunning;
+
+			recoverFromCallAs = (funcArgumentCount != 0xffffffff);
+			}
 			break;
 		case SCMD_CALLEXT:
 			// farcall: call external (imported) function reg1
 			if (_registers[int1]._type != rvtSystemFunction)
 				error("script tried to CALLEXT non-system-function runtime value of type %d (value %d) on line %d",
-					tempVal._type, tempVal._value, _lineNumber);
-			debug(2, "calling external function '%s'", _script->_imports[_registers[int1]._value].c_str());
+					_registers[int1]._type, _registers[int1]._value, _lineNumber);
+			debug(2, "calling external function '%s'", script->_imports[_registers[int1]._value].c_str());
 
+			recoverFromCallAs = false;
 			if (funcArgumentCount == 0xffffffff)
 				funcArgumentCount = externalStack.size();
 
@@ -822,18 +879,17 @@ void ccInstance::runCodeFrom(uint32 start) {
 					error("script tried to CALLOBJ system-object with offset %d (resolved to %d) on line %d",
 						_registers[SREG_OP]._value, offset, _lineNumber);
 
-				RuntimeValue objValue;
-				objValue._type = rvtSystemObject;
-				objValue._object = object;
+				RuntimeValue objValue(object);
 				params.push_back(objValue);
-				_registers[SREG_AX] = _registers[int1]._function(_vm, params);
+				_registers[SREG_AX] = callImportedFunction(_registers[int1]._function, object, params);
 				params.pop_back();
 			} else {
-				_registers[SREG_AX] = _registers[int1]._function(_vm, params);
+				_registers[SREG_AX] = callImportedFunction(_registers[int1]._function, NULL, params);
 			}
 
 			// FIXME: unfinished
 			funcArgumentCount = 0xffffffff;
+			nextCallNeedsObject = false;
 			break;
 		case SCMD_PUSHREAL:
 			// farpush: push reg1 onto real stack
@@ -843,7 +899,11 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_SUBREALSTACK:
 			// farsubsp
-			// FIXME: CALLAS handling
+			if (recoverFromCallAs) {
+				for (uint i = 0; i < (uint)int1; ++i)
+					popValue();
+				recoverFromCallAs = false;
+			}
 			for (uint i = 0; i < (uint32)int1; ++i)
 				externalStack.pop();
 			break;
@@ -920,6 +980,134 @@ void ccInstance::runCodeFrom(uint32 start) {
 		// increment to next instruction, skipping any arguments
 		_pc += (1 + neededArgs);
 	}
+}
+
+const uint kOldScriptStringLength = 200;
+
+class ScriptStackString : public ScriptString {
+public:
+	ScriptStackString(ccInstance *instance, uint32 offset) : _instance(instance), _offset(offset) { }
+
+	const Common::String getString() {
+		if (_instance->_stack.size() <= _offset + kOldScriptStringLength)
+			error("ScriptStackString: offset %d is too high", _offset);
+
+		// FIXME: sanity-check types
+		Common::String text;
+		for (uint i = 0; i < kOldScriptStringLength; ++i) {
+			if (_instance->_stack[_offset + i]._value == 0)
+				break;
+			if (i == kOldScriptStringLength - 1)
+				error("ScriptStackString: string isn't null-terminated");
+			text += (char)_instance->_stack[_offset + i]._value;
+		}
+		return text;
+	}
+
+	void setString(const Common::String &text) {
+		if (text.size() >= kOldScriptStringLength)
+			error("ScriptStackString: new string is too large (%d)", text.size());
+
+		for (uint i = 0; i < text.size(); ++i) {
+			_instance->_stack[_offset + i]._type = rvtInteger;
+			_instance->_stack[_offset + i]._value = text[i];
+		}
+		_instance->_stack[_offset + text.size()]._type = rvtInteger;
+		_instance->_stack[_offset + text.size()]._value = 0;
+	}
+
+protected:
+	ccInstance *_instance;
+	uint32 _offset;
+};
+
+class ScriptDataString : public ScriptString {
+public:
+	ScriptDataString(ccInstance *instance, uint32 offset) : _instance(instance), _offset(offset) { }
+
+	const Common::String getString() {
+		if (_instance->_globalData->size() <= _offset + kOldScriptStringLength)
+			error("ScriptDataString: offset %d is too high", _offset);
+
+		Common::String text;
+		for (uint i = 0; i < kOldScriptStringLength; ++i) {
+			if ((*_instance->_globalData)[i] == 0)
+				break;
+			if (i == kOldScriptStringLength - 1)
+				error("ScriptDataString: string isn't null-terminated");
+			text += (char)(*_instance->_globalData)[i];
+		}
+		return text;
+	}
+
+	void setString(const Common::String &text) {
+		if (text.size() >= kOldScriptStringLength)
+			error("ScriptDataString: new string is too large (%d)", text.size());
+
+		memcpy(&(*_instance->_globalData)[_offset], text.c_str(), text.size() + 1);
+	}
+
+
+protected:
+	ccInstance *_instance;
+	uint32 _offset;
+};
+
+RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *function,
+	ScriptObject *object, Common::Array<RuntimeValue> &params) {
+
+	// check the signature
+	uint pos = 0;
+	while (function->signature[pos] != '\0') {
+		if (pos == params.size())
+			error("not enough parameters (%d) to '%s'", params.size(), function->name);
+
+		char sigEntry = function->signature[pos];
+		switch (sigEntry) {
+		case 'i':
+			if (params[pos]._type != rvtInteger)
+				error("expected integer for param %d of '%s', got type %d", pos + 1, function->name, params[pos]._type);
+			break;
+		case 'f':
+			if (params[pos]._type != rvtFloat)
+				error("expected float for param %d of '%s', got type %d", pos + 1, function->name, params[pos]._type);
+			break;
+		case 'o':
+			if (params[pos]._type != rvtSystemObject)
+				error("expected object for param %d of '%s', got type %d", pos + 1, function->name, params[pos]._type);
+			break;
+		case 's':
+			if (params[pos]._type == rvtStackPointer) {
+				params[pos] = new ScriptStackString(this, params[pos]._value);
+				break;
+			} else if (params[pos]._type == rvtGlobalData) {
+				params[pos] = new ScriptDataString(this, params[pos]._value);
+				break;
+			}
+			if (params[pos]._type != rvtSystemObject || !params[pos]._object->isOfType(sotString))
+				error("expected string for param %d of '%s', got type %d", pos + 1, function->name, params[pos]._type);
+			break;
+		default:
+			error("unknown entry in signature '%s' for '%s'", function->signature, function->name);
+		}
+		++pos;
+	}
+
+	if (function->objectType && !object)
+		error("expected '%s' to be called on an object", function->name);
+
+	// if this is a member function, make sure it's being called on an object of the right type
+	if (object) {
+		if (!object->isOfType(function->objectType))
+			error("'%s' was passed an object with the wrong type", function->name);
+		++pos;
+	}
+
+	// FIXME: variable argument functions
+	if (pos < params.size())
+		error("too many parameters (%d) to '%s'", params.size(), function->name);
+
+	return function->function(_vm, object, params);
 }
 
 void ccInstance::pushValue(const RuntimeValue &value) {

@@ -46,7 +46,7 @@ class ResourceManager;
 class GameFile;
 class Sprite;
 class SpriteSet;
-struct CharacterInfo;
+struct Character;
 class ccInstance;
 
 class ExecutingScript {
@@ -121,7 +121,7 @@ private:
 	uint32 _displayedRoom;
 	class Room *_currentRoom;
 
-	CharacterInfo *_playerChar;
+	Character *_playerChar;
 
 	Common::Array<ExecutingScript> _runningScripts;
 
@@ -142,7 +142,7 @@ private:
 	void setupPlayerCharacter(uint32 charId);
 	void createGlobalScript();
 	void firstRoomInitialization();
-	void loadNewRoom(uint32 id, CharacterInfo *forChar);
+	void loadNewRoom(uint32 id, Character *forChar);
 	bool getScreenSize();
 	bool initGraphics();
 

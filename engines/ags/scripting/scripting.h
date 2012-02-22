@@ -29,19 +29,42 @@
 #include "engines/ags/ags.h"
 #include "engines/ags/script.h"
 
+#define UNUSED(x) (void)(x)
+
 namespace AGS {
 
 void addSystemScripting(AGSEngine *vm);
 
-RuntimeValue Script_UnimplementedStub(AGSEngine *vm, const Common::Array<RuntimeValue> &params);
+RuntimeValue Script_UnimplementedStub(AGSEngine *vm, ScriptObject *self, const Common::Array<RuntimeValue> &params);
+
+class AudioChannel;
+class AudioClip;
+class DateTime;
+class Dialog;
+class DialogOptionsRenderingInfo;
+class DrawingSurface;
+class DynamicSprite;
+class ScriptFile;
+class Overlay;
+class ViewFrame;
+
+typedef RuntimeValue ScriptAPIFunction(AGSEngine *vm, ScriptObject *self, const Common::Array<RuntimeValue> &params);
+
+struct ScriptSystemFunctionInfo {
+	const char *name;
+	ScriptAPIFunction *function;
+	const char *signature;
+	ScriptObjectType objectType;
+};
 
 class GlobalScriptState {
 public:
 	Common::HashMap<Common::String, ScriptImport, Common::CaseSensitiveString_Hash, Common::CaseSensitiveString_EqualTo> _imports;
 
 	void addImport(const Common::String &name, const ScriptImport &import, bool forceReplace = false);
-	void addSystemFunctionImport(const Common::String &name, ScriptAPIFunction *function);
+	void addSystemFunctionImport(const ScriptSystemFunctionInfo *function);
 	void addSystemObjectImport(const Common::String &name, ScriptObject *object, bool forceReplace = false);
+	void addSystemFunctionImportList(const ScriptSystemFunctionInfo *list, uint32 count);
 };
 
 } // End of namespace AGS

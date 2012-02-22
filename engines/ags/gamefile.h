@@ -157,7 +157,7 @@ public:
 private:
 	ViewFrame readViewFrame(Common::SeekableReadStream *dta);
 	void readOldViews(Common::SeekableReadStream *dta);
-	CharacterInfo *readCharacter(Common::SeekableReadStream *dta);
+	Character *readCharacter(Common::SeekableReadStream *dta);
 	void readGui(Common::SeekableReadStream *dta);
 	void readPlugins(Common::SeekableReadStream *dta);
 	void readPropertyData(Common::SeekableReadStream *dta);
@@ -182,7 +182,7 @@ public:
 	uint32 _totalScore;
 
 	uint16 _invItemCount;
-	Common::Array<InventoryItemInfo> _invItemInfo;
+	Common::Array<InventoryItem> _invItemInfo;
 
 	uint32 _dialogCount;
 	uint32 _dlgMsgCount;
@@ -230,7 +230,7 @@ public:
 
 	Common::Array<Common::String> _messages;
 
-	Common::Array<CharacterInfo *> _chars;
+	Common::Array<Character *> _chars;
 
 	Common::Array<DialogTopic> _dialogs;
 	Common::Array<Common::String> _speechLines;

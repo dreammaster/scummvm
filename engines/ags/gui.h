@@ -49,7 +49,7 @@ namespace AGS {
 #define GUIDIS_UNCHANGED 4
 #define GUIDIS_GUIOFF  0x80
 
-// GUIObject
+// GUIControl
 #define GUIF_DEFAULT  1
 #define GUIF_CANCEL   2
 #define GUIF_DISABLED 4
@@ -87,10 +87,11 @@ namespace AGS {
 
 class AGSEngine;
 
-class GUIObject : public ScriptObject {
+class GUIControl : public ScriptObject {
 public:
-	GUIObject(AGSEngine *vm) : _vm(vm) { }
-	virtual ~GUIObject() { }
+	GUIControl(AGSEngine *vm) : _vm(vm) { }
+	virtual ~GUIControl() { }
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl); }
 
 	uint32 _id;
 	uint32 _objectId;
@@ -116,10 +117,11 @@ protected:
 	Common::Array<Common::String> _supportedEventArgs;
 };
 
-class GUISlider : public GUIObject {
+class GUISlider : public GUIControl {
 public:
-	GUISlider(AGSEngine *vm) : GUIObject(vm) { }
+	GUISlider(AGSEngine *vm) : GUIControl(vm) { }
 	void readFrom(Common::SeekableReadStream *dta);
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUISlider); }
 
 	uint32 _min, _max;
 	uint32 _value;
@@ -137,10 +139,11 @@ protected:
 	uint32 _cachedHandleTLY, _cachedHandleBRY;
 };
 
-class GUILabel : public GUIObject {
+class GUILabel : public GUIControl {
 public:
-	GUILabel(AGSEngine *vm) : GUIObject(vm) { }
+	GUILabel(AGSEngine *vm) : GUIControl(vm) { }
 	void readFrom(Common::SeekableReadStream *dta);
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUILabel); }
 
 	uint32 _font;
 	uint32 _textColor;
@@ -152,10 +155,11 @@ protected:
 	Common::String _text;
 };
 
-class GUITextBox : public GUIObject {
+class GUITextBox : public GUIControl {
 public:
-	GUITextBox(AGSEngine *vm) : GUIObject(vm) { }
+	GUITextBox(AGSEngine *vm) : GUIControl(vm) { }
 	void readFrom(Common::SeekableReadStream *dta);
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUITextBox); }
 
 	Common::String _text;
 	uint32 _font;
@@ -166,10 +170,11 @@ protected:
 	uint32 getMaxNumEvents() { return 1; }
 };
 
-class GUIListBox : public GUIObject {
+class GUIListBox : public GUIControl {
 public:
-	GUIListBox(AGSEngine *vm) : GUIObject(vm) { }
+	GUIListBox(AGSEngine *vm) : GUIControl(vm) { }
 	void readFrom(Common::SeekableReadStream *dta);
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIListBox); }
 
 	Common::Array<Common::String> _items;
 	Common::Array<uint16> _itemSaveGameIndexes;
@@ -192,10 +197,11 @@ protected:
 	uint32 getMaxNumEvents() { return 1; }
 };
 
-class GUIInvControl : public GUIObject {
+class GUIInvControl : public GUIControl {
 public:
-	GUIInvControl(AGSEngine *vm) : GUIObject(vm) { }
+	GUIInvControl(AGSEngine *vm) : GUIControl(vm) { }
 	void readFrom(Common::SeekableReadStream *dta);
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIInvWindow); }
 
 	uint32 _charId; // whose inventory? (-1 = current player)
 	uint32 _itemWidth, _itemHeight;
@@ -209,10 +215,11 @@ protected:
 	uint32 getMaxNumEvents() { return 1; }
 };
 
-class GUIButton : public GUIObject {
+class GUIButton : public GUIControl {
 public:
-	GUIButton(AGSEngine *vm) : GUIObject(vm) { }
+	GUIButton(AGSEngine *vm) : GUIControl(vm) { }
 	void readFrom(Common::SeekableReadStream *dta);
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIButton); }
 
 	Common::String _text;
 
@@ -234,6 +241,8 @@ protected:
 };
 
 struct GUIGroup : public ScriptObject {
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUI); }
+
 	char _vText[4]; // ??? - for compatibility
 	Common::String _name;
 	Common::String _clickEventHandler;
@@ -258,9 +267,9 @@ struct GUIGroup : public ScriptObject {
 	uint32 _id;
 	uint32 _on;
 
-	Common::Array<GUIObject *> _objects;
-	Common::Array<uint32> _objectRefPtrs; // for re-building objs array
-	Common::Array<uint16> _objectDrawOrder;
+	Common::Array<GUIControl *> _controls;
+	Common::Array<uint32> _controlRefPtrs; // for re-building objs array
+	Common::Array<uint16> _controlDrawOrder;
 };
 
 } // End of namespace AGS

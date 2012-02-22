@@ -30,7 +30,7 @@
 
 namespace AGS {
 
-void GUIObject::readFrom(Common::SeekableReadStream *dta) {
+void GUIControl::readFrom(Common::SeekableReadStream *dta) {
 	_flags = dta->readUint32LE();
 	_x = dta->readUint32LE();
 	_y = dta->readUint32LE();
@@ -46,7 +46,7 @@ void GUIObject::readFrom(Common::SeekableReadStream *dta) {
 	if (_vm->getGUIVersion() >= 108) {
 		uint32 eventCount = dta->readUint32LE();
 		if (eventCount > getMaxNumEvents())
-			error("too many events (%d) when reading GUIObject", eventCount);
+			error("too many events (%d) when reading GUIControl", eventCount);
 
 		_eventHandlers.resize(eventCount);
 		for (uint i = 0; i < eventCount; ++i)
@@ -55,7 +55,7 @@ void GUIObject::readFrom(Common::SeekableReadStream *dta) {
 }
 
 void GUISlider::readFrom(Common::SeekableReadStream *dta) {
-	GUIObject::readFrom(dta);
+	GUIControl::readFrom(dta);
 
 	_min = dta->readUint32LE();
 	_max = dta->readUint32LE();
@@ -74,7 +74,7 @@ void GUISlider::readFrom(Common::SeekableReadStream *dta) {
 }
 
 void GUILabel::readFrom(Common::SeekableReadStream *dta) {
-	GUIObject::readFrom(dta);
+	GUIControl::readFrom(dta);
 
 	uint32 textLen = 200;
 	if (_vm->getGUIVersion() >= 113) {
@@ -96,7 +96,7 @@ void GUILabel::readFrom(Common::SeekableReadStream *dta) {
 }
 
 void GUITextBox::readFrom(Common::SeekableReadStream *dta) {
-	GUIObject::readFrom(dta);
+	GUIControl::readFrom(dta);
 
 	char buffer[200 + 1];
 	dta->read(&buffer[0], 200);
@@ -109,7 +109,7 @@ void GUITextBox::readFrom(Common::SeekableReadStream *dta) {
 }
 
 void GUIListBox::readFrom(Common::SeekableReadStream *dta) {
-	GUIObject::readFrom(dta);
+	GUIControl::readFrom(dta);
 
 	uint32 itemCount = dta->readUint32LE();
 	_selected = dta->readUint32LE();
@@ -153,7 +153,7 @@ void GUIListBox::readFrom(Common::SeekableReadStream *dta) {
 }
 
 void GUIInvControl::readFrom(Common::SeekableReadStream *dta) {
-	GUIObject::readFrom(dta);
+	GUIControl::readFrom(dta);
 
 	if (_vm->getGUIVersion() >= 109) {
 		_charId = dta->readUint32LE();
@@ -177,7 +177,7 @@ void GUIInvControl::readFrom(Common::SeekableReadStream *dta) {
 }
 
 void GUIButton::readFrom(Common::SeekableReadStream *dta) {
-	GUIObject::readFrom(dta);
+	GUIControl::readFrom(dta);
 
 	_pic = dta->readUint32LE();
 	_overPic = dta->readUint32LE();

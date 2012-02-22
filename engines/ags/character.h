@@ -33,7 +33,9 @@
 
 namespace AGS {
 
-struct CharacterInfo : public ScriptObject {
+struct Character : public ScriptObject {
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotCharacter); }
+
 	uint32 _defView, _talkView, _view;
 	uint32 _room, _prevRoom;
 

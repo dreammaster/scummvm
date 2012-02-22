@@ -178,7 +178,7 @@ void AGSEngine::firstRoomInitialization() {
 	_loopCounter = 0;
 }
 
-void AGSEngine::loadNewRoom(uint32 id, CharacterInfo *forChar) {
+void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	debug(2, "loading new room %d", id);
 
 	delete _currentRoom;
@@ -255,9 +255,28 @@ bool AGSEngine::init() {
 
 	addSystemScripting(this);
 
-	_scriptState->addSystemObjectImport("character", new ScriptObjectArray<CharacterInfo *>(_gameFile->_chars, 780));
+	_scriptState->addSystemObjectImport("character", new ScriptObjectArray<Character *>(_gameFile->_chars, 780));
+	_scriptState->addSystemObjectImport("player", _gameFile->_chars[_gameFile->_playerChar]);
+	for (uint i = 0; i < _gameFile->_chars.size(); ++i) {
+		Character *charInfo = _gameFile->_chars[i];
+		if (charInfo->_scriptName.empty())
+			continue;
+		_scriptState->addSystemObjectImport(charInfo->_scriptName, charInfo);
+	}
 	_scriptState->addSystemObjectImport("gui", new ScriptObjectArray<GUIGroup>(_gameFile->_guiGroups, 8));
-	_scriptState->addSystemObjectImport("inventory", new ScriptObjectArray<InventoryItemInfo>(_gameFile->_invItemInfo, 68));
+	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
+		GUIGroup &group = _gameFile->_guiGroups[i];
+		if (group._name.empty())
+			continue;
+		_scriptState->addSystemObjectImport(group._name, &group);
+	}
+	_scriptState->addSystemObjectImport("inventory", new ScriptObjectArray<InventoryItem>(_gameFile->_invItemInfo, 68));
+	for (uint i = 0; i < _gameFile->_invItemInfo.size(); ++i) {
+		InventoryItem &invItem = _gameFile->_invItemInfo[i];
+		if (invItem._scriptName.empty())
+			continue;
+		_scriptState->addSystemObjectImport(invItem._scriptName, &invItem);
+	}
 
 	// FIXME: load fonts
 

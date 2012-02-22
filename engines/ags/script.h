@@ -82,7 +82,6 @@ enum RuntimeValueType {
 	// local data/code
 	rvtGlobalData,
 	rvtFunction,
-	rvtString,
 	// imports
 	rvtScriptFunction,
 	rvtScriptData,
@@ -95,22 +94,46 @@ enum RuntimeValueType {
 class AGSEngine;
 class ccInstance;
 struct RuntimeValue;
-
-typedef RuntimeValue ScriptAPIFunction(AGSEngine *vm, const Common::Array<RuntimeValue> &params);
+struct ScriptSystemFunctionInfo;
 
 struct RuntimeValue {
 	RuntimeValue() : _type(rvtInteger), _value(0) { }
 	RuntimeValue(uint32 intValue) : _type(rvtInteger), _value(intValue) { }
+	RuntimeValue(int intValue) : _type(rvtInteger), _value(intValue) { }
 
+	// support for object reference counting
+	RuntimeValue(ScriptObject *obj) : _type(rvtSystemObject), _value(0), _object(obj) { _object->IncRef(); }
+	~RuntimeValue() { if (_type == rvtSystemObject) _object->DecRef(); }
+	RuntimeValue(const RuntimeValue &v) {
+		_type = v._type;
+		_value = v._value;
+		_object = v._object;
+		if (_type == rvtSystemObject)
+			_object->IncRef();
+	}
+	RuntimeValue &operator=(const RuntimeValue &v) {
+		if (_type == rvtSystemObject)
+			_object->DecRef();
+		_type = v._type;
+		_value = v._value;
+		_object = v._object;
+		if (_type == rvtSystemObject)
+			_object->IncRef();
+		return *this;
+	}
+
+	// the type and associated data
 	RuntimeValueType _type;
 	union {
+		// integer value, offset, etc
 		uint32 _value;
 		int32 _signedValue;
+		float _floatValue;
 	};
 	union {
 		ccInstance *_instance;
 		ScriptObject *_object;
-		ScriptAPIFunction *_function;
+		const ScriptSystemFunctionInfo *_function;
 	};
 
 	RuntimeValue &operator=(uint32 intValue) {
@@ -125,7 +148,7 @@ struct ScriptImport {
 
 	// function pointer (system)
 	union {
-		ScriptAPIFunction *_function;
+		const ScriptSystemFunctionInfo *_function;
 		class ScriptObject *_object;
 	};
 
@@ -143,6 +166,9 @@ struct CallStackEntry {
 
 // a running instance of a script
 class ccInstance {
+	friend class ScriptStackString;
+	friend class ScriptDataString;
+
 public:
 	ccInstance(AGSEngine *vm, ccScript *script, bool autoImport = false, ccInstance *fork = NULL);
 	~ccInstance();
@@ -153,6 +179,8 @@ public:
 
 protected:
 	void runCodeFrom(uint32 start);
+	RuntimeValue callImportedFunction(const ScriptSystemFunctionInfo *function, ScriptObject *object,
+		Common::Array<RuntimeValue> &params);
 
 	AGSEngine *_vm;
 	ccScript *_script;
@@ -173,41 +201,6 @@ protected:
 	RuntimeValue popValue();
 	uint32 popIntValue();
 };
-
-// array of (system) script objects; for characters[], gui[], etc
-template<class T> class ScriptObjectArray : public ScriptObject {
-public:
-	ScriptObjectArray(Common::Array<T> &array, uint32 elementSize) : _array(array), _elementSize(elementSize) { }
-	virtual ScriptObject *getObjectAt(uint32 &offset) {
-		uint32 objectId = offset / _elementSize;
-		if (objectId >= _array.size())
-			return NULL;
-		offset = offset % _elementSize;
-		return &_array[objectId];
-	}
-
-protected:
-	uint32 _elementSize;
-	Common::Array<T> &_array;
-};
-
-// specialization of above for arrays containing pointers
-template<class T> class ScriptObjectArray<T *> : public ScriptObject {
-public:
-	ScriptObjectArray(Common::Array<T *> &array, uint32 elementSize) : _array(array), _elementSize(elementSize) { }
-	virtual ScriptObject *getObjectAt(uint32 &offset) {
-		uint32 objectId = offset / _elementSize;
-		if (objectId >= _array.size())
-			return NULL;
-		offset = offset % _elementSize;
-		return _array[objectId];
-	}
-
-protected:
-	uint32 _elementSize;
-	Common::Array<T *> &_array;
-};
-
 
 } // End of namespace AGS
 
