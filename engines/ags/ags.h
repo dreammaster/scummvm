@@ -57,6 +57,45 @@ protected:
 	ccInstance *_instance;
 };
 
+enum NewRoomState {
+	kNewRoomStateNone = 0,
+	kNewRoomStateNew = 1,		// new room
+	kNewRoomStateFirstTime = 2,	// first time in new room
+	kNewRoomStateSavedGame = 3	// new room due to loading saved game
+};
+
+enum GameEventType {
+	kEventTextScript = 1,
+	kEventRunEventBlock = 2,
+	kEventAfterFadeIn = 3,
+	kEventInterfaceClick = 4,
+	kEventNewRoom = 5
+};
+
+enum {
+	kEventBlockHotspot = 1,
+	kEventBlockRoom = 2
+};
+
+enum {
+	kRoomEventLeftEdge = 0,
+	kRoomEventRightEdge = 1,
+	kRoomEventBottomEdge = 2,
+	kRoomEventTopEdge = 3,
+	kRoomEventFirstTimeEntersScreen = 4,
+	kRoomEventEntersScreen = 5,
+	kRoomEventTick = 6,
+	kRoomEventEnterAfterFadeIn = 7,
+	kRoomEventPlayerLeavesScreen = 8
+};
+
+struct GameEvent {
+	GameEventType type;
+
+	uint32 data1, data2, data3;
+	uint32 playerId;
+};
+
 class AGSEngine : public Engine {
 public:
 	AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc);
@@ -151,6 +190,25 @@ private:
 	uint32 _displayedRoom;
 	class Room *_currentRoom;
 
+	// new room state (this frame)
+	NewRoomState _inNewRoom;
+	// new room state (from last time it was not None)
+	NewRoomState _newRoomWas;
+
+	Common::Array<GameEvent> _queuedGameEvents;
+	void queueGameEvent(GameEventType type, uint data1 = 0, uint data2 = (uint)-1000, uint data3 = 0);
+	void runGameEventNow(GameEventType type, uint data1 = 0, uint data2 = (uint)-1000, uint data3 = 0);
+	void processGameEvent(const GameEvent &event);
+	void processAllGameEvents();
+	bool runInteractionEvent(struct NewInteraction *interaction, uint eventId, uint fallback = (uint)-1, bool isInventory = false);
+	bool runInteractionCommandList(struct NewInteractionEvent &event, uint &commandsRunCount);
+	void runUnhandledEvent(uint eventId);
+
+	// details of running event block, if any
+	uint _inEntersScreenCounter;
+	Common::String _eventBlockBaseName;
+	uint _eventBlockId;
+
 	Character *_playerChar;
 
 	Common::Array<ExecutingScript> _runningScripts;
@@ -160,7 +218,7 @@ private:
 	Common::Array<ccInstance *> _scriptModules;
 	Common::Array<ccInstance *> _scriptModuleForks;
 	ccInstance *_dialogScriptsScript;
-	ccInstance *_roomScript;
+	ccInstance *_roomScript, *_roomScriptFork;
 
 	class GlobalScriptState *_scriptState;
 
@@ -168,11 +226,16 @@ private:
 
 	bool init();
 
+	void mainGameLoop();
+	void tickGame(bool checkControls = false);
+	void updateEvents();
+
 	void startNewGame();
 	void setupPlayerCharacter(uint32 charId);
 	void createGlobalScript();
 	void firstRoomInitialization();
 	void loadNewRoom(uint32 id, Character *forChar);
+	void checkNewRoom();
 	bool getScreenSize();
 	bool initGraphics();
 

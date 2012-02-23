@@ -51,10 +51,11 @@ namespace AGS {
 
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
-	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true),
+	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true), _guiNeedsUpdate(true),
 	_mouseFrame(0), _mouseDelay(0), _startingRoom(0xffffffff), _displayedRoom(0xffffffff),
-	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL),
-	_currentRoom(NULL), _currentCursor(0xffffffff) {
+	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL), _roomScriptFork(NULL),
+	_currentRoom(NULL), _currentCursor(0xffffffff), _framesPerSecond(40), _lastFrameTime(0),
+	_inNewRoom(kNewRoomStateNone), _newRoomWas(kNewRoomStateNone), _inEntersScreenCounter(0) {
 
 	_rnd = new Common::RandomSource("ags");
 	_scriptState = new GlobalScriptState();
@@ -122,13 +123,64 @@ Common::Error AGSEngine::run() {
 		startNewGame();
 
 	while (!shouldQuit()) {
-		Common::Event event;
+		mainGameLoop();
 
-		while (_eventMan->pollEvent(event)) {
-		}
+		// FIXME: load new game if needed
 	}
 
 	return Common::kNoError;
+}
+
+void AGSEngine::mainGameLoop() {
+	if (_displayedRoom == 0xffffffff)
+		error("mainGameLoop() called before a room was loaded, did game_start try blocking?");
+
+	tickGame(true);
+
+	// FIXME: location updates
+
+	// FIXME: cursor updates
+
+	// FIXME: restriction updates
+}
+
+// This is called from all over the place, and does all of the per-frame work.
+// Similar to 'mainloop' in original code.
+void AGSEngine::tickGame(bool checkControls) {
+	updateEvents();
+
+	// If we're running faster than the target rate, sleep for a bit.
+	uint32 time = _system->getMillis();
+	if (time < _lastFrameTime + (1000 / _framesPerSecond))
+		_system->delayMillis((1000 / _framesPerSecond) + time - _lastFrameTime);
+	_lastFrameTime = _system->getMillis();
+
+	// FIXME
+
+	if (_inNewRoom == 0) {
+		// FIXME: repExecAlways
+		// FIXME: same: queueGameEvent(kEventTextScript, TS_REPEAT);
+		queueGameEvent(kEventRunEventBlock, kEventBlockRoom, 0, kRoomEventTick);
+	}
+	checkNewRoom();
+
+	// FIXME
+
+	_newRoomWas = _inNewRoom;
+	if (_inNewRoom != kNewRoomStateNone)
+		queueGameEvent(kEventAfterFadeIn, 0, 0, 0);
+	_inNewRoom = kNewRoomStateNone;
+	processAllGameEvents();
+
+	// FIXME
+}
+
+void AGSEngine::updateEvents() {
+	Common::Event event;
+
+	while (_eventMan->pollEvent(event)) {
+		// FIXME
+	}
 }
 
 void AGSEngine::startNewGame() {
@@ -225,8 +277,411 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 	// FIXME
 
+	_inNewRoom = kNewRoomStateNew;
+
+	// FIXME
+
 	_scriptState->addSystemObjectImport("object", new ScriptObjectArray<RoomObject>(_currentRoom->_objects, 8), true);
 
+	// FIXME
+
+	// compile_room_script
+	delete _roomScript;
+	delete _roomScriptFork;
+	_roomScript = new ccInstance(this, _currentRoom->_compiledScript);
+	_roomScriptFork = new ccInstance(this, _currentRoom->_compiledScript, false, _roomScript);
+	// FIXME: optimization stuff
+
+	// FIXME
+
+	invalidateGUI();
+}
+
+void AGSEngine::checkNewRoom() {
+	// we only care if we're in a new room, and it's not from a restored game
+	if (_inNewRoom == kNewRoomStateNone || _inNewRoom == kNewRoomStateSavedGame)
+		return;
+
+	// make sure that any script calls don't re-call Enters Screen
+	NewRoomState newRoomWas = _inNewRoom;
+	_inNewRoom = kNewRoomStateNone;
+
+	_state->_disabledUserInterface++;
+	runGameEventNow(kEventRunEventBlock, kEventBlockRoom, 0, kRoomEventEntersScreen);
+	_state->_disabledUserInterface--;
+
+	_inNewRoom = newRoomWas;
+}
+
+void AGSEngine::queueGameEvent(GameEventType type, uint data1, uint data2, uint data3) {
+	GameEvent ev;
+	ev.type = type;
+	ev.data1 = data1;
+	ev.data2 = data2;
+	ev.data3 = data3;
+	ev.playerId = _gameFile->_playerChar;
+	_queuedGameEvents.push_back(ev);
+}
+
+void AGSEngine::runGameEventNow(GameEventType type, uint data1, uint data2, uint data3) {
+	GameEvent ev;
+	ev.type = type;
+	ev.data1 = data1;
+	ev.data2 = data2;
+	ev.data3 = data3;
+	ev.playerId = _gameFile->_playerChar;
+	processGameEvent(ev);
+}
+
+void AGSEngine::processGameEvent(const GameEvent &event) {
+	switch (event.type) {
+	case kEventTextScript:
+		error("processGameEvent: can't do kEventTextScript yet"); // FIXME
+		break;
+	case kEventRunEventBlock:
+		{
+		// save old state (to cope with nested calls)
+		Common::String oldBaseName = _eventBlockBaseName;
+		uint oldEventBlockId = _eventBlockId;
+
+		NewInteraction *interaction = NULL;
+		// FIXME: 3.x scripts: InteractionScripts *scripts = NULL;
+
+		switch (event.data1) {
+		case kEventBlockHotspot:
+			debug(7, "running hotspot interaction: event %d", event.data3);
+			_eventBlockBaseName = "hotspot%d";
+			_eventBlockId = event.data2;
+
+			// FIXME: hotspotScripts (3.x)
+			interaction = _currentRoom->_hotspots[event.data2]._interaction;
+			break;
+		case kEventBlockRoom:
+			debug(7, "running room interaction: event %d", event.data3);
+			_eventBlockBaseName = "room";
+
+			if (event.data3 == kRoomEventEntersScreen)
+				_inEntersScreenCounter++;
+
+			// FIXME: roomScripts (3.x)
+			interaction = _currentRoom->_interaction;
+			break;
+		default:
+			error("processGameEvent: unknown event block type %d", event.data1);
+		}
+
+		/*if (scripts) {
+			// FIXME: scripts (3.x)
+		} else */ if (interaction) {
+			runInteractionEvent(interaction, event.data3);
+		}
+
+		if (event.data1 == kEventBlockRoom && event.data3 == kRoomEventEntersScreen) {
+			_inEntersScreenCounter--;
+		}
+
+		// restore state
+		_eventBlockBaseName = oldBaseName;
+		_eventBlockId = oldEventBlockId;
+
+		break;
+		}
+	case kEventAfterFadeIn:
+		warning("processGameEvent: can't do kEventAfterFadeIn yet"); // FIXME
+		break;
+	case kEventInterfaceClick:
+		error("processGameEvent: can't do kEventInterfaceClick yet"); // FIXME
+		break;
+	case kEventNewRoom:
+		error("processGameEvent: can't do kEventNewRoom yet"); // FIXME
+		break;
+	default:
+		error("processGameEvent: unknown event type %d", event.type);
+	}
+}
+
+void AGSEngine::processAllGameEvents() {
+	// make a copy of the events - if processing an event includes
+	// a blocking function it will continue to the next game loop
+	// and wipe the event list
+	Common::Array<GameEvent> events = _queuedGameEvents;
+
+	uint roomWas = _state->_roomChanges;
+
+	for (uint i = 0; i < events.size(); ++i) {
+		processGameEvent(events[i]);
+
+		// if the room changed, discard all other events
+		if (roomWas != _state->_roomChanges)
+			break;
+	}
+
+	_queuedGameEvents.clear();
+}
+
+// returns true if the NewInteraction has been invalidated (e.g. a room change occurred)
+bool AGSEngine::runInteractionEvent(struct NewInteraction *interaction, uint eventId, uint checkFallback, bool isInventory) {
+	if (!interaction->hasResponseFor(eventId)) {
+		// no response for this event
+
+		// if there is a fallback, stop now (caller can run that instead)
+		if (checkFallback != (uint)-1 && interaction->hasResponseFor(checkFallback))
+			return false;
+
+		runUnhandledEvent(eventId);
+
+		return false;
+	}
+
+	if (_state->_checkInteractionOnly) {
+		_state->_checkInteractionOnly = 2;
+
+		return true;
+	}
+
+	uint commandsRunCount = 0;
+	bool ret = runInteractionCommandList(interaction->_events[eventId], commandsRunCount);
+
+	// a failed inventory interaction
+	if ((commandsRunCount == 0) && isInventory)
+		runUnhandledEvent(eventId);
+
+	return ret;
+}
+
+enum {
+	kActionDoNothing = 0,
+	kActionRunScript = 1,
+	kActionAddScoreOnce = 2,
+	kActionAddScore = 3,
+	kActionDisplayMessage = 4,
+	kActionPlayMusic = 5,
+	kActionStopMusic = 6,
+	kActionPlaySound = 7,
+	kActionPlayFlic = 8,
+	kActionRunDialog = 9,
+	kActionEnableDialogOption = 10,
+	kActionDisableDialogOption = 11,
+	kActionGoToScreen = 12,
+	kActionAddInventory = 13,
+	kActionMoveObject = 14,
+	kActionObjectOff = 15,
+	kActionObjectOn = 16,
+	kActionSetObjectView = 17,
+	kActionAnimateObject = 18,
+	kActionMoveCharacter = 19,
+	kActionIfInventoryItemUsed = 20,
+	kActionIfHasInventoryItem = 21,
+	kActionIfCharacterMoving = 22,
+	kActionIfVariablesEqual = 23,
+	kActionStopCharacterWalking = 24,
+	kActionGoToScreenAtCoordinates = 25,
+	kActionMoveNPCToRoom = 26,
+	kActionSetCharacterView = 27,
+	kActionReleaseCharacterView = 28,
+	kActionFollowCharacter = 29,
+	kActionStopFollowing = 30,
+	kActionDisableHotspot = 31,
+	kActionEnableHotspot = 32,
+	kActionSetVariableValue = 33,
+	kActionRunAnimation = 34,
+	kActionQuickAnimation = 35,
+	kActionSetIdleAnimation = 36,
+	kActionDisableIdleAnimation = 37,
+	kActionLoseInventoryItem = 38,
+	kActionShowGUI = 39,
+	kActionHideGUI = 40,
+	kActionStopRunningCommands = 41,
+	kActionFaceLocation = 42,
+	kActionPauseCommands = 43,
+	kActionChangeCharacterView = 44,
+	kActionIfPlayerCharacterIs = 45,
+	kActionIfCursorModeIs = 46,
+	kActionIfPlayerHasBeenToRoom = 47
+};
+
+Common::String makeTextScriptName(const Common::String &base, uint id, uint val) {
+	Common::String string = Common::String::format(base.c_str(), id);
+	string += Common::String::format("_%c", 'a' + val);
+	return string;
+}
+
+bool AGSEngine::runInteractionCommandList(NewInteractionEvent &event, uint &commandsRunCount) {
+	assert(event._response);
+
+	const Common::Array<NewInteractionCommand> &commands = event._response->_commands;
+
+	for (uint i = 0; i < commands.size(); ++i) {
+		commandsRunCount++;
+		uint roomWas = _state->_roomChanges;
+
+		debug(6, "runInteractionCommandList: action %d", commands[i]._type);
+
+		switch (commands[i]._type) {
+		case kActionDoNothing:
+			break;
+		case kActionRunScript:
+			if (_eventBlockBaseName.contains("character") || _eventBlockBaseName.contains("inventory")) {
+				// global script (character or inventory)
+				// FIXME
+			} else {
+				// FIXME: bounds check?
+				runTextScript(_roomScript, makeTextScriptName(_eventBlockBaseName, _eventBlockId, commands[i]._args[0]._val));
+				// FIXME
+			}
+			break;
+		case kActionAddScoreOnce:
+			if (event._response->_timesRun)
+				break;
+			event._response->_timesRun++;
+			// fallthrough
+		case kActionAddScore:
+			// FIXME
+			break;
+		case kActionDisplayMessage:
+			// FIXME
+			break;
+		case kActionPlayMusic:
+			// FIXME
+			break;
+		case kActionStopMusic:
+			// FIXME
+			break;
+		case kActionPlaySound:
+			// FIXME
+			break;
+		case kActionPlayFlic:
+			// FIXME
+			break;
+		case kActionRunDialog:
+			// FIXME
+			break;
+		case kActionEnableDialogOption:
+			// FIXME
+			break;
+		case kActionDisableDialogOption:
+			// FIXME
+			break;
+		case kActionGoToScreen:
+			// FIXME
+			break;
+		case kActionAddInventory:
+			// FIXME
+			break;
+		case kActionMoveObject:
+			// FIXME
+			break;
+		case kActionObjectOff:
+			// FIXME
+			break;
+		case kActionObjectOn:
+			// FIXME
+			break;
+		case kActionSetObjectView:
+			// FIXME
+			break;
+		case kActionAnimateObject:
+			// FIXME
+			break;
+		case kActionMoveCharacter:
+			// FIXME
+			break;
+		case kActionIfInventoryItemUsed:
+			// FIXME
+			break;
+		case kActionIfHasInventoryItem:
+			// FIXME
+			break;
+		case kActionIfCharacterMoving:
+			// FIXME
+			break;
+		case kActionIfVariablesEqual:
+			// FIXME
+			break;
+		case kActionStopCharacterWalking:
+			// FIXME
+			break;
+		case kActionGoToScreenAtCoordinates:
+			// FIXME
+			break;
+		case kActionMoveNPCToRoom:
+			// FIXME
+			break;
+		case kActionSetCharacterView:
+			// FIXME
+			break;
+		case kActionReleaseCharacterView:
+			// FIXME
+			break;
+		case kActionFollowCharacter:
+			// FIXME
+			break;
+		case kActionStopFollowing:
+			// FIXME
+			break;
+		case kActionDisableHotspot:
+			// FIXME
+			break;
+		case kActionEnableHotspot:
+			// FIXME
+			break;
+		case kActionSetVariableValue:
+			// FIXME
+			break;
+		case kActionRunAnimation:
+			// FIXME
+			break;
+		case kActionQuickAnimation:
+			// FIXME
+			break;
+		case kActionSetIdleAnimation:
+			// FIXME
+			break;
+		case kActionDisableIdleAnimation:
+			// FIXME
+			break;
+		case kActionLoseInventoryItem:
+			// FIXME
+			break;
+		case kActionShowGUI:
+			// FIXME
+			break;
+		case kActionHideGUI:
+			// FIXME
+			break;
+		case kActionStopRunningCommands:
+			return true;
+		case kActionFaceLocation:
+			// FIXME
+			break;
+		case kActionPauseCommands:
+			// FIXME
+			break;
+		case kActionChangeCharacterView:
+			// FIXME
+			break;
+		case kActionIfPlayerCharacterIs:
+			// FIXME
+			break;
+		case kActionIfCursorModeIs:
+			// FIXME
+			break;
+		case kActionIfPlayerHasBeenToRoom:
+			// FIXME
+			break;
+		default:
+			error("runInteractionEvent: unknown action %d", commands[i]._type);
+		}
+
+		// return true if the room changed from under us (the interaction is no longer valid)
+		if (roomWas != _state->_roomChanges)
+			return true;
+	}
+
+	return false;
+}
+
+void AGSEngine::runUnhandledEvent(uint eventId) {
 	// FIXME
 }
 

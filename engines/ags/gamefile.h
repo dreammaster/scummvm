@@ -86,6 +86,10 @@ struct NewInteraction {
 	static NewInteraction *createFrom(Common::SeekableReadStream *dta);
 	~NewInteraction();
 
+	bool hasResponseFor(uint eventId) {
+		return (eventId < _events.size()) && _events[eventId]._response && !_events[eventId]._response->_commands.empty();
+	}
+
 	Common::Array<NewInteractionEvent> _events;
 
 protected:
