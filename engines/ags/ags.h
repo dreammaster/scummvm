@@ -93,7 +93,22 @@ public:
 
 	Common::RandomSource *getRandomSource() { return _rnd; }
 
+	byte getGameOption(uint index);
+
+	// resolution system functions
+	uint getFixedPixelSize(uint pixels);
+	int convertToLowRes(int coord);
+	int convertBackToHighRes(int coord);
+	int multiplyUpCoordinate(int coords);
+	void multiplyUpCoordinates(int32 &x, int32 &y);
+	void multiplyUpCoordinatesRoundUp(int32 &x, int32 &y);
+	int divideDownCoordinate(int coord);
+	int divideDownCoordinateRoundUp(int coord);
+
 	void playSound(uint soundId);
+
+	GameFile *_gameFile;
+	class GameState *_state;
 
 	Common::Array<Character *> _characters;
 
@@ -108,11 +123,11 @@ private:
 
 	uint16 _width, _height;
 	uint16 _baseWidth, _baseHeight;
+	uint32 _screenResolutionMultiplier;
 	uint16 _textMultiply;
 	bool _forceLetterbox;
 
 	ResourceManager *_resourceMan;
-	GameFile *_gameFile;
 	SpriteSet *_sprites;
 
 	bool _needsUpdate;

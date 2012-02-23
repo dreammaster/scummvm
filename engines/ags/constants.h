@@ -227,6 +227,85 @@ enum AGSRoomVersion {
 #define MODE_CUSTOM1 8
 #define MODE_CUSTOM2 9
 
+#define OVER_TEXTMSG  1
+#define OVER_COMPLETE 2
+#define OVER_PICTURE  3
+#define OVER_CUSTOM   100
+#define OVR_AUTOPLACE 30000
+#define FOR_ANIMATION 1
+#define FOR_SCRIPT    2
+#define FOR_EXITLOOP  3
+
+#define EVENT_NONE       0
+#define EVENT_INPROGRESS 1
+#define EVENT_CLAIMED    2
+
+#define SKIP_AUTOTIMER  1
+#define SKIP_KEYPRESS   2
+#define SKIP_MOUSECLICK 4
+
+#define UNTIL_ANIMEND   1
+#define UNTIL_MOVEEND   2
+#define UNTIL_CHARIS0   3
+#define UNTIL_NOOVERLAY 4
+#define UNTIL_NEGATIVE  5
+#define UNTIL_INTIS0    6
+#define UNTIL_SHORTIS0  7
+#define UNTIL_INTISNEG  8
+
+#define TURNING_AROUND     1000
+#define TURNING_BACKWARDS 10000
+
+#define AMBIENCE_FULL_DIST 25
+
+// parameters to run_on_event
+#define GE_LEAVE_ROOM 1
+#define GE_ENTER_ROOM 2
+#define GE_MAN_DIES   3
+#define GE_GOT_SCORE  4
+#define GE_GUI_MOUSEDOWN 5
+#define GE_GUI_MOUSEUP   6
+#define GE_ADD_INV       7
+#define GE_LOSE_INV      8
+#define GE_RESTORE_GAME  9
+
+// These numbers were chosen arbitrarily -- the idea is
+// to make sure that the user gets the parameters the right way round
+#define ANYWHERE       304
+#define WALKABLE_AREAS 305
+#define BLOCKING       919
+#define IN_BACKGROUND  920
+#define FORWARDS       1062
+#define BACKWARDS      1063
+#define VOL_CHANGEEXISTING   1678
+#define VOL_SETFUTUREDEFAULT 1679
+#define VOL_BOTH             1680
+#define SCR_NO_VALUE   31998
+#define SCR_COLOR_TRANSPARENT -1
+
+// GameState
+#define INVALID_X  30000
+#define MAXGSVALUES 500
+#define MAXGLOBALSTRINGS 51
+#define MAX_INVORDER 500
+#define SCALIGN_LEFT     1
+#define SCALIGN_CENTRE   2
+#define SCALIGN_RIGHT    3
+#define DIALOG_NONE      0
+#define DIALOG_RUNNING   1
+#define DIALOG_STOP      2
+#define DIALOG_NEWROOM   100
+#define DIALOG_NEWTOPIC  12000
+#define MAX_TIMERS       21
+#define MAX_PARSED_WORDS 15
+#define MAXSAVEGAMES     50
+#define MAX_QUEUED_MUSIC 10
+#define GLED_INTERACTION 1
+#define GLED_EFFECTS     2
+#define QUEUED_MUSIC_REPEAT 10000
+#define PLAYMP3FILE_MAX_FILENAME_LEN 50
+#define MAX_AUDIO_TYPES  30
+
 } // End of namespace AGS
 
 #endif // AGS_CONSTANTS_H

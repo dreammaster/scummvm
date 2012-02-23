@@ -38,6 +38,7 @@
 #include "ags/ags.h"
 #include "ags/constants.h"
 #include "ags/gamefile.h"
+#include "ags/gamestate.h"
 #include "ags/resourceman.h"
 #include "ags/room.h"
 #include "ags/script.h"
@@ -55,6 +56,7 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 
 	_rnd = new Common::RandomSource("ags");
 	_scriptState = new GlobalScriptState();
+	_state = new GameState(this);
 }
 
 AGSEngine::~AGSEngine() {
@@ -185,6 +187,8 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	debug(2, "loading new room %d", id);
 
 	delete _currentRoom;
+
+	_state->_roomChanges++;
 	_displayedRoom = id;
 
 	Common::String filename = Common::String::format("room%d.crm", id);
@@ -197,6 +201,11 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 		error("failed to open room file for room %d", id);
 
 	_currentRoom = new Room(this, stream);
+
+	_state->_roomWidth = _currentRoom->_width;
+	_state->_roomHeight = _currentRoom->_height;
+	_state->_animBackgroundSpeed = _currentRoom->_backgroundSceneAnimSpeed;
+	_state->_bgAnimDelay = _currentRoom->_backgroundSceneAnimSpeed;
 
 	_scriptState->addSystemObjectImport("object", new ScriptObjectArray<RoomObject>(_currentRoom->_objects, 8), true);
 
@@ -255,6 +264,8 @@ bool AGSEngine::init() {
 	_gameFile = new GameFile(this);
 	if (!_gameFile->init())
 		return false;
+
+	_state->init();
 
 	addSystemScripting(this);
 
@@ -350,6 +361,8 @@ bool AGSEngine::getScreenSize() {
 		_gameFile->_options[OPT_LETTERBOX] = 0;
 		_forceLetterbox = false;
 	}
+
+	_screenResolutionMultiplier = _width / _baseWidth;
 
 	return true;
 }
@@ -534,6 +547,54 @@ ScriptImport AGSEngine::resolveImport(const Common::String &name) {
 
 GlobalScriptState *AGSEngine::getScriptState() {
 	return _scriptState;
+}
+
+byte AGSEngine::getGameOption(uint index) {
+	return _gameFile->_options[index];
+}
+
+// Multiplies up the number of pixels depending on the current
+// resolution, to give a relatively fixed size at any game res
+uint AGSEngine::getFixedPixelSize(uint pixels) {
+	return pixels * _screenResolutionMultiplier;
+}
+
+int AGSEngine::convertToLowRes(int coord) {
+	return (getGameOption(OPT_NATIVECOORDINATES) ? (coord / _screenResolutionMultiplier) : coord);
+}
+
+int AGSEngine::convertBackToHighRes(int coord) {
+	return (getGameOption(OPT_NATIVECOORDINATES) ? (coord * _screenResolutionMultiplier) : coord);
+}
+
+int AGSEngine::multiplyUpCoordinate(int coord) {
+	return (getGameOption(OPT_NATIVECOORDINATES) ? coord : (coord * _screenResolutionMultiplier));
+}
+
+void AGSEngine::multiplyUpCoordinates(int32 &x, int32 &y) {
+	if (!getGameOption(OPT_NATIVECOORDINATES))
+		return;
+
+	x *= _screenResolutionMultiplier;
+	y *= _screenResolutionMultiplier;
+}
+
+void AGSEngine::multiplyUpCoordinatesRoundUp(int32 &x, int32 &y) {
+	if (!getGameOption(OPT_NATIVECOORDINATES))
+		return;
+
+	x *= _screenResolutionMultiplier;
+	x += (_screenResolutionMultiplier - 1);
+	y *= _screenResolutionMultiplier;
+	y += (_screenResolutionMultiplier - 1);
+}
+
+int AGSEngine::divideDownCoordinate(int coord) {
+	return (getGameOption(OPT_NATIVECOORDINATES) ? coord : (coord / _screenResolutionMultiplier));
+}
+
+int AGSEngine::divideDownCoordinateRoundUp(int coord) {
+	return (getGameOption(OPT_NATIVECOORDINATES) ? coord : (coord / _screenResolutionMultiplier + _screenResolutionMultiplier - 1));
 }
 
 void AGSEngine::playSound(uint soundId) {

@@ -4,6 +4,7 @@ MODULE_OBJS := \
 	ags.o \
 	detection.o \
 	gamefile.o \
+	gamestate.o \
 	gui.o \
 	metaengine.o \
 	resourceman.o \

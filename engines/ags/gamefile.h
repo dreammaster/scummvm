@@ -145,6 +145,11 @@ struct CustomPropertySchemaProperty {
 	uint32 _type;
 };
 
+struct AGSFont {
+	byte _flags;
+	byte _outline;
+};
+
 class AGSEngine;
 
 class GameFile {
@@ -172,22 +177,17 @@ public:
 
 	uint32 _options[100];
 
-	uint8 _palUses[256];
-	byte  _defPal[768];
+	uint8 _paletteUses[256];
+	byte _defaultPalette[768];
 
-	uint32 _viewCount;
-	uint32 _charCount;
 	uint32 _playerChar;
 
 	uint32 _totalScore;
 
-	uint16 _invItemCount;
 	Common::Array<InventoryItem> _invItemInfo;
 
 	uint32 _dialogCount;
 	uint32 _dlgMsgCount;
-
-	uint32 _fontCount;
 
 	uint32 _colorDepth;
 
@@ -211,8 +211,7 @@ public:
 	uint32 _globalScript;
 	uint32 _compiledScript;
 
-	Common::Array<byte> _fontFlags;
-	Common::Array<byte> _fontOutline;
+	Common::Array<AGSFont> _fonts;
 
 	Common::Array<byte> _spriteFlags;
 

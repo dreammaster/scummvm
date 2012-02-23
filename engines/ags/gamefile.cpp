@@ -107,30 +107,30 @@ bool GameFile::init() {
 
 	// palette
 	for (uint32 i = 0; i < 256; i++)
-		_palUses[i] = (uint8) dta->readByte();
+		_paletteUses[i] = (uint8) dta->readByte();
 	for (uint32 i = 0; i < 256; i++) {
-		_defPal[3 * i + 0] = dta->readByte(); // R
-		_defPal[3 * i + 1] = dta->readByte(); // G
-		_defPal[3 * i + 2] = dta->readByte(); // B
+		_defaultPalette[3 * i + 0] = dta->readByte(); // R
+		_defaultPalette[3 * i + 1] = dta->readByte(); // G
+		_defaultPalette[3 * i + 2] = dta->readByte(); // B
 
 		dta->skip(1); // Pad
 	}
 
-	_viewCount = dta->readUint32LE();
-	_charCount = dta->readUint32LE();
+	uint32 viewCount = dta->readUint32LE();
+	uint32 charCount = dta->readUint32LE();
 	_playerChar = dta->readUint32LE();
 
 	_totalScore = dta->readSint32LE();
 
-	_invItemCount = dta->readUint16LE();
+	uint32 invItemCount = dta->readUint16LE();
 	dta->skip(2); // padding
 
 	_dialogCount = dta->readUint32LE();
 	_dlgMsgCount = dta->readUint32LE();
-	_fontCount = dta->readUint32LE();
+	uint32 fontCount = dta->readUint32LE();
 
 	debug(2, "%d views, %d characters (player is %d), %d inventory items, %d dialog topics",
-		_viewCount, _charCount, _playerChar, _invItemCount, _dialogCount);
+		viewCount, charCount, _playerChar, invItemCount, _dialogCount);
 
 	_colorDepth = dta->readUint32LE();
 
@@ -177,12 +177,11 @@ bool GameFile::init() {
 	}
 
 	// fonts
-	_fontFlags.resize(_fontCount);
-	for (uint32 i = 0; i < _fontCount; ++i)
-		_fontFlags[i] = dta->readByte();
-	_fontOutline.resize(_fontCount);
-	for (uint32 i = 0; i < _fontCount; ++i)
-		_fontOutline[i] = dta->readByte();
+	_fonts.resize(fontCount);
+	for (uint32 i = 0; i < fontCount; ++i)
+		_fonts[i]._flags = dta->readByte();
+	for (uint32 i = 0; i < fontCount; ++i)
+		_fonts[i]._outline = dta->readByte();
 
 	// TODO: PSP version fixes up fontOutlines here...
 
@@ -193,8 +192,8 @@ bool GameFile::init() {
 		_spriteFlags[i] = dta->readByte();
 
 	// inventory info
-	_invItemInfo.resize(_invItemCount);
-	for (uint32 i = 0; i < _invItemCount; ++i) {
+	_invItemInfo.resize(invItemCount);
+	for (uint32 i = 0; i < invItemCount; ++i) {
 		InventoryItem &info = _invItemInfo[i];
 
 		char invName[26];
@@ -242,12 +241,12 @@ bool GameFile::init() {
 		error("3.x not supported yet");
 	} else {
 		debug(1, "char interactions");
-		_interactionsChar.resize(_charCount);
-		for (uint32 i = 0; i < _charCount; i++)
+		_interactionsChar.resize(charCount);
+		for (uint32 i = 0; i < charCount; i++)
 			_interactionsChar[i] = NewInteraction::createFrom(dta);
 		debug(1, "inv interactions");
-		_interactionsInv.resize(_invItemCount);
-		for (uint32 i = 0; i < _invItemCount; i++)
+		_interactionsInv.resize(invItemCount);
+		for (uint32 i = 0; i < invItemCount; i++)
 			_interactionsInv[i] = NewInteraction::createFrom(dta);
 
 		uint32 globalVarsCount = dta->readUint32LE();
@@ -296,11 +295,12 @@ bool GameFile::init() {
 		error("3.x not supported yet");
 	} else {
 		// 2.x views
+		_views.resize(viewCount);
 		readOldViews(dta);
 	}
 
-	_vm->_characters.resize(_charCount);
-	for (uint i = 0; i < _charCount; ++i)
+	_vm->_characters.resize(charCount);
+	for (uint i = 0; i < charCount; ++i)
 		_vm->_characters[i] = readCharacter(dta);
 
 	if (_version <= kAGSVer272) {
@@ -465,7 +465,6 @@ NewInteraction *NewInteraction::createFrom(Common::SeekableReadStream *dta) {
 			error("invalid interaction? (%d)", unknown);
 		return NULL;
 	}
-	debug(8, "new interaction");
 
 	NewInteraction *interaction = new NewInteraction();
 
@@ -487,7 +486,7 @@ NewInteraction *NewInteraction::createFrom(Common::SeekableReadStream *dta) {
 		if (!hasResponse[i])
 			continue;
 
-		debug(8, "reading response");
+		debug(8, "reading NewInteraction response (event %d)", i);
 		interaction->_events[i]._response = interaction->readCommandList(dta);
 	}
 
@@ -552,8 +551,7 @@ ViewFrame GameFile::readViewFrame(Common::SeekableReadStream *dta) {
 }
 
 void GameFile::readOldViews(Common::SeekableReadStream *dta) {
-	_views.resize(_viewCount);
-	for (uint n = 0; n < _viewCount; ++n) {
+	for (uint n = 0; n < _views.size(); ++n) {
 		// read the old 2.x view data
 		uint16 numLoops = dta->readUint16LE();
 		uint16 numFrames[16];
