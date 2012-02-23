@@ -30,6 +30,32 @@
 
 namespace AGS {
 
+bool GUIControl::isOverControl(const Common::Point &pos, uint extra) {
+	Common::Rect r(_x, _y, _x + _width + extra, _y + _height + extra);
+	return r.contains(pos);
+}
+
+void GUIControl::resize(uint32 width, uint32 height) {
+	_width = width;
+	_height = height;
+}
+
+bool GUIControl::isDisabled() {
+	if (_flags & GUIF_DISABLED)
+		return true;
+
+	// FIXME: global button disabling
+
+	return false;
+}
+
+void GUIControl::setClickable(bool value) {
+	if (value)
+		_flags &= ~GUIF_NOCLICKS;
+	else
+		_flags |= GUIF_NOCLICKS;
+}
+
 void GUIControl::readFrom(Common::SeekableReadStream *dta) {
 	_flags = dta->readUint32LE();
 	_x = dta->readUint32LE();

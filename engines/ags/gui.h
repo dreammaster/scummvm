@@ -27,6 +27,7 @@
 #define AGS_GUI_H
 
 #include "common/array.h"
+#include "common/rect.h"
 #include "common/stream.h"
 
 #include "engines/ags/scriptobj.h"
@@ -105,7 +106,29 @@ public:
 	Common::String _scriptName;
 	Common::Array<Common::String> _eventHandlers;
 
-	// FIXME: virtual functions
+	// position relative to gui
+	virtual void onMouseMove(const Common::Point &pos) { }
+	virtual void onMouseEnter() { }
+	virtual void onMouseLeave() { }
+	// button down - return true to lock focus
+	virtual bool onMouseDown() { return false; }
+	virtual void onMouseUp() { }
+	virtual void onKeyPress(uint id) { }
+	virtual void draw() { }
+
+	virtual bool isOverControl(const Common::Point &pos, uint extra);
+
+	virtual void resize(uint32 width, uint32 height);
+
+	bool isDeleted() { return _flags & GUIF_DELETED; }
+	bool isDisabled();
+	void enable() { _flags &= ~GUIF_DISABLED; }
+	void disable() { _flags |= GUIF_DISABLED; }
+	bool isVisible() { return !(_flags & GUIF_INVISIBLE); }
+	void show() { _flags &= ~GUIF_INVISIBLE; }
+	void hide() { _flags |= GUIF_INVISIBLE; }
+	bool isClickable() { return !(_flags & GUIF_NOCLICKS); }
+	void setClickable(bool value);
 
 protected:
 	virtual void readFrom(Common::SeekableReadStream *dta);
