@@ -93,6 +93,9 @@ public:
 
 	Common::RandomSource *getRandomSource() { return _rnd; }
 
+	uint32 getGameSpeed();
+	void setGameSpeed(uint32 speed);
+
 	byte getGameOption(uint index);
 
 	// resolution system functions
@@ -107,6 +110,8 @@ public:
 
 	void playSound(uint soundId);
 
+	void invalidateGUI() { _guiNeedsUpdate = true; }
+
 	GameFile *_gameFile;
 	class GameState *_state;
 
@@ -120,6 +125,8 @@ private:
 	uint32 _engineStartTime;
 	uint32 _playTime;
 	uint32 _loopCounter;
+	uint32 _framesPerSecond;
+	uint32 _lastFrameTime;
 
 	uint16 _width, _height;
 	uint16 _baseWidth, _baseHeight;
@@ -130,7 +137,7 @@ private:
 	ResourceManager *_resourceMan;
 	SpriteSet *_sprites;
 
-	bool _needsUpdate;
+	bool _needsUpdate, _guiNeedsUpdate;
 	uint32 _cursorMode;
 
 	Sprite *_cursorSprite;

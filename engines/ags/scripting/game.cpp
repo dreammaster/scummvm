@@ -23,6 +23,7 @@
  * which is licensed under the Artistic License 2.0.
  */
 
+#include "common/debug.h"
 #include "engines/ags/scripting/scripting.h"
 
 namespace AGS {
@@ -571,11 +572,10 @@ RuntimeValue Script_QuitGame(AGSEngine *vm, ScriptObject *, const Common::Array<
 // import void SetGameSpeed(int framesPerSecond)
 // Changes the current game speed.
 RuntimeValue Script_SetGameSpeed(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int framesPerSecond = params[0]._signedValue;
-	UNUSED(framesPerSecond);
+	uint32 framesPerSecond = params[0]._value;
 
-	// FIXME
-	error("SetGameSpeed unimplemented");
+	debug(3, "SetGameSpeed: %d fps", framesPerSecond);
+	vm->setGameSpeed(framesPerSecond);
 
 	return RuntimeValue();
 }
@@ -583,10 +583,7 @@ RuntimeValue Script_SetGameSpeed(AGSEngine *vm, ScriptObject *, const Common::Ar
 // import int GetGameSpeed()
 // Gets the current game speed.
 RuntimeValue Script_GetGameSpeed(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GetGameSpeed unimplemented");
-
-	return RuntimeValue();
+	return vm->getGameSpeed();
 }
 
 // import int SetGameOption(int option, int value)
