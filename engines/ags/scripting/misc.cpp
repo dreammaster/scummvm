@@ -24,6 +24,7 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/gamestate.h"
 
 namespace AGS {
 
@@ -83,13 +84,16 @@ RuntimeValue Script_AreThingsOverlapping(AGSEngine *vm, ScriptObject *, const Co
 // import void SetTimer(int timerID, int timeout)
 // Starts a timer, which will expire after the specified number of game loops.
 RuntimeValue Script_SetTimer(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int timerID = params[0]._signedValue;
-	UNUSED(timerID);
+	uint timerID = params[0]._value;
 	int timeout = params[1]._signedValue;
-	UNUSED(timeout);
 
-	// FIXME
-	error("SetTimer unimplemented");
+	if (timerID >= vm->_state->_scriptTimers.size())
+		error("SetTimer: timer %d is too high (only have %d)", timerID, vm->_state->_scriptTimers.size());
+
+	if (timeout < 0)
+		error("SetTimer: timeout %d is negative", timeout);
+
+	vm->_state->_scriptTimers[timerID] = timeout;
 
 	return RuntimeValue();
 }
@@ -97,13 +101,18 @@ RuntimeValue Script_SetTimer(AGSEngine *vm, ScriptObject *, const Common::Array<
 // import bool IsTimerExpired(int timerID)
 // Returns true the first time this is called after the timer expires.
 RuntimeValue Script_IsTimerExpired(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int timerID = params[0]._signedValue;
-	UNUSED(timerID);
+	uint timerID = params[0]._value;
 
-	// FIXME
-	error("IsTimerExpired unimplemented");
+	if (timerID >= vm->_state->_scriptTimers.size())
+		error("SetTimer: timer %d is too high (only have %d)", timerID, vm->_state->_scriptTimers.size());
 
-	return RuntimeValue();
+	if (vm->_state->_scriptTimers[timerID] == 1) {
+		// The timer has expired; reset it.
+		vm->_state->_scriptTimers[timerID] = 0;
+		return 1;
+	}
+
+	return 0;
 }
 
 // import void SetMultitaskingMode (int mode)

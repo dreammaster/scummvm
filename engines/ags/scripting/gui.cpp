@@ -25,6 +25,8 @@
 
 #include "engines/ags/scripting/scripting.h"
 #include "engines/ags/gui.h"
+#include "engines/ags/gamefile.h"
+#include "engines/ags/gamestate.h"
 
 namespace AGS {
 
@@ -82,13 +84,19 @@ RuntimeValue Script_FindGUIID(AGSEngine *vm, ScriptObject *, const Common::Array
 // import void SetInvDimensions(int width, int height)
 // Obsolete GUI function.
 RuntimeValue Script_SetInvDimensions(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int width = params[0]._signedValue;
-	UNUSED(width);
-	int height = params[1]._signedValue;
-	UNUSED(height);
+	uint width = params[0]._value;
+	uint height = params[1]._value;
 
-	// FIXME
-	error("SetInvDimensions unimplemented");
+	vm->_state->_invItemWidth = width;
+	vm->_state->_invItemHeight = height;
+	vm->_state->_invNumDisplayed = 0;
+
+	// backwards compatibility
+	for (uint i = 0; i < vm->_gameFile->_guiInvControls.size(); ++i) {
+		vm->_gameFile->_guiInvControls[i]->resize(width, height);
+	}
+
+	vm->invalidateGUI();
 
 	return RuntimeValue();
 }

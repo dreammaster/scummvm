@@ -24,6 +24,7 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/gamestate.h"
 
 namespace AGS {
 
@@ -714,8 +715,7 @@ RuntimeValue Script_SetSpeechFont(AGSEngine *vm, ScriptObject *, const Common::A
 	uint32 fonttype = params[0]._value;
 	UNUSED(fonttype);
 
-	// FIXME
-	error("SetSpeechFont unimplemented");
+	vm->_state->setSpeechFont(fonttype);
 
 	return RuntimeValue();
 }
@@ -724,10 +724,8 @@ RuntimeValue Script_SetSpeechFont(AGSEngine *vm, ScriptObject *, const Common::A
 // Undocumented.
 RuntimeValue Script_SetNormalFont(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 fonttype = params[0]._value;
-	UNUSED(fonttype);
 
-	// FIXME
-	error("SetNormalFont unimplemented");
+	vm->_state->setNormalFont(fonttype);
 
 	return RuntimeValue();
 }
