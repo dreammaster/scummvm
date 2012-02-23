@@ -34,6 +34,8 @@
 // Audio
 #include "audio/mixer.h"
 
+#include "graphics/palette.h"
+
 // AGS subsystems
 #include "ags/ags.h"
 #include "ags/constants.h"
@@ -207,6 +209,22 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	_state->_animBackgroundSpeed = _currentRoom->_backgroundSceneAnimSpeed;
 	_state->_bgAnimDelay = _currentRoom->_backgroundSceneAnimSpeed;
 
+	const byte *roomPal = _currentRoom->_backgroundScenes[0]._palette;
+	for (uint i = 0; i < 256; ++i) {
+		if (_gameFile->_paletteUses[i] == PAL_BACKGROUND) {
+			_palette[i * 3 + 0] = roomPal[i * 4 + 0];
+			_palette[i * 3 + 1] = roomPal[i * 4 + 0];
+			_palette[i * 3 + 2] = roomPal[i * 4 + 0];
+		} else {
+			// FIXME: patch room palette
+		}
+	}
+
+	if (_gameFile->_defaultResolution > 2 && !getGameOption(OPT_NATIVECOORDINATES))
+		_currentRoom->convertCoordinatesToLowRes();
+
+	// FIXME
+
 	_scriptState->addSystemObjectImport("object", new ScriptObjectArray<RoomObject>(_currentRoom->_objects, 8), true);
 
 	// FIXME
@@ -265,6 +283,14 @@ bool AGSEngine::init() {
 	if (!_gameFile->init())
 		return false;
 
+	// init_game_settings
+	for (uint i = 0; i < 256; ++i) {
+		if (_gameFile->_paletteUses[i] != PAL_BACKGROUND) {
+			_palette[i * 3 + 0] = _gameFile->_defaultPalette[i * 3 + 0];
+			_palette[i * 3 + 1] = _gameFile->_defaultPalette[i * 3 + 1];
+			_palette[i * 3 + 2] = _gameFile->_defaultPalette[i * 3 + 2];
+		}
+	}
 	_state->init();
 
 	addSystemScripting(this);

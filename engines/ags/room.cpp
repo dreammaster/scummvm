@@ -306,6 +306,31 @@ Room::~Room() {
 	_regionsMask.free();
 }
 
+void Room::convertCoordinatesToLowRes() {
+	for (uint i = 0; i < _objects.size(); ++i) {
+		_objects[i]._sprite._x /= 2;
+		_objects[i]._sprite._y /= 2;
+		if (_objects[i]._baseLine != 0xffffffff)
+			_objects[i]._baseLine /= 2;
+	}
+
+	for (uint i = 0; i < _hotspots.size(); ++i) {
+		_hotspots[i]._walkToPos.x /= 2;
+		_hotspots[i]._walkToPos.y /= 2;
+	}
+
+	for (uint i = 0; i < _walkBehindBaselines.size(); ++i)
+		_walkBehindBaselines[i] /= 2;
+
+	_boundary.left /= 2;
+	_boundary.top /= 2;
+	_boundary.bottom /= 2;
+	_boundary.right /= 2;
+
+	_width /= 2;
+	_height /= 2;
+}
+
 #define NO_GAME_ID_IN_ROOM_FILE 16325
 #define MAX_WALK_AREAS 15
 

@@ -134,6 +134,8 @@ private:
 	uint16 _textMultiply;
 	bool _forceLetterbox;
 
+	byte _palette[256 * 3];
+
 	ResourceManager *_resourceMan;
 	SpriteSet *_sprites;
 
