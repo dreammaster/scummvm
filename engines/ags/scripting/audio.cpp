@@ -122,11 +122,9 @@ RuntimeValue Script_PlayMP3File(AGSEngine *vm, ScriptObject *, const Common::Arr
 // import int PlaySound(int soundNumber)
 // Starts the specified sound number playing.
 RuntimeValue Script_PlaySound(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int soundNumber = params[0]._signedValue;
-	UNUSED(soundNumber);
+	uint soundNumber = params[0]._value;
 
-	// FIXME
-	error("PlaySound unimplemented");
+	vm->playSound(soundNumber);
 
 	return RuntimeValue();
 }

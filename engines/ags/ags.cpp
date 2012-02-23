@@ -536,6 +536,12 @@ GlobalScriptState *AGSEngine::getScriptState() {
 	return _scriptState;
 }
 
+void AGSEngine::playSound(uint soundId) {
+	// uint priority = 10;
+
+	// FIXME
+}
+
 bool AGSEngine::runScriptFunction(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {
 	if (!prepareTextScript(instance, name))
 		return false;
