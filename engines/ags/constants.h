@@ -232,9 +232,6 @@ enum AGSRoomVersion {
 #define OVER_PICTURE  3
 #define OVER_CUSTOM   100
 #define OVR_AUTOPLACE 30000
-#define FOR_ANIMATION 1
-#define FOR_SCRIPT    2
-#define FOR_EXITLOOP  3
 
 #define EVENT_NONE       0
 #define EVENT_INPROGRESS 1
@@ -243,15 +240,6 @@ enum AGSRoomVersion {
 #define SKIP_AUTOTIMER  1
 #define SKIP_KEYPRESS   2
 #define SKIP_MOUSECLICK 4
-
-#define UNTIL_ANIMEND   1
-#define UNTIL_MOVEEND   2
-#define UNTIL_CHARIS0   3
-#define UNTIL_NOOVERLAY 4
-#define UNTIL_NEGATIVE  5
-#define UNTIL_INTIS0    6
-#define UNTIL_SHORTIS0  7
-#define UNTIL_INTISNEG  8
 
 #define TURNING_AROUND     1000
 #define TURNING_BACKWARDS 10000

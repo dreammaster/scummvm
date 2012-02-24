@@ -229,6 +229,7 @@ bool ResourceManager::readArchiveList_v06(MasterArchive &master) {
 			fileName[i] -= password;
 
 		file->name = (const char *) fileName;
+		debug(5, "file %s", fileName);
 	}
 
 	// File sizes

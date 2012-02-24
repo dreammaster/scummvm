@@ -78,6 +78,13 @@ enum {
 };
 
 enum {
+	kTextScriptNone = 0,
+	kTextScriptRepeatedlyExecute = 1,
+	kTextScriptOnKeyPress = 2,
+	kTextScriptOnMouseClick = 3
+};
+
+enum {
 	kRoomEventLeftEdge = 0,
 	kRoomEventRightEdge = 1,
 	kRoomEventBottomEdge = 2,
@@ -87,6 +94,17 @@ enum {
 	kRoomEventTick = 6,
 	kRoomEventEnterAfterFadeIn = 7,
 	kRoomEventPlayerLeavesScreen = 8
+};
+
+enum BlockUntilType {
+	kUntilNothing = 0,
+	kUntilNoOverlay,
+	kUntilMessageDone,
+	kUntilWaitDone,
+	kUntilCharAnimDone,
+	kUntilCharWalkDone,
+	kUntilObjMoveDone,
+	kUntilObjCycleDone
 };
 
 struct GameEvent {
@@ -149,6 +167,14 @@ public:
 
 	void playSound(uint soundId);
 
+	void blockUntil(BlockUntilType untilType, uint untilId = 0);
+
+	void skipUntilCharacterStops(uint charId);
+	void endSkippingUntilCharStops();
+	void startSkippableCutscene();
+	void stopFastForwarding();
+
+	void invalidateScreen() { _needsUpdate = true; }
 	void invalidateGUI() { _guiNeedsUpdate = true; }
 
 	GameFile *_gameFile;
@@ -191,9 +217,9 @@ private:
 	class Room *_currentRoom;
 
 	// new room state (this frame)
-	NewRoomState _inNewRoom;
+	NewRoomState _inNewRoomState;
 	// new room state (from last time it was not None)
-	NewRoomState _newRoomWas;
+	NewRoomState _newRoomStateWas;
 
 	Common::Array<GameEvent> _queuedGameEvents;
 	void queueGameEvent(GameEventType type, uint data1 = 0, uint data2 = (uint)-1000, uint data3 = 0);
@@ -205,6 +231,7 @@ private:
 	void runUnhandledEvent(uint eventId);
 
 	// details of running event block, if any
+	bool _insideProcessEvent;
 	uint _inEntersScreenCounter;
 	Common::String _eventBlockBaseName;
 	uint _eventBlockId;
@@ -222,11 +249,14 @@ private:
 
 	class GlobalScriptState *_scriptState;
 
+	BlockUntilType _blockingUntil;
+	uint _blockingUntilId;
+
 	Common::String getMasterArchive() const;
 
 	bool init();
 
-	void mainGameLoop();
+	bool mainGameLoop();
 	void tickGame(bool checkControls = false);
 	void updateEvents();
 
@@ -238,6 +268,8 @@ private:
 	void checkNewRoom();
 	bool getScreenSize();
 	bool initGraphics();
+
+	BlockUntilType checkBlockingUntil();
 
 	bool runScriptFunction(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params);
 	bool prepareTextScript(ccInstance *instance, const Common::String &name);

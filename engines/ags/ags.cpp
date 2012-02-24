@@ -49,13 +49,16 @@
 
 namespace AGS {
 
+#define REP_EXEC_NAME "repeatedly_execute"
+
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
 	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true), _guiNeedsUpdate(true),
 	_mouseFrame(0), _mouseDelay(0), _startingRoom(0xffffffff), _displayedRoom(0xffffffff),
 	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL), _roomScriptFork(NULL),
 	_currentRoom(NULL), _currentCursor(0xffffffff), _framesPerSecond(40), _lastFrameTime(0),
-	_inNewRoom(kNewRoomStateNone), _newRoomWas(kNewRoomStateNone), _inEntersScreenCounter(0) {
+	_inNewRoomState(kNewRoomStateNone), _newRoomStateWas(kNewRoomStateNone), _inEntersScreenCounter(0),
+	_blockingUntil(kUntilNothing), _insideProcessEvent(false) {
 
 	_rnd = new Common::RandomSource("ags");
 	_scriptState = new GlobalScriptState();
@@ -131,7 +134,7 @@ Common::Error AGSEngine::run() {
 	return Common::kNoError;
 }
 
-void AGSEngine::mainGameLoop() {
+bool AGSEngine::mainGameLoop() {
 	if (_displayedRoom == 0xffffffff)
 		error("mainGameLoop() called before a room was loaded, did game_start try blocking?");
 
@@ -141,13 +144,39 @@ void AGSEngine::mainGameLoop() {
 
 	// FIXME: cursor updates
 
-	// FIXME: restriction updates
+	// update blocking status
+	if (_blockingUntil != kUntilNothing) {
+		_blockingUntil = checkBlockingUntil();
+		if (_blockingUntil == kUntilNothing) {
+			// done blocking
+			setDefaultCursor();
+			invalidateGUI();
+			_state->_disabledUserInterface++;
+
+			// original had a few different FOR_ types here, but only FOR_EXITLOOP is used now
+			return false;
+		}
+	}
+
+	return true;
 }
 
 // This is called from all over the place, and does all of the per-frame work.
 // Similar to 'mainloop' in original code.
 void AGSEngine::tickGame(bool checkControls) {
+	debug(9, "tickGame");
+
+	if (_inEntersScreenCounter) {
+		if (_displayedRoom == _startingRoom)
+			error("script tried blocking in the Player Enters Screen event - use After Fadein instead");
+		warning("script blocking in Player Enters Screen - use After Fadein instead");
+	}
+
+	// FIXME: check no_blocking_functions
+
 	updateEvents();
+	if (shouldQuit())
+		return;
 
 	// If we're running faster than the target rate, sleep for a bit.
 	uint32 time = _system->getMillis();
@@ -157,20 +186,36 @@ void AGSEngine::tickGame(bool checkControls) {
 
 	// FIXME
 
-	if (_inNewRoom == 0) {
+	if (_inNewRoomState == 0) {
 		// FIXME: repExecAlways
-		// FIXME: same: queueGameEvent(kEventTextScript, TS_REPEAT);
+		queueGameEvent(kEventTextScript, kTextScriptRepeatedlyExecute);
 		queueGameEvent(kEventRunEventBlock, kEventBlockRoom, 0, kRoomEventTick);
 	}
 	checkNewRoom();
 
 	// FIXME
 
-	_newRoomWas = _inNewRoom;
-	if (_inNewRoom != kNewRoomStateNone)
+	_newRoomStateWas = _inNewRoomState;
+	if (_inNewRoomState != kNewRoomStateNone)
 		queueGameEvent(kEventAfterFadeIn, 0, 0, 0);
-	_inNewRoom = kNewRoomStateNone;
+	_inNewRoomState = kNewRoomStateNone;
 	processAllGameEvents();
+	if (_newRoomStateWas && !_inNewRoomState) {
+		// we're in a new room, and the room wasn't changed again;
+		// we should queue some Enters Screen scripts
+		if (_newRoomStateWas == kNewRoomStateFirstTime)
+			queueGameEvent(kEventRunEventBlock, kEventBlockRoom, 0, kRoomEventFirstTimeEntersScreen);
+		if (_newRoomStateWas != kNewRoomStateSavedGame)
+			queueGameEvent(kEventRunEventBlock, kEventBlockRoom, 0, kRoomEventEnterAfterFadeIn);
+	}
+
+	// FIXME: maintain background
+
+	_loopCounter++;
+	if (_state->_waitCounter)
+		_state->_waitCounter--;
+	if (_state->_shakeLength)
+		_state->_shakeLength--;
 
 	// FIXME
 }
@@ -277,7 +322,11 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 	// FIXME
 
-	_inNewRoom = kNewRoomStateNew;
+	_inNewRoomState = kNewRoomStateNew;
+
+	// FIXME
+
+	_inNewRoomState = kNewRoomStateFirstTime;
 
 	// FIXME
 
@@ -299,18 +348,18 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 void AGSEngine::checkNewRoom() {
 	// we only care if we're in a new room, and it's not from a restored game
-	if (_inNewRoom == kNewRoomStateNone || _inNewRoom == kNewRoomStateSavedGame)
+	if (_inNewRoomState == kNewRoomStateNone || _inNewRoomState == kNewRoomStateSavedGame)
 		return;
 
 	// make sure that any script calls don't re-call Enters Screen
-	NewRoomState newRoomWas = _inNewRoom;
-	_inNewRoom = kNewRoomStateNone;
+	NewRoomState newRoomWas = _inNewRoomState;
+	_inNewRoomState = kNewRoomStateNone;
 
 	_state->_disabledUserInterface++;
 	runGameEventNow(kEventRunEventBlock, kEventBlockRoom, 0, kRoomEventEntersScreen);
 	_state->_disabledUserInterface--;
 
-	_inNewRoom = newRoomWas;
+	_inNewRoomState = newRoomWas;
 }
 
 void AGSEngine::queueGameEvent(GameEventType type, uint data1, uint data2, uint data3) {
@@ -336,8 +385,32 @@ void AGSEngine::runGameEventNow(GameEventType type, uint data1, uint data2, uint
 void AGSEngine::processGameEvent(const GameEvent &event) {
 	switch (event.type) {
 	case kEventTextScript:
-		error("processGameEvent: can't do kEventTextScript yet"); // FIXME
+		{
+
+		Common::String textScriptName;
+		switch (event.data1) {
+		case kTextScriptRepeatedlyExecute:
+			textScriptName = REP_EXEC_NAME;
+			break;
+		case kTextScriptOnKeyPress:
+			textScriptName = "on_key_press";
+			break;
+		case kTextScriptOnMouseClick:
+			textScriptName = "on_mouse_click";
+			break;
+		default:
+			error("processGameEvent: can't do kEventTextScript for script %d", event.data1);
+		}
+
+		if ((int)event.data2 > -1000) {
+			error("processGameEvent: can't do kEventTextScript yet"); // FIXME
+		} else {
+			// FIXME: check inside_script
+			runTextScript(_gameScript, textScriptName);
+		}
+
 		break;
+		}
 	case kEventRunEventBlock:
 		{
 		// save old state (to cope with nested calls)
@@ -401,6 +474,11 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 }
 
 void AGSEngine::processAllGameEvents() {
+	if (_insideProcessEvent)
+		return;
+
+	_insideProcessEvent = true;
+
 	// make a copy of the events - if processing an event includes
 	// a blocking function it will continue to the next game loop
 	// and wipe the event list
@@ -417,6 +495,7 @@ void AGSEngine::processAllGameEvents() {
 	}
 
 	_queuedGameEvents.clear();
+	_insideProcessEvent = false;
 }
 
 // returns true if the NewInteraction has been invalidated (e.g. a room change occurred)
@@ -978,8 +1057,6 @@ void AGSEngine::mouseSetHotspot(uint32 x, uint32 y) {
 	// FIXME: set the hotspot!
 }
 
-#define REP_EXEC_NAME "repeatedly_execute"
-
 void AGSEngine::runTextScript(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {
 	// first, check for special cases
 	switch (params.size()) {
@@ -1092,6 +1169,93 @@ void AGSEngine::playSound(uint soundId) {
 	// uint priority = 10;
 
 	// FIXME
+}
+
+// don't return until the provided blocking condition is satisfied
+// this is similar to 'do_main_cycle' in original.
+void AGSEngine::blockUntil(BlockUntilType untilType, uint untilId) {
+	endSkippingUntilCharStops();
+
+	// save old state (to cope with nested calls)
+	BlockUntilType oldType = _blockingUntil;
+	uint oldId = _blockingUntilId;
+
+	// main_loop_until:
+	_state->_disabledUserInterface++;
+	invalidateGUI();
+	// only update the mouse cursor if it's speech, or if it hasn't been specifically changed first
+	if (_cursorMode != CURS_WAIT)
+		if ((_currentCursor == _cursorMode) || (untilType == kUntilNoOverlay))
+			setMouseCursor(CURS_WAIT);
+
+	_blockingUntil = untilType;
+	_blockingUntilId = untilId;
+
+	while (mainGameLoop() && !shouldQuit()) { }
+
+	_blockingUntil = oldType;
+	_blockingUntilId = oldId;
+}
+
+BlockUntilType AGSEngine::checkBlockingUntil() {
+	if (_blockingUntil == kUntilNothing)
+		error("checkBlockingUntil called, but game wasn't blocking");
+
+	switch (_blockingUntil) {
+	case kUntilNoOverlay:
+		error("checkBlockingUntil unfinished"); // FIXME
+		break;
+	case kUntilMessageDone:
+		error("checkBlockingUntil unfinished"); // FIXME
+		break;
+	case kUntilWaitDone:
+		if (_state->_waitCounter == 0)
+			return kUntilNothing;
+		break;
+	case kUntilCharAnimDone:
+		error("checkBlockingUntil unfinished"); // FIXME
+		break;
+	case kUntilCharWalkDone:
+		error("checkBlockingUntil unfinished"); // FIXME
+		break;
+	case kUntilObjMoveDone:
+		error("checkBlockingUntil unfinished"); // FIXME
+		break;
+	case kUntilObjCycleDone:
+		error("checkBlockingUntil unfinished"); // FIXME
+		break;
+	default:
+		error("checkBlockingUntil: invalid blocking type %d", _blockingUntil);
+	}
+
+	return _blockingUntil;
+}
+
+void AGSEngine::skipUntilCharacterStops(uint charId) {
+	// FIXME
+}
+
+void AGSEngine::endSkippingUntilCharStops() {
+	if (_state->_skipUntilCharStops == (uint)-1)
+		return;
+
+	stopFastForwarding();
+	_state->_skipUntilCharStops = (uint)-1;
+}
+
+void AGSEngine::startSkippableCutscene() {
+	_state->_endCutsceneMusic = (uint)-1;
+}
+
+void AGSEngine::stopFastForwarding() {
+	_state->_fastForward = 0;
+	// FIXME: setpal
+
+
+	/* FIXME if (_state->_endCutsceneMusic != (uint)-1)
+		newMusic(_state->_endCutsceneMusic); */
+	// FIXME: restore actual volume of sounds
+	// FIXME: updateMusicVolume();
 }
 
 bool AGSEngine::runScriptFunction(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {
