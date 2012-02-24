@@ -146,11 +146,15 @@ RuntimeValue Script_IsInteractionAvailable(AGSEngine *vm, ScriptObject *, const 
 // import void Wait(int waitLoops)
 // Blocks the script for the specified number of game loops.
 RuntimeValue Script_Wait(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int waitLoops = params[0]._signedValue;
-	UNUSED(waitLoops);
+	uint waitLoops = params[0]._value;
 
-	// FIXME
-	error("Wait unimplemented");
+	if (!waitLoops)
+		error("Wait: must wait at least one loop");
+
+	vm->_state->_waitCounter = waitLoops;
+	vm->_state->_keySkipWait = 0;
+
+	vm->blockUntil(kUntilWaitDone);
 
 	return RuntimeValue();
 }
@@ -170,11 +174,17 @@ RuntimeValue Script_SkipUntilCharacterStops(AGSEngine *vm, ScriptObject *, const
 // import void StartCutscene(CutsceneSkipType)
 // Specifies the start of a skippable cutscene.
 RuntimeValue Script_StartCutscene(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	uint32 cutsceneskiptype = params[0]._value;
-	UNUSED(cutsceneskiptype);
+	uint32 cutsceneSkipType = params[0]._value;
 
-	// FIXME
-	error("StartCutscene unimplemented");
+	if (vm->_state->_inCutscene)
+		error("StartCutscene: already in cutscene");
+	if (cutsceneSkipType < 1 || cutsceneSkipType > 5)
+		error("StartCutscene: skip type %d is invalid", cutsceneSkipType);
+
+	vm->endSkippingUntilCharStops();
+
+	vm->_state->_inCutscene = cutsceneSkipType;
+	vm->startSkippableCutscene();
 
 	return RuntimeValue();
 }
@@ -182,10 +192,19 @@ RuntimeValue Script_StartCutscene(AGSEngine *vm, ScriptObject *, const Common::A
 // import int EndCutscene()
 // Specifies the end of a skippable cutscene.
 RuntimeValue Script_EndCutscene(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("EndCutscene unimplemented");
+	if (vm->_state->_inCutscene == 0)
+		error("StartCutscene: not in a cutscene");
 
-	return RuntimeValue();
+	vm->_state->_inCutscene = 0;
+
+	// store the 'did the player skip it' return value
+	uint ret = vm->_state->_fastForward;
+
+	// stop fast-forwarding and force a screen redraw
+	vm->stopFastForwarding();
+	vm->invalidateScreen();
+
+	return ret;
 }
 
 // import void ClaimEvent()
