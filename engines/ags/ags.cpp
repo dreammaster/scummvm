@@ -51,6 +51,9 @@ namespace AGS {
 
 #define REP_EXEC_NAME "repeatedly_execute"
 
+const char *kGameDataNameV2 = "ac2game.dta";
+const char *kGameDataNameV3 = "game28.dta";
+
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
 	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true), _guiNeedsUpdate(true),

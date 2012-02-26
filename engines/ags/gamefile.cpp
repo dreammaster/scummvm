@@ -78,7 +78,11 @@ void GameFile::readVersion(Common::SeekableReadStream &dta) {
 #define MAXLIPSYNCFRAMES  20
 
 bool GameFile::init() {
-	Common::SeekableReadStream *dta = _vm->getFile("ac2game.dta");
+	Common::SeekableReadStream *dta = _vm->getFile(kGameDataNameV2);
+	if (!dta)
+		dta = _vm->getFile(kGameDataNameV3);
+	if (!dta)
+		error("can't find AGS data file");
 
 	dta->skip(30); // "Adventure Creator Game File v2"
 

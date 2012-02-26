@@ -50,6 +50,8 @@ public:
 	/** Get the specified archived file. */
 	Common::SeekableReadStream *getFile(const Common::String &file) const;
 
+	Common::Array<Common::String> getFilenames() const;
+
 	/** Debug method to quickly dump an archived file. */
 	bool dumpFile(const Common::String &file) const;
 

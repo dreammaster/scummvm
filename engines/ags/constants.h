@@ -28,6 +28,9 @@
 
 namespace AGS {
 
+extern const char *kGameDataNameV2;
+extern const char *kGameDataNameV3;
+
 enum AGSVersion {
 	kAGSVer251 = 19,
 	kAGSVer255 = 22,
