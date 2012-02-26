@@ -176,8 +176,10 @@ bool GameFile::init() {
 		error("missing compiledScript");
 
 	if (_version > kAGSVer272) {
-		// FIXME: guid, save game extension/folder
-		error("3.x not supported yet");
+		// 3.x Windows Game Explorer stuff
+		dta->skip(40); // guid
+		dta->skip(20); // saved game file extension
+		dta->skip(50); // saved game folder name
 	}
 
 	// fonts
@@ -241,9 +243,17 @@ bool GameFile::init() {
 	}
 
 	if (_version > kAGSVer272) {
-		// FIXME: character and inventory scripts
-		error("3.x not supported yet");
+		// 3.x interaction scripts
+		debug(1, "char interaction scripts");
+		_charInteractionScripts.resize(charCount);
+		for (uint i = 0; i < _charInteractionScripts.size(); ++i)
+			_charInteractionScripts[i].readFrom(dta);
+		debug(1, "inv interaction scripts");
+		_invInteractionScripts.resize(invItemCount);
+		for (uint i = 1; i < _invInteractionScripts.size(); ++i)
+			_invInteractionScripts[i].readFrom(dta);
 	} else {
+		// 2.5+ new interactions
 		debug(1, "char interactions");
 		_interactionsChar.resize(charCount);
 		for (uint32 i = 0; i < charCount; i++)
@@ -294,9 +304,20 @@ bool GameFile::init() {
 
 	if (_version > kAGSVer272) {
 		// 3.x views
+		_views.resize(viewCount);
+		for (uint i = 0; i < _views.size(); ++i) {
+			uint16 loopCount = dta->readUint16LE();
+			_views[i]._loops.resize(loopCount);
+			for (uint j = 0; j < _views[i]._loops.size(); ++j) {
+				ViewLoopNew &loop = _views[i]._loops[j];
 
-		// FIXME
-		error("3.x not supported yet");
+				uint16 frameCount = dta->readUint16LE();
+				loop._flags = dta->readUint32LE();
+				loop._frames.resize(frameCount);
+				for (uint n = 0; n < frameCount; ++n)
+					loop._frames[n] = readViewFrame(dta);
+			}
+		}
 	} else {
 		// 2.x views
 		_views.resize(viewCount);
@@ -404,7 +425,7 @@ bool GameFile::init() {
 			debug(5, "speech line '%s'", _speechLines.back().c_str());
 		}
 	} else {
-		uint32 magic = dta->readUint16LE();
+		uint32 magic = dta->readUint32LE();
 		if (magic != 0xcafebeef)
 			error("bad magic %x for GUI", magic);
 	}
@@ -537,6 +558,16 @@ NewInteractionCommandList *NewInteraction::readCommandList(Common::SeekableReadS
 	}
 
 	return list;
+}
+
+void InteractionScript::readFrom(Common::SeekableReadStream *dta) {
+	uint32 eventCount = dta->readUint32LE();
+
+	_eventScriptNames.resize(eventCount);
+	for (uint i = 0; i < eventCount; ++i) {
+		_eventScriptNames[i] = readString(dta);
+		debug(8, "interaction script: event %d: script '%s'", i, _eventScriptNames[i].c_str());
+	}
 }
 
 ViewFrame GameFile::readViewFrame(Common::SeekableReadStream *dta) {

@@ -96,6 +96,12 @@ protected:
 	NewInteractionCommandList *readCommandList(Common::SeekableReadStream *dta);
 };
 
+struct InteractionScript {
+	void readFrom(Common::SeekableReadStream *dta);
+
+	Common::Array<Common::String> _eventScriptNames;
+};
+
 struct DictionaryWord {
 	Common::String _word;
 	uint16 _id;
@@ -218,6 +224,9 @@ public:
 	Common::Array<AGSFont> _fonts;
 
 	Common::Array<byte> _spriteFlags;
+
+	Common::Array<InteractionScript> _charInteractionScripts;
+	Common::Array<InteractionScript> _invInteractionScripts;
 
 	Common::Array<NewInteraction *> _interactionsChar;
 	Common::Array<NewInteraction *> _interactionsInv;
