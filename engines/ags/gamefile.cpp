@@ -28,8 +28,10 @@
 #include "common/textconsole.h"
 
 #include "ags/ags.h"
+#include "ags/audio.h"
 #include "ags/constants.h"
 #include "ags/gamefile.h"
+#include "ags/gamestate.h"
 #include "ags/script.h"
 #include "ags/util.h"
 
@@ -450,11 +452,18 @@ bool GameFile::init() {
 	}
 
 	if (_version >= kAGSVer320) {
-		// FIXME
-		error("3.x not supported yet");
+		_vm->_audio->initFrom(dta);
+		_vm->_state->_scoreSound = dta->readUint32LE();
 	} else {
-		// TODO: audio clips
+		_vm->_audio->init();
+		if (_options[OPT_SCORESOUND] > 0) {
+			AudioClip *clip = _vm->_audio->getClipByIndex(false, _options[OPT_SCORESOUND]);
+			if (clip)
+				_vm->_state->_scoreSound = clip->_id;
+		}
 	}
+
+	debug(5, "game file read %d of %d", dta->pos(), dta->size());
 
 	if ((_version >= kAGSVer300b) && _options[OPT_DEBUGMODE]) {
 		uint32 roomCount = dta->readUint32LE();

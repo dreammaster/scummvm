@@ -39,6 +39,9 @@ GameState::GameState(AGSEngine *vm) : _vm(vm) {
 	_takeoverData = 0;
 
 	_gameStep = 0;
+
+	// this is initialized by gamefile
+	_scoreSound = (uint)-1;
 }
 
 void GameState::init() {

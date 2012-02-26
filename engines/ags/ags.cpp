@@ -38,6 +38,7 @@
 
 // AGS subsystems
 #include "ags/ags.h"
+#include "ags/audio.h"
 #include "ags/constants.h"
 #include "ags/gamefile.h"
 #include "ags/gamestate.h"
@@ -814,6 +815,9 @@ bool AGSEngine::init() {
 	_resourceMan = new ResourceManager();
 	if (!_resourceMan->init(getMasterArchive()))
 		return false;
+
+	// Open any present audio archives
+	_audio = new AGSAudio(this);
 
 	// Load the game file
 	_gameFile = new GameFile(this);
