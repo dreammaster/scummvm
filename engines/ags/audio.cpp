@@ -25,6 +25,7 @@
 
 #include "engines/ags/ags.h"
 #include "engines/ags/audio.h"
+#include "engines/ags/gamestate.h"
 #include "engines/ags/resourceman.h"
 
 #include "common/debug.h"
@@ -171,12 +172,14 @@ void AGSAudio::openResources() {
 	if (!_audioResources->init("audio.vox")) {
 		delete _audioResources;
 		_audioResources = NULL;
-	}
+	} else
+		_vm->_state->_separateMusicLib = 1;
 	_speechResources = new ResourceManager();
 	if (!_speechResources->init("speech.vox")) {
 		delete _speechResources;
 		_speechResources = NULL;
-	}
+	} else
+		_vm->_state->_wantSpeech = 1;
 }
 
 } // End of namespace AGS
