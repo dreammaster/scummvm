@@ -393,11 +393,83 @@ bool ResourceManager::readArchiveList_v20(MasterArchive &master) {
 	return true;
 }
 
-bool ResourceManager::readArchiveList_v21(MasterArchive &master) {
-	// Same as readArchiveList_v20, but encrypted.
+static uint16 getPseudoRand(uint32 &seed) {
+	seed = seed * 214013L + 2531011L;
+	return (seed >> 16) & 0x7fff;
+}
 
-	warning("TODO: ResourceManager::readArchiveList_v21()");
-	return false;
+static uint32 getUint32Encrypted(uint32 &seed, Common::File &file) {
+	char buf[4];
+	file.read(buf, 4);
+	for (uint i = 0; i < 4; ++i)
+		buf[i] -= getPseudoRand(seed);
+	return READ_LE_UINT32(buf);
+}
+
+static Common::String getEncryptedCString(uint32 &seed, Common::File &file) {
+	Common::String str;
+
+	char c = (uint16)file.readByte() - getPseudoRand(seed);
+	while (c) {
+		str += c;
+
+		c = (uint16)file.readByte() - getPseudoRand(seed);
+	}
+
+	return str;
+}
+
+bool ResourceManager::readArchiveList_v21(MasterArchive &master) {
+	// Similiar to readArchiveList_v20, but encrypted.
+
+	const int RAND_SEED_SALT = 9338638;
+	uint32 seed = master.file.readUint32LE() + RAND_SEED_SALT;
+
+	uint32 archiveCount = getUint32Encrypted(seed, master.file);
+
+	Common::Array<Common::String> archives;
+	archives.resize(archiveCount);
+
+	// Archive files
+	for (Common::Array<Common::String>::iterator archive = archives.begin();
+	     archive != archives.end(); ++archive) {
+
+		*archive = getEncryptedCString(seed, master.file);
+		debug(5, "archive %s", archive->c_str());
+	}
+
+	uint32 fileCount = getUint32Encrypted(seed, master.file);
+	_files.resize(fileCount);
+
+	// File names
+	for (Common::Array<File>::iterator file = _files.begin(); file != _files.end(); ++file) {
+		file->name = getEncryptedCString(seed, master.file);
+		debug(5, "file %s", file->name.c_str());
+	}
+
+	// File offsets
+	for (Common::Array<File>::iterator file = _files.begin(); file != _files.end(); ++file)
+		file->offset = getUint32Encrypted(seed, master.file);
+
+	// File sizes
+	for (Common::Array<File>::iterator file = _files.begin(); file != _files.end(); ++file)
+		file->size = getUint32Encrypted(seed, master.file);
+
+	// File archive indices
+	for (Common::Array<File>::iterator file = _files.begin(); file != _files.end(); ++file)
+		file->archive = (byte)((uint16)master.file.readByte() - getPseudoRand(seed));
+
+	if (master.file.err())
+		return false;
+
+	master.file.close();
+
+	if (!openArchives(master, archives))
+		return false;
+
+	createFileMap();
+
+	return true;
 }
 
 void ResourceManager::createFileMap() {
