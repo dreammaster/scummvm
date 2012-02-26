@@ -25,6 +25,7 @@ MODULE_OBJS := \
 	scripting/parser.o \
 	scripting/room.o \
 	scripting/scripting.o \
+	scripting/snowrain.o \
 	scripting/string.o \
 	scripting/utils.o \
 	sprites.o \
