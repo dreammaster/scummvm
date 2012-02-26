@@ -216,6 +216,20 @@ RuntimeValue Script_ClaimEvent(AGSEngine *vm, ScriptObject *, const Common::Arra
 	return RuntimeValue();
 }
 
+// import int ShellExecute(const string operation, const string file, const string parameters, ShowCommand showCommand = SW_SHOW);
+// From the ags_shell.dll plugin.
+RuntimeValue Script_ShellExecute(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
+	ScriptString *operation = (ScriptString *)params[0]._object;
+	ScriptString *file = (ScriptString *)params[1]._object;
+	ScriptString *parameters = (ScriptString *)params[2]._object;
+	uint showCommand = params[3]._value;
+
+	warning("attempted to call ShellExecute('%s', '%s', '%s', %d)", operation->getString().c_str(), file->getString().c_str(),
+		parameters->getString().c_str(), showCommand);
+
+	return RuntimeValue();
+}
+
 // System: readonly import static attribute bool CapsLock
 // Gets whether Caps Lock is currently on.
 RuntimeValue Script_System_get_CapsLock(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
@@ -431,6 +445,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "StartCutscene", (ScriptAPIFunction *)&Script_StartCutscene, "i", sotNone },
 	{ "EndCutscene", (ScriptAPIFunction *)&Script_EndCutscene, "", sotNone },
 	{ "ClaimEvent", (ScriptAPIFunction *)&Script_ClaimEvent, "", sotNone },
+	{ "ShellExecute", (ScriptAPIFunction *)&Script_ShellExecute, "sssi", sotNone },
 	{ "System::get_CapsLock", (ScriptAPIFunction *)&Script_System_get_CapsLock, "", sotNone },
 	{ "System::geti_AudioChannels", (ScriptAPIFunction *)&Script_System_geti_AudioChannels, "i", sotNone },
 	{ "System::get_AudioChannelCount", (ScriptAPIFunction *)&Script_System_get_AudioChannelCount, "", sotNone },
