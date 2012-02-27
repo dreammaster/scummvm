@@ -27,6 +27,7 @@
 #include "engines/ags/audio.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/resourceman.h"
+#include "engines/ags/scripting/scripting.h"
 
 #include "common/debug.h"
 
@@ -180,6 +181,11 @@ void AGSAudio::openResources() {
 		_speechResources = NULL;
 	} else
 		_vm->_state->_wantSpeech = 1;
+}
+
+void AGSAudio::registerScriptObjects() {
+	for (uint i = 0; i < _audioClips.size(); ++i)
+		_vm->getScriptState()->addSystemObjectImport(_audioClips[i]._scriptName, &_audioClips[i]);
 }
 
 } // End of namespace AGS
