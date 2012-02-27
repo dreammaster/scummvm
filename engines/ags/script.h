@@ -201,6 +201,8 @@ protected:
 	void pushValue(const RuntimeValue &value);
 	RuntimeValue popValue();
 	uint32 popIntValue();
+
+	ScriptObject *getObjectFrom(const RuntimeValue &value);
 };
 
 } // End of namespace AGS

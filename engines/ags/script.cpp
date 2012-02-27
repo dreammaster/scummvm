@@ -363,7 +363,7 @@ static InstructionInfo instructionInfo[NUM_INSTRUCTIONS + 1] = {
 	{ "$farpush", 1, iatRegister, iatNone },
 	{ "farsubsp", 1, iatInteger, iatNone },
 	{ "sourceline", 1, iatInteger, iatNone },
-	{ "$callscr", 1, iatAny, iatNone }, // TODO
+	{ "$callscr", 1, iatRegister, iatNone },
 	{ "thisaddr", 1, iatInteger, iatNone },
 	{ "setfuncargs", 1, iatInteger, iatNone },
 	{ "$$mod", 2, iatRegisterInt, iatRegisterInt },
@@ -373,14 +373,14 @@ static InstructionInfo instructionInfo[NUM_INSTRUCTIONS + 1] = {
 	{ "$$shr", 2, iatRegisterInt, iatRegisterInt },
 	{ "$callobj", 1, iatRegister, iatNone },
 	{ "$checkbounds", 2, iatRegisterInt, iatInteger },
-	{ "$memwrite.ptr", 1, iatAny, iatNone }, // TODO
-	{ "$memread.ptr", 1, iatAny, iatNone }, // TODO
+	{ "$memwrite.ptr", 1, iatRegister, iatNone },
+	{ "$memread.ptr", 1, iatRegister, iatNone },
 	{ "memwrite.ptr.0", 0, iatNone, iatNone },
-	{ "$meminit.ptr", 1, iatAny, iatNone }, // TODO
-	{ "load.sp.offs", 1, iatAny, iatNone }, // TODO
+	{ "$meminit.ptr", 1, iatRegister, iatNone },
+	{ "load.sp.offs", 1, iatInteger, iatNone },
 	{ "checknull.ptr", 0, iatNone, iatNone },
-	{ "$f.add", 2, iatRegisterFloat, iatRegisterFloat },
-	{ "$f.sub", 2, iatRegisterFloat, iatRegisterFloat },
+	{ "$f.add", 2, iatRegisterFloat, iatRegisterInt },
+	{ "$f.sub", 2, iatRegisterFloat, iatRegisterInt },
 	{ "$$f.mul", 2, iatRegisterFloat, iatRegisterFloat },
 	{ "$$f.div", 2, iatRegisterFloat, iatRegisterFloat },
 	{ "$$f.add", 2, iatRegisterFloat, iatRegisterFloat },
@@ -389,16 +389,16 @@ static InstructionInfo instructionInfo[NUM_INSTRUCTIONS + 1] = {
 	{ "$$f.lt", 2, iatRegisterFloat, iatRegisterFloat },
 	{ "$$f.gte", 2, iatRegisterFloat, iatRegisterFloat },
 	{ "$$f.lte", 2, iatRegisterFloat, iatRegisterFloat },
-	{ "zeromem", 1, iatAny, iatNone }, // TODO
-	{ "$newstring", 1, iatAny, iatNone }, // TODO
-	{ "$$strcmp", 2, iatAny, iatAny }, // TODO
-	{ "$$strnotcmp", 2, iatAny, iatAny }, // TODO
-	{ "$checknull", 1, iatAny, iatNone }, // TODO
+	{ "zeromem", 1, iatInteger, iatNone },
+	{ "$newstring", 1, iatRegister, iatNone },
+	{ "$$strcmp", 2, iatRegister, iatAny },
+	{ "$$strnotcmp", 2, iatRegister, iatAny },
+	{ "$checknull", 1, iatRegister, iatNone },
 	{ "loopcheckoff", 0, iatNone, iatNone },
 	{ "memwrite.ptr.0.nd", 0, iatNone, iatNone },
 	{ "jnz", 1, iatInteger, iatNone },
-	{ "$dynamicbounds", 1, iatAny, iatNone }, // TODO
-	{ "$newarray", 3, iatAny, iatAny } // TODO
+	{ "$dynamicbounds", 1, iatRegisterInt, iatNone },
+	{ "$newarray", 3, iatRegisterInt, iatInteger }
 };
 
 static const char *regnames[] = { "null", "sp", "mar", "ax", "bx", "cx", "op", "dx" };
@@ -532,10 +532,12 @@ void ccInstance::runCodeFrom(uint32 start) {
 
 		// temporary variables
 		RuntimeValue tempVal;
+		ScriptObject *tempObj;
 		Common::Array<RuntimeValue> params;
 
 		switch (instruction) {
 		case SCMD_LINENUM:
+			// debug info - source code line number
 			_lineNumber = int1;
 			break;
 		case SCMD_ADD:
@@ -741,18 +743,22 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_MEMREADB:
 			// reg1 = m[MAR] (1 byte)
+			// FIXME
 			error("unimplemented %s", info.name);
 			break;
 		case SCMD_MEMREADW:
 			// reg1 = m[MAR] (2 bytes)
+			// FIXME
 			error("unimplemented %s", info.name);
 			break;
 		case SCMD_MEMWRITEB:
 			// m[MAR] = reg1 (1 byte)
+			// FIXME
 			error("unimplemented %s", info.name);
 			break;
 		case SCMD_MEMWRITEW:
 			// m[MAR] = reg1 (2 bytes)
+			// FIXME
 			error("unimplemented %s", info.name);
 			break;
 		case SCMD_JZ:
@@ -794,13 +800,53 @@ void ccInstance::runCodeFrom(uint32 start) {
 				error("script error: checkbounds value %d was not in range to %d", _registers[int1]._value, int2);
 			break;
 		case SCMD_DYNAMICBOUNDS:
+			// check reg1 is between 0 and m[MAR-4]
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_MEMREADPTR:
+			// reg1 = m[MAR] (adjust ptr addr)
+			tempObj = getObjectFrom(_registers[SREG_MAR]);
+			if (!tempObj)
+				error("script tried to MEMREADPTR using runtime value of type %d (value %d) on line %d",
+					_registers[SREG_MAR]._type, _registers[SREG_MAR]._value, _lineNumber);
+			_registers[int1] = tempObj;
+			break;
 		case SCMD_MEMWRITEPTR:
+			// m[MAR] = reg1 (adjust ptr addr)
+			tempObj = getObjectFrom(_registers[int1]);
+			if (!tempObj)
+				error("script tried to MEMWRITEPTR using runtime value of type %d (value %d) on line %d",
+					_registers[int1]._type, _registers[int1]._value, _lineNumber);
+			_registers[SREG_MAR] = tempObj;
+			break;
 		case SCMD_MEMINITPTR:
+			// m[MAR] = reg1 (but don't free old one)
+			tempObj = getObjectFrom(_registers[int1]);
+			if (!tempObj)
+				error("script tried to MEMINITPTR using runtime value of type %d (value %d) on line %d",
+					_registers[int1]._type, _registers[int1]._value, _lineNumber);
+			_registers[SREG_MAR] = tempObj;
+			break;
 		case SCMD_MEMZEROPTR:
+			// m[MAR] = 0    (blank ptr)
+			// FIXME
+			_registers[SREG_MAR] = 0;
+			warning("unimplemented %s", info.name);
+			break;
 		case SCMD_MEMZEROPTRND:
+			// m[MAR] = 0    (blank ptr, no dispose if = ax)
+			// FIXME
+			_registers[SREG_MAR] = 0;
+			warning("unimplemented %s", info.name);
+			break;
 		case SCMD_CHECKNULL:
+			// error if MAR==0
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_CHECKNULLREG:
+			// error if reg1 == NULL
 			// FIXME
 			error("unimplemented %s", info.name);
 			break;
@@ -817,7 +863,6 @@ void ccInstance::runCodeFrom(uint32 start) {
 			// save current state
 			ccInstance *wasRunning = _runningInst;
 			uint32 oldpc = _pc;
-			uint32 oldsp = _registers[SREG_SP]._value;
 
 			// push the parameters on the stack
 			uint startArg = 0;
@@ -830,6 +875,8 @@ void ccInstance::runCodeFrom(uint32 start) {
 				pushValue(externalStack[i]);
 			}
 
+			uint32 oldsp = _registers[SREG_SP]._value;
+
 			// push 0, so that the runCodeFrom returns
 			pushValue(0);
 
@@ -837,9 +884,10 @@ void ccInstance::runCodeFrom(uint32 start) {
 			_runningInst = _registers[int1]._instance;
 			runCodeFrom(_registers[int1]._value);
 
-			// restore previous state
 			if (_registers[SREG_SP]._value != oldsp)
 				error("stack corrupt after CALLAS on line %d (was %d, now %d)", _lineNumber, oldsp, _registers[SREG_SP]._value);
+
+			// restore previous state
 			_pc = oldpc;
 			_runningInst = wasRunning;
 
@@ -904,6 +952,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_CALLOBJ:
 			// $callobj: next call is member function of reg1
 			nextCallNeedsObject = true;
+			// set the OP register
 			_registers[SREG_OP] = _registers[int1];
 			break;
 		case SCMD_SHIFTLEFT:
@@ -922,16 +971,57 @@ void ccInstance::runCodeFrom(uint32 start) {
 			currentBase.push(int1);
 			break;
 		case SCMD_NEWARRAY:
+			// reg1 = new array of reg1 elements, each of size arg2 (arg3=managed type?)
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_FADD:
+			// reg1 += arg2 (float,int)
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_FSUB:
+			// reg1 -= arg2 (float,int)
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_FMULREG:
+			// reg1 *= reg2 (float)
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_FDIVREG:
+			// reg1 /= reg2 (float)
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_FADDREG:
+			// reg1 += reg2 (float)
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_FSUBREG:
+			// reg1 -= reg2 (float)
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_FGREATER:
+			// reg1 > reg2 (float)
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_FLESSTHAN:
+			// reg1 < reg2 (float)
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_FGTE:
+			// reg1 >= reg2 (float)
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_FLTE:
+			// reg1 <= reg2 (float)
 			// FIXME
 			error("unimplemented %s", info.name);
 			break;
@@ -952,8 +1042,16 @@ void ccInstance::runCodeFrom(uint32 start) {
 			}
 			break;
 		case SCMD_CREATESTRING:
+			// reg1 = new String(reg1)
+			_registers[int1] = createStringFrom(_registers[int1]);
+			break;
 		case SCMD_STRINGSEQUAL:
+			// (char*)reg1 == (char*)reg2   reg1=1 if true, =0 if not
+			// FIXME
+			error("unimplemented %s", info.name);
+			break;
 		case SCMD_STRINGSNOTEQ:
+			// (char*)reg1 != (char*)reg2
 			// FIXME
 			error("unimplemented %s", info.name);
 			break;
@@ -1148,6 +1246,19 @@ uint32 ccInstance::popIntValue() {
 	if (val._type != rvtInteger)
 		error("expected to pop an integer value off the stack (got type %d) on line %d", val._type, _lineNumber);
 	return val._value;
+}
+
+ScriptObject *ccInstance::getObjectFrom(const RuntimeValue &value) {
+	switch (value._type) {
+	case rvtSystemObject:
+		return value._object;
+	case rvtStackPointer:
+		if (value._value >= _stack.size())
+			return NULL;
+		return getObjectFrom(_stack[value._value]);
+	default:
+		return NULL;
+	}
 }
 
 } // End of namespace AGS
