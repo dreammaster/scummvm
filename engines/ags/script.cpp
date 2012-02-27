@@ -460,7 +460,8 @@ void ccInstance::runCodeFrom(uint32 start) {
 					debugN(4, " %d", argValue);
 				break;
 			case FIXUP_GLOBALDATA:
-				argVal[v]._type = rvtGlobalData;
+				argVal[v]._type = rvtScriptData;
+				argVal[v]._instance = this;
 				debugN(4, " data@%d", argValue);
 				break;
 			case FIXUP_FUNCTION:
@@ -583,11 +584,8 @@ void ccInstance::runCodeFrom(uint32 start) {
 			tempVal = _registers[SREG_MAR];
 			// FIXME: other cases
 			switch (tempVal._type) {
-			case rvtGlobalData:
-				// FIXME: bounds checks
-				_registers[int1] = READ_LE_UINT32(&(*_globalData)[tempVal._value]);
-				break;
 			case rvtScriptData:
+				// FIXME: bounds checks
 				_registers[int1] = READ_LE_UINT32(&(*tempVal._instance->_globalData)[tempVal._value]);
 				break;
 			case rvtStackPointer:
@@ -609,10 +607,6 @@ void ccInstance::runCodeFrom(uint32 start) {
 			tempVal = _registers[SREG_MAR];
 			// FIXME: make sure it's an int?
 			switch (tempVal._type) {
-			case rvtGlobalData:
-				// FIXME: bounds checks
-				WRITE_LE_UINT32(&(*_globalData)[tempVal._value], _registers[int1]._value);
-				break;
 			case rvtScriptData:
 				// FIXME: bounds checks
 				WRITE_LE_UINT32(&tempVal._instance->_globalData[tempVal._value], _registers[int1]._value);
@@ -1053,6 +1047,19 @@ protected:
 	uint32 _offset;
 };
 
+ScriptString *ccInstance::createStringFrom(RuntimeValue &value) {
+	if (value._type == rvtStackPointer)
+		return new ScriptStackString(this, value._value);
+	else if (value._type == rvtScriptData)
+		return new ScriptDataString(value._instance, value._value);
+	else if (value._type == rvtSystemObject && value._object->isOfType(sotString)) {
+		ScriptString *string = (ScriptString *)value._object;
+		return new ScriptMutableString(string->getString());
+	}
+
+	error("createStringFrom failed to create a string from value of type %d", value._type);
+}
+
 RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *function,
 	ScriptObject *object, Common::Array<RuntimeValue> &params) {
 
@@ -1077,11 +1084,8 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 				error("expected object for param %d of '%s', got type %d", pos + 1, function->name, params[pos]._type);
 			break;
 		case 's':
-			if (params[pos]._type == rvtStackPointer) {
-				params[pos] = new ScriptStackString(this, params[pos]._value);
-				break;
-			} else if (params[pos]._type == rvtGlobalData) {
-				params[pos] = new ScriptDataString(this, params[pos]._value);
+			if (params[pos]._type == rvtStackPointer || params[pos]._type == rvtScriptData) {
+				params[pos] = createStringFrom(params[pos]);
 				break;
 			}
 			if (params[pos]._type != rvtSystemObject || !params[pos]._object->isOfType(sotString))

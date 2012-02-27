@@ -79,12 +79,12 @@ enum RuntimeValueType {
 	// constants
 	rvtInteger,
 	rvtFloat,
-	// local data/code
-	rvtGlobalData,
+	// local code
 	rvtFunction,
-	// imports
-	rvtScriptFunction,
+	// script data
 	rvtScriptData,
+	// other imports
+	rvtScriptFunction,
 	rvtSystemFunction,
 	rvtSystemObject,
 	// local stack
@@ -179,6 +179,7 @@ public:
 
 protected:
 	void runCodeFrom(uint32 start);
+	ScriptString *createStringFrom(RuntimeValue &value);
 	RuntimeValue callImportedFunction(const ScriptSystemFunctionInfo *function, ScriptObject *object,
 		Common::Array<RuntimeValue> &params);
 
