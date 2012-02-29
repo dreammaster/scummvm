@@ -24,6 +24,7 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/audio.h"
 #include "engines/ags/gamestate.h"
 
 namespace AGS {
@@ -125,9 +126,7 @@ RuntimeValue Script_PlayMP3File(AGSEngine *vm, ScriptObject *, const Common::Arr
 RuntimeValue Script_PlaySound(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint soundNumber = params[0]._value;
 
-	vm->playSound(soundNumber);
-
-	return RuntimeValue();
+	return vm->_audio->playSound(soundNumber);
 }
 
 // import void PlaySoundEx(int soundNumber, int channel)

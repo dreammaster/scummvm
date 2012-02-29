@@ -33,14 +33,11 @@ namespace Common {
 class SeekableReadStream;
 }
 
+namespace Audio {
+class SeekableAudioStream;
+}
+
 namespace AGS {
-
-struct AudioChannel : public ScriptObject {
-	bool isOfType(ScriptObjectType objectType) { return (objectType == sotAudioChannel); }
-
-	uint _priority;
-	Audio::SoundHandle _handle;
-};
 
 enum AudioFileType {
 	kAudioFileOGG = 1,
@@ -74,6 +71,36 @@ struct AudioClipType {
 	uint _crossfadeSpeed;
 };
 
+struct AudioChannel : public ScriptObject {
+public:
+	AudioChannel(AGSEngine *vm, uint id);
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotAudioChannel); }
+
+	bool isValid() { return _valid; }
+
+	bool playSound(AudioClip *clip);
+	void stop(bool resetLegacyMusicSettings = true);
+	void stopAmbientSound();
+	bool isPlaying();
+
+	uint getPriority() { return _priority; }
+	void setPriority(uint priority) { _priority = priority; }
+
+protected:
+	// housekeeping
+	AGSEngine *_vm;
+	uint _id;
+	bool _valid;
+
+	// AGS audio
+	uint _priority;
+	AudioClip *_clip;
+
+	// ScummVM audio
+	Audio::SoundHandle _handle;
+	Audio::SeekableAudioStream *_stream;
+};
+
 class ResourceManager;
 
 class AGSAudio {
@@ -87,9 +114,12 @@ public:
 
 	AudioClip *getClipByIndex(bool isMusic, uint index);
 
+	uint playSound(uint soundId, uint priority = 10);
+	bool playSoundOnChannel(uint soundId, uint channelId);
+
 	Common::Array<AudioClip> _audioClips;
 	Common::Array<AudioClipType> _audioClipTypes;
-	Common::Array<AudioChannel> _channels;
+	Common::Array<AudioChannel *> _channels;
 
 protected:
 	AGSEngine *_vm;

@@ -31,16 +31,37 @@
 
 #include "common/debug.h"
 
+#include "audio/decoders/vorbis.h"
+#include "audio/audiostream.h"
+
+#define MAX_SOUND_CHANNELS 8
+#define SPECIAL_CROSSFADE_CHANNEL 8
+
+#define SCHAN_SPEECH  0
+#define SCHAN_AMBIENT 1
+#define SCHAN_MUSIC   2
+#define SCHAN_NORMAL  3
+#define AUDIOTYPE_LEGACY_AMBIENT_SOUND 1
+#define AUDIOTYPE_LEGACY_MUSIC 2
+#define AUDIOTYPE_LEGACY_SOUND 3
+
 namespace AGS {
 
 AGSAudio::AGSAudio(AGSEngine *vm) : _vm(vm), _musicResources(NULL), _audioResources(NULL), _speechResources(NULL) {
 	openResources();
+
+	_channels.resize(MAX_SOUND_CHANNELS + 1);
+	for (uint i = 0; i < _channels.size(); ++i)
+		_channels[i] = new AudioChannel(_vm, i);
 }
 
 AGSAudio::~AGSAudio() {
 	delete _musicResources;
 	delete _audioResources;
 	delete _speechResources;
+
+	for (uint i = 0; i < _channels.size(); ++i)
+		delete _channels[i];
 }
 
 // older versions don't store any audio information
@@ -163,6 +184,71 @@ AudioClip *AGSAudio::getClipByIndex(bool isMusic, uint index) {
 	return NULL;
 }
 
+uint AGSAudio::playSound(uint soundId, uint priority) {
+	uint lowestPrioritySoFar = 9999, lowestPriorityId = 0;
+
+	for (uint i = SCHAN_NORMAL; i < _channels.size() - 1; ++i) {
+		if (soundId == (uint)-1) {
+			// playing sound -1 means iterate through and stop all sound
+			_channels[i]->stop();
+		} else if (!_channels[i]->isPlaying()) {
+			// we can use this one
+			if (playSoundOnChannel(soundId, i))
+				_channels[i]->setPriority(priority);
+			// TODO: why return a channel on failure?
+			return i;
+		} else if (_channels[i]->getPriority() < lowestPrioritySoFar) {
+			lowestPrioritySoFar = _channels[i]->getPriority();
+			lowestPriorityId = i;
+		}
+	}
+
+	if (soundId == (uint)-1)
+		return (uint)-1;
+
+	// no free channels, but perhaps we can override one?
+	if (priority >= lowestPrioritySoFar) {
+		if (playSoundOnChannel(soundId, lowestPriorityId)) {
+			_channels[lowestPriorityId]->setPriority(priority);
+			return lowestPriorityId;
+		}
+	}
+
+	return (uint)-1;
+}
+
+bool AGSAudio::playSoundOnChannel(uint soundId, uint channelId) {
+	// must be a normal channel, and not the last reserved channel
+	if (channelId >= _channels.size() - 1)
+		error("playSoundOnChannel: channel %d is too high (only %d channels)", channelId, _channels.size());
+	if (channelId < SCHAN_NORMAL)
+		error("playSoundOnChannel: channel %d is a reserved channel", channelId);
+
+	AudioChannel *channel = _channels[channelId];
+
+	// if an ambient sound is playing on this channel, abort it
+	channel->stopAmbientSound();
+
+	if (soundId == (uint)-1) {
+		channel->stop();
+		return false;
+	}
+
+	// not music
+	AudioClip *clip = getClipByIndex(false, soundId);
+	if (!clip) {
+		warning("playSoundOnChannel: no such sound %d", soundId);
+		return false;
+	}
+
+	channel->playSound(clip);
+	channel->setPriority(10);
+	// FIXME
+	// channel->setVolume(_vm->_state->_soundVolume);
+
+	return true;
+}
+
 void AGSAudio::openResources() {
 	_musicResources = new ResourceManager();
 	if (!_musicResources->init("music.vox")) {
@@ -186,6 +272,57 @@ void AGSAudio::openResources() {
 void AGSAudio::registerScriptObjects() {
 	for (uint i = 0; i < _audioClips.size(); ++i)
 		_vm->getScriptState()->addSystemObjectImport(_audioClips[i]._scriptName, &_audioClips[i]);
+}
+
+AudioChannel::AudioChannel(AGSEngine *vm, uint id) : _vm(vm), _id(id), _valid(false) {
+}
+
+bool AudioChannel::playSound(AudioClip *clip) {
+	_clip = clip;
+
+	_stream = NULL;
+	Common::SeekableReadStream *stream = _vm->getFile(clip->_filename);
+
+	switch (_clip->_fileType) {
+	case kAudioFileOGG:
+		_stream = Audio::makeVorbisStream(stream, DisposeAfterUse::YES);
+		break;
+	default:
+		// FIXME
+		error("AudioChannel::playSound: invalid clip file type %d", _clip->_fileType);
+	}
+
+	// FIXME
+	_vm->_mixer->playStream(Audio::Mixer::kSFXSoundType, &_handle, _stream, -1, Audio::Mixer::kMaxChannelVolume, 0, DisposeAfterUse::NO);
+
+	_valid = true;
+	return true;
+}
+
+void AudioChannel::stop(bool resetLegacyMusicSettings) {
+	if (_valid) {
+		// FIXME: actually stop
+		_valid = false;
+	}
+
+	if (_vm->_state->_crossfadingInChannel == _id)
+		_vm->_state->_crossfadingInChannel = 0;
+	else if (_vm->_state->_crossfadingOutChannel == _id)
+		_vm->_state->_crossfadingOutChannel = 0;
+
+	// FIXME: ambient
+	// FIXME: resetLegacyMusicSettings
+}
+
+void AudioChannel::stopAmbientSound() {
+	// FIXME
+}
+
+bool AudioChannel::isPlaying() {
+	if (!_valid)
+		return false;
+
+	return _vm->_mixer->isSoundHandleActive(_handle);
 }
 
 } // End of namespace AGS

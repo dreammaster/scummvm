@@ -166,8 +166,6 @@ public:
 	int divideDownCoordinate(int coord);
 	int divideDownCoordinateRoundUp(int coord);
 
-	void playSound(uint soundId);
-
 	void blockUntil(BlockUntilType untilType, uint untilId = 0);
 
 	void skipUntilCharacterStops(uint charId);
