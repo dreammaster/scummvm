@@ -15,6 +15,7 @@ MODULE_OBJS := \
 	scripting/character.o \
 	scripting/dialog.o \
 	scripting/file.o \
+	scripting/flashlight.o \
 	scripting/game.o \
 	scripting/graphics.o \
 	scripting/gui.o \

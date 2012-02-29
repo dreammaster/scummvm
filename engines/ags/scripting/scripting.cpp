@@ -76,6 +76,7 @@ extern void addAudioSystemScripting(AGSEngine *vm);
 extern void addCharacterSystemScripting(AGSEngine *vm);
 extern void addDialogSystemScripting(AGSEngine *vm);
 extern void addFileSystemScripting(AGSEngine *vm);
+extern void addFlashlightSystemScripting(AGSEngine *vm);
 extern void addGameSystemScripting(AGSEngine *vm);
 extern void addGraphicsSystemScripting(AGSEngine *vm);
 extern void addGuiSystemScripting(AGSEngine *vm);
@@ -94,6 +95,7 @@ void addSystemScripting(AGSEngine *vm) {
 	addDialogSystemScripting(vm);
 	addCharacterSystemScripting(vm);
 	addFileSystemScripting(vm);
+	addFlashlightSystemScripting(vm);
 	addGameSystemScripting(vm);
 	addGraphicsSystemScripting(vm);
 	addGuiSystemScripting(vm);
