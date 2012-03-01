@@ -177,6 +177,8 @@ public:
 	bool exportsSymbol(const Common::String &name);
 	void call(const Common::String &name, const Common::Array<uint32> &params);
 
+	uint32 getReturnValue();
+
 protected:
 	void runCodeFrom(uint32 start);
 	ScriptString *createStringFrom(RuntimeValue &value);
@@ -190,6 +192,7 @@ protected:
 	Common::Array<byte> *_globalData;
 
 	uint32 _pc;
+	RuntimeValue _returnValue;
 	uint32 _lineNumber;
 	Common::Array<RuntimeValue> _registers;
 	Common::Array<CallStackEntry> _callStack;
