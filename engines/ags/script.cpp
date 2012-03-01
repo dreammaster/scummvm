@@ -461,8 +461,9 @@ void ccInstance::runCodeFrom(uint32 start) {
 				break;
 			case FIXUP_GLOBALDATA:
 				argVal[v]._type = rvtScriptData;
-				argVal[v]._instance = this;
+				argVal[v]._instance = inst;
 				debugN(4, " data@%d", argValue);
+				// (note that you can't apply the fixup here, since we don't know the offset yet)
 				break;
 			case FIXUP_FUNCTION:
 				argVal[v]._type = rvtFunction;
@@ -470,6 +471,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 				break;
 			case FIXUP_STRING:
 				argVal[v] = new ScriptConstString(Common::String((const char *)&script->_strings[argValue]));
+				argVal[v]._object->DecRef();
 				debugN(4, " string@%d\"%s\"", argValue, &script->_strings[argValue]);
 				break;
 			case FIXUP_IMPORT:
@@ -1044,6 +1046,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_CREATESTRING:
 			// reg1 = new String(reg1)
 			_registers[int1] = createStringFrom(_registers[int1]);
+			_registers[int1]._object->DecRef();
 			break;
 		case SCMD_STRINGSEQUAL:
 			// (char*)reg1 == (char*)reg2   reg1=1 if true, =0 if not
@@ -1184,6 +1187,7 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 		case 's':
 			if (params[pos]._type == rvtStackPointer || params[pos]._type == rvtScriptData) {
 				params[pos] = createStringFrom(params[pos]);
+				params[pos]._object->DecRef();
 				break;
 			}
 			if (params[pos]._type != rvtSystemObject || !params[pos]._object->isOfType(sotString))
