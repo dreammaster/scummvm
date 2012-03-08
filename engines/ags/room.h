@@ -56,7 +56,7 @@ struct FullAnimation {
 	Common::Array<AnimationStruct> _stages;
 };
 
-struct RoomRegion {
+struct RoomRegion : public ScriptObject {
 	RoomRegion() : _interaction(NULL), _lightLevel(0), _tintLevel(0) { }
 
 	NewInteraction *_interaction;
@@ -126,7 +126,7 @@ struct RoomWalkArea {
 	uint16 _top, _bottom; // YP of area
 };
 
-struct RoomHotspot {
+struct RoomHotspot : public ScriptObject {
 	RoomHotspot() : _interaction(NULL) { }
 
 	Common::Point _walkToPos;

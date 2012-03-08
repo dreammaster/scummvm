@@ -26,10 +26,10 @@
 // Base stuff
 #include "common/error.h"
 #include "common/random.h"
+#include "common/stack.h"
 #include "common/events.h"
 
 #include "engines/advancedDetector.h"
-#include "engines/util.h"
 
 // Audio
 #include "audio/mixer.h"
@@ -56,7 +56,7 @@ const char *kGameDataNameV3 = "game28.dta";
 
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
-	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true), _guiNeedsUpdate(true),
+	_resourceMan(0), _needsUpdate(true), _guiNeedsUpdate(true),
 	_startingRoom(0xffffffff), _displayedRoom(0xffffffff),
 	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL), _roomScriptFork(NULL),
 	_currentRoom(NULL), _framesPerSecond(40), _lastFrameTime(0),
@@ -69,11 +69,6 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 }
 
 AGSEngine::~AGSEngine() {
-	delete _currentRoom;
-
-	for (uint i = 0; i < _characters.size(); ++i)
-		delete _characters[i];
-
 	for (uint i = 0; i < _scriptModules.size(); ++i)
 		delete _scriptModules[i];
 	for (uint i = 0; i < _scriptModuleForks.size(); ++i)
@@ -84,13 +79,22 @@ AGSEngine::~AGSEngine() {
 	delete _roomScript;
 	delete _roomScriptFork;
 
+	delete _currentRoom;
+
+	for (uint i = 0; i < _characters.size(); ++i) {
+		assert(_characters[i]->getRefCount() == 1);
+		_characters[i]->DecRef();
+	}
+
+	delete _scriptState;
+
+	delete _graphics;
 	delete _sprites;
 
 	delete _audio;
 	delete _gameFile;
 	delete _resourceMan;
 
-	delete _scriptState;
 	delete _rnd;
 }
 
@@ -407,8 +411,10 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 		if ((int)event.data2 > -1000) {
 			error("processGameEvent: can't do kEventTextScript yet"); // FIXME
 		} else {
-			// FIXME: check inside_script
-			runTextScript(_gameScript, textScriptName);
+			if (_runningScripts.size())
+				_runningScripts.back().queueScript(textScriptName);
+			else
+				runTextScript(_gameScript, textScriptName);
 		}
 
 		break;
@@ -778,20 +784,6 @@ uint32 AGSEngine::getGameUniqueID() const {
 	return _gameFile->_uniqueID;
 }
 
-Graphics::PixelFormat AGSEngine::getPixelFormat() const {
-	switch (_gameFile->_colorDepth) {
-	case 1:
-		// 8bpp
-		return Graphics::PixelFormat::createFormatCLUT8();
-	case 2:
-		// 16bpp: 565
-		return Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0);
-	default:
-		// 24bpp: RGB888
-		return Graphics::PixelFormat(3, 8, 8, 8, 0, 16, 8, 0, 0);
-	}
-}
-
 Common::SeekableReadStream *AGSEngine::getFile(const Common::String &filename) const {
 	return _resourceMan->getFile(filename);
 }
@@ -872,66 +864,12 @@ bool AGSEngine::init() {
 	_sprites = new SpriteSet(this, spritesStream);
 
 	// Init graphics
-
-	if (!getScreenSize())
-		return false;
-
-	if (!initGraphics())
+	if (!_graphics->initGraphics())
 		return false;
 
 	syncSoundSettings();
 
 	_engineStartTime = g_system->getMillis();
-
-	return true;
-}
-
-bool AGSEngine::getScreenSize() {
-	_baseWidth = 320;
-	_baseHeight = 200;
-	_textMultiply = 2;
-
-	switch (_gameFile->_defaultResolution) {
-	case 0:
-		_textMultiply = 1;
-		break;
-	case 1:
-	case 2:
-		_width = 640;
-		_height = 480;
-		break;
-	case 3:
-	case 4:
-		_width = 640;
-		_height = 400;
-		break;
-	case 5:
-		_baseWidth = 400;
-		_baseHeight = 300;
-		break;
-	default:
-		_baseWidth = 512;
-		_baseHeight = 384;
-		break;
-	}
-
-	if (_gameFile->_defaultResolution >= 5) {
-		_width = _baseWidth * 2;
-		_height = _baseHeight * 2;
-		_gameFile->_options[OPT_LETTERBOX] = 0;
-		_forceLetterbox = false;
-	}
-
-	_screenResolutionMultiplier = _width / _baseWidth;
-
-	return true;
-}
-
-bool AGSEngine::initGraphics() {
-	if ((_width == 0) || (_height == 0))
-		return false;
-
-	::initGraphics(_width, _height, 0);
 
 	return true;
 }
@@ -1071,45 +1009,45 @@ byte AGSEngine::getGameOption(uint index) {
 // Multiplies up the number of pixels depending on the current
 // resolution, to give a relatively fixed size at any game res
 uint AGSEngine::getFixedPixelSize(uint pixels) {
-	return pixels * _screenResolutionMultiplier;
+	return pixels * _graphics->_screenResolutionMultiplier;
 }
 
 int AGSEngine::convertToLowRes(int coord) {
-	return (getGameOption(OPT_NATIVECOORDINATES) ? (coord / _screenResolutionMultiplier) : coord);
+	return (getGameOption(OPT_NATIVECOORDINATES) ? (coord / _graphics->_screenResolutionMultiplier) : coord);
 }
 
 int AGSEngine::convertBackToHighRes(int coord) {
-	return (getGameOption(OPT_NATIVECOORDINATES) ? (coord * _screenResolutionMultiplier) : coord);
+	return (getGameOption(OPT_NATIVECOORDINATES) ? (coord * _graphics->_screenResolutionMultiplier) : coord);
 }
 
 int AGSEngine::multiplyUpCoordinate(int coord) {
-	return (getGameOption(OPT_NATIVECOORDINATES) ? coord : (coord * _screenResolutionMultiplier));
+	return (getGameOption(OPT_NATIVECOORDINATES) ? coord : (coord * _graphics->_screenResolutionMultiplier));
 }
 
 void AGSEngine::multiplyUpCoordinates(int32 &x, int32 &y) {
 	if (!getGameOption(OPT_NATIVECOORDINATES))
 		return;
 
-	x *= _screenResolutionMultiplier;
-	y *= _screenResolutionMultiplier;
+	x *= _graphics->_screenResolutionMultiplier;
+	y *= _graphics->_screenResolutionMultiplier;
 }
 
 void AGSEngine::multiplyUpCoordinatesRoundUp(int32 &x, int32 &y) {
 	if (!getGameOption(OPT_NATIVECOORDINATES))
 		return;
 
-	x *= _screenResolutionMultiplier;
-	x += (_screenResolutionMultiplier - 1);
-	y *= _screenResolutionMultiplier;
-	y += (_screenResolutionMultiplier - 1);
+	x *= _graphics->_screenResolutionMultiplier;
+	x += (_graphics->_screenResolutionMultiplier - 1);
+	y *= _graphics->_screenResolutionMultiplier;
+	y += (_graphics->_screenResolutionMultiplier - 1);
 }
 
 int AGSEngine::divideDownCoordinate(int coord) {
-	return (getGameOption(OPT_NATIVECOORDINATES) ? coord : (coord / _screenResolutionMultiplier));
+	return (getGameOption(OPT_NATIVECOORDINATES) ? coord : (coord / _graphics->_screenResolutionMultiplier));
 }
 
 int AGSEngine::divideDownCoordinateRoundUp(int coord) {
-	return (getGameOption(OPT_NATIVECOORDINATES) ? coord : (coord / _screenResolutionMultiplier + _screenResolutionMultiplier - 1));
+	return (getGameOption(OPT_NATIVECOORDINATES) ? coord : (coord / _graphics->_screenResolutionMultiplier + _graphics->_screenResolutionMultiplier - 1));
 }
 
 // don't return until the provided blocking condition is satisfied
@@ -1199,16 +1137,298 @@ void AGSEngine::stopFastForwarding() {
 	// FIXME: updateMusicVolume();
 }
 
+#define CHOSE_TEXTPARSER -3053
+#define SAYCHOSEN_USEFLAG 1
+#define SAYCHOSEN_YES 2
+#define SAYCHOSEN_NO  3
+
+#define RUN_DIALOG_STAY          -1
+#define RUN_DIALOG_STOP_DIALOG   -2
+#define RUN_DIALOG_GOTO_PREVIOUS -4
+
+void AGSEngine::runDialog(uint dialogId) {
+	if (dialogId >= _gameFile->_dialogs.size())
+		error("runDialog: dialog %d invalid (only have %d dialogs)", dialogId, _gameFile->_dialogs.size());
+
+	// FIXME: can_run_delayed_command
+
+	if (_state->_stopDialogAtEnd != DIALOG_NONE) {
+		if (_state->_stopDialogAtEnd != DIALOG_RUNNING)
+			error("runDialog: already-running dialog was in state %d", _state->_stopDialogAtEnd);
+		_state->_stopDialogAtEnd = DIALOG_NEWTOPIC + dialogId;
+		return;
+	}
+
+	if (_runningScripts.size())
+		_runningScripts.back().queueAction(kPSARunDialog, dialogId, "RunDialog");
+	else
+		doConversation(dialogId);
+}
+
+int AGSEngine::showDialogOptions(uint dialogId, uint sayChosenOption) {
+	if (dialogId >= _gameFile->_dialogs.size())
+		error("showDialogOptions: dialog %d invalid (only have %d dialogs)", dialogId, _gameFile->_dialogs.size());
+
+	// FIXME: can_run_delayed_command
+
+	// FIXME
+
+	while (!shouldQuit()) {
+		if ((bool)getGameOption(OPT_RUNGAMEDLGOPTS)) {
+			_state->_disabledUserInterface++;
+			// FIXME: pass alternative display info
+			tickGame();
+			_state->_disabledUserInterface--;
+		} else {
+			_state->_gameStep++;
+			// FIXME: rendering/polling stuff
+		}
+
+		// FIXME
+	}
+
+	// FIXME
+}
+
+void AGSEngine::doConversation(uint dialogId) {
+	endSkippingUntilCharStops();
+
+	// AGS 2.x always makes the mouse cursor visible when displaying a dialog.
+	if (getGameFileVersion() <= kAGSVer272)
+		_state->_mouseCursorHidden = 0;
+
+	Common::Stack<uint> previousTopics;
+	uint currDialogId = dialogId;
+	DialogTopic &currDialogTopic = _gameFile->_dialogs[dialogId];
+
+	// run the dialog startup script
+	int result = runDialogScript(currDialogTopic, currDialogId, currDialogTopic._startupEntryPoint, 0);
+	if ((result == RUN_DIALOG_STOP_DIALOG) || (result == RUN_DIALOG_GOTO_PREVIOUS)) {
+		// 'stop' or 'goto-previous' from startup script
+		// FIXME: remove_screen_overlay(OVER_COMPLETE);
+		_state->_inConversation--;
+		return;
+	} else if (result >= 0) {
+		currDialogId = (uint)result;
+	}
+
+	while (result != RUN_DIALOG_STOP_DIALOG && !shouldQuit()) {
+		if (currDialogId >= _gameFile->_dialogs.size())
+			error("doConversation: new dialog was too high (%d), only have %d dialogs",
+				currDialogId, _gameFile->_dialogs.size());
+
+		currDialogTopic = _gameFile->_dialogs[dialogId];
+
+		if (currDialogId != dialogId) {
+			// dialog topic changed, so play the startup script for the new topic
+			dialogId = currDialogId;
+			result = runDialogScript(currDialogTopic, currDialogId, currDialogTopic._startupEntryPoint, 0);
+		} else {
+			int chose = showDialogOptions(currDialogId, SAYCHOSEN_USEFLAG);
+
+			if (chose == CHOSE_TEXTPARSER) {
+				_saidSpeechLine = false;
+				result = runDialogRequest(currDialogId);
+				if (_saidSpeechLine) {
+					// FIXME: original futzes with the screen for close-up face here
+				}
+			} else {
+				result = runDialogScript(currDialogTopic, currDialogId, currDialogTopic._options[chose]._entryPoint, chose + 1);
+			}
+		}
+
+		if (result == RUN_DIALOG_GOTO_PREVIOUS) {
+			if (previousTopics.empty()) {
+				// goto-previous on first topic -- end dialog
+				result = RUN_DIALOG_STOP_DIALOG;
+			} else {
+				result = (int)previousTopics.pop();
+			}
+		}
+		if (result >= 0) {
+			// another topic change
+			previousTopics.push(currDialogId);
+			currDialogId = (uint)result;
+		}
+	}
+}
+
+// TODO: move this into DialogTopic itself?
+static void getDialogScriptParameters(DialogTopic &topic, uint &pos, uint16 *param1, uint16 *param2 = NULL) {
+	const Common::Array<byte> code = topic._code;
+	if (pos + 3 > code.size())
+		error("getDialogScriptParameters: %d is off end of script (size %d)", pos, code.size());
+	pos++;
+	*param1 = READ_LE_UINT16(&code[pos]);
+	pos += 2;
+	if (param2) {
+		if (pos + 2 > code.size())
+			error("getDialogScriptParameters: %d is off end of script (size %d)", pos, code.size());
+		*param1 = READ_LE_UINT16(&code[pos]);
+		pos += 2;
+	}
+}
+
+int AGSEngine::runDialogScript(DialogTopic &topic, uint dialogId, uint offset, uint optionId) {
+	_saidSpeechLine = false;
+
+	int result = RUN_DIALOG_STAY;
+	if (_dialogScriptsScript) {
+		Common::Array<uint32> params;
+		params.push_back(optionId);
+		runTextScript(_dialogScriptsScript, Common::String::format("_run_dialog%d", dialogId), params);
+		result = (int)_dialogScriptsScript->getReturnValue();
+	} else {
+		// old-style dialog script
+		if (offset == (uint)-1)
+			return result;
+
+		uint pos = offset;
+		bool scriptRunning = true;
+		uint16 param1, param2;
+
+		while (scriptRunning) {
+			if (pos + 2 > topic._code.size())
+				error("runDialogScript: %d is off end of script (size %d)", pos, topic._code.size());
+			byte opcode = topic._code[pos];
+			switch (opcode) {
+			case DCMD_SAY:
+				getDialogScriptParameters(topic, pos, &param1, &param2);
+				// FIXME
+				error("DCMD_SAY unimplemented");
+				break;
+			case DCMD_OPTOFF:
+				getDialogScriptParameters(topic, pos, &param1, NULL);
+				// FIXME
+				error("DCMD_OPTOFF unimplemented");
+				break;
+			case DCMD_OPTON:
+				getDialogScriptParameters(topic, pos, &param1, NULL);
+				// FIXME
+				error("DCMD_OPTON unimplemented");
+				break;
+			case DCMD_RETURN:
+				scriptRunning = false;
+				break;
+			case DCMD_STOPDIALOG:
+				result = RUN_DIALOG_STOP_DIALOG;
+				scriptRunning = false;
+				break;
+			case DCMD_OPTOFFFOREVER:
+				getDialogScriptParameters(topic, pos, &param1, NULL);
+				// FIXME
+				error("DCMD_OPTOFFFOREVER unimplemented");
+				break;
+			case DCMD_RUNTEXTSCRIPT:
+				getDialogScriptParameters(topic, pos, &param1, NULL);
+				// FIXME
+				error("DCMD_RUNTEXTSCRIPT unimplemented");
+				break;
+			case DCMD_GOTODIALOG:
+				getDialogScriptParameters(topic, pos, &param1, NULL);
+				result = param1;
+				scriptRunning = false;
+				break;
+			case DCMD_PLAYSOUND:
+				getDialogScriptParameters(topic, pos, &param1, NULL);
+				_audio->playSound(param1);
+				break;
+			case DCMD_ADDINV:
+				getDialogScriptParameters(topic, pos, &param1, NULL);
+				// FIXME
+				error("DCMD_ADDINV unimplemented");
+				break;
+			case DCMD_SETSPCHVIEW:
+				getDialogScriptParameters(topic, pos, &param1, &param2);
+				// FIXME
+				error("DCMD_SETSPCHVIEW unimplemented");
+				break;
+			case DCMD_NEWROOM:
+				getDialogScriptParameters(topic, pos, &param1, NULL);
+				// FIXME
+				error("DCMD_NEWROOM unimplemented");
+				break;
+			case DCMD_SETGLOBALINT:
+				getDialogScriptParameters(topic, pos, &param1, &param2);
+				// FIXME
+				error("DCMD_SETGLOBALINT unimplemented");
+				break;
+			case DCMD_GIVESCORE:
+				getDialogScriptParameters(topic, pos, &param1, NULL);
+				// FIXME
+				error("DCMD_GIVESCORE unimplemented");
+				break;
+			case DCMD_GOTOPREVIOUS:
+				result = RUN_DIALOG_GOTO_PREVIOUS;
+				scriptRunning = false;
+				break;
+			case DCMD_LOSEINV:
+				getDialogScriptParameters(topic, pos, &param1, NULL);
+				// FIXME
+				error("DCMD_LOSEINV unimplemented");
+				break;
+			case DCMD_ENDSCRIPT:
+				result = RUN_DIALOG_STOP_DIALOG;
+				scriptRunning = false;
+				break;
+			default:
+				error("runDialogScript: unknown opcode %d", opcode);
+			}
+		}
+	}
+
+	// if there was a room change, stop the dialog
+	if (_inNewRoomState != kNewRoomStateNone)
+		return RUN_DIALOG_STOP_DIALOG;
+
+	if (_saidSpeechLine) {
+		// FIXME: original futzes with the screen for close-up face here
+		// (see doConversation also)
+	}
+
+	return result;
+}
+
+int AGSEngine::runDialogRequest(uint request) {
+	_state->_stopDialogAtEnd = DIALOG_RUNNING;
+
+	Common::Array<uint32> params;
+	params.push_back(request);
+	runScriptFunction(_gameScript, "dialog_request", params);
+
+	if (_state->_stopDialogAtEnd == DIALOG_STOP) {
+		_state->_stopDialogAtEnd = DIALOG_NONE;
+		return RUN_DIALOG_STOP_DIALOG;
+	} else if (_state->_stopDialogAtEnd >= DIALOG_NEWTOPIC) {
+		uint topicId = (uint)_state->_stopDialogAtEnd - DIALOG_NEWTOPIC;
+		_state->_stopDialogAtEnd = DIALOG_NONE;
+		return topicId;
+	} else if (_state->_stopDialogAtEnd >= DIALOG_NEWROOM) {
+		uint roomId = (uint)_state->_stopDialogAtEnd - DIALOG_NEWROOM;
+		// FIXME: NewRoom(roomId);
+		error("runDialogRequest doesn't do DIALOG_NEWROOM yet");
+		return RUN_DIALOG_STOP_DIALOG;
+	} else {
+		_state->_stopDialogAtEnd = DIALOG_NONE;
+		return RUN_DIALOG_STAY;
+	}
+}
+
 bool AGSEngine::runScriptFunction(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {
 	if (!prepareTextScript(instance, name))
 		return false;
 
 	instance->call(name, params);
 
-	// FIXME: check return value
+	// non-zero if failed, except 100 if aborted
+	// TODO: original checked -2 but we don't use that, right?
+	// FIXME: this is fail
+	/*uint32 result = instance->getReturnValue();
+	if (result != 0 && result != 100)
+		error("runScriptFunction: script '%s' returned error %d", name.c_str(), result);*/
 
 	// FIXME: post script cleanup
-
+	_runningScripts.pop_back();
 	// FIXME: sabotage any running scripts in the event of restored game
 
 	return true;
@@ -1233,6 +1453,22 @@ bool AGSEngine::prepareTextScript(ccInstance *instance, const Common::String &na
 }
 
 ExecutingScript::ExecutingScript(ccInstance *instance) : _instance(instance) {
+}
+
+void ExecutingScript::queueAction(PostScriptActionType type, uint data, const Common::String &name) {
+	PostScriptAction a;
+	a.type = type;
+	a.data = data;
+	a.name = name;
+	_pendingActions.push_back(a);
+}
+
+void ExecutingScript::queueScript(const Common::String &name, uint p1, uint p2) {
+	PendingScript i;
+	i.name = name;
+	i.p1 = p1;
+	i.p2 = p2;
+	_pendingScripts.push_back(i);
 }
 
 } // End of namespace AGS

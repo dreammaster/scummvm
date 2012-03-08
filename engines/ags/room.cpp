@@ -26,6 +26,7 @@
 #include "engines/ags/ags.h"
 #include "engines/ags/constants.h"
 #include "engines/ags/gamestate.h"
+#include "engines/ags/graphics.h"
 #include "engines/ags/room.h"
 #include "engines/ags/script.h"
 #include "engines/ags/sprites.h"
@@ -278,7 +279,7 @@ Room::Room(AGSEngine *vm, Common::SeekableReadStream *dta) : _vm(vm), _compiledS
 				}
 				// we already read the first scene as part of the main block
 				for (uint i = 1; i < _backgroundScenes.size(); ++i)
-					_backgroundScenes[i]._scene = readLZSSImage(dta, _vm->getPixelFormat(), _backgroundScenes[i]._palette);
+					_backgroundScenes[i]._scene = readLZSSImage(dta, _vm->_graphics->getPixelFormat(), _backgroundScenes[i]._palette);
 			}
 			break;
 		case BLOCKTYPE_PROPERTIES:
@@ -614,7 +615,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	BackgroundScene scene;
 	_backgroundScenes.push_back(scene);
 	if (_version >= 5)
-		_backgroundScenes[0]._scene = readLZSSImage(dta, _vm->getPixelFormat(), _backgroundScenes[0]._palette);
+		_backgroundScenes[0]._scene = readLZSSImage(dta, _vm->_graphics->getPixelFormat(), _backgroundScenes[0]._palette);
 	else
 		_backgroundScenes[0]._scene = readRLEImage(dta);
 

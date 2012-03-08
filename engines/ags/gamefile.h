@@ -138,7 +138,7 @@ struct DialogOption {
 	uint16 _entryPoint;
 };
 
-struct DialogTopic {
+struct DialogTopic : public ScriptObject {
 	Common::Array<DialogOption> _options;
 	Common::Array<byte> _code;
 

@@ -42,6 +42,10 @@ public:
 	AGSGraphics(class AGSEngine *vm);
 	~AGSGraphics();
 
+	bool getScreenSize();
+	bool initGraphics();
+	Graphics::PixelFormat getPixelFormat() const;
+
 	void initPalette();
 	void newRoomPalette();
 
@@ -52,6 +56,12 @@ public:
 	void setCursorGraphic(uint32 spriteId);
 
 	uint32 getCurrentCursor();
+
+	uint16 _width, _height;
+	uint16 _baseWidth, _baseHeight;
+	uint32 _screenResolutionMultiplier;
+	uint16 _textMultiply;
+	bool _forceLetterbox;
 
 protected:
 	AGSEngine *_vm;
