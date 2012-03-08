@@ -23,43 +23,49 @@
  * which is licensed under the Artistic License 2.0.
  */
 
-#ifndef AGS_SPRITES_H
-#define AGS_SPRITES_H
+#ifndef AGS_GRAPHICS_H
+#define AGS_GRAPHICS_H
 
-#include "common/array.h"
-#include "common/stream.h"
+#include "graphics/surface.h"
 
-namespace Graphics {
-	struct Surface;
+namespace Common {
+class SeekableReadStream;
 }
 
 namespace AGS {
 
-void unpackSpriteBits(Common::SeekableReadStream *stream, byte *dest, uint32 size);
+class Drawable;
+class Room;
 
-struct SpriteInfo {
-	uint32 _offset;
-	uint32 _width, _height;
-};
-
-class AGSEngine;
-
-class SpriteSet {
+class AGSGraphics {
 public:
-	SpriteSet(AGSEngine *vm, Common::SeekableReadStream *stream);
-	~SpriteSet();
+	AGSGraphics(class AGSEngine *vm);
+	~AGSGraphics();
 
-	Graphics::Surface *getSprite(uint32 spriteId);
+	void initPalette();
+	void newRoomPalette();
+
+	void draw();
+
+	void setMouseCursor(uint32 cursor);
+	void mouseSetHotspot(uint32 x, uint32 y);
+	void setCursorGraphic(uint32 spriteId);
+
+	uint32 getCurrentCursor();
 
 protected:
 	AGSEngine *_vm;
-	Common::SeekableReadStream *_stream;
-	bool _spritesAreCompressed;
-	Common::Array<SpriteInfo> _spriteInfo;
 
-	bool loadSpriteIndexFile(uint32 spriteFileID);
+	byte _palette[256 * 3];
+	Graphics::Surface _backBuffer;
+
+	void draw(Drawable *item);
+
+	class CursorDrawable *_cursorObj;
+
+	void updateCachedMouseCursor();
 };
 
 } // End of namespace AGS
 
-#endif // AGS_SPRITES_H
+#endif // AGS_GRAPHICS_H

@@ -34,14 +34,13 @@
 // Audio
 #include "audio/mixer.h"
 
-#include "graphics/palette.h"
-
 // AGS subsystems
 #include "ags/ags.h"
 #include "ags/audio.h"
 #include "ags/constants.h"
 #include "ags/gamefile.h"
 #include "ags/gamestate.h"
+#include "ags/graphics.h"
 #include "ags/resourceman.h"
 #include "ags/room.h"
 #include "ags/script.h"
@@ -58,9 +57,9 @@ const char *kGameDataNameV3 = "game28.dta";
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
 	_width(0), _height(0), _resourceMan(0), _forceLetterbox(false), _needsUpdate(true), _guiNeedsUpdate(true),
-	_mouseFrame(0), _mouseDelay(0), _startingRoom(0xffffffff), _displayedRoom(0xffffffff),
+	_startingRoom(0xffffffff), _displayedRoom(0xffffffff),
 	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL), _roomScriptFork(NULL),
-	_currentRoom(NULL), _currentCursor(0xffffffff), _framesPerSecond(40), _lastFrameTime(0),
+	_currentRoom(NULL), _framesPerSecond(40), _lastFrameTime(0),
 	_inNewRoomState(kNewRoomStateNone), _newRoomStateWas(kNewRoomStateNone), _inEntersScreenCounter(0),
 	_blockingUntil(kUntilNothing), _insideProcessEvent(false) {
 
@@ -187,7 +186,7 @@ void AGSEngine::tickGame(bool checkControls) {
 	// If we're running faster than the target rate, sleep for a bit.
 	uint32 time = _system->getMillis();
 	if (time < _lastFrameTime + (1000 / _framesPerSecond))
-		_system->delayMillis((1000 / _framesPerSecond) + time - _lastFrameTime);
+		_system->delayMillis((1000 / _framesPerSecond) - time + _lastFrameTime);
 	_lastFrameTime = _system->getMillis();
 
 	// FIXME
@@ -198,6 +197,12 @@ void AGSEngine::tickGame(bool checkControls) {
 		queueGameEvent(kEventRunEventBlock, kEventBlockRoom, 0, kRoomEventTick);
 	}
 	checkNewRoom();
+
+	// FIXME
+
+	if (!_state->_fastForward) {
+		_graphics->draw();
+	}
 
 	// FIXME
 
@@ -312,16 +317,7 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	_state->_animBackgroundSpeed = _currentRoom->_backgroundSceneAnimSpeed;
 	_state->_bgAnimDelay = _currentRoom->_backgroundSceneAnimSpeed;
 
-	const byte *roomPal = _currentRoom->_backgroundScenes[0]._palette;
-	for (uint i = 0; i < 256; ++i) {
-		if (_gameFile->_paletteUses[i] == PAL_BACKGROUND) {
-			_palette[i * 3 + 0] = roomPal[i * 4 + 0];
-			_palette[i * 3 + 1] = roomPal[i * 4 + 0];
-			_palette[i * 3 + 2] = roomPal[i * 4 + 0];
-		} else {
-			// FIXME: patch room palette
-		}
-	}
+	_graphics->newRoomPalette();
 
 	if (_gameFile->_defaultResolution > 2 && !getGameOption(OPT_NATIVECOORDINATES))
 		_currentRoom->convertCoordinatesToLowRes();
@@ -336,7 +332,7 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 	// FIXME
 
-	_scriptState->addSystemObjectImport("object", new ScriptObjectArray<RoomObject>(_currentRoom->_objects, 8), true);
+	_scriptState->addSystemObjectImport("object", new ScriptObjectArray<RoomObject *>(_currentRoom->_objects, 8), true);
 
 	// FIXME
 
@@ -827,13 +823,8 @@ bool AGSEngine::init() {
 		return false;
 
 	// init_game_settings
-	for (uint i = 0; i < 256; ++i) {
-		if (_gameFile->_paletteUses[i] != PAL_BACKGROUND) {
-			_palette[i * 3 + 0] = _gameFile->_defaultPalette[i * 3 + 0];
-			_palette[i * 3 + 1] = _gameFile->_defaultPalette[i * 3 + 1];
-			_palette[i * 3 + 2] = _gameFile->_defaultPalette[i * 3 + 2];
-		}
-	}
+	_graphics = new AGSGraphics(this);
+	_graphics->initPalette();
 	_state->init();
 
 	addSystemScripting(this);
@@ -951,7 +942,7 @@ void AGSEngine::pauseEngineIntern(bool pause) {
 
 // reset the visible cursor to the one for the current mode
 void AGSEngine::setDefaultCursor() {
-	setMouseCursor(_cursorMode);
+	_graphics->setMouseCursor(_cursorMode);
 }
 
 // TODO: rename to something which indicates it sets too?
@@ -1009,61 +1000,8 @@ void AGSEngine::setCursorMode(uint32 newMode) {
 	debug(1, "cursor mode set to %d", newMode);
 }
 
-void AGSEngine::setMouseCursor(uint32 cursor) {
-	assert(cursor < _gameFile->_cursors.size());
-
-	MouseCursor &cursorInfo = _gameFile->_cursors[cursor];
-
-	setCursorGraphic(cursorInfo._pic);
-	/* FIXME if (_dottedMouseCursor) {
-		delete _dottedMouseCursor;
-		_dottedMouseCursor = NULL;
-	} */
-
-	if ((cursor == MODE_USE) && cursorInfo._pic && (_gameFile->_hotDot || _gameFile->_invHotDotSprite)) {
-		// create a copy of cursor with the hotspot dot onto it, if needed
-		/* FIXME: duplicate active mouse cursor onto _dottedMouseCursor */
-
-		if (_gameFile->_invHotDotSprite) {
-			// FIXME: draw invHotDotSprite centered on hotspot
-		} else {
-			// FIXME: draw pixel
-			if (_gameFile->_hotDotOuter) {
-				// FIXME: draw pixels
-			}
-		}
-
-		// FIXME: replace active mouse cursor with _dottedMouseCursor
-		updateCachedMouseCursor();
-	}
-
-	mouseSetHotspot(cursorInfo._hotspotX, cursorInfo._hotspotY);
-
-	if (cursor != _currentCursor) {
-		_currentCursor = cursor;
-		_mouseFrame = 0;
-		_mouseDelay = 0;
-	}
-}
-
-void AGSEngine::setCursorGraphic(uint32 spriteId) {
-	_cursorSprite = _sprites->getSprite(spriteId);
-
-	if (!spriteId || !_cursorSprite) {
-		// FIXME
-	}
-
-	_alphaBlendCursor = (bool)(_gameFile->_spriteFlags[spriteId] & SPF_ALPHACHANNEL);
-
-	updateCachedMouseCursor();
-}
-
-void AGSEngine::updateCachedMouseCursor() {
-	// FIXME: set the mouse cursor
-}
-
-void AGSEngine::mouseSetHotspot(uint32 x, uint32 y) {
-	// FIXME: set the hotspot!
+void AGSEngine::checkViewFrame(uint view, uint loop, uint frame) {
+	// FIXME: check sounds for new frames
 }
 
 void AGSEngine::runTextScript(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {
@@ -1188,8 +1126,8 @@ void AGSEngine::blockUntil(BlockUntilType untilType, uint untilId) {
 	invalidateGUI();
 	// only update the mouse cursor if it's speech, or if it hasn't been specifically changed first
 	if (_cursorMode != CURS_WAIT)
-		if ((_currentCursor == _cursorMode) || (untilType == kUntilNoOverlay))
-			setMouseCursor(CURS_WAIT);
+		if ((_graphics->getCurrentCursor() == _cursorMode) || (untilType == kUntilNoOverlay))
+			_graphics->setMouseCursor(CURS_WAIT);
 
 	_blockingUntil = untilType;
 	_blockingUntilId = untilId;

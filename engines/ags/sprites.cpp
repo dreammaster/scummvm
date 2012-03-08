@@ -28,6 +28,8 @@
 #include "ags/ags.h"
 #include "ags/sprites.h"
 
+#include "graphics/surface.h"
+
 namespace AGS {
 
 const char *kSpriteFileSignature = " Sprite File ";
@@ -68,7 +70,7 @@ SpriteSet::SpriteSet(AGSEngine *vm, Common::SeekableReadStream *stream) : _vm(vm
 		spriteCount = 200;
 	_spriteInfo.resize(spriteCount);
 
-	debug(2, "sprite set has %d sprites", spriteCount);
+	debug(2, "sprite set has %d sprites (version %d, %s)", spriteCount, version, _spritesAreCompressed ? "compressed" : "uncompressed");
 
 	// try and load the sprite index file first
 	if (loadSpriteIndexFile(spriteFileID))
@@ -154,9 +156,79 @@ bool SpriteSet::loadSpriteIndexFile(uint32 spriteFileID) {
 	return true;
 }
 
-Sprite *SpriteSet::getSprite(uint32 spriteId) {
+Graphics::Surface *SpriteSet::getSprite(uint32 spriteId) {
+	if (spriteId >= _spriteInfo.size())
+		error("SpriteSet::getSprite: sprite id %d is too high", spriteId);
+
+	_stream->seek(_spriteInfo[spriteId]._offset);
+	uint16 colorDepth = _stream->readUint16LE();
+
+	Graphics::PixelFormat format;
+	switch (colorDepth) {
+	case 0:
+		return NULL; // FIXME
+	case 1:
+		format = Graphics::PixelFormat::createFormatCLUT8();
+		break;
+	case 2:
+		format = Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0);
+		break;
+	case 3:
+		format = Graphics::PixelFormat(3, 8, 8, 8, 0, 16, 8, 0, 0);
+		break;
+	default:
+		error("SpriteSet::getSprite: invalid sprite depth %d", spriteId);
+	}
+
+	_spriteInfo[spriteId]._width = _stream->readUint16LE();
+	_spriteInfo[spriteId]._height = _stream->readUint16LE();
+
+	Graphics::Surface *surface = new Graphics::Surface;
+	surface->create(_spriteInfo[spriteId]._width, _spriteInfo[spriteId]._height, format);
+
+	if (_spritesAreCompressed) {
+		switch (colorDepth) {
+		case 1:
+			_stream->skip(2); // data size, FIXME: use this
+			unpackSpriteBits(_stream, (byte *)surface->getPixels(), surface->w * surface->h);
+			break;
+		case 2:
+		case 3:
+			error("high-depth sprites unimplemented"); // FIXME: !!!
+		}
+	} else {
+		_stream->read((byte *)surface->getPixels(), surface->w * surface->h * colorDepth);
+	}
+
 	// FIXME
-	return NULL;
+
+	return surface;
+}
+
+void unpackSpriteBits(Common::SeekableReadStream *stream, byte *dest, uint32 size) {
+	uint32 offset = 0;
+
+	while (!stream->eos() && (offset < size)) {
+		signed char n = (signed char)stream->readByte();
+
+		if (n == -128)
+			n = 0;
+
+		if (n < 0) {
+			// run of a single byte
+			uint32 count = 1 - n;
+			byte data = stream->readByte();
+			while (count-- && (offset < size)) {
+				dest[offset++] = data;
+			}
+		} else {
+			// run of non-encoded bytes
+			uint32 count = 1 + n;
+			while (count-- && (offset < size)) {
+				dest[offset++] = stream->readByte();
+			}
+		}
+	}
 }
 
 } // End of namespace AGS

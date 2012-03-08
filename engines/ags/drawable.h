@@ -23,43 +23,38 @@
  * which is licensed under the Artistic License 2.0.
  */
 
-#ifndef AGS_SPRITES_H
-#define AGS_SPRITES_H
+#ifndef AGS_DRAWABLE_H
+#define AGS_DRAWABLE_H
 
-#include "common/array.h"
-#include "common/stream.h"
+#include "common/rect.h"
 
 namespace Graphics {
-	struct Surface;
+	class Surface;
 }
 
 namespace AGS {
 
-void unpackSpriteBits(Common::SeekableReadStream *stream, byte *dest, uint32 size);
-
-struct SpriteInfo {
-	uint32 _offset;
-	uint32 _width, _height;
-};
-
-class AGSEngine;
-
-class SpriteSet {
+class Drawable {
 public:
-	SpriteSet(AGSEngine *vm, Common::SeekableReadStream *stream);
-	~SpriteSet();
+	Drawable();
+	virtual ~Drawable();
 
-	Graphics::Surface *getSprite(uint32 spriteId);
+	// position/zorder
+	virtual Common::Point getDrawPos() = 0;
+	virtual int getDrawOrder() = 0;
 
-protected:
-	AGSEngine *_vm;
-	Common::SeekableReadStream *_stream;
-	bool _spritesAreCompressed;
-	Common::Array<SpriteInfo> _spriteInfo;
+	// surface to draw
+	virtual const Graphics::Surface *getDrawSurface() = 0;
 
-	bool loadSpriteIndexFile(uint32 spriteFileID);
+	// transformations
+	virtual uint getDrawWidth() = 0;
+	virtual uint getDrawHeight() = 0;
+	virtual uint getDrawTransparency() = 0;
+	virtual bool isDrawVerticallyMirrored() = 0;
+	virtual int getDrawLightLevel() = 0;
+	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) = 0;
 };
 
 } // End of namespace AGS
 
-#endif // AGS_SPRITES_H
+#endif // AGS_DRAWABLE_H

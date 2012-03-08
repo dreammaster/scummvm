@@ -25,8 +25,10 @@
 
 #include "engines/ags/ags.h"
 #include "engines/ags/constants.h"
+#include "engines/ags/gamestate.h"
 #include "engines/ags/room.h"
 #include "engines/ags/script.h"
+#include "engines/ags/sprites.h"
 #include "engines/ags/util.h"
 
 namespace AGS {
@@ -106,32 +108,6 @@ static Graphics::Surface readLZSSImage(Common::SeekableReadStream *stream, Graph
 	return surf;
 }
 
-static void unpackBits(Common::SeekableReadStream *stream, byte *dest, uint32 size) {
-	uint32 offset = 0;
-
-	while (!stream->eos() && (offset < size)) {
-		signed char n = (signed char)stream->readByte();
-
-		if (n == -128)
-			n = 0;
-
-		if (n < 0) {
-			// run of a single byte
-			uint32 count = 1 - n;
-			byte data = stream->readByte();
-			while (count-- && (offset < size)) {
-				dest[offset++] = data;
-			}
-		} else {
-			// run of non-encoded bytes
-			uint32 count = 1 + n;
-			while (count-- && (offset < size)) {
-				dest[offset++] = stream->readByte();
-			}
-		}
-	}
-}
-
 static Graphics::Surface readRLEImage(Common::SeekableReadStream *stream) {
 	Graphics::Surface surf;
 
@@ -140,11 +116,47 @@ static Graphics::Surface readRLEImage(Common::SeekableReadStream *stream) {
 	surf.create(width, height, Graphics::PixelFormat::createFormatCLUT8());
 
 	for (uint i = 0; i < height; ++i)
-		unpackBits(stream, (byte *)surf.getBasePtr(0, i), width);
+		unpackSpriteBits(stream, (byte *)surf.getBasePtr(0, i), width);
 
 	stream->skip(256 * 3); // skip palette
 
 	return surf;
+}
+
+Common::Point RoomObject::getDrawPos() {
+	return _pos;
+}
+
+int RoomObject::getDrawOrder() {
+	return _baseLine;
+}
+
+const Graphics::Surface *RoomObject::getDrawSurface() {
+	return _vm->getSprites()->getSprite(_spriteId); // FIXME
+}
+
+uint RoomObject::getDrawWidth() {
+	return 0; // FIXME
+}
+
+uint RoomObject::getDrawHeight() {
+	return 0; // FIXME
+}
+
+uint RoomObject::getDrawTransparency() {
+	return 0; // FIXME
+}
+
+bool RoomObject::isDrawVerticallyMirrored() {
+	return false; // FIXME
+}
+
+int RoomObject::getDrawLightLevel() {
+	return 0; // FIXME
+}
+
+void RoomObject::getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) {
+	// FIXME
 }
 
 #define ROOM_FILE_VERSION kAGSRoomVer303x // 29
@@ -233,7 +245,7 @@ Room::Room(AGSEngine *vm, Common::SeekableReadStream *dta) : _vm(vm), _compiledS
 				char objectName[MAXOBJNAMELEN + 1];
 				dta->read(objectName, MAXOBJNAMELEN);
 				objectName[MAXOBJNAMELEN] = '\0';
-				_objects[i]._name = objectName;
+				_objects[i]->_name = objectName;
 			}
 			break;
 		case BLOCKTYPE_OBJECTSCRIPTNAMES:
@@ -244,7 +256,7 @@ Room::Room(AGSEngine *vm, Common::SeekableReadStream *dta) : _vm(vm), _compiledS
 				char objectName[MAX_SCRIPT_NAME_LEN + 1];
 				dta->read(objectName, MAX_SCRIPT_NAME_LEN);
 				objectName[MAX_SCRIPT_NAME_LEN] = '\0';
-				_objects[i]._scriptName = objectName;
+				_objects[i]->_scriptName = objectName;
 			}
 			break;
 		case BLOCKTYPE_ANIMBKGRND:
@@ -294,9 +306,12 @@ Room::~Room() {
 	for (uint i = 0; i < _hotspots.size(); ++i)
 		delete _hotspots[i]._interaction;
 	for (uint i = 0; i < _objects.size(); ++i)
-		delete _objects[i]._interaction;
+		delete _objects[i]->_interaction;
 	for (uint i = 0; i < _regions.size(); ++i)
 		delete _regions[i]._interaction;
+
+	for (uint i = 0; i < _objects.size(); ++i)
+		delete _objects[i];
 
 	for (uint i = 0; i < _backgroundScenes.size(); ++i)
 		_backgroundScenes[i]._scene.free();
@@ -308,10 +323,10 @@ Room::~Room() {
 
 void Room::convertCoordinatesToLowRes() {
 	for (uint i = 0; i < _objects.size(); ++i) {
-		_objects[i]._sprite._x /= 2;
-		_objects[i]._sprite._y /= 2;
-		if (_objects[i]._baseLine != 0xffffffff)
-			_objects[i]._baseLine /= 2;
+		_objects[i]->_pos.x /= 2;
+		_objects[i]->_pos.y /= 2;
+		if (_objects[i]->_baseLine != 0xffffffff)
+			_objects[i]->_baseLine /= 2;
 	}
 
 	for (uint i = 0; i < _hotspots.size(); ++i) {
@@ -407,13 +422,14 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 		error("Room: too many objects (%d)", objectCount);
 	_objects.resize(objectCount);
 	for (uint i = 0; i < _objects.size(); ++i) {
-		SpriteStruct &sprite = _objects[i]._sprite;
+		// sprites
+		_objects[i] = new RoomObject(_vm);
 
-		sprite._spriteId = dta->readUint16LE();
-		sprite._x = dta->readUint16LE();
-		sprite._y = dta->readUint16LE();
-		sprite._roomId = dta->readUint16LE();
-		sprite._on = dta->readUint16LE();
+		_objects[i]->_spriteId = dta->readUint16LE();
+		_objects[i]->_pos.x = dta->readUint16LE();
+		_objects[i]->_pos.y = dta->readUint16LE();
+		uint16 roomId = dta->readUint16LE();
+		_objects[i]->_on = dta->readUint16LE();
 	}
 
 	if (_version >= kAGSRoomVer253) {
@@ -432,7 +448,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 				_hotspots[i]._interaction = NewInteraction::createFrom(dta);
 			}
 			for (uint i = 0; i < _objects.size(); ++i) {
-				_objects[i]._interaction = NewInteraction::createFrom(dta);
+				_objects[i]->_interaction = NewInteraction::createFrom(dta);
 			}
 		}
 
@@ -465,7 +481,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 
 	if (_version >= kAGSRoomVer2a) {
 		for (uint i = 0; i < _objects.size(); ++i)
-			_objects[i]._baseLine = dta->readUint32LE();
+			_objects[i]->_baseLine = dta->readUint32LE();
 		_width = dta->readUint16LE();
 		_height = dta->readUint16LE();
 		debug(4, "Room: width %d, height %d", _width, _height);
@@ -474,7 +490,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	// object flags
 	if (_version >= kAGSRoomVer262) {
 		for (uint i = 0; i < _objects.size(); ++i)
-			_objects[i]._flags = dta->readUint16LE();
+			_objects[i]->_flags = dta->readUint16LE();
 	}
 
 	// (relative) resolution
@@ -613,6 +629,18 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 		// FIXME
 		error("Room: too old, fixme");
 	}
+}
+
+const Graphics::Surface *Room::getDrawSurface() {
+	return &_backgroundScenes[_vm->_state->_bgFrame]._scene;
+}
+
+uint Room::getDrawWidth() {
+	return _backgroundScenes[_vm->_state->_bgFrame]._scene.w;
+}
+
+uint Room::getDrawHeight() {
+	return _backgroundScenes[_vm->_state->_bgFrame]._scene.h;
 }
 
 } // End of namespace AGS

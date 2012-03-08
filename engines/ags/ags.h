@@ -42,9 +42,10 @@ namespace AGS {
 
 struct AGSGameDescription;
 
-class ResourceManager;
+class AGSGraphics;
 class GameFile;
-class Sprite;
+class ResourceManager;
+class Room;
 class SpriteSet;
 struct Character;
 class ccInstance;
@@ -131,17 +132,15 @@ public:
 
 	Common::SeekableReadStream *getFile(const Common::String &filename) const;
 	ResourceManager *getResourceManager() { return _resourceMan; }
+	SpriteSet *getSprites() { return _sprites; }
 
 	Graphics::PixelFormat getPixelFormat() const;
 
 	void setDefaultCursor();
 	uint32 findNextEnabledCursor(uint32 startWith);
 	void setCursorMode(uint32 newMode);
-	void setMouseCursor(uint32 cursor);
 
-	void setCursorGraphic(uint32 spriteId);
-	void mouseSetHotspot(uint32 x, uint32 y);
-	void updateCachedMouseCursor();
+	void checkViewFrame(uint view, uint loop, uint frame);
 
 	void runTextScript(ccInstance *instance, const Common::String &name,
 		const Common::Array<uint32> &params = Common::Array<uint32>());
@@ -176,6 +175,8 @@ public:
 	void invalidateScreen() { _needsUpdate = true; }
 	void invalidateGUI() { _guiNeedsUpdate = true; }
 
+	Room *getCurrentRoom() { return _currentRoom; }
+
 	GameFile *_gameFile;
 	class GameState *_state;
 	class AGSAudio *_audio;
@@ -186,6 +187,8 @@ private:
 	const AGSGameDescription *_gameDescription;
 
 	Common::RandomSource *_rnd;
+
+	AGSGraphics *_graphics;
 
 	uint32 _engineStartTime;
 	uint32 _playTime;
@@ -199,22 +202,15 @@ private:
 	uint16 _textMultiply;
 	bool _forceLetterbox;
 
-	byte _palette[256 * 3];
-
 	ResourceManager *_resourceMan;
 	SpriteSet *_sprites;
 
 	bool _needsUpdate, _guiNeedsUpdate;
 	uint32 _cursorMode;
 
-	Sprite *_cursorSprite;
-	bool _alphaBlendCursor;
-	uint32 _currentCursor;
-	uint32 _mouseFrame, _mouseDelay;
-
 	uint32 _startingRoom;
 	uint32 _displayedRoom;
-	class Room *_currentRoom;
+	Room *_currentRoom;
 
 	// new room state (this frame)
 	NewRoomState _inNewRoomState;
