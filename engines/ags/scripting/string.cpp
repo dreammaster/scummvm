@@ -337,14 +337,17 @@ RuntimeValue Script_StrGetCharAt(AGSEngine *vm, ScriptObject *, const Common::Ar
 // String function.
 RuntimeValue Script_StrSetCharAt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *string = (ScriptString *)params[0]._object;
-	UNUSED(string);
-	int position = params[1]._signedValue;
-	UNUSED(position);
-	int newChar = params[2]._signedValue;
-	UNUSED(newChar);
+	uint position = params[1]._value;
+	uint newChar = params[2]._value;
 
-	// FIXME
-	error("StrSetCharAt unimplemented");
+	Common::String realString = string->getString();
+	if (position > realString.size())
+		error("StrSetCharAt: position %d is beyond string length %d", position, realString.size());
+	else if (position == realString.size())
+		realString = realString + (char)newChar;
+	else
+		realString.setChar((char)newChar, position);
+	string->setString(realString);
 
 	return RuntimeValue();
 }
@@ -377,14 +380,19 @@ RuntimeValue Script_StrToUpperCase(AGSEngine *vm, ScriptObject *, const Common::
 // String function.
 RuntimeValue Script_StrContains(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *haystack = (ScriptString *)params[0]._object;
-	UNUSED(haystack);
 	ScriptString *needle = (ScriptString *)params[1]._object;
-	UNUSED(needle);
 
-	// FIXME
-	error("StrContains unimplemented");
+	Common::String haystackString = haystack->getString();
+	Common::String needleString = needle->getString();
+	haystackString.toLowercase();
+	needleString.toLowercase();
 
-	return RuntimeValue();
+	const char *haystackBuf = haystackString.c_str();
+	const char *offset = strstr(haystackBuf, needleString.c_str());
+	if (offset == NULL)
+		return RuntimeValue(-1);
+	else
+		return (uint)(offset - haystackBuf);
 }
 
 // import int StringToInt(const string)
@@ -420,7 +428,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "StrCaseComp", (ScriptAPIFunction *)&Script_StrCaseComp, "ss", sotNone },
 	{ "StrComp", (ScriptAPIFunction *)&Script_StrComp, "ss", sotNone },
 	{ "StrCopy", (ScriptAPIFunction *)&Script_StrCopy, "ss", sotNone },
-	{ "StrFormat", (ScriptAPIFunction *)&Script_StrFormat, "ss", sotNone },
+	{ "StrFormat", (ScriptAPIFunction *)&Script_StrFormat, "ss.", sotNone },
 	{ "StrLen", (ScriptAPIFunction *)&Script_StrLen, "s", sotNone },
 	{ "StrGetCharAt", (ScriptAPIFunction *)&Script_StrGetCharAt, "si", sotNone },
 	{ "StrSetCharAt", (ScriptAPIFunction *)&Script_StrSetCharAt, "sii", sotNone },
