@@ -32,6 +32,8 @@
 namespace AGS {
 
 struct InventoryItem : public ScriptObject {
+	bool isOfType(ScriptObjectType objectType) { return (objectType == sotInventoryItem); }
+
 	Common::String _name;
 	uint32 _pic;
 	uint32 _cursorPic;

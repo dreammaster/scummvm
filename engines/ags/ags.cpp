@@ -274,19 +274,28 @@ void AGSEngine::setupPlayerCharacter(uint32 charId) {
 void AGSEngine::createGlobalScript() {
 	assert(_scriptModules.empty());
 
+	_scriptState->addSystemObjectImport("dialog", new ScriptObjectArray<DialogTopic>(_gameFile->_dialogs, 8));
+	for (uint i = 0; i < _gameFile->_dialogs.size(); ++i)
+		_scriptState->addSystemObjectImport(_gameFile->_dialogs[i]._name, &_gameFile->_dialogs[i]);
+
+	_audio->registerScriptObjects();
+
 	for (uint i = 0; i < _gameFile->_scriptModules.size(); ++i) {
+		debug(3, "creating instance for script module %d", i);
 		// create an instance for the script module
 		_scriptModules.push_back(new ccInstance(this, _gameFile->_scriptModules[i], true));
 		// fork an instance for repeatedly_execute_always to run in
 		_scriptModuleForks.push_back(new ccInstance(this, _gameFile->_scriptModules[i], true, _scriptModules[i]));
 	}
 
+	debug(3, "creating instance for game script");
 	// create an instance for the game script
 	_gameScript = new ccInstance(this, _gameFile->_gameScript, true);
 	// fork an instance for repeatedly_execute_always to run in
 	_gameScriptFork = new ccInstance(this, _gameFile->_gameScript, true, _gameScript);
 
 	if (_gameFile->_dialogScriptsScript) {
+		debug(3, "creating instance for dialog scripts");
 		// create an instance for the 3.1.1+ dialog scripts if present
 		_dialogScriptsScript = new ccInstance(this, _gameFile->_dialogScriptsScript, true);
 	}
@@ -841,6 +850,11 @@ bool AGSEngine::init() {
 		if (group._name.empty())
 			continue;
 		_scriptState->addSystemObjectImport(group._name, &group);
+		for (uint j = 0; j < group._controls.size(); ++j) {
+			if (group._controls[j]->_scriptName.empty())
+				continue;
+			_scriptState->addSystemObjectImport(group._controls[j]->_scriptName, group._controls[j]);
+		}
 	}
 	_scriptState->addSystemObjectImport("inventory", new ScriptObjectArray<InventoryItem>(_gameFile->_invItemInfo, 68));
 	for (uint i = 0; i < _gameFile->_invItemInfo.size(); ++i) {
