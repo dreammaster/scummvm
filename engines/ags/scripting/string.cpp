@@ -42,13 +42,11 @@ RuntimeValue Script_String_Format(AGSEngine *vm, ScriptObject *, const Common::A
 // String: import static bool IsNullOrEmpty(String stringToCheck)
 // Checks whether the supplied string is null or empty.
 RuntimeValue Script_String_IsNullOrEmpty(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
+	if (params[0]._value == 0)
+		return 1;
+
 	ScriptString *stringToCheck = (ScriptString *)params[0]._object;
-	UNUSED(stringToCheck);
-
-	// FIXME
-	error("String::IsNullOrEmpty unimplemented");
-
-	return RuntimeValue();
+	return stringToCheck->getString().empty();
 }
 
 // String: import String Append(const string appendText)
@@ -257,22 +255,16 @@ RuntimeValue Script_String_geti_Chars(AGSEngine *vm, ScriptString *self, const C
 // String: readonly import attribute int Length
 // Returns the length of the string.
 RuntimeValue Script_String_get_Length(AGSEngine *vm, ScriptString *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("String::get_Length unimplemented");
-
-	return RuntimeValue();
+	return self->getString().size();
 }
 
 // import void StrCat(string main, const string newbit)
 // String function.
 RuntimeValue Script_StrCat(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *main = (ScriptString *)params[0]._object;
-	UNUSED(main);
 	ScriptString *newbit = (ScriptString *)params[1]._object;
-	UNUSED(newbit);
 
-	// FIXME
-	error("StrCat unimplemented");
+	main->setString(main->getString() + newbit->getString());
 
 	return RuntimeValue();
 }
@@ -281,40 +273,27 @@ RuntimeValue Script_StrCat(AGSEngine *vm, ScriptObject *, const Common::Array<Ru
 // String function.
 RuntimeValue Script_StrCaseComp(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *str1 = (ScriptString *)params[0]._object;
-	UNUSED(str1);
 	ScriptString *str2 = (ScriptString *)params[1]._object;
-	UNUSED(str2);
 
-	// FIXME
-	error("StrCaseComp unimplemented");
-
-	return RuntimeValue();
+	return str1->getString().compareToIgnoreCase(str2->getString());
 }
 
 // import int StrComp(const string str1, const string str2)
 // String function.
 RuntimeValue Script_StrComp(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *str1 = (ScriptString *)params[0]._object;
-	UNUSED(str1);
 	ScriptString *str2 = (ScriptString *)params[1]._object;
-	UNUSED(str2);
 
-	// FIXME
-	error("StrComp unimplemented");
-
-	return RuntimeValue();
+	return str1->getString().compareTo(str2->getString());
 }
 
 // import void StrCopy(string dest, const string source)
 // String function.
 RuntimeValue Script_StrCopy(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *dest = (ScriptString *)params[0]._object;
-	UNUSED(dest);
 	ScriptString *source = (ScriptString *)params[1]._object;
-	UNUSED(source);
 
-	// FIXME
-	error("StrCopy unimplemented");
+	dest->setString(source->getString());
 
 	return RuntimeValue();
 }
@@ -337,26 +316,21 @@ RuntimeValue Script_StrFormat(AGSEngine *vm, ScriptObject *, const Common::Array
 // String function.
 RuntimeValue Script_StrLen(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *string = (ScriptString *)params[0]._object;
-	UNUSED(string);
 
-	// FIXME
-	error("StrLen unimplemented");
-
-	return RuntimeValue();
+	return string->getString().size();
 }
 
 // import int StrGetCharAt (const string, int position)
 // String function.
 RuntimeValue Script_StrGetCharAt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *string = (ScriptString *)params[0]._object;
-	UNUSED(string);
-	int position = params[1]._signedValue;
-	UNUSED(position);
+	uint position = params[1]._value;
 
-	// FIXME
-	error("StrGetCharAt unimplemented");
+	const Common::String realString = string->getString();
+	if (position >= realString.size())
+		return 0;
 
-	return RuntimeValue();
+	return (uint)realString[position];
 }
 
 // import void StrSetCharAt (string, int position, int newChar)
@@ -379,10 +353,10 @@ RuntimeValue Script_StrSetCharAt(AGSEngine *vm, ScriptObject *, const Common::Ar
 // String function.
 RuntimeValue Script_StrToLowerCase(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *string = (ScriptString *)params[0]._object;
-	UNUSED(string);
 
-	// FIXME
-	error("StrToLowerCase unimplemented");
+	Common::String realString = string->getString();
+	realString.toLowercase();
+	string->setString(realString);
 
 	return RuntimeValue();
 }
@@ -417,17 +391,13 @@ RuntimeValue Script_StrContains(AGSEngine *vm, ScriptObject *, const Common::Arr
 // Undocumented.
 RuntimeValue Script_StringToInt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *string = (ScriptString *)params[0]._object;
-	UNUSED(string);
 
-	// FIXME
-	error("StringToInt unimplemented");
-
-	return RuntimeValue();
+	return atoi(string->getString().c_str());
 }
 
 static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "String::Format^101", (ScriptAPIFunction *)&Script_String_Format, "s", sotNone },
-	{ "String::IsNullOrEmpty^1", (ScriptAPIFunction *)&Script_String_IsNullOrEmpty, "s", sotNone },
+	{ "String::IsNullOrEmpty^1", (ScriptAPIFunction *)&Script_String_IsNullOrEmpty, "t", sotNone },
 	{ "String::Append^1", (ScriptAPIFunction *)&Script_String_Append, "s", sotString },
 	{ "String::AppendChar^1", (ScriptAPIFunction *)&Script_String_AppendChar, "c", sotString },
 	{ "String::CompareTo^2", (ScriptAPIFunction *)&Script_String_CompareTo, "si", sotString },
