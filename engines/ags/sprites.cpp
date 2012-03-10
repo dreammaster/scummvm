@@ -142,12 +142,14 @@ bool SpriteSet::loadSpriteIndexFile(uint32 spriteFileID) {
 		return false;
 	}
 
+	debug(3, "reading sprite information from index file");
+
 	for (uint i = 0; i < spriteCount; ++i)
 		_spriteInfo[i]._width = idxStream->readUint16LE();
 	for (uint i = 0; i < spriteCount; ++i)
 		_spriteInfo[i]._height = idxStream->readUint16LE();
 	for (uint i = 0; i < spriteCount; ++i) {
-		_spriteInfo[i]._offset = idxStream->readUint16LE();
+		_spriteInfo[i]._offset = idxStream->readUint32LE();
 		if (_spriteInfo[i]._offset >= (uint32)_stream->size())
 			error("corrupt sprite index file");
 	}
@@ -159,6 +161,10 @@ bool SpriteSet::loadSpriteIndexFile(uint32 spriteFileID) {
 Graphics::Surface *SpriteSet::getSprite(uint32 spriteId) {
 	if (spriteId >= _spriteInfo.size())
 		error("SpriteSet::getSprite: sprite id %d is too high", spriteId);
+
+	// convert non-existant sprites to the big blue cup
+	if (_spriteInfo[spriteId]._offset == 0)
+		spriteId = 0;
 
 	_stream->seek(_spriteInfo[spriteId]._offset);
 	uint16 colorDepth = _stream->readUint16LE();
@@ -173,11 +179,11 @@ Graphics::Surface *SpriteSet::getSprite(uint32 spriteId) {
 	case 2:
 		format = Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0);
 		break;
-	case 3:
-		format = Graphics::PixelFormat(3, 8, 8, 8, 0, 16, 8, 0, 0);
+	case 4:
+		format = Graphics::PixelFormat(4, 8, 8, 8, 8, 24, 16, 8, 0);
 		break;
 	default:
-		error("SpriteSet::getSprite: invalid sprite depth %d", spriteId);
+		error("SpriteSet::getSprite: invalid sprite depth %d", colorDepth);
 	}
 
 	_spriteInfo[spriteId]._width = _stream->readUint16LE();
@@ -193,8 +199,11 @@ Graphics::Surface *SpriteSet::getSprite(uint32 spriteId) {
 			unpackSpriteBits(_stream, (byte *)surface->getPixels(), surface->w * surface->h);
 			break;
 		case 2:
-		case 3:
-			error("high-depth sprites unimplemented"); // FIXME: !!!
+			unpackSpriteBits16(_stream, (uint16 *)surface->getPixels(), surface->w * surface->h);
+			break;
+		case 4:
+			unpackSpriteBits32(_stream, (uint32 *)surface->getPixels(), surface->w * surface->h);
+			break;
 		}
 	} else {
 		_stream->read((byte *)surface->getPixels(), surface->w * surface->h * colorDepth);
@@ -230,5 +239,59 @@ void unpackSpriteBits(Common::SeekableReadStream *stream, byte *dest, uint32 siz
 		}
 	}
 }
+
+void unpackSpriteBits16(Common::SeekableReadStream *stream, uint16 *dest, uint32 size) {
+	uint32 offset = 0;
+
+	while (!stream->eos() && (offset < size)) {
+		signed char n = (signed char)stream->readByte();
+
+		if (n == -128)
+			n = 0;
+
+		if (n < 0) {
+			// run of a single pixel
+			uint32 count = 1 - n;
+			uint16 data = stream->readUint16LE();
+			while (count-- && (offset < size)) {
+				dest[offset++] = data;
+			}
+		} else {
+			// run of non-encoded pixels
+			uint32 count = 1 + n;
+			while (count-- && (offset < size)) {
+				dest[offset++] = stream->readUint16LE();
+			}
+		}
+	}
+}
+
+void unpackSpriteBits32(Common::SeekableReadStream *stream, uint32 *dest, uint32 size) {
+	uint32 offset = 0;
+
+	while (!stream->eos() && (offset < size)) {
+		signed char n = (signed char)stream->readByte();
+
+		if (n == -128)
+			n = 0;
+
+		if (n < 0) {
+			// run of a single pixel
+			uint32 count = 1 - n;
+			uint32 data = stream->readUint32LE();
+			while (count-- && (offset < size)) {
+				dest[offset++] = data;
+			}
+		} else {
+			// run of non-encoded pixels
+			uint32 count = 1 + n;
+			while (count-- && (offset < size)) {
+				dest[offset++] = stream->readUint32LE();
+			}
+		}
+	}
+}
+
+
 
 } // End of namespace AGS
