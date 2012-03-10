@@ -544,6 +544,8 @@ void ccInstance::runCodeFrom(uint32 start) {
 		// temporary variables
 		RuntimeValue tempVal;
 		ScriptObject *tempObj;
+		uint32 *fixup;
+		ccScript *instScript;
 		Common::Array<RuntimeValue> params;
 
 		switch (instruction) {
@@ -600,7 +602,25 @@ void ccInstance::runCodeFrom(uint32 start) {
 			switch (tempVal._type) {
 			case rvtScriptData:
 				// FIXME: bounds checks
-				_registers[int1] = READ_LE_UINT32(&(*tempVal._instance->_globalData)[tempVal._value]);
+				instScript = tempVal._instance->_script;
+				if (instScript->_globalObjects.contains(tempVal._value)) {
+					// resolves to an object
+					_registers[int1] = instScript->_globalObjects[tempVal._value];
+					break;
+				}
+				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
+				if (fixup != instScript->_globalFixups.end()) {
+					// resolves to another pointer
+					_registers[int1] = *fixup;
+					_registers[int1]._type = rvtScriptData;
+					_registers[int1]._instance = tempVal._instance;
+				} else
+					_registers[int1] = READ_LE_UINT32(&(*tempVal._instance->_globalData)[tempVal._value]);
+				break;
+			case rvtSystemObject:
+				// FIXME: !!!
+				warning("script tried to MEMREAD from system object (value %d) on line %d",
+					tempVal._value, _lineNumber);
 				break;
 			case rvtStackPointer:
 				if (tempVal._value + 4 >= _stack.size())
@@ -619,11 +639,25 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_MEMWRITE:
 			// m[MAR] = reg1
 			tempVal = _registers[SREG_MAR];
-			// FIXME: make sure it's an int?
 			switch (tempVal._type) {
 			case rvtScriptData:
 				// FIXME: bounds checks
-				WRITE_LE_UINT32(&tempVal._instance->_globalData[tempVal._value], _registers[int1]._value);
+				instScript = tempVal._instance->_script;
+				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
+				// FIXME: *wrong*, this should be a pointer?
+				// FIXME	argVal[v]._value = (*inst->_globalData)[argValue];
+				if (fixup != instScript->_globalFixups.end())
+					error("MEMWRITE fixup fail");
+				if (_registers[int1]._type == rvtSystemObject) {
+					// writing an object to script global data
+					WRITE_LE_UINT32(&(*tempVal._instance->_globalData)[tempVal._value], 0);
+					instScript->_globalObjects[tempVal._value] = _registers[int1];
+					break;
+				}
+				if (_registers[int1]._type != rvtInteger)
+					error("script tried to MEMWRITE runtime value of type %d (value %d) on line %d",
+						_registers[int1]._type, _registers[int1]._value, _lineNumber);
+				WRITE_LE_UINT32(&(*tempVal._instance->_globalData)[tempVal._value], _registers[int1]._value);
 				break;
 			case rvtSystemObject:
 				// FIXME: !!!
@@ -760,8 +794,32 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_MEMREADW:
 			// reg1 = m[MAR] (2 bytes)
-			// FIXME
-			error("unimplemented %s", info.name);
+			tempVal = _registers[SREG_MAR];
+			// FIXME: other cases
+			switch (tempVal._type) {
+			case rvtScriptData:
+				// FIXME: bounds checks
+				instScript = tempVal._instance->_script;
+				if (instScript->_globalObjects.contains(tempVal._value))
+					error("script tried MEMREADW on object on line %d", _lineNumber);
+				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
+				if (fixup != instScript->_globalFixups.end())
+					error("script tried MEMREADW on fixup on line %d", _lineNumber);
+				_registers[int1] = READ_LE_UINT16(&(*tempVal._instance->_globalData)[tempVal._value]);
+				break;
+			case rvtStackPointer:
+				if (tempVal._value + 2 >= _stack.size())
+					error("script tried to MEMREADW from out-of-bounds stack@%d on line %d",
+						tempVal._value, _lineNumber);
+				if (_stack[tempVal._value]._type == rvtInvalid)
+					error("script tried to MEMREADW from invalid stack@%d on line %d",
+						tempVal._value, _lineNumber);
+				_registers[int1] = _stack[tempVal._value];
+				break;
+			default:
+				error("script tried to MEMREADW from runtime value of type %d (value %d) on line %d",
+					tempVal._type, tempVal._value, _lineNumber);
+			}
 			break;
 		case SCMD_MEMWRITEB:
 			// m[MAR] = reg1 (1 byte)
@@ -770,8 +828,31 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_MEMWRITEW:
 			// m[MAR] = reg1 (2 bytes)
-			// FIXME
-			error("unimplemented %s", info.name);
+			tempVal = _registers[SREG_MAR];
+			// FIXME: make sure it's an int?
+			if (_registers[int1]._type != rvtInteger)
+				error("script tried to MEMWRITEW runtime value of type %d (value %d) on line %d",
+					_registers[int1]._type, _registers[int1]._value, _lineNumber);
+			// FIXME: other cases
+			switch (tempVal._type) {
+			case rvtScriptData:
+				// FIXME: bounds checks
+				instScript = tempVal._instance->_script;
+				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
+				if (fixup != instScript->_globalFixups.end())
+					error("script tried MEMWRITEW on fixup on %d", _lineNumber);
+				WRITE_LE_UINT16(&(*tempVal._instance->_globalData)[tempVal._value], _registers[int1]._value);
+				break;
+			case rvtStackPointer:
+				if (tempVal._value + 2 >= _stack.size())
+					error("script tried to MEMWRITEW to out-of-bounds stack@%d on line %d",
+						tempVal._value, _lineNumber);
+				_stack[tempVal._value] = _registers[int1];
+				break;
+			default:
+				error("script tried to MEMWRITEW to runtime value of type %d (value %d) on line %d",
+					tempVal._type, tempVal._value, _lineNumber);
+			}
 			break;
 		case SCMD_JZ:
 			// jump if ax==0 by arg1
@@ -809,7 +890,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 			if (_registers[int1]._type != rvtInteger)
 				error("script error: checkbounds got value of type %d (not integer)", _registers[int1]._type);
 			if (_registers[int1]._value >= (uint32)int2)
-				error("script error: checkbounds value %d was not in range to %d", _registers[int1]._value, int2);
+				error("script error: checkbounds value %d was not in range 0 to %d", _registers[int1]._value, int2);
 			break;
 		case SCMD_DYNAMICBOUNDS:
 			// check reg1 is between 0 and m[MAR-4]
@@ -819,18 +900,21 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_MEMREADPTR:
 			// reg1 = m[MAR] (adjust ptr addr)
 			tempObj = getObjectFrom(_registers[SREG_MAR]);
-			if (!tempObj)
-				error("script tried to MEMREADPTR using runtime value of type %d (value %d) on line %d",
-					_registers[SREG_MAR]._type, _registers[SREG_MAR]._value, _lineNumber);
-			_registers[int1] = tempObj;
+			if (tempObj)
+				_registers[int1] = tempObj;
+			else
+				_registers[int1] = 0;
 			break;
 		case SCMD_MEMWRITEPTR:
 			// m[MAR] = reg1 (adjust ptr addr)
-			tempObj = getObjectFrom(_registers[int1]);
-			if (!tempObj)
-				error("script tried to MEMWRITEPTR using runtime value of type %d (value %d) on line %d",
-					_registers[int1]._type, _registers[int1]._value, _lineNumber);
-			_registers[SREG_MAR] = tempObj;
+			tempObj = NULL;
+			if (_registers[int1]._type != rvtInteger || _registers[int1]._value != 0) {
+				tempObj = getObjectFrom(_registers[int1]);
+				if (!tempObj)
+					error("script tried to MEMWRITEPTR using runtime value of type %d (value %d) on line %d",
+						_registers[int1]._type, _registers[int1]._value, _lineNumber);
+			}
+			writePointer(_registers[SREG_MAR], tempObj);
 			break;
 		case SCMD_MEMINITPTR:
 			// m[MAR] = reg1 (but don't free old one)
@@ -838,24 +922,22 @@ void ccInstance::runCodeFrom(uint32 start) {
 			if (!tempObj)
 				error("script tried to MEMINITPTR using runtime value of type %d (value %d) on line %d",
 					_registers[int1]._type, _registers[int1]._value, _lineNumber);
-			_registers[SREG_MAR] = tempObj;
+			writePointer(_registers[SREG_MAR], tempObj);
 			break;
 		case SCMD_MEMZEROPTR:
 			// m[MAR] = 0    (blank ptr)
 			// FIXME
 			_registers[SREG_MAR] = 0;
-			warning("unimplemented %s", info.name);
 			break;
 		case SCMD_MEMZEROPTRND:
 			// m[MAR] = 0    (blank ptr, no dispose if = ax)
 			// FIXME
 			_registers[SREG_MAR] = 0;
-			warning("unimplemented %s", info.name);
 			break;
 		case SCMD_CHECKNULL:
 			// error if MAR==0
-			// FIXME
-			error("unimplemented %s", info.name);
+			if (_registers[SREG_MAR]._type != rvtSystemObject && _registers[SREG_MAR]._value == 0)
+				error("script tried to dereference null pointer on line %d", _lineNumber);
 			break;
 		case SCMD_CHECKNULLREG:
 			// error if reg1 == NULL
@@ -925,12 +1007,12 @@ void ccInstance::runCodeFrom(uint32 start) {
 			if (nextCallNeedsObject) {
 				// FIXME: resolve array here?
 				if (_registers[SREG_OP]._type != rvtSystemObject)
-					error("script tried to CALLOBJ non-system-object runtime value of type %d (value %d) on line %d",
+					error("script tried to CALLEXT on non-system-object runtime value of type %d (value %d) on line %d",
 						tempVal._type, tempVal._value, _lineNumber);
 				uint32 offset = _registers[SREG_OP]._value;
 				ScriptObject *object = _registers[SREG_OP]._object->getObjectAt(offset);
 				if (offset != 0)
-					error("script tried to CALLOBJ system-object with offset %d (resolved to %d) on line %d",
+					error("script tried to CALLEXT on system-object with offset %d (resolved to %d) on line %d",
 						_registers[SREG_OP]._value, offset, _lineNumber);
 
 				RuntimeValue objValue(object);
@@ -967,6 +1049,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 			// $callobj: next call is member function of reg1
 			nextCallNeedsObject = true;
 			// set the OP register
+			// (we don't check for validity here because the next call might not be CALLEXT)
 			_registers[SREG_OP] = _registers[int1];
 			break;
 		case SCMD_SHIFTLEFT:
@@ -1163,9 +1246,16 @@ protected:
 ScriptString *ccInstance::createStringFrom(RuntimeValue &value) {
 	if (value._type == rvtStackPointer)
 		return new ScriptStackString(this, value._value);
-	else if (value._type == rvtScriptData)
+	else if (value._type == rvtScriptData) {
+		ccScript *script = value._instance->_script;
+		uint32 *fixup;
+		fixup = Common::find(script->_globalFixups.begin(), script->_globalFixups.end(), value._value);
+		// FIXME: *wrong*, this should be a pointer?
+		// FIXME	argVal[v]._value = (*inst->_globalData)[argValue];
+		if (fixup != script->_globalFixups.end())
+			error("string fixup fail");
 		return new ScriptDataString(value._instance, value._value);
-	else if (value._type == rvtSystemObject && value._object->isOfType(sotString)) {
+	} else if (value._type == rvtSystemObject && value._object->isOfType(sotString)) {
 		ScriptString *string = (ScriptString *)value._object;
 		return new ScriptMutableString(string->getString());
 	}
@@ -1185,18 +1275,27 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 		char sigEntry = function->signature[pos];
 		switch (sigEntry) {
 		case 'i':
+			// integer
 			if (params[pos]._type != rvtInteger)
 				error("expected integer for param %d of '%s', got type %d", pos + 1, function->name, params[pos]._type);
 			break;
 		case 'f':
+			// float
 			if (params[pos]._type != rvtFloat)
 				error("expected float for param %d of '%s', got type %d", pos + 1, function->name, params[pos]._type);
 			break;
 		case 'o':
+			// object
 			if (params[pos]._type != rvtSystemObject)
 				error("expected object for param %d of '%s', got type %d", pos + 1, function->name, params[pos]._type);
 			break;
+		case 't':
+			// string OR null
+			if (params[pos]._type == rvtInteger && params[pos]._value == 0)
+				break;
+			// (fallthrough)
 		case 's':
+			// string
 			if (params[pos]._type == rvtStackPointer || params[pos]._type == rvtScriptData) {
 				params[pos] = createStringFrom(params[pos]);
 				params[pos]._object->DecRef();
@@ -1266,14 +1365,83 @@ uint32 ccInstance::popIntValue() {
 
 ScriptObject *ccInstance::getObjectFrom(const RuntimeValue &value) {
 	switch (value._type) {
+	case rvtScriptData:
+		ccScript *instScript;
+		uint32 *fixup;
+		instScript = value._instance->_script;
+		if (instScript->_globalObjects.contains(value._value))
+			return getObjectFrom(instScript->_globalObjects[value._value]);
+
+		// no object, might still have a null pointer?
+		fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), value._value);
+		if (fixup != instScript->_globalFixups.end())
+			error("getObjectFrom got fixup for data@%d on line %d", value._value, _lineNumber);
+		// FIXME: bounds check
+		uint32 val;
+		val = READ_LE_UINT32(&(*value._instance->_globalData)[value._value]);
+		if (val == 0)
+			return NULL;
+		else
+			error("script tried to get object using global data (offset %d) on line %d",
+				value._value, _lineNumber);
 	case rvtSystemObject:
 		return value._object;
 	case rvtStackPointer:
-		if (value._value >= _stack.size())
+		if (value._value + 4 > _stack.size())
+			error("script tried to get object from beyond the end of the stack (value %d) on line %d",
+				value._value, _lineNumber);
+		if (_stack[value._value]._type == rvtSystemObject)
+			return _stack[value._value]._object;
+		else if (_stack[value._value]._type == rvtInteger && _stack[value._value]._value == 0)
 			return NULL;
-		return getObjectFrom(_stack[value._value]);
+		else
+			error("script tried to get object using stack (offset %d) on line %d",
+				value._value, _lineNumber);
 	default:
-		return NULL;
+		error("script tried to get object using runtime value of type %d (value %d) on line %d",
+			value._type, value._value, _lineNumber);
+	}
+}
+
+void ccInstance::writePointer(const RuntimeValue &value, ScriptObject *object) {
+	ccScript *instScript;
+	uint32 *fixup;
+	switch (value._type) {
+	case rvtScriptData:
+		// FIXME: bounds checks
+		instScript = value._instance->_script;
+		fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), value._value);
+		// FIXME: *wrong*, this should be a pointer?
+		// FIXME	argVal[v]._value = (*inst->_globalData)[argValue];
+		if (fixup != instScript->_globalFixups.end())
+			error("writePointer fixup fail");
+		// writing an object to script global data
+		WRITE_LE_UINT32(&(*value._instance->_globalData)[value._value], 0);
+		if (object)
+			instScript->_globalObjects[value._value] = object;
+		else
+			instScript->_globalObjects.erase(value._value);
+		break;
+	case rvtSystemObject:
+		// FIXME: !!!
+		error("script tried to writePointer to system object (value %d) on line %d",
+			value._value, _lineNumber);
+		break;
+	case rvtStackPointer:
+		if (value._value + 4 >= _stack.size())
+			error("script tried to writePointer to out-of-bounds stack@%d on line %d",
+				value._value, _lineNumber);
+		if (object)
+			_stack[value._value] = object;
+		else
+			_stack[value._value] = 0;
+		_stack[value._value + 1]._type = rvtInvalid;
+		_stack[value._value + 2]._type = rvtInvalid;
+		_stack[value._value + 3]._type = rvtInvalid;
+		break;
+	default:
+		error("script tried to writePointer to runtime value of type %d (value %d) on line %d",
+			value._type, value._value, _lineNumber);
 	}
 }
 
