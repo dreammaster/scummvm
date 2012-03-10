@@ -168,6 +168,7 @@ public:
 	void setDefaultCursor();
 	uint32 findNextEnabledCursor(uint32 startWith);
 	void setCursorMode(uint32 newMode);
+	uint32 getCursorMode() { return _cursorMode; }
 
 	void checkViewFrame(uint view, uint loop, uint frame);
 
