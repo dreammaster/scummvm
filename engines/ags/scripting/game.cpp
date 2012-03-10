@@ -25,6 +25,7 @@
 
 #include "common/debug.h"
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
 
 namespace AGS {
@@ -147,17 +148,19 @@ RuntimeValue Script_Game_GetSaveSlotDescription(AGSEngine *vm, ScriptObject *, c
 // Game: import static ViewFrame* GetViewFrame(int view, int loop, int frame)
 // Gets the ViewFrame instance for the specified view frame.
 RuntimeValue Script_Game_GetViewFrame(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int view = params[0]._signedValue;
-	UNUSED(view);
-	int loop = params[1]._signedValue;
-	UNUSED(loop);
-	int frame = params[2]._signedValue;
-	UNUSED(frame);
+	uint viewId = params[0]._value;
+	uint loopId = params[1]._value;
+	uint frameId = params[2]._value;
 
-	// FIXME
-	error("Game::GetViewFrame unimplemented");
+	if (viewId == 0 || viewId - 1 >= vm->_gameFile->_views.size())
+		error("Game::GetViewFrame: view %d is invalid or too high (only have %d)", viewId, vm->_gameFile->_views.size());
+	if (loopId >= vm->_gameFile->_views[viewId - 1]._loops.size())
+		error("Game::GetViewFrame: loop %d is too high (only have %d)", loopId, vm->_gameFile->_views[viewId - 1]._loops.size());
 
-	return RuntimeValue();
+	ViewLoopNew &loop = vm->_gameFile->_views[viewId - 1]._loops[loopId];
+	if (frameId >= loop._frames.size())
+		error("Game::GetViewFrame: frame %d is too high (only have %d)", frameId, loop._frames.size());
+	return &loop._frames[frameId];
 }
 
 // Game: import static String InputBox(const string prompt)
@@ -253,10 +256,7 @@ RuntimeValue Script_Game_StopSound(AGSEngine *vm, ScriptObject *, const Common::
 // Game: readonly import static attribute int CharacterCount
 // Gets the number of characters in the game.
 RuntimeValue Script_Game_get_CharacterCount(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Game::get_CharacterCount unimplemented");
-
-	return RuntimeValue();
+	return vm->_characters.size();
 }
 
 // Game: readonly import static attribute int DialogCount
@@ -402,20 +402,18 @@ RuntimeValue Script_Game_get_MouseCursorCount(AGSEngine *vm, ScriptObject *, con
 // Game: import static attribute String Name
 // Gets/sets the game name.
 RuntimeValue Script_Game_get_Name(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Game::get_Name unimplemented");
+	RuntimeValue ret = new ScriptConstString(vm->_state->_gameName);
 
-	return RuntimeValue();
+	ret._object->DecRef();
+	return ret;
 }
 
 // Game: import static attribute String Name
 // Gets/sets the game name.
 RuntimeValue Script_Game_set_Name(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *value = (ScriptString *)params[0]._object;
-	UNUSED(value);
 
-	// FIXME
-	error("Game::set_Name unimplemented");
+	vm->_state->_gameName = value->getString();
 
 	return RuntimeValue();
 }

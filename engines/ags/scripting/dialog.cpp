@@ -60,11 +60,9 @@ RuntimeValue Script_GetDialogOption(AGSEngine *vm, ScriptObject *, const Common:
 // import void RunDialog(int topic)
 // Undocumented.
 RuntimeValue Script_RunDialog(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int topic = params[0]._signedValue;
-	UNUSED(topic);
+	uint topic = params[0]._value;
 
-	// FIXME
-	error("RunDialog unimplemented");
+	vm->runDialog(topic);
 
 	return RuntimeValue();
 }
