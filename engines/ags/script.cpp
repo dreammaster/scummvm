@@ -609,13 +609,12 @@ void ccInstance::runCodeFrom(uint32 start) {
 					break;
 				}
 				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
+				_registers[int1] = READ_LE_UINT32(&(*tempVal._instance->_globalData)[tempVal._value]);
 				if (fixup != instScript->_globalFixups.end()) {
-					// resolves to another pointer
-					_registers[int1] = *fixup;
+					// this resolves to another offset!
 					_registers[int1]._type = rvtScriptData;
 					_registers[int1]._instance = tempVal._instance;
-				} else
-					_registers[int1] = READ_LE_UINT32(&(*tempVal._instance->_globalData)[tempVal._value]);
+				}
 				break;
 			case rvtSystemObject:
 				// FIXME: !!!
