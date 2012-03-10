@@ -426,7 +426,7 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 		uint oldEventBlockId = _eventBlockId;
 
 		NewInteraction *interaction = NULL;
-		// FIXME: 3.x scripts: InteractionScripts *scripts = NULL;
+		InteractionScript *scripts = NULL;
 
 		switch (event.data1) {
 		case kEventBlockHotspot:
@@ -434,8 +434,11 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 			_eventBlockBaseName = "hotspot%d";
 			_eventBlockId = event.data2;
 
-			// FIXME: hotspotScripts (3.x)
-			interaction = _currentRoom->_hotspots[event.data2]._interaction;
+			// 2.x vs 3.x
+			if (_currentRoom->_hotspots[event.data2]._interaction)
+				interaction = _currentRoom->_hotspots[event.data2]._interaction;
+			else
+				scripts = &_currentRoom->_hotspots[event.data2]._interactionScripts;
 			break;
 		case kEventBlockRoom:
 			debug(7, "running room interaction: event %d", event.data3);
@@ -444,16 +447,19 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 			if (event.data3 == kRoomEventEntersScreen)
 				_inEntersScreenCounter++;
 
-			// FIXME: roomScripts (3.x)
-			interaction = _currentRoom->_interaction;
+			// 2.x vs 3.x
+			if (_currentRoom->_interaction)
+				interaction = _currentRoom->_interaction;
+			else
+				scripts = &_currentRoom->_interactionScripts;
 			break;
 		default:
 			error("processGameEvent: unknown event block type %d", event.data1);
 		}
 
-		/*if (scripts) {
+		if (scripts) {
 			// FIXME: scripts (3.x)
-		} else */ if (interaction) {
+		} else if (interaction) {
 			runInteractionEvent(interaction, event.data3);
 		}
 

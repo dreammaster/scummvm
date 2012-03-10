@@ -60,7 +60,7 @@ struct RoomRegion : public ScriptObject {
 	RoomRegion() : _interaction(NULL), _lightLevel(0), _tintLevel(0) { }
 
 	NewInteraction *_interaction;
-	Common::Array<Common::String> *_scripts;
+	InteractionScript _interactionScripts;
 	uint16 _lightLevel;
 	uint32 _tintLevel;
 };
@@ -70,7 +70,7 @@ struct RoomObject : public ScriptObject, public Drawable {
 
 	// originally from room, immutable
 	NewInteraction *_interaction;
-	Common::Array<Common::String> *_scripts;
+	InteractionScript _interactionScripts;
 	Common::String _name;
 	Common::String _scriptName;
 	Common::StringMap _properties;
@@ -133,7 +133,7 @@ struct RoomHotspot : public ScriptObject {
 	Common::String _name;
 	Common::String _scriptName;
 	NewInteraction *_interaction;
-	Common::Array<Common::String> *_scripts;
+	InteractionScript _interactionScripts;
 	Common::StringMap _properties;
 };
 
@@ -203,7 +203,7 @@ public:
 	Common::Array<RoomHotspot> _hotspots;
 
 	NewInteraction *_interaction;
-	Common::String *_scripts;
+	InteractionScript _interactionScripts;
 	Common::Array<InteractionVariable> _localVars;
 
 	Common::String _script;
