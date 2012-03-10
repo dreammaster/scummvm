@@ -30,6 +30,15 @@
 
 namespace AGS {
 
+static GUIControl *getGUIControl(const char *funcName, AGSEngine *vm, uint guiId, uint objectId) {
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("%s: GUI %d is too high (only have %d)", funcName, guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
+	if (objectId >= group._controls.size())
+		error("%s: Control %d is too high (only have %d)", funcName, objectId, group._controls.size());
+	return group._controls[objectId];
+}
+
 // import void DisableInterface()
 // Disables the player interface and activates the Wait cursor.
 RuntimeValue Script_DisableInterface(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
@@ -51,34 +60,46 @@ RuntimeValue Script_EnableInterface(AGSEngine *vm, ScriptObject *, const Common:
 // import int IsInterfaceEnabled()
 // Checks whether the player interface is currently enabled.
 RuntimeValue Script_IsInterfaceEnabled(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("IsInterfaceEnabled unimplemented");
-
-	return RuntimeValue();
+	return (vm->_state->_disabledUserInterface > 0) ? 0 : 1;
 }
 
 // import void SetTextWindowGUI (int gui)
 // Changes the GUI used to render standard game text windows.
 RuntimeValue Script_SetTextWindowGUI(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
+
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("SetTextWindowGUI: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
 
 	// FIXME
+	UNUSED(group);
 	error("SetTextWindowGUI unimplemented");
 
 	return RuntimeValue();
 }
 
 // import int FindGUIID(const string)
-// Undocumented.
+// Return the ID of the GUI with the provided name.
+// Internal function used only in automatically-generated code.
 RuntimeValue Script_FindGUIID(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *string = (ScriptString *)params[0]._object;
-	UNUSED(string);
+	Common::String name = string->getString();
 
-	// FIXME
-	error("FindGUIID unimplemented");
+	const Common::Array<GUIGroup> &groups = vm->_gameFile->_guiGroups;
+	for (uint i = 0; i < groups.size(); ++i) {
+		// check for exact match
+		if (groups[i]._name == name)
+			return i;
 
-	return RuntimeValue();
+		// check for old-style match
+		if (groups[i]._name.empty() || groups[i]._name[0] != 'g')
+			continue;
+		if (groups[i]._name.equalsIgnoreCase('g' + name))
+			return i;
+	}
+
+	error("FindGUIID: Couldn't find a match for GUI '%s'", name.c_str());
 }
 
 // import void SetInvDimensions(int width, int height)
@@ -102,7 +123,7 @@ RuntimeValue Script_SetInvDimensions(AGSEngine *vm, ScriptObject *, const Common
 }
 
 // import int GetGUIAt (int x, int y)
-// Obsolete GUI function.
+// Returns the ID of the topmost enabled and clickable GUI at the given screen coordinates, or -1 if there isn't one.
 RuntimeValue Script_GetGUIAt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
 	UNUSED(x);
@@ -116,7 +137,8 @@ RuntimeValue Script_GetGUIAt(AGSEngine *vm, ScriptObject *, const Common::Array<
 }
 
 // import int GetGUIObjectAt (int x, int y)
-// Obsolete GUI function.
+// Returns the ID of the visible control at the given screen coordinates, or -1 if there isn't one.
+// (Note that this only works when GetGUIAt returns the GUI with the control in it.)
 RuntimeValue Script_GetGUIObjectAt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
 	UNUSED(x);
@@ -130,94 +152,118 @@ RuntimeValue Script_GetGUIObjectAt(AGSEngine *vm, ScriptObject *, const Common::
 }
 
 // import void InterfaceOn(int gui)
-// Obsolete GUI function.
+// Enable the specified GUI.
 RuntimeValue Script_InterfaceOn(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
+
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("InterfaceOn: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
 
 	// FIXME
-	error("InterfaceOn unimplemented");
+	UNUSED(group);
+	warning("InterfaceOn unimplemented");
 
 	return RuntimeValue();
 }
 
 // import void InterfaceOff(int gui)
-// Obsolete GUI function.
+// Disable the specified GUI.
 RuntimeValue Script_InterfaceOff(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
+
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("InterfaceOff: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
 
 	// FIXME
-	error("InterfaceOff unimplemented");
+	UNUSED(group);
+	warning("InterfaceOff unimplemented");
 
 	return RuntimeValue();
 }
 
 // import void SetGUIPosition(int gui, int x, int y)
-// Obsolete GUI function.
+// Set the position of the specified GUI.
 RuntimeValue Script_SetGUIPosition(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
 	int x = params[1]._signedValue;
 	UNUSED(x);
 	int y = params[2]._signedValue;
 	UNUSED(y);
 
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("SetGUIPosition: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
+
 	// FIXME
-	error("SetGUIPosition unimplemented");
+	UNUSED(group);
+	warning("SetGUIPosition unimplemented");
 
 	return RuntimeValue();
 }
 
 // import void SetGUISize(int gui, int width, int height)
-// Obsolete GUI function.
+// Set the size of the specified GUI.
 RuntimeValue Script_SetGUISize(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
 	int width = params[1]._signedValue;
 	UNUSED(width);
 	int height = params[2]._signedValue;
 	UNUSED(height);
 
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("SetGUISize: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
+
 	// FIXME
+	UNUSED(group);
 	error("SetGUISize unimplemented");
 
 	return RuntimeValue();
 }
 
 // import void CentreGUI(int gui)
-// Obsolete GUI function.
+// Move the specified GUI to the centre of the screen.
 RuntimeValue Script_CentreGUI(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
+
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("CentreGUI: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
 
 	// FIXME
+	UNUSED(group);
 	error("CentreGUI unimplemented");
 
 	return RuntimeValue();
 }
 
 // import int IsGUIOn (int gui)
-// Obsolete GUI function.
+// Returns whether the specified GUI is enabled.
 RuntimeValue Script_IsGUIOn(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
 
-	// FIXME
-	error("IsGUIOn unimplemented");
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("IsGUIOn: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
 
-	return RuntimeValue();
+	return (group._on >= 1) ? 1 : 0;
 }
 
 // import void SetGUIBackgroundPic (int gui, int spriteSlot)
-// Obsolete GUI function.
+// Set the background picture of the specified GUI.
 RuntimeValue Script_SetGUIBackgroundPic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
 	int spriteSlot = params[1]._signedValue;
 	UNUSED(spriteSlot);
 
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("SetGUIBackgroundPic: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
+
 	// FIXME
+	UNUSED(group);
 	error("SetGUIBackgroundPic unimplemented");
 
 	return RuntimeValue();
@@ -226,40 +272,52 @@ RuntimeValue Script_SetGUIBackgroundPic(AGSEngine *vm, ScriptObject *, const Com
 // import void SetGUITransparency(int gui, int amount)
 // Obsolete GUI function.
 RuntimeValue Script_SetGUITransparency(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
 	int amount = params[1]._signedValue;
 	UNUSED(amount);
 
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("SetGUITransparency: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
+
 	// FIXME
-	error("SetGUITransparency unimplemented");
+	UNUSED(group);
+	warning("SetGUITransparency unimplemented");
 
 	return RuntimeValue();
 }
 
 // import void SetGUIClickable(int gui, int clickable)
-// Obsolete GUI function.
+// Set whether clicks are enabled on the specified GUI.
 RuntimeValue Script_SetGUIClickable(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
 	int clickable = params[1]._signedValue;
-	UNUSED(clickable);
 
-	// FIXME
-	error("SetGUIClickable unimplemented");
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("SetGUIClickable: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
+
+	if (clickable)
+		group._flags &= ~GUIF_NOCLICK;
+	else
+		group._flags |= GUIF_NOCLICK;
 
 	return RuntimeValue();
 }
 
 // import void SetGUIZOrder(int gui, int z)
-// Obsolete GUI function.
+// Set the z-order value of the specified GUI.
 RuntimeValue Script_SetGUIZOrder(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
+	uint guiId = params[0]._value;
 	int z = params[1]._signedValue;
 	UNUSED(z);
 
+	if (guiId >= vm->_gameFile->_guiGroups.size())
+		error("SetGUIZOrder: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
+	GUIGroup &group = vm->_gameFile->_guiGroups[guiId];
+
 	// FIXME
+	UNUSED(group);
 	error("SetGUIZOrder unimplemented");
 
 	return RuntimeValue();
@@ -268,14 +326,15 @@ RuntimeValue Script_SetGUIZOrder(AGSEngine *vm, ScriptObject *, const Common::Ar
 // import void SetGUIObjectEnabled(int gui, int object, int enable)
 // Undocumented.
 RuntimeValue Script_SetGUIObjectEnabled(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint guiId = params[0]._value;
+	uint objectId = params[1]._value;
 	int enable = params[2]._signedValue;
 	UNUSED(enable);
 
+	GUIControl *control = getGUIControl("SetGUIObjectEnabled", vm, guiId, objectId);
+
 	// FIXME
+	UNUSED(control);
 	error("SetGUIObjectEnabled unimplemented");
 
 	return RuntimeValue();
@@ -284,16 +343,17 @@ RuntimeValue Script_SetGUIObjectEnabled(AGSEngine *vm, ScriptObject *, const Com
 // import void SetGUIObjectPosition(int gui, int object, int x, int y)
 // Undocumented.
 RuntimeValue Script_SetGUIObjectPosition(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint guiId = params[0]._value;
+	uint objectId = params[1]._value;
 	int x = params[2]._signedValue;
 	UNUSED(x);
 	int y = params[3]._signedValue;
 	UNUSED(y);
 
+	GUIControl *control = getGUIControl("SetGUIObjectPosition", vm, guiId, objectId);
+
 	// FIXME
+	UNUSED(control);
 	error("SetGUIObjectPosition unimplemented");
 
 	return RuntimeValue();
@@ -302,16 +362,17 @@ RuntimeValue Script_SetGUIObjectPosition(AGSEngine *vm, ScriptObject *, const Co
 // import void SetGUIObjectSize(int gui, int object, int width, int height)
 // Undocumented.
 RuntimeValue Script_SetGUIObjectSize(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint guiId = params[0]._value;
+	uint objectId = params[1]._value;
 	int width = params[2]._signedValue;
 	UNUSED(width);
 	int height = params[3]._signedValue;
 	UNUSED(height);
 
+	GUIControl *control = getGUIControl("SetGUIObjectSize", vm, guiId, objectId);
+
 	// FIXME
+	UNUSED(control);
 	error("SetGUIObjectSize unimplemented");
 
 	return RuntimeValue();
@@ -320,30 +381,37 @@ RuntimeValue Script_SetGUIObjectSize(AGSEngine *vm, ScriptObject *, const Common
 // import void SetLabelColor(int gui, int object, int colour)
 // Undocumented.
 RuntimeValue Script_SetLabelColor(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint guiId = params[0]._value;
+	uint objectId = params[1]._value;
 	int colour = params[2]._signedValue;
 	UNUSED(colour);
 
+	GUIControl *control = getGUIControl("SetLabelColor", vm, guiId, objectId);
+	if (!control->isOfType(sotGUILabel))
+		error("SetLabelColor: Control %d isn't a label.", objectId);
+	GUILabel *label = (GUILabel *)control;
+
 	// FIXME
+	UNUSED(label);
 	error("SetLabelColor unimplemented");
 
 	return RuntimeValue();
 }
 
 // import void SetLabelText(int gui, int object, const string text)
-// Undocumented.
+// Set the text of the specified label.
 RuntimeValue Script_SetLabelText(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint guiId = params[0]._value;
+	uint objectId = params[1]._value;
 	ScriptString *text = (ScriptString *)params[2]._object;
-	UNUSED(text);
+
+	GUIControl *control = getGUIControl("SetLabelText", vm, guiId, objectId);
+	if (!control->isOfType(sotGUILabel))
+		error("SetLabelText: Control %d isn't a label.", objectId);
+	GUILabel *label = (GUILabel *)control;
 
 	// FIXME
+	UNUSED(label);
 	error("SetLabelText unimplemented");
 
 	return RuntimeValue();
@@ -352,14 +420,18 @@ RuntimeValue Script_SetLabelText(AGSEngine *vm, ScriptObject *, const Common::Ar
 // import void SetLabelFont(int gui, int object, FontType)
 // Undocumented.
 RuntimeValue Script_SetLabelFont(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint guiId = params[0]._value;
+	uint objectId = params[1]._value;
 	uint32 fonttype = params[2]._value;
 	UNUSED(fonttype);
 
+	GUIControl *control = getGUIControl("SetLabelFont", vm, guiId, objectId);
+	if (!control->isOfType(sotGUILabel))
+		error("SetLabelFont: Control %d isn't a label.", objectId);
+	GUILabel *label = (GUILabel *)control;
+
 	// FIXME
+	UNUSED(label);
 	error("SetLabelFont unimplemented");
 
 	return RuntimeValue();
@@ -368,48 +440,72 @@ RuntimeValue Script_SetLabelFont(AGSEngine *vm, ScriptObject *, const Common::Ar
 // import void SetButtonText(int gui, int object, const string text)
 // Undocumented.
 RuntimeValue Script_SetButtonText(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint guiId = params[0]._value;
+	uint objectId = params[1]._value;
 	ScriptString *text = (ScriptString *)params[2]._object;
 	UNUSED(text);
 
+	GUIControl *control = getGUIControl("SetButtonText", vm, guiId, objectId);
+	if (!control->isOfType(sotGUIButton))
+		error("SetButtonText: Control %d isn't a button.", objectId);
+	GUIButton *button = (GUIButton *)control;
+
 	// FIXME
+	UNUSED(button);
 	error("SetButtonText unimplemented");
 
 	return RuntimeValue();
 }
 
 // import void SetButtonPic(int gui, int object, int which, int spriteSlot)
-// Undocumented.
+// Change the specified button's picture.
+// The 'which' parameter is 1 to change the normal picture, 2 for the mouse-over or 3 for the pushed picture.
+// You can specify a slot of -1 to disable the mouse-over and pushed pictures.
 RuntimeValue Script_SetButtonPic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
-	int which = params[2]._signedValue;
-	UNUSED(which);
-	int spriteSlot = params[3]._signedValue;
-	UNUSED(spriteSlot);
+	uint guiId = params[0]._value;
+	uint objectId = params[1]._value;
+	uint picType = params[2]._value;
+	uint spriteSlot = params[3]._value;
 
-	// FIXME
-	error("SetButtonPic unimplemented");
+	GUIControl *control = getGUIControl("SetButtonPic", vm, guiId, objectId);
+	if (!control->isOfType(sotGUIButton))
+		error("SetButtonPic: Control %d isn't a button.", objectId);
+	GUIButton *button = (GUIButton *)control;
+
+	switch (picType) {
+	case 1:
+		// FIXME
+		warning("SetButtonPic unimplemented");
+		break;
+	case 2:
+		// FIXME
+		warning("SetButtonPic unimplemented");
+		break;
+	case 3:
+		// FIXME
+		warning("SetButtonPic unimplemented");
+		break;
+	default:
+		error("SetButtonPic: Picture type %d is invalid.", picType);
+	}
 
 	return RuntimeValue();
 }
 
 // import int GetButtonPic(int gui, int object, int which)
-// Undocumented.
+// Returns the button picture of the specified type (see SetButtonPic).
 RuntimeValue Script_GetButtonPic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
-	int which = params[2]._signedValue;
-	UNUSED(which);
+	uint guiId = params[0]._value;
+	uint objectId = params[1]._value;
+	uint picType = params[2]._value;
+
+	GUIControl *control = getGUIControl("GetButtonPic", vm, guiId, objectId);
+	if (!control->isOfType(sotGUIButton))
+		error("GetButtonPic: Control %d isn't a button.", objectId);
+	GUIButton *button = (GUIButton *)control;
 
 	// FIXME
+	UNUSED(button);
 	error("GetButtonPic unimplemented");
 
 	return RuntimeValue();
@@ -418,10 +514,8 @@ RuntimeValue Script_GetButtonPic(AGSEngine *vm, ScriptObject *, const Common::Ar
 // import void AnimateButton(int gui, int object, int view, int loop, int delay, int repeat)
 // Undocumented.
 RuntimeValue Script_AnimateButton(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint guiId = params[0]._value;
+	uint objectId = params[1]._value;
 	int view = params[2]._signedValue;
 	UNUSED(view);
 	int loop = params[3]._signedValue;
@@ -431,7 +525,13 @@ RuntimeValue Script_AnimateButton(AGSEngine *vm, ScriptObject *, const Common::A
 	int repeat = params[5]._signedValue;
 	UNUSED(repeat);
 
+	GUIControl *control = getGUIControl("AnimateButton", vm, guiId, objectId);
+	if (!control->isOfType(sotGUIButton))
+		error("AnimateButton: Control %d isn't a button.", objectId);
+	GUIButton *button = (GUIButton *)control;
+
 	// FIXME
+	UNUSED(button);
 	error("AnimateButton unimplemented");
 
 	return RuntimeValue();
@@ -2010,10 +2110,7 @@ RuntimeValue Script_GUI_set_Height(AGSEngine *vm, GUIGroup *self, const Common::
 // GUI: readonly import attribute int ID
 // Gets the ID number of the GUI.
 RuntimeValue Script_GUI_get_ID(AGSEngine *vm, GUIGroup *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GUI::get_ID unimplemented");
-
-	return RuntimeValue();
+	return self->_id;
 }
 
 // GUI: import attribute int Transparency
