@@ -718,7 +718,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_NOTEQUAL:
 			// reg1 != reg2
-			_registers[int1]._value = (_registers[int1]._value == _registers[int2]._value);
+			_registers[int1]._value = (_registers[int1]._value != _registers[int2]._value);
 			break;
 		case SCMD_GREATER:
 			// reg1 > reg2
