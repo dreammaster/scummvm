@@ -113,7 +113,8 @@ struct WordsDictionary {
 
 struct ccScript;
 
-struct ViewFrame : public ScriptObject {
+class ViewFrame : public ScriptObject {
+public:
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotViewFrame); }
 
 	uint32 _pic;

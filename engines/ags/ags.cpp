@@ -1166,15 +1166,15 @@ void AGSEngine::stopFastForwarding() {
 #define RUN_DIALOG_STOP_DIALOG   -2
 #define RUN_DIALOG_GOTO_PREVIOUS -4
 
-void AGSEngine::runDialog(uint dialogId) {
+void AGSEngine::runDialogId(uint dialogId) {
 	if (dialogId >= _gameFile->_dialogs.size())
-		error("runDialog: dialog %d invalid (only have %d dialogs)", dialogId, _gameFile->_dialogs.size());
+		error("runDialogId: dialog %d invalid (only have %d dialogs)", dialogId, _gameFile->_dialogs.size());
 
 	// FIXME: can_run_delayed_command
 
 	if (_state->_stopDialogAtEnd != DIALOG_NONE) {
 		if (_state->_stopDialogAtEnd != DIALOG_RUNNING)
-			error("runDialog: already-running dialog was in state %d", _state->_stopDialogAtEnd);
+			error("runDialogId: already-running dialog was in state %d", _state->_stopDialogAtEnd);
 		_state->_stopDialogAtEnd = DIALOG_NEWTOPIC + dialogId;
 		return;
 	}
@@ -1208,6 +1208,7 @@ int AGSEngine::showDialogOptions(uint dialogId, uint sayChosenOption) {
 	}
 
 	// FIXME
+	return 0;
 }
 
 void AGSEngine::doConversation(uint dialogId) {

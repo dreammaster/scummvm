@@ -202,7 +202,7 @@ public:
 	void startSkippableCutscene();
 	void stopFastForwarding();
 
-	void runDialog(uint dialogId);
+	void runDialogId(uint dialogId);
 	int showDialogOptions(uint dialogId, uint sayChosenOption);
 
 	void invalidateScreen() { _needsUpdate = true; }

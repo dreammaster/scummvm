@@ -62,7 +62,7 @@ RuntimeValue Script_GetDialogOption(AGSEngine *vm, ScriptObject *, const Common:
 RuntimeValue Script_RunDialog(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint topic = params[0]._value;
 
-	vm->runDialog(topic);
+	vm->runDialogId(topic);
 
 	return RuntimeValue();
 }
