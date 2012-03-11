@@ -86,6 +86,7 @@ struct RuntimeValue {
 	RuntimeValue() : _type(rvtInteger), _value(0) { }
 	RuntimeValue(uint32 intValue) : _type(rvtInteger), _value(intValue) { }
 	RuntimeValue(int intValue) : _type(rvtInteger), _value(intValue) { }
+	RuntimeValue(float floatValue) : _type(rvtFloat), _floatValue(floatValue) { }
 
 	// support for object reference counting
 	RuntimeValue(ScriptObject *obj) : _type(rvtSystemObject), _value(0), _object(obj) { _object->IncRef(); }
