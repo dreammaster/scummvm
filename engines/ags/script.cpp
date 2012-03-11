@@ -568,7 +568,11 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_WRITELIT:
 			// m[MAR] = arg2 (copy arg1 bytes)
 			// "poss something dodgy about this routine"
-			error("no WRITELIT yet");
+			// But, conveniently, this should only ever be used to write 4-byte null pointers.
+			if (int1 != 4 || int2 != 0)
+				error("script tried using WRITELIT unsafely (%d bytes of %d) on line %d",
+					int1, int2, _lineNumber);
+			writePointer(_registers[SREG_MAR], NULL);
 			break;
 		case SCMD_RET:
 			// return from subroutine
