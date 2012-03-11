@@ -781,7 +781,8 @@ void ccInstance::runCodeFrom(uint32 start) {
 				_pc -= currentBase.top();
 			}
 
-			// FIXME: next call needs object?
+			// (note: scripts will explode on CALLEXT if this isn't here)
+			nextCallNeedsObject = false;
 
 			// sabotage the sanity check until returning from the function which disabled it
 			if (loopIterationCheckDisabledCount)
@@ -921,10 +922,13 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_MEMINITPTR:
 			// m[MAR] = reg1 (but don't free old one)
-			tempObj = getObjectFrom(_registers[int1]);
-			if (!tempObj)
-				error("script tried to MEMINITPTR using runtime value of type %d (value %d) on line %d",
-					_registers[int1]._type, _registers[int1]._value, _lineNumber);
+			tempObj = NULL;
+			if (_registers[int1]._type != rvtInteger || _registers[int1]._value != 0) {
+				tempObj = getObjectFrom(_registers[int1]);
+				if (!tempObj)
+					error("script tried to MEMINITPTR using runtime value of type %d (value %d) on line %d",
+						_registers[int1]._type, _registers[int1]._value, _lineNumber);
+			}
 			writePointer(_registers[SREG_MAR], tempObj);
 			break;
 		case SCMD_MEMZEROPTR:
@@ -989,6 +993,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 			_runningInst = wasRunning;
 
 			recoverFromCallAs = !externalStack.empty();
+			nextCallNeedsObject = false;
 			}
 			break;
 		case SCMD_CALLEXT:
