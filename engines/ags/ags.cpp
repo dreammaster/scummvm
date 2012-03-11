@@ -467,8 +467,10 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 		}
 
 		if (scripts) {
-			// FIXME: scripts (3.x)
+			// 3.x script
+			runInteractionScript(scripts, event.data3);
 		} else if (interaction) {
+			// 2.x interaction
 			runInteractionEvent(interaction, event.data3);
 		}
 
@@ -521,8 +523,52 @@ void AGSEngine::processAllGameEvents() {
 	_insideProcessEvent = false;
 }
 
+// run a 3.x-style interaction script
+// returns true if a room change occurred
+bool AGSEngine::runInteractionScript(InteractionScript *scripts, uint eventId, uint checkFallback, bool isInventory) {
+	if (eventId >= scripts->_eventScriptNames.size() || scripts->_eventScriptNames[eventId].empty()) {
+		// no response for this event
+
+		// if there is a fallback, stop now (caller can run that instead)
+		if (checkFallback != (uint)-1 && checkFallback < scripts->_eventScriptNames.size()
+			&& !scripts->_eventScriptNames[checkFallback].empty())
+			return false;
+
+		runUnhandledEvent(eventId);
+		return false;
+	}
+
+	if (_state->_checkInteractionOnly) {
+		_state->_checkInteractionOnly = 2;
+
+		return true;
+	}
+
+	uint roomWas = _state->_roomChanges;
+
+	if (_eventBlockBaseName.contains("character") || _eventBlockBaseName.contains("inventory")) {
+		// global script (character or inventory)
+		if (_runningScripts.size())
+			_runningScripts.back().queueScript(scripts->_eventScriptNames[eventId]);
+		else
+			runTextScript(_gameScript, scripts->_eventScriptNames[eventId]);
+	} else {
+		// room script
+		if (_runningScripts.size())
+			_runningScripts.back().queueScript("|" + scripts->_eventScriptNames[eventId]);
+		else
+			runTextScript(_roomScript, scripts->_eventScriptNames[eventId]);
+	}
+
+	if (roomWas != _state->_roomChanges)
+		return false;
+
+	return true;
+}
+
+// run a 2.x-style interaction event
 // returns true if the NewInteraction has been invalidated (e.g. a room change occurred)
-bool AGSEngine::runInteractionEvent(struct NewInteraction *interaction, uint eventId, uint checkFallback, bool isInventory) {
+bool AGSEngine::runInteractionEvent(NewInteraction *interaction, uint eventId, uint checkFallback, bool isInventory) {
 	if (!interaction->hasResponseFor(eventId)) {
 		// no response for this event
 
@@ -625,11 +671,19 @@ bool AGSEngine::runInteractionCommandList(NewInteractionEvent &event, uint &comm
 		case kActionRunScript:
 			if (_eventBlockBaseName.contains("character") || _eventBlockBaseName.contains("inventory")) {
 				// global script (character or inventory)
-				// FIXME
+				Common::String name = makeTextScriptName(_eventBlockBaseName, _eventBlockId, commands[i]._args[0]._val);
+				if (_runningScripts.size())
+					_runningScripts.back().queueScript(name);
+				else
+					runTextScript(_gameScript, name);
 			} else {
+				// room script
 				// FIXME: bounds check?
-				runTextScript(_roomScript, makeTextScriptName(_eventBlockBaseName, _eventBlockId, commands[i]._args[0]._val));
-				// FIXME
+				Common::String name = makeTextScriptName(_eventBlockBaseName, _eventBlockId, commands[i]._args[0]._val);
+				if (_runningScripts.size())
+					_runningScripts.back().queueScript("|" + name);
+				else
+					runTextScript(_roomScript, name);
 			}
 			break;
 		case kActionAddScoreOnce:
