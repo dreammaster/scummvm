@@ -515,7 +515,7 @@ void AGSEngine::processAllGameEvents() {
 		processGameEvent(events[i]);
 
 		// if the room changed, discard all other events
-		if (roomWas != _state->_roomChanges)
+		if (shouldQuit() || roomWas != _state->_roomChanges)
 			break;
 	}
 
@@ -830,7 +830,7 @@ bool AGSEngine::runInteractionCommandList(NewInteractionEvent &event, uint &comm
 		}
 
 		// return true if the room changed from under us (the interaction is no longer valid)
-		if (roomWas != _state->_roomChanges)
+		if (shouldQuit() || roomWas != _state->_roomChanges)
 			return true;
 	}
 
@@ -1362,7 +1362,7 @@ int AGSEngine::runDialogScript(DialogTopic &topic, uint dialogId, uint offset, u
 		bool scriptRunning = true;
 		uint16 param1, param2;
 
-		while (scriptRunning) {
+		while (scriptRunning && !shouldQuit()) {
 			if (pos + 2 > topic._code.size())
 				error("runDialogScript: %d is off end of script (size %d)", pos, topic._code.size());
 			byte opcode = topic._code[pos];
