@@ -569,6 +569,16 @@ void ccInstance::runCodeFrom(uint32 start) {
 			// m[MAR] = arg2 (copy arg1 bytes)
 			// "poss something dodgy about this routine"
 			// But, conveniently, this should only ever be used to write 4-byte null pointers.
+			// (Or apparently, in older versions, to invalidate stack variables?)
+			if (_registers[SREG_MAR]._type == rvtStackPointer) {
+				if (int1 > 4 || int2 != 0)
+					error("script tried using WRITELIT unsafely on stack (%d bytes of %d) on line %d",
+						int1, int2, _lineNumber);
+				// FIXME: check bounds
+				for (uint i = 0; i < int1; ++i)
+					_stack[i + _registers[SREG_MAR]._value].invalidate();
+				break;
+			}
 			if (int1 != 4 || int2 != 0)
 				error("script tried using WRITELIT unsafely (%d bytes of %d) on line %d",
 					int1, int2, _lineNumber);
@@ -1443,9 +1453,9 @@ void ccInstance::writePointer(const RuntimeValue &value, ScriptObject *object) {
 			_stack[value._value] = object;
 		else
 			_stack[value._value] = 0;
-		_stack[value._value + 1]._type = rvtInvalid;
-		_stack[value._value + 2]._type = rvtInvalid;
-		_stack[value._value + 3]._type = rvtInvalid;
+		_stack[value._value + 1].invalidate();
+		_stack[value._value + 2].invalidate();
+		_stack[value._value + 3].invalidate();
 		break;
 	default:
 		error("script tried to writePointer to runtime value of type %d (value %d) on line %d",

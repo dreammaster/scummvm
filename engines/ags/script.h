@@ -128,6 +128,12 @@ struct RuntimeValue {
 		_value = intValue;
 		return *this;
 	}
+
+	void invalidate() {
+		if (_type == rvtSystemObject)
+			_object->DecRef();
+		_type = rvtInvalid;
+	}
 };
 
 // the data for a script
