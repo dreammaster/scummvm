@@ -283,8 +283,14 @@ Room::Room(AGSEngine *vm, Common::SeekableReadStream *dta) : _vm(vm), _compiledS
 			}
 			break;
 		case BLOCKTYPE_PROPERTIES:
-			error("PROPERTIES");
-			// FIXME
+			count = dta->readUint32LE();
+			if (count != 1)
+				error("Room: invalid Custom Properties block encountered (%d)", count);
+			_vm->_gameFile->readProperties(dta, _properties);
+			for (uint i = 0; i < _hotspots.size(); ++i)
+				_vm->_gameFile->readProperties(dta, _hotspots[i]._properties);
+			for (uint i = 0; i < _objects.size(); ++i)
+				_vm->_gameFile->readProperties(dta, _objects[i]->_properties);
 			break;
 		default:
 			error("Room: unknown block type %d", blockType);
