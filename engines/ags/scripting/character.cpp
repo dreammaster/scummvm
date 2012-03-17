@@ -2039,11 +2039,17 @@ RuntimeValue Script_Character_get_Transparency(AGSEngine *vm, Character *self, c
 // Character: import attribute int Transparency
 // Gets/sets the character's current transparency level.
 RuntimeValue Script_Character_set_Transparency(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint trans = params[0]._value;
 
-	// FIXME
-	error("Character::set_Transparency unimplemented");
+	if (trans > 100)
+		error("Character::set_Transparency: transparency value must be between 0 and 100, but got %d", trans);
+
+	if (trans == 0)
+		self->_transparency = 0;
+	else if (trans == 100)
+		self->_transparency = 255;
+	else
+		self->_transparency = ((100 - trans) * 25) / 10;
 
 	return RuntimeValue();
 }
