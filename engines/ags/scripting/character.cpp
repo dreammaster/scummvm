@@ -1261,13 +1261,20 @@ RuntimeValue Script_Character_SetIdleView(AGSEngine *vm, Character *self, const 
 // Character: import function SetWalkSpeed(int x, int y)
 // Changes the character's movement speed.
 RuntimeValue Script_Character_SetWalkSpeed(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	int x = params[0]._signedValue;
-	UNUSED(x);
-	int y = params[1]._signedValue;
-	UNUSED(y);
+	int xSpeed = params[0]._signedValue;
+	int ySpeed = params[1]._signedValue;
 
-	// FIXME
-	error("Character::SetWalkSpeed unimplemented");
+	if (xSpeed == 0 || xSpeed > 50 || ySpeed == 0 || ySpeed > 50)
+		error("Character::SetWalkSpeed: invalid speed value");
+	if (self->_walking)
+		error("Character::SetWalkSpeed: cannot change speed while walking");
+
+	self->_walkSpeed = xSpeed;
+
+	if (ySpeed == xSpeed)
+		self->_walkSpeedY = UNIFORM_WALK_SPEED;
+	else
+		self->_walkSpeedY = ySpeed;
 
 	return RuntimeValue();
 }
