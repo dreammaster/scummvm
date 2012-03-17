@@ -2117,11 +2117,17 @@ RuntimeValue Script_GUI_get_Transparency(AGSEngine *vm, GUIGroup *self, const Co
 // GUI: import attribute int Transparency
 // Gets/sets the transparency of the GUI.
 RuntimeValue Script_GUI_set_Transparency(AGSEngine *vm, GUIGroup *self, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint trans = params[0]._value;
 
-	// FIXME
-	error("GUI::set_Transparency unimplemented");
+	if (trans > 100)
+		error("GUI::set_Transparency: transparency value must be between 0 and 100, but got %d", trans);
+
+	if (trans == 0)
+		self->_transparency = 0;
+	else if (trans == 100)
+		self->_transparency = 255;
+	else
+		self->_transparency = ((100 - trans) * 25) / 10;
 
 	return RuntimeValue();
 }
