@@ -1722,10 +1722,7 @@ RuntimeValue Script_Character_seti_InventoryQuantity(AGSEngine *vm, Character *s
 // Character: import attribute int Loop
 // Gets/sets the character's current loop number within its current view.
 RuntimeValue Script_Character_get_Loop(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_Loop unimplemented");
-
-	return RuntimeValue();
+	return self->_loop;
 }
 
 // Character: import attribute int Loop
