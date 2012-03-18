@@ -1785,10 +1785,7 @@ RuntimeValue Script_Character_set_MovementLinkedToAnimation(AGSEngine *vm, Chara
 // Character: readonly import attribute bool Moving
 // Gets whether the character is currently moving.
 RuntimeValue Script_Character_get_Moving(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_Moving unimplemented");
-
-	return RuntimeValue();
+	return self->_walking ? 1 : 0;
 }
 
 // Character: import attribute String Name
