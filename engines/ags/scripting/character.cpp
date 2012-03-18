@@ -1389,10 +1389,7 @@ RuntimeValue Script_Character_set_ActiveInventory(AGSEngine *vm, Character *self
 // Character: readonly import attribute bool Animating
 // Gets whether the character is currently animating.
 RuntimeValue Script_Character_get_Animating(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_Animating unimplemented");
-
-	return RuntimeValue();
+	return self->_animating ? 1 : 0;
 }
 
 // Character: import attribute int AnimationSpeed
