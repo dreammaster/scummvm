@@ -2073,10 +2073,7 @@ RuntimeValue Script_Character_set_TurnBeforeWalking(AGSEngine *vm, Character *se
 // Character: readonly import attribute int View
 // Gets the character's current view number.
 RuntimeValue Script_Character_get_View(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_View unimplemented");
-
-	return RuntimeValue();
+	return self->_view + 1;
 }
 
 // Character: readonly import attribute int WalkSpeedX
