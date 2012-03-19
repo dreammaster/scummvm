@@ -51,6 +51,7 @@ public:
 	SpriteSet(AGSEngine *vm, Common::SeekableReadStream *stream);
 	~SpriteSet();
 
+	uint getSpriteCount() { return _spriteInfo.size(); }
 	Graphics::Surface *getSprite(uint32 spriteId);
 
 protected:
