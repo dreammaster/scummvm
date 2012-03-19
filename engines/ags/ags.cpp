@@ -1088,6 +1088,18 @@ byte AGSEngine::getGameOption(uint index) {
 	return _gameFile->_options[index];
 }
 
+Common::String AGSEngine::getTranslation(const Common::String &text) {
+	// FIXME: implement
+
+	return text;
+}
+
+Common::String AGSEngine::replaceMacroTokens(const Common::String &text) {
+	// FIXME: implement
+
+	return text;
+}
+
 // Multiplies up the number of pixels depending on the current
 // resolution, to give a relatively fixed size at any game res
 uint AGSEngine::getFixedPixelSize(uint pixels) {

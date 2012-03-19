@@ -185,6 +185,9 @@ public:
 
 	byte getGameOption(uint index);
 
+	Common::String getTranslation(const Common::String &text);
+	Common::String replaceMacroTokens(const Common::String &text);
+
 	// resolution system functions
 	uint getFixedPixelSize(uint pixels);
 	int convertToLowRes(int coord);
