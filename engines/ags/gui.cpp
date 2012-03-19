@@ -25,6 +25,7 @@
 
 #include "engines/ags/ags.h"
 #include "engines/ags/constants.h"
+#include "engines/ags/graphics.h"
 #include "engines/ags/gui.h"
 #include "engines/ags/util.h"
 
@@ -232,6 +233,60 @@ void GUIButton::readFrom(Common::SeekableReadStream *dta) {
 	} else {
 		_textAlignment = GBUT_ALIGN_TOPMIDDLE;
 	}
+}
+
+GUIGroup::GUIGroup(AGSEngine *vm) : _vm(vm), _width(0), _height(0), _needsUpdate(true) {
+}
+
+GUIGroup::~GUIGroup() {
+	_surface.free();
+}
+
+void GUIGroup::setSize(uint32 width, uint32 height) {
+	if (_surface.getPixels() && width == _width && height == _height)
+		return;
+
+	_width = width;
+	_height = height;
+	_surface.free();
+
+	if (!_on)
+		return;
+
+	_surface.create(width, height, _vm->_graphics->getPixelFormat());
+
+	invalidate();
+}
+
+void GUIGroup::invalidate() {
+	_needsUpdate = true;
+}
+
+void GUIGroup::setVisible(bool visible) {
+	if ((bool)_on == visible)
+		return;
+
+	_on = visible ? 1 : 0;
+	if (!_on)
+		_surface.free();
+	else
+		setSize(_width, _height);
+}
+
+struct GUIZOrderLess {
+	bool operator()(const GUIControl *a, const GUIControl *b) const {
+		return a->_zorder < b->_zorder;
+	}
+};
+
+void GUIGroup::sortControls() {
+	Common::Array<GUIControl *> controls = _controls;
+
+	Common::sort(controls.begin(), controls.end(), GUIZOrderLess());
+
+	_controlDrawOrder.resize(controls.size());
+	for (uint i = 0; i < controls.size(); ++i)
+		_controlDrawOrder[i] = _controls[i]->_id;
 }
 
 } // End of namespace AGS

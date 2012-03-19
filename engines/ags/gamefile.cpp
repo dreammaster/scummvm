@@ -731,7 +731,8 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 
 	_guiGroups.resize(guiCount);
 	for (uint i = 0; i < guiCount; ++i) {
-		GUIGroup &group = _guiGroups[i];
+		_guiGroups[i] = new GUIGroup(_vm);
+		GUIGroup &group = *_guiGroups[i];
 
 		dta->read(group._vText, 4);
 
@@ -775,7 +776,12 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 		group._zorder = dta->readUint32LE();
 		group._id = dta->readUint32LE();
 		dta->skip(6 * 4); // reserved
-		group._on = dta->readUint32LE();
+
+		// This is overwritten later in the init code.
+		// (And we want it to default to not visible, for internal consistency.)
+		//group._on = dta->readUint32LE();
+		dta->skip(4);
+		group._on = 0;
 
 		dta->skip(MAX_OBJS_ON_GUI * 4); // obj pointers
 		group._controlRefPtrs.resize(MAX_OBJS_ON_GUI);
@@ -843,7 +849,7 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 	}
 
 	for (uint n = 0; n < _guiGroups.size(); ++n) {
-		GUIGroup &group = _guiGroups[n];
+		GUIGroup &group = *_guiGroups[n];
 
 		// set up the reverse-lookup array
 		for (uint i = 0; i < group._controls.size(); ++i) {
@@ -873,10 +879,14 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 			default:
 				error("invalid GUI control type %d", type);
 			}
+
+			group._controls[i]->_parent = &group;
+			group._controls[i]->_id = i;
 		}
 	}
 
-	// TODO: draw order?
+	for (uint n = 0; n < _guiGroups.size(); ++n)
+		_guiGroups[n]->sortControls();
 }
 
 void GameFile::readPlugins(Common::SeekableReadStream *dta) {

@@ -898,9 +898,9 @@ bool AGSEngine::init() {
 			continue;
 		_scriptState->addSystemObjectImport(charInfo->_scriptName, charInfo);
 	}
-	_scriptState->addSystemObjectImport("gui", new ScriptObjectArray<GUIGroup>(_gameFile->_guiGroups, 8));
+	_scriptState->addSystemObjectImport("gui", new ScriptObjectArray<GUIGroup *>(_gameFile->_guiGroups, 8));
 	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
-		GUIGroup &group = _gameFile->_guiGroups[i];
+		GUIGroup &group = *_gameFile->_guiGroups[i];
 		if (group._name.empty())
 			continue;
 		_scriptState->addSystemObjectImport(group._name, &group);
@@ -919,6 +919,14 @@ bool AGSEngine::init() {
 	}
 
 	// FIXME: load fonts
+
+	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
+		GUIGroup *group = _gameFile->_guiGroups[i];
+		if (group->_popup == POPUP_NONE || group->_popup == POPUP_NOAUTOREM)
+			group->setVisible(true);
+		else
+			group->setVisible(false);
+	}
 
 	// TODO: wtexttransparent(TEXTFG);
 	// TODO: fade_effect=OPT_FADETYPE

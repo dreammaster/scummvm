@@ -249,7 +249,7 @@ public:
 	Common::Array<Common::String> _speechLines;
 
 	uint32 _guiVersion;
-	Common::Array<GUIGroup> _guiGroups;
+	Common::Array<GUIGroup *> _guiGroups;
 
 	Common::Array<GUIButton *> _guiButtons;
 	Common::Array<GUILabel *> _guiLabels;
