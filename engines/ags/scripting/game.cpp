@@ -920,13 +920,13 @@ RuntimeValue Script_UnPauseGame(AGSEngine *vm, ScriptObject *, const Common::Arr
 // import void SetGlobalInt(int globalInt, int value)
 // Undocumented.
 RuntimeValue Script_SetGlobalInt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int globalInt = params[0]._signedValue;
-	UNUSED(globalInt);
-	int value = params[1]._signedValue;
-	UNUSED(value);
+	uint globalInt = params[0]._value;
+	uint value = params[1]._value;
 
-	// FIXME
-	error("SetGlobalInt unimplemented");
+	if (globalInt >= vm->_state->_globalScriptVars.size())
+		error("SetGlobalInt: invalid index %d", globalInt);
+
+	vm->_state->_globalScriptVars[globalInt] = value;
 
 	return RuntimeValue();
 }
@@ -934,13 +934,12 @@ RuntimeValue Script_SetGlobalInt(AGSEngine *vm, ScriptObject *, const Common::Ar
 // import int GetGlobalInt(int globalInt)
 // Undocumented.
 RuntimeValue Script_GetGlobalInt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int globalInt = params[0]._signedValue;
-	UNUSED(globalInt);
+	uint globalInt = params[0]._value;
 
-	// FIXME
-	error("GetGlobalInt unimplemented");
+	if (globalInt >= vm->_state->_globalScriptVars.size())
+		error("GetGlobalInt: invalid index %d", globalInt);
 
-	return RuntimeValue();
+	return vm->_state->_globalScriptVars[globalInt];
 }
 
 static const ScriptSystemFunctionInfo ourFunctionList[] = {
