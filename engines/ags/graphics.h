@@ -50,6 +50,9 @@ public:
 	bool initGraphics();
 	Graphics::PixelFormat getPixelFormat() const;
 
+	uint32 resolveHardcodedColor(uint32 color) const;
+	uint32 getTransparentColor() const;
+
 	void loadFonts();
 	Graphics::Font *getFont(uint id);
 
