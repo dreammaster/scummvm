@@ -918,7 +918,7 @@ bool AGSEngine::init() {
 		_scriptState->addSystemObjectImport(invItem._scriptName, &invItem);
 	}
 
-	// FIXME: load fonts
+	_graphics->loadFonts();
 
 	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
 		GUIGroup *group = _gameFile->_guiGroups[i];

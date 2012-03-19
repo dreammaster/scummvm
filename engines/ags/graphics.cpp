@@ -37,9 +37,105 @@
 
 #include "engines/util.h"
 
+#include "graphics/font.h"
+#include "graphics/fonts/ttf.h"
 #include "graphics/palette.h"
 
 namespace AGS {
+
+class WFNFont : public Graphics::Font {
+	struct WFNFontGlyph {
+		uint16 width, height;
+		byte *data;
+	};
+
+public:
+	WFNFont(Common::SeekableReadStream *stream) : _maxCharWidth(0), _maxCharHeight(0) {
+		const char *WFN_FILE_SIGNATURE = "WGT Font File  ";
+
+		char buffer[16];
+		stream->read(buffer, 15);
+		buffer[15] = '\0';
+		if (Common::String(buffer) != WFN_FILE_SIGNATURE)
+			error("bad WFN font signature");
+		uint16 tableOffset = stream->readUint16LE();
+
+		_glyphs.resize(128);
+		for (uint i = 0; i < 128; ++i) {
+			stream->seek(tableOffset + i*2);
+			uint16 charOffset = stream->readUint16LE();
+			stream->seek(charOffset);
+
+			_glyphs[i].width = stream->readUint16LE();
+			if (_glyphs[i].width > _maxCharWidth)
+				_maxCharWidth = _glyphs[i].width;
+			_glyphs[i].height = stream->readUint16LE();
+			if (_glyphs[i].height > _maxCharHeight)
+				_maxCharHeight = _glyphs[i].height;
+
+			uint32 dataSize = _glyphs[i].height * (((_glyphs[i].width - 1) / 8) + 1);
+			_glyphs[i].data = new byte[dataSize];
+			stream->read(_glyphs[i].data, dataSize);
+		}
+	}
+
+	~WFNFont() {
+		for (uint i = 0; i < _glyphs.size(); ++i)
+			delete[] _glyphs[i].data;
+	}
+
+	int getFontHeight() const { return _maxCharHeight; }
+	int getMaxCharWidth() const { return _maxCharWidth; }
+	int getCharWidth(uint32 chr) const { return _glyphs[chr].width; }
+
+	void drawChar(Graphics::Surface *surface, uint32 chr, int x, int y, uint32 color) const {
+		if (chr >= 128)
+			chr = '?';
+
+		uint32 dataWidth = ((_glyphs[chr].width - 1) / 8) + 1;
+
+		byte data = 0;
+		for (uint chrY = 0; chrY < _glyphs[chr].height; ++chrY) {
+			int destY = (int)chrY + y;
+			if (destY < 0 || destY >= surface->h)
+				continue;
+
+			byte *src = _glyphs[chr].data + (chrY * dataWidth);
+			for (uint chrX = 0; chrX < _glyphs[chr].width; ++chrX) {
+				if (!(chrX % 8))
+					data = *src++;
+				else
+					data <<= 1;
+
+				int destX = (int)chrX + x;
+				if (destX < 0 || destX >= surface->w)
+					continue;
+
+				if (!(data & 0x80))
+					continue;
+
+				void *dest = surface->getBasePtr(destX, destY);
+				// FIXME: we should obey the configured text multiply factor here
+				switch (surface->format.bytesPerPixel) {
+				case 1:
+					*(byte *)dest = color;
+					break;
+				case 2:
+					*(uint16 *)dest = color;
+					break;
+				case 4:
+					*(uint32 *)dest = color;
+					break;
+				}
+			}
+		}
+	}
+
+protected:
+	uint _maxCharWidth, _maxCharHeight;
+
+	Common::Array<WFNFontGlyph> _glyphs;
+};
 
 class CursorDrawable : public Drawable {
 public:
@@ -177,6 +273,9 @@ AGSGraphics::~AGSGraphics() {
 	_backBuffer.free();
 
 	delete _cursorObj;
+
+	for (uint i = 0; i < _fonts.size(); ++i)
+		delete _fonts[i];
 }
 
 bool AGSGraphics::getScreenSize() {
@@ -248,6 +347,45 @@ bool AGSGraphics::initGraphics() {
 	_backBuffer.create(_width, _height, format);
 
 	return true;
+}
+
+void AGSGraphics::loadFonts() {
+	_fonts.resize(_vm->_gameFile->_fonts.size());
+	for (uint i = 0; i < _fonts.size(); ++i) {
+		AGSFont &font = _vm->_gameFile->_fonts[i];
+
+		// calculate the font size (only used for TTF)
+		uint fontSize = font._flags & FFLG_SIZEMASK;
+		if (fontSize == 0)
+			fontSize = 8;
+		if (!_vm->getGameOption(OPT_NOSCALEFNT) && _vm->_gameFile->_defaultResolution > 2)
+			fontSize *= 2;
+
+		// prefer TTF
+		Common::SeekableReadStream *stream = _vm->getFile(Common::String::format("agsfnt%d.ttf", i));
+		if (stream) {
+			bool antialias = (_vm->_gameFile->_colorDepth != 1) && _vm->getGameOption(OPT_ANTIALIASFONTS);
+			antialias = false; // FIXME: AA causes color-key artifacts at present
+			Graphics::TTFSizeMode fontSizeMode = Graphics::kTTFSizeModeCharacter;
+			_fonts[i] = Graphics::loadTTFFont(*stream, fontSize, fontSizeMode, !antialias);
+			continue;
+		}
+		// try WFN
+		stream = _vm->getFile(Common::String::format("agsfnt%d.wfn", i));
+		// fall back to font 0 if needed
+		if (!stream)
+			stream = _vm->getFile("agsfnt0.wfn");
+		if (!stream)
+			error("couldn't find font %d", i);
+		_fonts[i] = new WFNFont(stream);
+	}
+}
+
+Graphics::Font *AGSGraphics::getFont(uint id) {
+	if (id >= _fonts.size())
+		error("game used font %d, but only %d fonts exist", id, _fonts.size());
+
+	return _fonts[id];
 }
 
 void AGSGraphics::initPalette() {
