@@ -146,12 +146,14 @@ bool SpriteSet::loadSpriteIndexFile(uint32 spriteFileID) {
 
 	for (uint i = 0; i < spriteCount; ++i)
 		_spriteInfo[i]._width = idxStream->readUint16LE();
+	idxStream->skip(2);
 	for (uint i = 0; i < spriteCount; ++i)
 		_spriteInfo[i]._height = idxStream->readUint16LE();
+	idxStream->skip(2);
 	for (uint i = 0; i < spriteCount; ++i) {
 		_spriteInfo[i]._offset = idxStream->readUint32LE();
 		if (_spriteInfo[i]._offset >= (uint32)_stream->size())
-			error("corrupt sprite index file");
+			error("corrupt sprite index file (item %d has offset %x of %x", i, _spriteInfo[i]._offset, _stream->size());
 	}
 
 	delete idxStream;
