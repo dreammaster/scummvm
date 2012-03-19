@@ -1264,8 +1264,10 @@ RuntimeValue Script_Character_SetWalkSpeed(AGSEngine *vm, Character *self, const
 	int xSpeed = params[0]._signedValue;
 	int ySpeed = params[1]._signedValue;
 
+	// can't be zero, nor too large
 	if (xSpeed == 0 || xSpeed > 50 || ySpeed == 0 || ySpeed > 50)
-		error("Character::SetWalkSpeed: invalid speed value");
+		error("Character::SetWalkSpeed: invalid speed values %d, %d", xSpeed, ySpeed);
+
 	if (self->_walking)
 		error("Character::SetWalkSpeed: cannot change speed while walking");
 
@@ -1977,7 +1979,7 @@ RuntimeValue Script_Character_set_SpeechColor(AGSEngine *vm, Character *self, co
 // Character: import attribute int SpeechView
 // Gets/sets the character's speech view.
 RuntimeValue Script_Character_get_SpeechView(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	return RuntimeValue(self->_talkView + 1);
+	return self->_talkView + 1;
 }
 
 // Character: import attribute int SpeechView
