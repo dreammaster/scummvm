@@ -179,12 +179,17 @@ public:
 	void readFrom(Common::SeekableReadStream *dta);
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUILabel); }
 
-	uint32 _font;
-	uint32 _textColor;
-	uint32 _align;
+	void setFont(uint32 font);
+	void setColor(uint32 color);
+	void setAlign(uint32 align);
+	void setText(Common::String text);
 
 protected:
 	uint32 getMaxNumEvents() { return 0; }
+
+	uint32 _font;
+	uint32 _textColor;
+	uint32 _align;
 
 	Common::String _text;
 };

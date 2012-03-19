@@ -25,6 +25,7 @@
 
 #include "engines/ags/ags.h"
 #include "engines/ags/constants.h"
+#include "engines/ags/gamefile.h"
 #include "engines/ags/graphics.h"
 #include "engines/ags/gui.h"
 #include "engines/ags/util.h"
@@ -120,6 +121,42 @@ void GUILabel::readFrom(Common::SeekableReadStream *dta) {
 
 	if (_textColor == 0)
 		_textColor = 16;
+}
+
+void GUILabel::setFont(uint32 font) {
+	if (_font == font)
+		return;
+
+	assert(font < _vm->_gameFile->_fonts.size());
+
+	_font = font;
+	_parent->invalidate();
+}
+
+void GUILabel::setColor(uint32 color) {
+	if (_textColor == color)
+		return;
+
+	_textColor = color;
+	_parent->invalidate();
+}
+
+void GUILabel::setAlign(uint32 align) {
+	if (_align == align)
+		return;
+
+	assert(align < 3);
+
+	_align = align;
+	_parent->invalidate();
+}
+
+void GUILabel::setText(Common::String text) {
+	if (_text == text)
+		return;
+
+	_text = text;
+	_parent->invalidate();
 }
 
 void GUITextBox::readFrom(Common::SeekableReadStream *dta) {
