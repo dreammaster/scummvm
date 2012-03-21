@@ -246,8 +246,8 @@ public:
 	}
 
 	// FIXME
-	virtual uint getDrawWidth() { return 0; }
-	virtual uint getDrawHeight() { return 0; }
+	virtual uint getDrawWidth() { return _cursorSprite->w; }
+	virtual uint getDrawHeight() { return _cursorSprite->h; }
 	virtual uint getDrawTransparency() { return 0; }
 	virtual bool isDrawVerticallyMirrored() { return false; }
 	virtual int getDrawLightLevel() { return 0; }
@@ -499,9 +499,18 @@ void AGSGraphics::draw() {
 
 void AGSGraphics::draw(Drawable *item) {
 	const Common::Point pos = item->getDrawPos();
+	uint itemWidth = item->getDrawWidth();
+	uint itemHeight = item->getDrawHeight();
+	if (!itemWidth || !itemHeight)
+		return;
 	const Graphics::Surface *surface = item->getDrawSurface();
 
 	// FIXME: lots of things
+
+	if (pos.x > _width)
+		return;
+	if (pos.y > _height)
+		return;
 
 	uint startX = 0, startY = 0;
 	if (pos.x < 0)

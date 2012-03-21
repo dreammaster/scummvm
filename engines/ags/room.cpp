@@ -137,11 +137,11 @@ const Graphics::Surface *RoomObject::getDrawSurface() {
 }
 
 uint RoomObject::getDrawWidth() {
-	return 0; // FIXME
+	return getDrawSurface()->w; // FIXME
 }
 
 uint RoomObject::getDrawHeight() {
-	return 0; // FIXME
+	return getDrawSurface()->h; // FIXME
 }
 
 uint RoomObject::getDrawTransparency() {
