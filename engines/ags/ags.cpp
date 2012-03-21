@@ -420,7 +420,12 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 		}
 
 		if ((int)event.data2 > -1000) {
-			error("processGameEvent: can't do kEventTextScript yet"); // FIXME
+			Common::Array<uint32> params;
+			params.push_back(event.data2);
+			if (_runningScripts.size())
+				_runningScripts.back().queueScript("!" + textScriptName, event.data2);
+			else
+				runTextScript(_gameScript, textScriptName, params);
 		} else {
 			if (_runningScripts.size())
 				_runningScripts.back().queueScript(textScriptName);
