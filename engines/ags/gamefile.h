@@ -116,6 +116,7 @@ struct ccScript;
 class ViewFrame : public ScriptObject {
 public:
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotViewFrame); }
+	const char *getObjectTypeName() { return "ViewFrame"; }
 
 	uint32 _pic;
 	uint16 _xOffs, _yOffs;
@@ -142,6 +143,8 @@ struct DialogOption {
 };
 
 struct DialogTopic : public ScriptObject {
+	const char *getObjectTypeName() { return "DialogTopic"; }
+
 	Common::Array<DialogOption> _options;
 	Common::Array<byte> _code;
 

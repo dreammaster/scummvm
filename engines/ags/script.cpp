@@ -112,7 +112,7 @@ void ccScript::readFrom(Common::SeekableReadStream *dta) {
 	}
 	Common::sort(_globalFixups.begin(), _globalFixups.end());
 
-	debug(1, "script has %d fixups for %d code entries", fixupsCount, codeSize);
+	debug(3, "script has %d fixups for %d code entries", fixupsCount, codeSize);
 
 	uint32 importsCount = dta->readUint32LE();
 	_imports.resize(importsCount);
@@ -1297,6 +1297,7 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 		char sigEntry = function->signature[pos];
 		switch (sigEntry) {
 		case 'i':
+		case 'c':
 			// integer
 			if (params[pos]._type != rvtInteger)
 				error("expected integer for param %d of '%s', got type %d",

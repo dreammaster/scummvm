@@ -35,6 +35,10 @@ public:
 	GameState(class AGSEngine *vm);
 	void init();
 
+	const char *getObjectTypeName() { return "GameState"; }
+	uint32 readUint32(uint offset);
+	bool writeUint32(uint offset, uint value);
+
 	void setNormalFont(uint fontId);
 	void setSpeechFont(uint fontId);
 

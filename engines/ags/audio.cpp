@@ -156,6 +156,7 @@ void AGSAudio::initFrom(Common::SeekableReadStream *stream) {
 		stream->read(buf, 15);
 		buf[15] = '\0';
 		_audioClips[i]._filename = buf;
+		debug(9, "clip '%s' (%s)", _audioClips[i]._scriptName.c_str(), buf);
 		_audioClips[i]._bundledInExecutable = (stream->readByte() == 1);
 		_audioClips[i]._type = stream->readByte();
 		// FIXME: check validity

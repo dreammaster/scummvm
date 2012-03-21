@@ -3,6 +3,7 @@ MODULE := engines/ags
 MODULE_OBJS := \
 	ags.o \
 	audio.o \
+	character.o \
 	detection.o \
 	gamefile.o \
 	gamestate.o \

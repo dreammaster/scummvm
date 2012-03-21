@@ -54,6 +54,9 @@ GameFile::~GameFile() {
 	for (uint i = 0; i < _guiListBoxes.size(); ++i)
 		delete _guiListBoxes[i];
 
+	for (uint i = 0; i < _guiGroups.size(); ++i)
+		delete _guiGroups[i];
+
 	for (uint i = 0; i < _interactionsChar.size(); ++i)
 		delete _interactionsChar[i];
 	for (uint i = 0; i < _interactionsInv.size(); ++i)
@@ -246,21 +249,21 @@ bool GameFile::init() {
 
 	if (_version > kAGSVer272) {
 		// 3.x interaction scripts
-		debug(1, "char interaction scripts");
+		debug(6, "reading char interaction scripts");
 		_charInteractionScripts.resize(charCount);
 		for (uint i = 0; i < _charInteractionScripts.size(); ++i)
 			_charInteractionScripts[i].readFrom(dta);
-		debug(1, "inv interaction scripts");
+		debug(6, "reading inv interaction scripts");
 		_invInteractionScripts.resize(invItemCount);
 		for (uint i = 1; i < _invInteractionScripts.size(); ++i)
 			_invInteractionScripts[i].readFrom(dta);
 	} else {
 		// 2.5+ new interactions
-		debug(1, "char interactions");
+		debug(6, "reading char interactions");
 		_interactionsChar.resize(charCount);
 		for (uint32 i = 0; i < charCount; i++)
 			_interactionsChar[i] = NewInteraction::createFrom(dta);
-		debug(1, "inv interactions");
+		debug(6, "reading inv interactions");
 		_interactionsInv.resize(invItemCount);
 		for (uint32 i = 0; i < invItemCount; i++)
 			_interactionsInv[i] = NewInteraction::createFrom(dta);

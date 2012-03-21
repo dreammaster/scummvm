@@ -91,6 +91,8 @@ AGSEngine::~AGSEngine() {
 	delete _graphics;
 	delete _sprites;
 
+	delete _state;
+
 	delete _audio;
 	delete _gameFile;
 	delete _resourceMan;
@@ -274,7 +276,7 @@ void AGSEngine::setupPlayerCharacter(uint32 charId) {
 void AGSEngine::createGlobalScript() {
 	assert(_scriptModules.empty());
 
-	_scriptState->addSystemObjectImport("dialog", new ScriptObjectArray<DialogTopic>(_gameFile->_dialogs, 8));
+	_scriptState->addSystemObjectImport("dialog", new ScriptObjectArray<DialogTopic>(_gameFile->_dialogs, 8, "DialogTopic"));
 	for (uint i = 0; i < _gameFile->_dialogs.size(); ++i)
 		_scriptState->addSystemObjectImport(_gameFile->_dialogs[i]._name, &_gameFile->_dialogs[i]);
 
@@ -345,7 +347,7 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 	// FIXME
 
-	_scriptState->addSystemObjectImport("object", new ScriptObjectArray<RoomObject *>(_currentRoom->_objects, 8), true);
+	_scriptState->addSystemObjectImport("object", new ScriptObjectArray<RoomObject *>(_currentRoom->_objects, 8, "RoomObject"), true);
 
 	// FIXME
 
@@ -890,7 +892,7 @@ bool AGSEngine::init() {
 
 	addSystemScripting(this);
 
-	_scriptState->addSystemObjectImport("character", new ScriptObjectArray<Character *>(_characters, 780));
+	_scriptState->addSystemObjectImport("character", new ScriptObjectArray<Character *>(_characters, 780, "Character"));
 	_scriptState->addSystemObjectImport("player", _characters[_gameFile->_playerChar]);
 	for (uint i = 0; i < _characters.size(); ++i) {
 		Character *charInfo = _characters[i];
@@ -898,7 +900,7 @@ bool AGSEngine::init() {
 			continue;
 		_scriptState->addSystemObjectImport(charInfo->_scriptName, charInfo);
 	}
-	_scriptState->addSystemObjectImport("gui", new ScriptObjectArray<GUIGroup *>(_gameFile->_guiGroups, 8));
+	_scriptState->addSystemObjectImport("gui", new ScriptObjectArray<GUIGroup *>(_gameFile->_guiGroups, 8, "GUI"));
 	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
 		GUIGroup &group = *_gameFile->_guiGroups[i];
 		if (group._name.empty())
@@ -910,7 +912,7 @@ bool AGSEngine::init() {
 			_scriptState->addSystemObjectImport(group._controls[j]->_scriptName, group._controls[j]);
 		}
 	}
-	_scriptState->addSystemObjectImport("inventory", new ScriptObjectArray<InventoryItem>(_gameFile->_invItemInfo, 68));
+	_scriptState->addSystemObjectImport("inventory", new ScriptObjectArray<InventoryItem>(_gameFile->_invItemInfo, 68, "InventoryItem"));
 	for (uint i = 0; i < _gameFile->_invItemInfo.size(); ++i) {
 		InventoryItem &invItem = _gameFile->_invItemInfo[i];
 		if (invItem._scriptName.empty())

@@ -23,28 +23,53 @@
  * which is licensed under the Artistic License 2.0.
  */
 
-#ifndef AGS_INVENTORY_H
-#define AGS_INVENTORY_H
-
-#include "common/hash-str.h"
-#include "engines/ags/scriptobj.h"
+#include "engines/ags/character.h"
 
 namespace AGS {
 
-struct InventoryItem : public ScriptObject {
-	bool isOfType(ScriptObjectType objectType) { return (objectType == sotInventoryItem); }
-	const char *getObjectTypeName() { return "InventoryItem"; }
+uint32 Character::readUint32(uint offset) {
+	switch (offset) {
+	case 0:
+		return _defView;
+	case 4:
+		return _talkView;
+	case 8:
+		return _view;
+	case 12:
+		return _room;
+	case 16:
+		return _prevRoom;
+	case 20:
+		return _x;
+	case 24:
+		return _y;
+	case 28:
+		return _wait;
+	case 32:
+		return _flags;
+	case 40:
+		return _idleView;
+	case 52:
+		return _activeInv;
+	case 56:
+		return _talkColor;
+	case 60:
+		return _thinkView;
+	case 76:
+		return _z;
+	case 80:
+		return _walkWait;
+	case 96:
+		return _indexId;
+	default:
+		error("Character::readUint32: offset %d is invalid", offset);
+	}
+}
 
-	Common::String _name;
-	uint32 _pic;
-	uint32 _cursorPic;
-	uint32 _hotspotX, _hotspotY;
-	uint8 _flags;
+bool Character::writeUint32(uint offset, uint value) {
+	// FIXME
 
-	Common::StringMap _properties;
-	Common::String _scriptName;
-};
+	return false;
+}
 
 } // End of namespace AGS
-
-#endif // AGS_INVENTORY_H

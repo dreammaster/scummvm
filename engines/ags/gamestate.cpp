@@ -30,6 +30,8 @@
 
 namespace AGS {
 
+const uint MAXGLOBALVARS = 50;
+
 GameState::GameState(AGSEngine *vm) : _vm(vm) {
 	_wantSpeech = -2;
 	_separateMusicLib = 0;
@@ -49,6 +51,172 @@ GameState::GameState(AGSEngine *vm) : _vm(vm) {
 	_mouseCursorHidden = false;
 
 	_globalScriptVars.resize(MAXGSVALUES);
+}
+
+uint32 GameState::readUint32(uint offset) {
+	if (offset >= 20 && offset <= (20 + 4 * MAXGLOBALVARS)) {
+		if (offset % 4 != 0)
+			error("GameState::readUint32: offset %d is invalid", offset);
+		offset = (offset - 20) / 4;
+		return _globalVars[offset];
+	}
+
+	switch (offset) {
+	case 0:
+		return _score;
+	case 4:
+		return _usedMode;
+	case 8:
+		return _disabledUserInterface;
+	case 12:
+		return _gscriptTimer;
+	case 16:
+		return _debugMode;
+	case 220:
+		return _messageTime;
+	case 224:
+		return _usedInv;
+	case 228:
+		return _invTop;
+	case 232:
+		return _invNumDisplayed;
+	case 236:
+		return _invNumOrder;
+	case 240:
+		return _invNumInLine;
+	case 244:
+		return _textSpeed;
+	case 248:
+		return _sierraInvColor;
+	case 252:
+		return _talkAnimSpeed;
+	case 256:
+		return _invItemWidth;
+	case 260:
+		return _invItemHeight;
+	case 264:
+		return _speechTextShadow;
+	case 268:
+		return _swapPortraitSide;
+	case 272:
+		return _speechTextWindowGUI;
+	case 276:
+		return _followChangeRoomTimer;
+	case 280:
+		return _totalScore;
+	case 284:
+		return _skipDisplay;
+	case 288:
+		return _noMultiLoopRepeat;
+	case 292:
+		return _roomScriptFinished;
+	case 296:
+		return _usedInvOn;
+	case 300:
+		return _noTextBgWhenVoice;
+	case 304:
+		return _maxDialogOptionWidth;
+	case 308:
+		return _noHiColorFadeIn;
+	case 312:
+		return _bgSpeechGameSpeed;
+	case 316:
+		return _bgSpeechStayOnDisplay;
+	case 320:
+		return _unfactorSpeechFromTextLength;
+	case 324:
+		return _mp3LoopBeforeEnd;
+	case 328:
+		return _speechMusicDrop;
+	case 332:
+		return _inCutscene;
+	case 336:
+		return _fastForward;
+	case 340:
+		return _roomWidth;
+	case 344:
+		return _roomHeight;
+	case 348:
+		return _gameSpeedModifier;
+	case 352:
+		return _scoreSound;
+	case 356:
+		return _takeoverData;
+	case 360:
+		return _replayHotkey;
+	case 364:
+		return _dialogOptionsX;
+	case 368:
+		return _dialogOptionsY;
+	case 372:
+		return _narratorSpeech;
+	case 376:
+		return _ambientSoundsPersist;
+	case 380:
+		return _lipsyncSpeed;
+	case 384:
+		return _closeMouthSpeechTime;
+	case 388:
+		return _disableAntialiasing;
+	case 392:
+		return _textSpeedModifier;
+	case 396:
+		return _textAlign;
+	case 400:
+		return _speechBubbleWidth;
+	case 404:
+		return _disableDialogParser;
+	case 408:
+		return _animBackgroundSpeed;
+	case 412:
+		return _topBarBackColor;
+	case 416:
+		return _topBarTextColor;
+	case 420:
+		return _topBarBorderColor;
+	case 424:
+		return _topBarBorderWidth;
+	case 428:
+		return _topBarYPos;
+	case 432:
+		return _screenshotWidth;
+	case 436:
+		return _screenshotHeight;
+	case 440:
+		return _topBarFont;
+	case 444:
+		return _speechTextAlign;
+	case 448:
+		return _autoUseWalkToPoints;
+	case 452:
+		return _inventoryGreysOut;
+	case 456:
+		return _skipSpeechSpecificKey;
+	case 460:
+		return _abortKey;
+	case 464:
+		return _fadeToRed;
+	case 468:
+		return _fadeToGreen;
+	case 472:
+		return _fadeToBlue;
+	case 476:
+		return _showSingleDialogOption;
+	case 480:
+		return _keepScreenDuringInstantTransition;
+	case 484:
+		return _readDialogOptionColor;
+	case 488:
+		return _stopDialogAtEnd;
+	default:
+		error("GameState::readUint32: offset %d is invalid", offset);
+	}
+}
+
+bool GameState::writeUint32(uint offset, uint value) {
+	// FIXME
+
+	return false;
 }
 
 void GameState::init() {
@@ -231,8 +399,10 @@ void GameState::init() {
 	// FIXME: _defaultAudioTypeVolumes -> -1, MAX_AUDIO_TYPES
 
 	// reset graphical script variables (for compatibility with older games)
-	// FIXME: _globalVars -> 0, MAXGLOBALVARS
-	// FIXME: _globalStrings -> "", MAXGLOBALSTRINGS
+	_globalVars.resize(MAXGLOBALVARS);
+	for (uint i = 0; i < _globalVars.size(); ++i)
+		_globalVars[i] = 0;
+	_globalStrings.resize(MAXGLOBALSTRINGS);
 	// FIXME: _lastSoundPlayed -> -1, MAX_SOUND_CHANNELS
 
 	// FIXME: make sure the init_translation and update_invorder stuff is done somewhere

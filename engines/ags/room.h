@@ -58,6 +58,7 @@ struct FullAnimation {
 
 struct RoomRegion : public ScriptObject {
 	RoomRegion() : _interaction(NULL), _lightLevel(0), _tintLevel(0) { }
+	const char *getObjectTypeName() { return "RoomRegion"; }
 
 	NewInteraction *_interaction;
 	InteractionScript _interactionScripts;
@@ -65,8 +66,18 @@ struct RoomRegion : public ScriptObject {
 	uint32 _tintLevel;
 };
 
+// object flags
+#define OBJF_NOINTERACT        1  // not clickable
+#define OBJF_NOWALKBEHINDS     2  // ignore walk-behinds
+#define OBJF_HASTINT           4  // the tint_* members are valid
+#define OBJF_USEREGIONTINTS    8  // obey region tints/light areas
+#define OBJF_USEROOMSCALING 0x10  // obey room scaling areas
+#define OBJF_SOLID          0x20  // blocks characters from moving
+#define OBJF_DELETED        0x40  // object has been deleted
+
 struct RoomObject : public ScriptObject, public Drawable {
 	RoomObject(AGSEngine *vm) : _vm(vm), _interaction(NULL), _flags(0) { }
+	const char *getObjectTypeName() { return "RoomObject"; }
 
 	// originally from room, immutable
 	NewInteraction *_interaction;
@@ -128,6 +139,7 @@ struct RoomWalkArea {
 
 struct RoomHotspot : public ScriptObject {
 	RoomHotspot() : _interaction(NULL) { }
+	const char *getObjectTypeName() { return "RoomHotspot"; }
 
 	Common::Point _walkToPos;
 	Common::String _name;
