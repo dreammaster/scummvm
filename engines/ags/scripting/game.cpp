@@ -25,6 +25,7 @@
 
 #include "common/debug.h"
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
 
@@ -596,13 +597,12 @@ RuntimeValue Script_SetGameOption(AGSEngine *vm, ScriptObject *, const Common::A
 // import int GetGameOption(int option)
 // Gets the current value of a game option.
 RuntimeValue Script_GetGameOption(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int option = params[0]._signedValue;
-	UNUSED(option);
+	uint option = params[0]._value;
 
-	// FIXME
-	error("GetGameOption unimplemented");
+	if ((option < 1 || option > OPT_HIGHESTOPTION) && option != OPT_LIPSYNCTEXT)
+		error("GetGameOption: invalid option %d requested", option);
 
-	return RuntimeValue();
+	return vm->getGameOption(option);
 }
 
 // import string GetTranslation (const string originalText)
