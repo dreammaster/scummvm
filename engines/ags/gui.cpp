@@ -272,6 +272,48 @@ void GUIButton::readFrom(Common::SeekableReadStream *dta) {
 	}
 }
 
+void GUIButton::setNormalGraphic(uint32 pic) {
+	if (_pic == pic)
+		return;
+
+	_pic = pic;
+	if ((!_isOver || (int)_overPic < 1) && !_isPushed)
+		_usePic = pic;
+
+	// FIXME: resize self to size of sprite
+
+	_parent->invalidate();
+	stopAnimation();
+}
+
+void GUIButton::setMouseOverGraphic(uint32 pic) {
+	if (_overPic == pic)
+		return;
+
+	_overPic = pic;
+	if (_isOver && !_isPushed)
+		_usePic = pic;
+
+	_parent->invalidate();
+	stopAnimation();
+}
+
+void GUIButton::setPushedGraphic(uint32 pic) {
+	if (_pushedPic == pic)
+		return;
+
+	_pushedPic = pic;
+	if (_isPushed)
+		_usePic = pic;
+
+	_parent->invalidate();
+	stopAnimation();
+}
+
+void GUIButton::stopAnimation() {
+	// FIXME
+}
+
 GUIGroup::GUIGroup(AGSEngine *vm) : _vm(vm), _width(0), _height(0), _needsUpdate(true) {
 }
 
