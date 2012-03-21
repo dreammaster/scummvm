@@ -598,6 +598,24 @@ RuntimeValue Script_AudioClip_get_Type(AGSEngine *vm, AudioClip *self, const Com
 	return RuntimeValue();
 }
 
+// System: readonly import static attribute AudioChannel *AudioChannels[]
+// Gets a specific audio channel instance.
+RuntimeValue Script_System_geti_AudioChannels(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
+	uint index = params[0]._value;
+
+	if (index >= vm->_audio->_channels.size())
+		error("System::geti_AudioChannels: channel %d too high (only %d channels)", index, vm->_audio->_channels.size());
+
+	return vm->_audio->_channels[index];
+}
+
+// System: readonly import static attribute int AudioChannelCount
+// Gets the number of audio channels supported by AGS.
+RuntimeValue Script_System_get_AudioChannelCount(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
+	// FIXME
+	return 8; // MAX_SOUND_CHANNELS
+}
+
 static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "CDAudio", (ScriptAPIFunction *)&Script_CDAudio, "ii", sotNone },
 	{ "PlayFlic", (ScriptAPIFunction *)&Script_PlayFlic, "ii", sotNone },
@@ -650,6 +668,8 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "AudioClip::get_FileType", (ScriptAPIFunction *)&Script_AudioClip_get_FileType, "", sotAudioClip },
 	{ "AudioClip::get_IsAvailable", (ScriptAPIFunction *)&Script_AudioClip_get_IsAvailable, "", sotAudioClip },
 	{ "AudioClip::get_Type", (ScriptAPIFunction *)&Script_AudioClip_get_Type, "", sotAudioClip },
+	{ "System::geti_AudioChannels", (ScriptAPIFunction *)&Script_System_geti_AudioChannels, "i", sotNone },
+	{ "System::get_AudioChannelCount", (ScriptAPIFunction *)&Script_System_get_AudioChannelCount, "", sotNone },
 };
 
 void addAudioSystemScripting(AGSEngine *vm) {
