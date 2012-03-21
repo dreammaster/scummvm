@@ -631,9 +631,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 				}
 				break;
 			case rvtSystemObject:
-				// FIXME: !!!
-				warning("script tried to MEMREAD from system object (value %d) on line %d",
-					tempVal._value, _lineNumber);
+				_registers[int1] = tempVal._object->readUint32(tempVal._value);
 				break;
 			case rvtStackPointer:
 				if (tempVal._value + 4 >= _stack.size())
