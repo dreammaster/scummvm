@@ -59,6 +59,7 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_resourceMan(0), _needsUpdate(true), _guiNeedsUpdate(true),
 	_startingRoom(0xffffffff), _displayedRoom(0xffffffff),
 	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL), _roomScriptFork(NULL),
+	_scriptMouseObject(NULL), _gameStateGlobalsObject(NULL), _saveGameIndexObject(NULL), _scriptSystemObject(NULL),
 	_currentRoom(NULL), _framesPerSecond(40), _lastFrameTime(0),
 	_inNewRoomState(kNewRoomStateNone), _newRoomStateWas(kNewRoomStateNone), _inEntersScreenCounter(0),
 	_blockingUntil(kUntilNothing), _insideProcessEvent(false) {
@@ -85,6 +86,11 @@ AGSEngine::~AGSEngine() {
 		assert(_characters[i]->getRefCount() == 1);
 		_characters[i]->DecRef();
 	}
+
+	delete _scriptMouseObject;
+	delete _gameStateGlobalsObject;
+	delete _saveGameIndexObject;
+	delete _scriptSystemObject;
 
 	delete _scriptState;
 
@@ -273,8 +279,109 @@ void AGSEngine::setupPlayerCharacter(uint32 charId) {
 	_playerChar = _characters[charId];
 }
 
+class ScriptMouseObject : public ScriptObject {
+public:
+	ScriptMouseObject(AGSEngine *vm) : _vm(vm) { }
+	const char *getObjectTypeName() { return "ScriptMouseObject"; }
+
+	uint32 readUint32(uint offset) {
+		switch (offset) {
+		case 0:
+			return _vm->divideDownCoordinate(_vm->_system->getEventManager()->getMousePos().x);
+		case 4:
+			return _vm->divideDownCoordinate(_vm->_system->getEventManager()->getMousePos().y);
+		default:
+			error("ScriptMouseObject::readUint32: offset %d is invalid", offset);
+		}
+	}
+
+protected:
+	AGSEngine *_vm;
+};
+
+class ScriptGameStateGlobalsObject : public ScriptObject {
+public:
+	ScriptGameStateGlobalsObject(AGSEngine *vm) : _vm(vm) { }
+	const char *getObjectTypeName() { return "ScriptGameStateGlobalsObject"; }
+
+	uint32 readUint32(uint offset) {
+		if (offset % 4 != 0)
+			error("ScriptGameStateGlobalsObject::readUint32: offset %d is invalid", offset);
+		offset /= 4;
+		if (offset >= _vm->_state->_globalVars.size())
+			error("ScriptGameStateGlobalsObject::readUint32: index %d is too high (only %d globals)",
+				offset, _vm->_state->_globalVars.size());
+		return _vm->_state->_globalVars[offset];
+	}
+
+protected:
+	AGSEngine *_vm;
+};
+
+class ScriptSaveGameIndexObject : public ScriptObject {
+public:
+	ScriptSaveGameIndexObject(AGSEngine *vm) : _vm(vm) { }
+	const char *getObjectTypeName() { return "ScriptSaveGameIndexObject"; }
+
+	// FIXME
+
+protected:
+	AGSEngine *_vm;
+};
+
+class ScriptSystemObject : public ScriptObject {
+public:
+	ScriptSystemObject(AGSEngine *vm) : _vm(vm) { }
+	const char *getObjectTypeName() { return "ScriptSystemObject"; }
+
+	uint32 readUint32(uint offset) {
+		switch (offset) {
+		case 0:
+			// width
+			return 0; // FIXME
+		case 4:
+			// height
+			return 0; // FIXME
+		case 8:
+			// coldepth
+			return 32; // FIXME
+		case 12:
+			// os
+			return 0; // FIXME
+		case 16:
+			// windowed
+			return 0; // FIXME
+		case 20:
+			// vsync
+			return 0; // FIXME
+		case 24:
+			// viewport_width
+			return 0; // FIXME
+		case 28:
+			// viewport_height
+			return 0; // FIXME
+		default:
+			error("ScriptSystemObject::readUint32: offset %d is invalid", offset);
+		}
+	}
+
+protected:
+	AGSEngine *_vm;
+};
+
+
 void AGSEngine::createGlobalScript() {
 	assert(_scriptModules.empty());
+
+	_scriptMouseObject = new ScriptMouseObject(this);
+	_scriptState->addSystemObjectImport("mouse", _scriptMouseObject);
+	_scriptState->addSystemObjectImport("game", _state);
+	_gameStateGlobalsObject = new ScriptGameStateGlobalsObject(this);
+	_scriptState->addSystemObjectImport("gs_globals", _gameStateGlobalsObject);
+	_saveGameIndexObject = new ScriptSaveGameIndexObject(this);
+	_scriptState->addSystemObjectImport("savegameindex", _saveGameIndexObject);
+	_scriptSystemObject = new ScriptSystemObject(this);
+	_scriptState->addSystemObjectImport("system", _scriptSystemObject);
 
 	_scriptState->addSystemObjectImport("dialog", new ScriptObjectArray<DialogTopic>(_gameFile->_dialogs, 8, "DialogTopic"));
 	for (uint i = 0; i < _gameFile->_dialogs.size(); ++i)

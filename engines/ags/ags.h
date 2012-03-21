@@ -46,6 +46,7 @@ class AGSGraphics;
 class GameFile;
 class ResourceManager;
 class Room;
+class ScriptObject;
 class SpriteSet;
 struct Character;
 class ccInstance;
@@ -274,6 +275,11 @@ private:
 	ccInstance *_roomScript, *_roomScriptFork;
 
 	class GlobalScriptState *_scriptState;
+
+	ScriptObject *_scriptMouseObject;
+	ScriptObject *_gameStateGlobalsObject;
+	ScriptObject *_saveGameIndexObject;
+	ScriptObject *_scriptSystemObject;
 
 	BlockUntilType _blockingUntil;
 	uint _blockingUntilId;
