@@ -68,7 +68,7 @@ SpriteSet::SpriteSet(AGSEngine *vm, Common::SeekableReadStream *stream) : _vm(vm
 	uint16 spriteCount = _stream->readUint16LE();
 	if (version < 4)
 		spriteCount = 200;
-	_spriteInfo.resize(spriteCount);
+	_spriteInfo.resize(spriteCount + 1);
 
 	debug(2, "sprite set has %d sprites (version %d, %s)", spriteCount, version, _spritesAreCompressed ? "compressed" : "uncompressed");
 
@@ -131,11 +131,11 @@ bool SpriteSet::loadSpriteIndexFile(uint32 spriteFileID) {
 		}
 	}
 
-	uint32 spriteCount = idxStream->readUint32LE();
+	uint32 spriteCount = idxStream->readUint32LE() + 1;
 	uint32 lastIndex = idxStream->readUint32LE();
 
 	// sprite count should match, and last index should be one beyond number of sprites
-	if ((spriteCount != _spriteInfo.size()) || (lastIndex != spriteCount + 1)) {
+	if ((spriteCount != _spriteInfo.size()) || (lastIndex != spriteCount)) {
 		warning("inconsistent sprite index file (%d sprites, should be %d, last index %d)",
 			spriteCount, _spriteInfo.size(), lastIndex);
 		delete idxStream;
@@ -146,10 +146,8 @@ bool SpriteSet::loadSpriteIndexFile(uint32 spriteFileID) {
 
 	for (uint i = 0; i < spriteCount; ++i)
 		_spriteInfo[i]._width = idxStream->readUint16LE();
-	idxStream->skip(2);
 	for (uint i = 0; i < spriteCount; ++i)
 		_spriteInfo[i]._height = idxStream->readUint16LE();
-	idxStream->skip(2);
 	for (uint i = 0; i < spriteCount; ++i) {
 		_spriteInfo[i]._offset = idxStream->readUint32LE();
 		if (_spriteInfo[i]._offset >= (uint32)_stream->size())
