@@ -646,16 +646,16 @@ void AGSEngine::scheduleNewRoom(int roomId) {
 
 	debug(1, "Room change requested to room %d", roomId);
 
+	endSkippingUntilCharStops();
 	// FIXME
-	// EndSkippingUntilCharStops();
 	// can_run_delayed_command();
-	//if (play.stop_dialog_at_end != DIALOG_NONE) {
-	//  if (play.stop_dialog_at_end == DIALOG_RUNNING)
-	//    play.stop_dialog_at_end = DIALOG_NEWROOM + nrnum;
-	//  else
-	//    quit("!NewRoom: two NewRoom/RunDialog/StopDialog requests within dialog");
-	//  return;
-	//}
+	if (_state->_stopDialogAtEnd != DIALOG_NONE) {
+		if (_state->_stopDialogAtEnd == DIALOG_RUNNING)
+			_state->_stopDialogAtEnd = DIALOG_NEWROOM + roomId;
+		else
+			error("scheduleNewRoom: two NewRoom/RunDialog/StopDialog requests within dialog");
+		return;
+	}
 
 	if (_leavesScreenRoomId >= 0) {
 		// NewRoom called from the Player Leaves Screen event -- just
@@ -668,11 +668,10 @@ void AGSEngine::scheduleNewRoom(int roomId) {
 	//} else if (in_inv_screen) {
 	//	inv_screen_newroom = nrnum;
 	//	return;
-	} else if (!_runningScripts.size()) { // in_graph_script was consulted here
+	} else if (_runningScripts.empty()) { // in_graph_script was consulted here
 		newRoom(roomId);
 		return;
-	}
-	else if (_runningScripts.size()) {
+	} else {
 		_runningScripts.back().queueAction(kPSANewRoom, roomId, "NewRoom");
 		// we might be within a MoveCharacterBlocking -- the room
 		// change should abort it
@@ -690,17 +689,20 @@ void AGSEngine::scheduleNewRoom(int roomId) {
 /** Changes the current room number and loads a new room from disk */
 void AGSEngine::newRoom(int roomId) {
 	warning("AGSEngine::newRoom not implemented");
-	//EndSkippingUntilCharStops();
+	endSkippingUntilCharStops();
 
 	debug(1, "Room change requested to room %d", roomId);
-
-	// TODO: update_polled_stuff()
 
 	// we are currently running Leaves Screen scripts
 	_leavesScreenRoomId = roomId;
 
 	// player leaves screen event
-	// TODO: run_room_event(8)
+	_eventBlockBaseName = "room";
+	if (_currentRoom->_interaction)
+		runInteractionEvent(_currentRoom->_interaction, kRoomEventPlayerLeavesScreen);
+	else
+		runInteractionScript(&_currentRoom->_interactionScripts, kRoomEventPlayerLeavesScreen);
+
 	// Run the global OnRoomLeave event
 	// TODO: run_on_event(GE_LEAVE_ROOM, _displayedRoom)
 
@@ -717,12 +719,8 @@ void AGSEngine::newRoom(int roomId) {
 		_playerChar->_following = -1;
 	}
 
-	// TODO: update_polled_stuff()
-
 	// change rooms
 	unloadOldRoom();
-
-	// TODO: update_polled_stuff()
 
 	loadNewRoom(roomId, _playerChar);
 }
