@@ -117,6 +117,18 @@ enum {
 	kTextScriptOnMouseClick = 3
 };
 
+// kTextScriptOnMouseClick parameters
+enum {
+	kMouseLeft = 1,
+	kMouseRight = 2,
+	kMouseMiddle = 3,
+	kMouseLeftInv = 5,
+	kMouseRightInv = 6,
+	kMouseMiddleInv = 7,
+	kMouseWheelNorth = 8,
+	kMouseWheelSouth = 9
+};
+
 enum {
 	kRoomEventLeftEdge = 0,
 	kRoomEventRightEdge = 1,
@@ -138,6 +150,14 @@ enum BlockUntilType {
 	kUntilCharWalkDone,
 	kUntilObjMoveDone,
 	kUntilObjCycleDone
+};
+
+enum CutsceneSkipType {
+	kSkipESCOnly = 1,
+	kSkipAnyKey = 2,
+	kSkipMouseClick = 3,
+	kSkipAnyKeyOrMouseClick = 4,
+	kSkipESCOrRightButton = 5
 };
 
 struct GameEvent {
@@ -170,6 +190,8 @@ public:
 	uint32 findNextEnabledCursor(uint32 startWith);
 	void setCursorMode(uint32 newMode);
 	uint32 getCursorMode() { return _cursorMode; }
+
+	void removePopupInterface(uint guiId);
 
 	void checkViewFrame(uint view, uint loop, uint frame);
 
@@ -204,6 +226,7 @@ public:
 	void skipUntilCharacterStops(uint charId);
 	void endSkippingUntilCharStops();
 	void startSkippableCutscene();
+	void startSkippingCutscene();
 	void stopFastForwarding();
 
 	void runDialogId(uint dialogId);
@@ -237,6 +260,7 @@ private:
 
 	bool _needsUpdate, _guiNeedsUpdate;
 	uint32 _cursorMode;
+	uint _poppedInterface;
 
 	uint32 _startingRoom;
 	uint32 _displayedRoom;
@@ -292,7 +316,7 @@ private:
 
 	bool mainGameLoop();
 	void tickGame(bool checkControls = false);
-	void updateEvents();
+	void updateEvents(bool checkControls);
 
 	void startNewGame();
 	void setupPlayerCharacter(uint32 charId);

@@ -349,6 +349,16 @@ void GUIGroup::invalidate() {
 	_needsUpdate = true;
 }
 
+bool GUIGroup::isMouseOver(const Common::Point &pos) {
+	if (_on < 1)
+		return false;
+
+	if (_flags & GUIF_NOCLICK)
+		return false;
+
+	return (pos.x >= _x && pos.y >= _y && pos.x <= _x + (int)_width && pos.y <= _y + (int)_height);
+}
+
 void GUIGroup::setVisible(bool visible) {
 	if ((bool)_on == visible)
 		return;

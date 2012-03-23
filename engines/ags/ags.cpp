@@ -56,7 +56,7 @@ const char *kGameDataNameV3 = "game28.dta";
 
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
-	_resourceMan(0), _needsUpdate(true), _guiNeedsUpdate(true),
+	_resourceMan(0), _needsUpdate(true), _guiNeedsUpdate(true), _poppedInterface((uint)-1),
 	_startingRoom(0xffffffff), _displayedRoom(0xffffffff),
 	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL), _roomScriptFork(NULL),
 	_scriptMouseObject(NULL), _gameStateGlobalsObject(NULL), _saveGameIndexObject(NULL), _scriptSystemObject(NULL),
@@ -191,7 +191,7 @@ void AGSEngine::tickGame(bool checkControls) {
 
 	// FIXME: check no_blocking_functions
 
-	updateEvents();
+	updateEvents(checkControls);
 	if (shouldQuit())
 		return;
 
@@ -243,12 +243,154 @@ void AGSEngine::tickGame(bool checkControls) {
 	// FIXME
 }
 
-void AGSEngine::updateEvents() {
+void AGSEngine::updateEvents(bool checkControls) {
 	Common::Event event;
 
+	uint numEventsWas = _queuedGameEvents.size();
+
+	uint buttonClicked = 0;
+
 	while (_eventMan->pollEvent(event)) {
-		// FIXME
+		// FIXME: if !checkControls, put these in a queue
+
+		switch (event.type) {
+		case Common::EVENT_LBUTTONDOWN:
+			// TODO
+			buttonClicked = kMouseLeft;
+			break;
+		case Common::EVENT_RBUTTONDOWN:
+			buttonClicked = kMouseRight;
+			if (_state->_inCutscene == kSkipESCOrRightButton)
+				startSkippingCutscene();
+			break;
+		case Common::EVENT_MBUTTONDOWN:
+			buttonClicked = kMouseMiddle;
+			break;
+
+		case Common::EVENT_LBUTTONUP:
+			// TODO
+			break;
+
+		// run mouse wheel scripts
+		case Common::EVENT_WHEELDOWN:
+			queueGameEvent(kEventTextScript, kTextScriptOnMouseClick, kMouseWheelSouth);
+			break;
+		case Common::EVENT_WHEELUP:
+			queueGameEvent(kEventTextScript, kTextScriptOnMouseClick, kMouseWheelNorth);
+			break;
+
+		case Common::EVENT_KEYDOWN:
+			// FIXME: keypresses
+			break;
+
+		default:
+			break;
+		}
 	}
+
+	int activeGUI = -1;
+
+	Common::Point mousePos = _system->getEventManager()->getMousePos();
+
+	if (getGameOption(OPT_DISABLEOFF) != 3 /* FIXME: || !_allButtonsDisabled */) {
+		for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
+			// FIXME: use draw order instead!
+			GUIGroup *group = _gameFile->_guiGroups[i];
+
+			// store the mouseover GUI for later use
+			if (group->isMouseOver(mousePos))
+				activeGUI = i;
+
+			// check for enabled popup-on-y-pos GUIs which need activation
+			if (group->_popup != POPUP_MOUSEY)
+				continue;
+			if (group->_on == (uint)-1)
+				continue;
+			if (group->_popupYP <= (uint)mousePos.y)
+				continue;
+
+			// don't display when skipping a cutscene
+			if (_state->_fastForward)
+				continue;
+			// FIXME: break if is complete overlay
+
+			// no need to do it more than once
+			if (_poppedInterface == i)
+				continue;
+
+			_graphics->setMouseCursor(CURS_ARROW);
+			group->setVisible(true);
+			_poppedInterface = i;
+			// FIXME: pauseGame();
+			break;
+		}
+	}
+
+	if (_poppedInterface != (uint)-1) {
+		// remove the popped interface if the mouse has moved away
+		GUIGroup *group = _gameFile->_guiGroups[_poppedInterface];
+		if (mousePos.y >= group->_y + (int)group->_height)
+			removePopupInterface(_poppedInterface);
+	}
+
+	// FIXME: check for mouse clicks on GUIs
+
+	if (buttonClicked) {
+		if (_state->_inCutscene == kSkipMouseClick || _state->_inCutscene == kSkipAnyKeyOrMouseClick)
+			startSkippingCutscene();
+
+		if (_state->_fastForward) {
+			// do nothing
+		} else if (_state->_waitCounter > 0 && _state->_keySkipWait > 1) {
+			// skip wait
+			_state->_waitCounter = -1;
+		} else {
+			// FIXME: the rest
+			queueGameEvent(kEventTextScript, kTextScriptOnMouseClick, buttonClicked);
+		}
+	}
+
+	// walking off edges only happens when none of the below are the case:
+	// * if walking off edges is disabled
+	if (!(_state->_groundLevelAreasDisabled & GLED_INTERACTION))
+		return;
+	// * if events have been queued above
+	if (numEventsWas != _queuedGameEvents.size())
+		return;
+	// * if we're moving between rooms, or still in Player Enters Screen
+	if (_inNewRoomState != kNewRoomStateNone || _newRoomStateWas != kNewRoomStateNone)
+		return;
+	// * if the game is paused
+	// FIXME
+	// * if the GUI is disabled (in wait mode)
+	// FIXME
+
+	// work out which edge the player is beyond, if any
+	bool edgesActivated[4] = { false, false, false, false };
+	if (_playerChar->_x <= _currentRoom->_boundary.left)
+		edgesActivated[0] = true;
+	else if (_playerChar->_x >= _currentRoom->_boundary.right)
+		edgesActivated[1] = true;
+	if (_playerChar->_y >= _currentRoom->_boundary.bottom)
+		edgesActivated[2] = true;
+	else if (_playerChar->_y <= _currentRoom->_boundary.top)
+		edgesActivated[3] = true;
+
+	if (_state->_enteredEdge <= 3) {
+		if (!edgesActivated[_state->_enteredEdge]) {
+			// once the player is no longer outside the edge, forget the stored edge
+			_state->_enteredEdge = (uint)-10;
+		} else {
+			// don't run an edge activation script more than once
+			// (original says "if we are walking in from off-screen, don't activate edges")
+			edgesActivated[_state->_enteredEdge] = false;
+		}
+	}
+
+	// run the script for any activated edges
+	for (uint i = 0; i < 4; ++i)
+		if (edgesActivated[i])
+			queueGameEvent(kEventRunEventBlock, kEventBlockRoom, 0, i);
 }
 
 void AGSEngine::startNewGame() {
@@ -1134,6 +1276,28 @@ void AGSEngine::setCursorMode(uint32 newMode) {
 	debug(1, "cursor mode set to %d", newMode);
 }
 
+void AGSEngine::removePopupInterface(uint guiId) {
+	if (_poppedInterface != guiId)
+		return;
+
+	_poppedInterface = (uint)-1;
+	// FIXME: unpauseGame();
+
+	GUIGroup *group = _gameFile->_guiGroups[guiId];
+	group->setVisible(false);
+
+	// FIXME: filter?
+
+	if (_state->_disabledUserInterface) {
+		// Only change the mouse cursor if it hasn't been specifically changed first
+		if (_cursorMode == _graphics->getCurrentCursor())
+			_graphics->setMouseCursor(CURS_WAIT);
+	} else
+		setDefaultCursor();
+
+	// FIXME: reset mouse_on_iface
+}
+
 void AGSEngine::checkViewFrame(uint view, uint loop, uint frame) {
 	// FIXME: check sounds for new frames
 }
@@ -1332,6 +1496,15 @@ void AGSEngine::endSkippingUntilCharStops() {
 
 void AGSEngine::startSkippableCutscene() {
 	_state->_endCutsceneMusic = (uint)-1;
+}
+
+void AGSEngine::startSkippingCutscene() {
+	_state->_fastForward = 1;
+
+	if (_poppedInterface != (uint)-1)
+		removePopupInterface(_poppedInterface);
+
+	// FIXME: remove text message, if any
 }
 
 void AGSEngine::stopFastForwarding() {
