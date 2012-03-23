@@ -319,6 +319,12 @@ void Room::readData(Common::SeekableReadStream *dta) {
 				objectName[MAX_SCRIPT_NAME_LEN] = '\0';
 				_objects[i]->_scriptName = objectName;
 				debug(7, "object %d script '%s'", i, objectName);
+
+				if (_version <= kAGSRoomVer300 && !_objects[i]->_scriptName.empty()) {
+					_objects[i]->_scriptName.toLowercase();
+					_objects[i]->_scriptName.setChar(toupper(_objects[i]->_scriptName[0]), 0);
+					_objects[i]->_scriptName.insertChar('o', 0);
+				}
 			}
 			break;
 		case BLOCKTYPE_ANIMBKGRND:

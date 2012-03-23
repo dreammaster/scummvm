@@ -603,6 +603,20 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	// FIXME
 
 	_scriptState->addSystemObjectImport("object", new ScriptObjectArray<RoomObject *>(_currentRoom->_objects, 8, "RoomObject"), true);
+	for (uint i = 0; i < _currentRoom->_objects.size(); ++i) {
+		RoomObject *obj = _currentRoom->_objects[i];
+		if (obj->_scriptName.empty())
+			continue;
+		_scriptState->addSystemObjectImport(obj->_scriptName, obj);
+	}
+
+	_scriptState->addSystemObjectImport("hotspot", new ScriptObjectArray<RoomHotspot>(_currentRoom->_hotspots, 8, "RoomHotspot"), true);
+	for (uint i = 0; i < _currentRoom->_hotspots.size(); ++i) {
+		RoomHotspot &hotspot = _currentRoom->_hotspots[i];
+		if (hotspot._scriptName.empty())
+			continue;
+		_scriptState->addSystemObjectImport(hotspot._scriptName, &hotspot);
+	}
 
 	// FIXME
 

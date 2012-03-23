@@ -1344,7 +1344,7 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 	// if this is a member function, make sure it's being called on an object of the right type
 	if (object) {
 		if (!object->isOfType(function->objectType))
-			error("'%s' was passed an object with the wrong type", function->name);
+			error("'%s' was passed an object with the wrong type '%s'", function->name, object->getObjectTypeName());
 		++pos;
 	}
 
