@@ -44,6 +44,15 @@ struct SpriteInfo {
 	uint32 _width, _height;
 };
 
+struct Sprite {
+	Sprite(uint spriteId, Graphics::Surface *surf) : _id(spriteId), _surface(surf), _refCount(0) { }
+	~Sprite();
+
+	uint _id;
+	Graphics::Surface *_surface;
+	uint _refCount;
+};
+
 class AGSEngine;
 
 class SpriteSet {
@@ -52,13 +61,17 @@ public:
 	~SpriteSet();
 
 	uint getSpriteCount() { return _spriteInfo.size(); }
-	Graphics::Surface *getSprite(uint32 spriteId);
+	Sprite *getSprite(uint32 spriteId);
+	void releaseSprite(Sprite *sprite);
 
 protected:
 	AGSEngine *_vm;
 	Common::SeekableReadStream *_stream;
 	bool _spritesAreCompressed;
 	Common::Array<SpriteInfo> _spriteInfo;
+
+	// id->sprite mapping
+	Common::HashMap<uint, Sprite *> _sprites;
 
 	bool loadSpriteIndexFile(uint32 spriteFileID);
 };

@@ -32,6 +32,11 @@
 
 namespace AGS {
 
+Sprite::~Sprite() {
+	_surface->free();
+	delete _surface;
+}
+
 const char *kSpriteFileSignature = " Sprite File ";
 const char *kSpriteIndexFilename = "sprindex.dat";
 const char *kSpriteIndexSignature = "SPRINDEX";
@@ -100,6 +105,9 @@ SpriteSet::SpriteSet(AGSEngine *vm, Common::SeekableReadStream *stream) : _vm(vm
 
 SpriteSet::~SpriteSet() {
 	delete _stream;
+
+	for (Common::HashMap<uint, Sprite *>::iterator i = _sprites.begin(); i != _sprites.end(); ++i)
+		delete i->_value;
 }
 
 bool SpriteSet::loadSpriteIndexFile(uint32 spriteFileID) {
@@ -158,13 +166,16 @@ bool SpriteSet::loadSpriteIndexFile(uint32 spriteFileID) {
 	return true;
 }
 
-Graphics::Surface *SpriteSet::getSprite(uint32 spriteId) {
+Sprite *SpriteSet::getSprite(uint32 spriteId) {
 	if (spriteId >= _spriteInfo.size())
 		error("SpriteSet::getSprite: sprite id %d is too high", spriteId);
 
 	// convert non-existant sprites to the big blue cup
 	if (_spriteInfo[spriteId]._offset == 0)
 		spriteId = 0;
+
+	if (_sprites.contains(spriteId))
+		return _sprites[spriteId];
 
 	_stream->seek(_spriteInfo[spriteId]._offset);
 	uint16 colorDepth = _stream->readUint16LE();
@@ -211,7 +222,9 @@ Graphics::Surface *SpriteSet::getSprite(uint32 spriteId) {
 
 	// FIXME
 
-	return surface;
+	Sprite *sprite = new Sprite(spriteId, surface);
+	_sprites[spriteId] = sprite;
+	return sprite;
 }
 
 void unpackSpriteBits(Common::SeekableReadStream *stream, byte *dest, uint32 size) {

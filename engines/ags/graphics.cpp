@@ -242,12 +242,12 @@ public:
 	virtual int getDrawOrder() { return 0; }
 
 	virtual const Graphics::Surface *getDrawSurface() {
-		return _cursorSprite;
+		return _cursorSprite->_surface;
 	}
 
 	// FIXME
-	virtual uint getDrawWidth() { return _cursorSprite->w; }
-	virtual uint getDrawHeight() { return _cursorSprite->h; }
+	virtual uint getDrawWidth() { return _cursorSprite->_surface->w; }
+	virtual uint getDrawHeight() { return _cursorSprite->_surface->h; }
 	virtual uint getDrawTransparency() { return 0; }
 	virtual bool isDrawVerticallyMirrored() { return false; }
 	virtual int getDrawLightLevel() { return 0; }
@@ -258,7 +258,7 @@ public:
 protected:
 	AGSEngine *_vm;
 
-	Graphics::Surface *_cursorSprite;
+	Sprite *_cursorSprite;
 	bool _alphaBlendCursor;
 
 	uint32 _mouseFrame, _mouseDelay;
