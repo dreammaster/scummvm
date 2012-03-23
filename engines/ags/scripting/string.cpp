@@ -189,15 +189,16 @@ RuntimeValue Script_String_StartsWith(AGSEngine *vm, ScriptString *self, const C
 // String: import String Substring(int index, int length)
 // Returns a portion of the string.
 RuntimeValue Script_String_Substring(AGSEngine *vm, ScriptString *self, const Common::Array<RuntimeValue> &params) {
-	int index = params[0]._signedValue;
-	UNUSED(index);
-	int length = params[1]._signedValue;
-	UNUSED(length);
+	uint index = params[0]._value;
+	uint length = params[1]._value;
 
-	// FIXME
-	error("String::Substring unimplemented");
+	if (index > self->getString().size())
+		error("String::Substring: invalid index");
 
-	return RuntimeValue();
+	Common::String result(self->getString().c_str() + index, length);
+	RuntimeValue ret = new ScriptMutableString(result);
+	ret._object->DecRef();
+	return ret;
 }
 
 // String: import String Truncate(int length)
