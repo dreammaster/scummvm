@@ -31,6 +31,7 @@
 #include "common/stream.h"
 #include "graphics/surface.h"
 
+#include "engines/ags/drawable.h"
 #include "engines/ags/scriptobj.h"
 
 namespace AGS {
@@ -125,7 +126,7 @@ public:
 	virtual bool onMouseDown() { return false; }
 	virtual void onMouseUp() { }
 	virtual void onKeyPress(uint id) { }
-	virtual void draw() { }
+	virtual void draw(Graphics::Surface *surface) = 0;
 
 	virtual bool isOverControl(const Common::Point &pos, uint extra);
 
@@ -165,6 +166,8 @@ public:
 	uint32 _handleOffset;
 	uint32 _bgImage;
 
+	void draw(Graphics::Surface *surface);
+
 protected:
 	uint32 getMaxNumEvents() { return 1; }
 
@@ -187,6 +190,8 @@ public:
 	const Common::String &getText() const { return _text; }
 	void setText(Common::String text);
 
+	void draw(Graphics::Surface *surface);
+
 protected:
 	uint32 getMaxNumEvents() { return 0; }
 
@@ -208,6 +213,8 @@ public:
 	uint32 _font;
 	uint32 _textColor;
 	uint32 _exFlags;
+
+	void draw(Graphics::Surface *surface);
 
 protected:
 	uint32 getMaxNumEvents() { return 1; }
@@ -237,6 +244,8 @@ public:
 	uint32 _selectedBgColor;
 	uint32 _alignment;
 
+	void draw(Graphics::Surface *surface);
+
 protected:
 	uint32 getMaxNumEvents() { return 1; }
 };
@@ -255,6 +264,8 @@ public:
 	// not persisted
 	uint32 _isOver;
 	uint32 _itemsPerLine, _numLines;
+
+	void draw(Graphics::Surface *surface);
 
 protected:
 	uint32 getMaxNumEvents() { return 1; }
@@ -291,11 +302,12 @@ protected:
 	uint32 _usePic;
 
 	void stopAnimation();
+	void draw(Graphics::Surface *surface);
 
 	uint32 getMaxNumEvents() { return 1; }
 };
 
-class GUIGroup : public ScriptObject {
+class GUIGroup : public ScriptObject, public Drawable {
 public:
 	GUIGroup(AGSEngine *vm);
 	~GUIGroup();
@@ -341,11 +353,25 @@ public:
 	Common::Array<uint32> _controlRefPtrs; // for re-building objs array
 	Common::Array<uint16> _controlDrawOrder;
 
+	virtual Common::Point getDrawPos() { return Common::Point(_x, _y); }
+	virtual int getDrawOrder() { return 0; }
+	virtual uint getDrawWidth() { return _width; }
+	virtual uint getDrawHeight() { return _height; }
+
+	virtual const Graphics::Surface *getDrawSurface();
+
+	virtual uint getDrawTransparency() { return 0; }
+	virtual bool isDrawVerticallyMirrored() { return 0; }
+	virtual int getDrawLightLevel() { return 0; }
+	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) { }
+
 protected:
 	AGSEngine *_vm;
 	Graphics::Surface _surface;
 
 	bool _needsUpdate;
+
+	void draw();
 };
 
 } // End of namespace AGS

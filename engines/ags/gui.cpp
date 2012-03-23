@@ -30,6 +30,8 @@
 #include "engines/ags/gui.h"
 #include "engines/ags/util.h"
 
+#include "graphics/font.h"
+
 namespace AGS {
 
 bool GUIControl::isOverControl(const Common::Point &pos, uint extra) {
@@ -101,6 +103,10 @@ void GUISlider::readFrom(Common::SeekableReadStream *dta) {
 	}
 }
 
+void GUISlider::draw(Graphics::Surface *surface) {
+	warning("GUISlider::draw unimplemented");
+}
+
 void GUILabel::readFrom(Common::SeekableReadStream *dta) {
 	GUIControl::readFrom(dta);
 
@@ -159,6 +165,39 @@ void GUILabel::setText(Common::String text) {
 	_parent->invalidate();
 }
 
+void GUILabel::draw(Graphics::Surface *surface) {
+	Common::String text = _vm->replaceMacroTokens(_vm->getTranslation(_text));
+	uint32 color = _vm->_graphics->resolveHardcodedColor(_textColor);
+	Graphics::Font *font = _vm->_graphics->getFont(_font);
+
+	Common::Array<Common::String> lines;
+	font->wordWrapText(text, _width, lines);
+
+	uint y = 0;
+	for (uint i = 0; i < lines.size(); ++i) {
+		// TODO: fix align elsewhere?
+		Graphics::TextAlign align;
+		switch (_align) {
+		case GALIGN_LEFT:
+			align = Graphics::kTextAlignLeft;
+			break;
+		case GALIGN_CENTRE:
+			align = Graphics::kTextAlignCenter;
+			break;
+		case GALIGN_RIGHT:
+			align = Graphics::kTextAlignRight;
+			break;
+		default:
+			error("GUILabel::draw: invalid alignment %d", _align);
+		}
+		// FIXME: draw with outline
+		font->drawString(surface, lines[i], _x, _y + y, _width, color, align);
+		y += font->getFontHeight() + 1;
+		if (y > _height)
+			return;
+	}
+}
+
 void GUITextBox::readFrom(Common::SeekableReadStream *dta) {
 	GUIControl::readFrom(dta);
 
@@ -170,6 +209,10 @@ void GUITextBox::readFrom(Common::SeekableReadStream *dta) {
 	_font = dta->readUint32LE();
 	_textColor = dta->readUint32LE();
 	_exFlags = dta->readUint32LE();
+}
+
+void GUITextBox::draw(Graphics::Surface *surface) {
+	error("GUITextBox::draw unimplemented");
 }
 
 void GUIListBox::readFrom(Common::SeekableReadStream *dta) {
@@ -216,6 +259,10 @@ void GUIListBox::readFrom(Common::SeekableReadStream *dta) {
 	}
 }
 
+void GUIListBox::draw(Graphics::Surface *surface) {
+	error("GUIListBox::draw unimplemented");
+}
+
 void GUIInvControl::readFrom(Common::SeekableReadStream *dta) {
 	GUIControl::readFrom(dta);
 
@@ -238,6 +285,10 @@ void GUIInvControl::readFrom(Common::SeekableReadStream *dta) {
 		if (_itemHeight > _height)
 			_itemHeight = _height;
 	}
+}
+
+void GUIInvControl::draw(Graphics::Surface *surface) {
+	error("GUIInvControl::draw unimplemented");
 }
 
 void GUIButton::readFrom(Common::SeekableReadStream *dta) {
@@ -314,6 +365,104 @@ void GUIButton::stopAnimation() {
 	// FIXME
 }
 
+void GUIButton::draw(Graphics::Surface *surface) {
+	bool drawDisabled = isDisabled();
+
+	// FIXME: disabled style
+
+	if ((int)_usePic <= 0 || drawDisabled)
+		_usePic = _pic;
+
+	// FIXME: disabled style
+
+	// First, we draw the graphical bits.
+	if ((int)_usePic > 0 && (int)_pic > 0) {
+		// graphical button
+
+		// FIXME
+	} else if (_text.size()) {
+		// text button
+
+		// FIXME
+	}
+
+	// Then, we try drawing the text (if any).
+	if (_text.empty())
+		return;
+	// Don't print text of (INV) (INVSHR) (INVNS)
+	if (_text.hasPrefix("(IN"))
+		return;
+	// Don't print the text if there's a graphic and it hasn't been named
+	if (_text == "New Button" && (int)_usePic > 0 && (int)_pic > 0)
+		return;
+
+	Common::String text = _vm->getTranslation(_text);
+
+	int useX = _x, useY = _y;
+
+	// move the text a bit while pushed
+	if (_isPushed && _isOver) {
+		useX++;
+		useY++;
+	}
+
+	Graphics::Font *font = _vm->_graphics->getFont(_font);
+	uint fontHeight = font->getFontHeight();
+
+	Graphics::TextAlign align;
+	switch (_textAlignment) {
+	case GBUT_ALIGN_TOPMIDDLE:
+		align = Graphics::kTextAlignCenter;
+		useY += 2;
+		break;
+	case GBUT_ALIGN_TOPLEFT:
+		align = Graphics::kTextAlignLeft;
+		useX += 2;
+		useY += 2;
+		break;
+	case GBUT_ALIGN_TOPRIGHT:
+		align = Graphics::kTextAlignRight;
+		useX -= 2;
+		useY += 2;
+		break;
+	case GBUT_ALIGN_MIDDLELEFT:
+		align = Graphics::kTextAlignLeft;
+		useX += 2;
+		useY += (_height / 2) - ((fontHeight + 1) / 2);
+		break;
+	case GBUT_ALIGN_CENTRED:
+		align = Graphics::kTextAlignCenter;
+		useX -= 2;
+		useY += (_height / 2) - ((fontHeight + 1) / 2);
+		break;
+	case GBUT_ALIGN_MIDDLERIGHT:
+		align = Graphics::kTextAlignRight;
+		useX -= 2;
+		useY += (_height / 2) - ((fontHeight + 1) / 2);
+		break;
+	case GBUT_ALIGN_BOTTOMLEFT:
+		align = Graphics::kTextAlignLeft;
+		useX += 2;
+		useY += _height - fontHeight - 2;
+		break;
+	case GBUT_ALIGN_BOTTOMMIDDLE:
+		align = Graphics::kTextAlignCenter;
+		useY += _height - fontHeight - 2;
+		break;
+	case GBUT_ALIGN_BOTTOMRIGHT:
+		align = Graphics::kTextAlignRight;
+		useX -= 2;
+		useY += _height - fontHeight - 2;
+		break;
+	}
+
+	uint32 color = _vm->_graphics->resolveHardcodedColor(_textColor);
+	if (drawDisabled)
+		color = _vm->_graphics->resolveHardcodedColor(8);
+	// TODO: is this right?
+	font->drawString(surface, text, useX, useY, _width, color, align);
+}
+
 GUIGroup::GUIGroup(AGSEngine *vm) : _vm(vm), _width(0), _height(0), _needsUpdate(true) {
 }
 
@@ -368,6 +517,59 @@ void GUIGroup::setVisible(bool visible) {
 		_surface.free();
 	else
 		setSize(_width, _height);
+}
+
+const Graphics::Surface *GUIGroup::getDrawSurface() {
+	assert(_surface.getPixels());
+
+	if (_needsUpdate)
+		draw();
+
+	return &_surface;
+}
+
+void GUIGroup::draw() {
+	// clear the surface, filling with either transparency or the background color
+	uint32 bgColor;
+	if (_bgColor != 0)
+		bgColor = _vm->_graphics->resolveHardcodedColor(_bgColor);
+	else
+		bgColor = _vm->_graphics->getTransparentColor();
+	_surface.fillRect(Common::Rect(0, 0, _width, _height), bgColor);
+
+	if (_bgColor != _fgColor) {
+		// draw the border
+		// FIXME
+		warning("ignoring border");
+	}
+
+	if ((int)_bgPic > 0) {
+		// draw the background picture
+		// FIXME
+		warning("ignoring bgpic");
+	}
+
+	for (uint i = 0; i < _controls.size(); ++i) {
+		uint16 controlId = _controlDrawOrder[i];
+		GUIControl *control = _controls[controlId];
+
+		// only visible controls should be drawn
+		if (!control->isVisible())
+			continue;
+
+		// if disabled controls shouldn't be drawn, don't draw them
+		// FIXME: check vm->_guiDisabledStyle == GUIDIS_BLACKOUT too
+		if (control->isDisabled())
+			continue;
+
+		// FIXME
+		control->draw(&_surface);
+
+		// FIXME: highlighting
+		// _surface.frameRect(Common::Rect(control->_x, control->_y, control->_x + control->_width, control->_y + control->_height), _vm->_graphics->resolveHardcodedColor(14));
+	}
+
+	_needsUpdate = false;
 }
 
 struct GUIZOrderLess {

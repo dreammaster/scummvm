@@ -487,6 +487,18 @@ void AGSGraphics::draw() {
 	for (uint i = 0; i < drawables.size(); ++i)
 		draw(drawables[i]);
 
+	// FIXME
+
+	// draw GUIs
+	for (uint i = 0; i < _vm->_gameFile->_guiGroups.size(); ++i) {
+		GUIGroup *group = _vm->_gameFile->_guiGroups[i];
+		if (group->_on < 1)
+			continue;
+		draw(group);
+	}
+
+	// FIXME
+
 	_cursorObj->tick();
 	if (!_vm->_state->_mouseCursorHidden)
 		draw(_cursorObj);
