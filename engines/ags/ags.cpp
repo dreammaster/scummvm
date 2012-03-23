@@ -1813,8 +1813,7 @@ bool AGSEngine::runScriptFunction(ccInstance *instance, const Common::String &na
 	if (result != 0 && result != 100)
 		error("runScriptFunction: script '%s' returned error %d", name.c_str(), result);*/
 
-	// FIXME: post script cleanup
-	_runningScripts.pop_back();
+	postScriptCleanup();
 	// FIXME: sabotage any running scripts in the event of restored game
 
 	return true;
@@ -1836,6 +1835,72 @@ bool AGSEngine::prepareTextScript(ccInstance *instance, const Common::String &na
 	// FIXME: updateScriptMouseCoords();
 
 	return true;
+}
+
+void AGSEngine::postScriptCleanup() {
+	ExecutingScript wasRunning = _runningScripts.back();
+	_runningScripts.pop_back();
+
+	// TODO: original engine checks forked here (but that is never used)
+
+	uint oldRoomNumber = _displayedRoom;
+
+	for (uint i = 0; i < wasRunning._pendingActions.size(); ++i) {
+		PostScriptAction &action = wasRunning._pendingActions[i];
+
+		switch (action.type) {
+		case kPSANewRoom:
+			if (_runningScripts.empty()) {
+				// FIXME: newRoom(action.data);
+				// don't allow any pending room scripts from the old room
+				// to be executed
+				return;
+			}
+			// queue it on the next script in the call stack
+			_runningScripts.back().queueAction(kPSANewRoom, action.data, "NewRoom");
+			break;
+		case kPSAInvScreen:
+			// FIXME
+			break;
+		case kPSARestoreGame:
+			// FIXME
+			break;
+		case kPSARestoreGameDialog:
+			// FIXME
+			break;
+		case kPSARunAGSGame:
+			// FIXME
+			break;
+		case kPSARunDialog:
+			doConversation(action.data);
+			break;
+		case kPSARestartGame:
+			// FIXME
+			break;
+		case kPSASaveGame:
+			// FIXME
+			break;
+		case kPSASaveGameDialog:
+			// FIXME
+			break;
+		default:
+			error("postScriptCleanup: unknown action %d", action.type);
+		}
+
+		// if the room changed in a conversation, for example, abort
+		if (oldRoomNumber != _displayedRoom)
+			return;
+	}
+
+	for (uint i = 0; i < wasRunning._pendingScripts.size(); ++i) {
+		PendingScript &script = wasRunning._pendingScripts[i];
+
+		// FIXME
+
+		// if they've changed rooms, cancel any further pending scripts
+		if (oldRoomNumber != _displayedRoom /* FIXME: || _loadNewGame */)
+			break;
+	}
 }
 
 ExecutingScript::ExecutingScript(ccInstance *instance) : _instance(instance) {
