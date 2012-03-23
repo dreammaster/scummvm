@@ -179,7 +179,67 @@ Room::Room(AGSEngine *vm, Common::SeekableReadStream *dta) : _vm(vm), _compiledS
 	_backgroundSceneAnimSpeed = 5;
 	// FIXME: copy main background scene palette
 
-	_version = dta->readUint16LE();
+	_loaded = false;
+	readData(dta);
+	_loaded = true;
+}
+
+void Room::loadFrom(Common::SeekableReadStream *dta) {
+	assert(!_loaded);
+	_loaded = true;
+	readData(dta);
+}
+
+void Room::unload() {
+	assert(_loaded);
+	_loaded = false;
+
+	for (uint i = 0; i < _objects.size(); ++i)
+		_objects[i]->_moving = 0;
+
+	// we want to get rid of anything consuming a lot of memory!
+	// the original saves only the contents of RoomStatus:
+	//   objects, interactions, flags, script global state,
+	//   hotspot/region enabled state, walkBehindBaselines
+	//   and the interaction variable values.
+	// anything else can go.
+
+	// all graphics can go
+	for (uint i = 0; i < _backgroundScenes.size(); ++i)
+		_backgroundScenes[i]._scene.free();
+	_backgroundScenes.clear();
+	_walkableMask.free();
+	_walkBehindMask.free();
+	_hotspotMask.free();
+	_regionsMask.free();
+
+	// messages, options, animations, etc
+	_messages.clear();
+	_options.clear();
+	_anims.clear();
+	_shadingInfo.clear();
+	_properties.clear();
+	_shadingInfo.clear();
+	_wallPoints.clear();
+	_walkAreas.clear();
+
+	_script.clear();
+
+	// hotspots, objects
+	for (uint i = 0; i < _hotspots.size(); ++i)
+		_hotspots[i]._properties.clear();
+	for (uint i = 0; i < _objects.size(); ++i) {
+		_objects[i]->_properties.clear();
+		// TODO: kill graphics, etc?
+	}
+}
+
+void Room::readData(Common::SeekableReadStream *dta) {
+	uint16 version = dta->readUint16LE();
+
+	if (_loaded && version != _version)
+		error("room version changed from under us (was %d, now %d)", _version, version);
+	_version = version;
 
 	if (_version < kAGSRoomVer241)
 		error("room version %d is too old", _version);
@@ -369,9 +429,14 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	debug(5, "Room: %d walk-behinds", walkBehindsCount);
 	if (walkBehindsCount > 16)
 		error("Room: too many walk-behinds (%d)", walkBehindsCount);
-	_walkBehindBaselines.resize(walkBehindsCount);
-	for (uint i = 0; i < _walkBehindBaselines.size(); ++i)
-		_walkBehindBaselines[i] = dta->readUint16LE();
+	if (_loaded) {
+		assert(walkBehindsCount == _walkBehindBaselines.size());
+		dta->skip(walkBehindsCount * 2);
+	} else {
+		_walkBehindBaselines.resize(walkBehindsCount);
+		for (uint i = 0; i < _walkBehindBaselines.size(); ++i)
+			_walkBehindBaselines[i] = dta->readUint16LE();
+	}
 
 	// hotspots
 	uint32 hotspotCount = dta->readUint32LE();
@@ -380,7 +445,10 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 		hotspotCount = 20;
 	if (hotspotCount > 50) // MAX_HOTSPOTS: v2.62 increased from 20 to 30; v2.8 to 50
 		error("Room: too many hotspots (%d)", hotspotCount);
-	_hotspots.resize(hotspotCount);
+	if (_loaded)
+		assert(hotspotCount == _hotspots.size());
+	else
+		_hotspots.resize(hotspotCount);
 	for (uint i = 0; i < _hotspots.size(); ++i) {
 		_hotspots[i]._walkToPos.x = dta->readSint16LE();
 		_hotspots[i]._walkToPos.y = dta->readSint16LE();
@@ -428,15 +496,23 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	debug(5, "Room: %d objects", objectCount);
 	if (objectCount > 40)
 		error("Room: too many objects (%d)", objectCount);
-	_objects.resize(objectCount);
+	if (_loaded)
+		assert(_objects.size() == objectCount);
+	else
+		_objects.resize(objectCount);
 	for (uint i = 0; i < _objects.size(); ++i) {
 		// sprites
+		if (_loaded) {
+			dta->skip(10);
+			continue;
+		}
+
 		_objects[i] = new RoomObject(_vm);
 
 		_objects[i]->_spriteId = dta->readUint16LE();
 		_objects[i]->_pos.x = dta->readUint16LE();
 		_objects[i]->_pos.y = dta->readUint16LE();
-		uint16 roomId = dta->readUint16LE();
+		/*uint16 roomId = */ dta->readUint16LE();
 		_objects[i]->_on = dta->readUint16LE();
 	}
 
@@ -449,7 +525,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 			_localVars[i].readFrom(dta);
 	}
 
-	if (_version >= kAGSRoomVer241) {
+	if (!_loaded && _version >= kAGSRoomVer241) {
 		// 2.x interactions
 		if (_version < kAGSRoomVer300) {
 			for (uint i = 0; i < _hotspots.size(); ++i) {
@@ -493,8 +569,12 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	}
 
 	if (_version >= kAGSRoomVer2a) {
-		for (uint i = 0; i < _objects.size(); ++i)
-			_objects[i]->_baseLine = dta->readUint32LE();
+		if (_loaded) {
+			dta->skip(_objects.size() * 4);
+		} else {
+			for (uint i = 0; i < _objects.size(); ++i)
+				_objects[i]->_baseLine = dta->readUint32LE();
+		}
 		_width = dta->readUint16LE();
 		_height = dta->readUint16LE();
 		debug(4, "Room: width %d, height %d", _width, _height);
@@ -502,8 +582,12 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 
 	// object flags
 	if (_version >= kAGSRoomVer262) {
-		for (uint i = 0; i < _objects.size(); ++i)
-			_objects[i]->_flags = dta->readUint16LE();
+		if (_loaded) {
+			dta->skip(_objects.size() * 2);
+		} else {
+			for (uint i = 0; i < _objects.size(); ++i)
+				_objects[i]->_flags = dta->readUint16LE();
+		}
 	}
 
 	// (relative) resolution

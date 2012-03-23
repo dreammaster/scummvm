@@ -82,6 +82,9 @@ AGSEngine::~AGSEngine() {
 	delete _roomScriptFork;
 
 	delete _currentRoom;
+	for (Common::HashMap<uint, Room *>::iterator i = _loadedRooms.begin(); i != _loadedRooms.end(); ++i)
+		if (i->_value != _currentRoom)
+			delete i->_value;
 
 	for (uint i = 0; i < _characters.size(); ++i) {
 		assert(_characters[i]->getRefCount() == 1);
@@ -561,7 +564,7 @@ void AGSEngine::firstRoomInitialization() {
 void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	debug(2, "loading new room %d", id);
 
-	delete _currentRoom;
+	assert(!_currentRoom);
 
 	_state->_roomChanges++;
 	_displayedRoom = id;
@@ -576,6 +579,8 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 		error("failed to open room file for room %d", id);
 
 	_currentRoom = new Room(this, stream);
+	// FIXME: discard room if we shouldn't keep it
+	_loadedRooms[id] = _currentRoom;
 
 	_state->_roomWidth = _currentRoom->_width;
 	_state->_roomHeight = _currentRoom->_height;
@@ -614,7 +619,14 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 }
 
 void AGSEngine::unloadOldRoom() {
-	error("AGSEngine::unloadOldRoom() unimplemented");
+	assert(_currentRoom);
+
+	// FIXME: discard room if we shouldn't keep it
+	_currentRoom->unload();
+	_currentRoom = NULL;
+
+	// FIXME: a lot of unimplemented stuff
+	warning("AGSEngine::unloadOldRoom() unimplemented");
 }
 
 void AGSEngine::checkNewRoom() {

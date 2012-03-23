@@ -271,6 +271,7 @@ private:
 	uint32 _startingRoom;
 	uint32 _displayedRoom;
 	Room *_currentRoom;
+	Common::HashMap<uint, Room *> _loadedRooms;
 
 	// new room state (this frame)
 	NewRoomState _inNewRoomState;
