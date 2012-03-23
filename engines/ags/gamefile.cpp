@@ -330,8 +330,11 @@ bool GameFile::init() {
 	}
 
 	_vm->_characters.resize(charCount);
-	for (uint i = 0; i < charCount; ++i)
-		_vm->_characters[i] = readCharacter(dta);
+	for (uint i = 0; i < charCount; ++i) {
+		Character *chr = readCharacter(dta);
+		chr->_indexId = i;
+		_vm->_characters[i] = chr;
+	}
 
 	if (_version <= kAGSVer272) {
 		// fixup character script names for 2.x (EGO -> cEgo)
