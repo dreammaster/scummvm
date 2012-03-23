@@ -956,8 +956,8 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_CHECKNULLREG:
 			// error if reg1 == NULL
-			// FIXME
-			error("unimplemented %s", info.name);
+			if (_registers[int1]._type != rvtSystemObject && _registers[int1]._value == 0)
+				error("script tried to dereference null pointer on line %d", _lineNumber);
 			break;
 		case SCMD_NUMFUNCARGS:
 			// setfuncargs: number of arguments for ext func call
