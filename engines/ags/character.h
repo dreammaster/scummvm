@@ -34,6 +34,8 @@
 namespace AGS {
 
 struct Character : public ScriptObject {
+	Character();
+
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotCharacter); }
 	const char *getObjectTypeName() { return "Character"; }
 	uint32 readUint32(uint offset);

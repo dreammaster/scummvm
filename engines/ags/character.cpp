@@ -27,6 +27,21 @@
 
 namespace AGS {
 
+Character::Character() {
+	_walking = 0;
+	_animating = 0;
+	_picXOffs = 0;
+	_picYOffs = 0;
+	_blinkInterval = 140;
+	_blinkTimer = _blinkInterval;
+	_blockingWidth = 0;
+	_blockingHeight = 0;
+	_prevRoom = (uint)-1;
+	_loop = 0;
+	_frame = 0;
+	_walkWait = (uint)-1;
+}
+
 uint32 Character::readUint32(uint offset) {
 	switch (offset) {
 	case 0:

@@ -641,9 +641,9 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 
 	chr->_defView = dta->readUint32LE();
 	chr->_talkView = dta->readUint32LE();
-	chr->_view = dta->readUint32LE();
+	/*chr->_view = */ dta->readUint32LE();
 	chr->_room = dta->readUint32LE();
-	chr->_prevRoom = dta->readUint32LE();
+	/*chr->_prevRoom = */ dta->readUint32LE();
 	chr->_x = dta->readUint32LE();
 	chr->_y = dta->readUint32LE();
 	chr->_wait = dta->readUint32LE();
@@ -659,22 +659,24 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 	chr->_talkColor = dta->readUint32LE();
 	chr->_thinkView = dta->readUint32LE();
 	chr->_blinkView = dta->readUint16LE();
-	chr->_blinkInterval = dta->readUint16LE();
-	chr->_blinkTimer = dta->readUint16LE();
+	/*chr->_blinkInterval = */ dta->readUint16LE();
+	/*chr->_blinkTimer = */ dta->readUint16LE();
 	chr->_blinkFrame = dta->readUint16LE();
 	chr->_walkSpeedY = dta->readUint16LE();
-	chr->_picYOffs = dta->readUint16LE();
+	/*chr->_picYOffs = */ dta->readUint16LE();
 	chr->_z = dta->readUint32LE();
-	dta->skip(2 * 4); // reserved
-	chr->_blockingWidth = dta->readUint16LE();
-	chr->_blockingHeight = dta->readUint16LE();
+	/*chr->_walkWait = */ dta->readUint32LE();
+	chr->_speechAnimSpeed = dta->readUint16LE();
+	dta->skip(2); // reserved
+	/*chr->_blockingWidth = */ dta->readUint16LE();
+	/*chr->_blockingHeight = */ dta->readUint16LE();
 	chr->_indexId = dta->readUint32LE();
-	chr->_picXOffs = dta->readUint16LE();
+	/*chr->_picXOffs = */ dta->readUint16LE();
 	chr->_walkWaitCounter = dta->readUint16LE();
-	chr->_loop = dta->readUint16LE();
-	chr->_frame = dta->readUint16LE();
-	chr->_walking = dta->readUint16LE();
-	chr->_animating = dta->readUint16LE();
+	/*chr->_loop = */ dta->readUint16LE();
+	/*chr->_frame = */ dta->readUint16LE();
+	/*chr->_walking = */ dta->readUint16LE();
+	/*chr->_animating = */ dta->readUint16LE();
 	chr->_walkSpeed = dta->readUint16LE();
 	chr->_animSpeed = dta->readUint16LE();
 	chr->_inventory.resize(MAX_INV);
