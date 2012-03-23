@@ -23,6 +23,7 @@
  * which is licensed under the Artistic License 2.0.
  */
 
+#include <string.h>
 #include "engines/ags/scripting/scripting.h"
 
 namespace AGS {
@@ -82,15 +83,19 @@ RuntimeValue Script_String_CompareTo(AGSEngine *vm, ScriptString *self, const Co
 }
 
 // String: import int Contains(const string needle)
-// Undocumented.
 RuntimeValue Script_String_Contains(AGSEngine *vm, ScriptString *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *needle = (ScriptString *)params[0]._object;
-	UNUSED(needle);
 
-	// FIXME
-	error("String::Contains unimplemented");
+	Common::String needleStr = needle->getString();
+	Common::String selfStr = self->getString();
+	needleStr.toLowercase();
+	selfStr.toLowercase();
 
-	return RuntimeValue();
+	const char *offset = strstr(selfStr.c_str(), needleStr.c_str());
+	if (offset == NULL)
+		return -1;
+
+	return (uint)(offset - selfStr.c_str());
 }
 
 // String: import String Copy()
