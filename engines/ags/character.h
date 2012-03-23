@@ -49,7 +49,7 @@ struct Character : public ScriptObject {
 	uint32 _wait;
 	uint32 _flags;
 
-	uint16 _following;
+	int16 _following;
 	uint16 _followInfo;
 
 	uint32 _idleView; // the loop will be randomly picked

@@ -236,13 +236,19 @@ public:
 	void invalidateGUI() { _guiNeedsUpdate = true; }
 
 	Room *getCurrentRoom() { return _currentRoom; }
+	void scheduleNewRoom(int roomId);
 
 	GameFile *_gameFile;
 	class GameState *_state;
 	class AGSAudio *_audio;
 	AGSGraphics *_graphics;
 
+	Character *getPlayerChar() { return _playerChar; }
 	Common::Array<Character *> _characters;
+
+	int32 newRoomPos;
+	int32 newRoomX;
+	int32 newRoomY;
 
 private:
 	const AGSGameDescription *_gameDescription;
@@ -270,6 +276,8 @@ private:
 	NewRoomState _inNewRoomState;
 	// new room state (from last time it was not None)
 	NewRoomState _newRoomStateWas;
+
+	int _leavesScreenRoomId;
 
 	Common::Array<GameEvent> _queuedGameEvents;
 	void queueGameEvent(GameEventType type, uint data1 = 0, uint data2 = (uint)-1000, uint data3 = 0);
@@ -323,7 +331,9 @@ private:
 	void createGlobalScript();
 	void firstRoomInitialization();
 	void loadNewRoom(uint32 id, Character *forChar);
+	void unloadOldRoom();
 	void checkNewRoom();
+	void newRoom(int roomId);
 
 	BlockUntilType checkBlockingUntil();
 

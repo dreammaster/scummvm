@@ -648,7 +648,7 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 	chr->_y = dta->readUint32LE();
 	chr->_wait = dta->readUint32LE();
 	chr->_flags = dta->readUint32LE();
-	chr->_following = dta->readUint16LE();
+	chr->_following = dta->readSint16LE();
 	chr->_followInfo = dta->readUint16LE();
 	chr->_idleView = dta->readUint32LE();
 	chr->_idleTime = dta->readUint16LE();

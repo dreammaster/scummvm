@@ -873,14 +873,33 @@ RuntimeValue Script_Character_Animate(AGSEngine *vm, Character *self, const Comm
 // Moves the character to another room. If this is the player character, the game will also switch to that room.
 RuntimeValue Script_Character_ChangeRoom(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	int room = params[0]._signedValue;
-	UNUSED(room);
 	int x = params[1]._signedValue;
-	UNUSED(x);
 	int y = params[2]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("Character::ChangeRoom unimplemented");
+	if (self->_indexId != vm->_gameFile->_playerChar) {
+		// NewRoomNPC
+		if (x != SCR_NO_VALUE && y != SCR_NO_VALUE) {
+			self->_x = x;
+			self->_y = y;
+		}
+		self->_prevRoom = self->_room;
+		self->_room = room;
+
+		debugN(1, "%s moved to room %d, location %d,%d",
+			self->_scriptName.c_str(), room, self->_x, self->_y);
+
+		return RuntimeValue();
+	}
+
+	if (x != SCR_NO_VALUE && y != SCR_NO_VALUE) {
+		vm->newRoomPos = 0;
+		// don't check X or Y bounds, so that they can do a
+		// walk-in animation if they want
+		vm->newRoomX = x;
+		vm->newRoomY = y;
+	}
+
+	vm->scheduleNewRoom(room);
 
 	return RuntimeValue();
 }

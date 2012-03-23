@@ -62,6 +62,7 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_scriptMouseObject(NULL), _gameStateGlobalsObject(NULL), _saveGameIndexObject(NULL), _scriptSystemObject(NULL),
 	_currentRoom(NULL), _framesPerSecond(40), _lastFrameTime(0),
 	_inNewRoomState(kNewRoomStateNone), _newRoomStateWas(kNewRoomStateNone), _inEntersScreenCounter(0),
+	_leavesScreenRoomId(-1),
 	_blockingUntil(kUntilNothing), _insideProcessEvent(false) {
 
 	_rnd = new Common::RandomSource("ags");
@@ -612,6 +613,10 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	invalidateGUI();
 }
 
+void AGSEngine::unloadOldRoom() {
+	error("AGSEngine::unloadOldRoom() unimplemented");
+}
+
 void AGSEngine::checkNewRoom() {
 	// we only care if we're in a new room, and it's not from a restored game
 	if (_inNewRoomState == kNewRoomStateNone || _inNewRoomState == kNewRoomStateSavedGame)
@@ -626,6 +631,100 @@ void AGSEngine::checkNewRoom() {
 	_state->_disabledUserInterface--;
 
 	_inNewRoomState = newRoomWas;
+}
+
+void AGSEngine::scheduleNewRoom(int roomId) {
+	warning("AGSEngine::scheduleNewRoom not implemented");
+
+	if (roomId < 0)
+		error("NewRoom: room change requested to invalid room number %d", roomId);
+
+	if (_displayedRoom == 0xffffffff) {
+		// called from game_start; change the room where the game will start
+		_playerChar->_room = roomId;
+	}
+
+	debug(1, "Room change requested to room %d", roomId);
+
+	// FIXME
+	// EndSkippingUntilCharStops();
+	// can_run_delayed_command();
+	//if (play.stop_dialog_at_end != DIALOG_NONE) {
+	//  if (play.stop_dialog_at_end == DIALOG_RUNNING)
+	//    play.stop_dialog_at_end = DIALOG_NEWROOM + nrnum;
+	//  else
+	//    quit("!NewRoom: two NewRoom/RunDialog/StopDialog requests within dialog");
+	//  return;
+	//}
+
+	if (_leavesScreenRoomId >= 0) {
+		// NewRoom called from the Player Leaves Screen event -- just
+		// change which room it will go to
+		_leavesScreenRoomId = roomId;
+	} else if (_inEntersScreenCounter) {
+		queueGameEvent(kEventNewRoom, roomId);
+		return;
+	// FIXME
+	//} else if (in_inv_screen) {
+	//	inv_screen_newroom = nrnum;
+	//	return;
+	} else if (!_runningScripts.size()) { // in_graph_script was consulted here
+		newRoom(roomId);
+		return;
+	}
+	else if (_runningScripts.size()) {
+		_runningScripts.back().queueAction(kPSANewRoom, roomId, "NewRoom");
+		// we might be within a MoveCharacterBlocking -- the room
+		// change should abort it
+		if (0 < _playerChar->_walking && _playerChar->_walking < TURNING_AROUND) {
+			// FIXME
+			// nasty hack - make sure it doesn't move the character
+			// to a walkable area
+			//mls[playerchar->walking].direct = 1;
+			//StopMoving(game.playercharacter);
+	  }
+	}
+	// in_graph_script was consulted here
+}
+
+/** Changes the current room number and loads a new room from disk */
+void AGSEngine::newRoom(int roomId) {
+	warning("AGSEngine::newRoom not implemented");
+	//EndSkippingUntilCharStops();
+
+	debug(1, "Room change requested to room %d", roomId);
+
+	// TODO: update_polled_stuff()
+
+	// we are currently running Leaves Screen scripts
+	_leavesScreenRoomId = roomId;
+
+	// player leaves screen event
+	// TODO: run_room_event(8)
+	// Run the global OnRoomLeave event
+	// TODO: run_on_event(GE_LEAVE_ROOM, _displayedRoom)
+
+	// TODO: RunPluginHooks(AGSE_LEAVEROOM, _displayedRoom)
+
+	// update the new room number if it has been altered by OnLeave scripts
+	roomId = _leavesScreenRoomId;
+	_leavesScreenRoomId = -1;
+
+	if (_playerChar->_following >= 0 &&
+	    _characters[_playerChar->_following]->_room != roomId) {
+		// the player character is following another character,
+		// who is not in the new room. therefore, abort the follow
+		_playerChar->_following = -1;
+	}
+
+	// TODO: update_polled_stuff()
+
+	// change rooms
+	unloadOldRoom();
+
+	// TODO: update_polled_stuff()
+
+	loadNewRoom(roomId, _playerChar);
 }
 
 // 'setevent' in original
@@ -1791,7 +1890,8 @@ int AGSEngine::runDialogRequest(uint request) {
 		return topicId;
 	} else if (_state->_stopDialogAtEnd >= DIALOG_NEWROOM) {
 		uint roomId = (uint)_state->_stopDialogAtEnd - DIALOG_NEWROOM;
-		// FIXME: NewRoom(roomId);
+		_state->_stopDialogAtEnd = DIALOG_NONE;
+		scheduleNewRoom(roomId);
 		error("runDialogRequest doesn't do DIALOG_NEWROOM yet");
 		return RUN_DIALOG_STOP_DIALOG;
 	} else {
@@ -1851,7 +1951,7 @@ void AGSEngine::postScriptCleanup() {
 		switch (action.type) {
 		case kPSANewRoom:
 			if (_runningScripts.empty()) {
-				// FIXME: newRoom(action.data);
+				newRoom(action.data);
 				// don't allow any pending room scripts from the old room
 				// to be executed
 				return;
