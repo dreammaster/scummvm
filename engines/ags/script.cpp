@@ -692,7 +692,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_LOADSPOFFS:
 			// MAR = SP - arg1 (optimization for local var access)
 			_registers[SREG_MAR] = _registers[SREG_SP];
-			if ((uint32)int1 > _registers[SREG_SP]._value - 4)
+			if ((uint32)int1 > _registers[SREG_SP]._value)
 				error("load.sp.offs tried going %d back in a stack of size %d on line %d",
 					int1, _registers[SREG_SP]._value, _lineNumber);
 			_registers[SREG_MAR]._value -= int1;
