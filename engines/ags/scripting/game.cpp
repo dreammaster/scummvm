@@ -609,12 +609,10 @@ RuntimeValue Script_GetGameOption(AGSEngine *vm, ScriptObject *, const Common::A
 // Gets the translated version of the specified text.
 RuntimeValue Script_GetTranslation(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *originalText = (ScriptString *)params[0]._object;
-	UNUSED(originalText);
 
-	// FIXME
-	error("GetTranslation unimplemented");
-
-	return RuntimeValue();
+	RuntimeValue ret = new ScriptMutableString(vm->getTranslation(originalText->getString()));
+	ret._object->DecRef();
+	return ret;
 }
 
 // import int IsTranslationAvailable ()
