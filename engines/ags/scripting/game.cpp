@@ -272,10 +272,9 @@ RuntimeValue Script_Game_get_DialogCount(AGSEngine *vm, ScriptObject *, const Co
 // Game: readonly import static attribute String FileName
 // Gets the name of the game EXE file.
 RuntimeValue Script_Game_get_FileName(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Game::get_FileName unimplemented");
-
-	return RuntimeValue();
+	RuntimeValue ret = new ScriptMutableString(vm->getMasterArchive());
+	ret._object->DecRef();
+	return ret;
 }
 
 // Game: readonly import static attribute int FontCount

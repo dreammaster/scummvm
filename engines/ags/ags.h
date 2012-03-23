@@ -181,6 +181,7 @@ public:
 	uint32 getGameFileVersion() const;
 	uint32 getGUIVersion() const;
 	uint32 getGameUniqueID() const;
+	Common::String getMasterArchive() const;
 
 	Common::SeekableReadStream *getFile(const Common::String &filename) const;
 	ResourceManager *getResourceManager() { return _resourceMan; }
@@ -318,8 +319,6 @@ private:
 	uint _blockingUntilId;
 
 	bool _saidSpeechLine;
-
-	Common::String getMasterArchive() const;
 
 	bool init();
 
