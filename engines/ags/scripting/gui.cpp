@@ -1953,8 +1953,8 @@ RuntimeValue Script_ListBox_set_TopItem(AGSEngine *vm, GUIListBox *self, const C
 // GUI: import void Centre()
 // Moves the GUI to be centred on the screen.
 RuntimeValue Script_GUI_Centre(AGSEngine *vm, GUIGroup *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GUI::Centre unimplemented");
+	self->_x = vm->_graphics->_width / 2 - self->_width / 2;
+	self->_y = vm->_graphics->_height / 2 - self->_height / 2;
 
 	return RuntimeValue();
 }
