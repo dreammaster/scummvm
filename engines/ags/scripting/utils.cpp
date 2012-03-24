@@ -95,7 +95,7 @@ RuntimeValue Script_IntToFloat(AGSEngine *vm, ScriptObject *, const Common::Arra
 // import int Random(int max)
 // Returns a random number between 0 and MAX, inclusive.
 RuntimeValue Script_Random(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int max = params[0]._signedValue;
+	uint max = params[0]._value;
 
 	return vm->getRandomSource()->getRandomNumber(max);
 }
@@ -238,14 +238,9 @@ RuntimeValue Script_Maths_RadiansToDegrees(AGSEngine *vm, ScriptObject *, const 
 // Calculates the base raised to the power of the exponent.
 RuntimeValue Script_Maths_RaiseToPower(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	float base = params[0]._floatValue;
-	UNUSED(base);
 	float exponent = params[1]._floatValue;
-	UNUSED(exponent);
 
-	// FIXME
-	error("Maths::RaiseToPower unimplemented");
-
-	return RuntimeValue();
+	return powf(base, exponent);
 }
 
 // Maths: import static float Sin(float radians)
