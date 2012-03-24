@@ -63,6 +63,9 @@ GameFile::~GameFile() {
 		delete _interactionsInv[i];
 
 	delete _gameScript;
+	delete _dialogScriptsScript;
+	for (uint i = 0; i < _scriptModules.size(); ++i)
+		delete _scriptModules[i];
 }
 
 void GameFile::readVersion(Common::SeekableReadStream &dta) {
