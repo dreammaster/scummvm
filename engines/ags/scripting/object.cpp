@@ -442,13 +442,17 @@ RuntimeValue Script_IsObjectOn(AGSEngine *vm, ScriptObject *, const Common::Arra
 // import void SetObjectClickable(int object, int clickable)
 // Obsolete function for objects.
 RuntimeValue Script_SetObjectClickable(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
-	int clickable = params[1]._signedValue;
-	UNUSED(clickable);
+	uint objectId = params[0]._value;
+	uint clickable = params[1]._value;
 
-	// FIXME
-	error("SetObjectClickable unimplemented");
+	if (objectId >= vm->getCurrentRoom()->_objects.size())
+		error("SetObjectClickable: object %d is too high (only have %d)", objectId, vm->getCurrentRoom()->_objects.size());
+
+	RoomObject *object = vm->getCurrentRoom()->_objects[objectId];
+	if (clickable)
+		object->_flags &= ~OBJF_NOINTERACT;
+	else
+		object->_flags |= OBJF_NOINTERACT;
 
 	return RuntimeValue();
 }
