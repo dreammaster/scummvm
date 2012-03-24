@@ -24,6 +24,9 @@
  */
 
 #include "engines/ags/character.h"
+#include "engines/ags/ags.h"
+#include "engines/ags/gamefile.h"
+#include "engines/ags/graphics.h"
 
 namespace AGS {
 
@@ -92,6 +95,31 @@ void Character::followCharacter(Character *chr, int distance, uint eagerness) {
 		error("followCharacter: invalid eagerness %d (must be 0-250)", eagerness);
 
 	// FIXME
+}
+
+void Character::lockView(uint viewId) {
+	if (viewId < 1 || viewId > _vm->_gameFile->_views.size())
+		error("Character::lockView: invalid view number %d (max is %d)", viewId, _vm->_gameFile->_views.size());
+	viewId--;
+
+	// FIXME
+}
+
+void Character::lockViewOffset(uint viewId, int xOffs, int yOffs) {
+	lockView(viewId);
+
+	if (_vm->_graphics->_screenResolutionMultiplier == 1 && _vm->_gameFile->_defaultResolution >= 3) {
+		// running a 640x400 game at 320x200, adjust
+		xOffs /= 2;
+		yOffs /= 2;
+	} else if (_vm->_graphics->_screenResolutionMultiplier > 1 && _vm->_gameFile->_defaultResolution <= 2) {
+		// running a 320x200 game at 640x400, adjust
+		xOffs *= 2;
+		yOffs *= 2;
+	}
+
+	_picXOffs = xOffs;
+	_picYOffs = yOffs;
 }
 
 } // End of namespace AGS

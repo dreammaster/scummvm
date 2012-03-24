@@ -1133,15 +1133,11 @@ RuntimeValue Script_Character_LockViewFrame(AGSEngine *vm, Character *self, cons
 // Character: import function LockViewOffset(int view, int xOffset, int yOffset)
 // Locks the character to is view, with high-resolution position adjustment.
 RuntimeValue Script_Character_LockViewOffset(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	int view = params[0]._signedValue;
-	UNUSED(view);
+	uint view = params[0]._value;
 	int xOffset = params[1]._signedValue;
-	UNUSED(xOffset);
 	int yOffset = params[2]._signedValue;
-	UNUSED(yOffset);
 
-	// FIXME
-	error("Character::LockViewOffset unimplemented");
+	self->lockViewOffset(view, xOffset, yOffset);
 
 	return RuntimeValue();
 }
