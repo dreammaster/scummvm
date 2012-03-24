@@ -226,7 +226,13 @@ void AGSEngine::tickGame(bool checkControls) {
 	// FIXME
 
 	if (_inNewRoomState == 0) {
+		for (uint i = 0; i < _scriptModules.size(); ++i) {
+			runScriptFunction(_scriptModuleForks[i], "repeatedly_execute_always", Common::Array<uint>());
+		}
+		runScriptFunction(_gameScriptFork, "repeatedly_execute_always", Common::Array<uint>());
+		runScriptFunction(_roomScriptFork, "repeatedly_execute_always", Common::Array<uint>());
 		// FIXME: repExecAlways
+
 		queueGameEvent(kEventTextScript, kTextScriptRepeatedlyExecute);
 		queueGameEvent(kEventRunEventBlock, kEventBlockRoom, 0, kRoomEventTick);
 	}
