@@ -119,27 +119,27 @@ protected:
 // array of (system) script objects; for characters[], gui[], etc
 template<class T> class ScriptObjectArray : public ScriptObject {
 public:
-	ScriptObjectArray(Common::Array<T> &array, uint32 elementSize, const char *objName)
+	ScriptObjectArray(Common::Array<T> *array, uint32 elementSize, const char *objName)
 		: _array(array), _elementSize(elementSize), _objName(objName) { }
-	void setArray(Common::Array<T> &array) { _array = array; }
+	void setArray(Common::Array<T> *array) { _array = array; }
 	virtual ScriptObject *getObjectAt(uint32 &offset) {
 		uint32 objectId = offset / _elementSize;
-		if (objectId >= _array.size())
+		if (objectId >= _array->size())
 			return NULL;
 		offset = offset % _elementSize;
-		return &_array[objectId];
+		return &(*_array)[objectId];
 	}
 	virtual uint32 readUint32(uint offset) {
 		uint32 objectId = offset / _elementSize;
-		if (objectId >= _array.size())
-			error("readUint32: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array.size());
-		return _array[objectId].readUint32(offset % _elementSize);
+		if (objectId >= _array->size())
+			error("readUint32: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId].readUint32(offset % _elementSize);
 	}
 	virtual bool writeUint32(uint offset, uint value) {
 		uint32 objectId = offset / _elementSize;
-		if (objectId >= _array.size())
-			error("writeUint32: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array.size());
-		return _array[objectId].writeUint32(offset % _elementSize, value);
+		if (objectId >= _array->size())
+			error("writeUint32: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId].writeUint32(offset % _elementSize, value);
 	}
 
 	const char *getObjectTypeName() { return "ScriptObjectArray"; }
@@ -147,33 +147,33 @@ public:
 protected:
 	uint32 _elementSize;
 	const char *_objName;
-	Common::Array<T> &_array;
+	Common::Array<T> *_array;
 };
 
 // specialization of above for arrays containing pointers
 template<class T> class ScriptObjectArray<T *> : public ScriptObject {
 public:
-	ScriptObjectArray(Common::Array<T *> &array, uint32 elementSize, const char *objName)
+	ScriptObjectArray(Common::Array<T *> *array, uint32 elementSize, const char *objName)
 		: _array(array), _elementSize(elementSize), _objName(objName) { }
-	void setArray(Common::Array<T *> &array) { _array = array; }
+	void setArray(Common::Array<T *> *array) { _array = array; }
 	virtual ScriptObject *getObjectAt(uint32 &offset) {
 		uint32 objectId = offset / _elementSize;
-		if (objectId >= _array.size())
+		if (objectId >= _array->size())
 			return NULL;
 		offset = offset % _elementSize;
-		return _array[objectId];
+		return (*_array)[objectId];
 	}
 	virtual uint32 readUint32(uint offset) {
 		uint32 objectId = offset / _elementSize;
-		if (objectId >= _array.size())
-			error("readUint32: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array.size());
-		return _array[objectId]->readUint32(offset % _elementSize);
+		if (objectId >= _array->size())
+			error("readUint32: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId]->readUint32(offset % _elementSize);
 	}
 	virtual bool writeUint32(uint offset, uint value) {
 		uint32 objectId = offset / _elementSize;
-		if (objectId >= _array.size())
-			error("writeUint32: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array.size());
-		return _array[objectId]->writeUint32(offset % _elementSize, value);
+		if (objectId >= _array->size())
+			error("writeUint32: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId]->writeUint32(offset % _elementSize, value);
 	}
 
 	const char *getObjectTypeName() { return "ScriptObjectArray<*>"; }
@@ -181,7 +181,7 @@ public:
 protected:
 	uint32 _elementSize;
 	const char *_objName;
-	Common::Array<T *> &_array;
+	Common::Array<T *> *_array;
 };
 
 } // End of namespace AGS
