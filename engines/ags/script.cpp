@@ -1090,13 +1090,11 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_FADD:
 			// reg1 += arg2 (float,int)
-			// FIXME
-			error("unimplemented %s", info.name);
+			_registers[int1]._floatValue += int2;
 			break;
 		case SCMD_FSUB:
 			// reg1 -= arg2 (float,int)
-			// FIXME
-			error("unimplemented %s", info.name);
+			_registers[int1]._floatValue -= int2;
 			break;
 		case SCMD_FMULREG:
 			// reg1 *= reg2 (float)
@@ -1104,38 +1102,33 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_FDIVREG:
 			// reg1 /= reg2 (float)
-			// FIXME
-			error("unimplemented %s", info.name);
+			if (_registers[int2]._floatValue == 0.0)
+				error("script tried to divide by fp zero on line %d", _lineNumber);
+			_registers[int1]._floatValue /= _registers[int2]._floatValue;
 			break;
 		case SCMD_FADDREG:
 			// reg1 += reg2 (float)
-			// FIXME
-			error("unimplemented %s", info.name);
+			_registers[int1]._floatValue += _registers[int2]._floatValue;
 			break;
 		case SCMD_FSUBREG:
 			// reg1 -= reg2 (float)
-			// FIXME
-			error("unimplemented %s", info.name);
+			_registers[int1]._floatValue -= _registers[int2]._floatValue;
 			break;
 		case SCMD_FGREATER:
 			// reg1 > reg2 (float)
-			// FIXME
-			error("unimplemented %s", info.name);
+			_registers[int1] = (_registers[int1]._floatValue > _registers[int2]._floatValue) ? 1.0f : 0.0f;
 			break;
 		case SCMD_FLESSTHAN:
 			// reg1 < reg2 (float)
-			// FIXME
-			error("unimplemented %s", info.name);
+			_registers[int1] = (_registers[int1]._floatValue < _registers[int2]._floatValue) ? 1.0f : 0.0f;
 			break;
 		case SCMD_FGTE:
 			// reg1 >= reg2 (float)
-			// FIXME
-			error("unimplemented %s", info.name);
+			_registers[int1] = (_registers[int1]._floatValue >= _registers[int2]._floatValue) ? 1.0f : 0.0f;
 			break;
 		case SCMD_FLTE:
 			// reg1 <= reg2 (float)
-			// FIXME
-			error("unimplemented %s", info.name);
+			_registers[int1] = (_registers[int1]._floatValue <= _registers[int2]._floatValue) ? 1.0f : 0.0f;
 			break;
 		case SCMD_ZEROMEMORY:
 			// m[MAR]..m[MAR+(arg1-1)] = 0
@@ -1303,6 +1296,10 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 			break;
 		case 'f':
 			// float
+			if (params[pos]._type == rvtInteger) {
+				// FIXME: This is horrible.
+				params[pos]._type = rvtFloat;
+			}
 			if (params[pos]._type != rvtFloat)
 				error("expected float for param %d of '%s', got type %d",
 					pos + 1, function->name, params[pos]._type);
