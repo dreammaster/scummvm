@@ -27,7 +27,7 @@
 
 namespace AGS {
 
-Character::Character() {
+Character::Character(AGSEngine *vm) : _vm(vm) {
 	_walking = 0;
 	_animating = 0;
 	_picXOffs = 0;

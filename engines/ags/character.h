@@ -33,8 +33,11 @@
 
 namespace AGS {
 
-struct Character : public ScriptObject {
-	Character();
+class AGSEngine;
+
+class Character : public ScriptObject {
+public:
+	Character(AGSEngine *vm);
 
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotCharacter); }
 	const char *getObjectTypeName() { return "Character"; }
@@ -99,6 +102,9 @@ struct Character : public ScriptObject {
 	byte _on;
 
 	Common::StringMap _properties;
+
+protected:
+	AGSEngine *_vm;
 };
 
 } // End of namespace AGS

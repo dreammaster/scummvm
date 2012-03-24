@@ -640,7 +640,7 @@ void GameFile::readOldViews(Common::SeekableReadStream *dta) {
 }
 
 Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
-	Character *chr = new Character();
+	Character *chr = new Character(_vm);
 
 	chr->_defView = dta->readUint32LE();
 	chr->_talkView = dta->readUint32LE();
