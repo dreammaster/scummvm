@@ -361,6 +361,14 @@ void GUIButton::setPushedGraphic(uint32 pic) {
 	stopAnimation();
 }
 
+void GUIButton::setText(Common::String text) {
+	if (_text == text)
+		return;
+
+	_text = text;
+	_parent->invalidate();
+}
+
 void GUIButton::stopAnimation() {
 	// FIXME
 }

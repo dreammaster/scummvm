@@ -1287,20 +1287,17 @@ RuntimeValue Script_Button_set_TextColor(AGSEngine *vm, GUIButton *self, const C
 // Button: import attribute String Text
 // Gets/sets the text to be drawn on the button.
 RuntimeValue Script_Button_get_Text(AGSEngine *vm, GUIButton *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Button::get_Text unimplemented");
-
-	return RuntimeValue();
+	RuntimeValue ret = new ScriptMutableString(self->getText());
+	ret._object->DecRef();
+	return ret;
 }
 
 // Button: import attribute String Text
 // Gets/sets the text to be drawn on the button.
 RuntimeValue Script_Button_set_Text(AGSEngine *vm, GUIButton *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *value = (ScriptString *)params[0]._object;
-	UNUSED(value);
 
-	// FIXME
-	error("Button::set_Text unimplemented");
+	self->setText(value->getString());
 
 	return RuntimeValue();
 }

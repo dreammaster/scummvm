@@ -285,6 +285,9 @@ public:
 	uint32 getPushedGraphic() { return _pushedPic; }
 	void setPushedGraphic(uint32 pic);
 
+	const Common::String &getText() const { return _text; }
+	void setText(Common::String text);
+
 protected:
 	Common::String _text;
 
