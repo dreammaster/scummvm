@@ -506,6 +506,12 @@ void GUIGroup::invalidate() {
 	_needsUpdate = true;
 }
 
+void GUIGroup::controlPositionsChanged() {
+	// force it to re-check for which control is under the mouse
+	_mouseWasX = -1;
+	_mouseWasY = -1;
+}
+
 bool GUIGroup::isMouseOver(const Common::Point &pos) {
 	if (_on < 1)
 		return false;

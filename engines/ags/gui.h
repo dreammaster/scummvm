@@ -319,6 +319,7 @@ public:
 	void setSize(uint32 width, uint32 height);
 	void setBackgroundPicture(uint32 pic);
 	void invalidate();
+	void controlPositionsChanged();
 
 	bool isMouseOver(const Common::Point &pos);
 
@@ -342,7 +343,7 @@ public:
 	uint32 _bgColor, _bgPic, _fgColor;
 
 	uint32 _mouseOver;
-	uint32 _mouseWasX, _mouseWasY;
+	int32 _mouseWasX, _mouseWasY;
 	uint32 _mouseDownOn;
 
 	uint32 _highlightObj;
