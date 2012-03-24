@@ -984,14 +984,10 @@ RuntimeValue Script_Character_FollowCharacter(AGSEngine *vm, Character *self, co
 	if (!params[0]._object->isOfType(sotCharacter))
 		error("Character::FollowCharacter got incorrect object type (expected a Character) for parameter 1");
 	Character *character = (Character *)params[0]._object;
-	UNUSED(character);
 	int dist = params[1]._signedValue;
-	UNUSED(dist);
-	int eagerness = params[2]._signedValue;
-	UNUSED(eagerness);
+	uint eagerness = params[2]._value;
 
-	// FIXME
-	error("Character::FollowCharacter unimplemented");
+	self->followCharacter(character, dist, eagerness);
 
 	return RuntimeValue();
 }

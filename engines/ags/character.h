@@ -41,6 +41,8 @@ struct Character : public ScriptObject {
 	uint32 readUint32(uint offset);
 	bool writeUint32(uint offset, uint value);
 
+	void followCharacter(Character *chr, int distance, uint eagerness);
+
 	uint32 _defView, _talkView, _view;
 	uint32 _room, _prevRoom;
 
