@@ -265,7 +265,7 @@ protected:
 	uint32 _hotspotX, _hotspotY;
 };
 
-AGSGraphics::AGSGraphics(AGSEngine *vm) : _vm(vm), _width(0), _height(0), _forceLetterbox(false) {
+AGSGraphics::AGSGraphics(AGSEngine *vm) : _vm(vm), _width(0), _height(0), _forceLetterbox(false), _vsync(false) {
 	_cursorObj = new CursorDrawable(_vm);
 }
 

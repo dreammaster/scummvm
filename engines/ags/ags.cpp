@@ -523,7 +523,7 @@ public:
 			return 0; // FIXME
 		case 20:
 			// vsync
-			return 0; // FIXME
+			return _vm->_graphics->_vsync ? 1 : 0;
 		case 24:
 			// viewport_width
 			return 0; // FIXME

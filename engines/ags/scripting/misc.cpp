@@ -25,6 +25,7 @@
 
 #include "engines/ags/scripting/scripting.h"
 #include "engines/ags/gamestate.h"
+#include "engines/ags/graphics.h"
 
 namespace AGS {
 
@@ -383,20 +384,15 @@ RuntimeValue Script_System_set_Volume(AGSEngine *vm, ScriptObject *, const Commo
 // System: import static attribute bool VSync
 // Gets/sets whether waiting for the vertical sync is enabled.
 RuntimeValue Script_System_get_VSync(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("System::get_VSync unimplemented");
-
-	return RuntimeValue();
+	return vm->_graphics->_vsync ? 1 : 0;
 }
 
 // System: import static attribute bool VSync
 // Gets/sets whether waiting for the vertical sync is enabled.
 RuntimeValue Script_System_set_VSync(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	uint32 value = params[0]._value;
-	UNUSED(value);
+	uint value = params[0]._value;
 
-	// FIXME
-	error("System::set_VSync unimplemented");
+	vm->_graphics->_vsync = value ? 1 : 0;
 
 	return RuntimeValue();
 }

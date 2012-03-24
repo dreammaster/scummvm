@@ -73,6 +73,8 @@ public:
 	uint16 _textMultiply;
 	bool _forceLetterbox;
 
+	bool _vsync;
+
 protected:
 	AGSEngine *_vm;
 
