@@ -185,6 +185,8 @@ public:
 	void loadFrom(Common::SeekableReadStream *dta);
 	void unload();
 
+	uint getRegionAt(int x, int y);
+
 protected:
 	AGSEngine *_vm;
 	bool _loaded;

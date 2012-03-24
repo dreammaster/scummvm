@@ -234,6 +234,30 @@ void Room::unload() {
 	}
 }
 
+uint Room::getRegionAt(int x, int y) {
+	x = _vm->convertToLowRes(x);
+	y = _vm->convertToLowRes(y);
+
+	if (x >= _regionsMask.w)
+		x = _regionsMask.w - 1;
+	if (y >= _regionsMask.h)
+		y = _regionsMask.h - 1;
+	if (x < 0)
+		x = 0;
+	if (y < 0)
+		y = 0;
+
+	void *ptr = _regionsMask.getBasePtr(x, y);
+	assert(_regionsMask.format.bytesPerPixel == 1);
+	uint regionId = *(byte *)ptr;
+
+	if (regionId >= _regions.size())
+		error("An invalid pixel was found on the room region mask (colour %d, location: %d, %d)", regionId, x, y);
+	if (!_regions[regionId]._enabled)
+		return 0;
+	return regionId;
+}
+
 void Room::readData(Common::SeekableReadStream *dta) {
 	uint16 version = dta->readUint16LE();
 

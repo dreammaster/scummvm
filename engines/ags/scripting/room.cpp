@@ -297,14 +297,9 @@ RuntimeValue Script_GetObjectAt(AGSEngine *vm, ScriptObject *, const Common::Arr
 // Undocumented.
 RuntimeValue Script_GetRegionAt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("GetRegionAt unimplemented");
-
-	return RuntimeValue();
+	return vm->getCurrentRoom()->getRegionAt(x, y);
 }
 
 // import void DisableHotspot(int hotspot)
@@ -697,14 +692,10 @@ RuntimeValue Script_Hotspot_get_WalkToY(AGSEngine *vm, RoomHotspot *self, const 
 // Gets the region at the specified location within this room.
 RuntimeValue Script_Region_GetAtRoomXY(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("Region::GetAtRoomXY unimplemented");
-
-	return RuntimeValue();
+	uint regionId = vm->getCurrentRoom()->getRegionAt(x, y);
+	return &vm->getCurrentRoom()->_regions[regionId];
 }
 
 // Region: import void RunInteraction(int event)
