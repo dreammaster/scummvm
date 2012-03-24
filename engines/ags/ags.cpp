@@ -694,12 +694,7 @@ void AGSEngine::checkNewRoom() {
 	_inNewRoomState = newRoomWas;
 }
 
-void AGSEngine::scheduleNewRoom(int roomId) {
-	warning("AGSEngine::scheduleNewRoom not implemented");
-
-	if (roomId < 0)
-		error("NewRoom: room change requested to invalid room number %d", roomId);
-
+void AGSEngine::scheduleNewRoom(uint roomId) {
 	if (_displayedRoom == 0xffffffff) {
 		// called from game_start; change the room where the game will start
 		_playerChar->_room = roomId;
@@ -748,7 +743,7 @@ void AGSEngine::scheduleNewRoom(int roomId) {
 }
 
 /** Changes the current room number and loads a new room from disk */
-void AGSEngine::newRoom(int roomId) {
+void AGSEngine::newRoom(uint roomId) {
 	warning("AGSEngine::newRoom not implemented");
 	endSkippingUntilCharStops();
 

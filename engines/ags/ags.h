@@ -237,7 +237,7 @@ public:
 	void invalidateGUI() { _guiNeedsUpdate = true; }
 
 	Room *getCurrentRoom() { return _currentRoom; }
-	void scheduleNewRoom(int roomId);
+	void scheduleNewRoom(uint roomId);
 
 	GameFile *_gameFile;
 	class GameState *_state;
@@ -334,7 +334,7 @@ private:
 	void loadNewRoom(uint32 id, Character *forChar);
 	void unloadOldRoom();
 	void checkNewRoom();
-	void newRoom(int roomId);
+	void newRoom(uint roomId);
 
 	BlockUntilType checkBlockingUntil();
 
