@@ -23,9 +23,25 @@
  * which is licensed under the Artistic License 2.0.
  */
 
+#include "common/savefile.h"
 #include "engines/ags/scripting/scripting.h"
 
 namespace AGS {
+
+class ScriptFile : public ScriptObject {
+public:
+	ScriptFile() : _inFile(NULL), _mode(0) { }
+	~ScriptFile() { delete _inFile; }
+
+	virtual bool isOfType(ScriptObjectType objectType) { return (objectType == sotFile); }
+	const char *getObjectTypeName() { return "ScriptFile"; }
+
+	int _mode; // 1 - read, 2 - write, 3 - append
+	union {
+		Common::SeekableReadStream *_inFile;
+		Common::WriteStream *_outFile;
+	};
+};
 
 // import int FileOpen(const string filename, const string mode)
 // Obsolete file I/O function.
@@ -211,21 +227,43 @@ RuntimeValue Script_File_Exists(AGSEngine *vm, ScriptObject *, const Common::Arr
 // Opens the specified file in order to read from or write to it.
 RuntimeValue Script_File_Open(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *filename = (ScriptString *)params[0]._object;
-	UNUSED(filename);
 	uint32 filemode = params[1]._value;
-	UNUSED(filemode);
 
-	// FIXME
-	error("File::Open unimplemented");
+	// Modes are:
+	// 0 - NULL (error?)
+	// 1 - "rb"
+	// 2 - "wb"
+	// 3 - "ab"
 
-	return RuntimeValue();
+	Common::String wrappedName = vm->wrapFilename(filename->getString());
+	Common::SaveFileManager *saveFileMan = vm->getSaveFileManager();
+
+	ScriptFile *f = new ScriptFile();
+	if (filemode == 1) {
+		f->_inFile = saveFileMan->openForLoading(wrappedName);
+	} else if (filemode == 2) {
+		f->_outFile = saveFileMan->openForSaving(wrappedName);
+	} else if (filemode == 3) {
+		error("File::open: unsupported file mode 3");
+	} else
+		error("File::open: Invalid file mode %u", filemode);
+
+	if (f->_inFile == NULL)
+		return 0;
+
+	f->_mode = filemode;
+
+	RuntimeValue ret = f;
+	ret._object->DecRef();
+	return ret;
 }
 
 // File: import void Close()
 // Closes the file.
 RuntimeValue Script_File_Close(AGSEngine *vm, ScriptFile *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("File::Close unimplemented");
+	self->_outFile->finalize();
+	delete self->_outFile;
+	self->_mode = 0;
 
 	return RuntimeValue();
 }
@@ -303,10 +341,12 @@ RuntimeValue Script_File_ReadStringBack(AGSEngine *vm, ScriptFile *self, const C
 // Writes an integer to the file.
 RuntimeValue Script_File_WriteInt(AGSEngine *vm, ScriptFile *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("File::WriteInt unimplemented");
+	if (self->_mode != 2 && self->_mode != 3)
+		error("File::WriteString: File not opened in 'write' mode");
+
+	self->_outFile->writeSByte('I');
+	self->_outFile->writeSint32LE(value);
 
 	return RuntimeValue();
 }
@@ -339,10 +379,13 @@ RuntimeValue Script_File_WriteRawLine(AGSEngine *vm, ScriptFile *self, const Com
 // Writes a string to the file.
 RuntimeValue Script_File_WriteString(AGSEngine *vm, ScriptFile *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *text = (ScriptString *)params[0]._object;
-	UNUSED(text);
 
-	// FIXME
-	error("File::WriteString unimplemented");
+	if (self->_mode != 2 && self->_mode != 3)
+		error("File::WriteString: File not opened in 'write' mode");
+
+	self->_outFile->writeSint32LE(text->getString().size()+1);
+	self->_outFile->writeString(text->getString());
+	self->_outFile->writeSByte(0);
 
 	return RuntimeValue();
 }
