@@ -721,10 +721,10 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	else
 		_backgroundScenes[0]._scene = readRLEImage(dta);
 
+	_regionsMask = readRLEImage(dta);
 	_walkableMask = readRLEImage(dta);
 	_walkBehindMask = readRLEImage(dta);
 	_hotspotMask = readRLEImage(dta);
-	_regionsMask = readRLEImage(dta);
 
 	if (_version < kAGSRoomVer255r) {
 		// old version - copy the walkable areas to regions
