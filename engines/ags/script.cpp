@@ -725,51 +725,35 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_ISEQUAL:
 			// reg1 == reg2   reg1=1 if true, =0 if not
-			// TODO: helper routine to deal with type checking?
-			if (_registers[int1]._type == rvtSystemObject && _registers[int2]._type == rvtSystemObject) {
-				uint32 offset1 = _registers[int1]._value;
-				ScriptObject *object1 = _registers[int1]._object->getObjectAt(offset1);
-				uint32 offset2 = _registers[int2]._value;
-				ScriptObject *object2 = _registers[int2]._object->getObjectAt(offset2);
-				_registers[int1]._value = (offset1 == offset2) && (object1 == object2);
-			} else
-				_registers[int1]._value = (_registers[int1]._value == _registers[int2]._value);
+			_registers[int1] = _registers[int1].equalTo(_registers[int2]) ? 1 : 0;
 			break;
 		case SCMD_NOTEQUAL:
 			// reg1 != reg2
-			// TODO: helper routine to deal with type checking?
-			if (_registers[int1]._type == rvtSystemObject && _registers[int2]._type == rvtSystemObject) {
-				uint32 offset1 = _registers[int1]._value;
-				ScriptObject *object1 = _registers[int1]._object->getObjectAt(offset1);
-				uint32 offset2 = _registers[int2]._value;
-				ScriptObject *object2 = _registers[int2]._object->getObjectAt(offset2);
-				_registers[int1]._value = (offset1 != offset2) || (object1 != object2);
-			} else
-				_registers[int1]._value = (_registers[int1]._value != _registers[int2]._value);
+			_registers[int1] = _registers[int1].equalTo(_registers[int2]) ? 0 : 1;
 			break;
 		case SCMD_GREATER:
 			// reg1 > reg2
-			_registers[int1]._signedValue = (_registers[int1]._signedValue > _registers[int2]._signedValue);
+			_registers[int1] = (_registers[int1]._signedValue > _registers[int2]._signedValue) ? 1 : 0;
 			break;
 		case SCMD_LESSTHAN:
 			// reg1 < reg2
-			_registers[int1]._signedValue = (_registers[int1]._signedValue < _registers[int2]._signedValue);
+			_registers[int1] = (_registers[int1]._signedValue < _registers[int2]._signedValue) ? 1 : 0;
 			break;
 		case SCMD_GTE:
 			// reg1 >= reg2
-			_registers[int1]._signedValue = (_registers[int1]._signedValue >= _registers[int2]._signedValue);
+			_registers[int1] = (_registers[int1]._signedValue >= _registers[int2]._signedValue) ? 1 : 0;
 			break;
 		case SCMD_LTE:
 			// reg1 <= reg2
-			_registers[int1]._signedValue = (_registers[int1]._signedValue <= _registers[int2]._signedValue);
+			_registers[int1] = (_registers[int1]._signedValue <= _registers[int2]._signedValue) ? 1 : 0;
 			break;
 		case SCMD_AND:
 			// (reg1!=0) && (reg2!=0) -> reg1
-			_registers[int1]._value = (_registers[int1]._value && _registers[int2]._value);
+			_registers[int1] = (_registers[int1]._value && _registers[int2]._value) ? 1 : 0;
 			break;
 		case SCMD_OR:
 			// (reg1!=0) || (reg2!=0) -> reg1
-			_registers[int1]._value = (_registers[int1]._value || _registers[int2]._value);
+			_registers[int1] = (_registers[int1]._value || _registers[int2]._value) ? 1 : 0;
 			break;
 		case SCMD_XORREG:
 			// reg1 ^= reg2

@@ -129,6 +129,19 @@ struct RuntimeValue {
 		return *this;
 	}
 
+	bool equalTo(const RuntimeValue &value) const {
+		if (_type == rvtSystemObject && value._type == rvtSystemObject) {
+			// two objects, resolve their offsets and compare the result
+			uint32 offset1 = _value;
+			ScriptObject *object1 = _object->getObjectAt(offset1);
+			uint32 offset2 = value._value;
+			ScriptObject *object2 = value._object->getObjectAt(offset2);
+			return (offset1 == offset2) && (object1 == object2);
+		} else {
+			return (_type == value._type) && (_value == value._value);
+		}
+	}
+
 	void invalidate() {
 		if (_type == rvtSystemObject)
 			_object->DecRef();
