@@ -120,6 +120,8 @@ public:
 	uint playSound(uint soundId, uint priority = 10);
 	bool playSoundOnChannel(uint soundId, uint channelId);
 
+	void updateMusicVolume();
+
 	Common::Array<AudioClip> _audioClips;
 	Common::Array<AudioClipType> _audioClipTypes;
 	Common::Array<AudioChannel *> _channels;

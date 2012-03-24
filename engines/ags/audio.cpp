@@ -250,6 +250,10 @@ bool AGSAudio::playSoundOnChannel(uint soundId, uint channelId) {
 	return true;
 }
 
+void AGSAudio::updateMusicVolume() {
+	// FIXME
+}
+
 void AGSAudio::openResources() {
 	_musicResources = new ResourceManager();
 	if (!_musicResources->init("music.vox")) {

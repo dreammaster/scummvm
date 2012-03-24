@@ -223,11 +223,13 @@ RuntimeValue Script_SetSoundVolume(AGSEngine *vm, ScriptObject *, const Common::
 // import void SetMusicMasterVolume(int volume)
 // Changes the music volume.
 RuntimeValue Script_SetMusicMasterVolume(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int volume = params[0]._signedValue;
-	UNUSED(volume);
+	uint volume = params[0]._value;
 
-	// FIXME
-	error("SetMusicMasterVolume unimplemented");
+	if (volume > 100)
+		error("SetMusicMasterVolume: volume %d is too high (must be 0-100)", volume);
+
+	vm->_state->_musicMasterVolume = volume + 60;
+	vm->_audio->updateMusicVolume();
 
 	return RuntimeValue();
 }
