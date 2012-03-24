@@ -725,11 +725,27 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_ISEQUAL:
 			// reg1 == reg2   reg1=1 if true, =0 if not
-			_registers[int1]._value = (_registers[int1]._value == _registers[int2]._value);
+			// TODO: helper routine to deal with type checking?
+			if (_registers[int1]._type == rvtSystemObject && _registers[int2]._type == rvtSystemObject) {
+				uint32 offset1 = _registers[int1]._value;
+				ScriptObject *object1 = _registers[int1]._object->getObjectAt(offset1);
+				uint32 offset2 = _registers[int2]._value;
+				ScriptObject *object2 = _registers[int2]._object->getObjectAt(offset2);
+				_registers[int1]._value = (offset1 == offset2) && (object1 == object2);
+			} else
+				_registers[int1]._value = (_registers[int1]._value == _registers[int2]._value);
 			break;
 		case SCMD_NOTEQUAL:
 			// reg1 != reg2
-			_registers[int1]._value = (_registers[int1]._value != _registers[int2]._value);
+			// TODO: helper routine to deal with type checking?
+			if (_registers[int1]._type == rvtSystemObject && _registers[int2]._type == rvtSystemObject) {
+				uint32 offset1 = _registers[int1]._value;
+				ScriptObject *object1 = _registers[int1]._object->getObjectAt(offset1);
+				uint32 offset2 = _registers[int2]._value;
+				ScriptObject *object2 = _registers[int2]._object->getObjectAt(offset2);
+				_registers[int1]._value = (offset1 != offset2) || (object1 != object2);
+			} else
+				_registers[int1]._value = (_registers[int1]._value != _registers[int2]._value);
 			break;
 		case SCMD_GREATER:
 			// reg1 > reg2
@@ -868,12 +884,12 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_JZ:
 			// jump if ax==0 by arg1
-			if (_registers[SREG_AX]._value == 0)
+			if (_registers[SREG_AX]._type == rvtInteger && _registers[SREG_AX]._value == 0)
 				_pc += int1;
 			break;
 		case SCMD_JNZ:
 			// jump by arg1 if ax!=0
-			if (_registers[SREG_AX]._value != 0)
+			if (_registers[SREG_AX]._type != rvtInteger || _registers[SREG_AX]._value != 0)
 				_pc += int1;
 			break;
 		case SCMD_PUSHREG:
@@ -951,12 +967,12 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_CHECKNULL:
 			// error if MAR==0
-			if (_registers[SREG_MAR]._type != rvtSystemObject && _registers[SREG_MAR]._value == 0)
+			if (_registers[SREG_MAR]._type == rvtInteger && _registers[SREG_MAR]._value == 0)
 				error("script tried to dereference null pointer on line %d", _lineNumber);
 			break;
 		case SCMD_CHECKNULLREG:
 			// error if reg1 == NULL
-			if (_registers[int1]._type != rvtSystemObject && _registers[int1]._value == 0)
+			if (_registers[int1]._type == rvtInteger && _registers[int1]._value == 0)
 				error("script tried to dereference null pointer on line %d", _lineNumber);
 			break;
 		case SCMD_NUMFUNCARGS:
