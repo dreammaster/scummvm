@@ -887,11 +887,12 @@ RuntimeValue Script_SetSkipSpeech(AGSEngine *vm, ScriptObject *, const Common::A
 // import void SetSpeechStyle(eSpeechStyle)
 // Changes the style in which speech is displayed.
 RuntimeValue Script_SetSpeechStyle(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	uint32 espeechstyle = params[0]._value;
-	UNUSED(espeechstyle);
+	uint speechStyle = params[0]._value;
 
-	// FIXME
-	error("SetSpeechStyle unimplemented");
+	if (speechStyle > 3)
+		error("SetSpeechStyle: invalid style %d", speechStyle);
+
+	vm->_gameFile->_options[OPT_SPEECHTYPE] = speechStyle;
 
 	return RuntimeValue();
 }
