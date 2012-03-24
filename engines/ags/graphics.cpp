@@ -510,6 +510,10 @@ void AGSGraphics::draw() {
 }
 
 void AGSGraphics::draw(Drawable *item) {
+	uint transparency = item->getDrawTransparency();
+	if (transparency == 255)
+		return;
+
 	const Common::Point pos = item->getDrawPos();
 	uint itemWidth = item->getDrawWidth();
 	uint itemHeight = item->getDrawHeight();
@@ -549,13 +553,26 @@ void AGSGraphics::draw(Drawable *item) {
 	} else if (surface->format.bytesPerPixel == 2) {
 		uint16 transColor = (uint16)getTransparentColor();
 
+		if (transparency)
+			transparency = (transparency + 1) / 8;
+
 		for (uint y = 0; y < height - startY; ++y) {
 			uint16 *dest = (uint16 *)_backBuffer.getBasePtr(pos.x + startX, pos.y + y);
 			const uint16 *src = (uint16 *)surface->getBasePtr(startX, startY + y);
 			for (uint x = startX; x < width; ++x) {
-				uint16 data = *src++;
-				if (data != transColor)
-					*dest = data;
+				uint16 srcData = *src++;
+				if (srcData != transColor) {
+					if (transparency != 0) {
+						uint16 destData = *dest;
+
+						uint32 blendDest = (destData | ((uint32)destData << 16)) & 0x7E0F81F;
+						uint32 blendSrc = (srcData | ((uint32)srcData << 16)) & 0x7E0F81F;
+						uint32 blended = (blendSrc - blendDest) * transparency / 32 + blendDest;
+						blended &= 0x7E0F81F;
+						*dest = (blended & 0xFFFF) | (blended >> 16);
+					} else
+						*dest = srcData;
+				}
 				dest++;
 			}
 		}
