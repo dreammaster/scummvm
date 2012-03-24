@@ -1351,20 +1351,15 @@ RuntimeValue Script_Slider_set_HandleGraphic(AGSEngine *vm, GUISlider *self, con
 // Slider: import attribute int HandleOffset
 // Gets/sets the pixel offset at which the handle is drawn.
 RuntimeValue Script_Slider_get_HandleOffset(AGSEngine *vm, GUISlider *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Slider::get_HandleOffset unimplemented");
-
-	return RuntimeValue();
+	return self->getHandleOffset();
 }
 
 // Slider: import attribute int HandleOffset
 // Gets/sets the pixel offset at which the handle is drawn.
 RuntimeValue Script_Slider_set_HandleOffset(AGSEngine *vm, GUISlider *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Slider::set_HandleOffset unimplemented");
+	self->setHandleOffset(value);
 
 	return RuntimeValue();
 }
@@ -1372,20 +1367,15 @@ RuntimeValue Script_Slider_set_HandleOffset(AGSEngine *vm, GUISlider *self, cons
 // Slider: import attribute int Max
 // Gets/sets the maximum value that the slider can have.
 RuntimeValue Script_Slider_get_Max(AGSEngine *vm, GUISlider *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Slider::get_Max unimplemented");
-
-	return RuntimeValue();
+	return self->getMax();
 }
 
 // Slider: import attribute int Max
 // Gets/sets the maximum value that the slider can have.
 RuntimeValue Script_Slider_set_Max(AGSEngine *vm, GUISlider *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Slider::set_Max unimplemented");
+	self->setMax(value);
 
 	return RuntimeValue();
 }
@@ -1393,20 +1383,15 @@ RuntimeValue Script_Slider_set_Max(AGSEngine *vm, GUISlider *self, const Common:
 // Slider: import attribute int Min
 // Gets/sets the minimum value that the slider can have.
 RuntimeValue Script_Slider_get_Min(AGSEngine *vm, GUISlider *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Slider::get_Min unimplemented");
-
-	return RuntimeValue();
+	return self->getMin();
 }
 
 // Slider: import attribute int Min
 // Gets/sets the minimum value that the slider can have.
 RuntimeValue Script_Slider_set_Min(AGSEngine *vm, GUISlider *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Slider::set_Min unimplemented");
+	self->setMin(value);
 
 	return RuntimeValue();
 }
@@ -1414,20 +1399,15 @@ RuntimeValue Script_Slider_set_Min(AGSEngine *vm, GUISlider *self, const Common:
 // Slider: import attribute int Value
 // Gets/sets the current value of the slider.
 RuntimeValue Script_Slider_get_Value(AGSEngine *vm, GUISlider *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Slider::get_Value unimplemented");
-
-	return RuntimeValue();
+	return self->getValue();
 }
 
 // Slider: import attribute int Value
 // Gets/sets the current value of the slider.
 RuntimeValue Script_Slider_set_Value(AGSEngine *vm, GUISlider *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Slider::set_Value unimplemented");
+	self->setValue(value);
 
 	return RuntimeValue();
 }

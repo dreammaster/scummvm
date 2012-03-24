@@ -103,6 +103,38 @@ void GUISlider::readFrom(Common::SeekableReadStream *dta) {
 	}
 }
 
+void GUISlider::setMin(int32 value) {
+	if (_min == value)
+		return;
+
+	_min = value;
+	_parent->invalidate();
+}
+
+void GUISlider::setMax(int32 value) {
+	if (_max == value)
+		return;
+
+	_max = value;
+	_parent->invalidate();
+}
+
+void GUISlider::setValue(int32 value) {
+	if (_value == value)
+		return;
+
+	_value = value;
+	_parent->invalidate();
+}
+
+void GUISlider::setHandleOffset(int32 value) {
+	if (_handleOffset == value)
+		return;
+
+	_handleOffset = value;
+	_parent->invalidate();
+}
+
 void GUISlider::draw(Graphics::Surface *surface) {
 	warning("GUISlider::draw unimplemented");
 }

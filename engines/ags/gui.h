@@ -159,11 +159,22 @@ public:
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUISlider); }
 	const char *getObjectTypeName() { return "GUISlider"; }
 
-	uint32 _min, _max;
-	uint32 _value;
+	int32 getMin() { return _min; }
+	void setMin(int32 value);
+	int32 getMax() { return _max; }
+	void setMax(int32 value);
+	int32 getValue() { return _value; }
+	void setValue(int32 value);
+
+	int32 getHandleOffset() { return _handleOffset; }
+	void setHandleOffset(int32 value);
+
+	int32 _min, _max;
+	int32 _value;
+
 	uint32 _mousePressed;
 	uint32 _handlePic;
-	uint32 _handleOffset;
+	int32 _handleOffset;
 	uint32 _bgImage;
 
 	void draw(Graphics::Surface *surface);
