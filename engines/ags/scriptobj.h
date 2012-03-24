@@ -121,6 +121,7 @@ template<class T> class ScriptObjectArray : public ScriptObject {
 public:
 	ScriptObjectArray(Common::Array<T> &array, uint32 elementSize, const char *objName)
 		: _array(array), _elementSize(elementSize), _objName(objName) { }
+	void setArray(Common::Array<T> &array) { _array = array; }
 	virtual ScriptObject *getObjectAt(uint32 &offset) {
 		uint32 objectId = offset / _elementSize;
 		if (objectId >= _array.size())
@@ -154,6 +155,7 @@ template<class T> class ScriptObjectArray<T *> : public ScriptObject {
 public:
 	ScriptObjectArray(Common::Array<T *> &array, uint32 elementSize, const char *objName)
 		: _array(array), _elementSize(elementSize), _objName(objName) { }
+	void setArray(Common::Array<T *> &array) { _array = array; }
 	virtual ScriptObject *getObjectAt(uint32 &offset) {
 		uint32 objectId = offset / _elementSize;
 		if (objectId >= _array.size())

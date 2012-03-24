@@ -54,12 +54,29 @@ namespace AGS {
 const char *kGameDataNameV2 = "ac2game.dta";
 const char *kGameDataNameV3 = "game28.dta";
 
+// wrapper class for object/hotspot/region objects, see createGlobalScript
+struct RoomObjectState {
+	~RoomObjectState() {
+		delete _objectObject;
+		delete _hotspotObject;
+		delete _regionObject;
+	}
+
+	Common::Array<RoomObject *> _invalidObjects;
+	ScriptObjectArray<RoomObject *> *_objectObject;
+	Common::Array<RoomHotspot> _invalidHotspots;
+	ScriptObjectArray<RoomHotspot> *_hotspotObject;
+	Common::Array<RoomRegion> _invalidRegions;
+	ScriptObjectArray<RoomRegion> *_regionObject;
+};
+
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
 	_resourceMan(0), _needsUpdate(true), _guiNeedsUpdate(true), _poppedInterface((uint)-1),
 	_startingRoom(0xffffffff), _displayedRoom(0xffffffff),
 	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL), _roomScriptFork(NULL),
 	_scriptMouseObject(NULL), _gameStateGlobalsObject(NULL), _saveGameIndexObject(NULL), _scriptSystemObject(NULL),
+	_roomObjectState(NULL),
 	_currentRoom(NULL), _framesPerSecond(40), _lastFrameTime(0),
 	_inNewRoomState(kNewRoomStateNone), _newRoomStateWas(kNewRoomStateNone), _inEntersScreenCounter(0),
 	_leavesScreenRoomId(-1),
@@ -86,6 +103,8 @@ AGSEngine::~AGSEngine() {
 		if (i->_value != _currentRoom)
 			delete i->_value;
 
+	delete _scriptState;
+
 	for (uint i = 0; i < _characters.size(); ++i) {
 		assert(_characters[i]->getRefCount() == 1);
 		_characters[i]->DecRef();
@@ -95,8 +114,7 @@ AGSEngine::~AGSEngine() {
 	delete _gameStateGlobalsObject;
 	delete _saveGameIndexObject;
 	delete _scriptSystemObject;
-
-	delete _scriptState;
+	delete _roomObjectState;
 
 	delete _graphics;
 	delete _sprites;
@@ -515,7 +533,6 @@ protected:
 	AGSEngine *_vm;
 };
 
-
 void AGSEngine::createGlobalScript() {
 	assert(_scriptModules.empty());
 
@@ -528,6 +545,17 @@ void AGSEngine::createGlobalScript() {
 	_scriptState->addSystemObjectImport("savegameindex", _saveGameIndexObject);
 	_scriptSystemObject = new ScriptSystemObject(this);
 	_scriptState->addSystemObjectImport("system", _scriptSystemObject);
+
+	// Some games import these from their global scripts (the original engine points them to
+	// a global array of wrapper objects), so we initialise them with empty arrays for now,
+	// and replace them later.
+	_roomObjectState = new RoomObjectState;
+	_roomObjectState->_objectObject = new ScriptObjectArray<RoomObject *>(_roomObjectState->_invalidObjects, 8, "RoomObject");
+	_scriptState->addSystemObjectImport("object", _roomObjectState->_objectObject);
+	_roomObjectState->_hotspotObject = new ScriptObjectArray<RoomHotspot>(_roomObjectState->_invalidHotspots, 8, "RoomHotspot");
+	_scriptState->addSystemObjectImport("hotspot", _roomObjectState->_hotspotObject);
+	_roomObjectState->_regionObject = new ScriptObjectArray<RoomRegion>(_roomObjectState->_invalidRegions, 8, "RoomRegion");
+	_scriptState->addSystemObjectImport("region", _roomObjectState->_regionObject);
 
 	_scriptState->addSystemObjectImport("dialog", new ScriptObjectArray<DialogTopic>(_gameFile->_dialogs, 8, "DialogTopic"));
 	for (uint i = 0; i < _gameFile->_dialogs.size(); ++i)
@@ -602,7 +630,7 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 	// FIXME
 
-	_scriptState->addSystemObjectImport("object", new ScriptObjectArray<RoomObject *>(_currentRoom->_objects, 8, "RoomObject"), true);
+	_roomObjectState->_objectObject->setArray(_currentRoom->_objects);
 	for (uint i = 0; i < _currentRoom->_objects.size(); ++i) {
 		RoomObject *obj = _currentRoom->_objects[i];
 		if (obj->_scriptName.empty())
@@ -610,13 +638,15 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 		_scriptState->addSystemObjectImport(obj->_scriptName, obj);
 	}
 
-	_scriptState->addSystemObjectImport("hotspot", new ScriptObjectArray<RoomHotspot>(_currentRoom->_hotspots, 8, "RoomHotspot"), true);
+	_roomObjectState->_hotspotObject->setArray(_currentRoom->_hotspots);
 	for (uint i = 0; i < _currentRoom->_hotspots.size(); ++i) {
 		RoomHotspot &hotspot = _currentRoom->_hotspots[i];
 		if (hotspot._scriptName.empty())
 			continue;
 		_scriptState->addSystemObjectImport(hotspot._scriptName, &hotspot);
 	}
+
+	_roomObjectState->_regionObject->setArray(_currentRoom->_regions);
 
 	// FIXME
 
@@ -638,6 +668,11 @@ void AGSEngine::unloadOldRoom() {
 	// FIXME: discard room if we shouldn't keep it
 	_currentRoom->unload();
 	_currentRoom = NULL;
+
+	_roomObjectState->_objectObject->setArray(_roomObjectState->_invalidObjects);
+	_roomObjectState->_hotspotObject->setArray(_roomObjectState->_invalidHotspots);
+	_roomObjectState->_regionObject->setArray(_roomObjectState->_invalidRegions);
+	// FIXME: remove old exported objects
 
 	// FIXME: a lot of unimplemented stuff
 	warning("AGSEngine::unloadOldRoom() unimplemented");
