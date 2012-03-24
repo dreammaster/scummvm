@@ -25,6 +25,7 @@
 
 #include "common/debug.h"
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/audio.h"
 #include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
@@ -191,13 +192,14 @@ RuntimeValue Script_Game_IsAudioPlaying(AGSEngine *vm, ScriptObject *, const Com
 // Game: import static void SetAudioTypeSpeechVolumeDrop(AudioType, int volumeDrop)
 // Changes the volume drop applied to this audio type when speech is played
 RuntimeValue Script_Game_SetAudioTypeSpeechVolumeDrop(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	uint32 audiotype = params[0]._value;
-	UNUSED(audiotype);
+	uint audioType = params[0]._value;
 	int volumeDrop = params[1]._signedValue;
-	UNUSED(volumeDrop);
 
-	// FIXME
-	error("Game::SetAudioTypeSpeechVolumeDrop unimplemented");
+	if (audioType >= vm->_audio->_audioClipTypes.size())
+		error("Game::SetAudioTypeSpeechVolumeDrop: clip type %d is too high (only have %d)",
+			audioType, vm->_audio->_audioClipTypes.size());
+
+	vm->_audio->_audioClipTypes[audioType]._volumeReductionWhileSpeechPlaying = volumeDrop;
 
 	return RuntimeValue();
 }
