@@ -576,7 +576,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 					error("script tried using WRITELIT unsafely on stack (%d bytes of %d) on line %d",
 						int1, int2, _lineNumber);
 				// FIXME: check bounds
-				for (uint i = 0; i < int1; ++i)
+				for (uint i = 0; i < (uint)int1; ++i)
 					_stack[i + _registers[SREG_MAR]._value].invalidate();
 				break;
 			}

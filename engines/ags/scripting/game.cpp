@@ -854,12 +854,12 @@ RuntimeValue Script_GiveScore(AGSEngine *vm, ScriptObject *, const Common::Array
 // import void SetVoiceMode(eVoiceMode)
 // Sets whether voice and/or text are used in the game.
 RuntimeValue Script_SetVoiceMode(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	uint32 newMode = params[0]._value;
+	int32 newMode = params[0]._signedValue;
 
 	// 0 = text only
 	// 1 = voice & text
 	// 2 = voice only
-	if (newMode > 2)
+	if (newMode < 0 || newMode > 2)
 		error("SetVoiceMode: invalid mode number %d (must be 0, 1 or 2)", newMode);
 
 	// If speech is turned off, store the mode anyway in case the

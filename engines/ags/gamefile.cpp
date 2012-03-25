@@ -386,7 +386,7 @@ bool GameFile::init() {
 		int optionFlags[MAXTOPICOPTIONS];
 		for (uint j = 0; j < MAXTOPICOPTIONS; ++j)
 			optionFlags[j] = dta->readUint32LE();
-		bool hasScripts = (bool)dta->readUint32LE();
+		/* bool hasScripts = (bool)*/dta->readUint32LE();
 		uint16 entryPoints[MAXTOPICOPTIONS];
 		for (uint j = 0; j < MAXTOPICOPTIONS; ++j)
 			entryPoints[j] = dta->readUint16LE();
@@ -615,6 +615,7 @@ void GameFile::readOldViews(Common::SeekableReadStream *dta) {
 				error("too many frames (%d) in 2.x view", numFrames[i]);
 		}
 		dta->skip(2); // padding
+		// FIXME: loopFlags are discarded?
 		uint32 loopFlags[16];
 		for (uint i = 0; i < 16; ++i)
 			loopFlags[i] = dta->readUint32LE();
