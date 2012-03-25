@@ -1802,7 +1802,7 @@ void AGSEngine::doConversation(uint dialogId) {
 
 // TODO: move this into DialogTopic itself?
 static void getDialogScriptParameters(DialogTopic &topic, uint &pos, uint16 *param1, uint16 *param2 = NULL) {
-	const Common::Array<byte> code = topic._code;
+	const Common::Array<byte> &code = topic._code;
 	if (pos + 3 > code.size())
 		error("getDialogScriptParameters: %d is off end of script (size %d)", pos, code.size());
 	pos++;
@@ -1811,7 +1811,7 @@ static void getDialogScriptParameters(DialogTopic &topic, uint &pos, uint16 *par
 	if (param2) {
 		if (pos + 2 > code.size())
 			error("getDialogScriptParameters: %d is off end of script (size %d)", pos, code.size());
-		*param1 = READ_LE_UINT16(&code[pos]);
+		*param2 = READ_LE_UINT16(&code[pos]);
 		pos += 2;
 	}
 }
