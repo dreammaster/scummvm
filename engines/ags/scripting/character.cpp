@@ -893,11 +893,11 @@ RuntimeValue Script_Character_ChangeRoom(AGSEngine *vm, Character *self, const C
 	}
 
 	if (x != SCR_NO_VALUE && y != SCR_NO_VALUE) {
-		vm->newRoomPos = 0;
+		vm->_newRoomPos = 0;
 		// don't check X or Y bounds, so that they can do a
 		// walk-in animation if they want
-		vm->newRoomX = x;
-		vm->newRoomY = y;
+		vm->_newRoomX = x;
+		vm->_newRoomY = y;
 	}
 
 	vm->scheduleNewRoom(room);

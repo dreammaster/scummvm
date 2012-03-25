@@ -251,9 +251,9 @@ public:
 	/** Prepend 'TARGET-' to the given filename. */
 	Common::String wrapFilename(const Common::String &name) const { return _targetName + "-" + name; };
 
-	int32 newRoomPos;
-	int32 newRoomX;
-	int32 newRoomY;
+	int32 _newRoomPos;
+	int32 _newRoomX;
+	int32 _newRoomY;
 
 private:
 	const AGSGameDescription *_gameDescription;

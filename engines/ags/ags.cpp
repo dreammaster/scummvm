@@ -81,6 +81,7 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_currentRoom(NULL), _framesPerSecond(40), _lastFrameTime(0),
 	_inNewRoomState(kNewRoomStateNone), _newRoomStateWas(kNewRoomStateNone), _inEntersScreenCounter(0),
 	_leavesScreenRoomId(-1),
+	_newRoomPos(0), _newRoomX(SCR_NO_VALUE), _newRoomY(SCR_NO_VALUE),
 	_blockingUntil(kUntilNothing), _insideProcessEvent(false) {
 
 	_rnd = new Common::RandomSource("ags");
