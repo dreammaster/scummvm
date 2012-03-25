@@ -126,7 +126,7 @@ static Graphics::Surface readRLEImage(Common::SeekableReadStream *stream) {
 }
 
 Common::Point RoomObject::getDrawPos() {
-	return _pos;
+	return Common::Point(_vm->multiplyUpCoordinate(_pos.x), _vm->multiplyUpCoordinate(_pos.y));
 }
 
 int RoomObject::getDrawOrder() {
@@ -393,7 +393,63 @@ void Room::readData(Common::SeekableReadStream *dta) {
 				blockType, dta->pos(), blockEnd);
 	}
 
-	// FIXME
+	// FIXME: palette sync
+
+	if (!_loaded && _vm->_gameFile->_defaultResolution > 2) {
+		if (_version < kAGSRoomVer303x && _vm->getGameOption(OPT_NATIVECOORDINATES)) {
+			// coordinates are stored in non-native form, and we want them in native
+			// (originally at the end of load_room)
+
+			for (uint i = 0; i < _objects.size(); ++i) {
+				_objects[i]->_pos.x *= 2;
+				_objects[i]->_pos.y *= 2;
+				if (_objects[i]->_baseLine != 0xffffffff)
+					_objects[i]->_baseLine *= 2;
+			}
+
+			for (uint i = 0; i < _hotspots.size(); ++i) {
+				_hotspots[i]._walkToPos.x *= 2;
+				_hotspots[i]._walkToPos.y *= 2;
+			}
+
+			for (uint i = 0; i < _walkBehindBaselines.size(); ++i)
+				_walkBehindBaselines[i] *= 2;
+
+			_boundary.left *= 2;
+			_boundary.top *= 2;
+			_boundary.bottom *= 2;
+			_boundary.right *= 2;
+
+			_width *= 2;
+			_height *= 2;
+		} else if (version >= kAGSRoomVer303x && !_vm->getGameOption(OPT_NATIVECOORDINATES)) {
+			// coordinates are stored in native form, and we want them in non-native
+			// (originally convert_room_coordinates_to_low_res)
+
+			for (uint i = 0; i < _objects.size(); ++i) {
+				_objects[i]->_pos.x /= 2;
+				_objects[i]->_pos.y /= 2;
+				if (_objects[i]->_baseLine != 0xffffffff)
+					_objects[i]->_baseLine /= 2;
+			}
+
+			for (uint i = 0; i < _hotspots.size(); ++i) {
+				_hotspots[i]._walkToPos.x /= 2;
+				_hotspots[i]._walkToPos.y /= 2;
+			}
+
+			for (uint i = 0; i < _walkBehindBaselines.size(); ++i)
+				_walkBehindBaselines[i] /= 2;
+
+			_boundary.left /= 2;
+			_boundary.top /= 2;
+			_boundary.bottom /= 2;
+			_boundary.right /= 2;
+
+			_width /= 2;
+			_height /= 2;
+		}
+	}
 
 	delete dta;
 }
@@ -418,31 +474,6 @@ Room::~Room() {
 	_walkBehindMask.free();
 	_hotspotMask.free();
 	_regionsMask.free();
-}
-
-void Room::convertCoordinatesToLowRes() {
-	for (uint i = 0; i < _objects.size(); ++i) {
-		_objects[i]->_pos.x /= 2;
-		_objects[i]->_pos.y /= 2;
-		if (_objects[i]->_baseLine != 0xffffffff)
-			_objects[i]->_baseLine /= 2;
-	}
-
-	for (uint i = 0; i < _hotspots.size(); ++i) {
-		_hotspots[i]._walkToPos.x /= 2;
-		_hotspots[i]._walkToPos.y /= 2;
-	}
-
-	for (uint i = 0; i < _walkBehindBaselines.size(); ++i)
-		_walkBehindBaselines[i] /= 2;
-
-	_boundary.left /= 2;
-	_boundary.top /= 2;
-	_boundary.bottom /= 2;
-	_boundary.right /= 2;
-
-	_width /= 2;
-	_height /= 2;
 }
 
 #define NO_GAME_ID_IN_ROOM_FILE 16325

@@ -625,8 +625,7 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 	_graphics->newRoomPalette();
 
-	if (_gameFile->_defaultResolution > 2 && !getGameOption(OPT_NATIVECOORDINATES))
-		_currentRoom->convertCoordinatesToLowRes();
+	// (note: convertCoordinatesToLowRes call was here, now in Room)
 
 	// FIXME
 
@@ -1576,7 +1575,7 @@ int AGSEngine::multiplyUpCoordinate(int coord) {
 }
 
 void AGSEngine::multiplyUpCoordinates(int32 &x, int32 &y) {
-	if (!getGameOption(OPT_NATIVECOORDINATES))
+	if (getGameOption(OPT_NATIVECOORDINATES))
 		return;
 
 	x *= _graphics->_screenResolutionMultiplier;
@@ -1584,7 +1583,7 @@ void AGSEngine::multiplyUpCoordinates(int32 &x, int32 &y) {
 }
 
 void AGSEngine::multiplyUpCoordinatesRoundUp(int32 &x, int32 &y) {
-	if (!getGameOption(OPT_NATIVECOORDINATES))
+	if (getGameOption(OPT_NATIVECOORDINATES))
 		return;
 
 	x *= _graphics->_screenResolutionMultiplier;
