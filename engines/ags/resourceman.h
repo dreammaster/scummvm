@@ -21,6 +21,7 @@
 
 /* Based on the Adventure Game Studio source code, copyright 1999-2011 Chris Jones,
  * which is licensed under the Artistic License 2.0.
+ * You may also modify/distribute the code in this file under that license.
  */
 
 #ifndef AGS_RESOURCEMAN_H
