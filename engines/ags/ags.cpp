@@ -905,7 +905,21 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 		break;
 		}
 	case kEventAfterFadeIn:
+		_state->_screenIsFadedOut = 0;
+
+		uint ourTransition;
+		ourTransition = _state->_fadeEffect;
+		if (_state->_nextScreenTransition != (uint)-1) {
+			// a one-off transition was selected, so use it
+			ourTransition = _state->_nextScreenTransition;
+			_state->_nextScreenTransition = (uint)-1;
+		}
+
+		if (_state->_fastForward)
+			return;
+
 		warning("processGameEvent: can't do kEventAfterFadeIn yet"); // FIXME
+		// FIXME
 		break;
 	case kEventInterfaceClick:
 		error("processGameEvent: can't do kEventInterfaceClick yet"); // FIXME
