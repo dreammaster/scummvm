@@ -32,7 +32,11 @@
 
 #include "common/debug.h"
 
+#include "audio/decoders/mp3.h"
+#include "audio/decoders/raw.h"
+#include "audio/decoders/voc.h"
 #include "audio/decoders/vorbis.h"
+#include "audio/decoders/wave.h"
 #include "audio/audiostream.h"
 
 #define MAX_SOUND_CHANNELS 8
@@ -290,9 +294,28 @@ bool AudioChannel::playSound(AudioClip *clip) {
 	Common::SeekableReadStream *stream = _vm->getFile(clip->_filename);
 
 	switch (_clip->_fileType) {
+	case kAudioFileVOC:
+		_stream = Audio::makeVOCStream(stream, Audio::FLAG_UNSIGNED, DisposeAfterUse::YES);
+		break;
+	case kAudioFileWAV: {
+		int size, rate;
+		byte rawFlags;
+		if (Audio::loadWAVFromStream(*stream, size, rate, rawFlags))
+			_stream = Audio::makeRawStream(stream->readStream(size), rate, rawFlags);
+		else
+			error("AudioChannel::playSound: Couldn't load WAV from stream");
+		}
+		break;
+#ifdef USE_MAD
+	case kAudioFileMP3:
+		_stream = Audio::makeMP3Stream(stream, DisposeAfterUse::YES);
+		break;
+#endif
+#ifdef USE_VORBIS
 	case kAudioFileOGG:
 		_stream = Audio::makeVorbisStream(stream, DisposeAfterUse::YES);
 		break;
+#endif
 	default:
 		// FIXME
 		error("AudioChannel::playSound: invalid clip file type %d", _clip->_fileType);
