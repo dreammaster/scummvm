@@ -234,6 +234,15 @@ public:
 	void runDialogId(uint dialogId);
 	int showDialogOptions(uint dialogId, uint sayChosenOption);
 
+	void display(const Common::String &text) { displayAtY(-1, text); }
+	void displayAtY(int y, const Common::String &text);
+	void displayAt(int x, int y, int width, const Common::String &text, int blocking, int asSpeech = 0, bool isThought = false,
+		int allowShrink = 0, bool overlayPositionFixed = false);
+	void displayMain(int x, int y, int width, const Common::String &text, int blocking, int usingFont,
+		int asSpeech, bool isThought, int allowShrink, bool overlayPositionFixed);
+	void displaySpeech(const Common::String &text, uint charId, int x = -1, int y = -1, int width = -1, bool isThought = false);
+	void displaySpeechAt(int x, int y, int width, uint charId, const Common::String &text);
+
 	void invalidateScreen() { _needsUpdate = true; }
 	void invalidateGUI() { _guiNeedsUpdate = true; }
 

@@ -1841,8 +1841,22 @@ int AGSEngine::runDialogScript(DialogTopic &topic, uint dialogId, uint offset, u
 			switch (opcode) {
 			case DCMD_SAY:
 				getDialogScriptParameters(topic, pos, &param1, &param2);
-				// FIXME
-				error("DCMD_SAY unimplemented");
+
+				{
+				if (param2 > _gameFile->_speechLines.size())
+					error("DCMD_SAY: speech line %d is too high (only have %d)", param2, _gameFile->_speechLines.size());
+				const Common::String &speechLine = _gameFile->_speechLines[param2];
+
+				if (param1 == DCHAR_PLAYER)
+					param1 = _gameFile->_playerChar;
+
+				if (param1 == DCHAR_NARRATOR)
+					display(getTranslation(speechLine));
+				else
+					displaySpeech(getTranslation(speechLine), param1);
+				}
+
+				_saidSpeechLine = true;
 				break;
 			case DCMD_OPTOFF:
 				getDialogScriptParameters(topic, pos, &param1, NULL);
@@ -1960,6 +1974,59 @@ int AGSEngine::runDialogRequest(uint request) {
 		_state->_stopDialogAtEnd = DIALOG_NONE;
 		return RUN_DIALOG_STAY;
 	}
+}
+
+void AGSEngine::displayAtY(int y, const Common::String &text) {
+	// FIXME: sanity-check y parameter
+
+	// Display("") ... a bit of a stupid thing to do, so ignore it
+	if (text.empty())
+		return;
+
+	if (y > 0)
+		y = multiplyUpCoordinate(y);
+
+	if (getGameOption(OPT_ALWAYSSPCH)) {
+		displaySpeechAt(-1, (y > 0) ? divideDownCoordinate(y) : y, -1, _gameFile->_playerChar, text);
+	} else {
+		// Normal "Display" in text box
+
+		// FIXME: some dirty stuff here
+
+		displayAt(-1, y, _graphics->_width / 2 + _graphics->_width / 4, getTranslation(text), 1);
+	}
+}
+
+void AGSEngine::displayAt(int x, int y, int width, const Common::String &text, int blocking, int asSpeech, bool isThought,
+	int allowShrink, bool overlayPositionFixed) {
+
+	bool needStopSpeech = false;
+
+	uint usingFont = _state->_normalFont;
+	if (asSpeech)
+		usingFont = _state->_speechFont;
+
+	// FIXME: auto-speech
+
+	displayMain(x, y, width, text, blocking, usingFont, asSpeech, isThought, allowShrink, overlayPositionFixed);
+
+	/* FIXME: if (needStopSpeech)
+		stopSpeech(); */
+}
+
+void AGSEngine::displayMain(int x, int y, int width, const Common::String &text, int blocking, int usingFont,
+	int asSpeech, bool isThought, int allowShrink, bool overlayPositionFixed) {
+	warning("displayMain '%s' unimplemented", text.c_str());
+}
+
+void AGSEngine::displaySpeech(const Common::String &text, uint charId, int x, int y, int width, bool isThought) {
+	warning("displaySpeech '%s' unimplemented", text.c_str());
+}
+
+void AGSEngine::displaySpeechAt(int x, int y, int width, uint charId, const Common::String &text) {
+	multiplyUpCoordinates(x, y);
+	width = multiplyUpCoordinate(width);
+	displaySpeech(getTranslation(text), charId, x, y, width);
 }
 
 bool AGSEngine::runScriptFunction(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {

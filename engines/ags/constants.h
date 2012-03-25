@@ -217,9 +217,7 @@ enum AGSRoomVersion {
 #define ANIM_REPEAT    2
 #define ANIM_ONCERESET 3
 #define FONT_STATUSBAR  0
-#define FONT_NORMAL     play.normal_font
 //#define FONT_SPEECHBACK 1
-#define FONT_SPEECH     play.speech_font
 #define MODE_WALK 0
 #define MODE_LOOK 1
 #define MODE_HAND 2
