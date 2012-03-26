@@ -473,7 +473,6 @@ void GUIButton::draw(Graphics::Surface *surface) {
 		break;
 	case GBUT_ALIGN_CENTRED:
 		align = Graphics::kTextAlignCenter;
-		useX -= 2;
 		useY += (_height / 2) - ((fontHeight + 1) / 2);
 		break;
 	case GBUT_ALIGN_MIDDLERIGHT:
