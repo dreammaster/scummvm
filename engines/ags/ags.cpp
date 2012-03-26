@@ -1565,12 +1565,13 @@ GlobalScriptState *AGSEngine::getScriptState() {
 }
 
 uint32 AGSEngine::getGameSpeed() {
-	// FIXME: adjust by modifier
-	return _framesPerSecond;
+	return _framesPerSecond - _state->_gameSpeedModifier;
 }
 
 void AGSEngine::setGameSpeed(uint32 speed) {
-	// FIXME: adjust by modifier
+	// FIXME: check for maxed out frame rate
+
+	speed += _state->_gameSpeedModifier;
 	_framesPerSecond = CLIP<uint32>(speed, 10, 1000);
 }
 
@@ -1637,6 +1638,8 @@ int AGSEngine::divideDownCoordinateRoundUp(int coord) {
 // don't return until the provided blocking condition is satisfied
 // this is similar to 'do_main_cycle' in original.
 void AGSEngine::blockUntil(BlockUntilType untilType, uint untilId) {
+	debug(2, "blocking (type %d, %d)", untilType, untilId);
+
 	endSkippingUntilCharStops();
 
 	// save old state (to cope with nested calls)
@@ -1658,8 +1661,11 @@ void AGSEngine::blockUntil(BlockUntilType untilType, uint untilId) {
 
 	_blockingUntil = oldType;
 	_blockingUntilId = oldId;
+
+	debug(2, "done blocking (type %d, %d)", untilType, untilId);
 }
 
+// 'wait_loop_still_valid' in original
 BlockUntilType AGSEngine::checkBlockingUntil() {
 	if (_blockingUntil == kUntilNothing)
 		error("checkBlockingUntil called, but game wasn't blocking");
@@ -1706,6 +1712,7 @@ void AGSEngine::endSkippingUntilCharStops() {
 	_state->_skipUntilCharStops = (uint)-1;
 }
 
+// 'initialize_skippable_cutscene' in original
 void AGSEngine::startSkippableCutscene() {
 	_state->_endCutsceneMusic = (uint)-1;
 }
