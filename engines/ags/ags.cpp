@@ -192,7 +192,7 @@ bool AGSEngine::mainGameLoop() {
 			// done blocking
 			setDefaultCursor();
 			invalidateGUI();
-			_state->_disabledUserInterface++;
+			_state->_disabledUserInterface--;
 
 			// original had a few different FOR_ types here, but only FOR_EXITLOOP is used now
 			return false;
@@ -207,6 +207,8 @@ bool AGSEngine::mainGameLoop() {
 void AGSEngine::tickGame(bool checkControls) {
 	debug(9, "tickGame");
 
+	uint gameEventQueueSizeAtStartOfFunction = _queuedGameEvents.size();
+
 	if (_inEntersScreenCounter) {
 		if (_displayedRoom == _startingRoom)
 			error("script tried blocking in the Player Enters Screen event - use After Fadein instead");
@@ -215,38 +217,59 @@ void AGSEngine::tickGame(bool checkControls) {
 
 	// FIXME: check no_blocking_functions
 
-	updateEvents(checkControls);
-	if (shouldQuit())
-		return;
+	if (_state->_noHiColorFadeIn && getGameOption(OPT_FADETYPE) == FADE_NORMAL)
+		_state->_screenIsFadedOut = 0;
 
-	// If we're running faster than the target rate, sleep for a bit.
-	uint32 time = _system->getMillis();
-	if (time < _lastFrameTime + (1000 / _framesPerSecond))
-		_system->delayMillis((1000 / _framesPerSecond) - time + _lastFrameTime);
-	_lastFrameTime = _system->getMillis();
+	// FIXME: updateGUIDisabledStatus();
 
-	// FIXME
-
-	if (_inNewRoomState == 0) {
+	if (_inNewRoomState == kNewRoomStateNone) {
+		// Run the room and game script repeatedly_execute
+		// FIXME: use repExecAlways on run_function_on_non_blocking_thread
 		for (uint i = 0; i < _scriptModules.size(); ++i) {
 			runScriptFunction(_scriptModuleForks[i], "repeatedly_execute_always", Common::Array<uint>());
 		}
 		runScriptFunction(_gameScriptFork, "repeatedly_execute_always", Common::Array<uint>());
 		runScriptFunction(_roomScriptFork, "repeatedly_execute_always", Common::Array<uint>());
-		// FIXME: repExecAlways
 
 		queueGameEvent(kEventTextScript, kTextScriptRepeatedlyExecute);
 		queueGameEvent(kEventRunEventBlock, kEventBlockRoom, 0, kRoomEventTick);
 	}
+	// run this immediately to make sure it gets done before fade-in
+	// (player enters screen)
 	checkNewRoom();
 
-	// FIXME
+	if (!(_state->_groundLevelAreasDisabled & GLED_INTERACTION)) {
+		// FIXME: check hotspots
+
+		// if in a Wait loop which is no longer valid (probably
+		// because the Region interaction did a NewRoom), abort
+		// the rest of the loop
+		if (_blockingUntil != kUntilNothing && checkBlockingUntil() == kUntilNothing) {
+			// cancel the Rep Exec and Stands on Hotspot events that
+			// we just added -- otherwise the event queue gets huge
+			_queuedGameEvents.resize(gameEventQueueSizeAtStartOfFunction);
+			return;
+		}
+	}
+
+	// FIXME: mouse_on_iface=-1;
+	// FIXME: checkDebugKeys();
+
+	// FIXME: check if _inNewRoomState is 0
+	updateEvents(checkControls);
+	if (shouldQuit())
+		return;
+	// FIXME: check if inventory action changed room
+
+	// FIXME: a whole bunch of update stuff
 
 	if (!_state->_fastForward) {
 		_graphics->draw();
+
+		// FIXME: hotspot stuff
 	}
 
-	// FIXME
+	// FIXME: a whole bunch of update stuff
 
 	_newRoomStateWas = _inNewRoomState;
 	if (_inNewRoomState != kNewRoomStateNone)
@@ -271,8 +294,18 @@ void AGSEngine::tickGame(bool checkControls) {
 		_state->_shakeLength--;
 
 	// FIXME
+
+	if (_state->_fastForward)
+		return;
+
+	// If we're running faster than the target rate, sleep for a bit.
+	uint32 time = _system->getMillis();
+	if (time < _lastFrameTime + (1000 / _framesPerSecond))
+		_system->delayMillis((1000 / _framesPerSecond) - time + _lastFrameTime);
+	_lastFrameTime = _system->getMillis();
 }
 
+// note that this is NOT equivalent to the original's update_events
 void AGSEngine::updateEvents(bool checkControls) {
 	Common::Event event;
 
@@ -953,6 +986,7 @@ void AGSEngine::processAllGameEvents() {
 			break;
 	}
 
+	// this is inside the 'update_events' caller in original
 	_queuedGameEvents.clear();
 	_insideProcessEvent = false;
 }
