@@ -493,7 +493,7 @@ void AGSGraphics::draw() {
 	// draw GUIs
 	for (uint i = 0; i < _vm->_gameFile->_guiGroups.size(); ++i) {
 		GUIGroup *group = _vm->_gameFile->_guiGroups[i];
-		if (group->_on < 1)
+		if (!group->_visible)
 			continue;
 		draw(group);
 	}

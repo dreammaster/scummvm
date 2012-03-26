@@ -518,7 +518,7 @@ void GUIGroup::setSize(uint32 width, uint32 height) {
 	_height = height;
 	_surface.free();
 
-	if (!_on)
+	if (!_visible)
 		return;
 
 	_surface.create(width, height, _vm->_graphics->getPixelFormat());
@@ -544,8 +544,12 @@ void GUIGroup::controlPositionsChanged() {
 	_mouseWasY = -1;
 }
 
+void GUIGroup::poll() {
+	// FIXME
+}
+
 bool GUIGroup::isMouseOver(const Common::Point &pos) {
-	if (_on < 1)
+	if (!_visible)
 		return false;
 
 	if (_flags & GUIF_NOCLICK)
@@ -554,12 +558,63 @@ bool GUIGroup::isMouseOver(const Common::Point &pos) {
 	return (pos.x >= _x && pos.y >= _y && pos.x <= _x + (int)_width && pos.y <= _y + (int)_height);
 }
 
-void GUIGroup::setVisible(bool visible) {
-	if ((bool)_on == visible)
+void GUIGroup::interfaceOn() {
+	_vm->endSkippingUntilCharStops();
+
+	if (_visible)
 		return;
 
-	_on = visible ? 1 : 0;
-	if (!_on)
+	if (!_enabled)
+		setEnabled(true);
+	if (_popup != POPUP_MOUSEY)
+		setVisible(true);
+
+	/* FIXME: if (_popup == POPUP_SCRIPT)
+		vm->pauseGame(); */
+
+	controlPositionsChanged();
+	poll();
+}
+
+void GUIGroup::interfaceOff() {
+	if (!_enabled)
+		return;
+	if (_popup != POPUP_MOUSEY && !_visible)
+		return;
+
+	setVisible(false);
+
+	// FIXME: update _mouseOver
+
+	controlPositionsChanged();
+	if (_popup == POPUP_MOUSEY)
+		setEnabled(false);
+	/* FIXME: else if (_popup == POPUP_SCRIPT)
+		vm->unpauseGame(); */
+}
+
+void GUIGroup::setEnabled(bool enabled) {
+	if (_enabled == enabled)
+		return;
+
+	assert(_enabled || !_visible);
+
+	_enabled = enabled;
+	if (!_enabled) {
+		_visible = false;
+		_surface.free();
+	} else
+		setSize(_width, _height);
+}
+
+void GUIGroup::setVisible(bool visible) {
+	if (_visible == visible)
+		return;
+
+	assert(_enabled);
+
+	_visible = visible;
+	if (!_visible)
 		_surface.free();
 	else
 		setSize(_width, _height);

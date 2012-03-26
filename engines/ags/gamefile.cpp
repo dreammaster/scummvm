@@ -794,7 +794,8 @@ void GameFile::readGui(Common::SeekableReadStream *dta) {
 		// (And we want it to default to not visible, for internal consistency.)
 		//group._on = dta->readUint32LE();
 		dta->skip(4);
-		group._on = 0;
+		group._enabled = true;
+		group._visible = false;
 
 		dta->skip(MAX_OBJS_ON_GUI * 4); // obj pointers
 		group._controlRefPtrs.resize(MAX_OBJS_ON_GUI);

@@ -367,7 +367,7 @@ void AGSEngine::updateEvents(bool checkControls) {
 			// check for enabled popup-on-y-pos GUIs which need activation
 			if (group->_popup != POPUP_MOUSEY)
 				continue;
-			if (group->_on == (uint)-1)
+			if (!group->_enabled)
 				continue;
 			if (group->_popupYP <= (uint)mousePos.y)
 				continue;

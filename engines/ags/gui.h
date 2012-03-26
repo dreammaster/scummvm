@@ -327,13 +327,18 @@ public:
 	GUIGroup(AGSEngine *vm);
 	~GUIGroup();
 
+	void setEnabled(bool enabled);
 	void setVisible(bool visible);
 	void setSize(uint32 width, uint32 height);
 	void setBackgroundPicture(uint32 pic);
 	void invalidate();
 	void controlPositionsChanged();
+	void poll();
 
 	bool isMouseOver(const Common::Point &pos);
+
+	void interfaceOn();
+	void interfaceOff();
 
 	void sortControls();
 
@@ -363,7 +368,10 @@ public:
 	uint32 _transparency;
 	uint32 _zorder;
 	uint32 _id;
-	uint32 _on;
+
+	// these replace _on
+	bool _enabled;
+	bool _visible;
 
 	Common::Array<GUIControl *> _controls;
 	Common::Array<uint32> _controlRefPtrs; // for re-building objs array
