@@ -245,7 +245,7 @@ void GUITextBox::readFrom(Common::SeekableReadStream *dta) {
 }
 
 void GUITextBox::draw(Graphics::Surface *surface) {
-	error("GUITextBox::draw unimplemented");
+	warning("GUITextBox::draw unimplemented");
 }
 
 void GUIListBox::readFrom(Common::SeekableReadStream *dta) {
@@ -293,7 +293,7 @@ void GUIListBox::readFrom(Common::SeekableReadStream *dta) {
 }
 
 void GUIListBox::draw(Graphics::Surface *surface) {
-	error("GUIListBox::draw unimplemented");
+	warning("GUIListBox::draw unimplemented");
 }
 
 void GUIInvControl::readFrom(Common::SeekableReadStream *dta) {
@@ -321,7 +321,7 @@ void GUIInvControl::readFrom(Common::SeekableReadStream *dta) {
 }
 
 void GUIInvControl::draw(Graphics::Surface *surface) {
-	error("GUIInvControl::draw unimplemented");
+	warning("GUIInvControl::draw unimplemented");
 }
 
 void GUIButton::readFrom(Common::SeekableReadStream *dta) {
