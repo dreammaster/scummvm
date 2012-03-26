@@ -62,6 +62,8 @@ public:
 	~SpriteSet();
 
 	uint getSpriteCount() { return _spriteInfo.size(); }
+	uint getSpriteWidth(uint id) { return _spriteInfo[id]._width; }
+	uint getSpriteHeight(uint id) { return _spriteInfo[id]._height; }
 	Sprite *getSprite(uint32 spriteId);
 	void releaseSprite(Sprite *sprite);
 
