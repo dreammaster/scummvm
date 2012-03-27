@@ -57,6 +57,24 @@ struct FullAnimation {
 	Common::Array<AnimationStruct> _stages;
 };
 
+struct WalkBehind : public Drawable {
+	uint _left, _top, _right, _bottom;
+	uint16 _baseline; // was objyval: baseline of walkbehind area
+
+	Graphics::Surface _surface;
+
+	virtual Common::Point getDrawPos() { return Common::Point(_left, _top); }
+	virtual int getDrawOrder() const { return _baseline; }
+	virtual bool priorityIfEqual() const { return false; }
+	virtual const Graphics::Surface *getDrawSurface() { return &_surface; }
+	virtual uint getDrawWidth() { return _surface.w; }
+	virtual uint getDrawHeight() { return _surface.h; }
+	virtual uint getDrawTransparency() { return 0; }
+	virtual bool isDrawVerticallyMirrored() { return false; }
+	virtual int getDrawLightLevel() { return 0; }
+	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) { }
+};
+
 struct RoomRegion : public ScriptObject {
 	RoomRegion() : _interaction(NULL), _lightLevel(0), _tintLevel(0), _enabled(true) { }
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotRegion); }
@@ -197,6 +215,9 @@ public:
 	void loadFrom(Common::SeekableReadStream *dta);
 	void unload();
 
+	void initWalkBehinds();
+	void updateWalkBehinds();
+
 	uint getRegionAt(int x, int y);
 
 protected:
@@ -214,7 +235,7 @@ public:
 	Graphics::Surface _hotspotMask; // lookat
 	Graphics::Surface _regionsMask; // regions
 
-	Common::Array<uint16> _walkBehindBaselines; // objyval: baselines of walkbehind areas
+	Common::Array<WalkBehind> _walkBehinds;
 
 	Common::Rect _boundary; // to walk off screen
 

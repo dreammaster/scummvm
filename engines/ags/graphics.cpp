@@ -497,6 +497,13 @@ void AGSGraphics::draw() {
 		drawables.push_back(room->_objects[i]);
 	}
 
+	for (uint i = 0; i < room->_walkBehinds.size(); ++i) {
+		if (!room->_walkBehinds[i]._surface.getPixels())
+			continue;
+
+		drawables.push_back(&room->_walkBehinds[i]);
+	}
+
 	// FIXME
 
 	// TODO: need stable sort?

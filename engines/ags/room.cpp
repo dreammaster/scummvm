@@ -362,6 +362,8 @@ void Room::unload() {
 	// all graphics can go
 	for (uint i = 0; i < _backgroundScenes.size(); ++i)
 		_backgroundScenes[i]._scene.free();
+	for (uint i = 0; i < _walkBehinds.size(); ++i)
+		_walkBehinds[i]._surface.free();
 	_backgroundScenes.clear();
 	_walkableMask.free();
 	_walkBehindMask.free();
@@ -386,6 +388,86 @@ void Room::unload() {
 	for (uint i = 0; i < _objects.size(); ++i) {
 		_objects[i]->_properties.clear();
 		// TODO: kill graphics, etc?
+	}
+}
+
+// 'recache_walk_behinds' in original
+void Room::initWalkBehinds() {
+	// The original initialises the walkBehindExists/walkBehindStartY/walkBehindEndY
+	// caches here too, but we don't care about those (at least, not yet).
+
+	// First, reset the data.
+	const uint NO_WALK_BEHIND = 100000;
+	for (uint i = 0; i < _walkBehinds.size(); ++i) {
+		_walkBehinds[i]._left = NO_WALK_BEHIND;
+		_walkBehinds[i]._top = NO_WALK_BEHIND;
+		_walkBehinds[i]._right = 0;
+		_walkBehinds[i]._bottom = 0;
+
+		_walkBehinds[i]._surface.free();
+	}
+
+	// Then, calculate the bounds of the walkbehinds.
+	assert(_walkBehindMask.format.bytesPerPixel == 1);
+	for (uint y = 0; y < _walkBehindMask.h; ++y) {
+		byte *ptr = (byte *)_walkBehindMask.getBasePtr(0, y);
+		for (uint x = 0; x < _walkBehindMask.w; ++x) {
+			byte maskId = *(ptr++);
+			if (maskId == 0 || maskId >= _walkBehinds.size())
+				continue;
+
+			_walkBehinds[maskId]._left = MIN(_walkBehinds[maskId]._left, x);
+			_walkBehinds[maskId]._right = MAX(_walkBehinds[maskId]._right, x);
+			_walkBehinds[maskId]._top = MIN(_walkBehinds[maskId]._top, y);
+			_walkBehinds[maskId]._bottom = MAX(_walkBehinds[maskId]._bottom, y);
+		}
+	}
+
+	// Finally, update the surfaces.
+	updateWalkBehinds();
+}
+
+void Room::updateWalkBehinds() {
+	const Graphics::Surface &background = _backgroundScenes[_vm->_state->_bgFrame]._scene;
+
+	// walkbehind 0 is never valid
+	for (uint i = 1; i < _walkBehinds.size(); ++i) {
+		WalkBehind &wb = _walkBehinds[i];
+
+		if (wb._right == 0)
+			continue;
+
+		uint width = wb._right - wb._left + 1;
+		uint height = wb._bottom - wb._top + 1;
+		if (!wb._surface.getPixels())
+			wb._surface.create(width, height, background.format);
+		else
+			assert(wb._surface.w == width && wb._surface.h == height);
+
+		// FIXME: pass format to getTransparentColor
+		wb._surface.fillRect(Common::Rect(0, 0, width, height), _vm->_graphics->getTransparentColor());
+		for (uint y = wb._top; y <= wb._bottom; y++) {
+			for (uint x = wb._left; x <= wb._right; x++) {
+				byte *ptr = (byte *)_walkBehindMask.getBasePtr(x, y);
+				if (*ptr != i)
+					continue;
+				const void *srcPtr = background.getBasePtr(x, y);
+				void *destPtr = wb._surface.getBasePtr(x - wb._left, y - wb._top);
+				switch (background.format.bytesPerPixel) {
+				case 1:
+					*(byte *)destPtr = *(byte *)srcPtr;
+					break;
+				case 2:
+					WRITE_UINT16(destPtr, READ_UINT16(srcPtr));
+					break;
+				case 4:
+					WRITE_UINT32(destPtr, READ_UINT32(srcPtr));
+					break;
+				}
+				//srcPtr = (byte *)srcPtr + background.format.bytesPerPixel;
+				//destPtr = (byte *)destPtr + background.format.bytesPerPixel;
+			}
+		}
 	}
 }
 
@@ -566,8 +648,8 @@ void Room::readData(Common::SeekableReadStream *dta) {
 				_hotspots[i]._walkToPos.y *= 2;
 			}
 
-			for (uint i = 0; i < _walkBehindBaselines.size(); ++i)
-				_walkBehindBaselines[i] *= 2;
+			for (uint i = 0; i < _walkBehinds.size(); ++i)
+				_walkBehinds[i]._baseline *= 2;
 
 			_boundary.left *= 2;
 			_boundary.top *= 2;
@@ -592,8 +674,8 @@ void Room::readData(Common::SeekableReadStream *dta) {
 				_hotspots[i]._walkToPos.y /= 2;
 			}
 
-			for (uint i = 0; i < _walkBehindBaselines.size(); ++i)
-				_walkBehindBaselines[i] /= 2;
+			for (uint i = 0; i < _walkBehinds.size(); ++i)
+				_walkBehinds[i]._baseline /= 2;
 
 			_boundary.left /= 2;
 			_boundary.top /= 2;
@@ -624,6 +706,8 @@ Room::~Room() {
 
 	for (uint i = 0; i < _backgroundScenes.size(); ++i)
 		_backgroundScenes[i]._scene.free();
+	for (uint i = 0; i < _walkBehinds.size(); ++i)
+		_walkBehinds[i]._surface.free();
 	_walkableMask.free();
 	_walkBehindMask.free();
 	_hotspotMask.free();
@@ -646,12 +730,12 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	if (walkBehindsCount > 16)
 		error("Room: too many walk-behinds (%d)", walkBehindsCount);
 	if (_loaded) {
-		assert(walkBehindsCount == _walkBehindBaselines.size());
+		assert(walkBehindsCount == _walkBehinds.size());
 		dta->skip(walkBehindsCount * 2);
 	} else {
-		_walkBehindBaselines.resize(walkBehindsCount);
-		for (uint i = 0; i < _walkBehindBaselines.size(); ++i)
-			_walkBehindBaselines[i] = dta->readUint16LE();
+		_walkBehinds.resize(walkBehindsCount);
+		for (uint i = 0; i < _walkBehinds.size(); ++i)
+			_walkBehinds[i]._baseline = dta->readUint16LE();
 	}
 
 	// hotspots
@@ -958,6 +1042,8 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	_walkableMask = readRLEImage(dta);
 	_walkBehindMask = readRLEImage(dta);
 	_hotspotMask = readRLEImage(dta);
+
+	initWalkBehinds(); // FIXME
 
 	if (_version < kAGSRoomVer255r) {
 		// old version - copy the walkable areas to regions
