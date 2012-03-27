@@ -196,7 +196,7 @@ public:
 	void removePopupInterface(uint guiId);
 
 	struct ViewLoopNew *getViewLoop(uint view, uint loop);
-	struct ViewFrame *getViewFrame(uint view, uint loop, uint frame);
+	class ViewFrame *getViewFrame(uint view, uint loop, uint frame);
 	void checkViewFrame(uint view, uint loop, uint frame);
 
 	void runTextScript(ccInstance *instance, const Common::String &name,
