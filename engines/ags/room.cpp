@@ -138,6 +138,19 @@ void RoomObject::setVisible(bool visible) {
 		stopMoving();
 }
 
+void RoomObject::setObjectView(uint viewId) {
+	if (viewId < 1 || viewId > _vm->_gameFile->_views.size())
+		error("RoomObject::setObjectView: invalid view id %d (only have %d)", viewId, _vm->_gameFile->_views.size());
+	_view = viewId - 1;
+
+	_frame = 0;
+	if (_loop >= _vm->_gameFile->_views[_view]._loops.size())
+		_loop = _vm->_gameFile->_views[_view]._loops.size() - 1;
+
+	_cycling = 0;
+	_spriteId = _vm->getViewLoop(_view, _loop)->_frames[_frame]._pic;
+}
+
 void RoomObject::setObjectFrame(uint viewId, int loopId, int frameId) {
 	if (viewId < 1 || viewId > _vm->_gameFile->_views.size())
 		error("RoomObject::setObjectFrame: invalid view id %d (only have %d)", viewId, _vm->_gameFile->_views.size());
@@ -300,7 +313,7 @@ uint RoomObject::getDrawHeight() {
 }
 
 uint RoomObject::getDrawTransparency() {
-	return 0; // FIXME
+	return _transparency;
 }
 
 bool RoomObject::isDrawVerticallyMirrored() {

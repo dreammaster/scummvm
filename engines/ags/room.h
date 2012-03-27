@@ -103,6 +103,7 @@ struct RoomObject : public ScriptObject, public Drawable {
 
 	bool isVisible() const { return _visible; }
 	void setVisible(bool visible);
+	void setObjectView(uint viewId);
 	void setObjectFrame(uint viewId, int loopId, int frameId);
 
 	void animate(uint loopId, uint speed, uint repeat, uint direction);

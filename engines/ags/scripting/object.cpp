@@ -79,11 +79,12 @@ RuntimeValue Script_RemoveObjectTint(AGSEngine *vm, ScriptObject *, const Common
 // import void StopObjectMoving(int object)
 // Obsolete function for objects.
 RuntimeValue Script_StopObjectMoving(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
+	uint object = params[0]._value;
 
-	// FIXME
-	error("StopObjectMoving unimplemented");
+	if (object >= vm->getCurrentRoom()->_objects.size())
+		error("StopObjectMoving: object %d is too high (only have %d)", object, vm->getCurrentRoom()->_objects.size());
+
+	vm->getCurrentRoom()->_objects[object]->stopMoving();
 
 	return RuntimeValue();
 }
@@ -135,17 +136,15 @@ RuntimeValue Script_GetObjectPropertyText(AGSEngine *vm, ScriptObject *, const C
 // import void AnimateObject(int object, int loop, int delay, int repeat)
 // Obsolete function for objects.
 RuntimeValue Script_AnimateObject(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
-	int loop = params[1]._signedValue;
-	UNUSED(loop);
-	int delay = params[2]._signedValue;
-	UNUSED(delay);
-	int repeat = params[3]._signedValue;
-	UNUSED(repeat);
+	uint object = params[0]._value;
+	uint loop = params[1]._value;
+	uint delay = params[2]._value;
+	uint repeat = params[3]._value;
 
-	// FIXME
-	error("AnimateObject unimplemented");
+	if (object >= vm->getCurrentRoom()->_objects.size())
+		error("AnimateObject: object %d is too high (only have %d)", object, vm->getCurrentRoom()->_objects.size());
+
+	vm->getCurrentRoom()->_objects[object]->animate(loop, delay, repeat, 0);
 
 	return RuntimeValue();
 }
@@ -153,21 +152,17 @@ RuntimeValue Script_AnimateObject(AGSEngine *vm, ScriptObject *, const Common::A
 // import void AnimateObjectEx(int object, int loop, int delay, int repeat, int direction, int blocking)
 // Obsolete function for objects.
 RuntimeValue Script_AnimateObjectEx(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
-	int loop = params[1]._signedValue;
-	UNUSED(loop);
-	int delay = params[2]._signedValue;
-	UNUSED(delay);
-	int repeat = params[3]._signedValue;
-	UNUSED(repeat);
-	int direction = params[4]._signedValue;
-	UNUSED(direction);
-	int blocking = params[5]._signedValue;
-	UNUSED(blocking);
+	uint object = params[0]._signedValue;
+	uint loop = params[1]._signedValue;
+	uint delay = params[2]._signedValue;
+	uint repeat = params[3]._signedValue;
+	uint direction = params[4]._signedValue;
+	uint blocking = params[5]._signedValue;
 
-	// FIXME
-	error("AnimateObjectEx unimplemented");
+	vm->getCurrentRoom()->_objects[object]->animate(loop, delay, repeat, direction);
+
+	if (blocking)
+		vm->blockUntil(kUntilObjCycleDone, object);
 
 	return RuntimeValue();
 }
@@ -227,17 +222,15 @@ RuntimeValue Script_GetObjectBaseline(AGSEngine *vm, ScriptObject *, const Commo
 // import void SetObjectFrame(int object, int view, int loop, int frame)
 // Obsolete function for objects.
 RuntimeValue Script_SetObjectFrame(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
-	int view = params[1]._signedValue;
-	UNUSED(view);
+	uint object = params[0]._value;
+	uint view = params[1]._signedValue;
 	int loop = params[2]._signedValue;
-	UNUSED(loop);
 	int frame = params[3]._signedValue;
-	UNUSED(frame);
 
-	// FIXME
-	error("SetObjectFrame unimplemented");
+	if (object >= vm->getCurrentRoom()->_objects.size())
+		error("SetObjectFrame: object %d is too high (only have %d)", object, vm->getCurrentRoom()->_objects.size());
+
+	vm->getCurrentRoom()->_objects[object]->setObjectFrame(view, loop, frame);
 
 	return RuntimeValue();
 }
@@ -259,13 +252,13 @@ RuntimeValue Script_SetObjectGraphic(AGSEngine *vm, ScriptObject *, const Common
 // import void SetObjectView(int object, int view)
 // Obsolete function for objects.
 RuntimeValue Script_SetObjectView(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
-	int view = params[1]._signedValue;
-	UNUSED(view);
+	uint object = params[0]._value;
+	uint view = params[1]._value;
 
-	// FIXME
-	error("SetObjectView unimplemented");
+	if (object >= vm->getCurrentRoom()->_objects.size())
+		error("SetObjectView: object %d is too high (only have %d)", object, vm->getCurrentRoom()->_objects.size());
+
+	vm->getCurrentRoom()->_objects[object]->setObjectView(view);
 
 	return RuntimeValue();
 }
@@ -454,13 +447,17 @@ RuntimeValue Script_SetObjectClickable(AGSEngine *vm, ScriptObject *, const Comm
 // import void SetObjectIgnoreWalkbehinds (int object, int ignore)
 // Obsolete function for objects.
 RuntimeValue Script_SetObjectIgnoreWalkbehinds(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
-	int ignore = params[1]._signedValue;
-	UNUSED(ignore);
+	uint objectId = params[0]._value;
+	uint ignore = params[1]._value;
 
-	// FIXME
-	error("SetObjectIgnoreWalkbehinds unimplemented");
+	if (objectId >= vm->getCurrentRoom()->_objects.size())
+		error("SetObjectIgnoreWalkbehinds: object %d is too high (only have %d)", objectId, vm->getCurrentRoom()->_objects.size());
+
+	RoomObject *object = vm->getCurrentRoom()->_objects[objectId];
+	if (ignore)
+		object->_flags |= OBJF_NOWALKBEHINDS;
+	else
+		object->_flags &= ~OBJF_NOWALKBEHINDS;
 
 	return RuntimeValue();
 }
@@ -710,7 +707,7 @@ RuntimeValue Script_Object_set_Baseline(AGSEngine *vm, RoomObject *self, const C
 	UNUSED(value);
 
 	// FIXME
-	error("Object::set_Baseline unimplemented");
+	self->_baseLine = value;
 
 	return RuntimeValue();
 }
@@ -841,20 +838,18 @@ RuntimeValue Script_Object_set_IgnoreScaling(AGSEngine *vm, RoomObject *self, co
 // Object: import attribute bool IgnoreWalkbehinds
 // Gets/sets whether the object ignores walk-behind areas.
 RuntimeValue Script_Object_get_IgnoreWalkbehinds(AGSEngine *vm, RoomObject *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Object::get_IgnoreWalkbehinds unimplemented");
-
-	return RuntimeValue();
+	return (self->_flags & OBJF_NOWALKBEHINDS) ? 1 : 0;
 }
 
 // Object: import attribute bool IgnoreWalkbehinds
 // Gets/sets whether the object ignores walk-behind areas.
 RuntimeValue Script_Object_set_IgnoreWalkbehinds(AGSEngine *vm, RoomObject *self, const Common::Array<RuntimeValue> &params) {
 	uint32 value = params[0]._value;
-	UNUSED(value);
 
-	// FIXME
-	error("Object::set_IgnoreWalkbehinds unimplemented");
+	if (value)
+		self->_flags |= OBJF_NOWALKBEHINDS;
+	else
+		self->_flags &= ~OBJF_NOWALKBEHINDS;
 
 	return RuntimeValue();
 }
@@ -916,11 +911,17 @@ RuntimeValue Script_Object_get_Transparency(AGSEngine *vm, RoomObject *self, con
 // Object: import attribute int Transparency
 // Gets/sets the object's transparency.
 RuntimeValue Script_Object_set_Transparency(AGSEngine *vm, RoomObject *self, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint trans = params[0]._value;
 
-	// FIXME
-	error("Object::set_Transparency unimplemented");
+	if (trans > 100)
+		error("Object::set_Transparency: transparency value must be between 0 and 100, but got %d", trans);
+
+	if (trans == 0)
+		self->_transparency = 0;
+	else if (trans == 100)
+		self->_transparency = 255;
+	else
+		self->_transparency = ((100 - trans) * 25) / 10;
 
 	return RuntimeValue();
 }
