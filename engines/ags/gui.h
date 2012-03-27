@@ -300,6 +300,9 @@ public:
 	const Common::String &getText() const { return _text; }
 	void setText(Common::String text);
 
+	uint getTextColor() const { return _textColor; }
+	void setTextColor(uint color);
+
 protected:
 	Common::String _text;
 

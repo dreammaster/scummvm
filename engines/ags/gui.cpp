@@ -402,6 +402,14 @@ void GUIButton::setText(Common::String text) {
 	_parent->invalidate();
 }
 
+void GUIButton::setTextColor(uint color) {
+	if (_textColor == color)
+		return;
+
+	_textColor = color;
+	_parent->invalidate();
+}
+
 void GUIButton::stopAnimation() {
 	// FIXME
 }
