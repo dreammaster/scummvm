@@ -1829,10 +1829,7 @@ RuntimeValue Script_Character_get_NormalView(AGSEngine *vm, Character *self, con
 // Character: readonly import attribute int PreviousRoom
 // Gets the room number that the character was in before this one.
 RuntimeValue Script_Character_get_PreviousRoom(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_PreviousRoom unimplemented");
-
-	return RuntimeValue();
+	return self->_prevRoom;
 }
 
 // Character: readonly import attribute int Room
