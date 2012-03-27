@@ -477,7 +477,7 @@ void AGSGraphics::draw() {
 	Common::Array<Drawable *> drawables;
 
 	for (uint i = 0; i < room->_objects.size(); ++i) {
-		if (!room->_objects[i]->_on)
+		if (!room->_objects[i]->isVisible())
 			continue;
 
 		drawables.push_back(room->_objects[i]);

@@ -179,11 +179,7 @@ RuntimeValue Script_ObjectOff(AGSEngine *vm, ScriptObject *, const Common::Array
 	if (object >= vm->getCurrentRoom()->_objects.size())
 		error("ObjectOff: object %d is too high (only have %d)", object, vm->getCurrentRoom()->_objects.size());
 
-	if (vm->getCurrentRoom()->_objects[object]->_on == 1) {
-		vm->getCurrentRoom()->_objects[object]->_on = 0;
-		// StopObjectMoving
-		vm->getCurrentRoom()->_objects[object]->_moving = false;
-	}
+	vm->getCurrentRoom()->_objects[object]->setVisible(false);
 
 	return RuntimeValue();
 }
@@ -196,8 +192,7 @@ RuntimeValue Script_ObjectOn(AGSEngine *vm, ScriptObject *, const Common::Array<
 	if (object >= vm->getCurrentRoom()->_objects.size())
 		error("ObjectOn: object %d is too high (only have %d)", object, vm->getCurrentRoom()->_objects.size());
 
-	if (vm->getCurrentRoom()->_objects[object]->_on == 0)
-		vm->getCurrentRoom()->_objects[object]->_on = 1;
+	vm->getCurrentRoom()->_objects[object]->setVisible(true);
 
 	return RuntimeValue();
 }
@@ -407,37 +402,34 @@ RuntimeValue Script_GetObjectGraphic(AGSEngine *vm, ScriptObject *, const Common
 // import int IsObjectAnimating(int object)
 // Obsolete function for objects.
 RuntimeValue Script_IsObjectAnimating(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
+	uint object = params[0]._value;
 
-	// FIXME
-	error("IsObjectAnimating unimplemented");
+	if (object >= vm->getCurrentRoom()->_objects.size())
+		error("IsObjectAnimating: object %d is too high (only have %d)", object, vm->getCurrentRoom()->_objects.size());
 
-	return RuntimeValue();
+	return vm->getCurrentRoom()->_objects[object]->_cycling ? 1 : 0;
 }
 
 // import int IsObjectMoving(int object)
 // Obsolete function for objects.
 RuntimeValue Script_IsObjectMoving(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
+	uint object = params[0]._value;
 
-	// FIXME
-	error("IsObjectMoving unimplemented");
+	if (object >= vm->getCurrentRoom()->_objects.size())
+		error("IsObjectMoving: object %d is too high (only have %d)", object, vm->getCurrentRoom()->_objects.size());
 
-	return RuntimeValue();
+	return vm->getCurrentRoom()->_objects[object]->_moving ? 1 : 0;
 }
 
 // import int IsObjectOn (int object)
 // Obsolete function for objects.
 RuntimeValue Script_IsObjectOn(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
+	uint object = params[0]._value;
 
-	// FIXME
-	error("IsObjectOn unimplemented");
+	if (object >= vm->getCurrentRoom()->_objects.size())
+		error("IsObjectOn: object %d is too high (only have %d)", object, vm->getCurrentRoom()->_objects.size());
 
-	return RuntimeValue();
+	return vm->getCurrentRoom()->_objects[object]->isVisible() ? 1 : 0;
 }
 
 // import void SetObjectClickable(int object, int clickable)
@@ -691,10 +683,7 @@ RuntimeValue Script_Object_Tint(AGSEngine *vm, RoomObject *self, const Common::A
 // Object: readonly import attribute bool Animating
 // Gets whether the object is currently animating.
 RuntimeValue Script_Object_get_Animating(AGSEngine *vm, RoomObject *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Object::get_Animating unimplemented");
-
-	return RuntimeValue();
+	return self->_cycling ? 1 : 0;
 }
 
 // Object: import attribute int Baseline
@@ -874,10 +863,7 @@ RuntimeValue Script_Object_get_Loop(AGSEngine *vm, RoomObject *self, const Commo
 // Object: readonly import attribute bool Moving
 // Gets whether the object is currently moving.
 RuntimeValue Script_Object_get_Moving(AGSEngine *vm, RoomObject *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Object::get_Moving unimplemented");
-
-	return RuntimeValue();
+	return self->_moving ? 1 : 0;
 }
 
 // Object: readonly import attribute String Name
@@ -943,20 +929,15 @@ RuntimeValue Script_Object_get_View(AGSEngine *vm, RoomObject *self, const Commo
 // Object: import attribute bool Visible
 // Gets/sets whether the object is currently visible.
 RuntimeValue Script_Object_get_Visible(AGSEngine *vm, RoomObject *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Object::get_Visible unimplemented");
-
-	return RuntimeValue();
+	return self->isVisible();
 }
 
 // Object: import attribute bool Visible
 // Gets/sets whether the object is currently visible.
 RuntimeValue Script_Object_set_Visible(AGSEngine *vm, RoomObject *self, const Common::Array<RuntimeValue> &params) {
-	uint32 value = params[0]._value;
-	UNUSED(value);
+	uint value = params[0]._value;
 
-	// FIXME
-	error("Object::set_Visible unimplemented");
+	self->setVisible((bool)value);
 
 	return RuntimeValue();
 }

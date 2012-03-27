@@ -125,6 +125,23 @@ static Graphics::Surface readRLEImage(Common::SeekableReadStream *stream) {
 	return surf;
 }
 
+void RoomObject::setVisible(bool visible) {
+	if (visible == _visible)
+		return;
+
+	// can't change visible state of merged objects
+	if (_merged)
+		return;
+
+	_visible = visible;
+	if (!_visible)
+		stopMoving();
+}
+
+void RoomObject::stopMoving() {
+	_moving = false;
+}
+
 Common::Point RoomObject::getDrawPos() {
 	return Common::Point(_vm->multiplyUpCoordinate(_pos.x),
 		_vm->multiplyUpCoordinate(_pos.y) - _vm->getSprites()->getSpriteHeight(_spriteId));
@@ -580,7 +597,26 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 			_objects[i]->_pos.y += _vm->divideDownCoordinate(spriteHeight);
 		}
 		/*uint16 roomId = */ dta->readUint16LE();
-		_objects[i]->_on = dta->readUint16LE();
+		uint16 objectOn = dta->readUint16LE();
+		switch (objectOn) {
+		case 0:
+			// off
+			_objects[i]->_merged = false;
+			_objects[i]->_visible = false;
+			break;
+		case 1:
+			// on
+			_objects[i]->_merged = false;
+			_objects[i]->_visible = true;
+			break;
+		case 2:
+			// merged into background, so disabled
+			_objects[i]->_merged = true;
+			_objects[i]->_visible = false;
+			break;
+		default:
+			error("Room: invalid on status %d for object", objectOn);
+		}
 	}
 
 	if (_version >= kAGSRoomVer253) {
