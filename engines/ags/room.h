@@ -121,7 +121,7 @@ struct RoomObject : public ScriptObject, public Drawable {
 	uint16 _blockingWidth, _blockingHeight;
 
 	virtual Common::Point getDrawPos();
-	virtual int getDrawOrder();
+	virtual int getDrawOrder() const;
 	virtual const Graphics::Surface *getDrawSurface();
 	virtual uint getDrawWidth();
 	virtual uint getDrawHeight();
@@ -183,7 +183,7 @@ public:
 	~Room();
 
 	virtual Common::Point getDrawPos() { return Common::Point(0, 0); }
-	virtual int getDrawOrder() { return 0; }
+	virtual int getDrawOrder() const { return 0; }
 	virtual const Graphics::Surface *getDrawSurface();
 	virtual uint getDrawWidth();
 	virtual uint getDrawHeight();

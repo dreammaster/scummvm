@@ -381,7 +381,7 @@ public:
 	Common::Array<uint16> _controlDrawOrder;
 
 	virtual Common::Point getDrawPos() { return Common::Point(_x, _y); }
-	virtual int getDrawOrder() { return 0; }
+	virtual int getDrawOrder() const { return 0; }
 	virtual uint getDrawWidth() { return _width; }
 	virtual uint getDrawHeight() { return _height; }
 

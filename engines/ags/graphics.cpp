@@ -240,7 +240,7 @@ public:
 		return _vm->_system->getEventManager()->getMousePos() - Common::Point(_hotspotX, _hotspotY);
 	}
 
-	virtual int getDrawOrder() { return 0; }
+	virtual int getDrawOrder() const { return 0; }
 
 	virtual const Graphics::Surface *getDrawSurface() {
 		return _cursorSprite->_surface;
@@ -454,6 +454,20 @@ void AGSGraphics::newRoomPalette() {
 	}
 }
 
+struct DrawableLess {
+	bool operator()(const Drawable *a, const Drawable *b) const {
+		uint baseLineA = a->getDrawOrder();
+		uint baseLineB = b->getDrawOrder();
+		if (baseLineA == baseLineB) {
+			if (a->priorityIfEqual())
+				return false;
+			if (b->priorityIfEqual())
+				return true;
+		}
+		return baseLineA < baseLineB;
+	}
+};
+
 void AGSGraphics::draw() {
 	// update palette
 	// TODO: be smarter
@@ -484,6 +498,9 @@ void AGSGraphics::draw() {
 	}
 
 	// FIXME
+
+	// TODO: need stable sort?
+	Common::sort(drawables.begin(), drawables.end(), DrawableLess());
 
 	for (uint i = 0; i < drawables.size(); ++i)
 		draw(drawables[i]);

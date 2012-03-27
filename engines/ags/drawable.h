@@ -42,7 +42,8 @@ public:
 
 	// position/zorder
 	virtual Common::Point getDrawPos() = 0;
-	virtual int getDrawOrder() = 0;
+	virtual int getDrawOrder() const = 0;
+	virtual bool priorityIfEqual() const { return true; }
 
 	// surface to draw
 	virtual const Graphics::Surface *getDrawSurface() = 0;
