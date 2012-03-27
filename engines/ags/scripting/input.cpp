@@ -25,8 +25,8 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
-#include "engines/ags/graphics.h"
 #include "engines/ags/gamestate.h"
+#include "engines/ags/graphics.h"
 #include "common/events.h"
 
 namespace AGS {
@@ -246,10 +246,7 @@ RuntimeValue Script_Mouse_set_Mode(AGSEngine *vm, ScriptObject *, const Common::
 // Mouse: import static attribute bool Visible
 // Gets/sets whether the mouse cursor is visible.
 RuntimeValue Script_Mouse_get_Visible(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Mouse::get_Visible unimplemented");
-
-	return RuntimeValue();
+	return (vm->_state->_mouseCursorHidden ? 0 : 1);
 }
 
 // Mouse: import static attribute bool Visible
@@ -320,8 +317,7 @@ RuntimeValue Script_SetNextCursorMode(AGSEngine *vm, ScriptObject *, const Commo
 // import void SetDefaultCursor()
 // Mouse function.
 RuntimeValue Script_SetDefaultCursor(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("SetDefaultCursor unimplemented");
+	vm->setDefaultCursor();
 
 	return RuntimeValue();
 }

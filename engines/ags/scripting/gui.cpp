@@ -26,6 +26,7 @@
 
 #include "engines/ags/scripting/scripting.h"
 #include "engines/ags/gui.h"
+#include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
@@ -46,7 +47,9 @@ static GUIControl *getGUIControl(const char *funcName, AGSEngine *vm, uint guiId
 // Disables the player interface and activates the Wait cursor.
 RuntimeValue Script_DisableInterface(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	// FIXME
-	error("DisableInterface unimplemented");
+	vm->_state->_disabledUserInterface++;
+	vm->invalidateGUI();
+	vm->_graphics->setMouseCursor(CURS_WAIT);
 
 	return RuntimeValue();
 }
@@ -55,7 +58,11 @@ RuntimeValue Script_DisableInterface(AGSEngine *vm, ScriptObject *, const Common
 // Re-enables the player interface.
 RuntimeValue Script_EnableInterface(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	// FIXME
-	error("EnableInterface unimplemented");
+	vm->invalidateGUI();
+	vm->_state->_disabledUserInterface--;
+	if (!vm->_state->_disabledUserInterface) {
+		vm->setDefaultCursor();
+	}
 
 	return RuntimeValue();
 }
@@ -206,16 +213,18 @@ RuntimeValue Script_SetGUIPosition(AGSEngine *vm, ScriptObject *, const Common::
 // Set the size of the specified GUI.
 RuntimeValue Script_SetGUISize(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint guiId = params[0]._value;
-	uint width = params[1]._value;
-	uint height = params[2]._value;
+	int width = params[1]._signedValue;
+	int height = params[2]._signedValue;
 
-	if (width > vm->_graphics->_width || height > vm->_graphics->_height)
+	// FIXME: base width/height
+	if (width < 0 || width > vm->_graphics->_width || height < 0 || height > vm->_graphics->_height)
 		error("SetGUISize: Tried resizing to an invalid size (%dx%d)", width, height);
 
 	if (guiId >= vm->_gameFile->_guiGroups.size())
 		error("SetGUISize: GUI %d is too high (only have %d)", guiId, vm->_gameFile->_guiGroups.size());
 	GUIGroup *group = vm->_gameFile->_guiGroups[guiId];
 
+	vm->multiplyUpCoordinates(width, height);
 	group->setSize(width, height);
 
 	return RuntimeValue();
@@ -2132,10 +2141,7 @@ RuntimeValue Script_GUI_set_Width(AGSEngine *vm, GUIGroup *self, const Common::A
 // GUI: import attribute int X
 // Gets/sets the X co-ordinate of the GUI's top-left corner.
 RuntimeValue Script_GUI_get_X(AGSEngine *vm, GUIGroup *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GUI::get_X unimplemented");
-
-	return RuntimeValue();
+	return vm->divideDownCoordinate(self->_x);
 }
 
 // GUI: import attribute int X
@@ -2153,10 +2159,7 @@ RuntimeValue Script_GUI_set_X(AGSEngine *vm, GUIGroup *self, const Common::Array
 // GUI: import attribute int Y
 // Gets/sets the Y co-ordinate of the GUI's top-left corner.
 RuntimeValue Script_GUI_get_Y(AGSEngine *vm, GUIGroup *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GUI::get_Y unimplemented");
-
-	return RuntimeValue();
+	return vm->divideDownCoordinate(self->_y);
 }
 
 // GUI: import attribute int Y
