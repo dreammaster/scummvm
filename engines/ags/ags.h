@@ -195,6 +195,8 @@ public:
 
 	void removePopupInterface(uint guiId);
 
+	struct ViewLoopNew *getViewLoop(uint view, uint loop);
+	struct ViewFrame *getViewFrame(uint view, uint loop, uint frame);
 	void checkViewFrame(uint view, uint loop, uint frame);
 
 	void runTextScript(ccInstance *instance, const Common::String &name,
@@ -339,6 +341,7 @@ private:
 	bool mainGameLoop();
 	void tickGame(bool checkControls = false);
 	void updateEvents(bool checkControls);
+	void updateStuff();
 
 	void startNewGame();
 	void setupPlayerCharacter(uint32 charId);

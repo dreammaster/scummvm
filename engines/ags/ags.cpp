@@ -261,6 +261,9 @@ void AGSEngine::tickGame(bool checkControls) {
 		return;
 	// FIXME: check if inventory action changed room
 
+	/* if (!paused) */
+		updateStuff();
+
 	// FIXME: a whole bunch of update stuff
 
 	if (!_state->_fastForward) {
@@ -454,6 +457,31 @@ void AGSEngine::updateEvents(bool checkControls) {
 	for (uint i = 0; i < 4; ++i)
 		if (edgesActivated[i])
 			queueGameEvent(kEventRunEventBlock, kEventBlockRoom, 0, i);
+}
+
+void AGSEngine::updateStuff() {
+	// This updates the game state when *unpaused*.
+	// (GUI updates are handled elsewhere, since they also run when paused.)
+
+	if (_state->_gscriptTimer)
+		_state->_gscriptTimer--;
+
+	for (uint i = 0; i < _state->_scriptTimers.size(); ++i) {
+		if (_state->_scriptTimers[i] > 1)
+			_state->_scriptTimers[i]--;
+	}
+
+	for (uint i = 0; i < _currentRoom->_objects.size(); ++i) {
+		_currentRoom->_objects[i]->update();
+	}
+
+	// FIXME: shadow areas
+
+	// FIXME: character updates
+
+	// FIXME: overlay timers
+
+	// FIXME: speech updates
 }
 
 void AGSEngine::startNewGame() {
@@ -1510,6 +1538,14 @@ void AGSEngine::removePopupInterface(uint guiId) {
 	// FIXME: reset mouse_on_iface
 }
 
+ViewLoopNew *AGSEngine::getViewLoop(uint view, uint loop) {
+	return &_gameFile->_views[view]._loops[loop];
+}
+
+ViewFrame *AGSEngine::getViewFrame(uint view, uint loop, uint frame) {
+	return &_gameFile->_views[view]._loops[loop]._frames[frame];
+}
+
 void AGSEngine::checkViewFrame(uint view, uint loop, uint frame) {
 	// FIXME: check sounds for new frames
 }
@@ -1691,7 +1727,8 @@ BlockUntilType AGSEngine::checkBlockingUntil() {
 		error("checkBlockingUntil unfinished"); // FIXME
 		break;
 	case kUntilObjCycleDone:
-		error("checkBlockingUntil unfinished"); // FIXME
+		if (_currentRoom->_objects[_blockingUntilId]->_cycling == 0)
+			return kUntilNothing;
 		break;
 	default:
 		error("checkBlockingUntil: invalid blocking type %d", _blockingUntil);

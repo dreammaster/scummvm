@@ -138,6 +138,139 @@ void RoomObject::setVisible(bool visible) {
 		stopMoving();
 }
 
+void RoomObject::setObjectFrame(uint viewId, int loopId, int frameId) {
+	if (viewId < 1 || viewId > _vm->_gameFile->_views.size())
+		error("RoomObject::setObjectFrame: invalid view id %d (only have %d)", viewId, _vm->_gameFile->_views.size());
+	_view = viewId - 1;
+	// TODO: check loopId too?
+
+	if (loopId >= 0)
+		_loop = loopId;
+	if (_loop >= _vm->_gameFile->_views[_view]._loops.size())
+		_loop = _vm->_gameFile->_views[_view]._loops.size() - 1;
+
+	ViewLoopNew *loopObj = _vm->getViewLoop(_view, _loop);
+	if (frameId >= 0)
+		_frame = frameId;
+	if (_frame >= loopObj->_frames.size())
+		_frame = loopObj->_frames.size() - 1;
+
+	if (_vm->getGameFileVersion() > kAGSVer272) {
+		// Skip check on 2.x
+		if (loopObj->_frames.empty())
+			error("RoomObject::setObjectFrame: loop %d of view %d is empty", _loop, _view);
+	}
+
+	_cycling = 0;
+	_spriteId = loopObj->_frames[_frame]._pic;
+	_vm->checkViewFrame(_view, _loop, _frame);
+}
+
+void RoomObject::animate(uint loopId, uint speed, uint repeat, uint direction) {
+	if (_view == (uint16)-1)
+		error("RoomObject::animate: object has not been assigned a view");
+	if (loopId >= _vm->_gameFile->_views[_view]._loops.size())
+		error("RoomObject::animate: loop %d is too high (view %d only has %d loops)",
+			loopId, _view, _vm->_gameFile->_views[_view]._loops.size());
+	if (direction > 1)
+		error("RoomObject::animate: invalid direction %d", direction);
+	if (repeat > 2)
+		error("RoomObject::animate: invalid repeat value %d", repeat);
+	if (_vm->getViewLoop(_view, loopId)->_frames.empty())
+		error("RoomObject::animate: no frames in loop %d of view %d", _view, loopId);
+
+	_cycling = repeat + 1 + (direction * 10);
+	_loop = loopId;
+	ViewLoopNew *loop = _vm->getViewLoop(_view, _loop);
+
+	if (direction == 0) {
+		_frame = 0;
+	} else {
+		_frame = loop->_frames.size() - 1;
+	}
+
+	_overallSpeed = speed;
+	_wait = speed + loop->_frames[_frame]._speed;
+	_spriteId = loop->_frames[_frame]._pic;
+
+	_vm->checkViewFrame(_view, _loop, _frame);
+}
+
+void RoomObject::update() {
+	if (!_visible)
+		return;
+
+	// do we need to move?
+	/* FIXME: if (_moving)
+		runMoveList(); */
+
+	// do we need to animate?
+	if (!_cycling)
+		return;
+	if (_view == (uint16)-1)
+		return;
+	if (_wait) {
+		_wait--;
+		return;
+	}
+
+	if (_cycling >= ANIM_BACKWARDS) {
+		// animate backwards
+		if (_frame == 0) {
+			// at the start of the loop, what now?
+			if (_loop > 0 && _vm->getViewLoop(_view, _loop - 1)->shouldRunNextLoop()) {
+				// If it's a Go-to-next-loop on the previous one, then go back
+				_loop--;
+				_frame = _vm->getViewLoop(_view, _loop)->_frames.size() - 1;
+			} else if (_cycling % ANIM_BACKWARDS == ANIM_ONCE) {
+				// leave it on the first frame
+				_cycling = 0;
+				_frame = 0;
+			} else {
+				// repeating animation
+				_frame = _vm->getViewLoop(_view, _loop)->_frames.size() - 1;
+			}
+		} else
+			_frame--;
+	} else {
+		// animate forwards
+		ViewLoopNew *loop = _vm->getViewLoop(_view, _loop);
+		if ((uint)_frame + 1 >= loop->_frames.size()) {
+			// at the end of the loop, what now?
+			if (loop->shouldRunNextLoop()) {
+				// go to next loop thing
+				if ((uint)_loop + 1 >= _vm->_gameFile->_views[_view]._loops.size())
+					error("RoomObject::update: last loop %d in view %d requested to move to next loop",
+						_loop, _view);
+				_loop++;
+				_frame = 0;
+			} else if (_cycling % ANIM_BACKWARDS == ANIM_ONCE) {
+				// leave it on the last frame
+				_cycling = 0;
+			} else {
+				if (!_vm->_state->_noMultiLoopRepeat) {
+					// multi-loop animation, go back to the start
+					while (_loop > 0 && _vm->getViewLoop(_view, _loop - 1)->shouldRunNextLoop())
+						_loop--;
+				}
+				if (_cycling % ANIM_BACKWARDS == ANIM_ONCERESET)
+					_cycling = 0;
+				_frame = 0;
+			}
+		} else
+			_frame++;
+	}
+
+	ViewFrame *frame = _vm->getViewFrame(_view, _loop, _frame);
+	_spriteId = frame->_pic;
+
+	if (!_cycling)
+		return;
+
+	_wait = frame->_speed + _overallSpeed;
+	_vm->checkViewFrame(_view, _loop, _frame);
+}
+
 void RoomObject::stopMoving() {
 	_moving = false;
 }
@@ -587,7 +720,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 			continue;
 		}
 
-		_objects[i] = new RoomObject(_vm);
+		_objects[i] = new RoomObject(_vm, i);
 
 		_objects[i]->_spriteId = dta->readUint16LE();
 		_objects[i]->_pos.x = dta->readUint16LE();

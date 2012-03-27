@@ -79,14 +79,19 @@ struct RoomRegion : public ScriptObject {
 #define OBJF_DELETED        0x40  // object has been deleted
 
 struct RoomObject : public ScriptObject, public Drawable {
-	RoomObject(AGSEngine *vm) : _vm(vm), _interaction(NULL), _flags(0) { }
+	RoomObject(AGSEngine *vm, uint id) : _vm(vm), _interaction(NULL), _flags(0), _id(id) { }
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotRoomObject); }
 	const char *getObjectTypeName() { return "RoomObject"; }
 
 	bool isVisible() const { return _visible; }
 	void setVisible(bool visible);
+	void setObjectFrame(uint viewId, int loopId, int frameId);
 
+	void animate(uint loopId, uint speed, uint repeat, uint direction);
+	void update();
 	void stopMoving();
+
+	uint _id;
 
 	// originally from room, immutable
 	NewInteraction *_interaction;
@@ -110,7 +115,7 @@ struct RoomObject : public ScriptObject, public Drawable {
 	uint16 _view, _loop, _frame;
 	uint16 _wait, _moving;
 	uint _transparency;
-	bool _cycling;
+	byte _cycling; // see ANIM_BACKWARDS etc
 	byte _overallSpeed;
 	uint16 _tintRed, _tintGreen, _tintBlue, _tintLevel, _tintLight;
 	uint16 _blockingWidth, _blockingHeight;

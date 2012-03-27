@@ -126,9 +126,13 @@ public:
 	uint32 _sound;
 };
 
+#define LOOPFLAG_RUNNEXTLOOP 1
+
 struct ViewLoopNew {
 	uint32 _flags;
 	Common::Array<ViewFrame> _frames;
+
+	bool shouldRunNextLoop() { return _flags & LOOPFLAG_RUNNEXTLOOP; }
 };
 
 struct ViewStruct {
