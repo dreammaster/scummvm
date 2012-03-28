@@ -26,6 +26,7 @@
 
 #include "engines/ags/drawingsurface.h"
 #include "engines/ags/ags.h"
+#include "engines/ags/constants.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/room.h"
 
@@ -35,6 +36,9 @@ namespace AGS {
 
 DrawingSurface::DrawingSurface(AGSEngine *vm) : _vm(vm), _type(dstInvalid), _modified(false),
 	_useHighResCoordinates(false), _currentColor(vm->_state->_rawColor) {
+
+	if (_vm->getGameOption(OPT_NATIVECOORDINATES) && (_vm->_gameFile->_defaultResolution > 2))
+		_useHighResCoordinates = true;
 }
 
 DrawingSurface::~DrawingSurface() {
@@ -47,13 +51,17 @@ void DrawingSurface::release() {
 		// already released, do nothing
 		break;
 	case dstRoomBackground:
-		if (_modified)
+		if (!_modified)
+			break;
+		// TODO: mark as modified for saving
+		if (_id == _vm->_state->_bgFrame)
 			_vm->getCurrentRoom()->updateWalkBehinds();
 		break;
 	case dstDynamicSprite:
 		// TODO: release sprite, update any caches..?
 		break;
 	case dstDynamicSurface:
+		_surface->free();
 		delete _surface;
 		break;
 	}
