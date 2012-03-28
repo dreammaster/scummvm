@@ -447,8 +447,10 @@ void Room::updateWalkBehinds() {
 	for (uint i = 1; i < _walkBehinds.size(); ++i) {
 		WalkBehind &wb = _walkBehinds[i];
 
-		if (wb._right == 0)
+		if (wb._right == 0) {
+			wb._surface.free();
 			continue;
+		}
 
 		uint width = wb._right - wb._left + 1;
 		uint height = wb._bottom - wb._top + 1;
@@ -459,6 +461,7 @@ void Room::updateWalkBehinds() {
 
 		// FIXME: pass format to getTransparentColor
 		wb._surface.fillRect(Common::Rect(0, 0, width, height), _vm->_graphics->getTransparentColor());
+
 		for (uint y = wb._top; y <= wb._bottom; y++) {
 			for (uint x = wb._left; x <= wb._right; x++) {
 				byte *ptr = (byte *)_walkBehindMask.getBasePtr(x, y);

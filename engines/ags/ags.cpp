@@ -1391,6 +1391,7 @@ bool AGSEngine::init() {
 
 	addSystemScripting(this);
 
+	// FIXME: don't leak all these!
 	_scriptState->addSystemObjectImport("character", new ScriptObjectArray<Character *>(&_characters, 780, "Character"));
 	_scriptState->addSystemObjectImport("player", _characters[_gameFile->_playerChar]);
 	for (uint i = 0; i < _characters.size(); ++i) {

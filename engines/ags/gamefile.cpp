@@ -42,6 +42,11 @@ GameFile::GameFile(AGSEngine *vm) : _vm(vm), _gameScript(NULL) {
 }
 
 GameFile::~GameFile() {
+	delete _gameScript;
+	delete _dialogScriptsScript;
+	for (uint i = 0; i < _scriptModules.size(); ++i)
+		delete _scriptModules[i];
+
 	for (uint i = 0; i < _guiButtons.size(); ++i)
 		delete _guiButtons[i];
 	for (uint i = 0; i < _guiLabels.size(); ++i)
@@ -55,18 +60,15 @@ GameFile::~GameFile() {
 	for (uint i = 0; i < _guiListBoxes.size(); ++i)
 		delete _guiListBoxes[i];
 
-	for (uint i = 0; i < _guiGroups.size(); ++i)
-		delete _guiGroups[i];
+	for (uint i = 0; i < _guiGroups.size(); ++i) {
+		assert(_guiGroups[i]->getRefCount() == 1);
+		_guiGroups[i]->DecRef();
+	}
 
 	for (uint i = 0; i < _interactionsChar.size(); ++i)
 		delete _interactionsChar[i];
 	for (uint i = 0; i < _interactionsInv.size(); ++i)
 		delete _interactionsInv[i];
-
-	delete _gameScript;
-	delete _dialogScriptsScript;
-	for (uint i = 0; i < _scriptModules.size(); ++i)
-		delete _scriptModules[i];
 }
 
 void GameFile::readVersion(Common::SeekableReadStream &dta) {
@@ -646,7 +648,7 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 
 	chr->_defView = dta->readUint32LE();
 	chr->_talkView = dta->readUint32LE();
-	/*chr->_view = */ dta->readUint32LE();
+	chr->_view = dta->readUint32LE();
 	chr->_room = dta->readUint32LE();
 	/*chr->_prevRoom = */ dta->readUint32LE();
 	chr->_x = dta->readUint32LE();

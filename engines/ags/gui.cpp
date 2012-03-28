@@ -511,7 +511,7 @@ void GUIButton::draw(Graphics::Surface *surface) {
 	font->drawString(surface, text, useX, useY, _width, color, align);
 }
 
-GUIGroup::GUIGroup(AGSEngine *vm) : _vm(vm), _width(0), _height(0), _needsUpdate(true) {
+GUIGroup::GUIGroup(AGSEngine *vm) : _vm(vm), _width(0), _height(0), _needsUpdate(true), _transparency(0) {
 }
 
 GUIGroup::~GUIGroup() {
