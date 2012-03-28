@@ -1382,6 +1382,11 @@ bool AGSEngine::init() {
 	// init_game_settings
 	_graphics = new AGSGraphics(this);
 	_graphics->initPalette();
+	if (!_graphics->initGraphics())
+		return false;
+
+	adjustSizesForResolution();
+
 	_state->init();
 
 	addSystemScripting(this);
@@ -1441,15 +1446,87 @@ bool AGSEngine::init() {
 		return false;
 	_sprites = new SpriteSet(this, spritesStream);
 
-	// Init graphics
-	if (!_graphics->initGraphics())
-		return false;
-
 	syncSoundSettings();
 
 	_engineStartTime = g_system->getMillis();
 
 	return true;
+}
+
+void AGSEngine::adjustSizesForResolution() {
+	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
+		GUIGroup *group = _gameFile->_guiGroups[i];
+
+		if (group->_width < 1)
+			group->_width = 1;
+		if (group->_height < 1)
+			group->_height = 1;
+		// "Temp fix for older games"
+		if (group->_width == (uint)_graphics->_baseWidth - 1)
+			group->_width = _graphics->_baseWidth;
+
+		for (uint j = 0; j < group->_controls.size(); ++j)
+			group->_controls[j]->_activated = 0;
+	}
+
+	if (getGameFileVersion() >= kAGSVer300) {
+		if (getGameOption(OPT_NATIVECOORDINATES))
+			return;
+		if (_gameFile->_defaultResolution <= 2)
+			return;
+
+		// New 3.1 format game file, but with Use Native Coordinates off
+		// Divide down the coordinates which are always stored in native form.
+
+		for (uint i = 0; i < _characters.size(); ++i) {
+			_characters[i]->_x /= 2;
+			_characters[i]->_y /= 2;
+		}
+
+		for (uint i = 0; i < _gameFile->_guiInvControls.size(); ++i) {
+			GUIInvControl *control = _gameFile->_guiInvControls[i];
+			control->_itemWidth /= 2;
+			control->_itemHeight /= 2;
+		}
+
+		return;
+	}
+
+	// Old format game file, with non-native coordinates. Multiply them all up.
+
+	for (uint i = 0; i < _gameFile->_cursors.size(); ++i) {
+		MouseCursor &cursor = _gameFile->_cursors[i];
+
+		cursor._hotspotX = multiplyUpCoordinate(cursor._hotspotX);
+		cursor._hotspotY = multiplyUpCoordinate(cursor._hotspotY);
+	}
+
+	for (uint i = 0; i < _gameFile->_invItemInfo.size(); ++i) {
+		InventoryItem &item = _gameFile->_invItemInfo[i];
+
+		item._hotspotX = multiplyUpCoordinate(item._hotspotX);
+		item._hotspotY = multiplyUpCoordinate(item._hotspotY);
+	}
+
+	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
+		GUIGroup *group = _gameFile->_guiGroups[i];
+
+		group->_x = multiplyUpCoordinate(group->_x);
+		group->_y = multiplyUpCoordinate(group->_y);
+		group->_width = multiplyUpCoordinate(group->_width);
+		group->_height = multiplyUpCoordinate(group->_height);
+
+		group->_popupYP = multiplyUpCoordinate(group->_popupYP);
+
+		for (uint j = 0; j < group->_controls.size(); ++j) {
+			GUIControl *control = group->_controls[j];
+
+			control->_x = multiplyUpCoordinate(control->_x);
+			control->_y = multiplyUpCoordinate(control->_y);
+			control->_width = multiplyUpCoordinate(control->_width);
+			control->_height = multiplyUpCoordinate(control->_height);
+		}
+	}
 }
 
 void AGSEngine::pauseEngineIntern(bool pause) {

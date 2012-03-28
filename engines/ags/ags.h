@@ -337,6 +337,7 @@ private:
 	bool _saidSpeechLine;
 
 	bool init();
+	void adjustSizesForResolution();
 
 	bool mainGameLoop();
 	void tickGame(bool checkControls = false);
