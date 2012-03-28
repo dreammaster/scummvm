@@ -63,6 +63,9 @@ public:
 
 	void draw();
 
+	// TODO: fix this (hack for SnowRain)
+	void internalDraw(const Graphics::Surface *srcSurf, const Common::Point &pos, uint transparency);
+
 	void blit(const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, const Common::Point &pos, uint transparency);
 
 	void setMouseCursor(uint32 cursor);

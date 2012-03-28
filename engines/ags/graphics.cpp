@@ -468,6 +468,10 @@ struct DrawableLess {
 	}
 };
 
+// plugin
+// TODO: make more modular (see also gamefile, ags.cpp)
+void drawSnowRain();
+
 void AGSGraphics::draw() {
 	// update palette
 	// TODO: be smarter
@@ -512,6 +516,9 @@ void AGSGraphics::draw() {
 	for (uint i = 0; i < drawables.size(); ++i)
 		draw(drawables[i]);
 
+	// TODO: make this suck less
+	drawSnowRain();
+
 	// FIXME
 
 	// draw GUIs
@@ -532,6 +539,10 @@ void AGSGraphics::draw() {
 	// FIXME: add dirty rectangling
 	g_system->copyRectToScreen((byte *)_backBuffer.getPixels(), _width * _vm->_gameFile->_colorDepth, 0, 0, _width, _height);
 	g_system->updateScreen();
+}
+
+void AGSGraphics::internalDraw(const Graphics::Surface *srcSurf, const Common::Point &pos, uint transparency) {
+	blit(srcSurf, &_backBuffer, pos, transparency);
 }
 
 void AGSGraphics::draw(Drawable *item) {

@@ -90,7 +90,14 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_state = new GameState(this);
 }
 
+// plugins
+// TODO: migrate to something more modular
+void initSnowRain(AGSEngine *vm);
+void shutdownSnowRain();
+
 AGSEngine::~AGSEngine() {
+	shutdownSnowRain();
+
 	for (uint i = 0; i < _scriptModules.size(); ++i)
 		delete _scriptModules[i];
 	for (uint i = 0; i < _scriptModuleForks.size(); ++i)
@@ -1396,6 +1403,7 @@ bool AGSEngine::init() {
 	_state->init();
 
 	addSystemScripting(this);
+	initSnowRain(this);
 
 	// FIXME: don't leak all these!
 	_scriptState->addSystemObjectImport("character", new ScriptObjectArray<Character *>(&_characters, 780, "Character"));
