@@ -124,9 +124,25 @@ struct RuntimeValue {
 		const ScriptSystemFunctionInfo *_function;
 	};
 
-	RuntimeValue &operator=(uint32 intValue) {
+	RuntimeValue &operator=(int32 intValue) {
+		if (_type == rvtSystemObject)
+			_object->DecRef();
 		_type = rvtInteger;
 		_value = intValue;
+		return *this;
+	}
+	RuntimeValue &operator=(uint32 intValue) {
+		if (_type == rvtSystemObject)
+			_object->DecRef();
+		_type = rvtInteger;
+		_value = intValue;
+		return *this;
+	}
+	RuntimeValue &operator=(float floatValue) {
+		if (_type == rvtSystemObject)
+			_object->DecRef();
+		_type = rvtFloat;
+		_value = floatValue;
 		return *this;
 	}
 
@@ -155,7 +171,6 @@ struct ccScript {
 	void readFrom(Common::SeekableReadStream *dta);
 
 	Common::Array<byte> _globalData;
-	Common::HashMap<uint32, RuntimeValue> _globalObjects;
 	Common::Array<uint32> _globalFixups;
 
 	Common::Array<ScriptCodeEntry> _code;
@@ -213,6 +228,7 @@ protected:
 	uint32 _flags;
 
 	Common::Array<byte> *_globalData;
+	Common::HashMap<uint32, RuntimeValue> *_globalObjects;
 
 	uint32 _pc;
 	RuntimeValue _returnValue;
