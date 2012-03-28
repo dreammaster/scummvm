@@ -536,8 +536,6 @@ void AGSGraphics::draw() {
 
 void AGSGraphics::draw(Drawable *item) {
 	uint transparency = item->getDrawTransparency();
-	if (transparency == 255)
-		return;
 
 	const Common::Point pos = item->getDrawPos();
 	uint itemWidth = item->getDrawWidth();
@@ -547,10 +545,16 @@ void AGSGraphics::draw(Drawable *item) {
 	const Graphics::Surface *surface = item->getDrawSurface();
 
 	// FIXME: lots of things
+	blit(surface, &_backBuffer, pos, transparency);
+}
 
-	if (pos.x > _width)
+void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, const Common::Point &pos, uint transparency) {
+	if (transparency == 255)
 		return;
-	if (pos.y > _height)
+
+	if (pos.x > destSurf->w)
+		return;
+	if (pos.y > destSurf->h)
 		return;
 
 	uint startX = 0, startY = 0;
@@ -558,16 +562,16 @@ void AGSGraphics::draw(Drawable *item) {
 		startX = -pos.x;
 	if (pos.y < 0)
 		startY = -pos.y;
-	uint width = surface->w, height = surface->h;
-	if (pos.x + width > _width)
-		width = _width - pos.x;
-	if (pos.y + height > _height)
-		height = _height - pos.y;
+	uint width = srcSurf->w, height = srcSurf->h;
+	if (pos.x + width > destSurf->w)
+		width = destSurf->w - pos.x;
+	if (pos.y + height > destSurf->h)
+		height = destSurf->h - pos.y;
 
-	if (surface->format.bytesPerPixel == 1) {
+	if (srcSurf->format.bytesPerPixel == 1) {
 		for (uint y = 0; y < height - startY; ++y) {
-			byte *dest = (byte *)_backBuffer.getBasePtr(pos.x + startX, pos.y + y);
-			const byte *src = (byte *)surface->getBasePtr(startX, startY + y);
+			byte *dest = (byte *)destSurf->getBasePtr(pos.x + startX, pos.y + y);
+			const byte *src = (byte *)srcSurf->getBasePtr(startX, startY + y);
 			for (uint x = startX; x < width; ++x) {
 				byte data = *src++;
 				if (data != 0)
@@ -575,23 +579,23 @@ void AGSGraphics::draw(Drawable *item) {
 				dest++;
 			}
 		}
-	} else if (surface->format.bytesPerPixel == 2) {
+	} else if (srcSurf->format.bytesPerPixel == 2) {
 		uint16 transColor = (uint16)getTransparentColor();
 
 		if (transparency)
 			transparency = (transparency + 1) / 8;
 
 		for (uint y = 0; y < height - startY; ++y) {
-			uint16 *dest = (uint16 *)_backBuffer.getBasePtr(pos.x + startX, pos.y + y);
-			const uint16 *src = (uint16 *)surface->getBasePtr(startX, startY + y);
+			uint16 *dest = (uint16 *)destSurf->getBasePtr(pos.x + startX, pos.y + y);
+			const uint16 *src = (uint16 *)srcSurf->getBasePtr(startX, startY + y);
 			for (uint x = startX; x < width; ++x) {
 				uint16 srcData = *src++;
 				if (srcData != transColor) {
 					if (transparency != 0) {
 						uint16 destData = *dest;
 
-						uint32 blendDest = (destData | ((uint32)destData << 16)) & 0x7E0F81F;
-						uint32 blendSrc = (srcData | ((uint32)srcData << 16)) & 0x7E0F81F;
+						uint32 blendDest = (destData | (destData << 16)) & 0x7E0F81F;
+						uint32 blendSrc = (srcData | (srcData << 16)) & 0x7E0F81F;
 						uint32 blended = (blendSrc - blendDest) * transparency / 32 + blendDest;
 						blended &= 0x7E0F81F;
 						*dest = (blended & 0xFFFF) | (blended >> 16);

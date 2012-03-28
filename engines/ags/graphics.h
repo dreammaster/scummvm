@@ -27,6 +27,7 @@
 #ifndef AGS_GRAPHICS_H
 #define AGS_GRAPHICS_H
 
+#include "common/rect.h"
 #include "graphics/surface.h"
 
 namespace Common {
@@ -61,6 +62,8 @@ public:
 	void newRoomPalette();
 
 	void draw();
+
+	void blit(const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, const Common::Point &pos, uint transparency);
 
 	void setMouseCursor(uint32 cursor);
 	void mouseSetHotspot(uint32 x, uint32 y);
