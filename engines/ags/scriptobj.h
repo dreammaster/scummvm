@@ -27,7 +27,9 @@
 #ifndef AGS_SCRIPTOBJ_H
 #define AGS_SCRIPTOBJ_H
 
-#include "common/scummsys.h"
+#include "common/textconsole.h"
+#include "common/array.h"
+#include "common/str.h"
 
 namespace AGS {
 

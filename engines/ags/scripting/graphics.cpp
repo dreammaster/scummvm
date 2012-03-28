@@ -25,7 +25,12 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/constants.h"
+#include "engines/ags/drawingsurface.h"
 #include "engines/ags/gamestate.h"
+#include "engines/ags/graphics.h"
+#include "engines/ags/sprites.h"
+#include "graphics/surface.h"
 
 namespace AGS {
 
@@ -154,10 +159,17 @@ RuntimeValue Script_DrawingSurface_Clear(AGSEngine *vm, DrawingSurface *self, co
 // DrawingSurface: import DrawingSurface* CreateCopy()
 // Creates a copy of the surface.
 RuntimeValue Script_DrawingSurface_CreateCopy(AGSEngine *vm, DrawingSurface *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("DrawingSurface::CreateCopy unimplemented");
+	DrawingSurface *surface = new DrawingSurface(vm);
+	surface->_type = dstDynamicSurface;
 
-	return RuntimeValue();
+	Graphics::Surface *source = self->startDrawing();
+	surface->_surface = new Graphics::Surface();
+	surface->_surface->copyFrom(*source);
+	self->finishedDrawing(true);
+
+	RuntimeValue ret = surface;
+	ret._object->DecRef();
+	return ret;
 }
 
 // DrawingSurface: import void DrawCircle(int x, int y, int radius)
@@ -180,20 +192,43 @@ RuntimeValue Script_DrawingSurface_DrawCircle(AGSEngine *vm, DrawingSurface *sel
 // Draws a sprite onto the surface with its top-left corner at (x,y).
 RuntimeValue Script_DrawingSurface_DrawImage(AGSEngine *vm, DrawingSurface *self, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
-	int spriteSlot = params[2]._signedValue;
-	UNUSED(spriteSlot);
-	int transparency = params[3]._signedValue;
-	UNUSED(transparency);
-	int width = params[4]._signedValue;
-	UNUSED(width);
-	int height = params[5]._signedValue;
-	UNUSED(height);
+	uint spriteSlot = params[2]._signedValue;
+	uint transparency = params[3]._signedValue;
+	uint width = params[4]._value;
+	uint height = params[5]._value;
 
-	// FIXME
-	error("DrawingSurface::DrawImage unimplemented");
+	if (spriteSlot >= vm->getSprites()->getSpriteCount())
+		error("DrawingSurface::DrawImage: sprite %d is too high (only have %d sprites)",
+			spriteSlot, vm->getSprites()->getSpriteCount());
+	if (transparency > 100)
+		error("DrawingSurface::DrawImage: transparency value must be between 0 and 100, but got %d", transparency);
+
+	if (transparency == 100)
+		return RuntimeValue();
+	if (transparency > 0)
+		transparency = ((100 - transparency) * 255) / 100;
+
+	if (width != SCR_NO_VALUE) {
+		// resize requested
+
+		// FIXME
+		UNUSED(height);
+		error("DrawingSurface::DrawImage: resizing unimplemented");
+	}
+
+	// FIXME: adjust coordinates
+
+	Graphics::Surface *dest = self->startDrawing();
+	Sprite *source = vm->getSprites()->getSprite(spriteSlot);
+	if (dest->format != source->_surface->format)
+		error("DrawingSurface::DrawImage: Incompatible formats (source is %dBpp, dest is %dBpp)",
+			source->_surface->format.bytesPerPixel, dest->format.bytesPerPixel);
+
+	vm->_graphics->blit(source->_surface, dest, Common::Point(x, y), transparency);
+	// FIXME: free sprite
+
+	self->finishedDrawing();
 
 	return RuntimeValue();
 }
@@ -316,12 +351,33 @@ RuntimeValue Script_DrawingSurface_DrawSurface(AGSEngine *vm, DrawingSurface *se
 	if (!params[0]._object->isOfType(sotDrawingSurface))
 		error("DrawingSurface::DrawSurface got incorrect object type (expected a DrawingSurface) for parameter 1");
 	DrawingSurface *surfaceToDraw = (DrawingSurface *)params[0]._object;
-	UNUSED(surfaceToDraw);
-	int transparency = params[1]._signedValue;
-	UNUSED(transparency);
+	uint transparency = params[1]._value;
 
-	// FIXME
-	error("DrawingSurface::DrawSurface unimplemented");
+	if (transparency > 100)
+		error("DrawingSurface::DrawSurface: transparency value must be between 0 and 100, but got %d", transparency);
+
+	// FIXME: sanity-check params
+
+	if (transparency == 100)
+		return RuntimeValue();
+
+	Graphics::Surface *dest = self->startDrawing();
+	Graphics::Surface *src = surfaceToDraw->startDrawing();
+
+	if (dest == src)
+		error("DrawingSurface::DrawSurface: attempted to draw a surface onto itself");
+
+	if (transparency > 0)
+		transparency = ((100 - transparency) * 255) / 100;
+
+	// TODO: remove this limitation?
+	if (src->format.bytesPerPixel == 1)
+		error("DrawingSurface::DrawSurface: 8bpp surfaces cannot be drawn transparently");
+
+	vm->_graphics->blit(src, dest, Common::Point(0, 0), transparency);
+
+	self->finishedDrawing();
+	surfaceToDraw->finishedDrawing(true);
 
 	return RuntimeValue();
 }
@@ -365,8 +421,7 @@ RuntimeValue Script_DrawingSurface_GetPixel(AGSEngine *vm, DrawingSurface *self,
 // DrawingSurface: import void Release()
 // Tells AGS that you have finished drawing onto the surface.
 RuntimeValue Script_DrawingSurface_Release(AGSEngine *vm, DrawingSurface *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("DrawingSurface::Release unimplemented");
+	self->release();
 
 	return RuntimeValue();
 }

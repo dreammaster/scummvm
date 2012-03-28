@@ -5,6 +5,7 @@ MODULE_OBJS := \
 	audio.o \
 	character.o \
 	detection.o \
+	drawingsurface.o \
 	gamefile.o \
 	gamestate.o \
 	graphics.o \
