@@ -247,6 +247,7 @@ public:
 
 	void invalidateScreen() { _needsUpdate = true; }
 	void invalidateGUI() { _guiNeedsUpdate = true; }
+	void invalidateBackground() { _backgroundNeedsUpdate = true; }
 
 	Room *getCurrentRoom() { return _currentRoom; }
 	void scheduleNewRoom(uint roomId);
@@ -281,6 +282,7 @@ private:
 	SpriteSet *_sprites;
 
 	bool _needsUpdate, _guiNeedsUpdate;
+	bool _backgroundNeedsUpdate;
 	uint32 _cursorMode;
 	uint _poppedInterface;
 

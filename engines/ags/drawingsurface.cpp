@@ -55,7 +55,7 @@ void DrawingSurface::release() {
 			break;
 		// TODO: mark as modified for saving
 		if (_id == _vm->_state->_bgFrame)
-			_vm->getCurrentRoom()->updateWalkBehinds();
+			_vm->invalidateBackground();
 		break;
 	case dstDynamicSprite:
 		// TODO: release sprite, update any caches..?
