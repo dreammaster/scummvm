@@ -53,6 +53,10 @@
 #define AUDIOTYPE_LEGACY_MUSIC 2
 #define AUDIOTYPE_LEGACY_SOUND 3
 
+#define VOL_CHANGEEXISTING   1678
+#define VOL_SETFUTUREDEFAULT 1679
+#define VOL_BOTH             1680
+
 namespace AGS {
 
 AGSAudio::AGSAudio(AGSEngine *vm) : _vm(vm), _musicResources(NULL), _audioResources(NULL), _speechResources(NULL) {
@@ -326,6 +330,27 @@ void AGSAudio::updateMusicVolume() {
 	// FIXME
 }
 
+void AGSAudio::setAudioTypeVolume(uint type, uint volume, uint changeType) {
+	// FIXME
+}
+
+void AGSAudio::setSoundVolume(uint volume) {
+	assert(volume <= 255);
+
+	_vm->_state->_soundVolume = volume;
+	setAudioTypeVolume(AUDIOTYPE_LEGACY_AMBIENT_SOUND, (volume * 100) / 255, VOL_BOTH);
+	setAudioTypeVolume(AUDIOTYPE_LEGACY_SOUND, (volume * 100) / 255, VOL_BOTH);
+	updateAmbientSoundVolume();
+}
+
+void AGSAudio::setSpeechVolume(uint volume) {
+	assert(volume <= 255);
+
+	if (_channels[SCHAN_SPEECH]->isPlaying())
+		_channels[SCHAN_SPEECH]->setVolume(volume);
+	_vm->_state->_speechVolume = volume;
+}
+
 void AGSAudio::openResources() {
 	_musicResources = new ResourceManager();
 	if (!_musicResources->init("music.vox")) {
@@ -426,6 +451,10 @@ bool AudioChannel::isPlaying() {
 		return false;
 
 	return _vm->_mixer->isSoundHandleActive(_handle);
+}
+
+void AudioChannel::setVolume(uint volume) {
+	// FIXME
 }
 
 } // End of namespace AGS

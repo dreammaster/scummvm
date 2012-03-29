@@ -86,6 +86,8 @@ public:
 	void stop(bool resetLegacyMusicSettings = true);
 	bool isPlaying();
 
+	void setVolume(uint volume);
+
 	uint getPriority() { return _priority; }
 	void setPriority(uint priority) { _priority = priority; }
 
@@ -136,6 +138,11 @@ public:
 	void updateAmbientSoundVolume();
 	void updateDirectionalSoundVolume();
 	void updateMusicVolume();
+
+	void setAudioTypeVolume(uint type, uint volume, uint changeType);
+
+	void setSoundVolume(uint volume);
+	void setSpeechVolume(uint volume);
 
 	Common::Array<AudioClip> _audioClips;
 	Common::Array<AudioClipType> _audioClipTypes;

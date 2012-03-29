@@ -204,11 +204,12 @@ RuntimeValue Script_SetMusicVolume(AGSEngine *vm, ScriptObject *, const Common::
 // import void SetSoundVolume(int volume)
 // Changes the sound volume.
 RuntimeValue Script_SetSoundVolume(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int volume = params[0]._signedValue;
-	UNUSED(volume);
+	uint volume = params[0]._value;
 
-	// FIXME
-	error("SetSoundVolume unimplemented");
+	if (volume > 255)
+		error("SetSoundVolume: volume %d is invalid (must be 1-255)", volume);
+
+	vm->_audio->setSoundVolume(volume);
 
 	return RuntimeValue();
 }
@@ -367,11 +368,12 @@ RuntimeValue Script_IsVoxAvailable(AGSEngine *vm, ScriptObject *, const Common::
 // import void SetSpeechVolume(int volume)
 // Changes the voice speech volume.
 RuntimeValue Script_SetSpeechVolume(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int volume = params[0]._signedValue;
-	UNUSED(volume);
+	uint volume = params[0]._value;
 
-	// FIXME
-	error("SetSpeechVolume unimplemented");
+	if (volume > 255)
+		error("SetSpeechVolume: volume %d is invalid (must be 1-255)", volume);
+
+	vm->_audio->setSpeechVolume(volume);
 
 	return RuntimeValue();
 }
