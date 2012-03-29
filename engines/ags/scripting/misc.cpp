@@ -25,6 +25,7 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/constants.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
 
@@ -133,16 +134,41 @@ RuntimeValue Script_SetMultitaskingMode(AGSEngine *vm, ScriptObject *, const Com
 // Checks whether an event handler is registered to handle clicking at the specified location on the screen.
 RuntimeValue Script_IsInteractionAvailable(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
-	uint32 cursormode = params[2]._value;
-	UNUSED(cursormode);
+	uint32 cursorMode = params[2]._value;
 
-	// FIXME
-	error("IsInteractionAvailable unimplemented");
+	if (cursorMode == MODE_WALK && !vm->getGameOption(OPT_NOWALKMODE))
+		return 1;
 
-	return RuntimeValue();
+	// FIXME: adjust by offset
+
+	uint locId;
+	uint locType = vm->getLocationType(Common::Point(x, y), locId);
+	if (locType == 0) {
+		// click on nothing -> hotspot 0
+		// TODO: why not just pass allowHotspot0 to getLocationType?
+		locId = 0;
+		locType = LOCTYPE_HOTSPOT;
+	}
+
+	switch (locType) {
+	case LOCTYPE_CHAR:
+		// FIXME
+		warning("IsInteractionAvailable unimplemented");
+		break;
+	case LOCTYPE_OBJ:
+		// FIXME
+		warning("IsInteractionAvailable unimplemented");
+		break;
+	case LOCTYPE_HOTSPOT:
+		// FIXME
+		warning("IsInteractionAvailable unimplemented");
+		break;
+	default:
+		error("IsInteractionAvailable: internal error (unknown loctype %d)", locType);
+	}
+
+	return 0;
 }
 
 // import void Wait(int waitLoops)

@@ -25,6 +25,7 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/constants.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
 #include "common/events.h"
@@ -35,14 +36,44 @@ namespace AGS {
 // Performs default processing of a mouse click at the specified co-ordinates.
 RuntimeValue Script_ProcessClick(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
-	uint32 cursormode = params[2]._value;
-	UNUSED(cursormode);
+	uint32 cursorMode = params[2]._value;
 
-	// FIXME
-	error("ProcessClick unimplemented");
+	uint locId;
+	uint locType = vm->getLocationType(Common::Point(x, y), locId);
+	if (locType == 0) {
+		// click on nothing -> hotspot 0
+		// TODO: why not just pass allowHotspot0 to getLocationType?
+		locId = 0;
+		locType = LOCTYPE_HOTSPOT;
+	}
+
+	// FIXME: adjust by offset
+
+	if (cursorMode == MODE_WALK && !vm->getGameOption(OPT_NOWALKMODE)) {
+		// FIXME
+		warning("ProcessClick unimplemented (walk mode)");
+		return RuntimeValue();
+	}
+
+	vm->_state->_usedMode = cursorMode;
+
+	switch (locType) {
+	case LOCTYPE_CHAR:
+		// FIXME
+		warning("ProcessClick unimplemented");
+		break;
+	case LOCTYPE_OBJ:
+		// FIXME
+		warning("ProcessClick unimplemented");
+		break;
+	case LOCTYPE_HOTSPOT:
+		// FIXME
+		warning("ProcessClick unimplemented");
+		break;
+	default:
+		error("IsInteractionAvailable: internal error (unknown loctype %d)", locType);
+	}
 
 	return RuntimeValue();
 }
