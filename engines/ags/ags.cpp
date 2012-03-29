@@ -897,7 +897,7 @@ void AGSEngine::newRoom(uint roomId) {
 		runInteractionScript(&_currentRoom->_interactionScripts, kRoomEventPlayerLeavesScreen);
 
 	// Run the global OnRoomLeave event
-	// TODO: run_on_event(GE_LEAVE_ROOM, _displayedRoom)
+	queueOrRunTextScript(_gameScript, "on_event", GE_LEAVE_ROOM, _displayedRoom);
 
 	// TODO: RunPluginHooks(AGSE_LEAVEROOM, _displayedRoom)
 
@@ -961,19 +961,10 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 			error("processGameEvent: can't do kEventTextScript for script %d", event.data1);
 		}
 
-		if ((int)event.data2 > -1000) {
-			Common::Array<uint32> params;
-			params.push_back(event.data2);
-			if (_runningScripts.size())
-				_runningScripts.back().queueScript("!" + textScriptName, event.data2);
-			else
-				runTextScript(_gameScript, textScriptName, params);
-		} else {
-			if (_runningScripts.size())
-				_runningScripts.back().queueScript(textScriptName);
-			else
-				runTextScript(_gameScript, textScriptName);
-		}
+		if ((int)event.data2 > -1000)
+			queueOrRunTextScript(_gameScript, textScriptName, event.data2);
+		else
+			queueOrRunTextScript(_gameScript, textScriptName);
 
 		break;
 		}
@@ -1002,8 +993,10 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 			debug(7, "running room interaction: event %d", event.data3);
 			_eventBlockBaseName = "room";
 
-			if (event.data3 == kRoomEventEntersScreen)
+			if (event.data3 == kRoomEventEntersScreen) {
 				_inEntersScreenCounter++;
+				queueOrRunTextScript(_gameScript, "on_event", GE_ENTER_ROOM, _displayedRoom);
+			}
 
 			// 2.x vs 3.x
 			if (_currentRoom->_interaction)
@@ -1113,16 +1106,9 @@ bool AGSEngine::runInteractionScript(InteractionScript *scripts, uint eventId, u
 
 	if (_eventBlockBaseName.contains("character") || _eventBlockBaseName.contains("inventory")) {
 		// global script (character or inventory)
-		if (_runningScripts.size())
-			_runningScripts.back().queueScript(scripts->_eventScriptNames[eventId]);
-		else
-			runTextScript(_gameScript, scripts->_eventScriptNames[eventId]);
+		queueOrRunTextScript(_gameScript, scripts->_eventScriptNames[eventId]);
 	} else {
-		// room script
-		if (_runningScripts.size())
-			_runningScripts.back().queueScript("|" + scripts->_eventScriptNames[eventId]);
-		else
-			runTextScript(_roomScript, scripts->_eventScriptNames[eventId]);
+		queueOrRunTextScript(_roomScript, scripts->_eventScriptNames[eventId]);
 	}
 
 	if (roomWas != _state->_roomChanges)
@@ -1237,18 +1223,12 @@ bool AGSEngine::runInteractionCommandList(NewInteractionEvent &event, uint &comm
 			if (_eventBlockBaseName.contains("character") || _eventBlockBaseName.contains("inventory")) {
 				// global script (character or inventory)
 				Common::String name = makeTextScriptName(_eventBlockBaseName, _eventBlockId, commands[i]._args[0]._val);
-				if (_runningScripts.size())
-					_runningScripts.back().queueScript(name);
-				else
-					runTextScript(_gameScript, name);
+				queueOrRunTextScript(_gameScript, name);
 			} else {
 				// room script
 				// FIXME: bounds check?
 				Common::String name = makeTextScriptName(_eventBlockBaseName, _eventBlockId, commands[i]._args[0]._val);
-				if (_runningScripts.size())
-					_runningScripts.back().queueScript("|" + name);
-				else
-					runTextScript(_roomScript, name);
+				queueOrRunTextScript(_roomScript, name);
 			}
 			break;
 		case kActionAddScoreOnce:
@@ -1688,6 +1668,28 @@ ViewFrame *AGSEngine::getViewFrame(uint view, uint loop, uint frame) {
 
 void AGSEngine::checkViewFrame(uint view, uint loop, uint frame) {
 	// FIXME: check sounds for new frames
+}
+
+void AGSEngine::queueOrRunTextScript(ccInstance *instance, const Common::String &name, uint32 p1) {
+	Common::Array<uint32> params;
+	params.push_back(p1);
+	queueOrRunTextScript(instance, name, params);
+}
+
+void AGSEngine::queueOrRunTextScript(ccInstance *instance, const Common::String &name, uint32 p1, uint32 p2) {
+	Common::Array<uint32> params;
+	params.push_back(p1);
+	params.push_back(p2);
+	queueOrRunTextScript(instance, name, params);
+}
+
+void AGSEngine::queueOrRunTextScript(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {
+	assert(instance == _gameScript || instance == _roomScript);
+
+	if (_runningScripts.size())
+		_runningScripts.back().queueScript(name, instance == _gameScript, params);
+	else
+		runTextScript(instance, name, params);
 }
 
 void AGSEngine::runTextScript(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params) {
@@ -2355,7 +2357,7 @@ void AGSEngine::postScriptCleanup() {
 	for (uint i = 0; i < wasRunning._pendingScripts.size(); ++i) {
 		PendingScript &script = wasRunning._pendingScripts[i];
 
-		// FIXME
+		runTextScript(script.isGameScript ? _gameScript : _roomScript, script.name, script.params);
 
 		// if they've changed rooms, cancel any further pending scripts
 		if (oldRoomNumber != _displayedRoom /* FIXME: || _loadNewGame */)
@@ -2374,11 +2376,11 @@ void ExecutingScript::queueAction(PostScriptActionType type, uint data, const Co
 	_pendingActions.push_back(a);
 }
 
-void ExecutingScript::queueScript(const Common::String &name, uint p1, uint p2) {
+void ExecutingScript::queueScript(const Common::String &name, bool isGameScript, const Common::Array<uint32> &params) {
 	PendingScript i;
 	i.name = name;
-	i.p1 = p1;
-	i.p2 = p2;
+	i.isGameScript = isGameScript;
+	i.params = params;
 	_pendingScripts.push_back(i);
 }
 

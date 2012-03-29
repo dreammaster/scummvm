@@ -54,7 +54,8 @@ class ccInstance;
 
 struct PendingScript {
 	Common::String name;
-	uint p1, p2;
+	bool isGameScript;
+	Common::Array<uint32> params;
 };
 
 // actions which can't be run while scripts are running, and so must be queued until the script is done
@@ -82,7 +83,7 @@ public:
 
 	void queueAction(PostScriptActionType type, uint data, const Common::String &name);
 	// run_another
-	void queueScript(const Common::String &name, uint p1 = 0, uint p2 = 0);
+	void queueScript(const Common::String &name, bool isGameScript, const Common::Array<uint32> &params);
 
 	Common::Array<PendingScript> _pendingScripts;
 	Common::Array<PostScriptAction> _pendingActions;
@@ -200,6 +201,10 @@ public:
 	struct ViewLoopNew *getViewLoop(uint view, uint loop);
 	class ViewFrame *getViewFrame(uint view, uint loop, uint frame);
 	void checkViewFrame(uint view, uint loop, uint frame);
+
+	void queueOrRunTextScript(ccInstance *instance, const Common::String &name, uint32 p1);
+	void queueOrRunTextScript(ccInstance *instance, const Common::String &name, uint32 p1, uint32 p2);
+	void queueOrRunTextScript(ccInstance *instance, const Common::String &name, const Common::Array<uint32> &params = Common::Array<uint32>());
 
 	void runTextScript(ccInstance *instance, const Common::String &name,
 		const Common::Array<uint32> &params = Common::Array<uint32>());
