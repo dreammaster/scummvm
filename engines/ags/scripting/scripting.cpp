@@ -25,6 +25,7 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "common/debug.h"
 
 namespace AGS {
 
@@ -37,17 +38,33 @@ void GlobalScriptState::addImport(const Common::String &name, const ScriptImport
 		if (forceReplace) {
 			ScriptImport oldImport = _imports[name];
 			if (oldImport._type == sitSystemObject) {
+				// TODO: Should this ever happen?
 				if (oldImport._object->getRefCount() != 1)
 					error("replacing referenced (%d) import '%s'", oldImport._object->getRefCount(), name.c_str());
 				oldImport._object->DecRef();
 			}
-		}  else {
-			warning("duplicate exported '%s'", name.c_str());
+		} else {
+			// this happens a lot (e.g. 'on_event'/'repeatedly_execute')
+			debug(2, "duplicate exported '%s'", name.c_str());
 			return;
 		}
 	}
 
+	if (import._type == sitSystemObject)
+		import._object->IncRef();
 	_imports[name] = import;
+}
+
+void GlobalScriptState::removeImport(const Common::String &name) {
+	if (!_imports.contains(name)) {
+		warning("tried to remove non-existent import '%s'", name.c_str());
+		return;
+	}
+
+	ScriptImport oldImport = _imports[name];
+	if (oldImport._type == sitSystemObject)
+		oldImport._object->DecRef();
+	_imports.erase(name);
 }
 
 void GlobalScriptState::addSystemFunctionImport(const ScriptSystemFunctionInfo *function) {
@@ -56,16 +73,16 @@ void GlobalScriptState::addSystemFunctionImport(const ScriptSystemFunctionInfo *
 	import._type = sitSystemFunction;
 	import._function = function;
 
-	addImport(function->name, import);
+	addImport(function->name, import, true);
 }
 
-void GlobalScriptState::addSystemObjectImport(const Common::String &name, ScriptObject *object, bool forceReplace) {
+void GlobalScriptState::addSystemObjectImport(const Common::String &name, ScriptObject *object) {
 	ScriptImport import;
 
 	import._type = sitSystemObject;
 	import._object = object;
 
-	addImport(name, import, forceReplace);
+	addImport(name, import, true);
 }
 
 void GlobalScriptState::addSystemFunctionImportList(const ScriptSystemFunctionInfo *list, uint32 count) {

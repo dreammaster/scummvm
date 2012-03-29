@@ -176,6 +176,8 @@ public:
 	void initGame(const AGSGameDescription *gd);
 
 	void pauseGame();
+	void unpauseGame();
+	bool isGamePaused() { return _pauseGameCounter > 0; }
 
 	bool isDemo() const;
 
@@ -277,6 +279,8 @@ private:
 	uint32 _loopCounter;
 	uint32 _framesPerSecond;
 	uint32 _lastFrameTime;
+
+	uint _pauseGameCounter;
 
 	ResourceManager *_resourceMan;
 	SpriteSet *_sprites;

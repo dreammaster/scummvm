@@ -115,6 +115,7 @@ public:
 	void init();
 	void initFrom(Common::SeekableReadStream *stream);
 	void registerScriptObjects();
+	void deregisterScriptObjects();
 
 	AudioClip *getClipByIndex(bool isMusic, uint index);
 

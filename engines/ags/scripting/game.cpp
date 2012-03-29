@@ -691,10 +691,7 @@ RuntimeValue Script_SetRestartPoint(AGSEngine *vm, ScriptObject *, const Common:
 // import int IsGamePaused()
 // Returns whether the game is currently paused.
 RuntimeValue Script_IsGamePaused(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("IsGamePaused unimplemented");
-
-	return RuntimeValue();
+	return vm->isGamePaused() ? 1 : 0;
 }
 
 // import int GetGraphicalVariable (const string variableName)
@@ -901,8 +898,7 @@ RuntimeValue Script_SetSpeechStyle(AGSEngine *vm, ScriptObject *, const Common::
 // import void PauseGame()
 // Pauses the game, which stops all animations and movement.
 RuntimeValue Script_PauseGame(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("PauseGame unimplemented");
+	vm->pauseGame();
 
 	return RuntimeValue();
 }
@@ -910,8 +906,7 @@ RuntimeValue Script_PauseGame(AGSEngine *vm, ScriptObject *, const Common::Array
 // import void UnPauseGame()
 // Resumes the game after it was paused earlier.
 RuntimeValue Script_UnPauseGame(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("UnPauseGame unimplemented");
+	vm->unpauseGame();
 
 	return RuntimeValue();
 }

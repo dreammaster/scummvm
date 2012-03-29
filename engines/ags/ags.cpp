@@ -25,6 +25,7 @@
  */
 
 // Base stuff
+#include "common/debug-channels.h"
 #include "common/error.h"
 #include "common/random.h"
 #include "common/stack.h"
@@ -72,7 +73,7 @@ struct RoomObjectState {
 };
 
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
-	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0),
+	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0), _pauseGameCounter(0),
 	_resourceMan(0), _needsUpdate(true), _guiNeedsUpdate(true), _backgroundNeedsUpdate(false),
 	_poppedInterface((uint)-1),
 	_startingRoom(0xffffffff), _displayedRoom(0xffffffff),
@@ -84,6 +85,8 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_leavesScreenRoomId(-1),
 	_newRoomPos(0), _newRoomX(SCR_NO_VALUE), _newRoomY(SCR_NO_VALUE),
 	_blockingUntil(kUntilNothing), _insideProcessEvent(false) {
+
+	DebugMan.addDebugChannel(kDebugLevelGame, "Game", "AGS runtime debugging");
 
 	_rnd = new Common::RandomSource("ags");
 	_scriptState = new GlobalScriptState();
@@ -113,12 +116,48 @@ AGSEngine::~AGSEngine() {
 		if (i->_value != _currentRoom)
 			delete i->_value;
 
-	delete _scriptState;
-
+	// un-export all the global objects
+	_scriptState->removeImport("character");
+	_scriptState->removeImport("player");
+	_scriptState->removeImport("gui");
+	_scriptState->removeImport("inventory");
+	_scriptState->removeImport("mouse");
+	_scriptState->removeImport("game");
+	_scriptState->removeImport("gs_globals");
+	_scriptState->removeImport("savegameindex");
+	_scriptState->removeImport("system");
+	_scriptState->removeImport("object");
+	_scriptState->removeImport("hotspot");
+	_scriptState->removeImport("region");
+	_scriptState->removeImport("dialog");
+	for (uint i = 0; i < _gameFile->_dialogs.size(); ++i)
+		_scriptState->removeImport(_gameFile->_dialogs[i]._name);
 	for (uint i = 0; i < _characters.size(); ++i) {
-		assert(_characters[i]->getRefCount() == 1);
-		_characters[i]->DecRef();
+		Character *charInfo = _characters[i];
+		if (charInfo->_scriptName.empty())
+			continue;
+		_scriptState->removeImport(charInfo->_scriptName);
 	}
+	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
+		GUIGroup &group = *_gameFile->_guiGroups[i];
+		if (group._name.empty())
+			continue;
+		_scriptState->removeImport(group._name);
+		for (uint j = 0; j < group._controls.size(); ++j) {
+			if (group._controls[j]->_scriptName.empty())
+				continue;
+			_scriptState->removeImport(group._controls[j]->_scriptName);
+		}
+	}
+	for (uint i = 0; i < _gameFile->_invItemInfo.size(); ++i) {
+		InventoryItem &invItem = _gameFile->_invItemInfo[i];
+		if (invItem._scriptName.empty())
+			continue;
+		_scriptState->removeImport(invItem._scriptName);
+	}
+	_audio->deregisterScriptObjects();
+
+	delete _scriptState;
 
 	delete _scriptMouseObject;
 	delete _gameStateGlobalsObject;
@@ -134,6 +173,11 @@ AGSEngine::~AGSEngine() {
 	delete _audio;
 	delete _gameFile;
 	delete _resourceMan;
+
+	for (uint i = 0; i < _characters.size(); ++i) {
+		assert(_characters[i]->getRefCount() == 1);
+		_characters[i]->DecRef();
+	}
 
 	delete _rnd;
 }
@@ -164,6 +208,19 @@ const ADGameFileDescription *AGSEngine::getGameFiles() const {
 
 const char *AGSEngine::getDetectedGameFile() const {
 	return _gameDescription->filename;
+}
+
+void AGSEngine::pauseGame() {
+	_pauseGameCounter++;
+	debugC(kDebugLevelGame, "game paused, pause level now %d", _pauseGameCounter);
+}
+
+void AGSEngine::unpauseGame() {
+	if (_pauseGameCounter == 0)
+		warning("unpauseGame: game isn't paused");
+	else
+		_pauseGameCounter--;
+	debugC(kDebugLevelGame, "game unpaused, pause level now %d", _pauseGameCounter);
 }
 
 Common::Error AGSEngine::run() {
@@ -269,13 +326,12 @@ void AGSEngine::tickGame(bool checkControls) {
 		return;
 	// FIXME: check if inventory action changed room
 
-	/* if (!paused) */
+	if (!isPaused())
 		updateStuff();
 
 	// FIXME: a whole bunch of update stuff
 
 	if (!_state->_fastForward) {
-		// TODO: workaround for Gemini Rue (which doesn't call Release)
 		if (_backgroundNeedsUpdate) {
 			_currentRoom->updateWalkBehinds();
 			_backgroundNeedsUpdate = false;
@@ -400,7 +456,7 @@ void AGSEngine::updateEvents(bool checkControls) {
 			_graphics->setMouseCursor(CURS_ARROW);
 			group->setVisible(true);
 			_poppedInterface = i;
-			// FIXME: pauseGame();
+			pauseGame();
 			break;
 		}
 	}
@@ -440,9 +496,11 @@ void AGSEngine::updateEvents(bool checkControls) {
 	if (_inNewRoomState != kNewRoomStateNone || _newRoomStateWas != kNewRoomStateNone)
 		return;
 	// * if the game is paused
-	// FIXME
+	if (isPaused())
+		return;
 	// * if the GUI is disabled (in wait mode)
-	// FIXME
+	if (_state->_disabledUserInterface)
+		return;
 
 	// work out which edge the player is beyond, if any
 	bool edgesActivated[4] = { false, false, false, false };
@@ -746,14 +804,28 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 void AGSEngine::unloadOldRoom() {
 	assert(_currentRoom);
 
-	// FIXME: discard room if we shouldn't keep it
-	_currentRoom->unload();
-	_currentRoom = NULL;
-
+	// set the global arrays back to invalid empty versions
 	_roomObjectState->_objectObject->setArray(&_roomObjectState->_invalidObjects);
 	_roomObjectState->_hotspotObject->setArray(&_roomObjectState->_invalidHotspots);
 	_roomObjectState->_regionObject->setArray(&_roomObjectState->_invalidRegions);
-	// FIXME: remove old exported objects
+
+	// remove all the exported objects
+	for (uint i = 0; i < _currentRoom->_objects.size(); ++i) {
+		RoomObject *obj = _currentRoom->_objects[i];
+		if (obj->_scriptName.empty())
+			continue;
+		_scriptState->removeImport(obj->_scriptName);
+	}
+	for (uint i = 0; i < _currentRoom->_hotspots.size(); ++i) {
+		RoomHotspot &hotspot = _currentRoom->_hotspots[i];
+		if (hotspot._scriptName.empty())
+			continue;
+		_scriptState->removeImport(hotspot._scriptName);
+	}
+
+	// FIXME: discard room if we shouldn't keep it
+	_currentRoom->unload();
+	_currentRoom = NULL;
 
 	// FIXME: a lot of unimplemented stuff
 	warning("AGSEngine::unloadOldRoom() unimplemented");
@@ -1613,7 +1685,7 @@ void AGSEngine::removePopupInterface(uint guiId) {
 		return;
 
 	_poppedInterface = (uint)-1;
-	// FIXME: unpauseGame();
+	unpauseGame();
 
 	GUIGroup *group = _gameFile->_guiGroups[guiId];
 	group->setVisible(false);

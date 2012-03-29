@@ -577,8 +577,8 @@ void GUIGroup::interfaceOn() {
 	if (_popup != POPUP_MOUSEY)
 		setVisible(true);
 
-	/* FIXME: if (_popup == POPUP_SCRIPT)
-		vm->pauseGame(); */
+	if (_popup == POPUP_SCRIPT)
+		_vm->pauseGame();
 
 	controlPositionsChanged();
 	poll();
@@ -597,8 +597,8 @@ void GUIGroup::interfaceOff() {
 	controlPositionsChanged();
 	if (_popup == POPUP_MOUSEY)
 		setEnabled(false);
-	/* FIXME: else if (_popup == POPUP_SCRIPT)
-		vm->unpauseGame(); */
+	else if (_popup == POPUP_SCRIPT)
+		_vm->unpauseGame();
 }
 
 void GUIGroup::setEnabled(bool enabled) {

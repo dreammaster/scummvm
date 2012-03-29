@@ -284,6 +284,11 @@ void AGSAudio::registerScriptObjects() {
 		_vm->getScriptState()->addSystemObjectImport(_audioClips[i]._scriptName, &_audioClips[i]);
 }
 
+void AGSAudio::deregisterScriptObjects() {
+	for (uint i = 0; i < _audioClips.size(); ++i)
+		_vm->getScriptState()->removeImport(_audioClips[i]._scriptName);
+}
+
 AudioChannel::AudioChannel(AGSEngine *vm, uint id) : _vm(vm), _id(id), _valid(false) {
 }
 
