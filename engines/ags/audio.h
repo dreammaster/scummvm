@@ -82,9 +82,8 @@ public:
 
 	bool isValid() { return _valid; }
 
-	bool playSound(AudioClip *clip);
+	bool playSound(AudioClip *clip, bool repeat = false);
 	void stop(bool resetLegacyMusicSettings = true);
-	void stopAmbientSound();
 	bool isPlaying();
 
 	uint getPriority() { return _priority; }
@@ -107,6 +106,16 @@ protected:
 
 class ResourceManager;
 
+struct AmbientSound {
+	AmbientSound() { _channel = 0; }
+
+	uint _maxDist;
+	uint _channel;
+	uint _soundId;
+	uint _volume;
+	Common::Point _pos;
+};
+
 class AGSAudio {
 public:
 	AGSAudio(class AGSEngine *vm);
@@ -121,12 +130,17 @@ public:
 
 	uint playSound(uint soundId, uint priority = 10);
 	bool playSoundOnChannel(uint soundId, uint channelId);
+	void playAmbientSound(uint channelId, uint soundId, uint volume, const Common::Point &pos);
+	void stopAmbientSound(uint channelId);
 
+	void updateAmbientSoundVolume();
+	void updateDirectionalSoundVolume();
 	void updateMusicVolume();
 
 	Common::Array<AudioClip> _audioClips;
 	Common::Array<AudioClipType> _audioClipTypes;
 	Common::Array<AudioChannel *> _channels;
+	Common::Array<AmbientSound> _ambients;
 
 protected:
 	AGSEngine *_vm;

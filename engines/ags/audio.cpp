@@ -28,6 +28,7 @@
 #include "engines/ags/audio.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/resourceman.h"
+#include "engines/ags/room.h"
 #include "engines/ags/scripting/scripting.h"
 
 #include "common/debug.h"
@@ -41,6 +42,8 @@
 
 #define MAX_SOUND_CHANNELS 8
 #define SPECIAL_CROSSFADE_CHANNEL 8
+
+#define AMBIENCE_FULL_DIST 25
 
 #define SCHAN_SPEECH  0
 #define SCHAN_AMBIENT 1
@@ -58,6 +61,7 @@ AGSAudio::AGSAudio(AGSEngine *vm) : _vm(vm), _musicResources(NULL), _audioResour
 	_channels.resize(MAX_SOUND_CHANNELS + 1);
 	for (uint i = 0; i < _channels.size(); ++i)
 		_channels[i] = new AudioChannel(_vm, i);
+	_ambients.resize(MAX_SOUND_CHANNELS + 1);
 }
 
 AGSAudio::~AGSAudio() {
@@ -176,6 +180,7 @@ void AGSAudio::initFrom(Common::SeekableReadStream *stream) {
 
 AudioClip *AGSAudio::getClipByIndex(bool isMusic, uint index) {
 	// TODO: this is from PSP code, checks using script name..
+	// 'get_audio_clip_for_old_style_number'
 
 	Common::String scriptName;
 	if (isMusic)
@@ -233,7 +238,7 @@ bool AGSAudio::playSoundOnChannel(uint soundId, uint channelId) {
 	AudioChannel *channel = _channels[channelId];
 
 	// if an ambient sound is playing on this channel, abort it
-	channel->stopAmbientSound();
+	stopAmbientSound(channelId);
 
 	if (soundId == (uint)-1) {
 		channel->stop();
@@ -253,6 +258,68 @@ bool AGSAudio::playSoundOnChannel(uint soundId, uint channelId) {
 	// channel->setVolume(_vm->_state->_soundVolume);
 
 	return true;
+}
+
+void AGSAudio::playAmbientSound(uint channelId, uint soundId, uint volume, const Common::Point &pos) {
+	// The use of ambient channels is a bit inconsistent in the original code:
+	// "the channel parameter is to allow multiple ambient sounds in future"
+	// I've tried to make this identical(-ish) for now.
+
+	if (channelId >= _channels.size() - 1)
+		error("playAmbientSound: channel %d is too high (only %d channels)", channelId, _channels.size());
+	if (channelId == SCHAN_SPEECH)
+		error("playAmbientSound: attempt to play ambient sound on speech channel");
+	if (volume < 1 || volume > 255)
+		error("playAmbientSound: volume %d is invalid (must be 1-255)", volume);
+
+	if (_ambients[channelId]._channel == 0 || !_channels[_ambients[channelId]._channel]->isPlaying() ||
+		_ambients[channelId]._soundId != soundId) {
+		// The ambient sound isn't already playing on this ambient channel.
+		AudioChannel *channel = _channels[channelId];
+
+		stopAmbientSound(channelId);
+		channel->stop();
+
+		AudioClip *clip = getClipByIndex(false, soundId);
+		if (!clip) {
+			warning("playAmbientSound: no such sound %d", soundId);
+			return;
+		}
+
+		_ambients[channelId]._channel = channelId;
+		channel->playSound(clip, true);
+		channel->setPriority(15); // ambient sound higher priority than normal sfx
+	}
+
+	if (pos.x > _vm->getCurrentRoom()->_width / 2)
+		_ambients[channelId]._maxDist = pos.x;
+	else
+		_ambients[channelId]._maxDist = _vm->getCurrentRoom()->_width - pos.x;
+	_ambients[channelId]._maxDist -= AMBIENCE_FULL_DIST;
+	_ambients[channelId]._soundId = soundId;
+	_ambients[channelId]._pos = pos;
+	_ambients[channelId]._volume = volume;
+
+	updateAmbientSoundVolume();
+}
+
+void AGSAudio::stopAmbientSound(uint channelId) {
+	if (channelId >= _channels.size() - 1)
+		error("stopAmbientSound: channel %d is too high (only %d channels)", channelId, _channels.size());
+
+	if (_ambients[channelId]._channel == 0)
+		return;
+
+	_channels[channelId]->stop();
+	_ambients[channelId]._channel = 0;
+}
+
+void AGSAudio::updateAmbientSoundVolume() {
+	// FIXME
+}
+
+void AGSAudio::updateDirectionalSoundVolume() {
+	// FIXME
 }
 
 void AGSAudio::updateMusicVolume() {
@@ -292,7 +359,7 @@ void AGSAudio::deregisterScriptObjects() {
 AudioChannel::AudioChannel(AGSEngine *vm, uint id) : _vm(vm), _id(id), _valid(false) {
 }
 
-bool AudioChannel::playSound(AudioClip *clip) {
+bool AudioChannel::playSound(AudioClip *clip, bool repeat) {
 	_clip = clip;
 
 	_stream = NULL;
@@ -326,8 +393,13 @@ bool AudioChannel::playSound(AudioClip *clip) {
 		error("AudioChannel::playSound: invalid clip file type %d", _clip->_fileType);
 	}
 
-	// FIXME
-	_vm->_mixer->playStream(Audio::Mixer::kSFXSoundType, &_handle, _stream, -1, Audio::Mixer::kMaxChannelVolume, 0, DisposeAfterUse::NO);
+	// FIXME: argh
+	if (repeat) {
+		// FIXME: horrible
+		Audio::AudioStream *streamToPlay = new Audio::LoopingAudioStream(_stream, 0, DisposeAfterUse::NO);
+		_vm->_mixer->playStream(Audio::Mixer::kSFXSoundType, &_handle, streamToPlay, -1, Audio::Mixer::kMaxChannelVolume, 0, DisposeAfterUse::YES);
+	} else
+		_vm->_mixer->playStream(Audio::Mixer::kSFXSoundType, &_handle, _stream, -1, Audio::Mixer::kMaxChannelVolume, 0, DisposeAfterUse::NO);
 
 	_valid = true;
 	return true;
@@ -335,7 +407,8 @@ bool AudioChannel::playSound(AudioClip *clip) {
 
 void AudioChannel::stop(bool resetLegacyMusicSettings) {
 	if (_valid) {
-		// FIXME: actually stop
+		_vm->_mixer->stopHandle(_handle);
+		// FIXME: zap stream?
 		_valid = false;
 	}
 
@@ -346,10 +419,6 @@ void AudioChannel::stop(bool resetLegacyMusicSettings) {
 
 	// FIXME: ambient
 	// FIXME: resetLegacyMusicSettings
-}
-
-void AudioChannel::stopAmbientSound() {
-	// FIXME
 }
 
 bool AudioChannel::isPlaying() {

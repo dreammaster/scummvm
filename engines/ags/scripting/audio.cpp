@@ -147,19 +147,13 @@ RuntimeValue Script_PlaySoundEx(AGSEngine *vm, ScriptObject *, const Common::Arr
 // import void PlayAmbientSound (int channel, int sound, int volume, int x, int y)
 // Starts an ambient looping sound playing.
 RuntimeValue Script_PlayAmbientSound(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int channel = params[0]._signedValue;
-	UNUSED(channel);
-	int sound = params[1]._signedValue;
-	UNUSED(sound);
-	int volume = params[2]._signedValue;
-	UNUSED(volume);
+	uint channel = params[0]._value;
+	uint sound = params[1]._value;
+	uint volume = params[2]._value;
 	int x = params[3]._signedValue;
-	UNUSED(x);
 	int y = params[4]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("PlayAmbientSound unimplemented");
+	vm->_audio->playAmbientSound(channel, sound, volume, Common::Point(x, y));
 
 	return RuntimeValue();
 }
@@ -167,11 +161,9 @@ RuntimeValue Script_PlayAmbientSound(AGSEngine *vm, ScriptObject *, const Common
 // import void StopAmbientSound (int channel)
 // Stops an ambient sound from playing.
 RuntimeValue Script_StopAmbientSound(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int channel = params[0]._signedValue;
-	UNUSED(channel);
+	uint channel = params[0]._value;
 
-	// FIXME
-	error("StopAmbientSound unimplemented");
+	vm->_audio->stopAmbientSound(channel);
 
 	return RuntimeValue();
 }

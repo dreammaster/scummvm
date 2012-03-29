@@ -357,6 +357,11 @@ void AGSEngine::tickGame(bool checkControls) {
 	if (_state->_shakeLength)
 		_state->_shakeLength--;
 
+	if (_loopCounter % 5 == 0) {
+		_audio->updateAmbientSoundVolume();
+		_audio->updateDirectionalSoundVolume();
+	}
+
 	// FIXME
 
 	if (_state->_fastForward)
@@ -1932,7 +1937,7 @@ void AGSEngine::stopFastForwarding() {
 	/* FIXME if (_state->_endCutsceneMusic != (uint)-1)
 		newMusic(_state->_endCutsceneMusic); */
 	// FIXME: restore actual volume of sounds
-	// FIXME: updateMusicVolume();
+	_audio->updateMusicVolume();
 }
 
 #define CHOSE_TEXTPARSER -3053
