@@ -34,6 +34,11 @@ RuntimeValue Script_UnimplementedStub(AGSEngine *vm, ScriptObject *self, const C
 }
 
 void GlobalScriptState::addImport(const Common::String &name, const ScriptImport &import, bool forceReplace) {
+	// Original ignores attempts by scripts to import symbols with empty strings,
+	// so there's no point adding any such symbols to the global list.
+	if (name.empty())
+		return;
+
 	if (_imports.contains(name)) {
 		if (forceReplace) {
 			ScriptImport oldImport = _imports[name];
@@ -56,6 +61,9 @@ void GlobalScriptState::addImport(const Common::String &name, const ScriptImport
 }
 
 void GlobalScriptState::removeImport(const Common::String &name) {
+	if (name.empty())
+		return;
+
 	if (!_imports.contains(name)) {
 		warning("tried to remove non-existent import '%s'", name.c_str());
 		return;

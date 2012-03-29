@@ -134,25 +134,17 @@ AGSEngine::~AGSEngine() {
 		_scriptState->removeImport(_gameFile->_dialogs[i]._name);
 	for (uint i = 0; i < _characters.size(); ++i) {
 		Character *charInfo = _characters[i];
-		if (charInfo->_scriptName.empty())
-			continue;
 		_scriptState->removeImport(charInfo->_scriptName);
 	}
 	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
 		GUIGroup &group = *_gameFile->_guiGroups[i];
-		if (group._name.empty())
-			continue;
 		_scriptState->removeImport(group._name);
 		for (uint j = 0; j < group._controls.size(); ++j) {
-			if (group._controls[j]->_scriptName.empty())
-				continue;
 			_scriptState->removeImport(group._controls[j]->_scriptName);
 		}
 	}
 	for (uint i = 0; i < _gameFile->_invItemInfo.size(); ++i) {
 		InventoryItem &invItem = _gameFile->_invItemInfo[i];
-		if (invItem._scriptName.empty())
-			continue;
 		_scriptState->removeImport(invItem._scriptName);
 	}
 	_audio->deregisterScriptObjects();
@@ -772,16 +764,12 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	_roomObjectState->_objectObject->setArray(&_currentRoom->_objects);
 	for (uint i = 0; i < _currentRoom->_objects.size(); ++i) {
 		RoomObject *obj = _currentRoom->_objects[i];
-		if (obj->_scriptName.empty())
-			continue;
 		_scriptState->addSystemObjectImport(obj->_scriptName, obj);
 	}
 
 	_roomObjectState->_hotspotObject->setArray(&_currentRoom->_hotspots);
 	for (uint i = 0; i < _currentRoom->_hotspots.size(); ++i) {
 		RoomHotspot &hotspot = _currentRoom->_hotspots[i];
-		if (hotspot._scriptName.empty())
-			continue;
 		_scriptState->addSystemObjectImport(hotspot._scriptName, &hotspot);
 	}
 
@@ -812,14 +800,10 @@ void AGSEngine::unloadOldRoom() {
 	// remove all the exported objects
 	for (uint i = 0; i < _currentRoom->_objects.size(); ++i) {
 		RoomObject *obj = _currentRoom->_objects[i];
-		if (obj->_scriptName.empty())
-			continue;
 		_scriptState->removeImport(obj->_scriptName);
 	}
 	for (uint i = 0; i < _currentRoom->_hotspots.size(); ++i) {
 		RoomHotspot &hotspot = _currentRoom->_hotspots[i];
-		if (hotspot._scriptName.empty())
-			continue;
 		_scriptState->removeImport(hotspot._scriptName);
 	}
 
@@ -1482,27 +1466,19 @@ bool AGSEngine::init() {
 	_scriptState->addSystemObjectImport("player", _characters[_gameFile->_playerChar]);
 	for (uint i = 0; i < _characters.size(); ++i) {
 		Character *charInfo = _characters[i];
-		if (charInfo->_scriptName.empty())
-			continue;
 		_scriptState->addSystemObjectImport(charInfo->_scriptName, charInfo);
 	}
 	_scriptState->addSystemObjectImport("gui", new ScriptObjectArray<GUIGroup *>(&_gameFile->_guiGroups, 8, "GUI"));
 	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
 		GUIGroup &group = *_gameFile->_guiGroups[i];
-		if (group._name.empty())
-			continue;
 		_scriptState->addSystemObjectImport(group._name, &group);
 		for (uint j = 0; j < group._controls.size(); ++j) {
-			if (group._controls[j]->_scriptName.empty())
-				continue;
 			_scriptState->addSystemObjectImport(group._controls[j]->_scriptName, group._controls[j]);
 		}
 	}
 	_scriptState->addSystemObjectImport("inventory", new ScriptObjectArray<InventoryItem>(&_gameFile->_invItemInfo, 68, "InventoryItem"));
 	for (uint i = 0; i < _gameFile->_invItemInfo.size(); ++i) {
 		InventoryItem &invItem = _gameFile->_invItemInfo[i];
-		if (invItem._scriptName.empty())
-			continue;
 		_scriptState->addSystemObjectImport(invItem._scriptName, &invItem);
 	}
 
