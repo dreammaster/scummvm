@@ -832,12 +832,14 @@ void AGSEngine::checkNewRoom() {
 }
 
 void AGSEngine::scheduleNewRoom(uint roomId) {
+	// FIXME: sanity-check roomId?
+
 	if (_displayedRoom == 0xffffffff) {
 		// called from game_start; change the room where the game will start
 		_playerChar->_room = roomId;
 	}
 
-	debug(1, "Room change requested to room %d", roomId);
+	debugC(kDebugLevelGame, "Room change requested to room %d", roomId);
 
 	endSkippingUntilCharStops();
 	// FIXME
@@ -881,10 +883,9 @@ void AGSEngine::scheduleNewRoom(uint roomId) {
 
 /** Changes the current room number and loads a new room from disk */
 void AGSEngine::newRoom(uint roomId) {
-	warning("AGSEngine::newRoom not implemented");
 	endSkippingUntilCharStops();
 
-	debug(1, "Room change requested to room %d", roomId);
+	debugC(kDebugLevelGame, "Room change now to room %d", roomId);
 
 	// we are currently running Leaves Screen scripts
 	_leavesScreenRoomId = roomId;
@@ -1704,6 +1705,7 @@ void AGSEngine::runTextScript(ccInstance *instance, const Common::String &name, 
 			runScriptFunction(_scriptModules[i], name, params);
 		}
 		break;
+	// FIXME: the rest
 	}
 
 	if (!runScriptFunction(instance, name, params)) {
