@@ -170,6 +170,10 @@ struct GameEvent {
 	uint32 playerId;
 };
 
+#define LOCTYPE_HOTSPOT 1
+#define LOCTYPE_CHAR 2
+#define LOCTYPE_OBJ  3
+
 class AGSEngine : public Engine {
 public:
 	AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc);
@@ -199,6 +203,9 @@ public:
 
 	uint getGUIAt(const Common::Point &pos);
 	void removePopupInterface(uint guiId);
+
+	uint getLocationType(const Common::Point &pos, bool throughGUI = false, bool allowHotspot0 = false);
+	uint getLocationType(const Common::Point &pos, uint &id, bool throughGUI = false, bool allowHotspot0 = false);
 
 	struct ViewLoopNew *getViewLoop(uint view, uint loop);
 	class ViewFrame *getViewFrame(uint view, uint loop, uint frame);

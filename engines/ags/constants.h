@@ -298,6 +298,9 @@ enum AGSRoomVersion {
 #define PLAYMP3FILE_MAX_FILENAME_LEN 50
 #define MAX_AUDIO_TYPES  30
 
+// ViewFrame
+#define VFLG_FLIPSPRITE 1
+
 } // End of namespace AGS
 
 #endif // AGS_CONSTANTS_H

@@ -497,14 +497,13 @@ RuntimeValue Script_Object_Animate(AGSEngine *vm, RoomObject *self, const Common
 // Gets the object that is on the screen at the specified co-ordinates.
 RuntimeValue Script_Object_GetAtScreenXY(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("Object::GetAtScreenXY unimplemented");
+	uint objectId = vm->getCurrentRoom()->getObjectAt(x, y);
+	if (objectId == (uint)-1)
+		return 0;
 
-	return RuntimeValue();
+	return vm->getCurrentRoom()->_objects[objectId];
 }
 
 // Object: import void GetName(string buffer)

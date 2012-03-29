@@ -1681,6 +1681,86 @@ void AGSEngine::removePopupInterface(uint guiId) {
 	// FIXME: reset mouse_on_iface
 }
 
+uint AGSEngine::getLocationType(const Common::Point &pos, bool throughGUI, bool allowHotspot0) {
+	uint id;
+	return getLocationType(pos, id, throughGUI, allowHotspot0);
+}
+
+// allowHotspot0 defines whether Hotspot 0 returns LOCTYPE_HOTSPOT
+// or whether it returns 0
+uint AGSEngine::getLocationType(const Common::Point &pos, uint &id, bool throughGUI, bool allowHotspot0) {
+	// If it's not in ProcessClick, then return 0 when over a GUI
+	if (!throughGUI && getGUIAt(pos) != (uint)-1)
+		return 0;
+
+	// FIXME: adjust by offset
+	Common::Point p = pos;
+
+	if (p.x < 0 || p.y < 0 || p.x >= _currentRoom->_width || p.y >= _currentRoom->_height)
+		return 0;
+
+	// check characters, objects and walkbehinds, work out which is
+	// foremost visible to the player
+
+	// FIXME: characters (use p!)
+	uint charYPos = 0;
+	uint charAt = (uint)-1;
+	// FIXME: hotspots (use p!)
+	uint hotspotAt = 0;
+	// getObjectAt adjusts the parameters itself, so use the unmodified pos.
+	uint objectYPos = 0;
+	uint objAt = _currentRoom->getObjectAt(pos.x, pos.y, objectYPos);
+
+	p.x = multiplyUpCoordinate(p.x);
+	p.y = multiplyUpCoordinate(p.y);
+
+	// Find the walkbehind at this point, since it might obscure the object.
+	assert(_currentRoom->_walkBehindMask.format.bytesPerPixel == 1);
+	byte walkBehindId = *(byte *)_currentRoom->_walkBehindMask.getBasePtr(p.x, p.y);
+
+	uint walkBase = 0;
+	if (walkBehindId > 0 && walkBehindId < _currentRoom->_walkBehinds.size()) {
+		walkBase = _currentRoom->_walkBehinds[walkBehindId]._baseline;
+		// // if it's an Ignore Walkbehinds object, then ignore the walkbehind
+		if (objAt != (uint)-1 && (_currentRoom->_objects[objAt]->_flags & OBJF_NOWALKBEHINDS))
+			walkBase = 0;
+		if (charAt != (uint)-1 && (_characters[charAt]->_flags & CHF_NOWALKBEHINDS))
+			walkBase = 0;
+	}
+
+	// There's always a match for hotspot 0, if nothing else.
+	uint winner = LOCTYPE_HOTSPOT;
+	if (charAt != (uint)-1 && objAt != (uint)-1) {
+		if (walkBase > objectYPos && walkBase > charYPos)
+			winner = LOCTYPE_HOTSPOT;
+		else if (objectYPos > charYPos)
+			winner = LOCTYPE_OBJ;
+		else
+			winner = LOCTYPE_CHAR;
+	} else if (charAt != (uint)-1) {
+		if (walkBase <= charYPos)
+			winner = LOCTYPE_CHAR;
+	} else if (objAt != (uint)-1) {
+		if (walkBase <= objectYPos)
+			winner = LOCTYPE_CHAR;
+	}
+
+	// Hotspot 0 doesn't win if it's not allowed to.
+	if ((winner == LOCTYPE_HOTSPOT) && (!allowHotspot0) && (hotspotAt == 0))
+		winner = 0;
+
+	if (winner == LOCTYPE_HOTSPOT)
+		id = hotspotAt;
+	else if (winner == LOCTYPE_CHAR)
+		id = charAt;
+	else if (winner == LOCTYPE_OBJ)
+		id = objAt;
+	else
+		id = 0;
+
+	return winner;
+}
+
 ViewLoopNew *AGSEngine::getViewLoop(uint view, uint loop) {
 	return &_gameFile->_views[view]._loops[loop];
 }

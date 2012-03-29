@@ -110,6 +110,8 @@ struct RoomObject : public ScriptObject, public Drawable {
 	void update();
 	void stopMoving();
 
+	uint getBaseline() const;
+
 	uint _id;
 
 	// originally from room, immutable
@@ -219,6 +221,8 @@ public:
 	void initWalkBehinds();
 	void updateWalkBehinds();
 
+	uint getObjectAt(int x, int y);
+	uint getObjectAt(int x, int y, uint &id);
 	uint getRegionAt(int x, int y);
 
 protected:

@@ -288,16 +288,17 @@ void RoomObject::stopMoving() {
 	_moving = false;
 }
 
+uint RoomObject::getBaseline() const {
+	return _baseLine ? _baseLine : _pos.y;
+}
+
 Common::Point RoomObject::getDrawPos() {
 	return Common::Point(_vm->multiplyUpCoordinate(_pos.x),
 		_vm->multiplyUpCoordinate(_pos.y) - _vm->getSprites()->getSpriteHeight(_spriteId));
 }
 
 int RoomObject::getDrawOrder() const {
-	uint order = _baseLine;
-	if (!order)
-		order = _pos.y;
-	return order + ((_flags & OBJF_NOWALKBEHINDS) ? _vm->getCurrentRoom()->_height : 0);
+	return getBaseline() + ((_flags & OBJF_NOWALKBEHINDS) ? _vm->getCurrentRoom()->_height : 0);
 }
 
 const Graphics::Surface *RoomObject::getDrawSurface() {
@@ -485,6 +486,47 @@ void Room::updateWalkBehinds() {
 			}
 		}
 	}
+}
+
+uint Room::getObjectAt(int x, int y) {
+	uint objectYPos;
+	return getObjectAt(x, y, objectYPos);
+}
+
+uint Room::getObjectAt(int x, int y, uint &objectYPos) {
+	// TODO: adjust by offset
+
+	uint objectId = (uint)-1;
+	uint bestBaseline = 0;
+
+	for (uint i = 0; i < _objects.size(); ++i) {
+		RoomObject *obj = _objects[i];
+
+		if (!obj->isVisible())
+			continue;
+		if (obj->_flags & OBJF_NOINTERACT)
+			continue;
+
+		bool isFlipped = false;
+		uint width = _vm->divideDownCoordinate(obj->getDrawWidth());
+		uint height = _vm->divideDownCoordinate(obj->getDrawWidth());
+		if (obj->_view != (uint16)-1)
+			isFlipped = _vm->getViewFrame(obj->_view, obj->_loop, obj->_frame)->_flags & VFLG_FLIPSPRITE;
+
+		// FIXME: totally wrong (should be call to isPosInSprite)
+		if (!Common::Rect(obj->_pos.x, obj->_pos.y, obj->_pos.x + width, obj->_pos.y + height).contains(Common::Point(x, y)))
+			continue;
+
+		uint baseline = obj->getBaseline();
+		if (baseline < bestBaseline)
+			continue;
+
+		objectId = i;
+		bestBaseline = baseline;
+	}
+
+	objectYPos = bestBaseline;
+	return objectId;
 }
 
 uint Room::getRegionAt(int x, int y) {
