@@ -140,7 +140,7 @@ protected:
 
 class CursorDrawable : public Drawable {
 public:
-	CursorDrawable(AGSEngine *vm) : _vm(vm), _mouseFrame(0), _mouseDelay(0), _currentCursor(0xffffffff) { }
+	CursorDrawable(AGSEngine *vm) : _vm(vm), _mouseFrame(0), _mouseDelay(0), _currentCursor(0xffffffff), _cursorSprite(NULL) { }
 
 	void setMouseCursor(uint32 cursor) {
 		assert(cursor < _vm->_gameFile->_cursors.size());
@@ -290,13 +290,13 @@ bool AGSGraphics::getScreenSize() {
 		break;
 	case 1:
 	case 2:
-		//_width = 640;
-		//_height = 480;
+		_width = 320;
+		_height = 200;
 		break;
 	case 3:
 	case 4:
-		//_width = 640;
-		//_height = 400;
+		_width = 640;
+		_height = 400;
 		break;
 	case 5:
 		_baseWidth = 400;
@@ -316,6 +316,10 @@ bool AGSGraphics::getScreenSize() {
 	}
 
 	_screenResolutionMultiplier = _width / _baseWidth;
+
+	debug(2, "target resolution: %dx%d real, %dx%d base, multiplier %d %s",
+		_width, _height, _baseWidth, _baseHeight, _screenResolutionMultiplier,
+		_vm->getGameOption(OPT_NATIVECOORDINATES) ? " (native)" : "(scaled)");
 
 	return true;
 }
@@ -434,9 +438,9 @@ Graphics::Font *AGSGraphics::getFont(uint id) {
 void AGSGraphics::initPalette() {
 	for (uint i = 0; i < 256; ++i) {
 		if (_vm->_gameFile->_paletteUses[i] != PAL_BACKGROUND) {
-			_palette[i * 3 + 0] = _vm->_gameFile->_defaultPalette[i * 3 + 0];
-			_palette[i * 3 + 1] = _vm->_gameFile->_defaultPalette[i * 3 + 1];
-			_palette[i * 3 + 2] = _vm->_gameFile->_defaultPalette[i * 3 + 2];
+			_palette[i * 3 + 0] = _vm->_gameFile->_defaultPalette[i * 3 + 0] * 4;
+			_palette[i * 3 + 1] = _vm->_gameFile->_defaultPalette[i * 3 + 1] * 4;
+			_palette[i * 3 + 2] = _vm->_gameFile->_defaultPalette[i * 3 + 2] * 4;
 		}
 	}
 }
@@ -445,13 +449,46 @@ void AGSGraphics::newRoomPalette() {
 	const byte *roomPal = _vm->getCurrentRoom()->_backgroundScenes[0]._palette;
 	for (uint i = 0; i < 256; ++i) {
 		if (_vm->_gameFile->_paletteUses[i] == PAL_BACKGROUND) {
-			_palette[i * 3 + 0] = roomPal[i * 4 + 0];
-			_palette[i * 3 + 1] = roomPal[i * 4 + 0];
-			_palette[i * 3 + 2] = roomPal[i * 4 + 0];
+			_palette[i * 3 + 0] = roomPal[i * 4 + 0] * 4;
+			_palette[i * 3 + 1] = roomPal[i * 4 + 0] * 4;
+			_palette[i * 3 + 2] = roomPal[i * 4 + 0] * 4;
 		} else {
 			// FIXME: patch room palette
 		}
 	}
+}
+
+void AGSGraphics::drawOutlinedString(uint fontId, Graphics::Surface *surface, const Common::String &text, int x, int y, uint width, uint32 color) {
+	const uint32 outlineColor = resolveHardcodedColor(_vm->_state->_speechTextShadow);
+	Graphics::Font *font = _fonts[fontId];
+
+	if (_vm->_gameFile->_fonts[fontId]._outline >= 0) {
+		// TODO: make sure this is sanity-checked
+		Graphics::Font *outlineFont = _fonts[_vm->_gameFile->_fonts[fontId]._outline];
+		outlineFont->drawString(surface, text, x, y, width, outlineColor);
+	} else {
+		uint outlineDist = 1;
+		// FIXME: following should also check it's not ttf
+		if (!_vm->getGameOption(OPT_NOSCALEFNT) && false) {
+			// // if it's a scaled up SCI font, move the outline out more
+			outlineDist = _vm->getFixedPixelSize(1);
+		}
+
+		// move the text over so that it's still within the bounding rect
+		x += outlineDist;
+		y += outlineDist;
+
+		font->drawString(surface, text, x - outlineDist, y, width, outlineColor);
+		font->drawString(surface, text, x + outlineDist, y, width, outlineColor);
+		font->drawString(surface, text, x, y + outlineDist, width, outlineColor);
+		font->drawString(surface, text, x, y - outlineDist, width, outlineColor);
+		font->drawString(surface, text, x - outlineDist, y - outlineDist, width, outlineColor);
+		font->drawString(surface, text, x - outlineDist, y + outlineDist, width, outlineColor);
+		font->drawString(surface, text, x + outlineDist, y - outlineDist, width, outlineColor);
+		font->drawString(surface, text, x + outlineDist, y + outlineDist, width, outlineColor);
+	}
+
+	font->drawString(surface, text, x, y, width, color);
 }
 
 struct DrawableLess {
@@ -593,8 +630,22 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 	} else if (srcSurf->format.bytesPerPixel == 2) {
 		uint16 transColor = (uint16)getTransparentColor();
 
-		if (transparency)
-			transparency = (transparency + 1) / 8;
+		if (!transparency) {
+			// simplified version of the loop below for the transparent==0 (opaque) case
+			for (uint y = 0; y < height - startY; ++y) {
+				uint16 *dest = (uint16 *)destSurf->getBasePtr(pos.x + startX, pos.y + y);
+				const uint16 *src = (uint16 *)srcSurf->getBasePtr(startX, startY + y);
+				for (uint x = startX; x < width; ++x) {
+					uint16 srcData = *src++;
+					if (srcData != transColor)
+						*dest = srcData;
+					dest++;
+				}
+			}
+			return;
+		}
+
+		transparency = (transparency + 1) / 8;
 
 		for (uint y = 0; y < height - startY; ++y) {
 			uint16 *dest = (uint16 *)destSurf->getBasePtr(pos.x + startX, pos.y + y);
@@ -602,16 +653,13 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 			for (uint x = startX; x < width; ++x) {
 				uint16 srcData = *src++;
 				if (srcData != transColor) {
-					if (transparency != 0) {
-						uint16 destData = *dest;
+					uint16 destData = *dest;
 
-						uint32 blendDest = (destData | (destData << 16)) & 0x7E0F81F;
-						uint32 blendSrc = (srcData | (srcData << 16)) & 0x7E0F81F;
-						uint32 blended = (blendSrc - blendDest) * transparency / 32 + blendDest;
-						blended &= 0x7E0F81F;
-						*dest = (blended & 0xFFFF) | (blended >> 16);
-					} else
-						*dest = srcData;
+					uint32 blendDest = (destData | (destData << 16)) & 0x7E0F81F;
+					uint32 blendSrc = (srcData | (srcData << 16)) & 0x7E0F81F;
+					uint32 blended = (blendSrc - blendDest) * transparency / 32 + blendDest;
+					blended &= 0x7E0F81F;
+					*dest = (blended & 0xFFFF) | (blended >> 16);
 				}
 				dest++;
 			}

@@ -89,8 +89,15 @@ Graphics::Surface *DrawingSurface::startDrawing() {
 void DrawingSurface::finishedDrawing(bool readOnly) {
 	// TODO
 
-	if (!readOnly)
-		_modified = true;
+	if (readOnly)
+		return;
+
+	_modified = true;
+
+	// TODO: mark as workaround for Gemini Rue
+	if (_type == dstRoomBackground)
+		if (_id == _vm->_state->_bgFrame)
+			_vm->invalidateBackground();
 }
 
 } // End of namespace AGS

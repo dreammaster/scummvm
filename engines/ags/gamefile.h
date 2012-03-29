@@ -168,7 +168,7 @@ struct CustomPropertySchemaProperty {
 
 struct AGSFont {
 	byte _flags;
-	byte _outline;
+	signed char _outline;
 };
 
 class AGSEngine;
