@@ -46,10 +46,18 @@ public:
 	bool writeUint32(uint offset, uint value);
 
 	void followCharacter(Character *chr, int distance, uint eagerness);
+	void stopMoving();
+
+	void findReasonableLoop();
+
 	void lockView(uint viewId);
 	void lockViewOffset(uint viewId, int xOffs, int yOffs);
+	void unlockView();
 
-	uint32 _defView, _talkView, _view;
+	void setIdleView(int view, uint time);
+
+	int32 _defView, _talkView, _view;
+
 	uint32 _room, _prevRoom;
 
 	int32 _x, _y;
@@ -60,8 +68,9 @@ public:
 	int16 _following;
 	uint16 _followInfo;
 
-	uint32 _idleView; // the loop will be randomly picked
-	uint16 _idleTime, _idleLeft; // num seconds idle before playing anim
+	int32 _idleView; // the loop will be randomly picked
+	uint16 _idleTime; // num seconds idle before playing anim
+	int32 _idleLeft; // num seconds left, or -2 for playing idle anim
 
 	uint16 _transparency; // if character is transparent
 	uint16 _baseLine;
@@ -106,6 +115,16 @@ public:
 	byte _on;
 
 	Common::StringMap _properties;
+
+	// CharacterExtras
+	Common::Array<uint16> _invOrder;
+	uint16 _width, _height;
+	uint16 _zoom;
+	uint16 _xWas, _yWas;
+	uint16 _tintR, _tintG, _tintB, _tintLevel, _tintLight;
+	bool _processIdleThisTime;
+	byte _slowMoveCounter;
+	uint16 _animWait;
 
 protected:
 	AGSEngine *_vm;

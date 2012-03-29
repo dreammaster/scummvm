@@ -646,9 +646,9 @@ void GameFile::readOldViews(Common::SeekableReadStream *dta) {
 Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 	Character *chr = new Character(_vm);
 
-	chr->_defView = dta->readUint32LE();
-	chr->_talkView = dta->readUint32LE();
-	chr->_view = dta->readUint32LE();
+	chr->_defView = dta->readSint32LE();
+	chr->_talkView = dta->readSint32LE();
+	chr->_view = dta->readSint32LE();
 	chr->_room = dta->readUint32LE();
 	/*chr->_prevRoom = */ dta->readUint32LE();
 	chr->_x = dta->readUint32LE();
@@ -657,7 +657,7 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 	chr->_flags = dta->readUint32LE();
 	chr->_following = dta->readSint16LE();
 	chr->_followInfo = dta->readUint16LE();
-	chr->_idleView = dta->readUint32LE();
+	chr->_idleView = dta->readSint32LE();
 	chr->_idleTime = dta->readUint16LE();
 	chr->_idleLeft = dta->readUint16LE();
 	chr->_transparency = dta->readUint16LE();
