@@ -36,8 +36,8 @@
 
 namespace AGS {
 
-bool GUIControl::isOverControl(const Common::Point &pos, uint extra) {
-	Common::Rect r(_x, _y, _x + _width + extra, _y + _height + extra);
+bool GUIControl::isOverControl(const Common::Point &pos) {
+	Common::Rect r(_x, _y, _x + _width, _y + _height);
 	return r.contains(pos);
 }
 
@@ -103,6 +103,15 @@ void GUISlider::readFrom(Common::SeekableReadStream *dta) {
 		_handleOffset = dta->readUint32LE();
 		_bgImage = dta->readUint32LE();
 	}
+}
+
+bool GUISlider::isOverControl(const Common::Point &pos) {
+	// check the overall boundary
+	if (GUIControl::isOverControl(pos))
+		return true;
+
+	// FIXME: check the handle too
+	return false;
 }
 
 void GUISlider::setMin(int32 value) {
@@ -565,6 +574,24 @@ bool GUIGroup::isMouseOver(const Common::Point &pos) {
 		return false;
 
 	return (pos.x >= _x && pos.y >= _y && pos.x <= _x + (int)_width && pos.y <= _y + (int)_height);
+}
+
+GUIControl *GUIGroup::getControlAt(const Common::Point &pos, bool mustBeClickable) {
+	for (uint i = 0; i < _controls.size(); ++i) {
+		uint16 controlId = _controlDrawOrder[i];
+		GUIControl *control = _controls[controlId];
+
+		if (!control->isVisible())
+			continue;
+
+		if (mustBeClickable && !control->isClickable())
+			continue;
+
+		if (control->isOverControl(pos))
+			return control;
+	}
+
+	return NULL;
 }
 
 void GUIGroup::interfaceOn() {

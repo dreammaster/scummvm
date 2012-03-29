@@ -1637,6 +1637,23 @@ void AGSEngine::setCursorMode(uint32 newMode) {
 	debug(1, "cursor mode set to %d", newMode);
 }
 
+uint AGSEngine::getGUIAt(const Common::Point &pos) {
+	Common::Point p(multiplyUpCoordinate(pos.x), multiplyUpCoordinate(pos.y));
+
+	for (int i = _gameFile->_guiGroups.size() - 1; i >= 0; --i) {
+		// FIXME: use draw order
+		GUIGroup *group = _gameFile->_guiGroups[i];
+		if (!group->_visible)
+			continue;
+		if (group->_flags & GUIF_NOCLICK)
+			continue;
+		if (p.x >= group->_x && p.y >= group->_y && p.x <= group->_x + (int)group->_width && p.y > group->_y + (int)group->_height)
+			return (uint)i;
+	}
+
+	return (uint)-1;
+}
+
 void AGSEngine::removePopupInterface(uint guiId) {
 	if (_poppedInterface != guiId)
 		return;

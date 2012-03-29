@@ -129,7 +129,7 @@ public:
 	virtual void onKeyPress(uint id) { }
 	virtual void draw(Graphics::Surface *surface) = 0;
 
-	virtual bool isOverControl(const Common::Point &pos, uint extra);
+	virtual bool isOverControl(const Common::Point &pos);
 
 	virtual void resize(uint32 width, uint32 height);
 
@@ -159,6 +159,8 @@ public:
 	void readFrom(Common::SeekableReadStream *dta);
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUISlider); }
 	const char *getObjectTypeName() { return "GUISlider"; }
+
+	virtual bool isOverControl(const Common::Point &pos);
 
 	int32 getMin() { return _min; }
 	void setMin(int32 value);
@@ -196,8 +198,11 @@ public:
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUILabel); }
 	const char *getObjectTypeName() { return "GUILabel"; }
 
+	uint32 getFont() { return _font; }
 	void setFont(uint32 font);
+	uint32 getColor() { return _textColor; }
 	void setColor(uint32 color);
+	uint32 getAlign() { return _align; }
 	void setAlign(uint32 align);
 	const Common::String &getText() const { return _text; }
 	void setText(Common::String text);
@@ -339,6 +344,7 @@ public:
 	void poll();
 
 	bool isMouseOver(const Common::Point &pos);
+	GUIControl *getControlAt(const Common::Point &pos, bool mustBeClickable = true);
 
 	void interfaceOn();
 	void interfaceOff();
