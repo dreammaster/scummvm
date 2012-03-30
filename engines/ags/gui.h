@@ -309,6 +309,11 @@ public:
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIButton); }
 	const char *getObjectTypeName() { return "GUIButton"; }
 
+	void onMouseEnter();
+	void onMouseLeave();
+	bool onMouseDown();
+	void onMouseUp();
+
 	uint32 getDisplayedGraphic();
 
 	uint32 getNormalGraphic() { return _pic; }

@@ -432,6 +432,39 @@ void GUIButton::readFrom(Common::SeekableReadStream *dta) {
 	}
 }
 
+void GUIButton::onMouseEnter() {
+	if (_isPushed)
+		_usePic = _pushedPic;
+	else
+		_usePic = _overPic;
+
+	_isOver = true;
+}
+
+void GUIButton::onMouseLeave() {
+	_usePic = _pic;
+	_isOver = false;
+}
+
+bool GUIButton::onMouseDown() {
+	if (_pushedPic > 0)
+		_usePic = _pushedPic;
+
+	_isPushed = true;
+	return false;
+}
+
+void GUIButton::onMouseUp() {
+	if (_isOver) {
+		_usePic = _overPic;
+		if (!isDisabled() && isClickable())
+			_activated = true;
+	} else
+		_usePic = _pic;
+
+	_isPushed = false;
+}
+
 uint32 GUIButton::getDisplayedGraphic() {
 	if ((int)_usePic < 0)
 		return _pic;
