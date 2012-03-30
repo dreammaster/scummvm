@@ -1516,7 +1516,7 @@ void AGSEngine::adjustSizesForResolution() {
 			group->_width = _graphics->_baseWidth;
 
 		for (uint j = 0; j < group->_controls.size(); ++j)
-			group->_controls[j]->_activated = 0;
+			group->_controls[j]->_activated = false;
 	}
 
 	if (getGameFileVersion() >= kAGSVer300) {

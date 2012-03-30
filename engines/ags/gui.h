@@ -103,7 +103,7 @@ class AGSEngine;
 
 class GUIControl : public ScriptObject {
 public:
-	GUIControl(AGSEngine *vm) : _vm(vm) { }
+	GUIControl(AGSEngine *vm) : _vm(vm), _parent(NULL) { }
 	virtual ~GUIControl() { }
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl); }
 
@@ -114,7 +114,7 @@ public:
 	uint32 _x, _y;
 	uint32 _width, _height;
 	uint32 _zorder;
-	uint32 _activated;
+	bool _activated;
 
 	Common::String _scriptName;
 	Common::Array<Common::String> _eventHandlers;
@@ -143,14 +143,12 @@ public:
 	bool isClickable() { return !(_flags & GUIF_NOCLICKS); }
 	void setClickable(bool value);
 
+	virtual uint32 getMaxNumEvents() const = 0;
+
 protected:
 	virtual void readFrom(Common::SeekableReadStream *dta);
-	virtual uint32 getMaxNumEvents() = 0;
 
 	AGSEngine *_vm;
-
-	Common::Array<Common::String> _supportedEvents;
-	Common::Array<Common::String> _supportedEventArgs;
 };
 
 class GUISlider : public GUIControl {
@@ -183,7 +181,7 @@ public:
 	void draw(Graphics::Surface *surface);
 
 protected:
-	uint32 getMaxNumEvents() { return 1; }
+	uint32 getMaxNumEvents() const { return 1; }
 
 	// The following variables are not persisted on disk
 	// Cached (x1, x2, y1, y2) co-ordinates of slider handle
@@ -210,7 +208,7 @@ public:
 	void draw(Graphics::Surface *surface);
 
 protected:
-	uint32 getMaxNumEvents() { return 0; }
+	uint32 getMaxNumEvents() const { return 0; }
 
 	uint32 _font;
 	uint32 _textColor;
@@ -239,7 +237,7 @@ public:
 	void draw(Graphics::Surface *surface);
 
 protected:
-	uint32 getMaxNumEvents() { return 1; }
+	uint32 getMaxNumEvents() const { return 1; }
 };
 
 class GUIListBox : public GUIControl {
@@ -274,7 +272,7 @@ public:
 	void draw(Graphics::Surface *surface);
 
 protected:
-	uint32 getMaxNumEvents() { return 1; }
+	uint32 getMaxNumEvents() const { return 1; }
 };
 
 class GUIInvControl : public GUIControl {
@@ -298,7 +296,7 @@ public:
 	void draw(Graphics::Surface *surface);
 
 protected:
-	uint32 getMaxNumEvents() { return 1; }
+	uint32 getMaxNumEvents() const { return 1; }
 };
 
 class GUIButton : public GUIControl {
@@ -345,13 +343,18 @@ protected:
 	void stopAnimation();
 	void draw(Graphics::Surface *surface);
 
-	uint32 getMaxNumEvents() { return 1; }
+	uint32 getMaxNumEvents() const { return 1; }
 };
 
 class GUIGroup : public ScriptObject, public Drawable {
 public:
 	GUIGroup(AGSEngine *vm);
 	~GUIGroup();
+
+	// note: these get GLOBAL positions
+	void onMouseMove(const Common::Point &pos);
+	void onMouseUp(const Common::Point &pos);
+	void onMouseDown(const Common::Point &pos);
 
 	void setEnabled(bool enabled);
 	void setVisible(bool visible);
@@ -364,7 +367,6 @@ public:
 
 	void invalidate();
 	void controlPositionsChanged();
-	void poll();
 
 	bool isMouseOver(const Common::Point &pos);
 	GUIControl *getControlAt(const Common::Point &pos, bool mustBeClickable = true);
@@ -393,9 +395,8 @@ public:
 
 	uint32 _bgColor, _bgPic, _fgColor;
 
-	uint32 _mouseOver;
-	int32 _mouseWasX, _mouseWasY;
-	uint32 _mouseDownOn;
+	int32 _mouseOver;
+	int32 _mouseDownOn;
 
 	uint32 _highlightObj;
 	uint32 _flags;

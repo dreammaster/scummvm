@@ -32,6 +32,7 @@
 #include "engines/ags/sprites.h"
 #include "engines/ags/util.h"
 
+#include "common/events.h"
 #include "graphics/font.h"
 
 namespace AGS {
@@ -91,7 +92,7 @@ void GUIControl::readFrom(Common::SeekableReadStream *dta) {
 	_width = dta->readUint32LE();
 	_height = dta->readUint32LE();
 	_zorder = dta->readUint32LE();
-	_activated = dta->readUint32LE();
+	_activated = (bool)dta->readUint32LE();
 
 	if (_vm->getGUIVersion() >= 106) {
 		_scriptName = readString(dta);
@@ -672,12 +673,75 @@ void GUIGroup::invalidate() {
 
 void GUIGroup::controlPositionsChanged() {
 	// force it to re-check for which control is under the mouse
-	_mouseWasX = -1;
-	_mouseWasY = -1;
+	Common::Point mousePos = _vm->_system->getEventManager()->getMousePos();
+	onMouseMove(mousePos);
 }
 
-void GUIGroup::poll() {
-	// FIXME
+void GUIGroup::onMouseMove(const Common::Point &pos) {
+	Common::Point p = pos;
+	p.x -= _x;
+	p.y -= _y;
+
+	if (_mouseOver == MOVER_MOUSEDOWNLOCKED) {
+		// A control has grabbed the input.
+		_controls[_mouseDownOn]->onMouseMove(p);
+		return;
+	}
+
+	GUIControl *control = getControlAt(p);
+
+	if (!control || control->_id != (uint)_mouseOver) {
+		// The mouse is now over a different control.
+		if (_mouseOver >= 0)
+			_controls[_mouseOver]->onMouseLeave();
+
+		if (!control || control->isDisabled() || !control->isClickable()) {
+			// either no control, or the control is disabled or not clickable - ignore it
+			_mouseOver = -1;
+			return;
+		}
+
+		_mouseOver = control->_id;
+		control->onMouseEnter();
+		control->onMouseMove(p);
+	} else if (_mouseOver >= 0) {
+		// The mouse is still over the same control.
+		control->onMouseMove(p);
+	}
+}
+
+void GUIGroup::onMouseDown(const Common::Point &pos) {
+	if (_mouseOver < 0)
+		return;
+
+	GUIControl *control = _controls[_mouseOver];
+
+	if (control->isDisabled() || !control->isVisible() || !control->isClickable())
+		return;
+
+	_mouseDownOn = _mouseOver;
+	if (control->onMouseDown())
+		_mouseOver = MOVER_MOUSEDOWNLOCKED;
+
+	control->onMouseMove(pos - Common::Point(_x, _y));
+	invalidate();
+}
+
+void GUIGroup::onMouseUp(const Common::Point &pos) {
+	if (_mouseOver == MOVER_MOUSEDOWNLOCKED) {
+		// focus was locked - reset it back to normal, but on the
+		// locked object so that a MouseLeave gets fired if necessary
+		_mouseOver = _mouseDownOn;
+		// force update
+		controlPositionsChanged();
+	}
+
+	if (_mouseDownOn < 0)
+		return;
+
+	_controls[_mouseDownOn]->onMouseUp();
+	_mouseDownOn = -1;
+	invalidate();
 }
 
 bool GUIGroup::isMouseOver(const Common::Point &pos) {
@@ -727,7 +791,8 @@ void GUIGroup::interfaceOn() {
 		_vm->pauseGame();
 
 	controlPositionsChanged();
-	poll();
+	Common::Point mousePos = _vm->_system->getEventManager()->getMousePos();
+	onMouseMove(mousePos);
 }
 
 void GUIGroup::interfaceOff() {
@@ -738,7 +803,11 @@ void GUIGroup::interfaceOff() {
 
 	setVisible(false);
 
-	// FIXME: update _mouseOver
+	if (_mouseOver >= 0) {
+		// Make sure that the overpic is turned off when the GUI goes off
+		_controls[_mouseOver]->onMouseLeave();
+		_mouseOver = -1;
+	}
 
 	controlPositionsChanged();
 	if (_popup == POPUP_MOUSEY)
