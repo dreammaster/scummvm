@@ -307,6 +307,8 @@ private:
 	bool _backgroundNeedsUpdate;
 	uint32 _cursorMode;
 	uint _poppedInterface;
+	// wasongui, mouse_on_iface
+	uint _clickWasOnGUI, _mouseOnGUI;
 
 	uint32 _startingRoom;
 	uint32 _displayedRoom;

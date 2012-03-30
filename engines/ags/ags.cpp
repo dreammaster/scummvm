@@ -75,7 +75,7 @@ struct RoomObjectState {
 AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0), _pauseGameCounter(0),
 	_resourceMan(0), _needsUpdate(true), _guiNeedsUpdate(true), _backgroundNeedsUpdate(false),
-	_poppedInterface((uint)-1),
+	_poppedInterface((uint)-1), _clickWasOnGUI(0), _mouseOnGUI((uint)-1),
 	_startingRoom(0xffffffff), _displayedRoom(0xffffffff),
 	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL), _roomScriptFork(NULL),
 	_scriptMouseObject(NULL), _gameStateGlobalsObject(NULL), _saveGameIndexObject(NULL), _scriptSystemObject(NULL),
@@ -309,7 +309,7 @@ void AGSEngine::tickGame(bool checkControls) {
 		}
 	}
 
-	// FIXME: mouse_on_iface=-1;
+	_mouseOnGUI = (uint)-1;
 	// FIXME: checkDebugKeys();
 
 	// FIXME: check if _inNewRoomState is 0
@@ -381,11 +381,16 @@ void AGSEngine::updateEvents(bool checkControls) {
 	uint numEventsWas = _queuedGameEvents.size();
 
 	uint buttonClicked = 0;
+	bool mouseUp = 0;
+	bool mouseMoved = false;
 
 	while (_eventMan->pollEvent(event)) {
 		// FIXME: if !checkControls, put these in a queue
 
 		switch (event.type) {
+		case Common::EVENT_MOUSEMOVE:
+			mouseMoved = true;
+			break;
 		case Common::EVENT_LBUTTONDOWN:
 			// TODO
 			buttonClicked = kMouseLeft;
@@ -400,8 +405,9 @@ void AGSEngine::updateEvents(bool checkControls) {
 			break;
 
 		case Common::EVENT_LBUTTONUP:
-			// TODO
+			mouseUp = kMouseLeft;
 			break;
+		// FIXME: the others
 
 		// run mouse wheel scripts
 		case Common::EVENT_WHEELDOWN:
@@ -423,8 +429,20 @@ void AGSEngine::updateEvents(bool checkControls) {
 	int activeGUI = -1;
 
 	Common::Point mousePos = _system->getEventManager()->getMousePos();
+	bool guisTurnedOffAsDisabled = (getGameOption(OPT_DISABLEOFF) == 3 /* FIXME: && _allButtonsDisabled */);
 
-	if (getGameOption(OPT_DISABLEOFF) != 3 /* FIXME: || !_allButtonsDisabled */) {
+	if (mouseMoved && !_state->_disabledUserInterface) {
+		// Notify all the GUIs, so they can do hover effects etc.
+		// (this was originally a poll() in the drawing code)
+		for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
+			GUIGroup *group = _gameFile->_guiGroups[i];
+			if (guisTurnedOffAsDisabled && group->_popup != POPUP_NOAUTOREM)
+				continue;
+			group->onMouseMove(mousePos);
+		}
+	}
+
+	if (!guisTurnedOffAsDisabled) {
 		for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
 			// FIXME: use draw order instead!
 			GUIGroup *group = _gameFile->_guiGroups[i];
@@ -465,7 +483,40 @@ void AGSEngine::updateEvents(bool checkControls) {
 			removePopupInterface(_poppedInterface);
 	}
 
-	// FIXME: check for mouse clicks on GUIs
+	// FIXME: check for mouse drags on GUIs
+
+	// FIXME: keep track of which button, only allow up when it matches last down, don't allow down if already down
+	if (mouseUp) {
+		GUIGroup *group = _gameFile->_guiGroups[_clickWasOnGUI];
+		group->onMouseUp(mousePos);
+
+		for (uint i = 0; i < group->_controls.size(); ++i) {
+			GUIControl *control = group->_controls[i];
+
+			if (!control->_activated)
+				continue;
+			control->_activated = false;
+
+			if (_state->_disabledUserInterface)
+				break;
+
+			if (control->isOfType(sotGUIButton) || control->isOfType(sotGUISlider)
+				|| control->isOfType(sotGUIListBox)) {
+				// call processInterfaceClick via a game event
+				queueGameEvent(kEventInterfaceClick, _clickWasOnGUI, i, mouseUp);
+			} else if (control->isOfType(sotGUIInvWindow)) {
+				// FIXME
+			} else
+				error("clicked on unknown control type");
+
+			if (group->_popup == POPUP_MOUSEY)
+				removePopupInterface(_clickWasOnGUI);
+
+			break;
+		}
+
+		queueOrRunTextScript(_gameScript, "on_event", GE_GUI_MOUSEUP, _clickWasOnGUI);
+	}
 
 	if (buttonClicked) {
 		if (_state->_inCutscene == kSkipMouseClick || _state->_inCutscene == kSkipAnyKeyOrMouseClick)
@@ -476,8 +527,14 @@ void AGSEngine::updateEvents(bool checkControls) {
 		} else if (_state->_waitCounter > 0 && _state->_keySkipWait > 1) {
 			// skip wait
 			_state->_waitCounter = -1;
-		} else {
-			// FIXME: the rest
+		// FIXME: text overlay
+		} else if (!_state->_disabledUserInterface && activeGUI != -1) {
+			debugC(kDebugLevelGame, "mouse down over GUI %d", activeGUI);
+			// FIXME: not as it is in original
+			_gameFile->_guiGroups[activeGUI]->onMouseDown(mousePos);
+			queueOrRunTextScript(_gameScript, "on_event", GE_GUI_MOUSEDOWN, activeGUI);
+			_clickWasOnGUI = activeGUI;
+		} else if (!_state->_disabledUserInterface) {
 			queueGameEvent(kEventTextScript, kTextScriptOnMouseClick, buttonClicked);
 		}
 	}
@@ -1739,7 +1796,9 @@ void AGSEngine::removePopupInterface(uint guiId) {
 	} else
 		setDefaultCursor();
 
-	// FIXME: reset mouse_on_iface
+	if (guiId == _mouseOnGUI)
+		_mouseOnGUI = (uint)-1;
+	invalidateGUI();
 }
 
 uint AGSEngine::getLocationType(const Common::Point &pos, bool throughGUI, bool allowHotspot0) {
