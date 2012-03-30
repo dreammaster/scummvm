@@ -527,6 +527,61 @@ void AGSEngine::updateEvents(bool checkControls) {
 			queueGameEvent(kEventRunEventBlock, kEventBlockRoom, 0, i);
 }
 
+void AGSEngine::processInterfaceClick(uint guiId, uint controlId, uint mouseButtonId) {
+	Common::Array<RuntimeValue> params;
+
+	GUIGroup *group = _gameFile->_guiGroups[guiId];
+
+	if (controlId == (uint)-1) {
+		// click on GUI background
+		params.push_back(group);
+		params.push_back(mouseButtonId);
+		runTextScript(_gameScript, group->_clickEventHandler);
+		return;
+	}
+
+	uint reactionType = 0, reactionData = 0;
+
+	GUIControl *control = group->_controls[controlId];
+	if (control->isOfType(sotGUIButton)) {
+		GUIButton *button = (GUIButton *)control;
+		reactionType = button->_leftClick;
+		reactionData = button->_leftClickData;
+	} else if (control->isOfType(sotGUISlider) || control->isOfType(sotGUITextBox)
+		|| control->isOfType(sotGUIListBox)) {
+		reactionType = IBACT_SCRIPT;
+	} else
+		error("processInterfaceClick on unknown control type");
+
+	switch (reactionType) {
+	case IBACT_SETMODE:
+		setCursorMode(reactionData);
+		break;
+	case IBACT_SCRIPT:
+		if (control->getMaxNumEvents() && !control->_eventHandlers.empty()) {
+			const Common::String &handler = control->_eventHandlers[0];
+			if (!handler.empty() && _gameScript->exportsSymbol(handler)) {
+				params.push_back(control);
+				if (control->isOfType(sotGUIButton)) {
+					// The original engine does something terribly overcomplicated here,
+					// trying to see if there's a ',' in the hard-coded parameter list
+					// for the event. We don't, since we know that only Button expects
+					// a second parameter (for the Click handler).
+					params.push_back(mouseButtonId);
+				}
+				runTextScript(_gameScript, handler, params);
+				break;
+			}
+		}
+
+		params.push_back(guiId);
+		params.push_back(controlId);
+		runTextScript(_gameScript, "interface_click", params);
+	default:
+		break;
+	}
+}
+
 void AGSEngine::updateStuff() {
 	// This updates the game state when *unpaused*.
 	// (GUI updates are handled elsewhere, since they also run when paused.)
@@ -1050,7 +1105,7 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 		// FIXME
 		break;
 	case kEventInterfaceClick:
-		error("processGameEvent: can't do kEventInterfaceClick yet"); // FIXME
+		processInterfaceClick(event.data1, event.data2, event.data3);
 		break;
 	case kEventNewRoom:
 		error("processGameEvent: can't do kEventNewRoom yet"); // FIXME
