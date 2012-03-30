@@ -241,7 +241,7 @@ bool ccInstance::exportsSymbol(const Common::String &name) {
 	return false;
 }
 
-void ccInstance::call(const Common::String &name, const Common::Array<uint32> &params) {
+void ccInstance::call(const Common::String &name, const Common::Array<RuntimeValue> &params) {
 	if (params.size() >= 20)
 		error("too many arguments %d to function '%s'", params.size(), name.c_str());
 
@@ -274,8 +274,8 @@ void ccInstance::call(const Common::String &name, const Common::Array<uint32> &p
 	}
 
 	debugN(2, "running function: '%s'@%d", name.c_str(), codeLoc);
-	for (uint i = 0; i < params.size(); i++)
-		debugN(2, " %d", params[i]);
+	//for (uint i = 0; i < params.size(); i++)
+	//	debugN(2, " %d", params[i]);
 	debug(2, " ");
 
 	// vm setup
