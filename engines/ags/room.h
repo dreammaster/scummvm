@@ -97,7 +97,9 @@ struct RoomRegion : public ScriptObject {
 #define OBJF_DELETED        0x40  // object has been deleted
 
 struct RoomObject : public ScriptObject, public Drawable {
-	RoomObject(AGSEngine *vm, uint id) : _vm(vm), _interaction(NULL), _flags(0), _id(id), _cycling(0), _transparency(0) { }
+	RoomObject(AGSEngine *vm, uint id) : _vm(vm), _interaction(NULL), _flags(0), _id(id),
+		_view(-1), _loop(0), _frame(0), _wait(0), _cycling(0), _transparency(0), _moving((uint16)-1),
+		_blockingWidth(0), _blockingHeight(0), _baseLine((uint)-1) { }
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotRoomObject); }
 	const char *getObjectTypeName() { return "RoomObject"; }
 
