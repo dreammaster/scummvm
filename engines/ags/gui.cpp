@@ -42,8 +42,15 @@ bool GUIControl::isOverControl(const Common::Point &pos) {
 }
 
 void GUIControl::resize(uint32 width, uint32 height) {
+	if (width == _width && height == _height)
+		return;
+
 	_width = width;
 	_height = height;
+	_parent->controlPositionsChanged();
+	_parent->invalidate();
+
+	resized();
 }
 
 bool GUIControl::isDisabled() {
@@ -53,6 +60,21 @@ bool GUIControl::isDisabled() {
 	// FIXME: global button disabling
 
 	return false;
+}
+
+void GUIControl::setEnabled(bool enabled) {
+	if (enabled && !(_flags & GUIF_DISABLED))
+		return;
+	else if (!enabled && (_flags & GUIF_DISABLED))
+		return;
+
+	if (enabled)
+		_flags &= ~GUIF_DISABLED;
+	else
+		_flags |= GUIF_DISABLED;
+
+	_parent->controlPositionsChanged();
+	_parent->invalidate();
 }
 
 void GUIControl::setClickable(bool value) {
@@ -254,6 +276,24 @@ void GUITextBox::readFrom(Common::SeekableReadStream *dta) {
 	_exFlags = dta->readUint32LE();
 }
 
+void GUITextBox::setFont(uint32 font) {
+	if (_font == font)
+		return;
+
+	assert(font < _vm->_gameFile->_fonts.size());
+
+	_font = font;
+	_parent->invalidate();
+}
+
+void GUITextBox::setText(Common::String text) {
+	if (_text == text)
+		return;
+
+	_text = text;
+	_parent->invalidate();
+}
+
 void GUITextBox::draw(Graphics::Surface *surface) {
 	warning("GUITextBox::draw unimplemented");
 }
@@ -302,6 +342,20 @@ void GUIListBox::readFrom(Common::SeekableReadStream *dta) {
 	}
 }
 
+void GUIListBox::resized() {
+	// FIXME
+}
+
+void GUIListBox::setFont(uint32 font) {
+	if (_font == font)
+		return;
+
+	assert(font < _vm->_gameFile->_fonts.size());
+
+	_font = font;
+	_parent->invalidate();
+}
+
 void GUIListBox::draw(Graphics::Surface *surface) {
 	warning("GUIListBox::draw unimplemented");
 }
@@ -328,6 +382,17 @@ void GUIInvControl::readFrom(Common::SeekableReadStream *dta) {
 		if (_itemHeight > _height)
 			_itemHeight = _height;
 	}
+}
+
+Character *GUIInvControl::getCharToDisplay() {
+	if (_charId >= _vm->_characters.size())
+		return _vm->getPlayerChar();
+
+	return _vm->_characters[_charId];
+}
+
+void GUIInvControl::resized() {
+	// FIXME
 }
 
 void GUIInvControl::draw(Graphics::Surface *surface) {
@@ -364,6 +429,13 @@ void GUIButton::readFrom(Common::SeekableReadStream *dta) {
 	} else {
 		_textAlignment = GBUT_ALIGN_TOPMIDDLE;
 	}
+}
+
+uint32 GUIButton::getDisplayedGraphic() {
+	if ((int)_usePic < 0)
+		return _pic;
+
+	return _usePic;
 }
 
 void GUIButton::setNormalGraphic(uint32 pic) {
@@ -409,6 +481,16 @@ void GUIButton::setText(Common::String text) {
 		return;
 
 	_text = text;
+	_parent->invalidate();
+}
+
+void GUIButton::setFont(uint32 font) {
+	if (_font == font)
+		return;
+
+	assert(font < _vm->_gameFile->_fonts.size());
+
+	_font = font;
 	_parent->invalidate();
 }
 
@@ -552,6 +634,38 @@ void GUIGroup::setBackgroundPicture(uint32 pic) {
 	invalidate();
 }
 
+void GUIGroup::setZOrder(uint zorder) {
+	if (_zorder == zorder)
+		return;
+
+	_zorder = zorder;
+	_vm->resortGUIs();
+}
+
+void GUIGroup::setTransparency(uint val) {
+	assert(val <= 100);
+
+	if (val == 0)
+		val = 0;
+	else if (val == 100)
+		val = 255;
+	else
+		val = ((100 - val) * 25) / 10;
+
+	if (_transparency == val)
+		return;
+
+	_transparency = val;
+}
+
+uint GUIGroup::getTransparency() {
+	if (_transparency == 0)
+		return 0;
+	if (_transparency == 255)
+		return 100;
+	return 100 - ((_transparency * 10) / 25);
+}
+
 void GUIGroup::invalidate() {
 	_needsUpdate = true;
 }
@@ -592,6 +706,10 @@ GUIControl *GUIGroup::getControlAt(const Common::Point &pos, bool mustBeClickabl
 	}
 
 	return NULL;
+}
+
+bool GUIGroup::isTextWindow() const {
+	return _vText[0] == GUI_TEXTWINDOW;
 }
 
 void GUIGroup::interfaceOn() {

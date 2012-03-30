@@ -132,11 +132,11 @@ public:
 	virtual bool isOverControl(const Common::Point &pos);
 
 	virtual void resize(uint32 width, uint32 height);
+	virtual void resized() { }
 
 	bool isDeleted() { return _flags & GUIF_DELETED; }
 	bool isDisabled();
-	void enable() { _flags &= ~GUIF_DISABLED; }
-	void disable() { _flags |= GUIF_DISABLED; }
+	void setEnabled(bool enabled);
 	bool isVisible() { return !(_flags & GUIF_INVISIBLE); }
 	void show() { _flags &= ~GUIF_INVISIBLE; }
 	void hide() { _flags |= GUIF_INVISIBLE; }
@@ -226,6 +226,11 @@ public:
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUITextBox); }
 	const char *getObjectTypeName() { return "GUITextBox"; }
 
+	uint32 getFont() { return _font; }
+	void setFont(uint32 font);
+	const Common::String &getText() const { return _text; }
+	void setText(Common::String text);
+
 	Common::String _text;
 	uint32 _font;
 	uint32 _textColor;
@@ -243,6 +248,11 @@ public:
 	void readFrom(Common::SeekableReadStream *dta);
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIListBox); }
 	const char *getObjectTypeName() { return "GUIListBox"; }
+
+	void resized();
+
+	uint32 getFont() { return _font; }
+	void setFont(uint32 font);
 
 	Common::Array<Common::String> _items;
 	Common::Array<uint16> _itemSaveGameIndexes;
@@ -274,6 +284,9 @@ public:
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIInvWindow); }
 	const char *getObjectTypeName() { return "GUIInvControl"; }
 
+	Character *getCharToDisplay();
+	void resized();
+
 	uint32 _charId; // whose inventory? (-1 = current player)
 	uint32 _itemWidth, _itemHeight;
 	uint32 _topIndex;
@@ -295,6 +308,8 @@ public:
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIButton); }
 	const char *getObjectTypeName() { return "GUIButton"; }
 
+	uint32 getDisplayedGraphic();
+
 	uint32 getNormalGraphic() { return _pic; }
 	void setNormalGraphic(uint32 pic);
 	uint32 getMouseOverGraphic() { return _overPic; }
@@ -304,6 +319,9 @@ public:
 
 	const Common::String &getText() const { return _text; }
 	void setText(Common::String text);
+
+	uint32 getFont() { return _font; }
+	void setFont(uint32 font);
 
 	uint getTextColor() const { return _textColor; }
 	void setTextColor(uint color);
@@ -339,12 +357,19 @@ public:
 	void setVisible(bool visible);
 	void setSize(uint32 width, uint32 height);
 	void setBackgroundPicture(uint32 pic);
+	void setZOrder(uint zorder);
+
+	void setTransparency(uint val);
+	uint getTransparency();
+
 	void invalidate();
 	void controlPositionsChanged();
 	void poll();
 
 	bool isMouseOver(const Common::Point &pos);
 	GUIControl *getControlAt(const Common::Point &pos, bool mustBeClickable = true);
+
+	bool isTextWindow() const;
 
 	void interfaceOn();
 	void interfaceOff();

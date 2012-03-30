@@ -1441,6 +1441,7 @@ bool AGSEngine::init() {
 		return false;
 
 	adjustSizesForResolution();
+	resortGUIs();
 
 	_state->init();
 
@@ -1640,6 +1641,11 @@ void AGSEngine::setCursorMode(uint32 newMode) {
 	setDefaultCursor();
 
 	debug(1, "cursor mode set to %d", newMode);
+}
+
+// 'update_gui_zorder'
+void AGSEngine::resortGUIs() {
+	// FIXME
 }
 
 uint AGSEngine::getGUIAt(const Common::Point &pos) {
