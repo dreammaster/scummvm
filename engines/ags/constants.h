@@ -301,6 +301,23 @@ enum AGSRoomVersion {
 // ViewFrame
 #define VFLG_FLIPSPRITE 1
 
+// hardcoded global message indexes for the hardcoded UI
+// (for some reason the original engine has them 500 higher
+//  and then subtracts 500 every time it uses them)
+#define MSG_MAYNOTINTERRUPT 485 // "Sorry, not now."
+#define MSG_RESTORE      484    // "Restore"
+#define MSG_CANCEL       485    // "Cancel"
+#define MSG_SELECTLOAD   486    // "Select game to restore"
+#define MSG_SAVEBUTTON   487    // "Save"
+#define MSG_SAVEDIALOG   488    // "Save game name:"
+#define MSG_REPLACE      489    // "Replace"
+#define MSG_MUSTREPLACE  490    // "The folder is full. you must replace"
+#define MSG_REPLACEWITH1 491    // "Replace:"
+#define MSG_REPLACEWITH2 492    // "With:"
+#define MSG_QUITBUTTON   493    // "Quit"
+#define MSG_PLAYBUTTON   494    // "Play"
+#define MSG_QUITDIALOG   495    // "Do you want to quit?"
+
 } // End of namespace AGS
 
 #endif // AGS_CONSTANTS_H

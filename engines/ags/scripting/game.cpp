@@ -31,6 +31,9 @@
 #include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
 
+// for QuitGame
+#include "gui/message.h"
+
 namespace AGS {
 
 // Game: import static bool ChangeTranslation(const string newTranslationFileName)
@@ -544,11 +547,18 @@ RuntimeValue Script_AbortGame(AGSEngine *vm, ScriptObject *, const Common::Array
 // import void QuitGame(int promptUser)
 // Quits the game, optionally showing a confirmation dialog.
 RuntimeValue Script_QuitGame(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int promptUser = params[0]._signedValue;
-	UNUSED(promptUser);
+	uint promptUser = params[0]._value;
 
-	// FIXME
-	error("QuitGame unimplemented");
+	bool shouldQuit = true;
+	if (promptUser) {
+		GUI::MessageDialog quitDialog(vm->_gameFile->_messages[MSG_QUITDIALOG],
+			vm->_gameFile->_messages[MSG_QUITBUTTON].c_str(),
+			vm->_gameFile->_messages[MSG_PLAYBUTTON].c_str());
+		shouldQuit = (quitDialog.runModal() == GUI::kMessageOK);
+	}
+
+	if (shouldQuit)
+		vm->quitGame();
 
 	return RuntimeValue();
 }

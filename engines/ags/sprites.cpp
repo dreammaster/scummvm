@@ -205,6 +205,7 @@ Sprite *SpriteSet::getSprite(uint32 spriteId) {
 	surface->create(_spriteInfo[spriteId]._width, _spriteInfo[spriteId]._height, format);
 
 	if (_spritesAreCompressed) {
+		_stream->skip(4); // data size, FIXME: use this
 		switch (colorDepth) {
 		case 1:
 			_stream->skip(2); // data size, FIXME: use this

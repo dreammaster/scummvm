@@ -711,19 +711,21 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 }
 
 void GameFile::setDefaultMessages() {
-	_messages[483] = "Sorry, not now.";
-	_messages[484] = "Restore";
-	_messages[485] = "Cancel";
-	_messages[486] = "Select a game to restore:";
-	_messages[487] = "Save";
-	_messages[488] = "Type a name to save as:";
-	_messages[489] = "Replace";
-	_messages[490] = "The save directory is full. You must replace an existing game:";
-	_messages[491] = "Replace:";
-	_messages[492] = "With:";
-	_messages[493] = "Quit";
-	_messages[494] = "Play";
-	_messages[495] = "Are you sure you want to quit?";
+	// These are messages for the hard-coded UI.
+	// We only use the first and the last three (for the quit confirmation dialog).
+	_messages[MSG_MAYNOTINTERRUPT] = "Sorry, not now.";
+	_messages[MSG_RESTORE] = "Restore";
+	_messages[MSG_CANCEL] = "Cancel";
+	_messages[MSG_SELECTLOAD] = "Select a game to restore:";
+	_messages[MSG_SAVEBUTTON] = "Save";
+	_messages[MSG_SAVEDIALOG] = "Type a name to save as:";
+	_messages[MSG_REPLACE] = "Replace";
+	_messages[MSG_MUSTREPLACE] = "The save directory is full. You must replace an existing game:";
+	_messages[MSG_REPLACEWITH1] = "Replace:";
+	_messages[MSG_REPLACEWITH2] = "With:";
+	_messages[MSG_QUITBUTTON] = "Quit";
+	_messages[MSG_PLAYBUTTON] = "Play";
+	_messages[MSG_QUITDIALOG] = "Are you sure you want to quit?";
 }
 
 #define GUI_VERSION 115
