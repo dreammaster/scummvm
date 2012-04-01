@@ -266,13 +266,16 @@ RuntimeValue Script_SetObjectView(AGSEngine *vm, ScriptObject *, const Common::A
 // import void SetObjectTransparency(int object, int amount)
 // Obsolete function for objects.
 RuntimeValue Script_SetObjectTransparency(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int object = params[0]._signedValue;
-	UNUSED(object);
-	int amount = params[1]._signedValue;
-	UNUSED(amount);
+	uint object = params[0]._value;
+	uint amount = params[1]._value;
 
-	// FIXME
-	error("SetObjectTransparency unimplemented");
+	if (amount > 100)
+		error("SetObjectTransparency: transparency value must be between 0 and 100, but got %d", amount);
+
+	if (object >= vm->getCurrentRoom()->_objects.size())
+		error("SetObjectTransparency: object %d is too high (only have %d)", object, vm->getCurrentRoom()->_objects.size());
+
+	vm->getCurrentRoom()->_objects[object]->setTransparency(amount);
 
 	return RuntimeValue();
 }
@@ -901,10 +904,7 @@ RuntimeValue Script_Object_set_Solid(AGSEngine *vm, RoomObject *self, const Comm
 // Object: import attribute int Transparency
 // Gets/sets the object's transparency.
 RuntimeValue Script_Object_get_Transparency(AGSEngine *vm, RoomObject *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Object::get_Transparency unimplemented");
-
-	return RuntimeValue();
+	return self->getTransparency();
 }
 
 // Object: import attribute int Transparency
@@ -915,12 +915,7 @@ RuntimeValue Script_Object_set_Transparency(AGSEngine *vm, RoomObject *self, con
 	if (trans > 100)
 		error("Object::set_Transparency: transparency value must be between 0 and 100, but got %d", trans);
 
-	if (trans == 0)
-		self->_transparency = 0;
-	else if (trans == 100)
-		self->_transparency = 255;
-	else
-		self->_transparency = ((100 - trans) * 25) / 10;
+	self->setTransparency(trans);
 
 	return RuntimeValue();
 }

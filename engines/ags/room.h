@@ -108,6 +108,23 @@ struct RoomObject : public ScriptObject, public Drawable {
 	void setObjectView(uint viewId);
 	void setObjectFrame(uint viewId, int loopId, int frameId);
 
+	uint getTransparency() {
+		if (_transparency == 0)
+			return 0;
+		if (_transparency == 255)
+			return 100;
+		return 100 - (_transparency * 10) / 25;
+	}
+
+	void setTransparency(uint value) {
+		if (value == 0)
+			_transparency = 0;
+		else if (value == 100)
+			_transparency = 255;
+		else
+			_transparency = ((100 - value) * 25) / 10;
+	}
+
 	void animate(uint loopId, uint speed, uint repeat, uint direction);
 	void update();
 	void stopMoving();
