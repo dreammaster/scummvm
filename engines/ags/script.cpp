@@ -583,6 +583,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 		// temporary variables
 		RuntimeValue tempVal;
 		ScriptObject *tempObj;
+		ScriptString *tempStr1, *tempStr2;
 		uint32 *fixup;
 		ccScript *instScript;
 		Common::Array<RuntimeValue> params;
@@ -849,8 +850,34 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_MEMREADB:
 			// reg1 = m[MAR] (1 byte)
-			// FIXME
-			error("unimplemented %s", info.name);
+			tempVal = _registers[SREG_MAR];
+			switch (tempVal._type) {
+			case rvtScriptData:
+				// FIXME: bounds checks
+				instScript = tempVal._instance->_script;
+				if (tempVal._instance->_globalObjects->contains(tempVal._value))
+					error("script tried MEMREADB on object on line %d", _lineNumber);
+				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
+				if (fixup != instScript->_globalFixups.end())
+					error("script tried MEMREADB on fixup on line %d", _lineNumber);
+				_registers[int1] = (*tempVal._instance->_globalData)[tempVal._value];
+				break;
+			case rvtSystemObject:
+				_registers[int1] = tempVal._object->readByte(tempVal._value);
+				break;
+			case rvtStackPointer:
+				if (tempVal._value + 2 >= _stack.size())
+					error("script tried to MEMREADB from out-of-bounds stack@%d on line %d",
+						tempVal._value, _lineNumber);
+				if (_stack[tempVal._value]._type != rvtInteger)
+					error("script tried to MEMREADB from invalid stack@%d on line %d",
+						tempVal._value, _lineNumber);
+				_registers[int1] = _stack[tempVal._value];
+				break;
+			default:
+				error("script tried to MEMREADB from runtime value of type %d (value %d) on line %d",
+					tempVal._type, tempVal._value, _lineNumber);
+			}
 			break;
 		case SCMD_MEMREADW:
 			// reg1 = m[MAR] (2 bytes)
@@ -885,8 +912,35 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_MEMWRITEB:
 			// m[MAR] = reg1 (1 byte)
-			// FIXME
-			error("unimplemented %s", info.name);
+			tempVal = _registers[SREG_MAR];
+			if (_registers[int1]._type != rvtInteger)
+				error("script tried to MEMWRITEB runtime value of type %d (value %d) on line %d",
+					_registers[int1]._type, _registers[int1]._value, _lineNumber);
+			// FIXME: check range?
+			switch (tempVal._type) {
+			case rvtScriptData:
+				// FIXME: bounds checks
+				instScript = tempVal._instance->_script;
+				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
+				if (fixup != instScript->_globalFixups.end())
+					error("script tried MEMWRITEB on fixup on %d", _lineNumber);
+				if (tempVal._instance->_globalObjects->contains(tempVal._value))
+					tempVal._instance->_globalObjects->erase(tempVal._value);
+				(*tempVal._instance->_globalData)[tempVal._value] = _registers[int1]._value;
+				break;
+			case rvtSystemObject:
+				tempVal._object->writeByte(tempVal._value, _registers[int1]._value);
+				break;
+			case rvtStackPointer:
+				if (tempVal._value + 1 >= _stack.size())
+					error("script tried to MEMWRITEB to out-of-bounds stack@%d on line %d",
+						tempVal._value, _lineNumber);
+				_stack[tempVal._value] = _registers[int1];
+				break;
+			default:
+				error("script tried to MEMWRITEB to runtime value of type %d (value %d) on line %d",
+					tempVal._type, tempVal._value, _lineNumber);
+			}
 			break;
 		case SCMD_MEMWRITEW:
 			// m[MAR] = reg1 (2 bytes)
@@ -1134,13 +1188,11 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_SHIFTLEFT:
 			// reg1 = reg1 << reg2
-			// FIXME
-			error("unimplemented %s", info.name);
+			_registers[int1]._signedValue <<= _registers[int2]._signedValue;
 			break;
 		case SCMD_SHIFTRIGHT:
 			// reg1 = reg1 >> reg2
-			// FIXME
-			error("unimplemented %s", info.name);
+			_registers[int1]._signedValue >>= _registers[int2]._signedValue;
 			break;
 		case SCMD_THISBASE:
 			// thisaddr: current relative address
@@ -1212,21 +1264,26 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_CREATESTRING:
 			// reg1 = new String(reg1)
-			ScriptString *tempStr;
-			tempStr = createStringFrom(_registers[int1]);
-			_registers[int1] = new ScriptMutableString(tempStr->getString());
+			tempStr1 = createStringFrom(_registers[int1]);
+			_registers[int1] = new ScriptMutableString(tempStr1->getString());
 			_registers[int1]._object->DecRef();
-			tempStr->DecRef();
+			tempStr1->DecRef();
 			break;
 		case SCMD_STRINGSEQUAL:
 			// (char*)reg1 == (char*)reg2   reg1=1 if true, =0 if not
-			// FIXME
-			error("unimplemented %s", info.name);
+			tempStr1 = createStringFrom(_registers[int1]);
+			tempStr2 = createStringFrom(_registers[int2]);
+			_registers[int1] = tempStr1->getString().equals(tempStr2->getString()) ? 1 : 0;
+			tempStr1->DecRef();
+			tempStr2->DecRef();
 			break;
 		case SCMD_STRINGSNOTEQ:
 			// (char*)reg1 != (char*)reg2
-			// FIXME
-			error("unimplemented %s", info.name);
+			tempStr1 = createStringFrom(_registers[int1]);
+			tempStr2 = createStringFrom(_registers[int2]);
+			_registers[int1] = tempStr1->getString().equals(tempStr2->getString()) ? 0 : 1;
+			tempStr1->DecRef();
+			tempStr2->DecRef();
 			break;
 		case SCMD_LOOPCHECKOFF:
 			// no loop checking for this function
