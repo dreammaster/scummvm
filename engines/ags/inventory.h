@@ -36,6 +36,8 @@ struct InventoryItem : public ScriptObject {
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotInventoryItem); }
 	const char *getObjectTypeName() { return "InventoryItem"; }
 
+	uint _id;
+
 	Common::String _name;
 	uint32 _pic;
 	uint32 _cursorPic;

@@ -29,6 +29,8 @@
 #include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
 #include "engines/ags/graphics.h"
+#include "engines/ags/room.h"
+#include "engines/ags/sprites.h"
 
 namespace AGS {
 
@@ -107,6 +109,16 @@ bool Character::writeUint32(uint offset, uint value) {
 	return false;
 }
 
+void Character::walk(int x, int y, bool ignoreWalkable, bool autoWalkAnims) {
+	if (_room != _vm->getCurrentRoomId())
+		error("Character::walk: character '%s' (id %d) in room %d, not in current room (%d)",
+			_scriptName.c_str(), _indexId, _room, _vm->getCurrentRoomId());
+
+	_flags &= ~CHF_MOVENOTWALK;
+
+	// FIXME
+}
+
 void Character::followCharacter(Character *chr, int distance, uint eagerness) {
 	if (eagerness > 250)
 		error("followCharacter: invalid eagerness %d (must be 0-250)", eagerness);
@@ -118,6 +130,47 @@ void Character::stopMoving() {
 	// FIXME
 }
 
+void Character::animate(uint loopId, uint speed, uint repeat, bool noIdleOverride, uint direction) {
+	if (_view < 0)
+		error("Character::animate: character '%s (id %d) has no view set",
+			_scriptName.c_str(), _indexId);
+	if ((uint)_view >= _vm->_gameFile->_views.size())
+		error("Character::animate: character '%s' (id %d) has invalid view %d (only have %d)",
+			_scriptName.c_str(), _indexId, _view, _vm->_gameFile->_views.size());
+
+	debugC(kDebugLevelGame, "character '%s' (id %d) starting animation: view %d, loop %d, speed %d, repeat %d",
+		_scriptName.c_str(), _indexId, _view, _loop, speed, repeat);
+
+	if (_idleLeft < 0 && !noIdleOverride) {
+		// if idle view in progress for the character (and this is not the
+		// "start idle animation" animate_character call), stop the idle anim
+		unlockView();
+		_idleLeft = _idleTime;
+	}
+
+	if (loopId >= _vm->_gameFile->_views[_view]._loops.size())
+		error("Character::animate: character '%s' (id %d) using invalid loop %d for view %d (only have %d)",
+			_scriptName.c_str(), _indexId, loopId, _view, _vm->_gameFile->_views[_view]._loops.size());
+
+	stopMoving();
+	_animating = 1;
+	if (repeat)
+		_animating |= CHANIM_REPEAT;
+	if (direction)
+		_animating |= CHANIM_BACKWARDS;
+
+	_animating |= ((speed << 8) & 0xff00);
+	_loop = loopId;
+
+	if (direction)
+		_frame = _vm->_gameFile->_views[_view]._loops[_loop]._frames.size() - 1;
+	else
+		_frame = 0;
+
+	_wait = speed + _vm->_gameFile->_views[_view]._loops[_loop]._frames[_frame]._speed;
+	// FIXME: checkViewFrame();
+}
+
 void Character::findReasonableLoop() {
 	// FIXME
 }
@@ -127,7 +180,23 @@ void Character::lockView(uint viewId) {
 		error("Character::lockView: invalid view number %d (max is %d)", viewId, _vm->_gameFile->_views.size());
 	viewId--;
 
-	// FIXME
+	debugC(kDebugLevelGame, "character '%s' (id %d) locked to view %d",
+		_scriptName.c_str(), _indexId, viewId + 1);
+
+	if (_idleLeft < 0) {
+		unlockView();
+		_idleLeft = _idleTime;
+	}
+
+	stopMoving();
+	_view = viewId;
+	_animating = 0;
+	findReasonableLoop();
+	_frame = 0;
+	_wait = 0;
+	_flags |= CHF_FIXVIEW;
+	_picXOffs = 0;
+	_picYOffs = 0;
 }
 
 void Character::lockViewOffset(uint viewId, int xOffs, int yOffs) {
@@ -205,6 +274,64 @@ void Character::setIdleView(int view, uint time) {
 
 	if (_idleTime == 0)
 		_processIdleThisTime = true;
+}
+
+void Character::setSpeechView(int view) {
+	if (view == -1) {
+		_talkView = view;
+		return;
+	}
+
+	if (view < 1 || (uint)view > _vm->_gameFile->_views.size())
+		error("Character::setSpeechView: invalid view number %d (max is %d)", view, _vm->_gameFile->_views.size());
+
+	_talkView = view - 1;
+}
+
+Common::Point Character::getDrawPos() {
+	uint spriteId = _vm->getViewFrame(_view, _loop, _frame)->_pic;
+
+	return Common::Point(_vm->multiplyUpCoordinate(_x) - getDrawWidth()/2 + _picXOffs,
+		_vm->multiplyUpCoordinate(_y) - _vm->getSprites()->getSpriteHeight(spriteId) -
+		_vm->multiplyUpCoordinate(_z) + _picYOffs);
+}
+
+uint Character::getBaseline() const {
+	return _baseline ? _baseline : _y;
+}
+
+int Character::getDrawOrder() const {
+	return getBaseline() + ((_flags & CHF_NOWALKBEHINDS) ? _vm->getCurrentRoom()->_height : 0);
+}
+
+const Graphics::Surface *Character::getDrawSurface() {
+	uint spriteId = _vm->getViewFrame(_view, _loop, _frame)->_pic;
+
+	return _vm->getSprites()->getSprite(spriteId)->_surface; // FIXME
+}
+
+uint Character::getDrawWidth() {
+	return getDrawSurface()->w; // FIXME
+}
+
+uint Character::getDrawHeight() {
+	return getDrawSurface()->h; // FIXME
+}
+
+uint Character::getDrawTransparency() {
+	return _transparency;
+}
+
+bool Character::isDrawVerticallyMirrored() {
+	return false; // FIXME
+}
+
+int Character::getDrawLightLevel() {
+	return 0; // FIXME
+}
+
+void Character::getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) {
+	// FIXME
 }
 
 } // End of namespace AGS

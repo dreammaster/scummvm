@@ -31,12 +31,13 @@
 #include "common/hash-str.h"
 
 #include "engines/ags/scriptobj.h"
+#include "engines/ags/drawable.h"
 
 namespace AGS {
 
 class AGSEngine;
 
-class Character : public ScriptObject {
+class Character : public ScriptObject, public Drawable {
 public:
 	Character(AGSEngine *vm);
 
@@ -45,8 +46,11 @@ public:
 	uint32 readUint32(uint offset);
 	bool writeUint32(uint offset, uint value);
 
+	void walk(int x, int y, bool ignoreWalkable, bool autoWalkAnims);
 	void followCharacter(Character *chr, int distance, uint eagerness);
 	void stopMoving();
+
+	void animate(uint loopId, uint speed, uint repeat, bool noIdleOverride, uint direction);
 
 	void findReasonableLoop();
 
@@ -55,6 +59,7 @@ public:
 	void unlockView();
 
 	void setIdleView(int view, uint time);
+	void setSpeechView(int view);
 
 	int32 _defView, _talkView, _view;
 
@@ -73,7 +78,7 @@ public:
 	int32 _idleLeft; // num seconds left, or -2 for playing idle anim
 
 	uint16 _transparency; // if character is transparent
-	uint16 _baseLine;
+	uint16 _baseline;
 
 	uint32 _activeInv;
 	uint32 _talkColor;
@@ -125,6 +130,18 @@ public:
 	bool _processIdleThisTime;
 	byte _slowMoveCounter;
 	uint16 _animWait;
+
+	uint getBaseline() const;
+
+	virtual Common::Point getDrawPos();
+	virtual int getDrawOrder() const;
+	virtual const Graphics::Surface *getDrawSurface();
+	virtual uint getDrawWidth();
+	virtual uint getDrawHeight();
+	virtual uint getDrawTransparency();
+	virtual bool isDrawVerticallyMirrored();
+	virtual int getDrawLightLevel();
+	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue);
 
 protected:
 	AGSEngine *_vm;

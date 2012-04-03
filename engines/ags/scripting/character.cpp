@@ -344,14 +344,13 @@ RuntimeValue Script_AnimateCharacterEx(AGSEngine *vm, ScriptObject *, const Comm
 // Obsolete character function.
 RuntimeValue Script_MoveCharacter(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 	int x = params[1]._signedValue;
-	UNUSED(x);
 	int y = params[2]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("MoveCharacter unimplemented");
+	if (charid >= vm->_characters.size())
+		error("MoveCharacter: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	vm->_characters[charid]->walk(x, y, false, true);
 
 	return RuntimeValue();
 }
@@ -564,10 +563,11 @@ RuntimeValue Script_SetCharacterFrame(AGSEngine *vm, ScriptObject *, const Commo
 // Obsolete character function.
 RuntimeValue Script_ReleaseCharacterView(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 
-	// FIXME
-	error("ReleaseCharacterView unimplemented");
+	if (charid >= vm->_characters.size())
+		error("ReleaseCharacterView: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	vm->_characters[charid]->unlockView();
 
 	return RuntimeValue();
 }
@@ -590,12 +590,12 @@ RuntimeValue Script_ChangeCharacterView(AGSEngine *vm, ScriptObject *, const Com
 // Obsolete character function.
 RuntimeValue Script_SetCharacterSpeechView(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 	int view = params[1]._signedValue;
-	UNUSED(view);
 
-	// FIXME
-	error("SetCharacterSpeechView unimplemented");
+	if (charid >= vm->_characters.size())
+		error("SetCharacterSpeechView: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	vm->_characters[charid]->setSpeechView(view);
 
 	return RuntimeValue();
 }
@@ -809,10 +809,7 @@ RuntimeValue Script_SetCharacterProperty(AGSEngine *vm, ScriptObject *, const Co
 // import int GetPlayerCharacter()
 // Obsolete character function.
 RuntimeValue Script_GetPlayerCharacter(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GetPlayerCharacter unimplemented");
-
-	return RuntimeValue();
+	return vm->_gameFile->_playerChar;
 }
 
 // Character: import function AddInventory(InventoryItem *item, int addAtIndex=SCR_NO_VALUE)
@@ -848,19 +845,30 @@ RuntimeValue Script_Character_AddWaypoint(AGSEngine *vm, Character *self, const 
 // Character: import function Animate(int loop, int delay, RepeatStyle=eOnce, BlockingStyle=eBlock, Direction=eForwards)
 // Animates the character using its current locked view.
 RuntimeValue Script_Character_Animate(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	int loop = params[0]._signedValue;
-	UNUSED(loop);
-	int delay = params[1]._signedValue;
-	UNUSED(delay);
-	uint32 repeatstyle = params[2]._value;
-	UNUSED(repeatstyle);
-	uint32 blockingstyle = params[3]._value;
-	UNUSED(blockingstyle);
+	uint loop = params[0]._signedValue;
+	uint delay = params[1]._signedValue;
+	uint32 repeatStyle = params[2]._value;
+	uint32 blockingStyle = params[3]._value;
 	uint32 direction = params[4]._value;
-	UNUSED(direction);
 
-	// FIXME
-	error("Character::Animate unimplemented");
+	if (direction == FORWARDS)
+		direction = 0;
+	else if (direction == BACKWARDS)
+		direction = 1;
+	else
+		error("Character::Animate: invalid direction %d", direction);
+
+	self->animate(loop, delay, repeatStyle, false, direction);
+
+	if (blockingStyle == BLOCKING)
+		blockingStyle = 1;
+	else if (blockingStyle == IN_BACKGROUND)
+		blockingStyle = 0;
+	else if (blockingStyle != 0 && blockingStyle != 1)
+		error("Character::Animate: invalid blocking style %d", blockingStyle);
+
+	if (blockingStyle)
+		vm->blockUntil(kUntilCharAnimDone, self->_indexId);
 
 	return RuntimeValue();
 }
@@ -881,7 +889,7 @@ RuntimeValue Script_Character_ChangeRoom(AGSEngine *vm, Character *self, const C
 		self->_prevRoom = self->_room;
 		self->_room = room;
 
-		debugN(1, "%s moved to room %d, location %d,%d",
+		debugC(kDebugLevelGame, "character '%s' moved to room %d, location %d,%d",
 			self->_scriptName.c_str(), room, self->_x, self->_y);
 
 		return RuntimeValue();
@@ -889,10 +897,17 @@ RuntimeValue Script_Character_ChangeRoom(AGSEngine *vm, Character *self, const C
 
 	if (x != SCR_NO_VALUE && y != SCR_NO_VALUE) {
 		vm->_newRoomPos = 0;
-		// don't check X or Y bounds, so that they can do a
-		// walk-in animation if they want
-		vm->_newRoomX = x;
-		vm->_newRoomY = y;
+
+		if (vm->getGameFileVersion() <= kAGSVer272) {
+			// Set position immediately on 2.x.
+			self->_x = x;
+			self->_y = y;
+		} else {
+			// don't check X or Y bounds, so that they can do a
+			// walk-in animation if they want
+			vm->_newRoomX = x;
+			vm->_newRoomY = y;
+		}
 	}
 
 	vm->scheduleNewRoom(room);
@@ -1086,10 +1101,8 @@ RuntimeValue Script_Character_IsCollidingWithObject(AGSEngine *vm, Character *se
 // Locks the character to this view, ready for doing animations.
 RuntimeValue Script_Character_LockView(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	int view = params[0]._signedValue;
-	UNUSED(view);
 
-	// FIXME
-	error("Character::LockView unimplemented");
+	self->lockView(view);
 
 	return RuntimeValue();
 }
@@ -1328,8 +1341,7 @@ RuntimeValue Script_Character_Tint(AGSEngine *vm, Character *self, const Common:
 // Character: import function UnlockView()
 // Unlocks the view after an animation has finished.
 RuntimeValue Script_Character_UnlockView(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::UnlockView unimplemented");
+	self->unlockView();
 
 	return RuntimeValue();
 }
@@ -1371,22 +1383,45 @@ RuntimeValue Script_Character_WalkStraight(AGSEngine *vm, Character *self, const
 // Character: import attribute InventoryItem* ActiveInventory
 // Gets/sets the character's current inventory item. null if no item selected.
 RuntimeValue Script_Character_get_ActiveInventory(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_ActiveInventory unimplemented");
+	if (self->_activeInv == (uint)-1)
+		return 0;
 
-	return RuntimeValue();
+	return &vm->_gameFile->_invItemInfo[self->_activeInv];
 }
 
 // Character: import attribute InventoryItem* ActiveInventory
 // Gets/sets the character's current inventory item. null if no item selected.
 RuntimeValue Script_Character_set_ActiveInventory(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
+	vm->invalidateGUI();
+
+	if (params[0]._type == rvtInteger) {
+		// null pointer
+
+		self->_activeInv = (uint)-1;
+
+		if (vm->getPlayerChar() == self) {
+			if (vm->getCursorMode() == MODE_USE)
+				vm->setCursorMode(0);
+		}
+
+		return RuntimeValue();
+	}
+
 	if (!params[0]._object->isOfType(sotInventoryItem))
 		error("Character::set_ActiveInventory got incorrect object type (expected a InventoryItem) for parameter 1");
 	InventoryItem *value = (InventoryItem *)params[0]._object;
-	UNUSED(value);
 
-	// FIXME
-	error("Character::set_ActiveInventory unimplemented");
+	if (self->_inventory[value->_id] < 1)
+		error("Character::set_ActiveInventory: character '%s' has no items with id %d in inventory",
+			self->_scriptName.c_str(), value->_id);
+
+	self->_activeInv = value->_id;
+
+	if (vm->getPlayerChar() == self) {
+		// if it's the player character, update mouse cursor
+		// FIXME: update_inv_cursor
+		vm->setCursorMode(MODE_USE);
+	}
 
 	return RuntimeValue();
 }
@@ -1419,20 +1454,18 @@ RuntimeValue Script_Character_set_AnimationSpeed(AGSEngine *vm, Character *self,
 // Character: import attribute int Baseline
 // Gets/sets a specific baseline for the character. 0 means character's Y-pos will be used.
 RuntimeValue Script_Character_get_Baseline(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_Baseline unimplemented");
+	if (self->_baseline < 1)
+		return 0;
 
-	return RuntimeValue();
+	return self->_baseline;
 }
 
 // Character: import attribute int Baseline
 // Gets/sets a specific baseline for the character. 0 means character's Y-pos will be used.
 RuntimeValue Script_Character_set_Baseline(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Character::set_Baseline unimplemented");
+	self->_baseline = value;
 
 	return RuntimeValue();
 }
@@ -1677,20 +1710,18 @@ RuntimeValue Script_Character_set_IgnoreScaling(AGSEngine *vm, Character *self, 
 // Character: import attribute bool IgnoreWalkbehinds
 // Gets/sets whether the character ignores walk-behind areas and is always placed on top.
 RuntimeValue Script_Character_get_IgnoreWalkbehinds(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_IgnoreWalkbehinds unimplemented");
-
-	return RuntimeValue();
+	return (self->_flags & CHF_NOWALKBEHINDS) ? 1 : 0;
 }
 
 // Character: import attribute bool IgnoreWalkbehinds
 // Gets/sets whether the character ignores walk-behind areas and is always placed on top.
 RuntimeValue Script_Character_set_IgnoreWalkbehinds(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	uint32 value = params[0]._value;
-	UNUSED(value);
 
-	// FIXME
-	error("Character::set_IgnoreWalkbehinds unimplemented");
+	if (value)
+		self->_flags |= CHF_NOWALKBEHINDS;
+	else
+		self->_flags &= ~CHF_NOWALKBEHINDS;
 
 	return RuntimeValue();
 }
@@ -1730,11 +1761,16 @@ RuntimeValue Script_Character_get_Loop(AGSEngine *vm, Character *self, const Com
 // Character: import attribute int Loop
 // Gets/sets the character's current loop number within its current view.
 RuntimeValue Script_Character_set_Loop(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint value = params[0]._value;
 
-	// FIXME
-	error("Character::set_Loop unimplemented");
+	if (value >= vm->_gameFile->_views[self->_view]._loops.size())
+		error("Character::set_Loop: loop %d is invalid for view %d, which only has %d loops",
+			value, self->_view, vm->_gameFile->_views[self->_view]._loops.size());
+
+	self->_loop = value;
+
+	if (self->_frame >= vm->_gameFile->_views[self->_view]._loops[self->_loop]._frames.size())
+		self->_frame = 0;
 
 	return RuntimeValue();
 }
@@ -1898,20 +1934,18 @@ RuntimeValue Script_Character_set_Scaling(AGSEngine *vm, Character *self, const 
 // Character: import attribute bool Solid
 // Gets/sets whether this character blocks other objects and characters from moving through it.
 RuntimeValue Script_Character_get_Solid(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_Solid unimplemented");
-
-	return RuntimeValue();
+	return (self->_flags & CHF_NOBLOCKING) ? 0 : 1;
 }
 
 // Character: import attribute bool Solid
 // Gets/sets whether this character blocks other objects and characters from moving through it.
 RuntimeValue Script_Character_set_Solid(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	uint32 value = params[0]._value;
-	UNUSED(value);
 
-	// FIXME
-	error("Character::set_Solid unimplemented");
+	if (value)
+		self->_flags &= ~CHF_NOBLOCKING;
+	else
+		self->_flags |= CHF_NOBLOCKING;
 
 	return RuntimeValue();
 }
@@ -1986,10 +2020,8 @@ RuntimeValue Script_Character_get_SpeechView(AGSEngine *vm, Character *self, con
 // Gets/sets the character's speech view.
 RuntimeValue Script_Character_set_SpeechView(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Character::set_SpeechView unimplemented");
+	self->setSpeechView(value);
 
 	return RuntimeValue();
 }
@@ -2097,10 +2129,8 @@ RuntimeValue Script_Character_get_x(AGSEngine *vm, Character *self, const Common
 // The character's current X-position.
 RuntimeValue Script_Character_set_x(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Character::set_x unimplemented");
+	self->_x = value;
 
 	return RuntimeValue();
 }
@@ -2115,10 +2145,8 @@ RuntimeValue Script_Character_get_y(AGSEngine *vm, Character *self, const Common
 // The character's current Y-position.
 RuntimeValue Script_Character_set_y(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Character::set_y unimplemented");
+	self->_y = value;
 
 	return RuntimeValue();
 }
@@ -2133,10 +2161,8 @@ RuntimeValue Script_Character_get_z(AGSEngine *vm, Character *self, const Common
 // The character's current Z-position.
 RuntimeValue Script_Character_set_z(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Character::set_z unimplemented");
+	self->_z = value;
 
 	return RuntimeValue();
 }
@@ -2234,7 +2260,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "Character::Walk^4", (ScriptAPIFunction *)&Script_Character_Walk, "iiii", sotCharacter },
 	{ "Character::WalkStraight^3", (ScriptAPIFunction *)&Script_Character_WalkStraight, "iii", sotCharacter },
 	{ "Character::get_ActiveInventory", (ScriptAPIFunction *)&Script_Character_get_ActiveInventory, "", sotCharacter },
-	{ "Character::set_ActiveInventory", (ScriptAPIFunction *)&Script_Character_set_ActiveInventory, "o", sotCharacter },
+	{ "Character::set_ActiveInventory", (ScriptAPIFunction *)&Script_Character_set_ActiveInventory, "t", sotCharacter },
 	{ "Character::get_Animating", (ScriptAPIFunction *)&Script_Character_get_Animating, "", sotCharacter },
 	{ "Character::get_AnimationSpeed", (ScriptAPIFunction *)&Script_Character_get_AnimationSpeed, "", sotCharacter },
 	{ "Character::set_AnimationSpeed", (ScriptAPIFunction *)&Script_Character_set_AnimationSpeed, "i", sotCharacter },

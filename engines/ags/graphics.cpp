@@ -540,14 +540,21 @@ void AGSGraphics::draw() {
 		drawables.push_back(room->_objects[i]);
 	}
 
+	for (uint i = 0; i < _vm->_characters.size(); ++i) {
+		if (!_vm->_characters[i]->_on)
+			continue;
+		if (_vm->_characters[i]->_room != _vm->getCurrentRoomId())
+			continue;
+
+		drawables.push_back(_vm->_characters[i]);
+	}
+
 	for (uint i = 0; i < room->_walkBehinds.size(); ++i) {
 		if (!room->_walkBehinds[i]._surface.getPixels())
 			continue;
 
 		drawables.push_back(&room->_walkBehinds[i]);
 	}
-
-	// FIXME
 
 	// TODO: need stable sort?
 	Common::sort(drawables.begin(), drawables.end(), DrawableLess());

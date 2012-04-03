@@ -213,6 +213,8 @@ bool GameFile::init() {
 	for (uint32 i = 0; i < invItemCount; ++i) {
 		InventoryItem &info = _invItemInfo[i];
 
+		info._id = i;
+
 		char invName[26];
 		dta->read(invName, 25);
 		invName[25] = '\0';
@@ -661,7 +663,7 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 	chr->_idleTime = dta->readUint16LE();
 	chr->_idleLeft = dta->readUint16LE();
 	chr->_transparency = dta->readUint16LE();
-	chr->_baseLine = dta->readUint16LE();
+	chr->_baseline = dta->readUint16LE();
 	chr->_activeInv = dta->readUint32LE();
 	chr->_talkColor = dta->readUint32LE();
 	chr->_thinkView = dta->readUint32LE();
