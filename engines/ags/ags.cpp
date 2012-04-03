@@ -78,6 +78,7 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_poppedInterface((uint)-1), _clickWasOnGUI(0), _mouseOnGUI((uint)-1),
 	_startingRoom(0xffffffff), _displayedRoom(0xffffffff),
 	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL), _roomScriptFork(NULL),
+	_scriptPlayerObject(NULL),
 	_scriptMouseObject(NULL), _gameStateGlobalsObject(NULL), _saveGameIndexObject(NULL), _scriptSystemObject(NULL),
 	_roomObjectState(NULL),
 	_currentRoom(NULL), _framesPerSecond(40), _lastFrameTime(0),
@@ -151,6 +152,7 @@ AGSEngine::~AGSEngine() {
 
 	delete _scriptState;
 
+	delete _scriptPlayerObject;
 	delete _scriptMouseObject;
 	delete _gameStateGlobalsObject;
 	delete _saveGameIndexObject;
@@ -693,6 +695,19 @@ void AGSEngine::setupPlayerCharacter(uint32 charId) {
 	_playerChar = _characters[charId];
 }
 
+class ScriptPlayerObject : public ScriptObject {
+public:
+	ScriptPlayerObject(AGSEngine *vm) : _vm(vm) { }
+	const char *getObjectTypeName() { return "ScriptPlayerObject"; }
+
+	ScriptObject *getObjectAt(uint32 &offset) {
+		return _vm->getPlayerChar();
+	}
+
+protected:
+	AGSEngine *_vm;
+};
+
 class ScriptMouseObject : public ScriptObject {
 public:
 	ScriptMouseObject(AGSEngine *vm) : _vm(vm) { }
@@ -786,6 +801,8 @@ protected:
 void AGSEngine::createGlobalScript() {
 	assert(_scriptModules.empty());
 
+	_scriptPlayerObject = new ScriptPlayerObject(this);
+	_scriptState->addSystemObjectImport("player", _scriptPlayerObject);
 	_scriptMouseObject = new ScriptMouseObject(this);
 	_scriptState->addSystemObjectImport("mouse", _scriptMouseObject);
 	_scriptState->addSystemObjectImport("game", _state);
@@ -1563,7 +1580,6 @@ bool AGSEngine::init() {
 
 	// FIXME: don't leak all these!
 	_scriptState->addSystemObjectImport("character", new ScriptObjectArray<Character *>(&_characters, 780, "Character"));
-	_scriptState->addSystemObjectImport("player", _characters[_gameFile->_playerChar]);
 	for (uint i = 0; i < _characters.size(); ++i) {
 		Character *charInfo = _characters[i];
 		_scriptState->addSystemObjectImport(charInfo->_scriptName, charInfo);
