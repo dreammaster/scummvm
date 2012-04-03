@@ -29,6 +29,7 @@
 #include "engines/ags/drawingsurface.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
+#include "engines/ags/room.h"
 #include "engines/ags/sprites.h"
 #include "graphics/surface.h"
 
@@ -356,8 +357,7 @@ RuntimeValue Script_DrawingSurface_DrawSurface(AGSEngine *vm, DrawingSurface *se
 	if (transparency > 100)
 		error("DrawingSurface::DrawSurface: transparency value must be between 0 and 100, but got %d", transparency);
 
-	// FIXME: sanity-check params
-
+	// Original error()s out here instead.
 	if (transparency == 100)
 		return RuntimeValue();
 
@@ -368,7 +368,7 @@ RuntimeValue Script_DrawingSurface_DrawSurface(AGSEngine *vm, DrawingSurface *se
 		error("DrawingSurface::DrawSurface: attempted to draw a surface onto itself");
 
 	if (transparency > 0)
-		transparency = ((100 - transparency) * 255) / 100;
+		transparency = ((100 - transparency) * 25) / 10;
 
 	// TODO: remove this limitation?
 	if (src->format.bytesPerPixel == 1)
@@ -600,12 +600,17 @@ RuntimeValue Script_DisplayMessageBar(AGSEngine *vm, ScriptObject *, const Commo
 // Locks the viewport to stop the screen scrolling automatically.
 RuntimeValue Script_SetViewport(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("SetViewport unimplemented");
+	if (x < 0)
+		x = 0;
+	if (y < 0)
+		y = 0;
+
+	vm->_graphics->_viewportX = vm->multiplyUpCoordinate(x);
+	vm->_graphics->_viewportY = vm->multiplyUpCoordinate(y);
+	vm->_graphics->checkViewportCoords();
+	vm->_state->_offsetsLocked = 1;
 
 	return RuntimeValue();
 }
@@ -613,8 +618,7 @@ RuntimeValue Script_SetViewport(AGSEngine *vm, ScriptObject *, const Common::Arr
 // import void ReleaseViewport()
 // Allows AGS to scroll the screen automatically to follow the player character.
 RuntimeValue Script_ReleaseViewport(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("ReleaseViewport unimplemented");
+	vm->_state->_offsetsLocked = 0;
 
 	return RuntimeValue();
 }
@@ -622,19 +626,13 @@ RuntimeValue Script_ReleaseViewport(AGSEngine *vm, ScriptObject *, const Common:
 // import int GetViewportX()
 // Gets the current X offset of the scrolled viewport.
 RuntimeValue Script_GetViewportX(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GetViewportX unimplemented");
-
-	return RuntimeValue();
+	return vm->divideDownCoordinate(vm->_graphics->_viewportX);
 }
 
 // import int GetViewportY()
 // Gets the current Y offset of the scrolled viewport.
 RuntimeValue Script_GetViewportY(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GetViewportY unimplemented");
-
-	return RuntimeValue();
+	return vm->divideDownCoordinate(vm->_graphics->_viewportY);
 }
 
 // import int CreateGraphicOverlay(int x, int y, int slot, bool transparent)

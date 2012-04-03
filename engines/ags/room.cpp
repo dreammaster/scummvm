@@ -494,7 +494,8 @@ uint Room::getObjectAt(int x, int y) {
 }
 
 uint Room::getObjectAt(int x, int y, uint &objectYPos) {
-	// TODO: adjust by offset
+	x += _vm->divideDownCoordinate(_vm->_graphics->_viewportX);
+	y += _vm->divideDownCoordinate(_vm->_graphics->_viewportY);
 
 	uint objectId = (uint)-1;
 	uint bestBaseline = 0;

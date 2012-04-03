@@ -328,6 +328,7 @@ void AGSEngine::tickGame(bool checkControls) {
 			_currentRoom->updateWalkBehinds();
 			_backgroundNeedsUpdate = false;
 		}
+		updateViewport();
 		_graphics->draw();
 
 		// FIXME: hotspot stuff
@@ -1813,9 +1814,8 @@ uint AGSEngine::getLocationType(const Common::Point &pos, uint &id, bool through
 	if (!throughGUI && getGUIAt(pos) != (uint)-1)
 		return 0;
 
-	// FIXME: adjust by offset
-	Common::Point p = pos;
-
+	Common::Point p = pos - Common::Point(divideDownCoordinate(_graphics->_viewportX),
+		divideDownCoordinate(_graphics->_viewportY));
 	if (p.x < 0 || p.y < 0 || p.x >= _currentRoom->_width || p.y >= _currentRoom->_height)
 		return 0;
 
@@ -2035,6 +2035,27 @@ int AGSEngine::divideDownCoordinate(int coord) {
 
 int AGSEngine::divideDownCoordinateRoundUp(int coord) {
 	return (getGameOption(OPT_NATIVECOORDINATES) ? coord : (coord / _graphics->_screenResolutionMultiplier + _graphics->_screenResolutionMultiplier - 1));
+}
+
+void AGSEngine::updateViewport() {
+	if (_currentRoom->_width <= _graphics->_baseWidth && _currentRoom->_height <= _graphics->_baseHeight) {
+		_graphics->_viewportX = 0;
+		_graphics->_viewportY = 0;
+		return;
+	}
+
+	if (!_state->_offsetsLocked) {
+		int x = multiplyUpCoordinate(_playerChar->_x) - _graphics->_width/2;
+		int y = multiplyUpCoordinate(_playerChar->_y) - _graphics->_height/2;
+		if (x < 0)
+			x = 0;
+		if (y < 0)
+			y = 0;
+		_graphics->_viewportX = x;
+		_graphics->_viewportY = y;
+	}
+
+	_graphics->checkViewportCoords();
 }
 
 // don't return until the provided blocking condition is satisfied
