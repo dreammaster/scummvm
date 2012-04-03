@@ -45,6 +45,10 @@ public:
 	const char *getObjectTypeName() { return "Character"; }
 	uint32 readUint32(uint offset);
 	bool writeUint32(uint offset, uint value);
+	uint16 readUint16(uint offset);
+	bool writeUint16(uint offset, uint16 value);
+	byte readByte(uint offset);
+	bool writeByte(uint offset, byte value);
 
 	void walk(int x, int y, bool ignoreWalkable, bool autoWalkAnims);
 	void followCharacter(Character *chr, int distance, uint eagerness);

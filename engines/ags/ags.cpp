@@ -702,6 +702,12 @@ public:
 	ScriptObject *getObjectAt(uint32 &offset) {
 		return _vm->getPlayerChar();
 	}
+	uint32 readUint32(uint offset) { return _vm->getPlayerChar()->readUint32(offset); }
+	bool writeUint32(uint offset, uint value) { return _vm->getPlayerChar()->writeUint32(offset, value); }
+	uint16 readUint16(uint offset) { return _vm->getPlayerChar()->readUint16(offset); }
+	bool writeUint16(uint offset, uint16 value) { return _vm->getPlayerChar()->writeUint16(offset, value); }
+	byte readByte(uint offset) { return _vm->getPlayerChar()->readByte(offset); }
+	bool writeByte(uint offset, byte value) { return _vm->getPlayerChar()->writeByte(offset, value); }
 
 protected:
 	AGSEngine *_vm;
@@ -766,16 +772,16 @@ public:
 		switch (offset) {
 		case 0:
 			// width
-			return 0; // FIXME
+			return _vm->_graphics->_width;
 		case 4:
 			// height
-			return 0; // FIXME
+			return _vm->_graphics->_height;
 		case 8:
 			// coldepth
 			return 32; // FIXME
 		case 12:
 			// os
-			return 0; // FIXME
+			return 2; // eOS_Win, FIXME
 		case 16:
 			// windowed
 			return 0; // FIXME
@@ -784,12 +790,22 @@ public:
 			return _vm->_graphics->_vsync ? 1 : 0;
 		case 24:
 			// viewport_width
-			return 0; // FIXME
+			return _vm->divideDownCoordinate(_vm->_graphics->_width);
 		case 28:
 			// viewport_height
-			return 0; // FIXME
+			return _vm->divideDownCoordinate(_vm->_graphics->_height);
 		default:
 			error("ScriptSystemObject::readUint32: offset %d is invalid", offset);
+		}
+	}
+	bool writeUint32(uint offset, uint value) {
+		switch (offset) {
+		case 20:
+			_vm->_graphics->_vsync = value;
+			return true;
+		default:
+			// Scripts really shouldn't be changing any other values.
+			return false;
 		}
 	}
 

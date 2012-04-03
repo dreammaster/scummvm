@@ -96,7 +96,7 @@ uint32 Character::readUint32(uint offset) {
 		return _z;
 	case 80:
 		return _walkWait;
-	case 96:
+	case 92:
 		return _indexId;
 	default:
 		error("Character::readUint32: offset %d is invalid", offset);
@@ -104,6 +104,236 @@ uint32 Character::readUint32(uint offset) {
 }
 
 bool Character::writeUint32(uint offset, uint value) {
+	switch (offset) {
+	case 0:
+		_defView = value;
+		break;
+	case 4:
+		_talkView = value;
+		break;
+	case 8:
+		_view = value;
+		break;
+	case 12:
+		_room = value;
+		break;
+	case 16:
+		_prevRoom = value;
+		break;
+	case 20:
+		_x = value;
+		break;
+	case 24:
+		_y = value;
+		break;
+	case 28:
+		_wait = value;
+		break;
+	case 32:
+		_flags = value;
+		break;
+	case 40:
+		_idleView = value;
+		break;
+	case 52:
+		_activeInv = value;
+		break;
+	case 56:
+		_talkColor = value;
+		break;
+	case 60:
+		_thinkView = value;
+		break;
+	case 76:
+		_z = value;
+		break;
+	case 80:
+		_walkWait = value;
+		break;
+	case 92:
+		_indexId = value;
+		break;
+	default:
+		return false;
+	}
+
+	return true;
+}
+
+uint16 Character::readUint16(uint offset) {
+	if (offset >= 112 && offset <= 112 + (MAX_INV*2)) {
+		if (offset % 2 != 0)
+			error("GameState::characterUint16: offset %d is invalid", offset);
+		offset = (offset - 112) / 2;
+		return _inventory[offset];
+	}
+
+	switch (offset) {
+	case 36:
+		return _following;
+	case 38:
+		return _followInfo;
+	case 44:
+		return _idleTime;
+	case 46:
+		return _idleLeft;
+	case 48:
+		return _transparency;
+	case 50:
+		return _baseline;
+	case 64:
+		return _blinkView;
+	case 66:
+		return _blinkInterval;
+	case 68:
+		return _blinkTimer;
+	case 70:
+		return _blinkFrame;
+	case 72:
+		return _walkSpeedY;
+	case 74:
+		return _picYOffs;
+	case 84:
+		return _speechAnimSpeed;
+	// (86 is reserved)
+	case 88:
+		return _blockingWidth;
+	case 90:
+		return _blockingHeight;
+	case 96:
+		return _picXOffs;
+	case 98:
+		return _walkWaitCounter;
+	case 100:
+		return _loop;
+	case 102:
+		return _frame;
+	case 104:
+		return _walking;
+	case 106:
+		return _animating;
+	case 108:
+		return _walkSpeed;
+	case 110:
+		return _animSpeed;
+	case 714: // 112 + MAX_INV*2
+		return _actX;
+	case 716:
+		return _actY;
+	default:
+		error("Character::readUint16: offset %d is invalid", offset);
+	}
+}
+
+bool Character::writeUint16(uint offset, uint16 value) {
+	switch (offset) {
+	case 36:
+		_following = value;
+		break;
+	case 38:
+		_followInfo = value;
+		break;
+	case 44:
+		_idleTime = value;
+		break;
+	case 46:
+		_idleLeft = value;
+		break;
+	case 48:
+		_transparency = value;
+		break;
+	case 50:
+		_baseline = value;
+		break;
+	case 64:
+		_blinkView = value;
+		break;
+	case 66:
+		_blinkInterval = value;
+		break;
+	case 68:
+		_blinkTimer = value;
+		break;
+	case 70:
+		_blinkFrame = value;
+		break;
+	case 72:
+		_walkSpeedY = value;
+		break;
+	case 74:
+		_picYOffs = value;
+		break;
+	case 84:
+		_speechAnimSpeed = value;
+		break;
+	case 88:
+		_blockingWidth = value;
+		break;
+	case 90:
+		_blockingHeight = value;
+		break;
+	case 96:
+		_picXOffs = value;
+		break;
+	case 98:
+		_walkWaitCounter = value;
+		break;
+	case 100:
+		_loop = value;
+		break;
+	case 102:
+		_frame = value;
+		break;
+	case 104:
+		_walking = value;
+		break;
+	case 106:
+		_animating = value;
+		break;
+	case 108:
+		_walkSpeed = value;
+		break;
+	case 110:
+		_animSpeed = value;
+		break;
+	case 714:
+		_actX = value;
+		break;
+	case 716:
+		_actY = value;
+		break;
+	default:
+		return false;
+	}
+
+	return true;
+}
+
+byte Character::readByte(uint offset) {
+	if (offset >= 718 && offset <= 718 + 40) {
+		// TODO: do we need this?
+		offset = offset - 718;
+		if (offset < _name.size())
+			return _name[offset];
+		return 0;
+	}
+	if (offset >= 758 && offset <= 758 + 20) {
+		// TODO: do we need this?
+		offset = offset - 758;
+		if (offset < _scriptName.size())
+			return _scriptName[offset];
+		return 0;
+	}
+
+	switch (offset) {
+	case 778:
+		return _on;
+	default:
+		error("Character::readByte: offset %d is invalid", offset);
+	}
+}
+
+bool Character::writeByte(uint offset, byte value) {
 	// FIXME
 
 	return false;
