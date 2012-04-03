@@ -77,6 +77,10 @@ public:
 
 	virtual uint32 readUint32(uint offset) { error("tried reading uint32 from offset %d on a %s", offset, getObjectTypeName()); }
 	virtual bool writeUint32(uint offset, uint value) { return false; }
+	virtual uint16 readUint16(uint offset) { error("tried reading uint16 from offset %d on a %s", offset, getObjectTypeName()); }
+	virtual bool writeUint16(uint offset, uint16 value) { return false; }
+	virtual byte readByte(uint offset) { error("tried reading byte from offset %d on a %s", offset, getObjectTypeName()); }
+	virtual bool writeByte(uint offset, byte value) { return false; }
 
 	// for resolving pointer arithmetic by scripts
 	virtual ScriptObject *getObjectAt(uint32 &offset) { return this; }
@@ -144,6 +148,30 @@ public:
 			error("writeUint32: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
 		return (*_array)[objectId].writeUint32(offset % _elementSize, value);
 	}
+	virtual uint16 readUint16(uint offset) {
+		uint16 objectId = offset / _elementSize;
+		if (objectId >= _array->size())
+			error("readUint16: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId].readUint16(offset % _elementSize);
+	}
+	virtual bool writeUint16(uint offset, uint16 value) {
+		uint16 objectId = offset / _elementSize;
+		if (objectId >= _array->size())
+			error("writeUint16: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId].writeUint16(offset % _elementSize, value);
+	}
+	virtual byte readByte(uint offset) {
+		byte objectId = offset / _elementSize;
+		if (objectId >= _array->size())
+			error("readUint16: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId].readByte(offset % _elementSize);
+	}
+	virtual bool writeByte(uint offset, byte value) {
+		byte objectId = offset / _elementSize;
+		if (objectId >= _array->size())
+			error("writeByte: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId].writeByte(offset % _elementSize, value);
+	}
 
 	const char *getObjectTypeName() { return "ScriptObjectArray"; }
 
@@ -177,6 +205,30 @@ public:
 		if (objectId >= _array->size())
 			error("writeUint32: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
 		return (*_array)[objectId]->writeUint32(offset % _elementSize, value);
+	}
+	virtual uint16 readUint16(uint offset) {
+		uint16 objectId = offset / _elementSize;
+		if (objectId >= _array->size())
+			error("readUint16: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId]->readUint16(offset % _elementSize);
+	}
+	virtual bool writeUint16(uint offset, uint16 value) {
+		uint16 objectId = offset / _elementSize;
+		if (objectId >= _array->size())
+			error("writeUint16: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId]->writeUint16(offset % _elementSize, value);
+	}
+	virtual byte readByte(uint offset) {
+		byte objectId = offset / _elementSize;
+		if (objectId >= _array->size())
+			error("readUint16: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId]->readByte(offset % _elementSize);
+	}
+	virtual bool writeByte(uint offset, byte value) {
+		byte objectId = offset / _elementSize;
+		if (objectId >= _array->size())
+			error("writeByte: offset %d is beyond end of array of %s (size %d)", offset, _objName, _array->size());
+		return (*_array)[objectId]->writeByte(offset % _elementSize, value);
 	}
 
 	const char *getObjectTypeName() { return "ScriptObjectArray<*>"; }

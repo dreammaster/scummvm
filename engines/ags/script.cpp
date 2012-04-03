@@ -679,9 +679,12 @@ void ccInstance::runCodeFrom(uint32 start) {
 				WRITE_LE_UINT32(&(*tempVal._instance->_globalData)[tempVal._value], _registers[int1]._value);
 				break;
 			case rvtSystemObject:
-				// FIXME: !!!
-				warning("script tried to MEMWRITE to system object (value %d) on line %d",
-					tempVal._value, _lineNumber);
+				if (_registers[int1]._type != rvtInteger)
+					error("script tried to MEMWRITE runtime value of type %d (value %d) on line %d",
+						_registers[int1]._type, _registers[int1]._value, _lineNumber);
+				if (!tempVal._object->writeUint32(tempVal._value, _registers[int1]._value))
+					error("script failed to write uint32 to offset %d of a %s on line %d",
+						tempVal._value, tempVal._object->getObjectTypeName(), _lineNumber);
 				break;
 			case rvtStackPointer:
 				if (tempVal._value + 4 >= _stack.size())
@@ -827,11 +830,14 @@ void ccInstance::runCodeFrom(uint32 start) {
 					error("script tried MEMREADW on fixup on line %d", _lineNumber);
 				_registers[int1] = READ_LE_UINT16(&(*tempVal._instance->_globalData)[tempVal._value]);
 				break;
+			case rvtSystemObject:
+				_registers[int1] = tempVal._object->readUint16(tempVal._value);
+				break;
 			case rvtStackPointer:
 				if (tempVal._value + 2 >= _stack.size())
 					error("script tried to MEMREADW from out-of-bounds stack@%d on line %d",
 						tempVal._value, _lineNumber);
-				if (_stack[tempVal._value]._type == rvtInvalid)
+				if (_stack[tempVal._value]._type != rvtInteger)
 					error("script tried to MEMREADW from invalid stack@%d on line %d",
 						tempVal._value, _lineNumber);
 				_registers[int1] = _stack[tempVal._value];
@@ -849,11 +855,10 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_MEMWRITEW:
 			// m[MAR] = reg1 (2 bytes)
 			tempVal = _registers[SREG_MAR];
-			// FIXME: make sure it's an int?
 			if (_registers[int1]._type != rvtInteger)
 				error("script tried to MEMWRITEW runtime value of type %d (value %d) on line %d",
 					_registers[int1]._type, _registers[int1]._value, _lineNumber);
-			// FIXME: other cases
+			// FIXME: check range?
 			switch (tempVal._type) {
 			case rvtScriptData:
 				// FIXME: bounds checks
@@ -861,13 +866,19 @@ void ccInstance::runCodeFrom(uint32 start) {
 				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
 				if (fixup != instScript->_globalFixups.end())
 					error("script tried MEMWRITEW on fixup on %d", _lineNumber);
+				if (tempVal._instance->_globalObjects->contains(tempVal._value))
+					tempVal._instance->_globalObjects->erase(tempVal._value);
 				WRITE_LE_UINT16(&(*tempVal._instance->_globalData)[tempVal._value], _registers[int1]._value);
+				break;
+			case rvtSystemObject:
+				tempVal._object->writeUint16(tempVal._value, _registers[int1]._value);
 				break;
 			case rvtStackPointer:
 				if (tempVal._value + 2 >= _stack.size())
 					error("script tried to MEMWRITEW to out-of-bounds stack@%d on line %d",
 						tempVal._value, _lineNumber);
 				_stack[tempVal._value] = _registers[int1];
+				_stack[tempVal._value + 1].invalidate();
 				break;
 			default:
 				error("script tried to MEMWRITEW to runtime value of type %d (value %d) on line %d",
@@ -1314,6 +1325,10 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 			if (params[pos]._type != rvtSystemObject)
 				error("expected object for param %d of '%s', got type %d",
 					pos + 1, function->name, params[pos]._type);
+			uint32 offset;
+			offset = params[pos]._value;
+			params[pos] = params[pos]._object->getObjectAt(offset);
+			params[pos]._value = offset;
 			break;
 		case 't':
 			// string OR null

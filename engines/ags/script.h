@@ -86,7 +86,7 @@ struct ScriptSystemFunctionInfo;
 struct RuntimeValue {
 	RuntimeValue() : _type(rvtInteger), _value(0) { }
 	RuntimeValue(uint32 intValue) : _type(rvtInteger), _value(intValue) { }
-	RuntimeValue(int intValue) : _type(rvtInteger), _value(intValue) { }
+	RuntimeValue(int intValue) : _type(rvtInteger), _signedValue(intValue) { }
 	RuntimeValue(float floatValue) : _type(rvtFloat), _floatValue(floatValue) { }
 
 	// support for object reference counting
@@ -128,7 +128,7 @@ struct RuntimeValue {
 		if (_type == rvtSystemObject)
 			_object->DecRef();
 		_type = rvtInteger;
-		_value = intValue;
+		_signedValue = intValue;
 		return *this;
 	}
 	RuntimeValue &operator=(uint32 intValue) {
@@ -142,11 +142,12 @@ struct RuntimeValue {
 		if (_type == rvtSystemObject)
 			_object->DecRef();
 		_type = rvtFloat;
-		_value = floatValue;
+		_floatValue = floatValue;
 		return *this;
 	}
 
 	bool equalTo(const RuntimeValue &value) const {
+		// FIXME: check instance for rvtScriptData, rvtScriptFunction
 		if (_type == rvtSystemObject && value._type == rvtSystemObject) {
 			// two objects, resolve their offsets and compare the result
 			uint32 offset1 = _value;

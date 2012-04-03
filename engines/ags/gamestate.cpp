@@ -166,48 +166,50 @@ uint32 GameState::readUint32(uint offset) {
 	case 400:
 		return _speechBubbleWidth;
 	case 404:
-		return _disableDialogParser;
+		return _minDialogOptionWidth;
 	case 408:
-		return _animBackgroundSpeed;
+		return _disableDialogParser;
 	case 412:
-		return _topBarBackColor;
+		return _animBackgroundSpeed;
 	case 416:
-		return _topBarTextColor;
+		return _topBarBackColor;
 	case 420:
-		return _topBarBorderColor;
+		return _topBarTextColor;
 	case 424:
-		return _topBarBorderWidth;
+		return _topBarBorderColor;
 	case 428:
-		return _topBarYPos;
+		return _topBarBorderWidth;
 	case 432:
-		return _screenshotWidth;
+		return _topBarYPos;
 	case 436:
-		return _screenshotHeight;
+		return _screenshotWidth;
 	case 440:
-		return _topBarFont;
+		return _screenshotHeight;
 	case 444:
-		return _speechTextAlign;
+		return _topBarFont;
 	case 448:
-		return _autoUseWalkToPoints;
+		return _speechTextAlign;
 	case 452:
-		return _inventoryGreysOut;
+		return _autoUseWalkToPoints;
 	case 456:
-		return _skipSpeechSpecificKey;
+		return _inventoryGreysOut;
 	case 460:
-		return _abortKey;
+		return _skipSpeechSpecificKey;
 	case 464:
-		return _fadeToRed;
+		return _abortKey;
 	case 468:
-		return _fadeToGreen;
+		return _fadeToRed;
 	case 472:
-		return _fadeToBlue;
+		return _fadeToGreen;
 	case 476:
-		return _showSingleDialogOption;
+		return _fadeToBlue;
 	case 480:
-		return _keepScreenDuringInstantTransition;
+		return _showSingleDialogOption;
 	case 484:
-		return _readDialogOptionColor;
+		return _keepScreenDuringInstantTransition;
 	case 488:
+		return _readDialogOptionColor;
+	case 492:
 		return _stopDialogAtEnd;
 	default:
 		error("GameState::readUint32: offset %d is invalid", offset);
@@ -215,9 +217,242 @@ uint32 GameState::readUint32(uint offset) {
 }
 
 bool GameState::writeUint32(uint offset, uint value) {
-	// FIXME
+	if (offset >= 20 && offset <= (20 + 4 * MAXGLOBALVARS)) {
+		if (offset % 4 != 0)
+			error("GameState::readWrite32: offset %d is invalid", offset);
+		offset = (offset - 20) / 4;
+		_globalVars[offset] = value;
+		return true;
+	}
 
-	return false;
+	switch (offset) {
+	case 0:
+		_score = value;
+		break;
+	case 4:
+		_usedMode = value;
+		break;
+	case 8:
+		_disabledUserInterface = value;
+		break;
+	case 12:
+		_gscriptTimer = value;
+		break;
+	case 16:
+		_debugMode = value;
+		break;
+	case 220:
+		_messageTime = value;
+		break;
+	case 224:
+		_usedInv = value;
+		break;
+	case 228:
+		_invTop = value;
+		break;
+	case 232:
+		_invNumDisplayed = value;
+		break;
+	case 236:
+		_invNumOrder = value;
+		break;
+	case 240:
+		_invNumInLine = value;
+		break;
+	case 244:
+		_textSpeed = value;
+		break;
+	case 248:
+		_sierraInvColor = value;
+		break;
+	case 252:
+		_talkAnimSpeed = value;
+		break;
+	case 256:
+		_invItemWidth = value;
+		break;
+	case 260:
+		_invItemHeight = value;
+		break;
+	case 264:
+		_speechTextShadow = value;
+		break;
+	case 268:
+		_swapPortraitSide = value;
+		break;
+	case 272:
+		_speechTextWindowGUI = value;
+		break;
+	case 276:
+		_followChangeRoomTimer = value;
+		break;
+	case 280:
+		_totalScore = value;
+		break;
+	case 284:
+		_skipDisplay = value;
+		break;
+	case 288:
+		_noMultiLoopRepeat = value;
+		break;
+	case 292:
+		_roomScriptFinished = value;
+		break;
+	case 296:
+		_usedInvOn = value;
+		break;
+	case 300:
+		_noTextBgWhenVoice = value;
+		break;
+	case 304:
+		_maxDialogOptionWidth = value;
+		break;
+	case 308:
+		_noHiColorFadeIn = value;
+		break;
+	case 312:
+		_bgSpeechGameSpeed = value;
+		break;
+	case 316:
+		_bgSpeechStayOnDisplay = value;
+		break;
+	case 320:
+		_unfactorSpeechFromTextLength = value;
+		break;
+	case 324:
+		_mp3LoopBeforeEnd = value;
+		break;
+	case 328:
+		_speechMusicDrop = value;
+		break;
+	case 332:
+		_inCutscene = value;
+		break;
+	case 336:
+		_fastForward = value;
+		break;
+	case 340:
+		_roomWidth = value;
+		break;
+	case 344:
+		_roomHeight = value;
+		break;
+	case 348:
+		_gameSpeedModifier = value;
+		break;
+	case 352:
+		_scoreSound = value;
+		break;
+	case 356:
+		_takeoverData = value;
+		break;
+	case 360:
+		_replayHotkey = value;
+		break;
+	case 364:
+		_dialogOptionsX = value;
+		break;
+	case 368:
+		_dialogOptionsY = value;
+		break;
+	case 372:
+		_narratorSpeech = value;
+		break;
+	case 376:
+		_ambientSoundsPersist = value;
+		break;
+	case 380:
+		_lipsyncSpeed = value;
+		break;
+	case 384:
+		_closeMouthSpeechTime = value;
+		break;
+	case 388:
+		_disableAntialiasing = value;
+		break;
+	case 392:
+		_textSpeedModifier = value;
+		break;
+	case 396:
+		_textAlign = value;
+		break;
+	case 400:
+		_speechBubbleWidth = value;
+		break;
+	case 404:
+		_minDialogOptionWidth = value;
+		break;
+	case 408:
+		_disableDialogParser = value;
+		break;
+	case 412:
+		_animBackgroundSpeed = value;
+		break;
+	case 416:
+		_topBarBackColor = value;
+		break;
+	case 420:
+		_topBarTextColor = value;
+		break;
+	case 424:
+		_topBarBorderColor = value;
+		break;
+	case 428:
+		_topBarBorderWidth = value;
+		break;
+	case 432:
+		_topBarYPos = value;
+		break;
+	case 436:
+		_screenshotWidth = value;
+		break;
+	case 440:
+		_screenshotHeight = value;
+		break;
+	case 444:
+		_topBarFont = value;
+		break;
+	case 448:
+		_speechTextAlign = value;
+		break;
+	case 452:
+		_autoUseWalkToPoints = value;
+		break;
+	case 456:
+		_inventoryGreysOut = value;
+		break;
+	case 460:
+		_skipSpeechSpecificKey = value;
+		break;
+	case 464:
+		_abortKey = value;
+		break;
+	case 468:
+		_fadeToRed = value;
+		break;
+	case 472:
+		_fadeToGreen = value;
+		break;
+	case 476:
+		_fadeToBlue = value;
+		break;
+	case 480:
+		_showSingleDialogOption = value;
+		break;
+	case 484:
+		_keepScreenDuringInstantTransition = value;
+		break;
+	case 488:
+		_readDialogOptionColor = value;
+		break;
+	case 492:
+		_stopDialogAtEnd = value;
+		break;
+	default:
+		return false;
+	}
+
+	return true;
 }
 
 void GameState::init() {
