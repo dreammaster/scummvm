@@ -2082,9 +2082,51 @@ Common::String AGSEngine::getTranslation(const Common::String &text) {
 }
 
 Common::String AGSEngine::replaceMacroTokens(const Common::String &text) {
-	// FIXME: implement
+	Common::String out;
 
-	return text;
+	bool hasMacro = false;
+	Common::String macroName;
+	for (uint i = 0; i < text.size(); ++i) {
+		if (!hasMacro) {
+			if (text[i] != '@')
+				out += text[i];
+			else
+				hasMacro = true;
+			continue;
+		}
+
+		if (text[i] != '@') {
+			macroName += text[i];
+			continue;
+		}
+
+		// try and find a macro; if we don't match one, just output as it was
+		if (macroName.equalsIgnoreCase("score"))
+			out += Common::String::format("%d", _state->_score);
+		else if (macroName.equalsIgnoreCase("totalscore"))
+			out += Common::String::format("%d", _state->_totalScore);
+		else if (macroName.equalsIgnoreCase("scoretext"))
+			out += Common::String::format("%d of %d", _state->_score, _state->_totalScore);
+		else if (macroName.equalsIgnoreCase("gamename"))
+			out += _gameFile->_gameName;
+		else if (macroName.equalsIgnoreCase("overhotspot")) {
+			// while the game is in wait mode, no overhotspot text
+			if (!_state->_disabledUserInterface) {
+				Common::Point mousePos = _system->getEventManager()->getMousePos();
+				mousePos.x = divideDownCoordinate(mousePos.x);
+				mousePos.y = divideDownCoordinate(mousePos.y);
+				out += getLocationName(mousePos);
+			}
+		} else
+			out += '@' + macroName;
+
+		hasMacro = false;
+	}
+
+	if (hasMacro)
+		out += '@' + macroName;
+
+	return out;
 }
 
 // Multiplies up the number of pixels depending on the current
