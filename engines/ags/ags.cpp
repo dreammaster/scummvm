@@ -911,15 +911,75 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 	// FIXME
 
+	if (forChar) {
+		// if it's not a Restore Game
+
+		// FIXME: following
+
+		_graphics->_viewportX = 0;
+		_graphics->_viewportY = 0;
+		forChar->_prevRoom = forChar->_room;
+		forChar->_room = id;
+
+		// only stop moving if it's a new room, not a restore game
+		for (uint i = 0; i < _characters.size(); ++i)
+			_characters[i]->stopMoving();
+	}
+
 	// compile_room_script
-	delete _roomScript;
-	delete _roomScriptFork;
 	_roomScript = new ccInstance(this, _currentRoom->_compiledScript);
 	_roomScriptFork = new ccInstance(this, _currentRoom->_compiledScript, false, _roomScript);
 	// FIXME: optimization stuff
+	// FIXME: global data
 
-	// FIXME
+	_state->_enteredEdge = (uint)-1;
 
+	if (_newRoomX != SCR_NO_VALUE && forChar) {
+		forChar->_x = _newRoomX;
+		forChar->_y = _newRoomY;
+	}
+
+	_newRoomX = SCR_NO_VALUE;
+
+	// FIXME: room entry stuff
+
+	// FIXME: music
+
+	if (forChar) {
+		// disable/enable the player character as specified in the room options
+		if (!_currentRoom->_options[ST_MANDISABLED]) {
+			forChar->_on = 1;
+			// FIXME: enableCursorMode(0);
+		} else {
+			forChar->_on = 0;
+			// FIXME: disableCursorMode(0);
+			// remember which character we turned off, in case they
+			// use SetPlayerChracter within this room (so we re-enable
+			// the correct character when leaving the room)
+			_state->_temporarilyTurnedOffCharacter = _gameFile->_playerChar;
+		}
+
+		// reset the frame/view
+		if (!(forChar->_flags & CHF_FIXVIEW)) {
+			if (_currentRoom->_options[ST_MANVIEW])
+				forChar->_view = _currentRoom->_options[ST_MANVIEW] - 1;
+			else
+				forChar->_view = forChar->_defView;
+		}
+		forChar->_frame = 0; // make him standing
+	}
+
+	// FIXME: lots and lots
+
+	updateViewport();
+
+	_state->_gscriptTimer = (uint)-1; // avoid screw-ups with changing screens
+	_state->_playerOnRegion = 0;
+
+	// FIXME: drop input
+
+	debugC(kDebugLevelGame, "now in room %d", _displayedRoom);
+	// TODO: plugin hook
 	invalidateGUI();
 }
 
@@ -931,6 +991,27 @@ void AGSEngine::unloadOldRoom() {
 	_roomObjectState->_hotspotObject->setArray(&_roomObjectState->_invalidHotspots);
 	_roomObjectState->_regionObject->setArray(&_roomObjectState->_invalidRegions);
 
+	if (!_state->_ambientSoundsPersist)
+		for (uint i = 0; i < 8; ++i)
+			_audio->stopAmbientSound(i);
+
+	// FIXME: save room data segment
+	delete _roomScriptFork;
+	_roomScriptFork = NULL;
+	delete _roomScript;
+	_roomScript = NULL;
+	// cancel any pending room events
+	_queuedGameEvents.clear();
+
+	_state->_bgFrame = 0;
+	_state->_bgFrameLocked = 0;
+	_state->_offsetsLocked = 0;
+
+	// FIXME: a lot of unimplemented stuff
+	warning("AGSEngine::unloadOldRoom() unimplemented");
+
+	_state->_swapPortraitLastChar = (uint)-1;
+
 	// remove all the exported objects
 	for (uint i = 0; i < _currentRoom->_objects.size(); ++i) {
 		RoomObject *obj = _currentRoom->_objects[i];
@@ -941,12 +1022,14 @@ void AGSEngine::unloadOldRoom() {
 		_scriptState->removeImport(hotspot._scriptName);
 	}
 
+	if (_state->_temporarilyTurnedOffCharacter != (uint16)-1) {
+		_characters[_state->_temporarilyTurnedOffCharacter]->_on = 1;
+		_state->_temporarilyTurnedOffCharacter = (uint16)-1;
+	}
+
 	// FIXME: discard room if we shouldn't keep it
 	_currentRoom->unload();
 	_currentRoom = NULL;
-
-	// FIXME: a lot of unimplemented stuff
-	warning("AGSEngine::unloadOldRoom() unimplemented");
 }
 
 void AGSEngine::checkNewRoom() {
@@ -965,6 +1048,7 @@ void AGSEngine::checkNewRoom() {
 	_inNewRoomState = newRoomWas;
 }
 
+// 'NewRoom' in original
 void AGSEngine::scheduleNewRoom(uint roomId) {
 	// FIXME: sanity-check roomId?
 
@@ -1009,8 +1093,8 @@ void AGSEngine::scheduleNewRoom(uint roomId) {
 			// nasty hack - make sure it doesn't move the character
 			// to a walkable area
 			//mls[playerchar->walking].direct = 1;
-			//StopMoving(game.playercharacter);
-	  }
+			_playerChar->stopMoving();
+		}
 	}
 	// in_graph_script was consulted here
 }

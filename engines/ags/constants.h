@@ -318,6 +318,15 @@ enum AGSRoomVersion {
 #define MSG_PLAYBUTTON   494    // "Play"
 #define MSG_QUITDIALOG   495    // "Do you want to quit?"
 
+// Room options
+enum {
+	ST_TUNE = 0,		// startup music
+	ST_SAVELOAD = 1,	// can save/load on screen (0 = yes, 1 = no)
+	ST_MANDISABLED = 2,	// player character disabled? (0 = no, 1 = yes)
+	ST_MANVIEW = 3,		// player special view (0 = normal)
+	ST_VOLUME = 4		// music volume (0 = normal, <0 quieter, >0 louder)
+};
+
 } // End of namespace AGS
 
 #endif // AGS_CONSTANTS_H
