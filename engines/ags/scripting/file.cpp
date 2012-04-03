@@ -264,6 +264,7 @@ RuntimeValue Script_File_Open(AGSEngine *vm, ScriptObject *, const Common::Array
 RuntimeValue Script_File_Close(AGSEngine *vm, ScriptFile *self, const Common::Array<RuntimeValue> &params) {
 	self->_outFile->finalize();
 	delete self->_outFile;
+	self->_outFile = NULL;
 	self->_mode = 0;
 
 	return RuntimeValue();
