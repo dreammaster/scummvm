@@ -155,9 +155,12 @@ struct RuntimeValue {
 			uint32 offset2 = value._value;
 			ScriptObject *object2 = value._object->getObjectAt(offset2);
 			return (offset1 == offset2) && (object1 == object2);
-		} else {
-			return (_type == value._type) && (_value == value._value);
+		} else if (_type == rvtFloat && value._type == rvtInteger) {
+			return _value == value._value;
+		} else if (_type == rvtInteger && value._type == rvtFloat) {
+			return _value == value._value;
 		}
+		return (_type == value._type) && (_value == value._value);
 	}
 
 	void invalidate() {
@@ -183,6 +186,8 @@ struct ccScript {
 };
 
 struct ScriptImport {
+	ScriptImport() : _type(sitInvalid), _owner(NULL) { }
+
 	ScriptImportType _type;
 
 	// function pointer (system)

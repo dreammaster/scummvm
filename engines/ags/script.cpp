@@ -217,6 +217,11 @@ ccInstance::ccInstance(AGSEngine *vm, ccScript *script, bool autoImport, ccInsta
 			state->addImport(mangledName, import);
 		}
 	}
+
+	_registers.resize(CC_NUM_REGISTERS);
+	_stack.resize(CC_STACK_SIZE);
+	for (uint i = 0; i < _stack.size(); ++i)
+		_stack[i].invalidate();
 }
 
 ccInstance::~ccInstance() {
@@ -308,16 +313,19 @@ void ccInstance::call(const Common::String &name, const Common::Array<RuntimeVal
 	// vm setup
 
 	// clear stack/registers
-	_stack.clear();
-	_stack.resize(CC_STACK_SIZE);
-	for (uint i = 0; i < _stack.size(); ++i)
-		_stack[i]._type = rvtInvalid;
-	_registers.clear();
-	_registers.resize(CC_NUM_REGISTERS);
+	//_stack.clear();
+	//_stack.resize(CC_STACK_SIZE);
+	//for (uint i = 0; i < _stack.size(); ++i)
+	//	_stack[i]._type = rvtInvalid;
+	//_registers.clear();
+	//_registers.resize(CC_NUM_REGISTERS);
+
+	// object pointer needs to start zeroed
+	_registers[SREG_OP] = 0;
 
 	// initialize stack pointer
+	_registers[SREG_SP] = 0;
 	_registers[SREG_SP]._type = rvtStackPointer;
-	_registers[SREG_SP]._value = 0;
 
 	// push parameters onto stack in reverse order
 	for (uint i = params.size(); i > 0; --i)
@@ -326,7 +334,6 @@ void ccInstance::call(const Common::String &name, const Common::Array<RuntimeVal
 	pushValue(0);
 
 	_runningInst = this;
-
 	runCodeFrom(codeLoc);
 
 	// check the stack was left in a sane state
@@ -461,7 +468,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 	Common::Stack<RuntimeValue> externalStack;
 	bool nextCallNeedsObject = false;
 	bool recoverFromCallAs = false;
-	uint32 funcArgumentCount = 0xffffffff;
+	uint32 funcArgumentCount = (uint)-1;
 
 	Common::Stack<uint32> currentBase;
 	currentBase.push(0);
@@ -570,7 +577,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 		}
 		debug(4, " ");
 
-		const RuntimeValue &val1 = argVal[0], &val2 = argVal[1];
+		const RuntimeValue &val2 = argVal[1];
 		int32 int1 = (int)argVal[0]._value, int2 = (int)argVal[1]._value;
 
 		// temporary variables
@@ -607,7 +614,9 @@ void ccInstance::runCodeFrom(uint32 start) {
 					error("script tried using WRITELIT unsafely on stack (%d bytes of %d) on line %d",
 						int1, int2, _lineNumber);
 				// FIXME: check bounds
-				for (uint i = 0; i < (uint)int1; ++i)
+				_stack[_registers[SREG_MAR]._value] = 0;
+				// TODO: good?
+				for (uint i = 1; i < (uint)int1; ++i)
 					_stack[i + _registers[SREG_MAR]._value].invalidate();
 				break;
 			}
@@ -630,10 +639,11 @@ void ccInstance::runCodeFrom(uint32 start) {
 				_returnValue = _registers[SREG_AX];
 				return;
 			}
-			// FIXME: set current instance?
+			// TODO: set current instance?
 
 			currentBase.pop();
 			currentStart.pop();
+			// TODO: restore call stack (line number etc)
 
 			// continue so that the PC doesn't get overwritten
 			continue;
@@ -644,7 +654,6 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_MEMREAD:
 			// reg1 = m[MAR]
 			tempVal = _registers[SREG_MAR];
-			// FIXME: other cases
 			switch (tempVal._type) {
 			case rvtScriptData:
 				// FIXME: bounds checks
@@ -673,6 +682,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 				if (_stack[tempVal._value]._type == rvtInvalid)
 					error("script tried to MEMREAD from invalid stack@%d on line %d",
 						tempVal._value, _lineNumber);
+				// TODO: make sure the other stack entries didn't get prodded at in the meantime
 				_registers[int1] = _stack[tempVal._value];
 				break;
 			default:
@@ -688,17 +698,17 @@ void ccInstance::runCodeFrom(uint32 start) {
 				// FIXME: bounds checks
 				instScript = tempVal._instance->_script;
 				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
-				// FIXME: *wrong*, this should be a pointer?
-				// FIXME	argVal[v]._value = (*inst->_globalData)[argValue];
 				if (fixup != instScript->_globalFixups.end())
-					error("MEMWRITE fixup fail");
+					error("script tried to MEMWRITE script data at %d with a fixup on line %d",
+						tempVal._value, _lineNumber);
 				if (_registers[int1]._type == rvtSystemObject) {
 					// writing an object to script global data
 					WRITE_LE_UINT32(&(*tempVal._instance->_globalData)[tempVal._value], 0);
 					(*tempVal._instance->_globalObjects)[tempVal._value] = _registers[int1];
 					break;
 				}
-				if (_registers[int1]._type != rvtInteger)
+				// FIXME: agh, float horror
+				if (_registers[int1]._type != rvtInteger && _registers[int1]._type != rvtFloat)
 					error("script tried to MEMWRITE runtime value of type %d (value %d) on line %d",
 						_registers[int1]._type, _registers[int1]._value, _lineNumber);
 				if (tempVal._instance->_globalObjects->contains(tempVal._value))
@@ -816,7 +826,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 			if (currentStart.size() > MAXNEST - 1)
 				error("too many nested script calls on line %d, infinite recursion?", _lineNumber);
 
-			// FIXME: store call stack
+			// TODO: store call stack (line number etc)
 
 			// push return value onto stack
 			pushValue(_pc + neededArgs + 1);
@@ -845,7 +855,6 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_MEMREADW:
 			// reg1 = m[MAR] (2 bytes)
 			tempVal = _registers[SREG_MAR];
-			// FIXME: other cases
 			switch (tempVal._type) {
 			case rvtScriptData:
 				// FIXME: bounds checks
@@ -914,13 +923,21 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_JZ:
 			// jump if ax==0 by arg1
-			if (_registers[SREG_AX]._type == rvtInteger && _registers[SREG_AX]._value == 0)
-				_pc += int1;
+			if (_registers[SREG_AX]._type != rvtInteger && _registers[SREG_AX]._type != rvtFloat)
+				break;
+			if (_registers[SREG_AX]._type == rvtFloat && _registers[SREG_AX]._floatValue != 0.0f)
+				break;
+			if (_registers[SREG_AX]._type == rvtInteger && _registers[SREG_AX]._value != 0)
+				break;
+			_pc += int1;
 			break;
 		case SCMD_JNZ:
 			// jump by arg1 if ax!=0
-			if (_registers[SREG_AX]._type != rvtInteger || _registers[SREG_AX]._value != 0)
-				_pc += int1;
+			if (_registers[SREG_AX]._type == rvtFloat && _registers[SREG_AX]._floatValue == 0.0f)
+				break;
+			if (_registers[SREG_AX]._type == rvtInteger && _registers[SREG_AX]._value == 0)
+				break;
+			_pc += int1;
 			break;
 		case SCMD_PUSHREG:
 			// m[sp]=reg1; sp++
@@ -987,13 +1004,11 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_MEMZEROPTR:
 			// m[MAR] = 0    (blank ptr)
-			// FIXME
-			_registers[SREG_MAR] = 0;
+			writePointer(_registers[SREG_MAR], NULL);
 			break;
 		case SCMD_MEMZEROPTRND:
 			// m[MAR] = 0    (blank ptr, no dispose if = ax)
-			// FIXME
-			_registers[SREG_MAR] = 0;
+			writePointer(_registers[SREG_MAR], NULL);
 			break;
 		case SCMD_CHECKNULL:
 			// error if MAR==0
@@ -1015,13 +1030,15 @@ void ccInstance::runCodeFrom(uint32 start) {
 			if (_registers[int1]._type != rvtScriptFunction)
 				error("script tried to CALLAS non-script-function runtime value of type %d (value %d) on line %d",
 					_registers[int1]._type, _registers[int1]._value, _lineNumber);
+			// TODO: store call stack (line number etc)
+
 			// save current state
 			ccInstance *wasRunning = _runningInst;
 			uint32 oldpc = _pc;
 
 			// push the parameters on the stack
 			uint startArg = 0;
-			if (funcArgumentCount != 0xffffffff) {
+			if (funcArgumentCount != (uint)-1) {
 				// only push arguments for this call
 				// (there might be nested CALLAS calls?)
 				startArg = externalStack.size() - funcArgumentCount;
@@ -1045,8 +1062,10 @@ void ccInstance::runCodeFrom(uint32 start) {
 			// restore previous state
 			_pc = oldpc;
 			_runningInst = wasRunning;
+			// TODO: restore call stack (line number etc)
 
 			recoverFromCallAs = !externalStack.empty();
+			funcArgumentCount = (uint)-1;
 			nextCallNeedsObject = false;
 			}
 			break;
@@ -1058,7 +1077,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 			debug(2, "calling external function '%s'", script->_imports[_registers[int1]._value].c_str());
 
 			recoverFromCallAs = false;
-			if (funcArgumentCount == 0xffffffff)
+			if (funcArgumentCount == (uint)-1)
 				funcArgumentCount = externalStack.size();
 
 			// construct the parameter list (in reverse order)
@@ -1067,7 +1086,6 @@ void ccInstance::runCodeFrom(uint32 start) {
 				params[i] = externalStack[externalStack.size() - i - 1];
 
 			if (nextCallNeedsObject) {
-				// FIXME: resolve array here?
 				if (_registers[SREG_OP]._type != rvtSystemObject)
 					error("script tried to CALLEXT on non-system-object runtime value of type %d (value %d) on line %d",
 						tempVal._type, tempVal._value, _lineNumber);
@@ -1085,8 +1103,8 @@ void ccInstance::runCodeFrom(uint32 start) {
 				_registers[SREG_AX] = callImportedFunction(_registers[int1]._function, NULL, params);
 			}
 
-			// FIXME: unfinished
-			funcArgumentCount = 0xffffffff;
+			// TODO: unfinished
+			funcArgumentCount = (uint)-1;
 			nextCallNeedsObject = false;
 			break;
 		case SCMD_PUSHREAL:
@@ -1400,6 +1418,7 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 }
 
 void ccInstance::pushValue(const RuntimeValue &value) {
+	// TODO: shouldn't be assert?
 	assert(_registers[SREG_SP]._type == rvtStackPointer);
 
 	uint32 stackValue = _registers[SREG_SP]._value;
@@ -1415,6 +1434,7 @@ void ccInstance::pushValue(const RuntimeValue &value) {
 }
 
 RuntimeValue ccInstance::popValue() {
+	// TODO: shouldn't be assert?
 	assert(_registers[SREG_SP]._type == rvtStackPointer && _registers[SREG_SP]._value >= 4);
 
 	_registers[SREG_SP]._value -= 4;
