@@ -264,10 +264,11 @@ RuntimeValue Script_FollowCharacterEx(AGSEngine *vm, ScriptObject *, const Commo
 // Obsolete character function.
 RuntimeValue Script_SetPlayerCharacter(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 
-	// FIXME
-	error("SetPlayerCharacter unimplemented");
+	if (charid >= vm->_characters.size())
+		error("SetPlayerCharacter: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	vm->setAsPlayerChar(charid);
 
 	return RuntimeValue();
 }
@@ -1258,8 +1259,7 @@ RuntimeValue Script_Character_SayBackground(AGSEngine *vm, Character *self, cons
 // Character: import function SetAsPlayer()
 // Makes this character the player character.
 RuntimeValue Script_Character_SetAsPlayer(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::SetAsPlayer unimplemented");
+	vm->setAsPlayerChar(self->_indexId);
 
 	return RuntimeValue();
 }

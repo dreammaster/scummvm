@@ -274,6 +274,7 @@ public:
 	class AGSAudio *_audio;
 	AGSGraphics *_graphics;
 
+	void setAsPlayerChar(uint charId);
 	Character *getPlayerChar() { return _playerChar; }
 	Common::Array<Character *> _characters;
 

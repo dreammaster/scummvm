@@ -1053,6 +1053,35 @@ void AGSEngine::newRoom(uint roomId) {
 	loadNewRoom(roomId, _playerChar);
 }
 
+void AGSEngine::setAsPlayerChar(uint charId) {
+	if (charId == _gameFile->_playerChar)
+		return;
+
+	setupPlayerCharacter(charId);
+
+	debugC(kDebugLevelGame, "'%s' is now player character", _playerChar->_scriptName.c_str());
+
+	// if we're still starting the game, return now
+	if (_displayedRoom == 0xffffffff)
+		return;
+
+	if (_displayedRoom != _playerChar->_room)
+		scheduleNewRoom(_playerChar->_room);
+	else
+		_state->_playerOnRegion = _currentRoom->getRegionAt(_playerChar->_x, _playerChar->_y);
+
+	// FIXME: is this what's intended?
+	if (_playerChar->_activeInv != (uint)-1 && _playerChar->_inventory[_playerChar->_activeInv] < 1)
+		_playerChar->_activeInv = (uint)-1;
+
+	if (_cursorMode == MODE_USE) {
+		/* FIXME: if (_playerChar->_activeInv == (uint)-1)
+			setNextCursor();
+		else
+			setActiveInventory(_playerChar->_activeInv); */
+	}
+}
+
 // 'setevent' in original
 void AGSEngine::queueGameEvent(GameEventType type, uint data1, uint data2, uint data3) {
 	GameEvent ev;
