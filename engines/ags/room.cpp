@@ -288,8 +288,8 @@ void RoomObject::stopMoving() {
 	_moving = false;
 }
 
-uint RoomObject::getBaseline() const {
-	return _baseLine ? _baseLine : _pos.y;
+int RoomObject::getBaseline() const {
+	return _baseline ? _baseline : _pos.y;
 }
 
 Common::Point RoomObject::getDrawPos() {
@@ -698,8 +698,8 @@ void Room::readData(Common::SeekableReadStream *dta) {
 			for (uint i = 0; i < _objects.size(); ++i) {
 				_objects[i]->_pos.x *= 2;
 				_objects[i]->_pos.y *= 2;
-				if (_objects[i]->_baseLine != 0xffffffff)
-					_objects[i]->_baseLine *= 2;
+				if (_objects[i]->_baseline != -1)
+					_objects[i]->_baseline *= 2;
 			}
 
 			for (uint i = 0; i < _hotspots.size(); ++i) {
@@ -724,8 +724,8 @@ void Room::readData(Common::SeekableReadStream *dta) {
 			for (uint i = 0; i < _objects.size(); ++i) {
 				_objects[i]->_pos.x /= 2;
 				_objects[i]->_pos.y /= 2;
-				if (_objects[i]->_baseLine != 0xffffffff)
-					_objects[i]->_baseLine /= 2;
+				if (_objects[i]->_baseline != -1)
+					_objects[i]->_baseline /= 2;
 			}
 
 			for (uint i = 0; i < _hotspots.size(); ++i) {
@@ -955,7 +955,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 			dta->skip(_objects.size() * 4);
 		} else {
 			for (uint i = 0; i < _objects.size(); ++i)
-				_objects[i]->_baseLine = dta->readUint32LE();
+				_objects[i]->_baseline = dta->readUint32LE();
 		}
 		_width = dta->readUint16LE();
 		_height = dta->readUint16LE();

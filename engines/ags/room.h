@@ -99,7 +99,7 @@ struct RoomRegion : public ScriptObject {
 struct RoomObject : public ScriptObject, public Drawable {
 	RoomObject(AGSEngine *vm, uint id) : _vm(vm), _interaction(NULL), _flags(0), _id(id),
 		_view(-1), _loop(0), _frame(0), _wait(0), _cycling(0), _transparency(0), _moving((uint16)-1),
-		_blockingWidth(0), _blockingHeight(0), _baseLine((uint)-1) { }
+		_blockingWidth(0), _blockingHeight(0), _baseline(-1) { }
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotRoomObject); }
 	const char *getObjectTypeName() { return "RoomObject"; }
 
@@ -129,7 +129,7 @@ struct RoomObject : public ScriptObject, public Drawable {
 	void update();
 	void stopMoving();
 
-	uint getBaseline() const;
+	int getBaseline() const;
 
 	uint _id;
 
@@ -141,7 +141,7 @@ struct RoomObject : public ScriptObject, public Drawable {
 	Common::StringMap _properties;
 
 	// originally from room, mutable
-	uint32 _baseLine;
+	int32 _baseline;
 	uint16 _flags;
 	// below originally from sprite
 	Common::Point _pos;

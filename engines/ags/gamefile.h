@@ -258,6 +258,7 @@ public:
 
 	uint32 _guiVersion;
 	Common::Array<GUIGroup *> _guiGroups;
+	Common::Array<GUIGroup *> _guiGroupDrawOrder;
 
 	Common::Array<GUIButton *> _guiButtons;
 	Common::Array<GUILabel *> _guiLabels;

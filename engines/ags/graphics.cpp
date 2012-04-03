@@ -495,8 +495,8 @@ void AGSGraphics::drawOutlinedString(uint fontId, Graphics::Surface *surface, co
 
 struct DrawableLess {
 	bool operator()(const Drawable *a, const Drawable *b) const {
-		uint baseLineA = a->getDrawOrder();
-		uint baseLineB = b->getDrawOrder();
+		int baseLineA = a->getDrawOrder();
+		int baseLineB = b->getDrawOrder();
 		if (baseLineA == baseLineB) {
 			if (a->priorityIfEqual())
 				return false;
@@ -558,17 +558,17 @@ void AGSGraphics::draw() {
 	// TODO: make this suck less
 	drawSnowRain();
 
-	// FIXME
+	// FIXME: draw non-text overlays
 
 	// draw GUIs
 	for (uint i = 0; i < _vm->_gameFile->_guiGroups.size(); ++i) {
-		GUIGroup *group = _vm->_gameFile->_guiGroups[i];
+		GUIGroup *group = _vm->_gameFile->_guiGroupDrawOrder[i];
 		if (!group->_visible)
 			continue;
 		draw(group);
 	}
 
-	// FIXME
+	// FIXME: draw overlays
 
 	_cursorObj->tick();
 	if (!_vm->_state->_mouseCursorHidden)

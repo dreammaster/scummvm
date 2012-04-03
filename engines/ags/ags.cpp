@@ -432,7 +432,7 @@ void AGSEngine::updateEvents(bool checkControls) {
 	int activeGUI = -1;
 
 	Common::Point mousePos = _system->getEventManager()->getMousePos();
-	bool guisTurnedOffAsDisabled = (getGameOption(OPT_DISABLEOFF) == 3 /* FIXME: && _allButtonsDisabled */);
+	bool guisTurnedOffAsDisabled = (getGameOption(OPT_DISABLEOFF) == 3 && false /* FIXME: _allButtonsDisabled */);
 
 	if (mouseMoved && !_state->_disabledUserInterface) {
 		// Notify all the GUIs, so they can do hover effects etc.
@@ -447,12 +447,11 @@ void AGSEngine::updateEvents(bool checkControls) {
 
 	if (!guisTurnedOffAsDisabled) {
 		for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
-			// FIXME: use draw order instead!
-			GUIGroup *group = _gameFile->_guiGroups[i];
+			GUIGroup *group = _gameFile->_guiGroupDrawOrder[i];
 
 			// store the mouseover GUI for later use
 			if (group->isMouseOver(mousePos))
-				activeGUI = i;
+				activeGUI = group->_id;
 
 			// check for enabled popup-on-y-pos GUIs which need activation
 			if (group->_popup != POPUP_MOUSEY)
@@ -468,12 +467,12 @@ void AGSEngine::updateEvents(bool checkControls) {
 			// FIXME: break if is complete overlay
 
 			// no need to do it more than once
-			if (_poppedInterface == i)
+			if (_poppedInterface == group->_id)
 				continue;
 
 			_graphics->setMouseCursor(CURS_ARROW);
 			group->setVisible(true);
-			_poppedInterface = i;
+			_poppedInterface = group->_id;
 			pauseGame();
 			break;
 		}
@@ -1774,21 +1773,38 @@ void AGSEngine::setCursorMode(uint32 newMode) {
 
 // 'update_gui_zorder'
 void AGSEngine::resortGUIs() {
-	// FIXME
+	Common::Array<GUIGroup *> &groups = _gameFile->_guiGroups;
+	Common::Array<GUIGroup *> &drawOrder = _gameFile->_guiGroupDrawOrder;
+
+	drawOrder.clear();
+	drawOrder.reserve(groups.size());
+
+	// for each GUI
+	for (uint i = 0; i < groups.size(); ++i) {
+		// find the right place in the draw order array
+		uint insertAt = drawOrder.size();
+		for (uint j = 0; j < insertAt; ++j) {
+			if (groups[i]->_zorder < drawOrder[j]->_zorder) {
+				insertAt = j;
+				break;
+			}
+		}
+		// insert the new item
+		drawOrder.insert_at(insertAt, groups[i]);
+	}
 }
 
 uint AGSEngine::getGUIAt(const Common::Point &pos) {
 	Common::Point p(multiplyUpCoordinate(pos.x), multiplyUpCoordinate(pos.y));
 
 	for (int i = _gameFile->_guiGroups.size() - 1; i >= 0; --i) {
-		// FIXME: use draw order
-		GUIGroup *group = _gameFile->_guiGroups[i];
+		GUIGroup *group = _gameFile->_guiGroupDrawOrder[i];
 		if (!group->_visible)
 			continue;
 		if (group->_flags & GUIF_NOCLICK)
 			continue;
 		if (p.x >= group->_x && p.y >= group->_y && p.x <= group->_x + (int)group->_width && p.y > group->_y + (int)group->_height)
-			return (uint)i;
+			return (uint)group->_id;
 	}
 
 	return (uint)-1;

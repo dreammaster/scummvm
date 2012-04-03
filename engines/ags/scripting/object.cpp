@@ -709,7 +709,7 @@ RuntimeValue Script_Object_set_Baseline(AGSEngine *vm, RoomObject *self, const C
 	UNUSED(value);
 
 	// FIXME
-	self->_baseLine = value;
+	self->_baseline = value;
 
 	return RuntimeValue();
 }
