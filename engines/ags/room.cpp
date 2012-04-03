@@ -488,6 +488,30 @@ void Room::updateWalkBehinds() {
 	}
 }
 
+uint Room::getHotspotAt(int x, int y) {
+	x = _vm->convertToLowRes(x);
+	y = _vm->convertToLowRes(y);
+
+	if (x >= _hotspotMask.w)
+		x = _hotspotMask.w - 1;
+	if (y >= _hotspotMask.h)
+		y = _hotspotMask.h - 1;
+	if (x < 0)
+		x = 0;
+	if (y < 0)
+		y = 0;
+
+	void *ptr = _hotspotMask.getBasePtr(x, y);
+	assert(_hotspotMask.format.bytesPerPixel == 1);
+	uint hotspotId = *(byte *)ptr;
+
+	if (hotspotId >= _hotspots.size())
+		error("An invalid pixel was found on the room hotspot mask (colour %d, location: %d, %d)", hotspotId, x, y);
+	if (!_hotspots[hotspotId]._enabled)
+		return 0;
+	return hotspotId;
+}
+
 uint Room::getObjectAt(int x, int y) {
 	uint objectYPos;
 	return getObjectAt(x, y, objectYPos);

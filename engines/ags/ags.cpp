@@ -1857,8 +1857,7 @@ uint AGSEngine::getLocationType(const Common::Point &pos, uint &id, bool through
 	// FIXME: characters (use p!)
 	uint charYPos = 0;
 	uint charAt = (uint)-1;
-	// FIXME: hotspots (use p!)
-	uint hotspotAt = 0;
+	uint hotspotAt = _currentRoom->getHotspotAt(p.x, p.y);
 	// getObjectAt adjusts the parameters itself, so use the unmodified pos.
 	uint objectYPos = 0;
 	uint objAt = _currentRoom->getObjectAt(pos.x, pos.y, objectYPos);
@@ -1894,7 +1893,7 @@ uint AGSEngine::getLocationType(const Common::Point &pos, uint &id, bool through
 			winner = LOCTYPE_CHAR;
 	} else if (objAt != (uint)-1) {
 		if (walkBase <= objectYPos)
-			winner = LOCTYPE_CHAR;
+			winner = LOCTYPE_OBJ;
 	}
 
 	// Hotspot 0 doesn't win if it's not allowed to.

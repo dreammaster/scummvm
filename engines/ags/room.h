@@ -195,7 +195,7 @@ struct RoomWalkArea {
 };
 
 struct RoomHotspot : public ScriptObject {
-	RoomHotspot() : _interaction(NULL) { }
+	RoomHotspot() : _interaction(NULL), _enabled(true) { }
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotHotspot); }
 	const char *getObjectTypeName() { return "RoomHotspot"; }
 
@@ -205,6 +205,7 @@ struct RoomHotspot : public ScriptObject {
 	NewInteraction *_interaction;
 	InteractionScript _interactionScripts;
 	Common::StringMap _properties;
+	bool _enabled;
 };
 
 struct BackgroundScene {
@@ -240,6 +241,7 @@ public:
 	void initWalkBehinds();
 	void updateWalkBehinds();
 
+	uint getHotspotAt(int x, int y);
 	uint getObjectAt(int x, int y);
 	uint getObjectAt(int x, int y, uint &id);
 	uint getRegionAt(int x, int y);

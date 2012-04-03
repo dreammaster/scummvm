@@ -28,6 +28,7 @@
 #include "engines/ags/constants.h"
 #include "engines/ags/drawingsurface.h"
 #include "engines/ags/gamestate.h"
+#include "engines/ags/graphics.h"
 #include "engines/ags/room.h"
 
 namespace AGS {
@@ -275,14 +276,15 @@ RuntimeValue Script_GetRoomPropertyText(AGSEngine *vm, ScriptObject *, const Com
 // OBSOLETE STUFF
 RuntimeValue Script_GetHotspotAt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("GetHotspotAt unimplemented");
+	x += vm->divideDownCoordinate(vm->_graphics->_viewportX);
+	y += vm->divideDownCoordinate(vm->_graphics->_viewportY);
 
-	return RuntimeValue();
+	if (x < 0 || y < 0 || x >= vm->getCurrentRoom()->_width || y >= vm->getCurrentRoom()->_height)
+		return 0;
+
+	return vm->getCurrentRoom()->getHotspotAt(x, y);
 }
 
 // import int GetObjectAt(int x,int y)
@@ -640,20 +642,15 @@ RuntimeValue Script_Hotspot_RunInteraction(AGSEngine *vm, RoomHotspot *self, con
 // Hotspot: import attribute bool Enabled
 // Gets/sets whether this hotspot is enabled.
 RuntimeValue Script_Hotspot_get_Enabled(AGSEngine *vm, RoomHotspot *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Hotspot::get_Enabled unimplemented");
-
-	return RuntimeValue();
+	return self->_enabled ? 1 : 0;
 }
 
 // Hotspot: import attribute bool Enabled
 // Gets/sets whether this hotspot is enabled.
 RuntimeValue Script_Hotspot_set_Enabled(AGSEngine *vm, RoomHotspot *self, const Common::Array<RuntimeValue> &params) {
 	uint32 value = params[0]._value;
-	UNUSED(value);
 
-	// FIXME
-	error("Hotspot::set_Enabled unimplemented");
+	self->_enabled = (bool)value;
 
 	return RuntimeValue();
 }
