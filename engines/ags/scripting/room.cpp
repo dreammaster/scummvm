@@ -184,11 +184,12 @@ RuntimeValue Script_HasPlayerBeenInRoom(AGSEngine *vm, ScriptObject *, const Com
 // import void CallRoomScript(int value)
 // Calls the on_call function in the current room.
 RuntimeValue Script_CallRoomScript(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint value = params[0]._value;
 
-	// FIXME
-	error("CallRoomScript unimplemented");
+	// FIXME: vm->canRunDelayedCommand("CallRoomScript");
+
+	vm->_state->_roomScriptFinished = false;
+	vm->queueCustomRoomScript(value);
 
 	return RuntimeValue();
 }
