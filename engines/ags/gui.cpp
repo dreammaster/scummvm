@@ -737,6 +737,8 @@ void GUIGroup::onMouseMove(const Common::Point &pos) {
 		_mouseOver = control->_id;
 		control->onMouseEnter();
 		control->onMouseMove(p);
+
+		invalidate();
 	} else if (_mouseOver >= 0) {
 		// The mouse is still over the same control.
 		control->onMouseMove(p);

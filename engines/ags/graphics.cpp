@@ -284,21 +284,19 @@ AGSGraphics::~AGSGraphics() {
 bool AGSGraphics::getScreenSize() {
 	_width = _baseWidth = 320;
 	_height = _baseHeight = 200;
-	_textMultiply = 2;
+	_textMultiply = 1;
 
 	switch (_vm->_gameFile->_defaultResolution) {
 	case 0:
-		_textMultiply = 1;
-		break;
 	case 1:
 	case 2:
-		_width = 320;
-		_height = 200;
+		// use defaults
 		break;
 	case 3:
 	case 4:
 		_width = 640;
 		_height = 400;
+		_textMultiply = 2;
 		break;
 	case 5:
 		_baseWidth = 400;
@@ -313,11 +311,20 @@ bool AGSGraphics::getScreenSize() {
 	if (_vm->_gameFile->_defaultResolution >= 5) {
 		_width = _baseWidth * 2;
 		_height = _baseHeight * 2;
+		_textMultiply = 2;
 		_vm->_gameFile->_options[OPT_LETTERBOX] = 0;
 		_forceLetterbox = false;
 	}
 
 	_screenResolutionMultiplier = _width / _baseWidth;
+
+	if ((_vm->_gameFile->_defaultResolution > 2) && _vm->getGameOption(OPT_NATIVECOORDINATES)) {
+		_baseWidth *= 2;
+		_baseHeight *= 2;
+	}
+
+	if (_vm->getGameOption(OPT_NOSCALEFNT))
+		_textMultiply = 1;
 
 	debug(2, "target resolution: %dx%d real, %dx%d base, multiplier %d %s",
 		_width, _height, _baseWidth, _baseHeight, _screenResolutionMultiplier,
@@ -622,10 +629,14 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 	uint startX = 0, startY = 0;
 	if (pos.x < 0) {
 		startX = -pos.x;
+		if (startX > srcSurf->w)
+			return;
 		pos.x = 0;
 	}
 	if (pos.y < 0) {
 		startY = -pos.y;
+		if (startY > srcSurf->h)
+			return;
 		pos.y = 0;
 	}
 
@@ -641,7 +652,7 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 		for (uint y = 0; y < height; ++y) {
 			byte *dest = (byte *)destSurf->getBasePtr(pos.x, pos.y + y);
 			const byte *src = (byte *)srcSurf->getBasePtr(startX, startY + y);
-			for (uint x = startX; x < width; ++x) {
+			for (uint x = 0; x < width; ++x) {
 				byte data = *src++;
 				if (data != 0)
 					*dest = data;
@@ -656,7 +667,7 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 			for (uint y = 0; y < height; ++y) {
 				uint16 *dest = (uint16 *)destSurf->getBasePtr(pos.x, pos.y + y);
 				const uint16 *src = (uint16 *)srcSurf->getBasePtr(startX, startY + y);
-				for (uint x = startX; x < width; ++x) {
+				for (uint x = 0; x < width; ++x) {
 					uint16 srcData = *src++;
 					if (srcData != transColor)
 						*dest = srcData;
@@ -671,7 +682,7 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 		for (uint y = 0; y < height; ++y) {
 			uint16 *dest = (uint16 *)destSurf->getBasePtr(pos.x, pos.y + y);
 			const uint16 *src = (uint16 *)srcSurf->getBasePtr(startX, startY + y);
-			for (uint x = startX; x < width; ++x) {
+			for (uint x = 0; x < width; ++x) {
 				uint16 srcData = *src++;
 				if (srcData != transColor) {
 					uint16 destData = *dest;
