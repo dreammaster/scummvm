@@ -102,15 +102,15 @@ void shutdownSnowRain();
 AGSEngine::~AGSEngine() {
 	shutdownSnowRain();
 
-	for (uint i = 0; i < _scriptModules.size(); ++i)
-		delete _scriptModules[i];
+	delete _roomScriptFork;
+	delete _roomScript;
+	delete _gameScriptFork;
+	delete _gameScript;
+	delete _dialogScriptsScript;
 	for (uint i = 0; i < _scriptModuleForks.size(); ++i)
 		delete _scriptModuleForks[i];
-	delete _gameScript;
-	delete _gameScriptFork;
-	delete _dialogScriptsScript;
-	delete _roomScript;
-	delete _roomScriptFork;
+	for (uint i = 0; i < _scriptModules.size(); ++i)
+		delete _scriptModules[i];
 
 	delete _currentRoom;
 	for (Common::HashMap<uint, Room *>::iterator i = _loadedRooms.begin(); i != _loadedRooms.end(); ++i)
@@ -1968,7 +1968,7 @@ void AGSEngine::runTextScript(ccInstance *instance, const Common::String &name, 
 	}
 }
 
-ScriptImport AGSEngine::resolveImport(const Common::String &name) {
+ScriptImport AGSEngine::resolveImport(const Common::String &name, bool mustSucceed) {
 	if (name.empty()) {
 		// no such import
 		ScriptImport import;
@@ -1991,7 +1991,10 @@ ScriptImport AGSEngine::resolveImport(const Common::String &name) {
 		}
 	}
 
-	error("unresolved script import '%s'", name.c_str());
+	if (mustSucceed)
+		error("unresolved script import '%s'", name.c_str());
+
+	return ScriptImport();
 }
 
 GlobalScriptState *AGSEngine::getScriptState() {

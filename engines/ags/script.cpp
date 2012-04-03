@@ -220,6 +220,33 @@ ccInstance::ccInstance(AGSEngine *vm, ccScript *script, bool autoImport, ccInsta
 }
 
 ccInstance::~ccInstance() {
+	_script->_instances--;
+	if (_script->_instances == 0) {
+		// FIXME: must make sure that nothing is referencing these!
+
+		GlobalScriptState *state = _vm->getScriptState();
+		for (uint i = 0; i < _script->_exports.size(); ++i) {
+			// remove import if it came from us
+			ScriptImport im = _vm->resolveImport(_script->_exports[i]._name, false);
+			if (im._owner == this)
+				state->removeImport(_script->_exports[i]._name);
+
+			if (!_script->_exports[i]._name.contains('$'))
+				continue;
+
+			// see comment in constructor
+			Common::String mangledName = _script->_exports[i]._name;
+			while (mangledName[mangledName.size() - 1] != '$')
+				mangledName.deleteLastChar();
+			mangledName.deleteLastChar();
+
+			// remove mangled import if it came from us
+			im = _vm->resolveImport(mangledName, false);
+			if (im._owner == this)
+				state->removeImport(mangledName);
+		}
+	}
+
 	if (!(_flags & INSTF_SHAREDATA)) {
 		delete _globalData;
 		delete _globalObjects;
