@@ -1834,6 +1834,66 @@ void AGSEngine::removePopupInterface(uint guiId) {
 	invalidateGUI();
 }
 
+Common::String AGSEngine::getLocationName(const Common::Point &pos) {
+	if (_displayedRoom == 0xffffffff)
+		error("getLocationName called before a room was loaded");
+
+	if (getGUIAt(pos) != (uint)-1) {
+		// FIXME: inventory items
+		return Common::String();
+	}
+
+	uint locId;
+	uint locType = getLocationType(pos, locId);
+
+	// don't reset the loc name if we got passed out-of-bounds coordinates
+	Common::Point p = pos - Common::Point(divideDownCoordinate(_graphics->_viewportX),
+		divideDownCoordinate(_graphics->_viewportY));
+	if (p.x < 0 || p.x >= _currentRoom->_width || p.y < 0 || p.y >= _currentRoom->_height)
+		return Common::String();
+
+	Common::String name;
+
+	switch (locType) {
+	case 0:
+		if (_state->_getLocNameLastTime) {
+			_state->_getLocNameLastTime = 0;
+			invalidateGUI();
+		}
+		break;
+
+	case LOCTYPE_CHAR:
+		if (_state->_getLocNameLastTime != 2000 + locId) {
+			_state->_getLocNameLastTime = 2000 + locId;
+			invalidateGUI();
+		}
+		name = getTranslation(_characters[locId]->_name);
+		break;
+
+	case LOCTYPE_OBJ:
+		if (_state->_getLocNameLastTime != 3000 + locId) {
+			_state->_getLocNameLastTime = 3000 + locId;
+			invalidateGUI();
+		}
+		name = getTranslation(_currentRoom->_objects[locId]->_name);
+		break;
+
+	case LOCTYPE_HOTSPOT:
+		if (_state->_getLocNameLastTime != locId) {
+			_state->_getLocNameLastTime = locId;
+			invalidateGUI();
+		}
+		if (locId)
+			name = getTranslation(_currentRoom->_hotspots[locId]._name);
+		break;
+
+	default:
+		error("internal error in getLocationName (invalid location type %d)", locType);
+	}
+
+	return name;
+}
+
 uint AGSEngine::getLocationType(const Common::Point &pos, bool throughGUI, bool allowHotspot0) {
 	uint id;
 	return getLocationType(pos, id, throughGUI, allowHotspot0);

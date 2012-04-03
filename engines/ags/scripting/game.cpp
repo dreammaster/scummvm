@@ -94,14 +94,11 @@ RuntimeValue Script_Game_GetFrameCountForLoop(AGSEngine *vm, ScriptObject *, con
 // Gets the name of whatever is on the screen at (x,y)
 RuntimeValue Script_Game_GetLocationName(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("Game::GetLocationName unimplemented");
-
-	return RuntimeValue();
+	RuntimeValue ret = new ScriptMutableString(vm->getLocationName(Common::Point(x, y)));
+	ret._object->DecRef();
+	return ret;
 }
 
 // Game: import static int GetLoopCountForView(int view)

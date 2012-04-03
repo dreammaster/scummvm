@@ -208,6 +208,7 @@ public:
 	uint getGUIAt(const Common::Point &pos);
 	void removePopupInterface(uint guiId);
 
+	Common::String getLocationName(const Common::Point &pos);
 	uint getLocationType(const Common::Point &pos, bool throughGUI = false, bool allowHotspot0 = false);
 	uint getLocationType(const Common::Point &pos, uint &id, bool throughGUI = false, bool allowHotspot0 = false);
 

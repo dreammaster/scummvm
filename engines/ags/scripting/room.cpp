@@ -246,14 +246,10 @@ RuntimeValue Script_GetRoomProperty(AGSEngine *vm, ScriptObject *, const Common:
 // Old string buffer function.
 RuntimeValue Script_GetLocationName(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
 	ScriptString *buffer = (ScriptString *)params[2]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("GetLocationName unimplemented");
+	buffer->setString(vm->getLocationName(Common::Point(x, y)));
 
 	return RuntimeValue();
 }
