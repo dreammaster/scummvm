@@ -250,7 +250,7 @@ public:
 	virtual uint getDrawWidth() { return _cursorSprite->_surface->w; }
 	virtual uint getDrawHeight() { return _cursorSprite->_surface->h; }
 	virtual uint getDrawTransparency() { return 0; }
-	virtual bool isDrawVerticallyMirrored() { return false; }
+	virtual bool isDrawMirrored() { return false; }
 	virtual int getDrawLightLevel() { return 0; }
 	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) { }
 
@@ -608,13 +608,15 @@ void AGSGraphics::draw(Drawable *item, bool useViewport) {
 	uint itemHeight = item->getDrawHeight();
 	if (!itemWidth || !itemHeight)
 		return;
+	bool mirrored = item->isDrawMirrored();
 	const Graphics::Surface *surface = item->getDrawSurface();
 
 	// FIXME: lots of things
-	blit(surface, &_backBuffer, pos, transparency);
+	blit(surface, &_backBuffer, pos, transparency, mirrored);
 }
 
-void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, Common::Point pos, uint transparency) {
+void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, Common::Point pos, uint transparency,
+	bool mirrored) {
 	if (transparency == 255)
 		return;
 
@@ -650,13 +652,20 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 
 	if (srcSurf->format.bytesPerPixel == 1) {
 		for (uint y = 0; y < height; ++y) {
-			byte *dest = (byte *)destSurf->getBasePtr(pos.x, pos.y + y);
+			byte *dest;
+			if (mirrored)
+				dest = (byte *)destSurf->getBasePtr(pos.x + width, pos.y + y);
+			else
+				dest = (byte *)destSurf->getBasePtr(pos.x, pos.y + y);
 			const byte *src = (byte *)srcSurf->getBasePtr(startX, startY + y);
 			for (uint x = 0; x < width; ++x) {
 				byte data = *src++;
 				if (data != 0)
 					*dest = data;
-				dest++;
+				if (mirrored)
+					dest--;
+				else
+					dest++;
 			}
 		}
 	} else if (srcSurf->format.bytesPerPixel == 2) {
@@ -665,13 +674,20 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 		if (!transparency) {
 			// simplified version of the loop below for the transparent==0 (opaque) case
 			for (uint y = 0; y < height; ++y) {
-				uint16 *dest = (uint16 *)destSurf->getBasePtr(pos.x, pos.y + y);
+				uint16 *dest;
+				if (mirrored)
+					dest = (uint16 *)destSurf->getBasePtr(pos.x + width, pos.y + y);
+				else
+					dest = (uint16 *)destSurf->getBasePtr(pos.x, pos.y + y);
 				const uint16 *src = (uint16 *)srcSurf->getBasePtr(startX, startY + y);
 				for (uint x = 0; x < width; ++x) {
 					uint16 srcData = *src++;
 					if (srcData != transColor)
 						*dest = srcData;
-					dest++;
+					if (mirrored)
+						dest--;
+					else
+						dest++;
 				}
 			}
 			return;
@@ -680,7 +696,11 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 		transparency = (transparency + 1) / 8;
 
 		for (uint y = 0; y < height; ++y) {
-			uint16 *dest = (uint16 *)destSurf->getBasePtr(pos.x, pos.y + y);
+			uint16 *dest;
+			if (mirrored)
+				dest = (uint16 *)destSurf->getBasePtr(pos.x + width, pos.y + y);
+			else
+				dest = (uint16 *)destSurf->getBasePtr(pos.x, pos.y + y);
 			const uint16 *src = (uint16 *)srcSurf->getBasePtr(startX, startY + y);
 			for (uint x = 0; x < width; ++x) {
 				uint16 srcData = *src++;
@@ -693,7 +713,10 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 					blended &= 0x7E0F81F;
 					*dest = (blended & 0xFFFF) | (blended >> 16);
 				}
-				dest++;
+				if (mirrored)
+					dest--;
+				else
+					dest++;
 			}
 		}
 	} else {

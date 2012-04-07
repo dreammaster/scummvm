@@ -157,7 +157,7 @@ public:
 	virtual uint getDrawWidth();
 	virtual uint getDrawHeight();
 	virtual uint getDrawTransparency();
-	virtual bool isDrawVerticallyMirrored();
+	virtual bool isDrawMirrored();
 	virtual int getDrawLightLevel();
 	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue);
 

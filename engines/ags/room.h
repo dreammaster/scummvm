@@ -70,7 +70,7 @@ struct WalkBehind : public Drawable {
 	virtual uint getDrawWidth() { return _surface.w; }
 	virtual uint getDrawHeight() { return _surface.h; }
 	virtual uint getDrawTransparency() { return 0; }
-	virtual bool isDrawVerticallyMirrored() { return false; }
+	virtual bool isDrawMirrored() { return false; }
 	virtual int getDrawLightLevel() { return 0; }
 	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) { }
 };
@@ -166,7 +166,7 @@ struct RoomObject : public ScriptObject, public Drawable {
 	virtual uint getDrawWidth();
 	virtual uint getDrawHeight();
 	virtual uint getDrawTransparency();
-	virtual bool isDrawVerticallyMirrored();
+	virtual bool isDrawMirrored();
 	virtual int getDrawLightLevel();
 	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue);
 
@@ -229,7 +229,7 @@ public:
 	virtual uint getDrawWidth();
 	virtual uint getDrawHeight();
 	virtual uint getDrawTransparency() { return 0; }
-	virtual bool isDrawVerticallyMirrored() { return false; }
+	virtual bool isDrawMirrored() { return false; }
 	virtual int getDrawLightLevel() { return 0; }
 	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) { }
 

@@ -429,7 +429,7 @@ public:
 	virtual const Graphics::Surface *getDrawSurface();
 
 	virtual uint getDrawTransparency() { return _transparency; }
-	virtual bool isDrawVerticallyMirrored() { return 0; }
+	virtual bool isDrawMirrored() { return 0; }
 	virtual int getDrawLightLevel() { return 0; }
 	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) { }
 
