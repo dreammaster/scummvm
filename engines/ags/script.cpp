@@ -1149,10 +1149,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 					error("script tried to CALLEXT on system-object with offset %d (resolved to %d) on line %d",
 						_registers[SREG_OP]._value, offset, _lineNumber);
 
-				RuntimeValue objValue(object);
-				params.push_back(objValue);
 				_registers[SREG_AX] = callImportedFunction(_registers[int1]._function, object, params);
-				params.pop_back();
 			} else {
 				_registers[SREG_AX] = callImportedFunction(_registers[int1]._function, NULL, params);
 			}
@@ -1464,11 +1461,19 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 	if (object) {
 		if (!object->isOfType(function->objectType))
 			error("'%s' was passed an object with the wrong type '%s'", function->name, object->getObjectTypeName());
-		++pos;
 	}
 
-	// FIXME: variable argument functions
-	if (function->signature[pos] != '.' && pos < params.size())
+	if (function->signature[pos] == '.') {
+		// variable argument function
+		while (pos < params.size()) {
+			if (params[pos]._type != rvtInteger && params[pos]._type != rvtFloat) {
+				// assume it's a string
+				params[pos] = createStringFrom(params[pos]);
+				params[pos]._object->DecRef();
+			}
+			++pos;
+		}
+	} else if (pos < params.size())
 		error("too many parameters (%d) to '%s'", params.size(), function->name);
 
 	return function->function(_vm, object, params);

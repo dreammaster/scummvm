@@ -304,6 +304,8 @@ public:
 	void loseInventory(uint itemId);
 	void setActiveInventory(uint itemId);
 
+	Common::String formatString(const Common::String &string, const Common::Array<RuntimeValue> &values);
+
 	int32 _newRoomPos;
 	int32 _newRoomX;
 	int32 _newRoomY;

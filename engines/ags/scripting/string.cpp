@@ -33,12 +33,14 @@ namespace AGS {
 // Creates a formatted string using the supplied parameters.
 RuntimeValue Script_String_Format(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *format = (ScriptString *)params[0]._object;
-	UNUSED(format);
 
-	// FIXME
-	error("String::Format unimplemented");
+	Common::Array<RuntimeValue> values = params;
+	values.remove_at(0);
+	Common::String string = vm->formatString(format->getString(), values);
 
-	return RuntimeValue();
+	RuntimeValue ret = new ScriptMutableString(string);
+	ret._object->DecRef();
+	return ret;
 }
 
 // String: import static bool IsNullOrEmpty(String stringToCheck)
@@ -306,12 +308,13 @@ RuntimeValue Script_StrCopy(AGSEngine *vm, ScriptObject *, const Common::Array<R
 // String function.
 RuntimeValue Script_StrFormat(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *dest = (ScriptString *)params[0]._object;
-	UNUSED(dest);
 	ScriptString *format = (ScriptString *)params[1]._object;
-	UNUSED(format);
 
-	// FIXME
-	error("StrFormat unimplemented");
+	Common::Array<RuntimeValue> values = params;
+	values.remove_at(0);
+	values.remove_at(0);
+	Common::String string = vm->formatString(format->getString(), values);
+	dest->setString(string);
 
 	return RuntimeValue();
 }

@@ -1218,6 +1218,83 @@ void AGSEngine::setActiveInventory(uint itemId) {
 	_playerChar->setActiveInventory(itemId);
 }
 
+Common::String AGSEngine::formatString(const Common::String &string, const Common::Array<RuntimeValue> &values) {
+	Common::String out;
+
+	uint paramId = 0;
+	for (uint i = 0; i < string.size(); ++i) {
+		if (string[i] != '%') {
+			out += string[i];
+			continue;
+		}
+
+		++i;
+
+		// handle %%
+		if (string[i] == '%') {
+			out += string[i];
+			continue;
+		}
+
+		uint n = i;
+		while (n < string.size()) {
+			char c = string[n];
+			if (c == 'd' || c == 'f' || c == 'c' || c == 's' || c == 'x' || c == 'X')
+				break;
+			++n;
+		}
+		if (n++ == string.size()) {
+			// something unsupported, so just write it literally
+			--i;
+			out += string[i];
+			continue;
+		}
+
+		if (paramId >= values.size())
+			error("formatString: ran out of parameters for string '%s' (got %d, needed #%d)",
+				string.c_str(), values.size(), paramId);
+		const RuntimeValue &value = values[paramId++];
+
+		// copy the format specifier and skip it
+		Common::String formatSpecifier(string.c_str() + i - 1, n - i + 1);
+		i = n;
+
+		char formatType = formatSpecifier[formatSpecifier.size() - 1];
+		switch (formatType) {
+		case 'd':
+		case 'x':
+		case 'X':
+		case 'c':
+			if (value._type != rvtInteger)
+				error("formatString: expected integer for parameter #%d for string '%s'",
+					paramId - 1, string.c_str());
+			out += Common::String::format(formatSpecifier.c_str(), value._value);
+			break;
+		case 'f':
+			if (value._type != rvtFloat)
+				error("formatString: expected float for parameter #%d for string '%s'",
+					paramId - 1, string.c_str());
+			out += Common::String::format(formatSpecifier.c_str(), value._floatValue);
+			break;
+		case 's':
+			if (value._type != rvtSystemObject || !value._object->isOfType(sotString))
+				error("formatString: expected string for parameter #%d for string '%s'",
+					paramId - 1, string.c_str());
+			out += Common::String::format(formatSpecifier.c_str(),
+				((ScriptString *)value._object)->getString().c_str());
+			break;
+		default:
+			error("formatString: internal error (invalid format type '%c')", formatType);
+		}
+	}
+
+	if (paramId < values.size())
+		error("formatString: too many parameters for string '%s' (got %d, used %d)",
+			string.c_str(), values.size(), paramId);
+
+	return out;
+}
+
 // for CallRoomScript
 void AGSEngine::queueCustomRoomScript(uint32 param) {
 	assert(!_runningScripts.empty());
