@@ -201,6 +201,7 @@ public:
 
 	void setDefaultCursor();
 	uint32 findNextEnabledCursor(uint32 startWith);
+	void setNextCursor();
 	void setCursorMode(uint32 newMode);
 	uint32 getCursorMode() { return _cursorMode; }
 
@@ -223,6 +224,7 @@ public:
 
 	uint32 getGameSpeed();
 	void setGameSpeed(uint32 speed);
+	uint getLoopCounter() const { return _loopCounter; }
 
 	byte getGameOption(uint index);
 
@@ -267,6 +269,7 @@ public:
 
 	uint getCurrentRoomId() { return _displayedRoom; }
 	Room *getCurrentRoom() { return _currentRoom; }
+	bool inEntersScreen() { return _inEntersScreenCounter > 0; }
 	void scheduleNewRoom(uint roomId);
 
 	GameFile *_gameFile;
@@ -281,12 +284,18 @@ public:
 	/** Prepend 'TARGET-' to the given filename. */
 	Common::String wrapFilename(const Common::String &name) const { return _targetName + "-" + name; };
 
+	void addInventory(uint itemId);
+	void loseInventory(uint itemId);
+	void setActiveInventory(uint itemId);
+
 	int32 _newRoomPos;
 	int32 _newRoomX;
 	int32 _newRoomY;
 
 	// for CallRoomScript
 	void queueCustomRoomScript(uint32 param);
+
+	void runOnEvent(uint32 p1, uint32 p2);
 
 private:
 	const AGSGameDescription *_gameDescription;

@@ -28,9 +28,12 @@
 #include "engines/ags/ags.h"
 #include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
+#include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
 #include "engines/ags/room.h"
 #include "engines/ags/sprites.h"
+
+#include "common/random.h"
 
 namespace AGS {
 
@@ -46,7 +49,9 @@ Character::Character(AGSEngine *vm) : _vm(vm) {
 	_prevRoom = (uint)-1;
 	_loop = 0;
 	_frame = 0;
-	_walkWait = (uint)-1;
+
+	// FIXME: _walkWait = (uint)-1;
+	_walkWait = 0;
 
 	// CharacterExtras
 	_width = 0;
@@ -339,6 +344,273 @@ bool Character::writeByte(uint offset, byte value) {
 	return false;
 }
 
+// order of loops to turn character in circle from down to down
+const uint turnLoopOrder[8] = { 0, 6, 1, 7, 3, 5, 2, 4 };
+
+uint findTurnLoopOrderIndex(uint loopId) {
+	for (uint i = 0; i < 8; ++i)
+		if (turnLoopOrder[i] == loopId)
+			return i;
+
+	return 0;
+}
+
+// returns true if is a following_exactly sheep
+bool Character::update() {
+	if (_on != 1)
+		return false;
+
+	// walking
+	if (_walking >= TURNING_AROUND) {
+		if (_walkWait > 0) {
+			// Currently rotating to correct direction
+			_walkWait--;
+			return false;
+		}
+
+		// Work out which direction is next
+		int wantLoop = findTurnLoopOrderIndex(_loop);
+		// going anti-clockwise, take one before; otherwise, one after
+		if (_walking >= TURNING_BACKWARDS)
+			wantLoop -= 1;
+		else
+			wantLoop += 1;
+
+		// TODO: make sure we don't loop forever!
+		while (true) {
+			// wrap around
+			if (wantLoop >= 8)
+				wantLoop = 0;
+			else if (wantLoop < 0)
+				wantLoop = 7;
+
+			// check that we have a useful loop
+			if ((turnLoopOrder[wantLoop] < _vm->_gameFile->_views[_view]._loops.size()) &&
+				(!_vm->getViewLoop(_view, turnLoopOrder[wantLoop])->_frames.empty())) {
+				// if this is moving diagonally, make sure that's okay
+
+				if (!(_flags & CHF_NODIAGONAL))
+					break;
+				if (turnLoopOrder[wantLoop] < 4)
+					break;
+			}
+
+			// continue to the next loop
+			if (_walking >= TURNING_BACKWARDS)
+				wantLoop--;
+			else
+				wantLoop++;
+		}
+
+		_loop = turnLoopOrder[wantLoop];
+		_walking -= TURNING_AROUND;
+
+		// if still turning, wait for next frame
+		if (_walking % TURNING_BACKWARDS >= TURNING_AROUND)
+			_walkWait = _animSpeed;
+		else
+			_walking = _walking % TURNING_BACKWARDS;
+
+		_animWait = 0;
+
+		return false;
+	}
+
+	// Make sure it doesn't flash up a blue cup
+	if (_view >= 0 && _loop >= _vm->_gameFile->_views[_view]._loops.size())
+		_loop = 0;
+
+	bool doingNothing = true;
+
+	if (_room == _vm->getCurrentRoomId() && _walking > 0) {
+		error("can't walk yet"); // FIXME
+	}
+
+	if (_room == _vm->getCurrentRoomId() &&
+		(_animating || (_idleLeft < 0)) &&
+		(!_walking || (_flags & CHF_MOVENOTWALK))) {
+		// not moving, but animating (or playing idle anim)
+
+		// idle anim doesn't count as doing something
+		doingNothing = (_idleLeft < 0);
+
+		if (_wait > 0)
+			_wait--;
+		else if (_vm->getGameOption(OPT_LIPSYNCTEXT) && false /* FIXME: check _charSpeaking */) {
+			// FIXME
+			return false;
+		} else {
+			// TODO: some of this is similar to RoomObject::update
+			uint oldFrame = _frame;
+			if (_animating & CHANIM_BACKWARDS) {
+				if (_frame == 0) {
+					// at the start of the loop, what now?
+					if (_loop > 0 && _vm->getViewLoop(_view, _loop - 1)->shouldRunNextLoop()) {
+						// If it's a Go-to-next-loop on the previous one, then go back
+						_loop--;
+						_frame = _vm->getViewLoop(_view, _loop)->_frames.size() - 1;
+					} else if (_animating & CHANIM_REPEAT) {
+						// repeating animation
+						_frame = _vm->getViewLoop(_view, _loop)->_frames.size() - 1;
+						while (_vm->getViewLoop(_view, _loop)->shouldRunNextLoop()) {
+							_loop++;
+							_frame = _vm->getViewLoop(_view, _loop)->_frames.size() - 1;
+						}
+					} else {
+						// leave it on the first frame
+						_animating = 0;
+					}
+				} else
+					_frame--;
+			} else
+				_frame++;
+
+			// FIXME: stop talking if we were _charSpeaking and the speech is done
+
+			ViewLoopNew *loop = _vm->getViewLoop(_view, _loop);
+			if (_frame >= loop->_frames.size()) {
+				// at the end of the loop, what now?
+				if (loop->shouldRunNextLoop()) {
+					// go to next loop thing
+					if ((uint)_loop + 1 >= _vm->_gameFile->_views[_view]._loops.size())
+						error("Character::update: last loop %d in view %d requested to move to next loop",
+							_loop, _view);
+					_loop++;
+					_frame = 0;
+				} else if (!(_animating & CHANIM_REPEAT)) {
+					// leave it on the last frame
+					_animating = 0;
+					_frame--;
+					if (_idleLeft < 0) {
+						// end of idle anim
+						if (_idleTime == 0) {
+							// constant anim, reset (need this cos animating==0)
+							_frame = 0;
+						} else {
+							// one-off anim, stop
+							unlockView();
+							_idleLeft = _idleTime;
+						}
+					}
+				} else {
+					_frame = 0;
+					if (!_vm->_state->_noMultiLoopRepeat) {
+						// multi-loop animation, go back to the start
+						while (_loop > 0 && _vm->getViewLoop(_view, _loop - 1)->shouldRunNextLoop())
+							_loop--;
+					}
+				}
+			}
+
+			ViewFrame *frame = _vm->getViewFrame(_view, _loop, _frame);
+			_wait = frame->_speed;
+
+			// idle anim doesn't have speed stored cos animating==0
+			if (_idleLeft < 0)
+				_wait += _animSpeed + 5;
+			else
+				_wait += (_animating >> 8) & 0xff;
+
+			if (_frame != oldFrame)
+				checkViewFrame();
+		}
+	}
+
+	bool isSheep = false;
+	if (_following >= 0) {
+		if (_followInfo == FOLLOW_ALWAYSONTOP) {
+			// an always-on-top follow
+
+			isSheep = true;
+		} else if (doingNothing) {
+			// not moving, but should be following another character
+
+			// FIXME
+		}
+	}
+
+	if (_idleView >= 1 && _idleLeft >= 0 && _room == _vm->getCurrentRoomId()) {
+		// char is in current room, and has an idle anim which is not currently playing
+
+		if (!doingNothing || (_flags & CHF_FIXVIEW)) {
+			// they are moving or animating, or the view is locked, so reset idle timeout
+			_idleLeft = _idleTime;
+		} else if (_processIdleThisTime || (_vm->getLoopCounter() % 40 == 0)) {
+			_idleLeft--;
+			if (_idleLeft == -1) {
+				debugC(kDebugLevelGame, "character '%s' (id %d) now idle: view %d",
+					_scriptName.c_str(), _indexId, _idleView + 1);
+				uint useLoop = _loop;
+
+				lockView(_idleView + 1);
+				// setView resets this to 0
+				_idleLeft = -2;
+
+				const ViewStruct &view = _vm->_gameFile->_views[_idleView];
+				uint maxLoops = view._loops.size();
+
+				// don't try using diagonal loops if useDiagonal() doesn't return 0
+				// (either there aren't any, or they're standing frame only)
+				if (maxLoops > 4 && useDiagonal())
+					maxLoops = 4;
+
+				if (_idleTime > 0 && useLoop >= maxLoops) {
+					// If it's not a "swimming"-type idleanim, choose a random loop
+					// if there arent enough loops to do the current one.
+
+					do {
+						useLoop = _vm->getRandomSource()->getRandomNumber(maxLoops - 1);
+					// don't select a loop which is a continuation of a previous one
+					} while (useLoop > 0 && view._loops[useLoop - 1].shouldRunNextLoop());
+				} else if (useLoop >= maxLoops) {
+					// Normal idle anim - just reset to loop 0 if not enough to
+					// use the current one
+
+					useLoop = 0;
+				}
+
+				animate(useLoop, _animSpeed + 5, (_idleTime == 0) ? 1 : 0, true);
+
+				// don't set animating while the idle anim plays
+				_animating = 0;
+			}
+		}
+	}
+
+	_processIdleThisTime = false;
+
+	return isSheep;
+}
+
+// return 0 to use diagonal, 1 to not
+// or 2 if there are only standing frames for the diagonal loops (to allow providing smoother turning)
+uint Character::useDiagonal() {
+	// don't use if the flags don't allow it
+	if (_flags & CHF_NODIAGONAL)
+		return 1;
+	// don't use if we don't have diagonal loops
+	if (_vm->_gameFile->_views[_view]._loops.size() < 8)
+		return 1;
+	// only standing frames for loop 4?
+	if (_vm->_gameFile->_views[_view]._loops[4]._frames.size() < 2)
+		return 2;
+	return 0;
+}
+
+// returns false if the character only has horizontal animations
+bool Character::hasUpDownLoops() {
+	const ViewStruct &view = _vm->_gameFile->_views[_view];
+
+	// no frames in the Down animation?
+	if (view._loops[0]._frames.empty())
+		return false;
+	// no Up animation, or no frames in it?
+	if (view._loops.size() < 4 || view._loops[3]._frames.empty())
+		return false;
+
+	return true;
+}
+
 void Character::walk(int x, int y, bool ignoreWalkable, bool autoWalkAnims) {
 	if (_room != _vm->getCurrentRoomId())
 		error("Character::walk: character '%s' (id %d) in room %d, not in current room (%d)",
@@ -346,6 +618,7 @@ void Character::walk(int x, int y, bool ignoreWalkable, bool autoWalkAnims) {
 
 	_flags &= ~CHF_MOVENOTWALK;
 
+	warning("Character::walk unimplemented");
 	// FIXME
 }
 
@@ -353,11 +626,190 @@ void Character::followCharacter(Character *chr, int distance, uint eagerness) {
 	if (eagerness > 250)
 		error("followCharacter: invalid eagerness %d (must be 0-250)", eagerness);
 
+	warning("Character::followChararacter unimplemented");
 	// FIXME
 }
 
 void Character::stopMoving() {
-	// FIXME
+	if (_vm->_state->_skipUntilCharStops == _indexId)
+		_vm->endSkippingUntilCharStops();
+
+	// FIXME: xwas/ywas logic
+
+	if (_walking > 0 && _walking < TURNING_AROUND) {
+		// if it's not a MoveCharDirect, make sure they end up on a walkable area
+		// FIXME: direct walking stuff
+
+		debugC(kDebugLevelGame, "character '%s' (id %d) stop walking",
+			_scriptName.c_str(), _indexId);
+
+		_idleLeft = _idleTime;
+		// restart the idle animation straight away
+		_processIdleThisTime = true;
+	}
+
+	if (_walking) {
+		// If the character is currently moving, stop them and reset their frame
+		_walking = 0;
+		if (!(_flags & CHF_MOVENOTWALK))
+			_frame = 0;
+	}
+}
+
+// replaces the 'CHECK_DIAGONAL' macro in original
+void adjustDiagonalMoveFrame(uint &useLoop, int mainDir, int otherDir, uint loop1, uint loop2) {
+	if (abs(mainDir) <= abs(otherDir) / 2)
+		return;
+
+	if (mainDir < 0)
+		useLoop = loop1;
+	else
+		useLoop = loop2;
+}
+
+// returns true if it actually started turning
+bool Character::faceLocation(int x, int y) {
+	int xDiff = x - _x;
+	int yDiff = y - _y;
+
+	debugC(kDebugLevelGame, "character '%s' (id %d) turning to face location: %d, %d",
+		_scriptName.c_str(), _indexId, x, y);
+
+	// called on their current position - do nothing
+	if (xDiff == 0 && yDiff == 0)
+		return false;
+
+	uint useLoop = 1;
+	uint highestLoopForTurning = 3;
+
+	// Allow use of any available diagonal frames, even if they're standing-only.
+	uint diagonalState = useDiagonal();
+	if (diagonalState != 1)
+		highestLoopForTurning = 7;
+
+	if (_vm->getGameFileVersion() <= kAGSVer272) {
+		// Use a different logic on 2.x. This fixes some edge cases where
+		// FaceLocation() is used to select a specific loop.
+		// "This fixes edge cases where the function was used to select specific loops, e.g. in Murder in a Wheel."
+
+		// TODO: check the loops exist?
+		bool canRight = !_vm->_gameFile->_views[_view]._loops[2]._frames.empty();
+		bool canLeft = !_vm->_gameFile->_views[_view]._loops[1]._frames.empty();
+
+		if (abs(yDiff) < abs(xDiff)) {
+			// primary movement in X direction
+			if (!canLeft && !canRight) {
+				useLoop = 0;
+			} else if (canRight && xDiff >= 0) {
+				useLoop = 2;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 5, 4);
+			} else if (canLeft && yDiff < 0) {
+				useLoop = 1;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 7, 6);
+			}
+		} else {
+			if (yDiff >= 0) {
+				useLoop = 0;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 6, 4);
+			} else {
+				useLoop = 3;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 7, 5);
+			}
+		}
+	} else {
+		// modern (3.x) logic
+
+		if (!hasUpDownLoops() || abs(yDiff) < abs(xDiff)) {
+			// wantHoriz
+			if (xDiff > 0) {
+				useLoop = 2;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 5, 4);
+			} else {
+				useLoop = 1;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 7, 6);
+			}
+		} else {
+			// !wantHoriz
+			if (yDiff > 0) {
+				useLoop = 0;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, xDiff, yDiff, 6, 4);
+			} else if (yDiff < 0) {
+				useLoop = 3;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, xDiff, yDiff, 7, 5);
+			}
+		}
+	}
+
+	if (_vm->getGameOption(OPT_TURNTOFACELOC) && useLoop != _loop && _loop <= highestLoopForTurning) {
+		if (!_vm->inEntersScreen()) {
+			// Turn to face new direction.
+			stopMoving();
+
+			if (_on == 1) {
+				// only do the turning if the character is not hidden
+
+				startTurning(useLoop, diagonalState);
+				// beware: the caller is reponsible for blocking and setting _frame to 0,
+				// unlike in the original code
+				return true;
+			}
+		}
+	}
+
+	_loop = useLoop;
+	_frame = 0;
+	return false;
+}
+
+void Character::startTurning(uint useLoop, uint diagonalState) {
+	// work out how far round they have to turn
+	uint fromIndex = findTurnLoopOrderIndex(_loop);
+	uint toIndex = findTurnLoopOrderIndex(useLoop);
+
+	int turnDirection = 1;
+	// work out whether anticlockwise is quicker or not
+	if ((toIndex > fromIndex) && ((toIndex - fromIndex) > 4))
+		turnDirection = -1;
+	if ((toIndex < fromIndex) && ((fromIndex - toIndex) < 4))
+		turnDirection = -1;
+
+	debugC(1, kDebugLevelGame, "character '%s' (id %d) starting turn from %d (loop %d) to %d (loop %d), direction %d",
+		_scriptName.c_str(), _indexId, fromIndex, _loop, toIndex, useLoop, turnDirection);
+
+	// strip any current turning_around stages
+	_walking = _walking % TURNING_AROUND;
+	if (turnDirection == -1)
+		_walking += TURNING_BACKWARDS;
+
+	// Iterate over the turning loops from the fromIndex to the toIndex.
+	for (int i = (int)fromIndex; i != (int)toIndex; i += turnDirection) {
+		// wrap the index
+		if (i < 0)
+			i = 7;
+		if (i >= 8)
+			i = 0;
+		if ((uint)i == toIndex)
+			break;
+
+		// If we shouldn't use ANY diagonals, don't.
+		if (turnLoopOrder[i] >= 4 && diagonalState == 1)
+			continue;
+		// If this frame is empty, it's useless.
+		if (_vm->_gameFile->_views[_view]._loops[turnLoopOrder[i]]._frames.empty())
+			continue;
+
+		// If this loop is present, then add it to the walking queue.
+		if (turnLoopOrder[i] < _vm->_gameFile->_views[_view]._loops.size())
+			_walking += TURNING_AROUND;
+	}
 }
 
 void Character::animate(uint loopId, uint speed, uint repeat, bool noIdleOverride, uint direction) {
@@ -398,11 +850,31 @@ void Character::animate(uint loopId, uint speed, uint repeat, bool noIdleOverrid
 		_frame = 0;
 
 	_wait = speed + _vm->_gameFile->_views[_view]._loops[_loop]._frames[_frame]._speed;
-	// FIXME: checkViewFrame();
+	checkViewFrame();
 }
 
 void Character::findReasonableLoop() {
-	// FIXME
+	const ViewStruct &view = _vm->_gameFile->_views[_view];
+	if (view._loops.empty())
+		error("Character::findReasonableLoop: character '%s' (id %d) using empty view %d (no loops)",
+			_scriptName.c_str(), _indexId, _view);
+	if (_loop >= view._loops.size())
+		_loop = 0;
+
+	if (!view._loops[_loop]._frames.empty())
+		return;
+
+	// if the current loop has no frames, find one that does
+	for (uint i = 0; i < view._loops.size(); ++i) {
+		if (view._loops[i]._frames.empty())
+			continue;
+
+		_loop = i;
+		return;
+	}
+
+	error("Character::findReasonableLoop: character '%s' (id %d) using empty view %d (all loops are empty)",
+		_scriptName.c_str(), _indexId, _view);
 }
 
 void Character::lockView(uint viewId) {
@@ -456,7 +928,8 @@ void Character::unlockView() {
 	_frame = 0;
 	stopMoving();
 	if (_view >= 0) {
-		/* unused:
+		/* TODO: unused: (presumably the intention was to limit the reasonable
+		 * loops to only the non-diagonal ones, if the flags want that)
 		uint maxLoop = _vm->_gameFile->_views[_view].size();
 		if ((_flags & CHF_NODIAGONAL) && (maxLoop > 4)
 			maxLoop = 4;
@@ -467,6 +940,7 @@ void Character::unlockView() {
 	_idleLeft = _idleTime;
 	_picXOffs = 0;
 	_picYOffs = 0;
+	// restart the idle animation straight away
 	_processIdleThisTime = true;
 }
 
@@ -508,7 +982,7 @@ void Character::setIdleView(int view, uint time) {
 
 void Character::setSpeechView(int view) {
 	if (view == -1) {
-		_talkView = view;
+		_talkView = -1;
 		return;
 	}
 
@@ -516,6 +990,103 @@ void Character::setSpeechView(int view) {
 		error("Character::setSpeechView: invalid view number %d (max is %d)", view, _vm->_gameFile->_views.size());
 
 	_talkView = view - 1;
+}
+
+void Character::checkViewFrame() {
+	// FIXME: volume stuff
+
+	_vm->checkViewFrame(_view, _loop, _frame);
+}
+
+void Character::addInventory(uint itemId, uint addIndex) {
+	assert(itemId < _vm->_gameFile->_invItemInfo.size());
+
+	if (_inventory[itemId] >= 32000)
+		error("Character::addInventory: can't carry more than 32000 of one inventory item");
+	_inventory[itemId]++;
+
+	if (!_vm->getGameOption(OPT_DUPLICATEINV)) {
+		// Ensure it is only in the list once
+		for (uint i = 0; i < _invOrder.size(); ++i) {
+			if (_invOrder[i] == itemId) {
+				// They already have the item, so don't add it to the list
+				if (_vm->getPlayerChar() == this)
+					_vm->runOnEvent(GE_ADD_INV, itemId);
+				return;
+			}
+		}
+	}
+
+	if (_invOrder.size() >= MAX_INVORDER)
+		error("Character::addInventory: too many inventory items added, can only have 500 at one time");
+
+	if (addIndex >= _invOrder.size()) {
+		// add new item at end of list
+		_invOrder.push_back(itemId);
+	} else {
+		// insert new item at index
+		_invOrder.insert_at(addIndex, itemId);
+	}
+
+	_vm->invalidateGUI();
+
+	if (_vm->getPlayerChar() == this)
+		_vm->runOnEvent(GE_ADD_INV, itemId);
+}
+
+void Character::loseInventory(uint itemId) {
+	assert(itemId < _vm->_gameFile->_invItemInfo.size());
+
+	if (_inventory[itemId] > 0)
+		_inventory[itemId]--;
+
+	if (_activeInv == itemId && _inventory[itemId] < 1) {
+		_activeInv = (uint)-1;
+		if (_vm->getPlayerChar() == this && _vm->getCursorMode() == MODE_USE)
+			_vm->setCursorMode(0);
+	}
+
+	if (!_inventory[itemId] || _vm->getGameOption(OPT_DUPLICATEINV)) {
+		// remove the invOrder entry, if any
+		for (uint i = 0; i < _invOrder.size(); ++i) {
+			if (_invOrder[i] != itemId)
+				continue;
+
+			_invOrder.remove_at(i);
+			break;
+		}
+	}
+
+	_vm->invalidateGUI();
+
+	if (_vm->getPlayerChar() == this)
+		_vm->runOnEvent(GE_LOSE_INV, itemId);
+}
+
+void Character::setActiveInventory(uint itemId) {
+	_vm->invalidateGUI();
+
+	if (itemId == (uint)-1) {
+		_activeInv = itemId;
+
+		if (_vm->getPlayerChar() == this && _vm->getCursorMode() == MODE_USE)
+			_vm->setCursorMode(0);
+
+		return;
+	}
+
+	assert(itemId < _vm->_gameFile->_invItemInfo.size());
+
+	if (_inventory[itemId] < 1)
+		error("setActiveInventory: character doesn't have any items with id %d", itemId);
+
+	_activeInv = itemId;
+
+	if (_vm->getPlayerChar() == this) {
+		// if it's the player character, update mouse cursor
+		// FIXME: _vm->updateInvCursor(itemId);
+		_vm->setCursorMode(MODE_USE);
+	}
 }
 
 Common::Point Character::getDrawPos() {

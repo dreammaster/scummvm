@@ -50,11 +50,17 @@ public:
 	byte readByte(uint offset);
 	bool writeByte(uint offset, byte value);
 
+	bool update();
+	uint useDiagonal();
+	bool hasUpDownLoops();
+
 	void walk(int x, int y, bool ignoreWalkable, bool autoWalkAnims);
 	void followCharacter(Character *chr, int distance, uint eagerness);
 	void stopMoving();
+	bool faceLocation(int x, int y);
+	void startTurning(uint useLoop, uint diagonalState);
 
-	void animate(uint loopId, uint speed, uint repeat, bool noIdleOverride, uint direction);
+	void animate(uint loopId, uint speed, uint repeat, bool noIdleOverride = false, uint direction = 0);
 
 	void findReasonableLoop();
 
@@ -64,6 +70,12 @@ public:
 
 	void setIdleView(int view, uint time);
 	void setSpeechView(int view);
+
+	void checkViewFrame();
+
+	void addInventory(uint itemId, uint addIndex = 0xffffffff);
+	void loseInventory(uint itemId);
+	void setActiveInventory(uint itemId);
 
 	int32 _defView, _talkView, _view;
 
@@ -134,6 +146,8 @@ public:
 	bool _processIdleThisTime;
 	byte _slowMoveCounter;
 	uint16 _animWait;
+
+	int getEffectiveY() { return _y - _z; }
 
 	uint getBaseline() const;
 
