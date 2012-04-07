@@ -30,6 +30,7 @@
 #include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
+#include "engines/ags/overlay.h"
 #include "engines/ags/room.h"
 #include "engines/ags/sprites.h"
 
@@ -572,7 +573,14 @@ void AGSGraphics::draw() {
 	// TODO: make this suck less
 	drawSnowRain();
 
-	// FIXME: draw non-text overlays
+	// draw overlays, except text boxes
+	for (uint i = 0; i < _vm->_overlays.size(); ++i) {
+		if (_vm->_overlays[i]->getType() == OVER_TEXTMSG)
+			continue;
+
+		// FIXME: draw OVER_COMPLETE in non-transparent mode
+		draw(_vm->_overlays[i]);
+	}
 
 	// draw GUIs
 	for (uint i = 0; i < _vm->_gameFile->_guiGroups.size(); ++i) {
@@ -582,7 +590,13 @@ void AGSGraphics::draw() {
 		draw(group);
 	}
 
-	// FIXME: draw overlays
+	// draw text overlays (so that they appear over GUIs)
+	for (uint i = 0; i < _vm->_overlays.size(); ++i) {
+		if (_vm->_overlays[i]->getType() != OVER_TEXTMSG)
+			continue;
+
+		draw(_vm->_overlays[i]);
+	}
 
 	_cursorObj->tick();
 	if (!_vm->_state->_mouseCursorHidden)
