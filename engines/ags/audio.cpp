@@ -26,6 +26,7 @@
 
 #include "engines/ags/ags.h"
 #include "engines/ags/audio.h"
+#include "engines/ags/constants.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/resourceman.h"
 #include "engines/ags/room.h"
@@ -40,15 +41,10 @@
 #include "audio/decoders/wave.h"
 #include "audio/audiostream.h"
 
-#define MAX_SOUND_CHANNELS 8
 #define SPECIAL_CROSSFADE_CHANNEL 8
 
 #define AMBIENCE_FULL_DIST 25
 
-#define SCHAN_SPEECH  0
-#define SCHAN_AMBIENT 1
-#define SCHAN_MUSIC   2
-#define SCHAN_NORMAL  3
 #define AUDIOTYPE_LEGACY_AMBIENT_SOUND 1
 #define AUDIOTYPE_LEGACY_MUSIC 2
 #define AUDIOTYPE_LEGACY_SOUND 3
@@ -264,6 +260,30 @@ bool AGSAudio::playSoundOnChannel(uint soundId, uint channelId) {
 	return true;
 }
 
+bool AGSAudio::playSpeech(const Common::String &filename) {
+	assert(_speechResources);
+
+	Common::SeekableReadStream *stream = NULL;
+
+	AudioFileType myType = kAudioFileWAV;
+	stream = _speechResources->getFile(filename + ".wav");
+	if (!stream) {
+		myType = kAudioFileOGG;
+		stream = _speechResources->getFile(filename + ".ogg");
+		if (!stream) {
+			myType = kAudioFileMP3;
+			stream = _speechResources->getFile(filename + ".mp3");
+			if (!stream)
+				return false;
+		}
+	}
+
+	_channels[SCHAN_SPEECH]->playSound(stream, myType);
+
+	// FIXME: adjust volumes
+	return true;
+}
+
 void AGSAudio::playAmbientSound(uint channelId, uint soundId, uint volume, const Common::Point &pos) {
 	// The use of ambient channels is a bit inconsistent in the original code:
 	// "the channel parameter is to allow multiple ambient sounds in future"
@@ -385,12 +405,21 @@ AudioChannel::AudioChannel(AGSEngine *vm, uint id) : _vm(vm), _id(id), _valid(fa
 }
 
 bool AudioChannel::playSound(AudioClip *clip, bool repeat) {
+	bool ret = playSound(_vm->getFile(clip->_filename), clip->_fileType, repeat);
 	_clip = clip;
+	return ret;
+}
 
+bool AudioChannel::playSound(Common::SeekableReadStream *stream, AudioFileType fileType, bool repeat) {
+	_clip = NULL;
 	_stream = NULL;
-	Common::SeekableReadStream *stream = _vm->getFile(clip->_filename);
 
-	switch (_clip->_fileType) {
+	// FIXME: stupid hack due to threading issues
+	Common::SeekableReadStream *newStream = stream->readStream(stream->size());
+	delete stream;
+	stream = newStream;
+
+	switch (fileType) {
 	case kAudioFileVOC:
 		_stream = Audio::makeVOCStream(stream, Audio::FLAG_UNSIGNED, DisposeAfterUse::YES);
 		break;

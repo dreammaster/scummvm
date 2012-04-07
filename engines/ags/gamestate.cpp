@@ -464,7 +464,7 @@ void GameState::init() {
 	_invItemWidth = 40;
 	_invItemHeight = 22;
 
-	_messageTime = (uint32)-1;
+	_messageTime = -1;
 	_disabledUserInterface = 0;
 	_gscriptTimer = (uint32)-1;
 

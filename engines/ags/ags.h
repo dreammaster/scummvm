@@ -149,7 +149,7 @@ enum {
 
 enum BlockUntilType {
 	kUntilNothing = 0,
-	kUntilNoOverlay,
+	kUntilNoTextOverlay,
 	kUntilMessageDone,
 	kUntilWaitDone,
 	kUntilCharAnimDone,
@@ -230,6 +230,7 @@ public:
 
 	Common::String getTranslation(const Common::String &text);
 	Common::String replaceMacroTokens(const Common::String &text);
+	uint getTextDisplayTime(const Common::String &text, bool canBeRelative = false);
 
 	// resolution system functions
 	uint getFixedPixelSize(uint pixels);
@@ -254,14 +255,29 @@ public:
 	void runDialogId(uint dialogId);
 	int showDialogOptions(uint dialogId, uint sayChosenOption);
 
+	Common::Array<class ScreenOverlay *> _overlays;
+	uint _completeOverlayCount, _textOverlayCount;
+
+	uint createTextOverlayCore(int x, int y, uint width, uint fontId, int color, const Common::String &text, int allowShrink);
+	uint createTextOverlay(int x, int y, uint width, uint fontId, int color, const Common::String &text);
+	uint addScreenOverlay(int x, int y, uint type, const Graphics::Surface &surface, bool alphaChannel);
+	void updateOverlayTimers();
+	uint findOverlayOfType(uint type);
+	void removeScreenOverlay(uint type);
+	void removeScreenOverlayIndex(uint index);
+
+	void updateSpeech();
+
 	void display(const Common::String &text) { displayAtY(-1, text); }
 	void displayAtY(int y, const Common::String &text);
-	void displayAt(int x, int y, int width, const Common::String &text, int blocking, int asSpeech = 0, bool isThought = false,
+	void displayAt(int x, int y, int width, Common::String text, int blocking, int asSpeech = 0, bool isThought = false,
 		int allowShrink = 0, bool overlayPositionFixed = false);
-	void displayMain(int x, int y, int width, const Common::String &text, int blocking, int usingFont,
+	uint displayMain(int x, int y, int width, const Common::String &text, int blocking, int usingFont,
 		int asSpeech, bool isThought, int allowShrink, bool overlayPositionFixed);
-	void displaySpeech(const Common::String &text, uint charId, int x = -1, int y = -1, int width = -1, bool isThought = false);
+	void displaySpeech(Common::String text, uint charId, int x = -1, int y = -1, int width = -1, bool isThought = false);
+	void displaySpeechCore(const Common::String &text, uint charId);
 	void displaySpeechAt(int x, int y, int width, uint charId, const Common::String &text);
+	uint displaySpeechBackground(uint charId, const Common::String &text);
 
 	void invalidateScreen() { _needsUpdate = true; }
 	void invalidateGUI() { _guiNeedsUpdate = true; }
@@ -296,6 +312,9 @@ public:
 	void queueCustomRoomScript(uint32 param);
 
 	void runOnEvent(uint32 p1, uint32 p2);
+
+	bool playSpeech(uint charId, uint speechId);
+	void stopSpeech();
 
 private:
 	const AGSGameDescription *_gameDescription;
@@ -378,7 +397,13 @@ private:
 	BlockUntilType _blockingUntil;
 	uint _blockingUntilId;
 
+	uint _lastTranslationSourceTextLength;
+	uint _lipsyncLoopsPerCharacter;
+	uint _lipsyncTextOffset;
+	Common::String _lipsyncText;
+	bool _saidText;
 	bool _saidSpeechLine;
+	uint _faceTalkingOverlayIndex;
 
 	bool init();
 	void adjustSizesForResolution();

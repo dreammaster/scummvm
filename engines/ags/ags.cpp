@@ -85,7 +85,11 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_inNewRoomState(kNewRoomStateNone), _newRoomStateWas(kNewRoomStateNone), _inEntersScreenCounter(0),
 	_leavesScreenRoomId(-1),
 	_newRoomPos(0), _newRoomX(SCR_NO_VALUE), _newRoomY(SCR_NO_VALUE),
-	_blockingUntil(kUntilNothing), _insideProcessEvent(false) {
+	_blockingUntil(kUntilNothing), _insideProcessEvent(false),
+	_completeOverlayCount(0), _textOverlayCount(0),
+	_lastTranslationSourceTextLength((uint)-1), _lipsyncLoopsPerCharacter((uint)-1),
+	_lipsyncTextOffset((uint)-1), _saidText(false), _saidSpeechLine(false),
+	_faceTalkingOverlayIndex((uint)-1) {
 
 	DebugMan.addDebugChannel(kDebugLevelGame, "Game", "AGS runtime debugging");
 
@@ -464,7 +468,8 @@ void AGSEngine::updateEvents(bool checkControls) {
 			// don't display when skipping a cutscene
 			if (_state->_fastForward)
 				continue;
-			// FIXME: break if is complete overlay
+			if (_completeOverlayCount)
+				continue;
 
 			// no need to do it more than once
 			if (_poppedInterface == group->_id)
@@ -529,7 +534,8 @@ void AGSEngine::updateEvents(bool checkControls) {
 		} else if (_state->_waitCounter > 0 && _state->_keySkipWait > 1) {
 			// skip wait
 			_state->_waitCounter = -1;
-		// FIXME: text overlay
+		} else if (_textOverlayCount && (_state->_cantSkipSpeech & SKIP_MOUSECLICK)) {
+			removeScreenOverlay(OVER_TEXTMSG);
 		} else if (!_state->_disabledUserInterface && activeGUI != -1) {
 			debugC(kDebugLevelGame, "mouse down over GUI %d", activeGUI);
 			// FIXME: not as it is in original
@@ -666,9 +672,9 @@ void AGSEngine::updateStuff() {
 
 	// FIXME: sheep
 
-	// FIXME: overlay timers
+	updateOverlayTimers();
 
-	// FIXME: speech updates
+	updateSpeech();
 }
 
 void AGSEngine::startNewGame() {
@@ -2253,6 +2259,18 @@ byte AGSEngine::getGameOption(uint index) {
 }
 
 Common::String AGSEngine::getTranslation(const Common::String &text) {
+	_lastTranslationSourceTextLength = text.size();
+	if (!text.empty() && text[0] == '&' && _state->_unfactorSpeechFromTextLength) {
+		// if there's an "&12 text" type line, remove "&12 " from the source
+		// length
+		// TODO: merge this with identical code in getTextDisplayTime
+		for (uint i = 0; i < text.size(); ++i) {
+			_lastTranslationSourceTextLength--;
+			if (text[i] == ' ')
+				break;
+		}
+	}
+
 	// FIXME: implement
 
 	return text;
@@ -2305,6 +2323,50 @@ Common::String AGSEngine::replaceMacroTokens(const Common::String &text) {
 		out += '@' + macroName;
 
 	return out;
+}
+
+uint AGSEngine::getTextDisplayTime(const Common::String &text, bool canBeRelative) {
+	uint fpsTimer = _framesPerSecond;
+	uint useLen = text.size();
+
+	// if it's background speech, make it stay relative to game speed
+	if (canBeRelative && (_state->_bgSpeechGameSpeed == 1))
+		fpsTimer = 40;
+
+	if (_lastTranslationSourceTextLength != (uint)-1) {
+		// sync to length of original text, to make sure any animations
+		// and music sync up correctly
+		useLen = _lastTranslationSourceTextLength;
+		_lastTranslationSourceTextLength = (uint)-1;
+	} else if (!text.empty() && text[0] == '&' && _state->_unfactorSpeechFromTextLength) {
+		// if there's an "&12 text" type line, remove "&12 " from the source
+		// length
+		for (uint i = 0; i < text.size(); ++i) {
+			useLen--;
+			if (text[i] == ' ')
+				break;
+		}
+	}
+
+	if (!useLen)
+		return 0;
+
+	uint textSpeed = _state->_textSpeed + _state->_textSpeedModifier;
+	if (textSpeed <= 0)
+		error("text speed is zero; unable to display text");
+
+	// Store how many game loops per character of text
+	// This is calculated using a hard-coded 15 for the text speed,
+	// so that it's always the same no matter how fast the user
+	// can read.
+	// TODO: Except it isn't?
+	_lipsyncLoopsPerCharacter = (((useLen / _state->_lipsyncSpeed) + 1) * fpsTimer) / useLen;
+
+	uint textDisplayTimeInMs = ((useLen / textSpeed) + 1) * 1000;
+	if (textDisplayTimeInMs < _state->_textMinDisplayTimeMs)
+		textDisplayTimeInMs = _state->_textMinDisplayTimeMs;
+
+	return (textDisplayTimeInMs * fpsTimer) / 1000;
 }
 
 // Multiplies up the number of pixels depending on the current
@@ -2388,7 +2450,7 @@ void AGSEngine::blockUntil(BlockUntilType untilType, uint untilId) {
 	invalidateGUI();
 	// only update the mouse cursor if it's speech, or if it hasn't been specifically changed first
 	if (_cursorMode != CURS_WAIT)
-		if ((_graphics->getCurrentCursor() == _cursorMode) || (untilType == kUntilNoOverlay))
+		if ((_graphics->getCurrentCursor() == _cursorMode) || (untilType == kUntilNoTextOverlay))
 			_graphics->setMouseCursor(CURS_WAIT);
 
 	_blockingUntil = untilType;
@@ -2408,24 +2470,29 @@ BlockUntilType AGSEngine::checkBlockingUntil() {
 		error("checkBlockingUntil called, but game wasn't blocking");
 
 	switch (_blockingUntil) {
-	case kUntilNoOverlay:
-		error("checkBlockingUntil unfinished"); // FIXME
+	case kUntilNoTextOverlay:
+		if (!_textOverlayCount)
+			return kUntilNothing;
 		break;
 	case kUntilMessageDone:
-		error("checkBlockingUntil unfinished"); // FIXME
+		if (_state->_messageTime < 0)
+			return kUntilNothing;
 		break;
 	case kUntilWaitDone:
 		if (_state->_waitCounter == 0)
 			return kUntilNothing;
 		break;
 	case kUntilCharAnimDone:
-		error("checkBlockingUntil unfinished"); // FIXME
+		if (_characters[_blockingUntilId]->_animating == 0)
+			return kUntilNothing;
 		break;
 	case kUntilCharWalkDone:
-		error("checkBlockingUntil unfinished"); // FIXME
+		if (_characters[_blockingUntilId]->_walking == 0)
+			return kUntilNothing;
 		break;
 	case kUntilObjMoveDone:
-		error("checkBlockingUntil unfinished"); // FIXME
+		if (_currentRoom->_objects[_blockingUntilId]->_moving == 0)
+			return kUntilNothing;
 		break;
 	case kUntilObjCycleDone:
 		if (_currentRoom->_objects[_blockingUntilId]->_cycling == 0)
@@ -2477,7 +2544,8 @@ void AGSEngine::startSkippingCutscene() {
 	if (_poppedInterface != (uint)-1)
 		removePopupInterface(_poppedInterface);
 
-	// FIXME: remove text message, if any
+	if (_textOverlayCount)
+		removeScreenOverlay(OVER_TEXTMSG);
 }
 
 void AGSEngine::stopFastForwarding() {
@@ -2489,6 +2557,64 @@ void AGSEngine::stopFastForwarding() {
 		newMusic(_state->_endCutsceneMusic); */
 	// FIXME: restore actual volume of sounds
 	_audio->updateMusicVolume();
+}
+
+bool AGSEngine::playSpeech(uint charId, uint speechId) {
+	_audio->_channels[SCHAN_SPEECH]->stop();
+
+	// don't play speech if we're skipping a cutscene
+	if (_state->_fastForward)
+		return false;
+	if (_state->_wantSpeech < 1)
+		return false;
+	if (!_audio->hasSpeechResources())
+		return false;
+
+	Common::String speechName = "NARR";
+	if (charId != (uint)-1) {
+		// append the first 4 characters of the script name to the filename
+		Common::String scriptName = _characters[charId]->_scriptName;
+		// TODO: ouch, checking for 'c' like this seems a bit drastic
+		if (!scriptName.empty() && scriptName[0] == 'c')
+			scriptName = scriptName.c_str() + 1;
+		speechName.clear();
+		for (uint i = 0; i < scriptName.size() && i < 4; ++i)
+			speechName += scriptName[i];
+	}
+
+	speechName = speechName + Common::String::format("%d", speechId);
+
+	// FIXME: voice lip sync
+
+	if (!_audio->playSpeech(speechName)) {
+		debugC(kDebugLevelGame, "failed to load speech '%s'", speechName.c_str());
+		// FIXME: reset lip sync
+		return false;
+	}
+
+	// change Sierra w/bgrnd  to Sierra without background when voice
+	// is available (for Tierra)
+	if ((getGameOption(OPT_SPEECHTYPE) == 2) && (_state->_noTextBgWhenVoice > 0)) {
+		_gameFile->_options[OPT_SPEECHTYPE] = 1;
+		_state->_noTextBgWhenVoice = 2;
+	}
+
+	return true;
+}
+
+void AGSEngine::stopSpeech() {
+	if (!_audio->_channels[SCHAN_SPEECH]->isValid())
+		return;
+
+	// FIXME: volume
+	_audio->_channels[SCHAN_SPEECH]->stop();
+	// FIXME: lip line
+
+	if (_state->_noTextBgWhenVoice == 2) {
+		// set back to Sierra w/bgrnd
+		_state->_noTextBgWhenVoice = 1;
+		_gameFile->_options[OPT_SPEECHTYPE] = 2;
+	}
 }
 
 #define CHOSE_TEXTPARSER -3053
@@ -2782,59 +2908,6 @@ int AGSEngine::runDialogRequest(uint request) {
 		_state->_stopDialogAtEnd = DIALOG_NONE;
 		return RUN_DIALOG_STAY;
 	}
-}
-
-void AGSEngine::displayAtY(int y, const Common::String &text) {
-	// FIXME: sanity-check y parameter
-
-	// Display("") ... a bit of a stupid thing to do, so ignore it
-	if (text.empty())
-		return;
-
-	if (y > 0)
-		y = multiplyUpCoordinate(y);
-
-	if (getGameOption(OPT_ALWAYSSPCH)) {
-		displaySpeechAt(-1, (y > 0) ? divideDownCoordinate(y) : y, -1, _gameFile->_playerChar, text);
-	} else {
-		// Normal "Display" in text box
-
-		// FIXME: some dirty stuff here
-
-		displayAt(-1, y, _graphics->_width / 2 + _graphics->_width / 4, getTranslation(text), 1);
-	}
-}
-
-void AGSEngine::displayAt(int x, int y, int width, const Common::String &text, int blocking, int asSpeech, bool isThought,
-	int allowShrink, bool overlayPositionFixed) {
-
-	bool needStopSpeech = false;
-
-	uint usingFont = _state->_normalFont;
-	if (asSpeech)
-		usingFont = _state->_speechFont;
-
-	// FIXME: auto-speech
-
-	displayMain(x, y, width, text, blocking, usingFont, asSpeech, isThought, allowShrink, overlayPositionFixed);
-
-	/* FIXME: if (needStopSpeech)
-		stopSpeech(); */
-}
-
-void AGSEngine::displayMain(int x, int y, int width, const Common::String &text, int blocking, int usingFont,
-	int asSpeech, bool isThought, int allowShrink, bool overlayPositionFixed) {
-	warning("displayMain '%s' unimplemented", text.c_str());
-}
-
-void AGSEngine::displaySpeech(const Common::String &text, uint charId, int x, int y, int width, bool isThought) {
-	warning("displaySpeech '%s' unimplemented", text.c_str());
-}
-
-void AGSEngine::displaySpeechAt(int x, int y, int width, uint charId, const Common::String &text) {
-	multiplyUpCoordinates(x, y);
-	width = multiplyUpCoordinate(width);
-	displaySpeech(getTranslation(text), charId, x, y, width);
 }
 
 bool AGSEngine::runScriptFunction(ccInstance *instance, const Common::String &name, const Common::Array<RuntimeValue> &params) {

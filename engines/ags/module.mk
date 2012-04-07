@@ -11,6 +11,7 @@ MODULE_OBJS := \
 	graphics.o \
 	gui.o \
 	metaengine.o \
+	overlay.o \
 	resourceman.o \
 	room.o \
 	script.o \

@@ -60,7 +60,7 @@ public:
 	Common::Array<uint32> _globalVars;
 
 	// time left for auto-remove messages
-	uint32 _messageTime;
+	int32 _messageTime;
 	// inventory item last used
 	uint32 _usedInv;
 
