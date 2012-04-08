@@ -327,6 +327,8 @@ enum {
 	ST_VOLUME = 4		// music volume (0 = normal, <0 quieter, >0 louder)
 };
 
+#define MAX_WALK_AREAS 15
+
 } // End of namespace AGS
 
 #endif // AGS_CONSTANTS_H

@@ -123,7 +123,7 @@ public:
 	uint16 _xOffs, _yOffs;
 	uint16 _speed;
 	uint32 _flags;
-	uint32 _sound;
+	int32 _sound;
 };
 
 #define LOOPFLAG_RUNNEXTLOOP 1

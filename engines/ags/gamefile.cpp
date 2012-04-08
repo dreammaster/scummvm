@@ -413,11 +413,9 @@ bool GameFile::init() {
 	if (_version <= kAGSVer300) {
 		// <= 3.0: dialog scripts
 		for (uint i = 0; i < _dialogCount; ++i) {
-			if (dialogCodeSizes[i] == 0)
-				continue;
-
 			_dialogs[i]._code.resize(dialogCodeSizes[i]);
-			dta->read(&_dialogs[i]._code[0], dialogCodeSizes[i]);
+			if (dialogCodeSizes[i] != 0)
+				dta->read(&_dialogs[i]._code[0], dialogCodeSizes[i]);
 
 			// we can just discard this..
 			Common::String dialogTextScript = decryptString(dta);
@@ -602,7 +600,7 @@ ViewFrame GameFile::readViewFrame(Common::SeekableReadStream *dta) {
 	frame._speed = dta->readUint16LE();
 	dta->skip(2); // padding
 	frame._flags = dta->readUint32LE();
-	frame._sound = dta->readUint32LE();
+	frame._sound = dta->readSint32LE();
 	dta->skip(2 * 4); // reserved_for_future
 
 	return frame;

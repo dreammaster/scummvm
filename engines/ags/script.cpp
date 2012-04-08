@@ -851,6 +851,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_MEMREADB:
 			// reg1 = m[MAR] (1 byte)
 			tempVal = _registers[SREG_MAR];
+			// FIXME: check range?
 			switch (tempVal._type) {
 			case rvtScriptData:
 				// FIXME: bounds checks
@@ -882,6 +883,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 		case SCMD_MEMREADW:
 			// reg1 = m[MAR] (2 bytes)
 			tempVal = _registers[SREG_MAR];
+			// FIXME: check range?
 			switch (tempVal._type) {
 			case rvtScriptData:
 				// FIXME: bounds checks
@@ -1128,7 +1130,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 			if (_registers[int1]._type != rvtSystemFunction)
 				error("script tried to CALLEXT non-system-function runtime value of type %d (value %d) on line %d",
 					_registers[int1]._type, _registers[int1]._value, _lineNumber);
-			debug(2, "calling external function '%s'", script->_imports[_registers[int1]._value].c_str());
+			debug(3, "calling external function '%s'", script->_imports[_registers[int1]._value].c_str());
 
 			recoverFromCallAs = false;
 			if (funcArgumentCount == (uint)-1)

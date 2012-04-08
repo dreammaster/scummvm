@@ -324,7 +324,7 @@ void AGSEngine::tickGame(bool checkControls) {
 		return;
 	// FIXME: check if inventory action changed room
 
-	if (!isPaused())
+	if (!isGamePaused())
 		updateStuff();
 
 	// FIXME: a whole bunch of update stuff
@@ -334,13 +334,11 @@ void AGSEngine::tickGame(bool checkControls) {
 			_currentRoom->updateWalkBehinds();
 			_backgroundNeedsUpdate = false;
 		}
-		updateViewport();
+		updateViewport(); // FIXME: only in the absence of a complete overlay?
 		_graphics->draw();
 
 		// FIXME: hotspot stuff
 	}
-
-	// FIXME: a whole bunch of update stuff
 
 	_newRoomStateWas = _inNewRoomState;
 	if (_inNewRoomState != kNewRoomStateNone)
@@ -369,7 +367,7 @@ void AGSEngine::tickGame(bool checkControls) {
 		_audio->updateDirectionalSoundVolume();
 	}
 
-	// FIXME
+	// TODO: replay stuff?
 
 	if (_state->_fastForward)
 		return;
@@ -558,7 +556,7 @@ void AGSEngine::updateEvents(bool checkControls) {
 	if (_inNewRoomState != kNewRoomStateNone || _newRoomStateWas != kNewRoomStateNone)
 		return;
 	// * if the game is paused
-	if (isPaused())
+	if (isGamePaused())
 		return;
 	// * if the GUI is disabled (in wait mode)
 	if (_state->_disabledUserInterface)
@@ -694,7 +692,7 @@ void AGSEngine::startNewGame() {
 		loadNewRoom(_playerChar->_room, _playerChar);
 
 		// loadNewRoom updates _prevRoom, reset it
-		_playerChar->_prevRoom = 0xffffffff;
+		_playerChar->_prevRoom = (uint)-1;
 	}
 
 	firstRoomInitialization();
@@ -959,8 +957,7 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	// FIXME: optimization stuff
 	// FIXME: global data
 
-	_state->_enteredEdge = (uint)-1;
-
+	// position character if new position was provided
 	if (_newRoomX != SCR_NO_VALUE && forChar) {
 		forChar->_x = _newRoomX;
 		forChar->_y = _newRoomY;
@@ -968,7 +965,28 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 	_newRoomX = SCR_NO_VALUE;
 
-	// FIXME: room entry stuff
+	// if a destination edge was provided, try positioning character there
+	if (_newRoomPos > 0 && forChar) {
+		// FIXME: room entry stuff
+		warning("room entry unimplemented");
+
+		_newRoomPos = 0;
+	}
+
+	// update state according to character position when entering
+	_state->_enteredEdge = (uint)-1;
+	if (forChar) {
+		_state->_enteredAtX = forChar->_x;
+		_state->_enteredAtY = forChar->_y;
+		if (forChar->_x >= _currentRoom->_boundary.right)
+			_state->_enteredEdge = 1;
+		else if (forChar->_x <= _currentRoom->_boundary.left)
+			_state->_enteredEdge = 0;
+		else if (forChar->_y >= _currentRoom->_boundary.bottom)
+			_state->_enteredEdge = 2;
+		else if (forChar->_y <= _currentRoom->_boundary.top)
+			_state->_enteredEdge = 3;
+	}
 
 	// FIXME: music
 
@@ -999,6 +1017,8 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	// FIXME: lots and lots
 
 	updateViewport();
+
+	// FIXME: merge objects
 
 	_state->_gscriptTimer = (uint)-1; // avoid screw-ups with changing screens
 	_state->_playerOnRegion = 0;
@@ -1821,6 +1841,8 @@ bool AGSEngine::init() {
 	_graphics->initPalette();
 	if (!_graphics->initGraphics())
 		return false;
+
+	// FIXME: the rest of init_game_settings (player inv etc)
 
 	adjustSizesForResolution();
 	resortGUIs();
@@ -2814,6 +2836,7 @@ void AGSEngine::doConversation(uint dialogId) {
 	endSkippingUntilCharStops();
 
 	// AGS 2.x always makes the mouse cursor visible when displaying a dialog.
+	// "Fixed invisible mouse cursor in dialogs with some version 2.x games, e.g. Murder in a Wheel."
 	if (getGameFileVersion() <= kAGSVer272)
 		_state->_mouseCursorHidden = 0;
 
