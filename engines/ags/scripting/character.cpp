@@ -124,28 +124,25 @@ RuntimeValue Script_NewRoomNPC(AGSEngine *vm, ScriptObject *, const Common::Arra
 // Obsolete character function.
 RuntimeValue Script_GetCharacterProperty(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 	ScriptString *property = (ScriptString *)params[1]._object;
-	UNUSED(property);
 
-	// FIXME
-	error("GetCharacterProperty unimplemented");
+	if (charid >= vm->_characters.size())
+		error("GetCharacterPropertyText: character %d is too high (only have %d)", charid, vm->_characters.size());
 
-	return RuntimeValue();
+	return vm->getIntProperty(property->getString(), vm->_characters[charid]->_properties);
 }
 
 // import void GetCharacterPropertyText(CHARID, const string property, string buffer)
 // Obsolete character function.
 RuntimeValue Script_GetCharacterPropertyText(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 	ScriptString *property = (ScriptString *)params[1]._object;
-	UNUSED(property);
 	ScriptString *buffer = (ScriptString *)params[2]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("GetCharacterPropertyText unimplemented");
+	if (charid >= vm->_characters.size())
+		error("GetCharacterPropertyText: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	buffer->setString(vm->getStringProperty(property->getString(), vm->_characters[charid]->_properties));
 
 	return RuntimeValue();
 }
@@ -1014,22 +1011,16 @@ RuntimeValue Script_Character_GetProperty(AGSEngine *vm, Character *self, const 
 	ScriptString *property = (ScriptString *)params[0]._object;
 	UNUSED(property);
 
-	// FIXME
-	error("Character::GetProperty unimplemented");
-
-	return RuntimeValue();
+	return vm->getIntProperty(property->getString(), self->_properties);
 }
 
 // Character: import void GetPropertyText(const string property, string buffer)
 // Undocumented.
 RuntimeValue Script_Character_GetPropertyText(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *property = (ScriptString *)params[0]._object;
-	UNUSED(property);
 	ScriptString *buffer = (ScriptString *)params[1]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("Character::GetPropertyText unimplemented");
+	buffer->setString(vm->getStringProperty(property->getString(), self->_properties));
 
 	return RuntimeValue();
 }
@@ -1038,12 +1029,11 @@ RuntimeValue Script_Character_GetPropertyText(AGSEngine *vm, Character *self, co
 // Gets a text custom property for this character.
 RuntimeValue Script_Character_GetTextProperty(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *property = (ScriptString *)params[0]._object;
-	UNUSED(property);
 
-	// FIXME
-	error("Character::GetTextProperty unimplemented");
-
-	return RuntimeValue();
+	Common::String string = vm->getStringProperty(property->getString(), self->_properties);
+	RuntimeValue ret = new ScriptMutableString(string);
+	ret._object->DecRef();
+	return ret;
 }
 
 // Character: import bool HasInventory(InventoryItem *item)

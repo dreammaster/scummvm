@@ -318,6 +318,9 @@ public:
 	bool playSpeech(uint charId, uint speechId);
 	void stopSpeech();
 
+	int getIntProperty(const Common::String &name, const Common::StringMap &properties);
+	Common::String getStringProperty(const Common::String &name, const Common::StringMap &properties);
+
 private:
 	const AGSGameDescription *_gameDescription;
 
