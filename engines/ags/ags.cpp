@@ -976,10 +976,10 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 		// disable/enable the player character as specified in the room options
 		if (!_currentRoom->_options[ST_MANDISABLED]) {
 			forChar->_on = 1;
-			// FIXME: enableCursorMode(0);
+			enableCursorMode(0);
 		} else {
 			forChar->_on = 0;
-			// FIXME: disableCursorMode(0);
+			disableCursorMode(0);
 			// remember which character we turned off, in case they
 			// use SetPlayerChracter within this room (so we re-enable
 			// the correct character when leaving the room)
@@ -2014,18 +2014,36 @@ void AGSEngine::setCursorMode(uint32 newMode) {
 	}
 
 	if (newMode == MODE_USE) {
-		// FIXME: inventory logic
-		// if (_playerChar->_activeInv == (uint)-1) {
-		// 	findNextEnabledCursor(0);
-		// 	return;
-		// }
-		// updateInvCursor(_playerChar->_activeInv);
+		if (_playerChar->_activeInv == (uint)-1) {
+			findNextEnabledCursor(0);
+			return;
+		}
+		// FIXME: updateInvCursor(_playerChar->_activeInv);
 	}
 
 	_cursorMode = newMode;
 	setDefaultCursor();
 
-	debug(1, "cursor mode set to %d", newMode);
+	debugC(kDebugLevelGame, "cursor mode set to %d", newMode);
+}
+
+void AGSEngine::enableCursorMode(uint cursorId) {
+	_gameFile->_cursors[cursorId]._flags &= ~MCF_DISABLED;
+
+	// FIXME: enable GUI buttons
+
+	invalidateGUI();
+}
+
+void AGSEngine::disableCursorMode(uint cursorId) {
+	_gameFile->_cursors[cursorId]._flags |= MCF_DISABLED;
+
+	// FIXME: disable GUI buttons
+
+	if (_cursorMode == cursorId)
+		findNextEnabledCursor(cursorId);
+
+	invalidateGUI();
 }
 
 // 'update_gui_zorder'

@@ -26,6 +26,7 @@
 
 #include "engines/ags/scripting/scripting.h"
 #include "engines/ags/constants.h"
+#include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
 #include "common/events.h"
@@ -82,12 +83,20 @@ RuntimeValue Script_ProcessClick(AGSEngine *vm, ScriptObject *, const Common::Ar
 // Changes the sprite for the specified mouse cursor.
 RuntimeValue Script_Mouse_ChangeModeGraphic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
-	int slot = params[1]._signedValue;
-	UNUSED(slot);
+	uint slot = params[1]._value;
 
-	// FIXME
-	error("Mouse::ChangeModeGraphic unimplemented");
+	if (cursormode >= vm->_gameFile->_cursors.size())
+		error("ChangeModeGraphic: mode %d is too high (only %d cursors)", cursormode, vm->_gameFile->_cursors.size());
+
+	if (cursormode == MODE_USE && !vm->getGameOption(OPT_FIXEDINVCURSOR))
+		error("ChangeModeGraphic: should not be used on the Inventory cursor when the cursor is linked to the active inventory item");
+
+	// TODO: check sanity of slot
+
+	vm->_gameFile->_cursors[cursormode]._pic = slot;
+
+	if (vm->getCursorMode() == cursormode)
+		vm->_graphics->setMouseCursor(cursormode);
 
 	return RuntimeValue();
 }
@@ -126,10 +135,11 @@ RuntimeValue Script_Mouse_ChangeModeView(AGSEngine *vm, ScriptObject *, const Co
 // Disables the specified cursor mode.
 RuntimeValue Script_Mouse_DisableMode(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
 
-	// FIXME
-	error("Mouse::DisableMode unimplemented");
+	if (cursormode >= vm->_gameFile->_cursors.size())
+		error("Mouse::DisableMode: mode %d is too high (only %d cursors)", cursormode, vm->_gameFile->_cursors.size());
+
+	vm->disableCursorMode(cursormode);
 
 	return RuntimeValue();
 }
@@ -138,10 +148,11 @@ RuntimeValue Script_Mouse_DisableMode(AGSEngine *vm, ScriptObject *, const Commo
 // Re-enables the specified cursor mode.
 RuntimeValue Script_Mouse_EnableMode(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
 
-	// FIXME
-	error("Mouse::EnableMode unimplemented");
+	if (cursormode >= vm->_gameFile->_cursors.size())
+		error("Mouse::EnableMode: mode %d is too high (only %d cursors)", cursormode, vm->_gameFile->_cursors.size());
+
+	vm->enableCursorMode(cursormode);
 
 	return RuntimeValue();
 }
@@ -170,7 +181,7 @@ RuntimeValue Script_Mouse_IsButtonDown(AGSEngine *vm, ScriptObject *, const Comm
 	uint mask = 1 << (mouseButton - 1);
 	bool ret = vm->getEventManager()->getButtonState() & mask;
 
-	return RuntimeValue((uint)ret);
+	return (uint)ret;
 }
 
 // Mouse: import static void SaveCursorUntilItLeaves()
@@ -256,8 +267,7 @@ RuntimeValue Script_Mouse_UseModeGraphic(AGSEngine *vm, ScriptObject *, const Co
 // Mouse: import static attribute CursorMode Mode
 // Gets/sets the current mouse cursor mode.
 RuntimeValue Script_Mouse_get_Mode(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Mouse::get_Mode unimplemented");
+	return vm->getCursorMode();
 
 	return RuntimeValue();
 }
@@ -266,10 +276,8 @@ RuntimeValue Script_Mouse_get_Mode(AGSEngine *vm, ScriptObject *, const Common::
 // Gets/sets the current mouse cursor mode.
 RuntimeValue Script_Mouse_set_Mode(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 value = params[0]._value;
-	UNUSED(value);
 
-	// FIXME
-	error("Mouse::set_Mode unimplemented");
+	vm->setCursorMode(value);
 
 	return RuntimeValue();
 }
@@ -426,10 +434,11 @@ RuntimeValue Script_RefreshMouse(AGSEngine *vm, ScriptObject *, const Common::Ar
 // Mouse function.
 RuntimeValue Script_DisableCursorMode(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
 
-	// FIXME
-	error("DisableCursorMode unimplemented");
+	if (cursormode >= vm->_gameFile->_cursors.size())
+		error("DisableCursorMode: mode %d is too high (only %d cursors)", cursormode, vm->_gameFile->_cursors.size());
+
+	vm->disableCursorMode(cursormode);
 
 	return RuntimeValue();
 }
@@ -438,10 +447,11 @@ RuntimeValue Script_DisableCursorMode(AGSEngine *vm, ScriptObject *, const Commo
 // Mouse function.
 RuntimeValue Script_EnableCursorMode(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
 
-	// FIXME
-	error("EnableCursorMode unimplemented");
+	if (cursormode >= vm->_gameFile->_cursors.size())
+		error("EnableCursorMode: mode %d is too high (only %d cursors)", cursormode, vm->_gameFile->_cursors.size());
+
+	vm->enableCursorMode(cursormode);
 
 	return RuntimeValue();
 }
@@ -457,14 +467,18 @@ RuntimeValue Script_SaveCursorForLocationChange(AGSEngine *vm, ScriptObject *, c
 
 // import int IsButtonDown(MouseButton)
 // Mouse function.
+// TODO: Point this whole function to IsButtonDown instead.
 RuntimeValue Script_IsButtonDown(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	uint32 mousebutton = params[0]._value;
-	UNUSED(mousebutton);
+	uint32 mouseButton = params[0]._value;
 
-	// FIXME
-	error("IsButtonDown unimplemented");
+	if (mouseButton < 1 || mouseButton > 3)
+		error("Mouse::IsButtonDown: button %d is invalid", mouseButton);
 
-	return RuntimeValue();
+	// TODO: at the time of writing, ScummVM doesn't provide the middle mouse button here
+	uint mask = 1 << (mouseButton - 1);
+	bool ret = vm->getEventManager()->getButtonState() & mask;
+
+	return (uint)ret;
 }
 
 // import int WaitKey(int waitLoops)

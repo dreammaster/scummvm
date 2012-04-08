@@ -204,6 +204,8 @@ public:
 	void setNextCursor();
 	void setCursorMode(uint32 newMode);
 	uint32 getCursorMode() { return _cursorMode; }
+	void enableCursorMode(uint cursorId);
+	void disableCursorMode(uint cursorId);
 
 	void resortGUIs();
 	uint getGUIAt(const Common::Point &pos);
