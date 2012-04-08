@@ -861,7 +861,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
 				if (fixup != instScript->_globalFixups.end())
 					error("script tried MEMREADB on fixup on line %d", _lineNumber);
-				_registers[int1] = (*tempVal._instance->_globalData)[tempVal._value];
+				_registers[int1] = (byte)(*tempVal._instance->_globalData)[tempVal._value];
 				break;
 			case rvtSystemObject:
 				_registers[int1] = tempVal._object->readByte(tempVal._value);
@@ -873,7 +873,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 				if (_stack[tempVal._value]._type != rvtInteger)
 					error("script tried to MEMREADB from invalid stack@%d on line %d",
 						tempVal._value, _lineNumber);
-				_registers[int1] = _stack[tempVal._value];
+				_registers[int1] = (byte)_stack[tempVal._value]._value;
 				break;
 			default:
 				error("script tried to MEMREADB from runtime value of type %d (value %d) on line %d",
@@ -893,10 +893,10 @@ void ccInstance::runCodeFrom(uint32 start) {
 				fixup = Common::find(instScript->_globalFixups.begin(), instScript->_globalFixups.end(), tempVal._value);
 				if (fixup != instScript->_globalFixups.end())
 					error("script tried MEMREADW on fixup on line %d", _lineNumber);
-				_registers[int1] = READ_LE_UINT16(&(*tempVal._instance->_globalData)[tempVal._value]);
+				_registers[int1] = (int16)READ_LE_UINT16(&(*tempVal._instance->_globalData)[tempVal._value]);
 				break;
 			case rvtSystemObject:
-				_registers[int1] = tempVal._object->readUint16(tempVal._value);
+				_registers[int1] = (int16)tempVal._object->readUint16(tempVal._value);
 				break;
 			case rvtStackPointer:
 				if (tempVal._value + 2 >= _stack.size())
@@ -905,7 +905,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 				if (_stack[tempVal._value]._type != rvtInteger)
 					error("script tried to MEMREADW from invalid stack@%d on line %d",
 						tempVal._value, _lineNumber);
-				_registers[int1] = _stack[tempVal._value];
+				_registers[int1] = (int16)_stack[tempVal._value]._value;
 				break;
 			default:
 				error("script tried to MEMREADW from runtime value of type %d (value %d) on line %d",
@@ -928,16 +928,16 @@ void ccInstance::runCodeFrom(uint32 start) {
 					error("script tried MEMWRITEB on fixup on %d", _lineNumber);
 				if (tempVal._instance->_globalObjects->contains(tempVal._value))
 					tempVal._instance->_globalObjects->erase(tempVal._value);
-				(*tempVal._instance->_globalData)[tempVal._value] = _registers[int1]._value;
+				(*tempVal._instance->_globalData)[tempVal._value] = (byte)_registers[int1]._value;
 				break;
 			case rvtSystemObject:
-				tempVal._object->writeByte(tempVal._value, _registers[int1]._value);
+				tempVal._object->writeByte(tempVal._value, (byte)_registers[int1]._value);
 				break;
 			case rvtStackPointer:
 				if (tempVal._value + 1 >= _stack.size())
 					error("script tried to MEMWRITEB to out-of-bounds stack@%d on line %d",
 						tempVal._value, _lineNumber);
-				_stack[tempVal._value] = _registers[int1];
+				_stack[tempVal._value] = (byte)_registers[int1]._value;
 				break;
 			default:
 				error("script tried to MEMWRITEB to runtime value of type %d (value %d) on line %d",
@@ -960,16 +960,16 @@ void ccInstance::runCodeFrom(uint32 start) {
 					error("script tried MEMWRITEW on fixup on %d", _lineNumber);
 				if (tempVal._instance->_globalObjects->contains(tempVal._value))
 					tempVal._instance->_globalObjects->erase(tempVal._value);
-				WRITE_LE_UINT16(&(*tempVal._instance->_globalData)[tempVal._value], _registers[int1]._value);
+				WRITE_LE_UINT16(&(*tempVal._instance->_globalData)[tempVal._value], (int16)_registers[int1]._value);
 				break;
 			case rvtSystemObject:
-				tempVal._object->writeUint16(tempVal._value, _registers[int1]._value);
+				tempVal._object->writeUint16(tempVal._value, (int16)_registers[int1]._value);
 				break;
 			case rvtStackPointer:
 				if (tempVal._value + 2 >= _stack.size())
 					error("script tried to MEMWRITEW to out-of-bounds stack@%d on line %d",
 						tempVal._value, _lineNumber);
-				_stack[tempVal._value] = _registers[int1];
+				_stack[tempVal._value] = (int16)_registers[int1]._value;
 				_stack[tempVal._value + 1].invalidate();
 				break;
 			default:
