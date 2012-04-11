@@ -12,6 +12,7 @@ MODULE_OBJS := \
 	gui.o \
 	metaengine.o \
 	overlay.o \
+	pathfinder.o \
 	resourceman.o \
 	room.o \
 	script.o \
