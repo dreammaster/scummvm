@@ -30,6 +30,8 @@
 #include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
+#include "engines/ags/room.h"
+#include "engines/ags/sprites.h"
 
 // for QuitGame
 #include "gui/message.h"
@@ -52,12 +54,14 @@ RuntimeValue Script_Game_ChangeTranslation(AGSEngine *vm, ScriptObject *, const 
 // Returns true the first time this command is called with this token.
 RuntimeValue Script_Game_DoOnceOnly(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *token = (ScriptString *)params[0]._object;
-	UNUSED(token);
 
-	// FIXME
-	error("Game::DoOnceOnly unimplemented");
+	Common::String string = token->getString();
 
-	return RuntimeValue();
+	if (Common::find(vm->_state->_doOnceTokens.begin(), vm->_state->_doOnceTokens.end(), string) != vm->_state->_doOnceTokens.end())
+		return 0;
+
+	vm->_state->_doOnceTokens.push_back(string);
+	return 1;
 }
 
 // Game: import static int GetColorFromRGB(int red, int green, int blue)
@@ -79,15 +83,18 @@ RuntimeValue Script_Game_GetColorFromRGB(AGSEngine *vm, ScriptObject *, const Co
 // Game: import static int GetFrameCountForLoop(int view, int loop)
 // Gets the number of frames in the specified view loop.
 RuntimeValue Script_Game_GetFrameCountForLoop(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int view = params[0]._signedValue;
-	UNUSED(view);
-	int loop = params[1]._signedValue;
-	UNUSED(loop);
+	uint view = params[0]._value;
+	uint loop = params[1]._value;
 
-	// FIXME
-	error("Game::GetFrameCountForLoop unimplemented");
+	if (view < 1 || view > vm->_gameFile->_views.size())
+		error("Game::GetFrameCountForLoop: view %d is invalid or too high (only have %d)",
+			view, vm->_gameFile->_views.size());
+	view--;
+	if (loop >= vm->_gameFile->_views[view]._loops.size())
+		error("Game::GetFrameCountForLoop: loop %d (in view %d) is invalid or too high (only have %d)",
+			loop, view, vm->_gameFile->_views[view]._loops.size());
 
-	return RuntimeValue();
+	return vm->_gameFile->_views[view]._loops[loop]._frames.size();
 }
 
 // Game: import static String GetLocationName(int x, int y)
@@ -104,13 +111,12 @@ RuntimeValue Script_Game_GetLocationName(AGSEngine *vm, ScriptObject *, const Co
 // Game: import static int GetLoopCountForView(int view)
 // Gets the number of loops in the specified view.
 RuntimeValue Script_Game_GetLoopCountForView(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int view = params[0]._signedValue;
-	UNUSED(view);
+	uint view = params[0]._value;
 
-	// FIXME
-	error("Game::GetLoopCountForView unimplemented");
+	if (view == 0 || view - 1 >= vm->_gameFile->_views.size())
+		error("GetLoopCountForView: view %d is invalid or too high (only have %d)", view, vm->_gameFile->_views.size());
 
-	return RuntimeValue();
+	return vm->_gameFile->_views[view]._loops.size();
 }
 
 // Game: import static int GetMODPattern()
@@ -394,10 +400,7 @@ RuntimeValue Script_Game_set_MinimumTextDisplayTimeMs(AGSEngine *vm, ScriptObjec
 // Game: readonly import static attribute int MouseCursorCount
 // Gets the number of mouse cursors in the game.
 RuntimeValue Script_Game_get_MouseCursorCount(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Game::get_MouseCursorCount unimplemented");
-
-	return RuntimeValue();
+	return vm->_gameFile->_cursors.size();
 }
 
 // Game: import static attribute String Name
@@ -484,20 +487,18 @@ RuntimeValue Script_Game_geti_SpriteWidth(AGSEngine *vm, ScriptObject *, const C
 // Game: import static attribute int TextReadingSpeed
 // Gets/sets how fast speech text is removed from the screen.
 RuntimeValue Script_Game_get_TextReadingSpeed(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Game::get_TextReadingSpeed unimplemented");
-
-	return RuntimeValue();
+	return vm->_state->_textSpeed;
 }
 
 // Game: import static attribute int TextReadingSpeed
 // Gets/sets how fast speech text is removed from the screen.
 RuntimeValue Script_Game_set_TextReadingSpeed(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint value = params[0]._value;
 
-	// FIXME
-	error("Game::set_TextReadingSpeed unimplemented");
+	if (!value)
+		error("Game::set_TextReadingSpeed: invalid speed %d", value);
+
+	vm->_state->_textSpeed = value;
 
 	return RuntimeValue();
 }
@@ -744,13 +745,13 @@ RuntimeValue Script_SetGlobalString(AGSEngine *vm, ScriptObject *, const Common:
 // import void GetGlobalString(int stringID, string buffer)
 // Old string buffer function.
 RuntimeValue Script_GetGlobalString(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int stringID = params[0]._signedValue;
-	UNUSED(stringID);
+	uint stringID = params[0]._value;
 	ScriptString *buffer = (ScriptString *)params[1]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("GetGlobalString unimplemented");
+	if (stringID >= vm->_state->_globalStrings.size())
+		error("GetGlobalString: invalid string id %d (only %d present)", stringID, vm->_state->_globalStrings.size());
+
+	buffer->setString(vm->_state->_globalStrings[stringID]);
 
 	return RuntimeValue();
 }
@@ -825,22 +826,55 @@ RuntimeValue Script_LoadSaveSlotScreenshot(AGSEngine *vm, ScriptObject *, const 
 	return RuntimeValue();
 }
 
+#define GP_SPRITEWIDTH   1
+#define GP_SPRITEHEIGHT  2
+#define GP_NUMLOOPS      3
+#define GP_NUMFRAMES     4
+#define GP_ISRUNNEXTLOOP 5
+#define GP_FRAMESPEED    6
+#define GP_FRAMEIMAGE    7
+#define GP_FRAMESOUND    8
+#define GP_NUMGUIS       9
+#define GP_NUMOBJECTS    10
+#define GP_NUMCHARACTERS 11
+#define GP_NUMINVITEMS   12
+#define GP_ISFRAMEFLIPPED 13
+
 // import int GetGameParameter(int parameter, int data1=0, int data2=0, int data3=0)
-// Undocumented.
+// Obsolete function for retrieving game parameters. Since replaced by individual functions.
 RuntimeValue Script_GetGameParameter(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int parameter = params[0]._signedValue;
-	UNUSED(parameter);
-	int data1 = params[1]._signedValue;
-	UNUSED(data1);
-	int data2 = params[2]._signedValue;
-	UNUSED(data2);
-	int data3 = params[3]._signedValue;
-	UNUSED(data3);
+	uint parameter = params[0]._value;
+	uint data1 = params[1]._value;
+	uint data2 = params[2]._value;
+	uint data3 = params[3]._value;
 
-	// FIXME
-	error("GetGameParameter unimplemented");
+	// TODO: add sanity checks?
 
-	return RuntimeValue();
+	switch (parameter) {
+	case GP_SPRITEWIDTH:
+		return vm->getSprites()->getSpriteWidth(data1);
+	case GP_SPRITEHEIGHT:
+		return vm->getSprites()->getSpriteHeight(data1);
+	case GP_NUMLOOPS:
+	case GP_NUMFRAMES:
+	case GP_FRAMESPEED:
+	case GP_FRAMEIMAGE:
+	case GP_FRAMESOUND:
+	case GP_ISFRAMEFLIPPED:
+	case GP_ISRUNNEXTLOOP:
+		// FIXME
+		error("GetGameParameter: unimplemented parameter %d", parameter);
+	case GP_NUMGUIS:
+		return vm->_gameFile->_guiGroups.size();
+	case GP_NUMOBJECTS:
+		return vm->getCurrentRoom()->_objects.size();
+	case GP_NUMCHARACTERS:
+		return vm->_characters.size();
+	case GP_NUMINVITEMS:
+		return vm->_gameFile->_invItemInfo.size();
+	default:
+		error("GetGameParameter: unknown parameter %d", parameter);
+	}
 }
 
 // import void GiveScore(int points)
