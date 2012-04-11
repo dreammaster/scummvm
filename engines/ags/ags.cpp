@@ -954,9 +954,20 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	if (!stream)
 		error("failed to open room file for room %d", id);
 
-	_currentRoom = new Room(this, stream);
-	// FIXME: discard room if we shouldn't keep it
-	_loadedRooms[id] = _currentRoom;
+	bool beenHere = false;
+	if (_loadedRooms.contains(id)) {
+		// We already have state for this room.
+		_currentRoom = _loadedRooms[id];
+		_currentRoom->loadFrom(stream);
+		beenHere = true;
+	} else {
+		// This is a brand-new room.
+		_currentRoom = new Room(this, stream);
+		// FIXME: discard room if we shouldn't keep it
+		_loadedRooms[id] = _currentRoom;
+	}
+
+	// (note: convertCoordinatesToLowRes call was here, now in Room)
 
 	_state->_roomWidth = _currentRoom->_width;
 	_state->_roomHeight = _currentRoom->_height;
@@ -965,15 +976,17 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 	_graphics->newRoomPalette();
 
-	// (note: convertCoordinatesToLowRes call was here, now in Room)
-
 	// FIXME
 
 	_inNewRoomState = kNewRoomStateNew;
 
 	// FIXME
 
-	_inNewRoomState = kNewRoomStateFirstTime;
+	if (!beenHere) {
+		// FIXME
+
+		_inNewRoomState = kNewRoomStateFirstTime;
+	}
 
 	// FIXME
 
@@ -1045,7 +1058,8 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 			_state->_enteredEdge = 3;
 	}
 
-	// FIXME: music
+	if (_currentRoom->_options[ST_TUNE] > 0)
+		{ } // FIXME: music
 
 	if (forChar) {
 		// disable/enable the player character as specified in the room options
@@ -1063,7 +1077,7 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 		// reset the frame/view
 		if (!(forChar->_flags & CHF_FIXVIEW)) {
-			if (_currentRoom->_options[ST_MANVIEW])
+			if (_currentRoom->_options[ST_MANVIEW] != 0)
 				forChar->_view = _currentRoom->_options[ST_MANVIEW] - 1;
 			else
 				forChar->_view = forChar->_defView;
@@ -1073,6 +1087,7 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 
 	// FIXME: lots and lots
 
+	_audio->updateMusicVolume();
 	updateViewport();
 
 	// FIXME: merge objects

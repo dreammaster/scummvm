@@ -687,6 +687,11 @@ void Room::readData(Common::SeekableReadStream *dta) {
 			dta->skip(blockSize);
 			break;
 		case BLOCKTYPE_COMPSCRIPT3:
+			if (_loaded) {
+				dta->skip(blockSize);
+				break;
+			}
+
 			if (_compiledScript)
 				error("Room: second compiled script encountered");
 
@@ -1022,6 +1027,35 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 				_objects[i]->_interactionScripts.readFrom(dta);
 			for (uint i = 0; i < _regions.size(); ++i)
 				_regions[i]._interactionScripts.readFrom(dta);
+		}
+	} else if (_version >= kAGSRoomVer241) {
+		// all this is already loaded; need to skip the data
+
+		if (_version < kAGSRoomVer300) {
+			uint count = _hotspots.size() + _objects.size() + 1;
+			for (uint i = 0; i < count; ++i) {
+				NewInteraction *interaction = NewInteraction::createFrom(dta);
+				delete interaction;
+			}
+		}
+
+		if (_version >= kAGSRoomVer255r) {
+			uint32 regionCount = dta->readUint32LE();
+			assert(_regions.size() == regionCount);
+			if (_version < kAGSRoomVer300) {
+				for (uint i = 0; i < regionCount; ++i) {
+					NewInteraction *interaction = NewInteraction::createFrom(dta);
+					delete interaction;
+				}
+			}
+		}
+
+		if (_version >= kAGSRoomVer300) {
+			uint count = 1 + _hotspots.size() + _objects.size() + _regions.size();
+			for (uint i = 0; i < count; ++i) {
+				InteractionScript script;
+				script.readFrom(dta);
+			}
 		}
 	}
 
