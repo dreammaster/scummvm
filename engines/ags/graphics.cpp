@@ -25,6 +25,7 @@
  */
 
 #include "engines/ags/ags.h"
+#include "engines/ags/character.h"
 #include "engines/ags/constants.h"
 #include "engines/ags/drawable.h"
 #include "engines/ags/gamefile.h"

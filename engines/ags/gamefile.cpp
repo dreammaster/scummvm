@@ -30,6 +30,7 @@
 
 #include "ags/ags.h"
 #include "ags/audio.h"
+#include "ags/character.h"
 #include "ags/constants.h"
 #include "ags/gamefile.h"
 #include "ags/gamestate.h"

@@ -92,14 +92,10 @@ RuntimeValue Script_NewRoom(AGSEngine *vm, ScriptObject *, const Common::Array<R
 // Obsolete character function.
 RuntimeValue Script_NewRoomEx(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int roomNumber = params[0]._signedValue;
-	UNUSED(roomNumber);
 	int x = params[1]._signedValue;
-	UNUSED(x);
 	int y = params[2]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("NewRoomEx unimplemented");
+	vm->getPlayerChar()->changeRoom(roomNumber, x, y);
 
 	return RuntimeValue();
 }
@@ -108,16 +104,17 @@ RuntimeValue Script_NewRoomEx(AGSEngine *vm, ScriptObject *, const Common::Array
 // Obsolete character function.
 RuntimeValue Script_NewRoomNPC(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 	int roomNumber = params[1]._signedValue;
-	UNUSED(roomNumber);
 	int x = params[2]._signedValue;
-	UNUSED(x);
 	int y = params[3]._signedValue;
-	UNUSED(y);
 
-	// FIXME
-	error("NewRoomNPC unimplemented");
+	if (charid >= vm->_characters.size())
+		error("NewRoomNPC: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	if (charid == vm->_gameFile->_playerChar)
+		error("NewRoomNPC: you must use NewRoomEx with the player character");
+
+	vm->_characters[charid]->changeRoom(roomNumber, x, y);
 
 	return RuntimeValue();
 }
@@ -169,7 +166,14 @@ RuntimeValue Script_DisplaySpeech(AGSEngine *vm, ScriptObject *, const Common::A
 	uint charId = params[0]._value;
 	ScriptString *message = (ScriptString *)params[1]._object;
 
-	vm->displaySpeech(message->getString(), charId);
+	Common::String string = vm->getTranslation(message->getString());
+
+	Common::Array<RuntimeValue> values = params;
+	values.remove_at(0);
+	values.remove_at(0);
+	string = vm->formatString(string, values);
+
+	vm->displaySpeech(string, charId);
 
 	return RuntimeValue();
 }
@@ -178,32 +182,28 @@ RuntimeValue Script_DisplaySpeech(AGSEngine *vm, ScriptObject *, const Common::A
 // Obsolete character function.
 RuntimeValue Script_DisplaySpeechBackground(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 	ScriptString *message = (ScriptString *)params[1]._object;
-	UNUSED(message);
 
-	// FIXME
-	error("DisplaySpeechBackground unimplemented");
-
-	return RuntimeValue();
+	return vm->displaySpeechBackground(charid, message->getString());
 }
 
 // import void DisplaySpeechAt (int x, int y, int width, CHARID, const string message)
 // Obsolete character function.
 RuntimeValue Script_DisplaySpeechAt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
 	int width = params[2]._signedValue;
-	UNUSED(width);
 	uint32 charid = params[3]._value;
-	UNUSED(charid);
 	ScriptString *message = (ScriptString *)params[4]._object;
-	UNUSED(message);
 
-	// FIXME
-	error("DisplaySpeechAt unimplemented");
+	// TODO: sanity-check params?
+
+	x = vm->multiplyUpCoordinate(x);
+	y = vm->multiplyUpCoordinate(y);
+	width = vm->multiplyUpCoordinate(width);
+
+	Common::String text = vm->getTranslation(message->getString());
+	vm->displaySpeech(text, charid, x, y, width);
 
 	return RuntimeValue();
 }
@@ -445,10 +445,11 @@ RuntimeValue Script_MoveCharacterBlocking(AGSEngine *vm, ScriptObject *, const C
 // Obsolete character function.
 RuntimeValue Script_MoveToWalkableArea(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 
-	// FIXME
-	error("MoveToWalkableArea unimplemented");
+	if (charid >= vm->_characters.size())
+		error("MoveToWalkableArea: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	vm->_characters[charid]->moveToNearestWalkableArea();
 
 	return RuntimeValue();
 }
@@ -457,12 +458,23 @@ RuntimeValue Script_MoveToWalkableArea(AGSEngine *vm, ScriptObject *, const Comm
 // Obsolete character function.
 RuntimeValue Script_FaceCharacter(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 	uint32 toFace = params[1]._value;
-	UNUSED(toFace);
 
-	// FIXME
-	error("FaceCharacter unimplemented");
+	if (charid >= vm->_characters.size())
+		error("FaceCharacter: character %d is too high (only have %d)", charid, vm->_characters.size());
+	if (toFace >= vm->_characters.size())
+		error("FaceCharacter: target character %d is too high (only have %d)", toFace, vm->_characters.size());
+
+	Character *self = vm->_characters[charid];
+	Character *target = vm->_characters[toFace];
+
+	if (self->_room != target->_room)
+		error("FaceCharacter: target characters are in different rooms");
+
+	if (self->faceLocation(target->_x, target->_y)) {
+		vm->blockUntil(kUntilCharWalkDone, self->_indexId);
+		self->_frame = 0;
+	}
 
 	return RuntimeValue();
 }
@@ -477,7 +489,10 @@ RuntimeValue Script_FaceLocation(AGSEngine *vm, ScriptObject *, const Common::Ar
 	if (charid >= vm->_characters.size())
 		error("MoveCharacter: character %d is too high (only have %d)", charid, vm->_characters.size());
 
-	vm->_characters[charid]->faceLocation(x, y);
+	if (vm->_characters[charid]->faceLocation(x, y)) {
+		vm->blockUntil(kUntilCharWalkDone, charid);
+		vm->_characters[charid]->_frame = 0;
+	}
 
 	return RuntimeValue();
 }
@@ -486,12 +501,12 @@ RuntimeValue Script_FaceLocation(AGSEngine *vm, ScriptObject *, const Common::Ar
 // Obsolete character function.
 RuntimeValue Script_SetCharacterView(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 	int view = params[1]._signedValue;
-	UNUSED(view);
 
-	// FIXME
-	error("SetCharacterView unimplemented");
+	if (charid >= vm->_characters.size())
+		error("SetCharacterView: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	vm->_characters[charid]->lockView(view);
 
 	return RuntimeValue();
 }
@@ -627,10 +642,11 @@ RuntimeValue Script_SetCharacterIdle(AGSEngine *vm, ScriptObject *, const Common
 // Obsolete character function.
 RuntimeValue Script_StopMoving(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 
-	// FIXME
-	error("StopMoving unimplemented");
+	if (charid >= vm->_characters.size())
+		error("StopMoving: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	vm->_characters[charid]->stopMoving();
 
 	return RuntimeValue();
 }
@@ -667,12 +683,22 @@ RuntimeValue Script_AreCharactersColliding(AGSEngine *vm, ScriptObject *, const 
 // Obsolete character function.
 RuntimeValue Script_SetCharacterSpeed(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 	int speed = params[1]._signedValue;
-	UNUSED(speed);
 
-	// FIXME
-	error("SetCharacterSpeed unimplemented");
+	// can't be zero, nor too large
+	if (speed == 0 || speed > 50)
+		error("SetCharacterSpeed: invalid speed value %d", speed);
+
+	if (charid >= vm->_characters.size())
+		error("SetCharacterSpeed: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	Character *self = vm->_characters[charid];
+
+	if (self->_walking)
+		error("SetCharacterSpeed: cannot change speed while walking");
+
+	self->_walkSpeed = speed;
+	self->_walkSpeedY = UNIFORM_WALK_SPEED;
 
 	return RuntimeValue();
 }
@@ -681,14 +707,27 @@ RuntimeValue Script_SetCharacterSpeed(AGSEngine *vm, ScriptObject *, const Commo
 // Obsolete character function.
 RuntimeValue Script_SetCharacterSpeedEx(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
-	int x_speed = params[1]._signedValue;
-	UNUSED(x_speed);
-	int y_speed = params[2]._signedValue;
-	UNUSED(y_speed);
+	int xSpeed = params[1]._signedValue;
+	int ySpeed = params[2]._signedValue;
 
-	// FIXME
-	error("SetCharacterSpeedEx unimplemented");
+	// can't be zero, nor too large
+	if (xSpeed == 0 || xSpeed > 50 || ySpeed == 0 || ySpeed > 50)
+		error("SetCharacterSpeedEx: invalid speed values %d, %d", xSpeed, ySpeed);
+
+	if (charid >= vm->_characters.size())
+		error("SetCharacterSpeedEx: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	Character *self = vm->_characters[charid];
+
+	if (self->_walking)
+		error("SetCharacterSpeedEx: cannot change speed while walking");
+
+	self->_walkSpeed = xSpeed;
+
+	if (ySpeed == xSpeed)
+		self->_walkSpeedY = UNIFORM_WALK_SPEED;
+	else
+		self->_walkSpeedY = ySpeed;
 
 	return RuntimeValue();
 }
@@ -869,38 +908,7 @@ RuntimeValue Script_Character_ChangeRoom(AGSEngine *vm, Character *self, const C
 	int x = params[1]._signedValue;
 	int y = params[2]._signedValue;
 
-	if (self->_indexId != vm->_gameFile->_playerChar) {
-		// NewRoomNPC
-		if (x != SCR_NO_VALUE && y != SCR_NO_VALUE) {
-			self->_x = x;
-			self->_y = y;
-		}
-		self->_prevRoom = self->_room;
-		self->_room = room;
-
-		debugC(kDebugLevelGame, "character '%s' moved to room %d, location %d,%d",
-			self->_scriptName.c_str(), room, self->_x, self->_y);
-
-		return RuntimeValue();
-	}
-
-	if (x != SCR_NO_VALUE && y != SCR_NO_VALUE) {
-		vm->_newRoomPos = 0;
-
-		if (vm->getGameFileVersion() <= kAGSVer272) {
-			// Set position immediately on 2.x.
-			// "Fixed the player looking the wrong way after entering a room in the Ben Jordan games."
-			self->_x = x;
-			self->_y = y;
-		} else {
-			// don't check X or Y bounds, so that they can do a
-			// walk-in animation if they want
-			vm->_newRoomX = x;
-			vm->_newRoomY = y;
-		}
-	}
-
-	vm->scheduleNewRoom(room);
+	self->changeRoom(room, x, y);
 
 	return RuntimeValue();
 }
@@ -969,12 +977,13 @@ RuntimeValue Script_Character_FaceObject(AGSEngine *vm, Character *self, const C
 	if (!params[0]._object->isOfType(sotRoomObject))
 		error("Character::FaceObject got incorrect object type (expected a RoomObject) for parameter 1");
 	RoomObject *object = (RoomObject *)params[0]._object;
-	UNUSED(object);
-	uint32 blockingstyle = params[1]._value;
-	UNUSED(blockingstyle);
+	uint32 blockingStyle = params[1]._value;
 
-	// FIXME
-	error("Character::FaceObject unimplemented");
+	if (self->faceLocation(object->_pos.x, object->_pos.y)) {
+		if (blockingStyle == 1 || blockingStyle == BLOCKING)
+			vm->blockUntil(kUntilCharWalkDone, self->_indexId);
+		self->_frame = 0;
+	}
 
 	return RuntimeValue();
 }
@@ -1168,8 +1177,7 @@ RuntimeValue Script_Character_Move(AGSEngine *vm, Character *self, const Common:
 // Character: import function PlaceOnWalkableArea()
 // Moves the character to the nearest walkable area.
 RuntimeValue Script_Character_PlaceOnWalkableArea(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::PlaceOnWalkableArea unimplemented");
+	self->moveToNearestWalkableArea();
 
 	return RuntimeValue();
 }
@@ -1199,10 +1207,14 @@ RuntimeValue Script_Character_RunInteraction(AGSEngine *vm, Character *self, con
 // Says the specified text using the character's speech settings.
 RuntimeValue Script_Character_Say(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *message = (ScriptString *)params[0]._object;
-	UNUSED(message);
 
-	// FIXME
-	error("Character::Say unimplemented");
+	Common::String string = vm->getTranslation(message->getString());
+
+	Common::Array<RuntimeValue> values = params;
+	values.remove_at(0);
+	string = vm->formatString(string, values);
+
+	vm->displaySpeechCore(string, self->_indexId);
 
 	return RuntimeValue();
 }
@@ -1211,16 +1223,16 @@ RuntimeValue Script_Character_Say(AGSEngine *vm, Character *self, const Common::
 // Says the specified text at the specified position on the screen using the character's speech settings.
 RuntimeValue Script_Character_SayAt(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
 	int width = params[2]._signedValue;
-	UNUSED(width);
 	ScriptString *message = (ScriptString *)params[3]._object;
-	UNUSED(message);
 
-	// FIXME
-	error("Character::SayAt unimplemented");
+	x = vm->multiplyUpCoordinate(x);
+	y = vm->multiplyUpCoordinate(y);
+	width = vm->multiplyUpCoordinate(width);
+
+	Common::String text = vm->getTranslation(message->getString());
+	vm->displaySpeech(text, self->_indexId, x, y, width);
 
 	return RuntimeValue();
 }
@@ -1229,12 +1241,10 @@ RuntimeValue Script_Character_SayAt(AGSEngine *vm, Character *self, const Common
 // Displays the text as lucasarts-style speech but does not block the game.
 RuntimeValue Script_Character_SayBackground(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *message = (ScriptString *)params[0]._object;
-	UNUSED(message);
 
-	// FIXME
-	error("Character::SayBackground unimplemented");
-
-	return RuntimeValue();
+	uint overlayType = vm->displaySpeechBackground(self->_indexId, message->getString());
+	// FIXME: set border width/height to 0, mark as background speech
+	return vm->_overlays[overlayType];
 }
 
 // Character: import function SetAsPlayer()
@@ -1331,16 +1341,26 @@ RuntimeValue Script_Character_UnlockView(AGSEngine *vm, Character *self, const C
 // Moves the character to the destination, automatically playing his walking animation.
 RuntimeValue Script_Character_Walk(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
-	uint32 blockingstyle = params[2]._value;
-	UNUSED(blockingstyle);
-	uint32 walkwhere = params[3]._value;
-	UNUSED(walkwhere);
+	uint32 blockingStyle = params[2]._value;
+	uint32 walkWhere = params[3]._value;
 
-	// FIXME
-	error("Character::Walk unimplemented");
+	if (self->_on != 1)
+		error("Character::Walk: character is turned off and cannot be moved");
+
+	if (walkWhere == ANYWHERE)
+		walkWhere = 1;
+	else if (walkWhere == WALKABLE_AREAS)
+		walkWhere = 0;
+	else if (walkWhere != 0 && walkWhere != 1)
+		error("Character::Walk: %d is not a valid value for WalkWhere", walkWhere);
+
+	self->walk(x, y, (bool)walkWhere, true);
+
+	if (blockingStyle == BLOCKING || blockingStyle == 1)
+		vm->blockUntil(kUntilCharWalkDone, self->_indexId);
+	else if (blockingStyle != IN_BACKGROUND && blockingStyle != 0)
+		error("Character::Walk: %d is not a valid value for BlockingStyle", blockingStyle);
 
 	return RuntimeValue();
 }
@@ -1577,20 +1597,18 @@ RuntimeValue Script_Character_set_Clickable(AGSEngine *vm, Character *self, cons
 // Character: import attribute bool DiagonalLoops
 // Gets/sets whether this character has an 8-loop walking view with diagonal loops.
 RuntimeValue Script_Character_get_DiagonalLoops(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_DiagonalLoops unimplemented");
-
-	return RuntimeValue();
+	return (self->_flags & CHF_NODIAGONAL) ? 0 : 1;
 }
 
 // Character: import attribute bool DiagonalLoops
 // Gets/sets whether this character has an 8-loop walking view with diagonal loops.
 RuntimeValue Script_Character_set_DiagonalLoops(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	uint32 value = params[0]._value;
-	UNUSED(value);
 
-	// FIXME
-	error("Character::set_DiagonalLoops unimplemented");
+	if (value)
+		self->_flags &= ~CHF_NODIAGONAL;
+	else
+		self->_flags |= CHF_NODIAGONAL;
 
 	return RuntimeValue();
 }
@@ -2077,19 +2095,16 @@ RuntimeValue Script_Character_get_View(AGSEngine *vm, Character *self, const Com
 // Character: readonly import attribute int WalkSpeedX
 // Gets the character's X movement speed.
 RuntimeValue Script_Character_get_WalkSpeedX(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_WalkSpeedX unimplemented");
-
-	return RuntimeValue();
+	return self->_walkSpeed;
 }
 
 // Character: readonly import attribute int WalkSpeedY
 // Gets the character's Y movement speed.
 RuntimeValue Script_Character_get_WalkSpeedY(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_WalkSpeedY unimplemented");
+	if (self->_walkSpeedY != UNIFORM_WALK_SPEED)
+		return self->_walkSpeedY;
 
-	return RuntimeValue();
+	return self->_walkSpeed;
 }
 
 // Character: import attribute int x
@@ -2151,7 +2166,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "GetCharacterProperty", (ScriptAPIFunction *)&Script_GetCharacterProperty, "is", sotNone },
 	{ "GetCharacterPropertyText", (ScriptAPIFunction *)&Script_GetCharacterPropertyText, "iss", sotNone },
 	{ "RunCharacterInteraction", (ScriptAPIFunction *)&Script_RunCharacterInteraction, "ii", sotNone },
-	{ "DisplaySpeech", (ScriptAPIFunction *)&Script_DisplaySpeech, "is", sotNone },
+	{ "DisplaySpeech", (ScriptAPIFunction *)&Script_DisplaySpeech, "is.", sotNone },
 	{ "DisplaySpeechBackground", (ScriptAPIFunction *)&Script_DisplaySpeechBackground, "is", sotNone },
 	{ "DisplaySpeechAt", (ScriptAPIFunction *)&Script_DisplaySpeechAt, "iiiis", sotNone },
 	{ "DisplayThought", (ScriptAPIFunction *)&Script_DisplayThought, "is", sotNone },
@@ -2220,7 +2235,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "Character::PlaceOnWalkableArea^0", (ScriptAPIFunction *)&Script_Character_PlaceOnWalkableArea, "", sotCharacter },
 	{ "Character::RemoveTint^0", (ScriptAPIFunction *)&Script_Character_RemoveTint, "", sotCharacter },
 	{ "Character::RunInteraction^1", (ScriptAPIFunction *)&Script_Character_RunInteraction, "i", sotCharacter },
-	{ "Character::Say^101", (ScriptAPIFunction *)&Script_Character_Say, "s", sotCharacter },
+	{ "Character::Say^101", (ScriptAPIFunction *)&Script_Character_Say, "s.", sotCharacter },
 	{ "Character::SayAt^4", (ScriptAPIFunction *)&Script_Character_SayAt, "iiis", sotCharacter },
 	{ "Character::SayBackground^1", (ScriptAPIFunction *)&Script_Character_SayBackground, "s", sotCharacter },
 	{ "Character::SetAsPlayer^0", (ScriptAPIFunction *)&Script_Character_SetAsPlayer, "", sotCharacter },

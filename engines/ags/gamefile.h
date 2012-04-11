@@ -30,7 +30,6 @@
 #include "common/array.h"
 #include "common/hash-str.h"
 
-#include "engines/ags/character.h"
 #include "engines/ags/gui.h"
 #include "engines/ags/inventory.h"
 
@@ -173,6 +172,7 @@ struct AGSFont {
 };
 
 class AGSEngine;
+class Character;
 
 class GameFile {
 public:

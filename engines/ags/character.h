@@ -30,8 +30,9 @@
 #include "common/array.h"
 #include "common/hash-str.h"
 
-#include "engines/ags/scriptobj.h"
 #include "engines/ags/drawable.h"
+#include "engines/ags/pathfinder.h"
+#include "engines/ags/scriptobj.h"
 
 namespace AGS {
 
@@ -73,9 +74,15 @@ public:
 
 	void checkViewFrame();
 
+	void changeRoom(int room, int x, int y);
+
 	void addInventory(uint itemId, uint addIndex = 0xffffffff);
 	void loseInventory(uint itemId);
 	void setActiveInventory(uint itemId);
+
+	byte getSpeechAnimationDelay();
+
+	void moveToNearestWalkableArea();
 
 	int32 _defView, _talkView, _view;
 
@@ -103,7 +110,7 @@ public:
 	uint16 _blinkView, _blinkInterval; // design time
 	uint16 _blinkTimer, _blinkFrame; // run time
 
-	uint16 _walkSpeedY;
+	int16 _walkSpeedY;
 	int16 _picYOffs;
 
 	int32 _z;
@@ -124,7 +131,8 @@ public:
 	uint16 _walking;
 	uint16 _animating;
 
-	uint16 _walkSpeed, _animSpeed;
+	int16 _walkSpeed;
+	uint16 _animSpeed;
 
 	Common::Array<uint16> _inventory;
 
@@ -141,7 +149,7 @@ public:
 	Common::Array<uint16> _invOrder;
 	uint16 _width, _height;
 	uint16 _zoom;
-	uint16 _xWas, _yWas;
+	int16 _xWas, _yWas; // next frame's X/Y position, during interpolation for small movement steps
 	uint16 _tintR, _tintG, _tintB, _tintLevel, _tintLight;
 	bool _processIdleThisTime;
 	byte _slowMoveCounter;
@@ -163,6 +171,12 @@ public:
 
 protected:
 	AGSEngine *_vm;
+	MoveList _moveList;
+
+	void fixPlayerSprite();
+	int needMoveSteps();
+	bool doNextMoveStep();
+	bool moveToNearestWalkableAreaWithin(int range, int step);
 };
 
 } // End of namespace AGS

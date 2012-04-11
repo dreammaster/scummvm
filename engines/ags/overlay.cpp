@@ -620,8 +620,9 @@ void AGSEngine::displaySpeech(Common::String text, uint charId, int x, int y, in
 			oldView = speakingChar->_view;
 			oldLoop = speakingChar->_loop;
 
-			// FIXME: animating
-			speakingChar->_animating |= CHANIM_REPEAT;
+			speakingChar->_animating = 1 | (speakingChar->getSpeechAnimationDelay() << 8);
+			if (!isThought)
+				speakingChar->_animating |= CHANIM_REPEAT;
 
 			speakingChar->_view = useView;
 			speakingChar->_frame = 0;

@@ -39,6 +39,7 @@
 // AGS subsystems
 #include "ags/ags.h"
 #include "ags/audio.h"
+#include "ags/character.h"
 #include "ags/constants.h"
 #include "ags/gamefile.h"
 #include "ags/gamestate.h"
@@ -1290,6 +1291,14 @@ void AGSEngine::setAsPlayerChar(uint charId) {
 		else
 			setActiveInventory(_playerChar->_activeInv);
 	}
+}
+
+Graphics::Surface *AGSEngine::getWalkableMaskFor(uint charId) {
+	Graphics::Surface *surface = new Graphics::Surface;
+	surface->copyFrom(_currentRoom->_walkableMask);
+
+	// FIXME
+	return surface;
 }
 
 void AGSEngine::addInventory(uint itemId) {

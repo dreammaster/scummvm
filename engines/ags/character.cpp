@@ -30,6 +30,7 @@
 #include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
+#include "engines/ags/pathfinder.h"
 #include "engines/ags/room.h"
 #include "engines/ags/sprites.h"
 
@@ -423,7 +424,102 @@ bool Character::update() {
 	bool doingNothing = true;
 
 	if (_room == _vm->getCurrentRoomId() && _walking > 0) {
-		error("can't walk yet"); // FIXME
+		if (_walkWait > 0) {
+			_walkWait--;
+		} else {
+			_flags &= ~CHF_AWAITINGMOVE;
+
+			int numSteps = needMoveSteps();
+
+			if (numSteps && _xWas != INVALID_X) {
+				// if the zoom level changed mid-move, the walkcounter
+				// might not have come round properly - so sort it out
+				_x = _xWas;
+				_y = _yWas;
+				_xWas = INVALID_X;
+			}
+
+			int oldX = _x, oldY = _y;
+			for (int i = 0; i < abs(numSteps); ++i) {
+				if (doNextMoveStep())
+					break;
+				if (_walking == 0 || _walking >= TURNING_AROUND)
+					break;
+			}
+
+			if (numSteps < 0) {
+				// very small scaling, intersperse the movement
+				// to stop it being jumpy
+				_xWas = _x;
+				_yWas = _y;
+				_x = (_x - oldX) / 2 + oldX;
+				_y = (_y - oldY) / 2 + oldY;
+			} else if (numSteps > 0) {
+				_xWas = INVALID_X;
+			}
+
+			if (!(_flags & CHF_ANTIGLIDE))
+				_walkWaitCounter++;
+		}
+
+		if (_loop >= _vm->_gameFile->_views[_view]._loops.size())
+			error("can't render character '%s' (id %d) because loop %d doesn't exist in view %d",
+				_scriptName.c_str(), _indexId, _loop, _view + 1);
+
+		uint framesInLoop = _vm->_gameFile->_views[_view]._loops[_loop]._frames.size();
+		if (_frame >= framesInLoop) {
+			// force back to a valid frame
+			if (framesInLoop == 0)
+				error("can't render character '%s' (id %d) because loop %d has no frames in view %d",
+					_scriptName.c_str(), _indexId, _loop, _view + 1);
+			else if (framesInLoop == 1)
+				_frame = 0;
+			else
+				_frame = 1;
+		}
+
+		if (!_walking) {
+			// done!
+			_processIdleThisTime = true;
+			doingNothing = true; // TODO: this is stomped over below
+			_walkWait = 0;
+			_animWait = 0;
+
+			// use standing pic
+			stopMoving();
+			_frame = 0;
+			checkViewFrame();
+		} else if (_animWait > 0) {
+			// waiting for an animation..
+			_animWait--;
+		} else {
+			// moved
+			if (_flags & CHF_ANTIGLIDE)
+				_walkWaitCounter++;
+
+			if (!(_flags & CHF_MOVENOTWALK)) {
+				// walk animation
+				_frame++;
+				if (_frame >= framesInLoop) {
+					// end of loop, so loop back round skipping the standing frame (if possible)
+					if (framesInLoop == 1)
+						_frame = 0;
+					else
+						_frame = 1;
+				}
+
+				_animWait = _vm->_gameFile->_views[_view]._loops[_loop]._frames[_frame]._speed + _animSpeed;
+
+				if (_flags & CHF_ANTIGLIDE)
+					_walkWait = _animWait;
+				else
+					_walkWait = 0;
+
+				checkViewFrame();
+			}
+		}
+
+		doingNothing = false;
 	}
 
 	if (_room == _vm->getCurrentRoomId() &&
@@ -618,8 +714,78 @@ void Character::walk(int x, int y, bool ignoreWalkable, bool autoWalkAnims) {
 
 	_flags &= ~CHF_MOVENOTWALK;
 
-	warning("Character::walk unimplemented");
-	// FIXME
+	Common::Point from(_vm->convertToLowRes(_x), _vm->convertToLowRes(_y));
+	Common::Point to(_vm->convertToLowRes(x), _vm->convertToLowRes(y));
+
+	// if we're already there, don't bother
+	if (to == from) {
+		stopMoving();
+		debugC(kDebugLevelGame, "character '%s' (id %d) already at dest, not moving",
+			_scriptName.c_str(), _indexId);
+		return;
+	}
+
+	// if we're going to override the animation, stop the existing one
+	if (_animating && autoWalkAnims)
+		_animating = 0;
+
+	// if we're playing an idle animation, stop it
+	if (_idleLeft < 0) {
+		unlockView();
+		_idleLeft = _idleTime;
+	}
+
+	uint32 oldWait = 0;
+	uint16 oldAnimWait = 0;
+	if (_walking) {
+		// if they are currently walking, save the current wait
+		oldWait = _wait;
+		oldAnimWait = _animWait;
+	}
+
+	// stop them to make sure they're on a walkable area
+	// but save their frame first so that if they're already
+	// moving it looks smoother
+	uint16 oldFrame = _frame;
+	stopMoving();
+	_frame = oldFrame;
+
+	debugC(kDebugLevelGame, "character '%s' (id %d) now moving to %d,%d",
+		_scriptName.c_str(), _indexId, x, y);
+
+	int moveSpeedX = _walkSpeed;
+	int moveSpeedY = _walkSpeed;
+	if (_walkSpeedY != UNIFORM_WALK_SPEED)
+		moveSpeedY = _walkSpeedY;
+
+	if (moveSpeedX == 0 && moveSpeedY == 0)
+		warning("character '%s' (id %d) moving with walk speed 0", _scriptName.c_str(), _indexId);
+
+	Graphics::Surface *walkableMask = _vm->getWalkableMaskFor(_indexId);
+
+	if (findPath(_vm, from, to, walkableMask, &_moveList, moveSpeedX, moveSpeedY, true, ignoreWalkable)) {
+		_walking = 1;
+		_moveList._direct = ignoreWalkable;
+
+		if (autoWalkAnims) {
+			// cancel any pending waits on current animations
+			// or if they were already moving, keep the current wait -
+			// this prevents a glitch if MoveCharacter is called when they
+			// are already moving
+
+			_walkWait = oldWait;
+			_animWait = oldAnimWait;
+
+			if (_moveList._stages[0].pos != _moveList._stages[1].pos)
+				fixPlayerSprite();
+		} else
+			_flags |= CHF_MOVENOTWALK;
+	} else if (autoWalkAnims) {
+		// pathfinder couldn't get a route, stand them still
+		_frame = 0;
+	}
+
+	delete walkableMask;
 }
 
 void Character::followCharacter(Character *chr, int distance, uint eagerness) {
@@ -634,11 +800,16 @@ void Character::stopMoving() {
 	if (_vm->_state->_skipUntilCharStops == _indexId)
 		_vm->endSkippingUntilCharStops();
 
-	// FIXME: xwas/ywas logic
+	if (_xWas != INVALID_X) {
+		_x = _xWas;
+		_y = _yWas;
+		_xWas = INVALID_X;
+	}
 
 	if (_walking > 0 && _walking < TURNING_AROUND) {
 		// if it's not a MoveCharDirect, make sure they end up on a walkable area
-		// FIXME: direct walking stuff
+		if (!_moveList._direct && _room == _vm->getCurrentRoomId())
+			moveToNearestWalkableArea();
 
 		debugC(kDebugLevelGame, "character '%s' (id %d) stop walking",
 			_scriptName.c_str(), _indexId);
@@ -667,6 +838,183 @@ void adjustDiagonalMoveFrame(uint &useLoop, int mainDir, int otherDir, uint loop
 		useLoop = loop2;
 }
 
+// changes to the appropriate animation loop for our current walk
+void Character::fixPlayerSprite() {
+	// TODO: some of this is copied right from faceLocation
+	uint useLoop = 1;
+
+	frac_t xDiff = _moveList._stages[_moveList._curStage].xPerMove;
+	frac_t yDiff = _moveList._stages[_moveList._curStage].yPerMove;
+
+	uint diagonalState = useDiagonal();
+
+	if (_vm->getGameFileVersion() <= kAGSVer272) {
+		// Use a different logic on 2.x. This fixes some edge cases where
+		// FaceLocation() is used to select a specific loop.
+		// "This fixes edge cases where the function was used to select specific loops, e.g. in Murder in a Wheel."
+
+		bool canRight = _vm->_gameFile->_views[_view]._loops.size() >= 3 && !_vm->_gameFile->_views[_view]._loops[2]._frames.empty();
+		bool canLeft = _vm->_gameFile->_views[_view]._loops.size() >= 2 && !_vm->_gameFile->_views[_view]._loops[1]._frames.empty();
+
+		if (abs(yDiff) < abs(xDiff)) {
+			// primary movement in X direction
+			if (!canLeft && !canRight) {
+				useLoop = 0;
+			} else if (canRight && xDiff >= 0) {
+				useLoop = 2;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 5, 4);
+			} else if (canLeft && yDiff < 0) {
+				useLoop = 1;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 7, 6);
+			}
+		} else {
+			if (yDiff >= 0) {
+				useLoop = 0;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 6, 4);
+			} else {
+				useLoop = 3;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 7, 5);
+			}
+		}
+	} else {
+		// modern (3.x) logic
+
+		if (!hasUpDownLoops() || abs(yDiff) < abs(xDiff)) {
+			// wantHoriz
+			if (xDiff > 0) {
+				useLoop = 2;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 5, 4);
+			} else {
+				useLoop = 1;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 7, 6);
+			}
+		} else {
+			// !wantHoriz
+			if (yDiff > 0) {
+				useLoop = 0;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, xDiff, yDiff, 6, 4);
+			} else if (yDiff < 0) {
+				useLoop = 3;
+				if (diagonalState == 0)
+					adjustDiagonalMoveFrame(useLoop, xDiff, yDiff, 7, 5);
+			}
+		}
+	}
+
+	if (!_vm->getGameOption(OPT_ROTATECHARS) || (_flags & CHF_NOTURNING)) {
+		_loop = useLoop;
+		return;
+	}
+
+	if (_loop > 3 && (_flags & CHF_NODIAGONAL)) {
+		// They've just been playing an animation with an extended loop number,
+		// so don't try and rotate using it
+		_loop = useLoop;
+		return;
+	}
+
+	if (_loop >= _vm->_gameFile->_views[_view]._loops.size() ||
+		_vm->_gameFile->_views[_view]._loops[_loop]._frames.empty() || !hasUpDownLoops()) {
+		// Character is not currently on a valid loop, so don't try to rotate
+		// eg. left/right only view, but current loop 0
+		_loop = useLoop;
+		return;
+	}
+
+	startTurning(useLoop, diagonalState);
+}
+
+// returns the number of move steps needed per frame
+// (-ve for only partial steps) based on the walkWaitCounter
+int Character::needMoveSteps() {
+	// check the most likely cases first
+	if (_zoom == 100)
+		return 1;
+	if (!(_flags & CHF_SCALEMOVESPEED))
+		return 1;
+
+	if (_zoom >= 170) {
+		// scaling 170-200%, move 175% speed
+		if ((_walkWaitCounter % 4) >= 1)
+			return 2;
+		else
+			return 1;
+	} else if (_zoom >= 140) {
+		// scaling 140-170%, move 150% speed
+		if ((_walkWaitCounter % 2) == 1)
+			return 2;
+		else
+			return 1;
+	} else if (_zoom >= 115) {
+		// scaling 115-140%, move 125% speed
+		if ((_walkWaitCounter % 4) >= 3)
+			return 2;
+		else
+			return 1;
+	} else if (_zoom >= 80) {
+		// scaling 80-120%, normal speed
+		return 1;
+	} else if (_zoom >= 60) {
+		// scaling 60-80%, move 75% speed
+		if ((_walkWaitCounter % 4) >= 1)
+			return 1;
+		else
+			return 0;
+	} else if (_zoom >= 30) {
+		// scaling 30-60%, move 50% speed
+		if ((_walkWaitCounter % 2) == 1)
+			return -1;
+		else if (_xWas != INVALID_X) {
+			// move the second half of the movement to make it smoother
+			_x = _xWas;
+			_y = _yWas;
+			_xWas = INVALID_X;
+		}
+		return 0;
+	} else {
+		// scaling 0-30%, move 25% speed
+		if ((_walkWaitCounter % 4) >= 3)
+			return -1;
+		else if ((_walkWaitCounter % 4) == 1) {
+			if (_xWas != INVALID_X) {
+				// move the second half of the movement to make it smoother
+				_x = _xWas;
+				_y = _yWas;
+				_xWas = INVALID_X;
+			}
+		}
+		return 0;
+	}
+}
+
+// returns true if waiting for another char to move
+bool Character::doNextMoveStep() {
+	int xWas = _x;
+	int yWas = _y;
+
+	Common::Point pos(_x, _y);
+	if (_moveList.doStep(pos)) {
+		if (!(_flags & CHF_MOVENOTWALK))
+			fixPlayerSprite();
+	}
+	if (_moveList._stages.empty())
+		_walking = 0;
+	_x = pos.x;
+	_y = pos.y;
+
+	// FIXME
+	warning("Character::doNextMoveStep unimplemented");
+
+	return false;
+}
+
 // returns true if it actually started turning
 bool Character::faceLocation(int x, int y) {
 	int xDiff = x - _x;
@@ -692,9 +1040,8 @@ bool Character::faceLocation(int x, int y) {
 		// FaceLocation() is used to select a specific loop.
 		// "This fixes edge cases where the function was used to select specific loops, e.g. in Murder in a Wheel."
 
-		// TODO: check the loops exist?
-		bool canRight = !_vm->_gameFile->_views[_view]._loops[2]._frames.empty();
-		bool canLeft = !_vm->_gameFile->_views[_view]._loops[1]._frames.empty();
+		bool canRight = _vm->_gameFile->_views[_view]._loops.size() >= 3 && !_vm->_gameFile->_views[_view]._loops[2]._frames.empty();
+		bool canLeft = _vm->_gameFile->_views[_view]._loops.size() >= 2 && !_vm->_gameFile->_views[_view]._loops[1]._frames.empty();
 
 		if (abs(yDiff) < abs(xDiff)) {
 			// primary movement in X direction
@@ -998,6 +1345,41 @@ void Character::checkViewFrame() {
 	_vm->checkViewFrame(_view, _loop, _frame);
 }
 
+void Character::changeRoom(int room, int x, int y) {
+	if (_indexId != _vm->_gameFile->_playerChar) {
+		// NewRoomNPC
+		if (x != SCR_NO_VALUE && y != SCR_NO_VALUE) {
+			_x = x;
+			_y = y;
+		}
+		_prevRoom = _room;
+		_room = room;
+
+		debugC(kDebugLevelGame, "character '%s' moved to room %d, location %d,%d",
+			_scriptName.c_str(), room, _x, _y);
+
+		return;
+	}
+
+	if (x != SCR_NO_VALUE && y != SCR_NO_VALUE) {
+		_vm->_newRoomPos = 0;
+
+		if (_vm->getGameFileVersion() <= kAGSVer272) {
+			// Set position immediately on 2.x.
+			// "Fixed the player looking the wrong way after entering a room in the Ben Jordan games."
+			_x = x;
+			_y = y;
+		} else {
+			// don't check X or Y bounds, so that they can do a
+			// walk-in animation if they want
+			_vm->_newRoomX = x;
+			_vm->_newRoomY = y;
+		}
+	}
+
+	_vm->scheduleNewRoom(room);
+}
+
 void Character::addInventory(uint itemId, uint addIndex) {
 	assert(itemId < _vm->_gameFile->_invItemInfo.size());
 
@@ -1093,6 +1475,110 @@ void Character::setActiveInventory(uint itemId) {
 		// FIXME: _vm->updateInvCursor(itemId);
 		_vm->setCursorMode(MODE_USE);
 	}
+}
+
+byte Character::getSpeechAnimationDelay() {
+	if (_vm->getGameOption(OPT_OLDTALKANIMSPD)) {
+		// The talkanim property only applies to Lucasarts style speech.
+		// Sierra style speech has a fixed delay of 5.
+		if (_vm->getGameOption(OPT_SPEECHTYPE) == 0)
+			return _vm->_state->_talkAnimSpeed;
+		else
+			return 5;
+	}
+
+	return _speechAnimSpeed;
+}
+
+bool Character::moveToNearestWalkableAreaWithin(int range, int step) {
+	int x = _vm->convertToLowRes(_x), y = _vm->convertToLowRes(_y);
+	int startX = 0, startY = 14;
+
+	int width = _vm->convertToLowRes(_vm->getCurrentRoom()->_width);
+	int height = _vm->convertToLowRes(_vm->getCurrentRoom()->_height);
+
+	Common::Rect boundary = _vm->getCurrentRoom()->_boundary;
+	boundary.left = _vm->convertToLowRes(boundary.left);
+	boundary.right = _vm->convertToLowRes(boundary.right);
+	boundary.top = _vm->convertToLowRes(boundary.top);
+	boundary.bottom = _vm->convertToLowRes(boundary.bottom);
+
+	// tweak because people forget to move the edges sometimes
+	// if the player is already over the edge, ignore it
+	if (x >= boundary.right)
+		boundary.right = width;
+	if (x <= boundary.left)
+		boundary.left = 0;
+	if (y >= boundary.bottom)
+		boundary.bottom = height;
+	if (y <= boundary.top)
+		boundary.top = 0;
+
+	if (range > 0) {
+		startX = x - range;
+		width = MIN<int>(width, startX + (range * 2));
+		if (startX < 0)
+			startX = 0;
+		startY = y - range;
+		height = MIN<int>(height, startY + (range * 2));
+		if (startY < 0)
+			startY = 0;
+	}
+
+	const Graphics::Surface &mask = _vm->getCurrentRoom()->_walkableMask;
+
+	uint nearest = 99999;
+	int nearestX, nearestY;
+
+	// TODO: This could be a lot more efficient than it is, if it ever shows up in a profile enough to care.
+	for (int newX = startX; newX < width; newX += step) {
+		for (int newY = startY; newY < height; newY += step) {
+			// if it's non-walkable, don't go there
+			if (*(byte *)mask.getBasePtr(newX, newY) == 0)
+				continue;
+
+			// off a screen edge, don't move them there
+			if (newX <= boundary.left || newX >= boundary.right || newY <= boundary.top || newY >= boundary.bottom)
+				continue;
+
+			// otherwise, calculate distance from target
+			uint thisIs = (uint)sqrt((float)((newX - x) * (newX - x) + (newY - y) * (newY - y)));
+			if (thisIs < nearest) {
+				nearest = thisIs;
+				nearestX = newX;
+				nearestY = newY;
+			}
+		}
+	}
+
+	if (nearest < 99999) {
+		_x = _vm->convertBackToHighRes(nearestX);
+		_y = _vm->convertBackToHighRes(nearestY);
+		return true;
+	}
+
+	return false;
+}
+
+void Character::moveToNearestWalkableArea() {
+	int x = _vm->convertToLowRes(_x);
+	int y = _vm->convertToLowRes(_y);
+
+	byte pixValue = 0;
+	if (x >= 0 && y >= 0 && x < _vm->getCurrentRoom()->_width && y < _vm->getCurrentRoom()->_height)
+		pixValue = *(byte *)_vm->getCurrentRoom()->_walkableMask.getBasePtr(x, y);
+	else if (_vm->getGameFileVersion() < kAGSVer261)
+		return; // "only fix this code if the game was built with 2.61 or above"
+
+	if (pixValue != 0)
+		return;
+
+	// First, check every 2 pixels within immediate area
+	if (moveToNearestWalkableAreaWithin(20, 2))
+		return;
+
+	// If not, check whole screen at 5 pixel intervals
+	moveToNearestWalkableAreaWithin(-1, 5);
 }
 
 Common::Point Character::getDrawPos() {
