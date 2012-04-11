@@ -327,6 +327,11 @@ bool AGSGraphics::getScreenSize() {
 	if (_vm->getGameOption(OPT_NOSCALEFNT))
 		_textMultiply = 1;
 
+	if (_vm->getGameOption(OPT_LETTERBOX)) {
+		// FIXME: do this properly
+		_height = (_height * 12) / 10;
+	}
+
 	debug(2, "target resolution: %dx%d real, %dx%d base, multiplier %d %s",
 		_width, _height, _baseWidth, _baseHeight, _screenResolutionMultiplier,
 		_vm->getGameOption(OPT_NATIVECOORDINATES) ? " (native)" : "(scaled)");
@@ -476,7 +481,7 @@ void AGSGraphics::drawOutlinedString(uint fontId, Graphics::Surface *surface, co
 		// TODO: make sure this is sanity-checked
 		Graphics::Font *outlineFont = _fonts[_vm->_gameFile->_fonts[fontId]._outline];
 		outlineFont->drawString(surface, text, x, y, width, outlineColor);
-	} else {
+	} else if (_vm->_gameFile->_fonts[fontId]._outline == FONT_OUTLINE_AUTO) {
 		uint outlineDist = 1;
 		// FIXME: following should also check it's not ttf
 		if (!_vm->getGameOption(OPT_NOSCALEFNT) && false) {

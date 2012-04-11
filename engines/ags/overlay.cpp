@@ -26,6 +26,7 @@
 
 #include "engines/ags/ags.h"
 #include "engines/ags/audio.h"
+#include "engines/ags/character.h"
 #include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
@@ -445,6 +446,8 @@ uint AGSEngine::displayMain(int x, int y, int width, const Common::String &text,
 
 	// FIXME
 	warning("displayMain '%s' unimplemented", text.c_str());
+
+	removeScreenOverlay(OVER_TEXTMSG);
 
 	_state->_messageTime = -1;
 	return 0;

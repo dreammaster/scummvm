@@ -732,6 +732,7 @@ void AGSEngine::updateStuff() {
 	updateSpeech();
 }
 
+// 'start_game' in original
 void AGSEngine::startNewGame() {
 	setCursorMode(MODE_WALK);
 	// FIXME: filter->setMousePosition(160, 100);
@@ -844,10 +845,10 @@ public:
 			return _vm->_graphics->_height;
 		case 8:
 			// coldepth
-			return 32; // FIXME
+			return _vm->_graphics->getPixelFormat().bytesPerPixel * 8;
 		case 12:
 			// os
-			return 2; // eOS_Win, FIXME
+			return _vm->getOperatingSystem();
 		case 16:
 			// windowed
 			return 0; // FIXME
@@ -1125,9 +1126,15 @@ void AGSEngine::unloadOldRoom() {
 	_state->_bgFrame = 0;
 	_state->_bgFrameLocked = 0;
 	_state->_offsetsLocked = 0;
+	removeScreenOverlay((uint)-1);
 
-	// FIXME: a lot of unimplemented stuff
-	warning("AGSEngine::unloadOldRoom() unimplemented");
+	// FIXME: reset raw screen stuff
+	for (uint i = 0; i < _characters.size(); ++i) {
+		// TODO: clear cache?
+
+		// ensure that any half-moves (eg. with scaled movement) are stopped
+		_characters[i]->_xWas = INVALID_X;
+	}
 
 	_state->_swapPortraitLastChar = (uint)-1;
 
@@ -2242,6 +2249,15 @@ bool AGSEngine::init() {
 	}
 
 	// FIXME: the rest of init_game_settings (player inv etc)
+	for (uint i = 0; i < _characters.size(); ++i) {
+		if (_characters[i]->_view >= 0) {
+			// set initial loop to 0..
+			_characters[i]->_loop = 0;
+			// .. or to 1, if they don't have up/down frames
+			if (getViewLoop(_characters[i]->_view, _characters[i]->_loop)->_frames.empty())
+				_characters[i]->_loop = 1;
+		}
+	}
 
 	adjustSizesForResolution();
 	resortGUIs();
@@ -2383,6 +2399,19 @@ void AGSEngine::adjustSizesForResolution() {
 
 void AGSEngine::pauseEngineIntern(bool pause) {
 	_mixer->pauseAll(pause);
+}
+
+enum {
+	kOSDos = 1,
+	kOSWindows = 2,
+	kOSLinux = 3,
+	kOSMac = 4
+};
+
+uint32 AGSEngine::getOperatingSystem() const {
+	// Lie, because otherwise a lot of games don't work properly.
+
+	return kOSWindows;
 }
 
 // reset the visible cursor to the one for the current mode

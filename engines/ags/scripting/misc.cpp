@@ -221,7 +221,7 @@ RuntimeValue Script_StartCutscene(AGSEngine *vm, ScriptObject *, const Common::A
 // Specifies the end of a skippable cutscene.
 RuntimeValue Script_EndCutscene(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	if (vm->_state->_inCutscene == 0)
-		error("StartCutscene: not in a cutscene");
+		error("EndCutscene: not in a cutscene");
 
 	vm->_state->_inCutscene = 0;
 
@@ -270,29 +270,29 @@ RuntimeValue Script_System_get_CapsLock(AGSEngine *vm, ScriptObject *, const Com
 // System: readonly import static attribute int ColorDepth
 // Gets the colour depth that the game is running at.
 RuntimeValue Script_System_get_ColorDepth(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("System::get_ColorDepth unimplemented");
-
-	return RuntimeValue();
+	return vm->_graphics->getPixelFormat().bytesPerPixel * 8;
 }
 
 // System: import static attribute int Gamma
 // Gets/sets the gamma correction level.
 RuntimeValue Script_System_get_Gamma(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("System::get_Gamma unimplemented");
-
-	return RuntimeValue();
+	return vm->_state->_gammaAdjustment;
 }
 
 // System: import static attribute int Gamma
 // Gets/sets the gamma correction level.
 RuntimeValue Script_System_set_Gamma(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint value = params[0]._value;
 
-	// FIXME
-	error("System::set_Gamma unimplemented");
+	if (value > 200)
+		error("System::set_Gamma: value must be between 0-200 (not %d)", value);
+
+	if (vm->_state->_gammaAdjustment != value) {
+		vm->_state->_gammaAdjustment = value;
+		debugC(kDebugLevelGame, "gamma control set to %d", value);
+
+		// ScummVM doesn't support gamma.
+	}
 
 	return RuntimeValue();
 }
@@ -318,28 +318,19 @@ RuntimeValue Script_System_get_NumLock(AGSEngine *vm, ScriptObject *, const Comm
 // System: readonly import static attribute eOperatingSystem OperatingSystem
 // Gets which operating system the game is running on.
 RuntimeValue Script_System_get_OperatingSystem(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("System::get_OperatingSystem unimplemented");
-
-	return RuntimeValue();
+	return vm->getOperatingSystem();
 }
 
 // System: readonly import static attribute int ScreenHeight
 // Gets the screen height of the current resolution.
 RuntimeValue Script_System_get_ScreenHeight(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("System::get_ScreenHeight unimplemented");
-
-	return RuntimeValue();
+	return vm->_graphics->_height;
 }
 
 // System: readonly import static attribute int ScreenWidth
 // Gets the screen width of the current resolution.
 RuntimeValue Script_System_get_ScreenWidth(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("System::get_ScreenWidth unimplemented");
-
-	return RuntimeValue();
+	return vm->_graphics->_width;
 }
 
 // System: readonly import static attribute bool ScrollLock
@@ -370,19 +361,13 @@ RuntimeValue Script_System_get_Version(AGSEngine *vm, ScriptObject *, const Comm
 // System: readonly import static attribute int ViewportHeight
 // Gets the height of the visible area in which the game is displayed.
 RuntimeValue Script_System_get_ViewportHeight(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("System::get_ViewportHeight unimplemented");
-
-	return RuntimeValue();
+	return vm->divideDownCoordinate(vm->_graphics->_height);
 }
 
 // System: readonly import static attribute int ViewportWidth
 // Gets the width of the visible area in which the game is displayed.
 RuntimeValue Script_System_get_ViewportWidth(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("System::get_ViewportWidth unimplemented");
-
-	return RuntimeValue();
+	return vm->divideDownCoordinate(vm->_graphics->_width);
 }
 
 // System: import static attribute int Volume

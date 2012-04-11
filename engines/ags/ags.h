@@ -209,6 +209,8 @@ public:
 	ResourceManager *getResourceManager() { return _resourceMan; }
 	SpriteSet *getSprites() { return _sprites; }
 
+	uint32 getOperatingSystem() const;
+
 	void setDefaultCursor();
 	uint32 findNextEnabledCursor(uint32 startWith);
 	void setNextCursor();
