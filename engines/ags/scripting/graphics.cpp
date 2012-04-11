@@ -38,10 +38,7 @@ namespace AGS {
 // ViewFrame: readonly import attribute bool Flipped
 // Gets whether this frame is flipped.
 RuntimeValue Script_ViewFrame_get_Flipped(AGSEngine *vm, ViewFrame *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("ViewFrame::get_Flipped unimplemented");
-
-	return RuntimeValue();
+	return (self->_flags & VFLG_FLIPSPRITE) ? 1 : 0;
 }
 
 // ViewFrame: readonly import attribute int Frame
@@ -56,10 +53,7 @@ RuntimeValue Script_ViewFrame_get_Frame(AGSEngine *vm, ViewFrame *self, const Co
 // ViewFrame: import attribute int Graphic
 // Gets/sets the sprite that is displayed by this frame.
 RuntimeValue Script_ViewFrame_get_Graphic(AGSEngine *vm, ViewFrame *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("ViewFrame::get_Graphic unimplemented");
-
-	return RuntimeValue();
+	return self->_pic;
 }
 
 // ViewFrame: import attribute int Graphic
@@ -490,10 +484,14 @@ RuntimeValue Script_DrawingSurface_get_Width(AGSEngine *vm, DrawingSurface *self
 // Displays the text in a standard text window.
 RuntimeValue Script_Display(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *message = (ScriptString *)params[0]._object;
-	UNUSED(message);
 
-	// FIXME
-	error("Display unimplemented");
+	Common::String string = vm->getTranslation(message->getString());
+
+	Common::Array<RuntimeValue> values = params;
+	values.remove_at(0);
+	string = vm->formatString(string, values);
+
+	vm->display(string);
 
 	return RuntimeValue();
 }
@@ -520,12 +518,9 @@ RuntimeValue Script_DisplayAt(AGSEngine *vm, ScriptObject *, const Common::Array
 // Displays the text in a standard text window at the specified y-coordinate.
 RuntimeValue Script_DisplayAtY(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int y = params[0]._signedValue;
-	UNUSED(y);
 	ScriptString *message = (ScriptString *)params[1]._object;
-	UNUSED(message);
 
-	// FIXME
-	error("DisplayAtY unimplemented");
+	vm->displayAtY(y, message->getString());
 
 	return RuntimeValue();
 }
@@ -607,6 +602,8 @@ RuntimeValue Script_SetViewport(AGSEngine *vm, ScriptObject *, const Common::Arr
 	if (y < 0)
 		y = 0;
 
+	debugC(kDebugLevelGame, "viewport under script control, now %d,%d", x, y);
+
 	vm->_graphics->_viewportX = vm->multiplyUpCoordinate(x);
 	vm->_graphics->_viewportY = vm->multiplyUpCoordinate(y);
 	vm->_graphics->checkViewportCoords();
@@ -618,6 +615,8 @@ RuntimeValue Script_SetViewport(AGSEngine *vm, ScriptObject *, const Common::Arr
 // import void ReleaseViewport()
 // Allows AGS to scroll the screen automatically to follow the player character.
 RuntimeValue Script_ReleaseViewport(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
+	debugC(kDebugLevelGame, "viewport released back to engine control");
+
 	vm->_state->_offsetsLocked = 0;
 
 	return RuntimeValue();
@@ -1596,11 +1595,23 @@ RuntimeValue Script_SetAmbientTint(AGSEngine *vm, ScriptObject *, const Common::
 // import void SetBackgroundFrame(int frame)
 // Locks the current room to the specified background.
 RuntimeValue Script_SetBackgroundFrame(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int frame = params[0]._signedValue;
-	UNUSED(frame);
+	uint frame = params[0]._value;
 
-	// FIXME
-	error("SetBackgroundFrame unimplemented");
+	if (frame == (uint)-1) {
+		vm->_state->_bgFrameLocked = 0;
+		return RuntimeValue();
+	}
+
+	if (frame >= vm->getCurrentRoom()->_backgroundScenes.size())
+		error("SetBackgroundFrame: frame %d is too high (only have %d backgrounds)",
+			frame, vm->getCurrentRoom()->_backgroundScenes.size());
+
+	vm->_state->_bgFrameLocked = 1;
+	if (vm->_state->_bgFrame == frame)
+		return RuntimeValue();
+
+	vm->_state->_bgFrame = frame;
+	vm->invalidateBackground();
 
 	return RuntimeValue();
 }
@@ -1645,11 +1656,12 @@ RuntimeValue Script_ShakeScreenBackground(AGSEngine *vm, ScriptObject *, const C
 // import void SetScreenTransition(TransitionStyle)
 // Changes the room transition style.
 RuntimeValue Script_SetScreenTransition(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	uint32 transitionstyle = params[0]._value;
-	UNUSED(transitionstyle);
+	uint transitionStyle = params[0]._value;
 
-	// FIXME
-	error("SetScreenTransition unimplemented");
+	if (transitionStyle > FADE_LAST)
+		error("SetScreenTransition: invalid transition type %d", transitionStyle);
+
+	vm->_state->_fadeEffect = transitionStyle;
 
 	return RuntimeValue();
 }
@@ -1657,11 +1669,12 @@ RuntimeValue Script_SetScreenTransition(AGSEngine *vm, ScriptObject *, const Com
 // import void SetNextScreenTransition(TransitionStyle)
 // Changes the room transition style for the next room change only.
 RuntimeValue Script_SetNextScreenTransition(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	uint32 transitionstyle = params[0]._value;
-	UNUSED(transitionstyle);
+	uint32 transitionStyle = params[0]._value;
 
-	// FIXME
-	error("SetNextScreenTransition unimplemented");
+	if (transitionStyle > FADE_LAST)
+		error("SetScreenTransition: invalid transition type %d", transitionStyle);
+
+	vm->_state->_nextScreenTransition = transitionStyle;
 
 	return RuntimeValue();
 }
@@ -1756,7 +1769,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "DrawingSurface::get_UseHighResCoordinates", (ScriptAPIFunction *)&Script_DrawingSurface_get_UseHighResCoordinates, "", sotDrawingSurface },
 	{ "DrawingSurface::set_UseHighResCoordinates", (ScriptAPIFunction *)&Script_DrawingSurface_set_UseHighResCoordinates, "i", sotDrawingSurface },
 	{ "DrawingSurface::get_Width", (ScriptAPIFunction *)&Script_DrawingSurface_get_Width, "", sotDrawingSurface },
-	{ "Display", (ScriptAPIFunction *)&Script_Display, "s", sotNone },
+	{ "Display", (ScriptAPIFunction *)&Script_Display, "s.", sotNone },
 	{ "DisplayAt", (ScriptAPIFunction *)&Script_DisplayAt, "iiis", sotNone },
 	{ "DisplayAtY", (ScriptAPIFunction *)&Script_DisplayAtY, "is", sotNone },
 	{ "DisplayMessage", (ScriptAPIFunction *)&Script_DisplayMessage, "i", sotNone },

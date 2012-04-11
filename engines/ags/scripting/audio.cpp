@@ -171,10 +171,7 @@ RuntimeValue Script_StopAmbientSound(AGSEngine *vm, ScriptObject *, const Common
 // import int GetCurrentMusic()
 // Returns the currently playing music number.
 RuntimeValue Script_GetCurrentMusic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GetCurrentMusic unimplemented");
-
-	return RuntimeValue();
+	return vm->_state->_curMusicNumber;
 }
 
 // import void SetMusicRepeat(int repeat)
@@ -362,7 +359,7 @@ RuntimeValue Script_StopMusic(AGSEngine *vm, ScriptObject *, const Common::Array
 // import int IsVoxAvailable()
 // Checks whether a SPEECH.VOX file was found.
 RuntimeValue Script_IsVoxAvailable(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	return (vm->_state->_wantSpeech >= 0);
+	return (vm->_state->_wantSpeech >= 0) ? 1 : 0;
 }
 
 // import void SetSpeechVolume(int volume)
@@ -609,8 +606,7 @@ RuntimeValue Script_System_geti_AudioChannels(AGSEngine *vm, ScriptObject *, con
 // System: readonly import static attribute int AudioChannelCount
 // Gets the number of audio channels supported by AGS.
 RuntimeValue Script_System_get_AudioChannelCount(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	return 8; // MAX_SOUND_CHANNELS
+	return MAX_SOUND_CHANNELS;
 }
 
 static const ScriptSystemFunctionInfo ourFunctionList[] = {
