@@ -140,10 +140,8 @@ RuntimeValue Script_IsInteractionAvailable(AGSEngine *vm, ScriptObject *, const 
 	if (cursorMode == MODE_WALK && !vm->getGameOption(OPT_NOWALKMODE))
 		return 1;
 
-	// FIXME: adjust by offset
-
 	uint locId;
-	uint locType = vm->getLocationType(Common::Point(x, y), locId);
+	uint locType = vm->getLocationType(Common::Point(x, y), locId, true);
 	if (locType == 0) {
 		// click on nothing -> hotspot 0
 		// TODO: why not just pass allowHotspot0 to getLocationType?
@@ -151,24 +149,27 @@ RuntimeValue Script_IsInteractionAvailable(AGSEngine *vm, ScriptObject *, const 
 		locType = LOCTYPE_HOTSPOT;
 	}
 
+	// TODO: maybe we don't need to do this at all
+	x += vm->divideDownCoordinate(vm->_graphics->_viewportX);
+	y += vm->divideDownCoordinate(vm->_graphics->_viewportY);
+
+	bool ret;
+
 	switch (locType) {
 	case LOCTYPE_CHAR:
-		// FIXME
-		warning("IsInteractionAvailable unimplemented");
+		ret = vm->runCharacterInteraction(locId, cursorMode, true);
 		break;
 	case LOCTYPE_OBJ:
-		// FIXME
-		warning("IsInteractionAvailable unimplemented");
+		ret = vm->runObjectInteraction(locId, cursorMode, true);
 		break;
 	case LOCTYPE_HOTSPOT:
-		// FIXME
-		warning("IsInteractionAvailable unimplemented");
+		ret = vm->runHotspotInteraction(locId, cursorMode, true);
 		break;
 	default:
 		error("IsInteractionAvailable: internal error (unknown loctype %d)", locType);
 	}
 
-	return 0;
+	return ret ? 1 : 0;
 }
 
 // import void Wait(int waitLoops)
@@ -238,8 +239,7 @@ RuntimeValue Script_EndCutscene(AGSEngine *vm, ScriptObject *, const Common::Arr
 // import void ClaimEvent()
 // Prevents further event handlers running for this event.
 RuntimeValue Script_ClaimEvent(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("ClaimEvent unimplemented");
+	vm->claimEvent();
 
 	return RuntimeValue();
 }

@@ -25,10 +25,12 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/character.h"
 #include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
+#include "engines/ags/room.h"
 #include "common/events.h"
 
 namespace AGS {
@@ -41,7 +43,7 @@ RuntimeValue Script_ProcessClick(AGSEngine *vm, ScriptObject *, const Common::Ar
 	uint32 cursorMode = params[2]._value;
 
 	uint locId;
-	uint locType = vm->getLocationType(Common::Point(x, y), locId);
+	uint locType = vm->getLocationType(Common::Point(x, y), locId, true);
 	if (locType == 0) {
 		// click on nothing -> hotspot 0
 		// TODO: why not just pass allowHotspot0 to getLocationType?
@@ -49,11 +51,21 @@ RuntimeValue Script_ProcessClick(AGSEngine *vm, ScriptObject *, const Common::Ar
 		locType = LOCTYPE_HOTSPOT;
 	}
 
-	// FIXME: adjust by offset
+	x += vm->divideDownCoordinate(vm->_graphics->_viewportX);
+	y += vm->divideDownCoordinate(vm->_graphics->_viewportY);
 
 	if (cursorMode == MODE_WALK && !vm->getGameOption(OPT_NOWALKMODE)) {
-		// FIXME
-		warning("ProcessClick unimplemented (walk mode)");
+		uint hotspotId = vm->getCurrentRoom()->getHotspotAt(x, y);
+		if (hotspotId && vm->_state->_autoUseWalkToPoints) {
+			// we clicked on a hotspot and walk-to points are enabled..
+			const RoomHotspot &hotspot = vm->getCurrentRoom()->_hotspots[hotspotId];
+			if (hotspot._walkToPos.x >= 1) {
+				// .. valid destination, so walk there instead
+				x = hotspot._walkToPos.x;
+				y = hotspot._walkToPos.y;
+			}
+		}
+		vm->getPlayerChar()->walk(x, y, false, true);
 		return RuntimeValue();
 	}
 
@@ -61,19 +73,18 @@ RuntimeValue Script_ProcessClick(AGSEngine *vm, ScriptObject *, const Common::Ar
 
 	switch (locType) {
 	case LOCTYPE_CHAR:
-		// FIXME
-		warning("ProcessClick unimplemented");
+		// FIXME: original engine does getCharAt again?!
+		vm->runCharacterInteraction(locId, cursorMode);
 		break;
 	case LOCTYPE_OBJ:
-		// FIXME
-		warning("ProcessClick unimplemented");
+		// FIXME: original engine does getObjectAt again?!
+		vm->runObjectInteraction(locId, cursorMode);
 		break;
 	case LOCTYPE_HOTSPOT:
-		// FIXME
-		warning("ProcessClick unimplemented");
+		vm->runHotspotInteraction(locId, cursorMode);
 		break;
 	default:
-		error("IsInteractionAvailable: internal error (unknown loctype %d)", locType);
+		error("ProcessClick: internal error (unknown loctype %d)", locType);
 	}
 
 	return RuntimeValue();
@@ -161,12 +172,11 @@ RuntimeValue Script_Mouse_EnableMode(AGSEngine *vm, ScriptObject *, const Common
 // Gets the sprite used for the specified mouse cursor.
 RuntimeValue Script_Mouse_GetModeGraphic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
 
-	// FIXME
-	error("Mouse::GetModeGraphic unimplemented");
+	if (cursormode >= vm->_gameFile->_cursors.size())
+		error("Mouse::GetModeGraphic: mode %d is too high (only %d cursors)", cursormode, vm->_gameFile->_cursors.size());
 
-	return RuntimeValue();
+	return vm->_gameFile->_cursors[cursormode]._pic;
 }
 
 // Mouse: import static bool IsButtonDown(MouseButton)
@@ -196,8 +206,7 @@ RuntimeValue Script_Mouse_SaveCursorUntilItLeaves(AGSEngine *vm, ScriptObject *,
 // Mouse: import static void SelectNextMode()
 // Cycles to the next available mouse cursor.
 RuntimeValue Script_Mouse_SelectNextMode(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Mouse::SelectNextMode unimplemented");
+	vm->setNextCursor();
 
 	return RuntimeValue();
 }
@@ -347,8 +356,7 @@ RuntimeValue Script_SetCursorMode(AGSEngine *vm, ScriptObject *, const Common::A
 // import void SetNextCursorMode()
 // Mouse function.
 RuntimeValue Script_SetNextCursorMode(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("SetNextCursorMode unimplemented");
+	vm->setNextCursor();
 
 	return RuntimeValue();
 }
@@ -424,8 +432,7 @@ RuntimeValue Script_HideMouseCursor(AGSEngine *vm, ScriptObject *, const Common:
 // import void RefreshMouse()
 // Mouse function.
 RuntimeValue Script_RefreshMouse(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("RefreshMouse unimplemented");
+	// Do nothing.
 
 	return RuntimeValue();
 }
