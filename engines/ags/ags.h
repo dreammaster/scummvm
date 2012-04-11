@@ -206,10 +206,13 @@ public:
 	uint32 getCursorMode() { return _cursorMode; }
 	void enableCursorMode(uint cursorId);
 	void disableCursorMode(uint cursorId);
+	void updateInvCursor(uint itemId);
 
 	void resortGUIs();
 	uint getGUIAt(const Common::Point &pos);
 	void removePopupInterface(uint guiId);
+
+	uint getInventoryItemAt(const Common::Point &pos);
 
 	Common::String getLocationName(const Common::Point &pos);
 	uint getLocationType(const Common::Point &pos, bool throughGUI = false, bool allowHotspot0 = false);

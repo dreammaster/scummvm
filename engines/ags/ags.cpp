@@ -334,6 +334,12 @@ void AGSEngine::tickGame(bool checkControls) {
 			_currentRoom->updateWalkBehinds();
 			_backgroundNeedsUpdate = false;
 		}
+		if (_guiNeedsUpdate) {
+			// invalidate all GUIs (e.g. when something used in a macro changed)
+			for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i)
+				_gameFile->_guiGroups[i]->invalidate();
+			_guiNeedsUpdate = false;
+		}
 		updateViewport(); // FIXME: only in the absence of a complete overlay?
 		_graphics->draw();
 
@@ -386,7 +392,7 @@ void AGSEngine::updateEvents(bool checkControls) {
 	uint numEventsWas = _queuedGameEvents.size();
 
 	uint buttonClicked = 0;
-	bool mouseUp = 0;
+	uint mouseUp = 0;
 	bool mouseMoved = false;
 
 	while (_eventMan->pollEvent(event)) {
@@ -411,6 +417,9 @@ void AGSEngine::updateEvents(bool checkControls) {
 
 		case Common::EVENT_LBUTTONUP:
 			mouseUp = kMouseLeft;
+			break;
+		case Common::EVENT_RBUTTONUP:
+			mouseUp = kMouseRight;
 			break;
 		// FIXME: the others
 
@@ -1842,6 +1851,11 @@ bool AGSEngine::init() {
 	if (!_graphics->initGraphics())
 		return false;
 
+	// init all the inventory controls (now that the screen size is known)
+	for (uint i = 0; i < _gameFile->_guiInvControls.size(); ++i) {
+		_gameFile->_guiInvControls[i]->resized();
+	}
+
 	// FIXME: the rest of init_game_settings (player inv etc)
 
 	adjustSizesForResolution();
@@ -2002,7 +2016,6 @@ uint AGSEngine::findNextEnabledCursor(uint32 startWith) {
 		if (!(_gameFile->_cursors[testing]._flags & MCF_DISABLED)) {
 			if (testing == MODE_USE) {
 				// inventory cursor - use it if the player has an active item
-				// FIXME: inventory logic
 				if (_playerChar->_activeInv != (uint)-1)
 					break;
 			} else if (_gameFile->_cursors[testing]._flags & MCF_STANDARD) {
@@ -2040,7 +2053,7 @@ void AGSEngine::setCursorMode(uint32 newMode) {
 			findNextEnabledCursor(0);
 			return;
 		}
-		// FIXME: updateInvCursor(_playerChar->_activeInv);
+		updateInvCursor(_playerChar->_activeInv);
 	}
 
 	_cursorMode = newMode;
@@ -2066,6 +2079,22 @@ void AGSEngine::disableCursorMode(uint cursorId) {
 		findNextEnabledCursor(cursorId);
 
 	invalidateGUI();
+}
+
+void AGSEngine::updateInvCursor(uint itemId) {
+	if (getGameOption(OPT_FIXEDINVCURSOR))
+		return;
+	if (itemId == 0)
+		return;
+
+	uint cursorSprite = _gameFile->_invItemInfo[itemId]._cursorPic;
+	// Fall back to the inventory pic if no cursor pic is defined.
+	if (cursorSprite == 0)
+		cursorSprite = _gameFile->_invItemInfo[itemId]._pic;
+
+	_gameFile->_cursors[MODE_USE]._pic = cursorSprite;
+
+	// FIXME: hotspot
 }
 
 // 'update_gui_zorder'
@@ -2131,12 +2160,40 @@ void AGSEngine::removePopupInterface(uint guiId) {
 	invalidateGUI();
 }
 
+uint AGSEngine::getInventoryItemAt(const Common::Point &pos) {
+	uint guiId = getGUIAt(pos);
+	if (guiId == (uint)-1)
+		return (uint)-1;
+
+	GUIGroup *group = _gameFile->_guiGroups[guiId];
+
+	GUIControl *control = group->getControlAt(pos - Common::Point(group->_x, group->_y));
+	if (!control || !control->isOfType(sotGUIInvWindow))
+		return (uint)-1;
+
+	GUIInvControl *invControl = (GUIInvControl *)control;
+	return invControl->getItemAt(pos - Common::Point(group->_x, group->_y) -
+		Common::Point(control->_x, control->_y));
+}
+
 Common::String AGSEngine::getLocationName(const Common::Point &pos) {
 	if (_displayedRoom == 0xffffffff)
 		error("getLocationName called before a room was loaded");
 
 	if (getGUIAt(pos) != (uint)-1) {
-		// FIXME: inventory items
+		uint itemId = getInventoryItemAt(pos);
+		if (itemId != (uint)-1) {
+			// over an item
+			if (_state->_getLocNameLastTime != 1000 + itemId) {
+				_state->_getLocNameLastTime = 1000 + itemId;
+				invalidateGUI();
+			}
+			return getTranslation(_gameFile->_invItemInfo[itemId]._name);
+		} else if (_state->_getLocNameLastTime > 1000 && _state->_getLocNameLastTime < 1000 + MAX_INV) {
+			// no longer over an item
+			_state->_getLocNameLastTime = (uint)-1;
+			invalidateGUI();
+		}
 		return Common::String();
 	}
 

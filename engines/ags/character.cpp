@@ -1001,6 +1001,9 @@ void Character::checkViewFrame() {
 void Character::addInventory(uint itemId, uint addIndex) {
 	assert(itemId < _vm->_gameFile->_invItemInfo.size());
 
+	debugC(kDebugLevelGame, "adding inv %d (at %d) to character '%s' (id %d)",
+		itemId, addIndex, _scriptName.c_str(), _indexId);
+
 	if (_inventory[itemId] >= 32000)
 		error("Character::addInventory: can't carry more than 32000 of one inventory item");
 	_inventory[itemId]++;
@@ -1037,6 +1040,9 @@ void Character::addInventory(uint itemId, uint addIndex) {
 void Character::loseInventory(uint itemId) {
 	assert(itemId < _vm->_gameFile->_invItemInfo.size());
 
+	debugC(kDebugLevelGame, "removing inv %d from character '%s' (id %d)",
+		itemId, _scriptName.c_str(), _indexId);
+
 	if (_inventory[itemId] > 0)
 		_inventory[itemId]--;
 
@@ -1066,7 +1072,7 @@ void Character::loseInventory(uint itemId) {
 void Character::setActiveInventory(uint itemId) {
 	_vm->invalidateGUI();
 
-	if (itemId == (uint)-1) {
+	if (itemId == 0) {
 		_activeInv = itemId;
 
 		if (_vm->getPlayerChar() == this && _vm->getCursorMode() == MODE_USE)

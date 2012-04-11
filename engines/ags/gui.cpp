@@ -25,8 +25,10 @@
  */
 
 #include "engines/ags/ags.h"
+#include "engines/ags/character.h"
 #include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
+#include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
 #include "engines/ags/gui.h"
 #include "engines/ags/sprites.h"
@@ -370,7 +372,7 @@ void GUIInvControl::readFrom(Common::SeekableReadStream *dta) {
 		_itemHeight = dta->readUint32LE();
 		_topIndex = dta->readUint32LE();
 	} else {
-		_charId = 0xffffffff;
+		_charId = (uint)-1;
 		_itemWidth = 40;
 		_itemHeight = 22;
 		_topIndex = 0;
@@ -383,6 +385,21 @@ void GUIInvControl::readFrom(Common::SeekableReadStream *dta) {
 		if (_itemHeight > _height)
 			_itemHeight = _height;
 	}
+
+	// (don't recalculate cells here, screen size might not be available yet)
+}
+
+void GUIInvControl::onMouseEnter() {
+	_isOver = true;
+}
+
+void GUIInvControl::onMouseLeave() {
+	_isOver = false;
+}
+
+void GUIInvControl::onMouseUp() {
+	if (_isOver)
+		_activated = true;
 }
 
 Character *GUIInvControl::getCharToDisplay() {
@@ -393,11 +410,85 @@ Character *GUIInvControl::getCharToDisplay() {
 }
 
 void GUIInvControl::resized() {
-	// FIXME
+	recalculateNumCells();
+}
+
+uint GUIInvControl::getItemAt(const Common::Point &pos) {
+	if (_itemWidth == 0 || _itemHeight == 0) {
+		// TODO: verify we can't reach this and remove it
+		error("GUIInvControl::getItemAt: item size was zero");
+	}
+
+	uint itemId = pos.x / _vm->multiplyUpCoordinate(_itemWidth);
+	if (itemId >= _itemsPerLine)
+		return (uint)-1;
+
+	itemId += (pos.y / _vm->multiplyUpCoordinate(_itemHeight)) * _itemsPerLine;
+	if (itemId >= _itemsPerLine * _numLines)
+		return (uint)-1;
+
+	itemId += _topIndex;
+	if (itemId >= getCharToDisplay()->_invOrder.size())
+		return (uint)-1;
+
+	return getCharToDisplay()->_invOrder[itemId];
 }
 
 void GUIInvControl::draw(Graphics::Surface *surface) {
-	warning("GUIInvControl::draw unimplemented");
+	uint numItems = _itemsPerLine * _numLines;
+	// backwards compatibility
+	_vm->_state->_invNumInLine = _itemsPerLine;
+	_vm->_state->_invNumDisplayed = numItems;
+	_vm->_state->_invNumOrder = _vm->getPlayerChar()->_invOrder.size();
+
+	if (_vm->_state->_invTop) {
+		// if the user changes top_inv_item, switch into backwards
+		// compatibiltiy mode
+		_vm->_state->_invBackwardsCompatibility = 1;
+	}
+
+	if (_vm->_state->_invBackwardsCompatibility)
+		_topIndex = _vm->_state->_invTop;
+
+	uint curX = _x, curY = _y;
+	for (uint i = 0; i < numItems; ++i) {
+		uint indexId = _topIndex + i;
+		if (indexId >= getCharToDisplay()->_invOrder.size())
+			break;
+		uint itemId = getCharToDisplay()->_invOrder[indexId];
+
+		// draw inv graphic
+		// FIXME
+		Sprite *sprite = _vm->getSprites()->getSprite(_vm->_gameFile->_invItemInfo[itemId]._pic);
+		_vm->_graphics->blit(sprite->_surface, surface, Common::Point(curX, curY), 0);
+
+		curX += _vm->multiplyUpCoordinate(_itemWidth);
+
+		// go to the next row when appropriate
+		if ((i % _itemsPerLine) == (_itemsPerLine - 1)) {
+			curX = _x;
+			curY += _vm->multiplyUpCoordinate(_itemHeight);
+		}
+	}
+
+	// FIXME: darken the inventory when disabled
+}
+
+void GUIInvControl::recalculateNumCells() {
+	if (_itemWidth == 0 || _itemHeight == 0) {
+		// avoid an inconvenient divide by zero
+		error("GUIInvControl::recalculateNumCells: item size was zero");
+	}
+
+	if (_vm->getGameFileVersion() < kAGSVer270) {
+		// pre-2.7 compatibility from JJS
+		_itemsPerLine = floor((float)_width / (float)_vm->multiplyUpCoordinate(_itemWidth) + 0.5f);
+		_numLines = floor((float)_height / (float)_vm->multiplyUpCoordinate(_itemHeight) + 0.5f);
+		return;
+	}
+
+	_itemsPerLine = _width / _vm->multiplyUpCoordinate(_itemWidth);
+	_numLines = _height / _vm->multiplyUpCoordinate(_itemHeight);
 }
 
 void GUIButton::readFrom(Common::SeekableReadStream *dta) {
