@@ -856,4 +856,49 @@ Drawable::Drawable() {
 Drawable::~Drawable() {
 }
 
+// 'is_pos_in_sprite' in original
+bool Drawable::containsPoint(AGSEngine *vm, Common::Point point) {
+	Common::Point pos = getDrawPos();
+	uint width = vm->divideDownCoordinate(getDrawWidth());
+	uint height = vm->divideDownCoordinate(getDrawHeight());
+
+	Common::Point downPos(vm->divideDownCoordinate(pos.x), vm->divideDownCoordinate(pos.y));
+	if (!Common::Rect(downPos.x, downPos.y, downPos.x + width, downPos.y + height).contains(point))
+		return false;
+
+	if (!vm->getGameOption(OPT_PIXPERFECT))
+		return true;
+
+	point.x = vm->multiplyUpCoordinate(point.x - pos.x);
+	point.y = vm->multiplyUpCoordinate(point.y - pos.y);
+
+	const Graphics::Surface *surface = getDrawSurface();
+
+	// FIXME: stretching
+
+	if (isDrawMirrored())
+		point.x = (surface->w - 1) - point.x;
+
+	// TODO: sanity-check it's actually in the surface?
+	const void *ptr = surface->getBasePtr(point.x, point.y);
+	switch (surface->format.bytesPerPixel) {
+	case 1:
+		if (*(byte *)ptr == vm->_graphics->getTransparentColor())
+			return false;
+		break;
+	case 2:
+		if (*(uint16 *)ptr == vm->_graphics->getTransparentColor())
+			return false;
+		break;
+	case 4:
+		if (*(uint32 *)ptr == vm->_graphics->getTransparentColor())
+			return false;
+		break;
+	default:
+		error("Drawable::containsPoint: %dBpp not supported", surface->format.bytesPerPixel);
+	}
+
+	return true;
+}
+
 } // End of namespace AGS

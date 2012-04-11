@@ -59,7 +59,7 @@ struct FullAnimation {
 
 struct WalkBehind : public Drawable {
 	uint _left, _top, _right, _bottom;
-	uint16 _baseline; // was objyval: baseline of walkbehind area
+	int16 _baseline; // was objyval: baseline of walkbehind area
 
 	Graphics::Surface _surface;
 
@@ -243,7 +243,7 @@ public:
 
 	uint getHotspotAt(int x, int y);
 	uint getObjectAt(int x, int y);
-	uint getObjectAt(int x, int y, uint &id);
+	uint getObjectAt(int x, int y, int &id);
 	uint getRegionAt(int x, int y);
 
 protected:

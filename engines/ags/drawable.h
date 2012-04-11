@@ -40,6 +40,9 @@ public:
 	Drawable();
 	virtual ~Drawable();
 
+	// helper functions
+	bool containsPoint(class AGSEngine *vm, Common::Point point);
+
 	// position/zorder
 	virtual Common::Point getDrawPos() = 0;
 	virtual int getDrawOrder() const = 0;

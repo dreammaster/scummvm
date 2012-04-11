@@ -322,7 +322,7 @@ void RoomObject::stopMoving() {
 }
 
 int RoomObject::getBaseline() const {
-	return _baseline ? _baseline : _pos.y;
+	return (_baseline > 0) ? _baseline : _pos.y;
 }
 
 Common::Point RoomObject::getDrawPos() {
@@ -546,16 +546,16 @@ uint Room::getHotspotAt(int x, int y) {
 }
 
 uint Room::getObjectAt(int x, int y) {
-	uint objectYPos;
+	int objectYPos;
 	return getObjectAt(x, y, objectYPos);
 }
 
-uint Room::getObjectAt(int x, int y, uint &objectYPos) {
+uint Room::getObjectAt(int x, int y, int &objectYPos) {
 	x += _vm->divideDownCoordinate(_vm->_graphics->_viewportX);
 	y += _vm->divideDownCoordinate(_vm->_graphics->_viewportY);
 
 	uint objectId = (uint)-1;
-	uint bestBaseline = 0;
+	int bestBaseline = -1;
 
 	for (uint i = 0; i < _objects.size(); ++i) {
 		RoomObject *obj = _objects[i];
@@ -565,17 +565,16 @@ uint Room::getObjectAt(int x, int y, uint &objectYPos) {
 		if (obj->_flags & OBJF_NOINTERACT)
 			continue;
 
-		bool isFlipped = false;
+		/*bool isFlipped = false;
 		uint width = _vm->divideDownCoordinate(obj->getDrawWidth());
 		uint height = _vm->divideDownCoordinate(obj->getDrawWidth());
 		if (obj->_view != (uint16)-1)
-			isFlipped = _vm->getViewFrame(obj->_view, obj->_loop, obj->_frame)->_flags & VFLG_FLIPSPRITE;
+			isFlipped = _vm->getViewFrame(obj->_view, obj->_loop, obj->_frame)->_flags & VFLG_FLIPSPRITE;*/
 
-		// FIXME: totally wrong (should be call to isPosInSprite)
-		if (!Common::Rect(obj->_pos.x, obj->_pos.y, obj->_pos.x + width, obj->_pos.y + height).contains(Common::Point(x, y)))
+		if (!obj->containsPoint(_vm, Common::Point(x, y)))
 			continue;
 
-		uint baseline = obj->getBaseline();
+		int baseline = obj->getBaseline();
 		if (baseline < bestBaseline)
 			continue;
 
@@ -850,7 +849,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	} else {
 		_walkBehinds.resize(walkBehindsCount);
 		for (uint i = 0; i < _walkBehinds.size(); ++i)
-			_walkBehinds[i]._baseline = dta->readUint16LE();
+			_walkBehinds[i]._baseline = dta->readSint16LE();
 	}
 
 	// hotspots
