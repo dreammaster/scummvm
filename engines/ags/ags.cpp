@@ -81,6 +81,7 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_scriptPlayerObject(NULL),
 	_scriptMouseObject(NULL), _gameStateGlobalsObject(NULL), _saveGameIndexObject(NULL), _scriptSystemObject(NULL),
 	_roomObjectState(NULL),
+	_eventClaimed(EVENT_NONE),
 	_currentRoom(NULL), _framesPerSecond(40), _lastFrameTime(0),
 	_inNewRoomState(kNewRoomStateNone), _newRoomStateWas(kNewRoomStateNone), _inEntersScreenCounter(0),
 	_leavesScreenRoomId(-1),
@@ -307,7 +308,31 @@ void AGSEngine::tickGame(bool checkControls) {
 	checkNewRoom();
 
 	if (!(_state->_groundLevelAreasDisabled & GLED_INTERACTION)) {
-		// FIXME: check hotspots
+		// run the hotspot script
+		uint hotspotId = _currentRoom->getHotspotAt(_playerChar->_x, _playerChar->_y);
+		queueGameEvent(kEventRunEventBlock, kEventBlockHotspot, hotspotId, 0);
+
+		// now check for regions
+		uint regionId = _currentRoom->getRegionAt(_playerChar->_x, _playerChar->_y);
+		uint oldRoom = _displayedRoom;
+		if (regionId != _state->_playerOnRegion) {
+			// set the new region global
+			uint oldRegionId = _state->_playerOnRegion;
+			_state->_playerOnRegion = regionId;
+
+			// run Walks Off and Walks Onto scripts as necessary
+			if (oldRegionId)
+				runRegionInteraction(oldRegionId, kRegionEventWalksOff);
+			if (regionId)
+				runRegionInteraction(regionId, kRegionEventWalksOnto);
+		}
+		// run Stands On script if standing on a region
+		if (_state->_playerOnRegion)
+			runRegionInteraction(_state->_playerOnRegion, kRegionEventStandsOn);
+
+		// one of the region interactions might have sent us to another room
+		if (oldRoom != _displayedRoom)
+			checkNewRoom();
 
 		// if in a Wait loop which is no longer valid (probably
 		// because the Region interaction did a NewRoom), abort
@@ -524,7 +549,25 @@ void AGSEngine::updateEvents(bool checkControls) {
 				// call processInterfaceClick via a game event
 				queueGameEvent(kEventInterfaceClick, _clickWasOnGUI, i, mouseUp);
 			} else if (control->isOfType(sotGUIInvWindow)) {
-				// FIXME
+				GUIInvControl *invControl = (GUIInvControl *)control;
+				uint itemId = invControl->getItemAt(mousePos - Common::Point(group->_x, group->_y) -
+					Common::Point(control->_x, control->_y));
+				if (itemId != (uint)-1) {
+					_state->_usedInvOn = itemId;
+					if (getGameOption(OPT_HANDLEINVCLICKS)) {
+						// let the script handle the click: 5 is left, 6 is right
+						queueGameEvent(kEventTextScript, kTextScriptOnMouseClick, mouseUp == kMouseRight ? 6 : 5);
+					} else if (mouseUp == kMouseRight) {
+						// right-click is always look
+						runInventoryInteraction(itemId, MODE_LOOK);
+					} else if (_cursorMode == MODE_HAND) {
+						// set as active inventory item
+						setActiveInventory(itemId);
+					} else {
+						// run the interaction
+						runInventoryInteraction(itemId, _cursorMode);
+					}
+				}
 			} else
 				error("clicked on unknown control type");
 
@@ -561,7 +604,7 @@ void AGSEngine::updateEvents(bool checkControls) {
 
 	// walking off edges only happens when none of the below are the case:
 	// * if walking off edges is disabled
-	if (!(_state->_groundLevelAreasDisabled & GLED_INTERACTION))
+	if (_state->_groundLevelAreasDisabled & GLED_INTERACTION)
 		return;
 	// * if events have been queued above
 	if (numEventsWas != _queuedGameEvents.size())
@@ -1469,7 +1512,7 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 		processInterfaceClick(event.data1, event.data2, event.data3);
 		break;
 	case kEventNewRoom:
-		error("processGameEvent: can't do kEventNewRoom yet"); // FIXME
+		scheduleNewRoom(event.data1);
 		break;
 	default:
 		error("processGameEvent: unknown event type %d", event.type);
@@ -1505,7 +1548,7 @@ void AGSEngine::processAllGameEvents() {
 
 // run a 3.x-style interaction script
 // returns true if a room change occurred
-bool AGSEngine::runInteractionScript(InteractionScript *scripts, uint eventId, uint checkFallback, bool isInventory) {
+bool AGSEngine::runInteractionScript(InteractionScript *scripts, uint eventId, uint checkFallback, bool isInventory, bool checkOnly) {
 	if (eventId >= scripts->_eventScriptNames.size() || scripts->_eventScriptNames[eventId].empty()) {
 		// no response for this event
 
@@ -1514,15 +1557,13 @@ bool AGSEngine::runInteractionScript(InteractionScript *scripts, uint eventId, u
 			&& !scripts->_eventScriptNames[checkFallback].empty())
 			return false;
 
-		runUnhandledEvent(eventId);
+		if (!checkOnly)
+			runUnhandledEvent(eventId);
 		return false;
 	}
 
-	if (_state->_checkInteractionOnly) {
-		_state->_checkInteractionOnly = 2;
-
+	if (checkOnly)
 		return true;
-	}
 
 	uint roomWas = _state->_roomChanges;
 
@@ -1541,7 +1582,7 @@ bool AGSEngine::runInteractionScript(InteractionScript *scripts, uint eventId, u
 
 // run a 2.x-style interaction event
 // returns true if the NewInteraction has been invalidated (e.g. a room change occurred)
-bool AGSEngine::runInteractionEvent(NewInteraction *interaction, uint eventId, uint checkFallback, bool isInventory) {
+bool AGSEngine::runInteractionEvent(NewInteraction *interaction, uint eventId, uint checkFallback, bool isInventory, bool checkOnly) {
 	if (!interaction->hasResponseFor(eventId)) {
 		// no response for this event
 
@@ -1549,16 +1590,14 @@ bool AGSEngine::runInteractionEvent(NewInteraction *interaction, uint eventId, u
 		if (checkFallback != (uint)-1 && interaction->hasResponseFor(checkFallback))
 			return false;
 
-		runUnhandledEvent(eventId);
+		if (!checkOnly)
+			runUnhandledEvent(eventId);
 
 		return false;
 	}
 
-	if (_state->_checkInteractionOnly) {
-		_state->_checkInteractionOnly = 2;
-
+	if (checkOnly)
 		return true;
-	}
 
 	uint commandsRunCount = 0;
 	bool ret = runInteractionCommandList(interaction->_events[eventId], commandsRunCount);
@@ -1805,7 +1844,333 @@ bool AGSEngine::runInteractionCommandList(NewInteractionEvent &event, uint &comm
 }
 
 void AGSEngine::runUnhandledEvent(uint eventId) {
-	// FIXME
+	Common::String name = _eventBlockBaseName;
+	name.toLowercase();
+
+	// TODO: change the eventType to named constants
+	uint eventType = 0;
+	if (name.hasPrefix("hotspot")) {
+		eventType = 1;
+
+		// ignore: character stands on hotspot, mouse moves over hotspot, any click
+		if (eventId == kHotspotEventStandsOn || eventId == kHotspotEventClickOnHotspot || eventId == kHotspotEventMouseMovesOver)
+			return;
+
+		// clicked on hotspot 0?
+		if (_eventBlockId == 0)
+			eventType = 4;
+	} else if (name.hasPrefix("object")) {
+		eventType = 2;
+
+		if (eventId == kGeneralEventClick)
+			return;
+	} else if (name.hasPrefix("character")) {
+		eventType = 3;
+
+		if (eventId == kGeneralEventClick)
+			return;
+	} else if (name.hasPrefix("inventory"))
+		eventType = 5;
+	else if (name.hasPrefix("region"))
+		return; // no unhandled events for regions
+	else
+		return; // nor rooms etc
+
+	// FIXME: can_run_delayed_command
+
+	queueOrRunTextScript(_gameScript, "unhandled_event", eventType, eventId);
+}
+
+void AGSEngine::claimEvent() {
+	if (_eventClaimed == EVENT_NONE)
+		error("claimEvent: no event to claim");
+
+	_eventClaimed = EVENT_CLAIMED;
+}
+
+bool AGSEngine::runClaimableEvent(const Common::String &name, const Common::Array<RuntimeValue> &params) {
+	// Run the room script function, and if it is not claimed,
+	// then run the main one
+
+	// We need to remember the eventClaimed variable's state, in case
+	// this is a nested event
+	uint eventClaimedOldValue = _eventClaimed;
+	_eventClaimed = EVENT_INPROGRESS;
+
+	if (_roomScript)
+		runScriptFunction(_roomScript, name, params);
+	if (_eventClaimed == EVENT_CLAIMED) {
+		_eventClaimed = eventClaimedOldValue;
+		return true;
+	}
+
+	for (uint i = 0; i < _scriptModules.size(); ++i) {
+		runScriptFunction(_scriptModules[i], name, params);
+
+		if (_eventClaimed == EVENT_CLAIMED) {
+			_eventClaimed = eventClaimedOldValue;
+			return true;
+		}
+	}
+
+	_eventClaimed = eventClaimedOldValue;
+	return false;
+}
+
+bool AGSEngine::runCharacterInteraction(uint charId, uint mode, bool checkOnly) {
+	assert(charId < _characters.size());
+
+	uint param = (uint)-1;
+
+	switch (mode) {
+	case MODE_LOOK:
+		param = 0;
+		break;
+	case MODE_HAND:
+		param = 1;
+		break;
+	case MODE_TALK:
+		param = 2;
+		break;
+	case MODE_USE:
+		param = 3;
+		_state->_usedInv = _playerChar->_activeInv;
+		break;
+	case MODE_PICKUP:
+		param = 5;
+		break;
+	case MODE_CUSTOM1:
+		param = 6;
+		break;
+	case MODE_CUSTOM2:
+		param = 7;
+		break;
+	}
+
+	if (!checkOnly)
+		debugC(kDebugLevelGame, "run character interaction: hotspot %d, param %d", charId, param);
+
+	// can't use queueGameEvent, because "this ProcessClick is only executed once in a eventlist"
+	Common::String oldBaseName = _eventBlockBaseName;
+	uint oldEventBlockId = _eventBlockId;
+
+	_eventBlockBaseName = "character%d";
+	_eventBlockId = charId;
+
+	bool ret = false;
+	if (!_gameFile->_interactionsChar.empty()) {
+		// 2.x
+		if (param != (uint)-1)
+			ret |= runInteractionEvent(_gameFile->_interactionsChar[charId], param,
+				kGeneralEventClick, param == 3, checkOnly);
+		ret |= runInteractionEvent(_gameFile->_interactionsChar[charId], kGeneralEventClick, (uint)-1, false, checkOnly);
+	} else {
+		// 3.x
+		if (param != (uint)-1)
+			ret |= runInteractionScript(&_gameFile->_charInteractionScripts[charId], param,
+				kGeneralEventClick, param == 3, checkOnly);
+		ret |= runInteractionScript(&_gameFile->_charInteractionScripts[charId], kGeneralEventClick, (uint)-1, false, checkOnly);
+	}
+
+	_eventBlockBaseName = oldBaseName;
+	_eventBlockId = oldEventBlockId;
+
+	return ret;
+
+}
+
+bool AGSEngine::runInventoryInteraction(uint itemId, uint mode, bool checkOnly) {
+	// original doesn't bother preserving these, so maybe it's pointless
+	Common::String oldBaseName = _eventBlockBaseName;
+	uint oldEventBlockId = _eventBlockId;
+
+	_eventBlockBaseName = "inventory%d";
+	_eventBlockId = itemId;
+
+	uint eventId;
+	if (mode == MODE_LOOK)
+		eventId = 0;
+	else if (mode == MODE_HAND)
+		eventId = 1;
+	else if (mode == MODE_TALK)
+		eventId = 2;
+	else if (mode == MODE_USE) {
+		_state->_usedInv = _playerChar->_activeInv;
+		eventId = 3;
+	} else
+		eventId = 4;
+
+	if (!checkOnly)
+		debugC(kDebugLevelGame, "run inventory interaction: item %d, event %d", itemId, eventId);
+
+	bool ret;
+	if (!_gameFile->_interactionsInv.empty()) {
+		// 2.x
+		ret = runInteractionEvent(_gameFile->_interactionsInv[itemId], eventId, (uint)-1, false, checkOnly);
+	} else {
+		// 3.x
+		ret = runInteractionScript(&_gameFile->_invInteractionScripts[itemId], eventId, (uint)-1, false, checkOnly);
+	}
+
+	_eventBlockBaseName = oldBaseName;
+	_eventBlockId = oldEventBlockId;
+
+	return ret;
+}
+
+bool AGSEngine::runHotspotInteraction(uint hotspotId, uint mode, bool checkOnly) {
+	uint param = (uint)-1;
+
+	switch (mode) {
+	case MODE_TALK:
+		param = 4;
+		break;
+	case MODE_WALK:
+		param = 0;
+		break;
+	case MODE_LOOK:
+		param = 1;
+		break;
+	case MODE_HAND:
+		param = 2;
+		break;
+	case MODE_PICKUP:
+		param = 7;
+		break;
+	case MODE_CUSTOM1:
+		param = 8;
+		break;
+	case MODE_CUSTOM2:
+		param = 9;
+		break;
+	case MODE_USE:
+		param = 3;
+		_state->_usedInv = _playerChar->_activeInv;
+		break;
+	}
+
+	if (_state->_autoUseWalkToPoints && (getGameOption(OPT_WALKONLOOK) || mode != MODE_LOOK)) {
+		// If we should implicitly walk to the hotspot, do so.
+		if (mode != MODE_WALK && !checkOnly)
+			{ } // FIXME: _playerChar->moveToHotspot(hotspotId);
+	}
+
+	if (!checkOnly)
+		debugC(kDebugLevelGame, "run hotspot interaction: hotspot %d, param %d", hotspotId, param);
+
+	// can't use queueGameEvent, because "this ProcessClick is only executed once in a eventlist"
+	Common::String oldBaseName = _eventBlockBaseName;
+	uint oldEventBlockId = _eventBlockId;
+
+	_eventBlockBaseName = "hotspot%d";
+	_eventBlockId = hotspotId;
+
+	bool ret = false;
+	RoomHotspot &hotspot = _currentRoom->_hotspots[hotspotId];
+	if (hotspot._interaction) {
+		// 2.x
+		if (param != (uint)-1)
+			ret |= runInteractionEvent(hotspot._interaction, param,
+				kHotspotEventClickOnHotspot, param == 3, checkOnly);
+		if (!ret)
+			ret |= runInteractionEvent(hotspot._interaction, kHotspotEventClickOnHotspot, (uint)-1, false, checkOnly);
+	} else {
+		// 3.x
+		if (param != (uint)-1)
+			ret |= runInteractionScript(&hotspot._interactionScripts, param,
+				kHotspotEventClickOnHotspot, param == 3, checkOnly);
+		ret |= runInteractionScript(&hotspot._interactionScripts, kHotspotEventClickOnHotspot, (uint)-1, false, checkOnly);
+	}
+
+	_eventBlockBaseName = oldBaseName;
+	_eventBlockId = oldEventBlockId;
+
+	return ret;
+}
+
+bool AGSEngine::runObjectInteraction(uint objectId, uint mode, bool checkOnly) {
+	uint param = (uint)-1;
+
+	switch (mode) {
+	case MODE_LOOK:
+		param = 0;
+		break;
+	case MODE_HAND:
+		param = 1;
+		break;
+	case MODE_TALK:
+		param = 2;
+		break;
+	case MODE_PICKUP:
+		param = 5;
+		break;
+	case MODE_CUSTOM1:
+		param = 6;
+		break;
+	case MODE_CUSTOM2:
+		param = 7;
+		break;
+	case MODE_USE:
+		param = 3;
+		_state->_usedInv = _playerChar->_activeInv;
+		break;
+	}
+
+	if (!checkOnly)
+		debugC(kDebugLevelGame, "run object interaction: object %d, param %d", objectId, param);
+
+	// original doesn't bother preserving these, so maybe it's pointless
+	Common::String oldBaseName = _eventBlockBaseName;
+	uint oldEventBlockId = _eventBlockId;
+
+	_eventBlockBaseName = "object%d";
+	_eventBlockId = objectId;
+
+	bool ret = false;
+	RoomObject *object = _currentRoom->_objects[objectId];
+	if (object->_interaction) {
+		// 2.x
+		if (param != (uint)-1)
+			ret |= runInteractionEvent(object->_interaction, param,
+				kGeneralEventClick, param == 3, checkOnly);
+		if (!ret)
+			ret |= runInteractionEvent(object->_interaction, kGeneralEventClick, (uint)-1, checkOnly);
+	} else {
+		// 3.x
+		if (param != (uint)-1)
+			ret |= runInteractionScript(&object->_interactionScripts, param,
+				kGeneralEventClick, param == 3, checkOnly);
+		if (!ret)
+			ret |= runInteractionScript(&object->_interactionScripts, kGeneralEventClick, (uint)-1, checkOnly);
+	}
+
+	_eventBlockBaseName = oldBaseName;
+	_eventBlockId = oldEventBlockId;
+
+	return ret;
+}
+
+void AGSEngine::runRegionInteraction(uint regionId, uint mode) {
+	assert(regionId < _currentRoom->_regions.size());
+	assert(mode == kRegionEventStandsOn || mode == kRegionEventWalksOnto || mode == kRegionEventWalksOff);
+
+	Common::String oldBaseName = _eventBlockBaseName;
+	uint oldEventBlockId = _eventBlockId;
+
+	_eventBlockBaseName = "region%d";
+	_eventBlockId = regionId;
+
+	RoomRegion &region = _currentRoom->_regions[regionId];
+	if (region._interaction) {
+		// 2.x
+		runInteractionEvent(region._interaction, mode);
+	} else {
+		// 3.x
+		runInteractionScript(&region._interactionScripts, mode);
+	}
+
+	_eventBlockBaseName = oldBaseName;
+	_eventBlockId = oldEventBlockId;
 }
 
 uint32 AGSEngine::getGameFileVersion() const {
@@ -2407,12 +2772,29 @@ void AGSEngine::runTextScript(ccInstance *instance, const Common::String &name, 
 		if (name != REP_EXEC_NAME)
 			break;
 		// repeatedly_execute
+		{
+		uint roomWas = _state->_roomChanges;
 		for (uint i = 0; i < _scriptModules.size(); ++i) {
 			// FIXME: original checks whether the symbol exists first, unnecessary?
 			runScriptFunction(_scriptModules[i], name, params);
+			// FIXME: check restore game also
+			if (roomWas != _state->_roomChanges)
+				return;
 		}
 		break;
-	// FIXME: the rest
+		}
+	case 1:
+		if (name != "on_key_press" && name != "on_mouse_click")
+			break;
+		if (runClaimableEvent(name, params))
+			return;
+		break;
+	case 2:
+		if (name != "on_event")
+			break;
+		if (runClaimableEvent(name, params))
+			return;
+		break;
 	}
 
 	if (!runScriptFunction(instance, name, params)) {
@@ -3183,7 +3565,7 @@ bool AGSEngine::runScriptFunction(ccInstance *instance, const Common::String &na
 		error("runScriptFunction: script '%s' returned error %d", name.c_str(), result);*/
 
 	postScriptCleanup();
-	// FIXME: sabotage any running scripts in the event of restored game
+	// FIXME: sabotage any running scripts (set _eventClaimed) in the event of restored game
 
 	return true;
 }
@@ -3197,11 +3579,10 @@ bool AGSEngine::prepareTextScript(ccInstance *instance, const Common::String &na
 		return false;
 	}
 
-	// FIXME: original code has code which forks an instance if it was running
+	// TODO: original engine has code which forks an instance if it was running
 	// (but it's unreachable due to the check above..)
 
 	_runningScripts.push_back(ExecutingScript(instance));
-	// FIXME: updateScriptMouseCoords();
 
 	return true;
 }

@@ -147,6 +147,16 @@ enum {
 	kRoomEventPlayerLeavesScreen = 8
 };
 
+enum {
+	kHotspotEventStandsOn = 0,
+	kRegionEventStandsOn = 0,
+	kRegionEventWalksOnto = 1,
+	kRegionEventWalksOff = 2,
+	kGeneralEventClick = 4,
+	kHotspotEventClickOnHotspot = 5,
+	kHotspotEventMouseMovesOver = 6
+};
+
 enum BlockUntilType {
 	kUntilNothing = 0,
 	kUntilNoTextOverlay,
@@ -322,11 +332,19 @@ public:
 
 	void runOnEvent(uint32 p1, uint32 p2);
 
+	void claimEvent();
+
 	bool playSpeech(uint charId, uint speechId);
 	void stopSpeech();
 
 	int getIntProperty(const Common::String &name, const Common::StringMap &properties);
 	Common::String getStringProperty(const Common::String &name, const Common::StringMap &properties);
+
+	bool runCharacterInteraction(uint charId, uint mode, bool checkOnly = false);
+	bool runInventoryInteraction(uint itemId, uint mode, bool checkOnly = false);
+	bool runHotspotInteraction(uint hotspotId, uint mode, bool checkOnly = false);
+	bool runObjectInteraction(uint objectId, uint mode, bool checkOnly = false);
+	void runRegionInteraction(uint regionId, uint mode);
 
 private:
 	const AGSGameDescription *_gameDescription;
@@ -375,10 +393,11 @@ private:
 	void runGameEventNow(GameEventType type, uint data1 = 0, uint data2 = (uint)-1000, uint data3 = 0);
 	void processGameEvent(const GameEvent &event);
 	void processAllGameEvents();
-	bool runInteractionScript(struct InteractionScript *scripts, uint eventId, uint fallback = (uint)-1, bool isInventory = false);
-	bool runInteractionEvent(struct NewInteraction *interaction, uint eventId, uint fallback = (uint)-1, bool isInventory = false);
+	bool runInteractionScript(struct InteractionScript *scripts, uint eventId, uint fallback = (uint)-1, bool isInventory = false, bool checkOnly = false);
+	bool runInteractionEvent(struct NewInteraction *interaction, uint eventId, uint fallback = (uint)-1, bool isInventory = false, bool checkOnly = false);
 	bool runInteractionCommandList(struct NewInteractionEvent &event, uint &commandsRunCount);
 	void runUnhandledEvent(uint eventId);
+	bool runClaimableEvent(const Common::String &name, const Common::Array<RuntimeValue> &params);
 
 	// details of running event block, if any
 	bool _insideProcessEvent;
@@ -405,6 +424,8 @@ private:
 	ScriptObject *_gameStateGlobalsObject;
 	ScriptObject *_saveGameIndexObject;
 	ScriptObject *_scriptSystemObject;
+
+	uint _eventClaimed;
 
 	BlockUntilType _blockingUntil;
 	uint _blockingUntilId;
