@@ -437,8 +437,8 @@ static InstructionInfo instructionInfo[NUM_INSTRUCTIONS + 1] = {
 	{ "$$f.lte", 2, iatRegisterFloat, iatRegisterFloat },
 	{ "zeromem", 1, iatInteger, iatNone },
 	{ "$newstring", 1, iatRegister, iatNone },
-	{ "$$strcmp", 2, iatRegister, iatAny },
-	{ "$$strnotcmp", 2, iatRegister, iatAny },
+	{ "$$strcmp", 2, iatRegister, iatRegister },
+	{ "$$strnotcmp", 2, iatRegister, iatRegister },
 	{ "$checknull", 1, iatRegister, iatNone },
 	{ "loopcheckoff", 0, iatNone, iatNone },
 	{ "memwrite.ptr.0.nd", 0, iatNone, iatNone },
@@ -1421,6 +1421,11 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 				error("expected float for param %d of '%s', got type %d",
 					pos + 1, function->name, params[pos]._type);
 			break;
+		case 'p':
+			// object OR null
+			if (params[pos]._type == rvtInteger && params[pos]._value == 0)
+				break;
+			// (fallthrough)
 		case 'o':
 			// object
 			if (params[pos]._type != rvtSystemObject)

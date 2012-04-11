@@ -980,7 +980,7 @@ RuntimeValue Script_Character_FaceObject(AGSEngine *vm, Character *self, const C
 // Character: import function FollowCharacter(Character*, int dist=10, int eagerness=97)
 // Starts this character following the other character.
 RuntimeValue Script_Character_FollowCharacter(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	if (!params[0]._object->isOfType(sotCharacter))
+	if (params[0]._type == rvtSystemObject && !params[0]._object->isOfType(sotCharacter))
 		error("Character::FollowCharacter got incorrect object type (expected a Character) for parameter 1");
 	Character *character = (Character *)params[0]._object;
 	int dist = params[1]._signedValue;
@@ -2201,7 +2201,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "Character::FaceCharacter^2", (ScriptAPIFunction *)&Script_Character_FaceCharacter, "oi", sotCharacter },
 	{ "Character::FaceLocation^3", (ScriptAPIFunction *)&Script_Character_FaceLocation, "iii", sotCharacter },
 	{ "Character::FaceObject^2", (ScriptAPIFunction *)&Script_Character_FaceObject, "oi", sotCharacter },
-	{ "Character::FollowCharacter^3", (ScriptAPIFunction *)&Script_Character_FollowCharacter, "oii", sotCharacter },
+	{ "Character::FollowCharacter^3", (ScriptAPIFunction *)&Script_Character_FollowCharacter, "pii", sotCharacter },
 	{ "Character::GetAtScreenXY^2", (ScriptAPIFunction *)&Script_Character_GetAtScreenXY, "ii", sotNone },
 	{ "Character::GetProperty^1", (ScriptAPIFunction *)&Script_Character_GetProperty, "s", sotCharacter },
 	{ "Character::GetPropertyText^2", (ScriptAPIFunction *)&Script_Character_GetPropertyText, "ss", sotCharacter },
