@@ -69,7 +69,7 @@ public:
 	void internalDraw(const Graphics::Surface *srcSurf, const Common::Point &pos, uint transparency);
 
 	void blit(const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, Common::Point pos, uint transparency,
-		bool mirrored = false);
+		bool mirrored = false, bool useAlpha = false);
 
 	void setMouseCursor(uint32 cursor);
 	void mouseSetHotspot(uint32 x, uint32 y);

@@ -53,6 +53,7 @@ public:
 	virtual uint getDrawHeight() = 0;
 	virtual uint getDrawTransparency() = 0;
 	virtual bool isDrawMirrored() = 0;
+	virtual bool isDrawAlpha() { return false; }
 	virtual int getDrawLightLevel() = 0;
 	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) = 0;
 };

@@ -344,7 +344,7 @@ Graphics::PixelFormat AGSGraphics::getPixelFormat() const {
 		return Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0);
 	default:
 		// 24bpp: RGB888
-		return Graphics::PixelFormat(3, 8, 8, 8, 0, 16, 8, 0, 0);
+		return Graphics::PixelFormat(4, 8, 8, 8, 0, 16, 8, 0, 0);
 	}
 }
 
@@ -623,16 +623,19 @@ void AGSGraphics::draw(Drawable *item, bool useViewport) {
 	if (!itemWidth || !itemHeight)
 		return;
 	bool mirrored = item->isDrawMirrored();
+	bool useAlpha = item->isDrawAlpha();
 	const Graphics::Surface *surface = item->getDrawSurface();
 
 	// FIXME: lots of things
-	blit(surface, &_backBuffer, pos, transparency, mirrored);
+	blit(surface, &_backBuffer, pos, transparency, mirrored, useAlpha);
 }
 
 void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, Common::Point pos, uint transparency,
-	bool mirrored) {
+	bool mirrored, bool useAlpha) {
 	if (transparency == 255)
 		return;
+
+	// FIXME: fix the bounds checks for mirrored sprites
 
 	// ignore surfaces which are entirely off-screen
 	if (pos.x > destSurf->w)
@@ -734,8 +737,87 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 			}
 		}
 	} else {
-		// FIXME
-		warning("blub");
+		uint32 transColor = (uint32)getTransparentColor();
+
+		if (!transparency && useAlpha) {
+			for (uint y = 0; y < height; ++y) {
+				uint32 *dest;
+				if (mirrored)
+					dest = (uint32 *)destSurf->getBasePtr(pos.x + width, pos.y + y);
+				else
+					dest = (uint32 *)destSurf->getBasePtr(pos.x, pos.y + y);
+				const uint32 *src = (uint32 *)srcSurf->getBasePtr(startX, startY + y);
+				for (uint x = 0; x < width; ++x) {
+					uint32 srcData = *src++;
+					if (srcData != transColor) {
+						uint32 destData = *dest;
+
+						transparency = srcData >> 24;
+						if (transparency)
+							transparency++;
+						uint32 blendedRB = ((srcData & 0xFF00FF) - (destData & 0xFF00FF))
+							* transparency / 256 + destData;
+						uint32 blended = ((srcData & 0xFF00) - (destData & 0xFF00))
+							* transparency / 256 + (destData & 0xFF00);
+						*dest = (blended & 0xFF00) | (blendedRB & 0xFF00FF);
+					}
+					if (mirrored)
+						dest--;
+					else
+						dest++;
+				}
+			}
+			return;
+		}
+
+		if (!transparency) {
+			// simplified version of the loop below for the transparent==0 (opaque) case
+			for (uint y = 0; y < height; ++y) {
+				uint32 *dest;
+				if (mirrored)
+					dest = (uint32 *)destSurf->getBasePtr(pos.x + width, pos.y + y);
+				else
+					dest = (uint32 *)destSurf->getBasePtr(pos.x, pos.y + y);
+				const uint32 *src = (uint32 *)srcSurf->getBasePtr(startX, startY + y);
+				for (uint x = 0; x < width; ++x) {
+					uint32 srcData = *src++;
+					if (srcData != transColor)
+						*dest = srcData;
+					if (mirrored)
+						dest--;
+					else
+						dest++;
+				}
+			}
+			return;
+		}
+
+		transparency = transparency + 1;
+
+		for (uint y = 0; y < height; ++y) {
+			uint32 *dest;
+			if (mirrored)
+				dest = (uint32 *)destSurf->getBasePtr(pos.x + width, pos.y + y);
+			else
+				dest = (uint32 *)destSurf->getBasePtr(pos.x, pos.y + y);
+			const uint32 *src = (uint32 *)srcSurf->getBasePtr(startX, startY + y);
+			for (uint x = 0; x < width; ++x) {
+				uint32 srcData = *src++;
+				if (srcData != transColor) {
+					uint32 destData = *dest;
+
+					uint32 blendedRB = ((srcData & 0xFF00FF) - (destData & 0xFF00FF))
+						* transparency / 256 + destData;
+					uint32 blended = ((srcData & 0xFF00) - (destData & 0xFF00))
+						* transparency / 256 + (destData & 0xFF00);
+					*dest = (blended & 0xFF00) | (blendedRB & 0xFF00FF);
+				}
+				if (mirrored)
+					dest--;
+				else
+					dest++;
+			}
+		}
 	}
 }
 
