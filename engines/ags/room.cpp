@@ -412,6 +412,7 @@ void Room::unload() {
 	for (uint i = 0; i < _walkBehinds.size(); ++i)
 		_walkBehinds[i]._surface.free();
 	_backgroundScenes.clear();
+	_originalWalkableMask.free();
 	_walkableMask.free();
 	_walkBehindMask.free();
 	_hotspotMask.free();
@@ -517,6 +518,24 @@ void Room::updateWalkBehinds() {
 				//srcPtr = (byte *)srcPtr + background.format.bytesPerPixel;
 				//destPtr = (byte *)destPtr + background.format.bytesPerPixel;
 			}
+		}
+	}
+}
+
+void Room::redoWalkableAreas() {
+	// restore the walkable areas mask from the original copy
+	_walkableMask.free();
+	_walkableMask.copyFrom(_originalWalkableMask);
+	assert(_walkableMask.format.bytesPerPixel == 1);
+
+	// clear any walkable areas which are disabled
+	for (uint y = 0; y < _walkableMask.h; y++) {
+		byte *ptr = (byte *)_walkableMask.getBasePtr(0, y);
+		for (uint x = 0; x < _walkableMask.w; x++) {
+			byte id = *ptr;
+			if (!_vm->_state->_walkableAreasOn[id])
+				*ptr = 0;
+			ptr++;
 		}
 	}
 }
@@ -823,6 +842,7 @@ Room::~Room() {
 		_backgroundScenes[i]._scene.free();
 	for (uint i = 0; i < _walkBehinds.size(); ++i)
 		_walkBehinds[i]._surface.free();
+	_originalWalkableMask.free();
 	_walkableMask.free();
 	_walkBehindMask.free();
 	_hotspotMask.free();
@@ -1153,11 +1173,12 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 		_backgroundScenes[0]._scene = readRLEImage(dta);
 
 	_regionsMask = readRLEImage(dta);
-	_walkableMask = readRLEImage(dta);
+	_originalWalkableMask = readRLEImage(dta);
 	_walkBehindMask = readRLEImage(dta);
 	_hotspotMask = readRLEImage(dta);
 
-	initWalkBehinds(); // FIXME
+	redoWalkableAreas();
+	initWalkBehinds();
 
 	if (_version < kAGSRoomVer255r) {
 		// old version - copy the walkable areas to regions

@@ -241,6 +241,8 @@ public:
 	void initWalkBehinds();
 	void updateWalkBehinds();
 
+	void redoWalkableAreas();
+
 	uint getHotspotAt(int x, int y);
 	uint getObjectAt(int x, int y);
 	uint getObjectAt(int x, int y, int &id);
@@ -256,7 +258,8 @@ protected:
 public:
 	// TODO: obsolete 1.x(?) script conditions
 
-	Graphics::Surface _walkableMask; // walls
+	Graphics::Surface _originalWalkableMask; // walkareabackup
+	Graphics::Surface _walkableMask; // walls - as updated (scripts, characters)
 	Graphics::Surface _walkBehindMask; // object
 	Graphics::Surface _hotspotMask; // lookat
 	Graphics::Surface _regionsMask; // regions
