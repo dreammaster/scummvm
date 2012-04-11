@@ -212,6 +212,8 @@ public:
 	uint getGUIAt(const Common::Point &pos);
 	void removePopupInterface(uint guiId);
 
+	uint getCharacterAt(const Common::Point &pos, int &charYPos);
+
 	uint getInventoryItemAt(const Common::Point &pos);
 
 	Common::String getLocationName(const Common::Point &pos);

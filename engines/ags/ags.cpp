@@ -244,7 +244,12 @@ bool AGSEngine::mainGameLoop() {
 
 	tickGame(true);
 
-	// FIXME: location updates
+	// call getLocationName, to force a GUI update if the result has changed since last time
+	// (without this, @overhotspot@ often doesn't get updated)
+	Common::Point mousePos = _system->getEventManager()->getMousePos();
+	mousePos.x = divideDownCoordinate(mousePos.x);
+	mousePos.y = divideDownCoordinate(mousePos.y);
+	getLocationName(mousePos);
 
 	// FIXME: cursor updates
 
@@ -2160,6 +2165,42 @@ void AGSEngine::removePopupInterface(uint guiId) {
 	invalidateGUI();
 }
 
+uint AGSEngine::getCharacterAt(const Common::Point &pos, int &charYPos) {
+	uint charId = (uint)-1;
+	int bestBaseline = 0;
+
+	for (uint i = 0; i < _characters.size(); ++i) {
+		Character *chr = _characters[i];
+
+		if (chr->_room != _displayedRoom)
+			continue;
+		if (!chr->_on)
+			continue;
+		if (chr->_flags & CHF_NOINTERACT)
+			continue;
+		if (chr->_view < 0)
+			continue;
+
+		// TODO: any more sanity-checks?
+		ViewStruct &view = _gameFile->_views[chr->_view];
+		if (chr->_loop >= view._loops.size() || chr->_frame >= view._loops[chr->_loop]._frames.size())
+			continue;
+
+		if (!chr->containsPoint(this, pos))
+			continue;
+
+		int baseline = chr->getBaseline();
+		if (baseline < bestBaseline)
+			continue;
+
+		charId = i;
+		bestBaseline = baseline;
+	}
+
+	charYPos = bestBaseline;
+	return charId;
+}
+
 uint AGSEngine::getInventoryItemAt(const Common::Point &pos) {
 	uint guiId = getGUIAt(pos);
 	if (guiId == (uint)-1)
@@ -2270,9 +2311,8 @@ uint AGSEngine::getLocationType(const Common::Point &pos, uint &id, bool through
 	// check characters, objects and walkbehinds, work out which is
 	// foremost visible to the player
 
-	// FIXME: characters (use p!)
-	uint charYPos = 0;
-	uint charAt = (uint)-1;
+	int charYPos = 0;
+	uint charAt = getCharacterAt(p, charYPos);
 	uint hotspotAt = _currentRoom->getHotspotAt(p.x, p.y);
 	// getObjectAt adjusts the parameters itself, so use the unmodified pos.
 	int objectYPos = 0;
