@@ -774,11 +774,11 @@ void Character::walk(int x, int y, bool ignoreWalkable, bool autoWalkAnims) {
 		_idleLeft = _idleTime;
 	}
 
-	uint32 oldWait = 0;
+	uint32 oldWalkWait = 0;
 	uint16 oldAnimWait = 0;
 	if (_walking) {
 		// if they are currently walking, save the current wait
-		oldWait = _wait;
+		oldWalkWait = _walkWait;
 		oldAnimWait = _animWait;
 	}
 
@@ -812,7 +812,7 @@ void Character::walk(int x, int y, bool ignoreWalkable, bool autoWalkAnims) {
 			// this prevents a glitch if MoveCharacter is called when they
 			// are already moving
 
-			_walkWait = oldWait;
+			_walkWait = oldWalkWait;
 			_animWait = oldAnimWait;
 
 			if (_moveList._stages[0].pos != _moveList._stages[1].pos)
@@ -825,6 +825,52 @@ void Character::walk(int x, int y, bool ignoreWalkable, bool autoWalkAnims) {
 	}
 
 	delete walkableMask;
+}
+
+void Character::walkStraight(int x, int y) {
+	if (_room != _vm->getCurrentRoomId())
+		error("Character::walkStraight: character '%s' (id %d) in room %d, not in current room (%d)",
+			_scriptName.c_str(), _indexId, _room, _vm->getCurrentRoomId());
+
+	stopMoving();
+
+	Graphics::Surface *walkableMask = _vm->getWalkableMaskFor(_indexId);
+
+	Common::Point from(_vm->convertToLowRes(_x), _vm->convertToLowRes(_y));
+	Common::Point to(_vm->convertToLowRes(x), _vm->convertToLowRes(y));
+
+	Common::Point lastGoodPos;
+	if (!canSee(from, to, walkableMask, &lastGoodPos)) {
+		x = _vm->convertBackToHighRes(lastGoodPos.x);
+		y = _vm->convertBackToHighRes(lastGoodPos.y);
+	}
+
+	walk(x, y, true, true);
+
+	delete walkableMask;
+}
+
+void Character::addWaypoint(int x, int y) {
+	if (_room != _vm->getCurrentRoomId())
+		error("Character::addWaypoint: character '%s' (id %d) in room %d, not in current room (%d)",
+			_scriptName.c_str(), _indexId, _room, _vm->getCurrentRoomId());
+
+	if (!_walking) {
+		// they're not already walking; so just do a normal (direct) move
+		walk(x, y, true, true);
+		return;
+	}
+
+	assert(!_moveList._stages.empty());
+
+	// are they moving there anyway?
+	if (_moveList._stages.back().pos == Common::Point(x, y))
+		return;
+
+	// add a new stage to the end, and calculate the movement needed
+	_moveList._stages.push_back(MoveStage());
+	_moveList._stages.back().pos = Common::Point(x, y);
+	_moveList.calculateMoveStage(_moveList._stages.size() - 2);
 }
 
 void Character::followCharacter(Character *chr, int distance, uint eagerness) {
@@ -880,11 +926,14 @@ void adjustDiagonalMoveFrame(uint &useLoop, int mainDir, int otherDir, uint loop
 // changes to the appropriate animation loop for our current walk
 void Character::fixPlayerSprite() {
 	// TODO: some of this is copied right from faceLocation
-	uint useLoop = 1;
-
 	frac_t xDiff = _moveList._stages[_moveList._curStage].xPerMove;
 	frac_t yDiff = _moveList._stages[_moveList._curStage].yPerMove;
 
+	// if not moving, do nothing
+	if (xDiff == 0 && yDiff == 0)
+		return;
+
+	uint useLoop = 1;
 	uint diagonalState = useDiagonal();
 
 	if (_vm->getGameFileVersion() <= kAGSVer272) {
@@ -903,7 +952,7 @@ void Character::fixPlayerSprite() {
 				useLoop = 2;
 				if (diagonalState == 0)
 					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 5, 4);
-			} else if (canLeft && yDiff < 0) {
+			} else if (canLeft && xDiff < 0) {
 				useLoop = 1;
 				if (diagonalState == 0)
 					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 7, 6);
@@ -912,17 +961,17 @@ void Character::fixPlayerSprite() {
 			if (yDiff >= 0) {
 				useLoop = 0;
 				if (diagonalState == 0)
-					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 6, 4);
+					adjustDiagonalMoveFrame(useLoop, xDiff, yDiff, 6, 4);
 			} else {
 				useLoop = 3;
 				if (diagonalState == 0)
-					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 7, 5);
+					adjustDiagonalMoveFrame(useLoop, xDiff, yDiff, 7, 5);
 			}
 		}
 	} else {
 		// modern (3.x) logic
 
-		if (!hasUpDownLoops() || abs(yDiff) < abs(xDiff)) {
+		if (!hasUpDownLoops() || abs(yDiff) <= abs(xDiff)) {
 			// wantHoriz
 			if (xDiff > 0) {
 				useLoop = 2;
@@ -935,11 +984,11 @@ void Character::fixPlayerSprite() {
 			}
 		} else {
 			// !wantHoriz
-			if (yDiff > 0) {
+			if (yDiff >= 0) {
 				useLoop = 0;
 				if (diagonalState == 0)
 					adjustDiagonalMoveFrame(useLoop, xDiff, yDiff, 6, 4);
-			} else if (yDiff < 0) {
+			} else {
 				useLoop = 3;
 				if (diagonalState == 0)
 					adjustDiagonalMoveFrame(useLoop, xDiff, yDiff, 7, 5);
@@ -1090,7 +1139,7 @@ bool Character::faceLocation(int x, int y) {
 				useLoop = 2;
 				if (diagonalState == 0)
 					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 5, 4);
-			} else if (canLeft && yDiff < 0) {
+			} else if (canLeft && xDiff < 0) {
 				useLoop = 1;
 				if (diagonalState == 0)
 					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 7, 6);
@@ -1099,11 +1148,11 @@ bool Character::faceLocation(int x, int y) {
 			if (yDiff >= 0) {
 				useLoop = 0;
 				if (diagonalState == 0)
-					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 6, 4);
+					adjustDiagonalMoveFrame(useLoop, xDiff, yDiff, 6, 4);
 			} else {
 				useLoop = 3;
 				if (diagonalState == 0)
-					adjustDiagonalMoveFrame(useLoop, yDiff, xDiff, 7, 5);
+					adjustDiagonalMoveFrame(useLoop, xDiff, yDiff, 7, 5);
 			}
 		}
 	} else {
@@ -1461,8 +1510,8 @@ void Character::addInventory(uint itemId, uint addIndex) {
 void Character::loseInventory(uint itemId) {
 	assert(itemId < _vm->_gameFile->_invItemInfo.size());
 
-	debugC(kDebugLevelGame, "removing inv %d from character '%s' (id %d)",
-		itemId, _scriptName.c_str(), _indexId);
+	debugC(kDebugLevelGame, "removing inv %d (had %d) from character '%s' (id %d)",
+		itemId, _inventory[itemId], _scriptName.c_str(), _indexId);
 
 	if (_inventory[itemId] > 0)
 		_inventory[itemId]--;
@@ -1494,7 +1543,7 @@ void Character::setActiveInventory(uint itemId) {
 	_vm->invalidateGUI();
 
 	if (itemId == 0) {
-		_activeInv = itemId;
+		_activeInv = (uint)-1;
 
 		if (_vm->getPlayerChar() == this && _vm->getCursorMode() == MODE_USE)
 			_vm->setCursorMode(0);
@@ -1511,7 +1560,7 @@ void Character::setActiveInventory(uint itemId) {
 
 	if (_vm->getPlayerChar() == this) {
 		// if it's the player character, update mouse cursor
-		// FIXME: _vm->updateInvCursor(itemId);
+		_vm->updateInvCursor(itemId);
 		_vm->setCursorMode(MODE_USE);
 	}
 }
@@ -1560,8 +1609,8 @@ bool Character::moveToNearestWalkableAreaWithin(int range, int step) {
 			startX = 0;
 		startY = y - range;
 		height = MIN<int>(height, startY + (range * 2));
-		if (startY < 0)
-			startY = 0;
+		if (startY < 10)
+			startY = 10;
 	}
 
 	const Graphics::Surface &mask = _vm->getCurrentRoom()->_walkableMask;
@@ -1621,7 +1670,13 @@ void Character::moveToNearestWalkableArea() {
 }
 
 Common::Point Character::getDrawPos() {
-	uint spriteId = _vm->getViewFrame(_view, _loop, _frame)->_pic;
+	const ViewLoopNew &loop = *_vm->getViewLoop(_view, _loop);
+
+	// TODO: Resolve this at a better point?
+	if (_frame >= loop._frames.size())
+		_frame = 0;
+
+	uint spriteId = loop._frames[_frame]._pic;
 
 	return Common::Point(_vm->multiplyUpCoordinate(_x) - getDrawWidth()/2 + _picXOffs,
 		_vm->multiplyUpCoordinate(_y) - _vm->getSprites()->getSpriteHeight(spriteId) -
