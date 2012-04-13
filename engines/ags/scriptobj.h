@@ -81,6 +81,7 @@ public:
 	virtual bool writeUint16(uint offset, uint16 value) { return false; }
 	virtual byte readByte(uint offset) { error("tried reading byte from offset %d on a %s", offset, getObjectTypeName()); }
 	virtual bool writeByte(uint offset, byte value) { return false; }
+	virtual class ScriptString *getStringObject(uint offset) { return NULL; }
 
 	// for resolving pointer arithmetic by scripts
 	virtual ScriptObject *getObjectAt(uint32 &offset) { return this; }

@@ -1392,6 +1392,15 @@ ScriptString *ccInstance::createStringFrom(RuntimeValue &value) {
 		ScriptString *string = (ScriptString *)value._object;
 		string->IncRef();
 		return string;
+	} else if (value._type == rvtSystemObject) {
+		// String buffers inside old-style objects, such as character names.
+		uint32 offset = value._value;
+		ScriptObject *obj = value._object->getObjectAt(offset);
+		ScriptString *str = obj->getStringObject(offset);
+		if (str)
+			return str;
+		error("createStringFrom failed to create a string from offset %d of object of type '%s'",
+			offset, obj->getObjectTypeName());
 	}
 
 	error("createStringFrom failed to create a string from value of type %d", value._type);
@@ -1452,9 +1461,15 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 				params[pos]._object->DecRef();
 				break;
 			}
-			if (params[pos]._type != rvtSystemObject || !params[pos]._object->isOfType(sotString))
-				error("expected string for param %d of '%s', got type %d",
-					pos + 1, function->name, params[pos]._type);
+			if (params[pos]._type != rvtSystemObject || !params[pos]._object->isOfType(sotString)) {
+				ScriptString *str = createStringFrom(params[pos]);
+				if (!str)
+					error("expected string for param %d of '%s', got type %d",
+						pos + 1, function->name, params[pos]._type);
+				params[pos] = str;
+				str->DecRef();
+				break;
+			}
 			if (params[pos]._value != 0)
 				error("unexpected offset %d when creating string object for param %d of '%s'",
 					params[pos]._value, pos + 1, function->name);

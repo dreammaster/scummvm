@@ -50,6 +50,7 @@ public:
 	bool writeUint16(uint offset, uint16 value);
 	byte readByte(uint offset);
 	bool writeByte(uint offset, byte value);
+	ScriptString *getStringObject(uint offset);
 
 	bool update();
 	uint useDiagonal();

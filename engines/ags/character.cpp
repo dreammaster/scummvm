@@ -353,6 +353,37 @@ bool Character::writeByte(uint offset, byte value) {
 	return false;
 }
 
+class CharacterNameString : public ScriptString {
+public:
+	CharacterNameString(Character *parent) : _parent(parent) {
+		_parent->IncRef();
+	}
+
+	~CharacterNameString() {
+		_parent->DecRef();
+	}
+
+	const Common::String getString() {
+		return _parent->_name;
+	}
+
+	void setString(const Common::String &text) {
+		_parent->_name = text;
+	}
+
+protected:
+	Character *_parent;
+};
+
+ScriptString *Character::getStringObject(uint offset) {
+	switch (offset) {
+	case 718:
+		return new CharacterNameString(this);
+	default:
+		return NULL;
+	}
+}
+
 // order of loops to turn character in circle from down to down
 const uint turnLoopOrder[8] = { 0, 6, 1, 7, 3, 5, 2, 4 };
 
