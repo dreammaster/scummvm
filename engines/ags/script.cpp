@@ -931,7 +931,9 @@ void ccInstance::runCodeFrom(uint32 start) {
 				(*tempVal._instance->_globalData)[tempVal._value] = (byte)_registers[int1]._value;
 				break;
 			case rvtSystemObject:
-				tempVal._object->writeByte(tempVal._value, (byte)_registers[int1]._value);
+				if (!tempVal._object->writeByte(tempVal._value, (byte)_registers[int1]._value))
+					error("script failed to write byte to offset %d of a %s on line %d",
+						tempVal._value, tempVal._object->getObjectTypeName(), _lineNumber);
 				break;
 			case rvtStackPointer:
 				if (tempVal._value + 1 >= _stack.size())
@@ -963,7 +965,9 @@ void ccInstance::runCodeFrom(uint32 start) {
 				WRITE_LE_UINT16(&(*tempVal._instance->_globalData)[tempVal._value], (int16)_registers[int1]._value);
 				break;
 			case rvtSystemObject:
-				tempVal._object->writeUint16(tempVal._value, (int16)_registers[int1]._value);
+				if (!tempVal._object->writeUint16(tempVal._value, (int16)_registers[int1]._value))
+					error("script failed to write uint16 to offset %d of a %s on line %d",
+						tempVal._value, tempVal._object->getObjectTypeName(), _lineNumber);
 				break;
 			case rvtStackPointer:
 				if (tempVal._value + 2 >= _stack.size())
