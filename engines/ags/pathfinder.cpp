@@ -29,6 +29,7 @@
 #include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
 #include "engines/ags/graphics.h"
+#include "common/queue.h"
 #include "graphics/surface.h"
 
 namespace AGS {
@@ -96,8 +97,6 @@ bool MoveList::doStep(Common::Point &pos) {
 	} else
 		pos.y = _from.y + (int)(fracToDouble(stage.yPerMove)*(double)_curPart);
 
-	warning("move stage: now %d (target %d), %d (target %d)", pos.x, targetX, pos.y, targetY);
-
 	// did we finish horizontal movement?
 	if ((stage.xPerMove > 0 && pos.x >= targetX) || (stage.xPerMove < 0 && pos.x <= targetX)) {
 		_doneX = true;
@@ -134,41 +133,8 @@ bool MoveList::doStep(Common::Point &pos) {
 	return ret;
 }
 
-struct PathFinder {
-	// the walkable mask to use
-	const Graphics::Surface *_mask;
-	// the list to fill
-	MoveList *_moveList;
-	// the destination (possibly adjusted)
-	Common::Point _dest;
-
-	frac_t _moveSpeedX, _moveSpeedY;
-
-	// internal pathfinding state
-	bool _goingLeft;
-	int16 *_beenHere;
-
-	bool _hasFinalStep;
-	Common::Point _finalStep;
-
-	// state for the canSee callback
-	bool _lineFailed;
-
-	// state needed to construct the final path
-	Common::Array<Common::Point> _pathBackPositions;
-
-	void setRouteMoveSpeed(int x, int y);
-
-	bool findPath(const Common::Point &to, bool onlyIfDestAllowed);
-
-	bool constructPath();
-	void calculateMoveStage(uint stageId);
-
-	bool canSee(const Common::Point &from, const Common::Point &to);
-};
-
-void PathFinder::setRouteMoveSpeed(int x, int y) {
-	// // negative move speeds like -2 get converted to 1/2
+void MoveList::setRouteMoveSpeed(int x, int y) {
+	// negative move speeds like -2 get converted to 1/2
 
 	if (x < 0)
 		_moveSpeedX = intToFrac(1) / (-x);
@@ -180,9 +146,468 @@ void PathFinder::setRouteMoveSpeed(int x, int y) {
 		_moveSpeedY = intToFrac(y);
 }
 
-bool PathFinder::findPath(const Common::Point &to, bool onlyIfDestAllowed) {
-	// FIXME
-	error("findPath unimplemented");
+struct PathFinder {
+	// the walkable mask to use
+	const Graphics::Surface *_mask;
+	// the list to fill
+	MoveList *_moveList;
+	// the destination (possibly adjusted)
+	Common::Point _dest;
+
+	// internal pathfinding state
+	Graphics::Surface _beenHere;
+	Common::Array<int> _walkAreaGranularity;
+
+	bool _hasFinalStep;
+	Common::Point _finalStep;
+
+	// state needed to construct the final path
+	Common::Array<Common::Point> _pathBackPositions;
+
+	bool findPath(bool onlyIfDestAllowed);
+
+	bool constructPath();
+
+protected:
+	Common::Point roundDownCoordinates(Common::Point pos);
+	bool isRoutePossible(bool &foundNewCandidate);
+	bool findRouteDijkstra();
+	bool tryThisSquare(const Common::Point &from, const Common::Point &to, bool goingRight);
+
+	bool dijkstraCheckNeighbor(uint x, uint y, uint nX, uint nY, int modifier, int &min, Common::Array<uint> &found, Common::Array<uint> &cheapest);
+	bool findNearestWalkableArea(const Graphics::Surface &tempMask, int startX, int startY, int endX, int endY, uint step);
+};
+
+bool PathFinder::findPath(bool onlyIfDestAllowed) {
+	// FIXME: bad name + unused
+	if (!onlyIfDestAllowed) {
+		if (*(byte *)_mask->getBasePtr(_dest.x, _dest.y) == 0)
+			return false;
+	}
+
+	const Common::Point &from = _moveList->_from;
+
+	// vertical, horizontal or exactly diagonal?
+	bool isStraight = ((from.x == _dest.x) || (from.y == _dest.y) || (abs(from.x - _dest.x) == abs(from.y - _dest.y)));
+
+	if (from == _dest)
+		return true;
+
+	bool foundNewCandidate;
+	if (!isRoutePossible(foundNewCandidate) && (!foundNewCandidate))
+		return false;
+
+	if (from == _dest)
+		return true;
+
+	// TODO: this is annotated "don't use new algo on arrow key presses", maybe be smarter for that use case..
+	//if (!isStraight && findRouteDijkstra())
+	if (findRouteDijkstra())
+		return true;
+
+	// if the new pathfinder failed, try the old one..
+	_pathBackPositions.clear();
+	memset(_beenHere.getPixels(), 0, _beenHere.w * _beenHere.h * 2);
+	if (tryThisSquare(from, _dest, true))
+		return true;
+	// .. and again, in the other direction.
+	_pathBackPositions.clear();
+	memset(_beenHere.getPixels(), 0, _beenHere.w * _beenHere.h * 2);
+	if (tryThisSquare(from, _dest, false))
+		return true;
+
+	// No possible path found.
+	return false;
+}
+
+bool PathFinder::findNearestWalkableArea(const Graphics::Surface &tempMask, int startX, int startY, int endX, int endY, uint step) {
+	startX = MAX<int>(0, startX);
+	startY = MAX<int>(0, startY);
+	endX = MIN<int>(endX, tempMask.w - 1);
+	endY = MIN<int>(endY, tempMask.h - 1);
+
+	uint nearest = 99999;
+	Common::Point best;
+	for (int x = startX; x < endX; x += step) {
+		for (int y = startY; y < endY; y += step) {
+			if (*(byte *)tempMask.getBasePtr(x, y) != 232)
+				continue;
+
+			uint distance = (uint)sqrt((x - _dest.x) * (x - _dest.x) + (y - _dest.y) * (y - _dest.y));
+			if (distance < nearest) {
+				nearest = distance;
+				best = Common::Point(x, y);
+			}
+		}
+	}
+
+	if (nearest == 99999)
+		return false;
+
+	_dest = best;
+	return true;
+}
+
+static void floodFill(Graphics::Surface &surf, uint x, uint y, byte color) {
+	// TODO: Make this more efficient.
+
+	byte replace = *(byte *)surf.getBasePtr(x, y);
+	assert(replace != color);
+
+	Common::Queue<Common::Point> _queue;
+	_queue.push(Common::Point(x, y));
+
+	while (!_queue.empty()) {
+		Common::Point point = _queue.pop();
+		x = point.x;
+		y = point.y;
+		if (*(byte *)surf.getBasePtr(x, y) == color)
+			continue;
+		*(byte *)surf.getBasePtr(x, y) = color;
+
+		if (x > 0 && *(byte *)surf.getBasePtr(x - 1, y) == replace)
+			_queue.push(Common::Point(x - 1, y));
+		if (x + 1 < surf.w && *(byte *)surf.getBasePtr(x + 1, y) == replace)
+			_queue.push(Common::Point(x + 1, y));
+		if (y > 0 && *(byte *)surf.getBasePtr(x, y - 1) == replace)
+			_queue.push(Common::Point(x, y - 1));
+		if (y + 1 < surf.h && *(byte *)surf.getBasePtr(x, y + 1) == replace)
+			_queue.push(Common::Point(x, y + 1));
+	}
+}
+
+const int MAX_GRANULARITY = 3;
+
+// First, prepare our internal temporary walkable mask. Then, check if there's
+// a possible path, by flood-filling from the source and making sure the
+// destination gets filled. If it doesn't, try finding a nearby point which was.
+bool PathFinder::isRoutePossible(bool &foundNewCandidate) {
+	foundNewCandidate = false;
+
+	// If we're not *starting* from a walkable position, this will never work.
+	if (*(byte *)_mask->getBasePtr(_moveList->_from.x, _moveList->_from.y) == 0) {
+		warning("refusing to route from unwalkable point %d,%d", _moveList->_from.x, _moveList->_from.y);
+		return false;
+	}
+
+	Graphics::Surface tempMask;
+	tempMask.copyFrom(*_mask);
+
+	_walkAreaGranularity.resize(MAX_WALK_AREAS + 1);
+	uint walkAreaTimes[MAX_WALK_AREAS + 1];
+	for (uint i = 0; i < MAX_WALK_AREAS + 1; ++i) {
+		_walkAreaGranularity[i] = 0;
+		walkAreaTimes[i] = 0;
+	}
+
+	// calculate the maximum 'size' of each area
+	// TODO: shouldn't this really stop at the end of each row/column? and reset between orientations?
+	uint prevAreaType = 0;
+	uint inARow = 0;
+	for (uint y = 0; y < tempMask.h; ++y) {
+		for (uint x = 0; x < tempMask.w; ++x) {
+			uint areaType = *(byte *)tempMask.getBasePtr(x, y);
+			// TODO: verify the walkable mask before we get here, error check here would be silly
+			if (areaType == prevAreaType && inARow > 0)
+				inARow++;
+			else if (prevAreaType != 0) {
+				_walkAreaGranularity[prevAreaType] += inARow;
+				walkAreaTimes[prevAreaType]++;
+				inARow = 0;
+			}
+			prevAreaType = areaType;
+		}
+	}
+	for (uint x = 0; x < tempMask.w; ++x) {
+		for (uint y = 0; y < tempMask.h; ++y) {
+			uint areaType = *(byte *)tempMask.getBasePtr(x, y);
+			// overwrite the walkable areas with a uniform color
+			if (areaType)
+				*(byte *)tempMask.getBasePtr(x, y) = 1;
+			if (areaType == prevAreaType && inARow > 0)
+				inARow++;
+			else if (prevAreaType != 0) {
+				_walkAreaGranularity[prevAreaType] += inARow;
+				walkAreaTimes[prevAreaType]++;
+				inARow = 0;
+			}
+			prevAreaType = areaType;
+		}
+	}
+
+	// find the average "width" of a path in this walkable area
+	_walkAreaGranularity[0] = MAX_GRANULARITY;
+	for (uint i = 1; i <= MAX_WALK_AREAS; ++i) {
+		if (!walkAreaTimes[i]) {
+			// We didn't encounter *any* (useful) walkable areas of this type.
+			_walkAreaGranularity[i] = MAX_GRANULARITY;
+			continue;
+		}
+
+		_walkAreaGranularity[i] /= walkAreaTimes[i];
+		if (_walkAreaGranularity[i] <= 4)
+			_walkAreaGranularity[i] = 2;
+		else if (_walkAreaGranularity[i] <= 15)
+			_walkAreaGranularity[i] = 3;
+		else
+			_walkAreaGranularity[i] = MAX_GRANULARITY;
+	}
+
+	bool found = true;
+
+	floodFill(tempMask, _moveList->_from.x, _moveList->_from.y, 232);
+	if (*(byte *)tempMask.getBasePtr(_dest.x, _dest.y) != 232) {
+		// destination pixel is not reachable
+		found = false;
+		foundNewCandidate = true;
+
+		warning("%d, %d not reachable", _dest.x, _dest.y);
+
+		// try 100x100 square around the target, at 3-pixel granularity
+		if (!findNearestWalkableArea(tempMask, _dest.x - 50, _dest.y - 50, _dest.x + 50, _dest.y + 50, 3)) {
+			// then sweep the whole room at 5-pixel granularity
+			if (!findNearestWalkableArea(tempMask, 0, 0, tempMask.w, tempMask.h, 5))
+				foundNewCandidate = false;
+		}
+
+		if (foundNewCandidate)
+			warning("now using %d, %d", _dest.x, _dest.y);
+	}
+
+	tempMask.free();
+	return found;
+}
+
+// Round down the supplied co-ordinates to the area granularity,
+// and move a bit if this causes them to become non-walkable
+Common::Point PathFinder::roundDownCoordinates(Common::Point pos) {
+	int startGranularity = _walkAreaGranularity[*(byte *)_mask->getBasePtr(pos.x, pos.y)];
+
+	pos.y = pos.y - pos.y % startGranularity;
+	if (pos.y < 0)
+		pos.y = 0;
+	pos.x = pos.x - pos.x % startGranularity;
+	if (pos.x < 0)
+		pos.x = 0;
+
+	// We try one step to the right, one step down, then one step back left.
+	if (*(byte *)_mask->getBasePtr(pos.x, pos.y) == 0) {
+		pos.x += startGranularity;
+		if ((pos.y < _mask->h - startGranularity) && *(byte *)_mask->getBasePtr(pos.x, pos.y) == 0) {
+			pos.y += startGranularity;
+			if (*(byte *)_mask->getBasePtr(pos.x, pos.y) == 0)
+				pos.x -= startGranularity;
+		}
+	}
+
+	return pos;
+}
+
+// replaces the 'CHECK_MIN' macro in the original:
+// Update our state to account for the specified cell and adjacent neighbor,
+// and return true if we bothered making the check.
+bool PathFinder::dijkstraCheckNeighbor(uint x, uint y, uint nX, uint nY, int modifier, int &min, Common::Array<uint> &found, Common::Array<uint> &cheapest) {
+	// Neighbor finished already?
+	if (*(int16 *)_beenHere.getBasePtr(nX, nY) != -1)
+		return false;
+
+	// Neighbor not walkable?
+	if (*(byte *)_mask->getBasePtr(nX, nY) == 0)
+		return true;
+
+	// Cost of the cell?
+	int ourValue = *(int16 *)_beenHere.getBasePtr(x, y) + modifier;
+
+	// More expensive than what we already saw?
+	if (ourValue > min)
+		return true;
+
+	if (ourValue < min) {
+		// New minimum path length found. Clear any found nodes.
+		min = ourValue;
+		found.clear();
+		cheapest.clear();
+	}
+
+	// TODO: Agh, this is actually necessary, otherwise it spends forever checking the same cells.
+	if (found.size() >= 40)
+		return true;
+
+	// Add the neighbor and cell to the lists, if we're the cheapest path to it so far.
+	found.push_back(nX + (nY * _beenHere.w));
+	cheapest.push_back(x + (y * _beenHere.w));
+
+	return true;
+}
+
+// Try to find a route using A*.
+bool PathFinder::findRouteDijkstra() {
+	Common::Point from = roundDownCoordinates(_moveList->_from);
+
+	// already at destination, once adjusted?
+	if (from == roundDownCoordinates(_dest))
+		return true;
+
+	memset(_beenHere.getPixels(), 0xff, _beenHere.w * _beenHere.h * 2);
+	*(int16 *)_beenHere.getBasePtr(from.x, from.y) = 0;
+
+	// We store the previously-visited 'parent' cells here, for later tracing back.
+	Graphics::Surface parent;
+	parent.create(_beenHere.w, _beenHere.h, Graphics::PixelFormat(4, 0, 0, 0, 0, 0, 0, 0, 0));
+	uint *parentVals = (uint *)parent.getPixels();
+
+	// This is a list of the visited cell positions, in order.
+	uint visited[5000];
+	visited[0] = (from.y * parent.w) + from.x;
+	parentVals[visited[0]] = (uint)-1;
+
+	uint iteration = 1;
+	uint totalFound = 0;
+	int directionBonus = 0;
+
+	uint foundAnswer = (uint)-1;
+	while (iteration < 5000 && foundAnswer == (uint)-1) {
+		// TODO: Make these a single array?
+		Common::Array<uint> found;
+		Common::Array<uint> cheapest;
+
+		Common::Array<uint> replace;
+
+		int min = 29999;
+		uint changeIter = iteration;
+
+		// Update each visited cell, to take into account newly-visited neighbours.
+		for (uint i = 0; i < iteration; ++i) {
+			// Skip already-exhausted cells.
+			if (visited[i] == (uint)-1)
+				continue;
+
+			int x = visited[i] % parent.w;
+			int y = visited[i] / parent.w;
+			int granularity = _walkAreaGranularity[*(byte *)_mask->getBasePtr(x, y)];
+
+			bool updated = false;
+
+			if (x >= granularity)
+				updated |= dijkstraCheckNeighbor(x, y, x - granularity, y, (_dest.x < x) ? directionBonus : 0,
+					min, found, cheapest);
+
+			if (y >= granularity)
+				updated |= dijkstraCheckNeighbor(x, y, x, y - granularity, (_dest.y < y) ? directionBonus : 0,
+					min, found, cheapest);
+
+			if (x < _mask->w - granularity)
+				updated |= dijkstraCheckNeighbor(x, y, x + granularity, y, (_dest.x > x) ? directionBonus : 0,
+					min, found, cheapest);
+
+			if (y < _mask->h - granularity)
+				updated |= dijkstraCheckNeighbor(x, y, x, y + granularity, (_dest.y > y) ? directionBonus : 0,
+					min, found, cheapest);
+
+			if (!updated) {
+				// If all the adjacent cells have been done, stop checking this one
+				visited[replace.size()] = (uint)-1;
+				assert(i < 5000);
+				replace.push_back(i);
+			}
+		}
+
+		if (found.empty()) {
+			// No further candidates, give up.
+			parent.free();
+			return false;
+		}
+
+		totalFound += found.size();
+
+		for (uint i = 0; i < found.size(); ++i) {
+			int newX = found[i] % _mask->w;
+			int newY = found[i] / _mask->w;
+
+			assert(found[i] != cheapest[i]);
+
+			// Cost of this cell = cost of cheapest adjacent neighbor + 1.
+			uint cheapestX = cheapest[i] % _mask->w;
+			uint cheapestY = cheapest[i] / _mask->w;
+			*(int16 *)_beenHere.getBasePtr(newX, newY) = *(int16 *)_beenHere.getBasePtr(cheapestX, cheapestY) + 1;
+
+			// And that neighbor is our 'parent'.
+			parentVals[found[i]] = cheapest[i];
+
+			// The edges of the screen pose a problem, so if the current position
+			// and the destination are both within a certain distance of the edge,
+			// just snap to the destination.
+			if ((newX >= _mask->w - MAX_GRANULARITY) && (_dest.x >= _mask->w - MAX_GRANULARITY))
+				newX = _dest.x;
+			if ((newY >= _mask->h - MAX_GRANULARITY) && (_dest.y >= _mask->h - MAX_GRANULARITY))
+				newY = _dest.y;
+
+			if ((newX >= _dest.x - MAX_GRANULARITY) && (newX <= _dest.x + MAX_GRANULARITY) &&
+				(newY >= _dest.y - MAX_GRANULARITY) && (newY <= _dest.y + MAX_GRANULARITY)) {
+				// We're close enough to the destination, hoorah, done!
+				foundAnswer = found[i];
+				break;
+			}
+
+			if (totalFound >= 1000) {
+				// Ever so often, check if we can see the destination.
+				// TODO: This seems silly, and original says "Doesn't work cos it
+				// can see the destination from the point that's not nearest".
+				if (canSee(Common::Point(newX, newY), _dest, _mask)) {
+					directionBonus -= 50;
+					totalFound = 0;
+				}
+			}
+
+			if (!replace.empty()) {
+				changeIter = replace.back();
+				replace.pop_back();
+			} else
+				changeIter = iteration;
+
+			visited[changeIter] = found[i];
+			if (changeIter == iteration)
+				iteration++;
+
+			changeIter = iteration;
+
+			// Make sure we don't violate the outer loop condition.
+			if (iteration >= 5000)
+				break;
+		}
+
+		if (totalFound >= 1000)
+			totalFound = 0;
+	}
+
+	if (iteration >= 5000) {
+		// Too many iterations, give up.
+		parent.free();
+		return false;
+	}
+
+	_pathBackPositions.push_back(_finalStep);
+
+	for (uint on = parentVals[foundAnswer]; on != (uint)-1; on = parentVals[on]) {
+		assert(parentVals[on] != on);
+
+		int newX = on % _mask->w;
+		int newY = on / _mask->w;
+
+		// Done?
+		if ((newX >= _dest.x - MAX_GRANULARITY) && (newX <= _dest.x + MAX_GRANULARITY) &&
+			(newY >= _dest.y - MAX_GRANULARITY) && (newY <= _dest.y + MAX_GRANULARITY))
+			break;
+
+		_pathBackPositions.push_back(Common::Point(newX, newY));
+	}
+
+	parent.free();
+	return true;
+}
+
+bool PathFinder::tryThisSquare(const Common::Point &from, const Common::Point &to, bool goingRight) {
+	return false; // FIXME
 }
 
 bool PathFinder::constructPath() {
@@ -195,22 +620,22 @@ bool PathFinder::constructPath() {
 	_moveList->_stages.back().pos = pos;
 
 	uint lastRelevantPosIndex = _pathBackPositions.size();
-	while (true) {
+	while (lastRelevantPosIndex != 0) {
 		bool foundPos = false;
 		uint nearestPosIndex;
 
 		// find the furthest point that can be seen from this stage,
 		// by walking backwards through the position list
 		for (int i = lastRelevantPosIndex - 1; i >= 0; --i) {
-			if (canSee(pos, _pathBackPositions[i])) {
+			if (canSee(pos, _pathBackPositions[i], _mask)) {
 				foundPos = true;
 				nearestPosIndex = i;
 			}
 		}
 
-		if (!_pathBackPositions.empty() && !foundPos) {
+		if (!foundPos && lastRelevantPosIndex != 0) {
 			// If we have a path but we didn't find any next stage we could see..
-			if (!canSee(pos, _dest)) {
+			if (!canSee(pos, _dest, _mask)) {
 				// We're stuck in a corner so advance to the next square anyway.
 				if (pos.x >= 0 && pos.y >= 0 && pos.x < _mask->w && pos.y < _mask->h) {
 					// (but only if they're on the screen)
@@ -224,6 +649,7 @@ bool PathFinder::constructPath() {
 			break;
 
 		pos = _pathBackPositions[nearestPosIndex];
+		lastRelevantPosIndex = nearestPosIndex;
 		_moveList->_stages.push_back(MoveStage());
 		_moveList->_stages.back().pos = pos;
 	}
@@ -239,11 +665,13 @@ bool PathFinder::constructPath() {
 		_moveList->_stages.back().pos = _dest;
 	}
 
-	if (_moveList->_stages.size() == 1)
+	// If we have a single step and the starting point is destination, done.
+	// (The alternative for a single step is that the destination was modified.)
+	if (_moveList->_stages.size() == 1 && _moveList->_from == _dest)
 		return false;
 
 	for (uint i = 0; i < _moveList->_stages.size() - 1; ++i)
-		calculateMoveStage(i);
+		_moveList->calculateMoveStage(i);
 
 	return true;
 }
@@ -258,9 +686,9 @@ static frac_t fracDiv(frac_t a, frac_t b) {
 }
 
 // Calculate the x/y movement per frame, for this stage (moving to the one after it) of the movelist.
-void PathFinder::calculateMoveStage(uint stageId) {
-	MoveStage &stage = _moveList->_stages[stageId];
-	MoveStage &nextStage = _moveList->_stages[stageId + 1];
+void MoveList::calculateMoveStage(uint stageId) {
+	MoveStage &stage = _stages[stageId];
+	MoveStage &nextStage = _stages[stageId + 1];
 
 	if (stage.pos == nextStage.pos) {
 		stage.xPerMove = 0;
@@ -321,7 +749,12 @@ void PathFinder::calculateMoveStage(uint stageId) {
 	stage.yPerMove = newYMove;
 }
 
-#define BITMAP PathFinder
+struct CanSeeInfo {
+	const Graphics::Surface *mask;
+	bool lineFailed;
+	Common::Point *lastGoodPos;
+};
+#define BITMAP CanSeeInfo
 // The following function is copied (without change) from Allegro 4.4.2.
 
 /* do_line:
@@ -417,22 +850,29 @@ void do_line(BITMAP *bmp, int x1, int y1, int x2, int y2, int d, void (*proc)(BI
 
 // Mark a line as failed if it goes outside the mask boundaries,
 // or if the mask is zero (blocked/unwalkable).
-void lineCallback(PathFinder *pathfinder, int x, int y, int) {
-	if (x < 0 || y < 0 || x >= pathfinder->_mask->w || y >= pathfinder->_mask->h)
-		pathfinder->_lineFailed = true;
-	else if (*(byte *)pathfinder->_mask->getBasePtr(x, y) == 0)
-		pathfinder->_lineFailed = true;
+void lineCallback(CanSeeInfo *info, int x, int y, int) {
+	if (x < 0 || y < 0 || x >= info->mask->w || y >= info->mask->h)
+		info->lineFailed = true;
+	else if (*(byte *)info->mask->getBasePtr(x, y) == 0)
+		info->lineFailed = true;
+	else if (!info->lineFailed && info->lastGoodPos) {
+		info->lastGoodPos->x = x;
+		info->lastGoodPos->y = y;
+	}
 }
 
-bool PathFinder::canSee(const Common::Point &from, const Common::Point &to) {
-	_lineFailed = false;
-
+bool canSee(const Common::Point &from, const Common::Point &to, const Graphics::Surface *mask, Common::Point *lastGoodPos) {
 	if (from == to)
 		return true;
 
-	do_line(this, from.x, from.y, to.x, to.y, 0, lineCallback);
+	CanSeeInfo info;
+	info.mask = mask;
+	info.lineFailed = false;
+	info.lastGoodPos = lastGoodPos;
 
-	return !_lineFailed;
+	do_line(&info, from.x, from.y, to.x, to.y, 0, lineCallback);
+
+	return !info.lineFailed;
 }
 
 bool findPath(AGSEngine *vm, const Common::Point &from, const Common::Point &to, const Graphics::Surface *mask,
@@ -445,29 +885,24 @@ bool findPath(AGSEngine *vm, const Common::Point &from, const Common::Point &to,
 	moveList->_curPart = 0;
 	moveList->_doneX = false;
 	moveList->_doneY = false;
+	moveList->setRouteMoveSpeed(speedX, speedY);
 
 	// Construct a pathfinder.
 	PathFinder pathfinder;
 	pathfinder._mask = mask;
 	pathfinder._moveList = moveList;
 	pathfinder._dest = to;
-	pathfinder._beenHere = new int16[mask->w * mask->h];
-	pathfinder._goingLeft = false;
+	pathfinder._beenHere.create(mask->w, mask->h, Graphics::PixelFormat(2, 0, 0, 0, 0, 0, 0, 0, 0));
 	pathfinder._hasFinalStep = false;
-
-	pathfinder.setRouteMoveSpeed(speedX, speedY);
 
 	// Find a path.
 	bool foundPath = true;
-	/* FIXME if (!ignoreWalls && !pathfinder.canSee(from, to)) {
-		if (!pathfinder.findPath(to, onlyIfDestAllowed)) {
-			pathfinder._goingLeft = true;
-			if (!pathfinder.findPath(to, onlyIfDestAllowed)) {
-				// give up
-				foundPath = false;
-			}
+	if (!ignoreWalls && !canSee(from, to, mask)) {
+		if (!pathfinder.findPath(onlyIfDestAllowed)) {
+			// give up
+			foundPath = false;
 		}
-	} */
+	}
 
 	// Construct the path.
 	if (foundPath)
@@ -477,7 +912,7 @@ bool findPath(AGSEngine *vm, const Common::Point &from, const Common::Point &to,
 		moveList->convertToHighRes(vm->_graphics->_screenResolutionMultiplier);
 
 	// Done!
-	delete[] pathfinder._beenHere;
+	pathfinder._beenHere.free();
 	return foundPath;
 }
 

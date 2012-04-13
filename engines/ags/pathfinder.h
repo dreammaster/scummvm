@@ -57,10 +57,15 @@ struct MoveList {
 	// doneflag&1 == _doneX, doneflag&2 == _doneY
 	bool _doneX, _doneY;
 
+	frac_t _moveSpeedX, _moveSpeedY;
+
+	void setRouteMoveSpeed(int x, int y);
 	void convertToHighRes(uint multiplier);
 	bool doStep(Common::Point &pos);
+	void calculateMoveStage(uint stageId);
 };
 
+bool canSee(const Common::Point &from, const Common::Point &to, const Graphics::Surface *mask, Common::Point *lastGoodPos = NULL);
 bool findPath(class AGSEngine *vm, const Common::Point &from, const Common::Point &to, const Graphics::Surface *mask,
 	MoveList *moveList, int speedX, int speedY, bool onlyIfDestAllowed, bool ignoreWalls);
 
