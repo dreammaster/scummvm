@@ -25,7 +25,10 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/character.h"
+#include "engines/ags/constants.h"
 #include "engines/ags/gamefile.h"
+#include "engines/ags/graphics.h"
 #include "engines/ags/inventory.h"
 
 namespace AGS {
@@ -42,29 +45,26 @@ RuntimeValue Script_GetInvAt(AGSEngine *vm, ScriptObject *, const Common::Array<
 // import int GetInvProperty(int invItem, const string property)
 // Obsolete inventory function.
 RuntimeValue Script_GetInvProperty(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int invItem = params[0]._signedValue;
-	UNUSED(invItem);
+	uint invItem = params[0]._value;
 	ScriptString *property = (ScriptString *)params[1]._object;
-	UNUSED(property);
 
-	// FIXME
-	error("GetInvProperty unimplemented");
+	if (invItem >= vm->_gameFile->_invItemInfo.size())
+		error("GetInvProperty: item %d is too high (only have %d)", invItem, vm->_gameFile->_invItemInfo.size());
 
-	return RuntimeValue();
+	return vm->getIntProperty(property->getString(), vm->_gameFile->_invItemInfo[invItem]._properties);
 }
 
 // import void GetInvPropertyText(int invItem, const string property, string buffer)
 // Obsolete inventory function.
 RuntimeValue Script_GetInvPropertyText(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int invItem = params[0]._signedValue;
-	UNUSED(invItem);
+	uint invItem = params[0]._value;
 	ScriptString *property = (ScriptString *)params[1]._object;
-	UNUSED(property);
 	ScriptString *buffer = (ScriptString *)params[2]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("GetInvPropertyText unimplemented");
+	if (invItem >= vm->_gameFile->_invItemInfo.size())
+		error("GetInvPropertyText: item %d is too high (only have %d)", invItem, vm->_gameFile->_invItemInfo.size());
+
+	buffer->setString(vm->getStringProperty(property->getString(), vm->_gameFile->_invItemInfo[invItem]._properties));
 
 	return RuntimeValue();
 }
@@ -86,25 +86,44 @@ RuntimeValue Script_GetInvName(AGSEngine *vm, ScriptObject *, const Common::Arra
 // import int GetInvGraphic(int item)
 // Obsolete inventory function.
 RuntimeValue Script_GetInvGraphic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int item = params[0]._signedValue;
+	uint item = params[0]._value;
 	UNUSED(item);
 
-	// FIXME
-	error("GetInvGraphic unimplemented");
+	if (item >= vm->_gameFile->_invItemInfo.size())
+		error("GetInvGraphic: item %d is too high (only have %d)", item, vm->_gameFile->_invItemInfo.size());
 
-	return RuntimeValue();
+	return vm->_gameFile->_invItemInfo[item]._pic;
 }
 
 // import void SetInvItemPic(int item, int spriteSlot)
 // Obsolete inventory function.
 RuntimeValue Script_SetInvItemPic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int item = params[0]._signedValue;
-	UNUSED(item);
-	int spriteSlot = params[1]._signedValue;
-	UNUSED(spriteSlot);
+	uint item = params[0]._value;
+	uint spriteSlot = params[1]._value;
 
-	// FIXME
-	error("SetInvItemPic unimplemented");
+	if (item >= vm->_gameFile->_invItemInfo.size())
+		error("SetInvItemPic: item %d is too high (only have %d)", item, vm->_gameFile->_invItemInfo.size());
+
+	// TODO: sanity-check spriteSlot
+
+	InventoryItem &invItem = vm->_gameFile->_invItemInfo[item];
+	if (invItem._pic == spriteSlot)
+		return RuntimeValue();
+
+	if (invItem._pic == invItem._cursorPic) {
+		// Backwards compatibility -- there didn't used to be a cursorPic,
+		// so if they're the same update both.
+
+		invItem._cursorPic = spriteSlot;
+
+		if (vm->_graphics->getCurrentCursor() == MODE_USE && vm->getPlayerChar()->_activeInv == item) {
+			vm->updateInvCursor(item);
+			vm->_graphics->setMouseCursor(vm->_graphics->getCurrentCursor());
+		}
+	}
+
+	invItem._pic = spriteSlot;
+	vm->invalidateGUI();
 
 	return RuntimeValue();
 }
@@ -112,13 +131,16 @@ RuntimeValue Script_SetInvItemPic(AGSEngine *vm, ScriptObject *, const Common::A
 // import void SetInvItemName(int item, const string name)
 // Obsolete inventory function.
 RuntimeValue Script_SetInvItemName(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int item = params[0]._signedValue;
-	UNUSED(item);
+	uint item = params[0]._value;
 	ScriptString *name = (ScriptString *)params[1]._object;
-	UNUSED(name);
 
-	// FIXME
-	error("SetInvItemName unimplemented");
+	if (item >= vm->_gameFile->_invItemInfo.size())
+		error("SetInvItemName: item %d is too high (only have %d)", item, vm->_gameFile->_invItemInfo.size());
+
+	vm->_gameFile->_invItemInfo[item]._name = name->getString();
+
+	// might need to redraw the GUI if it has the inv item name on it
+	vm->invalidateGUI();
 
 	return RuntimeValue();
 }
@@ -152,8 +174,7 @@ RuntimeValue Script_RunInventoryInteraction(AGSEngine *vm, ScriptObject *, const
 // import void UpdateInventory()
 // Refreshes the on-screen inventory display.
 RuntimeValue Script_UpdateInventory(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("UpdateInventory unimplemented");
+	vm->updateInvOrder();
 
 	return RuntimeValue();
 }
@@ -175,46 +196,35 @@ RuntimeValue Script_InventoryItem_GetAtScreenXY(AGSEngine *vm, ScriptObject *, c
 // Gets an integer custom property for this item.
 RuntimeValue Script_InventoryItem_GetProperty(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *property = (ScriptString *)params[0]._object;
-	UNUSED(property);
 
-	// FIXME
-	error("InventoryItem::GetProperty unimplemented");
-
-	return RuntimeValue();
+	return vm->getIntProperty(property->getString(), self->_properties);
 }
 
 // InventoryItem: import String GetTextProperty(const string property)
 // Gets a text custom property for this item.
 RuntimeValue Script_InventoryItem_GetTextProperty(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *property = (ScriptString *)params[0]._object;
-	UNUSED(property);
 
-	// FIXME
-	error("InventoryItem::GetTextProperty unimplemented");
-
-	return RuntimeValue();
+	Common::String string = vm->getStringProperty(property->getString(), self->_properties);
+	RuntimeValue ret = new ScriptMutableString(string);
+	ret._object->DecRef();
+	return ret;
 }
 
 // InventoryItem: import int IsInteractionAvailable(CursorMode)
 // Checks whether an event handler has been registered for clicking on this item in the specified cursor mode.
 RuntimeValue Script_InventoryItem_IsInteractionAvailable(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
 
-	// FIXME
-	error("InventoryItem::IsInteractionAvailable unimplemented");
-
-	return RuntimeValue();
+	return vm->runInventoryInteraction(self->_id, cursormode, true) ? 1 : 0;
 }
 
 // InventoryItem: import void RunInteraction(CursorMode)
 // Runs the registered event handler for this item.
 RuntimeValue Script_InventoryItem_RunInteraction(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
 
-	// FIXME
-	error("InventoryItem::RunInteraction unimplemented");
+	vm->runInventoryInteraction(self->_id, cursormode);
 
 	return RuntimeValue();
 }
@@ -228,11 +238,14 @@ RuntimeValue Script_InventoryItem_get_CursorGraphic(AGSEngine *vm, InventoryItem
 // InventoryItem: import attribute int CursorGraphic
 // Gets/sets the sprite used as the item's mouse cursor.
 RuntimeValue Script_InventoryItem_set_CursorGraphic(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint value = params[0]._signedValue;
 
-	// FIXME
-	error("InventoryItem::set_CursorGraphic unimplemented");
+	self->_cursorPic = value;
+
+	if (vm->_graphics->getCurrentCursor() == MODE_USE && vm->getPlayerChar()->_activeInv == self->_id) {
+		vm->updateInvCursor(self->_id);
+		vm->_graphics->setMouseCursor(vm->_graphics->getCurrentCursor());
+	}
 
 	return RuntimeValue();
 }
@@ -246,11 +259,29 @@ RuntimeValue Script_InventoryItem_get_Graphic(AGSEngine *vm, InventoryItem *self
 // InventoryItem: import attribute int Graphic
 // Gets/sets the sprite used to display the inventory item.
 RuntimeValue Script_InventoryItem_set_Graphic(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint value = params[0]._value;
 
-	// FIXME
-	error("InventoryItem::set_Graphic unimplemented");
+	// TODO: mostly the same as SetInvItemPic
+
+	// TODO: sanity-check value
+
+	if (self->_pic == value)
+		return RuntimeValue();
+
+	if (self->_pic == self->_cursorPic) {
+		// Backwards compatibility -- there didn't used to be a cursorPic,
+		// so if they're the same update both.
+
+		self->_cursorPic = value;
+
+		if (vm->_graphics->getCurrentCursor() == MODE_USE && vm->getPlayerChar()->_activeInv == self->_id) {
+			vm->updateInvCursor(self->_id);
+			vm->_graphics->setMouseCursor(vm->_graphics->getCurrentCursor());
+		}
+	}
+
+	self->_pic = value;
+	vm->invalidateGUI();
 
 	return RuntimeValue();
 }
@@ -264,20 +295,20 @@ RuntimeValue Script_InventoryItem_get_ID(AGSEngine *vm, InventoryItem *self, con
 // InventoryItem: import attribute String Name
 // Gets/sets the name of the inventory item.
 RuntimeValue Script_InventoryItem_get_Name(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("InventoryItem::get_Name unimplemented");
-
-	return RuntimeValue();
+	RuntimeValue ret = new ScriptMutableString(vm->getTranslation(self->_name));
+	ret._object->DecRef();
+	return ret;
 }
 
 // InventoryItem: import attribute String Name
 // Gets/sets the name of the inventory item.
 RuntimeValue Script_InventoryItem_set_Name(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *value = (ScriptString *)params[0]._object;
-	UNUSED(value);
 
-	// FIXME
-	error("InventoryItem::set_Name unimplemented");
+	self->_name = value->getString();
+
+	// might need to redraw the GUI if it has the inv item name on it
+	vm->invalidateGUI();
 
 	return RuntimeValue();
 }
@@ -286,10 +317,8 @@ RuntimeValue Script_InventoryItem_set_Name(AGSEngine *vm, InventoryItem *self, c
 // Undocumented.
 RuntimeValue Script_InventoryItem_GetName(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *buffer = (ScriptString *)params[0]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("InventoryItem::GetName unimplemented");
+	buffer->setString(self->_name);
 
 	return RuntimeValue();
 }
@@ -298,12 +327,9 @@ RuntimeValue Script_InventoryItem_GetName(AGSEngine *vm, InventoryItem *self, co
 // Undocumented.
 RuntimeValue Script_InventoryItem_GetPropertyText(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *property = (ScriptString *)params[0]._object;
-	UNUSED(property);
 	ScriptString *buffer = (ScriptString *)params[1]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("InventoryItem::GetPropertyText unimplemented");
+	buffer->setString(vm->getStringProperty(property->getString(), self->_properties));
 
 	return RuntimeValue();
 }
@@ -312,10 +338,11 @@ RuntimeValue Script_InventoryItem_GetPropertyText(AGSEngine *vm, InventoryItem *
 // Undocumented.
 RuntimeValue Script_InventoryItem_SetName(AGSEngine *vm, InventoryItem *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *newName = (ScriptString *)params[0]._object;
-	UNUSED(newName);
 
-	// FIXME
-	error("InventoryItem::SetName unimplemented");
+	self->_name = newName->getString();
+
+	// might need to redraw the GUI if it has the inv item name on it
+	vm->invalidateGUI();
 
 	return RuntimeValue();
 }

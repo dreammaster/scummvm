@@ -370,10 +370,7 @@ RuntimeValue Script_Game_get_InSkippableCutscene(AGSEngine *vm, ScriptObject *, 
 // Game: readonly import static attribute int InventoryItemCount
 // Gets the number of inventory items in the game.
 RuntimeValue Script_Game_get_InventoryItemCount(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Game::get_InventoryItemCount unimplemented");
-
-	return RuntimeValue();
+	return vm->_gameFile->_invItemInfo.size();
 }
 
 // Game: import static attribute int MinimumTextDisplayTimeMs

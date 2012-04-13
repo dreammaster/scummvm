@@ -2268,6 +2268,16 @@ bool AGSEngine::init() {
 		}
 	}
 
+	const uint IFLG_STARTWITH = 1;
+	for (uint i = 0; i < _gameFile->_invItemInfo.size(); ++i) {
+		if (_gameFile->_invItemInfo[i]._flags & IFLG_STARTWITH)
+			_characters[_gameFile->_playerChar]->_inventory[i] = 1;
+		else
+			_characters[_gameFile->_playerChar]->_inventory[i] = 0;
+	}
+
+	updateInvOrder();
+
 	adjustSizesForResolution();
 	resortGUIs();
 
@@ -2290,7 +2300,7 @@ bool AGSEngine::init() {
 			_scriptState->addSystemObjectImport(group._controls[j]->_scriptName, group._controls[j]);
 		}
 	}
-	_scriptState->addSystemObjectImport("inventory", new ScriptObjectArray<InventoryItem>(&_gameFile->_invItemInfo, 68, "InventoryItem"));
+	_scriptState->addSystemObjectImport("inventory", new ScriptObjectArray<InventoryItem>(&_gameFile->_invItemInfo, 8, "InventoryItem"));
 	for (uint i = 0; i < _gameFile->_invItemInfo.size(); ++i) {
 		InventoryItem &invItem = _gameFile->_invItemInfo[i];
 		_scriptState->addSystemObjectImport(invItem._scriptName, &invItem);
@@ -2518,6 +2528,29 @@ void AGSEngine::updateInvCursor(uint itemId) {
 	_gameFile->_cursors[MODE_USE]._pic = cursorSprite;
 
 	// FIXME: hotspot
+}
+
+void AGSEngine::updateInvOrder() {
+	for (uint i = 0; i < _characters.size(); ++i) {
+		Character *chr = _characters[i];
+
+		// Recreate the invOrder list by checking the character's inventory.
+		chr->_invOrder.clear();
+		for (uint itemId = 0; itemId < _gameFile->_invItemInfo.size(); ++itemId) {
+			uint count = chr->_inventory[itemId];
+			if (!getGameOption(OPT_DUPLICATEINV) && (count > 0))
+				count = 1;
+
+			for (uint n = 0; n < count; ++n) {
+				chr->_invOrder.push_back(itemId);
+			}
+		}
+	}
+
+	// backwards compatibility
+	_state->_invNumOrder = _characters[_gameFile->_playerChar]->_invOrder.size();
+
+	invalidateGUI();
 }
 
 // 'update_gui_zorder'

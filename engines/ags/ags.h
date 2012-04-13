@@ -220,6 +220,8 @@ public:
 	void disableCursorMode(uint cursorId);
 	void updateInvCursor(uint itemId);
 
+	void updateInvOrder();
+
 	void resortGUIs();
 	uint getGUIAt(const Common::Point &pos);
 	void removePopupInterface(uint guiId);
