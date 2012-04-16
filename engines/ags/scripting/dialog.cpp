@@ -25,21 +25,43 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/constants.h"
+#include "engines/ags/gamefile.h"
+#include "engines/ags/gamestate.h"
 
 namespace AGS {
+
+enum DialogOptionsState {
+	kDialogOptionOff = 0,
+	kDialogOptionOn = 1,
+	kDialogOptionOffForever = 2
+};
 
 // import void SetDialogOption(int topic, int option, DialogOptionState)
 // Undocumented.
 RuntimeValue Script_SetDialogOption(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int topic = params[0]._signedValue;
-	UNUSED(topic);
-	int option = params[1]._signedValue;
-	UNUSED(option);
-	uint32 dialogoptionstate = params[2]._value;
-	UNUSED(dialogoptionstate);
+	uint topic = params[0]._value;
+	uint option = params[1]._value;
+	uint32 state = params[2]._value;
 
-	// FIXME
-	error("SetDialogOption unimplemented");
+	// TODO: duplicates most of Dialog::SetOptionState
+
+	if (topic >= vm->_gameFile->_dialogs.size())
+		error("SetDialogOption: topic %d is too high (only have %d)", topic, vm->_gameFile->_dialogs.size());
+
+	DialogTopic *dialogTopic = &vm->_gameFile->_dialogs[topic];
+
+	option--;
+	if (option >= dialogTopic->_options.size())
+		error("SetDialogOption: option %d is too high (only have %d)", option, dialogTopic->_options.size());
+
+	dialogTopic->_options[option]._flags &= ~DFLG_ON;
+	if (!(dialogTopic->_options[option]._flags & DFLG_OFFPERM)) {
+		if (state == kDialogOptionOn)
+			dialogTopic->_options[option]._flags |= DFLG_ON;
+		else if (state == kDialogOptionOffForever)
+			dialogTopic->_options[option]._flags |= DFLG_OFFPERM;
+	}
 
 	return RuntimeValue();
 }
@@ -47,13 +69,26 @@ RuntimeValue Script_SetDialogOption(AGSEngine *vm, ScriptObject *, const Common:
 // import DialogOptionState GetDialogOption(int topic, int option)
 // Undocumented.
 RuntimeValue Script_GetDialogOption(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int topic = params[0]._signedValue;
-	UNUSED(topic);
-	int option = params[1]._signedValue;
-	UNUSED(option);
+	uint topic = params[0]._value;
+	uint option = params[1]._value;
 
-	// FIXME
-	error("GetDialogOption unimplemented");
+	// TODO: duplicates most of Dialog::GetOptionState
+
+	if (topic >= vm->_gameFile->_dialogs.size())
+		error("GetDialogOption: topic %d is too high (only have %d)", topic, vm->_gameFile->_dialogs.size());
+
+	DialogTopic *dialogTopic = &vm->_gameFile->_dialogs[topic];
+
+	option--;
+	if (option >= dialogTopic->_options.size())
+		error("GetDialogOption: option %d is too high (only have %d)", option, dialogTopic->_options.size());
+
+	if (dialogTopic->_options[option]._flags & DFLG_OFFPERM)
+		return kDialogOptionOffForever;
+	else if (dialogTopic->_options[option]._flags & DFLG_ON)
+		return kDialogOptionOn;
+	else
+		return kDialogOptionOff;
 
 	return RuntimeValue();
 }
@@ -71,15 +106,17 @@ RuntimeValue Script_RunDialog(AGSEngine *vm, ScriptObject *, const Common::Array
 // import void StopDialog()
 // From within dialog_request, tells AGS not to return to the dialog after this function ends.
 RuntimeValue Script_StopDialog(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("StopDialog unimplemented");
+	if (vm->_state->_stopDialogAtEnd == DIALOG_NONE)
+		warning("StopDialog was called while not in a dialog");
+	else
+		vm->_state->_stopDialogAtEnd = DIALOG_STOP;
 
 	return RuntimeValue();
 }
 
 // Dialog: import int DisplayOptions(DialogOptionSayStyle = eSayUseOptionSetting)
 // Displays the options for this dialog and returns which one the player selected.
-RuntimeValue Script_Dialog_DisplayOptions(AGSEngine *vm, Dialog *self, const Common::Array<RuntimeValue> &params) {
+RuntimeValue Script_Dialog_DisplayOptions(AGSEngine *vm, DialogTopic *self, const Common::Array<RuntimeValue> &params) {
 	uint32 dialogoptionsaystyle = params[0]._value;
 	UNUSED(dialogoptionsaystyle);
 
@@ -91,88 +128,94 @@ RuntimeValue Script_Dialog_DisplayOptions(AGSEngine *vm, Dialog *self, const Com
 
 // Dialog: import DialogOptionState GetOptionState(int option)
 // Gets the enabled state for the specified option in this dialog.
-RuntimeValue Script_Dialog_GetOptionState(AGSEngine *vm, Dialog *self, const Common::Array<RuntimeValue> &params) {
-	int option = params[0]._signedValue;
-	UNUSED(option);
+RuntimeValue Script_Dialog_GetOptionState(AGSEngine *vm, DialogTopic *self, const Common::Array<RuntimeValue> &params) {
+	uint option = params[0]._value;
 
-	// FIXME
-	error("Dialog::GetOptionState unimplemented");
+	option--;
+	if (option >= self->_options.size())
+		error("Dialog::GetOptionState: option %d is too high (only have %d)", option, self->_options.size());
+
+	if (self->_options[option]._flags & DFLG_OFFPERM)
+		return kDialogOptionOffForever;
+	else if (self->_options[option]._flags & DFLG_ON)
+		return kDialogOptionOn;
+	else
+		return kDialogOptionOff;
 
 	return RuntimeValue();
 }
 
 // Dialog: import String GetOptionText(int option)
 // Gets the text of the specified option in this dialog.
-RuntimeValue Script_Dialog_GetOptionText(AGSEngine *vm, Dialog *self, const Common::Array<RuntimeValue> &params) {
-	int option = params[0]._signedValue;
-	UNUSED(option);
+RuntimeValue Script_Dialog_GetOptionText(AGSEngine *vm, DialogTopic *self, const Common::Array<RuntimeValue> &params) {
+	uint option = params[0]._value;
 
-	// FIXME
-	error("Dialog::GetOptionText unimplemented");
+	option--;
+	if (option >= self->_options.size())
+		error("Dialog::GetOptionText: option %d is too high (only have %d)", option, self->_options.size());
 
-	return RuntimeValue();
+	RuntimeValue ret = new ScriptMutableString(self->_options[option]._name);
+	ret._object->DecRef();
+	return ret;
 }
 
 // Dialog: import bool HasOptionBeenChosen(int option)
 // Checks whether the player has chosen this option before.
-RuntimeValue Script_Dialog_HasOptionBeenChosen(AGSEngine *vm, Dialog *self, const Common::Array<RuntimeValue> &params) {
-	int option = params[0]._signedValue;
-	UNUSED(option);
+RuntimeValue Script_Dialog_HasOptionBeenChosen(AGSEngine *vm, DialogTopic *self, const Common::Array<RuntimeValue> &params) {
+	uint option = params[0]._value;
 
-	// FIXME
-	error("Dialog::HasOptionBeenChosen unimplemented");
+	option--;
+	if (option >= self->_options.size())
+		error("Dialog::HasOptionBeenChosen: option %d is too high (only have %d)", option, self->_options.size());
 
-	return RuntimeValue();
+	return (self->_options[option]._flags & DFLG_HASBEENCHOSEN) ? 1 : 0;
 }
 
 // Dialog: import void SetOptionState(int option, DialogOptionState)
 // Sets the enabled state of the specified option in this dialog.
-RuntimeValue Script_Dialog_SetOptionState(AGSEngine *vm, Dialog *self, const Common::Array<RuntimeValue> &params) {
-	int option = params[0]._signedValue;
-	UNUSED(option);
-	uint32 dialogoptionstate = params[1]._value;
-	UNUSED(dialogoptionstate);
+RuntimeValue Script_Dialog_SetOptionState(AGSEngine *vm, DialogTopic *self, const Common::Array<RuntimeValue> &params) {
+	uint option = params[0]._value;
+	uint32 state = params[1]._value;
 
-	// FIXME
-	error("Dialog::SetOptionState unimplemented");
+	option--;
+	if (option >= self->_options.size())
+		error("Dialog::SetOptionState: option %d is too high (only have %d)", option, self->_options.size());
+
+	self->_options[option]._flags &= ~DFLG_ON;
+	if (!(self->_options[option]._flags & DFLG_OFFPERM)) {
+		if (state == kDialogOptionOn)
+			self->_options[option]._flags |= DFLG_ON;
+		else if (state == kDialogOptionOffForever)
+			self->_options[option]._flags |= DFLG_OFFPERM;
+	}
 
 	return RuntimeValue();
 }
 
 // Dialog: import void Start()
 // Runs the dialog interactively.
-RuntimeValue Script_Dialog_Start(AGSEngine *vm, Dialog *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Dialog::Start unimplemented");
+RuntimeValue Script_Dialog_Start(AGSEngine *vm, DialogTopic *self, const Common::Array<RuntimeValue> &params) {
+	vm->runDialogId(self->_id);
 
 	return RuntimeValue();
 }
 
 // Dialog: readonly import attribute int ID
 // Gets the dialog's ID number for interoperating with legacy code.
-RuntimeValue Script_Dialog_get_ID(AGSEngine *vm, Dialog *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Dialog::get_ID unimplemented");
-
-	return RuntimeValue();
+RuntimeValue Script_Dialog_get_ID(AGSEngine *vm, DialogTopic *self, const Common::Array<RuntimeValue> &params) {
+	return self->_id;
 }
 
 // Dialog: readonly import attribute int OptionCount
 // Gets the number of options that this dialog has.
-RuntimeValue Script_Dialog_get_OptionCount(AGSEngine *vm, Dialog *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Dialog::get_OptionCount unimplemented");
-
-	return RuntimeValue();
+RuntimeValue Script_Dialog_get_OptionCount(AGSEngine *vm, DialogTopic *self, const Common::Array<RuntimeValue> &params) {
+	return self->_options.size();
 }
 
 // Dialog: readonly import attribute bool ShowTextParser
 // Gets whether this dialog allows the player to type in text.
-RuntimeValue Script_Dialog_get_ShowTextParser(AGSEngine *vm, Dialog *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Dialog::get_ShowTextParser unimplemented");
-
-	return RuntimeValue();
+RuntimeValue Script_Dialog_get_ShowTextParser(AGSEngine *vm, DialogTopic *self, const Common::Array<RuntimeValue> &params) {
+	return (self->_flags & DTFLG_SHOWPARSER) ? 1 : 0;
 }
 
 // DialogOptionsRenderingInfo: import attribute int ActiveOptionID

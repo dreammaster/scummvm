@@ -269,7 +269,7 @@ protected:
 };
 
 AGSGraphics::AGSGraphics(AGSEngine *vm) : _vm(vm), _width(0), _height(0), _forceLetterbox(false), _vsync(false),
-	_viewportX(0), _viewportY(0) {
+	_viewportX(0), _viewportY(0), _extraDrawable(NULL) {
 
 	_cursorObj = new CursorDrawable(_vm);
 }
@@ -603,6 +603,9 @@ void AGSGraphics::draw() {
 
 		draw(_vm->_overlays[i]);
 	}
+
+	if (_extraDrawable)
+		draw(_extraDrawable);
 
 	_cursorObj->tick();
 	if (!_vm->_state->_mouseCursorHidden)

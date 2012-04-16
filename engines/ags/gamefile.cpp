@@ -387,6 +387,8 @@ bool GameFile::init() {
 	_dialogs.resize(_dialogCount);
 	dialogCodeSizes.resize(_dialogCount);
 	for (uint i = 0; i < _dialogCount; ++i) {
+		_dialogs[i]._id = i;
+
 		char optionNames[MAXTOPICOPTIONS][150 + 1];
 		for (uint j = 0; j < MAXTOPICOPTIONS; ++j) {
 			dta->read(optionNames[j], 150);

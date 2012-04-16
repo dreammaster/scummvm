@@ -150,6 +150,8 @@ struct DialogTopic : public ScriptObject {
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotDialog); }
 	const char *getObjectTypeName() { return "DialogTopic"; }
 
+	uint _id;
+
 	Common::Array<DialogOption> _options;
 	Common::Array<byte> _code;
 
