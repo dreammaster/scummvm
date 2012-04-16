@@ -50,7 +50,7 @@ public:
 
 	bool getScreenSize();
 	bool initGraphics();
-	Graphics::PixelFormat getPixelFormat() const;
+	Graphics::PixelFormat getPixelFormat(bool isAlpha = false) const;
 
 	uint32 resolveHardcodedColor(uint32 color) const;
 	uint32 getTransparentColor() const;

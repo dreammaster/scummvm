@@ -333,14 +333,14 @@ bool AGSGraphics::getScreenSize() {
 		_height = (_height * 12) / 10;
 	}
 
-	debug(2, "target resolution: %dx%d real, %dx%d base, multiplier %d %s",
+	debug(2, "target resolution: %dx%d real, %dx%d base, multiplier %d %s (depth %d)",
 		_width, _height, _baseWidth, _baseHeight, _screenResolutionMultiplier,
-		_vm->getGameOption(OPT_NATIVECOORDINATES) ? " (native)" : "(scaled)");
+		_vm->getGameOption(OPT_NATIVECOORDINATES) ? " (native)" : "(scaled)", _vm->_gameFile->_colorDepth);
 
 	return true;
 }
 
-Graphics::PixelFormat AGSGraphics::getPixelFormat() const {
+Graphics::PixelFormat AGSGraphics::getPixelFormat(bool withAlpha) const {
 	switch (_vm->_gameFile->_colorDepth) {
 	case 1:
 		// 8bpp
@@ -349,8 +349,13 @@ Graphics::PixelFormat AGSGraphics::getPixelFormat() const {
 		// 16bpp: 565
 		return Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0);
 	default:
-		// 24bpp: RGB888
-		return Graphics::PixelFormat(4, 8, 8, 8, 0, 16, 8, 0, 0);
+		if (withAlpha) {
+			// 32bpp: RGB8888
+			return Graphics::PixelFormat(4, 8, 8, 8, 8, 16, 8, 0, 24);
+		} else {
+			// 24bpp: RGB888
+			return Graphics::PixelFormat(4, 8, 8, 8, 0, 16, 8, 0, 0);
+		}
 	}
 }
 
@@ -462,12 +467,12 @@ void AGSGraphics::initPalette() {
 }
 
 void AGSGraphics::newRoomPalette() {
-	const byte *roomPal = _vm->getCurrentRoom()->_backgroundScenes[0]._palette;
+	const byte *roomPal = _vm->getCurrentRoom()->_backgroundScenes[_vm->_state->_bgFrame]._palette;
 	for (uint i = 0; i < 256; ++i) {
 		if (_vm->_gameFile->_paletteUses[i] == PAL_BACKGROUND) {
-			_palette[i * 3 + 0] = roomPal[i * 4 + 0] * 4;
-			_palette[i * 3 + 1] = roomPal[i * 4 + 0] * 4;
-			_palette[i * 3 + 2] = roomPal[i * 4 + 0] * 4;
+			_palette[i * 3 + 0] = roomPal[i * 3 + 0];
+			_palette[i * 3 + 1] = roomPal[i * 3 + 1];
+			_palette[i * 3 + 2] = roomPal[i * 3 + 2];
 		} else {
 			// FIXME: patch room palette
 		}
@@ -588,10 +593,14 @@ void AGSGraphics::draw() {
 		draw(_vm->_overlays[i]);
 	}
 
+	bool guisTurnedOffAsDisabled = (_vm->_guiDisabledStyle == GUIDIS_GUIOFF) && _vm->_guiDisabledState;
+
 	// draw GUIs
 	for (uint i = 0; i < _vm->_gameFile->_guiGroups.size(); ++i) {
 		GUIGroup *group = _vm->_gameFile->_guiGroupDrawOrder[i];
 		if (!group->_visible)
+			continue;
+		if (guisTurnedOffAsDisabled && (group->_popup != POPUP_NOAUTOREM))
 			continue;
 		draw(group);
 	}
