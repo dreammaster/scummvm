@@ -624,9 +624,6 @@ void GameState::init() {
 	/* FIXME if (debugFlags & DBG_DEBUGMODE)
 		_debugMode = 1; */
 
-	// FIXME: global
-	// _guiDisabledStyle = convertGuiDisabledStyle(_vm->getGameOption(OPT_DISABLEOFF);
-
 	_walkableAreasOn.resize(MAX_WALK_AREAS + 1);
 	for (uint i = 0; i < _walkableAreasOn.size(); ++i)
 		_walkableAreasOn[i] = 1;

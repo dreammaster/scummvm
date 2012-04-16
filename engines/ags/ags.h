@@ -222,9 +222,14 @@ public:
 
 	void updateInvOrder();
 
+	bool _guiDisabledState;
+	uint _guiDisabledStyle;
+
 	void resortGUIs();
 	uint getGUIAt(const Common::Point &pos);
 	void removePopupInterface(uint guiId);
+	uint convertGUIDisabledStyle(uint style);
+	void updateGUIDisabledStatus();
 
 	uint getCharacterAt(const Common::Point &pos, int &charYPos);
 

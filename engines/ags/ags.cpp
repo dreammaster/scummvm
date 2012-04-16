@@ -77,6 +77,7 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _engineStartTime(0), _playTime(0), _pauseGameCounter(0),
 	_resourceMan(0), _needsUpdate(true), _guiNeedsUpdate(true), _backgroundNeedsUpdate(false),
 	_poppedInterface((uint)-1), _clickWasOnGUI(0), _mouseOnGUI((uint)-1),
+	_guiDisabledStyle(0), _guiDisabledState(false),
 	_startingRoom(0xffffffff), _displayedRoom(0xffffffff),
 	_gameScript(NULL), _gameScriptFork(NULL), _dialogScriptsScript(NULL), _roomScript(NULL), _roomScriptFork(NULL),
 	_scriptPlayerObject(NULL),
@@ -290,7 +291,7 @@ void AGSEngine::tickGame(bool checkControls) {
 	if (_state->_noHiColorFadeIn && getGameOption(OPT_FADETYPE) == FADE_NORMAL)
 		_state->_screenIsFadedOut = 0;
 
-	// FIXME: updateGUIDisabledStatus();
+	updateGUIDisabledStatus();
 
 	if (_inNewRoomState == kNewRoomStateNone) {
 		// Run the room and game script repeatedly_execute
@@ -482,7 +483,7 @@ void AGSEngine::updateEvents(bool checkControls) {
 	int activeGUI = -1;
 
 	Common::Point mousePos = _system->getEventManager()->getMousePos();
-	bool guisTurnedOffAsDisabled = (getGameOption(OPT_DISABLEOFF) == 3 && false /* FIXME: _allButtonsDisabled */);
+	bool guisTurnedOffAsDisabled = (_guiDisabledStyle == GUIDIS_GUIOFF) && _guiDisabledState;
 
 	if (mouseMoved && !_state->_disabledUserInterface) {
 		// Notify all the GUIs, so they can do hover effects etc.
@@ -2279,6 +2280,8 @@ bool AGSEngine::init() {
 		_gameFile->_guiInvControls[i]->resized();
 	}
 
+	_guiDisabledStyle = convertGUIDisabledStyle(getGameOption(OPT_DISABLEOFF));
+
 	// FIXME: the rest of init_game_settings
 
 	for (uint i = 0; i < _characters.size(); ++i) {
@@ -2637,6 +2640,31 @@ void AGSEngine::removePopupInterface(uint guiId) {
 	if (guiId == _mouseOnGUI)
 		_mouseOnGUI = (uint)-1;
 	invalidateGUI();
+}
+
+uint AGSEngine::convertGUIDisabledStyle(uint style) {
+	switch (style) {
+	case 1:
+		return GUIDIS_BLACKOUT;
+	case 2:
+		return GUIDIS_UNCHANGED;
+	case 3:
+		return GUIDIS_GUIOFF;
+	default:
+		return GUIDIS_GREYOUT;
+	}
+}
+
+void AGSEngine::updateGUIDisabledStatus() {
+	bool stateWas = _guiDisabledState;
+
+	_guiDisabledState = (bool)_state->_disabledUserInterface;
+	if (stateWas != _guiDisabledState) {
+		// GUIs might have been changed.
+		for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i)
+			_gameFile->_guiGroups[i]->controlPositionsChanged();
+		invalidateGUI();
+	}
 }
 
 uint AGSEngine::getCharacterAt(const Common::Point &pos, int &charYPos) {

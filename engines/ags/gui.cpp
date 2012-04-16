@@ -435,6 +435,10 @@ uint GUIInvControl::getItemAt(const Common::Point &pos) {
 }
 
 void GUIInvControl::draw(Graphics::Surface *surface) {
+	// TODO: Isn't this already checked in the caller?
+	if (isDisabled() && (_vm->_guiDisabledStyle == GUIDIS_BLACKOUT))
+		return;
+
 	uint numItems = _itemsPerLine * _numLines;
 	// backwards compatibility
 	_vm->_state->_invNumInLine = _itemsPerLine;
@@ -634,12 +638,17 @@ void GUIButton::stopAnimation() {
 void GUIButton::draw(Graphics::Surface *surface) {
 	bool drawDisabled = isDisabled();
 
-	// FIXME: disabled style
+	// if it's "Unchanged when disabled" or "GUI Off", don't grey out
+	if (_vm->_guiDisabledStyle == GUIDIS_UNCHANGED || _vm->_guiDisabledStyle == GUIDIS_GUIOFF)
+		drawDisabled = false;
 
 	if ((int)_usePic <= 0 || drawDisabled)
 		_usePic = _pic;
 
-	// FIXME: disabled style
+	// buttons off when disabled
+	// TODO: Isn't this already checked in the caller?
+	if (drawDisabled && (_vm->_guiDisabledStyle == GUIDIS_BLACKOUT))
+		return;
 
 	// First, we draw the graphical bits.
 	if ((int)_usePic > 0 && (int)_pic > 0) {
@@ -1009,8 +1018,7 @@ void GUIGroup::draw() {
 			continue;
 
 		// if disabled controls shouldn't be drawn, don't draw them
-		// FIXME: check vm->_guiDisabledStyle == GUIDIS_BLACKOUT too
-		if (control->isDisabled())
+		if (control->isDisabled() && (_vm->_guiDisabledStyle == GUIDIS_BLACKOUT))
 			continue;
 
 		// FIXME
