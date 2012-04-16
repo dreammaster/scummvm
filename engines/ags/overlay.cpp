@@ -31,6 +31,7 @@
 #include "engines/ags/gamefile.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
+#include "engines/ags/gui.h"
 #include "engines/ags/overlay.h"
 
 #include "graphics/font.h"

@@ -43,6 +43,7 @@
 #include "ags/gamefile.h"
 #include "ags/gamestate.h"
 #include "ags/graphics.h"
+#include "ags/gui.h"
 #include "ags/resourceman.h"
 #include "ags/room.h"
 #include "ags/script.h"

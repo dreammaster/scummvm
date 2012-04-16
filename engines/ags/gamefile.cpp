@@ -34,6 +34,7 @@
 #include "ags/constants.h"
 #include "ags/gamefile.h"
 #include "ags/gamestate.h"
+#include "ags/gui.h"
 #include "ags/script.h"
 #include "ags/util.h"
 

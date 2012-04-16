@@ -30,11 +30,17 @@
 #include "common/array.h"
 #include "common/hash-str.h"
 
-#include "engines/ags/gui.h"
 #include "engines/ags/inventory.h"
 
 namespace AGS {
 
+class GUIGroup;
+class GUIButton;
+class GUILabel;
+class GUIInvControl;
+class GUISlider;
+class GUITextBox;
+class GUIListBox;
 class ResourceManager;
 
 struct MouseCursor {
