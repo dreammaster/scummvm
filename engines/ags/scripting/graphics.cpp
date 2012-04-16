@@ -1640,15 +1640,16 @@ RuntimeValue Script_ShakeScreen(AGSEngine *vm, ScriptObject *, const Common::Arr
 // import void ShakeScreenBackground(int delay, int amount, int length)
 // Shakes the screen but does not pause the game while it does so.
 RuntimeValue Script_ShakeScreenBackground(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int delay = params[0]._signedValue;
-	UNUSED(delay);
-	int amount = params[1]._signedValue;
-	UNUSED(amount);
-	int length = params[2]._signedValue;
-	UNUSED(length);
+	uint delay = params[0]._value;
+	uint amount = params[1]._value;
+	uint length = params[2]._value;
 
-	// FIXME
-	error("ShakeScreenBackground unimplemented");
+	if (delay < 2)
+		error("ShakeScreenBackground: invalid delay parameter %d", delay);
+
+	vm->_state->_shakeAmount = amount;
+	vm->_state->_shakeDelay = delay;
+	vm->_state->_shakeLength = length;
 
 	return RuntimeValue();
 }

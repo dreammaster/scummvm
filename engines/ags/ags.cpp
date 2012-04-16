@@ -369,19 +369,7 @@ void AGSEngine::tickGame(bool checkControls) {
 	// FIXME: a whole bunch of update stuff
 
 	if (!_state->_fastForward) {
-		// We do the graphics update now.
-		if (_backgroundNeedsUpdate) {
-			_currentRoom->updateWalkBehinds();
-			_backgroundNeedsUpdate = false;
-		}
-		if (_guiNeedsUpdate) {
-			// invalidate all GUIs (e.g. when something used in a macro changed)
-			for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i)
-				_gameFile->_guiGroups[i]->invalidate();
-			_guiNeedsUpdate = false;
-		}
-		updateViewport(); // FIXME: only in the absence of a complete overlay?
-		_graphics->draw();
+		draw();
 
 		// FIXME: hotspot stuff (mouse over hotspot)
 	}
@@ -405,8 +393,11 @@ void AGSEngine::tickGame(bool checkControls) {
 	_loopCounter++;
 	if (_state->_waitCounter)
 		_state->_waitCounter--;
-	if (_state->_shakeLength)
+	if (_state->_shakeLength) {
 		_state->_shakeLength--;
+		if (_state->_shakeLength == 0)
+			_system->setShakePos(0, 0);
+	}
 
 	if (_loopCounter % 5 == 0) {
 		_audio->updateAmbientSoundVolume();
@@ -709,6 +700,29 @@ void AGSEngine::processInterfaceClick(uint guiId, uint controlId, uint mouseButt
 		runTextScript(_gameScript, "interface_click", params);
 	default:
 		break;
+	}
+}
+
+void AGSEngine::draw() {
+	if (_backgroundNeedsUpdate) {
+		_graphics->newRoomPalette();
+		_currentRoom->updateWalkBehinds();
+		_backgroundNeedsUpdate = false;
+	}
+	if (_guiNeedsUpdate) {
+		// invalidate all GUIs (e.g. when something used in a macro changed)
+		for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i)
+			_gameFile->_guiGroups[i]->invalidate();
+		_guiNeedsUpdate = false;
+	}
+	updateViewport(); // FIXME: only in the absence of a complete overlay?
+	_graphics->draw();
+
+	if (_state->_shakeLength && _state->_shakeDelay) {
+		if ((_loopCounter % _state->_shakeDelay) < (_state->_shakeDelay / 2))
+			_system->setShakePos(0, multiplyUpCoordinate(_state->_shakeAmount));
+		else
+			_system->setShakePos(0, 0);
 	}
 }
 
