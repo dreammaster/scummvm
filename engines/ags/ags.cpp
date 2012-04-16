@@ -3330,7 +3330,7 @@ void AGSEngine::stopSpeech() {
 int AGSEngine::getIntProperty(const Common::String &name, const Common::StringMap &properties) {
 	int propertyId = -1;
 	for (uint i = 0; i < _gameFile->_schemaProperties.size(); ++i) {
-		if (_gameFile->_schemaProperties[i]._name == name) {
+		if (_gameFile->_schemaProperties[i]._name.equalsIgnoreCase(name)) {
 			propertyId = i;
 			break;
 		}
@@ -3350,7 +3350,7 @@ int AGSEngine::getIntProperty(const Common::String &name, const Common::StringMa
 Common::String AGSEngine::getStringProperty(const Common::String &name, const Common::StringMap &properties) {
 	int propertyId = -1;
 	for (uint i = 0; i < _gameFile->_schemaProperties.size(); ++i) {
-		if (_gameFile->_schemaProperties[i]._name == name) {
+		if (_gameFile->_schemaProperties[i]._name.equalsIgnoreCase(name)) {
 			propertyId = i;
 			break;
 		}
