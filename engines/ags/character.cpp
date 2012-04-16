@@ -68,6 +68,18 @@ Character::Character(AGSEngine *vm) : _vm(vm) {
 	_processIdleThisTime = false;
 	_slowMoveCounter = 0; // unused?
 	_animWait = 0;
+
+	// init_game_settings
+	_activeInv = (uint)-1;
+	_following = -1;
+	_followInfo = 97 | (10 << 8); // TODO: explain
+	_idleTime = 20;
+	_idleLeft = _idleTime;
+	_transparency = 0;
+	_baseline = -1;
+	_walkWaitCounter = 0;
+	_z = 0;
+	// FIXME: update inv
 }
 
 uint32 Character::readUint32(uint offset) {
@@ -348,9 +360,17 @@ byte Character::readByte(uint offset) {
 }
 
 bool Character::writeByte(uint offset, byte value) {
-	// FIXME
+	// FIXME: allow writing to anything else?
 
-	return false;
+	switch (offset) {
+	case 778:
+		_on = value;
+		break;
+	default:
+		return false;
+	}
+
+	return true;
 }
 
 class CharacterNameString : public ScriptString {
@@ -1683,8 +1703,8 @@ Common::Point Character::getDrawPos() {
 		_vm->multiplyUpCoordinate(_z) + _picYOffs);
 }
 
-uint Character::getBaseline() const {
-	return _baseline ? _baseline : _y;
+int Character::getBaseline() const {
+	return (_baseline >= 1) ? _baseline : _y;
 }
 
 int Character::getDrawOrder() const {

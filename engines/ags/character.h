@@ -104,7 +104,7 @@ public:
 	int32 _idleLeft; // num seconds left, or -2 for playing idle anim
 
 	uint16 _transparency; // if character is transparent
-	uint16 _baseline;
+	int16 _baseline;
 
 	uint32 _activeInv;
 	uint32 _talkColor;
@@ -160,7 +160,7 @@ public:
 
 	int getEffectiveY() { return _y - _z; }
 
-	uint getBaseline() const;
+	int getBaseline() const;
 
 	virtual Common::Point getDrawPos();
 	virtual int getDrawOrder() const;

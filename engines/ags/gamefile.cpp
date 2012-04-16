@@ -357,7 +357,11 @@ bool GameFile::init() {
 		}
 	}
 
-	// FIXME: PSP version fixes up ANTIGLIDE here
+	if (_version <= kAGSVer300 && _options[OPT_ANTIGLIDE]) {
+		// JJS: Fix the character walk speed for < 3.1.1.
+		for (uint i = 0; i < _vm->_characters.size(); ++i)
+			_vm->_characters[i]->_flags |= CHF_ANTIGLIDE;
+	}
 
 	// FIXME: lip sync data
 	for (uint i = 0; i < MAXLIPSYNCFRAMES; ++i)
@@ -656,14 +660,14 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 	chr->_y = dta->readUint32LE();
 	chr->_wait = dta->readUint32LE();
 	chr->_flags = dta->readUint32LE();
-	chr->_following = dta->readSint16LE();
-	chr->_followInfo = dta->readUint16LE();
+	/*chr->_following = */ dta->readSint16LE();
+	/*chr->_followInfo = */ dta->readUint16LE();
 	chr->_idleView = dta->readSint32LE();
-	chr->_idleTime = dta->readUint16LE();
-	chr->_idleLeft = dta->readUint16LE();
-	chr->_transparency = dta->readUint16LE();
-	chr->_baseline = dta->readUint16LE();
-	chr->_activeInv = dta->readUint32LE();
+	/*chr->_idleTime = */ dta->readUint16LE();
+	/*chr->_idleLeft = */ dta->readUint16LE();
+	/*chr->_transparency = */ dta->readUint16LE();
+	/*chr->_baseline = */ dta->readUint16LE();
+	/*chr->_activeInv = */ dta->readUint32LE();
 	chr->_talkColor = dta->readUint32LE();
 	chr->_thinkView = dta->readUint32LE();
 	chr->_blinkView = dta->readUint16LE();
@@ -672,7 +676,7 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 	chr->_blinkFrame = dta->readUint16LE();
 	chr->_walkSpeedY = dta->readUint16LE();
 	/*chr->_picYOffs = */ dta->readUint16LE();
-	chr->_z = dta->readUint32LE();
+	/*chr->_z = */ dta->readUint32LE();
 	/*chr->_walkWait = */ dta->readUint32LE();
 	chr->_speechAnimSpeed = dta->readUint16LE();
 	dta->skip(2); // reserved
@@ -680,7 +684,7 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 	/*chr->_blockingHeight = */ dta->readUint16LE();
 	chr->_indexId = dta->readUint32LE();
 	/*chr->_picXOffs = */ dta->readUint16LE();
-	chr->_walkWaitCounter = dta->readUint16LE();
+	/*chr->_walkWaitCounter = */ dta->readUint16LE();
 	/*chr->_loop = */ dta->readUint16LE();
 	/*chr->_frame = */ dta->readUint16LE();
 	/*chr->_walking = */ dta->readUint16LE();
