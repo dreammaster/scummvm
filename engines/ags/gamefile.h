@@ -71,7 +71,7 @@ struct NewInteractionAction {
 struct NewInteractionCommand : public NewInteractionAction {
 	uint32 _type;
 	Common::Array<NewInteractionValue> _args;
-	NewInteractionAction *_children;
+	struct NewInteractionCommandList *_children;
 	struct NewInteractionCommandList *_parent;
 };
 

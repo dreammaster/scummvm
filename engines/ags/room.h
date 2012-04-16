@@ -199,6 +199,7 @@ struct RoomHotspot : public ScriptObject {
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotHotspot); }
 	const char *getObjectTypeName() { return "RoomHotspot"; }
 
+	uint _id;
 	Common::Point _walkToPos;
 	Common::String _name;
 	Common::String _scriptName;

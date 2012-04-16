@@ -892,6 +892,7 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 	else
 		_hotspots.resize(hotspotCount);
 	for (uint i = 0; i < _hotspots.size(); ++i) {
+		_hotspots[i]._id = i;
 		_hotspots[i]._walkToPos.x = dta->readSint16LE();
 		_hotspots[i]._walkToPos.y = dta->readSint16LE();
 	}

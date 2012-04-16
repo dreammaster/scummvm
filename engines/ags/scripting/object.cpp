@@ -607,10 +607,8 @@ RuntimeValue Script_Object_RemoveTint(AGSEngine *vm, RoomObject *self, const Com
 // Runs the event handler for the specified event.
 RuntimeValue Script_Object_RunInteraction(AGSEngine *vm, RoomObject *self, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
 
-	// FIXME
-	error("Object::RunInteraction unimplemented");
+	vm->runObjectInteraction(self->_id, cursormode);
 
 	return RuntimeValue();
 }
