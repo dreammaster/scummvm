@@ -295,6 +295,7 @@ public:
 
 	Common::String _script;
 	ccScript *_compiledScript;
+	struct ScriptState *_savedScriptState;
 
 	uint16 _width, _height; // in 320x200 terms (scrolling room size)
 	uint16 _resolution; // 1 = 320x200, 2 = 640x400

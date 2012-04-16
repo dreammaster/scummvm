@@ -329,6 +329,8 @@ enum {
 
 #define MAX_WALK_AREAS 15
 
+#define MAX_ROOMS 500
+
 } // End of namespace AGS
 
 #endif // AGS_CONSTANTS_H

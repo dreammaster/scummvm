@@ -208,18 +208,24 @@ struct CallStackEntry {
 	class ccInstance *_instance;
 };
 
+struct ScriptState {
+	Common::Array<byte> _globalData;
+	Common::HashMap<uint32, RuntimeValue> _globalObjects;
+};
+
 // a running instance of a script
 class ccInstance {
 	friend class ScriptStackString;
 	friend class ScriptDataString;
 
 public:
-	ccInstance(AGSEngine *vm, ccScript *script, bool autoImport = false, ccInstance *fork = NULL);
+	ccInstance(AGSEngine *vm, ccScript *script, bool autoImport = false, ccInstance *fork = NULL, ScriptState *oldState = NULL);
 	~ccInstance();
 
 	bool isRunning() { return (_pc != 0); }
 	bool exportsSymbol(const Common::String &name);
 	void call(const Common::String &name, const Common::Array<RuntimeValue> &params);
+	ScriptState *saveState();
 
 	uint32 getReturnValue();
 
