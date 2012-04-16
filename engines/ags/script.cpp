@@ -1544,6 +1544,8 @@ uint32 ccInstance::popIntValue() {
 }
 
 ScriptObject *ccInstance::getObjectFrom(const RuntimeValue &value) {
+	RuntimeValue result;
+
 	switch (value._type) {
 	case rvtScriptData:
 		ccScript *instScript;
@@ -1565,22 +1567,31 @@ ScriptObject *ccInstance::getObjectFrom(const RuntimeValue &value) {
 			error("script tried to get object using global data (offset %d) on line %d",
 				value._value, _lineNumber);
 	case rvtSystemObject:
-		return value._object;
+		result = value;
+		break;
 	case rvtStackPointer:
 		if (value._value + 4 > _stack.size())
 			error("script tried to get object from beyond the end of the stack (value %d) on line %d",
 				value._value, _lineNumber);
 		if (_stack[value._value]._type == rvtSystemObject)
-			return _stack[value._value]._object;
+			result = _stack[value._value];
 		else if (_stack[value._value]._type == rvtInteger && _stack[value._value]._value == 0)
 			return NULL;
 		else
 			error("script tried to get object using stack (offset %d) on line %d",
 				value._value, _lineNumber);
+		break;
 	default:
 		error("script tried to get object using runtime value of type %d (value %d) on line %d",
 			value._type, value._value, _lineNumber);
 	}
+
+	uint32 offset = result._value;
+	ScriptObject *obj = result._object->getObjectAt(offset);
+	if (offset != 0)
+		error("script got object using runtime value of type %d (value %d), but offset %d was left over on a '%s' on line %d",
+			value._type, value._value, offset, obj->getObjectTypeName(), _lineNumber);
+	return obj;
 }
 
 void ccInstance::writePointer(const RuntimeValue &value, ScriptObject *object) {
