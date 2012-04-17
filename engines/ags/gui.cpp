@@ -349,6 +349,105 @@ void GUIListBox::resized() {
 	// FIXME
 }
 
+void GUIListBox::scrollUp() {
+	// FIXME
+}
+
+void GUIListBox::scrollDown() {
+	// FIXME
+}
+
+uint GUIListBox::getItemAt(Common::Point pos) {
+	return (uint)-1;
+}
+
+bool GUIListBox::addItem(const Common::String &value) {
+	_parent->invalidate();
+
+	_items.push_back(value);
+	_itemSaveGameIndexes.push_back((uint16)-1);
+
+	return true;
+}
+
+bool GUIListBox::insertItemAt(uint index, const Common::String &value) {
+	if (index > _items.size())
+		return false;
+
+	_parent->invalidate();
+
+	_items.insert_at(index, value);
+	_itemSaveGameIndexes.insert_at(index, (uint16)-1);
+
+	if (_selected >= index)
+		_selected++;
+
+	return true;
+}
+
+void GUIListBox::removeItem(uint index) {
+	assert(index < _items.size());
+
+	_items.remove_at(index);
+	_itemSaveGameIndexes.remove_at(index);
+
+	if (_selected > index)
+		_selected--;
+	if (_selected >= _items.size())
+		_selected = (uint)-1;
+
+	_parent->invalidate();
+}
+
+void GUIListBox::clear() {
+	_items.clear();
+	_itemSaveGameIndexes.clear();
+	_selected = 0;
+	_topItem = 0;
+
+	_parent->invalidate();
+}
+
+uint GUIListBox::getSelected() {
+	if (_selected >= _items.size())
+		return (uint)-1;
+
+	return _selected;
+}
+
+void GUIListBox::setSelected(uint index) {
+	if (index >= _items.size())
+		index = (uint)-1;
+
+	if (_selected == index)
+		return;
+
+	_selected = index;
+	if (index != (uint)-1) {
+		// If the new selected entry is off-screen, change
+		// the top item as necessary to get it on-screen.
+		if (index < _topItem)
+			_topItem = index;
+		if (index >= _topItem + _numItemsFit)
+			_topItem = (index - _numItemsFit) - 1;
+	}
+
+	_parent->invalidate();
+}
+
+void GUIListBox::setTopItem(uint index) {
+	// allow setTopItem(0) on an empty list, but forbid anything else
+	if (!_items.empty() || index)
+		if (index >= _items.size())
+			error("GUIListBox::setTopItem: %d is too high (only %d items)", index, _items.size());
+
+	if (_topItem == index)
+		return;
+
+	_topItem = index;
+	_parent->invalidate();
+}
+
 void GUIListBox::setFont(uint32 font) {
 	if (_font == font)
 		return;

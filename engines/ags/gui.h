@@ -252,6 +252,20 @@ public:
 
 	void resized();
 
+	void scrollUp();
+	void scrollDown();
+
+	uint getItemAt(Common::Point pos);
+	bool addItem(const Common::String &value);
+	bool insertItemAt(uint index, const Common::String &value);
+	void removeItem(uint index);
+	void clear();
+
+	uint getSelected();
+	void setSelected(uint index);
+	uint getTopItem() { return _topItem; }
+	void setTopItem(uint index);
+
 	uint32 getFont() { return _font; }
 	void setFont(uint32 font);
 
