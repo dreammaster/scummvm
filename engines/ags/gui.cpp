@@ -434,6 +434,34 @@ uint GUIInvControl::getItemAt(const Common::Point &pos) {
 	return getCharToDisplay()->_invOrder[itemId];
 }
 
+void GUIInvControl::setTopIndex(uint index) {
+	if (_topIndex == index)
+		return;
+
+	_topIndex = index;
+	_parent->invalidate();
+}
+
+void GUIInvControl::scrollUp() {
+	if (_topIndex == 0)
+		return;
+
+	if (_topIndex < _itemsPerLine)
+		_topIndex = 0;
+	else
+		_topIndex -= _itemsPerLine;
+
+	_parent->invalidate();
+}
+
+void GUIInvControl::scrollDown() {
+	if (getCharToDisplay()->_invOrder.size() <= (_topIndex + (_itemsPerLine * _numLines)))
+		return;
+
+	_topIndex += _itemsPerLine;
+	_parent->invalidate();
+}
+
 void GUIInvControl::draw(Graphics::Surface *surface) {
 	// TODO: Isn't this already checked in the caller?
 	if (isDisabled() && (_vm->_guiDisabledStyle == GUIDIS_BLACKOUT))

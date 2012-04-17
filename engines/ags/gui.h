@@ -293,6 +293,10 @@ public:
 	void resized();
 	uint getItemAt(const Common::Point &pos);
 
+	void setTopIndex(uint index);
+	void scrollUp();
+	void scrollDown();
+
 	uint32 _charId; // whose inventory? (-1 = current player)
 	uint32 _itemWidth, _itemHeight;
 	uint32 _topIndex;

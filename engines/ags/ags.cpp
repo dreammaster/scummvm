@@ -596,6 +596,8 @@ void AGSEngine::updateEvents(bool checkControls) {
 			debugC(kDebugLevelGame, "mouse down over GUI %d", activeGUI);
 			// FIXME: not as it is in original
 			_gameFile->_guiGroups[activeGUI]->onMouseDown(mousePos);
+			// FIXME: missing the generic GUI handler check?
+			//queueGameEvent(kEventInterfaceClick, activeGUI, (uint)-1, mouseUp + 1); // FIXME: <--
 			runOnEvent(GE_GUI_MOUSEDOWN, activeGUI);
 			_clickWasOnGUI = activeGUI;
 		} else if (!_state->_disabledUserInterface) {
@@ -2796,13 +2798,15 @@ uint AGSEngine::getInventoryItemAt(const Common::Point &pos) {
 
 	GUIGroup *group = _gameFile->_guiGroups[guiId];
 
-	GUIControl *control = group->getControlAt(pos - Common::Point(group->_x, group->_y));
+	Common::Point adjustedPos(multiplyUpCoordinate(pos.x), multiplyUpCoordinate(pos.y));
+	adjustedPos -= Common::Point(group->_x, group->_y);
+
+	GUIControl *control = group->getControlAt(adjustedPos);
 	if (!control || !control->isOfType(sotGUIInvWindow))
 		return (uint)-1;
 
 	GUIInvControl *invControl = (GUIInvControl *)control;
-	return invControl->getItemAt(pos - Common::Point(group->_x, group->_y) -
-		Common::Point(control->_x, control->_y));
+	return invControl->getItemAt(adjustedPos - Common::Point(control->_x, control->_y));
 }
 
 Common::String AGSEngine::getLocationName(const Common::Point &pos) {

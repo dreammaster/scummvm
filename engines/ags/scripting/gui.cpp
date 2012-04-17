@@ -1450,8 +1450,7 @@ RuntimeValue Script_TextBox_set_TextColor(AGSEngine *vm, GUITextBox *self, const
 // InvWindow: import void ScrollDown()
 // Scrolls the inventory window down one row.
 RuntimeValue Script_InvWindow_ScrollDown(AGSEngine *vm, GUIInvControl *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("InvWindow::ScrollDown unimplemented");
+	self->scrollDown();
 
 	return RuntimeValue();
 }
@@ -1459,8 +1458,7 @@ RuntimeValue Script_InvWindow_ScrollDown(AGSEngine *vm, GUIInvControl *self, con
 // InvWindow: import void ScrollUp()
 // Scrolls the inventory window up one row.
 RuntimeValue Script_InvWindow_ScrollUp(AGSEngine *vm, GUIInvControl *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("InvWindow::ScrollUp unimplemented");
+	self->scrollUp();
 
 	return RuntimeValue();
 }
@@ -1487,6 +1485,7 @@ RuntimeValue Script_InvWindow_set_CharacterToUse(AGSEngine *vm, GUIInvControl *s
 		self->_charId = value->_indexId;
 	}
 
+	// reset to top of list
 	self->_topIndex = 0;
 	self->_parent->invalidate();
 
@@ -1556,11 +1555,9 @@ RuntimeValue Script_InvWindow_get_TopItem(AGSEngine *vm, GUIInvControl *self, co
 // InvWindow: import attribute int TopItem
 // Gets the index of the first visible item in the window.
 RuntimeValue Script_InvWindow_set_TopItem(AGSEngine *vm, GUIInvControl *self, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint value = params[0]._value;
 
-	// FIXME
-	error("InvWindow::set_TopItem unimplemented");
+	self->setTopIndex(value);
 
 	return RuntimeValue();
 }
