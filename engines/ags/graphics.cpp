@@ -878,11 +878,13 @@ Drawable::~Drawable() {
 // 'is_pos_in_sprite' in original
 bool Drawable::containsPoint(AGSEngine *vm, Common::Point point) {
 	Common::Point pos = getDrawPos();
+	pos.x = vm->divideDownCoordinate(pos.x);
+	pos.y = vm->divideDownCoordinate(pos.y);
+
 	uint width = vm->divideDownCoordinate(getDrawWidth());
 	uint height = vm->divideDownCoordinate(getDrawHeight());
 
-	Common::Point downPos(vm->divideDownCoordinate(pos.x), vm->divideDownCoordinate(pos.y));
-	if (!Common::Rect(downPos.x, downPos.y, downPos.x + width, downPos.y + height).contains(point))
+	if (!Common::Rect(pos.x, pos.y, pos.x + width, pos.y + height).contains(point))
 		return false;
 
 	if (!vm->getGameOption(OPT_PIXPERFECT))
