@@ -957,7 +957,7 @@ void Character::fixPlayerSprite() {
 	uint diagonalState = useDiagonal();
 
 	if (_vm->getGameFileVersion() <= kAGSVer272) {
-		// Use a different logic on 2.x. This fixes some edge cases where
+		// JJS: Use a different logic on 2.x. This fixes some edge cases where
 		// FaceLocation() is used to select a specific loop.
 		// "This fixes edge cases where the function was used to select specific loops, e.g. in Murder in a Wheel."
 
@@ -1144,7 +1144,7 @@ bool Character::faceLocation(int x, int y) {
 		highestLoopForTurning = 7;
 
 	if (_vm->getGameFileVersion() <= kAGSVer272) {
-		// Use a different logic on 2.x. This fixes some edge cases where
+		// JJS: Use a different logic on 2.x. This fixes some edge cases where
 		// FaceLocation() is used to select a specific loop.
 		// "This fixes edge cases where the function was used to select specific loops, e.g. in Murder in a Wheel."
 
@@ -1332,6 +1332,28 @@ void Character::findReasonableLoop() {
 		_scriptName.c_str(), _indexId, _view);
 }
 
+void Character::changeView(uint viewId) {
+	viewId--;
+
+	if (viewId >= _vm->_gameFile->_views.size())
+		error("Character::changeView: character '%s' (id %d) can't use view %d (we only have %d)",
+			_scriptName.c_str(), _indexId, viewId, _vm->_gameFile->_views.size());
+
+	// fixed view, not running idle anim?
+	if ((_flags & CHF_FIXVIEW) && (_idleLeft >= 0))
+		warning("Character::changeView: character '%s' (id %d) had a fixed view, you should release it first",
+			_scriptName.c_str(), _indexId);
+
+	_defView = viewId;
+	_view = viewId;
+	_animating = 0;
+	_frame = 0;
+	_wait = 0;
+	_walkWait = 0;
+	_animWait = 0;
+	findReasonableLoop();
+}
+
 void Character::lockView(uint viewId) {
 	if (viewId < 1 || viewId > _vm->_gameFile->_views.size())
 		error("Character::lockView: invalid view number %d (max is %d)", viewId, _vm->_gameFile->_views.size());
@@ -1447,6 +1469,25 @@ void Character::setSpeechView(int view) {
 	_talkView = view - 1;
 }
 
+void Character::setThinkView(int view) {
+	if (view == -1) {
+		// TODO: original engine ends up setting to -2, weird?
+		_thinkView = -1;
+		return;
+	}
+
+	if (view < 2 || (uint)view > _vm->_gameFile->_views.size())
+		error("Character::setThinkView: invalid view number %d (max is %d)", view, _vm->_gameFile->_views.size());
+
+	_thinkView = view - 1;
+}
+
+void Character::setBlinkInterval(uint interval) {
+	_blinkInterval = interval;
+	if (_blinkTimer)
+		_blinkTimer = _blinkInterval;
+}
+
 void Character::checkViewFrame() {
 	// FIXME: volume stuff
 
@@ -1473,7 +1514,7 @@ void Character::changeRoom(int room, int x, int y) {
 		_vm->_newRoomPos = 0;
 
 		if (_vm->getGameFileVersion() <= kAGSVer272) {
-			// Set position immediately on 2.x.
+			// JJS: Set position immediately on 2.x.
 			// "Fixed the player looking the wrong way after entering a room in the Ben Jordan games."
 			_x = x;
 			_y = y;

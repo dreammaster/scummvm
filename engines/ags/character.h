@@ -68,12 +68,16 @@ public:
 
 	void findReasonableLoop();
 
+	void changeView(uint viewId);
 	void lockView(uint viewId);
 	void lockViewOffset(uint viewId, int xOffs, int yOffs);
 	void unlockView();
 
 	void setIdleView(int view, uint time);
 	void setSpeechView(int view);
+	void setThinkView(int view);
+
+	void setBlinkInterval(uint interval);
 
 	void checkViewFrame();
 
