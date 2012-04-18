@@ -389,8 +389,11 @@ uint32 AGSGraphics::resolveHardcodedColor(uint32 color) const {
 	return outFormat.RGBToColor(r, g, b);
 }
 
-uint32 AGSGraphics::getTransparentColor() const {
-	switch (_vm->_gameFile->_colorDepth) {
+uint32 AGSGraphics::getTransparentColor(uint depth) const {
+	if (depth == 0)
+		depth = _vm->_gameFile->_colorDepth;
+
+	switch (depth) {
 	case 1:
 		return 0;
 	case 2:

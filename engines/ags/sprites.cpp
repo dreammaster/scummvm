@@ -26,8 +26,11 @@
 
 #include "common/debug.h"
 
-#include "ags/ags.h"
-#include "ags/sprites.h"
+#include "engines/ags/ags.h"
+#include "engines/ags/constants.h"
+#include "engines/ags/gamefile.h"
+#include "engines/ags/graphics.h"
+#include "engines/ags/sprites.h"
 
 #include "graphics/surface.h"
 
@@ -192,7 +195,10 @@ Sprite *SpriteSet::getSprite(uint32 spriteId) {
 		format = Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0);
 		break;
 	case 4:
-		format = Graphics::PixelFormat(4, 8, 8, 8, 8, 24, 16, 8, 0);
+		if (_vm->_gameFile->_spriteFlags[spriteId] & SPF_ALPHACHANNEL)
+			format = Graphics::PixelFormat(4, 8, 8, 8, 8, 16, 8, 0, 24);
+		else
+			format = Graphics::PixelFormat(4, 8, 8, 8, 0, 16, 8, 0, 0);
 		break;
 	default:
 		error("SpriteSet::getSprite: invalid sprite depth %d", colorDepth);
@@ -220,6 +226,46 @@ Sprite *SpriteSet::getSprite(uint32 spriteId) {
 		}
 	} else {
 		_stream->read((byte *)surface->getPixels(), surface->w * surface->h * colorDepth);
+	}
+
+	Graphics::PixelFormat nativeFormat = _vm->_graphics->getPixelFormat();
+	if (format != nativeFormat && !(format.bytesPerPixel == 4 && nativeFormat.bytesPerPixel == 4)) {
+		// FIXME: converting downward?
+
+		debug(3, "converting sprite from %dBpp to %dBpp", format.bytesPerPixel, nativeFormat.bytesPerPixel);
+
+		byte myPalette[256 * 3];
+		if (format.bytesPerPixel == 1) {
+			// Converting from a paletted image, make a copy of the palette
+			// and fix the transparency.
+
+			memcpy(myPalette, _vm->_graphics->getPalette(), 256 * 3);
+			uint32 transColor = _vm->_graphics->getTransparentColor();
+			nativeFormat.colorToRGB(transColor, myPalette[0], myPalette[1], myPalette[2]);
+		}
+
+		Graphics::Surface *convertedSurf = surface->convertTo(nativeFormat, myPalette);
+
+		if (format.bytesPerPixel == 2 && nativeFormat.bytesPerPixel == 4) {
+			// Converted 16bpp->32bpp, fix the transparency.
+
+			uint16 transColor16 = (uint16)_vm->_graphics->getTransparentColor(2);
+			uint32 transColor32 = _vm->_graphics->getTransparentColor();
+			for (uint y = 0; y < surface->h; ++y) {
+				uint16 *src = (uint16 *)surface->getBasePtr(0, y);
+				uint32 *dest = (uint32 *)convertedSurf->getBasePtr(0, y);
+				for (uint x = 0; x < surface->w; ++x) {
+					if (*src == transColor16)
+						*dest = transColor32;
+					src++;
+					dest++;
+				}
+			}
+		}
+
+		surface->free();
+		delete surface;
+		surface = convertedSurf;
 	}
 
 	// FIXME

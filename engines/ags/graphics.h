@@ -53,13 +53,14 @@ public:
 	Graphics::PixelFormat getPixelFormat(bool isAlpha = false) const;
 
 	uint32 resolveHardcodedColor(uint32 color) const;
-	uint32 getTransparentColor() const;
+	uint32 getTransparentColor(uint depth = 0) const;
 
 	void loadFonts();
 	Graphics::Font *getFont(uint id);
 
 	void initPalette();
 	void newRoomPalette();
+	const byte *getPalette() { return _palette; }
 
 	void drawOutlinedString(uint fontId, Graphics::Surface *surface, const Common::String &text, int x, int y, uint width, uint32 color);
 
