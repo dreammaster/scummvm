@@ -28,6 +28,7 @@
 #include "engines/ags/constants.h"
 #include "engines/ags/gamestate.h"
 #include "engines/ags/graphics.h"
+#include "engines/ags/pathfinder.h"
 #include "engines/ags/room.h"
 #include "engines/ags/script.h"
 #include "engines/ags/sprites.h"
@@ -169,6 +170,18 @@ void RoomObject::setVisible(bool visible) {
 		stopMoving();
 }
 
+void RoomObject::setGraphic(uint id) {
+	if (_spriteId != id) {
+		_spriteId = id;
+		debugC(kDebugLevelGame, "object %d graphic changed to %d", _id, _spriteId);
+	}
+
+	_cycling = 0;
+	_frame = 0;
+	_loop = 0;
+	_view = (uint16)-1;
+}
+
 void RoomObject::setObjectView(uint viewId) {
 	if (viewId < 1 || viewId > _vm->_gameFile->_views.size())
 		error("RoomObject::setObjectView: invalid view id %d (only have %d)", viewId, _vm->_gameFile->_views.size());
@@ -247,8 +260,11 @@ void RoomObject::update() {
 		return;
 
 	// do we need to move?
-	/* FIXME: if (_moving)
-		runMoveList(); */
+	if (_moving > 0) {
+		_moveList.doStep(_pos);
+		if (_moveList._stages.empty())
+			_moving = 0;
+	}
 
 	// do we need to animate?
 	if (!_cycling)
@@ -315,6 +331,28 @@ void RoomObject::update() {
 
 	_wait = frame->_speed + _overallSpeed;
 	_vm->checkViewFrame(_view, _loop, _frame);
+}
+
+void RoomObject::move(int x, int y, int speed, bool ignoreWalkable) {
+	if ((_vm->getGameFileVersion() <= kAGSVer261) && (speed == -1)) {
+		// AGS <= 2.61 uses MoveObject with spp=-1 internally instead of SetObjectPosition
+		_pos.x = x;
+		_pos.y = y;
+		return;
+	}
+
+	debugC(kDebugLevelGame, "object %d starting move to %d,%d", _id, x, y);
+
+	int objX = _vm->convertToLowRes(_pos.x);
+	int objY = _vm->convertToLowRes(_pos.y);
+	x = _vm->convertToLowRes(x);
+	y = _vm->convertToLowRes(y);
+
+	Graphics::Surface *walkableMask = _vm->getWalkableMaskFor((uint)-1);
+	if (findPath(_vm, Common::Point(objX, objY), Common::Point(x, y), walkableMask, &_moveList, speed, speed, true, ignoreWalkable)) {
+		_moving = true;
+		_moveList._direct = ignoreWalkable;
+	}
 }
 
 void RoomObject::stopMoving() {

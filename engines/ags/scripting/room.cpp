@@ -87,10 +87,7 @@ RuntimeValue Script_Room_get_ColorDepth(AGSEngine *vm, ScriptObject *, const Com
 // Room: readonly import static attribute int Height
 // Gets the height of the room background.
 RuntimeValue Script_Room_get_Height(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Room::get_Height unimplemented");
-
-	return RuntimeValue();
+	return vm->getCurrentRoom()->_height;
 }
 
 // Room: readonly import static attribute int LeftEdge
@@ -150,10 +147,7 @@ RuntimeValue Script_Room_get_TopEdge(AGSEngine *vm, ScriptObject *, const Common
 // Room: readonly import static attribute int Width
 // Gets the width of the room background.
 RuntimeValue Script_Room_get_Width(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Room::get_Width unimplemented");
-
-	return RuntimeValue();
+	return vm->getCurrentRoom()->_width;
 }
 
 // import void ResetRoom(int roomNumber)
@@ -669,10 +663,9 @@ RuntimeValue Script_Hotspot_get_ID(AGSEngine *vm, RoomHotspot *self, const Commo
 // Hotspot: readonly import attribute String Name
 // Gets the name of the hotspot.
 RuntimeValue Script_Hotspot_get_Name(AGSEngine *vm, RoomHotspot *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Hotspot::get_Name unimplemented");
-
-	return RuntimeValue();
+	RuntimeValue ret = new ScriptMutableString(self->_name);
+	ret._object->DecRef();
+	return ret;
 }
 
 // Hotspot: readonly import attribute int WalkToX
