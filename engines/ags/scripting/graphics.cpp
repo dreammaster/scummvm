@@ -1259,6 +1259,18 @@ RuntimeValue Script_DynamicSprite_CreateFromDrawingSurface(AGSEngine *vm, Script
 	return RuntimeValue();
 }
 
+// DynamicSprite: import static DynamicSprite* CreateFromExistingSprite(int slot)
+// Creates a dynamic sprite as a copy of an existing sprite (non-alpha version for backwards compatibility).
+RuntimeValue Script_DynamicSprite_CreateFromExistingSprite_Old(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
+	int slot = params[0]._signedValue;
+	UNUSED(slot);
+
+	// FIXME
+	error("DynamicSprite::CreateFromExistingSprite_Old unimplemented");
+
+	return RuntimeValue();
+}
+
 // DynamicSprite: import static DynamicSprite* CreateFromExistingSprite(int slot, bool preserveAlphaChannel=0)
 // Creates a dynamic sprite as a copy of an existing sprite.
 RuntimeValue Script_DynamicSprite_CreateFromExistingSprite(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
@@ -1758,7 +1770,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "DrawingSurface::DrawMessageWrapped^5", (ScriptAPIFunction *)&Script_DrawingSurface_DrawMessageWrapped, "iiiii", sotDrawingSurface },
 	{ "DrawingSurface::DrawPixel^2", (ScriptAPIFunction *)&Script_DrawingSurface_DrawPixel, "ii", sotDrawingSurface },
 	{ "DrawingSurface::DrawRectangle^4", (ScriptAPIFunction *)&Script_DrawingSurface_DrawRectangle, "iiii", sotDrawingSurface },
-	{ "DrawingSurface::DrawString^104", (ScriptAPIFunction *)&Script_DrawingSurface_DrawString, "iiis", sotDrawingSurface },
+	{ "DrawingSurface::DrawString^104", (ScriptAPIFunction *)&Script_DrawingSurface_DrawString, "iiis.", sotDrawingSurface },
 	{ "DrawingSurface::DrawStringWrapped^6", (ScriptAPIFunction *)&Script_DrawingSurface_DrawStringWrapped, "iiiiis", sotDrawingSurface },
 	{ "DrawingSurface::DrawSurface^2", (ScriptAPIFunction *)&Script_DrawingSurface_DrawSurface, "oi", sotDrawingSurface },
 	{ "DrawingSurface::DrawTriangle^6", (ScriptAPIFunction *)&Script_DrawingSurface_DrawTriangle, "iiiiii", sotDrawingSurface },
@@ -1771,19 +1783,19 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "DrawingSurface::set_UseHighResCoordinates", (ScriptAPIFunction *)&Script_DrawingSurface_set_UseHighResCoordinates, "i", sotDrawingSurface },
 	{ "DrawingSurface::get_Width", (ScriptAPIFunction *)&Script_DrawingSurface_get_Width, "", sotDrawingSurface },
 	{ "Display", (ScriptAPIFunction *)&Script_Display, "s.", sotNone },
-	{ "DisplayAt", (ScriptAPIFunction *)&Script_DisplayAt, "iiis", sotNone },
+	{ "DisplayAt", (ScriptAPIFunction *)&Script_DisplayAt, "iiis.", sotNone },
 	{ "DisplayAtY", (ScriptAPIFunction *)&Script_DisplayAtY, "is", sotNone },
 	{ "DisplayMessage", (ScriptAPIFunction *)&Script_DisplayMessage, "i", sotNone },
 	{ "DisplayMessageAtY", (ScriptAPIFunction *)&Script_DisplayMessageAtY, "ii", sotNone },
-	{ "DisplayTopBar", (ScriptAPIFunction *)&Script_DisplayTopBar, "iiiss", sotNone },
+	{ "DisplayTopBar", (ScriptAPIFunction *)&Script_DisplayTopBar, "iiiss.", sotNone },
 	{ "DisplayMessageBar", (ScriptAPIFunction *)&Script_DisplayMessageBar, "iiisi", sotNone },
 	{ "SetViewport", (ScriptAPIFunction *)&Script_SetViewport, "ii", sotNone },
 	{ "ReleaseViewport", (ScriptAPIFunction *)&Script_ReleaseViewport, "", sotNone },
 	{ "GetViewportX", (ScriptAPIFunction *)&Script_GetViewportX, "", sotNone },
 	{ "GetViewportY", (ScriptAPIFunction *)&Script_GetViewportY, "", sotNone },
 	{ "CreateGraphicOverlay", (ScriptAPIFunction *)&Script_CreateGraphicOverlay, "iiii", sotNone },
-	{ "CreateTextOverlay", (ScriptAPIFunction *)&Script_CreateTextOverlay, "iiiiis", sotNone },
-	{ "SetTextOverlay", (ScriptAPIFunction *)&Script_SetTextOverlay, "iiiiiis", sotNone },
+	{ "CreateTextOverlay", (ScriptAPIFunction *)&Script_CreateTextOverlay, "iiiiis.", sotNone },
+	{ "SetTextOverlay", (ScriptAPIFunction *)&Script_SetTextOverlay, "iiiiiis.", sotNone },
 	{ "RemoveOverlay", (ScriptAPIFunction *)&Script_RemoveOverlay, "i", sotNone },
 	{ "MoveOverlay", (ScriptAPIFunction *)&Script_MoveOverlay, "iii", sotNone },
 	{ "IsOverlayValid", (ScriptAPIFunction *)&Script_IsOverlayValid, "i", sotNone },
@@ -1800,7 +1812,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "RawDrawLine", (ScriptAPIFunction *)&Script_RawDrawLine, "iiii", sotNone },
 	{ "RawDrawRectangle", (ScriptAPIFunction *)&Script_RawDrawRectangle, "iiii", sotNone },
 	{ "RawDrawTriangle", (ScriptAPIFunction *)&Script_RawDrawTriangle, "iiiiii", sotNone },
-	{ "RawPrint", (ScriptAPIFunction *)&Script_RawPrint, "iis", sotNone },
+	{ "RawPrint", (ScriptAPIFunction *)&Script_RawPrint, "iis.", sotNone },
 	{ "RawPrintMessageWrapped", (ScriptAPIFunction *)&Script_RawPrintMessageWrapped, "iiiii", sotNone },
 	{ "RawSetColor", (ScriptAPIFunction *)&Script_RawSetColor, "i", sotNone },
 	{ "RawSetColorRGB", (ScriptAPIFunction *)&Script_RawSetColorRGB, "iii", sotNone },
@@ -1822,6 +1834,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "DynamicSprite::Create^3", (ScriptAPIFunction *)&Script_DynamicSprite_Create, "iii", sotNone },
 	{ "DynamicSprite::CreateFromBackground^5", (ScriptAPIFunction *)&Script_DynamicSprite_CreateFromBackground, "iiiii", sotNone },
 	{ "DynamicSprite::CreateFromDrawingSurface^5", (ScriptAPIFunction *)&Script_DynamicSprite_CreateFromDrawingSurface, "oiiii", sotNone },
+	{ "DynamicSprite::CreateFromExistingSprite^1", (ScriptAPIFunction *)&Script_DynamicSprite_CreateFromExistingSprite_Old, "i", sotNone },
 	{ "DynamicSprite::CreateFromExistingSprite^2", (ScriptAPIFunction *)&Script_DynamicSprite_CreateFromExistingSprite, "ii", sotNone },
 	{ "DynamicSprite::CreateFromFile^1", (ScriptAPIFunction *)&Script_DynamicSprite_CreateFromFile, "s", sotNone },
 	{ "DynamicSprite::CreateFromSaveGame^3", (ScriptAPIFunction *)&Script_DynamicSprite_CreateFromSaveGame, "iii", sotNone },
