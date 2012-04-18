@@ -471,7 +471,7 @@ private:
 	BlockUntilType checkBlockingUntil();
 
 	void doConversation(uint dialogId);
-	int runDialogScript(struct DialogTopic &topic, uint dialogId, uint offset, uint optionId);
+	int runDialogScript(struct DialogTopic &topic, uint dialogId, uint16 offset, uint optionId);
 	int runDialogRequest(uint request);
 
 	bool runScriptFunction(ccInstance *instance, const Common::String &name, const Common::Array<RuntimeValue> &params = Common::Array<RuntimeValue>());

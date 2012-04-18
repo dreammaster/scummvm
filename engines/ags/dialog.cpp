@@ -399,7 +399,7 @@ int AGSEngine::showDialogOptions(uint dialogId, uint sayChosenOption) {
 void AGSEngine::doConversation(uint dialogId) {
 	endSkippingUntilCharStops();
 
-	// AGS 2.x always makes the mouse cursor visible when displaying a dialog.
+	// JJS: AGS 2.x always makes the mouse cursor visible when displaying a dialog.
 	// "Fixed invisible mouse cursor in dialogs with some version 2.x games, e.g. Murder in a Wheel."
 	if (getGameFileVersion() <= kAGSVer272)
 		_state->_mouseCursorHidden = 0;
@@ -424,12 +424,13 @@ void AGSEngine::doConversation(uint dialogId) {
 			error("doConversation: new dialog was too high (%d), only have %d dialogs",
 				currDialogId, _gameFile->_dialogs.size());
 
-		debugC(kDebugLevelGame, "running conversation topic %d", dialogId);
+		debugC(kDebugLevelGame, "running conversation topic %d", currDialogId);
 
 		currDialogTopic = _gameFile->_dialogs[currDialogId];
 
 		if (currDialogId != dialogId) {
 			// dialog topic changed, so play the startup script for the new topic
+			debugC(2, kDebugLevelGame, "changed from topic %d to topic %d", dialogId, currDialogId);
 			dialogId = currDialogId;
 			result = runDialogScript(currDialogTopic, currDialogId, currDialogTopic._startupEntryPoint, 0);
 		} else {
@@ -449,9 +450,11 @@ void AGSEngine::doConversation(uint dialogId) {
 		if (result == RUN_DIALOG_GOTO_PREVIOUS) {
 			if (previousTopics.empty()) {
 				// goto-previous on first topic -- end dialog
+				debugC(2, kDebugLevelGame, "back to previous topic (none left, done)");
 				result = RUN_DIALOG_STOP_DIALOG;
 			} else {
 				result = (int)previousTopics.pop();
+				debugC(2, kDebugLevelGame, "back to previous topic %d", result);
 			}
 		}
 		if (result >= 0) {
@@ -478,8 +481,10 @@ static void getDialogScriptParameters(DialogTopic &topic, uint &pos, uint16 *par
 	}
 }
 
-int AGSEngine::runDialogScript(DialogTopic &topic, uint dialogId, uint offset, uint optionId) {
+int AGSEngine::runDialogScript(DialogTopic &topic, uint dialogId, uint16 offset, uint optionId) {
 	_saidSpeechLine = false;
+
+	debugC(2, kDebugLevelGame, "running dialog script for option %d of dialog %d", optionId, dialogId);
 
 	int result = RUN_DIALOG_STAY;
 	if (_dialogScriptsScript) {
@@ -489,7 +494,7 @@ int AGSEngine::runDialogScript(DialogTopic &topic, uint dialogId, uint offset, u
 		result = (int)_dialogScriptsScript->getReturnValue();
 	} else {
 		// old-style dialog script
-		if (offset == (uint)-1)
+		if (offset == (uint16)-1)
 			return result;
 
 		uint pos = offset;
@@ -552,7 +557,8 @@ int AGSEngine::runDialogScript(DialogTopic &topic, uint dialogId, uint offset, u
 				break;
 			case DCMD_RUNTEXTSCRIPT:
 				getDialogScriptParameters(topic, pos, &param1, NULL);
-				scriptRunning = (runDialogRequest(param1) == RUN_DIALOG_STAY);
+				result = runDialogRequest(param1);
+				scriptRunning = (result == RUN_DIALOG_STAY);
 				break;
 			case DCMD_GOTODIALOG:
 				getDialogScriptParameters(topic, pos, &param1, NULL);
@@ -617,6 +623,8 @@ int AGSEngine::runDialogScript(DialogTopic &topic, uint dialogId, uint offset, u
 		// (see doConversation also)
 	}
 
+	debugC(2, kDebugLevelGame, "finished dialog script for option %d of dialog %d, returning %d", optionId, dialogId, result);
+
 	return result;
 }
 
@@ -638,7 +646,6 @@ int AGSEngine::runDialogRequest(uint request) {
 		uint roomId = (uint)_state->_stopDialogAtEnd - DIALOG_NEWROOM;
 		_state->_stopDialogAtEnd = DIALOG_NONE;
 		scheduleNewRoom(roomId);
-		error("runDialogRequest doesn't do DIALOG_NEWROOM yet");
 		return RUN_DIALOG_STOP_DIALOG;
 	} else {
 		_state->_stopDialogAtEnd = DIALOG_NONE;
