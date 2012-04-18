@@ -33,7 +33,7 @@
 
 namespace AGS {
 
-static char s_fallbackFilenameBuffer[21];
+static char s_fallbackFilenameBuffer[51];
 static char s_fallbackTitleBuffer[51];
 
 }
@@ -58,7 +58,6 @@ public:
 
 	ADDetectedGame fallbackDetect(const FileMap &allFiles, const Common::FSList &fslist) const override;
 };
-
 
 ADDetectedGame AGSMetaEngineDetection::fallbackDetect(const FileMap &allFiles, const Common::FSList &fslist) const {
 	// Set the default values for the fallback descriptor's ADGameDescription part.
@@ -100,6 +99,7 @@ ADDetectedGame AGSMetaEngineDetection::fallbackDetect(const FileMap &allFiles, c
 		dta->read(gameTitle, 50);
 		gameTitle[50] = '\0';
 		delete dta;
+
 		strncpy(AGS::s_fallbackTitleBuffer, gameTitle, 50);
 		AGS::s_fallbackTitleBuffer[50] = '\0';
 		gd.title = AGS::s_fallbackTitleBuffer;
