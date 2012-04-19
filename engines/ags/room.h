@@ -81,6 +81,8 @@ struct RoomRegion : public ScriptObject {
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotRegion); }
 	const char *getObjectTypeName() { return "RoomRegion"; }
 
+	uint _id;
+
 	NewInteraction *_interaction;
 	InteractionScript _interactionScripts;
 	uint16 _lightLevel;

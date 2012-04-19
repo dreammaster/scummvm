@@ -395,7 +395,7 @@ bool GameFile::init() {
 			dta->read(optionNames[j], 150);
 			optionNames[j][150] = '\0';
 		}
-		int optionFlags[MAXTOPICOPTIONS];
+		uint32 optionFlags[MAXTOPICOPTIONS];
 		for (uint j = 0; j < MAXTOPICOPTIONS; ++j)
 			optionFlags[j] = dta->readUint32LE();
 		/* bool hasScripts = (bool)*/dta->readUint32LE();

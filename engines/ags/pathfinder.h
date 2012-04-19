@@ -48,7 +48,6 @@ struct MoveList {
 	int _curPart;
 
 	Common::Point _from;
-	Common::Point _curPos;
 
 	// is the move direct (i.e. ignoring walls)?
 	// (if not, characters need to make sure they end up on a walkable area when done)

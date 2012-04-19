@@ -475,7 +475,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 	ccInstance *inst = _runningInst;
 	ccScript *script = inst->_script;
 
-	_returnValue = (uint)-1;
+	_returnValue = -1;
 
 	assert(start < script->_code.size());
 	_pc = start;

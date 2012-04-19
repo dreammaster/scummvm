@@ -1051,6 +1051,9 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 				error("Room: too many regions (%d)", regionCount);
 			_regions.resize(regionCount);
 
+			for (uint i = 0; i < _regions.size(); ++i)
+				_regions[i]._id = i;
+
 			// 2.x interactions
 			if (_version < kAGSRoomVer300) {
 				for (uint i = 0; i < _regions.size(); ++i) {

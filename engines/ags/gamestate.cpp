@@ -53,6 +53,8 @@ GameState::GameState(AGSEngine *vm) : _vm(vm) {
 	_usedInvOn = 0;
 
 	_globalScriptVars.resize(MAXGSVALUES);
+	for (uint i = 0; i < _globalScriptVars.size(); ++i)
+		_globalScriptVars[i] = 0;
 }
 
 uint32 GameState::readUint32(uint offset) {
