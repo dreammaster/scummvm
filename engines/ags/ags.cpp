@@ -1410,6 +1410,10 @@ Common::String AGSEngine::formatString(const Common::String &string, const Commo
 			if (c == 'd' || c == 'f' || c == 'c' || c == 's' || c == 'x' || c == 'X')
 				break;
 			++n;
+			// Give up quickly if there's something like '100% ' in here.
+			// TODO: This is kind of a hack.
+			if (c == ' ')
+				n = string.size();
 		}
 		if (n++ == string.size()) {
 			// something unsupported, so just write it literally
@@ -1418,14 +1422,19 @@ Common::String AGSEngine::formatString(const Common::String &string, const Commo
 			continue;
 		}
 
-		if (paramId >= values.size())
-			error("formatString: ran out of parameters for string '%s' (got %d, needed #%d)",
+		if (paramId >= values.size()) {
+			// Out of parameters! Just dump the rest of the string.
+			warning("formatString: ran out of parameters for string '%s' (got %d, needed #%d)",
 				string.c_str(), values.size(), paramId);
+			--i;
+			out += (string + i);
+			break;
+		}
 		const RuntimeValue &value = values[paramId++];
 
 		// copy the format specifier and skip it
 		Common::String formatSpecifier(string.c_str() + i - 1, n - i + 1);
-		i = n;
+		i = n - 1;
 
 		char formatType = formatSpecifier[formatSpecifier.size() - 1];
 		switch (formatType) {
@@ -1457,7 +1466,7 @@ Common::String AGSEngine::formatString(const Common::String &string, const Commo
 	}
 
 	if (paramId < values.size())
-		error("formatString: too many parameters for string '%s' (got %d, used %d)",
+		warning("formatString: too many parameters for string '%s' (got %d, used %d)",
 			string.c_str(), values.size(), paramId);
 
 	return out;
