@@ -882,7 +882,13 @@ void GUIGroup::setSize(uint32 width, uint32 height) {
 	if (!_visible)
 		return;
 
-	_surface.create(width, height, _vm->_graphics->getPixelFormat());
+	bool isAlpha = true;
+	if (_bgPic > 0)
+		isAlpha = (_vm->_gameFile->_spriteFlags[_bgPic] & SPF_ALPHACHANNEL);
+	else if (_bgColor > 0)
+		isAlpha = false;
+
+	_surface.create(width, height, _vm->_graphics->getPixelFormat(isAlpha));
 
 	invalidate();
 }
@@ -891,6 +897,7 @@ void GUIGroup::setBackgroundPicture(uint32 pic) {
 	if (pic == _bgPic)
 		return;
 
+	// FIXME: recreate surface with/without alpha if necessary
 	_bgPic = pic;
 	invalidate();
 }
@@ -1115,6 +1122,11 @@ const Graphics::Surface *GUIGroup::getDrawSurface() {
 }
 
 void GUIGroup::draw() {
+	// stop border being transparent, if the whole GUI isn't
+	// TODO: move this to some sanity-check?
+	if ((_fgColor == 0) && (_bgColor != 0))
+		_fgColor = 16;
+
 	// clear the surface, filling with either transparency or the background color
 	uint32 bgColor;
 	if (_bgColor != 0)

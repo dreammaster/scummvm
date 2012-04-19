@@ -484,7 +484,11 @@ void AGSGraphics::newRoomPalette() {
 }
 
 void AGSGraphics::drawOutlinedString(uint fontId, Graphics::Surface *surface, const Common::String &text, int x, int y, uint width, uint32 color) {
-	const uint32 outlineColor = resolveHardcodedColor(_vm->_state->_speechTextShadow);
+	uint32 outlineColor = resolveHardcodedColor(_vm->_state->_speechTextShadow);
+	if (surface->format.aShift) {
+		color |= 0xff000000;
+		outlineColor |= 0xff000000;
+	}
 	Graphics::Font *font = _fonts[fontId];
 
 	if (_vm->_gameFile->_fonts[fontId]._outline >= 0) {
@@ -645,15 +649,14 @@ void AGSGraphics::draw(Drawable *item, bool useViewport) {
 	if (!itemWidth || !itemHeight)
 		return;
 	bool mirrored = item->isDrawMirrored();
-	bool useAlpha = item->isDrawAlpha();
 	const Graphics::Surface *surface = item->getDrawSurface();
 
 	// FIXME: lots of things
-	blit(surface, &_backBuffer, pos, transparency, mirrored, useAlpha);
+	blit(surface, &_backBuffer, pos, transparency, mirrored);
 }
 
 void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, Common::Point pos, uint transparency,
-	bool mirrored, bool useAlpha) {
+	bool mirrored) {
 	if (transparency == 255)
 		return;
 
@@ -761,7 +764,7 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 	} else {
 		uint32 transColor = (uint32)getTransparentColor();
 
-		if (!transparency && useAlpha) {
+		if (srcSurf->format.aShift) {
 			for (uint y = 0; y < height; ++y) {
 				uint32 *dest;
 				if (mirrored)
@@ -771,17 +774,24 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 				const uint32 *src = (uint32 *)srcSurf->getBasePtr(startX, startY + y);
 				for (uint x = 0; x < width; ++x) {
 					uint32 srcData = *src++;
-					if (srcData != transColor) {
+					if ((srcData & 0xffffff) != transColor) {
 						uint32 destData = *dest;
 
 						transparency = srcData >> 24;
-						if (transparency)
-							transparency++;
-						uint32 blendedRB = ((srcData & 0xFF00FF) - (destData & 0xFF00FF))
-							* transparency / 256 + destData;
-						uint32 blended = ((srcData & 0xFF00) - (destData & 0xFF00))
-							* transparency / 256 + (destData & 0xFF00);
-						*dest = (blended & 0xFF00) | (blendedRB & 0xFF00FF);
+						if (destSurf->format.aShift) {
+							// alpha onto alpha; additive
+							uint alpha = MIN<uint>(0xff, transparency + (destData >> 24));
+							*dest = (alpha << 24) | (srcData & 0xffffff);
+						} else {
+							// alpha onto non-alpha; blend
+							if (transparency)
+								transparency++;
+							uint32 blendedRB = ((srcData & 0xFF00FF) - (destData & 0xFF00FF))
+								* transparency / 256 + (destData & 0xFF00FF);
+							uint32 blended = ((srcData & 0xFF00) - (destData & 0xFF00))
+								* transparency / 256 + (destData & 0xFF00);
+							*dest = (blended & 0xFF00) | (blendedRB & 0xFF00FF) | 0xFF000000;
+						}
 					}
 					if (mirrored)
 						dest--;
@@ -803,8 +813,8 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 				const uint32 *src = (uint32 *)srcSurf->getBasePtr(startX, startY + y);
 				for (uint x = 0; x < width; ++x) {
 					uint32 srcData = *src++;
-					if (srcData != transColor)
-						*dest = srcData;
+					if ((srcData & 0xffffff) != transColor)
+						*dest = srcData | 0xff000000;
 					if (mirrored)
 						dest--;
 					else
@@ -825,14 +835,14 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 			const uint32 *src = (uint32 *)srcSurf->getBasePtr(startX, startY + y);
 			for (uint x = 0; x < width; ++x) {
 				uint32 srcData = *src++;
-				if (srcData != transColor) {
+				if ((srcData & 0xffffff) != transColor) {
 					uint32 destData = *dest;
 
 					uint32 blendedRB = ((srcData & 0xFF00FF) - (destData & 0xFF00FF))
 						* transparency / 256 + destData;
 					uint32 blended = ((srcData & 0xFF00) - (destData & 0xFF00))
 						* transparency / 256 + (destData & 0xFF00);
-					*dest = (blended & 0xFF00) | (blendedRB & 0xFF00FF);
+					*dest = (blended & 0xFF00) | (blendedRB & 0xFF00FF) | 0xFF000000;
 				}
 				if (mirrored)
 					dest--;
@@ -915,7 +925,7 @@ bool Drawable::containsPoint(AGSEngine *vm, Common::Point point) {
 			return false;
 		break;
 	case 4:
-		if (*(uint32 *)ptr == vm->_graphics->getTransparentColor())
+		if ((*(uint32 *)ptr & 0xffffff) == vm->_graphics->getTransparentColor())
 			return false;
 		break;
 	default:

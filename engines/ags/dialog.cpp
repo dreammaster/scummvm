@@ -55,7 +55,6 @@ public:
 
 	virtual uint getDrawTransparency() { return 0; }
 	virtual bool isDrawMirrored() { return 0; }
-	virtual bool isDrawAlpha() { return true; }
 	virtual int getDrawLightLevel() { return 0; }
 	virtual void getDrawTint(int &lightLevel, int &luminance, byte &red, byte &green, byte &blue) { }
 

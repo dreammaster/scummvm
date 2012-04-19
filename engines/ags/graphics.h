@@ -70,7 +70,7 @@ public:
 	void internalDraw(const Graphics::Surface *srcSurf, const Common::Point &pos, uint transparency);
 
 	void blit(const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, Common::Point pos, uint transparency,
-		bool mirrored = false, bool useAlpha = false);
+		bool mirrored = false);
 
 	void setExtraDrawable(Drawable *drawable) { _extraDrawable = drawable; }
 
