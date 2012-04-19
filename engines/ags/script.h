@@ -231,7 +231,7 @@ public:
 
 protected:
 	void runCodeFrom(uint32 start);
-	ScriptString *createStringFrom(RuntimeValue &value);
+	ScriptString *createStringFrom(RuntimeValue &value, bool allowFailure = false);
 	RuntimeValue callImportedFunction(const ScriptSystemFunctionInfo *function, ScriptObject *object,
 		Common::Array<RuntimeValue> &params);
 

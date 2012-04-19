@@ -1396,7 +1396,7 @@ protected:
 	uint32 _offset;
 };
 
-ScriptString *ccInstance::createStringFrom(RuntimeValue &value) {
+ScriptString *ccInstance::createStringFrom(RuntimeValue &value, bool allowFailure) {
 	if (value._type == rvtStackPointer)
 		return new ScriptStackString(this, value._value);
 	else if (value._type == rvtScriptData) {
@@ -1418,6 +1418,8 @@ ScriptString *ccInstance::createStringFrom(RuntimeValue &value) {
 		ScriptString *str = obj->getStringObject(offset);
 		if (str)
 			return str;
+		if (allowFailure)
+			return NULL;
 		error("createStringFrom failed to create a string from offset %d of object of type '%s'",
 			offset, obj->getObjectTypeName());
 	}
@@ -1512,9 +1514,15 @@ RuntimeValue ccInstance::callImportedFunction(const ScriptSystemFunctionInfo *fu
 		// variable argument function
 		while (pos < params.size()) {
 			if (params[pos]._type != rvtInteger && params[pos]._type != rvtFloat) {
-				// assume it's a string
-				params[pos] = createStringFrom(params[pos]);
-				params[pos]._object->DecRef();
+				// assume it's a string..
+				ScriptString *str = createStringFrom(params[pos], true);
+				// .. if it isn't, then preserve it (to cope with games like
+				// Technobabylon which pass random objects without using them).
+				// formatString will complain if it's actually used.
+				if (str) {
+					params[pos] = str;
+					params[pos]._object->DecRef();
+				}
 			}
 			++pos;
 		}
