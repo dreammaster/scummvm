@@ -255,8 +255,7 @@ RuntimeValue Script_Mouse_Update(AGSEngine *vm, ScriptObject *, const Common::Ar
 // Mouse: import static void UseDefaultGraphic()
 // Changes the current mouse cursor back to the default for the current mode.
 RuntimeValue Script_Mouse_UseDefaultGraphic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Mouse::UseDefaultGraphic unimplemented");
+	vm->setDefaultCursor();
 
 	return RuntimeValue();
 }

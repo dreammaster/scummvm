@@ -192,10 +192,8 @@ RuntimeValue Script_Wait(AGSEngine *vm, ScriptObject *, const Common::Array<Runt
 // Fast-forwards the game until the specified character finishes moving.
 RuntimeValue Script_SkipUntilCharacterStops(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
 
-	// FIXME
-	error("SkipUntilCharacterStops unimplemented");
+	vm->skipUntilCharacterStops(charid);
 
 	return RuntimeValue();
 }

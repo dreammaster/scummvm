@@ -252,12 +252,9 @@ RuntimeValue Script_GetLocationName(AGSEngine *vm, ScriptObject *, const Common:
 // Old string buffer function.
 RuntimeValue Script_GetRoomPropertyText(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	ScriptString *property = (ScriptString *)params[0]._object;
-	UNUSED(property);
 	ScriptString *buffer = (ScriptString *)params[1]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("GetRoomPropertyText unimplemented");
+	buffer->setString(vm->getStringProperty(property->getString(), vm->getCurrentRoom()->_properties));
 
 	return RuntimeValue();
 }
@@ -330,13 +327,14 @@ RuntimeValue Script_EnableHotspot(AGSEngine *vm, ScriptObject *, const Common::A
 // import void GetHotspotName(int hotspot, string buffer)
 // Obsolete hotspot function.
 RuntimeValue Script_GetHotspotName(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int hotspot = params[0]._signedValue;
-	UNUSED(hotspot);
+	uint hotspot = params[0]._value;
 	ScriptString *buffer = (ScriptString *)params[1]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("GetHotspotName unimplemented");
+	if (hotspot >= vm->getCurrentRoom()->_hotspots.size())
+		error("GetHotspotName: hotspot %d is too high (only have %d)",
+			hotspot, vm->getCurrentRoom()->_hotspots.size());
+
+	buffer->setString(vm->getCurrentRoom()->_hotspots[hotspot]._name);
 
 	return RuntimeValue();
 }
@@ -344,25 +342,31 @@ RuntimeValue Script_GetHotspotName(AGSEngine *vm, ScriptObject *, const Common::
 // import int GetHotspotPointX(int hotspot)
 // Obsolete hotspot function.
 RuntimeValue Script_GetHotspotPointX(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int hotspot = params[0]._signedValue;
-	UNUSED(hotspot);
+	uint hotspot = params[0]._value;
 
-	// FIXME
-	error("GetHotspotPointX unimplemented");
+	if (hotspot >= vm->getCurrentRoom()->_hotspots.size())
+		error("GetHotspotPointX: hotspot %d is too high (only have %d)",
+			hotspot, vm->getCurrentRoom()->_hotspots.size());
 
-	return RuntimeValue();
+	if (vm->getCurrentRoom()->_hotspots[hotspot]._walkToPos.x < 1)
+		return -1;
+
+	return vm->getCurrentRoom()->_hotspots[hotspot]._walkToPos.x;
 }
 
 // import int GetHotspotPointY(int hotspot)
 // Obsolete hotspot function.
 RuntimeValue Script_GetHotspotPointY(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int hotspot = params[0]._signedValue;
-	UNUSED(hotspot);
+	uint hotspot = params[0]._value;
 
-	// FIXME
-	error("GetHotspotPointY unimplemented");
+	if (hotspot >= vm->getCurrentRoom()->_hotspots.size())
+		error("GetHotspotPointY: hotspot %d is too high (only have %d)",
+			hotspot, vm->getCurrentRoom()->_hotspots.size());
 
-	return RuntimeValue();
+	if (vm->getCurrentRoom()->_hotspots[hotspot]._walkToPos.y < 1)
+		return -1;
+
+	return vm->getCurrentRoom()->_hotspots[hotspot]._walkToPos.y;
 }
 
 // import int GetHotspotProperty(int hotspot, const string property)
@@ -590,10 +594,8 @@ RuntimeValue Script_Hotspot_GetAtScreenXY(AGSEngine *vm, ScriptObject *, const C
 // Undocumented.
 RuntimeValue Script_Hotspot_GetName(AGSEngine *vm, RoomHotspot *self, const Common::Array<RuntimeValue> &params) {
 	ScriptString *buffer = (ScriptString *)params[0]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("Hotspot::GetName unimplemented");
+	buffer->setString(self->_name);
 
 	return RuntimeValue();
 }
@@ -671,19 +673,19 @@ RuntimeValue Script_Hotspot_get_Name(AGSEngine *vm, RoomHotspot *self, const Com
 // Hotspot: readonly import attribute int WalkToX
 // Gets the X co-ordinate of the walk-to point for this hotspot.
 RuntimeValue Script_Hotspot_get_WalkToX(AGSEngine *vm, RoomHotspot *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Hotspot::get_WalkToX unimplemented");
+	if (self->_walkToPos.x < 1)
+		return -1;
 
-	return RuntimeValue();
+	return self->_walkToPos.x;
 }
 
 // Hotspot: readonly import attribute int WalkToY
 // Gets the Y co-ordinate of the walk-to point for this hotspot.
 RuntimeValue Script_Hotspot_get_WalkToY(AGSEngine *vm, RoomHotspot *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Hotspot::get_WalkToY unimplemented");
+	if (self->_walkToPos.y < 1)
+		return -1;
 
-	return RuntimeValue();
+	return self->_walkToPos.y;
 }
 
 // Region: import static Region* GetAtRoomXY(int x, int y)
@@ -699,11 +701,9 @@ RuntimeValue Script_Region_GetAtRoomXY(AGSEngine *vm, ScriptObject *, const Comm
 // Region: import void RunInteraction(int event)
 // Runs the event handler for the specified event for this region.
 RuntimeValue Script_Region_RunInteraction(AGSEngine *vm, RoomRegion *self, const Common::Array<RuntimeValue> &params) {
-	int event = params[0]._signedValue;
-	UNUSED(event);
+	uint event = params[0]._value;
 
-	// FIXME
-	error("Region::RunInteraction unimplemented");
+	vm->runRegionInteraction(self->_id, event);
 
 	return RuntimeValue();
 }

@@ -729,13 +729,9 @@ RuntimeValue Script_MoveOverlay(AGSEngine *vm, ScriptObject *, const Common::Arr
 // import int IsOverlayValid(int overlayID)
 // Undocumented.
 RuntimeValue Script_IsOverlayValid(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int overlayID = params[0]._signedValue;
-	UNUSED(overlayID);
+	uint overlayID = params[0]._value;
 
-	// FIXME
-	error("IsOverlayValid unimplemented");
-
-	return RuntimeValue();
+	return (vm->findOverlayOfType(overlayID) != (uint)-1) ? 1 : 0;
 }
 
 // import int LoadImageFile(const string filename)
