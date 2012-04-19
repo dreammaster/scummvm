@@ -826,12 +826,15 @@ RuntimeValue Script_SetCharacterBaseline(AGSEngine *vm, ScriptObject *, const Co
 // Obsolete character function.
 RuntimeValue Script_SetCharacterIgnoreLight(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
-	int ignoreLight = params[1]._signedValue;
-	UNUSED(ignoreLight);
+	uint ignoreLight = params[1]._value;
 
-	// FIXME
-	error("SetCharacterIgnoreLight unimplemented");
+	if (charid >= vm->_characters.size())
+		error("SetCharacterIgnoreLight: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	if (ignoreLight)
+		vm->_characters[charid]->_flags |= CHF_NOLIGHTING;
+	else
+		vm->_characters[charid]->_flags &= ~CHF_NOLIGHTING;
 
 	return RuntimeValue();
 }
@@ -840,12 +843,15 @@ RuntimeValue Script_SetCharacterIgnoreLight(AGSEngine *vm, ScriptObject *, const
 // Obsolete character function.
 RuntimeValue Script_SetCharacterIgnoreWalkbehinds(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 charid = params[0]._value;
-	UNUSED(charid);
-	int ignoreWBs = params[1]._signedValue;
-	UNUSED(ignoreWBs);
+	uint ignoreWBs = params[1]._value;
 
-	// FIXME
-	error("SetCharacterIgnoreWalkbehinds unimplemented");
+	if (charid >= vm->_characters.size())
+		error("SetCharacterWalkbehinds: character %d is too high (only have %d)", charid, vm->_characters.size());
+
+	if (ignoreWBs)
+		vm->_characters[charid]->_flags |= CHF_NOWALKBEHINDS;
+	else
+		vm->_characters[charid]->_flags &= ~CHF_NOWALKBEHINDS;
 
 	return RuntimeValue();
 }
@@ -1220,8 +1226,13 @@ RuntimeValue Script_Character_PlaceOnWalkableArea(AGSEngine *vm, Character *self
 // Character: import void RemoveTint()
 // Removes an existing colour tint from the character.
 RuntimeValue Script_Character_RemoveTint(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::RemoveTint unimplemented");
+	if (self->_flags & CHF_HASTINT) {
+		debugC(kDebugLevelGame, "character '%s' (id %d) now untinted",
+			self->_scriptName.c_str(), self->_indexId);
+		self->_flags &= ~CHF_HASTINT;
+	} else
+		warning("Character::RemoveTint called on untinted character '%s' (id %d)",
+			self->_scriptName.c_str(), self->_indexId);
 
 	return RuntimeValue();
 }
@@ -1230,10 +1241,8 @@ RuntimeValue Script_Character_RemoveTint(AGSEngine *vm, Character *self, const C
 // Runs one of the character's interaction events.
 RuntimeValue Script_Character_RunInteraction(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
 
-	// FIXME
-	error("Character::RunInteraction unimplemented");
+	vm->runCharacterInteraction(self->_indexId, cursormode);
 
 	return RuntimeValue();
 }
@@ -1630,10 +1639,7 @@ RuntimeValue Script_Character_set_Frame(AGSEngine *vm, Character *self, const Co
 // Character: readonly import attribute bool HasExplicitTint
 // Gets whether the character has an explicit tint set.
 RuntimeValue Script_Character_get_HasExplicitTint(AGSEngine *vm, Character *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Character::get_HasExplicitTint unimplemented");
-
-	return RuntimeValue();
+	return (self->_flags & CHF_HASTINT) ? 1 : 0;
 }
 
 // Character: readonly import attribute int ID
