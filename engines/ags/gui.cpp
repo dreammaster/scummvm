@@ -883,7 +883,7 @@ void GUIGroup::setSize(uint32 width, uint32 height) {
 		return;
 
 	bool isAlpha = true;
-	if (_bgPic > 0)
+	if ((int)_bgPic > 0)
 		isAlpha = (_vm->_gameFile->_spriteFlags[_bgPic] & SPF_ALPHACHANNEL);
 	else if (_bgColor > 0)
 		isAlpha = false;
