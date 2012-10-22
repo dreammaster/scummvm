@@ -40,8 +40,8 @@ AnimationManager::AnimationManager() {
 
 // Play Anim
 void AnimationManager::PLAY_ANM(const Common::String &filename, uint32 rate1, uint32 rate2, uint32 rate3) {
-	signed __int16 v4; 
-	signed __int16 v5; 
+	int16 v4; 
+	int16 v5; 
 	bool hasScreenCopy; 
 	byte *screenCopy = NULL; 
 	byte *v10 = NULL;
@@ -982,7 +982,7 @@ void AnimationManager::PLAY_SEQ(int a1, const Common::String &a2, uint32 a3, uin
 	v10 = _vm->_globals.dos_malloc2(0x16u);
 	_vm->_fileManager.CONSTRUIT_FICHIER(_vm->_globals.HOPSEQ, a2);
 	if (!f.open(_vm->_globals.NFICHIER))
-		error("Error opening file - %s", _vm->_globals.NFICHIER);
+		error("Error opening file - %s", _vm->_globals.NFICHIER.c_str());
 
 	f.read(&buf, 6u);
 	f.read(_vm->_graphicsManager.Palette, 0x320u);
