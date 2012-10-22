@@ -70,7 +70,7 @@ public:
 	}
 
 	virtual const char *getOriginalCopyright() const {
-		return "Hopkins Engine (C) ???";
+		return "Hopkins Engine (C) MP Entertainment";
 	}
 
 	virtual bool hasFeature(MetaEngineFeature f) const;
