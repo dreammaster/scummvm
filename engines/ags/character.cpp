@@ -1039,6 +1039,13 @@ void Character::fixPlayerSprite() {
 	startTurning(useLoop, diagonalState);
 }
 
+void Character::SetOption(int flag, bool value) {
+	if (value && (flag & CHF_MANUALSCALING))
+		_zoom = 100;
+	if (value) _flags |= flag;
+	else _flags &= ~flag;
+}
+
 // returns the number of move steps needed per frame
 // (-ve for only partial steps) based on the walkWaitCounter
 int Character::needMoveSteps() {
