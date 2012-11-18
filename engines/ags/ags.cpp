@@ -1391,7 +1391,7 @@ void AGSEngine::loseInventory(uint itemId) {
 }
 
 void AGSEngine::setActiveInventory(uint itemId) {
-	if (itemId >= _gameFile->_invItemInfo.size())
+	if (itemId >= _gameFile->_invItemInfo.size() && (int)itemId != -1)
 		error("setActiveInventory: itemId is too high (only %d items)", _gameFile->_invItemInfo.size());
 
 	_playerChar->setActiveInventory(itemId);

@@ -1610,7 +1610,7 @@ void Character::loseInventory(uint itemId) {
 void Character::setActiveInventory(uint itemId) {
 	_vm->invalidateGUI();
 
-	if (itemId == 0) {
+	if ((int32)itemId == -1 || itemId == 0) {
 		_activeInv = (uint)-1;
 
 		if (_vm->getPlayerChar() == this && _vm->getCursorMode() == MODE_USE)
