@@ -3465,7 +3465,7 @@ void AGSEngine::stopSpeech() {
 #define PROP_TYPE_INT    2
 #define PROP_TYPE_STRING 3
 
-int AGSEngine::getIntProperty(const Common::String &name, const Common::StringMap &properties) {
+const CustomPropertySchemaProperty* AGSEngine::getProperty(const Common::String &name) {
 	int propertyId = -1;
 	for (uint i = 0; i < _gameFile->_schemaProperties.size(); ++i) {
 		if (_gameFile->_schemaProperties[i]._name.equalsIgnoreCase(name)) {
@@ -3476,33 +3476,28 @@ int AGSEngine::getIntProperty(const Common::String &name, const Common::StringMa
 	if (propertyId == -1)
 		error("script requested property '%s', which isn't present in the game schema", name.c_str());
 
-	const CustomPropertySchemaProperty &property = _gameFile->_schemaProperties[propertyId];
-	if (property._type == PROP_TYPE_STRING)
+	return &_gameFile->_schemaProperties[propertyId];
+}
+
+int AGSEngine::getIntProperty(const Common::String &name, const Common::StringMap &properties) {
+	const CustomPropertySchemaProperty *property = getProperty(name);
+	if (property->_type == PROP_TYPE_STRING)
 		error("script requested property '%s' as an integer, but the schema says it's a string", name.c_str());
 
 	if (properties.contains(name))
 		return atoi(properties[name].c_str());
-	return atoi(property._defaultValue.c_str());
+	return atoi(property->_defaultValue.c_str());
 }
 
 Common::String AGSEngine::getStringProperty(const Common::String &name, const Common::StringMap &properties) {
-	int propertyId = -1;
-	for (uint i = 0; i < _gameFile->_schemaProperties.size(); ++i) {
-		if (_gameFile->_schemaProperties[i]._name.equalsIgnoreCase(name)) {
-			propertyId = i;
-			break;
-		}
-	}
-	if (propertyId == -1)
-		error("script requested property '%s', which isn't present in the game schema", name.c_str());
+	const CustomPropertySchemaProperty *property = getProperty(name);
 
-	const CustomPropertySchemaProperty &property = _gameFile->_schemaProperties[propertyId];
-	if (property._type != PROP_TYPE_STRING)
+	if (property->_type != PROP_TYPE_STRING)
 		error("script requested property '%s' as a string, but the schema says it's an integer", name.c_str());
 
 	if (properties.contains(name))
 		return properties[name].c_str();
-	return property._defaultValue;
+	return property->_defaultValue;
 }
 
 bool AGSEngine::runScriptFunction(ccInstance *instance, const Common::String &name, const Common::Array<RuntimeValue> &params) {
