@@ -1814,6 +1814,7 @@ bool AGSEngine::runInteractionCommandList(NewInteractionEvent &event, NewInterac
 	for (uint i = 0; i < commands.size(); ++i) {
 		commandsRunCount++;
 		uint roomWas = _state->_roomChanges;
+		int32 temparg = 0;
 
 		const NewInteractionCommand &command = commands[i];
 		debug(6, "runInteractionCommandList: action %d", command._type);
@@ -1839,7 +1840,13 @@ bool AGSEngine::runInteractionCommandList(NewInteractionEvent &event, NewInterac
 			event._response->_timesRun++;
 			// fallthrough
 		case kActionAddScore:
-			// FIXME
+			temparg = (int32) commands[i]._args[0]._val;
+			this->_state->_score += temparg;
+			_guiNeedsUpdate = true;
+			if (temparg > 0 && (int)_state->_scoreSound >= 0) {
+				_audio->playAudioClipByIndex(_state->_scoreSound);
+			}
+			runOnEvent(GE_GOT_SCORE, temparg);
 			break;
 		case kActionDisplayMessage:
 			// FIXME
