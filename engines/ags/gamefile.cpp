@@ -430,27 +430,53 @@ bool GameFile::init() {
 			debug(9, "dialog script text was %s", dialogTextScript.c_str());
 		}
 
-		while (true) {
-			uint32 stringLen = dta->readUint32LE();
-			if (dta->eos())
-				error("corrupt data file while reading speech lines");
-			if (stringLen == 0xcafebeef)
-				break;
+		if (_version < kAGSVer261) {
+			bool done = false;
+			while (true) {
+				Common::String text;
+				while (true) {
+					byte c = dta->readByte();
+					if (dta->eos())
+						error("corrupt data file while reading speech lines 1");
+					if (!c)
+						break;
+					if (c == 0xEF) {
+						dta->seek(-1, SEEK_CUR);
+						done = true;
+						break;
+					}
+					text += c;
+				}
+				if (done)
+					break;
+				_speechLines.push_back(text);
+				debug(5, "speech line '%s'", text.c_str());
+			}
+		} else {
+			while (true) {
+				uint32 stringLen = dta->readUint32LE();
+				if (dta->eos())
+					error("corrupt data file while reading speech lines");
+				if (stringLen == 0xcafebeef)
+					break;
 
-			byte *string = new byte[stringLen + 1];
-			dta->read(string, stringLen);
-			string[stringLen] = 0;
-			decryptText(string, stringLen);
-			_speechLines.push_back(Common::String((char *)string));
-			delete[] string;
+				byte *string = new byte[stringLen + 1];
+				dta->read(string, stringLen);
+				string[stringLen] = 0;
+				decryptText(string, stringLen);
+				_speechLines.push_back(Common::String((char *)string));
+				delete[] string;
 
-			debug(5, "speech line '%s'", _speechLines.back().c_str());
+				debug(5, "speech line '%s'", _speechLines.back().c_str());
+			}
+
+			dta->seek(-4, SEEK_CUR);
 		}
-	} else {
-		uint32 magic = dta->readUint32LE();
-		if (magic != 0xcafebeef)
-			error("bad magic %x for GUI", magic);
 	}
+
+	uint32 magic = dta->readUint32LE();
+	if (magic != 0xcafebeef)
+		error("bad magic %x for GUI", magic);
 
 	readGui(dta);
 
