@@ -1261,9 +1261,14 @@ void Room::readMainBlock(Common::SeekableReadStream *dta) {
 
 	if (_version < kAGSRoomVer255r) {
 		// old version - copy the walkable areas to regions
-
-		// FIXME
-		error("Room: too old, fixme");
+		_regionsMask.copyFrom(_walkableMask);
+		if (!_regions.size())
+			_regions.resize(16);
+		assert(_regions.size() >= 16 && _walkAreas.size() >= 16);
+		for (size_t i = 0; i < _regions.size() && i < 16; i++) {
+			_regions[i]._tintLevel = 0;
+			_regions[i]._lightLevel = _walkAreas[i]._light;
+		}
 	}
 }
 
