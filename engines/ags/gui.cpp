@@ -39,6 +39,32 @@
 
 namespace AGS {
 
+void GUITextControl::setFont(uint32 font) {
+	if (_font == font)
+		return;
+
+	assert(font < _vm->_gameFile->_fonts.size());
+
+	_font = font;
+	_parent->invalidate();
+}
+
+void GUITextControl::setTextColor(uint32 color) {
+	if (_textColor == color)
+		return;
+
+	_textColor = color;
+	_parent->invalidate();
+}
+
+void GUITextControl::setText(Common::String text) {
+	if (_text == text)
+		return;
+
+	_text = text;
+	_parent->invalidate();
+}
+
 bool GUIControl::isOverControl(const Common::Point &pos) {
 	Common::Rect r(_x, _y, _x + _width, _y + _height);
 	return r.contains(pos);
@@ -197,24 +223,6 @@ void GUILabel::readFrom(Common::SeekableReadStream *dta) {
 		_textColor = 16;
 }
 
-void GUILabel::setFont(uint32 font) {
-	if (_font == font)
-		return;
-
-	assert(font < _vm->_gameFile->_fonts.size());
-
-	_font = font;
-	_parent->invalidate();
-}
-
-void GUILabel::setColor(uint32 color) {
-	if (_textColor == color)
-		return;
-
-	_textColor = color;
-	_parent->invalidate();
-}
-
 void GUILabel::setAlign(uint32 align) {
 	if (_align == align)
 		return;
@@ -222,14 +230,6 @@ void GUILabel::setAlign(uint32 align) {
 	assert(align < 3);
 
 	_align = align;
-	_parent->invalidate();
-}
-
-void GUILabel::setText(Common::String text) {
-	if (_text == text)
-		return;
-
-	_text = text;
 	_parent->invalidate();
 }
 
@@ -277,24 +277,6 @@ void GUITextBox::readFrom(Common::SeekableReadStream *dta) {
 	_font = dta->readUint32LE();
 	_textColor = dta->readUint32LE();
 	_exFlags = dta->readUint32LE();
-}
-
-void GUITextBox::setFont(uint32 font) {
-	if (_font == font)
-		return;
-
-	assert(font < _vm->_gameFile->_fonts.size());
-
-	_font = font;
-	_parent->invalidate();
-}
-
-void GUITextBox::setText(Common::String text) {
-	if (_text == text)
-		return;
-
-	_text = text;
-	_parent->invalidate();
 }
 
 void GUITextBox::draw(Graphics::Surface *surface) {
@@ -445,16 +427,6 @@ void GUIListBox::setTopItem(uint index) {
 		return;
 
 	_topItem = index;
-	_parent->invalidate();
-}
-
-void GUIListBox::setFont(uint32 font) {
-	if (_font == font)
-		return;
-
-	assert(font < _vm->_gameFile->_fonts.size());
-
-	_font = font;
 	_parent->invalidate();
 }
 
@@ -732,31 +704,6 @@ void GUIButton::setPushedGraphic(uint32 pic) {
 	stopAnimation();
 }
 
-void GUIButton::setText(Common::String text) {
-	if (_text == text)
-		return;
-
-	_text = text;
-	_parent->invalidate();
-}
-
-void GUIButton::setFont(uint32 font) {
-	if (_font == font)
-		return;
-
-	assert(font < _vm->_gameFile->_fonts.size());
-
-	_font = font;
-	_parent->invalidate();
-}
-
-void GUIButton::setTextColor(uint color) {
-	if (_textColor == color)
-		return;
-
-	_textColor = color;
-	_parent->invalidate();
-}
 
 void GUIButton::stopAnimation() {
 	// FIXME

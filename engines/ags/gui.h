@@ -154,6 +154,23 @@ protected:
 	AGSEngine *_vm;
 };
 
+class GUITextControl : public GUIControl {
+public:
+	GUITextControl(AGSEngine* vm) : GUIControl(vm) { }
+
+	virtual uint32 getFont() { return _font; }
+	virtual void setFont(uint32 font);
+	virtual uint32 getTextColor() { return _textColor; }
+	virtual void setTextColor(uint32 color);
+	virtual const Common::String &getText() const { return _text; }
+	virtual void setText(Common::String text);
+
+	uint32 _font;
+	uint32 _textColor;
+
+	Common::String _text;
+};
+
 class GUISlider : public GUIControl {
 public:
 	GUISlider(AGSEngine *vm) : GUIControl(vm) { }
@@ -192,49 +209,32 @@ protected:
 	uint32 _cachedHandleTLY, _cachedHandleBRY;
 };
 
-class GUILabel : public GUIControl {
+class GUILabel : public GUITextControl {
 public:
-	GUILabel(AGSEngine *vm) : GUIControl(vm) { }
+	GUILabel(AGSEngine *vm) : GUITextControl(vm) { }
 	void readFrom(Common::SeekableReadStream *dta);
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUILabel); }
 	const char *getObjectTypeName() { return "GUILabel"; }
 
-	uint32 getFont() { return _font; }
-	void setFont(uint32 font);
-	uint32 getColor() { return _textColor; }
-	void setColor(uint32 color);
 	uint32 getAlign() { return _align; }
 	void setAlign(uint32 align);
-	const Common::String &getText() const { return _text; }
-	void setText(Common::String text);
 
 	void draw(Graphics::Surface *surface);
 
 protected:
 	uint32 getMaxNumEvents() const { return 0; }
 
-	uint32 _font;
-	uint32 _textColor;
 	uint32 _align;
 
-	Common::String _text;
 };
 
-class GUITextBox : public GUIControl {
+class GUITextBox : public GUITextControl {
 public:
-	GUITextBox(AGSEngine *vm) : GUIControl(vm) { }
+	GUITextBox(AGSEngine *vm) : GUITextControl(vm) { }
 	void readFrom(Common::SeekableReadStream *dta);
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUITextBox); }
 	const char *getObjectTypeName() { return "GUITextBox"; }
 
-	uint32 getFont() { return _font; }
-	void setFont(uint32 font);
-	const Common::String &getText() const { return _text; }
-	void setText(Common::String text);
-
-	Common::String _text;
-	uint32 _font;
-	uint32 _textColor;
 	uint32 _exFlags;
 
 	void draw(Graphics::Surface *surface);
@@ -243,9 +243,9 @@ protected:
 	uint32 getMaxNumEvents() const { return 1; }
 };
 
-class GUIListBox : public GUIControl {
+class GUIListBox : public GUITextControl {
 public:
-	GUIListBox(AGSEngine *vm) : GUIControl(vm) { }
+	GUIListBox(AGSEngine *vm) : GUITextControl(vm) { }
 	void readFrom(Common::SeekableReadStream *dta);
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIListBox); }
 	const char *getObjectTypeName() { return "GUIListBox"; }
@@ -266,9 +266,6 @@ public:
 	uint getTopItem() { return _topItem; }
 	void setTopItem(uint index);
 
-	uint32 getFont() { return _font; }
-	void setFont(uint32 font);
-
 	Common::Array<Common::String> _items;
 	Common::Array<uint16> _itemSaveGameIndexes;
 
@@ -279,8 +276,6 @@ public:
 	uint32 _rowHeight;
 	uint32 _numItemsFit;
 
-	uint32 _font;
-	uint32 _textColor;
 	uint32 _backColor;
 	uint32 _exFlags;
 	uint32 _selectedBgColor;
@@ -327,9 +322,9 @@ protected:
 	void recalculateNumCells();
 };
 
-class GUIButton : public GUIControl {
+class GUIButton : public GUITextControl {
 public:
-	GUIButton(AGSEngine *vm) : GUIControl(vm) { }
+	GUIButton(AGSEngine *vm) : GUITextControl(vm) { }
 	void readFrom(Common::SeekableReadStream *dta);
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIButton); }
 	const char *getObjectTypeName() { return "GUIButton"; }
@@ -348,26 +343,13 @@ public:
 	uint32 getPushedGraphic() { return _pushedPic; }
 	void setPushedGraphic(uint32 pic);
 
-	const Common::String &getText() const { return _text; }
-	void setText(Common::String text);
-
-	uint32 getFont() { return _font; }
-	void setFont(uint32 font);
-
-	uint getTextColor() const { return _textColor; }
-	void setTextColor(uint color);
-
 	uint32 _leftClick, _rightClick;
 	uint32 _leftClickData, _rightClickData;
 
 protected:
-	Common::String _text;
 
 	uint32 _pic, _overPic, _pushedPic;
 	uint32 _isPushed, _isOver;
-
-	uint32 _font;
-	uint32 _textColor;
 
 	uint32 _textAlignment;
 
