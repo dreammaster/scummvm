@@ -860,10 +860,8 @@ RuntimeValue Script_GetGameParameter(AGSEngine *vm, ScriptObject *, const Common
 // Adds to the player's score and plays the score sound, if set.
 RuntimeValue Script_GiveScore(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int points = params[0]._signedValue;
-	UNUSED(points);
 
-	// FIXME
-	error("GiveScore unimplemented");
+	vm->giveScore(points);
 
 	return RuntimeValue();
 }

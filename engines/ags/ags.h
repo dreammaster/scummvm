@@ -349,6 +349,8 @@ public:
 
 	void claimEvent();
 
+	void giveScore(int32 score);
+
 	bool playSpeech(uint charId, uint speechId);
 	void stopSpeech();
 

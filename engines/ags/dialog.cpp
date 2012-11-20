@@ -610,8 +610,7 @@ int AGSEngine::runDialogScript(DialogTopic &topic, uint dialogId, uint16 offset,
 				break;
 			case DCMD_GIVESCORE:
 				getDialogScriptParameters(topic, pos, &param1, NULL);
-				// FIXME
-				error("DCMD_GIVESCORE unimplemented");
+				giveScore(param1);
 				break;
 			case DCMD_GOTOPREVIOUS:
 				result = RUN_DIALOG_GOTO_PREVIOUS;
