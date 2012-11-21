@@ -663,8 +663,7 @@ RuntimeValue Script_Object_StopAnimating(AGSEngine *vm, RoomObject *self, const 
 // Object: import function StopMoving()
 // Stops any currently running move on the object.
 RuntimeValue Script_Object_StopMoving(AGSEngine *vm, RoomObject *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Object::StopMoving unimplemented");
+	self->stopMoving();
 
 	return RuntimeValue();
 }
