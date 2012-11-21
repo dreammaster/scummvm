@@ -936,15 +936,7 @@ RuntimeValue Script_UnPauseGame(AGSEngine *vm, ScriptObject *, const Common::Arr
 RuntimeValue Script_SetGlobalInt(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint globalInt = params[0]._value;
 	uint value = params[1]._value;
-
-	if (globalInt >= vm->_state->_globalScriptVars.size())
-		error("SetGlobalInt: invalid index %d", globalInt);
-
-	if (vm->_state->_globalScriptVars[globalInt] != value)
-		debugC(2, kDebugLevelGame, "global script variable %d set to %d", globalInt, value);
-
-	vm->_state->_globalScriptVars[globalInt] = value;
-
+	vm->setGlobalInt(globalInt, value);
 	return RuntimeValue();
 }
 

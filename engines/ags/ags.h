@@ -349,6 +349,8 @@ public:
 	bool playSpeech(uint charId, uint speechId);
 	void stopSpeech();
 
+	void setGlobalInt(uint32 globalInt, uint32 value);
+
 	const CustomPropertySchemaProperty* getProperty(const Common::String &name);
 	int getIntProperty(const Common::String &name, const Common::StringMap &properties);
 	Common::String getStringProperty(const Common::String &name, const Common::StringMap &properties);

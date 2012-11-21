@@ -587,8 +587,7 @@ int AGSEngine::runDialogScript(DialogTopic &topic, uint dialogId, uint16 offset,
 				break;
 			case DCMD_SETGLOBALINT:
 				getDialogScriptParameters(topic, pos, &param1, &param2);
-				// FIXME
-				error("DCMD_SETGLOBALINT unimplemented");
+				setGlobalInt(param1, param2);
 				break;
 			case DCMD_GIVESCORE:
 				getDialogScriptParameters(topic, pos, &param1, NULL);

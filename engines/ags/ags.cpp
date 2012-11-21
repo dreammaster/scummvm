@@ -917,6 +917,16 @@ protected:
 	AGSEngine *_vm;
 };
 
+void AGSEngine::setGlobalInt(uint32 globalInt, uint32 value) {
+	if (globalInt >= this->_state->_globalScriptVars.size())
+		error("SetGlobalInt: invalid index %d", globalInt);
+
+	if (this->_state->_globalScriptVars[globalInt] != value)
+		debugC(2, kDebugLevelGame, "global script variable %d set to %d", globalInt, value);
+
+	this->_state->_globalScriptVars[globalInt] = value;
+}
+
 void AGSEngine::createGlobalScript() {
 	assert(_scriptModules.empty());
 
