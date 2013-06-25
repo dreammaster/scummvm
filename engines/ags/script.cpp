@@ -26,6 +26,7 @@
 
 #include "engines/ags/ags.h"
 #include "engines/ags/script.h"
+#include "engines/ags/dynamicarray.h"
 #include "engines/ags/scripting/scripting.h"
 #include "engines/ags/util.h"
 #include "engines/ags/vm.h"
@@ -509,6 +510,7 @@ void ccInstance::runCodeFrom(uint32 start) {
 
 		ScriptCodeEntry arg[2];
 		RuntimeValue argVal[2];
+
 		for (uint v = 0; v < neededArgs && v < 2; ++v) {
 			arg[v] = code[_pc + 1 + v];
 
@@ -1047,9 +1049,15 @@ void ccInstance::runCodeFrom(uint32 start) {
 				error("script error: checkbounds value %d was not in range 0 to %d", _registers[int1]._value, int2);
 			break;
 		case SCMD_DYNAMICBOUNDS:
-			// check reg1 is between 0 and m[MAR-4]
-			// FIXME
-			error("unimplemented %s", info.name);
+			// this is a bounds check
+			tempObj = getObjectFrom(_registers[SREG_MAR]);
+			assert(tempObj->isOfType(sotDynamicArray));
+			{
+				ScriptDynamicArray* da = (ScriptDynamicArray*) tempObj;
+				int offset = _registers[int1]._value;
+				if (offset < 0 || (uint)offset >= da->getMaxOffset())
+					error("script error: dynamic bounds value %d was not in range 0 to %d", offset, da->getMaxOffset());
+			}
 			break;
 		case SCMD_MEMREADPTR:
 			// reg1 = m[MAR] (adjust ptr addr)
@@ -1223,8 +1231,17 @@ void ccInstance::runCodeFrom(uint32 start) {
 			break;
 		case SCMD_NEWARRAY:
 			// reg1 = new array of reg1 elements, each of size arg2 (arg3=managed type?)
-			// FIXME
-			error("unimplemented %s", info.name);
+			{
+				bool managed = (code[_pc + 3]._data == 1);
+				uint32 elemSize = int2;
+				assert(_registers[int1]._type == rvtInteger);
+				uint32 elemCount = _registers[int1]._value;
+				if (elemCount < 1 || elemCount > 1000000)
+					error("invalid size (%d) requested for dynamic array", elemCount);
+				tempObj = new ScriptDynamicArray(elemSize, elemCount, managed);
+				_registers[int1] = tempObj;
+				tempObj->DecRef();
+			}
 			break;
 		case SCMD_FADD:
 			// reg1 += arg2 (float,int)
