@@ -365,9 +365,15 @@ uint32 AGSGraphics::resolveHardcodedColor(uint32 color) const {
 	if (_vm->_gameFile->_colorDepth == 1)
 		return color;
 
+	const Graphics::PixelFormat outFormat = getPixelFormat();
+
 	// hardcoded color values are all less than 32
-	if (color >= 32)
-		return color;
+	if (color >= 32) {
+		const Graphics::PixelFormat inFormat(3, 5, 6, 5, 0, 11, 5, 0, 0);
+		uint8 r, g, b;
+		inFormat.colorToRGB(color, r, g, b);
+		return outFormat.RGBToColor(r, g, b);
+	}
 
 	const uint32 hardcodedColorTable[32] = {
 		// 16 system colors
@@ -383,9 +389,9 @@ uint32 AGSGraphics::resolveHardcodedColor(uint32 color) const {
 	};
 
 	const Graphics::PixelFormat inFormat(3, 8, 8, 8, 0, 16, 8, 0, 0);
-	const Graphics::PixelFormat outFormat = getPixelFormat();
 	uint8 r, g, b;
 	inFormat.colorToRGB(hardcodedColorTable[color], r, g, b);
+	// FIXME: set alpha, add check above to make sure we don't reconvert if alpha got set?
 	return outFormat.RGBToColor(r, g, b);
 }
 
