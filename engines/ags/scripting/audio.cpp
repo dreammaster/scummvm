@@ -26,7 +26,9 @@
 
 #include "engines/ags/scripting/scripting.h"
 #include "engines/ags/audio.h"
+#include "engines/ags/constants.h"
 #include "engines/ags/gamestate.h"
+#include "engines/ags/room.h"
 
 namespace AGS {
 
@@ -77,11 +79,10 @@ RuntimeValue Script_PlayVideo(AGSEngine *vm, ScriptObject *, const Common::Array
 // import void PlayMusic(int musicNumber)
 // Starts the specified music playing.
 RuntimeValue Script_PlayMusic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int musicNumber = params[0]._signedValue;
-	UNUSED(musicNumber);
+	uint musicNumber = params[0]._value;
 
-	// FIXME
-	error("PlayMusic unimplemented");
+	vm->_state->_musicQueue.clear();
+	vm->_audio->playNewMusic(musicNumber);
 
 	return RuntimeValue();
 }
@@ -90,12 +91,29 @@ RuntimeValue Script_PlayMusic(AGSEngine *vm, ScriptObject *, const Common::Array
 // Queues up the specified music to play after the current one finishes.
 RuntimeValue Script_PlayMusicQueued(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int musicNumber = params[0]._signedValue;
-	UNUSED(musicNumber);
 
-	// FIXME
-	error("PlayMusicQueued unimplemented");
+	// -1 means "return queue size".
+	if (musicNumber < 0)
+		return vm->_state->_musicQueue.size();
 
-	return RuntimeValue();
+	// If there's no music playing (and none about to be played), just play it directly.
+	if (!vm->_audio->isMusicPlaying() && vm->_state->_musicQueue.empty()) {
+		vm->_audio->playNewMusic(musicNumber);
+		return 0;
+	}
+
+	if (!vm->_state->_musicQueue.empty()) {
+		uint lastMusicId = vm->_state->_musicQueue.back();
+		if (lastMusicId >= QUEUED_MUSIC_REPEAT)
+			error("PlayMusicQueued: can't queue music after a repeating tune has been queued");
+	}
+
+	if (vm->_state->_musicRepeat)
+		musicNumber += QUEUED_MUSIC_REPEAT;
+
+	vm->_state->_musicQueue.push_back(musicNumber);
+
+	return vm->_state->_musicQueue.size();
 }
 
 // import void PlaySilentMIDI(int musicNumber)
@@ -133,15 +151,10 @@ RuntimeValue Script_PlaySound(AGSEngine *vm, ScriptObject *, const Common::Array
 // import void PlaySoundEx(int soundNumber, int channel)
 // Starts the specified sound number playing on the specified channel.
 RuntimeValue Script_PlaySoundEx(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int soundNumber = params[0]._signedValue;
-	UNUSED(soundNumber);
-	int channel = params[1]._signedValue;
-	UNUSED(channel);
+	uint soundNumber = params[0]._signedValue;
+	uint channel = params[1]._signedValue;
 
-	// FIXME
-	error("PlaySoundEx unimplemented");
-
-	return RuntimeValue();
+	return vm->_audio->playSoundOnChannel(soundNumber, channel);
 }
 
 // import void PlayAmbientSound (int channel, int sound, int volume, int x, int y)
@@ -177,11 +190,9 @@ RuntimeValue Script_GetCurrentMusic(AGSEngine *vm, ScriptObject *, const Common:
 // import void SetMusicRepeat(int repeat)
 // Sets whether music tracks should repeat once they reach the end.
 RuntimeValue Script_SetMusicRepeat(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int repeat = params[0]._signedValue;
-	UNUSED(repeat);
+	uint repeat = params[0]._value;
 
-	// FIXME
-	error("SetMusicRepeat unimplemented");
+	vm->_state->_musicRepeat = repeat;
 
 	return RuntimeValue();
 }
@@ -190,10 +201,13 @@ RuntimeValue Script_SetMusicRepeat(AGSEngine *vm, ScriptObject *, const Common::
 // Changes the current room's music volume modifier.
 RuntimeValue Script_SetMusicVolume(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int volume = params[0]._signedValue;
-	UNUSED(volume);
 
-	// FIXME
-	error("SetMusicVolume unimplemented");
+	if (volume < -3 || volume > 5)
+		error("SetMusicVolume: invalid volume number (must be from -3 to 5)");
+
+	vm->getCurrentRoom()->_options[ST_VOLUME] = (signed char)volume;
+
+	vm->_audio->updateMusicVolume();
 
 	return RuntimeValue();
 }
@@ -228,11 +242,13 @@ RuntimeValue Script_SetMusicMasterVolume(AGSEngine *vm, ScriptObject *, const Co
 // import void SetDigitalMasterVolume(int volume)
 // Changes the volume of all digital sound and music.
 RuntimeValue Script_SetDigitalMasterVolume(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int volume = params[0]._signedValue;
-	UNUSED(volume);
+	uint volume = params[0]._value;
 
-	// FIXME
-	error("SetDigitalMasterVolume unimplemented");
+	if (volume > 100)
+		error("SetDigitalMasterVolume: volume %d is too high (must be 0-100)", volume);
+
+	vm->_state->_digitalMasterVolume = volume;
+	vm->_audio->setVolume((volume * 255) / 100);
 
 	return RuntimeValue();
 }
@@ -252,31 +268,31 @@ RuntimeValue Script_SeekMODPattern(AGSEngine *vm, ScriptObject *, const Common::
 // import int IsChannelPlaying(int channel)
 // Returns whether sound is playing on the specified sound channel.
 RuntimeValue Script_IsChannelPlaying(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int channel = params[0]._signedValue;
-	UNUSED(channel);
+	uint channel = params[0]._signedValue;
 
-	// FIXME
-	error("IsChannelPlaying unimplemented");
+	if (channel >= vm->_audio->_channels.size() - 1)
+		error("IsChannelPlaying: channel %d is too high", channel);
 
-	return RuntimeValue();
+	return vm->_audio->_channels[channel]->isPlaying();
 }
 
 // import int IsSoundPlaying()
 // Returns whether a sound effect is currently playing.
 RuntimeValue Script_IsSoundPlaying(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("IsSoundPlaying unimplemented");
+	if (vm->_state->_fastForward)
+		return false;
 
-	return RuntimeValue();
+	for (uint i = SCHAN_NORMAL; i < vm->_audio->_channels.size() - 1; ++i)
+		if (vm->_audio->_channels[i]->isPlaying())
+			return true;
+
+	return false;
 }
 
 // import int IsMusicPlaying()
 // Returns whether background music is currently playing.
 RuntimeValue Script_IsMusicPlaying(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("IsMusicPlaying unimplemented");
-
-	return RuntimeValue();
+	return vm->_audio->isMusicPlaying() ? 1 : 0;
 }
 
 // import int GetMIDIPosition()
@@ -303,10 +319,11 @@ RuntimeValue Script_SeekMIDIPosition(AGSEngine *vm, ScriptObject *, const Common
 // import int GetMP3PosMillis()
 // Gets the offset into the currently playing MP3 or OGG music.
 RuntimeValue Script_GetMP3PosMillis(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GetMP3PosMillis unimplemented");
+	if (vm->_state->_fastForward)
+		return 999999999;
 
-	return RuntimeValue();
+	AudioChannel *channel = vm->_audio->_channels[SCHAN_MUSIC];
+	return channel->getPositionMs();
 }
 
 // import void SeekMP3PosMillis(int offset)
@@ -324,13 +341,15 @@ RuntimeValue Script_SeekMP3PosMillis(AGSEngine *vm, ScriptObject *, const Common
 // import void SetChannelVolume(int channel, int volume)
 // Changes the volume of the specified sound channel.
 RuntimeValue Script_SetChannelVolume(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int channel = params[0]._signedValue;
-	UNUSED(channel);
-	int volume = params[1]._signedValue;
-	UNUSED(volume);
+	uint channel = params[0]._value;
+	uint volume = params[1]._value;
 
-	// FIXME
-	error("SetChannelVolume unimplemented");
+	if (channel >= vm->_audio->_channels.size() - 1)
+		error("SetChannelVolume: channel %d is too high", channel);
+	if (volume > 255)
+		error("SetChannelVolume: volume %d is too high", volume);
+
+	vm->_audio->_channels[channel]->setVolume(volume);
 
 	return RuntimeValue();
 }
@@ -339,10 +358,8 @@ RuntimeValue Script_SetChannelVolume(AGSEngine *vm, ScriptObject *, const Common
 // Stops the sound currently playing on the specified sound channel.
 RuntimeValue Script_StopChannel(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int channel = params[0]._signedValue;
-	UNUSED(channel);
 
-	// FIXME
-	error("StopChannel unimplemented");
+	vm->_audio->_channels[channel]->stop(true);
 
 	return RuntimeValue();
 }
@@ -350,8 +367,8 @@ RuntimeValue Script_StopChannel(AGSEngine *vm, ScriptObject *, const Common::Arr
 // import void StopMusic()
 // Stops the currently playing music.
 RuntimeValue Script_StopMusic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("StopMusic unimplemented");
+	vm->_state->_musicQueue.clear();
+	vm->_audio->stopMusic();
 
 	return RuntimeValue();
 }
@@ -410,8 +427,7 @@ RuntimeValue Script_AudioChannel_SetRoomLocation(AGSEngine *vm, AudioChannel *se
 // AudioChannel: import void Stop()
 // Stops the sound currently playing on this channel.
 RuntimeValue Script_AudioChannel_Stop(AGSEngine *vm, AudioChannel *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioChannel::Stop unimplemented");
+	vm->_audio->stopOrFadeOutChannel(self->getId(), (uint)-1, NULL);
 
 	return RuntimeValue();
 }
@@ -419,19 +435,13 @@ RuntimeValue Script_AudioChannel_Stop(AGSEngine *vm, AudioChannel *self, const C
 // AudioChannel: readonly import attribute int ID
 // The channel ID of this channel (for use with legacy script).
 RuntimeValue Script_AudioChannel_get_ID(AGSEngine *vm, AudioChannel *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioChannel::get_ID unimplemented");
-
-	return RuntimeValue();
+	return self->getId();
 }
 
 // AudioChannel: readonly import attribute bool IsPlaying
 // Whether this channel is currently playing something.
 RuntimeValue Script_AudioChannel_get_IsPlaying(AGSEngine *vm, AudioChannel *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioChannel::get_IsPlaying unimplemented");
-
-	return RuntimeValue();
+	return !vm->_state->_fastForward && self->isPlaying();
 }
 
 // AudioChannel: readonly import attribute int LengthMs
@@ -467,10 +477,11 @@ RuntimeValue Script_AudioChannel_set_Panning(AGSEngine *vm, AudioChannel *self, 
 // AudioChannel: readonly import attribute AudioClip* PlayingClip
 // The audio clip that is currently being played on this channel, or null if none.
 RuntimeValue Script_AudioChannel_get_PlayingClip(AGSEngine *vm, AudioChannel *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioChannel::get_PlayingClip unimplemented");
-
-	return RuntimeValue();
+	AudioClip *clip = self->getClip();
+	if (clip)
+		return clip;
+	else
+		return 0;
 }
 
 // AudioChannel: readonly import attribute int Position
@@ -485,29 +496,30 @@ RuntimeValue Script_AudioChannel_get_Position(AGSEngine *vm, AudioChannel *self,
 // AudioChannel: readonly import attribute int PositionMs
 // The current offset into the sound, in milliseconds.
 RuntimeValue Script_AudioChannel_get_PositionMs(AGSEngine *vm, AudioChannel *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioChannel::get_PositionMs unimplemented");
+	if (!self->isPlaying())
+		return 0;
 
-	return RuntimeValue();
+	if (vm->_state->_fastForward)
+		return 999999999;
+
+	return self->getPositionMs();
 }
 
 // AudioChannel: import attribute int Volume
 // The volume of this sound channel, from 0 to 100.
 RuntimeValue Script_AudioChannel_get_Volume(AGSEngine *vm, AudioChannel *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioChannel::get_Volume unimplemented");
-
-	return RuntimeValue();
+	return self->getVolume();
 }
 
 // AudioChannel: import attribute int Volume
 // The volume of this sound channel, from 0 to 100.
 RuntimeValue Script_AudioChannel_set_Volume(AGSEngine *vm, AudioChannel *self, const Common::Array<RuntimeValue> &params) {
-	int value = params[0]._signedValue;
-	UNUSED(value);
+	uint value = params[0]._signedValue;
 
-	// FIXME
-	error("AudioChannel::set_Volume unimplemented");
+	if (value > 100)
+		error("AudioChannel::set_Volume: volume %d is too high (must be <= 100)", value);
+
+	self->setVolume((value * 255) / 100);
 
 	return RuntimeValue();
 }
@@ -515,52 +527,35 @@ RuntimeValue Script_AudioChannel_set_Volume(AGSEngine *vm, AudioChannel *self, c
 // AudioClip: import AudioChannel* Play(AudioPriority=SCR_NO_VALUE, RepeatStyle=SCR_NO_VALUE)
 // Plays this audio clip.
 RuntimeValue Script_AudioClip_Play(AGSEngine *vm, AudioClip *self, const Common::Array<RuntimeValue> &params) {
-	uint32 audiopriority = params[0]._value;
-	UNUSED(audiopriority);
-	uint32 repeatstyle = params[1]._value;
-	UNUSED(repeatstyle);
+	uint32 audioPriority = params[0]._value;
+	uint32 repeatStyle = params[1]._value;
 
-	// FIXME
-	error("AudioClip::Play unimplemented");
-
-	return RuntimeValue();
+	return vm->_audio->playAudioClip(*self, audioPriority, repeatStyle);
 }
 
 // AudioClip: import AudioChannel* PlayFrom(int position, AudioPriority=SCR_NO_VALUE, RepeatStyle=SCR_NO_VALUE)
 // Plays this audio clip, starting from the specified offset.
 RuntimeValue Script_AudioClip_PlayFrom(AGSEngine *vm, AudioClip *self, const Common::Array<RuntimeValue> &params) {
 	int position = params[0]._signedValue;
-	UNUSED(position);
-	uint32 audiopriority = params[1]._value;
-	UNUSED(audiopriority);
-	uint32 repeatstyle = params[2]._value;
-	UNUSED(repeatstyle);
+	uint32 audioPriority = params[1]._value;
+	uint32 repeatStyle = params[2]._value;
 
-	// FIXME
-	error("AudioClip::PlayFrom unimplemented");
-
-	return RuntimeValue();
+	return vm->_audio->playAudioClip(*self, audioPriority, repeatStyle, position);
 }
 
 // AudioClip: import AudioChannel* PlayQueued(AudioPriority=SCR_NO_VALUE, RepeatStyle=SCR_NO_VALUE)
 // Plays this audio clip, or queues it if all channels are busy.
 RuntimeValue Script_AudioClip_PlayQueued(AGSEngine *vm, AudioClip *self, const Common::Array<RuntimeValue> &params) {
-	uint32 audiopriority = params[0]._value;
-	UNUSED(audiopriority);
-	uint32 repeatstyle = params[1]._value;
-	UNUSED(repeatstyle);
+	uint32 audioPriority = params[0]._value;
+	uint32 repeatStyle = params[1]._value;
 
-	// FIXME
-	error("AudioClip::PlayQueued unimplemented");
-
-	return RuntimeValue();
+	return vm->_audio->playAudioClip(*self, audioPriority, repeatStyle, 0, true);
 }
 
 // AudioClip: import void Stop()
 // Stops all currently playing instances of this audio clip.
 RuntimeValue Script_AudioClip_Stop(AGSEngine *vm, AudioClip *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioClip::Stop unimplemented");
+	vm->_audio->stopClip(*self);
 
 	return RuntimeValue();
 }
@@ -586,10 +581,7 @@ RuntimeValue Script_AudioClip_get_IsAvailable(AGSEngine *vm, AudioClip *self, co
 // AudioClip: readonly import attribute AudioType Type
 // Gets the type of audio that this clip contains.
 RuntimeValue Script_AudioClip_get_Type(AGSEngine *vm, AudioClip *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioClip::get_Type unimplemented");
-
-	return RuntimeValue();
+	return self->_type;
 }
 
 // System: readonly import static attribute AudioChannel *AudioChannels[]

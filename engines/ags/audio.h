@@ -95,9 +95,15 @@ public:
 	bool isPlaying();
 
 	void setVolume(uint volume);
+	uint getVolume() { return _volume; }
 
-	uint getPriority() { return _priority; }
-	void setPriority(uint priority) { _priority = priority; }
+	int getPriority() { return _priority; }
+	void setPriority(int priority) { _priority = priority; }
+
+	uint getId() { return _id; }
+	AudioClip *getClip() { return isPlaying() ? _clip : NULL; }
+
+	uint32 getPositionMs();
 
 protected:
 	// housekeeping
@@ -106,8 +112,10 @@ protected:
 	bool _valid;
 
 	// AGS audio
-	uint _priority;
+	int _priority;
 	AudioClip *_clip;
+
+	uint _volume;
 
 	// ScummVM audio
 	Audio::SoundHandle _handle;
@@ -126,6 +134,12 @@ struct AmbientSound {
 	Common::Point _pos;
 };
 
+struct QueuedClip {
+	uint _clipId;
+	int _priority;
+	bool _repeat;
+};
+
 class AGSAudio {
 public:
 	AGSAudio(class AGSEngine *vm);
@@ -136,10 +150,26 @@ public:
 	void registerScriptObjects();
 	void deregisterScriptObjects();
 
+	void update();
+
 	AudioClip *getClipByIndex(bool isMusic, uint index);
 
-	uint playSound(uint soundId, uint priority = 10);
+	uint findFreeAudioChannel(AudioClip &clip, int priority, bool interruptEqualPriority);
+
+	void queueAudioClipToPlay(AudioClip &clip, int priority, bool repeat);
+	void removeClipsOfTypeFromQueue(uint clipType);
+	void playAudioClipByIndex(uint index);
+	uint playAudioClip(AudioClip &clip, int priority, uint repeat, uint fromOffset = 0, bool queueIfNoChannel = false);
+	uint playAudioClipOnChannel(uint channelId, AudioClip &clip, int priority, bool repeat, uint fromOffset = 0);
+	void stopClip(AudioClip &clip);
+
+	uint playSound(uint soundId, int priority = 10);
 	bool playSoundOnChannel(uint soundId, uint channelId);
+
+	void playNewMusic(uint musicId);
+	void playNewMusic(uint musicId, bool repeat);
+	void stopMusic();
+	bool isMusicPlaying();
 
 	bool playSpeech(const Common::String &filename);
 
@@ -152,6 +182,7 @@ public:
 
 	void setAudioTypeVolume(uint type, uint volume, uint changeType);
 
+	void setVolume(uint volume);
 	void setSoundVolume(uint volume);
 	void setSpeechVolume(uint volume);
 
@@ -162,13 +193,29 @@ public:
 	Common::Array<AudioChannel *> _channels;
 	Common::Array<AmbientSound> _ambients;
 
+	Common::SeekableReadStream *getAudioResource(const Common::String &filename);
+
+	void stopOrFadeOutChannel(uint channelId, uint newChannelId, AudioClip *clip);
+
 protected:
 	AGSEngine *_vm;
 
 	ResourceManager *_musicResources, *_audioResources, *_speechResources;
 
+	Common::Array<QueuedClip> _newMusicQueue;
+
 	void addAudioResourcesFrom(ResourceManager *manager, bool isExecutable);
 	void openResources();
+
+	void playNextQueued();
+
+	void updateClipDefaultVolume(AudioClip &clip);
+
+	uint getFirstChannelToUseFor(uint clipType = (uint)-1);
+	uint getLastChannelToUseFor(uint clipType);
+
+	void startFadingInNewTrackIfApplicable(uint channelId, AudioClip &clip);
+	void moveTrackToCrossfadeChannel(uint channelId, uint speed, uint fadeInChannel, AudioClip *clip);
 };
 
 } // End of namespace AGS
