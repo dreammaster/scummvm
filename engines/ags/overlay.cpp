@@ -116,7 +116,7 @@ void AGSEngine::removeScreenOverlay(uint type) {
 }
 
 void AGSEngine::removeScreenOverlayIndex(uint index) {
-	delete _overlays[index];
+	_overlays[index]->DecRef();
 	_overlays.remove_at(index);
 
 	// if an overlay before the sierra-style speech one is removed,
@@ -223,8 +223,7 @@ uint AGSEngine::displayMain(int x, int y, int width, const Common::String &text,
 
 	bool alphaChannel = false;
 	Graphics::Font *font = _graphics->getFont(usingFont);
-	// FIXME: this is the wrong height, and this is wgetfontheight
-	uint fontHeight = font->getFontHeight();
+	uint fontHeight = _graphics->getHeightForFont(usingFont);
 
 	// TODO: this code, to remove '&5 ' type prefixes and handle '[', should be elsewhere
 	// (it is in break_up_text_into_lines in original code)

@@ -470,6 +470,24 @@ Graphics::Font *AGSGraphics::getFont(uint id) {
 	return _fonts[id];
 }
 
+uint AGSGraphics::getHeightForFont(uint id) {
+	Graphics::Font *font = getFont(id);
+	AGSFont &fontInfo = _vm->_gameFile->_fonts[id];
+
+	// FIXME: wrong height
+	uint height = font->getFontHeight();
+
+	if (fontInfo._outline == FONT_OUTLINE_AUTO) {
+		bool isTTF = true; // FIXME
+		if (!_vm->getGameOption(OPT_NOSCALEFNT) && !isTTF)
+			height += _vm->getFixedPixelSize(2);
+		else
+			height += 2;
+	}
+
+	return height;
+}
+
 void AGSGraphics::initPalette() {
 	for (uint i = 0; i < 256; ++i) {
 		if (_vm->_gameFile->_paletteUses[i] != PAL_BACKGROUND) {
