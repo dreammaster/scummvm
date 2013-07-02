@@ -294,7 +294,7 @@ enum AGSRoomVersion {
 #define MAX_QUEUED_MUSIC 10
 #define GLED_INTERACTION 1
 #define GLED_EFFECTS     2
-#define QUEUED_MUSIC_REPEAT 10000
+#define QUEUED_MUSIC_REPEAT 10000 // adding this value to entries in (old) _musicQueue means they repeat
 #define PLAYMP3FILE_MAX_FILENAME_LEN 50
 #define MAX_AUDIO_TYPES  30
 
