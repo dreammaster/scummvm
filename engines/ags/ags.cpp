@@ -50,6 +50,63 @@
 #include "ags/scripting/scripting.h"
 #include "ags/sprites.h"
 
+namespace Common {
+
+static uint mapKeycodeToAGS(KeyCode key) {
+	// First, the trivial mappings.
+	if (key >= 0 && key <= KEYCODE_AT)
+		return (uint)key;
+	if (key >= KEYCODE_LEFTBRACKET && key <= KEYCODE_BACKQUOTE)
+		return (uint)key;
+	if (key >= KEYCODE_a && key <= KEYCODE_z)
+		return (uint)key - 32;
+	if (key >= KEYCODE_F1 && key <= KEYCODE_F10)
+		return (uint)key + 77;
+
+	// Then, the rest.
+	switch (key) {
+	case KEYCODE_DELETE:
+		return 383;
+	case KEYCODE_UP:
+		return 372;
+	case KEYCODE_DOWN:
+		return 380;
+	case KEYCODE_RIGHT:
+		return 377;
+	case KEYCODE_LEFT:
+		return 375;
+	case KEYCODE_INSERT:
+		return 382;
+	case KEYCODE_HOME:
+		return 371;
+	case KEYCODE_END:
+		return 379;
+	case KEYCODE_PAGEUP:
+		return 373;
+	case KEYCODE_PAGEDOWN:
+		return 381;
+	case KEYCODE_F11:
+		return 433;
+	case KEYCODE_F12:
+		return 434;
+	case KEYCODE_LSHIFT:
+		return 403;
+	case KEYCODE_RSHIFT:
+		return 404;
+	case KEYCODE_LCTRL:
+		return 405;
+	case KEYCODE_RCTRL:
+		return 406;
+	case KEYCODE_RALT:
+	case KEYCODE_LALT:
+		return 407;
+	default:
+		return 0;
+	}
+}
+
+}
+
 namespace AGS {
 
 #define REP_EXEC_NAME "repeatedly_execute"
@@ -99,6 +156,9 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) :
 	_rnd = new Common::RandomSource("ags");
 	_scriptState = new GlobalScriptState();
 	_state = new GameState(this);
+
+	for (uint i = 0; i < MAX_AGS_KEYCODE; ++i)
+		_keysPressed[i] = false;
 }
 
 // plugins
@@ -463,7 +523,16 @@ void AGSEngine::updateEvents(bool checkControls) {
 			break;
 
 		case Common::EVENT_KEYDOWN:
+			_keysPressed[Common::mapKeycodeToAGS(event.kbd.keycode)] = true;
+			// FIXME: bad mapping
+			queueGameEvent(kEventTextScript, kTextScriptOnKeyPress, Common::mapKeycodeToAGS(event.kbd.keycode));
+
 			// FIXME: keypresses
+			if (_state->_inCutscene > 0)
+				startSkippingCutscene();
+			break;
+		case Common::EVENT_KEYUP:
+			_keysPressed[Common::mapKeycodeToAGS(event.kbd.keycode)] = false;
 			break;
 
 		default:

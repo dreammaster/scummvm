@@ -187,6 +187,8 @@ struct GameEvent {
 #define LOCTYPE_CHAR 2
 #define LOCTYPE_OBJ  3
 
+#define MAX_AGS_KEYCODE 435
+
 struct CustomPropertySchemaProperty;
 
 class AGSEngine : public Engine {
@@ -360,6 +362,8 @@ public:
 	bool runHotspotInteraction(uint hotspotId, uint mode, bool checkOnly = false);
 	bool runObjectInteraction(uint objectId, uint mode, bool checkOnly = false);
 	void runRegionInteraction(uint regionId, uint mode);
+
+	bool _keysPressed[MAX_AGS_KEYCODE];
 
 private:
 	const AGSGameDescription *_gameDescription;

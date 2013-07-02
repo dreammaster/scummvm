@@ -514,13 +514,12 @@ RuntimeValue Script_WaitMouseKey(AGSEngine *vm, ScriptObject *, const Common::Ar
 // import bool IsKeyPressed(eKeyCode)
 // Checks whether the specified key is currently held down.
 RuntimeValue Script_IsKeyPressed(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	uint32 ekeycode = params[0]._value;
-	UNUSED(ekeycode);
+	uint32 keycode = params[0]._value;
 
-	// FIXME
-	error("IsKeyPressed unimplemented");
+	if (keycode >= MAX_AGS_KEYCODE)
+		return 0;
 
-	return RuntimeValue();
+	return vm->_keysPressed[keycode] ? 1 : 0;
 }
 
 static const ScriptSystemFunctionInfo ourFunctionList[] = {
