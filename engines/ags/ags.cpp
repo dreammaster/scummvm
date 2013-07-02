@@ -1540,7 +1540,9 @@ Common::String AGSEngine::formatString(const Common::String &string, const Commo
 			out += Common::String::format(formatSpecifier.c_str(), value._value);
 			break;
 		case 'f':
-			if (value._type != rvtFloat)
+			// FIXME: This depends on horrible union/float evil.
+			// Cart Life is a simple test case for the 'rvtInteger' case.
+			if (value._type != rvtFloat && value._type != rvtInteger)
 				error("formatString: expected float for parameter #%d for string '%s'",
 					paramId - 1, string.c_str());
 			out += Common::String::format(formatSpecifier.c_str(), value._floatValue);
