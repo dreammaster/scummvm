@@ -158,7 +158,7 @@ struct RoomObject : public ScriptObject, public Drawable {
 
 	// constructed at runtime
 	uint16 _view, _loop, _frame;
-	uint16 _wait;
+	int16 _wait;
 	int _moving;
 	uint _transparency;
 	byte _cycling; // see ANIM_BACKWARDS etc

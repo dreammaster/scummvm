@@ -97,7 +97,7 @@ public:
 
 	int32 _x, _y;
 
-	uint32 _wait;
+	int32 _wait;
 	uint32 _flags;
 
 	int16 _following;
@@ -114,7 +114,8 @@ public:
 	uint32 _talkColor;
 	uint32 _thinkView;
 
-	uint16 _blinkView, _blinkInterval; // design time
+	int16 _blinkView;
+	uint16 _blinkInterval; // design time
 	uint16 _blinkTimer, _blinkFrame; // run time
 
 	int16 _walkSpeedY;
@@ -162,7 +163,7 @@ public:
 	uint16 _tintR, _tintG, _tintB, _tintLevel, _tintLight;
 	bool _processIdleThisTime;
 	byte _slowMoveCounter;
-	uint16 _animWait;
+	int16 _animWait;
 
 	int getEffectiveY() { return _y - _z; }
 

@@ -271,7 +271,7 @@ void RoomObject::update() {
 		return;
 	if (_view == (uint16)-1)
 		return;
-	if (_wait) {
+	if (_wait > 0) {
 		_wait--;
 		return;
 	}

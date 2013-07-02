@@ -126,7 +126,7 @@ public:
 
 	uint32 _pic;
 	uint16 _xOffs, _yOffs;
-	uint16 _speed;
+	int16 _speed;
 	uint32 _flags;
 	int32 _sound;
 };

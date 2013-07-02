@@ -605,7 +605,7 @@ ViewFrame GameFile::readViewFrame(Common::SeekableReadStream *dta) {
 	frame._pic = dta->readUint32LE();
 	frame._xOffs = dta->readUint16LE();
 	frame._yOffs = dta->readUint16LE();
-	frame._speed = dta->readUint16LE();
+	frame._speed = dta->readSint16LE();
 	dta->skip(2); // padding
 	frame._flags = dta->readUint32LE();
 	frame._sound = dta->readSint32LE();
@@ -673,7 +673,7 @@ Character *GameFile::readCharacter(Common::SeekableReadStream *dta) {
 	/*chr->_activeInv = */ dta->readUint32LE();
 	chr->_talkColor = dta->readUint32LE();
 	chr->_thinkView = dta->readUint32LE();
-	chr->_blinkView = dta->readUint16LE();
+	chr->_blinkView = dta->readSint16LE();
 	/*chr->_blinkInterval = */ dta->readUint16LE();
 	/*chr->_blinkTimer = */ dta->readUint16LE();
 	chr->_blinkFrame = dta->readUint16LE();

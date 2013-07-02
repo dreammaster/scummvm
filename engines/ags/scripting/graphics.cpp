@@ -124,10 +124,7 @@ RuntimeValue Script_ViewFrame_set_Sound(AGSEngine *vm, ViewFrame *self, const Co
 // ViewFrame: readonly import attribute int Speed
 // Gets the delay of this frame.
 RuntimeValue Script_ViewFrame_get_Speed(AGSEngine *vm, ViewFrame *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("ViewFrame::get_Speed unimplemented");
-
-	return RuntimeValue();
+	return self->_speed;
 }
 
 // ViewFrame: readonly import attribute int View
