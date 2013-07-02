@@ -1566,6 +1566,21 @@ Common::String AGSEngine::formatString(const Common::String &string, const Commo
 	return out;
 }
 
+Common::String AGSEngine::wrapFilename(const Common::String &name) const {
+	Common::String out = name;
+
+	if (out.hasPrefix("$SAVEGAMEDIR$/") || out.hasPrefix("$SAVEGAMEDIR$\\")) {
+		// These are just normal save files.
+		out = name.c_str() + 14;
+	} else if (out.hasPrefix("$APPDATADIR$/") || out.hasPrefix("$APPDATADIR$\\")) {
+		// Mark these with a different name.
+		out = "appdata-";
+		out += name.c_str() + 13;
+	}
+
+	return _targetName + "-" + out;
+}
+
 // for CallRoomScript
 void AGSEngine::queueCustomRoomScript(uint32 param) {
 	assert(!_runningScripts.empty());

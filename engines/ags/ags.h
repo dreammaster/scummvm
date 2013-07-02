@@ -327,8 +327,6 @@ public:
 	Character *getPlayerChar() { return _playerChar; }
 	Common::Array<Character *> _characters;
 
-	/** Prepend 'TARGET-' to the given filename. */
-	Common::String wrapFilename(const Common::String &name) const { return _targetName + "-" + name; };
 	Graphics::Surface *getWalkableMaskFor(uint charId);
 
 	void addInventory(uint itemId);
@@ -336,6 +334,9 @@ public:
 	void setActiveInventory(uint itemId);
 
 	Common::String formatString(const Common::String &string, const Common::Array<RuntimeValue> &values);
+
+	/** Prepend 'TARGET-' to the given filename, and expand any variables. */
+	Common::String wrapFilename(const Common::String &name) const;
 
 	int32 _newRoomPos;
 	int32 _newRoomX;
