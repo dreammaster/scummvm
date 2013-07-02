@@ -546,7 +546,7 @@ void Room::updateWalkBehinds() {
 				void *destPtr = wb._surface.getBasePtr(x - wb._left, y - wb._top);
 				switch (background.format.bytesPerPixel) {
 				case 1:
-					*(byte *)destPtr = *(byte *)srcPtr;
+					*(byte *)destPtr = *(const byte *)srcPtr;
 					break;
 				case 2:
 					WRITE_UINT16(destPtr, READ_UINT16(srcPtr));

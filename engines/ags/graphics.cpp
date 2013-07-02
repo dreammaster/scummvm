@@ -703,7 +703,7 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 				dest = (byte *)destSurf->getBasePtr(pos.x + width, pos.y + y);
 			else
 				dest = (byte *)destSurf->getBasePtr(pos.x, pos.y + y);
-			const byte *src = (byte *)srcSurf->getBasePtr(startX, startY + y);
+			const byte *src = (const byte *)srcSurf->getBasePtr(startX, startY + y);
 			for (uint x = 0; x < width; ++x) {
 				byte data = *src++;
 				if (data != 0)
@@ -725,7 +725,7 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 					dest = (uint16 *)destSurf->getBasePtr(pos.x + width, pos.y + y);
 				else
 					dest = (uint16 *)destSurf->getBasePtr(pos.x, pos.y + y);
-				const uint16 *src = (uint16 *)srcSurf->getBasePtr(startX, startY + y);
+				const uint16 *src = (const uint16 *)srcSurf->getBasePtr(startX, startY + y);
 				for (uint x = 0; x < width; ++x) {
 					uint16 srcData = *src++;
 					if (srcData != transColor)
@@ -747,7 +747,7 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 				dest = (uint16 *)destSurf->getBasePtr(pos.x + width, pos.y + y);
 			else
 				dest = (uint16 *)destSurf->getBasePtr(pos.x, pos.y + y);
-			const uint16 *src = (uint16 *)srcSurf->getBasePtr(startX, startY + y);
+			const uint16 *src = (const uint16 *)srcSurf->getBasePtr(startX, startY + y);
 			for (uint x = 0; x < width; ++x) {
 				uint16 srcData = *src++;
 				if (srcData != transColor) {
@@ -775,7 +775,7 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 					dest = (uint32 *)destSurf->getBasePtr(pos.x + width, pos.y + y);
 				else
 					dest = (uint32 *)destSurf->getBasePtr(pos.x, pos.y + y);
-				const uint32 *src = (uint32 *)srcSurf->getBasePtr(startX, startY + y);
+				const uint32 *src = (const uint32 *)srcSurf->getBasePtr(startX, startY + y);
 				for (uint x = 0; x < width; ++x) {
 					uint32 srcData = *src++;
 					if ((srcData & 0xffffff) != transColor) {
@@ -814,7 +814,7 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 					dest = (uint32 *)destSurf->getBasePtr(pos.x + width, pos.y + y);
 				else
 					dest = (uint32 *)destSurf->getBasePtr(pos.x, pos.y + y);
-				const uint32 *src = (uint32 *)srcSurf->getBasePtr(startX, startY + y);
+				const uint32 *src = (const uint32 *)srcSurf->getBasePtr(startX, startY + y);
 				for (uint x = 0; x < width; ++x) {
 					uint32 srcData = *src++;
 					if ((srcData & 0xffffff) != transColor)
@@ -836,7 +836,7 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 				dest = (uint32 *)destSurf->getBasePtr(pos.x + width, pos.y + y);
 			else
 				dest = (uint32 *)destSurf->getBasePtr(pos.x, pos.y + y);
-			const uint32 *src = (uint32 *)srcSurf->getBasePtr(startX, startY + y);
+			const uint32 *src = (const uint32 *)srcSurf->getBasePtr(startX, startY + y);
 			for (uint x = 0; x < width; ++x) {
 				uint32 srcData = *src++;
 				if ((srcData & 0xffffff) != transColor) {
@@ -921,15 +921,15 @@ bool Drawable::containsPoint(AGSEngine *vm, Common::Point point) {
 	const void *ptr = surface->getBasePtr(point.x, point.y);
 	switch (surface->format.bytesPerPixel) {
 	case 1:
-		if (*(byte *)ptr == vm->_graphics->getTransparentColor())
+		if (*(const byte *)ptr == vm->_graphics->getTransparentColor())
 			return false;
 		break;
 	case 2:
-		if (*(uint16 *)ptr == vm->_graphics->getTransparentColor())
+		if (*(const uint16 *)ptr == vm->_graphics->getTransparentColor())
 			return false;
 		break;
 	case 4:
-		if ((*(uint32 *)ptr & 0xffffff) == vm->_graphics->getTransparentColor())
+		if ((*(const uint32 *)ptr & 0xffffff) == vm->_graphics->getTransparentColor())
 			return false;
 		break;
 	default:

@@ -1691,7 +1691,7 @@ bool Character::moveToNearestWalkableAreaWithin(int range, int step) {
 	for (int newX = startX; newX < width; newX += step) {
 		for (int newY = startY; newY < height; newY += step) {
 			// if it's non-walkable, don't go there
-			if (*(byte *)mask.getBasePtr(newX, newY) == 0)
+			if (*(const byte *)mask.getBasePtr(newX, newY) == 0)
 				continue;
 
 			// off a screen edge, don't move them there

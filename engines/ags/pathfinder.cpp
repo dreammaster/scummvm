@@ -181,7 +181,7 @@ protected:
 bool PathFinder::findPath(bool onlyIfDestAllowed) {
 	// FIXME: bad name + unused
 	if (!onlyIfDestAllowed) {
-		if (*(byte *)_mask->getBasePtr(_dest.x, _dest.y) == 0)
+		if (*(const byte *)_mask->getBasePtr(_dest.x, _dest.y) == 0)
 			return false;
 	}
 
@@ -230,7 +230,7 @@ bool PathFinder::findNearestWalkableArea(const Graphics::Surface &tempMask, int 
 	Common::Point best;
 	for (int x = startX; x < endX; x += step) {
 		for (int y = startY; y < endY; y += step) {
-			if (*(byte *)tempMask.getBasePtr(x, y) != 232)
+			if (*(const byte *)tempMask.getBasePtr(x, y) != 232)
 				continue;
 
 			uint distance = (uint)sqrt((x - _dest.x) * (x - _dest.x) + (y - _dest.y) * (y - _dest.y));
@@ -285,7 +285,7 @@ bool PathFinder::isRoutePossible(bool &foundNewCandidate) {
 	foundNewCandidate = false;
 
 	// If we're not *starting* from a walkable position, this will never work.
-	if (*(byte *)_mask->getBasePtr(_moveList->_from.x, _moveList->_from.y) == 0) {
+	if (*(const byte *)_mask->getBasePtr(_moveList->_from.x, _moveList->_from.y) == 0) {
 		warning("refusing to route from unwalkable point %d,%d", _moveList->_from.x, _moveList->_from.y);
 		return false;
 	}
@@ -381,7 +381,7 @@ bool PathFinder::isRoutePossible(bool &foundNewCandidate) {
 // Round down the supplied co-ordinates to the area granularity,
 // and move a bit if this causes them to become non-walkable
 Common::Point PathFinder::roundDownCoordinates(Common::Point pos) {
-	int startGranularity = _walkAreaGranularity[*(byte *)_mask->getBasePtr(pos.x, pos.y)];
+	int startGranularity = _walkAreaGranularity[*(const byte *)_mask->getBasePtr(pos.x, pos.y)];
 
 	pos.y = pos.y - pos.y % startGranularity;
 	if (pos.y < 0)
@@ -391,11 +391,11 @@ Common::Point PathFinder::roundDownCoordinates(Common::Point pos) {
 		pos.x = 0;
 
 	// We try one step to the right, one step down, then one step back left.
-	if (*(byte *)_mask->getBasePtr(pos.x, pos.y) == 0) {
+	if (*(const byte *)_mask->getBasePtr(pos.x, pos.y) == 0) {
 		pos.x += startGranularity;
-		if ((pos.y < _mask->h - startGranularity) && *(byte *)_mask->getBasePtr(pos.x, pos.y) == 0) {
+		if ((pos.y < _mask->h - startGranularity) && *(const byte *)_mask->getBasePtr(pos.x, pos.y) == 0) {
 			pos.y += startGranularity;
-			if (*(byte *)_mask->getBasePtr(pos.x, pos.y) == 0)
+			if (*(const byte *)_mask->getBasePtr(pos.x, pos.y) == 0)
 				pos.x -= startGranularity;
 		}
 	}
@@ -408,11 +408,11 @@ Common::Point PathFinder::roundDownCoordinates(Common::Point pos) {
 // and return true if we bothered making the check.
 bool PathFinder::dijkstraCheckNeighbor(uint x, uint y, uint nX, uint nY, int modifier, int &min, Common::Array<uint> &found, Common::Array<uint> &cheapest) {
 	// Neighbor finished already?
-	if (*(int16 *)_beenHere.getBasePtr(nX, nY) != -1)
+	if (*(const int16 *)_beenHere.getBasePtr(nX, nY) != -1)
 		return false;
 
 	// Neighbor not walkable?
-	if (*(byte *)_mask->getBasePtr(nX, nY) == 0)
+	if (*(const byte *)_mask->getBasePtr(nX, nY) == 0)
 		return true;
 
 	// Cost of the cell?
@@ -484,7 +484,7 @@ bool PathFinder::findRouteDijkstra() {
 
 			int x = visited[i] % parent.w;
 			int y = visited[i] / parent.w;
-			int granularity = _walkAreaGranularity[*(byte *)_mask->getBasePtr(x, y)];
+			int granularity = _walkAreaGranularity[*(const byte *)_mask->getBasePtr(x, y)];
 
 			bool updated = false;
 
@@ -853,7 +853,7 @@ void do_line(BITMAP *bmp, int x1, int y1, int x2, int y2, int d, void (*proc)(BI
 void lineCallback(CanSeeInfo *info, int x, int y, int) {
 	if (x < 0 || y < 0 || x >= info->mask->w || y >= info->mask->h)
 		info->lineFailed = true;
-	else if (*(byte *)info->mask->getBasePtr(x, y) == 0)
+	else if (*(const byte *)info->mask->getBasePtr(x, y) == 0)
 		info->lineFailed = true;
 	else if (!info->lineFailed && info->lastGoodPos) {
 		info->lastGoodPos->x = x;
