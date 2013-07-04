@@ -25,6 +25,7 @@
  */
 
 #include "engines/ags/scripting/scripting.h"
+#include "engines/ags/audio.h"
 #include "engines/ags/constants.h"
 #include "engines/ags/drawingsurface.h"
 #include "engines/ags/gamestate.h"
@@ -114,10 +115,18 @@ RuntimeValue Script_ViewFrame_get_Sound(AGSEngine *vm, ViewFrame *self, const Co
 // Gets/sets the sound that is played when this frame comes around.
 RuntimeValue Script_ViewFrame_set_Sound(AGSEngine *vm, ViewFrame *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("ViewFrame::set_Sound unimplemented");
+	if (value < 1) {
+		self->_sound = -1;
+	} else {
+		AudioClip *clip = vm->_audio->getClipByIndex(false, value);
+		if (!clip)
+			error("ViewFrame::set_Sound: no such clip %d", value);
+		self->_sound = clip->_id;
+
+		if (vm->getGameFileVersion() >= kAGSVer321)
+			self->_sound += 0x10000000;
+	}
 
 	return RuntimeValue();
 }
@@ -655,6 +664,7 @@ RuntimeValue Script_CreateTextOverlay(AGSEngine *vm, ScriptObject *, const Commo
 	int colour = params[4]._signedValue;
 	ScriptString *text = (ScriptString *)params[5]._object;
 
+	// FIXME: translation, formatString (also the other functions)
 	return vm->createTextOverlay(x, y, width, fontId, colour, text->getString());
 }
 
@@ -1611,10 +1621,7 @@ RuntimeValue Script_SetBackgroundFrame(AGSEngine *vm, ScriptObject *, const Comm
 // import int GetBackgroundFrame()
 // Gets the current background frame number.
 RuntimeValue Script_GetBackgroundFrame(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GetBackgroundFrame unimplemented");
-
-	return RuntimeValue();
+	return vm->_state->_bgFrame;
 }
 
 // import void ShakeScreen(int amount)

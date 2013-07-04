@@ -294,10 +294,10 @@ RuntimeValue Script_File_ReadInt(AGSEngine *vm, ScriptFile *self, const Common::
 // File: import int ReadRawChar()
 // Reads the next raw byte from the file.
 RuntimeValue Script_File_ReadRawChar(AGSEngine *vm, ScriptFile *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("File::ReadRawChar unimplemented");
+	if (self->_mode != 1)
+		error("File::ReadRawChar: File not opened in 'read' mode");
 
-	return RuntimeValue();
+	return self->_inFile->readByte();
 }
 
 // File: import int ReadRawInt()
@@ -369,10 +369,14 @@ RuntimeValue Script_File_WriteInt(AGSEngine *vm, ScriptFile *self, const Common:
 // Writes a raw byte to the file.
 RuntimeValue Script_File_WriteRawChar(AGSEngine *vm, ScriptFile *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("File::WriteRawChar unimplemented");
+	if (self->_mode != 2 && self->_mode != 3)
+		error("File::WriteRawChar: File not opened in 'write' mode");
+
+	if (value < 0 || value > 255)
+		error("File::WriteRawChar: %d is not a byte", value);
+
+	self->_outFile->writeByte((byte)value);
 
 	return RuntimeValue();
 }

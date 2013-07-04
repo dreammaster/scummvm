@@ -246,8 +246,7 @@ RuntimeValue Script_Mouse_SetPosition(AGSEngine *vm, ScriptObject *, const Commo
 // Mouse: import static void Update()
 // Updates the X and Y co-ordinates to match the current mouse position.
 RuntimeValue Script_Mouse_Update(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Mouse::Update unimplemented");
+	// Do nothing.
 
 	return RuntimeValue();
 }
@@ -276,8 +275,6 @@ RuntimeValue Script_Mouse_UseModeGraphic(AGSEngine *vm, ScriptObject *, const Co
 // Gets/sets the current mouse cursor mode.
 RuntimeValue Script_Mouse_get_Mode(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	return vm->getCursorMode();
-
-	return RuntimeValue();
 }
 
 // Mouse: import static attribute CursorMode Mode

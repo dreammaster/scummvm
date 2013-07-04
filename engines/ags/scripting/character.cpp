@@ -173,7 +173,7 @@ RuntimeValue Script_DisplaySpeech(AGSEngine *vm, ScriptObject *, const Common::A
 	values.remove_at(0);
 	string = vm->formatString(string, values);
 
-	vm->displaySpeech(string, charId);
+	vm->displaySpeechCore(string, charId);
 
 	return RuntimeValue();
 }

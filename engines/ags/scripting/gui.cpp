@@ -615,13 +615,15 @@ RuntimeValue Script_SetTextBoxText(AGSEngine *vm, ScriptObject *, const Common::
 // import void ListBoxClear(int gui, int object)
 // Undocumented.
 RuntimeValue Script_ListBoxClear(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint gui = params[0]._value;
+	uint object = params[1]._value;
 
-	// FIXME
-	error("ListBoxClear unimplemented");
+	GUIControl *control = getGUIControl("ListBoxClear", vm, gui, object);
+	if (!control->isOfType(sotGUIListBox))
+		error("ListBoxClear: Control %d isn't a listbox.", object);
+	GUIListBox *textbox = (GUIListBox *)control;
+
+	textbox->clear();
 
 	return RuntimeValue();
 }
@@ -629,15 +631,16 @@ RuntimeValue Script_ListBoxClear(AGSEngine *vm, ScriptObject *, const Common::Ar
 // import void ListBoxAdd(int gui, int object, const string text)
 // Undocumented.
 RuntimeValue Script_ListBoxAdd(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint gui = params[0]._value;
+	uint object = params[1]._value;
 	ScriptString *text = (ScriptString *)params[2]._object;
-	UNUSED(text);
 
-	// FIXME
-	error("ListBoxAdd unimplemented");
+	GUIControl *control = getGUIControl("ListBoxAdd", vm, gui, object);
+	if (!control->isOfType(sotGUIListBox))
+		error("ListBoxAdd: Control %d isn't a listbox.", object);
+	GUIListBox *textbox = (GUIListBox *)control;
+
+	textbox->addItem(text->getString());
 
 	return RuntimeValue();
 }
@@ -1757,10 +1760,7 @@ RuntimeValue Script_ListBox_set_HideScrollArrows(AGSEngine *vm, GUIListBox *self
 // ListBox: readonly import attribute int ItemCount
 // Gets the number of items currently in the list.
 RuntimeValue Script_ListBox_get_ItemCount(AGSEngine *vm, GUIListBox *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("ListBox::get_ItemCount unimplemented");
-
-	return RuntimeValue();
+	return self->_items.size();
 }
 
 // ListBox: import attribute String Items[]
@@ -1900,10 +1900,10 @@ RuntimeValue Script_GUI_SetSize(AGSEngine *vm, GUIGroup *self, const Common::Arr
 // GUI: import attribute int BackgroundGraphic
 // Gets/sets the sprite used to draw the GUI's background image.
 RuntimeValue Script_GUI_get_BackgroundGraphic(AGSEngine *vm, GUIGroup *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("GUI::get_BackgroundGraphic unimplemented");
-
-	return RuntimeValue();
+	if ((int)self->_bgPic > 0)
+		return self->_bgPic;
+	else
+		return 0;
 }
 
 // GUI: import attribute int BackgroundGraphic
@@ -2208,7 +2208,7 @@ static const ScriptSystemFunctionInfo ourFunctionList[] = {
 	{ "InvWindow::ScrollDown^0", (ScriptAPIFunction *)&Script_InvWindow_ScrollDown, "", sotGUIInvWindow },
 	{ "InvWindow::ScrollUp^0", (ScriptAPIFunction *)&Script_InvWindow_ScrollUp, "", sotGUIInvWindow },
 	{ "InvWindow::get_CharacterToUse", (ScriptAPIFunction *)&Script_InvWindow_get_CharacterToUse, "", sotGUIInvWindow },
-	{ "InvWindow::set_CharacterToUse", (ScriptAPIFunction *)&Script_InvWindow_set_CharacterToUse, "t", sotGUIInvWindow },
+	{ "InvWindow::set_CharacterToUse", (ScriptAPIFunction *)&Script_InvWindow_set_CharacterToUse, "p", sotGUIInvWindow },
 	{ "InvWindow::geti_ItemAtIndex", (ScriptAPIFunction *)&Script_InvWindow_geti_ItemAtIndex, "i", sotGUIInvWindow },
 	{ "InvWindow::get_ItemCount", (ScriptAPIFunction *)&Script_InvWindow_get_ItemCount, "", sotGUIInvWindow },
 	{ "InvWindow::get_ItemHeight", (ScriptAPIFunction *)&Script_InvWindow_get_ItemHeight, "", sotGUIInvWindow },
