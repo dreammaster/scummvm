@@ -1951,7 +1951,7 @@ bool AGSEngine::runInteractionCommandList(NewInteractionEvent &event, NewInterac
 			this->giveScore(temparg);
 			break;
 		case kActionDisplayMessage:
-			// FIXME
+			displayMessage(commands[i]._args[0]._val);
 			break;
 		case kActionPlayMusic:
 			// FIXME
@@ -3240,6 +3240,24 @@ byte AGSEngine::getGameOption(uint index) {
 	return _gameFile->_options[index];
 }
 
+Common::String AGSEngine::getMessageText(uint messageId) {
+	Common::String message;
+
+	if (messageId >= 500) {
+		messageId = messageId - 500;
+
+		if (messageId > _gameFile->_messages.size())
+			error("getMessageText: global message %d is too high", messageId);
+		message = _gameFile->_messages[messageId];
+	} else {
+		if (messageId > _currentRoom->_messages.size())
+			error("getMessageText: room message %d is too high", messageId);
+		message = _currentRoom->_messages[messageId]._text;
+	}
+
+	return replaceTokens(getTranslation(message), true);
+}
+
 Common::String AGSEngine::getTranslation(const Common::String &text) {
 	_lastTranslationSourceTextLength = text.size();
 	if (!text.empty() && text[0] == '&' && _state->_unfactorSpeechFromTextLength) {
@@ -3258,7 +3276,8 @@ Common::String AGSEngine::getTranslation(const Common::String &text) {
 	return text;
 }
 
-Common::String AGSEngine::replaceMacroTokens(const Common::String &text) {
+// both replace_tokens and replace_macro_tokens
+Common::String AGSEngine::replaceTokens(const Common::String &text, bool macro) {
 	Common::String out;
 
 	bool hasMacro = false;
@@ -3278,21 +3297,35 @@ Common::String AGSEngine::replaceMacroTokens(const Common::String &text) {
 		}
 
 		// try and find a macro; if we don't match one, just output as it was
-		if (macroName.equalsIgnoreCase("score"))
+		if (macro && macroName.equalsIgnoreCase("score"))
 			out += Common::String::format("%d", _state->_score);
-		else if (macroName.equalsIgnoreCase("totalscore"))
+		else if (macro && macroName.equalsIgnoreCase("totalscore"))
 			out += Common::String::format("%d", _state->_totalScore);
-		else if (macroName.equalsIgnoreCase("scoretext"))
+		else if (macro && macroName.equalsIgnoreCase("scoretext"))
 			out += Common::String::format("%d of %d", _state->_score, _state->_totalScore);
-		else if (macroName.equalsIgnoreCase("gamename"))
+		else if (macro && macroName.equalsIgnoreCase("gamename"))
 			out += _gameFile->_gameName;
-		else if (macroName.equalsIgnoreCase("overhotspot")) {
+		else if (macro && macroName.equalsIgnoreCase("overhotspot")) {
 			// while the game is in wait mode, no overhotspot text
 			if (!_state->_disabledUserInterface) {
 				Common::Point mousePos = _system->getEventManager()->getMousePos();
 				mousePos.x = divideDownCoordinate(mousePos.x);
 				mousePos.y = divideDownCoordinate(mousePos.y);
 				out += getLocationName(mousePos);
+			}
+		} else if (!macro && (macroName.hasPrefix("in") || macroName.hasPrefix("gi"))) {
+			// old-style token
+			uint id = atoi(macroName.c_str() + 2);
+			if (macroName[0] == 'i') {
+				// inventory item count
+				if (id < 1 || id >= _playerChar->_inventory.size())
+					error("replaceTokens: bad inventory item %d in string '%s'", id, text.c_str());
+				out += Common::String::format("%d", _playerChar->_inventory[id]);
+			} else {
+				// global integer
+				if (id >= _state->_globalScriptVars.size())
+					error("replaceTokens: bad global integer %d in string '%s'", id, text.c_str());
+				out += Common::String::format("%d", _state->_globalScriptVars[id]);
 			}
 		} else
 			out += '@' + macroName;

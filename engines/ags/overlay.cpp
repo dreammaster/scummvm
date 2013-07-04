@@ -33,6 +33,7 @@
 #include "engines/ags/graphics.h"
 #include "engines/ags/gui.h"
 #include "engines/ags/overlay.h"
+#include "engines/ags/room.h"
 
 #include "graphics/font.h"
 
@@ -443,9 +444,26 @@ uint AGSEngine::displayMain(int x, int y, int width, const Common::String &text,
 		return 0;
 	}
 
+	// FIXME: cursor stuff
+
+	uint countdown = getTextDisplayTime(text);
+	uint skipSetting = _state->userToInternalSkipSpeech(_state->_skipDisplay);
+
 	// FIXME
 	warning("displayMain '%s' unimplemented", text.c_str());
+	while (!shouldQuit()) {
+		_state->_gameStep++;
+		// FIXME: rendering/polling stuff
+		updateEvents(false);
+		draw();
 
+		// FIXME: totally wrong
+		if (!countdown)
+			break;
+		countdown--;
+	}
+
+	// FIXME: cursor stuff
 	removeScreenOverlay(OVER_TEXTMSG);
 
 	_state->_messageTime = -1;
@@ -729,6 +747,42 @@ uint AGSEngine::displaySpeechBackground(uint charId, const Common::String &text)
 	_overlays[overlayId]->_bgSpeechForChar = charId;
 	_overlays[overlayId]->_timeout = getTextDisplayTime(text, true);
 	return overlayId;
+}
+
+void AGSEngine::displayMessage(uint messageId, int y) {
+	Common::String message = getMessageText(messageId);
+
+	if (messageId >= 500) {
+		// global message
+
+		// TODO: Original source code uses long-dead display_message_aschar here.
+		// Work out what's going on there, and if it was ever useful.
+		displayAtY(y, message);
+		return;
+	}
+
+	// local (room) message
+	while (true) {
+		const MessageInfo &info = _currentRoom->_messages[messageId];
+
+		// FIXME: is this signed (-ve values *not* speech)?
+		if (info._displayAs) {
+			// Display as speech.
+			displaySpeech(message, info._displayAs - 1);
+		} else {
+			if (info._flags & MSG_TIMELIMIT) {
+				// FIXME: set _state->_skipDisplay to 0 (for this call only)
+			}
+
+			displayAtY(y, message);
+		}
+
+		if (!(info._flags & MSG_DISPLAYNEXT))
+			break;
+
+		messageId++;
+		message = getMessageText(messageId);
+	}
 }
 
 ScreenOverlay::ScreenOverlay(AGSEngine *vm, const Common::Point &pos, uint type,

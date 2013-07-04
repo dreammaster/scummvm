@@ -778,13 +778,10 @@ RuntimeValue Script_GetSaveSlotDescription(AGSEngine *vm, ScriptObject *, const 
 // import void GetMessageText (int messageNumber, string buffer)
 // Undocumented.
 RuntimeValue Script_GetMessageText(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int messageNumber = params[0]._signedValue;
-	UNUSED(messageNumber);
+	uint messageNumber = params[0]._value;
 	ScriptString *buffer = (ScriptString *)params[1]._object;
-	UNUSED(buffer);
 
-	// FIXME
-	error("GetMessageText unimplemented");
+	buffer->setString(vm->getMessageText(messageNumber));
 
 	return RuntimeValue();
 }

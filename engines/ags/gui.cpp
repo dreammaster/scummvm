@@ -234,7 +234,7 @@ void GUILabel::setAlign(uint32 align) {
 }
 
 void GUILabel::draw(Graphics::Surface *surface) {
-	Common::String text = _vm->replaceMacroTokens(_vm->getTranslation(_text));
+	Common::String text = _vm->replaceTokens(_vm->getTranslation(_text), true);
 	uint32 color = _vm->_graphics->resolveHardcodedColor(_textColor);
 	Graphics::Font *font = _vm->_graphics->getFont(_font);
 
