@@ -530,7 +530,11 @@ RuntimeValue Script_AudioClip_Play(AGSEngine *vm, AudioClip *self, const Common:
 	uint32 audioPriority = params[0]._value;
 	uint32 repeatStyle = params[1]._value;
 
-	return vm->_audio->playAudioClip(*self, audioPriority, repeatStyle);
+	uint channelId = vm->_audio->playAudioClip(*self, audioPriority, repeatStyle);
+	if (channelId == (uint)-1)
+		return 0;
+	else
+		return vm->_audio->_channels[channelId];
 }
 
 // AudioClip: import AudioChannel* PlayFrom(int position, AudioPriority=SCR_NO_VALUE, RepeatStyle=SCR_NO_VALUE)
@@ -540,7 +544,11 @@ RuntimeValue Script_AudioClip_PlayFrom(AGSEngine *vm, AudioClip *self, const Com
 	uint32 audioPriority = params[1]._value;
 	uint32 repeatStyle = params[2]._value;
 
-	return vm->_audio->playAudioClip(*self, audioPriority, repeatStyle, position);
+	uint channelId = vm->_audio->playAudioClip(*self, audioPriority, repeatStyle, position);
+	if (channelId == (uint)-1)
+		return 0;
+	else
+		return vm->_audio->_channels[channelId];
 }
 
 // AudioClip: import AudioChannel* PlayQueued(AudioPriority=SCR_NO_VALUE, RepeatStyle=SCR_NO_VALUE)
@@ -549,7 +557,11 @@ RuntimeValue Script_AudioClip_PlayQueued(AGSEngine *vm, AudioClip *self, const C
 	uint32 audioPriority = params[0]._value;
 	uint32 repeatStyle = params[1]._value;
 
-	return vm->_audio->playAudioClip(*self, audioPriority, repeatStyle, 0, true);
+	uint channelId = vm->_audio->playAudioClip(*self, audioPriority, repeatStyle, 0, true);
+	if (channelId == (uint)-1)
+		return 0;
+	else
+		return vm->_audio->_channels[channelId];
 }
 
 // AudioClip: import void Stop()
@@ -589,7 +601,7 @@ RuntimeValue Script_AudioClip_get_Type(AGSEngine *vm, AudioClip *self, const Com
 RuntimeValue Script_System_geti_AudioChannels(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint index = params[0]._value;
 
-	if (index >= vm->_audio->_channels.size())
+	if (index >= vm->_audio->_channels.size() - 1)
 		error("System::geti_AudioChannels: channel %d too high (only %d channels)", index, vm->_audio->_channels.size());
 
 	return vm->_audio->_channels[index];
