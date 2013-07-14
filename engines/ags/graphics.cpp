@@ -54,7 +54,8 @@ class WFNFont : public Graphics::Font {
 	};
 
 public:
-	WFNFont(Common::SeekableReadStream *stream) : _maxCharWidth(0), _maxCharHeight(0) {
+	WFNFont(Common::SeekableReadStream *stream, uint multiplier) : _maxCharWidth(0), _maxCharHeight(0), _multiplier(multiplier) {
+		assert(_multiplier);
 		const char *WFN_FILE_SIGNATURE = "WGT Font File  ";
 
 		char buffer[16];
@@ -88,9 +89,9 @@ public:
 			delete[] _glyphs[i].data;
 	}
 
-	int getFontHeight() const { return _maxCharHeight; }
-	int getMaxCharWidth() const { return _maxCharWidth; }
-	int getCharWidth(uint32 chr) const { return _glyphs[chr].width; }
+	int getFontHeight() const { return _maxCharHeight * _multiplier; }
+	int getMaxCharWidth() const { return _maxCharWidth * _multiplier; }
+	int getCharWidth(uint32 chr) const { return _glyphs[chr].width * _multiplier; }
 
 	void drawChar(Graphics::Surface *surface, uint32 chr, int x, int y, uint32 color) const {
 		if (chr >= 128)
@@ -99,17 +100,19 @@ public:
 		uint32 dataWidth = ((_glyphs[chr].width - 1) / 8) + 1;
 
 		byte data = 0;
-		for (uint chrY = 0; chrY < _glyphs[chr].height; ++chrY) {
+		for (uint chrY = 0; chrY < _glyphs[chr].height * _multiplier; ++chrY) {
 			int destY = (int)chrY + y;
 			if (destY < 0 || destY >= surface->h)
 				continue;
 
-			byte *src = _glyphs[chr].data + (chrY * dataWidth);
-			for (uint chrX = 0; chrX < _glyphs[chr].width; ++chrX) {
-				if (!(chrX % 8))
-					data = *src++;
-				else
-					data <<= 1;
+			byte *src = _glyphs[chr].data + ((chrY / _multiplier) * dataWidth);
+			for (uint chrX = 0; chrX < _glyphs[chr].width * _multiplier; ++chrX) {
+				if (chrX % _multiplier == 0) {
+					if (!((chrX / _multiplier) % 8))
+						data = *src++;
+					else
+						data <<= 1;
+				}
 
 				int destX = (int)chrX + x;
 				if (destX < 0 || destX >= surface->w)
@@ -137,6 +140,7 @@ public:
 
 protected:
 	uint _maxCharWidth, _maxCharHeight;
+	uint _multiplier;
 
 	Common::Array<WFNFontGlyph> _glyphs;
 };
@@ -456,7 +460,7 @@ void AGSGraphics::loadFonts() {
 			stream = _vm->getFile("agsfnt0.wfn");
 		if (!stream)
 			error("couldn't find font %d", i);
-		_fonts[i] = new WFNFont(stream);
+		_fonts[i] = new WFNFont(stream, _textMultiply);
 		delete stream;
 	}
 }
@@ -477,6 +481,7 @@ uint AGSGraphics::getHeightForFont(uint id) {
 	// FIXME: wrong height
 	uint height = font->getFontHeight();
 
+	// automatic outline fonts are 2 pixels taller
 	if (fontInfo._outline == FONT_OUTLINE_AUTO) {
 		bool isTTF = true; // FIXME
 		if (!_vm->getGameOption(OPT_NOSCALEFNT) && !isTTF)
