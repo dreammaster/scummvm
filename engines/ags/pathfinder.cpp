@@ -586,7 +586,7 @@ bool PathFinder::findRouteDijkstra() {
 		return false;
 	}
 
-	_pathBackPositions.push_back(_finalStep);
+	_pathBackPositions.push_back(_dest);
 
 	for (uint on = parentVals[foundAnswer]; on != (uint)-1; on = parentVals[on]) {
 		assert(parentVals[on] != on);
