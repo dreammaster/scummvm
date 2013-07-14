@@ -127,9 +127,9 @@ public:
 	virtual void onMouseEnter() { }
 	virtual void onMouseLeave() { }
 	// button down - return true to lock focus
-	virtual bool onMouseDown() { return false; }
+	virtual bool onMouseDown(Common::Point) { return false; }
 	virtual void onMouseUp() { }
-	virtual void onKeyPress(uint id) { }
+	virtual void onKeyPress(uint keycode) { }
 	virtual void draw(Graphics::Surface *surface) = 0;
 
 	virtual bool isOverControl(const Common::Point &pos);
@@ -237,6 +237,7 @@ public:
 
 	uint32 _exFlags;
 
+	void onKeyPress(uint keycode);
 	void draw(Graphics::Surface *surface);
 
 protected:
@@ -250,6 +251,8 @@ public:
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIListBox); }
 	const char *getObjectTypeName() { return "GUIListBox"; }
 
+	bool onMouseDown(Common::Point);
+
 	void resized();
 
 	void scrollUp();
@@ -261,6 +264,7 @@ public:
 	void removeItem(uint index);
 	void clear();
 
+	void setFont(uint32 font);
 	uint getSelected();
 	void setSelected(uint index);
 	uint getTopItem() { return _topItem; }
@@ -285,6 +289,8 @@ public:
 
 protected:
 	uint32 getMaxNumEvents() const { return 1; }
+
+	void recalculate();
 };
 
 class GUIInvControl : public GUIControl {
@@ -324,14 +330,14 @@ protected:
 
 class GUIButton : public GUITextControl {
 public:
-	GUIButton(AGSEngine *vm) : GUITextControl(vm) { }
+	GUIButton(AGSEngine *vm) : GUITextControl(vm), _animating(false) { }
 	void readFrom(Common::SeekableReadStream *dta);
 	bool isOfType(ScriptObjectType objectType) { return (objectType == sotGUIControl || objectType == sotGUIButton); }
 	const char *getObjectTypeName() { return "GUIButton"; }
 
 	void onMouseEnter();
 	void onMouseLeave();
-	bool onMouseDown();
+	bool onMouseDown(Common::Point);
 	void onMouseUp();
 
 	uint32 getDisplayedGraphic();
@@ -343,11 +349,13 @@ public:
 	uint32 getPushedGraphic() { return _pushedPic; }
 	void setPushedGraphic(uint32 pic);
 
+	void animate(uint16 view, uint16 loop, int16 speed, uint16 repeat);
+	void updateAnimation();
+
 	uint32 _leftClick, _rightClick;
 	uint32 _leftClickData, _rightClickData;
 
 protected:
-
 	uint32 _pic, _overPic, _pushedPic;
 	uint32 _isPushed, _isOver;
 
@@ -356,7 +364,13 @@ protected:
 	// not persisted
 	uint32 _usePic;
 
+	// animation state
+	bool _animating;
+	uint16 _animView, _animLoop;
+	int16 _animSpeed, _animWait;
+	uint16 _animFrame, _animRepeat; // FIXME: repeat -> bool?
 	void stopAnimation();
+
 	void draw(Graphics::Surface *surface);
 
 	uint32 getMaxNumEvents() const { return 1; }
@@ -371,6 +385,8 @@ public:
 	void onMouseMove(const Common::Point &pos);
 	void onMouseUp(const Common::Point &pos);
 	void onMouseDown(const Common::Point &pos);
+
+	bool onKeyPress(uint keycode);
 
 	void setEnabled(bool enabled);
 	void setVisible(bool visible);

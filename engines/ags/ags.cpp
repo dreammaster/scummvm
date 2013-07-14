@@ -425,7 +425,17 @@ void AGSEngine::tickGame(bool checkControls) {
 	if (!isGamePaused())
 		updateStuff();
 
-	// FIXME: update animating buttons
+	// update animating buttons (which scripts might be waiting on)
+	for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
+		GUIGroup *group = _gameFile->_guiGroups[i];
+		for (uint j = 0; j < group->_controls.size(); ++j) {
+			GUIControl *control = group->_controls[j];
+
+			if (control->isOfType(sotGUIButton))
+				((GUIButton *)control)->updateAnimation();
+		}
+	}
+
 	// FIXME: a whole bunch of update stuff
 
 	if (!_state->_fastForward) {
@@ -523,13 +533,37 @@ void AGSEngine::updateEvents(bool checkControls) {
 			break;
 
 		case Common::EVENT_KEYDOWN:
-			_keysPressed[Common::mapKeycodeToAGS(event.kbd.keycode)] = true;
-			// FIXME: bad mapping
-			queueGameEvent(kEventTextScript, kTextScriptOnKeyPress, Common::mapKeycodeToAGS(event.kbd.keycode));
+			{
+			uint keycode = Common::mapKeycodeToAGS(event.kbd.keycode);
+			_keysPressed[keycode] = true;
 
-			// FIXME: keypresses
+			if (!checkControls)
+				break;
+
+			// FIXME: keypresses, also FACTOR THIS OUT
 			if (_state->_inCutscene > 0)
 				startSkippingCutscene();
+
+			bool guiTaken = false;
+			// TODO: replace with nice constants
+			// either backspace, enter, or a normal key
+			if (keycode == 8 || keycode == 13 || (keycode >= 32 && keycode < 256 && keycode != '[')) {
+				for (uint i = 0; i < _gameFile->_guiGroups.size(); ++i) {
+					GUIGroup *group = _gameFile->_guiGroupDrawOrder[i];
+
+					if (group->onKeyPress(keycode)) {
+						guiTaken = true;
+						break;
+					}
+				}
+			}
+			if (guiTaken)
+				break;
+
+			if (keycode >= 'a' && keycode <= 'z')
+				keycode -= 32;
+			queueGameEvent(kEventTextScript, kTextScriptOnKeyPress, Common::mapKeycodeToAGS(event.kbd.keycode));
+			}
 			break;
 		case Common::EVENT_KEYUP:
 			_keysPressed[Common::mapKeycodeToAGS(event.kbd.keycode)] = false;

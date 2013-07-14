@@ -59,7 +59,8 @@ RuntimeValue Script_DisableInterface(AGSEngine *vm, ScriptObject *, const Common
 // Re-enables the player interface.
 RuntimeValue Script_EnableInterface(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	vm->invalidateGUI();
-	vm->_state->_disabledUserInterface--;
+	if (vm->_state->_disabledUserInterface)
+		vm->_state->_disabledUserInterface--;
 	if (!vm->_state->_disabledUserInterface) {
 		vm->setDefaultCursor();
 	}
@@ -648,15 +649,15 @@ RuntimeValue Script_ListBoxAdd(AGSEngine *vm, ScriptObject *, const Common::Arra
 // import int ListBoxGetSelected(int gui, int object)
 // Undocumented.
 RuntimeValue Script_ListBoxGetSelected(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
-	int gui = params[0]._signedValue;
-	UNUSED(gui);
-	int object = params[1]._signedValue;
-	UNUSED(object);
+	uint gui = params[0]._value;
+	uint object = params[1]._value;
 
-	// FIXME
-	error("ListBoxGetSelected unimplemented");
+	GUIControl *control = getGUIControl("ListBoxGetSelected", vm, gui, object);
+	if (!control->isOfType(sotGUIListBox))
+		error("ListBoxGetSelected: Control %d isn't a listbox.", object);
+	GUIListBox *textbox = (GUIListBox *)control;
 
-	return RuntimeValue();
+	return textbox->getSelected();
 }
 
 // import void ListBoxGetItemText(int gui, int object, int listIndex, string buffer)
@@ -1103,17 +1104,12 @@ RuntimeValue Script_Label_set_TextColor(AGSEngine *vm, GUILabel *self, const Com
 // Button: import void Animate(int view, int loop, int delay, RepeatStyle)
 // Animates the button graphic using the specified view loop.
 RuntimeValue Script_Button_Animate(AGSEngine *vm, GUIButton *self, const Common::Array<RuntimeValue> &params) {
-	int view = params[0]._signedValue;
-	UNUSED(view);
-	int loop = params[1]._signedValue;
-	UNUSED(loop);
-	int delay = params[2]._signedValue;
-	UNUSED(delay);
-	uint32 repeatstyle = params[3]._value;
-	UNUSED(repeatstyle);
+	uint view = params[0]._value;
+	uint loop = params[1]._value;
+	int delay = params[2]._value;
+	uint repeatstyle = params[3]._value;
 
-	// FIXME
-	error("Button::Animate unimplemented");
+	self->animate(view, loop, delay, repeatstyle);
 
 	return RuntimeValue();
 }
@@ -1620,9 +1616,16 @@ RuntimeValue Script_ListBox_GetItemAtLocation(AGSEngine *vm, GUIListBox *self, c
 	int x = params[0]._signedValue;
 	int y = params[1]._signedValue;
 
-	return self->getItemAt(Common::Point(x, y));
+	if (!self->_parent->_visible)
+		return -1;
 
-	return RuntimeValue();
+	vm->multiplyUpCoordinates(x, y);
+	x = x - self->_x - self->_parent->_x;
+	y = y - self->_y - self->_parent->_y;
+	if (x < 0 || y < 0 || (uint)x >= self->_width || (uint)y >= self->_height)
+		return -1;
+
+	return self->getItemAt(Common::Point(x, y));
 }
 
 // ListBox: import void GetItemText(int listIndex, string buffer)
@@ -1718,20 +1721,19 @@ RuntimeValue Script_ListBox_set_Font(AGSEngine *vm, GUIListBox *self, const Comm
 // ListBox: import attribute bool HideBorder
 // Gets/sets whether the border around the list box is hidden.
 RuntimeValue Script_ListBox_get_HideBorder(AGSEngine *vm, GUIListBox *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("ListBox::get_HideBorder unimplemented");
-
-	return RuntimeValue();
+	return (self->_exFlags & GLF_NOBORDER) ? 1 : 0;
 }
 
 // ListBox: import attribute bool HideBorder
 // Gets/sets whether the border around the list box is hidden.
 RuntimeValue Script_ListBox_set_HideBorder(AGSEngine *vm, GUIListBox *self, const Common::Array<RuntimeValue> &params) {
 	uint32 value = params[0]._value;
-	UNUSED(value);
 
-	// FIXME
-	error("ListBox::set_HideBorder unimplemented");
+	self->_exFlags &= ~GLF_NOBORDER;
+	if (value)
+		self->_exFlags |= GLF_NOBORDER;
+
+	self->_parent->invalidate();
 
 	return RuntimeValue();
 }
@@ -1739,20 +1741,18 @@ RuntimeValue Script_ListBox_set_HideBorder(AGSEngine *vm, GUIListBox *self, cons
 // ListBox: import attribute bool HideScrollArrows
 // Gets/sets whether the clickable scroll arrows are hidden.
 RuntimeValue Script_ListBox_get_HideScrollArrows(AGSEngine *vm, GUIListBox *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("ListBox::get_HideScrollArrows unimplemented");
-
-	return RuntimeValue();
+	return (self->_exFlags & GLF_NOARROWS) ? 1 : 0;
 }
 
 // ListBox: import attribute bool HideScrollArrows
 // Gets/sets whether the clickable scroll arrows are hidden.
 RuntimeValue Script_ListBox_set_HideScrollArrows(AGSEngine *vm, GUIListBox *self, const Common::Array<RuntimeValue> &params) {
 	uint32 value = params[0]._value;
-	UNUSED(value);
+	self->_exFlags &= ~GLF_NOARROWS;
+	if (value)
+		self->_exFlags |= GLF_NOARROWS;
 
-	// FIXME
-	error("ListBox::set_HideScrollArrows unimplemented");
+	self->_parent->invalidate();
 
 	return RuntimeValue();
 }

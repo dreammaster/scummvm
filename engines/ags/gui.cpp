@@ -279,8 +279,50 @@ void GUITextBox::readFrom(Common::SeekableReadStream *dta) {
 	_exFlags = dta->readUint32LE();
 }
 
+void GUITextBox::onKeyPress(uint keycode) {
+	_parent->invalidate();
+
+	// backspace
+	if (keycode == 8) {
+		_text.deleteLastChar();
+		return;
+	}
+
+	// enter
+	if (keycode == 13) {
+		_activated++;
+		return;
+	}
+
+	if (keycode >= 128) {
+		// FIXME: check	for extended char support?
+	}
+
+	_text += keycode;
+
+	// if the new text is too wide for the textbox, revert the added char
+	Graphics::Font *font = _vm->_graphics->getFont(_font);
+	uint textWidth = font->getStringWidth(_text); // FIXME
+	if ((int)textWidth > (int)_width - (6 + (int)_vm->getFixedPixelSize(5)))
+		_text.deleteLastChar();
+}
+
 void GUITextBox::draw(Graphics::Surface *surface) {
-	warning("GUITextBox::draw unimplemented");
+	Graphics::Font *font = _vm->_graphics->getFont(_font);
+
+	if (!(_flags & GLF_NOBORDER)) {
+		// FIXME: draw the border
+	}
+
+	uint x = _x + 1 + _vm->getFixedPixelSize(1);
+	uint y = _y + 1 + _vm->getFixedPixelSize(1);
+	uint textWidth = font->getStringWidth(_text); // FIXME
+	_vm->_graphics->drawOutlinedString(_font, surface, _text, x, y, textWidth, _textColor);
+
+	if (isDisabled())
+		return;
+
+	// FIXME: draw a cursor
 }
 
 void GUIListBox::readFrom(Common::SeekableReadStream *dta) {
@@ -327,8 +369,30 @@ void GUIListBox::readFrom(Common::SeekableReadStream *dta) {
 	}
 }
 
+bool GUIListBox::onMouseDown(Common::Point pos) {
+	pos.x -= _x;
+	pos.y -= _y;
+
+	// FIXME: right margin check for scroll bar
+
+	uint itemId = getItemAt(pos);
+	if (itemId == (uint)-1)
+		return false;
+
+	_selected = itemId;
+	_activated = true;
+
+	return false;
+}
+
+void GUIListBox::setFont(uint32 font) {
+	GUITextControl::setFont(font);
+
+	recalculate();
+}
+
 void GUIListBox::resized() {
-	// FIXME
+	recalculate();
 }
 
 void GUIListBox::scrollUp() {
@@ -340,7 +404,18 @@ void GUIListBox::scrollDown() {
 }
 
 uint GUIListBox::getItemAt(Common::Point pos) {
-	return (uint)-1;
+	// FIXME: right margin check
+
+	// The original engine doesn't do this, but that causes problems if you don't
+	// get a draw() before calling this.
+	recalculate();
+
+	// TODO: signed issues?
+	uint itemId = _topItem + (pos.y / _rowHeight);
+	if (itemId >= _items.size())
+		return (uint)-1;
+
+	return itemId;
 }
 
 bool GUIListBox::addItem(const Common::String &value) {
@@ -430,8 +505,59 @@ void GUIListBox::setTopItem(uint index) {
 	_parent->invalidate();
 }
 
+// was 'ChangeFont'
+void GUIListBox::recalculate() {
+	Graphics::Font *font = _vm->_graphics->getFont(_font);
+
+	_rowHeight = font->getFontHeight() + _vm->getFixedPixelSize(2);
+	_numItemsFit = _height / _rowHeight;
+}
+
 void GUIListBox::draw(Graphics::Surface *surface) {
+	Graphics::Font *font = _vm->_graphics->getFont(_font);
+	uint useWidth = _width - 1;
+	uint useHeight = _height - 1;
+	uint pixelSize = _vm->getFixedPixelSize(1);
+	uint rightHandEdge = (_x + _width) - pixelSize - 1;
+
+	recalculate();
+
+	if (!(_flags & GLF_NOBORDER)) {
+		// FIXME: draw the border
+	}
+
+	// FIXME: draw the scroll bar if needed
 	warning("GUIListBox::draw unimplemented");
+
+	for (uint i = 0; i < _numItemsFit; ++i) {
+		uint itemId = _topItem + i;
+		if (itemId >= _items.size())
+			break;
+		const Common::String &text = _items[itemId];
+		bool isSelected = (itemId == _selected);
+
+		uint y = _y + pixelSize + (i * _rowHeight);
+		uint32 color = isSelected ? _backColor : _textColor;
+
+		if (isSelected) {
+			// FIXME: draw selection highlight
+		}
+
+		uint textWidth = font->getStringWidth(text); // FIXME
+		uint x;
+		switch (_alignment) {
+		case GALIGN_LEFT:
+			x = _x + 1 + pixelSize;
+			break;
+		case GALIGN_RIGHT:
+			x = rightHandEdge - textWidth;
+			break;
+		default:
+			x = ((rightHandEdge - _x) / 2) + _x - (textWidth / 2);
+			break;
+		}
+		_vm->_graphics->drawOutlinedString(_font, surface, text, x, y + 1, textWidth, color);
+	}
 }
 
 void GUIInvControl::readFrom(Common::SeekableReadStream *dta) {
@@ -640,7 +766,7 @@ void GUIButton::onMouseLeave() {
 	_isOver = false;
 }
 
-bool GUIButton::onMouseDown() {
+bool GUIButton::onMouseDown(Common::Point) {
 	if (_pushedPic > 0)
 		_usePic = _pushedPic;
 
@@ -704,9 +830,66 @@ void GUIButton::setPushedGraphic(uint32 pic) {
 	stopAnimation();
 }
 
+void GUIButton::animate(uint16 view, uint16 loop, int16 speed, uint16 repeat) {
+	// FIXME
+
+	view--;
+
+	_animating = true;
+	_animView = view;
+	_animLoop = loop;
+	_animSpeed = speed;
+	_animRepeat = repeat;
+	_animWait = 0;
+
+	// immediately jump to the first frame
+	_animFrame = (uint16)-1;
+	updateAnimation();
+}
+
+void GUIButton::updateAnimation() {
+	if (!_animating)
+		return;
+
+	if (_animWait) {
+		_animWait--;
+		return;
+	}
+
+	const ViewStruct &view = _vm->_gameFile->_views[_animView];
+
+	_animFrame++;
+	if (_animFrame >= view._loops[_animLoop]._frames.size()) {
+		if (view._loops[_animLoop].shouldRunNextLoop()) {
+			// go to next loop
+			_animLoop++;
+			_animFrame = 0;
+		} else if (_animRepeat) {
+			// animation repeats
+			_animFrame = 0;
+			// if this is the end of a multi-loop animation, return to start
+			while (_animLoop > 0 && view._loops[_animLoop - 1].shouldRunNextLoop())
+				_animLoop--;
+		} else {
+			// end of animation
+			_animating = false;
+			return;
+		}
+	}
+
+	_vm->checkViewFrame(_animView, _animLoop, _animFrame);
+
+	ViewFrame *frame = _vm->getViewFrame(_animView, _animLoop, _animFrame);
+	_pic = _usePic = frame->_pic;
+	_pushedPic = _overPic = 0;
+
+	_parent->invalidate();
+
+	_animWait = _animSpeed + frame->_speed;
+}
 
 void GUIButton::stopAnimation() {
-	// FIXME
+	_animating = false;
 }
 
 void GUIButton::draw(Graphics::Surface *surface) {
@@ -936,7 +1119,7 @@ void GUIGroup::onMouseDown(const Common::Point &pos) {
 		return;
 
 	_mouseDownOn = _mouseOver;
-	if (control->onMouseDown())
+	if (control->onMouseDown(pos - Common::Point(_x, _y)))
 		_mouseOver = MOVER_MOUSEDOWNLOCKED;
 
 	control->onMouseMove(pos - Common::Point(_x, _y));
@@ -968,6 +1151,34 @@ bool GUIGroup::isMouseOver(const Common::Point &pos) {
 		return false;
 
 	return (pos.x >= _x && pos.y >= _y && pos.x <= _x + (int)_width && pos.y <= _y + (int)_height);
+}
+
+bool GUIGroup::onKeyPress(uint keycode) {
+	if (!_visible)
+		return false;
+
+	for (uint i = 0; i < _controls.size(); ++i) {
+		GUIControl *control = _controls[i];
+
+		if (!control->isOfType(sotGUITextBox))
+			continue;
+
+		if (!control->isVisible())
+			continue;
+		if (control->isDisabled())
+			continue;
+
+		control->onKeyPress(keycode);
+
+		if (control->_activated) {
+			_vm->queueGameEvent(kEventInterfaceClick, _id, i, 1);
+			control->_activated = false;
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 GUIControl *GUIGroup::getControlAt(const Common::Point &pos, bool mustBeClickable) {
