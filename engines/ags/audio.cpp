@@ -122,15 +122,29 @@ void AGSAudio::addAudioResourcesFrom(ResourceManager *manager, bool isExecutable
 		clip._id = _audioClips.size();
 		clip._filename = filename;
 		clip._bundledInExecutable = isExecutable;
+		Common::String newScriptName;
 		if (filename.hasPrefix("music")) {
-			clip._scriptName = Common::String::format("aMusic%d", id);
+			newScriptName = Common::String::format("aMusic%d", id);
 			clip._type = 2;
 			clip._defaultRepeat = true;
 		} else {
-			clip._scriptName = Common::String::format("aSound%d", id);
+			newScriptName = Common::String::format("aSound%d", id);
 			clip._type = 3;
 			clip._defaultRepeat = false;
 		}
+		// WORKAROUND: Old-style games can have clips with identical IDs. See Apprentice 2 for example.
+		// FIXME: Does this break things?
+		bool resolved = false;
+		while (!resolved) {
+			resolved = true;
+			for (uint n = 0; n < _audioClips.size(); ++n)
+				if (_audioClips[n]._scriptName.equalsIgnoreCase(newScriptName)) {
+					newScriptName = newScriptName + "_";
+					resolved = false;
+					break;
+				}
+		}
+		clip._scriptName = newScriptName;
 		if (extension == "mp3") {
 			clip._fileType = kAudioFileMP3;
 		} else if (extension == "wav") {
@@ -713,7 +727,9 @@ bool AudioChannel::playSound(Common::SeekableReadStream *stream, AudioFileType f
 	_clip = NULL;
 	_stream = NULL;
 
-	stop();
+	// FIXME: muh
+	if (isPlaying())
+		stop(false);
 
 	// FIXME: stupid hack due to threading issues
 	Common::SeekableReadStream *newStream = stream->readStream(stream->size());

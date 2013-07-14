@@ -265,7 +265,6 @@ public:
 	uint32 _restoreCursorImageTo;
 
 	Common::Array<uint16> _musicQueue;
-	// TODO: Common::Array<QueuedAudioItem> _newMusicQueue;
 
 	uint16 _crossfadingOutChannel;
 	uint16 _crossfadeStep;

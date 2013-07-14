@@ -1228,7 +1228,7 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	}
 
 	if (_currentRoom->_options[ST_TUNE] > 0) {
-		// FIXME: clear music queue
+		_state->_musicQueue.clear();
 		_audio->playNewMusic(_currentRoom->_options[ST_TUNE]);
 	}
 
