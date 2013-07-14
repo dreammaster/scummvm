@@ -686,6 +686,62 @@ void AGSGraphics::draw(Drawable *item, bool useViewport) {
 
 	// FIXME: lots of things
 	blit(surface, &_backBuffer, pos, transparency, mirrored);
+
+}
+
+static bool blitClip(Common::Point &pos, const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, bool mirrored, uint &startX, uint &startY, uint &width, uint &height) {
+	// FIXME: make sure the mirrored parts are ok
+
+	// ignore surfaces which are entirely off-screen
+	if (pos.x > destSurf->w)
+		return true;
+	if (pos.y > destSurf->h)
+		return true;
+
+	width = srcSurf->w;
+	height = srcSurf->h;
+
+	// work out if we want to start partially into a source surface,
+	// because some of it is off-screen
+	startX = 0;
+	if (pos.x < 0) {
+		if ((uint)-pos.x > srcSurf->w)
+			return true;
+
+		if (mirrored) {
+			// we only want to draw the right half
+			width += pos.x;
+		} else {
+			// we only want to draw the left half
+			startX = -pos.x;
+			width -= startX;
+		}
+
+		pos.x = 0;
+	}
+	startY = 0;
+	if (pos.y < 0) {
+		// we only want to draw the bottom half
+		startY = -pos.y;
+		if (startY > srcSurf->h)
+			return true;
+		pos.y = 0;
+		height -= startY;
+	}
+
+	// work out how much of the surface we want to draw, given some
+	// of it might be off-screen
+	if (pos.x + width > destSurf->w) {
+		if (mirrored) {
+			// we only want to draw the right half
+			startX += (pos.x + width - destSurf->w);
+		}
+		width = destSurf->w - pos.x;
+	}
+	if (pos.y + height > destSurf->h)
+		height = destSurf->h - pos.y;
+
+	return false;
 }
 
 void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *destSurf, Common::Point pos, uint transparency,
@@ -693,37 +749,9 @@ void AGSGraphics::blit(const Graphics::Surface *srcSurf, Graphics::Surface *dest
 	if (transparency == 255)
 		return;
 
-	// FIXME: fix the bounds checks for mirrored sprites
-
-	// ignore surfaces which are entirely off-screen
-	if (pos.x > destSurf->w)
+	uint startX, startY, width, height;
+	if (blitClip(pos, srcSurf, destSurf, mirrored, startX, startY, width, height))
 		return;
-	if (pos.y > destSurf->h)
-		return;
-
-	// work out if we want to start partially into a source surface,
-	// because some of it is off-screen
-	uint startX = 0, startY = 0;
-	if (pos.x < 0) {
-		startX = -pos.x;
-		if (startX > srcSurf->w)
-			return;
-		pos.x = 0;
-	}
-	if (pos.y < 0) {
-		startY = -pos.y;
-		if (startY > srcSurf->h)
-			return;
-		pos.y = 0;
-	}
-
-	// work out how much of the surface we want to draw, given some
-	// of it might be off-screen
-	uint width = srcSurf->w - startX, height = srcSurf->h - startY;
-	if (pos.x + width > destSurf->w)
-		width = destSurf->w - pos.x;
-	if (pos.y + height > destSurf->h)
-		height = destSurf->h - pos.y;
 
 	if (srcSurf->format.bytesPerPixel == 1) {
 		for (uint y = 0; y < height; ++y) {
