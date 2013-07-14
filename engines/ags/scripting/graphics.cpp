@@ -1131,10 +1131,11 @@ RuntimeValue Script_Overlay_SetText(AGSEngine *vm, Overlay *self, const Common::
 // Overlay: import void Remove()
 // Removes the overlay from the screen.
 RuntimeValue Script_Overlay_Remove(AGSEngine *vm, ScreenOverlay *self, const Common::Array<RuntimeValue> &params) {
+	if (!self->_isValid)
+		error("Overlay::Remove: overlay is invalid");
 	uint overlayId = vm->findOverlayOfType(self->getType());
 	if (overlayId == (uint)-1)
 		error("internal error: Overlay::Remove couldn't find overlay");
-	// FIXME: sabotage overlay object
 	vm->removeScreenOverlayIndex(overlayId);
 
 	return RuntimeValue();
@@ -1142,51 +1143,38 @@ RuntimeValue Script_Overlay_Remove(AGSEngine *vm, ScreenOverlay *self, const Com
 
 // Overlay: readonly import attribute bool Valid
 // Checks whether this overlay is currently valid.
-RuntimeValue Script_Overlay_get_Valid(AGSEngine *vm, Overlay *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Overlay::get_Valid unimplemented");
-
-	return RuntimeValue();
+RuntimeValue Script_Overlay_get_Valid(AGSEngine *vm, ScreenOverlay *self, const Common::Array<RuntimeValue> &params) {
+	return self->_isValid;
 }
 
 // Overlay: import attribute int X
 // Gets/sets the X position on the screen where this overlay is displayed.
-RuntimeValue Script_Overlay_get_X(AGSEngine *vm, Overlay *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Overlay::get_X unimplemented");
-
-	return RuntimeValue();
+RuntimeValue Script_Overlay_get_X(AGSEngine *vm, ScreenOverlay *self, const Common::Array<RuntimeValue> &params) {
+	return self->_pos.x;
 }
 
 // Overlay: import attribute int X
 // Gets/sets the X position on the screen where this overlay is displayed.
-RuntimeValue Script_Overlay_set_X(AGSEngine *vm, Overlay *self, const Common::Array<RuntimeValue> &params) {
+RuntimeValue Script_Overlay_set_X(AGSEngine *vm, ScreenOverlay *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Overlay::set_X unimplemented");
+	self->_pos.x = value;
 
 	return RuntimeValue();
 }
 
 // Overlay: import attribute int Y
 // Gets/sets the Y position on the screen where this overlay is displayed.
-RuntimeValue Script_Overlay_get_Y(AGSEngine *vm, Overlay *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("Overlay::get_Y unimplemented");
-
-	return RuntimeValue();
+RuntimeValue Script_Overlay_get_Y(AGSEngine *vm, ScreenOverlay *self, const Common::Array<RuntimeValue> &params) {
+	return self->_pos.y;
 }
 
 // Overlay: import attribute int Y
 // Gets/sets the Y position on the screen where this overlay is displayed.
-RuntimeValue Script_Overlay_set_Y(AGSEngine *vm, Overlay *self, const Common::Array<RuntimeValue> &params) {
+RuntimeValue Script_Overlay_set_Y(AGSEngine *vm, ScreenOverlay *self, const Common::Array<RuntimeValue> &params) {
 	int value = params[0]._signedValue;
-	UNUSED(value);
 
-	// FIXME
-	error("Overlay::set_Y unimplemented");
+	self->_pos.y = value;
 
 	return RuntimeValue();
 }

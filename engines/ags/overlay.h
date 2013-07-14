@@ -46,6 +46,8 @@ public:
 
 	uint getType() { return _type; }
 
+	bool _isValid;
+
 	Common::Point _pos;
 	uint _timeout;
 	uint _bgSpeechForChar;

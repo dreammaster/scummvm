@@ -117,8 +117,10 @@ void AGSEngine::removeScreenOverlay(uint type) {
 }
 
 void AGSEngine::removeScreenOverlayIndex(uint index) {
-	_overlays[index]->DecRef();
+	ScreenOverlay *overlay = _overlays[index];
+	overlay->_isValid = false;
 	_overlays.remove_at(index);
+	overlay->DecRef();
 
 	// if an overlay before the sierra-style speech one is removed,
 	// update the index
@@ -787,7 +789,7 @@ void AGSEngine::displayMessage(uint messageId, int y) {
 
 ScreenOverlay::ScreenOverlay(AGSEngine *vm, const Common::Point &pos, uint type,
 	const Graphics::Surface &surface, bool alphaChannel) : _vm(vm), _pos(pos), _type(type), _timeout(0),
-	_bgSpeechForChar((uint)-1), _positionRelativeToScreen(true), _hasAlphaChannel(alphaChannel) {
+	_bgSpeechForChar((uint)-1), _positionRelativeToScreen(true), _hasAlphaChannel(alphaChannel), _isValid(true) {
 
 	if (_type == OVER_COMPLETE)
 		_vm->_completeOverlayCount++;
