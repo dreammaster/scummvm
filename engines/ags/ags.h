@@ -331,6 +331,9 @@ public:
 	Common::Array<Character *> _characters;
 
 	Graphics::Surface *getWalkableMaskFor(uint charId);
+	uint getWalkablePixelAt(const Common::Point &pos);
+	uint getWalkableAreaAt(const Common::Point &pos);
+	uint getAreaScalingFor(uint area, Common::Point pos);
 
 	void addInventory(uint itemId);
 	void loseInventory(uint itemId);

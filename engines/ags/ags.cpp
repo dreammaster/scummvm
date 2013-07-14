@@ -1487,6 +1487,81 @@ Graphics::Surface *AGSEngine::getWalkableMaskFor(uint charId) {
 	return surface;
 }
 
+uint AGSEngine::getWalkablePixelAt(const Common::Point &pos) {
+	if (pos.x < 0 || (uint)convertToLowRes(pos.x) >= _currentRoom->_walkableMask.w || pos.y < 0 || (uint)convertToLowRes(pos.y) >= _currentRoom->_walkableMask.h)
+		return (uint)-1;
+
+	return *(const byte *)_currentRoom->_walkableMask.getBasePtr(convertToLowRes(pos.x), convertToLowRes(pos.y));
+}
+
+uint AGSEngine::getWalkableAreaAt(const Common::Point &pos) {
+	uint areaId = getWalkablePixelAt(pos);
+
+	if (areaId == (uint)-1) {
+		Common::Point newPos = pos;
+		// the character has walked off the edge of the screen, so stop them
+		// jumping up to full size when leaving
+		if (pos.x >= _currentRoom->_width)
+			newPos.x = _currentRoom->_width - 1;
+		else if (pos.x < 0)
+			newPos.x = 0;
+		if (pos.y >= _currentRoom->_height)
+			newPos.y = _currentRoom->_height - 1;
+		else if (pos.y < 0)
+			newPos.y = 0;
+		areaId = getWalkablePixelAt(newPos);
+	}
+
+	if (!areaId) {
+		// this area is not walkable: check for scaling in adjacent pixels
+		const uint trygap = 2;
+
+		areaId = getWalkablePixelAt(Common::Point(pos.x + trygap, pos.y));
+		if (areaId == 0 || areaId == (uint)-1)
+			areaId = getWalkablePixelAt(Common::Point(pos.x - trygap, pos.y));
+		if (areaId == 0 || areaId == (uint)-1)
+			areaId = getWalkablePixelAt(Common::Point(pos.x, pos.y + trygap));
+		if (areaId == 0 || areaId == (uint)-1)
+			areaId = getWalkablePixelAt(Common::Point(pos.x, pos.y));
+	}
+
+	if (areaId == (uint)-1)
+		areaId = 0;
+
+	return areaId;
+}
+
+// TODO: can we refactor this by getting rid of the areaId param? slightly tricky due to callers
+uint AGSEngine::getAreaScalingFor(uint areaId, Common::Point pos) {
+	if (areaId == (uint)-1 || areaId >= _currentRoom->_walkAreas.size())
+		return (uint)-1;
+
+	const RoomWalkArea &area = _currentRoom->_walkAreas[areaId];
+
+	// FIXME: this should really be unsigned and we should sanity check data I guess?
+	int zoom;
+
+	if (area._zoom2 != NOT_VECTOR_SCALED) {
+		// this should never happen (TODO: check at load time?)
+		assert(area._top < area._bottom);
+
+		if (pos.y > (int16)area._bottom)
+			pos.y = area._bottom;
+		if (pos.y < (int16)area._top)
+			pos.y = area._top;
+		int percent = ((pos.y - area._top) * 100) / (area._bottom - area._top);
+		zoom = (percent * (area._zoom2 - area._zoom)) / 100;
+		zoom += area._zoom;
+		zoom += 100;
+	} else {
+		zoom = area._zoom + 100;
+	}
+
+	if (zoom <= 0)
+		return 100;
+	return (uint)zoom;
+}
+
 void AGSEngine::addInventory(uint itemId) {
 	if (itemId >= _gameFile->_invItemInfo.size())
 		error("addInventory: itemId is too high (only %d items)", _gameFile->_invItemInfo.size());
