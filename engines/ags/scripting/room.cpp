@@ -586,7 +586,15 @@ RuntimeValue Script_Hotspot_GetAtScreenXY(AGSEngine *vm, ScriptObject *, const C
 	int x = params[0]._signedValue;
 	int y = params[1]._signedValue;
 
-	uint hotspotId = vm->getCurrentRoom()->getHotspotAt(x, y);
+	x += vm->divideDownCoordinate(vm->_graphics->_viewportX);
+	y += vm->divideDownCoordinate(vm->_graphics->_viewportY);
+
+	uint hotspotId;
+	if (x < 0 || y < 0 || x >= vm->getCurrentRoom()->_width || y >= vm->getCurrentRoom()->_height)
+		hotspotId = 0;
+	else
+		hotspotId = vm->getCurrentRoom()->getHotspotAt(x, y);
+
 	return &vm->getCurrentRoom()->_hotspots[hotspotId];
 }
 
