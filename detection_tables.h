@@ -28,7 +28,7 @@ static const AesopGameDescription gameDescriptions[] = {
 		{
 			"eob3",
 			0,
-			AD_ENTRY1s("eye.res", "ad0c4d6865edf15da4e9204c08815875", 1),
+			AD_ENTRY1s("eye.res", "0adde71f4231370fa265b4f409b1273a", 6845522),
 			Common::EN_ANY,
 			Common::kPlatformDOS,
 			ADGF_UNSTABLE,
@@ -42,7 +42,7 @@ static const AesopGameDescription gameDescriptions[] = {
 		{
 			"dungeonhack",
 			0,
-			AD_ENTRY1s("filename", "ad0c4d6865edf15da4e9204c08815875", 1),
+			AD_ENTRY1s("hack.res", "67345ba1870656dd54d8c8544954d834", 7083229),
 			Common::EN_ANY,
 			Common::kPlatformDOS,
 			ADGF_UNSTABLE,
