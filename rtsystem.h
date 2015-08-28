@@ -64,54 +64,53 @@ struct TF_class {
 // General file management
 //
 
-WORD copy_file(BYTE *src_filename, BYTE *dest_filename);
-WORD delete_file(BYTE *filename);
-ULONG file_time(BYTE *filename);
+extern WORD copy_file(const char *src_filename, const char *dest_filename);
+extern WORD delete_file(const char *filename);
+extern ULONG file_time(const char *filename);
 
 //
 // Text file management
 //
 
-TF_class *TF_construct(const char *filename, WORD oflag);
-WORD TF_destroy(TF_class *TF);
-WORD TF_wchar(TF_class *TF, BYTE ch);
-BYTE TF_rchar(TF_class *TF);
-WORD TF_readln(TF_class *TF, char *buffer, WORD maxlen);
-WORD TF_writeln(TF_class *TF, const char *buffer);
+extern TF_class *TF_construct(const char *filename, WORD oflag);
+extern WORD TF_destroy(TF_class *TF);
+extern WORD TF_wchar(TF_class *TF, BYTE ch);
+extern BYTE TF_rchar(TF_class *TF);
+extern WORD TF_readln(TF_class *TF, char *buffer, WORD maxlen);
+extern WORD TF_writeln(TF_class *TF, const char *buffer);
 
 //
 // Binary file management
 //
 
-LONG file_size(BYTE *filename);
-BYTE *read_file(BYTE *filename, void *dest);
-WORD write_file(BYTE *filename, void *buf, ULONG len);
-WORD append_file(BYTE *filename, void *buf, ULONG len);
+extern LONG file_size(const char *filename);
+extern BYTE *read_file(const char *filename, void *dest);
+extern WORD write_file(const char *filename, void *buf, ULONG len);
+extern WORD append_file(const char *filename, void *buf, ULONG len);
 
 //
 // Memory heap management
 //
 
-void mem_init(void);
-void mem_shutdown(void);
-ULONG mem_avail(void);
-void *mem_alloc(ULONG bytes);
-BYTE *str_alloc(BYTE *string);
-void mem_free(void *ptr);
-ULONG mem_headroom(void);
+extern void mem_init(void);
+extern void mem_shutdown(void);
+extern ULONG mem_avail(void);
+extern void *mem_alloc(ULONG bytes);
+extern BYTE *str_alloc(BYTE *string);
+extern void mem_free(void *ptr);
+extern ULONG mem_headroom(void);
 
 //
 // Misc. routines
 //
 
-LONG ascnum(const char *string);
-void opcode_fault(void *PC, void *stk);
-void abend(const char *msg, ...);
-void curpos(WORD *x, WORD *y);
-void locate(WORD x, WORD y);
+extern LONG ascnum(const char *string);
+extern void opcode_fault(void *PC, void *stk);
+extern void abend(const char *msg, ...);
+extern void curpos(WORD *x, WORD *y);
+extern void locate(WORD x, WORD y);
 
 } // End of namespace Aesop
 
 #endif
-
 

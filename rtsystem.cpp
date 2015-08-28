@@ -31,11 +31,12 @@
 #include "common/file.h"
 #include "common/stream.h"
 #include "common/textconsole.h"
+#include "aesop/aesop.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
-#include "aesop/rtres.h"
+#include "aesop/resources.h"
 #include "aesop/rt.h"
 #include "aesop/rtcode.h"
 #include "aesop/intrface.h"
@@ -255,7 +256,7 @@ void abend(const char *msg, ...)
 //
 /***************************************************/
 
-TF_class *TF_construct(BYTE *filename, WORD oflag) {
+TF_class *TF_construct(const char *filename, WORD oflag) {
    TF_class *TF;
    HRES hbuf;
    /*
@@ -272,14 +273,15 @@ TF_class *TF_construct(BYTE *filename, WORD oflag) {
    Common::File f;
    f.open((const char *)filename);
 
-   hbuf = RTR_alloc(RTR,TF_BUFSIZE,DA_FIXED | DA_PRECIOUS);
-   if (hbuf == -1U) return NULL;
+   hbuf = RES.alloc(TF_BUFSIZE,DA_FIXED | DA_PRECIOUS);
+   if (hbuf == (HRES)-1)
+	   return NULL;
 
    TF = (TF_class *)mem_alloc(sizeof(TF_class));
 
    TF->file = f.readStream(f.size());
    TF->hbuf = hbuf;
-   TF->buffer = (BYTE *)RTR_addr(TF->hbuf);
+   TF->buffer = (BYTE *)RES.addr(TF->hbuf);
    TF->p = 0;
    TF->mode = oflag;
    TF->len = f.size();
@@ -312,7 +314,7 @@ WORD TF_destroy(TF_class *TF)
    */
    delete TF->file;
 
-   RTR_free(RTR,TF->hbuf);
+   RES.free(TF->hbuf);
    mem_free(TF);
 
    return (e == f);
@@ -378,7 +380,7 @@ BYTE TF_rchar(TF_class *TF)
 //
 /***************************************************/
 
-WORD TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen)
+WORD TF_readln(TF_class *TF, char *buffer, WORD maxlen)
 {
    WORD b,c;
 
@@ -418,7 +420,7 @@ WORD TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen)
 //
 /***************************************************/
 
-WORD TF_writeln(TF_class *TF, BYTE *buffer)
+WORD TF_writeln(TF_class *TF, const char *buffer)
 {
    WORD b,c;
 
@@ -440,7 +442,7 @@ WORD TF_writeln(TF_class *TF, BYTE *buffer)
 //
 /***************************************************/
 
-WORD delete_file(BYTE *filename)
+WORD delete_file(const char *filename)
 {
 	error("TODO");
 	/*
@@ -462,7 +464,7 @@ WORD delete_file(BYTE *filename)
 //
 /***************************************************/
 
-WORD copy_file(BYTE *src_filename, BYTE *dest_filename)
+WORD copy_file(const char *src_filename, const char *dest_filename)
 {
 	error("TODO");
 	/*
@@ -715,7 +717,7 @@ WORD append_file(BYTE *filename, void *buf, ULONG len)
 //
 /****************************************************************************/
 
-ULONG file_time(BYTE *filename)
+ULONG file_time(const char *filename)
 {
 	error("TODO");
 	

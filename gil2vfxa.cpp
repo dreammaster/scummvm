@@ -20,32 +20,23 @@
  *
  */
 
-//
-//  Run-time graphics subs
-//
-
-#ifndef AESOP_GRAPHICS_H
-#define AESOP_GRAPHICS_H
+#include "aesop/aesop.h"
+#include "aesop/rt.h"
+#include "aesop/stubs.h"
 
 namespace Aesop {
 
-extern UBYTE *fade_tables[5][16];
-extern UWORD first_color[5];
-extern UWORD in_GIL;
+void GIL2VFXA_print_buffer(PANE *pane, LONG line_number) {
+	error("TODO: Convert ASM to CPP");
+}
 
-//#define MODE_X 1                 // 1 for VGA mode X, 0 for MCGA mode 13h
+void GIL2VFX_hook_INT9(void) {
+	error("TODO: Convert ASM to CPP");
+}
 
-#define NTW 32                   // # of text windows available
-
-extern void dprint(LONG argcnt, const char *format, ...);
-extern void sprint(LONG argcnt, ULONG wndnum, const char *format, ...);
-extern void aprint(LONG argcnt, const char *format, ...);
-extern void print(LONG argcnt, ULONG wndnum, ULONG format, ...);
-extern void text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG newColor);
-extern void release_owned_windows(LONG owner);
+void GIL2VFX_unhook_INT9(void) {
+	error("TODO: Convert ASM to CPP");
+}
 
 } // End of namespace Aesop
-
-#endif
-
 

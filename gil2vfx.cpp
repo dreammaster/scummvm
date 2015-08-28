@@ -28,7 +28,7 @@
 #include "aesop/rtmsg.h"
 #include "aesop/rtsystem.h"
 #include "aesop/mouse.h"
-#include "aesop/rtres.h"
+#include "aesop/resources.h"
 #include "aesop/stubs.h"
 
 namespace Aesop {

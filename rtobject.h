@@ -45,16 +45,16 @@ extern HRES objlist[NUM_OBJECTS];
 extern BYTE lvlmap[LVL_X][LVL_Y];
 extern WORD lvlobj[3][LVL_X][LVL_Y];
 
-void init_object_list(void);
+extern void init_object_list(void);
 
-void restore_range(BYTE *filename, ULONG first, ULONG last, ULONG restoring);
-LONG save_range(BYTE *filename, ULONG filetype, ULONG first, ULONG last);
+extern void restore_range(const char *filename, ULONG first, ULONG last, ULONG restoring);
+extern LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last);
 void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG first,
    ULONG last);
 
-LONG create_object(LONG argcnt, ULONG name);
-LONG create_program(LONG argcnt, LONG index, ULONG name);
-LONG destroy_object(LONG argcnt, LONG index);
+extern LONG create_object(LONG argcnt, ULONG name);
+extern LONG create_program(LONG argcnt, LONG index, ULONG name);
+extern LONG destroy_object(LONG argcnt, LONG index);
 
 } // End of namespace Aesop
 

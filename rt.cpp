@@ -20,20 +20,40 @@
  *
  */
 
-//
-//  Run-time linker
-//
-
-#ifndef AESOP_RTLINK_H
-#define AESOP_RTLINK_H
+#include "aesop/aesop.h"
+#include "aesop/rt.h"
 
 namespace Aesop {
 
-HRES create_instance(RTR_class *RTR, ULONG object);
-void destroy_instance(RTR_class *RTR, HRES instance);
+ULONG current_this;
+
+void *RTD_first(void *dictionary) {
+	error("TODO: Reimplement ASM as CPP code");
+}
+
+void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def) {
+	error("TODO: Reimplement ASM as CPP code");
+}
+
+BYTE *RTD_lookup(HRES dictionary, const void *key) {
+	error("TODO: Reimplement ASM as CPP code");
+}
+
+void RT_init(Resources *RTR, ULONG stack_size, HRES *objlist) {
+	error("TODO: Reimplement ASM as CPP code");
+}
+
+void RT_shutdown(void) {
+	error("TODO: Reimplement ASM as CPP code");
+}
+
+void RT_arguments(void *base, ULONG size) {
+	error("TODO: Reimplement ASM as CPP code");
+}
+
+LONG RT_execute(ULONG index, ULONG msg_num, ULONG vector) {
+	error("TODO: Reimplement ASM as CPP code");
+}
 
 } // End of namespace Aesop
-
-#endif
-
 

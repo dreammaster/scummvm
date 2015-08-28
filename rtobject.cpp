@@ -26,10 +26,10 @@
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
 #include "common/file.h"
+#include "aesop/aesop.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
-#include "aesop/rtres.h"
-#include "aesop/rtlink.h"
+#include "aesop/resources.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
 #include "aesop/intrface.h"
@@ -63,12 +63,11 @@ static char name[256];
 //
 /***************************************************/
 
-void init_object_list(void)
-{
+void init_object_list(void) {
    LONG i;
 
    for (i=0;i<NUM_OBJECTS;i++)
-      objlist[i] = -1;
+      objlist[i] = (HRES)-1;
 }
 
 /***************************************************/
@@ -83,7 +82,7 @@ LONG find_free_entry(LONG min, LONG end)
    LONG i;
 
    for (i=min;i<end;i++)
-      if (objlist[i] == -1U)
+      if (objlist[i] == (HRES)-1)
          break;
 
    if (i == end)
@@ -100,9 +99,9 @@ LONG find_free_entry(LONG min, LONG end)
 
 void create_SOP_instance(ULONG name, LONG index)
 {
-   objlist[index] = create_instance(RTR,name);
+   objlist[index] = RES.create_instance(name);
 
-   RT_execute(index,MSG_CREATE,-1U);
+   RT_execute(index,MSG_CREATE, (ULONG)-1);
 }
 
 /***************************************************/
@@ -113,7 +112,7 @@ void create_SOP_instance(ULONG name, LONG index)
 // 
 /***************************************************/
 
-#pragma off (unreferenced)
+
 LONG create_object(LONG argcnt, ULONG name)
 #pragma on (unreferenced)
 {
@@ -136,7 +135,7 @@ LONG create_object(LONG argcnt, ULONG name)
 // 
 /***************************************************/
 
-#pragma off (unreferenced)
+
 LONG create_program(LONG argcnt, LONG index, ULONG name)
 #pragma on (unreferenced)
 {
@@ -158,20 +157,20 @@ LONG create_program(LONG argcnt, LONG index, ULONG name)
 // 
 /***************************************************/
 
-#pragma off (unreferenced)
+
 LONG destroy_object(LONG argcnt, LONG index)
 #pragma on (unreferenced)
 {
    LONG rtn;
 
-   rtn = RT_execute(index,MSG_DESTROY,-1U);
+   rtn = RT_execute(index,MSG_DESTROY,(ULONG)-1);
 
    cancel_entity_requests(index);
    release_owned_windows(index);
 
-   destroy_instance(RTR,objlist[index]);
+   RES.destroy_instance(objlist[index]);
 
-   objlist[index] = -1;
+   objlist[index] = (HRES)-1;
 
    return rtn;
 }
@@ -188,12 +187,12 @@ void thrash_cache(void)
 
    for (i=0;i<3;i++)
       {
-      handles[i] = RTR_alloc(RTR,i*20000,DA_MOVEABLE | DA_DISCARDABLE);
+      handles[i] = RES.alloc(i*20000,DA_MOVEABLE | DA_DISCARDABLE);
       }
 
    for (i=0;i<3;i++)
       {
-      RTR_free(RTR,handles[i]);
+      RES.free(handles[i]);
       }
 }
 
@@ -203,11 +202,11 @@ void thrash_cache(void)
 //
 /***************************************************/
 
-#pragma off (unreferenced)
+
 ULONG flush_cache(LONG argcnt, ULONG goal)
 #pragma on (unreferenced)
 {
-   return RTR_force_discard(RTR,goal);
+   return RES.force_discard(goal);
 }
 
 /***************************************************/
@@ -240,42 +239,42 @@ void dump_static_context(ULONG index, TF_class *TF)
 
    instance = objlist[index];
 
-   if (instance == -1U)
+   if (instance == (HRES)-1)
       {
       strcat(linbuf,"Available");
       TF_writeln(TF, linbuf);
       return;
       }
 
-   thunk = ((IHDR *) RTR_addr(instance))->thunk;
+   thunk = ((IHDR *) RES.addr(instance))->thunk;
 
-   tptr = RTR_addr(thunk);
+   tptr = RES.addr(thunk);
    thdr = *((THDR *) tptr);
 
    SD = (SD_entry *)add_ptr(tptr,thdr.SD_list);
 
-   expt = RTR_get_resource_handle(RTR,SD[thdr.nprgs-1].exports,
+   expt = RES.get_resource_handle(SD[thdr.nprgs-1].exports,
       DA_TEMPORARY | DA_EVANESCENT);
-   RTR_lock(RTR,expt);
+   RES.lock(expt);
    linbuf[i+2] = '"';
    strcpy(&linbuf[i+3], (const char *)RTD_lookup(expt,"N:OBJECT"));
    strcat(&linbuf[i+3],"\"");
 
-   RTR_unlock(expt);
+   RES.unlock(expt);
 
    TF_writeln(TF, linbuf);
    TF_writeln(TF, "{");
 
    for (p=0;p<thdr.nprgs;p++)
       {
-      tptr = RTR_addr(thunk);
+      tptr = RES.addr(thunk);
       SD = (SD_entry *)add_ptr(tptr,thdr.SD_list);
 
       offset = SD[p].static_base;
 
-      expt = RTR_get_resource_handle(RTR,SD[p].exports,
+      expt = RES.get_resource_handle(SD[p].exports,
          DA_TEMPORARY | DA_EVANESCENT);
-      RTR_lock(RTR,expt);
+      RES.lock(expt);
 
       def = (const char *)RTD_lookup(expt,"N:OBJECT");
 
@@ -285,10 +284,10 @@ void dump_static_context(ULONG index, TF_class *TF)
       strcat(linbuf,"]");
       TF_writeln(TF,linbuf);
 
-      inst = add_ptr(RTR_addr(instance),offset);
+      inst = add_ptr(RES.addr(instance),offset);
 
-      dict = (UBYTE *)RTD_first(RTR_addr(expt));
-	  while ((dict = (UBYTE *)RTD_iterate(RTR_addr(expt), dict, &tag, (BYTE **)&def)) != NULL)
+      dict = (UBYTE *)RTD_first(RES.addr(expt));
+	  while ((dict = (UBYTE *)RTD_iterate(RES.addr(expt), dict, &tag, (BYTE **)&def)) != NULL)
          {
          type = tag[0];
          if ((type != 'B') && (type != 'W') && (type != 'L'))
@@ -331,7 +330,7 @@ void dump_static_context(ULONG index, TF_class *TF)
          TF_writeln(TF,linbuf);
          }
 
-      RTR_unlock(expt);
+      RES.unlock(expt);
       }
 
    TF_writeln(TF,"}");
@@ -343,7 +342,7 @@ void dump_static_context(ULONG index, TF_class *TF)
 //
 /***************************************************/
 
-#pragma off (unreferenced)
+
 LONG readln(TF_class *TF, BYTE *buffer, LONG maxlen)
 #pragma on (unreferenced)
 {
@@ -377,7 +376,7 @@ CDESC *read_context_descriptor(TF_class *TF)
 
    num = &linbuf[6];
 
-   c.size = -1U;
+   c.size = (UWORD)-1;
    c.slot = (UWORD) ascnum(num);
 
    name = strchr(num,'"');
@@ -390,8 +389,8 @@ CDESC *read_context_descriptor(TF_class *TF)
    name++;
    name[strlen(name)-1] = 0;
 
-   HROED = RTR_get_resource_handle(RTR,ROED,DA_TEMPORARY | DA_EVANESCENT);
-   RTR_lock(RTR,HROED);
+   HROED = RES.get_resource_handle(ROED,DA_TEMPORARY | DA_EVANESCENT);
+   RES.lock(HROED);
 
    def = (char *)RTD_lookup(HROED,name);
 
@@ -400,7 +399,7 @@ CDESC *read_context_descriptor(TF_class *TF)
 
    c.name = ascnum(def);
 
-   RTR_unlock(HROED);
+   RES.unlock(HROED);
 
    return &c;
 }
@@ -413,15 +412,15 @@ CDESC *read_context_descriptor(TF_class *TF)
 
 void restore_static_context(HRES instance, TF_class *TF)
 {
-   ULONG n,i,p,offset,asize;
-   HRES thunk,expt;
+   ULONG n,i,p,offset = 0,asize;
+   HRES thunk,expt = 0;
    void *d,*tptr;
    SD_entry *SD;
    THDR thdr;
    char *def, *tag, *size, *chrpnt;
 
-   thunk = ((IHDR *) RTR_addr(instance))->thunk;
-   thdr = *((THDR *) RTR_addr(thunk));
+   thunk = ((IHDR *) RES.addr(instance))->thunk;
+   thdr = *((THDR *) RES.addr(thunk));
 
    while (readln(TF, (BYTE *)linbuf,sizeof(linbuf)))
       {
@@ -437,18 +436,18 @@ void restore_static_context(HRES instance, TF_class *TF)
 
          for (p=0; p<thdr.nprgs; p++)
             {
-            tptr = RTR_addr(thunk);
+            tptr = RES.addr(thunk);
             SD   = (SD_entry *)add_ptr (tptr, thdr.SD_list);
 
             offset = SD[p].static_base;
 
-            expt = RTR_get_resource_handle(RTR,SD[p].exports,
+            expt = RES.get_resource_handle(SD[p].exports,
                                            DA_TEMPORARY | DA_EVANESCENT);
 
-            RTR_lock(RTR,expt);
+            RES.lock(expt);
             def = (char *)RTD_lookup(expt,"N:OBJECT");
 
-            RTR_unlock(expt);
+            RES.unlock(expt);
 
             if ( !strcmp(def,tag) )
                break;
@@ -474,15 +473,15 @@ void restore_static_context(HRES instance, TF_class *TF)
          if (!i)
             continue;
          
-         RTR_lock(RTR,expt);
+         RES.lock(expt);
          def = (char *)RTD_lookup(expt,name);
 
-         RTR_unlock(expt);
+         RES.unlock(expt);
          
          if (def == NULL)
             abend(MSG_UVR,name);       //"Unresolved variable reference '%s'"
          
-         d = (void *) ((ULONG)RTR_addr(instance) + ascnum(def) + offset);
+         d = (void *) ((ULONG)RES.addr(instance) + ascnum(def) + offset);
 
          if ((size = strchr(def,',')) != NULL)
             asize = ascnum(size+1);
@@ -548,11 +547,11 @@ void restore_static_context(HRES instance, TF_class *TF)
 //
 /*********************************************************/
 
-LONG save_range(const char *filename, LONG filetype, LONG first, LONG last)
+LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
 {
-   LONG good,index;
+	LONG good;
+	ULONG index;
    UBYTE typetest;
-   int handle;
    TF_class *TF;
    HRES instance,thunk;
    HD_entry *hd_inst;
@@ -595,16 +594,16 @@ LONG save_range(const char *filename, LONG filetype, LONG first, LONG last)
          CD.slot = index;
 
          instance = objlist[index];
-         if (instance == -1U)
+         if (instance == (HRES)-1)
             {
-            CD.name = (ULONG) -1L;
+            CD.name = (ULONG)-1;
             CD.size = 0;
             }
          else
             {
-            thunk = ((IHDR *) RTR_addr(instance))->thunk;
+            thunk = ((IHDR *) RES.addr(instance))->thunk;
 
-            tptr = RTR_addr(thunk);
+            tptr = RES.addr(thunk);
             thdr = *((THDR *) tptr);
 
             hd_inst = (HD_entry *) instance;
@@ -616,7 +615,7 @@ LONG save_range(const char *filename, LONG filetype, LONG first, LONG last)
          //f.write(&CD,sizeof(CDESC));
 
          if (CD.size)
-            if (f.write(add_ptr(RTR_addr(objlist[index]),sizeof(IHDR)),
+            if (f.write(add_ptr(RES.addr(objlist[index]),sizeof(IHDR)),
                       CD.size) != CD.size)
                {
                good = 0;
@@ -668,8 +667,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
    ULONG bad, txttype;
    ULONG index;
    UBYTE typetest;
-   int handle;
-   TF_class *TF;
+   TF_class *TF = nullptr;
    HRES cur;
    HD_entry *sel;
    CDESC stat_C;
@@ -756,7 +754,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
             }
          }
 
-      if (objlist[index] == -1U)
+      if (objlist[index] == (HRES)-1)
          {
          create_SOP_instance(CD->name,index);
          }
@@ -768,12 +766,12 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
       else
          if (CD->size)
             {
-            f.read((BYTE *)RTR_addr(objlist[index])+sizeof(IHDR), CD->size);
+            f.read((BYTE *)RES.addr(objlist[index])+sizeof(IHDR), CD->size);
             }
 
       if (restoring)
          {
-         RT_execute(index,MSG_RESTORE,-1U);
+         RT_execute(index,MSG_RESTORE, (ULONG)-1);
          }
       }
 
@@ -809,75 +807,74 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 /*********************************************************/
 
 void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG first,
-   ULONG last)
+	ULONG last)
 {
-   TF_class *TF;
-   CDESC *CD;
-   CDESC CD_out;
-   int handle;
-   LONG index;
-   HRES instance,thunk;
-   void *tptr;
-   THDR thdr;
-   UBYTE typetest;
+	TF_class *TF;
+	CDESC *CD;
+	CDESC CD_out;
+	LONG index;
+	HRES instance, thunk;
+	void *tptr;
+	THDR thdr;
+	UBYTE typetest;
 
-   Common::DumpFile f;
-   if (!f.open(BIN_filename))
-      abend(MSG_COOFFT);      //"Couldn't open output file for translation"
+	Common::DumpFile f;
+	if (!f.open(BIN_filename))
+		abend(MSG_COOFFT);      //"Couldn't open output file for translation"
 
-   typetest = 26;
-   f.writeByte(typetest);
+	typetest = 26;
+	f.writeByte(typetest);
 
-   TF = TF_construct(TXT_filename,TF_READ);
-   if (TF == NULL)
-      abend(MSG_COIFFT);      //"Couldn't open input file for translation"
+	TF = TF_construct(TXT_filename, TF_READ);
+	if (TF == NULL)
+		abend(MSG_COIFFT);      //"Couldn't open input file for translation"
 
-   for (index=first;index<=last;index++)
-      {
-      CD = read_context_descriptor(TF);
-      if ((CD==NULL) || (CD->slot != index))
-         abend(MSG_CTCFE,index); //"Couldn't translate context file entry %u"
+	for (index = first; index <= (LONG)last; index++)
+	{
+		CD = read_context_descriptor(TF);
+		if ((CD == NULL) || (CD->slot != index))
+			abend(MSG_CTCFE, index); //"Couldn't translate context file entry %u"
 
-      CD_out.name = CD->name;
-      CD_out.slot = index;
+		CD_out.name = CD->name;
+		CD_out.slot = index;
 
-      if (CD->name != (ULONG) -1L)
-         {
-         instance = create_instance(RTR,CD->name);
+		if (CD->name != (ULONG)-1L)
+		{
+			instance = RES.create_instance(CD->name);
 
-         thunk = ((IHDR *) RTR_addr(instance))->thunk;
+			thunk = ((IHDR *)RES.addr(instance))->thunk;
 
-         tptr = RTR_addr(thunk);
-         thdr = *((THDR *) tptr);
+			tptr = RES.addr(thunk);
+			thdr = *((THDR *)tptr);
 
-         CD_out.size = thdr.isize - sizeof(IHDR);
+			CD_out.size = thdr.isize - sizeof(IHDR);
 
-		 error("TODO: CDESC::save");
-         //write(handle,&CD_out,sizeof(CDESC));
+			error("TODO: CDESC::save");
+			//write(handle,&CD_out,sizeof(CDESC));
 
-         restore_static_context(instance,TF);
+			restore_static_context(instance, TF);
 
-         if (CD_out.size)
-            {
-            if (f.write(add_ptr(RTR_addr(instance),sizeof(IHDR)),CD_out.size)
-               != CD_out.size)
-               {
-               abend(MSG_CWTE,index);  //"Couldn't write translated entry %u"
-               }
-            }
+			if (CD_out.size)
+			{
+				if (f.write(add_ptr(RES.addr(instance), sizeof(IHDR)), CD_out.size)
+					!= CD_out.size)
+				{
+					abend(MSG_CWTE, index);  //"Couldn't write translated entry %u"
+				}
+			}
 
-         destroy_instance(RTR,instance);
-         }
-      else
-         {
-         CD_out.size = 0;
-		 error("TODO: CDESC::save");
-         //write(handle,&CD_out,sizeof(CDESC));
-         }
-      }
+			RES.destroy_instance(instance);
+		}
+		else
+		{
+			CD_out.size = 0;
+			error("TODO: CDESC::save");
+			//write(handle,&CD_out,sizeof(CDESC));
+		}
+	}
 
-   TF_destroy(TF);
-   f.close();
+	TF_destroy(TF);
+	f.close();
 }
 
 } // End of namespace Aesop

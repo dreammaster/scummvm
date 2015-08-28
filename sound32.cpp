@@ -33,8 +33,7 @@
 #include "aesop/defs.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
-#include "aesop/rtres.h"
-#include "aesop/rtlink.h"
+#include "aesop/resources.h"
 #include "aesop/rt.h"
 #include "aesop/rtmsg.h"
 //#include "aesop/ail32.h"
@@ -205,7 +204,7 @@ static void *load_global_timbre(ULONG bank, ULONG patch)
 //
 /****************************************************************************/
 
-#pragma off (unreferenced)
+
 void load_sound_block(LONG argcnt, ULONG first_block, ULONG last_block, ULONG *array)
 #pragma on (unreferenced)
 {
@@ -262,7 +261,7 @@ void load_sound_block(LONG argcnt, ULONG first_block, ULONG last_block, ULONG *a
 //
 /****************************************************************************/
 
-#pragma off (unreferenced)
+
 void sound_effect(LONG argcnt, ULONG index)
 #pragma on (unreferenced)
 {
@@ -290,7 +289,7 @@ void sound_effect(LONG argcnt, ULONG index)
 //
 /****************************************************************************/
 
-#pragma off (unreferenced)
+
 void play_sequence(LONG argcnt, ULONG LA_version, ULONG AD_version, ULONG PC_version)
 #pragma on (unreferenced)
 {
@@ -437,7 +436,7 @@ void unload_music(void)
 //
 /****************************************************************************/
 
-#pragma off (unreferenced)
+
 void set_sound_status(LONG argcnt, ULONG status)
 #pragma on (unreferenced)
 {
@@ -521,7 +520,7 @@ void shutdown_sound(void)
 //
 /****************************************************************************/
 
-#pragma off (unreferenced)
+
 void init_sound(LONG argcnt, ULONG errprompt)
 #pragma on (unreferenced)
 {

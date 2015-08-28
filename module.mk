@@ -6,14 +6,15 @@ MODULE_OBJS = \
 	event.o \
 	eye.o \
 	gil2vfx.o \
+	gil2vfxa.o \
 	graphics.o \
 	interp.o \
 	intrface.o \
 	mouse.o \
+	resources.o \
+	rt.o \
 	rtcode.o \
-	rtlink.o \
 	rtobject.o \
-	rtres.o \
 	rtsystem.o \
 	sound32.o \
 	stubs.o

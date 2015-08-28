@@ -1,29 +1,27 @@
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл  GRAPHICS.C                                                            лл
-//лл                                                                        лл
-//лл  AESOP graphics interface for Eye III engine                           лл
-//лл                                                                        лл
-//лл  Version: 1.00 of 6-May-92 -- Initial version                          лл
-//лл                                                                        лл
-//лл  Project: Eye III                                                      лл
-//лл   Author: John Miles                                                   лл
-//лл                                                                        лл
-//лл  C source compatible with Borland C++ v3.0 or later                    лл
-//лл  Large memory model (16-bit DOS)                                       лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл  Copyright (C) 1992 Miles Design, Inc.                                 лл
-//лл                                                                        лл
-//лл  Miles Design, Inc.                                                    лл
-//лл  10926 Jollyville #308                                                 лл
-//лл  Austin, TX 78759                                                      лл
-//лл  (512) 345-2642 / BBS (512) 454-9990 / FAX (512) 338-9630              лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
+/* RogueVM - RPG Engines
+*
+* RogueVM is the legal property of its developers, whose names
+* are too numerous to list here. Please refer to the COPYRIGHT
+* file distributed with this source distribution.
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+*
+*/
 
 //#include "aesop/vfx.h"
+#include "aesop/aesop.h"
 #include "aesop/mouse.h"
 #include "aesop/gil2vfx.h"
 #include "aesop/gil2vfxa.h"
@@ -32,8 +30,7 @@
 #include "aesop/shared.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
-#include "aesop/rtres.h"
-#include "aesop/rtlink.h"
+#include "aesop/resources.h"
 #include "aesop/rt.h"
 #include "aesop/intrface.h"
 #include "aesop/rtobject.h"
@@ -225,7 +222,7 @@ void release_owned_windows(LONG owner)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void draw_dot(LONG argcnt, ULONG page, ULONG x, ULONG y, ULONG color)
 #pragma on (unreferenced)
 {
@@ -233,7 +230,7 @@ void draw_dot(LONG argcnt, ULONG page, ULONG x, ULONG y, ULONG color)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void draw_line(LONG argcnt, ULONG page, ULONG x1, ULONG y1, ULONG x2, ULONG y2,
 #pragma on (unreferenced)
    ULONG color)
@@ -242,7 +239,7 @@ void draw_line(LONG argcnt, ULONG page, ULONG x1, ULONG y1, ULONG x2, ULONG y2,
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void line_to(LONG argcnt, ULONG x, ULONG y, ULONG color, ...)
 #pragma on (unreferenced)
 {
@@ -268,7 +265,7 @@ void line_to(LONG argcnt, ULONG x, ULONG y, ULONG color, ...)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void draw_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
                           LONG y2, ULONG color)
 #pragma on (unreferenced)
@@ -277,7 +274,7 @@ void draw_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void fill_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
                           LONG y2, ULONG color)
 #pragma on (unreferenced)
@@ -286,7 +283,7 @@ void fill_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void hash_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
                           LONG y2, ULONG color)
 #pragma on (unreferenced)
@@ -295,32 +292,30 @@ void hash_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
-ULONG get_bitmap_height(LONG argcnt, ULONG table, ULONG number)
-#pragma on (unreferenced)
-{
-   HRES handle;
+
+ULONG get_bitmap_height(LONG argcnt, ULONG table, ULONG number) {
+	Resources &res = *_vm->_resources;
+	HRES handle;
    ULONG h;
 
-   handle = RTR_get_resource_handle(RTR,table,DA_DEFAULT);
+   handle = res.get_resource_handle(table,DA_DEFAULT);
 
-   RTR_lock(RTR,handle);
+   res.lock(handle);
 
-   h = GIL2VFX_get_bitmap_height(RTR_addr(handle), number);
+   h = GIL2VFX_get_bitmap_height(res.addr(handle), number);
 
-   RTR_unlock(handle);
+   res.unlock(handle);
 
    return h;
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
                        LONG x, LONG y, ULONG scale, ULONG flip,
-                       ULONG fade_table, ULONG fade_level)
-#pragma on (unreferenced)
-{
-   HRES handle;
+                       ULONG fade_table, ULONG fade_level) {
+	Resources &res = *_vm->_resources;
+	HRES handle;
    static HRES last_handle = 0;
    static ULONG last_table;
    UBYTE *lookaside;
@@ -329,7 +324,7 @@ void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
       handle = last_handle;
    else
       {
-      handle = RTR_get_resource_handle(RTR,table,DA_DEFAULT);
+      handle = res.get_resource_handle(table,DA_DEFAULT);
       last_handle = handle;
       last_table = table;
       }
@@ -339,11 +334,11 @@ void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
 
    lookaside = fade_tables[fade_table][fade_level]-first_color[fade_table];
 
-   RTR_lock(RTR,handle);
+   res.lock(handle);
 
-   GIL2VFX_draw_bitmap(page,x,y,flip,scale,lookaside,(UBYTE *)RTR_addr(handle),number);
+   GIL2VFX_draw_bitmap(page,x,y,flip,scale,lookaside,(UBYTE *)res.addr(handle),number);
 
-   RTR_unlock(handle);
+   res.unlock(handle);
 }
 
 /*********************************************************/
@@ -360,32 +355,30 @@ void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
 ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
-                                ULONG table, ULONG number, WORD *array)
-#pragma on (unreferenced)
-{
-   HRES handle;
-   ULONG array_offset;
-   BYTE *new_array;
-   WORD bounds[4];
-   ULONG result;
+	ULONG table, ULONG number, WORD *array) {
+	Resources &res = *_vm->_resources;
+	HRES handle;
+	ULONG array_offset;
+	BYTE *new_array;
+	WORD bounds[4];
+	ULONG result;
 
-   array_offset = (ULONG) array - (ULONG) RTR_addr(objlist[current_this]);
+	array_offset = (ULONG)array - (ULONG)res.addr(objlist[current_this]);
 
-   handle = RTR_get_resource_handle(RTR,table,DA_DEFAULT);
+	handle = res.get_resource_handle(table, DA_DEFAULT);
 
-   RTR_lock(RTR,handle);
+	res.lock(handle);
 
-   result = GIL2VFX_visible_bitmap_rect(x,y,flip,(UBYTE *)RTR_addr(handle),number,bounds);
+	result = GIL2VFX_visible_bitmap_rect(x, y, flip, (UBYTE *)res.addr(handle), number, bounds);
 
-   new_array = (BYTE *)add_ptr(RTR_addr(objlist[current_this]),array_offset);
+	new_array = (BYTE *)add_ptr(res.addr(objlist[current_this]), array_offset);
 
-   far_memmove(new_array,bounds,sizeof(bounds));
+	far_memmove(new_array, bounds, sizeof(bounds));
 
-   RTR_unlock(handle);
+	res.unlock(handle);
 
-   return result;
+	return result;
 }
 
 /*********************************************************/
@@ -397,209 +390,207 @@ ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
-void set_palette(LONG argcnt, ULONG region, ULONG resource)
-#pragma on (unreferenced)
-{
-   HRES handle;
-   PAL_HDR *PHDR;
-   RGB *array;
-   LONG i,j,k,n,f,m,dm,d;
-   UBYTE *fade;
+void set_palette(LONG argcnt, ULONG region, ULONG resource) {
+	Resources &res = *_vm->_resources;
+	HRES handle;
+	PAL_HDR *PHDR;
+	RGB *array;
+	LONG i, j, k, n, f, m, dm, d;
+	UBYTE *fade;
 
-   handle = RTR_get_resource_handle(RTR,resource,DA_DEFAULT);
-   RTR_lock(RTR,handle);
+	handle = res.get_resource_handle(resource, DA_DEFAULT);
+	res.lock(handle);
 
-   PHDR = (PAL_HDR *)RTR_addr(handle);
+	PHDR = (PAL_HDR *)res.addr(handle);
 
-   if ((region == PAL_FIXED) ||
-       (region == PAL_WALLS) ||
-       (region == PAL_M1) ||
-       (region == PAL_M2))
-      {
-      for (i=0;i<11;i++)
-         {
-         fade = (UBYTE *)add_ptr(PHDR,PHDR->fade[i]);
+	if ((region == PAL_FIXED) ||
+		(region == PAL_WALLS) ||
+		(region == PAL_M1) ||
+		(region == PAL_M2))
+	{
+		for (i = 0; i < 11; i++)
+		{
+			fade = (UBYTE *)add_ptr(PHDR, PHDR->fade[i]);
 
-         for (j=0;j<PHDR->ncolors;j++)
-            fade_tables[region][i][j] = first_color[region] + fade[j];
-         }
-      }
+			for (j = 0; j < PHDR->ncolors; j++)
+				fade_tables[region][i][j] = first_color[region] + fade[j];
+		}
+	}
 
-   array = (RGB *)add_ptr(PHDR,PHDR->RGB);
+	array = (RGB *)add_ptr(PHDR, PHDR->RGB);
 
-   for (i=0;i<PHDR->ncolors;i++)
-      {
-      VFX_DAC_write(i+first_color[region],&array[i]);
+	for (i = 0; i < PHDR->ncolors; i++)
+	{
+		VFX_DAC_write(i + first_color[region], &array[i]);
 
-      if (!(i & 0x0f)) VFX_wait_vblank_leading();
-      }
+		if (!(i & 0x0f)) VFX_wait_vblank_leading();
+	}
 
-   switch (region)
-      {
-      case PAL_FIXED:
+	switch (region)
+	{
+	case PAL_FIXED:
 
-         for (n=0,i=BLU_BEG;n<BLU_NUM;n++,i++)
-            blu_inten[n] = array[i].r + array[i].g + array[i].b;
-         for (n=0,i=RED_BEG;n<RED_NUM;n++,i++)
-            red_inten[n] = array[i].r + array[i].g + array[i].b;
-         for (n=0,i=GRN_BEG;n<GRN_NUM;n++,i++)
-            grn_inten[n] = array[i].r + array[i].g + array[i].b;
-         for (n=0,i=GRY_BEG;n<GRY_NUM;n++,i++)
-            gry_inten[n] = array[i].r + array[i].g + array[i].b;
-         for (n=0,i=BRN_BEG;n<BRN_NUM;n++,i++)
-            brn_inten[n] = array[i].r + array[i].g + array[i].b;
-         
-         f = first_color[region];
-         n = num_colors[region];
-         for (i=0;i<n;i++)
-            {
-            j = array[i].r + array[i].g + array[i].b;
+		for (n = 0, i = BLU_BEG; n < BLU_NUM; n++, i++)
+			blu_inten[n] = array[i].r + array[i].g + array[i].b;
+		for (n = 0, i = RED_BEG; n < RED_NUM; n++, i++)
+			red_inten[n] = array[i].r + array[i].g + array[i].b;
+		for (n = 0, i = GRN_BEG; n < GRN_NUM; n++, i++)
+			grn_inten[n] = array[i].r + array[i].g + array[i].b;
+		for (n = 0, i = GRY_BEG; n < GRY_NUM; n++, i++)
+			gry_inten[n] = array[i].r + array[i].g + array[i].b;
+		for (n = 0, i = BRN_BEG; n < BRN_NUM; n++, i++)
+			brn_inten[n] = array[i].r + array[i].g + array[i].b;
 
-            m = 0;
-            dm = 32767;
-            for (k=0;k<BLU_NUM;k++)
-               {
-               d = abs(j-blu_inten[k]);
-               if (d < dm)
-                  {
-                  dm = d;
-                  m = k;
-                  }
-               }
+		f = first_color[region];
+		n = num_colors[region];
+		for (i = 0; i < n; i++)
+		{
+			j = array[i].r + array[i].g + array[i].b;
 
-            F_blu[i] = BLU_BEG+m;
+			m = 0;
+			dm = 32767;
+			for (k = 0; k < BLU_NUM; k++)
+			{
+				d = abs(j - blu_inten[k]);
+				if (d < dm)
+				{
+					dm = d;
+					m = k;
+				}
+			}
 
-            m = 0;
-            dm = 32767;
-            for (k=0;k<GRN_NUM;k++)
-               {
-               d = abs(j-grn_inten[k]);
-               if (d < dm)
-                  {
-                  dm = d;
-                  m = k;
-                  }
-               }
+			F_blu[i] = BLU_BEG + m;
 
-            F_grn[i] = GRN_BEG+m;
+			m = 0;
+			dm = 32767;
+			for (k = 0; k < GRN_NUM; k++)
+			{
+				d = abs(j - grn_inten[k]);
+				if (d < dm)
+				{
+					dm = d;
+					m = k;
+				}
+			}
 
-            m = 0;
-            dm = 32767;
-            for (k=0;k<RED_NUM;k++)
-               {
-               d = abs(j-red_inten[k]);
-               if (d < dm)
-                  {
-                  dm = d;
-                  m = k;
-                  }
-               }
+			F_grn[i] = GRN_BEG + m;
 
-            F_red[i] = RED_BEG+m;
+			m = 0;
+			dm = 32767;
+			for (k = 0; k < RED_NUM; k++)
+			{
+				d = abs(j - red_inten[k]);
+				if (d < dm)
+				{
+					dm = d;
+					m = k;
+				}
+			}
 
-            m = 0;
-            dm = 32767;
-            for (k=0;k<GRY_NUM;k++)
-               {
-               d = abs(j-gry_inten[k]);
-               if (d < dm)
-                  {
-                  dm = d;
-                  m = k;
-                  }
-               }
+			F_red[i] = RED_BEG + m;
 
-            F_gry[i] = GRY_BEG+m;
-            }
-         break;
+			m = 0;
+			dm = 32767;
+			for (k = 0; k < GRY_NUM; k++)
+			{
+				d = abs(j - gry_inten[k]);
+				if (d < dm)
+				{
+					dm = d;
+					m = k;
+				}
+			}
 
-      case PAL_M1:
-      case PAL_M2:
+			F_gry[i] = GRY_BEG + m;
+		}
+		break;
 
-         f = first_color[region];
-         n = num_colors[region];
-         for (i=0;i<n;i++)
-            {
-            j = array[i].r + array[i].g + array[i].b;
+	case PAL_M1:
+	case PAL_M2:
 
-            m = 0;
-            dm = 32767;
-            for (k=0;k<BRN_NUM;k++)
-               {
-               d = abs(j-brn_inten[k]);
-               if (d < dm)
-                  {
-                  dm = d;
-                  m = k;
-                  }
-               }
+		f = first_color[region];
+		n = num_colors[region];
+		for (i = 0; i < n; i++)
+		{
+			j = array[i].r + array[i].g + array[i].b;
 
-            if (region == PAL_M1)
-               M1_brn[i] = BRN_BEG+m;
-            else
-               M2_brn[i] = BRN_BEG+m;
+			m = 0;
+			dm = 32767;
+			for (k = 0; k < BRN_NUM; k++)
+			{
+				d = abs(j - brn_inten[k]);
+				if (d < dm)
+				{
+					dm = d;
+					m = k;
+				}
+			}
 
-            m = 0;
-            dm = 32767;
-            for (k=0;k<GRY_NUM;k++)
-               {
-               d = abs(j-gry_inten[k]);
-               if (d < dm)
-                  {
-                  dm = d;
-                  m = k;
-                  }
-               }
+			if (region == PAL_M1)
+				M1_brn[i] = BRN_BEG + m;
+			else
+				M2_brn[i] = BRN_BEG + m;
 
-            if (region == PAL_M1)
-               M1_gry[i] = GRY_BEG+m;
-            else
-               M2_gry[i] = GRY_BEG+m;
+			m = 0;
+			dm = 32767;
+			for (k = 0; k < GRY_NUM; k++)
+			{
+				d = abs(j - gry_inten[k]);
+				if (d < dm)
+				{
+					dm = d;
+					m = k;
+				}
+			}
 
-            m = 0;
-            dm = 32767;
-            for (k=0;k<GRN_NUM;k++)
-               {
-               d = abs(j-grn_inten[k]);
-               if (d < dm)
-                  {
-                  dm = d;
-                  m = k;
-                  }
-               }
+			if (region == PAL_M1)
+				M1_gry[i] = GRY_BEG + m;
+			else
+				M2_gry[i] = GRY_BEG + m;
 
-            if (region == PAL_M1)
-               M1_grn[i] = GRN_BEG+m;
-            else
-               M2_grn[i] = GRN_BEG+m;
+			m = 0;
+			dm = 32767;
+			for (k = 0; k < GRN_NUM; k++)
+			{
+				d = abs(j - grn_inten[k]);
+				if (d < dm)
+				{
+					dm = d;
+					m = k;
+				}
+			}
 
-            m = 0;
-            dm = 32767;
-            for (k=0;k<BLU_NUM;k++)
-               {
-               d = abs(j-blu_inten[k]);
-               if (d < dm)
-                  {
-                  dm = d;
-                  m = k;
-                  }
-               }
+			if (region == PAL_M1)
+				M1_grn[i] = GRN_BEG + m;
+			else
+				M2_grn[i] = GRN_BEG + m;
 
-            if (region == PAL_M1)
-               M1_blu[i] = BLU_BEG+m;
-            else
-               M2_blu[i] = BLU_BEG+m;
+			m = 0;
+			dm = 32767;
+			for (k = 0; k < BLU_NUM; k++)
+			{
+				d = abs(j - blu_inten[k]);
+				if (d < dm)
+				{
+					dm = d;
+					m = k;
+				}
+			}
 
-            if (region == PAL_M1)
-               M1_wht[i] = FIX_WHT;
-            else
-               M2_wht[i] = FIX_WHT;
-            }
-         break;
-      }
+			if (region == PAL_M1)
+				M1_blu[i] = BLU_BEG + m;
+			else
+				M2_blu[i] = BLU_BEG + m;
 
-   RTR_unlock(handle);
+			if (region == PAL_M1)
+				M1_wht[i] = FIX_WHT;
+			else
+				M2_wht[i] = FIX_WHT;
+		}
+		break;
+	}
+
+	res.unlock(handle);
 }
 
 /*********************************************************/
@@ -609,10 +600,8 @@ void wait_vertical_retrace(void)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
-ULONG read_palette(LONG argcnt, ULONG regnum)
-#pragma on (unreferenced)
-{
+
+ULONG read_palette(LONG argcnt, ULONG regnum) {
    RGB triplet;
    ULONG val;
 
@@ -623,7 +612,7 @@ ULONG read_palette(LONG argcnt, ULONG regnum)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void write_palette(LONG argcnt, ULONG regnum, ULONG value)
 #pragma on (unreferenced)
 {
@@ -637,7 +626,7 @@ void write_palette(LONG argcnt, ULONG regnum, ULONG value)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void pixel_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd, ULONG intervals)
 #pragma on (unreferenced)
 {
@@ -645,7 +634,7 @@ void pixel_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd, ULONG intervals)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void color_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd)
 #pragma on (unreferenced)
 {
@@ -653,7 +642,7 @@ void color_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void light_fade(LONG argcnt, ULONG src_wnd, ULONG color)
 #pragma on (unreferenced)
 {
@@ -661,7 +650,7 @@ void light_fade(LONG argcnt, ULONG src_wnd, ULONG color)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 ULONG assign_window(LONG argcnt, ULONG owner, ULONG x1, ULONG y1,
                           ULONG x2, ULONG y2)
 #pragma on (unreferenced)
@@ -676,7 +665,7 @@ ULONG assign_window(LONG argcnt, ULONG owner, ULONG x1, ULONG y1,
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 ULONG assign_subwindow(LONG argcnt, ULONG owner, ULONG parent,
                              ULONG x1, ULONG y1, ULONG x2, ULONG y2)
 #pragma on (unreferenced)
@@ -691,7 +680,7 @@ ULONG assign_subwindow(LONG argcnt, ULONG owner, ULONG parent,
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void release_window(LONG argcnt, ULONG window)
 #pragma on (unreferenced)
 {
@@ -700,7 +689,7 @@ void release_window(LONG argcnt, ULONG window)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 ULONG get_x1(LONG argcnt, ULONG window)
 #pragma on (unreferenced)
 {
@@ -708,7 +697,7 @@ ULONG get_x1(LONG argcnt, ULONG window)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 ULONG get_x2(LONG argcnt, ULONG window)
 #pragma on (unreferenced)
 {
@@ -716,7 +705,7 @@ ULONG get_x2(LONG argcnt, ULONG window)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 ULONG get_y1(LONG argcnt, ULONG window)
 #pragma on (unreferenced)
 {
@@ -724,7 +713,7 @@ ULONG get_y1(LONG argcnt, ULONG window)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 ULONG get_y2(LONG argcnt, ULONG window)
 #pragma on (unreferenced)
 {
@@ -732,7 +721,7 @@ ULONG get_y2(LONG argcnt, ULONG window)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void set_x1(LONG argcnt, ULONG window, ULONG x1)
 #pragma on (unreferenced)
 {
@@ -740,7 +729,7 @@ void set_x1(LONG argcnt, ULONG window, ULONG x1)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void set_x2(LONG argcnt, ULONG window, ULONG x2)
 #pragma on (unreferenced)
 {
@@ -748,7 +737,7 @@ void set_x2(LONG argcnt, ULONG window, ULONG x2)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void set_y1(LONG argcnt, ULONG window, ULONG y1)
 #pragma on (unreferenced)
 {
@@ -756,7 +745,7 @@ void set_y1(LONG argcnt, ULONG window, ULONG y1)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void set_y2(LONG argcnt, ULONG window, ULONG y2)
 #pragma on (unreferenced)
 {
@@ -764,7 +753,7 @@ void set_y2(LONG argcnt, ULONG window, ULONG y2)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void wipe_window(LONG argcnt, ULONG window, ULONG color)
 #pragma on (unreferenced)
 {
@@ -772,7 +761,7 @@ void wipe_window(LONG argcnt, ULONG window, ULONG color)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void text_window(LONG argcnt, ULONG wndnum, ULONG wnd)
 #pragma on (unreferenced)
 {
@@ -788,34 +777,32 @@ void text_window(LONG argcnt, ULONG wndnum, ULONG wnd)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
 void text_style(LONG argcnt, ULONG wndnum, ULONG font,
-                      ULONG justify)
-#pragma on (unreferenced)
-{
-   HRES hfont;
-   FONT *vfont;
+	ULONG justify) {
+	Resources &res = *_vm->_resources;
+	HRES hfont;
+	FONT *vfont;
 
-   tw[wndnum].justify = justify;
+	tw[wndnum].justify = justify;
 
-   hfont = (HRES) tw[wndnum].font;
+	hfont = (HRES)tw[wndnum].font;
 
-   if (hfont != (HRES)-1)
-      {
-      RTR_unlock(hfont);
-      }
+	if (hfont != (HRES)-1)
+	{
+		res.unlock(hfont);
+	}
 
-   tw[wndnum].font = (FONT *) RTR_get_resource_handle(RTR,font,DA_DEFAULT);
+	tw[wndnum].font = (FONT *)res.get_resource_handle(font, DA_DEFAULT);
 
-   RTR_lock(RTR,(HRES) tw[wndnum].font);
+	res.lock((HRES)tw[wndnum].font);
 
-   vfont = (FONT *) RTR_addr((HRES) tw[wndnum].font);
+	vfont = (FONT *)res.addr((HRES)tw[wndnum].font);
 
-   tw[wndnum].lookaside[vfont->font_background] = 255;
+	tw[wndnum].lookaside[vfont->font_background] = 255;
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void text_xy(LONG argcnt, ULONG wndnum, ULONG htab, ULONG vtab)
 #pragma on (unreferenced)
 {
@@ -824,7 +811,7 @@ void text_xy(LONG argcnt, ULONG wndnum, ULONG htab, ULONG vtab)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 LONG get_text_x(LONG argcnt, ULONG wndnum)
 #pragma on (unreferenced)
 {
@@ -832,7 +819,7 @@ LONG get_text_x(LONG argcnt, ULONG wndnum)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 LONG get_text_y(LONG argcnt, ULONG wndnum)
 #pragma on (unreferenced)
 {
@@ -840,14 +827,15 @@ LONG get_text_y(LONG argcnt, ULONG wndnum)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void home(LONG argcnt, ULONG wndnum)
 #pragma on (unreferenced)
 {
-   HRES hfont;
+	Resources &res = *_vm->_resources;
+	HRES hfont;
 
    hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = (FONT *)RTR_addr(hfont);
+   tw[wndnum].font = (FONT *)res.addr(hfont);
 
    GIL2VFX_select_text_window(&tw[wndnum]);
    GIL2VFX_home();
@@ -856,14 +844,15 @@ void home(LONG argcnt, ULONG wndnum)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG newColor)
 #pragma on (unreferenced)
 {
-   HRES hfont;
+	Resources &res = *_vm->_resources;
+	HRES hfont;
 
    hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = (FONT *)RTR_addr(hfont);
+   tw[wndnum].font = (FONT *)res.addr(hfont);
 
    GIL2VFX_select_text_window(&tw[wndnum]);
    GIL2VFX_remap_font_color(current, newColor);
@@ -872,7 +861,7 @@ void text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG newColor)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void text_refresh_window(LONG argcnt, ULONG wndnum, LONG wnd)
 #pragma on (unreferenced)
 {
@@ -888,97 +877,98 @@ void text_refresh_window(LONG argcnt, ULONG wndnum, LONG wnd)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void vsprint(LONG argcnt, ULONG wndnum, const char *format, va_list argptr)
 #pragma on (unreferenced)
 {
-   HRES hfont,str;
-   BYTE c,*s;
-   BYTE buff[32];
-   const char *p;
+	Resources &res = *_vm->_resources;
+	HRES hfont, str;
+	BYTE c, *s;
+	BYTE buff[32];
+	const char *p;
 
-   hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = (FONT *)RTR_addr(hfont);
+	hfont = (HRES)tw[wndnum].font;
+	tw[wndnum].font = (FONT *)res.addr(hfont);
 
-   GIL2VFX_select_text_window(&tw[wndnum]);
+	GIL2VFX_select_text_window(&tw[wndnum]);
 
-   GIL2VFX_print(BUF,"");
-   txtbuf[0] = 0;       // bug in GIL?  GIL_print("") above should do this!
+	GIL2VFX_print(BUF, "");
+	txtbuf[0] = 0;       // bug in GIL?  GIL_print("") above should do this!
 
-   p = format;
+	p = format;
 
-   while ((c = *p++) != 0)
-      {
-      if (c != '%')
-         {
-         GIL2VFX_print(APP,"%c",c);
-         continue;
-         }
+	while ((c = *p++) != 0)
+	{
+		if (c != '%')
+		{
+			GIL2VFX_print(APP, "%c", c);
+			continue;
+		}
 
-      switch (c=(*p++))
-         {
-         case '0': case '1': case '2': case '3': case '4':
-         case '5': case '6': case '7': case '8': case '9':
-            GIL2VFX_remap_font_color(15,text_colors[c-'0']);
-            break;
+		switch (c = (*p++))
+		{
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
+			GIL2VFX_remap_font_color(15, text_colors[c - '0']);
+			break;
 
-         case 'd':
-            GIL2VFX_print(APP,"%s",ltoa(va_arg(argptr,LONG),(char *)buff,10));
-            break;
+		case 'd':
+			GIL2VFX_print(APP, "%s", ltoa(va_arg(argptr, LONG), (char *)buff, 10));
+			break;
 
-         case 'u':
-			 GIL2VFX_print(APP, "%s", ultoa(va_arg(argptr, ULONG), (char *)buff, 10));
-            break;
+		case 'u':
+			GIL2VFX_print(APP, "%s", ultoa(va_arg(argptr, ULONG), (char *)buff, 10));
+			break;
 
-         case 'x':
-         case 'X':
-			 GIL2VFX_print(APP, "%s", ltoa(va_arg(argptr, LONG), (char *)buff, 16));
-            break;
+		case 'x':
+		case 'X':
+			GIL2VFX_print(APP, "%s", ltoa(va_arg(argptr, LONG), (char *)buff, 16));
+			break;
 
-         case 's':
-            str = RTR_get_resource_handle(RTR,va_arg(argptr,ULONG),
-               DA_DEFAULT);
+		case 's':
+			str = res.get_resource_handle(va_arg(argptr, ULONG),
+				DA_DEFAULT);
 
-            RTR_lock(RTR,str);
+			res.lock(str);
 
-            s = (BYTE *)RTR_addr(str);
+			s = (BYTE *)res.addr(str);
 
-            switch (*(UWORD *) s)
-               {
-               case ':S':
-                  GIL2VFX_print(APP,"%s",&s[2]);
-                  break;
+			switch (*(UWORD *)s)
+			{
+			case ':S':
+				GIL2VFX_print(APP, "%s", &s[2]);
+				break;
 
-               default:
-                  abend(MSG_SRRV);
-               }
+			default:
+				abend(MSG_SRRV);
+			}
 
-            RTR_unlock(str);
+			res.unlock(str);
 
-            tw[wndnum].font = (FONT *)RTR_addr(hfont);
-            break;
+			tw[wndnum].font = (FONT *)res.addr(hfont);
+			break;
 
-         case 'a':
-            GIL2VFX_print(APP,(const char *)va_arg(argptr,BYTE *));
-            break;
+		case 'a':
+			GIL2VFX_print(APP, (const char *)va_arg(argptr, BYTE *));
+			break;
 
-         case 'c':
-            GIL2VFX_print(APP,"%c",(UBYTE) (va_arg(argptr,ULONG) & 0xffL));
-            break;
-         }
-      }
+		case 'c':
+			GIL2VFX_print(APP, "%c", (UBYTE)(va_arg(argptr, ULONG) & 0xffL));
+			break;
+		}
+	}
 
-   if ((txtbuf[sizeof(txtbuf)-1] != 0x69)
-        ||
-       (txtbuf[sizeof(txtbuf)-2] != 0x77))
-      abend(MSG_TBO);
+	if ((txtbuf[sizeof(txtbuf) - 1] != 0x69)
+		||
+		(txtbuf[sizeof(txtbuf) - 2] != 0x77))
+		abend(MSG_TBO);
 
-   GIL2VFX_print_buffer(0);
+	GIL2VFX_print_buffer(0);
 
-   tw[wndnum].font = (FONT *) hfont;
+	tw[wndnum].font = (FONT *)hfont;
 
-   if (tw_refresh[wndnum] != -1)
-      refresh_window(0,tw[wndnum].window,tw_refresh[wndnum]);
+	if (tw_refresh[wndnum] != -1)
+		refresh_window(0, tw[wndnum].window, tw_refresh[wndnum]);
 }
 
 /*********************************************************/
@@ -997,16 +987,17 @@ void vsprint(LONG argcnt, ULONG wndnum, const char *format, va_list argptr)
 
 void print(LONG argcnt, ULONG wndnum, ULONG format, ...)
 {
+	Resources &res = *_vm->_resources;
    va_list argptr;
    HRES hstring;
    const char *p;
    UWORD *w;
 
-   hstring = RTR_get_resource_handle(RTR,format,DA_DEFAULT);
+   hstring = res.get_resource_handle(format,DA_DEFAULT);
 
-   RTR_lock(RTR,hstring);
+   res.lock(hstring);
 
-   p = (const char *)RTR_addr(hstring);
+   p = (const char *)res.addr(hstring);
 
    w = (UWORD *) p;
 
@@ -1032,7 +1023,7 @@ void print(LONG argcnt, ULONG wndnum, ULONG format, ...)
 
    va_end(argptr);
 
-   RTR_unlock(hstring);
+   res.unlock(hstring);
 }
 
 /*********************************************************/
@@ -1095,15 +1086,14 @@ void crout(LONG argcnt, ULONG wndnum)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
-ULONG char_width(LONG argcnt, ULONG wndnum, ULONG ch)
-#pragma on (unreferenced)
-{
-   HRES hfont;
+
+ULONG char_width(LONG argcnt, ULONG wndnum, ULONG ch) {
+	Resources &res = *_vm->_resources;
+	HRES hfont;
    ULONG w;
 
    hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = (FONT *)RTR_addr(hfont);
+   tw[wndnum].font = (FONT *)res.addr(hfont);
 
    GIL2VFX_select_text_window(&tw[wndnum]);
    w = GIL2VFX_char_width(ch);
@@ -1114,28 +1104,25 @@ ULONG char_width(LONG argcnt, ULONG wndnum, ULONG ch)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
-ULONG font_height(LONG argcnt, ULONG wndnum)
-#pragma on (unreferenced)
-{
-   HRES hfont;
-   ULONG w;
 
-   hfont = (HRES) tw[wndnum].font;
+ULONG font_height(LONG argcnt, ULONG wndnum) {
+	Resources &res = *_vm->_resources;
+	HRES hfont;
+	ULONG w;
 
-   w = ((FONT *)(RTR_addr(hfont)))->char_height;
+	hfont = (HRES)tw[wndnum].font;
 
-   return w;
+	w = ((FONT *)(res.addr(hfont)))->char_height;
+
+	return w;
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void solid_bar_graph(LONG argcnt, LONG x0, LONG y0, LONG x1, LONG y1,
                            ULONG lb_border, ULONG tr_border, ULONG bkgnd,
                            ULONG grn, ULONG yel, ULONG red, LONG val,
-                           LONG min, LONG crit, LONG max)
-#pragma on (unreferenced)
-{
+                           LONG min, LONG crit, LONG max) {
    LONG btop,bbtm,blft,brgt,grayx;
    LONG range,point,width;
    LONG color;
@@ -1178,15 +1165,12 @@ void solid_bar_graph(LONG argcnt, LONG x0, LONG y0, LONG x1, LONG y1,
       GIL2VFX_fill_rect(PAGE2,blft,btop,grayx,bbtm,color);
 }
 
-#pragma off (unreferenced)
-void aprint(LONG argcnt, const char *format, ...)
-#pragma on (unreferenced)
-{
+void aprint(LONG argcnt, const char *format, ...) {
 	va_list args;
 	char buffer[100];
 
 	va_start(args, format);
-	int len = vsnprintf(buffer, 100, format, args);
+	vsnprintf(buffer, 100, format, args);
 	va_end(args);
 
 	debug(buffer);

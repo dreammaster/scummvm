@@ -23,7 +23,9 @@
 //#include "aesop/vfx.h"
 
 #include "aesop/aesop.h"
+#include "aesop/eye.h"
 #include "aesop/gil2vfx.h"
+#include "aesop/graphics.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
 #include "aesop/rtcode.h"
@@ -33,7 +35,7 @@
 #include "aesop/graphics.h"
 #include "aesop/event.h"
 #include "aesop/intrface.h"
-#include "aesop/rtres.h"
+#include "aesop/resources.h"
 #include "aesop/rt.h"
 //#include "aesop/modsnd32.h"
 #include "aesop/sound.h"
@@ -46,13 +48,13 @@ namespace Aesop {
 
 char savegame_dir[NUM_SAVEGAMES][SAVE_LEN+1];
 
-static BYTE items_bin[] = "SAVEGAME\\ITEMS_yy.BIN";
-static BYTE items_txt[] = "SAVEGAME\\ITEMS_yy.TXT";
-static BYTE lvl_bin[] =   "SAVEGAME\\LVLxx_yy.BIN";
-static BYTE lvl_txt[] =   "SAVEGAME\\LVLxx_yy.TXT";
+static char items_bin[] = "SAVEGAME\\ITEMS_yy.BIN";
+static char items_txt[] = "SAVEGAME\\ITEMS_yy.TXT";
+static char lvl_bin[] = "SAVEGAME\\LVLxx_yy.BIN";
+static char lvl_txt[] = "SAVEGAME\\LVLxx_yy.TXT";
 
-static BYTE lvl_tmp[] =   "SAVEGAME\\LVLxx.TMP";
-static BYTE itm_tmp[] =   "SAVEGAME\\ITEMS.TMP";
+static char lvl_tmp[] = "SAVEGAME\\LVLxx.TMP";
+static char itm_tmp[] = "SAVEGAME\\ITEMS.TMP";
 
 BYTE DX_offset[6][4] = {{ 0, 0, 0 ,0 },
                         { 0, 1, 0,-1 },
@@ -68,12 +70,208 @@ BYTE DY_offset[6][4] = {{ 0, 0, 0, 0 },
                         { 1, 0,-1, 0 },
                         { 0, 1, 0,-1 }};
 
-extern BYTE txtbuf[2400]; // used as dot buffer -- needs 8 * MAXDOTS words
+extern char txtbuf[2400]; // used as dot buffer -- needs 8 * MAXDOTS words
+
+
+extern void *open_transfer_file(LONG argcnt, const char *filename);
+extern void close_transfer_file();
+
+//лллллллллллллллллллллллллллллллллллллллл
+//лл                                    лл
+//лл AESOP/C code resource declarations лл
+//лл                                    лл
+//лллллллллллллллллллллллллллллллллллллллл
+
+extern PROCDEF code_resources[] = {
+	//
+	// Miscellaneous functions
+	//
+
+	(PROCDEF)load_string,
+	(PROCDEF)load_resource,
+	(PROCDEF)copy_string,
+	(PROCDEF)string_force_lower,
+	(PROCDEF)string_force_upper,
+	(PROCDEF)string_len,
+	(PROCDEF)string_compare,
+	(PROCDEF)strval,
+	(PROCDEF)envval,
+	(PROCDEF)beep,
+	(PROCDEF)pokemem,
+	(PROCDEF)peekmem,
+	(PROCDEF)rnd,
+	(PROCDEF)dice,
+	(PROCDEF)absv,
+	(PROCDEF)minv,
+	(PROCDEF)maxv,
+	(PROCDEF)diagnose,
+	(PROCDEF)heapfree,
+
+	//
+	// Event functions
+	// 
+
+	(PROCDEF)notify,
+	(PROCDEF)cancel,
+	(PROCDEF)drain_event_queue,
+	(PROCDEF)post_event,
+	(PROCDEF)send_event,
+	(PROCDEF)peek_event,
+	(PROCDEF)dispatch_event,
+	(PROCDEF)flush_event_queue,
+	(PROCDEF)flush_input_events,
+
+	//
+	// Interface functions
+	//
+
+	(PROCDEF)init_interface,
+	(PROCDEF)shutdown_interface,
+	(PROCDEF)set_mouse_pointer,
+	(PROCDEF)set_wait_pointer,
+	(PROCDEF)standby_cursor,
+	(PROCDEF)resume_cursor,
+	(PROCDEF)show_mouse,
+	(PROCDEF)hide_mouse,
+	(PROCDEF)mouse_XY,
+	(PROCDEF)mouse_in_window,
+	(PROCDEF)lock_mouse,
+	(PROCDEF)unlock_mouse,
+	(PROCDEF)getkey,
+
+	//
+	// Graphics-related functions
+	//
+
+	(PROCDEF)init_graphics,
+	(PROCDEF)draw_dot,
+	(PROCDEF)draw_line,
+	(PROCDEF)line_to,
+	(PROCDEF)draw_rectangle,
+	(PROCDEF)fill_rectangle,
+	(PROCDEF)hash_rectangle,
+	(PROCDEF)get_bitmap_height,
+	(PROCDEF)draw_bitmap,
+	(PROCDEF)visible_bitmap_rect,
+	(PROCDEF)set_palette,
+	(PROCDEF)refresh_window,
+	(PROCDEF)wipe_window,
+	(PROCDEF)shutdown_graphics,
+	(PROCDEF)wait_vertical_retrace,
+	(PROCDEF)read_palette,
+	(PROCDEF)write_palette,
+	(PROCDEF)pixel_fade,
+	(PROCDEF)color_fade,
+	(PROCDEF)light_fade,
+
+	(PROCDEF)assign_window,
+	(PROCDEF)assign_subwindow,
+	(PROCDEF)release_window,
+	(PROCDEF)get_x1,
+	(PROCDEF)get_x2,
+	(PROCDEF)get_y1,
+	(PROCDEF)get_y2,
+	(PROCDEF)set_x1,
+	(PROCDEF)set_x2,
+	(PROCDEF)set_y1,
+	(PROCDEF)set_y2,
+
+	(PROCDEF)text_window,
+	(PROCDEF)text_style,
+	(PROCDEF)text_xy,
+	(PROCDEF)text_color,
+	(PROCDEF)text_refresh_window,
+	(PROCDEF)get_text_x,
+	(PROCDEF)get_text_y,
+	(PROCDEF)home,
+	(PROCDEF)print,
+	(PROCDEF)sprint,
+	(PROCDEF)dprint,
+	(PROCDEF)aprint,
+	(PROCDEF)crout,
+	(PROCDEF)char_width,
+	(PROCDEF)font_height,
+
+	(PROCDEF)solid_bar_graph,
+
+	//   (PROCDEF)mono_on,
+	//   (PROCDEF)mono_off,
+
+	//
+	// Sound-related functions
+	//
+
+	(PROCDEF)init_sound,
+	(PROCDEF)shutdown_sound,
+	(PROCDEF)load_sound_block,
+	(PROCDEF)sound_effect,
+	(PROCDEF)play_sequence,
+	(PROCDEF)load_music,
+	(PROCDEF)unload_music,
+	(PROCDEF)set_sound_status,
+
+	//
+	// Eye III object management
+	//
+
+	(PROCDEF)create_object,
+	(PROCDEF)create_program,
+	(PROCDEF)destroy_object,
+	(PROCDEF)flush_cache,
+	(PROCDEF)thrash_cache,
+
+	//
+	// Eye III support functions
+	//
+
+	(PROCDEF)step_X,
+	(PROCDEF)step_Y,
+	(PROCDEF)step_FDIR,
+
+	(PROCDEF)step_square_X,
+	(PROCDEF)step_square_Y,
+	(PROCDEF)step_region,
+
+	(PROCDEF)distance,
+	(PROCDEF)seek_direction,
+
+	(PROCDEF)spell_request,
+	(PROCDEF)spell_list,
+	(PROCDEF)magic_field,
+	(PROCDEF)do_dots,
+	(PROCDEF)do_ice,
+
+	(PROCDEF)read_save_directory,
+	(PROCDEF)savegame_title,
+	(PROCDEF)write_save_directory,
+
+	(PROCDEF)save_game,
+	(PROCDEF)suspend_game,
+	(PROCDEF)resume_items,
+	(PROCDEF)resume_level,
+	(PROCDEF)change_level,
+	(PROCDEF)restore_items,
+	(PROCDEF)restore_level_objects,
+	(PROCDEF)read_initial_items,
+	(PROCDEF)write_initial_tempfiles,
+	(PROCDEF)create_initial_binary_files,
+	(PROCDEF)launch,
+
+	//
+	// Eye II savegame file access
+	//
+
+	(PROCDEF)open_transfer_file,
+	(PROCDEF)close_transfer_file,
+	(PROCDEF)player_attrib,
+	(PROCDEF)item_attrib,
+	(PROCDEF)arrow_count,
+};
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 LONG step_X(LONG argcnt, ULONG x, ULONG fdir, ULONG mtype, ULONG distance)
-#pragma on (unreferenced)
+
 {
    BYTE xx = (BYTE) x;
 
@@ -103,9 +301,9 @@ LONG step_X(LONG argcnt, ULONG x, ULONG fdir, ULONG mtype, ULONG distance)
    return xx;
 }
 
-#pragma off (unreferenced)
+
 LONG step_Y(LONG argcnt, ULONG y, ULONG fdir, ULONG mtype, ULONG distance)
-#pragma on (unreferenced)
+
 {
    BYTE yy = (BYTE) y;
 
@@ -135,9 +333,9 @@ LONG step_Y(LONG argcnt, ULONG y, ULONG fdir, ULONG mtype, ULONG distance)
    return yy;
 }
 
-#pragma off (unreferenced)
+
 ULONG step_FDIR(LONG argcnt, ULONG fdir, ULONG mtype)
-#pragma on (unreferenced)
+
 {
    UBYTE f = (UBYTE) fdir;
 
@@ -154,9 +352,9 @@ ULONG step_FDIR(LONG argcnt, ULONG fdir, ULONG mtype)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 LONG step_square_X(LONG argcnt, ULONG x, ULONG r, ULONG dir)
-#pragma on (unreferenced)
+
 {
    switch (dir)
       {
@@ -167,9 +365,9 @@ LONG step_square_X(LONG argcnt, ULONG x, ULONG r, ULONG dir)
    return x;
 }
                                                 
-#pragma off (unreferenced)
+
 LONG step_square_Y(LONG argcnt, ULONG y, ULONG r, ULONG dir)
-#pragma on (unreferenced)
+
 {
    switch (dir)
       {
@@ -180,9 +378,9 @@ LONG step_square_Y(LONG argcnt, ULONG y, ULONG r, ULONG dir)
    return y;
 }
 
-#pragma off (unreferenced)
+
 LONG step_region(LONG argcnt, ULONG r, ULONG dir)
-#pragma on (unreferenced)
+
 {
    switch (dir)
       {
@@ -197,9 +395,9 @@ LONG step_region(LONG argcnt, ULONG r, ULONG dir)
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 ULONG distance(LONG argcnt, ULONG x1, ULONG y1, ULONG x2, ULONG y2)
-#pragma on (unreferenced)
+
 {
    ULONG dx,dy,root;
    LONG num;
@@ -236,10 +434,10 @@ ULONG distance(LONG argcnt, ULONG x1, ULONG y1, ULONG x2, ULONG y2)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 ULONG seek_direction(LONG argcnt, ULONG cur_x, ULONG cur_y, ULONG
                            dest_x, ULONG dest_y)
-#pragma on (unreferenced)
+
 {
    LONG dx,dy;
 
@@ -270,7 +468,7 @@ ULONG seek_direction(LONG argcnt, ULONG cur_x, ULONG cur_y, ULONG
    else if (dy < 0)
       return 0;         // move north (- in Y)
 
-   return -1;           // cur == dest, return -1
+   return (ULONG)-1;    // cur == dest, return -1
 }
 
 /*********************************************************/
@@ -287,9 +485,9 @@ ULONG seek_direction(LONG argcnt, ULONG cur_x, ULONG cur_y, ULONG
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 ULONG spell_request(LONG argcnt, BYTE *stat, BYTE *cnt, ULONG typ, ULONG num)
-#pragma on (unreferenced)
+
 {
    ULONG i,toff;
    BYTE n,h;
@@ -321,10 +519,10 @@ ULONG spell_request(LONG argcnt, BYTE *stat, BYTE *cnt, ULONG typ, ULONG num)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 ULONG spell_list(LONG argcnt, BYTE *cnt, ULONG typ, ULONG lvl, BYTE *list,
                        ULONG max)
-#pragma on (unreferenced)
+
 {
    ULONG i,l,num;
    BYTE m,n,j;
@@ -362,10 +560,10 @@ ULONG spell_list(LONG argcnt, BYTE *cnt, ULONG typ, ULONG lvl, BYTE *list,
 /*	RETURNS:	none																				*/
 /*=========================================================================*/
 
-#pragma off (unreferenced)
+
 void magic_field(LONG argcnt, ULONG p, ULONG redfield, ULONG yelfield,
                        LONG sparkle)
-#pragma on (unreferenced)
+
 {
 	static UBYTE _x[]={8,80};
 	static BYTE	 _y[]={2,54,106};
@@ -460,10 +658,10 @@ LONG Coord_In_Region(LONG x,LONG y,LONG x1,LONG y1,LONG x2,LONG y2)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
    LONG scale, LONG power, LONG dots, LONG life, LONG upval, BYTE *colors)
-#pragma on (unreferenced)
+
 {
 	static WORD _floor[]=
       {
@@ -581,11 +779,9 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 /*																									*/
 /*=========================================================================*/
 
-#pragma off (unreferenced)
+
 void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag, 
-   LONG grav, LONG life, BYTE *colors)
-#pragma on (unreferenced)
-{
+   LONG grav, LONG life, BYTE *colors) {
 	WORD i,pixcol,active,cx,cy,px,py,mask,count;
 	WORD *xpos,*ypos,*xvel,*yvel,*color,*colcnt,*colidx,*delay,*dotbuffer;
 	WORD m,v,grav78,t;
@@ -761,9 +957,9 @@ void read_save_directory(void)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 char *savegame_title(LONG argcnt, ULONG num)
-#pragma on (unreferenced)
+
 {
    return savegame_dir[num];
 }
@@ -775,9 +971,9 @@ char *savegame_title(LONG argcnt, ULONG num)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void set_savegame_title(LONG argcnt, BYTE *string, ULONG num)
-#pragma on (unreferenced)
+
 {
    strcpy(savegame_dir[num], (char *)string);
 }
@@ -839,9 +1035,9 @@ void set_save_lvlnum(ULONG lvl)
 
    sprintf(num,"%02u",lvl);
 
-   strncpy((char *)&lvl_bin[12], num, 2);
-   strncpy((char *)&lvl_txt[12], num, 2);
-   strncpy((char *)&lvl_tmp[12], num, 2);
+   strncpy(&lvl_bin[12], num, 2);
+   strncpy(&lvl_txt[12], num, 2);
+   strncpy(&lvl_tmp[12], num, 2);
 }
 
 /*********************************************************/
@@ -872,9 +1068,9 @@ void remove_temporary_save_files(void)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 ULONG save_game(LONG argcnt, ULONG slotnum, ULONG lvlnum)
-#pragma on (unreferenced)
+
 {
    ULONG lvl;
 
@@ -914,9 +1110,9 @@ ULONG save_game(LONG argcnt, ULONG slotnum, ULONG lvlnum)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void suspend_game(LONG argcnt, ULONG cur_lvl)
-#pragma on (unreferenced)
+
 {
    if (!save_range(itm_tmp,SAVETYPE,FIRST_ITEM,LAST_ITEM))
       abend(MSG_CNSI);
@@ -938,9 +1134,9 @@ void suspend_game(LONG argcnt, ULONG cur_lvl)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void resume_level(LONG argcnt, ULONG cur_lvl)
-#pragma on (unreferenced)
+
 {
    set_save_lvlnum(cur_lvl);
 
@@ -963,9 +1159,9 @@ void resume_level(LONG argcnt, ULONG cur_lvl)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void resume_items(LONG argcnt, ULONG first, ULONG last, ULONG restoring)
-#pragma on (unreferenced)
+
 {
    release_owned_windows(-1);
    cancel_entity_requests(-1);
@@ -985,9 +1181,9 @@ void resume_items(LONG argcnt, ULONG first, ULONG last, ULONG restoring)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void change_level(LONG argcnt, ULONG old_lvl, ULONG new_lvl)
-#pragma on (unreferenced)
+
 {
    set_save_lvlnum(old_lvl);
 
@@ -1015,9 +1211,9 @@ void change_level(LONG argcnt, ULONG old_lvl, ULONG new_lvl)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void restore_items(LONG argcnt, ULONG slotnum)
-#pragma on (unreferenced)
+
 {
    set_save_slotnum(slotnum);
 
@@ -1040,9 +1236,9 @@ void restore_items(LONG argcnt, ULONG slotnum)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void restore_level_objects(LONG argcnt, ULONG slotnum, ULONG lvlnum)
-#pragma on (unreferenced)
+
 {
    ULONG lvl;
 
@@ -1156,43 +1352,29 @@ void create_initial_binary_files(void)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
 void launch(LONG argcnt, const char *dirname, const char *prgname, const char *argn1,
-	const char *argn2)
-#pragma on (unreferenced)
-{
-	struct stag {
-      char  prg[128];
-      char arg1[128];
-      char arg2[128];
-   };
+	const char *argn2) {
+	error("TODO: See if this is needed");
+}
 
-   stag *s;
-   char dir[128];
+void *open_transfer_file(LONG argcnt, const char *filename) {
+	error("TODO");
+}
 
-   s = *(stag **) 0x4fa;
+void close_transfer_file() {
+	error("TODO");
+}
 
-   strcpy(dir,dirname);
-   strcpy(s->prg,prgname);
+LONG player_attrib(LONG argcnt, ULONG plrnum, ULONG offset, ULONG size) {
+	error("TODO");
+}
 
-   if (argn1 != NULL)
-      strcpy(s->arg1,argn1);
-   else
-      s->arg1[0] = 0;
+LONG item_attrib(LONG argcnt, ULONG plrnum, ULONG invslot, ULONG attrib) {
+	error("TODO");
+}
 
-   if (argn1 != NULL)
-      strcpy(s->arg2,argn2);
-   else
-      s->arg2[0] = 0;
-
-   RT_execute(bootstrap,MSG_DESTROY,-1U);
-
-   shutdown_sound();
-   RTR_destroy(RTR,RTR_FREEBASE);
-
-   locate(0,51);
-   //chdir(dir);
-   //exit(127);
+extern LONG arrow_count(LONG argcnt, ULONG plrnum) {
+	error("TODO");
 }
 
 } // End of namespace Aesop

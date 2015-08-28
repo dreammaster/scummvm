@@ -71,8 +71,6 @@ VFX_DESC *VFX_describe_driver() {
 	return &screen;
 }
 
-void shutdown_sound() {}
-
 LONG VFX_pane_copy(PANE *source, LONG sx, LONG sy,
 	PANE *target, LONG tx, LONG ty, LONG fill) { return 0; }
 void VFX_init_driver(void) {}

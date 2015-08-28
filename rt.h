@@ -27,6 +27,8 @@
 #ifndef AESOP_RT_H
 #define AESOP_RT_H
 
+#include "aesop/resources.h"
+
 namespace Aesop {
 
 // fundamental stack value structure
@@ -35,8 +37,7 @@ struct STKVAL {
    UWORD type;
 };
 
-enum
-{
+enum {
    TYP_CRES,                  // data type: code resource address
    TYP_SRES,                  // data type: string resource
    TYP_VSHR,                  // data type: short integer variable
@@ -62,17 +63,17 @@ extern ULONG current_index;
 
 // Assorted speed-critical .ASM routines
 
-void *RTD_first(void *dictionary);
-void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def);
+extern void *RTD_first(void *dictionary);
+extern void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def);
 
-BYTE *RTD_lookup(HRES dictionary, const void *key);
+extern BYTE *RTD_lookup(HRES dictionary, const void *key);
 
 // Runtime interpreter calls
 
-void RT_init(RTR_class *RTR, ULONG stack_size, HRES *objlist);
-void RT_shutdown(void);
-void RT_arguments(void *base, ULONG size);
-LONG RT_execute(ULONG index, ULONG msg_num, ULONG vector);
+extern void RT_init(Resources *RTR, ULONG stack_size, HRES *objlist);
+extern void RT_shutdown(void);
+extern void RT_arguments(void *base, ULONG size);
+extern LONG RT_execute(ULONG index, ULONG msg_num, ULONG vector);
 
 } // End of namespace Aesop
 

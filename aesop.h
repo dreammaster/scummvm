@@ -32,6 +32,7 @@
 #include "common/savefile.h"
 #include "common/util.h"
 #include "engines/engine.h"
+#include "aesop/resources.h"
 
 namespace Aesop {
 
@@ -54,8 +55,12 @@ private:
 	Common::RandomSource _randomSource;
 
 	void initialize();
+
+	void play();
 public:
 	const AesopGameDescription *_gameDescription;
+	Resources *_resources;
+	Resources *_linkResources;
 public:
 	AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc);
 	virtual ~AesopEngine();
@@ -72,6 +77,9 @@ public:
 };
 
 extern AesopEngine *_vm;
+
+#define RES (*_vm->_resources)
+#define LNK (*_vm->_linkResources)
 
 } // End of namespace Aesop
 

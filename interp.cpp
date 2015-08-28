@@ -28,10 +28,9 @@
 #include "aesop/defs.h"
 #include "aesop/shared.h"
 #include "aesop/rtmsg.h"
-#include "aesop/rtres.h"
+#include "aesop/resources.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rt.h"
-#include "aesop/rtlink.h"
 #include "aesop/rtobject.h"
 #include "aesop/rtcode.h"
 #include "aesop/event.h"
@@ -79,10 +78,7 @@ namespace Aesop {
 // Globals
 //
 
-RTR_class *RTR;
-
 HRES HROED;
-ULONG heap_size;
 
 BYTE *pathname;
 

@@ -25,6 +25,7 @@
 
 //#include "aesop/vfx.h"
 //#include "aesop/ail32.h"
+#include "aesop/aesop.h"
 #include "aesop/gil2vfx.h"
 #include "aesop/gil2vfxa.h"
 #include "aesop/mouse.h"
@@ -33,8 +34,7 @@
 #include "aesop/shared.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
-#include "aesop/rtres.h"
-#include "aesop/rtlink.h"
+#include "aesop/resources.h"
 #include "aesop/rtcode.h"
 #include "aesop/rt.h"
 #include "aesop/intrface.h"
@@ -253,7 +253,7 @@ static void mouse_event_handler(LONG px, LONG py)
    entry = 0;
 }
 /*********************************************************/
-#pragma off (unreferenced)
+
 static void mouse_button_event_handler(LONG left, LONG right, LONG center)
 #pragma on (unreferenced)
 {
@@ -356,7 +356,7 @@ void shutdown_interface(void)
 
    if (pointer_set != (unsigned)-1)
       {
-      RTR_unlock(pointer_set);
+      RES.unlock(pointer_set);
       }
 }
 
@@ -392,15 +392,15 @@ void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
       {
       if (pointer_set != (unsigned)-1)
          {
-         RTR_unlock(pointer_set);
+         RES.unlock(pointer_set);
          }
 
-      if ((entry = RTR_search_name_dir(RTR,table)) == NULL)
-         pointer_set = RTR_get_resource_handle(RTR,table,DA_DEFAULT);
+      if ((entry = RES.search_name_dir(table)) == NULL)
+         pointer_set = RES.get_resource_handle(table,DA_DEFAULT);
       else
          pointer_set = entry->handle;
 
-      RTR_lock(RTR,pointer_set);
+      RES.lock(pointer_set);
 
       pointer_set_entry = table;
       }
@@ -412,11 +412,11 @@ void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
 
    ptr_valid = 1;
 
-   mouse_set_pointer(RTR_addr(pointer_set),pointer_num,hot_X,hot_Y);
+   mouse_set_pointer(RES.addr(pointer_set),pointer_num,hot_X,hot_Y);
 }
 
 /*********************************************************/
-#pragma off (unreferenced)
+
 void set_wait_pointer(LONG argcnt, ULONG number, LONG hot_X, LONG hot_Y)
 #pragma on (unreferenced)
 {
@@ -527,7 +527,7 @@ ULONG mouse_XY(void)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 ULONG mouse_in_window(LONG argcnt, ULONG wnd)
 #pragma on (unreferenced)
 {
@@ -549,7 +549,7 @@ ULONG mouse_in_window(LONG argcnt, ULONG wnd)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void refresh_window(LONG argcnt, ULONG src, ULONG target)
 #pragma on (unreferenced)
 {

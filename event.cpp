@@ -21,10 +21,11 @@
  */
 
 #include "common/file.h"
+#include "aesop/aesop.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
 #include "aesop/event.h"
-#include "aesop/rtres.h"
+#include "aesop/resources.h"
 #include "aesop/intrface.h"
 #include "aesop/rt.h"
 #include "aesop/rtsystem.h"
@@ -153,7 +154,7 @@ void init_notify_list(void)
 
 void add_notify_request(LONG client, ULONG message, LONG event, LONG parameter)
 {
-   LONG i,nxt,cur;
+   LONG i,nxt,cur = 0;
    NREQ *NR;
 
    DISABLE();
@@ -201,8 +202,9 @@ void add_notify_request(LONG client, ULONG message, LONG event, LONG parameter)
 
 void delete_notify_request(LONG client, ULONG message, LONG event, LONG parameter)
 {
-   LONG nxt,cur,prev;
-   LONG fnxt,fcur;
+   LONG nxt,prev;
+   LONG fnxt;
+   LONG cur = 0, fcur = 0;
    NREQ *NR;
    LONG all_events;
 
@@ -277,7 +279,7 @@ void delete_notify_request(LONG client, ULONG message, LONG event, LONG paramete
 void cancel_entity_requests(LONG client)
 {
    LONG event,nxt,cur,prev;
-   LONG fnxt,fcur;
+   LONG fnxt,fcur = 0;
    NREQ *NR;
 
    DISABLE();
@@ -493,7 +495,7 @@ void dump_event_queue(void)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void notify(LONG argcnt, ULONG index, ULONG message, LONG event,
    LONG parameter)
 #pragma on (unreferenced)
@@ -507,7 +509,7 @@ void notify(LONG argcnt, ULONG index, ULONG message, LONG event,
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void cancel(LONG argcnt, ULONG index, ULONG message, LONG event,
    LONG parameter)
 #pragma on (unreferenced)
@@ -615,7 +617,7 @@ void dispatch_event(void)
          RT_arguments(&event_message_descriptor,
             sizeof(event_message_descriptor));
 
-         RT_execute((LONG)NR->client,(LONG)NR->message,-1U);
+         RT_execute((LONG)NR->client,(LONG)NR->message, (ULONG)-1);
          }
       }
 }
@@ -638,7 +640,7 @@ void drain_event_queue(void)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void post_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
 #pragma on (unreferenced)
 {
@@ -652,7 +654,7 @@ void post_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void send_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
 #pragma on (unreferenced)
 {
@@ -667,7 +669,7 @@ void send_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
 //
 /*********************************************************/
 
-#pragma off (unreferenced)
+
 void flush_event_queue(LONG argcnt, LONG owner, LONG event, LONG parameter)
 #pragma on (unreferenced)
 {
