@@ -8,7 +8,6 @@ MODULE_OBJS = \
 	gil2vfx.o \
 	gil2vfxa.o \
 	graphics.o \
-	interp.o \
 	intrface.o \
 	mouse.o \
 	resources.o \

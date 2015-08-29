@@ -45,6 +45,27 @@ namespace Aesop {
 typedef void(*FARPROC)();
 extern FARPROC code_resources[];
 
+/*----------------------------------------------------------------*/
+
+RF_file_hdr::RF_file_hdr() {
+	Common::fill(&_signature[0], &_signature[16], 0);
+	_fileSize = 0;
+	_lostSpace = 0;
+	_FOB = 0;
+	_createTime = 0;
+	_modifyTime = 0;
+}
+
+void RF_file_hdr::load(Common::SeekableReadStream &s) {
+	s.read(&_signature[0], 16);
+	_fileSize = s.readUint32LE();
+	_lostSpace = s.readUint32LE();
+	_FOB = s.readUint32LE();
+	_createTime = s.readUint32LE();
+	_modifyTime = s.readUint32LE();
+}
+
+/*----------------------------------------------------------------*/
 
 Resources::Resources(AesopEngine *vm): _vm(vm) {
 	const Common::String filename = vm->getGameID() == GType_EOB3 ? "eye.res" : "hack.res";
@@ -53,8 +74,7 @@ Resources::Resources(AesopEngine *vm): _vm(vm) {
 	if (!_file.open(filename))
 		error("Could not locate %s", filename.c_str());
 
-	error("TODO: RF_file_hdr::load");
-	//read(file,&RFH,sizeof(RF_file_hdr));
+	_RFH.load(_file);
 
 	_base = new byte[MAX_RES_SIZE];
 	beg = _base;
@@ -91,18 +111,18 @@ ULONG Resources::discard(ULONG index, bool do_move) {
 
 	sel = &_dir[index];
 
-	size = sel->size;
-	dest = sel->seg;
+	size = sel->_size;
+	dest = sel->_seg;
 	src = add_ptr(dest, size);
 	nbytes = ptr_dif(_next_M, src);
 
 	n = _nentries;
 	for (i = 0; i < n; i++) {
-		if (_dir[i].flags & (DA_FIXED | DA_DISCARDED))
+		if (_dir[i]._flags & (DA_FIXED | DA_DISCARDED))
 			continue;
 
-		if (ptr_dif(_dir[i].seg, dest) > 0L)
-			_dir[i].seg = (BYTE *)_dir[i].seg - size;
+		if (ptr_dif(_dir[i]._seg, dest) > 0L)
+			_dir[i]._seg = (BYTE *)_dir[i]._seg - size;
 	}
 
 	if (do_move) {
@@ -110,12 +130,12 @@ ULONG Resources::discard(ULONG index, bool do_move) {
 		far_memmove(dest, src, nbytes);
 	}
 
-	sel->flags |= DA_DISCARDED;
+	sel->_flags |= DA_DISCARDED;
 
 	_next_M = (BYTE *)_next_M - size;
 	_free = _free + size;
 
-	if (sel->flags & DA_EVANESCENT) {
+	if (sel->_flags & DA_EVANESCENT) {
 		free((HRES)sel);
 	}
 
@@ -130,14 +150,14 @@ ULONG Resources::LRU() {
 	oldest = age = (ULONG)-1;
 
 	for (i = 0; i < n; ++i) {
-		if (_dir[i].flags & (DA_FIXED | DA_PRECIOUS | DA_DISCARDED | DA_FREE))
+		if (_dir[i]._flags & (DA_FIXED | DA_PRECIOUS | DA_DISCARDED | DA_FREE))
 			continue;
 
-		if (_dir[i].locks > 0)
+		if (_dir[i]._locks > 0)
 			continue;
 
-		if (_dir[i].history < age) {
-			age = _dir[i].history;
+		if (_dir[i]._history < age) {
+			age = _dir[i]._history;
 			oldest = i;
 		}
 	}
@@ -164,7 +184,7 @@ ULONG Resources::make_room(ULONG goal) {
 	//
 
 	for (i = _nentries - 1; i >= 0; --i) {
-		if ((_dir[i].flags & DA_FREE) && (!(_dir[i].flags & (DA_FIXED | DA_DISCARDED)))) {
+		if ((_dir[i]._flags & DA_FREE) && (!(_dir[i]._flags & (DA_FIXED | DA_DISCARDED)))) {
 			discard(i, 1);
 		}
 	}
@@ -183,10 +203,10 @@ ULONG Resources::make_room(ULONG goal) {
 
 	for (first = _nentries - 1; first >= 0; first--)
 	{
-		if (_dir[first].flags & (DA_FIXED | DA_PRECIOUS | DA_DISCARDABLE | DA_DISCARDED))
+		if (_dir[first]._flags & (DA_FIXED | DA_PRECIOUS | DA_DISCARDABLE | DA_DISCARDED))
 			continue;
 
-		if (_dir[first].locks > 0)
+		if (_dir[first]._locks > 0)
 			continue;
 
 		//
@@ -195,20 +215,20 @@ ULONG Resources::make_room(ULONG goal) {
 		//
 
 		for (next = first - 1; next >= 0; --next) {
-			next_seg = (ULONG)_dir[next + 1].seg;
+			next_seg = (ULONG)_dir[next + 1]._seg;
 
-			if (_dir[next].flags & (DA_FIXED | DA_PRECIOUS | DA_DISCARDABLE | DA_DISCARDED))
+			if (_dir[next]._flags & (DA_FIXED | DA_PRECIOUS | DA_DISCARDABLE | DA_DISCARDED))
 				break;
 
-			if (_dir[next].locks > 0)
+			if (_dir[next]._locks > 0)
 				break;
 
-			if (((ULONG)_dir[next].seg + _dir[next].size) != next_seg)
+			if (((ULONG)_dir[next]._seg + _dir[next]._size) != next_seg)
 				break;
 		}
 
 		end = _next_M;
-		dest = _dir[next + 1].seg;
+		dest = _dir[next + 1]._seg;
 
 		size_deleted = 0L;
 		for (i = next + 1; i <= first; i++)
@@ -251,21 +271,21 @@ ULONG Resources::assign_space(ULONG bytes, ULONG attrib, HRES entry) {
 	if (!make_room(bytes))
 		return 0;
 
-	sel->flags = attrib & 0xffffffff;
-	sel->locks = 0;
-	sel->size = bytes;
-	sel->history = _LRU_cnt;
+	sel->_flags = attrib & 0xffffffff;
+	sel->_locks = 0;
+	sel->_size = bytes;
+	sel->_history = _LRU_cnt;
 
 	_free -= bytes;
 
 	if (attrib & DA_FIXED)
 	{
 		_last_F = (UBYTE *)_last_F - bytes;
-		sel->seg = _last_F;
+		sel->_seg = _last_F;
 	}
 	else
 	{
-		sel->seg = _next_M;
+		sel->_seg = _next_M;
 		_next_M = (UBYTE *)_next_M + bytes;
 	}
 
@@ -274,12 +294,12 @@ ULONG Resources::assign_space(ULONG bytes, ULONG attrib, HRES entry) {
 
 void Resources::init_dir(ULONG first) {
 	for (int i = 0, j = first; i < DIR_BLK; ++i, ++j) {
-		_dir[j].size = 0L;
-		_dir[j].flags = DA_FREE | DA_DISCARDED;
-		_dir[j].history = 0;
-		_dir[j].locks = 0;
-		_dir[j].user = (ULONG)-1;
-		_dir[j].seg = 0;
+		_dir[j]._size = 0L;
+		_dir[j]._flags = DA_FREE | DA_DISCARDED;
+		_dir[j]._history = 0;
+		_dir[j]._locks = 0;
+		_dir[j]._user = (ULONG)-1;
+		_dir[j]._seg = 0;
 	}
 }
 
@@ -294,7 +314,7 @@ HRES Resources::new_entry() {
 		return (HRES)-1;
 
 	for (i = 0; i < n; ++i) {
-		f = _dir[i].flags;
+		f = _dir[i]._flags;
 
 		if ((f & DA_FREE) && (f & DA_DISCARDED))
 			return (HRES)&_dir[i];
@@ -304,9 +324,9 @@ HRES Resources::new_entry() {
 		return (HRES)-1;
 
 	for (i = 0; i < n; i++) {
-		if (_dir[i].flags & (DA_DISCARDED | DA_FIXED))
+		if (_dir[i]._flags & (DA_DISCARDED | DA_FIXED))
 			continue;
-		_dir[i].seg = ((BYTE *)_dir[i].seg) + SIZE_DB;
+		_dir[i]._seg = ((BYTE *)_dir[i]._seg) + SIZE_DB;
 	}
 
 	src = add_ptr(_dir, n * sizeof(HD_entry));
@@ -335,7 +355,7 @@ ULONG Resources::seek(ULONG rnum) {
 	if (_cur_blk != dirblk) {
 		_cur_blk = dirblk;
 
-		next = _RFH.FOB;
+		next = _RFH._FOB;
 
 		do {
 			_file.seek(next, SEEK_SET);
@@ -364,8 +384,8 @@ void Resources::read(HRES entry) {
 
 	sel = (HD_entry *)entry;
 
-	ptr = (UBYTE *)sel->seg;
-	len = sel->size;
+	ptr = (UBYTE *)sel->_seg;
+	len = sel->_size;
 
 	while (len > (ULONG)DOS_BUFFSIZE) {
 		PollMod();
@@ -391,7 +411,7 @@ HRES Resources::alloc(ULONG bytes, ULONG attrib) {
 		return (HRES)-1;
 
 	sel = (HD_entry *)entry;
-	sel->user = (ULONG)-1;
+	sel->_user = (ULONG)-1;
 
 	return entry;
 }
@@ -406,8 +426,8 @@ void Resources::free(HRES entry) {
 
 	sel = (HD_entry *)entry;
 
-	sel->flags |= DA_FREE;
-	sel->locks = 0;
+	sel->_flags |= DA_FREE;
+	sel->_locks = 0;
 
 	for (i = 0, dir = (ND_entry *)addr(_name_dir); i < (ULONG)_nd_entries; ++i, ++dir) {
 		if (dir->handle == entry)
@@ -416,20 +436,20 @@ void Resources::free(HRES entry) {
 			dir->thunk = (HRES)-1;
 	}
 
-	if (!(sel->flags & DA_FIXED))
+	if (!(sel->_flags & DA_FIXED))
 	{
-		while ((!(sel->flags & DA_FIXED)) &&
-			(!(sel->flags & DA_DISCARDED)) &&
-			((ULONG)sel->seg + sel->size == (ULONG)_next_M)
+		while ((!(sel->_flags & DA_FIXED)) &&
+			(!(sel->_flags & DA_DISCARDED)) &&
+			((ULONG)sel->_seg + sel->_size == (ULONG)_next_M)
 		) {
 			discard((entry - (ULONG)_dir) / sizeof(HD_entry), 1);
 
 			n = _nentries;
 			for (i = 0; i < n; i++)
-				if ((!(_dir[i].flags & DA_FIXED)) &&
-					(_dir[i].flags & DA_FREE) &&
-					(!(_dir[i].flags & DA_DISCARDED)) &&
-					((ULONG)_dir[i].seg + sel->size == (ULONG)_next_M)
+				if ((!(_dir[i]._flags & DA_FIXED)) &&
+					(_dir[i]._flags & DA_FREE) &&
+					(!(_dir[i]._flags & DA_DISCARDED)) &&
+					((ULONG)_dir[i]._seg + sel->_size == (ULONG)_next_M)
 					)
 				{
 					sel = &(_dir[i]);
@@ -438,20 +458,20 @@ void Resources::free(HRES entry) {
 				}
 		}
 	} else {
-		while ((sel->flags & DA_FIXED)
-			&& (!(sel->flags & DA_DISCARDED))
-			&& (sel->seg == _last_F))
+		while ((sel->_flags & DA_FIXED)
+			&& (!(sel->_flags & DA_DISCARDED))
+			&& (sel->_seg == _last_F))
 		{
-			_last_F = (UBYTE *)_last_F + sel->size;
-			_free += sel->size;
-			sel->flags |= DA_DISCARDED;
+			_last_F = (UBYTE *)_last_F + sel->_size;
+			_free += sel->_size;
+			sel->_flags |= DA_DISCARDED;
 
 			n = _nentries;
 			for (i = 0; i < n; i++)
-				if ((_dir[i].flags & DA_FIXED)
-					&& (_dir[i].flags & DA_FREE)
-					&& (!(_dir[i].flags & DA_DISCARDED))
-					&& (_dir[i].seg == _last_F))
+				if ((_dir[i]._flags & DA_FIXED)
+					&& (_dir[i]._flags & DA_FREE)
+					&& (!(_dir[i]._flags & DA_DISCARDED))
+					&& (_dir[i]._seg == _last_F))
 				{
 					sel = &_dir[i];
 					break;
@@ -472,32 +492,32 @@ void Resources::lock(HRES entry) {
 
 	sel = (HD_entry *)entry;
 
-	if (sel->flags & (DA_FIXED | DA_PRECIOUS | DA_FREE))
+	if (sel->_flags & (DA_FIXED | DA_PRECIOUS | DA_FREE))
 		return;
 
-	if ((sel->flags & DA_DISCARDED) && (sel->user != -1L)) {
-		if (assign_space(sel->size, sel->flags, entry) == (ULONG)-1)
+	if ((sel->_flags & DA_DISCARDED) && (sel->_user != -1L)) {
+		if (assign_space(sel->_size, sel->_flags, entry) == (ULONG)-1)
 			return;
 
 #if FAST_LOCK
-		_file.seek(sel->user, SEEK_SET);
+		_file.seek(sel->_user, SEEK_SET);
 #else
 		seek(sel->user);
 #endif
 
 		read(entry);
 
-		sel->flags &= (~DA_DISCARDED);
+		sel->_flags &= (~DA_DISCARDED);
 	}
 
-	++sel->locks;
+	++sel->_locks;
 
-	sel->history = ++_LRU_cnt;
+	sel->_history = ++_LRU_cnt;
 
 	if (_LRU_cnt == 65535U) {
 		n = _nentries;
 		for (i = 0; i < n; i++)
-			_dir[i].history >>= 3;
+			_dir[i]._history >>= 3;
 
 		_LRU_cnt >>= 3;
 	}
@@ -508,15 +528,15 @@ void Resources::unlock(HRES entry) {
 
 	sel = (HD_entry *)entry;
 
-	if (sel->locks > 0)
-		--sel->locks;
+	if (sel->_locks > 0)
+		--sel->_locks;
 }
 
 ULONG Resources::size(HRES entry) {
 	HD_entry *sel;
 
 	sel = (HD_entry *)entry;
-	return sel->size;
+	return sel->_size;
 }
 
 void *Resources::addr(HRES entry) {
@@ -547,7 +567,7 @@ HRES Resources::load_resource(ULONG resource, ULONG attrib) {
 		sel = (HD_entry *)entry;
 
 #if FAST_LOCK
-		sel->user = _file.pos();
+		sel->_user = _file.pos();
 #else
 		sel->user = resource;
 #endif
@@ -670,7 +690,7 @@ HRES Resources::create_instance(ULONG object) {
 
 	sel = (HD_entry *)instance;
 
-	sel->user = object;
+	sel->_user = object;
 
 	*(IHDR *)addr(instance) = ihdr;
 

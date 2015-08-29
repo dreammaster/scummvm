@@ -87,9 +87,9 @@ void AesopEngine::play() {
 	destroy_object(1, rtn);
 
 	for (int i = 0; i < res._nentries; i++) {
-		ULONG f = res._dir[i].flags;
+		ULONG f = res._dir[i]._flags;
 
-		if ((f & DA_FREE) && (f & DA_DISCARDED) && (!res._dir[i].seg))
+		if ((f & DA_FREE) && (f & DA_DISCARDED) && (!res._dir[i]._seg))
 			break;
 	}
 }

@@ -615,7 +615,7 @@ LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
             thdr = *((THDR *) tptr);
 
             hd_inst = (HD_entry *) instance;
-            CD.name = hd_inst->user;
+            CD.name = hd_inst->_user;
             CD.size = thdr.isize - sizeof(IHDR);
             }
 
@@ -751,7 +751,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
          {
          sel = (HD_entry *) cur;
 
-         if (sel->user != CD->name)
+         if (sel->_user != CD->name)
             {
             destroy_object(0,index);
             }

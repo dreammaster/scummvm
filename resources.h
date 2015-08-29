@@ -51,13 +51,13 @@ enum {
 	DA_PLACEHOLDER	= 0x10000000L
 };
 
-#define SA_UNUSED      0x00000001    // Storage attribute flag equates
+#define SA_UNUSED      0x00000001	// Storage attribute flag equates
 #define SA_DELETED     0x00000002
                         
-#define ROED 0                   // Resource Ordinal Entry Directory
-#define RDES 1                   // Resource Description Directory
-#define RDEP 2                   // Resource Dependency Directory
-#define CRFD 3                   // Code Resource Function Directory
+#define ROED 0						// Resource Ordinal Entry Directory
+#define RDES 1						// Resource Description Directory
+#define RDEP 2						// Resource Dependency Directory
+#define CRFD 3						// Code Resource Function Directory
 
 #define RTR_FREEBASE   0x0001U   // TRUE for destructor to free heap memory
 
@@ -67,23 +67,30 @@ enum {
 
 // cached resource entry descriptor
 struct HD_entry {
-   void *seg;                    // pointer to resource data
+   void *_seg;					// pointer to resource data
 
-   ULONG size;                   // size of resource in bytes
-   ULONG flags;                  // DA_ flags
-   ULONG history;                // LRU counter value
-   ULONG locks;                  // locking depth
-   ULONG user;                   // .RES file offset or instance object name
+   ULONG _size;					// size of resource in bytes
+   ULONG _flags;				// DA_ flags
+   ULONG _history;				// LRU counter value
+   ULONG _locks;				// locking depth
+   ULONG _user;					// .RES file offset or instance object name
 };
 
 // resource file header
 struct RF_file_hdr {
-   BYTE  signature[16];
-   ULONG file_size;
-   ULONG lost_space;
-   ULONG FOB;
-   ULONG create_time;
-   ULONG modify_time;
+   BYTE  _signature[16];
+   ULONG _fileSize;
+   ULONG _lostSpace;
+   ULONG _FOB;
+   ULONG _createTime;
+   ULONG _modifyTime;
+
+   RF_file_hdr();
+
+   /**
+    * Load header data from the passed stream
+	*/
+   void load(Common::SeekableReadStream &s);
 };
 
 // resource file entry header
