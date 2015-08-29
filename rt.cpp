@@ -35,7 +35,7 @@ void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def) {
 	error("TODO: Reimplement ASM as CPP code");
 }
 
-BYTE *RTD_lookup(HRES dictionary, const void *key) {
+BYTE *RTD_lookup(HRES dictionary, const Common::String &key) {
 	error("TODO: Reimplement ASM as CPP code");
 }
 

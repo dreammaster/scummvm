@@ -66,7 +66,7 @@ extern ULONG current_index;
 extern void *RTD_first(void *dictionary);
 extern void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def);
 
-extern BYTE *RTD_lookup(HRES dictionary, const void *key);
+extern BYTE *RTD_lookup(HRES dictionary, const Common::String &key);
 
 // Runtime interpreter calls
 

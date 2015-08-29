@@ -59,6 +59,7 @@ HTIMER AIL_register_timer(void(*fn)()) { return 0; }
 void AIL_set_timer_frequency(HTIMER timer, int freq) {}
 void AIL_start_timer(HTIMER htimer) {}
 void AIL_release_timer_handle(HTIMER htimer) {}
+void AIL_shutdown() {}
 
 void VFX_wait_vblank_leading() {}
 void VFX_DAC_write(int index, RGB *rgb) {}

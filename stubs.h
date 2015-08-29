@@ -129,6 +129,7 @@ extern HTIMER AIL_register_timer(void(*fn)());
 extern void AIL_set_timer_frequency(HTIMER timer, int freq);
 extern void AIL_start_timer(HTIMER htimer);
 extern void AIL_release_timer_handle(HTIMER htimer);
+extern void AIL_shutdown();
 
 struct RGB {
 	byte r;

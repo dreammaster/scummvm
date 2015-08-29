@@ -20,9 +20,15 @@
  *
  */
 
-#include "aesop/aesop.h"
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
+#include "aesop/aesop.h"
+#include "aesop/event.h"
+#include "aesop/rt.h"
+#include "aesop/rtmsg.h"
+#include "aesop/rtobject.h"
+#include "aesop/rtsystem.h"
+#include "aesop/stubs.h"
 
 namespace Aesop {
 
@@ -45,71 +51,47 @@ AesopEngine::~AesopEngine() {
 
 void AesopEngine::initialize() {
 	_resources = new Resources(this);
+	init_object_list();
+	init_notify_list();
+	init_event_queue();
 
 	DebugMan.addDebugChannel(kDebugLevelScript, "scripts", "Script debug level");
 }
 
-Common::Error AesopEngine::run() {
-	// Initialize the engine
-	initialize();
+void AesopEngine::deinitialize() {
+	RT_shutdown();
+	mem_shutdown();
+	AIL_shutdown();
+}
 
+Common::Error AesopEngine::run() {
+	initialize();
 	play();
+	deinitialize();
 
 	return Common::kNoError;
 }
 
 void AesopEngine::play() {
-	Common::String resName = (getGameID() == GType_EOB3) ? "eye.res" : "hack.res";
-	Common::String codeName = "";
+	Resources &res = *_vm->_resources;
+	Common::String codeName = "start";
+	HRES hroed = _resources->get_resource_handle(ROED, DA_TEMPORARY | DA_EVANESCENT);
+	_resources->lock(hroed);
+	int code = ascnum((const char *)RTD_lookup(hroed, codeName));
+	_resources->unlock(hroed);
 
+	if (code == (ULONG)-1)
+		error(MSG_SPNF);
 
+	int rtn = create_program(1, bootstrap, (ULONG)code);
+	destroy_object(1, rtn);
 
-	/*
+	for (int i = 0; i < res._nentries; i++) {
+		ULONG f = res._dir[i].flags;
 
-	if (RTR == NULL)
-		abend(MSG_RIF, RES_name);
-
-	init_object_list();
-	init_notify_list();
-	init_event_queue();
-
-	RT_init(RTR, STK_SIZE, objlist);
-
-	HROED = RTR_get_resource_handle(RTR, ROED, DA_TEMPORARY | DA_EVANESCENT);
-	RTR_lock(RTR, HROED);
-	code = ascnum(RTD_lookup(HROED, code_name));
-	RTR_unlock(HROED);
-
-	if (code == (ULONG)-1L)
-		abend(MSG_SPNF);
-
-	rtn = create_program(1, bootstrap, (ULONG)code);
-	rtn = destroy_object(1, rtn);
-
-	for (i = 0; i<RTR->nentries; i++)
-	{
-		ULONG f;
-
-		f = RTR->dir[i].flags;
-
-		if ((f & DA_FREE) && (f & DA_DISCARDED) && (!RTR->dir[i].seg))
+		if ((f & DA_FREE) && (f & DA_DISCARDED) && (!res._dir[i].seg))
 			break;
 	}
-
-	if (envval(0, "AESOP_DIAG") == 1)
-	{
-		printf("Entries avail: %u\n", RTR->nentries);
-		printf("       In use: %u\n\n", i);
-
-		printf("%u names in use\n", RTR->nd_entries);
-	}
-
-	RTR_destroy(RTR, RTR_FREEBASE);
-	RT_shutdown();
-
-	mem_shutdown();
-	AIL_shutdown(MSG_AIL);
-	*/
 }
 
 int AesopEngine::getRandomNumber(int max) {

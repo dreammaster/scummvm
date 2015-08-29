@@ -23,6 +23,8 @@
 #ifndef AESOP_EVENT_H
 #define AESOP_EVENT_H
 
+#include "aesop/shared.h"
+
 namespace Aesop {
 
 //

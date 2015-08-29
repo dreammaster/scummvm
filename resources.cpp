@@ -860,7 +860,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 			tagbase = (BYTE *)addr(impt[i]);
 			switch (tag[0]) {
 			case 'C':               // Code
-				offset = (UWORD)ascnum((const char *)RTD_lookup(HCRFD, &tag[2]));
+				offset = (UWORD)ascnum((const char *)RTD_lookup(HCRFD, (const char *)&tag[2]));
 				if (offset == (UWORD)-1)
 					abend(MSG_MCR, &tag[2]); // "Missing code resource '%s'"
 
@@ -903,7 +903,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 						lnk->lock(xexpt);
 						tag = tag - tagbase + (BYTE *)addr(impt[i]);
 
-						offset = (UWORD)ascnum((const char *)RTD_lookup(xexpt, tag));
+						offset = (UWORD)ascnum((const char *)RTD_lookup(xexpt, (const char *)tag));
 
 						if (offset != (UWORD)-1) {
 							found = 1;

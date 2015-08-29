@@ -54,8 +54,19 @@ class AesopEngine : public Engine {
 private:
 	Common::RandomSource _randomSource;
 
+	/**
+	 * Initialize the engine
+	 */
 	void initialize();
 
+	/**
+	 * Deinitialize the engine
+	 */
+	void deinitialize();
+
+	/**
+	 * Play the game
+	 */
 	void play();
 public:
 	const AesopGameDescription *_gameDescription;
