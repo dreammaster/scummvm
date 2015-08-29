@@ -206,7 +206,7 @@ static void *load_global_timbre(ULONG bank, ULONG patch)
 
 
 void load_sound_block(LONG argcnt, ULONG first_block, ULONG last_block, ULONG *array)
-#pragma on (unreferenced)
+
 {
 	/*
    ULONG index;
@@ -263,7 +263,7 @@ void load_sound_block(LONG argcnt, ULONG first_block, ULONG last_block, ULONG *a
 
 
 void sound_effect(LONG argcnt, ULONG index)
-#pragma on (unreferenced)
+
 {
 	/*
    WORD ch;
@@ -291,7 +291,7 @@ void sound_effect(LONG argcnt, ULONG index)
 
 
 void play_sequence(LONG argcnt, ULONG LA_version, ULONG AD_version, ULONG PC_version)
-#pragma on (unreferenced)
+
 {
 	/*
    ULONG XMI_res;
@@ -438,7 +438,7 @@ void unload_music(void)
 
 
 void set_sound_status(LONG argcnt, ULONG status)
-#pragma on (unreferenced)
+
 {
 	/*
    if (!(PCM_active || XMI_active)) return;
@@ -522,7 +522,7 @@ void shutdown_sound(void)
 
 
 void init_sound(LONG argcnt, ULONG errprompt)
-#pragma on (unreferenced)
+
 {
 	/*
    WORD PCM_requested,XMI_requested;

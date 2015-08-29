@@ -53,35 +53,34 @@ ULONG diag_flag = 0;
 //
 
 
-void load_string(LONG argcnt, BYTE *array, ULONG string)
-#pragma on (unreferenced)
-{
-   HRES handle;
+void load_string(LONG argcnt, BYTE *array, ULONG string) {
+	Resources &res = *_vm->_resources;
+	HRES handle;
    BYTE *ptr;
    BYTE *new_array;
    ULONG array_offset;
 
-   array_offset = array - (BYTE *)RES.addr(objlist[current_this]);
+   array_offset = array - (BYTE *)res.addr(objlist[current_this]);
 
-   handle = RES.get_resource_handle(string,DA_DEFAULT);
+   handle = res.get_resource_handle(string,DA_DEFAULT);
 
-   RES.lock(handle);
+   res.lock(handle);
 
-   new_array = (BYTE *)add_ptr(RES.addr(objlist[current_this]),array_offset);
+   new_array = (BYTE *)add_ptr(res.addr(objlist[current_this]),array_offset);
 
-   ptr = (BYTE *)RES.addr(handle);
+   ptr = (BYTE *)res.addr(handle);
 
    switch (*(UWORD *) ptr)
       {
       case ':S':
-         far_memmove(new_array,ptr+2,RES.size(handle)-2L);
+         far_memmove(new_array,ptr+2,res.size(handle)-2L);
          break;
 
       default:
          abend(MSG_SRRLS);
       }
 
-   RES.unlock(handle);
+   res.unlock(handle);
 }
      
 //
@@ -94,58 +93,57 @@ void load_string(LONG argcnt, BYTE *array, ULONG string)
 //
 
 
-void load_resource(LONG argcnt, BYTE *array, ULONG resource)
-#pragma on (unreferenced)
-{
-   HRES handle;
+void load_resource(LONG argcnt, BYTE *array, ULONG resource) {
+	Resources &res = *_vm->_resources;
+	HRES handle;
    ULONG array_offset;
    BYTE *new_array;
 
    // TODO: Double-check removal of FP_OFF
-   array_offset = array - (BYTE *)RES.addr(objlist[current_this]);
+   array_offset = array - (BYTE *)res.addr(objlist[current_this]);
 
-   handle = RES.get_resource_handle(resource,DA_DEFAULT);
+   handle = res.get_resource_handle(resource,DA_DEFAULT);
 
-   RES.lock(handle);
+   res.lock(handle);
 
-   new_array = (BYTE *)add_ptr(RES.addr(objlist[current_this]),array_offset);
+   new_array = (BYTE *)add_ptr(res.addr(objlist[current_this]),array_offset);
 
-   far_memmove(new_array,RES.addr(handle),RES.size(handle));
+   far_memmove(new_array,res.addr(handle),res.size(handle));
 
-   RES.unlock(handle);
+   res.unlock(handle);
 }
 
 
 void copy_string(LONG argcnt, BYTE *src, BYTE *dest)
-#pragma on (unreferenced)
+
 {
    strcpy((char *)dest, (const char *)src);
 }
 
 
 void string_force_lower(LONG argcnt, BYTE *dest)
-#pragma on (unreferenced)
+
 {
    strlwr((char *)dest);
 }
 
 
 void string_force_upper(LONG argcnt, BYTE *dest)
-#pragma on (unreferenced)
+
 {
    strupr((char *)dest);
 }
 
 
 ULONG string_len(LONG argcnt, BYTE *string)
-#pragma on (unreferenced)
+
 {
    return strlen((const char *)string);
 }
 
 
 ULONG string_compare(LONG argcnt, BYTE *str1, BYTE *str2)
-#pragma on (unreferenced)
+
 {
    return scumm_stricmp((const char *)str1, (const char *)str2);
 }
@@ -156,7 +154,7 @@ ULONG string_compare(LONG argcnt, BYTE *str1, BYTE *str2)
 
 
 LONG strval(LONG argcnt, BYTE *string)
-#pragma on (unreferenced)
+
 {
    if (string == NULL)
       return -1L;
@@ -173,7 +171,7 @@ LONG strval(LONG argcnt, BYTE *string)
 
 
 LONG envval(LONG argcnt, BYTE *name)
-#pragma on (unreferenced)
+
 {
 	warning("Refactor uses of getenv");
 	return -1;
@@ -211,21 +209,21 @@ void beep(void)
 
 
 void pokemem(LONG argcnt, LONG *addr, LONG data)
-#pragma on (unreferenced)
+
 {
    *addr = data;
 }
 
 
 LONG peekmem(LONG argcnt, LONG *addr)
-#pragma on (unreferenced)
+
 {
    return *addr;
 }
 
 
 ULONG rnd(LONG argcnt, ULONG low, ULONG high)
-#pragma on (unreferenced)
+
 {
 	error("TODO: Hook up random number generator");
 	/*
@@ -243,7 +241,7 @@ ULONG rnd(LONG argcnt, ULONG low, ULONG high)
 
 
 ULONG dice(LONG argcnt, ULONG ndice, ULONG nsides, ULONG bonus)
-#pragma on (unreferenced)
+
 {
    ULONG n,total;
 
@@ -262,28 +260,28 @@ ULONG inkey(void)
 
 
 ULONG absv(LONG argcnt, LONG val)
-#pragma on (unreferenced)
+
 {
    return (val < 0L) ? -val:val;
 }
 
 
 LONG minv(LONG argcnt, LONG val1, LONG val2)
-#pragma on (unreferenced)
+
 {
    return MIN(val1,val2);
 }
 
 
 LONG maxv(LONG argcnt, LONG val1, LONG val2)
-#pragma on (unreferenced)
+
 {
    return MAX(val1,val2);
 }
 
 
 void diagnose(LONG argcnt, ULONG dtype, ULONG parm)
-#pragma on (unreferenced)
+
 {
    switch (dtype)
       {
@@ -299,7 +297,8 @@ void diagnose(LONG argcnt, ULONG dtype, ULONG parm)
 
 ULONG heapfree(void)
 {
-   return RES._free;
+	Resources &res = *_vm->_resources;
+	return res._free;
 }
 
 } // End of namespace Aesop

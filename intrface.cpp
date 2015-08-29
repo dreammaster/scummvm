@@ -255,7 +255,7 @@ static void mouse_event_handler(LONG px, LONG py)
 /*********************************************************/
 
 static void mouse_button_event_handler(LONG left, LONG right, LONG center)
-#pragma on (unreferenced)
+
 {
    static LONG entry = 0;
 
@@ -340,6 +340,7 @@ void init_interface(void)
 /*********************************************************/
 void shutdown_interface(void)
 {
+	Resources &res = *_vm->_resources;
    union REGS inregs,outregs;
 
    if (!interface_active) return;
@@ -356,7 +357,7 @@ void shutdown_interface(void)
 
    if (pointer_set != (unsigned)-1)
       {
-      RES.unlock(pointer_set);
+      res.unlock(pointer_set);
       }
 }
 
@@ -365,7 +366,8 @@ void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
                              LONG hot_Y, ULONG scale, ULONG fade_table,
                              ULONG fade_level)
 {
-   ND_entry *entry;
+	Resources &res = *_vm->_resources;
+	ND_entry *entry;
 
    if ((wait_ptr_state != 0) && (argcnt != 0))
       {
@@ -392,15 +394,15 @@ void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
       {
       if (pointer_set != (unsigned)-1)
          {
-         RES.unlock(pointer_set);
+         res.unlock(pointer_set);
          }
 
-      if ((entry = RES.search_name_dir(table)) == NULL)
-         pointer_set = RES.get_resource_handle(table,DA_DEFAULT);
+      if ((entry = res.search_name_dir(table)) == NULL)
+         pointer_set = res.get_resource_handle(table,DA_DEFAULT);
       else
          pointer_set = entry->handle;
 
-      RES.lock(pointer_set);
+      res.lock(pointer_set);
 
       pointer_set_entry = table;
       }
@@ -412,13 +414,13 @@ void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
 
    ptr_valid = 1;
 
-   mouse_set_pointer(RES.addr(pointer_set),pointer_num,hot_X,hot_Y);
+   mouse_set_pointer(res.addr(pointer_set),pointer_num,hot_X,hot_Y);
 }
 
 /*********************************************************/
 
 void set_wait_pointer(LONG argcnt, ULONG number, LONG hot_X, LONG hot_Y)
-#pragma on (unreferenced)
+
 {
    if (number == -1L)
       {
@@ -529,7 +531,7 @@ ULONG mouse_XY(void)
 
 
 ULONG mouse_in_window(LONG argcnt, ULONG wnd)
-#pragma on (unreferenced)
+
 {
    ULONG stat;
 
@@ -551,7 +553,7 @@ ULONG mouse_in_window(LONG argcnt, ULONG wnd)
 
 
 void refresh_window(LONG argcnt, ULONG src, ULONG target)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_refresh_window(src, target);
 }

@@ -224,7 +224,7 @@ void release_owned_windows(LONG owner)
 /*********************************************************/
 
 void draw_dot(LONG argcnt, ULONG page, ULONG x, ULONG y, ULONG color)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_draw_dot(lastg_p=page, lastg_x=x, lastg_y=y, color);
 }
@@ -232,7 +232,7 @@ void draw_dot(LONG argcnt, ULONG page, ULONG x, ULONG y, ULONG color)
 /*********************************************************/
 
 void draw_line(LONG argcnt, ULONG page, ULONG x1, ULONG y1, ULONG x2, ULONG y2,
-#pragma on (unreferenced)
+
    ULONG color)
 {
    GIL2VFX_draw_line(lastg_p=page, x1, y1, lastg_x=x2, lastg_y=y2, color);
@@ -241,7 +241,7 @@ void draw_line(LONG argcnt, ULONG page, ULONG x1, ULONG y1, ULONG x2, ULONG y2,
 /*********************************************************/
 
 void line_to(LONG argcnt, ULONG x, ULONG y, ULONG color, ...)
-#pragma on (unreferenced)
+
 {
    ULONG i;
    va_list argptr;
@@ -268,7 +268,7 @@ void line_to(LONG argcnt, ULONG x, ULONG y, ULONG color, ...)
 
 void draw_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
                           LONG y2, ULONG color)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_draw_rect(wndnum,x1,y1,x2,y2,color);
 }
@@ -277,7 +277,7 @@ void draw_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
 
 void fill_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
                           LONG y2, ULONG color)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_fill_rect(wndnum,x1,y1,x2,y2,color);
 }
@@ -286,7 +286,7 @@ void fill_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
 
 void hash_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
                           LONG y2, ULONG color)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_hash_rect(wndnum,x1,y1,x2,y2,color);
 }
@@ -614,7 +614,7 @@ ULONG read_palette(LONG argcnt, ULONG regnum) {
 /*********************************************************/
 
 void write_palette(LONG argcnt, ULONG regnum, ULONG value)
-#pragma on (unreferenced)
+
 {
    RGB triplet;
 
@@ -628,7 +628,7 @@ void write_palette(LONG argcnt, ULONG regnum, ULONG value)
 /*********************************************************/
 
 void pixel_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd, ULONG intervals)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_pixel_fade(src_wnd,dest_wnd,intervals);
 }
@@ -636,7 +636,7 @@ void pixel_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd, ULONG intervals)
 /*********************************************************/
 
 void color_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_color_fade(src_wnd,dest_wnd);
 }
@@ -644,7 +644,7 @@ void color_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd)
 /*********************************************************/
 
 void light_fade(LONG argcnt, ULONG src_wnd, ULONG color)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_light_fade(src_wnd,color);
 }
@@ -653,7 +653,7 @@ void light_fade(LONG argcnt, ULONG src_wnd, ULONG color)
 
 ULONG assign_window(LONG argcnt, ULONG owner, ULONG x1, ULONG y1,
                           ULONG x2, ULONG y2)
-#pragma on (unreferenced)
+
 {
    LONG window;
 
@@ -668,7 +668,7 @@ ULONG assign_window(LONG argcnt, ULONG owner, ULONG x1, ULONG y1,
 
 ULONG assign_subwindow(LONG argcnt, ULONG owner, ULONG parent,
                              ULONG x1, ULONG y1, ULONG x2, ULONG y2)
-#pragma on (unreferenced)
+
 {
    LONG window;
 
@@ -682,7 +682,7 @@ ULONG assign_subwindow(LONG argcnt, ULONG owner, ULONG parent,
 /*********************************************************/
 
 void release_window(LONG argcnt, ULONG window)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_release_window(window);
    window_owner[window] = -1;
@@ -691,7 +691,7 @@ void release_window(LONG argcnt, ULONG window)
 /*********************************************************/
 
 ULONG get_x1(LONG argcnt, ULONG window)
-#pragma on (unreferenced)
+
 {
    return GIL2VFX_get_x1(window);
 }
@@ -699,7 +699,7 @@ ULONG get_x1(LONG argcnt, ULONG window)
 /*********************************************************/
 
 ULONG get_x2(LONG argcnt, ULONG window)
-#pragma on (unreferenced)
+
 {
    return GIL2VFX_get_x2(window);
 }
@@ -707,7 +707,7 @@ ULONG get_x2(LONG argcnt, ULONG window)
 /*********************************************************/
 
 ULONG get_y1(LONG argcnt, ULONG window)
-#pragma on (unreferenced)
+
 {
    return GIL2VFX_get_y1(window);
 }
@@ -715,7 +715,7 @@ ULONG get_y1(LONG argcnt, ULONG window)
 /*********************************************************/
 
 ULONG get_y2(LONG argcnt, ULONG window)
-#pragma on (unreferenced)
+
 {
    return GIL2VFX_get_y2(window);
 }
@@ -723,7 +723,7 @@ ULONG get_y2(LONG argcnt, ULONG window)
 /*********************************************************/
 
 void set_x1(LONG argcnt, ULONG window, ULONG x1)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_set_x1(window,x1);
 }
@@ -731,7 +731,7 @@ void set_x1(LONG argcnt, ULONG window, ULONG x1)
 /*********************************************************/
 
 void set_x2(LONG argcnt, ULONG window, ULONG x2)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_set_x2(window,x2);
 }
@@ -739,7 +739,7 @@ void set_x2(LONG argcnt, ULONG window, ULONG x2)
 /*********************************************************/
 
 void set_y1(LONG argcnt, ULONG window, ULONG y1)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_set_y1(window,y1);
 }
@@ -747,7 +747,7 @@ void set_y1(LONG argcnt, ULONG window, ULONG y1)
 /*********************************************************/
 
 void set_y2(LONG argcnt, ULONG window, ULONG y2)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_set_y2(window,y2);
 }
@@ -755,7 +755,7 @@ void set_y2(LONG argcnt, ULONG window, ULONG y2)
 /*********************************************************/
 
 void wipe_window(LONG argcnt, ULONG window, ULONG color)
-#pragma on (unreferenced)
+
 {
    GIL2VFX_wipe_window(window,color);
 }
@@ -763,7 +763,7 @@ void wipe_window(LONG argcnt, ULONG window, ULONG color)
 /*********************************************************/
 
 void text_window(LONG argcnt, ULONG wndnum, ULONG wnd)
-#pragma on (unreferenced)
+
 {
    tw[wndnum].window = wnd;
 }
@@ -804,7 +804,7 @@ void text_style(LONG argcnt, ULONG wndnum, ULONG font,
 /*********************************************************/
 
 void text_xy(LONG argcnt, ULONG wndnum, ULONG htab, ULONG vtab)
-#pragma on (unreferenced)
+
 {
    tw[wndnum].htab = htab;
    tw[wndnum].vtab = vtab;
@@ -813,7 +813,7 @@ void text_xy(LONG argcnt, ULONG wndnum, ULONG htab, ULONG vtab)
 /*********************************************************/
 
 LONG get_text_x(LONG argcnt, ULONG wndnum)
-#pragma on (unreferenced)
+
 {
    return tw[wndnum].htab;
 }
@@ -821,7 +821,7 @@ LONG get_text_x(LONG argcnt, ULONG wndnum)
 /*********************************************************/
 
 LONG get_text_y(LONG argcnt, ULONG wndnum)
-#pragma on (unreferenced)
+
 {
    return tw[wndnum].vtab;
 }
@@ -829,7 +829,7 @@ LONG get_text_y(LONG argcnt, ULONG wndnum)
 /*********************************************************/
 
 void home(LONG argcnt, ULONG wndnum)
-#pragma on (unreferenced)
+
 {
 	Resources &res = *_vm->_resources;
 	HRES hfont;
@@ -846,7 +846,7 @@ void home(LONG argcnt, ULONG wndnum)
 /*********************************************************/
 
 void text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG newColor)
-#pragma on (unreferenced)
+
 {
 	Resources &res = *_vm->_resources;
 	HRES hfont;
@@ -863,7 +863,7 @@ void text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG newColor)
 /*********************************************************/
 
 void text_refresh_window(LONG argcnt, ULONG wndnum, LONG wnd)
-#pragma on (unreferenced)
+
 {
    tw_refresh[wndnum] = wnd;
 }
@@ -879,7 +879,7 @@ void text_refresh_window(LONG argcnt, ULONG wndnum, LONG wnd)
 
 
 void vsprint(LONG argcnt, ULONG wndnum, const char *format, va_list argptr)
-#pragma on (unreferenced)
+
 {
 	Resources &res = *_vm->_resources;
 	HRES hfont, str;

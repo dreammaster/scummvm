@@ -646,6 +646,7 @@ ND_entry *Resources::search_name_dir(ULONG resource) {
 }
 
 HRES Resources::create_instance(ULONG object) {
+	Resources &res = *_vm->_resources;
 	HRES thunk, instance;
 	HD_entry *sel;
 	ND_entry *entry;
@@ -655,7 +656,7 @@ HRES Resources::create_instance(ULONG object) {
 	entry = search_name_dir(object);
 
 	if ((entry == NULL) || (entry->thunk == (HRES)-1)) {
-		thunk = RES.construct_thunk(_vm->_linkResources, object);
+		thunk = res.construct_thunk(_vm->_linkResources, object);
 		search_name_dir(object)->thunk = thunk;
 	} else {
 		thunk = (HRES)entry->thunk;

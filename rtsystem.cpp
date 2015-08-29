@@ -257,7 +257,8 @@ void abend(const char *msg, ...)
 /***************************************************/
 
 TF_class *TF_construct(const char *filename, WORD oflag) {
-   TF_class *TF;
+	Resources &res = *_vm->_resources;
+	TF_class *TF;
    HRES hbuf;
    /*
    WORD file;
@@ -273,7 +274,7 @@ TF_class *TF_construct(const char *filename, WORD oflag) {
    Common::File f;
    f.open((const char *)filename);
 
-   hbuf = RES.alloc(TF_BUFSIZE,DA_FIXED | DA_PRECIOUS);
+   hbuf = res.alloc(TF_BUFSIZE,DA_FIXED | DA_PRECIOUS);
    if (hbuf == (HRES)-1)
 	   return NULL;
 
@@ -281,7 +282,7 @@ TF_class *TF_construct(const char *filename, WORD oflag) {
 
    TF->file = f.readStream(f.size());
    TF->hbuf = hbuf;
-   TF->buffer = (BYTE *)RES.addr(TF->hbuf);
+   TF->buffer = (BYTE *)res.addr(TF->hbuf);
    TF->p = 0;
    TF->mode = oflag;
    TF->len = f.size();
@@ -304,7 +305,8 @@ TF_class *TF_construct(const char *filename, WORD oflag) {
 
 WORD TF_destroy(TF_class *TF)
 {
-   WORD e,f;
+	Resources &res = *_vm->_resources;
+	WORD e,f;
 
    e = f = TF->p;
    /*
@@ -314,7 +316,7 @@ WORD TF_destroy(TF_class *TF)
    */
    delete TF->file;
 
-   RES.free(TF->hbuf);
+   res.free(TF->hbuf);
    mem_free(TF);
 
    return (e == f);

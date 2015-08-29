@@ -498,7 +498,7 @@ void dump_event_queue(void)
 
 void notify(LONG argcnt, ULONG index, ULONG message, LONG event,
    LONG parameter)
-#pragma on (unreferenced)
+
 {
    add_notify_request(index, message, event, parameter);
 }
@@ -512,7 +512,7 @@ void notify(LONG argcnt, ULONG index, ULONG message, LONG event,
 
 void cancel(LONG argcnt, ULONG index, ULONG message, LONG event,
    LONG parameter)
-#pragma on (unreferenced)
+
 {
    delete_notify_request(index, message, event, parameter);
 }
@@ -642,7 +642,7 @@ void drain_event_queue(void)
 
 
 void post_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
-#pragma on (unreferenced)
+
 {
    add_event(event,parameter,owner);
 }
@@ -656,7 +656,7 @@ void post_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
 
 
 void send_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
-#pragma on (unreferenced)
+
 {
    add_event(event,parameter,owner);
    drain_event_queue();
@@ -671,7 +671,7 @@ void send_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
 
 
 void flush_event_queue(LONG argcnt, LONG owner, LONG event, LONG parameter)
-#pragma on (unreferenced)
+
 {
    remove_event(event,parameter,owner);
 }

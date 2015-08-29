@@ -78,7 +78,6 @@ public:
 
 extern AesopEngine *_vm;
 
-#define RES (*_vm->_resources)
 #define LNK (*_vm->_linkResources)
 
 } // End of namespace Aesop
