@@ -35,9 +35,9 @@ void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def) {
 	error("TODO: Reimplement ASM as CPP code");
 }
 
-BYTE *RTD_lookup(HRES dictionary, const Common::String &key) {
-	void *es32 = static_cast<HD_entry *>(dictionary)->_seg;
-	int hashSize = READ_LE_UINT32(es32);
+const char *RTD_lookup(HRES dictionary, const Common::String &key) {
+	const byte *es32 = (byte *)static_cast<HD_entry *>(dictionary)->_seg;
+	int hashSize = READ_LE_UINT16(es32);
 
 	// Calculate the hash for the key
 	const char *keyP = key.c_str();
@@ -46,25 +46,26 @@ BYTE *RTD_lookup(HRES dictionary, const Common::String &key) {
 		hashTotal += *keyP++;
 	int hash = hashTotal % hashSize;
 
-	// Get the entry, and check whether there's any resources in that slot
-	byte *entryOffset = (byte *)es32 + hash * 4;
-	uint32 v = READ_LE_UINT32(entryOffset + 2);
-	if (!v)
+	// Get the entry, and check whether there's any resource names in that slot
+	uint32 namesOffset = READ_LE_UINT32(es32 + hash * 4 + 2);
+	if (!namesOffset)
 		return nullptr;
 
 	// Scan through the list of names with that hash to see if our resource is one of them
-	int keySize = key.size();
+	const char *names = (const char *)es32 + namesOffset;
+	int keySize = key.size() + 1;
 	int nameLen;
 	for (;;) {
-		nameLen = READ_LE_UINT16(entryOffset);
+		nameLen = READ_LE_UINT16(names);
 		if (!nameLen)
 			break;
 
-		if (keySize == nameLen && !strncmp(keyP, (const char *)(entryOffset + 2), keySize))
+		if (keySize == nameLen && !strcmp(key.c_str(), (const char *)(names + 2)))
 			// Found a name match
-			return (BYTE *)entryOffset + 2;
+			return names + 2 + nameLen + 2;
 
-		entryOffset += keySize + 2;
+		names += nameLen + 2;
+		names += READ_LE_UINT16(names) + 2;
 	}
 
 	// At this point, the key wasn't found, so return nothing
