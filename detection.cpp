@@ -27,14 +27,21 @@
 
 namespace Aesop {
 
+#define GAMEOPTION_AESOP32	GUIO_GAMEOPTIONS1
+
 struct AesopGameDescription {
 	ADGameDescription desc;
 
 	GameType gameID;
+	uint32 flags;
 };
 
 GameType AesopEngine::getGameID() const {
 	return _gameDescription->gameID;
+}
+
+bool AesopEngine::isAesop32() const {
+	return (bool)(_gameDescription->flags & GF_AESOP32);
 }
 
 } // End of namespace Aesop

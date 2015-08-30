@@ -23,8 +23,9 @@
 namespace Aesop {
 
 static const AesopGameDescription gameDescriptions[] = {
+#if 0
 	{
-		// Eye of the Beholder 3 - English
+		// Eye of the Beholder 3 - GOG.com English
 		{
 			"eob3",
 			0,
@@ -35,6 +36,22 @@ static const AesopGameDescription gameDescriptions[] = {
 			GUIO0()
 		},
 		GType_EOB3,
+		0
+	},
+#endif
+	{
+		// Eye of the Beholder 3 - AESOP32 Converted English
+		{
+			"eob3",
+			"AESOP32",
+			AD_ENTRY1s("eye.res", "e8e432b6c9f9ec1ae51eea44c1407750", 6845234),
+			Common::EN_ANY,
+			Common::kPlatformDOS,
+			ADGF_UNSTABLE,
+			GUIO0()
+		},
+		GType_EOB3,
+		GF_AESOP32
 	},
 
 	{
@@ -49,9 +66,10 @@ static const AesopGameDescription gameDescriptions[] = {
 			GUIO0()
 		},
 		GType_DungeonHack,
+		0
 	},
 
-	{ AD_TABLE_END_MARKER, (GameType)0 }
+	{ AD_TABLE_END_MARKER, (GameType)0, 0 }
 };
 
 } // End of namespace Aesop

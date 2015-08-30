@@ -45,6 +45,10 @@ enum GameType {
 	GType_DungeonHack = 1
 };
 
+enum AesopGameFeatures {
+	GF_AESOP32 = 1 << 0
+};
+
 #define AESOP_SCREEN_WIDTH 320
 #define AESOP_SCREEN_HEIGHT 200
 
@@ -83,6 +87,7 @@ public:
 
 	GameType getGameID() const;
 	bool hasFeature(EngineFeature f) const;
+	bool isAesop32() const;
 
 	int getRandomNumber(int max);
 };
