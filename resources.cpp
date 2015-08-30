@@ -67,6 +67,36 @@ void RF_file_hdr::load(Common::SeekableReadStream &s) {
 
 /*----------------------------------------------------------------*/
 
+OD_block::OD_block() {
+	_next = 0;
+	Common::fill(&_flags[0], &_flags[OD_SIZE], 0);
+	Common::fill(&_index[0], &_index[OD_SIZE], 0);
+}
+
+void OD_block::load(Common::SeekableReadStream &s) {
+	_next = s.readUint32LE();
+	for (int idx = 0; idx < OD_SIZE; ++idx)
+		_flags[idx] = s.readByte();
+	for (int idx = 0; idx < OD_SIZE; ++idx)
+		_index[idx] = s.readUint32LE();
+}
+
+/*----------------------------------------------------------------*/
+
+RF_entry_hdr::RF_entry_hdr() {
+	_timestamp = 0;
+	_dataAttrib = 0;
+	_dataSize = 0;
+}
+
+void RF_entry_hdr::load(Common::SeekableReadStream &s) {
+	_timestamp = s.readUint32LE();
+	_dataAttrib = s.readUint32LE();
+	_dataSize = s.readUint32LE();
+}
+
+/*----------------------------------------------------------------*/
+
 Resources::Resources(AesopEngine *vm): _vm(vm) {
 	const Common::String filename = vm->getGameID() == GType_EOB3 ? "eye.res" : "hack.res";
 	void *beg,*end;
@@ -359,22 +389,20 @@ ULONG Resources::seek(ULONG rnum) {
 
 		do {
 			_file.seek(next, SEEK_SET);
-			error("TODO: OD_block::load");
-			//read(_file,&_OD,sizeof(OD_block));
-			next = _OD.next;
+			_OD.load(_file);
+			next = _OD._next;
 
 			PollMod();
 		} while (dirblk--);
 	}
 
-	_file.seek(_OD.index[dirent], SEEK_SET);
-	error("TODO: RF_entry_hdr::load");
-	//read(_file,&_REH,sizeof(RF_entry_hdr));
+	_file.seek(_OD._index[dirent], SEEK_SET);
+	_REH.load(_file);
 
-	if (_REH.data_attrib & DA_PLACEHOLDER)
+	if (_REH._dataAttrib & DA_PLACEHOLDER)
 		return 0;
 
-	return _REH.data_size;
+	return _REH._dataSize;
 }
 
 void Resources::read(HRES entry) {
@@ -560,8 +588,8 @@ HRES Resources::load_resource(ULONG resource, ULONG attrib) {
 	if (!seek(resource))
 		return (HRES)-1;
 
-	entry = alloc(_REH.data_size,
-		(attrib == DA_DEFAULT) ? _REH.data_attrib : attrib);
+	entry = alloc(_REH._dataSize,
+		(attrib == DA_DEFAULT) ? _REH._dataAttrib : attrib);
 
 	if (entry != (HRES)-1) {
 		sel = (HD_entry *)entry;

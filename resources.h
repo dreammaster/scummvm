@@ -95,15 +95,29 @@ struct RF_file_hdr {
 
 // resource file entry header
 struct RF_entry_hdr {
-   ULONG timestamp;
-   ULONG data_attrib;
-   ULONG data_size;
+   ULONG _timestamp;
+   ULONG _dataAttrib;
+   ULONG _dataSize;
+
+   RF_entry_hdr();
+
+   /**
+    * Load header data from the passed stream
+	*/
+   void load(Common::SeekableReadStream &s);
 };
 
 struct OD_block {
-   ULONG next;
-   UBYTE flags[OD_SIZE];
-   ULONG index[OD_SIZE];
+	ULONG _next;
+   UBYTE _flags[OD_SIZE];
+   ULONG _index[OD_SIZE];
+
+   OD_block();
+
+   /**
+    * Load header data from the passed stream
+	*/
+   void load(Common::SeekableReadStream &s);
 };
 
 // name directory entry
