@@ -341,7 +341,7 @@ HRES Resources::new_entry() {
 	n = _nentries;
 
 	if (n >= (unsigned)(-DIR_BLK))
-		return (HRES)-1;
+		return HRES_NULL;
 
 	for (i = 0; i < n; ++i) {
 		f = _dir[i]._flags;
@@ -351,7 +351,7 @@ HRES Resources::new_entry() {
 	}
 
 	if (!make_room(SIZE_DB))
-		return (HRES)-1;
+		return HRES_NULL;
 
 	for (i = 0; i < n; i++) {
 		if (_dir[i]._flags & (DA_DISCARDED | DA_FIXED))
@@ -432,11 +432,11 @@ HRES Resources::alloc(ULONG bytes, ULONG attrib) {
 	HD_entry *sel;
 
 	entry = new_entry();
-	if (entry == (HRES)-1)
-		return (HRES)-1;
+	if (entry == HRES_NULL)
+		return HRES_NULL;
 
 	if (!assign_space(bytes, attrib, entry))
-		return (HRES)-1;
+		return HRES_NULL;
 
 	sel = (HD_entry *)entry;
 	sel->_user = (ULONG)-1;
@@ -449,7 +449,7 @@ void Resources::free(HRES entry) {
 	HD_entry *sel;
 	ND_entry *dir;
 
-	if (entry == (HRES)-1)
+	if (entry == HRES_NULL)
 		return;
 
 	sel = (HD_entry *)entry;
@@ -461,7 +461,7 @@ void Resources::free(HRES entry) {
 		if (dir->handle == entry)
 			dir->handle = 0;
 		else if (dir->thunk == entry)
-			dir->thunk = (HRES)-1;
+			dir->thunk = HRES_NULL;
 	}
 
 	if (!(sel->_flags & DA_FIXED))
@@ -470,7 +470,7 @@ void Resources::free(HRES entry) {
 			(!(sel->_flags & DA_DISCARDED)) &&
 			((ULONG)sel->_seg + sel->_size == (ULONG)_next_M)
 		) {
-			discard((entry - (ULONG)_dir) / sizeof(HD_entry), 1);
+			discard(((byte *)entry - (byte *)_dir) / sizeof(HD_entry), 1);
 
 			n = _nentries;
 			for (i = 0; i < n; i++)
@@ -586,12 +586,12 @@ HRES Resources::load_resource(ULONG resource, ULONG attrib) {
 	HRES entry;
 
 	if (!seek(resource))
-		return (HRES)-1;
+		return HRES_NULL;
 
 	entry = alloc(_REH._dataSize,
 		(attrib == DA_DEFAULT) ? _REH._dataAttrib : attrib);
 
-	if (entry != (HRES)-1) {
+	if (entry != HRES_NULL) {
 		sel = (HD_entry *)entry;
 
 #if FAST_LOCK
@@ -645,10 +645,10 @@ HRES Resources::get_resource_handle(ULONG resource, ULONG attrib) {
 
 		dir->OE = resource;
 		dir->handle = load_resource(resource, attrib);
-		dir->thunk = (HRES)-1;
+		dir->thunk = HRES_NULL;
 	}
 
-	if (dir->handle == (HRES)-1)
+	if (dir->handle == HRES_NULL)
 		dir->handle = 0;
 
 	return dir->handle;
@@ -703,7 +703,7 @@ HRES Resources::create_instance(ULONG object) {
 
 	entry = search_name_dir(object);
 
-	if ((entry == NULL) || (entry->thunk == (HRES)-1)) {
+	if ((entry == NULL) || (entry->thunk == HRES_NULL)) {
 		thunk = res.construct_thunk(_vm->_linkResources, object);
 		search_name_dir(object)->thunk = thunk;
 	} else {

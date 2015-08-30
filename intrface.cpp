@@ -305,7 +305,7 @@ void init_interface(void)
 
    if (outregs.w.ax == 0xffff)
       {
-      pointer_set = (unsigned)-1;
+      pointer_set = HRES_NULL;
       pointer_set_entry = (ULONG)-1;
       ptr_valid = 0;
       wait_ptr_valid = 0;
@@ -355,7 +355,7 @@ void shutdown_interface(void)
    inregs.w.ax = 0;
    int386(0x33,&inregs,&outregs);
 
-   if (pointer_set != (unsigned)-1)
+   if (pointer_set != HRES_NULL)
       {
       res.unlock(pointer_set);
       }
@@ -392,7 +392,7 @@ void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
 
    if (table != pointer_set_entry)
       {
-      if (pointer_set != (unsigned)-1)
+      if (pointer_set != HRES_NULL)
          {
          res.unlock(pointer_set);
          }

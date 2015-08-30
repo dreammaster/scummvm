@@ -787,7 +787,7 @@ void text_style(LONG argcnt, ULONG wndnum, ULONG font,
 
 	hfont = (HRES)tw[wndnum].font;
 
-	if (hfont != (HRES)-1)
+	if (hfont != HRES_NULL)
 	{
 		res.unlock(hfont);
 	}

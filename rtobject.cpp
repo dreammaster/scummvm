@@ -67,7 +67,7 @@ void init_object_list(void) {
    LONG i;
 
    for (i=0;i<NUM_OBJECTS;i++)
-      objlist[i] = (HRES)-1;
+      objlist[i] = HRES_NULL;
 }
 
 /***************************************************/
@@ -82,7 +82,7 @@ LONG find_free_entry(LONG min, LONG end)
    LONG i;
 
    for (i=min;i<end;i++)
-      if (objlist[i] == (HRES)-1)
+      if (objlist[i] == HRES_NULL)
          break;
 
    if (i == end)
@@ -172,7 +172,7 @@ LONG destroy_object(LONG argcnt, LONG index)
 
    res.destroy_instance(objlist[index]);
 
-   objlist[index] = (HRES)-1;
+   objlist[index] = HRES_NULL;
 
    return rtn;
 }
@@ -186,7 +186,8 @@ LONG destroy_object(LONG argcnt, LONG index)
 void thrash_cache(void)
 {
 	Resources &res = *_vm->_resources;
-	LONG i, handles[50];
+	LONG i;
+	HRES handles[50];
 
    for (i=0;i<3;i++)
       {
@@ -244,7 +245,7 @@ void dump_static_context(ULONG index, TF_class *TF)
 
    instance = objlist[index];
 
-   if (instance == (HRES)-1)
+   if (instance == HRES_NULL)
       {
       strcat(linbuf,"Available");
       TF_writeln(TF, linbuf);
@@ -602,7 +603,7 @@ LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
          CD.slot = index;
 
          instance = objlist[index];
-         if (instance == (HRES)-1)
+         if (instance == HRES_NULL)
             {
             CD.name = (ULONG)-1;
             CD.size = 0;
@@ -739,7 +740,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 
       if (CD->name == (ULONG) -1L)
          {
-         if (cur != -1)
+			 if (cur != HRES_NULL)
             {
             destroy_object(0,index);
             }
@@ -747,7 +748,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
          continue;
          }
 
-      if (cur != -1)
+	  if (cur != HRES_NULL)
          {
          sel = (HD_entry *) cur;
 
@@ -763,7 +764,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
             }
          }
 
-      if (objlist[index] == (HRES)-1)
+      if (objlist[index] == HRES_NULL)
          {
          create_SOP_instance(CD->name,index);
          }

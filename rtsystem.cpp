@@ -275,7 +275,7 @@ TF_class *TF_construct(const char *filename, WORD oflag) {
    f.open((const char *)filename);
 
    hbuf = res.alloc(TF_BUFSIZE,DA_FIXED | DA_PRECIOUS);
-   if (hbuf == (HRES)-1)
+   if (hbuf == HRES_NULL)
 	   return NULL;
 
    TF = (TF_class *)mem_alloc(sizeof(TF_class));

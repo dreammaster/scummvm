@@ -41,8 +41,9 @@ typedef signed char BYTE;
 typedef long LONG;
 #endif
 
-typedef ULONG HRES;           // run-time resource handle
+typedef void *HRES;           // run-time resource handle
 typedef UWORD HSTR;           // run-time len-prefixed string descriptor
+#define HRES_NULL (HRES)-1
 
 #define MSG_CREATE  0         // predefined message tokens (sent by system)
 #define MSG_DESTROY 1
