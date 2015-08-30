@@ -36,7 +36,39 @@ void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def) {
 }
 
 BYTE *RTD_lookup(HRES dictionary, const Common::String &key) {
-	error("TODO: Reimplement ASM as CPP code");
+	void *es32 = static_cast<HD_entry *>(dictionary)->_seg;
+	int hashSize = READ_LE_UINT32(es32);
+
+	// Calculate the hash for the key
+	const char *keyP = key.c_str();
+	int hashTotal = 0;
+	while (*keyP)
+		hashTotal += *keyP++;
+	int hash = hashTotal % hashSize;
+
+	// Get the entry, and check whether there's any resources in that slot
+	byte *entryOffset = (byte *)es32 + hash * 4;
+	uint32 v = READ_LE_UINT32(entryOffset + 2);
+	if (!v)
+		return nullptr;
+
+	// Scan through the list of names with that hash to see if our resource is one of them
+	int keySize = key.size();
+	int nameLen;
+	for (;;) {
+		nameLen = READ_LE_UINT16(entryOffset);
+		if (!nameLen)
+			break;
+
+		if (keySize == nameLen && !strncmp(keyP, (const char *)(entryOffset + 2), keySize))
+			// Found a name match
+			return (BYTE *)entryOffset + 2;
+
+		entryOffset += keySize + 2;
+	}
+
+	// At this point, the key wasn't found, so return nothing
+	return nullptr;
 }
 
 void RT_init(Resources *RTR, ULONG stack_size, HRES *objlist) {
