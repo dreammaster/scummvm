@@ -41,12 +41,10 @@ AesopEngine::AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc) :
 		Engine(syst), _gameDescription(gameDesc), _randomSource("Aesop") {
 	_vm = this;
 	_resources = nullptr;
-	_linkResources = nullptr;
 }
 
 AesopEngine::~AesopEngine() {
 	delete _resources;
-	delete _linkResources;
 }
 
 void AesopEngine::initialize() {

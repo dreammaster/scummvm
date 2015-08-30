@@ -22,6 +22,7 @@
 
 #include "common/scummsys.h"
 #include "common/file.h"
+#include "common/memstream.h"
 #include "common/textconsole.h"
 #include "aesop/aesop.h"
 #include "aesop/defs.h"
@@ -93,6 +94,22 @@ void RF_entry_hdr::load(Common::SeekableReadStream &s) {
 	_timestamp = s.readUint32LE();
 	_dataAttrib = s.readUint32LE();
 	_dataSize = s.readUint32LE();
+}
+
+/*----------------------------------------------------------------*/
+
+PRG_HDR::PRG_HDR() {
+	_staticSize = 0;
+	_imports = 0;
+	_exports = 0;
+	_parent = 0;
+}
+
+void PRG_HDR::load(Common::SeekableReadStream &s) {
+	_staticSize = s.readUint16LE();
+	_imports = s.readUint32LE();
+	_exports = s.readUint32LE();
+	_parent = s.readUint32LE();
 }
 
 /*----------------------------------------------------------------*/
@@ -704,7 +721,7 @@ HRES Resources::create_instance(ULONG object) {
 	entry = search_name_dir(object);
 
 	if ((entry == NULL) || (entry->thunk == HRES_NULL)) {
-		thunk = res.construct_thunk(_vm->_linkResources, object);
+		thunk = res.construct_thunk(&res, object);
 		search_name_dir(object)->thunk = thunk;
 	} else {
 		thunk = (HRES)entry->thunk;
@@ -803,18 +820,19 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 		lock(code[depth]);
 
-		prg = *(PRG_HDR *)addr(code[depth]);
+		Common::MemoryReadStream prgStream((const byte *)addr(code[depth]), 14);
+		prg.load(prgStream);
 
 		++thdr.nprgs;
 		tsize += sizeof(SD_entry);
 		XR_list += sizeof(SD_entry);
 
-		exports[depth] = prg.exports;
+		exports[depth] = prg._exports;
 
-		impt[depth] = lnk->get_resource_handle(prg.imports, DA_TEMPORARY | DA_EVANESCENT);
+		impt[depth] = lnk->get_resource_handle(prg._imports, DA_TEMPORARY | DA_EVANESCENT);
 		lnk->lock(impt[depth]);
 
-		expt[depth] = lnk->get_resource_handle(prg.exports, DA_TEMPORARY | DA_EVANESCENT);
+		expt[depth] = lnk->get_resource_handle(prg._exports, DA_TEMPORARY | DA_EVANESCENT);
 		lnk->lock(expt[depth]);
 
 		//
@@ -862,10 +880,10 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 			}
 		}
 
-		s_S[depth] += prg.static_size;
-		thdr.isize += prg.static_size;
+		s_S[depth] += prg._staticSize;
+		thdr.isize += prg._staticSize;
 
-		class1 = prg.parent;
+		class1 = prg._parent;
 
 		if (++depth == MAX_G)
 			abend(MSG_AILE);           // "AESOP inheritance limit exceeded"
@@ -941,11 +959,11 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 					xprg = *(PRG_HDR *)addr(xcode);
 
-					xclass = xprg.parent;
+					xclass = xprg._parent;
 
 					if (!found)
 					{
-						xexpt = lnk->get_resource_handle(xprg.exports,
+						xexpt = lnk->get_resource_handle(xprg._exports,
 							DA_TEMPORARY | DA_EVANESCENT);
 
 						lnk->lock(xexpt);
@@ -961,7 +979,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 						unlock(xexpt);
 					}
 					else {
-						index += xprg.static_size;
+						index += xprg._staticSize;
 					}
 
 					unlock(xcode);

@@ -137,6 +137,23 @@ struct XDR_entry {
 	UWORD offset;
 };
 
+
+// SOP program header
+struct PRG_HDR {
+	UWORD _staticSize;
+	ULONG _imports;
+	ULONG _exports;
+	ULONG _parent;
+
+	PRG_HDR();
+
+	/**
+	 * Load header data from the passed stream
+	 */
+	void load(Common::SeekableReadStream &s);
+};
+
+
 //
 // RTR_member macro allows access to HD_entry structure members
 //

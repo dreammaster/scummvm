@@ -75,7 +75,6 @@ private:
 public:
 	const AesopGameDescription *_gameDescription;
 	Resources *_resources;
-	Resources *_linkResources;
 public:
 	AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc);
 	virtual ~AesopEngine();

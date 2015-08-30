@@ -29,6 +29,8 @@
 #ifndef AESOP_DEFS_H
 #define AESOP_DEFS_H
 
+#include "common/stream.h"
+
 namespace Aesop {
 
 #ifndef TYPEDEFS
@@ -64,14 +66,6 @@ struct THDR {
    UWORD nprgs;
    UWORD isize;
    UWORD use_cnt;
-};
-
-// SOP program header
-struct PRG_HDR {
-   UWORD static_size;
-   ULONG imports;
-   ULONG exports;
-   ULONG parent;
 };
 
 // Message handler header

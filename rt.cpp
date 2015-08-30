@@ -27,7 +27,7 @@ namespace Aesop {
 
 ULONG current_this;
 
-void *RTD_first(void *dictionary) {
+void *RTD_first(HRES dictionary) {
 	error("TODO: Reimplement ASM as CPP code");
 }
 
