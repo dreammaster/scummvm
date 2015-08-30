@@ -27,8 +27,12 @@ namespace Aesop {
 
 ULONG current_this;
 
-void *RTD_first(HRES dictionary) {
-	error("TODO: Reimplement ASM as CPP code");
+uint RTD_first(HRES dictionary) {
+	// Skip over hash table
+	const byte *srcP = (const byte *)dictionary + READ_LE_UINT16(dictionary) * 4 + 2;
+
+	int nameLen = READ_LE_UINT16(srcP);
+	return !nameLen ? 0 : srcP - (const byte *)dictionary;
 }
 
 void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def) {

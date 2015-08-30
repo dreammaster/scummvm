@@ -63,7 +63,7 @@ extern ULONG current_index;
 
 // Assorted speed-critical .ASM routines
 
-extern void *RTD_first(HRES dictionary);
+extern uint RTD_first(HRES dictionary);
 extern void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def);
 
 extern const char *RTD_lookup(HRES dictionary, const Common::String &key);
