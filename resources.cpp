@@ -779,14 +779,15 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 	UWORD SD_offset[MAX_G];
 	UWORD index, offset, found;
 	UWORD XR_list;
-	SD_entry *SD, *SDarray;
+	SD_entry *SDarray;
 	MV_entry *MV;
-	void *XR;
+	uint SD, XR;
 	XDR_entry *xdr_ptr;
 
 	void *thunk_ptr;
 	ULONG def_off;
-	ULONG *XR_ptr, *CR_ptr;
+	const FARPROC *CR_ptr;
+	FARPROC *XR_ptr;
 
 	//
 	// Load programs and dictionaries, calculate thunk size
@@ -902,7 +903,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 	*(THDR *)addr(thunk) = thdr;
 
-	SD = (SD_entry *)thdr.SD_list;
+	SD = thdr.SD_list;
 
 	i = depth - 1;
 	j = 0;
@@ -911,7 +912,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 	n = thdr.SD_list;
 
 	while (i >= 0) {
-		SDarray = (SD_entry *)((ULONG)addr(thunk) + (ULONG)SD);
+		SDarray = (SD_entry *)((byte *)addr(thunk) + SD);
 		SDarray[j].SOP = code[i];
 		SDarray[j].exports = exports[i];
 		SDarray[j].static_base = k;
@@ -919,29 +920,28 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 		SD_offset[i] = n;
 
-		XR = (void *)m;
+		XR = m;
 
 		dict = RTD_first(addr(impt[i]));
 		while ((dict = RTD_iterate(addr(impt[i]), dict, &tag, &def)) != NULL) {
 			tagbase = (const char *)addr(impt[i]);
 			switch (tag[0]) {
 			case 'C':               // Code
-				offset = (UWORD)ascnum((const char *)RTD_lookup(HCRFD, (const char *)&tag[2]));
+				offset = ascnum(RTD_lookup(HCRFD, &tag[2]));
 				if (offset == (UWORD)-1)
 					abend(MSG_MCR, &tag[2]); // "Missing code resource '%s'"
 
 				thunk_ptr = addr(thunk);
 				def_off = ascnum(def);
-				XR_ptr = (ULONG *)((ULONG)thunk_ptr + (ULONG)XR + def_off);
-				CR_ptr = (ULONG *)((ULONG)&code_resources + offset);
+				XR_ptr = (FARPROC *)((byte *)thunk_ptr + XR + def_off);
+				CR_ptr = &code_resources[offset / 4];
 				*XR_ptr = *CR_ptr;
-
 				break;
 
 			case 'B':               // Byte
 			case 'W':               // Word
 			case 'L':               // Long   
-				target = (UWORD)ascnum(def);
+				target = ascnum(def);
 				source = ascnum(strchr(def, ',') + 1);
 
 				xclass = source;
@@ -969,7 +969,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 						lnk->lock(xexpt);
 						tag = tag - tagbase + (const char *)addr(impt[i]);
 
-						offset = (UWORD)ascnum((const char *)RTD_lookup(xexpt, (const char *)tag));
+						offset = ascnum(RTD_lookup(xexpt, tag));
 
 						if (offset != (UWORD)-1) {
 							found = 1;
@@ -989,7 +989,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 					abend(MSG_UER, tag);  //"Unresolved external reference '%s'"
 
 				thunk_ptr = addr(thunk);
-				xdr_ptr = (XDR_entry *)((ULONG)thunk_ptr + (ULONG)XR + target);
+				xdr_ptr = (XDR_entry *)((byte *)thunk_ptr + XR + target);
 				xdr_ptr->offset = index;
 
 				break;
@@ -1007,7 +1007,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 	for (i = m = 0; i < depth; i++) {
 		dict = RTD_first(addr(expt[i]));
-		while ((dict = RTD_iterate(addr(expt[i]), dict, (const char **)&tag, &def)) != NULL) {
+		while ((dict = RTD_iterate(addr(expt[i]), dict, &tag, &def)) != NULL) {
 			if (tag[0] == 'M') {
 				MV[m].msg = (UWORD)ascnum((const char *)&tag[2]);
 				MV[m].handler = (ULONG)ascnum(def);
