@@ -767,9 +767,9 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 	UWORD j, k, m, n, mcnt;
 	PRG_HDR prg, xprg;
 	THDR thdr;
-	UBYTE *dict;
-	BYTE *tag, *tagbase;
-	char *def;
+	uint dict;
+	const char *tag, *tagbase;
+	const char *def;
 	HRES thunk;
 	HRES HCRFD;
 	HRES impt[MAX_G], expt[MAX_G], code[MAX_G];
@@ -840,8 +840,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		//
 
 		mcnt = 0;
-		dict = (UBYTE *)RTD_first(addr(expt[depth]));
-		while ((dict = (UBYTE *)RTD_iterate(addr(expt[depth]), dict, &tag, (BYTE **)&def)) != NULL) {
+		dict = RTD_first(addr(expt[depth]));
+		while ((dict = RTD_iterate(addr(expt[depth]), dict, &tag, &def)) != NULL) {
 			switch (tag[0]) {
 			case 'M':               // Message
 				++thdr.max_msg;
@@ -860,8 +860,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		// Calculate Size of External Reference List
 		//
 
-		dict = (UBYTE *)RTD_first(addr(impt[depth]));
-		while ((dict = (UBYTE *)RTD_iterate(addr(impt[depth]), dict, &tag, (BYTE **)&def)) != NULL) {
+		dict = RTD_first(addr(impt[depth]));
+		while ((dict = RTD_iterate(addr(impt[depth]), dict, (const char **)&tag, &def)) != NULL) {
 			switch (tag[0]) {
 			case 'C':               // Code
 				tsize += sizeof(XCR_entry);
@@ -921,9 +921,9 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 		XR = (void *)m;
 
-		dict = (UBYTE *)RTD_first(addr(impt[i]));
-		while ((dict = (UBYTE *)RTD_iterate(addr(impt[i]), dict, &tag, (BYTE **)&def)) != NULL) {
-			tagbase = (BYTE *)addr(impt[i]);
+		dict = RTD_first(addr(impt[i]));
+		while ((dict = RTD_iterate(addr(impt[i]), dict, &tag, &def)) != NULL) {
+			tagbase = (const char *)addr(impt[i]);
 			switch (tag[0]) {
 			case 'C':               // Code
 				offset = (UWORD)ascnum((const char *)RTD_lookup(HCRFD, (const char *)&tag[2]));
@@ -955,7 +955,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 						abend(MSG_FPNF, xclass); //"Friend program %lu not found"
 
 					lock(xcode);
-					tag = tag - tagbase + (BYTE *)addr(impt[i]);
+					tag = tag - tagbase + (const char *)addr(impt[i]);
 
 					xprg = *(PRG_HDR *)addr(xcode);
 
@@ -967,7 +967,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 							DA_TEMPORARY | DA_EVANESCENT);
 
 						lnk->lock(xexpt);
-						tag = tag - tagbase + (BYTE *)addr(impt[i]);
+						tag = tag - tagbase + (const char *)addr(impt[i]);
 
 						offset = (UWORD)ascnum((const char *)RTD_lookup(xexpt, (const char *)tag));
 
@@ -1006,8 +1006,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 	MV = (MV_entry *)add_offset(addr(thunk), thdr.MV_list);
 
 	for (i = m = 0; i < depth; i++) {
-		dict = (UBYTE *)RTD_first(addr(expt[i]));
-		while ((dict = (UBYTE *)RTD_iterate(addr(expt[i]), dict, &tag, (BYTE **)&def)) != NULL) {
+		dict = RTD_first(addr(expt[i]));
+		while ((dict = RTD_iterate(addr(expt[i]), dict, (const char **)&tag, &def)) != NULL) {
 			if (tag[0] == 'M') {
 				MV[m].msg = (UWORD)ascnum((const char *)&tag[2]);
 				MV[m].handler = (ULONG)ascnum(def);

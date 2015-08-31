@@ -35,8 +35,27 @@ uint RTD_first(HRES dictionary) {
 	return !nameLen ? 0 : srcP - (const byte *)dictionary;
 }
 
-void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def) {
-	error("TODO: Reimplement ASM as CPP code");
+uint RTD_iterate(const void *base, uint cur, const char **tag, const char **def) {
+	if (!cur)
+		return 0;
+
+	// Check whether we're at the end of the chain list
+	const char *srcP = (const char *)base + cur;
+	if (READ_LE_UINT16(srcP) == 0) {
+		srcP += 2;
+		if (READ_LE_UINT16(srcP) == 0)
+			return 0;
+	}
+
+	// We're not, so save a pointer to the tag and definition
+	*tag = srcP + 2;
+
+	srcP += READ_LE_UINT16(srcP) + 2;
+	*def = srcP + 2;
+
+	// Return the offset of the next chain entry
+	srcP += READ_LE_UINT16(srcP) + 2;
+	return srcP - (const char *)base;
 }
 
 const char *RTD_lookup(HRES dictionary, const Common::String &key) {

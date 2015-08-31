@@ -230,8 +230,9 @@ void dump_static_context(ULONG index, TF_class *TF)
    SD_entry *SD;
    THDR thdr;
    char val[32];
-   UBYTE *dict;
-   BYTE type,*tag;
+   uint dict;
+   BYTE type;
+   const char *tag;
    const char *def, *size;
    void *inst,*d;
 
@@ -292,8 +293,8 @@ void dump_static_context(ULONG index, TF_class *TF)
 
       inst = add_ptr(res.addr(instance),offset);
 
-      dict = (UBYTE *)RTD_first(res.addr(expt));
-	  while ((dict = (UBYTE *)RTD_iterate(res.addr(expt), dict, &tag, (BYTE **)&def)) != NULL)
+      dict = RTD_first(res.addr(expt));
+	  while ((dict = RTD_iterate(res.addr(expt), dict, &tag, (const char **)&def)) != NULL)
          {
          type = tag[0];
          if ((type != 'B') && (type != 'W') && (type != 'L'))
