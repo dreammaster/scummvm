@@ -34,7 +34,6 @@
 #include "aesop/rtmsg.h"
 #include "aesop/intrface.h"
 #include "aesop/rtobject.h"
-#include "aesop/rt.h"
 #include "aesop/event.h"
 #include "aesop/graphics.h"
 
@@ -99,10 +98,11 @@ LONG find_free_entry(LONG min, LONG end)
 
 void create_SOP_instance(ULONG name, LONG index)
 {
+	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	objlist[index] = res.create_instance(name);
 
-   RT_execute(index,MSG_CREATE, (ULONG)-1);
+   interp.execute(index, MSG_CREATE, (ULONG)-1);
 }
 
 /***************************************************/
@@ -159,22 +159,21 @@ LONG create_program(LONG argcnt, LONG index, ULONG name)
 /***************************************************/
 
 
-LONG destroy_object(LONG argcnt, LONG index)
-
-{
+LONG destroy_object(LONG argcnt, LONG index) {
+	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	LONG rtn;
 
-   rtn = RT_execute(index,MSG_DESTROY,(ULONG)-1);
+	rtn = interp.execute(index, MSG_DESTROY, (ULONG)-1);
 
-   cancel_entity_requests(index);
-   release_owned_windows(index);
+	cancel_entity_requests(index);
+	release_owned_windows(index);
 
-   res.destroy_instance(objlist[index]);
+	res.destroy_instance(objlist[index]);
 
-   objlist[index] = HRES_NULL;
+	objlist[index] = HRES_NULL;
 
-   return rtn;
+	return rtn;
 }
 
 /***************************************************/
@@ -220,127 +219,127 @@ ULONG flush_cache(LONG argcnt, ULONG goal)
 //
 /***************************************************/
 
-void dump_static_context(ULONG index, TF_class *TF)
-{
+void dump_static_context(ULONG index, TF_class *TF) {
+	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	LONG i;
-   ULONG n,p,offset,asize;
-   HRES instance,thunk,expt;
-   void *tptr;
-   SD_entry *SD;
-   THDR thdr;
-   char val[32];
-   uint dict;
-   BYTE type;
-   const char *tag;
-   const char *def, *size;
-   void *inst,*d;
+	ULONG n, p, offset, asize;
+	HRES instance, thunk, expt;
+	void *tptr;
+	SD_entry *SD;
+	THDR thdr;
+	char val[32];
+	uint dict;
+	BYTE type;
+	const char *tag;
+	const char *def, *size;
+	void *inst, *d;
 
-   strcpy(linbuf,"Entry ");
-   ltoa(index,&linbuf[6],10);
+	strcpy(linbuf, "Entry ");
+	ltoa(index, &linbuf[6], 10);
 
-   i = strlen(linbuf);
-   linbuf[i] = ':';
-   linbuf[i+1] = ' ';
-   linbuf[i+2] = 0;
+	i = strlen(linbuf);
+	linbuf[i] = ':';
+	linbuf[i + 1] = ' ';
+	linbuf[i + 2] = 0;
 
-   instance = objlist[index];
+	instance = objlist[index];
 
-   if (instance == HRES_NULL)
-      {
-      strcat(linbuf,"Available");
-      TF_writeln(TF, linbuf);
-      return;
-      }
+	if (instance == HRES_NULL)
+	{
+		strcat(linbuf, "Available");
+		TF_writeln(TF, linbuf);
+		return;
+	}
 
-   thunk = ((IHDR *) res.addr(instance))->thunk;
+	thunk = ((IHDR *)res.addr(instance))->thunk;
 
-   tptr = res.addr(thunk);
-   thdr = *((THDR *) tptr);
+	tptr = res.addr(thunk);
+	thdr = *((THDR *)tptr);
 
-   SD = (SD_entry *)add_ptr(tptr,thdr.SD_list);
+	SD = (SD_entry *)add_ptr(tptr, thdr.SD_list);
 
-   expt = res.get_resource_handle(SD[thdr.nprgs-1].exports,
-      DA_TEMPORARY | DA_EVANESCENT);
-   res.lock(expt);
-   linbuf[i+2] = '"';
-   strcpy(&linbuf[i+3], (const char *)RTD_lookup(expt,"N:OBJECT"));
-   strcat(&linbuf[i+3],"\"");
+	expt = res.get_resource_handle(SD[thdr.nprgs - 1].exports,
+		DA_TEMPORARY | DA_EVANESCENT);
+	res.lock(expt);
+	linbuf[i + 2] = '"';
+	strcpy(&linbuf[i + 3], (const char *)interp.lookup(expt, "N:OBJECT"));
+	strcat(&linbuf[i + 3], "\"");
 
-   res.unlock(expt);
+	res.unlock(expt);
 
-   TF_writeln(TF, linbuf);
-   TF_writeln(TF, "{");
+	TF_writeln(TF, linbuf);
+	TF_writeln(TF, "{");
 
-   for (p=0;p<thdr.nprgs;p++)
-      {
-      tptr = res.addr(thunk);
-      SD = (SD_entry *)add_ptr(tptr,thdr.SD_list);
+	for (p = 0; p < thdr.nprgs; p++)
+	{
+		tptr = res.addr(thunk);
+		SD = (SD_entry *)add_ptr(tptr, thdr.SD_list);
 
-      offset = SD[p].static_base;
+		offset = SD[p].static_base;
 
-      expt = res.get_resource_handle(SD[p].exports,
-         DA_TEMPORARY | DA_EVANESCENT);
-      res.lock(expt);
+		expt = res.get_resource_handle(SD[p].exports,
+			DA_TEMPORARY | DA_EVANESCENT);
+		res.lock(expt);
 
-      def = (const char *)RTD_lookup(expt,"N:OBJECT");
+		def = (const char *)interp.lookup(expt, "N:OBJECT");
 
-      if (p) TF_writeln(TF,"");
-      linbuf[0] = '[';
-      strcpy(&linbuf[1], def);
-      strcat(linbuf,"]");
-      TF_writeln(TF,linbuf);
+		if (p) TF_writeln(TF, "");
+		linbuf[0] = '[';
+		strcpy(&linbuf[1], def);
+		strcat(linbuf, "]");
+		TF_writeln(TF, linbuf);
 
-      inst = add_ptr(res.addr(instance),offset);
+		inst = add_ptr(res.addr(instance), offset);
 
-      dict = RTD_first(res.addr(expt));
-	  while ((dict = RTD_iterate(res.addr(expt), dict, &tag, (const char **)&def)) != NULL)
-         {
-         type = tag[0];
-         if ((type != 'B') && (type != 'W') && (type != 'L'))
-            continue;
+		dict = interp.first(res.addr(expt));
+		while ((dict = interp.iterate(res.addr(expt), dict, &tag, &def)) != NULL)
+		{
+			type = tag[0];
+			if ((type != 'B') && (type != 'W') && (type != 'L'))
+				continue;
 
-         strcpy(linbuf,"   ");
-         strcpy(&linbuf[3], (const char *)tag);
-         strcat(linbuf," = ");
+			strcpy(linbuf, "   ");
+			strcpy(&linbuf[3], (const char *)tag);
+			strcat(linbuf, " = ");
 
-         d = add_ptr(inst,ascnum(def));
-         if ((size = strchr(def,',')) != NULL)
-            asize = (UWORD) ascnum(size+1);
-         else
-            asize = 1;
+			d = add_ptr(inst, ascnum(def));
+			if ((size = strchr(def, ',')) != NULL)
+				asize = (UWORD)ascnum(size + 1);
+			else
+				asize = 1;
 
-         for (n=0;n<asize;n++)
-            {
-            switch (type)
-               {
-               case 'B': ltoa(*(BYTE *) d,val,10); d = add_ptr(d,1L); break;
-               case 'W': ltoa(*(WORD *) d,val,10); d = add_ptr(d,2L); break;
-               case 'L': ltoa(*(LONG *) d,val,10); d = add_ptr(d,4L); break;
-               }
+			for (n = 0; n < asize; n++)
+			{
+				switch (type)
+				{
+				case 'B': ltoa(*(BYTE *)d, val, 10); d = add_ptr(d, 1L); break;
+				case 'W': ltoa(*(WORD *)d, val, 10); d = add_ptr(d, 2L); break;
+				case 'L': ltoa(*(LONG *)d, val, 10); d = add_ptr(d, 4L); break;
+				}
 
-            strcat(linbuf,val);
+				strcat(linbuf, val);
 
-            if (n != asize-1)
-               {
-               strcat(linbuf,",");
+				if (n != asize - 1)
+				{
+					strcat(linbuf, ",");
 
-               if (!((n+1) % 10))
-                  {
-                  TF_writeln(TF,linbuf);
-                  strcpy(linbuf,"      ");
-                  }
-               }
+					if (!((n + 1) % 10))
+					{
+						TF_writeln(TF, linbuf);
+						strcpy(linbuf, "      ");
+					}
+				}
 
-            }
+			}
 
-         TF_writeln(TF,linbuf);
-         }
+			TF_writeln(TF, linbuf);
+		}
 
-      res.unlock(expt);
-      }
+		res.unlock(expt);
+	}
 
-   TF_writeln(TF,"}");
+	TF_writeln(TF, "}");
 }
 
 /***************************************************/
@@ -372,44 +371,45 @@ LONG readln(TF_class *TF, BYTE *buffer, LONG maxlen)
 
 CDESC *read_context_descriptor(TF_class *TF)
 {
+	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	static CDESC c;
-   HRES HROED;
-   char *num;
-   char *name;
-   char *def;
+	HRES HROED;
+	char *num;
+	char *name;
+	char *def;
 
-   if (!readln(TF, (BYTE *)linbuf,sizeof(linbuf)))
-      return NULL;
+	if (!readln(TF, (BYTE *)linbuf, sizeof(linbuf)))
+		return NULL;
 
-   num = &linbuf[6];
+	num = &linbuf[6];
 
-   c.size = (UWORD)-1;
-   c.slot = (UWORD) ascnum(num);
+	c.size = (UWORD)-1;
+	c.slot = (UWORD)ascnum(num);
 
-   name = strchr(num,'"');
-   if (name == NULL)
-      {
-      c.name = (ULONG) -1L;
-      return &c;
-      }
+	name = strchr(num, '"');
+	if (name == NULL)
+	{
+		c.name = (ULONG)-1L;
+		return &c;
+	}
 
-   name++;
-   name[strlen(name)-1] = 0;
+	name++;
+	name[strlen(name) - 1] = 0;
 
-   HROED = res.get_resource_handle(ROED,DA_TEMPORARY | DA_EVANESCENT);
-   res.lock(HROED);
+	HROED = res.get_resource_handle(ROED, DA_TEMPORARY | DA_EVANESCENT);
+	res.lock(HROED);
 
-   def = (char *)RTD_lookup(HROED,name);
+	def = (char *)interp.lookup(HROED, name);
 
-   if (def == NULL)
-      abend(MSG_OMCR,name,c.slot);
+	if (def == NULL)
+		abend(MSG_OMCR, name, c.slot);
 
-   c.name = ascnum(def);
+	c.name = ascnum(def);
 
-   res.unlock(HROED);
+	res.unlock(HROED);
 
-   return &c;
+	return &c;
 }
 
 /***************************************************/
@@ -420,132 +420,133 @@ CDESC *read_context_descriptor(TF_class *TF)
 
 void restore_static_context(HRES instance, TF_class *TF)
 {
+	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	ULONG n, i, p, offset = 0, asize;
-   HRES thunk,expt = 0;
-   void *d,*tptr;
-   SD_entry *SD;
-   THDR thdr;
-   char *def, *tag, *size, *chrpnt;
+	HRES thunk, expt = 0;
+	void *d, *tptr;
+	SD_entry *SD;
+	THDR thdr;
+	char *def, *tag, *size, *chrpnt;
 
-   thunk = ((IHDR *) res.addr(instance))->thunk;
-   thdr = *((THDR *) res.addr(thunk));
+	thunk = ((IHDR *)res.addr(instance))->thunk;
+	thdr = *((THDR *)res.addr(thunk));
 
-   while (readln(TF, (BYTE *)linbuf,sizeof(linbuf)))
-      {
-      if (linbuf[0] == '{')
-         continue;
-      else if (linbuf[0] == '}')
-         break;
-      else if (linbuf[0] == '[')
-         {
-         if ((tag = strchr(linbuf,']')) != NULL)
-            *tag = 0;
-         tag = strchr(linbuf,'[')+1;
+	while (readln(TF, (BYTE *)linbuf, sizeof(linbuf)))
+	{
+		if (linbuf[0] == '{')
+			continue;
+		else if (linbuf[0] == '}')
+			break;
+		else if (linbuf[0] == '[')
+		{
+			if ((tag = strchr(linbuf, ']')) != NULL)
+				*tag = 0;
+			tag = strchr(linbuf, '[') + 1;
 
-         for (p=0; p<thdr.nprgs; p++)
-            {
-            tptr = res.addr(thunk);
-            SD   = (SD_entry *)add_ptr (tptr, thdr.SD_list);
+			for (p = 0; p < thdr.nprgs; p++)
+			{
+				tptr = res.addr(thunk);
+				SD = (SD_entry *)add_ptr(tptr, thdr.SD_list);
 
-            offset = SD[p].static_base;
+				offset = SD[p].static_base;
 
-            expt = res.get_resource_handle(SD[p].exports,
-                                           DA_TEMPORARY | DA_EVANESCENT);
+				expt = res.get_resource_handle(SD[p].exports,
+					DA_TEMPORARY | DA_EVANESCENT);
 
-            res.lock(expt);
-            def = (char *)RTD_lookup(expt,"N:OBJECT");
+				res.lock(expt);
+				def = (char *)interp.lookup(expt, "N:OBJECT");
 
-            res.unlock(expt);
+				res.unlock(expt);
 
-            if ( !strcmp(def,tag) )
-               break;
-            }
+				if (!strcmp(def, tag))
+					break;
+			}
 
-         if (p==thdr.nprgs)
-            abend(MSG_CMCR,tag);       //"Class '%s' missing; cannot restore"
-         }
-      else
-         {
-         tag=linbuf;
+			if (p == thdr.nprgs)
+				abend(MSG_CMCR, tag);       //"Class '%s' missing; cannot restore"
+		}
+		else
+		{
+			tag = linbuf;
 
-         //Skip leading white-space
+			//Skip leading white-space
 
-         while (*tag == ' ')
-            tag++;
+			while (*tag == ' ')
+				tag++;
 
-         //Get Variable Type and Name
+			//Get Variable Type and Name
 
-         for (i=0;(tag[i] != ' ') && tag[i];i++)
-            name[i] = tag[i];
-         name[i] = 0;
-         if (!i)
-            continue;
-         
-         res.lock(expt);
-         def = (char *)RTD_lookup(expt,name);
+			for (i = 0; (tag[i] != ' ') && tag[i]; i++)
+				name[i] = tag[i];
+			name[i] = 0;
+			if (!i)
+				continue;
 
-         res.unlock(expt);
-         
-         if (def == NULL)
-            abend(MSG_UVR,name);       //"Unresolved variable reference '%s'"
-         
-         d = (void *) ((ULONG)res.addr(instance) + ascnum(def) + offset);
+			res.lock(expt);
+			def = (char *)interp.lookup(expt, name);
 
-         if ((size = strchr(def,',')) != NULL)
-            asize = ascnum(size+1);
-         else
-            asize = 1;
-         
-         chrpnt = strchr(linbuf,'=');
-         if (chrpnt == NULL)
-            abend(MSG_BDIE);           //"Bad data item entry"
-         
-         for (n=0; n<asize; n++)
-            {
+			res.unlock(expt);
 
-            //Skip to data
+			if (def == NULL)
+				abend(MSG_UVR, name);       //"Unresolved variable reference '%s'"
 
-            while ( (!isnum(*chrpnt)) && (*chrpnt != '\'') )
-               {
-               if (!(*chrpnt))
-                  break;
-               else
-                  ++chrpnt;
-               }
-         
-            //Get Next Line if needed
+			d = (void *)((ULONG)res.addr(instance) + ascnum(def) + offset);
 
-            if ( (!(*chrpnt)) && (n != asize-1) )
-               {
-               readln(TF, (BYTE *)linbuf,sizeof(linbuf));
-               chrpnt = linbuf;
-               }
+			if ((size = strchr(def, ',')) != NULL)
+				asize = ascnum(size + 1);
+			else
+				asize = 1;
 
-            //Store data from text file in Instance
+			chrpnt = strchr(linbuf, '=');
+			if (chrpnt == NULL)
+				abend(MSG_BDIE);           //"Bad data item entry"
 
-            switch (name[0])
-               {
-               case 'B': *(BYTE *) d = (BYTE) ascnum(chrpnt); break;
-               case 'W': *(WORD *) d = (WORD) ascnum(chrpnt); break;
-               case 'L': *(LONG *) d = (LONG) ascnum(chrpnt); break;
-               }
-            
-            if (n != asize-1)
-               {
-               switch (name[0])
-                  {
-                  case 'B': d = ((BYTE *)d + 1); break;
-                  case 'W': d = ((BYTE *)d + 2); break;
-                  case 'L': d = ((BYTE *)d + 4); break;
-                  }
-         
-               while (isnum(*chrpnt) || (*chrpnt == ' ') || (*chrpnt == '\''))
-                  chrpnt++;
-               }
-            } // for
-         } // else
-      } // while
+			for (n = 0; n < asize; n++)
+			{
+
+				//Skip to data
+
+				while ((!isnum(*chrpnt)) && (*chrpnt != '\''))
+				{
+					if (!(*chrpnt))
+						break;
+					else
+						++chrpnt;
+				}
+
+				//Get Next Line if needed
+
+				if ((!(*chrpnt)) && (n != asize - 1))
+				{
+					readln(TF, (BYTE *)linbuf, sizeof(linbuf));
+					chrpnt = linbuf;
+				}
+
+				//Store data from text file in Instance
+
+				switch (name[0])
+				{
+				case 'B': *(BYTE *)d = (BYTE)ascnum(chrpnt); break;
+				case 'W': *(WORD *)d = (WORD)ascnum(chrpnt); break;
+				case 'L': *(LONG *)d = (LONG)ascnum(chrpnt); break;
+				}
+
+				if (n != asize - 1)
+				{
+					switch (name[0])
+					{
+					case 'B': d = ((BYTE *)d + 1); break;
+					case 'W': d = ((BYTE *)d + 2); break;
+					case 'L': d = ((BYTE *)d + 4); break;
+					}
+
+					while (isnum(*chrpnt) || (*chrpnt == ' ') || (*chrpnt == '\''))
+						chrpnt++;
+				}
+			} // for
+		} // else
+	} // while
 }
 
 /*********************************************************/
@@ -674,122 +675,123 @@ LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
 
 void restore_range(const char *filename, ULONG first, ULONG last, ULONG restoring)
 {
+	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	ULONG bad, txttype;
-   ULONG index;
-   UBYTE typetest;
-   TF_class *TF = nullptr;
-   HRES cur;
-   HD_entry *sel;
-   CDESC stat_C;
-   CDESC *CD;
+	ULONG index;
+	UBYTE typetest;
+	TF_class *TF = nullptr;
+	HRES cur;
+	HD_entry *sel;
+	CDESC stat_C;
+	CDESC *CD;
 
-   UWORD CDslot;       // object list index
-   ULONG CDname;       // code object name
-   UWORD CDsize;       // size of instance data (unused in text files)
+	UWORD CDslot;       // object list index
+	ULONG CDname;       // code object name
+	UWORD CDsize;       // size of instance data (unused in text files)
 
-   txttype = 0;
-   bad = 0;
+	txttype = 0;
+	bad = 0;
 
-   Common::File f;
-   if (!f.open(filename))
-      bad = 1;
-   else
-      {
-      typetest = 0;
-	  typetest = f.readByte();
+	Common::File f;
+	if (!f.open(filename))
+		bad = 1;
+	else
+	{
+		typetest = 0;
+		typetest = f.readByte();
 
-      if (typetest != 26)
-         {
-			 f.close();
-         txttype = 1;
-         }
-      }
+		if (typetest != 26)
+		{
+			f.close();
+			txttype = 1;
+		}
+	}
 
-   if (txttype)
-      {
-      TF = TF_construct(filename,TF_READ);
-      bad = (TF == NULL);
-      }
+	if (txttype)
+	{
+		TF = TF_construct(filename, TF_READ);
+		bad = (TF == NULL);
+	}
 
-   if (bad)
-      abend(MSG_CNOCF,filename);          //"Could not open context file '%s'"
+	if (bad)
+		abend(MSG_CNOCF, filename);          //"Could not open context file '%s'"
 
-   for (index=first;index<=last;index++)
-      {
-      cur = objlist[index];
+	for (index = first; index <= last; index++)
+	{
+		cur = objlist[index];
 
-      if (txttype)
-         {
-         CD = read_context_descriptor(TF);
+		if (txttype)
+		{
+			CD = read_context_descriptor(TF);
 
-         bad = (CD == NULL);
-         }
-      else
-         {
-         CD = &stat_C;
-		 error("TODO: CDESC::load");
-         bad = f.read(CD,sizeof(CDESC)) != sizeof(CDESC);
-         }
+			bad = (CD == NULL);
+		}
+		else
+		{
+			CD = &stat_C;
+			error("TODO: CDESC::load");
+			bad = f.read(CD, sizeof(CDESC)) != sizeof(CDESC);
+		}
 
-      if ((bad) || (CD->slot != index))
-         abend(MSG_CFCAE,index);          //"Context file corrupt at entry %u"
+		if ((bad) || (CD->slot != index))
+			abend(MSG_CFCAE, index);          //"Context file corrupt at entry %u"
 
-      CDslot=CD->slot;
-      CDname=CD->name;
-      CDsize=CD->size;
+		CDslot = CD->slot;
+		CDname = CD->name;
+		CDsize = CD->size;
 
-      if (CD->name == (ULONG) -1L)
-         {
-			 if (cur != HRES_NULL)
-            {
-            destroy_object(0,index);
-            }
+		if (CD->name == (ULONG)-1L)
+		{
+			if (cur != HRES_NULL)
+			{
+				destroy_object(0, index);
+			}
 
-         continue;
-         }
+			continue;
+		}
 
-	  if (cur != HRES_NULL)
-         {
-         sel = (HD_entry *) cur;
+		if (cur != HRES_NULL)
+		{
+			sel = (HD_entry *)cur;
 
-         if (sel->_user != CD->name)
-            {
-            destroy_object(0,index);
-            }
-         else
-            {
-            cancel_entity_requests(index);
+			if (sel->_user != CD->name)
+			{
+				destroy_object(0, index);
+			}
+			else
+			{
+				cancel_entity_requests(index);
 
-            release_owned_windows(index);
-            }
-         }
+				release_owned_windows(index);
+			}
+		}
 
-      if (objlist[index] == HRES_NULL)
-         {
-         create_SOP_instance(CD->name,index);
-         }
+		if (objlist[index] == HRES_NULL)
+		{
+			create_SOP_instance(CD->name, index);
+		}
 
-      if (txttype)
-         {
-         restore_static_context(objlist[index],TF);
-         }
-      else
-         if (CD->size)
-            {
-            f.read((BYTE *)res.addr(objlist[index])+sizeof(IHDR), CD->size);
-            }
+		if (txttype)
+		{
+			restore_static_context(objlist[index], TF);
+		}
+		else
+			if (CD->size)
+			{
+				f.read((BYTE *)res.addr(objlist[index]) + sizeof(IHDR), CD->size);
+			}
 
-      if (restoring)
-         {
-         RT_execute(index,MSG_RESTORE, (ULONG)-1);
-         }
-      }
+		if (restoring)
+		{
+			interp.execute(index, MSG_RESTORE, (ULONG)-1);
+		}
+	}
 
-   if (txttype)
-      TF_destroy(TF);
-   else
-      f.close();
+	if (txttype)
+		TF_destroy(TF);
+	else
+		f.close();
 }
 
 /*********************************************************/

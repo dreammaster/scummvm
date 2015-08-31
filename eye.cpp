@@ -36,7 +36,6 @@
 #include "aesop/event.h"
 #include "aesop/intrface.h"
 #include "aesop/resources.h"
-#include "aesop/rt.h"
 //#include "aesop/modsnd32.h"
 #include "aesop/sound.h"
 

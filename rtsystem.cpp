@@ -37,7 +37,6 @@
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
 #include "aesop/resources.h"
-#include "aesop/rt.h"
 #include "aesop/rtcode.h"
 #include "aesop/intrface.h"
 #include "aesop/event.h"

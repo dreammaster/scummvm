@@ -8,10 +8,10 @@ MODULE_OBJS = \
 	gil2vfx.o \
 	gil2vfxa.o \
 	graphics.o \
+	interpreter.o \
 	intrface.o \
 	mouse.o \
 	resources.o \
-	rt.o \
 	rtcode.o \
 	rtobject.o \
 	rtsystem.o \

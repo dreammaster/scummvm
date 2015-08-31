@@ -33,10 +33,11 @@ void diagnose(LONG argcnt, ULONG dtype, ULONG parm);
 
 typedef void (*FARPROC)();
 extern FARPROC code_resources[];
+extern ULONG diag_flag;
 
-ULONG absv(LONG argcnt, LONG val);
-ULONG rnd(LONG argcnt, ULONG low, ULONG high);
-LONG envval(LONG argcnt, BYTE *name);
+extern ULONG absv(LONG argcnt, LONG val);
+extern ULONG rnd(LONG argcnt, ULONG low, ULONG high);
+extern LONG envval(LONG argcnt, BYTE *name);
 
 void beep(void);
 

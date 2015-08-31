@@ -33,7 +33,6 @@
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
 #include "aesop/rtcode.h"
-#include "aesop/rt.h"
 #include "aesop/rtobject.h"
 #include "aesop/stubs.h"
 

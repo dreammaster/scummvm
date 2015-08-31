@@ -32,6 +32,7 @@
 #include "common/savefile.h"
 #include "common/util.h"
 #include "engines/engine.h"
+#include "aesop/interpreter.h"
 #include "aesop/resources.h"
 
 namespace Aesop {
@@ -74,6 +75,7 @@ private:
 	void play();
 public:
 	const AesopGameDescription *_gameDescription;
+	Interpreter *_interpreter;
 	Resources *_resources;
 public:
 	AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc);

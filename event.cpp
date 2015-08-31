@@ -27,7 +27,6 @@
 #include "aesop/event.h"
 #include "aesop/resources.h"
 #include "aesop/intrface.h"
-#include "aesop/rt.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
 //#include "aesop/modsnd32.h"
@@ -564,62 +563,63 @@ ULONG peek_event(void)
 
 void dispatch_event(void)
 {
-   EVENT *EV;
-   NREQ *NR;
-   LONG nxt;
-   LONG typ;
-   LONG par;
-   LONG own;
-   static struct
-      {
-      LONG parameter;
-      LONG owner;
-      }
-   event_message_descriptor;
+	Interpreter &interp = *_vm->_interpreter;
+	EVENT *EV;
+	NREQ *NR;
+	LONG nxt;
+	LONG typ;
+	LONG par;
+	LONG own;
+	static struct
+	{
+		LONG parameter;
+		LONG owner;
+	}
+	event_message_descriptor;
 
-   PollMod();
+	PollMod();
 
-   if ((EV = fetch_event()) == NULL)
-      return;
+	if ((EV = fetch_event()) == NULL)
+		return;
 
-   typ = EV->type;
-   par = EV->parameter;
-   own = EV->owner;
+	typ = EV->type;
+	par = EV->parameter;
+	own = EV->owner;
 
-   if (typ == SYS_FREE)
-      return;
+	if (typ == SYS_FREE)
+		return;
 
-   if ((typ >= FIRST_SYS_EVENT) &&
-       (typ <= LAST_SYS_EVENT) &&
-       (scan_event_range(FIRST_APP_EVENT,LAST_APP_EVENT) != NULL))
-      {
-      add_event((LONG) typ,(LONG) par,(LONG) own);
-      return;
-      }
+	if ((typ >= FIRST_SYS_EVENT) &&
+		(typ <= LAST_SYS_EVENT) &&
+		(scan_event_range(FIRST_APP_EVENT, LAST_APP_EVENT) != NULL))
+	{
+		add_event((LONG)typ, (LONG)par, (LONG)own);
+		return;
+	}
 
-   event_message_descriptor.parameter = par;
-   event_message_descriptor.owner = own;
+	event_message_descriptor.parameter = par;
+	event_message_descriptor.owner = own;
 
-   current_event_type = typ;
+	current_event_type = typ;
 
-   nxt = NR_first[typ];
-   while (nxt != -1)
-      {
-      NR = &NR_list[nxt];
-      nxt = NR->next;
+	nxt = NR_first[typ];
+	while (nxt != -1)
+	{
+		NR = &NR_list[nxt];
+		nxt = NR->next;
 
-      if ((NR->status & NSX_TYPE) != typ) break;
-      if  (NR->client == -1)              break;
-      if  (typ != current_event_type)     break;
+		if ((NR->status & NSX_TYPE) != typ) break;
+		if (NR->client == -1)              break;
+		if (typ != current_event_type)     break;
 
-      if (match_parameter((LONG)typ,(LONG)par,(LONG)NR->parameter))
-         {
-         RT_arguments(&event_message_descriptor,
-            sizeof(event_message_descriptor));
+		if (match_parameter((LONG)typ, (LONG)par, (LONG)NR->parameter))
+		{
+			interp.arguments(&event_message_descriptor,
+				sizeof(event_message_descriptor));
 
-         RT_execute((LONG)NR->client,(LONG)NR->message, (ULONG)-1);
-         }
-      }
+			interp.execute((LONG)NR->client, (LONG)NR->message, (ULONG)-1);
+		}
+	}
 }
 
 /*********************************************************/

@@ -21,13 +21,37 @@
  */
 
 #include "aesop/aesop.h"
-#include "aesop/rt.h"
+#include "aesop/interpreter.h"
 
 namespace Aesop {
 
+// fundamental stack value structure
+struct STKVAL {
+	ULONG val;
+	UWORD type;
+};
+
+enum {
+	TYP_CRES,                  // data type: code resource address
+	TYP_SRES,                  // data type: string resource
+	TYP_VSHR,                  // data type: short integer variable
+	TYP_VLNG,                  // data type: long integer variable
+	TYP_SVAR,                  // data type: string variable
+};
+
+// Pointer and memory block management
+
+#define norm(x) ((void *) (x))
+
 ULONG current_this;
 
-uint RTD_first(HRES dictionary) {
+/*----------------------------------------------------------------*/
+
+Interpreter::~Interpreter() {
+	// TODO: RTD_shutdown
+}
+
+uint Interpreter::first(HRES dictionary) {
 	// Skip over hash table
 	const byte *srcP = (const byte *)dictionary + READ_LE_UINT16(dictionary) * 4 + 2;
 
@@ -35,7 +59,7 @@ uint RTD_first(HRES dictionary) {
 	return !nameLen ? 0 : srcP - (const byte *)dictionary;
 }
 
-uint RTD_iterate(const void *base, uint cur, const char **tag, const char **def) {
+uint Interpreter::iterate(const void *base, uint cur, const char **tag, const char **def) {
 	if (!cur)
 		return 0;
 
@@ -58,7 +82,7 @@ uint RTD_iterate(const void *base, uint cur, const char **tag, const char **def)
 	return srcP - (const char *)base;
 }
 
-const char *RTD_lookup(HRES dictionary, const Common::String &key) {
+const char *Interpreter::lookup(HRES dictionary, const Common::String &key) {
 	const byte *es32 = (byte *)static_cast<HD_entry *>(dictionary)->_seg;
 	int hashSize = READ_LE_UINT16(es32);
 
@@ -95,19 +119,15 @@ const char *RTD_lookup(HRES dictionary, const Common::String &key) {
 	return nullptr;
 }
 
-void RT_init(Resources *RTR, ULONG stack_size, HRES *objlist) {
+void Interpreter::init(Resources *RTR, ULONG stackSize, HRES *objlist) {
 	error("TODO: Reimplement ASM as CPP code");
 }
 
-void RT_shutdown(void) {
+void Interpreter::arguments(void *base, ULONG size) {
 	error("TODO: Reimplement ASM as CPP code");
 }
 
-void RT_arguments(void *base, ULONG size) {
-	error("TODO: Reimplement ASM as CPP code");
-}
-
-LONG RT_execute(ULONG index, ULONG msg_num, ULONG vector) {
+LONG Interpreter::execute(ULONG index, ULONG msgNum, ULONG vector) {
 	error("TODO: Reimplement ASM as CPP code");
 }
 

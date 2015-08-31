@@ -24,7 +24,6 @@
 #include "common/debug-channels.h"
 #include "aesop/aesop.h"
 #include "aesop/event.h"
-#include "aesop/rt.h"
 #include "aesop/rtmsg.h"
 #include "aesop/rtobject.h"
 #include "aesop/rtsystem.h"
@@ -57,7 +56,6 @@ void AesopEngine::initialize() {
 }
 
 void AesopEngine::deinitialize() {
-	RT_shutdown();
 	mem_shutdown();
 	AIL_shutdown();
 }
@@ -75,7 +73,7 @@ void AesopEngine::play() {
 	Common::String codeName = "start";
 	HRES hroed = _resources->get_resource_handle(ROED, DA_TEMPORARY | DA_EVANESCENT);
 	_resources->lock(hroed);
-	int code = ascnum((const char *)RTD_lookup(hroed, codeName));
+	int code = ascnum((const char *)_interpreter->lookup(hroed, codeName));
 	_resources->unlock(hroed);
 
 	if (code == (ULONG)-1)

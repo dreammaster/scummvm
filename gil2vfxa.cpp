@@ -21,7 +21,6 @@
  */
 
 #include "aesop/aesop.h"
-#include "aesop/rt.h"
 #include "aesop/stubs.h"
 
 namespace Aesop {

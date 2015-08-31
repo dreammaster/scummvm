@@ -30,7 +30,6 @@
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
 #include "aesop/resources.h"
-#include "aesop/rt.h"
 #include "aesop/intrface.h"
 #include "aesop/graphics.h"   // for dprint()
 #include "aesop/stubs.h"
@@ -758,6 +757,7 @@ void Resources::destroy_instance(HRES instance) {
 /***************************************************/
 
 HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
+	Interpreter &interp = *_vm->_interpreter;
 	UWORD depth;              // 0..MAX_G = derived object..base class
 	ULONG class1, xclass;
 	ULONG tsize;
@@ -841,8 +841,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		//
 
 		mcnt = 0;
-		dict = RTD_first(addr(expt[depth]));
-		while ((dict = RTD_iterate(addr(expt[depth]), dict, &tag, &def)) != NULL) {
+		dict = interp.first(addr(expt[depth]));
+		while ((dict = interp.iterate(addr(expt[depth]), dict, &tag, &def)) != NULL) {
 			switch (tag[0]) {
 			case 'M':               // Message
 				++thdr.max_msg;
@@ -861,8 +861,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		// Calculate Size of External Reference List
 		//
 
-		dict = RTD_first(addr(impt[depth]));
-		while ((dict = RTD_iterate(addr(impt[depth]), dict, (const char **)&tag, &def)) != NULL) {
+		dict = interp.first(addr(impt[depth]));
+		while ((dict = interp.iterate(addr(impt[depth]), dict, (const char **)&tag, &def)) != NULL) {
 			switch (tag[0]) {
 			case 'C':               // Code
 				tsize += sizeof(XCR_entry);
@@ -922,12 +922,12 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 		XR = m;
 
-		dict = RTD_first(addr(impt[i]));
-		while ((dict = RTD_iterate(addr(impt[i]), dict, &tag, &def)) != NULL) {
+		dict = interp.first(addr(impt[i]));
+		while ((dict = interp.iterate(addr(impt[i]), dict, &tag, &def)) != NULL) {
 			tagbase = (const char *)addr(impt[i]);
 			switch (tag[0]) {
 			case 'C':               // Code
-				offset = ascnum(RTD_lookup(HCRFD, &tag[2]));
+				offset = ascnum(interp.lookup(HCRFD, &tag[2]));
 				if (offset == (UWORD)-1)
 					abend(MSG_MCR, &tag[2]); // "Missing code resource '%s'"
 
@@ -969,7 +969,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 						lnk->lock(xexpt);
 						tag = tag - tagbase + (const char *)addr(impt[i]);
 
-						offset = ascnum(RTD_lookup(xexpt, tag));
+						offset = ascnum(interp.lookup(xexpt, tag));
 
 						if (offset != (UWORD)-1) {
 							found = 1;
@@ -1006,8 +1006,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 	MV = (MV_entry *)add_offset(addr(thunk), thdr.MV_list);
 
 	for (i = m = 0; i < depth; i++) {
-		dict = RTD_first(addr(expt[i]));
-		while ((dict = RTD_iterate(addr(expt[i]), dict, &tag, &def)) != NULL) {
+		dict = interp.first(addr(expt[i]));
+		while ((dict = interp.iterate(addr(expt[i]), dict, &tag, &def)) != NULL) {
 			if (tag[0] == 'M') {
 				MV[m].msg = (UWORD)ascnum((const char *)&tag[2]);
 				MV[m].handler = (ULONG)ascnum(def);

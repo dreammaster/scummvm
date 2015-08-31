@@ -24,56 +24,34 @@
 //  AESOP runtime ASM calls
 //
 
-#ifndef AESOP_RT_H
-#define AESOP_RT_H
+#ifndef AESOP_INTERPRETER_H
+#define AESOP_INTERPRETER_H
 
 #include "aesop/resources.h"
 
 namespace Aesop {
 
-// fundamental stack value structure
-struct STKVAL {
-   ULONG val;
-   UWORD type;
-};
-
-enum {
-   TYP_CRES,                  // data type: code resource address
-   TYP_SRES,                  // data type: string resource
-   TYP_VSHR,                  // data type: short integer variable
-   TYP_VLNG,                  // data type: long integer variable
-   TYP_SVAR,                  // data type: string variable
-};
-
-extern ULONG diag_flag;
 extern ULONG current_this;
-extern ULONG current_msg;
-extern ULONG current_index;
-
-// Pointer and memory block management
-
-#define norm(x) ((void *) (x))
-#define add_offset(s,o) ((void *)((ULONG)(s) + (ULONG)(o)))
 
 #define add_ptr(base,offset) ((void *)((ULONG)(base) + (ULONG)(offset)))
-
 #define ptr_dif(top,bot) (((BYTE *)(top) - (BYTE *)(bot)))
-
 #define far_memmove(dest, src, len) ((void *)memmove((dest),(src),(len)))
+#define add_offset(s,o) ((void *)((ULONG)(s) + (ULONG)(o)))
 
-// Assorted speed-critical .ASM routines
+class Interpreter {
+public:
+	~Interpreter();
 
-extern uint RTD_first(HRES dictionary);
-extern uint RTD_iterate(const void *base, uint cur, const char **tag, const char **def);
+	uint first(HRES dictionary);
+	uint iterate(const void *base, uint cur, const char **tag, const char **def);
 
-extern const char *RTD_lookup(HRES dictionary, const Common::String &key);
+	const char *lookup(HRES dictionary, const Common::String &key);
 
-// Runtime interpreter calls
-
-extern void RT_init(Resources *RTR, ULONG stack_size, HRES *objlist);
-extern void RT_shutdown(void);
-extern void RT_arguments(void *base, ULONG size);
-extern LONG RT_execute(ULONG index, ULONG msg_num, ULONG vector);
+	void init(Resources *RTR, ULONG stackSize, HRES *objlist);
+	void shutdown(void);
+	void arguments(void *base, ULONG size);
+	LONG execute(ULONG index, ULONG msgNum, ULONG vector);
+};
 
 } // End of namespace Aesop
 
