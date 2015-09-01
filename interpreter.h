@@ -51,7 +51,7 @@ private:
 	HRES *_objList;
 	HRES _instance;
 	THDR *_thunk;
-	HRES _ds32;
+	const byte *_ds32;
 	const byte *_code;
 	uint16 *_fptr;
 	HRES _hPrg;

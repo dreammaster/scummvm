@@ -48,7 +48,94 @@ enum {
 /*----------------------------------------------------------------*/
 
 const OpcodeMethod Interpreter::_opcodes[] = {
-	&Interpreter::cmdBRT
+	&Interpreter::cmdBRT,
+	&Interpreter::cmdBRF,
+	&Interpreter::cmdBRA,
+	&Interpreter::cmdCASE,
+	&Interpreter::cmdPUSH,
+	&Interpreter::cmdDUP,
+	&Interpreter::cmdNOT,
+	&Interpreter::cmdSETB,
+	&Interpreter::cmdNEG,
+	&Interpreter::cmdADD,
+	&Interpreter::cmdSUB,
+	&Interpreter::cmdMUL,
+	&Interpreter::cmdDIV,
+	&Interpreter::cmdMOD,
+	&Interpreter::cmdEXP,
+	&Interpreter::cmdBAND,
+	&Interpreter::cmdBOR,
+	&Interpreter::cmdXOR,
+	&Interpreter::cmdBNOT,
+	&Interpreter::cmdSHL,
+	&Interpreter::cmdSHR,
+	&Interpreter::cmdLT,
+	&Interpreter::cmdLE,
+	&Interpreter::cmdEQ,
+	&Interpreter::cmdNE,
+	&Interpreter::cmdGE,
+	&Interpreter::cmdGT,
+	&Interpreter::cmdINC,
+	&Interpreter::cmdDEC,
+	&Interpreter::cmdSHTC,
+	&Interpreter::cmdINTC,
+	&Interpreter::cmdLNGC,
+	&Interpreter::cmdRCRS,
+	&Interpreter::cmdCALL,
+	&Interpreter::cmdSEND,
+	&Interpreter::cmdPASS,
+	&Interpreter::cmdJSR,
+	&Interpreter::cmdRTS,
+	&Interpreter::cmdAIM,
+	&Interpreter::cmdAIS,
+	&Interpreter::cmdLTBA,
+	&Interpreter::cmdLTWA,
+	&Interpreter::cmdLTDA,
+	&Interpreter::cmdLETA,
+	&Interpreter::cmdLAB,
+	&Interpreter::cmdLAW,
+	&Interpreter::cmdLAD,
+	&Interpreter::cmdSAB,
+	&Interpreter::cmdSAW,
+	&Interpreter::cmdSAD,
+	&Interpreter::cmdLABA,
+	&Interpreter::cmdLAWA,
+	&Interpreter::cmdLADA,
+	&Interpreter::cmdSABA,
+	&Interpreter::cmdSAWA,
+	&Interpreter::cmdSADA,
+	&Interpreter::cmdLEAA,
+	&Interpreter::cmdLSB,
+	&Interpreter::cmdLSW,
+	&Interpreter::cmdLSD,
+	&Interpreter::cmdSSB,
+	&Interpreter::cmdSSW,
+	&Interpreter::cmdSSD,
+	&Interpreter::cmdLSBA,
+	&Interpreter::cmdLSWA,
+	&Interpreter::cmdLSDA,
+	&Interpreter::cmdSSBA,
+	&Interpreter::cmdSSWA,
+	&Interpreter::cmdSSDA,
+	&Interpreter::cmdLESA,
+	&Interpreter::cmdLXB,
+	&Interpreter::cmdLXW,
+	&Interpreter::cmdLXD,
+	&Interpreter::cmdSXB,
+	&Interpreter::cmdSXW,
+	&Interpreter::cmdSXD,
+	&Interpreter::cmdLXBA,
+	&Interpreter::cmdLXWA,
+	&Interpreter::cmdLXDA,
+	&Interpreter::cmdSXBA,
+	&Interpreter::cmdSXWA,
+	&Interpreter::cmdSXDA,
+	&Interpreter::cmdLEXA,
+	&Interpreter::cmdSXAS,
+	&Interpreter::cmdLECA,
+	&Interpreter::cmdSOLE,
+	&Interpreter::cmdEND,
+	&Interpreter::cmdBRK
 };
 
 Interpreter::Interpreter(AesopEngine *vm, HRES *objList, int stackSize) : _vm(vm) {
@@ -148,6 +235,7 @@ void Interpreter::arguments(void *base, ULONG size) {
 
 LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	Resources &res = *_vm->_resources;
+	const int OPCODES_COUNT = sizeof(_opcodes) / sizeof(OpcodeMethod);
 
 	// Check the passed index
 	if (index == -1)
@@ -209,8 +297,8 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 
 	// Set up the code pointer
 	res.lock(_hPrg);
-	_ds32 = 0;
-	_code = (const byte *)Resources::addr(_hPrg) + codeOffset;
+	_ds32 = (const byte *)Resources::addr(_hPrg);
+	_code = _ds32 + codeOffset;
 	_breakFlag = false;
 
 	// Initialize the stack
@@ -221,9 +309,13 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 
 	while (!_vm->shouldQuit() && !_breakFlag) {
 		int opcode = *_code++;
+		if (opcode >= OPCODES_COUNT)
+			error("Invalid opcode encountered");
+
 		(this->*_opcodes[opcode])();
 	}
 
+	res.unlock(_hPrg);
 	return 0;
 }
 
@@ -235,7 +327,15 @@ void Interpreter::deref() {
 	*/
 }
 
-void Interpreter::cmdBRT() { error("TODO: opcode"); }
+void Interpreter::cmdBRT() {
+	if (*_stackPtr & *(_stackPtr + 1)) {
+		// Branch
+		_code = _ds32 + READ_LE_UINT32(_code);
+	} else {
+		// Don't branch
+		_code += 2;
+	}
+}
 
 void Interpreter::cmdBRF() { error("TODO: opcode"); }
 
