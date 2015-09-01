@@ -47,20 +47,27 @@ enum {
 
 /*----------------------------------------------------------------*/
 
+const OpcodeMethod Interpreter::_opcodes[] = {
+	&Interpreter::cmdBRT
+};
+
 Interpreter::Interpreter(AesopEngine *vm, HRES *objList, int stackSize) : _vm(vm) {
 	_objList = objList;
-	_stackBase = (byte *)mem_alloc(stackSize);
-	_stackSize = stackSize;
+	_stackBase = (uint16 *)mem_alloc(stackSize);
+	_stackPtr = _stackBase + stackSize;
 
 	_currentIndex = 0;
 	_currentMsg = 0;
 	_currentThis = 0;
-	_stackOffset = 0;
 	_instance = HRES_NULL;
 	_thunk = nullptr;
-	_ds32 = 0;
+	_ds32 = nullptr;
+	_code = nullptr;
 	_fptr = 0;
 	_hPrg = HRES_NULL;
+	_staticOffset = 0;
+	_externOffset = 0;
+	_breakFlag = false;
 }
 
 Interpreter::~Interpreter() {
@@ -195,31 +202,214 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	}
 
 	const SD_entry *sdEntry = (const SD_entry *)((const byte *)_thunk + curVector->SD_offset);
-	_thisOffset = curVector->handler;
+	uint codeOffset = curVector->handler;
 	_hPrg = sdEntry->SOP;
-	UWORD staticOffset = sdEntry->static_base;
-	UWORD externOffset = sdEntry->extern_base;
+	_staticOffset = sdEntry->static_base;
+	_externOffset = sdEntry->extern_base;
 
+	// Set up the code pointer
 	res.lock(_hPrg);
 	_ds32 = 0;
+	_code = (const byte *)Resources::addr(_hPrg) + codeOffset;
+	_breakFlag = false;
 
-	deref();
+	// Initialize the stack
+	_fptr = _stackPtr;
+	*(_stackPtr - 1) = index;
+	_stackPtr = _stackPtr - READ_LE_UINT16(_code) / 2 - 2;
+	_code += 2;
 
-	_fptr = _stackOffset;
-	//TODO
-
-	while (!_vm->shouldQuit()) {
-		error("TODO");
+	while (!_vm->shouldQuit() && !_breakFlag) {
+		int opcode = *_code++;
+		(this->*_opcodes[opcode])();
 	}
 
 	return 0;
 }
 
 void Interpreter::deref() {
-	_thisOffset -= _ds32;
-	
-	_thisOffset += _ds32;
+	/*
+	int diff = (const byte *)_code - (const byte *)_ds32;
+	_ds32 = Resources::addr(_hPrg);
+	_code = (HRES)((const byte *)_ds32 + diff);
+	*/
 }
+
+void Interpreter::cmdBRT() { error("TODO: opcode"); }
+
+void Interpreter::cmdBRF() { error("TODO: opcode"); }
+
+void Interpreter::cmdBRA() { error("TODO: opcode"); }
+
+void Interpreter::cmdCASE() { error("TODO: opcode"); }
+
+void Interpreter::cmdPUSH() { error("TODO: opcode"); }
+
+void Interpreter::cmdDUP() { error("TODO: opcode"); }
+
+void Interpreter::cmdNOT() { error("TODO: opcode"); }
+
+void Interpreter::cmdSETB() { error("TODO: opcode"); }
+
+void Interpreter::cmdNEG() { error("TODO: opcode"); }
+
+void Interpreter::cmdADD() { error("TODO: opcode"); }
+
+void Interpreter::cmdSUB() { error("TODO: opcode"); }
+
+void Interpreter::cmdMUL() { error("TODO: opcode"); }
+
+void Interpreter::cmdDIV() { error("TODO: opcode"); }
+
+void Interpreter::cmdMOD() { error("TODO: opcode"); }
+
+void Interpreter::cmdEXP() { error("TODO: opcode"); }
+
+void Interpreter::cmdBAND() { error("TODO: opcode"); }
+
+void Interpreter::cmdBOR() { error("TODO: opcode"); }	
+
+void Interpreter::cmdXOR() { error("TODO: opcode"); }
+
+void Interpreter::cmdBNOT() { error("TODO: opcode"); }
+
+void Interpreter::cmdSHL() { error("TODO: opcode"); }	
+
+void Interpreter::cmdSHR() { error("TODO: opcode"); }
+
+void Interpreter::cmdLT() { error("TODO: opcode"); }
+
+void Interpreter::cmdLE() { error("TODO: opcode"); }
+
+void Interpreter::cmdEQ() { error("TODO: opcode"); }
+
+void Interpreter::cmdNE() { error("TODO: opcode"); }
+
+void Interpreter::cmdGE() { error("TODO: opcode"); }
+
+void Interpreter::cmdGT() { error("TODO: opcode"); }
+
+void Interpreter::cmdINC() { error("TODO: opcode"); }
+
+void Interpreter::cmdDEC() { error("TODO: opcode"); }
+
+void Interpreter::cmdSHTC() { error("TODO: opcode"); }	
+
+void Interpreter::cmdINTC() { error("TODO: opcode"); }
+
+void Interpreter::cmdLNGC() { error("TODO: opcode"); }
+
+void Interpreter::cmdRCRS() { error("TODO: opcode"); }	
+
+void Interpreter::cmdCALL() { error("TODO: opcode"); }
+
+void Interpreter::cmdSEND() { error("TODO: opcode"); }
+
+void Interpreter::cmdPASS() { error("TODO: opcode"); }
+
+void Interpreter::cmdJSR() { error("TODO: opcode"); }
+
+void Interpreter::cmdRTS() { error("TODO: opcode"); }
+
+void Interpreter::cmdAIM() { error("TODO: opcode"); }
+
+void Interpreter::cmdAIS() { error("TODO: opcode"); }
+
+void Interpreter::cmdLTBA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLTWA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLTDA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLETA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLAB() { error("TODO: opcode"); }
+
+void Interpreter::cmdLAW() { error("TODO: opcode"); }
+
+void Interpreter::cmdLAD() { error("TODO: opcode"); }
+
+void Interpreter::cmdSAB() { error("TODO: opcode"); }
+
+void Interpreter::cmdSAW() { error("TODO: opcode"); }
+
+void Interpreter::cmdSAD() { error("TODO: opcode"); }
+
+void Interpreter::cmdLABA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLAWA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLADA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSABA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSAWA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSADA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLEAA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLSB() { error("TODO: opcode"); }
+
+void Interpreter::cmdLSW() { error("TODO: opcode"); }
+
+void Interpreter::cmdLSD() { error("TODO: opcode"); }
+
+void Interpreter::cmdSSB() { error("TODO: opcode"); }
+
+void Interpreter::cmdSSW() { error("TODO: opcode"); }
+
+void Interpreter::cmdSSD() { error("TODO: opcode"); }
+
+void Interpreter::cmdLSBA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLSWA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLSDA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSSBA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSSWA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSSDA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLESA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLXB() { error("TODO: opcode"); }
+
+void Interpreter::cmdLXW() { error("TODO: opcode"); }
+
+void Interpreter::cmdLXD() { error("TODO: opcode"); }
+
+void Interpreter::cmdSXB() { error("TODO: opcode"); }
+
+void Interpreter::cmdSXW() { error("TODO: opcode"); }
+
+void Interpreter::cmdSXD() { error("TODO: opcode"); }
+
+void Interpreter::cmdLXBA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLXWA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLXDA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSXBA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSXWA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSXDA() { error("TODO: opcode"); }
+
+void Interpreter::cmdLEXA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSXAS() { error("TODO: opcode"); }
+
+void Interpreter::cmdLECA() { error("TODO: opcode"); }
+
+void Interpreter::cmdSOLE() { error("TODO: opcode"); }
+
+void Interpreter::cmdEND() { error("TODO: opcode"); }
+
+void Interpreter::cmdBRK() { error("TODO: opcode"); }
 
 } // End of namespace Aesop
 

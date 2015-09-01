@@ -252,9 +252,9 @@ void dump_static_context(ULONG index, TF_class *TF) {
 		return;
 	}
 
-	thunk = ((IHDR *)res.addr(instance))->_thunk;
+	thunk = ((IHDR *)Resources::addr(instance))->_thunk;
 
-	tptr = res.addr(thunk);
+	tptr = Resources::addr(thunk);
 	thdr = *((THDR *)tptr);
 
 	SD = (SD_entry *)add_ptr(tptr, thdr._sdList);
@@ -273,7 +273,7 @@ void dump_static_context(ULONG index, TF_class *TF) {
 
 	for (p = 0; p < thdr._nPrgs; p++)
 	{
-		tptr = res.addr(thunk);
+		tptr = Resources::addr(thunk);
 		SD = (SD_entry *)add_ptr(tptr, thdr._sdList);
 
 		offset = SD[p].static_base;
@@ -290,10 +290,10 @@ void dump_static_context(ULONG index, TF_class *TF) {
 		strcat(linbuf, "]");
 		TF_writeln(TF, linbuf);
 
-		inst = add_ptr(res.addr(instance), offset);
+		inst = add_ptr(Resources::addr(instance), offset);
 
-		dict = interp.first(res.addr(expt));
-		while ((dict = interp.iterate(res.addr(expt), dict, &tag, &def)) != NULL)
+		dict = interp.first(Resources::addr(expt));
+		while ((dict = interp.iterate(Resources::addr(expt), dict, &tag, &def)) != NULL)
 		{
 			type = tag[0];
 			if ((type != 'B') && (type != 'W') && (type != 'L'))
@@ -429,8 +429,8 @@ void restore_static_context(HRES instance, TF_class *TF)
 	THDR thdr;
 	char *def, *tag, *size, *chrpnt;
 
-	thunk = ((IHDR *)res.addr(instance))->_thunk;
-	thdr = *((THDR *)res.addr(thunk));
+	thunk = ((IHDR *)Resources::addr(instance))->_thunk;
+	thdr = *((THDR *)Resources::addr(thunk));
 
 	while (readln(TF, (BYTE *)linbuf, sizeof(linbuf)))
 	{
@@ -446,7 +446,7 @@ void restore_static_context(HRES instance, TF_class *TF)
 
 			for (p = 0; p < thdr._nPrgs; p++)
 			{
-				tptr = res.addr(thunk);
+				tptr = Resources::addr(thunk);
 				SD = (SD_entry *)add_ptr(tptr, thdr._sdList);
 
 				offset = SD[p].static_base;
@@ -491,7 +491,7 @@ void restore_static_context(HRES instance, TF_class *TF)
 			if (def == NULL)
 				abend(MSG_UVR, name);       //"Unresolved variable reference '%s'"
 
-			d = (void *)((ULONG)res.addr(instance) + ascnum(def) + offset);
+			d = (void *)((ULONG)Resources::addr(instance) + ascnum(def) + offset);
 
 			if ((size = strchr(def, ',')) != NULL)
 				asize = ascnum(size + 1);
@@ -559,7 +559,6 @@ void restore_static_context(HRES instance, TF_class *TF)
 
 LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
 {
-	Resources &res = *_vm->_resources;
 	LONG good;
 	ULONG index;
    UBYTE typetest;
@@ -612,9 +611,9 @@ LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
             }
          else
             {
-            thunk = ((IHDR *) res.addr(instance))->_thunk;
+            thunk = ((IHDR *) Resources::addr(instance))->_thunk;
 
-            tptr = res.addr(thunk);
+            tptr = Resources::addr(thunk);
             thdr = *((THDR *) tptr);
 
             hd_inst = (HD_entry *) instance;
@@ -626,7 +625,7 @@ LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
          //f.write(&CD,sizeof(CDESC));
 
          if (CD.size)
-            if (f.write(add_ptr(res.addr(objlist[index]),sizeof(IHDR)),
+            if (f.write(add_ptr(Resources::addr(objlist[index]),sizeof(IHDR)),
                       CD.size) != CD.size)
                {
                good = 0;
@@ -676,7 +675,6 @@ LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
 void restore_range(const char *filename, ULONG first, ULONG last, ULONG restoring)
 {
 	Interpreter &interp = *_vm->_interpreter;
-	Resources &res = *_vm->_resources;
 	ULONG bad, txttype;
 	ULONG index;
 	UBYTE typetest;
@@ -779,7 +777,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 		else
 			if (CD->size)
 			{
-				f.read((BYTE *)res.addr(objlist[index]) + sizeof(IHDR), CD->size);
+				f.read((BYTE *)Resources::addr(objlist[index]) + sizeof(IHDR), CD->size);
 			}
 
 		if (restoring)
@@ -856,9 +854,9 @@ void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG fi
 		{
 			instance = res.create_instance(CD->name);
 
-			thunk = ((IHDR *)res.addr(instance))->_thunk;
+			thunk = ((IHDR *)Resources::addr(instance))->_thunk;
 
-			tptr = res.addr(thunk);
+			tptr = Resources::addr(thunk);
 			thdr = *((THDR *)tptr);
 
 			CD_out.size = thdr._iSize - sizeof(IHDR);
@@ -870,7 +868,7 @@ void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG fi
 
 			if (CD_out.size)
 			{
-				if (f.write(add_ptr(res.addr(instance), sizeof(IHDR)), CD_out.size)
+				if (f.write(add_ptr(Resources::addr(instance), sizeof(IHDR)), CD_out.size)
 					!= CD_out.size)
 				{
 					abend(MSG_CWTE, index);  //"Couldn't write translated entry %u"

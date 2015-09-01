@@ -47,7 +47,7 @@ AesopEngine::~AesopEngine() {
 }
 
 void AesopEngine::initialize() {
-	_interpreter = new Interpreter(this, objlist, 16384);
+	_interpreter = new Interpreter(this, objlist, 8192);
 	_resources = new Resources(this);
 	init_object_list();
 	init_notify_list();

@@ -831,11 +831,10 @@ LONG get_text_y(LONG argcnt, ULONG wndnum)
 void home(LONG argcnt, ULONG wndnum)
 
 {
-	Resources &res = *_vm->_resources;
 	HRES hfont;
 
    hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = (FONT *)res.addr(hfont);
+   tw[wndnum].font = (FONT *)Resources::addr(hfont);
 
    GIL2VFX_select_text_window(&tw[wndnum]);
    GIL2VFX_home();
@@ -848,11 +847,10 @@ void home(LONG argcnt, ULONG wndnum)
 void text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG newColor)
 
 {
-	Resources &res = *_vm->_resources;
 	HRES hfont;
 
    hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = (FONT *)res.addr(hfont);
+   tw[wndnum].font = (FONT *)Resources::addr(hfont);
 
    GIL2VFX_select_text_window(&tw[wndnum]);
    GIL2VFX_remap_font_color(current, newColor);
@@ -1088,12 +1086,11 @@ void crout(LONG argcnt, ULONG wndnum)
 /*********************************************************/
 
 ULONG char_width(LONG argcnt, ULONG wndnum, ULONG ch) {
-	Resources &res = *_vm->_resources;
 	HRES hfont;
    ULONG w;
 
    hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = (FONT *)res.addr(hfont);
+   tw[wndnum].font = (FONT *)Resources::addr(hfont);
 
    GIL2VFX_select_text_window(&tw[wndnum]);
    w = GIL2VFX_char_width(ch);
@@ -1106,13 +1103,12 @@ ULONG char_width(LONG argcnt, ULONG wndnum, ULONG ch) {
 /*********************************************************/
 
 ULONG font_height(LONG argcnt, ULONG wndnum) {
-	Resources &res = *_vm->_resources;
 	HRES hfont;
 	ULONG w;
 
 	hfont = (HRES)tw[wndnum].font;
 
-	w = ((FONT *)(res.addr(hfont)))->char_height;
+	w = ((FONT *)(Resources::addr(hfont)))->char_height;
 
 	return w;
 }
