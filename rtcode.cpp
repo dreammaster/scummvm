@@ -53,33 +53,34 @@ ULONG diag_flag = 0;
 
 
 void load_string(LONG argcnt, BYTE *array, ULONG string) {
+	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	HRES handle;
-   BYTE *ptr;
-   BYTE *new_array;
-   ULONG array_offset;
+	BYTE *ptr;
+	BYTE *new_array;
+	ULONG array_offset;
 
-   array_offset = array - (BYTE *)res.addr(objlist[current_this]);
+	array_offset = array - (BYTE *)res.addr(objlist[interp._currentThis]);
 
-   handle = res.get_resource_handle(string,DA_DEFAULT);
+	handle = res.get_resource_handle(string, DA_DEFAULT);
 
-   res.lock(handle);
+	res.lock(handle);
 
-   new_array = (BYTE *)add_ptr(res.addr(objlist[current_this]),array_offset);
+	new_array = (BYTE *)add_ptr(res.addr(objlist[interp._currentThis]), array_offset);
 
-   ptr = (BYTE *)res.addr(handle);
+	ptr = (BYTE *)res.addr(handle);
 
-   switch (*(UWORD *) ptr)
-      {
-      case ':S':
-         far_memmove(new_array,ptr+2,res.size(handle)-2L);
-         break;
+	switch (*(UWORD *)ptr)
+	{
+	case ':S':
+		far_memmove(new_array, ptr + 2, res.size(handle) - 2L);
+		break;
 
-      default:
-         abend(MSG_SRRLS);
-      }
+	default:
+		abend(MSG_SRRLS);
+	}
 
-   res.unlock(handle);
+	res.unlock(handle);
 }
      
 //
@@ -93,23 +94,24 @@ void load_string(LONG argcnt, BYTE *array, ULONG string) {
 
 
 void load_resource(LONG argcnt, BYTE *array, ULONG resource) {
+	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	HRES handle;
-   ULONG array_offset;
-   BYTE *new_array;
+	ULONG array_offset;
+	BYTE *new_array;
 
-   // TODO: Double-check removal of FP_OFF
-   array_offset = array - (BYTE *)res.addr(objlist[current_this]);
+	// TODO: Double-check removal of FP_OFF
+	array_offset = array - (BYTE *)res.addr(objlist[interp._currentThis]);
 
-   handle = res.get_resource_handle(resource,DA_DEFAULT);
+	handle = res.get_resource_handle(resource, DA_DEFAULT);
 
-   res.lock(handle);
+	res.lock(handle);
 
-   new_array = (BYTE *)add_ptr(res.addr(objlist[current_this]),array_offset);
+	new_array = (BYTE *)add_ptr(res.addr(objlist[interp._currentThis]), array_offset);
 
-   far_memmove(new_array,res.addr(handle),res.size(handle));
+	far_memmove(new_array, res.addr(handle), res.size(handle));
 
-   res.unlock(handle);
+	res.unlock(handle);
 }
 
 

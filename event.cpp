@@ -617,7 +617,7 @@ void dispatch_event(void)
 			interp.arguments(&event_message_descriptor,
 				sizeof(event_message_descriptor));
 
-			interp.execute((LONG)NR->client, (LONG)NR->message, (ULONG)-1);
+			interp.execute(NR->client, NR->message, HRES_NULL);
 		}
 	}
 }

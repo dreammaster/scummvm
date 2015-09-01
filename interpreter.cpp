@@ -21,7 +21,9 @@
  */
 
 #include "aesop/aesop.h"
+#include "aesop/defs.h"
 #include "aesop/interpreter.h"
+#include "aesop/rtsystem.h"
 
 namespace Aesop {
 
@@ -43,12 +45,26 @@ enum {
 
 #define norm(x) ((void *) (x))
 
-ULONG current_this;
-
 /*----------------------------------------------------------------*/
 
+Interpreter::Interpreter(AesopEngine *vm, HRES *objList, int stackSize) : _vm(vm) {
+	_objList = objList;
+	_stackBase = (byte *)mem_alloc(stackSize);
+	_stackSize = stackSize;
+
+	_currentIndex = 0;
+	_currentMsg = 0;
+	_currentThis = 0;
+	_stackOffset = 0;
+	_instance = HRES_NULL;
+	_thunk = nullptr;
+	_ds32 = 0;
+	_fptr = 0;
+	_hPrg = HRES_NULL;
+}
+
 Interpreter::~Interpreter() {
-	// TODO: RTD_shutdown
+	mem_free(_stackBase);
 }
 
 uint Interpreter::first(HRES dictionary) {
@@ -119,16 +135,90 @@ const char *Interpreter::lookup(HRES dictionary, const Common::String &key) {
 	return nullptr;
 }
 
-void Interpreter::init(Resources *RTR, ULONG stackSize, HRES *objlist) {
-	error("TODO: Reimplement ASM as CPP code");
-}
-
 void Interpreter::arguments(void *base, ULONG size) {
 	error("TODO: Reimplement ASM as CPP code");
 }
 
-LONG Interpreter::execute(ULONG index, ULONG msgNum, ULONG vector) {
-	error("TODO: Reimplement ASM as CPP code");
+LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
+	Resources &res = *_vm->_resources;
+
+	// Check the passed index
+	if (index == -1)
+		return -1;
+	_currentIndex = index;
+
+	// Get a handle to the object
+	HRES handle = _objList[index];
+	if (handle == HRES_NULL)
+		return -1;
+	_instance = handle;
+
+	IHDR *hdr = (IHDR *)res.addr(handle);
+	_thunk = (THDR *)res.addr(hdr->_thunk);
+	const MV_entry *curVector;
+
+	if (vector == HRES_NULL || vector == (HRES)0xffff) {
+		const MV_entry *mvList = (const MV_entry *)((const byte *)_thunk + _thunk->_mvList);
+		UWORD maxMsg = _thunk->_maxMsg;
+
+		if (maxMsg == (UWORD)-1)
+			return -1;
+		_currentMsg = msgNum;
+
+		// Find the vector using a binary search
+		int idx;
+		for (idx = 0; mvList[(maxMsg + idx) & 0xfffe].msg != msgNum; ) {			
+			int offset = (maxMsg + idx) & 0xfffe;
+			int msg = mvList[offset].msg;
+
+			if (msg > msgNum) {
+				// Too high
+				maxMsg = offset / 2 - 1;
+				if (idx > maxMsg)
+					return -1;
+			} else {
+				// Too low
+				idx = offset / 2 + 1;
+				if (idx > maxMsg)
+					return -1;
+			}
+		}
+
+		curVector = &mvList[(maxMsg + idx) & 0xfffe];
+		++curVector;
+
+		do {
+			--curVector;
+		} while (curVector > mvList && (curVector - 1)->msg == msgNum);
+	} else {
+		curVector = (MV_entry *)vector;
+	}
+
+	const SD_entry *sdEntry = (const SD_entry *)((const byte *)_thunk + curVector->SD_offset);
+	_thisOffset = curVector->handler;
+	_hPrg = sdEntry->SOP;
+	UWORD staticOffset = sdEntry->static_base;
+	UWORD externOffset = sdEntry->extern_base;
+
+	res.lock(_hPrg);
+	_ds32 = 0;
+
+	deref();
+
+	_fptr = _stackOffset;
+	//TODO
+
+	while (!_vm->shouldQuit()) {
+		error("TODO");
+	}
+
+	return 0;
+}
+
+void Interpreter::deref() {
+	_thisOffset -= _ds32;
+	
+	_thisOffset += _ds32;
 }
 
 } // End of namespace Aesop

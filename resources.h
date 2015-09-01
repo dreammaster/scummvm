@@ -153,6 +153,24 @@ struct PRG_HDR {
 	void load(Common::SeekableReadStream &s);
 };
 
+// Instance header
+struct IHDR {
+	HRES _thunk;
+
+	IHDR() : _thunk(nullptr) {}
+};
+
+// Thunk header
+struct THDR {
+	UWORD _mvList;
+	UWORD _maxMsg;
+	UWORD _sdList;
+	UWORD _nPrgs;
+	UWORD _iSize;
+	UWORD _useCount;
+
+	THDR();
+};
 
 //
 // RTR_member macro allows access to HD_entry structure members
@@ -161,8 +179,6 @@ struct PRG_HDR {
 #define RTR_member(x,y)   ( (HD_entry *)(x)->y )
 
 #define SIZE_DB (DIR_BLK * sizeof(HD_entry))
-
-//extern RTR_class *LNK;
 
 class AesopEngine;
 
@@ -381,10 +397,8 @@ public:
 	 * any function which can load resources or otherwise allocate cache memory.
 	 * The fix_segment() function may be used to adjust segment addresses
 	 * of moveable resources.
-	 *
-	 * This function is normally implemented via a macro #defined in RTRES.H.
 	 */
-	void *addr(HRES entry);
+	static void *addr(HRES entry);
 
 	void fixup(void **ptr, HRES entry);
 

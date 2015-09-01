@@ -356,6 +356,7 @@ void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
 
 ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
 	ULONG table, ULONG number, WORD *array) {
+	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	HRES handle;
 	ULONG array_offset;
@@ -363,7 +364,7 @@ ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
 	WORD bounds[4];
 	ULONG result;
 
-	array_offset = (ULONG)array - (ULONG)res.addr(objlist[current_this]);
+	array_offset = (ULONG)array - (ULONG)res.addr(objlist[interp._currentThis]);
 
 	handle = res.get_resource_handle(table, DA_DEFAULT);
 
@@ -371,7 +372,7 @@ ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
 
 	result = GIL2VFX_visible_bitmap_rect(x, y, flip, (UBYTE *)res.addr(handle), number, bounds);
 
-	new_array = (BYTE *)add_ptr(res.addr(objlist[current_this]), array_offset);
+	new_array = (BYTE *)add_ptr(res.addr(objlist[interp._currentThis]), array_offset);
 
 	far_memmove(new_array, bounds, sizeof(bounds));
 

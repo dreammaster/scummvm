@@ -102,7 +102,7 @@ void create_SOP_instance(ULONG name, LONG index)
 	Resources &res = *_vm->_resources;
 	objlist[index] = res.create_instance(name);
 
-   interp.execute(index, MSG_CREATE, (ULONG)-1);
+	interp.execute(index, MSG_CREATE, HRES_NULL);
 }
 
 /***************************************************/
@@ -164,7 +164,7 @@ LONG destroy_object(LONG argcnt, LONG index) {
 	Resources &res = *_vm->_resources;
 	LONG rtn;
 
-	rtn = interp.execute(index, MSG_DESTROY, (ULONG)-1);
+	rtn = interp.execute(index, MSG_DESTROY, HRES_NULL);
 
 	cancel_entity_requests(index);
 	release_owned_windows(index);
@@ -252,14 +252,14 @@ void dump_static_context(ULONG index, TF_class *TF) {
 		return;
 	}
 
-	thunk = ((IHDR *)res.addr(instance))->thunk;
+	thunk = ((IHDR *)res.addr(instance))->_thunk;
 
 	tptr = res.addr(thunk);
 	thdr = *((THDR *)tptr);
 
-	SD = (SD_entry *)add_ptr(tptr, thdr.SD_list);
+	SD = (SD_entry *)add_ptr(tptr, thdr._sdList);
 
-	expt = res.get_resource_handle(SD[thdr.nprgs - 1].exports,
+	expt = res.get_resource_handle(SD[thdr._nPrgs - 1].exports,
 		DA_TEMPORARY | DA_EVANESCENT);
 	res.lock(expt);
 	linbuf[i + 2] = '"';
@@ -271,10 +271,10 @@ void dump_static_context(ULONG index, TF_class *TF) {
 	TF_writeln(TF, linbuf);
 	TF_writeln(TF, "{");
 
-	for (p = 0; p < thdr.nprgs; p++)
+	for (p = 0; p < thdr._nPrgs; p++)
 	{
 		tptr = res.addr(thunk);
-		SD = (SD_entry *)add_ptr(tptr, thdr.SD_list);
+		SD = (SD_entry *)add_ptr(tptr, thdr._sdList);
 
 		offset = SD[p].static_base;
 
@@ -429,7 +429,7 @@ void restore_static_context(HRES instance, TF_class *TF)
 	THDR thdr;
 	char *def, *tag, *size, *chrpnt;
 
-	thunk = ((IHDR *)res.addr(instance))->thunk;
+	thunk = ((IHDR *)res.addr(instance))->_thunk;
 	thdr = *((THDR *)res.addr(thunk));
 
 	while (readln(TF, (BYTE *)linbuf, sizeof(linbuf)))
@@ -444,10 +444,10 @@ void restore_static_context(HRES instance, TF_class *TF)
 				*tag = 0;
 			tag = strchr(linbuf, '[') + 1;
 
-			for (p = 0; p < thdr.nprgs; p++)
+			for (p = 0; p < thdr._nPrgs; p++)
 			{
 				tptr = res.addr(thunk);
-				SD = (SD_entry *)add_ptr(tptr, thdr.SD_list);
+				SD = (SD_entry *)add_ptr(tptr, thdr._sdList);
 
 				offset = SD[p].static_base;
 
@@ -463,7 +463,7 @@ void restore_static_context(HRES instance, TF_class *TF)
 					break;
 			}
 
-			if (p == thdr.nprgs)
+			if (p == thdr._nPrgs)
 				abend(MSG_CMCR, tag);       //"Class '%s' missing; cannot restore"
 		}
 		else
@@ -612,14 +612,14 @@ LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
             }
          else
             {
-            thunk = ((IHDR *) res.addr(instance))->thunk;
+            thunk = ((IHDR *) res.addr(instance))->_thunk;
 
             tptr = res.addr(thunk);
             thdr = *((THDR *) tptr);
 
             hd_inst = (HD_entry *) instance;
             CD.name = hd_inst->_user;
-            CD.size = thdr.isize - sizeof(IHDR);
+            CD.size = thdr._iSize - sizeof(IHDR);
             }
 
 		 error("TODO: CDESC::save & IHDR::save");
@@ -784,7 +784,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 
 		if (restoring)
 		{
-			interp.execute(index, MSG_RESTORE, (ULONG)-1);
+			interp.execute(index, MSG_RESTORE, HRES_NULL);
 		}
 	}
 
@@ -856,12 +856,12 @@ void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG fi
 		{
 			instance = res.create_instance(CD->name);
 
-			thunk = ((IHDR *)res.addr(instance))->thunk;
+			thunk = ((IHDR *)res.addr(instance))->_thunk;
 
 			tptr = res.addr(thunk);
 			thdr = *((THDR *)tptr);
 
-			CD_out.size = thdr.isize - sizeof(IHDR);
+			CD_out.size = thdr._iSize - sizeof(IHDR);
 
 			error("TODO: CDESC::save");
 			//write(handle,&CD_out,sizeof(CDESC));

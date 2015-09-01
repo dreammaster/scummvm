@@ -31,15 +31,34 @@
 
 namespace Aesop {
 
-extern ULONG current_this;
-
 #define add_ptr(base,offset) ((void *)((ULONG)(base) + (ULONG)(offset)))
 #define ptr_dif(top,bot) (((BYTE *)(top) - (BYTE *)(bot)))
 #define far_memmove(dest, src, len) ((void *)memmove((dest),(src),(len)))
 #define add_offset(s,o) ((void *)((ULONG)(s) + (ULONG)(o)))
 
+class AesopEngine;
+
 class Interpreter {
+private:
+	AesopEngine *_vm;
+	LONG _currentIndex;
+	byte *_stackBase;
+	int _stackSize;
+	ULONG _stackOffset;
+	HRES *_objList;
+	HRES _instance;
+	THDR *_thunk;
+	ULONG _ds32;
+	ULONG _fptr;
+	ULONG _thisOffset;
+	HRES _hPrg;
+
+	void deref();
 public:
+	ULONG _currentMsg;
+	ULONG _currentThis;
+public:
+	Interpreter(AesopEngine *vm, HRES *objList, int stackSize);
 	~Interpreter();
 
 	uint first(HRES dictionary);
@@ -47,10 +66,9 @@ public:
 
 	const char *lookup(HRES dictionary, const Common::String &key);
 
-	void init(Resources *RTR, ULONG stackSize, HRES *objlist);
 	void shutdown(void);
 	void arguments(void *base, ULONG size);
-	LONG execute(ULONG index, ULONG msgNum, ULONG vector);
+	LONG execute(LONG index, LONG msgNum, HRES vector);
 };
 
 } // End of namespace Aesop

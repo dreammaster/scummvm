@@ -113,6 +113,16 @@ void PRG_HDR::load(Common::SeekableReadStream &s) {
 
 /*----------------------------------------------------------------*/
 
+THDR::THDR() {
+	_mvList = 0;
+	_sdList = 0;
+	_nPrgs = 0;
+	_iSize = 0;
+	_useCount = 0;
+}
+
+/*----------------------------------------------------------------*/
+
 Resources::Resources(AesopEngine *vm): _vm(vm) {
 	const Common::String filename = vm->getGameID() == GType_EOB3 ? "eye.res" : "hack.res";
 	void *beg,*end;
@@ -584,7 +594,7 @@ ULONG Resources::size(HRES entry) {
 }
 
 void *Resources::addr(HRES entry) {
-	return (void *)(*(ULONG *)entry);
+	return (void *)(*(void **)entry);
 }
 
 void Resources::read_resource(void *dest, ULONG len) {
@@ -725,12 +735,12 @@ HRES Resources::create_instance(ULONG object) {
 	} else {
 		thunk = (HRES)entry->thunk;
 	}
-	ihdr.thunk = thunk;
+	ihdr._thunk = thunk;
 
 	thdr = (THDR *)addr(thunk);
-	++thdr->use_cnt;
+	++thdr->_useCount;
 
-	instance = alloc(thdr->isize, DA_MOVEABLE | DA_PRECIOUS);
+	instance = alloc(thdr->_iSize, DA_MOVEABLE | DA_PRECIOUS);
 
 	sel = (HD_entry *)instance;
 
@@ -742,9 +752,9 @@ HRES Resources::create_instance(ULONG object) {
 }
 
 void Resources::destroy_instance(HRES instance) {
-	HRES thunk = ((IHDR *)addr(instance))->thunk;
+	HRES thunk = ((IHDR *)addr(instance))->_thunk;
 
-	if (!(--(((THDR *)addr(thunk))->use_cnt)))
+	if (!(--(((THDR *)addr(thunk))->_useCount)))
 		free(thunk);
 
 	free(instance);
@@ -796,12 +806,12 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 	HCRFD = get_resource_handle(CRFD, DA_TEMPORARY | DA_EVANESCENT);
 	lock(HCRFD);
 
-	thdr.MV_list = sizeof(THDR);
-	thdr.SD_list = sizeof(THDR);
-	thdr.max_msg = (UWORD)-1;
-	thdr.nprgs = 0;
-	thdr.isize = sizeof(IHDR);
-	thdr.use_cnt = 0;
+	thdr._mvList = sizeof(THDR);
+	thdr._sdList = sizeof(THDR);
+	thdr._maxMsg = (UWORD)-1;
+	thdr._nPrgs = 0;
+	thdr._iSize = sizeof(IHDR);
+	thdr._useCount = 0;
 
 	XR_list = sizeof(THDR);
 
@@ -824,7 +834,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		Common::MemoryReadStream prgStream((const byte *)addr(code[depth]), 14);
 		prg.load(prgStream);
 
-		++thdr.nprgs;
+		++thdr._nPrgs;
 		tsize += sizeof(SD_entry);
 		XR_list += sizeof(SD_entry);
 
@@ -845,9 +855,9 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		while ((dict = interp.iterate(addr(expt[depth]), dict, &tag, &def)) != NULL) {
 			switch (tag[0]) {
 			case 'M':               // Message
-				++thdr.max_msg;
+				++thdr._maxMsg;
 				++mcnt;
-				thdr.SD_list += sizeof(MV_entry);
+				thdr._sdList += sizeof(MV_entry);
 				XR_list += sizeof(MV_entry);
 				tsize += sizeof(MV_entry);
 				break;
@@ -882,7 +892,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		}
 
 		s_S[depth] += prg._staticSize;
-		thdr.isize += prg._staticSize;
+		thdr._iSize += prg._staticSize;
 
 		class1 = prg._parent;
 
@@ -903,13 +913,13 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 	*(THDR *)addr(thunk) = thdr;
 
-	SD = thdr.SD_list;
+	SD = thdr._sdList;
 
 	i = depth - 1;
 	j = 0;
 	k = sizeof(IHDR);
 	m = XR_list;
-	n = thdr.SD_list;
+	n = thdr._sdList;
 
 	while (i >= 0) {
 		SDarray = (SD_entry *)((byte *)addr(thunk) + SD);
@@ -1003,7 +1013,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		i--;
 	}
 
-	MV = (MV_entry *)add_offset(addr(thunk), thdr.MV_list);
+	MV = (MV_entry *)add_offset(addr(thunk), thdr._mvList);
 
 	for (i = m = 0; i < depth; i++) {
 		dict = interp.first(addr(expt[i]));

@@ -53,21 +53,6 @@ typedef UWORD HSTR;           // run-time len-prefixed string descriptor
 
 #define MAX_G 16              // Maximum depth of "family trees"
 
-// Instance header
-struct IHDR {
-   HRES thunk;
-};
-
-// Thunk header
-struct THDR {
-   UWORD MV_list;
-   UWORD max_msg;
-   UWORD SD_list;
-   UWORD nprgs;
-   UWORD isize;
-   UWORD use_cnt;
-};
-
 // Message handler header
 struct MHDR {
    UWORD auto_size;
