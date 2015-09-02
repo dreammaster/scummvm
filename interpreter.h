@@ -101,8 +101,9 @@ public:
 	size_type size() const {
 		return _stack.size();
 	}
-//	uint32 &operator[](size_type i) { return _stack[size() - i - 1]._val; }
-//	const uint32 &operator[](size_type i) const { return _stack[size() - i - 1]._val; }
+
+	uint32 &operator[](size_type i) { return _stack[i]._val; }
+	const uint32 &operator[](size_type i) const { return _stack[i]._val; }
 };
 
 typedef void (Interpreter::*OpcodeMethod)();

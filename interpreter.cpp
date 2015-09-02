@@ -315,7 +315,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	}
 
 	res.unlock(_hPrg);
-	return 0;
+	return _stack.top();
 }
 
 void Interpreter::deref() {
@@ -616,179 +616,400 @@ void Interpreter::cmdLETA() {
 }
 
 void Interpreter::cmdLAB() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	assert((offset % 4) == 0);
+
+	uint32 v = _stack[_stackBase + offset / 4] & 0xff;
+	_stack.top() = v;
 }
 
 void Interpreter::cmdLAW() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	assert((offset % 4) == 0);
+
+	uint32 v = _stack[_stackBase + offset / 4] & 0xffff;
+	_stack.top() = v;
 }
 
 void Interpreter::cmdLAD() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	assert((offset % 4) == 0);
+
+	uint32 v = _stack[_stackBase + offset / 4];
+	_stack.top() = v;
 }
 
 void Interpreter::cmdSAB() {
-	error("TODO: opcode");
+	uint32 v = READ_LE_UINT16(_code) / 4; _code += 2;
+	uint32 offset = _stack[_stackBase + v] & 0xff;
+	_stack[offset] = _stack.top();
 }
 
 void Interpreter::cmdSAW() {
-	error("TODO: opcode");
+	uint32 v = READ_LE_UINT16(_code) / 4; _code += 2;
+	uint32 offset = _stack[_stackBase + v] & 0xffff;
+	_stack[offset] = _stack.top();
 }
 
 void Interpreter::cmdSAD() {
-	error("TODO: opcode");
+	uint32 v = READ_LE_UINT16(_code) / 4; _code += 2;
+	uint32 offset = _stack[_stackBase + v];
+	_stack[offset] = _stack.top();
 }
 
 void Interpreter::cmdLABA() {
-	error("TODO: opcode");
+	int offset = READ_LE_UINT16(_code); _code += 2;
+	int subIndex = _stack.pop();
+	assert((offset % 4) == 0 && (subIndex % 4) == 0);
+
+	uint32 v = _stack[_stackBase + (offset - subIndex) / 4] & 0xff;
+	_stack.push(v);
 }
 
 void Interpreter::cmdLAWA() {
-	error("TODO: opcode");
+	int offset = READ_LE_UINT16(_code); _code += 2;
+	int subIndex = _stack.pop();
+	assert((offset % 4) == 0 && (subIndex % 4) == 0);
+
+	uint32 v = _stack[_stackBase + (offset - subIndex) / 4] & 0xffff;
+	_stack.push(v);
 }
 
 void Interpreter::cmdLADA() {
-	error("TODO: opcode");
+	int offset = READ_LE_UINT16(_code); _code += 2;
+	int subIndex = _stack.pop();
+	assert((offset % 4) == 0 && (subIndex % 4) == 0);
+
+	uint32 v = _stack[_stackBase + (offset - subIndex) / 4];
+	_stack.push(v);
 }
 
 void Interpreter::cmdSABA() {
-	error("TODO: opcode");
+	int val = _stack.pop();
+	int offset = READ_LE_UINT16(_code); _code += 2;
+	int subIndex = _stack.pop();
+	assert((offset % 4) == 0 && (subIndex % 4) == 0);
+
+	_stack[_stackBase + (offset - subIndex) / 4] = val & 0xff;
 }
 
 void Interpreter::cmdSAWA() {
-	error("TODO: opcode");
+	int val = _stack.pop();
+	int offset = READ_LE_UINT16(_code); _code += 2;
+	int subIndex = _stack.pop();
+	assert((offset % 4) == 0 && (subIndex % 4) == 0);
+
+	_stack[_stackBase + (offset - subIndex) / 4] = val & 0xffff;
 }
 
 void Interpreter::cmdSADA() {
-	error("TODO: opcode");
+	int val = _stack.pop();
+	int offset = READ_LE_UINT16(_code); _code += 2;
+	int subIndex = _stack.pop();
+	assert((offset % 4) == 0 && (subIndex % 4) == 0);
+
+	_stack[_stackBase + (offset - subIndex) / 4] = val;
 }
 
 void Interpreter::cmdLEAA() {
-	error("TODO: opcode");
+	int offset = READ_LE_UINT16(_code); _code += 2;
+	assert((offset % 4) == 0);
+
+	const byte *ptr = (const byte *)&_stack[_stackBase + (offset / 4)];
+	_stack.pop();
+	_stack.pushPtr(ptr);
 }
 
 void Interpreter::cmdLSB() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	const byte *srcP = (const byte *)_thunk + _staticOffset + offset;
+
+	_stack.top() = *srcP;
 }
 
 void Interpreter::cmdLSW() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	const byte *srcP = (const byte *)_thunk + _staticOffset + offset;
+
+	_stack.top() = READ_LE_UINT16(srcP);
 }
 
 void Interpreter::cmdLSD() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	const byte *srcP = (const byte *)_thunk + _staticOffset + offset;
+
+	_stack.top() = READ_LE_UINT32(srcP);
 }
 
 void Interpreter::cmdSSB() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	byte *destP = (byte *)_thunk + _staticOffset + offset;
+
+	*destP = _stack.top() & 0xff;
 }
 
 void Interpreter::cmdSSW() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	byte *destP = (byte *)_thunk + _staticOffset + offset;
+
+	WRITE_LE_UINT16(destP, _stack.top() & 0xffff);
 }
 
 void Interpreter::cmdSSD() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	byte *destP = (byte *)_thunk + _staticOffset + offset;
+
+	WRITE_LE_UINT32(destP, _stack.top());
 }
 
 void Interpreter::cmdLSBA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *srcP = (const byte *)_thunk + _staticOffset + offset + _stack.pop();
+
+	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLSWA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *srcP = (const byte *)_thunk + _staticOffset + offset + _stack.pop();
+
+	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLSDA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *srcP = (const byte *)_thunk + _staticOffset + offset + _stack.pop();
+
+	_stack.push(READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdSSBA() {
-	error("TODO: opcode");
+	uint32 val = _stack.pop();
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
+
+	*destP = val;
 }
 
 void Interpreter::cmdSSWA() {
-	error("TODO: opcode");
+	uint32 val = _stack.pop();
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
+
+	WRITE_LE_UINT16(destP, val);
 }
 
 void Interpreter::cmdSSDA() {
-	error("TODO: opcode");
+	uint32 val = _stack.pop();
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
+
+	WRITE_LE_UINT32(destP, val);
 }
 
 void Interpreter::cmdLESA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *srcP = (const byte *)_thunk + _staticOffset + offset;
+
+	_stack.topPtr() = srcP;
 }
 
 void Interpreter::cmdLXB() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	int objIndex = _stack.pop();
+	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+
+	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLXW() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	int objIndex = _stack.pop();
+	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+
+	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLXD() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	int objIndex = _stack.pop();
+	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+
+	_stack.push(READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdSXB() {
-	error("TODO: opcode");
+	uint32 val = _stack.pop() & 0xff;
+
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	int objIndex = _stack.pop();
+	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+
+	*destP = val;
+	_stack.push(val);
 }
 
 void Interpreter::cmdSXW() {
-	error("TODO: opcode");
+	uint32 val = _stack.pop();
+
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	int objIndex = _stack.pop();
+	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+
+	WRITE_LE_UINT16(destP, val);
+	_stack.push(val);
 }
 
 void Interpreter::cmdSXD() {
-	error("TODO: opcode");
+	uint32 val = _stack.pop();
+
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	int objIndex = _stack.pop();
+	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+
+	WRITE_LE_UINT32(destP, val);
+	_stack.push(val);
 }
 
 void Interpreter::cmdLXBA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	uint32 v = _stack.pop();
+	instanceOffset += v >> 16;
+	int objIndex = v & 0xffff;
+
+	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLXWA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	uint32 v = _stack.pop();
+	instanceOffset += v >> 16;
+	int objIndex = v & 0xffff;
+
+	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLXDA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	uint32 v = _stack.pop();
+	instanceOffset += v >> 16;
+	int objIndex = v & 0xffff;
+
+	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	_stack.push(READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdSXBA() {
-	error("TODO: opcode");
+	uint32 val = _stack.pop();
+
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	uint32 v = _stack.pop();
+	instanceOffset += v >> 16;
+	int objIndex = v & 0xffff;
+
+	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	*destP = val & 0xff;
+	_stack.push(val);
 }
 
 void Interpreter::cmdSXWA() {
-	error("TODO: opcode");
+	uint32 val = _stack.pop();
+
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	uint32 v = _stack.pop();
+	instanceOffset += v >> 16;
+	int objIndex = v & 0xffff;
+
+	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	*destP = val & 0xffff;
+	_stack.push(val);
 }
 
 void Interpreter::cmdSXDA() {
-	error("TODO: opcode");
+	uint32 val = _stack.pop();
+
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	uint32 v = _stack.pop();
+	instanceOffset += v >> 16;
+	int objIndex = v & 0xffff;
+
+	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	*destP = val & 0xff;
+	_stack.push(val);
 }
 
 void Interpreter::cmdLEXA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	uint32 instanceOffset = READ_LE_UINT16(instP);
+
+	uint32 v = _stack.pop();
+	instanceOffset += v >> 16;
+	int objIndex = v & 0xffff;
+
+	const byte *ptr = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	_stack.pushPtr(ptr);
 }
 
 void Interpreter::cmdSXAS() {
-	error("TODO: opcode");
+	uint32 index = _stack.pop();
+	_stack.top() |= index << 16;
 }
 
 void Interpreter::cmdLECA() {
-	error("TODO: opcode");
+	uint32 val = _stack.pop();
+	_stack.pushPtr(_ds32 + val);
 }
 
 void Interpreter::cmdSOLE() {
-	error("TODO: opcode");
+	HRES hres = _objList[_stack.pop()];
+	_stack.pushPtr((const byte *)hres);
 }
 
 void Interpreter::cmdEND() {
-	error("TODO: opcode");
+	_breakFlag = true;
 }
 
 void Interpreter::cmdBRK() {
-	error("TODO: opcode");
+	error("BRK encountered");
 }
 
 } // End of namespace Aesop
