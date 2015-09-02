@@ -296,6 +296,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	res.lock(_hPrg);
 	_ds32 = (const byte *)Resources::addr(_hPrg);
 	_code = _ds32 + codeOffset;
+	_offThis = _currentIndex;
 	_breakFlag = false;
 
 	// Initialize the stack
@@ -530,14 +531,24 @@ void Interpreter::cmdLNGC() {
 
 void Interpreter::cmdRCRS() {
 	// Get index into external offset list
-	uint offset = READ_LE_UINT16(_code) + _externOffset;
-	_code += 2;
+	uint offset = READ_LE_UINT16(_code); _code += 2;
 
-	const byte *data = (const byte *)_thunk + offset;
-	_stack.push(READ_LE_UINT32(data));
+	const byte *srcP = (const byte *)_thunk + _externOffset + offset;
+	_stack.push(READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdCALL() {
+	_currentThis = _currentIndex;
+	int argCount = *_code++;
+
+	// Handle any arguments
+	for (int idx = 0; idx < argCount; ++idx) {
+
+	}
+
+	// Handle the call
+	
+
 	error("TODO: opcode");
 }
 
@@ -557,6 +568,7 @@ void Interpreter::cmdJSR() {
 	// Set code and stack start
 	_code = _ds32 + methodOffset;
 	_stackBase = _stack.size();
+	_offThis = _currentIndex;
 
 	// Initialize manifest THIS var	
 	_stack.push(_currentIndex);

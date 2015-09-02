@@ -115,6 +115,7 @@ private:
 	InterpreterStack _stack;
 	Common::Stack<MethodStackEntry> _methodStack;
 	LONG _currentIndex;
+	LONG _offThis;
 	HRES *_objList;
 	HRES _instance;
 	THDR *_thunk;
