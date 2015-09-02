@@ -140,8 +140,6 @@ const OpcodeMethod Interpreter::_opcodes[] = {
 
 Interpreter::Interpreter(AesopEngine *vm, HRES *objList, int stackSize) : _vm(vm) {
 	_objList = objList;
-	_stackBase = (uint16 *)mem_alloc(stackSize);
-	_stackPtr = _stackBase + stackSize;
 
 	_currentIndex = 0;
 	_currentMsg = 0;
@@ -158,7 +156,6 @@ Interpreter::Interpreter(AesopEngine *vm, HRES *objList, int stackSize) : _vm(vm
 }
 
 Interpreter::~Interpreter() {
-	mem_free(_stackBase);
 }
 
 uint Interpreter::first(HRES dictionary) {
@@ -302,11 +299,15 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_breakFlag = false;
 
 	// Initialize the stack
-	_fptr = _stackPtr;
-	*(_stackPtr - 1) = index;
-	_stackPtr = _stackPtr - READ_LE_UINT16(_code) / 2 - 2;
+//	_fptr = _stackPtr;
+	_stack.push(index);
+	int count = READ_LE_UINT16(_code) / 4;
 	_code += 2;
 
+	for (int idx = 0; idx < count; ++idx)
+		_stack.push(0);
+	
+	// Main opcode execution loop
 	while (!_vm->shouldQuit() && !_breakFlag) {
 		int opcode = *_code++;
 		if (opcode >= OPCODES_COUNT)
@@ -328,188 +329,439 @@ void Interpreter::deref() {
 }
 
 void Interpreter::cmdBRT() {
-	if (*_stackPtr & *(_stackPtr + 1)) {
+	if (_stack.top()) {
 		// Branch
-		_code = _ds32 + READ_LE_UINT32(_code);
+		_code = _ds32 + READ_LE_UINT16(_code);
 	} else {
 		// Don't branch
 		_code += 2;
 	}
 }
 
-void Interpreter::cmdBRF() { error("TODO: opcode"); }
-
-void Interpreter::cmdBRA() { error("TODO: opcode"); }
-
-void Interpreter::cmdCASE() { error("TODO: opcode"); }
-
-void Interpreter::cmdPUSH() { error("TODO: opcode"); }
-
-void Interpreter::cmdDUP() { error("TODO: opcode"); }
-
-void Interpreter::cmdNOT() { error("TODO: opcode"); }
-
-void Interpreter::cmdSETB() { error("TODO: opcode"); }
-
-void Interpreter::cmdNEG() { error("TODO: opcode"); }
-
-void Interpreter::cmdADD() { error("TODO: opcode"); }
-
-void Interpreter::cmdSUB() { error("TODO: opcode"); }
-
-void Interpreter::cmdMUL() { error("TODO: opcode"); }
-
-void Interpreter::cmdDIV() { error("TODO: opcode"); }
-
-void Interpreter::cmdMOD() { error("TODO: opcode"); }
-
-void Interpreter::cmdEXP() { error("TODO: opcode"); }
-
-void Interpreter::cmdBAND() { error("TODO: opcode"); }
-
-void Interpreter::cmdBOR() { error("TODO: opcode"); }	
-
-void Interpreter::cmdXOR() { error("TODO: opcode"); }
-
-void Interpreter::cmdBNOT() { error("TODO: opcode"); }
-
-void Interpreter::cmdSHL() { error("TODO: opcode"); }	
-
-void Interpreter::cmdSHR() { error("TODO: opcode"); }
-
-void Interpreter::cmdLT() { error("TODO: opcode"); }
-
-void Interpreter::cmdLE() { error("TODO: opcode"); }
-
-void Interpreter::cmdEQ() { error("TODO: opcode"); }
-
-void Interpreter::cmdNE() { error("TODO: opcode"); }
-
-void Interpreter::cmdGE() { error("TODO: opcode"); }
-
-void Interpreter::cmdGT() { error("TODO: opcode"); }
-
-void Interpreter::cmdINC() { error("TODO: opcode"); }
-
-void Interpreter::cmdDEC() { error("TODO: opcode"); }
-
-void Interpreter::cmdSHTC() { error("TODO: opcode"); }	
-
-void Interpreter::cmdINTC() { error("TODO: opcode"); }
-
-void Interpreter::cmdLNGC() { error("TODO: opcode"); }
-
-void Interpreter::cmdRCRS() { error("TODO: opcode"); }	
-
-void Interpreter::cmdCALL() { error("TODO: opcode"); }
-
-void Interpreter::cmdSEND() { error("TODO: opcode"); }
-
-void Interpreter::cmdPASS() { error("TODO: opcode"); }
-
-void Interpreter::cmdJSR() { error("TODO: opcode"); }
-
-void Interpreter::cmdRTS() { error("TODO: opcode"); }
-
-void Interpreter::cmdAIM() { error("TODO: opcode"); }
-
-void Interpreter::cmdAIS() { error("TODO: opcode"); }
-
-void Interpreter::cmdLTBA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLTWA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLTDA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLETA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLAB() { error("TODO: opcode"); }
-
-void Interpreter::cmdLAW() { error("TODO: opcode"); }
-
-void Interpreter::cmdLAD() { error("TODO: opcode"); }
-
-void Interpreter::cmdSAB() { error("TODO: opcode"); }
-
-void Interpreter::cmdSAW() { error("TODO: opcode"); }
-
-void Interpreter::cmdSAD() { error("TODO: opcode"); }
-
-void Interpreter::cmdLABA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLAWA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLADA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSABA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSAWA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSADA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLEAA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLSB() { error("TODO: opcode"); }
-
-void Interpreter::cmdLSW() { error("TODO: opcode"); }
-
-void Interpreter::cmdLSD() { error("TODO: opcode"); }
-
-void Interpreter::cmdSSB() { error("TODO: opcode"); }
-
-void Interpreter::cmdSSW() { error("TODO: opcode"); }
-
-void Interpreter::cmdSSD() { error("TODO: opcode"); }
-
-void Interpreter::cmdLSBA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLSWA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLSDA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSSBA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSSWA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSSDA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLESA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLXB() { error("TODO: opcode"); }
-
-void Interpreter::cmdLXW() { error("TODO: opcode"); }
-
-void Interpreter::cmdLXD() { error("TODO: opcode"); }
-
-void Interpreter::cmdSXB() { error("TODO: opcode"); }
-
-void Interpreter::cmdSXW() { error("TODO: opcode"); }
-
-void Interpreter::cmdSXD() { error("TODO: opcode"); }
-
-void Interpreter::cmdLXBA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLXWA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLXDA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSXBA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSXWA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSXDA() { error("TODO: opcode"); }
-
-void Interpreter::cmdLEXA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSXAS() { error("TODO: opcode"); }
-
-void Interpreter::cmdLECA() { error("TODO: opcode"); }
-
-void Interpreter::cmdSOLE() { error("TODO: opcode"); }
-
-void Interpreter::cmdEND() { error("TODO: opcode"); }
-
-void Interpreter::cmdBRK() { error("TODO: opcode"); }
+void Interpreter::cmdBRF() {
+	if (!_stack.top()) {
+		// Branch
+		_code = _ds32 + READ_LE_UINT16(_code);
+	} else {
+		// Don't branch
+		_code += 2;
+	}
+}
+
+void Interpreter::cmdBRA() {
+	_code = _ds32 + READ_LE_UINT16(_code);
+}
+
+void Interpreter::cmdCASE() {
+	// Get value of test expression
+	uint32 v = _stack.pop();
+	int numCases = READ_LE_UINT16(_code); _code += 2;
+
+	// Scan through case list to find a matching value
+	for (int idx = 0; idx < numCases; ++idx, _code += 6) {
+		if (READ_LE_UINT32(_code) == v) {
+			_code += 4;
+			break;
+		}
+	}
+
+	cmdBRA();
+}
+
+void Interpreter::cmdPUSH() {
+	_stack.push(0);
+}
+
+void Interpreter::cmdDUP() {
+	_stack.push(_stack.top());
+}
+
+void Interpreter::cmdNOT() {
+	uint32 v = _stack.pop();
+	_stack.push(v ? 0 : 1);
+}
+
+void Interpreter::cmdSETB() {
+	uint32 v = _stack.pop();
+	_stack.push(v ? 0xffff : 0);
+}
+
+void Interpreter::cmdNEG() {
+	uint32 v = _stack.pop();
+	_stack.push(v ^ v);
+}
+
+void Interpreter::cmdADD() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 + v1);
+}
+
+void Interpreter::cmdSUB() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 - v1);
+}
+
+void Interpreter::cmdMUL() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 * v1);
+}
+
+void Interpreter::cmdDIV() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 / v1);
+}
+
+void Interpreter::cmdMOD() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 % v1);
+}
+
+void Interpreter::cmdEXP() {
+	uint32 v1 = _stack.pop() & 0xffff;
+	int result = 1;
+
+	if (v1 == 0) {
+		_stack.pop();
+	} else {
+		uint32 v2 = _stack.pop();
+		result = v2;
+		for (uint idx = 2; idx < v1; ++idx)
+			result *= v2;
+	}
+
+	_stack.push(result);
+}
+
+void Interpreter::cmdBAND() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 & v1);
+}
+
+void Interpreter::cmdBOR() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 | v1);
+}
+
+void Interpreter::cmdXOR() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 ^ v1);
+}
+
+void Interpreter::cmdBNOT() {
+	uint32 v = _stack.pop();
+	_stack.push(v ^ v);
+}
+
+void Interpreter::cmdSHL() {
+	uint32 v1 = _stack.pop() & 0xffff;
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 << v1);
+}
+
+void Interpreter::cmdSHR() {
+	uint32 v1 = _stack.pop() & 0xffff;
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 >> v1);
+}
+
+void Interpreter::cmdLT() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 < v1 ? 1 : 0);
+}
+
+void Interpreter::cmdLE() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 <= v1 ? 1 : 0);
+}
+
+void Interpreter::cmdEQ() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 == v1 ? 1 : 0);
+}
+
+void Interpreter::cmdNE() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 != v1 ? 1 : 0);
+}
+
+void Interpreter::cmdGE() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 >= v1 ? 1 : 0);
+}
+
+void Interpreter::cmdGT() {
+	uint32 v1 = _stack.pop();
+	uint32 v2 = _stack.pop();
+	_stack.push(v2 > v1 ? 1 : 0);
+}
+
+void Interpreter::cmdINC() {
+	_stack.push(_stack.pop() + 1);
+}
+
+void Interpreter::cmdDEC() {
+	_stack.push(_stack.pop() - 1);
+}
+
+void Interpreter::cmdSHTC() {
+	_stack.push(*_code++);
+}	
+
+void Interpreter::cmdINTC() {
+	uint16 v = READ_LE_UINT16(_code); _code += 2;
+	_stack.push(v);
+}
+
+void Interpreter::cmdLNGC() {
+	uint32 v = READ_LE_UINT32(_code); _code += 4;
+	_stack.push(v);
+}
+
+void Interpreter::cmdRCRS() {
+	// Get index into external offset list
+	uint offset = READ_LE_UINT16(_code) + _externOffset;
+	_code += 2;
+
+	const byte *data = (const byte *)_thunk + offset;
+	_stack.push(READ_LE_UINT32(data));
+}
+
+void Interpreter::cmdCALL() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSEND() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdPASS() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdJSR() {
+	uint16 v = READ_LE_UINT16(_code); _code += 2;
+	const byte *ds32 = _ds32;
+	const byte *code = _code;
+	
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdRTS() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdAIM() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdAIS() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLTBA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLTWA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLTDA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLETA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLAB() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLAW() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLAD() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSAB() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSAW() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSAD() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLABA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLAWA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLADA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSABA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSAWA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSADA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLEAA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLSB() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLSW() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLSD() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSSB() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSSW() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSSD() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLSBA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLSWA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLSDA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSSBA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSSWA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSSDA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLESA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLXB() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLXW() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLXD() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSXB() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSXW() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSXD() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLXBA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLXWA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLXDA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSXBA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSXWA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSXDA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLEXA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSXAS() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdLECA() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdSOLE() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdEND() {
+	error("TODO: opcode");
+}
+
+void Interpreter::cmdBRK() {
+	error("TODO: opcode");
+}
 
 } // End of namespace Aesop
 

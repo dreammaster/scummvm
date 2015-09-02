@@ -27,6 +27,7 @@
 #ifndef AESOP_INTERPRETER_H
 #define AESOP_INTERPRETER_H
 
+#include "common/stack.h"
 #include "aesop/resources.h"
 
 namespace Aesop {
@@ -45,9 +46,8 @@ class Interpreter {
 private:
 	AesopEngine *_vm;
 	static const OpcodeMethod _opcodes[];
-	LONG _currentIndex;
-	uint16 *_stackBase;
-	uint16 *_stackPtr;
+	Common::Stack<uint32> _stack;
+	LONG _currentIndex;	
 	HRES *_objList;
 	HRES _instance;
 	THDR *_thunk;
