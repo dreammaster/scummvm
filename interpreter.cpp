@@ -148,7 +148,7 @@ Interpreter::Interpreter(AesopEngine *vm, HRES *objList, int stackSize) : _vm(vm
 	_thunk = nullptr;
 	_ds32 = nullptr;
 	_code = nullptr;
-	_fptr = 0;
+	_stackBase = 0;
 	_hPrg = HRES_NULL;
 	_staticOffset = 0;
 	_externOffset = 0;
@@ -299,13 +299,11 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_breakFlag = false;
 
 	// Initialize the stack
-//	_fptr = _stackPtr;
+	_stackBase = 0;
 	_stack.push(index);
 	int count = READ_LE_UINT16(_code) / 4;
 	_code += 2;
-
-	for (int idx = 0; idx < count; ++idx)
-		_stack.push(0);
+	_stack.reserve(count);
 	
 	// Main opcode execution loop
 	while (!_vm->shouldQuit() && !_breakFlag) {
@@ -552,39 +550,69 @@ void Interpreter::cmdPASS() {
 }
 
 void Interpreter::cmdJSR() {
-	uint16 v = READ_LE_UINT16(_code); _code += 2;
-	const byte *ds32 = _ds32;
-	const byte *code = _code;
+	// Get the subroutine method offset, and save details for where to resume
+	uint16 methodOffset = READ_LE_UINT16(_code); _code += 2;
+	_methodStack.push(MethodStackEntry(_ds32, _code, _stack.size(), _stackBase));
 	
-	error("TODO: opcode");
+	// Set code and stack start
+	_code = _ds32 + methodOffset;
+	_stackBase = _stack.size();
+
+	// Initialize manifest THIS var	
+	_stack.push(_currentIndex);
+
+	// Set up the method autos
+	uint numAutos = READ_LE_UINT16(_code); _code += 2;
+	for (uint idx = 0; idx < numAutos / 4; ++idx)
+		_stack.push(0);
 }
 
 void Interpreter::cmdRTS() {
-	error("TODO: opcode");
+	uint32 returnValue = _stack.pop();
+	MethodStackEntry stackEntry = _methodStack.pop();
+	_stackBase = stackEntry._stackBase;
+	_stack.resize(stackEntry._stackSize);
+	_code = stackEntry._code;
+	_ds32 = stackEntry._ds32;
+
+	// PUsh return value back onto the stack
+	_stack.push(returnValue);
 }
 
 void Interpreter::cmdAIM() {
-	error("TODO: opcode");
+	uint32 v1 = _stack.pop() & 0xffff;
+	uint32 v2 = READ_LE_UINT16(_code); _code += 2;
+	_stack.push(_stack.pop() + v1 * v2);
 }
 
 void Interpreter::cmdAIS() {
-	error("TODO: opcode");
+	uint32 v1 = _stack.pop() & 0xffff;
+	uint32 v2 = *_code++;
+	_stack.push(_stack.pop() + (v1 << v2));
 }
 
 void Interpreter::cmdLTBA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *srcP = _ds32 + offset + _stack.pop();
+	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLTWA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *srcP = _ds32 + offset + _stack.pop();
+	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLTDA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *srcP = _ds32 + offset + _stack.pop();
+	_stack.push(READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdLETA() {
-	error("TODO: opcode");
+	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	const byte *srcP = _ds32 + offset;
+	_stack.pushPtr(srcP);
 }
 
 void Interpreter::cmdLAB() {

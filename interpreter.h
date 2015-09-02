@@ -40,20 +40,86 @@ namespace Aesop {
 class AesopEngine;
 class Interpreter;
 
+struct MethodStackEntry {
+	const byte *_ds32;
+	const byte *_code;
+	uint _stackSize, _stackBase;
+
+	MethodStackEntry() : _ds32(nullptr), _code(nullptr), _stackSize(0), _stackBase(0) {}
+	MethodStackEntry(const byte *ds32, const byte *code, int stackSize, int stackBase) :
+		_ds32(ds32), _code(code), _stackSize(stackSize), _stackBase(stackBase) {}
+};
+
+class InterpreterStack {
+	struct StackEntry {
+		uint32 _val;
+		const byte *_ptr;
+
+		StackEntry() : _val(0), _ptr(nullptr) {}
+		StackEntry(uint32 v) : _val(v), _ptr(nullptr) {}
+		StackEntry(const byte *v) : _val(0), _ptr(v) {}
+	};
+private:
+	Common::Array<StackEntry> _stack;
+public:
+	typedef Common::Array<StackEntry>::size_type size_type;
+	InterpreterStack() {}
+
+	bool empty() const { return _stack.empty(); }
+
+	void clear() { _stack.clear(); }
+
+	void resize(int newSize) { _stack.resize(newSize); }
+
+	void push(uint32 x) { _stack.push_back(x); }
+
+	void pushPtr(const byte *x) { _stack.push_back(x); }
+
+	void reserve(size_type count) {
+		while (count-- > 0)
+			_stack.push_back(StackEntry());
+	}
+
+	uint32 &top() { return _stack.back()._val; }
+
+	const uint32 &top() const { return _stack.back()._val; }
+
+	const byte *&topPtr() { return _stack.back()._ptr; }
+
+	uint32 pop() {
+		StackEntry tmp = _stack.back();
+		_stack.pop_back();
+		return tmp._val;
+	}
+
+	const byte *popPtr() {
+		StackEntry tmp = _stack.back();
+		_stack.pop_back();
+		return tmp._ptr;
+	}
+
+	size_type size() const {
+		return _stack.size();
+	}
+//	uint32 &operator[](size_type i) { return _stack[size() - i - 1]._val; }
+//	const uint32 &operator[](size_type i) const { return _stack[size() - i - 1]._val; }
+};
+
 typedef void (Interpreter::*OpcodeMethod)();
 
 class Interpreter {
 private:
 	AesopEngine *_vm;
 	static const OpcodeMethod _opcodes[];
-	Common::Stack<uint32> _stack;
-	LONG _currentIndex;	
+	InterpreterStack _stack;
+	Common::Stack<MethodStackEntry> _methodStack;
+	LONG _currentIndex;
 	HRES *_objList;
 	HRES _instance;
 	THDR *_thunk;
 	const byte *_ds32;
 	const byte *_code;
-	uint16 *_fptr;
+	int _stackBase;
 	HRES _hPrg;
 	UWORD _staticOffset;
 	UWORD _externOffset;
