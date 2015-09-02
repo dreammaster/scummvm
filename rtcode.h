@@ -31,8 +31,6 @@ namespace Aesop {
 
 void diagnose(LONG argcnt, ULONG dtype, ULONG parm);
 
-typedef void (*FARPROC)();
-extern FARPROC code_resources[];
 extern ULONG diag_flag;
 
 extern ULONG absv(LONG argcnt, LONG val);

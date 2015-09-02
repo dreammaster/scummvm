@@ -43,7 +43,6 @@ namespace Aesop {
 
 #undef FARPROC
 typedef void(*FARPROC)();
-extern FARPROC code_resources[];
 
 /*----------------------------------------------------------------*/
 
@@ -796,8 +795,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 	void *thunk_ptr;
 	ULONG def_off;
-	const FARPROC *CR_ptr;
-	FARPROC *XR_ptr;
+	uint32 methodNum;
+	uint32 *XR_ptr;
 
 	//
 	// Load programs and dictionaries, calculate thunk size
@@ -940,12 +939,16 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 				offset = ascnum(interp.lookup(HCRFD, &tag[2]));
 				if (offset == (UWORD)-1)
 					abend(MSG_MCR, &tag[2]); // "Missing code resource '%s'"
+				assert((offset % 4) == 0);
 
 				thunk_ptr = addr(thunk);
 				def_off = ascnum(def);
-				XR_ptr = (FARPROC *)((byte *)thunk_ptr + XR + def_off);
-				CR_ptr = &code_resources[offset / 4];
-				*XR_ptr = *CR_ptr;
+				XR_ptr = (uint32 *)((byte *)thunk_ptr + XR + def_off);
+
+				// Add a value in the high word for validation, with the index 
+				// in the global method list in the low word
+				methodNum = 0x12340000 | (offset / 4);
+				*XR_ptr = methodNum;
 				break;
 
 			case 'B':               // Byte

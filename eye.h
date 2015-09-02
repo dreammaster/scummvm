@@ -193,11 +193,8 @@ extern void launch(LONG argcnt, const char *dirname, const char *prgname, const 
 extern LONG player_attrib(LONG argcnt, ULONG plrnum, ULONG offset, ULONG size);
 extern LONG item_attrib(LONG argcnt, ULONG plrnum, ULONG invslot, ULONG attrib);
 extern LONG arrow_count(LONG argcnt, ULONG plrnum);
-
-typedef void (*FARPROC)();
-typedef FARPROC PROCDEF;
-
-extern PROCDEF code_resources[];
+extern void *open_transfer_file(LONG argcnt, const char *filename);
+extern void close_transfer_file();
 
 #ifdef __AESOP__
 

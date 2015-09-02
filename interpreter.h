@@ -20,10 +20,6 @@
  *
  */
 
-//
-//  AESOP runtime ASM calls
-//
-
 #ifndef AESOP_INTERPRETER_H
 #define AESOP_INTERPRETER_H
 
@@ -107,6 +103,7 @@ public:
 };
 
 typedef void (Interpreter::*OpcodeMethod)();
+typedef void(*FARPROC)();
 
 class Interpreter {
 private:
@@ -131,7 +128,7 @@ private:
 	 * Dereference an offset to a pointer
 	 */
 	void deref();
-
+private:
 	void cmdBRT();		// BRanch if True
 	void cmdBRF();		// BRanch if False
 	void cmdBRA();		// BRanch Always
@@ -220,6 +217,8 @@ private:
 	void cmdSOLE();		// Selector for Object List Entry
 	void cmdEND();		// END of handler
 	void cmdBRK();		// BReaKpoint for debugging
+private:
+
 public:
 	ULONG _currentMsg;
 	ULONG _currentThis;
