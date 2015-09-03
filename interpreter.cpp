@@ -671,12 +671,12 @@ void Interpreter::cmdDEC() {
 }
 
 void Interpreter::cmdSHTC() {
-	_stack.push(*_code++);
+	_stack.top() = *_code++;
 }	
 
 void Interpreter::cmdINTC() {
 	uint16 v = READ_LE_UINT16(_code); _code += 2;
-	_stack.push(v);
+	_stack.top() = v;
 }
 
 void Interpreter::cmdLNGC() {
