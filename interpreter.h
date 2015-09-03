@@ -36,13 +36,31 @@ namespace Aesop {
 class AesopEngine;
 class Interpreter;
 
-struct Parameter {
+class Parameter {
+private:
 	uint32 _val;
-	BYTE *_ptr;
+	void *_ptr;
+	const void *_ptrConst;
+public:
+	Parameter() : _val(0), _ptr(nullptr), _ptrConst(nullptr) {}
+	Parameter(ULONG v) : _val(v), _ptr(nullptr), _ptrConst(nullptr) {}
+	Parameter(BYTE *v) : _val(0), _ptr(v), _ptrConst(v) {}
+	Parameter(void *v) : _val(0), _ptr(v), _ptrConst(v) {}
+	Parameter(const BYTE *v) : _val(0), _ptr(nullptr), _ptrConst(v) {}
+	Parameter(const void *v) : _val(0), _ptr(nullptr), _ptrConst(v) {}
+	operator ULONG() { return _val; }
+	operator BYTE *() { return (BYTE *)_ptr; }
+	operator WORD *() { return (WORD *)_ptr; }
+	operator LONG *() { return (LONG *)_ptr; }
+	operator ULONG *() { return (ULONG *)_ptr; }
+	operator const BYTE *() { return (const BYTE *)_ptrConst; }
+	operator const void *() { return _ptrConst; }
+	operator const char *() { return (const char *)_ptrConst; }
 
-	Parameter() : _val(0), _ptr(nullptr) {}
-	Parameter(uint32 v) : _val(v), _ptr(nullptr) {}
-	Parameter(BYTE *v) : _val(0), _ptr(v) {}
+	const Parameter operator+(int other) const;
+	const Parameter operator-(int other) const;
+	Parameter operator&(int other);
+	Parameter &operator|=(int other);
 };
 
 class Parameters : public Common::Array<Parameter> {
@@ -77,41 +95,32 @@ public:
 
 	void resize(int newSize) { _stack.resize(newSize); }
 
-	void push(uint32 x) { _stack.push_back(x); }
-
-	void pushPtr(BYTE *x) { _stack.push_back(x); }
+	void push(Parameter p) { _stack.push_back(p); }
 
 	void reserve(size_type count) {
 		while (count-- > 0)
 			_stack.push_back(Parameter());
 	}
 
-	uint32 &top() { return _stack.back()._val; }
+	Parameter &top() { return _stack.back(); }
 
-	const uint32 &top() const { return _stack.back()._val; }
+	const Parameter &top() const { return _stack.back(); }
 
-	BYTE *&topPtr() { return _stack.back()._ptr; }
-
-	Parameter popEntry() {
+	Parameter pop() {
 		Parameter tmp = _stack.back();
 		_stack.pop_back();
 		return tmp;
 	}
-
-	uint32 pop() { return popEntry()._val; }
-
-	BYTE *popPtr() { return popEntry()._ptr; }
-
 	size_type size() const {
 		return _stack.size();
 	}
 
-	uint32 &operator[](size_type i) { return _stack[i]._val; }
-	const uint32 &operator[](size_type i) const { return _stack[i]._val; }
+	Parameter &operator[](size_type i) { return _stack[i]; }
+	const Parameter &operator[](size_type i) const { return _stack[i]; }
 };
 
 typedef void (Interpreter::*OpcodeMethod)();
-typedef int (Interpreter::*ExternMethod)(Parameters param);
+typedef Parameter (Interpreter::*ExternMethod)(Parameters param);
 
 class Interpreter {
 private:
@@ -223,161 +232,161 @@ private:
 	void cmdBRK();		// BReaKpoint for debugging
 private:
 	// Miscellaneous functions
-	int loadString(Parameters params);
-	int loadResource(Parameters params);
-	int copyString(Parameters params);
-	int stringForceLower(Parameters params);
-	int stringForceUpper(Parameters params);
-	int stringLen(Parameters params);
-	int stringCompare(Parameters params);
-	int strVal(Parameters params);
-	int envVal(Parameters params);
-	int beep(Parameters params);
-	int pokeMem(Parameters params);
-	int peekMem(Parameters params);
-	int rnd(Parameters params);
-	int dice(Parameters params);
-	int absv(Parameters params);
-	int minv(Parameters params);
-	int maxv(Parameters params);
-	int diagnose(Parameters params);
-	int heapfree(Parameters params);
+	Parameter loadString(Parameters params);
+	Parameter loadResource(Parameters params);
+	Parameter copyString(Parameters params);
+	Parameter stringForceLower(Parameters params);
+	Parameter stringForceUpper(Parameters params);
+	Parameter stringLen(Parameters params);
+	Parameter stringCompare(Parameters params);
+	Parameter strVal(Parameters params);
+	Parameter envVal(Parameters params);
+	Parameter beep(Parameters params);
+	Parameter pokeMem(Parameters params);
+	Parameter peekMem(Parameters params);
+	Parameter rnd(Parameters params);
+	Parameter dice(Parameters params);
+	Parameter absv(Parameters params);
+	Parameter minv(Parameters params);
+	Parameter maxv(Parameters params);
+	Parameter diagnose(Parameters params);
+	Parameter heapfree(Parameters params);
 
 	// Event functions
-	int notify(Parameters params);
-	int cancel(Parameters params);
-	int drainEventQueue(Parameters params);
-	int postEvent(Parameters params);
-	int sendEvent(Parameters params);
-	int peekEvent(Parameters params);
-	int dispatchEvent(Parameters params);
-	int flushEventQueue(Parameters params);
-	int flushInputEvents(Parameters params);
+	Parameter notify(Parameters params);
+	Parameter cancel(Parameters params);
+	Parameter drainEventQueue(Parameters params);
+	Parameter postEvent(Parameters params);
+	Parameter sendEvent(Parameters params);
+	Parameter peekEvent(Parameters params);
+	Parameter dispatchEvent(Parameters params);
+	Parameter flushEventQueue(Parameters params);
+	Parameter flushInputEvents(Parameters params);
 
 	// Interface functions
-	int initInterface(Parameters params);
-	int shutdownInterface(Parameters params);
-	int setMousePointer(Parameters params);
-	int setWaitPointer(Parameters params);
-	int standbyCursor(Parameters params);
-	int resumeCursor(Parameters params);
-	int showMouse(Parameters params);
-	int hideMouse(Parameters params);
-	int mouseXY(Parameters params);
-	int mouseInWindow(Parameters params);
-	int lockMouse(Parameters params);
-	int unlockMouse(Parameters params);
-	int getKey(Parameters params);
+	Parameter initInterface(Parameters params);
+	Parameter shutdownInterface(Parameters params);
+	Parameter setMousePointer(Parameters params);
+	Parameter setWaitPointer(Parameters params);
+	Parameter standbyCursor(Parameters params);
+	Parameter resumeCursor(Parameters params);
+	Parameter showMouse(Parameters params);
+	Parameter hideMouse(Parameters params);
+	Parameter mouseXY(Parameters params);
+	Parameter mouseInWindow(Parameters params);
+	Parameter lockMouse(Parameters params);
+	Parameter unlockMouse(Parameters params);
+	Parameter getKey(Parameters params);
 
 	// Graphics-related functions
-	int initGraphics(Parameters params);
-	int drawDot(Parameters params);
-	int drawLine(Parameters params);
-	int lineTo(Parameters params);
-	int drawRectangle(Parameters params);
-	int fillRectangle(Parameters params);
-	int hashRectangle(Parameters params);
-	int getBitmapHeight(Parameters params);
-	int drawBitmap(Parameters params);
-	int visibleBitmapRect(Parameters params);
-	int setPalette(Parameters params);
-	int refreshWindow(Parameters params);
-	int wipeWindow(Parameters params);
-	int shutdownGraphics(Parameters params);
-	int waitVerticalRetrace(Parameters params);
-	int readPalette(Parameters params);
-	int writePalette(Parameters params);
-	int pixelFade(Parameters params);
-	int colorFade(Parameters params);
-	int lightFade(Parameters params);
+	Parameter initGraphics(Parameters params);
+	Parameter drawDot(Parameters params);
+	Parameter drawLine(Parameters params);
+	Parameter lineTo(Parameters params);
+	Parameter drawRectangle(Parameters params);
+	Parameter fillRectangle(Parameters params);
+	Parameter hashRectangle(Parameters params);
+	Parameter getBitmapHeight(Parameters params);
+	Parameter drawBitmap(Parameters params);
+	Parameter visibleBitmapRect(Parameters params);
+	Parameter setPalette(Parameters params);
+	Parameter refreshWindow(Parameters params);
+	Parameter wipeWindow(Parameters params);
+	Parameter shutdownGraphics(Parameters params);
+	Parameter waitVerticalRetrace(Parameters params);
+	Parameter readPalette(Parameters params);
+	Parameter writePalette(Parameters params);
+	Parameter pixelFade(Parameters params);
+	Parameter colorFade(Parameters params);
+	Parameter lightFade(Parameters params);
 
-	int assignWindow(Parameters params);
-	int assignSubWindow(Parameters params);
-	int releaseWindow(Parameters params);
-	int getLeft(Parameters params);
-	int getRight(Parameters params);
-	int getTop(Parameters params);
-	int getBottom(Parameters params);
-	int setLeft(Parameters params);
-	int setRight(Parameters params);
-	int setTop(Parameters params);
-	int setBottom(Parameters params);
+	Parameter assignWindow(Parameters params);
+	Parameter assignSubWindow(Parameters params);
+	Parameter releaseWindow(Parameters params);
+	Parameter getLeft(Parameters params);
+	Parameter getRight(Parameters params);
+	Parameter getTop(Parameters params);
+	Parameter getBottom(Parameters params);
+	Parameter setLeft(Parameters params);
+	Parameter setRight(Parameters params);
+	Parameter setTop(Parameters params);
+	Parameter setBottom(Parameters params);
 
-	int textWindow(Parameters params);
-	int textStyle(Parameters params);
-	int textXy(Parameters params);
-	int textColor(Parameters params);
-	int textRefreshWindow(Parameters params);
-	int getTextX(Parameters params);
-	int getTextY(Parameters params);
-	int home(Parameters params);
-	int print(Parameters params);
-	int sPrint(Parameters params);
-	int dPrint(Parameters params);
-	int aPrint(Parameters params);
-	int crOut(Parameters params);
-	int charWidth(Parameters params);
-	int fontHeight(Parameters params);
+	Parameter textWindow(Parameters params);
+	Parameter textStyle(Parameters params);
+	Parameter textXy(Parameters params);
+	Parameter textColor(Parameters params);
+	Parameter textRefreshWindow(Parameters params);
+	Parameter getTextX(Parameters params);
+	Parameter getTextY(Parameters params);
+	Parameter home(Parameters params);
+	Parameter print(Parameters params);
+	Parameter sPrint(Parameters params);
+	Parameter dPrint(Parameters params);
+	Parameter aPrint(Parameters params);
+	Parameter crOut(Parameters params);
+	Parameter charWidth(Parameters params);
+	Parameter fontHeight(Parameters params);
 
-	int solidBarGraph(Parameters params);
+	Parameter solidBarGraph(Parameters params);
 
 	// Sound-related functions
-	int initSound(Parameters params);
-	int shutdownSound(Parameters params);
-	int loadSoundBlock(Parameters params);
-	int soundEffect(Parameters params);
-	int playSequence(Parameters params);
-	int loadMusic(Parameters params);
-	int unloadMusic(Parameters params);
-	int setSoundStatus(Parameters params);
+	Parameter initSound(Parameters params);
+	Parameter shutdownSound(Parameters params);
+	Parameter loadSoundBlock(Parameters params);
+	Parameter soundEffect(Parameters params);
+	Parameter playSequence(Parameters params);
+	Parameter loadMusic(Parameters params);
+	Parameter unloadMusic(Parameters params);
+	Parameter setSoundStatus(Parameters params);
 
 	// Eye III object management
-	int createObject(Parameters params);
-	int createProgram(Parameters params);
-	int destroyObject(Parameters params);
-	int flushCache(Parameters params);
-	int thrashCache(Parameters params);
+	Parameter createObject(Parameters params);
+	Parameter createProgram(Parameters params);
+	Parameter destroyObject(Parameters params);
+	Parameter flushCache(Parameters params);
+	Parameter thrashCache(Parameters params);
 
 	// Eye III support functions
-	int stepX(Parameters params);
-	int stepY(Parameters params);
-	int stepFDIR(Parameters params);
+	Parameter stepX(Parameters params);
+	Parameter stepY(Parameters params);
+	Parameter stepFDIR(Parameters params);
 
-	int stepSquareX(Parameters params);
-	int stepSquareY(Parameters params);
-	int stepRegion(Parameters params);
+	Parameter stepSquareX(Parameters params);
+	Parameter stepSquareY(Parameters params);
+	Parameter stepRegion(Parameters params);
 
-	int distance(Parameters params);
-	int seekDirection(Parameters params);
+	Parameter distance(Parameters params);
+	Parameter seekDirection(Parameters params);
 
-	int spellRequest(Parameters params);
-	int spellList(Parameters params);
-	int magicField(Parameters params);
-	int doDots(Parameters params);
-	int doIce(Parameters params);
+	Parameter spellRequest(Parameters params);
+	Parameter spellList(Parameters params);
+	Parameter magicField(Parameters params);
+	Parameter doDots(Parameters params);
+	Parameter doIce(Parameters params);
 
-	int readSaveDirectory(Parameters params);
-	int savegameTitle(Parameters params);
-	int writeSaveDirectory(Parameters params);
+	Parameter readSaveDirectory(Parameters params);
+	Parameter savegameTitle(Parameters params);
+	Parameter writeSaveDirectory(Parameters params);
 
-	int saveGame(Parameters params);
-	int suspendGame(Parameters params);
-	int resumeItems(Parameters params);
-	int resumeLevel(Parameters params);
-	int changeLevel(Parameters params);
-	int restoreItems(Parameters params);
-	int restoreLevelObjects(Parameters params);
-	int readInitialItems(Parameters params);
-	int writeInitialTempfiles(Parameters params);
-	int createInitialBinaryFiles(Parameters params);
-	int launch(Parameters params);
+	Parameter saveGame(Parameters params);
+	Parameter suspendGame(Parameters params);
+	Parameter resumeItems(Parameters params);
+	Parameter resumeLevel(Parameters params);
+	Parameter changeLevel(Parameters params);
+	Parameter restoreItems(Parameters params);
+	Parameter restoreLevelObjects(Parameters params);
+	Parameter readInitialItems(Parameters params);
+	Parameter writeInitialTempfiles(Parameters params);
+	Parameter createInitialBinaryFiles(Parameters params);
+	Parameter launch(Parameters params);
 
 	// Eye II savegame file access
-	int openTransferFile(Parameters params);
-	int closeTransferFile(Parameters params);
-	int playerAttrib(Parameters params);
-	int itemAttrib(Parameters params);
-	int arrowCount(Parameters params);
+	Parameter openTransferFile(Parameters params);
+	Parameter closeTransferFile(Parameters params);
+	Parameter playerAttrib(Parameters params);
+	Parameter itemAttrib(Parameters params);
+	Parameter arrowCount(Parameters params);
 public:
 	ULONG _currentMsg;
 	ULONG _currentThis;
@@ -390,7 +399,6 @@ public:
 
 	const char *lookup(HRES dictionary, const Common::String &key);
 
-	void shutdown(void);
 	void arguments(void *base, ULONG size);
 	LONG execute(LONG index, LONG msgNum, HRES vector);
 };

@@ -50,6 +50,39 @@ enum {
 
 /*----------------------------------------------------------------*/
 
+const Parameter Parameter::operator+(int other) const {
+	Parameter p;
+	p._val = _val + other;
+	if (_ptr)
+		p._ptr = (void *)((byte *)_ptr + other);
+	if (_ptrConst)
+		p._ptrConst = (const void *)((const byte *)_ptrConst + other);
+
+	return p;
+}
+
+const Parameter Parameter::operator-(int other) const {
+	Parameter p;
+	p._val = _val - other;
+	if (_ptr)
+		p._ptr = (void *)((byte *)_ptr - other);
+	if (_ptrConst)
+		p._ptrConst = (const void *)((const byte *)_ptrConst - other);
+
+	return p;
+}
+
+Parameter Parameter::operator&(int other) {
+	return Parameter(_val & other);
+}
+
+Parameter &Parameter::operator|=(int other) {
+	_val |= other;
+	return *this;
+}
+
+/*----------------------------------------------------------------*/
+
 const OpcodeMethod Interpreter::_opcodes[] = {
 	&Interpreter::cmdBRT,
 	&Interpreter::cmdBRF,
@@ -483,7 +516,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 }
 
 void Interpreter::cmdBRT() {
-	if (_stack.top()) {
+	if ((ULONG)_stack.top()) {
 		// Branch
 		_code = _ds32 + READ_LE_UINT16(_code);
 	} else {
@@ -493,7 +526,7 @@ void Interpreter::cmdBRT() {
 }
 
 void Interpreter::cmdBRF() {
-	if (!_stack.top()) {
+	if (!(ULONG)_stack.top()) {
 		// Branch
 		_code = _ds32 + READ_LE_UINT16(_code);
 	} else {
@@ -508,7 +541,7 @@ void Interpreter::cmdBRA() {
 
 void Interpreter::cmdCASE() {
 	// Get value of test expression
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	int numCases = READ_LE_UINT16(_code); _code += 2;
 
 	// Scan through case list to find a matching value
@@ -523,7 +556,7 @@ void Interpreter::cmdCASE() {
 }
 
 void Interpreter::cmdPUSH() {
-	_stack.push(0);
+	_stack.push(Parameter());
 }
 
 void Interpreter::cmdDUP() {
@@ -531,58 +564,58 @@ void Interpreter::cmdDUP() {
 }
 
 void Interpreter::cmdNOT() {
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	_stack.push(v ? 0 : 1);
 }
 
 void Interpreter::cmdSETB() {
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	_stack.push(v ? 0xffff : 0);
 }
 
 void Interpreter::cmdNEG() {
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	_stack.push(v ^ v);
 }
 
 void Interpreter::cmdADD() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 + v1);
 }
 
 void Interpreter::cmdSUB() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 - v1);
 }
 
 void Interpreter::cmdMUL() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 * v1);
 }
 
 void Interpreter::cmdDIV() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 / v1);
 }
 
 void Interpreter::cmdMOD() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 % v1);
 }
 
 void Interpreter::cmdEXP() {
-	uint32 v1 = _stack.pop() & 0xffff;
+	ULONG v1 = _stack.pop() & 0xffff;
 	int result = 1;
 
 	if (v1 == 0) {
 		_stack.pop();
 	} else {
-		uint32 v2 = _stack.pop();
+		ULONG v2 = _stack.pop();
 		result = v2;
 		for (uint idx = 2; idx < v1; ++idx)
 			result *= v2;
@@ -592,73 +625,73 @@ void Interpreter::cmdEXP() {
 }
 
 void Interpreter::cmdBAND() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 & v1);
 }
 
 void Interpreter::cmdBOR() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 | v1);
 }
 
 void Interpreter::cmdXOR() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 ^ v1);
 }
 
 void Interpreter::cmdBNOT() {
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	_stack.push(v ^ v);
 }
 
 void Interpreter::cmdSHL() {
-	uint32 v1 = _stack.pop() & 0xffff;
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop() & 0xffff;
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 << v1);
 }
 
 void Interpreter::cmdSHR() {
-	uint32 v1 = _stack.pop() & 0xffff;
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop() & 0xffff;
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 >> v1);
 }
 
 void Interpreter::cmdLT() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 < v1 ? 1 : 0);
 }
 
 void Interpreter::cmdLE() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 <= v1 ? 1 : 0);
 }
 
 void Interpreter::cmdEQ() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 == v1 ? 1 : 0);
 }
 
 void Interpreter::cmdNE() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 != v1 ? 1 : 0);
 }
 
 void Interpreter::cmdGE() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 >= v1 ? 1 : 0);
 }
 
 void Interpreter::cmdGT() {
-	uint32 v1 = _stack.pop();
-	uint32 v2 = _stack.pop();
+	ULONG v1 = _stack.pop();
+	ULONG v2 = _stack.pop();
 	_stack.push(v2 > v1 ? 1 : 0);
 }
 
@@ -701,10 +734,10 @@ void Interpreter::cmdCALL() {
 	Parameters params;
 	int argCount = *_code++;
 	for (int idx = 0; idx < argCount; ++idx)
-		params.push_back(_stack.popEntry());
+		params.push_back(_stack.pop());
 
 	// Get the method number
-	uint32 methodNum = _stack.pop();
+	ULONG methodNum = _stack.pop();
 	assert((methodNum >> 16) == 0x1234);
 
 	// Handle the call
@@ -739,11 +772,11 @@ void Interpreter::cmdJSR() {
 	// Set up the method autos
 	uint numAutos = READ_LE_UINT16(_code); _code += 2;
 	for (uint idx = 0; idx < numAutos / 4; ++idx)
-		_stack.push(0);
+		_stack.push(Parameter());
 }
 
 void Interpreter::cmdRTS() {
-	uint32 returnValue = _stack.pop();
+	ULONG returnValue = _stack.pop();
 	MethodStackEntry stackEntry = _methodStack.pop();
 	_stackBase = stackEntry._stackBase;
 	_stack.resize(stackEntry._stackSize);
@@ -755,15 +788,17 @@ void Interpreter::cmdRTS() {
 }
 
 void Interpreter::cmdAIM() {
-	uint32 v1 = _stack.pop() & 0xffff;
-	uint32 v2 = READ_LE_UINT16(_code); _code += 2;
-	_stack.push(_stack.pop() + v1 * v2);
+	ULONG v1 = _stack.pop() & 0xffff;
+	ULONG v2 = READ_LE_UINT16(_code); _code += 2;
+	int index = v1 * v2;
+	_stack.push(_stack.pop() + index);
 }
 
 void Interpreter::cmdAIS() {
-	uint32 v1 = _stack.pop() & 0xffff;
-	uint32 v2 = *_code++;
-	_stack.push(_stack.pop() + (v1 << v2));
+	ULONG v1 = _stack.pop() & 0xffff;
+	ULONG v2 = *_code++;
+	int index = v1 << v2;
+	_stack.push(_stack.pop() + index);
 }
 
 void Interpreter::cmdLTBA() {
@@ -786,15 +821,15 @@ void Interpreter::cmdLTDA() {
 
 void Interpreter::cmdLETA() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	byte *srcP = _ds32 + offset;
-	_stack.pushPtr((BYTE *)srcP);
+	BYTE *srcP = (BYTE *)_ds32 + offset;
+	_stack.push((BYTE *)srcP);
 }
 
 void Interpreter::cmdLAB() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
 	assert((offset % 4) == 0);
 
-	uint32 v = _stack[_stackBase + offset / 4] & 0xff;
+	ULONG v = _stack[_stackBase + offset / 4] & 0xff;
 	_stack.top() = v;
 }
 
@@ -802,7 +837,7 @@ void Interpreter::cmdLAW() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
 	assert((offset % 4) == 0);
 
-	uint32 v = _stack[_stackBase + offset / 4] & 0xffff;
+	ULONG v = _stack[_stackBase + offset / 4] & 0xffff;
 	_stack.top() = v;
 }
 
@@ -810,7 +845,7 @@ void Interpreter::cmdLAD() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
 	assert((offset % 4) == 0);
 
-	uint32 v = _stack[_stackBase + offset / 4];
+	ULONG v = _stack[_stackBase + offset / 4];
 	_stack.top() = v;
 }
 
@@ -818,7 +853,7 @@ void Interpreter::cmdSAB() {
 	int index4 = READ_LE_UINT16(_code); _code += 2;
 	assert((index4 % 4) == 0);
 
-	uint32 offset = _stack[_stackBase + index4 / 4] & 0xff;
+	ULONG offset = _stack[_stackBase + index4 / 4] & 0xff;
 	_stack[offset] = _stack.top();
 }
 
@@ -826,7 +861,7 @@ void Interpreter::cmdSAW() {
 	int index4 = READ_LE_UINT16(_code); _code += 2;
 	assert((index4 % 4) == 0);
 
-	uint32 offset = _stack[_stackBase + index4 / 4] & 0xffff;
+	ULONG offset = _stack[_stackBase + index4 / 4] & 0xffff;
 	_stack[offset] = _stack.top();
 }
 
@@ -834,7 +869,7 @@ void Interpreter::cmdSAD() {
 	int index4 = READ_LE_UINT16(_code); _code += 2;
 	assert((index4 % 4) == 0);
 
-	uint32 offset = _stack[_stackBase + index4 / 4];
+	ULONG offset = _stack[_stackBase + index4 / 4];
 	_stack[offset] = _stack.top();
 }
 
@@ -843,7 +878,7 @@ void Interpreter::cmdLABA() {
 	int subIndex = _stack.pop();
 	assert((offset % 4) == 0 && (subIndex % 4) == 0);
 
-	uint32 v = _stack[_stackBase + (offset - subIndex) / 4] & 0xff;
+	ULONG v = _stack[_stackBase + (offset - subIndex) / 4] & 0xff;
 	_stack.push(v);
 }
 
@@ -852,7 +887,7 @@ void Interpreter::cmdLAWA() {
 	int subIndex = _stack.pop();
 	assert((offset % 4) == 0 && (subIndex % 4) == 0);
 
-	uint32 v = _stack[_stackBase + (offset - subIndex) / 4] & 0xffff;
+	ULONG v = _stack[_stackBase + (offset - subIndex) / 4] & 0xffff;
 	_stack.push(v);
 }
 
@@ -861,7 +896,7 @@ void Interpreter::cmdLADA() {
 	int subIndex = _stack.pop();
 	assert((offset % 4) == 0 && (subIndex % 4) == 0);
 
-	uint32 v = _stack[_stackBase + (offset - subIndex) / 4];
+	ULONG v = _stack[_stackBase + (offset - subIndex) / 4];
 	_stack.push(v);
 }
 
@@ -896,9 +931,9 @@ void Interpreter::cmdLEAA() {
 	int offset = READ_LE_UINT16(_code); _code += 2;
 	assert((offset % 4) == 0);
 
-	byte *ptr = (byte *)&_stack[_stackBase + (offset / 4)];
+	BYTE *ptr = (BYTE *)&_stack[_stackBase + (offset / 4)];
 	_stack.pop();
-	_stack.pushPtr((BYTE *)ptr);
+	_stack.push(ptr);
 }
 
 void Interpreter::cmdLSB() {
@@ -944,61 +979,61 @@ void Interpreter::cmdSSD() {
 }
 
 void Interpreter::cmdLSBA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLSWA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLSDA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	_stack.push(READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdSSBA() {
-	uint32 val = _stack.pop();
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG val = _stack.pop();
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	*destP = val;
 }
 
 void Interpreter::cmdSSWA() {
-	uint32 val = _stack.pop();
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG val = _stack.pop();
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	WRITE_LE_UINT16(destP, val);
 }
 
 void Interpreter::cmdSSDA() {
-	uint32 val = _stack.pop();
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG val = _stack.pop();
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	WRITE_LE_UINT32(destP, val);
 }
 
 void Interpreter::cmdLESA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	BYTE *srcP = (BYTE *)_thunk + _staticOffset + offset;
 
-	_stack.topPtr() = srcP;
+	_stack.top() = srcP;
 }
 
 void Interpreter::cmdLXB() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
 	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
@@ -1007,9 +1042,9 @@ void Interpreter::cmdLXB() {
 }
 
 void Interpreter::cmdLXW() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
 	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
@@ -1018,9 +1053,9 @@ void Interpreter::cmdLXW() {
 }
 
 void Interpreter::cmdLXD() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
 	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
@@ -1029,11 +1064,11 @@ void Interpreter::cmdLXD() {
 }
 
 void Interpreter::cmdSXB() {
-	uint32 val = _stack.pop() & 0xff;
+	ULONG val = _stack.pop() & 0xff;
 
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
 	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
@@ -1043,11 +1078,11 @@ void Interpreter::cmdSXB() {
 }
 
 void Interpreter::cmdSXW() {
-	uint32 val = _stack.pop();
+	ULONG val = _stack.pop();
 
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
 	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
@@ -1057,11 +1092,11 @@ void Interpreter::cmdSXW() {
 }
 
 void Interpreter::cmdSXD() {
-	uint32 val = _stack.pop();
+	ULONG val = _stack.pop();
 
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
 	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
@@ -1071,11 +1106,11 @@ void Interpreter::cmdSXD() {
 }
 
 void Interpreter::cmdLXBA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
@@ -1084,11 +1119,11 @@ void Interpreter::cmdLXBA() {
 }
 
 void Interpreter::cmdLXWA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
@@ -1097,11 +1132,11 @@ void Interpreter::cmdLXWA() {
 }
 
 void Interpreter::cmdLXDA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
@@ -1110,13 +1145,13 @@ void Interpreter::cmdLXDA() {
 }
 
 void Interpreter::cmdSXBA() {
-	uint32 val = _stack.pop();
+	ULONG val = _stack.pop();
 
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
@@ -1126,13 +1161,13 @@ void Interpreter::cmdSXBA() {
 }
 
 void Interpreter::cmdSXWA() {
-	uint32 val = _stack.pop();
+	ULONG val = _stack.pop();
 
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
@@ -1142,13 +1177,13 @@ void Interpreter::cmdSXWA() {
 }
 
 void Interpreter::cmdSXDA() {
-	uint32 val = _stack.pop();
+	ULONG val = _stack.pop();
 
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
@@ -1158,31 +1193,31 @@ void Interpreter::cmdSXDA() {
 }
 
 void Interpreter::cmdLEXA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code); _code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	uint32 instanceOffset = READ_LE_UINT16(instP);
+	ULONG instanceOffset = READ_LE_UINT16(instP);
 
-	uint32 v = _stack.pop();
+	ULONG v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
 	byte *ptr = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
-	_stack.pushPtr((BYTE *)ptr);
+	_stack.push((BYTE *)ptr);
 }
 
 void Interpreter::cmdSXAS() {
-	uint32 index = _stack.pop();
+	ULONG index = _stack.pop();
 	_stack.top() |= index << 16;
 }
 
 void Interpreter::cmdLECA() {
-	uint32 val = _stack.pop();
-	_stack.pushPtr((BYTE *)_ds32 + val);
+	ULONG val = _stack.pop();
+	_stack.push((BYTE *)_ds32 + val);
 }
 
 void Interpreter::cmdSOLE() {
 	HRES hres = _objList[_stack.pop()];
-	_stack.pushPtr((BYTE *)hres);
+	_stack.push((BYTE *)hres);
 }
 
 void Interpreter::cmdEND() {
@@ -1193,647 +1228,646 @@ void Interpreter::cmdBRK() {
 	error("BRK encountered");
 }
 
-int Interpreter::loadString(Parameters params) {
-	load_string(params.size(), params[0]._ptr, params[1]._val);
-	return 0;
+Parameter Interpreter::loadString(Parameters params) {
+	load_string(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::loadResource(Parameters params) {
-	load_resource(params.size(), params[0]._ptr, params[1]._val);
-	return 0;
+Parameter Interpreter::loadResource(Parameters params) {
+	load_resource(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::copyString(Parameters params) {
-	copy_string(params.size(), params[0]._ptr, params[1]._ptr);
-	return 0;
+Parameter Interpreter::copyString(Parameters params) {
+	copy_string(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::stringForceLower(Parameters params) {
-	string_force_lower(params.size(), params[0]._ptr);
-	return 0;
+Parameter Interpreter::stringForceLower(Parameters params) {
+	string_force_lower(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::stringForceUpper(Parameters params) {
-	string_force_upper(params.size(), params[0]._ptr);
-	return 0;
+Parameter Interpreter::stringForceUpper(Parameters params) {
+	string_force_upper(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::stringLen(Parameters params) {
-	return string_len(params.size(), params[0]._ptr);
+Parameter Interpreter::stringLen(Parameters params) {
+	return string_len(params.size(), params[0]);
 }
 
-int Interpreter::stringCompare(Parameters params) {
-	return string_compare(params.size(), params[0]._ptr, params[1]._ptr);
+Parameter Interpreter::stringCompare(Parameters params) {
+	return string_compare(params.size(), params[0], params[1]);
 }
 
-int Interpreter::strVal(Parameters params) {
-	return strval(params.size(), params[0]._ptr);
+Parameter Interpreter::strVal(Parameters params) {
+	return strval(params.size(), params[0]);
 }
 
-int Interpreter::envVal(Parameters params) {
-	return envval(params.size(), params[0]._ptr);
+Parameter Interpreter::envVal(Parameters params) {
+	return envval(params.size(), params[0]);
 }
 
-int Interpreter::beep(Parameters params) {
+Parameter Interpreter::beep(Parameters params) {
 	::Aesop::beep();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::pokeMem(Parameters params) {
-	pokemem(params.size(), (LONG *)params[0]._ptr, params[1]._val);
-	return 0;
+Parameter Interpreter::pokeMem(Parameters params) {
+	pokemem(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::peekMem(Parameters params) {
-	return peekmem(params.size(), (LONG *)params[0]._ptr);
+Parameter Interpreter::peekMem(Parameters params) {
+	return peekmem(params.size(), params[0]);
 }
 
-int Interpreter::rnd(Parameters params) {
-	return ::Aesop::rnd(params.size(), params[0]._val, params[1]._val);
+Parameter Interpreter::rnd(Parameters params) {
+	return ::Aesop::rnd(params.size(), params[0], params[1]);
 }
 
-int Interpreter::dice(Parameters params) {
-	return ::Aesop::dice(params.size(), params[0]._val, params[1]._val, params[2]._val);
+Parameter Interpreter::dice(Parameters params) {
+	return ::Aesop::dice(params.size(), params[0], params[1], params[2]);
 }
 
-int Interpreter::absv(Parameters params) {
-	return ::Aesop::absv(params.size(), (LONG)params[0]._val);
+Parameter Interpreter::absv(Parameters params) {
+	return ::Aesop::absv(params.size(), params[0]);
 }
 
-int Interpreter::minv(Parameters params) {
-	return ::Aesop::minv(params.size(), (LONG)params[0]._val, (LONG)params[1]._val);
+Parameter Interpreter::minv(Parameters params) {
+	return ::Aesop::minv(params.size(), params[0], params[1]);
 }
 
-int Interpreter::maxv(Parameters params) {
-	return ::Aesop::maxv(params.size(), (LONG)params[0]._val, (LONG)params[1]._val);
+Parameter Interpreter::maxv(Parameters params) {
+	return ::Aesop::maxv(params.size(), params[0], params[1]);
 }
 
-int Interpreter::diagnose(Parameters params) {
-	::Aesop::diagnose(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::diagnose(Parameters params) {
+	::Aesop::diagnose(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::heapfree(Parameters params) {
+Parameter Interpreter::heapfree(Parameters params) {
 	return ::Aesop::heapfree();
 }
 
-int Interpreter::notify(Parameters params) {
-	::Aesop::notify(params.size(), params[0]._val, params[1]._val, (LONG)params[2]._val, (LONG)params[3]._val);
-	return 0;
+Parameter Interpreter::notify(Parameters params) {
+	::Aesop::notify(params.size(), params[0], params[1], params[2], params[3]);
+	return Parameter();
 }
 
-int Interpreter::cancel(Parameters params) {
-	::Aesop::cancel(params.size(), params[0]._val, params[1]._val, (LONG)params[2]._val, (LONG)params[3]._val);
-	return 0;
+Parameter Interpreter::cancel(Parameters params) {
+	::Aesop::cancel(params.size(), params[0], params[1], params[2], params[3]);
+	return Parameter();
 }
 
-int Interpreter::drainEventQueue(Parameters params) {
+Parameter Interpreter::drainEventQueue(Parameters params) {
 	drain_event_queue();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::postEvent(Parameters params) {
-	post_event(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val);
-	return 0;
+Parameter Interpreter::postEvent(Parameters params) {
+	post_event(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::sendEvent(Parameters params) {
-	send_event(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val);
-	return 0;
+Parameter Interpreter::sendEvent(Parameters params) {
+	send_event(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::peekEvent(Parameters params) {
+Parameter Interpreter::peekEvent(Parameters params) {
 	return peek_event();
 }
 
-int Interpreter::dispatchEvent(Parameters params) {
+Parameter Interpreter::dispatchEvent(Parameters params) {
 	dispatch_event();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::flushEventQueue(Parameters params) {
-	flush_event_queue(params.size(), (LONG)params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val);
-	return 0;
+Parameter Interpreter::flushEventQueue(Parameters params) {
+	flush_event_queue(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::flushInputEvents(Parameters params) {
+Parameter Interpreter::flushInputEvents(Parameters params) {
 	flush_input_events();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::initInterface(Parameters params) {
+Parameter Interpreter::initInterface(Parameters params) {
 	init_interface();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::shutdownInterface(Parameters params) {
+Parameter Interpreter::shutdownInterface(Parameters params) {
 	shutdown_interface();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::setMousePointer(Parameters params) {
-	set_mouse_pointer(params.size(), params[0]._val, params[1]._val, (LONG)params[2]._val,
-		(LONG)params[3]._val, params[4]._val, params[5]._val, params[6]._val);
-	return 0;
+Parameter Interpreter::setMousePointer(Parameters params) {
+	set_mouse_pointer(params.size(), params[0], params[1], params[2],
+		params[3], params[4], params[5], params[6]);
+	return Parameter();
 }
 
-int Interpreter::setWaitPointer(Parameters params) {
-	set_wait_pointer(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val);
-	return 0;
+Parameter Interpreter::setWaitPointer(Parameters params) {
+	set_wait_pointer(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::standbyCursor(Parameters params) {
+Parameter Interpreter::standbyCursor(Parameters params) {
 	standby_cursor();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::resumeCursor(Parameters params) {
+Parameter Interpreter::resumeCursor(Parameters params) {
 	resume_cursor();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::showMouse(Parameters params) {
+Parameter Interpreter::showMouse(Parameters params) {
 	show_mouse();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::hideMouse(Parameters params) {
+Parameter Interpreter::hideMouse(Parameters params) {
 	hide_mouse();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::mouseXY(Parameters params) {
+Parameter Interpreter::mouseXY(Parameters params) {
 	return mouse_XY();
 }
 
-int Interpreter::mouseInWindow(Parameters params) {
-	return mouse_in_window(params.size(), params[0]._val);
+Parameter Interpreter::mouseInWindow(Parameters params) {
+	return mouse_in_window(params.size(), params[0]);
 }
 
-int Interpreter::lockMouse(Parameters params) {
+Parameter Interpreter::lockMouse(Parameters params) {
 	lock_mouse();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::unlockMouse(Parameters params) {
+Parameter Interpreter::unlockMouse(Parameters params) {
 	unlock_mouse();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::getKey(Parameters params) {
+Parameter Interpreter::getKey(Parameters params) {
 	::Aesop::getkey();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::initGraphics(Parameters params) {
+Parameter Interpreter::initGraphics(Parameters params) {
 	init_graphics();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::drawDot(Parameters params) {
-	draw_dot(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val);
-	return 0;
+Parameter Interpreter::drawDot(Parameters params) {
+	draw_dot(params.size(), params[0], params[1], params[2], params[3]);
+	return Parameter();
 }
 
-int Interpreter::drawLine(Parameters params) {
-	draw_line(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val,
-		params[4]._val, params[5]._val);
-	return 0;
+Parameter Interpreter::drawLine(Parameters params) {
+	draw_line(params.size(), params[0], params[1], params[2], params[3],
+		params[4], params[5]);
+	return Parameter();
 }
 
-int Interpreter::lineTo(Parameters params) {
-	line_to(params.size(), params[0]._val, params[1]._val, params[2]._val);
-	return 0;
+Parameter Interpreter::lineTo(Parameters params) {
+	line_to(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::drawRectangle(Parameters params) {
-	draw_rectangle(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val,
-		(LONG)params[3]._val, (LONG)params[4]._val, params[5]._val);
-	return 0;
+Parameter Interpreter::drawRectangle(Parameters params) {
+	draw_rectangle(params.size(), params[0], params[1], params[2],
+		params[3], params[4], params[5]);
+	return Parameter();
 }
 
-int Interpreter::fillRectangle(Parameters params) {
-	fill_rectangle(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val,
-		(LONG)params[3]._val, (LONG)params[4]._val, params[5]._val);
-	return 0;
+Parameter Interpreter::fillRectangle(Parameters params) {
+	fill_rectangle(params.size(), params[0], params[1], params[2],
+		params[3], params[4], params[5]);
+	return Parameter();
 }
 
-int Interpreter::hashRectangle(Parameters params) {
-	hash_rectangle(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val,
-		(LONG)params[3]._val, (LONG)params[4]._val, params[5]._val);
-	return 0;
+Parameter Interpreter::hashRectangle(Parameters params) {
+	hash_rectangle(params.size(), params[0], params[1], params[2],
+		params[3], params[4], params[5]);
+	return Parameter();
 }
 
-int Interpreter::getBitmapHeight(Parameters params) {
-	return get_bitmap_height(params.size(), params[0]._val, params[1]._val);
+Parameter Interpreter::getBitmapHeight(Parameters params) {
+	return get_bitmap_height(params.size(), params[0], params[1]);
 }
 
-int Interpreter::drawBitmap(Parameters params) {
-	draw_bitmap(params.size(), params[0]._val, params[1]._val, params[2]._val,
-		(LONG)params[3]._val, (LONG)params[4]._val, params[5]._val, params[6]._val,
-		params[7]._val, params[8]._val);
-	return 0;
+Parameter Interpreter::drawBitmap(Parameters params) {
+	draw_bitmap(params.size(), params[0], params[1], params[2],
+		params[3], params[4], params[5], params[6],
+		params[7], params[8]);
+	return Parameter();
 }
 
-int Interpreter::visibleBitmapRect(Parameters params) {
-	assert(params[5]._ptr);
-	return visible_bitmap_rect(params.size(), (LONG)params[0]._val, (LONG)params[1]._val,
-		params[2]._val, params[3]._val, params[4]._val, (WORD *)params[5]._ptr);
+Parameter Interpreter::visibleBitmapRect(Parameters params) {
+	assert(params[5]);
+	return visible_bitmap_rect(params.size(), params[0], params[1],
+		params[2], params[3], params[4], params[5]);
 }
 
-int Interpreter::setPalette(Parameters params) {
-	set_palette(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::setPalette(Parameters params) {
+	set_palette(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::refreshWindow(Parameters params) {
-	refresh_window(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::refreshWindow(Parameters params) {
+	refresh_window(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::wipeWindow(Parameters params) {
-	wipe_window(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::wipeWindow(Parameters params) {
+	wipe_window(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::shutdownGraphics(Parameters params) {
+Parameter Interpreter::shutdownGraphics(Parameters params) {
 	shutdown_graphics();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::waitVerticalRetrace(Parameters params) {
+Parameter Interpreter::waitVerticalRetrace(Parameters params) {
 	wait_vertical_retrace();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::readPalette(Parameters params) {
-	return read_palette(params.size(), params[0]._val);
+Parameter Interpreter::readPalette(Parameters params) {
+	return read_palette(params.size(), params[0]);
 }
 
-int Interpreter::writePalette(Parameters params) {
-	write_palette(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::writePalette(Parameters params) {
+	write_palette(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::pixelFade(Parameters params) {
-	pixel_fade(params.size(), params[0]._val, params[1]._val, params[2]._val);
-	return 0;
+Parameter Interpreter::pixelFade(Parameters params) {
+	pixel_fade(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::colorFade(Parameters params) {
-	color_fade(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::colorFade(Parameters params) {
+	color_fade(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::lightFade(Parameters params) {
-	light_fade(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::lightFade(Parameters params) {
+	light_fade(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::assignWindow(Parameters params) {
-	assign_window(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val, params[4]._val);
-	return 0;
+Parameter Interpreter::assignWindow(Parameters params) {
+	assign_window(params.size(), params[0], params[1], params[2], params[3], params[4]);
+	return Parameter();
 }
 
-int Interpreter::assignSubWindow(Parameters params) {
-	return assign_subwindow(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val,
-		params[4]._val, params[5]._val);
+Parameter Interpreter::assignSubWindow(Parameters params) {
+	return assign_subwindow(params.size(), params[0], params[1], params[2], params[3],
+		params[4], params[5]);
 }
 
-int Interpreter::releaseWindow(Parameters params) {
-	release_window(params.size(), params[0]._val);
-	return 0;
+Parameter Interpreter::releaseWindow(Parameters params) {
+	release_window(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::getLeft(Parameters params) {
-	return get_x1(params.size(), params[0]._val);
+Parameter Interpreter::getLeft(Parameters params) {
+	return get_x1(params.size(), params[0]);
 }
 
-int Interpreter::getRight(Parameters params) {
-	return get_x2(params.size(), params[0]._val);
+Parameter Interpreter::getRight(Parameters params) {
+	return get_x2(params.size(), params[0]);
 }
 
-int Interpreter::getTop(Parameters params) {
-	return get_y1(params.size(), params[0]._val);
+Parameter Interpreter::getTop(Parameters params) {
+	return get_y1(params.size(), params[0]);
 }
 
-int Interpreter::getBottom(Parameters params) {
-	return get_y2(params.size(), params[0]._val);
+Parameter Interpreter::getBottom(Parameters params) {
+	return get_y2(params.size(), params[0]);
 }
 
-int Interpreter::setLeft(Parameters params) {
-	set_x1(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::setLeft(Parameters params) {
+	set_x1(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::setRight(Parameters params) {
-	set_x2(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::setRight(Parameters params) {
+	set_x2(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::setTop(Parameters params) {
-	set_y1(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::setTop(Parameters params) {
+	set_y1(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::setBottom(Parameters params) {
-	set_y2(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::setBottom(Parameters params) {
+	set_y2(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::textWindow(Parameters params) {
-	text_window(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::textWindow(Parameters params) {
+	text_window(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::textStyle(Parameters params) {
-	text_style(params.size(), params[0]._val, params[1]._val, params[2]._val);
-	return 0;
+Parameter Interpreter::textStyle(Parameters params) {
+	text_style(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::textXy(Parameters params) {
-	text_xy(params.size(), params[0]._val, params[1]._val, params[2]._val);
-	return 0;
+Parameter Interpreter::textXy(Parameters params) {
+	text_xy(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::textColor(Parameters params) {
-	text_color(params.size(), params[0]._val, params[1]._val, params[2]._val);
-	return 0;
+Parameter Interpreter::textColor(Parameters params) {
+	text_color(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::textRefreshWindow(Parameters params) {
-	text_refresh_window(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::textRefreshWindow(Parameters params) {
+	text_refresh_window(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::getTextX(Parameters params) {
-	return get_text_x(params.size(), params[0]._val);
+Parameter Interpreter::getTextX(Parameters params) {
+	return get_text_x(params.size(), params[0]);
 }
 
-int Interpreter::getTextY(Parameters params) {
-	return get_text_y(params.size(), params[0]._val);
+Parameter Interpreter::getTextY(Parameters params) {
+	return get_text_y(params.size(), params[0]);
 }
 
-int Interpreter::home(Parameters params) {
-	::Aesop::home(params.size(), params[0]._val);
-	return 0;
+Parameter Interpreter::home(Parameters params) {
+	::Aesop::home(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::print(Parameters params) {
+Parameter Interpreter::print(Parameters params) {
 	error("TODO: version of print() method accepting parameter array");
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::sPrint(Parameters params) {
+Parameter Interpreter::sPrint(Parameters params) {
 	error("TODO: version of sprint() method accepting parameter array");
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::dPrint(Parameters params) {
+Parameter Interpreter::dPrint(Parameters params) {
 	error("TODO: version of dprint() method accepting parameter array");
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::aPrint(Parameters params) {
+Parameter Interpreter::aPrint(Parameters params) {
 	error("TODO: version of aprint() method accepting parameter array");
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::crOut(Parameters params) {
-	::Aesop::crout(params.size(), params[0]._val);
-	return 0;
+Parameter Interpreter::crOut(Parameters params) {
+	::Aesop::crout(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::charWidth(Parameters params) {
-	return char_width(params.size(), params[0]._val, params[1]._val);
+Parameter Interpreter::charWidth(Parameters params) {
+	return char_width(params.size(), params[0], params[1]);
 }
 
-int Interpreter::fontHeight(Parameters params) {
-	return font_height(params.size(), params[0]._val);
+Parameter Interpreter::fontHeight(Parameters params) {
+	return font_height(params.size(), params[0]);
 }
 
-int Interpreter::solidBarGraph(Parameters params) {
-	solid_bar_graph(params.size(), (LONG)params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val,
-		(LONG)params[3]._val, params[4]._val, params[5]._val, params[6]._val, params[7]._val,
-		params[8]._val, params[9]._val, (LONG)params[10]._val, (LONG)params[11]._val,
-		(LONG)params[12]._val, (LONG)params[13]._val);
-	return 0;
+Parameter Interpreter::solidBarGraph(Parameters params) {
+	solid_bar_graph(params.size(), params[0], params[1], params[2],
+		params[3], params[4], params[5], params[6], params[7],
+		params[8], params[9], params[10], params[11],
+		params[12], params[13]);
+	return Parameter();
 }
 
-int Interpreter::initSound(Parameters params) {
-	init_sound(params.size(), params[0]._val);
-	return 0;
+Parameter Interpreter::initSound(Parameters params) {
+	init_sound(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::shutdownSound(Parameters params) {
+Parameter Interpreter::shutdownSound(Parameters params) {
 	shutdown_sound();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::loadSoundBlock(Parameters params) {
-	assert(params[2]._ptr);
-	load_sound_block(params.size(), params[0]._val, params[1]._val, (ULONG *)params[2]._ptr);
-	return 0;
+Parameter Interpreter::loadSoundBlock(Parameters params) {
+	assert(params[2]);
+	load_sound_block(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::soundEffect(Parameters params) {
-	sound_effect(params.size(), params[0]._val);
-	return 0;
+Parameter Interpreter::soundEffect(Parameters params) {
+	sound_effect(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::playSequence(Parameters params) {
-	play_sequence(params.size(), params[0]._val, params[1]._val, params[2]._val);
-	return 0;
+Parameter Interpreter::playSequence(Parameters params) {
+	play_sequence(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::loadMusic(Parameters params) {
+Parameter Interpreter::loadMusic(Parameters params) {
 	load_music();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::unloadMusic(Parameters params) {
+Parameter Interpreter::unloadMusic(Parameters params) {
 	unload_music();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::setSoundStatus(Parameters params) {
-	set_sound_status(params.size(), params[0]._val);
-	return 0;
+Parameter Interpreter::setSoundStatus(Parameters params) {
+	set_sound_status(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::createObject(Parameters params) {
-	return create_object(params.size(), params[0]._val);
+Parameter Interpreter::createObject(Parameters params) {
+	return create_object(params.size(), params[0]);
 }
 
-int Interpreter::createProgram(Parameters params) {
-	return create_program(params.size(), (LONG)params[0]._val, params[1]._val);
+Parameter Interpreter::createProgram(Parameters params) {
+	return create_program(params.size(), params[0], params[1]);
 }
 
-int Interpreter::destroyObject(Parameters params) {
-	return destroy_object(params.size(), (LONG)params[0]._val);
+Parameter Interpreter::destroyObject(Parameters params) {
+	return destroy_object(params.size(), params[0]);
 }
 
-int Interpreter::flushCache(Parameters params) {
-	return flush_cache(params.size(), params[0]._val);
+Parameter Interpreter::flushCache(Parameters params) {
+	return flush_cache(params.size(), params[0]);
 }
 
-int Interpreter::thrashCache(Parameters params) {
+Parameter Interpreter::thrashCache(Parameters params) {
 	thrash_cache();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::stepX(Parameters params) {
-	return step_X(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val);
+Parameter Interpreter::stepX(Parameters params) {
+	return step_X(params.size(), params[0], params[1], params[2], params[3]);
 }
 
-int Interpreter::stepY(Parameters params) {
-	return step_Y(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val);
+Parameter Interpreter::stepY(Parameters params) {
+	return step_Y(params.size(), params[0], params[1], params[2], params[3]);
 }
 
-int Interpreter::stepFDIR(Parameters params) {
-	return step_FDIR(params.size(), params[0]._val, params[1]._val);
+Parameter Interpreter::stepFDIR(Parameters params) {
+	return step_FDIR(params.size(), params[0], params[1]);
 }
 
-int Interpreter::stepSquareX(Parameters params) {
-	return step_square_X(params.size(), params[0]._val, params[1]._val, params[2]._val);
+Parameter Interpreter::stepSquareX(Parameters params) {
+	return step_square_X(params.size(), params[0], params[1], params[2]);
 }
 
-int Interpreter::stepSquareY(Parameters params) {
-	return step_square_Y(params.size(), params[0]._val, params[1]._val, params[2]._val);
+Parameter Interpreter::stepSquareY(Parameters params) {
+	return step_square_Y(params.size(), params[0], params[1], params[2]);
 }
 
-int Interpreter::stepRegion(Parameters params) {
-	return step_region(params.size(), params[0]._val, params[1]._val);
+Parameter Interpreter::stepRegion(Parameters params) {
+	return step_region(params.size(), params[0], params[1]);
 }
 
-int Interpreter::distance(Parameters params) {
-	return ::Aesop::distance(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val);
+Parameter Interpreter::distance(Parameters params) {
+	return ::Aesop::distance(params.size(), params[0], params[1], params[2], params[3]);
 }
 
-int Interpreter::seekDirection(Parameters params) {
-	return seek_direction(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val);
+Parameter Interpreter::seekDirection(Parameters params) {
+	return seek_direction(params.size(), params[0], params[1], params[2], params[3]);
 }
 
-int Interpreter::spellRequest(Parameters params) {
-	assert(params[0]._ptr && params[1]._ptr);
-	return spell_request(params.size(), params[0]._ptr, params[1]._ptr, params[2]._val, params[3]._val);
+Parameter Interpreter::spellRequest(Parameters params) {
+	assert(params[0] && params[1]);
+	return spell_request(params.size(), params[0], params[1], params[2], params[3]);
 }
 
-int Interpreter::spellList(Parameters params) {
-	assert(params[0]._ptr && params[3]._ptr);
-	return spell_list(params.size(), params[0]._ptr, params[1]._val, params[2]._val, params[3]._ptr, params[4]._val);
+Parameter Interpreter::spellList(Parameters params) {
+	assert(params[0] && params[3]);
+	return spell_list(params.size(), params[0], params[1], params[2], params[3], params[4]);
 }
 
-int Interpreter::magicField(Parameters params) {
-	magic_field(params.size(), params[0]._val, params[1]._val, params[2]._val, (LONG)params[3]._val);
-	return 0;
+Parameter Interpreter::magicField(Parameters params) {
+	magic_field(params.size(), params[0], params[1], params[2], params[3]);
+	return Parameter();
 }
 
-int Interpreter::doDots(Parameters params) {
-	assert(params[9]._ptr);
-	do_dots(params.size(), (LONG)params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val, (LONG)params[3]._val,
-		(LONG)params[4]._val, (LONG)params[5]._val, (LONG)params[6]._val, (LONG)params[7]._val,
-		(LONG)params[8]._val, params[9]._ptr);
-	return 0;
+Parameter Interpreter::doDots(Parameters params) {
+	assert(params[9]);
+	do_dots(params.size(), params[0], params[1], params[2], params[3],
+		params[4], params[5], params[6], params[7],
+		params[8], params[9]);
+	return Parameter();
 }
 
-int Interpreter::doIce(Parameters params) {
-	assert(params[6]._ptr);
-	do_ice(params.size(), (LONG)params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val, (LONG)params[3]._val,
-		(LONG)params[4]._val, (LONG)params[5]._val, params[6]._ptr);
-	return 0;
+Parameter Interpreter::doIce(Parameters params) {
+	assert(params[6]);
+	do_ice(params.size(), params[0], params[1], params[2], params[3],
+		params[4], params[5], params[6]);
+	return Parameter();
 }
 
-int Interpreter::readSaveDirectory(Parameters params) {
+Parameter Interpreter::readSaveDirectory(Parameters params) {
 	read_save_directory();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::savegameTitle(Parameters params) {
+Parameter Interpreter::savegameTitle(Parameters params) {
 	error("savegame_title returns char *");
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::writeSaveDirectory(Parameters params) {
+Parameter Interpreter::writeSaveDirectory(Parameters params) {
 	write_save_directory();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::saveGame(Parameters params) {
-	return save_game(params.size(), params[0]._val, params[1]._val);
+Parameter Interpreter::saveGame(Parameters params) {
+	return save_game(params.size(), params[0], params[1]);
 }
 
-int Interpreter::suspendGame(Parameters params) {
-	suspend_game(params.size(), params[0]._val);
-	return 0;
+Parameter Interpreter::suspendGame(Parameters params) {
+	suspend_game(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::resumeItems(Parameters params) {
-	resume_items(params.size(), params[0]._val, params[1]._val, params[2]._val);
-	return 0;
+Parameter Interpreter::resumeItems(Parameters params) {
+	resume_items(params.size(), params[0], params[1], params[2]);
+	return Parameter();
 }
 
-int Interpreter::resumeLevel(Parameters params) {
-	resume_level(params.size(), params[0]._val);
-	return 0;
+Parameter Interpreter::resumeLevel(Parameters params) {
+	resume_level(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::changeLevel(Parameters params) {
-	change_level(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::changeLevel(Parameters params) {
+	change_level(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::restoreItems(Parameters params) {
-	restore_items(params.size(), params[0]._val);
-	return 0;
+Parameter Interpreter::restoreItems(Parameters params) {
+	restore_items(params.size(), params[0]);
+	return Parameter();
 }
 
-int Interpreter::restoreLevelObjects(Parameters params) {
-	restore_level_objects(params.size(), params[0]._val, params[1]._val);
-	return 0;
+Parameter Interpreter::restoreLevelObjects(Parameters params) {
+	restore_level_objects(params.size(), params[0], params[1]);
+	return Parameter();
 }
 
-int Interpreter::readInitialItems(Parameters params) {
+Parameter Interpreter::readInitialItems(Parameters params) {
 	read_initial_items();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::writeInitialTempfiles(Parameters params) {
+Parameter Interpreter::writeInitialTempfiles(Parameters params) {
 	write_initial_tempfiles();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::createInitialBinaryFiles(Parameters params) {
+Parameter Interpreter::createInitialBinaryFiles(Parameters params) {
 	create_initial_binary_files();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::launch(Parameters params) {
-	::Aesop::launch(params.size(), (const char *)params[0]._ptr, (const char *)params[1]._ptr, 
-		(const char *)params[2]._ptr, (const char *)params[3]._ptr);
-	return 0;
+Parameter Interpreter::launch(Parameters params) {
+	::Aesop::launch(params.size(), params[0], params[1], params[2], params[3]);
+	return Parameter();
 }
 
-int Interpreter::openTransferFile(Parameters params) {
+Parameter Interpreter::openTransferFile(Parameters params) {
 	error("open_transfer_file");
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::closeTransferFile(Parameters params) {
+Parameter Interpreter::closeTransferFile(Parameters params) {
 	close_transfer_file();
-	return 0;
+	return Parameter();
 }
 
-int Interpreter::playerAttrib(Parameters params) {
-	return player_attrib(params.size(), params[0]._val, params[1]._val, params[2]._val);
+Parameter Interpreter::playerAttrib(Parameters params) {
+	return player_attrib(params.size(), params[0], params[1], params[2]);
 }
 
-int Interpreter::itemAttrib(Parameters params) {
-	return item_attrib(params.size(), params[0]._val, params[1]._val, params[2]._val);
+Parameter Interpreter::itemAttrib(Parameters params) {
+	return item_attrib(params.size(), params[0], params[1], params[2]);
 }
 
-int Interpreter::arrowCount(Parameters params) {
-	return arrow_count(params.size(), params[0]._val);
+Parameter Interpreter::arrowCount(Parameters params) {
+	return arrow_count(params.size(), params[0]);
 }
 
 } // End of namespace Aesop
