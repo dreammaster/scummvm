@@ -141,193 +141,162 @@ const OpcodeMethod Interpreter::_opcodes[] = {
 	&Interpreter::cmdBRK
 };
 
-typedef void(*FARPROC)();
-typedef FARPROC PROCDEF;
+const ExternMethod Interpreter::_methods[] = {
+	&Interpreter::loadString,
+	&Interpreter::loadResource,
+	&Interpreter::copyString,
+	&Interpreter::stringForceLower,
+	&Interpreter::stringForceUpper,
+	&Interpreter::stringLen,
+	&Interpreter::stringCompare,
+	&Interpreter::strVal,
+	&Interpreter::envVal,
+	&Interpreter::beep,
+	&Interpreter::pokeMem,
+	&Interpreter::peekMem,
+	&Interpreter::rnd,
+	&Interpreter::dice,
+	&Interpreter::absv,
+	&Interpreter::minv,
+	&Interpreter::maxv,
+	&Interpreter::diagnose,
+	&Interpreter::heapfree,
 
-PROCDEF code_resources[] = {
-	//
-	// Miscellaneous functions
-	//
-
-	(PROCDEF)load_string,
-	(PROCDEF)load_resource,
-	(PROCDEF)copy_string,
-	(PROCDEF)string_force_lower,
-	(PROCDEF)string_force_upper,
-	(PROCDEF)string_len,
-	(PROCDEF)string_compare,
-	(PROCDEF)strval,
-	(PROCDEF)envval,
-	(PROCDEF)beep,
-	(PROCDEF)pokemem,
-	(PROCDEF)peekmem,
-	(PROCDEF)rnd,
-	(PROCDEF)dice,
-	(PROCDEF)absv,
-	(PROCDEF)minv,
-	(PROCDEF)maxv,
-	(PROCDEF)diagnose,
-	(PROCDEF)heapfree,
-
-	//
 	// Event functions
-	// 
+	&Interpreter::notify,
+	&Interpreter::cancel,
+	&Interpreter::drainEventQueue,
+	&Interpreter::postEvent,
+	&Interpreter::sendEvent,
+	&Interpreter::peekEvent,
+	&Interpreter::dispatchEvent,
+	&Interpreter::flushEventQueue,
+	&Interpreter::flushInputEvents,
 
-	(PROCDEF)notify,
-	(PROCDEF)cancel,
-	(PROCDEF)drain_event_queue,
-	(PROCDEF)post_event,
-	(PROCDEF)send_event,
-	(PROCDEF)peek_event,
-	(PROCDEF)dispatch_event,
-	(PROCDEF)flush_event_queue,
-	(PROCDEF)flush_input_events,
-
-	//
 	// Interface functions
-	//
+	&Interpreter::initInterface,
+	&Interpreter::shutdownInterface,
+	&Interpreter::setMousePointer,
+	&Interpreter::setWaitPointer,
+	&Interpreter::standbyCursor,
+	&Interpreter::resumeCursor,
+	&Interpreter::showMouse,
+	&Interpreter::hideMouse,
+	&Interpreter::mouseXY,
+	&Interpreter::mouseInWindow,
+	&Interpreter::lockMouse,
+	&Interpreter::unlockMouse,
+	&Interpreter::getKey,
 
-	(PROCDEF)init_interface,
-	(PROCDEF)shutdown_interface,
-	(PROCDEF)set_mouse_pointer,
-	(PROCDEF)set_wait_pointer,
-	(PROCDEF)standby_cursor,
-	(PROCDEF)resume_cursor,
-	(PROCDEF)show_mouse,
-	(PROCDEF)hide_mouse,
-	(PROCDEF)mouse_XY,
-	(PROCDEF)mouse_in_window,
-	(PROCDEF)lock_mouse,
-	(PROCDEF)unlock_mouse,
-	(PROCDEF)getkey,
-
-	//
 	// Graphics-related functions
-	//
+	&Interpreter::initGraphics,
+	&Interpreter::drawDot,
+	&Interpreter::drawLine,
+	&Interpreter::lineTo,
+	&Interpreter::drawRectangle,
+	&Interpreter::fillRectangle,
+	&Interpreter::hashRectangle,
+	&Interpreter::getBitmapHeight,
+	&Interpreter::drawBitmap,
+	&Interpreter::visibleBitmapRect,
+	&Interpreter::setPalette,
+	&Interpreter::refreshWindow,
+	&Interpreter::wipe_window,
+	&Interpreter::shutdownGraphics,
+	&Interpreter::waitVerticalRetrace,
+	&Interpreter::readPalette,
+	&Interpreter::writePalette,
+	&Interpreter::pixelFade,
+	&Interpreter::colorFade,
+	&Interpreter::lightFade,
 
-	(PROCDEF)init_graphics,
-	(PROCDEF)draw_dot,
-	(PROCDEF)draw_line,
-	(PROCDEF)line_to,
-	(PROCDEF)draw_rectangle,
-	(PROCDEF)fill_rectangle,
-	(PROCDEF)hash_rectangle,
-	(PROCDEF)get_bitmap_height,
-	(PROCDEF)draw_bitmap,
-	(PROCDEF)visible_bitmap_rect,
-	(PROCDEF)set_palette,
-	(PROCDEF)refresh_window,
-	(PROCDEF)wipe_window,
-	(PROCDEF)shutdown_graphics,
-	(PROCDEF)wait_vertical_retrace,
-	(PROCDEF)read_palette,
-	(PROCDEF)write_palette,
-	(PROCDEF)pixel_fade,
-	(PROCDEF)color_fade,
-	(PROCDEF)light_fade,
+	&Interpreter::assignWindow,
+	&Interpreter::assignSubWindow,
+	&Interpreter::releaseWindow,
+	&Interpreter::getLeft,
+	&Interpreter::getRight,
+	&Interpreter::getTop,
+	&Interpreter::getBottom,
+	&Interpreter::setLeft,
+	&Interpreter::setRight,
+	&Interpreter::setTop,
+	&Interpreter::setBottom,
 
-	(PROCDEF)assign_window,
-	(PROCDEF)assign_subwindow,
-	(PROCDEF)release_window,
-	(PROCDEF)get_x1,
-	(PROCDEF)get_x2,
-	(PROCDEF)get_y1,
-	(PROCDEF)get_y2,
-	(PROCDEF)set_x1,
-	(PROCDEF)set_x2,
-	(PROCDEF)set_y1,
-	(PROCDEF)set_y2,
+	&Interpreter::textWindow,
+	&Interpreter::textStyle,
+	&Interpreter::textXy,
+	&Interpreter::textColor,
+	&Interpreter::textRefreshWindow,
+	&Interpreter::getTextX,
+	&Interpreter::getTextY,
+	&Interpreter::home,
+	&Interpreter::print,
+	&Interpreter::sPrint,
+	&Interpreter::dPrint,
+	&Interpreter::aPrint,
+	&Interpreter::crOut,
+	&Interpreter::charWidth,
+	&Interpreter::fontHeight,
 
-	(PROCDEF)text_window,
-	(PROCDEF)text_style,
-	(PROCDEF)text_xy,
-	(PROCDEF)text_color,
-	(PROCDEF)text_refresh_window,
-	(PROCDEF)get_text_x,
-	(PROCDEF)get_text_y,
-	(PROCDEF)home,
-	(PROCDEF)print,
-	(PROCDEF)sprint,
-	(PROCDEF)dprint,
-	(PROCDEF)aprint,
-	(PROCDEF)crout,
-	(PROCDEF)char_width,
-	(PROCDEF)font_height,
+	&Interpreter::solidBarGraph,
 
-	(PROCDEF)solid_bar_graph,
-
-	//   (PROCDEF)mono_on,
-	//   (PROCDEF)mono_off,
-
-	//
 	// Sound-related functions
-	//
+	&Interpreter::initSound,
+	&Interpreter::shutdownSound,
+	&Interpreter::loadSoundBlock,
+	&Interpreter::soundEffect,
+	&Interpreter::playSequence,
+	&Interpreter::loadMusic,
+	&Interpreter::unloadMusic,
+	&Interpreter::setSoundStatus,
 
-	(PROCDEF)init_sound,
-	(PROCDEF)shutdown_sound,
-	(PROCDEF)load_sound_block,
-	(PROCDEF)sound_effect,
-	(PROCDEF)play_sequence,
-	(PROCDEF)load_music,
-	(PROCDEF)unload_music,
-	(PROCDEF)set_sound_status,
-
-	//
 	// Eye III object management
-	//
+	&Interpreter::createObject,
+	&Interpreter::createProgram,
+	&Interpreter::destroyObject,
+	&Interpreter::flushCache,
+	&Interpreter::thrashCache,
 
-	(PROCDEF)create_object,
-	(PROCDEF)create_program,
-	(PROCDEF)destroy_object,
-	(PROCDEF)flush_cache,
-	(PROCDEF)thrash_cache,
-
-	//
 	// Eye III support functions
-	//
+	&Interpreter::stepX,
+	&Interpreter::stepY,
+	&Interpreter::stepFDIR,
 
-	(PROCDEF)step_X,
-	(PROCDEF)step_Y,
-	(PROCDEF)step_FDIR,
+	&Interpreter::stepSquareX,
+	&Interpreter::stepSquareY,
+	&Interpreter::stepRegion,
 
-	(PROCDEF)step_square_X,
-	(PROCDEF)step_square_Y,
-	(PROCDEF)step_region,
+	&Interpreter::distance,
+	&Interpreter::seekDirection,
 
-	(PROCDEF)distance,
-	(PROCDEF)seek_direction,
+	&Interpreter::spellRequest,
+	&Interpreter::spellList,
+	&Interpreter::magicField,
+	&Interpreter::doDots,
+	&Interpreter::doIce,
 
-	(PROCDEF)spell_request,
-	(PROCDEF)spell_list,
-	(PROCDEF)magic_field,
-	(PROCDEF)do_dots,
-	(PROCDEF)do_ice,
+	&Interpreter::readSaveDirectory,
+	&Interpreter::savegameTitle,
+	&Interpreter::writeSaveDirectory,
 
-	(PROCDEF)read_save_directory,
-	(PROCDEF)savegame_title,
-	(PROCDEF)write_save_directory,
+	&Interpreter::saveGame,
+	&Interpreter::suspendGame,
+	&Interpreter::resumeItems,
+	&Interpreter::resumeLevel,
+	&Interpreter::changeLevel,
+	&Interpreter::restoreItems,
+	&Interpreter::restoreLevel_objects,
+	&Interpreter::readInitialItems,
+	&Interpreter::writeInitialTempfiles,
+	&Interpreter::createInitialBinaryFiles,
+	&Interpreter::launch,
 
-	(PROCDEF)save_game,
-	(PROCDEF)suspend_game,
-	(PROCDEF)resume_items,
-	(PROCDEF)resume_level,
-	(PROCDEF)change_level,
-	(PROCDEF)restore_items,
-	(PROCDEF)restore_level_objects,
-	(PROCDEF)read_initial_items,
-	(PROCDEF)write_initial_tempfiles,
-	(PROCDEF)create_initial_binary_files,
-	(PROCDEF)launch,
-
-	//
 	// Eye II savegame file access
-	//
-
-	(PROCDEF)open_transfer_file,
-	(PROCDEF)close_transfer_file,
-	(PROCDEF)player_attrib,
-	(PROCDEF)item_attrib,
-	(PROCDEF)arrow_count,
+	&Interpreter::openTransferFile,
+	&Interpreter::closeTransferFile,
+	&Interpreter::playerAttrib,
+	&Interpreter::itemAttrib,
+	&Interpreter::arrowCount
 };
 
 /*----------------------------------------------------------------*/
@@ -488,7 +457,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 
 	// Set up the code pointer
 	res.lock(_hPrg);
-	_ds32 = (const byte *)Resources::addr(_hPrg);
+	_ds32 = (byte *)Resources::addr(_hPrg);
 	_code = _ds32 + codeOffset;
 	_offThis = _currentIndex;
 	_breakFlag = false;
@@ -511,14 +480,6 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 
 	res.unlock(_hPrg);
 	return _stack.top();
-}
-
-void Interpreter::deref() {
-	/*
-	int diff = (const byte *)_code - (const byte *)_ds32;
-	_ds32 = Resources::addr(_hPrg);
-	_code = (HRES)((const byte *)_ds32 + diff);
-	*/
 }
 
 void Interpreter::cmdBRT() {
@@ -735,17 +696,23 @@ void Interpreter::cmdRCRS() {
 
 void Interpreter::cmdCALL() {
 	_currentThis = _currentIndex;
+
+	// Load the arguments
+	Parameters params;
 	int argCount = *_code++;
+	for (int idx = 0; idx < argCount; ++idx)
+		params.push_back(_stack.popEntry());
 
-	// Handle any arguments
-	for (int idx = 0; idx < argCount; ++idx) {
-
-	}
+	// Get the method number
+	uint32 methodNum = _stack.pop();
+	assert((methodNum >> 16) == 0x1234);
 
 	// Handle the call
-	
+	uint stackSize = _stack.size();
+	int result = (this->*_methods[methodNum & 0xffff])(params);
 
-	error("TODO: opcode");
+	_stack.resize(stackSize);
+	_stack.push(result);
 }
 
 void Interpreter::cmdSEND() {
@@ -819,8 +786,8 @@ void Interpreter::cmdLTDA() {
 
 void Interpreter::cmdLETA() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *srcP = _ds32 + offset;
-	_stack.pushPtr(srcP);
+	byte *srcP = _ds32 + offset;
+	_stack.pushPtr((BYTE *)srcP);
 }
 
 void Interpreter::cmdLAB() {
@@ -923,28 +890,28 @@ void Interpreter::cmdLEAA() {
 	int offset = READ_LE_UINT16(_code); _code += 2;
 	assert((offset % 4) == 0);
 
-	const byte *ptr = (const byte *)&_stack[_stackBase + (offset / 4)];
+	byte *ptr = (byte *)&_stack[_stackBase + (offset / 4)];
 	_stack.pop();
-	_stack.pushPtr(ptr);
+	_stack.pushPtr((BYTE *)ptr);
 }
 
 void Interpreter::cmdLSB() {
 	uint32 offset = READ_LE_UINT32(_code); _code += 2;
-	const byte *srcP = (const byte *)_thunk + _staticOffset + offset;
+	byte *srcP = (byte *)_thunk + _staticOffset + offset;
 
 	_stack.top() = *srcP;
 }
 
 void Interpreter::cmdLSW() {
 	uint32 offset = READ_LE_UINT32(_code); _code += 2;
-	const byte *srcP = (const byte *)_thunk + _staticOffset + offset;
+	byte *srcP = (byte *)_thunk + _staticOffset + offset;
 
 	_stack.top() = READ_LE_UINT16(srcP);
 }
 
 void Interpreter::cmdLSD() {
 	uint32 offset = READ_LE_UINT32(_code); _code += 2;
-	const byte *srcP = (const byte *)_thunk + _staticOffset + offset;
+	byte *srcP = (byte *)_thunk + _staticOffset + offset;
 
 	_stack.top() = READ_LE_UINT32(srcP);
 }
@@ -972,21 +939,21 @@ void Interpreter::cmdSSD() {
 
 void Interpreter::cmdLSBA() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *srcP = (const byte *)_thunk + _staticOffset + offset + _stack.pop();
+	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLSWA() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *srcP = (const byte *)_thunk + _staticOffset + offset + _stack.pop();
+	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLSDA() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *srcP = (const byte *)_thunk + _staticOffset + offset + _stack.pop();
+	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	_stack.push(READ_LE_UINT32(srcP));
 }
@@ -1017,40 +984,40 @@ void Interpreter::cmdSSDA() {
 
 void Interpreter::cmdLESA() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *srcP = (const byte *)_thunk + _staticOffset + offset;
+	BYTE *srcP = (BYTE *)_thunk + _staticOffset + offset;
 
 	_stack.topPtr() = srcP;
 }
 
 void Interpreter::cmdLXB() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
-	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
 
 	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLXW() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
-	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
 
 	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLXD() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
-	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
 
 	_stack.push(READ_LE_UINT32(srcP));
 }
@@ -1059,7 +1026,7 @@ void Interpreter::cmdSXB() {
 	uint32 val = _stack.pop() & 0xff;
 
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
@@ -1073,7 +1040,7 @@ void Interpreter::cmdSXW() {
 	uint32 val = _stack.pop();
 
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
@@ -1087,7 +1054,7 @@ void Interpreter::cmdSXD() {
 	uint32 val = _stack.pop();
 
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
@@ -1099,40 +1066,40 @@ void Interpreter::cmdSXD() {
 
 void Interpreter::cmdLXBA() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	uint32 v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
 	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLXWA() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	uint32 v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
 	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLXDA() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	uint32 v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	const byte *srcP = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
 	_stack.push(READ_LE_UINT32(srcP));
 }
 
@@ -1140,7 +1107,7 @@ void Interpreter::cmdSXBA() {
 	uint32 val = _stack.pop();
 
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	uint32 v = _stack.pop();
@@ -1156,7 +1123,7 @@ void Interpreter::cmdSXWA() {
 	uint32 val = _stack.pop();
 
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	uint32 v = _stack.pop();
@@ -1172,7 +1139,7 @@ void Interpreter::cmdSXDA() {
 	uint32 val = _stack.pop();
 
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	uint32 v = _stack.pop();
@@ -1186,15 +1153,15 @@ void Interpreter::cmdSXDA() {
 
 void Interpreter::cmdLEXA() {
 	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	const byte *instP = (const byte *)_thunk + _externOffset + offset;
+	byte *instP = (byte *)_thunk + _externOffset + offset;
 	uint32 instanceOffset = READ_LE_UINT16(instP);
 
 	uint32 v = _stack.pop();
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	const byte *ptr = (const byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
-	_stack.pushPtr(ptr);
+	byte *ptr = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	_stack.pushPtr((BYTE *)ptr);
 }
 
 void Interpreter::cmdSXAS() {
@@ -1204,12 +1171,12 @@ void Interpreter::cmdSXAS() {
 
 void Interpreter::cmdLECA() {
 	uint32 val = _stack.pop();
-	_stack.pushPtr(_ds32 + val);
+	_stack.pushPtr((BYTE *)_ds32 + val);
 }
 
 void Interpreter::cmdSOLE() {
 	HRES hres = _objList[_stack.pop()];
-	_stack.pushPtr((const byte *)hres);
+	_stack.pushPtr((BYTE *)hres);
 }
 
 void Interpreter::cmdEND() {
@@ -1218,6 +1185,545 @@ void Interpreter::cmdEND() {
 
 void Interpreter::cmdBRK() {
 	error("BRK encountered");
+}
+
+int Interpreter::loadString(Parameters params) {
+	load_string(params.size(), params[0]._ptr, params[1]._val);
+	return 0;
+}
+
+int Interpreter::loadResource(Parameters params) {
+	load_resource(params.size(), params[0]._ptr, params[1]._val);
+	return 0;
+}
+
+int Interpreter::copyString(Parameters params) {
+	copy_string(params.size(), params[0]._ptr, params[1]._ptr);
+	return 0;
+}
+
+int Interpreter::stringForceLower(Parameters params) {
+	string_force_lower(params.size(), params[0]._ptr);
+	return 0;
+}
+
+int Interpreter::stringForceUpper(Parameters params) {
+	string_force_upper(params.size(), params[0]._ptr);
+	return 0;
+}
+
+int Interpreter::stringLen(Parameters params) {
+	return string_len(params.size(), params[0]._ptr);
+}
+
+int Interpreter::stringCompare(Parameters params) {
+	return string_compare(params.size(), params[0]._ptr, params[1]._ptr);
+}
+
+int Interpreter::strVal(Parameters params) {
+	return strval(params.size(), params[0]._ptr);
+}
+
+int Interpreter::envVal(Parameters params) {
+	return envval(params.size(), params[0]._ptr);
+}
+
+int Interpreter::beep(Parameters params) {
+	::Aesop::beep();
+	return 0;
+}
+
+int Interpreter::pokeMem(Parameters params) {
+	pokemem(params.size(), (LONG *)params[0]._ptr, params[1]._val);
+	return 0;
+}
+
+int Interpreter::peekMem(Parameters params) {
+	return peekmem(params.size(), (LONG *)params[0]._ptr);
+}
+
+int Interpreter::rnd(Parameters params) {
+	return ::Aesop::rnd(params.size(), params[0]._val, params[1]._val);
+}
+
+int Interpreter::dice(Parameters params) {
+	return 0;
+}
+
+int Interpreter::absv(Parameters params) {
+	return 0;
+}
+
+int Interpreter::minv(Parameters params) {
+	return 0;
+}
+
+int Interpreter::maxv(Parameters params) {
+	return 0;
+}
+
+int Interpreter::diagnose(Parameters params) {
+	return 0;
+}
+
+int Interpreter::heapfree(Parameters params) {
+	return 0;
+}
+
+int Interpreter::notify(Parameters params) {
+	return 0;
+}
+
+int Interpreter::cancel(Parameters params) {
+	return 0;
+}
+
+int Interpreter::drainEventQueue(Parameters params) {
+	return 0;
+}
+
+int Interpreter::postEvent(Parameters params) {
+	return 0;
+}
+
+int Interpreter::sendEvent(Parameters params) {
+	return 0;
+}
+
+int Interpreter::peekEvent(Parameters params) {
+	return 0;
+}
+
+int Interpreter::dispatchEvent(Parameters params) {
+	return 0;
+}
+
+int Interpreter::flushEventQueue(Parameters params) {
+	return 0;
+}
+
+int Interpreter::flushInputEvents(Parameters params) {
+	return 0;
+}
+
+int Interpreter::initInterface(Parameters params) {
+	return 0;
+}
+
+int Interpreter::shutdownInterface(Parameters params) {
+	return 0;
+}
+
+int Interpreter::setMousePointer(Parameters params) {
+	return 0;
+}
+
+int Interpreter::setWaitPointer(Parameters params) {
+	return 0;
+}
+
+int Interpreter::standbyCursor(Parameters params) {
+	return 0;
+}
+
+int Interpreter::resumeCursor(Parameters params) {
+	return 0;
+}
+
+int Interpreter::showMouse(Parameters params) {
+	return 0;
+}
+
+int Interpreter::hideMouse(Parameters params) {
+	return 0;
+}
+
+int Interpreter::mouseXY(Parameters params) {
+	return 0;
+}
+
+int Interpreter::mouseInWindow(Parameters params) {
+	return 0;
+}
+
+int Interpreter::lockMouse(Parameters params) {
+	return 0;
+}
+
+int Interpreter::unlockMouse(Parameters params) {
+	return 0;
+}
+
+int Interpreter::getKey(Parameters params) {
+	return 0;
+}
+
+int Interpreter::initGraphics(Parameters params) {
+	return 0;
+}
+
+int Interpreter::drawDot(Parameters params) {
+	return 0;
+}
+
+int Interpreter::drawLine(Parameters params) {
+	return 0;
+}
+
+int Interpreter::lineTo(Parameters params) {
+	return 0;
+}
+
+int Interpreter::drawRectangle(Parameters params) {
+	return 0;
+}
+
+int Interpreter::fillRectangle(Parameters params) {
+	return 0;
+}
+
+int Interpreter::hashRectangle(Parameters params) {
+	return 0;
+}
+
+int Interpreter::getBitmapHeight(Parameters params) {
+	return 0;
+}
+
+int Interpreter::drawBitmap(Parameters params) {
+	return 0;
+}
+
+int Interpreter::visibleBitmapRect(Parameters params) {
+	return 0;
+}
+
+int Interpreter::setPalette(Parameters params) {
+	return 0;
+}
+
+int Interpreter::refreshWindow(Parameters params) {
+	return 0;
+}
+
+int Interpreter::wipe_window(Parameters params) {
+	return 0;
+}
+
+int Interpreter::shutdownGraphics(Parameters params) {
+	return 0;
+}
+
+int Interpreter::waitVerticalRetrace(Parameters params) {
+	return 0;
+}
+
+int Interpreter::readPalette(Parameters params) {
+	return 0;
+}
+
+int Interpreter::writePalette(Parameters params) {
+	return 0;
+}
+
+int Interpreter::pixelFade(Parameters params) {
+	return 0;
+}
+
+int Interpreter::colorFade(Parameters params) {
+	return 0;
+}
+
+int Interpreter::lightFade(Parameters params) {
+	return 0;
+}
+
+int Interpreter::assignWindow(Parameters params) {
+	return 0;
+}
+
+int Interpreter::assignSubWindow(Parameters params) {
+	return 0;
+}
+
+int Interpreter::releaseWindow(Parameters params) {
+	return 0;
+}
+
+int Interpreter::getLeft(Parameters params) {
+	return 0;
+}
+
+int Interpreter::getRight(Parameters params) {
+	return 0;
+}
+
+int Interpreter::getTop(Parameters params) {
+	return 0;
+}
+
+int Interpreter::getBottom(Parameters params) {
+	return 0;
+}
+
+int Interpreter::setLeft(Parameters params) {
+	return 0;
+}
+
+int Interpreter::setRight(Parameters params) {
+	return 0;
+}
+
+int Interpreter::setTop(Parameters params) {
+	return 0;
+}
+
+int Interpreter::setBottom(Parameters params) {
+	return 0;
+}
+
+int Interpreter::textWindow(Parameters params) {
+	return 0;
+}
+
+int Interpreter::textStyle(Parameters params) {
+	return 0;
+}
+
+int Interpreter::textXy(Parameters params) {
+	return 0;
+}
+
+int Interpreter::textColor(Parameters params) {
+	return 0;
+}
+
+int Interpreter::textRefreshWindow(Parameters params) {
+	return 0;
+}
+
+int Interpreter::getTextX(Parameters params) {
+	return 0;
+}
+
+int Interpreter::getTextY(Parameters params) {
+	return 0;
+}
+
+int Interpreter::home(Parameters params) {
+	return 0;
+}
+
+int Interpreter::print(Parameters params) {
+	return 0;
+}
+
+int Interpreter::sPrint(Parameters params) {
+	return 0;
+}
+
+int Interpreter::dPrint(Parameters params) {
+	return 0;
+}
+
+int Interpreter::aPrint(Parameters params) {
+	return 0;
+}
+
+int Interpreter::crOut(Parameters params) {
+	return 0;
+}
+
+int Interpreter::charWidth(Parameters params) {
+	return 0;
+}
+
+int Interpreter::fontHeight(Parameters params) {
+	return 0;
+}
+
+int Interpreter::solidBarGraph(Parameters params) {
+	return 0;
+}
+
+int Interpreter::initSound(Parameters params) {
+	return 0;
+}
+
+int Interpreter::shutdownSound(Parameters params) {
+	return 0;
+}
+
+int Interpreter::loadSoundBlock(Parameters params) {
+	return 0;
+}
+
+int Interpreter::soundEffect(Parameters params) {
+	return 0;
+}
+
+int Interpreter::playSequence(Parameters params) {
+	return 0;
+}
+
+int Interpreter::loadMusic(Parameters params) {
+	return 0;
+}
+
+int Interpreter::unloadMusic(Parameters params) {
+	return 0;
+}
+
+int Interpreter::setSoundStatus(Parameters params) {
+	return 0;
+}
+
+int Interpreter::createObject(Parameters params) {
+	return 0;
+}
+
+int Interpreter::createProgram(Parameters params) {
+	return 0;
+}
+
+int Interpreter::destroyObject(Parameters params) {
+	return 0;
+}
+
+int Interpreter::flushCache(Parameters params) {
+	return 0;
+}
+
+int Interpreter::thrashCache(Parameters params) {
+	return 0;
+}
+
+int Interpreter::stepX(Parameters params) {
+	return 0;
+}
+
+int Interpreter::stepY(Parameters params) {
+	return 0;
+}
+
+int Interpreter::stepFDIR(Parameters params) {
+	return 0;
+}
+
+int Interpreter::stepSquareX(Parameters params) {
+	return 0;
+}
+
+int Interpreter::stepSquareY(Parameters params) {
+	return 0;
+}
+
+int Interpreter::stepRegion(Parameters params) {
+	return 0;
+}
+
+int Interpreter::distance(Parameters params) {
+	return 0;
+}
+
+int Interpreter::seekDirection(Parameters params) {
+	return 0;
+}
+
+int Interpreter::spellRequest(Parameters params) {
+	return 0;
+}
+
+int Interpreter::spellList(Parameters params) {
+	return 0;
+}
+
+int Interpreter::magicField(Parameters params) {
+	return 0;
+}
+
+int Interpreter::doDots(Parameters params) {
+	return 0;
+}
+
+int Interpreter::doIce(Parameters params) {
+	return 0;
+}
+
+int Interpreter::readSaveDirectory(Parameters params) {
+	return 0;
+}
+
+int Interpreter::savegameTitle(Parameters params) {
+	return 0;
+}
+
+int Interpreter::writeSaveDirectory(Parameters params) {
+	return 0;
+}
+
+int Interpreter::saveGame(Parameters params) {
+	return 0;
+}
+
+int Interpreter::suspendGame(Parameters params) {
+	return 0;
+}
+
+int Interpreter::resumeItems(Parameters params) {
+	return 0;
+}
+
+int Interpreter::resumeLevel(Parameters params) {
+	return 0;
+}
+
+int Interpreter::changeLevel(Parameters params) {
+	return 0;
+}
+
+int Interpreter::restoreItems(Parameters params) {
+	return 0;
+}
+
+int Interpreter::restoreLevel_objects(Parameters params) {
+	return 0;
+}
+
+int Interpreter::readInitialItems(Parameters params) {
+	return 0;
+}
+
+int Interpreter::writeInitialTempfiles(Parameters params) {
+	return 0;
+}
+
+int Interpreter::createInitialBinaryFiles(Parameters params) {
+	return 0;
+}
+
+int Interpreter::launch(Parameters params) {
+	return 0;
+}
+
+int Interpreter::openTransferFile(Parameters params) {
+	return 0;
+}
+
+int Interpreter::closeTransferFile(Parameters params) {
+	return 0;
+}
+
+int Interpreter::playerAttrib(Parameters params) {
+	return 0;
+}
+
+int Interpreter::itemAttrib(Parameters params) {
+	return 0;
+}
+
+int Interpreter::arrowCount(Parameters params) {
+	return 0;
 }
 
 } // End of namespace Aesop
