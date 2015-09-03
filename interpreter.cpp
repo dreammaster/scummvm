@@ -201,7 +201,7 @@ const ExternMethod Interpreter::_methods[] = {
 	&Interpreter::visibleBitmapRect,
 	&Interpreter::setPalette,
 	&Interpreter::refreshWindow,
-	&Interpreter::wipe_window,
+	&Interpreter::wipeWindow,
 	&Interpreter::shutdownGraphics,
 	&Interpreter::waitVerticalRetrace,
 	&Interpreter::readPalette,
@@ -285,7 +285,7 @@ const ExternMethod Interpreter::_methods[] = {
 	&Interpreter::resumeLevel,
 	&Interpreter::changeLevel,
 	&Interpreter::restoreItems,
-	&Interpreter::restoreLevel_objects,
+	&Interpreter::restoreLevelObjects,
 	&Interpreter::readInitialItems,
 	&Interpreter::writeInitialTempfiles,
 	&Interpreter::createInitialBinaryFiles,
@@ -815,20 +815,26 @@ void Interpreter::cmdLAD() {
 }
 
 void Interpreter::cmdSAB() {
-	uint32 v = READ_LE_UINT16(_code) / 4; _code += 2;
-	uint32 offset = _stack[_stackBase + v] & 0xff;
+	int index4 = READ_LE_UINT16(_code); _code += 2;
+	assert((index4 % 4) == 0);
+
+	uint32 offset = _stack[_stackBase + index4 / 4] & 0xff;
 	_stack[offset] = _stack.top();
 }
 
 void Interpreter::cmdSAW() {
-	uint32 v = READ_LE_UINT16(_code) / 4; _code += 2;
-	uint32 offset = _stack[_stackBase + v] & 0xffff;
+	int index4 = READ_LE_UINT16(_code); _code += 2;
+	assert((index4 % 4) == 0);
+
+	uint32 offset = _stack[_stackBase + index4 / 4] & 0xffff;
 	_stack[offset] = _stack.top();
 }
 
 void Interpreter::cmdSAD() {
-	uint32 v = READ_LE_UINT16(_code) / 4; _code += 2;
-	uint32 offset = _stack[_stackBase + v];
+	int index4 = READ_LE_UINT16(_code); _code += 2;
+	assert((index4 % 4) == 0);
+
+	uint32 offset = _stack[_stackBase + index4 / 4];
 	_stack[offset] = _stack.top();
 }
 
@@ -1247,483 +1253,587 @@ int Interpreter::rnd(Parameters params) {
 }
 
 int Interpreter::dice(Parameters params) {
-	return 0;
+	return ::Aesop::dice(params.size(), params[0]._val, params[1]._val, params[2]._val);
 }
 
 int Interpreter::absv(Parameters params) {
-	return 0;
+	return ::Aesop::absv(params.size(), (LONG)params[0]._val);
 }
 
 int Interpreter::minv(Parameters params) {
-	return 0;
+	return ::Aesop::minv(params.size(), (LONG)params[0]._val, (LONG)params[1]._val);
 }
 
 int Interpreter::maxv(Parameters params) {
-	return 0;
+	return ::Aesop::maxv(params.size(), (LONG)params[0]._val, (LONG)params[1]._val);
 }
 
 int Interpreter::diagnose(Parameters params) {
+	::Aesop::diagnose(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::heapfree(Parameters params) {
-	return 0;
+	return ::Aesop::heapfree();
 }
 
 int Interpreter::notify(Parameters params) {
+	::Aesop::notify(params.size(), params[0]._val, params[1]._val, (LONG)params[2]._val, (LONG)params[3]._val);
 	return 0;
 }
 
 int Interpreter::cancel(Parameters params) {
+	::Aesop::cancel(params.size(), params[0]._val, params[1]._val, (LONG)params[2]._val, (LONG)params[3]._val);
 	return 0;
 }
 
 int Interpreter::drainEventQueue(Parameters params) {
+	drain_event_queue();
 	return 0;
 }
 
 int Interpreter::postEvent(Parameters params) {
+	post_event(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val);
 	return 0;
 }
 
 int Interpreter::sendEvent(Parameters params) {
+	send_event(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val);
 	return 0;
 }
 
 int Interpreter::peekEvent(Parameters params) {
-	return 0;
+	return peek_event();
 }
 
 int Interpreter::dispatchEvent(Parameters params) {
+	dispatch_event();
 	return 0;
 }
 
 int Interpreter::flushEventQueue(Parameters params) {
+	flush_event_queue(params.size(), (LONG)params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val);
 	return 0;
 }
 
 int Interpreter::flushInputEvents(Parameters params) {
+	flush_input_events();
 	return 0;
 }
 
 int Interpreter::initInterface(Parameters params) {
+	init_interface();
 	return 0;
 }
 
 int Interpreter::shutdownInterface(Parameters params) {
+	shutdown_interface();
 	return 0;
 }
 
 int Interpreter::setMousePointer(Parameters params) {
+	set_mouse_pointer(params.size(), params[0]._val, params[1]._val, (LONG)params[2]._val,
+		(LONG)params[3]._val, params[4]._val, params[5]._val, params[6]._val);
 	return 0;
 }
 
 int Interpreter::setWaitPointer(Parameters params) {
+	set_wait_pointer(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val);
 	return 0;
 }
 
 int Interpreter::standbyCursor(Parameters params) {
+	standby_cursor();
 	return 0;
 }
 
 int Interpreter::resumeCursor(Parameters params) {
+	resume_cursor();
 	return 0;
 }
 
 int Interpreter::showMouse(Parameters params) {
+	show_mouse();
 	return 0;
 }
 
 int Interpreter::hideMouse(Parameters params) {
+	hide_mouse();
 	return 0;
 }
 
 int Interpreter::mouseXY(Parameters params) {
-	return 0;
+	return mouse_XY();
 }
 
 int Interpreter::mouseInWindow(Parameters params) {
-	return 0;
+	return mouse_in_window(params.size(), params[0]._val);
 }
 
 int Interpreter::lockMouse(Parameters params) {
+	lock_mouse();
 	return 0;
 }
 
 int Interpreter::unlockMouse(Parameters params) {
+	unlock_mouse();
 	return 0;
 }
 
 int Interpreter::getKey(Parameters params) {
+	::Aesop::getkey();
 	return 0;
 }
 
 int Interpreter::initGraphics(Parameters params) {
+	init_graphics();
 	return 0;
 }
 
 int Interpreter::drawDot(Parameters params) {
+	draw_dot(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val);
 	return 0;
 }
 
 int Interpreter::drawLine(Parameters params) {
+	draw_line(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val,
+		params[4]._val, params[5]._val);
 	return 0;
 }
 
 int Interpreter::lineTo(Parameters params) {
+	line_to(params.size(), params[0]._val, params[1]._val, params[2]._val);
 	return 0;
 }
 
 int Interpreter::drawRectangle(Parameters params) {
+	draw_rectangle(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val,
+		(LONG)params[3]._val, (LONG)params[4]._val, params[5]._val);
 	return 0;
 }
 
 int Interpreter::fillRectangle(Parameters params) {
+	fill_rectangle(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val,
+		(LONG)params[3]._val, (LONG)params[4]._val, params[5]._val);
 	return 0;
 }
 
 int Interpreter::hashRectangle(Parameters params) {
+	hash_rectangle(params.size(), params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val,
+		(LONG)params[3]._val, (LONG)params[4]._val, params[5]._val);
 	return 0;
 }
 
 int Interpreter::getBitmapHeight(Parameters params) {
-	return 0;
+	return get_bitmap_height(params.size(), params[0]._val, params[1]._val);
 }
 
 int Interpreter::drawBitmap(Parameters params) {
+	draw_bitmap(params.size(), params[0]._val, params[1]._val, params[2]._val,
+		(LONG)params[3]._val, (LONG)params[4]._val, params[5]._val, params[6]._val,
+		params[7]._val, params[8]._val);
 	return 0;
 }
 
 int Interpreter::visibleBitmapRect(Parameters params) {
-	return 0;
+	assert(params[5]._ptr);
+	return visible_bitmap_rect(params.size(), (LONG)params[0]._val, (LONG)params[1]._val,
+		params[2]._val, params[3]._val, params[4]._val, (WORD *)params[5]._ptr);
 }
 
 int Interpreter::setPalette(Parameters params) {
+	set_palette(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::refreshWindow(Parameters params) {
+	refresh_window(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
-int Interpreter::wipe_window(Parameters params) {
+int Interpreter::wipeWindow(Parameters params) {
+	wipe_window(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::shutdownGraphics(Parameters params) {
+	shutdown_graphics();
 	return 0;
 }
 
 int Interpreter::waitVerticalRetrace(Parameters params) {
+	wait_vertical_retrace();
 	return 0;
 }
 
 int Interpreter::readPalette(Parameters params) {
-	return 0;
+	return read_palette(params.size(), params[0]._val);
 }
 
 int Interpreter::writePalette(Parameters params) {
+	write_palette(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::pixelFade(Parameters params) {
+	pixel_fade(params.size(), params[0]._val, params[1]._val, params[2]._val);
 	return 0;
 }
 
 int Interpreter::colorFade(Parameters params) {
+	color_fade(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::lightFade(Parameters params) {
+	light_fade(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::assignWindow(Parameters params) {
+	assign_window(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val, params[4]._val);
 	return 0;
 }
 
 int Interpreter::assignSubWindow(Parameters params) {
-	return 0;
+	return assign_subwindow(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val,
+		params[4]._val, params[5]._val);
 }
 
 int Interpreter::releaseWindow(Parameters params) {
+	release_window(params.size(), params[0]._val);
 	return 0;
 }
 
 int Interpreter::getLeft(Parameters params) {
-	return 0;
+	return get_x1(params.size(), params[0]._val);
 }
 
 int Interpreter::getRight(Parameters params) {
-	return 0;
+	return get_x2(params.size(), params[0]._val);
 }
 
 int Interpreter::getTop(Parameters params) {
-	return 0;
+	return get_y1(params.size(), params[0]._val);
 }
 
 int Interpreter::getBottom(Parameters params) {
-	return 0;
+	return get_y2(params.size(), params[0]._val);
 }
 
 int Interpreter::setLeft(Parameters params) {
+	set_x1(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::setRight(Parameters params) {
+	set_x2(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::setTop(Parameters params) {
+	set_y1(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::setBottom(Parameters params) {
+	set_y2(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::textWindow(Parameters params) {
+	text_window(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::textStyle(Parameters params) {
+	text_style(params.size(), params[0]._val, params[1]._val, params[2]._val);
 	return 0;
 }
 
 int Interpreter::textXy(Parameters params) {
+	text_xy(params.size(), params[0]._val, params[1]._val, params[2]._val);
 	return 0;
 }
 
 int Interpreter::textColor(Parameters params) {
+	text_color(params.size(), params[0]._val, params[1]._val, params[2]._val);
 	return 0;
 }
 
 int Interpreter::textRefreshWindow(Parameters params) {
+	text_refresh_window(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::getTextX(Parameters params) {
-	return 0;
+	return get_text_x(params.size(), params[0]._val);
 }
 
 int Interpreter::getTextY(Parameters params) {
-	return 0;
+	return get_text_y(params.size(), params[0]._val);
 }
 
 int Interpreter::home(Parameters params) {
+	::Aesop::home(params.size(), params[0]._val);
 	return 0;
 }
 
 int Interpreter::print(Parameters params) {
+	error("TODO: version of print() method accepting parameter array");
 	return 0;
 }
 
 int Interpreter::sPrint(Parameters params) {
+	error("TODO: version of sprint() method accepting parameter array");
 	return 0;
 }
 
 int Interpreter::dPrint(Parameters params) {
+	error("TODO: version of dprint() method accepting parameter array");
 	return 0;
 }
 
 int Interpreter::aPrint(Parameters params) {
+	error("TODO: version of aprint() method accepting parameter array");
 	return 0;
 }
 
 int Interpreter::crOut(Parameters params) {
+	::Aesop::crout(params.size(), params[0]._val);
 	return 0;
 }
 
 int Interpreter::charWidth(Parameters params) {
-	return 0;
+	return char_width(params.size(), params[0]._val, params[1]._val);
 }
 
 int Interpreter::fontHeight(Parameters params) {
-	return 0;
+	return font_height(params.size(), params[0]._val);
 }
 
 int Interpreter::solidBarGraph(Parameters params) {
+	solid_bar_graph(params.size(), (LONG)params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val,
+		(LONG)params[3]._val, params[4]._val, params[5]._val, params[6]._val, params[7]._val,
+		params[8]._val, params[9]._val, (LONG)params[10]._val, (LONG)params[11]._val,
+		(LONG)params[12]._val, (LONG)params[13]._val);
 	return 0;
 }
 
 int Interpreter::initSound(Parameters params) {
+	init_sound(params.size(), params[0]._val);
 	return 0;
 }
 
 int Interpreter::shutdownSound(Parameters params) {
+	shutdown_sound();
 	return 0;
 }
 
 int Interpreter::loadSoundBlock(Parameters params) {
+	assert(params[2]._ptr);
+	load_sound_block(params.size(), params[0]._val, params[1]._val, (ULONG *)params[2]._ptr);
 	return 0;
 }
 
 int Interpreter::soundEffect(Parameters params) {
+	sound_effect(params.size(), params[0]._val);
 	return 0;
 }
 
 int Interpreter::playSequence(Parameters params) {
+	play_sequence(params.size(), params[0]._val, params[1]._val, params[2]._val);
 	return 0;
 }
 
 int Interpreter::loadMusic(Parameters params) {
+	load_music();
 	return 0;
 }
 
 int Interpreter::unloadMusic(Parameters params) {
+	unload_music();
 	return 0;
 }
 
 int Interpreter::setSoundStatus(Parameters params) {
+	set_sound_status(params.size(), params[0]._val);
 	return 0;
 }
 
 int Interpreter::createObject(Parameters params) {
-	return 0;
+	return create_object(params.size(), params[0]._val);
 }
 
 int Interpreter::createProgram(Parameters params) {
-	return 0;
+	return create_program(params.size(), (LONG)params[0]._val, params[1]._val);
 }
 
 int Interpreter::destroyObject(Parameters params) {
-	return 0;
+	return destroy_object(params.size(), (LONG)params[0]._val);
 }
 
 int Interpreter::flushCache(Parameters params) {
-	return 0;
+	return flush_cache(params.size(), params[0]._val);
 }
 
 int Interpreter::thrashCache(Parameters params) {
+	thrash_cache();
 	return 0;
 }
 
 int Interpreter::stepX(Parameters params) {
-	return 0;
+	return step_X(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val);
 }
 
 int Interpreter::stepY(Parameters params) {
-	return 0;
+	return step_Y(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val);
 }
 
 int Interpreter::stepFDIR(Parameters params) {
-	return 0;
+	return step_FDIR(params.size(), params[0]._val, params[1]._val);
 }
 
 int Interpreter::stepSquareX(Parameters params) {
-	return 0;
+	return step_square_X(params.size(), params[0]._val, params[1]._val, params[2]._val);
 }
 
 int Interpreter::stepSquareY(Parameters params) {
-	return 0;
+	return step_square_Y(params.size(), params[0]._val, params[1]._val, params[2]._val);
 }
 
 int Interpreter::stepRegion(Parameters params) {
-	return 0;
+	return step_region(params.size(), params[0]._val, params[1]._val);
 }
 
 int Interpreter::distance(Parameters params) {
-	return 0;
+	return ::Aesop::distance(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val);
 }
 
 int Interpreter::seekDirection(Parameters params) {
-	return 0;
+	return seek_direction(params.size(), params[0]._val, params[1]._val, params[2]._val, params[3]._val);
 }
 
 int Interpreter::spellRequest(Parameters params) {
-	return 0;
+	assert(params[0]._ptr && params[1]._ptr);
+	return spell_request(params.size(), params[0]._ptr, params[1]._ptr, params[2]._val, params[3]._val);
 }
 
 int Interpreter::spellList(Parameters params) {
-	return 0;
+	assert(params[0]._ptr && params[3]._ptr);
+	return spell_list(params.size(), params[0]._ptr, params[1]._val, params[2]._val, params[3]._ptr, params[4]._val);
 }
 
 int Interpreter::magicField(Parameters params) {
+	magic_field(params.size(), params[0]._val, params[1]._val, params[2]._val, (LONG)params[3]._val);
 	return 0;
 }
 
 int Interpreter::doDots(Parameters params) {
+	assert(params[9]._ptr);
+	do_dots(params.size(), (LONG)params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val, (LONG)params[3]._val,
+		(LONG)params[4]._val, (LONG)params[5]._val, (LONG)params[6]._val, (LONG)params[7]._val,
+		(LONG)params[8]._val, params[9]._ptr);
 	return 0;
 }
 
 int Interpreter::doIce(Parameters params) {
+	assert(params[6]._ptr);
+	do_ice(params.size(), (LONG)params[0]._val, (LONG)params[1]._val, (LONG)params[2]._val, (LONG)params[3]._val,
+		(LONG)params[4]._val, (LONG)params[5]._val, params[6]._ptr);
 	return 0;
 }
 
 int Interpreter::readSaveDirectory(Parameters params) {
+	read_save_directory();
 	return 0;
 }
 
 int Interpreter::savegameTitle(Parameters params) {
+	error("savegame_title returns char *");
 	return 0;
 }
 
 int Interpreter::writeSaveDirectory(Parameters params) {
+	write_save_directory();
 	return 0;
 }
 
 int Interpreter::saveGame(Parameters params) {
-	return 0;
+	return save_game(params.size(), params[0]._val, params[1]._val);
 }
 
 int Interpreter::suspendGame(Parameters params) {
+	suspend_game(params.size(), params[0]._val);
 	return 0;
 }
 
 int Interpreter::resumeItems(Parameters params) {
+	resume_items(params.size(), params[0]._val, params[1]._val, params[2]._val);
 	return 0;
 }
 
 int Interpreter::resumeLevel(Parameters params) {
+	resume_level(params.size(), params[0]._val);
 	return 0;
 }
 
 int Interpreter::changeLevel(Parameters params) {
+	change_level(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::restoreItems(Parameters params) {
+	restore_items(params.size(), params[0]._val);
 	return 0;
 }
 
-int Interpreter::restoreLevel_objects(Parameters params) {
+int Interpreter::restoreLevelObjects(Parameters params) {
+	restore_level_objects(params.size(), params[0]._val, params[1]._val);
 	return 0;
 }
 
 int Interpreter::readInitialItems(Parameters params) {
+	read_initial_items();
 	return 0;
 }
 
 int Interpreter::writeInitialTempfiles(Parameters params) {
+	write_initial_tempfiles();
 	return 0;
 }
 
 int Interpreter::createInitialBinaryFiles(Parameters params) {
+	create_initial_binary_files();
 	return 0;
 }
 
 int Interpreter::launch(Parameters params) {
+	::Aesop::launch(params.size(), (const char *)params[0]._ptr, (const char *)params[1]._ptr, 
+		(const char *)params[2]._ptr, (const char *)params[3]._ptr);
 	return 0;
 }
 
 int Interpreter::openTransferFile(Parameters params) {
+	error("open_transfer_file");
 	return 0;
 }
 
 int Interpreter::closeTransferFile(Parameters params) {
+	close_transfer_file();
 	return 0;
 }
 
 int Interpreter::playerAttrib(Parameters params) {
-	return 0;
+	return player_attrib(params.size(), params[0]._val, params[1]._val, params[2]._val);
 }
 
 int Interpreter::itemAttrib(Parameters params) {
-	return 0;
+	return item_attrib(params.size(), params[0]._val, params[1]._val, params[2]._val);
 }
 
 int Interpreter::arrowCount(Parameters params) {
-	return 0;
+	return arrow_count(params.size(), params[0]._val);
 }
 
 } // End of namespace Aesop

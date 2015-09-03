@@ -216,12 +216,9 @@ void pokemem(LONG argcnt, LONG *addr, LONG data)
 }
 
 
-LONG peekmem(LONG argcnt, LONG *addr)
-
-{
-   return *addr;
+LONG peekmem(LONG argcnt, LONG *addr) {
+	return addr ? *addr : 0;
 }
-
 
 ULONG rnd(LONG argcnt, ULONG low, ULONG high)
 

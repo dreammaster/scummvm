@@ -282,7 +282,7 @@ private:
 	int visibleBitmapRect(Parameters params);
 	int setPalette(Parameters params);
 	int refreshWindow(Parameters params);
-	int wipe_window(Parameters params);
+	int wipeWindow(Parameters params);
 	int shutdownGraphics(Parameters params);
 	int waitVerticalRetrace(Parameters params);
 	int readPalette(Parameters params);
@@ -366,7 +366,7 @@ private:
 	int resumeLevel(Parameters params);
 	int changeLevel(Parameters params);
 	int restoreItems(Parameters params);
-	int restoreLevel_objects(Parameters params);
+	int restoreLevelObjects(Parameters params);
 	int readInitialItems(Parameters params);
 	int writeInitialTempfiles(Parameters params);
 	int createInitialBinaryFiles(Parameters params);
