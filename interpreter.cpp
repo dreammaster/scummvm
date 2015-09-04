@@ -714,7 +714,7 @@ void Interpreter::cmdINTC() {
 
 void Interpreter::cmdLNGC() {
 	uint32 v = READ_LE_UINT32(_code); _code += 4;
-	_stack.push(v);
+	_stack.top() = v;
 }
 
 void Interpreter::cmdRCRS() {
@@ -1225,8 +1225,8 @@ void Interpreter::cmdSXAS() {
 }
 
 void Interpreter::cmdLECA() {
-	ULONG val = _stack.pop();
-	_stack.push((BYTE *)_ds32 + val);
+	ULONG val = READ_LE_UINT16(_code); _code += 2;
+	_stack.top() = (BYTE *)_ds32 + val;
 }
 
 void Interpreter::cmdSOLE() {

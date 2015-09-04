@@ -1121,10 +1121,11 @@ void write_initial_tempfiles(void)
 
 void create_initial_binary_files(void)
 {
-   ULONG lvl;
 
    set_save_slotnum(0);
-
+   /*
+   ULONG lvl;
+   
 //   if (copy_file(items_txt,items_bin) == -1)
 //      abend(MSG_CNTI);
 
@@ -1144,7 +1145,9 @@ void create_initial_binary_files(void)
 	  debugN("Translating %s to %s\n", lvl_txt, lvl_bin);
 
 	  translate_file((const char *)lvl_txt, (const char *)lvl_bin, FIRST_LVL_OBJ, LAST_LVL_OBJ);
-      }
+      
+	  }
+	  */
 }
 
 /*********************************************************/

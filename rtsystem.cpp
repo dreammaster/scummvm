@@ -720,7 +720,7 @@ WORD append_file(BYTE *filename, void *buf, ULONG len)
 
 ULONG file_time(const char *filename)
 {
-	error("TODO");
+	return 0L;
 	
 	/*
    union REGS in,out;
