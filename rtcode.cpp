@@ -209,10 +209,9 @@ void beep(void)
 }
 
 
-void pokemem(LONG argcnt, LONG *addr, LONG data)
-
-{
-   *addr = data;
+void pokemem(LONG argcnt, LONG *addr, LONG data) {
+	if (addr)
+		*addr = data;
 }
 
 

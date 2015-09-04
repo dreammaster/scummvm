@@ -730,11 +730,11 @@ void Interpreter::cmdRCRS() {
 void Interpreter::cmdCALL() {
 	_currentThis = _currentIndex;
 
-	// Load the arguments
+	// Load the arguments in reverse so they'll be in the correct order
 	Parameters params;
 	int argCount = *_code++;
 	for (int idx = 0; idx < argCount; ++idx)
-		params.push_back(_stack.pop());
+		params.insert_at(0, _stack.pop());
 
 	// Get the method number
 	ULONG methodNum = _stack.pop();
@@ -826,26 +826,29 @@ void Interpreter::cmdLETA() {
 }
 
 void Interpreter::cmdLAB() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	assert((offset % 4) == 0);
+	uint32 index4 = READ_LE_UINT16(_code); _code += 2;
+	assert(index4 == 0 || (index4 % 4) == 2);
+	int index = index4 ? (index4 + 2) / 4 : 0;
 
-	ULONG v = _stack[_stackBase + offset / 4] & 0xff;
+	ULONG v = _stack[_stackBase + index] & 0xff;
 	_stack.top() = v;
 }
 
 void Interpreter::cmdLAW() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	assert((offset % 4) == 0);
+	uint32 index4 = READ_LE_UINT16(_code); _code += 2;
+	assert(index4 == 0 || (index4 % 4) == 2);
+	int index = index4 ? (index4 + 2) / 4 : 0;
 
-	ULONG v = _stack[_stackBase + offset / 4] & 0xffff;
+	ULONG v = _stack[_stackBase + index] & 0xffff;
 	_stack.top() = v;
 }
 
 void Interpreter::cmdLAD() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
-	assert((offset % 4) == 0);
+	uint32 index4 = READ_LE_UINT16(_code); _code += 2;
+	assert(index4 == 0 || (index4 % 4) == 2);
+	int index = index4 ? (index4 + 2) / 4 : 0;
 
-	ULONG v = _stack[_stackBase + offset / 4];
+	ULONG v = _stack[_stackBase + index];
 	_stack.top() = v;
 }
 
