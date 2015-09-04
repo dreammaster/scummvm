@@ -718,7 +718,7 @@ void Interpreter::cmdLNGC() {
 }
 
 void Interpreter::cmdRCRS() {
-	// Get index into external offset list
+	// Get index into method offset list
 	uint offset = READ_LE_UINT16(_code); _code += 2;
 	uint32 methodNum = READ_LE_UINT32((const byte *)_thunk + _externOffset + offset);
 
@@ -851,52 +851,63 @@ void Interpreter::cmdLAD() {
 
 void Interpreter::cmdSAB() {
 	int index4 = READ_LE_UINT16(_code); _code += 2;
-	assert((index4 % 4) == 0);
+	assert(index4 == 0 || (index4 % 4) == 2);
+	int index = index4 ? (index4 + 2) / 4 : 0;
 
-	ULONG offset = _stack[_stackBase + index4 / 4] & 0xff;
-	_stack[offset] = _stack.top();
+	int offset = _stackBase + index;
+	_stack[offset] = ((ULONG)_stack[offset] & 0xffffff00) | (_stack.pop() & 0xff);
 }
 
 void Interpreter::cmdSAW() {
 	int index4 = READ_LE_UINT16(_code); _code += 2;
-	assert((index4 % 4) == 0);
+	assert(index4 == 0 || (index4 % 4) == 2);
+	int index = index4 ? (index4 + 2) / 4 : 0;
 
-	ULONG offset = _stack[_stackBase + index4 / 4] & 0xffff;
-	_stack[offset] = _stack.top();
+	int offset = _stackBase + index;
+	_stack[offset] = ((ULONG)_stack[offset] & 0xffff0000) | (_stack.pop() & 0xffff);
 }
 
 void Interpreter::cmdSAD() {
 	int index4 = READ_LE_UINT16(_code); _code += 2;
-	assert((index4 % 4) == 0);
+	assert(index4 == 0 || (index4 % 4) == 2);
+	int index = index4 ? (index4 + 2) / 4 : 0;
 
-	ULONG offset = _stack[_stackBase + index4 / 4];
-	_stack[offset] = _stack.top();
+	_stack[_stackBase + index] = _stack.top();
 }
 
 void Interpreter::cmdLABA() {
-	int offset = READ_LE_UINT16(_code); _code += 2;
-	int subIndex = _stack.pop();
-	assert((offset % 4) == 0 && (subIndex % 4) == 0);
+	int index4 = READ_LE_UINT16(_code); _code += 2;
+	assert(index4 == 0 || (index4 % 4) == 2);
+	int index = index4 ? (index4 + 2) / 4 : 0;
 
-	ULONG v = _stack[_stackBase + (offset - subIndex) / 4] & 0xff;
+	int subIndex = _stack.pop();
+	assert((subIndex % 4) == 0);
+
+	ULONG v = _stack[_stackBase + index +  subIndex / 4] & 0xff;
 	_stack.push(v);
 }
 
 void Interpreter::cmdLAWA() {
-	int offset = READ_LE_UINT16(_code); _code += 2;
-	int subIndex = _stack.pop();
-	assert((offset % 4) == 0 && (subIndex % 4) == 0);
+	int index4 = READ_LE_UINT16(_code); _code += 2;
+	assert(index4 == 0 || (index4 % 4) == 2);
+	int index = index4 ? (index4 + 2) / 4 : 0;
 
-	ULONG v = _stack[_stackBase + (offset - subIndex) / 4] & 0xffff;
+	int subIndex = _stack.pop();
+	assert((subIndex % 4) == 0);
+
+	ULONG v = _stack[_stackBase + index + subIndex / 4] & 0xffff;
 	_stack.push(v);
 }
 
 void Interpreter::cmdLADA() {
-	int offset = READ_LE_UINT16(_code); _code += 2;
-	int subIndex = _stack.pop();
-	assert((offset % 4) == 0 && (subIndex % 4) == 0);
+	int index4 = READ_LE_UINT16(_code); _code += 2;
+	assert(index4 == 0 || (index4 % 4) == 2);
+	int index = index4 ? (index4 + 2) / 4 : 0;
 
-	ULONG v = _stack[_stackBase + (offset - subIndex) / 4];
+	int subIndex = _stack.pop();
+	assert((subIndex % 4) == 0);
+
+	ULONG v = _stack[_stackBase + index + subIndex / 4];
 	_stack.push(v);
 }
 
