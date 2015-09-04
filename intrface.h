@@ -47,4 +47,3 @@ void refresh_window(LONG argcnt, ULONG src, ULONG target);
 
 #endif
 
-

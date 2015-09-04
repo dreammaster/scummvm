@@ -91,10 +91,10 @@ LONG GIL2VFX_assign_window(LONG x1, LONG y1, LONG x2, LONG y2)
 
 void GIL2VFX_init()
 {
-   LONG dummy;
+   //LONG dummy;
 
-   void *DLL,*drvr;
-   LONG w,h;
+   //void *DLL,*drvr;
+   //LONG w,h;
 
    //
    // Load the driver
@@ -122,8 +122,8 @@ void GIL2VFX_init()
    */
    VFX = VFX_describe_driver();
 
-   w = VFX->scrn_width;
-   h = VFX->scrn_height;
+//   w = VFX->scrn_width;
+//   h = VFX->scrn_height;
 
    //
    // Turn graphics on; set up window and pane
@@ -147,7 +147,7 @@ void GIL2VFX_init()
    panes[0].right = 319;
    panes[0].bottom = 199;
 
-   dummy = GIL2VFX_assign_window(0,0,319,199);  // Page 2 = 1
+   GIL2VFX_assign_window(0,0,319,199);  // Page 2 = 1
 
 }
 
@@ -289,7 +289,7 @@ void GIL2VFX_draw_bitmap(LONG wnd,LONG x, LONG y, LONG mirror, LONG scale,
    if (gil2vfx_active != true)
       return;
 
-   if ( (scale == NULL) && (mirror == NO_MIRROR) )
+   if ( (scale == 0) && (mirror == NO_MIRROR) )
       {
       VFX_shape_draw(&panes[wnd], shapes, shape_num, xp, yp);
       }
@@ -339,7 +339,7 @@ void GIL2VFX_draw_bitmap(LONG wnd,LONG x, LONG y, LONG mirror, LONG scale,
          flags = ST_XLAT;
          }
       else
-         flags = NULL;
+         flags = 0;
 
       VFX_shape_transform(&panes[wnd], shapes, shape_num, xp, yp,
                           bitmap_buffer, 0, x_scale, y_scale, flags);
@@ -351,28 +351,28 @@ LONG GIL2VFX_get_x1(ULONG wnd)
    if (panes[wnd].window != NULL)
       return panes[wnd].left;
    else
-      return NULL;
+      return 0;
 }
 LONG GIL2VFX_get_y1(ULONG wnd)
 {
    if (panes[wnd].window != NULL)
       return panes[wnd].top;
    else
-      return NULL;
+      return 0;
 }
 LONG GIL2VFX_get_x2(ULONG wnd)
 {
    if (panes[wnd].window != NULL)
       return panes[wnd].right;
    else
-      return NULL;
+      return 0;
 }
 LONG GIL2VFX_get_y2(ULONG wnd)
 {
    if (panes[wnd].window != NULL)
       return panes[wnd].bottom;
    else
-      return NULL;
+      return 0;
 }
 
 void GIL2VFX_set_x1(ULONG wnd, LONG val)
@@ -417,7 +417,7 @@ LONG GIL2VFX_read_dot(LONG wnd, LONG x, LONG y)
    LONG yp = y - panes[wnd].top;
 
    if (gil2vfx_active != true)
-      return NULL;
+      return 0;
 
    return VFX_pixel_read(&panes[wnd], xp, yp);
 }
@@ -501,7 +501,7 @@ void GIL2VFX_color_fade(LONG src_wnd, LONG dst_wnd)
 {
    RGB palette[256], clr;
    ULONG colors[256], num_colors;
-   LONG i;
+   ULONG i;
 
    if (gil2vfx_active != true)
       return;
@@ -658,4 +658,4 @@ void GIL2VFX_refresh_window(ULONG source, ULONG target)
 }
 
 } // End of namespace Aesop
-
+

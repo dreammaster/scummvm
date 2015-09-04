@@ -38,7 +38,7 @@
 namespace Aesop {
 
 enum {
-	kDebugLevelScript      = 1 << 0,
+	kDebugLevelScript      = 1 << 0
 };
 
 enum GameType {
@@ -100,3 +100,4 @@ extern AesopEngine *_vm;
 } // End of namespace Aesop
 
 #endif
+

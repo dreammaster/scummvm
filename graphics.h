@@ -48,4 +48,3 @@ extern void release_owned_windows(LONG owner);
 
 #endif
 
-

@@ -46,7 +46,7 @@ EVENT EV_queue[EV_QSIZE];
 ULONG EV_head;
 ULONG EV_tail;
 
-static char *strs[] = {"SYS_FREE",
+static const char *const strs[] = {"SYS_FREE",
                        "SYS_TIMER",
                        "SYS_MOUSEMOVE",
                        "SYS_ENTER_REGION",
@@ -699,4 +699,4 @@ void flush_input_events(void)
 }
 
 } // End of namespace Aesop
-
+

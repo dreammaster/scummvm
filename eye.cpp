@@ -818,7 +818,7 @@ void set_save_slotnum(ULONG slot)
 {
    char num[3];
 
-   sprintf(num,"%02u",slot);
+   sprintf(num,"%02d", (int)slot);
 
    strncpy((char *)&items_bin[15],num,2);
    strncpy((char *)&items_txt[15], num, 2);
@@ -840,7 +840,7 @@ void set_save_lvlnum(ULONG lvl)
 {
    char num[3];
 
-   sprintf(num,"%02u",lvl);
+   sprintf(num,"%02d", (int)lvl);
 
    strncpy(&lvl_bin[12], num, 2);
    strncpy(&lvl_txt[12], num, 2);
@@ -1188,4 +1188,4 @@ extern LONG arrow_count(LONG argcnt, ULONG plrnum) {
 }
 
 } // End of namespace Aesop
-
+

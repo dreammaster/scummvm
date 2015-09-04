@@ -193,4 +193,3 @@ extern LONG VFX_pane_scroll(PANE *pane, LONG dx, LONG dy,
 
 #endif
 
-

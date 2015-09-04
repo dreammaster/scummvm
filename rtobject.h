@@ -60,4 +60,3 @@ extern LONG destroy_object(LONG argcnt, LONG index);
 
 #endif
 
-

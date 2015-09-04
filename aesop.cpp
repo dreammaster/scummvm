@@ -77,7 +77,7 @@ void AesopEngine::play() {
 	int code = ascnum((const char *)_interpreter->lookup(hroed, codeName));
 	_resources->unlock(hroed);
 
-	if (code == (ULONG)-1)
+	if (code == -1)
 		error(MSG_SPNF);
 
 	int rtn = create_program(1, bootstrap, (ULONG)code);
