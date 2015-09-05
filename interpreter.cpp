@@ -1451,7 +1451,7 @@ Parameter Interpreter::drawLine(Parameters params) {
 }
 
 Parameter Interpreter::lineTo(Parameters params) {
-	line_to(params.size(), params[0], params[1], params[2]);
+	line_to(params);
 	return Parameter();
 }
 

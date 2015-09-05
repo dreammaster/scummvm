@@ -76,7 +76,6 @@ extern void init_graphics(void);
 extern void draw_dot(LONG argcnt, ULONG page, ULONG x, ULONG y, ULONG color);
 extern void draw_line(LONG argcnt, ULONG page,
    ULONG x1, ULONG y1, ULONG x2, ULONG y2, ULONG color);
-extern void line_to(LONG argcnt, ULONG x, ULONG y, ULONG color, ...);
 extern void draw_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
    LONG y2, ULONG color);
 extern void fill_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
@@ -198,11 +197,7 @@ extern void close_transfer_file();
 
 #ifdef __AESOP__
 
-//ллллллллллллллллллллллллллллллллллллллллллл
-//лл                                       лл
-//лл AESOP resource attribute declarations лл
-//лл                                       лл
-//ллллллллллллллллллллллллллллллллллллллллллл
+// AESOP resource attribute declarations
 
 attrib sequence fixed,precious
 attrib sample fixed,precious

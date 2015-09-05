@@ -1,28 +1,24 @@
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл  SOUND32.C                                                             лл
-//лл                                                                        лл
-//лл  AESOP sound system code resources for Eye III engine                  лл
-//лл                                                                        лл
-//лл  Version: 1.00 of 6-May-92 -- Initial version                          лл
-//лл                                                                        лл
-//лл  Project: Eye III                                                      лл
-//лл   Author: John Miles                                                   лл
-//лл                                                                        лл
-//лл  C source compatible with Watcom C v9.0 or later                       лл
-//лл  Flat memory model (32-bit DOS)                                        лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл  Copyright (C) 1993 Miles Design, Inc.                                 лл
-//лл                                                                        лл
-//лл  Miles Design, Inc.                                                    лл
-//лл  6702 Cat Creek Trail                                                  лл
-//лл  Austin, TX 78731                                                      лл
-//лл                                                                        лл
-//лл  (512) 345-2642 / BBS (512) 454-9990 / FAX (512) 338-9630              лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
+/* RogueVM - RPG Engines
+ *
+ * RogueVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
 //#include "aesop/vfx.h"
 //#include "aesop/dll.h"

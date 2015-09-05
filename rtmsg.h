@@ -20,31 +20,6 @@
  *
  */
 
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл  RTMSG.H                                                               лл
-//лл                                                                        лл
-//лл  AESOP runtime language-specific definitions                           лл
-//лл                                                                        лл
-//лл  Version: 1.00 of 6-May-92 -- Initial version                          лл
-//лл                                                                        лл
-//лл  Project: Extensible State-Object Processor (AESOP/16)                 лл
-//лл   Author: John Miles                                                   лл
-//лл                                                                        лл
-//лл  C source compatible with IBM PC ANSI C/C++ implementations            лл
-//лл  Large memory model (16-bit DOS)                                       лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл  Copyright (C) 1992 Miles Design, Inc.                                 лл
-//лл                                                                        лл
-//лл  Miles Design, Inc.                                                    лл
-//лл  10926 Jollyville #308                                                 лл
-//лл  Austin, TX 78759                                                      лл
-//лл  (512) 345-2642 / BBS (512) 454-9990 / FAX (512) 338-9630              лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-
 #ifndef AESOP_RTMSG_H
 #define AESOP_RTMSG_H
 
