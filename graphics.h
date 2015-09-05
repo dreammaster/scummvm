@@ -27,6 +27,8 @@
 #ifndef AESOP_GRAPHICS_H
 #define AESOP_GRAPHICS_H
 
+#include "aesop/interpreter.h"
+
 namespace Aesop {
 
 extern UBYTE *fade_tables[5][16];
@@ -43,6 +45,7 @@ extern void aprint(LONG argcnt, const char *format, ...);
 extern void print(LONG argcnt, ULONG wndnum, ULONG format, ...);
 extern void text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG newColor);
 extern void release_owned_windows(LONG owner);
+extern void line_to(Common::Array<Parameter> args);
 
 } // End of namespace Aesop
 

@@ -41,7 +41,7 @@ enum {
 	TYP_SRES,                  // data type: string resource
 	TYP_VSHR,                  // data type: short integer variable
 	TYP_VLNG,                  // data type: long integer variable
-	TYP_SVAR,                  // data type: string variable
+	TYP_SVAR                   // data type: string variable
 };
 
 // Pointer and memory block management
@@ -1885,4 +1885,4 @@ Parameter Interpreter::arrowCount(Parameters params) {
 }
 
 } // End of namespace Aesop
-
+

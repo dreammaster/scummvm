@@ -239,28 +239,21 @@ void draw_line(LONG argcnt, ULONG page, ULONG x1, ULONG y1, ULONG x2, ULONG y2,
 
 /*********************************************************/
 
-void line_to(LONG argcnt, ULONG x, ULONG y, ULONG color, ...)
-
-{
+void line_to(Common::Array<Parameter> args) {
    ULONG i;
-   va_list argptr;
    ULONG cx,cy,cc,lx,ly;
 
-   va_start(argptr,argcnt);
-
-   for (i=0;i<(ULONG)argcnt;i+=3)
+   for (i=0;i<args.size();i+=3)
       {
-      cx = va_arg(argptr,ULONG);
-      cy = va_arg(argptr,ULONG);
-      cc = va_arg(argptr,ULONG);
+      cx = args[i * 3 + 0];
+      cy = args[i * 3 + 1];
+      cc = args[i * 3 + 2];
 
       GIL2VFX_draw_line(lastg_p,lastg_x,lastg_y,lx=cx,ly=cy,cc);
 
       lastg_x = lx;
       lastg_y = ly;
       }
-
-   va_end(argptr);
 }
 
 /*********************************************************/
@@ -395,7 +388,7 @@ void set_palette(LONG argcnt, ULONG region, ULONG resource) {
 	HRES handle;
 	PAL_HDR *PHDR;
 	RGB *array;
-	LONG i, j, k, n, f, m, dm, d;
+	LONG i, j, k, n, m, dm, d;
 	UBYTE *fade;
 
 	handle = res.get_resource_handle(resource, DA_DEFAULT);
@@ -441,7 +434,7 @@ void set_palette(LONG argcnt, ULONG region, ULONG resource) {
 		for (n = 0, i = BRN_BEG; n < BRN_NUM; n++, i++)
 			brn_inten[n] = array[i].r + array[i].g + array[i].b;
 
-		f = first_color[region];
+		// f = first_color[region];
 		n = num_colors[region];
 		for (i = 0; i < n; i++)
 		{
@@ -508,7 +501,7 @@ void set_palette(LONG argcnt, ULONG region, ULONG resource) {
 	case PAL_M1:
 	case PAL_M2:
 
-		f = first_color[region];
+		//f = first_color[region];
 		n = num_colors[region];
 		for (i = 0; i < n; i++)
 		{
@@ -882,7 +875,7 @@ void vsprint(LONG argcnt, ULONG wndnum, const char *format, va_list argptr)
 	Resources &res = *_vm->_resources;
 	HRES hfont, str;
 	BYTE c, *s;
-	BYTE buff[32];
+	char buff[32];
 	const char *p;
 
 	hfont = (HRES)tw[wndnum].font;
@@ -910,17 +903,20 @@ void vsprint(LONG argcnt, ULONG wndnum, const char *format, va_list argptr)
 			GIL2VFX_remap_font_color(15, text_colors[c - '0']);
 			break;
 
-		case 'd':
-			GIL2VFX_print(APP, "%s", ltoa(va_arg(argptr, LONG), (char *)buff, 10));
+		case 'd': 
+			sprintf(buff, "%d", (int)va_arg(argptr, LONG));
+			GIL2VFX_print(APP, "%s", buff);
 			break;
 
 		case 'u':
-			GIL2VFX_print(APP, "%s", ultoa(va_arg(argptr, ULONG), (char *)buff, 10));
+			sprintf(buff, "%u", (uint)va_arg(argptr, ULONG));
+			GIL2VFX_print(APP, "%s", buff);
 			break;
 
 		case 'x':
 		case 'X':
-			GIL2VFX_print(APP, "%s", ltoa(va_arg(argptr, LONG), (char *)buff, 16));
+			sprintf(buff, "%d", (int)va_arg(argptr, LONG));
+			GIL2VFX_print(APP, "%s", buff);
 			break;
 
 		case 's':
@@ -989,7 +985,7 @@ void print(LONG argcnt, ULONG wndnum, ULONG format, ...)
    va_list argptr;
    HRES hstring;
    const char *p;
-   UWORD *w;
+   const UWORD *w;
 
    hstring = res.get_resource_handle(format,DA_DEFAULT);
 
@@ -997,9 +993,10 @@ void print(LONG argcnt, ULONG wndnum, ULONG format, ...)
 
    p = (const char *)res.addr(hstring);
 
-   w = (UWORD *) p;
+   w = (const UWORD *) p;
 
-   switch (*w)
+
+   switch (READ_LE_UINT16(w))
       {
       case ':S':
          p += 2;
@@ -1162,6 +1159,8 @@ void solid_bar_graph(LONG argcnt, LONG x0, LONG y0, LONG x1, LONG y1,
 }
 
 void aprint(LONG argcnt, const char *format, ...) {
+	error("TODO: aprint with Paramater array");
+/*
 	va_list args;
 	char buffer[100];
 
@@ -1170,6 +1169,7 @@ void aprint(LONG argcnt, const char *format, ...) {
 	va_end(args);
 
 	debug(buffer);
+*/
 }
 
 } // End of namespace Aesop

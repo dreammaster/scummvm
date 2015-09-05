@@ -169,11 +169,12 @@ static void timer_callback(void)   // Warning: called during IRQ 0
       {
       ++heartbeat;
 
-      if (!(heartbeat & 1L))
+      if (!(heartbeat & 1L)) {
          if ((EV = find_event(SYS_TIMER,-1)) == NULL)
             add_event(SYS_TIMER,heartbeat >> 1,-1);
          else
             EV->parameter = heartbeat >> 1;
+      }
       }
 
    if ((*head != *tail) && (!in_BIOS))
@@ -421,7 +422,7 @@ void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
 void set_wait_pointer(LONG argcnt, ULONG number, LONG hot_X, LONG hot_Y)
 
 {
-   if (number == -1L)
+   if (number == (ULONG)-1)
       {
       wait_ptr_valid = 0;
       return;
@@ -564,4 +565,4 @@ void intrface_entry()
 }
 
 } // End of namespace Aesop
-
+
