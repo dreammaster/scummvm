@@ -125,14 +125,15 @@ void copy_string(LONG argcnt, BYTE *src, BYTE *dest)
 void string_force_lower(LONG argcnt, BYTE *dest)
 
 {
-   strlwr((char *)dest);
+       for (char *c = (char *)dest; *c; ++c)
+                *c = tolower(*c);
 }
 
 
 void string_force_upper(LONG argcnt, BYTE *dest)
-
 {
-   strupr((char *)dest);
+	for (char *c = (char *)dest; *c; ++c)
+		*c = toupper(*c);
 }
 
 
@@ -283,7 +284,7 @@ void diagnose(LONG argcnt, ULONG dtype, ULONG parm)
    switch (dtype)
       {
       case 1:
-         warning("%X ", parm);
+         warning("%X ", (uint)parm);
          break;
 
       case 2:
@@ -299,4 +300,4 @@ ULONG heapfree(void)
 }
 
 } // End of namespace Aesop
-
+

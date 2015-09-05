@@ -155,20 +155,20 @@ Resources::Resources(AesopEngine *vm): _vm(vm) {
 
 Resources::~Resources() {
 	_file.close();
-	delete[] _base;
+	delete[] (byte *)_base;
 }
 
 ULONG Resources::discard(ULONG index, bool do_move) {
 	ULONG i, n;
 	void *dest, *src;
-	ULONG nbytes, size;
+	ULONG nbytes, nsize;
 	HD_entry *sel;
 
 	sel = &_dir[index];
 
-	size = sel->_size;
+	nsize = sel->_size;
 	dest = sel->_seg;
-	src = add_ptr(dest, size);
+	src = add_ptr(dest, nsize);
 	nbytes = ptr_dif(_next_M, src);
 
 	n = _nentries;
@@ -177,7 +177,7 @@ ULONG Resources::discard(ULONG index, bool do_move) {
 			continue;
 
 		if (ptr_dif(_dir[i]._seg, dest) > 0L)
-			_dir[i]._seg = (BYTE *)_dir[i]._seg - size;
+			_dir[i]._seg = (BYTE *)_dir[i]._seg - nsize;
 	}
 
 	if (do_move) {
@@ -187,14 +187,14 @@ ULONG Resources::discard(ULONG index, bool do_move) {
 
 	sel->_flags |= DA_DISCARDED;
 
-	_next_M = (BYTE *)_next_M - size;
-	_free = _free + size;
+	_next_M = (BYTE *)_next_M - nsize;
+	_free = _free + nsize;
 
 	if (sel->_flags & DA_EVANESCENT) {
 		free((HRES)sel);
 	}
 
-	return size;
+	return nsize;
 }
 
 ULONG Resources::LRU() {
@@ -307,7 +307,7 @@ ULONG Resources::make_room(ULONG goal) {
 		// If no LRU candidates available, return false
 		//       
 		index = LRU();
-		if (index == -1) {
+		if (index == (ULONG)-1) {
 			return 0;
 		}
 
@@ -548,7 +548,7 @@ void Resources::lock(HRES entry) {
 	if (sel->_flags & (DA_FIXED | DA_PRECIOUS | DA_FREE))
 		return;
 
-	if ((sel->_flags & DA_DISCARDED) && (sel->_user != -1L)) {
+	if ((sel->_flags & DA_DISCARDED) && (sel->_user != (ULONG)-1)) {
 		if (assign_space(sel->_size, sel->_flags, entry) == (ULONG)-1)
 			return;
 
@@ -822,7 +822,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 	depth = 0;
 	class1 = object;
 
-	while (class1 != -1L) {
+	while (class1 != (ULONG)-1) {
 		code[depth] = get_resource_handle(class1, DA_DEFAULT);
 
 		if (!code[depth])
@@ -851,7 +851,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 		mcnt = 0;
 		dict = interp.first(addr(expt[depth]));
-		while ((dict = interp.iterate(addr(expt[depth]), dict, &tag, &def)) != NULL) {
+		while ((dict = interp.iterate(addr(expt[depth]), dict, &tag, &def)) != 0) {
 			switch (tag[0]) {
 			case 'M':               // Message
 				++thdr._maxMsg;
@@ -871,7 +871,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		//
 
 		dict = interp.first(addr(impt[depth]));
-		while ((dict = interp.iterate(addr(impt[depth]), dict, (const char **)&tag, &def)) != NULL) {
+		while ((dict = interp.iterate(addr(impt[depth]), dict, (const char **)&tag, &def)) != 0) {
 			switch (tag[0]) {
 			case 'C':               // Code
 				tsize += sizeof(XCR_entry);
@@ -932,7 +932,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		XR = m;
 
 		dict = interp.first(addr(impt[i]));
-		while ((dict = interp.iterate(addr(impt[i]), dict, &tag, &def)) != NULL) {
+		while ((dict = interp.iterate(addr(impt[i]), dict, &tag, &def)) != 0) {
 			tagbase = (const char *)addr(impt[i]);
 			switch (tag[0]) {
 			case 'C':               // Code
@@ -961,7 +961,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 				index = sizeof(IHDR);
 				found = 0;
 
-				while (xclass != -1L) {
+				while (xclass != (ULONG)-1) {
 					xcode = get_resource_handle(xclass, DA_DEFAULT);
 
 					if (!xcode)
@@ -1071,8 +1071,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 int Resources::sort_by_msg(const void *a, const void *b) {
 	UWORD na, nb;
 
-	na = ((MV_entry *)a)->msg;
-	nb = ((MV_entry *)b)->msg;
+	na = ((const MV_entry *)a)->msg;
+	nb = ((const MV_entry *)b)->msg;
 
 	if (na > nb)
 		return 1;
@@ -1085,8 +1085,8 @@ int Resources::sort_by_msg(const void *a, const void *b) {
 int Resources::sort_by_class(const void *a, const void *b) {
 	UWORD na, nb;
 
-	na = ((MV_entry *)a)->SD_offset;
-	nb = ((MV_entry *)b)->SD_offset;
+	na = ((const MV_entry *)a)->SD_offset;
+	nb = ((const MV_entry *)b)->SD_offset;
 
 	if (na < nb)
 		return 1;
@@ -1098,6 +1098,3 @@ int Resources::sort_by_class(const void *a, const void *b) {
 
 } // End of namespace Aesop
 
-
-
-

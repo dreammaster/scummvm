@@ -52,7 +52,7 @@ HRES objlist[NUM_OBJECTS];
 //
 
 static char linbuf[256];
-static char name[256];
+//static char name[256];
 
 /***************************************************/
 //
@@ -236,7 +236,7 @@ void dump_static_context(ULONG index, TF_class *TF) {
 	void *inst, *d;
 
 	strcpy(linbuf, "Entry ");
-	ltoa(index, &linbuf[6], 10);
+	sprintf(&linbuf[6], "%d", (int)index);	
 
 	i = strlen(linbuf);
 	linbuf[i] = ':';
@@ -293,7 +293,7 @@ void dump_static_context(ULONG index, TF_class *TF) {
 		inst = add_ptr(Resources::addr(instance), offset);
 
 		dict = interp.first(Resources::addr(expt));
-		while ((dict = interp.iterate(Resources::addr(expt), dict, &tag, &def)) != NULL)
+		while ((dict = interp.iterate(Resources::addr(expt), dict, &tag, &def)) != 0)
 		{
 			type = tag[0];
 			if ((type != 'B') && (type != 'W') && (type != 'L'))
@@ -313,9 +313,9 @@ void dump_static_context(ULONG index, TF_class *TF) {
 			{
 				switch (type)
 				{
-				case 'B': ltoa(*(BYTE *)d, val, 10); d = add_ptr(d, 1L); break;
-				case 'W': ltoa(*(WORD *)d, val, 10); d = add_ptr(d, 2L); break;
-				case 'L': ltoa(*(LONG *)d, val, 10); d = add_ptr(d, 4L); break;
+				case 'B': sprintf(val, "%d", *(BYTE *)d); d = add_ptr(d, 1L); break;
+				case 'W': sprintf(val, "%d", READ_LE_UINT16(d)); d = add_ptr(d, 2L); break;
+				case 'L': sprintf(val, "%d", (int32)READ_LE_UINT32(d)); d = add_ptr(d, 4L); break;
 				}
 
 				strcat(linbuf, val);
@@ -377,7 +377,7 @@ CDESC *read_context_descriptor(TF_class *TF)
 	HRES HROED;
 	char *num;
 	char *name;
-	char *def;
+	const char *def;
 
 	if (!readln(TF, (BYTE *)linbuf, sizeof(linbuf)))
 		return NULL;
@@ -400,7 +400,7 @@ CDESC *read_context_descriptor(TF_class *TF)
 	HROED = res.get_resource_handle(ROED, DA_TEMPORARY | DA_EVANESCENT);
 	res.lock(HROED);
 
-	def = (char *)interp.lookup(HROED, name);
+	def = (const char *)interp.lookup(HROED, name);
 
 	if (def == NULL)
 		abend(MSG_OMCR, name, c.slot);
@@ -427,7 +427,9 @@ void restore_static_context(HRES instance, TF_class *TF)
 	void *d, *tptr;
 	SD_entry *SD;
 	THDR thdr;
-	char *def, *tag, *size, *chrpnt;
+	const char *def, *size;
+	char *tag, *chrpnt;
+	static char name[256];
 
 	thunk = ((IHDR *)Resources::addr(instance))->_thunk;
 	thdr = *((THDR *)Resources::addr(thunk));
@@ -455,7 +457,7 @@ void restore_static_context(HRES instance, TF_class *TF)
 					DA_TEMPORARY | DA_EVANESCENT);
 
 				res.lock(expt);
-				def = (char *)interp.lookup(expt, "N:OBJECT");
+				def = (const char *)interp.lookup(expt, "N:OBJECT");
 
 				res.unlock(expt);
 
@@ -484,7 +486,7 @@ void restore_static_context(HRES instance, TF_class *TF)
 				continue;
 
 			res.lock(expt);
-			def = (char *)interp.lookup(expt, name);
+			def = (const char *)interp.lookup(expt, name);
 
 			res.unlock(expt);
 
@@ -890,4 +892,4 @@ void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG fi
 }
 
 } // End of namespace Aesop
-
+

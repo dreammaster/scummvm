@@ -87,7 +87,7 @@ WORD  SND_blk[64];                // EMS block of sound effect at index #
 UWORD SND_off[64];                // EMS offset of sound effect at index #
 UWORD SND_size[64];               // Size of sound effect at index #
 
-struct                            // SSI MEL sound system config file
+struct MEL                        // SSI MEL sound system config file
 {
    WORD XMI_IO;
    WORD XMI_IRQ;
@@ -107,8 +107,7 @@ struct                            // SSI MEL sound system config file
    BYTE PCM_fn[14];
 
    BYTE dummy[32];
-}
-MEL;
+};
 
 /****************************************************************************/
 //
@@ -675,4 +674,4 @@ void init_sound(LONG argcnt, ULONG errprompt)
 }
 
 } // End of namespace Aesop
-
+

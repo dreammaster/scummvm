@@ -158,7 +158,7 @@ void add_region_event(LONG type, LONG owner)
 static void timer_callback(void)   // Warning: called during IRQ 0
 {
    EVENT *EV;
-   unsigned key,scan,ascii;
+   unsigned key,ascii;
    static UWORD *head =   (UWORD *) 0x41aL;
    static UWORD *tail =   (UWORD *) 0x41cL;
    static UWORD *buffer = (UWORD *) 0x41eL;
@@ -183,7 +183,7 @@ static void timer_callback(void)   // Warning: called during IRQ 0
       *head = *tail;
 
       ascii = key & 0xff;
-      scan = key >> 8;
+      //scan = key >> 8;
 
       if ((key == KP_5) || (ascii == 0) || (ascii == 0xe0))
          add_event(SYS_KEYDOWN,key,-1);

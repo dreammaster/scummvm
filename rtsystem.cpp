@@ -158,19 +158,19 @@ LONG ascnum(const char *string)
    if (*string == '\'')
       return (LONG) (*(string+1));
 
-   switch (*(UWORD *) string)
+   switch (READ_LE_UINT16(string))
       {
       case 'x0': base = 16; string += 2; break;
       case 'b0': base = 2;  string += 2; break;
       default:   base = 10; break;
       }
 
-   if (base == 10)
+   if (base == 10) {
       if (aesop_isdigit(*string))
 		  return neg ? -atol((const char *)string) : atol((const char *)string);
       else
          return -1;
-
+	}
    total = 0L;
    len = strlen((const char *)string);
 
@@ -213,7 +213,7 @@ void opcode_fault(void *PC, void *stk)
 
 void abend(const char *msg, ...)
 {
-	error(msg);
+	error("%s", msg);
 	/*
    va_list argptr;
    WORD recover;
@@ -556,7 +556,7 @@ BYTE *read_file(BYTE *filename, void *dest)
    disk_err = 0;
 
    len = file_size(filename);
-   if (len==-1L)
+   if (len==(ULONG)-1)
       {
       disk_err = FILE_NOT_FOUND;
       return NULL;
@@ -776,4 +776,4 @@ void curpos(WORD *x, WORD *y)
 }
 
 } // End of namespace Aesop
-
+
