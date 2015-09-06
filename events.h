@@ -85,10 +85,6 @@ struct NREQ {
 };
 
 class Events {
-	struct MessageDescriptor {
-		int32 parameter;
-		int32 owner;
-	};
 private:
 	AesopEngine *_vm;
 	uint32 _heartbeat;
@@ -101,7 +97,6 @@ private:
 	Common::Point _mousePos, _lastMousePos;
 	bool _btnLeft, _btnRight;
 	bool _btnLastLeft, _btnLastRight;
-	MessageDescriptor _eventMessageDescriptor;
 	int _locked;
 
 	/**

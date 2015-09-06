@@ -348,6 +348,7 @@ Interpreter::Interpreter(AesopEngine *vm, HRES *objList, int stackSize) : _vm(vm
 	_staticOffset = 0;
 	_externOffset = 0;
 	_breakFlag = false;
+	_currentVector = nullptr;
 }
 
 Interpreter::~Interpreter() {
@@ -421,8 +422,8 @@ const char *Interpreter::lookup(HRES dictionary, const Common::String &key) {
 	return nullptr;
 }
 
-void Interpreter::arguments(void *base, ULONG size) {
-	error("TODO: Reimplement ASM as CPP code");
+void Interpreter::addArgument(const Parameter &param) {
+	_stack.push(param);
 }
 
 LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
@@ -442,7 +443,6 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 
 	IHDR *hdr = (IHDR *)res.addr(handle);
 	_thunk = (THDR *)res.addr(hdr->_thunk);
-	const MV_entry *curVector;
 
 	if (vector == HRES_NULL || vector == (HRES)0xffff) {
 		const MV_entry *mvList = (const MV_entry *)((const byte *)_thunk + _thunk->_mvList);
@@ -471,18 +471,18 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 			}
 		}
 
-		curVector = &mvList[(maxMsg + idx) & 0xfffe];
-		++curVector;
+		_currentVector = &mvList[(maxMsg + idx) & 0xfffe];
+		++_currentVector;
 
 		do {
-			--curVector;
-		} while (curVector > mvList && (curVector - 1)->msg == msgNum);
+			--_currentVector;
+		} while (_currentVector > mvList && (_currentVector - 1)->msg == msgNum);
 	} else {
-		curVector = (MV_entry *)vector;
+		_currentVector = (MV_entry *)vector;
 	}
 
-	const SD_entry *sdEntry = (const SD_entry *)((const byte *)_thunk + curVector->SD_offset);
-	uint codeOffset = curVector->handler;
+	const SD_entry *sdEntry = (const SD_entry *)((const byte *)_thunk + _currentVector->SD_offset);
+	uint codeOffset = _currentVector->handler;
 	_hPrg = sdEntry->SOP;
 	_staticOffset = sdEntry->static_base;
 	_externOffset = sdEntry->extern_base;
@@ -495,11 +495,11 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_breakFlag = false;
 
 	// Initialize the stack
-	_stackBase = 0;
+	_stackBase = _stack.size();
 	_stack.push(index);
-	int count = READ_LE_UINT16(_code) / 4;
-	_code += 2;
-	_stack.reserve(count);
+	int count = READ_LE_UINT16(_code); _code += 2;
+	assert((count % 4) == 0);
+	_stack.reserve(count / 4);
 	
 	// Main opcode execution loop
 	while (!_vm->shouldQuit() && !_breakFlag) {
@@ -748,11 +748,64 @@ void Interpreter::cmdCALL() {
 }
 
 void Interpreter::cmdSEND() {
-	error("TODO: opcode");
+	// Load the arguments in reverse so they'll be in the correct order
+	Parameters params;
+	int argCount = *_code++;
+	for (int idx = 0; idx < argCount; ++idx)
+		params.insert_at(0, _stack.pop());
+
+	// Get the execution parameters
+	int msgNum = READ_LE_UINT16(_code); _code += 2;
+	int index = _stack.pop();
+
+	// Save the stack size and and other necessary fields
+	uint stackSize = _stack.size();
+	const MV_entry *currentVector = _currentVector;
+	int oldIndex = _currentIndex;
+	uint oldMsgNum = _currentMsg;
+
+	// Execute the new object's code
+	int result = execute(index, msgNum, HRES_NULL);
+
+	// Restore saved fields
+	_currentVector = currentVector;
+	_currentIndex = oldIndex;
+	_currentMsg = oldMsgNum;
+
+	// Reset the stack back to it's previous size, and push the result
+	_stack.resize(stackSize);
+	_stack.push(result);
 }
 
 void Interpreter::cmdPASS() {
-	error("TODO: opcode");
+	// Get the number of arguments
+	int argCount = *_code++;
+
+	// Get the next higher-level handler
+	const MV_entry *oldVector = _currentVector;
+	const MV_entry *newVector = _currentVector + 1;
+
+	if ((const byte *)newVector >= ((const byte *)_thunk + _thunk->_sdList))
+		// Past the end of the list, so it's not a valid vector
+		return;
+
+	// Load the arguments in reverse so they'll be in the correct order
+	Parameters params;
+	for (int idx = 0; idx < argCount; ++idx)
+		params.insert_at(0, _stack.pop());
+
+	// Save the stack size
+	uint stackSize = _stack.size();
+
+	// Execute the parent vector
+	int result = execute(_currentIndex, _currentMsg, (HRES)newVector);
+
+	// Restore saved fields
+	_currentVector = oldVector;
+
+	// Reset the stack back to it's previous size, and push the result
+	_stack.resize(stackSize);
+	_stack.push(result);
 }
 
 void Interpreter::cmdJSR() {

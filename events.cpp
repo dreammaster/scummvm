@@ -602,9 +602,6 @@ void Events::dispatchEvent() {
 		return;
 	}
 
-	_eventMessageDescriptor.parameter = par;
-	_eventMessageDescriptor.owner = own;
-
 	_currentEventType = typ;
 
 	nxt = NR_first[typ];
@@ -612,14 +609,13 @@ void Events::dispatchEvent() {
 		NR = &NR_list[nxt];
 		nxt = NR->next;
 
-		if ((NR->status & NSX_TYPE) != typ) break;
-		if (NR->client == -1)              break;
-		if (typ != _currentEventType)     break;
+		if ((NR->status & NSX_TYPE) != typ)	break;
+		if (NR->client == -1)				break;
+		if (typ != _currentEventType)		break;
 
-		if (matchParameter(typ, par, NR->parameter))
-		{
-			interp.arguments(&_eventMessageDescriptor, sizeof(MessageDescriptor));
-
+		if (matchParameter(typ, par, NR->parameter)) {
+			interp.addArgument(par);
+			interp.addArgument(own);
 			interp.execute(NR->client, NR->message, HRES_NULL);
 		}
 	}

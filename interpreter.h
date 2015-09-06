@@ -132,6 +132,7 @@ private:
 	InterpreterStack _stack;
 	Common::Stack<MethodStackEntry> _methodStack;
 	LONG _currentIndex;
+	ULONG _currentMsg;
 	LONG _offThis;
 	HRES *_objList;
 	HRES _instance;
@@ -143,6 +144,7 @@ private:
 	UWORD _staticOffset;
 	UWORD _externOffset;
 	bool _breakFlag;
+	const MV_entry *_currentVector;
 private:
 	void cmdBRT();		// BRanch if True
 	void cmdBRF();		// BRanch if False
@@ -390,9 +392,8 @@ private:
 	Parameter itemAttrib(Parameters params);
 	Parameter arrowCount(Parameters params);
 public:
-	ULONG _currentMsg;
-	ULONG _currentThis;
 	StartupState _startupState;
+	ULONG _currentThis;
 public:
 	Interpreter(AesopEngine *vm, HRES *objList, int stackSize);
 	~Interpreter();
@@ -402,7 +403,7 @@ public:
 
 	const char *lookup(HRES dictionary, const Common::String &key);
 
-	void arguments(void *base, ULONG size);
+	void addArgument(const Parameter &param);
 	LONG execute(LONG index, LONG msgNum, HRES vector);
 };
 
