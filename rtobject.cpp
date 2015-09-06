@@ -29,7 +29,6 @@
 #include "aesop/rtmsg.h"
 #include "aesop/intrface.h"
 #include "aesop/rtobject.h"
-#include "aesop/event.h"
 #include "aesop/graphics.h"
 
 namespace Aesop {
@@ -161,7 +160,7 @@ LONG destroy_object(LONG argcnt, LONG index) {
 
 	rtn = interp.execute(index, MSG_DESTROY, HRES_NULL);
 
-	cancel_entity_requests(index);
+	_vm->_events->cancelEntityRequests(index);
 	_vm->_screen->releaseOwnedWindows(index);
 
 	res.destroy_instance(objlist[index]);
@@ -756,8 +755,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 			}
 			else
 			{
-				cancel_entity_requests(index);
-
+				_vm->_events->cancelEntityRequests(index);
 				_vm->_screen->releaseOwnedWindows(index);
 			}
 		}

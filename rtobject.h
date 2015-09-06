@@ -27,6 +27,8 @@
 #ifndef AESOP_RTOBJECT_H
 #define AESOP_RTOBJECT_H
 
+#include "aesop/shared.h"
+
 namespace Aesop {
 
 // static context descriptor

@@ -36,7 +36,6 @@
 #include "aesop/resources.h"
 #include "aesop/rtcode.h"
 #include "aesop/intrface.h"
-#include "aesop/event.h"
 #include "aesop/sound.h"
 #include "aesop/graphics.h"
 #include "aesop/stubs.h"

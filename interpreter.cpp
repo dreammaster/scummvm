@@ -1336,56 +1336,56 @@ Parameter Interpreter::heapfree(Parameters params) {
 }
 
 Parameter Interpreter::notify(Parameters params) {
-	::Aesop::notify(params.size(), params[0], params[1], params[2], params[3]);
+	_vm->_events->notify(params[0], params[1], params[2], params[3]);
 	return Parameter();
 }
 
 Parameter Interpreter::cancel(Parameters params) {
-	::Aesop::cancel(params.size(), params[0], params[1], params[2], params[3]);
+	_vm->_events->cancel(params[0], params[1], params[2], params[3]);
 	return Parameter();
 }
 
 Parameter Interpreter::drainEventQueue(Parameters params) {
-	drain_event_queue();
+	_vm->_events->drainEventQueue();
 	return Parameter();
 }
 
 Parameter Interpreter::postEvent(Parameters params) {
-	post_event(params.size(), params[0], params[1], params[2]);
+	_vm->_events->postEvent(params[0], params[1], params[2]);
 	return Parameter();
 }
 
 Parameter Interpreter::sendEvent(Parameters params) {
-	send_event(params.size(), params[0], params[1], params[2]);
+	_vm->_events->sendEvent(params[0], params[1], params[2]);
 	return Parameter();
 }
 
 Parameter Interpreter::peekEvent(Parameters params) {
-	return peek_event();
+	return _vm->_events->peekEvent() ? 1 : 0;
 }
 
 Parameter Interpreter::dispatchEvent(Parameters params) {
-	dispatch_event();
+	_vm->_events->dispatchEvent();
 	return Parameter();
 }
 
 Parameter Interpreter::flushEventQueue(Parameters params) {
-	flush_event_queue(params.size(), params[0], params[1], params[2]);
+	_vm->_events->flushEventQueue(params[0], params[1], params[2]);
 	return Parameter();
 }
 
 Parameter Interpreter::flushInputEvents(Parameters params) {
-	flush_input_events();
+	_vm->_events->flushInputEvents();
 	return Parameter();
 }
 
 Parameter Interpreter::initInterface(Parameters params) {
-	init_interface();
+	// Handled during engine startup
 	return Parameter();
 }
 
 Parameter Interpreter::shutdownInterface(Parameters params) {
-	shutdown_interface();
+	// Handled during engine shutdown
 	return Parameter();
 }
 
@@ -1411,35 +1411,35 @@ Parameter Interpreter::resumeCursor(Parameters params) {
 }
 
 Parameter Interpreter::showMouse(Parameters params) {
-	show_mouse();
+	_vm->_events->showMouse();
 	return Parameter();
 }
 
 Parameter Interpreter::hideMouse(Parameters params) {
-	hide_mouse();
+	_vm->_events->hideMouse();
 	return Parameter();
 }
 
 Parameter Interpreter::mouseXY(Parameters params) {
-	return mouse_XY();
+	return _vm->_events->getXY();
 }
 
 Parameter Interpreter::mouseInWindow(Parameters params) {
-	return mouse_in_window(params.size(), params[0]);
+	return _vm->_events->mouseInWindow(params[0]);
 }
 
 Parameter Interpreter::lockMouse(Parameters params) {
-	lock_mouse();
+	_vm->_events->lockMouse();
 	return Parameter();
 }
 
 Parameter Interpreter::unlockMouse(Parameters params) {
-	unlock_mouse();
+	_vm->_events->unlockMouse();
 	return Parameter();
 }
 
 Parameter Interpreter::getKey(Parameters params) {
-	::Aesop::getkey();
+	_vm->_events->getKey();
 	return Parameter();
 }
 

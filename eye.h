@@ -45,32 +45,12 @@ extern LONG maxv(LONG argcnt, LONG val1, LONG val2);
 extern void diagnose(LONG argcnt, ULONG dtype, ULONG parm);
 extern ULONG heapfree(void);
 
-extern void notify(LONG argcnt, ULONG index, ULONG message, LONG event,
-   LONG parameter);
-extern void cancel(LONG argcnt, ULONG index, ULONG message, LONG event, 
-   LONG parameter);
-extern void drain_event_queue(void);
-extern void post_event(LONG argcnt, ULONG owner, LONG event, LONG parameter);
-extern void send_event(LONG argcnt, ULONG owner, LONG event, LONG parameter);
-extern ULONG peek_event(void);
-extern void dispatch_event(void);
-extern void flush_event_queue(LONG argcnt, LONG owner, LONG event, LONG parameter);
-extern void flush_input_events(void);
-
-extern void init_interface(void);
-extern void shutdown_interface(void);
 extern void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
    LONG hot_Y, ULONG scale, ULONG fade_table, ULONG fade_level);
 extern void set_wait_pointer(LONG argcnt, ULONG number, LONG hot_X, LONG hot_Y);
 extern void standby_cursor(void);
 extern void resume_cursor(void);
-extern void show_mouse(void);
-extern void hide_mouse(void);
-extern ULONG mouse_XY(void);
-extern ULONG mouse_in_window(LONG argcnt, ULONG wnd);
-extern void lock_mouse(void);
-extern void unlock_mouse(void);
-extern void getkey(void);
+
 
 /*
 extern void draw_dot(LONG argcnt, ULONG page, ULONG x, ULONG y, ULONG color);

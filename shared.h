@@ -81,27 +81,6 @@ namespace Aesop {
 	//лл                                       лл
 	//ллллллллллллллллллллллллллллллллллллллллллл
 
-#define SYS_FREE                  0
-#define SYS_TIMER                 1
-#define SYS_MOUSEMOVE             2
-#define SYS_ENTER_REGION          3
-#define SYS_LEAVE_REGION          4
-#define SYS_LEFT_CLICK            5
-#define SYS_LEFT_RELEASE          6
-#define SYS_RIGHT_CLICK           7
-#define SYS_RIGHT_RELEASE         8
-#define SYS_CLICK                 9
-#define SYS_RELEASE               10
-#define SYS_LEFT_CLICK_REGION     11
-#define SYS_LEFT_RELEASE_REGION   12
-#define SYS_RIGHT_CLICK_REGION    13
-#define SYS_RIGHT_RELEASE_REGION  14
-#define SYS_CLICK_REGION          15
-#define SYS_RELEASE_REGION        16
-#define SYS_KEYDOWN               17
-
-#define NUM_EVTYPES               256
-
 #define FIRST_INPUT_EVENT         2
 #define LAST_INPUT_EVENT          17
 

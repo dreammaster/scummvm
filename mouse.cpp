@@ -28,11 +28,11 @@
 
 #include "common/scummsys.h"
 #include "common/rect.h"
+#include "aesop/aesop.h"
 #include "aesop/defs.h"
 #include "aesop/resources.h"
 #include "aesop/rtsystem.h"
 #include "aesop/shared.h"
-#include "aesop/event.h"
 #include "aesop/mouse.h"
 #include "aesop/stubs.h"
 
@@ -50,8 +50,8 @@ static LONG volatile center;
 
 static LONG volatile last_x;
 static LONG volatile last_y;
-static LONG volatile last_left;
-static LONG volatile last_right;
+static LONG volatile _btnLastLeft;
+static LONG volatile _btnLastRight;
 static LONG volatile last_center;
 
 static LONG volatile locked;
@@ -123,7 +123,7 @@ static void mouse_draw(void)
 
    if (!mouse_active) return;
 
-   mouse_lock();
+   _vm->_events->lockMouse();
 
    //
    // Create windows "save" and "work" based on visible cursor area, clipping
@@ -145,7 +145,7 @@ static void mouse_draw(void)
       {
       excluded = 1;
 
-      mouse_unlock();
+      _vm->_events->unlockMouse();
       return;
       }
 
@@ -159,7 +159,7 @@ static void mouse_draw(void)
          {
          excluded = 1;
 
-         mouse_unlock();
+         _vm->_events->unlockMouse();
          return;
          }
 
@@ -168,7 +168,7 @@ static void mouse_draw(void)
          {
          excluded = 1;
 
-         mouse_unlock();
+         _vm->_events->unlockMouse();
          return;
          }
 
@@ -208,7 +208,7 @@ static void mouse_draw(void)
 
    VFX_window_refresh(&work,saved.left,saved.top,saved.right,saved.bottom);
 
-   mouse_unlock();
+   _vm->_events->unlockMouse();
    */
 }
 
@@ -223,7 +223,7 @@ static void mouse_restore_area(void)
 	/*
    if (!mouse_active) return;
 
-   mouse_lock();
+   _vm->_events->lockMouse();
 
    //
    // If cursor not visible, exit
@@ -231,7 +231,7 @@ static void mouse_restore_area(void)
 
    if (excluded)
       {
-      mouse_unlock();
+      _vm->_events->unlockMouse();
       return;
       }
 
@@ -242,7 +242,7 @@ static void mouse_restore_area(void)
 
    VFX_window_refresh(&save,saved.left,saved.top,saved.right,saved.bottom);
 
-   mouse_unlock();
+   _vm->_events->unlockMouse();
    */
 }
 
@@ -269,140 +269,6 @@ static void mouse_exclude_area(LONG x0, LONG y0, LONG x1, LONG y1)
    */
 }
 
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл Install a real-mode mouse event handler in lower 1MB of RAM            лл
-//лл                                                                        лл
-//лл To avoid the overhead of switching between real and protected mode, we лл
-//лл don't take advantage of the DOS extender's built-in support for mouse  лл
-//лл event handlers.  Instead, we make a real-mode interrupt call to the    лл
-//лл Microsoft INT 33H interface to install a very short real-mode event    лл
-//лл handler in the lower 1MB of memory.  Each time the mouse state changes,лл
-//лл the event handler records the new state in variables accessible to     лл
-//лл MOUSE.C.  These variables are then monitored at regular intervals by   лл
-//лл the protected-mode timer event handler mouse_serve(), which can then   лл
-//лл simulate the action of a true protected-mode mouse event handler       лл
-//лл with minimal overhead.                                                 лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-
-static LONG mouse_install_handler(void)
-{
-	/*
-   static unsigned char real_stub[] =
-      {
-      0xbe,0x00,0x00,         // mov si,0
-      0x8e,0xde,              // mov ds,si
-
-      0x89,0x1e,0xf4,0x04,    // mov [4f4],bx   (mouse button state)
-      0x89,0x0e,0xf6,0x04,    // mov [4f6],cx   (pointer X coordinate)
-      0x89,0x16,0xf8,0x04,    // mov [4f8],dx   (pointer Y coordinate)
-
-      0xcb                    // retf
-      };
-
-   //
-   // Rational Systems DOS/4GW version
-   // 
-
-#ifdef DPMI             
-
-   union REGS inregs,outregs;
-   struct SREGS sregs;
-   static DPMI_RMI RMI;
-
-   inregs.x.eax = 0x100;
-   inregs.x.ebx = ((sizeof(real_stub)+16) / 16);
-
-   int386(0x31,&inregs,&outregs);
-
-   if (outregs.x.cflag)
-      return 0;
-
-   real_event_seg = outregs.x.eax & 0xffff;
-   real_event_sel = outregs.x.edx & 0xffff;
-
-   memmove((void *) (real_event_seg*16),
-           real_stub,
-           sizeof(real_stub));
-
-   memset(&RMI,0,sizeof(RMI));
-
-   RMI.eax = 0x000c;
-   RMI.ecx = 0x007f;
-   RMI.es  = (UWORD) (real_event_seg & 0xffff);
-
-   inregs.x.eax = 0x300;
-   inregs.x.ebx = 0x33;
-   inregs.x.ecx = 0;
-   inregs.x.edi = FP_OFF((void far *) &RMI);
-   sregs.es = sregs.ds = FP_SEG((void far *) &RMI);
-
-   int386x(0x31,&inregs,&outregs,&sregs);
-
-#endif
-   */
-   return 1;
-}
-
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл Disable real-mode event handler                                        лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-
-static void mouse_remove_handler(void)
-{
-	/*
-   //
-   // Rational Systems DOS/4GW version
-   // 
-
-#ifdef DPMI             
-
-   union REGS inregs,outregs;
-   struct SREGS sregs;
-   static DPMI_RMI RMI;
-
-   memset(&RMI,0,sizeof(RMI));
-
-   RMI.eax = 0x000c;
-   RMI.ecx = 0x0000;
-   RMI.es  = 0x0000;
-
-   inregs.x.eax = 0x300;
-   inregs.x.ebx = 0x33;
-   inregs.x.ecx = 0;
-   inregs.x.edi = FP_OFF((void far *) &RMI);
-   sregs.es = sregs.ds = FP_SEG((void far *) &RMI);
-
-   int386x(0x31,&inregs,&outregs,&sregs);
-
-#endif
-   */
-}
-
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл Inhibit mouse service; stop tracking movement and button activity      лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-
-void mouse_lock(void)
-{
-   ++locked;
-}
-
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл Enable mouse service; resume movement and button tracking              лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-
-void mouse_unlock(void)
-{
-   --locked;
-}
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 //лл                                                                        лл
@@ -439,17 +305,17 @@ void mouse_release(void)
 LONG mouse_visible_area(Common::Rect *area)
 {
 	/*
-   mouse_lock();
+   _vm->_events->lockMouse();
 
    if ((excluded) || (hidecnt < 0))
       {
-      mouse_unlock();
+      _vm->_events->unlockMouse();
       return 0;
       }
 
    *area = saved;
 
-   mouse_unlock();
+   _vm->_events->unlockMouse();
    
    return 1;
    */
@@ -491,7 +357,7 @@ LONG mouse_shape_in_area(Common::Rect *area)
 
 void mouse_show(void)
 {
-   mouse_lock();
+   _vm->_events->lockMouse();
 
    if (hidecnt)
       {
@@ -501,7 +367,7 @@ void mouse_show(void)
          mouse_draw();
       }
 
-   mouse_unlock();
+   _vm->_events->unlockMouse();
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -512,14 +378,14 @@ void mouse_show(void)
 
 void mouse_hide(void)
 {
-   mouse_lock();
+   _vm->_events->lockMouse();
 
    if (!hidecnt)
       mouse_restore_area();
 
    --hidecnt;
 
-   mouse_unlock();
+   _vm->_events->unlockMouse();
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -542,7 +408,7 @@ void mouse_set_pointer(void *table, LONG shape, LONG uhot_x, LONG uhot_y)
        (pointer       == shape))
       return;
 
-   mouse_lock();
+   _vm->_events->lockMouse();
    mouse_hide();
 
    pointer_table = table;
@@ -572,7 +438,7 @@ void mouse_set_pointer(void *table, LONG shape, LONG uhot_x, LONG uhot_y)
    work.buffer = mem_alloc(buffer_size);
 
    mouse_show();
-   mouse_unlock();
+   _vm->_events->unlockMouse();
    */
 }
 
@@ -670,15 +536,15 @@ void mouse_serve(void)
 
    ++locked;
 
-   last_left   = left;
-   last_right  = right;
+   _btnLastLeft   = left;
+   _btnLastRight  = right;
    last_center = center;
 
    left   =  ((*(WORD *) 0x4f4) & 0x01) != 0;
    right  =  ((*(WORD *) 0x4f4) & 0x02) != 0;
    center =  ((*(WORD *) 0x4f4) & 0x04) != 0;
 
-   if ((left != last_left) || (right != last_right) || (center != last_center))
+   if ((left != _btnLastLeft) || (right != _btnLastRight) || (center != last_center))
       if (button_event_callback != NULL)
          button_event_callback(left,right,center);
 

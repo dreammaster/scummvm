@@ -33,7 +33,6 @@
 #include "aesop/rtmsg.h"
 #include "aesop/rtobject.h"
 #include "aesop/graphics.h"
-#include "aesop/event.h"
 #include "aesop/intrface.h"
 #include "aesop/resources.h"
 //#include "aesop/modsnd32.h"
@@ -467,30 +466,28 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
    LONG scale, LONG power, LONG dots, LONG life, LONG upval, BYTE *colors)
 
 {
-	static WORD _floor[]=
-      {
-		119,103,79,63,
-	   };
-
+	Events &events = *_vm->_events;
+	Screen &screen = *_vm->_screen;
+	static const WORD _floor[] = { 119, 103, 79, 63, };
 	static int i,pixcol,active,cx,cy,px,py,mask;
 	WORD *xpos,*ypos,*xvel,*yvel,*color,*colcnt,*colidx,*dotbuffer;
 	WORD lside,rside,top,bottom;
 	WORD roof,floor,lwall,rwall;
 
-   hide_mouse();
+   _vm->_events->hideMouse();
 
 	floor = _floor[scale];
 	if (scale) scale--;
 	
-	dotbuffer = (WORD*) _vm->_screen->txtbuf;
+	dotbuffer = (WORD*) screen.txtbuf;
 	roof = 0;
 	lwall = -100;
 	rwall = 276;
 
-	top = _vm->_screen->panes(view).getTop();
-	bottom = _vm->_screen->panes(view).getBottom();
-	lside = _vm->_screen->panes(view).getLeft();
-	rside = _vm->_screen->panes(view).getRight();
+	top = screen.panes(view).getTop();
+	bottom = screen.panes(view).getBottom();
+	lside = screen.panes(view).getLeft();
+	rside = screen.panes(view).getRight();
 
 	xpos = dotbuffer;
 	ypos = dotbuffer+MAXDOTS;
@@ -526,7 +523,7 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 
             
 				if (Coord_In_Region(px,py,lside,top,rside,bottom))
-               _vm->_screen->panes(scrn).drawDot(Common::Point(px,py),color[i]);
+               screen.panes(scrn).drawDot(Common::Point(px,py),color[i]);
 			}
 
 		active = 0;
@@ -549,8 +546,8 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 			if (( px >= rwall ) || ( px < lwall)) xvel[i]=0-(xvel[i]>>1);
 			if (py > floor) py = floor;
 
-			mask = _vm->_screen->panes(view).readDot(Common::Point(px, py));
-			color[i] = _vm->_screen->panes(scrn).readDot(Common::Point(px, py));
+			mask = screen.panes(view).readDot(Common::Point(px, py));
+			color[i] = screen.panes(scrn).readDot(Common::Point(px, py));
 
 			pixcol = colors[colidx[i]>>8];
 
@@ -559,17 +556,13 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 				active = 1;
 
 				if ((mask == XCOLOR) && Coord_In_Region(px, py, lside, top, rside, bottom))
-					_vm->_screen->panes(scrn).drawDot(Common::Point(px, py), pixcol);
+					screen.panes(scrn).drawDot(Common::Point(px, py), pixcol);
 			   }
 			else colcnt[i] = 0;
 		   }
-
-      PollMod();
-		//VFX_wait_vblank_leading();
-		//VFX_wait_vblank_leading();
 	   }
 
-   show_mouse();
+   events.showMouse();
 }
 
 /*=========================================================================*/
@@ -586,13 +579,15 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 
 void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag, 
    LONG grav, LONG life, BYTE *colors) {
+	Events &events = *_vm->_events;
+	Screen &screen = *_vm->_screen;
 	WORD i,pixcol,active,cx,cy,px,py,mask,count;
 	WORD *xpos,*ypos,*xvel,*yvel,*color,*colcnt,*colidx,*delay,*dotbuffer;
 	WORD m,v,grav78,t;
 
-   hide_mouse();
+   events.hideMouse();
 
-	dotbuffer = (WORD*) _vm->_screen->txtbuf;
+	dotbuffer = (WORD*) screen.txtbuf;
 
 	xpos   = dotbuffer;
 	ypos   = dotbuffer+MAXDOTS;
@@ -673,7 +668,7 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
             {
 				px = (xpos[i]>>ACCUR)+cx;
 				py = (ypos[i]>>ACCUR)+cy;
-				_vm->_screen->panes(scrn).drawDot(Common::Point(px,py),color[i]);
+				screen.panes(scrn).drawDot(Common::Point(px,py),color[i]);
 			   }
 
 		active = 0;
@@ -709,9 +704,9 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 			if (count < (life >> 2))
 				mask = 0;
 			else
-				mask = _vm->_screen->panes(view).readDot(Common::Point(px, py));
+				mask = screen.panes(view).readDot(Common::Point(px, py));
 
-			color[i] = _vm->_screen->panes(scrn).readDot(Common::Point(px, py));
+			color[i] = screen.panes(scrn).readDot(Common::Point(px, py));
 	  		pixcol = colors[colidx[i] >> 8];
 
 			if (pixcol)
@@ -719,7 +714,7 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 				active = 1;
 
 				if (mask == XCOLOR && !delay[i])
-					_vm->_screen->panes(scrn).drawDot(Common::Point(px, py), pixcol);
+					screen.panes(scrn).drawDot(Common::Point(px, py), pixcol);
 			   }
 			else colcnt[i] = 0;
 		   }
@@ -729,7 +724,7 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 		count++;
 	   }
 
-   show_mouse();
+   events.showMouse();
 }
 
 /*********************************************************/
@@ -966,7 +961,7 @@ void resume_level(LONG argcnt, ULONG cur_lvl)
 
 void resume_items(LONG argcnt, ULONG first, ULONG last, ULONG restoring) {
 	_vm->_screen->releaseOwnedWindows(-1);
-   cancel_entity_requests(-1);
+	_vm->_events->cancelEntityRequests(-1);
 
    restore_range(itm_tmp,first,last,restoring);
 }
@@ -1014,13 +1009,11 @@ void change_level(LONG argcnt, ULONG old_lvl, ULONG new_lvl)
 /*********************************************************/
 
 
-void restore_items(LONG argcnt, ULONG slotnum)
-
-{
+void restore_items(LONG argcnt, ULONG slotnum) {
    set_save_slotnum(slotnum);
 
    _vm->_screen->releaseOwnedWindows(-1);
-   cancel_entity_requests(-1);
+   _vm->_events->cancelEntityRequests(-1);
 
 //   aprint(0,"restore_range(%s, %d, %d, 1)\n",items_bin,FIRST_ITEM,LAST_ITEM);
    restore_range(items_bin,FIRST_ITEM,LAST_ITEM,1);

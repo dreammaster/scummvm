@@ -23,7 +23,6 @@
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
 #include "aesop/aesop.h"
-#include "aesop/event.h"
 #include "aesop/rtmsg.h"
 #include "aesop/rtobject.h"
 #include "aesop/rtsystem.h"
@@ -61,8 +60,6 @@ void AesopEngine::initialize() {
 	_resources = new Resources(this);
 	_screen = new Screen(this);
 	init_object_list();
-	init_notify_list();
-	init_event_queue();
 
 	DebugMan.addDebugChannel(kDebugLevelScript, "scripts", "Script debug level");
 }

@@ -35,13 +35,7 @@ void init_interface(void);
 void shutdown_interface(void);
 void standby_cursor(void);
 void resume_cursor(void);
-void lock_mouse(void);
-void unlock_mouse(void);
-void show_mouse(void);
-void hide_mouse(void);
 void copy_mouse(int window);
-ULONG mouse_in_window(LONG argcnt, ULONG wnd);
-void refresh_window(LONG argcnt, ULONG src, ULONG target);
 
 } // End of namespace Aesop
 

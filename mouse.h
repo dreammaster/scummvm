@@ -36,15 +36,12 @@ namespace Aesop {
 extern LONG mouse_init(LONG xsize, LONG ysize);
 extern void mouse_shutdown(void);
 
-extern void mouse_show(void);
-extern void mouse_hide(void);
 extern void mouse_set_pointer(void *table, LONG shape, LONG uhot_x, LONG uhot_y);
 
 extern void mouse_register_mouse_event_callback(void (*fn)(LONG x, LONG y));
 extern void mouse_register_button_event_callback(void (*fn)(LONG left, LONG right, LONG center));
 extern void mouse_register_watchdog_callback(LONG (*fn)(Common::Rect *area));
 
-extern void mouse_lock(void);
 extern void mouse_unlock(void);
 extern void mouse_hold(void);
 extern void mouse_release(void);
