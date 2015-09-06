@@ -528,7 +528,7 @@ void Screen::releaseOwnedWindows(int owner) {
 			}
 		}
 	} else {
-		for (int idx = PAGE2 + 1; idx < 256; ++idx) {
+		for (int idx = PAGE2 + 1; idx < (int)_windows.size(); ++idx) {
 			if (_windows[idx]._owner == owner) {
 				_windows[idx]._owner = -1;
 				releaseWindow(idx);
