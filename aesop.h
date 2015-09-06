@@ -32,6 +32,8 @@
 #include "common/savefile.h"
 #include "common/util.h"
 #include "engines/engine.h"
+#include "aesop/debugger.h"
+#include "aesop/events.h"
 #include "aesop/interpreter.h"
 #include "aesop/resources.h"
 #include "aesop/screen.h"
@@ -76,6 +78,8 @@ private:
 	void play();
 public:
 	const AesopGameDescription *_gameDescription;
+	Debugger *_debugger;
+	Events *_events;
 	Interpreter *_interpreter;
 	Resources *_resources;
 	Screen *_screen;

@@ -1520,7 +1520,12 @@ Parameter Interpreter::shutdownGraphics(Parameters params) {
 }
 
 Parameter Interpreter::waitVerticalRetrace(Parameters params) {
-	warning("TODO: wait_vertical_retrace");
+	Events &events = *_vm->_events;
+	uint32 frameCounter = events.frameCounter();
+	
+	while (!_vm->shouldQuit() && frameCounter == events.frameCounter())
+		events.delay(5);
+
 	return Parameter();
 }
 

@@ -166,9 +166,9 @@ public:
 };
 
 class Window : public Pane {
-private:
-	Graphics::Surface _surface;
 protected:
+	Graphics::Surface _surface;
+
 	/**
 	 * Called by any graphic routine to signify an area of the window that has been updated.
 	 * Used for performance blitting on the screen window to only update affected areas
@@ -285,6 +285,17 @@ private:
 	bool _active;
 	int _lastPage;
 	Common::Point _lastPos;
+	Common::List<Common::Rect> _dirtyRects;
+
+	/**
+	 * Merge together overlapping dirty rects
+	 */
+	void mergeDirtyRects();
+
+	/**
+	 * Returns the union of two dirty area rectangles
+	 */
+	bool unionRectangle(Common::Rect &destRect, const Common::Rect &src1, const Common::Rect &src2);
 public:
 	Common::Array<Window> _windows;
 	Common::Array<Pane> _panes;
@@ -296,6 +307,11 @@ public:
 public:
 	Screen(AesopEngine *vm);
 	virtual ~Screen();
+
+	/**
+	 * Update the physical screen
+	 */
+	void update();
 
 	/**
 	 * Copies the contents of one window to another

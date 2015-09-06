@@ -2,8 +2,10 @@ MODULE := engines/aesop
 
 MODULE_OBJS = \
 	aesop.o \
+	debugger.o \
 	detection.o \
 	event.o \
+	events.o \
 	eye.o \
 	gil2vfx.o \
 	gil2vfxa.o \

@@ -39,15 +39,24 @@ AesopEngine *_vm;
 AesopEngine::AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc) :
 		Engine(syst), _gameDescription(gameDesc), _randomSource("Aesop") {
 	_vm = this;
+	_debugger = nullptr;
+	_events = nullptr;
+	_interpreter = nullptr;
 	_resources = nullptr;
 	_screen = nullptr;
 }
 
 AesopEngine::~AesopEngine() {
+	delete _debugger;
+	delete _events;
+	delete _interpreter;
 	delete _resources;
+	delete _screen;
 }
 
 void AesopEngine::initialize() {
+	_debugger = new Debugger(this);
+	_events = new Events(this);
 	_interpreter = new Interpreter(this, objlist, 8192);
 	_resources = new Resources(this);
 	_screen = new Screen(this);
