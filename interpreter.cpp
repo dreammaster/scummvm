@@ -494,10 +494,10 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_offThis = _currentIndex;
 	_breakFlag = false;
 
-	// Initialize the stack
+	// Initialize the stack. The original only used two bytes 
 	_stackBase = _stack.size();
 	_stack.push(index);
-	int count = READ_LE_UINT16(_code); _code += 2;
+	int count = READ_LE_UINT16(_code) - 2; _code += 2;
 	assert((count % 4) == 0);
 	_stack.reserve(count / 4);
 	
@@ -765,7 +765,7 @@ void Interpreter::cmdSEND() {
 	uint oldMsgNum = _currentMsg;
 
 	// Execute the new object's code
-	int result = execute(index, msgNum, HRES_NULL);
+	int result = execute(index, msgNum);
 
 	// Restore saved fields
 	_currentVector = currentVector;

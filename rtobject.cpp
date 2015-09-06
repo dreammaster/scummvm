@@ -96,7 +96,7 @@ void create_SOP_instance(ULONG name, LONG index)
 	Resources &res = *_vm->_resources;
 	objlist[index] = res.create_instance(name);
 
-	interp.execute(index, MSG_CREATE, HRES_NULL);
+	interp.execute(index, MSG_CREATE);
 }
 
 /***************************************************/
@@ -158,7 +158,7 @@ LONG destroy_object(LONG argcnt, LONG index) {
 	Resources &res = *_vm->_resources;
 	LONG rtn;
 
-	rtn = interp.execute(index, MSG_DESTROY, HRES_NULL);
+	rtn = interp.execute(index, MSG_DESTROY);
 
 	_vm->_events->cancelEntityRequests(index);
 	_vm->_screen->releaseOwnedWindows(index);
@@ -777,7 +777,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 
 		if (restoring)
 		{
-			interp.execute(index, MSG_RESTORE, HRES_NULL);
+			interp.execute(index, MSG_RESTORE);
 		}
 	}
 

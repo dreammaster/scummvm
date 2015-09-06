@@ -616,7 +616,7 @@ void Events::dispatchEvent() {
 		if (matchParameter(typ, par, NR->parameter)) {
 			interp.addArgument(par);
 			interp.addArgument(own);
-			interp.execute(NR->client, NR->message, HRES_NULL);
+			interp.execute(NR->client, NR->message);
 		}
 	}
 }
