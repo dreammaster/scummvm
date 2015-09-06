@@ -162,7 +162,7 @@ LONG destroy_object(LONG argcnt, LONG index) {
 	rtn = interp.execute(index, MSG_DESTROY, HRES_NULL);
 
 	cancel_entity_requests(index);
-	release_owned_windows(index);
+	_vm->_screen->releaseOwnedWindows(index);
 
 	res.destroy_instance(objlist[index]);
 
@@ -758,7 +758,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 			{
 				cancel_entity_requests(index);
 
-				release_owned_windows(index);
+				_vm->_screen->releaseOwnedWindows(index);
 			}
 		}
 

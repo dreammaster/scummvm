@@ -31,28 +31,6 @@ namespace Aesop {
 #define MAXWORD 32767
 #define MAXLONG 2147483647
 
-	//ллллллллллллллллллллллллллллллллллллллллллл
-	//лл                                       лл
-	//лл SSI GIL constant definitions          лл
-	//лл                                       лл
-	//ллллллллллллллллллллллллллллллллллллллллллл
-
-#ifndef GIL_H
-
-#define PAGE1     0     // Default window numbers for display and staging
-#define PAGE2     1     // screens
-
-#define J_LEFT    0     // Justification modes for buffered text output
-#define J_RIGHT   1
-#define J_CENTER  2
-#define J_FILL    3
-
-#define NO_MIRROR 0     // mirror equates for draw_bitmap()
-#define X_MIRROR  1
-#define Y_MIRROR  2
-#define XY_MIRROR 3
-
-#endif
 
 	//ллллллллллллллллллллллллллллллллллллллллллл
 	//лл                                       лл

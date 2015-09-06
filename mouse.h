@@ -52,11 +52,13 @@ extern void mouse_release(void);
 extern LONG mouse_visible_area(Common::Rect *area);
 extern LONG mouse_shape_in_area(Common::Rect *area);
 
+/*
 extern void mouse_serve(void);
 
 extern void mouse_window_refresh(WINDOW *target, LONG x0, LONG y0, LONG x1, LONG y1);
 
 extern void mouse_pane_refresh(PANE *source, PANE *target);
+*/
 
 } // End of namespace Aesop
 

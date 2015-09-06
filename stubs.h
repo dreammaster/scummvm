@@ -29,16 +29,6 @@
 
 namespace Aesop {
 
-struct WINDOW: Common::Rect {
-	// TODO: Figure out what's needed
-	byte *buffer;
-};
-
-struct PANE: Common::Rect {
-	// TODO: Figure out what's needed
-	WINDOW *window;
-};
-
 struct FONT {
 	// TODO: Figure out what's needed
 	int font_background;
@@ -131,26 +121,10 @@ extern void AIL_start_timer(HTIMER htimer);
 extern void AIL_release_timer_handle(HTIMER htimer);
 extern void AIL_shutdown();
 
-struct RGB {
-	byte r;
-	byte g;
-	byte b;
-};
-
-enum {
-	NO_COLOR = 0
-};
-enum LineDraw { LD_DRAW = 0, LD_TRANSLATE = 1, LD_EXECUTE = 3 };
-enum PaneScroll { PS_NOWRAP = 0, PS_WRAP = 1 };
-enum ShapeTransform {
-	ST_XLAT = 0,		// Use shape_lookaside() table
-	ST_REUSE = 1		// Use buffer contents from prior call
-};
-
-typedef signed   long  FIXED16;
 
 extern void shutdown_sound();
 
+/*
 extern void VFX_wait_vblank_leading();
 extern void VFX_DAC_read(int index, RGB *rgb);
 extern void VFX_DAC_write(int index, RGB *rgb);
@@ -162,32 +136,20 @@ extern void VFX_shutdown_driver(void);
 extern LONG VFX_shape_bounds(void *shape_table, LONG shape_num);
 extern void VFX_shape_visible_rectangle(void *shape_table,
 	LONG shape_number, LONG hotX, LONG hotY, LONG mirror, LONG *rectangle);
-extern void VFX_fixed_mul(FIXED16 M1, FIXED16 M2, FIXED16 *result);
-extern void VFX_shape_draw(PANE *pane, void *shape_table,
-	LONG shape_number, LONG hotX, LONG hotY);
-extern void VFX_shape_lookaside(UBYTE *table);
-extern void VFX_shape_transform(PANE *pane,
-	void *shape_table, LONG shape_number, LONG hotX, LONG hotY,
-	void *buffer, LONG rot, LONG x_scale, LONG y_scale, LONG flags);
 extern LONG VFX_pane_wipe(PANE *pane, LONG color);
-extern void VFX_window_refresh(WINDOW *target, LONG x0, LONG y0,
-	LONG x1, LONG y1);
 extern LONG VFX_pixel_read(PANE *pane, LONG x, LONG y);
 extern LONG VFX_pixel_write(PANE *pane, LONG x, LONG y, ULONG color);
 extern LONG VFX_line_draw(PANE *pane, LONG x0, LONG y0,
 	LONG x1, LONG y1, LineDraw mode, LONG parm);
 extern LONG VFX_pixel_fade(PANE *source, PANE *destination,
 	LONG intervals, LONG rnd = 0);
-extern LONG VFX_shape_resolution(void *shape_table, LONG shape_num);
 extern LONG VFX_character_width(void *font, LONG character);
-extern LONG VFX_character_draw(PANE *pane, LONG x, LONG y, void *font,
-	LONG character, UBYTE *color_translate);
-extern void VFX_window_fade(WINDOW *buffer, RGB *palette, LONG intervals);
+
 extern LONG VFX_rectangle_hash(PANE *pane, LONG x0, LONG y0,
 	LONG x1, LONG y1, ULONG color);
-extern LONG VFX_color_scan(PANE *pane, ULONG *colors);
 extern LONG VFX_pane_scroll(PANE *pane, LONG dx, LONG dy,
 	PaneScroll mode, LONG parm);
+	*/
 
 } // End of namespace Aesop
 

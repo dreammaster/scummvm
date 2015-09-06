@@ -44,9 +44,7 @@ enum {
 	TYP_SVAR                   // data type: string variable
 };
 
-// Pointer and memory block management
-
-#define norm(x) ((void *) (x))
+#define GAME_STARTUP_STATE 0x4f0
 
 /*----------------------------------------------------------------*/
 
@@ -337,6 +335,7 @@ const ExternMethod Interpreter::_methods[] = {
 Interpreter::Interpreter(AesopEngine *vm, HRES *objList, int stackSize) : _vm(vm) {
 	_objList = objList;
 
+	_startupState = SS_CINE;
 	_currentIndex = 0;
 	_currentMsg = 0;
 	_currentThis = 0;
@@ -1294,7 +1293,17 @@ Parameter Interpreter::pokeMem(Parameters params) {
 }
 
 Parameter Interpreter::peekMem(Parameters params) {
-	return peekmem(params.size(), params[0]);
+	if (params[0] == GAME_STARTUP_STATE) {
+		switch (_startupState) {
+		case SS_CINE: return MKTAG('C', 'I', 'N', 'E');
+		case SS_VICT: return MKTAG('V', 'I', 'C', 'T');
+		case SS_CHGN: return MKTAG('C', 'H', 'G', 'N');
+		case SS_INTR: return MKTAG('I', 'N', 'T', 'R');
+		default: return Parameter();
+		}
+	} else {
+		return peekmem(params.size(), params[0]);
+	}
 }
 
 Parameter Interpreter::rnd(Parameters params) {
@@ -1435,41 +1444,41 @@ Parameter Interpreter::getKey(Parameters params) {
 }
 
 Parameter Interpreter::initGraphics(Parameters params) {
-	init_graphics();
+	// The Screen class already initializes the graphics
 	return Parameter();
 }
 
 Parameter Interpreter::drawDot(Parameters params) {
-	draw_dot(params.size(), params[0], params[1], params[2], params[3]);
+	_vm->_screen->panes(params[0]).drawDot(Common::Point(params[1], params[2]), params[3]);
 	return Parameter();
 }
 
 Parameter Interpreter::drawLine(Parameters params) {
-	draw_line(params.size(), params[0], params[1], params[2], params[3],
-		params[4], params[5]);
+	_vm->_screen->panes(params[0]).drawLine(Common::Point(params[1], params[2]),
+		Common::Point(params[3], params[4]), params[5]);
 	return Parameter();
 }
 
 Parameter Interpreter::lineTo(Parameters params) {
-	line_to(params);
+	_vm->_screen->lineTo(params);
 	return Parameter();
 }
 
 Parameter Interpreter::drawRectangle(Parameters params) {
-	draw_rectangle(params.size(), params[0], params[1], params[2],
-		params[3], params[4], params[5]);
+	_vm->_screen->panes(params[0]).drawRect(Common::Rect(params[1], params[2],
+		params[3], params[4]), params[5]);
 	return Parameter();
 }
 
 Parameter Interpreter::fillRectangle(Parameters params) {
-	fill_rectangle(params.size(), params[0], params[1], params[2],
-		params[3], params[4], params[5]);
+	_vm->_screen->panes(params[0]).fillRect(Common::Rect(params[1], params[2],
+		params[3], params[4]), params[5]);
 	return Parameter();
 }
 
 Parameter Interpreter::hashRectangle(Parameters params) {
-	hash_rectangle(params.size(), params[0], params[1], params[2],
-		params[3], params[4], params[5]);
+	_vm->_screen->panes(params[0]).hashRect(Common::Rect(params[1], params[2],
+		params[3], params[4]), params[5]);
 	return Parameter();
 }
 
@@ -1491,140 +1500,140 @@ Parameter Interpreter::visibleBitmapRect(Parameters params) {
 }
 
 Parameter Interpreter::setPalette(Parameters params) {
-	set_palette(params.size(), params[0], params[1]);
+	_vm->_screen->setPalette(params[0], params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::refreshWindow(Parameters params) {
-	refresh_window(params.size(), params[0], params[1]);
+	// Uneeded call to mouse_pane_refresh
 	return Parameter();
 }
 
 Parameter Interpreter::wipeWindow(Parameters params) {
-	wipe_window(params.size(), params[0], params[1]);
+	_vm->_screen->windows(params[0]).wipeWindow(params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::shutdownGraphics(Parameters params) {
-	shutdown_graphics();
+	// Screen class handles shutting down graphics
 	return Parameter();
 }
 
 Parameter Interpreter::waitVerticalRetrace(Parameters params) {
-	wait_vertical_retrace();
+	warning("TODO: wait_vertical_retrace");
 	return Parameter();
 }
 
 Parameter Interpreter::readPalette(Parameters params) {
-	return read_palette(params.size(), params[0]);
+	return _vm->_screen->readPalette(params[0]);
 }
 
 Parameter Interpreter::writePalette(Parameters params) {
-	write_palette(params.size(), params[0], params[1]);
+	_vm->_screen->writePalette(params[0], (ULONG)params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::pixelFade(Parameters params) {
-	pixel_fade(params.size(), params[0], params[1], params[2]);
+	_vm->_screen->pixelFade(params[0], params[1], params[2]);
 	return Parameter();
 }
 
 Parameter Interpreter::colorFade(Parameters params) {
-	color_fade(params.size(), params[0], params[1]);
+	_vm->_screen->colorFade(params[0], params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::lightFade(Parameters params) {
-	light_fade(params.size(), params[0], params[1]);
+	_vm->_screen->lightFade(params[0], params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::assignWindow(Parameters params) {
-	assign_window(params.size(), params[0], params[1], params[2], params[3], params[4]);
+	_vm->_screen->assignWindow(params[0], Common::Rect(params[1], params[2], params[3], params[4]));
 	return Parameter();
 }
 
 Parameter Interpreter::assignSubWindow(Parameters params) {
-	return assign_subwindow(params.size(), params[0], params[1], params[2], params[3],
-		params[4], params[5]);
+	return _vm->_screen->assignSubWindow(params[0], params[1], Common::Rect(params[2], params[3],
+		params[4], params[5]));
 }
 
 Parameter Interpreter::releaseWindow(Parameters params) {
-	release_window(params.size(), params[0]);
+	_vm->_screen->releaseWindow(params[0]);
 	return Parameter();
 }
 
 Parameter Interpreter::getLeft(Parameters params) {
-	return get_x1(params.size(), params[0]);
+	return _vm->_screen->panes(params[0]).getLeft();
 }
 
 Parameter Interpreter::getRight(Parameters params) {
-	return get_x2(params.size(), params[0]);
+	return _vm->_screen->panes(params[0]).getRight();
 }
 
 Parameter Interpreter::getTop(Parameters params) {
-	return get_y1(params.size(), params[0]);
+	return _vm->_screen->panes(params[0]).getTop();
 }
 
 Parameter Interpreter::getBottom(Parameters params) {
-	return get_y2(params.size(), params[0]);
+	return _vm->_screen->panes(params[0]).getBottom();
 }
 
 Parameter Interpreter::setLeft(Parameters params) {
-	set_x1(params.size(), params[0], params[1]);
+	_vm->_screen->panes(params[0]).setLeft(params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::setRight(Parameters params) {
-	set_x2(params.size(), params[0], params[1]);
+	_vm->_screen->panes(params[0]).setRight(params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::setTop(Parameters params) {
-	set_y1(params.size(), params[0], params[1]);
+	_vm->_screen->panes(params[0]).setTop(params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::setBottom(Parameters params) {
-	set_y2(params.size(), params[0], params[1]);
+	_vm->_screen->panes(params[0]).setBottom(params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::textWindow(Parameters params) {
-	text_window(params.size(), params[0], params[1]);
+	_vm->_screen->setTextWindow(params[0], params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::textStyle(Parameters params) {
-	text_style(params.size(), params[0], params[1], params[2]);
+	_vm->_screen->textStyle(params[0], params[1], params[2]);
 	return Parameter();
 }
 
 Parameter Interpreter::textXy(Parameters params) {
-	text_xy(params.size(), params[0], params[1], params[2]);
+	_vm->_screen->textWindows(params[0]).setPosition(Common::Point(params[1], params[2]));
 	return Parameter();
 }
 
 Parameter Interpreter::textColor(Parameters params) {
-	text_color(params.size(), params[0], params[1], params[2]);
+	_vm->_screen->textWindows(params[0]).textColor(params[1], params[2]);
 	return Parameter();
 }
 
 Parameter Interpreter::textRefreshWindow(Parameters params) {
-	text_refresh_window(params.size(), params[0], params[1]);
+	_vm->_screen->textWindows(params[0]).refreshWindow(params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::getTextX(Parameters params) {
-	return get_text_x(params.size(), params[0]);
+	return _vm->_screen->textWindows(params[0]).getX();
 }
 
 Parameter Interpreter::getTextY(Parameters params) {
-	return get_text_y(params.size(), params[0]);
+	return _vm->_screen->textWindows(params[0]).getY();
 }
 
 Parameter Interpreter::home(Parameters params) {
-	::Aesop::home(params.size(), params[0]);
+	_vm->_screen->textWindows(params[0]).home();
 	return Parameter();
 }
 
@@ -1649,23 +1658,22 @@ Parameter Interpreter::aPrint(Parameters params) {
 }
 
 Parameter Interpreter::crOut(Parameters params) {
-	::Aesop::crout(params.size(), params[0]);
+	_vm->_screen->textWindows(params[0]).crout();
 	return Parameter();
 }
 
 Parameter Interpreter::charWidth(Parameters params) {
-	return char_width(params.size(), params[0], params[1]);
+	return _vm->_screen->textWindows(params[0]).charWidth(params[1]);
 }
 
 Parameter Interpreter::fontHeight(Parameters params) {
-	return font_height(params.size(), params[0]);
+	return _vm->_screen->textWindows(params[0]).fontHeight();
 }
 
 Parameter Interpreter::solidBarGraph(Parameters params) {
-	solid_bar_graph(params.size(), params[0], params[1], params[2],
-		params[3], params[4], params[5], params[6], params[7],
-		params[8], params[9], params[10], params[11],
-		params[12], params[13]);
+	_vm->_screen->solidBarGraph(Common::Rect(params[0], params[1], params[2], params[3]),
+		params[4], params[5], params[6], params[7], params[8], params[9], params[10],
+		params[11], params[12], params[13]);
 	return Parameter();
 }
 

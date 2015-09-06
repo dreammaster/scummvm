@@ -69,8 +69,6 @@ BYTE DY_offset[6][4] = {{ 0, 0, 0, 0 },
                         { 1, 0,-1, 0 },
                         { 0, 1, 0,-1 }};
 
-extern char txtbuf[2400]; // used as dot buffer -- needs 8 * MAXDOTS words
-
 
 extern void *open_transfer_file(LONG argcnt, const char *filename);
 extern void close_transfer_file();
@@ -395,11 +393,11 @@ void magic_field(LONG argcnt, ULONG p, ULONG redfield, ULONG yelfield,
 
    if ((redfield)&&(!yelfield))
       {
-		GIL2VFX_draw_rect(PAGE2,x,y,x+63,y+49,color);
+		  _vm->_screen->panes(PAGE2).drawRect(Common::Rect(x,y,x+63,y+49),color);
 	   }
    else if ((yelfield)&&(!redfield))
       {
-		GIL2VFX_draw_rect(PAGE2,x,y,x+63,y+49,yel);
+		  _vm->_screen->panes(PAGE2).drawRect(Common::Rect(x, y, x + 63, y + 49), yel);
 	   }
    else
       {
@@ -408,15 +406,15 @@ void magic_field(LONG argcnt, ULONG p, ULONG redfield, ULONG yelfield,
          {						                        
 			x=save+lp;
 			if (redfield)
-            {								               
-				GIL2VFX_draw_line(PAGE2,x,y,x+7,y,color);				
-				GIL2VFX_draw_line(PAGE2,x+8,y+49,x+15,y+49,color);	
+            {
+				_vm->_screen->panes(PAGE2).drawLine(Common::Point(x,y), Common::Point(x+7,y), color);				
+				_vm->_screen->panes(PAGE2).drawLine(Common::Point(x + 8, y + 49), Common::Point(x + 15, y + 49), color);
 			   }
 
 			if (yelfield)
             {								               
-				GIL2VFX_draw_line(PAGE2,x+8,y,x+15,y,yel);			
-				GIL2VFX_draw_line(PAGE2,x,y+49,x+7,y+49,yel);		
+				_vm->_screen->panes(PAGE2).drawLine(Common::Point(x + 8, y), Common::Point(x + 15, y), yel);
+				_vm->_screen->panes(PAGE2).drawLine(Common::Point(x, y + 49), Common::Point(x + 7, y + 49), yel);
 			   }
 
 		   }
@@ -429,14 +427,13 @@ void magic_field(LONG argcnt, ULONG p, ULONG redfield, ULONG yelfield,
 			y=save+lp-1;
 			if (yelfield)
             {								               
-				GIL2VFX_draw_line(PAGE2,x,y+1,x,y+6,yel);			
-				GIL2VFX_draw_line(PAGE2,x+63,y+7,x+63,y+12,yel);	
+				_vm->_screen->panes(PAGE2).drawLine(Common::Point(x,y+1), Common::Point(x,y+6),yel);			
+				_vm->_screen->panes(PAGE2).drawLine(Common::Point(x + 63, y + 7), Common::Point(x + 63, y + 12), yel);
 			   }
 
-			if (redfield)
-            {								               
-				GIL2VFX_draw_line(PAGE2,x,y+7,x,y+12,color);			
-				GIL2VFX_draw_line(PAGE2,x+63,y+1,x+63,y+6,color);
+			if (redfield)   {				
+				_vm->_screen->panes(PAGE2).drawLine(Common::Point(x, y + 7), Common::Point(x, y + 12), color);
+				_vm->_screen->panes(PAGE2).drawLine(Common::Point(x + 63, y + 1), Common::Point(x + 63, y + 6), color);
 			   }
 		   }
 	   }
@@ -485,15 +482,15 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 	floor = _floor[scale];
 	if (scale) scale--;
 	
-	dotbuffer = (WORD*) txtbuf;
+	dotbuffer = (WORD*) _vm->_screen->txtbuf;
 	roof = 0;
 	lwall = -100;
 	rwall = 276;
 
-   top = GIL2VFX_get_y1(view);
-	bottom = GIL2VFX_get_y2(view);
-	lside = GIL2VFX_get_x1(view);
-	rside = GIL2VFX_get_x2(view);
+	top = _vm->_screen->panes(view).getTop();
+	bottom = _vm->_screen->panes(view).getBottom();
+	lside = _vm->_screen->panes(view).getLeft();
+	rside = _vm->_screen->panes(view).getRight();
 
 	xpos = dotbuffer;
 	ypos = dotbuffer+MAXDOTS;
@@ -529,8 +526,8 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 
             
 				if (Coord_In_Region(px,py,lside,top,rside,bottom))
-               GIL2VFX_draw_dot(scrn,px,py,color[i]);
-			   }
+               _vm->_screen->panes(scrn).drawDot(Common::Point(px,py),color[i]);
+			}
 
 		active = 0;
 
@@ -552,8 +549,8 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 			if (( px >= rwall ) || ( px < lwall)) xvel[i]=0-(xvel[i]>>1);
 			if (py > floor) py = floor;
 
-			mask = GIL2VFX_read_dot(view,px,py);
-			color[i] = GIL2VFX_read_dot(scrn,px,py);
+			mask = _vm->_screen->panes(view).readDot(Common::Point(px, py));
+			color[i] = _vm->_screen->panes(scrn).readDot(Common::Point(px, py));
 
 			pixcol = colors[colidx[i]>>8];
 
@@ -561,15 +558,15 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
             {
 				active = 1;
 
-				if ((mask == XCOLOR) && Coord_In_Region(px,py,lside,top,rside,bottom))
-					GIL2VFX_draw_dot(scrn,px,py,pixcol);
+				if ((mask == XCOLOR) && Coord_In_Region(px, py, lside, top, rside, bottom))
+					_vm->_screen->panes(scrn).drawDot(Common::Point(px, py), pixcol);
 			   }
 			else colcnt[i] = 0;
 		   }
 
       PollMod();
-		VFX_wait_vblank_leading();
-		VFX_wait_vblank_leading();
+		//VFX_wait_vblank_leading();
+		//VFX_wait_vblank_leading();
 	   }
 
    show_mouse();
@@ -595,7 +592,7 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 
    hide_mouse();
 
-	dotbuffer = (WORD*) txtbuf;
+	dotbuffer = (WORD*) _vm->_screen->txtbuf;
 
 	xpos   = dotbuffer;
 	ypos   = dotbuffer+MAXDOTS;
@@ -676,7 +673,7 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
             {
 				px = (xpos[i]>>ACCUR)+cx;
 				py = (ypos[i]>>ACCUR)+cy;
-            GIL2VFX_draw_dot(scrn,px,py,color[i]);
+				_vm->_screen->panes(scrn).drawDot(Common::Point(px,py),color[i]);
 			   }
 
 		active = 0;
@@ -709,12 +706,12 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 			px = (xpos[i] >> ACCUR) + cx;
 			py = (ypos[i] >> ACCUR) + cy;
 
-			if (count < (life>>2))
-            mask = 0;
+			if (count < (life >> 2))
+				mask = 0;
 			else
-				mask = GIL2VFX_read_dot(view,px,py);
+				mask = _vm->_screen->panes(view).readDot(Common::Point(px, py));
 
-			color[i] = GIL2VFX_read_dot(scrn,px,py);
+			color[i] = _vm->_screen->panes(scrn).readDot(Common::Point(px, py));
 	  		pixcol = colors[colidx[i] >> 8];
 
 			if (pixcol)
@@ -722,13 +719,13 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 				active = 1;
 
 				if (mask == XCOLOR && !delay[i])
-               GIL2VFX_draw_dot(scrn,px,py,pixcol);
+					_vm->_screen->panes(scrn).drawDot(Common::Point(px, py), pixcol);
 			   }
 			else colcnt[i] = 0;
 		   }
 
       PollMod();
-		VFX_wait_vblank_leading();
+		//VFX_wait_vblank_leading();
 		count++;
 	   }
 
@@ -967,10 +964,8 @@ void resume_level(LONG argcnt, ULONG cur_lvl)
 /*********************************************************/
 
 
-void resume_items(LONG argcnt, ULONG first, ULONG last, ULONG restoring)
-
-{
-   release_owned_windows(-1);
+void resume_items(LONG argcnt, ULONG first, ULONG last, ULONG restoring) {
+	_vm->_screen->releaseOwnedWindows(-1);
    cancel_entity_requests(-1);
 
    restore_range(itm_tmp,first,last,restoring);
@@ -1024,7 +1019,7 @@ void restore_items(LONG argcnt, ULONG slotnum)
 {
    set_save_slotnum(slotnum);
 
-   release_owned_windows(-1);
+   _vm->_screen->releaseOwnedWindows(-1);
    cancel_entity_requests(-1);
 
 //   aprint(0,"restore_range(%s, %d, %d, 1)\n",items_bin,FIRST_ITEM,LAST_ITEM);

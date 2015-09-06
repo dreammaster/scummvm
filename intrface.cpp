@@ -323,8 +323,7 @@ void init_interface(void)
       }
    else
       {
-      GIL2VFX_shutdown_driver();
-      abend(MSG_MMR);
+      error(MSG_MMR);
       }
 
    htimer = AIL_register_timer(timer_callback);
@@ -527,17 +526,8 @@ ULONG mouse_XY(void)
 /*********************************************************/
 
 
-ULONG mouse_in_window(LONG argcnt, ULONG wnd)
-
-{
-   ULONG stat;
-
-   stat = ((point_X >= GIL2VFX_get_x1(wnd)) &&
-           (point_X <= GIL2VFX_get_x2(wnd)) &&
-           (point_Y >= GIL2VFX_get_y1(wnd)) &&
-           (point_Y <= GIL2VFX_get_y2(wnd)));
-
-   return stat;
+ULONG mouse_in_window(LONG argcnt, ULONG wnd) {
+	return _vm->_screen->panes(wnd).contains(Common::Point(point_X, point_Y)) ? 1 : 0;
 }
 
 /*********************************************************/
@@ -550,9 +540,8 @@ ULONG mouse_in_window(LONG argcnt, ULONG wnd)
 
 
 void refresh_window(LONG argcnt, ULONG src, ULONG target)
-
 {
-   GIL2VFX_refresh_window(src, target);
+	// No implementation needed in ScummVM
 }
 
 

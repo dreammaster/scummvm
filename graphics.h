@@ -31,21 +31,17 @@
 
 namespace Aesop {
 
-extern UBYTE *fade_tables[5][16];
-extern UWORD first_color[5];
 extern UWORD in_GIL;
 
 //#define MODE_X 1                 // 1 for VGA mode X, 0 for MCGA mode 13h
 
-#define NTW 32                   // # of text windows available
+extern ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y,
+	ULONG flip, ULONG table, ULONG number, WORD *array);
 
-extern void dprint(LONG argcnt, const char *format, ...);
-extern void sprint(LONG argcnt, ULONG wndnum, const char *format, ...);
-extern void aprint(LONG argcnt, const char *format, ...);
-extern void print(LONG argcnt, ULONG wndnum, ULONG format, ...);
-extern void text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG newColor);
-extern void release_owned_windows(LONG owner);
-extern void line_to(Common::Array<Parameter> args);
+extern ULONG get_bitmap_height(LONG argcnt, ULONG table, ULONG number);
+extern void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
+	LONG x, LONG y, ULONG scale, ULONG flip, ULONG fade_table, ULONG
+	fade_level);
 
 } // End of namespace Aesop
 

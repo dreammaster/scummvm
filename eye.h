@@ -72,7 +72,7 @@ extern void lock_mouse(void);
 extern void unlock_mouse(void);
 extern void getkey(void);
 
-extern void init_graphics(void);
+/*
 extern void draw_dot(LONG argcnt, ULONG page, ULONG x, ULONG y, ULONG color);
 extern void draw_line(LONG argcnt, ULONG page,
    ULONG x1, ULONG y1, ULONG x2, ULONG y2, ULONG color);
@@ -82,10 +82,7 @@ extern void fill_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
    LONG y2, ULONG color);
 extern void hash_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
    LONG y2, ULONG color);
-extern ULONG get_bitmap_height(LONG argcnt, ULONG table, ULONG number);
-extern void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
-   LONG x, LONG y, ULONG scale, ULONG flip, ULONG fade_table, ULONG
-   fade_level);
+
 extern ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y,
    ULONG flip, ULONG table, ULONG number, WORD *array);
 extern void set_palette(LONG argcnt, ULONG region, ULONG resource);
@@ -122,16 +119,7 @@ extern void text_refresh_window(LONG argcnt, ULONG wndnum, LONG wnd);
 
 extern LONG get_text_x(LONG argcnt, ULONG wndnum);
 extern LONG get_text_y(LONG argcnt, ULONG wndnum);
-
-extern void home(LONG argcnt, ULONG wndnum);
-
-extern void crout(LONG argcnt, ULONG wndnum);
-extern ULONG char_width(LONG argcnt, ULONG wndnum, ULONG ch);
-extern ULONG font_height(LONG argcnt, ULONG wndnum);
-
-extern void solid_bar_graph(LONG argcnt, LONG x0, LONG y0, LONG x1, LONG y1,
-   ULONG lb_border, ULONG tr_border, ULONG bkgnd, ULONG grn, ULONG yel,
-   ULONG red, LONG val, LONG min, LONG crit, LONG max);
+*/
 
 extern void init_sound(LONG argcnt, ULONG errprompt);
 extern void shutdown_sound(void);

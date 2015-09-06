@@ -40,6 +40,7 @@ AesopEngine::AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc) :
 		Engine(syst), _gameDescription(gameDesc), _randomSource("Aesop") {
 	_vm = this;
 	_resources = nullptr;
+	_screen = nullptr;
 }
 
 AesopEngine::~AesopEngine() {
@@ -49,6 +50,7 @@ AesopEngine::~AesopEngine() {
 void AesopEngine::initialize() {
 	_interpreter = new Interpreter(this, objlist, 8192);
 	_resources = new Resources(this);
+	_screen = new Screen(this);
 	init_object_list();
 	init_notify_list();
 	init_event_queue();

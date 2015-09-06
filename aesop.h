@@ -34,6 +34,7 @@
 #include "engines/engine.h"
 #include "aesop/interpreter.h"
 #include "aesop/resources.h"
+#include "aesop/screen.h"
 
 namespace Aesop {
 
@@ -77,6 +78,7 @@ public:
 	const AesopGameDescription *_gameDescription;
 	Interpreter *_interpreter;
 	Resources *_resources;
+	Screen *_screen;
 public:
 	AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc);
 	virtual ~AesopEngine();

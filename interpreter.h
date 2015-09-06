@@ -33,6 +33,8 @@ namespace Aesop {
 #define far_memmove(dest, src, len) ((void *)memmove((dest),(src),(len)))
 #define add_offset(s,o) ((void *)((ULONG)(s) + (ULONG)(o)))
 
+enum StartupState { SS_NONE = 0, SS_CINE = 1, SS_VICT = 2, SS_CHGN = 3, SS_INTR = 4 };
+
 class AesopEngine;
 class Interpreter;
 
@@ -390,6 +392,7 @@ private:
 public:
 	ULONG _currentMsg;
 	ULONG _currentThis;
+	StartupState _startupState;
 public:
 	Interpreter(AesopEngine *vm, HRES *objList, int stackSize);
 	~Interpreter();

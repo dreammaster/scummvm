@@ -61,9 +61,9 @@ static Common::Rect volatile saved;
 static LONG   real_event_sel; 
 static LONG   real_event_seg;
 //static HTIMER timer;
-static WINDOW save;
-static WINDOW work;
-static PANE   workp;
+//static WINDOW save;
+//static WINDOW work;
+//static PANE   workp;
 static LONG   buffer_size;
 static void  *pointer_table;
 static LONG   pointer;
@@ -718,9 +718,9 @@ void mouse_serve(void)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
+/*
 void mouse_pane_refresh(PANE *source, PANE *target)
 {
-	/*
    LONG shp_x,shp_y;
    LONG bw,bh;
    PANE bkgnd,client;
@@ -834,8 +834,9 @@ void mouse_pane_refresh(PANE *source, PANE *target)
 
    mouse_release();
    mouse_serve();
-   */
+
 }
+*/
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 //лл                                                                        лл
 //лл Initialize mouse system                                                лл

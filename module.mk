@@ -15,6 +15,7 @@ MODULE_OBJS = \
 	rtcode.o \
 	rtobject.o \
 	rtsystem.o \
+	screen.o \
 	sound32.o \
 	stubs.o
 
