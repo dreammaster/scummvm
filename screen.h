@@ -35,30 +35,30 @@ extern const byte text_colors[9];
 extern const int first_color[5];
 extern const int num_colors[5];
 
-#define AESOP_SCREEN_WIDTH	320
-#define AESOP_SCREEN_HEIGHT	200
-#define MAX_WINDOWS			50
-#define MAX_PANES			250
-#define NTW					32
-#define PALETTE_COUNT		256
-#define PALETTE_SIZE		(256 * 3)
+#define AESOP_SCREEN_WIDTH  320
+#define AESOP_SCREEN_HEIGHT 200
+#define MAX_WINDOWS         50
+#define MAX_PANES           250
+#define NTW                 32
+#define PALETTE_COUNT       256
+#define PALETTE_SIZE        (256 * 3)
 
 enum {
-	NO_COLOR = 0
+    NO_COLOR = 0
 };
 enum Mirror { NO_MIRROR = 0, X_MIRROR = 1, Y_MIRROR = 2, XY_MIRROR = 3 };
 enum LineDraw { LD_DRAW = 0, LD_TRANSLATE = 1, LD_EXECUTE = 3 };
 enum PaneScroll { PS_NOWRAP = 0, PS_WRAP = 1 };
 enum ShapeTransform {
-	ST_XLAT = 0,		// Use shape_lookaside() table
-	ST_REUSE = 1		// Use buffer contents from prior call
+    ST_XLAT = 0,        // Use shape_lookaside() table
+    ST_REUSE = 1        // Use buffer contents from prior call
 };
 enum Justification { J_LEFT = 0, J_RIGHT = 1, J_CENTER = 2, J_FILL = 3 };
 enum { PAGE1 = 0, PAGE2 = 1 };
 enum PrintOperation {
-	WND = 0,		// output directly to window 
-	BUF = 1,		// output to start of buffer 
-	APP = 2			// append to end of buffer   
+    WND = 0,        // output directly to window
+    BUF = 1,        // output to start of buffer
+    APP = 2         // append to end of buffer
 };
 
 class AesopEngine;
@@ -251,10 +251,14 @@ public:
 	 * Set the text position in the window
 	 */
 	void setPosition(const Common::Point &pt);
-	
-	int getX() const { return htab; }
 
-	int getY() const { return vtab; }
+	int getX() const {
+		return htab;
+	}
+
+	int getY() const {
+		return vtab;
+	}
 
 	void home();
 
@@ -346,7 +350,7 @@ public:
 	/**
 	 * Release all windows assigned to owner, where owner refers to any program or entity object.
 	 *
-	 * If owner = -1, release all assigned windows except PAGE1, PAGE2, and windows assigned 
+	 * If owner = -1, release all assigned windows except PAGE1, PAGE2, and windows assigned
 	 * to program objects
 	 */
 	void releaseOwnedWindows(int owner);
@@ -369,7 +373,7 @@ public:
 	/**
 	 * Set a palette color range from a palette resource file
 	 *
-	 * Copy "fade tables" from resource file; dynamically build 
+	 * Copy "fade tables" from resource file; dynamically build
 	 * special shade tables for blue/green/red/gray/white/etc. effects
 	 */
 	void setPalette(uint region, uint resource);
@@ -429,7 +433,7 @@ public:
 	 * call is issued for the window
 	 */
 	void textStyle(uint wndnum, uint font, uint justify);
-	
+
 	void drawDot(uint page, const Common::Point &pos, byte color);
 
 	void drawLine(uint page, const Common::Point &src, const Common::Point &dest, byte color);
@@ -437,7 +441,7 @@ public:
 	void lineTo(Common::Array<Parameter> args);
 
 	void solidBarGraph(const Common::Rect &r, uint32 lb_border, uint32 tr_border, uint32 bkgnd,
-		uint32 grn, uint32 yel, uint32 red, int val, int min, int crit, int max);
+	                   uint32 grn, uint32 yel, uint32 red, int val, int min, int crit, int max);
 };
 
 typedef int FIXED16;
@@ -445,7 +449,7 @@ typedef int FIXED16;
 extern void VFX_shape_draw(Pane *pane, void *shape_table, LONG shape_number, LONG hotX, LONG hotY);
 extern int VFX_shape_resolution(byte *data, int shape_num);
 extern void GIL2VFX_draw_bitmap(int wnd, int x, int y, int mirror, int scale,
-	byte *fade_table, byte *shapes, int shape_num);
+                                byte *fade_table, byte *shapes, int shape_num);
 
 } // End of namespace Aesop
 

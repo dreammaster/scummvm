@@ -27,7 +27,7 @@
 
 namespace Aesop {
 
-#define GAMEOPTION_AESOP32	GUIO_GAMEOPTIONS1
+#define GAMEOPTION_AESOP32  GUIO_GAMEOPTIONS1
 
 struct AesopGameDescription {
 	ADGameDescription desc;
@@ -57,7 +57,7 @@ static const PlainGameDescriptor AesopGames[] = {
 class AesopMetaEngine : public AdvancedMetaEngine {
 public:
 	AesopMetaEngine() : AdvancedMetaEngine(Aesop::gameDescriptions, sizeof(Aesop::AesopGameDescription),
-		AesopGames) {}
+		                                       AesopGames) {}
 
 	virtual const char *getName() const {
 		return "Aesop Engine";
@@ -108,18 +108,18 @@ bool AesopMetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGam
 
 bool AesopMetaEngine::hasFeature(MetaEngineFeature f) const {
 	return
-		(f == kSupportsListSaves) ||
-		(f == kSupportsLoadingDuringStartup) ||
-		(f == kSupportsDeleteSave) ||
-		(f == kSavesSupportMetaInfo) ||
-		(f == kSavesSupportThumbnail);
+	    (f == kSupportsListSaves) ||
+	    (f == kSupportsLoadingDuringStartup) ||
+	    (f == kSupportsDeleteSave) ||
+	    (f == kSavesSupportMetaInfo) ||
+	    (f == kSavesSupportThumbnail);
 }
 
 bool Aesop::AesopEngine::hasFeature(EngineFeature f) const {
 	return
-		(f == kSupportsRTL) ||
-		(f == kSupportsLoadingDuringRuntime) ||
-		(f == kSupportsSavingDuringRuntime);
+	    (f == kSupportsRTL) ||
+	    (f == kSupportsLoadingDuringRuntime) ||
+	    (f == kSupportsSavingDuringRuntime);
 }
 
 SaveStateList AesopMetaEngine::listSaves(const char *target) const {
@@ -142,7 +142,7 @@ SaveStateDescriptor AesopMetaEngine::querySaveMetaInfos(const char *target, int 
 
 
 #if PLUGIN_ENABLED_DYNAMIC(AESOP)
-	REGISTER_PLUGIN_DYNAMIC(AESOP, PLUGIN_TYPE_ENGINE, AesopMetaEngine);
+REGISTER_PLUGIN_DYNAMIC(AESOP, PLUGIN_TYPE_ENGINE, AesopMetaEngine);
 #else
-	REGISTER_PLUGIN_STATIC(AESOP, PLUGIN_TYPE_ENGINE, AesopMetaEngine);
+REGISTER_PLUGIN_STATIC(AESOP, PLUGIN_TYPE_ENGINE, AesopMetaEngine);
 #endif

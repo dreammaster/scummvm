@@ -41,16 +41,16 @@
 namespace Aesop {
 
 enum {
-	kDebugLevelScript      = 1 << 0
+    kDebugLevelScript      = 1 << 0
 };
 
 enum GameType {
-	GType_EOB3 = 0,
-	GType_DungeonHack = 1
+    GType_EOB3 = 0,
+    GType_DungeonHack = 1
 };
 
 enum AesopGameFeatures {
-	GF_AESOP32 = 1 << 0
+    GF_AESOP32 = 1 << 0
 };
 
 #define AESOP_SCREEN_WIDTH 320

@@ -41,7 +41,7 @@ namespace Aesop {
 //
 // Mouse system variables
 //
-            
+
 static LONG volatile x;
 static LONG volatile y;
 static LONG volatile left;
@@ -55,10 +55,10 @@ static LONG volatile _btnLastRight;
 static LONG volatile last_center;
 
 static LONG volatile locked;
-static LONG volatile held;  
+static LONG volatile held;
 static Common::Rect volatile saved;
 
-static LONG   real_event_sel; 
+static LONG   real_event_sel;
 static LONG   real_event_seg;
 //static HTIMER timer;
 //static WINDOW save;
@@ -78,9 +78,9 @@ static LONG   scrn_max_y;
 static LONG   hidecnt;
 static LONG   excluded;
 static Common::Rect   exclude_region;
-static LONG   mouse_active=0;
+static LONG   mouse_active = 0;
 
-LONG (*watchdog_callback)(Common::Rect *area);
+LONG(*watchdog_callback)(Common::Rect *area);
 void (*mouse_event_callback)(LONG x, LONG y);
 void (*button_event_callback)(LONG left, LONG right, LONG center);
 
@@ -88,23 +88,23 @@ void (*button_event_callback)(LONG left, LONG right, LONG center);
 
 // DPMI real-mode interrupt structure
 struct DPMI_RMI {
-   LONG edi;
-   LONG esi;
-   LONG ebp;
-   LONG reserved;
-   LONG ebx;
-   LONG edx;
-   LONG ecx;
-   LONG eax;
-   WORD flags;
-   WORD es;
-   WORD ds;
-   WORD fs;
-   WORD gs;
-   WORD ip;
-   WORD cs;
-   WORD sp;
-   WORD ss;
+	LONG edi;
+	LONG esi;
+	LONG ebp;
+	LONG reserved;
+	LONG ebx;
+	LONG edx;
+	LONG ecx;
+	LONG eax;
+	WORD flags;
+	WORD es;
+	WORD ds;
+	WORD fs;
+	WORD gs;
+	WORD ip;
+	WORD cs;
+	WORD sp;
+	WORD ss;
 };
 
 #endif
@@ -116,100 +116,99 @@ struct DPMI_RMI {
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-static void mouse_draw(void)
-{
+static void mouse_draw(void) {
 	/*
-   LONG shp_x,shp_y;
+	LONG shp_x,shp_y;
 
-   if (!mouse_active) return;
+	if (!mouse_active) return;
 
-   _vm->_events->lockMouse();
+	_vm->_events->lockMouse();
 
-   //
-   // Create windows "save" and "work" based on visible cursor area, clipping
-   // to the edge of the screen if necessary
-   //
-   // If area under cursor is entirely offscreen, exit
-   // If area under cursor lies within an exclusion area, exit
-   //
+	//
+	// Create windows "save" and "work" based on visible cursor area, clipping
+	// to the edge of the screen if necessary
+	//
+	// If area under cursor is entirely offscreen, exit
+	// If area under cursor lies within an exclusion area, exit
+	//
 
-   saved.left = x+hot_x+user_x;
-   saved.top = y+hot_y+user_y;
-   saved.right = saved.left + ptr_width  - 1;
-   saved.bottom = saved.top + ptr_height - 1;
+	saved.left = x+hot_x+user_x;
+	saved.top = y+hot_y+user_y;
+	saved.right = saved.left + ptr_width  - 1;
+	saved.bottom = saved.top + ptr_height - 1;
 
-   if ((saved.left > scrn_max_x) ||
-       (saved.top > scrn_max_y) ||
-       (saved.right < 0)          ||
-       (saved.bottom < 0))
-      {
-      excluded = 1;
+	if ((saved.left > scrn_max_x) ||
+	   (saved.top > scrn_max_y) ||
+	   (saved.right < 0)          ||
+	   (saved.bottom < 0))
+	  {
+	  excluded = 1;
 
-      _vm->_events->unlockMouse();
-      return;
-      }
+	  _vm->_events->unlockMouse();
+	  return;
+	  }
 
-   if (saved.left < 0)          saved.left = 0;
-   if (saved.top < 0)          saved.top = 0;
-   if (saved.right > scrn_max_x) saved.right = scrn_max_x;
-   if (saved.bottom > scrn_max_y) saved.bottom = scrn_max_y;
+	if (saved.left < 0)          saved.left = 0;
+	if (saved.top < 0)          saved.top = 0;
+	if (saved.right > scrn_max_x) saved.right = scrn_max_x;
+	if (saved.bottom > scrn_max_y) saved.bottom = scrn_max_y;
 
-   if (exclude_region.left != -1)
-      if (mouse_shape_in_area(&exclude_region))
-         {
-         excluded = 1;
+	if (exclude_region.left != -1)
+	  if (mouse_shape_in_area(&exclude_region))
+	     {
+	     excluded = 1;
 
-         _vm->_events->unlockMouse();
-         return;
-         }
+	     _vm->_events->unlockMouse();
+	     return;
+	     }
 
-   if (watchdog_callback != NULL)
-      if (!watchdog_callback(&saved))
-         {
-         excluded = 1;
+	if (watchdog_callback != NULL)
+	  if (!watchdog_callback(&saved))
+	     {
+	     excluded = 1;
 
-         _vm->_events->unlockMouse();
-         return;
-         }
+	     _vm->_events->unlockMouse();
+	     return;
+	     }
 
-   excluded = 0;
+	excluded = 0;
 
-   workp.right = work.right = save.right = saved.right-saved.left;
-   workp.bottom = work.bottom = save.bottom = saved.bottom-saved.top;
+	workp.right = work.right = save.right = saved.right-saved.left;
+	workp.bottom = work.bottom = save.bottom = saved.bottom-saved.top;
 
-   //
-   // Read two copies of the screen area under the cursor
-   //
-   // "save" will be used later to restore the background
-   // "work" will be used to overlay the cursor shape on the screen
-   //
-   // Warning: If the compiler's "memmove" function is not re-entrant,
-   // replace the memmove() call below with another VFX_window_read()
-   // call for the "work" window
-   //
+	//
+	// Read two copies of the screen area under the cursor
+	//
+	// "save" will be used later to restore the background
+	// "work" will be used to overlay the cursor shape on the screen
+	//
+	// Warning: If the compiler's "memmove" function is not re-entrant,
+	// replace the memmove() call below with another VFX_window_read()
+	// call for the "work" window
+	//
 
-   VFX_window_read(&save,saved.left,saved.top,saved.right,saved.bottom);
-   memmove(work.buffer,save.buffer,buffer_size);
+	VFX_window_read(&save,saved.left,saved.top,saved.right,saved.bottom);
+	memmove(work.buffer,save.buffer,buffer_size);
 
-   //
-   // Calculate the offset of the pointer in the (0,0)-based "work" window
-   //
-   // If "work" is clipped to screen x=0 or y=0, draw at the actual X and
-   // Y locations; else -hot_x,-hot_y will align the shape with "work"'s
-   // top-left corner
-   //
-   // Finally, copy "work" back to the physical screen
-   //
+	//
+	// Calculate the offset of the pointer in the (0,0)-based "work" window
+	//
+	// If "work" is clipped to screen x=0 or y=0, draw at the actual X and
+	// Y locations; else -hot_x,-hot_y will align the shape with "work"'s
+	// top-left corner
+	//
+	// Finally, copy "work" back to the physical screen
+	//
 
-   shp_x = (x+hot_x+user_x < 0) ? x+user_x : -hot_x;
-   shp_y = (y+hot_y+user_y < 0) ? y+user_y : -hot_y;
+	shp_x = (x+hot_x+user_x < 0) ? x+user_x : -hot_x;
+	shp_y = (y+hot_y+user_y < 0) ? y+user_y : -hot_y;
 
-   VFX_shape_draw(&workp,pointer_table,pointer,shp_x,shp_y);
+	VFX_shape_draw(&workp,pointer_table,pointer,shp_x,shp_y);
 
-   VFX_window_refresh(&work,saved.left,saved.top,saved.right,saved.bottom);
+	VFX_window_refresh(&work,saved.left,saved.top,saved.right,saved.bottom);
 
-   _vm->_events->unlockMouse();
-   */
+	_vm->_events->unlockMouse();
+	*/
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -218,32 +217,31 @@ static void mouse_draw(void)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-static void mouse_restore_area(void)
-{
+static void mouse_restore_area(void) {
 	/*
-   if (!mouse_active) return;
+	if (!mouse_active) return;
 
-   _vm->_events->lockMouse();
+	_vm->_events->lockMouse();
 
-   //
-   // If cursor not visible, exit
-   //
+	//
+	// If cursor not visible, exit
+	//
 
-   if (excluded)
-      {
-      _vm->_events->unlockMouse();
-      return;
-      }
+	if (excluded)
+	  {
+	  _vm->_events->unlockMouse();
+	  return;
+	  }
 
-   //
-   // Copy the "save" window (written by mouse_draw() prior to drawing the 
-   // mouse cursor) to the screen
-   //
+	//
+	// Copy the "save" window (written by mouse_draw() prior to drawing the
+	// mouse cursor) to the screen
+	//
 
-   VFX_window_refresh(&save,saved.left,saved.top,saved.right,saved.bottom);
+	VFX_window_refresh(&save,saved.left,saved.top,saved.right,saved.bottom);
 
-   _vm->_events->unlockMouse();
-   */
+	_vm->_events->unlockMouse();
+	*/
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -259,14 +257,13 @@ static void mouse_restore_area(void)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-static void mouse_exclude_area(LONG x0, LONG y0, LONG x1, LONG y1)
-{
+static void mouse_exclude_area(LONG x0, LONG y0, LONG x1, LONG y1) {
 	/*
-   exclude_region.left = x0;
-   exclude_region.top = y0;
-   exclude_region.right = x1;
-   exclude_region.bottom = y1;
-   */
+	exclude_region.left = x0;
+	exclude_region.top = y0;
+	exclude_region.right = x1;
+	exclude_region.bottom = y1;
+	*/
 }
 
 
@@ -276,9 +273,8 @@ static void mouse_exclude_area(LONG x0, LONG y0, LONG x1, LONG y1)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-void mouse_hold(void)
-{
-   ++held;
+void mouse_hold(void) {
+	++held;
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -287,9 +283,8 @@ void mouse_hold(void)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-void mouse_release(void)
-{
-   --held;  
+void mouse_release(void) {
+	--held;
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -302,23 +297,22 @@ void mouse_release(void)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-LONG mouse_visible_area(Common::Rect *area)
-{
+LONG mouse_visible_area(Common::Rect *area) {
 	/*
-   _vm->_events->lockMouse();
+	_vm->_events->lockMouse();
 
-   if ((excluded) || (hidecnt < 0))
-      {
-      _vm->_events->unlockMouse();
-      return 0;
-      }
+	if ((excluded) || (hidecnt < 0))
+	  {
+	  _vm->_events->unlockMouse();
+	  return 0;
+	  }
 
-   *area = saved;
+	*area = saved;
 
-   _vm->_events->unlockMouse();
-   
-   return 1;
-   */
+	_vm->_events->unlockMouse();
+
+	return 1;
+	*/
 
 	return 0;
 }
@@ -330,23 +324,22 @@ LONG mouse_visible_area(Common::Rect *area)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-LONG mouse_shape_in_area(Common::Rect *area)
-{
+LONG mouse_shape_in_area(Common::Rect *area) {
 	return 0;
 	/*
-   RECT cur;
+	RECT cur;
 
-   if (!mouse_visible_area(&cur))
-      return 0;
+	if (!mouse_visible_area(&cur))
+	  return 0;
 
-   if ((cur.left > area->x1) ||
-       (cur.right < area->x0) ||
-       (cur.bottom < area->y0) ||
-       (cur.top > area->y1))
-      return 0;
+	if ((cur.left > area->x1) ||
+	   (cur.right < area->x0) ||
+	   (cur.bottom < area->y0) ||
+	   (cur.top > area->y1))
+	  return 0;
 
-   return 1;
-   */
+	return 1;
+	*/
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -355,19 +348,17 @@ LONG mouse_shape_in_area(Common::Rect *area)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-void mouse_show(void)
-{
-   _vm->_events->lockMouse();
+void mouse_show(void) {
+	_vm->_events->lockMouse();
 
-   if (hidecnt)
-      {
-      ++hidecnt;
+	if (hidecnt) {
+		++hidecnt;
 
-      if (!hidecnt)
-         mouse_draw();
-      }
+		if (!hidecnt)
+			mouse_draw();
+	}
 
-   _vm->_events->unlockMouse();
+	_vm->_events->unlockMouse();
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -376,16 +367,15 @@ void mouse_show(void)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-void mouse_hide(void)
-{
-   _vm->_events->lockMouse();
+void mouse_hide(void) {
+	_vm->_events->lockMouse();
 
-   if (!hidecnt)
-      mouse_restore_area();
+	if (!hidecnt)
+		mouse_restore_area();
 
-   --hidecnt;
+	--hidecnt;
 
-   _vm->_events->unlockMouse();
+	_vm->_events->unlockMouse();
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -398,48 +388,47 @@ void mouse_hide(void)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-void mouse_set_pointer(void *table, LONG shape, LONG uhot_x, LONG uhot_y)
-{
+void mouse_set_pointer(void *table, LONG shape, LONG uhot_x, LONG uhot_y) {
 	/*
-   LONG hot,res;
-   LONG w,h;
+	LONG hot,res;
+	LONG w,h;
 
-   if ((pointer_table == table) &&
-       (pointer       == shape))
-      return;
+	if ((pointer_table == table) &&
+	   (pointer       == shape))
+	  return;
 
-   _vm->_events->lockMouse();
-   mouse_hide();
+	_vm->_events->lockMouse();
+	mouse_hide();
 
-   pointer_table = table;
-   pointer       = shape;
+	pointer_table = table;
+	pointer       = shape;
 
-   res = VFX_shape_resolution(table,shape);
-   hot = VFX_shape_minxy     (table,shape);
+	res = VFX_shape_resolution(table,shape);
+	hot = VFX_shape_minxy     (table,shape);
 
-   ptr_width  = w = res >> 16;
-   ptr_height = h = res & 0xffff;
+	ptr_width  = w = res >> 16;
+	ptr_height = h = res & 0xffff;
 
-   hot_x = ((LONG) (WORD) (hot >> 16)   ) ;
-   hot_y = ((LONG) (WORD) (hot & 0xffff)) ;
+	hot_x = ((LONG) (WORD) (hot >> 16)   ) ;
+	hot_y = ((LONG) (WORD) (hot & 0xffff)) ;
 
-   user_x = -uhot_x;
-   user_y = -uhot_y;
+	user_x = -uhot_x;
+	user_y = -uhot_y;
 
-   buffer_size = w*h;
+	buffer_size = w*h;
 
-   if (work.buffer != NULL)
-      mem_free(work.buffer);
+	if (work.buffer != NULL)
+	  mem_free(work.buffer);
 
-   if (save.buffer != NULL)
-      mem_free(save.buffer);
+	if (save.buffer != NULL)
+	  mem_free(save.buffer);
 
-   save.buffer = mem_alloc(buffer_size);
-   work.buffer = mem_alloc(buffer_size);
+	save.buffer = mem_alloc(buffer_size);
+	work.buffer = mem_alloc(buffer_size);
 
-   mouse_show();
-   _vm->_events->unlockMouse();
-   */
+	mouse_show();
+	_vm->_events->unlockMouse();
+	*/
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -458,9 +447,8 @@ void mouse_set_pointer(void *table, LONG shape, LONG uhot_x, LONG uhot_y)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-void mouse_register_mouse_event_callback(void (*fn)(LONG x, LONG y))
-{
-   mouse_event_callback = fn;
+void mouse_register_mouse_event_callback(void (*fn)(LONG x, LONG y)) {
+	mouse_event_callback = fn;
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -480,9 +468,8 @@ void mouse_register_mouse_event_callback(void (*fn)(LONG x, LONG y))
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
 void mouse_register_button_event_callback(void (*fn)(LONG left,
-   LONG right, LONG center))
-{
-   button_event_callback = fn;
+        LONG right, LONG center)) {
+	button_event_callback = fn;
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -503,9 +490,8 @@ void mouse_register_button_event_callback(void (*fn)(LONG left,
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-void mouse_register_watchdog_callback(LONG (*fn)(Common::Rect *area))
-{
-   watchdog_callback = fn;
+void mouse_register_watchdog_callback(LONG(*fn)(Common::Rect *area)) {
+	watchdog_callback = fn;
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -527,53 +513,52 @@ void mouse_register_watchdog_callback(LONG (*fn)(Common::Rect *area))
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-void mouse_serve(void)
-{
+void mouse_serve(void) {
 	/*
-   if (ENABLED <= 0) return;
+	if (ENABLED <= 0) return;
 
-   if (locked > 0) return;
+	if (locked > 0) return;
 
-   ++locked;
+	++locked;
 
-   _btnLastLeft   = left;
-   _btnLastRight  = right;
-   last_center = center;
+	_btnLastLeft   = left;
+	_btnLastRight  = right;
+	last_center = center;
 
-   left   =  ((*(WORD *) 0x4f4) & 0x01) != 0;
-   right  =  ((*(WORD *) 0x4f4) & 0x02) != 0;
-   center =  ((*(WORD *) 0x4f4) & 0x04) != 0;
+	left   =  ((*(WORD *) 0x4f4) & 0x01) != 0;
+	right  =  ((*(WORD *) 0x4f4) & 0x02) != 0;
+	center =  ((*(WORD *) 0x4f4) & 0x04) != 0;
 
-   if ((left != _btnLastLeft) || (right != _btnLastRight) || (center != last_center))
-      if (button_event_callback != NULL)
-         button_event_callback(left,right,center);
+	if ((left != _btnLastLeft) || (right != _btnLastRight) || (center != last_center))
+	  if (button_event_callback != NULL)
+	     button_event_callback(left,right,center);
 
-   if (held > 0)
-      {
-      --locked;
-      return;
-      }
+	if (held > 0)
+	  {
+	  --locked;
+	  return;
+	  }
 
-   last_x = x;
-   last_y = y;
+	last_x = x;
+	last_y = y;
 
-   x = (LONG) (*(WORD *) 0x4f6) >> 3;
-   y = (LONG) (*(WORD *) 0x4f8) >> 3;
+	x = (LONG) (*(WORD *) 0x4f6) >> 3;
+	y = (LONG) (*(WORD *) 0x4f8) >> 3;
 
-   if ((x != last_x) || (y != last_y))
-      {
-      if (mouse_event_callback != NULL)
-         mouse_event_callback(x,y);
+	if ((x != last_x) || (y != last_y))
+	  {
+	  if (mouse_event_callback != NULL)
+	     mouse_event_callback(x,y);
 
-      if (hidecnt >= 0)
-         {
-         mouse_restore_area();         // restore area at old cursor position
-         mouse_draw();                 // draw the cursor
-         }
-      }
+	  if (hidecnt >= 0)
+	     {
+	     mouse_restore_area();         // restore area at old cursor position
+	     mouse_draw();                 // draw the cursor
+	     }
+	  }
 
-   --locked;
-   */
+	--locked;
+	*/
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -609,7 +594,7 @@ void mouse_pane_refresh(PANE *source, PANE *target)
 
    //
    // If mouse is currently outside the region to be refreshed, register the
-   // region as an exclusion area, release the mouse, do the refresh, 
+   // region as an exclusion area, release the mouse, do the refresh,
    // cancel the exclusion area, and force an update
    //
 
@@ -631,7 +616,7 @@ void mouse_pane_refresh(PANE *source, PANE *target)
       }
 
    //
-   // If mouse is inside the region to be refreshed, temporarily merge the 
+   // If mouse is inside the region to be refreshed, temporarily merge the
    // pointer shape with the client's window so that it will not be erased
    // during the refresh, do the refresh, and restore the client's window
    // contents
@@ -649,7 +634,7 @@ void mouse_pane_refresh(PANE *source, PANE *target)
    client.bottom = min(target->y1,saved.bottom);// - target->y0;
 
    //
-   // Define pane to describe part of saved background window which 
+   // Define pane to describe part of saved background window which
    // lies within client screen area
    //
 
@@ -663,7 +648,7 @@ void mouse_pane_refresh(PANE *source, PANE *target)
    bkgnd.bottom = (saved.bottom > target->y1) ? bh - (saved.bottom-target->y1) : bh;
 
    //
-   // Update background preservation window by copying client source 
+   // Update background preservation window by copying client source
    // pane to background pane
    //
 
@@ -687,14 +672,14 @@ void mouse_pane_refresh(PANE *source, PANE *target)
 
    //
    // Finally, restore the part of the client's window which we overwrote
-   // with the mouse pointer (not necessary if client doesn't intend to 
+   // with the mouse pointer (not necessary if client doesn't intend to
    // re-use contents of window)
    //
 
    VFX_pane_copy(&bkgnd,0,0,&client,0,0,NO_COLOR);
-       
+
    //
-   // Release the mouse and force service in case coordinates 
+   // Release the mouse and force service in case coordinates
    // need updating
    //
 
@@ -709,135 +694,134 @@ void mouse_pane_refresh(PANE *source, PANE *target)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-LONG mouse_init(LONG xsize, LONG ysize)
-{
+LONG mouse_init(LONG xsize, LONG ysize) {
 	/*
-   union REGS inregs,outregs;
+	union REGS inregs,outregs;
 
-   scrn_max_x = xsize-1;
-   scrn_max_y = ysize-1;
+	scrn_max_x = xsize-1;
+	scrn_max_y = ysize-1;
 
-#ifdef DPMI             
-   //
-   // Init mouse driver, returning 0 on failure
-   // 
+	#ifdef DPMI
+	//
+	// Init mouse driver, returning 0 on failure
+	//
 
-   inregs.x.eax = 0;
-   int386(0x33,&inregs,&outregs);
+	inregs.x.eax = 0;
+	int386(0x33,&inregs,&outregs);
 
-   if (outregs.w.ax != -1)
-      return 0;
+	if (outregs.w.ax != -1)
+	  return 0;
 
-   //
-   // Set horizontal and vertical limits for mouse movement
-   // Multiply limits by 8 to obtain single-pixel resolution
-   //
+	//
+	// Set horizontal and vertical limits for mouse movement
+	// Multiply limits by 8 to obtain single-pixel resolution
+	//
 
-   inregs.x.eax = 7;
-   inregs.x.ecx = 0;
-   inregs.x.edx = scrn_max_x << 3;
-   int386(0x33,&inregs,&outregs);
+	inregs.x.eax = 7;
+	inregs.x.ecx = 0;
+	inregs.x.edx = scrn_max_x << 3;
+	int386(0x33,&inregs,&outregs);
 
-   inregs.x.eax = 8;
-   inregs.x.ecx = 0;
-   inregs.x.edx = scrn_max_y << 3;
-   int386(0x33,&inregs,&outregs);
+	inregs.x.eax = 8;
+	inregs.x.ecx = 0;
+	inregs.x.edx = scrn_max_y << 3;
+	int386(0x33,&inregs,&outregs);
 
-   //
-   // Set mouse movement rate = 1 mickey/pixel
-   //
+	//
+	// Set mouse movement rate = 1 mickey/pixel
+	//
 
-   inregs.x.eax = 0x0f;
-   inregs.x.ecx = 1;
-   inregs.x.edx = 1;
-   int386(0x33,&inregs,&outregs);
+	inregs.x.eax = 0x0f;
+	inregs.x.ecx = 1;
+	inregs.x.edx = 1;
+	int386(0x33,&inregs,&outregs);
 
-   //
-   // Set mouse position to center of area
-   //
+	//
+	// Set mouse position to center of area
+	//
 
-   inregs.x.eax = 4;
-   inregs.x.ecx = xsize << 2;
-   inregs.x.edx = ysize << 2;
-   int386(0x33,&inregs,&outregs);
+	inregs.x.eax = 4;
+	inregs.x.ecx = xsize << 2;
+	inregs.x.edx = ysize << 2;
+	int386(0x33,&inregs,&outregs);
 
-   //
-   // Initialize shared status variables for new location
-   //
+	//
+	// Initialize shared status variables for new location
+	//
 
-   inregs.x.eax = 3;
-   int386(0x33,&inregs,&outregs);
-   *(WORD *) 0x4f4 = outregs.w.bx;
-   *(WORD *) 0x4f6 = outregs.w.cx;
-   *(WORD *) 0x4f8 = outregs.w.dx;
-#endif
+	inregs.x.eax = 3;
+	int386(0x33,&inregs,&outregs);
+	*(WORD *) 0x4f4 = outregs.w.bx;
+	*(WORD *) 0x4f6 = outregs.w.cx;
+	*(WORD *) 0x4f8 = outregs.w.dx;
+	#endif
 
-   if (!mouse_install_handler())
-      return 0;
+	if (!mouse_install_handler())
+	  return 0;
 
-   //
-   // Initialize windows used by pointer rendering
-   //
+	//
+	// Initialize windows used by pointer rendering
+	//
 
-   work.buffer = NULL;
-   save.buffer = NULL;
+	work.buffer = NULL;
+	save.buffer = NULL;
 
-   save.left = work.left = workp.left = 0;
-   save.top = work.top = workp.top = 0;
+	save.left = work.left = workp.left = 0;
+	save.top = work.top = workp.top = 0;
 
-   workp.window = &work;
+	workp.window = &work;
 
-   //
-   // Initialize mouse system variables: by default, mouse is unlocked,
-   // released, and hidden, with no valid pointer shape table and no exclusion
-   // area
-   //
+	//
+	// Initialize mouse system variables: by default, mouse is unlocked,
+	// released, and hidden, with no valid pointer shape table and no exclusion
+	// area
+	//
 
-   locked =  0;
-   held   =  0;
-   hidecnt = -1;
-   pointer_table = NULL;
-   excluded = 0;
+	locked =  0;
+	held   =  0;
+	hidecnt = -1;
+	pointer_table = NULL;
+	excluded = 0;
 
-   mouse_exclude_area(-1,-1,-1,-1);
+	mouse_exclude_area(-1,-1,-1,-1);
 
-   mouse_event_callback  = NULL;
-   button_event_callback = NULL;
-   watchdog_callback     = NULL;
+	mouse_event_callback  = NULL;
+	button_event_callback = NULL;
+	watchdog_callback     = NULL;
 
-   //
-   // Force service to validate mouse status variables
-   //
+	//
+	// Force service to validate mouse status variables
+	//
 
-   x = y = left = right = center = -1;
-   mouse_serve();
+	x = y = left = right = center = -1;
+	mouse_serve();
 
-   //
-   // Arrange for periodic background mouse service
-   //
-   // The mouse service rate should equal the vertical refresh period
-   // for smoothest cursor movement.  In 200-line mode, we assume a period
-   // of 70 Hz; otherwise, a 60 Hz timer rate is used
-   //
-   // If AIL/32 timer services are unavailable, the application must arrange
-   // for another source of periodic service.  The mouse_serve() routine may
-   // either be polled, or called from an interrupt handler.  To eliminate
-   // all mouse flicker, call mouse_serve() from an interrupt handler synced
-   // to the actual vertical retrace timing signal
-   //
+	//
+	// Arrange for periodic background mouse service
+	//
+	// The mouse service rate should equal the vertical refresh period
+	// for smoothest cursor movement.  In 200-line mode, we assume a period
+	// of 70 Hz; otherwise, a 60 Hz timer rate is used
+	//
+	// If AIL/32 timer services are unavailable, the application must arrange
+	// for another source of periodic service.  The mouse_serve() routine may
+	// either be polled, or called from an interrupt handler.  To eliminate
+	// all mouse flicker, call mouse_serve() from an interrupt handler synced
+	// to the actual vertical retrace timing signal
+	//
 
-   timer = AIL_register_timer(mouse_serve);
+	timer = AIL_register_timer(mouse_serve);
 
-   if (ysize >= 400)
-      AIL_set_timer_frequency(timer,60);
-   else
-      AIL_set_timer_frequency(timer,70);
+	if (ysize >= 400)
+	  AIL_set_timer_frequency(timer,60);
+	else
+	  AIL_set_timer_frequency(timer,70);
 
-   AIL_start_timer(timer);
+	AIL_start_timer(timer);
 
-   mouse_active = 1;
-   */
-   return 1;
+	mouse_active = 1;
+	*/
+	return 1;
 }
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
@@ -846,28 +830,27 @@ LONG mouse_init(LONG xsize, LONG ysize)
 //лл                                                                        лл
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-void mouse_shutdown(void)
-{
+void mouse_shutdown(void) {
 	/*
-   union REGS inregs,outregs;
+	union REGS inregs,outregs;
 
-   mouse_active = 0;
+	mouse_active = 0;
 
-   AIL_stop_timer(timer);
-   AIL_release_timer_handle(timer);
+	AIL_stop_timer(timer);
+	AIL_release_timer_handle(timer);
 
-   mouse_remove_handler();
+	mouse_remove_handler();
 
-   //
-   // Free real-mode memory used by event handler stub 
-   //
+	//
+	// Free real-mode memory used by event handler stub
+	//
 
-#ifdef DPMI             
-   inregs.x.eax = 0x101;
-   inregs.x.edx = real_event_sel;
-   int386(0x31,&inregs,&outregs);
-#endif
-   */
+	#ifdef DPMI
+	inregs.x.eax = 0x101;
+	inregs.x.edx = real_event_sel;
+	int386(0x31,&inregs,&outregs);
+	#endif
+	*/
 }
 
 } // End of namespace Aesop

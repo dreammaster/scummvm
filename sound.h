@@ -29,9 +29,9 @@
 
 namespace Aesop {
 
-	//
-	// Predefined sound block handles
-	//
+//
+// Predefined sound block handles
+//
 
 #define BLK_COMMON   0                 // COMMON sounds at EMS blocks 0-8
 #define END_COMMON   8
@@ -42,9 +42,9 @@ namespace Aesop {
 #define FIRST_COMMON 0                 // COMMON sound array indices = 0-49
 #define FIRST_LEVEL  50                // LEVEL sound array indices = 50-63
 
-	//
-	// COMMON sound array indices
-	//
+//
+// COMMON sound array indices
+//
 
 #define S_LAPC_HIT  0
 #define S_SWING1    1

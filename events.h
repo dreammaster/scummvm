@@ -37,29 +37,29 @@ namespace Aesop {
 #define NUM_EVTYPES 256
 
 enum EventType {
-	SYS_FREE				= 0,
-	SYS_TIMER				= 1,
-	SYS_MOUSEMOVE			= 2,
-	SYS_ENTER_REGION		= 3,
-	SYS_LEAVE_REGION		= 4,
-	SYS_LEFT_CLICK			= 5,
-	SYS_LEFT_RELEASE		= 6,
-	SYS_RIGHT_CLICK			= 7,
-	SYS_RIGHT_RELEASE		= 8,
-	SYS_CLICK				= 9,
-	SYS_RELEASE				= 10,
-	SYS_LEFT_CLICK_REGION	= 11,
-	SYS_LEFT_RELEASE_REGION	= 12,
-	SYS_RIGHT_CLICK_REGION	= 13,
-	SYS_RIGHT_RELEASE_REGION= 14,
-	SYS_CLICK_REGION		= 15,
-	SYS_RELEASE_REGION		= 16,
-	SYS_KEYDOWN				= 17
+    SYS_FREE                = 0,
+    SYS_TIMER               = 1,
+    SYS_MOUSEMOVE           = 2,
+    SYS_ENTER_REGION        = 3,
+    SYS_LEAVE_REGION        = 4,
+    SYS_LEFT_CLICK          = 5,
+    SYS_LEFT_RELEASE        = 6,
+    SYS_RIGHT_CLICK         = 7,
+    SYS_RIGHT_RELEASE       = 8,
+    SYS_CLICK               = 9,
+    SYS_RELEASE             = 10,
+    SYS_LEFT_CLICK_REGION   = 11,
+    SYS_LEFT_RELEASE_REGION = 12,
+    SYS_RIGHT_CLICK_REGION  = 13,
+    SYS_RIGHT_RELEASE_REGION = 14,
+    SYS_CLICK_REGION        = 15,
+    SYS_RELEASE_REGION      = 16,
+    SYS_KEYDOWN             = 17
 };
 enum NSX {
-	NSX_IN_REGION  = 0x100,		// notification status flags (high word)
-	NSX_OUT_REGION = 0x200,
-	NSX_TYPE       = 0x00FF		// notification event type mask (low word)
+    NSX_IN_REGION  = 0x100,     // notification status flags (high word)
+    NSX_OUT_REGION = 0x200,
+    NSX_TYPE       = 0x00FF     // notification event type mask (low word)
 };
 
 class AesopEngine;
@@ -110,10 +110,10 @@ private:
 	bool checkForNextFrameCounter();
 
 	/**
-	 * Timer callback routine; check for pending keyboard characters 60 times per second, 
+	 * Timer callback routine; check for pending keyboard characters 60 times per second,
 	 * and post SYS_TIMER events to the game's event queue 30 times per second.
 	 *
-	 * If a SYS_TIMER message is already in the queue, update its "heartbeat" parameter 
+	 * If a SYS_TIMER message is already in the queue, update its "heartbeat" parameter
 	 * instead of posting a new message
 	 *
 	 * Don't update system heartbeat count while hourglass cursor is active
@@ -160,8 +160,8 @@ private:
 	bool fetchEvent(AesopEvent &EV);
 
 	/**
-	 * Most event notifications are triggerable when/if the event's parameter 
-	 * is equal to the notify request's parameter.  SYS_TIMER events, however, 
+	 * Most event notifications are triggerable when/if the event's parameter
+	 * is equal to the notify request's parameter.  SYS_TIMER events, however,
 	 * become recognizable if the event parameter (heartbeat) is greater than
 	 * or equal to the notification parameter.
 	 *
@@ -260,7 +260,9 @@ public:
 	/**
 	 * Return the current game frame counter
 	 */
-	uint32 frameCounter() const { return _heartbeat; }
+	uint32 frameCounter() const {
+		return _heartbeat;
+	}
 
 	/**
 	 * Cancel all notification requests for a given entity or program object
@@ -286,8 +288,8 @@ public:
 	/**
 	 * Fetch the next event from the queue and fulfill any of its notification requests.
 	 *
-	 * System and input events are re-entered into the queue if any application 
-	 * events are pending; this prevents user- and system-level actions from 
+	 * System and input events are re-entered into the queue if any application
+	 * events are pending; this prevents user- and system-level actions from
 	 * pre-empting or invalidating application responses to earlier actions
 	 *
 	 * Stop processing notification chain if current event cancels request

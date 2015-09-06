@@ -35,23 +35,24 @@ enum ButtonFlag { LEFT_BUTTON = 1, RIGHT_BUTTON = 2 };
 
 
 static const char *const strs[] = {"SYS_FREE",
-                       "SYS_TIMER",
-                       "SYS_MOUSEMOVE",
-                       "SYS_ENTER_REGION",
-                       "SYS_LEAVE_REGION",
-                       "SYS_LEFT_CLICK",
-                       "SYS_LEFT_RELEASE",
-                       "SYS_RIGHT_CLICK",
-                       "SYS_RIGHT_RELEASE",
-                       "SYS_CLICK",
-                       "SYS_RELEASE",
-                       "SYS_LEFT_CLICK_REGION",
-                       "SYS_LEFT_RELEASE_REGION",
-                       "SYS_RIGHT_CLICK_REGION",
-                       "SYS_RIGHT_RELEASE_REGION",
-                       "SYS_CLICK_REGION",
-                       "SYS_RELEASE_REGION",
-                       "SYS_KEYDOWN"};
+                                   "SYS_TIMER",
+                                   "SYS_MOUSEMOVE",
+                                   "SYS_ENTER_REGION",
+                                   "SYS_LEAVE_REGION",
+                                   "SYS_LEFT_CLICK",
+                                   "SYS_LEFT_RELEASE",
+                                   "SYS_RIGHT_CLICK",
+                                   "SYS_RIGHT_RELEASE",
+                                   "SYS_CLICK",
+                                   "SYS_RELEASE",
+                                   "SYS_LEFT_CLICK_REGION",
+                                   "SYS_LEFT_RELEASE_REGION",
+                                   "SYS_RIGHT_CLICK_REGION",
+                                   "SYS_RIGHT_RELEASE_REGION",
+                                   "SYS_CLICK_REGION",
+                                   "SYS_RELEASE_REGION",
+                                   "SYS_KEYDOWN"
+                                  };
 
 /*----------------------------------------------------------------*/
 
@@ -75,7 +76,7 @@ void Events::initNotifyList(void) {
 
 	NR_first[SYS_FREE] = 0;
 
-	for (int i = 0; i<NR_LSIZE; i++) {
+	for (int i = 0; i < NR_LSIZE; i++) {
 		NR_list[i].next = i + 1;
 		NR_list[i].prev = i - 1;
 	}
@@ -153,7 +154,7 @@ void Events::pollEvents() {
 			mouseButtonEventHandler();
 			return;
 		default:
- 			break;
+			break;
 		}
 	}
 }
@@ -216,7 +217,7 @@ void Events::timerCallback() {
 	AesopEvent *EV;
 	++_heartbeat;
 
-	// Generate SYS_TIMER events every alternate timer call, so there are 30 per second 
+	// Generate SYS_TIMER events every alternate timer call, so there are 30 per second
 	if (!(_heartbeat & 1)) {
 		if ((EV = findEvent(SYS_TIMER, -1)) == nullptr)
 			addEvent(SYS_TIMER, _heartbeat >> 1, -1);
@@ -261,8 +262,7 @@ void Events::addRegionEvent(int type, int owner) {
 	NREQ *NR;
 
 	nxt = NR_first[type];
-	while (nxt != -1)
-	{
+	while (nxt != -1) {
 		NR = &NR_list[nxt];
 		nxt = NR->next;
 		r = NR->parameter;
@@ -296,23 +296,20 @@ void Events::cancelEntityRequests(int client) {
 	NREQ *NR;
 
 	// for all event types...
-	for (event = 1; event<NUM_EVTYPES; event++) {
+	for (event = 1; event < NUM_EVTYPES; event++) {
 		nxt = NR_first[event];                      // start at chain beginning
 
-		while (nxt != -1)                           // while not at end of chain
-		{
+		while (nxt != -1) {                         // while not at end of chain
 			cur = nxt;                               // get links
 			NR = &NR_list[cur];
 			nxt = NR->next;
 			prev = NR->prev;
 
-			if (client == -1)                        // for all clients?
-			{
+			if (client == -1) {                      // for all clients?
 				if ((NR->client >= NUM_ENTITIES) ||   // yes, filter out all non-
-					(NR->client == -1))               // entity clients
+				        (NR->client == -1))               // entity clients
 					continue;
-			}
-			else                                     // else match specified
+			} else                                   // else match specified
 				if (NR->client != client) continue;   // client
 
 			NR->client = -1;                         // invalidate the NREQ
@@ -328,13 +325,10 @@ void Events::cancelEntityRequests(int client) {
 
 			NR->next = -1;                           // append NREQ to FREE
 			fnxt = NR_first[SYS_FREE];               // chain...
-			if (fnxt == -1)
-			{
+			if (fnxt == -1) {
 				NR_first[SYS_FREE] = cur;
 				NR->prev = -1;
-			}
-			else
-			{
+			} else {
 				while (fnxt != -1)
 					fnxt = NR_list[fcur = fnxt].next;
 
@@ -392,40 +386,34 @@ void Events::mouseEventHandler() {
 		EV->parameter = ((ULONG)_mousePos.y << 16) | (ULONG)_mousePos.x;
 
 	nxt = NR_first[SYS_ENTER_REGION];
-	while (nxt != -1)
-	{
+	while (nxt != -1) {
 		NR = &NR_list[nxt];
 		nxt = NR->next;
 		r = NR->parameter;
 
-		if (mouseInWindow(r))
-		{
+		if (mouseInWindow(r)) {
 			if (NR->status & NSX_IN_REGION) continue;
 
 			NR->status |= NSX_IN_REGION;
 
 			addEvent(SYS_ENTER_REGION, r, -1);
-		}
-		else
+		} else
 			NR->status &= (~NSX_IN_REGION);
 	}
 
 	nxt = NR_first[SYS_LEAVE_REGION];
-	while (nxt != -1)
-	{
+	while (nxt != -1) {
 		NR = &NR_list[nxt];
 		nxt = NR->next;
 		r = NR->parameter;
 
-		if (!mouseInWindow(r))
-		{
+		if (!mouseInWindow(r)) {
 			if (!(NR->status & NSX_OUT_REGION)) continue;
 
 			NR->status &= (~NSX_OUT_REGION);
 
 			addEvent(SYS_LEAVE_REGION, r, -1);
-		}
-		else
+		} else
 			NR->status |= NSX_OUT_REGION;
 	}
 }
@@ -435,9 +423,9 @@ void Events::mouseButtonEventHandler() {
 		addEvent(_btnLeft ? SYS_CLICK : SYS_RELEASE, 0, -1);
 		addEvent(_btnLeft ? SYS_LEFT_CLICK : SYS_LEFT_RELEASE, 0, -1);
 		addRegionEvent(_btnLeft ?
-		SYS_LEFT_CLICK_REGION : SYS_LEFT_RELEASE_REGION, -1);
+		               SYS_LEFT_CLICK_REGION : SYS_LEFT_RELEASE_REGION, -1);
 		addRegionEvent(_btnLeft ?
-		SYS_CLICK_REGION : SYS_RELEASE_REGION, -1);
+		               SYS_CLICK_REGION : SYS_RELEASE_REGION, -1);
 
 		_btnLastLeft = _btnLeft;
 	}
@@ -446,7 +434,7 @@ void Events::mouseButtonEventHandler() {
 		addEvent(_btnRight ? SYS_CLICK : SYS_RELEASE, 0, -1);
 		addEvent(_btnRight ? SYS_RIGHT_CLICK : SYS_RIGHT_RELEASE, 0, -1);
 		addRegionEvent(_btnRight ?
-		SYS_RIGHT_CLICK_REGION : SYS_RIGHT_RELEASE_REGION, -1);
+		               SYS_RIGHT_CLICK_REGION : SYS_RIGHT_RELEASE_REGION, -1);
 		addRegionEvent(_btnRight ? SYS_CLICK_REGION : SYS_RELEASE_REGION, -1);
 
 		_btnLastRight = _btnRight;
@@ -488,13 +476,10 @@ void Events::addNotifyRequest(int client, uint32 message, int event, int paramet
 
 	nxt = NR_first[event];
 
-	if (nxt == -1)
-	{
+	if (nxt == -1) {
 		NR_first[event] = i;
 		NR->prev = -1;
-	}
-	else
-	{
+	} else {
 		while (nxt != -1)
 			nxt = NR_list[cur = nxt].next;
 
@@ -510,19 +495,17 @@ void Events::deleteNotifyRequest(int client, uint32 message, int event, int para
 	NREQ *NR;
 	LONG all_events;
 
-	if (event == (unsigned)-1) {
+	if (event == (unsigned) - 1) {
 		event = 1;
 		all_events = 1;
 	} else {
 		all_events = 0;
 	}
 
-	do
-	{
+	do {
 		nxt = NR_first[event];                      // start at chain beginning
 
-		while (nxt != -1)                           // while not at end of chain
-		{
+		while (nxt != -1) {                         // while not at end of chain
 			cur = nxt;                               // get links
 			NR = &NR_list[cur];
 			nxt = NR->next;
@@ -530,7 +513,7 @@ void Events::deleteNotifyRequest(int client, uint32 message, int event, int para
 
 			if (NR->client != client) continue;      // match specified parms
 
-			if (((ULONG)message != (unsigned)-1) && ((ULONG)message != NR->message))
+			if (((ULONG)message != (unsigned) - 1) && ((ULONG)message != NR->message))
 				continue;
 
 			if (!matchParameter(event, NR->parameter, parameter)) continue;
@@ -548,13 +531,10 @@ void Events::deleteNotifyRequest(int client, uint32 message, int event, int para
 
 			NR->next = -1;                           // append NREQ to FREE
 			fnxt = NR_first[SYS_FREE];               // chain...
-			if (fnxt == -1)
-			{
+			if (fnxt == -1) {
 				NR_first[SYS_FREE] = cur;
 				NR->prev = -1;
-			}
-			else
-			{
+			} else {
 				while (fnxt != -1)
 					fnxt = NR_list[fcur = fnxt].next;
 
@@ -597,7 +577,7 @@ void Events::dispatchEvent() {
 		return;
 
 	if ((typ >= FIRST_SYS_EVENT) && (typ <= LAST_SYS_EVENT) &&
-		(scanEventRange(FIRST_APP_EVENT, LAST_APP_EVENT) != nullptr)) {
+	        (scanEventRange(FIRST_APP_EVENT, LAST_APP_EVENT) != nullptr)) {
 		addEvent(typ, par, own);
 		return;
 	}
@@ -609,9 +589,9 @@ void Events::dispatchEvent() {
 		NR = &NR_list[nxt];
 		nxt = NR->next;
 
-		if ((NR->status & NSX_TYPE) != typ)	break;
-		if (NR->client == -1)				break;
-		if (typ != _currentEventType)		break;
+		if ((NR->status & NSX_TYPE) != typ) break;
+		if (NR->client == -1)               break;
+		if (typ != _currentEventType)       break;
 
 		if (matchParameter(typ, par, NR->parameter)) {
 			interp.addArgument(par);

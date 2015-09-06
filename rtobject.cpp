@@ -57,10 +57,10 @@ static char linbuf[256];
 /***************************************************/
 
 void init_object_list(void) {
-   LONG i;
+	LONG i;
 
-   for (i=0;i<NUM_OBJECTS;i++)
-      objlist[i] = HRES_NULL;
+	for (i = 0; i < NUM_OBJECTS; i++)
+		objlist[i] = HRES_NULL;
 }
 
 /***************************************************/
@@ -70,18 +70,17 @@ void init_object_list(void) {
 //
 /***************************************************/
 
-LONG find_free_entry(LONG min, LONG end)
-{
-   LONG i;
+LONG find_free_entry(LONG min, LONG end) {
+	LONG i;
 
-   for (i=min;i<end;i++)
-      if (objlist[i] == HRES_NULL)
-         break;
+	for (i = min; i < end; i++)
+		if (objlist[i] == HRES_NULL)
+			break;
 
-   if (i == end)
-      return -1;
-   else
-      return i;
+	if (i == end)
+		return -1;
+	else
+		return i;
 }
 
 /***************************************************/
@@ -90,8 +89,7 @@ LONG find_free_entry(LONG min, LONG end)
 //
 /***************************************************/
 
-void create_SOP_instance(ULONG name, LONG index)
-{
+void create_SOP_instance(ULONG name, LONG index) {
 	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	objlist[index] = res.create_instance(name);
@@ -102,54 +100,54 @@ void create_SOP_instance(ULONG name, LONG index)
 /***************************************************/
 //
 // Create a SOP object and return its object list index
-// 
+//
 // Returns -1 if no space in list
-// 
+//
 /***************************************************/
 
 
 LONG create_object(LONG argcnt, ULONG name)
 
 {
-   LONG index;
+	LONG index;
 
-   index = find_free_entry(0,NUM_ENTITIES);
+	index = find_free_entry(0, NUM_ENTITIES);
 
-   if (index != -1)
-      create_SOP_instance(name,index);
+	if (index != -1)
+		create_SOP_instance(name, index);
 
-   return index;
+	return index;
 }
 
 /***************************************************/
 //
 // Create a SOP program object at specified object list index
-// 
-// Dynamically assign an unused program object index if specified 
+//
+// Dynamically assign an unused program object index if specified
 // index == -1
-// 
+//
 /***************************************************/
 
 
 LONG create_program(LONG argcnt, LONG index, ULONG name)
 
 {
-   if (index == -1)
-      index = find_free_entry(NUM_ENTITIES,NUM_OBJECTS);
+	if (index == -1)
+		index = find_free_entry(NUM_ENTITIES, NUM_OBJECTS);
 
-   if (index != -1)
-      create_SOP_instance(name,index);
+	if (index != -1)
+		create_SOP_instance(name, index);
 
-   return index;
+	return index;
 }
 
 /***************************************************/
 //
 // Delete SOP object from object list
-// 
+//
 // Cancel any notifications for object, and release any
 // windows allocated by object
-// 
+//
 /***************************************************/
 
 
@@ -176,21 +174,18 @@ LONG destroy_object(LONG argcnt, LONG index) {
 //
 /***************************************************/
 
-void thrash_cache(void)
-{
+void thrash_cache(void) {
 	Resources &res = *_vm->_resources;
 	LONG i;
 	HRES handles[50];
 
-   for (i=0;i<3;i++)
-      {
-      handles[i] = res.alloc(i*20000,DA_MOVEABLE | DA_DISCARDABLE);
-      }
+	for (i = 0; i < 3; i++) {
+		handles[i] = res.alloc(i * 20000, DA_MOVEABLE | DA_DISCARDABLE);
+	}
 
-   for (i=0;i<3;i++)
-      {
-      res.free(handles[i]);
-      }
+	for (i = 0; i < 3; i++) {
+		res.free(handles[i]);
+	}
 }
 
 /***************************************************/
@@ -230,7 +225,7 @@ void dump_static_context(ULONG index, TF_class *TF) {
 	void *inst, *d;
 
 	strcpy(linbuf, "Entry ");
-	sprintf(&linbuf[6], "%d", (int)index);	
+	sprintf(&linbuf[6], "%d", (int)index);
 
 	i = strlen(linbuf);
 	linbuf[i] = ':';
@@ -239,8 +234,7 @@ void dump_static_context(ULONG index, TF_class *TF) {
 
 	instance = objlist[index];
 
-	if (instance == HRES_NULL)
-	{
+	if (instance == HRES_NULL) {
 		strcat(linbuf, "Available");
 		TF_writeln(TF, linbuf);
 		return;
@@ -254,7 +248,7 @@ void dump_static_context(ULONG index, TF_class *TF) {
 	SD = (SD_entry *)add_ptr(tptr, thdr._sdList);
 
 	expt = res.get_resource_handle(SD[thdr._nPrgs - 1].exports,
-		DA_TEMPORARY | DA_EVANESCENT);
+	                               DA_TEMPORARY | DA_EVANESCENT);
 	res.lock(expt);
 	linbuf[i + 2] = '"';
 	strcpy(&linbuf[i + 3], (const char *)interp.lookup(expt, "N:OBJECT"));
@@ -265,15 +259,14 @@ void dump_static_context(ULONG index, TF_class *TF) {
 	TF_writeln(TF, linbuf);
 	TF_writeln(TF, "{");
 
-	for (p = 0; p < thdr._nPrgs; p++)
-	{
+	for (p = 0; p < thdr._nPrgs; p++) {
 		tptr = Resources::addr(thunk);
 		SD = (SD_entry *)add_ptr(tptr, thdr._sdList);
 
 		offset = SD[p].static_base;
 
 		expt = res.get_resource_handle(SD[p].exports,
-			DA_TEMPORARY | DA_EVANESCENT);
+		                               DA_TEMPORARY | DA_EVANESCENT);
 		res.lock(expt);
 
 		def = (const char *)interp.lookup(expt, "N:OBJECT");
@@ -287,8 +280,7 @@ void dump_static_context(ULONG index, TF_class *TF) {
 		inst = add_ptr(Resources::addr(instance), offset);
 
 		dict = interp.first(Resources::addr(expt));
-		while ((dict = interp.iterate(Resources::addr(expt), dict, &tag, &def)) != 0)
-		{
+		while ((dict = interp.iterate(Resources::addr(expt), dict, &tag, &def)) != 0) {
 			type = tag[0];
 			if ((type != 'B') && (type != 'W') && (type != 'L'))
 				continue;
@@ -303,23 +295,28 @@ void dump_static_context(ULONG index, TF_class *TF) {
 			else
 				asize = 1;
 
-			for (n = 0; n < asize; n++)
-			{
-				switch (type)
-				{
-				case 'B': sprintf(val, "%d", *(BYTE *)d); d = add_ptr(d, 1L); break;
-				case 'W': sprintf(val, "%d", READ_LE_UINT16(d)); d = add_ptr(d, 2L); break;
-				case 'L': sprintf(val, "%d", (int32)READ_LE_UINT32(d)); d = add_ptr(d, 4L); break;
+			for (n = 0; n < asize; n++) {
+				switch (type) {
+				case 'B':
+					sprintf(val, "%d", *(BYTE *)d);
+					d = add_ptr(d, 1L);
+					break;
+				case 'W':
+					sprintf(val, "%d", READ_LE_UINT16(d));
+					d = add_ptr(d, 2L);
+					break;
+				case 'L':
+					sprintf(val, "%d", (int32)READ_LE_UINT32(d));
+					d = add_ptr(d, 4L);
+					break;
 				}
 
 				strcat(linbuf, val);
 
-				if (n != asize - 1)
-				{
+				if (n != asize - 1) {
 					strcat(linbuf, ",");
 
-					if (!((n + 1) % 10))
-					{
+					if (!((n + 1) % 10)) {
 						TF_writeln(TF, linbuf);
 						strcpy(linbuf, "      ");
 					}
@@ -346,13 +343,13 @@ void dump_static_context(ULONG index, TF_class *TF) {
 LONG readln(TF_class *TF, BYTE *buffer, LONG maxlen)
 
 {
-   LONG status;
+	LONG status;
 
-   do
-      status = TF_readln(TF,linbuf,sizeof(linbuf));
-   while (status && (linbuf[0] == ';'));
+	do
+		status = TF_readln(TF, linbuf, sizeof(linbuf));
+	while (status && (linbuf[0] == ';'));
 
-   return status;
+	return status;
 }
 
 /***************************************************/
@@ -363,8 +360,7 @@ LONG readln(TF_class *TF, BYTE *buffer, LONG maxlen)
 //
 /***************************************************/
 
-CDESC *read_context_descriptor(TF_class *TF)
-{
+CDESC *read_context_descriptor(TF_class *TF) {
 	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	static CDESC c;
@@ -378,13 +374,12 @@ CDESC *read_context_descriptor(TF_class *TF)
 
 	num = &linbuf[6];
 
-	c.size = (UWORD)-1;
+	c.size = (UWORD) - 1;
 	c.slot = (UWORD)ascnum(num);
 
 	name = strchr(num, '"');
-	if (name == NULL)
-	{
-		c.name = (ULONG)-1L;
+	if (name == NULL) {
+		c.name = (ULONG) - 1L;
 		return &c;
 	}
 
@@ -412,8 +407,7 @@ CDESC *read_context_descriptor(TF_class *TF)
 //
 /***************************************************/
 
-void restore_static_context(HRES instance, TF_class *TF)
-{
+void restore_static_context(HRES instance, TF_class *TF) {
 	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	ULONG n, i, p, offset = 0, asize;
@@ -428,27 +422,24 @@ void restore_static_context(HRES instance, TF_class *TF)
 	thunk = ((IHDR *)Resources::addr(instance))->_thunk;
 	thdr = *((THDR *)Resources::addr(thunk));
 
-	while (readln(TF, (BYTE *)linbuf, sizeof(linbuf)))
-	{
+	while (readln(TF, (BYTE *)linbuf, sizeof(linbuf))) {
 		if (linbuf[0] == '{')
 			continue;
 		else if (linbuf[0] == '}')
 			break;
-		else if (linbuf[0] == '[')
-		{
+		else if (linbuf[0] == '[') {
 			if ((tag = strchr(linbuf, ']')) != NULL)
-				*tag = 0;
+				* tag = 0;
 			tag = strchr(linbuf, '[') + 1;
 
-			for (p = 0; p < thdr._nPrgs; p++)
-			{
+			for (p = 0; p < thdr._nPrgs; p++) {
 				tptr = Resources::addr(thunk);
 				SD = (SD_entry *)add_ptr(tptr, thdr._sdList);
 
 				offset = SD[p].static_base;
 
 				expt = res.get_resource_handle(SD[p].exports,
-					DA_TEMPORARY | DA_EVANESCENT);
+				                               DA_TEMPORARY | DA_EVANESCENT);
 
 				res.lock(expt);
 				def = (const char *)interp.lookup(expt, "N:OBJECT");
@@ -461,9 +452,7 @@ void restore_static_context(HRES instance, TF_class *TF)
 
 			if (p == thdr._nPrgs)
 				abend(MSG_CMCR, tag);       //"Class '%s' missing; cannot restore"
-		}
-		else
-		{
+		} else {
 			tag = linbuf;
 
 			//Skip leading white-space
@@ -498,13 +487,11 @@ void restore_static_context(HRES instance, TF_class *TF)
 			if (chrpnt == NULL)
 				abend(MSG_BDIE);           //"Bad data item entry"
 
-			for (n = 0; n < asize; n++)
-			{
+			for (n = 0; n < asize; n++) {
 
 				//Skip to data
 
-				while ((!isnum(*chrpnt)) && (*chrpnt != '\''))
-				{
+				while ((!isnum(*chrpnt)) && (*chrpnt != '\'')) {
 					if (!(*chrpnt))
 						break;
 					else
@@ -513,28 +500,36 @@ void restore_static_context(HRES instance, TF_class *TF)
 
 				//Get Next Line if needed
 
-				if ((!(*chrpnt)) && (n != asize - 1))
-				{
+				if ((!(*chrpnt)) && (n != asize - 1)) {
 					readln(TF, (BYTE *)linbuf, sizeof(linbuf));
 					chrpnt = linbuf;
 				}
 
 				//Store data from text file in Instance
 
-				switch (name[0])
-				{
-				case 'B': *(BYTE *)d = (BYTE)ascnum(chrpnt); break;
-				case 'W': *(WORD *)d = (WORD)ascnum(chrpnt); break;
-				case 'L': *(LONG *)d = (LONG)ascnum(chrpnt); break;
+				switch (name[0]) {
+				case 'B':
+					*(BYTE *)d = (BYTE)ascnum(chrpnt);
+					break;
+				case 'W':
+					*(WORD *)d = (WORD)ascnum(chrpnt);
+					break;
+				case 'L':
+					*(LONG *)d = (LONG)ascnum(chrpnt);
+					break;
 				}
 
-				if (n != asize - 1)
-				{
-					switch (name[0])
-					{
-					case 'B': d = ((BYTE *)d + 1); break;
-					case 'W': d = ((BYTE *)d + 2); break;
-					case 'L': d = ((BYTE *)d + 4); break;
+				if (n != asize - 1) {
+					switch (name[0]) {
+					case 'B':
+						d = ((BYTE *)d + 1);
+						break;
+					case 'W':
+						d = ((BYTE *)d + 2);
+						break;
+					case 'L':
+						d = ((BYTE *)d + 4);
+						break;
 					}
 
 					while (isnum(*chrpnt) || (*chrpnt == ' ') || (*chrpnt == '\''))
@@ -553,86 +548,75 @@ void restore_static_context(HRES instance, TF_class *TF)
 //
 /*********************************************************/
 
-LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
-{
+LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last) {
 	LONG good;
 	ULONG index;
-   UBYTE typetest;
-   TF_class *TF;
-   HRES instance,thunk;
-   HD_entry *hd_inst;
-   void *tptr;
-   THDR thdr;
-   CDESC CD;
+	UBYTE typetest;
+	TF_class *TF;
+	HRES instance, thunk;
+	HD_entry *hd_inst;
+	void *tptr;
+	THDR thdr;
+	CDESC CD;
 
-   good = 1;
+	good = 1;
 
-   if (filetype == SF_TXT)
-      {
-      TF = TF_construct(filename,TF_WRITE);
-      if (TF == NULL)
-         return 0;
+	if (filetype == SF_TXT) {
+		TF = TF_construct(filename, TF_WRITE);
+		if (TF == NULL)
+			return 0;
 
-      for (index=first;index<=last;index++)
-         {
-         dump_static_context(index,TF);
+		for (index = first; index <= last; index++) {
+			dump_static_context(index, TF);
 
-         if (!TF_writeln(TF,""))
-            {
-            good = 0;
-            break;
-            };
-         }
+			if (!TF_writeln(TF, "")) {
+				good = 0;
+				break;
+			};
+		}
 
-      TF_destroy(TF);
-      }
-   else
-      {
-		  Common::DumpFile f;
-		  if (!f.open(filename))
-			  return 0;
+		TF_destroy(TF);
+	} else {
+		Common::DumpFile f;
+		if (!f.open(filename))
+			return 0;
 
-      typetest = 26;
-	  f.writeByte(typetest);
+		typetest = 26;
+		f.writeByte(typetest);
 
-      for (index=first;index<=last;index++)
-         {
-         CD.slot = index;
+		for (index = first; index <= last; index++) {
+			CD.slot = index;
 
-         instance = objlist[index];
-         if (instance == HRES_NULL)
-            {
-            CD.name = (ULONG)-1;
-            CD.size = 0;
-            }
-         else
-            {
-            thunk = ((IHDR *) Resources::addr(instance))->_thunk;
+			instance = objlist[index];
+			if (instance == HRES_NULL) {
+				CD.name = (ULONG) - 1;
+				CD.size = 0;
+			} else {
+				thunk = ((IHDR *) Resources::addr(instance))->_thunk;
 
-            tptr = Resources::addr(thunk);
-            thdr = *((THDR *) tptr);
+				tptr = Resources::addr(thunk);
+				thdr = *((THDR *) tptr);
 
-            hd_inst = (HD_entry *) instance;
-            CD.name = hd_inst->_user;
-            CD.size = thdr._iSize - sizeof(IHDR);
-            }
+				hd_inst = (HD_entry *) instance;
+				CD.name = hd_inst->_user;
+				CD.size = thdr._iSize - sizeof(IHDR);
+			}
 
-		 error("TODO: CDESC::save & IHDR::save");
-         //f.write(&CD,sizeof(CDESC));
+			error("TODO: CDESC::save & IHDR::save");
+			//f.write(&CD,sizeof(CDESC));
 
-         if (CD.size)
-            if (f.write(add_ptr(Resources::addr(objlist[index]),sizeof(IHDR)),
-                      CD.size) != CD.size)
-               {
-               good = 0;
-               break;
-               }
-         }
+			if (CD.size)
+				if (f.write(add_ptr(Resources::addr(objlist[index]), sizeof(IHDR)),
+				            CD.size) != CD.size) {
+					good = 0;
+					break;
+				}
+		}
 
-      f.close();
-      }
+		f.close();
+	}
 
-   return good;
+	return good;
 }
 
 /*********************************************************/
@@ -650,7 +634,7 @@ LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
 //       If slot entry exists, destroy it
 //       Continue
 //
-//   If slot entry exists 
+//   If slot entry exists
 //       If CDESC.name != current entry's name
 //          Destroy the current entry to make room for the new one
 //       Else
@@ -668,8 +652,7 @@ LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last)
 //
 /*********************************************************/
 
-void restore_range(const char *filename, ULONG first, ULONG last, ULONG restoring)
-{
+void restore_range(const char *filename, ULONG first, ULONG last, ULONG restoring) {
 	Interpreter &interp = *_vm->_interpreter;
 	ULONG bad, txttype;
 	ULONG index;
@@ -690,20 +673,17 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 	Common::File f;
 	if (!f.open(filename))
 		bad = 1;
-	else
-	{
+	else {
 		typetest = 0;
 		typetest = f.readByte();
 
-		if (typetest != 26)
-		{
+		if (typetest != 26) {
 			f.close();
 			txttype = 1;
 		}
 	}
 
-	if (txttype)
-	{
+	if (txttype) {
 		TF = TF_construct(filename, TF_READ);
 		bad = (TF == NULL);
 	}
@@ -711,18 +691,14 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 	if (bad)
 		abend(MSG_CNOCF, filename);          //"Could not open context file '%s'"
 
-	for (index = first; index <= last; index++)
-	{
+	for (index = first; index <= last; index++) {
 		cur = objlist[index];
 
-		if (txttype)
-		{
+		if (txttype) {
 			CD = read_context_descriptor(TF);
 
 			bad = (CD == NULL);
-		}
-		else
-		{
+		} else {
 			CD = &stat_C;
 			error("TODO: CDESC::load");
 			bad = f.read(CD, sizeof(CDESC)) != sizeof(CDESC);
@@ -735,48 +711,36 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 		CDname = CD->name;
 		CDsize = CD->size;
 
-		if (CD->name == (ULONG)-1L)
-		{
-			if (cur != HRES_NULL)
-			{
+		if (CD->name == (ULONG) - 1L) {
+			if (cur != HRES_NULL) {
 				destroy_object(0, index);
 			}
 
 			continue;
 		}
 
-		if (cur != HRES_NULL)
-		{
+		if (cur != HRES_NULL) {
 			sel = (HD_entry *)cur;
 
-			if (sel->_user != CD->name)
-			{
+			if (sel->_user != CD->name) {
 				destroy_object(0, index);
-			}
-			else
-			{
+			} else {
 				_vm->_events->cancelEntityRequests(index);
 				_vm->_screen->releaseOwnedWindows(index);
 			}
 		}
 
-		if (objlist[index] == HRES_NULL)
-		{
+		if (objlist[index] == HRES_NULL) {
 			create_SOP_instance(CD->name, index);
 		}
 
-		if (txttype)
-		{
+		if (txttype) {
 			restore_static_context(objlist[index], TF);
+		} else if (CD->size) {
+			f.read((BYTE *)Resources::addr(objlist[index]) + sizeof(IHDR), CD->size);
 		}
-		else
-			if (CD->size)
-			{
-				f.read((BYTE *)Resources::addr(objlist[index]) + sizeof(IHDR), CD->size);
-			}
 
-		if (restoring)
-		{
+		if (restoring) {
 			interp.execute(index, MSG_RESTORE);
 		}
 	}
@@ -792,7 +756,7 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 // Translate static context file from text to binary format
 //
 // For each entry in file:
-// 
+//
 // Read entry's context descriptor
 // Save descriptor to binary file
 //
@@ -806,15 +770,14 @@ void restore_range(const char *filename, ULONG first, ULONG last, ULONG restorin
 //   Restore instance from text file
 //   Save instance to binary file
 //   Destroy instance
-// 
+//
 // Errors during context file translation are fatal at the system level;
 // this routine will not return if translation fails
 //
 /*********************************************************/
 
 void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG first,
-	ULONG last)
-{
+                    ULONG last) {
 	Resources &res = *_vm->_resources;
 	TF_class *TF;
 	CDESC *CD;
@@ -836,8 +799,7 @@ void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG fi
 	if (TF == NULL)
 		abend(MSG_COIFFT);      //"Couldn't open input file for translation"
 
-	for (index = first; index <= (LONG)last; index++)
-	{
+	for (index = first; index <= (LONG)last; index++) {
 		CD = read_context_descriptor(TF);
 		if ((CD == NULL) || (CD->slot != index))
 			abend(MSG_CTCFE, index); //"Couldn't translate context file entry %u"
@@ -845,8 +807,7 @@ void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG fi
 		CD_out.name = CD->name;
 		CD_out.slot = index;
 
-		if (CD->name != (ULONG)-1L)
-		{
+		if (CD->name != (ULONG) - 1L) {
 			instance = res.create_instance(CD->name);
 
 			thunk = ((IHDR *)Resources::addr(instance))->_thunk;
@@ -861,19 +822,15 @@ void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG fi
 
 			restore_static_context(instance, TF);
 
-			if (CD_out.size)
-			{
+			if (CD_out.size) {
 				if (f.write(add_ptr(Resources::addr(instance), sizeof(IHDR)), CD_out.size)
-					!= CD_out.size)
-				{
+				        != CD_out.size) {
 					abend(MSG_CWTE, index);  //"Couldn't write translated entry %u"
 				}
 			}
 
 			res.destroy_instance(instance);
-		}
-		else
-		{
+		} else {
 			CD_out.size = 0;
 			error("TODO: CDESC::save");
 			//write(handle,&CD_out,sizeof(CDESC));

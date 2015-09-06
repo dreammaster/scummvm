@@ -37,11 +37,11 @@ struct STKVAL {
 };
 
 enum {
-	TYP_CRES,                  // data type: code resource address
-	TYP_SRES,                  // data type: string resource
-	TYP_VSHR,                  // data type: short integer variable
-	TYP_VLNG,                  // data type: long integer variable
-	TYP_SVAR                   // data type: string variable
+    TYP_CRES,                  // data type: code resource address
+    TYP_SRES,                  // data type: string resource
+    TYP_VSHR,                  // data type: short integer variable
+    TYP_VLNG,                  // data type: long integer variable
+    TYP_SVAR                   // data type: string variable
 };
 
 #define GAME_STARTUP_STATE 0x4f0
@@ -448,13 +448,13 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 		const MV_entry *mvList = (const MV_entry *)((const byte *)_thunk + _thunk->_mvList);
 		UWORD maxMsg = _thunk->_maxMsg;
 
-		if (maxMsg == (UWORD)-1)
+		if (maxMsg == (UWORD) - 1)
 			return -1;
 		_currentMsg = msgNum;
 
 		// Find the vector using a binary search
 		int idx;
-		for (idx = 0; mvList[(maxMsg + idx) & 0xfffe].msg != msgNum; ) {			
+		for (idx = 0; mvList[(maxMsg + idx) & 0xfffe].msg != msgNum;) {
 			int offset = (maxMsg + idx) & 0xfffe;
 			int msg = mvList[offset].msg;
 
@@ -494,13 +494,14 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_offThis = _currentIndex;
 	_breakFlag = false;
 
-	// Initialize the stack. The original only used two bytes 
+	// Initialize the stack. The original only used two bytes
 	_stackBase = _stack.size();
 	_stack.push(index);
-	int count = READ_LE_UINT16(_code) - 2; _code += 2;
+	int count = READ_LE_UINT16(_code) - 2;
+	_code += 2;
 	assert((count % 4) == 0);
 	_stack.reserve(count / 4);
-	
+
 	// Main opcode execution loop
 	while (!_vm->shouldQuit() && !_breakFlag) {
 		int opcode = *_code++;
@@ -541,7 +542,8 @@ void Interpreter::cmdBRA() {
 void Interpreter::cmdCASE() {
 	// Get value of test expression
 	ULONG v = _stack.pop();
-	int numCases = READ_LE_UINT16(_code); _code += 2;
+	int numCases = READ_LE_UINT16(_code);
+	_code += 2;
 
 	// Scan through case list to find a matching value
 	for (int idx = 0; idx < numCases; ++idx, _code += 6) {
@@ -704,21 +706,24 @@ void Interpreter::cmdDEC() {
 
 void Interpreter::cmdSHTC() {
 	_stack.top() = *_code++;
-}	
+}
 
 void Interpreter::cmdINTC() {
-	uint16 v = READ_LE_UINT16(_code); _code += 2;
+	uint16 v = READ_LE_UINT16(_code);
+	_code += 2;
 	_stack.top() = v;
 }
 
 void Interpreter::cmdLNGC() {
-	uint32 v = READ_LE_UINT32(_code); _code += 4;
+	uint32 v = READ_LE_UINT32(_code);
+	_code += 4;
 	_stack.top() = v;
 }
 
 void Interpreter::cmdRCRS() {
 	// Get index into method offset list
-	uint offset = READ_LE_UINT16(_code); _code += 2;
+	uint offset = READ_LE_UINT16(_code);
+	_code += 2;
 	uint32 methodNum = READ_LE_UINT32((const byte *)_thunk + _externOffset + offset);
 
 	// Validate that it's a correctly formatted method number, then push it to the stack
@@ -755,7 +760,8 @@ void Interpreter::cmdSEND() {
 		params.insert_at(0, _stack.pop());
 
 	// Get the execution parameters
-	int msgNum = READ_LE_UINT16(_code); _code += 2;
+	int msgNum = READ_LE_UINT16(_code);
+	_code += 2;
 	int index = _stack.pop();
 
 	// Save the stack size and and other necessary fields
@@ -810,19 +816,21 @@ void Interpreter::cmdPASS() {
 
 void Interpreter::cmdJSR() {
 	// Get the subroutine method offset, and save details for where to resume
-	uint16 methodOffset = READ_LE_UINT16(_code); _code += 2;
+	uint16 methodOffset = READ_LE_UINT16(_code);
+	_code += 2;
 	_methodStack.push(MethodStackEntry(_ds32, _code, _stack.size(), _stackBase));
-	
+
 	// Set code and stack start
 	_code = _ds32 + methodOffset;
 	_stackBase = _stack.size();
 	_offThis = _currentIndex;
 
-	// Initialize manifest THIS var	
+	// Initialize manifest THIS var
 	_stack.push(_currentIndex);
 
 	// Set up the method autos
-	uint numAutos = READ_LE_UINT16(_code); _code += 2;
+	uint numAutos = READ_LE_UINT16(_code);
+	_code += 2;
 	for (uint idx = 0; idx < numAutos / 4; ++idx)
 		_stack.push(Parameter());
 }
@@ -841,7 +849,8 @@ void Interpreter::cmdRTS() {
 
 void Interpreter::cmdAIM() {
 	ULONG v1 = _stack.pop() & 0xffff;
-	ULONG v2 = READ_LE_UINT16(_code); _code += 2;
+	ULONG v2 = READ_LE_UINT16(_code);
+	_code += 2;
 	int index = v1 * v2;
 	_stack.push(_stack.pop() + index);
 }
@@ -854,31 +863,36 @@ void Interpreter::cmdAIS() {
 }
 
 void Interpreter::cmdLTBA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	uint32 offset = READ_LE_UINT16(_code);
+	_code += 2;
 	const byte *srcP = _ds32 + offset + _stack.pop();
 	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLTWA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	uint32 offset = READ_LE_UINT16(_code);
+	_code += 2;
 	const byte *srcP = _ds32 + offset + _stack.pop();
 	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLTDA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	uint32 offset = READ_LE_UINT16(_code);
+	_code += 2;
 	const byte *srcP = _ds32 + offset + _stack.pop();
 	_stack.push(READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdLETA() {
-	uint32 offset = READ_LE_UINT16(_code); _code += 2;
+	uint32 offset = READ_LE_UINT16(_code);
+	_code += 2;
 	BYTE *srcP = (BYTE *)_ds32 + offset;
 	_stack.push((BYTE *)srcP);
 }
 
 void Interpreter::cmdLAB() {
-	uint32 index4 = READ_LE_UINT16(_code); _code += 2;
+	uint32 index4 = READ_LE_UINT16(_code);
+	_code += 2;
 	assert(index4 == 0 || (index4 % 4) == 2);
 	int index = index4 ? (index4 + 2) / 4 : 0;
 
@@ -887,7 +901,8 @@ void Interpreter::cmdLAB() {
 }
 
 void Interpreter::cmdLAW() {
-	uint32 index4 = READ_LE_UINT16(_code); _code += 2;
+	uint32 index4 = READ_LE_UINT16(_code);
+	_code += 2;
 	assert(index4 == 0 || (index4 % 4) == 2);
 	int index = index4 ? (index4 + 2) / 4 : 0;
 
@@ -896,7 +911,8 @@ void Interpreter::cmdLAW() {
 }
 
 void Interpreter::cmdLAD() {
-	uint32 index4 = READ_LE_UINT16(_code); _code += 2;
+	uint32 index4 = READ_LE_UINT16(_code);
+	_code += 2;
 	assert(index4 == 0 || (index4 % 4) == 2);
 	int index = index4 ? (index4 + 2) / 4 : 0;
 
@@ -905,7 +921,8 @@ void Interpreter::cmdLAD() {
 }
 
 void Interpreter::cmdSAB() {
-	int index4 = READ_LE_UINT16(_code); _code += 2;
+	int index4 = READ_LE_UINT16(_code);
+	_code += 2;
 	assert(index4 == 0 || (index4 % 4) == 2);
 	int index = index4 ? (index4 + 2) / 4 : 0;
 
@@ -914,7 +931,8 @@ void Interpreter::cmdSAB() {
 }
 
 void Interpreter::cmdSAW() {
-	int index4 = READ_LE_UINT16(_code); _code += 2;
+	int index4 = READ_LE_UINT16(_code);
+	_code += 2;
 	assert(index4 == 0 || (index4 % 4) == 2);
 	int index = index4 ? (index4 + 2) / 4 : 0;
 
@@ -923,7 +941,8 @@ void Interpreter::cmdSAW() {
 }
 
 void Interpreter::cmdSAD() {
-	int index4 = READ_LE_UINT16(_code); _code += 2;
+	int index4 = READ_LE_UINT16(_code);
+	_code += 2;
 	assert(index4 == 0 || (index4 % 4) == 2);
 	int index = index4 ? (index4 + 2) / 4 : 0;
 
@@ -931,7 +950,8 @@ void Interpreter::cmdSAD() {
 }
 
 void Interpreter::cmdLABA() {
-	int index4 = READ_LE_UINT16(_code); _code += 2;
+	int index4 = READ_LE_UINT16(_code);
+	_code += 2;
 	assert(index4 == 0 || (index4 % 4) == 2);
 	int index = index4 ? (index4 + 2) / 4 : 0;
 
@@ -943,7 +963,8 @@ void Interpreter::cmdLABA() {
 }
 
 void Interpreter::cmdLAWA() {
-	int index4 = READ_LE_UINT16(_code); _code += 2;
+	int index4 = READ_LE_UINT16(_code);
+	_code += 2;
 	assert(index4 == 0 || (index4 % 4) == 2);
 	int index = index4 ? (index4 + 2) / 4 : 0;
 
@@ -955,7 +976,8 @@ void Interpreter::cmdLAWA() {
 }
 
 void Interpreter::cmdLADA() {
-	int index4 = READ_LE_UINT16(_code); _code += 2;
+	int index4 = READ_LE_UINT16(_code);
+	_code += 2;
 	assert(index4 == 0 || (index4 % 4) == 2);
 	int index = index4 ? (index4 + 2) / 4 : 0;
 
@@ -968,7 +990,8 @@ void Interpreter::cmdLADA() {
 
 void Interpreter::cmdSABA() {
 	int val = _stack.pop();
-	int offset = READ_LE_UINT16(_code); _code += 2;
+	int offset = READ_LE_UINT16(_code);
+	_code += 2;
 	int subIndex = _stack.pop();
 	assert((offset % 4) == 0 && (subIndex % 4) == 0);
 
@@ -977,7 +1000,8 @@ void Interpreter::cmdSABA() {
 
 void Interpreter::cmdSAWA() {
 	int val = _stack.pop();
-	int offset = READ_LE_UINT16(_code); _code += 2;
+	int offset = READ_LE_UINT16(_code);
+	_code += 2;
 	int subIndex = _stack.pop();
 	assert((offset % 4) == 0 && (subIndex % 4) == 0);
 
@@ -986,7 +1010,8 @@ void Interpreter::cmdSAWA() {
 
 void Interpreter::cmdSADA() {
 	int val = _stack.pop();
-	int offset = READ_LE_UINT16(_code); _code += 2;
+	int offset = READ_LE_UINT16(_code);
+	_code += 2;
 	int subIndex = _stack.pop();
 	assert((offset % 4) == 0 && (subIndex % 4) == 0);
 
@@ -994,7 +1019,8 @@ void Interpreter::cmdSADA() {
 }
 
 void Interpreter::cmdLEAA() {
-	int offset = READ_LE_UINT16(_code); _code += 2;
+	int offset = READ_LE_UINT16(_code);
+	_code += 2;
 	assert((offset % 4) == 0);
 
 	BYTE *ptr = (BYTE *)&_stack[_stackBase + (offset / 4)];
@@ -1003,63 +1029,72 @@ void Interpreter::cmdLEAA() {
 }
 
 void Interpreter::cmdLSB() {
-	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	uint32 offset = READ_LE_UINT32(_code);
+	_code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset;
 
 	_stack.top() = *srcP;
 }
 
 void Interpreter::cmdLSW() {
-	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	uint32 offset = READ_LE_UINT32(_code);
+	_code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset;
 
 	_stack.top() = READ_LE_UINT16(srcP);
 }
 
 void Interpreter::cmdLSD() {
-	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	uint32 offset = READ_LE_UINT32(_code);
+	_code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset;
 
 	_stack.top() = READ_LE_UINT32(srcP);
 }
 
 void Interpreter::cmdSSB() {
-	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	uint32 offset = READ_LE_UINT32(_code);
+	_code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset;
 
 	*destP = _stack.top() & 0xff;
 }
 
 void Interpreter::cmdSSW() {
-	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	uint32 offset = READ_LE_UINT32(_code);
+	_code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset;
 
 	WRITE_LE_UINT16(destP, _stack.top() & 0xffff);
 }
 
 void Interpreter::cmdSSD() {
-	uint32 offset = READ_LE_UINT32(_code); _code += 2;
+	uint32 offset = READ_LE_UINT32(_code);
+	_code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset;
 
 	WRITE_LE_UINT32(destP, _stack.top());
 }
 
 void Interpreter::cmdLSBA() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLSWA() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLSDA() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	_stack.push(READ_LE_UINT32(srcP));
@@ -1067,7 +1102,8 @@ void Interpreter::cmdLSDA() {
 
 void Interpreter::cmdSSBA() {
 	ULONG val = _stack.pop();
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	*destP = val;
@@ -1075,7 +1111,8 @@ void Interpreter::cmdSSBA() {
 
 void Interpreter::cmdSSWA() {
 	ULONG val = _stack.pop();
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	WRITE_LE_UINT16(destP, val);
@@ -1083,21 +1120,24 @@ void Interpreter::cmdSSWA() {
 
 void Interpreter::cmdSSDA() {
 	ULONG val = _stack.pop();
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
 
 	WRITE_LE_UINT32(destP, val);
 }
 
 void Interpreter::cmdLESA() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	BYTE *srcP = (BYTE *)_thunk + _staticOffset + offset;
 
 	_stack.top() = srcP;
 }
 
 void Interpreter::cmdLXB() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1108,7 +1148,8 @@ void Interpreter::cmdLXB() {
 }
 
 void Interpreter::cmdLXW() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1119,7 +1160,8 @@ void Interpreter::cmdLXW() {
 }
 
 void Interpreter::cmdLXD() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1132,7 +1174,8 @@ void Interpreter::cmdLXD() {
 void Interpreter::cmdSXB() {
 	ULONG val = _stack.pop() & 0xff;
 
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1146,7 +1189,8 @@ void Interpreter::cmdSXB() {
 void Interpreter::cmdSXW() {
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1160,7 +1204,8 @@ void Interpreter::cmdSXW() {
 void Interpreter::cmdSXD() {
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1172,7 +1217,8 @@ void Interpreter::cmdSXD() {
 }
 
 void Interpreter::cmdLXBA() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1185,7 +1231,8 @@ void Interpreter::cmdLXBA() {
 }
 
 void Interpreter::cmdLXWA() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1198,7 +1245,8 @@ void Interpreter::cmdLXWA() {
 }
 
 void Interpreter::cmdLXDA() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1213,7 +1261,8 @@ void Interpreter::cmdLXDA() {
 void Interpreter::cmdSXBA() {
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1229,7 +1278,8 @@ void Interpreter::cmdSXBA() {
 void Interpreter::cmdSXWA() {
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1245,7 +1295,8 @@ void Interpreter::cmdSXWA() {
 void Interpreter::cmdSXDA() {
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1259,7 +1310,8 @@ void Interpreter::cmdSXDA() {
 }
 
 void Interpreter::cmdLEXA() {
-	ULONG offset = READ_LE_UINT16(_code); _code += 2;
+	ULONG offset = READ_LE_UINT16(_code);
+	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
@@ -1277,7 +1329,8 @@ void Interpreter::cmdSXAS() {
 }
 
 void Interpreter::cmdLECA() {
-	ULONG val = READ_LE_UINT16(_code); _code += 2;
+	ULONG val = READ_LE_UINT16(_code);
+	_code += 2;
 	_stack.top() = (BYTE *)_ds32 + val;
 }
 
@@ -1348,11 +1401,16 @@ Parameter Interpreter::pokeMem(Parameters params) {
 Parameter Interpreter::peekMem(Parameters params) {
 	if (params[0] == GAME_STARTUP_STATE) {
 		switch (_startupState) {
-		case SS_CINE: return MKTAG('C', 'I', 'N', 'E');
-		case SS_VICT: return MKTAG('V', 'I', 'C', 'T');
-		case SS_CHGN: return MKTAG('C', 'H', 'G', 'N');
-		case SS_INTR: return MKTAG('I', 'N', 'T', 'R');
-		default: return Parameter();
+		case SS_CINE:
+			return MKTAG('C', 'I', 'N', 'E');
+		case SS_VICT:
+			return MKTAG('V', 'I', 'C', 'T');
+		case SS_CHGN:
+			return MKTAG('C', 'H', 'G', 'N');
+		case SS_INTR:
+			return MKTAG('I', 'N', 'T', 'R');
+		default:
+			return Parameter();
 		}
 	} else {
 		return peekmem(params.size(), params[0]);
@@ -1444,7 +1502,7 @@ Parameter Interpreter::shutdownInterface(Parameters params) {
 
 Parameter Interpreter::setMousePointer(Parameters params) {
 	set_mouse_pointer(params.size(), params[0], params[1], params[2],
-		params[3], params[4], params[5], params[6]);
+	                  params[3], params[4], params[5], params[6]);
 	return Parameter();
 }
 
@@ -1508,7 +1566,7 @@ Parameter Interpreter::drawDot(Parameters params) {
 
 Parameter Interpreter::drawLine(Parameters params) {
 	_vm->_screen->panes(params[0]).drawLine(Common::Point(params[1], params[2]),
-		Common::Point(params[3], params[4]), params[5]);
+	                                        Common::Point(params[3], params[4]), params[5]);
 	return Parameter();
 }
 
@@ -1519,19 +1577,19 @@ Parameter Interpreter::lineTo(Parameters params) {
 
 Parameter Interpreter::drawRectangle(Parameters params) {
 	_vm->_screen->panes(params[0]).drawRect(Common::Rect(params[1], params[2],
-		params[3], params[4]), params[5]);
+	                                        params[3], params[4]), params[5]);
 	return Parameter();
 }
 
 Parameter Interpreter::fillRectangle(Parameters params) {
 	_vm->_screen->panes(params[0]).fillRect(Common::Rect(params[1], params[2],
-		params[3], params[4]), params[5]);
+	                                        params[3], params[4]), params[5]);
 	return Parameter();
 }
 
 Parameter Interpreter::hashRectangle(Parameters params) {
 	_vm->_screen->panes(params[0]).hashRect(Common::Rect(params[1], params[2],
-		params[3], params[4]), params[5]);
+	                                        params[3], params[4]), params[5]);
 	return Parameter();
 }
 
@@ -1541,15 +1599,15 @@ Parameter Interpreter::getBitmapHeight(Parameters params) {
 
 Parameter Interpreter::drawBitmap(Parameters params) {
 	draw_bitmap(params.size(), params[0], params[1], params[2],
-		params[3], params[4], params[5], params[6],
-		params[7], params[8]);
+	            params[3], params[4], params[5], params[6],
+	            params[7], params[8]);
 	return Parameter();
 }
 
 Parameter Interpreter::visibleBitmapRect(Parameters params) {
 	assert(params[5]);
 	return visible_bitmap_rect(params.size(), params[0], params[1],
-		params[2], params[3], params[4], params[5]);
+	                           params[2], params[3], params[4], params[5]);
 }
 
 Parameter Interpreter::setPalette(Parameters params) {
@@ -1575,7 +1633,7 @@ Parameter Interpreter::shutdownGraphics(Parameters params) {
 Parameter Interpreter::waitVerticalRetrace(Parameters params) {
 	Events &events = *_vm->_events;
 	uint32 frameCounter = events.frameCounter();
-	
+
 	while (!_vm->shouldQuit() && frameCounter == events.frameCounter())
 		events.delay(5);
 
@@ -1613,7 +1671,7 @@ Parameter Interpreter::assignWindow(Parameters params) {
 
 Parameter Interpreter::assignSubWindow(Parameters params) {
 	return _vm->_screen->assignSubWindow(params[0], params[1], Common::Rect(params[2], params[3],
-		params[4], params[5]));
+	                                     params[4], params[5]));
 }
 
 Parameter Interpreter::releaseWindow(Parameters params) {
@@ -1730,8 +1788,8 @@ Parameter Interpreter::fontHeight(Parameters params) {
 
 Parameter Interpreter::solidBarGraph(Parameters params) {
 	_vm->_screen->solidBarGraph(Common::Rect(params[0], params[1], params[2], params[3]),
-		params[4], params[5], params[6], params[7], params[8], params[9], params[10],
-		params[11], params[12], params[13]);
+	                            params[4], params[5], params[6], params[7], params[8], params[9], params[10],
+	                            params[11], params[12], params[13]);
 	return Parameter();
 }
 
@@ -1847,15 +1905,15 @@ Parameter Interpreter::magicField(Parameters params) {
 Parameter Interpreter::doDots(Parameters params) {
 	assert(params[9]);
 	do_dots(params.size(), params[0], params[1], params[2], params[3],
-		params[4], params[5], params[6], params[7],
-		params[8], params[9]);
+	        params[4], params[5], params[6], params[7],
+	        params[8], params[9]);
 	return Parameter();
 }
 
 Parameter Interpreter::doIce(Parameters params) {
 	assert(params[6]);
 	do_ice(params.size(), params[0], params[1], params[2], params[3],
-		params[4], params[5], params[6]);
+	       params[4], params[5], params[6]);
 	return Parameter();
 }
 

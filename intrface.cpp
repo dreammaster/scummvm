@@ -69,39 +69,38 @@ ULONG pointer_num;
 ULONG pointer_fade_table;
 ULONG pointer_fade_level;
 ULONG pointer_scale;
-LONG last_cursor_X,last_cursor_Y;
+LONG last_cursor_X, last_cursor_Y;
 
 // DPMI real-mode interrupt structure
 struct DPMI_RMI {
-   LONG edi;
-   LONG esi;
-   LONG ebp;
-   LONG reserved;
-   LONG ebx;
-   LONG edx;
-   LONG ecx;
-   LONG eax;
-   WORD flags;
-   WORD es;
-   WORD ds;
-   WORD fs;
-   WORD gs;
-   WORD ip;
-   WORD cs;
-   WORD sp;
-   WORD ss;
+	LONG edi;
+	LONG esi;
+	LONG ebp;
+	LONG reserved;
+	LONG ebx;
+	LONG edx;
+	LONG ecx;
+	LONG eax;
+	WORD flags;
+	WORD es;
+	WORD ds;
+	WORD fs;
+	WORD gs;
+	WORD ip;
+	WORD cs;
+	WORD sp;
+	WORD ss;
 };
 
 
 
 /*********************************************************/
-void init_interface(void)
-{
-      pointer_set = HRES_NULL;
-      pointer_set_entry = (ULONG)-1;
-      ptr_valid = 0;
-      wait_ptr_valid = 0;
-      wait_ptr_state = 0;
+void init_interface(void) {
+	pointer_set = HRES_NULL;
+	pointer_set_entry = (ULONG) - 1;
+	ptr_valid = 0;
+	wait_ptr_valid = 0;
+	wait_ptr_state = 0;
 
 }
 
@@ -109,58 +108,54 @@ void init_interface(void)
 
 /*********************************************************/
 void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
-                             LONG hot_Y, ULONG scale, ULONG fade_table,
-                             ULONG fade_level)
-{
+                       LONG hot_Y, ULONG scale, ULONG fade_table,
+                       ULONG fade_level) {
 	Resources &res = *_vm->_resources;
 	ND_entry *entry;
 
-   if ((wait_ptr_state != 0) && (argcnt != 0))
-      {
-      save_number = number;
-      save_hot_X = hot_X;
-      save_hot_Y = hot_Y;
+	if ((wait_ptr_state != 0) && (argcnt != 0)) {
+		save_number = number;
+		save_hot_X = hot_X;
+		save_hot_Y = hot_Y;
 
-      return;
-      }
+		return;
+	}
 
-   cur_table = table;
-   cur_number = number;
-   cur_hot_X = hot_X;
-   cur_hot_Y = hot_Y;
+	cur_table = table;
+	cur_number = number;
+	cur_hot_X = hot_X;
+	cur_hot_Y = hot_Y;
 
-   if ((table == pointer_set_entry) &&
-       (number == pointer_num) &&
-       (scale == pointer_scale) &&
-       (fade_table == pointer_fade_table) &&
-       (fade_level == pointer_fade_level))
-      return;
+	if ((table == pointer_set_entry) &&
+	        (number == pointer_num) &&
+	        (scale == pointer_scale) &&
+	        (fade_table == pointer_fade_table) &&
+	        (fade_level == pointer_fade_level))
+		return;
 
-   if (table != pointer_set_entry)
-      {
-      if (pointer_set != HRES_NULL)
-         {
-         res.unlock(pointer_set);
-         }
+	if (table != pointer_set_entry) {
+		if (pointer_set != HRES_NULL) {
+			res.unlock(pointer_set);
+		}
 
-      if ((entry = res.search_name_dir(table)) == NULL)
-         pointer_set = res.get_resource_handle(table,DA_DEFAULT);
-      else
-         pointer_set = entry->handle;
+		if ((entry = res.search_name_dir(table)) == NULL)
+			pointer_set = res.get_resource_handle(table, DA_DEFAULT);
+		else
+			pointer_set = entry->handle;
 
-      res.lock(pointer_set);
+		res.lock(pointer_set);
 
-      pointer_set_entry = table;
-      }
+		pointer_set_entry = table;
+	}
 
-   pointer_num = number;
-   pointer_scale = scale;
-   pointer_fade_table = fade_table;
-   pointer_fade_level = fade_level;
+	pointer_num = number;
+	pointer_scale = scale;
+	pointer_fade_table = fade_table;
+	pointer_fade_level = fade_level;
 
-   ptr_valid = 1;
+	ptr_valid = 1;
 
-   mouse_set_pointer(res.addr(pointer_set),pointer_num,hot_X,hot_Y);
+	mouse_set_pointer(res.addr(pointer_set), pointer_num, hot_X, hot_Y);
 }
 
 /*********************************************************/
@@ -168,37 +163,34 @@ void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
 void set_wait_pointer(LONG argcnt, ULONG number, LONG hot_X, LONG hot_Y)
 
 {
-   if (number == (ULONG)-1)
-      {
-      wait_ptr_valid = 0;
-      return;
+	if (number == (ULONG) - 1) {
+		wait_ptr_valid = 0;
+		return;
 
-      }
+	}
 
-   wait_number = number;
-   wait_hot_X = hot_X;
-   wait_hot_Y = hot_Y;
+	wait_number = number;
+	wait_hot_X = hot_X;
+	wait_hot_Y = hot_Y;
 
-   wait_ptr_valid = 1;
+	wait_ptr_valid = 1;
 }
 
 /*********************************************************/
-void standby_cursor(void)
-{
-   if (!wait_ptr_valid) return;
-   if (!ptr_valid) return;
+void standby_cursor(void) {
+	if (!wait_ptr_valid) return;
+	if (!ptr_valid) return;
 
-   ++wait_ptr_state;
+	++wait_ptr_state;
 
-   if (wait_ptr_state == 1)
-      {
-      save_number = cur_number;
-      save_hot_X = cur_hot_X;
-      save_hot_Y = cur_hot_Y;
+	if (wait_ptr_state == 1) {
+		save_number = cur_number;
+		save_hot_X = cur_hot_X;
+		save_hot_Y = cur_hot_Y;
 
-      set_mouse_pointer(0,cur_table,wait_number,wait_hot_X,wait_hot_Y,
-         pointer_scale,pointer_fade_table,pointer_fade_level);
-      }
+		set_mouse_pointer(0, cur_table, wait_number, wait_hot_X, wait_hot_Y,
+		                  pointer_scale, pointer_fade_table, pointer_fade_level);
+	}
 }
 
 /*********************************************************/
@@ -207,16 +199,15 @@ void standby_cursor(void)
 //
 /*********************************************************/
 
-void resume_cursor(void)
-{
-   if (!wait_ptr_valid) return;
-   if (!ptr_valid) return;
+void resume_cursor(void) {
+	if (!wait_ptr_valid) return;
+	if (!ptr_valid) return;
 
-   --wait_ptr_state;
+	--wait_ptr_state;
 
-   if (wait_ptr_state == 0)
-      set_mouse_pointer(0,cur_table,save_number,save_hot_X,save_hot_Y,
-         pointer_scale,pointer_fade_table,pointer_fade_level);
+	if (wait_ptr_state == 0)
+		set_mouse_pointer(0, cur_table, save_number, save_hot_X, save_hot_Y,
+		                  pointer_scale, pointer_fade_table, pointer_fade_level);
 }
 
 } // End of namespace Aesop

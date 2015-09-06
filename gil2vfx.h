@@ -32,7 +32,7 @@ namespace Aesop {
 LONG GIL2VFX_get_bitmap_width(void *shape_table, LONG shape_num);
 LONG GIL2VFX_get_bitmap_height(void *shape_table, LONG shape_num);
 LONG GIL2VFX_visible_bitmap_rect(LONG x1, LONG y1, LONG mirror,
-                                 UBYTE *shapes, LONG shape_num,WORD *bounds);
+                                 UBYTE *shapes, LONG shape_num, WORD *bounds);
 
 void GIL2VFX_cout(LONG c);
 

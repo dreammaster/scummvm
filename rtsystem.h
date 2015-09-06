@@ -34,13 +34,13 @@ namespace Aesop {
 #define TF_BUFSIZE 4096    // size of buffer allocated by file functions
 
 struct TF_class {
-   HRES hbuf;
-   BYTE *buffer;
-   WORD p;
-   Common::SeekableReadStream *file;
-   WORD mode;
-   LONG len;
-   LONG pos;
+	HRES hbuf;
+	BYTE *buffer;
+	WORD p;
+	Common::SeekableReadStream *file;
+	WORD mode;
+	LONG len;
+	LONG pos;
 };
 
 #define TF_WRITE 0

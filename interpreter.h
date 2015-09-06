@@ -50,14 +50,30 @@ public:
 	Parameter(void *v) : _val(0), _ptr(v), _ptrConst(v) {}
 	Parameter(const BYTE *v) : _val(0), _ptr(nullptr), _ptrConst(v) {}
 	Parameter(const void *v) : _val(0), _ptr(nullptr), _ptrConst(v) {}
-	operator ULONG() { return _val; }
-	operator BYTE *() { return (BYTE *)_ptr; }
-	operator WORD *() { return (WORD *)_ptr; }
-	operator LONG *() { return (LONG *)_ptr; }
-	operator ULONG *() { return (ULONG *)_ptr; }
-	operator const BYTE *() { return (const BYTE *)_ptrConst; }
-	operator const void *() { return _ptrConst; }
-	operator const char *() { return (const char *)_ptrConst; }
+	operator ULONG() {
+		return _val;
+	}
+	operator BYTE *() {
+		return (BYTE *)_ptr;
+	}
+	operator WORD *() {
+		return (WORD *)_ptr;
+	}
+	operator LONG *() {
+		return (LONG *)_ptr;
+	}
+	operator ULONG *() {
+		return (ULONG *)_ptr;
+	}
+	operator const BYTE *() {
+		return (const BYTE *)_ptrConst;
+	}
+	operator const void *() {
+		return _ptrConst;
+	}
+	operator const char *() {
+		return (const char *)_ptrConst;
+	}
 
 	const Parameter operator+(int other) const;
 	const Parameter operator-(int other) const;
@@ -91,22 +107,34 @@ public:
 	typedef Common::Array<Parameter>::size_type size_type;
 	InterpreterStack() {}
 
-	bool empty() const { return _stack.empty(); }
+	bool empty() const {
+		return _stack.empty();
+	}
 
-	void clear() { _stack.clear(); }
+	void clear() {
+		_stack.clear();
+	}
 
-	void resize(int newSize) { _stack.resize(newSize); }
+	void resize(int newSize) {
+		_stack.resize(newSize);
+	}
 
-	void push(Parameter p) { _stack.push_back(p); }
+	void push(Parameter p) {
+		_stack.push_back(p);
+	}
 
 	void reserve(size_type count) {
 		while (count-- > 0)
 			_stack.push_back(Parameter());
 	}
 
-	Parameter &top() { return _stack.back(); }
+	Parameter &top() {
+		return _stack.back();
+	}
 
-	const Parameter &top() const { return _stack.back(); }
+	const Parameter &top() const {
+		return _stack.back();
+	}
 
 	Parameter pop() {
 		Parameter tmp = _stack.back();
@@ -117,12 +145,16 @@ public:
 		return _stack.size();
 	}
 
-	Parameter &operator[](size_type i) { return _stack[i]; }
-	const Parameter &operator[](size_type i) const { return _stack[i]; }
+	Parameter &operator[](size_type i) {
+		return _stack[i];
+	}
+	const Parameter &operator[](size_type i) const {
+		return _stack[i];
+	}
 };
 
 typedef void (Interpreter::*OpcodeMethod)();
-typedef Parameter (Interpreter::*ExternMethod)(Parameters param);
+typedef Parameter(Interpreter::*ExternMethod)(Parameters param);
 
 class Interpreter {
 private:
@@ -146,94 +178,94 @@ private:
 	bool _breakFlag;
 	const MV_entry *_currentVector;
 private:
-	void cmdBRT();		// BRanch if True
-	void cmdBRF();		// BRanch if False
-	void cmdBRA();		// BRanch Always
-	void cmdCASE();		// CASE selection
-	void cmdPUSH();		// PUSH 0 onto stack
-	void cmdDUP();		// DUPlicate top of stack
-	void cmdNOT();		// Logical NOT(unary)
-	void cmdSETB();		// SET Boolean value(unary)
-	void cmdNEG();		// NEGate(unary)
-	void cmdADD();		// ADD(binary)
-	void cmdSUB();		// SUBtract(binary)
-	void cmdMUL();		// MULtiply(binary)
-	void cmdDIV();		// DIVide(binary)
-	void cmdMOD();		// MODulus(binary)
-	void cmdEXP();		// EXPonent(binary)
-	void cmdBAND();		// Bitwise AND(binary)
-	void cmdBOR();		// Bitwise OR(binary)
-	void cmdXOR();		// Bitwise XOR(binary)
-	void cmdBNOT();		// Bitwise NOT(unary)
-	void cmdSHL();		// SHift Left(binary)
-	void cmdSHR();		// SHift Right(binary)
-	void cmdLT();		// Less Than(binary)
-	void cmdLE();		// Less than or Equal(binary)
-	void cmdEQ();		// EQual(binary)
-	void cmdNE();		// Not Equal(binary)
-	void cmdGE();		// Greater than or Equal(binary)
-	void cmdGT();		// Greather Than(binary)
-	void cmdINC();		// INCrement(unary)
-	void cmdDEC();		// DECrement(unary)
-	void cmdSHTC();		// Load SHorT Constant(0 - 256)
-	void cmdINTC();		// Load INTeger Constant(256 - 64K)
-	void cmdLNGC();		// Load LoNG Constant(64K - 4G)
-	void cmdRCRS();		// Reference Code ReSource address
-	void cmdCALL();		// CALL code resource handler
-	void cmdSEND();		// SEND message
-	void cmdPASS();		// PASS message to parent class
-	void cmdJSR();		// Jump to SubRoutine
-	void cmdRTS();		// ReTurn from Subroutine
-	void cmdAIM();		// Array Index Multiply
-	void cmdAIS();		// Array Index Shift
-	void cmdLTBA();		// Load Table Byte Array
-	void cmdLTWA();		// Load Table Word Array
-	void cmdLTDA();		// Load Table Dword Array
-	void cmdLETA();		// Load Effective Table Address
-	void cmdLAB();		// Load Auto Byte
-	void cmdLAW();		// Load Auto Word
-	void cmdLAD();		// Load Auto Dword
-	void cmdSAB();		// Store Auto Byte
-	void cmdSAW();		// Store Auto Word
-	void cmdSAD();		// Store Auto Dword
-	void cmdLABA();		// Load Auto Byte Array
-	void cmdLAWA();		// Load Auto Word Array
-	void cmdLADA();		// Load Auto Dword Array
-	void cmdSABA();		// Store Auto Byte Array
-	void cmdSAWA();		// Store Auto Word Array
-	void cmdSADA();		// Store Auto Dword Array
-	void cmdLEAA();		// Load Effective Auto Address
-	void cmdLSB();		// Load Static Byte
-	void cmdLSW();		// Load Static Word
-	void cmdLSD();		// Load Static Dword
-	void cmdSSB();		// Store Static Byte
-	void cmdSSW();		// Store Static Word
-	void cmdSSD();		// Store Static Dword
-	void cmdLSBA();		// Load Static Byte Array
-	void cmdLSWA();		// Load Static Word Array
-	void cmdLSDA();		// Load Static Dword Array
-	void cmdSSBA();		// Store Static Byte Array
-	void cmdSSWA();		// Store Static Word Array
-	void cmdSSDA();		// Store Static Dword Array
-	void cmdLESA();		// Load Effective Static Address
-	void cmdLXB();		// Load eXtern Byte
-	void cmdLXW();		// Load eXtern Word
-	void cmdLXD();		// Load eXtern Dword
-	void cmdSXB();		// Store eXtern Byte
-	void cmdSXW();		// Store eXtern Word
-	void cmdSXD();		// Store eXtern Dword
-	void cmdLXBA();		// Load eXtern Byte Array
-	void cmdLXWA();		// Load eXtern Word Array
-	void cmdLXDA();		// Load eXtern Dword Array
-	void cmdSXBA();		// Store eXtern Byte Array
-	void cmdSXWA();		// Store eXtern Word Array
-	void cmdSXDA();		// Store eXtern Dword Array
-	void cmdLEXA();		// Load Effective eXtern Address
-	void cmdSXAS();		// Set eXtern Array Source
-	void cmdLECA();		// Load Effective Code Address
-	void cmdSOLE();		// Selector for Object List Entry
-	void cmdEND();		// END of handler
-	void cmdBRK();		// BReaKpoint for debugging
+	void cmdBRT();      // BRanch if True
+	void cmdBRF();      // BRanch if False
+	void cmdBRA();      // BRanch Always
+	void cmdCASE();     // CASE selection
+	void cmdPUSH();     // PUSH 0 onto stack
+	void cmdDUP();      // DUPlicate top of stack
+	void cmdNOT();      // Logical NOT(unary)
+	void cmdSETB();     // SET Boolean value(unary)
+	void cmdNEG();      // NEGate(unary)
+	void cmdADD();      // ADD(binary)
+	void cmdSUB();      // SUBtract(binary)
+	void cmdMUL();      // MULtiply(binary)
+	void cmdDIV();      // DIVide(binary)
+	void cmdMOD();      // MODulus(binary)
+	void cmdEXP();      // EXPonent(binary)
+	void cmdBAND();     // Bitwise AND(binary)
+	void cmdBOR();      // Bitwise OR(binary)
+	void cmdXOR();      // Bitwise XOR(binary)
+	void cmdBNOT();     // Bitwise NOT(unary)
+	void cmdSHL();      // SHift Left(binary)
+	void cmdSHR();      // SHift Right(binary)
+	void cmdLT();       // Less Than(binary)
+	void cmdLE();       // Less than or Equal(binary)
+	void cmdEQ();       // EQual(binary)
+	void cmdNE();       // Not Equal(binary)
+	void cmdGE();       // Greater than or Equal(binary)
+	void cmdGT();       // Greather Than(binary)
+	void cmdINC();      // INCrement(unary)
+	void cmdDEC();      // DECrement(unary)
+	void cmdSHTC();     // Load SHorT Constant(0 - 256)
+	void cmdINTC();     // Load INTeger Constant(256 - 64K)
+	void cmdLNGC();     // Load LoNG Constant(64K - 4G)
+	void cmdRCRS();     // Reference Code ReSource address
+	void cmdCALL();     // CALL code resource handler
+	void cmdSEND();     // SEND message
+	void cmdPASS();     // PASS message to parent class
+	void cmdJSR();      // Jump to SubRoutine
+	void cmdRTS();      // ReTurn from Subroutine
+	void cmdAIM();      // Array Index Multiply
+	void cmdAIS();      // Array Index Shift
+	void cmdLTBA();     // Load Table Byte Array
+	void cmdLTWA();     // Load Table Word Array
+	void cmdLTDA();     // Load Table Dword Array
+	void cmdLETA();     // Load Effective Table Address
+	void cmdLAB();      // Load Auto Byte
+	void cmdLAW();      // Load Auto Word
+	void cmdLAD();      // Load Auto Dword
+	void cmdSAB();      // Store Auto Byte
+	void cmdSAW();      // Store Auto Word
+	void cmdSAD();      // Store Auto Dword
+	void cmdLABA();     // Load Auto Byte Array
+	void cmdLAWA();     // Load Auto Word Array
+	void cmdLADA();     // Load Auto Dword Array
+	void cmdSABA();     // Store Auto Byte Array
+	void cmdSAWA();     // Store Auto Word Array
+	void cmdSADA();     // Store Auto Dword Array
+	void cmdLEAA();     // Load Effective Auto Address
+	void cmdLSB();      // Load Static Byte
+	void cmdLSW();      // Load Static Word
+	void cmdLSD();      // Load Static Dword
+	void cmdSSB();      // Store Static Byte
+	void cmdSSW();      // Store Static Word
+	void cmdSSD();      // Store Static Dword
+	void cmdLSBA();     // Load Static Byte Array
+	void cmdLSWA();     // Load Static Word Array
+	void cmdLSDA();     // Load Static Dword Array
+	void cmdSSBA();     // Store Static Byte Array
+	void cmdSSWA();     // Store Static Word Array
+	void cmdSSDA();     // Store Static Dword Array
+	void cmdLESA();     // Load Effective Static Address
+	void cmdLXB();      // Load eXtern Byte
+	void cmdLXW();      // Load eXtern Word
+	void cmdLXD();      // Load eXtern Dword
+	void cmdSXB();      // Store eXtern Byte
+	void cmdSXW();      // Store eXtern Word
+	void cmdSXD();      // Store eXtern Dword
+	void cmdLXBA();     // Load eXtern Byte Array
+	void cmdLXWA();     // Load eXtern Word Array
+	void cmdLXDA();     // Load eXtern Dword Array
+	void cmdSXBA();     // Store eXtern Byte Array
+	void cmdSXWA();     // Store eXtern Word Array
+	void cmdSXDA();     // Store eXtern Dword Array
+	void cmdLEXA();     // Load Effective eXtern Address
+	void cmdSXAS();     // Set eXtern Array Source
+	void cmdLECA();     // Load Effective Code Address
+	void cmdSOLE();     // Selector for Object List Entry
+	void cmdEND();      // END of handler
+	void cmdBRK();      // BReaKpoint for debugging
 private:
 	// Miscellaneous functions
 	Parameter loadString(Parameters params);

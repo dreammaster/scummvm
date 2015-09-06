@@ -37,27 +37,27 @@ namespace Aesop {
 #define OD_SIZE        128       // # of entries/ordinal file directory block
 
 enum {
-	DA_FIXED		= 0x00000001U,   // Entry attribute equates
-	DA_MOVEABLE		= 0x00000000U,   // (only low word preserved in cache)
-	DA_PRECIOUS		= 0x00000020U,
-	DA_DISCARDABLE	= 0x00000010U,
-	DA_TEMPORARY	= 0x00000000U,
+    DA_FIXED        = 0x00000001U,   // Entry attribute equates
+    DA_MOVEABLE     = 0x00000000U,   // (only low word preserved in cache)
+    DA_PRECIOUS     = 0x00000020U,
+    DA_DISCARDABLE  = 0x00000010U,
+    DA_TEMPORARY    = 0x00000000U,
 
-	DA_EVANESCENT	= 0x00000040U,   // Special runtime attribute equates
-	DA_DISCARDED	= 0x00000100U,
-	DA_FREE			= 0x00000200U,
-	DA_DEFAULT		= 0xFFFFFFFFU,
+    DA_EVANESCENT   = 0x00000040U,   // Special runtime attribute equates
+    DA_DISCARDED    = 0x00000100U,
+    DA_FREE         = 0x00000200U,
+    DA_DEFAULT      = 0xFFFFFFFFU,
 
-	DA_PLACEHOLDER	= 0x10000000L
+    DA_PLACEHOLDER  = 0x10000000L
 };
 
-#define SA_UNUSED      0x00000001	// Storage attribute flag equates
+#define SA_UNUSED      0x00000001   // Storage attribute flag equates
 #define SA_DELETED     0x00000002
-                        
-#define ROED 0						// Resource Ordinal Entry Directory
-#define RDES 1						// Resource Description Directory
-#define RDEP 2						// Resource Dependency Directory
-#define CRFD 3						// Code Resource Function Directory
+
+#define ROED 0                      // Resource Ordinal Entry Directory
+#define RDES 1                      // Resource Description Directory
+#define RDEP 2                      // Resource Dependency Directory
+#define CRFD 3                      // Code Resource Function Directory
 
 #define RTR_FREEBASE   0x0001U   // TRUE for destructor to free heap memory
 
@@ -67,64 +67,64 @@ enum {
 
 // cached resource entry descriptor
 struct HD_entry {
-   void *_seg;					// pointer to resource data
+	void *_seg;                  // pointer to resource data
 
-   ULONG _size;					// size of resource in bytes
-   ULONG _flags;				// DA_ flags
-   ULONG _history;				// LRU counter value
-   ULONG _locks;				// locking depth
-   ULONG _user;					// .RES file offset or instance object name
+	ULONG _size;                 // size of resource in bytes
+	ULONG _flags;                // DA_ flags
+	ULONG _history;              // LRU counter value
+	ULONG _locks;                // locking depth
+	ULONG _user;                 // .RES file offset or instance object name
 };
 
 // resource file header
 struct RF_file_hdr {
-   BYTE  _signature[16];
-   ULONG _fileSize;
-   ULONG _lostSpace;
-   ULONG _FOB;
-   ULONG _createTime;
-   ULONG _modifyTime;
+	BYTE  _signature[16];
+	ULONG _fileSize;
+	ULONG _lostSpace;
+	ULONG _FOB;
+	ULONG _createTime;
+	ULONG _modifyTime;
 
-   RF_file_hdr();
+	RF_file_hdr();
 
-   /**
-    * Load header data from the passed stream
+	/**
+	 * Load header data from the passed stream
 	*/
-   void load(Common::SeekableReadStream &s);
+	void load(Common::SeekableReadStream &s);
 };
 
 // resource file entry header
 struct RF_entry_hdr {
-   ULONG _timestamp;
-   ULONG _dataAttrib;
-   ULONG _dataSize;
+	ULONG _timestamp;
+	ULONG _dataAttrib;
+	ULONG _dataSize;
 
-   RF_entry_hdr();
+	RF_entry_hdr();
 
-   /**
-    * Load header data from the passed stream
+	/**
+	 * Load header data from the passed stream
 	*/
-   void load(Common::SeekableReadStream &s);
+	void load(Common::SeekableReadStream &s);
 };
 
 struct OD_block {
 	ULONG _next;
-   UBYTE _flags[OD_SIZE];
-   ULONG _index[OD_SIZE];
+	UBYTE _flags[OD_SIZE];
+	ULONG _index[OD_SIZE];
 
-   OD_block();
+	OD_block();
 
-   /**
-    * Load header data from the passed stream
+	/**
+	 * Load header data from the passed stream
 	*/
-   void load(Common::SeekableReadStream &s);
+	void load(Common::SeekableReadStream &s);
 };
 
 // name directory entry
 struct ND_entry {
-   ULONG OE;                     // public
-   HRES thunk;                   // public
-   HRES handle;                  // public
+	ULONG OE;                     // public
+	HRES thunk;                   // public
+	HRES handle;                  // public
 };
 
 // External code reference entry
@@ -209,7 +209,7 @@ private:
 	 * If do_move=false, caller is responsible for garbage collection
 	 *
 	 * If discarded object is EVANESCENT, free its entry
-	 * @returns		Size of discarded object in bytes (rounded to next paragraph)
+	 * @returns     Size of discarded object in bytes (rounded to next paragraph)
 	 */
 	ULONG discard(ULONG index, bool do_move);
 
@@ -240,7 +240,7 @@ private:
 	ULONG assign_space(ULONG bytes, ULONG attrib, HRES entry);
 
 	/**
-	 * Return next available entry (-1 if error) in resource 
+	 * Return next available entry (-1 if error) in resource
 	 * directory, expanding directory if necessary
 	 */
 	HRES new_entry();
@@ -269,7 +269,7 @@ public:
 	~Resources();
 
 	/**
-	 * Discard entries until amount of space is available in cache 
+	 * Discard entries until amount of space is available in cache
 	 * (-1UL for maximum)
 	 *
 	 * Returns 1 on success, 0 if space could not be obtained
@@ -304,11 +304,11 @@ public:
 
 	/**
 	 * "Lock" a resource cache entry
-	 * 
+	 *
 	 * A locked resource cannot be automatically discarded until the lock count is
 	 * decremented to zero via call(s) to RTR_unlock()
-	 * 
-	 * Locking does NOT guarantee that the resource will not be moved when other 
+	 *
+	 * Locking does NOT guarantee that the resource will not be moved when other
 	 * resources are discarded, only that it will always be instantly accessible
 	 * by dereferencing the handle segment pointer
 	 */
@@ -370,30 +370,30 @@ public:
 	void read_resource(void *dest, ULONG len);
 
 	/**
-	 * Read resource header to get data attribs & len, return w/file 
+	 * Read resource header to get data attribs & len, return w/file
 	 * pointer positioned at start of resource data
 	 *
-	 * Maintain copy of current ordinal directory block as part of 
+	 * Maintain copy of current ordinal directory block as part of
 	 * RTR structure to reduce excessive seeking
 	 *
 	 * Return size of resource in bytes
 	 *
 	 * Return 0 if resource was created by reference and never
-	 * subsequently written (PLACEHOLDER) 
+	 * subsequently written (PLACEHOLDER)
 	 */
 	ULONG seek(ULONG rnum);
 
 	/**
 	 * Return the current address of a cached resource
 	 *
-	 * Addresses of FIXED resources may safely be stored and re-used at will 
+	 * Addresses of FIXED resources may safely be stored and re-used at will
 	 * by the client program, since FIXED resources are neither MOVEABLE nor
 	 * (at least for the time being) DISCARDABLE.
 	 *
 	 * However, addresses of MOVEABLE resources may change any time a block of
 	 * memory is allocated from the resource cache.  Additionally, DISCARDABLE
 	 * resources MUST be locked via lock() before calling this function.
-	 * Do not expect pointers to MOVEABLE resources to remain valid after 
+	 * Do not expect pointers to MOVEABLE resources to remain valid after
 	 * any function which can load resources or otherwise allocate cache memory.
 	 * The fix_segment() function may be used to adjust segment addresses
 	 * of moveable resources.
@@ -405,7 +405,7 @@ public:
 	/**
 	 * Perform binary search of name directory for specified resource
 	 *
-	 * Return pointer to name directory entry or NULL if entry 
+	 * Return pointer to name directory entry or NULL if entry
 	 * deleted or not found
 	 */
 	ND_entry *search_name_dir(ULONG resource);

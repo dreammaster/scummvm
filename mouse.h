@@ -40,7 +40,7 @@ extern void mouse_set_pointer(void *table, LONG shape, LONG uhot_x, LONG uhot_y)
 
 extern void mouse_register_mouse_event_callback(void (*fn)(LONG x, LONG y));
 extern void mouse_register_button_event_callback(void (*fn)(LONG left, LONG right, LONG center));
-extern void mouse_register_watchdog_callback(LONG (*fn)(Common::Rect *area));
+extern void mouse_register_watchdog_callback(LONG(*fn)(Common::Rect *area));
 
 extern void mouse_unlock(void);
 extern void mouse_hold(void);

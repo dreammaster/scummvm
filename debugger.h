@@ -40,4 +40,4 @@ public:
 
 } // End of namespace Aesop
 
-#endif	/* AESOP_DEBUGGER_H */
+#endif  /* AESOP_DEBUGGER_H */

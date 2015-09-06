@@ -36,12 +36,12 @@ extern UWORD in_GIL;
 //#define MODE_X 1                 // 1 for VGA mode X, 0 for MCGA mode 13h
 
 extern ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y,
-	ULONG flip, ULONG table, ULONG number, WORD *array);
+                                 ULONG flip, ULONG table, ULONG number, WORD *array);
 
 extern ULONG get_bitmap_height(LONG argcnt, ULONG table, ULONG number);
 extern void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
-	LONG x, LONG y, ULONG scale, ULONG flip, ULONG fade_table, ULONG
-	fade_level);
+                        LONG x, LONG y, ULONG scale, ULONG flip, ULONG fade_table, ULONG
+                        fade_level);
 
 } // End of namespace Aesop
 

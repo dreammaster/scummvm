@@ -32,22 +32,22 @@ namespace Aesop {
 #define MAXLONG 2147483647
 
 
-	//ллллллллллллллллллллллллллллллллллллллллллл
-	//лл                                       лл
-	//лл Application event types               лл
-	//лл                                       лл
-	//ллллллллллллллллллллллллллллллллллллллллллл
+//ллллллллллллллллллллллллллллллллллллллллллл
+//лл                                       лл
+//лл Application event types               лл
+//лл                                       лл
+//ллллллллллллллллллллллллллллллллллллллллллл
 
-	//
-	// AESOP event usage:
-	//
-	//  post_event(owner,event,param);
-	//
-	//  notify(object,"message",event,param);
-	//  cancel(object,"message",event,param);
-	//
-	//  message "message",param,owner
-	//
+//
+// AESOP event usage:
+//
+//  post_event(owner,event,param);
+//
+//  notify(object,"message",event,param);
+//  cancel(object,"message",event,param);
+//
+//  message "message",param,owner
+//
 
 #define YX <<16|                             // [paramXY] access macro
 
@@ -85,11 +85,11 @@ namespace Aesop {
 #define EV_TREES_CUT              63         // [owner] cut down with [param]
 #define EV_TELEPORT_TRIGGERED     64         // Teleport Trigger
 
-	//ллллллллллллллллллллллллллллллллллллллллллл
-	//лл                                       лл
-	//лл Application-specific definitions      лл
-	//лл                                       лл
-	//ллллллллллллллллллллллллллллллллллллллллллл
+//ллллллллллллллллллллллллллллллллллллллллллл
+//лл                                       лл
+//лл Application-specific definitions      лл
+//лл                                       лл
+//ллллллллллллллллллллллллллллллллллллллллллл
 
 #define MAXSTRLEN     64  // Max # of chars supported by "input" class
 
@@ -99,17 +99,17 @@ namespace Aesop {
 
 #define NFEATURES     12  // # of simultaneous clickable features
 
-	//
-	// Item draw flags
-	//
+//
+// Item draw flags
+//
 
 #define DRAW_THROWN_ONLY  1
 #define DRAW_FLOOR_ONLY   2
 #define DRAW_ALL          3
 
-	//
-	// Kernel & program object indices
-	//
+//
+// Kernel & program object indices
+//
 
 #define kernel   0
 
@@ -120,32 +120,32 @@ namespace Aesop {
 #define utils    2004
 #define magic    2005
 
-	//
-	// Global spell expiration event (EV_GLOBAL_EXPIRE) types
-	//
+//
+// Global spell expiration event (EV_GLOBAL_EXPIRE) types
+//
 
 #define SEX_CAMP           1     // Camp resting caused spell expiration
 #define SEX_NEWLVL         2     // New PC level: expire if necessary
 #define SEX_DISPEL         3     // Dispel Magic cast at [ownerXY]
 #define SEX_END_LIFE       4     // Object created by spell no longer exists
 
-	//
-	// Time intervals
-	//
+//
+// Time intervals
+//
 
 #define HEARTBEAT_INTERVAL 6     // (6  * 33.333 ms. = 200 ms.)
 #define SCRIPT_INTERVAL    6     // (6  * 33.333 ms. = 200 ms.)
 #define SPELL_INTERVAL     30    // (30 * 33.333 ms. = 1000 ms.)
 
-	//
-	// Note: PCs and event scripts receive service at 200 ms. intervals
-	//
-	//       Kernel receives service at AESOP system rate of 33 1/3 ms.
-	//
-	//       NPCs receive service at 33.333 * SPEED ms. intervals
-	//
-	//       Spells receive service at 1000 ms. intervals
-	//
+//
+// Note: PCs and event scripts receive service at 200 ms. intervals
+//
+//       Kernel receives service at AESOP system rate of 33 1/3 ms.
+//
+//       NPCs receive service at 33.333 * SPEED ms. intervals
+//
+//       Spells receive service at 1000 ms. intervals
+//
 
 #define TIME_SECOND        5     // # of 200 msec. ticks/second
 #define TIME_MINUTE        300   // # of 200 msec. ticks/minute
@@ -157,9 +157,9 @@ namespace Aesop {
 #define SPELL_HOUR         3600  // 1 hour = 60 minutes
 #define SPELL_SECOND       1     // 1 second = 1 spell interval
 
-	//
-	// Character selection equates
-	//
+//
+// Character selection equates
+//
 
 #define NEED_MEMORIZE      0
 #define NEED_PRAY          1
@@ -168,16 +168,16 @@ namespace Aesop {
 #define NEED_RECIPIENT     4
 #define NEED_READ          5
 
-	//
-	// Index of special "hands" object -- used to implement the characteristics
-	// of unarmed attacks
-	//
+//
+// Index of special "hands" object -- used to implement the characteristics
+// of unarmed attacks
+//
 
 #define hands    15
 
-	//
-	// Text window names
-	//
+//
+// Text window names
+//
 
 #define TW_MAIN    0    // Main text window at bottom of screen
 #define TW_PARTY   1    // Party/character window
@@ -195,28 +195,28 @@ namespace Aesop {
 #define TW_7       30
 #define TW_8       31
 
-	//
-	// Other application-specific equates
-	//
+//
+// Other application-specific equates
+//
 
 #define MAX      0
 #define MIN      1
 
-	//
-	// Shortcut macro to get object attributes from derived classes
-	//
+//
+// Shortcut macro to get object attributes from derived classes
+//
 
 #define GET )send_message(this,"report",
 
-	//
-	// Shortcut macro to get a player #'s instance handle if qualified
-	//
+//
+// Shortcut macro to get a player #'s instance handle if qualified
+//
 
 #define QUALIFY )send_message(kernel,"qualify",
 
-	//
-	// Class names & weapon usage bits
-	//
+//
+// Class names & weapon usage bits
+//
 
 #define NOCLASS  -1
 #define FIGHTER   0
@@ -239,31 +239,31 @@ namespace Aesop {
 #define ST_MAGE   0     // spell types
 #define ST_CLERIC 1
 
-	//
-	// Status equates:
-	//
-	// SP_DEAD   = Spell is inactive, and can be destroyed.
-	//
-	// SP_ACTIVE = Spell is active, and must not be externally destroyed
-	//
+//
+// Status equates:
+//
+// SP_DEAD   = Spell is inactive, and can be destroyed.
+//
+// SP_ACTIVE = Spell is active, and must not be externally destroyed
+//
 
 #define SP_DEAD   0
 #define SP_ACTIVE 2
 
-	//
-	// Flags used to select qualified players based on class, race, sex, etc.
-	//
+//
+// Flags used to select qualified players based on class, race, sex, etc.
+//
 
 #define SPEC_ONLY  1
 #define ANYONE_OK  2
 
-	//
-	// Saving throw type & result equates
-	//
+//
+// Saving throw type & result equates
+//
 
 #define ST_DEATH         0    // these are table indices -- don't reorder!
 #define ST_POISON        0
-#define ST_WAND          1    
+#define ST_WAND          1
 #define ST_PETRIFICATION 2
 #define ST_BREATH        3
 #define ST_SPELL         4
@@ -274,9 +274,9 @@ namespace Aesop {
 #define SR_NO_DAM        32
 #define SR_NONE          32
 
-	//
-	// Damage & effect types
-	//
+//
+// Damage & effect types
+//
 
 #define DAM_MAGIC          0x00000001   // magic related damage
 #define DAM_ELECTRICAL     0x00000002   // electrical damage 
@@ -305,9 +305,9 @@ namespace Aesop {
 #define EFFECT_SLOW          9
 #define EFFECT_STUN          10
 
-	//
-	// Player status and qualification flags
-	// 
+//
+// Player status and qualification flags
+//
 
 #define POISONED      2       // (used by "inflict effect")
 #define PARALYZED     4       // (used by "inflict effect")
@@ -325,12 +325,12 @@ namespace Aesop {
 #define UNPARALYZED   8       // check for paralyzed false
 #define UNPOISONED    16      // check for poisoned false
 #define UNPETRIFIED   32      // check for poisoned false
-#define FED				 64      // check for food>0 true
+#define FED              64      // check for food>0 true
 #define ELIGIBLE      128     // check for ineligibility flag = 0
 
-	//
-	// Global monster commands
-	//
+//
+// Global monster commands
+//
 
 #define MC_CHARGE     0       // assume MS_HOSTILE,MM_PURSUE attitude
 #define MC_RETREAT    1       // set MS_RETREATING,MM_PURSUE attitude
@@ -338,9 +338,9 @@ namespace Aesop {
 #define MC_CRYHELP    3       // all MM_PEACEFULs CHARGE
 #define MC_DIE        4       // all NPCs "die" (for test purposes)
 
-	//
-	// Monster status flags
-	// 
+//
+// Monster status flags
+//
 
 #define MS_HOSTILE    0x00000001  // Monster will attack party on sight
 #define MS_ATTACKED   0x00000002  // Monster has been attacked by party
@@ -356,18 +356,18 @@ namespace Aesop {
 #define MS_WILTED     0x00000800  // Monster was hit by dessication attack
 #define MS_CASTONCE   0x00001000  // Monster cast spell once
 
-	//
-	// Monster mission parameters
-	//
+//
+// Monster mission parameters
+//
 
 #define MM_PURSUE     0           // Seek party's square
 #define MM_GUARD      1           // Set MS_HOSTILE, MM_PURSUE on sight
 #define MM_STATIONARY 2           // Remain at post awaiting orders
 #define MM_PEACEFUL   3           // Ignore party unless attacked
 
-	//
-	// Monster profile flags
-	//
+//
+// Monster profile flags
+//
 
 #define MP_FACEATK    0x00000001  // Monster must face opponent to attack
 #define MP_FACEMOVE   0x00000002  // Monster must face direction of movement
@@ -391,9 +391,9 @@ namespace Aesop {
 #define MP_WEAKEN     0x01000000  // Monster drains strength
 #define MP_INVISIBLE  0x02000000  // Monster invisible except when attacking
 
-	//
-	// Monster defense (immunity) flags:
-	//
+//
+// Monster defense (immunity) flags:
+//
 
 #define IMMUNITY_HOLD_P           0x00000001
 #define IMMUNITY_HOLD_M           0x00000002
@@ -415,17 +415,17 @@ namespace Aesop {
 #define IMMUNITY_DISINTEGRATE     0x00020000
 #define IMMUNITY_BLUDGEON         0x00040000
 
-	//
-	// Monster size values
-	//
+//
+// Monster size values
+//
 
 #define SMALL         1           // Small monster
 #define MEDIUM        2           // Medium monster
 #define LARGE         3           // Large monster
 
-	//
-	// Feature profile flags (constant):
-	//
+//
+// Feature profile flags (constant):
+//
 
 #define FP_FRAGILE    0x00000001  // Feature is vulnerable to physical attacks
 #define FP_XFLIP      0x00000002  // Feature is drawn horizontally flipped
@@ -437,9 +437,9 @@ namespace Aesop {
 #define FP_NOITEMS    0x00000100  // No items droppable in feature's square 
 #define FP_FCLICK     0x00000200  // Feature responds to clicks when faced
 
-	//
-	// Feature subflags for members of class "teleporters"
-	//
+//
+// Feature subflags for members of class "teleporters"
+//
 
 #define TP_GROUND     0x00000001  // Do not teleport airborne entities
 #define TP_FALL       0x00000002  // Inflict falling damage on party
@@ -449,9 +449,9 @@ namespace Aesop {
 #define TP_LEAVE      0x00000020  // Print "Leaving..." when triggered
 #define TP_CLRSCRN    0x00000040  // Clear screen when triggered (new palette)
 
-	//
-	// Weapon effects/attack results
-	//
+//
+// Weapon effects/attack results
+//
 
 #define AR_MISSED     -1      // Target missed/no target acquired
 #define AR_CANT_REACH -2      // Target out of reach from user's position
@@ -460,9 +460,9 @@ namespace Aesop {
 #define AR_HACKED     -5      // Inanimate target "hacked"
 #define AR_BASHED     -6      // Inanimate target "bashed"
 
-	//
-	// Entity types
-	//
+//
+// Entity types
+//
 
 #define T_FEA 0               // Feature (decoration, furnishing, etc.)
 #define T_ITM 1               // Item (portable)
@@ -470,9 +470,9 @@ namespace Aesop {
 #define T_PLR 3               // Player character (or kernel)
 #define T_SPL 4               // Spell supervisor instance
 
-	//
-	// Item profile flags
-	//
+//
+// Item profile flags
+//
 
 #define IP_WEAPON    0x00000001  // Weapon subclass
 #define IP_POLEARM   0x00000002  // Polearm (can attack from 2nd rank)
@@ -503,35 +503,35 @@ namespace Aesop {
 #define IP_SHIELD    0x08000000  // Armor is used in hand
 #define IP_AUTOLOAD  0x10000000  // Missile weapon reloaded from inventory
 
-	//
-	// Item flags
-	//
-	// DA __ __ __ ID CU ST RT HL ER ET PL PL PL MD MD
-	//
-	// MD = missile direction 0-3 (if airborne)
-	//
-	// PL = player # who launched missile; 0 or 1-6 (if airborne)
-	//
-	// ET = explodes when picked up; glows red under True Seeing
-	//
-	// ER = "returning" item currently en route to target if 1, returning if 0
-	//
-	// HL = "returning" item launched from primary (0) / secondary (1) hand
-	//
-	// RT = "returning" item is reversing direction
-	//
-	// ST = item has not yet left its originating square
-	//
-	// CU = item is cursed and cannot be dropped once placed in a hand
-	//
-	// ID = item has not been identified; name and bonuses are not apparent
-	//
-	// DA = item is "disabled" (broken weapons, rotten food, etc.)
-	//
+//
+// Item flags
+//
+// DA __ __ __ ID CU ST RT HL ER ET PL PL PL MD MD
+//
+// MD = missile direction 0-3 (if airborne)
+//
+// PL = player # who launched missile; 0 or 1-6 (if airborne)
+//
+// ET = explodes when picked up; glows red under True Seeing
+//
+// ER = "returning" item currently en route to target if 1, returning if 0
+//
+// HL = "returning" item launched from primary (0) / secondary (1) hand
+//
+// RT = "returning" item is reversing direction
+//
+// ST = item has not yet left its originating square
+//
+// CU = item is cursed and cannot be dropped once placed in a hand
+//
+// ID = item has not been identified; name and bonuses are not apparent
+//
+// DA = item is "disabled" (broken weapons, rotten food, etc.)
+//
 
 #define ITM_MD 0b0000000000000011
 #define ITM_PL 0b0000000000011100
-#define ITM_ET 0b0000000000100000      
+#define ITM_ET 0b0000000000100000
 #define ITM_ER 0b0000000001000000
 #define ITM_HL 0b0000000010000000
 #define ITM_RT 0b0000000100000000
@@ -540,9 +540,9 @@ namespace Aesop {
 #define ITM_ID 0b0000100000000000
 #define ITM_DA 0b1000000000000000
 
-	//
-	// Polymorphic attribute names (for use w/GET macro)
-	//
+//
+// Polymorphic attribute names (for use w/GET macro)
+//
 
 #define TYPE      0       // Entity type
 #define PROFILE   1       // Constant profile flag word
@@ -550,9 +550,9 @@ namespace Aesop {
 #define NAME      3       // Name resource
 #define SHPTABLE  4       // Shape table resource name (features/NPCs)
 
-	//
-	// NPC-specific attribute names
-	//
+//
+// NPC-specific attribute names
+//
 
 #define SPEED     1000    // Turn rate
 #define PALETTE   1001    // Palette # (PAL_M1,PAL_M2)
@@ -571,9 +571,9 @@ namespace Aesop {
 #define ATK_SND   1014    // Sound # made when attacking
 #define RMOV_SND  1015    // 25% chance of sound when moving
 
-	//
-	// Item-specific attribute names
-	//
+//
+// Item-specific attribute names
+//
 
 #define ICON_SHP  2000    // Shape number for icon/mouse cursor (P_IN_HAND)
 #define FLOOR_SHP 2001    // Shape number when lying on floor (P_ON_FLOOR)
@@ -584,9 +584,9 @@ namespace Aesop {
 
 #define KEY_CODE  2006    // key code, needed only for IP_KEYs
 
-	//
-	// Weapon-specific attribute names
-	//
+//
+// Weapon-specific attribute names
+//
 
 #define LARGE_NUM 2100    // n x-sided die against large monsters
 #define LARGE_DIE 2101    // n-sided die against large monsters
@@ -596,22 +596,22 @@ namespace Aesop {
 #define SMALL_ADD 2105    // x y-sided die + n against small/medium monsters
 #define TRUENAME  2106    // Magical ("ego") name resource
 
-	//
-	// Armor-specific attribute names
-	// 
+//
+// Armor-specific attribute names
+//
 
 #define AC_RATING 2200    // Base AC rating for armor
 #define AC_MODIFY 2201    // AC modifier for shields, bracers, etc.
 
-	//
-	// Food-specific attribute names
-	//
+//
+// Food-specific attribute names
+//
 
 #define NUTRITION 2300    // (present only if IP_FOOD flag is set)
 
-	//
-	// Spell missile attribute names
-	//
+//
+// Spell missile attribute names
+//
 
 #define FLAGS     2400    // Spell attributes vis-a-vis missile flight
 #define DAMTYPE   2401    // Type of damage to cause
@@ -621,23 +621,23 @@ namespace Aesop {
 #define DMG_ADD   2405    // Additional damage beyond rolled damage
 #define DMG_MUL   2406    // Damage roll multiplier
 
-	//
-	// Feature-specific attribute names
-	//
+//
+// Feature-specific attribute names
+//
 
 #define IMPEDANCE 3000    // 0=free, -1=impassable (parm1 = requestor)
 #define TIMER     3001    // 0=no timer service, else timer rate * 1/30 sec.
 #define STATES    3002    // # of possible valid states (state = 0...n-1)
 
-	//
-	// Lever-specific attribute names
-	//
+//
+// Lever-specific attribute names
+//
 
 #define SHPSET    3101    // Shape set # used for given state
 
-	//
-	// Spell missile FLAGS bits
-	//
+//
+// Spell missile FLAGS bits
+//
 
 #define AUTOHIT      0x01
 #define GROUPHIT     0x02
@@ -648,9 +648,9 @@ namespace Aesop {
 #define MAGMISS      0x40
 #define CONTINUE     0x80
 
-	//
-	// Explosion/vortex colors
-	//
+//
+// Explosion/vortex colors
+//
 
 #define REDPATTERN   0
 #define BLUEPATTERN  1
@@ -660,36 +660,36 @@ namespace Aesop {
 #define DARKNESS     1
 #define ACID         2
 
-	//
-	// Place definitions for "display" handlers
-	//
-	// Places 0-...+ = "owned" by entity
-	//
-	// 'place' variables for all non-item entities should be P_ON_FLOOR
-	//
+//
+// Place definitions for "display" handlers
+//
+// Places 0-...+ = "owned" by entity
+//
+// 'place' variables for all non-item entities should be P_ON_FLOOR
+//
 
 #define P_ON_FLOOR  -1  // Item, NPC, or feature associated with "floor"
 #define P_IN_HAND   -2  // Item taken from floor and placed in "hand" (cursor)
 #define P_AIRBORNE  -3  // Item thrown or cast, while in flight
 
-	//
-	// Valid item location flags (from Eye II)
-	//
+//
+// Valid item location flags (from Eye II)
+//
 
-#define	LOCPACK		0x01		/* these are bitfields which allow the  	*/
-#define	LOCCHEST		0x02		/*	program to determine in what inventory	*/
-#define	LOCARMS		0x04		/*	locations a given item may be placed	*/
-#define	LOCHANDS		0x08
-#define	LOCFEET		0x10
-#define	LOCHEAD		0x20
-#define	LOCNECK		0x40
-#define	LOCBELT		0x80
-#define	LOCRING		0x100
-#define	LOCANY		0xFFFF
+#define LOCPACK     0x01        /* these are bitfields which allow the      */
+#define LOCCHEST        0x02        /*  program to determine in what inventory  */
+#define LOCARMS     0x04        /*  locations a given item may be placed    */
+#define LOCHANDS        0x08
+#define LOCFEET     0x10
+#define LOCHEAD     0x20
+#define LOCNECK     0x40
+#define LOCBELT     0x80
+#define LOCRING     0x100
+#define LOCANY      0xFFFF
 
-	//
-	// Character flags/indices
-	//
+//
+// Character flags/indices
+//
 
 #define SCR_ADVENT 0    // Current display = "adventure screen"
 #define SCR_EQUIP  1    // Current display = "equipment screen"

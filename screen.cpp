@@ -29,10 +29,10 @@
 
 namespace Aesop {
 
-static byte F_fade[11][256];		// fixed      00-AF (also initializes B0-FF)
-static byte W_fade[11][16];			// wallset    B0-BF
-static byte M1_fade[11][32];		// monster #1 C0-DF
-static byte M2_fade[11][32];		// monster #2 E0-FF
+static byte F_fade[11][256];        // fixed      00-AF (also initializes B0-FF)
+static byte W_fade[11][16];         // wallset    B0-BF
+static byte M1_fade[11][32];        // monster #1 C0-DF
+static byte M2_fade[11][32];        // monster #2 E0-FF
 static byte M1_gry[32];
 static byte M1_wht[32];
 static byte M2_gry[32];
@@ -48,27 +48,35 @@ static byte F_blu[256];
 static byte F_red[256];
 static byte F_gry[256];
 
-const int first_color[5] = { 0x00,0xb0,0xc0,0xe0,0xb0 };
+const int first_color[5] = { 0x00, 0xb0, 0xc0, 0xe0, 0xb0 };
 const int num_colors[5] = { 256, 16, 32, 32, 80 };
 
-byte *fade_tables[5][16] = { 
-	{ F_fade[0],F_fade[1],F_fade[2],F_fade[3], F_fade[4],F_fade[5],F_fade[6],F_fade[7],
-            F_fade[8],F_fade[9],F_fade[10], F_blu,F_grn,F_red,F_gry, NULL },
+byte *fade_tables[5][16] = {
+	{
+		F_fade[0], F_fade[1], F_fade[2], F_fade[3], F_fade[4], F_fade[5], F_fade[6], F_fade[7],
+		F_fade[8], F_fade[9], F_fade[10], F_blu, F_grn, F_red, F_gry, NULL
+	},
 
-	{ W_fade[0],W_fade[1],W_fade[2],W_fade[3], W_fade[4],W_fade[5],W_fade[6],W_fade[7],
-            W_fade[8],W_fade[9],W_fade[10], NULL,  NULL,  NULL,  NULL,  NULL },
+	{
+		W_fade[0], W_fade[1], W_fade[2], W_fade[3], W_fade[4], W_fade[5], W_fade[6], W_fade[7],
+		W_fade[8], W_fade[9], W_fade[10], NULL,  NULL,  NULL,  NULL,  NULL
+	},
 
-	{ M1_fade[0],M1_fade[1],M1_fade[2],M1_fade[3], M1_fade[4],M1_fade[5],M1_fade[6],M1_fade[7],
-            M1_fade[8],M1_fade[9],M1_fade[10], M1_gry, M1_wht, M1_grn, M1_blu, M1_brn },
+	{
+		M1_fade[0], M1_fade[1], M1_fade[2], M1_fade[3], M1_fade[4], M1_fade[5], M1_fade[6], M1_fade[7],
+		M1_fade[8], M1_fade[9], M1_fade[10], M1_gry, M1_wht, M1_grn, M1_blu, M1_brn
+	},
 
-	{ M2_fade[0],M2_fade[1],M2_fade[2],M2_fade[3], M2_fade[4], M2_fade[5], M2_fade[6], M2_fade[7],
-            M2_fade[8], M2_fade[9], M2_fade[10], M2_gry, M2_wht, M2_grn, M2_blu, M2_brn },
+	{
+		M2_fade[0], M2_fade[1], M2_fade[2], M2_fade[3], M2_fade[4], M2_fade[5], M2_fade[6], M2_fade[7],
+		M2_fade[8], M2_fade[9], M2_fade[10], M2_gry, M2_wht, M2_grn, M2_blu, M2_brn
+	},
 
 	{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
 };
 
 //
-// Fixed-palette color ranges for magical auras, poison effects, 
+// Fixed-palette color ranges for magical auras, poison effects,
 // petrification effects, damage effects, etc.
 //
 
@@ -178,7 +186,7 @@ void Pane::drawDot(const Common::Point &pt, byte color) {
 
 void Pane::drawLine(const Common::Point &src, const Common::Point &dest, byte color) {
 	_window->drawLine(Common::Point(src.x - left, src.y - top),
-		Common::Point(dest.x - left, dest.y - top), color);
+	                  Common::Point(dest.x - left, dest.y - top), color);
 }
 
 void Pane::drawRect(const Common::Rect &r, byte color) {
@@ -292,7 +300,7 @@ int Font::charWidth(int c) {
 TextWindow::TextWindow() {
 	window = 0;
 	htab = vtab = 0;
-	font = (Font *)-1;
+	font = (Font *) - 1;
 	delay = 0;
 	continueFunction = nullptr;
 	txtbuf = nullptr;
@@ -314,7 +322,7 @@ void TextWindow::home() {
 	font = (Font *)Resources::addr(hfont);
 
 	selectTextWindow();
-	
+
 	error("TODO");
 
 	font = (Font *)hfont;
@@ -392,7 +400,7 @@ Screen::Screen(AesopEngine *vm): Window(Common::Rect(0, 0, AESOP_SCREEN_WIDTH, A
 
 	// Add the screen itself as the first window
 	_windows.push_back(*this);
-		
+
 	// Set up a second page
 	_windows.push_back(Window(Common::Rect(0, 0, AESOP_SCREEN_WIDTH, AESOP_SCREEN_HEIGHT)));
 
@@ -418,7 +426,7 @@ void Screen::update() {
 		const Common::Rect &r = *i;
 		const byte *srcP = (const byte *)_surface.getBasePtr(r.left, r.top);
 		g_system->copyRectToScreen(srcP, _surface.pitch, r.left, r.top,
-			r.width(), r.height());
+		                           r.width(), r.height());
 	}
 
 	// Signal the physical screen to update
@@ -563,7 +571,7 @@ void Screen::setPalette(uint region, uint resource) {
 	PHDR = (PAL_HDR *)res.addr(handle);
 
 	if ((region == PAL_FIXED) || (region == PAL_WALLS) ||
-			(region == PAL_M1) || (region == PAL_M2)) {
+	        (region == PAL_M1) || (region == PAL_M2)) {
 		for (int idx = 0; idx < 11; ++idx) {
 			fade = (const byte *)add_ptr(PHDR, PHDR->fade[idx]);
 
@@ -836,20 +844,17 @@ void Screen::cout(int c) {
 
 		nvtab = cvtab + _twptr->font->char_height;
 
-		if (nvtab > _windows[_twptr->window].bottom - _windows[_twptr->window].top)
-		{
-			if (_twptr->continueFunction != NULL)
-			{
-				if (((*_twptr->continueFunction)(_twptr->htab)) == 0)
-				{
+		if (nvtab > _windows[_twptr->window].bottom - _windows[_twptr->window].top) {
+			if (_twptr->continueFunction != NULL) {
+				if (((*_twptr->continueFunction)(_twptr->htab)) == 0) {
 					_twptr->htab = htab;
 					return;
 				}
 			}
 			_twptr->htab = htab;
 
-			_windows[_twptr->window].scroll(Common::Point(0, -_twptr->font->char_height), PS_NOWRAP, 
-				_twptr->font->font_background);
+			_windows[_twptr->window].scroll(Common::Point(0, -_twptr->font->char_height), PS_NOWRAP,
+			                                _twptr->font->font_background);
 		} else {
 			_twptr->vtab += _twptr->font->char_height;
 		}
@@ -857,8 +862,8 @@ void Screen::cout(int c) {
 		_twptr->htab = _windows[_twptr->window].left;    // Carriage Return
 	} else {
 		_twptr->htab += _windows[_twptr->window].drawCharacter(
-			Common::Point(_twptr->htab - _windows[_twptr->window].left, _twptr->vtab - _windows[_twptr->window].top),
-			_twptr->font, c, _twptr->lookaside);
+		                    Common::Point(_twptr->htab - _windows[_twptr->window].left, _twptr->vtab - _windows[_twptr->window].top),
+		                    _twptr->font, c, _twptr->lookaside);
 	}
 
 }
@@ -876,8 +881,7 @@ void Screen::textStyle(uint wndnum, uint font, uint justify) {
 
 	hfont = (HRES)_tw[wndnum].font;
 
-	if (hfont != HRES_NULL)
-	{
+	if (hfont != HRES_NULL) {
 		res.unlock(hfont);
 	}
 
@@ -916,8 +920,9 @@ void Screen::lineTo(Common::Array<Parameter> args) {
 
 
 void Screen::solidBarGraph(const Common::Rect &r, uint32 lb_border, uint32 tr_border, uint32 bkgnd,
-		uint32 grn, uint32 yel, uint32 red, int val, int min, int crit, int max) {
-	LONG btop, bbtm, blft, brgt, grayx; LONG range, point, width;
+                           uint32 grn, uint32 yel, uint32 red, int val, int min, int crit, int max) {
+	LONG btop, bbtm, blft, brgt, grayx;
+	LONG range, point, width;
 	LONG color;
 
 	_windows[PAGE2].drawLine(Common::Point(r.left, r.top), Common::Point(r.left, r.bottom), lb_border);
@@ -977,19 +982,17 @@ LONG VFX_shape_bounds(void *shape_table, LONG shape_num) {
 	return 0;
 }
 
-LONG GIL2VFX_get_bitmap_width(void *shape_table, LONG shape_num)
-{
+LONG GIL2VFX_get_bitmap_width(void *shape_table, LONG shape_num) {
 	return (VFX_shape_bounds(shape_table, shape_num) >> 16);
 }
 
-LONG GIL2VFX_get_bitmap_height(void *shape_table, LONG shape_num)
-{
+LONG GIL2VFX_get_bitmap_height(void *shape_table, LONG shape_num) {
 	return ((LONG)(WORD)VFX_shape_bounds(shape_table, shape_num));
 }
 
 void VFX_shape_visible_rectangle(void *shape_table,
-	LONG shape_number, LONG hotX, LONG hotY,
-	LONG mirror, LONG *rectangle) {
+                                 LONG shape_number, LONG hotX, LONG hotY,
+                                 LONG mirror, LONG *rectangle) {
 	error("TODO: VFX_shape_visible_rectangle");
 }
 
@@ -1006,8 +1009,8 @@ void VFX_shape_lookaside(UBYTE *table) {
 }
 
 void VFX_shape_transform(Pane *pane,
-	void *shape_table, LONG shape_number, LONG hotX, LONG hotY,
-	void *buffer, LONG rot, LONG x_scale, LONG y_scale, LONG flags) {
+                         void *shape_table, LONG shape_number, LONG hotX, LONG hotY,
+                         void *buffer, LONG rot, LONG x_scale, LONG y_scale, LONG flags) {
 	error("TODO");
 }
 
@@ -1020,38 +1023,31 @@ int VFX_shape_resolution(byte *data, int shape_num) {
 }
 
 LONG GIL2VFX_visible_bitmap_rect(LONG x1, LONG y1, LONG mirror,
-	UBYTE *shapes, LONG shape_num, WORD *bounds) {
+                                 UBYTE *shapes, LONG shape_num, WORD *bounds) {
 	LONG rectangle[4];
 	LONG bm_width, bm_height;
 
 	VFX_shape_visible_rectangle(shapes, shape_num, x1, y1, mirror, rectangle);
 
-	if (mirror)
-	{
+	if (mirror) {
 		bm_width = VFX_shape_bounds(shapes, shape_num);
 		bm_height = (LONG)(WORD)bm_width;
 		bm_width = bm_width >> 16;
 	}
 
 
-	if (mirror & X_MIRROR)
-	{
+	if (mirror & X_MIRROR) {
 		bounds[0] = (WORD)(bm_width + rectangle[0]);
 		bounds[2] = (WORD)(bm_width + rectangle[2]);
-	}
-	else
-	{
+	} else {
 		bounds[0] = (WORD)rectangle[0];
 		bounds[2] = (WORD)rectangle[2];
 	}
 
-	if (mirror & Y_MIRROR)
-	{
+	if (mirror & Y_MIRROR) {
 		bounds[1] = (WORD)(bm_height + rectangle[1]);
 		bounds[3] = (WORD)(bm_height + rectangle[3]);
-	}
-	else
-	{
+	} else {
 		bounds[1] = (WORD)rectangle[1];
 		bounds[3] = (WORD)rectangle[3];
 	}
@@ -1070,7 +1066,7 @@ LONG GIL2VFX_visible_bitmap_rect(LONG x1, LONG y1, LONG mirror,
 }
 
 void GIL2VFX_draw_bitmap(int wnd, int x, int y, int mirror, int scale,
-		byte *fade_table, byte *shapes, int shape_num) {
+                         byte *fade_table, byte *shapes, int shape_num) {
 	Pane &pane = _vm->_screen->panes(wnd);
 	int xp = x - pane.left;
 	int yp = y - pane.top;
@@ -1080,21 +1076,17 @@ void GIL2VFX_draw_bitmap(int wnd, int x, int y, int mirror, int scale,
 
 //	if (gil2vfx_active != true) return;
 
-	if ((scale == 0) && (mirror == NO_MIRROR))
-	{
+	if ((scale == 0) && (mirror == NO_MIRROR)) {
 		VFX_shape_draw(&pane, shapes, shape_num, xp, yp);
-	}
-	else
-	{
+	} else {
 		x_scale = ((scale) ? (scale << 8) : 0x10000);
 		y_scale = ((scale) ? (scale << 8) : 0x10000);
 
-		if (x_scale != 0x10000 || y_scale != 0x10000)
-		{
+		if (x_scale != 0x10000 || y_scale != 0x10000) {
 			VFX_fixed_mul(VFX_shape_bounds(shapes, shape_num) & 0xffff0000,
-				0x10000 - x_scale, &xs);
+			              0x10000 - x_scale, &xs);
 			VFX_fixed_mul(VFX_shape_bounds(shapes, shape_num) << 16,
-				0x10000 - y_scale, &ys);
+			              0x10000 - y_scale, &ys);
 
 			if (mirror & X_MIRROR) xs = -xs;
 			if (mirror & Y_MIRROR) ys = -ys;
@@ -1103,8 +1095,7 @@ void GIL2VFX_draw_bitmap(int wnd, int x, int y, int mirror, int scale,
 			yp += ys >> 17;
 		}
 
-		switch (mirror)
-		{
+		switch (mirror) {
 		case X_MIRROR:
 			x_scale = -x_scale;
 			xp += (VFX_shape_bounds(shapes, shape_num) >> 16);
@@ -1124,22 +1115,19 @@ void GIL2VFX_draw_bitmap(int wnd, int x, int y, int mirror, int scale,
 			break;
 		}
 
-		if (fade_table != NULL && scale != 0)
-		{
+		if (fade_table != NULL && scale != 0) {
 			VFX_shape_lookaside(fade_table);
 			flags = ST_XLAT;
-		}
-		else
+		} else
 			flags = 0;
 
 		VFX_shape_transform(&pane, shapes, shape_num, xp, yp,
-			_vm->_screen->_bitmapBuffer.getPixels(), 0, x_scale, y_scale, flags);
+		                    _vm->_screen->_bitmapBuffer.getPixels(), 0, x_scale, y_scale, flags);
 	}
 }
 
 
-void GIL2VFX_refresh_window(ULONG source, ULONG target)
-{
+void GIL2VFX_refresh_window(ULONG source, ULONG target) {
 	//mouse_pane_refresh(&panes[source], &panes[target]);
 }
 

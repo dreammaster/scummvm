@@ -55,29 +55,29 @@ typedef UWORD HSTR;           // run-time len-prefixed string descriptor
 
 // Message handler header
 struct MHDR {
-   UWORD auto_size;
+	UWORD auto_size;
 };
 
 // Thunk message vector list entry
 struct MV_entry {
-   UWORD msg;
-   ULONG handler;
-   UWORD SD_offset;
+	UWORD msg;
+	ULONG handler;
+	UWORD SD_offset;
 };
 
 // Thunk SOP descriptor list entry
 struct SD_entry {
-   HRES SOP;
-   ULONG exports;
-   UWORD static_base;
-   UWORD extern_base;
-};                     
+	HRES SOP;
+	ULONG exports;
+	UWORD static_base;
+	UWORD extern_base;
+};
 
 // Palette resource header
 struct PAL_HDR {
-   UWORD ncolors;
-   UWORD RGB;
-   UWORD fade[11];
+	UWORD ncolors;
+	UWORD RGB;
+	UWORD fade[11];
 };
 
 } // End of namespace Aesop

@@ -46,7 +46,7 @@ extern void diagnose(LONG argcnt, ULONG dtype, ULONG parm);
 extern ULONG heapfree(void);
 
 extern void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
-   LONG hot_Y, ULONG scale, ULONG fade_table, ULONG fade_level);
+                              LONG hot_Y, ULONG scale, ULONG fade_table, ULONG fade_level);
 extern void set_wait_pointer(LONG argcnt, ULONG number, LONG hot_X, LONG hot_Y);
 extern void standby_cursor(void);
 extern void resume_cursor(void);
@@ -104,10 +104,10 @@ extern LONG get_text_y(LONG argcnt, ULONG wndnum);
 extern void init_sound(LONG argcnt, ULONG errprompt);
 extern void shutdown_sound(void);
 extern void load_sound_block(LONG argcnt, ULONG first_block, ULONG last_block,
-   ULONG *array);
+                             ULONG *array);
 extern void sound_effect(LONG argcnt, ULONG index);
 extern void play_sequence(LONG argcnt, ULONG LA_version, ULONG AD_version, ULONG
-   PC_version);
+                          PC_version);
 extern void load_music(void);
 extern void unload_music(void);
 extern void set_sound_status(LONG argcnt, ULONG status);
@@ -128,17 +128,17 @@ extern LONG step_region(LONG argcnt, ULONG r, ULONG dir);
 
 extern ULONG distance(LONG argcnt, ULONG x1, ULONG y1, ULONG x2, ULONG y2);
 extern ULONG seek_direction(LONG argcnt, ULONG obj_x, ULONG obj_y, ULONG
-   dest_x, ULONG dest_y);
+                            dest_x, ULONG dest_y);
 
 extern ULONG spell_request(LONG argcnt, BYTE *stat, BYTE *cnt, ULONG typ, ULONG num);
 extern ULONG spell_list(LONG argcnt, BYTE *cnt, ULONG typ, ULONG lvl, BYTE *list,
-   ULONG max);
+                        ULONG max);
 extern void magic_field(LONG argcnt, ULONG p, ULONG redfield, ULONG yelfield,
-   LONG sparkle);
+                        LONG sparkle);
 extern void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
-   LONG scale, LONG power, LONG dots, LONG life, LONG upval, BYTE *colors);
-extern void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag, 
-   LONG grav, LONG life, BYTE *colors);
+                    LONG scale, LONG power, LONG dots, LONG life, LONG upval, BYTE *colors);
+extern void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
+                   LONG grav, LONG life, BYTE *colors);
 
 extern void read_save_directory(void);
 extern char *savegame_title(LONG argcnt, ULONG num);
@@ -155,7 +155,7 @@ extern void read_initial_items(void);
 extern void write_initial_tempfiles(void);
 extern void create_initial_binary_files(void);
 extern void launch(LONG argcnt, const char *dirname, const char *prgname, const char *argn1,
-	const char *argn2);
+                   const char *argn2);
 
 extern LONG player_attrib(LONG argcnt, ULONG plrnum, ULONG offset, ULONG size);
 extern LONG item_attrib(LONG argcnt, ULONG plrnum, ULONG invslot, ULONG attrib);
@@ -167,14 +167,14 @@ extern void close_transfer_file();
 
 // AESOP resource attribute declarations
 
-attrib sequence fixed,precious
-attrib sample fixed,precious
-attrib string moveable,discardable
-attrib source moveable,discardable
+attrib sequence fixed, precious
+attrib sample fixed, precious
+attrib string moveable, discardable
+attrib source moveable, discardable
 attrib document temporary
 attrib map temporary
-attrib palette moveable,discardable
-attrib file moveable,discardable
+attrib palette moveable, discardable
+attrib file moveable, discardable
 
 #endif
 

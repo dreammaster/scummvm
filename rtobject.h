@@ -33,14 +33,14 @@ namespace Aesop {
 
 // static context descriptor
 struct CDESC {
-   UWORD slot;       // object list index
-   ULONG name;       // code object name
-   UWORD size;       // size of instance data (unused in text files)
+	UWORD slot;       // object list index
+	ULONG name;       // code object name
+	UWORD size;       // size of instance data (unused in text files)
 };
 
 #define SF_TXT 1     // text savetype
 #define SF_BIN 0     // binary savetype
-                  
+
 extern UBYTE objflags[NUM_OBJECTS];
 extern HRES objlist[NUM_OBJECTS];
 
@@ -52,7 +52,7 @@ extern void init_object_list(void);
 extern void restore_range(const char *filename, ULONG first, ULONG last, ULONG restoring);
 extern LONG save_range(const char *filename, ULONG filetype, ULONG first, ULONG last);
 void translate_file(const char *TXT_filename, const char *BIN_filename, ULONG first,
-   ULONG last);
+                    ULONG last);
 
 extern LONG create_object(LONG argcnt, ULONG name);
 extern LONG create_program(LONG argcnt, LONG index, ULONG name);

@@ -75,11 +75,11 @@ namespace Aesop {
 #define K_ESC     0x001b
 #define K_BS      0x0008
 
-	//ллллллллллллллллллллллллллллллллллллллллллл
-	//лл                                       лл
-	//лл System and input event types          лл
-	//лл                                       лл
-	//ллллллллллллллллллллллллллллллллллллллллллл
+//ллллллллллллллллллллллллллллллллллллллллллл
+//лл                                       лл
+//лл System and input event types          лл
+//лл                                       лл
+//ллллллллллллллллллллллллллллллллллллллллллл
 
 #define FIRST_INPUT_EVENT         2
 #define LAST_INPUT_EVENT          17
@@ -90,11 +90,11 @@ namespace Aesop {
 #define FIRST_APP_EVENT           32
 #define LAST_APP_EVENT            (NUM_EVTYPES-1)
 
-	//ллллллллллллллллллллллллллллллллллллллллллл
-	//лл                                       лл
-	//лл Shared application equates            лл
-	//лл                                       лл
-	//ллллллллллллллллллллллллллллллллллллллллллл
+//ллллллллллллллллллллллллллллллллллллллллллл
+//лл                                       лл
+//лл Shared application equates            лл
+//лл                                       лл
+//ллллллллллллллллллллллллллллллллллллллллллл
 
 #define NUM_OBJECTS   2048 // Up to 2,048 objects in Eye III universe
 #define NUM_ENTITIES  2000 // Up to 2,000 physical entities in Eye III universe
@@ -121,9 +121,9 @@ namespace Aesop {
 
 #define bootstrap     2000 // Object which launches AESOP application
 
-	//
-	// Names of four basic palette regions
-	//
+//
+// Names of four basic palette regions
+//
 
 #define PAL_FIXED 0     // Fixed color palette = colors 00-AF
 #define PAL_WALLS 1     // Wallset palette     = colors B0-BF
@@ -142,9 +142,9 @@ namespace Aesop {
 #define M_BLU     14    // illumination value to render M1/M2 colors in blues
 #define M_BRN     15    // illumination value to render M1/M2 colors in browns
 
-	//
-	// Fixed palette color names
-	//
+//
+// Fixed palette color names
+//
 
 #define XCOLOR    0
 #define DK_GRN    1
@@ -166,9 +166,9 @@ namespace Aesop {
 #define BRN_2     0x14
 #define BRN_3     0x16
 
-	//
-	// Other application-specific equates
-	//
+//
+// Other application-specific equates
+//
 
 #define LVL_Y      32   // Max. Y-dimension of level map = 32 (must be 2^^n)
 #define LVL_X      32   // Max. X-dimension of level map = 32 (must be 2^^n)
@@ -192,7 +192,7 @@ namespace Aesop {
 #define GRAVITY    5    // Needed by explosion/vortex resources
 #define FRICTION   1
 #define MAXDOTS    150
-#define ACCUR	    6
+#define ACCUR       6
 
 #define EYE2_FLAGS 0    // Flags used by item transfer routines
 #define EYE2_TYPE  1

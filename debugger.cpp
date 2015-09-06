@@ -26,7 +26,7 @@
 namespace Aesop {
 
 Debugger::Debugger(AesopEngine *vm) : GUI::Debugger(), _vm(vm) {
-	registerCmd("continue",	     WRAP_METHOD(Debugger, cmdExit));
+	registerCmd("continue",      WRAP_METHOD(Debugger, cmdExit));
 }
 
 } // End of namespace Sherlock

@@ -37,9 +37,9 @@
 namespace Aesop {
 
 // user field = resource name if 0, file offset if 1
-#define FAST_LOCK		1				
+#define FAST_LOCK       1
 // AESOP resource cache size (800K)
-#define MAX_RES_SIZE	800000
+#define MAX_RES_SIZE    800000
 
 #undef FARPROC
 typedef void(*FARPROC)();
@@ -124,7 +124,7 @@ THDR::THDR() {
 
 Resources::Resources(AesopEngine *vm): _vm(vm) {
 	const Common::String filename = vm->getGameID() == GType_EOB3 ? "eye.res" : "hack.res";
-	void *beg,*end;
+	void *beg, *end;
 
 	if (!_file.open(filename))
 		error("Could not locate %s", filename.c_str());
@@ -138,16 +138,16 @@ Resources::Resources(AesopEngine *vm): _vm(vm) {
 	_nentries = DIR_BLK;
 	_dir = (HD_entry *)beg;
 
-	_next_M = add_ptr(beg,SIZE_DB);
+	_next_M = add_ptr(beg, SIZE_DB);
 	_last_F = end;
 
-	_free = ptr_dif(_last_F,_next_M);
+	_free = ptr_dif(_last_F, _next_M);
 
 	_LRU_cnt = 0;
 
 	init_dir(0);
 
-	_cur_blk = (ULONG)-1;
+	_cur_blk = (ULONG) - 1;
 
 	_name_dir = alloc(MAX_OBJ_TYPES * sizeof(ND_entry), DA_FIXED | DA_PRECIOUS);
 	_nd_entries = 0;
@@ -155,7 +155,7 @@ Resources::Resources(AesopEngine *vm): _vm(vm) {
 
 Resources::~Resources() {
 	_file.close();
-	delete[] (byte *)_base;
+	delete[](byte *)_base;
 }
 
 ULONG Resources::discard(ULONG index, bool do_move) {
@@ -202,7 +202,7 @@ ULONG Resources::LRU() {
 	ULONG n, age;
 
 	n = _nentries;
-	oldest = age = (ULONG)-1;
+	oldest = age = (ULONG) - 1;
 
 	for (i = 0; i < n; ++i) {
 		if (_dir[i]._flags & (DA_FIXED | DA_PRECIOUS | DA_DISCARDED | DA_FREE))
@@ -256,8 +256,7 @@ ULONG Resources::make_room(ULONG goal) {
 	// 4) Discard all unlocked TEMPORARY entries
 	//
 
-	for (first = _nentries - 1; first >= 0; first--)
-	{
+	for (first = _nentries - 1; first >= 0; first--) {
 		if (_dir[first]._flags & (DA_FIXED | DA_PRECIOUS | DA_DISCARDABLE | DA_DISCARDED))
 			continue;
 
@@ -305,13 +304,13 @@ ULONG Resources::make_room(ULONG goal) {
 	while (_free < goal) {
 		//
 		// If no LRU candidates available, return false
-		//       
+		//
 		index = LRU();
-		if (index == (ULONG)-1) {
+		if (index == (ULONG) - 1) {
 			return 0;
 		}
 
-		//       
+		//
 		// Discard least-recently-used valid candidate
 		//
 		discard(index, 1);
@@ -333,13 +332,10 @@ ULONG Resources::assign_space(ULONG bytes, ULONG attrib, HRES entry) {
 
 	_free -= bytes;
 
-	if (attrib & DA_FIXED)
-	{
+	if (attrib & DA_FIXED) {
 		_last_F = (UBYTE *)_last_F - bytes;
 		sel->_seg = _last_F;
-	}
-	else
-	{
+	} else {
 		sel->_seg = _next_M;
 		_next_M = (UBYTE *)_next_M + bytes;
 	}
@@ -353,7 +349,7 @@ void Resources::init_dir(ULONG first) {
 		_dir[j]._flags = DA_FREE | DA_DISCARDED;
 		_dir[j]._history = 0;
 		_dir[j]._locks = 0;
-		_dir[j]._user = (ULONG)-1;
+		_dir[j]._user = (ULONG) - 1;
 		_dir[j]._seg = 0;
 	}
 }
@@ -464,7 +460,7 @@ HRES Resources::alloc(ULONG bytes, ULONG attrib) {
 		return HRES_NULL;
 
 	sel = (HD_entry *)entry;
-	sel->_user = (ULONG)-1;
+	sel->_user = (ULONG) - 1;
 
 	return entry;
 }
@@ -489,22 +485,20 @@ void Resources::free(HRES entry) {
 			dir->thunk = HRES_NULL;
 	}
 
-	if (!(sel->_flags & DA_FIXED))
-	{
+	if (!(sel->_flags & DA_FIXED)) {
 		while ((!(sel->_flags & DA_FIXED)) &&
-			(!(sel->_flags & DA_DISCARDED)) &&
-			((ULONG)sel->_seg + sel->_size == (ULONG)_next_M)
-		) {
+		        (!(sel->_flags & DA_DISCARDED)) &&
+		        ((ULONG)sel->_seg + sel->_size == (ULONG)_next_M)
+		      ) {
 			discard(((byte *)entry - (byte *)_dir) / sizeof(HD_entry), 1);
 
 			n = _nentries;
 			for (i = 0; i < n; i++)
 				if ((!(_dir[i]._flags & DA_FIXED)) &&
-					(_dir[i]._flags & DA_FREE) &&
-					(!(_dir[i]._flags & DA_DISCARDED)) &&
-					((ULONG)_dir[i]._seg + sel->_size == (ULONG)_next_M)
-					)
-				{
+				        (_dir[i]._flags & DA_FREE) &&
+				        (!(_dir[i]._flags & DA_DISCARDED)) &&
+				        ((ULONG)_dir[i]._seg + sel->_size == (ULONG)_next_M)
+				   ) {
 					sel = &(_dir[i]);
 					entry = (HRES)sel;
 					break;
@@ -512,9 +506,8 @@ void Resources::free(HRES entry) {
 		}
 	} else {
 		while ((sel->_flags & DA_FIXED)
-			&& (!(sel->_flags & DA_DISCARDED))
-			&& (sel->_seg == _last_F))
-		{
+		        && (!(sel->_flags & DA_DISCARDED))
+		        && (sel->_seg == _last_F)) {
 			_last_F = (UBYTE *)_last_F + sel->_size;
 			_free += sel->_size;
 			sel->_flags |= DA_DISCARDED;
@@ -522,10 +515,9 @@ void Resources::free(HRES entry) {
 			n = _nentries;
 			for (i = 0; i < n; i++)
 				if ((_dir[i]._flags & DA_FIXED)
-					&& (_dir[i]._flags & DA_FREE)
-					&& (!(_dir[i]._flags & DA_DISCARDED))
-					&& (_dir[i]._seg == _last_F))
-				{
+				        && (_dir[i]._flags & DA_FREE)
+				        && (!(_dir[i]._flags & DA_DISCARDED))
+				        && (_dir[i]._seg == _last_F)) {
 					sel = &_dir[i];
 					break;
 				}
@@ -548,8 +540,8 @@ void Resources::lock(HRES entry) {
 	if (sel->_flags & (DA_FIXED | DA_PRECIOUS | DA_FREE))
 		return;
 
-	if ((sel->_flags & DA_DISCARDED) && (sel->_user != (ULONG)-1)) {
-		if (assign_space(sel->_size, sel->_flags, entry) == (ULONG)-1)
+	if ((sel->_flags & DA_DISCARDED) && (sel->_user != (ULONG) - 1)) {
+		if (assign_space(sel->_size, sel->_flags, entry) == (ULONG) - 1)
 			return;
 
 #if FAST_LOCK
@@ -614,7 +606,7 @@ HRES Resources::load_resource(ULONG resource, ULONG attrib) {
 		return HRES_NULL;
 
 	entry = alloc(_REH._dataSize,
-		(attrib == DA_DEFAULT) ? _REH._dataAttrib : attrib);
+	              (attrib == DA_DEFAULT) ? _REH._dataAttrib : attrib);
 
 	if (entry != HRES_NULL) {
 		sel = (HD_entry *)entry;
@@ -807,7 +799,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 	thdr._mvList = sizeof(THDR);
 	thdr._sdList = sizeof(THDR);
-	thdr._maxMsg = (UWORD)-1;
+	thdr._maxMsg = (UWORD) - 1;
 	thdr._nPrgs = 0;
 	thdr._iSize = sizeof(IHDR);
 	thdr._useCount = 0;
@@ -822,7 +814,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 	depth = 0;
 	class1 = object;
 
-	while (class1 != (ULONG)-1) {
+	while (class1 != (ULONG) - 1) {
 		code[depth] = get_resource_handle(class1, DA_DEFAULT);
 
 		if (!code[depth])
@@ -846,7 +838,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		lnk->lock(expt[depth]);
 
 		//
-		// Calculate Size of Message Vector List   
+		// Calculate Size of Message Vector List
 		//
 
 		mcnt = 0;
@@ -937,7 +929,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 			switch (tag[0]) {
 			case 'C':               // Code
 				offset = ascnum(interp.lookup(HCRFD, &tag[2]));
-				if (offset == (UWORD)-1)
+				if (offset == (UWORD) - 1)
 					abend(MSG_MCR, &tag[2]); // "Missing code resource '%s'"
 				assert((offset % 4) == 0);
 
@@ -945,7 +937,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 				def_off = ascnum(def);
 				XR_ptr = (uint32 *)((byte *)thunk_ptr + XR + def_off);
 
-				// Add a value in the high word for validation, with the index 
+				// Add a value in the high word for validation, with the index
 				// in the global method list in the low word
 				methodNum = 0x12340000 | (offset / 4);
 				*XR_ptr = methodNum;
@@ -953,7 +945,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 			case 'B':               // Byte
 			case 'W':               // Word
-			case 'L':               // Long   
+			case 'L':               // Long
 				target = ascnum(def);
 				source = ascnum(strchr(def, ',') + 1);
 
@@ -961,7 +953,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 				index = sizeof(IHDR);
 				found = 0;
 
-				while (xclass != (ULONG)-1) {
+				while (xclass != (ULONG) - 1) {
 					xcode = get_resource_handle(xclass, DA_DEFAULT);
 
 					if (!xcode)
@@ -974,24 +966,22 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 					xclass = xprg._parent;
 
-					if (!found)
-					{
+					if (!found) {
 						xexpt = lnk->get_resource_handle(xprg._exports,
-							DA_TEMPORARY | DA_EVANESCENT);
+						                                 DA_TEMPORARY | DA_EVANESCENT);
 
 						lnk->lock(xexpt);
 						tag = tag - tagbase + (const char *)addr(impt[i]);
 
 						offset = ascnum(interp.lookup(xexpt, tag));
 
-						if (offset != (UWORD)-1) {
+						if (offset != (UWORD) - 1) {
 							found = 1;
 							index += offset;
 						}
 
 						unlock(xexpt);
-					}
-					else {
+					} else {
 						index += xprg._staticSize;
 					}
 
@@ -1056,7 +1046,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 	//
 	// Unlock dictionaries and exit w/handle to thunk
-	// 
+	//
 
 	unlock(HCRFD);
 	for (i = 0; i < depth; ++i) {

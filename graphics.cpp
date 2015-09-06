@@ -49,48 +49,47 @@ VFX_DESC *VFX;
 ULONG get_bitmap_height(LONG argcnt, ULONG table, ULONG number) {
 	Resources &res = *_vm->_resources;
 	HRES handle;
-   ULONG h;
+	ULONG h;
 
-   handle = res.get_resource_handle(table,DA_DEFAULT);
+	handle = res.get_resource_handle(table, DA_DEFAULT);
 
-   res.lock(handle);
+	res.lock(handle);
 
-   h = GIL2VFX_get_bitmap_height(res.addr(handle), number);
+	h = GIL2VFX_get_bitmap_height(res.addr(handle), number);
 
-   res.unlock(handle);
+	res.unlock(handle);
 
-   return h;
+	return h;
 }
 
 /*********************************************************/
 
 void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number, LONG x, LONG y,
-		ULONG scale, ULONG flip, ULONG fade_table, ULONG fade_level) {
+                 ULONG scale, ULONG flip, ULONG fade_table, ULONG fade_level) {
 	Resources &res = *_vm->_resources;
 	HRES handle;
-   static HRES last_handle = 0;
-   static ULONG last_table;
-   UBYTE *lookaside;
+	static HRES last_handle = 0;
+	static ULONG last_table;
+	UBYTE *lookaside;
 
-   if (table == last_table)
-      handle = last_handle;
-   else
-      {
-      handle = res.get_resource_handle(table,DA_DEFAULT);
-      last_handle = handle;
-      last_table = table;
-      }
+	if (table == last_table)
+		handle = last_handle;
+	else {
+		handle = res.get_resource_handle(table, DA_DEFAULT);
+		last_handle = handle;
+		last_table = table;
+	}
 
-   if ((fade_level > 10) && (!scale))
-      scale = 256;
+	if ((fade_level > 10) && (!scale))
+		scale = 256;
 
-   lookaside = fade_tables[fade_table][fade_level]-first_color[fade_table];
+	lookaside = fade_tables[fade_table][fade_level] - first_color[fade_table];
 
-   res.lock(handle);
+	res.lock(handle);
 
-   GIL2VFX_draw_bitmap(page,x,y,flip,scale,lookaside,(UBYTE *)res.addr(handle),number);
+	GIL2VFX_draw_bitmap(page, x, y, flip, scale, lookaside, (UBYTE *)res.addr(handle), number);
 
-   res.unlock(handle);
+	res.unlock(handle);
 }
 
 /*********************************************************/
@@ -108,7 +107,7 @@ void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number, LONG x, LON
 /*********************************************************/
 
 ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
-	ULONG table, ULONG number, WORD *array) {
+                          ULONG table, ULONG number, WORD *array) {
 	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	HRES handle;
@@ -136,8 +135,7 @@ ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
 
 
 /*********************************************************/
-void wait_vertical_retrace(void)
-{
+void wait_vertical_retrace(void) {
 //   VFX_wait_vblank_leading();
 }
 
@@ -149,32 +147,31 @@ void wait_vertical_retrace(void)
 //
 /*********************************************************/
 
-void dprint(LONG argcnt, const char *format, ...)
-{
-   va_list argptr;
+void dprint(LONG argcnt, const char *format, ...) {
+	va_list argptr;
 
-   va_start(argptr,format);
+	va_start(argptr, format);
 
-   _vm->_screen->textWindows(0).textColor(15, DK_RED);
-   _vm->_screen->textWindows(0).textColor(0, 255);
-   _vm->_screen->textWindows(0).vsprint(format, argptr);
+	_vm->_screen->textWindows(0).textColor(15, DK_RED);
+	_vm->_screen->textWindows(0).textColor(0, 255);
+	_vm->_screen->textWindows(0).vsprint(format, argptr);
 
-   va_end(argptr);
+	va_end(argptr);
 }
 
 
 void aprint(LONG argcnt, const char *format, ...) {
 	error("TODO: aprint with Paramater array");
-/*
-	va_list args;
-	char buffer[100];
+	/*
+	    va_list args;
+	    char buffer[100];
 
-	va_start(args, format);
-	vsnprintf(buffer, 100, format, args);
-	va_end(args);
+	    va_start(args, format);
+	    vsnprintf(buffer, 100, format, args);
+	    va_end(args);
 
-	debug(buffer);
-*/
+	    debug(buffer);
+	*/
 }
 
 } // End of namespace Aesop

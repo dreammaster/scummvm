@@ -55,7 +55,9 @@ int kbhit() {
 	return 0;
 }
 
-HTIMER AIL_register_timer(void(*fn)()) { return (HTIMER)0; }
+HTIMER AIL_register_timer(void(*fn)()) {
+	return (HTIMER)0;
+}
 void AIL_set_timer_frequency(HTIMER timer, int freq) {}
 void AIL_start_timer(HTIMER htimer) {}
 void AIL_release_timer_handle(HTIMER htimer) {}

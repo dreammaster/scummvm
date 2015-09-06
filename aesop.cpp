@@ -36,7 +36,7 @@ AesopEngine *_vm;
 
 
 AesopEngine::AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc) :
-		Engine(syst), _gameDescription(gameDesc), _randomSource("Aesop") {
+	Engine(syst), _gameDescription(gameDesc), _randomSource("Aesop") {
 	_vm = this;
 	_debugger = nullptr;
 	_events = nullptr;
