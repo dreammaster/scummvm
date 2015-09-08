@@ -446,16 +446,16 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 
 	if (vector == HRES_NULL || vector == (HRES)0xffff) {
 		const MV_entry *mvList = (const MV_entry *)((const byte *)_thunk + _thunk->_mvList);
-		UWORD maxMsg = _thunk->_maxMsg;
+		WORD maxMsg = (WORD)_thunk->_maxMsg;
 
-		if (maxMsg == (UWORD) - 1)
+		if (maxMsg == -1)
 			return -1;
 		_currentMsg = msgNum;
 
 		// Find the vector using a binary search
 		int idx;
-		for (idx = 0; mvList[(maxMsg + idx) & 0xfffe].msg != msgNum;) {
-			int offset = (maxMsg + idx) & 0xfffe;
+		for (idx = 0; mvList[(maxMsg + idx) / 2].msg != msgNum;) {
+			int offset = (maxMsg + idx) / 2;
 			int msg = mvList[offset].msg;
 
 			if (msg > msgNum) {

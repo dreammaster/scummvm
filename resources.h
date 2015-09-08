@@ -140,10 +140,10 @@ struct XDR_entry {
 
 // SOP program header
 struct PRG_HDR {
-	UWORD _staticSize;
-	ULONG _imports;
-	ULONG _exports;
-	ULONG _parent;
+	uint _staticSize;
+	uint _imports;
+	uint _exports;
+	uint _parent;
 
 	PRG_HDR();
 
