@@ -244,28 +244,6 @@ static void mouse_restore_area(void) {
 	*/
 }
 
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-//лл                                                                        лл
-//лл Declare an area of the screen to be off limits to any visible part of  лл
-//лл the mouse cursor; the cursor will not be drawn if any portion falls    лл
-//лл within this area                                                       лл
-//лл                                                                        лл
-//лл If x0 < 0, the previously registered exclusion area will be cancelled  лл
-//лл                                                                        лл
-//лл This exclusion area is internal to the mouse system; for general mouse лл
-//лл area exclusion, use the mouse_register_watchdog_callback() function    лл
-//лл                                                                        лл
-//лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
-
-static void mouse_exclude_area(LONG x0, LONG y0, LONG x1, LONG y1) {
-	/*
-	exclude_region.left = x0;
-	exclude_region.top = y0;
-	exclude_region.right = x1;
-	exclude_region.bottom = y1;
-	*/
-}
-
 
 //лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 //лл                                                                        лл

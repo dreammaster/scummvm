@@ -106,39 +106,11 @@ struct MEL {                      // SSI MEL sound system config file
 
 /****************************************************************************/
 //
-// Load a .DLL sound driver
-//
-/****************************************************************************/
-
-static void *load_driver(BYTE *filename) {
-	/*
-	void *DLL, *drvr;
-
-	DLL = FILE_read(filename,NULL);
-
-	if (DLL == NULL)
-	  return NULL;
-
-	drvr = DLL_load(DLL,DLLMEM_ALLOC | DLLSRC_MEM,NULL);
-
-	free(DLL);
-
-	if (drvr == NULL)
-	  return NULL;
-
-	return drvr;
-	*/
-	return nullptr;
-}
-
-/****************************************************************************/
-//
 // Standard routine for Global Timbre Library access
 //
 /****************************************************************************/
-
+/*
 static void *load_global_timbre(ULONG bank, ULONG patch) {
-	/*
 	UWORD *timb_ptr;
 	static UWORD len;
 
@@ -172,10 +144,10 @@ static void *load_global_timbre(ULONG bank, ULONG patch) {
 	read(GTL,(timb_ptr+1),len-2);
 
 	return timb_ptr;               // else return pointer to timbre
-	*/
+
 	return nullptr;
 }
-
+*/
 
 /****************************************************************************/
 //
