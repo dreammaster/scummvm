@@ -452,7 +452,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 			return -1;
 		_currentMsg = msgNum;
 
-		// Find the vector using a binary search
+		// Find the correct vector to use
 		int idx;
 		for (idx = 0; mvList[(maxMsg + idx) / 2].msg != msgNum;) {
 			int offset = (maxMsg + idx) / 2;
@@ -460,12 +460,12 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 
 			if (msg > msgNum) {
 				// Too high
-				maxMsg = offset / 2 - 1;
+				maxMsg = offset - 1;
 				if (idx > maxMsg)
 					return -1;
 			} else {
 				// Too low
-				idx = offset / 2 + 1;
+				idx = offset + 1;
 				if (idx > maxMsg)
 					return -1;
 			}
