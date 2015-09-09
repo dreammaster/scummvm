@@ -286,7 +286,75 @@ void Window::refresh(const Common::Rect &r) {
 }
 
 void Window::fade(const byte *palette, int intervals) {
-	error("TODO: VFX_window_fade");
+	Events &events = *_vm->_events;
+	Screen &screen = *_vm->_screen;
+	bool colorUsed[PALETTE_COUNT];
+	byte colorList[PALETTE_COUNT];
+	byte colorBuffer[PALETTE_SIZE];
+	int8 fadeDirection[PALETTE_SIZE];
+	byte colorDelta[PALETTE_SIZE];
+	byte colorError[PALETTE_SIZE];
+	int lastColor = -1;
+
+	// Get the pixels in use in the window and their palette rgb values
+	Common::fill(&colorUsed[0], &colorUsed[PALETTE_COUNT], false);
+
+	for (int yp = 0; yp < _surface.h; ++yp) {
+		const byte *srcP = (const byte *)_surface.getBasePtr(0, yp);
+		for (int xp = 0; xp < _surface.w; ++xp, ++srcP) {
+			if (!colorUsed[*srcP]) {
+				colorUsed[*srcP] = true;
+
+				++lastColor;
+				colorList[lastColor] = *srcP;
+				screen.readPalette(*srcP, &colorBuffer[*srcP * 3]);
+			}
+		}
+	}
+
+	// Compute the needed deltas
+	int maxValue = 0, deltaVal = 0;
+	for (int idx = lastColor; idx >= 0; --idx) {
+		for (int rgbIndex = 0; rgbIndex < 3; ++rgbIndex) {
+			byte col = colorList[idx];
+			byte const *srcP = &colorBuffer[col * 3 + rgbIndex];
+			byte const *destP = &palette[col * 3 + rgbIndex];
+
+			fadeDirection[col * 3 + rgbIndex] = *destP >= *srcP ? -1 : 1;
+			colorDelta[col * 3 + rgbIndex] = deltaVal = ABS((int)*destP - (int)*srcP);
+			maxValue = MAX(maxValue, deltaVal);
+		}
+	}
+
+	if (maxValue == 0)
+		return;
+
+	// Do the actual fading
+	Common::fill(&colorError[0], &colorError[lastColor * 3 + 3], maxValue / 2);
+	int step = (intervals << 16) / maxValue;
+	int stepCount = 0x8000;
+
+	while (!_vm->shouldQuit() && maxValue >= 0) {
+		// Figure out the intermediate palette
+		for (int idx = lastColor; lastColor >= 0; --idx) {
+			int offset = colorList[idx] * 3;
+
+			for (int rgbNum = 2; rgbNum >= 0; --rgbNum) {
+				byte rgbVal = colorError[offset + rgbNum] + colorDelta[offset + rgbNum];
+				if (rgbVal >= maxValue) {
+					rgbVal -= maxValue;
+					colorBuffer[offset + rgbNum] = fadeDirection[offset + rgbNum];
+				}
+
+				colorError[offset + rgbNum] = rgbVal;
+			}
+
+			// Write the new palette entry
+			screen.writePalette(colorList[idx], &colorBuffer[offset]);
+		}
+
+		events.delay(50);
+	}
 }
 
 /*----------------------------------------------------------------*/
