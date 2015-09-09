@@ -471,7 +471,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 			}
 		}
 
-		_currentVector = &mvList[(maxMsg + idx) & 0xfffe];
+		_currentVector = &mvList[(maxMsg + idx) / 2];
 		++_currentVector;
 
 		do {
