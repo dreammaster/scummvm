@@ -866,35 +866,35 @@ void Interpreter::cmdLTBA() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	const byte *srcP = _ds32 + offset + _stack.pop();
-	_stack.push(*srcP);
+	_stack.top() = *srcP;
 }
 
 void Interpreter::cmdLTWA() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	const byte *srcP = _ds32 + offset + _stack.pop();
-	_stack.push(READ_LE_UINT16(srcP));
+	_stack.top() = READ_LE_UINT16(srcP);
 }
 
 void Interpreter::cmdLTDA() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	const byte *srcP = _ds32 + offset + _stack.pop();
-	_stack.push(READ_LE_UINT32(srcP));
+	_stack.top() = READ_LE_UINT32(srcP);
 }
 
 void Interpreter::cmdLETA() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	BYTE *srcP = (BYTE *)_ds32 + offset;
-	_stack.push((BYTE *)srcP);
+	_stack.top() = (BYTE *)srcP;
 }
 
 void Interpreter::cmdLAB() {
 	uint32 index4 = READ_LE_UINT16(_code);
 	_code += 2;
-	assert(((index4 - 2) % 4) == 0);
-	int index = (index4 - 2) / 4;
+	assert(index4 == 0 || ((index4 - 2) % 4) == 0);
+	int index = (index4 == 0) ? -1 : (index4 - 2) / 4;
 
 	ULONG v = _stack[_stackBase + index] & 0xff;
 	_stack.top() = v;
@@ -903,8 +903,8 @@ void Interpreter::cmdLAB() {
 void Interpreter::cmdLAW() {
 	uint32 index4 = READ_LE_UINT16(_code);
 	_code += 2;
-	assert(index4 == 2 || (index4 % 4) == 2);
-	int index = (index4 - 2) / 4;
+	assert(index4 == 0 || (index4 % 4) == 2);
+	int index = (index4 == 0) ? -1 : (index4 - 2) / 4;
 
 	ULONG v = _stack[_stackBase + index] & 0xffff;
 	_stack.top() = v;
@@ -913,8 +913,8 @@ void Interpreter::cmdLAW() {
 void Interpreter::cmdLAD() {
 	uint32 index4 = READ_LE_UINT16(_code);
 	_code += 2;
-	assert(((index4 - 2) % 4) == 0);
-	int index = (index4 - 2) / 4;
+	assert(index4 == 0 || ((index4 - 2) % 4) == 0);
+	int index = (index4 == 0) ? -1 : (index4 - 2) / 4;
 
 	ULONG v = _stack[_stackBase + index];
 	_stack.top() = v;
@@ -923,8 +923,8 @@ void Interpreter::cmdLAD() {
 void Interpreter::cmdSAB() {
 	int index4 = READ_LE_UINT16(_code);
 	_code += 2;
-	assert(((index4 - 2) % 4) == 0);
-	int index = (index4 - 2) / 4;
+	assert(index4 == 0 || ((index4 - 2) % 4) == 0);
+	int index = (index4 == 0) ? -1 : (index4 - 2) / 4;
 
 	int offset = _stackBase + index;
 	_stack[offset] = ((ULONG)_stack[offset] & 0xffffff00) | (_stack.pop() & 0xff);
@@ -933,8 +933,8 @@ void Interpreter::cmdSAB() {
 void Interpreter::cmdSAW() {
 	int index4 = READ_LE_UINT16(_code);
 	_code += 2;
-	assert(((index4 - 2) % 4) == 0);
-	int index = (index4 - 2) / 4;
+	assert(index4 == 0 || ((index4 - 2) % 4) == 0);
+	int index = (index4 == 0) ? -1 : (index4 - 2) / 4;
 
 	int offset = _stackBase + index;
 	_stack[offset] = ((ULONG)_stack[offset] & 0xffff0000) | (_stack.pop() & 0xffff);
@@ -943,8 +943,8 @@ void Interpreter::cmdSAW() {
 void Interpreter::cmdSAD() {
 	int index4 = READ_LE_UINT16(_code);
 	_code += 2;
-	assert(((index4 - 2) % 4) == 0);
-	int index = (index4 - 2) / 4;
+	assert(index4 == 0 || ((index4 - 2) % 4) == 0);
+	int index = (index4 == 0) ? -1 : (index4 - 2) / 4;
 
 	_stack[_stackBase + index] = _stack.top();
 }
@@ -952,8 +952,8 @@ void Interpreter::cmdSAD() {
 void Interpreter::cmdLABA() {
 	int index4 = READ_LE_UINT16(_code);
 	_code += 2;
-	assert(((index4 - 2) % 4) == 0);
-	int index = (index4 - 2) / 4;
+	assert(index4 == 0 || ((index4 - 2) % 4) == 0);
+	int index = (index4 == 0) ? -1 : (index4 - 2) / 4;
 
 	int subIndex = _stack.pop();
 	assert((subIndex % 4) == 0);
@@ -965,8 +965,8 @@ void Interpreter::cmdLABA() {
 void Interpreter::cmdLAWA() {
 	int index4 = READ_LE_UINT16(_code);
 	_code += 2;
-	assert(((index4 - 2) % 4) == 0);
-	int index = (index4 - 2) / 4;
+	assert(index4 == 0 || ((index4 - 2) % 4) == 0);
+	int index = (index4 == 0) ? -1 : (index4 - 2) / 4;
 
 	int subIndex = _stack.pop();
 	assert((subIndex % 4) == 0);
@@ -978,8 +978,8 @@ void Interpreter::cmdLAWA() {
 void Interpreter::cmdLADA() {
 	int index4 = READ_LE_UINT16(_code);
 	_code += 2;
-	assert(((index4 - 2) % 4) == 0);
-	int index = (index4 - 2) / 4;
+	assert(index4 == 0 || ((index4 - 2) % 4) == 0);
+	int index = (index4 == 0) ? -1 : (index4 - 2) / 4;
 
 	int subIndex = _stack.pop();
 	assert((subIndex % 4) == 0);
