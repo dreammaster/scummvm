@@ -110,6 +110,7 @@ void init_interface(void) {
 void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
                        LONG hot_Y, ULONG scale, ULONG fade_table,
                        ULONG fade_level) {
+	/*
 	Resources &res = *_vm->_resources;
 	ND_entry *entry;
 
@@ -156,6 +157,7 @@ void set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
 	ptr_valid = 1;
 
 	mouse_set_pointer(res.addr(pointer_set), pointer_num, hot_X, hot_Y);
+	*/
 }
 
 /*********************************************************/

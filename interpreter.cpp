@@ -1394,7 +1394,31 @@ Parameter Interpreter::beep(Parameters params) {
 }
 
 Parameter Interpreter::pokeMem(Parameters params) {
-	pokemem(params.size(), params[0], params[1]);
+	if (params[0] == GAME_STARTUP_STATE) {
+		uint32 newVal = params[1];
+		switch (newVal) {
+		case 0:
+			_startupState = SS_NONE;
+			break;
+		case MKTAG('C', 'I', 'N', 'E'):
+			_startupState = SS_CINE;
+			break;
+		case MKTAG('V', 'I', 'C', 'T'):
+			_startupState = SS_VICT;
+			break;
+		case MKTAG('C', 'H', 'G', 'N'):
+			_startupState = SS_CHGN;
+			break;
+		case MKTAG('I', 'N', 'T', 'R'):
+			_startupState = SS_INTR;
+			break;
+		default:
+			break;
+		}
+	} else {
+		pokemem(params.size(), params[0], params[1]);
+	}
+
 	return Parameter();
 }
 
