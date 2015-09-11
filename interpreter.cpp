@@ -1804,7 +1804,7 @@ Parameter Interpreter::shutdownSound(Parameters params) {
 }
 
 Parameter Interpreter::loadSoundBlock(Parameters params) {
-	assert(params[2]);
+	assert((BYTE *)params[2]);
 	load_sound_block(params.size(), params[0], params[1], params[2]);
 	return Parameter();
 }

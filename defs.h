@@ -73,13 +73,6 @@ struct SD_entry {
 	UWORD extern_base;
 };
 
-// Palette resource header
-struct PAL_HDR {
-	UWORD ncolors;
-	UWORD RGB;
-	UWORD fade[11];
-};
-
 } // End of namespace Aesop
 
 #endif

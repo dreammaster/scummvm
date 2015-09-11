@@ -122,6 +122,31 @@ THDR::THDR() {
 
 /*----------------------------------------------------------------*/
 
+void PAL_RES::load(Common::SeekableReadStream &s) {
+	_nColors = s.readUint16LE();
+	assert(_nColors <= PALETTE_COUNT);
+	int rgbOffset = s.readUint16LE();
+
+	// Get the fade offsets
+	int fadeOffsets[11];
+	for (int fadeNum = 0; fadeNum < 11; ++fadeNum)
+		fadeOffsets[fadeNum] = s.readUint16LE();
+
+	// Load in the palette RGB data
+	assert(s.pos() == rgbOffset);
+	_rgb.resize(_nColors * 3);
+	s.read(&_rgb[0], _nColors * 3);
+
+	// Load in the fade tables
+	for (int fadeNum = 0; fadeNum < 11; ++fadeNum) {
+		assert(s.pos() == fadeOffsets[fadeNum]);
+		_fade[fadeNum].resize(_nColors);
+		s.read(&_fade[fadeNum][0], _nColors);
+	}
+}
+
+/*----------------------------------------------------------------*/
+
 Resources::Resources(AesopEngine *vm): _vm(vm) {
 	const Common::String filename = vm->getGameID() == GType_EOB3 ? "eye.res" : "hack.res";
 	void *beg, *end;

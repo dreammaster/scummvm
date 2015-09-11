@@ -24,6 +24,7 @@
 #include "aesop/screen.h"
 #include "aesop/shared.h"
 #include "common/system.h"
+#include "common/memstream.h"
 #include "engines/util.h"
 #include "graphics/palette.h"
 
@@ -331,8 +332,8 @@ void Window::fade(const byte *palette, int intervals) {
 
 	// Do the actual fading
 	Common::fill(&colorError[0], &colorError[lastColor * 3 + 3], maxValue / 2);
-	int step = (intervals << 16) / maxValue;
-	int stepCount = 0x8000;
+	//int step = (intervals << 16) / maxValue;
+	//int stepCount = 0x8000;
 
 	while (!_vm->shouldQuit() && maxValue >= 0) {
 		// Figure out the intermediate palette
@@ -628,30 +629,30 @@ TextWindow &Screen::textWindows(uint idx) {
 void Screen::setPalette(uint region, uint resource) {
 	Resources &res = *_vm->_resources;
 	HRES handle;
-	PAL_HDR *PHDR;
-	const byte *rgbP;
+	PAL_RES pal;
 	int idx, j, k, n, m, dm, d;
 	const byte *fade;
 
 	handle = res.get_resource_handle(resource, DA_DEFAULT);
 	res.lock(handle);
 
-	PHDR = (PAL_HDR *)res.addr(handle);
+	Common::MemoryReadStream stream((const byte *)res.addr(handle), res.size(handle));
+	pal.load(stream);
 
 	if ((region == PAL_FIXED) || (region == PAL_WALLS) ||
 	        (region == PAL_M1) || (region == PAL_M2)) {
 		for (int idx = 0; idx < 11; ++idx) {
-			fade = (const byte *)add_ptr(PHDR, PHDR->fade[idx]);
+			fade = &pal._fade[idx][0];
 
-			for (j = 0; j < PHDR->ncolors; ++j)
+			for (j = 0; j < pal._nColors; ++j)
 				fade_tables[region][idx][j] = first_color[region] + fade[j];
 		}
 	}
 
-	rgbP = (const byte *)add_ptr(PHDR, PHDR->RGB);
+	const byte *rgbP = &pal._rgb[0];
 
-	for (idx = 0; idx < PHDR->ncolors; ++idx)
-		writePalette(idx + first_color[region], rgbP + idx * 3);
+	for (idx = 0; idx < pal._nColors; ++idx)
+		writePalette(idx + first_color[region], &pal._rgb[idx * 3]);
 
 	switch (region) {
 	case PAL_FIXED:
