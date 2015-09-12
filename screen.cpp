@@ -635,13 +635,12 @@ uint Screen::assignSubWindow(uint wnd, const Common::Rect &r) {
 	// No freed windows so replace, so add new window at the end of the list
 	assert(_panes.size() < MAX_PANES);
 	_panes.push_back(Pane(&_windows[wnd], r));
-	return (int)_panes.size() - 1;
-
+	return MAX_WINDOWS + (int)_panes.size() - 1;
 }
 
 uint Screen::assignSubWindow(int owner, uint wnd, const Common::Rect &r) {
 	uint win = assignSubWindow(wnd, r);
-	_windows[win]._owner = owner;
+	_panes[win - MAX_WINDOWS]._owner = owner;
 	return win;
 }
 
