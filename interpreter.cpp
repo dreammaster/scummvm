@@ -1029,7 +1029,7 @@ void Interpreter::cmdLEAA() {
 }
 
 void Interpreter::cmdLSB() {
-	uint32 offset = READ_LE_UINT32(_code);
+	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset;
 
@@ -1037,7 +1037,7 @@ void Interpreter::cmdLSB() {
 }
 
 void Interpreter::cmdLSW() {
-	uint32 offset = READ_LE_UINT32(_code);
+	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset;
 
@@ -1045,7 +1045,7 @@ void Interpreter::cmdLSW() {
 }
 
 void Interpreter::cmdLSD() {
-	uint32 offset = READ_LE_UINT32(_code);
+	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *srcP = (byte *)_thunk + _staticOffset + offset;
 
@@ -1053,7 +1053,7 @@ void Interpreter::cmdLSD() {
 }
 
 void Interpreter::cmdSSB() {
-	uint32 offset = READ_LE_UINT32(_code);
+	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset;
 
@@ -1061,7 +1061,7 @@ void Interpreter::cmdSSB() {
 }
 
 void Interpreter::cmdSSW() {
-	uint32 offset = READ_LE_UINT32(_code);
+	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset;
 
@@ -1069,7 +1069,7 @@ void Interpreter::cmdSSW() {
 }
 
 void Interpreter::cmdSSD() {
-	uint32 offset = READ_LE_UINT32(_code);
+	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *destP = (byte *)_thunk + _staticOffset + offset;
 
