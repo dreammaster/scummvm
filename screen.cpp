@@ -172,7 +172,27 @@ void Pane::paneWipe(byte color) {
 }
 
 int Pane::colorScan(uint32 *colors) {
-	error("VFX_color_scan");
+	bool colorUsed[PALETTE_COUNT];
+	Common::fill(&colorUsed[0], &colorUsed[PALETTE_COUNT], 0);
+	int numColors = 0;
+
+	// Iterate through the pane
+	for (int yp = top; yp <= bottom; ++yp) {
+		const byte *srcP = getBasePtr(left, yp);
+		for (int xp = left; xp <= right; ++xp, ++srcP) {
+			if (!colorUsed[*srcP]) {
+				// Flag the color as being used, and increment the total colors count
+				colorUsed[*srcP] = true;
+				++numColors;
+
+				// If an array was passed, store the palette index
+				if (colors)
+					*colors++ = *srcP;
+			}
+		}
+	}
+
+	return numColors;
 }
 
 byte Pane::readDot(const Common::Point &pt) {
@@ -230,20 +250,24 @@ Graphics::Surface Pane::getArea(const Common::Rect &r) {
 	return _window->getArea(bounds);
 }
 
+byte *Pane::getBasePtr(int x, int y) {
+	return _window->getBasePtr(x, y);
+}
+
+
 /*----------------------------------------------------------------*/
 
 Window::Window(): Pane() {
 }
 
-Window::Window(const Common::Rect &bounds): Pane(this) {
-	// Copy passed bounds
-	left = bounds.left;
-	top = bounds.top;
-	right = bounds.right;
-	bottom = bounds.bottom;
+Window::Window(const Common::Point &size) : Pane(this) {
+	// Set up window size
+	left = top = 0;
+	right = size.x - 1;
+	bottom = size.y - 1;
 
 	// Create the surface
-	_surface.create(bounds.width(), bounds.height(), Graphics::PixelFormat::createFormatCLUT8());
+	_surface.create(size.x, size.y, Graphics::PixelFormat::createFormatCLUT8());
 }
 
 void Window::clear() {
@@ -290,7 +314,15 @@ void Window::hashRect(const Common::Rect &r, byte color) {
 }
 
 void Window::refresh(const Common::Rect &r) {
-	error("TODO: VFX_window_refresh");
+	Common::Rect bounds = r;
+	bounds.clip(Common::Rect(0, 0, AESOP_SCREEN_WIDTH - 1, AESOP_SCREEN_HEIGHT - 1));
+	Graphics::Surface destSurface = _vm->_screen->getArea(bounds);
+
+	for (int yp = bounds.top; yp <= bounds.bottom; ++yp) {
+		const byte *srcP = (const byte *)getBasePtr(bounds.left, bounds.top);
+		byte *destP = (byte *)_vm->_screen->getBasePtr(0, yp - bounds.top);
+		Common::copy(srcP, srcP + (bounds.right - bounds.left + 1), destP);
+	}
 }
 
 void Window::fade(const byte *palette, int intervals) {
@@ -378,6 +410,10 @@ Graphics::Surface Window::getArea(const Common::Rect &r) {
 	s.h = r.height() + 1;
 
 	return s;
+}
+
+byte *Window::getBasePtr(int x, int y) {
+	return (byte *)_surface.getBasePtr(x, y);
 }
 
 /*----------------------------------------------------------------*/
@@ -482,7 +518,7 @@ void TextWindow::crout() {
 
 /*----------------------------------------------------------------*/
 
-Screen::Screen(AesopEngine *vm): Window(Common::Rect(0, 0, AESOP_SCREEN_WIDTH, AESOP_SCREEN_HEIGHT)), _vm(vm) {
+Screen::Screen(AesopEngine *vm): Window(Common::Point(AESOP_SCREEN_WIDTH, AESOP_SCREEN_HEIGHT)), _vm(vm) {
 	// Initialize the graphics mode
 	initGraphics(320, 200, false);
 	_bitmapBuffer.create(320, 200, Graphics::PixelFormat::createFormatCLUT8());
@@ -493,7 +529,7 @@ Screen::Screen(AesopEngine *vm): Window(Common::Rect(0, 0, AESOP_SCREEN_WIDTH, A
 	_windows.push_back(*this);
 
 	// Set up a second page
-	_windows.push_back(Window(Common::Rect(0, 0, AESOP_SCREEN_WIDTH, AESOP_SCREEN_HEIGHT)));
+	_windows.push_back(Window(Common::Point(AESOP_SCREEN_WIDTH, AESOP_SCREEN_HEIGHT)));
 
 	_windows[PAGE2].wipeWindow(NO_COLOR);
 	txtbuf[sizeof(txtbuf) - 1] = 0x69;    // constants for integrity checking
@@ -561,11 +597,13 @@ void Screen::copyWindow(uint src, uint dest) {
 }
 
 uint Screen::assignWindow(const Common::Rect &r) {
+	assert(r.left == 0 && r.top == 0);
+
 	for (uint idx = 0; idx < _windows.size(); ++idx) {
 		if (_windows[idx].isEmpty()) {
 			// Found a previously cleared window we can replace
 			_windows.remove_at(idx);
-			_windows.insert_at(idx, Window(r));
+			_windows.insert_at(idx, Common::Point(r.right + 1, r.bottom + 1));
 
 			return idx;
 		}
@@ -573,7 +611,7 @@ uint Screen::assignWindow(const Common::Rect &r) {
 
 	// No freed windows so replace, so add new window at the end of the list
 	assert(_windows.size() < MAX_WINDOWS);
-	_windows.push_back(Window(r));
+	_windows.push_back(Window(Common::Point(r.right + 1, r.bottom + 1)));
 	return (int)_windows.size() - 1;
 }
 

@@ -121,6 +121,9 @@ public:
 	 */
 	void paneWipe(byte color);
 
+	/**
+	 * Returns number of colors used in the specified window
+	 */
 	int colorScan(uint32 *colors);
 
 	bool testOverlap(const Common::Point &pt, byte *shapes, int shape_num);
@@ -168,6 +171,11 @@ public:
 	 * Return a specified sub-area for updating
 	 */
 	virtual Graphics::Surface getArea(const Common::Rect &r);
+
+	/**
+	 * Return an address for a pixel within the given pane.
+	 */
+	virtual byte *getBasePtr(int x, int y);
 };
 
 class Window : public Pane {
@@ -181,14 +189,17 @@ protected:
 	void addDirtyRect(const Common::Rect &r) {}
 public:
 	Window();
-	Window(const Common::Rect &bounds);
+	Window(const Common::Point &size);
 	virtual ~Window() {}
 
 	/**
 	 * Wipe the window with a specified color
 	 */
 	void wipeWindow(byte color);
-
+	
+	/**
+	 * Copy a specified area of the given window to the screen
+	 */
 	void refresh(const Common::Rect &r);
 
 	void fade(const byte *palette, int intervals);
@@ -232,6 +243,11 @@ public:
 	 * Return a specified sub-area for updating
 	 */
 	virtual Graphics::Surface getArea(const Common::Rect &r);
+
+	/**
+	 * Return an address for a pixel within the given pane.
+	 */
+	virtual byte *getBasePtr(int x, int y);
 };
 
 class Font {
