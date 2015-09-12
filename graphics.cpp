@@ -64,37 +64,6 @@ ULONG get_bitmap_height(LONG argcnt, ULONG table, ULONG number) {
 }
 
 /*********************************************************/
-
-void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number, LONG x, LONG y,
-                 ULONG scale, ULONG flip, ULONG fade_table, ULONG fade_level) {
-	Resources &res = *_vm->_resources;
-	HRES handle;
-	static HRES last_handle = 0;
-	static ULONG last_table;
-	UBYTE *lookaside;
-
-	if (table == last_table)
-		handle = last_handle;
-	else {
-		handle = res.get_resource_handle(table, DA_DEFAULT);
-		last_handle = handle;
-		last_table = table;
-	}
-
-	if ((fade_level > 10) && (!scale))
-		scale = 256;
-
-	lookaside = fade_tables[fade_table][fade_level] - first_color[fade_table];
-
-	res.lock(handle);
-
-	Shapes shapes((const byte *)res.addr(handle));
-	shapes.drawBitmap(page, Common::Point(x, y), flip, scale, lookaside, number);
-
-	res.unlock(handle);
-}
-
-/*********************************************************/
 //
 // Fill a 4-element array of words with the coordinates of the rectangle
 // enclosing the visible part of a bitmap

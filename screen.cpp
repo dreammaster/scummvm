@@ -1054,6 +1054,35 @@ void Screen::solidBarGraph(const Common::Rect &r, uint32 lb_border, uint32 tr_bo
 		_windows[PAGE2].fillRect(Common::Rect(blft, btop, grayx, bbtm), color);
 }
 
+void Screen::drawBitmap(int page, uint table, int number, const Common::Point &pt,
+	uint scale, uint flip, uint fadeTableNum, uint fadeLevelNum) {
+	Resources &res = *_vm->_resources;
+	HRES handle;
+	static HRES last_handle = 0;
+	static ULONG last_table;
+	UBYTE *lookaside;
+
+	if (table == last_table)
+		handle = last_handle;
+	else {
+		handle = res.get_resource_handle(table, DA_DEFAULT);
+		last_handle = handle;
+		last_table = table;
+	}
+
+	if ((fadeLevelNum > 10) && (!scale))
+		scale = 256;
+
+	lookaside = fade_tables[fadeTableNum][fadeLevelNum] - first_color[fadeTableNum];
+
+	res.lock(handle);
+
+	Shapes shapes((const byte *)res.addr(handle));
+	shapes.drawBitmap(page, pt, flip, scale, lookaside, number);
+
+	res.unlock(handle);
+}
+
 /*----------------------------------------------------------------*/
 
 

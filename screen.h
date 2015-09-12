@@ -452,6 +452,9 @@ public:
 
 	void solidBarGraph(const Common::Rect &r, uint32 lb_border, uint32 tr_border, uint32 bkgnd,
 	                   uint32 grn, uint32 yel, uint32 red, int val, int min, int crit, int max);
+
+	void drawBitmap(int page, uint table, int number, const Common::Point &pt,
+		uint scale, uint flip, uint fadeTableNum, uint fadeLevelNum);
 };
 
 typedef int FIXED16;

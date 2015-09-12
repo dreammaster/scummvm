@@ -39,9 +39,7 @@ extern ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y,
                                  ULONG flip, ULONG table, ULONG number, WORD *array);
 
 extern ULONG get_bitmap_height(LONG argcnt, ULONG table, ULONG number);
-extern void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
-                        LONG x, LONG y, ULONG scale, ULONG flip, ULONG fade_table, ULONG
-                        fade_level);
+
 
 } // End of namespace Aesop
 
