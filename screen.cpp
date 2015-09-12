@@ -22,6 +22,7 @@
 
 #include "aesop/aesop.h"
 #include "aesop/screen.h"
+#include "aesop/shapes.h"
 #include "aesop/shared.h"
 #include "common/system.h"
 #include "common/memstream.h"
@@ -223,6 +224,12 @@ int Pane::drawCharacter(const Common::Point &pt, void *font, int character, byte
 	error("TODO");
 }
 
+Graphics::Surface Pane::getArea(const Common::Rect &r) {
+	Common::Rect bounds = r;
+	bounds.translate(-left, -top);
+	return _window->getArea(bounds);
+}
+
 /*----------------------------------------------------------------*/
 
 Window::Window(): Pane() {
@@ -356,6 +363,21 @@ void Window::fade(const byte *palette, int intervals) {
 
 		events.delay(50);
 	}
+}
+
+Graphics::Surface Window::getArea(const Common::Rect &r) {
+	// Mark the desired area as dirty
+	addDirtyRect(r);
+
+	// Form a surface of the sub-area of the window
+	Graphics::Surface s;
+	s.setPixels(_surface.getBasePtr(r.left, r.top));
+	s.format = _surface.format;
+	s.pitch = _surface.pitch;
+	s.w = r.width() + 1;
+	s.h = r.height() + 1;
+
+	return s;
 }
 
 /*----------------------------------------------------------------*/
@@ -1069,14 +1091,6 @@ void VFX_window_fade(Window *buffer, byte *palette, LONG intervals) {
 	error("TODO");
 }
 
-void VFX_fixed_mul(FIXED16 M1, FIXED16 M2, FIXED16 *result) {
-	error("TODO");
-}
-
-void VFX_shape_lookaside(UBYTE *table) {
-	error("TODO");
-}
-
 void VFX_shape_transform(Pane *pane,
                          void *shape_table, LONG shape_number, LONG hotX, LONG hotY,
                          void *buffer, LONG rot, LONG x_scale, LONG y_scale, LONG flags) {
@@ -1133,68 +1147,6 @@ LONG GIL2VFX_visible_bitmap_rect(LONG x1, LONG y1, LONG mirror,
 	else
 		return 1;
 }
-
-void GIL2VFX_draw_bitmap(int wnd, int x, int y, int mirror, int scale,
-                         byte *fade_table, byte *shapes, int shape_num) {
-	Pane &pane = _vm->_screen->panes(wnd);
-	int xp = x - pane.left;
-	int yp = y - pane.top;
-	int x_scale, y_scale;
-	int flags;
-	int xs, ys;
-
-//	if (gil2vfx_active != true) return;
-
-	if ((scale == 0) && (mirror == NO_MIRROR)) {
-		VFX_shape_draw(&pane, shapes, shape_num, xp, yp);
-	} else {
-		x_scale = ((scale) ? (scale << 8) : 0x10000);
-		y_scale = ((scale) ? (scale << 8) : 0x10000);
-
-		if (x_scale != 0x10000 || y_scale != 0x10000) {
-			VFX_fixed_mul(VFX_shape_bounds(shapes, shape_num) & 0xffff0000,
-			              0x10000 - x_scale, &xs);
-			VFX_fixed_mul(VFX_shape_bounds(shapes, shape_num) << 16,
-			              0x10000 - y_scale, &ys);
-
-			if (mirror & X_MIRROR) xs = -xs;
-			if (mirror & Y_MIRROR) ys = -ys;
-
-			xp += xs >> 17;
-			yp += ys >> 17;
-		}
-
-		switch (mirror) {
-		case X_MIRROR:
-			x_scale = -x_scale;
-			xp += (VFX_shape_bounds(shapes, shape_num) >> 16);
-			break;
-		case Y_MIRROR:
-			y_scale = -y_scale;
-			yp += ((LONG)(WORD)VFX_shape_bounds(shapes, shape_num));
-			break;
-		case XY_MIRROR:
-			x_scale = -x_scale;
-			y_scale = -y_scale;
-			xp += (VFX_shape_bounds(shapes, shape_num) >> 16) - 1;
-			yp += ((LONG)(WORD)VFX_shape_bounds(shapes, shape_num)) - 1;
-			break;
-		case NO_MIRROR:
-		default:
-			break;
-		}
-
-		if (fade_table != NULL && scale != 0) {
-			VFX_shape_lookaside(fade_table);
-			flags = ST_XLAT;
-		} else
-			flags = 0;
-
-		VFX_shape_transform(&pane, shapes, shape_num, xp, yp,
-		                    _vm->_screen->_bitmapBuffer.getPixels(), 0, x_scale, y_scale, flags);
-	}
-}
-
 
 void GIL2VFX_refresh_window(ULONG source, ULONG target) {
 	//mouse_pane_refresh(&panes[source], &panes[target]);

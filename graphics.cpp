@@ -34,6 +34,7 @@
 #include "aesop/resources.h"
 #include "aesop/intrface.h"
 #include "aesop/rtobject.h"
+#include "aesop/shapes.h"
 #include "aesop/graphics.h"
 #include "aesop/stubs.h"
 
@@ -87,7 +88,8 @@ void draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number, LONG x, LON
 
 	res.lock(handle);
 
-	GIL2VFX_draw_bitmap(page, x, y, flip, scale, lookaside, (UBYTE *)res.addr(handle), number);
+	Shapes shapes((const byte *)res.addr(handle));
+	shapes.drawBitmap(page, Common::Point(x, y), flip, scale, lookaside, number);
 
 	res.unlock(handle);
 }

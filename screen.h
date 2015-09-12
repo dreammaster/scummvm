@@ -163,6 +163,11 @@ public:
 	 * Hash the specified area
 	 */
 	virtual void hashRect(const Common::Rect &r, byte color);
+
+	/**
+	 * Return a specified sub-area for updating
+	 */
+	virtual Graphics::Surface getArea(const Common::Rect &r);
 };
 
 class Window : public Pane {
@@ -222,6 +227,11 @@ public:
 	 * Hash the specified area
 	 */
 	virtual void hashRect(const Common::Rect &r, byte color);
+
+	/**
+	 * Return a specified sub-area for updating
+	 */
+	virtual Graphics::Surface getArea(const Common::Rect &r);
 };
 
 class Font {
@@ -448,8 +458,6 @@ typedef int FIXED16;
 
 extern void VFX_shape_draw(Pane *pane, void *shape_table, LONG shape_number, LONG hotX, LONG hotY);
 extern int VFX_shape_resolution(byte *data, int shape_num);
-extern void GIL2VFX_draw_bitmap(int wnd, int x, int y, int mirror, int scale,
-                                byte *fade_table, byte *shapes, int shape_num);
 
 } // End of namespace Aesop
 
