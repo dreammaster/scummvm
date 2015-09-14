@@ -74,7 +74,8 @@ void ShapeFrame::draw(Pane &pane, const Common::Point &pt) {
 	for (yp = drawBounds.top; yp <= drawBounds.bottom; ++yp) {
 		byte *destP = (byte *)surface.getBasePtr(drawBounds.left, yp);
 
-		for (xp = drawBounds.left; xp <= drawBounds.right; ) {
+		xp = drawBounds.left;
+		for (;;) {
 			cmd = *srcP++;
 			bit0 = cmd & 1;
 			cmd >>= 1;
@@ -110,7 +111,7 @@ void ShapeFrame::draw(Pane &pane, const Common::Point &pt) {
 			}
 		}
 
-		assert(xp <= (drawBounds.right + 1));
+		assert(xp == (drawBounds.right + 1));
 	}
 }
 
