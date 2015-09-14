@@ -347,6 +347,7 @@ void Window::fade(const byte *palette, int intervals) {
 
 	// Get the pixels in use in the window and their palette rgb values
 	Common::fill(&colorUsed[0], &colorUsed[PALETTE_COUNT], false);
+	Common::fill(&colorBuffer[0], &colorBuffer[PALETTE_SIZE], 0);
 
 	for (int yp = 0; yp < _surface.h; ++yp) {
 		const byte *srcP = (const byte *)_surface.getBasePtr(0, yp);
@@ -383,16 +384,16 @@ void Window::fade(const byte *palette, int intervals) {
 	//int step = (intervals << 16) / maxValue;
 	//int stepCount = 0x8000;
 
-	while (!_vm->shouldQuit() && maxValue >= 0) {
+	for (int stepNum = 0; stepNum < maxValue && !_vm->shouldQuit(); ++stepNum) {
 		// Figure out the intermediate palette
-		for (int idx = lastColor; lastColor >= 0; --idx) {
+		for (int idx = lastColor; idx >= 0; --idx) {
 			int offset = colorList[idx] * 3;
 
 			for (int rgbNum = 2; rgbNum >= 0; --rgbNum) {
 				byte rgbVal = colorError[offset + rgbNum] + colorDelta[offset + rgbNum];
 				if (rgbVal >= maxValue) {
 					rgbVal -= maxValue;
-					colorBuffer[offset + rgbNum] = fadeDirection[offset + rgbNum];
+					colorBuffer[offset + rgbNum] += fadeDirection[offset + rgbNum];
 				}
 
 				colorError[offset + rgbNum] = rgbVal;
@@ -599,6 +600,10 @@ bool Screen::unionRectangle(Common::Rect &destRect, const Common::Rect &src1, co
 	destRect.extend(src2);
 
 	return !destRect.isEmpty();
+}
+
+void Screen::addDirtyRect(const Common::Rect &r) {
+	_dirtyRects.push_back(r); 
 }
 
 uint Screen::assignWindow(const Common::Rect &r) {
@@ -901,14 +906,15 @@ void Screen::colorFade(int srcWnd, int destWnd) {
 	for (int idx = 0; idx < PALETTE_COUNT; ++idx)
 		readPalette(idx, palette + idx * 3);
 
-	// Set the colors
+	// Set all the colors used by the screen to the current background color,
+	// with the background palette index being chosen by reading the first pixel
 	byte pixel = destWin.readDot(Common::Point(0, 0));
 	rgb[0] = palette[pixel * 3];
 	rgb[1] = palette[pixel * 3 + 2];
 	rgb[2] = palette[pixel * 3 + 2];
 
 	for (int idx = 0; idx < numColors; ++idx)
-		writePalette(idx, rgb);
+		writePalette(colors[idx], rgb);
 
 	destWin.blitFrom(srcWin);
 	destWin.refresh(Common::Rect(0, 0, AESOP_SCREEN_WIDTH - 1, AESOP_SCREEN_HEIGHT - 1));

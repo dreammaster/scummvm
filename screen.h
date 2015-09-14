@@ -325,6 +325,11 @@ private:
 	 * Returns the union of two dirty area rectangles
 	 */
 	bool unionRectangle(Common::Rect &destRect, const Common::Rect &src1, const Common::Rect &src2);
+protected:
+	/**
+	 * Add an area to the screen's dirty rect list
+	 */
+	virtual void addDirtyRect(const Common::Rect &r);
 public:
 	Common::Array<Window *> _windows;
 	Common::Array<Pane *> _panes;
