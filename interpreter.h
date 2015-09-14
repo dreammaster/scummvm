@@ -427,7 +427,7 @@ public:
 	StartupState _startupState;
 	ULONG _currentThis;
 public:
-	Interpreter(AesopEngine *vm, HRES *objList, int stackSize);
+	Interpreter(AesopEngine *vm, HRES *objList);
 	~Interpreter();
 
 	uint first(HRES dictionary);

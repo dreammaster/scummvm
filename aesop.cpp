@@ -56,7 +56,7 @@ AesopEngine::~AesopEngine() {
 void AesopEngine::initialize() {
 	_debugger = new Debugger(this);
 	_events = new Events(this);
-	_interpreter = new Interpreter(this, objlist, 8192);
+	_interpreter = new Interpreter(this, objlist);
 	_resources = new Resources(this);
 	_screen = new Screen(this);
 	init_object_list();

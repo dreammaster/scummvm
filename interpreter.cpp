@@ -332,7 +332,7 @@ const ExternMethod Interpreter::_methods[] = {
 
 /*----------------------------------------------------------------*/
 
-Interpreter::Interpreter(AesopEngine *vm, HRES *objList, int stackSize) : _vm(vm) {
+Interpreter::Interpreter(AesopEngine *vm, HRES *objList) : _vm(vm) {
 	_objList = objList;
 
 	_startupState = SS_CINE;
@@ -753,33 +753,27 @@ void Interpreter::cmdCALL() {
 }
 
 void Interpreter::cmdSEND() {
-	// Load the arguments onto the stack in reverse so they'll be in the right order for usage
-	uint stackSize = _stack.size();
+	// Instantiate a new interpreter
+	Interpreter *interp = new Interpreter(_vm, _objList);
+	
+	// Load the arguments in reverse so they'll be in the correct order
+	Parameters params;
 	int argCount = *_code++;
 	for (int idx = 0; idx < argCount; ++idx)
-		_stack.push(_stack[stackSize - 1 - idx]);
+		params.insert_at(0, _stack.pop());
+	for (int idx = 0; idx < argCount; ++idx)
+		interp->addArgument(params[idx]);
 
 	// Get the execution parameters
 	int msgNum = READ_LE_UINT16(_code);
 	_code += 2;
-	int index = _stack[stackSize - 1 - argCount];
+	int index = _stack.pop();
 
-	// Save the stack size and and other necessary fields
-	stackSize = _stack.size();
-	const MV_entry *currentVector = _currentVector;
-	int oldIndex = _currentIndex;
-	uint oldMsgNum = _currentMsg;
+	// Execute the new code
+	int result = interp->execute(index, msgNum);
+	delete interp;
 
-	// Execute the new object's code
-	int result = execute(index, msgNum);
-
-	// Restore saved fields
-	_currentVector = currentVector;
-	_currentIndex = oldIndex;
-	_currentMsg = oldMsgNum;
-
-	// Reset the stack back to it's previous size, and push the result
-	_stack.resize(stackSize - argCount);
+	// Push the result onto the stack of the current interpreter
 	_stack.push(result);
 }
 
