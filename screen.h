@@ -74,8 +74,6 @@ public:
 	Pane(Window *window, const Common::Rect &bounds);
 	virtual ~Pane() {}
 
-	void paneCopy(Pane &src, const Common::Point &srcPos, const Common::Point &destPos, LONG fill);
-
 	/**
 	 * Get the left bound of the pane
 	 */
@@ -133,11 +131,6 @@ public:
 	int drawCharacter(const Common::Point &pt, void *font, int character, byte *color_translate);
 public:
 	/**
-	 * Clear the given pane
-	 */
-	virtual void clear();
-
-	/**
 	 * Read a pixel
 	 */
 	virtual byte readDot(const Common::Point &pt);
@@ -176,9 +169,20 @@ public:
 	 * Return an address for a pixel within the given pane.
 	 */
 	virtual byte *getBasePtr(int x, int y);
+
+	/**
+	 * Copy an area from one surfaec to another
+	 */
+	virtual void blitFrom(Pane &src, const Common::Point &destPos, const Common::Rect &srcRect);
+
+	/**
+	 * Copy one surface onto another
+	 */
+	virtual void blitFrom(Pane &src);
 };
 
 class Window : public Pane {
+	friend class Pane;
 protected:
 	Graphics::Surface _surface;
 
@@ -186,11 +190,11 @@ protected:
 	 * Called by any graphic routine to signify an area of the window that has been updated.
 	 * Used for performance blitting on the screen window to only update affected areas
 	 */
-	void addDirtyRect(const Common::Rect &r) {}
+	virtual void addDirtyRect(const Common::Rect &r) {}
 public:
 	Window();
 	Window(const Common::Point &size);
-	virtual ~Window() {}
+	virtual ~Window();
 
 	/**
 	 * Wipe the window with a specified color
@@ -204,11 +208,6 @@ public:
 
 	void fade(const byte *palette, int intervals);
 public:
-	/**
-	 * Clear the given window
-	 */
-	virtual void clear();
-
 	/**
 	 * Read a pixel
 	 */
@@ -327,8 +326,8 @@ private:
 	 */
 	bool unionRectangle(Common::Rect &destRect, const Common::Rect &src1, const Common::Rect &src2);
 public:
-	Common::Array<Window> _windows;
-	Common::Array<Pane> _panes;
+	Common::Array<Window *> _windows;
+	Common::Array<Pane *> _panes;
 	Graphics::Surface _bitmapBuffer;
 	TextWindow *_twptr;
 	TextWindow _tw[NTW];
@@ -342,11 +341,6 @@ public:
 	 * Update the physical screen
 	 */
 	void update();
-
-	/**
-	 * Copies the contents of one window to another
-	 */
-	void copyWindow(uint src, uint dest);
 
 	/**
 	 * Sets up a new window, allocating space for it

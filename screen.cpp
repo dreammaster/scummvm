@@ -125,16 +125,6 @@ Pane::Pane(Window *window, const Common::Rect &bounds) : _owner(-1), Common::Rec
 	bottom = bounds.bottom;
 }
 
-void Pane::clear() {
-	_window = nullptr;
-	left = top = right = bottom = 0;
-	_owner = -1;
-}
-
-void Pane::paneCopy(Pane &src, const Common::Point &srcPos, const Common::Point &destPos, LONG fill) {
-	warning("TODO: paneCopy");
-}
-
 int Pane::getLeft() const {
 	return _window ? _window->left : 0;
 }
@@ -254,10 +244,31 @@ byte *Pane::getBasePtr(int x, int y) {
 	return _window->getBasePtr(x, y);
 }
 
+void Pane::blitFrom(Pane &src, const Common::Point &destPos, const Common::Rect &srcRect) {
+	// Add a dirty rect for the area we'll be copying over
+	Common::Rect destRect(destPos.x, destPos.y, destPos.x + (srcRect.right - srcRect.left),
+		destPos.y + (srcRect.bottom - srcRect.top));
+	_window->addDirtyRect(destRect);
+
+	// Main blitting loop
+	for (int yp = 0; yp < srcRect.bottom - srcRect.top + 1; ++yp) {
+		const byte *srcP = src._window->getBasePtr(srcRect.left, srcRect.top + yp);
+		byte *destP = _window->getBasePtr(destPos.x, destPos.y + yp);
+		Common::copy(srcP, srcP + (srcRect.right - srcRect.left) + 1, destP);
+	}
+}
+
+void Pane::blitFrom(Pane &src) {
+	blitFrom(src, Common::Point(left, top), src);
+}
 
 /*----------------------------------------------------------------*/
 
 Window::Window(): Pane() {
+}
+
+Window::~Window() {
+	_surface.free();
 }
 
 Window::Window(const Common::Point &size) : Pane(this) {
@@ -268,11 +279,6 @@ Window::Window(const Common::Point &size) : Pane(this) {
 
 	// Create the surface
 	_surface.create(size.x, size.y, Graphics::PixelFormat::createFormatCLUT8());
-}
-
-void Window::clear() {
-	Pane::clear();
-	_surface.free();
 }
 
 void Window::wipeWindow(byte color) {
@@ -314,6 +320,9 @@ void Window::hashRect(const Common::Rect &r, byte color) {
 }
 
 void Window::refresh(const Common::Rect &r) {
+	if (this == _vm->_screen)
+		return;
+
 	Common::Rect bounds = r;
 	bounds.clip(Common::Rect(0, 0, AESOP_SCREEN_WIDTH - 1, AESOP_SCREEN_HEIGHT - 1));
 	Graphics::Surface destSurface = _vm->_screen->getArea(bounds);
@@ -526,19 +535,19 @@ Screen::Screen(AesopEngine *vm): Window(Common::Point(AESOP_SCREEN_WIDTH, AESOP_
 	_lastPage = PAGE1;
 
 	// Add the screen itself as the first window
-	_windows.push_back(*this);
+	_windows.push_back(this);
 
 	// Set up a second page
-	_windows.push_back(Window(Common::Point(AESOP_SCREEN_WIDTH, AESOP_SCREEN_HEIGHT)));
+	_windows.push_back(new Window(Common::Point(AESOP_SCREEN_WIDTH, AESOP_SCREEN_HEIGHT)));
 
-	_windows[PAGE2].wipeWindow(NO_COLOR);
+	_windows[PAGE2]->wipeWindow(NO_COLOR);
 	txtbuf[sizeof(txtbuf) - 1] = 0x69;    // constants for integrity checking
 	txtbuf[sizeof(txtbuf) - 2] = 0x77;
 }
 
 Screen::~Screen() {
 	for (uint idx = 0; idx < _windows.size(); ++idx)
-		_windows[idx].clear();
+		delete _windows[idx];
 
 	_bitmapBuffer.free();
 }
@@ -592,18 +601,13 @@ bool Screen::unionRectangle(Common::Rect &destRect, const Common::Rect &src1, co
 	return !destRect.isEmpty();
 }
 
-void Screen::copyWindow(uint src, uint dest) {
-	_panes[dest].paneCopy(_panes[src], Common::Point(), Common::Point(), NO_COLOR);
-}
-
 uint Screen::assignWindow(const Common::Rect &r) {
 	assert(r.left == 0 && r.top == 0);
 
 	for (uint idx = 0; idx < _windows.size(); ++idx) {
-		if (_windows[idx].isEmpty()) {
+		if (_windows[idx] == nullptr) {
 			// Found a previously cleared window we can replace
-			_windows.remove_at(idx);
-			_windows.insert_at(idx, Common::Point(r.right + 1, r.bottom + 1));
+			_windows[idx] = new Window(Common::Point(r.right + 1, r.bottom + 1));
 
 			return idx;
 		}
@@ -611,22 +615,21 @@ uint Screen::assignWindow(const Common::Rect &r) {
 
 	// No freed windows so replace, so add new window at the end of the list
 	assert(_windows.size() < MAX_WINDOWS);
-	_windows.push_back(Window(Common::Point(r.right + 1, r.bottom + 1)));
+	_windows.push_back(new Window(Common::Point(r.right + 1, r.bottom + 1)));
 	return (int)_windows.size() - 1;
 }
 
 uint Screen::assignWindow(int owner, const Common::Rect &r) {
 	uint win = assignWindow(r);
-	_windows[win]._owner = owner;
+	_windows[win]->_owner = owner;
 	return win;
 }
 
 uint Screen::assignSubWindow(uint wnd, const Common::Rect &r) {
 	for (uint idx = 0; idx < _panes.size(); ++idx) {
-		if (_panes[idx].isEmpty()) {
+		if (_panes[idx] == nullptr) {
 			// Found a previously cleared window we can replace
-			_panes.remove_at(idx);
-			_panes.insert_at(idx, Pane(&_windows[wnd], r));
+			_panes[idx] = new Pane(_windows[wnd], r);
 
 			return idx + MAX_WINDOWS;
 		}
@@ -634,22 +637,23 @@ uint Screen::assignSubWindow(uint wnd, const Common::Rect &r) {
 
 	// No freed windows so replace, so add new window at the end of the list
 	assert(_panes.size() < MAX_PANES);
-	_panes.push_back(Pane(&_windows[wnd], r));
+	_panes.push_back(new Pane(_windows[wnd], r));
 	return MAX_WINDOWS + (int)_panes.size() - 1;
 }
 
 uint Screen::assignSubWindow(int owner, uint wnd, const Common::Rect &r) {
 	uint win = assignSubWindow(wnd, r);
-	_panes[win - MAX_WINDOWS]._owner = owner;
+	_panes[win - MAX_WINDOWS]->_owner = owner;
 	return win;
 }
 
 void Screen::releaseWindow(uint wnd) {
-	// Clear the window
-	_windows[wnd].clear();
+	// Delete the window
+	delete _windows[wnd];
+	_windows[wnd] = nullptr;
 
 	// Handle removing any cleared windows at the end of the array
-	while (_windows.size() > 0 && _windows[_windows.size() - 1].isEmpty()) {
+	while (_windows.size() > 0 && _windows[_windows.size() - 1] == nullptr) {
 		_windows.remove_at(_windows.size() - 1);
 	}
 }
@@ -658,15 +662,15 @@ void Screen::releaseWindow(uint wnd) {
 void Screen::releaseOwnedWindows(int owner) {
 	if (owner == -1) {
 		for (int idx = PAGE2 + 1; idx < (int)_windows.size(); ++idx) {
-			if ((_windows[idx]._owner != -1) && (_windows[idx]._owner < NUM_ENTITIES)) {
-				_windows[idx]._owner = -1;
+			if ((_windows[idx]->_owner != -1) && (_windows[idx]->_owner < NUM_ENTITIES)) {
+				_windows[idx]->_owner = -1;
 				releaseWindow(idx);
 			}
 		}
 	} else {
 		for (int idx = PAGE2 + 1; idx < (int)_windows.size(); ++idx) {
-			if (_windows[idx]._owner == owner) {
-				_windows[idx]._owner = -1;
+			if (_windows[idx]->_owner == owner) {
+				_windows[idx]->_owner = -1;
 				releaseWindow(idx);
 			}
 		}
@@ -674,11 +678,11 @@ void Screen::releaseOwnedWindows(int owner) {
 }
 
 Pane &Screen::panes(uint idx) {
-	return (idx < MAX_WINDOWS) ? _windows[idx] : _panes[idx - MAX_WINDOWS];
+	return (idx < MAX_WINDOWS) ? *_windows[idx] : *_panes[idx - MAX_WINDOWS];
 }
 
 Window &Screen::windows(uint idx) {
-	return _windows[idx];
+	return *_windows[idx];
 }
 
 TextWindow &Screen::textWindows(uint idx) {
@@ -856,6 +860,7 @@ void Screen::setPalette(uint region, uint resource) {
 	}
 
 	res.unlock(handle);
+	update();
 }
 
 void Screen::writePalette(byte index, const byte *rgb) {
@@ -889,15 +894,15 @@ void Screen::pixelFade(int srcWnd, int destWnd, int intervals) {
 void Screen::colorFade(int srcWnd, int destWnd) {
 	byte palette[PALETTE_SIZE], rgb[3];
 	uint32 colors[PALETTE_COUNT];
-	Window &srcWin = _windows[srcWnd];
-	Window &destWin = _windows[destWnd];
+	Window &srcWin = *_windows[srcWnd];
+	Window &destWin = *_windows[destWnd];
 
-	int numColors = _windows[srcWnd].colorScan(colors);
+	int numColors = srcWin.colorScan(colors);
 	for (int idx = 0; idx < PALETTE_COUNT; ++idx)
 		readPalette(idx, palette + idx * 3);
 
 	// Set the colors
-	byte pixel = _windows[destWnd].readDot(Common::Point(0, 0));
+	byte pixel = destWin.readDot(Common::Point(0, 0));
 	rgb[0] = palette[pixel * 3];
 	rgb[1] = palette[pixel * 3 + 2];
 	rgb[2] = palette[pixel * 3 + 2];
@@ -905,7 +910,7 @@ void Screen::colorFade(int srcWnd, int destWnd) {
 	for (int idx = 0; idx < numColors; ++idx)
 		writePalette(idx, rgb);
 
-	destWin.paneCopy(srcWin, Common::Point(0, 0), Common::Point(0, 0), NO_COLOR);
+	destWin.blitFrom(srcWin);
 	destWin.refresh(Common::Rect(0, 0, AESOP_SCREEN_WIDTH - 1, AESOP_SCREEN_HEIGHT - 1));
 	destWin.fade(palette, FADE_INTERVALS);
 }
@@ -932,10 +937,10 @@ int Screen::charWidth(int ch) {
 }
 
 void Screen::home(void) {
-	_windows[_twptr->window].paneWipe(_twptr->font->font_background);
+	_windows[_twptr->window]->paneWipe(_twptr->font->font_background);
 
-	_twptr->htab = _windows[_twptr->window].left;
-	_twptr->vtab = _windows[_twptr->window].top;
+	_twptr->htab = _windows[_twptr->window]->left;
+	_twptr->vtab = _windows[_twptr->window]->top;
 }
 
 void Screen::remapFontColor(byte current, byte newColor) {
@@ -965,14 +970,14 @@ void Screen::cout(int c) {
 	int cvtab, nvtab, htab;
 
 	if (c == '\n') {
-		htab = _twptr->htab = _windows[_twptr->window].left;    // Carriage Return
+		htab = _twptr->htab = _windows[_twptr->window]->left;    // Carriage Return
 
-		cvtab = _twptr->vtab - _windows[_twptr->window].top;
+		cvtab = _twptr->vtab - _windows[_twptr->window]->top;
 		cvtab += _twptr->font->char_height;
 
 		nvtab = cvtab + _twptr->font->char_height;
 
-		if (nvtab > _windows[_twptr->window].bottom - _windows[_twptr->window].top) {
+		if (nvtab > _windows[_twptr->window]->bottom - _windows[_twptr->window]->top) {
 			if (_twptr->continueFunction != NULL) {
 				if (((*_twptr->continueFunction)(_twptr->htab)) == 0) {
 					_twptr->htab = htab;
@@ -981,16 +986,16 @@ void Screen::cout(int c) {
 			}
 			_twptr->htab = htab;
 
-			_windows[_twptr->window].scroll(Common::Point(0, -_twptr->font->char_height), PS_NOWRAP,
+			_windows[_twptr->window]->scroll(Common::Point(0, -_twptr->font->char_height), PS_NOWRAP,
 			                                _twptr->font->font_background);
 		} else {
 			_twptr->vtab += _twptr->font->char_height;
 		}
 	} else if (c == '\r') {
-		_twptr->htab = _windows[_twptr->window].left;    // Carriage Return
+		_twptr->htab = _windows[_twptr->window]->left;    // Carriage Return
 	} else {
-		_twptr->htab += _windows[_twptr->window].drawCharacter(
-		                    Common::Point(_twptr->htab - _windows[_twptr->window].left, _twptr->vtab - _windows[_twptr->window].top),
+		_twptr->htab += _windows[_twptr->window]->drawCharacter(
+			Common::Point(_twptr->htab - _windows[_twptr->window]->left, _twptr->vtab - _windows[_twptr->window]->top),
 		                    _twptr->font, c, _twptr->lookaside);
 	}
 
@@ -1024,14 +1029,14 @@ void Screen::textStyle(uint wndnum, uint font, uint justify) {
 
 
 void Screen::drawDot(uint page, const Common::Point &pos, byte color) {
-	_panes[page].drawDot(pos, color);
+	_panes[page]->drawDot(pos, color);
 
 	_lastPage = page;
 	_lastPos = pos;
 }
 
 void Screen::drawLine(uint page, const Common::Point &src, const Common::Point &dest, byte color) {
-	_panes[page].drawLine(src, dest, color);
+	_panes[page]->drawLine(src, dest, color);
 	_lastPage = page;
 	_lastPos = dest;
 }
@@ -1041,7 +1046,7 @@ void Screen::lineTo(Common::Array<Parameter> args) {
 		Common::Point destPt(args[i * 3 + 0], args[i * 3 + 1]);
 		byte cc = args[i * 3 + 2];
 
-		_panes[_lastPage].drawLine(_lastPos, destPt, cc);
+		_panes[_lastPage]->drawLine(_lastPos, destPt, cc);
 		_lastPos = destPt;
 	}
 }
@@ -1053,10 +1058,10 @@ void Screen::solidBarGraph(const Common::Rect &r, uint32 lb_border, uint32 tr_bo
 	LONG range, point, width;
 	LONG color;
 
-	_windows[PAGE2].drawLine(Common::Point(r.left, r.top), Common::Point(r.left, r.bottom), lb_border);
-	_windows[PAGE2].drawLine(Common::Point(r.left, r.bottom), Common::Point(r.right, r.bottom), lb_border);
-	_windows[PAGE2].drawLine(Common::Point(r.right, r.bottom - 1), Common::Point(r.right, r.top), tr_border);
-	_windows[PAGE2].drawLine(Common::Point(r.right, r.top), Common::Point(r.left + 1, r.top), tr_border);
+	_windows[PAGE2]->drawLine(Common::Point(r.left, r.top), Common::Point(r.left, r.bottom), lb_border);
+	_windows[PAGE2]->drawLine(Common::Point(r.left, r.bottom), Common::Point(r.right, r.bottom), lb_border);
+	_windows[PAGE2]->drawLine(Common::Point(r.right, r.bottom - 1), Common::Point(r.right, r.top), tr_border);
+	_windows[PAGE2]->drawLine(Common::Point(r.right, r.top), Common::Point(r.left + 1, r.top), tr_border);
 
 	btop = r.top + 1;
 	bbtm = r.bottom - 1;
@@ -1077,7 +1082,7 @@ void Screen::solidBarGraph(const Common::Rect &r, uint32 lb_border, uint32 tr_bo
 	grayx = blft + (point * width / range);
 
 	if (grayx != brgt)
-		_windows[PAGE2].fillRect(Common::Rect(grayx, btop, brgt, bbtm), bkgnd);
+		_windows[PAGE2]->fillRect(Common::Rect(grayx, btop, brgt, bbtm), bkgnd);
 
 	if (val <= crit)
 		color = red;
@@ -1088,7 +1093,7 @@ void Screen::solidBarGraph(const Common::Rect &r, uint32 lb_border, uint32 tr_bo
 		grayx = blft + 1;
 
 	if (grayx != blft)
-		_windows[PAGE2].fillRect(Common::Rect(blft, btop, grayx, bbtm), color);
+		_windows[PAGE2]->fillRect(Common::Rect(blft, btop, grayx, bbtm), color);
 }
 
 void Screen::drawBitmap(int page, uint table, int number, const Common::Point &pt,

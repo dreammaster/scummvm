@@ -196,7 +196,5 @@ void Shapes::drawBitmap(int wnd, const Common::Point &pt, int mirror, int scale,
 	}
 }
 
-
-
 } // End of namespace Aesop
 
