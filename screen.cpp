@@ -340,7 +340,7 @@ void Window::fade(const byte *palette, int intervals) {
 	bool colorUsed[PALETTE_COUNT];
 	byte colorList[PALETTE_COUNT];
 	byte colorBuffer[PALETTE_SIZE];
-	int8 fadeDirection[PALETTE_SIZE];
+	byte fadeDirection[PALETTE_SIZE];
 	byte colorDelta[PALETTE_SIZE];
 	byte colorError[PALETTE_SIZE];
 	int lastColor = -1;
@@ -370,7 +370,7 @@ void Window::fade(const byte *palette, int intervals) {
 			byte const *srcP = &colorBuffer[col * 3 + rgbIndex];
 			byte const *destP = &palette[col * 3 + rgbIndex];
 
-			fadeDirection[col * 3 + rgbIndex] = *destP >= *srcP ? -1 : 1;
+			fadeDirection[col * 3 + rgbIndex] = *srcP >= *destP ? (byte)-1 : 1;
 			colorDelta[col * 3 + rgbIndex] = deltaVal = ABS((int)*destP - (int)*srcP);
 			maxValue = MAX(maxValue, deltaVal);
 		}
@@ -380,7 +380,8 @@ void Window::fade(const byte *palette, int intervals) {
 		return;
 
 	// Do the actual fading
-	Common::fill(&colorError[0], &colorError[lastColor * 3 + 3], maxValue / 2);
+	Common::fill(&colorError[0], &colorError[lastColor], maxValue / 2);
+	Common::fill(&colorError[lastColor * 3 + 3], &colorError[PALETTE_SIZE], 0);
 	//int step = (intervals << 16) / maxValue;
 	//int stepCount = 0x8000;
 
@@ -389,9 +390,10 @@ void Window::fade(const byte *palette, int intervals) {
 		for (int idx = lastColor; idx >= 0; --idx) {
 			int offset = colorList[idx] * 3;
 
-			for (int rgbNum = 2; rgbNum >= 0; --rgbNum) {
+			for (int rgbNum = 0; rgbNum < 3; ++rgbNum) {
 				byte rgbVal = colorError[offset + rgbNum] + colorDelta[offset + rgbNum];
 				if (rgbVal >= maxValue) {
+					// Move component to next rgb index
 					rgbVal -= maxValue;
 					colorBuffer[offset + rgbNum] += fadeDirection[offset + rgbNum];
 				}
@@ -403,7 +405,7 @@ void Window::fade(const byte *palette, int intervals) {
 			screen.writePalette(colorList[idx], &colorBuffer[offset]);
 		}
 
-		events.delay(50);
+		events.delay(2);
 	}
 }
 
@@ -603,7 +605,7 @@ bool Screen::unionRectangle(Common::Rect &destRect, const Common::Rect &src1, co
 }
 
 void Screen::addDirtyRect(const Common::Rect &r) {
-	_dirtyRects.push_back(r); 
+	_dirtyRects.push_back(r);
 }
 
 uint Screen::assignWindow(const Common::Rect &r) {
