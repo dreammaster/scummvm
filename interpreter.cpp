@@ -498,11 +498,10 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	// parameter. We use a four-byte value, since each Parameter is 4 bytes
 	_stackBase = _stack.size();
 	_stack.push(index);
-	int count = READ_LE_UINT16(_code);
+	int count = READ_LE_UINT16(_code) - 2;
 	_code += 2;
-	assert(count == 0 || (count % 4) == 2);
-	if (count > 0)
-		_stack.resize(_stack.size() + (count - 2) / 4);
+	assert((count % 4) == 0);
+	_stack.resize(_stack.size() + count / 4);
 
 	// Main opcode execution loop
 	while (!_vm->shouldQuit() && !_breakFlag) {
