@@ -136,6 +136,8 @@ void PAL_RES::load(Common::SeekableReadStream &s) {
 	assert(s.pos() == rgbOffset);
 	_rgb.resize(_nColors * 3);
 	s.read(&_rgb[0], _nColors * 3);
+	for (int idx = 0; idx < _nColors * 3; ++idx)
+		_rgb[idx] = VGA_COLOR_TRANS((int)_rgb[idx]);
 
 	// Load in the fade tables
 	for (int fadeNum = 0; fadeNum < 11; ++fadeNum) {

@@ -370,8 +370,8 @@ void Window::fade(const byte *palette, int intervals) {
 			byte const *srcP = &colorBuffer[col * 3 + rgbIndex];
 			byte const *destP = &palette[col * 3 + rgbIndex];
 
-			fadeDirection[col * 3 + rgbIndex] = *srcP >= *destP ? (byte)-1 : 1;
-			colorDelta[col * 3 + rgbIndex] = deltaVal = ABS((int)*destP - (int)*srcP);
+			fadeDirection[col * 3 + rgbIndex] = *srcP >= *destP ? (byte)-4 : 4;
+			colorDelta[col * 3 + rgbIndex] = deltaVal = ABS((int)*destP - (int)*srcP) >> 2;
 			maxValue = MAX(maxValue, deltaVal);
 		}
 	}

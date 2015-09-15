@@ -42,6 +42,7 @@ extern const int num_colors[5];
 #define NTW                 32
 #define PALETTE_COUNT       256
 #define PALETTE_SIZE        (256 * 3)
+#define VGA_COLOR_TRANS(x) ((x) * 255 / 63)
 
 enum {
     NO_COLOR = 0
