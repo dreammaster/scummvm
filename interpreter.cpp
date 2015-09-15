@@ -494,13 +494,15 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_offThis = _currentIndex;
 	_breakFlag = false;
 
-	// Initialize the stack. The original only used two bytes
+	// Initialize the stack. Note: The original only used two bytes for the 'this' index
+	// parameter. We use a four-byte value, since each Parameter is 4 bytes
 	_stackBase = _stack.size();
 	_stack.push(index);
-	int count = READ_LE_UINT16(_code) - 2;
+	int count = READ_LE_UINT16(_code);
 	_code += 2;
-	assert((count % 4) == 0);
-	_stack.reserve(count / 4);
+	assert(count == 0 || (count % 4) == 2);
+	if (count > 0)
+		_stack.resize(_stack.size() + (count - 2) / 4);
 
 	// Main opcode execution loop
 	while (!_vm->shouldQuit() && !_breakFlag) {
