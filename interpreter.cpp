@@ -339,7 +339,7 @@ Interpreter::Interpreter(AesopEngine *vm, HRES *objList) : _vm(vm) {
 	_currentIndex = 0;
 	_currentMsg = 0;
 	_currentThis = 0;
-	_instance = HRES_NULL;
+	_instance = nullptr;
 	_thunk = nullptr;
 	_ds32 = nullptr;
 	_code = nullptr;
@@ -439,10 +439,9 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	HRES handle = _objList[index];
 	if (handle == HRES_NULL)
 		return -1;
-	_instance = handle;
 
-	IHDR *hdr = (IHDR *)res.addr(handle);
-	_thunk = (THDR *)res.addr(hdr->_thunk);
+	_instance = (IHDR *)res.addr(handle);
+	_thunk = (THDR *)res.addr(_instance->_thunk);
 
 	if (vector == HRES_NULL || vector == (HRES)0xffff) {
 		const MV_entry *mvList = (const MV_entry *)((const byte *)_thunk + _thunk->_mvList);
@@ -1026,7 +1025,7 @@ void Interpreter::cmdLEAA() {
 void Interpreter::cmdLSB() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *srcP = (byte *)_thunk + _staticOffset + offset;
+	byte *srcP = (byte *)_instance + _staticOffset + offset;
 
 	_stack.top() = *srcP;
 }
@@ -1034,7 +1033,7 @@ void Interpreter::cmdLSB() {
 void Interpreter::cmdLSW() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *srcP = (byte *)_thunk + _staticOffset + offset;
+	byte *srcP = (byte *)_instance + _staticOffset + offset;
 
 	_stack.top() = READ_LE_UINT16(srcP);
 }
@@ -1042,7 +1041,7 @@ void Interpreter::cmdLSW() {
 void Interpreter::cmdLSD() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *srcP = (byte *)_thunk + _staticOffset + offset;
+	byte *srcP = (byte *)_instance + _staticOffset + offset;
 
 	_stack.top() = READ_LE_UINT32(srcP);
 }
@@ -1050,7 +1049,7 @@ void Interpreter::cmdLSD() {
 void Interpreter::cmdSSB() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *destP = (byte *)_thunk + _staticOffset + offset;
+	byte *destP = (byte *)_instance + _staticOffset + offset;
 
 	*destP = _stack.top() & 0xff;
 }
@@ -1058,7 +1057,7 @@ void Interpreter::cmdSSB() {
 void Interpreter::cmdSSW() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *destP = (byte *)_thunk + _staticOffset + offset;
+	byte *destP = (byte *)_instance + _staticOffset + offset;
 
 	WRITE_LE_UINT16(destP, _stack.top() & 0xffff);
 }
@@ -1066,7 +1065,7 @@ void Interpreter::cmdSSW() {
 void Interpreter::cmdSSD() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *destP = (byte *)_thunk + _staticOffset + offset;
+	byte *destP = (byte *)_instance + _staticOffset + offset;
 
 	WRITE_LE_UINT32(destP, _stack.top());
 }
@@ -1074,7 +1073,7 @@ void Interpreter::cmdSSD() {
 void Interpreter::cmdLSBA() {
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
+	byte *srcP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
 	_stack.push(*srcP);
 }
@@ -1082,7 +1081,7 @@ void Interpreter::cmdLSBA() {
 void Interpreter::cmdLSWA() {
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
+	byte *srcP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
 	_stack.push(READ_LE_UINT16(srcP));
 }
@@ -1090,7 +1089,7 @@ void Interpreter::cmdLSWA() {
 void Interpreter::cmdLSDA() {
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *srcP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
+	byte *srcP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
 	_stack.push(READ_LE_UINT32(srcP));
 }
@@ -1099,7 +1098,7 @@ void Interpreter::cmdSSBA() {
 	ULONG val = _stack.pop();
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
+	byte *destP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
 	*destP = val;
 }
@@ -1108,7 +1107,7 @@ void Interpreter::cmdSSWA() {
 	ULONG val = _stack.pop();
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
+	byte *destP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
 	WRITE_LE_UINT16(destP, val);
 }
@@ -1117,7 +1116,7 @@ void Interpreter::cmdSSDA() {
 	ULONG val = _stack.pop();
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
-	byte *destP = (byte *)_thunk + _staticOffset + offset + _stack.pop();
+	byte *destP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
 	WRITE_LE_UINT32(destP, val);
 }
@@ -1125,7 +1124,7 @@ void Interpreter::cmdSSDA() {
 void Interpreter::cmdLESA() {
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
-	BYTE *srcP = (BYTE *)_thunk + _staticOffset + offset;
+	byte *srcP = (byte *)_instance + _staticOffset + offset;
 
 	_stack.top() = srcP;
 }

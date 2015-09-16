@@ -167,7 +167,7 @@ private:
 	ULONG _currentMsg;
 	LONG _offThis;
 	HRES *_objList;
-	HRES _instance;
+	IHDR *_instance;
 	THDR *_thunk;
 	byte *_ds32;
 	byte *_code;
