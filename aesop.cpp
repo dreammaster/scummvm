@@ -24,9 +24,9 @@
 #include "common/debug-channels.h"
 #include "aesop/aesop.h"
 #include "aesop/rtmsg.h"
-#include "aesop/rtobject.h"
 #include "aesop/rtsystem.h"
 #include "aesop/stubs.h"
+#include "aesop/utils.h"
 
 namespace Aesop {
 
@@ -34,12 +34,12 @@ AesopEngine *_vm;
 
 #define MAX_RES_SIZE 800000
 
-
 AesopEngine::AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc), _randomSource("Aesop") {
 	_vm = this;
 	_debugger = nullptr;
 	_events = nullptr;
+	_files = nullptr;
 	_interpreter = nullptr;
 	_resources = nullptr;
 	_screen = nullptr;
@@ -48,7 +48,9 @@ AesopEngine::AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc) :
 AesopEngine::~AesopEngine() {
 	delete _debugger;
 	delete _events;
+	delete _files;
 	delete _interpreter;
+	delete _objects;
 	delete _resources;
 	delete _screen;
 }
@@ -56,10 +58,11 @@ AesopEngine::~AesopEngine() {
 void AesopEngine::initialize() {
 	_debugger = new Debugger(this);
 	_events = new Events(this);
-	_interpreter = new Interpreter(this, objlist);
+	_files = new Files(this);
+	_interpreter = Interpreter::init(this);
+	_objects = new Objects(this);
 	_resources = new Resources(this);
 	_screen = new Screen(this);
-	init_object_list();
 
 	DebugMan.addDebugChannel(kDebugLevelScript, "scripts", "Script debug level");
 }
@@ -88,8 +91,8 @@ void AesopEngine::play() {
 	if (code == -1)
 		error(MSG_SPNF);
 
-	int rtn = create_program(1, bootstrap, (ULONG)code);
-	destroy_object(1, rtn);
+	int rtn = _objects->createProgram(BOOTSTRAP_OBJECT, (ULONG)code);
+	_objects->destroyObject(rtn);
 
 	for (int i = 0; i < res._nentries; i++) {
 		ULONG f = res._dir[i]._flags;

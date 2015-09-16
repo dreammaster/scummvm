@@ -6,20 +6,23 @@ MODULE_OBJS = \
 	detection.o \
 	events.o \
 	eye.o \
+	files.o \
 	gil2vfx.o \
 	gil2vfxa.o \
 	graphics.o \
 	interpreter.o \
 	intrface.o \
 	mouse.o \
+	objects.o \
+	resource_structures.o \
 	resources.o \
 	rtcode.o \
-	rtobject.o \
 	rtsystem.o \
 	screen.o \
 	shapes.o \
 	sound32.o \
-	stubs.o
+	stubs.o \
+	utils.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_SHERLOCK), DYNAMIC_PLUGIN)

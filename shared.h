@@ -96,9 +96,6 @@ namespace Aesop {
 //лл                                       лл
 //ллллллллллллллллллллллллллллллллллллллллллл
 
-#define NUM_OBJECTS   2048 // Up to 2,048 objects in Eye III universe
-#define NUM_ENTITIES  2000 // Up to 2,000 physical entities in Eye III universe
-
 #define FIRST_ITEM    0    // Object # range for global "items"
 #define LAST_ITEM     999
 
@@ -118,8 +115,6 @@ namespace Aesop {
 #define SAVE_LEN      26   // Max. # of characters in savegame title
 
 #define NUM_LEVELS    14   // # of "levels" (feature/monster regions) in game
-
-#define bootstrap     2000 // Object which launches AESOP application
 
 //
 // Names of four basic palette regions

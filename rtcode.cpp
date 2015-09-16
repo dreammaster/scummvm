@@ -25,59 +25,18 @@
 #include "common/util.h"
 #include "aesop/aesop.h"
 #include "aesop/defs.h"
-#include "aesop/shared.h"
+#include "aesop/eye.h"
 #include "aesop/resources.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
 #include "aesop/rtcode.h"
-#include "aesop/rtobject.h"
+#include "aesop/shared.h"
 #include "aesop/stubs.h"
-
-#include "aesop/eye.h"               // Application code resource header
+#include "aesop/utils.h"
 
 namespace Aesop {
 
 ULONG diag_flag = 0;
-
-//
-// Load a string resource into a SOP instance's array
-//
-// Determines array offset in instance, in case resource load causes
-// instance to move in memory
-//
-// WARNING: The array must not be of automatic or external scope!
-//
-
-
-void load_string(LONG argcnt, BYTE *array, ULONG string) {
-	Interpreter &interp = *_vm->_interpreter;
-	Resources &res = *_vm->_resources;
-	HRES handle;
-	BYTE *ptr;
-	BYTE *new_array;
-	ULONG array_offset;
-
-	array_offset = array - (BYTE *)res.addr(objlist[interp._currentThis]);
-
-	handle = res.get_resource_handle(string, DA_DEFAULT);
-
-	res.lock(handle);
-
-	new_array = (BYTE *)add_ptr(res.addr(objlist[interp._currentThis]), array_offset);
-
-	ptr = (BYTE *)res.addr(handle);
-
-	switch (*(UWORD *)ptr) {
-	case ':S':
-		far_memmove(new_array, ptr + 2, res.size(handle) - 2L);
-		break;
-
-	default:
-		abend(MSG_SRRLS);
-	}
-
-	res.unlock(handle);
-}
 
 //
 // Load a resource into a SOP instance's array
@@ -88,22 +47,21 @@ void load_string(LONG argcnt, BYTE *array, ULONG string) {
 // WARNING: The array must not be of automatic or external scope!
 //
 
-
 void load_resource(LONG argcnt, BYTE *array, ULONG resource) {
-	Interpreter &interp = *_vm->_interpreter;
+	Objects &objects = *_vm->_objects;
 	Resources &res = *_vm->_resources;
 	HRES handle;
 	ULONG array_offset;
 	BYTE *new_array;
 
 	// TODO: Double-check removal of FP_OFF
-	array_offset = array - (BYTE *)res.addr(objlist[interp._currentThis]);
+	array_offset = array - (BYTE *)res.addr(objects[Interpreter::_currentThis]);
 
 	handle = res.get_resource_handle(resource, DA_DEFAULT);
 
 	res.lock(handle);
 
-	new_array = (BYTE *)add_ptr(res.addr(objlist[interp._currentThis]), array_offset);
+	new_array = (BYTE *)add_ptr(res.addr(objects[Interpreter::_currentThis]), array_offset);
 
 	far_memmove(new_array, res.addr(handle), res.size(handle));
 

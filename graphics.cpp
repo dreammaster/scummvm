@@ -33,7 +33,6 @@
 #include "aesop/rtmsg.h"
 #include "aesop/resources.h"
 #include "aesop/intrface.h"
-#include "aesop/rtobject.h"
 #include "aesop/shapes.h"
 #include "aesop/graphics.h"
 #include "aesop/stubs.h"
@@ -79,7 +78,7 @@ ULONG get_bitmap_height(LONG argcnt, ULONG table, ULONG number) {
 
 ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
                           ULONG table, ULONG number, WORD *array) {
-	Interpreter &interp = *_vm->_interpreter;
+	Objects &objects = *_vm->_objects;
 	Resources &res = *_vm->_resources;
 	HRES handle;
 	ULONG array_offset;
@@ -87,7 +86,7 @@ ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
 	WORD bounds[4];
 	ULONG result;
 
-	array_offset = (ULONG)array - (ULONG)res.addr(objlist[interp._currentThis]);
+	array_offset = (ULONG)array - (ULONG)res.addr(objects[Interpreter::_currentThis]);
 
 	handle = res.get_resource_handle(table, DA_DEFAULT);
 
@@ -95,7 +94,7 @@ ULONG visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
 
 	result = GIL2VFX_visible_bitmap_rect(x, y, flip, (UBYTE *)res.addr(handle), number, bounds);
 
-	new_array = (BYTE *)add_ptr(res.addr(objlist[interp._currentThis]), array_offset);
+	new_array = (BYTE *)add_ptr(res.addr(objects[Interpreter::_currentThis]), array_offset);
 
 	far_memmove(new_array, bounds, sizeof(bounds));
 

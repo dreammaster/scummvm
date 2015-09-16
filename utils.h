@@ -20,27 +20,30 @@
  *
  */
 
-#include "aesop/stubs.h"
+#ifndef AESOP_UTILS_H
+#define AESOP_UTILS_H
 
 namespace Aesop {
 
-int int386(int intNum, REGS *inregs, REGS *outregs) {
-	return 0;
-}
+/**
+ * Convert string to number, returning -1 if not valid numeric string
+ * Skip leading whitespace; handles unary -/+ operators
+ *
+ * Accepts binary numbers with '0b' prefix,
+ * hexadecimal numbers with '0x' prefix; decimal numbers
+ * handled via atol() library function for speed
+ *
+ * Accepts single ASCII characters with '\'' prefix
+ */
+extern int ascnum(const char *string);
 
-void PollMod() {
-}
+extern bool aesop_isspace(const char c);
+extern bool aesop_isalpha(const char c);
+extern bool aesop_isdigit(const char c);
+extern bool aesop_isnumprefix(const char c);
+extern bool aesop_isalnum(const char c);
+extern bool aesop_ispunct(const char c);
 
-int kbhit() {
-	return 0;
-}
+} // End of namespace Aesop
 
-HTIMER AIL_register_timer(void(*fn)()) {
-	return (HTIMER)0;
-}
-void AIL_set_timer_frequency(HTIMER timer, int freq) {}
-void AIL_start_timer(HTIMER htimer) {}
-void AIL_release_timer_handle(HTIMER htimer) {}
-void AIL_shutdown() {}
-
-}
+#endif

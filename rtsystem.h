@@ -31,63 +31,6 @@
 
 namespace Aesop {
 
-#define TF_BUFSIZE 4096    // size of buffer allocated by file functions
-
-struct TF_class {
-	HRES hbuf;
-	BYTE *buffer;
-	WORD p;
-	Common::SeekableReadStream *file;
-	WORD mode;
-	LONG len;
-	LONG pos;
-};
-
-#define TF_WRITE 0
-#define TF_READ  1
-
-#define isnum(x) (((x) == '-') || (((x) >= '0') && ((x) <= '9')))
-
-//
-// Universal disk error codes
-//
-
-#define NO_ERROR        0
-#define IO_ERROR        1
-#define OUT_OF_MEMORY   2
-#define FILE_NOT_FOUND  3
-#define CANT_WRITE_FILE 4
-#define CANT_READ_FILE  5
-#define DISK_FULL       6
-
-//
-// General file management
-//
-
-extern WORD copy_file(const char *src_filename, const char *dest_filename);
-extern WORD delete_file(const char *filename);
-extern ULONG file_time(const char *filename);
-
-//
-// Text file management
-//
-
-extern TF_class *TF_construct(const char *filename, WORD oflag);
-extern WORD TF_destroy(TF_class *TF);
-extern WORD TF_wchar(TF_class *TF, BYTE ch);
-extern BYTE TF_rchar(TF_class *TF);
-extern WORD TF_readln(TF_class *TF, char *buffer, WORD maxlen);
-extern WORD TF_writeln(TF_class *TF, const char *buffer);
-
-//
-// Binary file management
-//
-
-extern LONG file_size(const char *filename);
-extern BYTE *read_file(const char *filename, void *dest);
-extern WORD write_file(const char *filename, void *buf, ULONG len);
-extern WORD append_file(const char *filename, void *buf, ULONG len);
-
 //
 // Memory heap management
 //
@@ -104,7 +47,6 @@ extern ULONG mem_headroom(void);
 // Misc. routines
 //
 
-extern LONG ascnum(const char *string);
 extern void opcode_fault(void *PC, void *stk);
 extern void abend(const char *msg, ...);
 extern void curpos(WORD *x, WORD *y);

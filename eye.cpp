@@ -31,7 +31,6 @@
 #include "aesop/rtcode.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
-#include "aesop/rtobject.h"
 #include "aesop/graphics.h"
 #include "aesop/intrface.h"
 #include "aesop/resources.h"
@@ -694,18 +693,21 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 /*********************************************************/
 
 void read_save_directory(void) {
+	error("TODO");
+	/*
 	LONG i;
-	TF_class *TF;
+	TextFile *TF;
 
-	TF = TF_construct(SAVEDIR_FN, TF_READ);
+	TF = new TextFile(SAVEDIR_FN, TF_READ);
 
 	if (TF == NULL)
 		abend(MSG_COSDR);
 
 	for (i = 0; i < NUM_SAVEGAMES; i++)
-		TF_readln(TF, savegame_dir[i], SAVE_LEN + 1);
+		TF->readln(TF, savegame_dir[i], SAVE_LEN + 1);
 
-	TF_destroy(TF);
+	delete TF;
+	*/
 }
 
 /*********************************************************/
@@ -743,8 +745,10 @@ void set_savegame_title(LONG argcnt, BYTE *string, ULONG num)
 /*********************************************************/
 
 void write_save_directory(void) {
+	error("TODO");
+	/*
 	LONG i;
-	TF_class *TF;
+	TextFile *TF;
 
 	TF = TF_construct(SAVEDIR_FN, TF_WRITE);
 
@@ -756,6 +760,7 @@ void write_save_directory(void) {
 			abend(MSG_CWSD);
 
 	TF_destroy(TF);
+	*/
 }
 
 /*********************************************************/
@@ -808,7 +813,7 @@ void remove_temporary_save_files(void) {
 
 	for (lvl = 1; lvl <= NUM_LEVELS; lvl++) {
 		set_save_lvlnum(lvl);
-		delete_file(lvl_tmp);
+		_vm->_files->deleteFile(lvl_tmp);
 	}
 }
 
@@ -822,9 +827,8 @@ void remove_temporary_save_files(void) {
 /*********************************************************/
 
 
-ULONG save_game(LONG argcnt, ULONG slotnum, ULONG lvlnum)
-
-{
+ULONG save_game(LONG argcnt, ULONG slotnum, ULONG lvlnum) {
+	Files &files = *_vm->_files;
 	ULONG lvl;
 
 	if (slotnum == 0)
@@ -833,10 +837,10 @@ ULONG save_game(LONG argcnt, ULONG slotnum, ULONG lvlnum)
 	set_save_slotnum(slotnum);
 	set_save_lvlnum(lvlnum);
 
-	if (!save_range(items_bin, SAVETYPE, FIRST_ITEM, LAST_ITEM))
+	if (!files.saveRange(items_bin, SAVETYPE, FIRST_ITEM, LAST_ITEM))
 		return 0;
 
-	if (!save_range(lvl_bin, SAVETYPE, FIRST_LVL_OBJ, LAST_LVL_OBJ))
+	if (!files.saveRange(lvl_bin, SAVETYPE, FIRST_LVL_OBJ, LAST_LVL_OBJ))
 		return 0;
 
 	for (lvl = 1; lvl <= NUM_LEVELS; lvl++) {
@@ -844,7 +848,7 @@ ULONG save_game(LONG argcnt, ULONG slotnum, ULONG lvlnum)
 
 		set_save_lvlnum(lvl);
 
-		if (copy_file(lvl_tmp, lvl_bin) == -1)
+		if (files.copyFile(lvl_tmp, lvl_bin) == -1)
 			return 0;
 	}
 
@@ -863,15 +867,15 @@ ULONG save_game(LONG argcnt, ULONG slotnum, ULONG lvlnum)
 /*********************************************************/
 
 
-void suspend_game(LONG argcnt, ULONG cur_lvl)
+void suspend_game(LONG argcnt, ULONG cur_lvl) {
+	Files &files = *_vm->_files;
 
-{
-	if (!save_range(itm_tmp, SAVETYPE, FIRST_ITEM, LAST_ITEM))
+	if (!files.saveRange(itm_tmp, SAVETYPE, FIRST_ITEM, LAST_ITEM))
 		abend(MSG_CNSI);
 
 	set_save_lvlnum(cur_lvl);
 
-	if (!save_range(lvl_tmp, SAVETYPE, FIRST_LVL_OBJ, LAST_LVL_OBJ))
+	if (!files.saveRange(lvl_tmp, SAVETYPE, FIRST_LVL_OBJ, LAST_LVL_OBJ))
 		abend(MSG_CNSCL);
 }
 
@@ -887,12 +891,11 @@ void suspend_game(LONG argcnt, ULONG cur_lvl)
 /*********************************************************/
 
 
-void resume_level(LONG argcnt, ULONG cur_lvl)
-
-{
+void resume_level(LONG argcnt, ULONG cur_lvl) {
+	Files &files = *_vm->_files;
 	set_save_lvlnum(cur_lvl);
 
-	restore_range(lvl_tmp, FIRST_LVL_OBJ, LAST_LVL_OBJ, 1);
+	files.restoreRange(lvl_tmp, FIRST_LVL_OBJ, LAST_LVL_OBJ, 1);
 }
 
 /*********************************************************/
@@ -913,10 +916,11 @@ void resume_level(LONG argcnt, ULONG cur_lvl)
 
 
 void resume_items(LONG argcnt, ULONG first, ULONG last, ULONG restoring) {
+	Files &files = *_vm->_files;
 	_vm->_screen->releaseOwnedWindows(-1);
 	_vm->_events->cancelEntityRequests(-1);
 
-	restore_range(itm_tmp, first, last, restoring);
+	files.restoreRange(itm_tmp, first, last, restoring);
 }
 
 /*********************************************************/
@@ -932,17 +936,16 @@ void resume_items(LONG argcnt, ULONG first, ULONG last, ULONG restoring) {
 /*********************************************************/
 
 
-void change_level(LONG argcnt, ULONG old_lvl, ULONG new_lvl)
-
-{
+void change_level(LONG argcnt, ULONG old_lvl, ULONG new_lvl) {
+	Files &files = *_vm->_files;
 	set_save_lvlnum(old_lvl);
 
-	if (!save_range(lvl_tmp, SAVETYPE, FIRST_LVL_OBJ, LAST_LVL_OBJ))
+	if (!files.saveRange(lvl_tmp, SAVETYPE, FIRST_LVL_OBJ, LAST_LVL_OBJ))
 		abend(MSG_CNSLT);
 
 	set_save_lvlnum(new_lvl);
 
-	restore_range(lvl_tmp, FIRST_LVL_OBJ, LAST_LVL_OBJ, 1);
+	files.restoreRange(lvl_tmp, FIRST_LVL_OBJ, LAST_LVL_OBJ, 1);
 }
 
 /*********************************************************/
@@ -963,13 +966,14 @@ void change_level(LONG argcnt, ULONG old_lvl, ULONG new_lvl)
 
 
 void restore_items(LONG argcnt, ULONG slotnum) {
+	Files &files = *_vm->_files;
 	set_save_slotnum(slotnum);
 
 	_vm->_screen->releaseOwnedWindows(-1);
 	_vm->_events->cancelEntityRequests(-1);
 
-//   aprint(0,"restore_range(%s, %d, %d, 1)\n",items_bin,FIRST_ITEM,LAST_ITEM);
-	restore_range(items_bin, FIRST_ITEM, LAST_ITEM, 1);
+//   aprint(0,"files.restoreRange(%s, %d, %d, 1)\n",items_bin,FIRST_ITEM,LAST_ITEM);
+	files.restoreRange(items_bin, FIRST_ITEM, LAST_ITEM, 1);
 }
 
 /*********************************************************/
@@ -985,22 +989,21 @@ void restore_items(LONG argcnt, ULONG slotnum) {
 /*********************************************************/
 
 
-void restore_level_objects(LONG argcnt, ULONG slotnum, ULONG lvlnum)
-
-{
+void restore_level_objects(LONG argcnt, ULONG slotnum, ULONG lvlnum) {
+	Files &files = *_vm->_files;
 	ULONG lvl;
 
 	set_save_slotnum(slotnum);
 	set_save_lvlnum(lvlnum);
 
-	restore_range(lvl_bin, FIRST_LVL_OBJ, LAST_LVL_OBJ, 1);
+	files.restoreRange(lvl_bin, FIRST_LVL_OBJ, LAST_LVL_OBJ, 1);
 
 	for (lvl = 1; lvl <= NUM_LEVELS; lvl++) {
 		if (lvl == lvlnum) continue;
 
 		set_save_lvlnum(lvl);
 
-		if (copy_file(lvl_bin, lvl_tmp) == -1)
+		if (files.copyFile(lvl_bin, lvl_tmp) == -1)
 			abend(MSG_CNCLT);
 	}
 }
@@ -1018,9 +1021,10 @@ void restore_level_objects(LONG argcnt, ULONG slotnum, ULONG lvlnum)
 /*********************************************************/
 
 void read_initial_items(void) {
+	Files &files = *_vm->_files;
 	set_save_slotnum(0);
 
-	restore_range(items_bin, FIRST_ITEM, LAST_ITEM, 0);
+	files.restoreRange(items_bin, FIRST_ITEM, LAST_ITEM, 0);
 }
 
 /*********************************************************/
@@ -1035,9 +1039,10 @@ void read_initial_items(void) {
 /*********************************************************/
 
 void write_initial_tempfiles(void) {
+	Files &files = *_vm->_files;
 	ULONG lvl;
 
-	if (!save_range(itm_tmp, SAVETYPE /* SF_TXT */, FIRST_ITEM, LAST_ITEM))
+	if (!files.saveRange(itm_tmp, SAVETYPE /* SF_TXT */, FIRST_ITEM, LAST_ITEM))
 		abend(MSG_CNSI);
 
 	set_save_slotnum(0);
@@ -1045,7 +1050,7 @@ void write_initial_tempfiles(void) {
 	for (lvl = 1; lvl <= NUM_LEVELS; lvl++) {
 		set_save_lvlnum(lvl);
 
-		if (copy_file(lvl_bin, lvl_tmp) == -1)
+		if (files.copyFile(lvl_bin, lvl_tmp) == -1)
 			abend(MSG_CNCLT);
 	}
 }

@@ -34,7 +34,9 @@
 #include "engines/engine.h"
 #include "aesop/debugger.h"
 #include "aesop/events.h"
+#include "aesop/files.h"
 #include "aesop/interpreter.h"
+#include "aesop/objects.h"
 #include "aesop/resources.h"
 #include "aesop/screen.h"
 
@@ -53,8 +55,9 @@ enum AesopGameFeatures {
     GF_AESOP32 = 1 << 0
 };
 
-#define AESOP_SCREEN_WIDTH 320
+#define AESOP_SCREEN_WIDTH	320
 #define AESOP_SCREEN_HEIGHT 200
+#define BOOTSTRAP_OBJECT	2000 // Object which launches AESOP application
 
 struct AesopGameDescription;
 
@@ -80,6 +83,8 @@ public:
 	const AesopGameDescription *_gameDescription;
 	Debugger *_debugger;
 	Events *_events;
+	Files *_files;
+	Objects *_objects;
 	Interpreter *_interpreter;
 	Resources *_resources;
 	Screen *_screen;
@@ -96,6 +101,9 @@ public:
 	bool hasFeature(EngineFeature f) const;
 	bool isAesop32() const;
 
+	/**
+	 * Return a random number from 0 to the specified maximum
+	 */
 	int getRandomNumber(int max);
 };
 

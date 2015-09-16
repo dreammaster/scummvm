@@ -25,8 +25,6 @@
 
 namespace Aesop {
 
-extern void load_string(LONG argcnt, BYTE *array, ULONG string);
-extern void load_resource(LONG argcnt, BYTE *array, ULONG resource);
 extern void copy_string(LONG argcnt, BYTE *src, BYTE *dest);
 extern void string_force_lower(LONG argcnt, BYTE *dest);
 extern void string_force_upper(LONG argcnt, BYTE *dest);
@@ -111,12 +109,6 @@ extern void play_sequence(LONG argcnt, ULONG LA_version, ULONG AD_version, ULONG
 extern void load_music(void);
 extern void unload_music(void);
 extern void set_sound_status(LONG argcnt, ULONG status);
-
-extern LONG create_object(LONG argcnt, ULONG name);
-extern LONG create_program(LONG argcnt, LONG index, ULONG name);
-extern LONG destroy_object(LONG argcnt, LONG index);
-extern void thrash_cache(void);
-extern ULONG flush_cache(LONG argcnt, ULONG goal);
 
 extern LONG step_X(LONG argcnt, ULONG x, ULONG fdir, ULONG mtype, ULONG distance);
 extern LONG step_Y(LONG argcnt, ULONG y, ULONG fdir, ULONG mtype, ULONG distance);

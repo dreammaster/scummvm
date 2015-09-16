@@ -28,10 +28,10 @@
 
 namespace Aesop {
 
-#define add_ptr(base,offset) ((void *)((ULONG)(base) + (ULONG)(offset)))
-#define ptr_dif(top,bot) (((BYTE *)(top) - (BYTE *)(bot)))
+#define add_ptr(base,offset) ((void *)((byte *)(base) + (uint)(offset)))
+#define ptr_dif(top,bot) (((byte *)(top) - (byte *)(bot)))
 #define far_memmove(dest, src, len) ((void *)memmove((dest),(src),(len)))
-#define add_offset(s,o) ((void *)((ULONG)(s) + (ULONG)(o)))
+#define add_offset(s,o) ((void *)((byte *)(s) + (ULONG)(o)))
 
 enum StartupState { SS_NONE = 0, SS_CINE = 1, SS_VICT = 2, SS_CHGN = 3, SS_INTR = 4 };
 
@@ -67,6 +67,9 @@ public:
 	}
 	operator const BYTE *() {
 		return (const BYTE *)_ptrConst;
+	}
+	operator byte *() {
+		return (byte *)_ptr;
 	}
 	operator const void *() {
 		return _ptrConst;
@@ -166,7 +169,6 @@ private:
 	LONG _currentIndex;
 	ULONG _currentMsg;
 	LONG _offThis;
-	HRES *_objList;
 	IHDR *_instance;
 	THDR *_thunk;
 	byte *_ds32;
@@ -424,11 +426,12 @@ private:
 	Parameter itemAttrib(Parameters params);
 	Parameter arrowCount(Parameters params);
 public:
-	StartupState _startupState;
-	ULONG _currentThis;
+	static StartupState _startupState;
+	static ULONG _currentThis;
 public:
-	Interpreter(AesopEngine *vm, HRES *objList);
+	Interpreter(AesopEngine *vm);
 	~Interpreter();
+	static Interpreter *init(AesopEngine *vm);
 
 	uint first(HRES dictionary);
 	uint iterate(const void *base, uint cur, const char **tag, const char **def);

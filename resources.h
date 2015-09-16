@@ -28,161 +28,12 @@
 #define AESOP_RESOURCES_H
 
 #include "common/file.h"
-#include "aesop/defs.h"
+#include "aesop/resource_structures.h"
 
 namespace Aesop {
 
 #define MAX_OBJ_TYPES  2450      // # of possible resource names
 #define DIR_BLK        256       // # of cache directory entries/block
-#define OD_SIZE        128       // # of entries/ordinal file directory block
-
-enum {
-    DA_FIXED        = 0x00000001U,   // Entry attribute equates
-    DA_MOVEABLE     = 0x00000000U,   // (only low word preserved in cache)
-    DA_PRECIOUS     = 0x00000020U,
-    DA_DISCARDABLE  = 0x00000010U,
-    DA_TEMPORARY    = 0x00000000U,
-
-    DA_EVANESCENT   = 0x00000040U,   // Special runtime attribute equates
-    DA_DISCARDED    = 0x00000100U,
-    DA_FREE         = 0x00000200U,
-    DA_DEFAULT      = 0xFFFFFFFFU,
-
-    DA_PLACEHOLDER  = 0x10000000L
-};
-
-#define SA_UNUSED      0x00000001   // Storage attribute flag equates
-#define SA_DELETED     0x00000002
-
-#define ROED 0                      // Resource Ordinal Entry Directory
-#define RDES 1                      // Resource Description Directory
-#define RDEP 2                      // Resource Dependency Directory
-#define CRFD 3                      // Code Resource Function Directory
-
-#define RTR_FREEBASE   0x0001U   // TRUE for destructor to free heap memory
-
-#define SIZE_DB (DIR_BLK * sizeof(HD_entry))
-
-#define DOS_BUFFSIZE 32768U
-
-// cached resource entry descriptor
-struct HD_entry {
-	void *_seg;                  // pointer to resource data
-
-	ULONG _size;                 // size of resource in bytes
-	ULONG _flags;                // DA_ flags
-	ULONG _history;              // LRU counter value
-	ULONG _locks;                // locking depth
-	ULONG _user;                 // .RES file offset or instance object name
-};
-
-// resource file header
-struct RF_file_hdr {
-	BYTE  _signature[16];
-	ULONG _fileSize;
-	ULONG _lostSpace;
-	ULONG _FOB;
-	ULONG _createTime;
-	ULONG _modifyTime;
-
-	RF_file_hdr();
-
-	/**
-	 * Load header data from the passed stream
-	*/
-	void load(Common::SeekableReadStream &s);
-};
-
-// resource file entry header
-struct RF_entry_hdr {
-	ULONG _timestamp;
-	ULONG _dataAttrib;
-	ULONG _dataSize;
-
-	RF_entry_hdr();
-
-	/**
-	 * Load header data from the passed stream
-	*/
-	void load(Common::SeekableReadStream &s);
-};
-
-struct OD_block {
-	ULONG _next;
-	UBYTE _flags[OD_SIZE];
-	ULONG _index[OD_SIZE];
-
-	OD_block();
-
-	/**
-	 * Load header data from the passed stream
-	*/
-	void load(Common::SeekableReadStream &s);
-};
-
-// name directory entry
-struct ND_entry {
-	ULONG OE;                     // public
-	HRES thunk;                   // public
-	HRES handle;                  // public
-};
-
-// External code reference entry
-struct XCR_entry {
-	ULONG val;
-};
-
-// External data reference entry
-struct XDR_entry {
-	UWORD offset;
-};
-
-
-// SOP program header
-struct PRG_HDR {
-	uint _staticSize;
-	uint _imports;
-	uint _exports;
-	uint _parent;
-
-	PRG_HDR();
-
-	/**
-	 * Load header data from the passed stream
-	 */
-	void load(Common::SeekableReadStream &s);
-};
-
-// Instance header
-struct IHDR {
-	HRES _thunk;
-
-	IHDR() : _thunk(nullptr) {}
-};
-
-// Thunk header
-struct THDR {
-	UWORD _mvList;
-	UWORD _maxMsg;
-	UWORD _sdList;
-	UWORD _nPrgs;
-	UWORD _iSize;
-	UWORD _useCount;
-
-	THDR();
-};
-
-// Palette resource header
-struct PAL_RES {
-	UWORD _nColors;
-	Common::Array<byte> _fade[11];
-	Common::Array <byte> _rgb;
-
-	/**
-	* Load header data from the passed stream
-	*/
-	void load(Common::SeekableReadStream &s);
-};
 
 //
 // RTR_member macro allows access to HD_entry structure members
@@ -371,7 +222,17 @@ public:
 	 *
 	 * Returns -1U if resource could not be loaded
 	 */
-	HRES load_resource(ULONG resource, ULONG attrib);
+	HRES loadResource(ULONG resource, ULONG attrib);
+
+	/**
+	 * Load a string resource into a SOP instance's array
+	 *
+	 * Determines array offset in instance, in case resource load causes
+	 * instance to move in memory
+	 *
+	 * WARNING: The array must not be of automatic or external scope!
+	*/
+	void loadString(byte *array, uint string);
 
 	/**
 	 * Read from resource file into a specified block of memory

@@ -106,11 +106,6 @@ typedef unsigned long HTIMER;
 
 extern int int386(int intNum, REGS *inregs, REGS *outregs);
 
-extern bool aesop_isspace(const char c);
-extern bool aesop_isalpha(const char c);
-extern bool aesop_isdigit(const char c);
-extern bool aesop_isalnum(const char c);
-extern bool aesop_ispunct(const char c);
 
 extern void PollMod();
 extern int kbhit();

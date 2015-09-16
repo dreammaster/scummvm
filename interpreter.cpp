@@ -330,15 +330,20 @@ const ExternMethod Interpreter::_methods[] = {
 	&Interpreter::arrowCount
 };
 
+StartupState Interpreter::_startupState;
+ULONG Interpreter::_currentThis;
+
 /*----------------------------------------------------------------*/
 
-Interpreter::Interpreter(AesopEngine *vm, HRES *objList) : _vm(vm) {
-	_objList = objList;
+Interpreter *Interpreter::init(AesopEngine *vm) {
+	Interpreter::_currentThis = 0;
+	Interpreter::_startupState = SS_CINE;
+	return new Interpreter(vm);
+}
 
-	_startupState = SS_CINE;
+Interpreter::Interpreter(AesopEngine *vm) : _vm(vm) {
 	_currentIndex = 0;
 	_currentMsg = 0;
-	_currentThis = 0;
 	_instance = nullptr;
 	_thunk = nullptr;
 	_ds32 = nullptr;
@@ -427,6 +432,7 @@ void Interpreter::addArgument(const Parameter &param) {
 }
 
 LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
+	Objects &objects = *_vm->_objects;
 	Resources &res = *_vm->_resources;
 	const int OPCODES_COUNT = sizeof(_opcodes) / sizeof(OpcodeMethod);
 
@@ -436,7 +442,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_currentIndex = index;
 
 	// Get a handle to the object
-	HRES handle = _objList[index];
+	HRES handle = objects[index];
 	if (handle == HRES_NULL)
 		return -1;
 
@@ -754,7 +760,7 @@ void Interpreter::cmdCALL() {
 
 void Interpreter::cmdSEND() {
 	// Instantiate a new interpreter
-	Interpreter *interp = new Interpreter(_vm, _objList);
+	Interpreter *interp = new Interpreter(_vm);
 	
 	// Load the arguments in reverse so they'll be in the correct order
 	Parameters params;
@@ -1130,42 +1136,46 @@ void Interpreter::cmdLESA() {
 }
 
 void Interpreter::cmdLXB() {
+	Objects &objects = *_vm->_objects;
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
-	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
 	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLXW() {
+	Objects &objects = *_vm->_objects;
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
-	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
 	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLXD() {
+	Objects &objects = *_vm->_objects;
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
-	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
 	_stack.push(READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdSXB() {
+	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop() & 0xff;
 
 	ULONG offset = READ_LE_UINT16(_code);
@@ -1174,13 +1184,14 @@ void Interpreter::cmdSXB() {
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
-	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *destP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
 	*destP = val;
 	_stack.push(val);
 }
 
 void Interpreter::cmdSXW() {
+	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
 	ULONG offset = READ_LE_UINT16(_code);
@@ -1189,13 +1200,14 @@ void Interpreter::cmdSXW() {
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
-	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *destP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
 	WRITE_LE_UINT16(destP, val);
 	_stack.push(val);
 }
 
 void Interpreter::cmdSXD() {
+	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
 	ULONG offset = READ_LE_UINT16(_code);
@@ -1204,13 +1216,14 @@ void Interpreter::cmdSXD() {
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
-	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *destP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
 	WRITE_LE_UINT32(destP, val);
 	_stack.push(val);
 }
 
 void Interpreter::cmdLXBA() {
+	Objects &objects = *_vm->_objects;
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
@@ -1220,11 +1233,12 @@ void Interpreter::cmdLXBA() {
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 	_stack.push(*srcP);
 }
 
 void Interpreter::cmdLXWA() {
+	Objects &objects = *_vm->_objects;
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
@@ -1234,11 +1248,12 @@ void Interpreter::cmdLXWA() {
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 	_stack.push(READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLXDA() {
+	Objects &objects = *_vm->_objects;
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
@@ -1248,11 +1263,12 @@ void Interpreter::cmdLXDA() {
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	byte *srcP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 	_stack.push(READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdSXBA() {
+	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
 	ULONG offset = READ_LE_UINT16(_code);
@@ -1264,12 +1280,13 @@ void Interpreter::cmdSXBA() {
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *destP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 	*destP = val & 0xff;
 	_stack.push(val);
 }
 
 void Interpreter::cmdSXWA() {
+	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
 	ULONG offset = READ_LE_UINT16(_code);
@@ -1281,12 +1298,13 @@ void Interpreter::cmdSXWA() {
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *destP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 	*destP = val & 0xffff;
 	_stack.push(val);
 }
 
 void Interpreter::cmdSXDA() {
+	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
 	ULONG offset = READ_LE_UINT16(_code);
@@ -1298,12 +1316,13 @@ void Interpreter::cmdSXDA() {
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	byte *destP = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *destP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 	*destP = val & 0xff;
 	_stack.push(val);
 }
 
 void Interpreter::cmdLEXA() {
+	Objects &objects = *_vm->_objects;
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *instP = (byte *)_thunk + _externOffset + offset;
@@ -1313,7 +1332,7 @@ void Interpreter::cmdLEXA() {
 	instanceOffset += v >> 16;
 	int objIndex = v & 0xffff;
 
-	byte *ptr = (byte *)Resources::addr(_objList[objIndex]) + instanceOffset;
+	byte *ptr = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 	_stack.push((BYTE *)ptr);
 }
 
@@ -1329,7 +1348,8 @@ void Interpreter::cmdLECA() {
 }
 
 void Interpreter::cmdSOLE() {
-	HRES hres = _objList[_stack.pop()];
+	Objects &objects = *_vm->_objects;
+	HRES hres = objects[_stack.pop()];
 	_stack.push((BYTE *)hres);
 }
 
@@ -1342,12 +1362,12 @@ void Interpreter::cmdBRK() {
 }
 
 Parameter Interpreter::loadString(Parameters params) {
-	load_string(params.size(), params[0], params[1]);
+	_vm->_resources->loadString(params[0], params[1]);
 	return Parameter();
 }
 
 Parameter Interpreter::loadResource(Parameters params) {
-	load_resource(params.size(), params[0], params[1]);
+	_vm->_resources->loadResource(params[0], params[1]);
 	return Parameter();
 }
 
@@ -1852,23 +1872,23 @@ Parameter Interpreter::setSoundStatus(Parameters params) {
 }
 
 Parameter Interpreter::createObject(Parameters params) {
-	return create_object(params.size(), params[0]);
+	return _vm->_objects->createObject(params[0]);
 }
 
 Parameter Interpreter::createProgram(Parameters params) {
-	return create_program(params.size(), params[0], params[1]);
+	return _vm->_objects->createProgram(params[0], params[1]);
 }
 
 Parameter Interpreter::destroyObject(Parameters params) {
-	return destroy_object(params.size(), params[0]);
+	return _vm->_objects->destroyObject(params[0]);
 }
 
 Parameter Interpreter::flushCache(Parameters params) {
-	return flush_cache(params.size(), params[0]);
+	return _vm->_objects->flushCache(params[0]);
 }
 
 Parameter Interpreter::thrashCache(Parameters params) {
-	thrash_cache();
+	_vm->_objects->thrashCache();
 	return Parameter();
 }
 
