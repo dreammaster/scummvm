@@ -64,6 +64,7 @@ struct AesopGameDescription;
 class AesopEngine : public Engine {
 private:
 	Common::RandomSource _randomSource;
+	uint _memChecksum;
 
 	/**
 	 * Initialize the engine
@@ -105,6 +106,12 @@ public:
 	 * Return a random number from 0 to the specified maximum
 	 */
 	int getRandomNumber(int max);
+
+	void *memAlloc(uint bytes);
+
+	char *strAlloc(const char *str);
+
+	void memFree(void *ptr);
 };
 
 extern AesopEngine *_vm;

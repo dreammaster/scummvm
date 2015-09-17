@@ -128,16 +128,6 @@ extern LONG VFX_pane_copy(PANE *source, LONG sx, LONG sy,
     PANE *target, LONG tx, LONG ty, LONG fill);
 extern void VFX_init_driver(void);
 extern void VFX_shutdown_driver(void);
-extern LONG VFX_shape_bounds(void *shape_table, LONG shape_num);
-extern void VFX_shape_visible_rectangle(void *shape_table,
-    LONG shape_number, LONG hotX, LONG hotY, LONG mirror, LONG *rectangle);
-extern LONG VFX_pane_wipe(PANE *pane, LONG color);
-extern LONG VFX_pixel_read(PANE *pane, LONG x, LONG y);
-extern LONG VFX_pixel_write(PANE *pane, LONG x, LONG y, ULONG color);
-extern LONG VFX_line_draw(PANE *pane, LONG x0, LONG y0,
-    LONG x1, LONG y1, LineDraw mode, LONG parm);
-extern LONG VFX_pixel_fade(PANE *source, PANE *destination,
-    LONG intervals, LONG rnd = 0);
 extern LONG VFX_character_width(void *font, LONG character);
 
 extern LONG VFX_rectangle_hash(PANE *pane, LONG x0, LONG y0,

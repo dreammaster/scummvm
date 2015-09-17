@@ -24,14 +24,11 @@
 
 #include "aesop/aesop.h"
 #include "aesop/eye.h"
-#include "aesop/gil2vfx.h"
-#include "aesop/graphics.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
 #include "aesop/rtcode.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
-#include "aesop/graphics.h"
 #include "aesop/intrface.h"
 #include "aesop/resources.h"
 //#include "aesop/modsnd32.h"
@@ -678,8 +675,7 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 			} else colcnt[i] = 0;
 		}
 
-		PollMod();
-		//VFX_wait_vblank_leading();
+		events.waitVBlankLeading();
 		count++;
 	}
 

@@ -29,6 +29,8 @@
 
 namespace Aesop {
 
+enum Mirror { NO_MIRROR = 0, X_MIRROR = 1, Y_MIRROR = 2, XY_MIRROR = 3 };
+
 struct ShapeFrame: public Common::Rect {
 private:
 	const byte *_data;
@@ -50,7 +52,21 @@ public:
 	/**
 	 * Returns the bounds of the shape encoded into a 32-bit value
 	 */
-	uint32 bounds() const;
+	uint32 getBounds() const;
+
+	int visibleBitmapRect(int x1, int y1, int mirror, uint16 *bounds);
+
+	/**
+	 * This function traces a shape and returns a smallest rectangle which
+	 * will hold the visible portion of the shape.
+	 *
+	 * @param hostpot	Specifies the location where the shape is to be drawn.
+	 * The shape's hot spot will end up at the specified location.
+	 * @param mirror	Holds flags to mirror the shape in X, Y or both.
+	 * @param rectangle	Must point to an array of at least 4 ints which
+	 * will receive the rectangle coordinates.
+	 */
+	void visibleRectangle(int hotX, int hotY, int mirror, int *rectangle);
 };
 
 class Shapes: public Common::Array<ShapeFrame> {
@@ -75,6 +91,20 @@ public:
 	 */
 	void drawBitmap(int wnd, const Common::Point &pt, int mirror, int scale,
 		byte *fade_table, int shape_num);
+
+	/**
+	 * Fill a 4-element array of words with the coordinates of the rectangle
+	 * enclosing the visible part of a bitmap
+	 *
+	 * Return 0 if bitmap empty
+	 * Determines array offset in instance, in case resource load causes
+	 * instance to move in memory
+	 *
+	 * WARNING: The array must not be of automatic or external scope!
+	 */
+	static uint visibleBitmapRect(int x, int y, uint flip, uint table, uint number, uint16 *array);
+
+	static uint getBitmapHeight(uint table, uint number);
 };
 
 } // End of namespace Aesop

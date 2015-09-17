@@ -104,7 +104,6 @@ uint Objects::flushCache(uint goal) {
 void Objects::dumpStaticContext(uint index, TextFile *TF) {
 	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
-	LONG i;
 	ULONG n, p, offset, asize;
 	HRES instance, thunk, expt;
 	void *tptr;

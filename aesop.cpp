@@ -43,6 +43,7 @@ AesopEngine::AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc) :
 	_interpreter = nullptr;
 	_resources = nullptr;
 	_screen = nullptr;
+	_memChecksum = 0;
 }
 
 AesopEngine::~AesopEngine() {
@@ -53,6 +54,8 @@ AesopEngine::~AesopEngine() {
 	delete _objects;
 	delete _resources;
 	delete _screen;
+
+	assert(_memChecksum == 0);
 }
 
 void AesopEngine::initialize() {
@@ -68,7 +71,6 @@ void AesopEngine::initialize() {
 }
 
 void AesopEngine::deinitialize() {
-	mem_shutdown();
 	AIL_shutdown();
 }
 
@@ -104,6 +106,30 @@ void AesopEngine::play() {
 
 int AesopEngine::getRandomNumber(int max) {
 	return _randomSource.getRandomNumber(max);
+}
+
+void *AesopEngine::memAlloc(uint bytes) {
+	void *ptr = (void *)malloc(bytes);
+	assert(ptr);
+
+	_memChecksum ^= (uint)ptr;
+
+	return ptr;
+}
+
+char *AesopEngine::strAlloc(const char *str) {
+	char *ptr;
+
+	ptr = (char *)memAlloc(strlen(str) + 1);
+	strcpy(ptr, str);
+
+	return ptr;
+}
+
+void AesopEngine::memFree(void *ptr) {
+	_memChecksum ^= (uint)ptr;
+
+	free(ptr);
 }
 
 } // End of namespace Aesop

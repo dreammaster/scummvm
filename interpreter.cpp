@@ -24,9 +24,9 @@
 #include "aesop/interpreter.h"
 #include "aesop/defs.h"
 #include "aesop/eye.h"
-#include "aesop/graphics.h"
 #include "aesop/rtmsg.h"
 #include "aesop/rtsystem.h"
+#include "aesop/shapes.h"
 
 namespace Aesop {
 
@@ -1632,7 +1632,7 @@ Parameter Interpreter::hashRectangle(Parameters params) {
 }
 
 Parameter Interpreter::getBitmapHeight(Parameters params) {
-	return get_bitmap_height(params.size(), params[0], params[1]);
+	return Shapes::getBitmapHeight(params[0], params[1]);
 }
 
 Parameter Interpreter::drawBitmap(Parameters params) {
@@ -1643,8 +1643,7 @@ Parameter Interpreter::drawBitmap(Parameters params) {
 
 Parameter Interpreter::visibleBitmapRect(Parameters params) {
 	assert(params[5]);
-	return visible_bitmap_rect(params.size(), params[0], params[1],
-	                           params[2], params[3], params[4], params[5]);
+	return Shapes::visibleBitmapRect(params[0], params[1], params[2], params[3], params[4], (uint16 *)((BYTE *)params[5]));
 }
 
 Parameter Interpreter::setPalette(Parameters params) {

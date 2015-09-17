@@ -1160,12 +1160,6 @@ LONG GIL2VFX_get_bitmap_height(void *shape_table, LONG shape_num) {
 	return ((LONG)(WORD)VFX_shape_bounds(shape_table, shape_num));
 }
 
-void VFX_shape_visible_rectangle(void *shape_table,
-                                 LONG shape_number, LONG hotX, LONG hotY,
-                                 LONG mirror, LONG *rectangle) {
-	error("TODO: VFX_shape_visible_rectangle");
-}
-
 void VFX_window_fade(Window *buffer, byte *palette, LONG intervals) {
 	error("TODO");
 }
@@ -1182,49 +1176,6 @@ LONG VFX_shape_resolution(void *shape_table, LONG shape_num) {
 
 int VFX_shape_resolution(byte *data, int shape_num) {
 	error("TODO");
-}
-
-LONG GIL2VFX_visible_bitmap_rect(LONG x1, LONG y1, LONG mirror,
-                                 UBYTE *shapes, LONG shape_num, WORD *bounds) {
-	LONG rectangle[4];
-	LONG bm_width, bm_height;
-
-	VFX_shape_visible_rectangle(shapes, shape_num, x1, y1, mirror, rectangle);
-
-	if (mirror) {
-		bm_width = VFX_shape_bounds(shapes, shape_num);
-		bm_height = (LONG)(WORD)bm_width;
-		bm_width = bm_width >> 16;
-	}
-
-
-	if (mirror & X_MIRROR) {
-		bounds[0] = (WORD)(bm_width + rectangle[0]);
-		bounds[2] = (WORD)(bm_width + rectangle[2]);
-	} else {
-		bounds[0] = (WORD)rectangle[0];
-		bounds[2] = (WORD)rectangle[2];
-	}
-
-	if (mirror & Y_MIRROR) {
-		bounds[1] = (WORD)(bm_height + rectangle[1]);
-		bounds[3] = (WORD)(bm_height + rectangle[3]);
-	} else {
-		bounds[1] = (WORD)rectangle[1];
-		bounds[3] = (WORD)rectangle[3];
-	}
-
-	Pane &pane0 = _vm->_screen->panes(0);
-	bounds[0] = (bounds[0] > pane0.left) ? bounds[0] : (WORD)pane0.left;
-	bounds[1] = (bounds[1] > pane0.top) ? bounds[1] : (WORD)pane0.top;
-
-	bounds[2] = (bounds[2] < pane0.right) ? bounds[2] : (WORD)pane0.right;
-	bounds[3] = (bounds[3] < pane0.bottom) ? bounds[3] : (WORD)pane0.bottom;
-
-	if ((bounds[0] > bounds[2]) || (bounds[1] > bounds[3]))
-		return 0;            // Nothing visible
-	else
-		return 1;
 }
 
 void GIL2VFX_refresh_window(ULONG source, ULONG target) {

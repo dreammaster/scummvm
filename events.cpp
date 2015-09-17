@@ -206,6 +206,14 @@ void Events::delay(uint32 time) {
 	}
 }
 
+void Events::waitVBlankLeading() {
+	// TODO
+}
+
+void Events::waitVerticalRetrace() {
+	// TODO
+}
+
 void Events::getKey() {
 	while (!_vm->shouldQuit() && !findEvent(SYS_KEYDOWN, -1))
 		delay(5);

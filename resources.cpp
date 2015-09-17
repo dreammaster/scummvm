@@ -31,7 +31,6 @@
 #include "aesop/rtmsg.h"
 #include "aesop/resources.h"
 #include "aesop/intrface.h"
-#include "aesop/graphics.h"   // for dprint()
 #include "aesop/stubs.h"
 #include "aesop/utils.h"
 

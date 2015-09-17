@@ -23,6 +23,7 @@
 #include "common/scummsys.h"
 #include "aesop/aesop.h"
 #include "aesop/utils.h"
+#include "aesop/shared.h"
 
 namespace Aesop {
 
@@ -107,6 +108,33 @@ bool aesop_isalnum(const char c) {
 bool aesop_ispunct(const char c) {
 	return !aesop_isalnum(c);
 }
+
+void dprint(LONG argcnt, const char *format, ...) {
+	va_list argptr;
+
+	va_start(argptr, format);
+
+	_vm->_screen->textWindows(0).textColor(15, DK_RED);
+	_vm->_screen->textWindows(0).textColor(0, 255);
+	_vm->_screen->textWindows(0).vsprint(format, argptr);
+
+	va_end(argptr);
+}
+
+void aprint(LONG argcnt, const char *format, ...) {
+	error("TODO: aprint with Paramater array");
+	/*
+	va_list args;
+	char buffer[100];
+
+	va_start(args, format);
+	vsnprintf(buffer, 100, format, args);
+	va_end(args);
+
+	debug(buffer);
+	*/
+}
+
 
 } // End of namespace Aesop
 

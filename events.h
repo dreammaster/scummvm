@@ -252,6 +252,10 @@ public:
 	 */
 	void delay(uint32 time);
 
+	void waitVBlankLeading();
+
+	void waitVerticalRetrace();
+
 	/**
 	 * Get a pending key
 	 */

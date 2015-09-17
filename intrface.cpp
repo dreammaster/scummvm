@@ -23,7 +23,6 @@
 //#include "aesop/vfx.h"
 //#include "aesop/ail32.h"
 #include "aesop/aesop.h"
-#include "aesop/gil2vfx.h"
 #include "aesop/gil2vfxa.h"
 #include "aesop/mouse.h"
 #include "aesop/stubs.h"
@@ -34,7 +33,6 @@
 #include "aesop/resources.h"
 #include "aesop/rtcode.h"
 #include "aesop/intrface.h"
-#include "aesop/graphics.h"
 
 namespace Aesop {
 

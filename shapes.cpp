@@ -116,12 +116,56 @@ void ShapeFrame::draw(Pane &pane, const Common::Point &pt) {
 }
 
 void ShapeFrame::transform(Pane &pane, const Common::Point &pt, const byte *pixels, int rot, 
-	int xScale, int yScale, uint flags) {
-
+		int xScale, int yScale, uint flags) {
+	error("TODO: transform");
 }
 
-uint32 ShapeFrame::bounds() const {
-	return 0;
+uint32 ShapeFrame::getBounds() const {
+	// Height is low 16-bits, Width is high 16 bits
+	return READ_LE_UINT32(_data);
+}
+
+int ShapeFrame::visibleBitmapRect(int x1, int y1, int mirror, uint16 *bounds) {
+	int rectangle[4];
+	int bm_width, bm_height;
+
+	visibleRectangle(x1, y1, mirror, rectangle);
+
+	if (mirror) {
+		bm_width = getBounds();
+		bm_height = bm_width & 0xffff;
+		bm_width = bm_width >> 16;
+	}
+
+
+	if (mirror & X_MIRROR) {
+		bounds[0] = (WORD)(bm_width + rectangle[0]);
+		bounds[2] = (WORD)(bm_width + rectangle[2]);
+	} else {
+		bounds[0] = (WORD)rectangle[0];
+		bounds[2] = (WORD)rectangle[2];
+	}
+
+	if (mirror & Y_MIRROR) {
+		bounds[1] = (WORD)(bm_height + rectangle[1]);
+		bounds[3] = (WORD)(bm_height + rectangle[3]);
+	} else {
+		bounds[1] = (WORD)rectangle[1];
+		bounds[3] = (WORD)rectangle[3];
+	}
+
+	Pane &pane0 = _vm->_screen->panes(0);
+	bounds[0] = (bounds[0] > pane0.left) ? bounds[0] : (WORD)pane0.left;
+	bounds[1] = (bounds[1] > pane0.top) ? bounds[1] : (WORD)pane0.top;
+
+	bounds[2] = (bounds[2] < pane0.right) ? bounds[2] : (WORD)pane0.right;
+	bounds[3] = (bounds[3] < pane0.bottom) ? bounds[3] : (WORD)pane0.bottom;
+
+	return ((bounds[0] > bounds[2]) || (bounds[1] > bounds[3])) ? 0 : 1;
+}
+
+void ShapeFrame::visibleRectangle(int hotX, int hotY, int mirror, int *rectangle) {
+	error("TODO: VFX_shape_visible_rectangle");
 }
 
 /*----------------------------------------------------------------*/
@@ -155,8 +199,8 @@ void Shapes::drawBitmap(int wnd, const Common::Point &pt, int mirror, int scale,
 		y_scale = ((scale) ? (scale << 8) : 0x10000);
 
 		if (x_scale != 0x10000 || y_scale != 0x10000) {
-			VFX_fixed_mul(frame.bounds() & 0xffff0000, 0x10000 - x_scale, &xs);
-			VFX_fixed_mul(frame.bounds() << 16, 0x10000 - y_scale, &ys);
+			VFX_fixed_mul(frame.getBounds() & 0xffff0000, 0x10000 - x_scale, &xs);
+			VFX_fixed_mul(frame.getBounds() << 16, 0x10000 - y_scale, &ys);
 
 			if (mirror & X_MIRROR) xs = -xs;
 			if (mirror & Y_MIRROR) ys = -ys;
@@ -168,17 +212,17 @@ void Shapes::drawBitmap(int wnd, const Common::Point &pt, int mirror, int scale,
 		switch (mirror) {
 		case X_MIRROR:
 			x_scale = -x_scale;
-			xp += (frame.bounds() >> 16);
+			xp += (frame.getBounds() >> 16);
 			break;
 		case Y_MIRROR:
 			y_scale = -y_scale;
-			yp += (WORD)frame.bounds();
+			yp += (WORD)frame.getBounds();
 			break;
 		case XY_MIRROR:
 			x_scale = -x_scale;
 			y_scale = -y_scale;
-			xp += (frame.bounds() >> 16) - 1;
-			yp += ((WORD)frame.bounds()) - 1;
+			xp += (frame.getBounds() >> 16) - 1;
+			yp += ((WORD)frame.getBounds()) - 1;
 			break;
 		case NO_MIRROR:
 		default:
@@ -195,6 +239,50 @@ void Shapes::drawBitmap(int wnd, const Common::Point &pt, int mirror, int scale,
 		frame.transform(pane, Common::Point(xp, yp), (const byte *)_vm->_screen->_bitmapBuffer.getPixels(),
 			0, x_scale, y_scale, flags);
 	}
+}
+
+uint Shapes::visibleBitmapRect(int x, int y, uint flip, uint table, uint number, uint16 *array) {
+	Objects &objects = *_vm->_objects;
+	Resources &res = *_vm->_resources;
+	HRES handle;
+	uint array_offset;
+	byte *new_array;
+	uint16 bounds[4];
+	uint result;
+
+	array_offset = (ULONG)array - (ULONG)res.addr(objects[Interpreter::_currentThis]);
+
+	handle = res.get_resource_handle(table, DA_DEFAULT);
+
+	res.lock(handle);
+
+	Shapes shapes((const byte *)res.addr(handle));
+	result = shapes[number].visibleBitmapRect(x, y, flip, bounds);
+
+	new_array = (byte *)add_ptr(res.addr(objects[Interpreter::_currentThis]), array_offset);
+
+	far_memmove(new_array, bounds, sizeof(bounds));
+
+	res.unlock(handle);
+
+	return result;
+}
+
+uint Shapes::getBitmapHeight(uint table, uint number) {
+	Resources &res = *_vm->_resources;
+	HRES handle;
+	uint h;
+
+	handle = res.get_resource_handle(table, DA_DEFAULT);
+
+	res.lock(handle);
+
+	Shapes shapes((const byte *)res.addr(handle));
+	h = shapes[number].height();
+
+	res.unlock(handle);
+
+	return h;
 }
 
 } // End of namespace Aesop

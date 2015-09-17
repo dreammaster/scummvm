@@ -47,7 +47,7 @@ extern const int num_colors[5];
 enum {
     NO_COLOR = 0
 };
-enum Mirror { NO_MIRROR = 0, X_MIRROR = 1, Y_MIRROR = 2, XY_MIRROR = 3 };
+
 enum LineDraw { LD_DRAW = 0, LD_TRANSLATE = 1, LD_EXECUTE = 3 };
 enum PaneScroll { PS_NOWRAP = 0, PS_WRAP = 1 };
 enum ShapeTransform {

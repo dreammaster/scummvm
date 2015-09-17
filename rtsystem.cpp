@@ -37,7 +37,6 @@
 #include "aesop/rtcode.h"
 #include "aesop/intrface.h"
 #include "aesop/sound.h"
-#include "aesop/graphics.h"
 #include "aesop/stubs.h"
 
 namespace Aesop {
@@ -45,75 +44,7 @@ namespace Aesop {
 void breakpoint(void);
 #pragma aux breakpoint = "int 3";
 
-ULONG headroom;
-ULONG checksum;
 ULONG init;
-
-WORD disk_err;
-
-void mem_init(void) {
-	headroom = init = mem_avail();
-
-	checksum = 0L;
-}
-
-void mem_shutdown(void) {
-	ULONG end;
-
-	end = mem_avail();
-
-	if ((init != end) || (checksum != 0L)) {
-//    abend(MSG_UH);    (unbalanced heap normal in flat-model version)
-	}
-}
-
-ULONG mem_avail(void) {
-	REGS inregs, outregs;
-	ULONG memarray[12];
-
-	inregs.x.eax = 0x0500;
-	inregs.x.edi = (ULONG) memarray;
-	int386(0x31, &inregs, &outregs);
-
-	return memarray[0];
-}
-
-ULONG mem_headroom(void) {
-	return headroom;
-}
-
-void *mem_alloc(ULONG bytes) {
-	ULONG left;
-	void *ptr;
-
-	ptr = (void *) malloc(bytes);
-
-	left = mem_avail();
-	if (left < headroom) headroom = left;
-
-	if (ptr == nullptr)
-		abend(MSG_OODM);
-
-	checksum ^= (ULONG) ptr;
-
-	return ptr;
-}
-
-BYTE *str_alloc(BYTE *str) {
-	BYTE *ptr;
-
-	ptr = (BYTE *)mem_alloc(strlen((const char *)str) + 1);
-	strcpy((char *)ptr, (const char *)str);
-
-	return ptr;
-}
-
-void mem_free(void *ptr) {
-	checksum ^= (ULONG) ptr;
-
-	free(ptr);
-}
-
 
 /***************************************************/
 //
