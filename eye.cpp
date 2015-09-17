@@ -694,7 +694,7 @@ void read_save_directory(void) {
 	LONG i;
 	TextFile *TF;
 
-	TF = new TextFile(SAVEDIR_FN, TF_READ);
+	TF = new TextFile(SAVEDIR_FN, FILE_READ);
 
 	if (TF == NULL)
 		abend(MSG_COSDR);
@@ -746,13 +746,13 @@ void write_save_directory(void) {
 	LONG i;
 	TextFile *TF;
 
-	TF = TF_construct(SAVEDIR_FN, TF_WRITE);
+	TF = TF_construct(SAVEDIR_FN, FILE_WRITE);
 
 	if (TF == NULL)
 		abend(MSG_COSDW);
 
 	for (i = 0; i < NUM_SAVEGAMES; i++)
-		if (!TF_writeln(TF, savegame_dir[i]))
+		if (!FILE_WRITEln(TF, savegame_dir[i]))
 			abend(MSG_CWSD);
 
 	TF_destroy(TF);

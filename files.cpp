@@ -21,6 +21,8 @@
  */
 
 #include "common/scummsys.h"
+#include "common/system.h"
+#include "common/config-manager.h"
 #include "aesop/aesop.h"
 #include "aesop/files.h"
 #include "aesop/rtmsg.h"
@@ -32,32 +34,101 @@ namespace Aesop {
 
 #define FILE_BUFFER_SIZE 4096
 
-TextFile::TextFile(const Common::String &filename, TextFileMode oFlag) {
-	if (oFlag == TF_WRITE) {
-		if (!_outFile.open(filename))
-			error("Could not create - %s", filename.c_str());
-	} else {
-		if (!_inFile.open(filename))
-			error("Could not open - %s", filename.c_str());
-	}
+BinaryFile::BinaryFile() : _inSave(nullptr), _outSave(nullptr) {
+}
 
+BinaryFile::BinaryFile(const Common::String &filename, FileMode oFlag) {
+	if (!open(filename, oFlag))
+		error("File not found");
+}
+
+BinaryFile::~BinaryFile() {
+	close();
+}
+
+bool BinaryFile::open(const Common::String &filename, FileMode oFlag) {
+	Common::String fname = filename;
+	bool isSavegame = fname.hasPrefix("SAVEGAME\\");
+	if (isSavegame)
+		fname = Common::String(fname.c_str() + 9);
 	_mode = oFlag;
+
+	if (oFlag == FILE_WRITE) {
+		// For writing files, we only allow writing savegame files
+		assert(isSavegame);
+
+		_outSave = g_system->getSavefileManager()->openForSaving(fname, false);
+		return _outSave != nullptr;
+	} else {
+		// If it's a savegame folder file, first try to load it from the save path
+		if (isSavegame) {
+			_inSave = g_system->getSavefileManager()->openForLoading(fname);
+			if (_inSave)
+				return true;
+		}
+
+		// Fallback on getting a local file
+		if (isSavegame) {
+			Common::FSNode dirNode(ConfMan.get("path"));
+			Common::FSNode fileNode = dirNode.getChild("SAVEGAME").getChild(fname);
+			return _inFile.open(fileNode);
+		} else {
+			return _inFile.open(fname);
+		}
+	}
 }
 
-TextFile::~TextFile() {
+void BinaryFile::close() {
 	_inFile.close();
-	_outFile.close();
+	delete _inSave;
+	delete _outSave;
+	_inSave = nullptr;
+	_outSave = nullptr;
 }
+
+uint BinaryFile::read(void *buffer, uint size) {
+	if (_inSave)
+		return _inSave->read(buffer, size);
+	else
+		return _inFile.read(buffer, size);
+}
+
+byte BinaryFile::readByte() {
+	byte v;
+	if (pos() >= size())
+		return 0;
+
+	read(&v, 1);
+	return v;
+}
+
+void BinaryFile::write(const void *buffer, uint size) {
+	assert(_outSave);
+	_outSave->write(buffer, size);
+}
+
+uint BinaryFile::pos() const {
+	assert(_mode == FILE_READ);
+	return _inSave ? _inSave->pos() : _inFile.pos();
+}
+
+uint BinaryFile::size() const {
+	return _inSave ? _inSave->size() : _inFile.size();
+}
+
+/*----------------------------------------------------------------*/
 
 void TextFile::wchar(char ch) {
-	_outFile.writeByte(ch);
+	write(&ch, 1);
 }
 
 char TextFile::rchar() {
-	if (_inFile.pos() >= _inFile.size())
+	if (pos() >= size())
 		return 0;
 
-	return (char)_inFile.readByte();
+	char c;
+	read(&c, 1);
+	return c;
 }
 
 bool TextFile::readln(Common::String &buffer, uint maxlen) {
@@ -87,8 +158,8 @@ bool TextFile::readln(Common::String &buffer, uint maxlen) {
 }
 
 bool TextFile::writeln(const Common::String &line) {
-	_outFile.writeString(line);
-	_outFile.writeString("\r\n");
+	write(line.c_str(), line.size());
+	write("\r\n", 2);
 	return true;
 }
 
@@ -224,7 +295,7 @@ int Files::saveRange(const Common::String &filename, FileType fileType, uint fir
 	good = 1;
 
 	if (fileType == SF_TXT) {
-		TF = new TextFile(filename, TF_WRITE);
+		TF = new TextFile(filename, FILE_WRITE);
 		if (TF == nullptr)
 			return 0;
 
@@ -301,11 +372,10 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 	txttype = 0;
 	bad = 0;
 
-	Common::File f;
-	if (!f.open(filename))
+	BinaryFile f;
+	if (!f.open(filename, FILE_READ))
 		bad = 1;
 	else {
-		typetest = 0;
 		typetest = f.readByte();
 
 		if (typetest != 26) {
@@ -315,7 +385,7 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 	}
 
 	if (txttype) {
-		TF = new TextFile(filename, TF_READ);
+		TF = new TextFile(filename, FILE_READ);
 		bad = (TF == NULL);
 	}
 
@@ -329,8 +399,7 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 			CD = readContextDescriptor(TF);
 
 			bad = (CD == NULL);
-		}
-		else {
+		} else {
 			CD = &stat_C;
 			error("TODO: CDESC::load");
 			bad = f.read(CD, sizeof(CDESC)) != sizeof(CDESC);
@@ -570,7 +639,7 @@ void Files::translateFile(const Common::String &txtFilename, const Common::Strin
 	typetest = 26;
 	f.writeByte(typetest);
 
-	TF = new TextFile(txtFilename, TF_READ);
+	TF = new TextFile(txtFilename, FILE_READ);
 	if (TF == NULL)
 		abend(MSG_COIFFT);      //"Couldn't open input file for translation"
 

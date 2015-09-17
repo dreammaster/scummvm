@@ -28,6 +28,7 @@
 #define AESOP_FILES_H
 
 #include "common/file.h"
+#include "common/savefile.h"
 #include "aesop/resource_structures.h"
 
 namespace Aesop {
@@ -35,7 +36,7 @@ namespace Aesop {
 /**
  * Text file access mode
  */
-enum TextFileMode { TF_WRITE = 0, TF_READ = 1 };
+enum FileMode { FILE_WRITE = 0, FILE_READ = 1 };
 
 /**
  * File type
@@ -57,14 +58,58 @@ enum FileError {
 
 class AesopEngine;
 
-class TextFile {
+class BinaryFile {
 private:
 	Common::File _inFile;
-	Common::DumpFile _outFile;
-	TextFileMode _mode;
+	Common::InSaveFile *_inSave;
+	Common::OutSaveFile *_outSave;
+	FileMode _mode;
 public:
-	TextFile(const Common::String &filename, TextFileMode oFlag);
-	~TextFile();
+	BinaryFile();
+	BinaryFile(const Common::String &filename, FileMode oFlag);
+	virtual ~BinaryFile();
+
+	/**
+	 * Try and open a specified file
+	 */
+	bool open(const Common::String &filename, FileMode oFlag);
+
+	/**
+	 * Close any active open file
+	 */
+	void close();
+
+	/**
+	 * Read data from the file
+	 */
+	uint read(void *buffer, uint size);
+
+	/**
+	 * Read a single byte from the file
+	 */
+	byte readByte();
+
+	/**
+	 * Write data to the file
+	 */
+	void write(const void *buffer, uint size);
+
+	/**
+	 * Return the current position within the file
+	 */
+	uint pos() const;
+
+	/**
+	 * Return the size of the file
+	 */
+	uint size() const;
+};
+
+class TextFile: public BinaryFile {
+public:
+	TextFile() : BinaryFile() {}
+	TextFile(const Common::String &filename, FileMode oFlag) : BinaryFile(filename, oFlag) {}
+	virtual ~TextFile() {}
 
 	/**
 	 * Read character from text file
