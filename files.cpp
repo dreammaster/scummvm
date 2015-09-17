@@ -102,9 +102,13 @@ byte BinaryFile::readByte() {
 	return v;
 }
 
-void BinaryFile::write(const void *buffer, uint size) {
+uint BinaryFile::write(const void *buffer, uint size) {
 	assert(_outSave);
-	_outSave->write(buffer, size);
+	return _outSave->write(buffer, size);
+}
+
+void BinaryFile::writeByte(byte v) {
+	write(&v, 1);
 }
 
 uint BinaryFile::pos() const {
@@ -114,6 +118,16 @@ uint BinaryFile::pos() const {
 
 uint BinaryFile::size() const {
 	return _inSave ? _inSave->size() : _inFile.size();
+}
+
+BinaryFile::operator Common::SeekableReadStream &() {
+	if (_inSave)
+		return *_inSave;
+	return _inFile;
+}
+
+BinaryFile::operator Common::WriteStream &() {
+	return *_outSave;
 }
 
 /*----------------------------------------------------------------*/
@@ -126,9 +140,7 @@ char TextFile::rchar() {
 	if (pos() >= size())
 		return 0;
 
-	char c;
-	read(&c, 1);
-	return c;
+	return (char)readByte();
 }
 
 bool TextFile::readln(Common::String &buffer, uint maxlen) {
@@ -310,8 +322,8 @@ int Files::saveRange(const Common::String &filename, FileType fileType, uint fir
 
 		delete TF;
 	} else {
-		Common::DumpFile f;
-		if (!f.open(filename))
+		BinaryFile f;
+		if (!f.open(filename, FILE_WRITE))
 			return 0;
 
 		typetest = 26;
@@ -324,8 +336,7 @@ int Files::saveRange(const Common::String &filename, FileType fileType, uint fir
 			if (instance == HRES_NULL) {
 				CD.name = (ULONG)-1;
 				CD.size = 0;
-			}
-			else {
+			} else {
 				thunk = ((IHDR *)Resources::addr(instance))->_thunk;
 
 				tptr = Resources::addr(thunk);
@@ -336,8 +347,7 @@ int Files::saveRange(const Common::String &filename, FileType fileType, uint fir
 				CD.size = thdr._iSize - sizeof(IHDR);
 			}
 
-			error("TODO: CDESC::save & IHDR::save");
-			//f.write(&CD,sizeof(CDESC));
+			CD.save(f);
 
 			if (CD.size)
 				if (f.write(add_ptr(Resources::addr(objects[index]), sizeof(IHDR)),
@@ -401,8 +411,7 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 			bad = (CD == NULL);
 		} else {
 			CD = &stat_C;
-			error("TODO: CDESC::load");
-			bad = f.read(CD, sizeof(CDESC)) != sizeof(CDESC);
+			CD->load(f);
 		}
 
 		if ((bad) || (CD->slot != index))

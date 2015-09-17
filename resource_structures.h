@@ -185,6 +185,16 @@ struct CDESC {
 	UWORD slot;       // object list index
 	ULONG name;       // code object name
 	UWORD size;       // size of instance data (unused in text files)
+
+	/**
+	 * Read an entry from a file
+	 */
+	void load(Common::SeekableReadStream &s);
+
+	/**
+	 * Write an entry to a file
+	 */
+	void save(Common::WriteStream &s);
 };
 
 } // End of namespace Aesop

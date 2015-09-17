@@ -139,5 +139,19 @@ void PAL_RES::load(Common::SeekableReadStream &s) {
 	}
 }
 
+/*----------------------------------------------------------------*/
+
+void CDESC::load(Common::SeekableReadStream &s) {
+	slot = s.readUint16LE();
+	name = s.readUint32LE();
+	size = s.readUint16LE();
+}
+
+void CDESC::save(Common::WriteStream &s) {
+	s.writeUint16LE(slot);
+	s.writeUint32LE(name);
+	s.writeUint16LE(size);
+}
+
 } // End of namespace Aesop
 

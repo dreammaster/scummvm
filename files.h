@@ -92,7 +92,12 @@ public:
 	/**
 	 * Write data to the file
 	 */
-	void write(const void *buffer, uint size);
+	uint write(const void *buffer, uint size);
+
+	/**
+	 * Write a single byte to the file
+	 */
+	void writeByte(byte v);
 
 	/**
 	 * Return the current position within the file
@@ -103,6 +108,10 @@ public:
 	 * Return the size of the file
 	 */
 	uint size() const;
+
+	operator Common::SeekableReadStream &();
+
+	operator Common::WriteStream &();
 };
 
 class TextFile: public BinaryFile {
