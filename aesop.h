@@ -43,7 +43,7 @@
 namespace Aesop {
 
 enum {
-    kDebugLevelScript      = 1 << 0
+    kDebugScripts      = 1 << 0
 };
 
 enum GameType {

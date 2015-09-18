@@ -44,6 +44,8 @@ AesopEngine::AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc) :
 	_resources = nullptr;
 	_screen = nullptr;
 	_memChecksum = 0;
+
+	DebugMan.addDebugChannel(kDebugScripts, "scripts", "Script debug level");
 }
 
 AesopEngine::~AesopEngine() {
@@ -66,8 +68,6 @@ void AesopEngine::initialize() {
 	_objects = new Objects(this);
 	_resources = new Resources(this);
 	_screen = new Screen(this);
-
-	DebugMan.addDebugChannel(kDebugLevelScript, "scripts", "Script debug level");
 }
 
 void AesopEngine::deinitialize() {

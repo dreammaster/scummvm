@@ -330,6 +330,61 @@ const ExternMethod Interpreter::_methods[] = {
 	&Interpreter::arrowCount
 };
 
+static const char *const OPCODE_NAMES[] = {
+	"BRT", "BRF", "BRA", "CASE", "PUSH", "DUP", "NOT", "SETB", "NEG", "ADD", "SUB", "MUL",
+	"DIV", "MOD", "EXP", "BAND", "BOR", "XOR", "BNOT", "SHL", "SHR", "LT", "LE", "EQ",
+	"NE", "GE", "GT", "INC", "DEC", "SHTC", "INTC", "LNGC", "RCRS", "CALL", "SEND", "PASS",
+	"JSR", "RTS", "AIM", "AIS", "LTBA", "LTWA", "LTDA", "LETA", "LAB", "LAW", "LAD", "SAB",
+	"SAW", "SAD", "LABA", "LAWA", "LADA", "SABA", "SAWA", "SADA", "LEAA", "LSB", "LSW",
+	"LSD", "SSB", "SSW", "SSD", "LSBA", "LSWA", "LSDA", "SSBA", "SSWA", "SSDA", "LESA",
+	"LXB", "LXW", "LXD", "SXB", "SXW", "SXD", "LXBA", "LXWA", "LXDA", "SXBA", "SXWA",
+	"SXDA", "LEXA", "SXAS", "LECA", "SOLE", "END", "BRK"
+};
+
+static const char *const METHOD_NAMES[] = {
+	"loadString", "loadResource", "copyString", "stringForceLower", "stringForceUpper",
+	"stringLen", "stringCompare", "strVal", "envVal", "beep", "pokeMem", "peekMem",
+	"rnd", "dice", "absv", "minv", "maxv", "diagnose", "heapfree",
+
+	"notify", "cancel", "drainEventQueue", "postEvent", "sendEvent", "peekEvent",
+	"dispatchEvent", "flushEventQueue", "flushInputEvents",
+
+	"initInterface", "shutdownInterface", "setMousePointer", "setWaitPointer",
+	"standbyCursor", "resumeCursor", "showMouse", "hideMouse", "mouseXY",
+	"mouseInWindow", "lockMouse", "unlockMouse", "getKey",
+
+	"initGraphics", "drawDot", "drawLine", "lineTo", "drawRectangle", "fillRectangle",
+	"hashRectangle", "getBitmapHeight", "drawBitmap", "visibleBitmapRect", "setPalette",
+	"refreshWindow", "wipeWindow", "shutdownGraphics", "waitVerticalRetrace",
+	"readPalette", "writePalette", "pixelFade", "colorFade", "lightFade",
+
+	"assignWindow", "assignSubWindow", "releaseWindow", "getLeft", "getRight",
+	"getTop", "getBottom", "setLeft", "setRight", "setTop", "setBottom",
+
+	"textWindow", "textStyle", "textXy", "textColor", "textRefreshWindow", "getTextX",
+	"getTextY", "home", "print", "sPrint", "dPrint", "aPrint", "crOut", "charWidth",
+	"fontHeight", "solidBarGraph",
+
+	"initSound", "shutdownSound", "loadSoundBlock", "soundEffect", "playSequence",
+	"loadMusic", "unloadMusic", "setSoundStatus",
+
+	"createObject", "createProgram", "destroyObject", "flushCache", "thrashCache",
+
+	"stepX", "stepY", "stepFDIR",
+
+	"stepSquareX", "stepSquareY", "stepRegion",
+
+	"distance", "seekDirection",
+
+	"spellRequest", "spellList", "magicField", "doDots", "doIce",
+
+	"readSaveDirectory", "savegameTitle", "writeSaveDirectory", "saveGame", "suspendGame",
+	"resumeItems", "resumeLevel", "changeLevel", "restoreItems", "restoreLevelObjects",
+	"readInitialItems", "writeInitialTempfiles", "createInitialBinaryFiles", "launch",
+
+	"openTransferFile", "closeTransferFile", "playerAttrib", "itemAttrib", "arrowCount"
+};
+
 StartupState Interpreter::_startupState;
 ULONG Interpreter::_currentThis;
 
@@ -435,6 +490,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	Objects &objects = *_vm->_objects;
 	Resources &res = *_vm->_resources;
 	const int OPCODES_COUNT = sizeof(_opcodes) / sizeof(OpcodeMethod);
+	debugC(1, kDebugScripts, "Interpreter::execute(%d, %d, %x", index, msgNum, (ULONG)vector);
 
 	// Check the passed index
 	if (index == -1)
@@ -513,6 +569,15 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 		int opcode = *_code++;
 		if (opcode >= OPCODES_COUNT)
 			error("Invalid opcode encountered");
+
+		if (gDebugLevel >= 1) {
+			Common::String msg = Common::String::format("%.4x %s", _code - _ds32, OPCODE_NAMES[opcode]);
+			if (opcode == 33)
+				msg += Common::String::format("(%s)", METHOD_NAMES[_stack[_stack.size() - 1 - *_code] & 0xff]);
+			msg += Common::String::format(" |%d|", _stack.size());
+
+			debugC(1, kDebugScripts, "%s", msg.c_str());
+		}
 
 		(this->*_opcodes[opcode])();
 	}
