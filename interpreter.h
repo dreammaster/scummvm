@@ -442,12 +442,11 @@ public:
 public:
 	Interpreter(AesopEngine *vm);
 	~Interpreter();
-	static Interpreter *init(AesopEngine *vm);
+	static void init(AesopEngine *vm);
 
-	uint first(HRES dictionary);
-	uint iterate(const void *base, uint cur, const char **tag, const char **def);
-
-	const char *lookup(HRES dictionary, const Common::String &key);
+	static uint first(HRES dictionary);
+	static uint iterate(const void *base, uint cur, const char **tag, const char **def);
+	static const char *lookup(HRES dictionary, const Common::String &key);
 
 	void addArgument(const Parameter &param);
 	LONG execute(LONG index, LONG msgNum, HRES vector = HRES_NULL);

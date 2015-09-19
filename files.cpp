@@ -463,7 +463,6 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 }
 
 CDESC *Files::readContextDescriptor(TextFile *TF) {
-	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	static CDESC c;
 	HRES HROED;
@@ -491,7 +490,7 @@ CDESC *Files::readContextDescriptor(TextFile *TF) {
 	HROED = res.get_resource_handle(ROED, DA_TEMPORARY | DA_EVANESCENT);
 	res.lock(HROED);
 
-	def = (const char *)interp.lookup(HROED, contextName);
+	def = (const char *)Interpreter::lookup(HROED, contextName);
 
 	if (def == NULL)
 		abend(MSG_OMCR, contextName, c.slot);
@@ -503,7 +502,6 @@ CDESC *Files::readContextDescriptor(TextFile *TF) {
 }
 
 void Files::restoreStaticContext(HRES instance, TextFile *TF) {
-	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	ULONG n, i, p, offset = 0, asize;
 	HRES thunk, expt = 0;
@@ -538,7 +536,7 @@ void Files::restoreStaticContext(HRES instance, TextFile *TF) {
 					DA_TEMPORARY | DA_EVANESCENT);
 
 				res.lock(expt);
-				def = (const char *)interp.lookup(expt, "N:OBJECT");
+				def = (const char *)Interpreter::lookup(expt, "N:OBJECT");
 
 				res.unlock(expt);
 
@@ -563,7 +561,7 @@ void Files::restoreStaticContext(HRES instance, TextFile *TF) {
 				continue;
 
 			res.lock(expt);
-			def = (const char *)interp.lookup(expt, name);
+			def = (const char *)Interpreter::lookup(expt, name);
 
 			res.unlock(expt);
 

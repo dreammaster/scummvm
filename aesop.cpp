@@ -40,7 +40,6 @@ AesopEngine::AesopEngine(OSystem *syst, const AesopGameDescription *gameDesc) :
 	_debugger = nullptr;
 	_events = nullptr;
 	_files = nullptr;
-	_interpreter = nullptr;
 	_resources = nullptr;
 	_screen = nullptr;
 	_memChecksum = 0;
@@ -52,7 +51,6 @@ AesopEngine::~AesopEngine() {
 	delete _debugger;
 	delete _events;
 	delete _files;
-	delete _interpreter;
 	delete _objects;
 	delete _resources;
 	delete _screen;
@@ -64,7 +62,7 @@ void AesopEngine::initialize() {
 	_debugger = new Debugger(this);
 	_events = new Events(this);
 	_files = new Files(this);
-	_interpreter = Interpreter::init(this);
+	Interpreter::init(this);
 	_objects = new Objects(this);
 	_resources = new Resources(this);
 	_screen = new Screen(this);
@@ -87,7 +85,7 @@ void AesopEngine::play() {
 	Common::String codeName = "start";
 	HRES hroed = _resources->get_resource_handle(ROED, DA_TEMPORARY | DA_EVANESCENT);
 	_resources->lock(hroed);
-	int code = ascnum((const char *)_interpreter->lookup(hroed, codeName));
+	int code = ascnum((const char *)Interpreter::lookup(hroed, codeName));
 	_resources->unlock(hroed);
 
 	if (code == -1)

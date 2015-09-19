@@ -566,7 +566,6 @@ bool Events::peekEvent() const {
 }
 
 void Events::dispatchEvent() {
-	Interpreter &interp = *_vm->_interpreter;
 	AesopEvent EV;
 	NREQ *NR;
 	int nxt;
@@ -602,9 +601,11 @@ void Events::dispatchEvent() {
 		if (typ != _currentEventType)       break;
 
 		if (matchParameter(typ, par, NR->parameter)) {
-			interp.addArgument(par);
-			interp.addArgument(own);
-			interp.execute(NR->client, NR->message);
+			Interpreter *interp = new Interpreter(_vm);
+			interp->addArgument(par);
+			interp->addArgument(own);
+			interp->execute(NR->client, NR->message);
+			delete interp;
 		}
 	}
 }

@@ -35,7 +35,6 @@
 #include "aesop/debugger.h"
 #include "aesop/events.h"
 #include "aesop/files.h"
-#include "aesop/interpreter.h"
 #include "aesop/objects.h"
 #include "aesop/resources.h"
 #include "aesop/screen.h"
@@ -92,7 +91,6 @@ public:
 	Events *_events;
 	Files *_files;
 	Objects *_objects;
-	Interpreter *_interpreter;
 	Resources *_resources;
 	Screen *_screen;
 public:

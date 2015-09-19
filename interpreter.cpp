@@ -390,10 +390,9 @@ ULONG Interpreter::_currentThis;
 
 /*----------------------------------------------------------------*/
 
-Interpreter *Interpreter::init(AesopEngine *vm) {
+void Interpreter::init(AesopEngine *vm) {
 	Interpreter::_currentThis = 0;
 	Interpreter::_startupState = SS_CINE;
-	return new Interpreter(vm);
 }
 
 Interpreter::Interpreter(AesopEngine *vm) : _vm(vm) {
@@ -907,22 +906,23 @@ void Interpreter::cmdPASS() {
 		// No further parent class do dispatch to, so exit
 		return;
 
+	// Create the new interpreter instance
+	Interpreter *interp = new Interpreter(_vm);
+
+
 	// Load the arguments in reverse so they'll be in the correct order
 	Parameters params;
 	for (int idx = 0; idx < argCount; ++idx)
 		params.insert_at(0, _stack.pop());
-
-	// Save the stack size
-	uint stackSize = _stack.size();
+	for (int idx = 0; idx < argCount; ++idx)
+		interp->addArgument(params[idx]);
 
 	// Execute the parent vector
-	int result = execute(_currentIndex, _currentMsg, (HRES)newVector);
+	int result = interp->execute(_currentIndex, _currentMsg, (HRES)newVector);
+	delete interp;
 
-	// Restore saved fields
+	// Restore saved fields, and push the result onto the stack
 	_currentVector = oldVector;
-
-	// Reset the stack back to it's previous size, and push the result
-	_stack.resize(stackSize);
 	_stack.push(result);
 }
 

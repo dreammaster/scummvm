@@ -44,7 +44,9 @@ int Objects::findFreeEntry(int min, int end) {
 void Objects::createSOPinstance(uint name, int index) {
 	_objList[index] = _vm->_resources->create_instance(name);
 
-	_vm->_interpreter->execute(index, MSG_CREATE);
+	Interpreter *interp = new Interpreter(_vm);
+	interp->execute(index, MSG_CREATE);
+	delete interp;
 }
 
 int Objects::createObject(uint name) {
@@ -67,7 +69,9 @@ int Objects::createProgram(int index, uint name) {
 }
 
 int Objects::destroyObject(int index) {
-	int rtn = _vm->_interpreter->execute(index, MSG_DESTROY);
+	Interpreter *interp = new Interpreter(_vm);
+	int rtn = interp->execute(index, MSG_DESTROY);
+	delete interp;
 
 	_vm->_events->cancelEntityRequests(index);
 	_vm->_screen->releaseOwnedWindows(index);
@@ -102,7 +106,6 @@ uint Objects::flushCache(uint goal) {
 /***************************************************/
 
 void Objects::dumpStaticContext(uint index, TextFile *TF) {
-	Interpreter &interp = *_vm->_interpreter;
 	Resources &res = *_vm->_resources;
 	ULONG n, p, offset, asize;
 	HRES instance, thunk, expt;
@@ -138,7 +141,7 @@ void Objects::dumpStaticContext(uint index, TextFile *TF) {
 	res.lock(expt);
 
 	line += '"';
-	line += (const char *)interp.lookup(expt, "N:OBJECT");
+	line += (const char *)Interpreter::lookup(expt, "N:OBJECT");
 	line += '"';
 
 	res.unlock(expt);
@@ -156,7 +159,7 @@ void Objects::dumpStaticContext(uint index, TextFile *TF) {
 			DA_TEMPORARY | DA_EVANESCENT);
 		res.lock(expt);
 
-		def = (const char *)interp.lookup(expt, "N:OBJECT");
+		def = (const char *)Interpreter::lookup(expt, "N:OBJECT");
 
 		if (p)
 			TF->writeln("");
@@ -165,8 +168,8 @@ void Objects::dumpStaticContext(uint index, TextFile *TF) {
 
 		inst = add_ptr(Resources::addr(instance), offset);
 
-		dict = interp.first(Resources::addr(expt));
-		while ((dict = interp.iterate(Resources::addr(expt), dict, &tag, &def)) != 0) {
+		dict = Interpreter::first(Resources::addr(expt));
+		while ((dict = Interpreter::iterate(Resources::addr(expt), dict, &tag, &def)) != 0) {
 			type = tag[0];
 			if ((type != 'B') && (type != 'W') && (type != 'L'))
 				continue;

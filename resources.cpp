@@ -710,7 +710,6 @@ void Resources::destroy_instance(HRES instance) {
 /***************************************************/
 
 HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
-	Interpreter &interp = *_vm->_interpreter;
 	UWORD depth;              // 0..MAX_G = derived object..base class
 	ULONG class1, xclass;
 	ULONG tsize;
@@ -794,8 +793,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		//
 
 		mcnt = 0;
-		dict = interp.first(addr(expt[depth]));
-		while ((dict = interp.iterate(addr(expt[depth]), dict, &tag, &def)) != 0) {
+		dict = Interpreter::first(addr(expt[depth]));
+		while ((dict = Interpreter::iterate(addr(expt[depth]), dict, &tag, &def)) != 0) {
 			switch (tag[0]) {
 			case 'M':               // Message
 				++thdr._maxMsg;
@@ -814,8 +813,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 		// Calculate Size of External Reference List
 		//
 
-		dict = interp.first(addr(impt[depth]));
-		while ((dict = interp.iterate(addr(impt[depth]), dict, (const char **)&tag, &def)) != 0) {
+		dict = Interpreter::first(addr(impt[depth]));
+		while ((dict = Interpreter::iterate(addr(impt[depth]), dict, (const char **)&tag, &def)) != 0) {
 			switch (tag[0]) {
 			case 'C':               // Code
 				tsize += sizeof(XCR_entry);
@@ -875,12 +874,12 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 		XR = m;
 
-		dict = interp.first(addr(impt[i]));
-		while ((dict = interp.iterate(addr(impt[i]), dict, &tag, &def)) != 0) {
+		dict = Interpreter::first(addr(impt[i]));
+		while ((dict = Interpreter::iterate(addr(impt[i]), dict, &tag, &def)) != 0) {
 			tagbase = (const char *)addr(impt[i]);
 			switch (tag[0]) {
 			case 'C':               // Code
-				offset = ascnum(interp.lookup(HCRFD, &tag[2]));
+				offset = ascnum(Interpreter::lookup(HCRFD, &tag[2]));
 				if (offset == (UWORD)-1)
 					abend(MSG_MCR, &tag[2]); // "Missing code resource '%s'"
 				assert((offset % 4) == 0);
@@ -926,7 +925,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 						lnk->lock(xexpt);
 						tag = tag - tagbase + (const char *)addr(impt[i]);
 
-						offset = ascnum(interp.lookup(xexpt, tag));
+						offset = ascnum(Interpreter::lookup(xexpt, tag));
 
 						if (offset != (UWORD)-1) {
 							found = 1;
@@ -962,8 +961,8 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 	MV = (MV_entry *)add_offset(addr(thunk), thdr._mvList);
 
 	for (i = m = 0; i < depth; i++) {
-		dict = interp.first(addr(expt[i]));
-		while ((dict = interp.iterate(addr(expt[i]), dict, &tag, &def)) != NULL) {
+		dict = Interpreter::first(addr(expt[i]));
+		while ((dict = Interpreter::iterate(addr(expt[i]), dict, &tag, &def)) != NULL) {
 			if (tag[0] == 'M') {
 				MV[m].msg = (UWORD)ascnum((const char *)&tag[2]);
 				MV[m].handler = (ULONG)ascnum(def);
