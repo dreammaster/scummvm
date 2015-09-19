@@ -555,11 +555,9 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_offThis = _currentIndex;
 	_breakFlag = false;
 
-	// Initialize the stack. Note: The original only used two bytes for the 'this' index
-	// parameter. We use a four-byte value, since each Parameter is 4 bytes
 	_stackBase = _stack.size();
 	_stack.push(index);
-	int count = READ_LE_UINT16(_code) - 2;
+	int count = READ_LE_UINT16(_code) + 2;
 	_code += 2;
 	assert((count % 4) == 0);
 	_stack.resize(_stack.size() + count / 4);
@@ -799,7 +797,7 @@ void Interpreter::cmdRCRS() {
 
 	// Validate that it's a correctly formatted method number, then push it to the stack
 	assert((methodNum >> 16) == 0x1234);
-	_stack.push(methodNum);
+	_stack.top() = methodNum;
 }
 
 void Interpreter::cmdCALL() {
@@ -894,9 +892,10 @@ void Interpreter::cmdJSR() {
 	_stack.push(_currentIndex);
 
 	// Set up the method autos
-	uint numAutos = READ_LE_UINT16(_code);
+	uint autosSize = READ_LE_UINT16(_code);
 	_code += 2;
-	for (uint idx = 0; idx < numAutos / 4; ++idx)
+	assert((autosSize % 4) == 0);
+	for (uint idx = 0; idx < autosSize / 4; ++idx)
 		_stack.push(Parameter());
 }
 

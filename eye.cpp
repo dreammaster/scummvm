@@ -1101,7 +1101,7 @@ void create_initial_binary_files(void) {
 
 void launch(LONG argcnt, const char *dirname, const char *prgname, const char *argn1,
             const char *argn2) {
-	error("TODO: See if this is needed");
+	error("TODO: Implement external programs line cine.exe");
 }
 
 void *open_transfer_file(LONG argcnt, const char *filename) {

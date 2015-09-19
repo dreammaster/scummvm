@@ -364,7 +364,6 @@ int Files::saveRange(const Common::String &filename, FileType fileType, uint fir
 }
 
 void Files::restoreRange(const Common::String &filename, uint first, uint last, uint restoring) {
-	Interpreter &interp = *_vm->_interpreter;
 	Objects &objects = *_vm->_objects;
 	ULONG bad, txttype;
 	ULONG index;
@@ -451,7 +450,9 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 		}
 
 		if (restoring) {
-			interp.execute(index, MSG_RESTORE);
+			Interpreter *interp = new Interpreter(_vm);
+			interp->execute(index, MSG_RESTORE);
+			delete interp;
 		}
 	}
 

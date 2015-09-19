@@ -53,6 +53,8 @@ Resources::Resources(AesopEngine *vm): _vm(vm) {
 	_RFH.load(_file);
 
 	_base = new byte[MAX_RES_SIZE];
+	Common::fill((byte *)_base, (byte *)_base + MAX_RES_SIZE, 0);
+
 	beg = _base;
 	end = add_ptr(_base, MAX_RES_SIZE);
 
