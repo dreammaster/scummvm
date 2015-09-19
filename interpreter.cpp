@@ -972,7 +972,7 @@ void Interpreter::cmdLAW() {
 	int index = (index4 == 2) ? 0 : index4 / 4;
 	bool hiWord = (index4 > 2) && (index4 % 4) == 0;
 
-	ULONG v = _stack[_stackBase + index] & 0xffff;
+	ULONG v = _stack[_stackBase + index];
 	if (hiWord)
 		v >>= 16;
 	else
