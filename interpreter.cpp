@@ -490,7 +490,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	Objects &objects = *_vm->_objects;
 	Resources &res = *_vm->_resources;
 	const int OPCODES_COUNT = sizeof(_opcodes) / sizeof(OpcodeMethod);
-	debugC(1, kDebugScripts, "Interpreter::execute(%d, %d, %x", index, msgNum, (ULONG)vector);
+	debugC(DEBUG_BASIC, kDebugScripts, "Interpreter::execute(%d, %d, %x)", index, msgNum, (ULONG)vector);
 
 	// Check the passed index
 	if (index == -1)
@@ -564,24 +564,45 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 
 	// Main opcode execution loop
 	while (!_vm->shouldQuit() && !_breakFlag) {
-		int opcode = *_code++;
+		int opcode = *_code;
 		if (opcode >= OPCODES_COUNT)
 			error("Invalid opcode encountered");
 
-		if (gDebugLevel >= 1) {
-			Common::String msg = Common::String::format("%.4x %s", _code - _ds32, OPCODE_NAMES[opcode]);
-			if (opcode == 33)
-				msg += Common::String::format("(%s)", METHOD_NAMES[_stack[_stack.size() - 1 - *_code] & 0xff]);
-			msg += Common::String::format(" |%d|", _stack.size());
+		if (gDebugLevel >= DEBUG_INTERMEDIATE)
+			printInstruction(opcode);
 
-			debugC(1, kDebugScripts, "%s", msg.c_str());
-		}
-
+		++_code;
 		(this->*_opcodes[opcode])();
 	}
 
 	res.unlock(_hPrg);
 	return _stack.top();
+}
+
+void Interpreter::printInstruction(int opcode) {
+	Common::String msg = Common::String::format("%.4x %s", _code - _ds32, OPCODE_NAMES[opcode]);
+	if (opcode == 33)
+		msg += Common::String::format("(%s)", METHOD_NAMES[_stack[_stack.size() - 1 - *(_code + 1)] & 0xff]);
+	
+	if (gDebugLevel == DEBUG_INTERMEDIATE) {
+		msg += Common::String::format(" |%d|", _stack.size());
+	} else {
+		msg += " |";
+		
+		for (uint idx = 0; idx < _stack.size(); ++idx) {
+			if (idx > 0)
+				msg += ", ";
+
+			if ((BYTE *)_stack[idx] != nullptr)
+				msg += Common::String::format("%p", (BYTE *)_stack[idx]);
+			else
+				msg += Common::String::format("%x", (ULONG)_stack[idx]);
+		}
+
+		msg += "|";
+	}
+
+	debugC(DEBUG_BASIC, kDebugScripts, "%s", msg.c_str());
 }
 
 void Interpreter::getStackIndex(int &stackIndex, int &byteNum, int dataSize) {
@@ -880,6 +901,10 @@ void Interpreter::cmdPASS() {
 
 	if ((const byte *)newVector >= ((const byte *)_thunk + _thunk->_sdList))
 		// Past the end of the list, so it's not a valid vector
+		return;
+
+	if (newVector->msg != _currentMsg)
+		// No further parent class do dispatch to, so exit
 		return;
 
 	// Load the arguments in reverse so they'll be in the correct order

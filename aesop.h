@@ -46,6 +46,12 @@ enum {
     kDebugScripts      = 1 << 0
 };
 
+enum {
+	DEBUG_BASIC = 1,
+	DEBUG_INTERMEDIATE = 2,
+	DEBUG_DETAILED = 3
+};
+
 enum GameType {
     GType_EOB3 = 0,
     GType_DungeonHack = 1

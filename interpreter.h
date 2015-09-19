@@ -181,6 +181,11 @@ private:
 	const MV_entry *_currentVector;
 private:
 	/**
+	 * When debug information is turned on, prints out the details of the current instruction
+	 */
+	void printInstruction(int opcode);
+
+	/**
 	 * Gets a stack offset from the script, and convert it to a stack index
 	 * and byte offset within the stack entry
 	 */
