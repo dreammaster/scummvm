@@ -1181,6 +1181,7 @@ void Interpreter::cmdSSBA() {
 	byte *destP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
 	*destP = val;
+	_stack.push(val);
 }
 
 void Interpreter::cmdSSWA() {
@@ -1190,6 +1191,7 @@ void Interpreter::cmdSSWA() {
 	byte *destP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
 	WRITE_LE_UINT16(destP, val);
+	_stack.push(val);
 }
 
 void Interpreter::cmdSSDA() {
@@ -1199,6 +1201,7 @@ void Interpreter::cmdSSDA() {
 	byte *destP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
 	WRITE_LE_UINT32(destP, val);
+	_stack.push(val);
 }
 
 void Interpreter::cmdLESA() {
