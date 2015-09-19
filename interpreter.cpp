@@ -943,8 +943,8 @@ void Interpreter::cmdJSR() {
 	// Set up the method autos
 	uint autosSize = READ_LE_UINT16(_code);
 	_code += 2;
-	assert((autosSize % 4) == 0);
-	for (uint idx = 0; idx <= autosSize / 4; ++idx)
+	assert((autosSize % 2) == 0);
+	for (uint idx = 0; idx <= (autosSize + 2) / 4; ++idx)
 		_stack.push(Parameter());
 }
 
