@@ -180,6 +180,12 @@ private:
 	bool _breakFlag;
 	const MV_entry *_currentVector;
 private:
+	/**
+	 * Gets a stack offset from the script, and convert it to a stack index
+	 * and byte offset within the stack entry
+	 */
+	void getStackIndex(int &stackIndex, int &byteNum, int dataSize);
+private:
 	void cmdBRT();      // BRanch if True
 	void cmdBRF();      // BRanch if False
 	void cmdBRA();      // BRanch Always
