@@ -617,7 +617,7 @@ void Interpreter::getStackIndex(int &stackIndex, int &byteNum, int dataSize) {
 		stackIndex = _stackBase;
 		byteNum = 0;
 	} else {
-		stackIndex = index4 / 4 - 1;
+		stackIndex = index4 / 4;
 		byteNum = 3 - (index4 - 3) % 4;
 
 		assert((dataSize == 4 && byteNum == 0) ||
