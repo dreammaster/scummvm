@@ -1577,7 +1577,7 @@ Parameter Interpreter::peekMem(Parameters params) {
 }
 
 Parameter Interpreter::rnd(Parameters params) {
-	return ::Aesop::rnd(params.size(), params[0], params[1]);
+	return _vm->getRandomNumber(params[0], params[1]);
 }
 
 Parameter Interpreter::dice(Parameters params) {

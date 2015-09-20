@@ -106,6 +106,10 @@ int AesopEngine::getRandomNumber(int max) {
 	return _randomSource.getRandomNumber(max);
 }
 
+int AesopEngine::getRandomNumber(int min, int max) {
+	return min + _randomSource.getRandomNumber(max - min);
+}
+
 void *AesopEngine::memAlloc(uint bytes) {
 	void *ptr = (void *)malloc(bytes);
 	assert(ptr);

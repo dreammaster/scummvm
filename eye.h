@@ -35,7 +35,6 @@ extern LONG strval(LONG argcnt, BYTE *string);
 extern LONG envval(LONG argcnt, BYTE *name);
 extern void pokemem(LONG argcnt, LONG *addr, LONG data);
 extern LONG peekmem(LONG argcnt, LONG *addr);
-extern ULONG rnd(LONG argcnt, ULONG low, ULONG high);
 extern ULONG dice(LONG argcnt, ULONG ndice, ULONG nsides, ULONG bonus);
 extern ULONG absv(LONG argcnt, LONG val);
 extern LONG minv(LONG argcnt, LONG val1, LONG val2);

@@ -34,7 +34,6 @@ void diagnose(LONG argcnt, ULONG dtype, ULONG parm);
 extern ULONG diag_flag;
 
 extern ULONG absv(LONG argcnt, LONG val);
-extern ULONG rnd(LONG argcnt, ULONG low, ULONG high);
 extern LONG envval(LONG argcnt, BYTE *name);
 
 void beep(void);

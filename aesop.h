@@ -111,6 +111,11 @@ public:
 	 */
 	int getRandomNumber(int max);
 
+	/**
+	 * Return a random number from a given minimum to maximum
+	 */
+	int getRandomNumber(int min, int max);
+
 	void *memAlloc(uint bytes);
 
 	char *strAlloc(const char *str);

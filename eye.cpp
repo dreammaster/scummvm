@@ -478,9 +478,9 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 
 	for (i = 0; i < dots; i++) {
 		xpos[i] = ypos[i] = 0;
-		xvel[i] = rnd(0, 0, power) - (power >> 1);
-		yvel[i] = rnd(0, 0, power) - (power >> 1) - (power >> (8 - upval));
-		colcnt[i] = rnd(0, (4 << 8) / life, (8 << 8) / life);
+		xvel[i] = _vm->getRandomNumber(0, power) - (power >> 1);
+		yvel[i] = _vm->getRandomNumber(0, power) - (power >> 1) - (power >> (8 - upval));
+		colcnt[i] = _vm->getRandomNumber((4 << 8) / life, (8 << 8) / life);
 		colidx[i] = scale << 8;
 	}
 
@@ -574,7 +574,7 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 	cy = 48;
 
 	for (i = 0; i < dots; i++) {
-		m = rnd(0, mag >> 2, mag);
+		m = _vm->getRandomNumber(mag >> 2, mag);
 		v = t = 0;
 
 		while (t < m) {
@@ -617,9 +617,9 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 			yvel[i] *= -1;
 		}
 
-		colcnt[i] = rnd(0, (4 << 8) / life, (8 << 8) / life);
+		colcnt[i] = _vm->getRandomNumber((4 << 8) / life, (8 << 8) / life);
 		colidx[i] = 0;
-		delay[i] = rnd(0, 0, life >> 2);
+		delay[i] = _vm->getRandomNumber(0, life >> 2);
 	}
 
 	active = 2;

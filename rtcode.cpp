@@ -172,24 +172,6 @@ LONG peekmem(LONG argcnt, LONG *addr) {
 	return addr ? *addr : 0;
 }
 
-ULONG rnd(LONG argcnt, ULONG low, ULONG high)
-
-{
-	error("TODO: Hook up random number generator");
-	/*
-	static init=0;
-
-	if (!init)
-	  {
-	  init = 1;
-	  srand(*(UWORD *) 0x0000046c);
-	  }
-
-	return low + ((ULONG) rand() % (high-low+1L));
-	*/
-}
-
-
 ULONG dice(LONG argcnt, ULONG ndice, ULONG nsides, ULONG bonus)
 
 {
@@ -198,7 +180,7 @@ ULONG dice(LONG argcnt, ULONG ndice, ULONG nsides, ULONG bonus)
 	total = bonus;
 
 	for (n = 0; n < ndice; n++)
-		total += rnd(0, 1, nsides);
+		total += _vm->getRandomNumber(1, nsides);
 
 	return total;
 }
