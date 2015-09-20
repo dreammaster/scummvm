@@ -628,6 +628,13 @@ void Interpreter::getStackIndex(int &stackIndex, int &byteNum, int dataSize) {
 	}
 }
 
+void Interpreter::deref() {
+	uint codeOffset = _code - _ds32;
+
+	_ds32 = (byte *)Resources::addr(_hPrg);
+	_code = _ds32 + codeOffset;
+}
+
 void Interpreter::cmdBRT() {
 	if ((ULONG)_stack.top()) {
 		// Branch
@@ -861,7 +868,10 @@ void Interpreter::cmdCALL() {
 	uint stackSize = _stack.size();
 	int result = (this->*_methods[methodNum & 0xffff])(params);
 
+	deref();
 	_stack.resize(stackSize);
+
+	// Push the result onto the stack
 	_stack.push(result);
 }
 
@@ -885,6 +895,7 @@ void Interpreter::cmdSEND() {
 	// Execute the new code
 	int result = interp->execute(index, msgNum);
 	delete interp;
+	deref();
 
 	// Push the result onto the stack of the current interpreter
 	_stack.push(result);
@@ -920,6 +931,7 @@ void Interpreter::cmdPASS() {
 	// Execute the parent vector
 	int result = interp->execute(_currentIndex, _currentMsg, (HRES)newVector);
 	delete interp;
+	deref();
 
 	// Restore saved fields, and push the result onto the stack
 	_currentVector = oldVector;
@@ -955,6 +967,7 @@ void Interpreter::cmdRTS() {
 	_stack.resize(stackEntry._stackSize);
 	_code = stackEntry._code;
 	_ds32 = stackEntry._ds32;
+	deref();
 
 	// PUsh return value back onto the stack
 	_stack.push(returnValue);

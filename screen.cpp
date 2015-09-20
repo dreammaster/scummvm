@@ -1033,6 +1033,8 @@ void Screen::textStyle(uint wndnum, uint font, uint justify) {
 	vfont = (Font *)res.addr((HRES)_tw[wndnum].font);
 
 	_tw[wndnum].lookaside[vfont->font_background] = 255;
+
+	res.unlock((HRES)_tw[wndnum].font);
 }
 
 

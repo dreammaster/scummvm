@@ -190,6 +190,12 @@ private:
 	 * and byte offset within the stack entry
 	 */
 	void getStackIndex(int &stackIndex, int &byteNum, int dataSize);
+
+	/**
+	 * In case the memory for the object has changed in memory, re-adjust the memory pointers
+	 * relative to the current start of the object
+	 */
+	void deref();
 private:
 	void cmdBRT();      // BRanch if True
 	void cmdBRF();      // BRanch if False

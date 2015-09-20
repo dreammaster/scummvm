@@ -40,7 +40,7 @@ namespace Aesop {
 #define FAST_LOCK       1
 // AESOP resource cache size (800K)
 #define MAX_RES_SIZE    800000
-
+static int lock_count = 0;
 /*----------------------------------------------------------------*/
 
 Resources::Resources(AesopEngine *vm): _vm(vm) {
@@ -479,7 +479,7 @@ void Resources::lock(HRES entry) {
 	}
 
 	++sel->_locks;
-
+	++lock_count;//***DEBUG****
 	sel->_history = ++_LRU_cnt;
 
 	if (_LRU_cnt == 65535U) {
@@ -496,8 +496,10 @@ void Resources::unlock(HRES entry) {
 
 	sel = (HD_entry *)entry;
 
-	if (sel->_locks > 0)
+	if (sel->_locks > 0) {
 		--sel->_locks;
+		--lock_count;//***DEBUG****
+	}
 }
 
 ULONG Resources::size(HRES entry) {
