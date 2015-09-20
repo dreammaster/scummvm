@@ -501,8 +501,8 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	if (handle == HRES_NULL)
 		return -1;
 
-	_instance = (IHDR *)res.addr(handle);
-	_thunk = (THDR *)res.addr(_instance->_thunk);
+	_instance = (IHDR *)Resources::addr(handle);
+	_thunk = (THDR *)Resources::addr(_instance->_thunk);
 
 	if (vector == HRES_NULL || vector == (HRES)0xffff) {
 		const MV_entry *mvList = (const MV_entry *)((const byte *)_thunk + _thunk->_mvList);
@@ -629,10 +629,16 @@ void Interpreter::getStackIndex(int &stackIndex, int &byteNum, int dataSize) {
 }
 
 void Interpreter::deref() {
-	uint codeOffset = _code - _ds32;
+	Objects &objects = *_vm->_objects;
 
+	// Readjust code pointer relative to current program start
+	uint codeOffset = _code - _ds32;
 	_ds32 = (byte *)Resources::addr(_hPrg);
 	_code = _ds32 + codeOffset;
+
+	// Load instance and thunk pointers
+	_instance = (IHDR *)Resources::addr(objects[_currentIndex]);
+	_thunk = (THDR *)Resources::addr(_instance->_thunk);
 }
 
 void Interpreter::cmdBRT() {
