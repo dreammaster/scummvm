@@ -558,8 +558,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_stack.push(index);
 	int count = READ_LE_UINT16(_code);
 	_code += 2;
-	assert((count % 2) == 0);
-	_stack.resize(_stack.size() + (count + 2) / 4);
+	_stack.resize(_stack.size() + (count + 3) / 4);
 
 	// Main opcode execution loop
 	while (!_vm->shouldQuit() && !_breakFlag) {
@@ -618,8 +617,7 @@ void Interpreter::getStackIndex(int &stackIndex, int &byteNum, int dataSize) {
 		stackIndex = _stackBase;
 		byteNum = 0;
 	} else {
-		assert((index4 % 2) == 0);
-		stackIndex = (index4 - 2) / 4;
+		stackIndex = index4 / 4 - 1;
 		byteNum = 3 - (index4 - 3) % 4;
 
 		assert((dataSize == 4 && byteNum == 0) ||
@@ -1277,6 +1275,7 @@ void Interpreter::cmdLXW() {
 	ULONG instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
+	assert(objects[objIndex] != HRES_NULL);
 	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
 	_stack.push(READ_LE_UINT16(srcP));
