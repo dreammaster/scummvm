@@ -79,6 +79,32 @@ Parameter &Parameter::operator|=(int other) {
 	return *this;
 }
 
+bool Parameter::operator==(Parameter &rhs) const {
+	// Equality checks are slightly complicated because either side can use -1 to check
+	// whether the given pointer equals HRES_NULL or not
+	if (_ptr != nullptr) {
+		// Left hand side is a pointer
+		void *ptr = rhs._ptr;
+		if (ptr == nullptr) {
+			assert(rhs._val == (ULONG)-1 || rhs._val == 0);
+			ptr = rhs._val == 0 ? nullptr : HRES_NULL;
+		}
+
+		return _ptr == ptr;
+	} else if (rhs._ptr != nullptr) {
+		// Right hand side is a pointer
+		assert(_val == (ULONG)-1 || _val == 0);
+		void *ptr = _val == 0 ? nullptr : HRES_NULL;
+		return rhs._ptr == ptr;
+	} else {
+		return _val == rhs._val;
+	}
+}
+
+bool Parameter::operator!=(Parameter &rhs) const {
+	return !(*this == rhs);
+}
+
 /*----------------------------------------------------------------*/
 
 const OpcodeMethod Interpreter::_opcodes[] = {
@@ -804,14 +830,14 @@ void Interpreter::cmdLE() {
 }
 
 void Interpreter::cmdEQ() {
-	ULONG v1 = _stack.pop();
-	ULONG v2 = _stack.pop();
+	Parameter v1 = _stack.pop();
+	Parameter v2 = _stack.pop();
 	_stack.push(v2 == v1 ? 1 : 0);
 }
 
 void Interpreter::cmdNE() {
-	ULONG v1 = _stack.pop();
-	ULONG v2 = _stack.pop();
+	Parameter v1 = _stack.pop();
+	Parameter v2 = _stack.pop();
 	_stack.push(v2 != v1 ? 1 : 0);
 }
 

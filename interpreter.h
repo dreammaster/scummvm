@@ -82,6 +82,8 @@ public:
 	const Parameter operator-(int other) const;
 	Parameter operator&(int other);
 	Parameter &operator|=(int other);
+	bool operator==(Parameter &rhs) const;
+	bool operator!=(Parameter &rhs) const;
 };
 
 class Parameters : public Common::Array<Parameter> {
