@@ -1023,8 +1023,9 @@ void Interpreter::cmdLETA() {
 void Interpreter::cmdLAB() {
 	int stackIndex, byteNum;
 	getStackIndex(stackIndex, byteNum, 1);
+	int bitShift = byteNum * 8;
 
-	ULONG v = _stack[stackIndex] & 0xff;
+	ULONG v = (_stack[stackIndex] >> bitShift) & 0xff;
 	_stack.top() = v;
 }
 
@@ -1052,8 +1053,12 @@ void Interpreter::cmdLAD() {
 void Interpreter::cmdSAB() {
 	int stackIndex, byteNum;
 	getStackIndex(stackIndex, byteNum, 1);
+	int bitShift = byteNum * 8;
 
-	_stack[stackIndex] = ((ULONG)_stack[stackIndex] & 0xffffff00) | (_stack.top() & 0xff);
+	ULONG val = _stack[stackIndex];
+	val &= ~(0xff << bitShift);
+	val |= (_stack.top() & 0xff) << bitShift;
+	_stack[stackIndex] = val;
 }
 
 void Interpreter::cmdSAW() {
