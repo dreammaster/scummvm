@@ -554,11 +554,18 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_offThis = _currentIndex;
 	_breakFlag = false;
 
+	// Store the stack base and set the 'this' index for this execution
 	_stackBase = _stack.size();
 	_stack.push(index);
+
+	// Allocate space for any remaining autos
 	int count = READ_LE_UINT16(_code);
 	_code += 2;
-	_stack.resize(_stack.size() + (count + 3) / 4);
+	assert(count >= 2);
+	_stack.resize(_stack.size() + ((count - 2) + 3) / 4);
+
+	// Add one final stack entry to act as the "top" of the stack
+	_stack.push(Parameter());
 
 	// Main opcode execution loop
 	while (!_vm->shouldQuit() && !_breakFlag) {
@@ -959,9 +966,11 @@ void Interpreter::cmdJSR() {
 	// Set up the method autos
 	uint autosSize = READ_LE_UINT16(_code);
 	_code += 2;
-	assert((autosSize % 2) == 0);
-	for (uint idx = 0; idx <= (autosSize + 2) / 4; ++idx)
-		_stack.push(Parameter());
+	assert(autosSize >= 2);
+	_stack.resize(_stack.size() + ((autosSize - 2) + 3) / 4);
+
+	// Add final parameter slot to act as the stack top
+	_stack.push(Parameter());
 }
 
 void Interpreter::cmdRTS() {
