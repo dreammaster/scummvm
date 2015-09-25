@@ -1237,15 +1237,15 @@ void Interpreter::cmdLSBA() {
 	_code += 2;
 	byte *srcP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
-	_stack.push(*srcP);
+	_stack.push((int8)*srcP);
 }
 
 void Interpreter::cmdLSWA() {
-	ULONG offset = READ_LE_UINT16(_code);
+	LONG offset = READ_LE_UINT16(_code);
 	_code += 2;
 	byte *srcP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
-	_stack.push(READ_LE_UINT16(srcP));
+	_stack.push((int16)READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLSDA() {

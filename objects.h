@@ -44,7 +44,10 @@ public:
 	/**
 	 * Return the handle of a given object
 	 */
-	const HRES &operator[](int idx) { return _objList[idx]; }
+	const HRES &operator[](int idx) { 
+		assert(idx < NUM_OBJECTS);
+		return _objList[idx];
+	}
 
 	/**
 	 * Return index of first free object list entry within given range, or -1 if none available
