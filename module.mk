@@ -21,7 +21,8 @@ MODULE_OBJS = \
 	shapes.o \
 	sound32.o \
 	stubs.o \
-	utils.o
+	utils.o \
+	windows.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_SHERLOCK), DYNAMIC_PLUGIN)
