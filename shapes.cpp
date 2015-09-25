@@ -54,7 +54,7 @@ void ShapeFrame::draw(Pane &pane, const Common::Point &pt) {
 	// Clip the drawing bounds to the given pane
 	Common::Rect clippedBounds = drawBounds;
 	clippedBounds.clip(pane);
-	if (!clippedBounds.isValidRect())
+	if (!clippedBounds.isValidRect() || clippedBounds.isEmpty())
 		return;
 
 	// Get the area of the pane that we'll be drawing to
@@ -111,7 +111,7 @@ void ShapeFrame::draw(Pane &pane, const Common::Point &pt) {
 			}
 		}
 
-		assert(xp == (drawBounds.right + 1));
+		assert(xp == 0 || xp == (drawBounds.right + 1));
 	}
 }
 
