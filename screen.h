@@ -369,7 +369,7 @@ public:
 	uint assignSubWindow(int owner, uint wnd, const Common::Rect &r);
 
 	/**
-	 * Release a previously allocated window
+	 * Release a previously allocated window or pane
 	 */
 	void releaseWindow(uint wnd);
 

@@ -655,13 +655,24 @@ uint Screen::assignSubWindow(int owner, uint wnd, const Common::Rect &r) {
 }
 
 void Screen::releaseWindow(uint wnd) {
-	// Delete the window
-	delete _windows[wnd];
-	_windows[wnd] = nullptr;
+	if (wnd < MAX_WINDOWS) {
+		// Delete the window
+		delete _windows[wnd];
+		_windows[wnd] = nullptr;
 
-	// Handle removing any cleared windows at the end of the array
-	while (_windows.size() > 0 && _windows[_windows.size() - 1] == nullptr) {
-		_windows.remove_at(_windows.size() - 1);
+		// Handle removing any cleared windows at the end of the array
+		while (_windows.size() > 0 && _windows[_windows.size() - 1] == nullptr) {
+			_windows.remove_at(_windows.size() - 1);
+		}
+	} else {
+		// Delete the pane
+		delete _panes[wnd - MAX_WINDOWS];
+		_panes[wnd - MAX_WINDOWS] = nullptr;
+
+		// Handle removing any cleared panes at the end of the array
+		while (_panes.size() > 0 && _panes[_panes.size() - 1] == nullptr) {
+			_panes.remove_at(_panes.size() - 1);
+		}
 	}
 }
 
