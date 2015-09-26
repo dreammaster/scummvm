@@ -117,8 +117,6 @@ public:
 	bool testOverlap(const Common::Point &pt, byte *shapes, int shape_num);
 
 	void scroll(const Common::Point &delta, PaneScroll flags, byte background);
-
-	int drawCharacter(const Common::Point &pt, Font *font, int character, byte *color_translate);
 public:
 	/**
 	 * Read a pixel

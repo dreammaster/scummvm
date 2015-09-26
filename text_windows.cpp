@@ -46,13 +46,14 @@ void Font::load(Common::SeekableReadStream &s) {
 	_charHeight = s.readUint32LE();
 	_fontBackground = s.readUint32LE();
 
-	int dataSize = s.size() - 16 - charCount * 4;
+	uint firstOffset = 16 + charCount * 4;
+	int dataSize = s.size() - firstOffset;
 	_data = new byte[dataSize];
 
 	// Load in each charcater offset
 	for (int idx = 0; idx < charCount; ++idx) {
-		uint offset = s.readUint32LE();
-		_chars.push_back(&_data[offset - 16]);
+		uint offset = s.readUint32LE() - firstOffset;
+		_chars.push_back(&_data[offset]);
 	}
 
 	// Read in the character data
@@ -65,6 +66,31 @@ void Font::clear() {
 	_chars.clear();
 	_fontBackground = 0;
 	_charHeight = 0;
+}
+
+int Font::characterDraw(const Common::Point &pt, Pane &pane, char c, byte *colorTranslate) {
+	Common::Point drawPt(pane.left + pt.x, pane.top + pt.y);
+	Graphics::Surface charSurface = pane.getArea(Common::Rect(drawPt.x, drawPt.y,
+		drawPt.x + charWidth(c), drawPt.y + _charHeight));
+	const byte *srcP = _chars[c] + 4;
+
+	for (int yp = 0, yPos = drawPt.y; yp < charSurface.h; ++yp, ++yPos) {
+		byte *destP = (byte *)charSurface.getBasePtr(0, yp);
+
+		for (int xp = 0, xPos = drawPt.x; xp < charSurface.w; ++xp, ++xPos, ++srcP, ++destP) {
+			if (pane.contains(xPos, yPos)) {
+				if (colorTranslate) {
+					byte v = colorTranslate[*srcP];
+					if (v != 0xff)
+						*destP = v;
+				} else {
+					*destP = *srcP;
+				}
+			}
+		}
+	}
+
+	return charSurface.w;
 }
 
 /*----------------------------------------------------------------*/
@@ -330,12 +356,12 @@ void TextWindow::printBuffer(int lineNum) {
 		}
 	}
 
-	error("TODO");
+	_pendingFlag = 0;
 }
 
 void TextWindow::cout(char c) {
 	Pane &pane = window();
-	int c_vTab, n_vTab, _hTab;
+	int c_vTab, n_vTab;
 
 	if (c == '\n') {
 		_hTab = _hTab = pane.left;    // Carriage Return
@@ -362,10 +388,9 @@ void TextWindow::cout(char c) {
 	} else if (c == '\r') {
 		_hTab = pane.left;    // Carriage Return
 	} else {
-		_hTab += pane.drawCharacter( Common::Point(_hTab - pane.left, _vTab - pane.top),
-			&_font, c, _lookaside);
+		_hTab += _font.characterDraw(Common::Point(_hTab - pane.left, _vTab - pane.top),
+			pane, c, _lookaside);
 	}
-
 }
 
 } // End of namespace Aesop

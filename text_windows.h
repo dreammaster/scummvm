@@ -64,6 +64,11 @@ public:
 	 * Clear the currently loaded font
 	 */
 	void clear();
+
+	/**
+	 * Draw a character
+	 */
+	int characterDraw(const Common::Point &pt, Pane &pane, char c, byte *colorTranslate);
 };
 
 class TextWindow {
