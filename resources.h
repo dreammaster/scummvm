@@ -188,7 +188,7 @@ public:
 	/**
 	 * Return the size of a cached resource (not necessarily present)
 	 */
-	ULONG size(HRES entry);
+	static ULONG size(HRES entry);
 
 	/**
 	 * Return handle to cached image of resource /resource/

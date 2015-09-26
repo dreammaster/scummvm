@@ -157,7 +157,7 @@ void Pane::scroll(const Common::Point &delta, PaneScroll flags, byte background)
 	error("TODO");
 }
 
-int Pane::drawCharacter(const Common::Point &pt, void *font, int character, byte *color_translate) {
+int Pane::drawCharacter(const Common::Point &pt, Font *font, int character, byte *color_translate) {
 	error("TODO");
 }
 
@@ -353,106 +353,6 @@ Graphics::Surface Window::getArea(const Common::Rect &r) {
 
 byte *Window::getBasePtr(int x, int y) {
 	return (byte *)_surface.getBasePtr(x, y);
-}
-
-/*----------------------------------------------------------------*/
-
-int Font::charWidth(int c) {
-	error("TODO");
-}
-
-/*----------------------------------------------------------------*/
-
-TextWindow::TextWindow() {
-	window = 0;
-	htab = vtab = 0;
-	font = (Font *) - 1;
-	delay = 0;
-	continueFunction = nullptr;
-	txtbuf = nullptr;
-	txtpnt = nullptr;
-	justify = J_LEFT;
-	_refresh = 0;
-
-	for (int idx = 0; idx < 256; ++idx)
-		lookaside[idx] = idx;
-}
-
-void TextWindow::setPosition(const Common::Point &pt) {
-	htab = pt.x;
-	vtab = pt.y;
-}
-
-void TextWindow::home() {
-	HRES hfont = (HRES)font;
-	font = (Font *)Resources::addr(hfont);
-
-	selectTextWindow();
-
-	error("TODO");
-
-	font = (Font *)hfont;
-}
-
-void TextWindow::textColor(byte current, byte newColor) {
-	HRES hfont = (HRES)font;
-	font = (Font *)Resources::addr(hfont);
-
-	selectTextWindow();
-	remapFontColor(current, newColor);
-
-	font = (Font *)hfont;
-}
-
-void TextWindow::remapFontColor(byte current, byte newColor) {
-	lookaside[current] = newColor;
-}
-
-void TextWindow::selectTextWindow() {
-	_vm->_screen->_twptr = this;
-}
-
-void TextWindow::refreshWindow(int wnd) {
-	_refresh = wnd;
-}
-
-uint TextWindow::charWidth(int ch) {
-	HRES hfont;
-	ULONG w;
-
-	hfont = (HRES)font;
-	font = (Font *)Resources::addr(hfont);
-
-	selectTextWindow();
-
-	error("TODO");
-
-	font = (Font *)hfont;
-
-	return w;
-}
-
-
-uint TextWindow::fontHeight() {
-	HRES hfont = (HRES)font;
-
-	return ((Font *)(Resources::addr(hfont)))->char_height;
-}
-
-void TextWindow::vsprint(const char *format, va_list argptr) {
-	error("vsprint");
-}
-
-void TextWindow::print(const char *format, ...) {
-	error("print");
-}
-
-void TextWindow::sprint(const char *format, ...) {
-	error("sprint");
-}
-
-void TextWindow::crout() {
-	sprint("%s", "\n");
 }
 
 } // End of namespace Aesop

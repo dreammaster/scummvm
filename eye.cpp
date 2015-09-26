@@ -453,7 +453,7 @@ void do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 	floor = _floor[scale];
 	if (scale) scale--;
 
-	dotbuffer = (WORD *) screen.txtbuf;
+	dotbuffer = (WORD *)screen._txtBuf;
 	roof = 0;
 	lwall = -100;
 	rwall = 276;
@@ -555,7 +555,7 @@ void do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 
 	events.hideMouse();
 
-	dotbuffer = (WORD *) screen.txtbuf;
+	dotbuffer = (WORD *) screen._txtBuf;
 
 	xpos   = dotbuffer;
 	ypos   = dotbuffer + MAXDOTS;

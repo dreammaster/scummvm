@@ -35,7 +35,6 @@ extern const byte text_colors[9];
 extern const int first_color[5];
 extern const int num_colors[5];
 
-#define NTW                 32
 #define PALETTE_COUNT       256
 #define PALETTE_SIZE        (256 * 3)
 #define VGA_COLOR_TRANS(x) ((x) * 255 / 63)
@@ -50,16 +49,10 @@ enum ShapeTransform {
     ST_XLAT = 0,        // Use shape_lookaside() table
     ST_REUSE = 1        // Use buffer contents from prior call
 };
-enum Justification { J_LEFT = 0, J_RIGHT = 1, J_CENTER = 2, J_FILL = 3 };
-enum { PAGE1 = 0, PAGE2 = 1 };
-enum PrintOperation {
-    WND = 0,        // output directly to window
-    BUF = 1,        // output to start of buffer
-    APP = 2         // append to end of buffer
-};
 
 class AesopEngine;
 class Window;
+class Font;
 
 class Pane : public Common::Rect {
 public:
@@ -125,7 +118,7 @@ public:
 
 	void scroll(const Common::Point &delta, PaneScroll flags, byte background);
 
-	int drawCharacter(const Common::Point &pt, void *font, int character, byte *color_translate);
+	int drawCharacter(const Common::Point &pt, Font *font, int character, byte *color_translate);
 public:
 	/**
 	 * Read a pixel
@@ -244,65 +237,6 @@ public:
 	 * Return an address for a pixel within the given pane.
 	 */
 	virtual byte *getBasePtr(int x, int y);
-};
-
-class Font {
-public:
-	byte font_background;
-	int char_height;
-public:
-	int charWidth(int c);
-};
-
-class TextWindow {
-public:
-	int window;
-	int htab, vtab;
-	Font *font;
-	int delay;
-	int (*continueFunction)(int);
-	char *txtbuf;
-	char *txtpnt;
-	int justify;
-	byte lookaside[256];
-	int _refresh;
-public:
-	TextWindow();
-
-	/**
-	 * Set the text position in the window
-	 */
-	void setPosition(const Common::Point &pt);
-
-	int getX() const {
-		return htab;
-	}
-
-	int getY() const {
-		return vtab;
-	}
-
-	void home();
-
-	void textColor(byte current, byte newColor);
-
-	void remapFontColor(byte current, byte newColor);
-
-	void selectTextWindow();
-
-	void refreshWindow(int wnd);
-
-	uint charWidth(int ch);
-
-	uint fontHeight();
-
-	void vsprint(const char *format, va_list argptr);
-
-	void print(const char *format, ...);
-
-	void sprint(const char *format, ...);
-
-	void crout();
 };
 
 } // End of namespace Aesop

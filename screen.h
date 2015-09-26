@@ -28,6 +28,7 @@
 #include "graphics/surface.h"
 #include "aesop/interpreter.h"
 #include "aesop/windows.h"
+#include "aesop/text_windows.h"
 
 namespace Aesop {
 
@@ -40,6 +41,7 @@ extern const int num_colors[5];
 #define AESOP_SCREEN_HEIGHT 200
 #define MAX_WINDOWS         50
 #define MAX_PANES           250
+#define MAX_TEXT_WINDOWS	32
 
 class Screen: public Window {
 private:
@@ -66,11 +68,11 @@ protected:
 public:
 	Common::Array<Window *> _windows;
 	Common::Array<Pane *> _panes;
+	TextWindow _textWindows[MAX_TEXT_WINDOWS];
 	Graphics::Surface _bitmapBuffer;
 	TextWindow *_twptr;
-	TextWindow _tw[NTW];
-	char strbuf[256];              // used for string resource buffering
-	char txtbuf[2402];             // used for word-wrapped text
+	char _strBuf[256];              // used for string resource buffering
+	char _txtBuf[2402];             // used for word-wrapped text
 public:
 	Screen(AesopEngine *vm);
 	virtual ~Screen();

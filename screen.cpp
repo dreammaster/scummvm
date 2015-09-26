@@ -121,8 +121,8 @@ Screen::Screen(AesopEngine *vm): Window(Common::Point(AESOP_SCREEN_WIDTH, AESOP_
 	_windows.push_back(new Window(Common::Point(AESOP_SCREEN_WIDTH, AESOP_SCREEN_HEIGHT)));
 
 	_windows[PAGE2]->wipeWindow(NO_COLOR);
-	txtbuf[sizeof(txtbuf) - 1] = 0x69;    // constants for integrity checking
-	txtbuf[sizeof(txtbuf) - 2] = 0x77;
+	_txtBuf[sizeof(_txtBuf) - 1] = 0x69;    // constants for integrity checking
+	_txtBuf[sizeof(_txtBuf) - 2] = 0x77;
 }
 
 Screen::~Screen() {
@@ -281,7 +281,8 @@ Window &Screen::windows(uint idx) {
 }
 
 TextWindow &Screen::textWindows(uint idx) {
-	return _tw[idx];
+	assert(idx < MAX_TEXT_WINDOWS);
+	return _textWindows[idx];
 }
 
 void Screen::setPalette(uint region, uint resource) {
@@ -529,14 +530,13 @@ void Screen::selectTextWindow(TextWindow *tw) {
 }
 
 int Screen::charWidth(int ch) {
-	return _twptr->font->charWidth(ch);
+	return _twptr->_font.charWidth(ch);
 }
 
 void Screen::home(void) {
-	_windows[_twptr->window]->paneWipe(_twptr->font->font_background);
-
-	_twptr->htab = _windows[_twptr->window]->left;
-	_twptr->vtab = _windows[_twptr->window]->top;
+	panes(_twptr->_window).paneWipe(_twptr->_font._fontBackground);
+	_twptr->_hTab = panes(_twptr->_window).left;
+	_twptr->_vTab = panes(_twptr->_window).top;
 }
 
 void Screen::remapFontColor(byte current, byte newColor) {
@@ -550,11 +550,11 @@ void Screen::print(PrintOperation operation, const char *format, ...) {
 	va_start(arglist, format);
 
 	if (operation == BUF) {
-		cw = vsprintf(_twptr->txtbuf, format, arglist);
-		_twptr->txtpnt = _twptr->txtbuf + cw;
+		cw = vsprintf(_twptr->_txtBuf, format, arglist);
+		_twptr->_txtPnt = _twptr->_txtBuf + cw;
 	} else if (operation == APP) {
-		cw = vsprintf(_twptr->txtpnt, format, arglist);
-		_twptr->txtpnt += cw;
+		cw = vsprintf(_twptr->_txtPnt, format, arglist);
+		_twptr->_txtPnt += cw;
 	}
 }
 
@@ -563,66 +563,57 @@ void Screen::printBuffer(int linenum) {
 }
 
 void Screen::cout(int c) {
-	int cvtab, nvtab, htab;
+	int c_vTab, n_vTab, _hTab;
 
 	if (c == '\n') {
-		htab = _twptr->htab = _windows[_twptr->window]->left;    // Carriage Return
+		_hTab = _twptr->_hTab = panes(_twptr->_window).left;    // Carriage Return
 
-		cvtab = _twptr->vtab - _windows[_twptr->window]->top;
-		cvtab += _twptr->font->char_height;
+		c_vTab = _twptr->_vTab - panes(_twptr->_window).top;
+		c_vTab += _twptr->_font._charHeight;
 
-		nvtab = cvtab + _twptr->font->char_height;
+		n_vTab = c_vTab + _twptr->_font._charHeight;
 
-		if (nvtab > _windows[_twptr->window]->bottom - _windows[_twptr->window]->top) {
-			if (_twptr->continueFunction != NULL) {
-				if (((*_twptr->continueFunction)(_twptr->htab)) == 0) {
-					_twptr->htab = htab;
+		if (n_vTab > panes(_twptr->_window).bottom - panes(_twptr->_window).top) {
+			if (_twptr->_continueFunction != NULL) {
+				if (((*_twptr->_continueFunction)(_twptr->_hTab)) == 0) {
+					_twptr->_hTab = _hTab;
 					return;
 				}
 			}
-			_twptr->htab = htab;
+			_twptr->_hTab = _hTab;
 
-			_windows[_twptr->window]->scroll(Common::Point(0, -_twptr->font->char_height), PS_NOWRAP,
-			                                _twptr->font->font_background);
+			panes(_twptr->_window).scroll(Common::Point(0, -_twptr->_font._charHeight), PS_NOWRAP,
+			                                _twptr->_font._fontBackground);
 		} else {
-			_twptr->vtab += _twptr->font->char_height;
+			_twptr->_vTab += _twptr->_font._charHeight;
 		}
 	} else if (c == '\r') {
-		_twptr->htab = _windows[_twptr->window]->left;    // Carriage Return
+		_twptr->_hTab = panes(_twptr->_window).left;    // Carriage Return
 	} else {
-		_twptr->htab += _windows[_twptr->window]->drawCharacter(
-			Common::Point(_twptr->htab - _windows[_twptr->window]->left, _twptr->vtab - _windows[_twptr->window]->top),
-		                    _twptr->font, c, _twptr->lookaside);
+		_twptr->_hTab += panes(_twptr->_window).drawCharacter(
+			Common::Point(_twptr->_hTab - panes(_twptr->_window).left, _twptr->_vTab - panes(_twptr->_window).top),
+		                    &_twptr->_font, c, _twptr->_lookaside);
 	}
 
 }
 
 void Screen::setTextWindow(uint wndNum, uint wnd) {
-	_tw[wndNum].window = wnd;
+	_textWindows[wndNum]._window = wnd;
 }
 
 void Screen::textStyle(uint wndnum, uint font, uint justify) {
 	Resources &res = *_vm->_resources;
-	HRES hfont;
-	Font *vfont;
+	TextWindow &tw = _textWindows[wndnum];
 
-	_tw[wndnum].justify = justify;
+	tw._justify = justify;
+	tw._font.clear();
 
-	hfont = (HRES)_tw[wndnum].font;
+	HRES handle = res.get_resource_handle(font, DA_DEFAULT);
+	Common::MemoryReadStream stream((const byte *)Resources::addr(handle), Resources::size(handle));
+	tw._font.load(stream);
+	res.free(handle);
 
-	if (hfont != HRES_NULL) {
-		res.unlock(hfont);
-	}
-
-	_tw[wndnum].font = (Font *)res.get_resource_handle(font, DA_DEFAULT);
-
-	res.lock((HRES)_tw[wndnum].font);
-
-	vfont = (Font *)res.addr((HRES)_tw[wndnum].font);
-
-	_tw[wndnum].lookaside[vfont->font_background] = 255;
-
-	res.unlock((HRES)_tw[wndnum].font);
+	tw._lookaside[tw._font._fontBackground] = 255;
 }
 
 

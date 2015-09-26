@@ -21,6 +21,7 @@ MODULE_OBJS = \
 	shapes.o \
 	sound32.o \
 	stubs.o \
+	text_windows.o \
 	utils.o \
 	windows.o
 
