@@ -182,12 +182,6 @@ public:
 
 	void remapFontColor(byte current, byte newColor);
 
-	void print(PrintOperation operation, const Common::String &format, const Parameters &params);
-
-	void printBuffer(int linenum);
-
-	void cout(int c);
-
 	/**
 	 * Set the window for a given text window
 	 */

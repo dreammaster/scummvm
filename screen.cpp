@@ -24,7 +24,6 @@
 #include "aesop/screen.h"
 #include "aesop/shapes.h"
 #include "aesop/shared.h"
-#include "aesop/utils.h"
 #include "common/system.h"
 #include "common/memstream.h"
 #include "engines/util.h"
@@ -548,53 +547,6 @@ void Screen::remapFontColor(byte current, byte newColor) {
 	_twptr->remapFontColor(current, newColor);
 }
 
-void Screen::print(PrintOperation operation, const Common::String &format, const Parameters &params) {
-	if (operation == BUF) {
-		_twptr->_textBuffer = aesop_vsprintf(format, params);
-	} else if (operation == APP) {
-		_twptr->_textBuffer += aesop_vsprintf(format, params);
-	}
-}
-
-void Screen::printBuffer(int linenum) {
-	error("TODO: GIL2VFXA_print_buffer");
-}
-
-void Screen::cout(int c) {
-	int c_vTab, n_vTab, _hTab;
-
-	if (c == '\n') {
-		_hTab = _twptr->_hTab = panes(_twptr->_window).left;    // Carriage Return
-
-		c_vTab = _twptr->_vTab - panes(_twptr->_window).top;
-		c_vTab += _twptr->_font._charHeight;
-
-		n_vTab = c_vTab + _twptr->_font._charHeight;
-
-		if (n_vTab > panes(_twptr->_window).bottom - panes(_twptr->_window).top) {
-			if (_twptr->_continueFunction != NULL) {
-				if (((*_twptr->_continueFunction)(_twptr->_hTab)) == 0) {
-					_twptr->_hTab = _hTab;
-					return;
-				}
-			}
-			_twptr->_hTab = _hTab;
-
-			panes(_twptr->_window).scroll(Common::Point(0, -_twptr->_font._charHeight), PS_NOWRAP,
-			                                _twptr->_font._fontBackground);
-		} else {
-			_twptr->_vTab += _twptr->_font._charHeight;
-		}
-	} else if (c == '\r') {
-		_twptr->_hTab = panes(_twptr->_window).left;    // Carriage Return
-	} else {
-		_twptr->_hTab += panes(_twptr->_window).drawCharacter(
-			Common::Point(_twptr->_hTab - panes(_twptr->_window).left, _twptr->_vTab - panes(_twptr->_window).top),
-		                    &_twptr->_font, c, _twptr->_lookaside);
-	}
-
-}
-
 void Screen::setTextWindow(uint wndNum, uint wnd) {
 	_textWindows[wndNum]._window = wnd;
 }
@@ -603,7 +555,7 @@ void Screen::textStyle(uint wndnum, uint font, uint justify) {
 	Resources &res = *_vm->_resources;
 	TextWindow &tw = _textWindows[wndnum];
 
-	tw._justify = justify;
+	tw._justify = (Justification)justify;
 	tw._font.clear();
 
 	HRES handle = res.get_resource_handle(font, DA_DEFAULT);

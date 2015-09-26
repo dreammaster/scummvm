@@ -69,6 +69,18 @@ public:
 class TextWindow {
 private:
 	static AesopEngine *_vm;
+	bool _endOfPageReached;
+	int _pendingFlag;
+
+	/**
+	 * Print a line from the buffer
+	 */
+	void printBuffer(int lineNum);
+
+	/**
+	 * Print a character
+	 */
+	void cout(char c);
 public:
 	int _window;
 	int _hTab, _vTab;
@@ -76,7 +88,7 @@ public:
 	int _delay;
 	int (*_continueFunction)(int);
 	Common::String _textBuffer;
-	int _justify;
+	Justification _justify;
 	byte _lookaside[256];
 	int _refresh;
 public:
@@ -110,6 +122,11 @@ public:
 	uint charWidth(int ch);
 
 	uint fontHeight();
+
+	/**
+	 * Print the specified string
+	 */
+	void print(PrintOperation operation, const Common::String &format, const Parameters &params);
 
 	void vsprint(const char *format, va_list argptr);
 

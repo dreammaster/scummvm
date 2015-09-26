@@ -23,6 +23,7 @@
 #include "aesop/aesop.h"
 #include "aesop/text_windows.h"
 #include "aesop/rtmsg.h"
+#include "aesop/utils.h"
 
 namespace Aesop {
 
@@ -77,6 +78,8 @@ TextWindow::TextWindow() {
 	_continueFunction = nullptr;
 	_justify = J_LEFT;
 	_refresh = 0;
+	_endOfPageReached = false;
+	_pendingFlag = 0;
 
 	for (int idx = 0; idx < 256; ++idx)
 		_lookaside[idx] = idx;
@@ -155,7 +158,7 @@ void TextWindow::sPrint(const Common::String &format, const Parameters &params) 
 	while ((c = *p++) != '\0') {
 		if (c != '%') {
 			// Print a character
-			screen.print(APP, "%c", Parameters(c));
+			print(APP, "%c", Parameters(c));
 			continue;
 		}
 
@@ -168,14 +171,14 @@ void TextWindow::sPrint(const Common::String &format, const Parameters &params) 
 		case 'd': {
 			LONG v = params[paramIndex++];
 			Common::String sVal = Common::String::format("%d", v);
-			screen.print(APP, "%s", Parameters(sVal.c_str()));
+			print(APP, "%s", Parameters(sVal.c_str()));
 			break;
 		}
 
 		case 'u': {
 			uint v = params[paramIndex++];
 			Common::String sVal = Common::String::format("%u", v);
-			screen.print(APP, "%s", Parameters(sVal.c_str()));
+			print(APP, "%s", Parameters(sVal.c_str()));
 			break;
 		}
 
@@ -183,7 +186,7 @@ void TextWindow::sPrint(const Common::String &format, const Parameters &params) 
 		case 'X':  {
 			uint v = params[paramIndex++];
 			Common::String sVal = Common::String::format("%x", v);
-			screen.print(APP, "%s", Parameters(sVal.c_str()));
+			print(APP, "%s", Parameters(sVal.c_str()));
 			break;
 		}
 
@@ -196,7 +199,7 @@ void TextWindow::sPrint(const Common::String &format, const Parameters &params) 
 
 			switch (READ_LE_UINT16(s)) {
 			case ':S':
-				screen.print(APP, "%s", Parameter(&s[2]));
+				print(APP, "%s", Parameter(&s[2]));
 				break;
 
 			default:
@@ -209,13 +212,13 @@ void TextWindow::sPrint(const Common::String &format, const Parameters &params) 
 
 		case 'a': {
 			const char *s = params[paramIndex++];
-			screen.print(APP, s, Parameter());
+			print(APP, s, Parameter());
 			break;
 		}
 
 		case 'c': {
 			int c = params[paramIndex++] & 0xff;
-			screen.print(APP, "%c", Parameter(c));
+			print(APP, "%c", Parameter(c));
 			break;
 		}
 
@@ -223,17 +226,146 @@ void TextWindow::sPrint(const Common::String &format, const Parameters &params) 
 			break;
 		}
 	}
-
-	screen.printBuffer(0);
+	
+	// Print out the message
+	printBuffer(0);
 
 	if (_refresh != -1)
 		screen.refreshWindow(_window, _refresh);
 }
 
 void TextWindow::crout() {
-	Parameters params;
-	params.push_back(Parameter("\n"));
-	sPrint("%s", params);
+	sPrint("%s", Parameter("\n"));
+}
+
+void TextWindow::print(PrintOperation operation, const Common::String &format, const Parameters &params) {
+	if (operation == BUF) {
+		_textBuffer = aesop_vsprintf(format, params);
+	}
+	else if (operation == APP) {
+		_textBuffer += aesop_vsprintf(format, params);
+	}
+}
+
+void TextWindow::printBuffer(int lineNum) {
+	Pane &pane = window();
+	int paneWidth = pane.right + 1 - pane.left;
+	int pendingLines = lineNum - 1;
+	const char *msgP = _textBuffer.c_str();
+	const char *lineStartP, *lineEndP;
+
+	_pendingFlag = lineNum,
+	_endOfPageReached = false;
+
+	while (!_pendingFlag || !_endOfPageReached) {
+		lineStartP = msgP;
+
+		// Find end of first word
+		if (*msgP) {
+			while (*msgP != '\0' && *msgP != ' ' && *msgP != '\n')
+				++msgP;
+		}
+		lineEndP = msgP;
+
+		// Find bounds of entire line
+		Common::Rect r(_hTab, _vTab, _hTab, _vTab + _font._charHeight);
+		int fullWidth = 0;
+		msgP = lineStartP;
+		for (;;) {
+			if (*msgP == '\0' || *msgP == '\n') {	
+				lineEndP = msgP + 1;
+				break;
+			}
+
+			if (*msgP == ' ') {
+				// Save end of displayable line and right edge
+				lineEndP = msgP;
+				r.right = r.left + fullWidth;
+			}
+
+			// Keep calculating right position until end of line or right edge of window is exceeded
+			fullWidth += _font.charWidth(*msgP++);
+			if ((r.left + fullWidth) > pane.right)
+				break;
+		}
+
+		if (_pendingFlag && pendingLines) {
+			--pendingLines;
+			if (!*(lineEndP - 1))
+				break;
+		} else {
+			bool print = true;
+			switch (_justify) {
+			case J_RIGHT:
+				if (*lineStartP)
+					_hTab = pane.right - r.width();
+				break;
+
+			case  J_CENTER:
+				if (*lineStartP)
+					_hTab = pane.left + paneWidth / 2;
+				break;
+
+			case J_FILL:
+				// Justify text on both sides of the pane
+				if (fullWidth < paneWidth && *lineStartP && *lineStartP != '\n') {
+					print = false;
+					error("TODO: Implement fully justified text");
+				}
+
+			default:
+				break;
+			}
+
+			if (print) {
+				for (msgP = lineStartP; *msgP && msgP < lineEndP; ++msgP)
+					cout(*msgP);
+			}
+
+			if (*(lineEndP - 1) == '\0')
+				break;
+			else if (*(lineEndP - 1) != '\n')
+				cout('\n');
+
+		}
+	}
+
+	error("TODO");
+}
+
+void TextWindow::cout(char c) {
+	Pane &pane = window();
+	int c_vTab, n_vTab, _hTab;
+
+	if (c == '\n') {
+		_hTab = _hTab = pane.left;    // Carriage Return
+
+		c_vTab = _vTab - pane.top;
+		c_vTab += _font._charHeight;
+
+		n_vTab = c_vTab + _font._charHeight;
+
+		if (n_vTab > pane.bottom - pane.top) {
+			if (_continueFunction != NULL) {
+				if (((*_continueFunction)(_hTab)) == 0) {
+					_hTab = _hTab;
+					return;
+				}
+			}
+			_hTab = _hTab;
+
+			pane.scroll(Common::Point(0, -_font._charHeight), PS_NOWRAP,
+			                                _font._fontBackground);
+		} else {
+			_vTab += _font._charHeight;
+		}
+	} else if (c == '\r') {
+		_hTab = pane.left;    // Carriage Return
+	} else {
+		_hTab += pane.drawCharacter( Common::Point(_hTab - pane.left, _vTab - pane.top),
+			&_font, c, _lookaside);
+	}
+
 }
 
 } // End of namespace Aesop
