@@ -135,6 +135,51 @@ void aprint(LONG argcnt, const char *format, ...) {
 	*/
 }
 
+Common::String aesop_vsprintf(const Common::String &format, const Parameters &params) {
+	Common::String result;
+	int paramIndex = 0;
+	const char *strP = format.c_str();
+	char c;
+
+	while ((c = *strP++) != '\0') {
+		if (c != '%') {
+			result += c;
+			continue;
+		}
+
+		switch (c = *strP++) {
+		case 'd': {
+			int v = params[paramIndex++];
+			result += Common::String::format("%d", v);
+			break;
+		}
+
+		case 'u': {
+			uint v = params[paramIndex++];
+			result += Common::String::format("%u", v);
+			break;
+		}
+
+		case 'c': {
+			int v = params[paramIndex++];
+			result += Common::String::format("%c", v);
+			break;
+		}
+
+		case 's': {
+			const char *s = params[paramIndex++];
+			result += s;
+			break;
+		}
+
+		default:
+			error("Unhandled printf format character - %c", c);
+			break;
+		}
+	}
+
+	return result;
+}
 
 } // End of namespace Aesop
 

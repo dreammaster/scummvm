@@ -66,6 +66,7 @@ void AesopEngine::initialize() {
 	_objects = new Objects(this);
 	_resources = new Resources(this);
 	_screen = new Screen(this);
+	TextWindow::init(this);
 }
 
 void AesopEngine::deinitialize() {

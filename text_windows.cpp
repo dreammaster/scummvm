@@ -22,6 +22,7 @@
 
 #include "aesop/aesop.h"
 #include "aesop/text_windows.h"
+#include "aesop/rtmsg.h"
 
 namespace Aesop {
 
@@ -35,7 +36,7 @@ Font::~Font() {
 }
 
 int Font::charWidth(int c) {
-	error("TODO");
+	return READ_LE_UINT32(_chars[c]);
 }
 
 void Font::load(Common::SeekableReadStream &s) {
@@ -67,18 +68,26 @@ void Font::clear() {
 
 /*----------------------------------------------------------------*/
 
+AesopEngine *TextWindow::_vm;
+
 TextWindow::TextWindow() {
 	_window = 0;
 	_hTab = _vTab = 0;
 	_delay = 0;
 	_continueFunction = nullptr;
-	_txtBuf = nullptr;
-	_txtPnt = nullptr;
 	_justify = J_LEFT;
 	_refresh = 0;
 
 	for (int idx = 0; idx < 256; ++idx)
 		_lookaside[idx] = idx;
+}
+
+void TextWindow::init(AesopEngine *vm) {
+	_vm = vm;
+}
+
+Pane &TextWindow::window() {
+	return _vm->_screen->panes(_window);
 }
 
 void TextWindow::setPosition(const Common::Point &pt) {
@@ -131,12 +140,100 @@ void TextWindow::print(const char *format, ...) {
 	error("print");
 }
 
-void TextWindow::sprint(const char *format, ...) {
-	error("sprint");
+void TextWindow::sPrint(const Common::String &format, const Parameters &params) {
+	Resources &res = *_vm->_resources;
+	Screen &screen = *_vm->_screen;
+	unsigned char c;
+	const byte *p;
+	int paramIndex = 0;
+
+	selectTextWindow();
+
+	p = (const byte *)format.c_str();
+
+	// Iterate across the format string
+	while ((c = *p++) != '\0') {
+		if (c != '%') {
+			// Print a character
+			screen.print(APP, "%c", Parameters(c));
+			continue;
+		}
+
+		switch (c = (*p++)) {
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
+			screen.remapFontColor(15, text_colors[c - '0']);
+			break;
+
+		case 'd': {
+			LONG v = params[paramIndex++];
+			Common::String sVal = Common::String::format("%d", v);
+			screen.print(APP, "%s", Parameters(sVal.c_str()));
+			break;
+		}
+
+		case 'u': {
+			uint v = params[paramIndex++];
+			Common::String sVal = Common::String::format("%u", v);
+			screen.print(APP, "%s", Parameters(sVal.c_str()));
+			break;
+		}
+
+		case 'x':
+		case 'X':  {
+			uint v = params[paramIndex++];
+			Common::String sVal = Common::String::format("%x", v);
+			screen.print(APP, "%s", Parameters(sVal.c_str()));
+			break;
+		}
+
+		case 's': {
+			uint resourceId = params[paramIndex++];
+			HRES str = res.get_resource_handle(resourceId, DA_DEFAULT);
+
+			res.lock(str);
+			const char *s = (const char *)res.addr(str);
+
+			switch (READ_LE_UINT16(s)) {
+			case ':S':
+				screen.print(APP, "%s", Parameter(&s[2]));
+				break;
+
+			default:
+				error(MSG_SRRV);
+			}
+
+			res.unlock(str);
+			break;
+		}
+
+		case 'a': {
+			const char *s = params[paramIndex++];
+			screen.print(APP, s, Parameter());
+			break;
+		}
+
+		case 'c': {
+			int c = params[paramIndex++] & 0xff;
+			screen.print(APP, "%c", Parameter(c));
+			break;
+		}
+
+		default:
+			break;
+		}
+	}
+
+	screen.printBuffer(0);
+
+	if (_refresh != -1)
+		screen.refreshWindow(_window, _refresh);
 }
 
 void TextWindow::crout() {
-	sprint("%s", "\n");
+	Parameters params;
+	params.push_back(Parameter("\n"));
+	sPrint("%s", params);
 }
 
 } // End of namespace Aesop

@@ -50,33 +50,17 @@ public:
 	Parameter(void *v) : _val(0), _ptr(v), _ptrConst(v) {}
 	Parameter(const BYTE *v) : _val(0), _ptr(nullptr), _ptrConst(v) {}
 	Parameter(const void *v) : _val(0), _ptr(nullptr), _ptrConst(v) {}
-	operator ULONG() {
-		return _val;
-	}
-	operator BYTE *() {
-		return (BYTE *)_ptr;
-	}
-	operator WORD *() {
-		return (WORD *)_ptr;
-	}
-	operator LONG *() {
-		return (LONG *)_ptr;
-	}
-	operator ULONG *() {
-		return (ULONG *)_ptr;
-	}
-	operator const BYTE *() {
-		return (const BYTE *)_ptrConst;
-	}
-	operator byte *() {
-		return (byte *)_ptr;
-	}
-	operator const void *() {
-		return _ptrConst;
-	}
-	operator const char *() {
-		return (const char *)_ptrConst;
-	}
+	Parameter(const char *v) : _val(0), _ptr(nullptr), _ptrConst(v) {}
+
+	operator ULONG() const { return _val; }
+	operator BYTE *() const { return (BYTE *)_ptr; }
+	operator WORD *() const { return (WORD *)_ptr; }
+	operator LONG *() const { return (LONG *)_ptr; }
+	operator ULONG *() const { return (ULONG *)_ptr; }
+	operator const BYTE *() const { return (const BYTE *)_ptrConst; }
+	operator byte *() { return (byte *)_ptr; }
+	operator const void *() const { return _ptrConst; }
+	operator const char *() const { return (const char *)_ptrConst; }
 
 	const Parameter operator+(int other) const;
 	const Parameter operator-(int other) const;
@@ -90,9 +74,22 @@ class Parameters : public Common::Array<Parameter> {
 private:
 	Parameter _empty;
 public:
+	Parameters() : Common::Array<Parameter>() {}
+	Parameters(const Parameter &v) : Common::Array<Parameter>() {
+		push_back(v);
+	}
+
 	Parameter &operator[](int idx) {
 		return (idx >= (int)size()) ? _empty : Common::Array<Parameter>::operator[](idx);
 	}
+	const Parameter &operator[](int idx) const {
+		return (idx >= (int)size()) ? _empty : Common::Array<Parameter>::operator[](idx);
+	}
+
+	/**
+	 * Remove a parameter from the front
+	 */
+	Parameter pop();
 };
 
 struct MethodStackEntry {

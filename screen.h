@@ -43,6 +43,8 @@ extern const int num_colors[5];
 #define MAX_PANES           250
 #define MAX_TEXT_WINDOWS	32
 
+enum { PAGE1 = 0, PAGE2 = 1 };
+
 class Screen: public Window {
 private:
 	AesopEngine *_vm;
@@ -116,6 +118,11 @@ public:
 	void releaseOwnedWindows(int owner);
 
 	/**
+	 * Refresh a window
+	 */
+	void refreshWindow(uint src, uint target);
+
+	/**
 	 * Returns the specified pane
 	 */
 	Pane &panes(uint idx);
@@ -175,7 +182,7 @@ public:
 
 	void remapFontColor(byte current, byte newColor);
 
-	void print(PrintOperation operation, const char *format, ...);
+	void print(PrintOperation operation, const Common::String &format, const Parameters &params);
 
 	void printBuffer(int linenum);
 

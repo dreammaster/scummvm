@@ -107,6 +107,14 @@ bool Parameter::operator!=(Parameter &rhs) const {
 
 /*----------------------------------------------------------------*/
 
+Parameter Parameters::pop() {
+	Parameter val = front();
+	remove_at(0);
+	return val;
+}
+
+/*----------------------------------------------------------------*/
+
 const OpcodeMethod Interpreter::_opcodes[] = {
 	&Interpreter::cmdBRT,
 	&Interpreter::cmdBRF,
@@ -1812,7 +1820,7 @@ Parameter Interpreter::setPalette(Parameters params) {
 }
 
 Parameter Interpreter::refreshWindow(Parameters params) {
-	// Uneeded call to mouse_pane_refresh
+	_vm->_screen->refreshWindow(params[0], params[1]);
 	return Parameter();
 }
 
@@ -1955,7 +1963,10 @@ Parameter Interpreter::print(Parameters params) {
 }
 
 Parameter Interpreter::sPrint(Parameters params) {
-	error("TODO: version of sprint() method accepting parameter array");
+	int textWin = params.pop();
+	const char *format = params.pop();
+
+	_vm->_screen->textWindows(textWin).sPrint(format, params);
 	return Parameter();
 }
 

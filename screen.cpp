@@ -24,6 +24,7 @@
 #include "aesop/screen.h"
 #include "aesop/shapes.h"
 #include "aesop/shared.h"
+#include "aesop/utils.h"
 #include "common/system.h"
 #include "common/memstream.h"
 #include "engines/util.h"
@@ -270,6 +271,10 @@ void Screen::releaseOwnedWindows(int owner) {
 			}
 		}
 	}
+}
+
+void Screen::refreshWindow(uint src, uint target) {
+	// Original seems only to have called a mouse cursor refresh here, so it's not needed
 }
 
 Pane &Screen::panes(uint idx) {
@@ -543,18 +548,11 @@ void Screen::remapFontColor(byte current, byte newColor) {
 	_twptr->remapFontColor(current, newColor);
 }
 
-void Screen::print(PrintOperation operation, const char *format, ...) {
-	va_list  arglist;
-	LONG     cw;
-
-	va_start(arglist, format);
-
+void Screen::print(PrintOperation operation, const Common::String &format, const Parameters &params) {
 	if (operation == BUF) {
-		cw = vsprintf(_twptr->_txtBuf, format, arglist);
-		_twptr->_txtPnt = _twptr->_txtBuf + cw;
+		_twptr->_textBuffer = aesop_vsprintf(format, params);
 	} else if (operation == APP) {
-		cw = vsprintf(_twptr->_txtPnt, format, arglist);
-		_twptr->_txtPnt += cw;
+		_twptr->_textBuffer += aesop_vsprintf(format, params);
 	}
 }
 

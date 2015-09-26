@@ -23,6 +23,9 @@
 #ifndef AESOP_UTILS_H
 #define AESOP_UTILS_H
 
+#include "common/str.h"
+#include "aesop/interpreter.h"
+
 namespace Aesop {
 
 /**
@@ -43,6 +46,11 @@ extern bool aesop_isdigit(const char c);
 extern bool aesop_isnumprefix(const char c);
 extern bool aesop_isalnum(const char c);
 extern bool aesop_ispunct(const char c);
+
+/**
+ * Aesop version of vsprintf that accepts a Parameters array
+ */
+Common::String aesop_vsprintf(const Common::String &format, const Parameters &params);
 
 } // End of namespace Aesop
 
