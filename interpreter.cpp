@@ -946,6 +946,7 @@ void Interpreter::cmdCALL() {
 	ULONG methodNum = _stack.pop();
 	assert((methodNum >> 16) == 0x1234);
 	_instructionParams.push_back(METHOD_NAMES[methodNum & 0xffff]);
+	printInstruction();
 
 	// Handle the call
 	uint stackSize = _stack.size();
