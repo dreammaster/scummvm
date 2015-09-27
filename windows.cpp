@@ -157,10 +157,6 @@ void Pane::scroll(const Common::Point &delta, PaneScroll flags, byte background)
 	error("TODO");
 }
 
-int Pane::drawCharacter(const Common::Point &pt, Font *font, int character, byte *color_translate) {
-	error("TODO");
-}
-
 Graphics::Surface Pane::getArea(const Common::Rect &r) {
 	Common::Rect bounds = r;
 	bounds.translate(-left, -top);
