@@ -608,14 +608,12 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 		if (opcode >= OPCODES_COUNT)
 			error("Invalid opcode encountered");
 
-		if (gDebugLevel >= DEBUG_INTERMEDIATE)
-			formInstruction();
+		formInstruction();
 
 		++_code;
 		(this->*_opcodes[opcode])();
 
-		if (gDebugLevel >= DEBUG_INTERMEDIATE)
-			printInstruction();
+		printInstruction();
 	}
 
 	res.unlock(_hPrg);
@@ -624,6 +622,9 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 }
 
 void Interpreter::formInstruction() {
+	if (gDebugLevel < DEBUG_INTERMEDIATE)
+		return;
+
 	int opcode = *_code;
 	_instruction = Common::String::format("%.4x %s", _code - _ds32, OPCODE_NAMES[opcode]);
 	_instruction += "(%s)";
@@ -659,6 +660,9 @@ void Interpreter::formInstruction() {
 }
 
 void Interpreter::printInstruction() {
+	if (gDebugLevel < DEBUG_INTERMEDIATE || _instruction.empty())
+		return;
+
 	Common::String params;
 	for (uint idx = 0; idx < _instructionParams.size(); ++idx) {
 		if (idx > 0)
@@ -668,6 +672,9 @@ void Interpreter::printInstruction() {
 
 	Common::String msg = Common::String::format(_instruction.c_str(), params.c_str());
 	debugC(DEBUG_BASIC, kDebugScripts, msg.c_str());
+
+	_instruction = "";
+	_instructionParams.clear();
 }
 
 byte *Interpreter::getAutoPtr(int dataSize) {
@@ -959,6 +966,7 @@ void Interpreter::cmdSEND() {
 	Parameters params;
 	int argCount = *_code++;
 	_instructionParams.push_back(Common::String::format("%d", argCount));
+	printInstruction();
 
 	for (int idx = 0; idx < argCount; ++idx)
 		params.insert_at(0, _stack.pop());
@@ -977,6 +985,9 @@ void Interpreter::cmdSEND() {
 	delete interp;
 	deref();
 
+	debugC(DEBUG_BASIC, kDebugScripts, "Interpreter::execute(%d, %d, %x) resuming",
+		_currentIndex, _currentMsg, (ULONG)_currentVector);
+
 	// Push the result onto the stack of the current interpreter
 	_stack.push(result);
 }
@@ -985,6 +996,7 @@ void Interpreter::cmdPASS() {
 	// Get the number of arguments
 	int argCount = *_code++;
 	_instructionParams.push_back(Common::String::format("%d", argCount));
+	printInstruction();
 
 	// Get the next higher-level handler
 	const MV_entry *oldVector = _currentVector;
@@ -1001,7 +1013,6 @@ void Interpreter::cmdPASS() {
 	// Create the new interpreter instance
 	Interpreter *interp = new Interpreter(_vm);
 
-
 	// Load the arguments in reverse so they'll be in the correct order
 	Parameters params;
 	for (int idx = 0; idx < argCount; ++idx)
@@ -1013,6 +1024,9 @@ void Interpreter::cmdPASS() {
 	int result = interp->execute(_currentIndex, _currentMsg, (HRES)newVector);
 	delete interp;
 	deref();
+
+	debugC(DEBUG_BASIC, kDebugScripts, "Interpreter::execute(%d, %d, %x) resuming",
+		_currentIndex, _currentMsg, (ULONG)_currentVector);
 
 	// Restore saved fields, and push the result onto the stack
 	_currentVector = oldVector;
