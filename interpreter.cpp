@@ -1034,21 +1034,21 @@ void Interpreter::cmdLTBA() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	const byte *srcP = _ds32 + offset + _stack.pop();
-	_stack.push(*srcP);
+	_stack.push((int8)*srcP);
 }
 
 void Interpreter::cmdLTWA() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	const byte *srcP = _ds32 + offset + _stack.pop();
-	_stack.push(READ_LE_UINT16(srcP));
+	_stack.push((int16)READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLTDA() {
 	uint32 offset = READ_LE_UINT16(_code);
 	_code += 2;
 	const byte *srcP = _ds32 + offset + _stack.pop();
-	_stack.push(READ_LE_UINT32(srcP));
+	_stack.push((int32)READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdLETA() {
@@ -1060,7 +1060,7 @@ void Interpreter::cmdLETA() {
 
 void Interpreter::cmdLAB() {
 	byte *p = getAutoPtr(1);
-	_stack.top() = *p;
+	_stack.top() = (int8)*p;
 }
 
 void Interpreter::cmdLAW() {
@@ -1085,25 +1085,26 @@ void Interpreter::cmdSAW() {
 
 void Interpreter::cmdSAD() {
 	byte *p = getAutoPtr(4);
+	assert((BYTE *)_stack.top() == nullptr);	// Can't store pointers in autos
 	WRITE_LE_UINT32(p, _stack.top());
 }
 
 void Interpreter::cmdLABA() {
 	byte *p = getAutoPtr(1);
 	p -= _stack.pop();
-	_stack.push(*p);
+	_stack.push((int8)*p);
 }
 
 void Interpreter::cmdLAWA() {
 	byte *p = getAutoPtr(2);
 	p -= _stack.pop();
-	_stack.push(READ_LE_UINT16(p));
+	_stack.push((int16)READ_LE_UINT16(p));
 }
 
 void Interpreter::cmdLADA() {
 	byte *p = getAutoPtr(4);
 	p -= _stack.pop();
-	_stack.push(READ_LE_UINT32(p));
+	_stack.push((int32)READ_LE_UINT32(p));
 }
 
 void Interpreter::cmdSABA() {
@@ -1137,7 +1138,7 @@ void Interpreter::cmdLSB() {
 	_code += 2;
 	byte *srcP = (byte *)_instance + _staticOffset + offset;
 
-	_stack.top() = *srcP;
+	_stack.top() = (int8)*srcP;
 }
 
 void Interpreter::cmdLSW() {
@@ -1201,7 +1202,7 @@ void Interpreter::cmdLSDA() {
 	_code += 2;
 	byte *srcP = (byte *)_instance + _staticOffset + offset + _stack.pop();
 
-	_stack.push(READ_LE_UINT32(srcP));
+	_stack.push((int32)READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdSSBA() {
@@ -1252,7 +1253,7 @@ void Interpreter::cmdLXB() {
 	int objIndex = _stack.pop();
 	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
-	_stack.push(*srcP);
+	_stack.push((int8)*srcP);
 }
 
 void Interpreter::cmdLXW() {
@@ -1266,7 +1267,7 @@ void Interpreter::cmdLXW() {
 	assert(objects[objIndex] != HRES_NULL);
 	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
-	_stack.push(READ_LE_UINT16(srcP));
+	_stack.push((int16)READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLXD() {
@@ -1279,12 +1280,12 @@ void Interpreter::cmdLXD() {
 	int objIndex = _stack.pop();
 	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
-	_stack.push(READ_LE_UINT32(srcP));
+	_stack.push((int32)READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdSXB() {
 	Objects &objects = *_vm->_objects;
-	ULONG val = _stack.pop() & 0xff;
+	ULONG val = _stack.pop();
 
 	ULONG offset = READ_LE_UINT16(_code);
 	_code += 2;
@@ -1294,7 +1295,7 @@ void Interpreter::cmdSXB() {
 	int objIndex = _stack.pop();
 	byte *destP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
 
-	*destP = val;
+	*destP = val & 0xff;
 	_stack.push(val);
 }
 
@@ -1342,7 +1343,7 @@ void Interpreter::cmdLXBA() {
 	int objIndex = v & 0xffff;
 
 	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
-	_stack.push(*srcP);
+	_stack.push((int8)*srcP);
 }
 
 void Interpreter::cmdLXWA() {
@@ -1357,7 +1358,7 @@ void Interpreter::cmdLXWA() {
 	int objIndex = v & 0xffff;
 
 	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
-	_stack.push(READ_LE_UINT16(srcP));
+	_stack.push((int16)READ_LE_UINT16(srcP));
 }
 
 void Interpreter::cmdLXDA() {
@@ -1372,7 +1373,7 @@ void Interpreter::cmdLXDA() {
 	int objIndex = v & 0xffff;
 
 	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
-	_stack.push(READ_LE_UINT32(srcP));
+	_stack.push((int32)READ_LE_UINT32(srcP));
 }
 
 void Interpreter::cmdSXBA() {
