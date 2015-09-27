@@ -68,6 +68,11 @@ public:
 	Parameter &operator|=(int other);
 	bool operator==(Parameter &rhs) const;
 	bool operator!=(Parameter &rhs) const;
+
+	byte *valPtr() const {
+		assert(_ptrConst == nullptr);
+		return (byte *)&_val;
+	}
 };
 
 class Parameters : public Common::Array<Parameter> {
@@ -96,6 +101,7 @@ struct MethodStackEntry {
 	byte *_ds32;
 	byte *_code;
 	uint _stackSize, _stackBase;
+	Common::Array<byte> _autos;
 
 	MethodStackEntry() : _ds32(nullptr), _code(nullptr), _stackSize(0), _stackBase(0) {}
 	MethodStackEntry(byte *ds32, byte *code, int stackSize, int stackBase) :
@@ -185,10 +191,9 @@ private:
 	void printInstruction(int opcode);
 
 	/**
-	 * Gets a stack offset from the script, and convert it to a stack index
-	 * and byte offset within the stack entry
+	 * Gets a pointer either within the autos list, or backwards in the stack for method parameters
 	 */
-	void getStackIndex(int &stackIndex, int &byteNum, int dataSize);
+	byte *getAutoPtr(int dataSize);
 
 	/**
 	 * In case the memory for the object has changed in memory, re-adjust the memory pointers

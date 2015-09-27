@@ -524,6 +524,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	Resources &res = *_vm->_resources;
 	const int OPCODES_COUNT = sizeof(_opcodes) / sizeof(OpcodeMethod);
 	debugC(DEBUG_BASIC, kDebugScripts, "Interpreter::execute(%d, %d, %x)", index, msgNum, (ULONG)vector);
+	assert(_methodStack.empty());
 
 	// Check the passed index
 	if (index == -1)
@@ -588,17 +589,17 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	_offThis = _currentIndex;
 	_breakFlag = false;
 
-	// Store the stack base and set the 'this' index for this execution
-	_stackBase = _stack.size();
-	_stack.push(index);
-
-	// Allocate space for any remaining autos
+	// Set up an initial method stack list entry particularly for storing the autos
 	int count = READ_LE_UINT16(_code);
 	_code += 2;
 	assert(count >= 2);
-	_stack.resize(_stack.size() + ((count - 2) + 3) / 4);
 
-	// Add one final stack entry to act as the "top" of the stack
+	_methodStack.push(MethodStackEntry());
+	_methodStack.top()._autos.resize(count);
+	WRITE_LE_UINT16(&_methodStack.top()._autos[count - 2], index);
+
+	// Add a stack entry to act as the "top" of the stack
+	_stackBase = _stack.size();
 	_stack.push(Parameter());
 
 	// Main opcode execution loop
@@ -615,6 +616,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
 	}
 
 	res.unlock(_hPrg);
+	_methodStack.pop();
 	return _stack.top();
 }
 
@@ -644,26 +646,18 @@ void Interpreter::printInstruction(int opcode) {
 	debugC(DEBUG_BASIC, kDebugScripts, "%s", msg.c_str());
 }
 
-void Interpreter::getStackIndex(int &stackIndex, int &byteNum, int dataSize) {
+byte *Interpreter::getAutoPtr(int dataSize) {
 	int index4 = (int16)READ_LE_UINT16(_code);
 	_code += 2;
 
 	if (index4 <= 0) {
 		// Backwards into the stack for retrieving subroutine parameters
 		assert((index4 % 4) == 0);
-		stackIndex = _stackBase - 1 - ABS(index4) / 4;
-		byteNum = 0;
-	} else if (index4 == 2) {
-		// Specifying the "this"/Index for the script
-		stackIndex = _stackBase;
-		byteNum = 0;
+		return _stack[_stackBase - 1 - ABS(index4) / 4].valPtr();
 	} else {
-		stackIndex = index4 / 4;
-		byteNum = 3 - (index4 - 3) % 4;
-
-		assert((dataSize == 4 && byteNum == 0) ||
-			(dataSize == 2 && (byteNum == 0 || byteNum == 2)) ||
-			dataSize == 1);
+		Common::Array<byte> &autos = _methodStack.top()._autos;
+		assert(index4 <= (int)autos.size());
+		return &autos[autos.size() - index4];
 	}
 }
 
@@ -706,7 +700,7 @@ void Interpreter::cmdBRA() {
 
 void Interpreter::cmdCASE() {
 	// Get value of test expression
-	ULONG v = _stack.pop();
+	ULONG v = _stack.top();
 	int numCases = READ_LE_UINT16(_code);
 	_code += 2;
 
@@ -736,7 +730,7 @@ void Interpreter::cmdNOT() {
 
 void Interpreter::cmdSETB() {
 	ULONG v = _stack.pop();
-	_stack.push(v ? 0xffff : 0);
+	_stack.push(v ? 1 : 0);
 }
 
 void Interpreter::cmdNEG() {
@@ -1001,9 +995,10 @@ void Interpreter::cmdJSR() {
 	uint autosSize = READ_LE_UINT16(_code);
 	_code += 2;
 	assert(autosSize >= 2);
-	_stack.resize(_stack.size() + ((autosSize - 2) + 3) / 4);
+	_methodStack.top()._autos.resize(autosSize);
+	WRITE_LE_UINT16(&_methodStack.top()._autos[autosSize - 2], _currentIndex);
 
-	// Add final parameter slot to act as the stack top
+	// Add a stack entry to act as the stack top for the new method
 	_stack.push(Parameter());
 }
 
@@ -1064,132 +1059,77 @@ void Interpreter::cmdLETA() {
 }
 
 void Interpreter::cmdLAB() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 1);
-	int bitShift = byteNum * 8;
-
-	ULONG v = (_stack[stackIndex] >> bitShift) & 0xff;
-	_stack.top() = v;
+	byte *p = getAutoPtr(1);
+	_stack.top() = *p;
 }
 
 void Interpreter::cmdLAW() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 2);
-
-	ULONG v = _stack[stackIndex];
-	if (byteNum == 2)
-		v >>= 16;
-	else
-		v &= 0xffff;
-
-	_stack.top() = v;
+	byte *p = getAutoPtr(2);
+	_stack.top() = (int16)READ_LE_UINT16(p);
 }
 
 void Interpreter::cmdLAD() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 4);
-
-	ULONG v = _stack[stackIndex];
-	_stack.top() = v;
+	byte *p = getAutoPtr(4);
+	_stack.top() = (int32)READ_LE_UINT32(p);
 }
 
 void Interpreter::cmdSAB() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 1);
-	int bitShift = byteNum * 8;
-
-	ULONG val = _stack[stackIndex];
-	val &= ~(0xff << bitShift);
-	val |= (_stack.top() & 0xff) << bitShift;
-	_stack[stackIndex] = val;
+	byte *p = getAutoPtr(1);
+	*p = _stack.top();
 }
 
 void Interpreter::cmdSAW() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 2);
-
-	if (byteNum == 2)
-		_stack[stackIndex] = ((ULONG)_stack[stackIndex] & 0xffff) | (_stack.top() << 16);
-	else
-		_stack[stackIndex] = ((ULONG)_stack[stackIndex] & 0xffff0000) | (_stack.top() & 0xffff);
+	byte *p = getAutoPtr(2);
+	WRITE_LE_UINT16(p, _stack.top());
 }
 
 void Interpreter::cmdSAD() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 4);
-
-	_stack[stackIndex] = _stack.top();
+	byte *p = getAutoPtr(4);
+	WRITE_LE_UINT32(p, _stack.top());
 }
 
 void Interpreter::cmdLABA() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 4);
-	int subIndex = _stack.pop();
-
-	ULONG v = _stack[stackIndex - subIndex / 4] & (0xff << ((subIndex % 4) * 8));
-	_stack.push(v);
+	byte *p = getAutoPtr(1);
+	p -= _stack.pop();
+	_stack.push(*p);
 }
 
 void Interpreter::cmdLAWA() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 4);
-	int subIndex = _stack.pop();
-
-	ULONG v = (ULONG)_stack[stackIndex - subIndex / 4] & ((subIndex % 4) == 2 ? 0xffff0000 : 0xffff);
-	_stack.push(v);
+	byte *p = getAutoPtr(2);
+	p -= _stack.pop();
+	_stack.push(READ_LE_UINT16(p));
 }
 
 void Interpreter::cmdLADA() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 4);
-	int subIndex = _stack.pop();
-	assert((subIndex % 4) == 0);
-
-	ULONG v = _stack[stackIndex - subIndex / 4];
-	_stack.push(v);
+	byte *p = getAutoPtr(4);
+	p -= _stack.pop();
+	_stack.push(READ_LE_UINT32(p));
 }
 
 void Interpreter::cmdSABA() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 4);
-	uint val = _stack.pop() & 0xffff;
-	int offset = _stack.pop();
-	int bitShift = (offset % 4) * 8;
-
-	_stack[_stackBase - offset / 4] = (_stack[_stackBase - offset / 4] & (0xf << bitShift))
-		| (val << bitShift);
+	byte *p = getAutoPtr(1);
+	uint val = _stack.pop();
+	p -= _stack.pop();
+	*p = val;
 }
 
 void Interpreter::cmdSAWA() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 4);
-	uint val = _stack.pop() & 0xffff;
-	int offset = _stack.pop();
-	int bitShift = (offset % 4) * 8;
-	assert((offset % 2) == 0);
-
-	_stack[_stackBase - offset / 4] = (_stack[_stackBase - offset / 4] & (0xffff << bitShift))
-		| (val << bitShift);
+	byte *p = getAutoPtr(2);
+	uint val = _stack.pop();
+	p -= _stack.pop();
+	WRITE_LE_UINT16(p, val);
 }
 
 void Interpreter::cmdSADA() {
-	int stackIndex, byteNum;
-	getStackIndex(stackIndex, byteNum, 4);
-	int val = _stack.pop();
-	int offset = _stack.pop();
-	assert((offset % 4) == 0);
-
-	_stack[_stackBase - offset / 4] = val;
+	byte *p = getAutoPtr(4);
+	uint val = _stack.pop();
+	p -= _stack.pop();
+	WRITE_LE_UINT32(p, val);
 }
 
 void Interpreter::cmdLEAA() {
-	int offset = READ_LE_UINT16(_code);
-	_code += 2;
-	assert((offset % 4) == 0);
-
-	BYTE *ptr = (BYTE *)&_stack[_stackBase + (offset / 4)];
-	_stack.pop();
-	_stack.push(ptr);
+	byte *p = getAutoPtr(1);
+	_stack.top() = p;
 }
 
 void Interpreter::cmdLSB() {
@@ -1205,7 +1145,7 @@ void Interpreter::cmdLSW() {
 	_code += 2;
 	byte *srcP = (byte *)_instance + _staticOffset + offset;
 
-	_stack.top() = READ_LE_UINT16(srcP);
+	_stack.top() = (int16)READ_LE_UINT16(srcP);
 }
 
 void Interpreter::cmdLSD() {
@@ -1213,7 +1153,7 @@ void Interpreter::cmdLSD() {
 	_code += 2;
 	byte *srcP = (byte *)_instance + _staticOffset + offset;
 
-	_stack.top() = READ_LE_UINT32(srcP);
+	_stack.top() = (int32)READ_LE_UINT32(srcP);
 }
 
 void Interpreter::cmdSSB() {
