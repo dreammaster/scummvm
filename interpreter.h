@@ -184,11 +184,18 @@ private:
 	UWORD _externOffset;
 	bool _breakFlag;
 	const MV_entry *_currentVector;
+	Common::String _instruction;
+	Common::StringArray _instructionParams;
 private:
 	/**
-	 * When debug information is turned on, prints out the details of the current instruction
+	 * When debug information is turned on, start forming an instruction line for printing
 	 */
-	void printInstruction(int opcode);
+	void formInstruction();
+
+	/**
+	 * When debug information is turned on, print out the instruction line
+	 */
+	void printInstruction();
 
 	/**
 	 * Gets a pointer either within the autos list, or backwards in the stack for method parameters
