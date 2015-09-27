@@ -177,6 +177,7 @@ void TextWindow::sPrint(const Common::String &format, const Parameters &params) 
 	int paramIndex = 0;
 
 	selectTextWindow();
+	_textBuffer = "";
 
 	p = (const byte *)format.c_str();
 
