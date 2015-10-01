@@ -443,9 +443,11 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 			objects.createSOPinstance(CD->name, index);
 		}
 
+		// Restore static data for the object from either a text file or binary file
 		if (txttype) {
 			restoreStaticContext(objects[index], TF);
 		} else if (CD->size) {
+			warning("%d - %d - %d", index, f.pos(), CD->size);
 			f.read((byte *)Resources::addr(objects[index]) + sizeof(IHDR), CD->size);
 		}
 
@@ -456,6 +458,7 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 		}
 	}
 
+	// Close the file
 	if (txttype)
 		delete TF;
 	else
