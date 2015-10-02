@@ -221,7 +221,16 @@ void Window::drawDot(const Common::Point &pt, byte color) {
 }
 
 void Window::drawLine(const Common::Point &src, const Common::Point &dest, byte color) {
-	error("TODO: drawLine");
+	if (src.y == dest.y) {
+		_surface.hLine(MIN(src.x, dest.x), src.y, MAX(src.x, dest.x), color);
+	} else if (src.x == dest.x) {
+		_surface.vLine(src.x, MIN(src.y, dest.y), MAX(src.y, dest.y), color);
+	} else {
+		error("Diagonal drawLine not yet supported");
+	}
+
+	addDirtyRect(Common::Rect(MIN(src.x, dest.x), MIN(src.x, src.y),
+		MAX(src.x, dest.x), MAX(src.y, dest.y)));
 }
 
 void Window::drawRect(const Common::Rect &r, byte color) {
