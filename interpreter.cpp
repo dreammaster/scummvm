@@ -934,7 +934,8 @@ void Interpreter::cmdRCRS() {
 }
 
 void Interpreter::cmdCALL() {
-	_currentThis = _currentIndex;
+	// This is a convenient place to allow the event manager to handle pending events
+	_vm->_events->pollEventsAndWait();
 
 	// Load the arguments in reverse so they'll be in the correct order
 	Parameters params;
@@ -949,6 +950,7 @@ void Interpreter::cmdCALL() {
 	printInstruction();
 
 	// Handle the call
+	_currentThis = _currentIndex;
 	uint stackSize = _stack.size();
 	int result = (this->*_methods[methodNum & 0xffff])(params);
 
