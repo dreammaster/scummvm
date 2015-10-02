@@ -857,14 +857,14 @@ void Interpreter::cmdSHR() {
 }
 
 void Interpreter::cmdLT() {
-	ULONG v1 = _stack.pop();
-	ULONG v2 = _stack.pop();
+	LONG v1 = _stack.pop();
+	LONG v2 = _stack.pop();
 	_stack.push(v2 < v1 ? 1 : 0);
 }
 
 void Interpreter::cmdLE() {
-	ULONG v1 = _stack.pop();
-	ULONG v2 = _stack.pop();
+	LONG v1 = _stack.pop();
+	LONG v2 = _stack.pop();
 	_stack.push(v2 <= v1 ? 1 : 0);
 }
 
@@ -881,14 +881,14 @@ void Interpreter::cmdNE() {
 }
 
 void Interpreter::cmdGE() {
-	ULONG v1 = _stack.pop();
-	ULONG v2 = _stack.pop();
+	LONG v1 = _stack.pop();
+	LONG v2 = _stack.pop();
 	_stack.push(v2 >= v1 ? 1 : 0);
 }
 
 void Interpreter::cmdGT() {
-	ULONG v1 = _stack.pop();
-	ULONG v2 = _stack.pop();
+	LONG v1 = _stack.pop();
+	LONG v2 = _stack.pop();
 	_stack.push(v2 > v1 ? 1 : 0);
 }
 
