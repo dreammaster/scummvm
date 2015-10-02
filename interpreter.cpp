@@ -970,9 +970,7 @@ void Interpreter::cmdSEND() {
 	printInstruction();
 
 	for (int idx = 0; idx < argCount; ++idx)
-		params.insert_at(0, _stack.pop());
-	for (int idx = 0; idx < argCount; ++idx)
-		interp->addArgument(params[idx]);
+		interp->addArgument(_stack.pop());
 
 	// Get the execution parameters
 	int msgNum = READ_LE_UINT16(_code);
