@@ -133,11 +133,10 @@ public:
 	 */
 	void print(PrintOperation operation, const Common::String &format, const Parameters &params);
 
-	void vsprint(const char *format, va_list argptr);
-
-	void print(const char *format, ...);
-
-	void sPrint(const Common::String &format, const Parameters &params);
+	/**
+	 * Main function for AESOP text output
+	 */
+	void vsprint(const Common::String &format, const Parameters &params);
 
 	void crout();
 };

@@ -161,15 +161,7 @@ uint TextWindow::fontHeight() {
 	return _font._charHeight;
 }
 
-void TextWindow::vsprint(const char *format, va_list argptr) {
-	error("vsprint");
-}
-
-void TextWindow::print(const char *format, ...) {
-	error("print");
-}
-
-void TextWindow::sPrint(const Common::String &format, const Parameters &params) {
+void TextWindow::vsprint(const Common::String &format, const Parameters &params) {
 	Resources &res = *_vm->_resources;
 	Screen &screen = *_vm->_screen;
 	unsigned char c;
@@ -253,7 +245,7 @@ void TextWindow::sPrint(const Common::String &format, const Parameters &params) 
 			break;
 		}
 	}
-	
+
 	// Print out the message
 	printBuffer(0);
 
@@ -262,7 +254,7 @@ void TextWindow::sPrint(const Common::String &format, const Parameters &params) 
 }
 
 void TextWindow::crout() {
-	sPrint("%s", Parameter("\n"));
+	vsprint("%s", Parameter("\n"));
 }
 
 void TextWindow::print(PrintOperation operation, const Common::String &format, const Parameters &params) {

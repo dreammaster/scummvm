@@ -2010,7 +2010,27 @@ Parameter Interpreter::home(Parameters params) {
 }
 
 Parameter Interpreter::print(Parameters params) {
-	error("TODO: version of print() method accepting parameter array");
+	Resources &res = *_vm->_resources;
+	Screen &screen = *_vm->_screen;
+	uint windNum = params.pop();
+	uint format = params.pop();
+
+	HRES hString = res.get_resource_handle(format, DA_DEFAULT);
+	res.lock(hString);
+	const char *p = (const char *)Resources::addr(hString);
+
+	switch (READ_LE_UINT16(p)) {
+	case ':S':
+		p += 2;
+		break;
+	default:
+		error(MSG_SRRP);
+	}
+	Common::String sFormat(p);
+
+	screen.textWindows(windNum).vsprint(sFormat.c_str(), params);
+
+	res.unlock(hString);
 	return Parameter();
 }
 
@@ -2018,7 +2038,7 @@ Parameter Interpreter::sPrint(Parameters params) {
 	int textWin = params.pop();
 	const char *format = params.pop();
 
-	_vm->_screen->textWindows(textWin).sPrint(format, params);
+	_vm->_screen->textWindows(textWin).vsprint(format, params);
 	return Parameter();
 }
 

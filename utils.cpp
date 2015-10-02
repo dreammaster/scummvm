@@ -110,15 +110,10 @@ bool aesop_ispunct(const char c) {
 }
 
 void dprint(LONG argcnt, const char *format, ...) {
-	va_list argptr;
-
-	va_start(argptr, format);
-
+	error("TODO: convert to using Parameters");
 	_vm->_screen->textWindows(0).textColor(15, DK_RED);
 	_vm->_screen->textWindows(0).textColor(0, 255);
-	_vm->_screen->textWindows(0).vsprint(format, argptr);
-
-	va_end(argptr);
+//	_vm->_screen->textWindows(0).vsprint(format, params);
 }
 
 void aprint(LONG argcnt, const char *format, ...) {
