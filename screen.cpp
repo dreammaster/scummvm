@@ -126,7 +126,8 @@ Screen::Screen(AesopEngine *vm): Window(Common::Point(AESOP_SCREEN_WIDTH, AESOP_
 }
 
 Screen::~Screen() {
-	for (uint idx = 0; idx < _windows.size(); ++idx)
+	// Delete all the windows except for the first, which is the screen itself, and is already being freed
+	for (uint idx = 1; idx < _windows.size(); ++idx)
 		delete _windows[idx];
 
 	_bitmapBuffer.free();
