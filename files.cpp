@@ -447,7 +447,6 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 		if (txttype) {
 			restoreStaticContext(objects[index], TF);
 		} else if (CD->size) {
-			warning("%d - %d - %d", index, f.pos(), CD->size);
 			f.read((byte *)Resources::addr(objects[index]) + sizeof(IHDR), CD->size);
 		}
 

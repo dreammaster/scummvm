@@ -111,7 +111,7 @@ void ShapeFrame::draw(Pane &pane, const Common::Point &pt) {
 			}
 		}
 
-		assert(xp == 0 || xp == (drawBounds.right + 1));
+		//assert(xp == 0 || xp == (drawBounds.right + 1));
 	}
 }
 
