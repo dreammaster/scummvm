@@ -117,7 +117,7 @@ void ShapeFrame::draw(Pane &pane, const Common::Point &pt) {
 
 void ShapeFrame::transform(Pane &pane, const Common::Point &pt, const byte *pixels, int rot, 
 		int xScale, int yScale, uint flags) {
-	error("TODO: transform");
+	warning("TODO: transform");
 }
 
 uint32 ShapeFrame::getBounds() const {
@@ -165,7 +165,71 @@ int ShapeFrame::visibleBitmapRect(int x1, int y1, int mirror, uint16 *bounds) {
 }
 
 void ShapeFrame::visibleRectangle(int hotX, int hotY, int mirror, int *rectangle) {
-	error("TODO: VFX_shape_visible_rectangle");
+	Common::Rect vpt;
+	vpt.left = vpt.top = 0x7FFF;
+	vpt.right = vpt.bottom = -0x7FFF;
+
+	// Main loop to decode data and figure out the shape size
+	const byte *srcP = _data + 24;
+	byte cmd;
+	bool bit0;
+	int16 xp, yp;
+
+	for (yp = hotY + top; yp <= hotY + bottom; ++yp) {
+		xp = hotX + left;
+		for (;;) {
+			cmd = *srcP++;
+			bit0 = cmd & 1;
+			cmd >>= 1;
+
+			if (!bit0 && cmd != 0) {
+				// Run length packet
+				srcP++;
+				vpt.left = MIN(vpt.left, xp);
+				vpt.right = MAX((int)vpt.right, xp + cmd);
+				vpt.top = MIN(vpt.top, yp);
+				vpt.bottom = MAX(vpt.bottom, yp);
+				xp += cmd;
+			} else if (cmd != 0) {
+				// String Packet
+				srcP += cmd;
+				vpt.left = MIN(vpt.left, xp);
+				vpt.right = MAX((int)vpt.right, xp + cmd);
+				vpt.top = MIN(vpt.top, yp);
+				vpt.bottom = MAX(vpt.bottom, yp);
+				xp += cmd;
+			} else if (!bit0) {
+				// End Packet - end of line reached
+				break;
+			} else {
+				// Skip Packet
+				cmd = *srcP++;
+				xp += cmd;
+			}
+		}
+	}
+
+	// Adjust for mirroring
+	if (mirror & X_MIRROR) {
+		int x0 = hotX * 2 - vpt.right;
+		int x1 = hotX * 2 - vpt.left;
+		vpt.left = x0;
+		vpt.right = x1;
+	}
+
+	if (mirror & Y_MIRROR) {
+		int y0 = hotY * 2 - vpt.bottom;
+		int y1 = hotY * 2 - vpt.top;
+		vpt.top = y0;
+		vpt.bottom = y1;
+	}
+
+	// Save the calculated coordinates
+	assert(vpt.isValidRect());
+	*rectangle++ = vpt.left;
+	*rectangle++ = vpt.top;
+	*rectangle++ = vpt.right;
+	*rectangle++ = vpt.bottom;
 }
 
 /*----------------------------------------------------------------*/
