@@ -69,11 +69,11 @@ void Font::clear() {
 }
 
 int Font::characterDraw(const Common::Point &pt, Pane &pane, char c, byte *colorTranslate) {
-	Common::Point drawPt(pane.left + pt.x, pane.top + pt.y);
-	Graphics::Surface charSurface = pane.getArea(Common::Rect(drawPt.x, drawPt.y,
-		drawPt.x + charWidth(c), drawPt.y + _charHeight));
+	Graphics::Surface charSurface = pane.getArea(Common::Rect(pt.x, pt.y,
+		pt.x + charWidth(c), pt.y + _charHeight));
 	const byte *srcP = _chars[c] + 4;
 
+	Common::Point drawPt(pane.left + pt.x, pane.top + pt.y);
 	for (int yp = 0, yPos = drawPt.y; yp < charSurface.h; ++yp, ++yPos) {
 		byte *destP = (byte *)charSurface.getBasePtr(0, yp);
 
@@ -260,8 +260,7 @@ void TextWindow::crout() {
 void TextWindow::print(PrintOperation operation, const Common::String &format, const Parameters &params) {
 	if (operation == BUF) {
 		_textBuffer = aesop_vsprintf(format, params);
-	}
-	else if (operation == APP) {
+	} else if (operation == APP) {
 		_textBuffer += aesop_vsprintf(format, params);
 	}
 }
@@ -354,32 +353,32 @@ void TextWindow::printBuffer(int lineNum) {
 
 void TextWindow::cout(char c) {
 	Pane &pane = window();
-	int c_vTab, n_vTab;
+	int cvTab, nvTab, hTab;
 
 	if (c == '\n') {
-		_hTab = _hTab = pane.left;    // Carriage Return
+		hTab = _hTab = pane.left;    // Carriage Return
 
-		c_vTab = _vTab - pane.top;
-		c_vTab += _font._charHeight;
+		cvTab = _vTab - pane.top;
+		cvTab += _font._charHeight;
 
-		n_vTab = c_vTab + _font._charHeight;
+		nvTab = cvTab + _font._charHeight;
 
-		if (n_vTab > pane.bottom - pane.top) {
+		if (nvTab > pane.bottom - pane.top) {
 			if (_continueFunction != NULL) {
 				if (((*_continueFunction)(_hTab)) == 0) {
-					_hTab = _hTab;
+					_hTab = hTab;
 					return;
 				}
 			}
-			_hTab = _hTab;
+			_hTab = hTab;
 
-			pane.scroll(Common::Point(0, -_font._charHeight), PS_NOWRAP,
-			                                _font._fontBackground);
+			pane.scroll(Common::Point(0, -_font._charHeight), PS_NOWRAP, _font._fontBackground);
 		} else {
 			_vTab += _font._charHeight;
 		}
 	} else if (c == '\r') {
-		_hTab = pane.left;    // Carriage Return
+		// Carriage Return
+		_hTab = pane.left;
 	} else {
 		_hTab += _font.characterDraw(Common::Point(_hTab - pane.left, _vTab - pane.top),
 			pane, c, _lookaside);

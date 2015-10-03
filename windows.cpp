@@ -159,7 +159,7 @@ void Pane::scroll(const Common::Point &delta, PaneScroll flags, byte background)
 
 Graphics::Surface Pane::getArea(const Common::Rect &r) {
 	Common::Rect bounds = r;
-	bounds.translate(-left, -top);
+	bounds.translate(left, top);
 	return _window->getArea(bounds);
 }
 
