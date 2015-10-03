@@ -130,6 +130,9 @@ Screen::~Screen() {
 	for (uint idx = 1; idx < _windows.size(); ++idx)
 		delete _windows[idx];
 
+	for (uint idx = 0; idx < _panes.size(); ++idx)
+		delete _panes[idx];
+
 	_bitmapBuffer.free();
 }
 
