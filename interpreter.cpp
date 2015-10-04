@@ -718,9 +718,10 @@ void Interpreter::cmdBRT() {
 }
 
 void Interpreter::cmdBRF() {
+	_instructionParams.push_back(Common::String::format("%.4x", READ_LE_UINT16(_code)));
+
 	if (!(ULONG)_stack.top()) {
 		// Branch
-		_instructionParams.push_back(Common::String::format("%.4x", READ_LE_UINT16(_code)));
 		_code = _ds32 + READ_LE_UINT16(_code);
 	} else {
 		// Don't branch
