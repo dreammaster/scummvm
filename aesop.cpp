@@ -115,7 +115,7 @@ void *AesopEngine::memAlloc(uint bytes) {
 	void *ptr = (void *)malloc(bytes);
 	assert(ptr);
 
-	_memChecksum ^= (uint)ptr;
+	_memChecksum ^= (intptr_t)ptr;
 
 	return ptr;
 }
@@ -130,7 +130,7 @@ char *AesopEngine::strAlloc(const char *str) {
 }
 
 void AesopEngine::memFree(void *ptr) {
-	_memChecksum ^= (uint)ptr;
+	_memChecksum ^= (intptr_t)ptr;
 
 	free(ptr);
 }

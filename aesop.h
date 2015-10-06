@@ -69,7 +69,7 @@ struct AesopGameDescription;
 class AesopEngine : public Engine {
 private:
 	Common::RandomSource _randomSource;
-	uint _memChecksum;
+	intptr_t _memChecksum;
 
 	/**
 	 * Initialize the engine
