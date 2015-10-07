@@ -519,7 +519,7 @@ void Interpreter::addArgument(const Parameter &param) {
 	_stack.push(param);
 }
 
-LONG Interpreter::execute(LONG index, LONG msgNum, HRES vector) {
+LONG Interpreter::execute(LONG index, LONG msgNum, const MV_entry *vector) {
 	Objects &objects = *_vm->_objects;
 	Resources &res = *_vm->_resources;
 	const int OPCODES_COUNT = sizeof(_opcodes) / sizeof(OpcodeMethod);
@@ -1023,7 +1023,7 @@ void Interpreter::cmdPASS() {
 		interp->addArgument(params[idx]);
 
 	// Execute the parent vector
-	int result = interp->execute(_currentIndex, _currentMsg, (HRES)newVector);
+	int result = interp->execute(_currentIndex, _currentMsg, newVector);
 	delete interp;
 	deref();
 

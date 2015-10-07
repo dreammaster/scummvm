@@ -466,7 +466,7 @@ public:
 	static const char *lookup(HRES dictionary, const Common::String &key);
 
 	void addArgument(const Parameter &param);
-	LONG execute(LONG index, LONG msgNum, HRES vector = HRES_NULL);
+	LONG execute(LONG index, LONG msgNum, const MV_entry *vector = (const MV_entry *)HRES_NULL);
 };
 
 } // End of namespace Aesop
