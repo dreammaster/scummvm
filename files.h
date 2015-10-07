@@ -82,7 +82,7 @@ public:
 	/**
 	 * Read data from the file
 	 */
-	uint read(void *buffer, uint size);
+	uint read(void *buffer, uint bufSize);
 
 	/**
 	 * Read a single byte from the file
@@ -92,7 +92,7 @@ public:
 	/**
 	 * Write data to the file
 	 */
-	uint write(const void *buffer, uint size);
+	uint write(const void *buffer, uint bufSize);
 
 	/**
 	 * Write a single byte to the file

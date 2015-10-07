@@ -7,7 +7,6 @@ MODULE_OBJS = \
 	events.o \
 	eye.o \
 	files.o \
-	gil2vfx.o \
 	gil2vfxa.o \
 	interpreter.o \
 	intrface.o \

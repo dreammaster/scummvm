@@ -261,7 +261,7 @@ void Window::refresh(const Common::Rect &r) {
 
 	for (int yp = bounds.top; yp <= bounds.bottom; ++yp) {
 		const byte *srcP = (const byte *)getBasePtr(bounds.left, bounds.top);
-		byte *destP = (byte *)_vm->_screen->getBasePtr(0, yp - bounds.top);
+		byte *destP = (byte *)destSurface.getBasePtr(0, yp - bounds.top);
 		Common::copy(srcP, srcP + (bounds.right - bounds.left + 1), destP);
 	}
 }

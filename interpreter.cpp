@@ -86,14 +86,14 @@ bool Parameter::operator==(Parameter &rhs) const {
 		// Left hand side is a pointer
 		void *ptr = rhs._ptr;
 		if (ptr == nullptr) {
-			assert(rhs._val == (ULONG)-1 || rhs._val == 0);
+			assert(rhs._val == (uint32)-1 || rhs._val == 0);
 			ptr = rhs._val == 0 ? nullptr : HRES_NULL;
 		}
 
 		return _ptr == ptr;
 	} else if (rhs._ptr != nullptr) {
 		// Right hand side is a pointer
-		assert(_val == (ULONG)-1 || _val == 0);
+		assert(_val == (uint32)-1 || _val == 0);
 		void *ptr = _val == 0 ? nullptr : HRES_NULL;
 		return rhs._ptr == ptr;
 	} else {
@@ -519,11 +519,11 @@ void Interpreter::addArgument(const Parameter &param) {
 	_stack.push(param);
 }
 
-LONG Interpreter::execute(LONG index, LONG msgNum, const MV_entry *vector) {
+LONG Interpreter::execute(int index, uint msgNum, const MV_entry *vector) {
 	Objects &objects = *_vm->_objects;
 	Resources &res = *_vm->_resources;
 	const int OPCODES_COUNT = sizeof(_opcodes) / sizeof(OpcodeMethod);
-	debugC(DEBUG_BASIC, kDebugScripts, "Interpreter::execute(%d, %d, %x)", index, msgNum, (ULONG)vector);
+	debugC(DEBUG_BASIC, kDebugScripts, "Interpreter::execute(%d, %u, %p)", index, msgNum, (const void *)vector);
 	assert(_methodStack.empty());
 
 	// Check the passed index
@@ -551,7 +551,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, const MV_entry *vector) {
 		int idx;
 		for (idx = 0; mvList[(maxMsg + idx) / 2].msg != msgNum;) {
 			int offset = (maxMsg + idx) / 2;
-			int msg = mvList[offset].msg;
+			uint msg = mvList[offset].msg;
 
 			if (msg > msgNum) {
 				// Too high
@@ -573,7 +573,7 @@ LONG Interpreter::execute(LONG index, LONG msgNum, const MV_entry *vector) {
 			--_currentVector;
 		} while (_currentVector > mvList && (_currentVector - 1)->msg == msgNum);
 	} else {
-		_currentVector = (MV_entry *)vector;
+		_currentVector = vector;
 	}
 
 	const SD_entry *sdEntry = (const SD_entry *)((const byte *)_thunk + _currentVector->SD_offset);
@@ -626,7 +626,7 @@ void Interpreter::formInstruction() {
 		return;
 
 	int opcode = *_code;
-	_instruction = Common::String::format("%.4x %s", _code - _ds32, OPCODE_NAMES[opcode]);
+	_instruction = Common::String::format("%.4x %s", (uint)(_code - _ds32), OPCODE_NAMES[opcode]);
 	_instruction += "(%s)";
 		
 	if (gDebugLevel == DEBUG_INTERMEDIATE) {
@@ -641,7 +641,7 @@ void Interpreter::formInstruction() {
 			if ((BYTE *)_stack[idx] != nullptr)
 				_instruction += "PTR";
 			else
-				_instruction += Common::String::format("%x", (ULONG)_stack[idx]);
+				_instruction += Common::String::format("%x", (uint)_stack[idx]);
 		}
 
 		_instruction += "| |";
@@ -671,7 +671,7 @@ void Interpreter::printInstruction() {
 	}
 
 	Common::String msg = Common::String::format(_instruction.c_str(), params.c_str());
-	debugC(DEBUG_BASIC, kDebugScripts, msg.c_str());
+	debugC(DEBUG_BASIC, kDebugScripts, "%s", msg.c_str());
 
 	_instruction = "";
 	_instructionParams.clear();
@@ -680,7 +680,7 @@ void Interpreter::printInstruction() {
 byte *Interpreter::getAutoPtr(int dataSize) {
 	int index4 = (int16)READ_LE_UINT16(_code);
 	_code += 2;
-	_instructionParams.push_back(Common::String::format("%.4x", index4));
+	_instructionParams.push_back(Common::String::format("%.4x", (uint)index4));
 
 	if (index4 <= 0) {
 		// Backwards into the stack for retrieving subroutine parameters
@@ -709,7 +709,7 @@ void Interpreter::deref() {
 void Interpreter::cmdBRT() {
 	if ((ULONG)_stack.top()) {
 		// Branch
-		_instructionParams.push_back(Common::String::format("%.4x", READ_LE_UINT16(_code)));
+		_instructionParams.push_back(Common::String::format("%.4x", (uint)READ_LE_UINT16(_code)));
 		_code = _ds32 + READ_LE_UINT16(_code);
 	} else {
 		// Don't branch
@@ -718,7 +718,7 @@ void Interpreter::cmdBRT() {
 }
 
 void Interpreter::cmdBRF() {
-	_instructionParams.push_back(Common::String::format("%.4x", READ_LE_UINT16(_code)));
+	_instructionParams.push_back(Common::String::format("%.4x", (uint)READ_LE_UINT16(_code)));
 
 	if (!(ULONG)_stack.top()) {
 		// Branch
@@ -730,7 +730,7 @@ void Interpreter::cmdBRF() {
 }
 
 void Interpreter::cmdBRA() {
-	_instructionParams.push_back(Common::String::format("%.4x", READ_LE_UINT16(_code)));
+	_instructionParams.push_back(Common::String::format("%.4x", (uint)READ_LE_UINT16(_code)));
 	_code = _ds32 + READ_LE_UINT16(_code);
 }
 
@@ -907,14 +907,14 @@ void Interpreter::cmdSHTC() {
 }
 
 void Interpreter::cmdINTC() {
-	uint16 v = READ_LE_UINT16(_code);
+	uint v = READ_LE_UINT16(_code);
 	_instructionParams.push_back(Common::String::format("%.4x", v));
 	_code += 2;
 	_stack.top() = v;
 }
 
 void Interpreter::cmdLNGC() {
-	uint32 v = READ_LE_UINT32(_code);
+	uint v = READ_LE_UINT32(_code);
 	_instructionParams.push_back(Common::String::format("%.8x", v));
 	_code += 4;
 	_stack.top() = v;
@@ -976,7 +976,7 @@ void Interpreter::cmdSEND() {
 		interp->addArgument(_stack.pop());
 
 	// Get the execution parameters
-	int msgNum = READ_LE_UINT16(_code);
+	uint msgNum = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", msgNum));
 
@@ -987,8 +987,8 @@ void Interpreter::cmdSEND() {
 	delete interp;
 	deref();
 
-	debugC(DEBUG_BASIC, kDebugScripts, "Interpreter::execute(%d, %d, %x) resuming",
-		_currentIndex, _currentMsg, (ULONG)_currentVector);
+	debugC(DEBUG_BASIC, kDebugScripts, "Interpreter::execute(%d, %u, %p) resuming",
+		_currentIndex, _currentMsg, (const void *)_currentVector);
 
 	// Push the result onto the stack of the current interpreter
 	_stack.push(result);
@@ -1027,8 +1027,8 @@ void Interpreter::cmdPASS() {
 	delete interp;
 	deref();
 
-	debugC(DEBUG_BASIC, kDebugScripts, "Interpreter::execute(%d, %d, %x) resuming",
-		_currentIndex, _currentMsg, (ULONG)_currentVector);
+	debugC(DEBUG_BASIC, kDebugScripts, "Interpreter::execute(%d, %u, %p) resuming",
+		_currentIndex, _currentMsg, (const void *)_currentVector);
 
 	// Restore saved fields, and push the result onto the stack
 	_currentVector = oldVector;
@@ -1037,7 +1037,7 @@ void Interpreter::cmdPASS() {
 
 void Interpreter::cmdJSR() {
 	// Get the subroutine method offset, and save details for where to resume
-	uint16 methodOffset = READ_LE_UINT16(_code);
+	uint methodOffset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", methodOffset));
 
@@ -1078,8 +1078,8 @@ void Interpreter::cmdRTS() {
 }
 
 void Interpreter::cmdAIM() {
-	ULONG v1 = _stack.pop() & 0xffff;
-	ULONG v2 = READ_LE_UINT16(_code);
+	uint v1 = _stack.pop() & 0xffff;
+	uint v2 = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", v2));
 
@@ -1088,8 +1088,8 @@ void Interpreter::cmdAIM() {
 }
 
 void Interpreter::cmdAIS() {
-	ULONG v1 = _stack.pop() & 0xffff;
-	ULONG v2 = *_code++;
+	uint v1 = _stack.pop() & 0xffff;
+	uint v2 = *_code++;
 	_instructionParams.push_back(Common::String::format("%.2x", v2));
 
 	int index = v1 << v2;
@@ -1097,7 +1097,7 @@ void Interpreter::cmdAIS() {
 }
 
 void Interpreter::cmdLTBA() {
-	uint32 offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1106,7 +1106,7 @@ void Interpreter::cmdLTBA() {
 }
 
 void Interpreter::cmdLTWA() {
-	uint32 offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1124,7 +1124,7 @@ void Interpreter::cmdLTDA() {
 }
 
 void Interpreter::cmdLETA() {
-	uint32 offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1208,7 +1208,7 @@ void Interpreter::cmdLEAA() {
 }
 
 void Interpreter::cmdLSB() {
-	uint32 offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1217,7 +1217,7 @@ void Interpreter::cmdLSB() {
 }
 
 void Interpreter::cmdLSW() {
-	uint32 offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1226,7 +1226,7 @@ void Interpreter::cmdLSW() {
 }
 
 void Interpreter::cmdLSD() {
-	uint32 offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1235,7 +1235,7 @@ void Interpreter::cmdLSD() {
 }
 
 void Interpreter::cmdSSB() {
-	uint32 offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1244,7 +1244,7 @@ void Interpreter::cmdSSB() {
 }
 
 void Interpreter::cmdSSW() {
-	uint32 offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1253,7 +1253,7 @@ void Interpreter::cmdSSW() {
 }
 
 void Interpreter::cmdSSD() {
-	uint32 offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1262,7 +1262,7 @@ void Interpreter::cmdSSD() {
 }
 
 void Interpreter::cmdLSBA() {
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1271,7 +1271,7 @@ void Interpreter::cmdLSBA() {
 }
 
 void Interpreter::cmdLSWA() {
-	LONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1280,7 +1280,7 @@ void Interpreter::cmdLSWA() {
 }
 
 void Interpreter::cmdLSDA() {
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1289,8 +1289,8 @@ void Interpreter::cmdLSDA() {
 }
 
 void Interpreter::cmdSSBA() {
-	ULONG val = _stack.pop();
-	ULONG offset = READ_LE_UINT16(_code);
+	uint val = _stack.pop();
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1300,8 +1300,8 @@ void Interpreter::cmdSSBA() {
 }
 
 void Interpreter::cmdSSWA() {
-	ULONG val = _stack.pop();
-	ULONG offset = READ_LE_UINT16(_code);
+	uint val = _stack.pop();
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1311,8 +1311,8 @@ void Interpreter::cmdSSWA() {
 }
 
 void Interpreter::cmdSSDA() {
-	ULONG val = _stack.pop();
-	ULONG offset = READ_LE_UINT16(_code);
+	uint val = _stack.pop();
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1322,7 +1322,7 @@ void Interpreter::cmdSSDA() {
 }
 
 void Interpreter::cmdLESA() {
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1332,7 +1332,7 @@ void Interpreter::cmdLESA() {
 
 void Interpreter::cmdLXB() {
 	Objects &objects = *_vm->_objects;
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1346,7 +1346,7 @@ void Interpreter::cmdLXB() {
 
 void Interpreter::cmdLXW() {
 	Objects &objects = *_vm->_objects;
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1362,12 +1362,12 @@ void Interpreter::cmdLXW() {
 
 void Interpreter::cmdLXD() {
 	Objects &objects = *_vm->_objects;
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	ULONG instanceOffset = READ_LE_UINT16(instP);
+	uint instanceOffset = READ_LE_UINT16(instP);
 
 	int objIndex = _stack.pop();
 	byte *srcP = (byte *)Resources::addr(objects[objIndex]) + instanceOffset;
@@ -1379,7 +1379,7 @@ void Interpreter::cmdSXB() {
 	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1397,7 +1397,7 @@ void Interpreter::cmdSXW() {
 	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1415,7 +1415,7 @@ void Interpreter::cmdSXD() {
 	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1431,7 +1431,7 @@ void Interpreter::cmdSXD() {
 
 void Interpreter::cmdLXBA() {
 	Objects &objects = *_vm->_objects;
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1448,7 +1448,7 @@ void Interpreter::cmdLXBA() {
 
 void Interpreter::cmdLXWA() {
 	Objects &objects = *_vm->_objects;
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1465,7 +1465,7 @@ void Interpreter::cmdLXWA() {
 
 void Interpreter::cmdLXDA() {
 	Objects &objects = *_vm->_objects;
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1484,7 +1484,7 @@ void Interpreter::cmdSXBA() {
 	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1504,7 +1504,7 @@ void Interpreter::cmdSXWA() {
 	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1524,7 +1524,7 @@ void Interpreter::cmdSXDA() {
 	Objects &objects = *_vm->_objects;
 	ULONG val = _stack.pop();
 
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
@@ -1542,12 +1542,12 @@ void Interpreter::cmdSXDA() {
 
 void Interpreter::cmdLEXA() {
 	Objects &objects = *_vm->_objects;
-	ULONG offset = READ_LE_UINT16(_code);
+	uint offset = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", offset));
 
 	byte *instP = (byte *)_thunk + _externOffset + offset;
-	ULONG instanceOffset = READ_LE_UINT16(instP);
+	uint instanceOffset = READ_LE_UINT16(instP);
 
 	ULONG v = _stack.pop();
 	instanceOffset += v >> 16;
@@ -1563,7 +1563,7 @@ void Interpreter::cmdSXAS() {
 }
 
 void Interpreter::cmdLECA() {
-	ULONG val = READ_LE_UINT16(_code);
+	uint val = READ_LE_UINT16(_code);
 	_code += 2;
 	_instructionParams.push_back(Common::String::format("%.4x", val));
 

@@ -86,11 +86,11 @@ void BinaryFile::close() {
 	_outSave = nullptr;
 }
 
-uint BinaryFile::read(void *buffer, uint size) {
+uint BinaryFile::read(void *buffer, uint bufSize) {
 	if (_inSave)
-		return _inSave->read(buffer, size);
+		return _inSave->read(buffer, bufSize);
 	else
-		return _inFile.read(buffer, size);
+		return _inFile.read(buffer, bufSize);
 }
 
 byte BinaryFile::readByte() {
@@ -102,9 +102,9 @@ byte BinaryFile::readByte() {
 	return v;
 }
 
-uint BinaryFile::write(const void *buffer, uint size) {
+uint BinaryFile::write(const void *buffer, uint bufSize) {
 	assert(_outSave);
-	return _outSave->write(buffer, size);
+	return _outSave->write(buffer, bufSize);
 }
 
 void BinaryFile::writeByte(byte v) {
@@ -374,10 +374,6 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 	CDESC stat_C;
 	CDESC *CD;
 
-	UWORD CDslot;       // object list index
-	ULONG CDname;       // code object name
-	UWORD CDsize;       // size of instance data (unused in text files)
-
 	txttype = 0;
 	bad = 0;
 
@@ -399,7 +395,7 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 	}
 
 	if (bad)
-		error(MSG_CNOCF, filename);          //"Could not open context file '%s'"
+		error(MSG_CNOCF, filename.c_str());          //"Could not open context file '%s'"
 
 	for (index = first; index <= last; index++) {
 		cur = objects[index];
@@ -414,11 +410,7 @@ void Files::restoreRange(const Common::String &filename, uint first, uint last, 
 		}
 
 		if ((bad) || (CD->slot != index))
-			error(MSG_CFCAE, index);          //"Context file corrupt at entry %u"
-
-		CDslot = CD->slot;
-		CDname = CD->name;
-		CDsize = CD->size;
+			error(MSG_CFCAE, (uint)index);          //"Context file corrupt at entry %u"
 
 		if (CD->name == (ULONG)-1L) {
 			if (cur != HRES_NULL) {
@@ -495,7 +487,7 @@ CDESC *Files::readContextDescriptor(TextFile *TF) {
 	def = (const char *)Interpreter::lookup(HROED, contextName);
 
 	if (def == NULL)
-		abend(MSG_OMCR, contextName, c.slot);
+		abend(MSG_OMCR, contextName.c_str(), c.slot);
 
 	c.name = ascnum(def);
 	res.unlock(HROED);
@@ -524,7 +516,7 @@ void Files::restoreStaticContext(HRES instance, TextFile *TF) {
 		else if (line[0] == '}')
 			break;
 		else if (line[0] == '[') {
-			Common::String tag(strchr(line.c_str(), '[') + 1);
+			tag = Common::String(strchr(line.c_str(), '[') + 1);
 			if ((tagP = strchr(tag.c_str(), ']')) != nullptr)
 				tag = Common::String(tag.c_str(), tagP);
 
@@ -547,7 +539,7 @@ void Files::restoreStaticContext(HRES instance, TextFile *TF) {
 			}
 
 			if (p == thdr._nPrgs)
-				abend(MSG_CMCR, tag);       //"Class '%s' missing; cannot restore"
+				abend(MSG_CMCR, tag.c_str());       //"Class '%s' missing; cannot restore"
 		} else {
 			tag = line;
 		
@@ -568,7 +560,7 @@ void Files::restoreStaticContext(HRES instance, TextFile *TF) {
 			res.unlock(expt);
 
 			if (def == NULL)
-				abend(MSG_UVR, name);       //"Unresolved variable reference '%s'"
+				abend(MSG_UVR, name.c_str());       //"Unresolved variable reference '%s'"
 
 			d = (void *)((ULONG)Resources::addr(instance) + ascnum(def) + offset);
 

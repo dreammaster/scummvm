@@ -964,7 +964,7 @@ HRES Resources::construct_thunk(Resources *lnk, ULONG object) {
 
 	for (i = m = 0; i < depth; i++) {
 		dict = Interpreter::first(addr(expt[i]));
-		while ((dict = Interpreter::iterate(addr(expt[i]), dict, &tag, &def)) != NULL) {
+		while ((dict = Interpreter::iterate(addr(expt[i]), dict, &tag, &def)) != 0) {
 			if (tag[0] == 'M') {
 				MV[m].msg = (UWORD)ascnum((const char *)&tag[2]);
 				MV[m].handler = (ULONG)ascnum(def);

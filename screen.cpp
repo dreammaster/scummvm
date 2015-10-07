@@ -298,7 +298,7 @@ void Screen::setPalette(uint region, uint resource) {
 	HRES handle;
 	PAL_RES pal;
 	int idx, j, k, n, m, dm, d;
-	const byte *fade;
+	const byte *fadeP;
 
 	handle = res.get_resource_handle(resource, DA_DEFAULT);
 	res.lock(handle);
@@ -308,11 +308,11 @@ void Screen::setPalette(uint region, uint resource) {
 
 	if ((region == PAL_FIXED) || (region == PAL_WALLS) ||
 	        (region == PAL_M1) || (region == PAL_M2)) {
-		for (int idx = 0; idx < 11; ++idx) {
-			fade = &pal._fade[idx][0];
+		for (idx = 0; idx < 11; ++idx) {
+			fadeP = &pal._fade[idx][0];
 
 			for (j = 0; j < pal._nColors; ++j)
-				fade_tables[region][idx][j] = first_color[region] + fade[j];
+				fade_tables[region][idx][j] = first_color[region] + fadeP[j];
 		}
 	}
 
@@ -597,7 +597,7 @@ void Screen::lineTo(Common::Array<Parameter> args) {
 void Screen::solidBarGraph(const Common::Rect &r, uint32 lb_border, uint32 tr_border, uint32 bkgnd,
                            uint32 grn, uint32 yel, uint32 red, int val, int min, int crit, int max) {
 	LONG btop, bbtm, blft, brgt, grayx;
-	LONG range, point, width;
+	LONG range, point, widthVal;
 	LONG color;
 
 	_windows[PAGE2]->drawLine(Common::Point(r.left, r.top), Common::Point(r.left, r.bottom), lb_border);
@@ -611,7 +611,7 @@ void Screen::solidBarGraph(const Common::Rect &r, uint32 lb_border, uint32 tr_bo
 	blft = r.left + 1;
 	brgt = r.right - 1;
 
-	width = brgt - blft;
+	widthVal = brgt - blft;
 
 	if (val > max)
 		val = max;
@@ -621,7 +621,7 @@ void Screen::solidBarGraph(const Common::Rect &r, uint32 lb_border, uint32 tr_bo
 	range = max - min;
 	point = val - min;
 
-	grayx = blft + (point * width / range);
+	grayx = blft + (point * widthVal / range);
 
 	if (grayx != brgt)
 		_windows[PAGE2]->fillRect(Common::Rect(grayx, btop, brgt, bbtm), bkgnd);

@@ -69,7 +69,7 @@ public:
 	bool operator==(Parameter &rhs) const;
 	bool operator!=(Parameter &rhs) const;
 
-	byte *valPtr() const {
+	byte *valPtr() {
 		assert(_ptrConst == nullptr);
 		return (byte *)&_val;
 	}
@@ -171,8 +171,8 @@ private:
 	static const ExternMethod _methods[];
 	InterpreterStack _stack;
 	Common::Stack<MethodStackEntry> _methodStack;
-	LONG _currentIndex;
-	ULONG _currentMsg;
+	int _currentIndex;
+	uint _currentMsg;
 	LONG _offThis;
 	IHDR *_instance;
 	THDR *_thunk;
@@ -466,7 +466,7 @@ public:
 	static const char *lookup(HRES dictionary, const Common::String &key);
 
 	void addArgument(const Parameter &param);
-	LONG execute(LONG index, LONG msgNum, const MV_entry *vector = (const MV_entry *)HRES_NULL);
+	LONG execute(int index, uint msgNum, const MV_entry *vector = (const MV_entry *)HRES_NULL);
 };
 
 } // End of namespace Aesop

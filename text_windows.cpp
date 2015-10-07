@@ -188,7 +188,7 @@ void TextWindow::vsprint(const Common::String &format, const Parameters &params)
 			break;
 
 		case 'd': {
-			LONG v = params[paramIndex++];
+			int v = params[paramIndex++];
 			Common::String sVal = Common::String::format("%d", v);
 			print(APP, "%s", Parameters(sVal.c_str()));
 			break;
@@ -236,8 +236,8 @@ void TextWindow::vsprint(const Common::String &format, const Parameters &params)
 		}
 
 		case 'c': {
-			int c = params[paramIndex++] & 0xff;
-			print(APP, "%c", Parameter(c));
+			int cv = params[paramIndex++] & 0xff;
+			print(APP, "%c", Parameter(cv));
 			break;
 		}
 
@@ -312,7 +312,7 @@ void TextWindow::printBuffer(int lineNum) {
 			if (!*(lineEndP - 1))
 				break;
 		} else {
-			bool print = true;
+			bool printFlag = true;
 			switch (_justify) {
 			case J_RIGHT:
 				if (*lineStartP)
@@ -327,7 +327,7 @@ void TextWindow::printBuffer(int lineNum) {
 			case J_FILL:
 				// Justify text on both sides of the pane
 				if (fullWidth < paneWidth && *lineStartP && *lineStartP != '\n') {
-					print = false;
+					printFlag = false;
 					error("TODO: Implement fully justified text");
 				}
 
@@ -335,7 +335,7 @@ void TextWindow::printBuffer(int lineNum) {
 				break;
 			}
 
-			if (print) {
+			if (printFlag) {
 				for (msgP = lineStartP; *msgP && msgP < lineEndP; ++msgP)
 					cout(*msgP);
 			}

@@ -503,7 +503,7 @@ void Events::deleteNotifyRequest(int client, uint32 message, int event, int para
 	NREQ *NR;
 	LONG all_events;
 
-	if (event == (unsigned) - 1) {
+	if (event == -1) {
 		event = 1;
 		all_events = 1;
 	} else {
