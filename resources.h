@@ -225,6 +225,12 @@ public:
 	HRES loadResource(ULONG resource, ULONG attrib);
 
 	/**
+	 * Load a resource into a SOP instance's array
+	 * Determines array offset in instance, in case resource load causes instance to move in memory
+	 */
+	void loadResource(byte *ptr, uint resource);
+
+	/**
 	 * Load a string resource into a SOP instance's array
 	 *
 	 * Determines array offset in instance, in case resource load causes

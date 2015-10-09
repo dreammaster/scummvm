@@ -1590,7 +1590,9 @@ Parameter Interpreter::loadString(Parameters params) {
 }
 
 Parameter Interpreter::loadResource(Parameters params) {
-	_vm->_resources->loadResource(params[0], params[1]);
+	byte *ptr = params[0];
+	uint resource = params[1];
+	_vm->_resources->loadResource(ptr, resource);
 	return Parameter();
 }
 

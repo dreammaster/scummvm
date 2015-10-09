@@ -548,6 +548,18 @@ HRES Resources::loadResource(ULONG resource, ULONG attrib) {
 	return entry;
 }
 
+void Resources::loadResource(byte *ptr, uint resource) {
+	Objects &objects = *_vm->_objects;
+
+	uint arrayOffset = ptr - (byte *)addr(objects[Interpreter::_currentThis]);
+	HRES handle = get_resource_handle(resource, DA_DEFAULT);
+
+	lock(handle);
+	byte *newArray = (byte *)addr(objects[Interpreter::_currentThis]) + arrayOffset;
+	Common::copy((byte *)addr(handle), (byte *)addr(handle) + size(handle), newArray);
+	unlock(handle);
+}
+
 void Resources::loadString(byte *array, uint string) {
 	Objects &objects = *_vm->_objects;
 	HRES handle;
