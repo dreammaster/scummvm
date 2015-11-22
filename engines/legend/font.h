@@ -50,7 +50,7 @@ public:
 	int _bytesPerLine;
 	int _minPrintableChar;
 	int _maxPrintableChar;
-	int _field9;
+	int _linesOffset;
 	int _linesPerChar;
 	int _fixedWidth;
 	int _fixedSpacing;
@@ -60,12 +60,14 @@ public:
 	Common::Array<byte> _pixelData;
 public:
 	static int _fontTabSize;
-	static int _fontLineSpacing;
+	static uint _lineSpacing;
+	static uint _lineSpacingCenter;
 	static int _textX;
 	static int _textY;
 	static int _fgColor;
 	static int _bgColor;
 	static uint _maxCharWidth;
+	static uint _maxCharCenter;
 	static int _fontSectionNum;
 	static int _fontFieldA;
 
@@ -98,6 +100,11 @@ public:
 	 * Return the width of a string
 	 */
 	uint stringWidth(const Message &msg) const;
+
+	/**
+	 * Returns the line spacing for the font
+	 */
+	uint getLineSpacing() const { return _linesOffset + _linesPerChar; }
 };
 
 } // End of namespace Legend

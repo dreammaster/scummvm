@@ -95,7 +95,7 @@ public:
 	/**
 	 * Load a specified font number
 	 */
-	void loadFont(int fontNumber);
+	Font *loadFont(int fontNumber);
 };
 
 } // End of namespace Legend

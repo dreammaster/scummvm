@@ -29,21 +29,24 @@
 namespace Legend {
 
 int Font::_fontTabSize;
-int Font::_fontLineSpacing;
+uint Font::_lineSpacing;
+uint Font::_lineSpacingCenter;
 int Font::_textX;
 int Font::_textY;
 int Font::_fgColor;
 int Font::_bgColor;
 uint Font::_maxCharWidth;
+uint Font::_maxCharCenter;
 int Font::_fontSectionNum;
 int Font::_fontFieldA;
 
 void Font::init() {
 	_fontTabSize = 0;
-	_fontLineSpacing = 0;
+	_lineSpacing = 0;
 	_textX = _textY = 0;
 	_fgColor = _bgColor = 0;
 	_maxCharWidth = 0;
+	_maxCharCenter = 0;
 	_fontSectionNum = -1;
 	_fontFieldA = 0;
 }
@@ -57,7 +60,7 @@ Font::Font(Screen *vm) {
 	_bytesPerLine = 0;
 	_minPrintableChar = 0;
 	_maxPrintableChar = 0;
-	_field9 = 0;
+	_linesOffset = 0;
 	_linesPerChar = 0;
 	_fixedWidth = 0;
 	_fixedSpacing = 0;
@@ -70,7 +73,7 @@ void Font::load(Common::SeekableReadStream &s) {
 	_bytesPerLine = s.readByte();
 	_minPrintableChar = s.readByte();
 	_maxPrintableChar = s.readByte();
-	_field9 = s.readByte();
+	_linesOffset = s.readByte();
 	_linesPerChar = s.readByte();
 	_fixedWidth = s.readSByte();
 	_fixedSpacing = s.readSByte();
@@ -96,11 +99,6 @@ void Font::load(Common::SeekableReadStream &s) {
 	_pixelData.resize((_maxPrintableChar - _minPrintableChar + 1)
 		* _bytesPerLine * _linesPerChar);
 	s.read(&_pixelData[0], _pixelData.size());
-
-	// Final font setup
-	_maxCharWidth = charWidth('M');
-
-	// TODO
 }
 
 void Font::writeChar(char c) {
@@ -109,7 +107,7 @@ void Font::writeChar(char c) {
 	}
 	if (c == '\n' || (c == '\t' && _textX >= _screen->w())) {
 		_textX = 0;
-		_textY += _fontLineSpacing;
+		_textY += _lineSpacing;
 		return;
 	}
 
@@ -119,7 +117,7 @@ void Font::writeChar(char c) {
 
 	if (_bgColor >= 0) {
 		_screen->fillRect(Common::Rect(_textX, _textY,
-			_textX + charFullWidth, _textY + _fontLineSpacing), _bgColor);
+			_textX + charFullWidth, _textY + _lineSpacing), _bgColor);
 	}
 
 	if (_fixedSpacing < 0) {

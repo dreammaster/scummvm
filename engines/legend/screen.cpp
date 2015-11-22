@@ -102,7 +102,7 @@ bool Screen::unionRectangle(Common::Rect &destRect, const Common::Rect &src1, co
 	return !destRect.isEmpty();
 }
 
-void Screen::loadFont(int fontNumber) {
+Font *Screen::loadFont(int fontNumber) {
 	Font *fontList[2] = { &_font0, &_font1 };
 	int idx;
 	Common::File f;
@@ -119,22 +119,29 @@ void Screen::loadFont(int fontNumber) {
 
 	if (idx < 2) {
 		// Use existing loaded font
-		fontList[idx]->_counter = 1;
 		_activeFont = fontList[idx];
+		_activeFont->_counter = 1;
 	} else {
-		Font &font = *fontList[idx];
+		_activeFont = fontList[idx];
 		if (fontNumber)
 			f.open(_vm->_res->getFilename(FILETYPE_FNT,
 				Font::_fontSectionNum * 100 + fontNumber));
 
-		font._counter = 1;
-		font._sectionNum = Font::_fontSectionNum;
-		font._fontNumber = fontNumber;
+		_activeFont->_counter = 1;
+		_activeFont->_sectionNum = Font::_fontSectionNum;
+		_activeFont->_fontNumber = fontNumber;
 
 		// Original used font 0 for text mode font, which we don't need
 		assert(fontNumber && f.isOpen());
-		font.load(f);
+		_activeFont->load(f);
 	}
+
+	// Final font setup
+	Font::_maxCharWidth = _activeFont->charWidth('M');
+	Font::_lineSpacing = _activeFont->getLineSpacing();
+	Font::_maxCharCenter = Font::_maxCharWidth / 2;
+
+	return _activeFont;
 }
 
 } // End of namespace Legend
