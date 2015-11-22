@@ -39,12 +39,9 @@ class LegendEngine;
 class Screen {
 private:
 	Common::List<Common::Rect> _dirtyRects;
-	uint32 _transitionSeed;
 	Graphics::Surface _screenSurface;
 	Font _font0;
 	Font _font1;
-	int _fontSectionNum;
-	int _fontFieldA;
 private:
 	/**
 	 * Merges together overlapping dirty areas of the screen

@@ -34,12 +34,18 @@ int Font::_textX;
 int Font::_textY;
 int Font::_fgColor;
 int Font::_bgColor;
+uint Font::_maxCharWidth;
+int Font::_fontSectionNum;
+int Font::_fontFieldA;
 
 void Font::init() {
 	_fontTabSize = 0;
 	_fontLineSpacing = 0;
 	_textX = _textY = 0;
 	_fgColor = _bgColor = 0;
+	_maxCharWidth = 0;
+	_fontSectionNum = -1;
+	_fontFieldA = 0;
 }
 
 Font::Font(Screen *vm) {
@@ -66,13 +72,33 @@ void Font::load(Common::SeekableReadStream &s) {
 	_maxPrintableChar = s.readByte();
 	_field9 = s.readByte();
 	_linesPerChar = s.readByte();
-	_fixedWidth = s.readByte();
-	_fixedSpacing = s.readByte();
+	_fixedWidth = s.readSByte();
+	_fixedSpacing = s.readSByte();
 	_fieldD = s.readByte();
 
 	_charWidths.clear();
 	_charSpacings.clear();
 	_pixelData.clear();
+
+	// For fonts which aren't fixed width, load the widths for each character
+	if (_fixedWidth < 0) {
+		_charWidths.resize(0x80);
+		s.read(&_charWidths[0], 0x80);
+	}
+
+	// For fonts without fixed spacing, load the spacing data
+	if (_fixedSpacing < 0) {
+		_charSpacings.resize(0x80);
+		s.read(&_charSpacings[0], 0x80);
+	}
+
+	// Load the font pixel data
+	_pixelData.resize((_maxPrintableChar - _minPrintableChar + 1)
+		* _bytesPerLine * _linesPerChar);
+	s.read(&_pixelData[0], _pixelData.size());
+
+	// Final font setup
+	_maxCharWidth = charWidth('M');
 
 	// TODO
 }
@@ -106,8 +132,8 @@ void Font::writeChar(char c) {
 		
 		for (int yCtr = 0, yp = _textY; yCtr < _linesPerChar; ++yCtr, ++yp) {
 			byte *destP = _screen->getBasePtr(_textX, yp);
-			byte bitMask, srcPixel;
-			for (int byteCtr = 0, xCtr = 0, xp = _textX;  xCtr < charFullWidth; ++xCtr, ++destP, bitMask >>= 1) {
+			byte bitMask = 0, srcPixel = 0;
+			for (int byteCtr = 0, xCtr = 0;  xCtr < charFullWidth; ++xCtr, ++destP, bitMask >>= 1) {
 				if ((byteCtr % 8) == 0) {
 					bitMask = 0x80;
 					srcPixel = *srcP++;
@@ -128,5 +154,17 @@ void Font::writeString(const Common::String &msg) {
 		writeChar(*msgP++);
 }
 
+uint Font::charWidth(char c) const {
+	if (c == '\t')
+		return _fontTabSize;
+	else if (c == '\n')
+		return 0;
+	else if (_fixedSpacing < 0)
+		return _charWidths[c] + _charSpacings[c].leftSpacing + _charSpacings[c].rightSpacing;
+	else if (_fixedWidth < 0)
+		return _charWidths[c] + _fixedSpacing;
+	else
+		return _fixedWidth + _fixedSpacing;
+}
 
 } // End of namespace Legend

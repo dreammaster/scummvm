@@ -64,6 +64,9 @@ public:
 	static int _textY;
 	static int _fgColor;
 	static int _bgColor;
+	static uint _maxCharWidth;
+	static int _fontSectionNum;
+	static int _fontFieldA;
 
 	static void init();
 public:
@@ -84,6 +87,11 @@ public:
 	 * Write out a string
 	 */
 	void writeString(const Common::String &msg);
+
+	/**
+	 * Return the width of a character
+	 */
+	uint charWidth(char c) const;
 };
 
 } // End of namespace Legend

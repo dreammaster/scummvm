@@ -34,9 +34,6 @@ Screen::Screen(LegendEngine *vm): _vm(vm), _font0(this), _font1(this),
 	_screenSurface.create(g_system->getWidth(), g_system->getHeight(),
 		Graphics::PixelFormat::createFormatCLUT8());
 	Font::init();
-
-	_fontSectionNum = -1;
-	_fontFieldA = 0;
 }
 
 Screen::~Screen() {
@@ -116,7 +113,7 @@ void Screen::loadFont(int fontNumber) {
 	}
 
 	for (idx = 0; idx < 2; ++idx) {
-		if (fontList[idx]->_sectionNum == _fontSectionNum && fontList[idx]->_fontNumber == fontNumber)
+		if (fontList[idx]->_sectionNum == Font::_fontSectionNum && fontList[idx]->_fontNumber == fontNumber)
 			break;
 	}
 
@@ -128,10 +125,10 @@ void Screen::loadFont(int fontNumber) {
 		Font &font = *fontList[idx];
 		if (fontNumber)
 			f.open(_vm->_res->getFilename(FILETYPE_FNT,
-				_fontSectionNum * 100 + fontNumber));
+				Font::_fontSectionNum * 100 + fontNumber));
 
 		font._counter = 1;
-		font._sectionNum = _fontSectionNum;
+		font._sectionNum = Font::_fontSectionNum;
 		font._fontNumber = fontNumber;
 
 		// Original used font 0 for text mode font, which we don't need
