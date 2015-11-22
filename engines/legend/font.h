@@ -23,6 +23,7 @@
 #ifndef LEGEND_FONT_H
 #define LEGEND_FONT_H
 
+#include "legend/resources.h"
 #include "common/array.h"
 #include "common/stream.h"
 #include "graphics/surface.h"
@@ -92,6 +93,11 @@ public:
 	 * Return the width of a character
 	 */
 	uint charWidth(char c) const;
+
+	/**
+	 * Return the width of a string
+	 */
+	uint stringWidth(const Message &msg) const;
 };
 
 } // End of namespace Legend

@@ -40,6 +40,18 @@ enum FileType {
 
 class LegendEngine;
 
+class Message {
+	friend class Resources;
+private:
+	static LegendEngine *_vm;
+	uint _id;
+	const char *_msg;
+public:
+	Message(uint id);
+	Message(const char *msg);
+	operator const char *() const;
+};
+
 class Resources {
 private:
 	LegendEngine *_vm;

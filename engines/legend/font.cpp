@@ -167,4 +167,13 @@ uint Font::charWidth(char c) const {
 		return _fixedWidth + _fixedSpacing;
 }
 
+uint Font::stringWidth(const Message &msg) const {
+	const char *msgP = msg;
+	uint total = 0;
+	while (*msgP)
+		total += charWidth(*msgP++);
+
+	return total;
+}
+
 } // End of namespace Legend

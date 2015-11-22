@@ -25,8 +25,21 @@
 
 namespace Legend {
 
+LegendEngine *Message::_vm;
+
+Message::Message(uint id) : _id(id), _msg(nullptr) {}
+
+Message::Message(const char *msg) : _id(0), _msg(msg) {}
+
+Message::operator const char *() const {
+	error("TODO");
+}
+
+/*-------------------------------------------------------------------*/
+
 Resources::Resources(LegendEngine *vm) {
 	_vm = vm;
+	Message::_vm = vm;
 
 	switch (vm->getGameID()) {
 	case GType_Gateway:
