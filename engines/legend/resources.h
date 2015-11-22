@@ -20,42 +20,39 @@
  *
  */
 
-#include "legend/legend.h"
-#include "common/scummsys.h"
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
+#ifndef LEGEND_RESOURCES_H
+#define LEGEND_RESOURCES_H
+
+#include "common/str.h"
 
 namespace Legend {
 
-LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		Engine(syst), _gameDescription(gameDesc), _randomSource("Legend") {
-	_debugger = nullptr;
-	_events = nullptr;
-	_res = nullptr;
-	_screen = nullptr;
-}
+enum FileType {
+	FILETYPE_PIC = 0,
+	FILETYPE_RGN = 1,
+	FILETYPE_FNT = 2,
+	FILETYPE_MUS = 3,
+	FILETYPE_SAV = 4,
+	FILETYPE_SAV2 = 5,
+	FILETYPE_VOC = 6,
+	FILETYPE_RS = 7
+};
 
-LegendEngine::~LegendEngine() {
-	delete _debugger;
-	delete _events;
-	delete _res;
-	delete _screen;
-}
+class LegendEngine;
 
-void LegendEngine::initialize() {
-	DebugMan.addDebugChannel(kDebugLevelScript,      "scripts", "Script debug level");
+class Resources {
+private:
+	LegendEngine *_vm;
+	Common::String _prefix;
+public:
+	Resources(LegendEngine *vm);
 
-	_debugger = Debugger::init(this);
-	_events = new Events(this);
-	_res = new Resources(this);
-	_screen = new Screen(this);
-}
-
-Common::Error LegendEngine::run() {
-	// Initialize the engine
-	initialize();
-
-	return Common::kNoError;
-}
+	/**
+	 * Form a filename for a specified file type and number
+	 */
+	Common::String getFilename(FileType fileType, int fileNumber);
+};
 
 } // End of namespace Legend
+
+#endif

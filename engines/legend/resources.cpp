@@ -20,42 +20,30 @@
  *
  */
 
+#include "legend/resources.h"
 #include "legend/legend.h"
-#include "common/scummsys.h"
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
 
 namespace Legend {
 
-LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		Engine(syst), _gameDescription(gameDesc), _randomSource("Legend") {
-	_debugger = nullptr;
-	_events = nullptr;
-	_res = nullptr;
-	_screen = nullptr;
+Resources::Resources(LegendEngine *vm) {
+	_vm = vm;
+
+	switch (vm->getGameID()) {
+	case GType_Gateway:
+		_prefix = "gate";
+		break;
+	case GType_CompanionsOfXanth:
+		_prefix = "xanth";
+		break;
+	default:
+		break;
+	}
 }
 
-LegendEngine::~LegendEngine() {
-	delete _debugger;
-	delete _events;
-	delete _res;
-	delete _screen;
-}
-
-void LegendEngine::initialize() {
-	DebugMan.addDebugChannel(kDebugLevelScript,      "scripts", "Script debug level");
-
-	_debugger = Debugger::init(this);
-	_events = new Events(this);
-	_res = new Resources(this);
-	_screen = new Screen(this);
-}
-
-Common::Error LegendEngine::run() {
-	// Initialize the engine
-	initialize();
-
-	return Common::kNoError;
+Common::String Resources::getFilename(FileType fileType, int fileNumber) {
+	const char *const EXTENSIONS[] = { "PIC", "RGN", "FNT", "MUS", "SAV", "SAV" };
+	return Common::String::format("%s_%03d.%s", _prefix.c_str(), fileNumber,
+		EXTENSIONS[fileType]);
 }
 
 } // End of namespace Legend

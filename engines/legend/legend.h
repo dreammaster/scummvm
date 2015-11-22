@@ -34,6 +34,8 @@
 #include "engines/engine.h"
 #include "legend/debugger.h"
 #include "legend/events.h"
+#include "legend/resources.h"
+#include "legend/screen.h"
 
 namespace Legend {
 
@@ -42,15 +44,15 @@ enum {
 };
 
 enum GameType {
-	GType_Spellcasting101 = 0,
-	GType_Spellcasting201 = 1,
-	GType_Spellcasting301 = 2,
-	GType_Timequest = 3,
-	GType_Gateway = 4,
-	GType_Gateway2 = 5,
-	GType_EricTheUnready = 6,
-	GType_CompanionsOfXanth = 7,
-	GType_DeathGate = 8
+	GType_Spellcasting101	= 0,
+	GType_Spellcasting201	= 1,
+	GType_Spellcasting301	= 2,
+	GType_Timequest			= 3,
+	GType_Gateway			= 4,
+	GType_Gateway2			= 5,
+	GType_EricTheUnready	= 6,
+	GType_CompanionsOfXanth	= 7,
+	GType_DeathGate			= 8
 };
 
 #define LEGEND_SCREEN_WIDTH _vm->_screen->w()
@@ -72,6 +74,8 @@ public:
 	const LegendGameDescription *_gameDescription;
 	Debugger *_debugger;
 	Events *_events;
+	Resources *_res;
+	Screen *_screen;
 public:
 	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);
 	virtual ~LegendEngine();
