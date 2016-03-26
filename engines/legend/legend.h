@@ -91,6 +91,11 @@ public:
 	GameType getGameID() const;
 
 	/**
+	 * Returns true if the game is Companions of Xanth or Death Gate
+	 */
+	bool isLater() const;
+
+	/**
 	 * Returns the platform the game's datafiles are for
 	 */
 	Common::Platform getPlatform() const;

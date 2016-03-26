@@ -45,6 +45,11 @@ Common::Language LegendEngine::getLanguage() const {
 	return _gameDescription->desc.language;
 }
 
+bool LegendEngine::isLater() const {
+	return getGameID() >= GType_CompanionsOfXanth;
+}
+
+
 } // End of namespace Legend
 
 static const PlainGameDescriptor legendGames[] = {

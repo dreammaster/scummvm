@@ -34,7 +34,21 @@ static const LegendGameDescription gameDescriptions[] = {
 			ADGF_NO_FLAGS,
 			GUIO0()
 		},
-		GType_Gateway,
+		GType_Gateway
+	},
+
+	{
+		// Companions of Xanth
+		{
+			"xanth",
+			0,
+			AD_ENTRY1s("xanth_00.pic", "17f720a5648a8fc98d81f7f86750414c", 60113),
+			Common::EN_ANY,
+			Common::kPlatformDOS,
+			ADGF_NO_FLAGS,
+			GUIO0()
+		},
+		GType_CompanionsOfXanth
 	},
 
 	{ AD_TABLE_END_MARKER, (GameType)0 }

@@ -32,10 +32,6 @@
 
 namespace Legend {
 
-enum TransitionType {
-	TT_INVALID = -1, TT_NONE = 0, TT_1 = 1, TT_2 = 2, TT_3 = 3, TT_4 = 4
-};
-
 class LegendEngine;
 class ScreenArea;
 
@@ -43,17 +39,12 @@ class Screen: public Graphics::Screen {
 	friend class Message;
 private:
 	Common::List<ScreenArea *> _screenAreas;
-	Font _font0;
-	Font _font1;
-	byte _palette[64];
 protected:
 	LegendEngine *_vm;
 public:
-	Font *_activeFont;
-	TransitionType _transitionType;
-public:
 	Screen(LegendEngine *vm);
 	virtual ~Screen();
+	static Screen *init(LegendEngine *vm);
 
 	/**
 	 * Adds a visual element from the screen
@@ -64,21 +55,6 @@ public:
 	* Removes a visual element from the screen
 	*/
 	void removeArea(ScreenArea *area);
-
-	/**
-	 * Load a specified font number
-	 */
-	Font *loadFont(int fontNumber);
-
-	/**
-	 * Handle a palette transition
-	 */
-	void transition(int index);
-
-	/**
-	 * Set an EGA palette
-	 */
-	void setEGAPalette(const byte *palette);
 };
 
 } // End of namespace Legend

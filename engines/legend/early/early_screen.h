@@ -20,43 +20,50 @@
  *
  */
 
-#include "legend/legend.h"
-#include "common/scummsys.h"
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
+#ifndef LEGEND_EARLY_SCREEN_H
+#define LEGEND_EARLY_SCREEN_H
+
+#include "legend/font.h"
+#include "common/list.h"
+#include "common/rect.h"
+#include "legend/screen.h"
 
 namespace Legend {
 
-LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		Engine(syst), _gameDescription(gameDesc), _randomSource("Legend") {
-	_debugger = nullptr;
-	_events = nullptr;
-	_res = nullptr;
-	_screen = nullptr;
-}
+enum TransitionType {
+	TT_INVALID = -1, TT_NONE = 0, TT_1 = 1, TT_2 = 2, TT_3 = 3, TT_4 = 4
+};
 
-LegendEngine::~LegendEngine() {
-	delete _debugger;
-	delete _events;
-	delete _res;
-	delete _screen;
-}
+class LegendEngine;
 
-void LegendEngine::initialize() {
-	DebugMan.addDebugChannel(kDebugLevelScript,      "scripts", "Script debug level");
+class EarlyScreen: public Screen {
+private:
+	Font _font0;
+	Font _font1;
+	byte _palette[64];
+public:
+	Font *_activeFont;
+	TransitionType _transitionType;
+public:
+	EarlyScreen(LegendEngine *vm);
+	virtual ~EarlyScreen();
 
-	_debugger = Debugger::init(this);
-	_events = new Events(this);
-	_res = new Resources(this);
-	_screen = Screen::init(this);
-	Message::init(this);
-}
+	/**
+	 * Load a specified font number
+	 */
+	Font *loadFont(int fontNumber);
 
-Common::Error LegendEngine::run() {
-	// Initialize the engine
-	initialize();
+	/**
+	 * Handle a palette transition
+	 */
+	void transition(int index);
 
-	return Common::kNoError;
-}
+	/**
+	 * Set an EGA palette
+	 */
+	void setEGAPalette(const byte *palette);
+};
 
 } // End of namespace Legend
+
+#endif

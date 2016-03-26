@@ -1,17 +1,19 @@
 MODULE := engines/legend
 
 MODULE_OBJS = \
-	legend/debugger.o \
-	legend/detection.o \
-	legend/events.o \
-	legend/font.o \
-	legend/legend.o \
-	legend/input_area.o \
-	legend/messages.o \
-	legend/resources.o \
-	legend/scene_area.o \
-	legend/screen.o \
-	legend/screen_area.o
+	early/early_screen.o \
+	later/later_screen.o \
+	debugger.o \
+	detection.o \
+	events.o \
+	font.o \
+	legend.o \
+	input_area.o \
+	messages.o \
+	resources.o \
+	scene_area.o \
+	screen.o \
+	screen_area.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_LEGEND), DYNAMIC_PLUGIN)

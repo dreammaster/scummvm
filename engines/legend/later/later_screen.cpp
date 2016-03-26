@@ -20,43 +20,14 @@
  *
  */
 
-#include "legend/legend.h"
-#include "common/scummsys.h"
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
+#include "legend/later/later_screen.h"
 
 namespace Legend {
 
-LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		Engine(syst), _gameDescription(gameDesc), _randomSource("Legend") {
-	_debugger = nullptr;
-	_events = nullptr;
-	_res = nullptr;
-	_screen = nullptr;
+LaterScreen::LaterScreen(LegendEngine *vm) : Screen(vm) {
 }
 
-LegendEngine::~LegendEngine() {
-	delete _debugger;
-	delete _events;
-	delete _res;
-	delete _screen;
-}
-
-void LegendEngine::initialize() {
-	DebugMan.addDebugChannel(kDebugLevelScript,      "scripts", "Script debug level");
-
-	_debugger = Debugger::init(this);
-	_events = new Events(this);
-	_res = new Resources(this);
-	_screen = Screen::init(this);
-	Message::init(this);
-}
-
-Common::Error LegendEngine::run() {
-	// Initialize the engine
-	initialize();
-
-	return Common::kNoError;
+LaterScreen::~LaterScreen() {
 }
 
 } // End of namespace Legend
