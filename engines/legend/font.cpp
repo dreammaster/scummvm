@@ -105,7 +105,7 @@ void Font::writeChar(char c) {
 	if (c == '\t') {
 		_textX = (_textX / 8 + 1) * 8;
 	}
-	if (c == '\n' || (c == '\t' && _textX >= _screen->w())) {
+	if (c == '\n' || (c == '\t' && _textX >= _screen->w)) {
 		_textX = 0;
 		_textY += _lineSpacing;
 		return;
@@ -129,7 +129,7 @@ void Font::writeChar(char c) {
 		const byte *srcP = &_pixelData[(c - _minPrintableChar) * _linesPerChar * _bytesPerLine];
 		
 		for (int yCtr = 0, yp = _textY; yCtr < _linesPerChar; ++yCtr, ++yp) {
-			byte *destP = _screen->getBasePtr(_textX, yp);
+			byte *destP = (byte *)_screen->getBasePtr(_textX, yp);
 			byte bitMask = 0, srcPixel = 0;
 			for (int byteCtr = 0, xCtr = 0;  xCtr < charFullWidth; ++xCtr, ++destP, bitMask >>= 1) {
 				if ((byteCtr % 8) == 0) {

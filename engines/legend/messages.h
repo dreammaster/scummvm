@@ -20,38 +20,16 @@
  *
  */
 
-#ifndef LEGEND_SCREEN_H
-#define LEGEND_SCREEN_H
+#ifndef LEGEND_MESSAGES_H
+#define LEGEND_MESSAGES_H
 
-#include "legend/font.h"
-#include "common/list.h"
-#include "common/rect.h"
-#include "graphics/screen.h"
+#include "common/scummsys.h"
+#include "common/events.h"
+#include "common/stack.h"
 
 namespace Legend {
 
-#define VGA_COLOR_TRANS(x) ((x) * 255 / 63)
-
-class LegendEngine;
-
-class Screen: public Graphics::Screen {
-private:
-	Font _font0;
-	Font _font1;
-protected:
-	LegendEngine *_vm;
-public:
-	Font *_activeFont;
-public:
-	Screen(LegendEngine *vm);
-	virtual ~Screen();
-
-	/**
-	 * Load a specified font number
-	 */
-	Font *loadFont(int fontNumber);
-};
 
 } // End of namespace Legend
 
-#endif
+#endif /* LEGEND_MESSAGES_H */

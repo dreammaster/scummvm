@@ -31,75 +31,10 @@ namespace Legend {
 
 Screen::Screen(LegendEngine *vm): _vm(vm), _font0(this), _font1(this), 
 		_activeFont(nullptr) {
-	_screenSurface.create(g_system->getWidth(), g_system->getHeight(),
-		Graphics::PixelFormat::createFormatCLUT8());
 	Font::init();
 }
 
 Screen::~Screen() {
-}
-
-void Screen::fillRect(const Common::Rect &r, int color) {
-	_screenSurface.fillRect(r, color);
-	addDirtyRect(r);
-}
-
-void Screen::update() {
-	// Merge the dirty rects
-	mergeDirtyRects();
-
-	// Loop through copying dirty areas to the physical screen
-	Common::List<Common::Rect>::iterator i;
-	for (i = _dirtyRects.begin(); i != _dirtyRects.end(); ++i) {
-		const Common::Rect &r = *i;
-		const byte *srcP = (const byte *)_screenSurface.getBasePtr(r.left, r.top);
-		g_system->copyRectToScreen(srcP, _screenSurface.pitch, r.left, r.top,
-			r.width(), r.height());
-	}
-
-	// Signal the physical screen to update
-	g_system->updateScreen();
-	_dirtyRects.clear();
-}
-
-void Screen::makeAllDirty() {
-	addDirtyRect(Common::Rect(0, 0, _screenSurface.w, _screenSurface.h));
-}
-
-void Screen::addDirtyRect(const Common::Rect &r) {
-	_dirtyRects.push_back(r);
-	assert(r.width() > 0 && r.height() > 0);
-}
-
-void Screen::mergeDirtyRects() {
-	Common::List<Common::Rect>::iterator rOuter, rInner;
-
-	// Process the dirty rect list to find any rects to merge
-	for (rOuter = _dirtyRects.begin(); rOuter != _dirtyRects.end(); ++rOuter) {
-		rInner = rOuter;
-		while (++rInner != _dirtyRects.end()) {
-
-			if ((*rOuter).intersects(*rInner)) {
-				// these two rectangles overlap or
-				// are next to each other - merge them
-
-				unionRectangle(*rOuter, *rOuter, *rInner);
-
-				// remove the inner rect from the list
-				_dirtyRects.erase(rInner);
-
-				// move back to beginning of list
-				rInner = rOuter;
-			}
-		}
-	}
-}
-
-bool Screen::unionRectangle(Common::Rect &destRect, const Common::Rect &src1, const Common::Rect &src2) {
-	destRect = src1;
-	destRect.extend(src2);
-
-	return !destRect.isEmpty();
 }
 
 Font *Screen::loadFont(int fontNumber) {
