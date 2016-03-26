@@ -29,6 +29,8 @@ namespace Legend {
 
 class InputArea : public ScreenArea {
 public:
+	Common::String _line;
+public:
 
 };
 

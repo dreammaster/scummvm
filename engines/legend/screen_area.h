@@ -34,6 +34,8 @@ class LegendEngine;
  * Represents an overall user interface area in the screen
  */
 class ScreenArea : public Graphics::ManagedSurface {
+protected:
+
 public:
 
 };

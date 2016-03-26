@@ -99,7 +99,7 @@ public:
 	/**
 	 * Return the width of a string
 	 */
-	uint stringWidth(const Message &msg) const;
+	uint stringWidth(const Common::String &msg) const;
 
 	/**
 	 * Returns the line spacing for the font

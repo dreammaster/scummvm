@@ -49,6 +49,7 @@ void LegendEngine::initialize() {
 	_events = new Events(this);
 	_res = new Resources(this);
 	_screen = new Screen(this);
+	Message::init(this);
 }
 
 Common::Error LegendEngine::run() {

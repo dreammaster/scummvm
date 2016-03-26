@@ -25,13 +25,13 @@
 
 namespace Legend {
 
-LegendEngine *Message::_vm;
+LegendEngine *ResourceMessage::_vm;
 
-Message::Message(uint id) : _id(id), _msg(nullptr) {}
+ResourceMessage::ResourceMessage(uint id) : _id(id), _msg(nullptr) {}
 
-Message::Message(const char *msg) : _id(0), _msg(msg) {}
+ResourceMessage::ResourceMessage(const char *msg) : _id(0), _msg(msg) {}
 
-Message::operator const char *() const {
+ResourceMessage::operator const char *() const {
 	error("TODO");
 }
 
@@ -39,7 +39,7 @@ Message::operator const char *() const {
 
 Resources::Resources(LegendEngine *vm) {
 	_vm = vm;
-	Message::_vm = vm;
+	ResourceMessage::_vm = vm;
 
 	switch (vm->getGameID()) {
 	case GType_Gateway:

@@ -21,8 +21,53 @@
  */
 
 #include "legend/messages.h"
+#include "legend/legend.h"
+#include "legend/screen.h"
+#include "legend/screen_area.h"
 
 namespace Legend {
 
+LegendEngine *Message::_vm;
+
+void Message::execute() {
+	Screen &screen = *_vm->_screen;
+	Common::List<ScreenArea *>::iterator i;
+	for (i = screen._screenAreas.begin(); i != screen._screenAreas.end(); ++i) {
+		perform(*i);
+	}
+}
+
+/*-------------------------------------------------------------------*/
+
+bool MouseMoveMsg::handleMessage(MouseMoveMsg &msg) {
+	return false;
+}
+
+bool MouseMoveMsg::perform(ScreenArea *screenArea) {
+	MouseMoveMsg *dest = dynamic_cast<MouseMoveMsg *>(screenArea);
+	return dest ? dest->handleMessage(*this) : false;
+}
+
+/*-------------------------------------------------------------------*/
+
+bool MouseButtonDownMsg::handleMessage(MouseButtonDownMsg &msg) {
+	return false;
+}
+
+bool MouseButtonDownMsg::perform(ScreenArea *screenArea) {
+	MouseButtonDownMsg *dest = dynamic_cast<MouseButtonDownMsg *>(screenArea);
+	return dest ? dest->handleMessage(*this) : false;
+}
+
+/*-------------------------------------------------------------------*/
+
+bool MouseButtonUpMsg::handleMessage(MouseButtonUpMsg &msg) {
+	return false;
+}
+
+bool MouseButtonUpMsg::perform(ScreenArea *screenArea) {
+	MouseButtonUpMsg *dest = dynamic_cast<MouseButtonUpMsg *>(screenArea);
+	return dest ? dest->handleMessage(*this) : false;
+}
 
 } // End of namespace Legend

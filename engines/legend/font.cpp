@@ -165,8 +165,8 @@ uint Font::charWidth(char c) const {
 		return _fixedWidth + _fixedSpacing;
 }
 
-uint Font::stringWidth(const Message &msg) const {
-	const char *msgP = msg;
+uint Font::stringWidth(const Common::String &msg) const {
+	const char *msgP = msg.c_str();
 	uint total = 0;
 	while (*msgP)
 		total += charWidth(*msgP++);
