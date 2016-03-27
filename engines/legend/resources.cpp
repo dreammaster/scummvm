@@ -92,9 +92,9 @@ void Resources::loadText() {
 
 	// Read in the second data block
 	count = _textFile.readUint16LE();
-	_textData2.resize(count);
+	_decryptionTable.resize(count);
 	for (int idx = 0; idx < count; ++idx)
-		_textData2[idx] = _textFile.readUint16LE();
+		_decryptionTable[idx] = _textFile.readSint16LE();
 
 	// Read in the word list
 	count = _textFile.readUint16LE();
@@ -124,10 +124,6 @@ void Resources::loadText() {
 		_textList[idx]._dataOffset = _textFile.pos();
 		_textFile.skip(_textList[idx]._size);
 	}
-
-	// Test
-	const char *msg = getMessage(0xF0000000);
-	debug("%s\n", msg);
 }
 
 const char *Resources::getMessage(uint id) {
@@ -198,15 +194,15 @@ const char *Resources::getMessage(uint id) {
 Common::String Resources::decompressText(Common::SeekableReadStream *stream) {
 	Common::String result;
 	int nextVal = -1;
-	int varE = 0;
-	int counter = 0;
-	byte srcByte;
+	int bitCounter = 0;
+	byte srcByte = 0;
 
 	while (!EOS && nextVal) {
-		int data2Val = _textData2.size() - 2;
+		int decryptIndex = _decryptionTable.size() - 2;
 
+		// Iterate across the decryption table to get the next value
 		do {
-			if (!counter) {
+			if (!bitCounter) {
 				if (EOS) {
 					// Reached end
 					nextVal = 0;
@@ -214,19 +210,21 @@ Common::String Resources::decompressText(Common::SeekableReadStream *stream) {
 				}
 
 				srcByte = stream->readByte();
-				counter = 0;
+				bitCounter = 8;
 			}
 
-			data2Val = _textData2[data2Val + (srcByte & 1)];
+			decryptIndex = _decryptionTable[decryptIndex | (srcByte & 1)];
 			srcByte >>= 1;
-			--counter;
-		} while (data2Val >= 0);
+			--bitCounter;
+		} while (decryptIndex >= 0);
 		if (EOS && !nextVal)
 			break;
 
-		nextVal = -1 - data2Val;
+		nextVal = -1 - decryptIndex;
 
-		if (nextVal < 0x80 || (nextVal - 0x80) >= (int)_wordList.size()) {
+		if (!nextVal) {
+			// Ignore null ending terminator
+		} else if (nextVal < 0x80 || (nextVal - 0x80) >= (int)_wordList.size()) {
 			// Printable character
 			result += (char)nextVal;
 		} else {

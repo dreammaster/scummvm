@@ -80,10 +80,8 @@ private:
 	Common::String _prefix;
 	Common::File _textFile;
 	Common::Array<TextIndexEntry> _textList;
-	Common::Array<uint> _textData2;
+	Common::Array<int> _decryptionTable;
 	Common::StringArray _wordList;
-	size_t _textData5Offset;
-	Common::Array<byte> _textData5;
 	Common::Array<TextEntry> _textCache;
 	int _currentTextIndexNum;
 	Common::Array<int> _currentTextIndexVals;
