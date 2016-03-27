@@ -97,6 +97,11 @@ private:
 	 * Get the text message for a given Id
 	 */
 	const char *getMessage(uint id);
+
+	/**
+	 * Decompresses a single text message from a passed stream
+	 */
+	Common::String decompressText(Common::SeekableReadStream *stream);
 public:
 	Resources(LegendEngine *vm);
 

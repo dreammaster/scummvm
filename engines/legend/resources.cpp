@@ -180,21 +180,64 @@ const char *Resources::getMessage(uint id) {
 		_textCache.resize(_textCache.size() + 1);
 	TextEntry &cacheEntry = _textCache[_textCache.size() - 1];
 	cacheEntry._id = id;
-	cacheEntry._text = "";
 
 	// Read in the data
 	_textFile.seek(offset);
 	Common::SeekableReadStream *textStream = _textFile.readStream(_currentTextIndexVals[subNum]);
 
 	// Decode the text
-	// TODO: This isn't quite right yet
-	while (textStream->pos() < textStream->size()) {
-		cacheEntry._text += _wordList[textStream->readByte()];
-	}
+	cacheEntry._text = decompressText(textStream);
 	delete textStream;
 
 	// Return the text
 	return cacheEntry._text.c_str();
 }
+
+#define EOS (stream->pos() >= stream->size())
+
+Common::String Resources::decompressText(Common::SeekableReadStream *stream) {
+	Common::String result;
+	int nextVal = -1;
+	int varE = 0;
+	int counter = 0;
+	byte srcByte;
+
+	while (!EOS && nextVal) {
+		int data2Val = _textData2.size() - 2;
+
+		do {
+			if (!counter) {
+				if (EOS) {
+					// Reached end
+					nextVal = 0;
+					break;
+				}
+
+				srcByte = stream->readByte();
+				counter = 0;
+			}
+
+			data2Val = _textData2[data2Val + (srcByte & 1)];
+			srcByte >>= 1;
+			--counter;
+		} while (data2Val >= 0);
+		if (EOS && !nextVal)
+			break;
+
+		nextVal = -1 - data2Val;
+
+		if (nextVal < 0x80 || (nextVal - 0x80) >= (int)_wordList.size()) {
+			// Printable character
+			result += (char)nextVal;
+		} else {
+			// An entry in the words list
+			result += _wordList[nextVal - 0x80];
+		}
+	}
+
+	return result;
+}
+
+#undef EOS
 
 } // End of namespace Legend
