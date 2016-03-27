@@ -23,7 +23,9 @@
 #ifndef LEGEND_RESOURCES_H
 #define LEGEND_RESOURCES_H
 
+#include "common/file.h"
 #include "common/str.h"
+#include "common/str-array.h"
 
 namespace Legend {
 
@@ -40,22 +42,61 @@ enum FileType {
 
 class LegendEngine;
 
-class ResourceMessage {
+class TextMessage {
 	friend class Resources;
 private:
 	static LegendEngine *_vm;
 	uint _id;
 	const char *_msg;
 public:
-	ResourceMessage(uint id);
-	ResourceMessage(const char *msg);
+	TextMessage(uint id);
+	TextMessage(const char *msg);
 	operator const char *() const;
 };
 
+struct TextIndexEntry {
+public:
+	int _count;
+	size_t _size;
+	size_t _indexOffset;
+	size_t _dataOffset;
+public:
+	TextIndexEntry() : _count(0), _size(0), _indexOffset(0), _dataOffset(0) {}
+
+	/**
+	 * Load the data for an entry
+	 */
+	void load(Common::SeekableReadStream &f);
+};
+
 class Resources {
+	friend class TextMessage;
+	struct TextEntry {
+		uint _id;
+		Common::String _text;
+	};
 private:
 	LegendEngine *_vm;
 	Common::String _prefix;
+	Common::File _textFile;
+	Common::Array<TextIndexEntry> _textList;
+	Common::Array<uint> _textData2;
+	Common::StringArray _wordList;
+	size_t _textData5Offset;
+	Common::Array<byte> _textData5;
+	Common::Array<TextEntry> _textCache;
+	int _currentTextIndexNum;
+	Common::Array<int> _currentTextIndexVals;
+private:
+	/**
+	 * Load text for the game
+	 */
+	void loadText();
+
+	/**
+	 * Get the text message for a given Id
+	 */
+	const char *getMessage(uint id);
 public:
 	Resources(LegendEngine *vm);
 

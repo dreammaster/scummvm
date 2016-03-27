@@ -146,8 +146,8 @@ void Font::writeChar(char c) {
 	}
 }
 
-void Font::writeString(const Common::String &msg) {
-	const char *msgP = msg.c_str();
+void Font::writeString(const TextMessage &msg) {
+	const char *msgP = msg;
 	while (*msgP)
 		writeChar(*msgP++);
 }
@@ -165,8 +165,8 @@ uint Font::charWidth(char c) const {
 		return _fixedWidth + _fixedSpacing;
 }
 
-uint Font::stringWidth(const Common::String &msg) const {
-	const char *msgP = msg.c_str();
+uint Font::stringWidth(const TextMessage &msg) const {
+	const char *msgP = msg;
 	uint total = 0;
 	while (*msgP)
 		total += charWidth(*msgP++);

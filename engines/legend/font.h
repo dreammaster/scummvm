@@ -89,7 +89,7 @@ public:
 	/**
 	 * Write out a string
 	 */
-	void writeString(const Common::String &msg);
+	void writeString(const TextMessage &msg);
 
 	/**
 	 * Return the width of a character
@@ -99,7 +99,7 @@ public:
 	/**
 	 * Return the width of a string
 	 */
-	uint stringWidth(const Common::String &msg) const;
+	uint stringWidth(const TextMessage &msg) const;
 
 	/**
 	 * Returns the line spacing for the font

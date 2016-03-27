@@ -25,21 +25,33 @@
 
 namespace Legend {
 
-LegendEngine *ResourceMessage::_vm;
+#define MAX_TEXT_CACHE_SIZE 256
 
-ResourceMessage::ResourceMessage(uint id) : _id(id), _msg(nullptr) {}
+LegendEngine *TextMessage::_vm;
 
-ResourceMessage::ResourceMessage(const char *msg) : _id(0), _msg(msg) {}
+TextMessage::TextMessage(uint id) : _id(id), _msg(nullptr) {}
 
-ResourceMessage::operator const char *() const {
-	error("TODO");
+TextMessage::TextMessage(const char *msg) : _id(0), _msg(msg) {}
+
+TextMessage::operator const char *() const {
+	if (_msg)
+		return _msg;
+	else
+		return _vm->_res->getMessage(_id);
 }
 
 /*-------------------------------------------------------------------*/
 
-Resources::Resources(LegendEngine *vm) {
+void TextIndexEntry::load(Common::SeekableReadStream &f) {
+	_count = f.readUint16LE();
+	_size = f.readUint32LE();
+}
+
+/*-------------------------------------------------------------------*/
+
+Resources::Resources(LegendEngine *vm) : _currentTextIndexNum(-1) {
 	_vm = vm;
-	ResourceMessage::_vm = vm;
+	TextMessage::_vm = vm;
 
 	switch (vm->getGameID()) {
 	case GType_Gateway:
@@ -51,12 +63,138 @@ Resources::Resources(LegendEngine *vm) {
 	default:
 		break;
 	}
+
+	loadText();
 }
 
 Common::String Resources::getFilename(FileType fileType, int fileNumber) {
 	const char *const EXTENSIONS[] = { "PIC", "RGN", "FNT", "MUS", "SAV", "SAV" };
 	return Common::String::format("%s_%03d.%s", _prefix.c_str(), fileNumber,
 		EXTENSIONS[fileType]);
+}
+
+void Resources::loadText() {
+	Common::String filename = Common::String::format("%sstr.dat", _prefix.c_str());
+	if (!_textFile.open(filename))
+		error("Could not open - %s", filename.c_str());
+
+	int count = _textFile.readUint16LE();
+	_textList.resize(count);
+	for (int idx = 0; idx < count; ++idx) {
+		_textList[idx].load(_textFile);
+	}
+
+	// Set up file offsets for each text list section data, and skip over the data
+	for (uint idx = 0; idx < _textList.size(); ++idx) {
+		_textList[idx]._indexOffset = _textFile.pos();
+		_textFile.skip(_textList[idx]._count * 2);
+	}
+
+	// Read in the second data block
+	count = _textFile.readUint16LE();
+	_textData2.resize(count);
+	for (int idx = 0; idx < count; ++idx)
+		_textData2[idx] = _textFile.readUint16LE();
+
+	// Read in the word list
+	count = _textFile.readUint16LE();
+
+	_wordList.resize(count);
+	if (count) {
+		// Read in the data offsets
+		Common::Array<uint> offsets;
+		offsets.resize(count);
+		for (int idx = 0; idx < count; ++idx)
+			offsets[idx] = _textFile.readUint16LE();
+
+		// Read in the raw text for the words
+		count = _textFile.readUint16LE();
+		char *data = new char[count];
+		_textFile.read(data, count);
+
+		// Extract the strings from the data block
+		for (uint idx = 0; idx < _wordList.size(); ++idx)
+			_wordList[idx] = Common::String(data + offsets[idx]);
+
+		delete[] data;
+	}
+
+	// Set up file offsets for each text list section raw values, and skip over the data
+	for (uint idx = 0; idx < _textList.size(); ++idx) {
+		_textList[idx]._dataOffset = _textFile.pos();
+		_textFile.skip(_textList[idx]._size);
+	}
+
+	// Test
+	const char *msg = getMessage(0xF0000000);
+	debug("%s\n", msg);
+}
+
+const char *Resources::getMessage(uint id) {
+	assert((id >> 16) >= 0xF000 && (id >> 16) <= 0xF100);
+	id &= 0xFFFFFFF;
+	int sectionNum = id >> 16;
+	int subNum = id & 0xffff;
+
+	// Check for the presence of the Id in the cache
+	for (uint idx = 0; idx < _textCache.size(); ++idx) {
+		// Check for text entry
+		if (_textCache[idx]._id == id) {
+			// If the entry isn't already at the front of the list, put it there
+			if (idx > 0) {
+				_textCache.insert_at(0, _textCache[idx]);
+				_textCache.remove_at(idx + 1);
+
+				return _textCache[0]._text.c_str();
+			}
+		}
+	}
+
+	// Ensure that the section number is within bounds
+	if (sectionNum >= (int)_textList.size())
+		return nullptr;
+
+	// If we're not already using the correct index, load it up
+	TextIndexEntry &indexEntry = _textList[sectionNum];
+	if (_currentTextIndexNum != sectionNum) {
+		_currentTextIndexNum = sectionNum;
+		_textFile.seek(indexEntry._indexOffset);
+
+		_currentTextIndexVals.resize(indexEntry._count);
+		for (int idx = 0; idx < indexEntry._count; ++idx)
+			_currentTextIndexVals[idx] = _textFile.readUint16LE();
+	}
+
+	// Ensure that the sub-section number is within range
+	if (subNum > indexEntry._count)
+		return nullptr;
+
+	// Figure out the offset of the data for the message
+	size_t offset = indexEntry._dataOffset;
+	for (int idx = 0; idx < subNum; ++subNum)
+		offset += _currentTextIndexVals[idx];
+
+	// Prepare a new cache entry, re-using the oldest if there are now
+	// too many entries in the cache
+	if (_textCache.size() <= MAX_TEXT_CACHE_SIZE)
+		_textCache.resize(_textCache.size() + 1);
+	TextEntry &cacheEntry = _textCache[_textCache.size() - 1];
+	cacheEntry._id = id;
+	cacheEntry._text = "";
+
+	// Read in the data
+	_textFile.seek(offset);
+	Common::SeekableReadStream *textStream = _textFile.readStream(_currentTextIndexVals[subNum]);
+
+	// Decode the text
+	// TODO: This isn't quite right yet
+	while (textStream->pos() < textStream->size()) {
+		cacheEntry._text += _wordList[textStream->readByte()];
+	}
+	delete textStream;
+
+	// Return the text
+	return cacheEntry._text.c_str();
 }
 
 } // End of namespace Legend
