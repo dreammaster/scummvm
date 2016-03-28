@@ -70,6 +70,11 @@ protected:
 	 * Initialize the engine
 	 */
 	virtual void initialize();
+
+	/**
+	 * Deinitialize the engine
+	 */
+	virtual void deinitialize();
 public:
 	const LegendGameDescription *_gameDescription;
 	Debugger *_debugger;

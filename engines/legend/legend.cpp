@@ -45,17 +45,23 @@ LegendEngine::~LegendEngine() {
 void LegendEngine::initialize() {
 	DebugMan.addDebugChannel(kDebugLevelScript,      "scripts", "Script debug level");
 
+	Font::init();
+	Message::init(this);
 	_debugger = Debugger::init(this);
 	_events = new Events(this);
 	_res = new Resources(this);
 	_screen = Screen::init(this);
-	Message::init(this);
+}
+
+void LegendEngine::deinitialize() {
+	Font::deinit();
 }
 
 Common::Error LegendEngine::run() {
 	// Initialize the engine
 	initialize();
 
+	deinitialize();
 	return Common::kNoError;
 }
 
