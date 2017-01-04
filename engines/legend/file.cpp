@@ -21,6 +21,7 @@
  */
 
 #include "legend/file.h"
+#include "legend/legend.h"
 
 namespace Legend {
 
@@ -55,5 +56,22 @@ bool File::open(SeekableReadStream *stream, const Common::String &name) {
 		ERROR;
 	return true;
 }
+
+void File::open(FileType fileType, int fileNumber) {
+	Common::String name = getFilename(fileType, fileNumber);
+	open(name);
+}
+
+#undef ERROR
+
+Common::String File::getFilename(FileType fileType, int fileNumber) {
+	Common::String prefix = _vm->getGameFilePrefix();
+
+	const char *const EXTENSIONS[] = { "PIC", "RGN", "FNT", "MUS", "SAV", "SAV" };
+	return Common::String::format("%s_%03d.%s", prefix.c_str(), fileNumber,
+		EXTENSIONS[fileType]);
+}
+
+
 
 } // End of namespace Legend

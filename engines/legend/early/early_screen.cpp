@@ -45,7 +45,7 @@ EarlyScreen::~EarlyScreen() {
 Font *EarlyScreen::loadFont(int fontNumber) {
 	Font *fontList[2] = { &_font0, &_font1 };
 	int idx;
-	Common::File f;
+	File f;
 
 	for (idx = 0; idx < 2; ++idx) {
 		if (fontList[idx]->_counter)
@@ -64,8 +64,7 @@ Font *EarlyScreen::loadFont(int fontNumber) {
 	} else {
 		_activeFont = fontList[idx];
 		if (fontNumber)
-			f.open(_vm->_res->getFilename(FILETYPE_FNT,
-				Font::_fontSectionNum * 100 + fontNumber));
+			f.open(FILETYPE_FNT, Font::_fontSectionNum * 100 + fontNumber);
 
 		_activeFont->_counter = 1;
 		_activeFont->_sectionNum = Font::_fontSectionNum;

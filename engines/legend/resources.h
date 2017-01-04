@@ -29,17 +29,6 @@
 
 namespace Legend {
 
-enum FileType {
-	FILETYPE_PIC = 0,
-	FILETYPE_RGN = 1,
-	FILETYPE_FNT = 2,
-	FILETYPE_MUS = 3,
-	FILETYPE_SAV = 4,
-	FILETYPE_SAV2 = 5,
-	FILETYPE_VOC = 6,
-	FILETYPE_RS = 7
-};
-
 class LegendEngine;
 
 class TextMessage {
@@ -102,11 +91,6 @@ private:
 	Common::String decompressText(Common::SeekableReadStream *stream);
 public:
 	Resources(LegendEngine *vm);
-
-	/**
-	 * Form a filename for a specified file type and number
-	 */
-	Common::String getFilename(FileType fileType, int fileNumber);
 };
 
 } // End of namespace Legend

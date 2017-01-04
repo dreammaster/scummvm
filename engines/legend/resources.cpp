@@ -53,24 +53,7 @@ Resources::Resources(LegendEngine *vm) : _currentTextIndexNum(-1) {
 	_vm = vm;
 	TextMessage::_vm = vm;
 
-	switch (vm->getGameID()) {
-	case GType_Gateway:
-		_prefix = "gate";
-		break;
-	case GType_CompanionsOfXanth:
-		_prefix = "xanth";
-		break;
-	default:
-		break;
-	}
-
 	loadText();
-}
-
-Common::String Resources::getFilename(FileType fileType, int fileNumber) {
-	const char *const EXTENSIONS[] = { "PIC", "RGN", "FNT", "MUS", "SAV", "SAV" };
-	return Common::String::format("%s_%03d.%s", _prefix.c_str(), fileNumber,
-		EXTENSIONS[fileType]);
 }
 
 void Resources::loadText() {

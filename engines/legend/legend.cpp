@@ -27,8 +27,11 @@
 
 namespace Legend {
 
+LegendEngine *_vm;
+
 LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
 		Engine(syst), _gameDescription(gameDesc), _randomSource("Legend") {
+	_vm = this;
 	_debugger = nullptr;
 	_events = nullptr;
 	_res = nullptr;
@@ -63,6 +66,17 @@ Common::Error LegendEngine::run() {
 
 	deinitialize();
 	return Common::kNoError;
+}
+
+Common::String LegendEngine::getGameFilePrefix() const {
+	switch (getGameID()) {
+	case GType_Gateway:
+		return "gate";
+	case GType_CompanionsOfXanth:
+		return "xanth";
+	default:
+		return "";
+	}
 }
 
 } // End of namespace Legend

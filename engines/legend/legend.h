@@ -114,7 +114,14 @@ public:
 	 * Return a random number
 	 */
 	int getRandomNumber(int limit) { return _randomSource.getRandomNumber(limit - 1); }
+
+	/**
+	 * Returns the prefix games use for certain data files
+	 */
+	Common::String getGameFilePrefix() const;
 };
+
+extern LegendEngine *_vm;
 
 } // End of namespace Legend
 
