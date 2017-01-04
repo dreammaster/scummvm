@@ -42,6 +42,9 @@ private:
 protected:
 	LegendEngine *_vm;
 public:
+	bool _paletteDirty;
+	byte _gamePalette[PALETTE_SIZE];
+public:
 	Screen(LegendEngine *vm);
 	virtual ~Screen();
 	static Screen *init(LegendEngine *vm);
@@ -52,9 +55,24 @@ public:
 	void addArea(ScreenArea *area);
 
 	/**
-	* Removes a visual element from the screen
-	*/
+	 * Removes a visual element from the screen
+	 */
 	void removeArea(ScreenArea *area);
+
+	/**
+	 * Reset the palette to blank
+	 */
+	void resetPalette();
+
+	/**
+	 * Set the palette
+	 */
+	void setPalette(const byte palette[PALETTE_SIZE]);
+
+	/**
+	 * Set a subsection of the palette
+	 */
+	void setPalette(const byte *palette, uint start, uint num);
 };
 
 } // End of namespace Legend

@@ -30,4 +30,15 @@ LaterScreen::LaterScreen(LegendEngine *vm) : Screen(vm) {
 LaterScreen::~LaterScreen() {
 }
 
+void LaterScreen::setDefaultPalette() {
+	for (int idx = 0; idx < 48; ++idx) {
+		_gamePalette[idx] = ((idx / 3) * 63) / 15;
+	}
+	_gamePalette[PALETTE_SIZE - 3] = 0;
+	_gamePalette[PALETTE_SIZE - 2] = 0;
+	_gamePalette[PALETTE_SIZE - 1] = 0;
+
+	setPalette(_gamePalette);
+}
+
 } // End of namespace Legend

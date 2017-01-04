@@ -49,4 +49,20 @@ void Screen::removeArea(ScreenArea *area) {
 	_screenAreas.remove(area);
 }
 
+void Screen::resetPalette() {
+	byte pal[PALETTE_SIZE];
+	Common::fill(&pal[0], &pal[PALETTE_SIZE], 0);
+	setPalette(pal);
+}
+
+void Screen::setPalette(const byte palette[PALETTE_SIZE]) {
+	Graphics::Screen::setPalette(palette);
+	_paletteDirty = false;
+}
+
+void Screen::setPalette(const byte *palette, uint start, uint num) {
+	Graphics::Screen::setPalette(palette, start, num);
+	_paletteDirty = false;
+}
+
 } // End of namespace Legend

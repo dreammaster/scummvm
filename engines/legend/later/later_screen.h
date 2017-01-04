@@ -31,6 +31,11 @@ class LaterScreen : public Screen {
 public:
 	LaterScreen(LegendEngine *vm);
 	virtual ~LaterScreen();
+
+	/**
+	 * Sets a default game palette
+	 */
+	void setDefaultPalette();
 };
 
 } // End of namespace Legend
