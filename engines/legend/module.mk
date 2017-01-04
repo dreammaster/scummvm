@@ -7,6 +7,7 @@ MODULE_OBJS = \
 	detection.o \
 	events.o \
 	font.o \
+	file.o \
 	legend.o \
 	input_area.o \
 	messages.o \

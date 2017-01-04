@@ -75,8 +75,7 @@ Common::String Resources::getFilename(FileType fileType, int fileNumber) {
 
 void Resources::loadText() {
 	Common::String filename = Common::String::format("%sstr.dat", _prefix.c_str());
-	if (!_textFile.open(filename))
-		error("Could not open - %s", filename.c_str());
+	_textFile.open(filename);
 
 	int count = _textFile.readUint16LE();
 	_textList.resize(count);

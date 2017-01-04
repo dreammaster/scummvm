@@ -23,9 +23,9 @@
 #ifndef LEGEND_RESOURCES_H
 #define LEGEND_RESOURCES_H
 
-#include "common/file.h"
 #include "common/str.h"
 #include "common/str-array.h"
+#include "legend/file.h"
 
 namespace Legend {
 
@@ -78,7 +78,7 @@ class Resources {
 private:
 	LegendEngine *_vm;
 	Common::String _prefix;
-	Common::File _textFile;
+	File _textFile;
 	Common::Array<TextIndexEntry> _textList;
 	Common::Array<int> _decryptionTable;
 	Common::StringArray _wordList;
