@@ -66,7 +66,6 @@ class Resources {
 	};
 private:
 	LegendEngine *_vm;
-	Common::String _prefix;
 	File _textFile;
 	Common::Array<TextIndexEntry> _textList;
 	Common::Array<int> _decryptionTable;

@@ -28,31 +28,31 @@ namespace Legend {
 #define ERROR error("Could not open file - %s", name.c_str())
 
 File::File(const Common::String &name) : Common::File() {
-	if (!open(name))
+	if (!Common::File::open(name))
 		ERROR;
 }
 
 bool File::open(const Common::String &name) {
-	if (!open(name))
+	if (!Common::File::open(name))
 		ERROR;
 	return true;
 }
 
 bool File::open(const Common::String &name, Common::Archive &archive) {
-	if (!open(name))
+	if (!Common::File::open(name, archive))
 		ERROR;
 	return true;
 }
 
 bool File::open(const Common::FSNode &node) {
 	Common::String name = node.getName();
-	if (!open(name))
+	if (!Common::File::open(node))
 		ERROR;
 	return true;
 }
 
 bool File::open(SeekableReadStream *stream, const Common::String &name) {
-	if (!open(name))
+	if (!Common::File::open(stream, name))
 		ERROR;
 	return true;
 }

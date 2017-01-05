@@ -57,7 +57,8 @@ Resources::Resources(LegendEngine *vm) : _currentTextIndexNum(-1) {
 }
 
 void Resources::loadText() {
-	Common::String filename = Common::String::format("%sstr.dat", _prefix.c_str());
+	Common::String prefix = _vm->getGameFilePrefix();
+	Common::String filename = Common::String::format("%sstr.dat", prefix.c_str());
 	_textFile.open(filename);
 
 	int count = _textFile.readUint16LE();

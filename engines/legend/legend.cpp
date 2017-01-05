@@ -69,8 +69,17 @@ Common::Error LegendEngine::run() {
 	// Initialize the engine
 	initialize();
 
+	playGame();
+
 	deinitialize();
 	return Common::kNoError;
+}
+
+void LegendEngine::playGame() {
+
+	while (!shouldQuit()) {
+		_events->pollEventsAndWait();
+	}
 }
 
 Common::String LegendEngine::getGameFilePrefix() const {

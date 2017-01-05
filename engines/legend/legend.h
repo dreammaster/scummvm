@@ -95,6 +95,11 @@ public:
 	virtual Common::Error run();
 
 	/**
+	 * Play the game
+	 */
+	void playGame();
+
+	/**
 	 * Returns the Id of the game
 	 */
 	GameType getGameID() const;
