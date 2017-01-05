@@ -68,7 +68,7 @@ Common::String File::getFilename(FileType fileType, int fileNumber) {
 	Common::String prefix = _vm->getGameFilePrefix();
 
 	const char *const EXTENSIONS[] = { "PIC", "RGN", "FNT", "MUS", "SAV", "SAV" };
-	return Common::String::format("%s_%03d.%s", prefix.c_str(), fileNumber,
+	return Common::String::format("%s_%02d.%s", prefix.c_str(), fileNumber,
 		EXTENSIONS[fileType]);
 }
 

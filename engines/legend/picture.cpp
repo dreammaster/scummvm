@@ -50,7 +50,7 @@ bool PicFile::open(uint pictureNum, uint frameNum) {
 		_file.open(FILETYPE_PIC, fileNumber);
 	
 		// Load in the index
-		loadIndex(pictureNum);
+		loadIndex(fileNumber);
 		assert(_index);
 	}
 

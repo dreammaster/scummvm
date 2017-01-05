@@ -76,6 +76,10 @@ Common::Error LegendEngine::run() {
 }
 
 void LegendEngine::playGame() {
+	Picture *pic = _picFile->load(31);
+	_screen->blitFrom(*pic);
+	_screen->setPalette();
+	delete pic;
 
 	while (!shouldQuit()) {
 		_events->pollEventsAndWait();

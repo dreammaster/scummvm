@@ -74,6 +74,11 @@ public:
 	 * Set a subsection of the palette
 	 */
 	void setPalette(const byte *palette, uint start, uint num);
+
+	/**
+	 * Set the palette to the currently loaded game palette
+	 */
+	void setPalette() { setPalette(_gamePalette); }
 };
 
 } // End of namespace Legend

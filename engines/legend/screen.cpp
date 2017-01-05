@@ -36,6 +36,7 @@ Screen *Screen::init(LegendEngine *vm) {
 
 Screen::Screen(LegendEngine *vm): _vm(vm), _paletteDirty(false), _picPalette(false) {
 	Font::init();
+	Common::fill(&_gamePalette[0], &_gamePalette[PALETTE_SIZE], 0);
 }
 
 Screen::~Screen() {
