@@ -28,7 +28,7 @@ namespace Legend {
 #define INDEXES_COUNT 2
 
 PicFile::PicFile() : _currentFileNumber(-1), _index(nullptr),
-		_paletteCheck(false), _skipPalette(false), _val1(0), _val2(0) {
+		_paletteCheck(false), _skipPreload(false), _val1(0), _val2(0) {
 	_indexes.resize(INDEXES_COUNT);
 }
 
@@ -55,6 +55,7 @@ bool PicFile::open(uint pictureNum, uint frameNum) {
 		return false;
 
 	const IndexEntry &entry = (*_index)[picIndex];
+	_currentPic = entry;
 	_file.seek(entry._offset);
 
 	if (_paletteCheck && (entry._flags & PIC_HAS_PALETTE))
@@ -73,7 +74,7 @@ bool PicFile::open(uint pictureNum, uint frameNum) {
 		_val2 = 0;
 	}
 
-	if (!_skipPalette) {
+	if (!_skipPreload) {
 		_file.seek(entry._offset + entry._frameCount * 4);
 		if (entry._flags & PIC_HAS_PALETTE) {
 			// Read in the game palette for the picture
@@ -81,7 +82,7 @@ bool PicFile::open(uint pictureNum, uint frameNum) {
 			_vm->_screen->_picPalette = true;
 		}
 
-		return entry._field6 && entry._field8;
+		return entry._width > 0 && entry._height > 0;
 	}
 
 	return true;
@@ -157,8 +158,8 @@ bool PicFile::IndexEntry::load(Common::SeekableReadStream &s) {
 	
 	_frameCount = s.readByte();
 	_flags = s.readByte();
-	_field6 = s.readUint16LE();
-	_field8 = s.readUint16LE();
+	_width = s.readUint16LE();
+	_height = s.readUint16LE();
 	_fieldA = s.readUint16LE();
 	return true;
 }

@@ -36,14 +36,14 @@ class PicFile {
 		uint _offset;
 		uint _frameCount;
 		byte _flags;
-		int _field6;
-		int _field8;
+		uint _width;
+		uint _height;
 		int _fieldA;
 		// Calculated after loading
 		uint _size;
 
-		IndexEntry() : _offset(0), _frameCount(0), _flags(0), _field6(0),
-			_field8(0), _fieldA(0), _size(0) {}
+		IndexEntry() : _offset(0), _frameCount(0), _flags(0), _width(0),
+			_height(0), _fieldA(0), _size(0) {}
 
 		/**
 		 * Load an index entry
@@ -71,8 +71,9 @@ private:
 	int _currentFileNumber;
 	Indexes _indexes;
 	IndexEntries *_index;
+	IndexEntry _currentPic;
 	bool _paletteCheck;
-	bool _skipPalette;
+	bool _skipPreload;
 	int _val1;
 	int _val2;
 private:
