@@ -20,7 +20,7 @@
  *
  */
 
-#include "legend/pic_file.h"
+#include "legend/picture.h"
 #include "legend/legend.h"
 
 namespace Legend {
@@ -30,6 +30,10 @@ namespace Legend {
 PicFile::PicFile() : _currentFileNumber(-1), _index(nullptr),
 		_paletteCheck(false), _skipPreload(false), _val1(0), _val2(0) {
 	_indexes.resize(INDEXES_COUNT);
+}
+
+PicFile::~PicFile() {
+	_file.close();
 }
 
 bool PicFile::open(uint pictureNum, uint frameNum) {
@@ -86,6 +90,18 @@ bool PicFile::open(uint pictureNum, uint frameNum) {
 	}
 
 	return true;
+}
+
+Picture *PicFile::load(uint pictureNum, uint frameNum) {
+	if (!open(pictureNum, frameNum))
+		return nullptr;
+
+	// Create the new picture instance
+	Picture *pic = new Picture;
+	pic->create(_currentPic._width, _currentPic._height);
+
+	// Return the picture
+	return pic;
 }
 
 void PicFile::loadIndex(int fileNumber) {

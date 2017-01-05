@@ -34,8 +34,9 @@
 #include "engines/engine.h"
 #include "legend/debugger.h"
 #include "legend/events.h"
-#include "legend/pic_file.h"
+#include "legend/picture.h"
 #include "legend/resources.h"
+#include "legend/scene.h"
 #include "legend/screen.h"
 
 namespace Legend {
@@ -82,6 +83,7 @@ public:
 	Events *_events;
 	PicFile *_picFile;
 	Resources *_res;
+	Scene *_scene;
 	Screen *_screen;
 public:
 	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);

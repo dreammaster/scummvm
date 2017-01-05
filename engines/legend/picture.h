@@ -20,15 +20,19 @@
  *
  */
 
-#ifndef LEGEND_PIC_FILE_H
-#define LEGEND_PIC_FILE_H
+#ifndef LEGEND_PIC_H
+#define LEGEND_PIC_H
 
+#include "graphics/managed_surface.h"
 #include "legend/file.h"
 
 namespace Legend {
 
 enum {
 	PIC_HAS_PALETTE = 0x10
+};
+
+class Picture : public Graphics::ManagedSurface {
 };
 
 class PicFile {
@@ -89,11 +93,17 @@ private:
 	int findIndexesSlot() const;
 public:
 	PicFile();
+	~PicFile();
 
 	/**
 	 * Opens up a picture
 	 */
 	bool open(uint pictureNum, uint frameNum = 0);
+
+	/**
+	 * Gets a picture
+	 */
+	Picture *load(uint pictureNum, uint frameNum = 0);
 };
 
 } // End of namespace Legend
