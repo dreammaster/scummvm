@@ -34,6 +34,7 @@
 #include "engines/engine.h"
 #include "legend/debugger.h"
 #include "legend/events.h"
+#include "legend/pic_file.h"
 #include "legend/resources.h"
 #include "legend/screen.h"
 
@@ -79,6 +80,7 @@ public:
 	const LegendGameDescription *_gameDescription;
 	Debugger *_debugger;
 	Events *_events;
+	PicFile *_picFile;
 	Resources *_res;
 	Screen *_screen;
 public:

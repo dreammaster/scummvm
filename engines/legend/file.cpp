@@ -72,6 +72,4 @@ Common::String File::getFilename(FileType fileType, int fileNumber) {
 		EXTENSIONS[fileType]);
 }
 
-
-
 } // End of namespace Legend

@@ -11,6 +11,7 @@ MODULE_OBJS = \
 	legend.o \
 	input_area.o \
 	messages.o \
+	pic_file.o \
 	resources.o \
 	scene_area.o \
 	screen.o \

@@ -41,6 +41,7 @@ LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc)
 LegendEngine::~LegendEngine() {
 	delete _debugger;
 	delete _events;
+	delete _picFile;
 	delete _res;
 	delete _screen;
 }
@@ -52,6 +53,7 @@ void LegendEngine::initialize() {
 	Message::init(this);
 	_debugger = Debugger::init(this);
 	_events = new Events(this);
+	_picFile = new PicFile();
 	_res = new Resources(this);
 	_screen = Screen::init(this);
 }
