@@ -27,11 +27,12 @@ namespace Legend {
 
 #define INDEXES_COUNT 2
 
-PicFile::PicFile() : _currentFileNumber(-1), _index(nullptr) {
+PicFile::PicFile() : _currentFileNumber(-1), _index(nullptr),
+		_paletteCheck(false), _skipPalette(false), _val1(0), _val2(0) {
 	_indexes.resize(INDEXES_COUNT);
 }
 
-void PicFile::open(int pictureNum, int paletteNum) {
+bool PicFile::open(uint pictureNum, uint frameNum) {
 	int fileNumber = (pictureNum >> 8) & 0xff;
 	int picIndex = pictureNum & 0xff;
 	
@@ -49,7 +50,41 @@ void PicFile::open(int pictureNum, int paletteNum) {
 		assert(_index);
 	}
 
-	// TODO
+	if (picIndex >= (int)_index->size())
+		// No such entry in the file
+		return false;
+
+	const IndexEntry &entry = (*_index)[picIndex];
+	_file.seek(entry._offset);
+
+	if (_paletteCheck && (entry._flags & PIC_HAS_PALETTE))
+		return false;
+
+	if (frameNum > entry._frameCount)
+		frameNum = entry._frameCount;
+
+	if (frameNum > 0) {
+		// Get the offset of the frame
+		_file.seek(entry._offset + (frameNum - 1) * 4);
+		_val1 = _file.readUint16LE();
+		_val2 = _file.readUint16LE();
+	} else {
+		_val1 = 0;
+		_val2 = 0;
+	}
+
+	if (!_skipPalette) {
+		_file.seek(entry._offset + entry._frameCount * 4);
+		if (entry._flags & PIC_HAS_PALETTE) {
+			// Read in the game palette for the picture
+			_file.read(_vm->_screen->_gamePalette, PALETTE_SIZE);
+			_vm->_screen->_picPalette = true;
+		}
+
+		return entry._field6 && entry._field8;
+	}
+
+	return true;
 }
 
 void PicFile::loadIndex(int fileNumber) {
@@ -80,15 +115,15 @@ void PicFile::loadIndex(int fileNumber) {
 	uint idx;
 	for (idx = 0; idx < index._entries.size(); ++idx) {
 		IndexEntry &e = index._entries[idx];
-		uint extraSize = e._field4 * 4;
+		uint frameListSize = e._frameCount * 4;
 		uint palSize = (e._flags & PIC_HAS_PALETTE) ? PALETTE_SIZE : 0;
 
 		// Calculate each entry's size by getting either the following entry's
 		// offset, or to the end of the file for the last entry
 		if (idx == (index._entries.size() - 1)) {
-			e._size = _file.size() - e._offset - palSize - extraSize;
+			e._size = _file.size() - e._offset - palSize - frameListSize;
 		} else {
-			e._size = index._entries[idx + 1]._offset - e._offset - palSize;
+			e._size = index._entries[idx + 1]._offset - e._offset - palSize - frameListSize;
 		}
 	}
 }
@@ -120,7 +155,7 @@ bool PicFile::IndexEntry::load(Common::SeekableReadStream &s) {
 	if (!_offset)
 		return false;
 	
-	_field4 = s.readByte();
+	_frameCount = s.readByte();
 	_flags = s.readByte();
 	_field6 = s.readUint16LE();
 	_field8 = s.readUint16LE();

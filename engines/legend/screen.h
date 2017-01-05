@@ -44,6 +44,7 @@ protected:
 public:
 	bool _paletteDirty;
 	byte _gamePalette[PALETTE_SIZE];
+	bool _picPalette;
 public:
 	Screen(LegendEngine *vm);
 	virtual ~Screen();

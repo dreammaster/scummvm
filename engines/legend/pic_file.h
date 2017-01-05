@@ -34,7 +34,7 @@ enum {
 class PicFile {
 	struct IndexEntry {
 		uint _offset;
-		byte _field4;
+		uint _frameCount;
 		byte _flags;
 		int _field6;
 		int _field8;
@@ -42,7 +42,7 @@ class PicFile {
 		// Calculated after loading
 		uint _size;
 
-		IndexEntry() : _offset(0), _field4(0), _flags(0), _field6(0),
+		IndexEntry() : _offset(0), _frameCount(0), _flags(0), _field6(0),
 			_field8(0), _fieldA(0), _size(0) {}
 
 		/**
@@ -71,6 +71,10 @@ private:
 	int _currentFileNumber;
 	Indexes _indexes;
 	IndexEntries *_index;
+	bool _paletteCheck;
+	bool _skipPalette;
+	int _val1;
+	int _val2;
 private:
 	/**
 	 * Loads the index of a newly opened PIC file
@@ -86,9 +90,9 @@ public:
 	PicFile();
 
 	/**
-	 * Opens up a picture file
+	 * Opens up a picture
 	 */
-	void open(int pictureNum, int paletteNum = 0);
+	bool open(uint pictureNum, uint frameNum = 0);
 };
 
 } // End of namespace Legend

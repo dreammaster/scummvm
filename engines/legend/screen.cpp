@@ -34,7 +34,7 @@ Screen *Screen::init(LegendEngine *vm) {
 		return new EarlyScreen(vm);
 }
 
-Screen::Screen(LegendEngine *vm): _vm(vm) {
+Screen::Screen(LegendEngine *vm): _vm(vm), _paletteDirty(false), _picPalette(false) {
 	Font::init();
 }
 
