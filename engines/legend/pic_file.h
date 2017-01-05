@@ -27,24 +27,30 @@
 
 namespace Legend {
 
+enum {
+	PIC_HAS_PALETTE = 0x10
+};
+
 class PicFile {
-	struct Index1Entry {
-		int _field0;
-		int _field2;
-		int _field4;
+	struct IndexEntry {
+		uint _offset;
+		byte _field4;
+		byte _flags;
 		int _field6;
 		int _field8;
 		int _fieldA;
+		// Calculated after loading
+		uint _size;
 
-		Index1Entry() : _field0(0), _field2(0), _field4(0), _field6(0),
-			_field8(0), _fieldA(0) {}
+		IndexEntry() : _offset(0), _field4(0), _flags(0), _field6(0),
+			_field8(0), _fieldA(0), _size(0) {}
 
 		/**
 		 * Load an index entry
 		 */
-		void load(Common::SeekableReadStream &s);
+		bool load(Common::SeekableReadStream &s);
 	};
-	class Index1Entries : public Common::Array<Index1Entry> {
+	class IndexEntries : public Common::Array<IndexEntry> {
 	public:
 		/**
 		 * Load an index entry
@@ -52,18 +58,10 @@ class PicFile {
 		void load(Common::SeekableReadStream &s);
 	};
 
-	struct Index2Entry {
-		int _field0;
-
-		Index2Entry() : _field0(0) {}
-	};
-	typedef Common::Array<Index2Entry> Index2Entries;
-
 	struct Index {
 		int _fileNumber;
 		int _refCounter;
-		Index1Entries _entries1;
-		Index2Entries _entries2;
+		IndexEntries _entries;
 
 		Index() : _fileNumber(-1), _refCounter(0) {}
 	};
@@ -72,8 +70,7 @@ private:
 	File _file;
 	int _currentFileNumber;
 	Indexes _indexes;
-	Index1Entries *_index1;
-	Index2Entries *_index2;
+	IndexEntries *_index;
 private:
 	/**
 	 * Loads the index of a newly opened PIC file
