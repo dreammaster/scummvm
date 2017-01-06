@@ -35,6 +35,7 @@ enum {
 
 class PictureDecoder {
 private:
+	static const uint16 _SETUP_DATA[256];
 	static const byte _DATA1[256];
 	static const byte _DATA2[16];
 	static const byte _DATA3[16];
@@ -70,6 +71,11 @@ private:
 	 * Inner method for doing the decoding
 	 */
 	int decodeInner();
+
+	/**
+	 * Does some general setup of reference arrays
+	 */
+	void setup();
 
 	/**
 	 * Sets up an array used in unpacking
