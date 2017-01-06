@@ -23,6 +23,7 @@
 #ifndef LEGEND_PIC_H
 #define LEGEND_PIC_H
 
+#include "common/memstream.h"
 #include "graphics/managed_surface.h"
 #include "legend/file.h"
 
@@ -32,7 +33,68 @@ enum {
 	PIC_HAS_PALETTE = 0x10
 };
 
-class Picture : public Graphics::ManagedSurface {
+class PictureDecoder {
+private:
+	static const byte _DATA1[256];
+	static const byte _DATA2[16];
+	static const byte _DATA3[16];
+	static const byte _DATA4[32];
+	static const byte _DATA5[64];
+	static const byte _REF1[16];
+	static const byte _REF2[64];
+private:
+	Common::SeekableReadStream *_inputStream;
+	Common::WriteStream *_outputStream;
+	int _field0;
+	int _field2;
+	int _field4;
+	int _field6;
+	int _field8;
+	int _fieldA;
+	int _fieldC;
+	byte _array1[256];
+	byte _array2[1152];
+	byte _array3[256];
+	byte _array4[64];
+	byte _array5[16];
+	byte _array6[16];
+	byte _array7[16];
+private:
+	/**
+	 * Inner method for doing the decoding
+	 */
+	int decodeInner();
+
+	/**
+	 * Sets up an array used in unpacking
+	 */
+	void setupArray(const byte *src, int srcSize, const byte *ref, byte *dest);
+
+	/**
+	 * Does the actual unpacking
+	 */
+	int unpack();
+public:
+	PictureDecoder();
+	virtual ~PictureDecoder();
+
+	/**
+	 * Decodes a picture from a passed stream
+	 */
+	int decode(Common::SeekableReadStream *inStream, Common::WriteStream *outStream);
+};
+
+class Picture : public Graphics::ManagedSurface, public PictureDecoder {
+public:
+	Picture() : Graphics::ManagedSurface(), PictureDecoder() {}
+	Picture(Picture &surf) : Graphics::ManagedSurface(surf), PictureDecoder() {}
+	Picture(int width, int height) : Graphics::ManagedSurface(width, height), PictureDecoder() {}
+	Picture(Picture &surf, const Common::Rect &bounds) : Graphics::ManagedSurface(surf, bounds), PictureDecoder() {}
+
+	/**
+	 * Decodes a picture from a passed stream
+	 */
+	int decode(Common::SeekableReadStream *inStream);
 };
 
 class PicFile {
