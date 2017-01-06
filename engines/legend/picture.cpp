@@ -389,6 +389,22 @@ int PictureDecoder::fetch() {
 }
 
 #undef PREFETCH
+#define PREFETCH(COUNT) if (prefetch(COUNT)) return 0
+
+int PictureDecoder::transform(int numBits) {
+	int val = _array1[_bits & 0xff];
+	PREFETCH(_array4[val]);
+
+	if (numBits == 2) {
+		val = (val << 2) | (_bits & 3);
+		PREFETCH(numBits);
+	} else {
+		val = (val << _field6) | (_bits & _field8);
+		PREFETCH(_field6);
+	}
+
+	return val + 1;
+}
 
 /*-------------------------------------------------------------------*/
 

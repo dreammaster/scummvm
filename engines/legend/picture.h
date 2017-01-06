@@ -93,6 +93,11 @@ private:
 	 * Fetches a new value from the input
 	 */
 	int fetch();
+
+	/**
+	 * Does some sort of fetch transformation
+	 */
+	int transform(int numBits);
 public:
 	PictureDecoder();
 	virtual ~PictureDecoder();
