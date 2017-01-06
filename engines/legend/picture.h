@@ -42,12 +42,13 @@ class PicFile {
 		byte _flags;
 		uint _width;
 		uint _height;
-		int _fieldA;
+		byte _fieldA;
+		byte _fieldB;
 		// Calculated after loading
 		uint _size;
 
 		IndexEntry() : _offset(0), _frameCount(0), _flags(0), _width(0),
-			_height(0), _fieldA(0), _size(0) {}
+			_height(0), _fieldA(0), _fieldB(0), _size(0) {}
 
 		/**
 		 * Load an index entry

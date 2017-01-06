@@ -176,7 +176,8 @@ bool PicFile::IndexEntry::load(Common::SeekableReadStream &s) {
 	_flags = s.readByte();
 	_width = s.readUint16LE();
 	_height = s.readUint16LE();
-	_fieldA = s.readUint16LE();
+	_fieldA = s.readByte();
+	_fieldB = s.readByte();
 	return true;
 }
 
