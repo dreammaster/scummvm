@@ -50,8 +50,8 @@ private:
 	int _field4;
 	int _field6;
 	int _field8;
-	int _fieldA;
-	int _fieldC;
+	uint _bits;
+	int _bitsRemaining;
 	byte _array1[256];
 	byte _array2[1152];
 	byte _array3[256];
@@ -59,6 +59,12 @@ private:
 	byte _array5[16];
 	byte _array6[16];
 	byte _array7[16];
+	
+	byte _array10[256];
+	byte _array11[256];
+	byte _array12[128];
+	byte _array13[256];
+
 private:
 	/**
 	 * Inner method for doing the decoding
@@ -74,6 +80,19 @@ private:
 	 * Does the actual unpacking
 	 */
 	int unpack();
+
+	/**
+	 * Ensures there's enough bits available to read, fetching new bytes from
+	 * the input stream as necessary
+	 * @param numBits	Number of bits that will be needed
+	 * @return		True if the entire end of stream has been reached
+	 */
+	bool prefetch(int numBits);
+
+	/**
+	 * Fetches a new value from the input
+	 */
+	int fetch();
 public:
 	PictureDecoder();
 	virtual ~PictureDecoder();

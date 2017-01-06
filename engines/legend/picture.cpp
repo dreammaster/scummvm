@@ -245,6 +245,8 @@ const byte PictureDecoder::_REF2[64] = {
 	240, 112, 176, 48, 208, 80, 144, 16, 224, 96, 160, 32, 192, 64, 128,  0
 };
 
+#define ERROR_CODE 0x306
+
 PictureDecoder::PictureDecoder() {
 	_inputStream = nullptr;
 	_outputStream = nullptr;
@@ -253,8 +255,8 @@ PictureDecoder::PictureDecoder() {
 	_field4 = 0;
 	_field6 = 0;
 	_field8 = 0;
-	_fieldA = 0;
-	_fieldC = 0;
+	_bits = 0;
+	_bitsRemaining = 0;
 }
 
 PictureDecoder::~PictureDecoder() {
@@ -280,7 +282,7 @@ int PictureDecoder::decodeInner() {
 
 	_field2 = _inputStream->readByte();
 	_field6 = _inputStream->readByte();
-	_fieldA = _inputStream->readByte();
+	_bits = _inputStream->readByte();
 
 	if (_field6 < 4 || _field6 > 6)
 		return 1;
@@ -316,6 +318,77 @@ int PictureDecoder::unpack() {
 	// TODO
 	return 0;
 }
+
+bool PictureDecoder::prefetch(int numBits) {
+	if (numBits <= _bitsRemaining) {
+		// There's enough bits left
+		_bits >>= numBits;
+		_bitsRemaining -= numBits;
+		return false;
+	}
+
+	if (_inputStream->pos() >= _inputStream->size())
+		return true;
+
+	_bits >>= _bitsRemaining;
+	_bits |= ((uint)_inputStream->readByte() << 8);
+	_bits >>= numBits - _bitsRemaining;
+	_bitsRemaining = -(8 - (numBits - _bitsRemaining));
+	return false;
+}
+
+#define PREFETCH(COUNT) if (prefetch(COUNT)) return ERROR_CODE
+
+int PictureDecoder::fetch() {
+	int offset, val;
+	int numBits, shift;
+
+	if (_bits & 1) {
+		PREFETCH(1);
+		offset = _array2[_bits & 0xff];
+		numBits = _array5[offset];
+		
+		PREFETCH(numBits);
+		shift = _array6[offset];
+		if (!shift)
+			return offset + 0x100;
+
+		val = _bits & ((1 << shift) - 1);
+		val += _array7[offset];
+		PREFETCH(shift);
+		return val + 0x100;
+	}
+
+	PREFETCH(1);
+	val = _bits & 0xff;
+	if (!_field2) {
+		PREFETCH(8);
+		return val;
+	}
+
+	if (!val) {
+		PREFETCH(8);
+		val = _array13[_bits & 0xff];
+	} else {
+		offset = val;
+		val = _array10[offset];
+		if (val == 0xff) {
+			if (_bits & 0x3f) {
+				PREFETCH(4);
+				val = _array11[_bits & 0xff];
+			} else {
+				PREFETCH(6);
+				val = _array12[_bits & 0x7f];
+			}
+		}
+	}
+
+	numBits = _array3[val];
+	PREFETCH(numBits);
+	return val;
+}
+
+#undef PREFETCH
 
 /*-------------------------------------------------------------------*/
 
