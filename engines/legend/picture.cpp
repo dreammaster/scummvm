@@ -305,7 +305,11 @@ int PictureDecoder::decodeInner() {
 }
 
 void PictureDecoder::setupArray(const byte *src, int srcSize, const byte *ref, byte *dest) {
-	// TODO
+	for (int idx = srcSize - 1; idx >= 0; --idx, ++src, ++ref) {
+		int jump = 1 << *src;	
+		for (int offset = *ref; offset < 256; offset += jump)
+			dest[offset] = idx;
+	}
 }
 
 int PictureDecoder::unpack() {
