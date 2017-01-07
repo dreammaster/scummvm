@@ -264,6 +264,7 @@ const byte PictureDecoder::_REF2[64] = {
 	240, 112, 176, 48, 208, 80, 144, 16, 224, 96, 160, 32, 192, 64, 128,  0
 };
 
+#define END_OF_STREAM 0x305
 #define ERROR_CODE 0x306
 
 PictureDecoder::PictureDecoder() {
@@ -271,7 +272,6 @@ PictureDecoder::PictureDecoder() {
 	_outputStream = nullptr;
 	_field0 = 0;
 	_field2 = 0;
-	_field4 = 0;
 	_field6 = 0;
 	_field8 = 0;
 	_bits = 0;
@@ -311,6 +311,7 @@ int PictureDecoder::decodeInner() {
 		if (_field2 != 1)
 			return 2;
 		Common::copy(_DATA1, _DATA1 + 256, _array3);
+		setup();
 	}
 
 	Common::copy(_DATA2, _DATA2 + 16, _array5);
@@ -373,9 +374,45 @@ void PictureDecoder::setupArray(const byte *src, int srcSize, const byte *ref, b
 	}
 }
 
+#define BUFFER_SIZE 0x1000
+#define BUFFER_SIZE2 0x2000
+#define PADDING_SIZE 516
+
 int PictureDecoder::unpack() {
-	// TODO
-	return 0;
+	byte buffer[BUFFER_SIZE2 + PADDING_SIZE];
+	Common::fill(&buffer[0], &buffer[BUFFER_SIZE2 + PADDING_SIZE], 0);
+
+	uint offset = BUFFER_SIZE;
+	int result = 0;
+	int val;
+	while ((val = fetch()) < (ERROR_CODE - 1)) {
+		if (val < 0x100) {
+			buffer[offset++] = val;
+		} else {
+			int count = val - 0xfe;
+			val = transform(count);
+			if (!val) {
+				result = ERROR_CODE;
+				break;
+			}
+
+			byte *destP = &buffer[offset];
+			byte *srcP = destP - val;
+			Common::copy(srcP, srcP + count, destP);
+			offset += count;
+		}
+
+		if (offset >= BUFFER_SIZE2) {
+			// Write out the data to the output stream
+			_outputStream->write(&buffer[BUFFER_SIZE], BUFFER_SIZE);
+			
+			// Shift the written data into the low portion of the buffer
+			Common::copy(&buffer[BUFFER_SIZE], &buffer[offset], &buffer[0]);
+			offset -= BUFFER_SIZE;
+		}
+	}
+
+	return result;
 }
 
 bool PictureDecoder::prefetch(int numBits) {

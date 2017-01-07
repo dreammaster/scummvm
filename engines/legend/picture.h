@@ -48,7 +48,6 @@ private:
 	Common::WriteStream *_outputStream;
 	int _field0;
 	int _field2;
-	int _field4;
 	int _field6;
 	int _field8;
 	uint _bits;
