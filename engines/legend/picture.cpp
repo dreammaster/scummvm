@@ -389,20 +389,22 @@ int PictureDecoder::unpack() {
 
 	uint offset = BUFFER_SIZE;
 	int result = 0;
-	int val;
-	while ((val = fetch()) < (ERROR_CODE - 1)) {
+	int val, blockOffset;
+	while ((val = fetch()) < END_OF_STREAM) {
 		if (val < 0x100) {
+			// Simple 8-bit value to add to output
 			buffer[offset++] = val;
 		} else {
+			// It's instructions to copy a prior block of data
 			int count = val - 0xfe;
-			val = transform(count);
-			if (!val) {
+			blockOffset = getBlockOffset(count);
+			if (!blockOffset) {
 				result = ERROR_CODE;
 				break;
 			}
 
 			byte *destP = &buffer[offset];
-			byte *srcP = destP - val;
+			byte *srcP = destP - blockOffset;
 			Common::copy(srcP, srcP + count, destP);
 			offset += count;
 		}
@@ -411,7 +413,8 @@ int PictureDecoder::unpack() {
 			// Write out the data to the output stream
 			_outputStream->write(&buffer[BUFFER_SIZE], BUFFER_SIZE);
 			
-			// Shift the written data into the low portion of the buffer
+			// Shift the written data into the low portion of the buffer,
+			// so it's available for future block copy operations
 			Common::copy(&buffer[BUFFER_SIZE], &buffer[offset], &buffer[0]);
 			offset -= BUFFER_SIZE;
 		}
@@ -448,6 +451,7 @@ int PictureDecoder::fetch() {
 	int numBits, shift;
 
 	if (_bits & 1) {
+		// Will be copying a block of previously generated data
 		SKIP_BITS(1);
 		offset = _array2[_bits & 0xff];
 		numBits = _array5[offset];
@@ -466,6 +470,7 @@ int PictureDecoder::fetch() {
 	SKIP_BITS(1);
 	val = _bits & 0xff;
 	if (!_field2) {
+		// It's a plain 8-bit value
 		SKIP_BITS(8);
 		return val;
 	}
@@ -495,7 +500,7 @@ int PictureDecoder::fetch() {
 #undef SKIP_BITS
 #define SKIP_BITS(COUNT) if (skipBits(COUNT)) return 0
 
-int PictureDecoder::transform(int numBits) {
+int PictureDecoder::getBlockOffset(int numBits) {
 	int val = _array1[_bits & 0xff];
 	SKIP_BITS(_array4[val]);
 

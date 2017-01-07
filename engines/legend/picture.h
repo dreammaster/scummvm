@@ -100,9 +100,10 @@ private:
 	int fetch();
 
 	/**
-	 * Does some sort of fetch transformation
+	 * Figures out the backwards offset for the start of a
+	 * previously generated block of values to copy
 	 */
-	int transform(int numBits);
+	int getBlockOffset(int numBits);
 public:
 	PictureDecoder();
 	virtual ~PictureDecoder();
