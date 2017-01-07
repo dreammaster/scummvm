@@ -100,6 +100,10 @@ Picture *PicFile::load(uint pictureNum, uint frameNum) {
 	Picture *pic = new Picture;
 	pic->create(_currentPic._width, _currentPic._height);
 
+	// Decode the picture contents
+	int result = pic->decode(&_file);
+	assert(!result);
+
 	// Return the picture
 	return pic;
 }
@@ -323,7 +327,7 @@ int PictureDecoder::decodeInner() {
 	setupArray(_array4, 64, _REF2, _array1);
 
 	int result = unpack();
-	return (result == 0x306) ? 4 : 0;
+	return (result == ERROR_CODE) ? 4 : 0;
 }
 
 void PictureDecoder::setup() {
@@ -411,6 +415,9 @@ int PictureDecoder::unpack() {
 			offset -= BUFFER_SIZE;
 		}
 	}
+
+	// Write any final bytes out to file
+	_outputStream->write(&buffer[BUFFER_SIZE], offset - BUFFER_SIZE);
 
 	return result;
 }
