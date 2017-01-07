@@ -306,6 +306,7 @@ int PictureDecoder::decodeInner() {
 	_field2 = _inputStream->readByte();
 	_field6 = _inputStream->readByte();
 	_bits = _inputStream->readByte();
+	_bitsRemaining = 0;
 
 	if (_field6 < 4 || _field6 > 6)
 		return 1;
@@ -371,9 +372,9 @@ void PictureDecoder::setup() {
 }
 
 void PictureDecoder::setupArray(const byte *src, int srcSize, const byte *ref, byte *dest) {
-	for (int idx = srcSize - 1; idx >= 0; --idx, ++src, ++ref) {
-		int jump = 1 << *src;	
-		for (int offset = *ref; offset < 256; offset += jump)
+	for (int idx = srcSize - 1; idx >= 0; --idx) {
+		int jump = 1 << src[idx];	
+		for (int offset = ref[idx]; offset < 256; offset += jump)
 			dest[offset] = idx;
 	}
 }

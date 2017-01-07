@@ -53,7 +53,7 @@ private:
 	uint _bits;
 	int _bitsRemaining;
 	byte _array1[256];
-	byte _array2[1152];
+	byte _array2[256];
 	byte _array3[256];
 	byte _array4[64];
 	byte _array5[16];
