@@ -464,7 +464,7 @@ int PictureDecoder::fetch() {
 			return offset + 0x100;
 
 		val = _bits & ((1 << shift) - 1);
-		val += _array7[offset];
+		val += READ_LE_UINT16(&_array7[offset * 2]);
 		SKIP_BITS(shift);
 		return val + 0x100;
 	}
@@ -530,6 +530,19 @@ int Picture::decode(Common::SeekableReadStream *inStream) {
 
 	int result = PictureDecoder::decode(inStream, outStream);
 	delete outStream;
+	
+	/* Debug code for dumping the data for a picture to a format
+	 * I can compare directly with a MEMDUMP from Dosbox Debugger
+	const byte *p = (const byte *)s.getPixels();
+	for (uint idx = 0; idx < 0xFA00; ) {
+		Common::String s = Common::String::format("515D:%.4x   ", idx);
+		for (int idx2 = 0; idx2 < 16; ++idx2, ++p, ++idx)
+			s += Common::String::format("%.2x ", *p);
+		s.toUppercase();
+		debug(s.c_str());
+	}
+	*/
+
 	return result;
 }
 
