@@ -423,7 +423,7 @@ int PictureDecoder::unpack() {
 	return result;
 }
 
-bool PictureDecoder::prefetch(int numBits) {
+bool PictureDecoder::skipBits(int numBits) {
 	if (numBits <= _bitsRemaining) {
 		// There's enough bits left
 		_bits >>= numBits;
@@ -437,80 +437,80 @@ bool PictureDecoder::prefetch(int numBits) {
 	_bits >>= _bitsRemaining;
 	_bits |= ((uint)_inputStream->readByte() << 8);
 	_bits >>= numBits - _bitsRemaining;
-	_bitsRemaining = -(8 - (numBits - _bitsRemaining));
+	_bitsRemaining = -((numBits - _bitsRemaining) - 8);
 	return false;
 }
 
-#define PREFETCH(COUNT) if (prefetch(COUNT)) return ERROR_CODE
+#define SKIP_BITS(COUNT) if (skipBits(COUNT)) return ERROR_CODE
 
 int PictureDecoder::fetch() {
 	int offset, val;
 	int numBits, shift;
 
 	if (_bits & 1) {
-		PREFETCH(1);
+		SKIP_BITS(1);
 		offset = _array2[_bits & 0xff];
 		numBits = _array5[offset];
 		
-		PREFETCH(numBits);
+		SKIP_BITS(numBits);
 		shift = _array6[offset];
 		if (!shift)
 			return offset + 0x100;
 
 		val = _bits & ((1 << shift) - 1);
 		val += _array7[offset];
-		PREFETCH(shift);
+		SKIP_BITS(shift);
 		return val + 0x100;
 	}
 
-	PREFETCH(1);
+	SKIP_BITS(1);
 	val = _bits & 0xff;
 	if (!_field2) {
-		PREFETCH(8);
+		SKIP_BITS(8);
 		return val;
 	}
 
 	if (!val) {
-		PREFETCH(8);
+		SKIP_BITS(8);
 		val = _array13[_bits & 0xff];
 	} else {
 		offset = val;
 		val = _array10[offset];
 		if (val == 0xff) {
 			if (_bits & 0x3f) {
-				PREFETCH(4);
+				SKIP_BITS(4);
 				val = _array11[_bits & 0xff];
 			} else {
-				PREFETCH(6);
+				SKIP_BITS(6);
 				val = _array12[_bits & 0x7f];
 			}
 		}
 	}
 
 	numBits = _array3[val];
-	PREFETCH(numBits);
+	SKIP_BITS(numBits);
 	return val;
 }
 
-#undef PREFETCH
-#define PREFETCH(COUNT) if (prefetch(COUNT)) return 0
+#undef SKIP_BITS
+#define SKIP_BITS(COUNT) if (skipBits(COUNT)) return 0
 
 int PictureDecoder::transform(int numBits) {
 	int val = _array1[_bits & 0xff];
-	PREFETCH(_array4[val]);
+	SKIP_BITS(_array4[val]);
 
 	if (numBits == 2) {
 		val = (val << 2) | (_bits & 3);
-		PREFETCH(numBits);
+		SKIP_BITS(numBits);
 	} else {
 		val = (val << _field6) | (_bits & _field8);
-		PREFETCH(_field6);
+		SKIP_BITS(_field6);
 	}
 
 	return val + 1;
 }
 
-#undef PREFETCH
+#undef SKIP_BITS
 
 /*-------------------------------------------------------------------*/
 

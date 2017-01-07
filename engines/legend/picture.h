@@ -87,12 +87,12 @@ private:
 	int unpack();
 
 	/**
-	 * Ensures there's enough bits available to read, fetching new bytes from
-	 * the input stream as necessary
-	 * @param numBits	Number of bits that will be needed
-	 * @return		True if the entire end of stream has been reached
+	 * Skips over the specified number of bits from the input stream,
+	 * handling reading further bytes as necessary
+	 * @param numBits	Number of bits that will be skipped
+	 * @return		True if the end of stream has been reached
 	 */
-	bool prefetch(int numBits);
+	bool skipBits(int numBits);
 
 	/**
 	 * Fetches a new value from the input
