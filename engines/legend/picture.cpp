@@ -82,7 +82,9 @@ bool PicFile::open(uint pictureNum, uint frameNum) {
 		_file.seek(entry._offset + entry._frameCount * 4);
 		if (entry._flags & PIC_HAS_PALETTE) {
 			// Read in the game palette for the picture
-			_file.read(_vm->_screen->_gamePalette, PALETTE_SIZE);
+			byte pal[PALETTE_SIZE];
+			_file.read(pal, PALETTE_SIZE);
+			_vm->_screen->setGamePalette(pal);
 			_vm->_screen->_picPalette = true;
 		}
 

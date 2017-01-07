@@ -27,6 +27,8 @@
 
 namespace Legend {
 
+#define VGA_COLOR_TRANS(x) ((x) * 255 / 63)
+
 Screen *Screen::init(LegendEngine *vm) {
 	if (vm->isLater())
 		return new LaterScreen(vm);
@@ -48,6 +50,16 @@ void Screen::addArea(ScreenArea *area) {
 
 void Screen::removeArea(ScreenArea *area) {
 	_screenAreas.remove(area);
+}
+
+void Screen::setGamePalette(byte palette[PALETTE_SIZE], bool from6Bit) {
+	if (from6Bit) {
+		for (int idx = 0; idx < PALETTE_SIZE; ++idx)
+			_gamePalette[idx] = VGA_COLOR_TRANS(palette[idx]);
+	} else {
+		// Palette already in 8-bit format, so simply copy it
+		Common::copy(palette, palette + PALETTE_SIZE, _gamePalette);
+	}
 }
 
 void Screen::resetPalette() {

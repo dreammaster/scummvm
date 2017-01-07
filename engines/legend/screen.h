@@ -41,9 +41,9 @@ private:
 	Common::List<ScreenArea *> _screenAreas;
 protected:
 	LegendEngine *_vm;
+	byte _gamePalette[PALETTE_SIZE];
 public:
 	bool _paletteDirty;
-	byte _gamePalette[PALETTE_SIZE];
 	bool _picPalette;
 public:
 	Screen(LegendEngine *vm);
@@ -59,6 +59,14 @@ public:
 	 * Removes a visual element from the screen
 	 */
 	void removeArea(ScreenArea *area);
+
+	/**
+	 * Sets the game palette
+	 * @param palette	Palette to set
+	 * @param from6Bit	If set, the passed palette is 6 bit per pixel,
+	 * and will be automatically converted to 8-bit
+	 */
+	void setGamePalette(byte palette[PALETTE_SIZE], bool from6Bit = true);
 
 	/**
 	 * Reset the palette to blank
