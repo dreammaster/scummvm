@@ -20,15 +20,35 @@
  *
  */
 
-#include "legend/scene.h"
+#ifndef LEGEND_IMAGE_H
+#define LEGEND_IMAGE_H
+
+#include "legend/picture.h"
 
 namespace Legend {
 
-Scene::Scene() : _pic(nullptr) {
-}
+class Image {
+public:
+	bool _active;
+	byte _field1;
+	int _field2;
+	int _field4;
+	int _width;
+	int _height;
+	byte _fieldA;
+	byte _fieldB;
+	const byte *_pixels;
+	Picture *_pic;
+public:
+	Image();
+	~Image();
 
-Scene::~Scene() {
-	delete _pic;
-}
+	/**
+	 * Loads the picture for the image
+	 */
+	bool load(int picNumber, int frameNumber = 0);
+};
 
 } // End of namespace Legend
+
+#endif

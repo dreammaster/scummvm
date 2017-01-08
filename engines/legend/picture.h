@@ -30,7 +30,8 @@
 namespace Legend {
 
 enum {
-	PIC_HAS_PALETTE = 0x10
+	PIC_HAS_PALETTE = 0x10,
+	PIC_40 = 40
 };
 
 class PictureDecoder {
@@ -168,11 +169,8 @@ private:
 	int _currentFileNumber;
 	Indexes _indexes;
 	IndexEntries *_index;
-	IndexEntry _currentPic;
 	bool _paletteCheck;
 	bool _skipPreload;
-	int _val1;
-	int _val2;
 private:
 	/**
 	 * Loads the index of a newly opened PIC file
@@ -184,6 +182,10 @@ private:
 	 * for a newly opened file into
 	 */
 	int findIndexesSlot() const;
+public:
+	IndexEntry _currentPic;
+	int _val1;
+	int _val2;
 public:
 	PicFile();
 	~PicFile();

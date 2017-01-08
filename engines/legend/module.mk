@@ -8,12 +8,12 @@ MODULE_OBJS = \
 	events.o \
 	font.o \
 	file.o \
-	legend.o \
+	image.o \
 	input_area.o \
+	legend.o \
 	messages.o \
 	picture.o \
 	resources.o \
-	scene.o \
 	scene_area.o \
 	screen.o \
 	screen_area.o
