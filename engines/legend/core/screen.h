@@ -28,7 +28,6 @@
 #include "common/rect.h"
 #include "graphics/screen.h"
 #include "legend/messages.h"
-#include "legend/core/screen_area.h"
 
 namespace Legend {
 
@@ -36,9 +35,6 @@ class LegendEngine;
 class ScreenArea;
 
 class Screen: public Graphics::Screen {
-	friend class Message;
-private:
-	Common::List<ScreenArea *> _screenAreas;
 protected:
 	LegendEngine *_vm;
 	byte _gamePalette[PALETTE_SIZE];
@@ -49,16 +45,6 @@ public:
 	Screen(LegendEngine *vm);
 	virtual ~Screen();
 	static Screen *init(LegendEngine *vm);
-
-	/**
-	 * Adds a visual element from the screen
-	 */
-	void addArea(ScreenArea *area);
-
-	/**
-	 * Removes a visual element from the screen
-	 */
-	void removeArea(ScreenArea *area);
 
 	/**
 	 * Sets the game palette

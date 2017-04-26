@@ -44,14 +44,6 @@ Screen::Screen(LegendEngine *vm): _vm(vm), _paletteDirty(false), _picPalette(fal
 Screen::~Screen() {
 }
 
-void Screen::addArea(ScreenArea *area) {
-	_screenAreas.push_back(area);
-}
-
-void Screen::removeArea(ScreenArea *area) {
-	_screenAreas.remove(area);
-}
-
 void Screen::setGamePalette(byte palette[PALETTE_SIZE], bool from6Bit) {
 	if (from6Bit) {
 		for (int idx = 0; idx < PALETTE_SIZE; ++idx)

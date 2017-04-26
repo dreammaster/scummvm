@@ -4,12 +4,9 @@ MODULE_OBJS = \
 	core/font.o \
 	core/file.o \
 	core/image.o \
-	core/input_area.o \
 	core/picture.o \
 	core/resources.o \
-	core/scene_area.o \
 	core/screen.o \
-	core/screen_area.o \
 	early/early_screen.o \
 	later/later_screen.o \
 	debugger.o \

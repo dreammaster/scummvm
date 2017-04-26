@@ -26,81 +26,9 @@
 #include "common/scummsys.h"
 #include "common/events.h"
 #include "common/stack.h"
-#include "legend/core/screen_area.h"
 
 namespace Legend {
 
-class LegendEngine;
-class Message;
-class MouseMoveMsg;
-class MouseButtonDownMsg;
-class MouseButtonUpMsg;
-class KeyDownMsg;
-class KeyUpMsg;
-
-class Message {
-private:
-	static LegendEngine *_vm;
-protected:
-	/**
-	 * Transfers the message to the passed screen area
-	 */
-	virtual bool perform(ScreenArea *screenArea) = 0;
-public:
-	Message() {}
-	virtual ~Message() {}
-
-	/**
-	 * Initializes the static engine reference
-	 */
-	static void init(LegendEngine *vm) { _vm = vm; }
-
-	/**
-	 * Executes the message
-	 */
-	void execute();
-};
-
-class MouseMoveMsg : public Message {
-protected:
-	virtual bool handleMessage(MouseMoveMsg &msg);
-	virtual bool perform(ScreenArea *screenArea);
-public:
-	Common::Point _mousePos;
-public:
-	MouseMoveMsg() : Message() {}
-	MouseMoveMsg(const Common::Point &pt) : Message(), _mousePos(pt) {}
-};
-
-class MouseButtonMsg : public Message {
-public:
-	Common::Point _mousePos;
-	int _buttons;
-public:
-	MouseButtonMsg() : Message() {}
-	MouseButtonMsg(const Common::Point &pt, int buttons) : Message(),
-		_mousePos(pt), _buttons(buttons) {}
-};
-
-class MouseButtonDownMsg : public MouseButtonMsg {
-protected:
-	virtual bool handleMessage(MouseButtonDownMsg &msg);
-	virtual bool perform(ScreenArea *screenArea);
-public:
-	MouseButtonDownMsg() : MouseButtonMsg() {}
-	MouseButtonDownMsg(const Common::Point &pt, int buttons) :
-		MouseButtonMsg(pt, buttons) {}
-};
-
-class MouseButtonUpMsg : public MouseButtonMsg {
-protected:
-	virtual bool handleMessage(MouseButtonUpMsg &msg);
-	virtual bool perform(ScreenArea *screenArea);
-public:
-	MouseButtonUpMsg() : MouseButtonMsg() {}
-	MouseButtonUpMsg(const Common::Point &pt, int buttons) :
-		MouseButtonMsg(pt, buttons) {}
-};
 
 } // End of namespace Legend
 
