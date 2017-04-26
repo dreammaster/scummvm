@@ -20,51 +20,35 @@
  *
  */
 
-#include "legend/image.h"
-#include "legend/legend.h"
+#ifndef LEGEND_IMAGE_H
+#define LEGEND_IMAGE_H
+
+#include "legend/core/picture.h"
 
 namespace Legend {
 
-Image::Image() : _pixels(nullptr), _pic(nullptr) {
-	_active = false;
-	_field1 = 0;
-	_field2 = 0;
-	_field4 = 0;
-	_width = 0;
-	_height = 0;
-	_fieldA = _fieldB = 0;
-}
+class Image {
+public:
+	bool _active;
+	byte _field1;
+	int _field2;
+	int _field4;
+	int _width;
+	int _height;
+	byte _fieldA;
+	byte _fieldB;
+	const byte *_pixels;
+	Picture *_pic;
+public:
+	Image();
+	~Image();
 
-Image::~Image() {
-	delete _pic;
-}
-
-bool Image::load(int picNumber, int frameNumber) {
-	int result;
-
-	if (!_active) {
-		_fieldA = _fieldB = 0;
-		if (_vm->_picFile->open(picNumber, frameNumber)) {
-			_pic = _vm->_picFile->load(picNumber, frameNumber);
-			assert(_pic);
-
-			_pixels = (const byte *)_pic->getPixels();
-			
-			PicFile &pf = *_vm->_picFile;
-			_field2 = pf._val1;
-			_field4 = pf._val2;
-			_width = pf._currentPic._width;
-			_height = pf._currentPic._height;
-			_fieldA = pf._currentPic._fieldA;
-			_fieldB = pf._currentPic._fieldB;
-			_field1 = (pf._currentPic._flags & PIC_40) ? 3 : 0;
-
-			_active = true;
-			return true;
-		}
-	}
-
-	return false;
-}
+	/**
+	 * Loads the picture for the image
+	 */
+	bool load(int picNumber, int frameNumber = 0);
+};
 
 } // End of namespace Legend
+
+#endif

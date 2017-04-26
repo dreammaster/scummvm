@@ -25,7 +25,7 @@
 
 #include "common/str.h"
 #include "common/str-array.h"
-#include "legend/file.h"
+#include "legend/core/file.h"
 
 namespace Legend {
 

@@ -34,9 +34,9 @@
 #include "engines/engine.h"
 #include "legend/debugger.h"
 #include "legend/events.h"
-#include "legend/picture.h"
-#include "legend/resources.h"
-#include "legend/screen.h"
+#include "legend/core/picture.h"
+#include "legend/core/resources.h"
+#include "legend/core/screen.h"
 
 namespace Legend {
 

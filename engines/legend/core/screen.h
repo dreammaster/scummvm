@@ -23,12 +23,12 @@
 #ifndef LEGEND_SCREEN_H
 #define LEGEND_SCREEN_H
 
-#include "legend/font.h"
+#include "legend/core/font.h"
 #include "common/list.h"
 #include "common/rect.h"
 #include "graphics/screen.h"
 #include "legend/messages.h"
-#include "legend/screen_area.h"
+#include "legend/core/screen_area.h"
 
 namespace Legend {
 

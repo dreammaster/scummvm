@@ -23,10 +23,10 @@
 #ifndef LEGEND_EARLY_SCREEN_H
 #define LEGEND_EARLY_SCREEN_H
 
-#include "legend/font.h"
 #include "common/list.h"
 #include "common/rect.h"
-#include "legend/screen.h"
+#include "legend/core/font.h"
+#include "legend/core/screen.h"
 
 namespace Legend {
 

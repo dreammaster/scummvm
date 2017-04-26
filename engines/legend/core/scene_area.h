@@ -20,9 +20,18 @@
  *
  */
 
-#include "legend/scene_area.h"
+#ifndef LEGEND_SCENE_AREA_H
+#define LEGEND_SCENE_AREA_H
+
+#include "legend/core/screen_area.h"
 
 namespace Legend {
 
+class SceneArea : public ScreenArea {
+public:
+
+};
 
 } // End of namespace Legend
+
+#endif /* LEGEND_SCENE_AREA_H */

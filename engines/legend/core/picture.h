@@ -25,7 +25,7 @@
 
 #include "common/memstream.h"
 #include "graphics/managed_surface.h"
-#include "legend/file.h"
+#include "legend/core/file.h"
 
 namespace Legend {
 

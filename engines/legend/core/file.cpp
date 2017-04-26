@@ -20,7 +20,7 @@
  *
  */
 
-#include "legend/file.h"
+#include "legend/core/file.h"
 #include "legend/legend.h"
 
 namespace Legend {

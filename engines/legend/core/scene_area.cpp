@@ -20,7 +20,7 @@
  *
  */
 
-#include "legend/screen_area.h"
+#include "legend/core/scene_area.h"
 
 namespace Legend {
 

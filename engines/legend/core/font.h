@@ -23,7 +23,7 @@
 #ifndef LEGEND_FONT_H
 #define LEGEND_FONT_H
 
-#include "legend/resources.h"
+#include "legend/core/resources.h"
 #include "common/array.h"
 #include "common/stream.h"
 #include "graphics/managed_surface.h"

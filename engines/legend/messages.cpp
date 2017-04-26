@@ -22,8 +22,8 @@
 
 #include "legend/messages.h"
 #include "legend/legend.h"
-#include "legend/screen.h"
-#include "legend/screen_area.h"
+#include "legend/core/screen.h"
+#include "legend/core/screen_area.h"
 
 namespace Legend {
 

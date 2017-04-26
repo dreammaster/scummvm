@@ -20,18 +20,20 @@
  *
  */
 
-#ifndef LEGEND_SCENE_AREA_H
-#define LEGEND_SCENE_AREA_H
+#ifndef LEGEND_INPUT_AREA_H
+#define LEGEND_INPUT_AREA_H
 
-#include "legend/screen_area.h"
+#include "legend/core/screen_area.h"
 
 namespace Legend {
 
-class SceneArea : public ScreenArea {
+class InputArea : public ScreenArea {
+public:
+	Common::String _line;
 public:
 
 };
 
 } // End of namespace Legend
 
-#endif /* LEGEND_SCENE_AREA_H */
+#endif /* LEGEND_INPUT_AREA_H */

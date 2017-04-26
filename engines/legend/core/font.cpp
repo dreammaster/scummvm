@@ -20,7 +20,7 @@
  *
  */
 
-#include "legend/screen.h"
+#include "legend/core/screen.h"
 #include "legend/legend.h"
 #include "common/system.h"
 #include "common/util.h"

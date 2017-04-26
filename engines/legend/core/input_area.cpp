@@ -20,35 +20,9 @@
  *
  */
 
-#ifndef LEGEND_IMAGE_H
-#define LEGEND_IMAGE_H
-
-#include "legend/picture.h"
+#include "legend/core/input_area.h"
 
 namespace Legend {
 
-class Image {
-public:
-	bool _active;
-	byte _field1;
-	int _field2;
-	int _field4;
-	int _width;
-	int _height;
-	byte _fieldA;
-	byte _fieldB;
-	const byte *_pixels;
-	Picture *_pic;
-public:
-	Image();
-	~Image();
-
-	/**
-	 * Loads the picture for the image
-	 */
-	bool load(int picNumber, int frameNumber = 0);
-};
 
 } // End of namespace Legend
-
-#endif

@@ -26,7 +26,7 @@
 #include "common/scummsys.h"
 #include "common/events.h"
 #include "common/stack.h"
-#include "legend/screen_area.h"
+#include "legend/core/screen_area.h"
 
 namespace Legend {
 
