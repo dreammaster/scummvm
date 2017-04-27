@@ -26,4 +26,101 @@
 
 namespace Legend {
 
+Message::Message() : SaveableObject() {
+}
+
+void Message::save(SimpleFile *file, int indent) {
+}
+
+void Message::load(SimpleFile *file) {
+}
+
+bool Message::execute(TreeItem *target, const ClassDef *classDef, int flags) {
+	// If no target was specified, then there's nothing to do
+	if (!target)
+		return false;
+
+	bool result = false;
+	TreeItem *item = target;
+	TreeItem *nextItem = nullptr;
+	do {
+		if (flags & MSGFLAG_SCAN)
+			nextItem = item->scan(target);
+
+		if (!classDef || item->isInstanceOf(classDef)) {
+			bool handled = perform(item);
+
+			if (handled) {
+				result = true;
+				if (flags & MSGFLAG_BREAK_IF_HANDLED)
+					return true;
+			}
+		}
+
+		item = nextItem;
+	} while (nextItem);
+
+	return result;
+}
+
+bool Message::execute(const Common::String &target, const ClassDef *classDef, int flags) {
+	// Scan for the target by name
+	ProjectItem *project = g_vm->_window->_project;
+	for (TreeItem *treeItem = project; treeItem; treeItem = treeItem->scan(project)) {
+		if (!treeItem->getName().compareToIgnoreCase(target))
+			return execute(treeItem, classDef, flags);
+	}
+
+	return false;
+}
+
+const MSGMAP_ENTRY *Message::findMapEntry(const TreeItem *treeItem, const ClassDef *classDef) {
+	// Iterate through the class and any parent classes
+	for (const MSGMAP *msgMap = treeItem->getMessageMap(); msgMap->pFnGetBaseMap;
+			msgMap = msgMap->pFnGetBaseMap()) {
+		// Iterate through the map entries for this class
+		for (const MSGMAP_ENTRY *entry = msgMap->lpEntries;
+				entry->_class != nullptr; ++entry) {
+			// Check if the class or any of it's ancesotrs is handled by this entry
+			for (const ClassDef *entryDef = entry->_class; entryDef; entryDef = entryDef->_parent) {
+				if (entryDef == classDef)
+					return entry;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+bool Message::perform(TreeItem *treeItem) {
+	const MSGMAP_ENTRY *entry = findMapEntry(treeItem, getType());
+	return entry && (*treeItem.*(entry->_fn))(this);
+}
+
+bool Message::supports(const TreeItem *treeItem, ClassDef *classDef) {
+	return findMapEntry(treeItem, classDef) != nullptr;
+}
+
+bool Message::isMouseMsg() const {
+	return dynamic_cast<const MouseMsg *>(this) != nullptr;
+}
+
+bool Message::isButtonDownMsg() const {
+	return dynamic_cast<const MouseButtonDownMsg *>(this) != nullptr;
+}
+
+bool Message::isButtonUpMsg() const {
+	return dynamic_cast<const MouseButtonUpMsg *>(this) != nullptr;
+}
+
+bool Message::isMouseMoveMsg() const {
+	return dynamic_cast<const MouseMoveMsg *>(this) != nullptr;
+}
+
+bool Message::isDoubleClickMsg() const {
+	return dynamic_cast<const MouseDoubleClickMsg *>(this) != nullptr;
+}
+
+/*------------------------------------------------------------------------*/
+
 } // End of namespace Legend

@@ -20,49 +20,36 @@
  *
  */
 
-#include "legend/core/image.h"
-#include "legend/legend.h"
+#ifndef LEGEND_NAMED_ITEM_H
+#define LEGEND_NAMED_ITEM_H
+
+#include "legend/core/tree_item.h"
 
 namespace Legend {
 
-Image::Image() : _pixels(nullptr), _pic(nullptr) {
-	_active = false;
-	_field1 = 0;
-	_field2 = 0;
-	_field4 = 0;
-	_width = 0;
-	_height = 0;
-	_fieldA = _fieldB = 0;
-}
+class NamedItem: public TreeItem {
+	DECLARE_MESSAGE_MAP;
+public:
+	Common::String _name;
+public:
+	CLASSDEF;
 
-Image::~Image() {
-	delete _pic;
-}
+	/**
+	 * Save the data for the class to file
+	 */
+	virtual void save(SimpleFile *file, int indent);
 
-bool Image::load(int picNumber, int frameNumber) {
-	if (!_active) {
-		_fieldA = _fieldB = 0;
-		if (g_vm->_picFile->open(picNumber, frameNumber)) {
-			_pic = g_vm->_picFile->load(picNumber, frameNumber);
-			assert(_pic);
+	/**
+	 * Load the data for the class from file
+	 */
+	virtual void load(SimpleFile *file);
 
-			_pixels = (const byte *)_pic->getPixels();
-			
-			PicFile &pf = *g_vm->_picFile;
-			_field2 = pf._val1;
-			_field4 = pf._val2;
-			_width = pf._currentPic._width;
-			_height = pf._currentPic._height;
-			_fieldA = pf._currentPic._fieldA;
-			_fieldB = pf._currentPic._fieldB;
-			_field1 = (pf._currentPic._flags & PIC_40) ? 3 : 0;
-
-			_active = true;
-			return true;
-		}
-	}
-
-	return false;
-}
+	/**
+	 * Gets the name of the item, if any
+	 */
+	virtual const Common::String getName() const { return _name; }
+};
 
 } // End of namespace Legend
+
+#endif /* LEGEND_NAMED_ITEM_H */

@@ -31,56 +31,103 @@ namespace Legend {
 
 #define GAME_FRAME_RATE 30
 #define GAME_FRAME_TIME (1000 / GAME_FRAME_RATE)
+#define DOUBLE_CLICK_TIME 100
 
-enum CursorId { INVALID_CURSOR = -1 };
+enum SpecialButtons {
+	MK_LBUTTON = 1, MK_RBUTTON = 2, MK_SHIFT = 4, MK_CONTROL = 8,
+	MK_MBUTTON = 0x10
+};
 
 class LegendEngine;
+
+/**
+ * A base class for windows that can receive event messages
+ */
+class EventTarget {
+public:
+	virtual ~EventTarget() {}
+
+	/**
+	 * Called to handle any regular updates the game requires
+	 */
+	virtual void onIdle() {}
+
+	/**
+	 * Mouse/key event handlers
+	 */
+	virtual void mouseMove(const Common::Point &mousePos) {}
+	virtual void leftButtonDown(const Common::Point &mousePos) {}
+	virtual void leftButtonUp(const Common::Point &mousePos) {}
+	virtual void leftButtonDoubleClick(const Common::Point &mousePos) {}
+	virtual void middleButtonDown(const Common::Point &mousePos) {}
+	virtual void middleButtonUp(const Common::Point &mousePos) {}
+	virtual void middleButtonDoubleClick(const Common::Point &mousePos) {}
+	virtual void rightButtonDown(const Common::Point &mousePos) {}
+	virtual void rightButtonUp(const Common::Point &mousePos) {}
+	virtual void mouseWheel(const Common::Point &mousePos, bool wheelUp) {}
+	virtual void keyDown(Common::KeyState keyState) {}
+	virtual void keyUp(Common::KeyState keyState) {}
+};
+
+/**
+ * An eent target used for waiting for a mouse or keypress
+ */
+class CPressTarget : public EventTarget {
+public:
+	bool _pressed;
+public:
+	CPressTarget() : _pressed(false) {}
+	virtual ~CPressTarget() {}
+	virtual void leftButtonDown(const Common::Point &mousePos) { _pressed = true; }
+	virtual void middleButtonDown(const Common::Point &mousePos) { _pressed = true; }
+	virtual void rightButtonDown(const Common::Point &mousePos) { _pressed = true; }
+	virtual void keyDown(Common::KeyState keyState) { _pressed = true; }
+};
 
 class Events {
 private:
 	LegendEngine *_vm;
+	Common::Stack<EventTarget *> _eventTargets;
 	uint32 _frameCounter;
 	uint32 _priorFrameTime;
+	Common::Point _mousePos;
+	uint _specialButtons;
 
 	/**
-	 * Check for the next frame
+	 * Check whether it's time to display the next screen frame
 	 */
-	void checkForNextFrameCounter();
-public:
-	CursorId _cursorId;
+	bool checkForNextFrameCounter();
+
+	/**
+	 * Return the currently active event target
+	 */
+	EventTarget *eventTarget() const {
+		return _eventTargets.top();
+	}
+
+	/**
+	 * Handles setting/resettings special buttons on key up/down
+	 */
+	void handleKbdSpecial(Common::KeyState keyState);
 public:
 	Events(LegendEngine *vm);
-	~Events();
+	~Events() {}
 
 	/**
-	 * Load a set of cursors from the specified file
+	 * Adds a new event target to the top of the list. It will get
+	 * all events generated until such time as another is pushed on
+	 * top of it, or the removeTarget method is called
 	 */
-	void loadCursors(const Common::String &filename);
+	void addTarget(EventTarget *target) {
+		_eventTargets.push(target);
+	}
 
 	/**
-	 * Set the cursor to show
+	 * Removes the currently active event target
 	 */
-	void setCursor(CursorId cursorId);
-
-	/**
-	 * Show the mouse cursor
-	 */
-	void showCursor();
-
-	/**
-	 * Hide the mouse cursor
-	 */
-	void hideCursor();
-
-	/**
-	 * Returns the cursor
-	 */
-	CursorId getCursor() const;
-
-	/**
-	 * Returns true if the mouse cursor is visible
-	 */
-	bool isCursorVisible() const;
+	void removeTarget() {
+		_eventTargets.pop();
+	}
 
 	/**
 	 * Check for any pending events
@@ -94,15 +141,48 @@ public:
 	void pollEventsAndWait();
 
 	/**
-	 * Get the current mouse position within the scene, adjusted by the scroll position
-	 */
-	Common::Point mousePos() const;
-
-	/**
 	 * Return the current game frame number
 	 */
 	uint32 getFrameCounter() const { return _frameCounter; }
+
+	/**
+	 * Get the elapsed playtime
+	 */
+	uint32 getTicksCount() const;
+
+	/**
+	 * Sleep for a specified period of time
+	 */
+	void sleep(uint time);
+
+	/**
+	 * Wait for a mouse or keypress
+	 */
+	bool waitForPress(uint expiry);
+
+	/**
+	 * Get the mouse position
+	 */
+	Common::Point getMousePos() const { return _mousePos; }
+
+	/**
+	 * Sets the mouse position
+	 */
+	void setMousePos(const Common::Point &pt);
+
+	/*
+	 * Return whether a given special key is currently pressed
+	 */
+	bool isSpecialPressed(SpecialButtons btn) const {
+		return (_specialButtons & btn) != 0;
+	}
+
+	/**
+	 * Returns the bitset of the currently pressed special buttons
+	 */
+	uint getSpecialButtons() const { return _specialButtons; }
 };
+
 
 } // End of namespace Legend
 

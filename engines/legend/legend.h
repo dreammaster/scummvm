@@ -34,6 +34,7 @@
 #include "engines/engine.h"
 #include "legend/debugger.h"
 #include "legend/events.h"
+#include "legend/main_game_window.h"
 #include "legend/core/picture.h"
 #include "legend/core/resources.h"
 #include "legend/core/screen.h"
@@ -80,6 +81,7 @@ public:
 	const LegendGameDescription *_gameDescription;
 	Debugger *_debugger;
 	Events *_events;
+	MainGameWindow *_window;
 	PicFile *_picFile;
 	Resources *_res;
 	//Scene *_scene;
@@ -129,7 +131,7 @@ public:
 	Common::String getGameFilePrefix() const;
 };
 
-extern LegendEngine *_vm;
+extern LegendEngine *g_vm;
 
 } // End of namespace Legend
 

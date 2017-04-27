@@ -20,49 +20,29 @@
  *
  */
 
-#include "legend/core/image.h"
-#include "legend/legend.h"
+#include "legend/core/message_target.h"
 
 namespace Legend {
 
-Image::Image() : _pixels(nullptr), _pic(nullptr) {
-	_active = false;
-	_field1 = 0;
-	_field2 = 0;
-	_field4 = 0;
-	_width = 0;
-	_height = 0;
-	_fieldA = _fieldB = 0;
+const MSGMAP *MessageTarget::getMessageMap() const {
+	return getThisMessageMap();
 }
 
-Image::~Image() {
-	delete _pic;
+const MSGMAP *MessageTarget::getThisMessageMap() {
+	static const MSGMAP_ENTRY _messageEntries[] = {
+		{ (PMSG)nullptr, nullptr }
+	};
+
+	static const MSGMAP messageMap = { nullptr, &_messageEntries[0] };
+	return &messageMap;
 }
 
-bool Image::load(int picNumber, int frameNumber) {
-	if (!_active) {
-		_fieldA = _fieldB = 0;
-		if (g_vm->_picFile->open(picNumber, frameNumber)) {
-			_pic = g_vm->_picFile->load(picNumber, frameNumber);
-			assert(_pic);
+void MessageTarget::save(SimpleFile *file, int indent) {
+	SaveableObject::save(file, indent);
+}
 
-			_pixels = (const byte *)_pic->getPixels();
-			
-			PicFile &pf = *g_vm->_picFile;
-			_field2 = pf._val1;
-			_field4 = pf._val2;
-			_width = pf._currentPic._width;
-			_height = pf._currentPic._height;
-			_fieldA = pf._currentPic._fieldA;
-			_fieldB = pf._currentPic._fieldB;
-			_field1 = (pf._currentPic._flags & PIC_40) ? 3 : 0;
-
-			_active = true;
-			return true;
-		}
-	}
-
-	return false;
+void MessageTarget::load(SimpleFile *file) {
+	SaveableObject::load(file);
 }
 
 } // End of namespace Legend

@@ -27,11 +27,11 @@
 
 namespace Legend {
 
-LegendEngine *_vm;
+LegendEngine *g_vm;
 
 LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
 		Engine(syst), _gameDescription(gameDesc), _randomSource("Legend") {
-	_vm = this;
+	g_vm = this;
 	_debugger = nullptr;
 	_events = nullptr;
 	_res = nullptr;

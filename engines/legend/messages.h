@@ -23,12 +23,205 @@
 #ifndef LEGEND_MESSAGES_H
 #define LEGEND_MESSAGES_H
 
-#include "common/scummsys.h"
-#include "common/events.h"
-#include "common/stack.h"
+#include "common/keyboard.h"
+#include "common/rect.h"
+#include "legend/core/saveable_object.h"
+#include "legend/core/tree_item.h"
 
 namespace Legend {
 
+enum MessageFlag {
+	MSGFLAG_SCAN = 1,
+	MSGFLAG_BREAK_IF_HANDLED = 2,
+	MSGFLAG_CLASS_DEF = 4
+};
+
+#define MESSAGE0(NAME) \
+	class NAME: public Message { \
+	public: NAME() : Message() {} \
+	CLASSDEF; \
+	static bool isSupportedBy(const TreeItem *item) { \
+		return supports(item, _type); } \
+}
+#define MESSAGE1(NAME, F1, N1, V1) \
+	class NAME: public Message { \
+	public: F1 _##N1; \
+	NAME() : Message(), _##N1(V1) {} \
+	NAME(F1 N1) : Message(), _##N1(N1) {} \
+	CLASSDEF; \
+	static bool isSupportedBy(const TreeItem *item) { \
+		return supports(item, _type); } \
+}
+#define MESSAGE2(NAME, F1, N1, V1, F2, N2, V2) \
+	class NAME: public Message { \
+	public: F1 _##N1; F2 _##N2; \
+	NAME() : Message(), _##N1(V1), _##N2(V2) {} \
+	NAME(F1 N1, F2 N2) : Message(), _##N1(N1), _##N2(N2) {} \
+	CLASSDEF; \
+	static bool isSupportedBy(const TreeItem *item) { \
+		return supports(item, _type); } \
+}
+#define MESSAGE3(NAME, F1, N1, V1, F2, N2, V2, F3, N3, V3) \
+	class NAME: public Message { \
+	public: F1 _##N1; F2 _##N2; F3 _##N3; \
+	NAME() : Message(), _##N1(V1), _##N2(V2), _##N3(V3) {} \
+	NAME(F1 N1, F2 N2, F3 N3) : Message(), _##N1(N1), _##N2(N2), _##N3(N3) {} \
+	CLASSDEF; \
+	static bool isSupportedBy(const TreeItem *item) { \
+		return supports(item, _type); } \
+}
+#define MESSAGE4(NAME, F1, N1, V1, F2, N2, V2, F3, N3, V3, F4, N4, V4) \
+	class NAME: public Message { \
+	public: F1 _##N1; F2 _##N2; F3 _##N3; F4 _##N4; \
+	NAME() : Message(), _##N1(V1), _##N2(V2), _##N3(V3), _##N4(V4) {} \
+	NAME(F1 N1, F2 N2, F3 N3, F4 N4) : Message(), _##N1(N1), _##N2(N2), _##N3(N3), _##N4(N4) {} \
+	CLASSDEF; \
+	static bool isSupportedBy(const TreeItem *item) { \
+		return supports(item, _type); } \
+}
+
+class Message : public SaveableObject {
+private:
+	/**
+	 * Find a map entry that supports the given class
+	 */
+	static const MSGMAP_ENTRY *findMapEntry(const TreeItem *treeItem, const ClassDef *classDef);
+public:
+	CLASSDEF;
+	Message();
+
+	/**
+	 * Executes the message, passing it on to the designated target,
+	 * and optionally it's children
+	 */
+	bool execute(TreeItem *target, const ClassDef *classDef = nullptr,
+		int flags = MSGFLAG_SCAN | MSGFLAG_BREAK_IF_HANDLED);
+
+	/**
+	 * Executes the message, passing it on to the designated target,
+	 * and optionally it's children
+	 */
+	bool execute(const Common::String &target, const ClassDef *classDef = nullptr,
+		int flags = MSGFLAG_SCAN | MSGFLAG_BREAK_IF_HANDLED);
+
+	/**
+	 * Makes the passed item execute the message
+	 */
+	virtual bool perform(TreeItem *treeItem);
+
+	/**
+	 * Returns true if the passed item supports the specified message class
+	 */
+	static bool supports(const TreeItem *treeItem, ClassDef *classDef);
+
+	/**
+	 * Save the data for the class to file
+	 */
+	virtual void save(SimpleFile *file, int indent);
+
+	/**
+	 * Load the data for the class from file
+	 */
+	virtual void load(SimpleFile *file);
+
+	virtual bool isMouseMsg() const;
+	virtual bool isButtonDownMsg() const;
+	virtual bool isButtonUpMsg() const;
+	virtual bool isMouseMoveMsg() const;
+	virtual bool isDoubleClickMsg() const;
+};
+
+
+enum MouseButton { MB_LEFT = 1, MB_MIDDLE = 2, MB_RIGHT = 4 };
+
+class MouseMsg : public Message {
+public:
+	int _buttons;
+	Common::Point _mousePos;
+public:
+	CLASSDEF;
+	static bool isSupportedBy(const TreeItem *item) {
+		return supports(item, _type);
+	}
+
+	MouseMsg() : _buttons(0) {}
+	MouseMsg(const Common::Point &pt, int buttons) :
+		_mousePos(pt), _buttons(buttons) {}
+};
+
+class MouseMoveMsg : public MouseMsg {
+public:
+	CLASSDEF;
+	MouseMoveMsg() : MouseMsg() {}
+	MouseMoveMsg(const Common::Point &pt, int buttons) : MouseMsg(pt, buttons) {}
+
+	static bool isSupportedBy(const TreeItem *item) {
+		return supports(item, _type);
+	}
+};
+
+class MouseButtonMsg : public MouseMsg {
+public:
+	int _field10;
+public:
+	CLASSDEF;
+	MouseButtonMsg() : MouseMsg(), _field10(0) {}
+	MouseButtonMsg(const Common::Point &pt, int buttons) : MouseMsg(pt, buttons) {}
+
+	static bool isSupportedBy(const TreeItem *item) {
+		return supports(item, _type);
+	}
+};
+
+class MouseButtonDownMsg : public MouseButtonMsg {
+public:
+	CLASSDEF;
+	MouseButtonDownMsg() : MouseButtonMsg() {}
+	MouseButtonDownMsg(const Common::Point &pt, int buttons) : MouseButtonMsg(pt, buttons) {}
+
+	static bool isSupportedBy(const TreeItem *item) {
+		return supports(item, _type);
+	}
+};
+
+class MouseButtonUpMsg : public MouseButtonMsg {
+public:
+	CLASSDEF;
+	MouseButtonUpMsg() : MouseButtonMsg() {}
+	MouseButtonUpMsg(const Common::Point &pt, int buttons) : MouseButtonMsg(pt, buttons) {}
+
+	static bool isSupportedBy(const TreeItem *item) {
+		return supports(item, _type);
+	}
+};
+
+class MouseWheelMsg : public MouseMsg {
+public:
+	bool _wheelUp;
+public:
+	CLASSDEF;
+	MouseWheelMsg() : MouseMsg(), _wheelUp(false) {}
+	MouseWheelMsg(const Common::Point &pt, bool wheelUp) :
+		MouseMsg(pt, 0), _wheelUp(wheelUp) {}
+
+	static bool isSupportedBy(const TreeItem *item) {
+		return supports(item, _type);
+	}
+};
+
+class MouseDoubleClickMsg : public MouseButtonMsg {
+public:
+	CLASSDEF;
+	MouseDoubleClickMsg() : MouseButtonMsg() {}
+	MouseDoubleClickMsg(const Common::Point &pt, int buttons) : MouseButtonMsg(pt, buttons) {}
+
+	static bool isSupportedBy(const TreeItem *item) {
+		return supports(item, _type);
+	}
+};
+
+MESSAGE1(CKeyCharMsg, int, key, 32);
+MESSAGE1(CVirtualKeyCharMsg, Common::KeyState, keyState, Common::KeyState());
 
 } // End of namespace Legend
 

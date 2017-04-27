@@ -20,49 +20,57 @@
  *
  */
 
-#include "legend/core/image.h"
-#include "legend/legend.h"
+#ifndef LEGEND_INPUT_HANDLER_H
+#define LEGEND_INPUT_HANDLER_H
+
+#include "legend/input_translator.h"
+#include "legend/core/tree_item.h"
 
 namespace Legend {
 
-Image::Image() : _pixels(nullptr), _pic(nullptr) {
-	_active = false;
-	_field1 = 0;
-	_field2 = 0;
-	_field4 = 0;
-	_width = 0;
-	_height = 0;
-	_fieldA = _fieldB = 0;
-}
+class GameManager;
 
-Image::~Image() {
-	delete _pic;
-}
+class InputHandler {
+private:
+	/**
+	 * Process and dispatch a passed message
+	 */
+	void processMessage(Message *msg);
 
-bool Image::load(int picNumber, int frameNumber) {
-	if (!_active) {
-		_fieldA = _fieldB = 0;
-		if (g_vm->_picFile->open(picNumber, frameNumber)) {
-			_pic = g_vm->_picFile->load(picNumber, frameNumber);
-			assert(_pic);
+	/**
+	 * Dispatches a message to the project
+	 */
+	void dispatchMessage(Message *msg);
+public:
+	GameManager *_gameManager;
+	InputTranslator *_inputTranslator;
+	bool _dragging;
+	bool _buttonDown;
+	Common::Point _mousePos;
+	int _lockCount;
+	bool _abortMessage;
+public:
+	InputHandler(GameManager *owner);
+	~InputHandler();
 
-			_pixels = (const byte *)_pic->getPixels();
-			
-			PicFile &pf = *g_vm->_picFile;
-			_field2 = pf._val1;
-			_field4 = pf._val2;
-			_width = pf._currentPic._width;
-			_height = pf._currentPic._height;
-			_fieldA = pf._currentPic._fieldA;
-			_fieldB = pf._currentPic._fieldB;
-			_field1 = (pf._currentPic._flags & PIC_40) ? 3 : 0;
+	void setTranslator(InputTranslator *translator);
 
-			_active = true;
-			return true;
-		}
-	}
+	/**
+	 * Increment the lock count
+	 */
+	void incLockCount();
 
-	return false;
-}
+	/**
+	 * Decrement the lock count on the input handler
+	 */
+	void decLockCount();
+
+	/**
+	 * Handles a genereated mouse message
+	 */
+	void handleMessage(Message &msg, bool respectLock = true);
+};
 
 } // End of namespace Legend
+
+#endif /* LEGEND_INPUT_HANDLER_H */

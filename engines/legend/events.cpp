@@ -24,79 +24,73 @@
 #include "common/events.h"
 #include "common/system.h"
 #include "engines/util.h"
-#include "graphics/cursorman.h"
-#include "legend/legend.h"
 #include "legend/events.h"
+#include "legend/legend.h"
+#include "legend/main_game_window.h"
 
 namespace Legend {
 
-enum ButtonFlag { LEFT_BUTTON = 1, RIGHT_BUTTON = 2 };
-
-Events::Events(LegendEngine *vm): _vm(vm) {
-	_cursorId = INVALID_CURSOR;
-	_frameCounter = 1;
-	_priorFrameTime = 0;
-}
-
-Events::~Events() {
-}
-
-void Events::loadCursors(const Common::String &filename) {
-}
-
-void Events::setCursor(CursorId cursorId) {
-}
-
-void Events::showCursor() {
-	CursorMan.showMouse(true);
-}
-
-void Events::hideCursor() {
-	CursorMan.showMouse(false);
-}
-
-CursorId Events::getCursor() const {
-	return _cursorId;
-}
-
-bool Events::isCursorVisible() const {
-	return CursorMan.isVisible();
+Events::Events(LegendEngine *vm): _vm(vm), _frameCounter(1),
+		_priorFrameTime(0), _specialButtons(0) {
 }
 
 void Events::pollEvents() {
 	checkForNextFrameCounter();
 
 	Common::Event event;
-	while (g_system->getEventManager()->pollEvent(event)) {
-		// Handle events
-		switch (event.type) {
-		case Common::EVENT_QUIT:
-		case Common::EVENT_RTL:
-			return;
+	if (!g_system->getEventManager()->pollEvent(event))
+		return;
 
-		case Common::EVENT_KEYDOWN:
-			// Check for debugger
-			if (event.kbd.keycode == Common::KEYCODE_d && (event.kbd.flags & Common::KBD_CTRL)) {
-				// Attach to the debugger
-				_vm->_debugger->attach();
-				_vm->_debugger->onFrame();
-			} else {
-				// TODO
-			}
-			return;
-		case Common::EVENT_KEYUP:
-			return;
-		case Common::EVENT_LBUTTONDOWN:
-			return;
-		case Common::EVENT_RBUTTONDOWN:
-			return;
-		case Common::EVENT_LBUTTONUP:
-			return;
-		case Common::EVENT_RBUTTONUP:
-			return;
-		default:
- 			break;
-		}
+	switch (event.type) {
+	case Common::EVENT_MOUSEMOVE:
+		_mousePos = event.mouse;
+		eventTarget()->mouseMove(_mousePos);
+		break;
+	case Common::EVENT_LBUTTONDOWN:
+		_specialButtons |= MK_LBUTTON;
+		_mousePos = event.mouse;
+		eventTarget()->leftButtonDown(_mousePos);
+		break;
+	case Common::EVENT_LBUTTONUP:
+		_specialButtons &= ~MK_LBUTTON;
+		_mousePos = event.mouse;
+		eventTarget()->leftButtonUp(_mousePos);
+		break;
+	case Common::EVENT_MBUTTONDOWN:
+		_specialButtons |= MK_MBUTTON;
+		_mousePos = event.mouse;
+		eventTarget()->middleButtonDown(_mousePos);
+		break;
+	case Common::EVENT_MBUTTONUP:
+		_specialButtons &= ~MK_MBUTTON;
+		_mousePos = event.mouse;
+		eventTarget()->middleButtonUp(_mousePos);
+		break;
+	case Common::EVENT_RBUTTONDOWN:
+		_specialButtons |= MK_RBUTTON;
+		_mousePos = event.mouse;
+		eventTarget()->rightButtonDown(_mousePos);
+		break;
+	case Common::EVENT_RBUTTONUP:
+		_specialButtons &= ~MK_RBUTTON;
+		_mousePos = event.mouse;
+		eventTarget()->rightButtonUp(_mousePos);
+		break;
+	case Common::EVENT_WHEELUP:
+	case Common::EVENT_WHEELDOWN:
+		_mousePos = event.mouse;
+		eventTarget()->mouseWheel(_mousePos, event.type == Common::EVENT_WHEELUP);
+		break;
+	case Common::EVENT_KEYDOWN:
+		handleKbdSpecial(event.kbd);
+		eventTarget()->keyDown(event.kbd);
+		break;
+	case Common::EVENT_KEYUP:
+		handleKbdSpecial(event.kbd);
+		eventTarget()->keyUp(event.kbd);
+		break;
+	default:
+		break;
 	}
 }
 
@@ -105,23 +99,68 @@ void Events::pollEventsAndWait() {
 	g_system->delayMillis(10);
 }
 
-Common::Point Events::mousePos() const {
-	return g_system->getEventManager()->getMousePos();
-}
-
-void Events::checkForNextFrameCounter() {
+bool Events::checkForNextFrameCounter() {
 	// Check for next game frame
 	uint32 milli = g_system->getMillis();
-	if ((milli - _priorFrameTime) >= GAME_FRAME_RATE) {
+	if ((milli - _priorFrameTime) >= GAME_FRAME_TIME) {
 		++_frameCounter;
 		_priorFrameTime = milli;
+
+		// Handle any idle updates
+		eventTarget()->onIdle();
 
 		// Give time to the debugger
 		_vm->_debugger->onFrame();
 
 		// Display the frame
 		_vm->_screen->update();
+
+		return true;
 	}
+
+	return false;
+}
+
+uint32 Events::getTicksCount() const {
+	return _frameCounter * GAME_FRAME_TIME;
+}
+
+void Events::sleep(uint time) {
+	uint32 delayEnd = g_system->getMillis() + time;
+
+	while (!_vm->shouldQuit() && g_system->getMillis() < delayEnd)
+		pollEventsAndWait();
+}
+
+bool Events::waitForPress(uint expiry) {
+	uint32 delayEnd = g_system->getMillis() + expiry;
+	CPressTarget pressTarget;
+	addTarget(&pressTarget);
+
+	while (!_vm->shouldQuit() && g_system->getMillis() < delayEnd && !pressTarget._pressed) {
+		pollEventsAndWait();
+	}
+
+	removeTarget();
+	return pressTarget._pressed;
+}
+
+void Events::setMousePos(const Common::Point &pt) {
+	g_system->warpMouse(pt.x, pt.y);
+	_mousePos = pt;
+	eventTarget()->mouseMove(_mousePos);
+}
+
+void Events::handleKbdSpecial(Common::KeyState keyState) {
+	if (keyState.flags & Common::KBD_CTRL)
+		_specialButtons |= MK_CONTROL;
+	else
+		_specialButtons &= ~MK_CONTROL;
+
+	if (keyState.flags & Common::KBD_SHIFT)
+		_specialButtons |= MK_SHIFT;
+	else
+		_specialButtons &= ~MK_SHIFT;
 }
 
 } // End of namespace Legend
