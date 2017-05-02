@@ -17,6 +17,7 @@ MODULE_OBJS = \
 	core/visual_item.o \
 	early/early_screen.o \
 	later/later_screen.o \
+	xanth/compendium.o \
 	debugger.o \
 	detection.o \
 	events.o \

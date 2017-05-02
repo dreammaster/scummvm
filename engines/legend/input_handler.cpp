@@ -49,7 +49,7 @@ void InputHandler::decLockCount() {
 
 	if (_lockCount == 0 && _inputTranslator) {
 		if (_dragging && !_inputTranslator->isMousePressed()) {
-			MouseButtonUpMsg upMsg(_mousePos, MK_LBUTTON);
+			CMouseButtonUpMsg upMsg(_mousePos, MK_LBUTTON);
 			handleMessage(upMsg);
 		}
 
@@ -58,14 +58,14 @@ void InputHandler::decLockCount() {
 	}
 }
 
-void InputHandler::handleMessage(Message &msg, bool respectLock) {
+void InputHandler::handleMessage(CMessage &msg, bool respectLock) {
 	if (!respectLock || _lockCount <= 0) {
 		processMessage(&msg);
 	}
 }
 
-void InputHandler::processMessage(Message *msg) {
-	const MouseMsg *mouseMsg = dynamic_cast<const MouseMsg *>(msg);
+void InputHandler::processMessage(CMessage *msg) {
+	const CMouseMsg *mouseMsg = dynamic_cast<const CMouseMsg *>(msg);
 	_abortMessage = false;
 	dispatchMessage(msg);
 
@@ -85,7 +85,7 @@ void InputHandler::processMessage(Message *msg) {
 	}
 }
 
-void InputHandler::dispatchMessage(Message *msg) {
+void InputHandler::dispatchMessage(CMessage *msg) {
 	/*
 	CPetControl *pet = _gameManager->_project->getPetControl();
 	if (!pet || !msg->execute(pet, nullptr, MSGFLAG_BREAK_IF_HANDLED)) {

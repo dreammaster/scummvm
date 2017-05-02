@@ -36,58 +36,59 @@ enum MessageFlag {
 	MSGFLAG_CLASS_DEF = 4
 };
 
-class Message;
+class CMessage;
+class VisualItem;
 
 #define MESSAGEDEF(theClass) \
-	static ClassDef type() { return ClassDef(#theClass, &Message::type); } \
+	static ClassDef type() { return ClassDef(#theClass, &CMessage::type); } \
 	virtual ClassDef getType() const { return type(); }
 #define MESSAGEDEFP(theClass, baseClass) \
 	static ClassDef type() { return ClassDef(#theClass, &baseClass::type); } \
 	virtual ClassDef getType() const { return type(); }
 
 #define MESSAGE0(NAME) \
-	class NAME: public Message { \
+	class NAME: public CMessage { \
 	public: NAME() : Message() {} \
 	MESSAGEDEF(NAME); \
 	}
 #define MESSAGE1(NAME, F1, N1, V1) \
-	class NAME: public Message { \
+	class NAME: public CMessage { \
 	public: F1 _##N1; \
-	NAME() : Message(), _##N1(V1) {} \
-	NAME(F1 N1) : Message(), _##N1(N1) {} \
+	NAME() : CMessage(), _##N1(V1) {} \
+	NAME(F1 N1) : CMessage(), _##N1(N1) {} \
 	MESSAGEDEF(NAME); \
 	}
 #define MESSAGE2(NAME, F1, N1, V1, F2, N2, V2) \
-	class NAME: public Message { \
+	class NAME: public CMessage { \
 	public: F1 _##N1; F2 _##N2; \
-	NAME() : Message(), _##N1(V1), _##N2(V2) {} \
-	NAME(F1 N1, F2 N2) : Message(), _##N1(N1), _##N2(N2) {} \
+	NAME() : CMessage(), _##N1(V1), _##N2(V2) {} \
+	NAME(F1 N1, F2 N2) : CMessage(), _##N1(N1), _##N2(N2) {} \
 	MESSAGEDEF(NAME); \
 	}
 #define MESSAGE3(NAME, F1, N1, V1, F2, N2, V2, F3, N3, V3) \
-	class NAME: public Message { \
+	class NAME: public CMessage { \
 	public: F1 _##N1; F2 _##N2; F3 _##N3; \
-	NAME() : Message(), _##N1(V1), _##N2(V2), _##N3(V3) {} \
-	NAME(F1 N1, F2 N2, F3 N3) : Message(), _##N1(N1), _##N2(N2), _##N3(N3) {} \
+	NAME() : CMessage(), _##N1(V1), _##N2(V2), _##N3(V3) {} \
+	NAME(F1 N1, F2 N2, F3 N3) : CMessage(), _##N1(N1), _##N2(N2), _##N3(N3) {} \
 	MESSAGEDEF(NAME); \
 	}
 #define MESSAGE4(NAME, F1, N1, V1, F2, N2, V2, F3, N3, V3, F4, N4, V4) \
-	class NAME: public Message { \
+	class NAME: public CMessage { \
 	public: F1 _##N1; F2 _##N2; F3 _##N3; F4 _##N4; \
-	NAME() : Message(), _##N1(V1), _##N2(V2), _##N3(V3), _##N4(V4) {} \
-	NAME(F1 N1, F2 N2, F3 N3, F4 N4) : Message(), _##N1(N1), _##N2(N2), _##N3(N3), _##N4(N4) {} \
+	NAME() : CMessage(), _##N1(V1), _##N2(V2), _##N3(V3), _##N4(V4) {} \
+	NAME(F1 N1, F2 N2, F3 N3, F4 N4) : CMessage(), _##N1(N1), _##N2(N2), _##N3(N3), _##N4(N4) {} \
 	MESSAGEDEF(NAME); \
 	}
 
-class Message : public SaveableObject {
+class CMessage : public SaveableObject {
 private:
 	/**
 	 * Find a map entry that supports the given class
 	 */
 	static const MSGMAP_ENTRY *findMapEntry(const TreeItem *treeItem, const ClassDef &classDef);
 public:
-	MESSAGEDEFP(Message, SaveableObject);
-	Message();
+	MESSAGEDEFP(CMessage, SaveableObject);
+	CMessage();
 
 	/**
 	 * Executes the message, passing it on to the designated target,
@@ -131,69 +132,72 @@ public:
 };
 
 
-enum MouseButton { MB_LEFT = 1, MB_MIDDLE = 2, MB_RIGHT = 4 };
+enum CMouseButton { MB_LEFT = 1, MB_MIDDLE = 2, MB_RIGHT = 4 };
 
-class MouseMsg : public Message {
+class CMouseMsg : public CMessage {
 public:
 	int _buttons;
 	Common::Point _mousePos;
 public:
-	MESSAGEDEF(MouseMsg);
+	MESSAGEDEF(CMouseMsg);
 
-	MouseMsg() : _buttons(0) {}
-	MouseMsg(const Common::Point &pt, int buttons) :
+	CMouseMsg() : _buttons(0) {}
+	CMouseMsg(const Common::Point &pt, int buttons) :
 		_mousePos(pt), _buttons(buttons) {}
 };
 
-class MouseMoveMsg : public MouseMsg {
+class CMouseMoveMsg : public CMouseMsg {
 public:
-	MESSAGEDEFP(MouseMoveMsg, MouseMsg);
-	MouseMoveMsg() : MouseMsg() {}
-	MouseMoveMsg(const Common::Point &pt, int buttons) : MouseMsg(pt, buttons) {}
+	MESSAGEDEFP(CMouseMoveMsg, CMouseMsg);
+	CMouseMoveMsg() : CMouseMsg() {}
+	CMouseMoveMsg(const Common::Point &pt, int buttons) : CMouseMsg(pt, buttons) {}
 };
 
-class MouseButtonMsg : public MouseMsg {
+class CMouseButtonMsg : public CMouseMsg {
 public:
 	int _field10;
 public:
-	MESSAGEDEFP(MouseButtonMsg, MouseMsg);
-	MouseButtonMsg() : MouseMsg(), _field10(0) {}
-	MouseButtonMsg(const Common::Point &pt, int buttons) : MouseMsg(pt, buttons) {}
+	MESSAGEDEFP(CMouseButtonMsg, CMouseMsg);
+	CMouseButtonMsg() : CMouseMsg(), _field10(0) {}
+	CMouseButtonMsg(const Common::Point &pt, int buttons) : CMouseMsg(pt, buttons) {}
 };
 
-class MouseButtonDownMsg : public MouseButtonMsg {
+class CMouseButtonDownMsg : public CMouseButtonMsg {
 public:
-	MESSAGEDEFP(MouseButtonDownMsg, MouseButtonMsg);
-	MouseButtonDownMsg() : MouseButtonMsg() {}
-	MouseButtonDownMsg(const Common::Point &pt, int buttons) : MouseButtonMsg(pt, buttons) {}
+	MESSAGEDEFP(CMouseButtonDownMsg, CMouseButtonMsg);
+	CMouseButtonDownMsg() : CMouseButtonMsg() {}
+	CMouseButtonDownMsg(const Common::Point &pt, int buttons) : CMouseButtonMsg(pt, buttons) {}
 };
 
-class MouseButtonUpMsg : public MouseButtonMsg {
+class CMouseButtonUpMsg : public CMouseButtonMsg {
 public:
-	MESSAGEDEFP(MouseButtonUpMsg, MouseButtonMsg);
-	MouseButtonUpMsg() : MouseButtonMsg() {}
-	MouseButtonUpMsg(const Common::Point &pt, int buttons) : MouseButtonMsg(pt, buttons) {}
+	MESSAGEDEFP(CMouseButtonUpMsg, CMouseButtonMsg);
+	CMouseButtonUpMsg() : CMouseButtonMsg() {}
+	CMouseButtonUpMsg(const Common::Point &pt, int buttons) : CMouseButtonMsg(pt, buttons) {}
 };
 
-class MouseWheelMsg : public MouseMsg {
+class CMouseWheelMsg : public CMouseMsg {
 public:
 	bool _wheelUp;
 public:
-	MESSAGEDEFP(MouseWheelMsg, MouseMsg);
-	MouseWheelMsg() : MouseMsg(), _wheelUp(false) {}
-	MouseWheelMsg(const Common::Point &pt, bool wheelUp) :
-		MouseMsg(pt, 0), _wheelUp(wheelUp) {}
+	MESSAGEDEFP(CMouseWheelMsg, CMouseMsg);
+	CMouseWheelMsg() : CMouseMsg(), _wheelUp(false) {}
+	CMouseWheelMsg(const Common::Point &pt, bool wheelUp) :
+		CMouseMsg(pt, 0), _wheelUp(wheelUp) {}
 };
 
-class MouseDoubleClickMsg : public MouseButtonMsg {
+class CMouseDoubleClickMsg : public CMouseButtonMsg {
 public:
-	MESSAGEDEFP(MouseDuobleClickMsg, MouseButtonMsg);
-	MouseDoubleClickMsg() : MouseButtonMsg() {}
-	MouseDoubleClickMsg(const Common::Point &pt, int buttons) : MouseButtonMsg(pt, buttons) {}
+	MESSAGEDEFP(CMouseDuobleClickMsg, CMouseButtonMsg);
+	CMouseDoubleClickMsg() : CMouseButtonMsg() {}
+	CMouseDoubleClickMsg(const Common::Point &pt, int buttons) : CMouseButtonMsg(pt, buttons) {}
 };
 
 MESSAGE1(CKeyCharMsg, int, key, 32);
 MESSAGE1(CVirtualKeyCharMsg, Common::KeyState, keyState, Common::KeyState());
+MESSAGE1(CShowMsg, VisualItem *, view, (VisualItem *)nullptr);
+MESSAGE1(CHideMsg, VisualItem *, view, (VisualItem *)nullptr);
+
 
 } // End of namespace Legend
 

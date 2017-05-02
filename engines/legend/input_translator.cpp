@@ -46,57 +46,57 @@ int InputTranslator::getButtons(int special) const {
 }
 
 void InputTranslator::mouseMove(int special, const Common::Point &pt) {
-	MouseMoveMsg msg(pt, getButtons(special));
+	CMouseMoveMsg msg(pt, getButtons(special));
 	_inputHandler->handleMessage(msg);
 }
 
 void InputTranslator::leftButtonDown(int special, const Common::Point &pt) {
-	MouseButtonDownMsg msg(pt, MB_LEFT);
+	CMouseButtonDownMsg msg(pt, MB_LEFT);
 	_inputHandler->handleMessage(msg);
 }
 
 void InputTranslator::leftButtonUp(int special, const Common::Point &pt) {
-	MouseButtonUpMsg msg(pt, MB_LEFT);
+	CMouseButtonUpMsg msg(pt, MB_LEFT);
 	_inputHandler->handleMessage(msg);
 }
 
 void InputTranslator::leftButtonDoubleClick(int special, const Common::Point &pt) {
-	MouseDoubleClickMsg msg(pt, MB_LEFT);
+	CMouseDoubleClickMsg msg(pt, MB_LEFT);
 	_inputHandler->handleMessage(msg);
 }
 
 void InputTranslator::middleButtonDown(int special, const Common::Point &pt) {
-	MouseButtonDownMsg msg(pt, MB_MIDDLE);
+	CMouseButtonDownMsg msg(pt, MB_MIDDLE);
 	_inputHandler->handleMessage(msg);
 }
 
 void InputTranslator::middleButtonUp(int special, const Common::Point &pt) {
-	MouseButtonUpMsg msg(pt, MB_MIDDLE);
+	CMouseButtonUpMsg msg(pt, MB_MIDDLE);
 	_inputHandler->handleMessage(msg);
 }
 
 void InputTranslator::middleButtonDoubleClick(int special, const Common::Point &pt) {
-	MouseDoubleClickMsg msg(pt, MB_MIDDLE);
+	CMouseDoubleClickMsg msg(pt, MB_MIDDLE);
 	_inputHandler->handleMessage(msg);
 }
 
 void InputTranslator::rightButtonDown(int special, const Common::Point &pt) {
-	MouseButtonDownMsg msg(pt, MB_RIGHT);
+	CMouseButtonDownMsg msg(pt, MB_RIGHT);
 	_inputHandler->handleMessage(msg);
 }
 
 void InputTranslator::rightButtonUp(int special, const Common::Point &pt) {
-	MouseButtonUpMsg msg(pt, MB_RIGHT);
+	CMouseButtonUpMsg msg(pt, MB_RIGHT);
 	_inputHandler->handleMessage(msg);
 }
 
 void InputTranslator::mouseWheel(bool wheelUp, const Common::Point &pt) {
-	MouseWheelMsg msg(pt, wheelUp);
+	CMouseWheelMsg msg(pt, wheelUp);
 	_inputHandler->handleMessage(msg);
 }
 
 void InputTranslator::rightButtonDoubleClick(int special, const Common::Point &pt) {
-	MouseDoubleClickMsg msg(pt, MB_RIGHT);
+	CMouseDoubleClickMsg msg(pt, MB_RIGHT);
 	_inputHandler->handleMessage(msg);
 }
 

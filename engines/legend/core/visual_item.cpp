@@ -25,7 +25,7 @@
 
 namespace Legend {
 
-EMPTY_MESSAGE_MAP(VisualItem, TreeItem);
+EMPTY_MESSAGE_MAP(VisualItem, NamedItem);
 
 Graphics::ManagedSurface VisualItem::getSurface() const {
 	assert(!_bounds.isEmpty());

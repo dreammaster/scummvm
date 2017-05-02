@@ -20,38 +20,25 @@
  *
  */
 
-#ifndef LEGEND_VISUAL_ITEM_H
-#define LEGEND_VISUAL_ITEM_H
+#ifndef LEGEND_XANTH_COMPENDIUM_H
+#define LEGEND_XANTH_COMPENDIUM_H
 
-#include "graphics/managed_surface.h"
-#include "legend/core/named_item.h"
+#include "legend/core/visual_container.h"
+#include "legend/messages.h"
 
 namespace Legend {
+namespace Xanth {
 
-/**
- * Acts as the base class for all classes that have a visual representation on the screen
- */
-class VisualItem : public NamedItem {
+class Compendium : public VisualContainer {
 	DECLARE_MESSAGE_MAP;
-public:
-	Common::Rect _bounds;
+	bool ShowMsg(CShowMsg &msg);
 public:
 	CLASSDEF;
-	virtual ~VisualItem() {}
-
-	/**
-	 * Draws the visual item on the screen
-	 * @remarks		Redrawing only necessary if the state of the item has changed
-	 */
-	virtual void draw() = 0;
-
-	/**
-	 * Gets a managed surface representing the portion of the screen defined by _bounds.
-	 * This allows drawing to be done without worrying about offsets or clipping
-	 */
-	Graphics::ManagedSurface getSurface() const;
+	Compendium();
+	virtual ~Compendium() {}
 };
 
+} // End of namespace Xanth
 } // End of namespace Legend
 
-#endif /* LEGEND_VISUAL_ITEM_H */
+#endif

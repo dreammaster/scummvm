@@ -28,9 +28,9 @@
 namespace Legend {
 
 class MessageTarget;
-class Message;
+class CMessage;
 
-typedef bool (MessageTarget::*PMSG)(Message *msg);
+typedef bool (MessageTarget::*PMSG)(CMessage *msg);
 
 struct MSGMAP_ENTRY {
 	PMSG _fn;
@@ -59,7 +59,7 @@ protected: \
 		static const MSGMAP_ENTRY _messageEntries[] = {
 
 #define ON_MESSAGE(msgClass) \
-	{ static_cast<PMSG>((FNPTR)&ThisClass::msgClass), &##msgClass::type() },
+	{ static_cast<PMSG>((FNPTR)&ThisClass::msgClass), &C##msgClass::type },
 
 #define END_MESSAGE_MAP() \
 		{ (PMSG)nullptr, nullptr } \

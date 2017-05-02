@@ -35,12 +35,12 @@ private:
 	/**
 	 * Process and dispatch a passed message
 	 */
-	void processMessage(Message *msg);
+	void processMessage(CMessage *msg);
 
 	/**
 	 * Dispatches a message to the project
 	 */
-	void dispatchMessage(Message *msg);
+	void dispatchMessage(CMessage *msg);
 public:
 	GameManager *_gameManager;
 	InputTranslator *_inputTranslator;
@@ -68,7 +68,7 @@ public:
 	/**
 	 * Handles a genereated mouse message
 	 */
-	void handleMessage(Message &msg, bool respectLock = true);
+	void handleMessage(CMessage &msg, bool respectLock = true);
 };
 
 } // End of namespace Legend

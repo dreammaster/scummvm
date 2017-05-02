@@ -30,10 +30,10 @@ namespace Legend {
 class GameManager;
 class NamedItem;
 class ProjectItem;
-class Message;
+class CMessage;
 
 class TreeItem: public MessageTarget {
-	friend class Message;
+	friend class CMessage;
 	DECLARE_MESSAGE_MAP;
 private:
 	TreeItem *_parent;
