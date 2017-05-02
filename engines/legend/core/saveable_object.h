@@ -33,15 +33,23 @@ namespace Legend {
 
 class SaveableObject;
 
+class ClassDef;
+typedef ClassDef(*ClassDefFn)();
+
 class ClassDef {
+private:
+	ClassDefFn _parentFn;
 public:
 	const char *_className;
-	ClassDef *_parent;
 public:
-	ClassDef(const char *className, ClassDef *parent) :
-		_className(className), _parent(parent) {}
-	virtual ~ClassDef() {}
-	virtual SaveableObject *create();
+	ClassDef(const char *className, const ClassDefFn parentFn) :
+		_className(className), _parentFn(parentFn) {}
+
+	bool hasParent() const { return _parentFn != nullptr; }
+	ClassDef parent() const { return (*_parentFn)(); }
+	bool operator==(const ClassDef &right) const {
+		return !strcmp(_className, right._className);
+	}
 };
 
 template<typename T>
@@ -53,36 +61,15 @@ public:
 };
 
 #define CLASSDEF \
-	static ClassDef *_type; \
-	virtual ClassDef *getType() const { return _type; }
+	static ClassDef type(); \
+	virtual ClassDef getType() const { return type(); }
 
 class SaveableObject {
-	typedef SaveableObject *(*CreateFunction)();
-private:
-	typedef Common::List<ClassDef *> ClassDefList;
-	typedef Common::HashMap<Common::String, CreateFunction> ClassListMap;
-	static ClassDefList *_classDefs;
-	static ClassListMap *_classList;
-public:
-	/**
-	 * Sets up the list of saveable object classes
-	 */
-	static void initClassList();
-
-	/**
-	 * Free the list of saveable object classes
-	 */
-	static void freeClassList();
-
-	/**
-	 * Creates a new instance of a saveable object class
-	 */
-	static SaveableObject *createInstance(const Common::String &name);
 public:
 	CLASSDEF
 	virtual ~SaveableObject() {}
 
-	bool isInstanceOf(const ClassDef *classDef) const;
+	bool isInstanceOf(const ClassDef &classDef) const;
 
 	/**
 	 * Save the data for the class to file

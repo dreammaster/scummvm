@@ -34,7 +34,7 @@ typedef bool (MessageTarget::*PMSG)(Message *msg);
 
 struct MSGMAP_ENTRY {
 	PMSG _fn;
-	ClassDef *_class;
+	ClassDefFn _classDef;
 };
 
 struct MSGMAP {
@@ -48,6 +48,7 @@ protected: \
 	virtual const MSGMAP *getMessageMap() const
 
 #define BEGIN_MESSAGE_MAP(theClass, baseClass) \
+	ClassDef theClass::type() { return ClassDef(#theClass, &baseClass::type()); } \
 	const MSGMAP *theClass::getMessageMap() const \
 		{ return getThisMessageMap(); } \
 	const MSGMAP *theClass::getThisMessageMap() \
@@ -58,7 +59,7 @@ protected: \
 		static const MSGMAP_ENTRY _messageEntries[] = {
 
 #define ON_MESSAGE(msgClass) \
-	{ static_cast<PMSG>((FNPTR)&ThisClass::msgClass), C##msgClass::_type },
+	{ static_cast<PMSG>((FNPTR)&ThisClass::msgClass), &##msgClass::type() },
 
 #define END_MESSAGE_MAP() \
 		{ (PMSG)nullptr, nullptr } \
@@ -69,6 +70,7 @@ protected: \
 	}
 
 #define EMPTY_MESSAGE_MAP(theClass, baseClass) \
+	ClassDef theClass::type() { return ClassDef(#theClass, &baseClass::type()); } \
 	const MSGMAP *theClass::getMessageMap() const \
 		{ return getThisMessageMap(); } \
 	const MSGMAP *theClass::getThisMessageMap() \

@@ -91,7 +91,7 @@ TreeItem *TreeItem::scan(TreeItem *item) const {
 	return nullptr;
 }
 
-TreeItem *TreeItem::findChildInstanceOf(ClassDef *classDef) const {
+TreeItem *TreeItem::findChildInstanceOf(const ClassDef &classDef) const {
 	for (TreeItem *treeItem = _firstChild; treeItem; treeItem = treeItem->getNextSibling()) {
 		if (treeItem->isInstanceOf(classDef))
 			return treeItem;
@@ -100,7 +100,7 @@ TreeItem *TreeItem::findChildInstanceOf(ClassDef *classDef) const {
 	return nullptr;
 }
 
-TreeItem *TreeItem::findNextInstanceOf(ClassDef *classDef, TreeItem *startItem) const {
+TreeItem *TreeItem::findNextInstanceOf(const ClassDef &classDef, TreeItem *startItem) const {
 	TreeItem *treeItem = startItem ? startItem->getNextSibling() : getFirstChild();
 
 	for (; treeItem; treeItem = treeItem->getNextSibling()) {

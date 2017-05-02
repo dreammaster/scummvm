@@ -35,16 +35,6 @@ public:
 	CLASSDEF;
 
 	/**
-	 * Save the data for the class to file
-	 */
-	virtual void save(SimpleFile *file, int indent);
-
-	/**
-	 * Load the data for the class from file
-	 */
-	virtual void load(SimpleFile *file);
-
-	/**
 	 * Gets the name of the item, if any
 	 */
 	virtual const Common::String getName() const { return _name; }

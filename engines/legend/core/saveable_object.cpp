@@ -27,70 +27,31 @@
 
 namespace Legend {
 
-SaveableObject *ClassDef::create() {
-	return new SaveableObject();
-}
-
-/*------------------------------------------------------------------------*/
-
-SaveableObject::ClassListMap *SaveableObject::_classList;
-SaveableObject::ClassDefList *SaveableObject::_classDefs;
-
-#define DEFFN(T) SaveableObject *Function##T() { return new T(); } \
-	ClassDef *T::_type
-#define ADDFN(CHILD, PARENT) \
-	CHILD::_type = new TypeTemplate<CHILD>(#CHILD, PARENT::_type); \
-	_classDefs->push_back(CHILD::_type); \
-	(*_classList)[#CHILD] = Function##CHILD
-
-DEFFN(SaveableObject);
-DEFFN(MessageTarget);
-DEFFN(TreeItem);
-DEFFN(NamedItem);
-DEFFN(ProjectItem);
-
-void SaveableObject::initClassList() {
-	_classDefs = new ClassDefList();
-	_classList = new ClassListMap();
-
-	ADDFN(TreeItem, MessageTarget);
-	ADDFN(NamedItem, TreeItem);
-	ADDFN(ProjectItem, NamedItem);
-}
-
-void SaveableObject::freeClassList() {
-	ClassDefList::iterator i;
-	for (i = _classDefs->begin(); i != _classDefs->end(); ++i)
-		delete *i;
-
-	delete _classDefs;
-	delete _classList;
-}
-
-SaveableObject *SaveableObject::createInstance(const Common::String &name) {
-	return (*_classList)[name]();
+ClassDef SaveableObject::type() {
+	return ClassDef("SaveableObject", nullptr);
 }
 
 void SaveableObject::save(SimpleFile *file, int indent) {
-	file->writeNumberLine(0, indent);
 }
 
 void SaveableObject::load(SimpleFile *file) {
-	file->readNumber();
 }
 
 void SaveableObject::saveHeader(SimpleFile *file, int indent) {
-	file->writeClassStart(getType()->_className, indent);
 }
 
 void SaveableObject::saveFooter(SimpleFile *file, int indent) {
-	file->writeClassEnd(indent);
 }
 
-bool SaveableObject::isInstanceOf(const ClassDef *classDef) const {
-	for (ClassDef *def = getType(); def != nullptr; def = def->_parent) {
+bool SaveableObject::isInstanceOf(const ClassDef &classDef) const {
+	ClassDef def = getType();
+	for (;;) {
 		if (def == classDef)
 			return true;
+		
+		if (!def.hasParent())
+			break;
+		def = def.parent();
 	}
 
 	return false;

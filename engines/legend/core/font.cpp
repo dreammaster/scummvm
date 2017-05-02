@@ -184,7 +184,7 @@ void Font::writeChar(char c) {
 	int charWidth = _fixedWidth ? _fixedWidth : _charWidths[c];
 	int charFullWidth = charWidth + (_fixedSpacing >= 0 ? _fixedSpacing :
 		(_charSpacings[c].leftSpacing + _charSpacings[c].rightSpacing));
-	int var6 = _fieldA;
+//	int var6 = _fieldA;
 
 	if (_bgColor >= 0 && _overrideColor != -1) {
 		_font2->fn1(0, _bgColor, 0);

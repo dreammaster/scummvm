@@ -128,12 +128,12 @@ public:
 	/**
 	 * Find the first child item that is of a given type
 	 */
-	TreeItem *findChildInstanceOf(ClassDef *classDef) const;
+	TreeItem *findChildInstanceOf(const ClassDef &classDef) const;
 
 	/**
 	 * Find the next sibling item that is of the given type
 	 */
-	TreeItem *findNextInstanceOf(ClassDef *classDef, TreeItem *startItem) const;
+	TreeItem *findNextInstanceOf(const ClassDef &classDef, TreeItem *startItem) const;
 
 	/**
 	 * Adds the item under another tree item

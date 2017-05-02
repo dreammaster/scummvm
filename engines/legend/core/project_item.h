@@ -80,16 +80,6 @@ private:
 	TreeItem *findSiblingChildInstanceOf(ClassDef *classDef, TreeItem *startItem) const;
 private:
 	/**
-	 * Load project data from the passed file
-	 */
-	ProjectItem *loadData(SimpleFile *file);
-
-	/**
-	 * Save project data to the passed file
-	 */
-	void saveData(SimpleFile *file, TreeItem *item) const;
-
-	/**
 	 * Creates a thumbnail for the current on-screen contents
 	 */
 	static Graphics::Surface *createThumbnail();
