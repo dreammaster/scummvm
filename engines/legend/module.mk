@@ -13,6 +13,8 @@ MODULE_OBJS = \
 	core/saveable_object.o \
 	core/screen.o \
 	core/tree_item.o \
+	core/visual_container.o \
+	core/visual_item.o \
 	early/early_screen.o \
 	later/later_screen.o \
 	debugger.o \
