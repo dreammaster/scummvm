@@ -24,6 +24,10 @@
 
 namespace Legend {
 
+ClassDef MessageTarget::type() {
+	return ClassDef("MessageTarget", &SaveableObject::type);
+}
+
 const MSGMAP *MessageTarget::getMessageMap() const {
 	return getThisMessageMap();
 }

@@ -52,17 +52,10 @@ public:
 	}
 };
 
-template<typename T>
-class TypeTemplate : public ClassDef {
-public:
-	TypeTemplate(const char *className, ClassDef *parent) :
-		ClassDef(className, parent) {}
-	virtual SaveableObject *create() { return new T(); }
-};
-
 #define CLASSDEF \
 	static ClassDef type(); \
 	virtual ClassDef getType() const { return type(); }
+
 
 class SaveableObject {
 public:

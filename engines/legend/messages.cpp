@@ -47,7 +47,7 @@ bool Message::execute(TreeItem *target, const ClassDef *classDef, int flags) {
 		if (flags & MSGFLAG_SCAN)
 			nextItem = item->scan(target);
 
-		if (!classDef || item->isInstanceOf(classDef)) {
+		if (!classDef || item->isInstanceOf(*classDef)) {
 			bool handled = perform(item);
 
 			if (handled) {
@@ -74,16 +74,16 @@ bool Message::execute(const Common::String &target, const ClassDef *classDef, in
 	return false;
 }
 
-const MSGMAP_ENTRY *Message::findMapEntry(const TreeItem *treeItem, const ClassDef *classDef) {
+const MSGMAP_ENTRY *Message::findMapEntry(const TreeItem *treeItem, const ClassDef &classDef) {
 	// Iterate through the class and any parent classes
 	for (const MSGMAP *msgMap = treeItem->getMessageMap(); msgMap->pFnGetBaseMap;
 			msgMap = msgMap->pFnGetBaseMap()) {
 		// Iterate through the map entries for this class
 		for (const MSGMAP_ENTRY *entry = msgMap->lpEntries;
-				entry->_class != nullptr; ++entry) {
+				entry->_classDef != nullptr; ++entry) {
 			// Check if the class or any of it's ancesotrs is handled by this entry
-			for (const ClassDef *entryDef = entry->_class; entryDef; entryDef = entryDef->_parent) {
-				if (entryDef == classDef)
+			for (ClassDef def = (*entry->_classDef)(); def.hasParent(); def = def.parent()) {
+				if (def == classDef)
 					return entry;
 			}
 		}
@@ -97,7 +97,7 @@ bool Message::perform(TreeItem *treeItem) {
 	return entry && (*treeItem.*(entry->_fn))(this);
 }
 
-bool Message::supports(const TreeItem *treeItem, ClassDef *classDef) {
+bool Message::supports(const TreeItem *treeItem, const ClassDef &classDef) {
 	return findMapEntry(treeItem, classDef) != nullptr;
 }
 

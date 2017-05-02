@@ -36,58 +36,57 @@ enum MessageFlag {
 	MSGFLAG_CLASS_DEF = 4
 };
 
+class Message;
+
+#define MESSAGEDEF(theClass) \
+	static ClassDef type() { return ClassDef(#theClass, &Message::type); } \
+	virtual ClassDef getType() const { return type(); }
+#define MESSAGEDEFP(theClass, baseClass) \
+	static ClassDef type() { return ClassDef(#theClass, &baseClass::type); } \
+	virtual ClassDef getType() const { return type(); }
+
 #define MESSAGE0(NAME) \
 	class NAME: public Message { \
 	public: NAME() : Message() {} \
-	CLASSDEF; \
-	static bool isSupportedBy(const TreeItem *item) { \
-		return supports(item, _type); } \
-}
+	MESSAGEDEF(NAME); \
+	}
 #define MESSAGE1(NAME, F1, N1, V1) \
 	class NAME: public Message { \
 	public: F1 _##N1; \
 	NAME() : Message(), _##N1(V1) {} \
 	NAME(F1 N1) : Message(), _##N1(N1) {} \
-	CLASSDEF; \
-	static bool isSupportedBy(const TreeItem *item) { \
-		return supports(item, _type); } \
-}
+	MESSAGEDEF(NAME); \
+	}
 #define MESSAGE2(NAME, F1, N1, V1, F2, N2, V2) \
 	class NAME: public Message { \
 	public: F1 _##N1; F2 _##N2; \
 	NAME() : Message(), _##N1(V1), _##N2(V2) {} \
 	NAME(F1 N1, F2 N2) : Message(), _##N1(N1), _##N2(N2) {} \
-	CLASSDEF; \
-	static bool isSupportedBy(const TreeItem *item) { \
-		return supports(item, _type); } \
-}
+	MESSAGEDEF(NAME); \
+	}
 #define MESSAGE3(NAME, F1, N1, V1, F2, N2, V2, F3, N3, V3) \
 	class NAME: public Message { \
 	public: F1 _##N1; F2 _##N2; F3 _##N3; \
 	NAME() : Message(), _##N1(V1), _##N2(V2), _##N3(V3) {} \
 	NAME(F1 N1, F2 N2, F3 N3) : Message(), _##N1(N1), _##N2(N2), _##N3(N3) {} \
-	CLASSDEF; \
-	static bool isSupportedBy(const TreeItem *item) { \
-		return supports(item, _type); } \
-}
+	MESSAGEDEF(NAME); \
+	}
 #define MESSAGE4(NAME, F1, N1, V1, F2, N2, V2, F3, N3, V3, F4, N4, V4) \
 	class NAME: public Message { \
 	public: F1 _##N1; F2 _##N2; F3 _##N3; F4 _##N4; \
 	NAME() : Message(), _##N1(V1), _##N2(V2), _##N3(V3), _##N4(V4) {} \
 	NAME(F1 N1, F2 N2, F3 N3, F4 N4) : Message(), _##N1(N1), _##N2(N2), _##N3(N3), _##N4(N4) {} \
-	CLASSDEF; \
-	static bool isSupportedBy(const TreeItem *item) { \
-		return supports(item, _type); } \
-}
+	MESSAGEDEF(NAME); \
+	}
 
 class Message : public SaveableObject {
 private:
 	/**
 	 * Find a map entry that supports the given class
 	 */
-	static const MSGMAP_ENTRY *findMapEntry(const TreeItem *treeItem, const ClassDef *classDef);
+	static const MSGMAP_ENTRY *findMapEntry(const TreeItem *treeItem, const ClassDef &classDef);
 public:
-	CLASSDEF;
+	MESSAGEDEFP(Message, SaveableObject);
 	Message();
 
 	/**
@@ -112,7 +111,7 @@ public:
 	/**
 	 * Returns true if the passed item supports the specified message class
 	 */
-	static bool supports(const TreeItem *treeItem, ClassDef *classDef);
+	static bool supports(const TreeItem *treeItem, const ClassDef &classDef);
 
 	/**
 	 * Save the data for the class to file
@@ -139,10 +138,7 @@ public:
 	int _buttons;
 	Common::Point _mousePos;
 public:
-	CLASSDEF;
-	static bool isSupportedBy(const TreeItem *item) {
-		return supports(item, _type);
-	}
+	MESSAGEDEF(MouseMsg);
 
 	MouseMsg() : _buttons(0) {}
 	MouseMsg(const Common::Point &pt, int buttons) :
@@ -151,73 +147,49 @@ public:
 
 class MouseMoveMsg : public MouseMsg {
 public:
-	CLASSDEF;
+	MESSAGEDEFP(MouseMoveMsg, MouseMsg);
 	MouseMoveMsg() : MouseMsg() {}
 	MouseMoveMsg(const Common::Point &pt, int buttons) : MouseMsg(pt, buttons) {}
-
-	static bool isSupportedBy(const TreeItem *item) {
-		return supports(item, _type);
-	}
 };
 
 class MouseButtonMsg : public MouseMsg {
 public:
 	int _field10;
 public:
-	CLASSDEF;
+	MESSAGEDEFP(MouseButtonMsg, MouseMsg);
 	MouseButtonMsg() : MouseMsg(), _field10(0) {}
 	MouseButtonMsg(const Common::Point &pt, int buttons) : MouseMsg(pt, buttons) {}
-
-	static bool isSupportedBy(const TreeItem *item) {
-		return supports(item, _type);
-	}
 };
 
 class MouseButtonDownMsg : public MouseButtonMsg {
 public:
-	CLASSDEF;
+	MESSAGEDEFP(MouseButtonDownMsg, MouseButtonMsg);
 	MouseButtonDownMsg() : MouseButtonMsg() {}
 	MouseButtonDownMsg(const Common::Point &pt, int buttons) : MouseButtonMsg(pt, buttons) {}
-
-	static bool isSupportedBy(const TreeItem *item) {
-		return supports(item, _type);
-	}
 };
 
 class MouseButtonUpMsg : public MouseButtonMsg {
 public:
-	CLASSDEF;
+	MESSAGEDEFP(MouseButtonUpMsg, MouseButtonMsg);
 	MouseButtonUpMsg() : MouseButtonMsg() {}
 	MouseButtonUpMsg(const Common::Point &pt, int buttons) : MouseButtonMsg(pt, buttons) {}
-
-	static bool isSupportedBy(const TreeItem *item) {
-		return supports(item, _type);
-	}
 };
 
 class MouseWheelMsg : public MouseMsg {
 public:
 	bool _wheelUp;
 public:
-	CLASSDEF;
+	MESSAGEDEFP(MouseWheelMsg, MouseMsg);
 	MouseWheelMsg() : MouseMsg(), _wheelUp(false) {}
 	MouseWheelMsg(const Common::Point &pt, bool wheelUp) :
 		MouseMsg(pt, 0), _wheelUp(wheelUp) {}
-
-	static bool isSupportedBy(const TreeItem *item) {
-		return supports(item, _type);
-	}
 };
 
 class MouseDoubleClickMsg : public MouseButtonMsg {
 public:
-	CLASSDEF;
+	MESSAGEDEFP(MouseDuobleClickMsg, MouseButtonMsg);
 	MouseDoubleClickMsg() : MouseButtonMsg() {}
 	MouseDoubleClickMsg(const Common::Point &pt, int buttons) : MouseButtonMsg(pt, buttons) {}
-
-	static bool isSupportedBy(const TreeItem *item) {
-		return supports(item, _type);
-	}
 };
 
 MESSAGE1(CKeyCharMsg, int, key, 32);

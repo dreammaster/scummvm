@@ -48,7 +48,7 @@ protected: \
 	virtual const MSGMAP *getMessageMap() const
 
 #define BEGIN_MESSAGE_MAP(theClass, baseClass) \
-	ClassDef theClass::type() { return ClassDef(#theClass, &baseClass::type()); } \
+	ClassDef theClass::type() { return ClassDef(#theClass, &baseClass::type); } \
 	const MSGMAP *theClass::getMessageMap() const \
 		{ return getThisMessageMap(); } \
 	const MSGMAP *theClass::getThisMessageMap() \
@@ -70,7 +70,7 @@ protected: \
 	}
 
 #define EMPTY_MESSAGE_MAP(theClass, baseClass) \
-	ClassDef theClass::type() { return ClassDef(#theClass, &baseClass::type()); } \
+	ClassDef theClass::type() { return ClassDef(#theClass, &baseClass::type); } \
 	const MSGMAP *theClass::getMessageMap() const \
 		{ return getThisMessageMap(); } \
 	const MSGMAP *theClass::getThisMessageMap() \
