@@ -35,9 +35,10 @@
 #include "legend/debugger.h"
 #include "legend/events.h"
 #include "legend/main_game_window.h"
+#include "legend/core/project_item.h"
+#include "legend/core/resources.h"
 #include "legend/gfx/gfx.h"
 #include "legend/gfx/picture.h"
-#include "legend/core/resources.h"
 #include "legend/gfx/screen.h"
 
 namespace Legend {
@@ -131,6 +132,12 @@ public:
 	 * Returns the prefix games use for certain data files
 	 */
 	Common::String getGameFilePrefix() const;
+
+	/**
+	 * Creates a new project hierarchy for the game, that contains all
+	 * the logic for playing that particular game.
+	 */
+	ProjectItem *createProject() const;
 };
 
 extern LegendEngine *g_vm;

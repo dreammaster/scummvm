@@ -118,6 +118,10 @@ void TreeItem::addUnder(TreeItem *newParent) {
 		setParent(newParent);
 }
 
+void TreeItem::addChild(TreeItem *child) {
+	child->addUnder(this);
+}
+
 void TreeItem::setParent(TreeItem *newParent) {
 	_parent = newParent;
 	_priorSibling = nullptr;

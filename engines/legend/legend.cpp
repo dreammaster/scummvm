@@ -20,10 +20,11 @@
  *
  */
 
-#include "legend/legend.h"
 #include "common/scummsys.h"
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
+#include "legend/legend.h"
+#include "legend/xanth/xanth_project_item.h"
 
 namespace Legend {
 
@@ -61,6 +62,8 @@ void LegendEngine::initialize() {
 	_res = new Resources(this);
 	_screen = Screen::init(this);
 	_window = new MainGameWindow(this);
+
+	_window->applicationStarting();
 }
 
 void LegendEngine::deinitialize() {
@@ -96,6 +99,15 @@ Common::String LegendEngine::getGameFilePrefix() const {
 		return "xanth";
 	default:
 		return "";
+	}
+}
+
+ProjectItem *LegendEngine::createProject() const {
+	switch (getGameID()) {
+	case GType_CompanionsOfXanth:
+		return new Xanth::XanthProjectItem();
+	default:
+		error("Unknown game");
 	}
 }
 

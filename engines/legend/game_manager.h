@@ -27,6 +27,7 @@
 #include "audio/mixer.h"
 #include "legend/input_handler.h"
 #include "legend/input_translator.h"
+#include "legend/gfx/visual_item.h"
 
 namespace Legend {
 
@@ -42,12 +43,13 @@ private:
 	/**
 	 * Generates a message for the next game frame
 	 */
-	void frameMessage(void *room);
+	void frameMessage(VisualItem *view);
 public:
 	ProjectItem *_project;
 	GameState _gameState;
 	InputHandler _inputHandler;
 	InputTranslator _inputTranslator;
+	VisualItem *_view;
 public:
 	GameManager(ProjectItem *project, Audio::Mixer *mixer);
 	~GameManager();
@@ -83,11 +85,6 @@ public:
 	void postSave();
 
 	/**
-	 * Updates the game time when the last disk access started
-	 */
-	void updateDiskTicksCount();
-
-	/**
 	 * Lock the input handler
 	 */
 	void lockInputHandler() { _inputHandler.incLockCount(); }
@@ -98,17 +95,12 @@ public:
 	void unlockInputHandler() { _inputHandler.decLockCount(); }
 
 	/**
-	 * Set default screen bounds
-	 */
-	void initBounds();
-
-	/**
 	 * Main frame update method for the game
 	 */
 	void update();
 
 	/**
-	 * Called when the view changes
+	 * Called when the visual item being viewed changes
 	 */
 	void viewChange();
 
@@ -123,21 +115,19 @@ public:
 	void incTransitions() { ++_transitionCtr; }
 
 	/**
-	 * Decremenst the number of active transitions
+	 * Decrements the number of active transitions
 	 */
 	void decTransitions() { --_transitionCtr; }
 
 	/**
-	 * Extends the bounds of the currently affected game display area
-	 * to include the passed rect
+	 * Sets the currently active visual item
 	 */
-	void extendBounds(const Common::Rect &r);
+	void setView(VisualItem *view) { _view = view; }
 
 	/**
-	 * Return the full Id of the current view in a
-	 * room.node.view tuplet form
+	 * Returns the currently active visual item
 	 */
-	Common::String getFullViewName();
+	VisualItem *view() const { return _view; }
 };
 
 } // End of namespace Legend

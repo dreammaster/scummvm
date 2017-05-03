@@ -197,6 +197,7 @@ MESSAGE1(CKeyCharMsg, int, key, 32);
 MESSAGE1(CVirtualKeyCharMsg, Common::KeyState, keyState, Common::KeyState());
 MESSAGE2(CShowMsg, VisualItem *, view, (VisualItem *)nullptr, bool, fadeIn, false);
 MESSAGE2(CHideMsg, VisualItem *, view, (VisualItem *)nullptr, bool, fadeOut, false);
+MESSAGE1(CFrameMsg, uint, ticks, 0);
 
 } // End of namespace Legend
 

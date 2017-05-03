@@ -20,49 +20,25 @@
  *
  */
 
-#include "legend/game_manager.h"
-#include "legend/legend.h"
+#ifndef LEGEND_XANTH_PROJECT_ITEM_H
+#define LEGEND_XANTH_PROJECT_ITEM_H
+
 #include "legend/core/project_item.h"
-#include "legend/messages.h"
+#include "legend/xanth/compendium.h"
 
 namespace Legend {
+namespace Xanth {
 
-GameManager::GameManager(ProjectItem *project, Audio::Mixer *mixer):
-		_project(project), _inputHandler(this), _inputTranslator(&_inputHandler) {
-}
+class XanthProjectItem : public ProjectItem {
+	DECLARE_MESSAGE_MAP;
+private:
+	Compendium _compendium;
+public:
+	CLASSDEF;
+	XanthProjectItem();
+};
 
-GameManager::~GameManager() {
-	_project->resetGameManager();
-}
-
-void GameManager::save(SimpleFile *file) {
-}
-
-void GameManager::load(SimpleFile *file) {
-}
-
-void GameManager::preLoad() {
-
-}
-
-void GameManager::postLoad(ProjectItem *project) {
-
-}
-
-void GameManager::preSave(ProjectItem *project) {
-
-}
-
-void GameManager::postSave() {
-
-}
-
-void GameManager::update() {
-	if (_view) {
-		// Signal the next frame
-		CFrameMsg frameMsg(g_vm->_events->getTicksCount());
-		frameMsg.execute(_view, nullptr, MSGFLAG_SCAN);
-	}
-}
-
+} // End of namespace Xanth
 } // End of namespace Legend
+
+#endif /* LEGEND_XANTH_PROJECT_ITEM_H */

@@ -19,6 +19,7 @@ MODULE_OBJS = \
 	gfx/visual_item.o \
 	early/early_screen.o \
 	later/later_screen.o \
+	xanth/xanth_project_item.o \
 	xanth/compendium.o \
 	debugger.o \
 	detection.o \

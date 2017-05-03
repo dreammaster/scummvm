@@ -141,6 +141,11 @@ public:
 	void addUnder(TreeItem *newParent);
 
 	/**
+	 * Adds a new child under this one
+	 */
+	void addChild(TreeItem *child);
+
+	/**
 	 * Sets the parent for the item
 	 */
 	void setParent(TreeItem *newParent);

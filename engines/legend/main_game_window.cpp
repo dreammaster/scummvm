@@ -32,7 +32,9 @@ namespace Legend {
 MainGameWindow::MainGameWindow(LegendEngine *vm): _vm(vm),
 		_priorLeftDownTime(0), _priorMiddleDownTime(0), _priorRightDownTime(0) {
 	_gameManager = nullptr;
-	_project = nullptr;
+
+	// Create the game project
+	_project = g_vm->createProject();
 
 	// Set the window as an event target
 	vm->_events->addTarget(this);
@@ -49,72 +51,22 @@ void MainGameWindow::applicationStarting() {
 	// Create game view and manager
 	_gameManager = new GameManager(_project, g_vm->_mixer);
 
-	/*
-	_gameView->setGameManager(_gameManager);
+	// Set the starting game view
+	VisualItem *firstView = dynamic_cast<VisualItem *>(_project->findByName("Compendium"));
+	_gameManager->setView(firstView);
 
-	// Generate starting messages for entering the view, node, and room.
-	// Note the old fields are nullptr, since there's no previous view/node/room
-	CViewItem *view = _gameManager->_gameState._gameLocation.getView();
-	CEnterViewMsg enterViewMsg(nullptr, view);
-	enterViewMsg.execute(view, nullptr, MSGFLAG_SCAN);
-
-	CNodeItem *node = view->findNode();
-	CEnterNodeMsg enterNodeMsg(nullptr, node);
-	enterNodeMsg.execute(node, nullptr, MSGFLAG_SCAN);
-
-	CRoomItem *room = view->findRoom();
-	CEnterRoomMsg enterRoomMsg(nullptr, room);
-	enterRoomMsg.execute(room, nullptr, MSGFLAG_SCAN);
-	*/
-	_gameManager->initBounds();
+	// Generate starting message for showing the view
+	CShowMsg showMsg;
+	showMsg.execute(firstView, nullptr, MSGFLAG_SCAN);
 }
 
 int MainGameWindow::getSavegameSlot() {
-	_project = new ProjectItem();
-
 	return 0;
 }
+
 void MainGameWindow::draw() {
-	/*
-	if (_gameManager) {
-		if (!_gameView->_surface) {
-			CViewItem *view = _gameManager->getView();
-			if (view)
-				setActiveView(view);
-		}
-
-		CScreenManager *scrManager = CScreenManager::setCurrent();
-		scrManager->clearSurface(SURFACE_BACKBUFFER, &_gameManager->_bounds);
-
-		switch (_gameManager->_gameState._mode) {
-		case GSMODE_PENDING_LOAD:
-			// Pending savegame to load
-			_gameManager->_gameState.setMode(GSMODE_INTERACTIVE);
-			_project->loadGame(_pendingLoadSlot);
-			_pendingLoadSlot = -1;
-
-			// Deliberate fall-through to draw loaded game
-
-		case GSMODE_INTERACTIVE:
-		case GSMODE_CUTSCENE:
-			if (_gameManager->_gameState._petActive)
-				drawPet(scrManager);
-
-			drawView();
-			drawViewContents(scrManager);
-			scrManager->drawCursors();
-			break;
-
-		case GSMODE_INSERT_CD:
-			scrManager->drawCursors();
-			_vm->_filesManager->insertCD(scrManager);
-			break;
-
-		default:
-			break;
-		}
-	}
-	*/
+	if (_gameManager->_view)
+		_gameManager->_view->draw();
 }
 
 void MainGameWindow::mouseChanged() {
@@ -122,7 +74,14 @@ void MainGameWindow::mouseChanged() {
 }
 
 void MainGameWindow::onIdle() {
+	if (!_gameManager)
+		return;
 
+	// Let the game manager perform any game updates
+	_gameManager->update();
+
+	// Handle any drawing updates
+	draw();
 }
 
 #define HANDLE_MESSAGE(METHOD) \
