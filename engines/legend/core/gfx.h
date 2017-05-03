@@ -41,7 +41,7 @@ struct Gfx {
 	int _field14;
 	int _field16;
 	int _field18;
-	int _field1A;
+	Common::Rect _bounds;
 	int _field1C;
 	int _field1E;
 	int _field20;
@@ -81,6 +81,8 @@ public:
 	int fn1(bool flag, int color, int val3);
 
 	void eraseRect(const Common::Rect &r, int val);
+
+	void setBounds(const Common::Rect &r) { _bounds = r; }
 };
 
 } // End of namespace Legend

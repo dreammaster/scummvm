@@ -189,14 +189,15 @@ void Font::load(Common::SeekableReadStream &s) {
 }
 
 void Font::writeChar(char c) {
-	assert(_surface);
+	Font *font = _activeFont;
+	assert(_surface && font);
 
 	if (c == '\t') {
 		_textX -= (_textX % _tabWidth) - _tabWidth;
 		if (_textX < (_surface->w - 1))
 			return;
 	}
-	if (c == '\n') {
+	if (c == '\n' || c == '\t') {
 		_textX = 0;
 		_textY += _lineHeight;
 		return;
@@ -213,10 +214,10 @@ void Font::writeChar(char c) {
 			_textY + charHeight), 2);
 	}
 
-	if (_bgColor >= 0) {
-		_surface->fillRect(Common::Rect(_textX, _textY,
-			_textX + charFullWidth, _textY + _lineHeight), _bgColor);
-	}
+	//if (_bgColor >= 0) {
+	//	_surface->fillRect(Common::Rect(_textX, _textY,
+	//		_textX + charFullWidth, _textY + _lineHeight), _bgColor);
+	//}
 
 	if (_fixedSpacing < 0) {
 		_textX += _charSpacings[c].leftSpacing;
@@ -239,8 +240,15 @@ void Font::writeChar(char c) {
 					*destP = _fgColor;
 			}
 		}
+	}
 
-		_textX += charFullWidth;
+	_textX += charFullWidth;
+	
+	if (_overrideColor >= 0) {
+		++_textX;
+	} else {
+		_textX = 0;
+		_textY += _lineHeight;
 	}
 }
 

@@ -24,7 +24,7 @@
 
 namespace Legend {
 
-Gfx::Gfx() {
+Gfx::Gfx() : _bounds(0, 0, 319, 199) {
 	_field0 = 0;
 	_field2 = 0;
 	_field4 = 0;
@@ -38,10 +38,6 @@ Gfx::Gfx() {
 	_field14 = 0;
 	_field16 = 0;
 	_field18 = 0;
-	_field1A = 0;
-	_field1C = 0;
-	_field1E = 0x3FF;
-	_field20 = 0x3FF;
 	_field22 = 0;
 	_color = 0;
 	_field26 = 1;
