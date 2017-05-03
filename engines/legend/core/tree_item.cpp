@@ -31,7 +31,8 @@ namespace Legend {
 EMPTY_MESSAGE_MAP(TreeItem, MessageTarget);
 
 TreeItem::TreeItem() : _parent(nullptr), _firstChild(nullptr),
-	_nextSibling(nullptr), _priorSibling(nullptr) {
+	_nextSibling(nullptr), _priorSibling(nullptr),
+	_disposeAfterUse(DisposeAfterUse::NO) {
 }
 
 void TreeItem::save(SimpleFile *file, int indent) {
@@ -152,7 +153,8 @@ void TreeItem::moveUnder(TreeItem *newParent) {
 void TreeItem::destroyAll() {
 	destroyChildren();
 	detach();
-	delete this;
+	if (_disposeAfterUse == DisposeAfterUse::YES)
+		delete this;
 }
 
 int TreeItem::destroyChildren() {
@@ -169,7 +171,8 @@ int TreeItem::destroyChildren() {
 		if (child)
 			total += item->destroyChildren();
 		item->detach();
-		delete item;
+		if (item->_disposeAfterUse == DisposeAfterUse::YES)
+			delete item;
 		++total;
 	} while ((item = nextSibling) != nullptr);
 

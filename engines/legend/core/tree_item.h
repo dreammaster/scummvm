@@ -40,6 +40,7 @@ private:
 	TreeItem *_nextSibling;
 	TreeItem *_priorSibling;
 	TreeItem *_firstChild;
+	DisposeAfterUse::Flag _disposeAfterUse;
 public:
 	CLASSDEF;
 	TreeItem();
