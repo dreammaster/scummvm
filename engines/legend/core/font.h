@@ -23,10 +23,10 @@
 #ifndef LEGEND_FONT_H
 #define LEGEND_FONT_H
 
-#include "legend/core/resources.h"
 #include "common/array.h"
 #include "common/stream.h"
 #include "graphics/managed_surface.h"
+#include "legend/core/gfx.h"
 
 namespace Legend {
 
@@ -40,71 +40,20 @@ struct Spacing {
 	uint rightSpacing : 4;
 };
 
-struct Font2 {
-	int _field0;
-	int _field2;
-	int _field4;
-	int _field6;
-	int _field8;
-	int _fieldA;
-	int _fieldC;
-	int _fieldE;
-	int _field10;
-	int _field12;
-	int _field14;
-	int _field16;
-	int _field18;
-	int _field1A;
-	int _field1C;
-	int _field1E;
-	int _field20;
-	int _field22;
-	int _color;
-	int _field26;
-	int _field28;
-	int _field2A;
-	int _field2C;
-	int _field2E;
-	int _field30;
-	int _field32;
-	int _field34;
-	int _field36;
-	int _field38;
-	int _field3A;
-	int _field3C;
-	int _field3E;
-	int _field40;
-	int _field42;
-	int _field44;
-	int _field46;
-	int _field48;
-	int _field4A;
-	int _field4C;
-	int _field4E;
-	int _field50;
-	int _field52;
-	int _field54;
-	int _field56;
-public:
-	/**
-	 * Constructor
-	 */
-	Font2();
-
-	int fn1(bool flag, int color, int val3);
-};
-
 class Font {
 private:
 	Graphics::ManagedSurface *_surface;
 private:
+	/**
+	 * Frees the least recently used font, and returns a new font
+	 * instance that replaces it
+	 */
 	static Font *getFreeSlot();
 public:
 	int _counter;
 	int _sectionNum;
 	int _fontNumber;
 
-	int _field3;
 	int _field4;
 	int _field5;
 	int _fieldA;
@@ -123,7 +72,7 @@ public:
 public:
 	static Font *_fonts[FONT_COUNT];
 	static Font *_activeFont;
-	static Font2 *_font2;
+	static Gfx *_gfx;
 	static int _currentSection;
 	static int _textX;
 	static int _textY;
@@ -193,7 +142,7 @@ public:
 	/**
 	 * Write out a string
 	 */
-	void writeString(const TextMessage &msg);
+	void writeString(const Common::String &msg);
 
 	/**
 	 * Return the width of a character
@@ -203,7 +152,7 @@ public:
 	/**
 	 * Return the width of a string
 	 */
-	uint stringWidth(const TextMessage &msg) const;
+	uint stringWidth(const Common::String &msg) const;
 
 	/**
 	 * Returns the height of the font

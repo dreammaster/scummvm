@@ -3,6 +3,7 @@ MODULE := engines/legend
 MODULE_OBJS = \
 	core/font.o \
 	core/file.o \
+	core/gfx.o \
 	core/image.o \
 	core/message_target.o \
 	core/named_item.o \
