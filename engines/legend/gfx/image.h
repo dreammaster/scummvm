@@ -25,28 +25,38 @@
 
 #include "common/rect.h"
 #include "legend/gfx/picture.h"
+#include "legend/gfx/visual_item.h"
 
 namespace Legend {
 
-class Image {
+class Image : public VisualItem {
+	DECLARE_MESSAGE_MAP;
+private:
+	/**
+	 * Sets up the state for a blank image
+	 */
+	void setup();
 public:
 	bool _active;
+	bool _isDirty;
 	byte _field1;
-	Common::Rect _bounds;
 	byte _fieldA;
 	byte _fieldB;
-	const byte *_pixels;
 	Picture *_pic;
 public:
+	CLASSDEF;
 	Image();
 	~Image();
+
+	/**
+	 * Draws the image on the screen
+	 */
+	virtual void draw();
 
 	/**
 	 * Loads the picture for the image
 	 */
 	bool load(int picNumber, int frameNumber = 0);
-
-	bool setBounds(const Common::Rect &r);
 };
 
 } // End of namespace Legend

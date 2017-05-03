@@ -34,7 +34,7 @@ namespace Legend {
  */
 class VisualItem : public NamedItem {
 	DECLARE_MESSAGE_MAP;
-public:
+protected:
 	Common::Rect _bounds;
 public:
 	CLASSDEF;
@@ -56,6 +56,16 @@ public:
 	 * Returns a reference to the screen
 	 */
 	Screen &screen() const;
+
+	/**
+	 * Gets the bounds for the item
+	 */
+	const Common::Rect &getBounds() { return _bounds; }
+
+	/**
+	 * Sets the bounds for the item
+	 */
+	void setBounds(const Common::Rect &r) { _bounds = r; }
 };
 
 } // End of namespace Legend

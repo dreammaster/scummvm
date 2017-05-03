@@ -25,7 +25,9 @@
 
 namespace Legend {
 
-Image::Image() : _pixels(nullptr), _pic(nullptr) {
+EMPTY_MESSAGE_MAP(Image, VisualItem);
+
+Image::Image() : VisualItem(), _pic(nullptr) {
 	_active = false;
 	_field1 = 0;
 	_fieldA = _fieldB = 0;
@@ -42,8 +44,6 @@ bool Image::load(int picNumber, int frameNumber) {
 			_pic = g_vm->_picFile->load(picNumber, frameNumber);
 			assert(_pic);
 
-			_pixels = (const byte *)_pic->getPixels();
-			
 			PicFile &pf = *g_vm->_picFile;
 			_bounds = Common::Rect(pf._origin.x, pf._origin.y,
 				pf._origin.x + pf._currentPic._width,
@@ -60,15 +60,19 @@ bool Image::load(int picNumber, int frameNumber) {
 	return false;
 }
 
-bool Image::setBounds(const Common::Rect &r) {
-	if (_active || r.isEmpty())
-		return false;
+void Image::draw() {
+	// If a picture is not yet set, default to a blank surface
+	if (!_pic)
+		setup();
 
-	_pic = new Picture(r.width(), r.height());
+	// Draw the picture to the screen
+	getSurface().blitFrom(*_pic);
+}
+
+void Image::setup() {
+	_pic = new Picture(_bounds.width(), _bounds.height());
 	assert(_pic);
 
-	_pixels = (const byte *)_pic->getPixels();
-	_bounds = r;
 	_fieldA = _fieldB = 0;
 	_active = true;
 	_field1 = 0;
