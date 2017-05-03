@@ -27,7 +27,8 @@ namespace Xanth {
 
 EMPTY_MESSAGE_MAP(XanthProjectItem, ProjectItem);
 
-XanthProjectItem::XanthProjectItem() : ProjectItem() {
+XanthProjectItem::XanthProjectItem() : ProjectItem(),
+		_compendium("Compendium", 423, 0x5a10) {
 	_compendium.addUnder(this);
 }
 

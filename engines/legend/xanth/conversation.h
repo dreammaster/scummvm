@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef LEGEND_XANTH_COMPENDIUM_H
-#define LEGEND_XANTH_COMPENDIUM_H
+#ifndef LEGEND_XANTH_CONVERSATION_H
+#define LEGEND_XANTH_CONVERSATION_H
 
 #include "legend/gfx/visual_container.h"
 #include "legend/messages.h"
@@ -32,20 +32,16 @@ namespace Xanth {
 /**
  * Implements the in-game encyclopedia, the Com-Pendium of Xanth
  */
-class Compendium : public VisualContainer {
-	struct CompendiumBounds {
-		int _bgNumber;
-		int _left, _top, _right, _bottom;
-	};
-
+class Conversation : public VisualContainer {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
 private:
+	int _val1;
 	int _bgNumber;
 public:
 	CLASSDEF;
-	Compendium();
-	virtual ~Compendium() {}
+	Conversation(const Common::String &name, int val1, int bgNumber);
+	virtual ~Conversation() {}
 };
 
 } // End of namespace Xanth

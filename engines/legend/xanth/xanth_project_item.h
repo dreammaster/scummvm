@@ -24,7 +24,7 @@
 #define LEGEND_XANTH_PROJECT_ITEM_H
 
 #include "legend/core/project_item.h"
-#include "legend/xanth/compendium.h"
+#include "legend/xanth/conversation.h"
 
 namespace Legend {
 namespace Xanth {
@@ -32,7 +32,7 @@ namespace Xanth {
 class XanthProjectItem : public ProjectItem {
 	DECLARE_MESSAGE_MAP;
 private:
-	Compendium _compendium;
+	Conversation _compendium;
 public:
 	CLASSDEF;
 	XanthProjectItem();

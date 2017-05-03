@@ -20,7 +20,7 @@ MODULE_OBJS = \
 	early/early_screen.o \
 	later/later_screen.o \
 	xanth/xanth_project_item.o \
-	xanth/compendium.o \
+	xanth/conversation.o \
 	debugger.o \
 	detection.o \
 	events.o \

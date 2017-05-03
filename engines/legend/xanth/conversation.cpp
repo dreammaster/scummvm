@@ -20,23 +20,23 @@
  *
  */
 
-#include "legend/xanth/compendium.h"
+#include "legend/xanth/conversation.h"
 #include "legend/legend.h"
 
 namespace Legend {
 namespace Xanth {
 
-BEGIN_MESSAGE_MAP(Compendium, VisualContainer)
+BEGIN_MESSAGE_MAP(Conversation, VisualContainer)
 	ON_MESSAGE(ShowMsg)
 END_MESSAGE_MAP()
 
-Compendium::Compendium() : VisualContainer() {
-	_bgNumber = 0;
-	_name = "Compendium";
-}
-
-bool Compendium::ShowMsg(CShowMsg &msg) {
-	static const CompendiumBounds BOUNDS[6] = {
+Conversation::Conversation(const Common::String &name, int val1, int bgNumber) :
+		VisualContainer(name), _val1(val1), _bgNumber(bgNumber) {
+	struct ConvBounds {
+		int _bgNumber;
+		int _left, _top, _right, _bottom;
+	};
+	static const ConvBounds BOUNDS[6] = {
 		{ 2476, 129, 13, 215, 117 },
 		{ 4529, 75, 9, 165, 102 },
 		{ 1024, 72, 0, 153, 68 },
@@ -45,20 +45,21 @@ bool Compendium::ShowMsg(CShowMsg &msg) {
 		{ 3609, 103, 0, 190, 99 }
 	};
 
-	Font *font = screen().loadFont(10);
-	font->setColor(15);
-
-	bool foundFlag = false;
-	Common::Rect bounds;
-	for (int idx = 0; idx < 6 && !foundFlag; ++idx) {
+	// There are six special numbers we set special bounds for
+	for (int idx = 0; idx < 6; ++idx) {
 		if (BOUNDS[idx]._bgNumber == _bgNumber) {
-			foundFlag = true;
-			bounds = Common::Rect(BOUNDS[idx]._left, BOUNDS[idx]._top,
+			_bounds = Common::Rect(BOUNDS[idx]._left, BOUNDS[idx]._top,
 				BOUNDS[idx]._right, BOUNDS[idx]._bottom);
+			break;
 		}
 	}
+}
 
-	if (foundFlag) {
+bool Conversation::ShowMsg(CShowMsg &msg) {
+	screen().loadFont(10);
+	Font::setColor(15);
+
+	if (!_bounds.isEmpty()) {
 
 	} else {
 

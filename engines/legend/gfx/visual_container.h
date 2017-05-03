@@ -31,6 +31,10 @@ class VisualContainer : public VisualItem {
 	DECLARE_MESSAGE_MAP;
 public:
 	CLASSDEF;
+	VisualContainer() : VisualItem() {}
+	VisualContainer(const Common::Rect &r) : VisualItem(r) {}
+	VisualContainer(const Common::String &name) : VisualItem(name) {}
+	VisualContainer(const Common::String &name, const Common::Rect &r) : VisualItem(name, r) {}
 	virtual ~VisualContainer() {}
 
 	/**
