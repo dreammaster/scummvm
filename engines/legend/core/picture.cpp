@@ -28,7 +28,7 @@ namespace Legend {
 #define INDEXES_COUNT 2
 
 PicFile::PicFile() : _currentFileNumber(-1), _index(nullptr),
-		_paletteCheck(false), _skipPreload(false), _val1(0), _val2(0) {
+		_paletteCheck(false), _skipPreload(false) {
 	_indexes.resize(INDEXES_COUNT);
 }
 
@@ -71,11 +71,10 @@ bool PicFile::open(uint pictureNum, uint frameNum) {
 	if (frameNum > 0) {
 		// Get the offset of the frame
 		_file.seek(entry._offset + (frameNum - 1) * 4);
-		_val1 = _file.readUint16LE();
-		_val2 = _file.readUint16LE();
+		_origin.x = _file.readUint16LE();
+		_origin.y = _file.readUint16LE();
 	} else {
-		_val1 = 0;
-		_val2 = 0;
+		_origin.x = _origin.y = 0;
 	}
 
 	if (!_skipPreload) {

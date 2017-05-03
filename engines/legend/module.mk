@@ -5,6 +5,7 @@ MODULE_OBJS = \
 	core/file.o \
 	core/gfx.o \
 	core/image.o \
+	core/lines.o \
 	core/message_target.o \
 	core/named_item.o \
 	core/picture.o \

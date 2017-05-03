@@ -20,51 +20,19 @@
  *
  */
 
-#include "legend/xanth/compendium.h"
-#include "legend/legend.h"
+#include "legend/core/lines.h"
 
 namespace Legend {
-namespace Xanth {
 
-BEGIN_MESSAGE_MAP(Compendium, VisualContainer)
+BEGIN_MESSAGE_MAP(Lines, VisualItem)
 	ON_MESSAGE(ShowMsg)
 END_MESSAGE_MAP()
 
-Compendium::Compendium() : VisualContainer() {
-	_name = "Compendium";
-}
-
-bool Compendium::ShowMsg(CShowMsg &msg) {
-	static const CompendiumBounds BOUNDS[6] = {
-		{ 2476, 129, 13, 215, 117 },
-		{ 4529, 75, 9, 165, 102 },
-		{ 1024, 72, 0, 153, 68 },
-		{ 1536, 92, 0, 165, 89 },
-		{ 1614, 59, 0, 126, 84 },
-		{ 3609, 103, 0, 190, 99 }
-	};
-
-	Font *font = screen().loadFont(10);
-	font->setColor(15);
-
-	bool foundFlag = false;
-	Common::Rect bounds;
-	for (int idx = 0; idx < 6 && !foundFlag; ++idx) {
-		if (BOUNDS[idx]._bgNumber == _bgNumber) {
-			foundFlag = true;
-			bounds = Common::Rect(BOUNDS[idx]._left, BOUNDS[idx]._top,
-				BOUNDS[idx]._right, BOUNDS[idx]._bottom);
-		}
-	}
-
-	if (foundFlag) {
-
-	} else {
-
-	}
-
+bool Lines::ShowMsg(CShowMsg &msg) {
 	return true;
 }
 
-} // End of namespace Xanth
+void Lines::draw() {
+}
+
 } // End of namespace Legend

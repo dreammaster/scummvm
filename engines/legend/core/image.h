@@ -23,6 +23,7 @@
 #ifndef LEGEND_IMAGE_H
 #define LEGEND_IMAGE_H
 
+#include "common/rect.h"
 #include "legend/core/picture.h"
 
 namespace Legend {
@@ -31,10 +32,7 @@ class Image {
 public:
 	bool _active;
 	byte _field1;
-	int _field2;
-	int _field4;
-	int _width;
-	int _height;
+	Common::Rect _bounds;
 	byte _fieldA;
 	byte _fieldB;
 	const byte *_pixels;
@@ -47,6 +45,8 @@ public:
 	 * Loads the picture for the image
 	 */
 	bool load(int picNumber, int frameNumber = 0);
+
+	bool setBounds(const Common::Rect &r);
 };
 
 } // End of namespace Legend

@@ -34,6 +34,7 @@ LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc)
 	g_vm = this;
 	_debugger = nullptr;
 	_events = nullptr;
+	_gfx = nullptr;
 	_res = nullptr;
 	_screen = nullptr;
 	_window = nullptr;
@@ -42,6 +43,7 @@ LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc)
 LegendEngine::~LegendEngine() {
 	delete _debugger;
 	delete _events;
+	delete _gfx;
 	delete _picFile;
 	delete _res;
 	delete _screen;
@@ -54,6 +56,7 @@ void LegendEngine::initialize() {
 	Font::init();
 	_debugger = Debugger::init(this);
 	_events = new Events(this);
+	_gfx = new Gfx();
 	_picFile = new PicFile();
 	_res = new Resources(this);
 	_screen = Screen::init(this);

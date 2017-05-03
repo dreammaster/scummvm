@@ -30,7 +30,6 @@ namespace Legend {
 
 Font *Font::_fonts[FONT_COUNT];
 Font *Font::_activeFont;
-Gfx *Font::_gfx;	// TODO: This probably needs to be on the engine itself
 int Font::_currentSection;
 int Font::_tabWidth;
 uint Font::_lineHeight;
@@ -49,7 +48,6 @@ int Font::_fontFieldA;
 void Font::init() {
 	for (int idx = 0; idx < FONT_COUNT; ++idx)
 		_fonts[idx] = new Font();
-	_gfx = new Gfx();
 	_currentSection = 0;
 	_tabWidth = 0;
 	_lineHeight = 0;
@@ -63,7 +61,6 @@ void Font::init() {
 }
 
 void Font::deinit() {
-	delete _gfx;
 	for (int idx = 0; idx < FONT_COUNT; ++idx)
 		delete _fonts[idx];
 }
@@ -209,8 +206,8 @@ void Font::writeChar(char c) {
 	int charHeight = _lineHeight;
 
 	if (_bgColor >= 0 && _overrideColor != -1) {
-		_gfx->fn1(0, _bgColor, 0);
-		_gfx->eraseRect(Common::Rect(_textX, _textY, _textX + charFullWidth,
+		g_vm->_gfx->fn1(0, _bgColor, 0);
+		g_vm->_gfx->eraseRect(Common::Rect(_textX, _textY, _textX + charFullWidth,
 			_textY + charHeight), 2);
 	}
 

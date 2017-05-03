@@ -184,8 +184,7 @@ private:
 	int findIndexesSlot() const;
 public:
 	IndexEntry _currentPic;
-	int _val1;
-	int _val2;
+	Common::Point _origin;
 public:
 	PicFile();
 	~PicFile();

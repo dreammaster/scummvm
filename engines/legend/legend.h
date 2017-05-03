@@ -35,6 +35,7 @@
 #include "legend/debugger.h"
 #include "legend/events.h"
 #include "legend/main_game_window.h"
+#include "legend/core/gfx.h"
 #include "legend/core/picture.h"
 #include "legend/core/resources.h"
 #include "legend/core/screen.h"
@@ -81,6 +82,7 @@ public:
 	const LegendGameDescription *_gameDescription;
 	Debugger *_debugger;
 	Events *_events;
+	Gfx *_gfx;
 	MainGameWindow *_window;
 	PicFile *_picFile;
 	Resources *_res;

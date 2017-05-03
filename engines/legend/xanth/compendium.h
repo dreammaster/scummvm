@@ -33,8 +33,15 @@ namespace Xanth {
  * Implements the in-game encyclopedia, the Com-Pendium of Xanth
  */
 class Compendium : public VisualContainer {
+	struct CompendiumBounds {
+		int _bgNumber;
+		int _left, _top, _right, _bottom;
+	};
+
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
+private:
+	int _bgNumber;
 public:
 	CLASSDEF;
 	Compendium();

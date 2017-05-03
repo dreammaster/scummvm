@@ -72,7 +72,6 @@ public:
 public:
 	static Font *_fonts[FONT_COUNT];
 	static Font *_activeFont;
-	static Gfx *_gfx;
 	static int _currentSection;
 	static int _textX;
 	static int _textY;

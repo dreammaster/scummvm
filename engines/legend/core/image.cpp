@@ -28,10 +28,6 @@ namespace Legend {
 Image::Image() : _pixels(nullptr), _pic(nullptr) {
 	_active = false;
 	_field1 = 0;
-	_field2 = 0;
-	_field4 = 0;
-	_width = 0;
-	_height = 0;
 	_fieldA = _fieldB = 0;
 }
 
@@ -49,10 +45,9 @@ bool Image::load(int picNumber, int frameNumber) {
 			_pixels = (const byte *)_pic->getPixels();
 			
 			PicFile &pf = *g_vm->_picFile;
-			_field2 = pf._val1;
-			_field4 = pf._val2;
-			_width = pf._currentPic._width;
-			_height = pf._currentPic._height;
+			_bounds = Common::Rect(pf._origin.x, pf._origin.y,
+				pf._origin.x + pf._currentPic._width,
+				pf._origin.y + pf._currentPic._height);
 			_fieldA = pf._currentPic._fieldA;
 			_fieldB = pf._currentPic._fieldB;
 			_field1 = (pf._currentPic._flags & PIC_40) ? 3 : 0;
@@ -63,6 +58,21 @@ bool Image::load(int picNumber, int frameNumber) {
 	}
 
 	return false;
+}
+
+bool Image::setBounds(const Common::Rect &r) {
+	if (_active || r.isEmpty())
+		return false;
+
+	_pic = new Picture(r.width(), r.height());
+	assert(_pic);
+
+	_pixels = (const byte *)_pic->getPixels();
+	_bounds = r;
+	_fieldA = _fieldB = 0;
+	_active = true;
+	_field1 = 0;
+	// TODO
 }
 
 } // End of namespace Legend
