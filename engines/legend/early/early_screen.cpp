@@ -33,54 +33,12 @@ static const byte INITIAL_PALETTE[16] = {
 	0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x00
 };
 
-EarlyScreen::EarlyScreen(LegendEngine *vm): Screen(vm), _font0(this), _font1(this),
-		_activeFont(nullptr), _transitionType(TT_INVALID) {
+EarlyScreen::EarlyScreen(LegendEngine *vm): Screen(vm), _transitionType(TT_INVALID) {
 	Font::init();
 	Common::copy(&INITIAL_PALETTE[0], &INITIAL_PALETTE[16], _palette);
 }
 
 EarlyScreen::~EarlyScreen() {
-}
-
-Font *EarlyScreen::loadFont(int fontNumber) {
-	Font *fontList[2] = { &_font0, &_font1 };
-	int idx;
-	File f;
-
-	for (idx = 0; idx < 2; ++idx) {
-		if (fontList[idx]->_counter)
-			fontList[idx]->_counter++;
-	}
-
-	for (idx = 0; idx < 2; ++idx) {
-		if (fontList[idx]->_sectionNum == Font::_fontSectionNum && fontList[idx]->_fontNumber == fontNumber)
-			break;
-	}
-
-	if (idx < 2) {
-		// Use existing loaded font
-		_activeFont = fontList[idx];
-		_activeFont->_counter = 1;
-	} else {
-		_activeFont = fontList[idx];
-		if (fontNumber)
-			f.open(FILETYPE_FNT, Font::_fontSectionNum * 100 + fontNumber);
-
-		_activeFont->_counter = 1;
-		_activeFont->_sectionNum = Font::_fontSectionNum;
-		_activeFont->_fontNumber = fontNumber;
-
-		// Original used font 0 for text mode font, which we don't need
-		assert(fontNumber && f.isOpen());
-		_activeFont->load(f);
-	}
-
-	// Final font setup
-	Font::_maxCharWidth = _activeFont->charWidth('M');
-	Font::_lineSpacing = _activeFont->getLineSpacing();
-	Font::_maxCharCenter = Font::_maxCharWidth / 2;
-
-	return _activeFont;
 }
 
 void EarlyScreen::transition(int index) {

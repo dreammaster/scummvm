@@ -29,6 +29,9 @@
 namespace Legend {
 namespace Xanth {
 
+/**
+ * Implements the in-game encyclopedia, the Com-Pendium of Xanth
+ */
 class Compendium : public VisualContainer {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);

@@ -87,10 +87,13 @@ int Font2::fn1(bool flag, int color, int val3) {
 
 /*-------------------------------------------------------------------*/
 
+Font *Font::_fonts[FONT_COUNT];
 Font2 *Font::_font2;
+int Font::_currentSection;
 int Font::_fontTabSize;
-uint Font::_lineSpacing;
-uint Font::_lineSpacingCenter;
+uint Font::_lineHeight;
+uint Font::_xCenter;
+uint Font::_yCenter;
 int Font::_textX;
 int Font::_textY;
 int Font::_fgColor;
@@ -102,9 +105,12 @@ int Font::_fontSectionNum;
 int Font::_fontFieldA;
 
 void Font::init() {
+	for (int idx = 0; idx < FONT_COUNT; ++idx)
+		_fonts[idx] = new Font();
 	_font2 = new Font2();
+	_currentSection = 0;
 	_fontTabSize = 0;
-	_lineSpacing = 0;
+	_lineHeight = 0;
 	_textX = _textY = 0;
 	_fgColor = _bgColor = 0;
 	_overrideColor = 0;
@@ -116,9 +122,11 @@ void Font::init() {
 
 void Font::deinit() {
 	delete _font2;
+	for (int idx = 0; idx < FONT_COUNT; ++idx)
+		delete _fonts[idx];
 }
 
-Font::Font(Screen *vm) {
+Font::Font() {
 	_counter = 0;
 	_sectionNum = -1;
 	_fontNumber = -1;
@@ -132,6 +140,58 @@ Font::Font(Screen *vm) {
 	_fixedWidth = 0;
 	_fixedSpacing = 0;
 	_fieldD = 0;
+}
+
+Font *Font::loadFont(int fontNumber) {
+	assert(fontNumber > 0);
+
+	for (int idx = 0; idx < FONT_COUNT; ++idx) {
+		if (_fonts[idx]->_counter)
+			_fonts[idx]->_counter++;
+	}
+
+	// Scan for the presense of the font already
+	for (int idx = 0; idx < FONT_COUNT; ++idx) {
+		if (_fonts[idx]->_sectionNum == _currentSection && 
+				_fonts[idx]->_fontNumber == fontNumber) {
+			_fonts[idx]->setActive();
+			return _fonts[idx];
+		}
+	}
+
+	// Not yet present, so select a slot to load it in
+	Font *font = getFreeSlot();
+
+	File f;
+	if (fontNumber)
+		f.open(FILETYPE_FNT, Font::_currentSection * 100 + fontNumber);
+
+	font->_counter = 1;
+	font->_sectionNum = Font::_currentSection;
+	font->_fontNumber = fontNumber;
+
+	font->load(f);
+
+	// Set the font as active and return it
+	font->setActive();
+	return font;
+}
+
+Font *Font::getFreeSlot() {
+	// Scan for the font slot with the lowest couner tally
+	int counter = _fonts[0]->_counter;
+	int minIndex = 0;
+
+	for (int idx = 0; idx < (FONT_COUNT - 1) && _fonts[idx]->_counter; ++idx) {
+		if (!_fonts[idx]->_counter < _fonts[minIndex]->_counter) {
+			minIndex = idx;			
+		}
+	}
+
+	// Delete the old font in the slot, if any, and add a new instance
+	delete _fonts[minIndex];
+	_fonts[minIndex] = new Font();
+	return _fonts[minIndex];
 }
 
 void Font::load(Common::SeekableReadStream &s) {
@@ -178,7 +238,7 @@ void Font::writeChar(char c) {
 	}
 	if (c == '\n' || c == 't') {
 		_textX = 0;
-		_textY += _lineSpacing;
+		_textY += _lineHeight;
 	}
 
 	int charWidth = _fixedWidth ? _fixedWidth : _charWidths[c];
@@ -192,7 +252,7 @@ void Font::writeChar(char c) {
 
 	if (_bgColor >= 0) {
 		_surface->fillRect(Common::Rect(_textX, _textY,
-			_textX + charFullWidth, _textY + _lineSpacing), _bgColor);
+			_textX + charFullWidth, _textY + _lineHeight), _bgColor);
 	}
 
 	if (_fixedSpacing < 0) {
@@ -252,6 +312,14 @@ uint Font::stringWidth(const TextMessage &msg) const {
 		total += charWidth(*msgP++);
 
 	return total;
+}
+
+void Font::setActive() {
+	_counter = 1;
+	_maxCharWidth = charWidth('M');
+	_lineHeight = lineHeight();
+	_xCenter = _maxCharWidth / 2;
+	_yCenter = _lineHeight / 2;
 }
 
 } // End of namespace Legend

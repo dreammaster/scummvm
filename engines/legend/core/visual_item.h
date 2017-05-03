@@ -25,6 +25,7 @@
 
 #include "graphics/managed_surface.h"
 #include "legend/core/named_item.h"
+#include "legend/core/screen.h"
 
 namespace Legend {
 
@@ -50,6 +51,11 @@ public:
 	 * This allows drawing to be done without worrying about offsets or clipping
 	 */
 	Graphics::ManagedSurface getSurface() const;
+
+	/**
+	 * Returns a reference to the screen
+	 */
+	Screen &screen() const;
 };
 
 } // End of namespace Legend

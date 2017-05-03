@@ -38,20 +38,12 @@ class LegendEngine;
 
 class EarlyScreen: public Screen {
 private:
-	Font _font0;
-	Font _font1;
 	byte _palette[64];
 public:
-	Font *_activeFont;
 	TransitionType _transitionType;
 public:
 	EarlyScreen(LegendEngine *vm);
 	virtual ~EarlyScreen();
-
-	/**
-	 * Load a specified font number
-	 */
-	Font *loadFont(int fontNumber);
 
 	/**
 	 * Handle a palette transition

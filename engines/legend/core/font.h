@@ -33,6 +33,8 @@ namespace Legend {
 class LegendEngine;
 class Screen;
 
+#define FONT_COUNT 2
+
 struct Spacing {
 	uint leftSpacing : 4;
 	uint rightSpacing : 4;
@@ -95,6 +97,8 @@ public:
 class Font {
 private:
 	Graphics::ManagedSurface *_surface;
+private:
+	static Font *getFreeSlot();
 public:
 	int _counter;
 	int _sectionNum;
@@ -117,14 +121,16 @@ public:
 	Common::Array<Spacing> _charSpacings;
 	Common::Array<byte> _pixelData;
 public:
+	static Font *_fonts[FONT_COUNT];
+	static Font *_activeFont;
 	static Font2 *_font2;
+	static int _currentSection;
 	static int _textX;
 	static int _textY;
 	static int _fontTabSize;
-	static uint _lineSpacing;
-	static uint _lineSpacingCenter;
-	static int _fgColor;
-	static int _bgColor;
+	static uint _lineHeight;
+	static uint _xCenter, _yCenter;
+	static int _fgColor, _bgColor;
 	static int _overrideColor;
 	static uint _maxCharWidth;
 	static uint _maxCharCenter;
@@ -134,8 +140,13 @@ public:
 	static void init();
 
 	static void deinit();
+
+	/**
+	 * Loads a font and makes it the active one
+	 */
+	static Font *loadFont(int fontNumber);
 public:
-	Font(Screen *vm);
+	Font();
 	~Font() {}
 
 	/**
@@ -164,9 +175,14 @@ public:
 	uint stringWidth(const TextMessage &msg) const;
 
 	/**
-	 * Returns the line spacing for the font
+	 * Returns the height of the font
 	 */
-	uint getLineSpacing() const { return _linesOffset + _linesPerChar; }
+	uint lineHeight() const { return _linesOffset + _linesPerChar; }
+
+	/**
+	 * Sets the given font as the currently active one
+	 */
+	void setActive();
 };
 
 } // End of namespace Legend

@@ -29,7 +29,11 @@ EMPTY_MESSAGE_MAP(VisualItem, NamedItem);
 
 Graphics::ManagedSurface VisualItem::getSurface() const {
 	assert(!_bounds.isEmpty());
-	return Graphics::ManagedSurface();// *g_vm->_screen, _bounds);
+	return Graphics::ManagedSurface(screen(), _bounds);
+}
+
+Screen &VisualItem::screen() const {
+	return *g_vm->_screen;
 }
 
 } // End of namespace Legend

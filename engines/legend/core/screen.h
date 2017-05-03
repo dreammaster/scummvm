@@ -73,6 +73,11 @@ public:
 	 * Set the palette to the currently loaded game palette
 	 */
 	void setPalette() { setPalette(_gamePalette); }
+
+	/**
+	 * Loads a font
+	 */
+	void loadFont(int fontNumber) { Font::loadFont(fontNumber); }
 };
 
 } // End of namespace Legend

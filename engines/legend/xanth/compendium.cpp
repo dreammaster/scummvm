@@ -21,6 +21,7 @@
  */
 
 #include "legend/xanth/compendium.h"
+#include "legend/legend.h"
 
 namespace Legend {
 namespace Xanth {
@@ -34,7 +35,8 @@ Compendium::Compendium() : VisualContainer() {
 }
 
 bool Compendium::ShowMsg(CShowMsg &msg) {
-	return false;
+	screen().loadFont(10);
+	return true;
 }
 
 } // End of namespace Xanth
