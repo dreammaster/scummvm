@@ -30,8 +30,6 @@ namespace Legend {
 class Lines : public VisualItem {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
-private:
-	bool _isDirty;
 public:
 	CLASSDEF;
 	virtual ~Lines() {}

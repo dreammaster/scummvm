@@ -38,7 +38,6 @@ private:
 	void setup();
 public:
 	bool _active;
-	bool _isDirty;
 	byte _field1;
 	byte _fieldA;
 	byte _fieldB;

@@ -33,6 +33,8 @@ public:
 	Common::String _name;
 public:
 	CLASSDEF;
+	NamedItem() {}
+	NamedItem(const Common::String &name) : _name(name) {}
 
 	/**
 	 * Gets the name of the item, if any

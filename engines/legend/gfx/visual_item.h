@@ -36,15 +36,21 @@ class VisualItem : public NamedItem {
 	DECLARE_MESSAGE_MAP;
 protected:
 	Common::Rect _bounds;
+	bool _isDirty;
 public:
 	CLASSDEF;
+	VisualItem() : _isDirty(false) {}
+	VisualItem(const Common::Rect &r) : _bounds(r), _isDirty(false) {}
+	VisualItem(const Common::String &name) : NamedItem(name), _isDirty(false) {}
+	VisualItem(const Common::String &name, const Common::Rect &r) : NamedItem(name),
+		_bounds(r), _isDirty(false) {}
+
 	virtual ~VisualItem() {}
 
 	/**
 	 * Draws the visual item on the screen
-	 * @remarks		Redrawing only necessary if the state of the item has changed
 	 */
-	virtual void draw() = 0;
+	virtual void draw() { _isDirty = false; }
 
 	/**
 	 * Gets a managed surface representing the portion of the screen defined by _bounds.
@@ -66,6 +72,11 @@ public:
 	 * Sets the bounds for the item
 	 */
 	void setBounds(const Common::Rect &r) { _bounds = r; }
+
+	/**
+	 * Flags the item as being changed, requiring a full redraw
+	 */
+	void setDirty();
 };
 
 } // End of namespace Legend

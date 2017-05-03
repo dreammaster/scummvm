@@ -36,4 +36,17 @@ Screen &VisualItem::screen() const {
 	return *g_vm->_screen;
 }
 
+void VisualItem::setDirty() {
+	// Flag the item as dirty
+	_isDirty = true;
+
+	// Flag any child items also as dirty, since rendering the parent
+	// would cover up any areas that the sub-items render within
+	for (TreeItem *treeItem = scan(this); treeItem; treeItem = treeItem->scan(this)) {
+		VisualItem *item = dynamic_cast<VisualItem *>(treeItem);
+		if (item)
+			item->_isDirty = true;
+	}
+}
+
 } // End of namespace Legend

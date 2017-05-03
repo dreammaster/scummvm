@@ -31,6 +31,7 @@ BEGIN_MESSAGE_MAP(Compendium, VisualContainer)
 END_MESSAGE_MAP()
 
 Compendium::Compendium() : VisualContainer() {
+	_bgNumber = 0;
 	_name = "Compendium";
 }
 
