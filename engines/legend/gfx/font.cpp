@@ -20,7 +20,7 @@
  *
  */
 
-#include "legend/core/font.h"
+#include "legend/gfx/font.h"
 #include "legend/legend.h"
 #include "common/system.h"
 #include "common/util.h"

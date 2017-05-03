@@ -1,22 +1,22 @@
 MODULE := engines/legend
 
 MODULE_OBJS = \
-	core/font.o \
 	core/file.o \
-	core/gfx.o \
-	core/image.o \
-	core/lines.o \
 	core/message_target.o \
 	core/named_item.o \
-	core/picture.o \
 	core/project_item.o \
 	core/resources.o \
-	core/room_item.o \
 	core/saveable_object.o \
-	core/screen.o \
 	core/tree_item.o \
-	core/visual_container.o \
-	core/visual_item.o \
+	gfx/font.o \
+	gfx/gfx.o \
+	gfx/image.o \
+	gfx/lines.o \
+	gfx/picture.o \
+	gfx/room_item.o \
+	gfx/screen.o \
+	gfx/visual_container.o \
+	gfx/visual_item.o \
 	early/early_screen.o \
 	later/later_screen.o \
 	xanth/compendium.o \

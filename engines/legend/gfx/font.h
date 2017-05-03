@@ -26,7 +26,7 @@
 #include "common/array.h"
 #include "common/stream.h"
 #include "graphics/managed_surface.h"
-#include "legend/core/gfx.h"
+#include "legend/gfx/gfx.h"
 
 namespace Legend {
 

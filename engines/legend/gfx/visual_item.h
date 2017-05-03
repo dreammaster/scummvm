@@ -20,35 +20,44 @@
  *
  */
 
-#ifndef LEGEND_IMAGE_H
-#define LEGEND_IMAGE_H
+#ifndef LEGEND_VISUAL_ITEM_H
+#define LEGEND_VISUAL_ITEM_H
 
-#include "common/rect.h"
-#include "legend/core/picture.h"
+#include "graphics/managed_surface.h"
+#include "legend/core/named_item.h"
+#include "legend/gfx/screen.h"
 
 namespace Legend {
 
-class Image {
+/**
+ * Acts as the base class for all classes that have a visual representation on the screen
+ */
+class VisualItem : public NamedItem {
+	DECLARE_MESSAGE_MAP;
 public:
-	bool _active;
-	byte _field1;
 	Common::Rect _bounds;
-	byte _fieldA;
-	byte _fieldB;
-	const byte *_pixels;
-	Picture *_pic;
 public:
-	Image();
-	~Image();
+	CLASSDEF;
+	virtual ~VisualItem() {}
 
 	/**
-	 * Loads the picture for the image
+	 * Draws the visual item on the screen
+	 * @remarks		Redrawing only necessary if the state of the item has changed
 	 */
-	bool load(int picNumber, int frameNumber = 0);
+	virtual void draw() = 0;
 
-	bool setBounds(const Common::Rect &r);
+	/**
+	 * Gets a managed surface representing the portion of the screen defined by _bounds.
+	 * This allows drawing to be done without worrying about offsets or clipping
+	 */
+	Graphics::ManagedSurface getSurface() const;
+
+	/**
+	 * Returns a reference to the screen
+	 */
+	Screen &screen() const;
 };
 
 } // End of namespace Legend
 
-#endif
+#endif /* LEGEND_VISUAL_ITEM_H */

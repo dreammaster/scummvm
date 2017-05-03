@@ -25,8 +25,8 @@
 
 #include "common/list.h"
 #include "common/rect.h"
-#include "legend/core/font.h"
-#include "legend/core/screen.h"
+#include "legend/gfx/font.h"
+#include "legend/gfx/screen.h"
 
 namespace Legend {
 

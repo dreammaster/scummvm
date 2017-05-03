@@ -20,28 +20,19 @@
  *
  */
 
-#ifndef LEGEND_LINES_H
-#define LEGEND_LINES_H
-
-#include "legend/core/visual_item.h"
+#include "legend/gfx/lines.h"
 
 namespace Legend {
 
-class Lines : public VisualItem {
-	DECLARE_MESSAGE_MAP;
-	bool ShowMsg(CShowMsg &msg);
-private:
-	bool _isDirty;
-public:
-	CLASSDEF;
-	virtual ~Lines() {}
+BEGIN_MESSAGE_MAP(Lines, VisualItem)
+	ON_MESSAGE(ShowMsg)
+END_MESSAGE_MAP()
 
-	/**
-	 * Draws the lines
-	 */
-	virtual void draw();
-};
+bool Lines::ShowMsg(CShowMsg &msg) {
+	return true;
+}
+
+void Lines::draw() {
+}
 
 } // End of namespace Legend
-
-#endif /* LEGEND_LINES_H */

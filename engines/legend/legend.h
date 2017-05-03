@@ -35,10 +35,10 @@
 #include "legend/debugger.h"
 #include "legend/events.h"
 #include "legend/main_game_window.h"
-#include "legend/core/gfx.h"
-#include "legend/core/picture.h"
+#include "legend/gfx/gfx.h"
+#include "legend/gfx/picture.h"
 #include "legend/core/resources.h"
-#include "legend/core/screen.h"
+#include "legend/gfx/screen.h"
 
 namespace Legend {
 

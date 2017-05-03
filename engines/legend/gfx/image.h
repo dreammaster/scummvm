@@ -20,25 +20,35 @@
  *
  */
 
-#ifndef LEGEND_VISUAL_CONTAINER_H
-#define LEGEND_VISUAL_CONTAINER_H
+#ifndef LEGEND_IMAGE_H
+#define LEGEND_IMAGE_H
 
-#include "legend/core/visual_item.h"
+#include "common/rect.h"
+#include "legend/gfx/picture.h"
 
 namespace Legend {
 
-class VisualContainer : public VisualItem {
-	DECLARE_MESSAGE_MAP;
+class Image {
 public:
-	CLASSDEF;
-	virtual ~VisualContainer() {}
+	bool _active;
+	byte _field1;
+	Common::Rect _bounds;
+	byte _fieldA;
+	byte _fieldB;
+	const byte *_pixels;
+	Picture *_pic;
+public:
+	Image();
+	~Image();
 
 	/**
-	 * Draws the container by iterating through each child and letting it draw
+	 * Loads the picture for the image
 	 */
-	virtual void draw();
+	bool load(int picNumber, int frameNumber = 0);
+
+	bool setBounds(const Common::Rect &r);
 };
 
 } // End of namespace Legend
 
-#endif /* LEGEND_VISUAL_CONTAINER_H */
+#endif

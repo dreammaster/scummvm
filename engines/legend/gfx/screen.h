@@ -23,7 +23,7 @@
 #ifndef LEGEND_SCREEN_H
 #define LEGEND_SCREEN_H
 
-#include "legend/core/font.h"
+#include "legend/gfx/font.h"
 #include "common/list.h"
 #include "common/rect.h"
 #include "graphics/screen.h"

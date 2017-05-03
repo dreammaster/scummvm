@@ -20,7 +20,7 @@
  *
  */
 
-#include "legend/core/screen.h"
+#include "legend/gfx/screen.h"
 #include "legend/legend.h"
 #include "legend/early/early_screen.h"
 #include "legend/later/later_screen.h"

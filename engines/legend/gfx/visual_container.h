@@ -20,44 +20,25 @@
  *
  */
 
-#ifndef LEGEND_VISUAL_ITEM_H
-#define LEGEND_VISUAL_ITEM_H
+#ifndef LEGEND_VISUAL_CONTAINER_H
+#define LEGEND_VISUAL_CONTAINER_H
 
-#include "graphics/managed_surface.h"
-#include "legend/core/named_item.h"
-#include "legend/core/screen.h"
+#include "legend/gfx/visual_item.h"
 
 namespace Legend {
 
-/**
- * Acts as the base class for all classes that have a visual representation on the screen
- */
-class VisualItem : public NamedItem {
+class VisualContainer : public VisualItem {
 	DECLARE_MESSAGE_MAP;
 public:
-	Common::Rect _bounds;
-public:
 	CLASSDEF;
-	virtual ~VisualItem() {}
+	virtual ~VisualContainer() {}
 
 	/**
-	 * Draws the visual item on the screen
-	 * @remarks		Redrawing only necessary if the state of the item has changed
+	 * Draws the container by iterating through each child and letting it draw
 	 */
-	virtual void draw() = 0;
-
-	/**
-	 * Gets a managed surface representing the portion of the screen defined by _bounds.
-	 * This allows drawing to be done without worrying about offsets or clipping
-	 */
-	Graphics::ManagedSurface getSurface() const;
-
-	/**
-	 * Returns a reference to the screen
-	 */
-	Screen &screen() const;
+	virtual void draw();
 };
 
 } // End of namespace Legend
 
-#endif /* LEGEND_VISUAL_ITEM_H */
+#endif /* LEGEND_VISUAL_CONTAINER_H */

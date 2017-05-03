@@ -23,7 +23,7 @@
 #ifndef LEGEND_LATER_SCREEN_H
 #define LEGEND_LATER_SCREEN_H
 
-#include "legend/core/screen.h"
+#include "legend/gfx/screen.h"
 
 namespace Legend {
 

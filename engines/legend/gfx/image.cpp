@@ -20,7 +20,7 @@
  *
  */
 
-#include "legend/core/image.h"
+#include "legend/gfx/image.h"
 #include "legend/legend.h"
 
 namespace Legend {

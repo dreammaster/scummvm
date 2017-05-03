@@ -20,20 +20,28 @@
  *
  */
 
-#include "legend/core/visual_item.h"
-#include "legend/legend.h"
+#ifndef LEGEND_LINES_H
+#define LEGEND_LINES_H
+
+#include "legend/gfx/visual_item.h"
 
 namespace Legend {
 
-EMPTY_MESSAGE_MAP(VisualItem, NamedItem);
+class Lines : public VisualItem {
+	DECLARE_MESSAGE_MAP;
+	bool ShowMsg(CShowMsg &msg);
+private:
+	bool _isDirty;
+public:
+	CLASSDEF;
+	virtual ~Lines() {}
 
-Graphics::ManagedSurface VisualItem::getSurface() const {
-	assert(!_bounds.isEmpty());
-	return Graphics::ManagedSurface(screen(), _bounds);
-}
-
-Screen &VisualItem::screen() const {
-	return *g_vm->_screen;
-}
+	/**
+	 * Draws the lines
+	 */
+	virtual void draw();
+};
 
 } // End of namespace Legend
+
+#endif /* LEGEND_LINES_H */

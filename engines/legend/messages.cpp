@@ -22,7 +22,7 @@
 
 #include "legend/messages.h"
 #include "legend/legend.h"
-#include "legend/core/screen.h"
+#include "legend/gfx/screen.h"
 
 namespace Legend {
 

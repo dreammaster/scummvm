@@ -23,7 +23,7 @@
 #ifndef LEGEND_XANTH_COMPENDIUM_H
 #define LEGEND_XANTH_COMPENDIUM_H
 
-#include "legend/core/visual_container.h"
+#include "legend/gfx/visual_container.h"
 #include "legend/messages.h"
 
 namespace Legend {

@@ -20,7 +20,7 @@
  *
  */
 
-#include "legend/core/visual_container.h"
+#include "legend/gfx/visual_container.h"
 
 namespace Legend {
 

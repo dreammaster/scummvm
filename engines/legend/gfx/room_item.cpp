@@ -20,7 +20,7 @@
  *
  */
 
-#include "legend/core/room_item.h"
+#include "legend/gfx/room_item.h"
 
 namespace Legend {
 
