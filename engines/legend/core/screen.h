@@ -77,7 +77,7 @@ public:
 	/**
 	 * Loads a font
 	 */
-	void loadFont(int fontNumber) { Font::loadFont(fontNumber); }
+	Font *loadFont(int fontNumber) { return Font::loadFont(fontNumber); }
 };
 
 } // End of namespace Legend

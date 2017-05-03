@@ -127,7 +127,7 @@ public:
 	static int _currentSection;
 	static int _textX;
 	static int _textY;
-	static int _fontTabSize;
+	static int _tabWidth;
 	static uint _lineHeight;
 	static uint _xCenter, _yCenter;
 	static int _fgColor, _bgColor;
@@ -136,15 +136,46 @@ public:
 	static uint _maxCharCenter;
 	static int _fontSectionNum;
 	static int _fontFieldA;
-
+public:
+	/**
+	 * Initialises static font data
+	 */
 	static void init();
 
+	/**
+	 * De-initializes static font data
+	 */
 	static void deinit();
 
 	/**
 	 * Loads a font and makes it the active one
 	 */
 	static Font *loadFont(int fontNumber);
+
+	/**
+	 * Gets the current font colors
+	 */
+	static void getColor(int &fgColor, int &bgColor);
+
+	/**
+	 * Sets the font colors
+	 */
+	static void setColor(int fgColor, int bgColor = -1);
+
+	/**
+	 * Sets the override color
+	 */
+	static void setOverrideColor(int color);
+
+	/**
+	 * Set the position for writing text to
+	 */
+	static void setTextPos(const Common::Point &pt);
+
+	/**
+	 * Sets the width of tab characters
+	 */
+	static int setTabWidth(int width);
 public:
 	Font();
 	~Font() {}

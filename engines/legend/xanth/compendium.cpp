@@ -35,7 +35,9 @@ Compendium::Compendium() : VisualContainer() {
 }
 
 bool Compendium::ShowMsg(CShowMsg &msg) {
-	screen().loadFont(10);
+	Font *font = screen().loadFont(10);
+	font->setColor(15);
+
 	return true;
 }
 

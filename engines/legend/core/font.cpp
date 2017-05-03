@@ -90,7 +90,7 @@ int Font2::fn1(bool flag, int color, int val3) {
 Font *Font::_fonts[FONT_COUNT];
 Font2 *Font::_font2;
 int Font::_currentSection;
-int Font::_fontTabSize;
+int Font::_tabWidth;
 uint Font::_lineHeight;
 uint Font::_xCenter;
 uint Font::_yCenter;
@@ -109,7 +109,7 @@ void Font::init() {
 		_fonts[idx] = new Font();
 	_font2 = new Font2();
 	_currentSection = 0;
-	_fontTabSize = 0;
+	_tabWidth = 0;
 	_lineHeight = 0;
 	_textX = _textY = 0;
 	_fgColor = _bgColor = 0;
@@ -177,6 +177,25 @@ Font *Font::loadFont(int fontNumber) {
 	return font;
 }
 
+void Font::getColor(int &fgColor, int &bgColor) {
+	fgColor = _fgColor;
+	bgColor = _bgColor;
+}
+
+void Font::setColor(int fgColor, int bgColor) {
+	_fgColor = fgColor;
+	_bgColor = bgColor;
+}
+
+void Font::setOverrideColor(int color) {
+	_overrideColor = color;
+}
+
+void Font::setTextPos(const Common::Point &pt) {
+	_textX = pt.x;
+	_textY = pt.y;
+}
+
 Font *Font::getFreeSlot() {
 	// Scan for the font slot with the lowest couner tally
 	int counter = _fonts[0]->_counter;
@@ -232,7 +251,7 @@ void Font::writeChar(char c) {
 	assert(_surface);
 
 	if (c == '\t') {
-		_textX -= (_textX % _fontTabSize) - _fontTabSize;
+		_textX -= (_textX % _tabWidth) - _tabWidth;
 		if (_textX < (_surface->w - 1))
 			return;
 	}
@@ -294,7 +313,7 @@ void Font::writeString(const TextMessage &msg) {
 
 uint Font::charWidth(char c) const {
 	if (c == '\t')
-		return _fontTabSize;
+		return _tabWidth;
 	else if (c == '\n')
 		return 0;
 	else if (_fixedSpacing < 0)
@@ -320,6 +339,12 @@ void Font::setActive() {
 	_lineHeight = lineHeight();
 	_xCenter = _maxCharWidth / 2;
 	_yCenter = _lineHeight / 2;
+}
+
+int Font::setTabWidth(int width) {
+	int oldWidth = _tabWidth;
+	_tabWidth = width;
+	return oldWidth;
 }
 
 } // End of namespace Legend
