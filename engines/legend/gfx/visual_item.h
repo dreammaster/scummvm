@@ -34,6 +34,8 @@ namespace Legend {
  */
 class VisualItem : public NamedItem {
 	DECLARE_MESSAGE_MAP;
+	bool ShowMsg(CShowMsg &msg);
+	bool HideMsg(CHideMsg &msg);
 protected:
 	Common::Rect _bounds;
 	bool _isDirty;
@@ -77,6 +79,11 @@ public:
 	 * Flags the item as being changed, requiring a full redraw
 	 */
 	void setDirty();
+
+	/**
+	 * Helper function to switch to a different visual item
+	 */
+	void changeView(const Common::String &name);
 };
 
 } // End of namespace Legend

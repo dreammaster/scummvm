@@ -65,4 +65,27 @@ void GameManager::update() {
 	}
 }
 
+void GameManager::changeView(const Common::String &name) {
+	VisualItem *newView = dynamic_cast<VisualItem *>(_project->findByName(name));
+	assert(newView);
+
+	// Hide the current view
+	CHideMsg hideMsg(_view, true);
+	hideMsg.execute(_view, nullptr, MSGFLAG_SCAN);
+
+	if (hideMsg._fadeOut) {
+		// TODO: Fade out
+	}
+
+	// Show the new view
+	_view = newView;
+	CShowMsg showMsg(_view, true);
+	showMsg.execute(_view, nullptr, MSGFLAG_SCAN);
+
+	_view->draw();
+	if (showMsg._fadeIn) {
+		// TODO: Fade in
+	}
+}
+
 } // End of namespace Legend

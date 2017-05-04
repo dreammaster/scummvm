@@ -27,6 +27,18 @@ namespace Legend {
 
 EMPTY_MESSAGE_MAP(VisualItem, NamedItem);
 
+bool VisualItem::ShowMsg(CShowMsg &msg) {
+	// When a view is shown, mark it to be redrawn
+	_isDirty = true;
+	return false;
+}
+
+bool VisualItem::HideMsg(CHideMsg &msg) {
+	// When view is hidden, mark it as not dirty
+	_isDirty = false;
+	return false;
+}
+
 Graphics::ManagedSurface VisualItem::getSurface() const {
 	assert(!_bounds.isEmpty());
 	return Graphics::ManagedSurface(screen(), _bounds);
@@ -47,6 +59,10 @@ void VisualItem::setDirty() {
 		if (item)
 			item->_isDirty = true;
 	}
+}
+
+void VisualItem::changeView(const Common::String &name) {
+	getGameManager()->changeView(name);
 }
 
 } // End of namespace Legend

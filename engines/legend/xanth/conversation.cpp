@@ -65,7 +65,7 @@ bool Conversation::ShowMsg(CShowMsg &msg) {
 
 	}
 
-	return true;
+	return VisualContainer::ShowMsg(msg);
 }
 
 } // End of namespace Xanth

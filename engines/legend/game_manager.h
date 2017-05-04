@@ -128,6 +128,11 @@ public:
 	 * Returns the currently active visual item
 	 */
 	VisualItem *view() const { return _view; }
+
+	/**
+	 * Changes to a different view
+	 */
+	void changeView(const Common::String &name);
 };
 
 } // End of namespace Legend
