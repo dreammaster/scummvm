@@ -24,6 +24,7 @@
 #define LEGEND_XANTH_CONVERSATION_H
 
 #include "legend/xanth/background.h"
+#include "legend/gfx/image.h"
 
 namespace Legend {
 namespace Xanth {
@@ -37,6 +38,7 @@ class Conversation : public Background {
 private:
 	int _conversationId;
 	int _bgNumber;
+	Image _image;
 public:
 	CLASSDEF;
 	Conversation(const Common::String &name, int convId, int bgNumber);

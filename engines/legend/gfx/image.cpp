@@ -79,6 +79,9 @@ void Image::draw() {
 }
 
 bool Image::load(int picNumber, int frameNumber) {
+	_picNum = picNumber;
+	_frameNumber = frameNumber;
+
 	_fieldA = _fieldB = 0;
 	if (g_vm->_picFile->open(picNumber, frameNumber)) {
 		_pic = g_vm->_picFile->load(picNumber, frameNumber);

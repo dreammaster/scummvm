@@ -53,16 +53,20 @@ Conversation::Conversation(const Common::String &name, int convId, int bgNumber)
 			break;
 		}
 	}
+
+	_image.addUnder(this);
 }
 
 bool Conversation::ShowMsg(CShowMsg &msg) {
 	getScreen().loadFont(10);
 	Font::setColor(15);
 
+	// Load the image for the conversation target
 	if (!_bounds.isEmpty()) {
 
 	} else {
-
+		_image.load(_bgNumber);
+		getScreen().setPalette();
 	}
 
 	return Background::ShowMsg(msg);
