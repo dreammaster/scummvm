@@ -24,13 +24,15 @@
 #define LEGEND_GATEWAY_PROJECT_ITEM_H
 
 #include "legend/core/project_item.h"
-#include "legend/xanth/conversation.h"
+#include "legend/early/help_screen.h"
 
 namespace Legend {
 namespace Gateway {
 
 class GatewayProjectItem : public ProjectItem {
 	DECLARE_MESSAGE_MAP;
+private:
+	Early::HelpScreen _helpScreen;
 public:
 	CLASSDEF;
 	GatewayProjectItem();

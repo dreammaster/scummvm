@@ -3,6 +3,7 @@ MODULE := engines/legend
 MODULE_OBJS = \
 	core/file.o \
 	core/message_target.o \
+	core/mouse_cursor.o \
 	core/named_item.o \
 	core/project_item.o \
 	core/resources.o \
@@ -18,6 +19,7 @@ MODULE_OBJS = \
 	gfx/visual_container.o \
 	gfx/visual_item.o \
 	early/early_screen.o \
+	early/help_screen.o \
 	later/later_screen.o \
 	gateway/gateway_project_item.o \
 	xanth/xanth_project_item.o \

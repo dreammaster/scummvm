@@ -507,4 +507,4 @@ void SimpleFile::skipSpaces() {
 		_inStream->seek(-1, SEEK_CUR);
 }
 
-} // End of namespace Titanic
+} // End of namespace Legend

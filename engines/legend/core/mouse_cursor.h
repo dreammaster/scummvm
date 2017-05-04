@@ -20,16 +20,35 @@
  *
  */
 
-#include "legend/gateway/gateway_project_item.h"
+#ifndef LEGEND_MOUSE_CURSOR_H
+#define LEGEND_MOUSE_CURSOR_H
+
+#include "common/scummsys.h"
 
 namespace Legend {
-namespace Gateway {
 
-EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
+class LegendEngine;
 
-GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
-	_helpScreen.addUnder(this);
-}
+enum CursorId {
+	CURSOR_ARROW = 1,
+};
 
-} // End of namespace Gateway
+class MouseCursor {
+public:
+	MouseCursor(LegendEngine *vm);
+
+	/**
+	 * Make the mouse cursor visible
+	 */
+	void show();
+
+	/**
+	 * Hide the mouse cursor
+	 */
+	void hide();
+};
+
+
 } // End of namespace Legend
+
+#endif /* LEGEND_MOUSE_CURSOR_H */

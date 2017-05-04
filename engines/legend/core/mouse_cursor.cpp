@@ -20,16 +20,21 @@
  *
  */
 
-#include "legend/gateway/gateway_project_item.h"
+#include "graphics/cursorman.h"
+#include "legend/core/mouse_cursor.h"
+#include "legend/legend.h"
 
 namespace Legend {
-namespace Gateway {
 
-EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
-
-GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
-	_helpScreen.addUnder(this);
+MouseCursor::MouseCursor(LegendEngine *vm) {
 }
 
-} // End of namespace Gateway
+void MouseCursor::show() {
+	CursorMan.showMouse(true);
+}
+
+void MouseCursor::hide() {
+	CursorMan.showMouse(false);
+}
+
 } // End of namespace Legend

@@ -35,6 +35,7 @@
 #include "legend/debugger.h"
 #include "legend/events.h"
 #include "legend/main_game_window.h"
+#include "legend/core/mouse_cursor.h"
 #include "legend/core/project_item.h"
 #include "legend/core/resources.h"
 #include "legend/gfx/gfx.h"
@@ -85,6 +86,7 @@ public:
 	Events *_events;
 	Gfx *_gfx;
 	MainGameWindow *_window;
+	MouseCursor *_mouseCursor;
 	PicFile *_picFile;
 	Resources *_res;
 	//Scene *_scene;

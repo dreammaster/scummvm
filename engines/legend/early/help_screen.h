@@ -20,16 +20,30 @@
  *
  */
 
-#include "legend/gateway/gateway_project_item.h"
+#ifndef LEGEND_EARLY_HELP_SCREEN_H
+#define LEGEND_EARLY_HELP_SCREEN_H
+
+#include "legend/gfx/visual_item.h"
 
 namespace Legend {
-namespace Gateway {
+namespace Early {
 
-EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
+class HelpScreen : public VisualItem {
+	DECLARE_MESSAGE_MAP;
+	bool MouseButtonMsg(CMouseButtonMsg &msg);
+	bool KeyCharMsg(CKeyCharMsg &msg);
+public:
+	CLASSDEF;
+	HelpScreen();
+	virtual ~HelpScreen() {}
 
-GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
-	_helpScreen.addUnder(this);
-}
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();
+};
 
-} // End of namespace Gateway
+} // End of namespace Early
 } // End of namespace Legend
+
+#endif

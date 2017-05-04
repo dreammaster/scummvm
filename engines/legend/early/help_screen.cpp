@@ -20,16 +20,43 @@
  *
  */
 
-#include "legend/gateway/gateway_project_item.h"
+#include "legend/early/help_screen.h"
 
 namespace Legend {
-namespace Gateway {
+namespace Early {
 
-EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
+BEGIN_MESSAGE_MAP(HelpScreen, VisualItem)
+	ON_MESSAGE(MouseButtonMsg)
+	ON_MESSAGE(KeyCharMsg)
+END_MESSAGE_MAP()
 
-GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
-	_helpScreen.addUnder(this);
+HelpScreen::HelpScreen() : VisualItem() {
+	_name = "Help";
+	setBounds(getScreen().getBounds());
 }
 
-} // End of namespace Gateway
+void HelpScreen::draw() {
+	if (!_isDirty)
+		return;
+	VisualItem::draw();
+
+	// Fill out the background
+	Graphics::ManagedSurface surface = getSurface();
+	surface.fillRect(surface.getBounds(), 0);
+
+	// Write out the help
+	
+}
+
+bool HelpScreen::MouseButtonMsg(CMouseButtonMsg &msg) {
+	// TODO: Leave help screen
+	return true;
+}
+
+bool HelpScreen::KeyCharMsg(CKeyCharMsg &msg) {
+	// TODO: Leave help screen
+	return true;
+}
+
+} // End of namespace Early
 } // End of namespace Legend

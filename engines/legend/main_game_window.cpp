@@ -51,7 +51,8 @@ void MainGameWindow::applicationStarting() {
 	_gameManager = new GameManager(_project, g_vm->_mixer);
 
 	// Set the starting game view
-	VisualItem *firstView = dynamic_cast<VisualItem *>(_project->findByName("Compendium"));
+	const char *name = g_vm->getGameID() == GType_Gateway ? "Help" : "Compendium";
+	VisualItem *firstView = dynamic_cast<VisualItem *>(_project->findByName(name));
 	_gameManager->setView(firstView);
 
 	// Generate starting message for showing the view
