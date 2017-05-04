@@ -64,15 +64,28 @@ bool Conversation::ShowMsg(CShowMsg &msg) {
 	Font::setColor(15);
 
 	// Load the image for the conversation target
-	if (_isSpecialTarget) {
-
-	} else {
-		_image.load(_targetPicNum);
-		getScreen().setPalette();
+	// TODO: Original has a branch here which seems simply to be
+	// a way of handling drawing images which aren't at position (0,0)
+	_image.load(_targetPicNum);
+	if (!_isSpecialTarget) {
+		Common::Rect r = _image.getBounds();
+		r.moveTo(4, 4);
+		_image.setBounds(r);
 	}
 
+	getScreen().setPalette();
 	return Background::ShowMsg(msg);
 }
+
+void Conversation::draw() {
+	Background::draw();
+	
+	// Draw a frame around where the target image will be drawn
+	Common::Rect r = _image.getBounds();
+	r.grow(1);
+	getScreen().frameRect(r, 0x10);
+}
+
 
 } // End of namespace Xanth
 } // End of namespace Legend

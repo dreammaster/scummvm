@@ -22,11 +22,13 @@
 
 #include "common/file.h"
 #include "common/system.h"
+#include "engines/util.h"
 #include "graphics/palette.h"
 #include "legend/early/early_screen.h"
 #include "legend/legend.h"
 
 namespace Legend {
+namespace Early {
 
 static const byte INITIAL_PALETTE[16] = {
 	0x3F, 0x07, 0x38, 0x03, 0x04, 0x05, 0x14, 0x07,
@@ -36,6 +38,10 @@ static const byte INITIAL_PALETTE[16] = {
 EarlyScreen::EarlyScreen(LegendEngine *vm): Screen(vm), _transitionType(TT_INVALID) {
 	Font::init();
 	Common::copy(&INITIAL_PALETTE[0], &INITIAL_PALETTE[16], _palette);
+}
+
+void EarlyScreen::setupGraphics() {
+	initGraphics(640, 480);
 }
 
 EarlyScreen::~EarlyScreen() {
@@ -73,4 +79,5 @@ void EarlyScreen::setEGAPalette(const byte *palette) {
 	g_system->getPaletteManager()->setPalette(tempPalette, 0, 16);
 }
 
+} // End of namespace Early
 } // End of namespace Legend

@@ -47,6 +47,11 @@ public:
 	static Screen *init(LegendEngine *vm);
 
 	/**
+	 * Initialises graphics mode
+	 */
+	virtual void setupGraphics() = 0;
+
+	/**
 	 * Sets the game palette
 	 * @param palette	Palette to set
 	 * @param from6Bit	If set, the passed palette is 6 bit per pixel,

@@ -21,13 +21,19 @@
  */
 
 #include "legend/later/later_screen.h"
+#include "engines/util.h"
 
 namespace Legend {
+namespace Later {
 
 LaterScreen::LaterScreen(LegendEngine *vm) : Screen(vm) {
 }
 
 LaterScreen::~LaterScreen() {
+}
+
+void LaterScreen::setupGraphics() {
+	initGraphics(640, 480, false);
 }
 
 void LaterScreen::setDefaultPalette() {
@@ -41,4 +47,5 @@ void LaterScreen::setDefaultPalette() {
 	setPalette(_gamePalette);
 }
 
+} // End of namespace Later
 } // End of namespace Legend

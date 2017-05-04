@@ -26,6 +26,7 @@
 #include "legend/gfx/screen.h"
 
 namespace Legend {
+namespace Later {
 
 class LaterScreen : public Screen {
 public:
@@ -33,11 +34,17 @@ public:
 	virtual ~LaterScreen();
 
 	/**
+	 * Initialises graphics mode
+	 */
+	virtual void setupGraphics();
+
+	/**
 	 * Sets a default game palette
 	 */
 	void setDefaultPalette();
 };
 
+} // End of namespace Later
 } // End of namespace Legend
 
 #endif

@@ -39,6 +39,7 @@ class VisualItem : public NamedItem {
 protected:
 	Common::Rect _bounds;
 	bool _isDirty;
+	int _fontNumber;
 public:
 	CLASSDEF;
 	VisualItem() : _isDirty(false) {}

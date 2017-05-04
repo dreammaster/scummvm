@@ -29,12 +29,11 @@
 #include "legend/gfx/screen.h"
 
 namespace Legend {
+namespace Early {
 
 enum TransitionType {
 	TT_INVALID = -1, TT_NONE = 0, TT_1 = 1, TT_2 = 2, TT_3 = 3, TT_4 = 4
 };
-
-class LegendEngine;
 
 class EarlyScreen: public Screen {
 private:
@@ -44,6 +43,11 @@ public:
 public:
 	EarlyScreen(LegendEngine *vm);
 	virtual ~EarlyScreen();
+
+	/**
+	 * Initialises graphics mode
+	 */
+	virtual void setupGraphics();
 
 	/**
 	 * Handle a palette transition
@@ -56,6 +60,7 @@ public:
 	void setEGAPalette(const byte *palette);
 };
 
+} // End of namespace Early
 } // End of namespace Legend
 
 #endif

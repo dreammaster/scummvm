@@ -31,9 +31,9 @@ namespace Legend {
 
 Screen *Screen::init(LegendEngine *vm) {
 	if (vm->isLater())
-		return new LaterScreen(vm);
+		return new Later::LaterScreen(vm);
 	else
-		return new EarlyScreen(vm);
+		return new Early::EarlyScreen(vm);
 }
 
 Screen::Screen(LegendEngine *vm): _vm(vm), _paletteDirty(false), _picPalette(false) {

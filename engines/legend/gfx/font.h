@@ -101,6 +101,11 @@ public:
 	static Font *loadFont(int fontNumber);
 
 	/**
+	 * Return the currently active font
+	 */
+	static Font *getActiveFont() { return _activeFont; }
+
+	/**
 	 * Gets the current font colors
 	 */
 	static void getColor(int &fgColor, int &bgColor);

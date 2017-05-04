@@ -33,6 +33,9 @@ END_MESSAGE_MAP()
 bool VisualItem::ShowMsg(CShowMsg &msg) {
 	// When a view is shown, mark it to be redrawn
 	_isDirty = true;
+	Font *font = Font::getActiveFont();
+	_fontNumber = font ? font->_fontNumber : -1;
+
 	return false;
 }
 

@@ -44,6 +44,11 @@ public:
 	CLASSDEF;
 	Conversation(const Common::String &name, int convId, int targetId);
 	virtual ~Conversation() {}
+
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();
 };
 
 } // End of namespace Xanth

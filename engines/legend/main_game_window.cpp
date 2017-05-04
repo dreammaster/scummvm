@@ -21,7 +21,6 @@
  */
 
 #include "common/config-manager.h"
-#include "engines/util.h"
 #include "legend/legend.h"
 #include "legend/game_manager.h"
 #include "legend/main_game_window.h"
@@ -46,7 +45,7 @@ MainGameWindow::~MainGameWindow() {
 
 void MainGameWindow::applicationStarting() {
 	// Set the video mode
-	initGraphics(320, 200);
+	g_vm->_screen->setupGraphics();
 
 	// Create game view and manager
 	_gameManager = new GameManager(_project, g_vm->_mixer);
