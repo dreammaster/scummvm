@@ -24,6 +24,7 @@
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
 #include "legend/legend.h"
+#include "legend/gateway/gateway_project_item.h"
 #include "legend/xanth/xanth_project_item.h"
 
 namespace Legend {
@@ -99,6 +100,8 @@ Common::String LegendEngine::getGameFilePrefix() const {
 
 ProjectItem *LegendEngine::createProject() const {
 	switch (getGameID()) {
+	case GType_Gateway:
+		return new Gateway::GatewayProjectItem();
 	case GType_CompanionsOfXanth:
 		return new Xanth::XanthProjectItem();
 	default:

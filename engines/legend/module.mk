@@ -19,6 +19,7 @@ MODULE_OBJS = \
 	gfx/visual_item.o \
 	early/early_screen.o \
 	later/later_screen.o \
+	gateway/gateway_project_item.o \
 	xanth/xanth_project_item.o \
 	xanth/background.o \
 	xanth/conversation.o \
