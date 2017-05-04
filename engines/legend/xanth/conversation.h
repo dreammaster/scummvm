@@ -37,11 +37,12 @@ class Conversation : public Background {
 	bool ShowMsg(CShowMsg &msg);
 private:
 	int _conversationId;
-	int _bgNumber;
+	int _targetPicNum;
+	bool _isSpecialTarget;
 	Image _image;
 public:
 	CLASSDEF;
-	Conversation(const Common::String &name, int convId, int bgNumber);
+	Conversation(const Common::String &name, int convId, int targetId);
 	virtual ~Conversation() {}
 };
 

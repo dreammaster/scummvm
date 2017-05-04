@@ -34,8 +34,7 @@ int Background::_bgPicNum;
 
 bool Background::ShowMsg(CShowMsg &msg) {
 	// Set the background picture number to match the common background Id
-	_picNum = _bgPicNum;
-	_frameNumber = 0;
+	load(_bgPicNum, 0);
 
 	return VisualContainer::ShowMsg(msg);
 }

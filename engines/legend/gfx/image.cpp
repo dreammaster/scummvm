@@ -56,7 +56,7 @@ void Image::fill(int color) {
 
 bool Image::ShowMsg(CShowMsg &msg) {
 	if (_picNum != -1 && !_pic)
-		load(_picNum, _frameNumber);
+		loadImage();
 
 	return VisualItem::ShowMsg(msg);
 }
@@ -82,15 +82,24 @@ bool Image::load(int picNumber, int frameNumber) {
 	_picNum = picNumber;
 	_frameNumber = frameNumber;
 
-	_fieldA = _fieldB = 0;
-	if (g_vm->_picFile->open(picNumber, frameNumber)) {
-		_pic = g_vm->_picFile->load(picNumber, frameNumber);
-		assert(_pic);
-
+	bool result = loadImage();
+	if (result) {
 		PicFile &pf = *g_vm->_picFile;
 		_bounds = Common::Rect(pf._origin.x, pf._origin.y,
 			pf._origin.x + pf._currentPic._width,
 			pf._origin.y + pf._currentPic._height);
+	}
+
+	return result;
+}
+
+bool Image::loadImage() {
+	_fieldA = _fieldB = 0;
+	if (g_vm->_picFile->open(_picNum, _frameNumber)) {
+		_pic = g_vm->_picFile->load(_picNum, _frameNumber);
+		assert(_pic);
+
+		PicFile &pf = *g_vm->_picFile;
 		_fieldA = pf._currentPic._fieldA;
 		_fieldB = pf._currentPic._fieldB;
 		_field1 = (pf._currentPic._flags & PIC_40) ? 3 : 0;

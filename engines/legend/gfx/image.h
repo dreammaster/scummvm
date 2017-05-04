@@ -34,13 +34,19 @@ class Image : public VisualItem {
 	bool ShowMsg(CShowMsg &msg);
 	bool HideMsg(CHideMsg &msg); 
 private:
+	int _picNum;
+	int _frameNumber;
+private:
 	/**
 	 * Sets up the state for a blank image
 	 */
 	void setup();
+
+	/**
+	 * Internal method for loading an image
+	 */
+	bool loadImage();
 public:
-	int _picNum;
-	int _frameNumber;
 	bool _active;
 	byte _field1;
 	byte _fieldA;

@@ -30,10 +30,10 @@ BEGIN_MESSAGE_MAP(Conversation, Background)
 	ON_MESSAGE(ShowMsg)
 END_MESSAGE_MAP()
 
-Conversation::Conversation(const Common::String &name, int convId, int bgNumber) :
-		Background(name), _conversationId(convId), _bgNumber(bgNumber) {
+Conversation::Conversation(const Common::String &name, int convId, int targetId) :
+		Background(name), _conversationId(convId), _targetPicNum(targetId) {
 	struct ConvBounds {
-		int _bgNumber;
+		int _targetPicNum;
 		int _left, _top, _right, _bottom;
 	};
 	static const ConvBounds BOUNDS[6] = {
@@ -46,10 +46,12 @@ Conversation::Conversation(const Common::String &name, int convId, int bgNumber)
 	};
 
 	// There are six special numbers we set special bounds for
+	_isSpecialTarget = false;
 	for (int idx = 0; idx < 6; ++idx) {
-		if (BOUNDS[idx]._bgNumber == _bgNumber) {
+		if (BOUNDS[idx]._targetPicNum == _targetPicNum) {
 			_bounds = Common::Rect(BOUNDS[idx]._left, BOUNDS[idx]._top,
 				BOUNDS[idx]._right, BOUNDS[idx]._bottom);
+			_isSpecialTarget = true;
 			break;
 		}
 	}
@@ -62,10 +64,10 @@ bool Conversation::ShowMsg(CShowMsg &msg) {
 	Font::setColor(15);
 
 	// Load the image for the conversation target
-	if (!_bounds.isEmpty()) {
+	if (_isSpecialTarget) {
 
 	} else {
-		_image.load(_bgNumber);
+		_image.load(_targetPicNum);
 		getScreen().setPalette();
 	}
 
