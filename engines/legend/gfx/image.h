@@ -31,12 +31,16 @@ namespace Legend {
 
 class Image : public VisualItem {
 	DECLARE_MESSAGE_MAP;
+	bool ShowMsg(CShowMsg &msg);
+	bool HideMsg(CHideMsg &msg); 
 private:
 	/**
 	 * Sets up the state for a blank image
 	 */
 	void setup();
 public:
+	int _picNum;
+	int _frameNumber;
 	bool _active;
 	byte _field1;
 	byte _fieldA;
@@ -44,7 +48,10 @@ public:
 	Picture *_pic;
 public:
 	CLASSDEF;
-	Image();
+	Image() : VisualItem() { setup(); }
+	Image(const Common::Rect &r) : VisualItem(r) { setup(); }
+	Image(const Common::String &name) : VisualItem(name) { setup(); }
+	Image(const Common::String &name, const Common::Rect &r) : VisualItem(name, r) { setup(); }
 	~Image();
 
 	/**
@@ -56,6 +63,12 @@ public:
 	 * Loads the picture for the image
 	 */
 	bool load(int picNumber, int frameNumber = 0);
+
+	/**
+	 * Sets up the image with a solid background
+	 * @remarks		It will be destroyed when the image is hidden
+	 */
+	void fill(int color = 0);
 };
 
 } // End of namespace Legend

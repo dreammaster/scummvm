@@ -27,6 +27,9 @@ namespace Legend {
 EMPTY_MESSAGE_MAP(VisualContainer, VisualItem);
 
 void VisualContainer::draw() {
+	// Handle drawing any background
+	Image::draw();
+
 	// Iterate through each child and draw the visual items
 	for (TreeItem *child = getFirstChild(); child; child = child->getNextSibling()) {
 		VisualItem *item = dynamic_cast<VisualItem *>(child);

@@ -20,52 +20,24 @@
  *
  */
 
-#include "legend/xanth/conversation.h"
+#include "legend/xanth/background.h"
 #include "legend/legend.h"
 
 namespace Legend {
 namespace Xanth {
 
-BEGIN_MESSAGE_MAP(Conversation, Background)
+BEGIN_MESSAGE_MAP(Background, VisualContainer)
 	ON_MESSAGE(ShowMsg)
 END_MESSAGE_MAP()
 
-Conversation::Conversation(const Common::String &name, int convId, int bgNumber) :
-		Background(name), _conversationId(convId), _bgNumber(bgNumber) {
-	struct ConvBounds {
-		int _bgNumber;
-		int _left, _top, _right, _bottom;
-	};
-	static const ConvBounds BOUNDS[6] = {
-		{ 2476, 129, 13, 215, 117 },
-		{ 4529, 75, 9, 165, 102 },
-		{ 1024, 72, 0, 153, 68 },
-		{ 1536, 92, 0, 165, 89 },
-		{ 1614, 59, 0, 126, 84 },
-		{ 3609, 103, 0, 190, 99 }
-	};
+int Background::_bgPicNum;
 
-	// There are six special numbers we set special bounds for
-	for (int idx = 0; idx < 6; ++idx) {
-		if (BOUNDS[idx]._bgNumber == _bgNumber) {
-			_bounds = Common::Rect(BOUNDS[idx]._left, BOUNDS[idx]._top,
-				BOUNDS[idx]._right, BOUNDS[idx]._bottom);
-			break;
-		}
-	}
-}
+bool Background::ShowMsg(CShowMsg &msg) {
+	// Set the background picture number to match the common background Id
+	_picNum = _bgPicNum;
+	_frameNumber = 0;
 
-bool Conversation::ShowMsg(CShowMsg &msg) {
-	getScreen().loadFont(10);
-	Font::setColor(15);
-
-	if (!_bounds.isEmpty()) {
-
-	} else {
-
-	}
-
-	return Background::ShowMsg(msg);
+	return VisualContainer::ShowMsg(msg);
 }
 
 } // End of namespace Xanth

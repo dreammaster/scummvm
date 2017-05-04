@@ -63,7 +63,7 @@ public:
 	/**
 	 * Returns a reference to the screen
 	 */
-	Screen &screen() const;
+	Screen &getScreen() const;
 
 	/**
 	 * Gets the bounds for the item

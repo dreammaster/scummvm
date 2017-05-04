@@ -25,9 +25,15 @@
 
 namespace Legend {
 
-EMPTY_MESSAGE_MAP(Image, VisualItem);
+BEGIN_MESSAGE_MAP(Image, VisualItem)
+	ON_MESSAGE(ShowMsg)
+	ON_MESSAGE(HideMsg)
+END_MESSAGE_MAP()
 
-Image::Image() : VisualItem(), _pic(nullptr) {
+void Image::setup() {
+	_pic = nullptr;
+	_picNum = -1;
+	_frameNumber = 0;
 	_active = false;
 	_field1 = 0;
 	_fieldA = _fieldB = 0;
@@ -37,46 +43,60 @@ Image::~Image() {
 	delete _pic;
 }
 
-bool Image::load(int picNumber, int frameNumber) {
-	if (!_active) {
-		_fieldA = _fieldB = 0;
-		if (g_vm->_picFile->open(picNumber, frameNumber)) {
-			_pic = g_vm->_picFile->load(picNumber, frameNumber);
-			assert(_pic);
-
-			PicFile &pf = *g_vm->_picFile;
-			_bounds = Common::Rect(pf._origin.x, pf._origin.y,
-				pf._origin.x + pf._currentPic._width,
-				pf._origin.y + pf._currentPic._height);
-			_fieldA = pf._currentPic._fieldA;
-			_fieldB = pf._currentPic._fieldB;
-			_field1 = (pf._currentPic._flags & PIC_40) ? 3 : 0;
-
-			_active = true;
-			return true;
-		}
-	}
-
-	return false;
-}
-
-void Image::draw() {
-	// If a picture is not yet set, default to a blank surface
-	if (!_pic)
-		setup();
-
-	// Draw the picture to the screen
-	getSurface().blitFrom(*_pic);
-}
-
-void Image::setup() {
+void Image::fill(int color) {
+	assert(!_bounds.isEmpty());
+	delete _pic;
 	_pic = new Picture(_bounds.width(), _bounds.height());
 	assert(_pic);
 
 	_fieldA = _fieldB = 0;
 	_active = true;
 	_field1 = 0;
-	// TODO
+}
+
+bool Image::ShowMsg(CShowMsg &msg) {
+	if (_picNum != -1 && !_pic)
+		load(_picNum, _frameNumber);
+
+	return VisualItem::ShowMsg(msg);
+}
+
+bool Image::HideMsg(CHideMsg &msg) {
+	delete _pic;
+	_pic = nullptr;
+	
+	return VisualItem::HideMsg(msg);
+}
+
+void Image::draw() {
+	if (_isDirty && _pic) {
+		// Draw the picture to the screen
+		getSurface().blitFrom(*_pic);
+		getScreen().setPalette();
+	}
+
+	VisualItem::draw();
+}
+
+bool Image::load(int picNumber, int frameNumber) {
+	_fieldA = _fieldB = 0;
+	if (g_vm->_picFile->open(picNumber, frameNumber)) {
+		_pic = g_vm->_picFile->load(picNumber, frameNumber);
+		assert(_pic);
+
+		PicFile &pf = *g_vm->_picFile;
+		_bounds = Common::Rect(pf._origin.x, pf._origin.y,
+			pf._origin.x + pf._currentPic._width,
+			pf._origin.y + pf._currentPic._height);
+		_fieldA = pf._currentPic._fieldA;
+		_fieldB = pf._currentPic._fieldB;
+		_field1 = (pf._currentPic._flags & PIC_40) ? 3 : 0;
+
+		_active = true;
+		return true;
+	}
+
+	return false;
 }
 
 } // End of namespace Legend

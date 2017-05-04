@@ -25,7 +25,10 @@
 
 namespace Legend {
 
-EMPTY_MESSAGE_MAP(VisualItem, NamedItem);
+BEGIN_MESSAGE_MAP(VisualItem, NamedItem)
+	ON_MESSAGE(ShowMsg)
+	ON_MESSAGE(HideMsg)
+END_MESSAGE_MAP()
 
 bool VisualItem::ShowMsg(CShowMsg &msg) {
 	// When a view is shown, mark it to be redrawn
@@ -41,10 +44,10 @@ bool VisualItem::HideMsg(CHideMsg &msg) {
 
 Graphics::ManagedSurface VisualItem::getSurface() const {
 	assert(!_bounds.isEmpty());
-	return Graphics::ManagedSurface(screen(), _bounds);
+	return Graphics::ManagedSurface(getScreen(), _bounds);
 }
 
-Screen &VisualItem::screen() const {
+Screen &VisualItem::getScreen() const {
 	return *g_vm->_screen;
 }
 

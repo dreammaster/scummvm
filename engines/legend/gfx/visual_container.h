@@ -23,18 +23,18 @@
 #ifndef LEGEND_VISUAL_CONTAINER_H
 #define LEGEND_VISUAL_CONTAINER_H
 
-#include "legend/gfx/visual_item.h"
+#include "legend/gfx/image.h"
 
 namespace Legend {
 
-class VisualContainer : public VisualItem {
+class VisualContainer : public Image {
 	DECLARE_MESSAGE_MAP;
 public:
 	CLASSDEF;
-	VisualContainer() : VisualItem() {}
-	VisualContainer(const Common::Rect &r) : VisualItem(r) {}
-	VisualContainer(const Common::String &name) : VisualItem(name) {}
-	VisualContainer(const Common::String &name, const Common::Rect &r) : VisualItem(name, r) {}
+	VisualContainer() : Image() {}
+	VisualContainer(const Common::Rect &r) : Image(r) {}
+	VisualContainer(const Common::String &name) : Image(name) {}
+	VisualContainer(const Common::String &name, const Common::Rect &r) : Image(name, r) {}
 	virtual ~VisualContainer() {}
 
 	/**

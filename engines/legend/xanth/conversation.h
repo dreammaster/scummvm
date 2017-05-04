@@ -23,8 +23,7 @@
 #ifndef LEGEND_XANTH_CONVERSATION_H
 #define LEGEND_XANTH_CONVERSATION_H
 
-#include "legend/gfx/visual_container.h"
-#include "legend/messages.h"
+#include "legend/xanth/background.h"
 
 namespace Legend {
 namespace Xanth {
@@ -32,15 +31,15 @@ namespace Xanth {
 /**
  * Implements the in-game encyclopedia, the Com-Pendium of Xanth
  */
-class Conversation : public VisualContainer {
+class Conversation : public Background {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
 private:
-	int _val1;
+	int _conversationId;
 	int _bgNumber;
 public:
 	CLASSDEF;
-	Conversation(const Common::String &name, int val1, int bgNumber);
+	Conversation(const Common::String &name, int convId, int bgNumber);
 	virtual ~Conversation() {}
 };
 
