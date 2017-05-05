@@ -62,4 +62,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_INPUT_TRANSLATOR_H */
+#endif

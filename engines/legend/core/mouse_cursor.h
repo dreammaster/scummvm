@@ -51,4 +51,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_MOUSE_CURSOR_H */
+#endif

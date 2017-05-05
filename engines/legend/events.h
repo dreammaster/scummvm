@@ -186,4 +186,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_EVENTS_H */
+#endif

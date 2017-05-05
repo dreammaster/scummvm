@@ -73,4 +73,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_INPUT_HANDLER_H */
+#endif

@@ -140,4 +140,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_PROJECT_ITEM_H */
+#endif

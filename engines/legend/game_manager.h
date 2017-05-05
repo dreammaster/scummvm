@@ -130,4 +130,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_GAME_MANAGER_H */
+#endif

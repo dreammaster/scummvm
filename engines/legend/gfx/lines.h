@@ -44,4 +44,4 @@ public:
 } // End of namespace Gfx
 } // End of namespace Legend
 
-#endif /* LEGEND_LINES_H */
+#endif

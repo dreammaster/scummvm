@@ -203,4 +203,4 @@ MESSAGE1(CFrameMsg, uint, ticks, 0);
 
 } // End of namespace Legend
 
-#endif /* LEGEND_MESSAGES_H */
+#endif

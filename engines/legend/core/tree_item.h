@@ -203,4 +203,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_TREE_ITEM_H */
+#endif

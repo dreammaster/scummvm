@@ -89,4 +89,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_SAVEABLE_OBJECT_H */
+#endif

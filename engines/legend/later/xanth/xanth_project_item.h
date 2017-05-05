@@ -43,4 +43,4 @@ public:
 } // End of namespace Later
 } // End of namespace Legend
 
-#endif /* LEGEND_XANTH_PROJECT_ITEM_H */
+#endif

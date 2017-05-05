@@ -44,4 +44,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_NAMED_ITEM_H */
+#endif

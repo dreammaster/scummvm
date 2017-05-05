@@ -314,4 +314,4 @@ Common::String readStringFromStream(Common::SeekableReadStream *s);
 
 } // End of namespace Legend
 
-#endif /* LEGEND_SIMPLE_FILE_H */
+#endif

@@ -103,4 +103,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_MESSAGE_TARGET_H */
+#endif

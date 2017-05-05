@@ -95,4 +95,4 @@ public:
 
 } // End of namespace Legend
 
-#endif /* LEGEND_MAIN_GAME_WINDOW_H */
+#endif
