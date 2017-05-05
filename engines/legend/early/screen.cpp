@@ -41,7 +41,9 @@ Screen &Screen::get() {
 
 Screen::Screen(LegendEngine *vm): Gfx::Screen(vm) {
 	Gfx::Font::init();
+
 	Common::copy(&INITIAL_LOW_PALETTE[0], &INITIAL_LOW_PALETTE[16], _palette);
+	Common::fill(&_palette[16], &_palette[PALETTE_SIZE], 0);
 	defaultPalette();
 }
 
@@ -60,9 +62,8 @@ void Screen::transition(int index) {
 }
 
 void Screen::setEGAPalette(const byte *palette) {
-	byte tempPalette[PALETTE_SIZE];
 	const byte *srcP = palette;
-	byte *destP = &tempPalette[0];
+	byte *destP = &_gamePalette[0];
 
 	for (int idx = 0;  idx < PALETTE_COUNT; ++idx, ++srcP, destP += 3) {
 		destP[0] = (*srcP >> 2 & 1) * 0xaa + (*srcP >> 5 & 1) * 0x55;
@@ -70,7 +71,7 @@ void Screen::setEGAPalette(const byte *palette) {
 		destP[2] = (*srcP & 1) * 0xaa + (*srcP >> 3 & 1) * 0x55;
 	}
 
-	g_system->getPaletteManager()->setPalette(tempPalette, 0, PALETTE_COUNT);
+	g_system->getPaletteManager()->setPalette(_gamePalette, 0, PALETTE_COUNT);
 }
 
 void Screen::defaultPalette() {

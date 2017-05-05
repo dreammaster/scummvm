@@ -118,6 +118,8 @@ public:
 
 class Picture : public Graphics::ManagedSurface, public PictureDecoder {
 public:
+	Common::Rect _bounds;
+public:
 	Picture() : Graphics::ManagedSurface(), PictureDecoder() {}
 	Picture(Picture &surf) : Graphics::ManagedSurface(surf), PictureDecoder() {}
 	Picture(int width, int height) : Graphics::ManagedSurface(width, height), PictureDecoder() {}

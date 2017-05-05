@@ -85,10 +85,7 @@ bool Image::load(int picNumber, int frameNumber) {
 
 	bool result = loadImage();
 	if (result) {
-		PicFile &pf = *g_vm->_picFile;
-		_bounds = Common::Rect(pf._origin.x, pf._origin.y,
-			pf._origin.x + pf._currentPic._width,
-			pf._origin.y + pf._currentPic._height);
+		_bounds = _pic->_bounds;
 	}
 
 	return result;

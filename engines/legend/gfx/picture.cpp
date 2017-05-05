@@ -106,6 +106,10 @@ Picture *PicFile::load(uint pictureNum, uint frameNum) {
 	int result = pic->decode(&_file);
 	assert(!result);
 
+	// Set the bounds
+	pic->_bounds = Common::Rect(_origin.x, _origin.y,
+		_origin.x + _currentPic._width, _origin.y + _currentPic._height);
+
 	// Return the picture
 	return pic;
 }
