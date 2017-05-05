@@ -49,6 +49,12 @@ GameManager *TreeItem::getGameManager() const {
 	return _parent ? _parent->getGameManager() : nullptr;
 }
 
+Events *TreeItem::getEvents() const {
+	return _parent ? _parent->getEvents() : nullptr;
+}
+
+
+
 ProjectItem *TreeItem::getRoot() const {
 	TreeItem *parent = getParent();
 
@@ -218,6 +224,10 @@ NamedItem *TreeItem::findByName(const Common::String &name) {
 	}
 
 	return nullptr;
+}
+
+GameState &TreeItem::getGameState() {
+	return getGameManager()->_gameState;
 }
 
 } // End of namespace Legend

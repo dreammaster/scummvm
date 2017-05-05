@@ -68,16 +68,6 @@ private:
 	 * Called when a game has finished being saved
 	 */
 	void postSave();
-
-	/**
-	 * Finds the first child instance of a given class type
-	 */
-	TreeItem *findChildInstance(ClassDef *classDef) const;
-
-	/**
-	 * Finds the next sibling occurance of a given class type
-	 */
-	TreeItem *findSiblingChildInstanceOf(ClassDef *classDef, TreeItem *startItem) const;
 private:
 	/**
 	 * Creates a thumbnail for the current on-screen contents
@@ -117,6 +107,11 @@ public:
 	 * Get the game manager for the project
 	 */
 	virtual GameManager *getGameManager() const;
+
+	/**
+	 * Get the events manager for the project
+	 */
+	virtual Events *getEvents() const;
 
 	/**
 	 * Sets the game manager for the project, if not already set

@@ -29,6 +29,7 @@ namespace Legend {
 
 GameManager::GameManager(ProjectItem *project, Audio::Mixer *mixer):
 		_project(project), _inputHandler(this), _inputTranslator(&_inputHandler) {
+	_project->setGameManager(this);
 }
 
 GameManager::~GameManager() {

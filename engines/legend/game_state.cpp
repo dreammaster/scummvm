@@ -20,17 +20,13 @@
  *
  */
 
-#include "legend/gateway/gateway_project_item.h"
+#include "legend/game_state.h"
 
 namespace Legend {
-namespace Gateway {
 
-EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
-
-GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
-	_partTitleScreen.addUnder(this);
-	_helpScreen.addUnder(this);
+GameState::GameState() {
+	_sectionNumber = 0;
+	_partNumber = 0;
 }
 
-} // End of namespace Gateway
 } // End of namespace Legend

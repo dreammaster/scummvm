@@ -20,17 +20,33 @@
  *
  */
 
-#include "legend/gateway/gateway_project_item.h"
+#ifndef LEGEND_GATEWAY_PART_TITLE_H
+#define LEGEND_GATEWAY_PART_TITLE_H
+
+#include "legend/early/early_visual_item.h"
+#include "legend/gfx/image.h"
 
 namespace Legend {
 namespace Gateway {
 
-EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
+class PartTitle : public Early::EarlyVisualItem {
+	DECLARE_MESSAGE_MAP;
+	bool ShowMsg(CShowMsg &msg);
+	bool FrameMsg(CFrameMsg &msg);
+private:
+	Image _title;
+	uint32 _closeTime;
+public:
+	CLASSDEF;
+	PartTitle();
 
-GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
-	_partTitleScreen.addUnder(this);
-	_helpScreen.addUnder(this);
-}
+	/**
+	 * Draws the image on the screen
+	 */
+	virtual void draw();
+};
 
 } // End of namespace Gateway
 } // End of namespace Legend
+
+#endif

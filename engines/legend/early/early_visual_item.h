@@ -20,17 +20,25 @@
  *
  */
 
-#include "legend/gateway/gateway_project_item.h"
+#ifndef LEGEND_EARLY_VISUAL_ITEM_H
+#define LEGEND_EARLY_VISUAL_ITEM_H
+
+#include "legend/gfx/visual_item.h"
+#include "legend/early/early_screen.h"
 
 namespace Legend {
-namespace Gateway {
+namespace Early {
 
-EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
+class EarlyVisualItem : public VisualItem {
+public:
+	/**
+	* Reintroduced method to return a reference to the screen sub-class
+	* used by the earlier games
+	*/
+	EarlyScreen &getScreen() const;
+};
 
-GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
-	_partTitleScreen.addUnder(this);
-	_helpScreen.addUnder(this);
-}
-
-} // End of namespace Gateway
+} // End of namespace Early
 } // End of namespace Legend
+
+#endif

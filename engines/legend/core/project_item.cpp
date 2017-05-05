@@ -55,6 +55,10 @@ GameManager *ProjectItem::getGameManager() const {
 	return _gameManager;
 }
 
+Events *ProjectItem::getEvents() const {
+	return g_vm->_events;
+}
+
 void ProjectItem::setGameManager(GameManager *gameManager) {
 	if (!_gameManager)
 		_gameManager = gameManager;

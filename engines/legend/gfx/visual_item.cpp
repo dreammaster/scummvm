@@ -54,6 +54,16 @@ Screen &VisualItem::getScreen() const {
 	return *g_vm->_screen;
 }
 
+void VisualItem::setBounds(const Common::Rect &r) {
+	_bounds = r;
+	setDirty();
+}
+
+void VisualItem::setPosition(const Common::Point &pt) {
+	_bounds.moveTo(pt);
+	setDirty();
+}
+
 void VisualItem::setDirty() {
 	// Flag the item as dirty
 	_isDirty = true;

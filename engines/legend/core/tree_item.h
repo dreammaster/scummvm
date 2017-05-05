@@ -28,6 +28,8 @@
 namespace Legend {
 
 class GameManager;
+struct GameState;
+class Events;
 class NamedItem;
 class ProjectItem;
 class CMessage;
@@ -59,6 +61,11 @@ public:
 	 * Get the game manager for the project
 	 */
 	virtual GameManager *getGameManager() const;
+
+	/**
+	 * Get the events manager for the project
+	 */
+	virtual Events *getEvents() const;
 
 	/**
 	 * Gets the name of the item, if any
@@ -187,6 +194,11 @@ public:
 	 * @param name		Name to find
 	 */
 	NamedItem *findByName(const Common::String &name);
+
+	/**
+	 * Gets the game state
+	 */
+	GameState &getGameState();
 };
 
 } // End of namespace Legend

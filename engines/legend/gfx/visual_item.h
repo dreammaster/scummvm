@@ -73,8 +73,15 @@ public:
 
 	/**
 	 * Sets the bounds for the item
+	 * @remarks Does not erase the item if it's already been drawn
 	 */
-	void setBounds(const Common::Rect &r) { _bounds = r; }
+	void setBounds(const Common::Rect &r);
+
+	/**
+	 * Set the position for the item
+	 * @remarks Does not erase the item if it's already been drawn
+	 */
+	void setPosition(const Common::Point &pt);
 
 	/**
 	 * Flags the item as being changed, requiring a full redraw

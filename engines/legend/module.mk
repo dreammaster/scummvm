@@ -20,8 +20,10 @@ MODULE_OBJS = \
 	gfx/visual_item.o \
 	early/early_screen.o \
 	early/help_screen.o \
+	early/early_visual_item.o \
 	later/later_screen.o \
 	gateway/gateway_project_item.o \
+	gateway/part_title.o \
 	xanth/xanth_project_item.o \
 	xanth/background.o \
 	xanth/conversation.o \
@@ -30,6 +32,7 @@ MODULE_OBJS = \
 	events.o \
 	legend.o \
 	game_manager.o \
+	game_state.o \
 	input_handler.o \
 	input_translator.o \
 	main_game_window.o \

@@ -25,6 +25,7 @@
 
 #include "legend/core/project_item.h"
 #include "legend/early/help_screen.h"
+#include "legend/gateway/part_title.h"
 
 namespace Legend {
 namespace Gateway {
@@ -32,6 +33,7 @@ namespace Gateway {
 class GatewayProjectItem : public ProjectItem {
 	DECLARE_MESSAGE_MAP;
 private:
+	PartTitle _partTitleScreen;
 	Early::HelpScreen _helpScreen;
 public:
 	CLASSDEF;
@@ -41,4 +43,4 @@ public:
 } // End of namespace Gateway
 } // End of namespace Legend
 
-#endif /* LEGEND_GATEWAY_PROJECT_ITEM_H */
+#endif

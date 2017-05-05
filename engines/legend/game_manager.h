@@ -25,6 +25,7 @@
 
 #include "common/scummsys.h"
 #include "audio/mixer.h"
+#include "legend/game_state.h"
 #include "legend/input_handler.h"
 #include "legend/input_translator.h"
 #include "legend/gfx/visual_item.h"
@@ -33,17 +34,9 @@ namespace Legend {
 
 class ProjectItem;
 
-struct GameState {
-};
-
 class GameManager {
 private:
 	int _transitionCtr;
-private:
-	/**
-	 * Generates a message for the next game frame
-	 */
-	void frameMessage(VisualItem *view);
 public:
 	ProjectItem *_project;
 	GameState _gameState;

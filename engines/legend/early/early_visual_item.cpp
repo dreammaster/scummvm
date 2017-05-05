@@ -20,17 +20,15 @@
  *
  */
 
-#include "legend/gateway/gateway_project_item.h"
+#include "legend/early/early_visual_item.h"
+#include "legend/legend.h"
 
 namespace Legend {
-namespace Gateway {
-
-EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
-
-GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
-	_partTitleScreen.addUnder(this);
-	_helpScreen.addUnder(this);
+namespace Early {
+	
+EarlyScreen &EarlyVisualItem::getScreen() const {
+	return *((Legend::Early::EarlyScreen *)g_vm->_screen);
 }
 
-} // End of namespace Gateway
+} // End of namespace Early
 } // End of namespace Legend

@@ -20,17 +20,18 @@
  *
  */
 
-#include "legend/gateway/gateway_project_item.h"
+#ifndef LEGEND_GAME_STATE_H
+#define LEGEND_GAME_STATE_H
 
 namespace Legend {
-namespace Gateway {
 
-EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
+struct GameState {
+	int _partNumber;
+	int _sectionNumber;
 
-GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
-	_partTitleScreen.addUnder(this);
-	_helpScreen.addUnder(this);
-}
+	GameState();
+};
 
-} // End of namespace Gateway
 } // End of namespace Legend
+
+#endif
