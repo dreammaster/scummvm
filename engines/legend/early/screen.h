@@ -31,15 +31,9 @@
 namespace Legend {
 namespace Early {
 
-enum SectionType {
-	TT_INVALID = -1, TT_NONE = 0, TT_1 = 1, TT_2 = 2, TT_3 = 3, TT_4 = 4
-};
-
 class Screen: public Gfx::Screen {
 private:
 	byte _palette[PALETTE_SIZE];
-public:
-	SectionType _sectionType;
 public:
 	Screen(LegendEngine *vm);
 	virtual ~Screen();

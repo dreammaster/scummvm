@@ -43,8 +43,6 @@ PartTitle::PartTitle() : Gfx::VisualContainer() {
 bool PartTitle::ShowMsg(CShowMsg &msg) {
 	// Set up for the display of the part number image
 	_title.load(260 + getGameState()._partNumber);
-	if (Screen::get()._sectionType == 4)
-		_title.setPosition(Common::Point(80, 60));
 
 	// Set up an expirty time to close the view after 2 seconds
 	_closeTime = getEvents()->getTicksCount() + 2000;

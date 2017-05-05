@@ -39,7 +39,7 @@ Screen &Screen::get() {
 	return *((Screen *)g_vm->_screen);
 }
 
-Screen::Screen(LegendEngine *vm): Gfx::Screen(vm), _sectionType(TT_2) {
+Screen::Screen(LegendEngine *vm): Gfx::Screen(vm) {
 	Gfx::Font::init();
 	Common::copy(&INITIAL_LOW_PALETTE[0], &INITIAL_LOW_PALETTE[16], _palette);
 	defaultPalette();
@@ -53,20 +53,9 @@ Screen::~Screen() {
 }
 
 void Screen::transition(int index) {
-	switch (_sectionType) {
-	case TT_1:
-		_palette[index] = 36;
+	for (int idx = 0; idx < 64; ++idx) {
+		_palette[index * 3] = idx;
 		setEGAPalette(_palette);
-		break;
-	case TT_2:
-	case TT_4:
-		for (int idx = 0; idx < 64; ++idx) {
-			_palette[index * 3] = idx;
-			setEGAPalette(_palette);
-		}
-		break;
-	default:
-		break;
 	}
 }
 
@@ -85,34 +74,13 @@ void Screen::setEGAPalette(const byte *palette) {
 }
 
 void Screen::defaultPalette() {
-	int index;
+	// White and black colors
+	Common::fill(&_palette[0], &_palette[3], 63);
+	Common::fill(&_palette[15 * 3], &_palette[15 * 3 + 3], 0);
 
-	switch (_sectionType) {
-	case 1:
-		_palette[0] = 63;
-		_palette[1] = 7;
-		_palette[2] = 56;
-		_palette[15] = 0;
-		break;
-	case 2:
-	case 3:
-	case 4:
-		// White color
-		index = _sectionType == TT_3 ? PALETTE_SIZE - 3 : 0;
-		Common::fill(&_palette[index], &_palette[index + 3], 63);
-
-		// Black color
-		index = _sectionType == TT_3 ? 0 : 45;
-		Common::fill(&_palette[index], &_palette[index + 3], 0);
-
-		// Miscellaneous
-		_palette[3] = _palette[4] = _palette[5] = 42;
-		_palette[6] = _palette[7] = _palette[8] = 21;
-		break;
-
-	default:
-		break;
-	}
+	// Miscellaneous
+	Common::fill(&_palette[3], &_palette[3 + 3], 42);
+	Common::fill(&_palette[6], &_palette[6 + 3], 21);
 
 	setEGAPalette(_palette);
 }
