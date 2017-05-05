@@ -20,23 +20,28 @@
  *
  */
 
-#include "legend/later/later_screen.h"
+#include "legend/later/screen.h"
 #include "engines/util.h"
+#include "legend/legend.h"
 
 namespace Legend {
 namespace Later {
 
-LaterScreen::LaterScreen(LegendEngine *vm) : Screen(vm) {
+Screen &Screen::get() {
+	return *((Screen *)g_vm->_screen);
 }
 
-LaterScreen::~LaterScreen() {
+Screen::Screen(LegendEngine *vm) : Gfx::Screen(vm) {
 }
 
-void LaterScreen::setupGraphics() {
+Screen::~Screen() {
+}
+
+void Screen::setupGraphics() {
 	initGraphics(640, 480, false);
 }
 
-void LaterScreen::setDefaultPalette() {
+void Screen::setDefaultPalette() {
 	for (int idx = 0; idx < 48; ++idx) {
 		_gamePalette[idx] = ((idx / 3) * 63) / 15;
 	}

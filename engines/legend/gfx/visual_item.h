@@ -28,6 +28,7 @@
 #include "legend/gfx/screen.h"
 
 namespace Legend {
+namespace Gfx {
 
 /**
  * Acts as the base class for all classes that have a visual representation on the screen
@@ -62,11 +63,6 @@ public:
 	Graphics::ManagedSurface getSurface() const;
 
 	/**
-	 * Returns a reference to the screen
-	 */
-	Screen &getScreen() const;
-
-	/**
 	 * Gets the bounds for the item
 	 */
 	const Common::Rect &getBounds() { return _bounds; }
@@ -94,6 +90,7 @@ public:
 	void changeView(const Common::String &name);
 };
 
+} // End of namespace Gfx
 } // End of namespace Legend
 
-#endif /* LEGEND_VISUAL_ITEM_H */
+#endif

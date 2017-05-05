@@ -24,31 +24,36 @@
 #include "common/system.h"
 #include "engines/util.h"
 #include "graphics/palette.h"
-#include "legend/early/early_screen.h"
+#include "legend/early/screen.h"
 #include "legend/legend.h"
 
 namespace Legend {
 namespace Early {
 
-static const byte INITIAL_PALETTE[16] = {
+static const byte INITIAL_LOW_PALETTE[16] = {
 	0x3F, 0x07, 0x38, 0x03, 0x04, 0x05, 0x14, 0x07,
 	0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x00
 };
 
-EarlyScreen::EarlyScreen(LegendEngine *vm): Screen(vm), _transitionType(TT_INVALID) {
-	Font::init();
-	Common::copy(&INITIAL_PALETTE[0], &INITIAL_PALETTE[16], _palette);
+Screen &Screen::get() {
+	return *((Screen *)g_vm->_screen);
 }
 
-void EarlyScreen::setupGraphics() {
+Screen::Screen(LegendEngine *vm): Gfx::Screen(vm), _sectionType(TT_2) {
+	Gfx::Font::init();
+	Common::copy(&INITIAL_LOW_PALETTE[0], &INITIAL_LOW_PALETTE[16], _palette);
+	defaultPalette();
+}
+
+void Screen::setupGraphics() {
 	initGraphics(640, 480);
 }
 
-EarlyScreen::~EarlyScreen() {
+Screen::~Screen() {
 }
 
-void EarlyScreen::transition(int index) {
-	switch (_transitionType) {
+void Screen::transition(int index) {
+	switch (_sectionType) {
 	case TT_1:
 		_palette[index] = 36;
 		setEGAPalette(_palette);
@@ -65,18 +70,51 @@ void EarlyScreen::transition(int index) {
 	}
 }
 
-void EarlyScreen::setEGAPalette(const byte *palette) {
-	byte tempPalette[16 * 3];
+void Screen::setEGAPalette(const byte *palette) {
+	byte tempPalette[PALETTE_SIZE];
 	const byte *srcP = palette;
 	byte *destP = &tempPalette[0];
 
-	for (int idx = 0;  idx < 16; ++idx, ++srcP, destP += 3) {
+	for (int idx = 0;  idx < PALETTE_COUNT; ++idx, ++srcP, destP += 3) {
 		destP[0] = (*srcP >> 2 & 1) * 0xaa + (*srcP >> 5 & 1) * 0x55;
 		destP[1] = (*srcP >> 1 & 1) * 0xaa + (*srcP >> 4 & 1) * 0x55;
 		destP[2] = (*srcP & 1) * 0xaa + (*srcP >> 3 & 1) * 0x55;
 	}
 
-	g_system->getPaletteManager()->setPalette(tempPalette, 0, 16);
+	g_system->getPaletteManager()->setPalette(tempPalette, 0, PALETTE_COUNT);
+}
+
+void Screen::defaultPalette() {
+	int index;
+
+	switch (_sectionType) {
+	case 1:
+		_palette[0] = 63;
+		_palette[1] = 7;
+		_palette[2] = 56;
+		_palette[15] = 0;
+		break;
+	case 2:
+	case 3:
+	case 4:
+		// White color
+		index = _sectionType == TT_3 ? PALETTE_SIZE - 3 : 0;
+		Common::fill(&_palette[index], &_palette[index + 3], 63);
+
+		// Black color
+		index = _sectionType == TT_3 ? 0 : 45;
+		Common::fill(&_palette[index], &_palette[index + 3], 0);
+
+		// Miscellaneous
+		_palette[3] = _palette[4] = _palette[5] = 42;
+		_palette[6] = _palette[7] = _palette[8] = 21;
+		break;
+
+	default:
+		break;
+	}
+
+	setEGAPalette(_palette);
 }
 
 } // End of namespace Early

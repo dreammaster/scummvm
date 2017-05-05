@@ -31,6 +31,9 @@
 namespace Legend {
 
 class LegendEngine;
+
+namespace Gfx {
+
 class Screen;
 
 #define FONT_COUNT 2
@@ -169,6 +172,7 @@ public:
 	void setActive();
 };
 
+} // End of namespace Gfx
 } // End of namespace Legend
 
 #endif

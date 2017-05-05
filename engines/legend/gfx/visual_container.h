@@ -26,6 +26,7 @@
 #include "legend/gfx/image.h"
 
 namespace Legend {
+namespace Gfx {
 
 class VisualContainer : public Image {
 	DECLARE_MESSAGE_MAP;
@@ -43,6 +44,7 @@ public:
 	virtual void draw();
 };
 
+} // End of namespace Gfx
 } // End of namespace Legend
 
-#endif /* LEGEND_VISUAL_CONTAINER_H */
+#endif

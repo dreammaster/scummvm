@@ -21,6 +21,7 @@
  */
 
 #include "legend/early/help_screen.h"
+#include "legend/early/screen.h"
 
 namespace Legend {
 namespace Early {
@@ -32,7 +33,7 @@ END_MESSAGE_MAP()
 
 HelpScreen::HelpScreen() : VisualItem() {
 	_name = "Help";
-	setBounds(getScreen().getBounds());
+	setBounds(Screen::get().getBounds());
 }
 
 void HelpScreen::draw() {

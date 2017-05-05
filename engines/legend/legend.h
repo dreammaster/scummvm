@@ -85,13 +85,13 @@ public:
 	const LegendGameDescription *_gameDescription;
 	Debugger *_debugger;
 	Events *_events;
-	Gfx *_gfx;
+	Gfx::Gfx *_gfx;
 	MainGameWindow *_window;
 	MouseCursor *_mouseCursor;
-	PicFile *_picFile;
+	Gfx::PicFile *_picFile;
 	Resources *_res;
 	//Scene *_scene;
-	Screen *_screen;
+	Gfx::Screen *_screen;
 public:
 	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);
 	virtual ~LegendEngine();

@@ -32,7 +32,8 @@
 namespace Legend {
 
 class LegendEngine;
-class ScreenArea;
+
+namespace Gfx {
 
 class Screen: public Graphics::Screen {
 protected:
@@ -45,6 +46,7 @@ public:
 	Screen(LegendEngine *vm);
 	virtual ~Screen();
 	static Screen *init(LegendEngine *vm);
+	static Screen &get();
 
 	/**
 	 * Initialises graphics mode
@@ -85,6 +87,7 @@ public:
 	Font *loadFont(int fontNumber) { return Font::loadFont(fontNumber); }
 };
 
+} // End of namespace Gfx
 } // End of namespace Legend
 
 #endif

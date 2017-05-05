@@ -20,36 +20,36 @@
  *
  */
 
-#include "legend/gateway/part_title.h"
-#include "legend/early/early_screen.h"
+#include "legend/early/gateway/part_title.h"
+#include "legend/early/screen.h"
 #include "legend/legend.h"
 
 namespace Legend {
+namespace Early {
 namespace Gateway {
 
-BEGIN_MESSAGE_MAP(PartTitle, Early::EarlyVisualItem)
+BEGIN_MESSAGE_MAP(PartTitle, Gfx::VisualContainer)
 	ON_MESSAGE(ShowMsg)
 	ON_MESSAGE(FrameMsg)
 END_MESSAGE_MAP()
 
-PartTitle::PartTitle() : Early::EarlyVisualItem() {
+PartTitle::PartTitle() : Gfx::VisualContainer() {
 	_closeTime = 0;
 	_name = "PartTitle";
 	_title.addUnder(this);
-	setBounds(getScreen().getBounds());
+	setBounds(Screen::get().getBounds());
 }
 
 bool PartTitle::ShowMsg(CShowMsg &msg) {
-	Early::EarlyVisualItem::ShowMsg(msg);
-
 	// Set up for the display of the part number image
 	_title.load(260 + getGameState()._partNumber);
-	if (getGameState()._sectionNumber == 4)
+	if (Screen::get()._sectionType == 4)
 		_title.setPosition(Common::Point(80, 60));
 
 	// Set up an expirty time to close the view after 2 seconds
 	_closeTime = getEvents()->getTicksCount() + 2000;
-	return true;
+
+	return Gfx::VisualContainer::ShowMsg(msg);
 }
 
 bool PartTitle::FrameMsg(CFrameMsg &msg) {
@@ -63,7 +63,7 @@ bool PartTitle::FrameMsg(CFrameMsg &msg) {
 void PartTitle::draw() {
 	if (!_isDirty)
 		return;
-	Early::EarlyVisualItem::draw();
+	Gfx::VisualContainer::draw();
 
 	// Fill the entire screen with black. The title sub-item
 	// will then draw itself on top of that
@@ -71,4 +71,5 @@ void PartTitle::draw() {
 }
 
 } // End of namespace Gateway
+} // End of namespace Early
 } // End of namespace Legend

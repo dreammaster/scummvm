@@ -20,38 +20,29 @@
  *
  */
 
-#ifndef LEGEND_XANTH_CONVERSATION_H
-#define LEGEND_XANTH_CONVERSATION_H
+#ifndef LEGEND_GATEWAY_PROJECT_ITEM_H
+#define LEGEND_GATEWAY_PROJECT_ITEM_H
 
-#include "legend/xanth/background.h"
-#include "legend/gfx/image.h"
+#include "legend/core/project_item.h"
+#include "legend/early/help_screen.h"
+#include "legend/early/gateway/part_title.h"
 
 namespace Legend {
-namespace Xanth {
+namespace Early {
+namespace Gateway {
 
-/**
- * Implements the in-game encyclopedia, the Com-Pendium of Xanth
- */
-class Conversation : public Background {
+class GatewayProjectItem : public ProjectItem {
 	DECLARE_MESSAGE_MAP;
-	bool ShowMsg(CShowMsg &msg);
 private:
-	int _conversationId;
-	int _targetPicNum;
-	bool _isSpecialTarget;
-	Image _image;
+	PartTitle _partTitleScreen;
+	Early::HelpScreen _helpScreen;
 public:
 	CLASSDEF;
-	Conversation(const Common::String &name, int convId, int targetId);
-	virtual ~Conversation() {}
-
-	/**
-	 * Draws the visual item on the screen
-	 */
-	virtual void draw();
+	GatewayProjectItem();
 };
 
-} // End of namespace Xanth
+} // End of namespace Gateway
+} // End of namespace Early
 } // End of namespace Legend
 
 #endif

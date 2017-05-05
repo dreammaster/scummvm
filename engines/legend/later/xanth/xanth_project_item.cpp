@@ -20,15 +20,21 @@
  *
  */
 
-#include "legend/early/early_visual_item.h"
-#include "legend/legend.h"
+#include "legend/later/xanth/xanth_project_item.h"
 
 namespace Legend {
-namespace Early {
-	
-EarlyScreen &EarlyVisualItem::getScreen() const {
-	return *((Legend::Early::EarlyScreen *)g_vm->_screen);
+namespace Later {
+namespace Xanth {
+
+EMPTY_MESSAGE_MAP(XanthProjectItem, ProjectItem);
+
+XanthProjectItem::XanthProjectItem() : ProjectItem(),
+		_compendium("Compendium", 423, 0x5a10) {
+	_compendium.addUnder(this);
+
+	Background::_bgPicNum = 31;
 }
 
-} // End of namespace Early
+} // End of namespace Xanth
+} // End of namespace Later
 } // End of namespace Legend

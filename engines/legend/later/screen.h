@@ -20,33 +20,32 @@
  *
  */
 
-#ifndef LEGEND_GATEWAY_PART_TITLE_H
-#define LEGEND_GATEWAY_PART_TITLE_H
+#ifndef LEGEND_LATER_SCREEN_H
+#define LEGEND_LATER_SCREEN_H
 
-#include "legend/early/early_visual_item.h"
-#include "legend/gfx/image.h"
+#include "legend/gfx/screen.h"
 
 namespace Legend {
-namespace Gateway {
+namespace Later {
 
-class PartTitle : public Early::EarlyVisualItem {
-	DECLARE_MESSAGE_MAP;
-	bool ShowMsg(CShowMsg &msg);
-	bool FrameMsg(CFrameMsg &msg);
-private:
-	Image _title;
-	uint32 _closeTime;
+class Screen : public Gfx::Screen {
 public:
-	CLASSDEF;
-	PartTitle();
+	Screen(LegendEngine *vm);
+	virtual ~Screen();
+	static Screen &get();
 
 	/**
-	 * Draws the image on the screen
+	 * Initialises graphics mode
 	 */
-	virtual void draw();
+	virtual void setupGraphics();
+
+	/**
+	 * Sets a default game palette
+	 */
+	void setDefaultPalette();
 };
 
-} // End of namespace Gateway
+} // End of namespace Later
 } // End of namespace Legend
 
 #endif

@@ -20,10 +20,12 @@
  *
  */
 
-#include "legend/xanth/conversation.h"
+#include "legend/later/xanth/conversation.h"
+#include "legend/later/screen.h"
 #include "legend/legend.h"
 
 namespace Legend {
+namespace Later {
 namespace Xanth {
 
 BEGIN_MESSAGE_MAP(Conversation, Background)
@@ -60,8 +62,8 @@ Conversation::Conversation(const Common::String &name, int convId, int targetId)
 }
 
 bool Conversation::ShowMsg(CShowMsg &msg) {
-	getScreen().loadFont(10);
-	Font::setColor(15);
+	Screen::get().loadFont(10);
+	Gfx::Font::setColor(15);
 
 	// Load the image for the conversation target
 	// TODO: Original has a branch here which seems simply to be
@@ -73,7 +75,7 @@ bool Conversation::ShowMsg(CShowMsg &msg) {
 		_image.setBounds(r);
 	}
 
-	getScreen().setPalette();
+	Screen::get().setPalette();
 	return Background::ShowMsg(msg);
 }
 
@@ -83,9 +85,9 @@ void Conversation::draw() {
 	// Draw a frame around where the target image will be drawn
 	Common::Rect r = _image.getBounds();
 	r.grow(1);
-	getScreen().frameRect(r, 0x10);
+	Screen::get().frameRect(r, 0x10);
 }
 
-
 } // End of namespace Xanth
+} // End of namespace Later
 } // End of namespace Legend

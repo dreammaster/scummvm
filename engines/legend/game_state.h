@@ -27,7 +27,6 @@ namespace Legend {
 
 struct GameState {
 	int _partNumber;
-	int _sectionNumber;
 
 	GameState();
 };

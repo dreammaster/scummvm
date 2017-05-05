@@ -28,6 +28,7 @@
 #include "legend/gfx/visual_item.h"
 
 namespace Legend {
+namespace Gfx {
 
 class Image : public VisualItem {
 	DECLARE_MESSAGE_MAP;
@@ -77,6 +78,7 @@ public:
 	void fill(int color = 0);
 };
 
+} // End of namespace Gfx
 } // End of namespace Legend
 
 #endif

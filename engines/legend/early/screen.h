@@ -20,25 +20,53 @@
  *
  */
 
-#ifndef LEGEND_XANTH_PROJECT_ITEM_H
-#define LEGEND_XANTH_PROJECT_ITEM_H
+#ifndef LEGEND_EARLY_SCREEN_H
+#define LEGEND_EARLY_SCREEN_H
 
-#include "legend/core/project_item.h"
-#include "legend/xanth/conversation.h"
+#include "common/list.h"
+#include "common/rect.h"
+#include "legend/gfx/font.h"
+#include "legend/gfx/screen.h"
 
 namespace Legend {
-namespace Xanth {
+namespace Early {
 
-class XanthProjectItem : public ProjectItem {
-	DECLARE_MESSAGE_MAP;
-private:
-	Conversation _compendium;
-public:
-	CLASSDEF;
-	XanthProjectItem();
+enum SectionType {
+	TT_INVALID = -1, TT_NONE = 0, TT_1 = 1, TT_2 = 2, TT_3 = 3, TT_4 = 4
 };
 
-} // End of namespace Xanth
+class Screen: public Gfx::Screen {
+private:
+	byte _palette[PALETTE_SIZE];
+public:
+	SectionType _sectionType;
+public:
+	Screen(LegendEngine *vm);
+	virtual ~Screen();
+	static Screen &get();
+
+	/**
+	 * Initialises graphics mode
+	 */
+	virtual void setupGraphics();
+
+	/**
+	 * Handle a palette transition
+	 */
+	void transition(int index);
+
+	/**
+	 * Set an EGA palette
+	 */
+	void setEGAPalette(const byte *palette);
+
+	/**
+	 * Sets up the default EGA palette
+	 */
+	void defaultPalette();
+};
+
+} // End of namespace Early
 } // End of namespace Legend
 
-#endif /* LEGEND_XANTH_PROJECT_ITEM_H */
+#endif

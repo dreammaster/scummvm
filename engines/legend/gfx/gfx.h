@@ -26,6 +26,7 @@
 #include "common/rect.h"
 
 namespace Legend {
+namespace Gfx {
 
 struct Gfx {
 	int _field0;
@@ -85,6 +86,7 @@ public:
 	void setBounds(const Common::Rect &r) { _bounds = r; }
 };
 
+} // End of namespace Gfx
 } // End of namespace Legend
 
 #endif

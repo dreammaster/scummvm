@@ -24,8 +24,8 @@
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
 #include "legend/legend.h"
-#include "legend/gateway/gateway_project_item.h"
-#include "legend/xanth/xanth_project_item.h"
+#include "legend/early/gateway/gateway_project_item.h"
+#include "legend/later/xanth/xanth_project_item.h"
 
 namespace Legend {
 
@@ -57,21 +57,21 @@ LegendEngine::~LegendEngine() {
 void LegendEngine::initialize() {
 	DebugMan.addDebugChannel(kDebugLevelScript,      "scripts", "Script debug level");
 
-	Font::init();
+	Gfx::Font::init();
 	_debugger = Debugger::init(this);
 	_events = new Events(this);
-	_gfx = new Gfx();
+	_gfx = new Gfx::Gfx();
 	_mouseCursor = new MouseCursor(this);
-	_picFile = new PicFile();
+	_picFile = new Gfx::PicFile();
 	_res = new Resources(this);
-	_screen = Screen::init(this);
+	_screen = Gfx::Screen::init(this);
 	_window = new MainGameWindow(this);
 
 	_window->applicationStarting();
 }
 
 void LegendEngine::deinitialize() {
-	Font::deinit();
+	Gfx::Font::deinit();
 }
 
 Common::Error LegendEngine::run() {
@@ -93,9 +93,9 @@ void LegendEngine::playGame() {
 ProjectItem *LegendEngine::createProject() const {
 	switch (getGameID()) {
 	case GType_Gateway:
-		return new Gateway::GatewayProjectItem();
+		return new Early::Gateway::GatewayProjectItem();
 	case GType_CompanionsOfXanth:
-		return new Xanth::XanthProjectItem();
+		return new Later::Xanth::XanthProjectItem();
 	default:
 		error("Unknown game");
 	}

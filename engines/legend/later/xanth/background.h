@@ -27,27 +27,29 @@
 #include "legend/messages.h"
 
 namespace Legend {
+namespace Later {
 namespace Xanth {
 
 /**
  * Special descendent of the VisualContainer that uses a common static
  * background picture number
  */
-class Background : public VisualContainer {
+class Background : public Gfx::VisualContainer {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
 public:
 	static int _bgPicNum;
 public:
 	CLASSDEF;
-	Background() : VisualContainer() {}
-	Background(const Common::Rect &r) : VisualContainer(r) {}
-	Background(const Common::String &name) : VisualContainer(name) {}
-	Background(const Common::String &name, const Common::Rect &r) : VisualContainer(name, r) {}
+	Background() : Gfx::VisualContainer() {}
+	Background(const Common::Rect &r) : Gfx::VisualContainer(r) {}
+	Background(const Common::String &name) : Gfx::VisualContainer(name) {}
+	Background(const Common::String &name, const Common::Rect &r) : Gfx::VisualContainer(name, r) {}
 	virtual ~Background() {}
 };
 
 } // End of namespace Xanth
+} // End of namespace Later
 } // End of namespace Legend
 
 #endif

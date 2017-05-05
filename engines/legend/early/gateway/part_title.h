@@ -20,24 +20,34 @@
  *
  */
 
-#ifndef LEGEND_EARLY_VISUAL_ITEM_H
-#define LEGEND_EARLY_VISUAL_ITEM_H
+#ifndef LEGEND_GATEWAY_PART_TITLE_H
+#define LEGEND_GATEWAY_PART_TITLE_H
 
-#include "legend/gfx/visual_item.h"
-#include "legend/early/early_screen.h"
+#include "legend/gfx/visual_container.h"
+#include "legend/gfx/image.h"
 
 namespace Legend {
 namespace Early {
+namespace Gateway {
 
-class EarlyVisualItem : public VisualItem {
+class PartTitle : public Gfx::VisualContainer {
+	DECLARE_MESSAGE_MAP;
+	bool ShowMsg(CShowMsg &msg);
+	bool FrameMsg(CFrameMsg &msg);
+private:
+	Image _title;
+	uint32 _closeTime;
 public:
+	CLASSDEF;
+	PartTitle();
+
 	/**
-	* Reintroduced method to return a reference to the screen sub-class
-	* used by the earlier games
-	*/
-	EarlyScreen &getScreen() const;
+	 * Draws the image on the screen
+	 */
+	virtual void draw();
 };
 
+} // End of namespace Gateway
 } // End of namespace Early
 } // End of namespace Legend
 

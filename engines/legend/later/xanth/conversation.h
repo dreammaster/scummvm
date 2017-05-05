@@ -20,30 +20,39 @@
  *
  */
 
-#ifndef LEGEND_LATER_SCREEN_H
-#define LEGEND_LATER_SCREEN_H
+#ifndef LEGEND_XANTH_CONVERSATION_H
+#define LEGEND_XANTH_CONVERSATION_H
 
-#include "legend/gfx/screen.h"
+#include "legend/later/xanth/background.h"
+#include "legend/gfx/image.h"
 
 namespace Legend {
 namespace Later {
+namespace Xanth {
 
-class LaterScreen : public Screen {
+/**
+ * Implements the in-game encyclopedia, the Com-Pendium of Xanth
+ */
+class Conversation : public Background {
+	DECLARE_MESSAGE_MAP;
+	bool ShowMsg(CShowMsg &msg);
+private:
+	int _conversationId;
+	int _targetPicNum;
+	bool _isSpecialTarget;
+	Image _image;
 public:
-	LaterScreen(LegendEngine *vm);
-	virtual ~LaterScreen();
+	CLASSDEF;
+	Conversation(const Common::String &name, int convId, int targetId);
+	virtual ~Conversation() {}
 
 	/**
-	 * Initialises graphics mode
+	 * Draws the visual item on the screen
 	 */
-	virtual void setupGraphics();
-
-	/**
-	 * Sets a default game palette
-	 */
-	void setDefaultPalette();
+	virtual void draw();
 };
 
+} // End of namespace Xanth
 } // End of namespace Later
 } // End of namespace Legend
 

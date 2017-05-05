@@ -28,7 +28,7 @@
 namespace Legend {
 namespace Early {
 
-class HelpScreen : public VisualItem {
+class HelpScreen : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
 	bool MouseButtonMsg(CMouseButtonMsg &msg);
 	bool KeyCharMsg(CKeyCharMsg &msg);

@@ -18,15 +18,14 @@ MODULE_OBJS = \
 	gfx/screen.o \
 	gfx/visual_container.o \
 	gfx/visual_item.o \
-	early/early_screen.o \
+	early/screen.o \
 	early/help_screen.o \
-	early/early_visual_item.o \
-	later/later_screen.o \
-	gateway/gateway_project_item.o \
-	gateway/part_title.o \
-	xanth/xanth_project_item.o \
-	xanth/background.o \
-	xanth/conversation.o \
+	early/gateway/gateway_project_item.o \
+	early/gateway/part_title.o \
+	later/screen.o \
+	later/xanth/xanth_project_item.o \
+	later/xanth/background.o \
+	later/xanth/conversation.o \
 	debugger.o \
 	detection.o \
 	events.o \

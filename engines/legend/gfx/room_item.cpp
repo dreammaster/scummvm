@@ -23,10 +23,12 @@
 #include "legend/gfx/room_item.h"
 
 namespace Legend {
+namespace Gfx {
 
 EMPTY_MESSAGE_MAP(RoomItem, NamedItem);
 
 RoomItem::RoomItem() : NamedItem() {
 }
 
+} // End of namespace Gfx
 } // End of namespace Legend

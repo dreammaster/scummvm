@@ -52,7 +52,7 @@ void MainGameWindow::applicationStarting() {
 
 	// Set the starting game view
 	const char *name = g_vm->getGameID() == GType_Gateway ? "PartTitle" : "Compendium";
-	VisualItem *firstView = dynamic_cast<VisualItem *>(_project->findByName(name));
+	Gfx::VisualItem *firstView = dynamic_cast<Gfx::VisualItem *>(_project->findByName(name));
 	_gameManager->setView(firstView);
 
 	// Generate starting message for showing the view

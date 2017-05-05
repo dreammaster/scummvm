@@ -22,18 +22,23 @@
 
 #include "legend/gfx/screen.h"
 #include "legend/legend.h"
-#include "legend/early/early_screen.h"
-#include "legend/later/later_screen.h"
+#include "legend/early/screen.h"
+#include "legend/later/screen.h"
 
 namespace Legend {
+namespace Gfx {
 
 #define VGA_COLOR_TRANS(x) ((x) * 255 / 63)
 
 Screen *Screen::init(LegendEngine *vm) {
 	if (vm->isLater())
-		return new Later::LaterScreen(vm);
+		return new Later::Screen(vm);
 	else
-		return new Early::EarlyScreen(vm);
+		return new Early::Screen(vm);
+}
+
+Screen &Screen::get() {
+	return *((Screen *)g_vm->_screen);
 }
 
 Screen::Screen(LegendEngine *vm): _vm(vm), _paletteDirty(false), _picPalette(false) {
@@ -70,4 +75,5 @@ void Screen::setPalette(const byte *palette, uint start, uint num) {
 	_paletteDirty = false;
 }
 
+} // End of namespace Gfx
 } // End of namespace Legend

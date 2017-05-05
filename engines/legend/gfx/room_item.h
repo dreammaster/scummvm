@@ -26,6 +26,7 @@
 #include "legend/core/named_item.h"
 
 namespace Legend {
+namespace Gfx {
 
 class RoomItem : public NamedItem {
 	DECLARE_MESSAGE_MAP;
@@ -35,6 +36,7 @@ public:
 	RoomItem();
 };
 
+} // End of namespace Gfx
 } // End of namespace Legend
 
-#endif /* LEGEND_ROOM_ITEM_H */
+#endif

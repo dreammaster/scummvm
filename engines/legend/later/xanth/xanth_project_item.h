@@ -20,17 +20,27 @@
  *
  */
 
-#include "legend/gateway/gateway_project_item.h"
+#ifndef LEGEND_XANTH_PROJECT_ITEM_H
+#define LEGEND_XANTH_PROJECT_ITEM_H
+
+#include "legend/core/project_item.h"
+#include "legend/later/xanth/conversation.h"
 
 namespace Legend {
-namespace Gateway {
+namespace Later {
+namespace Xanth {
 
-EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
+class XanthProjectItem : public ProjectItem {
+	DECLARE_MESSAGE_MAP;
+private:
+	Conversation _compendium;
+public:
+	CLASSDEF;
+	XanthProjectItem();
+};
 
-GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
-	_partTitleScreen.addUnder(this);
-	_helpScreen.addUnder(this);
-}
-
-} // End of namespace Gateway
+} // End of namespace Xanth
+} // End of namespace Later
 } // End of namespace Legend
+
+#endif /* LEGEND_XANTH_PROJECT_ITEM_H */

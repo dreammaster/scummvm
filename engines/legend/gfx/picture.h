@@ -28,6 +28,7 @@
 #include "legend/core/file.h"
 
 namespace Legend {
+namespace Gfx {
 
 enum {
 	PIC_HAS_PALETTE = 0x10,
@@ -200,6 +201,7 @@ public:
 	Picture *load(uint pictureNum, uint frameNum = 0);
 };
 
+} // End of namespace Gfx
 } // End of namespace Legend
 
 #endif

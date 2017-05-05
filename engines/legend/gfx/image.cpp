@@ -24,6 +24,7 @@
 #include "legend/legend.h"
 
 namespace Legend {
+namespace Gfx {
 
 BEGIN_MESSAGE_MAP(Image, VisualItem)
 	ON_MESSAGE(ShowMsg)
@@ -72,7 +73,7 @@ void Image::draw() {
 	if (_isDirty && _pic) {
 		// Draw the picture to the screen
 		getSurface().blitFrom(*_pic);
-		getScreen().setPalette();
+		Screen::get().setPalette();
 	}
 
 	VisualItem::draw();
@@ -111,4 +112,5 @@ bool Image::loadImage() {
 	return false;
 }
 
+} // End of namespace Gfx
 } // End of namespace Legend

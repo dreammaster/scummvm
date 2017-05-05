@@ -67,7 +67,7 @@ void GameManager::update() {
 }
 
 void GameManager::changeView(const Common::String &name) {
-	VisualItem *newView = dynamic_cast<VisualItem *>(_project->findByName(name));
+	Gfx::VisualItem *newView = dynamic_cast<Gfx::VisualItem *>(_project->findByName(name));
 	assert(newView);
 
 	// Hide the current view

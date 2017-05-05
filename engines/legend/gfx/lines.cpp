@@ -23,6 +23,7 @@
 #include "legend/gfx/lines.h"
 
 namespace Legend {
+namespace Gfx {
 
 BEGIN_MESSAGE_MAP(Lines, VisualItem)
 	ON_MESSAGE(ShowMsg)
@@ -35,4 +36,5 @@ bool Lines::ShowMsg(CShowMsg &msg) {
 void Lines::draw() {
 }
 
+} // End of namespace Gfx
 } // End of namespace Legend

@@ -23,6 +23,7 @@
 #include "legend/gfx/visual_container.h"
 
 namespace Legend {
+namespace Gfx {
 
 EMPTY_MESSAGE_MAP(VisualContainer, VisualItem);
 
@@ -38,4 +39,5 @@ void VisualContainer::draw() {
 	}
 }
 
+} // End of namespace Gfx
 } // End of namespace Legend

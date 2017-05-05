@@ -25,7 +25,6 @@
 namespace Legend {
 
 GameState::GameState() {
-	_sectionNumber = 0;
 	_partNumber = 0;
 }
 

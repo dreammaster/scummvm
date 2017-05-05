@@ -23,6 +23,7 @@
 #include "legend/gfx/gfx.h"
 
 namespace Legend {
+namespace Gfx {
 
 Gfx::Gfx() : _bounds(0, 0, 319, 199) {
 	_field0 = 0;
@@ -81,4 +82,5 @@ void Gfx::eraseRect(const Common::Rect &r, int val) {
 	// TODO
 }
 
+} // End of namespace Gfx
 } // End of namespace Legend

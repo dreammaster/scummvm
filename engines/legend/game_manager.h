@@ -42,7 +42,7 @@ public:
 	GameState _gameState;
 	InputHandler _inputHandler;
 	InputTranslator _inputTranslator;
-	VisualItem *_view;
+	Gfx::VisualItem *_view;
 public:
 	GameManager(ProjectItem *project, Audio::Mixer *mixer);
 	~GameManager();
@@ -115,12 +115,12 @@ public:
 	/**
 	 * Sets the currently active visual item
 	 */
-	void setView(VisualItem *view) { _view = view; }
+	void setView(Gfx::VisualItem *view) { _view = view; }
 
 	/**
 	 * Returns the currently active visual item
 	 */
-	VisualItem *view() const { return _view; }
+	Gfx::VisualItem *view() const { return _view; }
 
 	/**
 	 * Changes to a different view

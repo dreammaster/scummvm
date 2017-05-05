@@ -20,24 +20,19 @@
  *
  */
 
-#include "legend/xanth/background.h"
-#include "legend/legend.h"
+#include "legend/early/gateway/gateway_project_item.h"
 
 namespace Legend {
-namespace Xanth {
+namespace Early {
+namespace Gateway {
 
-BEGIN_MESSAGE_MAP(Background, VisualContainer)
-	ON_MESSAGE(ShowMsg)
-END_MESSAGE_MAP()
+EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
 
-int Background::_bgPicNum;
-
-bool Background::ShowMsg(CShowMsg &msg) {
-	// Set the background picture number to match the common background Id
-	load(_bgPicNum, 0);
-
-	return VisualContainer::ShowMsg(msg);
+GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
+	_partTitleScreen.addUnder(this);
+	_helpScreen.addUnder(this);
 }
 
-} // End of namespace Xanth
+} // End of namespace Gateway
+} // End of namespace Early
 } // End of namespace Legend

@@ -24,6 +24,7 @@
 #include "legend/legend.h"
 
 namespace Legend {
+namespace Gfx {
 
 BEGIN_MESSAGE_MAP(VisualItem, NamedItem)
 	ON_MESSAGE(ShowMsg)
@@ -47,11 +48,7 @@ bool VisualItem::HideMsg(CHideMsg &msg) {
 
 Graphics::ManagedSurface VisualItem::getSurface() const {
 	assert(!_bounds.isEmpty());
-	return Graphics::ManagedSurface(getScreen(), _bounds);
-}
-
-Screen &VisualItem::getScreen() const {
-	return *g_vm->_screen;
+	return Graphics::ManagedSurface(Screen::get(), _bounds);
 }
 
 void VisualItem::setBounds(const Common::Rect &r) {
@@ -81,4 +78,5 @@ void VisualItem::changeView(const Common::String &name) {
 	getGameManager()->changeView(name);
 }
 
+} // End of namespace Gfx
 } // End of namespace Legend

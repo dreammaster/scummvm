@@ -27,6 +27,7 @@
 #include "graphics/palette.h"
 
 namespace Legend {
+namespace Gfx {
 
 Font *Font::_fonts[FONT_COUNT];
 Font *Font::_activeFont;
@@ -293,4 +294,5 @@ int Font::setTabWidth(int width) {
 	return oldWidth;
 }
 
+} // End of namespace Gfx
 } // End of namespace Legend

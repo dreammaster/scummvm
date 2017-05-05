@@ -24,6 +24,7 @@
 #include "legend/legend.h"
 
 namespace Legend {
+namespace Gfx {
 
 #define INDEXES_COUNT 2
 
@@ -545,4 +546,5 @@ int Picture::decode(Common::SeekableReadStream *inStream) {
 	return result;
 }
 
+} // End of namespace Gfx
 } // End of namespace Legend
