@@ -78,11 +78,7 @@ void File::open(FileType fileType, int fileNumber) {
 #undef ERROR
 
 Common::String File::getFilename(FileType fileType, int fileNumber) {
-	Common::String prefix = g_vm->getGameFilePrefix();
-
-	const char *const EXTENSIONS[] = { "PIC", "RGN", "FNT", "MUS", "SAV", "SAV" };
-	return Common::String::format("%s_%02d.%s", prefix.c_str(), fileNumber,
-		EXTENSIONS[fileType]);
+	return g_vm->getFilename(fileType, fileNumber);
 }
 
 /*------------------------------------------------------------------------*/

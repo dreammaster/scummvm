@@ -41,7 +41,6 @@ struct LegendSavegameHeader {
 	int _totalFrames;
 };
 
-
 class GameManager;
 
 class ProjectItem : public NamedItem {

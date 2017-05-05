@@ -86,6 +86,9 @@ public:
 	 */
 	void open(FileType fileType, int fileNumber);
 
+	/**
+	 * Returns a formatted filename for a given resource type and file number
+	 */
 	static Common::String getFilename(FileType fileType, int fileNumber);
 };
 

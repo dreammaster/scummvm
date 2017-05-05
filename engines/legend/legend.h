@@ -35,6 +35,7 @@
 #include "legend/debugger.h"
 #include "legend/events.h"
 #include "legend/main_game_window.h"
+#include "legend/core/file.h"
 #include "legend/core/mouse_cursor.h"
 #include "legend/core/project_item.h"
 #include "legend/core/resources.h"
@@ -131,15 +132,20 @@ public:
 	int getRandomNumber(int limit) { return _randomSource.getRandomNumber(limit - 1); }
 
 	/**
+	 * Creates a new project hierarchy for the game, that contains all
+	 * the logic for playing that particular game.
+	 */
+	ProjectItem *createProject() const;
+
+	/**
 	 * Returns the prefix games use for certain data files
 	 */
 	Common::String getGameFilePrefix() const;
 
 	/**
-	 * Creates a new project hierarchy for the game, that contains all
-	 * the logic for playing that particular game.
+	 * Returns a formatted filename for a given resource type and file number
 	 */
-	ProjectItem *createProject() const;
+	Common::String getFilename(FileType fileType, int fileNumber);
 };
 
 extern LegendEngine *g_vm;
