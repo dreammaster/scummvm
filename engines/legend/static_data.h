@@ -20,33 +20,19 @@
  *
  */
 
-#include "legend/later/screen.h"
-#include "engines/util.h"
-#include "legend/legend.h"
+#ifndef LEGEND_STATIC_DATA_H
+#define LEGEND_STATIC_DATA_H
 
 namespace Legend {
-namespace Later {
+namespace Early {
 
-Screen &Screen::get() {
-	return *((Screen *)g_vm->_screen);
-}
+struct HelpMessage {
+	const char *_msg1;
+	const char *_msg2;
+};
+extern const HelpMessage HELP_TEXT[38];
 
-Screen::Screen(LegendEngine *vm) : Gfx::Screen(vm, 320, 200) {
-}
-
-Screen::~Screen() {
-}
-
-void Screen::setDefaultPalette() {
-	for (int idx = 0; idx < 48; ++idx) {
-		_gamePalette[idx] = ((idx / 3) * 63) / 15;
-	}
-	_gamePalette[PALETTE_SIZE - 3] = 0;
-	_gamePalette[PALETTE_SIZE - 2] = 0;
-	_gamePalette[PALETTE_SIZE - 1] = 0;
-
-	setPalette(_gamePalette);
-}
-
-} // End of namespace Later
+} // End of namespace Early
 } // End of namespace Legend
+
+#endif

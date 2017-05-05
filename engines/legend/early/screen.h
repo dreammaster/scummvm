@@ -35,14 +35,11 @@ class Screen: public Gfx::Screen {
 private:
 	byte _palette[PALETTE_SIZE];
 public:
+	int _defaultTextColor;
+public:
 	Screen(LegendEngine *vm);
 	virtual ~Screen();
 	static Screen &get();
-
-	/**
-	 * Initialises graphics mode
-	 */
-	virtual void setupGraphics();
 
 	/**
 	 * Handle a palette transition

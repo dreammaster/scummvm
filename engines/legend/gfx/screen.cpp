@@ -20,6 +20,7 @@
  *
  */
 
+#include "engines/util.h"
 #include "legend/gfx/screen.h"
 #include "legend/legend.h"
 #include "legend/early/screen.h"
@@ -41,9 +42,11 @@ Screen &Screen::get() {
 	return *((Screen *)g_vm->_screen);
 }
 
-Screen::Screen(LegendEngine *vm): _vm(vm), _paletteDirty(false), _picPalette(false) {
+Screen::Screen(LegendEngine *vm, int width, int height): Graphics::Screen(width, height),
+		_vm(vm), _paletteDirty(false), _picPalette(false) {
 	Font::init();
 	Common::fill(&_gamePalette[0], &_gamePalette[PALETTE_SIZE], 0);
+	initGraphics(width, height);
 }
 
 Screen::~Screen() {

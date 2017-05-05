@@ -39,16 +39,14 @@ Screen &Screen::get() {
 	return *((Screen *)g_vm->_screen);
 }
 
-Screen::Screen(LegendEngine *vm): Gfx::Screen(vm) {
+Screen::Screen(LegendEngine *vm): Gfx::Screen(vm, 640, 480) {
 	Gfx::Font::init();
 
 	Common::copy(&INITIAL_LOW_PALETTE[0], &INITIAL_LOW_PALETTE[16], _palette);
 	Common::fill(&_palette[16], &_palette[PALETTE_SIZE], 0);
 	defaultPalette();
-}
 
-void Screen::setupGraphics() {
-	initGraphics(640, 480);
+	_defaultTextColor = 15;
 }
 
 Screen::~Screen() {

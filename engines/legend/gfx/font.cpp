@@ -36,8 +36,6 @@ int Font::_tabWidth;
 uint Font::_lineHeight;
 uint Font::_xCenter;
 uint Font::_yCenter;
-int Font::_textX;
-int Font::_textY;
 int Font::_fgColor;
 int Font::_bgColor;
 int Font::_overrideColor;
@@ -52,7 +50,6 @@ void Font::init() {
 	_currentSection = 0;
 	_tabWidth = 0;
 	_lineHeight = 0;
-	_textX = _textY = 0;
 	_fgColor = _bgColor = 0;
 	_overrideColor = 0;
 	_maxCharWidth = 0;
@@ -131,11 +128,6 @@ void Font::setOverrideColor(int color) {
 	_overrideColor = color;
 }
 
-void Font::setTextPos(const Common::Point &pt) {
-	_textX = pt.x;
-	_textY = pt.y;
-}
-
 Font *Font::getFreeSlot() {
 	// Scan for the font slot with the lowest couner tally
 	int minIndex = 0;
@@ -186,18 +178,15 @@ void Font::load(Common::SeekableReadStream &s) {
 	s.read(&_pixelData[0], _pixelData.size());
 }
 
-void Font::writeChar(char c) {
-	Font *font = _activeFont;
-	assert(_surface && font);
-
+void Font::writeChar(Graphics::ManagedSurface &surface, Common::Point &textPos, char c) {
 	if (c == '\t') {
-		_textX -= (_textX % _tabWidth) - _tabWidth;
-		if (_textX < (_surface->w - 1))
+		textPos.x -= (textPos.x % _tabWidth) - _tabWidth;
+		if (textPos.x < (surface.w - 1))
 			return;
 	}
 	if (c == '\n' || c == '\t') {
-		_textX = 0;
-		_textY += _lineHeight;
+		textPos.x = 0;
+		textPos.y += _lineHeight;
 		return;
 	}
 
@@ -208,25 +197,25 @@ void Font::writeChar(char c) {
 
 	if (_bgColor >= 0 && _overrideColor != -1) {
 		g_vm->_gfx->fn1(0, _bgColor, 0);
-		g_vm->_gfx->eraseRect(Common::Rect(_textX, _textY, _textX + charFullWidth,
-			_textY + charHeight), 2);
+		g_vm->_gfx->eraseRect(Common::Rect(textPos.x, textPos.y, textPos.x + charFullWidth,
+			textPos.y + charHeight), 2);
 	}
 
 	//if (_bgColor >= 0) {
-	//	_surface->fillRect(Common::Rect(_textX, _textY,
-	//		_textX + charFullWidth, _textY + _lineHeight), _bgColor);
+	//	surface.fillRect(Common::Rect(textPos.x, textPos.y,
+	//		textPos.x + charFullWidth, textPos.y + _lineHeight), _bgColor);
 	//}
 
 	if (_fixedSpacing < 0) {
-		_textX += _charSpacings[c].leftSpacing;
+		textPos.x += _charSpacings[c].leftSpacing;
 		charFullWidth -= _charSpacings[c].leftSpacing;
 	}
 
 	if (c >= _minPrintableChar && c <= _maxPrintableChar) {
 		const byte *srcP = &_pixelData[(c - _minPrintableChar) * _linesPerChar * _bytesPerLine];
 		
-		for (int yCtr = 0, yp = _textY; yCtr < _linesPerChar; ++yCtr, ++yp) {
-			byte *destP = (byte *)_surface->getBasePtr(_textX, yp);
+		for (int yCtr = 0, yp = textPos.y; yCtr < _linesPerChar; ++yCtr, ++yp) {
+			byte *destP = (byte *)surface.getBasePtr(textPos.x, yp);
 			byte bitMask = 0, srcPixel = 0;
 			for (int byteCtr = 0, xCtr = 0;  xCtr < charFullWidth; ++xCtr, ++destP, bitMask >>= 1) {
 				if ((byteCtr % 8) == 0) {
@@ -240,22 +229,22 @@ void Font::writeChar(char c) {
 		}
 	}
 
-	_textX += charFullWidth;
+	textPos.x += charFullWidth;
 	
 	if (_overrideColor >= 0) {
-		++_textX;
+		++textPos.x;
 	} else {
-		_textX = 0;
-		_textY += _lineHeight;
+		textPos.x = 0;
+		textPos.y += _lineHeight;
 	}
 }
 
-void Font::writeString(const Common::String &msg) {
+void Font::writeString(Graphics::ManagedSurface &surface, Common::Point &textPos, const Common::String &msg) {
 	const char *msgP = msg.c_str();
 	assert(_activeFont && _activeFont->_fontNumber > 0);
 
 	while (*msgP)
-		writeChar(*msgP++);
+		writeChar(surface, textPos, *msgP++);
 }
 
 uint Font::charWidth(char c) const {

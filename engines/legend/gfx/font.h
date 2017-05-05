@@ -45,8 +45,6 @@ struct Spacing {
 
 class Font {
 private:
-	Graphics::ManagedSurface *_surface;
-private:
 	/**
 	 * Frees the least recently used font, and returns a new font
 	 * instance that replaces it
@@ -76,8 +74,7 @@ public:
 	static Font *_fonts[FONT_COUNT];
 	static Font *_activeFont;
 	static int _currentSection;
-	static int _textX;
-	static int _textY;
+//	static int _textX, _textY;		-- now stored in VisualItem
 	static int _tabWidth;
 	static uint _lineHeight;
 	static uint _xCenter, _yCenter;
@@ -124,11 +121,6 @@ public:
 	static void setOverrideColor(int color);
 
 	/**
-	 * Set the position for writing text to
-	 */
-	static void setTextPos(const Common::Point &pt);
-
-	/**
 	 * Sets the width of tab characters
 	 */
 	static int setTabWidth(int width);
@@ -144,12 +136,12 @@ public:
 	/**
 	 * Draw a character
 	 */
-	void writeChar(char c);
+	void writeChar(Graphics::ManagedSurface &surface, Common::Point &textPos, char c);
 
 	/**
 	 * Write out a string
 	 */
-	void writeString(const Common::String &msg);
+	void writeString(Graphics::ManagedSurface &surface, Common::Point &textPos, const Common::String &msg);
 
 	/**
 	 * Return the width of a character

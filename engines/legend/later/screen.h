@@ -35,11 +35,6 @@ public:
 	static Screen &get();
 
 	/**
-	 * Initialises graphics mode
-	 */
-	virtual void setupGraphics();
-
-	/**
 	 * Sets a default game palette
 	 */
 	void setDefaultPalette();

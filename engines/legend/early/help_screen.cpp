@@ -22,6 +22,7 @@
 
 #include "legend/early/help_screen.h"
 #include "legend/early/screen.h"
+#include "legend/static_data.h"
 
 namespace Legend {
 namespace Early {
@@ -45,8 +46,32 @@ void HelpScreen::draw() {
 	Graphics::ManagedSurface surface = getSurface();
 	surface.fillRect(surface.getBounds(), 0);
 
+	loadFont(1);
+	setFontColor(Screen::get()._defaultTextColor);
+
 	// Write out the help
-	
+	for (int idx = 0; idx < 39; ++idx) {
+		const HelpMessage &msg = HELP_TEXT[idx];
+		int xp = idx < 22 ? 24 : 312;
+		int yp = (idx >= 22 ? idx - 22 : idx) * Gfx::Font::_lineHeight
+			+ 64 + _fontCenter.y;
+
+		int xs;
+		if (idx < 11)
+			xs = 56;
+		else if (idx < 18)
+			xs = 112;
+		else
+			xs = 120;
+
+		if (msg._msg2) {
+			// It's a key/purpose pair
+			SetTextPos(Common::Point(xp + 16, yp));
+			writeString(msg._msg1);
+
+		}
+
+	}
 }
 
 bool HelpScreen::MouseButtonMsg(CMouseButtonMsg &msg) {

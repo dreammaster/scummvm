@@ -31,6 +31,13 @@ BEGIN_MESSAGE_MAP(VisualItem, NamedItem)
 	ON_MESSAGE(HideMsg)
 END_MESSAGE_MAP()
 
+void VisualItem::init() {
+	_isDirty = true;
+	_fontNumber = -1;
+	_fontHorizSpacings = -1;
+	_fontDetailsFlags1 = 0;
+}
+
 bool VisualItem::ShowMsg(CShowMsg &msg) {
 	// When a view is shown, mark it to be redrawn
 	_isDirty = true;
@@ -76,6 +83,35 @@ void VisualItem::setDirty() {
 
 void VisualItem::changeView(const Common::String &name) {
 	getGameManager()->changeView(name);
+}
+
+Font *VisualItem::loadFont(int fontNumber) {
+	init();
+	Font *font = Font::loadFont(fontNumber);
+	assert(font);
+
+	_fontNumber = font->_fontNumber;
+	_fontCenter = Common::Point(font->_xCenter, font->_yCenter);
+	return font;
+}
+
+void VisualItem::setFontColor(int fgColor, int bgColor) {
+	Font::setColor(fgColor, bgColor);
+}
+
+void VisualItem::writeString(const Common::String &msg) {
+	// Get the surface area the visual item covers
+	Graphics::ManagedSurface surface = getSurface();
+
+	// Ensure the correct font is active
+	Font *font = Font::_activeFont;
+	if (Font::_activeFont->_fontNumber != _fontNumber) {
+		assert(_fontNumber > 0);
+		loadFont(_fontNumber);
+	}
+
+	// Write out the text
+	font->writeString(surface, _fontWritePos, msg);
 }
 
 } // End of namespace Gfx

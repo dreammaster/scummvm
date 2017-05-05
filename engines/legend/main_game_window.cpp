@@ -44,14 +44,11 @@ MainGameWindow::~MainGameWindow() {
 }
 
 void MainGameWindow::applicationStarting() {
-	// Set the video mode
-	g_vm->_screen->setupGraphics();
-
 	// Create game view and manager
 	_gameManager = new GameManager(_project, g_vm->_mixer);
 
 	// Set the starting game view
-	const char *name = g_vm->getGameID() == GType_Gateway ? "PartTitle" : "Compendium";
+	const char *name = g_vm->getGameID() == GType_Gateway ? "Help" : "Compendium";
 	Gfx::VisualItem *firstView = dynamic_cast<Gfx::VisualItem *>(_project->findByName(name));
 	_gameManager->setView(firstView);
 

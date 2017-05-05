@@ -43,15 +43,10 @@ public:
 	bool _paletteDirty;
 	bool _picPalette;
 public:
-	Screen(LegendEngine *vm);
+	Screen(LegendEngine *vm, int width, int height);
 	virtual ~Screen();
 	static Screen *init(LegendEngine *vm);
 	static Screen &get();
-
-	/**
-	 * Initialises graphics mode
-	 */
-	virtual void setupGraphics() = 0;
 
 	/**
 	 * Sets the game palette
