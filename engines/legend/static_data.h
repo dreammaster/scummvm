@@ -32,8 +32,8 @@ namespace Legend {
  */
 struct MouseCursorData {
 	int _hotspotX, _hotspotY;
-	uint16 _pixels[16];
 	uint16 _masks[16];
+	uint16 _pixels[16];
 };
 	
 namespace Early {
