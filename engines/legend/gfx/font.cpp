@@ -95,7 +95,7 @@ Font *Font::loadFont(int fontNumber) {
 	// Not yet present, so select a slot to load it in
 	Font *font = getFreeSlot();
 
-	const int VGA_VIDEO_INDEX = 2;
+	const int VGA_VIDEO_INDEX = g_vm->isLater() ? 0 : 2;
 	File f;
 	if (fontNumber)
 		f.open(FILETYPE_FNT, VGA_VIDEO_INDEX * 100 + fontNumber);
