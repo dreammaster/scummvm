@@ -212,22 +212,22 @@ void Font::writeChar(Graphics::ManagedSurface &surface, Common::Point &textPos, 
 		surface.getSubArea(Common::Rect(textPos.x, textPos.y, textPos.x + charFullWidth, textPos.y + charHeight));
 
 		if (c >= _minPrintableChar && c <= _maxPrintableChar) {
-			const byte *srcP = &_pixelData[(c - _minPrintableChar) * _linesPerChar * _bytesPerLine];
+			const byte *srcLineP = &_pixelData[(c - _minPrintableChar) * _linesPerChar * _bytesPerLine];
 
-			for (int yCtr = 0, yp = textPos.y; yCtr < _linesPerChar; ++yCtr, ++yp) {
+			for (int yCtr = 0, yp = textPos.y; yCtr < _linesPerChar; ++yCtr, ++yp, srcLineP += _bytesPerLine) {
 				if (yp < 0 || yp >= surface.h)
 					continue;
 
+				const byte *srcP = srcLineP;
 				byte *destP = (byte *)surface.getBasePtr(textPos.x, yp);
 				byte bitMask = 0, srcPixel = 0;
-				for (int byteCtr = 0, xCtr = 0, xp = textPos.x; xCtr < charFullWidth; ++xCtr, ++xp, ++destP, bitMask >>= 1) {
-					if ((byteCtr % 8) == 0) {
+				for (int xCtr = 0, xp = textPos.x; xCtr < charWidth; ++xCtr, ++xp, ++destP, bitMask >>= 1) {
+					if (!bitMask) {
 						bitMask = 0x80;
 						srcPixel = *srcP++;
 					}
-
 					
-					if (srcPixel & bitMask && xp >= 0 && xp < surface.w)
+					if ((srcPixel & bitMask) && xp >= 0 && xp < surface.w)
 						*destP = _fgColor;
 				}
 			}
