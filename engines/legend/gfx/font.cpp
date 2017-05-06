@@ -193,17 +193,17 @@ void Font::writeChar(Graphics::ManagedSurface &surface, Common::Point &textPos, 
 		(_charSpacings[c]._vals.leftSpacing + _charSpacings[c]._vals.rightSpacing));
 	int charHeight = _lineHeight;
 
+	if (_fixedSpacing < 0) {
+		textPos.x += _charSpacings[c]._vals.leftSpacing;
+		charFullWidth -= _charSpacings[c]._vals.rightSpacing;
+	}
+
 	// Only draw character if it's at least partially on the surface
 	if ((textPos.x + charFullWidth) > 0 && (textPos.y + charHeight) > 0
 		&& textPos.x < surface.w && textPos.y < surface.h) {
 		if (_bgColor >= 0 && _overrideColor != -1) {
 			surface.fillRect(Common::Rect(textPos.x, textPos.y,
 				textPos.x + charFullWidth, textPos.y + _lineHeight), _bgColor);
-		}
-
-		if (_fixedSpacing < 0) {
-			textPos.x += _charSpacings[c]._vals.leftSpacing;
-			charFullWidth -= _charSpacings[c]._vals.leftSpacing;
 		}
 
 		// Get the sub-area of the surface we're going to draw on. It's more convenien for clipping
