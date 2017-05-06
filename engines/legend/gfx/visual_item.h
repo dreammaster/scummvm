@@ -107,14 +107,14 @@ public:
 	 * Set the position for writing text in screen-coordinates
 	 * @remarks		All text is clipped to the bounds of the visual item
 	 */
-	void SetTextPos(const Common::Point &pt) {
+	void setTextPos(const Common::Point &pt) {
 		_fontWritePos = Common::Point(pt.x - _bounds.left, pt.y - _bounds.top);
 	}
 
 	/**
 	 * Sets the postion or writing text relative to the top-left corner of the visual item's bounds
 	 */
-	void SetRelativeTextPos(const Common::Point &pt) { _fontWritePos = pt; }
+	void setRelativeTextPos(const Common::Point &pt) { _fontWritePos = pt; }
 
 	/**
 	 * Set the font color

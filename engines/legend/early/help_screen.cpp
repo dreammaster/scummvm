@@ -66,11 +66,15 @@ void HelpScreen::draw() {
 
 		if (msg._msg2) {
 			// It's a key/purpose pair
-			SetTextPos(Common::Point(xp + 16, yp));
+			setTextPos(Common::Point(xp + 16, yp));
 			writeString(msg._msg1);
-
+			setTextPos(Common::Point(xp + xs, yp));
+			writeString(msg._msg2);
+		} else if (msg._msg1) {
+			// It's a section title
+			setTextPos(Common::Point(xp, yp));
+			writeString(msg._msg1);
 		}
-
 	}
 }
 

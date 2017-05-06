@@ -31,7 +31,6 @@ namespace Gfx {
 
 Font *Font::_fonts[FONT_COUNT];
 Font *Font::_activeFont;
-int Font::_currentSection;
 int Font::_tabWidth;
 uint Font::_lineHeight;
 uint Font::_xCenter;
@@ -47,7 +46,6 @@ int Font::_fontFieldA;
 void Font::init() {
 	for (int idx = 0; idx < FONT_COUNT; ++idx)
 		_fonts[idx] = new Font();
-	_currentSection = 0;
 	_tabWidth = 0;
 	_lineHeight = 0;
 	_fgColor = _bgColor = 0;
@@ -65,7 +63,6 @@ void Font::deinit() {
 
 Font::Font() {
 	_counter = 0;
-	_sectionNum = -1;
 	_fontNumber = -1;
 	_field4 = 0;
 	_field5 = 0;
@@ -89,8 +86,7 @@ Font *Font::loadFont(int fontNumber) {
 
 	// Scan for the presense of the font already
 	for (int idx = 0; idx < FONT_COUNT; ++idx) {
-		if (_fonts[idx]->_sectionNum == _currentSection && 
-				_fonts[idx]->_fontNumber == fontNumber) {
+		if (_fonts[idx]->_fontNumber == fontNumber) {
 			_fonts[idx]->setActive();
 			return _fonts[idx];
 		}
@@ -99,12 +95,12 @@ Font *Font::loadFont(int fontNumber) {
 	// Not yet present, so select a slot to load it in
 	Font *font = getFreeSlot();
 
+	const int VGA_VIDEO_INDEX = 2;
 	File f;
 	if (fontNumber)
-		f.open(FILETYPE_FNT, Font::_currentSection * 100 + fontNumber);
+		f.open(FILETYPE_FNT, VGA_VIDEO_INDEX * 100 + fontNumber);
 
 	font->_counter = 1;
-	font->_sectionNum = Font::_currentSection;
 	font->_fontNumber = fontNumber;
 
 	font->load(f);
@@ -163,13 +159,15 @@ void Font::load(Common::SeekableReadStream &s) {
 	// For fonts which aren't fixed width, load the widths for each character
 	if (_fixedWidth < 0) {
 		_charWidths.resize(0x80);
-		s.read(&_charWidths[0], 0x80);
+		for (int idx = 0; idx < 128; ++idx)
+			_charWidths[idx] = s.readByte();
 	}
 
 	// For fonts without fixed spacing, load the spacing data
 	if (_fixedSpacing < 0) {
 		_charSpacings.resize(0x80);
-		s.read(&_charSpacings[0], 0x80);
+		for (int idx = 0; idx < 128; ++idx)
+			_charSpacings[idx]._byte = s.readByte();
 	}
 
 	// Load the font pixel data
@@ -190,48 +188,55 @@ void Font::writeChar(Graphics::ManagedSurface &surface, Common::Point &textPos, 
 		return;
 	}
 
-	int charWidth = _fixedWidth ? _fixedWidth : _charWidths[c];
+	int charWidth = _fixedWidth >= 0 ? _fixedWidth : _charWidths[c];
 	int charFullWidth = charWidth + (_fixedSpacing >= 0 ? _fixedSpacing :
-		(_charSpacings[c].leftSpacing + _charSpacings[c].rightSpacing));
+		(_charSpacings[c]._vals.leftSpacing + _charSpacings[c]._vals.rightSpacing));
 	int charHeight = _lineHeight;
 
-	if (_bgColor >= 0 && _overrideColor != -1) {
-		g_vm->_gfx->fn1(0, _bgColor, 0);
-		g_vm->_gfx->eraseRect(Common::Rect(textPos.x, textPos.y, textPos.x + charFullWidth,
-			textPos.y + charHeight), 2);
-	}
+	// Only draw character if it's at least partially on the surface
+	if ((textPos.x + charFullWidth) > 0 && (textPos.y + charHeight) > 0
+		&& textPos.x < surface.w && textPos.y < surface.h) {
+		if (_bgColor >= 0 && _overrideColor != -1) {
+			surface.fillRect(Common::Rect(textPos.x, textPos.y,
+				textPos.x + charFullWidth, textPos.y + _lineHeight), _bgColor);
+		}
 
-	//if (_bgColor >= 0) {
-	//	surface.fillRect(Common::Rect(textPos.x, textPos.y,
-	//		textPos.x + charFullWidth, textPos.y + _lineHeight), _bgColor);
-	//}
+		if (_fixedSpacing < 0) {
+			textPos.x += _charSpacings[c]._vals.leftSpacing;
+			charFullWidth -= _charSpacings[c]._vals.leftSpacing;
+		}
 
-	if (_fixedSpacing < 0) {
-		textPos.x += _charSpacings[c].leftSpacing;
-		charFullWidth -= _charSpacings[c].leftSpacing;
-	}
+		// Get the sub-area of the surface we're going to draw on. It's more convenien for clipping
+		// to not directly use the result, but the call adds a dirty rect for area, which will
+		// be needed to make the resulting character be drawn to the screen
+		surface.getSubArea(Common::Rect(textPos.x, textPos.y, textPos.x + charFullWidth, textPos.y + charHeight));
 
-	if (c >= _minPrintableChar && c <= _maxPrintableChar) {
-		const byte *srcP = &_pixelData[(c - _minPrintableChar) * _linesPerChar * _bytesPerLine];
-		
-		for (int yCtr = 0, yp = textPos.y; yCtr < _linesPerChar; ++yCtr, ++yp) {
-			byte *destP = (byte *)surface.getBasePtr(textPos.x, yp);
-			byte bitMask = 0, srcPixel = 0;
-			for (int byteCtr = 0, xCtr = 0;  xCtr < charFullWidth; ++xCtr, ++destP, bitMask >>= 1) {
-				if ((byteCtr % 8) == 0) {
-					bitMask = 0x80;
-					srcPixel = *srcP++;
+		if (c >= _minPrintableChar && c <= _maxPrintableChar) {
+			const byte *srcP = &_pixelData[(c - _minPrintableChar) * _linesPerChar * _bytesPerLine];
+
+			for (int yCtr = 0, yp = textPos.y; yCtr < _linesPerChar; ++yCtr, ++yp) {
+				if (yp < 0 || yp >= surface.h)
+					continue;
+
+				byte *destP = (byte *)surface.getBasePtr(textPos.x, yp);
+				byte bitMask = 0, srcPixel = 0;
+				for (int byteCtr = 0, xCtr = 0, xp = textPos.x; xCtr < charFullWidth; ++xCtr, ++xp, ++destP, bitMask >>= 1) {
+					if ((byteCtr % 8) == 0) {
+						bitMask = 0x80;
+						srcPixel = *srcP++;
+					}
+
+					
+					if (srcPixel & bitMask && xp >= 0 && xp < surface.w)
+						*destP = _fgColor;
 				}
-
-				if (srcPixel & bitMask)
-					*destP = _fgColor;
 			}
 		}
 	}
 
-	textPos.x += charFullWidth;
-	
-	if (_overrideColor >= 0) {
+	// Move the text writing position to after the drawn character
+	textPos.x += charFullWidth;	
+	if (textPos.x < surface.w) {
 		++textPos.x;
 	} else {
 		textPos.x = 0;
@@ -253,7 +258,7 @@ uint Font::charWidth(char c) const {
 	else if (c == '\n')
 		return 0;
 	else if (_fixedSpacing < 0)
-		return _charWidths[c] + _charSpacings[c].leftSpacing + _charSpacings[c].rightSpacing;
+		return _charWidths[c] + _charSpacings[c]._vals.leftSpacing + _charSpacings[c]._vals.rightSpacing;
 	else if (_fixedWidth < 0)
 		return _charWidths[c] + _fixedSpacing;
 	else
@@ -270,6 +275,7 @@ uint Font::stringWidth(const Common::String &msg) const {
 }
 
 void Font::setActive() {
+	_activeFont = this;
 	_counter = 1;
 	_maxCharWidth = charWidth('M');
 	_lineHeight = lineHeight();

@@ -42,6 +42,10 @@ struct Spacing {
 	uint leftSpacing : 4;
 	uint rightSpacing : 4;
 };
+union SpacingUnion {
+	Spacing _vals;
+	byte _byte;
+};
 
 class Font {
 private:
@@ -52,7 +56,6 @@ private:
 	static Font *getFreeSlot();
 public:
 	int _counter;
-	int _sectionNum;
 	int _fontNumber;
 
 	int _field4;
@@ -68,12 +71,11 @@ public:
 	int _fixedSpacing;
 	int _fieldD;
 	Common::Array<uint> _charWidths;
-	Common::Array<Spacing> _charSpacings;
+	Common::Array<SpacingUnion> _charSpacings;
 	Common::Array<byte> _pixelData;
 public:
 	static Font *_fonts[FONT_COUNT];
 	static Font *_activeFont;
-	static int _currentSection;
 //	static int _textX, _textY;		-- now stored in VisualItem
 	static int _tabWidth;
 	static uint _lineHeight;
