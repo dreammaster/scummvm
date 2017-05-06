@@ -32,18 +32,22 @@ Screen &Screen::get() {
 }
 
 Screen::Screen(LegendEngine *vm) : Gfx::Screen(vm, 320, 200) {
+	setDefaultPalette();
 }
 
 Screen::~Screen() {
 }
 
 void Screen::setDefaultPalette() {
-	for (int idx = 0; idx < 48; ++idx) {
+	for (int idx = 0; idx < (16 * 3); ++idx) {
 		_gamePalette[idx] = ((idx / 3) * 63) / 15;
 	}
 	_gamePalette[PALETTE_SIZE - 3] = 0;
 	_gamePalette[PALETTE_SIZE - 2] = 0;
 	_gamePalette[PALETTE_SIZE - 1] = 0;
+	_gamePalette[15 * 3] = 0xff;
+	_gamePalette[15 * 3 + 1] = 0xff;
+	_gamePalette[15 * 3 + 2] = 0xff;
 
 	setPalette(_gamePalette);
 }
