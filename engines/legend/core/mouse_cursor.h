@@ -24,18 +24,47 @@
 #define LEGEND_MOUSE_CURSOR_H
 
 #include "common/scummsys.h"
+#include "legend/static_data.h"
 
 namespace Legend {
 
+#define CURSOR_WIDTH 16
+#define CURSOR_HEIGHT 16
+
 class LegendEngine;
 
+namespace Later {
+namespace Xanth {
+
 enum CursorId {
-	CURSOR_ARROW = 1,
+	CURSOR_BIG_ARROW = 0,
+	CURSOR_SMALL_ARROW = 1,
+	CURSOR_TICK = 2,
+	CURSOR_HOURGLASS
 };
 
+}
+}
+
+/**
+ * Handles the dislay and management of the on-screen mouse cursor
+ */
 class MouseCursor {
+private:
+	Common::Array<MouseCursorData> _cursors;
+	int _cursorId;
 public:
 	MouseCursor(LegendEngine *vm);
+
+	/**
+	 * Sets the active cursor
+	 */
+	void setCursor(int cursorId);
+
+	/**
+	 * Returns the curent cursor
+	 */
+	int getCursor() const { return _cursorId; }
 
 	/**
 	 * Make the mouse cursor visible

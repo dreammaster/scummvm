@@ -23,7 +23,19 @@
 #ifndef LEGEND_STATIC_DATA_H
 #define LEGEND_STATIC_DATA_H
 
+#include "common/scummsys.h"
+
 namespace Legend {
+
+/**
+ * 16x16 1bpp mouse cursors
+ */
+struct MouseCursorData {
+	int _hotspotX, _hotspotY;
+	uint16 _pixels[16];
+	uint16 _masks[16];
+};
+	
 namespace Early {
 
 struct HelpMessage {
@@ -33,6 +45,16 @@ struct HelpMessage {
 extern const HelpMessage HELP_TEXT[38];
 
 } // End of namespace Early
+
+namespace Later {
+namespace Xanth {
+
+extern const MouseCursorData XANTH_CURSORS[4];
+
+} // End of namespaec Xanth
+} // ENd of namespace Later
+
+
 } // End of namespace Legend
 
 #endif
