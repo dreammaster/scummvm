@@ -63,6 +63,9 @@ void GameManager::update() {
 		// Signal the next frame
 		CFrameMsg frameMsg(g_vm->_events->getTicksCount());
 		frameMsg.execute(_view, nullptr, MSGFLAG_SCAN);
+
+		_view->draw();
+		Gfx::Screen::get().checkPalette();
 	}
 }
 

@@ -23,6 +23,7 @@
 #include "legend/later/screen.h"
 #include "engines/util.h"
 #include "legend/legend.h"
+#include "legend/gfx/image.h"
 
 namespace Legend {
 namespace Later {
@@ -50,6 +51,33 @@ void Screen::setDefaultPalette() {
 	_gamePalette[15 * 3 + 2] = 0xff;
 
 	setPalette(_gamePalette);
+}
+
+void Screen::saveSubPalette1(int picNumber) {
+	// Load the specified image, which will also load it's palette into _gamePalette
+	Gfx::Image img;
+	img.load(picNumber);
+
+	// Backup relevant palette section for later re-use
+	Common::copy(&_gamePalette[16 * 3], &_gamePalette[(16 + 16) * 3], &_subPalette1[0]);
+	_subPalette1[0] = _subPalette1[1] = 0xff;
+	_subPalette1[2] = 0xff;
+
+	// TODO: Other stuff setup
+}
+
+void Screen::saveSubPalette2(int picNumber) {
+	// Load the specified image, which will also load it's palette into _gamePalette
+	Gfx::Image img;
+	img.load(picNumber);
+
+	// Backup relevant palette section for later re-use
+	Common::copy(&_gamePalette[32 * 3], &_gamePalette[(32 + 48) * 3], &_subPalette2[0]);
+}
+
+void Screen::restoreSubPalettes() {
+	Common::copy(&_subPalette1[0], &_subPalette1[16 * 3], &_gamePalette[16 * 3]);
+	Common::copy(&_subPalette2[0], &_subPalette2[48 * 3], &_gamePalette[32 * 3]);
 }
 
 } // End of namespace Later

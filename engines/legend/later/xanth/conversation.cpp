@@ -82,12 +82,18 @@ bool Conversation::ShowMsg(CShowMsg &msg) {
 }
 
 void Conversation::draw() {
+	if (!_isDirty)
+		return;
 	Background::draw();
 	
 	// Draw a frame around where the target image will be drawn
 	Common::Rect r = _image.getBounds();
 	r.grow(1);
 	Screen::get().frameRect(r, 0x10);
+
+	// TODO: If the sub-palettes are restored in lots of places, think of a way
+	// to abstract this up into the game manager
+	Screen::get().restoreSubPalettes();
 }
 
 } // End of namespace Xanth

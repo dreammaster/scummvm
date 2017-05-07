@@ -29,6 +29,9 @@ namespace Legend {
 namespace Later {
 
 class Screen : public Gfx::Screen {
+private:
+	byte _subPalette1[16 * 3];
+	byte _subPalette2[48 * 3];
 public:
 	Screen(LegendEngine *vm);
 	virtual ~Screen();
@@ -38,6 +41,23 @@ public:
 	 * Sets a default game palette
 	 */
 	void setDefaultPalette();
+
+	/**
+	 * Takes a section of the game palette loaded from a specified picture,
+	 * for use in later use in restoring after loading images to keep these sections unchanged
+	 */
+	void saveSubPalette1(int picNumber = 31);
+
+	/**
+	 * Takes a section of the game palette loaded from a specified picture,
+	 * for use in later use in restoring after loading images to keep these sections unchanged
+	 */
+	void saveSubPalette2(int picNumber = 256);
+
+	/**
+	 * Restores previously saved palette sub-sections into the game palette
+	 */
+	void restoreSubPalettes();
 };
 
 } // End of namespace Later

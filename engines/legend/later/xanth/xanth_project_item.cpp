@@ -21,6 +21,7 @@
  */
 
 #include "legend/later/xanth/xanth_project_item.h"
+#include "legend/later/screen.h"
 
 namespace Legend {
 namespace Later {
@@ -33,6 +34,8 @@ XanthProjectItem::XanthProjectItem() : ProjectItem(),
 	_compendium.addUnder(this);
 
 	Background::_bgPicNum = 31;
+	Screen::get().saveSubPalette1();
+	Screen::get().saveSubPalette2();
 }
 
 } // End of namespace Xanth
