@@ -93,6 +93,12 @@ void writeStringList(const char *name, const char **strings, int count) {
 		outputFile.writeString(strings[idx]);
 }
 
+void writeEntry(const char *name, uint fileOffset, uint size) {
+	writeEntryHeader(name, size);
+	inputFile.seek(fileOffset);
+	outputFile.write(inputFile, size);
+}
+
 void writeHeaderIndex() {
 	// Write out magic string
 	const char *MAGIC_STR = "LGND";

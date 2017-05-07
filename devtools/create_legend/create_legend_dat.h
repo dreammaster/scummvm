@@ -31,4 +31,6 @@ extern void writeEntryHeader(const char *name, uint size);
 
 extern void writeStringList(const char *name, const char **strings, int count);
 
+extern void writeEntry(const char *name, uint fileOffset, uint size);
+
 #endif

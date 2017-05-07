@@ -52,6 +52,14 @@ void writeCursors() {
 	writeCursor(0x29BA0);	// Hourglass arrow
 }
 
+void writeConversationData() {
+	writeEntry("XANTH/CONVERSATIONS/1", 0x32508, 1036);
+	writeEntry("XANTH/CONVERSATIONS/2", 0x33944, 1300);
+	writeEntry("XANTH/CONVERSATIONS/3", 0x353f0, 400);
+	writeEntry("XANTH/CONVERSATIONS/LOOKUPS", 0x35580, 400 * 6);
+}
+
 void writeXanthData() {
 	writeCursors();
+	writeConversationData();
 }
