@@ -40,7 +40,7 @@ protected:
 	LegendEngine *_vm;
 	byte _gamePalette[PALETTE_SIZE];
 public:
-	bool _paletteDirty;
+	bool _paletteReset;
 	bool _picPalette;
 public:
 	Screen(LegendEngine *vm, int width, int height);
@@ -72,9 +72,19 @@ public:
 	void setPalette(const byte *palette, uint start, uint num);
 
 	/**
+	 * Handles updating the screen palete after a picture loading has set a new palette
+	 */
+	void checkPalette();
+
+	/**
 	 * Set the palette to the currently loaded game palette
 	 */
 	void setPalette() { setPalette(_gamePalette); }
+
+	/**
+	 * Fades in to the palette in _gamePalette
+	 */
+	void fadeIn();
 
 	/**
 	 * Loads a font

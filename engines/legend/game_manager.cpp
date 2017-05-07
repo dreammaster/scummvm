@@ -84,6 +84,8 @@ void GameManager::changeView(const Common::String &name) {
 	showMsg.execute(_view, nullptr, MSGFLAG_SCAN);
 
 	_view->draw();
+	Gfx::Screen::get().checkPalette();
+
 	if (showMsg._fadeIn) {
 		// TODO: Fade in
 	}

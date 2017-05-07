@@ -62,6 +62,8 @@ Conversation::Conversation(const Common::String &name, int convId, int targetId)
 }
 
 bool Conversation::ShowMsg(CShowMsg &msg) {
+	Background::ShowMsg(msg);
+
 	Screen::get().loadFont(10);
 	Gfx::Font::setColor(15);
 
@@ -76,7 +78,7 @@ bool Conversation::ShowMsg(CShowMsg &msg) {
 	}
 
 	Screen::get().setPalette();
-	return Background::ShowMsg(msg);
+	return true;
 }
 
 void Conversation::draw() {

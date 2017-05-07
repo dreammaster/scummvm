@@ -43,7 +43,7 @@ Screen &Screen::get() {
 }
 
 Screen::Screen(LegendEngine *vm, int width, int height): Graphics::Screen(width, height),
-		_vm(vm), _paletteDirty(false), _picPalette(false) {
+		_vm(vm), _paletteReset(false), _picPalette(false) {
 	Font::init();
 	Common::fill(&_gamePalette[0], &_gamePalette[PALETTE_SIZE], 0);
 	initGraphics(width, height);
@@ -66,16 +66,35 @@ void Screen::resetPalette() {
 	byte pal[PALETTE_SIZE];
 	Common::fill(&pal[0], &pal[PALETTE_SIZE], 0);
 	setPalette(pal);
+	_paletteReset = true;
 }
 
 void Screen::setPalette(const byte palette[PALETTE_SIZE]) {
 	Graphics::Screen::setPalette(palette);
-	_paletteDirty = false;
+	_paletteReset = false;
 }
 
 void Screen::setPalette(const byte *palette, uint start, uint num) {
 	Graphics::Screen::setPalette(palette, start, num);
-	_paletteDirty = false;
+	_paletteReset = false;
+}
+
+void Screen::checkPalette() {
+	if (_picPalette) {
+		_picPalette = false;
+		if (_paletteReset) {
+			fadeIn();
+		} else {
+			setPalette(_gamePalette);
+		}
+	}
+
+	// TODO: Other unknown copying
+}
+
+void Screen::fadeIn() {
+	// TODO: Fading
+	setPalette(_gamePalette);
 }
 
 } // End of namespace Gfx
