@@ -60,11 +60,11 @@ void LegendEngine::initialize() {
 	Gfx::Font::init();
 	_debugger = Debugger::init(this);
 	_events = new Events(this);
+	_res = new Resources(this);
 	_screen = Gfx::Screen::init(this);
 	_gfx = new Gfx::Gfx();
 	_mouseCursor = new MouseCursor(this);
 	_picFile = new Gfx::PicFile();
-	_res = new Resources(this);
 	_window = new MainGameWindow(this);
 
 	_window->applicationStarting();

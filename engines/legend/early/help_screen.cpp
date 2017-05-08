@@ -22,7 +22,8 @@
 
 #include "legend/early/help_screen.h"
 #include "legend/early/screen.h"
-#include "legend/static_data.h"
+#include "legend/legend.h"
+#include "legend/core/resources.h"
 
 namespace Legend {
 namespace Early {
@@ -50,8 +51,12 @@ void HelpScreen::draw() {
 	setFontColor(Screen::get()._defaultTextColor);
 
 	// Write out the help
-	for (int idx = 0; idx < 39; ++idx) {
-		const HelpMessage &msg = HELP_TEXT[idx];
+	Common::SeekableReadStream *s = g_vm->_res->getResource("EARLY/HELP");
+
+	for (int idx = 0; s->pos() < s->size(); ++idx) {
+		Common::String msg1 = readStringFromStream(s);
+		Common::String msg2 = readStringFromStream(s);
+
 		int xp = idx < 22 ? 24 : 312;
 		int yp = (idx >= 22 ? idx - 22 : idx) * Gfx::Font::_lineHeight
 			+ 64 + _fontCenter.y;
@@ -64,18 +69,20 @@ void HelpScreen::draw() {
 		else
 			xs = 120;
 
-		if (msg._msg2) {
+		if (!msg2.empty()) {
 			// It's a key/purpose pair
 			setTextPos(Common::Point(xp + 16, yp));
-			writeString(msg._msg1);
+			writeString(msg1);
 			setTextPos(Common::Point(xp + xs, yp));
-			writeString(msg._msg2);
-		} else if (msg._msg1) {
+			writeString(msg2);
+		} else if (!msg1.empty()) {
 			// It's a section title
 			setTextPos(Common::Point(xp, yp));
-			writeString(msg._msg1);
+			writeString(msg1);
 		}
 	}
+
+	delete s;
 }
 
 bool HelpScreen::MouseButtonMsg(CMouseButtonMsg &msg) {

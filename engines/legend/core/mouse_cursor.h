@@ -24,7 +24,8 @@
 #define LEGEND_MOUSE_CURSOR_H
 
 #include "common/scummsys.h"
-#include "legend/static_data.h"
+#include "common/rect.h"
+#include "common/stream.h"
 
 namespace Legend {
 
@@ -40,19 +41,31 @@ enum CursorId {
 	CURSOR_BIG_ARROW = 0,
 	CURSOR_SMALL_ARROW = 1,
 	CURSOR_TICK = 2,
-	CURSOR_HOURGLASS
+	CURSOR_HOURGLASS = 3
 };
 
-}
-}
+} // End of namespace Xanth
+} // End of namespace Later
 
 /**
  * Handles the dislay and management of the on-screen mouse cursor
  */
 class MouseCursor {
+	struct MouseCursorData {
+		Common::Point _hotspot;
+		uint16 _pixels[16];
+		uint16 _mask[16];
+
+		void load(Common::SeekableReadStream &s);
+	};
 private:
 	Common::Array<MouseCursorData> _cursors;
 	int _cursorId;
+private:
+	/**
+	 * Loads the mosue cursors from the specified resource
+	 */
+	void loadCursors(const Common::String &name);
 public:
 	MouseCursor(LegendEngine *vm);
 

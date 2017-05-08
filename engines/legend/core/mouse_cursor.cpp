@@ -23,8 +23,20 @@
 #include "graphics/cursorman.h"
 #include "legend/core/mouse_cursor.h"
 #include "legend/legend.h"
+#include "legend/core/resources.h"
 
 namespace Legend {
+
+void MouseCursor::MouseCursorData::load(Common::SeekableReadStream &s) {
+	_hotspot.x = s.readSint16LE();
+	_hotspot.y = s.readSint16LE();
+	for (int idx = 0; idx < 16; ++idx)
+		_pixels[idx] = s.readUint16LE();
+	for (int idx = 0; idx < 16; ++idx)
+		_mask[idx] = s.readUint16LE();
+}
+
+/*-------------------------------------------------------------------*/
 
 MouseCursor::MouseCursor(LegendEngine *vm) {
 	int count;
@@ -32,20 +44,33 @@ MouseCursor::MouseCursor(LegendEngine *vm) {
 
 	switch (vm->getGameID()) {
 	case GType_CompanionsOfXanth:
-		data = Later::Xanth::XANTH_CURSORS;
-		count = 4;
+		loadCursors("XANTH/CURSORS");
 		break;
 	default:
 		return;
 	}
 
-	// Copy the cursors into an array. This will give better protention against
-	// invalid cursor indexes later on
-	_cursors.resize(count);
-	Common::copy(&data[0], &data[count], &_cursors[0]);
-	
 	_cursorId = -1;
 	setCursor(0);
+}
+
+void MouseCursor::loadCursors(const Common::String &name) {
+	_cursors.clear();
+
+	Common::SeekableReadStream *s = g_vm->_res->getResource(name);
+	while (s->pos() < s->size()) {
+		_cursors.push_back(MouseCursorData());
+		MouseCursorData &mc = _cursors.back();
+
+		mc._hotspot.x = s->readSint16LE();
+		mc._hotspot.y = s->readSint16LE();
+		for (int idx = 0; idx < 16; ++idx)
+			mc._mask[idx] = s->readUint16LE();
+		for (int idx = 0; idx < 16; ++idx)
+			mc._pixels[idx] = s->readUint16LE();
+	}
+
+	delete s;
 }
 
 void MouseCursor::setCursor(int cursorId) {
@@ -59,7 +84,7 @@ void MouseCursor::setCursor(int cursorId) {
 	s.fillRect(s.getBounds(), 0xff);
 	
 	const MouseCursorData &data = _cursors[cursorId];
-	const uint16 *pixelsP = data._pixels, *maskP = data._masks;
+	const uint16 *pixelsP = data._pixels, *maskP = data._mask;
 
 	// Iterate trhough the lines to build up the cursor
 	for (int y = 0; y < CURSOR_HEIGHT; ++y) {
@@ -76,7 +101,8 @@ void MouseCursor::setCursor(int cursorId) {
 	}
 
 	// Pass the generated surface onto the ScummVM cursor manager
-	CursorMan.replaceCursor(s.getPixels(), CURSOR_WIDTH, CURSOR_HEIGHT, data._hotspotX, data._hotspotY, 0xff);
+	CursorMan.replaceCursor(s.getPixels(), CURSOR_WIDTH, CURSOR_HEIGHT,
+		data._hotspot.x, data._hotspot.y, 0xff);
 }
 
 void MouseCursor::show() {

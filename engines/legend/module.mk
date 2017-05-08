@@ -35,8 +35,7 @@ MODULE_OBJS = \
 	input_handler.o \
 	input_translator.o \
 	main_game_window.o \
-	messages.o \
-	static_data.o
+	messages.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_LEGEND), DYNAMIC_PLUGIN)
