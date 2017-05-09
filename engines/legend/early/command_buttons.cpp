@@ -20,31 +20,18 @@
  *
  */
 
-#ifndef LEGEND_GATEWAY_PROJECT_ITEM_H
-#define LEGEND_GATEWAY_PROJECT_ITEM_H
-
-#include "legend/core/project_item.h"
-#include "legend/early/help_screen.h"
-#include "legend/early/scene.h"
-#include "legend/early/gateway/part_title.h"
+#include "legend/early/command_buttons.h"
 
 namespace Legend {
 namespace Early {
-namespace Gateway {
 
-class GatewayProjectItem : public ProjectItem {
-	DECLARE_MESSAGE_MAP;
-private:
-	PartTitle _partTitleScreen;
-	Scene _scene;
-	Early::HelpScreen _helpScreen;
-public:
-	CLASSDEF;
-	GatewayProjectItem();
-};
+EMPTY_MESSAGE_MAP(CommandButtons, Gfx::VisualItem);
 
-} // End of namespace Gateway
+CommandButtons::CommandButtons() : Gfx::VisualItem() {
+}
+
+void CommandButtons::draw() {
+}
+
 } // End of namespace Early
 } // End of namespace Legend
-
-#endif

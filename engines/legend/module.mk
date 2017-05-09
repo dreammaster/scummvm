@@ -18,8 +18,14 @@ MODULE_OBJS = \
 	gfx/screen.o \
 	gfx/visual_container.o \
 	gfx/visual_item.o \
-	early/screen.o \
+	early/button.o \
+	early/command_buttons.o \
 	early/help_screen.o \
+	early/scene.o \
+	early/scene_picture.o \
+	early/screen.o \
+	early/scroll_list.o \
+	early/text_area.o \
 	early/gateway/gateway_project_item.o \
 	early/gateway/part_title.o \
 	later/screen.o \
