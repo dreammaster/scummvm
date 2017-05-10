@@ -32,14 +32,19 @@ BEGIN_MESSAGE_MAP(Button, Gfx::VisualItem)
 	ON_MESSAGE(MouseButtonDownMsg)
 END_MESSAGE_MAP()
 
-Button::Button() {
-}
-
 void Button::draw() {
+	if (!_isDirty)
+		return;
+	Gfx::VisualItem::draw();
+
+	// Draw the button
+	Graphics::ManagedSurface s = getSurface();
+	// TODO:
+	s.fillRect(s.getBounds(), 1);
 }
 
 bool Button::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
-	// TODO: Execute the button action
+	execute();
 	return true;
 }
 

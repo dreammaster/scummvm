@@ -23,19 +23,32 @@
 #ifndef LEGEND_EARLY_COMMAND_BUTTONS_H
 #define LEGEND_EARLY_COMMAND_BUTTONS_H
 
-#include "legend/early/boxed_element.h"
+#include "legend/gfx/visual_container.h"
 #include "legend/early/button.h"
 
 namespace Legend {
 namespace Early {
 
-class CommandButtons : public BoxedElement {
+class CommandButtons : public Gfx::VisualContainer {
 	DECLARE_MESSAGE_MAP;
+	DEFINE_BUTTON(Help);
+	DEFINE_BUTTON(Half);
+	DEFINE_BUTTON(Text);
+	DEFINE_BUTTON(Erase);
+	DEFINE_BUTTON(Picture);
+	DEFINE_BUTTON(Status);
+	DEFINE_BUTTON(Inventory);
+	DEFINE_BUTTON(Look);
+	DEFINE_BUTTON(Do);
 public:
 	CLASSDEF;
-	CommandButtons(const Common::String &name, const Common::Rect &r) :
-		BoxedElement(name, r) {}
+	CommandButtons(const Common::String &name, const Common::Rect &r);
 	virtual ~CommandButtons() {}
+
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();	
 };
 
 } // End of namespace Early

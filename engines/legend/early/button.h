@@ -33,14 +33,27 @@ class Button : public Gfx::VisualItem {
 	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
 public:
 	CLASSDEF;
-	Button();
+	Button(const Common::Rect &r) : Gfx::VisualItem() {}
 	virtual ~Button() {}
 
 	/**
 	 * Draws the visual item on the screen
 	 */
 	virtual void draw();
+
+	/**
+	 * Execute the button action
+	 */
+	virtual void execute() = 0;
 };
+
+#define DEFINE_BUTTON(NAME) \
+	class NAME##Button : public Button { \
+	public: \
+	NAME##Button(const Common::Rect &r) : Button(r) {} \
+	virtual void execute(); \
+	}; \
+	NAME##Button _btn##NAME
 
 } // End of namespace Early
 } // End of namespace Legend
