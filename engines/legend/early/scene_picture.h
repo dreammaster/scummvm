@@ -23,16 +23,17 @@
 #ifndef LEGEND_EARLY_SCENE_PICTURE_H
 #define LEGEND_EARLY_SCENE_PICTURE_H
 
-#include "legend/gfx/visual_item.h"
+#include "legend/early/boxed_element.h"
 
 namespace Legend {
 namespace Early {
 
-class ScenePicture : public Gfx::VisualItem {
+class ScenePicture : public BoxedElement {
 	DECLARE_MESSAGE_MAP;
 public:
 	CLASSDEF;
-	ScenePicture();
+	ScenePicture(const Common::String &name, const Common::Rect &r) :
+		BoxedElement(name, r) {}
 	virtual ~ScenePicture() {}
 
 	/**

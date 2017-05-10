@@ -52,7 +52,7 @@ void MainGameWindow::applicationStarting() {
 		g_vm->_mouseCursor->show();
 	}
 
-	const char *name = g_vm->getGameID() == GType_Gateway ? "Help" : "Compendium";
+	const char *name = g_vm->getGameID() == GType_Gateway ? "Scene" : "Compendium";
 	Gfx::VisualItem *firstView = dynamic_cast<Gfx::VisualItem *>(_project->findByName(name));
 	_gameManager->setView(firstView);
 

@@ -20,32 +20,31 @@
  *
  */
 
-#ifndef LEGEND_EARLY_SCENE_H
-#define LEGEND_EARLY_SCENE_H
+#ifndef LEGEND_EARLY_BOXED_ELEMENT_H
+#define LEGEND_EARLY_BOXED_ELEMENT_H
 
-#include "legend/gfx/visual_container.h"
-#include "legend/gfx/compass.h"
-#include "legend/early/command_buttons.h"
-#include "legend/early/scene_picture.h"
-#include "legend/early/scroll_list.h"
-#include "legend/early/text_area.h"
+#include "legend/gfx/visual_item.h"
 
 namespace Legend {
 namespace Early {
 
-class Scene : public Gfx::VisualContainer {
+/**
+ * Base class for visual areas with a white background with a thin black border
+ */
+class BoxedElement : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
-private:
-	CommandButtons _commandButtons;
-	Gfx::Compass _compass;
-	ScenePicture _scenePicture;
-	ScrollList _commands;
-	ScrollList _items;
-	TextArea _textArea;
 public:
 	CLASSDEF;
-	Scene();
-	virtual ~Scene() {}
+	BoxedElement() : Gfx::VisualItem() {}
+	BoxedElement(const Common::Rect &r) : Gfx::VisualItem(r) {}
+	BoxedElement(const Common::String &name) : Gfx::VisualItem(name) {}
+	BoxedElement(const Common::String &name, const Common::Rect &r) :  Gfx::VisualItem(name, r) {}
+	virtual ~BoxedElement() {}
+
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();
 };
 
 } // End of namespace Early

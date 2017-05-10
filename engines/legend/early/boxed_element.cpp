@@ -20,35 +20,24 @@
  *
  */
 
-#ifndef LEGEND_EARLY_SCENE_H
-#define LEGEND_EARLY_SCENE_H
-
-#include "legend/gfx/visual_container.h"
-#include "legend/gfx/compass.h"
-#include "legend/early/command_buttons.h"
-#include "legend/early/scene_picture.h"
-#include "legend/early/scroll_list.h"
-#include "legend/early/text_area.h"
+#include "legend/early/boxed_element.h"
 
 namespace Legend {
 namespace Early {
 
-class Scene : public Gfx::VisualContainer {
-	DECLARE_MESSAGE_MAP;
-private:
-	CommandButtons _commandButtons;
-	Gfx::Compass _compass;
-	ScenePicture _scenePicture;
-	ScrollList _commands;
-	ScrollList _items;
-	TextArea _textArea;
-public:
-	CLASSDEF;
-	Scene();
-	virtual ~Scene() {}
-};
+EMPTY_MESSAGE_MAP(BoxedElement, Gfx::VisualItem);
+
+void BoxedElement::draw() {
+	if (!_isDirty)
+		return;
+	Gfx::VisualItem::draw();
+
+	Graphics::ManagedSurface s = getSurface();
+	Common::Rect r = s.getBounds();
+	s.fillRect(r, 15);
+	r.grow(-1);
+	s.fillRect(r, 0);
+}
 
 } // End of namespace Early
 } // End of namespace Legend
-
-#endif

@@ -25,10 +25,7 @@
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(ScrollList, Gfx::VisualItem);
-
-ScrollList::ScrollList() : Gfx::VisualItem() {
-}
+EMPTY_MESSAGE_MAP(ScrollList, BoxedElement);
 
 } // End of namespace Early
 } // End of namespace Legend

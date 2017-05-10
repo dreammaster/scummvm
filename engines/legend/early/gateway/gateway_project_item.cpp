@@ -30,6 +30,7 @@ EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
 
 GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
 	_partTitleScreen.addUnder(this);
+	_scene.addUnder(this);
 	_helpScreen.addUnder(this);
 }
 

@@ -26,10 +26,7 @@
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(ScenePicture, Gfx::VisualItem);
-
-ScenePicture::ScenePicture() : Gfx::VisualItem() {
-}
+EMPTY_MESSAGE_MAP(ScenePicture, BoxedElement);
 
 void ScenePicture::draw() {
 }

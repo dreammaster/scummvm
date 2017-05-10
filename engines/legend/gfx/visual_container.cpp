@@ -28,6 +28,9 @@ namespace Gfx {
 EMPTY_MESSAGE_MAP(VisualContainer, VisualItem);
 
 void VisualContainer::draw() {
+	if (!_isDirty)
+		return;
+
 	// Handle drawing any background
 	Image::draw();
 

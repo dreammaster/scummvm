@@ -23,16 +23,17 @@
 #ifndef LEGEND_EARLY_TEXT_AREA_H
 #define LEGEND_EARLY_TEXT_AREA_H
 
-#include "legend/gfx/visual_item.h"
+#include "legend/early/boxed_element.h"
 
 namespace Legend {
 namespace Early {
 
-class TextArea : public Gfx::VisualItem {
+class TextArea : public BoxedElement {
 	DECLARE_MESSAGE_MAP;
 public:
 	CLASSDEF;
-	TextArea();
+	TextArea(const Common::String &name, const Common::Rect &r) :
+		BoxedElement(name, r) {}
 	virtual ~TextArea() {}
 
 	/**

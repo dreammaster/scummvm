@@ -9,6 +9,7 @@ MODULE_OBJS = \
 	core/resources.o \
 	core/saveable_object.o \
 	core/tree_item.o \
+	gfx/compass.o \
 	gfx/font.o \
 	gfx/gfx.o \
 	gfx/image.o \
@@ -18,6 +19,7 @@ MODULE_OBJS = \
 	gfx/screen.o \
 	gfx/visual_container.o \
 	gfx/visual_item.o \
+	early/boxed_element.o \
 	early/button.o \
 	early/command_buttons.o \
 	early/help_screen.o \

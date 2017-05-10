@@ -28,10 +28,19 @@ namespace Early {
 
 EMPTY_MESSAGE_MAP(Scene, Gfx::VisualItem);
 
-Scene::Scene() : Gfx::VisualItem() {
-}
-
-void Scene::draw() {
+Scene::Scene() : Gfx::VisualContainer("Scene"),
+		_commandButtons("CommandButtons", Common::Rect(0, 0, 120, 136)),
+		_compass("Compass", Common::Rect(120, 0, 158, 136)),
+		_scenePicture("ScenePicture", Common::Rect(260, 0, 640, 224)),
+		_commands("Commands", Common::Rect(0, 136, 116, 480)),
+		_items("Items", Common::Rect(116, 136, 260, 480)),
+		_textArea("TextArea", Common::Rect(260, 224, 640, 480)) {
+	_commandButtons.addUnder(this);
+	_compass.addUnder(this);
+	_scenePicture.addUnder(this);
+	_commands.addUnder(this);
+	_items.addUnder(this);
+	_textArea.addUnder(this);
 }
 
 } // End of namespace Early

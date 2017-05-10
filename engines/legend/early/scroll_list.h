@@ -23,16 +23,17 @@
 #ifndef LEGEND_EARLY_SCROLL_LIST_H
 #define LEGEND_EARLY_SCROLL_LIST_H
 
-#include "legend/gfx/visual_item.h"
+#include "legend/early/boxed_element.h"
 
 namespace Legend {
 namespace Early {
 
-class ScrollList : public Gfx::VisualItem {
+class ScrollList : public BoxedElement {
 	DECLARE_MESSAGE_MAP;
 public:
 	CLASSDEF;
-	ScrollList();
+	ScrollList(const Common::String &name, const Common::Rect &r) :
+		BoxedElement(name, r) {}
 	virtual ~ScrollList() {}
 };
 

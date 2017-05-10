@@ -25,13 +25,7 @@
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(CommandButtons, Gfx::VisualItem);
-
-CommandButtons::CommandButtons() : Gfx::VisualItem() {
-}
-
-void CommandButtons::draw() {
-}
+EMPTY_MESSAGE_MAP(CommandButtons, BoxedElement);
 
 } // End of namespace Early
 } // End of namespace Legend

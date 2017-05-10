@@ -20,35 +20,31 @@
  *
  */
 
-#ifndef LEGEND_EARLY_SCENE_H
-#define LEGEND_EARLY_SCENE_H
+#ifndef LEGEND_COMPASS_H
+#define LEGEND_COMPASS_H
 
-#include "legend/gfx/visual_container.h"
-#include "legend/gfx/compass.h"
-#include "legend/early/command_buttons.h"
-#include "legend/early/scene_picture.h"
-#include "legend/early/scroll_list.h"
-#include "legend/early/text_area.h"
+#include "legend/gfx/visual_item.h"
 
 namespace Legend {
-namespace Early {
+namespace Gfx {
 
-class Scene : public Gfx::VisualContainer {
+class Compass : public VisualItem {
 	DECLARE_MESSAGE_MAP;
-private:
-	CommandButtons _commandButtons;
-	Gfx::Compass _compass;
-	ScenePicture _scenePicture;
-	ScrollList _commands;
-	ScrollList _items;
-	TextArea _textArea;
 public:
 	CLASSDEF;
-	Scene();
-	virtual ~Scene() {}
+	Compass() : VisualItem() {}
+	Compass(const Common::Rect &r) : VisualItem(r) {}
+	Compass(const Common::String &name) : VisualItem(name) {}
+	Compass(const Common::String &name, const Common::Rect &r) : VisualItem(name, r) {}
+	virtual ~Compass() {}
+
+	/**
+	 * Draws the container by iterating through each child and letting it draw
+	 */
+	virtual void draw();
 };
 
-} // End of namespace Early
+} // End of namespace Gfx
 } // End of namespace Legend
 
 #endif

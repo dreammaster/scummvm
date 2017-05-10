@@ -25,10 +25,7 @@
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(TextArea, Gfx::VisualItem);
-
-TextArea::TextArea() : Gfx::VisualItem() {
-}
+EMPTY_MESSAGE_MAP(TextArea, BoxedElement);
 
 void TextArea::draw() {
 }
