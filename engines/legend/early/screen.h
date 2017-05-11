@@ -31,6 +31,11 @@
 namespace Legend {
 namespace Early {
 
+#define WHITE 0
+#define LIGHT_GRAY 1
+#define DARK_GRAY 2
+#define BLACK 15
+
 class Screen: public Gfx::Screen {
 private:
 	byte _palette[PALETTE_SIZE];

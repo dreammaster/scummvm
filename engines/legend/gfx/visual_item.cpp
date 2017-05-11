@@ -114,5 +114,15 @@ void VisualItem::writeString(const Common::String &msg) {
 	font->writeString(surface, _fontWritePos, msg);
 }
 
+void VisualItem::writeString(const Common::Point &pt, const Common::String &msg) {
+	setTextPos(pt);
+	writeString(msg);
+}
+
+int VisualItem::stringWidth(const Common::String &msg) {
+	Font *font = Font::_activeFont;
+	return font->stringWidth(msg);
+}
+
 } // End of namespace Gfx
 } // End of namespace Legend

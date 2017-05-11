@@ -46,7 +46,7 @@ Screen::Screen(LegendEngine *vm): Gfx::Screen(vm, 640, 480) {
 	Common::fill(&_palette[16], &_palette[PALETTE_SIZE], 0);
 	defaultPalette();
 
-	_defaultTextColor = 15;
+	_defaultTextColor = BLACK;
 }
 
 Screen::~Screen() {
@@ -73,13 +73,11 @@ void Screen::setEGAPalette(const byte *palette) {
 }
 
 void Screen::defaultPalette() {
-	// White and black colors
-	Common::fill(&_palette[0], &_palette[3], 63);
-	Common::fill(&_palette[15 * 3], &_palette[15 * 3 + 3], 0);
-
-	// Miscellaneous
-	Common::fill(&_palette[3], &_palette[3 + 3], 42);
-	Common::fill(&_palette[6], &_palette[6 + 3], 21);
+	// Set default palette entries
+	Common::fill(&_palette[WHITE * 3], &_palette[WHITE * 3], 63);
+	Common::fill(&_palette[BLACK * 3], &_palette[BLACK * 3 + 3], 0);
+	Common::fill(&_palette[LIGHT_GRAY * 3], &_palette[LIGHT_GRAY * 3 + 3], 42);
+	Common::fill(&_palette[DARK_GRAY * 3], &_palette[DARK_GRAY * 3 + 3], 21);
 
 	setEGAPalette(_palette);
 }

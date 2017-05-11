@@ -125,6 +125,16 @@ public:
 	 * Writes a string
 	 */
 	void writeString(const Common::String &msg);
+
+	/**
+	 * Writes a string
+	 */
+	void writeString(const Common::Point &pt, const Common::String &msg);
+
+	/**
+	 * Get the width of a string
+	 */
+	int stringWidth(const Common::String &msg);
 };
 
 } // End of namespace Gfx

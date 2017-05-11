@@ -31,9 +31,11 @@ namespace Early {
 class Button : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
 	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
+private:
+	Common::String _text;
 public:
 	CLASSDEF;
-	Button(const Common::Rect &r) : Gfx::VisualItem(r) {}
+	Button(const Common::String &text, const Common::Rect &r) : Gfx::VisualItem(r), _text(text) {}
 	virtual ~Button() {}
 
 	/**
@@ -50,7 +52,7 @@ public:
 #define DEFINE_BUTTON(NAME) \
 	class NAME##Button : public Button { \
 	public: \
-	NAME##Button(const Common::Rect &r) : Button(r) {} \
+	NAME##Button(const Common::Rect &r) : Button(#NAME, r) {} \
 	virtual void execute(); \
 	}; \
 	NAME##Button _btn##NAME

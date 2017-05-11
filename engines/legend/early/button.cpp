@@ -37,10 +37,24 @@ void Button::draw() {
 		return;
 	Gfx::VisualItem::draw();
 
-	// Draw the button
+	// Get the surface
 	Graphics::ManagedSurface s = getSurface();
-	// TODO:
-	s.fillRect(s.getBounds(), 15);
+
+	// White background
+	Common::Rect r = s.getBounds();
+	s.fillRect(r, WHITE);
+	// Black edges
+	s.hLine(r.left + 1, r.top, r.right - 2, BLACK);
+	s.hLine(r.left + 1, r.bottom - 1, r.right - 2, BLACK);
+	s.vLine(r.left, r.top + 1, r.bottom - 2, BLACK);
+	s.vLine(r.right - 1, r.top + 1, r.bottom - 2, BLACK);
+	// Dark grey bottom/right button inner edges
+	s.hLine(r.left + 1, r.bottom - 2, r.right - 2, DARK_GRAY);
+	s.hLine(r.left + 2, r.bottom - 3, r.right - 2, DARK_GRAY);
+	s.vLine(r.right - 3, r.top + 2, r.bottom - 4, DARK_GRAY);
+	s.vLine(r.right - 2, r.top + 1, r.bottom - 4, DARK_GRAY);
+	// Inner button content
+	s.fillRect(Common::Rect(r.left + 3, r.top + 3, r.right - 3, r.bottom - 3), LIGHT_GRAY);
 }
 
 bool Button::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
