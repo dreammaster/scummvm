@@ -55,6 +55,13 @@ void Button::draw() {
 	s.vLine(r.right - 2, r.top + 1, r.bottom - 4, DARK_GRAY);
 	// Inner button content
 	s.fillRect(Common::Rect(r.left + 3, r.top + 3, r.right - 3, r.bottom - 3), LIGHT_GRAY);
+
+	// Handle writing the button text
+	loadFont(1);
+	setFontColor(BLACK);
+	int strWidth = stringWidth(_text);
+	int xp = _bounds.left + (_bounds.width() - strWidth) / 2;
+	writeString(Common::Point(xp, _bounds.top + 5), _text);
 }
 
 bool Button::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
