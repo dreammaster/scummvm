@@ -23,7 +23,7 @@
 #ifndef LEGEND_EARLY_BOXED_ELEMENT_H
 #define LEGEND_EARLY_BOXED_ELEMENT_H
 
-#include "legend/gfx/visual_item.h"
+#include "legend/gfx/visual_container.h"
 
 namespace Legend {
 namespace Early {
@@ -31,14 +31,14 @@ namespace Early {
 /**
  * Base class for visual areas with a white background with a thin black border
  */
-class BoxedElement : public Gfx::VisualItem {
+class BoxedElement : public Gfx::VisualContainer {
 	DECLARE_MESSAGE_MAP;
 public:
 	CLASSDEF;
-	BoxedElement() : Gfx::VisualItem() {}
-	BoxedElement(const Common::Rect &r) : Gfx::VisualItem(r) {}
-	BoxedElement(const Common::String &name) : Gfx::VisualItem(name) {}
-	BoxedElement(const Common::String &name, const Common::Rect &r) :  Gfx::VisualItem(name, r) {}
+	BoxedElement() : Gfx::VisualContainer() {}
+	BoxedElement(const Common::Rect &r) : Gfx::VisualContainer(r) {}
+	BoxedElement(const Common::String &name) : Gfx::VisualContainer(name) {}
+	BoxedElement(const Common::String &name, const Common::Rect &r) :  Gfx::VisualContainer(name, r) {}
 	virtual ~BoxedElement() {}
 
 	/**

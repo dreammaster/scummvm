@@ -25,18 +25,19 @@
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(BoxedElement, Gfx::VisualItem);
+EMPTY_MESSAGE_MAP(BoxedElement, Gfx::VisualContainer);
 
 void BoxedElement::draw() {
 	if (!_isDirty)
 		return;
-	Gfx::VisualItem::draw();
 
 	Graphics::ManagedSurface s = getSurface();
 	Common::Rect r = s.getBounds();
-	s.fillRect(r, 15);
+	s.frameRect(r, 15);
 	r.grow(-1);
 	s.fillRect(r, 0);
+
+	Gfx::VisualContainer::draw();
 }
 
 } // End of namespace Early

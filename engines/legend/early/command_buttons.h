@@ -23,13 +23,13 @@
 #ifndef LEGEND_EARLY_COMMAND_BUTTONS_H
 #define LEGEND_EARLY_COMMAND_BUTTONS_H
 
-#include "legend/gfx/visual_container.h"
+#include "legend/early/boxed_element.h"
 #include "legend/early/button.h"
 
 namespace Legend {
 namespace Early {
 
-class CommandButtons : public Gfx::VisualContainer {
+class CommandButtons : public BoxedElement {
 	DECLARE_MESSAGE_MAP;
 	DEFINE_BUTTON(Help);
 	DEFINE_BUTTON(Half);

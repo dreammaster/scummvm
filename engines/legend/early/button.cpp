@@ -40,7 +40,7 @@ void Button::draw() {
 	// Draw the button
 	Graphics::ManagedSurface s = getSurface();
 	// TODO:
-	s.fillRect(s.getBounds(), 1);
+	s.fillRect(s.getBounds(), 15);
 }
 
 bool Button::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {

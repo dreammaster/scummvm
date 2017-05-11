@@ -29,30 +29,32 @@ namespace Early {
 EMPTY_MESSAGE_MAP(CommandButtons, Gfx::VisualContainer);
 
 CommandButtons::CommandButtons(const Common::String &name, const Common::Rect &r) :
-		Gfx::VisualContainer(name, r),
-		_btnPicture(Common::Rect(33, 3, 115, 25)),
-		_btnStatus(Common::Rect(33, 30, 115, 52)),
-		_btnInventory(Common::Rect(33, 57, 115, 79)),
-		_btnLook(Common::Rect(33, 84, 115, 106)),
-		_btnHelp(Common::Rect(4, 3, 47, 3)),
-		_btnHalf(Common::Rect(4, 30, 47, 30)),
+		BoxedElement(name, r),
+		_btnPicture(Common::Rect(51, 3, 115, 25)),
+		_btnStatus(Common::Rect(51, 30, 115, 52)),
+		_btnInventory(Common::Rect(51, 57, 115, 79)),
+		_btnLook(Common::Rect(51, 84, 115, 106)),
+		_btnHelp(Common::Rect(4, 3, 47, 25)),
+		_btnHalf(Common::Rect(4, 30, 47, 52)),
 		_btnText(Common::Rect(4, 57, 47, 79)),
 		_btnErase(Common::Rect(4, 84, 47, 106)),
 		_btnDo(Common::Rect(4, 111, 115, 133)) {
+	_btnPicture.addUnder(this);
+	_btnStatus.addUnder(this);
+	_btnInventory.addUnder(this);
+	_btnLook.addUnder(this);
+	_btnHelp.addUnder(this);
+	_btnHalf.addUnder(this);
+	_btnText.addUnder(this);
+	_btnErase.addUnder(this);
+	_btnDo.addUnder(this);
 }
 
 void CommandButtons::draw() {
 	if (!_isDirty)
 		return;
 
-	// Draw the background
-	Graphics::ManagedSurface s = getSurface();
-	Common::Rect r = s.getBounds();
-	s.fillRect(r, 15);
-	r.grow(-1);
-	s.fillRect(r, 0);
-
-	Gfx::VisualContainer::draw();
+	BoxedElement::draw();
 }
 
 void CommandButtons::PictureButton::execute() {

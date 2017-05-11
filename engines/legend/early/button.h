@@ -33,7 +33,7 @@ class Button : public Gfx::VisualItem {
 	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
 public:
 	CLASSDEF;
-	Button(const Common::Rect &r) : Gfx::VisualItem() {}
+	Button(const Common::Rect &r) : Gfx::VisualItem(r) {}
 	virtual ~Button() {}
 
 	/**
