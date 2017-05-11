@@ -30,15 +30,15 @@ EMPTY_MESSAGE_MAP(CommandButtons, Gfx::VisualContainer);
 
 CommandButtons::CommandButtons(const Common::String &name, const Common::Rect &r) :
 		BoxedElement(name, r),
-		_btnPicture(Common::Rect(51, 3, 115, 25)),
-		_btnStatus(Common::Rect(51, 30, 115, 52)),
-		_btnInventory(Common::Rect(51, 57, 115, 79)),
-		_btnLook(Common::Rect(51, 84, 115, 106)),
-		_btnHelp(Common::Rect(4, 3, 47, 25)),
-		_btnHalf(Common::Rect(4, 30, 47, 52)),
-		_btnText(Common::Rect(4, 57, 47, 79)),
-		_btnErase(Common::Rect(4, 84, 47, 106)),
-		_btnDo(Common::Rect(4, 111, 115, 133)) {
+		_btnPicture(Common::Rect(51, 3, 115, 26)),
+		_btnStatus(Common::Rect(51, 30, 115, 53)),
+		_btnInventory(Common::Rect(51, 57, 115, 80)),
+		_btnLook(Common::Rect(51, 84, 115, 107)),
+		_btnHelp(Common::Rect(4, 3, 47, 26)),
+		_btnHalf(Common::Rect(4, 30, 47, 53)),
+		_btnText(Common::Rect(4, 57, 47, 80)),
+		_btnErase(Common::Rect(4, 84, 47, 107)),
+		_btnDo(Common::Rect(4, 111, 115, 134)) {
 	_btnPicture.addUnder(this);
 	_btnStatus.addUnder(this);
 	_btnInventory.addUnder(this);
