@@ -39,14 +39,15 @@ void MouseCursor::MouseCursorData::load(Common::SeekableReadStream &s) {
 /*-------------------------------------------------------------------*/
 
 MouseCursor::MouseCursor(LegendEngine *vm) {
-	int count;
-	const MouseCursorData *data;
-
 	switch (vm->getGameID()) {
 	case GType_CompanionsOfXanth:
 		loadCursors("XANTH/CURSORS");
 		break;
 	default:
+		if (!vm->isLater()) {
+			loadCursors("EARLY/CURSORS");
+			break;
+		}
 		return;
 	}
 

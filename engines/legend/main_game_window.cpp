@@ -48,9 +48,7 @@ void MainGameWindow::applicationStarting() {
 	_gameManager = new GameManager(_project, g_vm->_mixer);
 
 	// Set the starting game view
-	if (g_vm->getGameID() == GType_CompanionsOfXanth) {
-		g_vm->_mouseCursor->show();
-	}
+	g_vm->_mouseCursor->show();
 
 	const char *name = g_vm->getGameID() == GType_Gateway ? "Scene" : "Compendium";
 	Gfx::VisualItem *firstView = dynamic_cast<Gfx::VisualItem *>(_project->findByName(name));

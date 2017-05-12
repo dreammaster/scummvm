@@ -34,6 +34,14 @@ namespace Legend {
 
 class LegendEngine;
 
+namespace Early {
+
+enum CursorId {
+	CURSOR_ARROW = 0
+};
+
+} // End of namespace Early
+
 namespace Later {
 namespace Xanth {
 
