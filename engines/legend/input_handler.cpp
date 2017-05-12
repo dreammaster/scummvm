@@ -86,13 +86,9 @@ void InputHandler::processMessage(CMessage *msg) {
 }
 
 void InputHandler::dispatchMessage(CMessage *msg) {
-	/*
-	CPetControl *pet = _gameManager->_project->getPetControl();
-	if (!pet || !msg->execute(pet, nullptr, MSGFLAG_BREAK_IF_HANDLED)) {
-		CViewItem *view = _gameManager->getView();
+	Gfx::VisualItem *view = _gameManager->getView();
+	if (view)
 		msg->execute(view);
-	}
-	*/
 }
 
 } // End of namespace Legend

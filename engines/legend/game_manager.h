@@ -120,7 +120,7 @@ public:
 	/**
 	 * Returns the currently active visual item
 	 */
-	Gfx::VisualItem *view() const { return _view; }
+	Gfx::VisualItem *getView() const { return _view; }
 
 	/**
 	 * Changes to a different view

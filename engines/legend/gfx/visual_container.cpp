@@ -25,7 +25,55 @@
 namespace Legend {
 namespace Gfx {
 
-EMPTY_MESSAGE_MAP(VisualContainer, VisualItem);
+BEGIN_MESSAGE_MAP(VisualContainer, VisualItem)
+	ON_MESSAGE(MouseButtonDownMsg)
+	ON_MESSAGE(MouseButtonUpMsg)
+	ON_MESSAGE(MouseMoveMsg)
+	ON_MESSAGE(MouseDoubleClickMsg)
+END_MESSAGE_MAP()
+
+
+bool VisualContainer::MouseButtonDownMsg(CMouseButtonDownMsg *msg) {
+	if (msg->_buttons & MB_LEFT)
+		handleMouseMsg(msg);
+
+	return true;
+}
+
+bool VisualContainer::MouseButtonUpMsg(CMouseButtonUpMsg *msg) {
+	if (msg->_buttons & MB_LEFT)
+		handleMouseMsg(msg);
+
+	return true;
+}
+
+bool VisualContainer::MouseDoubleClickMsg(CMouseDoubleClickMsg *msg) {
+	if (msg->_buttons & MB_LEFT)
+		handleMouseMsg(msg);
+
+	return true;
+}
+
+bool VisualContainer::MouseMoveMsg(CMouseMoveMsg *msg) {
+	if (msg->_buttons & MB_LEFT)
+		handleMouseMsg(msg);
+
+	return true;
+}
+
+bool VisualContainer::handleMouseMsg(CMouseMsg *msg) {
+	// Iterate through each child and pass the message to the first
+	// immediate child the mouse position falls within
+	for (TreeItem *child = getFirstChild(); child; child = child->getNextSibling()) {
+		VisualItem *item = dynamic_cast<VisualItem *>(child);
+		if (item && item->getBounds().contains(msg->_mousePos)) {
+			if (msg->execute(item))
+				break;
+		}
+	}
+
+	return true;
+}
 
 void VisualContainer::draw() {
 	if (!_isDirty)

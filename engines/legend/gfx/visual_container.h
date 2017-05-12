@@ -30,6 +30,15 @@ namespace Gfx {
 
 class VisualContainer : public Image {
 	DECLARE_MESSAGE_MAP;
+	bool MouseButtonDownMsg(CMouseButtonDownMsg *msg);
+	bool MouseButtonUpMsg(CMouseButtonUpMsg *msg);
+	bool MouseMoveMsg(CMouseMoveMsg *msg);
+	bool MouseDoubleClickMsg(CMouseDoubleClickMsg *msg);
+private:
+	/**
+	 * Called to handle mouse messagaes on the view
+	 */
+	bool handleMouseMsg(CMouseMsg *msg);
 public:
 	CLASSDEF;
 	VisualContainer() : Image() {}
