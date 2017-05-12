@@ -51,7 +51,7 @@ const char *HELP_TEXT[38 * 2] = {
 	"<Esc>", "erases all typing",
 	"<Enter>", "execute command",
 	nullptr, nullptr,
-	"Mouse Commands on the Pictures:",
+	"Mouse Commands on the Pictures:", nullptr,
 	"Single-click:", "\"look at\" object",
 	"Double-click:", "do 'obvious' thing to object",
 	nullptr, nullptr,
