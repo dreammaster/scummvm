@@ -31,7 +31,7 @@ void BoxedElement::draw() {
 	if (!_isDirty)
 		return;
 
-	Graphics::ManagedSurface s = getSurface();
+	Gfx::VisualSurface s = getSurface();
 	Common::Rect r = s.getBounds();
 	s.frameRect(r, 15);
 	r.grow(-1);

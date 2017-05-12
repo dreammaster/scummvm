@@ -44,22 +44,22 @@ void HelpScreen::draw() {
 	VisualItem::draw();
 
 	// Fill out the background
-	Graphics::ManagedSurface surface = getSurface();
-	surface.fillRect(surface.getBounds(), 0);
+	Gfx::VisualSurface s = getSurface();
+	s.fillRect(s.getBounds(), 0);
 
-	loadFont(1);
-	setFontColor(Screen::get()._defaultTextColor);
+	s.loadFont(1);
+	s.setFontColor(Screen::get()._defaultTextColor);
 
 	// Write out the help
-	Common::SeekableReadStream *s = g_vm->_res->getResource("EARLY/HELP");
+	Common::SeekableReadStream *stream = g_vm->_res->getResource("EARLY/HELP");
 
-	for (int idx = 0; s->pos() < s->size(); ++idx) {
-		Common::String msg1 = readStringFromStream(s);
-		Common::String msg2 = readStringFromStream(s);
+	for (int idx = 0; stream->pos() < stream->size(); ++idx) {
+		Common::String msg1 = readStringFromStream(stream);
+		Common::String msg2 = readStringFromStream(stream);
 
 		int xp = idx < 22 ? 24 : 312;
 		int yp = (idx >= 22 ? idx - 22 : idx) * Gfx::Font::_lineHeight
-			+ 64 + _fontCenter.y;
+			+ 64 + s.getFontCenter().y;
 
 		int xs;
 		if (idx < 11)
@@ -71,18 +71,18 @@ void HelpScreen::draw() {
 
 		if (!msg2.empty()) {
 			// It's a key/purpose pair
-			setTextPos(Common::Point(xp + 16, yp));
-			writeString(msg1);
-			setTextPos(Common::Point(xp + xs, yp));
-			writeString(msg2);
+			s.setTextPos(Common::Point(xp + 16, yp));
+			s.writeString(msg1);
+			s.setTextPos(Common::Point(xp + xs, yp));
+			s.writeString(msg2);
 		} else if (!msg1.empty()) {
 			// It's a section title
-			setTextPos(Common::Point(xp, yp));
-			writeString(msg1);
+			s.setTextPos(Common::Point(xp, yp));
+			s.writeString(msg1);
 		}
 	}
 
-	delete s;
+	delete stream;
 }
 
 bool HelpScreen::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {

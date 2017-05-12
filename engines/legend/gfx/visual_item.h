@@ -30,13 +30,84 @@
 namespace Legend {
 namespace Gfx {
 
+class VisualItem;
+
+/**
+ * Font related details
+ */
+struct FontDetails {
+	int _fontNumber;
+	Common::Point _fontCenter;
+	int _horizSpacings;
+	int _flags1;
+	Common::Point _writePos;
+
+	FontDetails() : _fontNumber(-1), _horizSpacings(-1), _flags1(0) {}
+	void reset();
+};
+
+class VisualSurface : public Graphics::ManagedSurface {
+private:
+	FontDetails &_font;
+	const Common::Rect &_bounds;
+public:
+	VisualSurface(const Graphics::ManagedSurface &src,
+		FontDetails &fontDetails, const Common::Rect &bounds);
+
+	/**
+	 * Loads a font to use for the item
+	 */
+	Font *loadFont(int fontNumber);
+
+	/**
+	 * Set the position for writing text in screen-coordinates
+	 * @remarks		All text is clipped to the bounds of the visual item
+	 */
+	void setTextPos(const Common::Point &pt) {
+		_font._writePos = Common::Point(pt.x - _bounds.left, pt.y - _bounds.top);
+	}
+
+	/**
+	 * Sets the postion or writing text relative to the top-left corner of the visual item's bounds
+	 */
+	void setRelativeTextPos(const Common::Point &pt) { _font._writePos = pt; }
+
+	/**
+	 * Set the font color
+	 */
+	void setFontColor(int fgColor, int bgColor = -1);
+
+	/**
+	 * Writes a string
+	 */
+	void writeString(const Common::String &msg);
+
+	/**
+	 * Writes a string
+	 */
+	void writeString(const Common::Point &pt, const Common::String &msg);
+
+	/**
+	 * Get the width of a string
+	 */
+	int stringWidth(const Common::String &msg);
+
+	/**
+	 * Return the font center
+	 */
+	Common::Point getFontCenter() const { return _font._fontCenter; }
+};
+
 /**
  * Acts as the base class for all classes that have a visual representation on the screen
  */
 class VisualItem : public NamedItem {
+	friend class VisualSurface;
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
 	bool HideMsg(CHideMsg &msg);
+private:
+	FontDetails _fontDetails;
 private:
 	/**
 	 * Common initialization method used by the constructors
@@ -45,11 +116,6 @@ private:
 protected:
 	Common::Rect _bounds;
 	bool _isDirty;
-	int _fontNumber;
-	Common::Point _fontCenter;
-	int _fontHorizSpacings;
-	int _fontDetailsFlags1;
-	Common::Point _fontWritePos;
 public:
 	CLASSDEF;
 	VisualItem() { init(); }
@@ -69,7 +135,7 @@ public:
 	 * Gets a managed surface representing the portion of the screen defined by _bounds.
 	 * This allows drawing to be done without worrying about offsets or clipping
 	 */
-	Graphics::ManagedSurface getSurface() const;
+	VisualSurface getSurface();
 
 	/**
 	 * Gets the bounds for the item
@@ -97,44 +163,6 @@ public:
 	 * Helper function to switch to a different visual item
 	 */
 	void changeView(const Common::String &name);
-
-	/**
-	 * Loads a font to use for the item
-	 */
-	Font *loadFont(int fontNumber);
-
-	/**
-	 * Set the position for writing text in screen-coordinates
-	 * @remarks		All text is clipped to the bounds of the visual item
-	 */
-	void setTextPos(const Common::Point &pt) {
-		_fontWritePos = Common::Point(pt.x - _bounds.left, pt.y - _bounds.top);
-	}
-
-	/**
-	 * Sets the postion or writing text relative to the top-left corner of the visual item's bounds
-	 */
-	void setRelativeTextPos(const Common::Point &pt) { _fontWritePos = pt; }
-
-	/**
-	 * Set the font color
-	 */
-	void setFontColor(int fgColor, int bgColor = -1);
-
-	/**
-	 * Writes a string
-	 */
-	void writeString(const Common::String &msg);
-
-	/**
-	 * Writes a string
-	 */
-	void writeString(const Common::Point &pt, const Common::String &msg);
-
-	/**
-	 * Get the width of a string
-	 */
-	int stringWidth(const Common::String &msg);
 };
 
 } // End of namespace Gfx

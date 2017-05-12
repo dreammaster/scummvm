@@ -31,18 +31,66 @@ BEGIN_MESSAGE_MAP(VisualItem, NamedItem)
 	ON_MESSAGE(HideMsg)
 END_MESSAGE_MAP()
 
+void FontDetails::reset() {
+	_fontNumber = -1;
+	_horizSpacings = -1;
+	_flags1 = 0;
+}
+
+/*-------------------------------------------------------------------*/
+
+VisualSurface::VisualSurface(const Graphics::ManagedSurface &src,
+		FontDetails &fontDetails, const Common::Rect &bounds) :
+		Graphics::ManagedSurface(src), _font(fontDetails), _bounds(bounds) {
+}
+
+Font *VisualSurface::loadFont(int fontNumber) {
+	_font.reset();
+	Font *font = Font::loadFont(fontNumber);
+	assert(font);
+
+	_font._fontNumber = font->_fontNumber;
+	_font._fontCenter = Common::Point(font->_xCenter, font->_yCenter);
+	return font;
+}
+
+void VisualSurface::setFontColor(int fgColor, int bgColor) {
+	Font::setColor(fgColor, bgColor);
+}
+
+void VisualSurface::writeString(const Common::String &msg) {
+	// Ensure the correct font is active
+	Font *font = Font::_activeFont;
+	if (Font::_activeFont->_fontNumber != _font._fontNumber) {
+		assert(_font._fontNumber > 0);
+		loadFont(_font._fontNumber);
+	}
+
+	// Write out the text
+	font->writeString(*this, _font._writePos, msg);
+}
+
+void VisualSurface::writeString(const Common::Point &pt, const Common::String &msg) {
+	setTextPos(pt);
+	writeString(msg);
+}
+
+int VisualSurface::stringWidth(const Common::String &msg) {
+	Font *font = Font::_activeFont;
+	return font->stringWidth(msg);
+}
+
+/*-------------------------------------------------------------------*/
+
 void VisualItem::init() {
 	_isDirty = true;
-	_fontNumber = -1;
-	_fontHorizSpacings = -1;
-	_fontDetailsFlags1 = 0;
 }
 
 bool VisualItem::ShowMsg(CShowMsg &msg) {
 	// When a view is shown, mark it to be redrawn
 	_isDirty = true;
 	Font *font = Font::getActiveFont();
-	_fontNumber = font ? font->_fontNumber : -1;
+	_fontDetails._fontNumber = font ? font->_fontNumber : -1;
 
 	return false;
 }
@@ -53,9 +101,9 @@ bool VisualItem::HideMsg(CHideMsg &msg) {
 	return false;
 }
 
-Graphics::ManagedSurface VisualItem::getSurface() const {
-	assert(!_bounds.isEmpty());
-	return Graphics::ManagedSurface(Screen::get(), _bounds);
+VisualSurface VisualItem::getSurface() {
+	Graphics::ManagedSurface src(Screen::get(), _bounds);
+	return VisualSurface(src, _fontDetails, _bounds);
 }
 
 void VisualItem::setBounds(const Common::Rect &r) {
@@ -83,45 +131,6 @@ void VisualItem::setDirty() {
 
 void VisualItem::changeView(const Common::String &name) {
 	getGameManager()->changeView(name);
-}
-
-Font *VisualItem::loadFont(int fontNumber) {
-	init();
-	Font *font = Font::loadFont(fontNumber);
-	assert(font);
-
-	_fontNumber = font->_fontNumber;
-	_fontCenter = Common::Point(font->_xCenter, font->_yCenter);
-	return font;
-}
-
-void VisualItem::setFontColor(int fgColor, int bgColor) {
-	Font::setColor(fgColor, bgColor);
-}
-
-void VisualItem::writeString(const Common::String &msg) {
-	// Get the surface area the visual item covers
-	Graphics::ManagedSurface surface = getSurface();
-
-	// Ensure the correct font is active
-	Font *font = Font::_activeFont;
-	if (Font::_activeFont->_fontNumber != _fontNumber) {
-		assert(_fontNumber > 0);
-		loadFont(_fontNumber);
-	}
-
-	// Write out the text
-	font->writeString(surface, _fontWritePos, msg);
-}
-
-void VisualItem::writeString(const Common::Point &pt, const Common::String &msg) {
-	setTextPos(pt);
-	writeString(msg);
-}
-
-int VisualItem::stringWidth(const Common::String &msg) {
-	Font *font = Font::_activeFont;
-	return font->stringWidth(msg);
 }
 
 } // End of namespace Gfx

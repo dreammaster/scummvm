@@ -38,7 +38,7 @@ void Button::draw() {
 	Gfx::VisualItem::draw();
 
 	// Get the surface
-	Graphics::ManagedSurface s = getSurface();
+	Gfx::VisualSurface s = getSurface();
 
 	// White background
 	Common::Rect r = s.getBounds();
@@ -57,11 +57,11 @@ void Button::draw() {
 	s.fillRect(Common::Rect(r.left + 3, r.top + 3, r.right - 3, r.bottom - 3), LIGHT_GRAY);
 
 	// Handle writing the button text
-	loadFont(1);
-	setFontColor(BLACK);
-	int strWidth = stringWidth(_text);
+	s.loadFont(1);
+	s.setFontColor(BLACK);
+	int strWidth = s.stringWidth(_text);
 	int xp = _bounds.left + (_bounds.width() - strWidth) / 2;
-	writeString(Common::Point(xp, _bounds.top + 5), _text);
+	s.writeString(Common::Point(xp, _bounds.top + 5), _text);
 }
 
 bool Button::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
