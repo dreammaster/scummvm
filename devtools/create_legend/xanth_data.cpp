@@ -50,6 +50,10 @@ void writeCursors() {
 	writeCursor(0x29B20);	// Small arrow
 	writeCursor(0x29B60);	// Tick arrow
 	writeCursor(0x29BA0);	// Hourglass arrow
+
+	// Reuse the small arrow cursor for the earlier games
+	writeEntryHeader("EARLY/CURSORS", 1 * (2 + 2 + 64));
+	writeCursor(0x29B20);	// Small arrow
 }
 
 void writeConversationData() {
