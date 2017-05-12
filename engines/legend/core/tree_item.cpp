@@ -23,7 +23,6 @@
 #include "legend/core/tree_item.h"
 #include "legend/core/named_item.h"
 #include "legend/core/project_item.h"
-#include "legend/gfx/room_item.h"
 #include "legend/game_manager.h"
 
 namespace Legend {

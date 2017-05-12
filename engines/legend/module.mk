@@ -13,9 +13,7 @@ MODULE_OBJS = \
 	gfx/font.o \
 	gfx/gfx.o \
 	gfx/image.o \
-	gfx/lines.o \
 	gfx/picture.o \
-	gfx/room_item.o \
 	gfx/screen.o \
 	gfx/visual_container.o \
 	gfx/visual_item.o \

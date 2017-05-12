@@ -30,7 +30,7 @@ namespace Early {
 
 class HelpScreen : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
-	bool MouseButtonMsg(CMouseButtonMsg &msg);
+	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
 	bool KeyCharMsg(CKeyCharMsg &msg);
 public:
 	CLASSDEF;

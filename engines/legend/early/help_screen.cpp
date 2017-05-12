@@ -29,7 +29,7 @@ namespace Legend {
 namespace Early {
 
 BEGIN_MESSAGE_MAP(HelpScreen, VisualItem)
-	ON_MESSAGE(MouseButtonMsg)
+	ON_MESSAGE(MouseButtonDownMsg)
 	ON_MESSAGE(KeyCharMsg)
 END_MESSAGE_MAP()
 
@@ -85,13 +85,13 @@ void HelpScreen::draw() {
 	delete s;
 }
 
-bool HelpScreen::MouseButtonMsg(CMouseButtonMsg &msg) {
-	// TODO: Leave help screen
+bool HelpScreen::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
+	changeView("Scene");
 	return true;
 }
 
 bool HelpScreen::KeyCharMsg(CKeyCharMsg &msg) {
-	// TODO: Leave help screen
+	changeView("Scene");
 	return true;
 }
 
