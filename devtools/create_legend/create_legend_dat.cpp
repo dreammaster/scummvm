@@ -35,6 +35,7 @@
 #include "common/language.h"
 #include "file.h"
 #include "early_data.h"
+#include "gateway_data.h"
 #include "xanth_data.h"
 
 /**
@@ -133,6 +134,8 @@ int main(int argc, char *argv[]) {
 
 		if (inputFile.size() == XANTH_FILESIZE) {
 			writeXanthData();
+		} else if (inputFile.size() == GATEWAY_FILESIZE) {
+			writeGatewayData();
 		} else {
 			printf("Unknown Legend game specified\n");
 			exit(0);

@@ -20,11 +20,13 @@
  *
  */
 
-#ifndef LEGEND_EARLY_DATA_H
-#define LEGEND_EARLY_DATA_H
+#ifndef LEGEND_GATEWAY_DATA_H
+#define LEGEND_GATEWAY_DATA_H
 
 #include "common/scummsys.h"
 
-extern void writeEarlyGamesData();
+#define GATEWAY_FILESIZE 155400
+
+extern void writeGatewayData();
 
 #endif

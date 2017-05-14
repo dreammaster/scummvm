@@ -20,11 +20,18 @@
  *
  */
 
-#ifndef LEGEND_EARLY_DATA_H
-#define LEGEND_EARLY_DATA_H
+ // Disable symbol overrides so that we can use system headers.
+#define FORBIDDEN_SYMBOL_ALLOW_ALL
 
-#include "common/scummsys.h"
+ // HACK to allow building with the SDL backend on MinGW
+ // see bug #1800764 "TOOLS: MinGW tools building broken"
+#ifdef main
+#undef main
+#endif // main
 
-extern void writeEarlyGamesData();
+#include "gateway_data.h"
+#include "create_legend_dat.h"
 
-#endif
+void writeGatewayData() {
+	writeEntry("GATEWAY/COMMANDS", 0x1064e, 206 * 2 * 2);
+}
