@@ -20,21 +20,21 @@
  *
  */
 
-#ifndef LEGEND_EARLY_SCROLL_LIST_H
-#define LEGEND_EARLY_SCROLL_LIST_H
+#ifndef LEGEND_EARLY_LISTBOX_H
+#define LEGEND_EARLY_LISTBOX_H
 
 #include "legend/early/boxed_element.h"
 
 namespace Legend {
 namespace Early {
 
-class ScrollList : public BoxedElement {
+class Listbox : public BoxedElement {
 	DECLARE_MESSAGE_MAP;
 public:
 	CLASSDEF;
-	ScrollList(const Common::String &name, const Common::Rect &r) :
+	Listbox(const Common::String &name, const Common::Rect &r) :
 		BoxedElement(name, r) {}
-	virtual ~ScrollList() {}
+	virtual ~Listbox() {}
 };
 
 } // End of namespace Early

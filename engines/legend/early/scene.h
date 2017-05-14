@@ -27,7 +27,7 @@
 #include "legend/gfx/compass.h"
 #include "legend/early/command_buttons.h"
 #include "legend/early/scene_picture.h"
-#include "legend/early/scroll_list.h"
+#include "legend/early/listbox.h"
 #include "legend/early/text_area.h"
 
 namespace Legend {
@@ -39,8 +39,8 @@ private:
 	CommandButtons _commandButtons;
 	Gfx::Compass _compass;
 	ScenePicture _scenePicture;
-	ScrollList _commands;
-	ScrollList _items;
+	Listbox _commands;
+	Listbox _items;
 	TextArea _textArea;
 public:
 	CLASSDEF;

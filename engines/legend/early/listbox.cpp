@@ -20,12 +20,12 @@
  *
  */
 
-#include "legend/early/scroll_list.h"
+#include "legend/early/listbox.h"
 
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(ScrollList, BoxedElement);
+EMPTY_MESSAGE_MAP(Listbox, BoxedElement);
 
 } // End of namespace Early
 } // End of namespace Legend
