@@ -42,7 +42,7 @@ class CommandButtons : public BoxedElement {
 	DEFINE_BUTTON(Do);
 public:
 	CLASSDEF;
-	CommandButtons(const Common::String &name, const Common::Rect &r);
+	CommandButtons(const String &name, const Common::Rect &r);
 	virtual ~CommandButtons() {}
 
 	/**

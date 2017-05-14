@@ -32,7 +32,7 @@ class Listbox : public BoxedElement {
 	DECLARE_MESSAGE_MAP;
 public:
 	CLASSDEF;
-	Listbox(const Common::String &name, const Common::Rect &r) :
+	Listbox(const String &name, const Common::Rect &r) :
 		BoxedElement(name, r) {}
 	virtual ~Listbox() {}
 };

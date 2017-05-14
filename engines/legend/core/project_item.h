@@ -29,12 +29,13 @@
 #include "graphics/surface.h"
 #include "legend/core/file.h"
 #include "legend/core/named_item.h"
+#include "legend/core/string.h"
 
 namespace Legend {
 
 struct LegendSavegameHeader {
 	uint8 _version;
-	Common::String _saveName;
+	String _saveName;
 	Graphics::Surface *_thumbnail;
 	int _year, _month, _day;
 	int _hour, _minute;
@@ -76,7 +77,7 @@ public:
 	/**
 	 * Load a list of savegames
 	 */
-	static SaveStateList getSavegameList(const Common::String &target);
+	static SaveStateList getSavegameList(const String &target);
 
 	/**
 	 * Write out the header information for a savegame
@@ -130,7 +131,7 @@ public:
 	/**
 	 * Save the entire project data to a given savegame slot
 	 */
-	void saveGame(int slotId, const Common::String &desc);
+	void saveGame(int slotId, const String &desc);
 
 	/**
 	 * Clear any currently loaded project

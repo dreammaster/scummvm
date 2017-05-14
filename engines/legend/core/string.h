@@ -20,29 +20,34 @@
  *
  */
 
-#ifndef LEGEND_EARLY_SCENE_PICTURE_H
-#define LEGEND_EARLY_SCENE_PICTURE_H
+#ifndef LEGEND_STRING_H
+#define LEGEND_STRING_H
 
-#include "legend/early/boxed_element.h"
+#include "common/array.h"
+#include "common/str.h"
 
 namespace Legend {
-namespace Early {
 
-class ScenePicture : public BoxedElement {
-	DECLARE_MESSAGE_MAP;
+/**
+ * String class that derives from the standard ScummVM String class
+ */
+class String : public Common::String {
 public:
-	CLASSDEF;
-	ScenePicture(const String &name, const Common::Rect &r) :
-		BoxedElement(name, r) {}
-	virtual ~ScenePicture() {}
+	String() : Common::String() {}
+	String(const char *str) : Common::String(str) {}
+	String(const char *str, uint32 len) : Common::String(str, len) {}
+	String(const char *beginP, const char *endP) : Common::String(beginP, endP) {}
+	String(const Common::String &str) : Common::String(str) {}
+	explicit String(char c) : Common::String(c) {}
 
 	/**
-	 * Draws the visual item on the screen
+	 * Initialises a string from a given resource Id
 	 */
-	virtual void draw();
+	String(uint id);
 };
 
-} // End of namespace Early
+typedef Common::Array<String> StringArray;
+
 } // End of namespace Legend
 
 #endif

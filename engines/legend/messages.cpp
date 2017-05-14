@@ -63,7 +63,7 @@ bool CMessage::execute(TreeItem *target, const ClassDef *classDef, int flags) {
 	return result;
 }
 
-bool CMessage::execute(const Common::String &target, const ClassDef *classDef, int flags) {
+bool CMessage::execute(const String &target, const ClassDef *classDef, int flags) {
 	// Scan for the target by name
 	ProjectItem *project = g_vm->_window->_project;
 	for (TreeItem *treeItem = project; treeItem; treeItem = treeItem->scan(project)) {

@@ -103,7 +103,7 @@ public:
 	 * Executes the message, passing it on to the designated target,
 	 * and optionally it's children
 	 */
-	bool execute(const Common::String &target, const ClassDef *classDef = nullptr,
+	bool execute(const String &target, const ClassDef *classDef = nullptr,
 		int flags = MSGFLAG_SCAN | MSGFLAG_BREAK_IF_HANDLED);
 
 	/**

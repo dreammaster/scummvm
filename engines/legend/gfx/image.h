@@ -57,8 +57,8 @@ public:
 	CLASSDEF;
 	Image() : VisualItem() { setup(); }
 	Image(const Common::Rect &r) : VisualItem(r) { setup(); }
-	Image(const Common::String &name) : VisualItem(name) { setup(); }
-	Image(const Common::String &name, const Common::Rect &r) : VisualItem(name, r) { setup(); }
+	Image(const String &name) : VisualItem(name) { setup(); }
+	Image(const String &name, const Common::Rect &r) : VisualItem(name, r) { setup(); }
 	~Image();
 
 	/**

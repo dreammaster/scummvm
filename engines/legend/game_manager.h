@@ -125,7 +125,7 @@ public:
 	/**
 	 * Changes to a different view
 	 */
-	void changeView(const Common::String &name);
+	void changeView(const String &name);
 };
 
 } // End of namespace Legend

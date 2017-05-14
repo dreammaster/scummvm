@@ -140,12 +140,12 @@ public:
 	/**
 	 * Returns the prefix games use for certain data files
 	 */
-	Common::String getGameFilePrefix() const;
+	String getGameFilePrefix() const;
 
 	/**
 	 * Returns a formatted filename for a given resource type and file number
 	 */
-	Common::String getFilename(FileType fileType, int fileNumber);
+	String getFilename(FileType fileType, int fileNumber);
 };
 
 extern LegendEngine *g_vm;

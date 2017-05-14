@@ -58,7 +58,7 @@ void VisualSurface::setFontColor(int fgColor, int bgColor) {
 	Font::setColor(fgColor, bgColor);
 }
 
-void VisualSurface::writeString(const Common::String &msg) {
+void VisualSurface::writeString(const String &msg) {
 	// Ensure the correct font is active
 	Font *font = Font::_activeFont;
 	if (Font::_activeFont->_fontNumber != _font._fontNumber) {
@@ -70,12 +70,12 @@ void VisualSurface::writeString(const Common::String &msg) {
 	font->writeString(*this, _font._writePos, msg);
 }
 
-void VisualSurface::writeString(const Common::Point &pt, const Common::String &msg) {
+void VisualSurface::writeString(const Common::Point &pt, const String &msg) {
 	setTextPos(pt);
 	writeString(msg);
 }
 
-int VisualSurface::stringWidth(const Common::String &msg) {
+int VisualSurface::stringWidth(const String &msg) {
 	Font *font = Font::_activeFont;
 	return font->stringWidth(msg);
 }
@@ -129,7 +129,7 @@ void VisualItem::setDirty() {
 	}
 }
 
-void VisualItem::changeView(const Common::String &name) {
+void VisualItem::changeView(const String &name) {
 	getGameManager()->changeView(name);
 }
 

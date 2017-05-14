@@ -43,8 +43,8 @@ public:
 	CLASSDEF;
 	VisualContainer() : Image() {}
 	VisualContainer(const Common::Rect &r) : Image(r) {}
-	VisualContainer(const Common::String &name) : Image(name) {}
-	VisualContainer(const Common::String &name, const Common::Rect &r) : Image(name, r) {}
+	VisualContainer(const String &name) : Image(name) {}
+	VisualContainer(const String &name, const Common::Rect &r) : Image(name, r) {}
 	virtual ~VisualContainer() {}
 
 	/**

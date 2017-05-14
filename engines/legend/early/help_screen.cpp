@@ -54,8 +54,8 @@ void HelpScreen::draw() {
 	Common::SeekableReadStream *stream = g_vm->_res->getResource("EARLY/HELP");
 
 	for (int idx = 0; stream->pos() < stream->size(); ++idx) {
-		Common::String msg1 = readStringFromStream(stream);
-		Common::String msg2 = readStringFromStream(stream);
+		String msg1 = readStringFromStream(stream);
+		String msg2 = readStringFromStream(stream);
 
 		int xp = idx < 22 ? 24 : 312;
 		int yp = (idx >= 22 ? idx - 22 : idx) * Gfx::Font::_lineHeight

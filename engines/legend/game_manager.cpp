@@ -69,7 +69,7 @@ void GameManager::update() {
 	}
 }
 
-void GameManager::changeView(const Common::String &name) {
+void GameManager::changeView(const String &name) {
 	Gfx::VisualItem *newView = dynamic_cast<Gfx::VisualItem *>(_project->findByName(name));
 	assert(newView);
 

@@ -539,9 +539,9 @@ int Picture::decode(Common::SeekableReadStream *inStream) {
 	 * I can compare directly with a MEMDUMP from Dosbox Debugger
 	const byte *p = (const byte *)s.getPixels();
 	for (uint idx = 0; idx < 0xFA00; ) {
-		Common::String s = Common::String::format("515D:%.4x   ", idx);
+		String s = String::format("515D:%.4x   ", idx);
 		for (int idx2 = 0; idx2 < 16; ++idx2, ++p, ++idx)
-			s += Common::String::format("%.2x ", *p);
+			s += String::format("%.2x ", *p);
 		s.toUppercase();
 		debug(s.c_str());
 	}

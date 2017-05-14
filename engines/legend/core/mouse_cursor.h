@@ -26,6 +26,7 @@
 #include "common/scummsys.h"
 #include "common/rect.h"
 #include "common/stream.h"
+#include "legend/core/string.h"
 
 namespace Legend {
 
@@ -73,7 +74,7 @@ private:
 	/**
 	 * Loads the mosue cursors from the specified resource
 	 */
-	void loadCursors(const Common::String &name);
+	void loadCursors(const String &name);
 public:
 	MouseCursor(LegendEngine *vm);
 

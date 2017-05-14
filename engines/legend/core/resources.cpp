@@ -27,21 +27,6 @@ namespace Legend {
 
 #define MAX_TEXT_CACHE_SIZE 256
 
-LegendEngine *TextMessage::_vm;
-
-TextMessage::TextMessage(uint id) : _id(id), _msg(nullptr) {}
-
-TextMessage::TextMessage(const char *msg) : _id(0), _msg(msg) {}
-
-TextMessage::operator const char *() const {
-	if (_msg)
-		return _msg;
-	else
-		return _vm->_res->getMessage(_id);
-}
-
-/*-------------------------------------------------------------------*/
-
 void TextIndexEntry::load(Common::SeekableReadStream &f) {
 	_count = f.readUint16LE();
 	_size = f.readUint32LE();
@@ -50,9 +35,6 @@ void TextIndexEntry::load(Common::SeekableReadStream &f) {
 /*-------------------------------------------------------------------*/
 
 Resources::Resources(LegendEngine *vm) : _currentTextIndexNum(-1) {
-	_vm = vm;
-	TextMessage::_vm = vm;
-
 	loadResourceIndex();
 	loadText();
 }
@@ -69,14 +51,14 @@ void Resources::loadResourceIndex() {
 	// Read in entries
 	uint offset, size;
 	char c;
-	Common::String resourceName;
+	String resourceName;
 	for (;;) {
 		offset = _datFile.readUint32LE();
 		size = _datFile.readUint32LE();
 		if (offset == 0 && size == 0)
 			break;
 
-		Common::String resName;
+		String resName;
 		while ((c = _datFile.readByte()) != '\0')
 			resName += c;
 
@@ -85,8 +67,8 @@ void Resources::loadResourceIndex() {
 }
 
 void Resources::loadText() {
-	Common::String prefix = _vm->getGameFilePrefix();
-	Common::String filename = Common::String::format("%sstr.dat", prefix.c_str());
+	String prefix = g_vm->getGameFilePrefix();
+	String filename = String::format("%sstr.dat", prefix.c_str());
 	_textFile.open(filename);
 
 	int count = _textFile.readUint16LE();
@@ -125,7 +107,7 @@ void Resources::loadText() {
 
 		// Extract the strings from the data block
 		for (uint idx = 0; idx < _wordList.size(); ++idx)
-			_wordList[idx] = Common::String(data + offsets[idx]);
+			_wordList[idx] = String(data + offsets[idx]);
 
 		delete[] data;
 	}
@@ -137,7 +119,7 @@ void Resources::loadText() {
 	}
 }
 
-const char *Resources::getMessage(uint id) {
+Common::String Resources::getMessage(uint id) {
 	assert((id >> 16) >= 0xF000 && (id >> 16) <= 0xF100);
 	id &= 0xFFFFFFF;
 	int sectionNum = id >> 16;
@@ -202,8 +184,8 @@ const char *Resources::getMessage(uint id) {
 
 #define EOS (stream->pos() >= stream->size())
 
-Common::String Resources::decompressText(Common::SeekableReadStream *stream) {
-	Common::String result;
+String Resources::decompressText(Common::SeekableReadStream *stream) {
+	String result;
 	int nextVal = -1;
 	int bitCounter = 0;
 	byte srcByte = 0;
@@ -249,7 +231,7 @@ Common::String Resources::decompressText(Common::SeekableReadStream *stream) {
 
 #undef EOS
 
-Common::SeekableReadStream *Resources::getResource(const Common::String &name) {
+Common::SeekableReadStream *Resources::getResource(const String &name) {
 	ResourceEntry resEntry = _resources[name];
 
 	_datFile.seek(resEntry._offset);

@@ -244,7 +244,7 @@ void Font::writeChar(Graphics::ManagedSurface &surface, Common::Point &textPos, 
 	}
 }
 
-void Font::writeString(Graphics::ManagedSurface &surface, Common::Point &textPos, const Common::String &msg) {
+void Font::writeString(Graphics::ManagedSurface &surface, Common::Point &textPos, const String &msg) {
 	const char *msgP = msg.c_str();
 	assert(_activeFont && _activeFont->_fontNumber > 0);
 
@@ -265,7 +265,7 @@ uint Font::charWidth(char c) const {
 		return _fixedWidth + _fixedSpacing;
 }
 
-uint Font::stringWidth(const Common::String &msg) const {
+uint Font::stringWidth(const String &msg) const {
 	const char *msgP = msg.c_str();
 	uint total = 0;
 	while (*msgP)

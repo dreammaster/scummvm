@@ -43,7 +43,7 @@ private:
 	Image _image;
 public:
 	CLASSDEF;
-	Conversation(const Common::String &name, int convId, int targetId);
+	Conversation(const String &name, int convId, int targetId);
 	virtual ~Conversation() {}
 
 	/**

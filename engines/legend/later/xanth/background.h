@@ -43,8 +43,8 @@ public:
 	CLASSDEF;
 	Background() : Gfx::VisualContainer() {}
 	Background(const Common::Rect &r) : Gfx::VisualContainer(r) {}
-	Background(const Common::String &name) : Gfx::VisualContainer(name) {}
-	Background(const Common::String &name, const Common::Rect &r) : Gfx::VisualContainer(name, r) {}
+	Background(const String &name) : Gfx::VisualContainer(name) {}
+	Background(const String &name, const Common::Rect &r) : Gfx::VisualContainer(name, r) {}
 	virtual ~Background() {}
 };
 

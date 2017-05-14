@@ -32,10 +32,10 @@ class Button : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
 	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
 private:
-	Common::String _text;
+	String _text;
 public:
 	CLASSDEF;
-	Button(const Common::String &text, const Common::Rect &r) : Gfx::VisualItem(r), _text(text) {}
+	Button(const String &text, const Common::Rect &r) : Gfx::VisualItem(r), _text(text) {}
 	virtual ~Button() {}
 
 	/**

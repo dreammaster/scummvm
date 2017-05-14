@@ -70,17 +70,17 @@ public:
 	/**
 	 * Gets the name of the item, if any
 	 */
-	virtual const Common::String getName() const { return Common::String(); }
+	virtual const String getName() const { return String(); }
 
 	/**
 	 * Returns true if the item's name matches a passed name
 	 */
-	virtual bool isEquals(const Common::String &name, int maxLen = 0) const { return false; }
+	virtual bool isEquals(const String &name, int maxLen = 0) const { return false; }
 
 	/**
 	 * Compares the name of the item to a passed name
 	 */
-	virtual int compareTo(const Common::String &name, int maxLen = 0) const { return false; }
+	virtual int compareTo(const String &name, int maxLen = 0) const { return false; }
 
 	/**
 	 * Allows the item to draw itself
@@ -193,7 +193,7 @@ public:
 	 * Finds a tree item by name
 	 * @param name		Name to find
 	 */
-	NamedItem *findByName(const Common::String &name);
+	NamedItem *findByName(const String &name);
 
 	/**
 	 * Gets the game state

@@ -80,17 +80,17 @@ public:
 	/**
 	 * Writes a string
 	 */
-	void writeString(const Common::String &msg);
+	void writeString(const String &msg);
 
 	/**
 	 * Writes a string
 	 */
-	void writeString(const Common::Point &pt, const Common::String &msg);
+	void writeString(const Common::Point &pt, const String &msg);
 
 	/**
 	 * Get the width of a string
 	 */
-	int stringWidth(const Common::String &msg);
+	int stringWidth(const String &msg);
 
 	/**
 	 * Return the font center
@@ -120,8 +120,8 @@ public:
 	CLASSDEF;
 	VisualItem() { init(); }
 	VisualItem(const Common::Rect &r) : _bounds(r) { init(); }
-	VisualItem(const Common::String &name) : NamedItem(name) { init(); }
-	VisualItem(const Common::String &name, const Common::Rect &r) : NamedItem(name),
+	VisualItem(const String &name) : NamedItem(name) { init(); }
+	VisualItem(const String &name, const Common::Rect &r) : NamedItem(name),
 		_bounds(r) { init(); }
 
 	virtual ~VisualItem() {}
@@ -162,7 +162,7 @@ public:
 	/**
 	 * Helper function to switch to a different visual item
 	 */
-	void changeView(const Common::String &name);
+	void changeView(const String &name);
 };
 
 } // End of namespace Gfx

@@ -28,7 +28,7 @@ namespace Early {
 
 EMPTY_MESSAGE_MAP(CommandButtons, Gfx::VisualContainer);
 
-CommandButtons::CommandButtons(const Common::String &name, const Common::Rect &r) :
+CommandButtons::CommandButtons(const String &name, const Common::Rect &r) :
 		BoxedElement(name, r),
 		_btnPicture(Common::Rect(51, 3, 115, 26)),
 		_btnStatus(Common::Rect(51, 30, 115, 53)),

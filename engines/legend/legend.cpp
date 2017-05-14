@@ -101,7 +101,7 @@ ProjectItem *LegendEngine::createProject() const {
 	}
 }
 
-Common::String LegendEngine::getGameFilePrefix() const {
+String LegendEngine::getGameFilePrefix() const {
 	switch (getGameID()) {
 	case GType_Gateway:
 		return "gate";
@@ -112,14 +112,14 @@ Common::String LegendEngine::getGameFilePrefix() const {
 	}
 }
 
-Common::String LegendEngine::getFilename(FileType fileType, int fileNumber) {
+String LegendEngine::getFilename(FileType fileType, int fileNumber) {
 	static const char *const EXTENSIONS[] = { "PIC", "RGN", "FNT", "MUS", "SAV", "SAV" };
 	
 	switch (getGameID()) {
 	case GType_Gateway:
-		return Common::String::format("gate_%03d.%s", fileNumber, EXTENSIONS[fileType]);
+		return String::format("gate_%03d.%s", fileNumber, EXTENSIONS[fileType]);
 	case GType_CompanionsOfXanth:
-		return Common::String::format("xanth_%02d.%s", fileNumber, EXTENSIONS[fileType]);
+		return String::format("xanth_%02d.%s", fileNumber, EXTENSIONS[fileType]);
 	default:
 		error("Unknown game");
 	}

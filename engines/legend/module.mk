@@ -8,6 +8,7 @@ MODULE_OBJS = \
 	core/project_item.o \
 	core/resources.o \
 	core/saveable_object.o \
+	core/string.o \
 	core/tree_item.o \
 	gfx/compass.o \
 	gfx/font.o \

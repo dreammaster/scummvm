@@ -24,22 +24,23 @@
 #define LEGEND_NAMED_ITEM_H
 
 #include "legend/core/tree_item.h"
+#include "legend/core/string.h"
 
 namespace Legend {
 
 class NamedItem: public TreeItem {
 	DECLARE_MESSAGE_MAP;
 public:
-	Common::String _name;
+	String _name;
 public:
 	CLASSDEF;
 	NamedItem() {}
-	NamedItem(const Common::String &name) : _name(name) {}
+	NamedItem(const String &name) : _name(name) {}
 
 	/**
 	 * Gets the name of the item, if any
 	 */
-	virtual const Common::String getName() const { return _name; }
+	virtual const String getName() const { return _name; }
 };
 
 } // End of namespace Legend

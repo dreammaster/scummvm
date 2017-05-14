@@ -32,7 +32,7 @@ BEGIN_MESSAGE_MAP(Conversation, Background)
 	ON_MESSAGE(ShowMsg)
 END_MESSAGE_MAP()
 
-Conversation::Conversation(const Common::String &name, int convId, int targetId) :
+Conversation::Conversation(const String &name, int convId, int targetId) :
 		Background(name), _conversationId(convId), _targetPicNum(targetId) {
 	struct ConvBounds {
 		int _targetPicNum;

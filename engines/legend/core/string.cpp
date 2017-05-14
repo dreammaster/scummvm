@@ -20,29 +20,13 @@
  *
  */
 
-#ifndef LEGEND_EARLY_SCENE_PICTURE_H
-#define LEGEND_EARLY_SCENE_PICTURE_H
-
-#include "legend/early/boxed_element.h"
+#include "legend/core/string.h"
+#include "legend/legend.h"
+#include "legend/core/resources.h"
 
 namespace Legend {
-namespace Early {
 
-class ScenePicture : public BoxedElement {
-	DECLARE_MESSAGE_MAP;
-public:
-	CLASSDEF;
-	ScenePicture(const String &name, const Common::Rect &r) :
-		BoxedElement(name, r) {}
-	virtual ~ScenePicture() {}
+String::String(uint id) : Common::String(g_vm->_res->getMessage(id)) {
+}
 
-	/**
-	 * Draws the visual item on the screen
-	 */
-	virtual void draw();
-};
-
-} // End of namespace Early
 } // End of namespace Legend
-
-#endif

@@ -34,8 +34,8 @@ public:
 	CLASSDEF;
 	Compass() : VisualItem() {}
 	Compass(const Common::Rect &r) : VisualItem(r) {}
-	Compass(const Common::String &name) : VisualItem(name) {}
-	Compass(const Common::String &name, const Common::Rect &r) : VisualItem(name, r) {}
+	Compass(const String &name) : VisualItem(name) {}
+	Compass(const String &name, const Common::Rect &r) : VisualItem(name, r) {}
 	virtual ~Compass() {}
 
 	/**

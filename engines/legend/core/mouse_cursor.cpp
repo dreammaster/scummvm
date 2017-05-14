@@ -55,7 +55,7 @@ MouseCursor::MouseCursor(LegendEngine *vm) {
 	setCursor(0);
 }
 
-void MouseCursor::loadCursors(const Common::String &name) {
+void MouseCursor::loadCursors(const String &name) {
 	_cursors.clear();
 
 	Common::SeekableReadStream *s = g_vm->_res->getResource(name);

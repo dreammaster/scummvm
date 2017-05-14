@@ -32,7 +32,7 @@ class TextArea : public BoxedElement {
 	DECLARE_MESSAGE_MAP;
 public:
 	CLASSDEF;
-	TextArea(const Common::String &name, const Common::Rect &r) :
+	TextArea(const String &name, const Common::Rect &r) :
 		BoxedElement(name, r) {}
 	virtual ~TextArea() {}
 

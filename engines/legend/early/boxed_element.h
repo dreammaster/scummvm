@@ -37,8 +37,8 @@ public:
 	CLASSDEF;
 	BoxedElement() : Gfx::VisualContainer() {}
 	BoxedElement(const Common::Rect &r) : Gfx::VisualContainer(r) {}
-	BoxedElement(const Common::String &name) : Gfx::VisualContainer(name) {}
-	BoxedElement(const Common::String &name, const Common::Rect &r) :  Gfx::VisualContainer(name, r) {}
+	BoxedElement(const String &name) : Gfx::VisualContainer(name) {}
+	BoxedElement(const String &name, const Common::Rect &r) :  Gfx::VisualContainer(name, r) {}
 	virtual ~BoxedElement() {}
 
 	/**

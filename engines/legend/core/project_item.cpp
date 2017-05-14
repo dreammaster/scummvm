@@ -22,6 +22,7 @@
 
 #include "common/file.h"
 #include "common/savefile.h"
+#include "common/str-array.h"
 #include "common/system.h"
 #include "graphics/scaler.h"
 #include "graphics/thumbnail.h"
@@ -72,7 +73,7 @@ void ProjectItem::loadGame(int slotId) {
 
 }
 
-void ProjectItem::saveGame(int slotId, const Common::String &desc) {
+void ProjectItem::saveGame(int slotId, const String &desc) {
 
 }
 
@@ -98,11 +99,11 @@ void ProjectItem::postSave() {
 
 }
 
-SaveStateList ProjectItem::getSavegameList(const Common::String &target) {
+SaveStateList ProjectItem::getSavegameList(const String &target) {
 	Common::SaveFileManager *saveFileMan = g_system->getSavefileManager();
 	Common::StringArray filenames;
 	Common::String saveDesc;
-	Common::String pattern = Common::String::format("%s.0??", target.c_str());
+	Common::String pattern = String::format("%s.0??", target.c_str());
 	LegendSavegameHeader header;
 
 	filenames = saveFileMan->listSavefiles(pattern);

@@ -210,12 +210,12 @@ void TreeItem::attach(TreeItem *item) {
 		item->_parent->_firstChild = this;
 }
 
-NamedItem *TreeItem::findByName(const Common::String &name) {
-	Common::String nameLower = name;
+NamedItem *TreeItem::findByName(const String &name) {
+	String nameLower = name;
 	nameLower.toLowercase();
 
 	for (TreeItem *treeItem = this; treeItem; treeItem = treeItem->scan(this)) {
-		Common::String itemName = treeItem->getName();
+		String itemName = treeItem->getName();
 		itemName.toLowercase();
 
 		if (!itemName.compareTo(nameLower))

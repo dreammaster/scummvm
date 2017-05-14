@@ -23,25 +23,13 @@
 #ifndef LEGEND_RESOURCES_H
 #define LEGEND_RESOURCES_H
 
-#include "common/str.h"
-#include "common/str-array.h"
+#include "common/hashmap.h"
 #include "legend/core/file.h"
+#include "legend/core/string.h"
 
 namespace Legend {
 
 class LegendEngine;
-
-class TextMessage {
-	friend class Resources;
-private:
-	static LegendEngine *_vm;
-	uint _id;
-	const char *_msg;
-public:
-	TextMessage(uint id);
-	TextMessage(const char *msg);
-	operator const char *() const;
-};
 
 struct TextIndexEntry {
 public:
@@ -59,8 +47,6 @@ public:
 };
 
 class Resources {
-	friend class TextMessage;
-
 	struct ResourceEntry {
 		uint _offset;
 		uint _size;
@@ -72,16 +58,15 @@ class Resources {
 
 	struct TextEntry {
 		uint _id;
-		Common::String _text;
+		String _text;
 	};
 private:
-	LegendEngine *_vm;
 	ResourceHash _resources;
 	Common::File _datFile;
 	File _textFile;
 	Common::Array<TextIndexEntry> _textList;
 	Common::Array<int> _decryptionTable;
-	Common::StringArray _wordList;
+	StringArray _wordList;
 	Common::Array<TextEntry> _textCache;
 	int _currentTextIndexNum;
 	Common::Array<int> _currentTextIndexVals;
@@ -97,21 +82,21 @@ private:
 	void loadText();
 
 	/**
-	 * Get the text message for a given Id
-	 */
-	const char *getMessage(uint id);
-
-	/**
 	 * Decompresses a single text message from a passed stream
 	 */
-	Common::String decompressText(Common::SeekableReadStream *stream);
+	String decompressText(Common::SeekableReadStream *stream);
 public:
 	Resources(LegendEngine *vm);
 
 	/**
 	* Get a resource from the legend.dat
 	*/
-	Common::SeekableReadStream *getResource(const Common::String &name);
+	Common::SeekableReadStream *getResource(const String &name);
+
+	/**
+	 * Get the text message for a given Id
+	 */
+	Common::String getMessage(uint id);
 };
 
 } // End of namespace Legend
