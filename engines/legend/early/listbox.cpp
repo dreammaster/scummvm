@@ -21,11 +21,47 @@
  */
 
 #include "legend/early/listbox.h"
+#include "legend/legend.h"
 
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(Listbox, BoxedElement);
+EMPTY_MESSAGE_MAP(Listbox, Gfx::VisualItem);
+
+void Listbox::init() {
+	_lines.clear();
+	_topVisible = 0;
+	_xOffset = 0;
+}
+
+void Listbox::load(const StringArray &lines) {
+	init();
+	_lines = lines;
+}
+
+void Listbox::load(const String &resName) {
+	init();
+
+	Common::SeekableReadStream *stream = g_vm->_res->getResource(resName);
+	int valsPerLine = stream->readUint16LE();
+
+	while (stream->pos() < stream->size()) {
+		String line;
+		for (int idx = 0; idx < valsPerLine; ++idx) {
+			uint id = stream->readUint16LE();
+			
+			if (id) {
+				assert(id != 0xffff);
+				if (idx > 0)
+					line += " ";
+				// TODO: line += vocab
+			}
+		}
+	}
+
+	delete stream;
+}
+
 
 } // End of namespace Early
 } // End of namespace Legend

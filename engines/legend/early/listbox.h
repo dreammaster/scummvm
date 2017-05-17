@@ -23,18 +23,41 @@
 #ifndef LEGEND_EARLY_LISTBOX_H
 #define LEGEND_EARLY_LISTBOX_H
 
-#include "legend/early/boxed_element.h"
+#include "legend/gfx/visual_item.h"
 
 namespace Legend {
 namespace Early {
 
-class Listbox : public BoxedElement {
+class Listbox : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
+private:
+	StringArray _lines;
+	int _topVisible;
+	int _xOffset;
+private:
+	/**
+	 * Common initialization method used by the constructors
+	 */
+	void init();
 public:
 	CLASSDEF;
-	Listbox(const String &name, const Common::Rect &r) :
-		BoxedElement(name, r) {}
+	Listbox() : Gfx::VisualItem() { init(); }
+	Listbox(const Common::Rect &r) : Gfx::VisualItem(r) { init(); }
+	Listbox(const Common::String &name) : Gfx::VisualItem(name) { init(); }
+	Listbox(const Common::String &name, const Common::Rect &r) : 
+		Gfx::VisualItem(name, r) { init(); }
 	virtual ~Listbox() {}
+
+	/**
+	 * Loads a listbox with a list of strings
+	 */
+	void load(const StringArray &lines);
+
+	/**
+	 * Loads a listbox with a list of strings based on a resource
+	 * containing string identifiers
+	 */
+	void load(const String &resName);
 };
 
 } // End of namespace Early
