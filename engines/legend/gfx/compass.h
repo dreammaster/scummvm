@@ -34,7 +34,10 @@ class Compass : public VisualItem {
 private:
 	PictureArray _images;
 private:
-	void load(int picNumber = 0);
+	/**
+	 * Loads the pictures for the compass
+	 */
+	void load(uint picNum = 0);
 public:
 	CLASSDEF;
 	Compass() : VisualItem() { load(); }

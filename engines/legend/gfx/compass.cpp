@@ -27,9 +27,10 @@ namespace Gfx {
 
 EMPTY_MESSAGE_MAP(Compass, VisualItem);
 
-void Compass::load(int picNumber) {
-	_images.load(picNumber);
-	_images.loadRange(16, picNumber + 1, 1);
+void Compass::load(uint picNum) {
+	picNum |= 0x8000;
+	_images.load(picNum);
+	_images.loadRange(16, picNum + 1, 1);
 }
 
 void Compass::draw() {
