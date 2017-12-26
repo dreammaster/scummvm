@@ -94,8 +94,8 @@ bool PicFile::open(uint pictureNum, uint frameNum) {
 	return true;
 }
 
-Picture *PicFile::load(uint pictureNum, uint frameNum) {
-	if (!open(pictureNum, frameNum))
+Picture *PicFile::load(uint picNum, uint frameNum) {
+	if (!open(picNum, frameNum))
 		return nullptr;
 
 	// Create the new picture instance
@@ -173,6 +173,22 @@ int PicFile::findIndexesSlot() const {
 	}
 
 	return minIndex;
+}
+
+size_t PicFile::loadRange(PictureArray &images, size_t count, uint picNum, uint frameNum) {
+	if (count < 1)
+		count = 256;
+
+	size_t total = 0;
+	for (; count > 0; --count, ++picNum, ++total) {
+		Picture *pic = load(picNum, frameNum);
+		if (!pic)
+			break;
+
+		images.push_back(pic);
+	}
+
+	return total;
 }
 
 /*-------------------------------------------------------------------*/
@@ -548,6 +564,24 @@ int Picture::decode(Common::SeekableReadStream *inStream) {
 	*/
 
 	return result;
+}
+
+/*-------------------------------------------------------------------*/
+
+PictureArray::~PictureArray() {
+	for (uint idx = 0; idx < size(); ++idx)
+		delete (*this)[idx];
+}
+
+bool PictureArray::load(uint picNum, uint frameNum) {
+	Picture *pic = g_vm->_picFile->load(picNum, frameNum);
+	if (pic)
+		push_back(pic);
+	return pic != nullptr;
+}
+
+size_t PictureArray::loadRange(size_t count, uint picNum, uint frameNum) {
+	return g_vm->_picFile->loadRange(*this, count, picNum, frameNum);
 }
 
 } // End of namespace Gfx

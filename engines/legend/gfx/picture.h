@@ -24,6 +24,7 @@
 #define LEGEND_PIC_H
 
 #include "common/memstream.h"
+#include "common/ptr.h"
 #include "graphics/managed_surface.h"
 #include "legend/core/file.h"
 
@@ -131,6 +132,28 @@ public:
 	int decode(Common::SeekableReadStream *inStream);
 };
 
+class PictureArray : public Common::Array<Picture *> {
+public:
+	~PictureArray();
+
+	/**
+	 * Gets a picture
+	 * @param picNum		Picture number
+	 * @param frameNum		Frame number
+	 * @returns True if picture was loaded
+	 */
+	bool load(uint picNum, uint frameNum = 0);
+
+	/**
+	 * Load a sequential range of pictures
+	 * @param count			Maximum number of images. 0 = Up to 256
+	 * @param picNum		Starting picture number
+	 * @param frameNum		Frame number
+	 * @returns Number of images loaded
+	 */
+	size_t loadRange(size_t count, uint picNum, uint frameNum = 0);
+};
+
 class PicFile {
 	struct IndexEntry {
 		uint _offset;
@@ -199,8 +222,21 @@ public:
 
 	/**
 	 * Gets a picture
+	 * @param picNum		Picture number
+	 * @param frameNum		Frame number
+	 * @returns Picture
 	 */
-	Picture *load(uint pictureNum, uint frameNum = 0);
+	Picture *load(uint picNum, uint frameNum = 0);
+
+	/**
+	 * Load a sequential range of pictures
+	 * @param images		Picture array to add items to
+	 * @param count			Maximum number of images. 0 = Up to 256
+	 * @param picNum		Starting picture number
+	 * @param frameNum		Frame number
+	 * @returns Number of images loaded
+	 */
+	size_t loadRange(PictureArray &images, size_t count, uint picNum, uint frameNum = 0);
 };
 
 } // End of namespace Gfx

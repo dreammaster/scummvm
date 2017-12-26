@@ -27,11 +27,18 @@ namespace Gfx {
 
 EMPTY_MESSAGE_MAP(Compass, VisualItem);
 
+void Compass::load(int picNumber) {
+	_images.load(picNumber);
+	_images.loadRange(16, picNumber + 1, 1);
+}
+
 void Compass::draw() {
 	if (!_isDirty)
 		return;
-
 	VisualItem::draw();
+
+	VisualSurface s = getSurface();
+	s.blitFrom(*_images[0]);
 }
 
 } // End of namespace Gfx

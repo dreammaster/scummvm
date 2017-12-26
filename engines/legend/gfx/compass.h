@@ -24,18 +24,23 @@
 #define LEGEND_COMPASS_H
 
 #include "legend/gfx/visual_item.h"
+#include "legend/gfx/image.h"
 
 namespace Legend {
 namespace Gfx {
 
 class Compass : public VisualItem {
 	DECLARE_MESSAGE_MAP;
+private:
+	PictureArray _images;
+private:
+	void load(int picNumber = 0);
 public:
 	CLASSDEF;
-	Compass() : VisualItem() {}
-	Compass(const Common::Rect &r) : VisualItem(r) {}
-	Compass(const String &name) : VisualItem(name) {}
-	Compass(const String &name, const Common::Rect &r) : VisualItem(name, r) {}
+	Compass() : VisualItem() { load(); }
+	Compass(const Common::Rect &r) : VisualItem(r) { load(); }
+	Compass(const String &name) : VisualItem(name) { load(); }
+	Compass(const String &name, const Common::Rect &r) : VisualItem(name, r) { load(); }
 	virtual ~Compass() {}
 
 	/**
