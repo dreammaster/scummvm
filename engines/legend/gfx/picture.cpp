@@ -38,7 +38,7 @@ PicFile::~PicFile() {
 }
 
 bool PicFile::open(uint pictureNum, uint frameNum) {
-	int fileNumber = (pictureNum >> 8) & 0xff;
+	int fileNumber = (pictureNum >> 8) & 0xf;
 	int picIndex = pictureNum & 0xff;
 	
 	// Check if the desired picture is in another PIC file
