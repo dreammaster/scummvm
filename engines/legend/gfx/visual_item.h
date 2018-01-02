@@ -39,10 +39,13 @@ struct FontDetails {
 	int _fontNumber;
 	Common::Point _fontCenter;
 	int _horizSpacings;
-	int _flags1;
+	bool _allowsPendingText;
+	Common::String _pendingText;
 	Common::Point _writePos;
+	int _fgColor, _bgColor;
 
-	FontDetails() : _fontNumber(-1), _horizSpacings(-1), _flags1(0) {}
+	FontDetails() : _fontNumber(-1), _horizSpacings(-1), _allowsPendingText(false),
+		_fgColor(0), _bgColor(0) {}
 	void reset();
 };
 
@@ -50,6 +53,11 @@ class VisualSurface : public Graphics::ManagedSurface {
 private:
 	FontDetails &_font;
 	const Common::Rect &_bounds;
+
+	/**
+	 * Moves font output to a new line, prompting for waiting if necessary
+	 */
+	bool newLine();
 public:
 	VisualSurface(const Graphics::ManagedSurface &src,
 		FontDetails &fontDetails, const Common::Rect &bounds);
@@ -79,8 +87,10 @@ public:
 
 	/**
 	 * Writes a string
+	 * @param text	Text to display
+	 * @returns		Number of characters written
 	 */
-	void writeString(const String &msg);
+	int writeString(const String &text);
 
 	/**
 	 * Writes a string
@@ -158,6 +168,18 @@ public:
 	 * Flags the item as being changed, requiring a full redraw
 	 */
 	void setDirty();
+
+	/**
+	 * Sets whether small text fragments at the end of strings can be queued
+	 * between writeString calls
+	 */
+	void allowPendingText(bool flag);
+
+	/**
+	 * Flushes any pending text for the window
+	 * @returns		True if pending text was allowed
+	 */
+	bool flushText();
 
 	/**
 	 * Helper function to switch to a different visual item

@@ -34,7 +34,7 @@ END_MESSAGE_MAP()
 void FontDetails::reset() {
 	_fontNumber = -1;
 	_horizSpacings = -1;
-	_flags1 = 0;
+	_allowsPendingText = false;
 }
 
 /*-------------------------------------------------------------------*/
@@ -55,10 +55,11 @@ Font *VisualSurface::loadFont(int fontNumber) {
 }
 
 void VisualSurface::setFontColor(int fgColor, int bgColor) {
-	Font::setColor(fgColor, bgColor);
+	_font._fgColor = fgColor;
+	_font._bgColor = bgColor;
 }
 
-void VisualSurface::writeString(const String &msg) {
+int VisualSurface::writeString(const String &text) {
 	// Ensure the correct font is active
 	Font *font = Font::_activeFont;
 	if (Font::_activeFont->_fontNumber != _font._fontNumber) {
@@ -66,8 +67,112 @@ void VisualSurface::writeString(const String &msg) {
 		loadFont(_font._fontNumber);
 	}
 
-	// Write out the text
-	font->writeString(*this, _font._writePos, msg);
+	// Set the color
+	font->setColor(_font._fgColor, _font._bgColor);
+
+	// Prefix any pending text
+	Common::String msg = !_font._allowsPendingText ? text.c_str() : (_font._pendingText + text).c_str();
+
+	// Main loop for writing text
+	int result = 0;
+	const char *startP = msg.c_str(), *endP = msg.c_str();
+	for (;;) {
+		endP = startP;
+
+		if (*endP) {
+			// Scan for end of next word
+			for (; *endP; ++endP) {
+				if (*endP != ' ' && *endP != '\t' && *endP != '\n' && *endP != '-')
+					break;
+			}
+		}
+
+		if (!*startP || (!*endP && _font._allowsPendingText)) {
+			// Finished string
+			if (endP != startP) {
+				if (_font._allowsPendingText && (endP - startP) < 16) {
+					_font._pendingText = Common::String(startP, endP);
+				} else {
+					font->writeString(*this, _font._writePos, Common::String(startP));
+					result += endP - startP;
+				}
+			}
+
+			// Check for end of line
+			if (_font._writePos.x >= (this->w - font->_xCenter))
+				newLine();
+
+			break;
+		}
+
+		if (*endP != '-')
+			++endP;
+
+		int wordWidth = font->stringWidth(Common::String(startP, endP));
+		int width = this->w - font->_xCenter;
+		if ((width - font->_xCenter) >= wordWidth) {
+			width -= _font._writePos.x;
+
+			if (wordWidth < width) {
+				result += width / font->_maxCharWidth;
+				if (newLine())
+					break;
+			}
+		} else {
+			width -= _font._writePos.x;
+			width = 0;
+			endP = startP;
+
+			// Figure out allowable word width to fit in surface
+			for (; *endP && (font->charWidth(*endP) + wordWidth) <= width;
+					wordWidth += font->charWidth(*endP), ++endP) ;
+		}
+
+		// Display the word
+		Common::String word(startP, endP);
+		font->writeString(*this, _font._writePos, word);
+
+		_font._writePos.x += wordWidth;
+		result += word.size();
+
+		if (*endP == '\t') {
+			// Word ended by tab character
+			++endP;
+			startP = endP;
+
+			// Ensure there's enough remaining width for a tab
+			width = this->w - _font._writePos.x - font->_xCenter;
+			if (width >= font->_tabWidth) {
+				int xPos = ((_font._writePos.x - font->_xCenter) / font->_tabWidth + 1) * font->_tabWidth;
+				_font._writePos.x = xPos + font->_xCenter;
+				result += xPos / font->_maxCharWidth;
+			}
+		} else if (*endP == '\n') {
+			// Newline character
+			startP = ++endP;
+			if (newLine())
+				break;
+		} else if (*endP == ' ') {
+			// Space character
+			endP = startP;
+		} else {
+			// All other characters
+			startP = ++endP;
+
+			wordWidth = font->charWidth(' ');
+			width = this->w - _font._writePos.x - font->_xCenter;
+			if (wordWidth <= width) {
+				font->writeString(*this, _font._writePos, " ");
+				++result;
+			} else {
+				if (newLine())
+					break;
+			}
+		}
+	}
+
+	// Return number of characters written
+	return result;
 }
 
 void VisualSurface::writeString(const Common::Point &pt, const String &msg) {
@@ -80,10 +185,16 @@ int VisualSurface::stringWidth(const String &msg) {
 	return font->stringWidth(msg);
 }
 
+bool VisualSurface::newLine() {
+	// TODO
+	return false;
+}
+
 /*-------------------------------------------------------------------*/
 
 void VisualItem::init() {
 	_isDirty = true;
+	Font::getColor(_fontDetails._fgColor, _fontDetails._bgColor);
 }
 
 bool VisualItem::ShowMsg(CShowMsg &msg) {
@@ -127,6 +238,24 @@ void VisualItem::setDirty() {
 		if (item)
 			item->_isDirty = true;
 	}
+}
+
+void VisualItem::allowPendingText(bool flag) {
+	if (flag)
+		_fontDetails._allowsPendingText = true;
+}
+
+bool VisualItem::flushText() {
+	bool allowed = _fontDetails._allowsPendingText;
+	if (allowed) {
+		_fontDetails._allowsPendingText = false;
+
+		VisualSurface s = getSurface();
+		s.writeString(_fontDetails._pendingText);
+		_fontDetails._pendingText.clear();
+	}
+
+	return allowed;
 }
 
 void VisualItem::changeView(const String &name) {
