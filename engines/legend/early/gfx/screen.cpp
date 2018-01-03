@@ -24,7 +24,7 @@
 #include "common/system.h"
 #include "engines/util.h"
 #include "graphics/palette.h"
-#include "legend/early/screen.h"
+#include "legend/early/gfx/screen.h"
 #include "legend/legend.h"
 
 namespace Legend {

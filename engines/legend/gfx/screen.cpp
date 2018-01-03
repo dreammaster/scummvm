@@ -23,7 +23,7 @@
 #include "engines/util.h"
 #include "legend/gfx/screen.h"
 #include "legend/legend.h"
-#include "legend/early/screen.h"
+#include "legend/early/gfx/screen.h"
 #include "legend/later/screen.h"
 
 namespace Legend {

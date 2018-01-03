@@ -19,17 +19,17 @@ MODULE_OBJS = \
 	gfx/screen.o \
 	gfx/visual_container.o \
 	gfx/visual_item.o \
-	early/boxed_element.o \
-	early/button.o \
-	early/command_buttons.o \
-	early/help_screen.o \
-	early/listbox.o \
-	early/scene.o \
-	early/scene_picture.o \
-	early/screen.o \
-	early/text_area.o \
 	early/core/huffman.o \
 	early/core/vocab.o \
+	early/gfx/boxed_element.o \
+	early/gfx/button.o \
+	early/gfx/command_buttons.o \
+	early/gfx/help_screen.o \
+	early/gfx/listbox.o \
+	early/gfx/scene.o \
+	early/gfx/scene_picture.o \
+	early/gfx/screen.o \
+	early/gfx/text_area.o \
 	early/gateway/gateway_project_item.o \
 	early/gateway/part_title.o \
 	later/screen.o \

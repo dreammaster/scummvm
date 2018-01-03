@@ -20,15 +20,14 @@
  *
  */
 
-#include "legend/early/scene_picture.h"
-#include "legend/legend.h"
+#include "legend/early/gfx/text_area.h"
 
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(ScenePicture, BoxedElement);
+EMPTY_MESSAGE_MAP(TextArea, BoxedElement);
 
-void ScenePicture::draw() {
+void TextArea::draw() {
 }
 
 } // End of namespace Early

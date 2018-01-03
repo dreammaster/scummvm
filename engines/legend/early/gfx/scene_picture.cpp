@@ -20,29 +20,16 @@
  *
  */
 
-#ifndef LEGEND_EARLY_TEXT_AREA_H
-#define LEGEND_EARLY_TEXT_AREA_H
-
-#include "legend/early/boxed_element.h"
+#include "legend/early/gfx/scene_picture.h"
+#include "legend/legend.h"
 
 namespace Legend {
 namespace Early {
 
-class TextArea : public BoxedElement {
-	DECLARE_MESSAGE_MAP;
-public:
-	CLASSDEF;
-	TextArea(const String &name, const Common::Rect &r) :
-		BoxedElement(name, r) {}
-	virtual ~TextArea() {}
+EMPTY_MESSAGE_MAP(ScenePicture, BoxedElement);
 
-	/**
-	 * Draws the visual item on the screen
-	 */
-	virtual void draw();
-};
+void ScenePicture::draw() {
+}
 
 } // End of namespace Early
 } // End of namespace Legend
-
-#endif

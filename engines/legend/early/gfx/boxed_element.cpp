@@ -20,14 +20,24 @@
  *
  */
 
-#include "legend/early/text_area.h"
+#include "legend/early/gfx/boxed_element.h"
 
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(TextArea, BoxedElement);
+EMPTY_MESSAGE_MAP(BoxedElement, Gfx::VisualContainer);
 
-void TextArea::draw() {
+void BoxedElement::draw() {
+	if (!_isDirty)
+		return;
+
+	Gfx::VisualSurface s = getSurface();
+	Common::Rect r = s.getBounds();
+	s.frameRect(r, 15);
+	r.grow(-1);
+	s.fillRect(r, 0);
+
+	Gfx::VisualContainer::draw();
 }
 
 } // End of namespace Early

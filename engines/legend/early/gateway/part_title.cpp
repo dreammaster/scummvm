@@ -21,7 +21,7 @@
  */
 
 #include "legend/early/gateway/part_title.h"
-#include "legend/early/screen.h"
+#include "legend/early/gfx/screen.h"
 #include "legend/legend.h"
 
 namespace Legend {

@@ -20,32 +20,35 @@
  *
  */
 
-#ifndef LEGEND_EARLY_SCENE_H
-#define LEGEND_EARLY_SCENE_H
+#ifndef LEGEND_EARLY_COMMAND_BUTTONS_H
+#define LEGEND_EARLY_COMMAND_BUTTONS_H
 
-#include "legend/gfx/visual_container.h"
-#include "legend/gfx/compass.h"
-#include "legend/early/command_buttons.h"
-#include "legend/early/scene_picture.h"
-#include "legend/early/listbox.h"
-#include "legend/early/text_area.h"
+#include "legend/early/gfx/boxed_element.h"
+#include "legend/early/gfx/button.h"
 
 namespace Legend {
 namespace Early {
 
-class Scene : public Gfx::VisualContainer {
+class CommandButtons : public BoxedElement {
 	DECLARE_MESSAGE_MAP;
-private:
-	CommandButtons _commandButtons;
-	Gfx::Compass _compass;
-	ScenePicture _scenePicture;
-	Listbox _commands;
-	Listbox _items;
-	TextArea _textArea;
+	DEFINE_BUTTON(Help);
+	DEFINE_BUTTON(Half);
+	DEFINE_BUTTON(Text);
+	DEFINE_BUTTON(Erase);
+	DEFINE_BUTTON(Picture);
+	DEFINE_BUTTON(Status);
+	DEFINE_BUTTON(Inventory);
+	DEFINE_BUTTON(Look);
+	DEFINE_BUTTON(Do);
 public:
 	CLASSDEF;
-	Scene();
-	virtual ~Scene() {}
+	CommandButtons(const String &name, const Common::Rect &r);
+	virtual ~CommandButtons() {}
+
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();	
 };
 
 } // End of namespace Early

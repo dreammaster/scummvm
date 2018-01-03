@@ -20,7 +20,7 @@
  *
  */
 
-#include "legend/early/command_buttons.h"
+#include "legend/early/gfx/command_buttons.h"
 #include "legend/game_manager.h"
 
 namespace Legend {

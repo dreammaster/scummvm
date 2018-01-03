@@ -20,28 +20,48 @@
  *
  */
 
-#include "legend/early/scene.h"
+#include "legend/early/gfx/listbox.h"
 #include "legend/legend.h"
 
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(Scene, Gfx::VisualItem);
+EMPTY_MESSAGE_MAP(Listbox, Gfx::VisualItem);
 
-Scene::Scene() : Gfx::VisualContainer("Scene"),
-		_commandButtons("CommandButtons", Common::Rect(0, 0, 120, 136)),
-		_compass("Compass", Common::Rect(120, 0, 260, 136)),
-		_scenePicture("ScenePicture", Common::Rect(260, 0, 640, 232)),
-		_commands("Commands", Common::Rect(0, 136, 116, 480)),
-		_items("Items", Common::Rect(116, 136, 260, 480)),
-		_textArea("TextArea", Common::Rect(260, 232, 640, 480)) {
-	_commandButtons.addUnder(this);
-	_compass.addUnder(this);
-	_scenePicture.addUnder(this);
-	_commands.addUnder(this);
-	_items.addUnder(this);
-	_textArea.addUnder(this);
+void Listbox::init() {
+	_lines.clear();
+	_topVisible = 0;
+	_xOffset = 0;
 }
+
+void Listbox::load(const StringArray &lines) {
+	init();
+	_lines = lines;
+}
+
+void Listbox::load(const String &resName) {
+	init();
+
+	Common::SeekableReadStream *stream = g_vm->_res->getResource(resName);
+	int valsPerLine = stream->readUint16LE();
+
+	while (stream->pos() < stream->size()) {
+		String line;
+		for (int idx = 0; idx < valsPerLine; ++idx) {
+			uint id = stream->readUint16LE();
+			
+			if (id) {
+				assert(id != 0xffff);
+				if (idx > 0)
+					line += " ";
+				// TODO: line += vocab
+			}
+		}
+	}
+
+	delete stream;
+}
+
 
 } // End of namespace Early
 } // End of namespace Legend

@@ -20,25 +20,29 @@
  *
  */
 
-#include "legend/early/boxed_element.h"
+#ifndef LEGEND_EARLY_TEXT_AREA_H
+#define LEGEND_EARLY_TEXT_AREA_H
+
+#include "legend/early/gfx/boxed_element.h"
 
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(BoxedElement, Gfx::VisualContainer);
+class TextArea : public BoxedElement {
+	DECLARE_MESSAGE_MAP;
+public:
+	CLASSDEF;
+	TextArea(const String &name, const Common::Rect &r) :
+		BoxedElement(name, r) {}
+	virtual ~TextArea() {}
 
-void BoxedElement::draw() {
-	if (!_isDirty)
-		return;
-
-	Gfx::VisualSurface s = getSurface();
-	Common::Rect r = s.getBounds();
-	s.frameRect(r, 15);
-	r.grow(-1);
-	s.fillRect(r, 0);
-
-	Gfx::VisualContainer::draw();
-}
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();
+};
 
 } // End of namespace Early
 } // End of namespace Legend
+
+#endif

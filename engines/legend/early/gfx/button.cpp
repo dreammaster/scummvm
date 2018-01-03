@@ -20,8 +20,8 @@
  *
  */
 
-#include "legend/early/button.h"
-#include "legend/early/screen.h"
+#include "legend/early/gfx/button.h"
+#include "legend/early/gfx/screen.h"
 #include "legend/legend.h"
 #include "legend/core/resources.h"
 

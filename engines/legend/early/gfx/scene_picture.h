@@ -20,48 +20,29 @@
  *
  */
 
-#include "legend/early/listbox.h"
-#include "legend/legend.h"
+#ifndef LEGEND_EARLY_SCENE_PICTURE_H
+#define LEGEND_EARLY_SCENE_PICTURE_H
+
+#include "legend/early/gfx/boxed_element.h"
 
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(Listbox, Gfx::VisualItem);
+class ScenePicture : public BoxedElement {
+	DECLARE_MESSAGE_MAP;
+public:
+	CLASSDEF;
+	ScenePicture(const String &name, const Common::Rect &r) :
+		BoxedElement(name, r) {}
+	virtual ~ScenePicture() {}
 
-void Listbox::init() {
-	_lines.clear();
-	_topVisible = 0;
-	_xOffset = 0;
-}
-
-void Listbox::load(const StringArray &lines) {
-	init();
-	_lines = lines;
-}
-
-void Listbox::load(const String &resName) {
-	init();
-
-	Common::SeekableReadStream *stream = g_vm->_res->getResource(resName);
-	int valsPerLine = stream->readUint16LE();
-
-	while (stream->pos() < stream->size()) {
-		String line;
-		for (int idx = 0; idx < valsPerLine; ++idx) {
-			uint id = stream->readUint16LE();
-			
-			if (id) {
-				assert(id != 0xffff);
-				if (idx > 0)
-					line += " ";
-				// TODO: line += vocab
-			}
-		}
-	}
-
-	delete stream;
-}
-
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();
+};
 
 } // End of namespace Early
 } // End of namespace Legend
+
+#endif

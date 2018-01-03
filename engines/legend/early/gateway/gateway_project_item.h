@@ -24,8 +24,8 @@
 #define LEGEND_GATEWAY_PROJECT_ITEM_H
 
 #include "legend/core/project_item.h"
-#include "legend/early/help_screen.h"
-#include "legend/early/scene.h"
+#include "legend/early/gfx/help_screen.h"
+#include "legend/early/gfx/scene.h"
 #include "legend/early/gateway/part_title.h"
 
 namespace Legend {
