@@ -107,6 +107,11 @@ public:
 	 * Return the font center
 	 */
 	Common::Point getFontCenter() const { return _font._fontCenter; }
+
+	/**
+	 * Fill the surface with a given color
+	 */
+	void fill(byte color) { Graphics::ManagedSurface::clear(color); }
 };
 
 /**

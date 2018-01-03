@@ -24,16 +24,25 @@
 #define LEGEND_EARLY_LISTBOX_H
 
 #include "legend/gfx/visual_item.h"
+#include "legend/gfx/picture.h"
 
 namespace Legend {
 namespace Early {
 
 class Listbox : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
+	bool ShowMsg(CShowMsg &msg);
+	bool FrameMsg(CFrameMsg &msg); 
 private:
 	StringArray _lines;
 	int _topVisible;
 	int _xOffset;
+	bool _upPressed, _downPressed;
+	Gfx::Picture *_thumbUp;
+	Gfx::Picture *_thumbDown;
+	Gfx::Picture *_thumbnail;
+	Gfx::Picture *_thumbUpPressed;
+	Gfx::Picture *_thumbDownPressed;
 private:
 	/**
 	 * Common initialization method used by the constructors
@@ -46,7 +55,7 @@ public:
 	Listbox(const Common::String &name) : Gfx::VisualItem(name) { init(); }
 	Listbox(const Common::String &name, const Common::Rect &r) : 
 		Gfx::VisualItem(name, r) { init(); }
-	virtual ~Listbox() {}
+	virtual ~Listbox();
 
 	/**
 	 * Loads a listbox with a list of strings
@@ -58,6 +67,11 @@ public:
 	 * containing string identifiers
 	 */
 	void load(const String &resName);
+
+	/**
+	 * Draws the image on the screen
+	 */
+	virtual void draw();
 };
 
 } // End of namespace Early

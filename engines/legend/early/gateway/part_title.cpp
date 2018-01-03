@@ -65,7 +65,7 @@ void PartTitle::draw() {
 
 	// Fill the entire screen with black. The title sub-item
 	// will then draw itself on top of that
-	getSurface().fillRect(getBounds(), 0);
+	getSurface().fill(0);
 }
 
 } // End of namespace Gateway
