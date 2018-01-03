@@ -82,7 +82,7 @@ int VisualSurface::writeString(const String &text) {
 		if (*endP) {
 			// Scan for end of next word
 			for (; *endP; ++endP) {
-				if (*endP != ' ' && *endP != '\t' && *endP != '\n' && *endP != '-')
+				if (*endP == ' ' || *endP == '\t' || *endP == '\n' || *endP == '-')
 					break;
 			}
 		}
@@ -99,17 +99,17 @@ int VisualSurface::writeString(const String &text) {
 			}
 
 			// Check for end of line
-			if (_font._writePos.x >= (this->w - font->_xCenter))
+			if (_font._writePos.x >= (int)(this->w - font->_xCenter))
 				newLine();
 
 			break;
 		}
 
-		if (*endP != '-')
+		if (*endP == '-')
 			++endP;
 
-		int wordWidth = font->stringWidth(Common::String(startP, endP));
-		int width = this->w - font->_xCenter;
+		uint wordWidth = font->stringWidth(Common::String(startP, endP));
+		uint width = this->w - font->_xCenter;
 		if ((width - font->_xCenter) >= wordWidth) {
 			width -= _font._writePos.x;
 
@@ -157,7 +157,9 @@ int VisualSurface::writeString(const String &text) {
 			endP = startP;
 		} else {
 			// All other characters
-			startP = ++endP;
+			if (*endP)
+				++endP;
+			startP = endP;
 
 			wordWidth = font->charWidth(' ');
 			width = this->w - _font._writePos.x - font->_xCenter;

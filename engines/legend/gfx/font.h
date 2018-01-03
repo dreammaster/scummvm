@@ -78,7 +78,7 @@ public:
 	static Font *_fonts[FONT_COUNT];
 	static Font *_activeFont;
 //	static int _textX, _textY;		-- now stored in VisualItem
-	static int _tabWidth;
+	static uint _tabWidth;
 	static uint _lineHeight;
 	static uint _xCenter, _yCenter;
 	static int _fgColor, _bgColor;

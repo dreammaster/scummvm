@@ -31,7 +31,7 @@ namespace Gfx {
 
 Font *Font::_fonts[FONT_COUNT];
 Font *Font::_activeFont;
-int Font::_tabWidth;
+uint Font::_tabWidth;
 uint Font::_lineHeight;
 uint Font::_xCenter;
 uint Font::_yCenter;

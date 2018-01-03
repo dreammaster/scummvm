@@ -29,7 +29,6 @@ MODULE_OBJS = \
 	early/screen.o \
 	early/text_area.o \
 	early/core/huffman.o \
-	early/core/text.o \
 	early/core/vocab.o \
 	early/gateway/gateway_project_item.o \
 	early/gateway/part_title.o \
