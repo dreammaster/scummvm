@@ -15,6 +15,7 @@ MODULE_OBJS = \
 	gfx/gfx.o \
 	gfx/image.o \
 	gfx/picture.o \
+	gfx/region.o \
 	gfx/screen.o \
 	gfx/visual_container.o \
 	gfx/visual_item.o \

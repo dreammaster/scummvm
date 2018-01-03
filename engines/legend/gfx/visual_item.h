@@ -25,6 +25,7 @@
 
 #include "graphics/managed_surface.h"
 #include "legend/core/named_item.h"
+#include "legend/gfx/region.h"
 #include "legend/gfx/screen.h"
 
 namespace Legend {
@@ -126,6 +127,7 @@ private:
 protected:
 	Common::Rect _bounds;
 	bool _isDirty;
+	Regions _regions;
 public:
 	CLASSDEF;
 	VisualItem() { init(); }
@@ -185,6 +187,12 @@ public:
 	 * Helper function to switch to a different visual item
 	 */
 	void changeView(const String &name);
+
+	/**
+	 * Returns the index of a region that contains a given point
+	 * @returns		Index of match, or -1 for none
+	 */
+	int regionIndexOf(const Common::Point &pt) { return _regions.indexOf(pt); }
 };
 
 } // End of namespace Gfx
