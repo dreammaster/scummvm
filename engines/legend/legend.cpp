@@ -40,6 +40,7 @@ LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc)
 	_mouseCursor = nullptr;
 	_res = nullptr;
 	_screen = nullptr;
+	_vocab = nullptr;
 	_window = nullptr;
 }
 
@@ -51,6 +52,7 @@ LegendEngine::~LegendEngine() {
 	delete _picFile;
 	delete _res;
 	delete _screen;
+	delete _vocab;
 	delete _window;
 }
 
@@ -66,6 +68,8 @@ void LegendEngine::initialize() {
 	_mouseCursor = new MouseCursor(this);
 	_picFile = new Gfx::PicFile();
 	_window = new MainGameWindow(this);
+
+	_vocab = isLater() ? nullptr : new Early::Vocab();
 
 	_window->applicationStarting();
 }

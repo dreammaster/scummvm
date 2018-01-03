@@ -24,14 +24,22 @@
 #define LEGEND_EARLY_CORE_HUFFMAN_H
 
 #include "common/stream.h"
+#include "common/memstream.h"
 
 namespace Legend {
 namespace Early {
 
+/**
+ * Huffman decoder
+ * TODO: See if engine can be refactored to use the common Huffman class
+ */
 class Huffman {
 public:
-	static void decompress(byte *buffer, Common::SeekableReadStream *stream,
-		const uint16 *huffmanTable, size_t nodeCount);
+	/**
+	 * Decompress Huffman encoded stream
+	 */
+	static Common::MemoryWriteStreamDynamic *decompress(Common::SeekableReadStream &stream,
+		const int16 *huffmanTable, size_t nodeCount, byte **symbols = nullptr, int symbolsCount = 0);
 };
 
 } // End of namespace Early

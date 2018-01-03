@@ -21,6 +21,7 @@
  */
 
 #include "common/file.h"
+#include "common/substream.h"
 #include "legend/early/core/vocab.h"
 #include "legend/early/core/huffman.h"
 
@@ -28,8 +29,7 @@ namespace Legend {
 namespace Early {
 
 Vocab::Vocab() {
-	char vocabData[18842];
-	uint16 huffmanTable[256];
+	int16 huffmanTable[256];
 
 	Common::File f;
 	if (!f.open("vocab.dat"))
@@ -38,19 +38,19 @@ Vocab::Vocab() {
 	// Read in the table
 	size_type nodeCount = f.readUint16LE();
 	for (size_type idx = 0; idx < nodeCount; ++idx)
-		huffmanTable[idx] = f.readUint16LE();
+		huffmanTable[idx] = f.readSint16LE();
 
 	size_type streamSize = f.readUint16LE();
-	Huffman::decompress((byte *)vocabData, &f, huffmanTable, nodeCount);
+	Common::SeekableSubReadStream substream(&f, f.pos(), f.pos() + streamSize);
+	Common::MemoryWriteStreamDynamic *data = Huffman::decompress(substream, huffmanTable, nodeCount);
 
 	size_type vocabCount = f.readUint16LE();
 	reserve(vocabCount);
 
 	for (size_type vocabIdx = 0; vocabIdx < vocabCount; ++vocabIdx) {
-		VocabEntry &v = (*this)[vocabIdx];
 		uint16 vocabOffset = f.readUint16LE();
 		uint16 flags = f.readUint16LE();
-		v = VocabEntry(&vocabData[vocabOffset], flags);
+		push_back(VocabEntry((const char *)data->getData() + vocabOffset, flags));
 	}
 
 	vocabCount = f.readUint16LE();
@@ -67,6 +67,7 @@ Vocab::Vocab() {
 	}
 
 	f.close();
+	delete data;
 }
 
 } // End of namespace Early

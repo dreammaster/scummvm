@@ -42,6 +42,7 @@
 #include "legend/gfx/gfx.h"
 #include "legend/gfx/picture.h"
 #include "legend/gfx/screen.h"
+#include "legend/early/core/vocab.h"
 
 namespace Legend {
 
@@ -90,8 +91,8 @@ public:
 	MouseCursor *_mouseCursor;
 	Gfx::PicFile *_picFile;
 	Resources *_res;
-	//Scene *_scene;
 	Gfx::Screen *_screen;
+	Early::Vocab *_vocab;
 public:
 	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);
 	virtual ~LegendEngine();
