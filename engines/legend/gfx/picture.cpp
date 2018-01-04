@@ -40,7 +40,10 @@ PicFile::~PicFile() {
 bool PicFile::open(uint pictureNum, uint frameNum) {
 	int fileNumber = (pictureNum >> 8) & 0xf;
 	int picIndex = pictureNum & 0xff;
-	
+	if (!g_vm->isLater())
+		// Use EGA pic files
+		fileNumber += 200;
+
 	// Check if the desired picture is in another PIC file
 	if (fileNumber != _currentFileNumber) {
 		// Close any previously open PIC file
@@ -544,12 +547,35 @@ int PictureDecoder::getBlockOffset(int numBits) {
 int Picture::decode(Common::SeekableReadStream *inStream) {
 	assert(!empty());
 
+	int result;
 	Graphics::Surface s = this->getSubArea(Common::Rect(0, 0, this->w, this->h));
-	Common::MemoryWriteStream *outStream = new Common::MemoryWriteStream(
-		(byte *)s.getPixels(), s.w * s.h);
 
-	int result = PictureDecoder::decode(inStream, outStream);
-	delete outStream;
+	if (g_vm->isLater()) {
+		// Later games use 8-bit pixels, so can written directly to surface
+		Common::MemoryWriteStream *outStream = new Common::MemoryWriteStream(
+			(byte *)s.getPixels(), s.w * s.h);
+
+		result = PictureDecoder::decode(inStream, outStream);
+		delete outStream;
+	} else {
+		// Earlier games are set to use EGA graphics, which has 2 pixels per byte
+		Common::MemoryWriteStreamDynamic *outStream = new Common::MemoryWriteStreamDynamic(DisposeAfterUse::YES);
+		result = PictureDecoder::decode(inStream, outStream);
+
+		if (!result) {
+			// Decoded successfully, so split up each byte
+			const byte *pSrc = outStream->getData();
+			for (int yp = 0; yp < s.h; ++yp) {
+				byte *pDest = (byte *)s.getBasePtr(0, yp);
+				for (int xp = 0; xp < s.w; xp += 2, ++pSrc) {
+					*pDest++ = *pSrc & 0xf;
+					*pDest++ = *pSrc >> 4;
+				}
+			}
+		}
+
+		delete outStream;
+	}
 	
 	/* Debug code for dumping the data for a picture to a format
 	 * I can compare directly with a MEMDUMP from Dosbox Debugger
