@@ -23,13 +23,17 @@
 #ifndef LEGEND_EARLY_LISTBOX_H
 #define LEGEND_EARLY_LISTBOX_H
 
-#include "legend/gfx/visual_item.h"
+#include "legend/early/gfx/boxed_element.h"
 #include "legend/gfx/picture.h"
 
 namespace Legend {
 namespace Early {
 
-class Listbox : public Gfx::VisualItem {
+enum ListboxRegion {
+	LB_ITEMS = 0, LB_THUMBNAIL = 1, LB_SCROLLBAR = 2, LB_THUMB_UP = 3, LB_THUMB_DOWN = 4
+};
+
+class Listbox : public BoxedElement {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
 	bool FrameMsg(CFrameMsg &msg); 
@@ -37,6 +41,7 @@ private:
 	StringArray _lines;
 	int _topVisible;
 	int _xOffset;
+	int _thumbnailY;
 	bool _upPressed, _downPressed;
 	Gfx::Picture *_thumbUp;
 	Gfx::Picture *_thumbDown;
@@ -50,11 +55,11 @@ private:
 	void init();
 public:
 	CLASSDEF;
-	Listbox() : Gfx::VisualItem() { init(); }
-	Listbox(const Common::Rect &r) : Gfx::VisualItem(r) { init(); }
-	Listbox(const Common::String &name) : Gfx::VisualItem(name) { init(); }
+	Listbox() : BoxedElement() { init(); }
+	Listbox(const Common::Rect &r) : BoxedElement(r) { init(); }
+	Listbox(const Common::String &name) : BoxedElement(name) { init(); }
 	Listbox(const Common::String &name, const Common::Rect &r) : 
-		Gfx::VisualItem(name, r) { init(); }
+		BoxedElement(name, r) { init(); }
 	virtual ~Listbox();
 
 	/**

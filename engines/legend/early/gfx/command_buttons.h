@@ -29,7 +29,7 @@
 namespace Legend {
 namespace Early {
 
-class CommandButtons : public BoxedElement {
+class CommandButtons : public Gfx::VisualContainer {
 	DECLARE_MESSAGE_MAP;
 	DEFINE_BUTTON(Help);
 	DEFINE_BUTTON(Half);

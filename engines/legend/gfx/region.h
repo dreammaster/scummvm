@@ -50,12 +50,18 @@ public:
 	/**
 	 * Add a region to the list
 	 */
-	int add(const Region &r) { push_back(r); }
+	int add(const Region &r) {
+		push_back(r);
+		return size() - 1;
+	}
 
 	/**
 	 * Add a region to the list
 	 */
-	int add(const Common::Rect &r) { push_back(r); }
+	int add(const Common::Rect &r) { 
+		push_back(r);
+		return size() - 1;
+	}
 
 	/**
 	 * Returns the index of a region that contains a given point

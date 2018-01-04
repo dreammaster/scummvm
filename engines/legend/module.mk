@@ -19,6 +19,7 @@ MODULE_OBJS = \
 	gfx/screen.o \
 	gfx/visual_container.o \
 	gfx/visual_item.o \
+	gfx/visual_surface.o \
 	early/core/huffman.o \
 	early/core/vocab.o \
 	early/gfx/boxed_element.o \

@@ -27,92 +27,10 @@
 #include "legend/core/named_item.h"
 #include "legend/gfx/region.h"
 #include "legend/gfx/screen.h"
+#include "legend/gfx/visual_surface.h"
 
 namespace Legend {
 namespace Gfx {
-
-class VisualItem;
-
-/**
- * Font related details
- */
-struct FontDetails {
-	int _fontNumber;
-	Common::Point _fontCenter;
-	int _horizSpacings;
-	bool _allowsPendingText;
-	Common::String _pendingText;
-	Common::Point _writePos;
-	int _fgColor, _bgColor;
-
-	FontDetails() : _fontNumber(-1), _horizSpacings(-1), _allowsPendingText(false),
-		_fgColor(0), _bgColor(0) {}
-	void reset();
-};
-
-class VisualSurface : public Graphics::ManagedSurface {
-private:
-	FontDetails &_font;
-	const Common::Rect &_bounds;
-
-	/**
-	 * Moves font output to a new line, prompting for waiting if necessary
-	 */
-	bool newLine();
-public:
-	VisualSurface(const Graphics::ManagedSurface &src,
-		FontDetails &fontDetails, const Common::Rect &bounds);
-
-	/**
-	 * Loads a font to use for the item
-	 */
-	Font *loadFont(int fontNumber);
-
-	/**
-	 * Set the position for writing text in screen-coordinates
-	 * @remarks		All text is clipped to the bounds of the visual item
-	 */
-	void setTextPos(const Common::Point &pt) {
-		_font._writePos = Common::Point(pt.x - _bounds.left, pt.y - _bounds.top);
-	}
-
-	/**
-	 * Sets the postion or writing text relative to the top-left corner of the visual item's bounds
-	 */
-	void setRelativeTextPos(const Common::Point &pt) { _font._writePos = pt; }
-
-	/**
-	 * Set the font color
-	 */
-	void setFontColor(int fgColor, int bgColor = -1);
-
-	/**
-	 * Writes a string
-	 * @param text	Text to display
-	 * @returns		Number of characters written
-	 */
-	int writeString(const String &text);
-
-	/**
-	 * Writes a string
-	 */
-	void writeString(const Common::Point &pt, const String &msg);
-
-	/**
-	 * Get the width of a string
-	 */
-	int stringWidth(const String &msg);
-
-	/**
-	 * Return the font center
-	 */
-	Common::Point getFontCenter() const { return _font._fontCenter; }
-
-	/**
-	 * Fill the surface with a given color
-	 */
-	void fill(byte color) { Graphics::ManagedSurface::clear(color); }
-};
 
 /**
  * Acts as the base class for all classes that have a visual representation on the screen

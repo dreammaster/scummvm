@@ -27,7 +27,7 @@
 namespace Legend {
 namespace Early {
 
-BEGIN_MESSAGE_MAP(Listbox, Gfx::VisualItem)
+BEGIN_MESSAGE_MAP(Listbox, BoxedElement)
 	ON_MESSAGE(ShowMsg)
 	ON_MESSAGE(FrameMsg)
 END_MESSAGE_MAP()
@@ -36,6 +36,7 @@ void Listbox::init() {
 	_lines.clear();
 	_topVisible = 0;
 	_xOffset = 0;
+	_thumbnailY = 0;
 	_upPressed = _downPressed = false;
 	_thumbUp = _thumbDown = nullptr;
 	_thumbUpPressed = _thumbDownPressed = nullptr;
@@ -89,6 +90,21 @@ bool Listbox::ShowMsg(CShowMsg &msg) {
 	_thumbUpPressed = pic.load(LISTBOX_PIC + 3);
 	_thumbDownPressed = pic.load(LISTBOX_PIC + 4);
 
+	_thumbnailY = _bounds.top + _thumbUp->h + 3;
+	int scrollbarLeft = _bounds.right - _thumbUp->w - 1;
+
+	// Set up regions for the listbox. These match the order of ListboxRegion enum
+	_regions.add(Common::Rect(_bounds.left + 1, _bounds.top + 1,
+		scrollbarLeft, _bounds.bottom - 1));
+	_regions.add(Common::Rect(scrollbarLeft, _thumbnailY,
+		scrollbarLeft + _thumbnail->w, _thumbnailY + _thumbnail->h));
+	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + _thumbUp->h + 3,
+		scrollbarLeft + _thumbnail->w, _bounds.bottom - _thumbDown->h - 3));
+	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + 1,
+		scrollbarLeft + _thumbUp->w, _bounds.top + 1 + _thumbUp->h));
+	_regions.add(Common::Rect(scrollbarLeft, _bounds.bottom - _thumbDown->h - 1,
+		scrollbarLeft + _thumbDown->w, _bounds.bottom - 1));
+
 	return Gfx::VisualItem::ShowMsg(msg);
 }
 
@@ -106,14 +122,15 @@ void Listbox::draw() {
 	Gfx::VisualSurface s = getSurface();
 
 	// Fill the background with white
-	s.fill(LIGHT_GRAY);// WHITE);
-/*
+	s.fill(WHITE);
+	s.frameRect(Common::Rect(0, 0, s.w, s.h), BLACK);
+
 	// Draw the thumb up/down buttons
-	s.blitFrom(_upPressed ? *_thumbUpPressed : *_thumbUp,
-		Common::Point(s.w - _thumbUp->w, 0));
-	s.blitFrom(_downPressed ? *_thumbDownPressed : *_thumbDown,
-		Common::Point(s.w - _thumbUp->w, s.h - _thumbDown->h));
-*/
+	s.blitFrom(_upPressed ? *_thumbUpPressed : *_thumbUp, _regions[LB_THUMB_UP]);
+	s.blitFrom(_downPressed ? *_thumbDownPressed : *_thumbDown, _regions[LB_THUMB_DOWN]);
+
+	// TODO: Display of thumbnail
+	s.blitFrom(*_thumbnail, Common::Point(50, 50));
 }
 
 } // End of namespace Early
