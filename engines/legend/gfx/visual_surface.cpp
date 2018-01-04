@@ -27,7 +27,7 @@ namespace Legend {
 namespace Gfx {
 
 void FontDetails::reset() {
-	_fontNumber = -1;
+	_fontNumber = 1;
 	_horizSpacings = -1;
 	_allowsPendingText = false;
 }
@@ -49,6 +49,15 @@ Font *VisualSurface::loadFont(int fontNumber) {
 	return font;
 }
 
+Font *VisualSurface::getFont() {
+	if (Font::_activeFont->_fontNumber != _font._fontNumber) {
+		assert(_font._fontNumber > 0);
+		loadFont(_font._fontNumber);
+	}
+
+	return Font::_activeFont;
+}
+
 void VisualSurface::setFontColor(int fgColor, int bgColor) {
 	_font._fgColor = fgColor;
 	_font._bgColor = bgColor;
@@ -56,11 +65,7 @@ void VisualSurface::setFontColor(int fgColor, int bgColor) {
 
 int VisualSurface::writeString(const String &text) {
 	// Ensure the correct font is active
-	Font *font = Font::_activeFont;
-	if (Font::_activeFont->_fontNumber != _font._fontNumber) {
-		assert(_font._fontNumber > 0);
-		loadFont(_font._fontNumber);
-	}
+	Font *font = getFont();
 
 	// Set the color
 	font->setColor(_font._fgColor, _font._bgColor);

@@ -67,10 +67,9 @@ void LegendEngine::initialize() {
 	_gfx = new Gfx::Gfx();
 	_mouseCursor = new MouseCursor(this);
 	_picFile = new Gfx::PicFile();
-	_window = new MainGameWindow(this);
-
 	_vocab = isLater() ? nullptr : new Early::Vocab();
 
+	_window = new MainGameWindow(this);
 	_window->applicationStarting();
 }
 

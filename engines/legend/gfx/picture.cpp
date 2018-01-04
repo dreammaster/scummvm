@@ -564,7 +564,7 @@ int Picture::decode(Common::SeekableReadStream *inStream) {
 
 		if (!result) {
 			// Decoded successfully, so split up each byte
-			assert((outStream->size() * 2) == (((s.w + 1) / 2) * 2 * s.h));
+			assert((outStream->size() * 2) == (uint)(((s.w + 1) / 2) * 2 * s.h));
 
 			const byte *pSrc = outStream->getData();
 			for (int yp = 0; yp < s.h; ++yp) {

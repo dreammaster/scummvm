@@ -43,7 +43,7 @@ struct FontDetails {
 	Common::Point _writePos;
 	int _fgColor, _bgColor;
 
-	FontDetails() : _fontNumber(-1), _horizSpacings(-1), _allowsPendingText(false),
+	FontDetails() : _fontNumber(1), _horizSpacings(-1), _allowsPendingText(false),
 		_fgColor(0), _bgColor(0) {}
 	void reset();
 };
@@ -65,6 +65,11 @@ public:
 	 * Loads a font to use for the item
 	 */
 	Font *loadFont(int fontNumber);
+
+	/**
+	 * Gets the surface's current font
+	 */
+	Font *getFont();
 
 	/**
 	 * Set the position for writing text in screen-coordinates

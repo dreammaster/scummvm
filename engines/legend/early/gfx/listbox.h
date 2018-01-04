@@ -25,6 +25,7 @@
 
 #include "legend/early/gfx/boxed_element.h"
 #include "legend/gfx/picture.h"
+#include "legend/gfx/visual_surface.h"
 
 namespace Legend {
 namespace Early {
@@ -41,7 +42,6 @@ private:
 	StringArray _lines;
 	int _topVisible;
 	int _xOffset;
-	int _thumbnailY;
 	bool _upPressed, _downPressed;
 	Gfx::Picture *_thumbUp;
 	Gfx::Picture *_thumbDown;
@@ -53,6 +53,23 @@ private:
 	 * Common initialization method used by the constructors
 	 */
 	void init();
+
+	/**
+	 * Returns the number of visible rows of text the listbox can display
+	 */
+	uint numVisibleRows() {
+		return _bounds.height() / (getSurface().getFont()->_lineHeight + 1);
+	}
+
+	/**
+	 * Handles drawing the scrollbar
+	 */
+	void drawScrollbar();
+
+	/**
+	 * Draws the list of items
+	 */
+	void drawItems();
 public:
 	CLASSDEF;
 	Listbox() : BoxedElement() { init(); }

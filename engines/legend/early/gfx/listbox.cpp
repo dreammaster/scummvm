@@ -36,7 +36,6 @@ void Listbox::init() {
 	_lines.clear();
 	_topVisible = 0;
 	_xOffset = 0;
-	_thumbnailY = 0;
 	_upPressed = _downPressed = false;
 	_thumbUp = _thumbDown = nullptr;
 	_thumbUpPressed = _thumbDownPressed = nullptr;
@@ -60,7 +59,7 @@ void Listbox::load(const String &resName) {
 	init();
 
 	Common::SeekableReadStream *stream = g_vm->_res->getResource(resName);
-	int valsPerLine = stream->readUint16LE();
+	int valsPerLine = stream->readUint32LE();
 
 	while (stream->pos() < stream->size()) {
 		String line;
@@ -71,8 +70,10 @@ void Listbox::load(const String &resName) {
 				assert(id != 0xffff);
 				if (idx > 0)
 					line += " ";
-				// TODO: line += vocab
+				line += (*g_vm->_vocab)[id];
 			}
+
+			_lines.push_back(line);
 		}
 	}
 
@@ -90,14 +91,14 @@ bool Listbox::ShowMsg(CShowMsg &msg) {
 	_thumbUpPressed = pic.load(LISTBOX_PIC + 3);
 	_thumbDownPressed = pic.load(LISTBOX_PIC + 4);
 
-	_thumbnailY = _bounds.top + _thumbUp->h + 3;
+	int thumbnailY = _bounds.top + _thumbUp->h + 3;
 	int scrollbarLeft = _bounds.right - _thumbUp->w - 1;
 
 	// Set up regions for the listbox. These match the order of ListboxRegion enum
 	_regions.add(Common::Rect(_bounds.left + 1, _bounds.top + 1,
 		scrollbarLeft, _bounds.bottom - 1));
-	_regions.add(Common::Rect(scrollbarLeft, _thumbnailY,
-		scrollbarLeft + _thumbnail->w, _thumbnailY + _thumbnail->h));
+	_regions.add(Common::Rect(scrollbarLeft, thumbnailY,
+		scrollbarLeft + _thumbnail->w, thumbnailY + _thumbnail->h));
 	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + _thumbUp->h + 3,
 		scrollbarLeft + _thumbnail->w, _bounds.bottom - _thumbDown->h - 3));
 	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + 1,
@@ -116,21 +117,33 @@ bool Listbox::FrameMsg(CFrameMsg &msg) {
 void Listbox::draw() {
 	if (!_isDirty)
 		return;
-	Gfx::VisualItem::draw();
+	BoxedElement::draw();
 
+	drawScrollbar();
+	drawItems();
+}
+
+void Listbox::drawScrollbar() {
 	// Get a drawing surface
 	Gfx::VisualSurface s = getSurface();
 
-	// Fill the background with white
-	s.fill(WHITE);
-	s.frameRect(Common::Rect(0, 0, s.w, s.h), BLACK);
+	// Draw the vertical line for the left side of the scrollbar
+	int scrollbarLeft = s.w - _regions[LB_THUMB_UP].width() - 1;
+	s.vLine(scrollbarLeft, 0, s.h, BLACK);
 
 	// Draw the thumb up/down buttons
 	s.blitFrom(_upPressed ? *_thumbUpPressed : *_thumbUp, _regions[LB_THUMB_UP]);
 	s.blitFrom(_downPressed ? *_thumbDownPressed : *_thumbDown, _regions[LB_THUMB_DOWN]);
 
-	// TODO: Display of thumbnail
-	s.blitFrom(*_thumbnail, Common::Point(50, 50));
+	// Only draw the scrolling area if there are enough items to actually allow scrolling
+	if (_lines.size() > numVisibleRows()) {
+		// TODO: Pattern background
+		s.blitFrom(*_thumbnail, _regions[LB_THUMBNAIL]);
+	}
+}
+
+void Listbox::drawItems() {
+
 }
 
 } // End of namespace Early
