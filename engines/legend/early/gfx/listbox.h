@@ -34,11 +34,15 @@ enum ListboxRegion {
 	LB_ITEMS = 0, LB_THUMBNAIL = 1, LB_SCROLLBAR = 2, LB_THUMB_UP = 3, LB_THUMB_DOWN = 4
 };
 
+#define ARROW_REPEAT_FRAMES 2
+
 class Listbox : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
 	bool FrameMsg(CFrameMsg &msg);
 	bool MouseWheelMsg(CMouseWheelMsg &msg);
+	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
+	bool MouseButtonUpMsg(CMouseButtonUpMsg &msg);
 private:
 	StringArray _lines;
 	int _topVisible;
@@ -46,6 +50,7 @@ private:
 	int _xOffset;
 	int _dividerIndex;
 	bool _upPressed, _downPressed;
+	uint _pressRepeatExpiry;
 	Gfx::Picture *_thumbUp;
 	Gfx::Picture *_thumbDown;
 	Gfx::Picture *_thumbnail;
@@ -62,6 +67,13 @@ private:
 	 */
 	uint numVisibleRows() {
 		return (_bounds.height() - 10) / (getSurface().getFont()->_lineHeight + 2);
+	}
+
+	/**
+	 * Returns true if scrolling is enabled
+	 */
+	bool isScrollingEnabled() {
+		return _lines.size() > numVisibleRows();
 	}
 
 	/**

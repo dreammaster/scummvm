@@ -31,6 +31,8 @@ BEGIN_MESSAGE_MAP(Listbox, Gfx::VisualItem)
 	ON_MESSAGE(ShowMsg)
 	ON_MESSAGE(FrameMsg)
 	ON_MESSAGE(MouseWheelMsg)
+	ON_MESSAGE(MouseButtonDownMsg)
+	ON_MESSAGE(MouseButtonUpMsg)
 END_MESSAGE_MAP()
 
 void Listbox::init() {
@@ -40,6 +42,7 @@ void Listbox::init() {
 	_dividerIndex = -1;
 	_xOffset = 0;
 	_upPressed = _downPressed = false;
+	_pressRepeatExpiry = 0;
 	_thumbUp = _thumbDown = nullptr;
 	_thumbUpPressed = _thumbDownPressed = nullptr;
 	_thumbnail = nullptr;
@@ -117,7 +120,7 @@ void Listbox::draw() {
 }
 
 void Listbox::drawScrollbar() {
-	bool thumbVisible = _lines.size() > numVisibleRows();
+	bool thumbVisible = isScrollingEnabled();
 
 	// Get a drawing surface
 	Gfx::VisualSurface surface = getSurface();
@@ -178,14 +181,14 @@ void Listbox::deltaChange(int delta) {
 
 	int topVisible = _topVisible;
 	int newIndex = _selectedIndex;
-	int lastIndex = _lines.size() - numVisibleRows();
 
 	// Figure out the new index and top visible row to use after delta change
 	if (delta < -1 || delta > 1) {
+		int maxTopVisible = _lines.size() - numVisibleRows();
 		topVisible += delta;
 
-		if (topVisible > lastIndex) {
-			topVisible = MAX(lastIndex, 0);
+		if (topVisible > maxTopVisible) {
+			topVisible = MAX(maxTopVisible, 0);
 			newIndex = (int)_lines.size() - 1;
 		} else {
 			if (topVisible < 0)
@@ -198,8 +201,9 @@ void Listbox::deltaChange(int delta) {
 		if (newIndex < topVisible) {
 			topVisible = newIndex;
 		} else {
-			if (topVisible > lastIndex)
-				topVisible = MAX(lastIndex, 0);
+			int minTopVisible = newIndex - numVisibleRows() + 1;
+			if (topVisible < minTopVisible)
+				topVisible = MAX(minTopVisible, 0);
 		}
 	}
 
@@ -241,7 +245,17 @@ bool Listbox::ShowMsg(CShowMsg &msg) {
 }
 
 bool Listbox::FrameMsg(CFrameMsg &msg) {
-	// TODO
+	// When the up or down arrow buttons are pressed in the scrollbar,
+	// do repeated delta changes as long as the mouse button is held
+	if (_upPressed || _downPressed) {
+		uint currTime = g_vm->_events->getFrameCounter();
+
+		if (currTime >= _pressRepeatExpiry) {
+			_pressRepeatExpiry = currTime + ARROW_REPEAT_FRAMES;
+			deltaChange(_upPressed ? -1 : 1);
+		}
+	}
+
 	return true;
 }
 
@@ -250,6 +264,39 @@ bool Listbox::MouseWheelMsg(CMouseWheelMsg &msg) {
 		_selectedIndex = _topVisible;
 
 	deltaChange(msg._wheelUp ? -1 : 1);
+	return true;
+}
+
+bool Listbox::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
+	switch (_regions.indexOf(msg._mousePos)) {
+	case LB_THUMB_UP:
+		if (isScrollingEnabled()) {
+			_upPressed = true;
+			setDirty();
+		}
+		break;
+
+	case LB_THUMB_DOWN:
+		if (isScrollingEnabled()) {
+			_downPressed = true;
+			setDirty();
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	return true;
+}
+
+bool Listbox::MouseButtonUpMsg(CMouseButtonUpMsg &msg) {
+	if (_upPressed || _downPressed) {
+		_upPressed = _downPressed = false;
+		_pressRepeatExpiry = 0;
+		setDirty();
+	}
+
 	return true;
 }
 

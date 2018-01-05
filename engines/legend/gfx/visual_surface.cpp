@@ -131,8 +131,6 @@ int VisualSurface::writeString(const String &text) {
 		// Display the word
 		Common::String word(startP, endP);
 		font->writeString(*this, _font._writePos, word);
-
-		_font._writePos.x += wordWidth;
 		result += word.size();
 
 		if (*endP == '\t') {
@@ -154,13 +152,9 @@ int VisualSurface::writeString(const String &text) {
 				break;
 		} else if (*endP == ' ') {
 			// Space character
-			endP = startP;
-		} else {
-			// All other characters
-			if (*endP)
-				++endP;
-			startP = endP;
+			startP = ++endP;
 
+			// Put in a single space character
 			wordWidth = font->charWidth(' ');
 			width = this->w - _font._writePos.x - font->_xCenter;
 			if (wordWidth <= width) {
@@ -170,6 +164,9 @@ int VisualSurface::writeString(const String &text) {
 				if (newLine())
 					break;
 			}
+		} else {
+			// All other characters
+			startP = endP;
 		}
 	}
 
