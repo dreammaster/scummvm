@@ -33,6 +33,7 @@ BEGIN_MESSAGE_MAP(Listbox, Gfx::VisualItem)
 	ON_MESSAGE(MouseWheelMsg)
 	ON_MESSAGE(MouseButtonDownMsg)
 	ON_MESSAGE(MouseButtonUpMsg)
+	ON_MESSAGE(MouseDragMsg)
 END_MESSAGE_MAP()
 
 void Listbox::init() {
@@ -41,6 +42,8 @@ void Listbox::init() {
 	_selectedIndex = -1;
 	_dividerIndex = -1;
 	_xOffset = 0;
+	_dragOffset = 0;
+	_draggingThumbnail = false;
 	_upPressed = _downPressed = false;
 	_pressRepeatExpiry = 0;
 	_thumbUp = _thumbDown = nullptr;
@@ -283,6 +286,18 @@ bool Listbox::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
 		}
 		break;
 
+	case LB_SCROLLBAR:
+		// Clicked on scrollbar above or below thmbnail, so move up/down a page
+		deltaChange((msg._mousePos.y < _regions[LB_THUMBNAIL].top) ?
+			-numVisibleRows() : numVisibleRows());
+		break;
+
+	case LB_THUMBNAIL:
+		// Clicked on thumbail
+		_draggingThumbnail = true;
+		_dragOffset = msg._mousePos.y - _regions[LB_THUMBNAIL].top;
+		break;
+
 	default:
 		break;
 	}
@@ -295,6 +310,30 @@ bool Listbox::MouseButtonUpMsg(CMouseButtonUpMsg &msg) {
 		_upPressed = _downPressed = false;
 		_pressRepeatExpiry = 0;
 		setDirty();
+	}
+
+	if (_draggingThumbnail) {
+		_draggingThumbnail = false;
+		_dragOffset = 0;
+	}
+
+	return true;
+}
+
+bool Listbox::MouseDragMsg(CMouseDragMsg &msg) {
+	if (_draggingThumbnail) {
+		// Figure out new position based on mouse position
+		int yStart = _regions[LB_SCROLLBAR].top;
+		int yEnd = _regions[LB_SCROLLBAR].bottom - _thumbnail->h;
+		int newY = CLIP(msg._mousePos.y - _dragOffset, yStart, yEnd);
+
+		// Determine the effective selection index
+		int newIndex = (newY - yStart) * ((int)_lines.size() - 1)
+			/ (yEnd - yStart + 1);
+
+		if (newIndex != _selectedIndex)
+			// Do a delta change to select that index
+			deltaChange(newIndex - MAX(_selectedIndex, 0));
 	}
 
 	return true;

@@ -42,6 +42,7 @@ public:
 	InputTranslator(InputHandler *inputHandler);
 
 	void mouseMove(int special, const Common::Point &pt);
+	void mouseDrag(int special, const Common::Point &pt);
 	void leftButtonDown(int special, const Common::Point &pt);
 	void leftButtonUp(int special, const Common::Point &pt);
 	void leftButtonDoubleClick(int special, const Common::Point &pt);

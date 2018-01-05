@@ -155,6 +155,13 @@ public:
 	CMouseMoveMsg(const Common::Point &pt, int buttons) : CMouseMsg(pt, buttons) {}
 };
 
+class CMouseDragMsg : public CMouseMoveMsg {
+public:
+	MESSAGEDEFP(CMouseDragMsg, CMouseMoveMsg);
+	CMouseDragMsg() : CMouseMoveMsg() {}
+	CMouseDragMsg(const Common::Point &pt, int buttons) : CMouseMoveMsg(pt, buttons) {}
+};
+
 class CMouseButtonMsg : public CMouseMsg {
 public:
 	int _field10;

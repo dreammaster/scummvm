@@ -35,6 +35,7 @@ class VisualContainer : public Image {
 	bool MouseMoveMsg(CMouseMoveMsg *msg);
 	bool MouseDoubleClickMsg(CMouseDoubleClickMsg *msg);
 	bool MouseWheelMsg(CMouseWheelMsg *msg);
+	bool MouseDragMsg(CMouseDragMsg *msg);
 private:
 	VisualItem *_mouseFocusItem;
 private:

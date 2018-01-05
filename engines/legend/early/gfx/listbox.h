@@ -43,6 +43,7 @@ class Listbox : public Gfx::VisualItem {
 	bool MouseWheelMsg(CMouseWheelMsg &msg);
 	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
 	bool MouseButtonUpMsg(CMouseButtonUpMsg &msg);
+	bool MouseDragMsg(CMouseDragMsg &msg);
 private:
 	StringArray _lines;
 	int _topVisible;
@@ -51,6 +52,8 @@ private:
 	int _dividerIndex;
 	bool _upPressed, _downPressed;
 	uint _pressRepeatExpiry;
+	bool _draggingThumbnail;
+	int _dragOffset;
 	Gfx::Picture *_thumbUp;
 	Gfx::Picture *_thumbDown;
 	Gfx::Picture *_thumbnail;

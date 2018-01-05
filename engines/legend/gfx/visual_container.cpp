@@ -71,6 +71,10 @@ bool VisualContainer::MouseMoveMsg(CMouseMoveMsg *msg) {
 	return false;
 }
 
+bool VisualContainer::MouseDragMsg(CMouseDragMsg *msg) {
+	return handleMouseMsg(msg);
+}
+
 VisualItem *VisualContainer::handleMouseMsg(CMouseMsg *msg) {
 	if (_mouseFocusItem) {
 		// An item currently has focus, so pass all events directly to

@@ -28,7 +28,7 @@
 namespace Legend {
 
 InputHandler::InputHandler(GameManager *owner) :
-		_gameManager(owner), _inputTranslator(nullptr),
+		_gameManager(owner), _inputTranslator(nullptr), _dragging(false),
 		_buttonDown(false), _lockCount(0), _abortMessage(false) {
 }
 
@@ -82,6 +82,29 @@ void InputHandler::processMessage(CMessage *msg) {
 			_buttonDown = true;
 		else if (mouseMsg->isButtonUpMsg())
 			_buttonDown = false;
+
+		// Drag events generation
+		if (_dragging) {
+			if (mouseMsg->isMouseMoveMsg()) {
+				CMouseDragMsg moveMsg(_mousePos, mouseMsg->_buttons);
+				dispatchMessage(&moveMsg);
+			} else if (mouseMsg->isButtonUpMsg()) {
+				_dragging = false;
+			}
+		} else if (_buttonDown) {
+			if (!mouseMsg->isMouseMoveMsg()) {
+				// Save where the drag movement started from
+				_dragStartPos = _mousePos;
+			} else {
+				Common::Point delta = _mousePos - _dragStartPos;
+				int distance = (int)sqrt(double(delta.x * delta.x + delta.y * delta.y));
+
+				if (distance > 4) {
+					// A drag has started
+					_dragging = true;
+				}
+			}
+		}
 	}
 }
 

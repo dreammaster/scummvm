@@ -50,6 +50,11 @@ void InputTranslator::mouseMove(int special, const Common::Point &pt) {
 	_inputHandler->handleMessage(msg);
 }
 
+void InputTranslator::mouseDrag(int special, const Common::Point &pt) {
+	CMouseDragMsg msg(pt, getButtons(special));
+	_inputHandler->handleMessage(msg);
+}
+
 void InputTranslator::leftButtonDown(int special, const Common::Point &pt) {
 	CMouseButtonDownMsg msg(pt, MB_LEFT);
 	_inputHandler->handleMessage(msg);
