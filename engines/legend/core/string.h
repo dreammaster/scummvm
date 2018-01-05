@@ -44,6 +44,11 @@ public:
 	 * Initialises a string from a given resource Id
 	 */
 	String(uint id);
+
+	/**
+	 * Capitalizes the string
+	 */
+	void capitalize();
 };
 
 typedef Common::Array<String> StringArray;

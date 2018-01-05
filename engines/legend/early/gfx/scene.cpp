@@ -43,6 +43,7 @@ Scene::Scene() : Gfx::VisualContainer("Scene"),
 	_textArea.addUnder(this);
 
 	_commands.load("GATEWAY/COMMANDS");
+	_commands.setDividerIndex(16);
 }
 
 } // End of namespace Early

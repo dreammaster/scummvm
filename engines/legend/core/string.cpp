@@ -29,4 +29,9 @@ namespace Legend {
 String::String(uint id) : Common::String(g_vm->_res->getMessage(id)) {
 }
 
+void String::capitalize() {
+	if (!empty())
+		setChar(toupper(firstChar()), 0);
+}
+
 } // End of namespace Legend

@@ -34,14 +34,16 @@ enum ListboxRegion {
 	LB_ITEMS = 0, LB_THUMBNAIL = 1, LB_SCROLLBAR = 2, LB_THUMB_UP = 3, LB_THUMB_DOWN = 4
 };
 
-class Listbox : public BoxedElement {
+class Listbox : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
 	bool FrameMsg(CFrameMsg &msg); 
 private:
 	StringArray _lines;
 	int _topVisible;
+	int _selectedIndex;
 	int _xOffset;
+	int _dividerIndex;
 	bool _upPressed, _downPressed;
 	Gfx::Picture *_thumbUp;
 	Gfx::Picture *_thumbDown;
@@ -58,7 +60,7 @@ private:
 	 * Returns the number of visible rows of text the listbox can display
 	 */
 	uint numVisibleRows() {
-		return _bounds.height() / (getSurface().getFont()->_lineHeight + 1);
+		return (_bounds.height() - 10) / (getSurface().getFont()->_lineHeight + 2);
 	}
 
 	/**
@@ -72,11 +74,11 @@ private:
 	void drawItems();
 public:
 	CLASSDEF;
-	Listbox() : BoxedElement() { init(); }
-	Listbox(const Common::Rect &r) : BoxedElement(r) { init(); }
-	Listbox(const Common::String &name) : BoxedElement(name) { init(); }
+	Listbox() : Gfx::VisualItem() { init(); }
+	Listbox(const Common::Rect &r) : Gfx::VisualItem(r) { init(); }
+	Listbox(const Common::String &name) : Gfx::VisualItem(name) { init(); }
 	Listbox(const Common::String &name, const Common::Rect &r) : 
-		BoxedElement(name, r) { init(); }
+		Gfx::VisualItem(name, r) { init(); }
 	virtual ~Listbox();
 
 	/**
@@ -89,6 +91,12 @@ public:
 	 * containing string identifiers
 	 */
 	void load(const String &resName);
+
+	/**
+	 * Sets the divider line index, which is the dotted line separating
+	 * commonly used words from the remainder of the items
+	 */
+	void setDividerIndex(int index) { _dividerIndex = index; }
 
 	/**
 	 * Draws the image on the screen

@@ -60,8 +60,8 @@ void Button::draw() {
 	s.loadFont(1);
 	s.setFontColor(BLACK);
 	int strWidth = s.stringWidth(_text);
-	int xp = _bounds.left + (_bounds.width() - strWidth) / 2;
-	s.writeString(Common::Point(xp, _bounds.top + 5), _text);
+	int xp = (_bounds.width() - strWidth) / 2;
+	s.writeString(Common::Point(xp, 5), _text);
 }
 
 bool Button::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {

@@ -27,7 +27,7 @@
 namespace Legend {
 namespace Early {
 
-BEGIN_MESSAGE_MAP(Listbox, BoxedElement)
+BEGIN_MESSAGE_MAP(Listbox, Gfx::VisualItem)
 	ON_MESSAGE(ShowMsg)
 	ON_MESSAGE(FrameMsg)
 END_MESSAGE_MAP()
@@ -35,6 +35,8 @@ END_MESSAGE_MAP()
 void Listbox::init() {
 	_lines.clear();
 	_topVisible = 0;
+	_selectedIndex = 0; //***DEBUG*** -1;
+	_dividerIndex = -1;
 	_xOffset = 0;
 	_upPressed = _downPressed = false;
 	_thumbUp = _thumbDown = nullptr;
@@ -68,13 +70,14 @@ void Listbox::load(const String &resName) {
 			
 			if (id) {
 				assert(id != 0xffff);
-				if (idx > 0)
+				if (idx != 0)
 					line += " ";
-				line += (*g_vm->_vocab)[id];
+				line += (*g_vm->_vocab)[id - 1];
 			}
-
-			_lines.push_back(line);
 		}
+
+		line.capitalize();
+		_lines.push_back(line);
 	}
 
 	delete stream;
@@ -99,12 +102,12 @@ bool Listbox::ShowMsg(CShowMsg &msg) {
 		scrollbarLeft, _bounds.bottom - 1));
 	_regions.add(Common::Rect(scrollbarLeft, thumbnailY,
 		scrollbarLeft + _thumbnail->w, thumbnailY + _thumbnail->h));
-	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + _thumbUp->h + 3,
-		scrollbarLeft + _thumbnail->w, _bounds.bottom - _thumbDown->h - 3));
+	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + _thumbUp->h + 1,
+		scrollbarLeft + _thumbnail->w, _bounds.bottom - _thumbDown->h));
 	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + 1,
 		scrollbarLeft + _thumbUp->w, _bounds.top + 1 + _thumbUp->h));
-	_regions.add(Common::Rect(scrollbarLeft, _bounds.bottom - _thumbDown->h - 1,
-		scrollbarLeft + _thumbDown->w, _bounds.bottom - 1));
+	_regions.add(Common::Rect(scrollbarLeft, _bounds.bottom - _thumbDown->h,
+		scrollbarLeft + _thumbDown->w, _bounds.bottom));
 
 	return Gfx::VisualItem::ShowMsg(msg);
 }
@@ -117,8 +120,13 @@ bool Listbox::FrameMsg(CFrameMsg &msg) {
 void Listbox::draw() {
 	if (!_isDirty)
 		return;
-	BoxedElement::draw();
+	Gfx::VisualItem::draw();
 
+	// Draw top line of listbox (only the top side has a line)
+	Gfx::VisualSurface s = getSurface();
+	s.hLine(0, 0, s.w - 1, BLACK);
+
+	// Draw scrollbar and list of items
 	drawScrollbar();
 	drawItems();
 }
@@ -130,6 +138,7 @@ void Listbox::drawScrollbar() {
 	// Draw the vertical line for the left side of the scrollbar
 	int scrollbarLeft = s.w - _regions[LB_THUMB_UP].width() - 1;
 	s.vLine(scrollbarLeft, 0, s.h, BLACK);
+	s.vLine(s.w - 1, 0, s.h, BLACK);
 
 	// Draw the thumb up/down buttons
 	s.blitFrom(_upPressed ? *_thumbUpPressed : *_thumbUp, _regions[LB_THUMB_UP]);
@@ -143,7 +152,29 @@ void Listbox::drawScrollbar() {
 }
 
 void Listbox::drawItems() {
+	Gfx::VisualSurface s = getSurface();
+	int lineHeight = s.getFont()->_lineHeight + 2;
+	int scrollbarLeft = s.w - _regions[LB_THUMB_UP].width() - 1;
 
+	for (int yp = 7, index = _topVisible; index < (int)_lines.size() && yp < s.h;
+			++index, yp += lineHeight) {
+		// Write out the text line
+		if (index == _selectedIndex) {
+			s.setFontColor(WHITE, BLACK);
+			s.fillRect(Common::Rect(1, yp, scrollbarLeft - 1, yp + lineHeight), BLACK);
+		} else {
+			s.setFontColor(BLACK, WHITE);
+		}
+		s.writeString(Common::Point(8, yp + 2), _lines[index]);
+	
+		if (index == _dividerIndex) {
+			int lineY = yp + lineHeight;
+
+			// Draw a dashed line alternating four pixels on to off
+			for (int xp = 1; xp < scrollbarLeft; xp += 8)
+				s.hLine(xp, lineY, MIN(xp + 3, scrollbarLeft - 1), BLACK);
+		}
+	}
 }
 
 } // End of namespace Early
