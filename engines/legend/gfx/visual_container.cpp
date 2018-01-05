@@ -35,15 +35,20 @@ END_MESSAGE_MAP()
 
 
 bool VisualContainer::MouseButtonDownMsg(CMouseButtonDownMsg *msg) {
-	if (msg->_buttons & MB_LEFT)
-		return handleMouseMsg(msg);
+	if (msg->_buttons & MB_LEFT) {
+		_mouseFocusItem = handleMouseMsg(msg);
+		return _mouseFocusItem != nullptr;
+	}
 
 	return false;
 }
 
 bool VisualContainer::MouseButtonUpMsg(CMouseButtonUpMsg *msg) {
-	if (msg->_buttons & MB_LEFT)
-		return handleMouseMsg(msg);
+	if (msg->_buttons & MB_LEFT) {
+		bool result = handleMouseMsg(msg) != nullptr;
+		_mouseFocusItem = nullptr;
+		return result;
+	}
 
 	return false;
 }
@@ -66,18 +71,26 @@ bool VisualContainer::MouseMoveMsg(CMouseMoveMsg *msg) {
 	return false;
 }
 
-bool VisualContainer::handleMouseMsg(CMouseMsg *msg) {
-	// Iterate through each child and pass the message to the first
-	// immediate child the mouse position falls within
-	for (TreeItem *child = getFirstChild(); child; child = child->getNextSibling()) {
-		VisualItem *item = dynamic_cast<VisualItem *>(child);
-		if (item && item->getBounds().contains(msg->_mousePos)) {
-			if (msg->execute(item))
-				return true;
-		}
-	}
+VisualItem *VisualContainer::handleMouseMsg(CMouseMsg *msg) {
+	if (_mouseFocusItem) {
+		// An item currently has focus, so pass all events directly to
+		// it, irrespective of whether the mouse is still in it or not
+		msg->execute(_mouseFocusItem);
+		return _mouseFocusItem;
 
-	return false;
+	} else {
+		// Iterate through each child and pass the message to the first
+		// immediate child the mouse position falls within
+		for (TreeItem *child = getFirstChild(); child; child = child->getNextSibling()) {
+			VisualItem *item = dynamic_cast<VisualItem *>(child);
+			if (item && item->getBounds().contains(msg->_mousePos)) {
+				if (msg->execute(item))
+					return item;
+			}
+		}
+
+		return nullptr;
+	}
 }
 
 void VisualContainer::draw() {

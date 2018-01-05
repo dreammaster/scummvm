@@ -36,16 +36,19 @@ class VisualContainer : public Image {
 	bool MouseDoubleClickMsg(CMouseDoubleClickMsg *msg);
 	bool MouseWheelMsg(CMouseWheelMsg *msg);
 private:
+	VisualItem *_mouseFocusItem;
+private:
 	/**
 	 * Called to handle mouse messagaes on the view
 	 */
-	bool handleMouseMsg(CMouseMsg *msg);
+	VisualItem *handleMouseMsg(CMouseMsg *msg);
 public:
 	CLASSDEF;
-	VisualContainer() : Image() {}
-	VisualContainer(const Common::Rect &r) : Image(r) {}
-	VisualContainer(const String &name) : Image(name) {}
-	VisualContainer(const String &name, const Common::Rect &r) : Image(name, r) {}
+	VisualContainer() : Image(), _mouseFocusItem(nullptr) {}
+	VisualContainer(const Common::Rect &r) : Image(r), _mouseFocusItem(nullptr) {}
+	VisualContainer(const String &name) : Image(name), _mouseFocusItem(nullptr) {}
+	VisualContainer(const String &name, const Common::Rect &r) : Image(name, r),
+		_mouseFocusItem(nullptr) {}
 	virtual ~VisualContainer() {}
 
 	/**
