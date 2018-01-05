@@ -26,7 +26,7 @@
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(Scene, Gfx::VisualItem);
+EMPTY_MESSAGE_MAP(Scene, Gfx::VisualContainer);
 
 Scene::Scene() : Gfx::VisualContainer("Scene"),
 		_commandButtons("CommandButtons", Common::Rect(0, 0, 120, 136)),

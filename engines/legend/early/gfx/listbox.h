@@ -37,7 +37,8 @@ enum ListboxRegion {
 class Listbox : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
-	bool FrameMsg(CFrameMsg &msg); 
+	bool FrameMsg(CFrameMsg &msg);
+	bool MouseWheelMsg(CMouseWheelMsg &msg);
 private:
 	StringArray _lines;
 	int _topVisible;
@@ -62,6 +63,11 @@ private:
 	uint numVisibleRows() {
 		return (_bounds.height() - 10) / (getSurface().getFont()->_lineHeight + 2);
 	}
+
+	/**
+	 * Updates the thumbnail position
+	 */
+	void updateThumbnail();
 
 	/**
 	 * Handles drawing the scrollbar
@@ -102,6 +108,11 @@ public:
 	 * Draws the image on the screen
 	 */
 	virtual void draw();
+
+	/**
+	 * Changes the selected index by a given amount
+	 */
+	void deltaChange(int delta);
 };
 
 } // End of namespace Early

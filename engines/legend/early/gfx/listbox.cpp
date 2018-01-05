@@ -30,12 +30,13 @@ namespace Early {
 BEGIN_MESSAGE_MAP(Listbox, Gfx::VisualItem)
 	ON_MESSAGE(ShowMsg)
 	ON_MESSAGE(FrameMsg)
+	ON_MESSAGE(MouseWheelMsg)
 END_MESSAGE_MAP()
 
 void Listbox::init() {
 	_lines.clear();
 	_topVisible = 0;
-	_selectedIndex = 0; //***DEBUG*** -1;
+	_selectedIndex = -1;
 	_dividerIndex = -1;
 	_xOffset = 0;
 	_upPressed = _downPressed = false;
@@ -81,40 +82,24 @@ void Listbox::load(const String &resName) {
 	}
 
 	delete stream;
+	updateThumbnail();
 }
 
+void Listbox::updateThumbnail() {
+	if (!_thumbnail || _lines.size() < numVisibleRows())
+		return;
 
-bool Listbox::ShowMsg(CShowMsg &msg) {
-	// Load the images for the listbox scrollbar
-	const int LISTBOX_PIC = 17 | 0x8000;
-	Gfx::PicFile &pic = *g_vm->_picFile;
-	_thumbUp = pic.load(LISTBOX_PIC);
-	_thumbDown = pic.load(LISTBOX_PIC + 1);
-	_thumbnail = pic.load(LISTBOX_PIC + 2);
-	_thumbUpPressed = pic.load(LISTBOX_PIC + 3);
-	_thumbDownPressed = pic.load(LISTBOX_PIC + 4);
+	const Gfx::Region &scrollRegion = _regions[LB_SCROLLBAR];
+	Gfx::Region &thumbRegion = _regions[LB_THUMBNAIL];
 
-	int thumbnailY = _bounds.top + _thumbUp->h + 3;
-	int scrollbarLeft = _bounds.right - _thumbUp->w - 1;
+	// Figure out the new vertical position of the scrollbar thumbnail
+	int yStart = scrollRegion.top;
+	int yEnd = scrollRegion.bottom - _thumbnail->h;
+	int newY = yStart + ((yEnd - yStart + 1) * MAX(_selectedIndex, 0)
+		/ ((int)_lines.size() - 1));
 
-	// Set up regions for the listbox. These match the order of ListboxRegion enum
-	_regions.add(Common::Rect(_bounds.left + 1, _bounds.top + 1,
-		scrollbarLeft, _bounds.bottom - 1));
-	_regions.add(Common::Rect(scrollbarLeft, thumbnailY,
-		scrollbarLeft + _thumbnail->w, thumbnailY + _thumbnail->h));
-	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + _thumbUp->h + 1,
-		scrollbarLeft + _thumbnail->w, _bounds.bottom - _thumbDown->h));
-	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + 1,
-		scrollbarLeft + _thumbUp->w, _bounds.top + 1 + _thumbUp->h));
-	_regions.add(Common::Rect(scrollbarLeft, _bounds.bottom - _thumbDown->h,
-		scrollbarLeft + _thumbDown->w, _bounds.bottom));
-
-	return Gfx::VisualItem::ShowMsg(msg);
-}
-
-bool Listbox::FrameMsg(CFrameMsg &msg) {
-	// TODO
-	return true;
+	// Readjust the thumbnail's region
+	thumbRegion.moveTo(thumbRegion.left, newY);
 }
 
 void Listbox::draw() {
@@ -152,29 +137,116 @@ void Listbox::drawScrollbar() {
 }
 
 void Listbox::drawItems() {
-	Gfx::VisualSurface s = getSurface();
+	// Get a surface constrained to the area to write the items in
+	Gfx::VisualSurface surface = getSurface();
+	Gfx::VisualSurface s = surface.getSubArea(Common::Rect(0, 7,
+		surface.w - _regions[LB_THUMB_UP].width() - 1, surface.h - 1));
 	int lineHeight = s.getFont()->_lineHeight + 2;
-	int scrollbarLeft = s.w - _regions[LB_THUMB_UP].width() - 1;
 
-	for (int yp = 7, index = _topVisible; index < (int)_lines.size() && yp < s.h;
+	// Erase any previously drawn items
+	s.fill(WHITE);
+
+	for (int yp = 0, index = _topVisible; index < (int)_lines.size() && yp < s.h;
 			++index, yp += lineHeight) {
 		// Write out the text line
 		if (index == _selectedIndex) {
 			s.setFontColor(WHITE, BLACK);
-			s.fillRect(Common::Rect(1, yp, scrollbarLeft - 1, yp + lineHeight), BLACK);
+			s.fillRect(Common::Rect(0, yp, s.w, yp + lineHeight), BLACK);
 		} else {
 			s.setFontColor(BLACK, WHITE);
 		}
 		s.writeString(Common::Point(8, yp + 2), _lines[index]);
 	
+		// Handle drawing the divider line, if present
 		if (index == _dividerIndex) {
 			int lineY = yp + lineHeight;
 
 			// Draw a dashed line alternating four pixels on to off
-			for (int xp = 1; xp < scrollbarLeft; xp += 8)
-				s.hLine(xp, lineY, MIN(xp + 3, scrollbarLeft - 1), BLACK);
+			for (int xp = 1; xp < s.w; xp += 8)
+				s.hLine(xp, lineY, MIN(xp + 3, s.w - 1), BLACK);
 		}
 	}
+}
+
+void Listbox::deltaChange(int delta) {
+	if (_lines.empty())
+		return;
+
+	int topVisible = _topVisible;
+	int newIndex = _selectedIndex;
+	int lastIndex = _lines.size() - numVisibleRows();
+
+	// Figure out the new index and top visible row to use after delta change
+	if (delta < -1 || delta > 1) {
+		topVisible += delta;
+
+		if (topVisible > lastIndex) {
+			topVisible = MAX(lastIndex, 0);
+			newIndex = (int)_lines.size() - 1;
+		} else {
+			if (topVisible < 0)
+				topVisible = 0;
+			newIndex = topVisible;
+		}
+	} else {
+		newIndex = CLIP(newIndex + delta, 0, (int)_lines.size() - 1);
+
+		if (newIndex < topVisible) {
+			topVisible = newIndex;
+		} else {
+			if (topVisible > lastIndex)
+				topVisible = MAX(lastIndex, 0);
+		}
+	}
+
+	_topVisible = topVisible;
+	_selectedIndex = newIndex;
+
+	// Update the thumbnail and flag the listbox for a redraw
+	updateThumbnail();
+	setDirty();
+}
+
+bool Listbox::ShowMsg(CShowMsg &msg) {
+	// Load the images for the listbox scrollbar
+	const int LISTBOX_PIC = 17 | 0x8000;
+	Gfx::PicFile &pic = *g_vm->_picFile;
+	_thumbUp = pic.load(LISTBOX_PIC);
+	_thumbDown = pic.load(LISTBOX_PIC + 1);
+	_thumbnail = pic.load(LISTBOX_PIC + 2);
+	_thumbUpPressed = pic.load(LISTBOX_PIC + 3);
+	_thumbDownPressed = pic.load(LISTBOX_PIC + 4);
+
+	int thumbnailY = _bounds.top + _thumbUp->h + 3;
+	int scrollbarLeft = _bounds.right - _thumbUp->w - 1;
+
+	// Set up regions for the listbox. These match the order of ListboxRegion enum
+	_regions.add(Common::Rect(_bounds.left + 1, _bounds.top + 1,
+		scrollbarLeft, _bounds.bottom - 1));
+	_regions.add(Common::Rect(scrollbarLeft, thumbnailY,
+		scrollbarLeft + _thumbnail->w, thumbnailY + _thumbnail->h));
+	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + _thumbUp->h + 1,
+		scrollbarLeft + _thumbnail->w, _bounds.bottom - _thumbDown->h));
+	_regions.add(Common::Rect(scrollbarLeft, _bounds.top + 1,
+		scrollbarLeft + _thumbUp->w, _bounds.top + 1 + _thumbUp->h));
+	_regions.add(Common::Rect(scrollbarLeft, _bounds.bottom - _thumbDown->h,
+		scrollbarLeft + _thumbDown->w, _bounds.bottom));
+
+	updateThumbnail();
+	return Gfx::VisualItem::ShowMsg(msg);
+}
+
+bool Listbox::FrameMsg(CFrameMsg &msg) {
+	// TODO
+	return true;
+}
+
+bool Listbox::MouseWheelMsg(CMouseWheelMsg &msg) {
+	if (_selectedIndex == -1)
+		_selectedIndex = _topVisible;
+
+	deltaChange(msg._wheelUp ? -1 : 1);
+	return true;
 }
 
 } // End of namespace Early

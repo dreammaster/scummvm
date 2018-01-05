@@ -50,7 +50,7 @@ Font *VisualSurface::loadFont(int fontNumber) {
 }
 
 Font *VisualSurface::getFont() {
-	if (Font::_activeFont->_fontNumber != _font._fontNumber) {
+	if (!Font::_activeFont || Font::_activeFont->_fontNumber != _font._fontNumber) {
 		assert(_font._fontNumber > 0);
 		loadFont(_font._fontNumber);
 	}
@@ -195,6 +195,13 @@ bool VisualSurface::newLine() {
 void VisualSurface::blitFrom(const Graphics::Surface &src, const Region &r) {
 	Common::Point pt(r.left - _bounds.left, r.top - _bounds.top);
 	blitFrom(src, pt);
+}
+
+VisualSurface VisualSurface::getSubArea(const Common::Rect &r) {
+	Common::Rect newBounds(r.left + _bounds.left, r.top + _bounds.top,
+		r.right + _bounds.left, r.bottom + _bounds.top);
+	Graphics::ManagedSurface src(Screen::get(), newBounds);
+	return VisualSurface(src, _font, newBounds);
 }
 
 } // End of namespace Gfx

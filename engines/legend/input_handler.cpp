@@ -88,7 +88,7 @@ void InputHandler::processMessage(CMessage *msg) {
 void InputHandler::dispatchMessage(CMessage *msg) {
 	Gfx::VisualItem *view = _gameManager->getView();
 	if (view)
-		msg->execute(view);
+		msg->execute(view, nullptr, MSGFLAG_BREAK_IF_HANDLED);
 }
 
 } // End of namespace Legend

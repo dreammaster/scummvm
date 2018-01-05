@@ -34,6 +34,7 @@ class VisualContainer : public Image {
 	bool MouseButtonUpMsg(CMouseButtonUpMsg *msg);
 	bool MouseMoveMsg(CMouseMoveMsg *msg);
 	bool MouseDoubleClickMsg(CMouseDoubleClickMsg *msg);
+	bool MouseWheelMsg(CMouseWheelMsg *msg);
 private:
 	/**
 	 * Called to handle mouse messagaes on the view

@@ -131,6 +131,14 @@ public:
 			const Common::Point &destPos) {
 		Graphics::ManagedSurface::blitFrom(src, srcRect, destPos);
 	}
+
+	/**
+	 * Gets a new visual surface representing sub-area of the parent surface.
+	 * This is useful when drawing needs to be clipped to an area of a surface
+	 * @param r		Rect specifying sub-area of surface to return
+	 */
+	VisualSurface getSubArea(const Common::Rect &r);
+
 };
 
 } // End of namespace Gfx

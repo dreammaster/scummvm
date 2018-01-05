@@ -30,35 +30,40 @@ BEGIN_MESSAGE_MAP(VisualContainer, VisualItem)
 	ON_MESSAGE(MouseButtonUpMsg)
 	ON_MESSAGE(MouseMoveMsg)
 	ON_MESSAGE(MouseDoubleClickMsg)
+	ON_MESSAGE(MouseWheelMsg)
 END_MESSAGE_MAP()
 
 
 bool VisualContainer::MouseButtonDownMsg(CMouseButtonDownMsg *msg) {
 	if (msg->_buttons & MB_LEFT)
-		handleMouseMsg(msg);
+		return handleMouseMsg(msg);
 
-	return true;
+	return false;
 }
 
 bool VisualContainer::MouseButtonUpMsg(CMouseButtonUpMsg *msg) {
 	if (msg->_buttons & MB_LEFT)
-		handleMouseMsg(msg);
+		return handleMouseMsg(msg);
 
-	return true;
+	return false;
 }
 
 bool VisualContainer::MouseDoubleClickMsg(CMouseDoubleClickMsg *msg) {
 	if (msg->_buttons & MB_LEFT)
-		handleMouseMsg(msg);
+		return handleMouseMsg(msg);
 
-	return true;
+	return false;
+}
+
+bool VisualContainer::MouseWheelMsg(CMouseWheelMsg *msg) {
+	return handleMouseMsg(msg);
 }
 
 bool VisualContainer::MouseMoveMsg(CMouseMoveMsg *msg) {
 	if (msg->_buttons & MB_LEFT)
-		handleMouseMsg(msg);
+		return handleMouseMsg(msg);
 
-	return true;
+	return false;
 }
 
 bool VisualContainer::handleMouseMsg(CMouseMsg *msg) {
@@ -68,21 +73,19 @@ bool VisualContainer::handleMouseMsg(CMouseMsg *msg) {
 		VisualItem *item = dynamic_cast<VisualItem *>(child);
 		if (item && item->getBounds().contains(msg->_mousePos)) {
 			if (msg->execute(item))
-				break;
+				return true;
 		}
 	}
 
-	return true;
+	return false;
 }
 
 void VisualContainer::draw() {
-	if (!_isDirty)
-		return;
+	if (_isDirty)
+		// Handle drawing any background
+		Image::draw();
 
-	// Handle drawing any background
-	Image::draw();
-
-	// Iterate through each child and draw the visual items
+	// Iterate through each child and draw any dirty visual items
 	for (TreeItem *child = getFirstChild(); child; child = child->getNextSibling()) {
 		VisualItem *item = dynamic_cast<VisualItem *>(child);
 		if (item)
