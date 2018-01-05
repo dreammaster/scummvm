@@ -22,6 +22,7 @@
 
 #include "legend/early/gfx/listbox.h"
 #include "legend/early/gfx/screen.h"
+#include "legend/early/core/messages.h"
 #include "legend/legend.h"
 
 namespace Legend {
@@ -44,6 +45,7 @@ void Listbox::init() {
 	_xOffset = 0;
 	_dragOffset = 0;
 	_draggingThumbnail = false;
+	_itemSelected = false;
 	_upPressed = _downPressed = false;
 	_pressRepeatExpiry = 0;
 	_thumbUp = _thumbDown = nullptr;
@@ -149,9 +151,9 @@ void Listbox::drawScrollbar() {
 void Listbox::drawItems() {
 	// Get a surface constrained to the area to write the items in
 	Gfx::VisualSurface surface = getSurface();
-	Gfx::VisualSurface s = surface.getSubArea(Common::Rect(0, 7,
+	Gfx::VisualSurface s = surface.getSubArea(Common::Rect(0, LISTBOX_ITEMS_X,
 		surface.w - _regions[LB_THUMB_UP].width() - 1, surface.h - 1));
-	int lineHeight = s.getFont()->_lineHeight + 2;
+	int lineHeight = itemsLineHeight();
 
 	// Erase any previously drawn items
 	s.fill(WHITE);
@@ -272,6 +274,15 @@ bool Listbox::MouseWheelMsg(CMouseWheelMsg &msg) {
 
 bool Listbox::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
 	switch (_regions.indexOf(msg._mousePos)) {
+	case LB_ITEMS:
+		if (msg._mousePos.y >= (_bounds.top + LISTBOX_ITEMS_Y)) {
+			_itemSelected = true;
+			_selectedIndex = (msg._mousePos.y - _bounds.top - LISTBOX_ITEMS_Y)
+				/ itemsLineHeight() + _topVisible;
+			setDirty();
+		}
+		break;
+
 	case LB_THUMB_UP:
 		if (isScrollingEnabled()) {
 			_upPressed = true;
@@ -307,14 +318,23 @@ bool Listbox::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
 
 bool Listbox::MouseButtonUpMsg(CMouseButtonUpMsg &msg) {
 	if (_upPressed || _downPressed) {
+		// Released mouse from clicking on up/down buttons
 		_upPressed = _downPressed = false;
 		_pressRepeatExpiry = 0;
 		setDirty();
 	}
 
 	if (_draggingThumbnail) {
+		// Finished dragging scrollbar thumbnail
 		_draggingThumbnail = false;
 		_dragOffset = 0;
+	}
+
+	if (_itemSelected) {
+		// An entry was selected, generate message now that the mouse is released
+		_itemSelected = false;
+		CListboxSelection selMsg(this, _selectedIndex);
+		selMsg.execute(getRoot());
 	}
 
 	return true;

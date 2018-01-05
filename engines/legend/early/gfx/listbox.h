@@ -35,6 +35,8 @@ enum ListboxRegion {
 };
 
 #define ARROW_REPEAT_FRAMES 2
+#define LISTBOX_ITEMS_X 7
+#define LISTBOX_ITEMS_Y 10
 
 class Listbox : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
@@ -54,6 +56,7 @@ private:
 	uint _pressRepeatExpiry;
 	bool _draggingThumbnail;
 	int _dragOffset;
+	bool _itemSelected;
 	Gfx::Picture *_thumbUp;
 	Gfx::Picture *_thumbDown;
 	Gfx::Picture *_thumbnail;
@@ -66,10 +69,17 @@ private:
 	void init();
 
 	/**
+	 * Returns the line height of items in the listbox
+	 */
+	uint itemsLineHeight() {
+		return getSurface().getFont()->_lineHeight + 2;
+	}
+
+	/**
 	 * Returns the number of visible rows of text the listbox can display
 	 */
 	uint numVisibleRows() {
-		return (_bounds.height() - 10) / (getSurface().getFont()->_lineHeight + 2);
+		return (_bounds.height() - LISTBOX_ITEMS_Y) / itemsLineHeight();
 	}
 
 	/**
