@@ -20,15 +20,30 @@
  *
  */
 
-#include "legend/early/gfx/scene_picture.h"
+#include "legend/early/gfx/interface.h"
 #include "legend/legend.h"
 
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(ScenePicture, BoxedElement);
+EMPTY_MESSAGE_MAP(Interface, Gfx::VisualContainer);
 
-void ScenePicture::draw() {
+Interface::Interface() : Gfx::VisualContainer("Scene"),
+		_commandButtons("CommandButtons", Common::Rect(0, 0, 120, 136)),
+		_compass("Compass", Common::Rect(120, 0, 260, 136)),
+		_scene("ScenePicture", Common::Rect(260, 0, 640, 232)),
+		_commands("Commands", Common::Rect(0, 136, 117, 480)),
+		_items("Items", Common::Rect(117, 136, 260, 480)),
+		_textArea("TextArea", Common::Rect(260, 232, 640, 480)) {
+	_commandButtons.addUnder(this);
+	_compass.addUnder(this);
+	_scene.addUnder(this);
+	_commands.addUnder(this);
+	_items.addUnder(this);
+	_textArea.addUnder(this);
+
+	_commands.load("GATEWAY/COMMANDS");
+	_commands.setDividerIndex(16);
 }
 
 } // End of namespace Early

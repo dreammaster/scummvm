@@ -23,29 +23,23 @@
 #ifndef LEGEND_EARLY_SCENE_H
 #define LEGEND_EARLY_SCENE_H
 
-#include "legend/gfx/visual_container.h"
-#include "legend/gfx/compass.h"
-#include "legend/early/gfx/command_buttons.h"
-#include "legend/early/gfx/scene_picture.h"
-#include "legend/early/gfx/listbox.h"
-#include "legend/early/gfx/text_area.h"
+#include "legend/early/gfx/boxed_element.h"
 
 namespace Legend {
 namespace Early {
 
-class Scene : public Gfx::VisualContainer {
+class Scene : public BoxedElement {
 	DECLARE_MESSAGE_MAP;
-private:
-	CommandButtons _commandButtons;
-	Gfx::Compass _compass;
-	ScenePicture _scenePicture;
-	Listbox _commands;
-	Listbox _items;
-	TextArea _textArea;
 public:
 	CLASSDEF;
-	Scene();
+	Scene(const String &name, const Common::Rect &r) :
+		BoxedElement(name, r) {}
 	virtual ~Scene() {}
+
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();
 };
 
 } // End of namespace Early

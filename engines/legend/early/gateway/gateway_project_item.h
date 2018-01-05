@@ -25,7 +25,7 @@
 
 #include "legend/core/project_item.h"
 #include "legend/early/gfx/help_screen.h"
-#include "legend/early/gfx/scene.h"
+#include "legend/early/gfx/interface.h"
 #include "legend/early/gateway/part_title.h"
 
 namespace Legend {
@@ -36,7 +36,7 @@ class GatewayProjectItem : public ProjectItem {
 	DECLARE_MESSAGE_MAP;
 private:
 	PartTitle _partTitleScreen;
-	Scene _scene;
+	Interface _interface;
 	Early::HelpScreen _helpScreen;
 public:
 	CLASSDEF;

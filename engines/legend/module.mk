@@ -26,9 +26,9 @@ MODULE_OBJS = \
 	early/gfx/button.o \
 	early/gfx/command_buttons.o \
 	early/gfx/help_screen.o \
+	early/gfx/interface.o \
 	early/gfx/listbox.o \
 	early/gfx/scene.o \
-	early/gfx/scene_picture.o \
 	early/gfx/screen.o \
 	early/gfx/text_area.o \
 	early/gateway/gateway_project_item.o \

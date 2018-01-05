@@ -20,26 +20,32 @@
  *
  */
 
-#ifndef LEGEND_EARLY_SCENE_PICTURE_H
-#define LEGEND_EARLY_SCENE_PICTURE_H
+#ifndef LEGEND_EARLY_INTERFACE_H
+#define LEGEND_EARLY_INTERFACE_H
 
-#include "legend/early/gfx/boxed_element.h"
+#include "legend/gfx/visual_container.h"
+#include "legend/gfx/compass.h"
+#include "legend/early/gfx/command_buttons.h"
+#include "legend/early/gfx/scene.h"
+#include "legend/early/gfx/listbox.h"
+#include "legend/early/gfx/text_area.h"
 
 namespace Legend {
 namespace Early {
 
-class ScenePicture : public BoxedElement {
+class Interface : public Gfx::VisualContainer {
 	DECLARE_MESSAGE_MAP;
+private:
+	CommandButtons _commandButtons;
+	Gfx::Compass _compass;
+	Scene _scene;
+	Listbox _commands;
+	Listbox _items;
+	TextArea _textArea;
 public:
 	CLASSDEF;
-	ScenePicture(const String &name, const Common::Rect &r) :
-		BoxedElement(name, r) {}
-	virtual ~ScenePicture() {}
-
-	/**
-	 * Draws the visual item on the screen
-	 */
-	virtual void draw();
+	Interface();
+	virtual ~Interface() {}
 };
 
 } // End of namespace Early
