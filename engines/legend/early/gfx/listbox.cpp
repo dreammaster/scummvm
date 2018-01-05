@@ -117,23 +117,26 @@ void Listbox::draw() {
 }
 
 void Listbox::drawScrollbar() {
-	// Get a drawing surface
-	Gfx::VisualSurface s = getSurface();
+	bool thumbVisible = _lines.size() > numVisibleRows();
 
-	// Draw the vertical line for the left side of the scrollbar
-	int scrollbarLeft = s.w - _regions[LB_THUMB_UP].width() - 1;
-	s.vLine(scrollbarLeft, 0, s.h, BLACK);
-	s.vLine(s.w - 1, 0, s.h, BLACK);
+	// Get a drawing surface
+	Gfx::VisualSurface surface = getSurface();
+	Gfx::VisualSurface s = surface.getSubArea(Common::Rect(
+		surface.w - _regions[LB_THUMB_UP].width(), 0, surface.w, surface.h));
+
+	// Draw the scrollbar background
+	s.fill(thumbVisible ? 2 : WHITE);
+
+	// Draw the vertical lines on both sides of the scrollbar
+	s.vLine(0, 0, s.h - 1, BLACK);
+	s.vLine(s.w - 1, 0, s.h - 1, BLACK);
 
 	// Draw the thumb up/down buttons
 	s.blitFrom(_upPressed ? *_thumbUpPressed : *_thumbUp, _regions[LB_THUMB_UP]);
 	s.blitFrom(_downPressed ? *_thumbDownPressed : *_thumbDown, _regions[LB_THUMB_DOWN]);
 
-	// Only draw the scrolling area if there are enough items to actually allow scrolling
-	if (_lines.size() > numVisibleRows()) {
-		// TODO: Pattern background
+	if (thumbVisible)
 		s.blitFrom(*_thumbnail, _regions[LB_THUMBNAIL]);
-	}
 }
 
 void Listbox::drawItems() {
@@ -217,8 +220,8 @@ bool Listbox::ShowMsg(CShowMsg &msg) {
 	_thumbUpPressed = pic.load(LISTBOX_PIC + 3);
 	_thumbDownPressed = pic.load(LISTBOX_PIC + 4);
 
-	int thumbnailY = _bounds.top + _thumbUp->h + 3;
-	int scrollbarLeft = _bounds.right - _thumbUp->w - 1;
+	int thumbnailY = _bounds.top + _thumbUp->h;
+	int scrollbarLeft = _bounds.right - _thumbUp->w;
 
 	// Set up regions for the listbox. These match the order of ListboxRegion enum
 	_regions.add(Common::Rect(_bounds.left + 1, _bounds.top + 1,

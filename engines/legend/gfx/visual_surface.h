@@ -51,7 +51,7 @@ struct FontDetails {
 class VisualSurface : public Graphics::ManagedSurface {
 private:
 	FontDetails &_font;
-	const Common::Rect &_bounds;
+	Common::Rect _bounds;
 
 	/**
 	 * Moves font output to a new line, prompting for waiting if necessary
