@@ -124,8 +124,9 @@ void Listbox::drawScrollbar() {
 	Gfx::VisualSurface s = surface.getSubArea(Common::Rect(
 		surface.w - _regions[LB_THUMB_UP].width(), 0, surface.w, surface.h));
 
-	// Draw the scrollbar background
-	s.fill(thumbVisible ? 2 : WHITE);
+	// Draw the scrollbar background. Either checkered if there are enough items
+	// for scrolling, or completely white for a 'disabled' look
+	s.fill(thumbVisible ? 0x82 : WHITE);
 
 	// Draw the vertical lines on both sides of the scrollbar
 	s.vLine(0, 0, s.h - 1, BLACK);

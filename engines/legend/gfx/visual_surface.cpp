@@ -204,5 +204,34 @@ VisualSurface VisualSurface::getSubArea(const Common::Rect &r) {
 	return VisualSurface(src, _font, newBounds);
 }
 
+void VisualSurface::fillRect(Common::Rect r, byte color) {
+	if (!(color & 0x80)) {
+		// Solid color, so we can use the base method's fillRect
+		Graphics::ManagedSurface::fillRect(r, color);
+		return;
+	}
+
+	// Iterate through the area, creating a checkerbox pattern
+	color &= 0x7f;
+	Graphics::Surface s = Graphics::ManagedSurface::getSubArea(r);
+
+	for (int y = 0; y < s.h; ++y) {
+		byte *pDest = (byte *)s.getBasePtr(0, y);
+		for (int x = 0; x < s.w; ++x, ++pDest) {
+			*pDest = ((x + y) % 2) ? 1 : color;
+		}
+	}
+}
+
+void VisualSurface::fill(byte color) {
+	if (color & 0x80) {
+		// Checkberbox fill
+		fillRect(Common::Rect(0, 0, this->w, this->h), color);
+	} else {
+		// Solid fill
+		Graphics::ManagedSurface::clear(color);
+	}
+}
+
 } // End of namespace Gfx
 } // End of namespace Legend

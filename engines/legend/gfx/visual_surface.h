@@ -110,11 +110,6 @@ public:
 	Common::Point getFontCenter() const { return _font._fontCenter; }
 
 	/**
-	 * Fill the surface with a given color
-	 */
-	void fill(byte color) { Graphics::ManagedSurface::clear(color); }
-
-	/**
 	 * Custom blitFrom version that takes in a Region. Since regions are defined
 	 * in terms of overall screen co-ordinates, and the visual surface's top left
 	 * is (0,0), converts from screen to local coordintaes.
@@ -139,6 +134,20 @@ public:
 	 */
 	VisualSurface getSubArea(const Common::Rect &r);
 
+	/**
+	 * Fill a rect with a given color.
+	 * @param r			Drawing area
+	 * @param color		Color to use. If bit 7 is set, it uses a checkerbox
+	 *		of alternating grey with the color in the remaining bits
+	 */
+	void fillRect(Common::Rect r, byte color);
+
+	/**
+	 * Fill the entire surface with a given color.
+	 * @param color		Color to use. If bit 7 is set, it uses a checkerbox
+	 *		of alternating color 10 with the color in the remaining bits
+	 */
+	void fill(byte color);
 };
 
 } // End of namespace Gfx
