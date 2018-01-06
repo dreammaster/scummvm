@@ -36,6 +36,9 @@ static const byte INITIAL_LOW_PALETTE[16 * 3] = {
 	0xaa, 0x55, 0xaa, 0x55, 0x55, 0xff, 0x55, 0xff, 0x55, 0x55, 0xff, 0xff
 };
 
+const int Screen::TEXT_ROWS = 30;
+const int Screen::TEXT_COLUMNS = 80;
+
 Screen &Screen::get() {
 	return *((Screen *)g_vm->_screen);
 }

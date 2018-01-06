@@ -97,5 +97,11 @@ void Screen::fadeIn() {
 	setPalette(_gamePalette);
 }
 
+void Screen::fadeOut() {
+	// TODO: Fading
+	resetPalette();
+	setPalette();
+}
+
 } // End of namespace Gfx
 } // End of namespace Legend

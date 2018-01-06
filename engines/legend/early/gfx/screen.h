@@ -38,6 +38,8 @@ namespace Early {
 
 class Screen: public Gfx::Screen {
 public:
+	static const int TEXT_ROWS, TEXT_COLUMNS;
+public:
 	int _defaultTextColor;
 public:
 	Screen(LegendEngine *vm);

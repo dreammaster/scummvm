@@ -29,6 +29,7 @@ namespace Gateway {
 EMPTY_MESSAGE_MAP(GatewayProjectItem, ProjectItem);
 
 GatewayProjectItem::GatewayProjectItem() : ProjectItem() {
+	_commset.addUnder(this);
 	_partTitleScreen.addUnder(this);
 	_interface.addUnder(this);
 	_helpScreen.addUnder(this);

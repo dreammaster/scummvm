@@ -87,6 +87,11 @@ public:
 	void fadeIn();
 
 	/**
+	 * Fades out to black
+	 */
+	void fadeOut();
+
+	/**
 	 * Loads a font
 	 */
 	Font *loadFont(int fontNumber) { return Font::loadFont(fontNumber); }

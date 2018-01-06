@@ -20,32 +20,29 @@
  *
  */
 
-#ifndef LEGEND_GATEWAY_PROJECT_ITEM_H
-#define LEGEND_GATEWAY_PROJECT_ITEM_H
+#ifndef LEGEND_EARLY_COMMSET_H
+#define LEGEND_EARLY_COMMSET_H
 
-#include "legend/core/project_item.h"
-#include "legend/early/gfx/help_screen.h"
-#include "legend/early/gfx/interface.h"
-#include "legend/early/gateway/commset.h"
-#include "legend/early/gateway/part_title.h"
+#include "legend/gfx/visual_item.h"
 
 namespace Legend {
 namespace Early {
-namespace Gateway {
 
-class GatewayProjectItem : public ProjectItem {
+class Commset : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
-private:
-	PartTitle _partTitleScreen;
-	Interface _interface;
-	Early::HelpScreen _helpScreen;
-	Commset _commset;
+	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
+	bool KeyCharMsg(CKeyCharMsg &msg);
 public:
 	CLASSDEF;
-	GatewayProjectItem();
+	Commset();
+	virtual ~Commset() {}
+
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();
 };
 
-} // End of namespace Gateway
 } // End of namespace Early
 } // End of namespace Legend
 

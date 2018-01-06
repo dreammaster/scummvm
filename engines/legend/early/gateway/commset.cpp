@@ -20,33 +20,47 @@
  *
  */
 
-#ifndef LEGEND_GATEWAY_PROJECT_ITEM_H
-#define LEGEND_GATEWAY_PROJECT_ITEM_H
-
-#include "legend/core/project_item.h"
-#include "legend/early/gfx/help_screen.h"
-#include "legend/early/gfx/interface.h"
 #include "legend/early/gateway/commset.h"
-#include "legend/early/gateway/part_title.h"
+#include "legend/early/gfx/screen.h"
+#include "legend/legend.h"
+#include "legend/core/resources.h"
 
 namespace Legend {
 namespace Early {
-namespace Gateway {
 
-class GatewayProjectItem : public ProjectItem {
-	DECLARE_MESSAGE_MAP;
-private:
-	PartTitle _partTitleScreen;
-	Interface _interface;
-	Early::HelpScreen _helpScreen;
-	Commset _commset;
-public:
-	CLASSDEF;
-	GatewayProjectItem();
-};
+BEGIN_MESSAGE_MAP(Commset, VisualItem)
+	ON_MESSAGE(MouseButtonDownMsg)
+	ON_MESSAGE(KeyCharMsg)
+END_MESSAGE_MAP()
 
-} // End of namespace Gateway
+Commset::Commset() : VisualItem() {
+	_name = "Commset";
+	setBounds(Screen::get().getBounds());
+
+	const int TEXT_COLUMNS = 72;
+	const int TEXT_ROWS = 25;
+	// TODO: Regions
+}
+
+void Commset::draw() {
+	if (!_isDirty)
+		return;
+	VisualItem::draw();
+
+	// Fill out the background
+	Gfx::VisualSurface s = getSurface();
+	s.fillRect(s.getBounds(), 2);
+
+	// TODO
+}
+
+bool Commset::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
+	return true;
+}
+
+bool Commset::KeyCharMsg(CKeyCharMsg &msg) {
+	return true;
+}
+
 } // End of namespace Early
 } // End of namespace Legend
-
-#endif

@@ -32,6 +32,7 @@ MODULE_OBJS = \
 	early/gfx/screen.o \
 	early/gfx/text_area.o \
 	early/gateway/gateway_project_item.o \
+	early/gateway/commset.o \
 	early/gateway/part_title.o \
 	later/screen.o \
 	later/xanth/xanth_project_item.o \

@@ -300,7 +300,7 @@ bool Listbox::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
 	case LB_SCROLLBAR:
 		// Clicked on scrollbar above or below thmbnail, so move up/down a page
 		deltaChange((msg._mousePos.y < _regions[LB_THUMBNAIL].top) ?
-			-numVisibleRows() : numVisibleRows());
+			-(int)numVisibleRows() : (int)numVisibleRows());
 		break;
 
 	case LB_THUMBNAIL:
