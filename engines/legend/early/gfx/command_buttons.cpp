@@ -58,6 +58,7 @@ void CommandButtons::draw() {
 }
 
 void CommandButtons::PictureButton::execute() {
+	changeView("Commset");
 }
 
 void CommandButtons::StatusButton::execute() {

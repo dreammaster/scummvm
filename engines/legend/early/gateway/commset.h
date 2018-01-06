@@ -24,18 +24,23 @@
 #define LEGEND_EARLY_COMMSET_H
 
 #include "legend/gfx/visual_item.h"
+#include "legend/gfx/picture.h"
 
 namespace Legend {
 namespace Early {
 
 class Commset : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
+	bool ShowMsg(CShowMsg &msg);
+	bool HideMsg(CHideMsg &msg);
 	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
 	bool KeyCharMsg(CKeyCharMsg &msg);
+private:
+	Gfx::Picture *_background;
 public:
 	CLASSDEF;
 	Commset();
-	virtual ~Commset() {}
+	virtual ~Commset();
 
 	/**
 	 * Draws the visual item on the screen

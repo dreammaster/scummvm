@@ -29,17 +29,23 @@ namespace Legend {
 namespace Early {
 
 BEGIN_MESSAGE_MAP(Commset, VisualItem)
+	ON_MESSAGE(ShowMsg)
+	ON_MESSAGE(HideMsg)
 	ON_MESSAGE(MouseButtonDownMsg)
 	ON_MESSAGE(KeyCharMsg)
 END_MESSAGE_MAP()
 
-Commset::Commset() : VisualItem() {
+Commset::Commset() : VisualItem(), _background(nullptr) {
 	_name = "Commset";
 	setBounds(Screen::get().getBounds());
 
 	const int TEXT_COLUMNS = 72;
 	const int TEXT_ROWS = 25;
 	// TODO: Regions
+}
+
+Commset::~Commset() {
+	delete _background;
 }
 
 void Commset::draw() {
@@ -51,7 +57,20 @@ void Commset::draw() {
 	Gfx::VisualSurface s = getSurface();
 	s.fillRect(s.getBounds(), 2);
 
+	s.blitFrom(*_background);
+
 	// TODO
+}
+
+bool Commset::ShowMsg(CShowMsg &msg) {
+	_background = g_vm->_picFile->load(574, 1);
+	return true;
+}
+
+bool Commset::HideMsg(CHideMsg &msg) {
+	delete _background;
+	_background = nullptr;
+	return true;
 }
 
 bool Commset::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
