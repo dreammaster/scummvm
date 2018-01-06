@@ -95,16 +95,27 @@ bool PicFile::open(uint pictureNum, uint frameNum) {
 		_file.seek(entry._offset + entry._frameCount * 4);
 		if (entry._flags & PIC_HAS_PALETTE) {
 			// Read in the game palette for the picture
-			byte pal[PALETTE_SIZE];
-			_file.read(pal, PALETTE_SIZE);
-			g_vm->_screen->setGamePalette(pal);
-			g_vm->_screen->_picPalette = true;
+			readPalette(entry._flags & PIC_BIT_DEPTH);
 		}
 
 		return entry._width > 0 && entry._height > 0;
 	}
 
 	return true;
+}
+
+void PicFile::readPalette(uint bitDepth) {
+	Screen &screen = *g_vm->_screen;
+	byte pal[PALETTE_SIZE];
+	const int PALETTE_SIZES[5] = { 0, 16, 48, PALETTE_SIZE, 48 };
+	int palSIze = g_vm->isLater() ? PALETTE_SIZE : PALETTE_SIZES[bitDepth];
+
+	// Read in the palette
+	Common::fill(pal, pal + PALETTE_SIZE, 0);
+	_file.read(pal, palSIze);
+
+	screen.setGamePalette(pal);
+	screen._picPalette = true;
 }
 
 Picture *PicFile::load(uint picNum, uint frameNum) {

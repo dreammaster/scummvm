@@ -32,6 +32,7 @@ namespace Legend {
 namespace Gfx {
 
 enum {
+	PIC_BIT_DEPTH = 0xF,
 	PIC_HAS_PALETTE = 0x10,
 	PIC_40 = 40
 };
@@ -156,7 +157,7 @@ public:
 
 class PicFile {
 	struct IndexEntry {
-		uint _offset;
+		int _offset;
 		uint _frameCount;
 		byte _flags;
 		uint _width;
@@ -208,6 +209,11 @@ private:
 	 * for a newly opened file into
 	 */
 	int findIndexesSlot() const;
+
+	/**
+	 * Reads in a palette from the file
+	 */
+	void readPalette(uint bitDepth);
 public:
 	IndexEntry _currentPic;
 	Common::Point _origin;
