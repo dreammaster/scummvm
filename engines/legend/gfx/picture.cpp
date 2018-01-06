@@ -206,10 +206,9 @@ size_t PicFile::loadRange(PictureArray &images, size_t count, uint picNum, uint 
 
 /*-------------------------------------------------------------------*/
 
-bool PicFile::IndexEntry::load(Common::SeekableReadStream &s) {
+void PicFile::IndexEntry::load(Common::SeekableReadStream &s) {
 	_offset = s.readUint32LE();
-	if (!_offset)
-		return false;
+	assert(_offset);
 	
 	_frameCount = s.readByte();
 	_flags = s.readByte();
@@ -217,7 +216,6 @@ bool PicFile::IndexEntry::load(Common::SeekableReadStream &s) {
 	_height = s.readUint16LE();
 	_fieldA = s.readByte();
 	_fieldB = s.readByte();
-	return true;
 }
 
 /*-------------------------------------------------------------------*/
@@ -225,11 +223,12 @@ bool PicFile::IndexEntry::load(Common::SeekableReadStream &s) {
 void PicFile::IndexEntries::load(Common::SeekableReadStream &s) {
 	clear();
 
-	// Load up to 256 index entries
+	// Load up index entries until the offset of the first entry is reached
 	IndexEntry entry;
-	int idx = 0;
-	while (idx++ < 256 && entry.load(s))
+	do {
+		entry.load(s);
 		push_back(entry);
+	} while (s.pos() < (*this)[0]._offset);
 }
 
 /*-------------------------------------------------------------------*/

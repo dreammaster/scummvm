@@ -172,7 +172,7 @@ class PicFile {
 		/**
 		 * Load an index entry
 		 */
-		bool load(Common::SeekableReadStream &s);
+		void load(Common::SeekableReadStream &s);
 	};
 	class IndexEntries : public Common::Array<IndexEntry> {
 	public:
