@@ -37,8 +37,6 @@ namespace Early {
 #define BLACK 15
 
 class Screen: public Gfx::Screen {
-private:
-	byte _palette[PALETTE_SIZE];
 public:
 	int _defaultTextColor;
 public:
@@ -47,19 +45,14 @@ public:
 	static Screen &get();
 
 	/**
-	 * Handle a palette transition
-	 */
-	void transition(int index);
-
-	/**
 	 * Set an EGA palette
 	 */
 	void setEGAPalette(const byte *palette);
 
 	/**
-	 * Sets up the default EGA palette
+	 * Handle a palette transition
 	 */
-	void defaultPalette();
+	void cyclePaleteEntry(int index);
 };
 
 } // End of namespace Early
