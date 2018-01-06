@@ -40,9 +40,19 @@ PicFile::~PicFile() {
 bool PicFile::open(uint pictureNum, uint frameNum) {
 	int fileNumber = (pictureNum >> 8) & 0xf;
 	int picIndex = pictureNum & 0xff;
-	if (!g_vm->isLater())
-		// Use EGA pic files
-		fileNumber += 200;
+	if (!g_vm->isLater()) {
+		// Earlier game logic for loadng picturse depending on display mode
+		int vidIndex;
+		if (pictureNum & 0x8000) {
+			vidIndex = 2;	// EGA pictures
+		} else {
+			vidIndex = pictureNum >> 12;
+			if (!vidIndex)
+				vidIndex = 1;
+		}
+
+		fileNumber += vidIndex * 100;
+	}
 
 	// Check if the desired picture is in another PIC file
 	if (fileNumber != _currentFileNumber) {
