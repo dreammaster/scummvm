@@ -23,14 +23,14 @@
 #ifndef LEGEND_EARLY_COMMSET_H
 #define LEGEND_EARLY_COMMSET_H
 
-#include "legend/gfx/visual_item.h"
+#include "legend/gfx/visual_container.h"
 #include "legend/gfx/picture.h"
 #include "legend/early/gfx/button.h"
 
 namespace Legend {
 namespace Early {
 
-class Commset : public Gfx::VisualItem {
+class Commset : public Gfx::VisualContainer {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
 	bool HideMsg(CHideMsg &msg);
@@ -38,6 +38,8 @@ class Commset : public Gfx::VisualItem {
 	bool KeyCharMsg(CKeyCharMsg &msg);
 private:
 	Gfx::Picture *_logo;
+	ValueButton _btn1, _btn2, _btn3, _btn4, _btn5, _btn6;
+	ValueButton _btn7, _btn8, _btn9, _btnPrev, _btn0, _btnNext;
 public:
 	CLASSDEF;
 	Commset();
