@@ -22,6 +22,7 @@
 
 #include "legend/early/gateway/commset.h"
 #include "legend/early/gfx/screen.h"
+#include "legend/gfx/visual_surface.h"
 #include "legend/legend.h"
 #include "legend/core/resources.h"
 
@@ -78,7 +79,10 @@ void Commset::draw() {
 
 	// Fill out the background
 	Gfx::VisualSurface s = getSurface();
-	s.fillRect(s.getBounds(), 2);
+	s.fill(8);
+
+	// Draw a bevelled window for the commset
+	s.frameRect(Common::Rect(28, 40, 605, 441), Gfx::FF_GRAY_CONTENT);
 
 	s.blitFrom(*_logo);
 

@@ -31,6 +31,10 @@
 namespace Legend {
 namespace Gfx {
 
+enum FrameRectFlag {
+	FF_UNUSED = 1, FF_BLACK_FILL = 2, FF_GRAY_CONTENT = 4, FF_WHITE_CONTENT = 8
+};
+
 /**
  * Font related details
  */
@@ -148,6 +152,16 @@ public:
 	 *		of alternating color 10 with the color in the remaining bits
 	 */
 	void fill(byte color);
+
+	/**
+	 * Fills an area with a frame
+	 */
+	void frameRect(const Common::Rect &r, byte flags);
+
+	/**
+	 * Fill the entire surface with bevelled frame
+	 */
+	void frame(byte flags);
 };
 
 } // End of namespace Gfx

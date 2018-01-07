@@ -21,6 +21,7 @@
  */
 
 #include "legend/gfx/visual_surface.h"
+#include "legend/early/gfx/screen.h"
 #include "legend/legend.h"
 
 namespace Legend {
@@ -229,6 +230,50 @@ void VisualSurface::fill(byte color) {
 		Graphics::ManagedSurface::clear(color);
 	}
 }
+
+void VisualSurface::frameRect(const Common::Rect &r, byte flags) {
+	if (flags & FF_BLACK_FILL) {
+		// Background is being preserved, so draw edge lines
+		Graphics::ManagedSurface::frameRect(r, BLACK);
+	} else {
+		// No preservation, so fill entire area with black
+		fillRect(r, BLACK);
+	}
+
+	// Handling for secondary content fill
+	if (flags & FF_GRAY_CONTENT) {
+		fillRect(Common::Rect(r.left + 3, r.top + 3, r.right - 3, r.bottom - 3), LIGHT_GRAY);
+
+		// White lines for top and left inner edges
+		hLine(r.left + 1, r.top + 1, r.right - 2, WHITE);
+		hLine(r.left + 1, r.top + 2, r.right - 3, WHITE);
+		vLine(r.left + 1, r.top + 3, r.bottom - 2, WHITE);
+		vLine(r.left + 2, r.top + 3, r.bottom - 3, WHITE);
+		// Dark gray lines for right and bottom inner edges
+		vLine(r.right - 3, r.top + 2, r.bottom - 2, DARK_GRAY);
+		vLine(r.right - 2, r.top + 1, r.bottom - 2, DARK_GRAY);
+		hLine(r.left + 2, r.bottom - 3, r.right - 4, DARK_GRAY);
+		hLine(r.left + 1, r.bottom - 2, r.right - 4, DARK_GRAY);
+	} else if (flags & FF_WHITE_CONTENT) {
+		fillRect(Common::Rect(r.left + 3, r.top + 3, r.right - 3, r.bottom - 3), WHITE);
+
+		// Dark gray lines for top and left outer edges
+		hLine(r.left, r.top, r.right - 2, DARK_GRAY);
+		hLine(r.left, r.top + 1, r.right - 3, DARK_GRAY);
+		vLine(r.left, r.top + 2, r.bottom - 1, DARK_GRAY);
+		vLine(r.left + 1, r.top + 2, r.bottom - 2, DARK_GRAY);
+		// White lines for right and bottom outer edges
+		vLine(r.right - 2, r.top + 2, r.bottom - 1, WHITE);
+		vLine(r.right - 1, r.top + 1, r.bottom - 1, WHITE);
+		hLine(r.left + 1, r.bottom - 2, r.right - 3, WHITE);
+		hLine(r.left, r.bottom - 1, r.right - 3, WHITE);
+	}
+}
+
+void VisualSurface::frame(byte flags) {
+	frameRect(Common::Rect(0, 0, this->w, this->h), flags);
+}
+
 
 } // End of namespace Gfx
 } // End of namespace Legend
