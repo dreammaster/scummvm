@@ -24,6 +24,7 @@
 #define LEGEND_EARLY_BUTTON_H
 
 #include "legend/gfx/visual_item.h"
+#include "legend/early/core/messages.h"
 
 namespace Legend {
 namespace Early {
@@ -49,13 +50,25 @@ public:
 	virtual void execute() = 0;
 };
 
-#define DEFINE_BUTTON(NAME) \
-	class NAME##Button : public Button { \
-	public: \
-	NAME##Button(const Common::Rect &r) : Button(#NAME, r) {} \
-	virtual void execute(); \
-	}; \
-	NAME##Button _btn##NAME
+/**
+ * Derived button class that stores an Id, and generates a message
+ * to it's immediate owner when clicked
+ */
+class ValueButton : public Button {
+private:
+	int _value;
+public:
+	ValueButton(const String &text, int value, const Common::Rect &r) : Button(text, r), _value(value) {}
+	virtual ~ValueButton() {}
+
+	/**
+	 * Execute the button action
+	 */
+	virtual void execute() {
+		CButtonClicked clickedMsg(_value);
+		clickedMsg.execute(getParent(), nullptr, 0);
+	};
+};
 
 } // End of namespace Early
 } // End of namespace Legend

@@ -30,6 +30,7 @@ namespace Early {
 
 class Listbox;
 
+MESSAGE1(CButtonClicked, int, value, -1);
 MESSAGE2(CListboxSelection, Listbox *, listbox, (Listbox *)nullptr, int, index, -1);
 
 } // End of namespace Early

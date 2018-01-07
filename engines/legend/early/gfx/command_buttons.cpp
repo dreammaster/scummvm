@@ -26,19 +26,26 @@
 namespace Legend {
 namespace Early {
 
-EMPTY_MESSAGE_MAP(CommandButtons, Gfx::VisualContainer);
+BEGIN_MESSAGE_MAP(CommandButtons, Gfx::VisualContainer)
+	ON_MESSAGE(ButtonClicked)
+END_MESSAGE_MAP()
+
+enum Commands {
+	HELP = 0, HALF = 1, TEXT = 2, ERASE = 3, PICTURE = 4,
+	STATUS = 5, INVENTORY = 6, LOOK = 7, DO = 8
+};
 
 CommandButtons::CommandButtons(const String &name, const Common::Rect &r) :
 		Gfx::VisualContainer(name, r),
-		_btnPicture(Common::Rect(51, 3, 115, 26)),
-		_btnStatus(Common::Rect(51, 30, 115, 53)),
-		_btnInventory(Common::Rect(51, 57, 115, 80)),
-		_btnLook(Common::Rect(51, 84, 115, 107)),
-		_btnHelp(Common::Rect(4, 3, 47, 26)),
-		_btnHalf(Common::Rect(4, 30, 47, 53)),
-		_btnText(Common::Rect(4, 57, 47, 80)),
-		_btnErase(Common::Rect(4, 84, 47, 107)),
-		_btnDo(Common::Rect(4, 111, 115, 134)) {
+		_btnPicture("Picture", PICTURE, Common::Rect(51, 3, 115, 26)),
+		_btnStatus("Status", STATUS, Common::Rect(51, 30, 115, 53)),
+		_btnInventory("Inventory", INVENTORY, Common::Rect(51, 57, 115, 80)),
+		_btnLook("Look", LOOK, Common::Rect(51, 84, 115, 107)),
+		_btnHelp("Help", HELP, Common::Rect(4, 3, 47, 26)),
+		_btnHalf("Half", HALF, Common::Rect(4, 30, 47, 53)),
+		_btnText("Text", TEXT, Common::Rect(4, 57, 47, 80)),
+		_btnErase("Erase", ERASE, Common::Rect(4, 84, 47, 107)),
+		_btnDo("Do", DO, Common::Rect(4, 111, 115, 134)) {
 	_btnPicture.addUnder(this);
 	_btnStatus.addUnder(this);
 	_btnInventory.addUnder(this);
@@ -57,33 +64,19 @@ void CommandButtons::draw() {
 	Gfx::VisualContainer::draw();
 }
 
-void CommandButtons::PictureButton::execute() {
-	changeView("Commset");
-}
+bool CommandButtons::ButtonClicked(CButtonClicked &msg) {
+	switch (msg._value) {
+	case PICTURE:
+		changeView("Commset");
+		break;
+	case HELP:
+		changeView("Help");
+		break;
+	default:
+		break;
+	}
 
-void CommandButtons::StatusButton::execute() {
-}
-
-void CommandButtons::InventoryButton::execute() {
-}
-
-void CommandButtons::LookButton::execute() {
-}
-
-void CommandButtons::HelpButton::execute() {
-	getGameManager()->changeView("Help");
-}
-
-void CommandButtons::HalfButton::execute() {
-}
-
-void CommandButtons::TextButton::execute() {
-}
-
-void CommandButtons::EraseButton::execute() {
-}
-
-void CommandButtons::DoButton::execute() {
+	return true;
 }
 
 } // End of namespace Early

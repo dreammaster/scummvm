@@ -31,15 +31,17 @@ namespace Early {
 
 class CommandButtons : public Gfx::VisualContainer {
 	DECLARE_MESSAGE_MAP;
-	DEFINE_BUTTON(Help);
-	DEFINE_BUTTON(Half);
-	DEFINE_BUTTON(Text);
-	DEFINE_BUTTON(Erase);
-	DEFINE_BUTTON(Picture);
-	DEFINE_BUTTON(Status);
-	DEFINE_BUTTON(Inventory);
-	DEFINE_BUTTON(Look);
-	DEFINE_BUTTON(Do);
+	bool ButtonClicked(CButtonClicked &msg);
+private:
+	ValueButton _btnHelp;
+	ValueButton _btnHalf;
+	ValueButton _btnText;
+	ValueButton _btnErase;
+	ValueButton _btnPicture;
+	ValueButton _btnStatus;
+	ValueButton _btnInventory;
+	ValueButton _btnLook;
+	ValueButton _btnDo;
 public:
 	CLASSDEF;
 	CommandButtons(const String &name, const Common::Rect &r);
