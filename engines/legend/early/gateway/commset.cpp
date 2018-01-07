@@ -35,7 +35,7 @@ BEGIN_MESSAGE_MAP(Commset, VisualItem)
 	ON_MESSAGE(KeyCharMsg)
 END_MESSAGE_MAP()
 
-Commset::Commset() : VisualItem(), _background(nullptr) {
+Commset::Commset() : VisualItem(), _logo(nullptr) {
 	_name = "Commset";
 	setBounds(Screen::get().getBounds());
 
@@ -45,7 +45,7 @@ Commset::Commset() : VisualItem(), _background(nullptr) {
 }
 
 Commset::~Commset() {
-	delete _background;
+	delete _logo;
 }
 
 void Commset::draw() {
@@ -57,19 +57,19 @@ void Commset::draw() {
 	Gfx::VisualSurface s = getSurface();
 	s.fillRect(s.getBounds(), 2);
 
-	s.blitFrom(*_background);
+	s.blitFrom(*_logo);
 
 	// TODO
 }
 
 bool Commset::ShowMsg(CShowMsg &msg) {
-	_background = g_vm->_picFile->load(574, 1);
+	_logo = g_vm->_picFile->load(574, 1);
 	return true;
 }
 
 bool Commset::HideMsg(CHideMsg &msg) {
-	delete _background;
-	_background = nullptr;
+	delete _logo;
+	_logo = nullptr;
 	return true;
 }
 

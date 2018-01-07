@@ -25,6 +25,7 @@
 
 #include "legend/gfx/visual_item.h"
 #include "legend/gfx/picture.h"
+#include "legend/early/gfx/button.h"
 
 namespace Legend {
 namespace Early {
@@ -36,7 +37,7 @@ class Commset : public Gfx::VisualItem {
 	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
 	bool KeyCharMsg(CKeyCharMsg &msg);
 private:
-	Gfx::Picture *_background;
+	Gfx::Picture *_logo;
 public:
 	CLASSDEF;
 	Commset();
