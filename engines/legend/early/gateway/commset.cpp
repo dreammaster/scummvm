@@ -56,6 +56,7 @@ Commset::Commset() : VisualContainer(), _logo(nullptr),
 		_btnNext("Next", BTN_NEXT, Common::Rect(132, 191, 172, 213)) {
 	_name = "Commset";
 	setBounds(Screen::get().getBounds());
+	_fontDetails._fontNumber = 2;
 
 	// Add the buttons
 	ValueButton *btns[12] = { &_btn1, &_btn2, &_btn3, &_btn4, &_btn5, &_btn6,
@@ -63,10 +64,8 @@ Commset::Commset() : VisualContainer(), _logo(nullptr),
 	for (int idx = 0; idx < 12; ++idx)
 		btns[idx]->addUnder(this);
 
-	// Set up the regions
-	const int TEXT_COLUMNS = 72;
-	const int TEXT_ROWS = 25;
-	// TODO: Regions
+	// Set up a region for the commset inner content area
+	_regions.add(Common::Rect(188, 56, 596, 424));
 }
 
 Commset::~Commset() {
@@ -77,14 +76,17 @@ void Commset::draw() {
 	if (!_isDirty)
 		return;
 
-	// Fill out the background
+	// Fill out the green background
 	Gfx::VisualSurface s = getSurface();
 	s.fill(8);
 
 	// Draw a bevelled window for the commset
-	s.frameRect(Common::Rect(28, 40, 605, 441), Gfx::FF_GRAY_CONTENT);
+	s.frameRect(Common::Rect(28, 41, 605, 442), Gfx::FF_INNER_BEVEL);
 
-	s.blitFrom(*_logo);
+	// Draw the inner content area
+	s.frameRect(_regions[0], Gfx::FF_OUTER_BEVEL);
+
+	s.blitFrom(*_logo, Common::Point(64, 55));
 
 	// Draw the buttons
 	VisualContainer::draw();
@@ -92,6 +94,7 @@ void Commset::draw() {
 
 bool Commset::ShowMsg(CShowMsg &msg) {
 	_logo = g_vm->_picFile->load(574, 1);
+
 	return true;
 }
 

@@ -131,8 +131,7 @@ Picture *PicFile::load(uint picNum, uint frameNum) {
 	assert(!result);
 
 	// Set the bounds
-	pic->_bounds = Common::Rect(_origin.x, _origin.y,
-		_origin.x + _currentPic._width, _origin.y + _currentPic._height);
+	pic->_origin = Common::Point(_origin.x, _origin.y);
 
 	// Return the picture
 	return pic;

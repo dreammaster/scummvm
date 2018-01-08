@@ -85,7 +85,8 @@ bool Image::load(int picNumber, int frameNumber) {
 
 	bool result = loadImage();
 	if (result) {
-		_bounds = _pic->_bounds;
+		_bounds = Common::Rect(_pic->w, _pic->h);
+		_bounds.moveTo(_pic->_origin);
 	}
 
 	return result;

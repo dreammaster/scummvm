@@ -195,6 +195,10 @@ void VisualSurface::blitFrom(const Graphics::Surface &src, const Region &r) {
 	blitFrom(src, pt);
 }
 
+void VisualSurface::blitFrom(const Picture &src) {
+	blitFrom(src, src._origin);
+}
+
 VisualSurface VisualSurface::getSubArea(const Common::Rect &r) {
 	Common::Rect newBounds(r.left + _bounds.left, r.top + _bounds.top,
 		r.right + _bounds.left, r.bottom + _bounds.top);
@@ -232,7 +236,7 @@ void VisualSurface::fill(byte color) {
 }
 
 void VisualSurface::frameRect(const Common::Rect &r, byte flags) {
-	if (flags & FF_BLACK_FILL) {
+	if (flags & FF_SKIP_BLACK_FILL) {
 		// Background is being preserved, so draw edge lines
 		Graphics::ManagedSurface::frameRect(r, BLACK);
 	} else {
@@ -240,8 +244,7 @@ void VisualSurface::frameRect(const Common::Rect &r, byte flags) {
 		fillRect(r, BLACK);
 	}
 
-	// Handling for secondary content fill
-	if (flags & FF_GRAY_CONTENT) {
+	if (flags & FF_INNER_BEVEL) {
 		fillRect(Common::Rect(r.left + 3, r.top + 3, r.right - 3, r.bottom - 3), LIGHT_GRAY);
 
 		// White lines for top and left inner edges
@@ -254,9 +257,7 @@ void VisualSurface::frameRect(const Common::Rect &r, byte flags) {
 		vLine(r.right - 2, r.top + 1, r.bottom - 2, DARK_GRAY);
 		hLine(r.left + 2, r.bottom - 3, r.right - 4, DARK_GRAY);
 		hLine(r.left + 1, r.bottom - 2, r.right - 4, DARK_GRAY);
-	} else if (flags & FF_WHITE_CONTENT) {
-		fillRect(Common::Rect(r.left + 3, r.top + 3, r.right - 3, r.bottom - 3), WHITE);
-
+	} else if (flags & FF_OUTER_BEVEL) {
 		// Dark gray lines for top and left outer edges
 		hLine(r.left, r.top, r.right - 2, DARK_GRAY);
 		hLine(r.left, r.top + 1, r.right - 3, DARK_GRAY);

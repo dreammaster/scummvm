@@ -25,6 +25,7 @@
 
 #include "graphics/managed_surface.h"
 #include "legend/core/named_item.h"
+#include "legend/gfx/picture.h"
 #include "legend/gfx/region.h"
 #include "legend/gfx/screen.h"
 
@@ -32,7 +33,7 @@ namespace Legend {
 namespace Gfx {
 
 enum FrameRectFlag {
-	FF_UNUSED = 1, FF_BLACK_FILL = 2, FF_GRAY_CONTENT = 4, FF_WHITE_CONTENT = 8
+	FF_UNUSED = 1, FF_SKIP_BLACK_FILL = 2, FF_INNER_BEVEL = 4, FF_OUTER_BEVEL = 8
 };
 
 /**
@@ -119,6 +120,12 @@ public:
 	 * is (0,0), converts from screen to local coordintaes.
 	 */
 	void blitFrom(const Graphics::Surface &src, const Region &r);
+
+	/**
+	 * Custom blitFrom version that takes in a picture, and displays it
+	 * at the coordintaes specifid by the picture itself
+	 */
+	void blitFrom(const Picture &src);
 
 	void blitFrom(const Graphics::Surface &src) {
 		Graphics::ManagedSurface::blitFrom(src);

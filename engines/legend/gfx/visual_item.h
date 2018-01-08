@@ -40,7 +40,7 @@ class VisualItem : public NamedItem {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
 	bool HideMsg(CHideMsg &msg);
-private:
+protected:
 	FontDetails _fontDetails;
 private:
 	/**

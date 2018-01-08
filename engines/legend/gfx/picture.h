@@ -120,7 +120,7 @@ public:
 
 class Picture : public Graphics::ManagedSurface, public PictureDecoder {
 public:
-	Common::Rect _bounds;
+	Common::Point _origin;
 public:
 	Picture() : Graphics::ManagedSurface(), PictureDecoder() {}
 	Picture(Picture &surf) : Graphics::ManagedSurface(surf), PictureDecoder() {}
