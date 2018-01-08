@@ -76,6 +76,17 @@ void Commset::draw() {
 	if (!_isDirty)
 		return;
 
+	// Draw the background
+	drawBackground();
+
+	// Draw the keypad buttons
+	VisualContainer::draw();
+
+	// Draw the text contents
+	drawContents();
+}
+
+void Commset::drawBackground() {
 	// Fill out the green background
 	Gfx::VisualSurface s = getSurface();
 	s.fill(8);
@@ -93,19 +104,20 @@ void Commset::draw() {
 	s.frameRect(Common::Rect(39, 107, 177, 221), Gfx::FF_OUTER_BEVEL);
 	s.fillRect(Common::Rect(40, 108, 176, 220), 2, 10);
 
-	// Draw the buttons
-	VisualContainer::draw();
-
 	// Draw the grill lines on the left hand side of the commset
 	Common::Rect r(39, 238, 177, 244);
 	s.frameRect(r, Gfx::FF_OUTER_BEVEL);
 	s.fillRect(r, BLACK);
 
 	r.top = 262;
-	r.bottom = 265;
+	r.bottom = 263;
 	for (int idx = 0; idx < 19; ++idx, r.top += 9, r.bottom += 9) {
 		s.frameRect(r, Gfx::FF_OUTER_BEVEL);
 	}
+}
+
+void Commset::drawContents() {
+	// TODO
 }
 
 bool Commset::ShowMsg(CShowMsg &msg) {

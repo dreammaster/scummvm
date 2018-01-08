@@ -245,6 +245,8 @@ void VisualSurface::frameRect(const Common::Rect &r, byte flags) {
 	}
 
 	if (flags & FF_INNER_BEVEL) {
+		// Bevil will be drawn just inside the bounds, with the 1 pixel black
+		// border left. The contents will also be cleared
 		fillRect(Common::Rect(r.left + 3, r.top + 3, r.right - 3, r.bottom - 3), LIGHT_GRAY);
 
 		// White lines for top and left inner edges
@@ -258,16 +260,17 @@ void VisualSurface::frameRect(const Common::Rect &r, byte flags) {
 		hLine(r.left + 2, r.bottom - 3, r.right - 4, DARK_GRAY);
 		hLine(r.left + 1, r.bottom - 2, r.right - 4, DARK_GRAY);
 	} else if (flags & FF_OUTER_BEVEL) {
+		// Bevel is drawn outside the specified bounds
 		// Dark gray lines for top and left outer edges
-		hLine(r.left, r.top, r.right - 2, DARK_GRAY);
-		hLine(r.left, r.top + 1, r.right - 3, DARK_GRAY);
-		vLine(r.left, r.top + 2, r.bottom - 1, DARK_GRAY);
-		vLine(r.left + 1, r.top + 2, r.bottom - 2, DARK_GRAY);
+		hLine(r.left - 2, r.top, r.right + 1, DARK_GRAY);
+		hLine(r.left - 2, r.top + 1, r.right, DARK_GRAY);
+		vLine(r.left - 2, r.top, r.bottom, DARK_GRAY);
+		vLine(r.left - 1, r.top, r.bottom + 1, DARK_GRAY);
 		// White lines for right and bottom outer edges
-		vLine(r.right - 2, r.top + 2, r.bottom - 1, WHITE);
-		vLine(r.right - 1, r.top + 1, r.bottom - 1, WHITE);
-		hLine(r.left + 1, r.bottom - 2, r.right - 3, WHITE);
-		hLine(r.left, r.bottom - 1, r.right - 3, WHITE);
+		vLine(r.right, r.top + 1, r.bottom + 2, WHITE);
+		vLine(r.right + 1, r.top + 2, r.bottom + 2, WHITE);
+		hLine(r.left - 1, r.bottom, r.right - 1, WHITE);
+		hLine(r.left - 2, r.bottom + 1, r.right - 1, WHITE);
 	}
 }
 

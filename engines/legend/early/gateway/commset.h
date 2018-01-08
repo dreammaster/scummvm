@@ -40,6 +40,16 @@ private:
 	Gfx::Picture *_logo;
 	ValueButton _btn1, _btn2, _btn3, _btn4, _btn5, _btn6;
 	ValueButton _btn7, _btn8, _btn9, _btnPrev, _btn0, _btnNext;
+private:
+	/**
+	 * Draws the background for the Commset
+	 */
+	void drawBackground();
+
+	/**
+	 * Draws the text contents being displayed in the Commset
+	 */
+	void drawContents();
 public:
 	CLASSDEF;
 	Commset();
