@@ -35,6 +35,11 @@ namespace Early {
  */
 class CommsetContents : public Gfx::VisualItem {
 	DECLARE_MESSAGE_MAP;
+private:
+	/**
+	 * Set up the font for drawing
+	 */
+	void setupFont();
 public:
 	CLASSDEF;
 	CommsetContents(const Common::Rect &r) : Gfx::VisualItem(r) {}

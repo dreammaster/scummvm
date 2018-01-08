@@ -129,10 +129,28 @@ bool Commset::KeyCharMsg(CKeyCharMsg &msg) {
 
 /*-------------------------------------------------------------------*/
 
+#define COMMSET_TEXT_COLOR 5
+
+void CommsetContents::setupFont() {
+	Gfx::VisualSurface s = getSurface();
+	s.loadFont(2);
+	s.setFontColor(COMMSET_TEXT_COLOR);
+	s.loadFont(2);
+
+	_fontDetails._horizSpacings = -1;
+	_fontDetails._writePos = _fontDetails._fontCenter;
+}
+
 void CommsetContents::draw() {
 	// Draw the contents frame
 	Gfx::VisualSurface s = getSurface();
 	s.frame(Gfx::FF_OUTER_BEVEL);
+
+	// Allow any remaining pending text to be flushed for display, and setup font
+	//allowPendingText();
+	setupFont();
+
+	// TODO
 }
 
 
