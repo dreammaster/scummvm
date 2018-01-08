@@ -30,6 +30,25 @@
 namespace Legend {
 namespace Early {
 
+/**
+ * Implements the contents area of the Commset
+ */
+class CommsetContents : public Gfx::VisualItem {
+	DECLARE_MESSAGE_MAP;
+public:
+	CLASSDEF;
+	CommsetContents(const Common::Rect &r) : Gfx::VisualItem(r) {}
+	virtual ~CommsetContents() {}
+
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();
+};
+
+/**
+ * Implements the Commset interface
+ */
 class Commset : public Gfx::VisualContainer {
 	DECLARE_MESSAGE_MAP;
 	bool ShowMsg(CShowMsg &msg);
@@ -37,6 +56,7 @@ class Commset : public Gfx::VisualContainer {
 	bool MouseButtonDownMsg(CMouseButtonDownMsg &msg);
 	bool KeyCharMsg(CKeyCharMsg &msg);
 private:
+	CommsetContents _contents;
 	Gfx::Picture *_logo;
 	ValueButton _btn1, _btn2, _btn3, _btn4, _btn5, _btn6;
 	ValueButton _btn7, _btn8, _btn9, _btnPrev, _btn0, _btnNext;
@@ -45,11 +65,6 @@ private:
 	 * Draws the background for the Commset
 	 */
 	void drawBackground();
-
-	/**
-	 * Draws the text contents being displayed in the Commset
-	 */
-	void drawContents();
 public:
 	CLASSDEF;
 	Commset();

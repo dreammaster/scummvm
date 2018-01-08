@@ -29,6 +29,7 @@
 namespace Legend {
 namespace Early {
 
+EMPTY_MESSAGE_MAP(CommsetContents, Gfx::VisualItem);
 BEGIN_MESSAGE_MAP(Commset, VisualContainer)
 	ON_MESSAGE(ShowMsg)
 	ON_MESSAGE(HideMsg)
@@ -53,7 +54,8 @@ Commset::Commset() : VisualContainer(), _logo(nullptr),
 		_btn9("9", BTN_9, Common::Rect(132, 165, 172, 187)),
 		_btnPrev("Prev", BTN_PREV, Common::Rect(44, 191, 84, 213)),
 		_btn0("0", BTN_0, Common::Rect(88, 191, 128, 213)),
-		_btnNext("Next", BTN_NEXT, Common::Rect(132, 191, 172, 213)) {
+		_btnNext("Next", BTN_NEXT, Common::Rect(132, 191, 172, 213)),
+		_contents(Common::Rect(188, 56, 596, 424)) {
 	_name = "Commset";
 	setBounds(Screen::get().getBounds());
 	_fontDetails._fontNumber = 2;
@@ -63,9 +65,7 @@ Commset::Commset() : VisualContainer(), _logo(nullptr),
 		&_btn7, &_btn8, &_btn9, &_btnPrev, &_btn0, &_btnNext };
 	for (int idx = 0; idx < 12; ++idx)
 		btns[idx]->addUnder(this);
-
-	// Set up a region for the commset inner content area
-	_regions.add(Common::Rect(188, 56, 596, 424));
+	_contents.addUnder(this);
 }
 
 Commset::~Commset() {
@@ -73,17 +73,11 @@ Commset::~Commset() {
 }
 
 void Commset::draw() {
-	if (!_isDirty)
-		return;
+	if (_isDirty)
+		drawBackground();
 
-	// Draw the background
-	drawBackground();
-
-	// Draw the keypad buttons
+	// Draw the keypad buttons and commset contents area
 	VisualContainer::draw();
-
-	// Draw the text contents
-	drawContents();
 }
 
 void Commset::drawBackground() {
@@ -93,9 +87,6 @@ void Commset::drawBackground() {
 
 	// Draw a bevelled window for the commset
 	s.frameRect(Common::Rect(28, 41, 605, 442), Gfx::FF_INNER_BEVEL);
-
-	// Draw the inner content area
-	s.frameRect(_regions[0], Gfx::FF_OUTER_BEVEL);
 
 	// Draw NAT&T logo
 	s.blitFrom(*_logo, Common::Point(64, 55));
@@ -114,10 +105,6 @@ void Commset::drawBackground() {
 	for (int idx = 0; idx < 19; ++idx, r.top += 9, r.bottom += 9) {
 		s.frameRect(r, Gfx::FF_OUTER_BEVEL);
 	}
-}
-
-void Commset::drawContents() {
-	// TODO
 }
 
 bool Commset::ShowMsg(CShowMsg &msg) {
@@ -139,6 +126,15 @@ bool Commset::MouseButtonDownMsg(CMouseButtonDownMsg &msg) {
 bool Commset::KeyCharMsg(CKeyCharMsg &msg) {
 	return true;
 }
+
+/*-------------------------------------------------------------------*/
+
+void CommsetContents::draw() {
+	// Draw the contents frame
+	Gfx::VisualSurface s = getSurface();
+	s.frame(Gfx::FF_OUTER_BEVEL);
+}
+
 
 } // End of namespace Early
 } // End of namespace Legend
