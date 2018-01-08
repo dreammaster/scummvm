@@ -206,7 +206,7 @@ VisualSurface VisualSurface::getSubArea(const Common::Rect &r) {
 	return VisualSurface(src, _font, newBounds);
 }
 
-void VisualSurface::fillRect(Common::Rect r, byte color) {
+void VisualSurface::fillRect(Common::Rect r, byte color, byte color2) {
 	if (!(color & 0x80)) {
 		// Solid color, so we can use the base method's fillRect
 		Graphics::ManagedSurface::fillRect(r, color);
@@ -225,10 +225,10 @@ void VisualSurface::fillRect(Common::Rect r, byte color) {
 	}
 }
 
-void VisualSurface::fill(byte color) {
+void VisualSurface::fill(byte color, byte color2) {
 	if (color & 0x80) {
 		// Checkberbox fill
-		fillRect(Common::Rect(0, 0, this->w, this->h), color);
+		fillRect(Common::Rect(0, 0, this->w, this->h), color, color2);
 	} else {
 		// Solid fill
 		Graphics::ManagedSurface::clear(color);

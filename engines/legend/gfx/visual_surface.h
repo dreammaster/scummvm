@@ -149,16 +149,18 @@ public:
 	 * Fill a rect with a given color.
 	 * @param r			Drawing area
 	 * @param color		Color to use. If bit 7 is set, it uses a checkerbox
-	 *		of alternating grey with the color in the remaining bits
+	 *		of alternating second color with the color in the remaining bits
+	 * @param color2	Second color to use when doing a checkered fill
 	 */
-	void fillRect(Common::Rect r, byte color);
+	void fillRect(Common::Rect r, byte color, byte color2 = 0);
 
 	/**
 	 * Fill the entire surface with a given color.
 	 * @param color		Color to use. If bit 7 is set, it uses a checkerbox
-	 *		of alternating color 10 with the color in the remaining bits
+	 *		of alternating second color with the color in the remaining bits
+	 * @param color2	Second color to use when doing a checkered fill
 	 */
-	void fill(byte color);
+	void fill(byte color, byte color2 = 0);
 
 	/**
 	 * Fills an area with a frame

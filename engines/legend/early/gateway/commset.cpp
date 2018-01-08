@@ -86,10 +86,26 @@ void Commset::draw() {
 	// Draw the inner content area
 	s.frameRect(_regions[0], Gfx::FF_OUTER_BEVEL);
 
+	// Draw NAT&T logo
 	s.blitFrom(*_logo, Common::Point(64, 55));
+
+	// Draw the background the buttons will be drawn on
+	s.frameRect(Common::Rect(39, 107, 177, 221), Gfx::FF_OUTER_BEVEL);
+	s.fillRect(Common::Rect(40, 108, 176, 220), 2, 10);
 
 	// Draw the buttons
 	VisualContainer::draw();
+
+	// Draw the grill lines on the left hand side of the commset
+	Common::Rect r(39, 238, 177, 244);
+	s.frameRect(r, Gfx::FF_OUTER_BEVEL);
+	s.fillRect(r, BLACK);
+
+	r.top = 262;
+	r.bottom = 265;
+	for (int idx = 0; idx < 19; ++idx, r.top += 9, r.bottom += 9) {
+		s.frameRect(r, Gfx::FF_OUTER_BEVEL);
+	}
 }
 
 bool Commset::ShowMsg(CShowMsg &msg) {
