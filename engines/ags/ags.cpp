@@ -2573,12 +2573,17 @@ Common::String AGSEngine::getMasterArchive() const {
 	const ADGameFileDescription *gameFiles = getGameFiles();
 	const char *gameFile = getDetectedGameFile();
 
-	if (gameFiles[0].fileName)
-		return gameFiles[0].fileName;
-	else if (gameFile[0])
-		return gameFile;
+	Common::String masterArchive;
 
-	return "ac2game.dat";
+	if (gameFiles[0].fileName)
+		masterArchive = gameFiles[0].fileName;
+	else if (gameFile[0])
+		masterArchive = gameFile;
+	else
+		masterArchive = "ac2game.dat";
+
+	debug(3, "master archive is %s", masterArchive.c_str());
+	return masterArchive;
 }
 
 bool AGSEngine::init() {
