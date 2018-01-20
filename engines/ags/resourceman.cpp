@@ -37,10 +37,8 @@ static const uint32 k1234 = MKTAG('\x1', '\x2', '\x3', '\x4');
 static const uint32 kSigE = MKTAG('S', 'I', 'G', 'E');
 
 // The master archive, which might be attached to the EXE, is always referenced
-// as "ac2game.ags" in V2.
-static const char *kMasterArchiveNameLegacy = "ac2game.ags";
-static const char *kMasterArchiveName = "Game.ags";
-
+// as "ac2game.ags" in V2. Potentially <GAMENAME>.ags in later versions
+static const char *kMasterArchiveSuffix= ".ags";
 static const char *kSecretArchivePassword = "My\x1\xde\x4Jibzle";
 
 namespace AGS {
@@ -183,7 +181,7 @@ bool ResourceManager::openArchives(MasterArchive &master,
 		_archives.push_back(new Common::File);
 
 		// Make sure that we open the right archive file
-		if (archive->equalsIgnoreCase(kMasterArchiveName) || archive->equalsIgnoreCase(kMasterArchiveNameLegacy)) {
+		if (archive->hasSuffix(kMasterArchiveSuffix)) {
 			if (!_archives.back()->open(master.name))
 				return false;
 		} else {
