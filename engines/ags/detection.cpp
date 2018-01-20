@@ -81,12 +81,15 @@ ADDetectedGame AGSMetaEngineDetection::fallbackDetect(const FileMap &allFiles, c
 		SearchMan.clear();
 		SearchMan.addDirectory(file->getParent().getName(), file->getParent());
 		AGS::ResourceManager resourceManager;
-		if (!resourceManager.init(filename))
+		if (!resourceManager.init(filename)) {
+			debug(4, "File %s failed ResourceManager init", filename.c_str());
 			continue;
+		}
 
 		Common::SeekableReadStream *dta = resourceManager.getFile(AGS::kGameDataNameV2);
 		if (!dta) {
 			// if no 2.x data, try 3.x
+			debug(4, "No V2 game data. Trying V3...");
 			dta = resourceManager.getFile(AGS::kGameDataNameV3);
 			if (!dta) {
 				debug(3, "AGS detection couldn't find game data file in '%s'", filename.c_str());
