@@ -590,7 +590,8 @@ int Picture::decode(Common::SeekableReadStream *inStream) {
 				byte *pDest = (byte *)s.getBasePtr(0, yp);
 				for (int xp = 0; xp < s.w; xp += 2, ++pSrc) {
 					*pDest++ = *pSrc & 0xf;
-					*pDest++ = *pSrc >> 4;
+					if (xp != (s.w - 1))
+						*pDest++ = *pSrc >> 4;
 				}
 			}
 		}
