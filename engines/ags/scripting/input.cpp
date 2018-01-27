@@ -263,10 +263,7 @@ RuntimeValue Script_Mouse_UseDefaultGraphic(AGSEngine *vm, ScriptObject *, const
 // Changes the mouse cursor to use the graphic for a different non-active cursor mode.
 RuntimeValue Script_Mouse_UseModeGraphic(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint32 cursormode = params[0]._value;
-	UNUSED(cursormode);
-
-	// FIXME
-	error("Mouse::UseModeGraphic unimplemented");
+	vm->_graphics->setMouseCursor(cursormode);
 
 	return RuntimeValue();
 }
