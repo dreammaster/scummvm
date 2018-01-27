@@ -86,7 +86,7 @@ SpriteSet::SpriteSet(AGSEngine *vm, Common::SeekableReadStream *stream) : _vm(vm
 		return;
 
 	// no sprite index file, manually index the sprites
-	for (uint i = 0; i < spriteCount; ++i) {
+	for (uint i = 0; i <= spriteCount; ++i) {
 		SpriteInfo &info = _spriteInfo[i];
 		info._offset = _stream->pos();
 		uint16 colorDepth = _stream->readUint16LE();
@@ -175,8 +175,10 @@ Sprite *SpriteSet::getSprite(uint32 spriteId) {
 		error("SpriteSet::getSprite: sprite id %d is too high", spriteId);
 
 	// convert non-existant sprites to the big blue cup
-	if (_spriteInfo[spriteId]._offset == 0)
+	if (_spriteInfo[spriteId]._offset == 0) {
+		warning("Sprite %d was converted to a placeholder", spriteId);
 		spriteId = 0;
+	}
 
 	if (_sprites.contains(spriteId))
 		return _sprites[spriteId];
