@@ -390,12 +390,8 @@ RuntimeValue Script_SetMouseBounds(AGSEngine *vm, ScriptObject *, const Common::
 // Mouse function.
 RuntimeValue Script_SetMousePosition(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
-
-	// FIXME
-	error("SetMousePosition unimplemented");
+	vm->_system->warpMouse(x, y);
 
 	return RuntimeValue();
 }
