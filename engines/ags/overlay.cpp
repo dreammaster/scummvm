@@ -452,21 +452,34 @@ uint AGSEngine::displayMain(int x, int y, int width, const Common::String &text,
 	uint skipSetting = _state->userToInternalSkipSpeech(_state->_skipDisplay);
 
 	// FIXME
-	warning("displayMain '%s' unimplemented", text.c_str());
+	warning("displayMain '%s' partially implemented", text.c_str());
 	while (!shouldQuit()) {
 		_state->_gameStep++;
 		// FIXME: rendering/polling stuff
 		updateEvents(false);
 		draw();
 
-		// FIXME: totally wrong
-		if (!countdown)
+		// FIXME: extend life of text if the voice hasn't finished yet
+		// FIXME: if the voice has finished, remove the speech
+
+		// FIXME: account for ignore_user_input_until_time
+		if (!countdown && skipSetting & SKIP_AUTOTIMER)
 			break;
+
+		// if skipping cutscene, don't get stuck on No Auto Remove text boxes
+		if (!countdown && _state->_fastForward)
+			break;
+
+		// if click or keypress removed the Overlay
+		if (!_textOverlayCount)
+			break;
+
 		countdown--;
 	}
 
 	// FIXME: cursor stuff
-	removeScreenOverlay(OVER_TEXTMSG);
+	if (_textOverlayCount)
+		removeScreenOverlay(OVER_TEXTMSG);
 
 	_state->_messageTime = -1;
 	return 0;

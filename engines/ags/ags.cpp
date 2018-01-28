@@ -537,6 +537,10 @@ void AGSEngine::updateEvents(bool checkControls) {
 			uint keycode = Common::mapKeycodeToAGS(event.kbd.keycode);
 			_keysPressed[keycode] = true;
 
+			// Remove Overlay message on key press
+			if (_textOverlayCount && (_state->_cantSkipSpeech & SKIP_KEYPRESS))
+				removeScreenOverlay(OVER_TEXTMSG);
+
 			if (!checkControls)
 				break;
 
