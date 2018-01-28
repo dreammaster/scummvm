@@ -234,6 +234,14 @@ RuntimeValue Script_Mouse_SetBounds(AGSEngine *vm, ScriptObject *, const Common:
 RuntimeValue Script_Mouse_SetPosition(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
 	int y = params[1]._signedValue;
+
+	int max_x = vm->_graphics->_width - 1;
+	int max_y = vm->_graphics->_height - 1;
+
+	x = MIN(MAX(0, x), max_x);
+	y = MIN(MAX(0, y), max_y);
+
+	vm->multiplyUpCoordinates(x, y);
 	vm->_system->warpMouse(x, y);
 
 	return RuntimeValue();
@@ -391,6 +399,14 @@ RuntimeValue Script_SetMouseBounds(AGSEngine *vm, ScriptObject *, const Common::
 RuntimeValue Script_SetMousePosition(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
 	int y = params[1]._signedValue;
+
+	int max_x = vm->_graphics->_width - 1;
+	int max_y = vm->_graphics->_height - 1;
+
+	x = MIN(MAX(0, x), max_x);
+	y = MIN(MAX(0, y), max_y);
+
+	vm->multiplyUpCoordinates(x, y);
 	vm->_system->warpMouse(x, y);
 
 	return RuntimeValue();
