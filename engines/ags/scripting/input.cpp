@@ -233,12 +233,8 @@ RuntimeValue Script_Mouse_SetBounds(AGSEngine *vm, ScriptObject *, const Common:
 // Moves the mouse cursor to the specified location.
 RuntimeValue Script_Mouse_SetPosition(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int x = params[0]._signedValue;
-	UNUSED(x);
 	int y = params[1]._signedValue;
-	UNUSED(y);
-
-	// FIXME
-	error("Mouse::SetPosition unimplemented");
+	vm->_system->warpMouse(x, y);
 
 	return RuntimeValue();
 }
