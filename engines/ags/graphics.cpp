@@ -244,7 +244,56 @@ public:
 	}
 
 	virtual Common::Point getDrawPos() {
-		return _vm->_system->getEventManager()->getMousePos() - Common::Point(_hotspotX, _hotspotY);
+		Common::Point pos = _vm->_system->getEventManager()->getMousePos();
+		Common::Point offset = Common::Point(_hotspotX, _hotspotY);
+
+		int32 min_x = _vm->_state->_mboundX1;
+		int32 max_x = _vm->_state->_mboundX2;		
+		int32 min_y = _vm->_state->_mboundY1;
+		int32 max_y = _vm->_state->_mboundY2;
+
+		if (min_x != 0 || min_y != 0 || max_x != 0 || max_y != 0) {
+			bool restricted = false;
+
+			// these were low-res co-ordinates, so scale them
+			_vm->multiplyUpCoordinates(min_x, min_y);
+			_vm->multiplyUpCoordinates(max_x, max_y);
+
+			// ensure maximum boundaries are in the viewport
+			max_x = MIN(max_x, (int32)_vm->_graphics->_width);
+			max_y = MIN(max_y, (int32)_vm->_graphics->_height);
+
+			// reset lower boundaries if they are above the upper boundaries
+			if (min_x > max_x)
+				min_x = 0;
+			if (min_y > max_y)
+				min_y = 0;
+
+			// enforce x boundaries
+			if (pos.x < min_x) {
+				pos.x = min_x;
+				restricted = true;
+			}
+			else if (pos.x > max_x) {
+				pos.x = max_x;
+				restricted = true;
+			}
+
+			// enforce y boundaries
+			if (pos.y < min_y) {
+				pos.y = min_y;
+				restricted = true;
+			}
+			else if (pos.y > max_y) {
+				pos.y = max_y;
+				restricted = true;
+			}
+
+			if (restricted)
+				_vm->_system->warpMouse(pos.x, pos.y);
+		}
+
+		return pos - offset;
 	}
 
 	virtual int getDrawOrder() const { return 0; }

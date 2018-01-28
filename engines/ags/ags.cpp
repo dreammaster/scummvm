@@ -1130,6 +1130,12 @@ void AGSEngine::loadNewRoom(uint32 id, Character *forChar) {
 	_state->_animBackgroundSpeed = _currentRoom->_backgroundSceneAnimSpeed;
 	_state->_bgAnimDelay = _currentRoom->_backgroundSceneAnimSpeed;
 
+	// was originally calling SetMouseBounds
+	_state->_mboundX1 = 0;
+	_state->_mboundX2 = 0;
+	_state->_mboundY1 = 0;
+	_state->_mboundY2 = 0;
+
 	_graphics->newRoomPalette();
 
 	// FIXME
