@@ -189,6 +189,10 @@ struct GameEvent {
 
 #define MAX_AGS_KEYCODE 435
 
+#define BLOCK_EXIT_NONE 0
+#define BLOCK_EXIT_KEY 1
+#define BLOCK_EXIT_KEY_OR_MOUSE 3
+
 #define UINT_UNDEFINED (uint)-1
 #define UINT16_UNDEFINED (uint16)-1
 #define UINT32_UNDEFINED (uint32)-1

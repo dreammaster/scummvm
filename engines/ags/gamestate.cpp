@@ -521,7 +521,7 @@ void GameState::init() {
 
 	_shakeLength = 0;
 	_waitCounter = 0;
-	_keySkipWait = 0;
+	_keySkipWait = BLOCK_EXIT_NONE;
 
 	_curMusicNumber = (uint32)-1;
 	_musicRepeat = 1;
