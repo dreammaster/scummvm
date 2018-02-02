@@ -314,7 +314,26 @@ bool AGSEngine::mainGameLoop() {
 	mousePos.y = divideDownCoordinate(mousePos.y);
 	getLocationName(mousePos);
 
-	// FIXME: cursor updates
+	// FIXME: cursor updates, was this just to restore the saved cursor?
+	if (_state->_getLocNameSaveCursor != UINT32_UNDEFINED &&
+		_state->_getLocNameSaveCursor != _state->_getLocNameLastTime &&
+		_mouseOnGUI == UINT_UNDEFINED &&
+		_poppedInterface == UINT_UNDEFINED) {
+		// we have saved the cursor, but the mouse location has changed
+		// and it's time to restore it
+
+		_state->_getLocNameSaveCursor = UINT32_UNDEFINED;
+		setCursorMode(_state->_restoreCursorModeTo);
+		uint32 mode = getCursorMode();
+
+		if (mode == _state->_restoreCursorModeTo)
+		{
+			// make sure it changed -- the new mode might have been disabled
+			// in which case don't change the image
+			_gameFile->_cursors[mode]._pic = _state->_restoreCursorImageTo;
+		}
+		debug(3, "Restore mouse to mode %d cursor %d", _state->_restoreCursorModeTo, _state->_restoreCursorImageTo);
+	}
 
 	// update blocking status
 	if (_blockingUntil != kUntilNothing) {
@@ -696,7 +715,7 @@ void AGSEngine::updateEvents(bool checkControls) {
 			// do nothing
 		} else if (_state->_waitCounter > 0 && _state->_keySkipWait > 1) {
 			// skip wait
-			_state->_waitCounter = -1;
+			_state->_waitCounter = UINT16_UNDEFINED;
 		} else if (_textOverlayCount && (_state->_cantSkipSpeech & SKIP_MOUSECLICK)) {
 			removeScreenOverlay(OVER_TEXTMSG);
 		} else if (!_state->_disabledUserInterface && activeGUI != -1) {

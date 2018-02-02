@@ -189,6 +189,10 @@ struct GameEvent {
 
 #define MAX_AGS_KEYCODE 435
 
+#define UINT_UNDEFINED (uint)-1
+#define UINT16_UNDEFINED (uint16)-1
+#define UINT32_UNDEFINED (uint32)-1
+
 struct CustomPropertySchemaProperty;
 
 class AGSEngine : public Engine {
