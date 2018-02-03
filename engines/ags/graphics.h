@@ -78,6 +78,7 @@ public:
 	void setMouseCursor(uint32 cursor);
 	void mouseSetHotspot(uint32 x, uint32 y);
 	void setCursorGraphic(uint32 spriteId);
+	void setMouseDelay(uint32 delay);
 
 	uint32 getCurrentCursor();
 
