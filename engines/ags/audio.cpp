@@ -694,6 +694,17 @@ void AGSAudio::openResources() {
 		_vm->_state->_wantSpeech = 1;
 }
 
+bool AGSAudio::getAudioClipIsAvailable(AudioClip *clip) {
+	if (clip->_bundledInExecutable)
+		return true;
+	if (_musicResources && _musicResources->hasFile(clip->_filename))
+		return true;
+	if (_audioResources && _audioResources->hasFile(clip->_filename))
+		return true;
+
+	return false;
+}
+
 void AGSAudio::registerScriptObjects() {
 	for (uint i = 0; i < _audioClips.size(); ++i)
 		_vm->getScriptState()->addSystemObjectImport(_audioClips[i]._scriptName, &_audioClips[i]);

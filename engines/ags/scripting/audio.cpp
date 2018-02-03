@@ -575,19 +575,16 @@ RuntimeValue Script_AudioClip_Stop(AGSEngine *vm, AudioClip *self, const Common:
 // AudioClip: readonly import attribute AudioFileType FileType
 // Gets the file type of the sound.
 RuntimeValue Script_AudioClip_get_FileType(AGSEngine *vm, AudioClip *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioClip::get_FileType unimplemented");
-
-	return RuntimeValue();
+	return self->_fileType;
 }
 
 // AudioClip: readonly import attribute bool IsAvailable
 // Checks whether this audio file is available on the player's system.
 RuntimeValue Script_AudioClip_get_IsAvailable(AGSEngine *vm, AudioClip *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioClip::get_IsAvailable unimplemented");
+	if (vm->_audio->getAudioClipIsAvailable(self))
+		return 1;
 
-	return RuntimeValue();
+	return 0;
 }
 
 // AudioClip: readonly import attribute AudioType Type

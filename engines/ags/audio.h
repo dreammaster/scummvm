@@ -187,6 +187,7 @@ public:
 	void setSpeechVolume(uint volume);
 
 	bool hasSpeechResources() { return (bool)_speechResources; }
+	bool getAudioClipIsAvailable(AudioClip *clip);
 
 	Common::Array<AudioClip> _audioClips;
 	Common::Array<AudioClipType> _audioClipTypes;
