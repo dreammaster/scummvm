@@ -49,7 +49,7 @@ GameState::GameState(AGSEngine *vm) : _vm(vm) {
 
 	// not inited in original?!
 	_stopDialogAtEnd = DIALOG_NONE;
-	_mouseCursorHidden = false;
+	_mouseCursorHidden = 0;
 	_usedInvOn = 0;
 
 	_globalScriptVars.resize(MAXGSVALUES);
