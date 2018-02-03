@@ -534,7 +534,7 @@ RuntimeValue Script_WaitKey(AGSEngine *vm, ScriptObject *, const Common::Array<R
 	vm->_state->_keySkipWait = BLOCK_EXIT_KEY;
 	vm->blockUntil(kUntilWaitDone, 0);
 
-	if (vm->_state->_waitCounter < 0)
+	if (vm->_state->_waitCounter == UINT16_UNDEFINED)
 		return 1;
 
 	return 0;
@@ -552,7 +552,7 @@ RuntimeValue Script_WaitMouseKey(AGSEngine *vm, ScriptObject *, const Common::Ar
 	vm->_state->_keySkipWait = BLOCK_EXIT_KEY_OR_MOUSE;
 	vm->blockUntil(kUntilWaitDone, 0);
 
-	if (vm->_state->_waitCounter < 0)
+	if (vm->_state->_waitCounter == UINT16_UNDEFINED)
 		return 1;
 
 	return 0;
