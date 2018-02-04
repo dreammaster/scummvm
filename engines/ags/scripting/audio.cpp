@@ -487,10 +487,13 @@ RuntimeValue Script_AudioChannel_get_PlayingClip(AGSEngine *vm, AudioChannel *se
 // AudioChannel: readonly import attribute int Position
 // The current offset into the sound. What this represents depends on the audio type.
 RuntimeValue Script_AudioChannel_get_Position(AGSEngine *vm, AudioChannel *self, const Common::Array<RuntimeValue> &params) {
-	// FIXME
-	error("AudioChannel::get_Position unimplemented");
+	if (!self->isPlaying())
+		return 0;
 
-	return RuntimeValue();
+	if (vm->_state->_fastForward)
+		return 999999999;
+
+	return self->getPosition();
 }
 
 // AudioChannel: readonly import attribute int PositionMs

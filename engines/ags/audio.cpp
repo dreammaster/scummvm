@@ -828,4 +828,30 @@ uint32 AudioChannel::getPositionMs() {
 	return _vm->_mixer->getSoundElapsedTime(_handle);
 }
 
+uint32 AudioChannel::getPosition() {
+	AudioFileType fileType = _clip->_fileType;
+
+	switch (fileType) {
+		case kAudioFileVOC:
+		case kAudioFileWAV:
+			// CHECKME
+			// - might not be accurate enough (the mixer doesn't expose sample info?)
+			// - what happens if audio is disabled or samplerate comes back as 0?
+			// samples per millisecond from the mixer * milliseconds played
+			return (_vm->_mixer->getOutputRate() / 1000) * _vm->_mixer->getSoundElapsedTime(_handle);
+			break;
+		case kAudioFileOGG:
+		case kAudioFileMP3:
+			return _vm->_mixer->getSoundElapsedTime(_handle);
+			break;
+		case kAudioFileMOD:
+		default:
+			// FIXME
+			warning("AudioChannnel::getPosition not implemented for clip file type %d", fileType);
+		case kAudioFileMIDI:
+			return 0;
+			break;
+	}
+}
+
 } // End of namespace AGS
