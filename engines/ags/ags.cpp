@@ -480,7 +480,7 @@ void AGSEngine::tickGame(bool checkControls) {
 	// FIXME: maintain background
 
 	_loopCounter++;
-	if (_state->_waitCounter)
+	if (_state->_waitCounter != UINT16_UNDEFINED)
 		_state->_waitCounter--;
 	if (_state->_shakeLength) {
 		_state->_shakeLength--;
@@ -560,8 +560,8 @@ void AGSEngine::updateEvents(bool checkControls) {
 				removeScreenOverlay(OVER_TEXTMSG);
 
 			// Check if blocking can be skipped with a key press
-			if (_state->_keySkipWait != BLOCK_EXIT_NONE)
-				_state->_waitCounter = 0;
+			if (_state->_waitCounter != UINT16_UNDEFINED && _state->_keySkipWait != BLOCK_EXIT_NONE)
+				_state->_waitCounter = UINT16_UNDEFINED;
 
 			if (!checkControls)
 				break;
@@ -716,9 +716,9 @@ void AGSEngine::updateEvents(bool checkControls) {
 
 		if (_state->_fastForward) {
 			// do nothing
-		} else if (_state->_waitCounter > 0 && _state->_keySkipWait == BLOCK_EXIT_KEY_OR_MOUSE) {
-			// skip wait, originally set to -1 for the original engine loop
-			_state->_waitCounter = 0;
+		} else if (_state->_waitCounter != UINT16_UNDEFINED && _state->_keySkipWait == BLOCK_EXIT_KEY_OR_MOUSE) {
+			// skip wait
+			_state->_waitCounter = UINT16_UNDEFINED;
 		} else if (_textOverlayCount && (_state->_cantSkipSpeech & SKIP_MOUSECLICK)) {
 			removeScreenOverlay(OVER_TEXTMSG);
 		} else if (!_state->_disabledUserInterface && activeGUI != -1) {
@@ -3640,7 +3640,7 @@ BlockUntilType AGSEngine::checkBlockingUntil() {
 			return kUntilNothing;
 		break;
 	case kUntilWaitDone:
-		if (_state->_waitCounter == 0)
+		if (_state->_waitCounter == 0 || _state->_waitCounter == UINT16_UNDEFINED)
 			return kUntilNothing;
 		break;
 	case kUntilCharAnimDone:
