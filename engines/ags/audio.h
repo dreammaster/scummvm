@@ -97,6 +97,9 @@ public:
 	void setVolume(uint volume);
 	uint getVolume() { return _volume; }
 
+	void setPanning(int panning);
+	int getPanning() { return _panning; }
+
 	int getPriority() { return _priority; }
 	void setPriority(int priority) { _priority = priority; }
 
@@ -117,6 +120,7 @@ protected:
 	AudioClip *_clip;
 
 	uint _volume;
+	int _panning;
 
 	// ScummVM audio
 	Audio::SoundHandle _handle;

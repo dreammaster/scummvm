@@ -824,6 +824,28 @@ void AudioChannel::setVolume(uint volume) {
 	_volume = volume;
 }
 
+void AudioChannel::setPanning(int panning) {
+	// FIXME: this will need a reset when the current AudioClip has finished playing
+
+	// CHECKME: compare floor with original Allegro conversion to IDirectSoundBuffer::SetPan
+
+	//alleg_to_dsound_pan[0] = DSBPAN_LEFT;
+	//for (v = 1; v < 128; v++)
+	//	alleg_to_dsound_pan[v] = MAX(DSBPAN_LEFT, DSBPAN_CENTER + 2000.0*log10(v / 127.0));
+	//
+	//alleg_to_dsound_pan[255] = DSBPAN_RIGHT;
+	//for (v = 128; v < 255; v++)
+	//	alleg_to_dsound_pan[v] = MIN(DSBPAN_RIGHT, DSBPAN_CENTER - 2000.0*log10((255.0 - v) / 127.0));
+
+	if (panning < -100 || panning > 100)
+		warning("AudioChannel.Panning: panning value must be between -100 and 100 (passed=%d)", panning);
+	else if (_valid && _vm->_mixer->isSoundHandleActive(_handle)) {
+		_panning = panning;
+		int8 balance = floor(panning * 1.27);
+		_vm->_mixer->setChannelBalance(_handle, balance);
+	}
+}
+
 uint32 AudioChannel::getPositionMs() {
 	return _vm->_mixer->getSoundElapsedTime(_handle);
 }
