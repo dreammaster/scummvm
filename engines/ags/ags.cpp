@@ -457,6 +457,9 @@ void AGSEngine::tickGame(bool checkControls) {
 
 	// FIXME: a whole bunch of update stuff
 
+	if (_loopCounter % 5 == 0)
+		_audio->update();
+
 	if (!_state->_fastForward) {
 		draw();
 
@@ -486,11 +489,6 @@ void AGSEngine::tickGame(bool checkControls) {
 		_state->_shakeLength--;
 		if (_state->_shakeLength == 0)
 			_system->setShakePos(0, 0);
-	}
-
-	if (_loopCounter % 5 == 0) {
-		_audio->updateAmbientSoundVolume();
-		_audio->updateDirectionalSoundVolume();
 	}
 
 	// TODO: replay stuff?
