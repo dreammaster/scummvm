@@ -881,11 +881,9 @@ uint32 AudioChannel::getPosition() {
 	switch (fileType) {
 		case kAudioFileVOC:
 		case kAudioFileWAV:
-			// CHECKME
-			// - might not be accurate enough (the mixer doesn't expose sample info?)
-			// - what happens if audio is disabled or samplerate comes back as 0?
-			// samples per millisecond from the mixer * milliseconds played
-			return (_vm->_mixer->getOutputRate() / 1000) * _vm->_mixer->getSoundElapsedTime(_handle) - _rewind;
+			// samples = samples per millisecond * elapsed milliseconds
+			// Note: original engine does not account for stereo
+			return (_stream->getRate() / 1000) * (_vm->_mixer->getSoundElapsedTime(_handle) - _rewind);
 			break;
 		case kAudioFileOGG:
 		case kAudioFileMP3:
