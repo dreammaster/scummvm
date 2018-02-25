@@ -330,10 +330,9 @@ RuntimeValue Script_GetMP3PosMillis(AGSEngine *vm, ScriptObject *, const Common:
 // Seeks into the currently playing MP3 or OGG music.
 RuntimeValue Script_SeekMP3PosMillis(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	int offset = params[0]._signedValue;
-	UNUSED(offset);
 
-	// FIXME
-	error("SeekMP3PosMillis unimplemented");
+	AudioChannel *channel = vm->_audio->_channels[SCHAN_MUSIC];
+	channel->seek(offset);
 
 	return RuntimeValue();
 }
@@ -402,10 +401,7 @@ RuntimeValue Script_IsMusicVoxAvailable(AGSEngine *vm, ScriptObject *, const Com
 // Changes playback to continue from the specified position into the sound.
 RuntimeValue Script_AudioChannel_Seek(AGSEngine *vm, AudioChannel *self, const Common::Array<RuntimeValue> &params) {
 	int position = params[0]._signedValue;
-	UNUSED(position);
-
-	// FIXME
-	error("AudioChannel::Seek unimplemented");
+	self->seek(position);
 
 	return RuntimeValue();
 }
