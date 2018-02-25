@@ -901,4 +901,11 @@ uint32 AudioChannel::getPosition() {
 	}
 }
 
+uint32 AudioChannel::getLengthMs() {
+	if (!_stream)
+		return 0;
+
+	return _stream->getLength().msecs();
+}
+
 } // End of namespace AGS

@@ -108,6 +108,7 @@ public:
 	uint getId() { return _id; }
 	AudioClip *getClip() { return isPlaying() ? _clip : NULL; }
 
+	uint32 getLengthMs();
 	uint32 getPositionMs();
 	uint32 getPosition();
 
