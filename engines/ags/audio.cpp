@@ -909,7 +909,7 @@ uint32 AudioChannel::getLengthMs() {
 void AudioChannel::seek(uint32 offset) {
 	uint32 length = _stream->getLength().msecs();
 
-	if (_stream && offset >= 0 && offset <= length) {
+	if (_stream && offset <= length) {
 		// store channel position - offset, so getting position can account for the stream being rewound
 		// FIXME: Get the stream position directly?
 		this->_rewind += _vm->_mixer->getSoundElapsedTime(_handle) - offset;
