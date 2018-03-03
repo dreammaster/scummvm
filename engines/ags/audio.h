@@ -96,8 +96,8 @@ public:
 	bool isPlaying();
 	bool hasFinished();
 
-	void setVolume(uint volume);
-	uint getVolume() { return _volume; }
+	void setVolume(uint volume, bool raw = false);
+	uint getVolume(bool raw = false);
 
 	void setPanning(int panning);
 	int getPanning() { return _panning; }
@@ -123,9 +123,8 @@ protected:
 	// AGS audio
 	int _priority;
 	AudioClip *_clip;
-
+	bool _repeat;
 	int32 _rewind;
-	uint _volume;
 	int _panning;
 
 	// ScummVM audio

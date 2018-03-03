@@ -386,7 +386,7 @@ uint AGSAudio::playAudioClipOnChannel(uint channelId, AudioClip &clip, int prior
 	channel->playSound(&clip, repeat);
 	channel->setPriority(priority);
 	// FIXME
-	channel->setVolume(_vm->_state->_soundVolume);
+	channel->setVolume(_vm->_state->_soundVolume, true);
 
 	// FIXME: everything else
 	return channelId;
@@ -463,7 +463,7 @@ bool AGSAudio::playSoundOnChannel(uint soundId, uint channelId) {
 
 	channel->playSound(clip);
 	channel->setPriority(10);
-	channel->setVolume(_vm->_state->_soundVolume);
+	channel->setVolume(_vm->_state->_soundVolume, true);
 
 	return true;
 }
@@ -646,7 +646,7 @@ void AGSAudio::setSpeechVolume(uint volume) {
 	assert(volume <= 255);
 
 	if (_channels[SCHAN_SPEECH]->isPlaying())
-		_channels[SCHAN_SPEECH]->setVolume(volume);
+		_channels[SCHAN_SPEECH]->setVolume(volume, true);
 	_vm->_state->_speechVolume = volume;
 }
 
@@ -727,15 +727,18 @@ void AGSAudio::deregisterScriptObjects() {
 		_vm->getScriptState()->removeImport(_audioClips[i]._scriptName);
 }
 
-AudioChannel::AudioChannel(AGSEngine *vm, uint id) : _vm(vm), _id(id), _valid(false), _rewind(0) {
+AudioChannel::AudioChannel(AGSEngine *vm, uint id) : _vm(vm), _id(id), _valid(false), _rewind(0),
+	_repeat(false), _panning(PAN_CENTER) {
 }
 
 void AudioChannel::reset() {
 	// FIXME: zap stream?
 	_valid = false;
-
-	_volume = Audio::Mixer::kMaxChannelVolume;
+	_repeat = false;
 	_rewind = 0;
+
+	this->setVolume(Audio::Mixer::kMaxChannelVolume, true);
+
 	_panning = PAN_CENTER;
 	this->setPanning(PAN_CENTER);
 }
@@ -842,16 +845,27 @@ bool AudioChannel::hasFinished() {
 	return _valid && !_vm->_mixer->isSoundHandleActive(_handle);
 }
 
-void AudioChannel::setVolume(uint volume) {
-	// FIXME: set volume
+void AudioChannel::setVolume(uint volume, bool raw) {
+	uint newVolume;
 
-	// TODO: The original engine seems rather inconsistent about setting this, take a look at it.
-	_volume = volume;
+	if (raw)
+		newVolume = volume;
+	else
+		newVolume = (volume * 255) / 100;
+
+	_vm->_mixer->setChannelVolume(_handle, newVolume);
+}
+
+uint AudioChannel::getVolume(bool raw) {
+	uint volume = _vm->_mixer->getChannelVolume(_handle);
+
+	if (!raw)
+		return (volume / 255.0) * 100;
+
+	return volume;
 }
 
 void AudioChannel::setPanning(int panning) {
-	// FIXME: this will need a reset when the current AudioClip has finished playing
-
 	// CHECKME: compare floor with original Allegro conversion to IDirectSoundBuffer::SetPan
 
 	//alleg_to_dsound_pan[0] = DSBPAN_LEFT;
