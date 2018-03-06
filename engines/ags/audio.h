@@ -92,9 +92,11 @@ public:
 
 	bool playSound(AudioClip *clip, bool repeat = false);
 	bool playSound(Common::SeekableReadStream *stream, AudioFileType fileType, bool repeat = false);
+	bool playStream(bool repeat = true);
 	void stop(bool resetLegacyMusicSettings = true);
 	bool isPlaying();
 	bool hasFinished();
+	bool isRepeating() { return _repeat; }
 
 	void setVolume(uint volume, bool raw = false);
 	uint getVolume(bool raw = false);
@@ -126,6 +128,7 @@ protected:
 	bool _repeat;
 	int32 _rewind;
 	int _panning;
+	int _volume;
 
 	// ScummVM audio
 	Audio::SoundHandle _handle;

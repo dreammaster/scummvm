@@ -219,8 +219,12 @@ void AGSAudio::update() {
 	this->updateDirectionalSoundVolume();
 
 	for (uint i = 0; i < MAX_SOUND_CHANNELS; ++i) {
-		if (_channels[i]->hasFinished())
-			_channels[i]->reset();
+		if (_channels[i]->hasFinished()) {
+			if (_channels[i]->isRepeating())
+				_channels[i]->playStream();
+			else
+				_channels[i]->reset();
+		}
 	}
 
 	if (_vm->_state->_fastForward)
@@ -737,6 +741,7 @@ void AudioChannel::reset() {
 	_repeat = false;
 	_rewind = 0;
 
+	_volume = Audio::Mixer::kMaxChannelVolume;
 	this->setVolume(Audio::Mixer::kMaxChannelVolume, true);
 
 	_panning = PAN_CENTER;
@@ -803,14 +808,28 @@ bool AudioChannel::playSound(Common::SeekableReadStream *stream, AudioFileType f
 		return false;
 	}
 
-	// FIXME: argh
-	if (repeat) {
-		// FIXME: horrible
-		Audio::AudioStream *streamToPlay = new Audio::LoopingAudioStream(_stream, 0, DisposeAfterUse::NO);
-		_vm->_mixer->playStream(Audio::Mixer::kSFXSoundType, &_handle, streamToPlay, -1, Audio::Mixer::kMaxChannelVolume, 0, DisposeAfterUse::YES);
-	} else
-		_vm->_mixer->playStream(Audio::Mixer::kSFXSoundType, &_handle, _stream, -1, Audio::Mixer::kMaxChannelVolume, 0, DisposeAfterUse::NO);
+	DisposeAfterUse::Flag dispose = repeat ? DisposeAfterUse::NO : DisposeAfterUse::YES;
+	_vm->_mixer->playStream(Audio::Mixer::kSFXSoundType, &_handle, _stream, -1, Audio::Mixer::kMaxChannelVolume, false, dispose);
 
+	_repeat = repeat;
+	_valid = true;
+	return true;
+}
+
+// FIXME
+// Looping audiostreams aren't seekable, and the sound handle for a seekable audiostream is
+// reset when the stream has ended. So to fake a repeat: rewind the existing stream, play it again,
+// and apply the existing volume and balance.
+bool AudioChannel::playStream(bool repeat) {
+	if (!_stream || !_repeat)
+		return false;
+
+	_stream->rewind();
+	DisposeAfterUse::Flag dispose = repeat ? DisposeAfterUse::NO : DisposeAfterUse::YES;
+	_vm->_mixer->playStream(Audio::Mixer::kSFXSoundType, &_handle, _stream, -1, _volume, false, dispose);
+	_vm->_mixer->setChannelBalance(_handle, _panning);
+
+	_repeat = repeat;
 	_valid = true;
 	return true;
 }
@@ -853,16 +872,15 @@ void AudioChannel::setVolume(uint volume, bool raw) {
 	else
 		newVolume = (volume * 255) / 100;
 
+	_volume = newVolume;
 	_vm->_mixer->setChannelVolume(_handle, newVolume);
 }
 
 uint AudioChannel::getVolume(bool raw) {
-	uint volume = _vm->_mixer->getChannelVolume(_handle);
-
 	if (!raw)
-		return (volume / 255.0) * 100;
+		return (_volume / 255.0) * 100;
 
-	return volume;
+	return _volume;
 }
 
 void AudioChannel::setPanning(int panning) {
