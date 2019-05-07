@@ -76,6 +76,8 @@ MODULE_OBJS := \
 	magnetic/graphics.o \
 	magnetic/magnetic.o \
 	magnetic/sound.o \
+	magnetic2/detection.o \
+	magnetic2/magnetic.o \
 	scott/detection.o \
 	scott/scott.o \
 	tads/detection.o \
