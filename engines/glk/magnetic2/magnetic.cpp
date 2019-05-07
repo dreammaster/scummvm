@@ -30,16 +30,20 @@ Magnetic::Magnetic(OSystem *syst, const GlkGameDescription &gameDesc) : GlkAPI(s
 
 void Magnetic::runGame() {
 	// At this point, _gameFile has an open reference to the main game file
+	GUIErrorMessage("Game is open");
+
+	Common::String gfxFile = getGraphicsFilename();
+	if (Common::File::exists(gfxFile)) {
+		GUIErrorMessage("Oh, and the graphics file is present too");
+	}
 }
 
-Common::Error Magnetic::loadGameData(strid_t file) {
-	// TODO
-	return Common::kNoError;
-}
+Common::String Magnetic::getGraphicsFilename() const {
+	Common::String filename = getFilename();
+	while (filename.contains("."))
+		filename.deleteLastChar();
 
-Common::Error Magnetic::saveGameData(strid_t file, const Common::String &desc) {
-	// TODO
-	return Common::kNoError;
+	return filename + ".gfx";
 }
 
 } // End of namespace Magnetic2

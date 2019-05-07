@@ -34,6 +34,10 @@ namespace Magnetic2 {
  */
 class Magnetic : public GlkAPI {
 private:
+	/**
+	 * Returns the optional graphics filename for the game
+	 */
+	Common::String getGraphicsFilename() const;
 public:
 	/**
 	 * Constructor
@@ -53,12 +57,18 @@ public:
 	/**
 	 * Load a savegame from the passed stream
 	 */
-	virtual Common::Error loadGameData(strid_t file) override;
+	virtual Common::Error loadGameData(strid_t file) override {
+		// TODO
+		return Common::kNoError;
+	}
 
 	/**
 	 * Save the game to the passed stream
 	 */
-	virtual Common::Error saveGameData(strid_t file, const Common::String &desc) override;
+	virtual Common::Error saveGameData(strid_t file, const Common::String &desc) override {
+		// TODO
+		return Common::kNoError;
+	}
 };
 
 } // End of namespace Magnetic2

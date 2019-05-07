@@ -46,7 +46,7 @@ GameDescriptor MagneticMetaEngine::findGame(const char *gameId) {
 }
 
 bool MagneticMetaEngine::detectGames(const Common::FSList &fslist, DetectedGames &gameList) {
-	const char *const EXTENSIONS[] = { ".rsc", nullptr };
+	const char *const EXTENSIONS[] = { ".mag", nullptr };
 
 	// Loop through the files of the folder
 	for (Common::FSList::const_iterator file = fslist.begin(); file != fslist.end(); ++file) {
@@ -64,12 +64,7 @@ bool MagneticMetaEngine::detectGames(const Common::FSList &fslist, DetectedGames
 		Common::File gameFile;
 		if (!gameFile.open(*file))
 			continue;
-		if (gameFile.readUint32BE() != MKTAG('M', 'a', 'S', 'c')) {
-			gameFile.close();
-			continue;
-		}
 
-		gameFile.seek(0);
 		Common::String md5 = Common::computeStreamMD5AsString(gameFile, 5000);
 		size_t filesize = gameFile.size();
 		gameFile.close();
@@ -85,17 +80,14 @@ bool MagneticMetaEngine::detectGames(const Common::FSList &fslist, DetectedGames
 				// Print an entry suitable for putting into the detection_tables.h
 				debug("ENTRY0(\"%s\", \"%s\", %u),", filename.c_str(), md5.c_str(), (uint)filesize);
 			}
-
-			const PlainGameDescriptor &desc = MAGNETIC_GAME_LIST[0];
-			gd = DetectedGame(desc.gameId, desc.description, Common::UNK_LANG, Common::kPlatformUnknown);
 		} else {
 			PlainGameDescriptor gameDesc = findGame(p->_gameId);
 			gd = DetectedGame(p->_gameId, gameDesc.description, p->_language, Common::kPlatformUnknown, p->_extra);
 			gd.setGUIOptions(GUIO4(GUIO_NOSPEECH, GUIO_NOSFX, GUIO_NOMUSIC, GUIO_NOSUBTITLES));
-		}
 
-		gd.addExtraEntry("filename", filename);
-		gameList.push_back(gd);
+			gd.addExtraEntry("filename", filename);
+			gameList.push_back(gd);
+		}
 	}
 
 	return !gameList.empty();

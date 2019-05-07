@@ -117,7 +117,7 @@ Common::Error GlkMetaEngine::createInstance(OSystem *syst, Engine **engine) cons
 #ifndef RELEASE_BUILD
 	else if ((*engine = create<Glk::Alan2::Alan2MetaEngine, Glk::Alan2::Alan2>(syst, gameDesc)) != nullptr) {}
 	else if ((*engine = create<Glk::Magnetic::MagneticMetaEngine, Glk::Magnetic::Magnetic>(syst, gameDesc)) != nullptr) {}
-	else if ((*engine = create<Glk::Magnetic2::MagneticMetaEngine, Glk::Magnetic::Magnetic>(syst, gameDesc)) != nullptr) {}
+	else if ((*engine = create<Glk::Magnetic2::MagneticMetaEngine, Glk::Magnetic2::Magnetic>(syst, gameDesc)) != nullptr) {}
 	else if ((td = Glk::TADS::TADSMetaEngine::findGame(gameDesc._gameId.c_str()))._description) {
 		if (td._options & Glk::TADS::OPTION_TADS3)
 			*engine = new Glk::TADS::TADS3::TADS3(syst, gameDesc);
