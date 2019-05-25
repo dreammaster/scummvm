@@ -20,32 +20,44 @@
  *
  */
 
-#include "glk/tads/tads3/tads3.h"
-#include "glk/tads/os_glk.h"
+#ifndef TADS3_OSNETDUM_H
+#define TADS3_OSNETDUM_H
+
+/* Dummy implementation of TADS networking for non-supporting
+ *
+ * This module provides a stub implementation of the portions of the portable networking
+ * interface that are required to link the rest of the system.  This should be used on
+ * platforms that don't provide TADS networking functionality.
+*/
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
-TADS3::TADS3(OSystem *syst, const GlkGameDescription &gameDesc) : TADS(syst, gameDesc) {
-}
+class OS_Counter
+{
+public:
+    OS_Counter(long c = 1) { cnt = c; }
+    long get() const { return cnt; }
+    long inc() { return ++cnt; }
+    long dec() { return --cnt; }
 
-void TADS3::runGame() {
-	// Initialize the OS layer
-	os_init(nullptr, nullptr, 0, 0, 0);
-	os_instbrk(true);
+private:
+    long cnt;
+};
 
-	char name[255];
-	strcpy(name, getFilename().c_str());
-	char* argv[2] = { nullptr, name };
+#include "glk/tads/tads3/vmrefcnt.h"
 
-	// TODO:
+class OS_Event: public CVmRefCntObj
+{
+public:
+    OS_Event(int /*manual_reset*/) { }
+    void signal() { }
+    void reset() { }
+};
 
-	// Shutdown
-	os_instbrk(false);
-	os_uninit();
-}
-
-} // End of namespace TADS2
+} // End of namespace TADS3
 } // End of namespace TADS
 } // End of namespace Glk
+
+#endif

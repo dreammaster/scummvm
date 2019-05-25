@@ -20,32 +20,28 @@
  *
  */
 
-#include "glk/tads/tads3/tads3.h"
-#include "glk/tads/os_glk.h"
+#ifndef TADS3_VMPREINI_H
+#define TADS3_VMPREINI_H
+
+/* Preinit */
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
-TADS3::TADS3(OSystem *syst, const GlkGameDescription &gameDesc) : TADS(syst, gameDesc) {
-}
+/*
+ *   Run preinitialization.  Loads the image file, invokes its main
+ *   entrypoint, and saves the new file. 
+ */
+void vm_run_preinit(class CVmFile *origfp, const char *orig_image_fname,
+                    class CVmFile *newfp, class CVmHostIfc *hostifc,
+                    class CVmMainClientIfc *clientifc,
+                    const char *const *argv, int argc,
+                    class CVmRuntimeSymbols *global_symtab,
+                    class CVmRuntimeSymbols *macros);
 
-void TADS3::runGame() {
-	// Initialize the OS layer
-	os_init(nullptr, nullptr, 0, 0, 0);
-	os_instbrk(true);
-
-	char name[255];
-	strcpy(name, getFilename().c_str());
-	char* argv[2] = { nullptr, name };
-
-	// TODO:
-
-	// Shutdown
-	os_instbrk(false);
-	os_uninit();
-}
-
-} // End of namespace TADS2
+} // End of namespace TADS3
 } // End of namespace TADS
 } // End of namespace Glk
+
+#endif

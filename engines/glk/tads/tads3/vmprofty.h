@@ -20,32 +20,39 @@
  *
  */
 
-#include "glk/tads/tads3/tads3.h"
-#include "glk/tads/os_glk.h"
+#ifndef TADS3_VMPROFTY_H
+#define TADS3_VMPROFTY_H
+
+/* Basic type definitions for the profiler
+ *
+ * This defines some basic types for the profiler.  We use a separate header to allow
+ * finer-grained inclusions.
+ */
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
-TADS3::TADS3(OSystem *syst, const GlkGameDescription &gameDesc) : TADS(syst, gameDesc) {
-}
+/* ------------------------------------------------------------------------ */
+/*
+ *   Profiler time record.  We use a 64-bit value for the time; this gives
+ *   the time as a delta from some arbitrary zero point, defined by the OS,
+ *   as a 64-bit quantity in units defined by the OS.
+ *   
+ *   We use a 64-bit value to allow for OS-provided timers with very high
+ *   precision.  The OS doesn't necessarily have to use the full 64 bits; if
+ *   only 32-bit timer values are available, the OS code can simply set the
+ *   high-order part to zero.
+ */
+struct vm_prof_time
+{
+    /* the high-order and low-order 32 bits of the time value */
+    unsigned long hi;
+    unsigned long lo;
+};
 
-void TADS3::runGame() {
-	// Initialize the OS layer
-	os_init(nullptr, nullptr, 0, 0, 0);
-	os_instbrk(true);
-
-	char name[255];
-	strcpy(name, getFilename().c_str());
-	char* argv[2] = { nullptr, name };
-
-	// TODO:
-
-	// Shutdown
-	os_instbrk(false);
-	os_uninit();
-}
-
-} // End of namespace TADS2
+} // End of namespace TADS3
 } // End of namespace TADS
 } // End of namespace Glk
+
+#endif

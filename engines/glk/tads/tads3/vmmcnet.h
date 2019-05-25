@@ -20,32 +20,15 @@
  *
  */
 
-#include "glk/tads/tads3/tads3.h"
-#include "glk/tads/os_glk.h"
+/* Networking Metaclass Registrations */
 
-namespace Glk {
-namespace TADS {
-namespace TADS3 {
+/* 
+ *   NOTE - this file is INTENTIONALLY not protected against multiple
+ *   inclusion.  Because of the funny business involved in buildling the
+ *   registration tables, we must include this file more than once in
+ *   different configurations.  Therefore, there's no #ifndef
+ *   VMMCCORE_INCLUDED test at all in this file.  
+ */
 
-TADS3::TADS3(OSystem *syst, const GlkGameDescription &gameDesc) : TADS(syst, gameDesc) {
-}
-
-void TADS3::runGame() {
-	// Initialize the OS layer
-	os_init(nullptr, nullptr, 0, 0, 0);
-	os_instbrk(true);
-
-	char name[255];
-	strcpy(name, getFilename().c_str());
-	char* argv[2] = { nullptr, name };
-
-	// TODO:
-
-	// Shutdown
-	os_instbrk(false);
-	os_uninit();
-}
-
-} // End of namespace TADS2
-} // End of namespace TADS
-} // End of namespace Glk
+#include "glk/tads/tads3/vmhttpsrv.h"
+#include "glk/tads/tads3/vmhttpreq.h"

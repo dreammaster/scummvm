@@ -20,32 +20,23 @@
  *
  */
 
-#include "glk/tads/tads3/tads3.h"
-#include "glk/tads/os_glk.h"
+/* Tads 3 compiler - javascript code generator - type definitions */
+
+#ifndef TADS3_TCJSTY_H
+#define TADS3_TCJSTY_H
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
-TADS3::TADS3(OSystem *syst, const GlkGameDescription &gameDesc) : TADS(syst, gameDesc) {
-}
+typedef unsigned long tctarg_obj_id_t;
+const tctarg_obj_id_t TCTARG_INVALID_OBJ = 0;
 
-void TADS3::runGame() {
-	// Initialize the OS layer
-	os_init(nullptr, nullptr, 0, 0, 0);
-	os_instbrk(true);
+typedef unsigned int tctarg_prop_id_t;
+const tctarg_obj_id_t TCTARG_INVALID_PROP = 0;
 
-	char name[255];
-	strcpy(name, getFilename().c_str());
-	char* argv[2] = { nullptr, name };
-
-	// TODO:
-
-	// Shutdown
-	os_instbrk(false);
-	os_uninit();
-}
-
-} // End of namespace TADS2
+} // End of namespace TADS3
 } // End of namespace TADS
 } // End of namespace Glk
+
+#endif

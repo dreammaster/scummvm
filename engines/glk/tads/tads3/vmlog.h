@@ -20,32 +20,38 @@
  *
  */
 
-#include "glk/tads/tads3/tads3.h"
-#include "glk/tads/os_glk.h"
+#ifndef TADS3_VMLOG_H
+#define TADS3_VMLOG_H
+
+/* System log file
+ *
+ * Functions for writing messages to the system log file
+ *
+ * Strings passed to vm_log_xxx functions are expected to be in the local file system
+ * character set, unless otherwise noted per function.  These functions generally just
+ * write the bytes of the strings as given, without any character set mapping, so it's
+ * up to the caller to map to the file character set if necessary.  Plain ASCII strings
+ * don't need mapping, since virtually all modern machines use character sets that
+ *  include ASCII as a subset - this includes UTF-8, ISO-8859-X, Win CP12xx, etc,
+ * but excludes 16-bit Unicode mappings (UCS-2) and EBCDIC.
+ */
+
+#include "glk/tads/tads3/t3std.h"
+#include "glk/tads/tads3/vmglob.h"
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
-TADS3::TADS3(OSystem *syst, const GlkGameDescription &gameDesc) : TADS(syst, gameDesc) {
-}
+/* log a message with sprintf-style formatting */
+void vm_log_fmt(VMG_ const char *fmt, ...);
 
-void TADS3::runGame() {
-	// Initialize the OS layer
-	os_init(nullptr, nullptr, 0, 0, 0);
-	os_instbrk(true);
+/* log a message string */
+void vm_log(VMG_ const char *str, size_t len);
 
-	char name[255];
-	strcpy(name, getFilename().c_str());
-	char* argv[2] = { nullptr, name };
-
-	// TODO:
-
-	// Shutdown
-	os_instbrk(false);
-	os_uninit();
-}
-
-} // End of namespace TADS2
+} // End of namespace TADS3
 } // End of namespace TADS
 } // End of namespace Glk
+
+#endif
+

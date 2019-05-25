@@ -20,32 +20,37 @@
  *
  */
 
-#include "glk/tads/tads3/tads3.h"
-#include "glk/tads/os_glk.h"
+#ifndef TADS3_VMCRC_H
+#define TADS3_VMCRC_H
+
+/* compute a CRC-32 checksum of a data stream */
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
-TADS3::TADS3(OSystem *syst, const GlkGameDescription &gameDesc) : TADS(syst, gameDesc) {
-}
+class CVmCRC32
+{
+public:
+    CVmCRC32()
+    {
+        /* start with zero in the accumulator */
+        acc_ = 0;
+    }
 
-void TADS3::runGame() {
-	// Initialize the OS layer
-	os_init(nullptr, nullptr, 0, 0, 0);
-	os_instbrk(true);
+    /* add the given buffer into the checksum */
+    void scan_bytes(const void *ptr, size_t len);
 
-	char name[255];
-	strcpy(name, getFilename().c_str());
-	char* argv[2] = { nullptr, name };
+    /* retrieve the current checksum value */
+    unsigned long get_crc_val() const { return acc_; }
 
-	// TODO:
+protected:
+    /* the checksum accumulator */
+    unsigned long acc_;
+};
 
-	// Shutdown
-	os_instbrk(false);
-	os_uninit();
-}
-
-} // End of namespace TADS2
+} // End of namespace TADS3
 } // End of namespace TADS
 } // End of namespace Glk
+
+#endif

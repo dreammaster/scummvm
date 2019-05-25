@@ -20,32 +20,25 @@
  *
  */
 
-#include "glk/tads/tads3/tads3.h"
-#include "glk/tads/os_glk.h"
+/* Built-in function set registry definitions */
+
+#ifndef TADS3_VMBIFREG_H
+#define TADS3_VMBIFREG_H
+
+#include "glk/tads/tads3/vmbif.h"
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
-TADS3::TADS3(OSystem *syst, const GlkGameDescription &gameDesc) : TADS(syst, gameDesc) {
-}
+/* ------------------------------------------------------------------------ */
+/*
+ *   Declare the global static table 
+ */
+extern vm_bif_entry_t G_bif_reg_table[];
 
-void TADS3::runGame() {
-	// Initialize the OS layer
-	os_init(nullptr, nullptr, 0, 0, 0);
-	os_instbrk(true);
-
-	char name[255];
-	strcpy(name, getFilename().c_str());
-	char* argv[2] = { nullptr, name };
-
-	// TODO:
-
-	// Shutdown
-	os_instbrk(false);
-	os_uninit();
-}
-
-} // End of namespace TADS2
+} // End of namespace TADS3
 } // End of namespace TADS
 } // End of namespace Glk
+
+#endif

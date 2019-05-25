@@ -20,32 +20,34 @@
  *
  */
 
-#include "glk/tads/tads3/tads3.h"
-#include "glk/tads/os_glk.h"
+#ifndef TADS3_TCT3TY_H
+#define TADS3_TCT3TY_H
+
+/* T3 Target-specific Type definitions */
+
+#include "glk/tads/tads3/vmtype.h"
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
-TADS3::TADS3(OSystem *syst, const GlkGameDescription &gameDesc) : TADS(syst, gameDesc) {
-}
+/* ------------------------------------------------------------------------ */
+/*
+ *   target type specifications 
+ */
 
-void TADS3::runGame() {
-	// Initialize the OS layer
-	os_init(nullptr, nullptr, 0, 0, 0);
-	os_instbrk(true);
+/* global object ID */
+typedef vm_obj_id_t tctarg_obj_id_t;
 
-	char name[255];
-	strcpy(name, getFilename().c_str());
-	char* argv[2] = { nullptr, name };
+/* global property ID */
+typedef vm_prop_id_t tctarg_prop_id_t;
 
-	// TODO:
+/* invalid object/property ID's */
+const tctarg_obj_id_t TCTARG_INVALID_OBJ = VM_INVALID_OBJ;
+const tctarg_prop_id_t TCTARG_INVALID_PROP = VM_INVALID_PROP;
 
-	// Shutdown
-	os_instbrk(false);
-	os_uninit();
-}
-
-} // End of namespace TADS2
+} // End of namespace TADS3
 } // End of namespace TADS
 } // End of namespace Glk
+
+#endif
