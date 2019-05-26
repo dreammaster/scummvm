@@ -469,7 +469,7 @@ struct err_frame_t
     CVmException *exc_;
 
     /* jmpbuf for this handler */
-    jmp_buf jmpbuf_;
+    //jmp_buf jmpbuf_;
 };
 
 /* 

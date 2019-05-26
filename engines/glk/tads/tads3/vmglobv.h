@@ -28,9 +28,7 @@
  * to be included more than once with different definitions for the macros.
  */
 
-namespace Glk {
-namespace TADS {
-namespace TADS3 {
+#ifdef VM_GLOBALS_BEGIN
 
 VM_GLOBALS_BEGIN
    
@@ -195,9 +193,5 @@ VM_GLOBALS_BEGIN
 
 
 VM_GLOBALS_END
-
-} // End of namespace TADS3
-} // End of namespace TADS
-} // End of namespace Glk
 
 #endif

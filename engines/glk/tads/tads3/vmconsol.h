@@ -38,9 +38,8 @@
  * TADS 3 formatting model.
  */
 
-#include "glk/tads/tads3/wchar.h"
-
 #include "glk/tads/os_glk.h"
+#include "glk/tads/os_banners.h"
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmtype.h"
 #include "glk/tads/tads3/vmglob.h"
@@ -48,6 +47,10 @@
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
+
+class CVmNetFile;
+class CCharmapToLocal;
+struct vm_rcdesc;
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -270,8 +273,7 @@ public:
     CVmLogConsoleManager() { }
 
     /* create a log console - returns the console handle */
-    int create_log_console(VMG_ class CVmNetFile *nf, osfildef *fp,
-                           class CCharmapToLocal *cmap, int width);
+    int create_log_console(VMG_ CVmNetFile *nf, osfildef *fp, CCharmapToLocal *cmap, int width);
 
     /* delete a log console */
     void delete_log_console(VMG_ int handle);
@@ -427,8 +429,7 @@ public:
      *   non-zero on failure.  
      */
     int open_log_file(VMG_ const char *fname);
-    int open_log_file(VMG_ const vm_val_t *filespec,
-                      const struct vm_rcdesc *rc);
+    int open_log_file(VMG_ const vm_val_t *filespec, const vm_rcdesc *rc);
 
     /* 
      *   close any existing log file - returns zero on success, non-zero

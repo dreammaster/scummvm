@@ -22,6 +22,7 @@
 
 #include "glk/tads/tads3/tads3.h"
 #include "glk/tads/os_glk.h"
+#include "glk/tads/tads3/vmmaincn.h"
 
 namespace Glk {
 namespace TADS {

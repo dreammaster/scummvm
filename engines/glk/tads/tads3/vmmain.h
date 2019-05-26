@@ -25,11 +25,17 @@
 
 /* Main entrypoint to run a T3 image file */
 
+#include "common/textconsole.h"
 #include "glk/tads/tads3/vmglob.h"
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
+
+class CVmMainClientIfc;
+class CVmHostIfc;
+struct vm_globals;
+struct CVmException;
 
 /*
  *   Parse a command line to determine the name of the game file specified by
@@ -122,9 +128,7 @@ int vm_get_game_type(const char *filename,
  */
 struct vm_run_image_params
 {
-    vm_run_image_params(class CVmMainClientIfc *clientifc,
-                        class CVmHostIfc *hostifc,
-                        const char *image_file_name)
+    vm_run_image_params(CVmMainClientIfc *clientifc, CVmHostIfc *hostifc, const char *image_file_name)
     {
         /* set the required parameters */
         this->clientifc = clientifc;
@@ -495,8 +499,7 @@ public:
      *   we're displaying the message in an alert box on a GUI, for example,
      *   this can be ignored.
      */
-    virtual void display_error(struct vm_globals *globals,
-                               const struct CVmException *exc,
+    virtual void display_error(vm_globals *globals, const CVmException *exc,
                                const char *msg, int add_blank_line) = 0;
 };
 
@@ -518,11 +521,10 @@ public:
     virtual void post_exec(struct vm_globals *) { }
     virtual void post_exec_err(struct vm_globals *) { }
 
-    virtual void display_error(struct vm_globals *,
-                               const struct CVmException *,
+    virtual void display_error(vm_globals *, CVmException *,
                                const char *msg, int add_blank_line)
     {
-        printf(add_blank_line ? "%s\n" : "%s", msg);
+        error(add_blank_line ? "%s\n" : "%s", msg);
     }
 };
 

@@ -35,6 +35,14 @@
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
+	
+#if defined (RELEASE_BUILD)
+#define VMGLOB_VARS
+#else
+#define VMGLOB_PARAM
+#endif
+
+typedef uint16 uint16_t;
 
 class CVmBifTable;
 class CVmMetaTable;

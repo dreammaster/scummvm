@@ -1699,6 +1699,8 @@ void os_set_text_attr(int attr);
 # define OS_ATTR_STRONG  0
 #endif
 
+#define OS_DECLARATIVE_TLS
+#define OS_DECL_TLS(t, v) t v
 
 /* ------------------------------------------------------------------------ */
 /*

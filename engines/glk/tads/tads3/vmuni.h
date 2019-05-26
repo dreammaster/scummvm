@@ -25,7 +25,6 @@
 
 /* T3 VM Unicode-specific functions */
 
-#include "glk/tads/tads3/wchar.h"
 #include "glk/tads/tads3/t3std.h"
 
 namespace Glk {
