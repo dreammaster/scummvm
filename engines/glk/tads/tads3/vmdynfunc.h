@@ -44,6 +44,11 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+struct CTcGramPropArrows;
+class CVmDynamicFunc;
+class CTcGramProdAlt;
+class CTPNStmTop;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   The image file data block is arranged as follows:
@@ -76,7 +81,7 @@ const size_t VMCO_PREFIX_LENGTH = VMB_OBJECT_ID;
 struct vm_dynfunc_ext
 {
     /* allocate the structure */
-    static vm_dynfunc_ext *alloc_ext(VMG_ class CVmDynamicFunc *self,
+    static vm_dynfunc_ext *alloc_ext(VMG_ CVmDynamicFunc *self,
                                      size_t bytecode_len, int obj_ref_cnt);
 
     /* the source string object */
@@ -169,8 +174,7 @@ struct vm_dynfunc_ext
  *   DynamicFunc metaclass 
  */
 
-class CVmDynamicFunc: public CVmObject
-{
+class CVmDynamicFunc: public CVmObject {
     friend class CVmMetaclassDynamicFunc;
     friend class CVmDynamicCompiler;
     
@@ -454,8 +458,8 @@ struct CVmDynCompResults
      *   parse grammar rules can leave this as a no-op.  'alts' is the head
      *   of the alternative list for the parsed grammar rule.  
      */
-    virtual void save_grammar(VMG_ class CTcGramProdAlt * /*alts*/,
-                              struct CTcGramPropArrows * /*arrows*/) { }
+    virtual void save_grammar(VMG_ CTcGramProdAlt * /*alts*/,
+                              CTcGramPropArrows * /*arrows*/) { }
     
     /* compiler error code */
     int err;
@@ -527,7 +531,7 @@ public:
 protected:
     /* generate code for a code body */
     int gen_code_body(
-        VMG_ class CTPNStmTop *node, const vm_val_t *srcval,
+        VMG_ CTPNStmTop *node, const vm_val_t *srcval,
         CVmDynCompDebug *dbg);
 
     /* parser */

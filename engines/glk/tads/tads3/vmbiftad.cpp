@@ -1,28 +1,24 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header: d:/cvsroot/tads/tads3/VMBIFTAD.CPP,v 1.3 1999/07/11 00:46:58 MJRoberts Exp $";
-#endif
-
-/* 
- *   Copyright (c) 1999, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmbiftad.cpp - TADS built-in function set for T3 VM
-Function
-  
-Notes
-  
-Modified
-  04/05/99 MJRoberts  - Creation
-*/
-
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/os_glk.h"
@@ -55,6 +51,9 @@ Modified
 #include "glk/tads/tads3/vmcrc.h"
 #include "glk/tads/tads3/vmfindrep.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -1185,7 +1184,7 @@ public:
          *   the list.  Otherwise, generate a character according to our
          *   character class code.  
          */
-        wchar_t outc;
+        wchar_t outc = 0;
         if (listChars != 0)
         {
             /* pick a random index in our range */
@@ -1642,7 +1641,7 @@ void RandStrParser::exec(VMG_ vm_val_t *result)
  */
 void CVmBifTADS::rand(VMG_ uint argc)
 {
-    int32_t range;
+    int32_t range = 0;
     int use_range;
     int choose_an_arg = FALSE;
     int choose_an_ele = FALSE;
@@ -2916,7 +2915,7 @@ void CVmBifTADS::save(VMG_ uint argc)
         CVmObjFile::check_safety_for_open(vmg_ netfile, VMOBJFILE_ACCESS_WRITE);
 
         /* open the file */
-        osfildef *fp = osfoprwtb(netfile->lclfname, OSFTT3SAV);
+        osfildef *fp = osfoprwtb(netfile->_lclfname, OSFTT3SAV);
         if (fp == 0)
             err_throw(VMERR_CREATE_FILE);
 
@@ -2981,7 +2980,7 @@ void CVmBifTADS::restore(VMG_ uint argc)
         CVmObjFile::check_safety_for_open(vmg_ netfile, VMOBJFILE_ACCESS_READ);
 
         /* open the file */
-        osfildef *fp = osfoprb(netfile->lclfname, OSFTT3SAV);
+        osfildef *fp = osfoprb(netfile->_lclfname, OSFTT3SAV);
         if (fp == 0)
             err_throw(VMERR_FILE_NOT_FOUND);
 
@@ -3160,7 +3159,7 @@ void CVmBifTADS::make_string(VMG_ uint argc)
     long rpt;
     vm_obj_id_t new_str_obj;
     CVmObjString *new_str;
-    size_t new_str_len;
+    size_t new_str_len = 0;
     char *new_strp;
     const char *strp = 0;
     int lst_len = -1;
@@ -3291,7 +3290,7 @@ void CVmBifTADS::make_string(VMG_ uint argc)
         else if (strp != 0)
         {
             /* copy the string's contents into the output string */
-            memcpy(dst.getptr(), strp + VMB_LEN, vmb_get_len(strp));
+            memcpy(dst.getCharPtr(), strp + VMB_LEN, vmb_get_len(strp));
 
             /* advance past the bytes we copied */
             dst.set(dst.getptr() + vmb_get_len(strp));
@@ -3584,11 +3583,12 @@ struct bpwriter
     }
 
     /* write a string */
-    void puts(const char *str) { puts(str, strlen(str)); }
-    void puts(const char *str, size_t len)
+#undef puts
+    void puts(const char *str_) { puts(str_, strlen(str_)); }
+    void puts(const char *str_, size_t len)
     {
         VMGLOB_PTR(vmg);
-        dst = this->str->cons_append(vmg_ dst, str, len, 64);
+        dst = this->str->cons_append(vmg_ dst, str_, len, 64);
     }
 
     /* format a string value */
@@ -3600,12 +3600,12 @@ struct bpwriter
         G_stk->push(&strval);
 
         /* get the string buffer and length */
-        const char *str = strval.get_as_string(vmg0_);
-        size_t bytes = vmb_get_len(str);
-        str += VMB_LEN;
+        const char *s = strval.get_as_string(vmg0_);
+        size_t bytes = vmb_get_len(s);
+        s += VMB_LEN;
 
         /* get the length of the string in characters */
-        utf8_ptr p((char *)str);
+        utf8_ptr p(s);
         size_t chars = p.len(bytes);
 
         /* If the string is longer than the precision, truncate it */
@@ -3617,7 +3617,7 @@ struct bpwriter
         }
 
         /* write it out with the appropriate padding and alignment */
-        format_with_padding(vmg_ str, bytes, chars, opts);
+        format_with_padding(vmg_ s, bytes, chars, opts);
 
         /* discard our gc protection */
         G_stk->discard();
@@ -3627,16 +3627,16 @@ struct bpwriter
     void format_char(VMG_ const vm_val_t *val)
     {
         /* check what we have */
-        const char *str = val->get_as_string(vmg0_);
-        if (str != 0)
+        const char *s = val->get_as_string(vmg0_);
+        if (s != 0)
         {
             /* it's a string - show the first character */
-            size_t len = vmb_get_len(str);
-            str += VMB_LEN;
+            size_t len = vmb_get_len(s);
+            s += VMB_LEN;
             if (len != 0)
             {
                 /* write the first character */
-                putwch(utf8_ptr::s_getch(str));
+                putwch(utf8_ptr::s_getch(s));
             }
             else
             {
@@ -3659,22 +3659,22 @@ struct bpwriter
     }
 
     /* format an internal UTF-8 length+string, with padding and alignment */
-    void format_with_padding(VMG_ const char *str, const fmtopts &opts)
+    void format_with_padding(VMG_ const char *str_, const fmtopts &opts)
     {
         /* figure the byte length and get the buffer */
-        size_t bytes = vmb_get_len(str);
-        str += VMB_LEN;
+        size_t bytes = vmb_get_len(str_);
+        str_ += VMB_LEN;
 
         /* figure the character length */
-        utf8_ptr p((char *)str);
+        utf8_ptr p((char *)str_);
         size_t chars = p.len(bytes);
 
         /* write it out */
-        format_with_padding(vmg_ str, bytes, chars, opts);
+        format_with_padding(vmg_ str_, bytes, chars, opts);
     }
 
     /* format a UTF-8 string value, adding padding and alignment */
-    void format_with_padding(VMG_ const char *str,
+    void format_with_padding(VMG_ const char *str_,
                              size_t bytes, size_t chars,
                              const fmtopts &opts)
     {
@@ -3689,7 +3689,7 @@ struct bpwriter
             putwch(opts.pad, npad);
 
         /* write the string */
-        puts(str, bytes);
+        puts(str_, bytes);
 
         /* if left-aligning, write the padding */
         if (opts.left_align)
@@ -3751,10 +3751,10 @@ struct bpwriter
                 G_stk->push(&num);
 
                 /* ...thence to string, to get a printable representation */
-                vm_val_t str;
+                vm_val_t str_;
                 const char *p = CVmObjString::cvt_to_str(
-                    vmg_ &str, buf, sizeof(buf), &num, radix, tsflags);
-                G_stk->push(&str);
+                    vmg_ &str_, buf, sizeof(buf), &num, radix, tsflags);
+                G_stk->push(&str_);
 
                 /* apply our extra formatting to the basic string rep */
                 format_int(vmg_ p + VMB_LEN, vmb_get_len(p),
@@ -4032,11 +4032,11 @@ struct bpwriter
                 CVmObjBigNum *bn = (CVmObjBigNum *)vm_objp(vmg_ num.val.obj);
 
                 /* format the BigNumber */
-                vm_val_t str;
+                vm_val_t str_;
                 const char *p = bn->cvt_to_string_buf(
-                    vmg_ &str, buf, sizeof(buf),
+                    vmg_ &str_, buf, sizeof(buf),
                     maxdigs, -1, prec, 3, flags);
-                G_stk->push(&str);
+                G_stk->push(&str_);
 
                 /* write it out, adding padding and alignment */
                 format_with_padding(vmg_ p, opts);
@@ -4472,12 +4472,12 @@ void CVmBifTADS::concat(VMG_ uint argc)
         const char *src = G_stk->get(i)->get_as_string(vmg0_);
 
         /* parse and skip the length prefix */
-        size_t len = vmb_get_len(src);
+        size_t len_ = vmb_get_len(src);
         src += VMB_LEN;
 
         /* add the string to the output buffer */
-        memcpy(dst, src, len);
-        dst += len;
+        memcpy(dst, src, len_);
+        dst += len_;
     }
 
     /* return the result string */
@@ -4487,3 +4487,6 @@ void CVmBifTADS::concat(VMG_ uint argc)
     G_stk->discard(argc);
 }
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

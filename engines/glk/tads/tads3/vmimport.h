@@ -20,9 +20,6 @@
  *
  */
 
-#ifndef TADS3_VMIMPORT
-#define TADS3_VMIMPORT
-
 /* T3 VM imported symbol list
  *
  * Defines the list of symbols to import from the image file.  Each imported symbol
@@ -36,24 +33,20 @@
  * the appropriate table entries for that inclusion.
 */
 
-namespace Glk {
-namespace TADS {
-namespace TADS3 {
-
 /* if any of our macros are undefined, provide empty definitions now */
-#ifndef TADS3_VM_IMPORT_OBJ
+#ifndef VM_IMPORT_OBJ
 #define VM_IMPORT_OBJ(sym, member_name)
 #endif
-#ifndef TADS3_VM_IMPORT_PROP
+#ifndef VM_IMPORT_PROP
 #define VM_IMPORT_PROP(sym, member_name)
 #endif
-#ifndef TADS3_VM_NOIMPORT_OBJ
+#ifndef VM_NOIMPORT_OBJ
 #define VM_NOIMPORT_OBJ(sym, member_name)
 #endif
-#ifndef TADS3_VM_NOIMPORT_PROP
+#ifndef VM_NOIMPORT_PROP
 #define VM_NOIMPORT_PROP(sym, member_name)
 #endif
-#ifndef TADS3_VM_IMPORT_FUNC
+#ifndef VM_IMPORT_FUNC
 #define VM_IMPORT_FUNC(symm, member_name)
 #endif
 
@@ -227,9 +220,3 @@ VM_IMPORT_PROP("objToString", objToString)
 #undef VM_NOIMPORT_OBJ
 #undef VM_NOIMPORT_PROP
 #undef VM_IMPORT_FUNC
-
-} // End of namespace TADS3
-} // End of namespace TADS
-} // End of namespace Glk
-
-#endif

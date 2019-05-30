@@ -132,6 +132,14 @@ inline int t3_is_unichar(wchar_t ch)
     return (t3_get_chartype(ch) != T3_CTYPE_UNDEF);
 }
 
+inline size_t wcslen(const wchar_t *s) {
+	size_t count = 0;
+	while (*s++ != '\0')
+		++count;
+
+	return count;
+}
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Case folding wchar_t string reader

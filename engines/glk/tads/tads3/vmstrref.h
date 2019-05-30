@@ -52,8 +52,8 @@ public:
     char *getend() const { return str + len; }
     long getlen() const { return len; }
 
-    void setlen(long len) { this->len = len; }
-    void addlen(long len) { this->len += len; }
+    void setlen(long count) { this->len = count; }
+    void addlen(long count) { this->len += count; }
 
     /* create from a sprintf-style format */
     static StringRef *format(const char *fmt, ...)

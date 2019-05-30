@@ -1,34 +1,32 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header: d:/cvsroot/tads/tads3/vmerr.cpp,v 1.4 1999/07/11 00:46:59 MJRoberts Exp $";
-#endif
-
-/* 
- *   Copyright (c) 1998, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmerr.cpp - VM error handling
-Function
-  This module contains global variables required for the error handler.
-Notes
-  
-Modified
-  10/20/98 MJRoberts  - Creation
-*/
-
-#include <stdarg.h>
-#include <stdlib.h>
-#include <assert.h>
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmtype.h"
 #include "glk/tads/tads3/vmerr.h"
 
-
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -101,7 +99,7 @@ static void err_throw_current()
         new_state = ERR_STATE_RETHROWN | f;
 
     /* jump to the enclosing frame's exception handler */
-    longjmp(os_tls_get(err_frame_t *, G_err_frame)->jmpbuf_, new_state);
+//    longjmp(os_tls_get(err_frame_t *, G_err_frame)->jmpbuf_, new_state);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -450,10 +448,8 @@ void err_rethrow()
 /*
  *   Abort the program with a serious, unrecoverable error
  */
-void err_abort(const char *message)
-{
-    printf("%s\n", message);
-    exit(2);
+void err_abort(const char *message) {
+    error("%s", message);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -728,7 +724,7 @@ size_t err_format_msg(char *outbuf, size_t outbuflen,
             const char *src;
             char srcbuf[30];
             err_param_type typ;
-            size_t len;
+            size_t len = 0;
             int use_strlen;
             
             /* 
@@ -828,7 +824,7 @@ size_t err_format_msg(char *outbuf, size_t outbuflen,
                 len = strlen(src);
 
             /* count the full 'len' in our space needs */
-            need +=len;
+            need += len;
 
             /* copy as much as we can */
             if (rem > 1)
@@ -863,3 +859,6 @@ size_t err_format_msg(char *outbuf, size_t outbuflen,
     return need;
 }
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

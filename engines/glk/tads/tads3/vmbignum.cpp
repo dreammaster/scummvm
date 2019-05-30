@@ -1,32 +1,24 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header$";
-#endif
-
-/* 
- *   Copyright (c) 2000, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmbignum.cpp - big number metaclass
-Function
-  
-Notes
-  
-Modified
-  02/18/00 MJRoberts  - Creation
-*/
-
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <limits.h>
-#include <stdarg.h>
-#include <math.h>
-#include <float.h>
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmtype.h"
@@ -45,6 +37,9 @@ Modified
 #include "glk/tads/tads3/vmlst.h"
 #include "glk/tads/tads3/vmdatasrc.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -1794,9 +1789,9 @@ const char *CVmObjBigNum::cvt_to_string_in_radix(
              *   We just generated the digits in reverse order.  Reverse the
              *   string so that they're in the right order. 
              */
-            char *p1, *p2, tmp;
-            for (p1 = buf, p2 = p - 1 ; p2 > p1 ; --p2, ++p1)
-                tmp = *p1, *p1 = *p2, *p2 = tmp;
+            char *p1, *p2;
+			for (p1 = buf, p2 = p - 1; p2 > p1; --p2, ++p1)
+				SWAP(*p1, *p2);
 
             /* if we generated no digits, generate a zero */
             if (p == buf)
@@ -3529,7 +3524,7 @@ void CVmObjBigNum::calc_asincos_into(char *dst, const char *src,
             0x70, 0x71, 0x06, 0x78, 0x14
         };
         int use_sqrt;
-        int sqrt_neg;
+        int sqrt_neg = 0;
         
         /* get the initial value of x into our accumulator, r1 */
         copy_val(ext1, src, FALSE);
@@ -6122,3 +6117,6 @@ int CVmObjBigNum::cvt_to_bignum(VMG_ vm_obj_id_t self, vm_val_t *val) const
     return TRUE;
 }
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

@@ -253,6 +253,10 @@ struct vm_val_t
         } bifptr;
     } val;
 
+	vm_val_t() : typ(VM_NIL) {
+		val.ptr = nullptr;
+	}
+
     /* set various types of values */
     void set_empty() { typ = VM_EMPTY; }
     void set_nil() { typ = VM_NIL; }
@@ -668,6 +672,10 @@ public:
     int varargs_;
 };
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk
+
 /* ------------------------------------------------------------------------ */
 /*
  *   String handling - these routines are provided as covers to allow for
@@ -691,11 +699,23 @@ public:
 #include "glk/tads/tads3/tadshtml.h"
 #else
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
+
 inline size_t get_strlen(const textchar_t *str) { return strlen(str); }
 inline void do_strcpy(textchar_t *dst, const textchar_t *src)
     { strcpy(dst, src); }
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk
+
 #endif /* T3_COMPILING_FOR_HTML */
+
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*

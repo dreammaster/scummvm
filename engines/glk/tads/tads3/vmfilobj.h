@@ -39,6 +39,8 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class CVmNetFile;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   File intrinsic class.  Our extension keeps track of our data source (our
@@ -142,7 +144,7 @@ public:
 
     /* create with the given character set and file handle */
     static vm_obj_id_t create(VMG_ int in_root_set,
-                              class CVmNetFile *netfile,
+                              CVmNetFile *netfile,
                               vm_obj_id_t charset, CVmDataSource *fp,
                               int mode, int access, int create_readbuf);
 
@@ -222,7 +224,7 @@ public:
      *   given file with the given access mode.  If the access is not
      *   allowed, we'll throw an error.  
      */
-    static void check_safety_for_open(VMG_ class CVmNetFile *f, int access);
+    static void check_safety_for_open(VMG_ CVmNetFile *f, int access);
 
     /* check the safety settings for opening the given local file path */
     static void check_safety_for_open(VMG_ const char *lclfname, int access);
@@ -251,11 +253,11 @@ protected:
     CVmObjFile() { ext_ = 0; }
 
     /* create with the given character set and file object */
-    CVmObjFile(VMG_ class CVmNetFile *netfile, vm_obj_id_t charset,
+    CVmObjFile(VMG_ CVmNetFile *netfile, vm_obj_id_t charset,
                CVmDataSource *fp, int mode, int access, int create_readbuf);
 
     /* allocate our extension */
-    void alloc_ext(VMG_ class CVmNetFile *netfile,
+    void alloc_ext(VMG_ CVmNetFile *netfile,
                    vm_obj_id_t charset, CVmDataSource *fp,
                    unsigned long flags, int mode, int access,
                    int create_readbuf);
@@ -360,7 +362,7 @@ protected:
     int getp_digestMD5(VMG_ vm_obj_id_t self, vm_val_t *retval, uint *argc);
 
     /* retrieve the filename and access arguments for an 'open' method */
-    static class CVmNetFile *get_filename_and_access(
+    static CVmNetFile *get_filename_and_access(
         VMG_ const struct vm_rcdesc *rc, int *access, int is_resource_file,
         os_filetype_t file_type, const char *mime_type);
 
@@ -434,7 +436,7 @@ struct vmobjfile_ext_t
      *   Our network/local file descriptor.  This handles network storage
      *   server operations when we're running in web server mode. 
      */
-    class CVmNetFile *netfile;
+    CVmNetFile *netfile;
     
     /* our abstract data source (usually an OS file) */
     CVmDataSource *fp;

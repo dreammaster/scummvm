@@ -1,24 +1,28 @@
-#ifdef RCSID
-static char RCSid[] =
-    "$Header$";
-#endif
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
-/* Copyright (c) 2010 by Michael J. Roberts.  All Rights Reserved. */
-/*
-Name
-  vmnetfil.cpp - network file operations, local mode 
-Function
-  This module contains network file functions that are needed in both
-  server and local modes.  This file should be linked into all builds,
-  whether or not the server mode is used.
-Notes
-
-Modified
-  09/08/10 MJRoberts  - Creation
-*/
-
-#include "glk/tads/tads3/t3std.h"
 #include "glk/tads/os_glk.h"
+#include "glk/tads/os_frob_tads.h"
+#include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/osifcnet.h"
 #include "glk/tads/tads3/vmnetfil.h"
 #include "glk/tads/tads3/vmnet.h"
@@ -44,6 +48,9 @@ Modified
 #include "glk/tads/tads3/vmfilobj.h"
 #include "glk/tads/tads3/vmstr.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -53,7 +60,7 @@ CVmNetFile *CVmNetFile::open(VMG_ const vm_val_t *val, const vm_rcdesc *rc,
                              int mode, os_filetype_t typ,
                              const char *mime_type)
 {
-    vm_val_t filespec;
+    vm_val_t _filespec;
     
     /* check for a TadsObject implementing getFilename */
     if (G_predef->filespec_getFilename != VM_INVALID_PROP
@@ -64,19 +71,19 @@ CVmNetFile *CVmNetFile::open(VMG_ const vm_val_t *val, const vm_rcdesc *rc,
             vmg_ 0, val, G_predef->filespec_getFilename, val, 0, rc);
 
         /* the result is the real file spec */
-        filespec = *G_interpreter->get_r0();
+        _filespec = *G_interpreter->get_r0();
     }
     else
     {
         /* it's not a TadsObject, so it must directly have the file name */
-        filespec = *val;
+        _filespec = *val;
     }
 
     /* check the file spec argument type */
     CVmNetFile *nf = 0;
     CVmObjTemporaryFile *tmp = 0;
     CVmObjFileName *ofn = 0;
-    if ((tmp = vm_val_cast(CVmObjTemporaryFile, &filespec)) != 0)
+    if ((tmp = vm_val_cast(CVmObjTemporaryFile, &_filespec)) != 0)
     {
         /* if the temporary file object is invalid, it's an error */
         if (tmp->get_fname() == 0)
@@ -86,10 +93,10 @@ CVmNetFile *CVmNetFile::open(VMG_ const vm_val_t *val, const vm_rcdesc *rc,
         nf = open_local(vmg_ tmp->get_fname(), 0, mode, typ);
 
         /* mark it as a temp file */
-        nf->is_temp = TRUE;
+        nf->_is_temp = TRUE;
     }
-    else if (filespec.is_numeric(vmg0_)
-             || ((ofn = vm_val_cast(CVmObjFileName, &filespec)) != 0
+    else if (_filespec.is_numeric(vmg0_)
+             || ((ofn = vm_val_cast(CVmObjFileName, &_filespec)) != 0
                  && ofn->is_special_file()))
     {
         /* 
@@ -97,7 +104,7 @@ CVmNetFile *CVmNetFile::open(VMG_ const vm_val_t *val, const vm_rcdesc *rc,
          *   wrapping a special file int.  Get the value. 
          */
         int32_t sfid = (ofn != 0 ? ofn->get_sfid()
-                                 : filespec.num_to_int(vmg0_));
+                                 : _filespec.num_to_int(vmg0_));
 
         /* resolve the file system path for the given special file ID */
         char fname[OSFNMAX] = { '\0' };
@@ -111,7 +118,7 @@ CVmNetFile *CVmNetFile::open(VMG_ const vm_val_t *val, const vm_rcdesc *rc,
     {
         /* anything else has to be a string */
         char fname[OSFNMAX];
-        CVmBif::get_fname_val(vmg_ fname, sizeof(fname), &filespec);
+        CVmBif::get_fname_val(vmg_ fname, sizeof(fname), &_filespec);
 
         /* 
          *   if it's a local file, and it has a relative path, explicitly
@@ -133,7 +140,7 @@ CVmNetFile *CVmNetFile::open(VMG_ const vm_val_t *val, const vm_rcdesc *rc,
 
     /* if they gave us an object as our file spec, remember it */
     if (nf != 0 && val->typ == VM_OBJ)
-        nf->filespec = val->val.obj;
+        nf->_filespec = val->val.obj;
 
     /* return the network file descriptor */
     return nf;
@@ -150,11 +157,11 @@ void CVmNetFile::rename_to_local(VMG_ CVmNetFile *newname)
         err_throw(VMERR_RENAME_FILE);
 
     /* if the destination file already exists, it's an error */
-    if (!osfacc(newname->lclfname))
+    if (!osfacc(newname->_lclfname))
         err_throw(VMERR_RENAME_FILE);
 
     /* do the rename */
-    if (!os_rename_file(lclfname, newname->lclfname))
+    if (!os_rename_file(_lclfname, newname->_lclfname))
         err_throw(VMERR_RENAME_FILE);
 }
 
@@ -162,10 +169,10 @@ void CVmNetFile::rename_to_local(VMG_ CVmNetFile *newname)
 /*
  *   Create a local directory 
  */
-void CVmNetFile::mkdir_local(VMG_ int create_parents)
+void CVmNetFile::makedir_local(VMG_ int create_parents)
 {
     /* try creating the directory */
-    if (!os_mkdir(lclfname, create_parents))
+    if (!os_mkdir(_lclfname, create_parents))
         err_throw(VMERR_CREATE_FILE);
 }
 
@@ -237,10 +244,10 @@ void CVmNetFile::rmdir_local(VMG_ int remove_contents)
 {
     /* if desired, recursively remove the directory's contents */
     if (remove_contents)
-        empty_dir(vmg_ lclfname);
+        empty_dir(vmg_ _lclfname);
 
     /* try removing the directory */
-    if (!os_rmdir(lclfname))
+    if (!os_rmdir(_lclfname))
         err_throw(VMERR_DELETE_FILE);
 }
 
@@ -248,7 +255,7 @@ void CVmNetFile::rmdir_local(VMG_ int remove_contents)
 /* 
  *   static directory lister 
  */
-static int s_readdir_local(VMG_ const char *lclfname,
+static int s_readdir_local(VMG_ const char *_lclfname,
                            const char *nominal_path,
                            vm_val_t *retval, const vm_rcdesc *rc,
                            const vm_val_t *cb, int recursive)
@@ -282,7 +289,7 @@ static int s_readdir_local(VMG_ const char *lclfname,
 
     /* open the directory */
     osdirhdl_t dirhdl;
-    if (os_open_dir(lclfname, &dirhdl))
+    if (os_open_dir(_lclfname, &dirhdl))
     {
         err_try
         {
@@ -294,8 +301,8 @@ static int s_readdir_local(VMG_ const char *lclfname,
                 char *unm = 0;
                 vm_obj_id_t fnobj = VM_INVALID_OBJ;
 
-                err_try
-                {
+//                err_try
+//                {
                     /* map the filename to UTF8 */
                     size_t unmlen = G_cmap_from_fname->map_str_alo(
                         &unm, curname);
@@ -307,14 +314,14 @@ static int s_readdir_local(VMG_ const char *lclfname,
                 
                     /* push it for gc protection */
                     G_stk->push()->set_obj(fnobj);
-                }
+/*              }
                 err_finally
                 {
                     if (unm != 0)
                         t3free(unm);
                 }
                 err_end;
-            
+*/            
                 /* if we're building a list, add the file to the list */
                 if (retval != 0)
                 {
@@ -346,7 +353,7 @@ static int s_readdir_local(VMG_ const char *lclfname,
                     /* build the full path name */
                     char fullname[OSFNMAX];
                     os_build_full_path(fullname, sizeof(fullname),
-                                       lclfname, curname);
+                                       _lclfname, curname);
 
                     /* check to see if it's a directory */
                     unsigned long fmode;
@@ -361,7 +368,7 @@ static int s_readdir_local(VMG_ const char *lclfname,
                         /* build the actual combined path */
                         char subfname[OSFNMAX];
                         os_build_full_path(
-                            subfname, sizeof(subfname), lclfname, curname);
+                            subfname, sizeof(subfname), _lclfname, curname);
                 
                         /* do the recursive listing */
                         ok |= s_readdir_local(vmg_ subfname, path + VMB_LEN,
@@ -401,7 +408,7 @@ int CVmNetFile::readdir_local(VMG_ const char *nominal_path,
     /* verify that the path exists and refers to a directory */
     unsigned long mode;
     unsigned long attr;
-    if (!osfmode(lclfname, TRUE, &mode, &attr)
+    if (!osfmode(_lclfname, TRUE, &mode, &attr)
         || (mode & OSFMODE_DIR) == 0)
         return FALSE;
 
@@ -410,10 +417,10 @@ int CVmNetFile::readdir_local(VMG_ const char *nominal_path,
      *   FileName objects, use the actual local path 
      */
     if (nominal_path == 0)
-        nominal_path = lclfname;
+        nominal_path = _lclfname;
 
     /* call our static implementation with our local filename path */
-    return s_readdir_local(vmg_ lclfname, nominal_path,
+    return s_readdir_local(vmg_ _lclfname, nominal_path,
                            retval, rc, cb, recursive);
 }
 
@@ -423,8 +430,11 @@ int CVmNetFile::readdir_local(VMG_ const char *nominal_path,
  */
 void CVmNetFile::mark_refs(VMG_ uint state)
 {
-    /* if we have a filespec object, mark it */
-    if (filespec != VM_INVALID_OBJ)
-        G_obj_table->mark_all_refs(filespec, state);
+    /* if we have a _filespec object, mark it */
+    if (_filespec != VM_INVALID_OBJ)
+        G_obj_table->mark_all_refs(_filespec, state);
 }
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

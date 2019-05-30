@@ -1,27 +1,24 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header: d:/cvsroot/tads/tads3/charmap.cpp,v 1.3 1999/07/11 00:46:58 MJRoberts Exp $";
-#endif
-
-/* 
- *   Copyright (c) 1998, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  charmap.cpp - character mapper
-Function
-  
-Notes
-  
-Modified
-  10/17/98 MJRoberts  - Creation
-*/
-
-#include <stdlib.h>
-#include <string.h>
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/os_glk.h"
@@ -30,6 +27,9 @@ Modified
 #include "glk/tads/tads3/charmap.h"
 #include "glk/tads/tads3/vmdatasrc.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -859,10 +859,10 @@ size_t CCharmapToLocal::map_utf8(char *dest, size_t dest_len,
     src_start = src;
 
     /* compute where the source buffer ends */
-    srcend = src.getptr() + src_byte_len;
+    srcend = src.getCharPtr() + src_byte_len;
     
     /* copy characters until we reach the end of the source string */
-    for (cur_total = 0 ; src.getptr() < srcend ; src.inc())
+    for (cur_total = 0 ; src.getCharPtr() < srcend ; src.inc())
     {
         char mapbuf[10];
         size_t maplen = sizeof(mapbuf);
@@ -1033,7 +1033,7 @@ size_t CCharmapToLocal::map_utf8(char *dest, size_t dest_len,
     utf8_ptr src_ptr;
 
     /* set up the source UTF-8 pointer */
-    src_ptr.set((char *)src);
+    src_ptr.set(src);
 
     /* map it and return the result */
     return map_utf8(dest, dest_len, src_ptr, src_byte_len, src_bytes_used);
@@ -1264,7 +1264,7 @@ int CCharmapToLocal::write_file(CVmDataSource *fp,
     utf8_ptr p;
 
     /* set up to read from the buffer */
-    p.set((char *)buf);
+    p.set(buf);
     
     /* map and write one buffer-full at a time */
     while (bufl > 0)
@@ -1456,11 +1456,11 @@ size_t CCharmapToLocalSB::map_utf8(char *dest, size_t dest_len,
     utf8_ptr src_start = src;
 
     /* compute where the source buffer ends */
-    char *srcend = src.getptr() + src_byte_len;
+    char *srcend = src.getCharPtr() + src_byte_len;
 
     /* copy characters until we reach the end of the source string */
     size_t cur_total;
-    for (cur_total = 0 ; src.getptr() < srcend ; src.inc())
+    for (cur_total = 0 ; src.getCharPtr() < srcend ; src.inc())
     {
         const unsigned char *mapping;
         size_t map_len;
@@ -1608,13 +1608,13 @@ size_t CCharmapToLocalWideUnicode::
     src_start = src;
 
     /* compute where the source buffer ends */
-    srcend = src.getptr() + src_byte_len;
+    srcend = src.getCharPtr() + src_byte_len;
 
     /* set up a wchar_t output pointer for convenience */
     destw = (wchar_t *)dest;
 
     /* copy characters until we reach the end of the source string */
-    for (cur_total = 0 ; src.getptr() < srcend ; src.inc())
+    for (cur_total = 0 ; src.getCharPtr() < srcend ; src.inc())
     {
         /* 
          *   if we have room, add it; otherwise, zero the output length
@@ -1758,10 +1758,10 @@ size_t CCharmapToLocalUcs2Big::
     src_start = src;
 
     /* compute where the source buffer ends */
-    srcend = src.getptr() + src_byte_len;
+    srcend = src.getCharPtr() + src_byte_len;
 
     /* copy characters until we reach the end of the source string */
-    for (cur_total = 0 ; src.getptr() < srcend ; src.inc())
+    for (cur_total = 0 ; src.getCharPtr() < srcend ; src.inc())
     {
         /* 
          *   if we have room, add it; otherwise, zero the output length
@@ -1906,10 +1906,10 @@ size_t CCharmapToLocalUcs2Little::
     src_start = src;
 
     /* compute where the source buffer ends */
-    srcend = src.getptr() + src_byte_len;
+    srcend = src.getCharPtr() + src_byte_len;
 
     /* copy characters until we reach the end of the source string */
-    for (cur_total = 0 ; src.getptr() < srcend ; src.inc())
+    for (cur_total = 0 ; src.getCharPtr() < srcend ; src.inc())
     {
         /* 
          *   if we have room, add it; otherwise, zero the output length
@@ -2987,3 +2987,6 @@ size_t CCharmapToUniMB::read_file(CVmDataSource *fp, char *buf, size_t bufl)
     return outlen;
 }
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

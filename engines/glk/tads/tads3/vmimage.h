@@ -64,6 +64,11 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class CVmRuntimeSymbols;
+class CVmFile;
+class CVmObjFixup;
+class CVmHashEntry;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Image file constants 
@@ -286,10 +291,8 @@ public:
      *   VMERR_UNHANDLED_EXC, with the exception object as the first
      *   parameter.  
      */
-    void run(VMG_ const char *const *argv, int argc,
-             class CVmRuntimeSymbols *global_symtab,
-             class CVmRuntimeSymbols *macro_symtab,
-             const char *saved_state);
+    void run(VMG_ const char *const *argv, int argc, CVmRuntimeSymbols *global_symtab,
+			CVmRuntimeSymbols *macro_symtab, const char *saved_state);
 
     /* run all static initializers */
     void run_static_init(VMG0_);
@@ -366,9 +369,8 @@ public:
     vm_prop_id_t get_last_prop(VMG0_);
 
     /* save/restore the synthesized export table */
-    void save_synth_exports(VMG_ class CVmFile *fp);
-    int restore_synth_exports(VMG_ class CVmFile *fp,
-                              class CVmObjFixup *fixups);
+    void save_synth_exports(VMG_ CVmFile *fp);
+    int restore_synth_exports(VMG_ CVmFile *fp, CVmObjFixup *fixups);
 
     /* get the starting offset of static initializers in the code pool */
     ulong get_static_cs_ofs() const { return static_cs_ofs_; }
@@ -473,7 +475,7 @@ private:
     void set_last_prop(VMG_ vm_prop_id_t last_prop);
 
     /* callback for synthesized export enumeration: save to file */
-    static void save_synth_export_cb(void *ctx, class CVmHashEntry *entry);
+    static void save_synth_export_cb(void *ctx, CVmHashEntry *entry);
 
     /* underlying image file interface */
     class CVmImageFile *fp_;
@@ -528,14 +530,14 @@ private:
      *   the compile-time global symbols as reflected in the debugging
      *   records, and are used for reflection-type operations.  
      */
-    class CVmRuntimeSymbols *runtime_symtab_;
+    CVmRuntimeSymbols *runtime_symtab_;
 
     /* 
      *   The runtime macro definitions table, if we have one.  As with the
      *   runtime global symbol table, we build this from the debug records,
      *   or from the records passed in from the compiler during preinit. 
      */
-    class CVmRuntimeSymbols *runtime_macros_;
+    CVmRuntimeSymbols *runtime_macros_;
 
     /* object ID of LookupTable containing the global symbol table */
     vm_obj_id_t reflection_symtab_;
@@ -759,7 +761,7 @@ public:
     ~CVmImageFileExt();
     
     /* initialize with an underlying file */
-    CVmImageFileExt(class CVmFile *fp)
+    CVmImageFileExt(CVmFile *fp)
     {
         /* remember our file */
         fp_ = fp;
@@ -816,7 +818,7 @@ private:
     char *alloc_mem(size_t siz, ulong remaining_in_page);
     
     /* the underlying file */
-    class CVmFile *fp_;
+    CVmFile *fp_;
 
     /* 
      *   Memory block list.  We keep a set of memory blocks for loading

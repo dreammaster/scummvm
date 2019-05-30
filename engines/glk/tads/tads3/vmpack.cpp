@@ -1,23 +1,24 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header$";
-#endif
-
-/* Copyright (c) 2010 by Michael J. Roberts.  All Rights Reserved. */
-/*
-Name
-  vmpack.cpp - binary data stream pack/unpack
-Function
-  
-Notes
-  
-Modified
-  10/01/10 MJRoberts  - Creation
-*/
-
-#include <float.h>
-#include <math.h>
-#include <limits.h>
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmtype.h"
@@ -32,6 +33,9 @@ Modified
 #include "glk/tads/tads3/utf8.h"
 #include "glk/tads/tads3/charmap.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -499,12 +503,12 @@ struct ListArgs: CVmPackArgs
 {
     ListArgs(VMG_ vm_val_t *lst) { set(vmg_ lst); }
 
-    void set(VMG_ vm_val_t *lst)
+    void set(VMG_ vm_val_t *l)
     {
         this->vmg = VMGLOB_ADDR;
-        this->lst = *lst;
+        this->lst = *l;
         this->idx = 1;
-        this->len = lst->ll_length(vmg0_);
+        this->len = l->ll_length(vmg0_);
     }
 
     virtual int more() { return idx <= (len >= 0 ? len : 1); }
@@ -571,13 +575,13 @@ struct SingleArg: CVmPackArgs
 
     virtual int more() { return idx == 0; }
     virtual int nrem() { return idx == 0 ? 1 : 0; }
-    virtual vm_val_t *get(vm_val_t *val)
+    virtual vm_val_t *get(vm_val_t *v)
     {
         if (idx == 0)
-            *val = this->val;
+            *v = this->val;
         else
-            val->set_nil();
-        return val;
+            v->set_nil();
+        return v;
     }
     virtual void next() { ++idx; }
 
@@ -673,11 +677,11 @@ void CVmPack::pack_group(VMG_ CVmPackPos *p, CVmPackArgs *args_main,
              *   if we're reading arguments from a separate sublist per
              *   iteration of the group, move on to the next sublist 
              */
-            int more = args->more();
+            int moreVal = args->more();
             if (list_per_iter)
             {
                 /* switch to the next sublist from the main arguments */
-                more = args_main->more();
+                moreVal = args_main->more();
                 listargs.set(vmg_ args_main->get(&listval));
                 args_main->next();
             }
@@ -690,9 +694,9 @@ void CVmPack::pack_group(VMG_ CVmPackPos *p, CVmPackArgs *args_main,
              *   we've reached the iteration count limit.
              */
             if ((group->num_iters == ITER_STAR
-                 ? !more
+                 ? !moreVal
                  : group->cur_iter >= group->num_iters)
-                || (group->up_to_iters && !more))
+                || (group->up_to_iters && !moreVal))
             {
                 /* 
                  *   if this is an up-to count, make sure we consumed all
@@ -1490,7 +1494,7 @@ public:
             }
 
             /* set the string length to the length without the padding */
-            str->cons_shrink_buffer(vmg_ p.getptr());
+            str->cons_shrink_buffer(vmg_ p.getCharPtr());
         }
 
         /* done with the gc protection */
@@ -2761,11 +2765,11 @@ void CVmPack::unpack_iter_item(VMG_ CVmPackPos *p,
     case '"':
         /* count the characters in the string */
         len = 0;
-        for (CVmPackPos p(&t.lit) ; p.len != 0 ; p.inc(), ++len)
+        for (CVmPackPos pp(&t.lit) ; pp.len != 0 ; pp.inc(), ++len)
         {
             /* if this is a quote, it must be stuttered, so skip it */
-            if (p.getch_raw() == '"')
-                p.inc();
+            if (pp.getch_raw() == '"')
+                pp.inc();
         }
 
         /* skip the bytes, and we're done */
@@ -2775,7 +2779,7 @@ void CVmPack::unpack_iter_item(VMG_ CVmPackPos *p,
     case '{':
         /* count the hex digit pairs */
         len = 0;
-        for (CVmPackPos p(&t.lit) ; p.more() ; ++len, p.inc(), p.inc()) ;
+        for (CVmPackPos pp(&t.lit) ; pp.more() ; ++len, pp.inc(), pp.inc()) ;
 
         /* skip the bytes, and we're done */
         src->seek(len * t.get_count(), OSFSK_CUR);
@@ -3537,3 +3541,7 @@ void CVmPack::parse_mods(CVmPackPos *p, CVmPackType *t)
         }
     }
 }
+
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

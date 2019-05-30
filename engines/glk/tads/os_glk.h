@@ -112,12 +112,23 @@ typedef uint32 uint32_t;
  *   time_t and a 64-bit other_time_t, the OS headers should #define these
  *   macros in terms of those compiler-specific 64-bit names.
  */
-#ifndef os_time_t
-# define os_time_t        int64
-# define os_gmtime(t)     gmtime(t)
-# define os_localtime(t)  localtime(t)
-# define os_time(t)       time(t)
-#endif
+typedef int64 os_time_t;
+
+struct tm {
+	int tm_sec;
+	int tm_min;
+	int tm_hour;
+	int tm_mday;
+	int tm_wday;
+	int tm_mon;
+	int tm_year;
+	int tm_yday;
+	int tm_isdst;
+};
+
+tm *os_gmtime(const os_time_t *timer);
+tm *os_localtime(const os_time_t *timer);
+os_time_t os_time(os_time_t*timer);
 
 /*
  *   Initialize the time zone.  This routine is meant to take care of any
@@ -3220,6 +3231,163 @@ int os_get_sysinfo(int code, void *param, long *result);
 #endif
 
 int memicmp(const char *s1, const char *s2, int len);
+
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   Thread-local storage (TLS).
+ *   
+ *   When TADS is compiled with threading support, it requires some variables
+ *   to be "thread-local".  This means that the variables have global scope
+ *   (so they're not stored in "auto" variables on the stack), but each
+ *   thread has a private copy of each such variable.
+ *   
+ *   Nearly all systems that support threads also support thread-local
+ *   storage.  Like threading support itself, though, TLS support is at
+ *   present implemented only in non-portable OS APIs rather than standard C
+ *   language features.  TLS is a requirement if TADS is compiled with
+ *   threading, but it's not needed for non-threaded builds.  TADS only
+ *   requires threading at present (version 3.1) for its network features;
+ *   since these features are optional, systems that don't have threading and
+ *   TLS support will simply need to disable the network features, which will
+ *   allow all of the threading and TLS definitions in osifc to be omitted.
+ *   
+ *   There appear to be two common styles of TLS programming models.  The
+ *   first provides non-standard compiler syntax for declarative creation of
+ *   thread-local variables.  The Microsoft (on Windows) and Gnu compilers
+ *   (on Linux and Unix) do this: they provide custom storage class modifiers
+ *   for declaring thread locals (__declspec(thread) for MSVC, __thread for
+ *   gcc).  Compilers that support declarative thread locals handle the
+ *   implementation details through code generation, so the program merely
+ *   needs to add the special TLS storage class qualifier to an otherwise
+ *   ordinary global variable declaration, and then can access the thread
+ *   local as though it were an ordinary global.
+ *   
+ *   The second programming model is via explicit OS API calls to create,
+ *   initialize, and access thread locals.  pthreads provides such an API, as
+ *   does Win32.  In fact, when you use the declarative syntax with MSVC or
+ *   gcc, the compiler generates the appropriate API calls, but the details
+ *   are transparent to the program; in contrast, when using pthreads
+ *   directly, the program must actively call the relevant APIs.
+ *   
+ *   It's probably the case that every system that has compiler-level support
+ *   for declarative thread local creation also has procedural APIs, so the
+ *   simplest way to abstract the platform differences would be to do
+ *   everything in terms of APIs.  However, it seems likely that compilers
+ *   with declarative syntax might be able to generate more efficient code,
+ *   since optimizers always benefit from declarative information.  So we'd
+ *   like to use declarative syntax whenever it's available, but fall back on
+ *   explicit API calls when it's not.  So our programming model is a union
+ *   of the two styles:
+ *   
+ *   1. For each thread local, declare the thread local:
+ *.      OS_DECL_TLS(char *, my_local);
+ *   
+ *   2. At main program startup (for the main thread only), initialize each
+ *   thread local:
+ *.      os_tls_create(my_local);
+ *   
+ *   3. Never get or set the value of a thread local directly; instead, use
+ *   the get/set functions:
+ *.      char *x = os_tls_get(char *, my_local);
+ *.      os_tls_set(my_local, "hello");
+ *   
+ *   One key feature of this implementation is that each thread local is
+ *   stored as a (void *) value.  We do it this way to allow a simple direct
+ *   mapping to the pthreads APIs, since that's going to be the most common
+ *   non-declarative implementation.  This means that a thread local variable
+ *   can contain any pointer type, but *only* a pointer type.  The standard
+ *   pattern for dealing with anything more ocmplex is the same as in
+ *   pthreads: gather up the data into a structure, malloc() an instance of
+ *   that structure at entry to each thread (including the main thread), and
+ *   os_tls_set() the variable to contain a pointer to that structure.  From
+ *   then on, use os_tls_set(my_struct *, my_local)->member to access the
+ *   member variables in the structure.  And finally, each thread must delete
+ *   the structure at thread exit.
+ */
+
+/*   
+ *   
+ *   Declare a thread local.
+ *   
+ *   - For compilers that support declarative TLS variables, the local OS
+ *   headers should use the compiler support by #defining OS_DECL_TLS to the
+ *   appropriate local declarative keyword.
+ *   
+ *   - For systems without declarative TLS support but with TLS APIs, the
+ *   global declared by this macro actually stores the slot ID (what pthreads
+ *   calls the "key") for the variable.  This macro should therefore expand
+ *   to a declaration of the appropriate API type for a slot ID; for example,
+ *   on pthreads, #define OS_DECL_TLS(t, v) pthread_key_t v.
+ *   
+ *   - For builds with no thread support, simply #define this to declare the
+ *   variable as an ordinary global: #define OS_DECL_TLS(t, v) t v.
+ */
+/* #define OS_DECL_TLS(typ, varname)  __thread typ varname */
+
+/*
+ *   For API-based systems without declarative support in the compiler, the
+ *   main program startup code must explicitly create a slot for each thread-
+ *   local variable by calling os_tls_create().  The API returns a slot ID,
+ *   which is shared among threads and therefore can be stored in an ordinary
+ *   global variable.  OS_DECL_TLS will have declared the global variable
+ *   name in this case as an ordinary global of the slot ID type.  The
+ *   os_tls_create() macro should therefore expand to a call to the slot
+ *   creation API, storing the new slot ID in the global.
+ *   
+ *   Correspondingly, before the main thread exits, it should delete each
+ *   slot it created, b calling os_tls_delete().
+ *   
+ *   For declarative systems, there's no action required here, so these
+ *   macros can be defined to empty.
+ */
+/* #define os_tls_create(varname)  pthread_key_create(&varname, NULL) */
+/* #define os_tls_delete(varname)  pthread_key_delete(varname) */
+
+
+/*
+ *   On API-based systems, each access to get or set the thread local
+ *   requires an API call, using the slot ID stored in the actual global to
+ *   get the per-thread instance of the variable's storage.
+ *.    #define os_tls_get(typ, varname) ((typ)pthread_getspecific(varname))
+ *.    #define os_tls_set(varname, val) pthread_setspecific(varname, val)
+ *   
+ *   On declarative systems, the global variable itself is the thread local,
+ *   so get/set can be implemented as direct access to the variable.
+ *.    #define os_tls_get(typ, varname) varname
+ *.    #define os_tls_set(varname, val) varname = (val)
+ */
+
+/*
+ *   Common TLS definitions - declarative thread locals
+ *   
+ *   For systems with declarative TLS support in the compiler, the OS header
+ *   can #define OS_DECLARATIVE_TLS to pick up suitable definitions for the
+ *   os_tls_xxx() macros.  The OS header must separately define OS_DECL_TLS
+ *   as appropriate for the local system.
+ */
+#ifdef OS_DECLARATIVE_TLS
+#define os_tls_create(varname)
+#define os_tls_delete(varname)
+#define os_tls_get(typ, varname) varname
+#define os_tls_set(varname, val) varname = (val)
+#endif
+
+/*
+ *   Common TLS definitions - pthreads
+ *   
+ *   For pthreads systems without declarative TLS support in the compiler,
+ *   the OS header can simply #define OS_PTHREAD_TLS to pick up the standard
+ *   definitions below. 
+ */
+#ifdef OS_PTHREAD_TLS
+#include <pthread.h>
+#define OS_DECL_TLS(typ, varname) pthread_key_t varname
+#define os_tls_create(varname) pthread_key_create(&varname, NULL)
+#define os_tls_delete(varname) pthread_key_delete(varname)
+#define os_tls_get(typ, varname) ((typ)pthread_getspecific(varname))
+#define os_tls_set(varname, val) pthread_setspecific(varname, val)
+#endif
 
 } // End of namespace TADS
 } // End of namespace Glk

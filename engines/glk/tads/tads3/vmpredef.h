@@ -53,35 +53,6 @@ namespace TADS3 {
  */
 struct CVmPredef
 {
-    /* initialize */
-    CVmPredef()
-    {
-        /* 
-         *   the pre-defined variables are all undefined initially
-         */
-        reset();
-    }
-
-    /*
-     *   Reset the predef variables to their initial undefined values 
-     */
-    void reset()
-    {
-        /* 
-         *   include the import list to generate initializations for the
-         *   predef variables 
-         */
-#define VM_IMPORT_OBJ(sym, mem) mem = VM_INVALID_OBJ;
-#define VM_NOIMPORT_OBJ(sym, mem) VM_IMPORT_OBJ(sym, mem)
-
-#define VM_IMPORT_PROP(sym, mem) mem = VM_INVALID_PROP;
-#define VM_NOIMPORT_PROP(sym, mem) VM_IMPORT_PROP(sym, mem)
-
-#define VM_IMPORT_FUNC(sym, mem) mem = 0;
-
-#include "glk/tads/tads3/vmimport.h"
-    }
-
     /*
      *   Now include the import list to generate the actual member variables
      *   for the imported symbols.  During image file load, the loader will
@@ -97,6 +68,33 @@ struct CVmPredef
 #define VM_IMPORT_FUNC(sym, mem) pool_ofs_t mem;
 
 #include "glk/tads/tads3/vmimport.h"
+
+	/**
+	 * initialize
+	 */
+	CVmPredef() {
+		// the pre-defined variables are all undefined initially
+		reset();
+	}
+
+	/**
+	 * Reset the predef variables to their initial undefined values
+	 */
+	void reset() {
+		/*
+		 * include the import list to generate initializations for the
+		 * predef variables
+		 */
+#define VM_IMPORT_OBJ(sym, mem) mem = VM_INVALID_OBJ;
+#define VM_NOIMPORT_OBJ(sym, mem) VM_IMPORT_OBJ(sym, mem)
+
+#define VM_IMPORT_PROP(sym, mem) mem = VM_INVALID_PROP;
+#define VM_NOIMPORT_PROP(sym, mem) VM_IMPORT_PROP(sym, mem)
+
+#define VM_IMPORT_FUNC(sym, mem) mem = 0;
+
+#include "glk/tads/tads3/vmimport.h"
+	}
 };
 
 } // End of namespace TADS3

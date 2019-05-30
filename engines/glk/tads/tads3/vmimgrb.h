@@ -23,11 +23,22 @@
 #ifndef TADS3_VMIMGRB_H
 #define TADS3_VMIMGRB_H
 
-/* image rebuilder
+/* T3 Image File Re - Builder
  *
- * Re-builds an image file from the loaded program's state.  Useful
- * for writing an image file after pre-initialization has bee completed.
-*/
+ * This module re - builds an image file from the contents of memory after
+ * the program has been "pre-initialized."  This allows a program to
+ * run through its static state initialization during the compilation
+ * process, then store the result as a new image file with pre - initialized
+ * state.Any initialization that must always happen for every run of
+ * the program can be performed during this pre - initialization pass,
+ * saving the time of doing the work each time the program is run.
+ *
+ * Mostly, we just copy the old image file to the new image file; most
+ * parts of the image file are copied without changes.We update the
+ * object stream, replacing the original objects with the objects in
+ * their pre - initialized state, and we add any new strings dynamically
+ * created during pre - initialization to the constant pool.
+ */
 
 #include "glk/tads/tads3/vmtype.h"
 

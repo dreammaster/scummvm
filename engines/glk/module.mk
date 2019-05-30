@@ -131,7 +131,43 @@ MODULE_OBJS := \
 	tads/tads2/tokenizer_hash.o \
 	tads/tads2/vocabulary.o \
 	tads/tads2/vocabulary_parser.o \
-	tads/tads3/tads3.o
+	tads/tads3/charmap.o \
+	tads/tads3/md5.o \
+	tads/tads3/resload.o \
+	tads/tads3/std.o \
+	tads/tads3/tads3.o \
+	tads/tads3/utf8.o \
+	tads/tads3/vmbif.o \
+	tads/tads3/vmbifc.o \
+	tads/tads3/vmbifl.o \
+	tads/tads3/vmbiftad.o \
+	tads/tads3/vmbignum.o \
+	tads/tads3/vmbignumlib.o \
+	tads/tads3/vmbytarr.o \
+	tads/tads3/vmconhmp.o \
+	tads/tads3/vmconnom.o \
+	tads/tads3/vmconsol.o \
+	tads/tads3/vmcset.o \
+	tads/tads3/vmdynfunc.o \
+	tads/tads3/vmerr.o \
+	tads/tads3/vmfilobj.o \
+	tads/tads3/vmfunc.o \
+	tads/tads3/vmhash.o \
+	tads/tads3/vmimgrb.o \
+	tads/tads3/vmintcls.o \
+	tads/tads3/vmlst.o \
+	tads/tads3/vmmeta.o \
+	tads/tads3/vmnetfillcl.o \
+	tads/tads3/vmobj.o \
+	tads/tads3/vmpack.o \
+	tads/tads3/vmpat.o \
+	tads/tads3/vmregex.o \
+	tads/tads3/vmsa.o \
+	tads/tads3/vmstr.o \
+	tads/tads3/vmstrbuf.o \
+	tads/tads3/vmtype.o \
+	tads/tads3/vmundo.o \
+	tads/tads3/vmuni.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_GLK), DYNAMIC_PLUGIN)

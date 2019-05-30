@@ -84,19 +84,19 @@ namespace TADS3 {
 
 /* type to hold the SHA256 context                              */
 
-typedef struct
-{   sha2_32t count[2];
-    sha2_32t hash[8];
-    sha2_32t wbuf[16];
-} sha256_ctx;
+struct sha256_ctx {
+	sha2_32t count[2];
+	sha2_32t hash[8];
+	sha2_32t wbuf[16];
+};
 
 /* type to hold the SHA384/512 context                  */
 
-typedef struct
-{   sha2_64t count[2];
-    sha2_64t hash[8];
-    sha2_64t wbuf[16];
-} sha512_ctx;
+struct sha512_ctx {
+	sha2_64t count[2];
+	sha2_64t hash[8];
+	sha2_64t wbuf[16];
+};
 
 typedef sha512_ctx  sha384_ctx;
 

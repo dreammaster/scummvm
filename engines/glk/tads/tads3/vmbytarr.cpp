@@ -1,22 +1,25 @@
-/* 
- *   Copyright (c) 2001, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmbytarr.cpp - TADS 3 ByteArray intrinsic class
-Function
-  
-Notes
-  
-Modified
-  06/05/01 MJRoberts  - Creation
-*/
 
-#include <stdlib.h>
-#include <assert.h>
 #include "glk/tads/tads3/vmtype.h"
 #include "glk/tads/tads3/vmobj.h"
 #include "glk/tads/tads3/vmglob.h"
@@ -38,6 +41,9 @@ Modified
 #include "glk/tads/tads3/sha2.h"
 #include "glk/tads/tads3/md5.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -2650,3 +2656,6 @@ int CVmObjByteArray::getp_digestMD5(
     return TRUE;
 }
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

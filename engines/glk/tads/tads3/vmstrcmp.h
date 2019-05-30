@@ -54,6 +54,8 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class CVmObjStrCompMapReader;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Our serialized data stream, in both the image file and a saved file,
@@ -276,7 +278,7 @@ protected:
     /* allocate and initialize our extension */
     void alloc_ext(VMG_ size_t trunc_len, int case_sensitive,
                    size_t equiv_cnt, size_t total_chars,
-                   class CVmObjStrCompMapReader *reader);
+                   CVmObjStrCompMapReader *reader);
 
     /* count of equivalence mappings */
     void count_equiv_mappings(size_t *equiv_cnt, size_t *total_ch_cnt);

@@ -173,6 +173,10 @@ public:
     class CVmMT19937 *mt_ctx;
 };
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk
+
 /* end of section protected against multiple inclusion */
 #endif /* VMBIFTAD_H */
 
@@ -187,6 +191,10 @@ public:
  *   the file protected against multiple inclusion.  
  */
 #ifdef VMBIF_DEFINE_VECTOR
+
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* TADS general data manipulation functions */
 vm_bif_desc CVmBifTADS::bif_table[] =

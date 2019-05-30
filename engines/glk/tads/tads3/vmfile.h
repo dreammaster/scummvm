@@ -28,6 +28,7 @@
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmerr.h"
 #include "glk/tads/tads3/osifcnet.h"
+#include "glk/tads/tads3/vmrefcnt.h"
 
 namespace Glk {
 namespace TADS {
@@ -452,7 +453,7 @@ private:
 /*
  *   Reference-counted long int value (service class for CVmCountingStream) 
  */
-class CVmRefCntLong: public CVmRefCntObj
+class CVmRefCntLong: public Glk::TADS::TADS3::CVmRefCntObj
 {
 public:
     CVmRefCntLong() { val = 0; }
@@ -525,148 +526,163 @@ protected:
  *   flexible memory stream writer that allocates space as needed, use
  *   CVmExpandableMemoryStream.)  
  */
-class CVmMemoryStream: public CVmStream
-{
+template<class T>
+class CVmMemoryStreamBase : public CVmStream {
+protected:
+	T _buf;			///< Buffer pointer
+	size_t _size;	///< Buffer size
+	T _p;			///< Current position
 public:
-    /* create given the underlying memory buffer */
-    CVmMemoryStream(char *buf, size_t len)
-    {
-        /* remember the buffer */
-        buf_ = buf;
-        buflen_ = len;
+    /**
+	 * Constructor
+	 */
+	CVmMemoryStreamBase(T buf, size_t len) : _buf(buf), _p(buf), _size(len) {
+	}
 
-        /* start at the start of the buffer */
-        p_ = buf;
-    }
+    /**
+	 * Clone
+	 */
+    virtual CVmStream *clone(VMG_ const char *) {
+		return new CVmMemoryStreamBase<T>(_buf, _size);
+	}
 
-    /* clone */
-    virtual CVmStream *clone(VMG_ const char * /*mode*/)
-        { return new CVmMemoryStream(buf_, buflen_); }
-
-    /* read bytes */
-    void read_bytes(char *buf, size_t len)
-    {
-        /* if we don't have enough bytes left, throw an error */
-        if (len > (size_t)((buf_ + buflen_) - p_))
+    /**
+	 * Read bytes
+	 */
+    void read_bytes(char *buf, size_t len) {
+        // if we don't have enough bytes left, throw an error
+        if (len > (size_t)((_buf + _size) - _p))
             err_throw(VMERR_READ_FILE);
 
-        /* copy the data */
-        memcpy(buf, p_, len);
+        // copy the data
+        memcpy(buf, _p, len);
 
-        /* advance past the data we just read */
-        p_ += len;
+        // advance past the data we just read
+        _p += len;
     }
 
-    /* read bytes, partial read OK */
-    size_t read_nbytes(char *buf, size_t len)
-    {
-        /* limit the request to the number of bytes available */
-        long avail = (buf_ + buflen_) - p_;
+    /**
+	 * Read bytes, partial read OK
+	 */
+    size_t read_nbytes(char *buf, size_t len) {
+        // limit the request to the number of bytes available
+        long avail = (_buf + _size) - _p;
         if ((long)len > avail)
             len = (size_t)avail;
 
-        /* copy the data */
+        // copy the data
         if (len != 0)
-            memcpy(buf, p_, len);
+            memcpy(buf, _p, len);
 
-        /* advance past the data we just read */
-        p_ += len;
+        // advance past the data we just read
+        _p += len;
 
-        /* return the number of bytes read */
+        // return the number of bytes read
         return len;
     }
 
-    /* read a line */
-    char *read_line(char *buf, size_t len)
-    {
-        /* if already at EOF, or there's no buffer, return null */
-        if (p_ >= buf_ + buflen_ || buf == 0 || len == 0)
+    /**
+	 * Read a line
+	 */
+    char *read_line(char *buf, size_t len) {
+        // if already at EOF, or there's no buffer, return null
+        if (_p >= _buf + _size || buf == 0 || len == 0)
             return 0;
 
-        /* read bytes until we fill the buffer or reach '\n' or EOF */
+        // read bytes until we fill the buffer or reach '\n' or EOF
         char *dst;
         size_t rem;
-        for (dst = buf, rem = len ; rem > 1 && p_ < buf_ + buflen_ ; --rem)
-        {
-            /* get this character */
-            char c = *p_++;
+        for (dst = buf, rem = len ; rem > 1 && _p < _buf + _size ; --rem) {
+            // get this character
+            char c = *_p++;
 
-            /* check for newlines */
-            if (c == '\n' || c == '\r')
-            {
-                /* write CR and LF as simply CR */
+            // check for newlines
+            if (c == '\n' || c == '\r') {
+                // write CR and LF as simply CR
                 *dst++ = '\n';
 
-                /* if we have a CR-LF or LF-CR sequence, skip the pair */
-                if (p_ < buf_ + buflen_
-                    && ((c == '\n' && *p_ == '\r')
-                        || (c == '\r' && *p_ == '\n')))
-                    p_ += 1;
+                // if we have a CR-LF or LF-CR sequence, skip the pair
+                if (_p < _buf + _size
+                    && ((c == '\n' && *_p == '\r')
+                        || (c == '\r' && *_p == '\n')))
+                    _p += 1;
 
-                /* done */
+                // done
                 break;
             }
 
-            /* copy this character */
+            // copy this character
             *dst++ = c;
         }
 
-        /* add the trailing null and return the buffer */
+        // add the trailing null and return the buffer
         *dst = '\0';
         return buf;
     }
 
-    /* write bytes */
-    void write_bytes(const char *buf, size_t len)
-    {
-        /* if we don't have space, throw an error */
-        if (len > (size_t)((buf_ + buflen_) - p_))
-            err_throw(VMERR_WRITE_FILE);
+    /**
+	 * disallow writing unless specific subclass overrides it
+	 */
+    void write_bytes(const char *, size_t) { err_throw(VMERR_WRITE_FILE); }
 
-        /* copy the data */
-        memcpy(p_, buf, len);
+    /**
+	 * Get the position - return an offset from the start of our buffer
+	 */
+    long get_seek_pos() const { return _p - _buf; }
 
-        /* advance past the data */
-        p_ += len;
-    }
-
-    /* get the position - return an offset from the start of our buffer */
-    long get_seek_pos() const { return p_ - buf_; }
-
-    /* set the position, as an offset from the start of our buffer */
-    void set_seek_pos(long pos)
-    {
-        /* limit it to the available space */
+    /**
+	 * Set the position, as an offset from the start of our buffer
+	 */
+    void set_seek_pos(long pos) {
+        // limit it to the available space
         if (pos < 0)
             pos = 0;
-        else if (pos > (long)buflen_)
-            pos = buflen_;
+        else if (pos > (long)_size)
+            pos = _size;
 
-        /* set the position */
-        p_ = buf_ + pos;
+        // set the position
+        _p = _buf + pos;
     }
 
-    /* get the stream length */
-    long get_len() { return buflen_; }
+    /**
+	 * Get the stream length
+	 */
+    long get_len() { return _size; }
 
-    /* set the stream length */
-    void set_len(size_t len) { buflen_ = len; }
-
-protected:
-    /* our buffer */
-    char *buf_;
-
-    /* size of our buffer */
-    size_t buflen_;
-
-    /* current read/write pointer */
-    char *p_;
+    /**
+	 * Set the stream length
+	 */
+    void set_len(size_t len) { _size = len; }
 };
+
+class CVmMemoryStream : public CVmMemoryStreamBase<char *> {
+public:
+	/**
+	 * Constructor
+	 */
+	CVmMemoryStream(char *buf, size_t len) : CVmMemoryStreamBase(buf, len) {}
+
+	/**
+	 * Write bytes
+	 */
+	void write_bytes(const char *buf, size_t len) {
+		// if we don't have space, throw an error
+		if (len > (size_t)((_buf + _size) - _p))
+			err_throw(VMERR_WRITE_FILE);
+
+		// copy the data
+		memcpy(_p, buf, len);
+
+		// advance past the data
+		_p += len;
+	}
+};
+
 
 /*
  *   reference-counted buffer 
  */
-class CVmRefCntBuf: public CVmRefCntObj
+class CVmRefCntBuf: public Glk::TADS::TADS3::CVmRefCntObj
 {
 public:
     CVmRefCntBuf(size_t len)
@@ -684,60 +700,50 @@ protected:
 /*
  *   Memory stream, using a private allocated buffer
  */
-class CVmPrivateMemoryStream: public CVmMemoryStream
-{
+class CVmPrivateMemoryStream: public CVmMemoryStream {
 public:
-    CVmPrivateMemoryStream(size_t len)
-        : CVmMemoryStream(0, len)
-    {
-        bufobj_ = new CVmRefCntBuf(len);
-        buf_ = bufobj_->buf_;
+    CVmPrivateMemoryStream(size_t len) : CVmMemoryStream(nullptr, len) {
+        _bufObj = new CVmRefCntBuf(len);
+        _buf = _bufObj->buf_;
     }
 
-    CVmPrivateMemoryStream(const char *str, size_t len)
-        : CVmMemoryStream(0, len)
-    {
-        bufobj_ = new CVmRefCntBuf(str, len);
-        buf_ = bufobj_->buf_;
+    CVmPrivateMemoryStream(const char *str, size_t len) : CVmMemoryStream(nullptr, len) {
+        _bufObj = new CVmRefCntBuf(str, len);
+        _buf = _bufObj->buf_;
     }
 
     CVmPrivateMemoryStream(CVmRefCntBuf *bufobj, size_t len)
-        : CVmMemoryStream(bufobj->buf_, len)
-    {
+        : CVmMemoryStream(bufobj->buf_, len) {
         bufobj->add_ref();
-        bufobj_ = bufobj;
+        _bufObj = bufobj;
     }
 
-    CVmStream *clone(VMG_ const char * /*mode*/)
-        { return new CVmPrivateMemoryStream(bufobj_, buflen_); }
+    CVmStream *clone(VMG_ const char * /*mode*/) {
+		return new CVmPrivateMemoryStream(_bufObj, _size);
+	}
 
-    ~CVmPrivateMemoryStream() { bufobj_->release_ref(); }
+    ~CVmPrivateMemoryStream() { _bufObj->release_ref(); }
 
 protected:
-    CVmRefCntBuf *bufobj_;
+    CVmRefCntBuf *_bufObj;
 };
 
 /*
  *   Read-only memory stream 
  */
-class CVmReadOnlyMemoryStream: public CVmMemoryStream
-{
+class CVmReadOnlyMemoryStream: public CVmMemoryStreamBase<const char *> {
 public:
     CVmReadOnlyMemoryStream(const char *buf, size_t len)
-        : CVmMemoryStream((char *)buf, len)
-    {
+        : CVmMemoryStreamBase(buf, len) {
     }
-
-    /* disallow writing */
-    void write_bytes(const char *, size_t) { err_throw(VMERR_WRITE_FILE); }
 };
 
 /* expandable memory stream block */
 struct CVmExpandableMemoryStreamBlock
 {
-    CVmExpandableMemoryStreamBlock(long ofs)
+    CVmExpandableMemoryStreamBlock(long pos)
     {
-        this->ofs = ofs;
+        this->ofs = pos;
         nxt = 0;
     }
     
@@ -755,8 +761,7 @@ struct CVmExpandableMemoryStreamBlock
 };
 
 /* expandable memory stream block list */
-class CVmExpandableMemoryStreamList: public CVmRefCntObj
-{
+class CVmExpandableMemoryStreamList: public Glk::TADS::TADS3::CVmRefCntObj {
 public:
     static const int BlockLen = CVmExpandableMemoryStreamBlock::BlockLen;
 
@@ -1098,10 +1103,10 @@ public:
         { return bl->get_len(); }
 
 protected:
-    CVmExpandableMemoryStream(CVmExpandableMemoryStreamList *bl)
+    CVmExpandableMemoryStream(CVmExpandableMemoryStreamList *l)
     {
         bl->add_ref();
-        this->bl = bl;
+        this->bl = l;
     }
 
     CVmExpandableMemoryStreamList *bl;
@@ -1112,3 +1117,4 @@ protected:
 } // End of namespace Glk
 
 #endif
+

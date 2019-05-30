@@ -56,6 +56,7 @@ enum InterpreterType {
 /**
  * These are the compile-time conditionals that reveal various Glk optional modules.
  */
+#define GLK
 #define GLK_MODULE_LINE_ECHO
 #define GLK_MODULE_LINE_TERMINATORS
 #define GLK_MODULE_UNICODE

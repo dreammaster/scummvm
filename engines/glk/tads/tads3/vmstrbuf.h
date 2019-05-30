@@ -20,21 +20,22 @@
  *
  */
 
-
 #ifndef TADS3_VMSTRBUF_H
 #define TADS3_VMSTRBUF_H
 
 /* StringBuffer object */
 
-#include "glk/tads/tads3/tads/tads3/t3std.h"
-#include "glk/tads/tads3/tads/tads3/vmtype.h"
-#include "glk/tads/tads3/tads/tads3/vmglob.h"
-#include "glk/tads/tads3/tads/tads3/vmobj.h"
-#include "glk/tads/tads3/tads/tads3/vmundo.h"
+#include "glk/tads/tads3/t3std.h"
+#include "glk/tads/tads3/vmtype.h"
+#include "glk/tads/tads3/vmglob.h"
+#include "glk/tads/tads3/vmobj.h"
+#include "glk/tads/tads3/vmundo.h"
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
+
+class CVmObjStringBuffer;
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -67,11 +68,11 @@ namespace TADS3 {
 struct vm_strbuf_ext
 {
     /* allocate the structure */
-    static vm_strbuf_ext *alloc_ext(VMG_ class CVmObjStringBuffer *self,
+    static vm_strbuf_ext *alloc_ext(VMG_ CVmObjStringBuffer *self,
                                     int32_t alo, int32_t inc);
 
     /* expand an existing extension */
-    static vm_strbuf_ext *expand_ext(VMG_ class CVmObjStringBuffer *self,
+    static vm_strbuf_ext *expand_ext(VMG_ CVmObjStringBuffer *self,
                                      vm_strbuf_ext *old_ext,
                                      int32_t new_len);
 

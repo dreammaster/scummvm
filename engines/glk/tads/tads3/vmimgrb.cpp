@@ -1,39 +1,24 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header$";
-#endif
-
-/* 
- *   Copyright (c) 1999, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmimgrb.cpp - T3 Image File Re-Builder
-Function
-  This module re-builds an image file from the contents of memory after
-  the program has been "pre-initialized."  This allows a program to
-  run through its static state initialization during the compilation
-  process, then store the result as a new image file with pre-initialized
-  state.  Any initialization that must always happen for every run of
-  the program can be performed during this pre-initialization pass,
-  saving the time of doing the work each time the program is run.
-
-  Mostly, we just copy the old image file to the new image file; most
-  parts of the image file are copied without changes.  We update the
-  object stream, replacing the original objects with the objects in
-  their pre-initialized state, and we add any new strings dynamically
-  created during pre-initialization to the constant pool.
-Notes
-  
-Modified
-  07/21/99 MJRoberts  - Creation
-*/
-
-#include <stdlib.h>
-#include <memory.h>
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmfile.h"
@@ -75,6 +60,9 @@ Modified
 #include "glk/tads/tads3/vmhttpreq.h"
 #endif
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -2286,3 +2274,6 @@ ulong CVmObjHTTPRequest::rebuild_image(VMG_ char *buf, ulong buflen)
 
 #endif /* TADSNET */
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

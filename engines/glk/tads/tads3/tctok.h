@@ -41,6 +41,11 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class CVmStream;
+class CTcTokLoadMacErr;
+class CTcTokFileDesc;
+class CTcSrcObject;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Constants 
@@ -204,7 +209,7 @@ struct tok_if_info_t
     tok_if_t state;
 
     /* file descriptor and line number of starting #if */
-    class CTcTokFileDesc *desc;
+    CTcTokFileDesc *desc;
     long linenum;
 };
 
@@ -698,12 +703,12 @@ struct tok_embed_level
     /* true -> the enclosing string is a triple-quoted string */
     int triple;
 
-    void enter(wchar_t qu, int triple)
+    void enter(wchar_t quVal, int tripleVal)
     {
         this->parens = 0;
-        this->endtok = (qu == '"' ? TOKT_DSTR_END : TOKT_SSTR_END);
-        this->qu = qu;
-        this->triple = triple;
+        this->endtok = (quVal == '"' ? TOKT_DSTR_END : TOKT_SSTR_END);
+        this->qu = quVal;
+        this->triple = tripleVal;
     }
 };
 struct tok_embed_ctx
@@ -1189,9 +1194,9 @@ public:
     int read_line_pp();
 
     /* get the file descriptor and line number of the last line read */
-    class CTcTokFileDesc *get_last_desc() const { return last_desc_; }
+    CTcTokFileDesc *get_last_desc() const { return last_desc_; }
     long get_last_linenum() const { return last_linenum_; }
-    void get_last_pos(class CTcTokFileDesc **desc, long *linenum) const
+    void get_last_pos(CTcTokFileDesc **desc, long *linenum) const
     {
         *desc = last_desc_;
         *linenum = last_linenum_;
@@ -1203,7 +1208,7 @@ public:
      *   (during code generation, for example) for error-reporting and
      *   debug-record purposes 
      */
-    void set_line_info(class CTcTokFileDesc *desc, long linenum)
+    void set_line_info(CTcTokFileDesc *desc, long linenum)
     {
         last_desc_ = desc;
         last_linenum_ = linenum;
@@ -1355,21 +1360,21 @@ public:
     int get_filedesc_count() const { return next_filedesc_id_; }
 
     /* get the file descriptor at the given (0-based) index */
-    class CTcTokFileDesc *get_filedesc(size_t idx) const
+    CTcTokFileDesc *get_filedesc(size_t idx) const
     {
         /* return the array entry at the index, if the index is valid */
         return (idx < desc_list_cnt_ ? desc_list_[idx] : 0);
     }
 
     /* get the head of the master source file descriptor list */
-    class CTcTokFileDesc *get_first_filedesc() const { return desc_head_; }
+    CTcTokFileDesc *get_first_filedesc() const { return desc_head_; }
 
     /* 
      *   Create a new file descriptor and add it to the master list.  This
      *   creates the new descriptor unconditionally, even if a descriptor
      *   for the same source file already exists. 
      */
-    class CTcTokFileDesc *create_file_desc(const char *fname, size_t len)
+    CTcTokFileDesc *create_file_desc(const char *fname, size_t len)
         { return get_file_desc(fname, len, TRUE, fname, len); }
 
     /*
@@ -1387,8 +1392,8 @@ public:
      *   through the error handler object and return a non-zero value.
      *   Returns zero on success.  
      */
-    int load_macros_from_file(class CVmStream *fp,
-                              class CTcTokLoadMacErr *err_handler);
+    int load_macros_from_file(CVmStream *fp,
+                              CTcTokLoadMacErr *err_handler);
 
     /* receive notification that the compiler is done with all parsing */
     void parsing_done()
@@ -1744,7 +1749,7 @@ private:
      *   filename that resulted from searching the include path for the
      *   given name. 
      */
-    class CTcTokFileDesc *get_file_desc(const char *fname, size_t fname_len,
+    CTcTokFileDesc *get_file_desc(const char *fname, size_t fname_len,
                                         int always_create,
                                         const char *orig_fname,
                                         size_t orig_fname_len);
@@ -1811,19 +1816,19 @@ private:
     struct tctok_incpath_t *incpath_tail_;
 
     /* file descriptor and line number of last line read */
-    class CTcTokFileDesc *last_desc_;
+    CTcTokFileDesc *last_desc_;
     long last_linenum_;
 
     /* file descriptor and line number of last line appended */
-    class CTcTokFileDesc *appended_desc_;
+    CTcTokFileDesc *appended_desc_;
     long appended_linenum_;
 
     /* current input stream */
     class CTcTokStream *str_;
 
     /* master list of file descriptors */
-    class CTcTokFileDesc *desc_head_;
-    class CTcTokFileDesc *desc_tail_;
+    CTcTokFileDesc *desc_head_;
+    CTcTokFileDesc *desc_tail_;
 
     /* 
      *   array of file descriptors (we keep the list in both an array and
@@ -1831,7 +1836,7 @@ private:
      *   this isn't a lot of trouble since we never need to remove an
      *   entry from the list) 
      */
-    class CTcTokFileDesc **desc_list_;
+    CTcTokFileDesc **desc_list_;
 
     /* number of entries in desc_list_ */
     size_t desc_list_cnt_;
@@ -1969,8 +1974,7 @@ private:
  *   CTcTokenizer must provide an implementation of this interface to handle
  *   errors that occur while loading macros.  
  */
-class CTcTokLoadMacErr
-{
+class CTcTokLoadMacErr {
 public:
     /* 
      *   Flag an error.  The error codes are taken from the following list:
@@ -1988,8 +1992,7 @@ public:
  *   Tokenizer File Descriptor.  Each unique source file has a separate
  *   file descriptor, which keeps track of the file's name. 
  */
-class CTcTokFileDesc
-{
+class CTcTokFileDesc {
 public:
     /* create a file descriptor */
     CTcTokFileDesc(const char *fname, size_t fname_len, int index,
@@ -2113,11 +2116,10 @@ private:
 /*
  *   Tokenizer Input Stream 
  */
-class CTcTokStream
-{
+class CTcTokStream {
 public:
     /* create a token stream */
-    CTcTokStream(class CTcTokFileDesc *desc, class CTcSrcObject *src,
+    CTcTokStream(CTcTokFileDesc *desc, CTcSrcObject *src,
                  CTcTokStream *parent, int charset_error,
                  int init_if_level);
 
@@ -2125,11 +2127,11 @@ public:
     ~CTcTokStream();
     
     /* get/set the associated file descriptor */
-    class CTcTokFileDesc *get_desc() const { return desc_; }
-    void set_desc(class CTcTokFileDesc *desc) { desc_ = desc; }
+    CTcTokFileDesc *get_desc() const { return desc_; }
+    void set_desc(CTcTokFileDesc *desc) { desc_ = desc; }
 
     /* get the underlying source file */
-    class CTcSrcObject *get_src() const { return src_; }
+    CTcSrcObject *get_src() const { return src_; }
 
     /* get the line number of the next line to be read */
     long get_next_linenum() const { return next_linenum_; }
@@ -2166,10 +2168,10 @@ public:
 
 private:
     /* file descriptor associated with this file */
-    class CTcTokFileDesc *desc_;
+    CTcTokFileDesc *desc_;
     
     /* the underlying source reader */
-    class CTcSrcObject *src_;
+    CTcSrcObject *src_;
 
     /* 
      *   the enclosing stream - this is the stream that #include'd the

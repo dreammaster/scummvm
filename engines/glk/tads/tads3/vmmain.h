@@ -128,12 +128,12 @@ int vm_get_game_type(const char *filename,
  */
 struct vm_run_image_params
 {
-    vm_run_image_params(CVmMainClientIfc *clientifc, CVmHostIfc *hostifc, const char *image_file_name)
+    vm_run_image_params(CVmMainClientIfc *cifc, CVmHostIfc *hifc, const char *filename)
     {
         /* set the required parameters */
-        this->clientifc = clientifc;
-        this->hostifc = hostifc;
-        this->image_file_name = image_file_name;
+        this->clientifc = cifc;
+        this->hostifc = hifc;
+        this->image_file_name = filename;
 
         /* assume no program arguments */
         prog_argv = 0;

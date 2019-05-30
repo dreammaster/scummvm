@@ -37,6 +37,8 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class CVmObjLookupTable;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   The image file data block is arranged as follows:
@@ -111,7 +113,7 @@ struct vm_lookup_val
 struct vm_lookup_ext
 {
     /* allocate the structure, given the number of buckets and values */
-    static vm_lookup_ext *alloc_ext(VMG_ class CVmObjLookupTable *self,
+    static vm_lookup_ext *alloc_ext(VMG_ CVmObjLookupTable *self,
                                     uint bucket_cnt, uint value_cnt);
 
     /* 
@@ -128,7 +130,7 @@ struct vm_lookup_ext
      *   all of the data from the original hash table into the new hash
      *   table, and deletes the old structure.  
      */
-    static vm_lookup_ext *expand_ext(VMG_ class CVmObjLookupTable *self,
+    static vm_lookup_ext *expand_ext(VMG_ CVmObjLookupTable *self,
                                      vm_lookup_ext *old_ext,
                                      uint new_value_cnt);
 

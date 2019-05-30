@@ -1,22 +1,35 @@
-/* $Header$ */
-
-/* Copyright (c) 2010 by Michael J. Roberts.  All Rights Reserved. */
-/*
-Name
-  vmdatasrc.h - Data Source object
-Function
-  CVmDataSource is an abstract class representing a read/write data source,
-  such as a file, block of memory, etc.  The data source object has an
-  interface essentially identical to the osifc file interface, but can be
-  implemented with a variety of underlying data sources.
-Notes
-  
-Modified
-  05/05/10 MJRoberts  - Creation
-*/
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
 #ifndef TADS3_VMDATASRC_H
 #define TADS3_VMDATASRC_H
+
+/* Data Source object
+ *
+ * CVmDataSource is an abstract class representing a read/write data source,
+ * such as a file, block of memory, etc.  The data source object has an
+ * interface essentially identical to the osifc file interface, but can be
+ * implemented with a variety of underlying data sources.
+ */
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/osifcnet.h"
@@ -191,7 +204,7 @@ public:
 class CVmFileSource: public CVmDataSource
 {
 public:
-    CVmFileSource(osfildef *fp) { this->fp = fp; }
+    CVmFileSource(osfildef *fd) { this->fp = fd; }
     ~CVmFileSource()
     {
         if (fp != 0)
@@ -275,13 +288,13 @@ class CVmResFileSource: public CVmDataSource
 public:
     CVmResFileSource(osfildef *fp, unsigned long start, long end)
     {
-        this->fp = fp;
-        this->start = start;
-        this->end = end;
+        _fp = fp;
+        _start = start;
+        _end = end;
     }
     ~CVmResFileSource()
     {
-        if (fp != 0)
+        if (_fp != nullptr)
             close();
     }
 
@@ -289,36 +302,36 @@ public:
     virtual CVmDataSource *clone(VMG_ const char *mode)
     {
         /* duplicate our underlying file handle */
-        osfildef *fpdup = osfdup(fp, mode);
+        osfildef *fpdup = osfdup(_fp, mode);
         if (fpdup == 0)
             return 0;
 
         /* return a new source wrapping the duplicated file handle */
-        return new CVmResFileSource(fpdup, start, end);
+        return new CVmResFileSource(fpdup, _start, _end);
     }
 
     /* read bytes - returns 0 on success, non-zero on EOF or error */
     virtual int read(void *buf, size_t len)
     {
         /* if this would take us past the end, we can't fulfill the request */
-        unsigned long pos = osfpos(fp);
-        if (pos + len > end)
+        unsigned long pos = osfpos(_fp);
+        if (pos + len > _end)
             return 1;
 
         /* do the read */
-        return osfrb(fp, buf, len);
+        return osfrb(_fp, buf, len);
     }
 
     /* read a line of text (fgets() semantics) */
     virtual char *read_line(char *buf, size_t len)
     {
         /* if we're already past the end, we can't fulfill the request */
-        unsigned long pos = osfpos(fp);
-        if (pos >= end)
+        unsigned long pos = osfpos(_fp);
+        if (pos >= _end)
             return 0;
 
         /* read a line */
-        char *ret = osfgets(buf, len, fp);
+        char *ret = osfgets(buf, len, _fp);
         if (ret == 0)
             return 0;
 
@@ -326,14 +339,14 @@ public:
          *   if that moved us past the end of our segment, go back and
          *   re-read the exact number of bytes remaining 
          */
-        if ((unsigned long)osfpos(fp) > end)
+        if ((unsigned long)osfpos(_fp) > _end)
         {
             /* seek back to where we started */
-            osfseek(fp, pos, OSFSK_SET);
+            osfseek(_fp, pos, OSFSK_SET);
 
             /* read the remaining bytes in the resource (up to buflen) */
-            size_t r = end - pos > len ? (long)len : (size_t)(end - pos);
-            if (osfrb(fp, buf, r))
+            size_t r = _end - pos > len ? (long)len : (size_t)(_end - pos);
+            if (osfrb(_fp, buf, r))
                 return 0;
 
             /* if that didn't fill the buffer, null-terminate it */
@@ -349,27 +362,27 @@ public:
     virtual int readc(void *buf, size_t len)
     {
         /* if we're already past the end, we can't read anything */
-        unsigned long pos = osfpos(fp);
-        if (pos >= end)
+        unsigned long pos = osfpos(_fp);
+        if (pos >= _end)
             return 0;
 
         /* limit the read to the available file size */
-        unsigned long limit = end - pos;
+        unsigned long limit = _end - pos;
         if (len > limit)
             len = (size_t)limit;
 
         /* do the read */
-        return osfrbc(fp, buf, len);
+        return osfrbc(_fp, buf, len);
     }
 
     /* write bytes - resource files are read-only */
     virtual int write(const void *buf, size_t len) { return 1; }
 
     /* get the length of the file in bytes */
-    virtual long get_size() { return end - start; }
+    virtual long get_size() { return _end - _start; }
 
     /* get the current seek location */
-    virtual long get_pos() { return osfpos(fp) - start; }
+    virtual long get_pos() { return osfpos(_fp) - _start; }
 
     /* set the current seek location - 'mode' is an OSFSK_xxx mode */
     virtual int seek(long ofs, int mode)
@@ -379,11 +392,11 @@ public:
         case OSFSK_SET:
         do_set:
             /* check that 'ofs' is in range */
-            if (ofs < 0 || (unsigned long)ofs > end - start)
+            if (ofs < 0 || (unsigned long)ofs > _end - _start)
                 return 1;
 
             /* seek to the offset */
-            return osfseek(fp, start + ofs, OSFSK_SET);
+            return osfseek(_fp, _start + ofs, OSFSK_SET);
 
         case OSFSK_CUR:
             /* set the offset relative to the current position */
@@ -392,7 +405,7 @@ public:
 
         case OSFSK_END:
             /* set the offset relative to the end of the file */
-            ofs += (end - start);
+            ofs += (_end - _start);
             goto do_set;
 
         default:
@@ -407,16 +420,16 @@ public:
     /* close the underlying system resource */
     virtual void close()
     {
-        osfcls(fp);
-        fp = 0;
+        osfcls(_fp);
+        _fp = nullptr;
     }
 
 protected:
     /* the underlying file */
-    osfildef *fp;
+    osfildef *_fp;
 
     /* the byte range within the resource file */
-    unsigned long start, end;
+    unsigned long _start, _end;
 };
 
 
@@ -430,28 +443,28 @@ class CVmStringSource: public CVmDataSource
 public:
     CVmStringSource(const char *mem, long len)
     {
-        this->mem = mem;
-        this->memlen = len;
-        this->pos = 0;
+        _mem = mem;
+        _memlen = len;
+        _pos = 0;
     }
 
     virtual ~CVmStringSource() { }
 
     virtual CVmDataSource *clone(VMG_ const char * /*mode*/)
-        { return new CVmStringSource(mem, memlen); }
+        { return new CVmStringSource(_mem, _memlen); }
 
     /* read bytes - returns 0 on success, non-zero on EOF or error */
     virtual int read(void *buf, size_t len)
     {
         /* make sure there's enough data to satisfy the request */
-        if (pos + (long)len > memlen)
+        if (_pos + (long)len > _memlen)
             return 1;
 
         /* copy the data */
-        memcpy(buf, mem + pos, len);
+        memcpy(buf, _mem + _pos, len);
 
         /* advance the read pointer */
-        pos += len;
+        _pos += len;
 
         /* success */
         return 0;
@@ -461,15 +474,15 @@ public:
     virtual int readc(void *buf, size_t len)
     {
         /* limit the read to the available length */
-        long rem = memlen - pos;
+        long rem = _memlen - _pos;
         if ((long)len > rem)
             len = rem;
 
         /* copy the bytes */
-        memcpy(buf, mem + pos, len);
+        memcpy(buf, _mem + _pos, len);
 
         /* advance the read pointer */
-        pos += len;
+        _pos += len;
         
         /* return the amount read */
         return (int)len;
@@ -479,15 +492,15 @@ public:
     virtual char *read_line(char *buf, size_t len)
     {
         /* if we have no bytes left, return null for EOF */
-        if (pos == memlen)
+        if (_pos == _memlen)
             return 0;
         
         /* read bytes until we encounter a CR, LF, or CR-LF */
         char *dst = buf;
-        while (pos < memlen && len > 0)
+        while (_pos < _memlen && len > 0)
         {
             /* check for a line terminator */
-            if (mem[pos] == 10 || mem[pos] == 13)
+            if (_mem[_pos] == 10 || _mem[_pos] == 13)
             {
                 /* 
                  *   add a newline to the result (it's always '\n' in the
@@ -501,16 +514,16 @@ public:
                  *   if this is a CR-LF sequence, skip both characters;
                  *   otherwise just skip the single CR or LF
                  */
-                ++pos;
-                if (pos < memlen && mem[pos-1] == 13 && mem[pos] == 10)
-                    ++pos;
+                ++_pos;
+                if (_pos < _memlen && _mem[_pos-1] == 13 && _mem[_pos] == 10)
+                    ++_pos;
 
                 /* we're done */
                 break;
             }
 
             /* copy this byte */
-            *dst++ = mem[pos++];
+            *dst++ = _mem[_pos++];
 
             /* count it against the remaining buffer length */
             --len;
@@ -528,10 +541,10 @@ public:
     virtual int write(const void *buf, size_t len) { return 1; }
 
     /* get the length of the file in bytes */
-    virtual long get_size() { return memlen; }
+    virtual long get_size() { return _memlen; }
 
     /* get the current seek location */
-    virtual long get_pos() { return pos; }
+    virtual long get_pos() { return _pos; }
 
     /* set the current seek location - 'mode' is an OSFSK_xxx mode */
     virtual int seek(long ofs, int mode)
@@ -541,23 +554,23 @@ public:
         case OSFSK_SET:
         do_set:
             /* make sure it's in range */
-            if (ofs < 0 || ofs > memlen)
+            if (ofs < 0 || ofs > _memlen)
                 return 1;
 
             /* set the new position */
-            pos = ofs;
+            _pos = ofs;
 
             /* success */
             return 0;
 
         case OSFSK_CUR:
             /* calculate the absolute position and go do the set */
-            ofs += pos;
+            ofs += _pos;
             goto do_set;
 
         case OSFSK_END:
             /* calculate the absolute position and go do the set */
-            ofs += memlen;
+            ofs += _memlen;
             goto do_set;
 
         default:
@@ -574,11 +587,11 @@ public:
 
 protected:
     /* our memory buffer, and the number of bytes in the buffer */
-    const char *mem;
-    long memlen;
+    const char *_mem;
+    long _memlen;
 
     /* current read position  */
-    long pos;
+    long _pos;
 };
 
 /* ------------------------------------------------------------------------ */
@@ -592,26 +605,26 @@ public:
     CVmPrivateStringSource(const char *mem, long len)
         : CVmStringSource(0, len)
     {
-        this->bufobj = new CVmRefCntBuf(mem, len);
-        this->mem = bufobj->buf_;
+        _bufobj = new CVmRefCntBuf(mem, len);
+        _mem = _bufobj->buf_;
     }
 
     CVmPrivateStringSource(CVmRefCntBuf *bufobj, long len)
         : CVmStringSource(bufobj->buf_, len)
     {
-        this->bufobj = bufobj;
+        _bufobj = bufobj;
     }
 
     CVmDataSource *clone(VMG_ const char * /*mode*/)
-        { return new CVmPrivateStringSource(bufobj, memlen); }
+        { return new CVmPrivateStringSource(_bufobj, _memlen); }
 
     ~CVmPrivateStringSource()
     {
-        bufobj->release_ref();
+        _bufobj->release_ref();
     }
 
 protected:
-    CVmRefCntBuf *bufobj;
+    CVmRefCntBuf *_bufobj;
 };
 
 
@@ -624,9 +637,9 @@ protected:
 /* page block for a memory source */
 struct CVmMemorySourceBlock
 {
-    CVmMemorySourceBlock(long ofs)
+    CVmMemorySourceBlock(long pos)
     {
-        this->ofs = ofs;
+        ofs = pos;
         nxt = 0;
     }
 
@@ -644,7 +657,7 @@ struct CVmMemorySourceBlock
 };
 
 /* page list for a memory source */
-class CVmMemorySourceList: public CVmRefCntObj
+class CVmMemorySourceList: public Glk::TADS::TADS3::CVmRefCntObj
 {
 public:
     static const int BlockLen = CVmMemorySourceBlock::BlockLen;
@@ -697,15 +710,15 @@ public:
         size_t bytes_read = 0;
 
         /* limit the length to the remaining bytes in the object */
-        long rem = len_ - get_pos();
-        if ((long)len > rem)
+        size_t rem = len_ - get_pos();
+        if (len > rem)
             len = (size_t)rem;
 
         /* keep going until we satisfy the request */
         while (len != 0)
         {
             /* figure how much we can read from the current block */
-            size_t rem = BlockLen - cur_block_ofs_;
+            rem = BlockLen - cur_block_ofs_;
             size_t cur = (len < rem ? len : rem);
 
             /* read that much */
@@ -922,40 +935,40 @@ public:
     CVmMemorySource(long init_len)
     {
         /* create our underlying page list */
-        pl = new CVmMemorySourceList(init_len);
+        _pl = new CVmMemorySourceList(init_len);
     }
 
     /* clone the data source */
     CVmDataSource *clone(VMG_ const char * /*mode*/)
     {
         /* return a new data source wrapper for our page list */
-        return new CVmMemorySource(pl);
+        return new CVmMemorySource(_pl);
     }
 
     ~CVmMemorySource()
     {
         /* release our underlying page list */
-        pl->release_ref();
+        _pl->release_ref();
     }
     
     /* read bytes */
-    virtual int read(void *buf, size_t len) { return pl->read(buf, len); }
+    virtual int read(void *buf, size_t len) { return _pl->read(buf, len); }
 
     /* read bytes */
-    virtual int readc(void *buf, size_t len) { return pl->readc(buf, len); }
+    virtual int readc(void *buf, size_t len) { return _pl->readc(buf, len); }
 
     /* write bytes */
     virtual int write(const void *buf, size_t len)
-        { return pl->write(buf, len); }
+        { return _pl->write(buf, len); }
 
     /* get the length of the stream's contents */
-    virtual long get_size() { return pl->get_size(); }
+    virtual long get_size() { return _pl->get_size(); }
 
     /* get the current seek offset */
-    virtual long get_pos() { return pl->get_pos(); }
+    virtual long get_pos() { return _pl->get_pos(); }
 
     /* set the seek offset */
-    virtual int seek(long pos, int mode) { return pl->seek(pos, mode); }
+    virtual int seek(long pos, int mode) { return _pl->seek(pos, mode); }
 
     /* flush - we don't buffer, so this does nothing */
     virtual int flush() { return 0; }
@@ -970,11 +983,11 @@ protected:
     CVmMemorySource(CVmMemorySourceList *pl)
     {
         pl->add_ref();
-        this->pl = pl;
+        _pl = pl;
     }
 
     /* our underlying page list */
-    CVmMemorySourceList *pl;
+    CVmMemorySourceList *_pl;
 };
 
 } // End of namespace TADS3
@@ -982,3 +995,4 @@ protected:
 } // End of namespace Glk
 
 #endif
+

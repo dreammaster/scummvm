@@ -38,6 +38,12 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+struct date_parse_result;
+struct date_parse_string;
+class CVmObjDate;
+class CVmDateLocale;
+class CVmTimeZone;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Service class for calendar date conversions.  This converts between
@@ -53,12 +59,12 @@ struct caldate_t
     caldate_t(int y, int m, int d) : y(y), m(m), d(d) { }
 
     /* create from a day number */
-    caldate_t(int32_t dayno) { set_dayno(dayno); }
+    caldate_t(int32 dayno) { set_dayno(dayno); }
 
     /* set to the current date (UTC) */
     void set_now()
     {
-        int32_t dayno, daytime;
+        int32 dayno, daytime;
         now(dayno, daytime);
         set_dayno(dayno);
     }
@@ -69,17 +75,17 @@ struct caldate_t
     /* figure the date on the Julian calendar */
     void julian_date(int &jy, int &jm, int &jd)
     {
-        int32_t z = (int32_t)floor(julian_dayno() + 0.5);
+        int32 z = (int32)floor(julian_dayno() + 0.5);
 
-        int32_t a = z;
-        int32_t b = a + 1524;
-        int32_t c = (int32_t)floor((b - 122.1) / 365.25);
-        int32_t d = (int32_t)floor(365.25 * c);
-        int32_t e = (int32_t)floor((b - d) / 30.6001);
+        int32 va = z;
+        int32 vb = va + 1524;
+        int32 vc = (int32)floor((vb - 122.1) / 365.25);
+        int32 vd = (int32)floor(365.25 * vc);
+        int32 ve = (int32)floor((vb - vd) / 30.6001);
 
-        jm = e < 14 ? e - 1 : e - 13;
-        jy = jm > 2 ? c - 4716 : c - 4715;
-        jd = b - d - (int32_t)floor(30.6001 * e);
+        jm = ve < 14 ? ve - 1 : ve - 13;
+        jy = jm > 2 ? vc - 4716 : vc - 4715;
+        jd = vb - vd - (int32)floor(30.6001 * ve);
     }
 
     /* set my internal (Gregorian) date from a Julian date */
@@ -102,27 +108,27 @@ struct caldate_t
             jy -= 1;
             jm += 12;
         }
-        set_dayno((int32_t)(floor(365.25 * (jy + 4716))
+        set_dayno((int32)(floor(365.25 * (jy + 4716))
                             + floor(30.6001 * (jm + 1))
                             + jd - 1524.5 - 1721119.5));
     }
 
     /* set from a day number */
-    void set_dayno(int32_t dayno)
+    void set_dayno(int32 dayno)
     {
-        int32_t y = (int32_t)floor((10000*(double)dayno + 14780)/3652425.0);
-        int32_t d = dayno - (365*y + divfl(y, 4) - divfl(y, 100)
-                             + divfl(y, 400));
-        if (d < 0)
+        int32 vy = (int32)floor((10000*(double)dayno + 14780)/3652425.0);
+        int32 vd = dayno - (365*vy + divfl(vy, 4) - divfl(vy, 100)
+                             + divfl(vy, 400));
+        if (vd < 0)
         {
-            y -= 1;
-            d = dayno - (365*y + divfl(y, 4) - divfl(y, 100) + divfl(y, 400));
+            vy -= 1;
+            vd = dayno - (365*vy + divfl(vy, 4) - divfl(vy, 100) + divfl(vy, 400));
         }
-        int32_t m = (100*d + 52)/3060;
+        int32 vm = (100*vd + 52)/3060;
 
-        this->y = y + (m+2)/12;
-        this->m = (m + 2)%12 + 1;
-        this->d = d - (m*306 + 5)/10 + 1;
+        this->y = vy + (vm+2)/12;
+        this->m = (vm + 2)%12 + 1;
+        this->d = vd - (vm*306 + 5)/10 + 1;
     }
 
     /*
@@ -143,14 +149,14 @@ struct caldate_t
      *   for positive numbers, but for negative numbers most C
      *   implementations round towards zero.
      */
-    static inline int32_t divfl(int32_t a, int32_t b)
+    static inline int32 divfl(int32 a, int32 b)
     {
         ldiv_t ld = ldiv(a, b);
         return (ld.rem < 0 ? ld.quot - 1 : ld.quot);
     }
 
     /* get the day number of this calendar date */
-    int32_t dayno() const
+    int32 dayno() const
     {
         /* 
          *   Adjust the month to our odd range where the year starts in
@@ -162,14 +168,14 @@ struct caldate_t
         if (mq.rem < 0)
             mq.rem += 12, mq.quot -= 1;
 
-        int m = mq.rem;
-        int y = this->y + mq.quot;
-        return 365*y + divfl(y, 4) - divfl(y, 100) + divfl(y, 400)
-            + (m*306 + 5)/10 + (d-1);
+        int vm = mq.rem;
+        int vy = this->y + mq.quot;
+        return 365*vy + divfl(vy, 4) - divfl(vy, 100) + divfl(vy, 400)
+            + (vm*306 + 5)/10 + (d-1);
     }
 
     /* day number of the Unix Epoch (1/1/1970 UTC) */
-    static const int32_t UNIX_EPOCH_DAYNO = 719468;
+    static const int32 UNIX_EPOCH_DAYNO = 719468;
 
     /* get the weekday for this date (0=Sunday, 1=Monday, etc) */
     int weekday() const
@@ -220,7 +226,7 @@ struct caldate_t
          *   (starting on Monday) belongs to.
          */
         int wday = iso_weekday();
-        int32_t this_thu_dayno = dayno() - (wday-1) + 3;
+        int32 this_thu_dayno = dayno() - (wday-1) + 3;
         caldate_t this_thu(this_thu_dayno);
 
         /* the year containing the Thursday is the week's calendar year */
@@ -235,7 +241,7 @@ struct caldate_t
          */
         caldate_t jan1(this_thu.y, 1, 1);
         int jan1_wday = jan1.weekday();
-        int32_t first_thu_dayno = jan1.dayno() + ((11 - jan1_wday) % 7);
+        int32 first_thu_dayno = jan1.dayno() + ((11 - jan1_wday) % 7);
 
         /*
          *   Calculate the number of weeks (== the number of days divided by
@@ -248,10 +254,10 @@ struct caldate_t
     }
 
     /* get the current system date/time (UTC) */
-    static void now(int32_t &dayno, int32_t &daytime);
+    static void now(int32 &dayno, int32 &daytime);
 
     /* normalize a date/time to bring the time within 00:00-24:00 */
-    static void normalize(int32_t &dayno, int32_t &daytime);
+    static void normalize(int32 &dayno, int32 &daytime);
 
     /* calendar year, month (1=January), and day of month */
     int y;
@@ -268,14 +274,14 @@ struct caldate_t
 struct multicaldate_t
 {
     virtual ~multicaldate_t() { }
-    virtual int32_t dayno() const = 0;
-    virtual void set_dayno(int32_t d) = 0;
+    virtual int32 dayno() const = 0;
+    virtual void set_dayno(int32 d) = 0;
     virtual int weekday() const = 0;
     virtual int iso_weekday() const = 0;
     virtual int iso_weekno(int *year) const = 0;
 
     /* get the day number of January 1 of year 'y' */
-    virtual int32_t jan1_dayno() const = 0;
+    virtual int32 jan1_dayno() const = 0;
 
     /* 
      *   get the week number for this date, for the week starting on the
@@ -310,14 +316,14 @@ protected:
 struct gregcaldate_t: multicaldate_t
 {
     gregcaldate_t() { }
-    gregcaldate_t(int32_t d) { gregcaldate_t::set_dayno(d); }
+    gregcaldate_t(int32 d) { gregcaldate_t::set_dayno(d); }
     
-    virtual int32_t dayno() const
+    virtual int32 dayno() const
     {
         return cd.dayno();
     }
 
-    virtual void set_dayno(int32_t d)
+    virtual void set_dayno(int32 d)
     {
         cd.set_dayno(d);
         y_ = cd.y;
@@ -332,7 +338,7 @@ struct gregcaldate_t: multicaldate_t
         d_ = cd.d = d;
     }
 
-    virtual int32_t jan1_dayno() const
+    virtual int32 jan1_dayno() const
     {
         caldate_t jan1(y_, 1, 1);
         return jan1.dayno();
@@ -347,12 +353,12 @@ struct gregcaldate_t: multicaldate_t
 
 struct julcaldate_t: multicaldate_t
 {
-    virtual int32_t dayno() const
+    virtual int32 dayno() const
     {
         return cd.dayno();
     }
 
-    virtual void set_dayno(int32_t d)
+    virtual void set_dayno(int32 d)
     {
         cd.set_dayno(d);
         cd.julian_date(y_, m_, d_);
@@ -366,7 +372,7 @@ struct julcaldate_t: multicaldate_t
         d_ = d;
     }
 
-    virtual int32_t jan1_dayno() const
+    virtual int32 jan1_dayno() const
     {
         caldate_t jan1;
         jan1.set_julian_date(y_, 1, 1);
@@ -399,7 +405,7 @@ struct julcaldate_t: multicaldate_t
 /*
  *   Forward declarations 
  */
-typedef struct date_parse_result date_parse_result;
+typedef date_parse_result date_parse_result;
 
 
 /* ------------------------------------------------------------------------ */
@@ -413,13 +419,13 @@ typedef struct date_parse_result date_parse_result;
 struct vm_date_ext
 {
     /* allocate the structure */
-    static vm_date_ext *alloc_ext(VMG_ class CVmObjDate *self);
+    static vm_date_ext *alloc_ext(VMG_ CVmObjDate *self);
 
     /* day number - number of days since March 1, year 0000 UTC */
-    int32_t dayno;
+    int32 dayno;
 
     /* time of day - number of milliseconds past midnight UTC on dayno*/
-    int32_t daytime;
+    int32 daytime;
 };
 
 
@@ -428,10 +434,9 @@ struct vm_date_ext
  *   CVmObjDate intrinsic class definition
  */
 
-class CVmObjDate: public CVmObject
-{
+class CVmObjDate: public CVmObject {
     friend class CVmMetaclassDate;
-    
+
 public:
     /* metaclass registration object */
     static class CVmMetaclass *metaclass_reg_;
@@ -450,8 +455,8 @@ public:
         { return vm_objp(vmg_ obj)->is_of_metaclass(metaclass_reg_); }
 
     /* get my date and time values */
-    int32_t get_dayno() const { return get_ext()->dayno; }
-    int32_t get_daytime() const { return get_ext()->daytime; }
+    int32 get_dayno() const { return get_ext()->dayno; }
+    int32 get_daytime() const { return get_ext()->daytime; }
 
     /* create dynamically using stack arguments */
     static vm_obj_id_t create_from_stack(VMG_ const uchar **pc_ptr,
@@ -459,7 +464,7 @@ public:
 
     /* create with a given timestamp */
     static vm_obj_id_t create(VMG_ int in_root_set,
-                              int32_t dayno, int32_t daytime);
+                              int32 dayno, int32 daytime);
 
     /* create from an os_time_t value */
     static vm_obj_id_t create_from_time_t(VMG_ int in_root_set, os_time_t t);
@@ -493,10 +498,10 @@ public:
     /* format using a template */
     size_t format_date(VMG_ char *buf, size_t buflen,
                        const char *fmt, size_t fmtlen,
-                       class CVmDateLocale *lc,
+                       CVmDateLocale *lc,
                        const multicaldate_t *date,
-                       int32_t dayno, int32_t daytime,
-                       const char *tzabbr, int32_t tzofs) const;
+                       int32 dayno, int32 daytime,
+                       const char *tzabbr, int32 tzofs) const;
 
     /* date arithmetic - add an integer or BigNumber to add days */
     int add_val(VMG_ vm_val_t *result, vm_obj_id_t self, const vm_val_t *val);
@@ -559,34 +564,34 @@ protected:
     CVmObjDate() { ext_ = 0; }
 
     /* create with a given timestamp */
-    CVmObjDate(VMG_ int32_t dayno, uint32_t daytime);
+    CVmObjDate(VMG_ int32 dayno, uint32 daytime);
 
     /* get my extension data */
     vm_date_ext *get_ext() const { return (vm_date_ext *)ext_; }
 
     /* get my date/time in the given time zone; returns the format abbr */
     const char *get_local_time(
-        int32_t &dayno, int32_t &daytime, class CVmTimeZone *tz) const
-        { int32_t ofs; return get_local_time(dayno, daytime, ofs, tz); }
+        int32 &dayno, int32 &daytime, CVmTimeZone *tz) const
+        { int32 ofs; return get_local_time(dayno, daytime, ofs, tz); }
 
     /* 
      *   get my date/time in the given time zone, filling in the time zone's
      *   offset from UTC in milliseconds 
      */
     const char *get_local_time(
-        int32_t &dayno, int32_t &daytime, int32_t &tzofs,
-        class CVmTimeZone *tz) const;
+        int32 &dayno, int32 &daytime, int32 &tzofs,
+        CVmTimeZone *tz) const;
 
     /* get my date (as a day number since 1/1/0000) in the local time zone */
-    int32_t get_local_date(class CVmTimeZone *tz) const
+    int32 get_local_date(CVmTimeZone *tz) const
     {
-        int32_t dayno, daytime;
+        int32 dayno, daytime;
         (void)get_local_time(dayno, daytime, tz);
         return dayno;
     }
 
     /* get a TimeZone argument to one of our methods */
-    static class CVmTimeZone *get_tz_arg(VMG_ uint argn, uint argc);
+    static CVmTimeZone *get_tz_arg(VMG_ uint argn, uint argc);
 
     /* load or reload image data */
     void load_image_data(VMG_ const char *ptr, size_t siz);
@@ -595,14 +600,14 @@ protected:
     static int parse_string_fmt(
         VMG_ date_parse_result *res,
         const char *&str, size_t &len,
-        const char *fmt, size_t fmtlen, class CVmDateLocale *lc);
+        const char *fmt, size_t fmtlen, CVmDateLocale *lc);
     static int parse_date_string(
-        VMG_ int32_t &dayno, int32_t &daytime,
-        const char *str, const vm_val_t *custom, class CVmDateLocale *lc,
+        VMG_ int32 &dayno, int32 &daytime,
+        const char *str, const vm_val_t *custom, CVmDateLocale *lc,
         multicaldate_t *cal,
-        int32_t refday, int32_t reftime, CVmTimeZone *reftz,
-        struct date_parse_result *resultp,
-        struct date_parse_string *fmtlist, int *nfmtlist);
+        int32 refday, int32 reftime, CVmTimeZone *reftz,
+        date_parse_result *resultp,
+        date_parse_string *fmtlist, int *nfmtlist);
 
     /* property evaluator - undefined function */
     int getp_undef(VMG_ vm_obj_id_t, vm_val_t *, uint *) { return FALSE; }

@@ -63,13 +63,13 @@ public:
 	 * Create a UTF-8 string pointer with an underlying string.  The
 	 * pointer must point to the first byte of a valid character.  
 	 */
-	utf8_ptr(char *str) { set(str); }
-	utf8_ptr(const char *str) { set(str); }
+	utf8_ptr(char *str) : _pc(nullptr), _pnc(nullptr) { set(str); }
+	utf8_ptr(const char *str) : _pc(nullptr), _pnc(nullptr) { set(str); }
 
 	/**
 	 * Create from another utf8 pointer
 	 */
-	utf8_ptr(const utf8_ptr *p) {
+	utf8_ptr(const utf8_ptr *p) : _pc(nullptr), _pnc(nullptr) {
 		if (p->_pnc)
 			set(p->_pnc);
 		else
@@ -709,7 +709,7 @@ public:
 	static size_t to_wchar(wchar_t *buf, size_t bufcnt, const char *str, size_t len) {
 		// scan the string
 		int cnt = 0;
-		for (utf8_ptr p((char *)str) ; len != 0 ; p.inc(&len), ++cnt) {
+		for (utf8_ptr p(str) ; len != 0 ; p.inc(&len), ++cnt) {
 			/* if there's room, add this character to the output buffer */
 			if (bufcnt > 0) {
 				*buf++ = p.getch();
@@ -725,76 +725,89 @@ private:
 	char *_pnc;
 };
 
-
-/* ------------------------------------------------------------------------ */
-/*
- *   Case folding utf8 string reader 
+/**
+ * Case folding utf8 string reader 
  */
-class Utf8FoldStr
-{
+class Utf8FoldStr {
 public:
-    Utf8FoldStr(const char *p, size_t bytelen)
-    {
-        /* set up at the start of the string */
-        this->p.set((char *)p);
-        this->rem = bytelen;
+	Utf8FoldStr(const char *p, size_t bytelen) {
+		// set up at the start of the string
+		_p.set(p);
+		_rem = bytelen;
 
-        /* null-terminate our special one-byte identity conversion buffer */
-        ie[1] = 0;
+		// null-terminate our special one-byte identity conversion buffer
+		_ie[1] = 0;
 
-        /* start without anything loaded */
-        fpbase = ie;
-        fp = &ie[1];
-    }
+		// start without anything loaded
+		_fpbase = _ie;
+		_fp = &_ie[1];
+	}
 
-    /* get the current byte offset */
-    const char *getptr() const { return p.getptr(); }
+	/**
+	 * Get the current byte offset
+	 */
+	const char *getptr() const { return _p.getptr(); }
 
-    /* is a character available? */
-    int more() const { return rem != 0 || *fp != 0 || fp == ie; }
+	/**
+	 * Is a character available?
+	*/
+	int more() const { return _rem != 0 || *_fp != 0 || _fp == _ie; }
 
-    /* are we at a character boundary in the original string? */
-    int at_boundary() const { return fp != fpbase && *fp == 0; }
+	/**
+	 * Are we at a character boundary in the original string?
+	 */
+	int at_boundary() const { return _fp != _fpbase && *_fp == 0; }
 
-    /* get the next character */
-    wchar_t getch()
-    {
-        /* if the expansion is exhausted, expand the next source character */
-        if (fp != ie && *fp == 0)
-        {
-            /* if there's nothing left in the source string, we're done */
-            if (rem == 0)
-                return 0;
+	/**
+	 * Get the next character
+	 */
+	wchar_t getch() {
+		// if the expansion is exhausted, expand the next source character
+		if (_fp != _ie && *_fp == 0) {
+			// if there's nothing left in the source string, we're done
+			if (_rem == 0)
+				return 0;
 
-            /* get the next source character */
-            wchar_t ch = p.getch();
-            p.inc(&rem);
+			// Get the next source character
+			wchar_t ch = _p.getch();
+			_p.inc(&_rem);
 
-            /* get its case-folded expansion */
-            if ((fp = t3_to_fold(ch)) == 0)
-            {
-                ie[0] = ch;
-                fpbase = fp = ie;
-            }
-        }
+			// get its case-folded expansion
+			if ((_fp = t3_to_fold(ch)) == 0) {
+				_ie[0] = ch;
+				_fpbase = _fp = _ie;
+			}
+		}
         
-        /* return the next expansion character */
-        return *fp++;
-    }
+		// Return the next expansion character
+		return *_fp++;
+	}
 
 private:
-    /* current position in case folding expansion of current 's' character */
-    const wchar_t *fp;
+	/**
+	 * current position in case folding expansion of current 's' character
+	 */
+	const wchar_t *_fp;
 
-    /* start of current expansion */
-    const wchar_t *fpbase;
+	/**
+	 * Start of current expansion
+	 */
+	const wchar_t *_fpbase;
 
-    /* buffer for identity expansions */
-    wchar_t ie[2];
+	/**
+	 * Buffer for identity expansions
+	 */
+	wchar_t _ie[2];
 
-    /* pointer into original string source, and remaining length in bytes */
-    utf8_ptr p;
-    size_t rem;
+	/**
+	 * Pointer into original string source, and remaining length in bytes
+	 */
+	utf8_ptr _p;
+
+	/**
+	 * Remainder of string
+	 */
+	size_t _rem;
 };
 
 } // End of namespace TADS3
@@ -802,3 +815,4 @@ private:
 } // End of namespace Glk
 
 #endif
+

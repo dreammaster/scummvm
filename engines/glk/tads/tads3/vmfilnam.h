@@ -40,6 +40,8 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class CVmObjFileName;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   The image file data block is arranged as follows:
@@ -61,7 +63,7 @@ namespace TADS3 {
 struct vm_filnam_ext
 {
     /* allocate the structure */
-    static vm_filnam_ext *alloc_ext(VMG_ class CVmObjFileName *self,
+    static vm_filnam_ext *alloc_ext(VMG_ CVmObjFileName *self,
                                     int32_t sfid, const char *str, size_t len);
     
     /* get the length of the string, and a pointer to the string buffer */
@@ -98,8 +100,7 @@ struct vm_filnam_ext
  *   CVmObjFileName intrinsic class definition
  */
 
-class CVmObjFileName: public CVmObject
-{
+class CVmObjFileName: public CVmObject {
     friend class CVmMetaclassFileName;
     
 public:

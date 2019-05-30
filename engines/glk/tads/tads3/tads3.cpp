@@ -32,6 +32,8 @@ TADS3::TADS3(OSystem *syst, const GlkGameDescription &gameDesc) : TADS(syst, gam
 }
 
 void TADS3::runGame() {
+	CVmMainClientConsole clientifc;
+
 	// Initialize the OS layer
 	os_init(nullptr, nullptr, 0, 0, 0);
 	os_instbrk(true);

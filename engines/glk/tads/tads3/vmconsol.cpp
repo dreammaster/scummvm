@@ -1,43 +1,24 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header$";
-#endif
-
-/* 
- *   Copyright (c) 1987, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmconsol.cpp - TADS 3 console input reader and output formatter
-Function
-  Provides console input and output for the TADS 3 built-in function set
-  for the T3 VM, including the output formatter.
-
-  T3 uses the UTF-8 character set to represent character strings.  The OS
-  functions use the local character set.  We perform the mapping between
-  UTF-8 and the local character set within this module, so that OS routines
-  see local characters only, not UTF-8.
-
-  This code is based on the TADS 2 output formatter, but has been
-  substantially reworked for C++, Unicode, and the slightly different
-  TADS 3 formatting model.
-Notes
-
-Returns
-  None
-Modified
-  08/25/99 MJRoberts  - created from TADS 2 output formatter
-*/
-
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include "glk/tads/tads3/wchar.h"
 
 #include "glk/tads/os_glk.h"
 #include "glk/tads/tads3/t3std.h"
@@ -53,6 +34,10 @@ Modified
 #include "glk/tads/tads3/vmerr.h"
 #include "glk/tads/tads3/vmobj.h"
 
+
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -144,7 +129,7 @@ int CVmFormatterLog::open_log_file(VMG_ CVmNetFile *nf)
     lognf_ = nf;
 
     /* open the local file */
-    logfp_ = osfopwt(lognf_->lclfname, OSFTLOG);
+    logfp_ = osfopwt(lognf_->_lclfname, OSFTLOG);
 
     /* if we couldn't open the file, abandon the network file descriptor */
     if (logfp_ == 0)
@@ -455,7 +440,7 @@ void CVmFormatter::write_text(VMG_ const wchar_t *txt, size_t cnt,
 void CVmFormatter::flush(VMG_ vm_nl_type nl)
 {
     int cnt;
-    vm_nl_type write_nl;
+    vm_nl_type write_nl = VM_NL_NONE;
 
     /* null-terminate the current output line buffer */
     linebuf_[linepos_] = '\0';
@@ -1020,9 +1005,9 @@ void CVmFormatter::buffer_expchar(VMG_ wchar_t c)
                 html_passthru_state_ = VMCON_HPS_MARKUP_END;
 
                 /* note if entering or exiting a PRE tag */
-                if (stricmp(html_passthru_tag_, "pre") == 0)
+                if (scumm_stricmp(html_passthru_tag_, "pre") == 0)
                     ++html_pre_level_;
-                else if (stricmp(html_passthru_tag_, "/pre") == 0
+                else if (scumm_stricmp(html_passthru_tag_, "/pre") == 0
                          && html_pre_level_ != 0)
                     --html_pre_level_;
             }
@@ -2259,7 +2244,7 @@ int CVmConsole::open_script_file(VMG_ CVmNetFile *nf, const vm_val_t *filespec,
         return 1;
 
     /* open the local file */
-    osfildef *fp = osfoprt(nf->lclfname, OSFTCMD);
+    osfildef *fp = osfoprt(nf->_lclfname, OSFTCMD);
 
     /* if that failed, silently ignore the request */
     if (fp == 0)
@@ -2491,7 +2476,7 @@ int CVmConsole::open_command_log(VMG_ CVmNetFile *nf, int event_script)
         return 1;
     
     /* open the file */
-    osfildef *fp = osfopwt(nf->lclfname, OSFTCMD);
+    osfildef *fp = osfopwt(nf->_lclfname, OSFTCMD);
     if (fp != 0)
     {
         /* success - remember the file handle and net descriptor */
@@ -3194,12 +3179,12 @@ static int read_script_token(char *buf, size_t buflen, osfildef *fp)
     int c;
 
     /* skip leading whitespace */
-    for (c = osfgetc(fp) ; isspace(c) ; c = osfgetc(fp)) ;
+    for (c = osfgetc(fp) ; Common::isSpace(c) ; c = osfgetc(fp)) ;
 
     /* read from the file until we reach the end of the token */
     for (p = buf ;
          p < buf + buflen - 1
-             && c != '>' && !isspace(c)
+             && c != '>' && !Common::isSpace(c)
              && c != '\n' && c != '\r' && c != EOF ; )
     {
         /* store this character */
@@ -3308,7 +3293,7 @@ int CVmConsole::read_script_event_type(int *evt, unsigned long *attrs)
         c = read_script_token(tag, sizeof(tag), fp);
 
         /* check for attributes */
-        while (isspace(c))
+        while (Common::isSpace(c))
         {
             char attr[32];
             static const struct
@@ -3333,7 +3318,7 @@ int CVmConsole::read_script_event_type(int *evt, unsigned long *attrs)
             for (ap = attrlist ; ap->name != 0 ; ++ap)
             {
                 /* check for a match */
-                if (stricmp(attr, ap->name) == 0)
+                if (scumm_stricmp(attr, ap->name) == 0)
                 {
                     /* if the caller wants the flag, set it */
                     if (attrs != 0)
@@ -3360,7 +3345,7 @@ int CVmConsole::read_script_event_type(int *evt, unsigned long *attrs)
         for (tp = tags ; tp->tag != 0 ; ++tp)
         {
             /* check for a match to this tag name */
-            if (stricmp(tp->tag, tag) == 0)
+            if (scumm_stricmp(tp->tag, tag) == 0)
             {
                 /* got it - return the event type */
                 *evt = tp->evt;
@@ -4069,3 +4054,8 @@ void CVmConsoleLog::delete_obj(VMG0_)
     /* do the inherited work */
     CVmConsole::delete_obj(vmg0_);
 }
+
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk
+

@@ -39,6 +39,7 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+struct vm_bif_desc;
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -58,8 +59,7 @@ struct vmrun_save_ctx
  *   a caller can set up one of these structures to describe the caller.
  *   We'll store this in the stack in the recursive context slot.
  */
-struct vm_rcdesc
-{
+struct vm_rcdesc {
     /* no-op construction */
     vm_rcdesc() { }
     
@@ -69,13 +69,13 @@ struct vm_rcdesc
     /* initialize for a system caller */
     void init(const char *name)
     {
-        this->name = name;
-        bifptr.set_nil();
-        self.set_nil();
-        method_idx = 0;
-        argc = 0;
-        argp = 0;
-        caller_addr = 0;
+        _name = name;
+        _bifptr.set_nil();
+        _self.set_nil();
+        _method_idx = 0;
+        _argc = 0;
+        _argp = 0;
+        _caller_addr = 0;
     }
 
     /* initialize for a system caller, including a return address */
@@ -83,7 +83,7 @@ struct vm_rcdesc
 
     /* construct for a built-in function */
     vm_rcdesc(VMG_ const char *name,
-              const struct vm_bif_desc *funcset, int idx,
+              const vm_bif_desc *funcset, int idx,
               vm_val_t *argp, int argc)
     {
         init(vmg_ name, funcset, idx, argp, argc);
@@ -91,7 +91,7 @@ struct vm_rcdesc
 
     /* initialize for a built-in function */
     void init(VMG_ const char *name,
-              const struct vm_bif_desc *funcset, int idx,
+              const vm_bif_desc *funcset, int idx,
               vm_val_t *argp, int argc);
     
     /* construct for an intrinsic class method */
@@ -137,7 +137,7 @@ struct vm_rcdesc
     }
 
     /* is there a return address available in the calling frame? */
-    int has_return_addr() const { return caller_addr != 0; }
+    int has_return_addr() const { return _caller_addr != 0; }
 
     /* 
      *   Compute the return address in the calling frame.  This requires
@@ -148,29 +148,29 @@ struct vm_rcdesc
     const uchar *get_return_addr() const;
 
     /* pointer to first argument in stack */
-    vm_val_t *argp;
+    vm_val_t *_argp;
 
     /* number of arguments */
-    int argc;
+    int _argc;
 
     /* descriptive name, for error messages */
-    const char *name;
+    const char * _name;
 
     /* built-in function pointer, if the caller is a bif */
-    vm_val_t bifptr;
+    vm_val_t _bifptr;
 
     /* 'self', if the caller is an intrinsic class */
-    vm_val_t self;
+    vm_val_t _self;
 
     /* for an intrinsic class caller, the method index of the caller */
-    unsigned short method_idx;
+    unsigned short _method_idx;
 
     /* 
      *   Byte-code address of the instruction in the calling frame that
      *   triggered the call.  The return address can be computed by adding
      *   the length of that instruction to this address. 
      */
-    const uchar *caller_addr;
+    const uchar * _caller_addr;
 };
 
 
@@ -976,7 +976,7 @@ public:
         { push()->set_int(intval); }
 
     /* push an enumerator value */
-    void push_enum(VMG_ uint32_t intval)
+    void push_enum(VMG_ uint32 intval)
         { push()->set_enum(intval); }
 
     /* push a C string value */
@@ -1404,17 +1404,17 @@ protected:
      *   get a signed 16-bit byte-code operand, incrementing the
      *   instruction pointer past the operand 
      */
-    int16_t get_op_int16(const uchar **p)
+    int16 get_op_int16(const uchar **p)
     {
-        int16_t ret = (int16_t)osrp2s(*p);
+		int16 ret = osrp2s(*p);
         *p += 2;
         return ret;
     }
 
     /* get an unsigned 16-bit byte-code operand */
-    uint16_t get_op_uint16(const uchar **p)
+    uint16 get_op_uint16(const uchar **p)
     {
-        uint16_t ret = (uint16_t)osrp2(*p);
+        uint16 ret = (uint16)osrp2(*p);
         *p += 2;
         return ret;
     }
@@ -1428,9 +1428,9 @@ protected:
     }
 
     /* get an unsigned 32-bit byte-code operand */
-    uint32_t get_op_uint32(const uchar **p)
+    uint32 get_op_uint32(const uchar **p)
     {
-        uint32_t ret = (uint32_t)t3rp4u(*p);
+        uint32 ret = (uint32)t3rp4u(*p);
         *p += 4;
         return ret;
     }

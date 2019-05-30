@@ -99,7 +99,20 @@ namespace TADS {
 typedef Common::Stream osfildef;
 
 /* Directory handle for searches via os_open_dir() et al. */
-typedef Common::FSNode *osdirhdl_t;
+struct FSDirectory {
+	Common::FSList _list;
+	Common::FSList::iterator _i;
+	bool _inProgress;
+
+	FSDirectory() : _inProgress(false) {}
+};
+typedef FSDirectory *osdirhdl_t;
+
+#define	S_IFIFO	0x1000	/* FIFO */
+#define	S_IFCHR	0x2000	/* Character */
+#define	S_IFBLK	0x3000	/* Block */
+#define	S_IFDIR	0x4000	/* Directory */
+#define	S_IFREG	0x8000	/* Regular */
 
 /* file type/mode bits */
 #define OSFMODE_FILE    S_IFREG

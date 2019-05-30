@@ -63,6 +63,8 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+struct vm_rcdesc;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   File modes for CVmNetFile::open() 
@@ -156,8 +158,7 @@ public:
      *   This accepts string filenames, TemporaryFile (CVmObjTemporaryFile)
      *   objects, or TadsObject objects providing the file spec interface.
      */
-    static CVmNetFile *open(
-        VMG_ const vm_val_t *filespec, const struct vm_rcdesc *rc,
+    static CVmNetFile *open(VMG_ const vm_val_t *filespec, const vm_rcdesc *rc,
         int mode, os_filetype_t typ, const char *mime_type);
 
     /*
@@ -184,12 +185,12 @@ public:
 #endif
 
     /* create a directory as named in the file object */
-    void mkdir_local(VMG_ int create_parents);
-    void mkdir(VMG_ int create_parents)
+    void makedir_local(VMG_ int create_parents);
+    void makedir(VMG_ int create_parents)
 #ifdef TADSNET
         ;
 #else
-        { mkdir_local(vmg_ create_parents); }
+        { makedir_local(vmg_ create_parents); }
 #endif
 
     /* remove the directory named in the file object */
@@ -208,7 +209,7 @@ public:
     int is_net_file() const
     {
         /* it's a network file if it has a server-side filename */
-        return srvfname != 0;
+        return _srvfname != 0;
     }
 
     /*
@@ -224,7 +225,7 @@ public:
         ;
 #else
     {
-        return osfmode(lclfname, follow_links, mode, attrs);
+        return osfmode(_lclfname, follow_links, mode, attrs);
     }
 #endif
 
@@ -237,7 +238,7 @@ public:
         ;
 #else
     {
-        return os_file_stat(lclfname, follow_links, stat);
+        return os_file_stat(_lclfname, follow_links, stat);
     }
 #endif
 
@@ -251,7 +252,7 @@ public:
         ;
 #else
     {
-        return os_resolve_symlink(lclfname, target, target_size);
+        return os_resolve_symlink(_lclfname, target, target_size);
     }
 #endif
     
@@ -282,7 +283,7 @@ public:
      *   Enumerate files in the directory through a callback function. 
      */
     int readdir_cb(VMG_ const char *nominal_path,
-                   const struct vm_rcdesc *rc, const vm_val_t *cb,
+                   const vm_rcdesc *rc, const vm_val_t *cb,
                    int recursive)
 #ifdef TADSNET
         ;
@@ -295,7 +296,7 @@ public:
     /* read a local directory */
     int readdir_local(VMG_ const char *nominal_path,
                       vm_val_t *retval,
-                      const struct vm_rcdesc *rc, const vm_val_t *cb,
+                      const vm_rcdesc *rc, const vm_val_t *cb,
                       int recursive);
 
     /*
@@ -352,13 +353,13 @@ public:
          *.  - if we opened it in "create" mode, set the file's OS type code 
          */
         int err = 0;
-        if ((mode & NETF_DELETE) != 0)
+        if ((_mode & NETF_DELETE) != 0)
         {
-            if (osfdel(lclfname))
+            if (osfdel(_lclfname))
                 err = VMERR_DELETE_FILE;
         }
-        else if ((mode & NETF_CREATE) != 0)
-            os_settype(lclfname, typ);
+        else if ((_mode & NETF_CREATE) != 0)
+            os_settype(_lclfname, _typ);
 
         /* delete self */
         delete this;
@@ -401,56 +402,55 @@ public:
      *   in the system temp directory; if the file isn't on the storage
      *   server, this is simply the local file name.  
      */
-    char *lclfname;
+    char *_lclfname;
 
     /* special file ID */
-    int sfid;
+    int _sfid;
 
     /* 
      *   The server filename.  When we're operating on a storage server file,
      *   this is the name of the file on the server; otherwise it's null.
      */
-    char *srvfname;
+    char * _srvfname;
 
     /*
      *   The file spec object.  This can be a TemporaryFile object, or a
      *   TadsObject object with a file spec interface.  If the file was
      *   opened based on a string filename, this is nil.  
      */
-    vm_obj_id_t filespec;
+    vm_obj_id_t _filespec;
 
     /* the file mode */
-    int mode;
+    int _mode;
 
     /* is this a temporary file? */
-    int is_temp;
+    int _is_temp;
 
     /* the OS file type */
-    os_filetype_t typ;
+    os_filetype_t _typ;
 
     /* MIME type of the file */
-    char *mime_type;
+    char *_mime_type;
 
 protected:
     CVmNetFile(const char *lclfname, int sfid, const char *srvfname,
                int mode, os_filetype_t typ, const char *mime_type)
     {
         /* save the filenames, mode, and type */
-        this->lclfname = lib_copy_str(lclfname);
-        this->srvfname = lib_copy_str(srvfname);
-        this->sfid = sfid;
-        this->mode = mode;
-        this->typ = typ;
-        this->mime_type = lib_copy_str(mime_type);
-        this->filespec = VM_INVALID_OBJ;
-        this->is_temp = FALSE;
+        _lclfname = lib_copy_str(lclfname);
+        _srvfname = lib_copy_str(srvfname);
+        _sfid = sfid;
+        _mode = mode;
+        _typ = typ;
+        _mime_type = lib_copy_str(mime_type);
+        _filespec = VM_INVALID_OBJ;
+        _is_temp = FALSE;
     }
 
-    ~CVmNetFile()
-    {
-        lib_free_str(lclfname);
-        lib_free_str(srvfname);
-        lib_free_str(mime_type);
+    ~CVmNetFile() {
+        lib_free_str(_lclfname);
+        lib_free_str(_srvfname);
+        lib_free_str(_mime_type);
     }
 
     /* build the full server-side filename for a given file */

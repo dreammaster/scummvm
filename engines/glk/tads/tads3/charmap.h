@@ -127,65 +127,65 @@ protected:
     static int name_is_ascii_synonym(const char *table_name)
     {
         /* accept any of the various synonyms for ASCII */
-        return (stricmp(table_name, "us-ascii") == 0
-                || stricmp(table_name, "asc7dflt") == 0
-                || stricmp(table_name, "ascii") == 0
-                || stricmp(table_name, "iso646-us") == 0
-                || stricmp(table_name, "iso-ir-6") == 0
-                || stricmp(table_name, "cp367") == 0
-                || stricmp(table_name, "us") == 0);
+        return (scumm_stricmp(table_name, "us-ascii") == 0
+                || scumm_stricmp(table_name, "asc7dflt") == 0
+                || scumm_stricmp(table_name, "ascii") == 0
+                || scumm_stricmp(table_name, "iso646-us") == 0
+                || scumm_stricmp(table_name, "iso-ir-6") == 0
+                || scumm_stricmp(table_name, "cp367") == 0
+                || scumm_stricmp(table_name, "us") == 0);
     }
 
     /* check for a utf-8 synonym */
     static int name_is_utf8_synonym(const char *table_name)
     {
-        return (stricmp(table_name, "utf-8") == 0
-                || stricmp(table_name, "utf8") == 0);
+        return (scumm_stricmp(table_name, "utf-8") == 0
+                || scumm_stricmp(table_name, "utf8") == 0);
     }
 
     /* check for ucs2-le synonyms */
     static int name_is_ucs2le_synonym(const char *table_name)
     {
-        return (stricmp(table_name, "utf-16le") == 0
-                || stricmp(table_name, "utf16le") == 0
-                || stricmp(table_name, "utf_16le") == 0
-                || stricmp(table_name, "unicodel") == 0
-                || stricmp(table_name, "unicode-l") == 0
-                || stricmp(table_name, "unicode-le") == 0
-                || stricmp(table_name, "ucs-2le") == 0
-                || stricmp(table_name, "ucs2le") == 0);
+        return (scumm_stricmp(table_name, "utf-16le") == 0
+                || scumm_stricmp(table_name, "utf16le") == 0
+                || scumm_stricmp(table_name, "utf_16le") == 0
+                || scumm_stricmp(table_name, "unicodel") == 0
+                || scumm_stricmp(table_name, "unicode-l") == 0
+                || scumm_stricmp(table_name, "unicode-le") == 0
+                || scumm_stricmp(table_name, "ucs-2le") == 0
+                || scumm_stricmp(table_name, "ucs2le") == 0);
     }
 
     /* check for ucs2-be synonyms */
     static int name_is_ucs2be_synonym(const char *table_name)
     {
-        return (stricmp(table_name, "utf-16be") == 0
-                || stricmp(table_name, "utf16be") == 0
-                || stricmp(table_name, "utf_16be") == 0
-                || stricmp(table_name, "unicodeb") == 0
-                || stricmp(table_name, "unicode-b") == 0
-                || stricmp(table_name, "unicode-be") == 0
-                || stricmp(table_name, "ucs-2be") == 0
-                || stricmp(table_name, "ucs2be") == 0);
+        return (scumm_stricmp(table_name, "utf-16be") == 0
+                || scumm_stricmp(table_name, "utf16be") == 0
+                || scumm_stricmp(table_name, "utf_16be") == 0
+                || scumm_stricmp(table_name, "unicodeb") == 0
+                || scumm_stricmp(table_name, "unicode-b") == 0
+                || scumm_stricmp(table_name, "unicode-be") == 0
+                || scumm_stricmp(table_name, "ucs-2be") == 0
+                || scumm_stricmp(table_name, "ucs2be") == 0);
     }
 
     /* check a name to see if it matches one of the names for ISO 8859-1 */
     static int name_is_8859_1_synonym(const char *table_name)
     {
         /* accept any of the various names for ISO 8859-1 */
-        return (stricmp(table_name, "iso-8859-1") == 0
-                || stricmp(table_name, "iso_8859-1") == 0
-                || stricmp(table_name, "iso_8859_1") == 0
-                || stricmp(table_name, "iso8859-1") == 0
-                || stricmp(table_name, "iso8859_1") == 0
-                || stricmp(table_name, "8859-1") == 0
-                || stricmp(table_name, "8859_1") == 0
-                || stricmp(table_name, "iso-ir-100") == 0
-                || stricmp(table_name, "latin1") == 0
-                || stricmp(table_name, "latin-1") == 0
-                || stricmp(table_name, "l1") == 0
-                || stricmp(table_name, "iso1") == 0
-                || stricmp(table_name, "cp819") == 0);
+        return (scumm_stricmp(table_name, "iso-8859-1") == 0
+                || scumm_stricmp(table_name, "iso_8859-1") == 0
+                || scumm_stricmp(table_name, "iso_8859_1") == 0
+                || scumm_stricmp(table_name, "iso8859-1") == 0
+                || scumm_stricmp(table_name, "iso8859_1") == 0
+                || scumm_stricmp(table_name, "8859-1") == 0
+                || scumm_stricmp(table_name, "8859_1") == 0
+                || scumm_stricmp(table_name, "iso-ir-100") == 0
+                || scumm_stricmp(table_name, "latin1") == 0
+                || scumm_stricmp(table_name, "latin-1") == 0
+                || scumm_stricmp(table_name, "l1") == 0
+                || scumm_stricmp(table_name, "iso1") == 0
+                || scumm_stricmp(table_name, "cp819") == 0);
     }
 
     /* reference count */

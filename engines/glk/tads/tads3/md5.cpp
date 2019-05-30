@@ -1,60 +1,32 @@
-/*
-  Copyright (C) 1999, 2000, 2002 Aladdin Enterprises.  All rights reserved.
-
-  This software is provided 'as-is', without any express or implied
-  warranty.  In no event will the authors be held liable for any damages
-  arising from the use of this software.
-
-  Permission is granted to anyone to use this software for any purpose,
-  including commercial applications, and to alter it and redistribute it
-  freely, subject to the following restrictions:
-
-  1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
-  2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
-  3. This notice may not be removed or altered from any source distribution.
-
-  L. Peter Deutsch
-  ghost@aladdin.com
-
- */
-/* $Id: md5.c,v 1.6 2002/04/13 19:20:28 lpd Exp $ */
-/*
-  Independent implementation of MD5 (RFC 1321).
-
-  This code implements the MD5 Algorithm defined in RFC 1321, whose
-  text is available at
-        http://www.ietf.org/rfc/rfc1321.txt
-  The code is derived from the text of the RFC, including the test suite
-  (section A.5) but excluding the rest of Appendix A.  It does not include
-  any code or documentation that is identified in the RFC as being
-  copyrighted.
-
-  The original and principal author of md5.c is L. Peter Deutsch
-  <ghost@aladdin.com>.  Other authors are noted in the change history
-  that follows (in reverse chronological order):
-
-  2002-04-13 lpd Clarified derivation from RFC 1321; now handles byte order
-        either statically or dynamically; added missing #include <string.h>
-        in library.
-  2002-03-11 lpd Corrected argument list for main(), and added int return
-        type, in test program and T value program.
-  2002-02-21 lpd Added missing #include <stdio.h> in test program.
-  2000-07-03 lpd Patched to eliminate warnings about "constant is
-        unsigned in ANSI C, signed in traditional"; made test program
-        self-checking.
-  1999-11-04 lpd Edited comments slightly for automatic TOC extraction.
-  1999-10-18 lpd Fixed typo in header comment (ansi2knr rather than md5).
-  1999-05-03 lpd Original version.
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
 
 #include "glk/tads/tads3/md5.h"
-#include "glk/tads/tads3/t3std.h"  // MJR addition
-#include "glk/tads/tads3/vmdatasrc.h" // MJR addition
-#include <string.h>
+#include "glk/tads/tads3/t3std.h"
+#include "glk/tads/tads3/vmdatasrc.h"
+
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 #undef BYTE_ORDER       /* 1 = big-endian, -1 = little-endian, 0 = unknown */
 #ifdef ARCH_IS_BIG_ENDIAN
@@ -446,3 +418,7 @@ void md5_datasrc(char *hash, class CVmDataSource *src, unsigned long len)
     /* null-terminate the output string */
     *hash = '\0';
 }
+
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

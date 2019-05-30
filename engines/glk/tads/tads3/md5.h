@@ -47,9 +47,13 @@
  * 1999-05-03 lpd Original version.
  */
 
+#include "common/scummsys.h"
+
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
+
+class CVmDataSource;
 
 /*
  * This package supports both compile-time and run-time determination of CPU
@@ -96,7 +100,7 @@ void md5_ez(char *hash, const char *msg, size_t len);
  *   returning printable hex.  The hash buffer must be at least 33 characters
  *   long.  [MJR addition] 
  */
-void md5_datasrc(char *hash, class CVmDataSource *src, unsigned long len);
+void md5_datasrc(char *hash, CVmDataSource *src, unsigned long len);
 
 //#ifdef __cplusplus
 //}  /* end extern "C" */

@@ -1,33 +1,24 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header$";
-#endif
-
-/* 
- *   Copyright (c) 1999, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmbifl.cpp - built-in function - Load-time resolution
-Function
-  This is a version of the built-in function interface for resolving
-  built-ins on loading the image file.  This version makes no checks
-  on the availability of a function when it's invoked.
-
-  This version can be used in a normal stand-alone interpreter.  A
-  version of the interpreter that's used to complete compilation by
-  running 'preinit' should use the call-time resolution version instead.
-Notes
-  
-Modified
-  07/21/99 MJRoberts  - Creation
-*/
-
-#include <stdlib.h>
-#include <string.h>
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmtype.h"
@@ -40,6 +31,9 @@ Modified
 #include "glk/tads/tads3/vmobj.h"
 #include "glk/tads/tads3/vmrun.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -79,3 +73,7 @@ void CVmBifTable::add_entry_unresolved(VMG_ const char *func_set_id)
                 ERR_TYPE_FUNCSET, func_set_id,
                 ERR_TYPE_VERSION_FLAG);
 }
+
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

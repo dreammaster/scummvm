@@ -1,162 +1,166 @@
-/* 
- *   Copyright (c) 1998, 2012 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  regex.c - Regular Expression Parser and Recognizer for T3
-Function
-  Parses and recognizes regular expressions.  Adapted to C++ and UTF-8
-  from the TADS 2 implementation.
-Notes
-  Regular expression syntax:
 
-     abc|def    either abc or def
-     (abc)      abc
-     abc+       abc, abcc, abccc, ...
-     abc*       ab, abc, abcc, ...
-     abc?       ab or abc
-     x{n}       x exactly 'n' times
-     x{n,}      x at least 'n' times
-     x{,n}      x 0 to 'n' times
-     x{n,m}     x from 'n' to 'm' times
-     .          any single character
-     abc$       abc at the end of the line
-     ^abc       abc at the beginning of the line
-     %^abc      literally ^abc
-     [abcx-z]   matches a, b, c, x, y, or z
-     [^abcx-z]  matches any character except a, b, c, x, y, or z
-     [^]-q]     matches any character except ], -, or q
-     x+?        use *shortest* working match to x+
-     x*?        use shortest match to x*
-     x{}?       use shortest match to x{}
-
-  Note that using ']' or '-' in a character range expression requires
-  special ordering.  If ']' is to be used, it must be the first character
-  after the '^', if present, within the brackets.  If '-' is to be used,
-  it must be the first character after the '^' and/or ']', if present.
-
-  The following special sequences match literal characters by name (the
-  names insensitive to case):
-
-     <lparen>   (
-     <rparen>   )
-     <lsquare>  [
-     <rsquare>  ]
-     <lbrace>   {
-     <rbrace>   }
-     <langle>   <
-     <rangle>   >
-     <vbar>     |
-     <caret>    ^
-     <period>   .
-     <dot>      .
-     <squote>   '
-     <dquote>   "
-     <star>     *
-     <plus>     +
-     <percent>  %
-     <question> ?
-     <dollar>   $
-     <backslash> \
-     <return>   carriage return (character code 0x000D)
-     <linefeed> line feed (character code 0x000A)
-     <tab>      tab (character code 0x0009)
-     <nul>      null character (character code 0x0000)
-     <null>     null character (character code 0x0000)
-
-  The following special sequences match character classes (these class
-  names, like the character literal names above, are insensitive to case):
-
-     <Alpha>    any alphabetic character
-     <Upper>    any upper-case alphabetic character
-     <Lower>    any lower-case alphabetic character
-     <Digit>    any digit
-     <AlphaNum> any alphabetic character or digit
-     <Space>    space character
-     <VSpace>   vertical whitespace
-     <Punct>    punctuation character
-     <Newline>  any newline character: \r, \n, \b, 0x2028, 0x2029
-
-  Character classes can be combined by separating class names with the '|'
-  delimiter.  In addition, a class expression can be complemented to make
-  it an exclusion expression by putting a '^' after the opening bracket.
-
-     <Upper|Digit>  any uppercase letter or any digit
-     <^Alpha>       anything except an alphabetic character
-     <^Upper|Digit> anything except an uppercase letter or a digit
-                    (note that the exclusion applies to the ENTIRE
-                    expression, so in this case both uppercase letters
-                    and digits are excluded)
-
-  In addition, character classes and named literals can be combined:
-
-     <Upper|Star|Plus>  Any uppercase letter, or '*' or '+'
-
-  Finally, literal characters and literal ranges resembling '[]' ranges
-  can be used in angle-bracket expressions, with the limitation that each
-  character or range must be separated with the '|' delimiter:
-
-     <a|b|c>        'a' or 'b' or 'c'
-     <Upper|a|b|c>  any uppercase letter, or 'a', 'b', or 'c'
-     <Upper|a-m>    any uppercase letter, or lowercase letters 'a' to 'm'
-
-  '%' is used to escape the special characters: | . ( ) * ? + ^ $ % [
-  (We use '%' rather than a backslash because it's less trouble to
-  enter in a TADS string -- a backslash needs to be quoted with another
-  backslash, which is error-prone and hard to read.  '%' doesn't need
-  any special quoting in a TADS string, which makes it a lot more
-  readable.)
-
-  In addition, '%' is used to introduce additional special sequences:
-
-     %1         text matching first parenthesized expression
-     %9         text matching ninth parenthesized experssion
-     %<         matches at the beginning of a word only
-     %>         matches at the end of a word only
-     %w         matches any word character
-     %W         matches any non-word character
-     %b         matches at any word boundary (beginning or end of word)
-     %B         matches except at a word boundary
-     %s         <space>
-     %S         <^space>
-     %v         <vspace>
-     %V         <^vspace>
-     %d         <digit>
-     %D         <^digit>
-
-  For the word matching sequences, a word is any sequence of letters and
-  numbers.
-
-  The following special sequences modify the search rules:
-
-     <Case> - makes the search case-sensitive.  This is the default.
-     <NoCase> - makes the search case-insensitive.  <Case> and <NoCase>
-              are both global - the entire expression is either
-              case-sensitive or case-insensitive.
-
-     <FE> or <FirstEnd> - select the substring that ends earliest, in
-              case of an ambiguous match.  <FirstBegin> is the default.
-     <FB> or <FirstBegin> - select the substring that starts earliest, in
-              case of an ambiguous match.  This is the default.
-
-     <Min> - select the shortest matching substring, in case of an
-              ambiguous match.  <Max> is the default.
-     <Max> - select the longest matching substring, in case of an
-              ambiguous match.
-
-Modified
-  09/06/98 MJRoberts  - Creation
+/* Regular Expression Parser and Recognizer for T3
+ *
+ * Parses and recognizes regular expressions.  Adapted to C++ and UTF-8
+ * from the TADS 2 implementation.
+ *
+ * Regular expression syntax:
+ *
+ *    abc|def    either abc or def
+ *    (abc)      abc
+ *    abc+       abc, abcc, abccc, ...
+ *    abc*       ab, abc, abcc, ...
+ *    abc?       ab or abc
+ *    x{n}       x exactly 'n' times
+ *    x{n,}      x at least 'n' times
+ *    x{,n}      x 0 to 'n' times
+ *    x{n,m}     x from 'n' to 'm' times
+ *    .          any single character
+ *    abc$       abc at the end of the line
+ *    ^abc       abc at the beginning of the line
+ *    %^abc      literally ^abc
+ *    [abcx-z]   matches a, b, c, x, y, or z
+ *    [^abcx-z]  matches any character except a, b, c, x, y, or z
+ *    [^]-q]     matches any character except ], -, or q
+ *    x+?        use *shortest* working match to x+
+ *    x*?        use shortest match to x*
+ *    x{}?       use shortest match to x{}
+ *
+ * Note that using ']' or '-' in a character range expression requires
+ * special ordering.  If ']' is to be used, it must be the first character
+ * after the '^', if present, within the brackets.  If '-' is to be used,
+ * it must be the first character after the '^' and/or ']', if present.
+ *
+ * The following special sequences match literal characters by name (the
+ * names insensitive to case):
+ *
+ *    <lparen>   (
+ *    <rparen>   )
+ *    <lsquare>  [
+ *    <rsquare>  ]
+ *    <lbrace>   {
+ *    <rbrace>   }
+ *    <langle>   <
+ *    <rangle>   >
+ *    <vbar>     |
+ *    <caret>    ^
+ *    <period>   .
+ *    <dot>      .
+ *    <squote>   '
+ *    <dquote>   "
+ *    <star>     *
+ *    <plus>     +
+ *    <percent>  %
+ *    <question> ?
+ *    <dollar>   $
+ *    <backslash> \
+ *    <return>   carriage return (character code 0x000D)
+ *    <linefeed> line feed (character code 0x000A)
+ *    <tab>      tab (character code 0x0009)
+ *    <nul>      null character (character code 0x0000)
+ *    <null>     null character (character code 0x0000)
+ *
+ * The following special sequences match character classes (these class
+ * names, like the character literal names above, are insensitive to case):
+ *
+ *    <Alpha>    any alphabetic character
+ *    <Upper>    any upper-case alphabetic character
+ *    <Lower>    any lower-case alphabetic character
+ *    <Digit>    any digit
+ *    <AlphaNum> any alphabetic character or digit
+ *    <Space>    space character
+ *    <VSpace>   vertical whitespace
+ *    <Punct>    punctuation character
+ *    <Newline>  any newline character: \r, \n, \b, 0x2028, 0x2029
+ *
+ * Character classes can be combined by separating class names with the '|'
+ * delimiter.  In addition, a class expression can be complemented to make
+ * it an exclusion expression by putting a '^' after the opening bracket.
+ *
+ *    <Upper|Digit>  any uppercase letter or any digit
+ *    <^Alpha>       anything except an alphabetic character
+ *    <^Upper|Digit> anything except an uppercase letter or a digit
+ *                   (note that the exclusion applies to the ENTIRE
+ *                   expression, so in this case both uppercase letters
+ *                   and digits are excluded)
+ *
+ * In addition, character classes and named literals can be combined:
+ *
+ *    <Upper|Star|Plus>  Any uppercase letter, or '*' or '+'
+ *
+ * Finally, literal characters and literal ranges resembling '[]' ranges
+ * can be used in angle-bracket expressions, with the limitation that each
+ * character or range must be separated with the '|' delimiter:
+ *
+ *    <a|b|c>        'a' or 'b' or 'c'
+ *    <Upper|a|b|c>  any uppercase letter, or 'a', 'b', or 'c'
+ *    <Upper|a-m>    any uppercase letter, or lowercase letters 'a' to 'm'
+ *
+ * '%' is used to escape the special characters: | . ( ) * ? + ^ $ % [
+ * (We use '%' rather than a backslash because it's less trouble to
+ * enter in a TADS string -- a backslash needs to be quoted with another
+ * backslash, which is error-prone and hard to read.  '%' doesn't need
+ * any special quoting in a TADS string, which makes it a lot more
+ * readable.)
+ *
+ * In addition, '%' is used to introduce additional special sequences:
+ *
+ *    %1         text matching first parenthesized expression
+ *    %9         text matching ninth parenthesized experssion
+ *    %<         matches at the beginning of a word only
+ *    %>         matches at the end of a word only
+ *    %w         matches any word character
+ *    %W         matches any non-word character
+ *    %b         matches at any word boundary (beginning or end of word)
+ *    %B         matches except at a word boundary
+ *    %s         <space>
+ *    %S         <^space>
+ *    %v         <vspace>
+ *    %V         <^vspace>
+ *    %d         <digit>
+ *    %D         <^digit>
+ *
+ * For the word matching sequences, a word is any sequence of letters and
+ * numbers.
+ *
+ * The following special sequences modify the search rules:
+ *
+ *    <Case> - makes the search case-sensitive.  This is the default.
+ *    <NoCase> - makes the search case-insensitive.  <Case> and <NoCase>
+ *             are both global - the entire expression is either
+ *             case-sensitive or case-insensitive.
+ *
+ *    <FE> or <FirstEnd> - select the substring that ends earliest, in
+ *             case of an ambiguous match.  <FirstBegin> is the default.
+ *    <FB> or <FirstBegin> - select the substring that starts earliest, in
+ *             case of an ambiguous match.  This is the default.
+ *
+ *    <Min> - select the shortest matching substring, in case of an
+ *             ambiguous match.  <Max> is the default.
+ *    <Max> - select the longest matching substring, in case of an
+ *             ambiguous match.
 */
-
-
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmregex.h"
@@ -166,6 +170,9 @@ Modified
 #include "glk/tads/tads3/vmuni.h"
 #include "glk/tads/tads3/vmfile.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -1715,7 +1722,7 @@ int CRegexParser::compile_char_class_expr(utf8_ptr *expr, size_t *exprchars,
     for (;;)
     {
         utf8_ptr start;
-        wchar_t delim;
+        wchar_t delim = 0;
         size_t curcharlen;
         size_t curbytelen;
         
@@ -4416,3 +4423,7 @@ int CRegexSearcherSimple::compile_and_search_back(
     /* return the result */
     return m;
 }
+
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

@@ -102,10 +102,10 @@ struct re_replace_arg
     }
 
     void set(VMG_ const vm_val_t *patv, const vm_val_t *rplv,
-             int str_to_pat, int32_t flags)
+             int str_to_pat, int32_t newFlags)
     {
         /* save the flags */
-        this->flags = flags;
+        this->flags = newFlags;
 
         /* retrieve the compiled RexPattern or uncompiled pattern string */
         const char *str;
@@ -774,8 +774,8 @@ template<int mode> inline void vm_find_replace(
                 /* copy the initial part that we skipped */
                 if (skip_bytes != 0)
                 {
-                    memcpy(dstp.getptr(), str + VMB_LEN, skip_bytes);
-                    dstp.set(dstp.getptr() + skip_bytes);
+                    memcpy(dstp.getCharPtr(), str + VMB_LEN, skip_bytes);
+                    dstp.set(dstp.getCharPtr() + skip_bytes);
                 }
             }
 
@@ -784,13 +784,13 @@ template<int mode> inline void vm_find_replace(
             {
                 /* ensure space */
                 dstp.set(ret_str->cons_ensure_space(
-                    vmg_ dstp.getptr(), match_idx, 512));
+                    vmg_ dstp.getCharPtr(), match_idx, 512));
                 
                 /* copy the part from the last match to this match */
-                memcpy(dstp.getptr(), last_str, match_idx);
+                memcpy(dstp.getCharPtr(), last_str, match_idx);
                 
                 /* advance the output pointer */
-                dstp.set(dstp.getptr() + match_idx);
+                dstp.set(dstp.getCharPtr() + match_idx);
             }
 
             /* apply the replacement text */
@@ -815,13 +815,13 @@ template<int mode> inline void vm_find_replace(
                 {
                     /* ensure space */
                     dstp.set(ret_str->cons_ensure_space(
-                        vmg_ dstp.getptr(), rpllen, 512));
+                        vmg_ dstp.getCharPtr(), rpllen, 512));
 
                     /* copy the replacement text */
-                    memcpy(dstp.getptr(), rplstr + VMB_LEN, rpllen);
+                    memcpy(dstp.getCharPtr(), rplstr + VMB_LEN, rpllen);
 
                     /* advance the pointer */
-                    dstp.set(dstp.getptr() + rpllen);
+                    dstp.set(dstp.getCharPtr() + rpllen);
                 }
                 else
                 {
@@ -843,7 +843,7 @@ template<int mode> inline void vm_find_replace(
                              *   UTF8 needs 3 bytes max) 
                              */
                             dstp.set(ret_str->cons_ensure_space(
-                                vmg_ dstp.getptr(), 3, 512));
+                                vmg_ dstp.getCharPtr(), 3, 512));
                             
                             /* 
                              *   if we're in 'follow case' mode, adjust the
@@ -881,7 +881,7 @@ template<int mode> inline void vm_find_replace(
                                 /* ensure we have room for the conversion */
                                 size_t need = utf8_ptr::s_wstr_size(u);
                                 dstp.set(ret_str->cons_ensure_space(
-                                    vmg_ dstp.getptr(), need, 512));
+                                    vmg_ dstp.getCharPtr(), need, 512));
                                 
                                 /* store the converted characters */
                                 dstp.setwcharsz(u, need);
@@ -931,16 +931,16 @@ template<int mode> inline void vm_find_replace(
                                             /* ensure space */
                                             dstp.set(
                                                 ret_str->cons_ensure_space(
-                                                    vmg_ dstp.getptr(),
+                                                    vmg_ dstp.getCharPtr(),
                                                     glen, 512));
                                             
                                             /* copy the data */
-                                            memcpy(dstp.getptr(),
+                                            memcpy(dstp.getCharPtr(),
                                                 str + VMB_LEN + reg->start_ofs,
                                                 glen);
                                             
                                             /* advance past it */
-                                            dstp.set(dstp.getptr() + glen);
+                                            dstp.set(dstp.getCharPtr() + glen);
                                         }
                                     }
                                 }
@@ -949,18 +949,18 @@ template<int mode> inline void vm_find_replace(
                             case '*':
                                 /* ensure space */
                                 dstp.set(ret_str->cons_ensure_space(
-                                    vmg_ dstp.getptr(), match_len, 512));
+                                    vmg_ dstp.getCharPtr(), match_len, 512));
                                 
                                 /* add the entire matched string */
-                                memcpy(dstp.getptr(), last_str + match_idx,
+                                memcpy(dstp.getCharPtr(), last_str + match_idx,
                                        match_len);
-                                dstp.set(dstp.getptr() + match_len);
+                                dstp.set(dstp.getCharPtr() + match_len);
                                 break;
                                 
                             case '%':
                                 /* ensure space (the '%' is just one byte) */
                                 dstp.set(ret_str->cons_ensure_space(
-                                    vmg_ dstp.getptr(), 1, 512));
+                                    vmg_ dstp.getCharPtr(), 1, 512));
                                 
                                 /* add a single '%' */
                                 dstp.setch('%');
@@ -972,7 +972,7 @@ template<int mode> inline void vm_find_replace(
                                  *   '%', up to 3 for the other character) 
                                  */
                                 dstp.set(ret_str->cons_ensure_space(
-                                    vmg_ dstp.getptr(), 4, 512));
+                                    vmg_ dstp.getCharPtr(), 4, 512));
                                 
                                 /* add the entire sequence unchanged */
                                 dstp.setch('%');
@@ -1015,11 +1015,11 @@ template<int mode> inline void vm_find_replace(
                     
                     /* ensure space for it in the result */
                     dstp.set(ret_str->cons_ensure_space(
-                        vmg_ dstp.getptr(), vmb_get_len(r), 512));
+                        vmg_ dstp.getCharPtr(), vmb_get_len(r), 512));
                     
                     /* store it */
-                    memcpy(dstp.getptr(), r + VMB_LEN, vmb_get_len(r));
-                    dstp.set(dstp.getptr() + vmb_get_len(r));
+                    memcpy(dstp.getCharPtr(), r + VMB_LEN, vmb_get_len(r));
+                    dstp.set(dstp.getCharPtr() + vmb_get_len(r));
                 }
             }
             
@@ -1031,7 +1031,7 @@ template<int mode> inline void vm_find_replace(
             {
                 /* ensure space */
                 dstp.set(ret_str->cons_ensure_space(
-                    vmg_ dstp.getptr(), 3, 512));
+                    vmg_ dstp.getCharPtr(), 3, 512));
                 
                 /* copy the character we're skipping to the output */
                 p.set((char *)str + VMB_LEN + start_idx);
@@ -1064,18 +1064,18 @@ template<int mode> inline void vm_find_replace(
         {
             /* ensure space for the remainder after the last match */
             dstp.set(ret_str->cons_ensure_space(
-                vmg_ dstp.getptr(), vmb_get_len(str) - start_idx, 512));
+                vmg_ dstp.getCharPtr(), vmb_get_len(str) - start_idx, 512));
             
             /* add the part after the end of the matched text */
             if ((size_t)start_idx < vmb_get_len(str))
             {
-                memcpy(dstp.getptr(), str + VMB_LEN + start_idx,
+                memcpy(dstp.getCharPtr(), str + VMB_LEN + start_idx,
                        vmb_get_len(str) - start_idx);
-                dstp.set(dstp.getptr() + vmb_get_len(str) - start_idx);
+                dstp.set(dstp.getCharPtr() + vmb_get_len(str) - start_idx);
             }
             
             /* set the actual length of the string */
-            ret_str->cons_shrink_buffer(vmg_ dstp.getptr());
+            ret_str->cons_shrink_buffer(vmg_ dstp.getCharPtr());
 
             /* return the string */
             result->set_obj(ret_obj);

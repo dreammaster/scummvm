@@ -25,9 +25,7 @@
 
 /* TADS 3 Compiler Target Selector */
 
-namespace Glk {
-namespace TADS {
-namespace TADS3 {
+#include "glk/tads/tads3/t3std.h"
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -117,9 +115,5 @@ namespace TADS3 {
 #ifndef TADS3_TCTARG_TARGET_DEFINED__
 #error No code generator target is defined.  A code generator must be defined in your makefile.  See tctarg.h for details.
 #endif
-
-} // End of namespace TADS3
-} // End of namespace TADS
-} // End of namespace Glk
 
 #endif

@@ -110,6 +110,8 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+struct CVmException;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Error Message Definition structure 
@@ -203,14 +205,13 @@ const char *err_get_msg(const err_msg_t *msg_array, size_t msg_count,
  *   
  *   %% - Formats as a single percent sign.  
  */
-size_t err_format_msg(char *outbuf, size_t outbuflen,
-                      const char *msg, const struct CVmException *exc);
+size_t err_format_msg(char *outbuf, size_t outbuflen, const char *msg, const CVmException *exc);
 
 /* 
  *   Format a message, allocating a buffer to store the result.  The caller
  *   must free the buffer with t3free(). 
  */
-char *err_format_msg(const char *msg, const struct CVmException *exc);
+char *err_format_msg(const char *msg, const CVmException *exc);
 
 /* ------------------------------------------------------------------------ */
 /* 
@@ -523,14 +524,16 @@ CVmException *err_get_cur_exc();
  */
 void err_abort(const char *message);
 
-
+/**
+ * NOTE: Use of setjmp for error try/catch disabled for ScummVM
+ */
 #define err_try \
     { \
         err_frame_t err_cur__; \
         err_cur__.prv_ = os_tls_get(err_frame_t *, G_err_frame); \
         os_tls_set(G_err_frame, &err_cur__); \
-        if ((err_cur__.state_ = \
-            (err_state_t)setjmp(err_cur__.jmpbuf_)) == ERR_STATE_TRYING) \
+        err_cur__.state_ = ERR_STATE_TRYING; \
+		if (true) \
         { \
 
 #define err_catch(exc) \

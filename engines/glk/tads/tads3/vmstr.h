@@ -25,12 +25,15 @@
 
 /* VM dynamic string implementation */
 
-#include "glk/tads/tads3/tads/tads3/vmglob.h"
-#include "glk/tads/tads3/tads/tads3/vmobj.h"
+#include "glk/tads/tads3/vmglob.h"
+#include "glk/tads/tads3/vmobj.h"
 
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
+
+class CVmObjPattern;
+class CVmDataSource;
 
 /*
  *   String object
@@ -88,7 +91,7 @@ public:
 
     /* create from a byte stream, treating the bytes as Latin-1 characters */
     static vm_obj_id_t create_latin1(VMG_ int in_root_set,
-                                     class CVmDataSource *src);
+                                     CVmDataSource *src);
 
     /* create from a string, mapping through the given character mapper */
     static vm_obj_id_t create(VMG_ int in_root_set,
@@ -397,14 +400,14 @@ public:
     static const char *find_substr(
         VMG_ const vm_val_t *strval,
         const char *basestr, const char *str, size_t len,
-        const char *substr, class CVmObjPattern *pat,
+        const char *substr, CVmObjPattern *pat,
         int *match_idx, int *match_len);
 
     /* find the last matching substring or pattern */
     static const char *find_last_substr(
         VMG_ const vm_val_t *strval,
         const char *basestr, const char *str, size_t len,
-        const char *substr, class CVmObjPattern *pat,
+        const char *substr, CVmObjPattern *pat,
         int *match_idx, int *match_len);
                                    
 
@@ -604,7 +607,7 @@ protected:
      *   to scan the string and get the required allocation length.  
      */
     static size_t copy_latin1_to_string(char *str, size_t len,
-                                        class CVmDataSource *src);
+                                        CVmDataSource *src);
 
     /* common handler for specialsToText and specialsToHtml */
     static int specialsTo(VMG_ vm_val_t *retval,

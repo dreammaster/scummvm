@@ -1,32 +1,24 @@
-/* 
- *   Copyright (c) 2002 by Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmconhmp.cpp - T3 VM Console - HTML mini-parser
-Function
-  This is the console HTML "mini-parser," which provides some minimal
-  interpretation of HTML markups for text-only underlying output streams.
-
-  Note that the mini-parser is included even in full HTML-enabled versions
-  of TADS (such as HTML TADS or HyperTADS), because we still need text-only
-  interpretation of HTML markups for log-file targets.
-Notes
-  
-Modified
-  06/08/02 MJRoberts  - Creation
-*/
-
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include <assert.h>
-#include "glk/tads/tads3/wchar.h"
 
 #include "glk/tads/os_glk.h"
 #include "glk/tads/tads3/t3std.h"
@@ -37,6 +29,9 @@ Modified
 #include "glk/tads/tads3/charmap.h"
 #include "glk/tads/tads3/vmhash.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -630,7 +625,7 @@ CVmFmtTabStop *CVmFormatter::find_tab(wchar_t *id, int create)
 void CVmFormatter::expand_pending_tab(VMG_ int allow_anon)
 {
     int txtlen;
-    int spaces;
+    int spaces = 0;
     int i;
     int col;
     
@@ -1466,7 +1461,7 @@ wchar_t CVmFormatter::parse_html_markup(VMG_ wchar_t c,
                 /* check to see if this is a start or end tag */
                 if (!is_end_tag)
                 {
-                    int attr;
+                    int attr = 0;
 
                     /* it's a start tag - push the current attributes */
                     push_color();
@@ -1977,3 +1972,6 @@ int CVmFormatter::wtoi(const wchar_t *p)
     return acc;
 }
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

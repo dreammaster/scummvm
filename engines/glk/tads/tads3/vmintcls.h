@@ -33,6 +33,9 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+struct vm_meta_entry_t;
+class CVmObjList;
+
 /*
  *   An IntrinsicClass object represents the class of an instance of an
  *   intrinsic class.  For example, if we create a BigNumber instance, then
@@ -106,7 +109,7 @@ public:
     uint get_meta_idx() const { return get_ext()->meta_idx; }
 
     /* get my metaclass table entry */
-    struct vm_meta_entry_t *get_meta_entry(VMG0_) const;
+    vm_meta_entry_t *get_meta_entry(VMG0_) const;
 
     /* 
      *   Get the class state value.  This is for use by the class
@@ -262,8 +265,8 @@ protected:
 
     /* list our intrinsic class's properties */
     size_t list_class_props(VMG_ vm_obj_id_t self,
-                            struct vm_meta_entry_t *entry,
-                            class CVmObjList *lst, size_t starting_idx,
+                            vm_meta_entry_t *entry,
+                            CVmObjList *lst, size_t starting_idx,
                             int static_only);
 
     /* 

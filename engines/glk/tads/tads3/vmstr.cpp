@@ -1,30 +1,24 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header: d:/cvsroot/tads/tads3/VMSTR.CPP,v 1.3 1999/05/17 02:52:28 MJRoberts Exp $";
-#endif
-
-/* 
- *   Copyright (c) 1998, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmstr.cpp - VM string metaclass implementation
-Function
-  
-Notes
-  
-Modified
-  10/28/98 MJRoberts  - Creation
-*/
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <limits.h>
-#include <stdarg.h>
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmmcreg.h"
@@ -57,6 +51,9 @@ Modified
 #include "glk/tads/tads3/vmbiftad.h"
 #include "glk/tads/tads3/vmfindrep.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -2954,14 +2951,14 @@ static void find_tag_name(StringRef *tag, const char *&name, size_t &len,
     const char *p;
 
     /* skip leading spaces */
-    for (p = tag->get() ; isspace(*p) ; ++p) ;
+    for (p = tag->get() ; Common::isSpace(*p) ; ++p) ;
 
     /* if it's an end tag, skip the '/' and any intervening spaces */
     if ((is_end_tag = (*p == '/')) != 0)
-        for (++p ; isspace(*p) ; ++p) ;
+        for (++p ; Common::isSpace(*p) ; ++p) ;
 
     /* scan the name - it's from here to the next space */
-    for (name = p ; *p != '\0' && !isspace(*p) ; ++p) ;
+    for (name = p ; *p != '\0' && !Common::isSpace(*p) ; ++p) ;
 
     /* note the length */
     len = p - name;
@@ -2995,7 +2992,7 @@ static int find_attr_val(const char *name, size_t name_len,
         val = ++p;
 
         /* skip the token */
-        for (char qu = 0 ; *p != 0 && (!isspace(*p) || qu != 0) ; ++p)
+        for (char qu = 0 ; *p != 0 && (!Common::isSpace(*p) || qu != 0) ; ++p)
         {
             /* note if entering or leaving a quoted section */
             if (qu == 0 && (*p == '"' || *p == '\''))
@@ -3037,7 +3034,7 @@ static char *parse_attr_val(StringRef *tag, const char *attr_name)
     for (;;)
     {
         /* skip leading spaces */
-        for ( ; isspace(*p) ; ++p) ;
+        for ( ; Common::isSpace(*p) ; ++p) ;
 
         /* if we're at the end of the text, we're done */
         if (*p == '\0')
@@ -3046,7 +3043,7 @@ static char *parse_attr_val(StringRef *tag, const char *attr_name)
         /* scan the attribute name */
         const char *an;
         size_t anlen;
-        for (an = p ; *p != '\0' && *p != '=' && !isspace(*p) ; ++p) ;
+        for (an = p ; *p != '\0' && *p != '=' && !Common::isSpace(*p) ; ++p) ;
         anlen = p - an;
 
         /* get the attribute value */
@@ -3276,7 +3273,7 @@ int CVmObjString::specialsTo(VMG_ vm_val_t *retval,
                         int keep_tag = TRUE;
 
                         /* check to see if it's one of our special tags */
-                        if (stricmp(tagname, "q") == 0)
+                        if (scumm_stricmp(tagname, "q") == 0)
                         {
                             /* 
                              *   <Q> or </Q> - translate to &ldquo..&rdquo or
@@ -3314,7 +3311,7 @@ int CVmObjString::specialsTo(VMG_ vm_val_t *retval,
                             /* we've translated the tag */
                             keep_tag = FALSE;
                         }
-                        else if (stricmp(tagname, "br") == 0)
+                        else if (scumm_stricmp(tagname, "br") == 0)
                         {
                             /* 
                              *   if there's a HEIGHT attribute, it's special;
@@ -3355,7 +3352,7 @@ int CVmObjString::specialsTo(VMG_ vm_val_t *retval,
                             in_line = FALSE;
                             col = 0;
                         }
-                        else if (stricmp(tagname, "p") == 0)
+                        else if (scumm_stricmp(tagname, "p") == 0)
                         {
                             /* in text mode, add a newline or two */
                             if (!html)
@@ -3369,12 +3366,12 @@ int CVmObjString::specialsTo(VMG_ vm_val_t *retval,
                             in_line = FALSE;
                             col = 0;
                         }
-                        else if (stricmp(tagname, "div") == 0
-                                 || stricmp(tagname, "center") == 0
-                                 || stricmp(tagname, "table") == 0
-                                 || stricmp(tagname, "td") == 0
-                                 || stricmp(tagname, "th") == 0
-                                 || stricmp(tagname, "caption") == 0)
+                        else if (scumm_stricmp(tagname, "div") == 0
+                                 || scumm_stricmp(tagname, "center") == 0
+                                 || scumm_stricmp(tagname, "table") == 0
+                                 || scumm_stricmp(tagname, "td") == 0
+                                 || scumm_stricmp(tagname, "th") == 0
+                                 || scumm_stricmp(tagname, "caption") == 0)
                         {
                             /* this counts as a line break */
                             in_line = FALSE;
@@ -3440,20 +3437,20 @@ int CVmObjString::specialsTo(VMG_ vm_val_t *retval,
                         if (ch != ';')
                             buf->append_utf8(ch);
                     }
-                    else if (stricmp(n, "nbsp") == 0)
+                    else if (scumm_stricmp(n, "nbsp") == 0)
                         buf->append_utf8(' ');
-                    else if (stricmp(n, "gt") == 0)
+                    else if (scumm_stricmp(n, "gt") == 0)
                         buf->append_utf8('>');
-                    else if (stricmp(n, "lt") == 0)
+                    else if (scumm_stricmp(n, "lt") == 0)
                         buf->append_utf8('<');
-                    else if (stricmp(n, "amp") == 0)
+                    else if (scumm_stricmp(n, "amp") == 0)
                         buf->append_utf8('&');
-                    else if (stricmp(n, "ldquo") == 0
-                             || stricmp(n, "rdquo") == 0
-                             || stricmp(n, "quot") == 0)
+                    else if (scumm_stricmp(n, "ldquo") == 0
+                             || scumm_stricmp(n, "rdquo") == 0
+                             || scumm_stricmp(n, "quot") == 0)
                         buf->append_utf8('\"');
-                    else if (stricmp(n, "lsquo") == 0
-                             || stricmp(n, "rsquo") == 0)
+                    else if (scumm_stricmp(n, "lsquo") == 0
+                             || scumm_stricmp(n, "rsquo") == 0)
                         buf->append_utf8('\'');
                     else
                     {
@@ -4301,3 +4298,7 @@ vm_obj_id_t CVmObjStringConst::create(VMG_ const char *const_ptr)
     /* return the new ID */
     return id;
 }
+
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

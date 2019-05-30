@@ -74,6 +74,12 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+struct ZoneSearchSpec;
+class ZoneHashEntryDb;
+class ZoneHashEntrySynth;
+class ZoneHashEntry;
+class AbbrHashEntry;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Time zone cache.  This loads time zone data on demand.
@@ -167,7 +173,7 @@ protected:
     int load_db_index(VMG0_);
 
     /* get or load the CVmTimeZone object for a hash entry */
-    CVmTimeZone *tz_from_hash(VMG_ class ZoneHashEntry *entry);
+    CVmTimeZone *tz_from_hash(VMG_ ZoneHashEntry *entry);
 
     /* parse a "UTC+-h[:mm[:ss]]" offset string into a zone */
     CVmTimeZone *parse_zone_hhmmss(
@@ -181,11 +187,9 @@ protected:
                      int sign_required);
 
     /* search for a set of zone specifications */
-    class ZoneHashEntry *search(
-        VMG_ const struct ZoneSearchSpec *specs, int cnt);
-    class ZoneHashEntry *search(
-        VMG_ const struct ZoneSearchSpec *specs, class AbbrHashEntry **e,
-        int cnt, class ZoneHashEntry *zone);
+    ZoneHashEntry *search(VMG_ const ZoneSearchSpec *specs, int cnt);
+    ZoneHashEntry *search(VMG_ const ZoneSearchSpec *specs, AbbrHashEntry **e,
+        int cnt, ZoneHashEntry *zone);
 
     /* have we attempted to load the index yet? */
     int index_loaded_;
@@ -210,7 +214,7 @@ protected:
     class CVmHashTable *abbr_tab_;
 
     /* head of linked list of *loaded* zone objects */
-    class ZoneHashEntry *first_loaded_;
+    ZoneHashEntry *first_loaded_;
 
     /* zone index, loaded from the binary file */
     char *zone_bytes_;
@@ -413,7 +417,7 @@ public:
     ~CVmTimeZone();
 
     /* load from the zoneinfo database file */
-    static CVmTimeZone *load(VMG_ class ZoneHashEntry *entry);
+    static CVmTimeZone *load(VMG_ ZoneHashEntry *entry);
 
     /* get the primary name of the zone */
     const char *get_name(size_t &len) const;
@@ -463,18 +467,18 @@ public:
 
 protected:
     /* create from binary data loaded from the file */
-    CVmTimeZone(class ZoneHashEntryDb *entry, const char *file_data,
+    CVmTimeZone(ZoneHashEntryDb *entry, const char *file_data,
                 unsigned int trans_cnt, unsigned int type_cnt,
                 unsigned int rule_cnt, unsigned int abbr_bytes);
 
     /* create a synthetic zone */
-    CVmTimeZone(class ZoneHashEntrySynth *entry);
+    CVmTimeZone(ZoneHashEntrySynth *entry);
 
     /* initialize from an OS timezone descriptor */
     void init(const os_tzinfo_t *desc);
 
     /* my hash table entry */
-    class ZoneHashEntry *hashentry_;
+    ZoneHashEntry *hashentry_;
 
     /* my name; used only if we don't have a hash entry */
     char *name_;

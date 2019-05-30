@@ -35,6 +35,8 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class CVmObjTimeZone;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   The image file data simply contains the name of the time zone, as an
@@ -53,7 +55,7 @@ namespace TADS3 {
 struct vm_tzobj_ext
 {
     /* allocate the structure */
-    static vm_tzobj_ext *alloc_ext(VMG_ class CVmObjTimeZone *self,
+    static vm_tzobj_ext *alloc_ext(VMG_ CVmObjTimeZone *self,
                                    class CVmTimeZone *tz);
 
     /* our CVmTimeZone object */

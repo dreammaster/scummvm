@@ -48,6 +48,8 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class CVmObjTemporaryFile;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Image file data block:
@@ -67,7 +69,7 @@ struct vm_tmpfil_ext
 {
     /* allocate the structure */
     static vm_tmpfil_ext *alloc_ext(
-        VMG_ class CVmObjTemporaryFile *self, const char *filename);
+        VMG_ CVmObjTemporaryFile *self, const char *filename);
 
     /* 
      *   The filename, as a null-terminated string.  We overallocate the

@@ -1108,5 +1108,53 @@ int memicmp(const char *s1, const char *s2, int len) {
 	return cs1.compareToIgnoreCase(cs2);
 }
 
+int os_open_dir(const char *dirname, osdirhdl_t *handle) {
+	Common::FSNode folder(dirname);
+	*handle = new FSDirectory();
+	folder.getChildren((*handle)->_list, Common::FSNode::kListFilesOnly);
+
+	return 0;
+}
+
+int os_read_dir(osdirhdl_t handle, char *fname, size_t fname_size) {
+	if (handle->_list.empty())
+		return false;
+
+	if (handle->_inProgress) {
+		++handle->_i;
+	} else {
+		handle->_inProgress = true;
+		handle->_i = handle->_list.begin();
+	}
+
+	if (handle->_i == handle->_list.end())
+		return false;
+
+	strncpy(fname, (*handle->_i).getName().c_str(), fname_size - 1);
+	fname[fname_size - 1] = '\0';
+	return true;
+}
+
+void os_close_dir(osdirhdl_t handle) {
+	delete handle;
+}
+
+void os_update_display() {
+	// No implementation
+}
+
+tm *os_gmtime(const os_time_t *timer) {
+	error("TODO");
+}
+
+tm *os_localtime(const os_time_t *timer) {
+	error("TODO");
+}
+
+os_time_t os_time(os_time_t *timer) {
+	error("TODO");
+}
+
+
 } // End of namespace TADS
 } // End of namespace Glk

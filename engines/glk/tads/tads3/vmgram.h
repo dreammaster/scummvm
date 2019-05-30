@@ -35,6 +35,13 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+struct CVmGramProdState;
+struct vmgram_tok_info;
+struct CVmGramProdQueue;
+struct CVmGramProdMatch;
+class CTcGramProdAlt;
+class CVmStream;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   intrinsic function vector indices 
@@ -205,7 +212,7 @@ struct vmgram_alt_info
     vm_obj_id_t proc_obj;
 
     /* array of token elements in the alternative */
-    struct vmgram_tok_info *toks;
+    vmgram_tok_info *toks;
     size_t tok_cnt;
 };
 
@@ -410,7 +417,7 @@ protected:
                                 class CVmObjList *lst);
 
     /* add an alternative from a parsed rule, keeping undo */
-    void add_alt(VMG_ vm_obj_id_t self, class CTcGramProdAlt *alt,
+    void add_alt(VMG_ vm_obj_id_t self, CTcGramProdAlt *alt,
                  vm_obj_id_t dict, vm_obj_id_t match);
 
     /* delete an alternative, keeping undo */
@@ -423,14 +430,14 @@ protected:
     int find_literal_in_alts(const char *str, size_t len);
 
     /* save to a data stream */
-    void save_to_stream(VMG_ class CVmStream *dst);
+    void save_to_stream(VMG_ CVmStream *dst);
 
     /* mark references in an alt list (for garbage collection tracing) */
     void mark_alt_refs(VMG_ const vmgram_alt_info *alt, uint state);
 
     /* load alternatives from a stream, in image file format */
     void load_alts(VMG_ vm_obj_id_t self,
-                   class CVmStream *src, class CVmObjFixup *fixups);
+                   CVmStream *src, class CVmObjFixup *fixups);
 
     /* property evaluation - undefined property */
     int getp_undef(VMG_ vm_obj_id_t, vm_val_t *, uint *) { return FALSE; }
@@ -465,39 +472,39 @@ protected:
     void enqueue_alts(VMG_ class CVmGramProdMem *mem,
                       const struct vmgramprod_tok *tok,
                       size_t tok_cnt, size_t start_tok_pos,
-                      struct CVmGramProdState *state,
-                      struct CVmGramProdQueue *queues,
+                      CVmGramProdState *state,
+                      CVmGramProdQueue *queues,
                       vm_obj_id_t self, int circ_only,
-                      struct CVmGramProdMatch *circ_match,
+                      CVmGramProdMatch *circ_match,
                       class CVmObjDict *dict);
 
     /* create and enqueue a new state */
-    static struct CVmGramProdState *
+    static CVmGramProdState *
         enqueue_new_state(class CVmGramProdMem *mem,
                           size_t start_tok_pos,
-                          struct CVmGramProdState *enclosing_state,
+                          CVmGramProdState *enclosing_state,
                           const vmgram_alt_info *altp, vm_obj_id_t self,
                           int *need_to_clone,
-                          struct CVmGramProdQueue *queues,
+                          CVmGramProdQueue *queues,
                           int circular_alt);
     
     /* create a new state */
-    static struct CVmGramProdState *
+    static CVmGramProdState *
         create_new_state(class CVmGramProdMem *mem,
                          size_t start_tok_pos,
-                         struct CVmGramProdState *enclosing_state,
+                         CVmGramProdState *enclosing_state,
                          const vmgram_alt_info *altp, vm_obj_id_t self,
                          int *need_to_clone, int circular_alt);
     
     /* enqueue a state */
-    static void enqueue_state(struct CVmGramProdState *state,
-                              struct CVmGramProdQueue *queues);
+    static void enqueue_state(CVmGramProdState *state,
+                              CVmGramProdQueue *queues);
 
     /* process the work queue */
     static void process_work_queue(VMG_ CVmGramProdMem *mem,
                                    const struct vmgramprod_tok *tok,
                                    size_t tok_cnt,
-                                   struct CVmGramProdQueue *queues,
+                                   CVmGramProdQueue *queues,
                                    class CVmObjDict *dict);
                                    
 
@@ -505,11 +512,11 @@ protected:
     static void process_work_queue_head(VMG_ CVmGramProdMem *mem,
                                         const struct vmgramprod_tok *tok,
                                         size_t tok_cnt,
-                                        struct CVmGramProdQueue *queues,
+                                        CVmGramProdQueue *queues,
                                         class CVmObjDict *dict);
 
     /* build a match tree */
-    static void build_match_tree(VMG_ const struct CVmGramProdMatch *match,
+    static void build_match_tree(VMG_ const CVmGramProdMatch *match,
                                  const vm_val_t *tok_list,
                                  const vm_val_t *tok_match_list,
                                  vm_val_t *retval,

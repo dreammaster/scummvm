@@ -1,21 +1,25 @@
-/* 
- *   Copyright (c) 2001, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmfilobj.h - File object metaclass
-Function
-  Implements an intrinsic class interface to operating system file I/O.
-Notes
 
-Modified
-  06/28/01 MJRoberts  - Creation
-*/
-
-#include <assert.h>
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/charmap.h"
 #include "glk/tads/tads3/vmerr.h"
@@ -48,7 +52,9 @@ Modified
 #include "glk/tads/tads3/sha2.h"
 #include "glk/tads/tads3/md5.h"
 
-
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -281,7 +287,7 @@ void CVmObjFile::get_filespec(vm_val_t *val) const
 
     /* if we have a net file object, get its filespec */
     if (get_ext()->netfile != 0)
-        val->set_obj(get_ext()->netfile->filespec);
+        val->set_obj(get_ext()->netfile->_filespec);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -343,23 +349,23 @@ int CVmObjFile::call_stat_prop(VMG_ vm_val_t *result,
     switch(midx)
     {
     case VMOBJFILE_OPEN_TEXT:
-        rc.name = "File.openTextFile";
+        rc._name = "File.openTextFile";
         return s_getp_open_text(vmg_ result, argc, FALSE, &rc);
 
     case VMOBJFILE_OPEN_DATA:
-        rc.name = "File.openDataFile";
+        rc._name = "File.openDataFile";
         return s_getp_open_data(vmg_ result, argc, &rc);
 
     case VMOBJFILE_OPEN_RAW:
-        rc.name = "File.openRawFile";
+        rc._name = "File.openRawFile";
         return s_getp_open_raw(vmg_ result, argc, FALSE, &rc);
 
     case VMOBJFILE_OPEN_RES_TEXT:
-        rc.name = "File.openTextResource";
+        rc._name = "File.openTextResource";
         return s_getp_open_text(vmg_ result, argc, TRUE, &rc);
 
     case VMOBJFILE_OPEN_RES_RAW:
-        rc.name = "File.openRawResource";
+        rc._name = "File.openRawResource";
         return s_getp_open_raw(vmg_ result, argc, TRUE, &rc);
 
     case VMOBJFILE_GET_ROOT_NAME:
@@ -659,7 +665,7 @@ CVmNetFile *CVmObjFile::get_filename_arg(
     os_filetype_t file_type, const char *mime_type)
 {
     /* figure the network file access mode */
-    int nmode;
+    int nmode = 0;
     switch (access)
     {
     case VMOBJFILE_ACCESS_READ:
@@ -865,7 +871,7 @@ int CVmObjFile::s_getp_open_text(VMG_ vm_val_t *retval, uint *in_argc,
                 /* it's a resource - open it */
                 unsigned long res_len;
                 fp = G_host_ifc->find_resource(
-                    netfile->lclfname, strlen(netfile->lclfname), &res_len);
+                    netfile->_lclfname, strlen(netfile->_lclfname), &res_len);
                 
                 /* 
                  *   if we found the resource, note the start and end seek
@@ -906,7 +912,7 @@ int CVmObjFile::s_getp_open_text(VMG_ vm_val_t *retval, uint *in_argc,
                  *   systems will be fully usable even if they haven't been
                  *   fixed up to local conventions.  
                  */
-                fp = osfoprb(netfile->lclfname, OSFTTEXT);
+                fp = osfoprb(netfile->_lclfname, OSFTTEXT);
 
                 /* if that worked, create the data source */
                 if (fp != 0)
@@ -925,7 +931,7 @@ int CVmObjFile::s_getp_open_text(VMG_ vm_val_t *retval, uint *in_argc,
             
         case VMOBJFILE_ACCESS_WRITE:
             /* open for writing */
-            fp = osfopwb(netfile->lclfname, OSFTTEXT);
+            fp = osfopwb(netfile->_lclfname, OSFTTEXT);
             
             /* make sure we created it successfully */
             if (fp == 0)
@@ -939,7 +945,7 @@ int CVmObjFile::s_getp_open_text(VMG_ vm_val_t *retval, uint *in_argc,
 
         case VMOBJFILE_ACCESS_RW_KEEP:
             /* open for read/write, keeping existing contents */
-            fp = osfoprwb(netfile->lclfname, OSFTTEXT);
+            fp = osfoprwb(netfile->_lclfname, OSFTTEXT);
             
             /* make sure we were able to find or create the file */
             if (fp == 0)
@@ -955,7 +961,7 @@ int CVmObjFile::s_getp_open_text(VMG_ vm_val_t *retval, uint *in_argc,
             
         case VMOBJFILE_ACCESS_RW_TRUNC:
             /* open for read/write, truncating existing contents */
-            fp = osfoprwtb(netfile->lclfname, OSFTTEXT);
+            fp = osfoprwtb(netfile->_lclfname, OSFTTEXT);
             
             /* make sure we were successful */
             if (fp == 0)
@@ -1060,7 +1066,7 @@ int CVmObjFile::open_binary(VMG_ vm_val_t *retval, uint *in_argc, int mode,
                 
                 /* it's a resource - open it */
                 fp = G_host_ifc->find_resource(
-                    netfile->lclfname, strlen(netfile->lclfname), &res_len);
+                    netfile->_lclfname, strlen(netfile->_lclfname), &res_len);
 
                 /* 
                  *   if we found the resource, note the start and end seek
@@ -1090,7 +1096,7 @@ int CVmObjFile::open_binary(VMG_ vm_val_t *retval, uint *in_argc, int mode,
             else
             {
                 /* open the ordinary file in binary mode for reading only */
-                fp = osfoprb(netfile->lclfname, OSFTBIN);
+                fp = osfoprb(netfile->_lclfname, OSFTBIN);
                 
                 /* create the data source */
                 if (fp != 0)
@@ -1105,7 +1111,7 @@ int CVmObjFile::open_binary(VMG_ vm_val_t *retval, uint *in_argc, int mode,
             
         case VMOBJFILE_ACCESS_WRITE:
             /* open in binary mode for writing only */
-            fp = osfopwb(netfile->lclfname, OSFTBIN);
+            fp = osfopwb(netfile->_lclfname, OSFTBIN);
             
             /* make sure we were able to create the file successfully */
             if (fp == 0)
@@ -1119,7 +1125,7 @@ int CVmObjFile::open_binary(VMG_ vm_val_t *retval, uint *in_argc, int mode,
             
         case VMOBJFILE_ACCESS_RW_KEEP:
             /* open for read/write, keeping existing contents */
-            fp = osfoprwb(netfile->lclfname, OSFTBIN);
+            fp = osfoprwb(netfile->_lclfname, OSFTBIN);
             
             /* make sure we were able to find or create the file */
             if (fp == 0)
@@ -1132,7 +1138,7 @@ int CVmObjFile::open_binary(VMG_ vm_val_t *retval, uint *in_argc, int mode,
             
         case VMOBJFILE_ACCESS_RW_TRUNC:
             /* open for read/write, truncating existing contents */
-            fp = osfoprwtb(netfile->lclfname, OSFTBIN);
+            fp = osfoprwtb(netfile->_lclfname, OSFTBIN);
             
             /* make sure we were successful */
             if (fp == 0)
@@ -1187,7 +1193,7 @@ void CVmObjFile::check_safety_for_open(VMG_ CVmNetFile *nf, int access)
      *   Special files are inherently sandboxed, since the system determines
      *   their paths.  These are always allowed for ordinary read/write.
      */
-    if (nf->sfid != 0
+    if (nf->_sfid != 0
         && (access == VMOBJFILE_ACCESS_READ
             || access == VMOBJFILE_ACCESS_WRITE
             || access == VMOBJFILE_ACCESS_RW_KEEP
@@ -1200,7 +1206,7 @@ void CVmObjFile::check_safety_for_open(VMG_ CVmNetFile *nf, int access)
      *   Temporary file paths can only be obtained from the VM.  Ordinary
      *   read/write operations are allowed, as is delete. 
      */
-    if (nf->is_temp
+    if (nf->_is_temp
         && (access == VMOBJFILE_ACCESS_READ
             || access == VMOBJFILE_ACCESS_WRITE
             || access == VMOBJFILE_ACCESS_RW_KEEP
@@ -1225,7 +1231,7 @@ void CVmObjFile::check_safety_for_open(VMG_ CVmNetFile *nf, int access)
      *   interaction.
      */
     CVmObjFileName *ofn;
-    if ((ofn = vm_objid_cast(CVmObjFileName, nf->filespec)) != 0
+    if ((ofn = vm_objid_cast(CVmObjFileName, nf->_filespec)) != 0
         && ofn->get_from_ui() != 0)
     {
         /* grant permission based on the dialog mode */
@@ -1258,7 +1264,7 @@ void CVmObjFile::check_safety_for_open(VMG_ CVmNetFile *nf, int access)
      *   privileges, so determine if it's accessible according to the local
      *   file name's handling under the file safety and sandbox rules.
      */
-    return check_safety_for_open(vmg_ nf->lclfname, access);
+    return check_safety_for_open(vmg_ nf->_lclfname, access);
 }
 
 /*
@@ -1368,7 +1374,7 @@ int CVmObjFile::query_safety_for_open(VMG_ const char *lclfname, int access)
          *   this operation, as is its parent, its parent's parent, etc
          *   (which is to say, any folder that contains the sandbox)
          */
-        in_sandbox |= os_is_file_in_dir(sandbox, lclfname, TRUE, TRUE);
+		in_sandbox |= os_is_file_in_dir(sandbox, lclfname, TRUE, TRUE) ? 1 : 0;
         break;
 
     case VMOBJFILE_ACCESS_READDIR:
@@ -1385,7 +1391,7 @@ int CVmObjFile::query_safety_for_open(VMG_ const char *lclfname, int access)
      *   thereof).  If not, we may have to disallow the operation based on
      *   safety level settings, but for now just note the location status.
      */
-    in_sandbox |= os_is_file_in_dir(lclfname, sandbox, TRUE, match_self);
+	in_sandbox |= os_is_file_in_dir(lclfname, sandbox, TRUE, match_self) ? 1 : 0;
 
     /* if the file isn't in the sandbox, access isn't allowed */
     if (!in_sandbox)
@@ -2259,8 +2265,8 @@ int CVmObjFile::getp_write_bytes(VMG_ vm_obj_id_t self, vm_val_t *retval,
     vm_val_t srcval;
     CVmObjByteArray *arr = 0;
     CVmObjFile *file = 0;
-    unsigned long idx, has_idx = FALSE;
-    unsigned long len;
+    unsigned long idx = 0, has_idx = FALSE;
+    unsigned long len = 0;
 
     /* check arguments */
     if (get_prop_check_argc(retval, in_argc, &desc))
@@ -2992,3 +2998,7 @@ int vmobjfile_readbuf_t::peekch(wchar_t &ch,
             return FALSE;
     }
 }
+
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

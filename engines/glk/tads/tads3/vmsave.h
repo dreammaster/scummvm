@@ -34,6 +34,9 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class CVmFile;
+class CVmObjLookupTable;
+
 /*
  *   Save/restore API.  (This class is all static methods, so it's never
  *   instatiated; it's really just a namespace.)
@@ -54,21 +57,19 @@ public:
      *   help the user identify the context of the saved game when looking
      *   for the one he/she wishes to restore.  
      */
-    static void save(VMG_ class CVmFile *fp,
-                     class CVmObjLookupTable *metadata);
+    static void save(VMG_ CVmFile *fp, CVmObjLookupTable *metadata);
 
     /* 
      *   given a saved state file, read the name of the image file that
      *   created it 
      */
-    static int restore_get_image(osfildef *fp,
-                                 char *fname_buf, size_t fname_buf_len);
+    static int restore_get_image(osfildef *fp, char *fname_buf, size_t fname_buf_len);
 
     /* 
      *   Restore state from a file.  Returns zero on success, or a
      *   VMERR_xxx code indicating the problem on failure.  
      */
-    static int restore(VMG_ class CVmFile *fp);
+    static int restore(VMG_ CVmFile *fp);
 
     /* reset the VM to the initial image file state */
     static void reset(VMG0_);

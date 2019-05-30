@@ -30,23 +30,11 @@
  * platforms that don't provide TADS networking functionality.
 */
 
+#include "glk/tads/tads3/vmrefcnt.h"
+
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
-
-class OS_Counter
-{
-public:
-    OS_Counter(long c = 1) { cnt = c; }
-    long get() const { return cnt; }
-    long inc() { return ++cnt; }
-    long dec() { return --cnt; }
-
-private:
-    long cnt;
-};
-
-#include "glk/tads/tads3/vmrefcnt.h"
 
 class OS_Event: public CVmRefCntObj
 {

@@ -1,37 +1,33 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header$";
-#endif
-
-/* Copyright (c) 2012 by Michael J. Roberts.  All Rights Reserved. */
-/*
-Name
-  vmbignumlib.cpp - BigNumber numerics library
-Function
-  This module contains the low-level numerics library for the BigNumber
-  object.  The routines here operate on the internal byte-array
-  representation of a BigNumber value, without the CVmObjBigNum wrapper
-  object, so this module can be used as a library for high-precision
-  arithmetic without dragging in the whole TADS 3 VM.
-Notes
-  
-Modified
-  06/20/12 MJRoberts  - Creation
-*/
-
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <limits.h>
-#include <stdarg.h>
-#include <math.h>
-#include <float.h>
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/utf8.h"
 #include "glk/tads/tads3/vmtype.h"
 #include "glk/tads/tads3/vmbignum.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -436,7 +432,6 @@ start_over:
         size_t src_rem;
         utf8_ptr src;
         utf8_ptr dst;
-        int idx;
 
         /* start with the excess whole places */
         cnt = whole_places - dig_before_pt;
@@ -500,7 +495,7 @@ start_over:
         }
 
         /* resynchronize from our utf8 pointer */
-        p = dst.getptr();
+        p = dst.getCharPtr();
     }
 
     /* 
@@ -1266,8 +1261,6 @@ void CVmObjBigNum::parse_str_into(char *ext, const char *str, size_t len)
             /* parse the exponent */
             for (acc = 0 ; rem != 0 ; p.inc(&rem))
             {
-                wchar_t ch;
-
                 /* if this is a digit, add it to the exponent */
                 ch = p.getch();
                 if (is_digit(ch))
@@ -4294,4 +4287,6 @@ void CVmBigNumCache::release_all()
         release_reg(i);
 }
 
-
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

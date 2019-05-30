@@ -38,6 +38,17 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class OS_Counter {
+public:
+    OS_Counter(long c = 1) { cnt = c; }
+    long get() const { return cnt; }
+    long inc() { return ++cnt; }
+    long dec() { return --cnt; }
+
+private:
+    long cnt;
+};
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Reference-counted object.  This is the base class for objects with
@@ -76,12 +87,12 @@ public:
     void add_ref(void *from, const char *msg)
     {
         add_ref();
-        printf("add_ref(this=%lx, cnt=%ld, from=%lx, %s)\n",
+        debug("add_ref(this=%lx, cnt=%ld, from=%lx, %s)\n",
                (long)this, cnt.get(), (long)from, msg);
     }
     void release_ref(void *from, const char *msg)
     {
-        printf("release_ref(this=%lx, cnt=%ld, from=%lx, %s)\n",
+		debug("release_ref(this=%lx, cnt=%ld, from=%lx, %s)\n",
                (long)this, cnt.get()-1, (long)from, msg);
         release_ref();
     }
@@ -181,7 +192,7 @@ public:
     /* debugging version */
     void release_ref(void *from, const char *msg)
     {
-        printf("release_ref(this=%lx, cnt=%ld, from=%lx, %s)\n",
+		debug("release_ref(this=%lx, cnt=%ld, from=%lx, %s)\n",
                (long)this, cnt.get()-1, (long)from, msg);
         release_ref();
     }
@@ -201,3 +212,4 @@ protected:
 } // End of namespace Glk
 
 #endif
+

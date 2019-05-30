@@ -1,28 +1,24 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header$";
-#endif
-
-/* 
- *   Copyright (c) 2010 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmstrbuf.cpp - StringBuffer object
-Function
-  
-Notes
-  
-Modified
-  12/13/09 MJRoberts  - Creation
-*/
-
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmstrbuf.h"
@@ -40,6 +36,10 @@ Modified
 #include "glk/tads/tads3/vmrun.h"
 #include "glk/tads/tads3/vmstr.h"
 #include "glk/tads/tads3/utf8.h"
+
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -191,7 +191,7 @@ vm_obj_id_t CVmObjStringBuffer::create_from_stack(
     VMG_ const uchar **pc_ptr, uint argc)
 {
     vm_obj_id_t id;
-    int alo, inc;
+    int alo = 0, inc = 0;
 
     /* get the arguments */
     if (argc == 0)
@@ -1278,3 +1278,7 @@ int CVmObjStringBuffer::getp_substr(VMG_ vm_obj_id_t self,
     /* handled */
     return TRUE;
 }
+
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

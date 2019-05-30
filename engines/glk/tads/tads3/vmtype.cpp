@@ -1,24 +1,24 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header: d:/cvsroot/tads/tads3/VMTYPE.CPP,v 1.3 1999/05/17 02:52:29 MJRoberts Exp $";
-#endif
-
-/* 
- *   Copyright (c) 1998, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  vmtype.cpp - VM types
-Function
-  
-Notes
-  
-Modified
-  11/18/98 MJRoberts  - Creation
-*/
 
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/vmtype.h"
@@ -26,6 +26,10 @@ Modified
 #include "glk/tads/tads3/vmstr.h"
 #include "glk/tads/tads3/vmlst.h"
 #include "glk/tads/tads3/vmpool.h"
+
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -392,12 +396,12 @@ void vm_val_t::cast_to_num(VMG_ vm_val_t *retval) const
 /*
  *   Promote an integer to match my type 
  */
-void vm_val_t::promote_int(VMG_ vm_val_t *val) const
+void vm_val_t::promote_int(VMG_ vm_val_t *v) const
 {
     if (typ == VM_OBJ)
     {
         /* ask the object to perform the promotion */
-        vm_objp(vmg_ this->val.obj)->promote_int(vmg_ val);
+        vm_objp(vmg_ this->val.obj)->promote_int(vmg_ v);
     }
     else
     {
@@ -664,3 +668,7 @@ int vm_val_t::is_func_ptr(VMG0_) const
             || (typ == VM_OBJ
                 && vm_objp(vmg_ val.obj)->get_invoker(vmg_ 0)));
 }
+
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk

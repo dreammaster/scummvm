@@ -34,6 +34,9 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class CVmObjString;
+class CCharmapToUni;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   A ByteArray is simply an array of byte values.  This class provides a
@@ -438,8 +441,8 @@ protected:
 
     /* map to a string */
     size_t map_to_string(unsigned long idx, unsigned long len,
-                         class CVmObjString *str, size_t str_len,
-                         class CCharmapToUni *mapper);
+                         CVmObjString *str, size_t str_len,
+                         CCharmapToUni *mapper);
     
     /* save undo for a change to a range of the array */
     void save_undo(VMG_ vm_obj_id_t self, unsigned long start_idx,

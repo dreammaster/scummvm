@@ -27,6 +27,8 @@
 
 #include "glk/tads/tads3/t3std.h"
 
+#undef rand
+
 namespace Glk {
 namespace TADS {
 namespace TADS3 {

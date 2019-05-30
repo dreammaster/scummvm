@@ -42,7 +42,14 @@ namespace TADS3 {
 #define VMGLOB_PARAM
 #endif
 
+#define TC_TARGET_T3
+
+#define DBL_DIG 16
+#define DBL_MIN (1e-99)
+#define DBL_MAX (9.999999999999999e99)
+
 typedef uint16 uint16_t;
+typedef uint32 uint32_t;
 
 class CVmBifTable;
 class CVmMetaTable;
@@ -487,18 +494,18 @@ inline int lib_stricmp(const char *str1, size_t len1, const char *str2)
  *   character; stops if we exhaust the length limit 'len' bytes or reach a
  *   null character in the string.  
  */
-inline char *lib_strnchr(const char *src, size_t len, int ch)
+inline const char *lib_strnchr(const char *src, size_t len, int ch)
 {
     /* search until we exhaust the length limit or reach a null byte */
     for ( ; len != 0 && *src != '\0' ; --len, ++src)
     {
         /* if this is the character we're looking for, return the pointer */
         if (*src == ch)
-            return (char *)src;
+            return src;
     }
 
     /* didn't find it */
-    return 0;
+    return nullptr;
 }
 
 /* ------------------------------------------------------------------------ */

@@ -75,6 +75,9 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+class OS_HttpPayload;
+class CVmDataSource;
+
 /*
  *   Intialize the networking and threading package.  This must be called
  *   once at program startup.  The OS isn't required to do anything here;
@@ -815,9 +818,8 @@ public:
     static int request(int opts, const char *host, unsigned short portno,
                        const char *verb, const char *resource,
                        const char *send_headers, size_t send_headers_len,
-                       class OS_HttpPayload *payload,
-                       class CVmDataSource *reply, char **reply_headers,
-                       char **location, const char *ua);
+                       OS_HttpPayload *payload, CVmDataSource *reply,
+                       char **reply_headers, char **location, const char *ua);
 
     /* option flags for request() */
     static const int OptHTTPS = 0x0001;                 /* use https scheme */
@@ -950,13 +952,16 @@ protected:
  */
 class TadsThreadList;
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk
 
 /* ------------------------------------------------------------------------ */
 /*
  *   Include the appropriate system-specific header 
  */
 
-#if defined(GARGOYLE)
+#if defined(GLK)
 #include "glk/tads/tads3/osnetdum.h"
 
 #elif defined(_WIN32)
@@ -970,6 +975,9 @@ class TadsThreadList;
 
 #endif
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 /* ------------------------------------------------------------------------ */
 /*

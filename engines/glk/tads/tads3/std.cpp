@@ -1,42 +1,35 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header: d:/cvsroot/tads/tads3/STD.CPP,v 1.3 1999/07/11 00:46:52 MJRoberts Exp $";
-#endif
-
-/* 
- *   Copyright (c) 1999, 2002 Michael J. Roberts.  All Rights Reserved.
- *   
- *   Please see the accompanying license file, LICENSE.TXT, for information
- *   on using and copying this software.  
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
-/*
-Name
-  std.cpp - T3 library functions
-Function
-  
-Notes
-  
-Modified
-  04/16/99 MJRoberts  - Creation
-*/
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdarg.h>
 
 #include "glk/tads/os_glk.h"
 #include "glk/tads/tads3/t3std.h"
 #include "glk/tads/tads3/utf8.h"
 #include "glk/tads/tads3/osifcnet.h"
 
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
-/* ------------------------------------------------------------------------ */
-/*
- *   Allocate space for a string of a given length.  We'll add in space
- *   for the null terminator.  
- */
-char *lib_alloc_str(size_t len)
-{
+char *lib_alloc_str(size_t len) {
     char *buf;
 
     /* allocate the space */
@@ -49,14 +42,7 @@ char *lib_alloc_str(size_t len)
     return buf;
 }
 
-/*
- *   Allocate space for a string of known length, and save a copy of the
- *   string.  The length does not include a null terminator, and in fact
- *   the string does not need to be null-terminated.  The copy returned,
- *   however, is null-terminated.  
- */
-char *lib_copy_str(const char *str, size_t len)
-{
+char *lib_copy_str(const char *str, size_t len) {
     /* if the source string is null, just return null as the result */
     if (str == 0)
         return 0;
@@ -78,30 +64,17 @@ char *lib_copy_str(const char *str, size_t len)
     return buf;
 }
 
-/*
- *   allocate and copy a null-terminated string 
- */
-char *lib_copy_str(const char *str)
-{
+char *lib_copy_str(const char *str) {
     return (str == 0 ? 0 : lib_copy_str(str, strlen(str)));
 }
 
-/*
- *   Free a string previously allocated with lib_copy_str() 
- */
-void lib_free_str(char *buf)
-{
+void lib_free_str(char *buf) {
     if (buf != 0)
         t3free(buf);
 }
 
-/* ------------------------------------------------------------------------ */
-/*
- *   Utility routine: compare spaces, collapsing whitespace 
- */
 int lib_strequal_collapse_spaces(const char *a, size_t a_len,
-                                 const char *b, size_t b_len)
-{
+                                 const char *b, size_t b_len) {
     const char *a_end;
     const char *b_end;
     utf8_ptr ap, bp;
@@ -143,26 +116,8 @@ int lib_strequal_collapse_spaces(const char *a, size_t a_len,
     return (ap.getptr() == a_end && bp.getptr() == b_end);
 }
 
-/* ------------------------------------------------------------------------ */
-/*
- *   Utility routine: do a case-insensitive comparison of two UTF-8 strings.
- *   Returns strcmp-style results: negative if a < b, 0 if a == b, positive
- *   if a > b.
- *   
- *   If 'bmatchlen' is null, it means that the two strings must have the same
- *   number of characters.  Otherwise, we'll return 0 (equal) if 'a' is a
- *   leading substring of 'b', and fill in '*bmatchlen' with the length in
- *   bytes of the 'b' string that we matched.  This might differ from the
- *   length of the 'a' string because of case folding.  To match as a leading
- *   substring, we have to match to a character boundary.  E.g., we won't
- *   match "weis" as a leading substring of "weiß": while "weis" is indeed a
- *   leading substring of "weiss", which is the case-folded version of
- *   "weiß", it doesn't end at a character boundary in the original.
- */
-int t3_compare_case_fold(
-    const char *a, size_t alen,
-    const char *b, size_t blen, size_t *bmatchlen)
-{
+int t3_compare_case_fold(const char *a, size_t alen,
+    const char *b, size_t blen, size_t *bmatchlen) {
     /* set up folded-case string readers for the two strings */
     Utf8FoldStr ap(a, alen), bp(b, blen);
 
@@ -193,13 +148,8 @@ int t3_compare_case_fold(
     return ap.more() ? 1 : bp.more() ? -1 : 0;
 }
 
-/*
- *   compare a wchar_t string against a utf-8 string with case folding
- */
-int t3_compare_case_fold(
-    const wchar_t *a, size_t alen,
-    const char *b, size_t blen, size_t *bmatchlen)
-{
+int t3_compare_case_fold(const wchar_t *a, size_t alen,
+    const char *b, size_t blen, size_t *bmatchlen) {
     /* set up folded-case string readers for the two strings */
     CVmCaseFoldStr ap(a, alen);
     Utf8FoldStr bp(b, blen);
@@ -231,14 +181,7 @@ int t3_compare_case_fold(
     return ap.more() ? 1 : bp.more() ? -1 : 0;
 }
 
-/* ------------------------------------------------------------------------ */
-/*
- *   Compare the minimum number of characters in each string with case
- *   folding. 
- */
-int t3_compare_case_fold_min(
-    utf8_ptr &a, size_t &alen, utf8_ptr &b, size_t &blen)
-{
+int t3_compare_case_fold_min(utf8_ptr &a, size_t &alen, utf8_ptr &b, size_t &blen) {
     /* if either is empty, there can be no match (unless both are empty) */
     if (alen == 0 || blen == 0)
         return alen - blen;
@@ -278,9 +221,7 @@ int t3_compare_case_fold_min(
     return 0;
 }
 
-int t3_compare_case_fold_min(
-    utf8_ptr &a, size_t &alen, const wchar_t *&b, size_t &blen)
-{
+int t3_compare_case_fold_min(utf8_ptr &a, size_t &alen, const wchar_t *&b, size_t &blen) {
     /* if either is empty, there can be no match (unless both are empty) */
     if (alen == 0 || blen == 0)
         return alen - blen;
@@ -320,9 +261,7 @@ int t3_compare_case_fold_min(
     return 0;
 }
 
-int t3_compare_case_fold_min(
-    const wchar_t* &a, size_t &alen, const wchar_t* &b, size_t &blen)
-{
+int t3_compare_case_fold_min(const wchar_t* &a, size_t &alen, const wchar_t* &b, size_t &blen) {
     /* if either is empty, there can be no match (unless both are empty) */
     if (alen == 0 || blen == 0)
         return alen - blen;
@@ -360,13 +299,7 @@ int t3_compare_case_fold_min(
     return 0;
 }
 
-
-/* ------------------------------------------------------------------------ */
-/*
- *   Limited-length atoi 
- */
-int lib_atoi(const char *str, size_t len)
-{
+int lib_atoi(const char *str, size_t len) {
     /* parse the sign, if present */
     int s = 1;
     if (len >= 1 && *str == '-')
@@ -383,11 +316,7 @@ int lib_atoi(const char *str, size_t len)
     return s * acc;
 }
 
-/*
- *   Limited-length atoi, with auto-advance of the string
- */
-int lib_atoi_adv(const char *&str, size_t &len)
-{
+int lib_atoi_adv(const char *&str, size_t &len) {
     /* parse the sign, if present */
     int s = 1;
     if (len >= 1 && *str == '-')
@@ -404,22 +333,8 @@ int lib_atoi_adv(const char *&str, size_t &len)
     return s * acc;
 }
 
-
-/* ------------------------------------------------------------------------ */
-/*
- *   Find a version suffix in an identifier string.  A version suffix
- *   starts with the given character.  If we don't find the character,
- *   we'll return the default version suffix.  In any case, we'll set
- *   name_len to the length of the name portion, excluding the version
- *   suffix and its leading separator.
- *   
- *   For example, with a '/' suffix, a versioned name string would look
- *   like "tads-gen/030000" - the name is "tads_gen" and the version is
- *   "030000".  
- */
 const char *lib_find_vsn_suffix(const char *name_string, char suffix_char,
-                                const char *default_vsn, size_t *name_len)
-{
+                                const char *default_vsn, size_t *name_len) {
     const char *vsn;
     
     /* find the suffix character, if any */
@@ -442,13 +357,7 @@ const char *lib_find_vsn_suffix(const char *name_string, char suffix_char,
     return vsn;
 }
 
-
-/* ------------------------------------------------------------------------ */
-/*
- *   allocating sprintf implementation 
- */
-char *t3sprintf_alloc(const char *fmt, ...)
-{
+char *t3sprintf_alloc(const char *fmt, ...) {
     /* package the arguments as a va_list and invoke our va_list version */
     va_list args;
     va_start(args, fmt);
@@ -459,11 +368,7 @@ char *t3sprintf_alloc(const char *fmt, ...)
     return str;
 }
 
-/*
- *   allocating vsprintf implementation 
- */
-char *t3vsprintf_alloc(const char *fmt, va_list args)
-{
+char *t3vsprintf_alloc(const char *fmt, va_list args) {
     /* measure the required space - add in a byte for null termination */
     size_t len = t3vsprintf(0, 0, fmt, args) + 1;
 
@@ -479,11 +384,7 @@ char *t3vsprintf_alloc(const char *fmt, va_list args)
     return buf;
 }
 
-/*
- *   buffer-checked sprintf implementation
- */
-size_t t3sprintf(char *buf, size_t buflen, const char *fmt, ...)
-{
+size_t t3sprintf(char *buf, size_t buflen, const char *fmt, ...) {
     /* package the arguments as a va_list and invoke our va_list version */
     va_list args;
     va_start(args, fmt);
@@ -494,9 +395,10 @@ size_t t3sprintf(char *buf, size_t buflen, const char *fmt, ...)
     return len;
 }
 
-/* check for 'th' suffix in a format code */
-static const char *check_nth(const char *&fmt, int ival)
-{
+/**
+ * Check for 'th' suffix in a format code
+ */
+static const char *check_nth(const char *&fmt, int ival) {
     /* presume no suffix */
     const char *nth = "";
 
@@ -536,11 +438,7 @@ static const char *check_nth(const char *&fmt, int ival)
     return nth;
 }
 
-/*
- *   buffer-checked vsprintf implementation 
- */
-size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
-{
+size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0) {
     size_t rem;
     size_t need = 0;
     char *dst;
@@ -565,7 +463,7 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
             const char *nth = "";
             const char *txt;
             size_t txtlen;
-            char buf[20];
+            char buffer[20];
             int fld_wid = -1;
             int fld_prec = -1;
             char lead_char = ' ';
@@ -741,7 +639,7 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
                 /* use the field precision if given, or the string length */
                 txtlen = (fld_prec >= 0 ? fld_prec : strlen(txt));
 
-                /* encode the parameter and add it to the buffer */
+                /* encode the parameter and add it to the bufferfer */
                 for ( ; txtlen != 0 ; --txtlen, ++txt)
                 {
                     switch (*txt)
@@ -766,12 +664,12 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
                     case ']':
                     case ' ':
                         /* use % encoding for special characters */
-                        sprintf(buf, "%%%02x", (unsigned)(uchar)*txt);
+                        sprintf(buffer, "%%%02x", (unsigned)(uchar)*txt);
                         need += 3;
                         for (i = 0 ; i < 3 ; ++i)
                         {
                             if (rem > 1)
-                                *dst++ = buf[i], --rem;
+                                *dst++ = buffer[i], --rem;
                         }
                         break;
 
@@ -787,8 +685,8 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
 
             case 'c':
                 /* the value is a (char) */
-                buf[0] = (char)va_arg(args, int);
-                txt = buf;
+                buffer[0] = (char)va_arg(args, int);
+                txt = buffer;
                 txtlen = 1;
                 break;
 
@@ -796,7 +694,7 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
                 /* the value is an int, formatted in decimal */
                 {
                     int ival = va_arg(args, int);
-                    sprintf(buf, "%d", ival);
+                    sprintf(buffer, "%d", ival);
 
                     /* check for '%dth' notation (1st, 2nd, etc) */
                     nth = check_nth(fmt, ival);
@@ -804,9 +702,9 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
                 /* fall through to num_common: */
                 
             num_common:
-                /* use the temporary buffer where we formatted the value */
-                txt = buf;
-                txtlen = strlen(buf);
+                /* use the temporary bufferfer where we formatted the value */
+                txt = buffer;
+                txtlen = strlen(buffer);
 
                 /* 
                  *   Pad with leading spaces or zeros if the requested
@@ -857,17 +755,17 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
 
             case 'u':
                 /* the value is an int, formatted as unsigned decimal */
-                sprintf(buf, "%u", va_arg(args, int));
+                sprintf(buffer, "%u", va_arg(args, int));
                 goto num_common;
 
             case 'x':
                 /* the value is an int, formatted in hex */
-                sprintf(buf, "%x", va_arg(args, int));
+                sprintf(buffer, "%x", va_arg(args, int));
                 goto num_common;
 
             case 'o':
                 /* the value is an int, formatted in hex */
-                sprintf(buf, "%o", va_arg(args, int));
+                sprintf(buffer, "%o", va_arg(args, int));
                 goto num_common;
 
             case 'l':
@@ -876,22 +774,22 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
                 {
                 case 'd':
                     /* it's a long, formatted in decimal */
-                    sprintf(buf, "%ld", va_arg(args, long));
+                    sprintf(buffer, "%ld", va_arg(args, long));
                     goto num_common;
 
                 case 'u':
                     /* it's a long, formatted as unsigned decimal */
-                    sprintf(buf, "%lu", va_arg(args, long));
+                    sprintf(buffer, "%lu", va_arg(args, long));
                     goto num_common;
 
                 case 'x':
                     /* it's a long, formatted in hex */
-                    sprintf(buf, "%lx", va_arg(args, long));
+                    sprintf(buffer, "%lx", va_arg(args, long));
                     goto num_common;
 
                 case 'o':
                     /* it's a long, formatted in octal */
-                    sprintf(buf, "%lo", va_arg(args, long));
+                    sprintf(buffer, "%lo", va_arg(args, long));
                     goto num_common;
 
                 default:
@@ -911,7 +809,7 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
                 break;
             }
 
-            /* add the text to the buffer */
+            /* add the text to the bufferfer */
             for (i = txtlen ; i != 0 ; --i, ++txt)
             {
                 ++need;
@@ -977,16 +875,14 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
     return need;
 }
 
-
-/* ------------------------------------------------------------------------ */
-/*
- *   Convert string to lower case 
- */
-void t3strlwr(char *p)
-{
+void t3strlwr(char *p) {
     for ( ; *p != '\0' ; ++p)
         *p = (char)to_lower(*p);
 }
+
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -995,8 +891,9 @@ void t3strlwr(char *p)
 
 #ifdef T3_DEBUG
 
-#include <stdio.h>
-#include <stdlib.h>
+namespace Glk {
+namespace TADS {
+namespace TADS3 {
 
 #define T3_DEBUG_MEMGUARD
 #ifdef T3_DEBUG_MEMGUARD
@@ -1349,5 +1246,8 @@ void os_mem_prefix_set(mem_prefix_t *mem)
 
 #endif /* T_WIN32 */
 
+} // End of namespace TADS3
+} // End of namespace TADS
+} // End of namespace Glk
 
 #endif /* T3_DEBUG */

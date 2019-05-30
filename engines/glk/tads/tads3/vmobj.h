@@ -34,6 +34,14 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+struct CVmUndoRecord;
+class CVmFile;
+class CVmObjFixup;
+class CVmConstMapper;
+class CVmImageWriter;
+class CVmHashEntryPLI;
+class CVmHashEntry;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   GC statistics conditional compilation macro
@@ -173,11 +181,11 @@ const int VM_GC_WORK_INCREMENT = 500;
  *   allows instances of this object to be dynamically linked from the
  *   image file.  
  */
-class CVmObject
-{
+class CVmObject {
     friend class CVmVarHeap;
-    
 public:
+	virtual ~CVmObject() {}
+
     /* metaclass registration object (for the root object implementation) */
     static class CVmMetaclass *metaclass_reg_;
 
@@ -443,7 +451,7 @@ public:
      *   when the undo record was created), this should also discard the
      *   additional data 
      */
-    virtual void apply_undo(VMG_ struct CVmUndoRecord *rec) = 0;
+    virtual void apply_undo(VMG_ CVmUndoRecord *rec) = 0;
 
     /* 
      *   Discard any extra information associated with this undo record.
@@ -451,7 +459,7 @@ public:
      *   since apply_undo() is expected to discard any extra information
      *   itself after applying the record.  
      */
-    virtual void discard_undo(VMG_ struct CVmUndoRecord *) { }
+    virtual void discard_undo(VMG_ CVmUndoRecord *) { }
 
     /*
      *   Mark an object object reference.  If this object keeps strong
@@ -459,7 +467,7 @@ public:
      *   record's saved value as referenced; if this object keeps only
      *   weak references, this doesn't need to do anything. 
      */
-    virtual void mark_undo_ref(VMG_ struct CVmUndoRecord *rec) = 0;
+    virtual void mark_undo_ref(VMG_ CVmUndoRecord *rec) = 0;
 
     /*
      *   Remove any stale weak reference contained in an undo record.  For
@@ -471,7 +479,7 @@ public:
      *   in the old value to 'invalid'). 
      */
     virtual void remove_stale_undo_weak_ref(VMG_
-                                            struct CVmUndoRecord *rec) = 0;
+                                            CVmUndoRecord *rec) = 0;
 
     /*
      *   Post-load initialization.  This routine is called only if the object
@@ -550,7 +558,7 @@ public:
      *   save this object to a file, so that it can be restored to its
      *   current state via restore_from_file 
      */
-    virtual void save_to_file(VMG_ class CVmFile *fp) = 0;
+    virtual void save_to_file(VMG_ CVmFile *fp) = 0;
 
     /* 
      *   Restore the state of the object from a file into which state was
@@ -559,8 +567,8 @@ public:
      *   memory to make room for the variable data.  
      */
     virtual void restore_from_file(VMG_ vm_obj_id_t self,
-                                   class CVmFile *fp,
-                                   class CVmObjFixup *fixups) = 0;
+                                   CVmFile *fp,
+                                   CVmObjFixup *fixups) = 0;
 
     /*
      *   Compare to another value for equality.  Returns true if the value is
@@ -940,7 +948,7 @@ public:
      *   here does nothing.  Those that can, such as strings and lists,
      *   should override this.  
      */
-    virtual void reserve_const_data(VMG_ class CVmConstMapper *,
+    virtual void reserve_const_data(VMG_ CVmConstMapper *,
                                     vm_obj_id_t /*self*/)
         { /* default does nothing */ }
 
@@ -957,7 +965,7 @@ public:
      *   least, it must be overridden by objects that can be converted or
      *   that can refer to objects that can be converted).  
      */
-    virtual void convert_to_const_data(VMG_ class CVmConstMapper *,
+    virtual void convert_to_const_data(VMG_ CVmConstMapper *,
                                        vm_obj_id_t /*self*/)
         { /* default does nothing */ }
 
@@ -1390,8 +1398,7 @@ struct obj_fixup_entry
 /* fixup table subarray size */
 #define VMOBJFIXUP_SUB_SIZE 2048
 
-class CVmObjFixup
-{
+class CVmObjFixup {
 public:
     CVmObjFixup(ulong entry_cnt);
     ~CVmObjFixup();
@@ -1897,7 +1904,7 @@ public:
      *   records won't contain any references either.  
      */
     void mark_obj_undo_rec(VMG_ vm_obj_id_t obj,
-                           struct CVmUndoRecord *undo_rec)
+                           CVmUndoRecord *undo_rec)
     {
         /* get the object entry */
         CVmObjPageEntry *entry = get_entry(obj);
@@ -1919,7 +1926,7 @@ public:
      *   know it won't do anything.  
      */
     void remove_obj_stale_undo_weak_ref(VMG_ vm_obj_id_t obj,
-                                        struct CVmUndoRecord *undo_rec)
+                                        CVmUndoRecord *undo_rec)
     {
         /* get the object entry */
         CVmObjPageEntry *entry = get_entry(obj);
@@ -2035,7 +2042,7 @@ public:
     /*
      *   Apply an undo record 
      */
-    void apply_undo(VMG_ struct CVmUndoRecord *rec);
+    void apply_undo(VMG_ CVmUndoRecord *rec);
 
     /* call a callback for each object in the table */
     void for_each(VMG_ void (*func)(VMG_ vm_obj_id_t, void *), void *ctx);
@@ -2050,8 +2057,8 @@ public:
      *   'meta_dep_idx' is the index in the metaclass dependency table of
      *   the metaclass to be written.  
      */
-    void rebuild_image(VMG_ int meta_dep_idx, class CVmImageWriter *writer,
-                       class CVmConstMapper *mapper);
+    void rebuild_image(VMG_ int meta_dep_idx, CVmImageWriter *writer,
+                       CVmConstMapper *mapper);
 
     /*
      *   Scan all objects and add metaclass entries to the metaclass
@@ -2067,7 +2074,7 @@ public:
      *   data; this routine makes all of these conversions. 
      */
     void rebuild_image_convert_const_data(VMG_
-                                          class CVmConstMapper *const_mapper);
+                                          CVmConstMapper *const_mapper);
 
     /*
      *   Get the maximum object ID that has ever been allocated.  This
@@ -2124,7 +2131,7 @@ public:
      *   Save state to a file.  We write out each object's state to the
      *   file so that the state can be restored later. 
      */
-    void save(VMG_ class CVmFile *fp);
+    void save(VMG_ CVmFile *fp);
 
     /* 
      *   Restore state from a previously saved file.  Returns zero on
@@ -2134,7 +2141,7 @@ public:
      *   *fixups.  The caller is responsible for deleting this object if a
      *   non-null pointer is returned in *fixups.  
      */
-    int restore(VMG_ class CVmFile *fp, class CVmObjFixup **fixups);
+    int restore(VMG_ CVmFile *fp, CVmObjFixup **fixups);
 
     /*
      *   Save an object's image data pointer.  An object's load_from_image()
@@ -2219,14 +2226,14 @@ public:
 private:
     /* rebuild the image, writing only transient or only persistent objects */
     void rebuild_image(VMG_ int meta_dep_idx, CVmImageWriter *writer,
-                       class CVmConstMapper *mapper, int trans);
+                       CVmConstMapper *mapper, int trans);
 
     /* invoke a post-load initialization method */
-    static void call_post_load_init(VMG_ class CVmHashEntryPLI *entry);
+    static void call_post_load_init(VMG_ CVmHashEntryPLI *entry);
 
     /* enumeration callbacks for post-load initialization */
-    static void pli_status_cb(void *ctx, class CVmHashEntry *entry);
-    static void pli_invoke_cb(void *ctx, class CVmHashEntry *entry);
+    static void pli_status_cb(void *ctx, CVmHashEntry *entry);
+    static void pli_invoke_cb(void *ctx, CVmHashEntry *entry);
 
     /* get the page entry for a given ID */
     inline CVmObjPageEntry *get_entry(vm_obj_id_t id) const
