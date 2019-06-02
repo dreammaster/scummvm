@@ -56,7 +56,7 @@ class CTPNArgcBase: public CTcPrsNode
 {
 public:
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* simply return myself unchanged */
         return this;
@@ -75,7 +75,7 @@ class CTPNSelfBase: public CTcPrsNode
 {
 public:
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* simply return myself unchanged */
         return this;
@@ -94,7 +94,7 @@ class CTPNTargetpropBase: public CTcPrsNode
 {
 public:
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* simply return myself unchanged */
         return this;
@@ -114,7 +114,7 @@ class CTPNTargetobjBase: public CTcPrsNode
 {
 public:
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* simply return myself unchanged */
         return this;
@@ -134,7 +134,7 @@ class CTPNDefiningobjBase: public CTcPrsNode
 {
 public:
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *)
     {
         /* simply return myself unchanged */
         return this;
@@ -153,7 +153,7 @@ class CTPNInvokeeBase: public CTcPrsNode
 {
 public:
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *) { return this; }
+    CTcPrsNode *fold_constants(CTcPrsSymtab *) { return this; }
 
     /* adjust for dynamic (run-time) compilation */
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *)
@@ -174,7 +174,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* simply return myself unchanged */
         return this;
@@ -205,7 +205,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* simply return myself unchanged */
         return this;
@@ -234,7 +234,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* fold constants in the delegatee */
         delegatee_ = delegatee_->fold_constants(symtab);
@@ -265,7 +265,7 @@ class CTPNReplacedBase: public CTcPrsNode
 {
 public:
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* simply return myself unchanged */
         return this;
@@ -290,7 +290,7 @@ public:
     virtual class CTcConstVal *get_const_val() { return &val_; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* simply return myself unchanged */
         return this;
@@ -340,7 +340,7 @@ public:
         { return this; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 };
 
 /* ------------------------------------------------------------------------ */
@@ -386,7 +386,7 @@ public:
         { return (len_ == len && memcmp(sym, sym_, len) == 0); }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* generate a constant node for my address value */
     class CTcPrsNode *fold_addr_const(class CTcPrsSymtab *symtab);
@@ -444,7 +444,7 @@ public:
         { return sym_->has_return_value_on_call(); }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* generate a constant node for my address value */
     class CTcPrsNode *fold_addr_const(class CTcPrsSymtab *symtab);
@@ -486,7 +486,7 @@ public:
     virtual int has_return_value_on_call() const { return TRUE; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *) { return this; }
+    CTcPrsNode *fold_constants(CTcPrsSymtab *) { return this; }
 
     /* adjust for dynamic (run-time) compilation */
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *)
@@ -537,7 +537,7 @@ public:
     void set_arg_list_head(class CTPNArg *head) { list_ = head; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* adjust for dynamic (run-time) compilation */
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info);
@@ -597,7 +597,7 @@ public:
     void set_next_arg(class CTPNArg *prv) { next_arg_ = prv; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* adjust for dynamic (run-time) compilation */
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info)
@@ -652,7 +652,7 @@ public:
     class CTPNArglist *get_arg_list() const { return arglist_; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* we have a return value if our function has a return value */
     virtual int has_return_value() const
@@ -688,7 +688,7 @@ public:
     virtual int is_dstring_expr() const { return TRUE; }
 
     /* fold constants - there's nothing extra to do here */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
         { return this; }
 
     /* double-quoted strings have no value */
@@ -765,7 +765,7 @@ public:
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info);
     
     /* folder constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* 
      *   The overall "one of" list has a return value if it's in a
@@ -849,7 +849,7 @@ public:
     int get_count() const { return cnt_; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* adjust for dynamic (run-time) compilation */
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info);
@@ -907,7 +907,7 @@ public:
     CTcPrsNode *get_expr() const { return expr_; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* fold constants in my expression */
         expr_ = expr_->fold_constants(symtab);
@@ -965,7 +965,7 @@ public:
     CTcPrsNode *get_prop_expr() const { return prop_expr_; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         /* fold constants in the object and property expressions */
         obj_expr_ = obj_expr_->fold_constants(symtab);
@@ -1022,7 +1022,7 @@ public:
     class CTPNArglist *get_arg_list() const { return arglist_; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* adjust for dynamic (run-time) compilation */
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info);
@@ -1290,7 +1290,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* I have a return value if one or the other of my subnodes has a value */
     virtual int has_return_value() const
@@ -1326,7 +1326,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* add the branches */
     void set_cond(CTcPrsNode *e) { first_ = e; }
@@ -2947,7 +2947,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /*
      *   Generate the program code and write to the image file.  After
@@ -3061,7 +3061,7 @@ public:
      *   underlying code body, because its constants will be folded along
      *   with other top-level statements
      */
-    virtual class CTcPrsNode *fold_constants(class CTcPrsSymtab *)
+    virtual CTcPrsNode *fold_constants(CTcPrsSymtab *)
         { return this; }
 
     /* adjust for dynamic (run-time) compilation */
@@ -3136,7 +3136,7 @@ public:
     class CTcSymFunc *get_func_sym() const { return fixup_owner_sym_; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /*
      *   Check for unreferenced labels.  Scans the 'goto' symbol table and
@@ -3440,7 +3440,7 @@ public:
     void set_has_own_scope(int f) { has_own_scope_ = f; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* generate code for the compound statement */
     virtual void gen_code(int discard, int for_condition);
@@ -3498,7 +3498,7 @@ public:
     CTPNStmNullBase() { }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *) { return this; }
+    CTcPrsNode *fold_constants(CTcPrsSymtab *) { return this; }
 
     /* generate code for the compound statement */
     virtual void gen_code(int, int) { }
@@ -3522,7 +3522,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* generate code for the compound statement */
     virtual void gen_code(int discard, int for_condition);
@@ -3562,7 +3562,7 @@ public:
      *   these nodes, as this type of node is only created during constant
      *   folding of the containing property initializer node 
      */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *) { return this; }
+    CTcPrsNode *fold_constants(CTcPrsSymtab *) { return this; }
 
 protected:
     /* our expression */
@@ -3589,7 +3589,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the conditional */
     virtual unsigned long get_control_flow(int warn) const;
@@ -3649,7 +3649,7 @@ public:
     void set_body(class CTPNStm *body) { body_stm_ = body; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the loop */
     virtual unsigned long get_control_flow(int warn) const;
@@ -3718,7 +3718,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* adjust for dynamic (run-time) compilation */
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info)
@@ -3775,7 +3775,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
 protected:
     /* the lvalue for the control variable */
@@ -3834,7 +3834,7 @@ public:
     void set_body(class CTPNStm *body) { body_stm_ = body; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
     
     /* evaluate control flow for the loop */
     virtual unsigned long get_control_flow(int warn) const;
@@ -3895,7 +3895,7 @@ public:
     void set_body(class CTPNStm *body) { body_stm_ = body; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the loop */
     virtual unsigned long get_control_flow(int warn) const;
@@ -3945,7 +3945,7 @@ public:
     void set_body(class CTPNStm *body) { body_stm_ = body; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the loop */
     virtual unsigned long get_control_flow(int warn) const;
@@ -3992,7 +3992,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *)
     {
         /* we have nothing to fold - return unchangdd */
         return this;
@@ -4029,7 +4029,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *)
     {
         /* we have nothing to fold - return unchangdd */
         return this;
@@ -4066,7 +4066,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the statement */
     virtual unsigned long get_control_flow(int /*warn*/) const
@@ -4117,7 +4117,7 @@ public:
     void set_body(class CTPNStm *body) { body_ = body; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the statement */
     virtual unsigned long get_control_flow(int warn) const;
@@ -4184,7 +4184,7 @@ public:
     void set_stm(class CTPNStm *stm) { stm_ = stm; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the statement */
     virtual unsigned long get_control_flow(int warn) const;
@@ -4245,7 +4245,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *)
     {
         /* 'goto' statements are unaffected by constant folding */
         return this;
@@ -4286,7 +4286,7 @@ public:
     void set_stm(class CTPNStm *stm) { stm_ = stm; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the statement */
     virtual unsigned long get_control_flow(int warn) const;
@@ -4327,7 +4327,7 @@ public:
     void set_stm(class CTPNStm *stm) { stm_ = stm; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the statement */
     virtual unsigned long get_control_flow(int warn) const;
@@ -4379,7 +4379,7 @@ public:
     }
     
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
     
     /* evaluate control flow for the statement list */
     virtual unsigned long get_control_flow(int warn) const;
@@ -4435,7 +4435,7 @@ public:
     void set_exc_var(class CTcSymLocal *var) { exc_var_ = var; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the clause */
     virtual unsigned long get_control_flow(int warn) const;
@@ -4513,7 +4513,7 @@ public:
     long get_end_linenum() const { return end_linenum_; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* evaluate control flow for the clause */
     virtual unsigned long get_control_flow(int warn) const;
@@ -4566,7 +4566,7 @@ public:
     }
     
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
     
     /* evaluate control flow for the statement */
     virtual unsigned long get_control_flow(int /*warn*/) const
@@ -4601,7 +4601,7 @@ public:
     }
 
     /* fold constants - this has no effect on us */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *) { return this; }
+    CTcPrsNode *fold_constants(CTcPrsSymtab *) { return this; }
 
 protected:
     /* the underlying dictionary entry */
@@ -4643,7 +4643,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
         { return this; }
 
     /* generate code for the compound statement */
@@ -4922,7 +4922,7 @@ public:
         const class CTcToken *prop_tok, int replace);
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         CTPNObjDef::fold_proplist(symtab);
         return this;
@@ -4961,7 +4961,7 @@ class CTPNInlineObjectBase: public CTcPrsNode, public CTPNObjDef
 {
 public:
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab)
     {
         CTPNObjDef::fold_proplist(symtab);
         return this;
@@ -5025,7 +5025,7 @@ public:
     class CTcSymProp *get_prop_sym() const { return prop_sym_; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab);
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab);
 
     /* adjust for dynamic execution */
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info);
@@ -5115,7 +5115,7 @@ public:
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *) { return this; }
+    CTcPrsNode *fold_constants(CTcPrsSymtab *) { return this; }
 
 protected:
     /* my object statement */

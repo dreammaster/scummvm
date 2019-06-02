@@ -37,6 +37,7 @@
 #include "glk/tads/tads3/vmlst.h"
 #include "glk/tads/tads3/vmdatasrc.h"
 
+
 namespace Glk {
 namespace TADS {
 namespace TADS3 {
@@ -652,9 +653,7 @@ vm_obj_id_t CVmObjBigNum::create_from_ber(VMG_ int in_root_set,
  *   64, and 128 (half, single, double, and quad precision).
  *   
  */
-vm_obj_id_t CVmObjBigNum::create_from_ieee754(
-    VMG_ int in_root_set, const char *buf, int bits)
-{
+vm_obj_id_t CVmObjBigNum::create_from_ieee754(VMG_ int in_root_set, char *buf, int bits) {
     /* 
      *   Create the object.  Use the decimal equivalent precision of the IEEE
      *   754 object.  Note that we use 17 digits for doubles; the binary type
@@ -1462,10 +1461,9 @@ void CVmObjBigNum::convert_to_ieee754(VMG_ char *buf, int bits, int &ov)
  *   the fully standard IEEE format, simply reverse the byte order before
  *   converting.  
  */
-void CVmObjBigNum::set_ieee754_value(VMG_ const char *buf, int bits)
-{
+void CVmObjBigNum::set_ieee754_value(VMG_ char *buf, int bits) {
     /* set up the buffer descriptor */
-    ieee754 val((char *)buf, bits);
+    ieee754 val(buf, bits);
 
     /* check for special values */
     if (val.is_zero())

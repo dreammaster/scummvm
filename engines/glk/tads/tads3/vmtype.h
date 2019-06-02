@@ -82,6 +82,13 @@ const vm_prop_id_t VM_INVALID_PROP = 0;
  */
 const int VM_MAX_TREE_DEPTH_EQ = 256;
 
+#ifndef LONG_MAX
+#define LONG_MAX 0x7fffffff
+#endif
+#ifndef ULONG_MAX
+#define ULONG_MAX 0xffffffff
+#endif
+
 /*
  *   Datatypes
  */
@@ -252,10 +259,6 @@ struct vm_val_t
             unsigned short func_idx;
         } bifptr;
     } val;
-
-	vm_val_t() : typ(VM_NIL) {
-		val.ptr = nullptr;
-	}
 
     /* set various types of values */
     void set_empty() { typ = VM_EMPTY; }

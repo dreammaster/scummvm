@@ -163,11 +163,11 @@ struct vm_runtime_sym
      *   null-terminate each name, AND must include the null byte in the
      *   'len' value.  
      */
-    void commit_macro_arg(int i, size_t len)
+    void commit_macro_arg(int i, size_t len_)
     {
         /* if this isn't the last argument, set the next allocation pointer */
         if (i + 1 < macro_argc)
-            macro_args[i + 1] = macro_args[i] + len;
+            macro_args[i + 1] = macro_args[i] + len_;
     }
 };
 

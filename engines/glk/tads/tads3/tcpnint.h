@@ -38,18 +38,16 @@ namespace TADS3 {
 class CTPNUnaryBase: public CTcPrsNode
 {
 public:
-    CTPNUnaryBase(class CTcPrsNode *sub)
-    {
+    CTPNUnaryBase(CTcPrsNode *sub) {
         sub_ = sub;
     }
 
     /* get the subexpression */
-    class CTcPrsNode *get_sub_expr() const { return sub_; }
+    CTcPrsNode *get_sub_expr() const { return sub_; }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
-    {
-        class CTcPrsNode *ret;
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab) {
+        CTcPrsNode *ret;
         
         /* fold constants on my subexpression */
         sub_ = sub_->fold_constants(symtab);
@@ -65,8 +63,7 @@ public:
     }
 
     /* adjust for dynamic (run-time) compilation */
-    class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info)
-    {
+    CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info) {
         /* 
          *   if this expression has side effects, don't allow it to be
          *   evaluated speculatively 
@@ -83,13 +80,13 @@ public:
 
 protected:
     /* fold constants for the operator */
-    virtual class CTcPrsNode *fold_unop() { return 0; }
+    virtual CTcPrsNode *fold_unop() { return 0; }
 
     /* determine if I have side effects */
     virtual int has_side_effects() const { return FALSE; }
 
     /* our subexpression */
-    class CTcPrsNode *sub_;
+    CTcPrsNode *sub_;
 };
 
 /*
@@ -99,7 +96,7 @@ protected:
  *   subclasses.  
  */
 #define CTPNUnary_ctor(scname) \
-    scname(class CTcPrsNode *sub) \
+    scname(CTcPrsNode *sub) \
         : CTPNUnary(sub) { }
 
 
@@ -138,15 +135,13 @@ public: \
 class CTPNBinBase: public CTcPrsNode
 {
 public:
-    CTPNBinBase(class CTcPrsNode *left, class CTcPrsNode *right)
-    {
+    CTPNBinBase(CTcPrsNode *left, CTcPrsNode *right) {
         left_ = left;
         right_ = right;
     }
 
     /* fold constants */
-    class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab)
-    {
+    CTcPrsNode *fold_constants(CTcPrsSymtab *symtab) {
         CTcPrsNode *ret;
         
         /* fold constants on my subexpressions */
@@ -164,8 +159,7 @@ public:
     }
 
     /* adjust for dynamic (run-time) compilation */
-    class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info)
-    {
+    CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info) {
         /* if I have side effects, don't allow speculative evaluation */
         if (info->speculative && has_side_effects())
             err_throw(VMERR_BAD_SPEC_EVAL);
@@ -180,14 +174,14 @@ public:
 
 protected:
     /* perform folding on this binary operator, if possible */
-    virtual class CTcPrsNode *fold_binop() { return 0; }
+    virtual CTcPrsNode *fold_binop() { return 0; }
 
     /* determine if I have side effects */
     virtual int has_side_effects() const { return FALSE; }
 
     /* left and right operands */
-    class CTcPrsNode *left_;
-    class CTcPrsNode *right_;
+    CTcPrsNode *left_;
+    CTcPrsNode *right_;
 };
 
 /*
@@ -196,7 +190,7 @@ protected:
  *   constructor - this is simply for conciseness in those subclasses.  
  */
 #define CTPNBin_ctor(scname) \
-    scname(class CTcPrsNode *left, class CTcPrsNode *right) \
+    scname(CTcPrsNode *left, CTcPrsNode *right) \
     : CTPNBin(left, right) { }
 
 /*
@@ -248,13 +242,13 @@ public:
     CTPNStmBase();
 
     /* initialize at the given source position */
-    CTPNStmBase(class CTcTokFileDesc *file, long linenum)
+    CTPNStmBase(CTcTokFileDesc *file, long linenum)
     {
         init(file, linenum);
     }
 
     /* set the file and line number */
-    void set_source_pos(class CTcTokFileDesc *file, long linenum)
+    void set_source_pos(CTcTokFileDesc *file, long linenum)
     {
         /* remember the new line information */
         file_ = file;
@@ -262,10 +256,10 @@ public:
     }
 
     /* get the next statement after this one */
-    class CTPNStm *get_next_stm() const { return next_stm_; }
+    CTPNStm *get_next_stm() const { return next_stm_; }
 
     /* set the next statement after this one */
-    void set_next_stm(class CTPNStm *nxt) { next_stm_ = nxt; }
+    void set_next_stm(CTPNStm *nxt) { next_stm_ = nxt; }
 
     /* 
      *   log an error, using the source file location of this statement as
@@ -280,7 +274,7 @@ public:
     void log_warning(int errnum, ...) const;
 
     /* get my source location information */
-    class CTcTokFileDesc *get_source_desc() const { return file_; }
+    CTcTokFileDesc *get_source_desc() const { return file_; }
     long get_source_linenum() const { return linenum_; }
 
     /* 
@@ -289,7 +283,7 @@ public:
      *   complex statements, such as compound statements, this will
      *   provide the source location where the statement's structure ends. 
      */
-    virtual class CTcTokFileDesc *get_end_desc() const { return file_; }
+    virtual CTcTokFileDesc *get_end_desc() const { return file_; }
     virtual long get_end_linenum() const { return linenum_; }
 
     /*
@@ -349,13 +343,13 @@ protected:
      *   error reporting location to refer to the sub-statement, then
      *   generates code for the sub-statement normally.  
      */
-    void gen_code_substm(class CTPNStm *substm);
+    void gen_code_substm(CTPNStm *substm);
 
     /* add a debugging line record at the given position */
-    void add_debug_line_rec(class CTcTokFileDesc *desc, long linenum);
+    void add_debug_line_rec(CTcTokFileDesc *desc, long linenum);
 
     /* initialize */
-    void init(class CTcTokFileDesc *file, long linenum)
+    void init(CTcTokFileDesc *file, long linenum)
     {
         /* remember the file and line number containing the code */
         file_ = file;
@@ -366,10 +360,10 @@ protected:
     }
     
     /* next statement in execution order */
-    class CTPNStm *next_stm_;
+    CTPNStm *next_stm_;
 
     /* file and line number where this statement's source code appears */
-    class CTcTokFileDesc *file_;
+    CTcTokFileDesc *file_;
     long linenum_;
 };
 
@@ -422,12 +416,12 @@ public:
     }
 
     /* get/set the next list entry */
-    class CTPNForIn *getnxt() const { return nxt_; }
-    void setnxt(class CTPNForIn *nxt) { nxt_ = nxt; }
+    CTPNForIn *getnxt() const { return nxt_; }
+    void setnxt(CTPNForIn *nxt) { nxt_ = nxt; }
 
 protected:
     /* next in list of 'in' clauses for this 'for' */
-    class CTPNForIn *nxt_;
+    CTPNForIn *nxt_;
 };
 
 } // End of namespace TADS3

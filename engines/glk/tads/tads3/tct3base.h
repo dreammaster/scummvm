@@ -34,6 +34,9 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+struct CTcCodeLabel;
+struct CTcNamedArgs;
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Base parse node class 
@@ -115,7 +118,7 @@ public:
      */
     virtual int gen_code_asi(int discard, int phase,
                              tc_asitype_t typ, const char *op,
-                             class CTcPrsNode *rhs,
+                             CTcPrsNode *rhs,
                              int ignore_error, int xplicit, void **ctx);
 
     /*
@@ -140,8 +143,8 @@ public:
      *   null directly follows the condition test, so we are simply to fall
      *   through to that code rather than jump to it explicitly.  
      */
-    virtual void gen_code_cond(struct CTcCodeLabel *then_label,
-                               struct CTcCodeLabel *else_label);
+    virtual void gen_code_cond(CTcCodeLabel *then_label,
+                               CTcCodeLabel *else_label);
     
     /*
      *   Generate code to call the expression as a function or method.
@@ -154,7 +157,7 @@ public:
      *   expression.  
      */
     virtual void gen_code_call(int discard, int argc, int varargs,
-                               struct CTcNamedArgs *named_args);
+                               CTcNamedArgs *named_args);
 
     /*
      *   Generate code to apply operator 'new' to the expression.  By
@@ -162,7 +165,7 @@ public:
      *   allow operator 'new' must override this.  
      */
     virtual void gen_code_new(int discard, int argc,
-                              int varargs, struct CTcNamedArgs *named_args,
+                              int varargs, CTcNamedArgs *named_args,
                               int from_call, int is_transient);
 
     /*
@@ -183,10 +186,10 @@ public:
      *   parentheses can be a local variable.)  
      */
     virtual void gen_code_member(int discard,
-                                 class CTcPrsNode *prop_expr,
+                                 CTcPrsNode *prop_expr,
                                  int prop_is_expr,
                                  int argc, int varargs,
-                                 struct CTcNamedArgs *named_args);
+                                 CTcNamedArgs *named_args);
 
     /*
      *   Generate code for an object on the left side of a '.' expression.
@@ -217,10 +220,10 @@ public:
      *   has been generated 
      */
     static void s_gen_member_rhs(int discard,
-                                 class CTcPrsNode *prop_expr,
+                                 CTcPrsNode *prop_expr,
                                  int prop_is_expr,
                                  int argc, int varargs,
-                                 struct CTcNamedArgs *named_args);
+                                 CTcNamedArgs *named_args);
 
     /*
      *   Get the property ID of this expression.  If the property ID is
@@ -251,13 +254,13 @@ public:
      *   generate a jump-ahead instruction, returning a new label which
      *   serves as the jump destination 
      */
-    static struct CTcCodeLabel *gen_jump_ahead(uchar opc);
+    static CTcCodeLabel *gen_jump_ahead(uchar opc);
 
     /* define the position of a code label */
-    static void def_label_pos(struct CTcCodeLabel *lbl);
+    static void def_label_pos(CTcCodeLabel *lbl);
 
     /* allocate a new label at the current write position */
-    static struct CTcCodeLabel *new_label_here();
+    static CTcCodeLabel *new_label_here();
 };
 
 /* ------------------------------------------------------------------------ */
@@ -308,7 +311,7 @@ public:
      */
     virtual int gen_code_asi(int discard, int phase,
                              tc_asitype_t typ, const char *op,
-                             class CTcPrsNode *rhs,
+                             CTcPrsNode *rhs,
                              int ignore_error, int xplicit, void **ctx);
 
     /* 
@@ -323,7 +326,7 @@ public:
      *   symbol.  
      */
     virtual void gen_code_call(int discard, int argc, int varargs,
-                               struct CTcNamedArgs *named_args);
+                               CTcNamedArgs *named_args);
 
     /* 
      *   generate code for operator 'new' applied to the symbol, with the
@@ -331,7 +334,7 @@ public:
      *   code 
      */
     virtual void gen_code_new(int discard, int argc,
-                              int varargs, struct CTcNamedArgs *named_args,
+                              int varargs, CTcNamedArgs *named_args,
                               int is_transient);
 
     /* evaluate a property ID */
@@ -339,10 +342,10 @@ public:
 
     /* generate code for a member expression */
     virtual void gen_code_member(int discard,
-                                 class CTcPrsNode *prop_expr,
+                                 CTcPrsNode *prop_expr,
                                  int prop_is_expr,
                                  int argc, int varargs,
-                                 struct CTcNamedArgs *named_args);
+                                 CTcNamedArgs *named_args);
 
     /* get the object value for a '.' expression */
     virtual vm_obj_id_t gen_code_obj_predot(int *is_self);

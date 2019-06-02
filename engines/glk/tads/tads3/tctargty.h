@@ -64,7 +64,9 @@
  *   cannot proceed 
  */
 #ifndef TADS3_TCTARGTY_TARGET_DEFINED__
+#ifdef TODO
 #error No code generator target is defined.  A code generator must be defined in your makefile.  See tctarg.h for details.
+#endif
 #endif
 
 #endif

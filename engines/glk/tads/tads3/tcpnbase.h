@@ -118,7 +118,7 @@ public:
      *   null.  Only constant parse nodes can provide a constant value, so
      *   they should override this.  
      */
-    virtual class CTcConstVal *get_const_val() { return 0; }
+    virtual CTcConstVal *get_const_val() { return 0; }
 
     /* determine if the node has a constant value */
     int is_const() { return get_const_val() != 0; }
@@ -136,7 +136,7 @@ public:
      *   node.  The caller must already have checked that this node and
      *   the value being assigned are both valid constant values.  
      */
-    void set_const_val(class CTcPrsNode *src)
+    void set_const_val(CTcPrsNode *src)
     {
         /* set my constant value from the source's constant value */
         get_const_val()->set(((CTcPrsNodeBase *)src)->get_const_val());
@@ -165,7 +165,7 @@ public:
      *   resolving symbols in the given scope.  Returns true if so, false
      *   if not. 
      */
-    virtual int check_lvalue_resolved(class CTcPrsSymtab *symtab) const
+    virtual int check_lvalue_resolved(CTcPrsSymtab *symtab) const
         { return FALSE; }
 
     /*
@@ -255,13 +255,13 @@ public:
      *   Returns the folded version of the node, or simply 'this' if no
      *   folding takes place.  
      */
-    virtual class CTcPrsNode *fold_constants(class CTcPrsSymtab *symtab) = 0;
+    virtual CTcPrsNode *fold_constants(CTcPrsSymtab *symtab) = 0;
 
     /* 
      *   generate a constant value node for the address of this node;
      *   returns null if the symbol has no address 
      */
-    virtual class CTcPrsNode *fold_addr_const(class CTcPrsSymtab *)
+    virtual CTcPrsNode *fold_addr_const(CTcPrsSymtab *)
     {
         /* by default, we have no address */
         return 0;
@@ -286,7 +286,7 @@ public:
      *   interesting, the expression must not be evaluated if it has any side
      *   effects at all.  
      */
-    virtual class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info);
+    virtual CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info);
 };
 
 /* ------------------------------------------------------------------------ */
@@ -335,7 +335,7 @@ public:
      *   invocation of the property, hence must be executed at run time,
      *   hence is not a compile-time constant.  
      */
-    virtual class CTcPrsNode *fold_constant()
+    virtual CTcPrsNode *fold_constant()
     {
         /* by default, a symbol's value is not a constant */
         return 0;
@@ -345,7 +345,7 @@ public:
      *   generate a constant value node for the address of this symbol;
      *   returns null if the symbol has no address 
      */
-    virtual class CTcPrsNode *fold_addr_const()
+    virtual CTcPrsNode *fold_addr_const()
     {
         /* by default, a symbol has no address */
         return 0;
@@ -378,10 +378,10 @@ public:
      *   to store the symbol because the symbol is not of a type that we
      *   want to put in the export file.)  
      */
-    virtual int write_to_sym_file(class CVmFile *fp);
+    virtual int write_to_sym_file(CVmFile *fp);
 
     /* write the symbol name (with a UINT2 length prefix) to a file */
-    int write_name_to_file(class CVmFile *fp);
+    int write_name_to_file(CVmFile *fp);
 
     /*
      *   Write the symbol to an object file.  By default, we'll write the
@@ -401,7 +401,7 @@ public:
      *   to store the symbol because the symbol is not of a type that we
      *   want to put in the export file.)  
      */
-    virtual int write_to_obj_file(class CVmFile *fp);
+    virtual int write_to_obj_file(CVmFile *fp);
 
     /*
      *   Write the symbol's cross references to the object file.  This can
@@ -413,7 +413,7 @@ public:
      *   giving the object file index of this symbol.  On loading, we'll
      *   read this and look up the loaded symbol.  
      */
-    virtual int write_refs_to_obj_file(class CVmFile *) { return FALSE; }
+    virtual int write_refs_to_obj_file(CVmFile *) { return FALSE; }
 
     /* 
      *   perform basic writing to a file - this performs common work that
@@ -424,7 +424,7 @@ public:
     /*
      *   Read a symbol from a symbol file, returning the new symbol 
      */
-    static class CTcSymbol *read_from_sym_file(class CVmFile *fp);
+    static CTcSymbol *read_from_sym_file(CVmFile *fp);
 
     /*
      *   Load a symbol from an object file.  Stores the symbol in the
@@ -432,7 +432,7 @@ public:
      *   mapping table when necessary.  Returns zero on success; logs
      *   error messages and return non-zero on failure.  
      */
-    static int load_from_obj_file(class CVmFile *fp,
+    static int load_from_obj_file(CVmFile *fp,
                                   const textchar_t *fname,
                                   tctarg_obj_id_t *obj_xlat,
                                   tctarg_prop_id_t *prop_xlat,
@@ -444,7 +444,7 @@ public:
      *   read the first UINT4 giving the symbol's object file index before
      *   calling this routine. 
      */
-    virtual void load_refs_from_obj_file(class CVmFile *,
+    virtual void load_refs_from_obj_file(CVmFile *,
                                          const textchar_t * /*obj_fname*/,
                                          tctarg_obj_id_t * /*obj_xlat*/,
                                          tctarg_prop_id_t * /*prop_xlat*/)
@@ -515,7 +515,7 @@ public:
      *   an anonymous function.  This is only needed for symbols that can
      *   exist in a local scope.  
      */
-    virtual class CTcSymbol *new_ctx_var() const { return 0; }
+    virtual CTcSymbol *new_ctx_var() const { return 0; }
 
     /*
      *   Apply context variable conversion.  If this symbol has not been
@@ -527,8 +527,7 @@ public:
      *   Returns true if a conversion was performed (i.e., the symbol was
      *   referenced), false if not.  
      */
-    virtual int apply_ctx_var_conv(class CTcPrsSymtab *,
-                                   class CTPNCodeBody *)
+    virtual int apply_ctx_var_conv(CTcPrsSymtab *, CTPNCodeBody *)
         { return FALSE; }
 
     /*
@@ -560,7 +559,7 @@ public:
      *   By default, this does nothing.  Symbol types that don't need to
      *   generate runtime symbol table entries don't need to override this.  
      */
-    virtual void add_runtime_symbol(class CVmRuntimeSymbols *) { }
+    virtual void add_runtime_symbol(CVmRuntimeSymbols *) { }
     
 protected:
     /* 
@@ -569,7 +568,7 @@ protected:
      *   that will remain valid throughout the compilation) on success; on
      *   failure, logs an error and returns null.  
      */
-    static const char *base_read_from_sym_file(class CVmFile *fp);
+    static const char *base_read_from_sym_file(CVmFile *fp);
     
     /* symbol type */
     tc_symtype_t typ_;

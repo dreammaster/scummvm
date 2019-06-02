@@ -84,8 +84,7 @@ struct CVmUndoRecord
  *   link pointer.  The first undo record in any savepoint is always a
  *   link pointer; all of the other records are normal undo records. 
  */
-union CVmUndoMeta
-{
+union CVmUndoMeta {
     /* the first entry in each savepoint is a link entry */
     struct
     {

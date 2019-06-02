@@ -37,36 +37,12 @@ namespace TADS3 {
 #define n_u64(p)    sfx_hi(0x##p,s_u64)
 
 /* define an unsigned 32-bit type */
-
-#if UINT_MAX == 0xffffffff
-  typedef   unsigned int     sha2_32t;
-  #define s_u32    u
-#elif ULONG_MAX == 0xffffffff
-  typedef   unsigned long    sha2_32t;
-  #define s_u32   ul
-#else
-#error Please define sha2_32t as an unsigned 32 bit type in sha2.h
-#endif
+typedef uint32 sha2_32t;
+#define s_u32    u
 
 /* define an unsigned 64-bit type */
-
-#if defined( _MSC_VER )
-  typedef unsigned __int64   sha2_64t;
-  #define s_u64 ui64
-#elif ULONG_MAX == 0xffffffffffffffff
-  typedef unsigned long      sha2_64t;
-  #define s_u64   ul
-#elif ULONG_MAX == 0xffffffff
-  typedef unsigned long long sha2_64t;   /* a somewhat dangerous guess */
-  #define s_u64  ull
-#else
-#error Please define sha2_64t as an unsigned 64 bit type in sha2.h
-#endif
-
-//#if defined(__cplusplus)
-//extern "C"
-//{
-//#endif
+typedef int64 sha2_64t;
+#define s_u64  ull
 
 #define SHA256_DIGEST_SIZE  32
 #define SHA384_DIGEST_SIZE  48
@@ -151,10 +127,6 @@ int sha2_begin(unsigned long size, sha2_ctx ctx[1]);
 void sha2_hash(const unsigned char data[], unsigned long len, sha2_ctx ctx[1]);
 void sha2_end(unsigned char hval[], sha2_ctx ctx[1]);
 int sha2(unsigned char hval[], unsigned long size, const unsigned char data[], unsigned long len); 
-
-//#if defined(__cplusplus)
-//}
-//#endif
 
 } // End of namespace TADS3
 } // End of namespace TADS

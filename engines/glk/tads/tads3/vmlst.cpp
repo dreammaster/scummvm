@@ -3089,6 +3089,7 @@ int CVmObjList::get_minmax(VMG_ vm_val_t *retval,
     /* we don't have a winner yet */
     int winner_idx = 0;
     vm_val_t winner;
+	winner.typ = VM_NIL;
 
     /* run through the list */
     for (int i = 0 ; i < cnt ; ++i)

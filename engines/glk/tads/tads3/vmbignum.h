@@ -637,8 +637,7 @@ public:
                                        const char *buf, size_t len);
 
     /* create from an IEEE 754-2008 binary interchange format buffer */
-    static vm_obj_id_t create_from_ieee754(
-        VMG_ int in_root_set, const char *buf, int bits);
+    static vm_obj_id_t create_from_ieee754(VMG_ int in_root_set, char *buf, int bits);
 
     /* 
      *   create from a string value, using the precision required to hold the
@@ -1035,7 +1034,7 @@ public:
     void convert_to_ieee754(VMG_ char *buf, int bits, int &ov);
 
     /* set the value from an IEEE 754 buffer */
-    void set_ieee754_value(VMG_ const char *buf, int bits);
+    void set_ieee754_value(VMG_ char *buf, int bits);
 
     /* 
      *   Write a 64-bit integer representation, using the standard TADS

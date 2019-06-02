@@ -36,6 +36,61 @@ namespace Glk {
 namespace TADS {
 namespace TADS3 {
 
+enum tc_symtype_t;
+struct tcprs_term_info;
+struct CTcGramPropArrows;
+struct propset_def;
+struct CTcCodeBodyRef;
+struct tcprsdbg_sym_info;
+struct CTcEmbedBuilder;
+struct CTcEmbedLevel;
+class CVmFile;
+class CTcMake;
+class CTcSymObj;
+class CTcGramProdEntry;
+class CTcGramAltFuncs;
+class CTcObjTemplateItem;
+class CTcObjTemplate;
+class CTcSymMetaclass;
+class CTPNObjDef;
+class CTPNSuperclassList;
+class CTcObjTemplateInst;
+class CTcEmbedTokenList;
+class CTcPrsPropExprSave;
+class CTcGramProdAlt;
+class CTPNStmProg;
+class CTcPrsNode;
+class CTcSymProp;
+class CTPNStmTop;
+class CTPNStmObject;
+class CTPNSuperclass;
+class CTPNCodeBody;
+class CTcSymLocal;
+class CTPNStmComp;
+class CTPNStmSwitch;
+class CTPNStm;
+class CTPNForIn;
+class CTPNStmEnclosing;
+class CTcSymLabel;
+class CTcSymbol;
+class CTPNAnonFunc;
+class CTcSymEnum;
+class CTcSymFunc;
+class vbignum_t;
+class CTPNList;
+class CTcSymBif;
+class CTPNArglist;
+class CTPNInlineObject;
+class CTcPrsGramNode;
+class CTcStrTemplate;
+class CTcPrsExport;
+class CTcFormalTypeList;
+class CTcDictEntry;
+class CTcDictPropEntry;
+class CTcGramProdTok;
+class CTcFormalTypeEle;
+
+
 /* ------------------------------------------------------------------------ */
 /*
  *   Object ID type 
@@ -55,10 +110,10 @@ typedef uint tc_prop_id;
 struct tcprs_scope_t
 {
     /* local symbol table */
-    class CTcPrsSymtab *local_symtab;
+    CTcPrsSymtab *local_symtab;
 
     /* enclosing scope's local symbol table */
-    class CTcPrsSymtab *enclosing_symtab;
+    CTcPrsSymtab *enclosing_symtab;
 
     /* number of locals allocated in scope */
     int local_cnt;
@@ -138,8 +193,7 @@ public:
      *   define (def=TRUE) or look up (def=FALSE) a special compiler-defined
      *   property 
      */
-    class CTcSymProp *def_special_prop(int def, const char *name,
-                                       tc_prop_id *idp = 0);
+    CTcSymProp *def_special_prop(int def, const char *name, tc_prop_id *idp = 0);
 
     /*
      *   Set the module information.  This tells us the module's name (as
@@ -160,7 +214,7 @@ public:
      *   without manually entering a set of external definitions in module
      *   A's source code. 
      */
-    void write_symbol_file(class CVmFile *fp, class CTcMake *make_obj);
+    void write_symbol_file(CVmFile *fp, CTcMake *make_obj);
 
     /*
      *   Seek to the start of the build configuration information in a symbol
@@ -170,12 +224,12 @@ public:
      *   Returns zero if the symbol file is invalid or does not contain any
      *   configuration data.  
      */
-    static ulong seek_sym_file_build_config_info(class CVmFile *fp);
+    static ulong seek_sym_file_build_config_info(CVmFile *fp);
 
     /* 
      *   Write the global table to an object file. 
      */
-    void write_to_object_file(class CVmFile *fp);
+    void write_to_object_file(CVmFile *fp);
 
     /*
      *   Read an object file and load it into the global symbol table.  We
@@ -193,7 +247,7 @@ public:
      *   conflicts or other errors.  This routine should return failure
      *   only when it is not possible to continue reading the file.  
      */
-    int load_object_file(class CVmFile *fp,
+    int load_object_file(CVmFile *fp,
                          const textchar_t *fname,
                          tctarg_obj_id_t *obj_xlat,
                          tctarg_prop_id_t *prop_xlat,
@@ -221,16 +275,16 @@ public:
      *   If any errors occur, we'll log the errors and return non-zero.
      *   We'll return zero on success.  
      */
-    int read_symbol_file(class CVmFile *fp);
+    int read_symbol_file(CVmFile *fp);
 
     /* get the global symbol table */
-    class CTcPrsSymtab *get_global_symtab() const { return global_symtab_; }
+    CTcPrsSymtab *get_global_symtab() const { return global_symtab_; }
 
     /* set the global symbol table */
-    class CTcPrsSymtab *set_global_symtab(class CTcPrsSymtab *t)
+    CTcPrsSymtab *set_global_symtab(CTcPrsSymtab *t)
     {
         /* remember the old table */
-        class CTcPrsSymtab *old = global_symtab_;
+        CTcPrsSymtab *old = global_symtab_;
 
         /* set the new table */
         global_symtab_ = t;
@@ -243,10 +297,10 @@ public:
     }
 
     /* get the current local symbol table */
-    class CTcPrsSymtab *get_local_symtab() const { return local_symtab_; }
+    CTcPrsSymtab *get_local_symtab() const { return local_symtab_; }
 
     /* get the 'goto' symbol table */
-    class CTcPrsSymtab *get_goto_symtab() const { return goto_symtab_; }
+    CTcPrsSymtab *get_goto_symtab() const { return goto_symtab_; }
 
     /* set the current pragma C mode */
     void set_pragma_c(int mode);
@@ -277,7 +331,7 @@ public:
     tc_prop_id get_finalize_prop() const { return finalize_prop_; }
 
     /* get the constructor property symbol */
-    class CTcSymProp *get_constructor_sym() const { return constructor_sym_; }
+    CTcSymProp *get_constructor_sym() const { return constructor_sym_; }
 
     /* get the exported GrammarProd exported */
     tc_prop_id get_grammarTag_prop() const;
@@ -304,7 +358,7 @@ public:
      *   Top-level parser.  Parse functions, objects, and other top-level
      *   definitions and declarations. 
      */
-    class CTPNStmProg *parse_top();
+    CTPNStmProg *parse_top();
 
     /* 
      *   Parse a required semicolon.  If the semicolon is present, we'll
@@ -334,7 +388,7 @@ public:
     /* 
      *   Parse an expression.  This parses a top-level "comma" expression. 
      */
-    class CTcPrsNode *parse_expr();
+    CTcPrsNode *parse_expr();
 
     /*
      *   Parse a condition expression.  This parses a top-level "comma"
@@ -343,7 +397,7 @@ public:
      *   very frequently meant as comparisons, but the '=' operator was
      *   inadvertantly used instead of '=='. 
      */
-    class CTcPrsNode *parse_cond_expr();
+    CTcPrsNode *parse_cond_expr();
 
     /* 
      *   Parse a value expression or a double-quoted string expression
@@ -353,7 +407,7 @@ public:
      *   expression is broader than an assignment expression, since the
      *   comma separates assignment expressions.)  
      */
-    class CTcPrsNode *parse_expr_or_dstr(int allow_comma_expr);
+    CTcPrsNode *parse_expr_or_dstr(int allow_comma_expr);
 
     /* 
      *   Parse an assignment expression - this is the next precedence
@@ -362,31 +416,31 @@ public:
      *   separate meaning (in the initializer clause of a 'for' statement,
      *   for example, or in a list element). 
      */
-    class CTcPrsNode *parse_asi_expr();
+    CTcPrsNode *parse_asi_expr();
 
     /* parse an 'enum' top-level statement */
     void parse_enum(int *err);
 
     /* parse a 'dictionary' top-level statement */
-    class CTPNStmTop *parse_dict(int *err);
+    CTPNStmTop *parse_dict(int *err);
 
     /* parse a 'grammar' top-level statement */
-    class CTPNStmTop *parse_grammar(int *err, int replace, int modify);
+    CTPNStmTop *parse_grammar(int *err, int replace, int modify);
 
     /* parse a grammar token list (an alternative list) */
-    void parse_gram_alts(int *err, class CTcSymObj *gram_obj,
-                         class CTcGramProdEntry *prod,
-                         struct CTcGramPropArrows *arrows,
-                         class CTcGramAltFuncs *funcs);
+    void parse_gram_alts(int *err, CTcSymObj *gram_obj,
+                         CTcGramProdEntry *prod,
+                         CTcGramPropArrows *arrows,
+                         CTcGramAltFuncs *funcs);
 
     /* parse and flatten a set of grammar rules */
-    class CTcPrsGramNode *flatten_gram_rule(int *err);
+    CTcPrsGramNode *flatten_gram_rule(int *err);
 
     /* parse a 'grammar' OR node */
-    class CTcPrsGramNode *parse_gram_or(int *err, int level);
+    CTcPrsGramNode *parse_gram_or(int *err, int level);
 
     /* parse a 'grammar' CAT node */
-    class CTcPrsGramNode *parse_gram_cat(int *err, int level);
+    CTcPrsGramNode *parse_gram_cat(int *err, int level);
 
     /* parse a 'grammar' qualifier int value */
     int parse_gram_qual_int(int *err, const char *qual_name, int *stm_end);
@@ -405,15 +459,15 @@ public:
      *   the 'function' keyword and starts directly with the function name
      *   symbol.  
      */
-    class CTPNStmTop *parse_function(int *err, int is_extern,
+    CTPNStmTop *parse_function(int *err, int is_extern,
                                      int replace, int modify,
                                      int func_kw_present);
 
     /* parse an 'intrinsic' top-level statement */
-    class CTPNStmTop *parse_intrinsic(int *err);
+    CTPNStmTop *parse_intrinsic(int *err);
 
     /* parse an 'intrinsic class' top-level statement */
-    class CTPNStmTop *parse_intrinsic_class(int *err);
+    CTPNStmTop *parse_intrinsic_class(int *err);
 
     /* parse an 'extern' top-level statement */
     void parse_extern(int *err);
@@ -423,35 +477,32 @@ public:
      *   first thing in a statement is a symbol; we must check what
      *   follows to determine what type of definition it is) 
      */
-    class CTPNStmTop *parse_object_or_func(int *err, int replace,
+    CTPNStmTop *parse_object_or_func(int *err, int replace,
                                            int suppress_error,
                                            int *suppress_next_error);
 
     /* parse a template definition statement */
-    class CTPNStmTop *parse_template_def(int *err,
-                                         const class CTcToken *class_tok);
+    CTPNStmTop *parse_template_def(int *err,
+                                         const CTcToken *class_tok);
 
     /* parse a string template definition statement */
-    class CTPNStmTop *parse_string_template_def(int *err);
+    CTPNStmTop *parse_string_template_def(int *err);
 
     /* add a template definition */
-    void add_template_def(class CTcSymObj *class_sym,
-                          class CTcObjTemplateItem *item_head,
+    void add_template_def(CTcSymObj *class_sym, CTcObjTemplateItem *item_head,
                           size_t item_cnt);
 
     /* add inherited template definitions */
-    void add_inherited_templates(class CTcSymObj *sc_sym,
-                                 class CTcObjTemplateItem *item_head,
+    void add_inherited_templates(CTcSymObj *sc_sym, CTcObjTemplateItem *item_head,
                                  size_t item_cnt);
 
     /* 
      *   expand the 'inherited' keyword in a template for the given
      *   superclass template and add the result to the template list for the
-     *   class 
+     *   
      */
-    void expand_and_add_inherited_template(class CTcSymObj *sc_sym,
-                                           class CTcObjTemplateItem *items,
-                                           class CTcObjTemplate *sc_tpl);
+    void expand_and_add_inherited_template(CTcSymObj *sc_sym, CTcObjTemplateItem *items,
+                                           CTcObjTemplate *sc_tpl);
 
     /* 
      *   build a list of superclass templates, for expanding an 'inherited'
@@ -459,16 +510,16 @@ public:
      */
     void build_super_template_list(struct inh_tpl_entry **list_head,
                                    struct inh_tpl_entry **list_tail,
-                                   class CTcSymObj *sc_sym);
+                                   CTcSymObj *sc_sym);
 
     /* parse an 'object' statement */
-    class CTPNStmTop *parse_object_stm(int *err, int is_transient);
+    CTPNStmTop *parse_object_stm(int *err, int is_transient);
 
     /* 
      *   parse an object definition that starts with a '+' string; this
      *   also parses '+ property' statements 
      */
-    class CTPNStmTop *parse_plus_object(int *err);
+    CTPNStmTop *parse_plus_object(int *err);
 
     /* 
      *   Parse an object definition.  If 'replace' is true, this
@@ -481,21 +532,21 @@ public:
      *   plus_cnt gives the number of '+' signs preceding the object
      *   definition.  
      */
-    class CTPNStmTop *parse_object(int *err, int replace, int modify,
+    CTPNStmTop *parse_object(int *err, int replace, int modify,
                                    int is_class, int plus_cnt,
                                    int is_transient);
 
     /* find or define an object symbol */
     CTcSymObj *find_or_def_obj(const char *tok_txt, size_t tok_len,
                                int replace, int modify, int *is_class,
-                               class CTcSymObj **mod_orig_sym,
-                               class CTcSymMetaclass **meta_sym,
+                               CTcSymObj **mod_orig_sym,
+                               CTcSymMetaclass **meta_sym,
                                int *is_transient);
 
     /* parse an anonymous object */
-    class CTPNStmObject *parse_anon_object(int *err, int plus_cnt,
+    CTPNStmObject *parse_anon_object(int *err, int plus_cnt,
                                            int is_nested,
-                                           struct tcprs_term_info *term_info,
+                                           tcprs_term_info *term_info,
                                            int is_transient);
 
     /* 
@@ -519,15 +570,14 @@ public:
      *   a method defined in the native interface to the class.  
      */
     class CTPNStmObject *parse_object_body(
-        int *err, class CTcSymObj *obj_sym,
+        int *err, CTcSymObj *obj_sym,
         int is_class, int is_anon, int is_grammar, int is_nested,
-        int modify, class CTcSymObj *mod_orig_sym,
-        int plus_cnt, class CTcSymMetaclass *meta_sym,
-        struct tcprs_term_info *term_info, int is_transient);
+        int modify, CTcSymObj *mod_orig_sym,
+        int plus_cnt, CTcSymMetaclass *meta_sym,
+        tcprs_term_info *term_info, int is_transient);
 
     /* parse an object definition's superclass list */
-    void parse_superclass_list(
-        class CTcSymObj *obj_sym, class CTPNSuperclassList &sclist);
+    void parse_superclass_list(CTcSymObj *obj_sym, CTPNSuperclassList &sclist);
 
     /*
      *   Add a generated object.  This is used for objects created implicitly
@@ -536,32 +586,32 @@ public:
      *   statements.  For the dynamic compiler, we'll actually create the VM
      *   object directly.  
      */
-    class CTcSymObj *add_gen_obj(const char *clsname);
-    class CTcSymObj *add_gen_obj(class CTcSymObj *cls);
-    class CTcSymObj *add_gen_obj()
-        { return add_gen_obj((class CTcSymObj *)0); }
+    CTcSymObj *add_gen_obj(const char *clsname);
+    CTcSymObj *add_gen_obj(CTcSymObj *cls);
+    CTcSymObj *add_gen_obj()
+        { return add_gen_obj((CTcSymObj *)0); }
 
     /* add constant property values to a generated object */
-    void add_gen_obj_prop(class CTcSymObj *obj, const char *prop, int val);
-    void add_gen_obj_prop(class CTcSymObj *obj, const char *prop,
+    void add_gen_obj_prop(CTcSymObj *obj, const char *prop, int val);
+    void add_gen_obj_prop(CTcSymObj *obj, const char *prop,
                           const char *val);
-    void add_gen_obj_prop(class CTcSymObj *obj, const char *prop,
+    void add_gen_obj_prop(CTcSymObj *obj, const char *prop,
                           const CTcConstVal *val);
 
     /* parse an object template instance in an object body */
-    void parse_obj_template(int *err, class CTPNObjDef *objdef, int is_inline);
+    void parse_obj_template(int *err, CTPNObjDef *objdef, int is_inline);
 
     /* search a superclass list for a template match */
-    const class CTcObjTemplate
-        *find_class_template(const class CTPNSuperclass *first_sc,
-                             class CTcObjTemplateInst *src,
+    const CTcObjTemplate
+        *find_class_template(const CTPNSuperclass *first_sc,
+                             CTcObjTemplateInst *src,
                              size_t src_cnt, const CTPNSuperclass **def_sc,
                              int *undescribed_class);
 
     /* find a match for a given template in the given list */
-    const class CTcObjTemplate
-        *find_template_match(const class CTcObjTemplate *first_tpl,
-                             class CTcObjTemplateInst *src,
+    const CTcObjTemplate
+        *find_template_match(const CTcObjTemplate *first_tpl,
+                             CTcObjTemplateInst *src,
                              size_t src_cnt);
 
     /*
@@ -570,35 +620,34 @@ public:
      *   the property symbols that we matched; these values are only
      *   meaningful if we return true to indicate a match.  
      */
-    int match_template(const class CTcObjTemplateItem *tpl_head,
-                       class CTcObjTemplateInst *src, size_t src_cnt);
+    int match_template(const CTcObjTemplateItem *tpl_head,
+                       CTcObjTemplateInst *src, size_t src_cnt);
 
     /* get the first string template */
-    class CTcStrTemplate *get_str_template_head() const
-        { return str_template_head_; }
+    CTcStrTemplate *get_str_template_head() const { return str_template_head_; }
 
     /* parse an object's property list */
     int parse_obj_prop_list(
-        int *err, class CTPNObjDef *objdef, class CTcSymMetaclass *meta_sym,
+        int *err, CTPNObjDef *objdef, CTcSymMetaclass *meta_sym,
         int modify, int is_nested, int braces, int is_inline,
-        struct tcprs_term_info *outer_term_info,
-        struct tcprs_term_info *term_info);
+        tcprs_term_info *outer_term_info,
+        tcprs_term_info *term_info);
 
     /* parse property definition within an object */
     void parse_obj_prop(
-        int *err, class CTPNObjDef *objdef, int replace,
-        class CTcSymMetaclass *meta_sym, struct tcprs_term_info *term_info,
-        struct propset_def *propset_stack, int propset_depth,
+        int *err, CTPNObjDef *objdef, int replace,
+        CTcSymMetaclass *meta_sym, tcprs_term_info *term_info,
+        propset_def *propset_stack, int propset_depth,
         int enclosing_obj_is_nested, int is_inline);
 
     /* parse a class definition */
-    class CTPNStmTop *parse_class(int *err);
+    CTPNStmTop *parse_class(int *err);
 
     /* parse a 'modify' definition */
-    class CTPNStmTop *parse_modify(int *err);
+    CTPNStmTop *parse_modify(int *err);
 
     /* parse a 'replace' definition */
-    class CTPNStmTop *parse_replace(int *err);
+    CTPNStmTop *parse_replace(int *err);
 
     /* parse a 'property' statement */
     void parse_property(int *err);
@@ -607,13 +656,13 @@ public:
     void parse_export(int *err);
 
     /* add an export for the given symbol; returns the new export record */
-    class CTcPrsExport *add_export(const char *sym, size_t sym_len);
+    CTcPrsExport *add_export(const char *sym, size_t sym_len);
 
     /* add an export record to our list */
-    void add_export_to_list(class CTcPrsExport *exp);
+    void add_export_to_list(CTcPrsExport *exp);
 
     /* get the head of the export list */
-    class CTcPrsExport *get_exp_head() const { return exp_head_; }
+    CTcPrsExport *get_exp_head() const { return exp_head_; }
 
     /*
      *   Parse a function or method body, starting with the formal parameter
@@ -624,42 +673,41 @@ public:
      *   of the code being compiled; for an object method, 'self' is usually
      *   valid, while for a stand-alone function it isn't.  
      */
-    class CTPNCodeBody *parse_code_body(int eq_before_brace, int is_obj_prop,
+    CTPNCodeBody *parse_code_body(int eq_before_brace, int is_obj_prop,
                                         int self_valid, 
                                         int *p_argc, int *p_opt_argc,
                                         int *p_varargs, int *p_varargs_list,
-                                        class CTcSymLocal **
-                                            p_varargs_list_local,
+                                        CTcSymLocal **p_varargs_list_local,
                                         int *has_retval, int *err,
-                                        class CTcPrsSymtab *local_symtab,
+                                        CTcPrsSymtab *local_symtab,
                                         tcprs_codebodytype cb_type,
-                                        struct propset_def *propset_stack,
+                                        propset_def *propset_stack,
                                         int propset_depth,
-                                        struct CTcCodeBodyRef *enclosing,
-                                        class CTcFormalTypeList **type_list);
+                                        CTcCodeBodyRef *enclosing,
+                                        CTcFormalTypeList **type_list);
 
     /* parse a nested code body (such as an anonymous function) */
-    class CTPNCodeBody *parse_nested_code_body(
+    CTPNCodeBody *parse_nested_code_body(
         int eq_before_brace,
         int self_valid,
         int *p_argc, int *p_opt_argc, int *p_varargs,
-        int *p_varargs_list, class CTcSymLocal **p_varargs_list_local,
+        int *p_varargs_list, CTcSymLocal **p_varargs_list_local,
         int *has_retval, int *err,
-        class CTcPrsSymtab *local_symtab,
+        CTcPrsSymtab *local_symtab,
         tcprs_codebodytype cb_type);
 
     /* insert a propertyset expansion */
-    void insert_propset_expansion(struct propset_def *propset_stack,
+    void insert_propset_expansion(propset_def *propset_stack,
                                   int propset_depth);
 
     /* parse a formal parameter list */
     void parse_formal_list(int count_only, int opt_allowed,
                            int *argc, int *opt_argc, int *varargs,
                            int *varargs_list,
-                           class CTcSymLocal **varargs_list_local,
+                           CTcSymLocal **varargs_list_local,
                            int *err, int base_formal_num,
                            int for_short_anon_func,
-                           class CTcFormalTypeList **type_list);
+                           CTcFormalTypeList **type_list);
 
     /*
      *   Parse a compound statement.  If 'skip_lbrace' is true, we'll skip
@@ -678,16 +726,16 @@ public:
      *   any.  This is only set when we're parsing the immediate body of a
      *   switch statement.  
      */
-    class CTPNStmComp *parse_compound(int *err,
+    CTPNStmComp *parse_compound(int *err,
                                       int skip_lbrace, int need_rbrace,
-                                      class CTPNStmSwitch *enclosing_switch,
+                                      CTPNStmSwitch *enclosing_switch,
                                       int use_enclosing_scope);
 
     /* parse a local variable definition */
-    class CTPNStm *parse_local(int *err);
+    CTPNStm *parse_local(int *err);
 
     /* parse a local initializer */
-    class CTcPrsNode *parse_local_initializer(class CTcSymLocal *lcl,
+    CTcPrsNode *parse_local_initializer(CTcSymLocal *lcl,
                                               int *err);
 
     /*
@@ -705,60 +753,58 @@ public:
      *   body go in the same scope, so the function body's compound
      *   statement doesn't create its own scope.  
      */
-    class CTPNStm *parse_stm(int *err, class CTPNStmSwitch *enclosing_switch,
+    CTPNStm *parse_stm(int *err, CTPNStmSwitch *enclosing_switch,
                              int compound_use_enclosing_scope);
 
     /* parse a 'case' label */
-    class CTPNStm *parse_case(int *err,
-                              class CTPNStmSwitch *enclosing_switch);
+    CTPNStm *parse_case(int *err,
+                              CTPNStmSwitch *enclosing_switch);
 
     /* parse a 'default' label */
-    class CTPNStm *parse_default(int *err,
-                                 class CTPNStmSwitch *enclosing_switch);
+    CTPNStm *parse_default(int *err,
+                                 CTPNStmSwitch *enclosing_switch);
 
     /* parse an 'if' statement */
-    class CTPNStm *parse_if(int *err);
+    CTPNStm *parse_if(int *err);
 
     /* parse a 'return' statement */
-    class CTPNStm *parse_return(int *err);
+    CTPNStm *parse_return(int *err);
 
     /* parse a 'for' statement */
-    class CTPNStm *parse_for(int *err);
+    CTPNStm *parse_for(int *err);
 
     /* parse an 'in' clause in a 'for' statement */
-    class CTcPrsNode *parse_for_in_clause(
-        class CTcPrsNode *lval,
-        class CTPNForIn *&head, class CTPNForIn *&tail);
+    CTcPrsNode *parse_for_in_clause(CTcPrsNode *lval, CTPNForIn *&head, CTPNForIn *&tail);
 
     /* parse a 'foreach' statement */
-    class CTPNStm *parse_foreach(int *err);
+    CTPNStm *parse_foreach(int *err);
 
     /* parse a 'break' statement */
-    class CTPNStm *parse_break(int *err);
+    CTPNStm *parse_break(int *err);
 
     /* parse a 'continue' statement */
-    class CTPNStm *parse_continue(int *err);
+    CTPNStm *parse_continue(int *err);
 
     /* parse a 'while' */
-    class CTPNStm *parse_while(int *err);
+    CTPNStm *parse_while(int *err);
     
     /* parse a 'do-while' */
-    class CTPNStm *parse_do_while(int *err);
+    CTPNStm *parse_do_while(int *err);
 
     /* parse a 'switch' */
-    class CTPNStm *parse_switch(int *err);
+    CTPNStm *parse_switch(int *err);
 
     /* parse a 'goto' */
-    class CTPNStm *parse_goto(int *err);
+    CTPNStm *parse_goto(int *err);
 
     /* parse a 'try' */
-    class CTPNStm *parse_try(int *err);
+    CTPNStm *parse_try(int *err);
 
     /* parse a 'throw' */
-    class CTPNStm *parse_throw(int *err);
+    CTPNStm *parse_throw(int *err);
 
     /* parse an 'operator' property name */
-    int parse_op_name(class CTcToken *tok, int *op_argp = 0);
+    int parse_op_name(CTcToken *tok, int *op_argp = 0);
 
     /*
      *   Create a symbol node.  We'll look up the symbol in local scope.
@@ -768,7 +814,7 @@ public:
      *   so that the symbol's resolution can be deferred until code
      *   generation. 
      */
-    class CTcPrsNode *create_sym_node(const textchar_t *sym, size_t sym_len);
+    CTcPrsNode *create_sym_node(const textchar_t *sym, size_t sym_len);
 
     /*
      *   Get the source file descriptor and line number for the current
@@ -776,7 +822,7 @@ public:
      *   that a statement node constructed when we finish parsing the
      *   statement can record the location of the start of the statement. 
      */
-    class CTcTokFileDesc *get_cur_desc() const { return cur_desc_; }
+    CTcTokFileDesc *get_cur_desc() const { return cur_desc_; }
     long get_cur_linenum() const { return cur_linenum_; }
 
     /*
@@ -789,11 +835,11 @@ public:
      *   'try' blocks our to that point so that it can invoke their
      *   'finally' blocks.  
      */
-    class CTPNStmEnclosing *get_enclosing_stm() const
+    CTPNStmEnclosing *get_enclosing_stm() const
         { return enclosing_stm_; }
-    class CTPNStmEnclosing *set_enclosing_stm(class CTPNStmEnclosing *stm)
+    CTPNStmEnclosing *set_enclosing_stm(CTPNStmEnclosing *stm)
     {
-        class CTPNStmEnclosing *old_enclosing;
+        CTPNStmEnclosing *old_enclosing;
 
         /* remember the current enclosing statement for a moment */
         old_enclosing = enclosing_stm_;
@@ -811,7 +857,7 @@ public:
     }
 
     /* get the current code body reference object */
-    struct CTcCodeBodyRef *get_cur_code_body() const
+    CTcCodeBodyRef *get_cur_code_body() const
         { return cur_code_body_; }
 
     /* determine if 'self' is valid in the current context */
@@ -863,15 +909,15 @@ public:
      *   Add a code label.  This creates a 'goto' symbol table for the
      *   current code body if one doesn't already exist 
      */
-    class CTcSymLabel *add_code_label(const class CTcToken *tok);
+    CTcSymLabel *add_code_label(const CTcToken *tok);
 
     /*
      *   Set the debugger local symbol table.  Returns the previous symbol
      *   table so that it can be restored if desired.  
      */
-    class CTcPrsDbgSymtab *set_debug_symtab(class CTcPrsDbgSymtab *tab)
+    CTcPrsDbgSymtab *set_debug_symtab(CTcPrsDbgSymtab *tab)
     {
-        class CTcPrsDbgSymtab *old_tab;
+        CTcPrsDbgSymtab *old_tab;
 
         /* remember the original for later use */
         old_tab = debug_symtab_;
@@ -886,27 +932,27 @@ public:
     /*
      *   given a (1-based) object file symbol index, get the symbol 
      */
-    class CTcSymbol *get_objfile_sym(uint idx)
+    CTcSymbol *get_objfile_sym(uint idx)
         { return (idx == 0 ? 0 : obj_sym_list_[idx - 1]); }
 
     /* 
      *   given a 1-based object file symbol index, get an object symbol;
      *   if the symbol does not refer to an object, we'll return null 
      */
-    class CTcSymObj *get_objfile_objsym(uint idx);
+    CTcSymObj *get_objfile_objsym(uint idx);
 
     /* 
      *   given an object file (1-based) object file dictionary index, get
      *   the dictionary entry 
      */
-    class CTcDictEntry *get_obj_dict(uint idx)
+    CTcDictEntry *get_obj_dict(uint idx)
         { return (idx == 0 ? 0 : obj_dict_list_[idx - 1]); }
 
     /* add a dictionary object loaded from the object file */
-    void add_dict_from_obj_file(class CTcSymObj *sym);
+    void add_dict_from_obj_file(CTcSymObj *sym);
 
     /* add a symbol object loaded from the object file */
-    void add_sym_from_obj_file(uint idx, class CTcSymbol *sym);
+    void add_sym_from_obj_file(uint idx, CTcSymbol *sym);
 
     /*
      *   Get the next object file symbol index.  Object file symbol
@@ -933,14 +979,14 @@ public:
      *   add an anonymous function or other anonymous top-level statement
      *   to our list of nested top-level statements
      */
-    void add_nested_stm(class CTPNStmTop *stm);
+    void add_nested_stm(CTPNStmTop *stm);
 
     /* get the head of the nested statement list */
-    class CTPNStmTop *get_first_nested_stm() const
+    CTPNStmTop *get_first_nested_stm() const
         { return nested_stm_head_; }
 
     /* add an anonymous object to our list */
-    void add_anon_obj(class CTcSymObj *obj);
+    void add_anon_obj(CTcSymObj *obj);
 
     /* add a non-symbolic object ID */
     void add_nonsym_obj(tctarg_obj_id_t id);
@@ -955,7 +1001,7 @@ public:
     void init_local_ctx();
 
     /* finish the local context, after parsing a nested code body */
-    void finish_local_ctx(CTPNCodeBody *cb, class CTcPrsSymtab *local_symtab);
+    void finish_local_ctx(CTPNCodeBody *cb, CTcPrsSymtab *local_symtab);
 
     /* 
      *   allocate a context variable index - this assigns an array index
@@ -971,21 +1017,21 @@ public:
     int get_max_local_cnt() const { return max_local_cnt_; }
 
     /* get the lexicalParent property symbol */
-    class CTcSymProp *get_lexical_parent_sym() const
+    CTcSymProp *get_lexical_parent_sym() const
         { return lexical_parent_sym_; }
 
     /* 
      *   find a grammar production symbol, adding a new one if needed,
      *   returning the grammar production list entry for the object 
      */
-    class CTcGramProdEntry *declare_gramprod(const char *sym, size_t len);
+    CTcGramProdEntry *declare_gramprod(const char *sym, size_t len);
 
     /* find a grammar production list entry for a given object */
-    class CTcGramProdEntry *get_gramprod_entry(class CTcSymObj *sym);
+    CTcGramProdEntry *get_gramprod_entry(CTcSymObj *sym);
 
     /* find a grammar production symbol, adding a new one if needed */
-    class CTcSymObj *find_or_def_gramprod(const char *txt, size_t len,
-                                          class CTcGramProdEntry **entryp);
+    CTcSymObj *find_or_def_gramprod(const char *txt, size_t len,
+                                          CTcGramProdEntry **entryp);
 
     /* allocate a new enumerator ID */
     ulong new_enum_id() { return next_enum_id_++; }
@@ -998,7 +1044,7 @@ public:
      *   symbol is defined as another type, we'll show an error if
      *   show_err is true, and return null.  
      */
-    CTcSymProp *look_up_prop(const class CTcToken *tok, int show_err);
+    CTcSymProp *look_up_prop(const CTcToken *tok, int show_err);
 
     /* get the '+' property for tracking the location graph */
     CTcSymProp *get_plus_prop() const { return plus_prop_; }
@@ -1035,24 +1081,24 @@ public:
     tctarg_prop_id_t get_miscvocab_prop() const { return miscvocab_prop_; }
 
     /* property symbols for the operator overload properties */
-    class CTcSymProp *ov_op_add_;
-    class CTcSymProp *ov_op_sub_;
-    class CTcSymProp *ov_op_mul_;
-    class CTcSymProp *ov_op_div_;
-    class CTcSymProp *ov_op_mod_;
-    class CTcSymProp *ov_op_xor_;
-    class CTcSymProp *ov_op_shl_;
-    class CTcSymProp *ov_op_ashr_;
-    class CTcSymProp *ov_op_lshr_;
-    class CTcSymProp *ov_op_bnot_;
-    class CTcSymProp *ov_op_bor_;
-    class CTcSymProp *ov_op_band_;
-    class CTcSymProp *ov_op_neg_;
-    class CTcSymProp *ov_op_idx_;
-    class CTcSymProp *ov_op_setidx_;
+    CTcSymProp *ov_op_add_;
+    CTcSymProp *ov_op_sub_;
+    CTcSymProp *ov_op_mul_;
+    CTcSymProp *ov_op_div_;
+    CTcSymProp *ov_op_mod_;
+    CTcSymProp *ov_op_xor_;
+    CTcSymProp *ov_op_shl_;
+    CTcSymProp *ov_op_ashr_;
+    CTcSymProp *ov_op_lshr_;
+    CTcSymProp *ov_op_bnot_;
+    CTcSymProp *ov_op_bor_;
+    CTcSymProp *ov_op_band_;
+    CTcSymProp *ov_op_neg_;
+    CTcSymProp *ov_op_idx_;
+    CTcSymProp *ov_op_setidx_;
 
     /* embedded expression token capture list */
-    class CTcEmbedTokenList *embed_toks_;
+    CTcEmbedTokenList *embed_toks_;
 
 private:
     /* cache the special properties, defining them if desired */
@@ -1064,8 +1110,8 @@ private:
      *   dynamic compiler, because the dynamic compiler generates objects in
      *   the live VM through the G_vmifc interface instead.  
      */
-    CTcSymObj *add_gen_obj_stat(class CTcSymObj *cls);
-    void add_gen_obj_prop_stat(class CTcSymObj *obj, class CTcSymProp *prop,
+    CTcSymObj *add_gen_obj_stat(CTcSymObj *cls);
+    void add_gen_obj_prop_stat(CTcSymObj *obj, CTcSymProp *prop,
                                const CTcConstVal *val);
 
     /* clear the anonymous function local context information */
@@ -1076,7 +1122,7 @@ private:
      *   restoration with finish_prop_expr 
      */
     void begin_prop_expr(
-        class CTcPrsPropExprSave *save_info, int is_static, int is_inline);
+        CTcPrsPropExprSave *save_info, int is_static, int is_inline);
 
     /* 
      *   Finish a property expression, wrapping it in a code body if
@@ -1087,27 +1133,27 @@ private:
      *   discarded in favor of the fully wrapped code body.  
      */
     void finish_prop_expr(
-        class CTcPrsPropExprSave *save_info, class CTcPrsNode* &expr,
-        class CTPNCodeBody* &code_body, class CTPNAnonFunc* &inline_method,
-        int is_static, int is_inline, class CTcSymProp *prop_sym);
+        CTcPrsPropExprSave *save_info, CTcPrsNode* &expr,
+        CTPNCodeBody* &code_body, CTPNAnonFunc* &inline_method,
+        int is_static, int is_inline, CTcSymProp *prop_sym);
     
     /* 
      *   callback for symbol table enumeration for writing a symbol export
      *   file 
      */
-    static void write_sym_cb(void *ctx, class CTcSymbol *sym);
+    static void write_sym_cb(void *ctx, CTcSymbol *sym);
     
     /* callback for symbol table enumeration for writing an object file */
-    static void write_obj_cb(void *ctx, class CTcSymbol *sym);
+    static void write_obj_cb(void *ctx, CTcSymbol *sym);
     
     /* callback for symbol table enumeration for writing cross references */
-    static void write_obj_ref_cb(void *ctx, class CTcSymbol *sym);
+    static void write_obj_ref_cb(void *ctx, CTcSymbol *sym);
 
     /* callback for symbol table enumeration for named grammar rules */
-    static void write_obj_gram_cb(void *ctx, class CTcSymbol *sym);
+    static void write_obj_gram_cb(void *ctx, CTcSymbol *sym);
 
     /* callback for symbol table enumeration for merging grammar rules */
-    static void build_grammar_cb(void *ctx, class CTcSymbol *sym);
+    static void build_grammar_cb(void *ctx, CTcSymbol *sym);
 
 
     /*
@@ -1175,60 +1221,60 @@ private:
     }
 
     /* find a dictionary symbol, adding a new one if needed */
-    class CTcDictEntry *declare_dict(const char *sym, size_t len);
+    CTcDictEntry *declare_dict(const char *sym, size_t len);
 
     /* create a new dictionary list entry */
-    class CTcDictEntry *create_dict_entry(class CTcSymObj *sym);
+    CTcDictEntry *create_dict_entry(CTcSymObj *sym);
 
     /* find a dictionary list entry for a given object */
-    class CTcDictEntry *get_dict_entry(class CTcSymObj *sym);
+    CTcDictEntry *get_dict_entry(CTcSymObj *sym);
 
     /* create a new grammar production list entry */
-    class CTcGramProdEntry *create_gramprod_entry(class CTcSymObj *sym);
+    CTcGramProdEntry *create_gramprod_entry(CTcSymObj *sym);
 
     /* symbol enumerator - look for unresolved external references */
-    static void enum_sym_extref(void *ctx, class CTcSymbol *sym);
+    static void enum_sym_extref(void *ctx, CTcSymbol *sym);
 
     /* symbol enumerator - apply internal fixups */
-    static void enum_sym_internal_fixup(void *ctx, class CTcSymbol *sym);
+    static void enum_sym_internal_fixup(void *ctx, CTcSymbol *sym);
 
     /* symbol enumerator - build dictionary */
-    static void enum_sym_dict(void *ctx, class CTcSymbol *sym);
+    static void enum_sym_dict(void *ctx, CTcSymbol *sym);
 
     /* enumeration callback - context local conversion */
-    static void enum_for_ctx_locals(void *ctx, class CTcSymbol *sym);
+    static void enum_for_ctx_locals(void *ctx, CTcSymbol *sym);
 
     /* global symbol table */
-    class CTcPrsSymtab *global_symtab_;
+    CTcPrsSymtab *global_symtab_;
 
     /* the constructor property ID and symbol */
     tc_prop_id constructor_prop_;
-    class CTcSymProp *constructor_sym_;
+    CTcSymProp *constructor_sym_;
 
     /* the finalizer property ID */
     tc_prop_id finalize_prop_;
 
     /* grammarInfo property symbol */
-    class CTcSymProp *graminfo_prop_;
+    CTcSymProp *graminfo_prop_;
 
     /* grammarTag property symbol */
-    class CTcSymProp *gramtag_prop_;
+    CTcSymProp *gramtag_prop_;
 
     /* miscVocab property ID */
     tctarg_prop_id_t miscvocab_prop_;
 
     /* lexicalParent property symbol */
-    class CTcSymProp *lexical_parent_sym_;
+    CTcSymProp *lexical_parent_sym_;
 
     /* sourceTextOrder property symbol */
-    class CTcSymProp *src_order_sym_;
+    CTcSymProp *src_order_sym_;
 
     /* sourceTextGroup property symbol */
-    class CTcSymProp *src_group_sym_;
+    CTcSymProp *src_group_sym_;
 
     /* sourceTextGroupName, sourceTextGroupOrder */
-    class CTcSymProp *src_group_mod_sym_;
-    class CTcSymProp *src_group_seq_sym_;
+    CTcSymProp *src_group_mod_sym_;
+    CTcSymProp *src_group_seq_sym_;
 
     /* 
      *   Source text order index.  Each time we encounter an object
@@ -1285,7 +1331,7 @@ private:
      *   'goto' scope for an entire code block, so this never changes over
      *   the course of a code block 
      */
-    class CTcPrsSymtab *goto_symtab_;
+    CTcPrsSymtab *goto_symtab_;
 
     /* 
      *   Current local symbol table.  Each inner scope that defines its
@@ -1294,7 +1340,7 @@ private:
      *   always be restored to the local symbol table of the enclosing
      *   scope.  
      */
-    class CTcPrsSymtab *local_symtab_;
+    CTcPrsSymtab *local_symtab_;
 
     /*
      *   Enclosing local symbol table.  If this is the same as
@@ -1303,14 +1349,14 @@ private:
      *   we find we actually need a local symbol table in a scope, since
      *   most scopes don't define any of their own local variables. 
      */
-    class CTcPrsSymtab *enclosing_local_symtab_;
+    CTcPrsSymtab *enclosing_local_symtab_;
 
     /*
      *   Current debugger local symbol table.  When we're compiling a
      *   debugger expression, this will provide access to the current
      *   local scope in the debug records. 
      */
-    class CTcPrsDbgSymtab *debug_symtab_;
+    CTcPrsDbgSymtab *debug_symtab_;
 
     /* 
      *   Number of local variables allocated so far in current code block
@@ -1331,22 +1377,22 @@ private:
      *   Enclosing statement - this is the innermost 'try' or 'label:'
      *   enclosing the current code.
      */
-    class CTPNStmEnclosing *enclosing_stm_;
+    CTPNStmEnclosing *enclosing_stm_;
 
     /* file descriptor and line number at start of current statement */
-    class CTcTokFileDesc *cur_desc_;
+    CTcTokFileDesc *cur_desc_;
     long cur_linenum_;
 
     /* currently active dictionary */
-    class CTcDictEntry *dict_cur_;
+    CTcDictEntry *dict_cur_;
 
     /* head and tail of dictionary list */
-    class CTcDictEntry *dict_head_;
-    class CTcDictEntry *dict_tail_;
+    CTcDictEntry *dict_head_;
+    CTcDictEntry *dict_tail_;
 
     /* head and tail of grammar production entry list */
-    class CTcGramProdEntry *gramprod_head_;
-    class CTcGramProdEntry *gramprod_tail_;
+    CTcGramProdEntry *gramprod_head_;
+    CTcGramProdEntry *gramprod_tail_;
 
     /* 
      *   array of symbols loaded from the object file - these are indexed
@@ -1354,7 +1400,7 @@ private:
      *   the object file, allowing us to fix up references from one symbol
      *   to another during loading 
      */
-    class CTcSymbol **obj_sym_list_;
+    CTcSymbol **obj_sym_list_;
 
     /* 
      *   array of dictionary objects for the object file being loaded -
@@ -1362,7 +1408,7 @@ private:
      *   references in the object file, allowing us to fix up references
      *   from an object to its dictionary 
      */
-    class CTcDictEntry **obj_dict_list_;
+    CTcDictEntry **obj_dict_list_;
 
     /* next available object file dictionary index */
     uint obj_file_dict_idx_;
@@ -1371,7 +1417,7 @@ private:
     uint obj_file_sym_idx_;
 
     /* dictionary property list head */
-    class CTcDictPropEntry *dict_prop_head_;
+    CTcDictPropEntry *dict_prop_head_;
 
     /*
      *   Head and tail of list of nested top-level statements parsed for the
@@ -1384,15 +1430,15 @@ private:
      *   list to the top-level statement list when we're done with the
      *   entire program.  
      */
-    class CTPNStmTop *nested_stm_head_;
-    class CTPNStmTop *nested_stm_tail_;
+    CTPNStmTop *nested_stm_head_;
+    CTPNStmTop *nested_stm_tail_;
 
     /*
      *   Anonymous object list.  This is a list of objects which are
      *   defined without symbol names.  
      */
-    class CTcSymObj *anon_obj_head_;
-    class CTcSymObj *anon_obj_tail_;
+    CTcSymObj *anon_obj_head_;
+    CTcSymObj *anon_obj_tail_;
 
     /* 
      *   Non-symbolic object list.  This is a list of objects that are
@@ -1405,8 +1451,8 @@ private:
      *   Object template list - this is the master list of templates for the
      *   root object class.  
      */
-    class CTcObjTemplate *template_head_;
-    class CTcObjTemplate *template_tail_;
+    CTcObjTemplate *template_head_;
+    CTcObjTemplate *template_tail_;
 
     /*
      *   Object template instance parsing expression array.  Each time we
@@ -1417,7 +1463,7 @@ private:
      *   list which template we're using, so we must keep track of the
      *   entire list until we reach the end of the list. 
      */
-    class CTcObjTemplateInst *template_expr_;
+    CTcObjTemplateInst *template_expr_;
     size_t template_expr_max_;
 
     /* 
@@ -1425,12 +1471,12 @@ private:
      *   templates; these are for custom syntax in << >> expressions in
      *   strings.  
      */
-    class CTcStrTemplate *str_template_head_;
-    class CTcStrTemplate *str_template_tail_;
+    CTcStrTemplate *str_template_head_;
+    CTcStrTemplate *str_template_tail_;
 
     /* head and tail of exported symbol list */
-    class CTcPrsExport *exp_head_;
-    class CTcPrsExport *exp_tail_;
+    CTcPrsExport *exp_head_;
+    CTcPrsExport *exp_tail_;
 
     /* 
      *   Flag: current code body has a local variable context object.  If
@@ -1493,7 +1539,7 @@ private:
      *   The '+' property - this is the property that defines the
      *   containment graph for the purposes of the '+' syntax. 
      */
-    class CTcSymProp *plus_prop_;
+    CTcSymProp *plus_prop_;
 
     /*
      *   '+' property location stack.  Each time the program defines an
@@ -1503,7 +1549,7 @@ private:
      *   set to the last object at depth N-1.  An object with no '+' signs
      *   is at depth zero.  
      */
-    class CTPNStmObject **plus_stack_;
+    CTPNStmObject **plus_stack_;
     size_t plus_stack_alloc_;
 
     /*
@@ -1530,7 +1576,7 @@ struct CTcGramPropArrows
     static const size_t max_arrows = 100;
 
     /* array of property arrows */
-    class CTcSymProp *prop[max_arrows];
+    CTcSymProp *prop[max_arrows];
 
     /* number of arrows */
     size_t cnt;
@@ -1547,15 +1593,15 @@ class CTcGramAltFuncs
 {
 public:
     /* look up a property symbol, defining it if it's undefined */
-    virtual class CTcSymProp *look_up_prop(
-        const class CTcToken *tok, int show_err) = 0;
+    virtual CTcSymProp *look_up_prop(
+        const CTcToken *tok, int show_err) = 0;
 
     /* declare a grammar production symbol */
-    virtual class CTcGramProdEntry *declare_gramprod(
+    virtual CTcGramProdEntry *declare_gramprod(
         const char *txt, size_t len) = 0;
 
     /* check the given enum for use as a production token */
-    virtual void check_enum_tok(class CTcSymEnum *enumsym) = 0;
+    virtual void check_enum_tok(CTcSymEnum *enumsym) = 0;
 
     /* handle EOF in an alternative list */
     virtual void on_eof(int *err) = 0;
@@ -1624,10 +1670,9 @@ public:
  *   definition is to be interpreted as being actually caused by a lack of
  *   termination of the enclosing definition. 
  */
-struct tcprs_term_info
-{
+struct tcprs_term_info {
     /* initialize */
-    void init(class CTcTokFileDesc *desc, long linenum)
+    void init(CTcTokFileDesc *desc, long linenum)
     {
         /* remember the current location */
         desc_ = desc;
@@ -1643,7 +1688,7 @@ struct tcprs_term_info
      *   that the definintion shouldn't have been nested after all, there
      *   was missing termination here 
      */
-    class CTcTokFileDesc *desc_;
+    CTcTokFileDesc *desc_;
     long linenum_;
 
     /* 
@@ -1660,7 +1705,7 @@ struct tcprs_term_info
 class CTcObjTemplate
 {
 public:
-    CTcObjTemplate(class CTcObjTemplateItem *item_head, size_t item_cnt)
+    CTcObjTemplate(CTcObjTemplateItem *item_head, size_t item_cnt)
     {
         /* remember my item list */
         items_ = item_head;
@@ -1671,7 +1716,7 @@ public:
     }
     
     /* head of list of template items */
-    class CTcObjTemplateItem *items_;
+    CTcObjTemplateItem *items_;
 
     /* number of items in the list */
     size_t item_cnt_;
@@ -1686,7 +1731,7 @@ public:
 class CTcObjTemplateItem
 {
 public:
-    CTcObjTemplateItem(class CTcSymProp *prop, tc_toktyp_t tok_type,
+    CTcObjTemplateItem(CTcSymProp *prop, tc_toktyp_t tok_type,
                        int is_alt, int is_opt)
     {
         /* remember my defining information */
@@ -1700,7 +1745,7 @@ public:
     }
     
     /* property that the item in this position defines */
-    class CTcSymProp *prop_;
+    CTcSymProp *prop_;
 
     /* token type of item in this position */
     tc_toktyp_t tok_type_;
@@ -1727,9 +1772,9 @@ public:
      *   expression (expr_) or as a code body (code_body_) - only one of
      *   expr_ or code_body_ will be valid 
      */
-    class CTcPrsNode *expr_;
-    class CTPNCodeBody *code_body_;
-    class CTPNAnonFunc *inline_method_;
+    CTcPrsNode *expr_;
+    CTPNCodeBody *code_body_;
+    CTPNAnonFunc *inline_method_;
 
     /* 
      *   the introductory token of the parameter - if the parameter is
@@ -1747,7 +1792,7 @@ public:
      *   since we don't know the meanings of the parameters until we match
      *   the actuals to an existing template in memory.  
      */
-    class CTcSymProp *prop_;
+    CTcSymProp *prop_;
 };
 
 /* ------------------------------------------------------------------------ */
@@ -1756,8 +1801,7 @@ public:
  *   property pattern and an optional argument list for the properties within
  *   the propertyset group.  
  */
-struct propset_def
-{
+struct propset_def {
     /* the property name pattern */
     const char *prop_pattern;
     size_t prop_pattern_len;
@@ -1875,7 +1919,7 @@ public:
     int star;
 
     /* the processor function symbol */
-    class CTcSymFunc *func;
+    CTcSymFunc *func;
 
     /* next list element */
     CTcStrTemplate *nxt;
@@ -1911,7 +1955,7 @@ struct tcprs_nonsym_obj
 class CTcDictPropEntry
 {
 public:
-    CTcDictPropEntry(class CTcSymProp *prop)
+    CTcDictPropEntry(CTcSymProp *prop)
     {
         /* remember the property */
         prop_ = prop;
@@ -1941,14 +1985,14 @@ public:
 class CTcDictEntry
 {
 public:
-    CTcDictEntry(class CTcSymObj *sym);
+    CTcDictEntry(CTcSymObj *sym);
 
     /* get/set my object file index */
     uint get_obj_idx() const { return obj_idx_; }
     void set_obj_idx(uint idx) { obj_idx_ = idx; }
 
     /* get my object symbol */
-    class CTcSymObj *get_sym() const { return sym_; }
+    CTcSymObj *get_sym() const { return sym_; }
 
     /* get/set the next item in the list */
     CTcDictEntry *get_next() const { return nxt_; }
@@ -1962,14 +2006,14 @@ public:
     void write_sym_to_obj_file(CVmFile *fp);
 
     /* get the hash table */
-    class CVmHashTable *get_hash_table() const { return hashtab_; }
+    CVmHashTable *get_hash_table() const { return hashtab_; }
 
 protected:
     /* enumeration callback - write to object file */
-    static void enum_cb_writeobj(void *ctx, class CVmHashEntry *entry);
+    static void enum_cb_writeobj(void *ctx, CVmHashEntry *entry);
     
     /* associated object symbol */
-    class CTcSymObj *sym_;
+    CTcSymObj *sym_;
 
     /* 
      *   object file index (we use this to match up the dictionary objects
@@ -1981,7 +2025,7 @@ protected:
     CTcDictEntry *nxt_;
 
     /* hash table containing the word entries */
-    class CVmHashTable *hashtab_;
+    CVmHashTable *hashtab_;
 };
 
 
@@ -2038,29 +2082,29 @@ protected:
 class CTcGramProdEntry
 {
 public:
-    CTcGramProdEntry(class CTcSymObj *prod_obj);
+    CTcGramProdEntry(CTcSymObj *prod_obj);
 
     /* get my production object symbol */
-    class CTcSymObj *get_prod_sym() const { return prod_sym_; }
+    CTcSymObj *get_prod_sym() const { return prod_sym_; }
 
     /* get/set the next item in the list */
     CTcGramProdEntry *get_next() const { return nxt_; }
     void set_next(CTcGramProdEntry *nxt) { nxt_ = nxt; }
 
     /* add an alternative */
-    void add_alt(class CTcGramProdAlt *alt);
+    void add_alt(CTcGramProdAlt *alt);
 
     /* get the alternative list head */
-    class CTcGramProdAlt *get_alt_head() const { return alt_head_; }
+    CTcGramProdAlt *get_alt_head() const { return alt_head_; }
 
     /* write to an object file */
-    void write_to_obj_file(class CVmFile *fp);
+    void write_to_obj_file(CVmFile *fp);
 
     /* load from an object file */
-    static void load_from_obj_file(class CVmFile *fp,
+    static void load_from_obj_file(CVmFile *fp,
                                    const tctarg_prop_id_t *prop_xlat,
                                    const ulong *enum_xlat,
-                                   class CTcSymObj *private_owner);
+                                   CTcSymObj *private_owner);
 
     /* move alternatives from my list to the given target list */
     void move_alts_to(CTcGramProdEntry *new_entry);
@@ -2071,14 +2115,14 @@ public:
 
 protected:
     /* associated production object symbol */
-    class CTcSymObj *prod_sym_;
+    CTcSymObj *prod_sym_;
 
     /* next item in the list */
     CTcGramProdEntry *nxt_;
 
     /* head and tail of alternative list */
-    class CTcGramProdAlt *alt_head_;
-    class CTcGramProdAlt *alt_tail_;
+    CTcGramProdAlt *alt_head_;
+    CTcGramProdAlt *alt_tail_;
 
     /* 
      *   flag: this production was explicitly declared (this means that we
@@ -2095,7 +2139,7 @@ protected:
 class CTcGramProdAlt
 {
 public:
-    CTcGramProdAlt(class CTcSymObj *obj_sym, class CTcDictEntry *dict);
+    CTcGramProdAlt(CTcSymObj *obj_sym, CTcDictEntry *dict);
 
     /* get/set my score */
     int get_score() const { return score_; }
@@ -2106,40 +2150,40 @@ public:
     void set_badness(int badness) { badness_ = badness; }
 
     /* get my processor object symbol */
-    class CTcSymObj *get_processor_obj() const { return obj_sym_; }
+    CTcSymObj *get_processor_obj() const { return obj_sym_; }
 
     /* get/set the next list element */
     CTcGramProdAlt *get_next() const { return nxt_; }
     void set_next(CTcGramProdAlt *nxt) { nxt_ = nxt; }
 
     /* add a token to my list */
-    void add_tok(class CTcGramProdTok *tok);
+    void add_tok(CTcGramProdTok *tok);
 
     /* get the head of my token list */
-    class CTcGramProdTok *get_tok_head() const { return tok_head_; }
+    CTcGramProdTok *get_tok_head() const { return tok_head_; }
 
     /* write to an object file */
-    void write_to_obj_file(class CVmFile *fp);
+    void write_to_obj_file(CVmFile *fp);
 
     /* load from an object file */
     static CTcGramProdAlt *
-        load_from_obj_file(class CVmFile *fp,
+        load_from_obj_file(CVmFile *fp,
                            const tctarg_prop_id_t *prop_xlat,
                            const ulong *enum_xlat);
 
     /* get the dictionary in effect when the alternative was defined */
-    class CTcDictEntry *get_dict() const { return dict_; }
+    CTcDictEntry *get_dict() const { return dict_; }
 
 protected:
     /* head and tail of our token list */
-    class CTcGramProdTok *tok_head_;
-    class CTcGramProdTok *tok_tail_;
+    CTcGramProdTok *tok_head_;
+    CTcGramProdTok *tok_tail_;
 
     /* dictionary in effect when alternative was defined */
-    class CTcDictEntry *dict_;
+    CTcDictEntry *dict_;
 
     /* the processor object associated with this alternative */
-    class CTcSymObj *obj_sym_;
+    CTcSymObj *obj_sym_;
 
     /* next alternative in our production */
     CTcGramProdAlt *nxt_;
@@ -2199,7 +2243,7 @@ public:
     void set_next(CTcGramProdTok *nxt) { nxt_ = nxt; }
 
     /* set me to match a production object */
-    void set_match_prod(class CTcSymObj *obj)
+    void set_match_prod(CTcSymObj *obj)
     {
         /* remember the production object */
         typ_ = TCGRAM_PROD;
@@ -2251,7 +2295,7 @@ public:
     tcgram_tok_type get_type() const { return typ_; }
 
     /* get my value */
-    class CTcSymObj *getval_prod() const { return val_.obj_; }
+    CTcSymObj *getval_prod() const { return val_.obj_; }
     tctarg_prop_id_t getval_part_of_speech() const { return val_.prop_; }
     const char *getval_literal_txt() const { return val_.str_.txt_; }
     const size_t getval_literal_len() const { return val_.str_.len_; }
@@ -2268,11 +2312,11 @@ public:
     void set_prop_assoc(tctarg_prop_id_t prop) { prop_assoc_ = prop; }
 
     /* write to an object file */
-    void write_to_obj_file(class CVmFile *fp);
+    void write_to_obj_file(CVmFile *fp);
 
     /* load from an object file */
     static CTcGramProdTok *
-        load_from_obj_file(class CVmFile *fp,
+        load_from_obj_file(CVmFile *fp,
                            const tctarg_prop_id_t *prop_xlat,
                            const ulong *enum_xlat);
 
@@ -2287,7 +2331,7 @@ protected:
     union
     {
         /* object - for matching a production */
-        class CTcSymObj *obj_;
+        CTcSymObj *obj_;
 
         /* property - for matching a part of speech */
         tctarg_prop_id_t prop_;
@@ -2365,10 +2409,10 @@ public:
     void set_next(CTcPrsExport *nxt) { nxt_ = nxt; }
 
     /* write to an object file */
-    void write_to_obj_file(class CVmFile *fp);
+    void write_to_obj_file(CVmFile *fp);
 
     /* read from an object file */
-    static CTcPrsExport *read_from_obj_file(class CVmFile *fp);
+    static CTcPrsExport *read_from_obj_file(CVmFile *fp);
 
     /* determine if my external name matches the given export's */
     int ext_name_matches(const CTcPrsExport *exp) const
@@ -2459,10 +2503,10 @@ public:
     CTcPrsSymtab *get_parent() const { return parent_; }
 
     /* find a symbol; returns null if the symbol isn't defined */
-    class CTcSymbol *find(const textchar_t *sym, size_t len)
+    CTcSymbol *find(const textchar_t *sym, size_t len)
         { return find(sym, len, 0); }
 
-    class CTcSymbol *find(const textchar_t *sym)
+    CTcSymbol *find(const textchar_t *sym)
         { return find(sym, strlen(sym), 0); }
 
     /* 
@@ -2471,11 +2515,11 @@ public:
      *   in which we found the symbol; this might be an enclosing symbol
      *   table, since we search up the enclosing scope list. 
      */
-    class CTcSymbol *find(const textchar_t *sym, size_t len,
+    CTcSymbol *find(const textchar_t *sym, size_t len,
                           CTcPrsSymtab **symtab);
 
     /* find a symbol without changing its referenced status */
-    class CTcSymbol *find_noref(const textchar_t *sym, size_t len,
+    CTcSymbol *find_noref(const textchar_t *sym, size_t len,
                                 CTcPrsSymtab **symtab);
 
     /* 
@@ -2484,7 +2528,7 @@ public:
      *   the symbol isn't defined, this *always* returns a valid symbol
      *   object.  
      */
-    class CTcSymbol *find_or_def_undef(const char *sym, size_t len,
+    CTcSymbol *find_or_def_undef(const char *sym, size_t len,
                                        int copy_str)
     {
         return find_or_def(sym, len, copy_str, TCPRS_UNDEF_ADD_UNDEF);
@@ -2496,7 +2540,7 @@ public:
      *   the symbol isn't defined, this *always* returns a valid symbol
      *   object.  
      */
-    class CTcSymbol *find_or_def_prop(const char *sym, size_t len,
+    CTcSymbol *find_or_def_prop(const char *sym, size_t len,
                                       int copy_str)
     {
         return find_or_def(sym, len, copy_str, TCPRS_UNDEF_ADD_PROP);
@@ -2509,7 +2553,7 @@ public:
      *   add an entry if the symbol isn't defined, this *always* returns a
      *   valid symbol object.  
      */
-    class CTcSymbol *find_or_def_prop_explicit(
+    CTcSymbol *find_or_def_prop_explicit(
         const char *sym, size_t len, int copy_str)
     {
         return find_or_def(sym, len, copy_str,
@@ -2520,7 +2564,7 @@ public:
      *   Find a symbol; if the symbol isn't defined, define it as a property
      *   without warning, but flag it as a "weak" definition. 
      */
-    class CTcSymbol *find_or_def_prop_weak(
+    CTcSymbol *find_or_def_prop_weak(
         const char *sym, size_t len, int copy_str)
     {
         return find_or_def(sym, len, copy_str, TCPRS_UNDEF_ADD_PROP_WEAK);
@@ -2532,7 +2576,7 @@ public:
      *   isn't defined an no "self" object is available, add an
      *   "undefined" entry for the symbol. 
      */
-    class CTcSymbol *find_or_def_prop_implied(const char *sym, size_t len,
+    CTcSymbol *find_or_def_prop_implied(const char *sym, size_t len,
                                               int copy_str, int is_self_avail)
     {
         return find_or_def(sym, len, copy_str,
@@ -2544,14 +2588,14 @@ public:
      *   Find a symbol.  If the symbol is already defined as a "weak"
      *   property, delete it to make way for the new definition. 
      */
-    class CTcSymbol *find_delete_weak(const char *sym, size_t len);
+    CTcSymbol *find_delete_weak(const char *sym, size_t len);
 
     /* add a formal parameter symbol */
-    class CTcSymLocal *add_formal(const textchar_t *sym, size_t len,
+    CTcSymLocal *add_formal(const textchar_t *sym, size_t len,
                                   int formal_num, int copy_str);
 
     /* add a local variable symbol */
-    class CTcSymLocal *add_local(const textchar_t *sym, size_t len,
+    CTcSymLocal *add_local(const textchar_t *sym, size_t len,
                                  int local_num, int copy_str,
                                  int init_assigned, int init_referenced);
 
@@ -2559,14 +2603,14 @@ public:
      *   add the current token as a local symbol, initially unassigned and
      *   unreferenced 
      */
-    class CTcSymLocal *add_local(int local_num);
+    CTcSymLocal *add_local(int local_num);
 
     /* add a 'goto' symbol */
-    class CTcSymLabel *add_code_label(const textchar_t *sym, size_t len,
+    CTcSymLabel *add_code_label(const textchar_t *sym, size_t len,
                                       int copy_str);
 
     /* enumerate entries in the table through a callback */
-    void enum_entries(void (*func)(void *, class CTcSymbol *), void *ctx);
+    void enum_entries(void (*func)(void *, CTcSymbol *), void *ctx);
 
     /*
      *   Scan the symbol table and check for unreferenced locals.  Logs an
@@ -2600,13 +2644,13 @@ public:
      */
 
     /* find a symbol directly in this table, without searching parents */
-    virtual class CTcSymbol *find_direct(const textchar_t *sym, size_t len);
+    virtual CTcSymbol *find_direct(const textchar_t *sym, size_t len);
 
     /* add an entry to the table */
-    virtual void add_entry(class CTcSymbol *sym);
+    virtual void add_entry(CTcSymbol *sym);
 
     /* remove an entry */
-    virtual void remove_entry(class CTcSymbol *sym);
+    virtual void remove_entry(CTcSymbol *sym);
 
     /* expand my byte code range to include the given location */
     void add_to_range(int ofs)
@@ -2635,26 +2679,26 @@ protected:
     static void add_to_global_symtab(CTcPrsSymtab *tab, CTcSymbol *entry);
 
     /* get the underlying hash table */
-    class CVmHashTable *get_hashtab() const { return hashtab_; }
+    CVmHashTable *get_hashtab() const { return hashtab_; }
 
     /* enumeration callback - check for unreferenced locals */
-    static void unref_local_cb(void *ctx, class CTcSymbol *sym);
+    static void unref_local_cb(void *ctx, CTcSymbol *sym);
 
     /* 
      *   find a symbol, or define a new symbol, according to the given
      *   action mode, if the symbol is undefined 
      */
-    class CTcSymbol *find_or_def(const textchar_t *sym, size_t len,
+    CTcSymbol *find_or_def(const textchar_t *sym, size_t len,
                                  int copy_str, tcprs_undef_action action);
     
     /* enclosing scope (parent) symbol table */
     CTcPrsSymtab *parent_;
     
     /* hash table */
-    class CVmHashTable *hashtab_;
+    CVmHashTable *hashtab_;
 
     /* hash function */
-    static class CVmHashFunc *hash_func_;
+    static CVmHashFunc *hash_func_;
 
     /*
      *   Byte code range covered by this frame.  This is the range of offsets
@@ -2699,16 +2743,15 @@ public:
      *   information structure with the appropriate data.  
      */
     virtual int find_symbol(const textchar_t *sym, size_t len,
-                            struct tcprsdbg_sym_info *info) = 0;
+                            tcprsdbg_sym_info *info) = 0;
 };
 
 /*
  *   Debugger local symbol information structure 
  */
-struct tcprsdbg_sym_info
-{
+struct tcprsdbg_sym_info {
     /* symbol type */
-    enum tc_symtype_t sym_type;
+    tc_symtype_t sym_type;
     
     /* local/parameter number */
     uint var_id;
@@ -2800,13 +2843,12 @@ struct tcprsmem_state_t
     size_t rem;
 };
 
-
+#ifdef TODO
 /*
  *   Provide an overridden operator new for allocating objects explicitly
  *   from the pool 
  */
-inline void *operator new(size_t siz, CTcPrsMem *pool)
-{
+inline void *operator new(size_t siz, CTcPrsMem *pool) {
     return pool->alloc(siz);
 }
 
@@ -2817,7 +2859,7 @@ inline void *operator new[](size_t siz, CTcPrsMem *pool)
 {
     return pool->alloc(siz);
 }
-
+#endif
 
 /*
  *   parse tree memory block 
@@ -2922,7 +2964,7 @@ public:
     void set_float(const char *val, size_t len, int promoted);
 
     /* set a floating-point value from a vbignum_t */
-    void set_float(const class vbignum_t *val, int promoted);
+    void set_float(const vbignum_t *val, int promoted);
 
     /* set a floating-point value promoted from an integer */
     void set_float(ulong i);
@@ -2950,7 +2992,7 @@ public:
     void set_restr(const CTcToken *tok);
 
     /* set a list value */
-    void set_list(class CTPNList *lst);
+    void set_list(CTPNList *lst);
 
     /* for the debugger only: set a pre-resolved constant pool value */
     void set_sstr(uint32_t ofs);
@@ -2972,21 +3014,21 @@ public:
     }
 
     /* set a function pointer value */
-    void set_funcptr(class CTcSymFunc *sym)
+    void set_funcptr(CTcSymFunc *sym)
     {
         typ_ = TC_CVT_FUNCPTR;
         val_.funcptrval_ = sym;
     }
 
     /* set an anonymous function pointer value */
-    void set_anon_funcptr(class CTPNCodeBody *code_body)
+    void set_anon_funcptr(CTPNCodeBody *code_body)
     {
         typ_ = TC_CVT_ANONFUNCPTR;
         val_.codebodyval_ = code_body;
     }
 
     /* set a built-in function pointer value */
-    void set_bifptr(class CTcSymBif *sym)
+    void set_bifptr(CTcSymBif *sym)
     {
         typ_ = TC_CVT_BIFPTR;
         val_.bifptrval_ = sym;
@@ -3034,7 +3076,7 @@ public:
     size_t get_val_str_len() const { return val_.strval_.strval_len_; }
 
     /* get my list value (no type checking) */
-    class CTPNList *get_val_list() const { return val_.listval_.l_; }
+    CTPNList *get_val_list() const { return val_.listval_.l_; }
 
     /* 
      *   for debugger expressions only: the string/list as a pre-resolved
@@ -3053,15 +3095,15 @@ public:
     uint get_val_prop() const { return val_.propval_; }
 
     /* get my function pointer symbol value (no type checking) */
-    class CTcSymFunc *get_val_funcptr_sym() const
+    CTcSymFunc *get_val_funcptr_sym() const
         { return val_.funcptrval_; }
 
     /* get my anonymous function pointer value (no type checking) */
-    class CTPNCodeBody *get_val_anon_func_ptr() const
+    CTPNCodeBody *get_val_anon_func_ptr() const
         { return val_.codebodyval_; }
 
     /* get my built-in function pointer symbol value (noi type checking) */
-    class CTcSymBif *get_val_bifptr_sym() const
+    CTcSymBif *get_val_bifptr_sym() const
         { return val_.bifptrval_; }
 
     /*
@@ -3146,7 +3188,7 @@ private:
         /* my list value */
         struct
         {
-            class CTPNList *l_;
+            CTPNList *l_;
 
             /* for debugger expressions only: the pre-resolved pool address */
             uint32_t pool_ofs_;
@@ -3169,16 +3211,16 @@ private:
          *   since function pointers are generally not resolved until late
          *   in the compilation 
          */
-        class CTcSymFunc *funcptrval_;
+        CTcSymFunc *funcptrval_;
 
         /* built-in function pointer value */
-        class CTcSymBif *bifptrval_;
+        CTcSymBif *bifptrval_;
 
         /* 
          *   code body pointer value - we store the underlying code body
          *   for anonymous functions 
          */
-        class CTPNCodeBody *codebodyval_;
+        CTPNCodeBody *codebodyval_;
     } val_;
 
     /*
@@ -3303,7 +3345,7 @@ public:
                        const CTcToken *func_base_name);
 
     /* get the first parameter in the list */
-    class CTcFormalTypeEle *get_first() const { return head_; }
+    CTcFormalTypeEle *get_first() const { return head_; }
 
     /* add a typed variable to the list */
     void add_typed_param(const CTcToken *tok);
@@ -3323,10 +3365,10 @@ public:
 
 protected:
     /* add a new list element */
-    void add(class CTcFormalTypeEle *ele);
+    void add(CTcFormalTypeEle *ele);
 
     /* add/tail of parameter list */
-    class CTcFormalTypeEle *head_, *tail_;
+    CTcFormalTypeEle *head_, *tail_;
 
     /* is this a varargs list? */
     int varargs_;
@@ -3377,7 +3419,7 @@ public:
      *   and the operator parser is unable to make a guess about what was
      *   intended.  
      */
-    virtual class CTcPrsNode *parse() const = 0;
+    virtual CTcPrsNode *parse() const = 0;
 };
 
 /*
@@ -3412,12 +3454,12 @@ public:
     }
 
     /* parse the binary expression */
-    class CTcPrsNode *parse() const;
+    CTcPrsNode *parse() const;
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    virtual class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const = 0;
+    virtual CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const = 0;
 
     /* 
      *   Try evaluating a constant result.  If the two values can be
@@ -3429,9 +3471,9 @@ public:
      *   By default, we'll indicate that the expression does not have a
      *   valid constant value.  
      */
-    virtual class CTcPrsNode
-        *eval_constant(class CTcPrsNode *left,
-                       class CTcPrsNode *right) const
+    virtual CTcPrsNode
+        *eval_constant(CTcPrsNode *left,
+                       CTcPrsNode *right) const
     {
         /* indicate that we cannot synthesize a constant value */
         return 0;
@@ -3463,7 +3505,7 @@ class CTcPrsOpBinGroup: public CTcPrsOp
 {
 public:
     CTcPrsOpBinGroup(const CTcPrsOp *left, const CTcPrsOp *right,
-                     const class CTcPrsOpBin *const *ops)
+                     const CTcPrsOpBin *const *ops)
     {
         /* remember my left and right suboperators */
         left_ = left;
@@ -3474,7 +3516,7 @@ public:
     }
 
     /* parse the expression */
-    class CTcPrsNode *parse() const;
+    CTcPrsNode *parse() const;
 
 protected:
     /* find and apply an operator to the parsed left-hand side */
@@ -3485,7 +3527,7 @@ protected:
     const CTcPrsOp *right_;
     
     /* group of binary operators at this precedence level */
-    const class CTcPrsOpBin *const *ops_;
+    const CTcPrsOpBin *const *ops_;
 };
 
 /*
@@ -3496,18 +3538,18 @@ protected:
 class CTcPrsOpBinGroupCompare: public CTcPrsOpBinGroup
 {
 public:
-    CTcPrsOpBinGroupCompare(const class CTcPrsOp *left,
-                            const class CTcPrsOp *right,
-                            const class CTcPrsOpBin *const *ops)
+    CTcPrsOpBinGroupCompare(const CTcPrsOp *left,
+                            const CTcPrsOp *right,
+                            const CTcPrsOpBin *const *ops)
         : CTcPrsOpBinGroup(left, right, ops)
     {
     }
 
-    class CTcPrsNode *parse() const;
+    CTcPrsNode *parse() const;
 
 protected:
     /* parse the 'in' list portion of the expression */
-    class CTPNArglist *parse_inlist() const;
+    CTPNArglist *parse_inlist() const;
 };
 
 /* comma operator */
@@ -3518,14 +3560,14 @@ public:
         : CTcPrsOpBin(left, right, TOKT_COMMA) { }
 
     /* evaluate constant result */
-    class CTcPrsNode
-        *eval_constant(class CTcPrsNode *left,
-                       class CTcPrsNode *right) const;
+    CTcPrsNode
+        *eval_constant(CTcPrsNode *left,
+                       CTcPrsNode *right) const;
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 };
 
 /* logical OR */
@@ -3536,14 +3578,14 @@ public:
         : CTcPrsOpBin(left, right, TOKT_OROR) { }
 
     /* evaluate constant result */
-    class CTcPrsNode
-        *eval_constant(class CTcPrsNode *left,
-                       class CTcPrsNode *right) const;
+    CTcPrsNode
+        *eval_constant(CTcPrsNode *left,
+                       CTcPrsNode *right) const;
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 };
 
 /* logical AND */
@@ -3554,14 +3596,14 @@ public:
         : CTcPrsOpBin(left, right, TOKT_ANDAND) { }
 
     /* evaluate constant result */
-    class CTcPrsNode
-        *eval_constant(class CTcPrsNode *left,
-                       class CTcPrsNode *right) const;
+    CTcPrsNode
+        *eval_constant(CTcPrsNode *left,
+                       CTcPrsNode *right) const;
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 };
 
 /* general magnitude comparison operators */
@@ -3571,9 +3613,9 @@ public:
     CTcPrsOpRel(tc_toktyp_t typ) : CTcPrsOpBin(typ) { }
     
     /* evaluate constant result */
-    class CTcPrsNode
-        *eval_constant(class CTcPrsNode *left,
-                       class CTcPrsNode *right) const;
+    CTcPrsNode
+        *eval_constant(CTcPrsNode *left,
+                       CTcPrsNode *right) const;
 
 protected:
     /*
@@ -3594,9 +3636,9 @@ public:
     int get_bool_val(int comp) const { return comp > 0; }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 };
 
 /* comparison - greater than or equal to */
@@ -3609,9 +3651,9 @@ public:
     int get_bool_val(int comp) const { return comp >= 0; }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 };
 
 /* comparison - less than */
@@ -3624,9 +3666,9 @@ public:
     int get_bool_val(int comp) const { return comp < 0; }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 };
 
 /* comparison - less than or equal to */
@@ -3639,9 +3681,9 @@ public:
     int get_bool_val(int comp) const { return comp <= 0; }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 };
 
 /*
@@ -3653,9 +3695,9 @@ public:
     CTcPrsOpEqComp(tc_toktyp_t typ) : CTcPrsOpBin(typ) { }
 
     /* evaluate constant result */
-    class CTcPrsNode
-        *eval_constant(class CTcPrsNode *left,
-                       class CTcPrsNode *right) const;
+    CTcPrsNode
+        *eval_constant(CTcPrsNode *left,
+                       CTcPrsNode *right) const;
 
 protected:
     /* get the boolean value to use if the operands are equal */
@@ -3677,9 +3719,9 @@ public:
     void set_eq_op(tc_toktyp_t op) { op_tok_ = op; }
     
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
     /* get the boolean value to use if the operands are equal */
     virtual int get_bool_val(int ops_equal) const { return ops_equal; }
@@ -3694,9 +3736,9 @@ public:
     CTcPrsOpNe() : CTcPrsOpEqComp(TOKT_NE) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
     /* get the boolean value to use if the operands are equal */
     virtual int get_bool_val(int ops_equal) const { return !ops_equal; }
@@ -3716,17 +3758,17 @@ public:
         : CTcPrsOpBin(left, right, typ) { }
 
     /* evaluate constant result */
-    class CTcPrsNode
-        *eval_constant(class CTcPrsNode *left,
-                       class CTcPrsNode *right) const;
+    CTcPrsNode
+        *eval_constant(CTcPrsNode *left,
+                       CTcPrsNode *right) const;
 
 protected:
     /* calculate the result of the operand applied to constant int values */
     virtual long calc_result(long val1, long val2, int &ov) const = 0;
 
     /* calculate the result for constant float values */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const = 0;
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const = 0;
 };
 
 /* bitwise OR */
@@ -3737,9 +3779,9 @@ public:
         : CTcPrsOpArith(left, right, TOKT_OR) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
 protected:
     /* calculate a constant integer result */
@@ -3750,8 +3792,8 @@ protected:
     }
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const
     {
         G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
         return 0;
@@ -3766,9 +3808,9 @@ public:
         : CTcPrsOpArith(left, right, TOKT_XOR) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
 protected:
     /* calculate the result */
@@ -3779,8 +3821,8 @@ protected:
     }
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const
     {
         G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
         return 0;
@@ -3795,9 +3837,9 @@ public:
         : CTcPrsOpArith(left, right, TOKT_AND) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
 protected:
     /* calculate the result */
@@ -3808,8 +3850,8 @@ protected:
     }
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const
     {
         G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
         return 0;
@@ -3825,9 +3867,9 @@ public:
     CTcPrsOpShl() : CTcPrsOpArith(TOKT_SHL) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
 protected:
     long calc_result(long a, long b, int &ov) const
@@ -3837,8 +3879,8 @@ protected:
     }
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const
     {
         G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
         return 0;
@@ -3854,9 +3896,9 @@ public:
     CTcPrsOpAShr() : CTcPrsOpArith(TOKT_ASHR) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
 protected:
     long calc_result(long a, long b, int &ov) const
@@ -3866,8 +3908,8 @@ protected:
     }
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const
     {
         G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
         return 0;
@@ -3883,9 +3925,9 @@ public:
     CTcPrsOpLShr() : CTcPrsOpArith(TOKT_LSHR) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
 protected:
     /* calculate a constant integer result */
@@ -3896,8 +3938,8 @@ protected:
     }
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const
     {
         G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
         return 0;
@@ -3913,22 +3955,22 @@ public:
     CTcPrsOpMul() : CTcPrsOpArith(TOKT_TIMES) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
 protected:
     /* calculate a constant integer result */
     long calc_result(long a, long b, int &ov) const
     {
-        int64_t prod = a * b;
-        ov = (prod > (int64_t)INT32MAXVAL || prod < (int64_t)INT32MINVAL);
+        int64 prod = a * b;
+        ov = (prod > (int64)INT32MAXVAL || prod < (int64)INT32MINVAL);
         return (long)prod;
     }
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const;
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const;
 };
 
 /*
@@ -3944,17 +3986,17 @@ public:
         : CTcPrsOpArith(tok) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
     
 protected:
     /* calculate a constant integer result */
     long calc_result(long a, long b, int &ov) const;
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const;
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const;
 };
 
 
@@ -3967,17 +4009,17 @@ public:
     CTcPrsOpMod() : CTcPrsOpDiv(TOKT_MOD) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
 protected:
     /* calculate a constant integer result */
     long calc_result(long a, long b, int &ov) const;
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const;
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const;
 };
 
 /*
@@ -3989,14 +4031,14 @@ public:
     CTcPrsOpAdd() : CTcPrsOpArith(TOKT_PLUS) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
     /* evaluate constant result */
-    class CTcPrsNode
-        *eval_constant(class CTcPrsNode *left,
-                       class CTcPrsNode *right) const;
+    CTcPrsNode
+        *eval_constant(CTcPrsNode *left,
+                       CTcPrsNode *right) const;
 
 protected:
     /* calculate a constant integer result */
@@ -4008,8 +4050,8 @@ protected:
     }
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const;
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const;
 };
 
 /*
@@ -4021,14 +4063,14 @@ public:
     CTcPrsOpSub() : CTcPrsOpArith(TOKT_MINUS) { }
 
     /* build a new tree out of our left-hand and right-hand subtrees */
-    class CTcPrsNode
-        *build_tree(class CTcPrsNode *left,
-                    class CTcPrsNode *right) const;
+    CTcPrsNode
+        *build_tree(CTcPrsNode *left,
+                    CTcPrsNode *right) const;
 
     /* evaluate constant result */
-    class CTcPrsNode
-        *eval_constant(class CTcPrsNode *left,
-                       class CTcPrsNode *right) const;
+    CTcPrsNode
+        *eval_constant(CTcPrsNode *left,
+                       CTcPrsNode *right) const;
 
 protected:
     /* calculate a constant integer result */
@@ -4040,8 +4082,8 @@ protected:
     }
 
     /* calculate a constant float result */
-    virtual class vbignum_t *calc_result(
-        const class vbignum_t &a, const class vbignum_t &b) const;
+    virtual vbignum_t *calc_result(
+        const vbignum_t &a, const vbignum_t &b) const;
 };
 
 /*
@@ -4050,130 +4092,130 @@ protected:
 class CTcPrsOpUnary: public CTcPrsOp
 {
 public:
-    class CTcPrsNode *parse() const;
+    CTcPrsNode *parse() const;
 
     /* 
      *   evaluate a constant subscript expression; returns a constant
      *   parse node expression if the subscript can be evaluated to a
      *   compile-time constant, or null if not 
      */
-    static class CTcPrsNode
-        *eval_const_subscript(class CTcPrsNode *lhs,
-                              class CTcPrsNode *subscript);
+    static CTcPrsNode
+        *eval_const_subscript(CTcPrsNode *lhs,
+                              CTcPrsNode *subscript);
 
     /* 
      *   evaluate a constant NOT expression; returns a constant parse node
      *   expression if the logical negation can be evaluated to a
      *   compile-time constant, or null if not 
      */
-    static class CTcPrsNode *eval_const_not(class CTcPrsNode *lhs);
+    static CTcPrsNode *eval_const_not(CTcPrsNode *lhs);
 
     /* parse a string with embedded expressions */
-    static class CTcPrsNode *parse_embedding(struct CTcEmbedBuilder *builder);
+    static CTcPrsNode *parse_embedding(CTcEmbedBuilder *builder);
 
     /* parse a list */
-    static class CTcPrsNode *parse_list();
+    static CTcPrsNode *parse_list();
 
     /* parse a primary expression */
-    static class CTcPrsNode *parse_primary();
+    static CTcPrsNode *parse_primary();
 
     /* parse an anonymous function */
-    static class CTPNAnonFunc *parse_anon_func(int short_form, int is_method);
+    static CTPNAnonFunc *parse_anon_func(int short_form, int is_method);
 
     /* parse an in-line object definition */
-    static class CTPNInlineObject *parse_inline_object(int has_colon);
+    static CTPNInlineObject *parse_inline_object(int has_colon);
 
 protected:
     /* embedded expression: parse an expression list */
     static CTcPrsNode *parse_embedding_list(
-        struct CTcEmbedBuilder *b, int &eos, struct CTcEmbedLevel *parent);
+        CTcEmbedBuilder *b, int &eos, CTcEmbedLevel *parent);
 
     /* embedded expression: parse an <<if>> or <<unless>> embedding */
     static CTcPrsNode *parse_embedded_if(
-        struct CTcEmbedBuilder *b, int unless,
-        int &eos, struct CTcEmbedLevel *parent);
+        CTcEmbedBuilder *b, int unless,
+        int &eos, CTcEmbedLevel *parent);
 
     /* parse a single embedded expression */
     static CTcPrsNode *parse_embedded_expr(
-        struct CTcEmbedBuilder *b, class CTcEmbedTokenList *tl);
+        CTcEmbedBuilder *b, CTcEmbedTokenList *tl);
 
     /* embedded expression: parse an <<one of>> embedding */
     static CTcPrsNode *parse_embedded_oneof(
-        struct CTcEmbedBuilder *b, int &eos, struct CTcEmbedLevel *parent);
+        CTcEmbedBuilder *b, int &eos, CTcEmbedLevel *parent);
 
     /* embedded expression: parse an <<first time>>...<<only>> embedding */
     static CTcPrsNode *parse_embedded_firsttime(
-        struct CTcEmbedBuilder *b, int &eos, struct CTcEmbedLevel *parent);
+        CTcEmbedBuilder *b, int &eos, CTcEmbedLevel *parent);
 
     /* create the parse node for a <<one of>> structure */
     static CTcPrsNode *create_oneof_node(
-        struct CTcEmbedBuilder *b, class CTPNList *lst, const char *attrs);
+        CTcEmbedBuilder *b, CTPNList *lst, const char *attrs);
 
     /* capture an embedded expression to a saved token list */
-    static void capture_embedded(struct CTcEmbedBuilder *b,
-                                 class CTcEmbedTokenList *tl);
+    static void capture_embedded(CTcEmbedBuilder *b,
+                                 CTcEmbedTokenList *tl);
 
     /* 
      *   Match an end token for an embedded expression construct - <<end>>,
      *   <<else>>, etc.  This version parses captured tokens.
      */
-    static int parse_embedded_end_tok(class CTcEmbedTokenList *tl,
-                                      struct CTcEmbedLevel *parent,
+    static int parse_embedded_end_tok(CTcEmbedTokenList *tl,
+                                      CTcEmbedLevel *parent,
                                       const char **open_kw);
 
     /* parse an end token directly from the token stream */
-    static int parse_embedded_end_tok(struct CTcEmbedBuilder *b,
-                                      struct CTcEmbedLevel *parent,
+    static int parse_embedded_end_tok(CTcEmbedBuilder *b,
+                                      CTcEmbedLevel *parent,
                                       const char **open_kw);
 
     /* parse a logical NOT operator */
-    static class CTcPrsNode *parse_not(CTcPrsNode *sub);
+    static CTcPrsNode *parse_not(CTcPrsNode *sub);
     
     /* parse a bitwise NOT operator */
-    static class CTcPrsNode *parse_bnot(CTcPrsNode *sub);
+    static CTcPrsNode *parse_bnot(CTcPrsNode *sub);
 
     /* parse an address-of operator */
-    class CTcPrsNode *parse_addr() const;
+    CTcPrsNode *parse_addr() const;
 
     /* parse an arithmetic positive operator */
-    static class CTcPrsNode *parse_pos(CTcPrsNode *sub);
+    static CTcPrsNode *parse_pos(CTcPrsNode *sub);
 
     /* parse an arithmetic negative operator */
-    static class CTcPrsNode *parse_neg(CTcPrsNode *sub);
+    static CTcPrsNode *parse_neg(CTcPrsNode *sub);
 
     /* parse a pre- or post-increment operator */
-    static class CTcPrsNode *parse_inc(int pre, CTcPrsNode *sub);
+    static CTcPrsNode *parse_inc(int pre, CTcPrsNode *sub);
 
     /* parse a pre- or post-decrement operator */
-    static class CTcPrsNode *parse_dec(int pre, CTcPrsNode *sub);
+    static CTcPrsNode *parse_dec(int pre, CTcPrsNode *sub);
 
     /* parse a 'new' operator */
-    static class CTcPrsNode *parse_new(CTcPrsNode *sub, int is_transient);
+    static CTcPrsNode *parse_new(CTcPrsNode *sub, int is_transient);
 
     /* parse a 'delete' operator */
-    static class CTcPrsNode *parse_delete(CTcPrsNode *sub);
+    static CTcPrsNode *parse_delete(CTcPrsNode *sub);
 
     /* parse a postfix expression */
-    static class CTcPrsNode *parse_postfix(int allow_member_expr,
+    static CTcPrsNode *parse_postfix(int allow_member_expr,
                                            int allow_call_expr);
 
     /* parse a function or method call */
-    static class CTcPrsNode *parse_call(CTcPrsNode *lhs);
+    static CTcPrsNode *parse_call(CTcPrsNode *lhs);
 
     /* parse an argument list */
-    static class CTPNArglist *parse_arg_list();
+    static CTPNArglist *parse_arg_list();
 
     /* parse a subscript */
-    static class CTcPrsNode *parse_subscript(CTcPrsNode *lhs);
+    static CTcPrsNode *parse_subscript(CTcPrsNode *lhs);
 
     /* parse a member selection ('.' operator) */
-    static class CTcPrsNode *parse_member(CTcPrsNode *lhs);
+    static CTcPrsNode *parse_member(CTcPrsNode *lhs);
 
     /* parse an "inherited" expression */
-    static class CTcPrsNode *parse_inherited();
+    static CTcPrsNode *parse_inherited();
 
     /* parse a "delegated" expression */
-    static class CTcPrsNode *parse_delegated();
+    static CTcPrsNode *parse_delegated();
 };
 
 /*
@@ -4183,7 +4225,7 @@ class CTcPrsOpIfnil: public CTcPrsOp
 {
 public:
     CTcPrsOpIfnil() { }
-    class CTcPrsNode *parse() const;
+    CTcPrsNode *parse() const;
 };
 
 /*
@@ -4193,7 +4235,7 @@ class CTcPrsOpIf: public CTcPrsOp
 {
 public:
     CTcPrsOpIf() { }
-    class CTcPrsNode *parse() const;
+    CTcPrsNode *parse() const;
 };
 
 /*
@@ -4210,7 +4252,7 @@ public:
     }
 
     /* parse an assignment */
-    class CTcPrsNode *parse() const;
+    CTcPrsNode *parse() const;
 
     /* set the current simple assignment operator */
     void set_asi_op(tc_toktyp_t tok) { asi_op_ = tok; }
