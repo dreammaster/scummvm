@@ -38,7 +38,7 @@ static const PlainGameDescriptor agsGames[] = {
 
 Ultima8MetaEngine::Ultima8MetaEngine() : AdvancedMetaEngine(Ultima8::gameDescriptions,
 	        sizeof(Ultima8::Ultima8GameDescription), agsGames) {
-	static const char *const DIRECTORY_GLOBS[2] = { "usecode", nullptr };
+	static const char *const DIRECTORY_GLOBS[2] = { "usecode", 0 };
 	_maxScanDepth = 2;
 	_directoryGlobs = DIRECTORY_GLOBS;
 }
