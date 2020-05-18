@@ -296,7 +296,29 @@ MODULE_OBJS := \
 	tads/tads2/vocabulary_parser.o \
 	tads/tads3/tads3.o \
 	zcode/detection.o \
-	zcode/zcode.o
+	zcode/zcode.o \
+	zcode/common/buffer.o \
+	zcode/common/err.o \
+	zcode/common/fastmem.o \
+	zcode/common/files.o \
+	zcode/common/getopt.o \
+	zcode/common/hotkey.o \
+	zcode/common/input.o \
+	zcode/common/main.o \
+	zcode/common/math.o \
+	zcode/common/missing.o \
+	zcode/common/object.o \
+	zcode/common/process.o \
+	zcode/common/quetzal.o \
+	zcode/common/random.o \
+	zcode/common/redirect.o \
+	zcode/common/screen.o \
+	zcode/common/sound.o \
+	zcode/common/stream.o \
+	zcode/common/table.o \
+	zcode/common/text.o \
+	zcode/common/variable.o \
+	zcode/glk/io.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_GLK), DYNAMIC_PLUGIN)

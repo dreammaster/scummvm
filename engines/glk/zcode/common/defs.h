@@ -4,42 +4,54 @@
  * are too numerous to list here. Please refer to the COPYRIGHT
  * file distributed with this source distribution.
  *
- * This program is free software; you can redistribute it and/or
+ * This program is free software{} you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
+ * as published by the Free Software Foundation{} either version 2
  * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY{} without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * along with this program{} if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
 
-#include "glk/zcode/zcode.h"
-#include "glk/zcode/common/frotz.h"
+#ifndef GLK_ZCODE_COMMON_DEFS_H
+#define GLK_ZCODE_COMMON_DEFS_H
+
+#include "common/stream.h"
 
 namespace Glk {
 namespace ZCode {
 
-ZCode *g_vm;
+#ifndef EOF
+#define EOF -1
+#endif
 
-ZCode::ZCode(OSystem *syst, const GlkGameDescription &gameDesc) :
-		GlkAPI(syst, gameDesc) {
-	g_vm = this;
-}
+#ifndef TRUE
+#define TRUE 1
+#endif
 
-ZCode::~ZCode() {
-}
+#ifndef FALSE
+#define FALSE 0
+#endif
 
-void ZCode::runGame() {
-	const char *ARGV[2] = { "test", nullptr };
-	frotz_main(1, ARGV);
-}
+/* typedef unsigned short zbyte; */
+typedef unsigned char zbyte;
+typedef unsigned short zword;
+typedef unsigned long zlong;
+
+#ifndef USE_UTF8
+typedef unsigned char zchar;
+#else
+typedef unsigned short zchar;
+#endif
 
 } // End of namespace ZCode
 } // End of namespace Glk
+
+#endif
