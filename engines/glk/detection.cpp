@@ -54,6 +54,8 @@
 #include "glk/tads/detection.h"
 #include "glk/tads/tads2/tads2.h"
 #include "glk/tads/tads3/tads3.h"
+#include "glk/zcode/detection.h"
+#include "glk/zcode/zcode.h"
 
 #include "base/plugins.h"
 #include "common/md5.h"
@@ -172,7 +174,6 @@ Common::Error GlkMetaEngine::createInstance(OSystem *syst, Engine **engine) cons
 	else if ((*engine = create<Glk::Alan2::Alan2MetaEngine, Glk::Alan2::Alan2>(syst, gameDesc)) != nullptr) {}
 	else if ((*engine = create<Glk::Alan3::Alan3MetaEngine, Glk::Alan3::Alan3>(syst, gameDesc)) != nullptr) {}
 	else if ((*engine = create<Glk::Archetype::ArchetypeMetaEngine, Glk::Archetype::Archetype>(syst, gameDesc)) != nullptr) {}
-	else if ((*engine = create<Glk::Frotz::FrotzMetaEngine, Glk::Frotz::Frotz>(syst, gameDesc)) != nullptr) {}
 	else if ((*engine = create<Glk::Glulxe::GlulxeMetaEngine, Glk::Glulxe::Glulxe>(syst, gameDesc)) != nullptr) {}
 	else if ((*engine = create<Glk::Hugo::HugoMetaEngine, Glk::Hugo::Hugo>(syst, gameDesc)) != nullptr) {}
 	else if ((*engine = create<Glk::JACL::JACLMetaEngine, Glk::JACL::JACL>(syst, gameDesc)) != nullptr) {}
@@ -185,7 +186,8 @@ Common::Error GlkMetaEngine::createInstance(OSystem *syst, Engine **engine) cons
 			*engine = new Glk::TADS::TADS3::TADS3(syst, gameDesc);
 		else
 			*engine = new Glk::TADS::TADS2::TADS2(syst, gameDesc);
-	} else {
+	} else if ((*engine = create<Glk::ZCode::ZCodeMetaEngine, Glk::Frotz::Frotz>(syst, gameDesc)) != nullptr) {}
+	else {
 		return Common::kNoGameDataFoundError;
 	}
 
@@ -222,7 +224,6 @@ PlainGameList GlkMetaEngine::getSupportedGames() const {
 	Glk::Alan2::Alan2MetaEngine::getSupportedGames(list);
 	Glk::Alan3::Alan3MetaEngine::getSupportedGames(list);
 	Glk::Archetype::ArchetypeMetaEngine::getSupportedGames(list);
-	Glk::Frotz::FrotzMetaEngine::getSupportedGames(list);
 	Glk::Glulxe::GlulxeMetaEngine::getSupportedGames(list);
 	Glk::Hugo::HugoMetaEngine::getSupportedGames(list);
 	Glk::JACL::JACLMetaEngine::getSupportedGames(list);
@@ -231,6 +232,7 @@ PlainGameList GlkMetaEngine::getSupportedGames() const {
 	Glk::Quest::QuestMetaEngine::getSupportedGames(list);
 	Glk::Scott::ScottMetaEngine::getSupportedGames(list);
 	Glk::TADS::TADSMetaEngine::getSupportedGames(list);
+	Glk::ZCode::ZCodeMetaEngine::getSupportedGames(list);
 
 	return list;
 }
@@ -246,7 +248,6 @@ PlainGameDescriptor GlkMetaEngine::findGame(const char *gameId) const {
 	FIND_GAME(AGT);
 	FIND_GAME(Alan3);
 	FIND_GAME(Archetype);
-	FIND_GAME(Frotz);
 	FIND_GAME(Glulxe);
 	FIND_GAME(Hugo);
 	FIND_GAME(JACL);
@@ -255,6 +256,7 @@ PlainGameDescriptor GlkMetaEngine::findGame(const char *gameId) const {
 	FIND_GAME(Quest);
 	FIND_GAME(Scott);
 	FIND_GAME(TADS);
+	FIND_GAME(ZCode);
 
 	return PlainGameDescriptor();
 }

@@ -294,7 +294,9 @@ MODULE_OBJS := \
 	tads/tads2/tokenizer_hash.o \
 	tads/tads2/vocabulary.o \
 	tads/tads2/vocabulary_parser.o \
-	tads/tads3/tads3.o
+	tads/tads3/tads3.o \
+	zcode/detection.o \
+	zcode/zcode.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_GLK), DYNAMIC_PLUGIN)
