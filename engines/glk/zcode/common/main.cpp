@@ -109,7 +109,7 @@ void z_piracy(void)
 int frotz_main(int argc, const char *argv[])
 {
 	init_header();
-	init_setup();
+	init_setup(); 
 	os_init_setup();
 	os_process_arguments(argc, argv);
 	init_buffer();

@@ -24,21 +24,15 @@
  * New undo mechanism added by Jim Dunleavy <jim.dunleavy@erha.ie>
  */
 
-#include <stdio.h>
-#include <string.h>
 #include "glk/zcode/common/frotz.h"
 
 #ifdef MSDOS_16BIT
-
-#include <alloc.h>
 
 #define malloc(size)	farmalloc (size)
 #define realloc(size,p)	farrealloc (size,p)
 #define free(size)	farfree (size)
 
 #else
-
-//include <stdlib.h>
 
 #ifndef SEEK_SET
 #define SEEK_SET 0

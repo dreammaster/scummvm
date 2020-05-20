@@ -30,6 +30,8 @@ namespace ZCode {
 
 #undef strdup
 #define strdup scumm_strdup
+#undef strcasecmp
+#define strcasecmp scumm_stricmp
 
 #undef FILE
 #define FILE Common::Stream
@@ -39,12 +41,17 @@ extern Common::Stream *fopen(const char *filename, const char *mode);
 extern int fseek(Common::Stream *stream, long int offset, int origin);
 #undef ftell
 extern int32 ftell(Common::Stream *stream);
+#undef feof
+extern int feof(FILE *stream);
 #undef fread
 extern size_t fread(void *ptr, size_t size, size_t count, Common::Stream *stream);
 #undef fgetc
 extern int fgetc(Common::Stream *stream);
 #undef fungetc
 extern int ungetc(int character, Common::Stream *stream);
+#undef fgets
+extern char *fgets(char *str, int num, FILE *stream);
+
 #undef fputc
 extern int fputc(int character, Common::Stream *stream);
 #undef fwrite

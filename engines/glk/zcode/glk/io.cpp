@@ -56,6 +56,12 @@ int32 ftell(Common::Stream *stream) {
 	return rs->pos();
 }
 
+int feof(FILE *stream) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(stream);
+	assert(rs);
+	return rs->eos();
+}
+
 size_t fread(void *ptr, size_t size, size_t count, Common::Stream *stream) {
 	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(stream);
 	assert(rs);
@@ -68,6 +74,24 @@ int fgetc(Common::Stream *stream) {
 	byte v = rs->readByte();
 	return rs->eos() ? EOF : v;
 }
+
+char *fgets(char *str, int num, FILE *stream) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(stream);
+	assert(rs);
+	size_t size = rs->size();
+	char *ptr = str;
+	char c;
+
+	while (rs->pos() < size && --num > 0) {
+		c = rs->readByte();
+		if (c == '\n' || c == '\0')
+			break;
+		*ptr++ = c;
+	}
+	*ptr++ = '\0';
+	return str;
+}
+
 
 int fputc(int character, Common::Stream *stream) {
 	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(stream);

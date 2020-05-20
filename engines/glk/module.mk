@@ -297,6 +297,7 @@ MODULE_OBJS := \
 	tads/tads3/tads3.o \
 	zcode/detection.o \
 	zcode/zcode.o \
+	zcode/blorb/blorblib.o \
 	zcode/common/buffer.o \
 	zcode/common/err.o \
 	zcode/common/fastmem.o \
@@ -318,7 +319,20 @@ MODULE_OBJS := \
 	zcode/common/table.o \
 	zcode/common/text.o \
 	zcode/common/variable.o \
-	zcode/glk/io.o
+	zcode/glk/generic.o \
+	zcode/glk/io.o \
+	zcode/glk/sf_deffont.o \
+	zcode/glk/sf_font3.o \
+	zcode/glk/sf_fonts.o \
+	zcode/glk/sf_ftype.o \
+	zcode/glk/sf_images.o \
+	zcode/glk/sf_msg_en.o \
+	zcode/glk/sf_osfdlg.o \
+	zcode/glk/sf_resource.o \
+	zcode/glk/sf_sig.o \
+	zcode/glk/sf_sound.o \
+	zcode/glk/sf_util.o \
+	zcode/glk/sf_video.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_GLK), DYNAMIC_PLUGIN)

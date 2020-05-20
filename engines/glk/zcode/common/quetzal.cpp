@@ -27,16 +27,11 @@ namespace ZCode {
 
 #ifdef MSDOS_16BIT
 
-#include <alloc.h>
-#include <dos.h>
-
 #define malloc(size)	farmalloc (size)
 #define realloc(size,p)	farrealloc (size,p)
 #define free(size)	farfree (size)
 
 #else
-
-#include <stdlib.h>
 
 #ifndef SEEK_SET
 #define SEEK_SET 0

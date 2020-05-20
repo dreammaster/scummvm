@@ -750,7 +750,7 @@ void screen_new_line(void);
 #define cdecl
 #endif
 
-int cdecl zgetopt(int, char **, const char *);
+int cdecl zgetopt(int, const char **, const char *);
 
 /*** returns the current window ***/
 Zwindow * curwinrec(void);
