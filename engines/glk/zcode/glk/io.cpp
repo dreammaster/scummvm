@@ -75,10 +75,24 @@ int fgetc(Common::Stream *stream) {
 	return rs->eos() ? EOF : v;
 }
 
+int ungetc(int character, Common::Stream *stream) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(stream);
+	assert(rs);
+
+	// Only a limited ungetc is supported that the provided
+	// character must have been the one just read previously
+	rs->seek(-1, SEEK_CUR);
+	byte c = rs->readByte();
+	assert(c == character);
+
+	rs->seek(-1, SEEK_CUR);
+	return 0;
+}
+
 char *fgets(char *str, int num, FILE *stream) {
 	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(stream);
 	assert(rs);
-	size_t size = rs->size();
+	int32 size = rs->size();
 	char *ptr = str;
 	char c;
 

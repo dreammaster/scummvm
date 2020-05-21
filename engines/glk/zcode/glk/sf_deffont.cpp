@@ -688,7 +688,7 @@ static unsigned char myfont[] = {
 	0x92,0x92,0x9e,0x90,0x90,0x92,0x6c,0x00,
 	0x00};
 
-unsigned char * SF_defaultfont = &(myfont[0]);
+unsigned const char *SF_defaultfont = &(myfont[0]);
 int SF_defaultfontsize = sizeof(myfont);
 
 } // End of namespace ZCode

@@ -186,7 +186,7 @@ Common::Error GlkMetaEngine::createInstance(OSystem *syst, Engine **engine) cons
 			*engine = new Glk::TADS::TADS3::TADS3(syst, gameDesc);
 		else
 			*engine = new Glk::TADS::TADS2::TADS2(syst, gameDesc);
-	} else if ((*engine = create<Glk::ZCode::ZCodeMetaEngine, Glk::Frotz::Frotz>(syst, gameDesc)) != nullptr) {}
+	} else if ((*engine = create<Glk::ZCode::ZCodeMetaEngine, Glk::ZCode::ZCode>(syst, gameDesc)) != nullptr) {}
 	else {
 		return Common::kNoGameDataFoundError;
 	}

@@ -746,11 +746,7 @@ int colour_in_use(zword);
 
 void screen_new_line(void);
 
-#ifndef MSDOS_16BIT
-#define cdecl
-#endif
-
-int cdecl zgetopt(int, const char **, const char *);
+int zgetopt(int argc, const char *argv[], const char *options);
 
 /*** returns the current window ***/
 Zwindow * curwinrec(void);

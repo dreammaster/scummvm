@@ -25,15 +25,11 @@
 namespace Glk {
 namespace ZCode {
 
-#ifndef MSDOS_16BIT
-#define cdecl
-#endif
-
 int zoptind = 1;
 int zoptopt = 0;
 char *zoptarg = nullptr;
 
-int cdecl zgetopt (int argc, char *argv[], const char *options)
+int zgetopt(int argc, const char *argv[], const char *options)
 {
 #ifdef TODO
 	static int pos = 1;

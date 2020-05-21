@@ -795,9 +795,10 @@ void os_set_cursor(int row, int col)
 	current.cy = row - 1;
 }
 
-
+#ifdef TODO
 extern SF_bdffont *SF_defaultfont;
 extern int SF_defaultfontsize;
+#endif
 
 static void destroySFonly(SFONT * f)
 {
@@ -855,6 +856,7 @@ SFONT *sf_VGA_SFONT;
 /* ensure a font loaded */
 void sf_initfonts()
 {
+#ifdef TODO
 	int i, j, size = 0;
 	byte *cfont, *bmp;
 	SF_glyph *g;
@@ -965,6 +967,7 @@ void sf_initfonts()
 		else
 			myfonts[8] = SF_font3double;
 	}
+#endif
 }
 
 
