@@ -29,6 +29,8 @@
 #include "common/memstream.h"
 #include "common/translation.h"
 #include "ultima/shared/early/ultima_early.h"
+#include "ultima/ultima2/ultima2.h"
+#include "ultima/ultima2/meta_engine.h"
 #include "ultima/ultima4/ultima4.h"
 #include "ultima/ultima4/meta_engine.h"
 #include "ultima/nuvie/meta_engine.h"
@@ -39,18 +41,20 @@
 namespace Ultima {
 
 static const PlainGameDescriptor ULTIMA_GAMES[] = {
-	{ "ultima1", "Ultima I - The First Age of Darkness" },
-	{ "ultima4", "Ultima IV - Quest of the Avatar" },
+	{ "ultima1",     "Ultima I - The First Age of Darkness" },
+	{ "ultima2",     "Ultima II - The Revenge of the Enchantress" },
+	{ "ultima2_enh", "Ultima II - The Revenge of the Enchantress" },
+	{ "ultima4",     "Ultima IV - Quest of the Avatar" },
 	{ "ultima4_enh", "Ultima IV - Quest of the Avatar - Enhanced" },
-	{ "ultima6", "Ultima VI - The False Prophet" },
+	{ "ultima6",     "Ultima VI - The False Prophet" },
 	{ "ultima6_enh", "Ultima VI - The False Prophet - Enhanced" },
-	{ "ultima8", "Ultima VIII - Pagan" },
-	{ "remorse", "Crusader: No Remorse" },
-	{ "regret", "Crusader: No Regret" },
+	{ "ultima8",     "Ultima VIII - Pagan" },
+	{ "remorse",     "Crusader: No Remorse" },
+	{ "regret",      "Crusader: No Regret" },
 
-	{ "martiandreams", "Worlds of Ultima: Martian Dreams" },
-	{ "martiandreams_enh", "Worlds of Ultima: Martian Dreams - Enhanced" },
-	{ "thesavageempire", "Worlds of Ultima: The Savage Empire" },
+	{ "martiandreams",       "Worlds of Ultima: Martian Dreams" },
+	{ "martiandreams_enh",   "Worlds of Ultima: Martian Dreams - Enhanced" },
+	{ "thesavageempire",     "Worlds of Ultima: The Savage Empire" },
 	{ "thesavageempire_enh", "Worlds of Ultima: The Savage Empire - Enhanced" },
 	{ 0, 0 }
 };
@@ -72,6 +76,9 @@ bool UltimaMetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGa
 		switch (gd->gameId) {
 		case Ultima::GAME_ULTIMA1:
 			*engine = new Ultima::Shared::UltimaEarlyEngine(syst, gd);
+			break;
+		case Ultima::GAME_ULTIMA2:
+			*engine = new Ultima::Ultima2::Ultima2Engine(syst, gd);
 			break;
 		case Ultima::GAME_ULTIMA4:
 			*engine = new Ultima::Ultima4::Ultima4Engine(syst, gd);
@@ -124,6 +131,8 @@ SaveStateList UltimaMetaEngine::listSaves(const char *target) const {
 
 Common::KeymapArray UltimaMetaEngine::initKeymaps(const char *target) const {
 	Common::String gameId = getGameId(target);
+	if (gameId == "ultima2" || gameId == "ultima2_enh")
+		return Ultima::Ultima2::MetaEngine::initKeymaps();
 	if (gameId == "ultima4" || gameId == "ultima4_enh")
 		return Ultima::Ultima4::MetaEngine::initKeymaps();
 	if (gameId == "ultima8" || gameId == "remorse" || gameId == "regret")

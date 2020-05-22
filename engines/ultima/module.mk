@@ -134,6 +134,8 @@ MODULE_OBJS := \
 	ultima1/widgets/urban_widget.o \
 	ultima1/widgets/wench.o \
 	ultima1/game.o \
+	ultima2/meta_engine.o \
+	ultima2/ultima2.o \
 	ultima4/controllers/alpha_action_controller.o \
 	ultima4/controllers/camp_controller.o \
 	ultima4/controllers/combat_controller.o \

@@ -78,6 +78,36 @@ static const UltimaGameDescription GAME_DESCRIPTIONS[] = {
 	},
 
 	{
+		// Ultima 2 - The Revenge of the Enchantress
+		{
+			"ultima2_enh",
+			"VGA Enhanced",
+			AD_ENTRY1s("monsters", "29160ad200758650d8a4a6af2474d075", 2176),
+			Common::EN_ANY,
+			Common::kPlatformDOS,
+			ADGF_UNSTABLE,
+			GUIO0()
+		},
+		GAME_ULTIMA1,
+		GF_VGA_ENHANCED
+	},
+
+	{
+		// Ultima 2 - The Revenge of the Enchantress
+		{
+			"ultima2",
+			0,
+			AD_ENTRY1s("monsters", "29160ad200758650d8a4a6af2474d075", 2176),
+			Common::EN_ANY,
+			Common::kPlatformDOS,
+			ADGF_UNSTABLE,
+			GUIO0()
+		},
+		GAME_ULTIMA1,
+		0
+	},
+
+	{
 		// Ultima IV - Quest of the Avatar
 		{
 			"ultima4",
