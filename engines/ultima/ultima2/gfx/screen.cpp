@@ -20,46 +20,19 @@
  *
  */
 
-#include "ultima/ultima2/ultima2.h"
 #include "ultima/ultima2/gfx/screen.h"
-#include "common/debug.h"
-#include "common/system.h"
 
 namespace Ultima {
 namespace Ultima2 {
 
-Ultima2Engine *g_ultima;
+Screen *g_screen;
 
-Ultima2Engine::Ultima2Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc) :
-		Shared::UltimaEngine(syst, gameDesc), _saveSlotToLoad(-1) {
-	g_ultima = this;
+Screen::Screen() : Graphics::Screen() {
+	g_screen = this;
 }
 
-Ultima2Engine::~Ultima2Engine() {
-	delete _screen;
-}
-
-bool Ultima2Engine::initialize() {
-	if (!Shared::UltimaEngine::initialize())
-		return false;
-
-	_saveSlotToLoad = ConfMan.hasKey("save_slot") ? ConfMan.getInt("save_slot") : -1;
-
-	return true;
-}
-
-Common::Error Ultima2Engine::run() {
-	if (initialize()) {
-	}
-
-	return Common::kNoError;
-}
-
-bool Ultima2Engine::isDataRequired(Common::String &folder, int &majorVersion, int &minorVersion) {
-	folder = "ultima2";
-	majorVersion = 1;
-	minorVersion = 0;
-	return false;
+Screen::~Screen() {
+	g_screen = nullptr;
 }
 
 } // End of namespace Ultima2

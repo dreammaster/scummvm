@@ -29,8 +29,11 @@
 namespace Ultima {
 namespace Ultima2 {
 
+class Screen;
+
 class Ultima2Engine : public Shared::UltimaEngine {
 private:
+	Screen *_screen;
 	int _saveSlotToLoad;
 protected:
 	// Engine APIs
