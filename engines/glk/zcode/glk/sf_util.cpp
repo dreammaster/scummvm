@@ -20,9 +20,9 @@
  *
  */
 
-#include "glk/zcode/glk/sf_frotz.h"
-#include "glk/glk.h"
 #include "common/debug.h"
+#include "glk/glk.h"
+#include "glk/zcode/glk/sf_frotz.h"
 
 namespace Glk {
 namespace ZCode {
@@ -35,7 +35,8 @@ typedef struct cfstruct cfrec;
 
 static void print_version(void);
 
-enum { USAGE_NORMAL, USAGE_EXTENDED };
+enum { USAGE_NORMAL,
+	   USAGE_EXTENDED };
 
 struct cfstruct {
 	CLEANFUNC func;
@@ -47,19 +48,17 @@ static cfrec *cflist = nullptr;
 
 static int getcolor(const char *);
 
-
 void sf_regcleanfunc(void *f, const char *p) {
 	cfrec *n = (cfrec *)calloc(1, sizeof(cfrec));
 	if (n) {
 		if (!p)
 			p = "";
-		n->func = (CLEANFUNC) f;
+		n->func = (CLEANFUNC)f;
 		n->name = p;
 		n->next = cflist;
 		cflist = n;
 	}
 }
-
 
 void sf_cleanup_all() {
 	while (cflist) {
@@ -70,7 +69,6 @@ void sf_cleanup_all() {
 		cflist = n;
 	}
 }
-
 
 /*
  * os_reset_screen
@@ -130,33 +128,32 @@ static const char *info_header =
     "Syntax: sfrotz [options] story-file\n";
 
 static const char *info[] = {
-	"-a   watch attribute setting",
-	"-A   watch attribute testing",
-	"-b <colourname> background colour",
-	"-c # context lines",
-	"-f <colorname> foreground colour",
-	"-F   fullscreen mode",
-	"-H # screen height",
-	"-i   ignore runtime errors",
-	"-I # interpreter number",
-	"-l # left margin",
-	"-L <file> load this save file",
-	"-o   watch object movement",
-	"-O   watch object locating",
-	"-P   alter piracy opcode",
-	"-q   quiet (disable sound)",
-	"-r # right margin",
-	"-s # random number seed value",
-	"-S # transcript width",
-	"-t   set Tandy bit",
-	"-u # slots for multiple undo",
-	"-W # screen width",
-	"-x   expand abbreviations g/x/z",
-	"-X   show extended options",
-	"-v   show version information",
-	"-Z # error checking (see below)",
-	nullptr
-};
+    "-a   watch attribute setting",
+    "-A   watch attribute testing",
+    "-b <colourname> background colour",
+    "-c # context lines",
+    "-f <colorname> foreground colour",
+    "-F   fullscreen mode",
+    "-H # screen height",
+    "-i   ignore runtime errors",
+    "-I # interpreter number",
+    "-l # left margin",
+    "-L <file> load this save file",
+    "-o   watch object movement",
+    "-O   watch object locating",
+    "-P   alter piracy opcode",
+    "-q   quiet (disable sound)",
+    "-r # right margin",
+    "-s # random number seed value",
+    "-S # transcript width",
+    "-t   set Tandy bit",
+    "-u # slots for multiple undo",
+    "-W # screen width",
+    "-x   expand abbreviations g/x/z",
+    "-X   show extended options",
+    "-v   show version information",
+    "-Z # error checking (see below)",
+    nullptr};
 
 static const char *info_footer =
     "\nError checking: 0 none, 1 first only (default), 2 all, 3 exit after any error.";
@@ -164,19 +161,17 @@ static const char *info_footer =
 static const char *extended_header = "\nExtended Options\n";
 
 static const char *extended_options[] = {
-	"-@ <file> use resources in <file>",
-	"-%        use local resources",
-	"-F        run in fullscreen mode.",
-	"-m #      set timer interrupt cycle to # milliseconds",
-	"-N <mode> add date or number to save filename",
-	"-T        use in-game requests for filenames",
-	"-V        force VGA fonts",
-	nullptr
-};
+    "-@ <file> use resources in <file>",
+    "-%        use local resources",
+    "-F        run in fullscreen mode.",
+    "-m #      set timer interrupt cycle to # milliseconds",
+    "-N <mode> add date or number to save filename",
+    "-T        use in-game requests for filenames",
+    "-V        force VGA fonts",
+    nullptr};
 
 static const char *footer =
     "More options and information are in the manual page.  Type \"man sfrotz\".\n";
-
 
 #define WIDCOL 40
 static void usage(int type) {
@@ -218,7 +213,6 @@ static void usage(int type) {
 	debug(footer);
 }
 
-
 /*
  * parse_options
  *
@@ -245,12 +239,12 @@ static int limit(int v, int m, int M) {
 	return v;
 }
 
-
 static void parse_options(int argc, const char **argv) {
 	int c;
 
 	do {
-		int num = 0, copt = 0;;
+		int num = 0, copt = 0;
+		;
 
 		c = zgetopt(argc, argv, options);
 
@@ -335,34 +329,23 @@ static void parse_options(int argc, const char **argv) {
 	} while (c != EOF && c != '?');
 } /* parse_options */
 
-
 static void print_version() {
 	debug("FROTZ V%s", VERSION);
 	debug("  Frotz was originally written by Stefan Jokisch.");
-	debug
-	("  It complies with standard 1.0 of Graham Nelson's specification.\n");
+	debug("  It complies with standard 1.0 of Graham Nelson's specification.\n");
 	debug("  It was ported to Unix by Galen Hazelwood.");
-	debug
-	("  The core and SDL port are maintained by David Griffith.\n");
+	debug("  The core and SDL port are maintained by David Griffith.\n");
 	debug("  Frotz's homepage is https://661.org/proj/if/frotz/\n\n");
 	os_quit(EXIT_SUCCESS);
 }
-
 
 /**
  * Like dirname except well defined.
  * Does not modify path.  Always returns a new string (caller must free).
  */
 static char *new_dirname(const char *path) {
-#ifdef TODO
-	char *p = strdup(path), *p2 = strdup(dirname(p));
-	free(p);
-	return p2;
-#else
-	error("TODO");
-#endif
+	return strdup("");
 }
-
 
 /**
  * Like basename except well defined.
@@ -371,7 +354,6 @@ static char *new_dirname(const char *path) {
 static char *new_basename(const char *path) {
 	return strdup(path);
 }
-
 
 /*
  * os_process_arguments
@@ -404,55 +386,54 @@ void os_process_arguments(int argc, const char *argv[]) {
 	/* Now strip off the extension. */
 	p = strrchr(f_setup.story_name, '.');
 	if ((p != nullptr) &&
-	        ((scumm_stricmp(p, EXT_BLORB2) == 0) ||
-	         (scumm_stricmp(p, EXT_BLORB3) == 0) || (scumm_stricmp(p, EXT_BLORB4) == 0))) {
+	    ((scumm_stricmp(p, EXT_BLORB2) == 0) ||
+	     (scumm_stricmp(p, EXT_BLORB3) == 0) || (scumm_stricmp(p, EXT_BLORB4) == 0))) {
 		/*  blorb_ext = strdup(p); */
 	} else
-		/*  blorb_ext = strdup(EXT_BLORB); */
+	    /*  blorb_ext = strdup(EXT_BLORB); */
 
-		/* Get rid of extensions with 1 to 6 character extensions. */
-		/* This will take care of an extension like ".zblorb". */
-		/* More than that, there might be something weird going on */
-		/* which is not our concern. */
-		if (p != nullptr) {
-			if (strlen(p) >= 2 && strlen(p) <= 7) {
-				*p = '\0';  /* extension removed */
-			}
+	    /* Get rid of extensions with 1 to 6 character extensions. */
+	    /* This will take care of an extension like ".zblorb". */
+	    /* More than that, there might be something weird going on */
+	    /* which is not our concern. */
+	    if (p != nullptr) {
+		if (strlen(p) >= 2 && strlen(p) <= 7) {
+			*p = '\0'; /* extension removed */
 		}
+	}
 	f_setup.story_path = new_dirname(argv[zoptind]);
 
 	/* Create nice default file names */
-	f_setup.script_name = (char *)
-	                      malloc((strlen(f_setup.story_name) +
-	                              strlen(EXT_SCRIPT)) * sizeof(char) + 1);
-	memcpy(f_setup.script_name, f_setup.story_name, strlen(f_setup.story_name) * sizeof(char));
-	strncat(f_setup.script_name, EXT_SCRIPT, strlen(EXT_SCRIPT) + 1);
+	f_setup.script_name = (char *)malloc((strlen(f_setup.story_name) +
+	                                      strlen(EXT_SCRIPT)) *
+	                                         sizeof(char) +
+	                                     1);
+	strcpy(f_setup.script_name, f_setup.story_name);
+	strcpy(f_setup.script_name + strlen(f_setup.story_name), EXT_SCRIPT);
 
-	f_setup.command_name = (char *)
-	                       malloc((strlen(f_setup.story_name) +
-	                               strlen(EXT_COMMAND)) * sizeof(char) + 1);
-	memcpy(f_setup.command_name, f_setup.story_name, strlen(f_setup.story_name) * sizeof(char));
-	strncat(f_setup.command_name, EXT_COMMAND, strlen(EXT_COMMAND) + 1);
+	f_setup.command_name = (char *)malloc((strlen(f_setup.story_name) +
+	                                       strlen(EXT_COMMAND)) *
+	                                          sizeof(char) +
+	                                      1);
+	strcpy(f_setup.command_name, f_setup.story_name);
+	strcpy(f_setup.command_name + strlen(f_setup.story_name), EXT_COMMAND);
 
 	if (!f_setup.restore_mode) {
-		f_setup.save_name = (char *)
-		                    malloc((strlen(f_setup.story_name) +
-		                            strlen(EXT_SAVE)) * sizeof(char) + 1);
+		f_setup.save_name = (char *)malloc((strlen(f_setup.story_name) + strlen(EXT_SAVE)) * sizeof(char) + 1);
 		memcpy(f_setup.save_name, f_setup.story_name, strlen(f_setup.story_name) * sizeof(char));
-		strncat(f_setup.save_name, EXT_SAVE, strlen(EXT_SAVE) + 1);
-	} else {    /* Set our auto load save as the name_save */
-		f_setup.save_name = (char *)
-		                    malloc((strlen(f_setup.tmp_save_name) +
-		                            strlen(EXT_SAVE)) * sizeof(char) + 1);
+		strcpy(f_setup.save_name + strlen(f_setup.story_name), EXT_SAVE);
+	} else { /* Set our auto load save as the name_save */
+		f_setup.save_name = (char *)malloc((strlen(f_setup.tmp_save_name) + strlen(EXT_SAVE)) * sizeof(char) + 1);
 		memcpy(f_setup.save_name, f_setup.tmp_save_name, strlen(f_setup.tmp_save_name) * sizeof(char));
 		free(f_setup.tmp_save_name);
 	}
 
-	f_setup.aux_name = (char *)
-	                   malloc((strlen(f_setup.story_name) +
-	                           strlen(EXT_AUX)) * sizeof(char) + 1);
-	memcpy(f_setup.aux_name, f_setup.story_name, strlen(f_setup.story_name) * sizeof(char));
-	strncat(f_setup.aux_name, EXT_AUX, strlen(EXT_AUX) + 1);
+	f_setup.aux_name = (char *)malloc((strlen(f_setup.story_name) +
+	                                   strlen(EXT_AUX)) *
+	                                      sizeof(char) +
+	                                  1);
+	strcpy(f_setup.aux_name, f_setup.story_name);
+	strcpy(f_setup.aux_name + strlen(f_setup.story_name), EXT_AUX);
 
 	/* Save the executable file name */
 	progname = argv[0];
@@ -474,7 +455,6 @@ void os_process_arguments(int argc, const char *argv[]) {
 
 	sf_initfonts();
 } /* os_process_arguments */
-
 
 void sf_sleep(int msecs) {
 	g_system->delayMillis(msecs);
@@ -498,11 +478,11 @@ unsigned long sf_ticks(void) {
 	}
 	ticks =
 	    (now.tv_sec - start.tv_sec) * 1000 + (now.tv_usec -
-	            start.tv_usec) / 1000;
+	                                          start.tv_usec) /
+	                                             1000;
 	return ticks;
 }
 #endif
-
 
 static const char *getextension(int flag) {
 	const char *ext = EXT_AUX;
@@ -517,13 +497,11 @@ static const char *getextension(int flag) {
 	return ext;
 }
 
-
 static bool newfile(int flag) {
 	if (flag == FILE_SAVE || flag == FILE_SAVE_AUX || flag == FILE_RECORD)
 		return true;
 	return false;
 }
-
 
 static char buf[FILENAME_MAX];
 
@@ -538,7 +516,6 @@ static const char *getnumbername(const char *def, const char *ext) {
 	}
 	return buf;
 }
-
 
 static const char *getdatename(const char *def, const char *ext) {
 #ifdef TODO
@@ -559,7 +536,6 @@ static const char *getdatename(const char *def, const char *ext) {
 	error("TODO: getdatename");
 #endif
 }
-
 
 static int ingame_read_file_name(char *file_name, const char *default_name,
                                  int flag);
@@ -617,7 +593,6 @@ char *os_read_file_name(const char *default_name, int flag) {
 	return strdup(file_name);
 }
 
-
 static int ingame_read_file_name(char *file_name, const char *default_name,
                                  int flag) {
 	const char *extension;
@@ -671,7 +646,7 @@ static int ingame_read_file_name(char *file_name, const char *default_name,
 		file_name[i] = 0;
 	}
 #else
-	read_string(MAX_FILE_NAME - 4, (zchar *) file_name);
+	read_string(MAX_FILE_NAME - 4, (zchar *)file_name);
 #endif
 
 	/* Use the default name if nothing was typed */
@@ -710,7 +685,6 @@ finished:
 
 	return result;
 } /* os_read_file_name */
-
 
 static int dialog_read_file_name(char *file_name, const char *default_name,
                                  int flag) {
@@ -774,7 +748,6 @@ void sf_FinishProfile() {
 	rc = nullptr;
 }
 
-
 void sf_InitProfile(const char *fn) {
 	FILE *f;
 	int size;
@@ -829,7 +802,6 @@ void sf_InitProfile(const char *fn) {
 	CLEANREG(sf_FinishProfile);
 }
 
-
 static char *findsect(const char *sect) {
 	int ns = strlen(sect);
 	char *r = rc;
@@ -845,7 +817,6 @@ static char *findsect(const char *sect) {
 	return nullptr;
 }
 
-
 static char *findid(const char *sect, const char *id) {
 	int nid = strlen(id);
 	char *r, *sav, *rq, *fnd = nullptr;
@@ -860,8 +831,7 @@ static char *findid(const char *sect, const char *id) {
 		if (!r)
 			break;
 		rq = r + nid;
-		if ((*(byte *)(r - 1) <= ' ')
-		        && ((*rq == ' ') || (*rq == '='))) {
+		if ((*(byte *)(r - 1) <= ' ') && ((*rq == ' ') || (*rq == '='))) {
 			while (*rq)
 				if (*rq++ == '=')
 					break;
@@ -877,7 +847,6 @@ static char *findid(const char *sect, const char *id) {
 	return fnd;
 }
 
-
 int sf_GetProfileInt(const char *sect, const char *id, int def) {
 	if (rc) {
 		char *p = findid(sect, id);
@@ -887,7 +856,6 @@ int sf_GetProfileInt(const char *sect, const char *id, int def) {
 	return def;
 }
 
-
 double sf_GetProfileDouble(const char *sect, const char *id, double def) {
 	if (rc) {
 		char *p = findid(sect, id);
@@ -896,7 +864,6 @@ double sf_GetProfileDouble(const char *sect, const char *id, double def) {
 	}
 	return def;
 }
-
 
 char *sf_GetProfileString(const char *sect, const char *id, const char *def) {
 	char *q = nullptr, sav = 0;
@@ -936,7 +903,6 @@ char *sf_GetProfileString(const char *sect, const char *id, const char *def) {
 	return result;
 }
 
-
 /*  A.  Local file header:
  *
  *         local file header signature   0  4 bytes  (0x04034b50)
@@ -955,10 +921,10 @@ char *sf_GetProfileString(const char *sect, const char *id, const char *def) {
  *         extra field (variable size)
  */
 
-#define plong( b) (((int)((b)[3]) << 24) + ((int)((b)[2]) << 16) +\
-                   ((int)((b)[1]) << 8) + (int)((b)[0]))
+#define plong(b) (((int)((b)[3]) << 24) + ((int)((b)[2]) << 16) + \
+	              ((int)((b)[1]) << 8) + (int)((b)[0]))
 
-#define pshort( b) (((int)((b)[1]) << 8) + (int)((b)[0]))
+#define pshort(b) (((int)((b)[1]) << 8) + (int)((b)[0]))
 
 #ifdef TODO
 
@@ -1041,7 +1007,6 @@ int sf_pkread(FILE *f, int foffs, void **out, int *size) {
 	*size = usize;
 	return st;
 }
-
 
 /*
  * getcolor
