@@ -57,7 +57,7 @@ bool m_localfiles = false;
 char *m_fontdir = nullptr;
 bool m_aafonts = 0;
 char m_names_format = 0;
-char *m_reslist_file = nullptr;
+const char *m_reslist_file = nullptr;
 const char *m_setupfile = ".sfrotzrc";
 extern int m_frequency;
 

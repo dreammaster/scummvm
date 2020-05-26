@@ -37,8 +37,9 @@ ZCode::~ZCode() {
 }
 
 void ZCode::runGame() {
-	const char *ARGV[2] = { "test", nullptr };
-	frotz_main(1, ARGV);
+	Common::String filename = getFilename();
+	const char *ARGV[3] = { nullptr, filename.c_str(), nullptr };
+	frotz_main(2, ARGV);
 }
 
 } // End of namespace ZCode

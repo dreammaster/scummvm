@@ -45,7 +45,7 @@ struct cfstruct {
 
 static cfrec *cflist = nullptr;
 
-static int getcolor(char *);
+static int getcolor(const char *);
 
 
 void sf_regcleanfunc(void *f, const char *p) {
@@ -121,7 +121,7 @@ int m_vga_fonts = 0;
 extern const char *m_setupfile;
 extern char m_names_format;
 static char user_names_format = 0;
-extern char *m_reslist_file;
+extern const char *m_reslist_file;
 extern int option_scrollback_buffer;
 
 static const char *info_header =
@@ -369,13 +369,7 @@ static char *new_dirname(const char *path) {
  * Does not modify path.  Always returns a new string (caller must free).
  */
 static char *new_basename(const char *path) {
-#ifdef TODO
-	char *p = strdup(path), *p2 = strdup(basename(p));
-	free(p);
-	return p2;
-#else
-	error("TODO");
-#endif
+	return strdup(path);
 }
 
 
@@ -410,8 +404,8 @@ void os_process_arguments(int argc, const char *argv[]) {
 	/* Now strip off the extension. */
 	p = strrchr(f_setup.story_name, '.');
 	if ((p != nullptr) &&
-	        ((strcmp(p, EXT_BLORB2) == 0) ||
-	         (strcmp(p, EXT_BLORB3) == 0) || (strcmp(p, EXT_BLORB4) == 0))) {
+	        ((scumm_stricmp(p, EXT_BLORB2) == 0) ||
+	         (scumm_stricmp(p, EXT_BLORB3) == 0) || (scumm_stricmp(p, EXT_BLORB4) == 0))) {
 		/*  blorb_ext = strdup(p); */
 	} else
 		/*  blorb_ext = strdup(EXT_BLORB); */
@@ -627,7 +621,7 @@ char *os_read_file_name(const char *default_name, int flag) {
 static int ingame_read_file_name(char *file_name, const char *default_name,
                                  int flag) {
 	const char *extension;
-	FILE *fp;
+	FILE *file;
 	bool terminal;
 	bool result;
 
@@ -694,13 +688,13 @@ static int ingame_read_file_name(char *file_name, const char *default_name,
 		goto finished;
 
 	/* OK if the file does not exist */
-	if ((fp = fopen(file_name, "rb")) == nullptr)
+	if ((file = fopen(file_name, "rb")) == nullptr)
 		goto finished;
 
 	/* OK if this is a pseudo-file (like PRN, CON, NUL) */
-	terminal = false; // isatty(fileno(fp));
+	terminal = false; // isatty(fileno(file));
 
-	fclose(fp);
+	fclose(file);
 
 	if (terminal)
 		goto finished;
@@ -966,12 +960,12 @@ char *sf_GetProfileString(const char *sect, const char *id, const char *def) {
 
 #define pshort( b) (((int)((b)[1]) << 8) + (int)((b)[0]))
 
+#ifdef TODO
 
 static unsigned myin(void *d, byte **b) {
 	return 0;
 }
 
-#ifdef TODO
 static int myout(void *udata, byte *b, unsigned n) {
 	memmove(udata, b, n);
 	udata += n;
@@ -1056,35 +1050,29 @@ int sf_pkread(FILE *f, int foffs, void **out, int *size) {
  * corresponding to the color macros defined in frotz.h.
  *
  */
-static int getcolor(char *value) {
-	int num;
-
-	/* Be case-insensitive */
-	for (num = 0; value[num] != 0; num++)
-		value[num] = tolower((int) value[num]);
-
-	if (strcmp(value, "black") == 0)
+static int getcolor(const char *value) {
+	if (scumm_stricmp(value, "black") == 0)
 		return BLACK_COLOUR;
-	if (strcmp(value, "red") == 0)
+	if (scumm_stricmp(value, "red") == 0)
 		return RED_COLOUR;
-	if (strcmp(value, "green") == 0)
+	if (scumm_stricmp(value, "green") == 0)
 		return GREEN_COLOUR;
-	if (strcmp(value, "blue") == 0)
+	if (scumm_stricmp(value, "blue") == 0)
 		return BLUE_COLOUR;
-	if (strcmp(value, "magenta") == 0)
+	if (scumm_stricmp(value, "magenta") == 0)
 		return MAGENTA_COLOUR;
-	if (strcmp(value, "cyan") == 0)
+	if (scumm_stricmp(value, "cyan") == 0)
 		return CYAN_COLOUR;
-	if (strcmp(value, "white") == 0)
+	if (scumm_stricmp(value, "white") == 0)
 		return WHITE_COLOUR;
-	if (strcmp(value, "yellow") == 0)
+	if (scumm_stricmp(value, "yellow") == 0)
 		return YELLOW_COLOUR;
 
-	if (strcmp(value, "purple") == 0)
+	if (scumm_stricmp(value, "purple") == 0)
 		return MAGENTA_COLOUR;
-	if (strcmp(value, "violet") == 0)
+	if (scumm_stricmp(value, "violet") == 0)
 		return MAGENTA_COLOUR;
-	if (strcmp(value, "aqua") == 0)
+	if (scumm_stricmp(value, "aqua") == 0)
 		return CYAN_COLOUR;
 
 	/* If we can't tell what that string means,

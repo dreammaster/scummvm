@@ -528,7 +528,7 @@ extern long reserve_mem;
 
 extern int zoptind;
 extern int zoptopt;
-extern char *zoptarg;
+extern const char *zoptarg;
 
 /*** Z-machine opcodes ***/
 void    z_add(void);

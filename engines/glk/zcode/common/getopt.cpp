@@ -21,16 +21,16 @@
  */
 
 #include "glk/zcode/common/defs.h"
+#include "common/debug.h"
 
 namespace Glk {
 namespace ZCode {
 
 int zoptind = 1;
 int zoptopt = 0;
-char *zoptarg = nullptr;
+const char *zoptarg = nullptr;
 
 int zgetopt(int argc, const char *argv[], const char *options) {
-#ifdef TODO
 	static int pos = 1;
 	const char *p;
 
@@ -48,11 +48,11 @@ int zgetopt(int argc, const char *argv[], const char *options) {
 	p = strchr(options, zoptopt);
 
 	if (zoptopt == ':' || p == nullptr) {
-		fputs("illegal option -- ", stdout);
+		debugN("illegal option -- ");
 		goto error;
 	} else if (p[1] == ':') {
 		if (zoptind >= argc) {
-			fputs("option requires an argument -- ", stdout);
+			debugN("option requires an argument -- ");
 			goto error;
 		} else {
 			zoptarg = argv[zoptind];
@@ -65,9 +65,8 @@ int zgetopt(int argc, const char *argv[], const char *options) {
 	return zoptopt;
 
 error:
-	fputc(zoptopt, stdout);
-	fputc('\n', stdout);
-#endif
+	debug("%c", zoptopt);
+
 	return '?';
 } /* zgetopt */
 
