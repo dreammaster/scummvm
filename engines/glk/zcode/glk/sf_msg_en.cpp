@@ -25,8 +25,7 @@
 namespace Glk {
 namespace ZCode {
 
-const char *sf_msgstring(int id)
-{
+const char *sf_msgstring(int id) {
 	const char *p = "";
 	switch (id) {
 	case IDS_BLORB_GLULX:

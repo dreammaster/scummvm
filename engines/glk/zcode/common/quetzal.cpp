@@ -27,9 +27,9 @@ namespace ZCode {
 
 #ifdef MSDOS_16BIT
 
-#define malloc(size)	farmalloc (size)
-#define realloc(size,p)	farrealloc (size,p)
-#define free(size)	farfree (size)
+#define malloc(size)    farmalloc (size)
+#define realloc(size,p) farrealloc (size,p)
+#define free(size)  farfree (size)
 
 #else
 
@@ -68,12 +68,12 @@ static zword frames[STACK_SIZE / 4 + 1];
 /*
  * Various parsing states within restoration.
  */
-#define GOT_HEADER	0x01
-#define GOT_STACK	0x02
-#define GOT_MEMORY	0x04
-#define GOT_NONE	0x00
-#define GOT_ALL		0x07
-#define GOT_ERROR	0x80
+#define GOT_HEADER  0x01
+#define GOT_STACK   0x02
+#define GOT_MEMORY  0x04
+#define GOT_NONE    0x00
+#define GOT_ALL     0x07
+#define GOT_ERROR   0x80
 
 /*
  * Macros used to write the files.
@@ -84,7 +84,7 @@ static zword frames[STACK_SIZE / 4 + 1];
 	(write_bytx (fp, (w) >>  8) && write_bytx (fp, (w)))
 #define write_long(fp,l) \
 	(write_bytx (fp, (l) >> 24) && write_bytx (fp, (l) >> 16) && \
-	write_bytx (fp, (l) >>  8) && write_bytx (fp, (l)))
+	 write_bytx (fp, (l) >>  8) && write_bytx (fp, (l)))
 #define write_chnk(fp,id,len) \
 	(write_long (fp, (id))      && write_long (fp, (len)))
 #define write_run(fp,run) \
@@ -92,8 +92,7 @@ static zword frames[STACK_SIZE / 4 + 1];
 
 
 /* Read one word from file; return TRUE if OK. */
-static bool read_word(FILE * f, zword * result)
-{
+static bool read_word(FILE *f, zword *result) {
 	int a, b;
 
 	if ((a = get_c(f)) == EOF)
@@ -107,8 +106,7 @@ static bool read_word(FILE * f, zword * result)
 
 
 /* Read one long from file; return TRUE if OK. */
-static bool read_long(FILE * f, zlong * result)
-{
+static bool read_long(FILE *f, zlong *result) {
 	int a, b, c, d;
 
 	if ((a = get_c(f)) == EOF)
@@ -126,8 +124,8 @@ static bool read_long(FILE * f, zlong * result)
 	 * Use a mask to prevent this from happening.
 	 * There's no harm in letting all ports see this.
 	 */
-	*result = ((zlong) a << 24) | (0x00ff0000UL &((zlong) b << 16)) |
-	    ((zlong) c << 8) | (zlong) d;
+	*result = ((zlong) a << 24) | (0x00ff0000UL & ((zlong) b << 16)) |
+	          ((zlong) c << 8) | (zlong) d;
 
 	return TRUE;
 }
@@ -137,50 +135,49 @@ static bool read_long(FILE * f, zlong * result)
  * Restore a saved game using Quetzal format. Return 2 if OK, 0 if an error
  * occurred before any damage was done, -1 on a fatal error.
  */
-zword restore_quetzal(FILE * svf, FILE * stf)
-{
+zword restore_quetzal(FILE *svf, FILE *stf) {
 	zlong ifzslen, currlen, tmpl;
 	zlong pc;
 	zword i, tmpw;
-	zword fatal = 0;	/* Set to -1 when errors must be fatal. */
+	zword fatal = 0;    /* Set to -1 when errors must be fatal. */
 	zbyte skip, progress = GOT_NONE;
 	int x, y;
 
 	/* Check it's really an `IFZS' file. */
 	if (!read_long(svf, &tmpl)
-	    || !read_long(svf, &ifzslen)
-	    || !read_long(svf, &currlen))
+	        || !read_long(svf, &ifzslen)
+	        || !read_long(svf, &currlen))
 		return 0;
 	if (tmpl != ID_FORM || currlen != ID_IFZS) {
 		print_string("This is not a saved game file!\n");
 		return 0;
 	}
-	if ((ifzslen & 1) || ifzslen < 4)	/* Sanity checks. */
+	if ((ifzslen & 1) || ifzslen < 4)   /* Sanity checks. */
 		return 0;
 	ifzslen -= 4;
 
 	/* Read each chunk and process it. */
 	while (ifzslen > 0) {
 		/* Read chunk header. */
-		if (ifzslen < 8)	/* Couldn't contain a chunk. */
+		if (ifzslen < 8)    /* Couldn't contain a chunk. */
 			return 0;
 		if (!read_long(svf, &tmpl)
-		    || !read_long(svf, &currlen))
+		        || !read_long(svf, &currlen))
 			return 0;
-		ifzslen -= 8;	/* Reduce remaining by size of header. */
+		ifzslen -= 8;   /* Reduce remaining by size of header. */
 
 		/* Handle chunk body. */
-		if (ifzslen < currlen)	/* Chunk goes past EOF?! */
+		if (ifzslen < currlen)  /* Chunk goes past EOF?! */
 			return 0;
 		skip = currlen & 1;
 		ifzslen -= currlen + (zlong) skip;
 
 		switch (tmpl) {
-			/* `IFhd' header chunk; must be first in file. */
+		/* `IFhd' header chunk; must be first in file. */
 		case ID_IFhd:
 			if (progress & GOT_HEADER) {
 				print_string
-				    ("Save file has two IFZS chunks!\n");
+				("Save file has two IFZS chunks!\n");
 				return fatal;
 			}
 			progress |= GOT_HEADER;
@@ -203,7 +200,7 @@ zword restore_quetzal(FILE * svf, FILE * stf)
 
 			if (progress & GOT_ERROR) {
 				print_string
-				    ("File was not saved from this story!\n");
+				("File was not saved from this story!\n");
 				return fatal;
 			}
 			if ((x = get_c(svf)) == EOF)
@@ -215,22 +212,22 @@ zword restore_quetzal(FILE * svf, FILE * stf)
 			if ((x = get_c(svf)) == EOF)
 				return fatal;
 			pc |= (zlong) x;
-			fatal = (zword)-1;	/* Setting PC means errors must be fatal. */
+			fatal = (zword) - 1; /* Setting PC means errors must be fatal. */
 			SET_PC(pc);
 
 			for (i = 13; i < currlen; ++i)
-				(void)get_c(svf);	/* Skip rest of chunk. */
+				(void)get_c(svf);   /* Skip rest of chunk. */
 			break;
-			/* `Stks' stacks chunk; restoring this is quite complex. ;) */
+		/* `Stks' stacks chunk; restoring this is quite complex. ;) */
 		case ID_Stks:
 			if (progress & GOT_STACK) {
 				print_string
-				    ("File contains two stack chunks!\n");
+				("File contains two stack chunks!\n");
 				break;
 			}
 			progress |= GOT_STACK;
 
-			fatal = (zword)-1;	/* Setting SP means errors must be fatal. */
+			fatal = (zword) - 1; /* Setting SP means errors must be fatal. */
 			sp = stack + STACK_SIZE;
 
 			/*
@@ -249,7 +246,7 @@ zword restore_quetzal(FILE * svf, FILE * stf)
 					return fatal;
 				if (tmpw > STACK_SIZE) {
 					print_string
-					    ("Save-file has too much stack (and I can't cope).\n");
+					("Save-file has too much stack (and I can't cope).\n");
 					return fatal;
 				}
 				currlen -= 8;
@@ -263,19 +260,19 @@ zword restore_quetzal(FILE * svf, FILE * stf)
 
 			/* We now proceed to load the main block of stack frames. */
 			for (fp = stack + STACK_SIZE, frame_count = 0;
-			     currlen > 0; currlen -= 8, ++frame_count) {
+			        currlen > 0; currlen -= 8, ++frame_count) {
 				if (currlen < 8)
 					return fatal;
-				if (sp - stack < 4) {	/* No space for frame. */
+				if (sp - stack < 4) {   /* No space for frame. */
 					print_string
-					    ("Save-file has too much stack (and I can't cope).\n");
+					("Save-file has too much stack (and I can't cope).\n");
 					return fatal;
 				}
 
 				/* Read PC, procedure flag and formal param count. */
 				if (!read_long(svf, &tmpl))
 					return fatal;
-				y = (int)(tmpl & 0x0F);	/* Number of formals. */
+				y = (int)(tmpl & 0x0F); /* Number of formals. */
 				tmpw = y << 8;
 
 				/* Read result variable. */
@@ -284,58 +281,58 @@ zword restore_quetzal(FILE * svf, FILE * stf)
 
 				/* Check the procedure flag... */
 				if (tmpl & 0x10) {
-					tmpw |= 0x1000;	/* It's a procedure. */
-					tmpl >>= 8;	/* Shift to get PC value. */
+					tmpw |= 0x1000; /* It's a procedure. */
+					tmpl >>= 8; /* Shift to get PC value. */
 				} else {
 					/* Functions have type 0, so no need to or anything. */
-					tmpl >>= 8;	/* Shift to get PC value. */
-					--tmpl;	/* Point at result byte. */
+					tmpl >>= 8; /* Shift to get PC value. */
+					--tmpl; /* Point at result byte. */
 					/* Sanity check on result variable... */
 #ifdef MSDOS_16BIT
 					if (tmpl > 0xffffL) {
-					    zbyte far *zmp2;
-					    zmp2 = MK_FP(FP_SEG(zmp) + (unsigned)(tmpl >> 16) * 0x1000,
-							 FP_OFF(zmp));
-					    x -= zmp2[tmpl & 0xffff];
+						zbyte far *zmp2;
+						zmp2 = MK_FP(FP_SEG(zmp) + (unsigned)(tmpl >> 16) * 0x1000,
+						             FP_OFF(zmp));
+						x -= zmp2[tmpl & 0xffff];
 					} else {
-					    x -= zmp[tmpl];
+						x -= zmp[tmpl];
 					}
 					if (x != 0) {
 #else
 					if (zmp[tmpl] != (zbyte) x) {
 #endif
 						print_string
-						    ("Save-file has wrong variable number on stack (possibly wrong game version?)\n");
+						("Save-file has wrong variable number on stack (possibly wrong game version?)\n");
 						return fatal;
 					}
 				}
-				*--sp = (zword) (tmpl >> 9);	/* High part of PC */
-				*--sp = (zword) (tmpl & 0x1FF);	/* Low part of PC */
-				*--sp = (zword) (fp - stack - 1);	/* FP */
+				*--sp = (zword)(tmpl >> 9);     /* High part of PC */
+				*--sp = (zword)(tmpl & 0x1FF);  /* Low part of PC */
+				*--sp = (zword)(fp - stack - 1);    /* FP */
 
 				/* Read and process argument mask. */
 				if ((x = get_c(svf)) == EOF)
 					return fatal;
-				++x;	/* Should now be a power of 2 */
+				++x;    /* Should now be a power of 2 */
 				for (i = 0; i < 8; ++i)
 					if (x & (1 << i))
 						break;
-				if (x ^ (1 << i)) {	/* Not a power of 2 */
+				if (x ^ (1 << i)) { /* Not a power of 2 */
 					print_string
-					    ("Save-file uses incomplete argument lists (which I can't handle)\n");
+					("Save-file uses incomplete argument lists (which I can't handle)\n");
 					return fatal;
 				}
 				*--sp = tmpw | i;
-				fp = sp;	/* FP for next frame. */
+				fp = sp;    /* FP for next frame. */
 
 				/* Read amount of eval stack used. */
 				if (!read_word(svf, &tmpw))
 					return fatal;
 
-				tmpw += y;	/* Amount of stack + number of locals. */
+				tmpw += y;  /* Amount of stack + number of locals. */
 				if (sp - stack <= tmpw) {
 					print_string
-					    ("Save-file has too much stack (and I can't cope).\n");
+					("Save-file has too much stack (and I can't cope).\n");
 					return fatal;
 				}
 				if (currlen < (zlong)tmpw * 2)
@@ -347,54 +344,54 @@ zword restore_quetzal(FILE * svf, FILE * stf)
 			}
 			/* End of `Stks' processing... */
 			break;
-			/* Any more special chunk types must go in HERE or ABOVE. */
-			/* `CMem' compressed memory chunk; uncompress it. */
+		/* Any more special chunk types must go in HERE or ABOVE. */
+		/* `CMem' compressed memory chunk; uncompress it. */
 		case ID_CMem:
-			if (!(progress & GOT_MEMORY)) {	/* Don't complain if two. */
+			if (!(progress & GOT_MEMORY)) { /* Don't complain if two. */
 				(void)os_storyfile_seek(stf, 0, SEEK_SET);
-				i = 0;	/* Bytes written to data area. */
+				i = 0;  /* Bytes written to data area. */
 				for (; currlen > 0; --currlen) {
 					if ((x = get_c(svf)) == EOF)
 						return fatal;
-					if (x == 0) {	/* Start run. */
+					if (x == 0) {   /* Start run. */
 						/* Check for bogus run. */
 						if (currlen < 2) {
 							print_string
-							    ("File contains bogus `CMem' chunk.\n");
+							("File contains bogus `CMem' chunk.\n");
 							for (; currlen > 0;
-							     --currlen)
-								(void)get_c(svf);	/* Skip rest. */
+							        --currlen)
+								(void)get_c(svf);   /* Skip rest. */
 							currlen = 1;
 							i = 0xFFFF;
-							break;	/* Keep going; may be a `UMem' too. */
+							break;  /* Keep going; may be a `UMem' too. */
 						}
 						/* Copy story file to memory during the run. */
 						--currlen;
 						if ((x = get_c(svf)) == EOF)
 							return fatal;
 						for (;
-						     x >= 0
-						     && i < z_header.dynamic_size;
-						     --x, ++i)
+						        x >= 0
+						        && i < z_header.dynamic_size;
+						        --x, ++i)
 							if ((y =
-							     get_c(stf)) == EOF)
+							            get_c(stf)) == EOF)
 								return fatal;
 							else
 								zmp[i] =
 								    (zbyte) y;
-					} else {	/* Not a run. */
-					if ((y = get_c(stf)) == EOF)
-						return fatal;
-					zmp[i] = (zbyte) (x ^ y);
-					++i;
+					} else {    /* Not a run. */
+						if ((y = get_c(stf)) == EOF)
+							return fatal;
+						zmp[i] = (zbyte)(x ^ y);
+						++i;
 					}
 					/* Make sure we don't load too much. */
 					if (i > z_header.dynamic_size) {
 						print_string
-						    ("warning: `CMem' chunk too long!\n");
+						("warning: `CMem' chunk too long!\n");
 						for (; currlen > 1; --currlen)
-							(void)get_c(svf);	/* Skip rest. */
-						break;	/* Keep going; there may be a `UMem' too. */
+							(void)get_c(svf);   /* Skip rest. */
+						break;  /* Keep going; there may be a `UMem' too. */
 					}
 				}
 				/* If chunk is short, assume a run. */
@@ -404,36 +401,36 @@ zword restore_quetzal(FILE * svf, FILE * stf)
 					else
 						zmp[i] = (zbyte) y;
 				if (currlen == 0)
-					progress |= GOT_MEMORY;	/* Only if succeeded. */
+					progress |= GOT_MEMORY; /* Only if succeeded. */
 				break;
 			}
 			/* Already GOT_MEMORY */
-			(void)fseek(svf, currlen, SEEK_CUR);	/* Skip chunk. */
+			(void)fseek(svf, currlen, SEEK_CUR);    /* Skip chunk. */
 			break;
-			/* `UMem' uncompressed memory chunk; load it. */
+		/* `UMem' uncompressed memory chunk; load it. */
 		case ID_UMem:
-			if (!(progress & GOT_MEMORY)) {	/* Don't complain if two. */
+			if (!(progress & GOT_MEMORY)) { /* Don't complain if two. */
 				/* Must be exactly the right size. */
 				if (currlen == z_header.dynamic_size) {
 					if (fread(zmp, currlen, 1, svf) == 1) {
-						progress |= GOT_MEMORY;	/* Only on success. */
+						progress |= GOT_MEMORY; /* Only on success. */
 						break;
 					}
 				} else
 					/* actually handle the problem outside if statement by skipping chunk. */
 					print_string
-					    ("`UMem' chunk wrong size!\n");
+					("`UMem' chunk wrong size!\n");
 			}
 			/* Already GOT_MEMORY */
-			(void)fseek(svf, currlen, SEEK_CUR);	/* Skip chunk. */
+			(void)fseek(svf, currlen, SEEK_CUR);    /* Skip chunk. */
 			break;
-			/* Unrecognised chunk type; skip it. */
+		/* Unrecognised chunk type; skip it. */
 		default:
-			(void)fseek(svf, currlen, SEEK_CUR);	/* Skip chunk. */
+			(void)fseek(svf, currlen, SEEK_CUR);    /* Skip chunk. */
 			break;
 		}
 		if (skip)
-			(void)get_c(svf);	/* Skip pad byte. */
+			(void)get_c(svf);   /* Skip pad byte. */
 	}
 
 	/*
@@ -442,12 +439,12 @@ zword restore_quetzal(FILE * svf, FILE * stf)
 	 */
 	if (!(progress & GOT_HEADER))
 		print_string
-		    ("error: no valid header (`IFhd') chunk in file.\n");
+		("error: no valid header (`IFhd') chunk in file.\n");
 	if (!(progress & GOT_STACK))
 		print_string("error: no valid stack (`Stks') chunk in file.\n");
 	if (!(progress & GOT_MEMORY))
 		print_string
-		    ("error: no valid memory (`CMem' or `UMem') chunk in file.\n");
+		("error: no valid memory (`CMem' or `UMem') chunk in file.\n");
 
 	return (progress == GOT_ALL ? 2 : fatal);
 }
@@ -456,8 +453,7 @@ zword restore_quetzal(FILE * svf, FILE * stf)
 /*
  * Save a game using Quetzal format. Return 1 if OK, 0 if failed.
  */
-zword save_quetzal(FILE * svf, FILE * stf)
-{
+zword save_quetzal(FILE *svf, FILE *stf) {
 	zlong ifzslen = 0, cmemlen = 0, stkslen = 0;
 	zlong pc;
 	zword i, j, n;
@@ -483,7 +479,7 @@ zword save_quetzal(FILE * svf, FILE * stf)
 			return 0;
 	if (!write_word(svf, z_header.checksum))
 		return 0;
-	if (!write_long(svf, pc << 8))	/* Includes pad. */
+	if (!write_long(svf, pc << 8))  /* Includes pad. */
 		return 0;
 
 	/* Write `CMem' chunk. */
@@ -498,7 +494,7 @@ zword save_quetzal(FILE * svf, FILE * stf)
 			return 0;
 		c ^= (int)zmp[i];
 		if (c == 0)
-			++j;	/* It's a run of equal bytes. */
+			++j;    /* It's a run of equal bytes. */
 		else {
 			/* Write out any run there may be. */
 			if (j > 0) {
@@ -523,7 +519,7 @@ zword save_quetzal(FILE * svf, FILE * stf)
 	 * Reached end of dynamic memory. We ignore any unwritten run there may be
 	 * at this point.
 	 */
-	if (cmemlen & 1)	/* Chunk length must be even. */
+	if (cmemlen & 1)    /* Chunk length must be even. */
 		if (!write_byte(svf, 0))
 			return 0;
 
@@ -538,9 +534,9 @@ zword save_quetzal(FILE * svf, FILE * stf)
 	 * These indices are the offsets into the `stack' array of the word before
 	 * the first word pushed in each frame.
 	 */
-	frames[0] = sp - stack;	/* The frame we'd get by doing a call now. */
+	frames[0] = sp - stack; /* The frame we'd get by doing a call now. */
 	for (i = fp - stack + 4, n = 0; i < STACK_SIZE + 4;
-	     i = stack[i - 3] + 5)
+	        i = stack[i - 3] + 5)
 		frames[++n] = i;
 
 	/*
@@ -563,45 +559,45 @@ zword save_quetzal(FILE * svf, FILE * stf)
 
 	/* Write out the rest of the stack frames. */
 	for (i = n; i > 0; --i) {
-		p = stack + frames[i] - 4;	/* Points to call frame. */
+		p = stack + frames[i] - 4;  /* Points to call frame. */
 		nvars = (p[0] & 0x0F00) >> 8;
 		nargs = p[0] & 0x00FF;
 		nstk = frames[i] - frames[i - 1] - nvars - 4;
 		pc = ((zlong) p[3] << 9) | p[2];
 
-		switch (p[0] & 0xF000) {	/* Check type of call. */
-		case 0x0000:	/* Function. */
+		switch (p[0] & 0xF000) {    /* Check type of call. */
+		case 0x0000:    /* Function. */
 #ifdef MSDOS_16BIT
 			if (pc > 0xffffL) {
-			    zbyte far *zmp2;
-			    zmp2 = MK_FP(FP_SEG(zmp) + (unsigned)(pc >> 16) * 0x1000,
-				         FP_OFF(zmp));
-			    var = zmp2[pc & 0xffff];
+				zbyte far *zmp2;
+				zmp2 = MK_FP(FP_SEG(zmp) + (unsigned)(pc >> 16) * 0x1000,
+				             FP_OFF(zmp));
+				var = zmp2[pc & 0xffff];
 			} else {
-			    var = zmp[pc];
+				var = zmp[pc];
 			}
 #else
 			var = zmp[pc];
 #endif
 			pc = ((pc + 1) << 8) | nvars;
 			break;
-		case 0x1000:	/* Procedure. */
+		case 0x1000:    /* Procedure. */
 			var = 0;
-			pc = (pc << 8) | 0x10 | nvars;	/* Set procedure flag. */
+			pc = (pc << 8) | 0x10 | nvars;  /* Set procedure flag. */
 			break;
-			/* case 0x2000: */
+		/* case 0x2000: */
 		default:
 			runtime_error(ERR_SAVE_IN_INTER);
 			return 0;
 		}
 		if (nargs != 0)
-			nargs = (1 << nargs) - 1;	/* Make args into bitmap. */
+			nargs = (1 << nargs) - 1;   /* Make args into bitmap. */
 
 		/* Write the main part of the frame... */
 		if (!write_long(svf, pc)
-		    || !write_byte(svf, var)
-		    || !write_byte(svf, nargs)
-		    || !write_word(svf, nstk))
+		        || !write_byte(svf, var)
+		        || !write_byte(svf, nargs)
+		        || !write_word(svf, nstk))
 			return 0;
 
 		/* Write the variables and eval stack. */

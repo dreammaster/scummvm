@@ -68,7 +68,7 @@ void init_sound(void) {
 	}
 
 	if ((z_header.flags & SOUND_FLAG)
-		|| (z_header.version == V3 && (z_header.flags & OLD_SOUND_FLAG))) {
+	        || (z_header.version == V3 && (z_header.flags & OLD_SOUND_FLAG))) {
 		f_setup.sound = TRUE;
 		locked = FALSE;
 		playing = FALSE;
@@ -147,13 +147,13 @@ void end_of_sound(void) {
 /*
  * z_sound_effect, load / play / stop / discard a sound effect.
  *
- *   	zargs[0] = number of bleep (1 or 2) or sample
- *	zargs[1] = operation to perform (samples only)
- *	zargs[2] = repeats and volume (play sample only)
- *	zargs[3] = end-of-sound routine (play sample only, optional)
+ *      zargs[0] = number of bleep (1 or 2) or sample
+ *  zargs[1] = operation to perform (samples only)
+ *  zargs[2] = repeats and volume (play sample only)
+ *  zargs[3] = end-of-sound routine (play sample only, optional)
  *
  * Note: Volumes range from 1 to 8, volume 255 is the default volume.
- *	 Repeats are stored in the high byte, 255 is infinite loop.
+ *   Repeats are stored in the high byte, 255 is infinite loop.
  *
  */
 void z_sound_effect(void) {
@@ -199,7 +199,7 @@ void z_sound_effect(void) {
 			break;
 		case EFFECT_PLAY:
 			start_sample(number, lo(volume), hi(volume),
-				(zargc == 4) ? zargs[3] : 0);
+			             (zargc == 4) ? zargs[3] : 0);
 			break;
 		case EFFECT_STOP:
 			os_stop_sample(number);

@@ -31,7 +31,7 @@ namespace ZCode {
 static char banner[256];
 static int isfullscreen;
 static ulong *sbuffer = nullptr;
-static int sbpitch;		/* in longs */
+static int sbpitch;     /* in longs */
 static int dirty = 0;
 static int ewidth, eheight;
 static Window *window = nullptr;
@@ -51,8 +51,7 @@ extern z_header_t z_header;
 /* clipping region */
 static int xmin, xmax, ymin, ymax;
 
-void sf_setclip(int x, int y, int w, int h)
-{
+void sf_setclip(int x, int y, int w, int h) {
 	if (x < 0) {
 		w += x;
 		x = 0;
@@ -72,8 +71,7 @@ void sf_setclip(int x, int y, int w, int h)
 }
 
 
-void sf_getclip(int *x, int *y, int *w, int *h)
-{
+void sf_getclip(int *x, int *y, int *w, int *h) {
 	*x = xmin;
 	*y = ymin;
 	*w = xmax - xmin;
@@ -81,8 +79,7 @@ void sf_getclip(int *x, int *y, int *w, int *h)
 }
 
 
-static int mywcslen(zchar * b)
-{
+static int mywcslen(zchar *b) {
 	int n = 0;
 	while (*b++)
 		n++;
@@ -99,8 +96,7 @@ static void myGrefresh() {
 }
 
 
-void sf_wpixel(int x, int y, ulong c)
-{
+void sf_wpixel(int x, int y, ulong c) {
 	if (x < xmin || x >= xmax || y < ymin || y >= ymax)
 		return;
 	sbuffer[x + sbpitch * y] = c;
@@ -108,8 +104,7 @@ void sf_wpixel(int x, int y, ulong c)
 }
 
 
-ulong sf_rpixel(int x, int y)
-{
+ulong sf_rpixel(int x, int y) {
 	if (x < 0 || x >= ewidth || y < 0 || y >= eheight)
 		return 0;
 	return sbuffer[x + sbpitch * y];
@@ -118,8 +113,7 @@ ulong sf_rpixel(int x, int y)
 #define MAXCUR 64
 static ulong savedcur[MAXCUR];
 
-static void drawthecursor(int x, int y, int onoff)
-{
+static void drawthecursor(int x, int y, int onoff) {
 	SF_textsetting *ts = sf_curtextsetting();
 	int i, h = ts->font->height(ts->font);
 	if (h > MAXCUR)
@@ -137,8 +131,7 @@ static void drawthecursor(int x, int y, int onoff)
 }
 
 
-bool sf_IsValidChar(unsigned short c)
-{
+bool sf_IsValidChar(unsigned short c) {
 	if (c >= ZC_ASCII_MIN && c <= ZC_ASCII_MAX)
 		return true;
 	if (c >= ZC_LATIN1_MIN && c <= ZC_LATIN1_MAX)
@@ -149,15 +142,13 @@ bool sf_IsValidChar(unsigned short c)
 }
 
 
-void sf_drawcursor(bool c)
-{
+void sf_drawcursor(bool c) {
 	SF_textsetting *ts = sf_curtextsetting();
 	drawthecursor(ts->cx, ts->cy, c);
 }
 
 
-void sf_chline(int x, int y, ulong c, int n)
-{
+void sf_chline(int x, int y, ulong c, int n) {
 	ulong *s;
 	if (y < ymin || y >= ymax)
 		return;
@@ -176,8 +167,7 @@ void sf_chline(int x, int y, ulong c, int n)
 }
 
 
-void sf_cvline(int x, int y, ulong c, int n)
-{
+void sf_cvline(int x, int y, ulong c, int n) {
 	ulong *s;
 	if (x < xmin || x >= xmax)
 		return;
@@ -198,8 +188,7 @@ void sf_cvline(int x, int y, ulong c, int n)
 }
 
 
-ulong sf_blendlinear(int a, ulong s, ulong d)
-{
+ulong sf_blendlinear(int a, ulong s, ulong d) {
 	ulong r;
 	r = ((s & 0xff) * a + (d & 0xff) * (256 - a)) >> 8;
 	s >>= 8;
@@ -212,15 +201,14 @@ ulong sf_blendlinear(int a, ulong s, ulong d)
 }
 
 
-void sf_writeglyph(SF_glyph * g)
-{
+void sf_writeglyph(SF_glyph *g) {
 	SF_textsetting *ts = sf_curtextsetting();
 
 	int i, j, m;
 
 	int w = g->dx;
 	int weff = g->xof + g->w;
-	byte *bmp = (byte *) (&(g->bitmap[0]));
+	byte *bmp = (byte *)(&(g->bitmap[0]));
 	int h = g->h;
 	int nby = (g->w + 7) / 8;
 	int byw = g->w;
@@ -264,7 +252,7 @@ void sf_writeglyph(SF_glyph * g)
 					if (t) {
 						ulong sval = color;
 						if (t < 255)
-							sval = sf_blend((int) (t + (t >> 7)), sval, sf_rpixel(x + xx, y));
+							sval = sf_blend((int)(t + (t >> 7)), sval, sf_rpixel(x + xx, y));
 						sf_wpixel(x + xx, y, sval);
 					}
 				}
@@ -290,8 +278,7 @@ void sf_writeglyph(SF_glyph * g)
 }
 
 
-void sf_fillrect(unsigned long color, int x, int y, int w, int h)
-{
+void sf_fillrect(unsigned long color, int x, int y, int w, int h) {
 	ulong *dst;
 	int i;
 	if (x < xmin) {
@@ -320,8 +307,7 @@ void sf_fillrect(unsigned long color, int x, int y, int w, int h)
 }
 
 
-void sf_rect(unsigned long color, int x, int y, int w, int h)
-{
+void sf_rect(unsigned long color, int x, int y, int w, int h) {
 	sf_chline(x, y, color, w);
 	sf_chline(x, y + h - 1, color, w);
 	sf_cvline(x, y, color, h);
@@ -329,8 +315,7 @@ void sf_rect(unsigned long color, int x, int y, int w, int h)
 }
 
 
-void sf_flushtext()
-{
+void sf_flushtext() {
 	SF_textsetting *ts = sf_curtextsetting();
 	ts->cx += ts->oh;
 	ts->oh = 0;
@@ -348,11 +333,10 @@ void sf_flushtext()
  * being erased.
  *
  */
-void os_erase_area(int top, int left, int bottom, int right, int win)
-{
+void os_erase_area(int top, int left, int bottom, int right, int win) {
 	sf_flushtext();
 	sf_fillrect((sf_curtextsetting())->back, left - 1, top - 1,
-		    right - left + 1, bottom - top + 1);
+	            right - left + 1, bottom - top + 1);
 }
 
 
@@ -370,16 +354,14 @@ void os_erase_area(int top, int left, int bottom, int right, int win)
  * with these colours.
  *
  */
-int os_peek_colour(void)
-{
+int os_peek_colour(void) {
 	SF_textsetting *ts = sf_curtextsetting();
 	sf_flushtext();
 	return sf_GetColourIndex(sf_rpixel(ts->cx, ts->cy));
 }
 
 
-static void scroll(int x, int y, int w, int h, int n)
-{
+static void scroll(int x, int y, int w, int h, int n) {
 	ulong *src, *dst;
 	int nmove, step;
 	if (n > 0) {
@@ -410,12 +392,11 @@ static void scroll(int x, int y, int w, int h, int n)
  * Update the display if contents have changed.
  * Return whether contents had changed, i.e., display was updated.
  */
-bool sf_flushdisplay()
-{
+bool sf_flushdisplay() {
 #ifdef TODO
 	if (dirty) {
 		SDL_UpdateTexture(texture, nullptr, sbuffer,
-				  sbpitch * sizeof(ulong));
+		                  sbpitch * sizeof(ulong));
 		myGrefresh();
 		dirty = 0;
 		return true;
@@ -435,23 +416,21 @@ bool sf_flushdisplay()
  * colour. Top left coordinates are (1,1). The cursor stays put.
  *
  */
-void os_scroll_area(int top, int left, int bottom, int right, int units)
-{
+void os_scroll_area(int top, int left, int bottom, int right, int units) {
 	sf_flushtext();
 
 	scroll(left - 1, top - 1, right - left + 1, bottom - top + 1, units);
 	if (units > 0)
 		sf_fillrect((sf_curtextsetting())->back, left - 1,
-			    bottom - units, right - left + 1, units);
+		            bottom - units, right - left + 1, units);
 	else if (units < 0)
 		sf_fillrect((sf_curtextsetting())->back, left - 1, top - 1,
-			    right - left + 1, units);
+		            right - left + 1, units);
 }
 
 
 bool os_repaint_window(int win, int ypos_old, int ypos_new, int xpos,
-		       int ysize, int xsize)
-{
+                       int ysize, int xsize) {
 	/* TODO */
 	return FALSE;
 }
@@ -462,8 +441,7 @@ static /*SDL_atomic_t*/uint SFticked = 0;
 static /*SDL_TimerID*/uint timerid = 0;
 static uint32 refreshEventType = 0;
 
-static uint32 mytimer(uint32 inter, void *parm)
-{
+static uint32 mytimer(uint32 inter, void *parm) {
 #ifdef TODO
 	SDL_AtomicSet(&SFticked, 1);
 	Common::Event event = {0};
@@ -477,8 +455,7 @@ static uint32 mytimer(uint32 inter, void *parm)
 }
 
 
-static void cleanvideo()
-{
+static void cleanvideo() {
 #ifdef TODO
 	if (timerid)
 		SDL_RemoveTimer(timerid);
@@ -492,13 +469,12 @@ static void cleanvideo()
 #define GM 0x00ff00
 #define BM 0xff0000
 
-static void sf_toggle_fullscreen()
-{
+static void sf_toggle_fullscreen() {
 #ifdef TODO
 	if (SDL_SetWindowFullscreen
-	    (window, isfullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP))
+	        (window, isfullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP))
 		os_warn("Error switching %s fullscreen: %s",
-			isfullscreen ? "off" : "to", SDL_GetError());
+		        isfullscreen ? "off" : "to", SDL_GetError());
 	else {
 		isfullscreen = !isfullscreen;
 		if (!isfullscreen)
@@ -517,7 +493,7 @@ void sf_initvideo(int W, int H, int full) {
 	uint32 initflags = SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO;
 
 	sprintf(banner, "SDL Frotz v%s - %s (z%d)",
-		VERSION, f_setup.story_name, z_header.version);
+	        VERSION, f_setup.story_name, z_header.version);
 
 	if (SDL_Init(initflags) < 0) {
 		os_fatal("Couldn't initialize SDL: %s", SDL_GetError());
@@ -535,22 +511,22 @@ void sf_initvideo(int W, int H, int full) {
 	if (full)
 		video_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 	if ((window =
-	     SDL_CreateWindow(banner, SDL_WINDOWPOS_UNDEFINED,
-			      SDL_WINDOWPOS_UNDEFINED, W, H, video_flags)))
+	            SDL_CreateWindow(banner, SDL_WINDOWPOS_UNDEFINED,
+	                             SDL_WINDOWPOS_UNDEFINED, W, H, video_flags)))
 		renderer = SDL_CreateRenderer(window, -1, 0);
 	else
 		renderer = nullptr;
 	if (renderer == nullptr) {
 		os_fatal("Couldn't create %dx%d window: %s",
-			 W, H, SDL_GetError());
+		         W, H, SDL_GetError());
 	}
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	if (SDL_RenderSetLogicalSize(renderer, W, H))
 		os_fatal("Failed to set logical rendering size to %dx%d: %s",
-			 W, H, SDL_GetError());
+		         W, H, SDL_GetError());
 	pixfmt = SDL_MasksToPixelFormatEnum(32, RM, GM, BM, 0);
 	if (!(texture = SDL_CreateTexture(renderer, pixfmt,
-					  SDL_TEXTUREACCESS_STREAMING, W, H)))
+	                                  SDL_TEXTUREACCESS_STREAMING, W, H)))
 		os_fatal("Failed to create texture: %s", SDL_GetError());
 
 	sbuffer = calloc(W * H, sizeof(ulong));
@@ -577,8 +553,7 @@ void sf_initvideo(int W, int H, int full) {
  * Display a picture at the given coordinates.
  *
  */
-void os_draw_picture(int picture, int y, int x)
-{
+void os_draw_picture(int picture, int y, int x) {
 	int ew, eh, xx, yy, ix, iy, d;
 	int ox, oy, ow, oh;
 	Zwindow *winpars;
@@ -608,7 +583,7 @@ void os_draw_picture(int picture, int y, int x)
 	sf_getclip(&ox, &oy, &ow, &oh);
 	winpars = curwinrec();
 	sf_setclip(winpars->x_pos - 1, winpars->y_pos - 1, winpars->x_size,
-		   winpars->y_size);
+	           winpars->y_size);
 
 	/* clip taking into account possible origin
 	 * outside the clipping rect */
@@ -648,15 +623,15 @@ void os_draw_picture(int picture, int y, int x)
 		for (yy = 0; yy < eh * m_gfxScale_h; yy++) {
 			int ys = ceil(yy / m_gfxScale_h);
 			if (ys >= pic->height)
-			    ys = pic->height - 1;
+				ys = pic->height - 1;
 			for (xx = 0; xx < ew * m_gfxScale_w; xx++) {
 				int xs = ceil(xx / m_gfxScale_w);
 				if (xs >= pic->width)
-				    xs = pic->width - 1;
+					xs = pic->width - 1;
 				int index = pic->pixels[ys * pic->width + xs];
 				if (index != pic->transparentcolor)
 					sf_wpixel(x + xx, y + yy,
-						  screen_palette[index]);
+					          screen_palette[index]);
 			}
 		}
 	} else {
@@ -675,8 +650,8 @@ void os_draw_picture(int picture, int y, int x)
 				else
 					dval =
 					    sf_blend((int)
-						     (alpha + (alpha >> 7)),
-						     sval, dst[0]);
+					             (alpha + (alpha >> 7)),
+					             sval, dst[0]);
 				for (iy = 0; iy < m_gfxScale_h; iy++) {
 					for (ix = 0; ix < m_gfxScale_w; ix++)
 						dst[ix] = dval;
@@ -696,8 +671,7 @@ static ulong mytimeout;
 int mouse_button;
 static int numAltQ = 0;
 
-static void set_mouse_xy(int x, int y)
-{
+static void set_mouse_xy(int x, int y) {
 	/* This is enough even in fullscreen:
 	 * SDL maps mouse events to logical coordinates. */
 	mouse_x = x + 1;
@@ -709,8 +683,7 @@ static void set_mouse_xy(int x, int y)
  * Return the first character in the UTF-8-encoded str.
  * Return 0 on encoding error or if the first character > U+FFFF.
  */
-static zword decode_utf8(char *str)
-{
+static zword decode_utf8(char *str) {
 	int i, n = 0;
 	zword res;
 	if (!(*str & 0200))
@@ -747,7 +720,7 @@ static void handle_window_event(Common::Event *e) {
 }
 
 
-static zword goodzkey(Common::Event * e, int allowed) {
+static zword goodzkey(Common::Event *e, int allowed) {
 #ifdef TODO
 	SDL_Keycode c;
 	zword res;
@@ -765,14 +738,14 @@ static zword goodzkey(Common::Event * e, int allowed) {
 			return 0;
 	case SDL_KEYDOWN:
 		if ((e->key.keysym.mod & 0xfff) == (KMOD_LALT | KMOD_LCTRL)
-		    && e->key.keysym.sym == 'x')
+		        && e->key.keysym.sym == 'x')
 			os_fatal("Emergency exit!\n\n(Control-Alt-X pressed)");
 		if (e->key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
 			if (e->key.keysym.sym == 'q') {
 				numAltQ++;
 				if (numAltQ > 2)
 					os_fatal("Emergency exit!\n\n"
-						 "(Alt-Q pressed 3 times in succession)");
+					         "(Alt-Q pressed 3 times in succession)");
 				return 0;
 			} else
 				numAltQ = 0;
@@ -949,8 +922,7 @@ zword sf_read_key(int timeout, bool cursor, bool allowed, bool text) {
  * return it. Input aborts after timeout/10 seconds.
  *
  */
-zchar os_read_key(int timeout, int cursor)
-{
+zchar os_read_key(int timeout, int cursor) {
 	return sf_read_key(timeout, cursor, false, true);
 }
 
@@ -1000,8 +972,7 @@ zchar os_read_key(int timeout, int cursor)
  * to implement word completion (similar to tcsh under Unix).
  *
  */
-zchar os_read_line(int max, zchar * buf, int timeout, int width, int continued)
-{
+zchar os_read_line(int max, zchar *buf, int timeout, int width, int continued) {
 #ifdef TODO
 	static int pos = 0, searchpos = -1;
 	int ptx, pty;
@@ -1015,8 +986,8 @@ zchar os_read_line(int max, zchar * buf, int timeout, int width, int continued)
 	   with Beyond Zork. */
 	if (!continued || pos > len || searchpos > len) {
 		pos = len;
-		gen_history_reset();	/* Reset user's history view. */
-		searchpos = -1;	/* -1 means initialize from len. */
+		gen_history_reset();    /* Reset user's history view. */
+		searchpos = -1; /* -1 means initialize from len. */
 	}
 	/* Draw the input line */
 	ptx = ts->cx;
@@ -1037,33 +1008,33 @@ zchar os_read_line(int max, zchar * buf, int timeout, int width, int continued)
 					/* Delete the character to the left of the cursor */
 					if (pos > 0) {
 						memmove(buf + pos - 1,
-							buf + pos,
-							sizeof(zchar) *
-							(mywcslen(buf) - pos +
-							 1));
+						        buf + pos,
+						        sizeof(zchar) *
+						        (mywcslen(buf) - pos +
+						         1));
 						pos--;
 						sf_DrawInput(buf, pos, ptx, pty,
-							     width, true);
+						             width, true);
 					}
 					continue;
 				case VK_DEL:
 					/* Delete the character to the right of the cursor */
 					if (pos < mywcslen(buf)) {
 						memmove(buf + pos,
-							buf + pos + 1,
-							sizeof(zchar) *
-							(mywcslen(buf) - pos));
+						        buf + pos + 1,
+						        sizeof(zchar) *
+						        (mywcslen(buf) - pos));
 						sf_DrawInput(buf, pos, ptx, pty,
-							     width, true);
+						             width, true);
 					}
 					continue;
-				case ZC_ESCAPE:	/* Delete whole line */
+				case ZC_ESCAPE: /* Delete whole line */
 					pos = 0;
 					buf[0] = '\0';
 					searchpos = -1;
 					gen_history_reset();
 					sf_DrawInput(buf, pos, ptx, pty, width,
-						     true);
+					             true);
 					continue;
 				case VK_TAB:
 					if (pos == (int)mywcslen(buf)) {
@@ -1072,13 +1043,13 @@ zchar os_read_line(int max, zchar * buf, int timeout, int width, int continued)
 
 						/* Add the completion to the input stream */
 						for (s = extension; *s != 0;
-						     s++)
+						        s++)
 							if (sf_IsValidChar(*s))
 								buf[pos++] =
 								    (*s);
 						buf[pos] = 0;
 						sf_DrawInput(buf, pos, ptx, pty,
-							     width, true);
+						             width, true);
 					}
 					continue;
 				case ZC_ARROW_LEFT:
@@ -1086,30 +1057,30 @@ zchar os_read_line(int max, zchar * buf, int timeout, int width, int continued)
 					if (pos > 0)
 						pos--;
 					sf_DrawInput(buf, pos, ptx, pty, width,
-						     true);
+					             true);
 					continue;
 				case ZC_ARROW_RIGHT:
 					/* Move the cursor right */
 					if (pos < (int)mywcslen(buf))
 						pos++;
 					sf_DrawInput(buf, pos, ptx, pty, width,
-						     true);
+					             true);
 					continue;
 				case ZC_ARROW_UP:
 				case ZC_ARROW_DOWN:
 					if (searchpos < 0)
 						searchpos = mywcslen(buf);
 					if ((c == ZC_ARROW_UP
-					     ? gen_history_back :
-					     gen_history_forward) (buf,
-								   searchpos,
-								   max)) {
+					        ? gen_history_back :
+					        gen_history_forward)(buf,
+					                             searchpos,
+					                             max)) {
 						pos = mywcslen(buf);
 						sf_DrawInput(buf, pos, ptx, pty,
-							     width, true);
+						             width, true);
 					}
 					continue;
-					/* Pass through as up/down arrows for Beyond Zork. */
+				/* Pass through as up/down arrows for Beyond Zork. */
 				case VK_PAGE_UP:
 					c = ZC_ARROW_UP;
 					break;
@@ -1118,7 +1089,7 @@ zchar os_read_line(int max, zchar * buf, int timeout, int width, int continued)
 					break;
 				default:
 					if (sf_IsValidChar(c)
-					    && mywcslen(buf) < max) {
+					        && mywcslen(buf) < max) {
 						/* Add a valid character to the input line
 						 * Get the width of the new input line */
 						int len = os_string_width(buf);
@@ -1129,16 +1100,16 @@ zchar os_read_line(int max, zchar * buf, int timeout, int width, int continued)
 						 * Only allow if the width limit is not exceeded */
 						if (len <= width) {
 							memmove(buf + pos + 1,
-								buf + pos,
-								sizeof(zchar) *
-								(mywcslen(buf) -
-								 pos + 1));
+							        buf + pos,
+							        sizeof(zchar) *
+							        (mywcslen(buf) -
+							         pos + 1));
 							*(buf + pos) = c;
 							pos++;
 							sf_DrawInput(buf, pos,
-								     ptx, pty,
-								     width,
-								     true);
+							             ptx, pty,
+							             width,
+							             true);
 						}
 						continue;
 					}
@@ -1147,10 +1118,10 @@ zchar os_read_line(int max, zchar * buf, int timeout, int width, int continued)
 					/* Terminate the current input */
 					m_exitPause = false;
 					sf_DrawInput(buf, pos, ptx, pty, width,
-						     false);
+					             false);
 
 					if ((c == ZC_SINGLE_CLICK)
-					    || (c == ZC_DOUBLE_CLICK)) {
+					        || (c == ZC_DOUBLE_CLICK)) {
 						/*  mouse_x = input.mousex+1;
 						   mouse_y = input.mousey+1; */
 					} else if (c == ZC_RETURN)
@@ -1174,8 +1145,7 @@ zchar os_read_line(int max, zchar * buf, int timeout, int width, int continued)
 
 /* Draw the current input line */
 void sf_DrawInput(zchar *buffer, int pos, int ptx, int pty, int width,
-		  bool cursor)
-{
+                  bool cursor) {
 #ifdef TODO
 	int height;
 	SF_textsetting *ts = sf_curtextsetting();
@@ -1248,8 +1218,7 @@ zword os_read_mouse(void) {
  * prompt from the screen.
  *
  */
-void os_more_prompt(void)
-{
+void os_more_prompt(void) {
 	if (m_morePrompts) {
 		SF_textsetting *ts;
 		int x, y, h;
@@ -1264,7 +1233,7 @@ void os_more_prompt(void)
 		h = ts->font->height(ts->font);
 		/* Show a [More] prompt */
 		while (*p)
-			os_display_char((zchar) (*p++));
+			os_display_char((zchar)(*p++));
 
 		/* Wait for a key press */
 		sf_read_key(0, true, false, false);
@@ -1277,8 +1246,7 @@ void os_more_prompt(void)
 }
 
 
-ulong *sf_savearea(int x, int y, int w, int h)
-{
+ulong *sf_savearea(int x, int y, int w, int h) {
 	ulong *r, *p, *s;
 	int i;
 
@@ -1319,8 +1287,7 @@ ulong *sf_savearea(int x, int y, int w, int h)
 }
 
 
-void sf_restoreareaandfree(ulong * s)
-{
+void sf_restoreareaandfree(ulong *s) {
 	ulong *p, *d;
 	int i, x, y, w, h;
 	if (!s)
@@ -1346,23 +1313,21 @@ void sf_restoreareaandfree(ulong * s)
 
 
 int (*sf_osdialog)(bool ex, const char *def, const char *filt, const char *tit,
-		   char **res, ulong * sbuf, int sbp, int ew, int eh,
-		   int isfull) = nullptr;
+                   char **res, ulong *sbuf, int sbp, int ew, int eh,
+                   int isfull) = nullptr;
 
 
 int sf_user_fdialog(bool existing, const char *defaultname, const char *filter,
-		    const char *title, char **result)
-{
+                    const char *title, char **result) {
 	if (sf_osdialog)
 		return sf_osdialog(existing, defaultname, filter, title, result,
-				   sbuffer, sbpitch, ewidth, eheight,
-				   isfullscreen);
+		                   sbuffer, sbpitch, ewidth, eheight,
+		                   isfullscreen);
 	return SF_NOTIMP;
 }
 
 
-void sf_videodata(ulong ** sb, int *sp, int *ew, int *eh)
-{
+void sf_videodata(ulong **sb, int *sp, int *ew, int *eh) {
 	*sb = sbuffer;
 	*sp = sbpitch;
 	*ew = ewidth;
@@ -1371,10 +1336,9 @@ void sf_videodata(ulong ** sb, int *sp, int *ew, int *eh)
 
 
 extern zword sf_yesnooverlay(int xc, int yc, const char *t, int sr);
-static void sf_quitconf()
-{
+static void sf_quitconf() {
 	if (sf_yesnooverlay(ewidth / 2, eheight / 2, "Quit: are you sure?", 1)
-	    == ZC_RETURN) {
+	        == ZC_RETURN) {
 		error("Quitting (close button clicked on main window)");
 	}
 }
@@ -1388,8 +1352,8 @@ void os_tick() {
 			Common::Event ev;
 			SDL_PumpEvents();
 			while (SDL_PeepEvents(&ev, 1, SDL_GETEVENT,
-					      SDL_WINDOWEVENT,
-					      SDL_WINDOWEVENT) > 0)
+			                      SDL_WINDOWEVENT,
+			                      SDL_WINDOWEVENT) > 0)
 				handle_window_event(&ev);
 		}
 	}
@@ -1401,8 +1365,7 @@ void os_tick() {
 
 /* Apply the picture's palette to the screen palette. */
 /* Adapted from FrotzGfx::ApplyPalette() in Windows Frotz. */
-static bool ApplyPalette(sf_picture * graphic)
-{
+static bool ApplyPalette(sf_picture *graphic) {
 	bool changed = FALSE;
 	int i, colors;
 

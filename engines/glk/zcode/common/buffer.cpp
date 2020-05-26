@@ -25,9 +25,9 @@
 namespace Glk {
 namespace ZCode {
 
-extern void stream_char (zchar);
-extern void stream_word (const zchar *);
-extern void stream_new_line (void);
+extern void stream_char(zchar);
+extern void stream_word(const zchar *);
+extern void stream_new_line(void);
 
 static zchar buffer[TEXT_BUFFER_SIZE];
 static int bufpos = 0;
@@ -42,9 +42,8 @@ static zchar prev_c = 0;
  *
  */
 
-void init_buffer(void)
-{
-	memset(buffer, 0, sizeof (zchar) * TEXT_BUFFER_SIZE);
+void init_buffer(void) {
+	memset(buffer, 0, sizeof(zchar) * TEXT_BUFFER_SIZE);
 	bufpos = 0;
 	prev_c = 0;
 }
@@ -56,8 +55,7 @@ void init_buffer(void)
  * Copy the contents of the text buffer to the output streams.
  *
  */
-void flush_buffer(void)
-{
+void flush_buffer(void) {
 	static bool locked = FALSE;
 
 	/* Make sure we stop when flush_buffer is called from flush_buffer.
@@ -72,7 +70,9 @@ void flush_buffer(void)
 
 	buffer[bufpos] = 0;
 
-	locked = TRUE; stream_word (buffer); locked = FALSE;
+	locked = TRUE;
+	stream_word(buffer);
+	locked = FALSE;
 
 	/* Reset the buffer */
 
@@ -87,8 +87,7 @@ void flush_buffer(void)
  * High level output function.
  *
  */
-void print_char(zchar c)
-{
+void print_char(zchar c) {
 	static bool flag = FALSE;
 	need_newline_at_exit = TRUE;
 
@@ -106,11 +105,11 @@ void print_char(zchar c)
 			 * after a hyphen
 			 */
 			if (c == ' ' || c == ZC_INDENT || c == ZC_GAP ||
-				(prev_c == '-' && c != '-'))
-				flush_buffer ();
-				/* Set the flag if this is part one of a
-				 * style or font change
-				 */
+			        (prev_c == '-' && c != '-'))
+				flush_buffer();
+			/* Set the flag if this is part one of a
+			 * style or font change
+			 */
 			if (c == ZC_NEW_FONT || c == ZC_NEW_STYLE)
 				flag = TRUE;
 			/* Remember the current character code */
@@ -121,8 +120,8 @@ void print_char(zchar c)
 		/* Insert the character into the buffer */
 		buffer[bufpos++] = c;
 		if (bufpos == TEXT_BUFFER_SIZE)
-			runtime_error (ERR_TEXT_BUF_OVF);
-	} else stream_char (c);
+			runtime_error(ERR_TEXT_BUF_OVF);
+	} else stream_char(c);
 } /* print_char */
 
 
@@ -132,9 +131,10 @@ void print_char(zchar c)
  * High level newline function.
  *
  */
-void new_line(void)
-{
-	flush_buffer (); stream_new_line (); need_newline_at_exit = FALSE;
+void new_line(void) {
+	flush_buffer();
+	stream_new_line();
+	need_newline_at_exit = FALSE;
 
 } /* new_line */
 

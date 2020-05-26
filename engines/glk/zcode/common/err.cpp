@@ -70,7 +70,7 @@ static const char *err_messages[] = {
 	"@play_sound called without SOUND_FLAG or OLD_SOUND_FLAG set"
 };
 
-static void print_long (unsigned long value, int base);
+static void print_long(unsigned long value, int base);
 
 
 /*
@@ -79,13 +79,12 @@ static void print_long (unsigned long value, int base);
  * Initialise error reporting.
  *
  */
-void init_err(void)
-{
+void init_err(void) {
 	int i;
 
 	/* Initialize the counters. */
 	for (i = 0; i < ERR_NUM_ERRORS; i++)
-	error_count[i] = 0;
+		error_count[i] = 0;
 }
 
 
@@ -98,17 +97,16 @@ void init_err(void)
  * errnum : Numeric code for error (1 to ERR_NUM_ERRORS)
  *
  */
-void runtime_error(int errnum)
-{
+void runtime_error(int errnum) {
 	int wasfirst;
 
 	if (errnum <= 0 || errnum > ERR_NUM_ERRORS)
 		return;
 
 	if (f_setup.err_report_mode == ERR_REPORT_FATAL
-		|| errnum <= ERR_MAX_FATAL) {
-		flush_buffer ();
-		os_fatal (err_messages[errnum - 1]);
+	        || errnum <= ERR_MAX_FATAL) {
+		flush_buffer();
+		os_fatal(err_messages[errnum - 1]);
 		return;
 	}
 
@@ -116,24 +114,24 @@ void runtime_error(int errnum)
 	error_count[errnum - 1]++;
 
 	if ((f_setup.err_report_mode == ERR_REPORT_ALWAYS)
-		|| (f_setup.err_report_mode == ERR_REPORT_ONCE && wasfirst)) {
+	        || (f_setup.err_report_mode == ERR_REPORT_ONCE && wasfirst)) {
 		long pc;
 
-		GET_PC (pc);
-		print_string ("Warning: ");
-		print_string (err_messages[errnum - 1]);
-		print_string (" (PC = ");
-		print_long (pc, 16);
-		print_char (')');
+		GET_PC(pc);
+		print_string("Warning: ");
+		print_string(err_messages[errnum - 1]);
+		print_string(" (PC = ");
+		print_long(pc, 16);
+		print_char(')');
 
 		if (f_setup.err_report_mode == ERR_REPORT_ONCE) {
-			print_string (" (will ignore further occurrences)");
+			print_string(" (will ignore further occurrences)");
 		} else {
-			print_string (" (occurrence ");
-			print_long (error_count[errnum - 1], 10);
-			print_char (')');
+			print_string(" (occurrence ");
+			print_long(error_count[errnum - 1], 10);
+			print_char(')');
 		}
-		new_line ();
+		new_line();
 	}
 } /* report_error */
 
@@ -144,15 +142,14 @@ void runtime_error(int errnum)
  * Print an unsigned 32bit number in decimal or hex.
  *
  */
-static void print_long (unsigned long value, int base)
-{
+static void print_long(unsigned long value, int base) {
 	unsigned long i;
 	char c;
 
 	for (i = (base == 10 ? 1000000000 : 0x10000000); i != 0; i /= base) {
 		if (value >= i || i == 1) {
 			c = (value / i) % base;
-			print_char (c + (c <= 9 ? '0' : 'a' - 10));
+			print_char(c + (c <= 9 ? '0' : 'a' - 10));
 		}
 	}
 } /* print_long */

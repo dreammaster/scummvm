@@ -77,8 +77,7 @@ static int audio_buffers = 512;
 static uint16 audio_format;
 static int bits;
 
-static void finishaudio()
-{
+static void finishaudio() {
 	if (!SFaudiorunning)
 		return;
 	os_stop_sample(0);
@@ -103,8 +102,7 @@ static void channel_finished(int channel);
  * whether sound is desired and has no means for indicating whether sound is
  * available.  See sf_initsound for the real init.
  */
-void os_init_sound()
-{
+void os_init_sound() {
 }
 
 int sf_initsound() {
@@ -116,7 +114,7 @@ int sf_initsound() {
 #ifdef TODO
 	/* initialize sdl mixer, open up the audio device */
 	if (Mix_OpenAudio(m_frequency, MIX_DEFAULT_FORMAT, 2, audio_buffers) <
-	    0) {
+	        0) {
 		SFaudiorunning = 0;
 		return 0;
 	}
@@ -136,7 +134,7 @@ int sf_initsound() {
 }
 
 
-static void baredestroy(EFFECT * r) {
+static void baredestroy(EFFECT *r) {
 #ifdef TODO
 	if (r) {
 		if (r->mod)
@@ -149,8 +147,7 @@ static void baredestroy(EFFECT * r) {
 }
 
 
-static EFFECT *new_effect(int type, int num)
-{
+static EFFECT *new_effect(int type, int num) {
 	EFFECT *reader = (EFFECT *) calloc(1, sizeof(EFFECT));
 	if (reader) {
 		reader->type = type;
@@ -164,8 +161,7 @@ static EFFECT *new_effect(int type, int num)
 /* According to specs, this is only called when music ends "naturally",
  * which I take for "not halted programmatically"
  */
-static void music_finished(void)
-{
+static void music_finished(void) {
 	if (!e_mod)
 		return;
 	if (!e_mod->active)
@@ -176,8 +172,7 @@ static void music_finished(void)
 
 
 /* This may be called also via a Mix_Haltetc. */
-static void channel_finished(int channel)
-{
+static void channel_finished(int channel) {
 	if (channel != 0)
 		return;
 	if (!e_sfx)
@@ -185,12 +180,11 @@ static void channel_finished(int channel)
 	if (!e_sfx->active)
 		return;
 	e_sfx->active = 0;
-	e_sfx->ended = 1;	/* stopsample will take care of this... */
+	e_sfx->ended = 1;   /* stopsample will take care of this... */
 }
 
 
-static void stopsample()
-{
+static void stopsample() {
 	if (!e_sfx)
 		return;
 	e_sfx->active = 0;
@@ -199,8 +193,7 @@ static void stopsample()
 }
 
 
-static void stopmodule()
-{
+static void stopmodule() {
 	if (!e_mod)
 		return;
 	e_mod->active = 0;
@@ -209,8 +202,7 @@ static void stopmodule()
 }
 
 
-static void startsample()
-{
+static void startsample() {
 	if (!e_sfx)
 		return;
 #ifdef TODO
@@ -221,8 +213,7 @@ static void startsample()
 }
 
 
-static void startmodule()
-{
+static void startmodule() {
 	if (!e_mod)
 		return;
 #ifdef TODO
@@ -233,7 +224,7 @@ static void startmodule()
 }
 
 
-static EFFECT *getaiff(FILE * f, size_t pos, int len, int num) {
+static EFFECT *getaiff(FILE *f, size_t pos, int len, int num) {
 #ifdef TODO
 	EFFECT *res = nullptr;
 
@@ -241,7 +232,7 @@ static EFFECT *getaiff(FILE * f, size_t pos, int len, int num) {
 	if (!res)
 		return nullptr;
 	if (fseek(f, pos, SEEK_SET)
-	    || !(res->sam = Mix_LoadWAV_RW(SDL_RWFromFP(f, false), 1))) {
+	        || !(res->sam = Mix_LoadWAV_RW(SDL_RWFromFP(f, false), 1))) {
 		os_warn("Read error on audio data: %s", strerror(errno));
 		res->destroy(res);
 		return nullptr;
@@ -253,8 +244,7 @@ static EFFECT *getaiff(FILE * f, size_t pos, int len, int num) {
 }
 
 
-static EFFECT *getmodule(FILE * f, size_t pos, int len, int num)
-{
+static EFFECT *getmodule(FILE *f, size_t pos, int len, int num) {
 #ifdef TODO
 	EFFECT *res;
 	byte h[2];
@@ -266,8 +256,7 @@ static EFFECT *getmodule(FILE * f, size_t pos, int len, int num)
 	fseek(f, pos, SEEK_SET);
 	fread(h, 1, 2, f);
 	fseek(f, pos, SEEK_SET);
-	if (h[0] == 'P' && h[1] == 'K')	/* zipped module */
-	{
+	if (h[0] == 'P' && h[1] == 'K') { /* zipped module */
 		int size;
 		void *data;
 		int st = sf_pkread(f, pos, &data, &size);
@@ -291,8 +280,7 @@ static EFFECT *getmodule(FILE * f, size_t pos, int len, int num)
 }
 
 
-static EFFECT *geteffect(int num)
-{
+static EFFECT *geteffect(int num) {
 	myresource res;
 	EFFECT *result = nullptr;
 	unsigned int id;
@@ -311,11 +299,11 @@ static EFFECT *geteffect(int num)
 	if (id == bb_ID_FORM) {
 		result =
 		    getaiff(res.file, res.bbres.data.startpos, res.bbres.length,
-			    num);
+		            num);
 	} else if (id == bb_ID_MOD || id == bb_ID_OGGV) {
 		result =
 		    getmodule(res.file, res.bbres.data.startpos,
-			      res.bbres.length, num);
+		              res.bbres.length, num);
 	}
 	sf_freeresource(&res);
 
@@ -339,8 +327,8 @@ void os_beep(int number) {
 	fflush(stdout);
 	if (!SFaudiorunning)
 		return;
-/*	theWnd->FlushDisplay();
-	::MessageBeep(MB_ICONEXCLAMATION);*/
+	/*  theWnd->FlushDisplay();
+	    ::MessageBeep(MB_ICONEXCLAMATION);*/
 #else
 	error("TODO: os_beep");
 #endif
@@ -353,8 +341,7 @@ void os_beep(int number) {
  * Remove the current sample from memory (if any).
  *
  */
-void os_finish_with_sample(int number)
-{
+void os_finish_with_sample(int number) {
 	if (!SFaudiorunning)
 		return;
 	os_stop_sample(number);
@@ -367,8 +354,7 @@ void os_finish_with_sample(int number)
  * Load the given sample from the disk.
  *
  */
-void os_prepare_sample(int number)
-{
+void os_prepare_sample(int number) {
 	if (!SFaudiorunning)
 		return;
 }
@@ -384,8 +370,7 @@ void os_prepare_sample(int number)
  * eos argument.
  *
  */
-void os_start_sample(int number, int volume, int repeats, zword eos)
-{
+void os_start_sample(int number, int volume, int repeats, zword eos) {
 	EFFECT *e;
 
 	if (!SFaudiorunning)
@@ -434,8 +419,7 @@ void os_start_sample(int number, int volume, int repeats, zword eos)
  * Turn off the current sample.
  *
  */
-void os_stop_sample(int number)
-{
+void os_stop_sample(int number) {
 	if (!SFaudiorunning)
 		return;
 	if (number == 0) {
@@ -450,8 +434,7 @@ void os_stop_sample(int number)
 }
 
 
-void sf_checksound()
-{
+void sf_checksound() {
 	if ((e_sfx) && (e_sfx->ended)) {
 		e_sfx->ended = 0;
 		if (e_sfx->eos) {

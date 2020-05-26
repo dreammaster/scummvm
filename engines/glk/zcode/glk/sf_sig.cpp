@@ -46,8 +46,7 @@ static struct {
 #endif
 
 #ifdef TODO
-static const char *getsigname(int s)
-{
+static const char *getsigname(int s) {
 	int i = 0;
 	while (NAMES[i].name) {
 		if (NAMES[i].sig == s)

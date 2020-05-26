@@ -41,8 +41,7 @@ static bool truncate_question_mark(void);
  * Check if the given key is an input terminator.
  *
  */
-bool is_terminator(zchar key)
-{
+bool is_terminator(zchar key) {
 	if (key == ZC_TIME_OUT)
 		return TRUE;
 	if (key == ZC_RETURN)
@@ -69,12 +68,11 @@ bool is_terminator(zchar key)
 /*
  * z_make_menu, add or remove a menu and branch if successful.
  *
- * 	zargs[0] = number of menu
- *	zargs[1] = table of menu entries or 0 to remove menu
+ *  zargs[0] = number of menu
+ *  zargs[1] = table of menu entries or 0 to remove menu
  *
  */
-void z_make_menu(void)
-{
+void z_make_menu(void) {
 	/* This opcode was only used for the Macintosh version of Journey.
 	 * It controls menus with numbers greater than 2 (menus 0, 1 and 2
 	 * are system menus). Frotz doesn't implement menus yet.
@@ -89,8 +87,7 @@ void z_make_menu(void)
  * Ask the user a question; return true if the answer is yes.
  *
  */
-bool read_yes_or_no(const char *s)
-{
+bool read_yes_or_no(const char *s) {
 	zchar key;
 
 	print_string(s);
@@ -115,11 +112,10 @@ bool read_yes_or_no(const char *s)
  *
  */
 
-void read_string (int max, zchar *buffer)
-{
+void read_string(int max, zchar *buffer) {
 	zchar key;
 
- 	buffer[0] = 0;
+	buffer[0] = 0;
 
 	do {
 		key = stream_read_input(max, buffer, 0, 0, FALSE, FALSE);
@@ -133,8 +129,7 @@ void read_string (int max, zchar *buffer)
  * Ask the user to type in a number and return it.
  *
  */
-int read_number(void)
-{
+int read_number(void) {
 	zchar buffer[6];
 	int value = 0;
 	int i;
@@ -152,14 +147,13 @@ int read_number(void)
 /*
  * z_read, read a line of input and (in V5+) store the terminating key.
  *
- *	zargs[0] = address of text buffer
- *	zargs[1] = address of token buffer
- *	zargs[2] = timeout in tenths of a second (optional)
- *	zargs[3] = packed address of routine to be called on timeout
+ *  zargs[0] = address of text buffer
+ *  zargs[1] = address of token buffer
+ *  zargs[2] = timeout in tenths of a second (optional)
+ *  zargs[3] = packed address of routine to be called on timeout
  *
  */
-void z_read(void)
-{
+void z_read(void) {
 	zchar buffer[INPUT_BUFFER_SIZE];
 	zword addr;
 	zchar key;
@@ -173,7 +167,7 @@ void z_read(void)
 
 	/* Get maximum input size */
 	addr = zargs[0];
-	LOW_BYTE (addr, max);
+	LOW_BYTE(addr, max);
 	if (z_header.version <= V4)
 		max--;
 	if (max >= INPUT_BUFFER_SIZE)
@@ -198,12 +192,12 @@ void z_read(void)
 		z_show_status();
 
 	/* Read input from current input stream */
-	key = stream_read_input (
-		max, buffer,		/* buffer and size */
-		zargs[2],		/* timeout value   */
-		zargs[3],		/* timeout routine */
-		TRUE,	        	/* enable hot keys */
-		z_header.version == V6);	/* no script in V6 */
+	key = stream_read_input(
+	          max, buffer,        /* buffer and size */
+	          zargs[2],       /* timeout value   */
+	          zargs[3],       /* timeout routine */
+	          TRUE,               /* enable hot keys */
+	          z_header.version == V6);    /* no script in V6 */
 
 	if (key == ZC_BAD)
 		return;
@@ -219,37 +213,36 @@ void z_read(void)
 		}
 		if (truncate_question_mark() && buffer[i] == '?')
 			buffer[i] = ' ';
-		storeb((zword) (zargs[0] + ((z_header.version <= V4) ? 1 : 2) + i),
-		    translate_to_zscii (buffer[i]));
+		storeb((zword)(zargs[0] + ((z_header.version <= V4) ? 1 : 2) + i),
+		       translate_to_zscii(buffer[i]));
 	}
 
 	/* Add null character (V1-V4) or write input length into 2nd byte */
 	if (z_header.version <= V4)
-		storeb((zword) (zargs[0] + 1 + i), 0);
+		storeb((zword)(zargs[0] + 1 + i), 0);
 	else
-		storeb((zword) (zargs[0] + 1), i);
+		storeb((zword)(zargs[0] + 1), i);
 
 	/* Tokenise line if a token buffer is present */
 	if (key == ZC_RETURN && zargs[1] != 0)
-		tokenise_line (zargs[0], zargs[1], 0, FALSE);
+		tokenise_line(zargs[0], zargs[1], 0, FALSE);
 
 	/* Store key */
 	if (z_header.version >= V5)
-		store(translate_to_zscii (key));
+		store(translate_to_zscii(key));
 } /* z_read */
 
 
 /*
  * z_read_char, read and store a key.
  *
- *	zargs[0] = input device (must be 1)
- *	zargs[1] = timeout in tenths of a second (optional)
- *	zargs[2] = packed address of routine to be called on timeout
+ *  zargs[0] = input device (must be 1)
+ *  zargs[1] = timeout in tenths of a second (optional)
+ *  zargs[2] = packed address of routine to be called on timeout
  *
  */
 
-void z_read_char(void)
-{
+void z_read_char(void) {
 	zchar key;
 
 	/* Supply default arguments */
@@ -258,9 +251,9 @@ void z_read_char(void)
 
 	/* Read input from the current input stream */
 	key = stream_read_key(
-		zargs[1],	/* timeout value   */
-		zargs[2],	/* timeout routine */
-		TRUE);  	/* enable hot keys */
+	          zargs[1],   /* timeout value   */
+	          zargs[2],   /* timeout routine */
+	          TRUE);      /* enable hot keys */
 
 	if (key == ZC_BAD)
 		return;
@@ -273,34 +266,33 @@ void z_read_char(void)
 	if (key == 0)
 		store(key);
 	else
-		store(translate_to_zscii (key));
+		store(translate_to_zscii(key));
 } /* z_read_char */
 
 
 /*
  * z_read_mouse, write the current mouse status into a table.
  *
- *	zargs[0] = address of table
+ *  zargs[0] = address of table
  *
  */
 
-void z_read_mouse(void)
-{
+void z_read_mouse(void) {
 	zword btn;
 
 	btn = 1;
 
 	/** I don't remember what was going on here */
 	/* Read the mouse position and which buttons are down */
-/*
-	btn = os_read_mouse ();
-	z_header.x_mouse_y = mouse_y;
-	z_header.x_mouse_x = mouse_x;
-*/
-	storew((zword) (zargs[0] + 0), z_header.x_mouse_y);
-	storew((zword) (zargs[0] + 2), z_header.x_mouse_x);
-	storew((zword) (zargs[0] + 4), btn);	/* mouse button bits */
-	storew((zword) (zargs[0] + 6), 0);	/* menu selection */
+	/*
+	    btn = os_read_mouse ();
+	    z_header.x_mouse_y = mouse_y;
+	    z_header.x_mouse_x = mouse_x;
+	*/
+	storew((zword)(zargs[0] + 0), z_header.x_mouse_y);
+	storew((zword)(zargs[0] + 2), z_header.x_mouse_x);
+	storew((zword)(zargs[0] + 4), btn);     /* mouse button bits */
+	storew((zword)(zargs[0] + 6), 0);   /* menu selection */
 
 } /* z_read_mouse */
 
@@ -322,8 +314,7 @@ void z_read_mouse(void)
  * the trailing question mark to be truncated.
  *
  */
-static bool truncate_question_mark(void)
-{
+static bool truncate_question_mark(void) {
 	if (story_id == ZORK1) return TRUE;
 	if (story_id == ZORK2) return TRUE;
 	if (story_id == ZORK3) return TRUE;

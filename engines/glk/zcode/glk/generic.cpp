@@ -89,7 +89,7 @@ bb_err_t gen_blorb_init(const char *filename) {
 	 * zcode file and our resources are in a separate blorb file.
 	 */
 	if (isblorb(file)) { /* Now we know to look */
-		f_setup.exec_in_blorb = 1;	/* for zcode in the blorb */
+		f_setup.exec_in_blorb = 1;  /* for zcode in the blorb */
 		blorb_fp = file;
 	} else {
 		fclose(file);
@@ -139,7 +139,7 @@ bb_err_t gen_blorb_init(const char *filename) {
 	 */
 	if (f_setup.exec_in_blorb) {
 		blorb_err = bb_load_chunk_by_type(blorb_map, bb_method_FilePos,
-			&blorb_res, bb_ID_ZCOD, 0);
+		                                  &blorb_res, bb_ID_ZCOD, 0);
 		f_setup.exec_in_blorb = 1;
 	}
 
@@ -200,8 +200,8 @@ int os_storyfile_seek(FILE *file, long offset, int whence) {
 		switch (whence) {
 		case SEEK_END:
 			return fseek(file,
-				blorb_res.data.startpos +
-				blorb_res.length + offset, SEEK_SET);
+			             blorb_res.data.startpos +
+			             blorb_res.length + offset, SEEK_SET);
 			break;
 		case SEEK_CUR:
 			return fseek(file, offset, SEEK_CUR);
@@ -209,7 +209,7 @@ int os_storyfile_seek(FILE *file, long offset, int whence) {
 		case SEEK_SET:
 		default:
 			return fseek(file, blorb_res.data.startpos + offset,
-				SEEK_SET);
+			             SEEK_SET);
 			break;
 		}
 	} else {
@@ -326,8 +326,8 @@ zchar *zcharstrdup(zchar *src) {
 
 #define MAX_HISTORY 256
 static zchar *history_buffer[MAX_HISTORY];
-static zchar **history_next = history_buffer;	/* Next available slot. */
-static zchar **history_view = history_buffer;	/* What the user is looking at. */
+static zchar **history_next = history_buffer;   /* Next available slot. */
+static zchar **history_view = history_buffer;   /* What the user is looking at. */
 #define history_end (history_buffer + MAX_HISTORY - 1)
 
 
@@ -339,7 +339,7 @@ void gen_add_to_history(zchar *str) {
 		free(*history_next);
 	*history_next = zcharstrdup(str);
 	RING_INC(history_next, history_buffer, history_end);
-	history_view = history_next;	/* Reset user frame after each line */
+	history_view = history_next;    /* Reset user frame after each line */
 
 	return;
 }
@@ -364,14 +364,14 @@ int gen_history_back(zchar *str, int searchlen, int maxlen) {
 	do {
 		RING_DEC(history_view, history_buffer, history_end);
 		if ((history_view == history_next)
-			|| (*history_view == nullptr)) {
+		        || (*history_view == nullptr)) {
 			os_beep(BEEP_HIGH);
 			history_view = prev;
 			return 0;
 		}
 	} while (zcharstrlen(*history_view) > (size_t)maxlen
-		|| (searchlen != 0
-			&& zcharstrncmp(str, *history_view, searchlen)));
+	         || (searchlen != 0
+	             && zcharstrncmp(str, *history_view, searchlen)));
 	zcharstrcpy(str + searchlen, *history_view + searchlen);
 	return 1;
 }
@@ -386,15 +386,15 @@ int gen_history_forward(zchar *str, int searchlen, int maxlen) {
 	do {
 		RING_INC(history_view, history_buffer, history_end);
 		if ((history_view == history_next)
-			|| (*history_view == nullptr)) {
+		        || (*history_view == nullptr)) {
 
 			os_beep(BEEP_HIGH);
 			history_view = prev;
 			return 0;
 		}
 	} while (zcharstrlen(*history_view) > (size_t)maxlen
-		|| (searchlen != 0
-			&& zcharstrncmp(str, *history_view, searchlen)));
+	         || (searchlen != 0
+	             && zcharstrncmp(str, *history_view, searchlen)));
 	zcharstrcpy(str + searchlen, *history_view + searchlen);
 	return 1;
 }

@@ -90,8 +90,7 @@ typedef struct {
 
 
 /* destructor */
-static void bdestroy(SFONT * s)
-{
+static void bdestroy(SFONT *s) {
 	if (s) {
 		int i;
 		MYFONT *f = (MYFONT *) s;
@@ -106,50 +105,44 @@ static void bdestroy(SFONT * s)
 }
 
 
-static int bheight(SFONT * s)
-{
+static int bheight(SFONT *s) {
 	if (s)
 		return ((MYFONT *) s)->height;
 	return 0;
 }
 
 
-static int bascent(SFONT * s)
-{
+static int bascent(SFONT *s) {
 	if (s)
 		return ((MYFONT *) s)->ascent;
 	return 0;
 }
 
 
-static int bdescent(SFONT * s)
-{
+static int bdescent(SFONT *s) {
 	if (s)
 		return ((MYFONT *) s)->descent;
 	return 0;
 }
 
 
-static int bminchar(SFONT * s)
-{
+static int bminchar(SFONT *s) {
 	if (s)
 		return ((MYFONT *) s)->minchar;
 	return 0;
 }
 
 
-static int bmaxchar(SFONT * s)
-{
+static int bmaxchar(SFONT *s) {
 	if (s)
 		return ((MYFONT *) s)->maxchar;
 	return 0;
 }
 
 
-static void setglyph(MYFONT * f, FT_Face face, int ch);
+static void setglyph(MYFONT *f, FT_Face face, int ch);
 
-static SF_glyph *getglyph(SFONT * s, word c, int allowdef)
-{
+static SF_glyph *getglyph(SFONT *s, word c, int allowdef) {
 	if (s) {
 		MYFONT *f = (MYFONT *) s;
 		if (c < f->minchar || c > f->maxchar) {
@@ -166,8 +159,7 @@ static SF_glyph *getglyph(SFONT * s, word c, int allowdef)
 }
 
 
-static int hasglyph(SFONT * fo, word c, int allowdef)
-{
+static int hasglyph(SFONT *fo, word c, int allowdef) {
 	return (getglyph(fo, c, allowdef) != nullptr);
 }
 
@@ -175,8 +167,7 @@ static int hasglyph(SFONT * fo, word c, int allowdef)
 static int inited = 0, initerr = 0;
 static FT_Library library;
 
-static void libfinish()
-{
+static void libfinish() {
 	if (!inited)
 		return;
 	FT_Done_FreeType(library);
@@ -184,13 +175,12 @@ static void libfinish()
 }
 
 
-static void libinit()
-{
+static void libinit() {
 	if (initerr)
 		return;
 	if (inited)
 		return;
-	initerr = FT_Init_FreeType(&library);	/* initialize library */
+	initerr = FT_Init_FreeType(&library);   /* initialize library */
 	/* error handling omitted */
 	if (initerr)
 		error("FT_Init_FreeType: error %d\n", initerr);
@@ -201,8 +191,7 @@ static void libinit()
 }
 
 
-static MYFONT *makefont(int totglyphs)
-{
+static MYFONT *makefont(int totglyphs) {
 	MYFONT *res;
 	res = (MYFONT *)calloc(1, sizeof(MYFONT) + totglyphs * sizeof(SF_glyph *));
 	if (!res)
@@ -228,8 +217,7 @@ static MYFONT *makefont(int totglyphs)
 
 #define MAXUNI 0xffff
 
-static void setglyph(MYFONT * f, FT_Face face, int ch)
-{
+static void setglyph(MYFONT *f, FT_Face face, int ch) {
 #ifdef TODO
 	int err, gid = FT_Get_Char_Index(face, ch);
 	int mode = FT_RENDER_MODE_MONO;
@@ -278,8 +266,7 @@ static void setglyph(MYFONT * f, FT_Face face, int ch)
 }
 
 
-static SFONT *loadftype(char *fname, int size, SFONT * like, int *err)
-{
+static SFONT *loadftype(char *fname, int size, SFONT *like, int *err) {
 	MYFONT *res;
 	FT_Face face;
 	int i;
@@ -301,7 +288,7 @@ static SFONT *loadftype(char *fname, int size, SFONT * like, int *err)
 		return nullptr;
 	}
 
-	*err = FT_New_Face(library, fname, 0, &face);	/* create face object */
+	*err = FT_New_Face(library, fname, 0, &face);   /* create face object */
 	if (*err) {
 		res->sfont.destroy(&res->sfont);
 		return nullptr;
@@ -342,8 +329,7 @@ static SFONT *loadftype(char *fname, int size, SFONT * like, int *err)
 #define SYSFONTS "/usr/share/fonts/freetype"
 #endif
 
-SFONT *sf_loadftype(char *fspec, SFONT * like, int *err)
-{
+SFONT *sf_loadftype(char *fspec, SFONT *like, int *err) {
 	char buf[FILENAME_MAX], *fn, *at;// , *fenv;
 	int size = DEFSIZE, fnlen = -1;
 
@@ -377,8 +363,7 @@ SFONT *sf_loadftype(char *fspec, SFONT * like, int *err)
 
 /****************************************/
 
-void sf_initloader()
-{
+void sf_initloader() {
 	ttfontloader = sf_loadftype;
 }
 

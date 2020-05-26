@@ -49,15 +49,14 @@ z_header_t z_header;
  * Calculate the address of an object.
  *
  */
-static zword object_address(zword obj)
-{
+static zword object_address(zword obj) {
 	/* Check object number */
 	if (obj > ((z_header.version <= V3) ? 255 : MAX_OBJECT)) {
 		print_string("@Attempt to address illegal object ");
 		print_num(obj);
 		print_string(".  This is normally fatal.");
 		new_line();
-		runtime_error (ERR_ILL_OBJ);
+		runtime_error(ERR_ILL_OBJ);
 	}
 
 	/* Return object address */
@@ -74,8 +73,7 @@ static zword object_address(zword obj)
  * Return the address of the given object's name.
  *
  */
-zword object_name(zword object)
-{
+zword object_name(zword object) {
 	zword obj_addr;
 	zword name_addr;
 
@@ -99,13 +97,12 @@ zword object_name(zword object)
  * an object.
  *
  */
-static zword first_property(zword obj)
-{
+static zword first_property(zword obj) {
 	zword prop_addr;
 	zbyte size;
 
 	/* Fetch address of object name */
-	prop_addr = object_name (obj);
+	prop_addr = object_name(obj);
 
 	/* Get length of object name */
 	LOW_BYTE(prop_addr, size)
@@ -121,8 +118,7 @@ static zword first_property(zword obj)
  * Calculate the address of the next property in a property list.
  *
  */
-static zword next_property(zword prop_addr)
-{
+static zword next_property(zword prop_addr) {
 	zbyte value;
 
 	/* Load the current property id */
@@ -138,7 +134,7 @@ static zword next_property(zword prop_addr)
 	else {
 		LOW_BYTE(prop_addr, value)
 		value &= 0x3f;
-		if (value == 0) value = 64;	/* demanded by Spec 1.0 */
+		if (value == 0) value = 64; /* demanded by Spec 1.0 */
 	}
 
 	/* Add property length to current property pointer */
@@ -152,8 +148,7 @@ static zword next_property(zword prop_addr)
  * Unlink an object from its parent and siblings.
  *
  */
-static void unlink_object(zword object)
-{
+static void unlink_object(zword object) {
 	zword obj_addr;
 	zword parent_addr;
 	zword sibling_addr;
@@ -163,7 +158,7 @@ static void unlink_object(zword object)
 		return;
 	}
 
-	obj_addr = object_address (object);
+	obj_addr = object_address(object);
 
 	if (z_header.version <= V3) {
 		zbyte parent;
@@ -192,14 +187,14 @@ static void unlink_object(zword object)
 		/* Remove object from the list of siblings */
 		if (younger_sibling == object)
 			SET_BYTE(parent_addr, older_sibling)
-		else {
-			do {
-				sibling_addr = object_address(younger_sibling)
-					+ O1_SIBLING;
-				LOW_BYTE(sibling_addr, younger_sibling)
-			} while (younger_sibling != object);
-			SET_BYTE(sibling_addr, older_sibling)
-		}
+			else {
+				do {
+					sibling_addr = object_address(younger_sibling)
+					               + O1_SIBLING;
+					LOW_BYTE(sibling_addr, younger_sibling)
+				} while (younger_sibling != object);
+				SET_BYTE(sibling_addr, older_sibling)
+			}
 	} else {
 		zword parent;
 		zword younger_sibling;
@@ -227,14 +222,14 @@ static void unlink_object(zword object)
 		/* Remove object from the list of siblings */
 		if (younger_sibling == object)
 			SET_WORD(parent_addr, older_sibling)
-		else {
-			do {
-				sibling_addr = object_address(younger_sibling)
-					+ O4_SIBLING;
-				LOW_WORD(sibling_addr, younger_sibling)
-			} while (younger_sibling != object);
-			SET_WORD(sibling_addr, older_sibling)
-		}
+			else {
+				do {
+					sibling_addr = object_address(younger_sibling)
+					               + O4_SIBLING;
+					LOW_WORD(sibling_addr, younger_sibling)
+				} while (younger_sibling != object);
+				SET_WORD(sibling_addr, older_sibling)
+			}
 	}
 } /* unlink_object */
 
@@ -242,12 +237,11 @@ static void unlink_object(zword object)
 /*
  * z_clear_attr, clear an object attribute.
  *
- *	zargs[0] = object
- *	zargs[1] = number of attribute to be cleared
+ *  zargs[0] = object
+ *  zargs[1] = number of attribute to be cleared
  *
  */
-void z_clear_attr(void)
-{
+void z_clear_attr(void) {
 	zword obj_addr;
 	zbyte value;
 
@@ -287,12 +281,11 @@ void z_clear_attr(void)
 /*
  * z_jin, branch if the first object is inside the second.
  *
- *	zargs[0] = first object
- *	zargs[1] = second object
+ *  zargs[0] = first object
+ *  zargs[1] = second object
  *
  */
-void z_jin(void)
-{
+void z_jin(void) {
 	zword obj_addr;
 
 	/* If we are monitoring object locating display a short note */
@@ -321,7 +314,7 @@ void z_jin(void)
 		LOW_BYTE(obj_addr, parent)
 
 		/* Branch if the parent is obj2 */
-		branch (parent == zargs[1]);
+		branch(parent == zargs[1]);
 	} else {
 		zword parent;
 		/* Get parent id from object */
@@ -329,7 +322,7 @@ void z_jin(void)
 		LOW_WORD(obj_addr, parent)
 
 		/* Branch if the parent is obj2 */
-		branch (parent == zargs[1]);
+		branch(parent == zargs[1]);
 	}
 } /* z_jin */
 
@@ -337,11 +330,10 @@ void z_jin(void)
 /*
  * z_get_child, store the child of an object.
  *
- *	zargs[0] = object
+ *  zargs[0] = object
  *
  */
-void z_get_child(void)
-{
+void z_get_child(void) {
 	zword obj_addr;
 
 	/* If we are monitoring object locating display a short note */
@@ -360,7 +352,7 @@ void z_get_child(void)
 		return;
 	}
 
-	obj_addr = object_address (zargs[0]);
+	obj_addr = object_address(zargs[0]);
 
 	if (z_header.version <= V3) {
 		zbyte child;
@@ -389,12 +381,11 @@ void z_get_child(void)
 /*
  * z_get_next_prop, store the number of the first or next property.
  *
- *	zargs[0] = object
- *	zargs[1] = address of current property (0 gets the first property)
+ *  zargs[0] = object
+ *  zargs[1] = address of current property (0 gets the first property)
  *
  */
-void z_get_next_prop(void)
-{
+void z_get_next_prop(void) {
 	zword prop_addr;
 	zbyte value;
 	zbyte mask;
@@ -425,18 +416,17 @@ void z_get_next_prop(void)
 
 	/* Return the property id */
 	LOW_BYTE(prop_addr, value)
-	store((zword) (value & mask));
+	store((zword)(value & mask));
 } /* z_get_next_prop */
 
 
 /*
  * z_get_parent, store the parent of an object.
  *
- *	zargs[0] = object
+ *  zargs[0] = object
  *
  */
-void z_get_parent(void)
-{
+void z_get_parent(void) {
 	zword obj_addr;
 
 	/* If we are monitoring object locating display a short note */
@@ -454,7 +444,7 @@ void z_get_parent(void)
 		return;
 	}
 
-	obj_addr = object_address (zargs[0]);
+	obj_addr = object_address(zargs[0]);
 
 	if (z_header.version <= V3) {
 		zbyte parent;
@@ -470,10 +460,10 @@ void z_get_parent(void)
 
 		/* Get parent id from object */
 		obj_addr += O4_PARENT;
-		LOW_WORD (obj_addr, parent)
+		LOW_WORD(obj_addr, parent)
 
 		/* Store parent */
-		store (parent);
+		store(parent);
 	}
 } /* z_get_parent */
 
@@ -481,12 +471,11 @@ void z_get_parent(void)
 /*
  * z_get_prop, store the value of an object property.
  *
- *	zargs[0] = object
- *	zargs[1] = number of property to be examined
+ *  zargs[0] = object
+ *  zargs[1] = number of property to be examined
  *
  */
-void z_get_prop(void)
-{
+void z_get_prop(void) {
 	zword prop_addr;
 	zword wprop_val;
 	zbyte bprop_val;
@@ -513,34 +502,33 @@ void z_get_prop(void)
 		prop_addr = next_property(prop_addr);
 	}
 
-	if ((value & mask) == zargs[1]) { 	/* property found */
+	if ((value & mask) == zargs[1]) {   /* property found */
 		/* Load property (byte or word sized) */
 		prop_addr++;
 		if ((z_header.version <= V3 && !(value & 0xe0)) ||
-		    (z_header.version >= V4 && !(value & 0xc0))) {
+		        (z_header.version >= V4 && !(value & 0xc0))) {
 			LOW_BYTE(prop_addr, bprop_val)
 			wprop_val = bprop_val;
 		} else
 			LOW_WORD(prop_addr, wprop_val)
-	} else {	/* property not found */
+		} else {    /* property not found */
 		/* Load default value */
 		prop_addr = z_header.objects + 2 * (zargs[1] - 1);
 		LOW_WORD(prop_addr, wprop_val)
 	}
 	/* Store the property value */
-	store (wprop_val);
+	store(wprop_val);
 } /* z_get_prop */
 
 
 /*
  * z_get_prop_addr, store the address of an object property.
  *
- *	zargs[0] = object
- *	zargs[1] = number of property to be examined
+ *  zargs[0] = object
+ *  zargs[1] = number of property to be examined
  *
  */
-void z_get_prop_addr(void)
-{
+void z_get_prop_addr(void) {
 	zword prop_addr;
 	zbyte value;
 	zbyte mask;
@@ -553,7 +541,7 @@ void z_get_prop_addr(void)
 
 	if (story_id == BEYOND_ZORK) {
 		if (zargs[0] > MAX_OBJECT) {
-			store (0);
+			store(0);
 			return;
 		}
 	}
@@ -576,20 +564,19 @@ void z_get_prop_addr(void)
 	if ((value & mask) == zargs[1]) {
 		if (z_header.version >= V4 && (value & 0x80))
 			prop_addr++;
-		store ((zword) (prop_addr + 1));
+		store((zword)(prop_addr + 1));
 	} else
-		store (0);
+		store(0);
 } /* z_get_prop_addr */
 
 
 /*
  * z_get_prop_len, store the length of an object property.
  *
- * 	zargs[0] = address of property to be examined
+ *  zargs[0] = address of property to be examined
  *
  */
-void z_get_prop_len(void)
-{
+void z_get_prop_len(void) {
 	zword addr;
 	zbyte value;
 
@@ -609,7 +596,7 @@ void z_get_prop_len(void)
 		value = (value >> 6) + 1;
 	else {
 		value &= 0x3f;
-		if (value == 0) value = 64;	/* demanded by Spec 1.0 */
+		if (value == 0) value = 64; /* demanded by Spec 1.0 */
 
 	}
 	/* Store length of property */
@@ -620,11 +607,10 @@ void z_get_prop_len(void)
 /*
  * z_get_sibling, store the sibling of an object.
  *
- *	zargs[0] = object
+ *  zargs[0] = object
  *
  */
-void z_get_sibling(void)
-{
+void z_get_sibling(void) {
 	zword obj_addr;
 
 	if (zargs[0] == 0) {
@@ -664,12 +650,11 @@ void z_get_sibling(void)
 /*
  * z_insert_obj, make an object the first child of another object.
  *
- *	zargs[0] = object to be moved
- *	zargs[1] = destination object
+ *  zargs[0] = object to be moved
+ *  zargs[1] = destination object
  *
  */
-void z_insert_obj(void)
-{
+void z_insert_obj(void) {
 	zword obj1 = zargs[0];
 	zword obj2 = zargs[1];
 	zword obj1_addr;
@@ -730,13 +715,12 @@ void z_insert_obj(void)
 /*
  * z_put_prop, set the value of an object property.
  *
- *	zargs[0] = object
- *	zargs[1] = number of property to set
- *	zargs[2] = value to set property to
+ *  zargs[0] = object
+ *  zargs[1] = number of property to set
+ *  zargs[2] = value to set property to
  *
  */
-void z_put_prop(void)
-{
+void z_put_prop(void) {
 	zword prop_addr;
 	zword value;
 	zbyte mask;
@@ -757,7 +741,7 @@ void z_put_prop(void)
 		LOW_BYTE(prop_addr, value)
 		if ((value & mask) <= zargs[1])
 			break;
-		prop_addr = next_property (prop_addr);
+		prop_addr = next_property(prop_addr);
 	}
 
 	/* Exit if the property does not exist */
@@ -768,7 +752,7 @@ void z_put_prop(void)
 	prop_addr++;
 
 	if ((z_header.version <= V3 && !(value & 0xe0)) ||
-	    (z_header.version >= V4 && !(value & 0xc0))) {
+	        (z_header.version >= V4 && !(value & 0xc0))) {
 		zbyte v = zargs[2];
 		SET_BYTE(prop_addr, v)
 	} else {
@@ -781,11 +765,10 @@ void z_put_prop(void)
 /*
  * z_remove_obj, unlink an object from its parent and siblings.
  *
- *	zargs[0] = object
+ *  zargs[0] = object
  *
  */
-void z_remove_obj (void)
-{
+void z_remove_obj(void) {
 	/* If we are monitoring object movements display a short note */
 	if (f_setup.object_movement) {
 		stream_mssg_on();
@@ -802,14 +785,13 @@ void z_remove_obj (void)
 /*
  * z_set_attr, set an object attribute.
  *
- *	zargs[0] = object
- *	zargs[1] = number of attribute to set
+ *  zargs[0] = object
+ *  zargs[1] = number of attribute to set
  *
  */
-void z_set_attr(void)
-{
-    zword obj_addr;
-    zbyte value;
+void z_set_attr(void) {
+	zword obj_addr;
+	zbyte value;
 
 	if (story_id == SHERLOCK)
 		if (zargs[1] == 48)
@@ -850,12 +832,11 @@ void z_set_attr(void)
 /*
  * z_test_attr, branch if an object attribute is set.
  *
- *	zargs[0] = object
- *	zargs[1] = number of attribute to test
+ *  zargs[0] = object
+ *  zargs[1] = number of attribute to test
  *
  */
-void z_test_attr(void)
-{
+void z_test_attr(void) {
 	zword obj_addr;
 	zbyte value;
 
@@ -884,7 +865,7 @@ void z_test_attr(void)
 	LOW_BYTE(obj_addr, value)
 
 	/* Test attribute */
-	branch (value & (0x80 >> (zargs[1] & 7)));
+	branch(value & (0x80 >> (zargs[1] & 7)));
 
 } /* z_test_attr */
 

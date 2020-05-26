@@ -56,7 +56,8 @@ GameDescriptor ZCodeMetaEngine::findGame(const char *gameId) {
 
 bool ZCodeMetaEngine::detectGames(const Common::FSList &fslist, DetectedGames &gameList) {
 	const char *const EXTENSIONS[] = { ".z1", ".z2", ".z3", ".z4", ".z5", ".z6", ".z7", ".z8",
-		".dat", ".zip", nullptr };
+	                                   ".dat", ".zip", nullptr
+	                                 };
 
 	// Loop through the files of the folder
 	for (Common::FSList::const_iterator file = fslist.begin(); file != fslist.end(); ++file) {
@@ -110,7 +111,7 @@ bool ZCodeMetaEngine::detectGames(const Common::FSList &fslist, DetectedGames &g
 		// first 5Kb, and only worry about filesize for more recent Blorb based Zcode games
 		const FrotzGameDescription *p = FROTZ_GAMES;
 		while (p->_gameId && p->_md5 && (md5 != p->_md5 ||
-				(filesize != p->_filesize && isBlorb)))
+		                                 (filesize != p->_filesize && isBlorb)))
 			++p;
 
 		if (!p->_gameId) {

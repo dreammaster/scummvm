@@ -46,21 +46,20 @@ static zword pushed = 0;
 static int wentry;
 
 static ulong *sbuffer = nullptr;
-static int sbpitch;		/* in longs */
+static int sbpitch;     /* in longs */
 static int ewidth, eheight;
 static int X, Y, W, H, xdlg, ydlg, wdlg, hdlg;
 
 #define HTEXT 18
 
-STATIC void cleanlist(ENTRY * t);
+STATIC void cleanlist(ENTRY *t);
 STATIC void drawlist();
 STATIC ENTRY *dodir(char *dirname, char *pattern, char *resdir, int size,
-		    int *ndirs, int *ntot);
+                    int *ndirs, int *ntot);
 static int Numdirs, Numtot, First;
 static ENTRY *curdir = nullptr, *selected;
 
-STATIC void updatelist()
-{
+STATIC void updatelist() {
 	if (curdir)
 		cleanlist(curdir);
 	curdir =
@@ -73,8 +72,7 @@ STATIC void updatelist()
 STATIC void goright();
 STATIC void goleft();
 /* assumes a / at end */
-STATIC void goup()
-{
+STATIC void goup() {
 	char *p;
 	if (strlen(lastdir) < 2)
 		return;
@@ -88,8 +86,8 @@ STATIC void goup()
 }
 
 typedef struct {
-	int x, y, w, h;		/* internal */
-	 zword(*click) (int, int);
+	int x, y, w, h;     /* internal */
+	zword(*click)(int, int);
 	ulong back;
 	int isbutton;
 } BAREA;
@@ -107,15 +105,14 @@ static SF_textsetting *ts;
 
 #define HCURSOR 8
 
-#define O_BLACK	0
-#define O_GRAY1	0x8a8a8a
-#define O_GRAY2	0xd6d6d6
-#define O_GRAY3	0xe2e2e2
-#define O_WHITE	0xf5f5f5
+#define O_BLACK 0
+#define O_GRAY1 0x8a8a8a
+#define O_GRAY2 0xd6d6d6
+#define O_GRAY3 0xe2e2e2
+#define O_WHITE 0xf5f5f5
 
 
-STATIC void frame_upframe(int x, int y, int w, int h)
-{
+STATIC void frame_upframe(int x, int y, int w, int h) {
 	ulong v = O_WHITE;
 	sf_chline(x, y, v, w);
 	sf_cvline(x, y, v, --h);
@@ -133,8 +130,7 @@ STATIC void frame_upframe(int x, int y, int w, int h)
 }
 
 
-STATIC void frame_downframe(int x, int y, int w, int h)
-{
+STATIC void frame_downframe(int x, int y, int w, int h) {
 	ulong v = O_BLACK;
 	sf_chline(x, y, v, w);
 	sf_cvline(x, y, v, --h);
@@ -152,8 +148,7 @@ STATIC void frame_downframe(int x, int y, int w, int h)
 }
 
 /* internal coords */
-STATIC int addarea(int x, int y, int w, int h, zword(*click) (int, int))
-{
+STATIC int addarea(int x, int y, int w, int h, zword(*click)(int, int)) {
 	BAREA *a = bareas + nbareas;
 	a->x = x;
 	a->y = y;
@@ -165,8 +160,7 @@ STATIC int addarea(int x, int y, int w, int h, zword(*click) (int, int))
 }
 
 
-STATIC void clarea(int n)
-{
+STATIC void clarea(int n) {
 	BAREA *a = bareas + n;
 	sf_fillrect(a->back, a->x, a->y, a->w, a->h);
 }
@@ -176,8 +170,7 @@ STATIC void clarea(int n)
 /* Convert UTF-8 encoded char starting at in[idx] to zchar (UCS-2) if
  * representable in 16 bits or '?' otherwise and return index to next
  * char of input array. */
-STATIC int utf8_to_zchar(zchar * out, const char *in, int idx)
-{
+STATIC int utf8_to_zchar(zchar *out, const char *in, int idx) {
 	zchar ch;
 	int i;
 	if ((in[idx] & 0x80) == 0) {
@@ -205,8 +198,7 @@ error:
 }
 
 
-STATIC size_t utf8_len(const char *str)
-{
+STATIC size_t utf8_len(const char *str) {
 	size_t ret = 0;
 	while (*str) {
 		if ((*str++ & 0xc0) != 0x80)
@@ -214,12 +206,11 @@ STATIC size_t utf8_len(const char *str)
 	}
 	return ret;
 }
-#endif	/* USE_UTF8 */
+#endif  /* USE_UTF8 */
 
 
 STATIC void writetext(ulong color, const char *s, int x, int y, int w,
-		      int center)
-{
+                      int center) {
 	int ox, oy, ow, oh;
 	int wtext, htext;
 	os_font_data(0, &htext, &wtext);
@@ -243,7 +234,7 @@ STATIC void writetext(ulong color, const char *s, int x, int y, int w,
 #ifndef USE_UTF8
 	while (*s)
 		sf_writeglyph(ts->font->
-			      getglyph(ts->font, (unsigned char)(*s++), 1));
+		              getglyph(ts->font, (unsigned char)(*s++), 1));
 #else
 	while (*s) {
 		zchar ch;
@@ -256,8 +247,7 @@ STATIC void writetext(ulong color, const char *s, int x, int y, int w,
 
 
 static int addbutton(int x, int y, int w, int h, const char *text,
-		     zword(*click) (int, int))
-{
+                     zword(*click)(int, int)) {
 	int b = addarea(x, y, w, h, click);
 	bareas[b].isbutton = 1;
 	frame_upframe(x - 2, y - 2, w + 4, h + 4);
@@ -273,8 +263,7 @@ static int A_dir, A_filter, A_entry, A_list;
 #define BUTTW 60
 
 
-STATIC void showfilename(int pos)
-{
+STATIC void showfilename(int pos) {
 	BAREA *a = bareas + A_entry;
 	clarea(A_entry);
 	writetext(0, filename, a->x, a->y, a->w, 0);
@@ -286,8 +275,7 @@ STATIC void showfilename(int pos)
 }
 
 
-STATIC void clicked(BAREA * a)
-{
+STATIC void clicked(BAREA *a) {
 	frame_downframe(a->x - 2, a->y - 2, a->w + 4, a->h + 4);
 	sf_flushdisplay();
 	sf_sleep(100);
@@ -296,8 +284,7 @@ STATIC void clicked(BAREA * a)
 }
 
 
-STATIC zword checkmouse(int i0)
-{
+STATIC zword checkmouse(int i0) {
 	int x = mouse_x - 1, y = mouse_y - 1;
 	int i;
 	for (i = i0; i < nbareas; i++) {
@@ -315,21 +302,18 @@ STATIC zword checkmouse(int i0)
 }
 
 
-STATIC zword Zup(int x, int y)
-{
+STATIC zword Zup(int x, int y) {
 	goup();
 	return 0;
 }
 
 
-STATIC zword Zok(int x, int y)
-{
+STATIC zword Zok(int x, int y) {
 	return ZC_RETURN;
 }
 
 
-STATIC zword Zcanc(int x, int y)
-{
+STATIC zword Zcanc(int x, int y) {
 	return ZC_ESCAPE;
 }
 
@@ -337,8 +321,7 @@ STATIC zword Zselect(int x, int y);
 STATIC zword yesnoover(int xc, int yc);
 STATIC zword Zentry(int x, int y);
 
-STATIC zword inputkey(bool text)
-{
+STATIC zword inputkey(bool text) {
 	zword c = sf_read_key(0, false, true, text);
 	if (c == ZC_SINGLE_CLICK) {
 		switch (mouse_button) {
@@ -359,13 +342,12 @@ STATIC zword inputkey(bool text)
 }
 
 int (*sf_sysdialog)(bool existing, const char *def, const char *filt,
-		    const char *tit, char **res) = nullptr;
+                    const char *tit, char **res) = nullptr;
 
 
 STATIC int myosdialog(bool existing, const char *def, const char *filt,
-		      const char *tit, char **res, ulong * sbuf, int sbp,
-		      int ew, int eh, int isfull)
-{
+                      const char *tit, char **res, ulong *sbuf, int sbp,
+                      int ew, int eh, int isfull) {
 	char *pp;
 	ulong *saved;
 	int y0, y1, y2, x1;
@@ -534,16 +516,14 @@ STATIC int myosdialog(bool existing, const char *def, const char *filt,
 }
 
 
-void sf_setdialog(void)
-{
+void sf_setdialog(void) {
 	sf_osdialog = myosdialog;
 }
 
 /*********************************/
 
 /* simplified fnmatch - only allows a single * at beginning */
-STATIC int myfnmatch(const char *pattern, const char *p, int dummy)
-{
+STATIC int myfnmatch(const char *pattern, const char *p, int dummy) {
 	int lpat, lp;
 	if (!pattern)
 		return -1;
@@ -553,18 +533,17 @@ STATIC int myfnmatch(const char *pattern, const char *p, int dummy)
 		return strcmp(pattern, p);
 	lpat = strlen(pattern);
 	if (lpat == 1)
-		return 0;	/* * matches anything */
+		return 0;   /* * matches anything */
 	lpat--;
 	pattern++;
 	lp = strlen(p);
 	if (lp < lpat)
-		return 1;	/* too short */
+		return 1;   /* too short */
 	return strcmp(pattern, p + lp - lpat);
 }
 
 
-STATIC void cleanlist(ENTRY * t)
-{
+STATIC void cleanlist(ENTRY *t) {
 	while (t) {
 		ENTRY *n = (ENTRY *)t->right;
 		if (t->value)
@@ -575,8 +554,7 @@ STATIC void cleanlist(ENTRY * t)
 }
 
 
-STATIC ENTRY *newentry(char *s)
-{
+STATIC ENTRY *newentry(char *s) {
 	ENTRY *r = (ENTRY *)calloc(1, sizeof(ENTRY));
 
 	if (r) {
@@ -590,8 +568,7 @@ STATIC ENTRY *newentry(char *s)
 }
 
 
-static void addentry(char *s, ENTRY ** ae)
-{
+static void addentry(char *s, ENTRY **ae) {
 	ENTRY *t = *ae;
 	if (!t) {
 		*ae = newentry(s);
@@ -620,8 +597,7 @@ static void addentry(char *s, ENTRY ** ae)
 }
 
 
-STATIC char *resolvedir(char *dir, char *res, int size)
-{
+STATIC char *resolvedir(char *dir, char *res, int size) {
 #ifdef TODO
 	char cwd[FILENAME_MAX], *p;
 	int i;
@@ -649,8 +625,7 @@ STATIC char *resolvedir(char *dir, char *res, int size)
 }
 
 
-static void exhaust(ENTRY * e, ENTRY ** resp, int *n)
-{
+static void exhaust(ENTRY *e, ENTRY **resp, int *n) {
 	if (!e)
 		return;
 	exhaust((ENTRY *)e->left, resp, n);
@@ -662,8 +637,7 @@ static void exhaust(ENTRY * e, ENTRY ** resp, int *n)
 
 
 STATIC ENTRY *dodir(char *dirname, char *pattern, char *resdir, int size,
-		    int *ndirs, int *ntot)
-{
+                    int *ndirs, int *ntot) {
 #ifdef TODO
 	DIR *dir;
 	ENTRY *dirs = nullptr;
@@ -720,7 +694,7 @@ STATIC ENTRY *dodir(char *dirname, char *pattern, char *resdir, int size,
 
 	if (res)
 		while (res->left) {
-			((ENTRY *) (res->left))->right = res;
+			((ENTRY *)(res->left))->right = res;
 			res = res->left;
 		}
 
@@ -735,8 +709,7 @@ STATIC ENTRY *dodir(char *dirname, char *pattern, char *resdir, int size,
 /* Convert character count into index in UTF-8 encoded string.
  * Works by skipping over continuation bytes.
  */
-STATIC int utf8_char_pos(char *s, int pos)
-{
+STATIC int utf8_char_pos(char *s, int pos) {
 	int cpos;
 	int idx = 0;
 	for (cpos = 0; s[cpos] && idx < pos; cpos++) {
@@ -825,8 +798,7 @@ static unsigned char docbmp[] = {
 
 /******************************/
 
-STATIC void drawit(int x, int y, ENTRY * e, int w, int issub)
-{
+STATIC void drawit(int x, int y, ENTRY *e, int w, int issub) {
 	int i, j, n, color;
 	unsigned char *bmp;
 	char *s = e->value;
@@ -838,7 +810,7 @@ STATIC void drawit(int x, int y, ENTRY * e, int w, int issub)
 	for (i = 0; i < 16; i++) {
 		for (j = 0; j < 16; j++) {
 			sf_wpixel(x + j, y + i + height / 2 - 8,
-				  bcolors[*bmp++]);
+			          bcolors[*bmp++]);
 		}
 	}
 	x += 17;
@@ -873,9 +845,8 @@ STATIC void drawit(int x, int y, ENTRY * e, int w, int issub)
 
 static int Nrows, Ncols, Ewid, Fh;
 
-STATIC void drawnames(int x, int y, int w, int h, ENTRY * files, int first,
-		      int nsub, int ntot, int ewid)
-{
+STATIC void drawnames(int x, int y, int w, int h, ENTRY *files, int first,
+                      int nsub, int ntot, int ewid) {
 	int i;
 
 #ifdef USE_UTF8
@@ -921,20 +892,18 @@ STATIC void drawnames(int x, int y, int w, int h, ENTRY * files, int first,
 }
 
 
-STATIC void drawlist()
-{
+STATIC void drawlist() {
 	BAREA *a = bareas + A_list, *b = bareas + A_dir;
 
 	clarea(A_dir);
 	writetext(0, lastdir, b->x, b->y, b->w, 0);
 	drawnames(a->x, a->y, a->w, a->h, curdir, First, Numdirs, Numtot,
-		21 * 8);
+	          21 * 8);
 
 }
 
 
-STATIC void goright()
-{
+STATIC void goright() {
 	if (First + Nrows * Ncols > Numtot)
 		return;
 	First += Nrows;
@@ -942,8 +911,7 @@ STATIC void goright()
 }
 
 
-STATIC void goleft()
-{
+STATIC void goleft() {
 	if (!First)
 		return;
 	First -= Nrows;
@@ -951,8 +919,7 @@ STATIC void goleft()
 }
 
 
-STATIC ENTRY *filesat(int n)
-{
+STATIC ENTRY *filesat(int n) {
 	ENTRY *e = curdir;
 	while (n--) {
 		if (e)
@@ -962,8 +929,7 @@ STATIC ENTRY *filesat(int n)
 }
 
 
-STATIC zword Zselect(int x, int y)
-{
+STATIC zword Zselect(int x, int y) {
 	int n;
 	x /= Ewid;
 	y /= Fh;
@@ -993,9 +959,8 @@ STATIC zword Zselect(int x, int y)
 }
 
 
-extern void sf_videodata(ulong ** sb, int *sp, int *ew, int *eh);
-zword sf_yesnooverlay(int xc, int yc, const char *t, int saverest)
-{
+extern void sf_videodata(ulong **sb, int *sp, int *ew, int *eh);
+zword sf_yesnooverlay(int xc, int yc, const char *t, int saverest) {
 	zword c = ZC_RETURN;
 	int nsav = nbareas;
 	ulong *saved = nullptr;
@@ -1010,7 +975,7 @@ zword sf_yesnooverlay(int xc, int yc, const char *t, int saverest)
 			return ZC_ESCAPE;
 		saved =
 		    sf_savearea(xc - hx - 2, yc - hy - 2, 2 * hx + 4,
-				2 * hy + 4);
+		                2 * hy + 4);
 		if (!saved)
 			return ZC_ESCAPE;
 		sf_pushtextsettings();
@@ -1023,7 +988,7 @@ zword sf_yesnooverlay(int xc, int yc, const char *t, int saverest)
 	}
 
 	sf_fillrect(FRAMECOLOR, xc - hx - 2, yc - hy - 2, 2 * hx + 4,
-		    2 * hy + 4);
+	            2 * hy + 4);
 	sf_fillrect(O_WHITE, xc - hx, yc - hy, 2 * hx, 2 * hy);
 	writetext(O_BLACK, t, xc - hx, yc - SPC - HTEXT, 2 * hx, 1);
 	addbutton(xc - SPC - BUTTW, yc + SPC, BUTTW, HTEXT, "Yes", Zok);
@@ -1052,8 +1017,7 @@ zword sf_yesnooverlay(int xc, int yc, const char *t, int saverest)
 }
 
 
-STATIC zword yesnoover(int xc, int yc)
-{
+STATIC zword yesnoover(int xc, int yc) {
 	zword c;
 
 	c = sf_yesnooverlay(xc, yc, "Overwrite file?", 0);
@@ -1066,14 +1030,12 @@ STATIC zword yesnoover(int xc, int yc)
 /* this is needed for overlapping source and dest in Zentry
  * (lib does not guarantee correct behaviour in that case)
  */
-static void mystrcpy(char *d, const char *s)
-{
+static void mystrcpy(char *d, const char *s) {
 	while ((*d++ = *s++)) ;
 }
 
 
-STATIC zword Zentry(int x, int y)
-{
+STATIC zword Zentry(int x, int y) {
 	static int pos = 10000;
 	int i, n, nmax;
 	zword c;
@@ -1143,15 +1105,15 @@ STATIC zword Zentry(int x, int y)
 #else
 				cpos = utf8_char_pos(filename, pos);
 				while (cpos > clen
-				       && (filename[cpos - clen] & 0xc0) ==
-				       0x80)
+				        && (filename[cpos - clen] & 0xc0) ==
+				        0x80)
 					clen++;
 #endif
 				/* needs mystrcpy() because
 				 * overlapping src-dst */
 				if (cpos < n)
 					mystrcpy(filename + cpos - clen,
-						 filename + cpos);
+					         filename + cpos);
 				n -= clen;
 				nchars--;
 				filename[n] = 0;

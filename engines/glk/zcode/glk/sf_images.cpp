@@ -30,28 +30,26 @@ static byte toLinear[256];
 static byte fromLinear[256];
 extern bool m_adaptiveMode;
 
-ulong sf_blend(int a, ulong s, ulong d)
-{
+ulong sf_blend(int a, ulong s, ulong d) {
 	ulong r;
 	r = fromLinear[(toLinear[s & 0xff] * a +
-			toLinear[d & 0xff] * (256 - a)) >> 8];
+	                toLinear[d & 0xff] * (256 - a)) >> 8];
 	s >>= 8;
 	d >>= 8;
 	r |= (fromLinear
 	      [(toLinear[s & 0xff] * a +
-		toLinear[d & 0xff] * (256 - a)) >> 8]) << 8;
+	        toLinear[d & 0xff] * (256 - a)) >> 8]) << 8;
 	s >>= 8;
 	d >>= 8;
 	r |= (fromLinear
 	      [(toLinear[s & 0xff] * a +
-		toLinear[d & 0xff] * (256 - a)) >> 8]) << 16;
+	        toLinear[d & 0xff] * (256 - a)) >> 8]) << 16;
 	return r;
 }
 
 
 /* Set the screen gamma and build gamma correction tables */
-void sf_setgamma(double gamma)
-{
+void sf_setgamma(double gamma) {
 	int i;
 
 	m_gamma = gamma;
@@ -85,8 +83,7 @@ static void readPNGData(png_structp png_ptr, png_bytep data, png_size_t length) 
 #endif
 
 
-static int loadpng(byte * data, int length, sf_picture * graphic)
-{
+static int loadpng(byte *data, int length, sf_picture *graphic) {
 #ifdef TODO
 	png_bytep *rowPointers = nullptr;
 	png_structp png_ptr = nullptr;
@@ -104,14 +101,14 @@ static int loadpng(byte * data, int length, sf_picture * graphic)
 		return 0;
 
 	png_ptr = png_create_read_struct
-	    (PNG_LIBPNG_VER_STRING, (png_voidp) nullptr, nullptr, nullptr);
+	          (PNG_LIBPNG_VER_STRING, (png_voidp) nullptr, nullptr, nullptr);
 	if (!png_ptr)
 		return 0;
 
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr) {
 		png_destroy_read_struct(&png_ptr,
-					(png_infopp) nullptr, (png_infopp) nullptr);
+		                        (png_infopp) nullptr, (png_infopp) nullptr);
 		return 0;
 	}
 
@@ -141,7 +138,7 @@ static int loadpng(byte * data, int length, sf_picture * graphic)
 
 	width = png_get_image_width(png_ptr, info_ptr);
 	height = png_get_image_height(png_ptr, info_ptr);
-        bit_depth = png_get_bit_depth(png_ptr,info_ptr);
+	bit_depth = png_get_bit_depth(png_ptr, info_ptr);
 	color_type = png_get_color_type(png_ptr, info_ptr);
 
 	graphic->width = width;
@@ -163,8 +160,8 @@ static int loadpng(byte * data, int length, sf_picture * graphic)
 		png_color_16p trans_values;
 
 		if (png_get_tRNS
-		    (png_ptr, info_ptr, &trans, &num_trans, &trans_values)
-		    && num_trans >= 1)
+		        (png_ptr, info_ptr, &trans, &num_trans, &trans_values)
+		        && num_trans >= 1)
 			graphic->transparentcolor = trans[0];
 
 		size = width * height;
@@ -185,9 +182,9 @@ static int loadpng(byte * data, int length, sf_picture * graphic)
 			for (int i = 0; i < num_palette; i++) {
 				ulong color =
 				    palette[i].red | (palette[i].
-						      green << 8) | (palette[i].
-								     blue <<
-								     16);
+				                      green << 8) | (palette[i].
+				                                     blue <<
+				                                     16);
 				graphic->palette[i] = color;
 			}
 		}
@@ -198,7 +195,7 @@ static int loadpng(byte * data, int length, sf_picture * graphic)
 			png_set_palette_to_rgb(png_ptr);
 		if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
 			png_set_expand_gray_1_2_4_to_8(png_ptr);
-		if (png_get_valid(png_ptr,info_ptr,PNG_INFO_tRNS))
+		if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
 			png_set_tRNS_to_alpha(png_ptr);
 
 		if (bit_depth == 16)
@@ -208,8 +205,8 @@ static int loadpng(byte * data, int length, sf_picture * graphic)
 		if (color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
 			png_set_gray_to_rgb(png_ptr);
 
-		png_set_filler(png_ptr,0xff,PNG_FILLER_AFTER);
-		size = width*height*4;
+		png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
+		size = width * height * 4;
 		graphic->pixels = (byte *) malloc(size);
 		rowPointers = malloc(sizeof(png_bytep) * height);
 		for (int i = 0; i < (int)height; i++)
@@ -241,36 +238,31 @@ struct JPEGErrorInfo {
 };
 
 
-static void errorJPEGExit(j_common_ptr cinfo)
-{
+static void errorJPEGExit(j_common_ptr cinfo) {
 	struct JPEGErrorInfo *error = (struct JPEGErrorInfo *)cinfo->err;
-	(*cinfo->err->output_message) (cinfo);
+	(*cinfo->err->output_message)(cinfo);
 	longjmp(error->errorJump, 1);
 }
 
 
-static void outputJPEGMessage(j_common_ptr cinfo)
-{
+static void outputJPEGMessage(j_common_ptr cinfo) {
 	char buffer[JMSG_LENGTH_MAX];
-	(*cinfo->err->format_message) (cinfo, buffer);
+	(*cinfo->err->format_message)(cinfo, buffer);
 }
 
 
 /* Memory Data Source */
-static void memJPEGInit(j_decompress_ptr unused)
-{
+static void memJPEGInit(j_decompress_ptr unused) {
 	/* Nothing here */
 }
 
 
-static int memJPEGFillInput(j_decompress_ptr unused)
-{
+static int memJPEGFillInput(j_decompress_ptr unused) {
 	return 0;
 }
 
 
-static void memJPEGSkipInput(j_decompress_ptr cinfo, long num_bytes)
-{
+static void memJPEGSkipInput(j_decompress_ptr cinfo, long num_bytes) {
 	if (num_bytes > 0) {
 		if (num_bytes > (long)cinfo->src->bytes_in_buffer)
 			num_bytes = (long)cinfo->src->bytes_in_buffer;
@@ -281,14 +273,13 @@ static void memJPEGSkipInput(j_decompress_ptr cinfo, long num_bytes)
 }
 
 
-static void memJPEGTerm(j_decompress_ptr unused)
-{
+static void memJPEGTerm(j_decompress_ptr unused) {
 	/* Nothing here */
 }
 
 #endif
 
-static int loadjpeg(byte * data, int length, sf_picture * graphic) {
+static int loadjpeg(byte *data, int length, sf_picture *graphic) {
 #ifdef TODO
 	struct jpeg_decompress_struct info;
 	struct JPEGErrorInfo error;
@@ -313,8 +304,8 @@ static int loadjpeg(byte * data, int length, sf_picture * graphic) {
 	jpeg_create_decompress(&info);
 
 	info.src = (struct jpeg_source_mgr *)(info.mem->alloc_small)
-	    ((j_common_ptr) (&info), JPOOL_PERMANENT,
-	     sizeof(struct jpeg_source_mgr));
+	           ((j_common_ptr)(&info), JPOOL_PERMANENT,
+	            sizeof(struct jpeg_source_mgr));
 	info.src->init_source = memJPEGInit;
 	info.src->fill_input_buffer = memJPEGFillInput;
 	info.src->skip_input_data = memJPEGSkipInput;
@@ -338,7 +329,7 @@ static int loadjpeg(byte * data, int length, sf_picture * graphic) {
 
 	/* Get an output buffer */
 	buffer = (*info.mem->alloc_sarray)
-	    ((j_common_ptr) & info, JPOOL_IMAGE, width * 3, 1);
+	         ((j_common_ptr) & info, JPOOL_IMAGE, width * 3, 1);
 
 	jpeg_start_decompress(&info);
 	while ((int)info.output_scanline < height) {
@@ -347,7 +338,7 @@ static int loadjpeg(byte * data, int length, sf_picture * graphic) {
 		jpeg_read_scanlines(&info, buffer, 1);
 
 		pixelRow = graphic->pixels +
-		    (width * (info.output_scanline - 1) * 4);
+		           (width * (info.output_scanline - 1) * 4);
 		for (i = 0; i < width; i++) {
 			pixelRow[(i * 4) + 0] = (*buffer)[(i * 3) + 0];
 			pixelRow[(i * 4) + 1] = (*buffer)[(i * 3) + 1];
@@ -369,8 +360,7 @@ static int loadjpeg(byte * data, int length, sf_picture * graphic) {
  ****************************************************************************
  */
 
-static int loadrect(byte * data, int length, sf_picture * graphic)
-{
+static int loadrect(byte *data, int length, sf_picture *graphic) {
 	graphic->width =
 	    (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
 	graphic->height =
@@ -382,8 +372,7 @@ static int loadrect(byte * data, int length, sf_picture * graphic)
 /*****************************/
 
 /* Get a picture from the Blorb resource map */
-static int sf_loadpic(int picture, sf_picture * graphic)
-{
+static int sf_loadpic(int picture, sf_picture *graphic) {
 	myresource res;
 	int st = 0;
 
@@ -423,8 +412,7 @@ static int sf_loadpic(int picture, sf_picture * graphic)
 static sf_picture cached[MAXCACHE];
 static int cacheinited = 0;
 
-static void cacheflush()
-{
+static void cacheflush() {
 	int i;
 	if (!cacheinited)
 		return;
@@ -438,8 +426,7 @@ static void cacheflush()
 }
 
 
-static void cacheinit()
-{
+static void cacheinit() {
 	int i;
 	if (cacheinited)
 		return;
@@ -452,8 +439,7 @@ static void cacheinit()
 }
 
 
-static sf_picture *cachefind(int n)
-{
+static sf_picture *cachefind(int n) {
 	int i;
 	for (i = 0; i < MAXCACHE; i++)
 		if (cached[i].number == n)
@@ -469,8 +455,7 @@ static sf_picture *cachefind(int n)
 }
 
 
-sf_picture *sf_getpic(int num)
-{
+sf_picture *sf_getpic(int num) {
 	sf_picture *res;
 	cacheinit();
 	res = cachefind(num);

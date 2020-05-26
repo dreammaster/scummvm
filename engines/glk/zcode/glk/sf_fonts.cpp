@@ -34,7 +34,7 @@ typedef struct {
 	int refcount;
 	word minchar, maxchar, defchar;
 	byte ascent, descent;
-	int glyphs[1];		/* offsets to glyphs from start of rec */
+	int glyphs[1];      /* offsets to glyphs from start of rec */
 } SF_bdffont;
 
 char *m_fontfiles[9];
@@ -43,8 +43,7 @@ extern z_header_t z_header;
 
 static char s[1026];
 
-static char *starts(char *s, const char *id)
-{
+static char *starts(char *s, const char *id) {
 	int len = strlen(id);
 	while (*s == ' ')
 		s++;
@@ -54,8 +53,7 @@ static char *starts(char *s, const char *id)
 }
 
 
-static int hexd(char c)
-{
+static int hexd(char c) {
 	if (c >= '0' && c <= '9')
 		return c - '0';
 	if (c >= 'A' && c <= 'F')
@@ -66,8 +64,7 @@ static int hexd(char c)
 }
 
 
-static void gethex(char *p, byte * dst, int n)
-{
+static void gethex(char *p, byte *dst, int n) {
 	while (n--) {
 		*dst++ = 16 * hexd(p[0]) + hexd(p[1]);
 		p += 2;
@@ -77,8 +74,7 @@ static void gethex(char *p, byte * dst, int n)
 
 #define ERRET(n) { *err = n; return font;}
 
-static SF_bdffont *sBDXload(FILE * f, int *err, int *size, int MAXCHAR)
-{
+static SF_bdffont *sBDXload(FILE *f, int *err, int *size, int MAXCHAR) {
 	int totb, i, k = 0, wh[4];
 	byte *po, *pbeg;
 	char *p, *q;
@@ -98,7 +94,7 @@ static SF_bdffont *sBDXload(FILE * f, int *err, int *size, int MAXCHAR)
 	for (;;) {
 		fgets(s, 1024, f);
 		if (feof(f))
-			ERRET(-1)	/* errorexit(99,"unexpected EOF\n"); */
+			ERRET(-1)   /* errorexit(99,"unexpected EOF\n"); */
 			if ((p = starts(s, "FONT "))) {
 				while (*p == ' ')
 					p++;
@@ -117,7 +113,7 @@ static SF_bdffont *sBDXload(FILE * f, int *err, int *size, int MAXCHAR)
 	for (i = 0; i < nprop; i++) {
 		fgets(s, 1024, f);
 		if (feof(f))
-			ERRET(-51)	/* errorexit(99,"unexpected EOF\n"); */
+			ERRET(-51)  /* errorexit(99,"unexpected EOF\n"); */
 			if ((p = starts(s, "COPYRIGHT "))) {
 				while (*p == ' ')
 					p++;
@@ -138,7 +134,7 @@ static SF_bdffont *sBDXload(FILE * f, int *err, int *size, int MAXCHAR)
 	for (;;) {
 		fgets(s, 1024, f);
 		if (feof(f))
-			ERRET(-61)	/* errorexit(99,"unexpected EOF\n"); */
+			ERRET(-61)  /* errorexit(99,"unexpected EOF\n"); */
 			if ((p = starts(s, "CHARS "))) {
 				nchars = atoi(p);
 				break;
@@ -154,7 +150,7 @@ static SF_bdffont *sBDXload(FILE * f, int *err, int *size, int MAXCHAR)
 	for (i = 0; i < nchars;) {
 		fgets(s, 1024, f);
 		if (feof(f))
-			ERRET(-71)	/* errorexit(99,"unexpected EOF\n"); */
+			ERRET(-71)  /* errorexit(99,"unexpected EOF\n"); */
 			if ((p = starts(s, "ENCODING "))) {
 				k = atoi(p);
 				k &= 0xffff;
@@ -194,13 +190,13 @@ static SF_bdffont *sBDXload(FILE * f, int *err, int *size, int MAXCHAR)
 	font = (SF_bdffont *)calloc(1, totb);
 	if (!font)
 		ERRET(-3)
-	font->minchar = minch;
+		font->minchar = minch;
 	font->maxchar = maxch;
 	font->defchar = defchar;
 	font->ascent = ascent;
 	font->descent = descent;
 	pbeg = (byte *) font;
-	po = (byte *) (&(font->glyphs[maxch - minch + 1]));
+	po = (byte *)(&(font->glyphs[maxch - minch + 1]));
 	k = strlen(fontname) + 1;
 	memmove(po, fontname, k);
 	po += k;
@@ -240,13 +236,13 @@ static SF_bdffont *sBDXload(FILE * f, int *err, int *size, int MAXCHAR)
 			if ((p = starts(s, "DWIDTH "))) {
 				if (!hasenc)
 					ERRET(-11)
-					    dwid = atoi(p);
+					dwid = atoi(p);
 			}
 			if ((p = starts(s, "BBX "))) {
 				if (!hasenc)
 					ERRET(-12)
-					    sscanf(p, "%d %d %d %d", wh, wh + 1,
-						   wh + 2, wh + 3);
+					sscanf(p, "%d %d %d %d", wh, wh + 1,
+					       wh + 2, wh + 3);
 				hasbbx = 1;
 			}
 			if (starts(s, "BITMAP"))
@@ -254,19 +250,19 @@ static SF_bdffont *sBDXload(FILE * f, int *err, int *size, int MAXCHAR)
 		}
 		if (!hasenc || !hasbbx)
 			ERRET(-13)
-			    if (i <= MAXCHAR) {
+			if (i <= MAXCHAR) {
 				bg->dx = dwid;
 				bg->w = wh[0];
 				w = (wh[0] + 7) / 8;
 				bg->h = h = wh[1];
 				bg->xof = wh[2];
 				bg->yof = wh[3];
-				po = (byte *) (&(bg->bitmap[0]));
+				po = (byte *)(&(bg->bitmap[0]));
 				for (j = 0; j < h; j++) {
 					fgets(s, 1024, f);
 					if (feof(f))
 						ERRET(-91)
-						    gethex(s, po, w);
+						gethex(s, po, w);
 					po += w;
 				}
 			}
@@ -278,8 +274,7 @@ static SF_bdffont *sBDXload(FILE * f, int *err, int *size, int MAXCHAR)
 
 
 /* destructor for fonts with all dynamic data */
-static void bdestroy(SFONT * s)
-{
+static void bdestroy(SFONT *s) {
 	if (s) {
 		if (s->data)
 			free(s->data);
@@ -288,8 +283,7 @@ static void bdestroy(SFONT * s)
 }
 
 
-static int bheight(SFONT * s)
-{
+static int bheight(SFONT *s) {
 	if (s) {
 		if (s->data) {
 			SF_bdffont *f = (SF_bdffont *)s->data;
@@ -300,46 +294,41 @@ static int bheight(SFONT * s)
 }
 
 
-static int bascent(SFONT * s)
-{
+static int bascent(SFONT *s) {
 	if (s) {
 		if (s->data)
-			return (int)((SF_bdffont *) (s->data))->ascent;
+			return (int)((SF_bdffont *)(s->data))->ascent;
 	}
 	return 0;
 }
 
 
-static int bdescent(SFONT * s)
-{
+static int bdescent(SFONT *s) {
 	if (s) {
 		if (s->data)
-			return (int)((SF_bdffont *) (s->data))->descent;
+			return (int)((SF_bdffont *)(s->data))->descent;
 	}
 	return 0;
 }
 
 
-static int bminchar(SFONT * s)
-{
+static int bminchar(SFONT *s) {
 	if (s) {
 		if (s->data)
-			return (int)((SF_bdffont *) (s->data))->minchar;
+			return (int)((SF_bdffont *)(s->data))->minchar;
 	}
 	return 0;
 }
 
-static int bmaxchar(SFONT * s)
-{
+static int bmaxchar(SFONT *s) {
 	if (s) {
 		if (s->data)
-			return (int)((SF_bdffont *) (s->data))->maxchar;
+			return (int)((SF_bdffont *)(s->data))->maxchar;
 	}
 	return 0;
 }
 
-static SF_glyph *getglyph(SFONT * fo, word c, int allowdef)
-{
+static SF_glyph *getglyph(SFONT *fo, word c, int allowdef) {
 	int m;
 	SF_bdffont *b;
 	if (!fo)
@@ -360,18 +349,16 @@ static SF_glyph *getglyph(SFONT * fo, word c, int allowdef)
 		else
 			return nullptr;
 	}
-	return (SF_glyph *) (((byte *) b) + m);
+	return (SF_glyph *)(((byte *) b) + m);
 }
 
 
-static int hasglyph(SFONT * fo, word c, int allowdef)
-{
+static int hasglyph(SFONT *fo, word c, int allowdef) {
 	return (getglyph(fo, c, allowdef) != nullptr);
 }
 
 
-static SFONT *makefont(SF_bdffont * b)
-{
+static SFONT *makefont(SF_bdffont *b) {
 	SFONT *res;
 	if (!b)
 		return nullptr;
@@ -393,8 +380,7 @@ static SFONT *makefont(SF_bdffont * b)
 }
 
 
-static SFONT *loadfont(char *fname, int *err, int *size)
-{
+static SFONT *loadfont(char *fname, int *err, int *size) {
 	SF_bdffont *font;
 	SFONT *res;
 	FILE *f;
@@ -446,10 +432,9 @@ static SFONT *loadfont(char *fname, int *err, int *size)
 #define NUMFONTS 9
 
 static SFONT *myfonts[9] =
-	{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
-static int styleidx(int zfont, int style)
-{
+static int styleidx(int zfont, int style) {
 	int k = 0;
 	if (zfont == GRAPHICS_FONT)
 		return 8;
@@ -474,8 +459,7 @@ static SF_textsetting tsstack[MAXSTACK];
 static int tsstackptr = 0;
 
 /* does not increase the refcount of f - user must do that */
-static void setfontk(int k, SFONT * f)
-{
+static void setfontk(int k, SFONT *f) {
 	if (myfonts[k]) {
 		myfonts[k]->refcount--;
 		if (myfonts[k]->refcount == 0)
@@ -485,24 +469,21 @@ static void setfontk(int k, SFONT * f)
 }
 
 
-static void cleanfonts()
-{
+static void cleanfonts() {
 	int i;
 	for (i = 0; i < 8; i++)
 		setfontk(i, nullptr);
-/*  for (i=0;i<8;i++)
-	if (m_fontfiles[i]){ free(m_fontfiles[i]); m_fontfiles[i] = nullptr;}*/
+	/*  for (i=0;i<8;i++)
+	    if (m_fontfiles[i]){ free(m_fontfiles[i]); m_fontfiles[i] = nullptr;}*/
 }
 
 
-SF_textsetting *sf_curtextsetting()
-{
+SF_textsetting *sf_curtextsetting() {
 	return &current;
 }
 
 
-void sf_pushtextsettings()
-{
+void sf_pushtextsettings() {
 	if (tsstackptr < MAXSTACK) {
 		tsstack[tsstackptr] = current;
 		tsstackptr++;
@@ -510,8 +491,7 @@ void sf_pushtextsettings()
 }
 
 
-void sf_poptextsettings()
-{
+void sf_poptextsettings() {
 	if (tsstackptr) {
 		tsstackptr--;
 		current = tsstack[tsstackptr];
@@ -527,14 +507,12 @@ void sf_poptextsettings()
  *
  *
  */
-int os_check_unicode(int font, zchar c)
-{
+int os_check_unicode(int font, zchar c) {
 	return ((current.font->hasglyph(current.font, c, 0) != 0) ? 3 : 2);
 }
 
 
-int sf_charwidth(zword c, int *oh)
-{
+int sf_charwidth(zword c, int *oh) {
 	SF_glyph *g;
 	int ww = 0;
 	if (c == ZC_INDENT)
@@ -559,16 +537,14 @@ int sf_charwidth(zword c, int *oh)
  * Return the length of the character in screen units.
  *
  */
-int os_char_width(zchar c)
-{
+int os_char_width(zchar c) {
 	int w, oh;
 	w = sf_charwidth(c, &oh);
 	return (w + oh);
 }
 
 
-static void setfont(int zfont)
-{
+static void setfont(int zfont) {
 	int k = styleidx(zfont, current.style);
 	current.font = myfonts[k];
 	current.zfontnum = zfont;
@@ -576,8 +552,7 @@ static void setfont(int zfont)
 }
 
 
-static void setstyle(int style)
-{
+static void setstyle(int style) {
 	current.style = style;
 	setfont(current.zfontnum);
 }
@@ -600,8 +575,7 @@ static void setstyle(int style)
  * Font can also be 0 to query the size of the current font in the current
  * style.  Not all front end support this.  Those that do return true.
  */
-int os_font_data(int font, int *height, int *width)
-{
+int os_font_data(int font, int *height, int *width) {
 	switch (font) {
 	case TEXT_FONT:
 	case FIXED_WIDTH_FONT:
@@ -610,12 +584,12 @@ int os_font_data(int font, int *height, int *width)
 		setfont(font);
 		setstyle(0);
 		*height = current.font->height(current.font);
-		*width = os_char_width((zword) ('0'));
+		*width = os_char_width((zword)('0'));
 		sf_poptextsettings();
 		return 1;
 	case 0:
 		*height = current.font->height(current.font);
-		*width = os_char_width((zword) ('0'));
+		*width = os_char_width((zword)('0'));
 		return 1;
 	default:
 		return 0;
@@ -630,8 +604,7 @@ int os_font_data(int font, int *height, int *width)
  * choose fonts which aren't supported by the interface.
  *
  */
-void os_set_font(int new_font)
-{
+void os_set_font(int new_font) {
 	sf_flushtext();
 	setfont(new_font);
 }
@@ -648,8 +621,7 @@ void os_set_font(int new_font)
  *     FIXED_WIDTH_STYLE
  *
  */
-void os_set_text_style(int new_style)
-{
+void os_set_text_style(int new_style) {
 	sf_flushtext();
 	setstyle(new_style);
 }
@@ -665,8 +637,7 @@ void os_set_text_style(int new_style)
  *    ZC_NEW_FONT  - next character is a new font
  *
  */
-int os_string_width(const zchar * s)
-{
+int os_string_width(const zchar *s) {
 	int width = 0, wacc = 0, oh = 0;
 	zword c;
 
@@ -695,8 +666,7 @@ int os_string_width(const zchar * s)
  * Pass a string of characters to os_display_char.
  *
  */
-void os_display_string(const zchar * s)
-{
+void os_display_string(const zchar *s) {
 	zword c;
 	while ((c = *s++) != 0) {
 		if (c == ZC_NEW_FONT)
@@ -720,8 +690,7 @@ void os_display_string(const zchar * s)
  * be scrolled after printing to the bottom right corner.
  *
  */
-void os_display_char(zchar c)
-{
+void os_display_char(zchar c) {
 	if (c == ZC_INDENT) {
 		os_display_char(' ');
 		os_display_char(' ');
@@ -751,8 +720,7 @@ void os_display_char(zchar c)
  *    -1 - redraw the screen, do not change the mode
  *
  */
-int os_buffer_screen(int mode)
-{
+int os_buffer_screen(int mode) {
 	if (mode == -1)
 		sf_flushdisplay();
 	return 0;
@@ -765,8 +733,7 @@ int os_buffer_screen(int mode)
  * Return non-zero if the window should have text wrapped.
  *
  */
-int os_wrap_window(int win)
-{
+int os_wrap_window(int win) {
 	return 1;
 }
 
@@ -777,8 +744,7 @@ int os_wrap_window(int win)
  * Called when the height of a window is changed.
  *
  */
-void os_window_height(int win, int height)
-{
+void os_window_height(int win, int height) {
 }
 
 
@@ -788,8 +754,7 @@ void os_window_height(int win, int height)
  * Place the text cursor at the given coordinates. Top left is (1,1).
  *
  */
-void os_set_cursor(int row, int col)
-{
+void os_set_cursor(int row, int col) {
 	sf_flushtext();
 	current.cx = col - 1;
 	current.cy = row - 1;
@@ -800,20 +765,18 @@ extern SF_bdffont *SF_defaultfont;
 extern int SF_defaultfontsize;
 #endif
 
-static void destroySFonly(SFONT * f)
-{
+static void destroySFonly(SFONT *f) {
 	if (f)
 		free(f);
 }
 
 extern SFONT *SF_font3, *SF_font3double;
 
-SFONT *(*ttfontloader)(char *fspec, SFONT * like, int *err) = nullptr;
+SFONT *(*ttfontloader)(char *fspec, SFONT *like, int *err) = nullptr;
 void (*ttfontsdone)() = nullptr;
 
 
-static SFONT *tryloadfont(char *fspec, SFONT * like)
-{
+static SFONT *tryloadfont(char *fspec, SFONT *like) {
 	char buf[FILENAME_MAX];
 	int err, size = DEFSIZE;
 	char *fn = nullptr;
@@ -854,8 +817,7 @@ SFONT *sf_VGA_SFONT;
 
 
 /* ensure a font loaded */
-void sf_initfonts()
-{
+void sf_initfonts() {
 #ifdef TODO
 	int i, j, size = 0;
 	byte *cfont, *bmp;
@@ -886,8 +848,8 @@ void sf_initfonts()
 		int m = norm->glyphs[i - norm->minchar];
 		if (!m)
 			continue;
-		g = (SF_glyph *) (cfont + m);
-		bmp = (byte *) (&(g->bitmap[0]));
+		g = (SF_glyph *)(cfont + m);
+		bmp = (byte *)(&(g->bitmap[0]));
 		bmp[g->h - 2] = 0xff;
 	}
 	/* make a copy for bold */
@@ -904,9 +866,9 @@ void sf_initfonts()
 		int h, m = norm->glyphs[i - norm->minchar];
 		if (!m)
 			continue;
-		g = (SF_glyph *) (cfont + m);
+		g = (SF_glyph *)(cfont + m);
 		h = g->h;
-		bmp = (byte *) (&(g->bitmap[0]));
+		bmp = (byte *)(&(g->bitmap[0]));
 		for (j = 0; j < h; j++) {
 			int c = bmp[j];
 			bmp[j] = (c) | (c >> 1);
@@ -926,8 +888,8 @@ void sf_initfonts()
 		int m = norm->glyphs[i - norm->minchar];
 		if (!m)
 			continue;
-		g = (SF_glyph *) (cfont + m);
-		bmp = (byte *) (&(g->bitmap[0]));
+		g = (SF_glyph *)(cfont + m);
+		bmp = (byte *)(&(g->bitmap[0]));
 		bmp[g->h - 2] = 0xff;
 	}
 
@@ -946,11 +908,11 @@ void sf_initfonts()
 		for (i = 0; i <= 8; i++)
 			if (m_fontfiles[i]) {
 				SFONT *b = tryloadfont(m_fontfiles[i],
-					i == 8 ? myfonts[FIXED_WIDTH_FONT]
-						: nullptr);
+				                       i == 8 ? myfonts[FIXED_WIDTH_FONT]
+				                       : nullptr);
 				if (!b)
 					warning("could not load font%d [%s%c%s]\n",
-						i, m_fontdir, PATH_SEPARATOR, m_fontfiles[i]);
+					        i, m_fontdir, PATH_SEPARATOR, m_fontfiles[i]);
 				else {
 					setfontk(i, b);
 					b->refcount = 1;
@@ -971,8 +933,7 @@ void sf_initfonts()
 }
 
 
-char *sf_searchfile(char *fn, int fnlen, char *buf, const char *paths)
-{
+char *sf_searchfile(char *fn, int fnlen, char *buf, const char *paths) {
 	char emptyString = '\0';
 	char *p;
 	if (!fn)

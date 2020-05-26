@@ -28,9 +28,9 @@
 
 #ifdef MSDOS_16BIT
 
-#define malloc(size)	farmalloc (size)
-#define realloc(size,p)	farrealloc (size,p)
-#define free(size)	farfree (size)
+#define malloc(size)    farmalloc (size)
+#define realloc(size,p) farrealloc (size,p)
+#define free(size)  farfree (size)
 
 #else
 
@@ -61,10 +61,10 @@ extern zword restore_quetzal(FILE *, FILE *);
 
 extern void erase_window(zword);
 
-extern void (*op0_opcodes[]) (void);
-extern void (*op1_opcodes[]) (void);
-extern void (*op2_opcodes[]) (void);
-extern void (*var_opcodes[]) (void);
+extern void (*op0_opcodes[])(void);
+extern void (*op1_opcodes[])(void);
+extern void (*op2_opcodes[])(void);
+extern void (*var_opcodes[])(void);
 
 /* char save_name[MAX_FILE_NAME + 1] = DEFAULT_SAVE_NAME; */
 char auxilary_name[MAX_FILE_NAME + 1] = DEFAULT_AUXILARY_NAME;
@@ -242,62 +242,62 @@ void init_memory(void) {
 		zword release;
 		zbyte serial[7];
 	} records[] = {
-		{	   ZORK1,   2, "AS000C" },
-		{	   ZORK1,   5, ""       },
-		{	   ZORK1,  15, "UG3AU5" },
-		{	   ZORK1,  20, ""       },
-		{	   ZORK1,  23, "820428" },
-		{	   ZORK1,  25, "820515" },
-		{	   ZORK1,  26, "820803" },
-		{	   ZORK1,  28, "821013" },
-		{	   ZORK1,  30, "830330" },
-		{	   ZORK1,  75, "830929" },
-		{	   ZORK1,  76, "840509" },
-		{	   ZORK1,  88, "840726" },
-		{	   ZORK1,  52, "871125" },
-		{	   ZORK1, 119, "880429" },
-		{	  ZORK1G,   3, "880113" },
-		{	  ZORK1G,  15, "890613" },
-		{	   ZORK2,   7, "UG3AU5" },
-		{	   ZORK2,  15, "820308" },
-		{	   ZORK2,  17, "820427" },
-		{	   ZORK2,  18, "820512" },
-		{	   ZORK2,  18, "820517" },
-		{	   ZORK2,  19, "820721" },
-		{	   ZORK2,  22, "830331" },
-		{	   ZORK2,  22, "840518" },
-		{	   ZORK2,  23, "830411" },
-		{	   ZORK2,  48, "840904" },
-		{	   ZORK2,  63, "860811" },
-		{	   ZORK3,  10, "820818" },
-		{	   ZORK3,  12, "821025" },
-		{	   ZORK3,  15, "830331" },
-		{	   ZORK3,  15, "840518" },
-		{	   ZORK3,  16, "830410" },
-		{	   ZORK3,  17, "840727" },
-		{	   ZORK3,  25, "860811" },
-		{	MINIZORK,   2, "840207" },
-		{	MINIZORK,  34, "871124" },
-		{	SAMPLER1,  26, "840731" },
-		{	SAMPLER1,  53, "850407" },
-		{	SAMPLER1,  55, "850823" },
-		{	SAMPLER2,  97, "870601" },
+		{      ZORK1,   2, "AS000C" },
+		{      ZORK1,   5, ""       },
+		{      ZORK1,  15, "UG3AU5" },
+		{      ZORK1,  20, ""       },
+		{      ZORK1,  23, "820428" },
+		{      ZORK1,  25, "820515" },
+		{      ZORK1,  26, "820803" },
+		{      ZORK1,  28, "821013" },
+		{      ZORK1,  30, "830330" },
+		{      ZORK1,  75, "830929" },
+		{      ZORK1,  76, "840509" },
+		{      ZORK1,  88, "840726" },
+		{      ZORK1,  52, "871125" },
+		{      ZORK1, 119, "880429" },
+		{     ZORK1G,   3, "880113" },
+		{     ZORK1G,  15, "890613" },
+		{      ZORK2,   7, "UG3AU5" },
+		{      ZORK2,  15, "820308" },
+		{      ZORK2,  17, "820427" },
+		{      ZORK2,  18, "820512" },
+		{      ZORK2,  18, "820517" },
+		{      ZORK2,  19, "820721" },
+		{      ZORK2,  22, "830331" },
+		{      ZORK2,  22, "840518" },
+		{      ZORK2,  23, "830411" },
+		{      ZORK2,  48, "840904" },
+		{      ZORK2,  63, "860811" },
+		{      ZORK3,  10, "820818" },
+		{      ZORK3,  12, "821025" },
+		{      ZORK3,  15, "830331" },
+		{      ZORK3,  15, "840518" },
+		{      ZORK3,  16, "830410" },
+		{      ZORK3,  17, "840727" },
+		{      ZORK3,  25, "860811" },
+		{   MINIZORK,   2, "840207" },
+		{   MINIZORK,  34, "871124" },
+		{   SAMPLER1,  26, "840731" },
+		{   SAMPLER1,  53, "850407" },
+		{   SAMPLER1,  55, "850823" },
+		{   SAMPLER2,  97, "870601" },
 		{      ENCHANTER,  10, "830810" },
 		{      ENCHANTER,  15, "831107" },
 		{      ENCHANTER,  16, "831118" },
 		{      ENCHANTER,  16, "840518" },
 		{      ENCHANTER,  24, "851118" },
 		{      ENCHANTER,  29, "860820" },
-		{	SORCERER,  67, "831208" },
-		{	SORCERER,  67, "0"      },
-		{	SORCERER,  85, "840106" },
-		{	SORCERER,   4, "840131" },
-		{	SORCERER,   6, "840508" },
-		{	SORCERER,  13, "851021" },
-		{	SORCERER,  15, "851108" },
-		{	SORCERER,  18, "860904" },
-		{	SORCERER,  63, "850916" },
-		{	SORCERER,  87, "860904" },
+		{   SORCERER,  67, "831208" },
+		{   SORCERER,  67, "0"      },
+		{   SORCERER,  85, "840106" },
+		{   SORCERER,   4, "840131" },
+		{   SORCERER,   6, "840508" },
+		{   SORCERER,  13, "851021" },
+		{   SORCERER,  15, "851108" },
+		{   SORCERER,  18, "860904" },
+		{   SORCERER,  63, "850916" },
+		{   SORCERER,  87, "860904" },
 		{   SPELLBREAKER,  63, "850916" },
 		{   SPELLBREAKER,  87, "860904" },
 		{     PLANETFALL,  20, "830708" },
@@ -310,34 +310,34 @@ void init_memory(void) {
 		{    STATIONFALL,  63, "870218" },
 		{    STATIONFALL,  87, "870326" },
 		{    STATIONFALL, 107, "870430" },
-		{	BALLYHOO,  97, "851218" },
-		{	BALLYHOO,  99, "861014" },
+		{   BALLYHOO,  97, "851218" },
+		{   BALLYHOO,  99, "861014" },
 		{    BORDER_ZONE,   9, "871008" },
-		{	    AMFV,   1, "841226" },
-		{	    AMFV,  47, "850313" },
-		{	    AMFV,  84, "850516" },
-		{	    AMFV, 131, "850628" },
-		{	    AMFV,  77, "850814" },
-		{	    AMFV,  79, "851122" },
-		{	    HHGG, 108, "840809" },
-		{	    HHGG, 119, "840822" },
-		{	    HHGG,  47, "840914" },
-		{	    HHGG,  56, "841221" },
-		{	    HHGG,  58, "851002" },
-		{	    HHGG,  59, "851108" },
-		{	    HHGG,  60, "861002" },
-		{	    HHGG,  31, "871119" },
-		{	    LGOP,   0, "BLOWN!" },
-		{	    LGOP,   1, "851008" },
-		{	    LGOP,  57, "860121" },
-		{	    LGOP, 118, "860325" },
-		{	    LGOP, 160, "860521" },
-		{	    LGOP,  50, "860711" },
-		{	    LGOP,  59, "860730" },
-		{	    LGOP,  59, "861114" },
-		{	    LGOP,   4, "880405" },
-		{	 SUSPECT,  14, "841005" },
-		{	 SUSPECT,  18, "850222" },
+		{       AMFV,   1, "841226" },
+		{       AMFV,  47, "850313" },
+		{       AMFV,  84, "850516" },
+		{       AMFV, 131, "850628" },
+		{       AMFV,  77, "850814" },
+		{       AMFV,  79, "851122" },
+		{       HHGG, 108, "840809" },
+		{       HHGG, 119, "840822" },
+		{       HHGG,  47, "840914" },
+		{       HHGG,  56, "841221" },
+		{       HHGG,  58, "851002" },
+		{       HHGG,  59, "851108" },
+		{       HHGG,  60, "861002" },
+		{       HHGG,  31, "871119" },
+		{       LGOP,   0, "BLOWN!" },
+		{       LGOP,   1, "851008" },
+		{       LGOP,  57, "860121" },
+		{       LGOP, 118, "860325" },
+		{       LGOP, 160, "860521" },
+		{       LGOP,  50, "860711" },
+		{       LGOP,  59, "860730" },
+		{       LGOP,  59, "861114" },
+		{       LGOP,   4, "880405" },
+		{    SUSPECT,  14, "841005" },
+		{    SUSPECT,  18, "850222" },
 		{       SHERLOCK,  97, "871026" },
 		{       SHERLOCK,  21, "871214" },
 		{       SHERLOCK,  22, "880112" },
@@ -511,7 +511,7 @@ no_match:; /* null statement */
 void init_undo(void) {
 	void far *reserved;
 
-	reserved = nullptr;	/* makes compilers shut up */
+	reserved = nullptr; /* makes compilers shut up */
 
 	if (reserve_mem != 0) {
 		if ((reserved = malloc(reserve_mem)) == nullptr)
@@ -599,7 +599,7 @@ void storeb(zword addr, zbyte value) {
 	if (addr >= z_header.dynamic_size)
 		runtime_error(ERR_STORE_RANGE);
 
-	if (addr == H_FLAGS + 1) {	/* flags register is modified */
+	if (addr == H_FLAGS + 1) {  /* flags register is modified */
 		z_header.flags &= ~(SCRIPTING_FLAG | FIXED_FONT_FLAG);
 		z_header.flags |= value & (SCRIPTING_FLAG | FIXED_FONT_FLAG);
 
@@ -631,7 +631,7 @@ void storew(zword addr, zword value) {
 /*
  * z_restart, re-load dynamic area, clear the stack and set the PC.
  *
- * 	no zargs used
+ *  no zargs used
  *
  */
 void z_restart(void) {
@@ -705,9 +705,9 @@ static void get_default_name(char *default_name, size_t length, zword addr) {
 /*
  * z_restore, restore [a part of] a Z-machine state from disk
  *
- *	zargs[0] = address of area to restore (optional)
- *	zargs[1] = number of bytes to restore
- *	zargs[2] = address of suggested file name
+ *  zargs[0] = address of area to restore (optional)
+ *  zargs[1] = number of bytes to restore
+ *  zargs[2] = address of suggested file name
  *
  */
 void z_restore(void) {
@@ -739,12 +739,12 @@ void z_restore(void) {
 		fclose(gfp);
 	} else {
 
-		//	long pc;
-		//	zword release;
-		//	zword addr;
-		//	int i;
+		//  long pc;
+		//  zword release;
+		//  zword addr;
+		//  int i;
 
-				/* Get the file name */
+		/* Get the file name */
 		new_name = os_read_file_name(f_setup.save_name, FILE_RESTORE);
 		if (new_name == nullptr)
 			goto finished;
@@ -779,9 +779,9 @@ void z_restore(void) {
 				 * seems to cover up most of the
 				 * resulting badness.
 				 */
-				if (z_header.version > V3 &&z_header.version != V6
-					&& (z_header.screen_rows != old_screen_rows
-						|| z_header.screen_cols != old_screen_cols))
+				if (z_header.version > V3 && z_header.version != V6
+				        && (z_header.screen_rows != old_screen_rows
+				            || z_header.screen_cols != old_screen_cols))
 					erase_window(1);
 			}
 		} else
@@ -904,7 +904,7 @@ int restore_undo(void) {
 	frame_count = curr_undo->frame_count;
 	mem_undiff((zbyte *)(curr_undo + 1), curr_undo->diff_size, prev_zmp);
 	memmove(sp, (zbyte *)(curr_undo + 1) + curr_undo->diff_size,
-		curr_undo->stack_size * sizeof(*sp));
+	        curr_undo->stack_size * sizeof(*sp));
 
 	curr_undo = curr_undo->prev;
 	restart_header();
@@ -915,7 +915,7 @@ int restore_undo(void) {
 /*
  * z_restore_undo, restore a Z-machine state from memory.
  *
- *	no zargs used
+ *  no zargs used
  *
  */
 void z_restore_undo(void) {
@@ -927,9 +927,9 @@ void z_restore_undo(void) {
 /*
  * z_save, save [a part of] the Z-machine state to disk.
  *
- *	zargs[0] = address of memory area to save (optional)
- *	zargs[1] = number of bytes to save
- *	zargs[2] = address of suggested file name
+ *  zargs[0] = address of memory area to save (optional)
+ *  zargs[1] = number of bytes to save
+ *  zargs[2] = address of suggested file name
  *
  */
 void z_save(void) {
@@ -961,13 +961,13 @@ void z_save(void) {
 
 	} else {
 
-		//	long pc;
-		//	zword addr;
-		//	zword nsp, nfp;
-		//	int skip;
-		//	int i;
+		//  long pc;
+		//  zword addr;
+		//  zword nsp, nfp;
+		//  int skip;
+		//  int i;
 
-				/* Get the file name */
+		/* Get the file name */
 		new_name = os_read_file_name(f_setup.save_name, FILE_SAVE);
 		if (new_name == nullptr)
 			goto finished;
@@ -1041,7 +1041,7 @@ int save_undo(void) {
 	if (p == nullptr)
 		return -1;
 	pc = p->pc;
-	GET_PC(pc);	/* Turbo C doesn't like seeing p->pc here */
+	GET_PC(pc); /* Turbo C doesn't like seeing p->pc here */
 	p->pc = pc;
 	p->frame_count = frame_count;
 	p->diff_size = diff_size;
@@ -1067,7 +1067,7 @@ int save_undo(void) {
 /*
  * z_save_undo, save the current Z-machine state for a future undo.
  *
- *	no zargs used
+ *  no zargs used
  *
  */
 void z_save_undo(void) {
@@ -1078,7 +1078,7 @@ void z_save_undo(void) {
 /*
  * z_verify, check the story file integrity.
  *
- *	no zargs used
+ *  no zargs used
  *
  */
 void z_verify(void) {

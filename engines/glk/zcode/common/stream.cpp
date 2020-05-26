@@ -71,8 +71,7 @@ extern int direct_call(zword);
  * Start printing a "debugging" message.
  *
  */
-void stream_mssg_on(void)
-{
+void stream_mssg_on(void) {
 	flush_buffer();
 
 	if (ostream_screen)
@@ -90,8 +89,7 @@ void stream_mssg_on(void)
  * Stop printing a "debugging" message.
  *
  */
-void stream_mssg_off(void)
-{
+void stream_mssg_off(void) {
 	flush_buffer();
 
 	if (ostream_screen)
@@ -106,13 +104,12 @@ void stream_mssg_off(void)
 /*
  * z_output_stream, open or close an output stream.
  *
- *	zargs[0] = stream to open (positive) or close (negative)
- *	zargs[1] = address to redirect output to (stream 3 only)
- *	zargs[2] = width of redirected output (stream 3 only, optional)
+ *  zargs[0] = stream to open (positive) or close (negative)
+ *  zargs[1] = address to redirect output to (stream 3 only)
+ *  zargs[2] = width of redirected output (stream 3 only, optional)
  *
  */
-void z_output_stream(void)
-{
+void z_output_stream(void) {
 	flush_buffer();
 
 	switch ((short)zargs[0]) {
@@ -154,8 +151,7 @@ void z_output_stream(void)
  * Send a single character to the output stream.
  *
  */
-void stream_char(zchar c)
-{
+void stream_char(zchar c) {
 	if (ostream_screen)
 		screen_char(c);
 	if (ostream_script && enable_scripting)
@@ -169,8 +165,7 @@ void stream_char(zchar c)
  * Send a string of characters to the output streams.
  *
  */
-void stream_word(const zchar * s)
-{
+void stream_word(const zchar *s) {
 	if (ostream_memory && !message)
 		memory_word(s);
 	else {
@@ -188,8 +183,7 @@ void stream_word(const zchar * s)
  * Send a newline to the output streams.
  *
  */
-void stream_new_line(void)
-{
+void stream_new_line(void) {
 	if (ostream_memory && !message)
 		memory_new_line();
 	else {
@@ -204,11 +198,10 @@ void stream_new_line(void)
 /*
  * z_input_stream, select an input stream.
  *
- *	zargs[0] = input stream to be selected
+ *  zargs[0] = input stream to be selected
  *
  */
-void z_input_stream(void)
-{
+void z_input_stream(void) {
 	flush_buffer();
 
 	if (zargs[0] == 0 && istream_replay)
@@ -224,8 +217,7 @@ void z_input_stream(void)
  * Read a single keystroke from the current input stream.
  *
  */
-zchar stream_read_key(zword timeout, zword routine, bool hot_keys)
-{
+zchar stream_read_key(zword timeout, zword routine, bool hot_keys) {
 	zchar key = ZC_BAD;
 	flush_buffer();
 
@@ -283,10 +275,9 @@ continue_input:
  * Read a line of input from the current input stream.
  *
  */
-zchar stream_read_input(int max, zchar * buf,
-			zword timeout, zword routine,
-			bool hot_keys, bool no_scripting)
-{
+zchar stream_read_input(int max, zchar *buf,
+                        zword timeout, zword routine,
+                        bool hot_keys, bool no_scripting) {
 	zchar key = ZC_BAD;
 
 	flush_buffer();
@@ -305,7 +296,7 @@ continue_input:
 		else
 			key =
 			    console_read_input(max, buf, timeout,
-					       key != ZC_BAD);
+			                       key != ZC_BAD);
 	} while (key == ZC_BAD);
 
 	/* Verify mouse clicks */

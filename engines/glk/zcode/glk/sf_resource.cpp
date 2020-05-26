@@ -75,8 +75,7 @@ int AcWidth = 640, AcHeight = 400;
 int option_scrollback_buffer = 0;
 bool m_adaptiveMode = FALSE;
 
-static void checkwidths()
-{
+static void checkwidths() {
 	bb_resolution_t *reso;
 	reso = bb_get_resolution(blorb_map);
 	if (reso) {
@@ -89,8 +88,7 @@ static void checkwidths()
 }
 
 
-static void sf_cleanup_resources(void)
-{
+static void sf_cleanup_resources(void) {
 	if (blorb_map)
 		bb_destroy_map(blorb_map);
 	blorb_map = nullptr;
@@ -107,21 +105,20 @@ static void load_local_resources(void);
  * Perform additional resource loading after the blorb map is built.
  *
  */
-int sf_load_resources(void)
-{
+int sf_load_resources(void) {
 	bb_result_t result;
 	CLEANREG(sf_cleanup_resources);
 
 	if (blorb_map) {
 		checkwidths();
 		bb_count_resources(blorb_map, bb_ID_Pict, &countedpics, nullptr,
-				   &maxlegalpic);
+		                   &maxlegalpic);
 		releaseno = bb_get_release_num(blorb_map);
-		if (bb_load_chunk_by_type (blorb_map,
-					   bb_method_Memory,
-					   &result,
-					   bb_ID_APal,
-					   0) == bb_err_None) {
+		if (bb_load_chunk_by_type(blorb_map,
+		                          bb_method_Memory,
+		                          &result,
+		                          bb_ID_APal,
+		                          0) == bb_err_None) {
 			m_adaptiveMode = TRUE;
 			bb_unload_chunk(blorb_map, result.chunknum);
 		}
@@ -141,8 +138,7 @@ int sf_load_resources(void)
  * that file.  If found, return a pointer to that file
  *
  */
-static FILE *pathopen(const char *name, const char *path, const char *mode)
-{
+static FILE *pathopen(const char *name, const char *path, const char *mode) {
 	FILE *file;
 	char *buf;
 	char *bp;
@@ -182,8 +178,7 @@ static FILE *pathopen(const char *name, const char *path, const char *mode)
  * defined, search INFOCOM_PATH.
  *
  */
-FILE *os_path_open(const char *name, const char *mode)
-{
+FILE *os_path_open(const char *name, const char *mode) {
 	FILE *file;
 	char *p = nullptr;
 
@@ -204,7 +199,7 @@ FILE *os_path_open(const char *name, const char *mode)
 		file = pathopen(name, p, mode);
 		return file;
 	}
-	return nullptr;	/* give up */
+	return nullptr; /* give up */
 } /* os_path_open() */
 
 
@@ -218,8 +213,7 @@ FILE *os_path_open(const char *name, const char *mode)
  * variables respectively when this picture number is asked for.
  *
  */
-int os_picture_data(int picture, int *height, int *width)
-{
+int os_picture_data(int picture, int *height, int *width) {
 	if (maxlegalpic) {
 		if (picture == 0) {
 			*height = maxlegalpic;
@@ -249,20 +243,19 @@ int os_picture_data(int picture, int *height, int *width)
  *     MENU_REMOVE - Remove the menu at the given index
  *
  */
-void os_menu(int action, int menu, const zword * text)
-{
-/*	switch (action)
-	{
-	case MENU_NEW:
-		theWnd->AddNewMenu(menu,text);
-		break;
-	case MENU_ADD:
-		theWnd->AddMenuItem(menu,text);
-		break;
-	case MENU_REMOVE:
-		theWnd->RemoveMenu(menu);
-		break;
-	}*/
+void os_menu(int action, int menu, const zword *text) {
+	/*  switch (action)
+	    {
+	    case MENU_NEW:
+	        theWnd->AddNewMenu(menu,text);
+	        break;
+	    case MENU_ADD:
+	        theWnd->AddMenuItem(menu,text);
+	        break;
+	    case MENU_REMOVE:
+	        theWnd->RemoveMenu(menu);
+	        break;
+	    }*/
 }
 
 
@@ -275,8 +268,7 @@ void os_menu(int action, int menu, const zword * text)
  * this is a provisional workaround (time granularity is at best 1s)
  */
 
-int os_random_seed(void)
-{
+int os_random_seed(void) {
 	if (m_random_seed == -1) {
 		return g_system->getMillis() & 32767;
 	}
@@ -291,17 +283,16 @@ int os_random_seed(void)
  * Write a character to the scrollback buffer.
  *
  */
-void os_scrollback_char(zword c)
-{
+void os_scrollback_char(zword c) {
 	if (option_scrollback_buffer == 0)
 		return;
 	if (c == 13)
 		c = 10;
-	if (option_scrollback_buffer == 1) {	/* Latin-1 */
+	if (option_scrollback_buffer == 1) {    /* Latin-1 */
 		if (c > 255)
 			c = '?';
 		debugN("%c", c);
-	} else {		/* UTF8 */
+	} else {        /* UTF8 */
 		if (c < 0x80)
 			debugN("%c", c);
 		else {
@@ -318,8 +309,7 @@ void os_scrollback_char(zword c)
  * Remove characters from the scrollback buffer.
  *
  */
-void os_scrollback_erase(int erase)
-{
+void os_scrollback_erase(int erase) {
 	if (option_scrollback_buffer)
 		while (erase--)
 			debugN("%c", 8);
@@ -337,8 +327,7 @@ void os_scrollback_erase(int erase)
  *     RESTART_END - restart is complete
  *
  */
-void os_restart_game(int stage)
-{
+void os_restart_game(int stage) {
 	/* Show Beyond Zork's title screen */
 	if ((stage == RESTART_END) && (story_id == BEYOND_ZORK)) {
 		int w, h;
@@ -354,24 +343,23 @@ void os_restart_game(int stage)
 #define DEFAULT_GAMMA 2.2
 double m_gamma = DEFAULT_GAMMA;
 
-void sf_initcolours()
-{
+void sf_initcolours() {
 	int i;
 
 	sf_setgamma(m_gamma);
 
 	/* Standard Z-Machine colours */
-	m_colours[0]  = RGB5ToTrue(0x0000);	/* black */
-	m_colours[1]  = RGB5ToTrue(0x001D);	/* red */
-	m_colours[2]  = RGB5ToTrue(0x0340);	/* green */
-	m_colours[3]  = RGB5ToTrue(0x03BD);	/* yellow */
-	m_colours[4]  = RGB5ToTrue(0x59A0);	/* blue */
-	m_colours[5]  = RGB5ToTrue(0x7C1F);	/* magenta */
-	m_colours[6]  = RGB5ToTrue(0x77A0);	/* cyan */
-	m_colours[7]  = RGB5ToTrue(0x7FFF);	/* white */
-	m_colours[8]  = RGB5ToTrue(0x5AD6);	/* light grey */
-	m_colours[9]  = RGB5ToTrue(0x4631);	/* medium grey */
-	m_colours[10] = RGB5ToTrue(0x2D6B);	/* dark grey */
+	m_colours[0]  = RGB5ToTrue(0x0000); /* black */
+	m_colours[1]  = RGB5ToTrue(0x001D); /* red */
+	m_colours[2]  = RGB5ToTrue(0x0340); /* green */
+	m_colours[3]  = RGB5ToTrue(0x03BD); /* yellow */
+	m_colours[4]  = RGB5ToTrue(0x59A0); /* blue */
+	m_colours[5]  = RGB5ToTrue(0x7C1F); /* magenta */
+	m_colours[6]  = RGB5ToTrue(0x77A0); /* cyan */
+	m_colours[7]  = RGB5ToTrue(0x7FFF); /* white */
+	m_colours[8]  = RGB5ToTrue(0x5AD6); /* light grey */
+	m_colours[9]  = RGB5ToTrue(0x4631); /* medium grey */
+	m_colours[10] = RGB5ToTrue(0x2D6B); /* dark grey */
 
 	for (i = 0; i < NON_STD_COLS; i++)
 		m_nonStdColours[i] = 0xFFFFFFFF;
@@ -381,8 +369,7 @@ void sf_initcolours()
 
 
 /* Read in settings */
-void sf_readsettings(void)
-{
+void sf_readsettings(void) {
 	char *p;
 
 	sf_InitProfile(m_setupfile);
@@ -454,7 +441,7 @@ void sf_readsettings(void)
 		m_fontdir_temp = (char *)malloc(((fontdir_len + homedir_len) * sizeof(char)) + 3);
 
 		if ((m_fontdir[0] == '~') && (m_fontdir[1] == PATH_SEPARATOR))
-			snprintf(m_fontdir_temp, fontdir_len + homedir_len + 3, "%s%c%s", myhome, PATH_SEPARATOR, m_fontdir+2);
+			snprintf(m_fontdir_temp, fontdir_len + homedir_len + 3, "%s%c%s", myhome, PATH_SEPARATOR, m_fontdir + 2);
 		else
 			snprintf(m_fontdir_temp, fontdir_len + homedir_len + 3, "%s%c%s", myhome, PATH_SEPARATOR, m_fontdir);
 
@@ -467,8 +454,7 @@ void sf_readsettings(void)
 
 
 /* Get a colour */
-ulong sf_GetColour(int colour)
-{
+ulong sf_GetColour(int colour) {
 	/* Standard colours */
 	if ((colour >= BLACK_COLOUR) && (colour <= DARKGREY_COLOUR))
 		return m_colours[colour - BLACK_COLOUR];
@@ -489,8 +475,7 @@ ulong sf_GetColour(int colour)
 
 
 /* Get a default colour */
-ulong sf_GetDefaultColour(bool fore)
-{
+ulong sf_GetDefaultColour(bool fore) {
 	if (m_IsInfocomV6)
 		return sf_GetColour(fore ? WHITE_COLOUR : BLACK_COLOUR);
 	return fore ? m_defaultFore : m_defaultBack;
@@ -498,8 +483,7 @@ ulong sf_GetDefaultColour(bool fore)
 
 
 /* Get an index for a non-standard colour */
-int sf_GetColourIndex(ulong colour)
-{
+int sf_GetColourIndex(ulong colour) {
 	int i, index = -1;
 	/* Is this a standard colour? */
 	for (i = 0; i < 11; i++) {
@@ -560,8 +544,7 @@ int sf_GetColourIndex(ulong colour)
  * remarks about os_peek_colour.
  *
  */
-void os_set_colour(int new_foreground, int new_background)
-{
+void os_set_colour(int new_foreground, int new_background) {
 	SF_textsetting *ts = sf_curtextsetting();
 	sf_flushtext();
 	if (new_foreground == 1)
@@ -585,8 +568,7 @@ void os_set_colour(int new_foreground, int new_background)
  * Given a true colour, return an appropriate colour index.
  *
  */
-int os_from_true_colour(zword colour)
-{
+int os_from_true_colour(zword colour) {
 	return sf_GetColourIndex(RGB5ToTrue(colour));
 }
 
@@ -597,8 +579,7 @@ int os_from_true_colour(zword colour)
  * Given a colour index, return the appropriate true colour.
  *
  */
-zword os_to_true_colour(int index)
-{
+zword os_to_true_colour(int index) {
 	return TrueToRGB5(sf_GetColour(index));
 }
 
@@ -628,8 +609,7 @@ zword os_to_true_colour(int index)
  * should not be used for multiple undo and reserved for later use.
  *
  */
-void os_init_screen(void)
-{
+void os_init_screen(void) {
 
 	sf_initvideo(AcWidth, AcHeight, (m_fullscreen != -1));
 	sf_load_resources();
@@ -642,8 +622,8 @@ void os_init_screen(void)
 		m_gfxScale_w = 1.0;
 		m_gfxScale_h = 1.0;
 	}
-	m_gfxScale_w *= (double) AcWidth /640.0;
-	m_gfxScale_h *= (double) AcHeight /400.0;
+	m_gfxScale_w *= (double) AcWidth / 640.0;
+	m_gfxScale_h *= (double) AcHeight / 400.0;
 
 	/* Set the configuration */
 	if (z_header.version == V3) {
@@ -692,17 +672,17 @@ void os_init_screen(void)
 
 	z_header.screen_width = (zword) AcWidth;
 	z_header.screen_height = (zword) AcHeight;
-	z_header.screen_cols = (zbyte) (z_header.screen_width / z_header.font_width);
-	z_header.screen_rows = (zbyte) (z_header.screen_height / z_header.font_height);
+	z_header.screen_cols = (zbyte)(z_header.screen_width / z_header.font_width);
+	z_header.screen_rows = (zbyte)(z_header.screen_height / z_header.font_height);
 
 	/* Check for sound */
 	if ((z_header.version == V3) && (z_header.flags & OLD_SOUND_FLAG)) {
 		if (((blorb_map == nullptr) && (m_localfiles == 0))
-		    || (!sf_initsound()))
+		        || (!sf_initsound()))
 			z_header.flags &= ~OLD_SOUND_FLAG;
 	} else if ((z_header.version >= V4) && (z_header.flags & SOUND_FLAG)) {
 		if (((blorb_map == nullptr) && (m_localfiles == 0))
-		    || (!sf_initsound()))
+		        || (!sf_initsound()))
 			z_header.flags &= ~SOUND_FLAG;
 	}
 
@@ -726,8 +706,7 @@ void os_init_screen(void)
  * Stops execution with a given message
  *
  */
-void os_fatal(const char *s, ...)
-{
+void os_fatal(const char *s, ...) {
 	va_list m;
 	va_start(m, s);
 	Common::String msg = Common::String::vformat(s, m);
@@ -738,8 +717,7 @@ void os_fatal(const char *s, ...)
 
 
 /* If true, running one of Infocom's V6 games */
-bool sf_IsInfocomV6()
-{
+bool sf_IsInfocomV6() {
 	switch (story_id) {
 	case ARTHUR:
 	case JOURNEY:
@@ -754,15 +732,14 @@ bool sf_IsInfocomV6()
 
 
 /* If true, this picture has an adaptive palette */
-bool sf_IsAdaptive(int picture)
-{
+bool sf_IsAdaptive(int picture) {
 	bb_result_t result;
 	bool adaptive = FALSE;
 
 	if (blorb_map == nullptr) return FALSE;
 
 	if (bb_load_chunk_by_type
-	    (blorb_map, bb_method_Memory, &result, bb_ID_APal, 0) == bb_err_None) {
+	        (blorb_map, bb_method_Memory, &result, bb_ID_APal, 0) == bb_err_None) {
 		for (int i = 0; i < (int)result.length; i += 4) {
 			unsigned char *data =
 			    ((unsigned char *)result.data.ptr) + i;
@@ -780,11 +757,10 @@ bool sf_IsAdaptive(int picture)
 }
 
 
-#define LOCAL_MEM	-1
-#define LOCAL_FILE	-2
+#define LOCAL_MEM   -1
+#define LOCAL_FILE  -2
 
-void sf_freeresource(myresource * res)
-{
+void sf_freeresource(myresource *res) {
 	int cnu;
 
 	if (!res)
@@ -808,8 +784,7 @@ void sf_freeresource(myresource * res)
 }
 
 
-static FILE *findlocal(int ispic, int num, int *size)
-{
+static FILE *findlocal(int ispic, int num, int *size) {
 	FILE *f;
 	const char *tpl;
 	char buf[MAX_FILE_NAME + 1];
@@ -830,8 +805,7 @@ static FILE *findlocal(int ispic, int num, int *size)
 static FILE *findfromlist(int ispic, int num, int *size);
 
 
-static int loadlocal(int num, int ispic, int method, myresource * res)
-{
+static int loadlocal(int num, int ispic, int method, myresource *res) {
 	FILE *f;
 	int size;
 	byte hd[4];
@@ -883,17 +857,16 @@ static int loadlocal(int num, int ispic, int method, myresource * res)
 }
 
 
-int sf_getresource(int num, int ispic, int method, myresource * res)
-{
+int sf_getresource(int num, int ispic, int method, myresource *res) {
 	int st;
 	ulong usage;
 
 	res->bbres.data.ptr = nullptr;
 	res->file = nullptr;
 
-        if (m_localfiles)
-                if ((st = loadlocal(num, ispic, method, res)) == bb_err_None)
-                        return st;
+	if (m_localfiles)
+		if ((st = loadlocal(num, ispic, method, res)) == bb_err_None)
+			return st;
 
 	if (!blorb_map)
 		return bb_err_NotFound;
@@ -929,8 +902,7 @@ static ulong p_type;
 static char *p_name;
 
 
-static void cleanLLENTRY(LLENTRY * e)
-{
+static void cleanLLENTRY(LLENTRY *e) {
 	while (e) {
 		LLENTRY *n = (LLENTRY *)e->next;
 		if (e->name)
@@ -941,8 +913,7 @@ static void cleanLLENTRY(LLENTRY * e)
 }
 
 
-static void cleanlocallist()
-{
+static void cleanlocallist() {
 	cleanLLENTRY(Lpics);
 	Lpics = nullptr;
 	cleanLLENTRY(Lsnds);
@@ -950,8 +921,7 @@ static void cleanlocallist()
 }
 
 
-static int parseline(char *s)
-{
+static int parseline(char *s) {
 	char *p, p3;
 	int n;
 	p = strtok(s, " \t\n");
@@ -986,8 +956,7 @@ static int parseline(char *s)
 }
 
 
-static void load_local_resources(void)
-{
+static void load_local_resources(void) {
 	FILE *f;
 	LLENTRY *e;
 	char s[256];
@@ -1029,8 +998,7 @@ static void load_local_resources(void)
 }
 
 
-static FILE *findfromlist(int ispic, int num, int *size)
-{
+static FILE *findfromlist(int ispic, int num, int *size) {
 	FILE *f;
 	LLENTRY *l;
 	char buf[MAX_FILE_NAME + 1];
@@ -1060,8 +1028,7 @@ static FILE *findfromlist(int ispic, int num, int *size)
 }
 
 
-void os_init_setup(void)
-{
+void os_init_setup(void) {
 	sf_setdialog();
 	sf_initloader();
 	sdl_active = FALSE;

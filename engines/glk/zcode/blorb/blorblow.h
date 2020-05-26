@@ -39,44 +39,44 @@ namespace ZCode {
 
 /* bb_chunkdesc_t: Describes one chunk of the Blorb file. */
 typedef struct bb_chunkdesc_struct {
-    uint32 type;
-    uint32 len;
-    uint32 startpos; /* start of chunk header */
-    uint32 datpos; /* start of data (either startpos or startpos+8) */
+	uint32 type;
+	uint32 len;
+	uint32 startpos; /* start of chunk header */
+	uint32 datpos; /* start of data (either startpos or startpos+8) */
 
-    void *ptr; /* pointer to malloc'd data, if loaded */
-    int auxdatnum; /* entry in the auxsound/auxpict array; -1 if none.
+	void *ptr; /* pointer to malloc'd data, if loaded */
+	int auxdatnum; /* entry in the auxsound/auxpict array; -1 if none.
         This only applies to chunks that represent resources;  */
 
 } bb_chunkdesc_t;
 
 /* bb_resdesc_t: Describes one resource in the Blorb file. */
 typedef struct bb_resdesc_struct {
-    uint32 usage;
-    int resnum;
-    int chunknum;
+	uint32 usage;
+	int resnum;
+	int chunknum;
 } bb_resdesc_t;
 
 /* bb_map_t: Holds the complete description of an open Blorb file. */
 struct bb_map_struct {
-    uint32 inited; /* holds bb_Inited_Magic if the map structure is valid */
-    FILE *file;
+	uint32 inited; /* holds bb_Inited_Magic if the map structure is valid */
+	FILE *file;
 
-    int numchunks;
-    bb_chunkdesc_t *chunks; /* list of chunk descriptors */
+	int numchunks;
+	bb_chunkdesc_t *chunks; /* list of chunk descriptors */
 
-    int numresources;
-    bb_resdesc_t *resources; /* list of resource descriptors */
-    bb_resdesc_t **ressorted; /* list of pointers to descriptors
+	int numresources;
+	bb_resdesc_t *resources; /* list of resource descriptors */
+	bb_resdesc_t **ressorted; /* list of pointers to descriptors
         in map->resources -- sorted by usage and resource number. */
 
-    bb_zheader_t *zheader;
-    int releasenum;
-    bb_resolution_t *resolution;
-    int palettechunk; /* chunk number of palette, or -1 if there is none. */
-    bb_palette_t *palette;
-    bb_aux_sound_t *auxsound; /* extra information about sounds */
-    bb_aux_pict_t *auxpict; /* extra information about pictures */
+	bb_zheader_t *zheader;
+	int releasenum;
+	bb_resolution_t *resolution;
+	int palettechunk; /* chunk number of palette, or -1 if there is none. */
+	bb_palette_t *palette;
+	bb_aux_sound_t *auxsound; /* extra information about sounds */
+	bb_aux_pict_t *auxpict; /* extra information about pictures */
 };
 
 #define bb_Inited_Magic (0xB7012BED)

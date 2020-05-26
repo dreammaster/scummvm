@@ -35,11 +35,11 @@ namespace ZCode {
 #define cdecl
 #endif
 
-extern void interpret (void);
-extern void init_memory (void);
-extern void init_undo (void);
-extern void reset_screen (void);
-extern void reset_memory (void);
+extern void interpret(void);
+extern void init_memory(void);
+extern void init_undo(void);
+extern void reset_screen(void);
+extern void reset_memory(void);
 
 bool need_newline_at_exit = FALSE;
 
@@ -91,12 +91,11 @@ long reserve_mem = 0;
 /*
  * z_piracy, branch if the story file is a legal copy.
  *
- *	no zargs used
+ *  no zargs used
  *
  */
-void z_piracy(void)
-{
-	branch (!f_setup.piracy);
+void z_piracy(void) {
+	branch(!f_setup.piracy);
 } /* z_piracy */
 
 
@@ -106,10 +105,9 @@ void z_piracy(void)
  * Prepare and run the game.
  *
  */
-int frotz_main(int argc, const char *argv[])
-{
+int frotz_main(int argc, const char *argv[]) {
 	init_header();
-	init_setup(); 
+	init_setup();
 	os_init_setup();
 	os_process_arguments(argc, argv);
 	init_buffer();

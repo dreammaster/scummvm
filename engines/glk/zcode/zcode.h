@@ -47,7 +47,9 @@ public:
 	/**
 	 * Returns the running interpreter type
 	 */
-	InterpreterType getInterpreterType() const override { return INTERPRETER_ZCODE; }
+	InterpreterType getInterpreterType() const override {
+		return INTERPRETER_ZCODE;
+	}
 
 	/**
 	 * Execute the game
@@ -57,12 +59,16 @@ public:
 	/**
 	 * Loading method not used for Frotz sub-engine
 	 */
-	Common::Error readSaveData(Common::SeekableReadStream *rs) override { return Common::kReadingFailed; }
+	Common::Error readSaveData(Common::SeekableReadStream *rs) override {
+		return Common::kReadingFailed;
+	}
 
 	/**
 	 * Saving method not used for Frotz sub-engine
 	 */
-	Common::Error writeGameData(Common::WriteStream *ws) override { return Common::kWritingFailed; }
+	Common::Error writeGameData(Common::WriteStream *ws) override {
+		return Common::kWritingFailed;
+	}
 };
 
 extern ZCode *g_vm;

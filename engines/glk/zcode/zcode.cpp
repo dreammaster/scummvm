@@ -29,7 +29,7 @@ namespace ZCode {
 ZCode *g_vm;
 
 ZCode::ZCode(OSystem *syst, const GlkGameDescription &gameDesc) :
-		GlkAPI(syst, gameDesc) {
+	GlkAPI(syst, gameDesc) {
 	g_vm = this;
 }
 

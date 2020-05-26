@@ -152,7 +152,7 @@ void (*ext_opcodes[0x1d])(void) = {
 	z_restore_undo,
 	z_print_unicode,
 	z_check_unicode,
-	z_set_true_colour,	/* spec 1.1 */
+	z_set_true_colour,  /* spec 1.1 */
 	__illegal__,
 	__illegal__,
 	z_move_window,
@@ -191,25 +191,25 @@ void init_process(void) {
 static void load_operand(zbyte type) {
 	zword value;
 
-	if (type & 2) {		/* variable */
+	if (type & 2) {     /* variable */
 		zbyte variable;
 
 		CODE_BYTE(variable)
-			if (variable == 0)
-				value = *sp++;
-			else if (variable < 16)
-				value = *(fp - variable);
-			else {
-				zword addr = z_header.globals + 2 * (variable - 16);
-				LOW_WORD(addr, value)
-			}
-	} else if (type & 1) {	/* small constant */
+		if (variable == 0)
+			value = *sp++;
+		else if (variable < 16)
+			value = *(fp - variable);
+		else {
+			zword addr = z_header.globals + 2 * (variable - 16);
+			LOW_WORD(addr, value)
+		}
+	} else if (type & 1) {  /* small constant */
 		zbyte bvalue;
 
 		CODE_BYTE(bvalue)
-			value = bvalue;
+		value = bvalue;
 	} else
-		CODE_WORD(value)	/* large constant */
+		CODE_WORD(value)    /* large constant */
 		zargs[zargc++] = value;
 } /* load_operand */
 
@@ -251,28 +251,28 @@ void interpret(void) {
 		zbyte opcode;
 
 		CODE_BYTE(opcode)
-			zargc = 0;
+		zargc = 0;
 
-		if (opcode < 0x80) {	/* 2OP opcodes */
+		if (opcode < 0x80) {    /* 2OP opcodes */
 			load_operand((zbyte)(opcode & 0x40) ? 2 : 1);
 			load_operand((zbyte)(opcode & 0x20) ? 2 : 1);
 			var_opcodes[opcode & 0x1f]();
-		} else if (opcode < 0xb0) {	/* 1OP opcodes */
+		} else if (opcode < 0xb0) { /* 1OP opcodes */
 			load_operand((zbyte)(opcode >> 4));
 			op1_opcodes[opcode & 0x0f]();
-		} else if (opcode < 0xc0) {	/* 0OP opcodes */
+		} else if (opcode < 0xc0) { /* 0OP opcodes */
 			op0_opcodes[opcode - 0xb0]();
-		} else {	/* VAR opcodes */
+		} else {    /* VAR opcodes */
 			zbyte specifier1;
 			zbyte specifier2;
-			if (opcode == 0xec || opcode == 0xfa) {		/* opcodes 0xec */
-				CODE_BYTE(specifier1)			/* and 0xfa are */
-					CODE_BYTE(specifier2)		/* call opcodes */
-					load_all_operands(specifier1);	/* with up to 8 */
-				load_all_operands(specifier2);		/* arguments    */
+			if (opcode == 0xec || opcode == 0xfa) {     /* opcodes 0xec */
+				CODE_BYTE(specifier1)           /* and 0xfa are */
+				CODE_BYTE(specifier2)       /* call opcodes */
+				load_all_operands(specifier1);  /* with up to 8 */
+				load_all_operands(specifier2);      /* arguments    */
 			} else {
 				CODE_BYTE(specifier1)
-					load_all_operands(specifier1);
+				load_all_operands(specifier1);
 			}
 			var_opcodes[opcode - 0xc0]();
 		}
@@ -286,18 +286,18 @@ void interpret(void) {
 	} while (finished == 0);
 
 	finished--;
-	} /* interpret */
+} /* interpret */
 
 
-	/*
-	 * call
-	 *
-	 * Call a subroutine. Save PC and FP then load new PC and initialise
-	 * new stack frame. Note that the caller may legally provide less or
-	 * more arguments than the function actually has. The call type "ct"
-	 * can be 0 (z_call_s), 1 (z_call_n) or 2 (direct call).
-	 *
-	 */
+/*
+ * call
+ *
+ * Call a subroutine. Save PC and FP then load new PC and initialise
+ * new stack frame. Note that the caller may legally provide less or
+ * more arguments than the function actually has. The call type "ct"
+ * can be 0 (z_call_s), 1 (z_call_n) or 2 (direct call).
+ *
+ */
 void call(zword routine, int argc, zword *args, int ct) {
 	long pc;
 	zword value;
@@ -308,7 +308,7 @@ void call(zword routine, int argc, zword *args, int ct) {
 		runtime_error(ERR_STK_OVF);
 
 	GET_PC(pc)
-		*--sp = (zword)(pc >> 9);
+	*--sp = (zword)(pc >> 9);
 	*--sp = (zword)(pc & 0x1ff);
 	*--sp = (zword)(fp - stack - 1);
 	*--sp = (zword)(argc | (ct << 12));
@@ -324,25 +324,25 @@ void call(zword routine, int argc, zword *args, int ct) {
 		pc = (long)routine << 2;
 	else if (z_header.version <= V7)
 		pc = ((long)routine << 2) + ((long)z_header.functions_offset << 3);
-	else			/* z_header.version == V8 */
+	else            /* z_header.version == V8 */
 		pc = (long)routine << 3;
 
 	if (pc >= story_size)
 		runtime_error(ERR_ILL_CALL_ADDR);
 
 	SET_PC(pc)
-		/* Initialise local variables */
-		CODE_BYTE(count)
+	/* Initialise local variables */
+	CODE_BYTE(count)
 
-		if (count > 15)
-			runtime_error(ERR_CALL_NON_RTN);
+	if (count > 15)
+		runtime_error(ERR_CALL_NON_RTN);
 	if (sp - stack < count)
 		runtime_error(ERR_STK_OVF);
 
-	fp[0] |= (zword)count << 8;	 /* Save local var count for Quetzal. */
+	fp[0] |= (zword)count << 8;  /* Save local var count for Quetzal. */
 	value = 0;
 	for (i = 0; i < count; i++) {
-		if (z_header.version <= V4)	  /* V1 to V4 games provide default */
+		if (z_header.version <= V4)   /* V1 to V4 games provide default */
 			CODE_WORD(value)  /* values for all local variables */
 			*--sp = (zword)((argc-- > 0) ? args[i] : value);
 	}
@@ -375,12 +375,12 @@ void ret(zword value) {
 	frame_count--;
 	fp = stack + 1 + *sp++;
 	pc = *sp++;
-	pc = ((long)*sp++ << 9) | pc;
+	pc = ((long) * sp++ << 9) | pc;
 
 	SET_PC(pc)
-		/* Handle resulting value */
-		if (ct == 0)
-			store(value);
+	/* Handle resulting value */
+	if (ct == 0)
+		store(value);
 	if (ct == 2)
 		*--sp = value;
 
@@ -411,27 +411,27 @@ void branch(bool flag) {
 	zbyte off2;
 
 	CODE_BYTE(specifier)
-		off1 = specifier & 0x3f;
+	off1 = specifier & 0x3f;
 
 	if (!flag)
 		specifier ^= 0x80;
 
-	if (!(specifier & 0x40)) {	/* it's a long branch */
-		if (off1 & 0x20)	/* propagate sign bit */
+	if (!(specifier & 0x40)) {  /* it's a long branch */
+		if (off1 & 0x20)    /* propagate sign bit */
 			off1 |= 0xc0;
 
 		CODE_BYTE(off2)
-			offset = (off1 << 8) | off2;
+		offset = (off1 << 8) | off2;
 	} else
-		offset = off1;	/* it's a short branch */
+		offset = off1;  /* it's a short branch */
 
 	if (specifier & 0x80) {
-		if (offset > 1) {	/* normal branch */
+		if (offset > 1) {   /* normal branch */
 			GET_PC(pc)
-				pc += (short)offset - 2;
+			pc += (short)offset - 2;
 			SET_PC(pc)
 		} else
-			ret(offset);	/* special case, return 0 or 1 */
+			ret(offset);    /* special case, return 0 or 1 */
 	}
 } /* branch */
 
@@ -446,14 +446,14 @@ void store(zword value) {
 	zbyte variable;
 
 	CODE_BYTE(variable)
-		if (variable == 0)
-			*--sp = value;
-		else if (variable < 16)
-			*(fp - variable) = value;
-		else {
-			zword addr = z_header.globals + 2 * (variable - 16);
-			SET_WORD(addr, value)
-		}
+	if (variable == 0)
+		*--sp = value;
+	else if (variable < 16)
+		*(fp - variable) = value;
+	else {
+		zword addr = z_header.globals + 2 * (variable - 16);
+		SET_WORD(addr, value)
+	}
 } /* store */
 
 
@@ -492,7 +492,7 @@ int direct_call(zword addr) {
 	zargc = saved_zargc;
 
 	/* Resulting value lies on top of the stack */
-	return (short)*sp++;
+	return (short) * sp++;
 } /* direct_call */
 
 
@@ -507,12 +507,12 @@ static void __extended__(void) {
 	zbyte specifier;
 
 	CODE_BYTE(opcode)
-		CODE_BYTE(specifier)
-		load_all_operands(specifier);
+	CODE_BYTE(specifier)
+	load_all_operands(specifier);
 
 	/* extended opcodes from 0x1d on */
 	if (opcode < 0x1d)
-		ext_opcodes[opcode]();	/* are reserved for future spec' */
+		ext_opcodes[opcode]();  /* are reserved for future spec' */
 } /* __extended__ */
 
 
@@ -530,7 +530,7 @@ static void __illegal__(void) {
 /*
  * z_catch, store the current stack frame for later use with z_throw.
  *
- *	no zargs used
+ *  no zargs used
  *
  */
 void z_catch(void) {
@@ -541,8 +541,8 @@ void z_catch(void) {
 /*
  * z_throw, go back to the given stack frame and return the given value.
  *
- *	zargs[0] = value to return
- *	zargs[1] = stack frame
+ *  zargs[0] = value to return
+ *  zargs[1] = stack frame
  *
  */
 void z_throw(void) {
@@ -560,10 +560,10 @@ void z_throw(void) {
 /*
  * z_call_n, call a subroutine and discard its result.
  *
- * 	zargs[0] = packed address of subroutine
- *	zargs[1] = first argument (optional)
- *	...
- *	zargs[7] = seventh argument (optional)
+ *  zargs[0] = packed address of subroutine
+ *  zargs[1] = first argument (optional)
+ *  ...
+ *  zargs[7] = seventh argument (optional)
  *
  */
 void z_call_n(void) {
@@ -575,10 +575,10 @@ void z_call_n(void) {
 /*
  * z_call_s, call a subroutine and store its result.
  *
- * 	zargs[0] = packed address of subroutine
- *	zargs[1] = first argument (optional)
- *	...
- *	zargs[7] = seventh argument (optional)
+ *  zargs[0] = packed address of subroutine
+ *  zargs[1] = first argument (optional)
+ *  ...
+ *  zargs[7] = seventh argument (optional)
  *
  */
 void z_call_s(void) {
@@ -592,7 +592,7 @@ void z_call_s(void) {
 /*
  * z_check_arg_count, branch if subroutine was called with >= n arg's.
  *
- * 	zargs[0] = number of arguments
+ *  zargs[0] = number of arguments
  *
  */
 void z_check_arg_count(void) {
@@ -607,14 +607,14 @@ void z_check_arg_count(void) {
 /*
  * z_jump, jump unconditionally to the given address.
  *
- *	zargs[0] = PC relative address
+ *  zargs[0] = PC relative address
  *
  */
 void z_jump(void) {
 	long pc;
 
 	GET_PC(pc)
-		pc += (short)zargs[0] - 2;
+	pc += (short)zargs[0] - 2;
 
 	if (pc >= story_size)
 		runtime_error(ERR_ILL_JUMP_ADDR);
@@ -626,7 +626,7 @@ void z_jump(void) {
 /*
  * z_nop, no operation.
  *
- *	no zargs used
+ *  no zargs used
  *
  */
 void z_nop(void) {
@@ -637,7 +637,7 @@ void z_nop(void) {
 /*
  * z_quit, stop game and exit interpreter.
  *
- *	no zargs used
+ *  no zargs used
  *
  */
 void z_quit(void) {
@@ -648,7 +648,7 @@ void z_quit(void) {
 /*
  * z_ret, return from a subroutine with the given value.
  *
- *	zargs[0] = value to return
+ *  zargs[0] = value to return
  *
  */
 void z_ret(void) {
@@ -659,7 +659,7 @@ void z_ret(void) {
 /*
  * z_ret_popped, return from a subroutine with a value popped off the stack.
  *
- *	no zargs used
+ *  no zargs used
  *
  */
 void z_ret_popped(void) {
@@ -670,7 +670,7 @@ void z_ret_popped(void) {
 /*
  * z_rfalse, return from a subroutine with false (0).
  *
- * 	no zargs used
+ *  no zargs used
  *
  */
 void z_rfalse(void) {
@@ -681,7 +681,7 @@ void z_rfalse(void) {
 /*
  * z_rtrue, return from a subroutine with true (1).
  *
- * 	no zargs used
+ *  no zargs used
  *
  */
 void z_rtrue(void) {

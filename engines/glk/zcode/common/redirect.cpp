@@ -45,8 +45,7 @@ static struct {
  * Begin output redirection to the memory of the Z-machine.
  *
  */
-void memory_open(zword table, zword xsize, bool buffering)
-{
+void memory_open(zword table, zword xsize, bool buffering) {
 	if (++depth < MAX_NESTING) {
 		if (!buffering)
 			xsize = 0xffff;
@@ -73,8 +72,7 @@ void memory_open(zword table, zword xsize, bool buffering)
  * Redirect a newline to the memory of the Z-machine.
  *
  */
-void memory_new_line(void)
-{
+void memory_new_line(void) {
 	zword size;
 	zword addr;
 
@@ -91,7 +89,7 @@ void memory_new_line(void)
 		size = 0;
 
 	} else
-		storeb((zword) (addr + (size++)), 13);
+		storeb((zword)(addr + (size++)), 13);
 
 	storew(redirect[depth].table, size);
 } /* memory_new_line */
@@ -103,8 +101,7 @@ void memory_new_line(void)
  * Redirect a string of characters to the memory of the Z-machine.
  *
  */
-void memory_word(const zchar * s)
-{
+void memory_word(const zchar *s) {
 	zword size;
 	zword addr;
 	zchar c;
@@ -114,9 +111,9 @@ void memory_word(const zchar * s)
 
 		if (redirect[depth].xsize != 0xffff)
 			if (redirect[depth].width + width >
-			    redirect[depth].xsize) {
+			        redirect[depth].xsize) {
 				if (*s == ' ' || *s == ZC_INDENT ||
-				    *s == ZC_GAP)
+				        *s == ZC_GAP)
 					width = os_string_width(++s);
 				memory_new_line();
 			}
@@ -127,7 +124,7 @@ void memory_word(const zchar * s)
 	addr += 2;
 
 	while ((c = *s++) != 0)
-		storeb((zword) (addr + (size++)), translate_to_zscii(c));
+		storeb((zword)(addr + (size++)), translate_to_zscii(c));
 
 	storew(redirect[depth].table, size);
 } /* memory_word */
@@ -139,15 +136,14 @@ void memory_word(const zchar * s)
  * End of output redirection.
  *
  */
-void memory_close(void)
-{
+void memory_close(void) {
 	if (depth >= 0) {
 		if (redirect[depth].xsize != 0xffff)
 			memory_new_line();
 		if (z_header.version == V6) {
 
 			z_header.line_width = (redirect[depth].xsize != 0xffff) ?
-			    redirect[depth].total : redirect[depth].width;
+			                      redirect[depth].total : redirect[depth].width;
 
 			SET_WORD(H_LINE_WIDTH, z_header.line_width)
 		}

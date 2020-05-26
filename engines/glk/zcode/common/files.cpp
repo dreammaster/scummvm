@@ -31,11 +31,11 @@ namespace ZCode {
 #define SEEK_END 2
 #endif
 
-extern void set_more_prompts (bool);
+extern void set_more_prompts(bool);
 
-extern bool is_terminator (zchar);
+extern bool is_terminator(zchar);
 
-extern bool read_yes_or_no (const char *);
+extern bool read_yes_or_no(const char *);
 
 /* char script_name[MAX_FILE_NAME + 1] = DEFAULT_SCRIPT_NAME; */
 /* char command_name[MAX_FILE_NAME + 1] = DEFAULT_COMMAND_NAME; */
@@ -63,8 +63,7 @@ static FILE *pfp = nullptr;
  * name in V5+.
  *
  */
-void script_open(void)
-{
+void script_open(void) {
 	static bool script_valid = FALSE;
 
 	char *new_name;
@@ -80,15 +79,15 @@ void script_open(void)
 	}
 
 	/* Opening in "at" mode doesn't work for script_erase_input... */
-	if ((sfp = fopen (f_setup.script_name, "r+t")) != nullptr ||
-	    (sfp = fopen(f_setup.script_name, "w+t")) != nullptr) {
-		fseek (sfp, 0, SEEK_END);
+	if ((sfp = fopen(f_setup.script_name, "r+t")) != nullptr ||
+	        (sfp = fopen(f_setup.script_name, "w+t")) != nullptr) {
+		fseek(sfp, 0, SEEK_END);
 		z_header.flags |= SCRIPTING_FLAG;
 		script_valid = TRUE;
 		ostream_script = TRUE;
 		script_width = 0;
 	} else
-		print_string ("Cannot open file\n");
+		print_string("Cannot open file\n");
 
 done:
 	SET_WORD(H_FLAGS, z_header.flags);
@@ -101,11 +100,10 @@ done:
  * Stop transcription.
  *
  */
-void script_close(void)
-{
+void script_close(void) {
 	z_header.flags &= ~SCRIPTING_FLAG;
 	SET_WORD(H_FLAGS, z_header.flags);
-	fclose (sfp);
+	fclose(sfp);
 	ostream_script = FALSE;
 } /* script_close */
 
@@ -116,10 +114,9 @@ void script_close(void)
  * Write a newline to the transcript file.
  *
  */
-void script_new_line(void)
-{
-	if (fputc ('\n', sfp) == EOF)
-		script_close ();
+void script_new_line(void) {
+	if (fputc('\n', sfp) == EOF)
+		script_close();
 	script_width = 0;
 } /* script_new_line */
 
@@ -130,27 +127,26 @@ void script_new_line(void)
  * Write a single character to the transcript file.
  *
  */
-void script_char(zchar c)
-{
+void script_char(zchar c) {
 	if (c == ZC_INDENT && script_width != 0)
 		c = ' ';
 
 	if (c == ZC_INDENT) {
 		script_char(' ');
-		script_char (' ');
-		script_char (' ');
+		script_char(' ');
+		script_char(' ');
 		return;
 	}
 
 	if (c == ZC_GAP) {
-		script_char (' ');
-		script_char (' ');
+		script_char(' ');
+		script_char(' ');
 		return;
 	}
 
 #ifdef __MSDOS__
-	if (c > 0xff)	/* Should always be false */
-		c = '?';	/* Unreachable */
+	if (c > 0xff)   /* Should always be false */
+		c = '?';    /* Unreachable */
 	if (c >= ZC_LATIN1_MIN)
 		c = latin1_to_ibm[c - ZC_LATIN1_MIN];
 	fputc(c, sfp);
@@ -159,7 +155,7 @@ void script_char(zchar c)
 
 
 #ifdef USE_UTF8
-	if (c > 0x7ff) {	/* Encode as UTF-8 */
+	if (c > 0x7ff) {    /* Encode as UTF-8 */
 		fputc(0xe0 | ((c >> 12) & 0xf), sfp);
 		fputc(0x80 | ((c >> 6) & 0x3f), sfp);
 		fputc(0x80 | (c & 0x3f), sfp);
@@ -188,13 +184,12 @@ void script_char(zchar c)
  * Write a string to the transcript file.
  *
  */
-void script_word(const zchar *s)
-{
+void script_word(const zchar *s) {
 	int width;
 	int i;
 
 	if (*s == ZC_INDENT && script_width != 0)
-		script_char (*s++);
+		script_char(*s++);
 
 	for (i = 0, width = 0; s[i] != 0; i++) {
 		if (s[i] == ZC_NEW_STYLE || s[i] == ZC_NEW_FONT)
@@ -210,13 +205,13 @@ void script_word(const zchar *s)
 	if (f_setup.script_cols != 0 && script_width + width > f_setup.script_cols) {
 		if (*s == ' ' || *s == ZC_INDENT || *s == ZC_GAP)
 			s++;
-		script_new_line ();
+		script_new_line();
 	}
 	for (i = 0; s[i] != 0; i++) {
 		if (s[i] == ZC_NEW_FONT || s[i] == ZC_NEW_STYLE)
 			i++;
 		else
-			script_char (s[i]);
+			script_char(s[i]);
 	}
 } /* script_word */
 
@@ -227,8 +222,7 @@ void script_word(const zchar *s)
  * Send an input line to the transcript file.
  *
  */
-void script_write_input(const zchar *buf, zchar key)
-{
+void script_write_input(const zchar *buf, zchar key) {
 	int width;
 	int i;
 
@@ -252,15 +246,15 @@ void script_write_input(const zchar *buf, zchar key)
  * Remove an input line from the transcript file.
  *
  */
-void script_erase_input(const zchar *buf)
-{
+void script_erase_input(const zchar *buf) {
 	int width;
 	int i;
 
 	for (i = 0, width = 0; buf[i] != 0; i++)
 		width++;
 
-	fseek(sfp, -width, SEEK_CUR); script_width -= width;
+	fseek(sfp, -width, SEEK_CUR);
+	script_width -= width;
 } /* script_erase_input */
 
 
@@ -270,8 +264,7 @@ void script_erase_input(const zchar *buf)
  * Start sending a "debugging" message to the transcript file.
  *
  */
-void script_mssg_on(void)
-{
+void script_mssg_on(void) {
 	if (script_width != 0)
 		script_new_line();
 
@@ -285,8 +278,7 @@ void script_mssg_on(void)
  * Stop writing a "debugging" message.
  *
  */
-void script_mssg_off(void)
-{
+void script_mssg_off(void) {
 	script_new_line();
 
 } /* script_mssg_off */
@@ -298,8 +290,7 @@ void script_mssg_off(void)
  * Open a file to record the player's input.
  *
  */
-void record_open(void)
-{
+void record_open(void) {
 	char *new_name;
 
 	new_name = os_read_file_name(f_setup.command_name, FILE_RECORD);
@@ -321,9 +312,9 @@ void record_open(void)
  * Stop recording the player's input.
  *
  */
-void record_close (void)
-{
-    fclose (rfp); ostream_record = FALSE;
+void record_close(void) {
+	fclose(rfp);
+	ostream_record = FALSE;
 
 }/* record_close */
 
@@ -334,8 +325,7 @@ void record_close (void)
  * Helper function for record_char.
  *
  */
-static void record_code(int c, bool force_encoding)
-{
+static void record_code(int c, bool force_encoding) {
 	if (force_encoding || c == '[' || c < 0x20 || c > 0x7e) {
 		int i;
 
@@ -358,17 +348,16 @@ static void record_code(int c, bool force_encoding)
  * Write a character to the command file.
  *
  */
-static void record_char(zchar c)
-{
+static void record_char(zchar c) {
 	if (c != ZC_RETURN) {
 		if (c < ZC_HKEY_MIN || c > ZC_HKEY_MAX) {
-			record_code (translate_to_zscii (c), FALSE);
+			record_code(translate_to_zscii(c), FALSE);
 			if (c == ZC_SINGLE_CLICK || c == ZC_DOUBLE_CLICK) {
-				record_code (mouse_x, TRUE);
-				record_code (mouse_y, TRUE);
+				record_code(mouse_x, TRUE);
+				record_code(mouse_y, TRUE);
 			}
 		} else
-			record_code (1000 + c - ZC_HKEY_MIN, TRUE);
+			record_code(1000 + c - ZC_HKEY_MIN, TRUE);
 	}
 } /* record_char */
 
@@ -379,8 +368,7 @@ static void record_char(zchar c)
  * Copy a keystroke to the command file.
  *
  */
-void record_write_key(zchar key)
-{
+void record_write_key(zchar key) {
 	record_char(key);
 	if (fputc('\n', rfp) == EOF)
 		record_close();
@@ -393,8 +381,7 @@ void record_write_key(zchar key)
  * Copy a line of input to a command file.
  *
  */
-void record_write_input(const zchar *buf, zchar key)
-{
+void record_write_input(const zchar *buf, zchar key) {
 	zchar c;
 
 	while ((c = *buf++) != 0)
@@ -411,8 +398,7 @@ void record_write_input(const zchar *buf, zchar key)
  * Open a file of commands for playback.
  *
  */
-void replay_open(void)
-{
+void replay_open(void) {
 	char *new_name;
 
 	new_name = os_read_file_name(f_setup.command_name, FILE_PLAYBACK);
@@ -435,10 +421,9 @@ void replay_open(void)
  * Stop playback of commands.
  *
  */
-void replay_close(void)
-{
+void replay_close(void) {
 	set_more_prompts(TRUE);
-	fclose (pfp);
+	fclose(pfp);
 	istream_replay = FALSE;
 } /* replay_close */
 
@@ -449,8 +434,7 @@ void replay_close(void)
  * Helper function for replay_key and replay_line.
  *
  */
-static int replay_code(void)
-{
+static int replay_code(void) {
 	int c;
 
 	if ((c = fgetc(pfp)) == '[') {
@@ -472,14 +456,13 @@ static int replay_code(void)
  * Read a character from the command file.
  *
  */
-static zchar replay_char (void)
-{
+static zchar replay_char(void) {
 	int c;
 
 	if ((c = replay_code()) != EOF) {
 		if (c != '\n') {
-			 if (c < 1000) {
-				c = translate_from_zscii (c);
+			if (c < 1000) {
+				c = translate_from_zscii(c);
 				if (c == ZC_SINGLE_CLICK || c == ZC_DOUBLE_CLICK) {
 					mouse_x = replay_code();
 					mouse_y = replay_code();
@@ -502,8 +485,7 @@ static zchar replay_char (void)
  * Read a keystroke from a command file.
  *
  */
-zchar replay_read_key (void)
-{
+zchar replay_read_key(void) {
 	zchar key;
 
 	key = replay_char();
@@ -522,8 +504,7 @@ zchar replay_read_key (void)
  * Read a line of input from a command file.
  *
  */
-zchar replay_read_input(zchar *buf)
-{
+zchar replay_read_input(zchar *buf) {
 	zchar c;
 
 	for (;;) {

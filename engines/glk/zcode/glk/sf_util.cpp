@@ -48,8 +48,7 @@ static cfrec *cflist = nullptr;
 static int getcolor(char *);
 
 
-void sf_regcleanfunc(void *f, const char *p)
-{
+void sf_regcleanfunc(void *f, const char *p) {
 	cfrec *n = (cfrec *)calloc(1, sizeof(cfrec));
 	if (n) {
 		if (!p)
@@ -62,8 +61,7 @@ void sf_regcleanfunc(void *f, const char *p)
 }
 
 
-void sf_cleanup_all()
-{
+void sf_cleanup_all() {
 	while (cflist) {
 		cfrec *n = cflist->next;
 		if (cflist->func)
@@ -80,8 +78,7 @@ void sf_cleanup_all()
  * Reset the screen before the program ends.
  *
  */
-void os_reset_screen(void)
-{
+void os_reset_screen(void) {
 	sf_flushdisplay();
 
 	if (m_exitPause) {
@@ -182,8 +179,7 @@ static const char *footer =
 
 
 #define WIDCOL 40
-static void usage(int type)
-{
+static void usage(int type) {
 	const char **p;
 	int i = 0, len = 0;
 
@@ -241,8 +237,7 @@ extern int m_timerinterval;
 
 static const char *options = "@:%aAb:B:c:f:FH:iI:l:L:m:N:oOPqr:s:S:tTu:vVW:xXZ:";
 
-static int limit(int v, int m, int M)
-{
+static int limit(int v, int m, int M) {
 	if (v < m)
 		return m;
 	if (v > M)
@@ -345,10 +340,10 @@ static void print_version() {
 	debug("FROTZ V%s", VERSION);
 	debug("  Frotz was originally written by Stefan Jokisch.");
 	debug
-	    ("  It complies with standard 1.0 of Graham Nelson's specification.\n");
+	("  It complies with standard 1.0 of Graham Nelson's specification.\n");
 	debug("  It was ported to Unix by Galen Hazelwood.");
 	debug
-	    ("  The core and SDL port are maintained by David Griffith.\n");
+	("  The core and SDL port are maintained by David Griffith.\n");
 	debug("  Frotz's homepage is https://661.org/proj/if/frotz/\n\n");
 	os_quit(EXIT_SUCCESS);
 }
@@ -358,8 +353,7 @@ static void print_version() {
  * Like dirname except well defined.
  * Does not modify path.  Always returns a new string (caller must free).
  */
-static char *new_dirname(const char *path)
-{
+static char *new_dirname(const char *path) {
 #ifdef TODO
 	char *p = strdup(path), *p2 = strdup(dirname(p));
 	free(p);
@@ -374,8 +368,7 @@ static char *new_dirname(const char *path)
  * Like basename except well defined.
  * Does not modify path.  Always returns a new string (caller must free).
  */
-static char *new_basename(const char *path)
-{
+static char *new_basename(const char *path) {
 #ifdef TODO
 	char *p = strdup(path), *p2 = strdup(basename(p));
 	free(p);
@@ -393,8 +386,7 @@ static char *new_basename(const char *path)
  * Some variables may be set to activate special features of Frotz.
  *
  */
-void os_process_arguments(int argc, const char *argv[])
-{
+void os_process_arguments(int argc, const char *argv[]) {
 	char *p;
 
 	zoptarg = nullptr;
@@ -418,8 +410,8 @@ void os_process_arguments(int argc, const char *argv[])
 	/* Now strip off the extension. */
 	p = strrchr(f_setup.story_name, '.');
 	if ((p != nullptr) &&
-	    ((strcmp(p, EXT_BLORB2) == 0) ||
-	     (strcmp(p, EXT_BLORB3) == 0) || (strcmp(p, EXT_BLORB4) == 0))) {
+	        ((strcmp(p, EXT_BLORB2) == 0) ||
+	         (strcmp(p, EXT_BLORB3) == 0) || (strcmp(p, EXT_BLORB4) == 0))) {
 		/*  blorb_ext = strdup(p); */
 	} else
 		/*  blorb_ext = strdup(EXT_BLORB); */
@@ -428,43 +420,43 @@ void os_process_arguments(int argc, const char *argv[])
 		/* This will take care of an extension like ".zblorb". */
 		/* More than that, there might be something weird going on */
 		/* which is not our concern. */
-	if (p != nullptr) {
-		if (strlen(p) >= 2 && strlen(p) <= 7) {
-			*p = '\0';	/* extension removed */
+		if (p != nullptr) {
+			if (strlen(p) >= 2 && strlen(p) <= 7) {
+				*p = '\0';  /* extension removed */
+			}
 		}
-	}
 	f_setup.story_path = new_dirname(argv[zoptind]);
 
 	/* Create nice default file names */
 	f_setup.script_name = (char *)
-	    malloc((strlen(f_setup.story_name) +
-		    strlen(EXT_SCRIPT)) * sizeof(char) + 1);
+	                      malloc((strlen(f_setup.story_name) +
+	                              strlen(EXT_SCRIPT)) * sizeof(char) + 1);
 	memcpy(f_setup.script_name, f_setup.story_name, strlen(f_setup.story_name) * sizeof(char));
 	strncat(f_setup.script_name, EXT_SCRIPT, strlen(EXT_SCRIPT) + 1);
 
 	f_setup.command_name = (char *)
-	    malloc((strlen(f_setup.story_name) +
-		    strlen(EXT_COMMAND)) * sizeof(char) + 1);
+	                       malloc((strlen(f_setup.story_name) +
+	                               strlen(EXT_COMMAND)) * sizeof(char) + 1);
 	memcpy(f_setup.command_name, f_setup.story_name, strlen(f_setup.story_name) * sizeof(char));
 	strncat(f_setup.command_name, EXT_COMMAND, strlen(EXT_COMMAND) + 1);
 
 	if (!f_setup.restore_mode) {
 		f_setup.save_name = (char *)
-		    malloc((strlen(f_setup.story_name) +
-			    strlen(EXT_SAVE)) * sizeof(char) + 1);
+		                    malloc((strlen(f_setup.story_name) +
+		                            strlen(EXT_SAVE)) * sizeof(char) + 1);
 		memcpy(f_setup.save_name, f_setup.story_name, strlen(f_setup.story_name) * sizeof(char));
 		strncat(f_setup.save_name, EXT_SAVE, strlen(EXT_SAVE) + 1);
-	} else {	/* Set our auto load save as the name_save */
+	} else {    /* Set our auto load save as the name_save */
 		f_setup.save_name = (char *)
-		    malloc((strlen(f_setup.tmp_save_name) +
-			    strlen(EXT_SAVE)) * sizeof(char) + 1);
+		                    malloc((strlen(f_setup.tmp_save_name) +
+		                            strlen(EXT_SAVE)) * sizeof(char) + 1);
 		memcpy(f_setup.save_name, f_setup.tmp_save_name, strlen(f_setup.tmp_save_name) * sizeof(char));
 		free(f_setup.tmp_save_name);
 	}
 
 	f_setup.aux_name = (char *)
-	    malloc((strlen(f_setup.story_name) +
-		    strlen(EXT_AUX)) * sizeof(char) + 1);
+	                   malloc((strlen(f_setup.story_name) +
+	                           strlen(EXT_AUX)) * sizeof(char) + 1);
 	memcpy(f_setup.aux_name, f_setup.story_name, strlen(f_setup.story_name) * sizeof(char));
 	strncat(f_setup.aux_name, EXT_AUX, strlen(EXT_AUX) + 1);
 
@@ -490,19 +482,16 @@ void os_process_arguments(int argc, const char *argv[])
 } /* os_process_arguments */
 
 
-void sf_sleep(int msecs)
-{
+void sf_sleep(int msecs) {
 	g_system->delayMillis(msecs);
 }
 
 #ifdef WIN32
-unsigned long sf_ticks(void)
-{
+unsigned long sf_ticks(void) {
 	return g_system->getMillis();
 }
 #else
-unsigned long sf_ticks(void)
-{
+unsigned long sf_ticks(void) {
 	struct timeval now;
 	static struct timeval start;
 	static int started = 0;
@@ -515,7 +504,7 @@ unsigned long sf_ticks(void)
 	}
 	ticks =
 	    (now.tv_sec - start.tv_sec) * 1000 + (now.tv_usec -
-						  start.tv_usec) / 1000;
+	            start.tv_usec) / 1000;
 	return ticks;
 }
 #endif
@@ -535,8 +524,7 @@ static const char *getextension(int flag) {
 }
 
 
-static bool newfile(int flag)
-{
+static bool newfile(int flag) {
 	if (flag == FILE_SAVE || flag == FILE_SAVE_AUX || flag == FILE_RECORD)
 		return true;
 	return false;
@@ -545,8 +533,7 @@ static bool newfile(int flag)
 
 static char buf[FILENAME_MAX];
 
-static const char *getnumbername(const char *def, const char *ext)
-{
+static const char *getnumbername(const char *def, const char *ext) {
 	int len, number = 0;
 	strcpy(buf, f_setup.story_name);
 	len = strlen(buf);
@@ -559,8 +546,7 @@ static const char *getnumbername(const char *def, const char *ext)
 }
 
 
-static const char *getdatename(const char *def, const char *ext)
-{
+static const char *getdatename(const char *def, const char *ext) {
 #ifdef TODO
 	int len;
 
@@ -572,8 +558,8 @@ static const char *getdatename(const char *def, const char *ext)
 	strcpy(buf, f_setup.story_name);
 	len = strlen(buf);
 	sdebug(buf + len, "%04d%02d%02d%02d%02d%s",
-		tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-		tm->tm_hour, tm->tm_min, ext);
+	       tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+	       tm->tm_hour, tm->tm_min, ext);
 	return buf;
 #else
 	error("TODO: getdatename");
@@ -582,9 +568,9 @@ static const char *getdatename(const char *def, const char *ext)
 
 
 static int ingame_read_file_name(char *file_name, const char *default_name,
-				 int flag);
+                                 int flag);
 static int dialog_read_file_name(char *file_name, const char *default_name,
-				 int flag);
+                                 int flag);
 
 /*
  * os_read_file_name
@@ -606,8 +592,7 @@ static int dialog_read_file_name(char *file_name, const char *default_name,
  *
  * Return value is nullptr is there was a problem
  */
-char *os_read_file_name(const char *default_name, int flag)
-{
+char *os_read_file_name(const char *default_name, int flag) {
 	int st;
 	const char *initname = default_name;
 	char file_name[FILENAME_MAX + 1];
@@ -640,8 +625,7 @@ char *os_read_file_name(const char *default_name, int flag)
 
 
 static int ingame_read_file_name(char *file_name, const char *default_name,
-				 int flag)
-{
+                                 int flag) {
 	const char *extension;
 	FILE *fp;
 	bool terminal;
@@ -724,7 +708,7 @@ static int ingame_read_file_name(char *file_name, const char *default_name,
 	/* OK if user wants to overwrite */
 	result = read_yes_or_no("Overwrite existing file");
 
- finished:
+finished:
 
 	/* Restore state of playback and recording */
 	istream_replay = saved_replay;
@@ -735,8 +719,7 @@ static int ingame_read_file_name(char *file_name, const char *default_name,
 
 
 static int dialog_read_file_name(char *file_name, const char *default_name,
-				 int flag)
-{
+                                 int flag) {
 	int filter = 0;
 	int title = 0, st;
 	char *res;
@@ -777,7 +760,7 @@ static int dialog_read_file_name(char *file_name, const char *default_name,
 	}
 
 	st = sf_user_fdialog(!newfile(flag), default_name, sf_msgstring(filter),
-			     sf_msgstring(title), &res);
+	                     sf_msgstring(title), &res);
 	if (st == SF_NOTIMP)
 		return st;
 	if (st == 0) {
@@ -790,8 +773,7 @@ static int dialog_read_file_name(char *file_name, const char *default_name,
 
 static char *rc = nullptr;
 
-void sf_FinishProfile()
-{
+void sf_FinishProfile() {
 	if (!rc)
 		return;
 	free(rc);
@@ -799,8 +781,7 @@ void sf_FinishProfile()
 }
 
 
-void sf_InitProfile(const char *fn)
-{
+void sf_InitProfile(const char *fn) {
 	FILE *f;
 	int size;
 	char *s, *d;
@@ -855,8 +836,7 @@ void sf_InitProfile(const char *fn)
 }
 
 
-static char *findsect(const char *sect)
-{
+static char *findsect(const char *sect) {
 	int ns = strlen(sect);
 	char *r = rc;
 	while (r) {
@@ -872,8 +852,7 @@ static char *findsect(const char *sect)
 }
 
 
-static char *findid(const char *sect, const char *id)
-{
+static char *findid(const char *sect, const char *id) {
 	int nid = strlen(id);
 	char *r, *sav, *rq, *fnd = nullptr;
 	r = findsect(sect);
@@ -887,8 +866,8 @@ static char *findid(const char *sect, const char *id)
 		if (!r)
 			break;
 		rq = r + nid;
-		if ((*(byte *) (r - 1) <= ' ')
-		    && ((*rq == ' ') || (*rq == '='))) {
+		if ((*(byte *)(r - 1) <= ' ')
+		        && ((*rq == ' ') || (*rq == '='))) {
 			while (*rq)
 				if (*rq++ == '=')
 					break;
@@ -905,8 +884,7 @@ static char *findid(const char *sect, const char *id)
 }
 
 
-int sf_GetProfileInt(const char *sect, const char *id, int def)
-{
+int sf_GetProfileInt(const char *sect, const char *id, int def) {
 	if (rc) {
 		char *p = findid(sect, id);
 		if (p)
@@ -916,8 +894,7 @@ int sf_GetProfileInt(const char *sect, const char *id, int def)
 }
 
 
-double sf_GetProfileDouble(const char *sect, const char *id, double def)
-{
+double sf_GetProfileDouble(const char *sect, const char *id, double def) {
 	if (rc) {
 		char *p = findid(sect, id);
 		if (p)
@@ -927,8 +904,7 @@ double sf_GetProfileDouble(const char *sect, const char *id, double def)
 }
 
 
-char *sf_GetProfileString(const char *sect, const char *id, const char *def)
-{
+char *sf_GetProfileString(const char *sect, const char *id, const char *def) {
 	char *q = nullptr, sav = 0;
 	if (rc) {
 		char *p = findid(sect, id);
@@ -940,7 +916,7 @@ char *sf_GetProfileString(const char *sect, const char *id, const char *def)
 					p++;
 					break;
 				}
-				if ((byte) (*p) > ' ')
+				if ((byte)(*p) > ' ')
 					break;
 			}
 			if (*p) {
@@ -986,26 +962,23 @@ char *sf_GetProfileString(const char *sect, const char *id, const char *def)
  */
 
 #define plong( b) (((int)((b)[3]) << 24) + ((int)((b)[2]) << 16) +\
-	((int)((b)[1]) << 8) + (int)((b)[0]))
+                   ((int)((b)[1]) << 8) + (int)((b)[0]))
 
 #define pshort( b) (((int)((b)[1]) << 8) + (int)((b)[0]))
 
 
-static unsigned myin(void *d, byte ** b)
-{
+static unsigned myin(void *d, byte **b) {
 	return 0;
 }
 
 #ifdef TODO
-static int myout(void *udata, byte * b, unsigned n)
-{
+static int myout(void *udata, byte *b, unsigned n) {
 	memmove(udata, b, n);
 	udata += n;
 	return 0;
 }
 
-static int myunzip(int csize, byte * cdata, byte * udata)
-{
+static int myunzip(int csize, byte *cdata, byte *udata) {
 	byte window[32768];
 	z_stream z;
 	int st;
@@ -1033,8 +1006,7 @@ static int myunzip(int csize, byte * cdata, byte * udata)
 
 #endif
 
-int sf_pkread(FILE * f, int foffs, void **out, int *size)
-{
+int sf_pkread(FILE *f, int foffs, void **out, int *size) {
 	byte hd[30];
 	byte *data, *cdata;
 	int csize, usize, cmet, skip, st;
@@ -1084,12 +1056,11 @@ int sf_pkread(FILE * f, int foffs, void **out, int *size)
  * corresponding to the color macros defined in frotz.h.
  *
  */
-static int getcolor(char *value)
-{
+static int getcolor(char *value) {
 	int num;
 
 	/* Be case-insensitive */
-	for (num = 0; value[num] !=0; num++)
+	for (num = 0; value[num] != 0; num++)
 		value[num] = tolower((int) value[num]);
 
 	if (strcmp(value, "black") == 0)

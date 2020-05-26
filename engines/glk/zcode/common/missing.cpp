@@ -31,19 +31,18 @@ namespace ZCode {
  * lack memmove(3).
  *
  */
-void *my_memmove(void *dest, const void *src, size_t n)
-{
-	char *d =(char *)dest;
-	char *s =(char *)src;
+void *my_memmove(void *dest, const void *src, size_t n) {
+	char *d = (char *)dest;
+	char *s = (char *)src;
 
-	if(s == d) return dest;
+	if (s == d) return dest;
 
-	if(s < d) {	// copy from back
-		s=s+n-1;
-		d=d+n-1;
-		while(n--) *d-- = *s--;
-	} else		// copy from front
-		while(n--) *d++=*s++;
+	if (s < d) { // copy from back
+		s = s + n - 1;
+		d = d + n - 1;
+		while (n--) *d-- = *s--;
+	} else      // copy from front
+		while (n--) *d++ = *s++;
 
 	return dest;
 }
@@ -56,8 +55,7 @@ void *my_memmove(void *dest, const void *src, size_t n)
  * lack strdup(3) and strndup(3).
  *
  */
-char *my_strdup(const char *src)
-{
+char *my_strdup(const char *src) {
 	char *str;
 	char *p;
 	int len = 0;
@@ -67,13 +65,12 @@ char *my_strdup(const char *src)
 	str = malloc(len + 1);
 	p = str;
 	while (*src)
-	*p++ = *src++;
+		*p++ = *src++;
 	*p = '\0';
 	return str;
 }
 
-char *my_strndup(const char *src, size_t n)
-{
+char *my_strndup(const char *src, size_t n) {
 	char *str;
 	char *p;
 	int len = 0;

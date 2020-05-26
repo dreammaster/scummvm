@@ -42,8 +42,8 @@ void *my_memmove(void *, const void *, size_t);
 #ifdef NO_STRDUP
 char *my_strdup(const char *);
 char *my_strndup(const char *, size_t);
-#define strdup	my_strdup
-#define strndup	my_strndup
+#define strdup  my_strdup
+#define strndup my_strndup
 #endif
 
 } // End of namespace ZCode

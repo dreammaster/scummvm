@@ -24,7 +24,7 @@
  * Various status thingies for the interpreter and interface.
  *
  */
- 
+
 #ifndef GLK_ZCODE_COMMON_SETUP_H
 #define GLK_ZCODE_COMMON_SETUP_H
 
@@ -61,15 +61,15 @@ typedef struct frotz_setup_struct {
 
 	char *story_file;
 	const char *blorb_file;
-        char *story_name;
-        char *story_base;
-        char *script_name;
-        char *command_name;
-        char *save_name;
-        char *tmp_save_name;
-        char *aux_name;
-        char *story_path;
-        char *zcode_path;
+	char *story_name;
+	char *story_base;
+	char *script_name;
+	char *command_name;
+	char *save_name;
+	char *tmp_save_name;
+	char *aux_name;
+	char *story_path;
+	char *zcode_path;
 	char *restricted_path;
 
 	format_t format;  /* type of format codes for dumb interface */
