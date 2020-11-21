@@ -336,7 +336,7 @@ int AGSEngine::showDialogOptions(uint dialogId, uint sayChosenOption) {
 	if (displayedOptions.empty())
 		error("runConversation: no enabled options in dialog topic %d", dialogId);
 
-	int chosenOption;
+	int chosenOption = 0;
 	if (displayedOptions.size() == 1 && !parserEnabled && !_state->_showSingleDialogOption) {
 		// Only one choice, so just use that one.
 		chosenOption = displayedOptions[0];

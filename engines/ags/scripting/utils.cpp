@@ -154,7 +154,7 @@ RuntimeValue Script_Maths_Cosh(AGSEngine *vm, ScriptObject *, const Common::Arra
 // Converts the angle from degrees to radians.
 RuntimeValue Script_Maths_DegreesToRadians(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	float degrees = params[0]._floatValue;
-	degrees *= (M_PI / 180.0);
+	degrees *= (float)(M_PI / 180.0);
 	return RuntimeValue(degrees);
 }
 

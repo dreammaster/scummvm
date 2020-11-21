@@ -1111,8 +1111,8 @@ int Character::needMoveSteps() {
 
 // returns true if waiting for another char to move
 bool Character::doNextMoveStep() {
-	int xWas = _x;
-	int yWas = _y;
+	//int xWas = _x;
+	//int yWas = _y;
 
 	Common::Point pos(_x, _y);
 	if (_moveList.doStep(pos)) {
@@ -1480,7 +1480,7 @@ void Character::setSpeechView(int view) {
 void Character::setThinkView(int view) {
 	if (view == -1) {
 		// TODO: original engine ends up setting to -2, weird?
-		_thinkView = -1;
+		_thinkView = (uint32)-1;
 		return;
 	}
 
@@ -1685,7 +1685,7 @@ bool Character::moveToNearestWalkableAreaWithin(int range, int step) {
 	const Graphics::Surface &mask = _vm->getCurrentRoom()->_walkableMask;
 
 	uint nearest = 99999;
-	int nearestX, nearestY;
+	int nearestX = 0, nearestY = 0;
 
 	// TODO: This could be a lot more efficient than it is, if it ever shows up in a profile enough to care.
 	for (int newX = startX; newX < width; newX += step) {

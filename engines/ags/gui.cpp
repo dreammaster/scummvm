@@ -515,8 +515,8 @@ void GUIListBox::recalculate() {
 
 void GUIListBox::draw(Graphics::Surface *surface) {
 	Graphics::Font *font = _vm->_graphics->getFont(_font);
-	uint useWidth = _width - 1;
-	uint useHeight = _height - 1;
+	//uint useWidth = _width - 1;
+	//uint useHeight = _height - 1;
 	uint pixelSize = _vm->getFixedPixelSize(1);
 	uint rightHandEdge = (_x + _width) - pixelSize - 1;
 

@@ -330,17 +330,17 @@ uint AGSEngine::displayMain(int x, int y, int width, const Common::String &text,
 			uint textWidth = width - 6;
 
 			// Work out if we want to draw into a GUI or not.
-			bool drawBackground = false;
+			//bool drawBackground = false;
 			uint usingGui = (uint)-1;
 			if ((asSpeech < 0) && (getGameOption(OPT_SPEECHTYPE) >= 2)) {
 				usingGui = _state->_speechTextWindowGUI;
-				drawBackground = true;
+				//drawBackground = true;
 			} else if (isThought && (getGameOption(OPT_THOUGHTGUI) > 0)) {
 				usingGui = getGameOption(OPT_THOUGHTGUI);
 				// make it treat it as drawing inside a window now
 				if (asSpeech > 0)
 					asSpeech = -asSpeech;
-				drawBackground = true;
+				//drawBackground = true;
 			}
 			// TODO: sanity-check GUI value
 
@@ -563,7 +563,7 @@ void AGSEngine::displaySpeech(Common::String text, uint charId, int x, int y, in
 
 	int useX = x, useY = y;
 	int oldView = -1, oldLoop = -1;
-	uint overlayType = 0;
+	//uint overlayType = 0;
 
 	_lipsyncTextOffset = 0;
 	_lipsyncText = text;
@@ -836,7 +836,7 @@ Common::Point ScreenOverlay::getDrawPos() {
 				(_vm->_graphics->_height / 2) - (_surface.h / 2));
 		}
 
-		uint charPic = _vm->getViewFrame(chr->_view, chr->_loop, 0)->_pic;
+		//uint charPic = _vm->getViewFrame(chr->_view, chr->_loop, 0)->_pic;
 
 		pos.y = _vm->multiplyUpCoordinate(chr->getEffectiveY()) - _vm->_graphics->_viewportY - 5;
 		pos.y -= chr->getDrawHeight();

@@ -188,7 +188,7 @@ bool PathFinder::findPath(bool onlyIfDestAllowed) {
 	const Common::Point &from = _moveList->_from;
 
 	// vertical, horizontal or exactly diagonal?
-	bool isStraight = ((from.x == _dest.x) || (from.y == _dest.y) || (abs(from.x - _dest.x) == abs(from.y - _dest.y)));
+	//bool isStraight = ((from.x == _dest.x) || (from.y == _dest.y) || (abs(from.x - _dest.x) == abs(from.y - _dest.y)));
 
 	if (from == _dest)
 		return true;
@@ -622,7 +622,7 @@ bool PathFinder::constructPath() {
 	uint lastRelevantPosIndex = _pathBackPositions.size();
 	while (lastRelevantPosIndex != 0) {
 		bool foundPos = false;
-		uint nearestPosIndex;
+		uint nearestPosIndex = 0;
 
 		// find the furthest point that can be seen from this stage,
 		// by walking backwards through the position list

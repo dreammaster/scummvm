@@ -819,8 +819,8 @@ RuntimeValue Script_LoadSaveSlotScreenshot(AGSEngine *vm, ScriptObject *, const 
 RuntimeValue Script_GetGameParameter(AGSEngine *vm, ScriptObject *, const Common::Array<RuntimeValue> &params) {
 	uint parameter = params[0]._value;
 	uint data1 = params[1]._value;
-	uint data2 = params[2]._value;
-	uint data3 = params[3]._value;
+	//uint data2 = params[2]._value;
+	//uint data3 = params[3]._value;
 
 	// TODO: add sanity checks?
 

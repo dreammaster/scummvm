@@ -1571,7 +1571,7 @@ uint AGSEngine::getAreaScalingFor(uint areaId, Common::Point pos) {
 	// FIXME: this should really be unsigned and we should sanity check data I guess?
 	int zoom;
 
-	if (area._zoom2 != NOT_VECTOR_SCALED) {
+	if (area._zoom2 != (int16)NOT_VECTOR_SCALED) {
 		// this should never happen (TODO: check at load time?)
 		assert(area._top < area._bottom);
 
@@ -1842,11 +1842,10 @@ void AGSEngine::processGameEvent(const GameEvent &event) {
 	case kEventAfterFadeIn:
 		_state->_screenIsFadedOut = 0;
 
-		uint ourTransition;
-		ourTransition = _state->_fadeEffect;
+		//uint ourTransition = _state->_fadeEffect;
 		if (_state->_nextScreenTransition != (uint)-1) {
 			// a one-off transition was selected, so use it
-			ourTransition = _state->_nextScreenTransition;
+		//	ourTransition = _state->_nextScreenTransition;
 			_state->_nextScreenTransition = (uint)-1;
 		}
 

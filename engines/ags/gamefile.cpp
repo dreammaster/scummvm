@@ -652,9 +652,13 @@ void GameFile::readOldViews(Common::SeekableReadStream *dta) {
 		}
 		dta->skip(2); // padding
 		// FIXME: loopFlags are discarded?
+#ifdef UNUSED
 		uint32 loopFlags[16];
 		for (uint i = 0; i < 16; ++i)
 			loopFlags[i] = dta->readUint32LE();
+#else
+		dta->skip(16 * 4);
+#endif
 		ViewFrame frames[16][20];
 		for (uint j = 0; j < 16; ++j)
 			for (uint i = 0; i < 20; ++i)
