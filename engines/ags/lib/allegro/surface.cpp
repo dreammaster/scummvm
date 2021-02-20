@@ -90,6 +90,97 @@ void BITMAP::floodfill(int x, int y, int color) {
 	AGS3::floodfill(this, x, y, color);
 }
 
+const int SCALE_THRESHOLD = 0x100;
+#define IS_TRANSPARENT(R, G, B) ((R) == 255 && (G) == 0 && (B) == 255)
+
+void BITMAP::draw(const BITMAP *srcBitmap, const Common::Rect &srcRect,
+		const Common::Rect &destRect, bool horizFlip, bool vertFlip,
+		bool skipTrans, int srcAlpha) {
+	assert(format.bytesPerPixel == 2 || format.bytesPerPixel == 4 ||
+		(format.bytesPerPixel == 1 && srcBitmap->format.bytesPerPixel == 1));
+
+	const Graphics::ManagedSurface &src = **srcBitmap;
+	Graphics::ManagedSurface &dest = *_owner;
+	Graphics::Surface destArea = dest.getSubArea(destRect);
+	const int scaleX = SCALE_THRESHOLD * srcRect.width() / destRect.width();
+	const int scaleY = SCALE_THRESHOLD * srcRect.height() / destRect.height();
+	const int xDir = horizFlip ? -1 : 1;
+
+	byte r, g, b, a;
+	uint32 pal[PALETTE_COUNT];
+
+	if (src.format.bytesPerPixel == 1) {
+		for (int i = 0; i < PALETTE_COUNT; ++i)
+			pal[i] = format.RGBToColor(_current_palette[i].r,
+				_current_palette[i].g, _current_palette[i].b);
+		pal[0] = format.RGBToColor(0xff, 0, 0xff);
+	}
+
+	for (int destY = destRect.top, yCtr = 0, scaleYCtr = 0; yCtr < destArea.h;
+			++destY, ++yCtr, scaleYCtr += scaleY) {
+		if (destY < 0 || destY >= h)
+			continue;
+		byte *destP = (byte *)destArea.getBasePtr(0, yCtr);
+		const byte *srcP = (const byte *)src.getBasePtr(
+			horizFlip ? srcRect.right - 1 : srcRect.left,
+			vertFlip ? srcRect.bottom - 1 - scaleYCtr / SCALE_THRESHOLD :
+			srcRect.top + scaleYCtr / SCALE_THRESHOLD);
+
+		// Loop through the pixels of the row
+		for (int destX = destRect.left, xCtr = 0, scaleXCtr = 0; xCtr < destArea.w;
+				++destX, ++xCtr, scaleXCtr += scaleX) {
+			if (destX < 0 || destX >= w)
+				continue;
+
+			const byte *srcVal = srcP + xDir * (scaleXCtr / SCALE_THRESHOLD * src.format.bytesPerPixel);
+			byte *destVal = (byte *)&destP[xCtr * format.bytesPerPixel];
+
+			switch (src.format.bytesPerPixel) {
+			case 1:
+				if (format.bytesPerPixel == 1) {
+					*destVal = *srcVal;
+					continue;
+				}
+				format.colorToARGB(pal[*srcVal], a, r, g, b);
+				break;
+			case 2:
+				src.format.colorToARGB(*(uint16 *)srcVal, a, r, g, b);
+				break;
+			case 4:
+				src.format.colorToARGB(*(uint32 *)srcVal, a, r, g, b);
+				break;
+			default:
+				error("Unknown format");
+			}
+
+			if (a == 0)
+				a = 0xff;
+
+			if (a != 0xff || srcAlpha != -1) {
+				// Alpha blender
+				double alpha = (double)a / 255.0 * ((double)srcAlpha / 255.0);
+				byte rDest, gDest, bDest;
+				format.colorToRGB(format.bytesPerPixel == 2 ?
+					*(uint16 *)destVal : *(uint32 *)destVal, rDest, gDest, bDest);
+				if (IS_TRANSPARENT(rDest, gDest, bDest)) {
+					rDest = gDest = bDest = 0;
+				}
+
+				r = static_cast<byte>((r * alpha) + (rDest * (1.0 - alpha)));
+				g = static_cast<byte>((g * alpha) + (gDest * (1.0 - alpha)));
+				b = static_cast<byte>((b * alpha) + (bDest * (1.0 - alpha)));
+			}
+
+			if (!(IS_TRANSPARENT(r, g, b) && skipTrans)) {
+				if (format.bytesPerPixel ==  4)
+					*(uint32 *)destVal = format.ARGBToColor(a, r, g, b);
+				else
+					*(uint16 *)destVal = format.RGBToColor(r, g, b);
+			}
+		}
+	}
+}
+
 /*-------------------------------------------------------------------*/
 
 /**
@@ -128,9 +219,6 @@ BITMAP *create_bitmap_ex(int color_depth, int width, int height) {
 	}
 
 	BITMAP *bitmap = new Surface(width, height, format);
-	if (color_depth == 8)
-		add_palette_if_needed(bitmap->getSurface());
-
 	return bitmap;
 }
 
