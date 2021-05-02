@@ -20,12 +20,12 @@
  *
  */
 
-#ifndef AGS_ENGINE_MAIN_GRAPHICSMODE_H
-#define AGS_ENGINE_MAIN_GRAPHICSMODE_H
+#ifndef AGS_ENGINE_MAIN_GRAPHICS_MODE_H
+#define AGS_ENGINE_MAIN_GRAPHICS_MODE_H
 
-#include "ags/engine/gfx/gfxdefines.h"
-#include "ags/engine/util/scaling.h"
-#include "ags/shared/util/string.h"
+#include "gfx/gfxdefines.h"
+#include "util/scaling.h"
+#include "util/string.h"
 
 namespace AGS3 {
 
@@ -38,12 +38,18 @@ String make_scaling_factor_string(uint32_t scaling);
 namespace AGS {
 namespace Engine {
 class IGfxModeList;
-} // namespace Engine
-} // namespace AGS
-
+}
+}
 bool find_nearest_supported_mode(const AGS::Engine::IGfxModeList &modes, const Size &wanted_size,
 	const int color_depth, const Size *ratio_reference, const Size *upper_bound,
 	AGS::Engine::DisplayMode &dm, int *mode_index = nullptr);
+
+
+// The game-to-screen transformation
+// TODO: this is only required for low-level mouse processing;
+// when possible, move to mouse "manager" object, and assign at gfxmode init
+extern AGS::Engine::PlaneScaling GameScaling;
+
 
 // Filter configuration
 struct GfxFilterSetup {
@@ -79,7 +85,7 @@ enum ScreenSizeDefinition {
 // Configuration that is used to determine the size of the screen
 struct ScreenSizeSetup {
 	ScreenSizeDefinition SizeDef;       // a method used to determine screen size
-	AGS3::Size           Size;          // explicitly defined screen metrics
+	::Size               Size;          // explicitly defined screen metrics
 	bool                 MatchDeviceRatio; // whether to choose resolution matching device aspect ratio
 
 	ScreenSizeSetup();
@@ -150,6 +156,8 @@ bool graphics_mode_set_render_frame(const GameFrameSetup &frame_setup);
 bool graphics_mode_set_filter_any(const GfxFilterSetup &setup);
 // Set the scaling filter with given ID
 bool graphics_mode_set_filter(const String &filter_id);
+// Update graphic renderer and render frame when window size changes
+void graphics_mode_on_window_changed(const Size &sz);
 // Releases current graphic mode and shuts down renderer
 void graphics_mode_shutdown();
 

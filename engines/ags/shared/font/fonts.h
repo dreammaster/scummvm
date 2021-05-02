@@ -20,39 +20,29 @@
  *
  */
 
-#ifndef AGS_SHARED_FONT_FONTS_H
-#define AGS_SHARED_FONT_FONTS_H
+#ifndef AGS_SHARED_FONT_FONT_H
+#define AGS_SHARED_FONT_FONT_H
 
 #include "ags/lib/std/vector.h"
 #include "ags/shared/core/types.h"
 #include "ags/shared/util/string.h"
-#include "ags/shared/ac/gamestructdefines.h"
+
+namespace AGS3 {
 
 // TODO: we need to make some kind of TextManager class of this module
 
-namespace AGS3 {
+namespace AGS {
+namespace Shared {
+class Bitmap;
+} // namespace Shared
+} // namespace AGS
+
+using namespace AGS;
 
 class IAGSFontRenderer;
 class IAGSFontRenderer2;
 struct FontInfo;
 struct FontRenderParams;
-
-namespace AGS {
-namespace Shared {
-class Bitmap;
-
-struct Font {
-	IAGSFontRenderer *Renderer = nullptr;
-	IAGSFontRenderer2 *Renderer2 = nullptr;
-	FontInfo            Info;
-
-	Font();
-};
-
-} // namespace Shared
-} // namespace AGS
-
-using namespace AGS;
 
 void init_font_renderer();
 void shutdown_font_renderer();
@@ -69,7 +59,6 @@ bool font_supports_extended_characters(size_t fontNumber);
 // at random times (usually - drawing routines).
 // Need to check whether it is safe to completely remove it.
 void ensure_text_valid_for_font(char *text, size_t fontnum);
-// Get font's scaling multiplier
 int get_font_scaling_mul(size_t fontNumber);
 // Calculate actual width of a line of text
 int wgettextwidth(const char *texx, size_t fontNumber);
@@ -81,11 +70,7 @@ int getfontheight(size_t fontNumber);
 int getfontlinespacing(size_t fontNumber);
 // Get is font is meant to use default line spacing
 bool use_default_linespacing(size_t fontNumber);
-// Get font's outline type
 int  get_font_outline(size_t font_number);
-// Get font's automatic outline thickness (if set)
-int  get_font_outline_thickness(size_t font_number);
-// Set font's outline type
 void set_font_outline(size_t font_number, int outline_type);
 // Outputs a single line of text on the defined position on bitmap, using defined font, color and parameters
 int getfontlinespacing(size_t fontNumber);
@@ -118,8 +103,7 @@ public:
 		return _pool[i];
 	}
 	inline void Clear() {
-		_pool.clear();
-		_count = 0;
+		_pool.clear(); _count = 0;
 	}
 	inline void Reset() {
 		_count = 0;
@@ -140,6 +124,12 @@ private:
 // Break up the text into lines restricted by the given width;
 // returns number of lines, or 0 if text cannot be split well to fit in this width
 size_t split_lines(const char *texx, SplitLines &lines, int width, int fontNumber, size_t max_lines = -1);
+
+namespace AGS {
+namespace Shared {
+extern SplitLines Lines;
+} // namespace Shared
+} // namespace AGS
 
 } // namespace AGS3
 

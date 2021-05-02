@@ -20,12 +20,13 @@
  *
  */
 
-#include "ags/engine/ac/dynobj/cc_inventory.h"
-#include "ags/engine/ac/dynobj/scriptinvitem.h"
-#include "ags/shared/ac/characterinfo.h"
-#include "ags/globals.h"
+#include "ac/dynobj/cc_inventory.h"
+#include "ac/dynobj/scriptinvitem.h"
+#include "ac/characterinfo.h"
 
 namespace AGS3 {
+
+extern ScriptInvItem scrInv[MAX_INV];
 
 // return the type name of the object
 const char *CCInventory::GetType() {
@@ -35,7 +36,7 @@ const char *CCInventory::GetType() {
 // serialize the object into BUFFER (which is BUFSIZE bytes)
 // return number of bytes used
 int CCInventory::Serialize(const char *address, char *buffer, int bufsize) {
-	ScriptInvItem *shh = (ScriptInvItem *)const_cast<char *>(address);
+	ScriptInvItem *shh = (ScriptInvItem *)address;
 	StartSerialize(buffer);
 	SerializeInt(shh->id);
 	return EndSerialize();
@@ -44,7 +45,7 @@ int CCInventory::Serialize(const char *address, char *buffer, int bufsize) {
 void CCInventory::Unserialize(int index, const char *serializedData, int dataSize) {
 	StartUnserialize(serializedData, dataSize);
 	int num = UnserializeInt();
-	ccRegisterUnserializedObject(index, &_G(scrInv)[num], this);
+	ccRegisterUnserializedObject(index, &scrInv[num], this);
 }
 
 } // namespace AGS3

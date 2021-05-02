@@ -20,19 +20,17 @@
  *
  */
 
-#ifndef AGS_ENGINE_MEDIA_AUDIO_AUDIO_SYSTEM_H
-#define AGS_ENGINE_MEDIA_AUDIO_AUDIO_SYSTEM_H
+#ifndef AGS_ENGINE_MEDIA_AUDIO_SYSTEM_H
+#define AGS_ENGINE_MEDIA_AUDIO_SYSTEM_H
 
-#include "ags/engine/media/audio/audiodefines.h"
-#include "ags/engine/media/audio/ambientsound.h"
+#include "media/audio/audiodefines.h"
+#include "media/audio/ambientsound.h"
 
-#include "ags/engine/media/audio/audio.h"
+#include "media/audio/audio.h"
 
-#include "ags/engine/media/audio/soundcache.h"
+#include "media/audio/soundclip.h"
+#include "media/audio/sound.h"
 
-#include "ags/engine/media/audio/soundclip.h"
-#include "ags/engine/media/audio/sound.h"
-
-#include "ags/engine/media/audio/queuedaudioitem.h"
+#include "media/audio/queuedaudioitem.h"
 
 #endif

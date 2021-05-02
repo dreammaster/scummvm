@@ -26,22 +26,24 @@
 //
 //=============================================================================
 
-#include "ags/lib/alfont/alfont.h"
-#include "ags/shared/ac/gamesetupstruct.h"
-#include "ags/globals.h"
+//include <alfont.h>
+#include "ac/gamesetupstruct.h"
 
 namespace AGS3 {
+
+extern int our_eip;
+extern GameSetupStruct game;
 
 //=============================================================================
 // Engine-specific implementation split out of acfonts.cpp
 //=============================================================================
 
 void set_our_eip(int eip) {
-	_G(our_eip) = eip;
+	our_eip = eip;
 }
 
 int get_our_eip() {
-	return _G(our_eip);
+	return our_eip;
 }
 
 } // namespace AGS3

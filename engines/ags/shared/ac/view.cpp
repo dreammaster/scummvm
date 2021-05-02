@@ -20,8 +20,9 @@
  *
  */
 
+//include <string.h>
 #include "ags/shared/ac/view.h"
-#include "ags/shared/util/alignedstream.h"
+#include "ags/shared/util/aligned_stream.h"
 
 namespace AGS3 {
 

@@ -20,11 +20,14 @@
  *
  */
 
+//include <ctype.h>
 #include "ags/shared/util/version.h"
 
 namespace AGS3 {
 namespace AGS {
 namespace Shared {
+
+const Version Version::LastOldFormatVersion(3, 2, 2, 1120);
 
 Version::Version()
 	: Major(0)
@@ -104,7 +107,7 @@ void Version::SetFromString(const String &version_string) {
 		const char *seek_ptr = revision_section.GetCStr();
 		const char *end_ptr = revision_section.GetCStr() + revision_section.GetLength();
 		while (seek_ptr != end_ptr) {
-			if (!Common::isDigit(*seek_ptr)) {
+			if (!isdigit(*seek_ptr)) {
 				break;
 			}
 			revision_length++;

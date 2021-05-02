@@ -1,89 +1,84 @@
-/* ScummVM - Graphic Adventure Engine
- *
- * ScummVM is the legal property of its developers, whose names
- * are too numerous to list here. Please refer to the COPYRIGHT
- * file distributed with this source distribution.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- */
+//=============================================================================
+//
+// Adventure Game Studio (AGS)
+//
+// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
+// The full list of copyright holders can be found in the Copyright.txt
+// file, which is part of this source code distribution.
+//
+// The AGS source code is provided under the Artistic License 2.0.
+// A copy of this license can be found in the file License.txt and at
+// http://www.opensource.org/licenses/artistic-license-2.0.php
+//
+//=============================================================================
+#include "ac/gamesetup.h"
+#include "ac/gamestate.h"
+#include "ac/global_audio.h"
+#include "ac/global_game.h"
+#include "ac/global_video.h"
+#include "ac/path_helper.h"
+#include "core/assetmanager.h"
+#include "debug/debugger.h"
+#include "debug/debug_log.h"
+#include "media/video/video.h"
+#include "media/audio/audio_system.h"
+#include "platform/base/agsplatformdriver.h"
+#include "util/string_compat.h"
 
-#include "ags/lib/allegro.h"
-#include "ags/engine/ac/gamesetup.h"
-#include "ags/engine/ac/gamestate.h"
-#include "ags/engine/ac/global_audio.h"
-#include "ags/engine/ac/global_display.h"
-#include "ags/engine/ac/global_game.h"
-#include "ags/engine/ac/global_video.h"
-#include "ags/engine/ac/path_helper.h"
-#include "ags/engine/debugging/debugger.h"
-#include "ags/engine/media/video/video.h"
-#include "ags/engine/media/audio/audio_system.h"
-#include "ags/engine/platform/base/agsplatformdriver.h"
-#include "ags/shared/util/string_compat.h"
-#include "ags/globals.h"
+using namespace AGS::Shared;
 
-namespace AGS3 {
+void scrPlayVideo(const char* name, int skip, int flags) {
+    EndSkippingUntilCharStops();
 
-void scrPlayVideo(const char *name, int skip, int flags) {
-	EndSkippingUntilCharStops();
+    if (play.fast_forward)
+        return;
+    if (debug_flags & DBG_NOVIDEO)
+        return;
 
-	if (_GP(play).fast_forward)
-		return;
-	if (_G(debug_flags) & DBG_NOVIDEO)
-		return;
+    if ((flags < 10) && (usetup.audio_backend == 0)) {
+        // if game audio is disabled in Setup, then don't
+        // play any sound on the video either
+        flags += 10;
+    }
 
-	if ((flags < 10) && (_GP(usetup).audio_backend == 0)) {
-		// if game audio is disabled in Setup, then don't
-		// play any sound on the video either
-		flags += 10;
-	}
-
-	pause_sound_if_necessary_and_play_video(name, skip, flags);
+    pause_sound_if_necessary_and_play_video(name, skip, flags);
 }
 
-void pause_sound_if_necessary_and_play_video(const char *name, int skip, int flags) {
-	int musplaying = _GP(play).cur_music_number, i;
-	int ambientWas[MAX_SOUND_CHANNELS];
-	for (i = 1; i < MAX_SOUND_CHANNELS; i++)
-		ambientWas[i] = _GP(ambient)[i].channel;
 
-	if ((strlen(name) > 3) && (ags_stricmp(&name[strlen(name) - 3], "ogv") == 0)) {
-		play_theora_video(name, skip, flags, true);
-	} else if ((strlen(name) > 3) && (ags_stricmp(&name[strlen(name) - 3], "mpg") == 0)) {
-		play_mpeg_video(name, skip, flags, true);
-	} else if ((strlen(name) > 3) && (ags_stricmp(&name[strlen(name) - 3], "avi") == 0)) {
-		play_avi_video(name, skip, flags, true);
-	} else {
-		// Unsure what the video type is, so try each in turn
-		if (!play_avi_video(name, skip, flags, false) &&
-				!play_mpeg_video(name, skip, flags, false) &&
-				!play_theora_video(name, skip, flags, false))
-			Display("Unsupported video '%s'", name);
-	}
+#ifndef AGS_NO_VIDEO_PLAYER
 
-	if (flags < 10) {
-		update_music_volume();
-		// restart the music
-		if (musplaying >= 0)
-			newmusic(musplaying);
-		for (i = 1; i < MAX_SOUND_CHANNELS; i++) {
-			if (ambientWas[i] > 0)
-				PlayAmbientSound(ambientWas[i], _GP(ambient)[i].num, _GP(ambient)[i].vol, _GP(ambient)[i].x, _GP(ambient)[i].y);
-		}
-	}
+void pause_sound_if_necessary_and_play_video(const char *name, int skip, int flags)
+{
+    int musplaying = play.cur_music_number, i;
+    int ambientWas[MAX_SOUND_CHANNELS];
+    for (i = 1; i < MAX_SOUND_CHANNELS; i++)
+        ambientWas[i] = ambient[i].channel;
+
+    if ((strlen(name) > 3) && (ags_stricmp(&name[strlen(name) - 3], "ogv") == 0))
+    {
+        play_theora_video(name, skip, flags);
+    }
+    else
+    {
+        debug_script_warn("PlayVideo: file '%s' is an unsupported format.", name);
+        return;
+    }
+
+    if (flags < 10) 
+    {
+        update_music_volume();
+        // restart the music
+        if (musplaying >= 0)
+            newmusic (musplaying);
+        for (i = 1; i < MAX_SOUND_CHANNELS; i++) {
+            if (ambientWas[i] > 0)
+                PlayAmbientSound(ambientWas[i], ambient[i].num, ambient[i].vol, ambient[i].x, ambient[i].y);
+        }
+    }
 }
 
-} // namespace AGS3
+#else
+
+void pause_sound_if_necessary_and_play_video(const char *name, int skip, int flags) {}
+
+#endif

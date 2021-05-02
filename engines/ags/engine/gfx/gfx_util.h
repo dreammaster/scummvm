@@ -32,11 +32,11 @@
 //
 //=============================================================================
 
-#ifndef AGS_ENGINE_GFX_GFXUTIL_H
-#define AGS_ENGINE_GFX_GFXUTIL_H
+#ifndef AGS_ENGINE_GFX_GFX_UTIL_H
+#define AGS_ENGINE_GFX_GFX_UTIL_H
 
-#include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/gfx_def.h"
+#include "gfx/bitmap.h"
+#include "gfx/gfx_def.h"
 
 namespace AGS3 {
 namespace AGS {

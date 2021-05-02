@@ -21,7 +21,7 @@
  */
 
 #include "ags/shared/core/platform.h"
-#include <string.h>
+//include <string.h>
 #include "ags/shared/ac/game_version.h"
 #include "ags/shared/debugging/assert.h"
 #include "ags/engine/script/script_api.h"

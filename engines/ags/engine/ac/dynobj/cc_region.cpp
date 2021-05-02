@@ -20,13 +20,14 @@
  *
  */
 
-#include "ags/engine/ac/dynobj/cc_region.h"
-#include "ags/engine/ac/dynobj/scriptregion.h"
-#include "ags/shared/ac/common_defines.h"
-#include "ags/shared/game/roomstruct.h"
-#include "ags/globals.h"
+#include "ac/dynobj/cc_region.h"
+#include "ac/dynobj/scriptregion.h"
+#include "ac/common_defines.h"
+#include "game/roomstruct.h"
 
 namespace AGS3 {
+
+extern ScriptRegion scrRegion[MAX_ROOM_REGIONS];
 
 // return the type name of the object
 const char *CCRegion::GetType() {
@@ -36,7 +37,7 @@ const char *CCRegion::GetType() {
 // serialize the object into BUFFER (which is BUFSIZE bytes)
 // return number of bytes used
 int CCRegion::Serialize(const char *address, char *buffer, int bufsize) {
-	ScriptRegion *shh = (ScriptRegion *)const_cast<char *>(address);
+	ScriptRegion *shh = (ScriptRegion *)address;
 	StartSerialize(buffer);
 	SerializeInt(shh->id);
 	return EndSerialize();
@@ -45,7 +46,7 @@ int CCRegion::Serialize(const char *address, char *buffer, int bufsize) {
 void CCRegion::Unserialize(int index, const char *serializedData, int dataSize) {
 	StartUnserialize(serializedData, dataSize);
 	int num = UnserializeInt();
-	ccRegisterUnserializedObject(index, &_G(scrRegion)[num], this);
+	ccRegisterUnserializedObject(index, &scrRegion[num], this);
 }
 
 } // namespace AGS3

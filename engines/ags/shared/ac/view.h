@@ -24,16 +24,14 @@
 #define AGS_SHARED_AC_VIEW_H
 
 #include "ags/lib/std/vector.h"
-#include "ags/shared/core/types.h"
 
 namespace AGS3 {
 
 namespace AGS {
 namespace Shared {
 class Stream;
-} // namespace Shared
-} // namespace AGS
-
+}
+}
 using namespace AGS; // FIXME later
 
 #define VFLG_FLIPSPRITE 1
@@ -82,7 +80,7 @@ struct ViewStruct {
 struct ViewStruct272 {
 	short     numloops;
 	short     numframes[16];
-	int32_t   loopflags[16];
+	int       loopflags[16];
 	ViewFrame frames[16][20];
 
 	ViewStruct272();

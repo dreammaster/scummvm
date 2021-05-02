@@ -20,12 +20,12 @@
  *
  */
 
+//include <errno.h>
+//include <string.h>
 #include "ags/shared/core/platform.h"
 #include "ags/shared/util/math.h"
 #include "ags/shared/util/string_utils.h"
 #include "ags/shared/util/stream.h"
-#include "ags/lib/allegro/error.h"
-#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -58,11 +58,11 @@ StrUtil::ConversionError StrUtil::StringToInt(const String &s, int &val, int def
 	if (!s.GetCStr())
 		return StrUtil::kFailed;
 	char *stop_ptr;
-	_G(errnum) = AL_NOERROR;
+	errno = 0;
 	long lval = strtol(s.GetCStr(), &stop_ptr, 0);
 	if (stop_ptr != s.GetCStr() + s.GetLength())
 		return StrUtil::kFailed;
-	if (lval > INT_MAX || lval < INT_MIN || _G(errnum) == AL_ERANGE)
+	if (lval > INT_MAX || lval < INT_MIN || errno == ERANGE)
 		return StrUtil::kOutOfRange;
 	val = (int)lval;
 	return StrUtil::kNoError;

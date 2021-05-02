@@ -34,54 +34,60 @@
 //
 //=============================================================================
 
-#include "ags/engine/script/script_runtime.h"
-#include "ags/shared/script/script_common.h"
-#include "ags/shared/script/cc_error.h"
-#include "ags/shared/script/cc_options.h"
-#include "ags/engine/script/systemimports.h"
-#include "ags/plugins/agsplugin.h"
-#include "ags/engine/ac/dynobj/cc_dynamicarray.h"
-#include "ags/engine/ac/statobj/staticobject.h"
-#include "ags/plugins/plugin_base.h"
-#include "ags/globals.h"
+//include <stdlib.h>
+//include <stdarg.h>
+//include <string.h>
+#include "script/script_runtime.h"
+#include "script/script_common.h"
+#include "script/cc_error.h"
+#include "script/cc_options.h"
+#include "ac/dynobj/cc_dynamicarray.h"
+#include "script/systemimports.h"
+#include "ac/statobj/staticobject.h"
 
 namespace AGS3 {
 
+extern ccInstance *current_instance; // in script/cc_instance
+
 bool ccAddExternalStaticFunction(const String &name, ScriptAPIFunction *pfn) {
-	return _GP(simp).add(name, RuntimeScriptValue().SetStaticFunction(pfn), nullptr) == 0;
+	return simp.add(name, RuntimeScriptValue().SetStaticFunction(pfn), nullptr) == 0;
 }
 
 bool ccAddExternalPluginFunction(const String &name, void *pfn) {
-	return _GP(simp).add(name, RuntimeScriptValue().SetPluginFunction(pfn), nullptr) == 0;
+	return simp.add(name, RuntimeScriptValue().SetPluginFunction(pfn), nullptr) == 0;
 }
 
 bool ccAddExternalStaticObject(const String &name, void *ptr, ICCStaticObject *manager) {
-	return _GP(simp).add(name, RuntimeScriptValue().SetStaticObject(ptr, manager), nullptr) == 0;
+	return simp.add(name, RuntimeScriptValue().SetStaticObject(ptr, manager), nullptr) == 0;
 }
 
 bool ccAddExternalStaticArray(const String &name, void *ptr, StaticArray *array_mgr) {
-	return _GP(simp).add(name, RuntimeScriptValue().SetStaticArray(ptr, array_mgr), nullptr) == 0;
+	return simp.add(name, RuntimeScriptValue().SetStaticArray(ptr, array_mgr), nullptr) == 0;
 }
 
 bool ccAddExternalDynamicObject(const String &name, void *ptr, ICCDynamicObject *manager) {
-	return _GP(simp).add(name, RuntimeScriptValue().SetDynamicObject(ptr, manager), nullptr) == 0;
+	return simp.add(name, RuntimeScriptValue().SetDynamicObject(ptr, manager), nullptr) == 0;
 }
 
 bool ccAddExternalObjectFunction(const String &name, ScriptAPIObjectFunction *pfn) {
-	return _GP(simp).add(name, RuntimeScriptValue().SetObjectFunction(pfn), nullptr) == 0;
+	return simp.add(name, RuntimeScriptValue().SetObjectFunction(pfn), nullptr) == 0;
 }
 
 bool ccAddExternalScriptSymbol(const String &name, const RuntimeScriptValue &prval, ccInstance *inst) {
-	return _GP(simp).add(name, prval, inst) == 0;
+	return simp.add(name, prval, inst) == 0;
 }
 
 void ccRemoveExternalSymbol(const String &name) {
-	_GP(simp).remove(name);
+	simp.remove(name);
 }
 
 void ccRemoveAllSymbols() {
-	_GP(simp).clear();
+	simp.clear();
 }
+
+ccInstance *loadedInstances[MAX_LOADED_INSTANCES] = { nullptr,
+nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
 void nullfree(void *data) {
 	if (data != nullptr)
@@ -89,7 +95,7 @@ void nullfree(void *data) {
 }
 
 void *ccGetSymbolAddress(const String &name) {
-	const ScriptImport *import = _GP(simp).getByName(name);
+	const ScriptImport *import = simp.getByName(name);
 	if (import) {
 		return import->Value.Ptr;
 	}
@@ -97,16 +103,16 @@ void *ccGetSymbolAddress(const String &name) {
 }
 
 bool ccAddExternalFunctionForPlugin(const String &name, void *pfn) {
-	return _GP(simp_for_plugin).add(name, RuntimeScriptValue().SetPluginFunction(pfn), nullptr) == 0;
+	return simp_for_plugin.add(name, RuntimeScriptValue().SetPluginFunction(pfn), nullptr) == 0;
 }
 
 void *ccGetSymbolAddressForPlugin(const String &name) {
-	const ScriptImport *import = _GP(simp_for_plugin).getByName(name);
+	const ScriptImport *import = simp_for_plugin.getByName(name);
 	if (import) {
 		return import->Value.Ptr;
 	} else {
 		// Also search the internal symbol table for non-function symbols
-		import = _GP(simp).getByName(name);
+		import = simp.getByName(name);
 		if (import) {
 			return import->Value.Ptr;
 		}
@@ -114,20 +120,25 @@ void *ccGetSymbolAddressForPlugin(const String &name) {
 	return nullptr;
 }
 
+new_line_hook_type new_line_hook = nullptr;
+
+char ccRunnerCopyright[] = "ScriptExecuter32 v" SCOM_VERSIONSTR " (c) 2001 Chris Jones";
+int maxWhileLoops = 0;
+
 // If a while loop does this many iterations without the
 // NofityScriptAlive function getting called, the script
 // aborts. Set to 0 to disable.
 void ccSetScriptAliveTimer(int numloop) {
-	_G(maxWhileLoops) = numloop;
+	maxWhileLoops = numloop;
 }
 
 void ccNotifyScriptStillAlive() {
-	if (_G(current_instance) != nullptr)
-		_G(current_instance)->flags |= INSTF_RUNNING;
+	if (current_instance != nullptr)
+		current_instance->flags |= INSTF_RUNNING;
 }
 
 void ccSetDebugHook(new_line_hook_type jibble) {
-	_G(new_line_hook) = jibble;
+	new_line_hook = jibble;
 }
 
 int call_function(intptr_t addr, const RuntimeScriptValue *object, int numparm, const RuntimeScriptValue *parms) {
@@ -160,33 +171,109 @@ int call_function(intptr_t addr, const RuntimeScriptValue *object, int numparm, 
 		}
 	}
 
-	// AN IMPORTANT NOTE ON PARAMS
-	// The original AGS interpreter did a bunch of dodgy function pointers with
-	// varying numbers of parameters, which were all int64_t. To simply matters
-	// now that we only supported plugins implemented in code, and not DLLs,
-	// we use a simplified Common::Array containing the parameters and result
+	//
+	// AN IMPORTANT NOTE ON PARAM TYPE
+	// of 2012-11-10
+	//
+	//// NOTE of 2012-12-20:
+	//// Everything said below is applicable only for calling
+	//// exported plugin functions.
+	//
+	// Here we are sending parameters of type intptr_t to registered
+	// function of unknown kind. Intptr_t is 32-bit for x32 build and
+	// 64-bit for x64 build.
+	// The exported functions usually have two types of parameters:
+	// pointer and 'int' (32-bit). For x32 build those two have the
+	// same size, but for x64 build first has 64-bit size while the
+	// second remains 32-bit.
+	// In formal case that would cause 'overflow' - function will
+	// receive more data than needed (written to stack), with some
+	// values shifted further by 32 bits.
+	//
+	// Upon testing, however, it was revealed that AMD64 processor,
+	// the only platform we support x64 Linux AGS build on right now,
+	// treats all the function parameters pushed to stack as 64-bit
+	// values (few first parameters are sent via registers, and hence
+	// are least concern anyway). Therefore, no 'overflow' occurs,
+	// and 64-bit values are being effectively truncated to 32-bit
+	// integers in the callee.
+	//
+	// Since this is still quite unreliable, this should be
+	// reimplemented when there's enough free time available for
+	// developers both for coding & testing.
+	//
+	// Most basic idea is to pass array of RuntimeScriptValue
+	// objects (that hold type description) and get same RSV as a
+	// return result. Keep in mind, though, that this solution will
+	// require fixing ALL exported functions, so a good amount of
+	// time and energy should be allocated for this task.
+	//
 
-	if (numparm > 9) {
-		cc_error("too many arguments in call to function");
-		return -1;
-	} else {
-		// Build the parameters
-		ScriptMethodParams params;
-		for (int i = 0; i < numparm; ++i)
-			params.push_back(parm_value[i]);
-
-		// Call the method
-		Plugins::PluginMethod fparam = (Plugins::PluginMethod)addr;
-		fparam(params);
-
-		// TODO: Though some script methods return pointers, the call_function only
-		// supports a 32-bit result. In case they're actually used by any game, the
-		// guard below will throw a wobbly if they're more than 32-bits
-		if ((int64)params._result._ptr > 0xffffffff)
-			error("Uhandled 64-bit pointer result from plugin method call");
-
-		return params._result;
+	switch (numparm) {
+	case 0:
+	{
+		int (*fparam) ();
+		fparam = (int (*)())addr;
+		return fparam();
 	}
+	case 1:
+	{
+		int (*fparam) (intptr_t);
+		fparam = (int (*)(intptr_t))addr;
+		return fparam(parm_value[0]);
+	}
+	case 2:
+	{
+		int (*fparam) (intptr_t, intptr_t);
+		fparam = (int (*)(intptr_t, intptr_t))addr;
+		return fparam(parm_value[0], parm_value[1]);
+	}
+	case 3:
+	{
+		int (*fparam) (intptr_t, intptr_t, intptr_t);
+		fparam = (int (*)(intptr_t, intptr_t, intptr_t))addr;
+		return fparam(parm_value[0], parm_value[1], parm_value[2]);
+	}
+	case 4:
+	{
+		int (*fparam) (intptr_t, intptr_t, intptr_t, intptr_t);
+		fparam = (int (*)(intptr_t, intptr_t, intptr_t, intptr_t))addr;
+		return fparam(parm_value[0], parm_value[1], parm_value[2], parm_value[3]);
+	}
+	case 5:
+	{
+		int (*fparam) (intptr_t, intptr_t, intptr_t, intptr_t, intptr_t);
+		fparam = (int (*)(intptr_t, intptr_t, intptr_t, intptr_t, intptr_t))addr;
+		return fparam(parm_value[0], parm_value[1], parm_value[2], parm_value[3], parm_value[4]);
+	}
+	case 6:
+	{
+		int (*fparam) (intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t);
+		fparam = (int (*)(intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t))addr;
+		return fparam(parm_value[0], parm_value[1], parm_value[2], parm_value[3], parm_value[4], parm_value[5]);
+	}
+	case 7:
+	{
+		int (*fparam) (intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t);
+		fparam = (int (*)(intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t))addr;
+		return fparam(parm_value[0], parm_value[1], parm_value[2], parm_value[3], parm_value[4], parm_value[5], parm_value[6]);
+	}
+	case 8:
+	{
+		int (*fparam) (intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t);
+		fparam = (int (*)(intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t))addr;
+		return fparam(parm_value[0], parm_value[1], parm_value[2], parm_value[3], parm_value[4], parm_value[5], parm_value[6], parm_value[7]);
+	}
+	case 9:
+	{
+		int (*fparam) (intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t);
+		fparam = (int (*)(intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t))addr;
+		return fparam(parm_value[0], parm_value[1], parm_value[2], parm_value[3], parm_value[4], parm_value[5], parm_value[6], parm_value[7], parm_value[8]);
+	}
+	}
+
+	cc_error("too many arguments in call to function");
+	return -1;
 }
 
 } // namespace AGS3

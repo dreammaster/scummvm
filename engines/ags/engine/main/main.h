@@ -25,27 +25,47 @@
 
 #include "ags/shared/core/platform.h"
 #include "ags/shared/util/version.h"
-#include "ags/shared/util/ini_util.h"
-#include "ags/shared/util/string.h"
 
 namespace AGS3 {
 
-using AGS::Shared::ConfigTree;
-using AGS::Shared::String;
+// Current engine version
+extern AGS::Shared::Version EngineVersion;
+// Lowest savedgame version, accepted by this engine
+extern AGS::Shared::Version SavedgameLowestBackwardCompatVersion;
+// Lowest engine version, which would accept current savedgames
+extern AGS::Shared::Version SavedgameLowestForwardCompatVersion;
 
 //=============================================================================
+
+extern char **global_argv;
+
+// Full path to the engine executable
+extern AGS::Shared::String appPath;
+// Engine executable's directory
+extern AGS::Shared::String appDirectory;
+// Game path from the startup options (before reading config)
+extern AGS::Shared::String cmdGameDataPath;
+
+AGS::Shared::String GetPathFromCmdArg(int arg_index);
+
+// Startup flags, set from parameters to engine
+extern int force_window;
+extern int override_start_room;
+extern bool justRegisterGame;
+extern bool justUnRegisterGame;
+extern bool justTellInfo;
+extern const char *loadSaveGameOnStartup;
+
+extern int psp_video_framedrop;
+extern int psp_ignore_acsetup_cfg_file;
+extern int psp_clear_cache_on_room_change; // clear --sprite cache-- when room is unloaded
+
+extern char psp_game_file_name[];
+extern char psp_translation[];
 
 void main_print_help();
 
 int ags_entry_point(int argc, char *argv[]);
-
-extern void main_init(int argc, const char *argv[]);
-
-extern int main_process_cmdline(ConfigTree &cfg, int argc, const char *argv[]);
-
-extern String get_engine_string();
-
-extern void main_set_gamedir(int argc, const char *argv[]);
 
 } // namespace AGS3
 

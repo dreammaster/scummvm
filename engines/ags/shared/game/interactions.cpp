@@ -20,26 +20,24 @@
  *
  */
 
+//include <string.h>
 #include "ags/shared/ac/common.h" // quit
 #include "ags/shared/game/interactions.h"
-#include "ags/shared/util/alignedstream.h"
+#include "ags/shared/util/aligned_stream.h"
 #include "ags/shared/util/math.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 
+InteractionVariable globalvars[MAX_GLOBAL_VARIABLES] = { InteractionVariable("Global 1", 0, 0) };
+int numGlobalVars = 1;
+
 namespace AGS {
 namespace Shared {
 
 InteractionValue::InteractionValue() {
 	Type = kInterValLiteralInt;
-	Value = 0;
-	Extra = 0;
-}
-
-void InteractionValue::clear() {
-	Type = kInterValInvalid; // FIXME: can this be kInterValLiteralInt?
 	Value = 0;
 	Extra = 0;
 }
@@ -76,9 +74,7 @@ void InteractionCommand::Assign(const InteractionCommand &ic, InteractionCommand
 
 void InteractionCommand::Reset() {
 	Type = 0;
-	for (uint i = 0; i < ARRAYSIZE(Data); i++) {
-		Data[i].clear();
-	}
+	memset(Data, 0, sizeof(Data));
 	Children.reset();
 	Parent = nullptr;
 }
@@ -246,8 +242,8 @@ Interaction *Interaction::CreateFromStream(Stream *in) {
 	if (evt_count > MAX_NEWINTERACTION_EVENTS)
 		quit("Can't deserialize interaction: too many events");
 
-	int32_t types[MAX_NEWINTERACTION_EVENTS];
-	int32_t load_response[MAX_NEWINTERACTION_EVENTS];
+	int types[MAX_NEWINTERACTION_EVENTS];
+	int load_response[MAX_NEWINTERACTION_EVENTS];
 	in->ReadArrayOfInt32(types, evt_count);
 	in->ReadArrayOfInt32(load_response, evt_count);
 

@@ -26,12 +26,12 @@
 //
 //=============================================================================
 
-#ifndef AGS_ENGINE_GFX_GFXFILTER_H
-#define AGS_ENGINE_GFX_GFXFILTER_H
+#ifndef AGS_ENGINE_GFX__GFXFILTER_H
+#define AGS_ENGINE_GFX__GFXFILTER_H
 
 #include "ags/lib/std/memory.h"
-#include "ags/shared/util/geometry.h"
-#include "ags/shared/util/string.h"
+#include "util/geometry.h"
+#include "util/string.h"
 
 namespace AGS3 {
 namespace AGS {
@@ -57,7 +57,7 @@ struct GfxFilterInfo {
 
 class IGfxFilter {
 public:
-	virtual ~IGfxFilter() {}
+	virtual ~IGfxFilter() = default;
 
 	virtual const GfxFilterInfo &GetInfo() const = 0;
 

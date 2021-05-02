@@ -36,8 +36,6 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 
-extern const char *SAVE_FOLDER_PREFIX;
-
 namespace Directory {
 // Creates new directory (if it does not exist)
 bool   CreateDirectory(const String &path);

@@ -23,12 +23,18 @@
 #ifndef AGS_ENGINE_DEBUGGING_DEBUGGER_H
 #define AGS_ENGINE_DEBUGGING_DEBUGGER_H
 
-#include "ags/shared/util/string.h"
+#include "util/string.h"
 
 namespace AGS3 {
 
 struct IAGSEditorDebugger;
 struct ScriptPosition;
+
+extern int editor_debugging_enabled;
+extern int editor_debugging_initialized;
+extern char editor_debugger_instance_token[100];
+extern IAGSEditorDebugger *editor_debugger;
+extern int break_on_next_script_step;
 
 int check_for_messages_from_editor();
 bool send_message_to_editor(const char *msg);
@@ -45,7 +51,7 @@ void check_debug_keys();
 #define DBG_NOSFX      0x10
 #define DBG_NOMUSIC    0x20
 #define DBG_NOSCRIPT   0x40
-#define DBG_DBGSCRIPT  0x80
+// #define DBG_DBGSCRIPT  0x80 // unused
 #define DBG_DEBUGMODE 0x100
 #define DBG_REGONLY   0x200
 #define DBG_NOVIDEO   0x400
@@ -55,6 +61,10 @@ enum FPSDisplayMode {
 	kFPS_Display = 1, // shown by the script/user command
 	kFPS_Forced = 2   // forced shown by the engine arg
 };
+
+extern float fps;
+extern FPSDisplayMode display_fps;
+extern int debug_flags;
 
 } // namespace AGS3
 

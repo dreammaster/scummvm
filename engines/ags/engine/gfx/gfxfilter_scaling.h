@@ -26,11 +26,11 @@
 //
 //=============================================================================
 
-#ifndef AGS_ENGINE_GFX_SCALINGGFXFILTER_H
-#define AGS_ENGINE_GFX_SCALINGGFXFILTER_H
+#ifndef AGS_ENGINE_GFX_SCALING_GFX_FILTER_H
+#define AGS_ENGINE_GFX_SCALING_GFX_FILTER_H
 
-#include "ags/engine/gfx/gfxfilter.h"
-#include "ags/engine/util/scaling.h"
+#include "gfx/gfxfilter.h"
+#include "util/scaling.h"
 
 namespace AGS3 {
 namespace AGS {

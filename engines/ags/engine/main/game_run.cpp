@@ -25,56 +25,88 @@
 //
 
 #include "ags/lib/std/limits.h"
-#include "ags/lib/std/chrono.h"
-#include "ags/shared/ac/common.h"
-#include "ags/engine/ac/characterextras.h"
-#include "ags/shared/ac/characterinfo.h"
-#include "ags/engine/ac/draw.h"
-#include "ags/engine/ac/event.h"
-#include "ags/engine/ac/game.h"
-#include "ags/engine/ac/gamesetup.h"
-#include "ags/shared/ac/gamesetupstruct.h"
-#include "ags/engine/ac/global_debug.h"
-#include "ags/engine/ac/global_display.h"
-#include "ags/engine/ac/global_game.h"
-#include "ags/engine/ac/global_gui.h"
-#include "ags/engine/ac/global_region.h"
-#include "ags/engine/ac/gui.h"
-#include "ags/engine/ac/hotspot.h"
-#include "ags/engine/ac/keycode.h"
-#include "ags/engine/ac/mouse.h"
-#include "ags/engine/ac/overlay.h"
-#include "ags/engine/ac/sys_events.h"
-#include "ags/engine/ac/room.h"
-#include "ags/engine/ac/roomobject.h"
-#include "ags/engine/ac/roomstatus.h"
-#include "ags/engine/debugging/debugger.h"
-#include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/gui/guiinv.h"
-#include "ags/shared/gui/guimain.h"
-#include "ags/shared/gui/guitextbox.h"
-#include "ags/engine/main/mainheader.h"
-#include "ags/engine/main/engine.h"
-#include "ags/engine/main/game_run.h"
-#include "ags/engine/main/update.h"
-#include "ags/plugins/agsplugin.h"
-#include "ags/plugins/plugin_engine.h"
-#include "ags/engine/script/script.h"
-#include "ags/shared/ac/spritecache.h"
-#include "ags/engine/media/audio/audio_system.h"
-#include "ags/engine/platform/base/agsplatformdriver.h"
-#include "ags/engine/ac/timer.h"
-#include "ags/engine/ac/keycode.h"
-#include "ags/lib/allegro/keyboard.h"
-#include "ags/globals.h"
-#include "ags/events.h"
+//include <chrono>
+//include <SDL.h>
+#include "ac/common.h"
+#include "ac/characterextras.h"
+#include "ac/characterinfo.h"
+#include "ac/draw.h"
+#include "ac/event.h"
+#include "ac/game.h"
+#include "ac/gamesetup.h"
+#include "ac/gamesetupstruct.h"
+#include "ac/gamestate.h"
+#include "ac/global_debug.h"
+#include "ac/global_display.h"
+#include "ac/global_game.h"
+#include "ac/global_gui.h"
+#include "ac/global_region.h"
+#include "ac/gui.h"
+#include "ac/hotspot.h"
+#include "ac/keycode.h"
+#include "ac/mouse.h"
+#include "ac/overlay.h"
+#include "ac/sys_events.h"
+#include "ac/room.h"
+#include "ac/roomobject.h"
+#include "ac/roomstatus.h"
+#include "debug/debugger.h"
+#include "debug/debug_log.h"
+#include "gui/guiinv.h"
+#include "gui/guimain.h"
+#include "gui/guitextbox.h"
+#include "main/mainheader.h"
+#include "main/engine.h"
+#include "main/game_run.h"
+#include "main/update.h"
+#include "plugin/agsplugin.h"
+#include "plugin/plugin_engine.h"
+#include "script/script.h"
+#include "ac/spritecache.h"
+#include "media/audio/audio_system.h"
+#include "platform/base/agsplatformdriver.h"
+#include "ac/timer.h"
+#include "ac/keycode.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 
+extern AnimatingGUIButton animbuts[MAX_ANIMATING_BUTTONS];
+extern int numAnimButs;
+extern int mouse_on_iface;   // mouse cursor is over this interface
+extern int ifacepopped;
+extern int is_text_overlay;
+extern volatile char want_exit, abort_engine;
+extern int proper_exit, our_eip;
+extern int displayed_room, starting_room, in_new_room, new_room_was;
+extern GameSetupStruct game;
+extern RoomStruct thisroom;
+extern int game_paused;
+extern int getloctype_index;
+extern int in_enters_screen, done_es_error;
+extern int in_leaves_screen;
+extern int inside_script, in_graph_script;
+extern int no_blocking_functions;
+extern CharacterInfo *playerchar;
+extern int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
+extern int cur_mode;
+extern RoomObject *objs;
+extern char noWalkBehindsAtAll;
+extern RoomStatus *croom;
+extern CharacterExtras *charextra;
+extern SpriteCache spriteset;
+extern int cur_mode, cur_cursor;
+extern char check_dynamic_sprites_at_exit;
+
 // Checks if user interface should remain disabled for now
 static int ShouldStayInWaitMode();
+
+static int numEventsAtStartOfFunction;
+static auto t1 = AGS_Clock::now();  // timer for FPS // ... 't1'... how very appropriate.. :)
+
+static int user_disabled_for = 0;
+static const void *user_disabled_data = nullptr;
 
 #define UNTIL_ANIMEND   1
 #define UNTIL_MOVEEND   2
@@ -85,29 +117,33 @@ static int ShouldStayInWaitMode();
 #define UNTIL_SHORTIS0  7
 #define UNTIL_INTISNEG  8
 
+static int restrict_until = 0;
+
+unsigned int loopcounter = 0;
+static unsigned int lastcounter = 0;
 
 static void ProperExit() {
-	_G(want_exit) = 0;
-	_G(proper_exit) = true;
+	want_exit = 0;
+	proper_exit = 1;
 	quit("||exit!");
 }
 
 static void game_loop_check_problems_at_start() {
-	if ((_G(in_enters_screen) != 0) & (_G(displayed_room) == _G(starting_room)))
+	if ((in_enters_screen != 0) & (displayed_room == starting_room))
 		quit("!A text script run in the Player Enters Screen event caused the\n"
 			"screen to be updated. If you need to use Wait(), do so in After Fadein");
-	if ((_G(in_enters_screen) != 0) && (_G(done_es_error) == 0)) {
+	if ((in_enters_screen != 0) && (done_es_error == 0)) {
 		debug_script_warn("Wait() was used in Player Enters Screen - use Enters Screen After Fadein instead");
-		_G(done_es_error) = 1;
+		done_es_error = 1;
 	}
-	if (_G(no_blocking_functions))
+	if (no_blocking_functions)
 		quit("!A blocking function was called from within a non-blocking event such as " REP_EXEC_ALWAYS_NAME);
 }
 
 static void game_loop_check_new_room() {
-	if (_G(in_new_room) == 0) {
+	if (in_new_room == 0) {
 		// Run the room and game script repeatedly_execute
-		run_function_on_non_blocking_thread(&_GP(repExecAlways));
+		run_function_on_non_blocking_thread(&repExecAlways);
 		setevent(EV_TEXTSCRIPT, TS_REPEAT);
 		setevent(EV_RUNEVBLOCK, EVB_ROOM, 0, 6);
 	}
@@ -117,29 +153,29 @@ static void game_loop_check_new_room() {
 }
 
 static void game_loop_do_late_update() {
-	if (_G(in_new_room) == 0) {
+	if (in_new_room == 0) {
 		// Run the room and game script late_repeatedly_execute
-		run_function_on_non_blocking_thread(&_GP(lateRepExecAlways));
+		run_function_on_non_blocking_thread(&lateRepExecAlways);
 	}
 }
 
 static int game_loop_check_ground_level_interactions() {
-	if ((_GP(play).ground_level_areas_disabled & GLED_INTERACTION) == 0) {
+	if ((play.ground_level_areas_disabled & GLED_INTERACTION) == 0) {
 		// check if he's standing on a hotspot
-		int hotspotThere = get_hotspot_at(_G(playerchar)->x, _G(playerchar)->y);
+		int hotspotThere = get_hotspot_at(playerchar->x, playerchar->y);
 		// run Stands on Hotspot event
 		setevent(EV_RUNEVBLOCK, EVB_HOTSPOT, hotspotThere, 0);
 
 		// check current region
-		int onRegion = GetRegionIDAtRoom(_G(playerchar)->x, _G(playerchar)->y);
-		int inRoom = _G(displayed_room);
+		int onRegion = GetRegionIDAtRoom(playerchar->x, playerchar->y);
+		int inRoom = displayed_room;
 
-		if (onRegion != _GP(play).player_on_region) {
-			// we need to save this and set _GP(play).player_on_region
+		if (onRegion != play.player_on_region) {
+			// we need to save this and set play.player_on_region
 			// now, so it's correct going into RunRegionInteraction
-			int oldRegion = _GP(play).player_on_region;
+			int oldRegion = play.player_on_region;
 
-			_GP(play).player_on_region = onRegion;
+			play.player_on_region = onRegion;
 			// Walks Off last region
 			if (oldRegion > 0)
 				RunRegionInteraction(oldRegion, 2);
@@ -147,21 +183,21 @@ static int game_loop_check_ground_level_interactions() {
 			if (onRegion > 0)
 				RunRegionInteraction(onRegion, 1);
 		}
-		if (_GP(play).player_on_region > 0)   // player stands on region
-			RunRegionInteraction(_GP(play).player_on_region, 0);
+		if (play.player_on_region > 0)   // player stands on region
+			RunRegionInteraction(play.player_on_region, 0);
 
 		// one of the region interactions sent us to another room
-		if (inRoom != _G(displayed_room)) {
+		if (inRoom != displayed_room) {
 			check_new_room();
 		}
 
 		// if in a Wait loop which is no longer valid (probably
 		// because the Region interaction did a NewRoom), abort
 		// the rest of the loop
-		if ((_G(restrict_until)) && (!ShouldStayInWaitMode())) {
+		if ((restrict_until) && (!ShouldStayInWaitMode())) {
 			// cancel the Rep Exec and Stands on Hotspot events that
 			// we just added -- otherwise the event queue gets huge
-			_G(numevents) = _G(numEventsAtStartOfFunction);
+			numevents = numEventsAtStartOfFunction;
 			return 0;
 		}
 	} // end if checking ground level interactions
@@ -170,16 +206,16 @@ static int game_loop_check_ground_level_interactions() {
 }
 
 static void lock_mouse_on_click() {
-	if (_GP(usetup).mouse_auto_lock && _GP(scsystem).windowed)
-		_GP(mouse).TryLockToWindow();
+	if (usetup.mouse_auto_lock && scsystem.windowed)
+		Mouse::TryLockToWindow();
 }
 
 static void toggle_mouse_lock() {
-	if (_GP(scsystem).windowed) {
-		if (_GP(mouse).IsLockedToWindow())
-			_GP(mouse).UnlockFromWindow();
+	if (scsystem.windowed) {
+		if (Mouse::IsLockedToWindow())
+			Mouse::UnlockFromWindow();
 		else
-			_GP(mouse).TryLockToWindow();
+			Mouse::TryLockToWindow();
 	}
 }
 
@@ -189,9 +225,9 @@ static void check_mouse_controls() {
 
 	mongu = gui_on_mouse_move();
 
-	_G(mouse_on_iface) = mongu;
-	if ((_G(ifacepopped) >= 0) && (_G(mousey) >= _GP(guis)[_G(ifacepopped)].Y + _GP(guis)[_G(ifacepopped)].Height))
-		remove_popup_interface(_G(ifacepopped));
+	mouse_on_iface = mongu;
+	if ((ifacepopped >= 0) && (mousey >= guis[ifacepopped].Y + guis[ifacepopped].Height))
+		remove_popup_interface(ifacepopped);
 
 	// check mouse clicks on GUIs
 	static int wasbutdown = 0, wasongui = 0;
@@ -203,22 +239,19 @@ static void check_mouse_controls() {
 		wasbutdown = 0;
 	}
 
-	int mbut = NONE;
+	int mbut = MouseNone;
 	int mwheelz = 0;
 	if (run_service_mb_controls(mbut, mwheelz) && mbut >= 0) {
 
 		check_skip_cutscene_mclick(mbut);
 
-		if (_GP(play).fast_forward || _GP(play).IsIgnoringInput()) {
-			/* do nothing if skipping cutscene or input disabled */
-		} else if ((_GP(play).wait_counter != 0) && (_GP(play).key_skip_wait & SKIP_MOUSECLICK) != 0) {
-			_GP(play).wait_counter = 0;
-			_GP(play).wait_skipped_by = SKIP_MOUSECLICK;
-			_GP(play).wait_skipped_by_data = mbut;
-		} else if (_G(is_text_overlay) > 0) {
-			if (_GP(play).cant_skip_speech & SKIP_MOUSECLICK)
+		if (play.fast_forward || play.IsIgnoringInput()) { /* do nothing if skipping cutscene or input disabled */
+		} else if ((play.wait_counter > 0) && (play.key_skip_wait & SKIP_MOUSECLICK) != 0)
+			play.wait_counter = -1;
+		else if (is_text_overlay > 0) {
+			if (play.cant_skip_speech & SKIP_MOUSECLICK)
 				remove_screen_overlay(OVER_TEXTMSG);
-		} else if (!IsInterfaceEnabled()); // blocking cutscene, ignore mouse
+		} else if (!IsInterfaceEnabled());  // blocking cutscene, ignore mouse
 		else if (pl_run_plugin_hooks(AGSE_MOUSECLICK, mbut + 1)) {
 			// plugin took the click
 			debug_script_log("Plugin handled mouse button %d", mbut + 1);
@@ -229,7 +262,7 @@ static void check_mouse_controls() {
 			wasongui = mongu;
 			wasbutdown = mbut + 1;
 		} else setevent(EV_TEXTSCRIPT, TS_MCLICK, mbut + 1);
-		//    else RunTextScriptIParam(_G(gameinst),"on_mouse_click",aa+1);
+		//    else RunTextScriptIParam(gameinst,"on_mouse_click",aa+1);
 	}
 
 	if (mwheelz < 0)
@@ -238,81 +271,169 @@ static void check_mouse_controls() {
 		setevent(EV_TEXTSCRIPT, TS_MCLICK, 8);
 }
 
-// Returns current key modifiers;
-static int get_active_shifts() {
-	return ::AGS::g_events->getModifierFlags();
-}
 
-// Special flags to OR saved shift flags with:
-// Shifts key combination already fired (wait until full shifts release)
-#define KEY_SHIFTS_FIRED      0x80000000
+
+// Special flags to OR saved SDL_Keymod flags with:
+// Mod key combination already fired (wait until full mod release)
+#define KEY_MODS_FIRED      0x80000000
+
+int cur_key_mods = 0;
+int old_key_mod = 0; // for saving previous key mods
 
 // Runs service key controls, returns false if service key combinations were handled
 // and no more processing required, otherwise returns true and provides current keycode and key shifts.
-bool run_service_key_controls(int &kgn) {
-	// check keypresses
+bool run_service_key_controls(int &out_key) {
 	bool handled = false;
-	int kbhit_res = ags_kbhit();
-	// First, check shifts
-	const int act_shifts = get_active_shifts();
+	const bool key_valid = ags_keyevent_ready();
+	const SDL_Event key_evt = key_valid ? ags_get_next_keyevent() : SDL_Event();
+	const bool is_only_mod_key = key_evt.type == SDL_KEYDOWN ? is_mod_key(key_evt.key.keysym) : false;
+
+	// Following section is for testing for pushed and released mod-keys.
+	// A bit of explanation: some service actions may require combination of
+	// mod-keys, for example [Ctrl + Alt] toggles mouse lock in window.
+	// Here comes a problem: other actions may also use [Ctrl + Alt] mods in
+	// combination with a third key: e.g. [Ctrl + Alt + V] displays engine info.
+	// For this reason we cannot simply test for pressed Ctrl and Alt here,
+	// but we must wait until player *releases at least one mod key* of this combo,
+	// while no third key was pressed.
+	// In other words, such action should only trigger if:
+	// * if combination of held down mod-keys was gathered,
+	// * if no other key was pressed meanwhile,
+	// * if at least one of those gathered mod-keys was released.
+	//
+	// TODO: maybe split this mod handling into sep procedure and make it easier to use (not that it's used alot)?
+
+	// First, check mods
+	const int cur_mod = make_merged_mod(SDL_GetModState());
+
 	// If shifts combination have already triggered an action, then do nothing
 	// until new shifts are empty, in which case reset saved shifts
-	if (_G(old_key_shifts) & KEY_SHIFTS_FIRED) {
-		if (act_shifts == 0)
-			_G(old_key_shifts) = 0;
+	if (old_key_mod & KEY_MODS_FIRED) {
+		if (cur_mod == 0)
+			old_key_mod = 0;
 	} else {
-		// If any non-shift key is pressed, add fired flag to indicate that
-		// this is no longer a pure shifts key combination
-		if (kbhit_res) {
-			_G(old_key_shifts) = act_shifts | KEY_SHIFTS_FIRED;
+		// If any non-mod key is pressed, add fired flag to indicate that
+		// this is no longer a pure mod keys combination
+		if (key_valid && !is_only_mod_key) {
+			old_key_mod = cur_mod | KEY_MODS_FIRED;
 		}
-		// If all the previously registered shifts are still pressed,
-		// then simply resave new shift state.
-		else if ((_G(old_key_shifts) & act_shifts) == _G(old_key_shifts)) {
-			_G(old_key_shifts) = act_shifts;
+		// If all the previously registered mods are still pressed,
+		// then simply resave new mods state.
+		else if ((old_key_mod & cur_mod) == old_key_mod) {
+			old_key_mod = cur_mod;
 		}
-		// Otherwise some of the shifts were released, then run key combo action
-		// and set KEY_COMBO_FIRED flag to prevent multiple execution
-		else if (_G(old_key_shifts)) {
+		// Otherwise some of the mods were released, then run key combo action
+		// and set KEY_MODS_FIRED flag to prevent multiple execution
+		else if (old_key_mod) {
 			// Toggle mouse lock on Ctrl + Alt
-			if (_G(old_key_shifts) == (KB_ALT_FLAG | KB_CTRL_FLAG)) {
+			if (old_key_mod == (KMOD_CTRL | KMOD_ALT)) {
 				toggle_mouse_lock();
 				handled = true;
 			}
-			_G(old_key_shifts) |= KEY_SHIFTS_FIRED;
+			old_key_mod |= KEY_MODS_FIRED;
 		}
 	}
+	cur_key_mods = cur_mod;
 
-	if (!kbhit_res || handled)
-		return false;
+	if (!key_valid)
+		return false; // if there was no key press, finish after handling current mod state
+	if (is_only_mod_key || handled)
+		return false; // rest of engine currently does not use pressed mod keys
+					  // change this when it's no longer true (but be mindful about key-skipping!)
 
-	int keycode = ags_getch();
-	// NS: I'm still not sure why we read a second key.
-	// Perhaps it's of a time when we read the keyboard one byte at a time?
-	// if (keycode == 0)
-	//     keycode = ags_getch() + AGS_EXT_KEY_SHIFT;
-	if (keycode == 0)
-		return false;
+	int agskey = ags_keycode_from_sdl(key_evt);
+	if (agskey == eAGSKeyCodeNone)
+		return false; // should skip this key event
 
-	// LAlt or RAlt + Enter
-	// NOTE: for some reason LAlt + Enter produces same code as F9
-	if (act_shifts == KB_ALT_FLAG && (
-			(keycode == eAGSKeyCodeF9 && !::AGS::g_events->isKeyPressed(KEY_F9)) ||
-			keycode == eAGSKeyCodeReturn)
-	) {
+	// LAlt or RAlt + Enter/Return
+	if ((cur_mod == KMOD_ALT) && agskey == eAGSKeyCodeReturn) {
 		engine_try_switch_windowed_gfxmode();
 		return false;
 	}
 
-	// No service operation triggered? return active keypress and shifts to caller
-	kgn = keycode;
+	// Alt+X, abort (but only once game is loaded)
+	if ((displayed_room >= 0) && (play.abort_key > 0 && agskey == play.abort_key)) {
+		check_dynamic_sprites_at_exit = 0;
+		quit("!|");
+	}
+
+	// debug console
+	if ((agskey == '`') && (play.debug_mode > 0)) {
+		display_console = !display_console;
+		return false;
+	}
+
+	if ((agskey == eAGSKeyCodeCtrlE) && (display_fps == kFPS_Forced)) {
+		// if --fps paramter is used, Ctrl+E will max out frame rate
+		setTimerFps(isTimerFpsMaxed() ? frames_per_second : 1000);
+		return false;
+	}
+
+	if ((agskey == eAGSKeyCodeCtrlD) && (play.debug_mode > 0)) {
+		// ctrl+D - show info
+		char infobuf[900];
+		int ff;
+		// MACPORT FIX 9/6/5: added last %s
+		sprintf(infobuf, "In room %d %s[Player at %d, %d (view %d, loop %d, frame %d)%s%s%s",
+			displayed_room, (noWalkBehindsAtAll ? "(has no walk-behinds)" : ""), playerchar->x, playerchar->y,
+			playerchar->view + 1, playerchar->loop, playerchar->frame,
+			(IsGamePaused() == 0) ? "" : "[Game paused.",
+			(play.ground_level_areas_disabled == 0) ? "" : "[Ground areas disabled.",
+			(IsInterfaceEnabled() == 0) ? "[Game in Wait state" : "");
+		for (ff = 0; ff < croom->numobj; ff++) {
+			if (ff >= 8) break; // buffer not big enough for more than 7
+			sprintf(&infobuf[strlen(infobuf)],
+				"[Object %d: (%d,%d) size (%d x %d) on:%d moving:%s animating:%d slot:%d trnsp:%d clkble:%d",
+				ff, objs[ff].x, objs[ff].y,
+				(spriteset[objs[ff].num] != nullptr) ? game.SpriteInfos[objs[ff].num].Width : 0,
+				(spriteset[objs[ff].num] != nullptr) ? game.SpriteInfos[objs[ff].num].Height : 0,
+				objs[ff].on,
+				(objs[ff].moving > 0) ? "yes" : "no", objs[ff].cycling,
+				objs[ff].num, objs[ff].transparent,
+				((objs[ff].flags & OBJF_NOINTERACT) != 0) ? 0 : 1);
+		}
+		Display(infobuf);
+		int chd = game.playercharacter;
+		char bigbuffer[STD_BUFFER_SIZE] = "CHARACTERS IN THIS ROOM:[";
+		for (ff = 0; ff < game.numcharacters; ff++) {
+			if (game.chars[ff].room != displayed_room) continue;
+			if (strlen(bigbuffer) > 430) {
+				strcat(bigbuffer, "and more...");
+				Display(bigbuffer);
+				strcpy(bigbuffer, "CHARACTERS IN THIS ROOM (cont'd):[");
+			}
+			chd = ff;
+			sprintf(&bigbuffer[strlen(bigbuffer)],
+				"%s (view/loop/frm:%d,%d,%d  x/y/z:%d,%d,%d  idleview:%d,time:%d,left:%d walk:%d anim:%d follow:%d flags:%X wait:%d zoom:%d)[",
+				game.chars[chd].scrname, game.chars[chd].view + 1, game.chars[chd].loop, game.chars[chd].frame,
+				game.chars[chd].x, game.chars[chd].y, game.chars[chd].z,
+				game.chars[chd].idleview, game.chars[chd].idletime, game.chars[chd].idleleft,
+				game.chars[chd].walking, game.chars[chd].animating, game.chars[chd].following,
+				game.chars[chd].flags, game.chars[chd].wait, charextra[chd].zoom);
+		}
+		Display(bigbuffer);
+		return false;
+	}
+
+	if (((agskey == eAGSKeyCodeCtrlV) && (cur_key_mods & KMOD_ALT) != 0)
+		&& (play.wait_counter < 1) && (is_text_overlay == 0) && (restrict_until == 0)) {
+		// make sure we can't interrupt a Wait()
+		// and desync the music to cutscene
+		play.debug_mode++;
+		script_debug(1, 0);
+		play.debug_mode--;
+		return false;
+	}
+
+	// No service operation triggered? return active keypress and mods to caller
+	out_key = agskey;
 	return true;
 }
 
 bool run_service_mb_controls(int &mbut, int &mwheelz) {
 	int mb = ags_mgetbutton();
 	int mz = ags_check_mouse_wheel();
-	if (mb == NONE && mz == 0)
+	if (mb == MouseNone && mz == 0)
 		return false;
 	lock_mouse_on_click(); // do not claim
 	mbut = mb;
@@ -329,10 +450,10 @@ static void check_keyboard_controls() {
 	}
 	// Then, check cutscene skip
 	check_skip_cutscene_keypress(kgn);
-	if (_GP(play).fast_forward) {
+	if (play.fast_forward) {
 		return;
 	}
-	if (_GP(play).IsIgnoringInput()) {
+	if (play.IsIgnoringInput()) {
 		return;
 	}
 	// Now check for in-game controls
@@ -342,19 +463,13 @@ static void check_keyboard_controls() {
 		return;
 	}
 
-	// debug console
-	if ((kgn == '`') && (_GP(play).debug_mode > 0)) {
-		_G(display_console) = !_G(display_console);
-		return;
-	}
-
 	// skip speech if desired by Speech.SkipStyle
-	if ((_G(is_text_overlay) > 0) && (_GP(play).cant_skip_speech & SKIP_KEYPRESS)) {
+	if ((is_text_overlay > 0) && (play.cant_skip_speech & SKIP_KEYPRESS)) {
 		// only allow a key to remove the overlay if the icon bar isn't up
 		if (IsGamePaused() == 0) {
 			// check if it requires a specific keypress
-			if ((_GP(play).skip_speech_specific_key > 0) &&
-				(kgn != _GP(play).skip_speech_specific_key)) {
+			if ((play.skip_speech_specific_key > 0) &&
+				(kgn != play.skip_speech_specific_key)) {
 			} else
 				remove_screen_overlay(OVER_TEXTMSG);
 		}
@@ -362,86 +477,13 @@ static void check_keyboard_controls() {
 		return;
 	}
 
-	if ((_GP(play).wait_counter != 0) && (_GP(play).key_skip_wait & SKIP_KEYPRESS) != 0) {
-		_GP(play).wait_counter = 0;
-		_GP(play).wait_skipped_by = SKIP_KEYPRESS;
-		_GP(play).wait_skipped_by_data = kgn;
+	if ((play.wait_counter > 0) && (play.key_skip_wait & SKIP_KEYPRESS) != 0) {
+		play.wait_counter = -1;
 		debug_script_log("Keypress code %d ignored - in Wait", kgn);
 		return;
 	}
 
-	if ((kgn == eAGSKeyCodeCtrlE) && (_G(display_fps) == kFPS_Forced)) {
-		// if --fps paramter is used, Ctrl+E will max out frame rate
-		setTimerFps(isTimerFpsMaxed() ? _G(frames_per_second) : 1000);
-		return;
-	}
-
-	if ((kgn == eAGSKeyCodeCtrlD) && (_GP(play).debug_mode > 0)) {
-		// ctrl+D - show info
-		char infobuf[900];
-		int ff;
-		// MACPORT FIX 9/6/5: added last %s
-		sprintf(infobuf, "In room %d %s[Player at %d, %d (view %d, loop %d, frame %d)%s%s%s",
-			_G(displayed_room), (_G(noWalkBehindsAtAll) ? "(has no walk-behinds)" : ""), _G(playerchar)->x, _G(playerchar)->y,
-			_G(playerchar)->view + 1, _G(playerchar)->loop, _G(playerchar)->frame,
-			(IsGamePaused() == 0) ? "" : "[Game paused.",
-			(_GP(play).ground_level_areas_disabled == 0) ? "" : "[Ground areas disabled.",
-			(IsInterfaceEnabled() == 0) ? "[Game in Wait state" : "");
-		for (ff = 0; ff < _G(croom)->numobj; ff++) {
-			if (ff >= 8) break; // buffer not big enough for more than 7
-			sprintf(&infobuf[strlen(infobuf)],
-				"[Object %d: (%d,%d) size (%d x %d) on:%d moving:%s animating:%d slot:%d trnsp:%d clkble:%d",
-				ff, _G(objs)[ff].x, _G(objs)[ff].y,
-				(_GP(spriteset)[_G(objs)[ff].num] != nullptr) ? _GP(game).SpriteInfos[_G(objs)[ff].num].Width : 0,
-				(_GP(spriteset)[_G(objs)[ff].num] != nullptr) ? _GP(game).SpriteInfos[_G(objs)[ff].num].Height : 0,
-				_G(objs)[ff].on,
-				(_G(objs)[ff].moving > 0) ? "yes" : "no", _G(objs)[ff].cycling,
-				_G(objs)[ff].num, _G(objs)[ff].transparent,
-				((_G(objs)[ff].flags & OBJF_NOINTERACT) != 0) ? 0 : 1);
-		}
-		Display(infobuf);
-		int chd = _GP(game).playercharacter;
-		char bigbuffer[STD_BUFFER_SIZE] = "CHARACTERS IN THIS ROOM:[";
-		for (ff = 0; ff < _GP(game).numcharacters; ff++) {
-			if (_GP(game).chars[ff].room != _G(displayed_room)) continue;
-			if (strlen(bigbuffer) > 430) {
-				strcat(bigbuffer, "and more...");
-				Display(bigbuffer);
-				strcpy(bigbuffer, "CHARACTERS IN THIS ROOM (cont'd):[");
-			}
-			chd = ff;
-			sprintf(&bigbuffer[strlen(bigbuffer)],
-				"%s (view/loop/frm:%d,%d,%d  x/y/z:%d,%d,%d  idleview:%d,time:%d,left:%d walk:%d anim:%d follow:%d flags:%X wait:%d zoom:%d)[",
-				_GP(game).chars[chd].scrname, _GP(game).chars[chd].view + 1, _GP(game).chars[chd].loop, _GP(game).chars[chd].frame,
-				_GP(game).chars[chd].x, _GP(game).chars[chd].y, _GP(game).chars[chd].z,
-				_GP(game).chars[chd].idleview, _GP(game).chars[chd].idletime, _GP(game).chars[chd].idleleft,
-				_GP(game).chars[chd].walking, _GP(game).chars[chd].animating, _GP(game).chars[chd].following,
-				_GP(game).chars[chd].flags, _GP(game).chars[chd].wait, _G(charextra)[chd].zoom);
-		}
-		Display(bigbuffer);
-
-		return;
-	}
-
-	// if (kgn == key_ctrl_u) {
-	//     _GP(play).debug_mode++;
-	//     script_debug(5,0);
-	//     _GP(play).debug_mode--;
-	//     return;
-	// }
-
-	if (kgn == eAGSKeyCodeAltV && (::AGS::g_events->getModifierFlags() & KB_CTRL_FLAG)
-			&& (_GP(play).wait_counter < 1) && (_G(is_text_overlay) == 0) && (_G(restrict_until) == 0)) {
-		// make sure we can't interrupt a Wait()
-		// and desync the music to cutscene
-		_GP(play).debug_mode++;
-		script_debug(1, 0);
-		_GP(play).debug_mode--;
-
-		return;
-	}
-
-	if (_G(inside_script)) {
+	if (inside_script) {
 		// Don't queue up another keypress if it can't be run instantly
 		debug_script_log("Keypress %d ignored (game blocked)", kgn);
 		return;
@@ -454,9 +496,9 @@ static void check_keyboard_controls() {
 	// pressed, but exclude control characters (<32) and
 	// extended keys (eg. up/down arrow; 256+)
 	if ((((kgn >= 32) && (kgn <= 255) && (kgn != '[')) || (kgn == eAGSKeyCodeReturn) || (kgn == eAGSKeyCodeBackspace))
-		&& !_G(all_buttons_disabled)) {
-		for (int guiIndex = 0; guiIndex < _GP(game).numgui; guiIndex++) {
-			auto &gui = _GP(guis)[guiIndex];
+		&& !all_buttons_disabled) {
+		for (int guiIndex = 0; guiIndex < game.numgui; guiIndex++) {
+			auto &gui = guis[guiIndex];
 
 			if (!gui.IsDisplayed()) continue;
 
@@ -492,17 +534,19 @@ static void check_keyboard_controls() {
 	}
 
 	if (!keywasprocessed) {
-		kgn = GetKeyForKeyPressCb(kgn);
+		kgn = AGSKeyToScriptKey(kgn);
 		debug_script_log("Running on_key_press keycode %d", kgn);
 		setevent(EV_TEXTSCRIPT, TS_KEYPRESS, kgn);
 	}
 
-	// RunTextScriptIParam(_G(gameinst),"on_key_press",kgn);
+	// RunTextScriptIParam(gameinst,"on_key_press",kgn);
 }
 
 // check_controls: checks mouse & keyboard interface
 static void check_controls() {
-	_G(our_eip) = 1007;
+	our_eip = 1007;
+
+	sys_evt_process_pending();
 
 	check_mouse_controls();
 	check_keyboard_controls();
@@ -510,30 +554,30 @@ static void check_controls() {
 
 static void check_room_edges(int numevents_was) {
 	if ((IsInterfaceEnabled()) && (IsGamePaused() == 0) &&
-		(_G(in_new_room) == 0) && (_G(new_room_was) == 0)) {
+		(in_new_room == 0) && (new_room_was == 0)) {
 		// Only allow walking off edges if not in wait mode, and
 		// if not in Player Enters Screen (allow walking in from off-screen)
 		int edgesActivated[4] = { 0, 0, 0, 0 };
 		// Only do it if nothing else has happened (eg. mouseclick)
-		if ((_G(numevents) == numevents_was) &&
-			((_GP(play).ground_level_areas_disabled & GLED_INTERACTION) == 0)) {
+		if ((numevents == numevents_was) &&
+			((play.ground_level_areas_disabled & GLED_INTERACTION) == 0)) {
 
-			if (_G(playerchar)->x <= _GP(thisroom).Edges.Left)
+			if (playerchar->x <= thisroom.Edges.Left)
 				edgesActivated[0] = 1;
-			else if (_G(playerchar)->x >= _GP(thisroom).Edges.Right)
+			else if (playerchar->x >= thisroom.Edges.Right)
 				edgesActivated[1] = 1;
-			if (_G(playerchar)->y >= _GP(thisroom).Edges.Bottom)
+			if (playerchar->y >= thisroom.Edges.Bottom)
 				edgesActivated[2] = 1;
-			else if (_G(playerchar)->y <= _GP(thisroom).Edges.Top)
+			else if (playerchar->y <= thisroom.Edges.Top)
 				edgesActivated[3] = 1;
 
-			if ((_GP(play).entered_edge >= 0) && (_GP(play).entered_edge <= 3)) {
+			if ((play.entered_edge >= 0) && (play.entered_edge <= 3)) {
 				// once the player is no longer outside the edge, forget the stored edge
-				if (edgesActivated[_GP(play).entered_edge] == 0)
-					_GP(play).entered_edge = -10;
+				if (edgesActivated[play.entered_edge] == 0)
+					play.entered_edge = -10;
 				// if we are walking in from off-screen, don't activate edges
 				else
-					edgesActivated[_GP(play).entered_edge] = 0;
+					edgesActivated[play.entered_edge] = 0;
 			}
 
 			for (int ii = 0; ii < 4; ii++) {
@@ -542,37 +586,33 @@ static void check_room_edges(int numevents_was) {
 			}
 		}
 	}
-	_G(our_eip) = 1008;
+	our_eip = 1008;
 
 }
 
 static void game_loop_check_controls(bool checkControls) {
 	// don't let the player do anything before the screen fades in
-	if ((_G(in_new_room) == 0) && (checkControls)) {
-		int inRoom = _G(displayed_room);
-		int numevents_was = _G(numevents);
+	if ((in_new_room == 0) && (checkControls)) {
+		int inRoom = displayed_room;
+		int numevents_was = numevents;
 		check_controls();
 		check_room_edges(numevents_was);
-
-		if (_G(abort_engine))
-			return;
-
 		// If an inventory interaction changed the room
-		if (inRoom != _G(displayed_room))
+		if (inRoom != displayed_room)
 			check_new_room();
 	}
 }
 
 static void game_loop_do_update() {
-	if (_G(debug_flags) & DBG_NOUPDATE);
-	else if (_G(game_paused) == 0) update_stuff();
+	if (debug_flags & DBG_NOUPDATE);
+	else if (game_paused == 0) update_stuff();
 }
 
 static void game_loop_update_animated_buttons() {
 	// update animating GUI buttons
 	// this bit isn't in update_stuff because it always needs to
 	// happen, even when the game is paused
-	for (int aa = 0; aa < _G(numAnimButs); aa++) {
+	for (int aa = 0; aa < numAnimButs; aa++) {
 		if (UpdateAnimatingButton(aa)) {
 			StopButtonAnimation(aa);
 			aa--;
@@ -581,8 +621,8 @@ static void game_loop_update_animated_buttons() {
 }
 
 static void game_loop_do_render_and_check_mouse(IDriverDependantBitmap *extraBitmap, int extraX, int extraY) {
-	if (!_GP(play).fast_forward) {
-		int mwasatx = _G(mousex), mwasaty = _G(mousey);
+	if (!play.fast_forward) {
+		int mwasatx = mousex, mwasaty = mousey;
 
 		// Only do this if we are not skipping a cutscene
 		render_graphics(extraBitmap, extraX, extraY);
@@ -591,9 +631,9 @@ static void game_loop_do_render_and_check_mouse(IDriverDependantBitmap *extraBit
 		// TODO: move this out of render related function? find out why we remember mwasatx and mwasaty before render
 		// TODO: do not use static variables!
 		// TODO: if we support rotation then we also need to compare full transform!
-		if (_G(displayed_room) < 0)
+		if (displayed_room < 0)
 			return;
-		auto view = _GP(play).GetRoomViewportAt(_G(mousex), _G(mousey));
+		auto view = play.GetRoomViewportAt(mousex, mousey);
 		auto cam = view ? view->GetCamera() : nullptr;
 		if (cam) {
 			// NOTE: all cameras are in same room right now, so their positions are in same coordinate system;
@@ -602,11 +642,11 @@ static void game_loop_do_render_and_check_mouse(IDriverDependantBitmap *extraBit
 			int offsetx = cam->GetRect().Left;
 			int offsety = cam->GetRect().Top;
 
-			if (((mwasatx != _G(mousex)) || (mwasaty != _G(mousey)) ||
+			if (((mwasatx != mousex) || (mwasaty != mousey) ||
 				(offsetxWas != offsetx) || (offsetyWas != offsety))) {
 				// mouse moves over hotspot
-				if (__GetLocationType(game_to_data_coord(_G(mousex)), game_to_data_coord(_G(mousey)), 1) == LOCTYPE_HOTSPOT) {
-					int onhs = _G(getloctype_index);
+				if (__GetLocationType(game_to_data_coord(mousex), game_to_data_coord(mousey), 1) == LOCTYPE_HOTSPOT) {
+					int onhs = getloctype_index;
 
 					setevent(EV_RUNEVBLOCK, EVB_HOTSPOT, onhs, 6);
 				}
@@ -619,31 +659,31 @@ static void game_loop_do_render_and_check_mouse(IDriverDependantBitmap *extraBit
 }
 
 static void game_loop_update_events() {
-	_G(new_room_was) = _G(in_new_room);
-	if (_G(in_new_room) > 0)
+	new_room_was = in_new_room;
+	if (in_new_room > 0)
 		setevent(EV_FADEIN, 0, 0, 0);
-	_G(in_new_room) = 0;
+	in_new_room = 0;
 	update_events();
-	if (!_G(abort_engine) && (_G(new_room_was) > 0) && (_G(in_new_room) == 0)) {
+	if ((new_room_was > 0) && (in_new_room == 0)) {
 		// if in a new room, and the room wasn't just changed again in update_events,
 		// then queue the Enters Screen scripts
 		// run these next time round, when it's faded in
-		if (_G(new_room_was) == 2) // first time enters screen
+		if (new_room_was == 2)  // first time enters screen
 			setevent(EV_RUNEVBLOCK, EVB_ROOM, 0, 4);
-		if (_G(new_room_was) != 3) // enters screen after fadein
+		if (new_room_was != 3)   // enters screen after fadein
 			setevent(EV_RUNEVBLOCK, EVB_ROOM, 0, 7);
 	}
 }
 
 static void game_loop_update_background_animation() {
-	if (_GP(play).bg_anim_delay > 0) _GP(play).bg_anim_delay--;
-	else if (_GP(play).bg_frame_locked);
+	if (play.bg_anim_delay > 0) play.bg_anim_delay--;
+	else if (play.bg_frame_locked);
 	else {
-		_GP(play).bg_anim_delay = _GP(play).anim_background_speed;
-		_GP(play).bg_frame++;
-		if ((size_t)_GP(play).bg_frame >= _GP(thisroom).BgFrameCount)
-			_GP(play).bg_frame = 0;
-		if (_GP(thisroom).BgFrameCount >= 2) {
+		play.bg_anim_delay = play.anim_background_speed;
+		play.bg_frame++;
+		if ((size_t)play.bg_frame >= thisroom.BgFrameCount)
+			play.bg_frame = 0;
+		if (thisroom.BgFrameCount >= 2) {
 			// get the new frame's palette
 			on_background_frame_change();
 		}
@@ -651,12 +691,12 @@ static void game_loop_update_background_animation() {
 }
 
 static void game_loop_update_loop_counter() {
-	_G(loopcounter)++;
+	loopcounter++;
 
-	if (_GP(play).wait_counter > 0) _GP(play).wait_counter--;
-	if (_GP(play).shakesc_length > 0) _GP(play).shakesc_length--;
+	if (play.wait_counter > 0) play.wait_counter--;
+	if (play.shakesc_length > 0) play.shakesc_length--;
 
-	if (_G(loopcounter) % 5 == 0) {
+	if (loopcounter % 5 == 0) {
 		update_ambient_sound_vol();
 		update_directional_sound_vol();
 	}
@@ -664,76 +704,75 @@ static void game_loop_update_loop_counter() {
 
 static void game_loop_update_fps() {
 	auto t2 = AGS_Clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - _G(t1));
-	auto frames = _G(loopcounter) - _G(lastcounter);
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+	auto frames = loopcounter - lastcounter;
 
 	if (duration >= std::chrono::milliseconds(1000) && frames > 0) {
-		_G(fps) = 1000.0f * frames / duration.count();
-		_G(t1) = t2;
-		_G(lastcounter) = _G(loopcounter);
+		fps = 1000.0f * frames / duration.count();
+		t1 = t2;
+		lastcounter = loopcounter;
 	}
 }
 
 float get_current_fps() {
 	// if we have maxed out framerate then return the frame rate we're seeing instead
 	// fps must be greater that 0 or some timings will take forever.
-	if (isTimerFpsMaxed() && _G(fps) > 0.0f) {
-		return _G(fps);
+	if (isTimerFpsMaxed() && fps > 0.0f) {
+		return fps;
 	}
-	return _G(frames_per_second);
+	return frames_per_second;
 }
 
 void set_loop_counter(unsigned int new_counter) {
-	_G(loopcounter) = new_counter;
-	_G(t1) = AGS_Clock::now();
-	_G(lastcounter) = _G(loopcounter);
-	_G(fps) = std::numeric_limits<float>::quiet_undefined();
+	loopcounter = new_counter;
+	t1 = AGS_Clock::now();
+	lastcounter = loopcounter;
+	fps = std::numeric_limits<float>::quiet_NaN();
 }
 
 void UpdateGameOnce(bool checkControls, IDriverDependantBitmap *extraBitmap, int extraX, int extraY) {
 
 	int res;
 
-	_G(numEventsAtStartOfFunction) = _G(numevents);
+	sys_evt_process_pending();
 
-	if (_G(want_exit)) {
+	numEventsAtStartOfFunction = numevents;
+
+	if (want_exit) {
 		ProperExit();
 	}
 
 	ccNotifyScriptStillAlive();
-	_G(our_eip) = 1;
+	our_eip = 1;
 
 	game_loop_check_problems_at_start();
 
 	// if we're not fading in, don't count the fadeouts
-	if ((_GP(play).no_hicolor_fadein) && (_GP(game).options[OPT_FADETYPE] == FADE_NORMAL))
-		_GP(play).screen_is_faded_out = 0;
+	if ((play.no_hicolor_fadein) && (game.options[OPT_FADETYPE] == FADE_NORMAL))
+		play.screen_is_faded_out = 0;
 
-	_G(our_eip) = 1014;
+	our_eip = 1014;
 
 	update_gui_disabled_status();
 
-	_G(our_eip) = 1004;
+	our_eip = 1004;
 
 	game_loop_check_new_room();
 
-	_G(our_eip) = 1005;
+	our_eip = 1005;
 
 	res = game_loop_check_ground_level_interactions();
 	if (res != RETURN_CONTINUE) {
 		return;
 	}
 
-	_G(mouse_on_iface) = -1;
+	mouse_on_iface = -1;
 
 	check_debug_keys();
 
 	game_loop_check_controls(checkControls);
 
-	if (_G(abort_engine))
-		return;
-
-	_G(our_eip) = 2;
+	our_eip = 2;
 
 	game_loop_do_update();
 
@@ -745,16 +784,12 @@ void UpdateGameOnce(bool checkControls, IDriverDependantBitmap *extraBitmap, int
 
 	game_loop_do_render_and_check_mouse(extraBitmap, extraX, extraY);
 
-	_G(our_eip) = 6;
+	our_eip = 6;
 
 	game_loop_update_events();
 
-	if (_G(abort_engine))
-		return;
+	our_eip = 7;
 
-	_G(our_eip) = 7;
-
-	//    if (ags_mgetbutton()>NONE) break;
 	update_polled_stuff_if_runtime();
 
 	game_loop_update_background_animation();
@@ -762,10 +797,10 @@ void UpdateGameOnce(bool checkControls, IDriverDependantBitmap *extraBitmap, int
 	game_loop_update_loop_counter();
 
 	// Immediately start the next frame if we are skipping a cutscene
-	if (_GP(play).fast_forward)
+	if (play.fast_forward)
 		return;
 
-	_G(our_eip) = 72;
+	our_eip = 72;
 
 	game_loop_update_fps();
 
@@ -778,50 +813,50 @@ static void UpdateMouseOverLocation() {
 	// Call GetLocationName - it will internally force a GUI refresh
 	// if the result it returns has changed from last time
 	char tempo[STD_BUFFER_SIZE];
-	GetLocationName(game_to_data_coord(_G(mousex)), game_to_data_coord(_G(mousey)), tempo);
+	GetLocationName(game_to_data_coord(mousex), game_to_data_coord(mousey), tempo);
 
-	if ((_GP(play).get_loc_name_save_cursor >= 0) &&
-		(_GP(play).get_loc_name_save_cursor != _GP(play).get_loc_name_last_time) &&
-		(_G(mouse_on_iface) < 0) && (_G(ifacepopped) < 0)) {
+	if ((play.get_loc_name_save_cursor >= 0) &&
+		(play.get_loc_name_save_cursor != play.get_loc_name_last_time) &&
+		(mouse_on_iface < 0) && (ifacepopped < 0)) {
 		// we have saved the cursor, but the mouse location has changed
 		// and it's time to restore it
-		_GP(play).get_loc_name_save_cursor = -1;
-		set_cursor_mode(_GP(play).restore_cursor_mode_to);
+		play.get_loc_name_save_cursor = -1;
+		set_cursor_mode(play.restore_cursor_mode_to);
 
-		if (_G(cur_mode) == _GP(play).restore_cursor_mode_to) {
+		if (cur_mode == play.restore_cursor_mode_to) {
 			// make sure it changed -- the new mode might have been disabled
 			// in which case don't change the image
-			set_mouse_cursor(_GP(play).restore_cursor_image_to);
+			set_mouse_cursor(play.restore_cursor_image_to);
 		}
-		debug_script_log("Restore mouse to mode %d cursor %d", _GP(play).restore_cursor_mode_to, _GP(play).restore_cursor_image_to);
+		debug_script_log("Restore mouse to mode %d cursor %d", play.restore_cursor_mode_to, play.restore_cursor_image_to);
 	}
 }
 
 // Checks if user interface should remain disabled for now
 static int ShouldStayInWaitMode() {
-	if (_G(restrict_until) == 0)
+	if (restrict_until == 0)
 		quit("end_wait_loop called but game not in loop_until state");
-	int retval = _G(restrict_until);
+	int retval = restrict_until;
 
-	if (_G(restrict_until) == UNTIL_MOVEEND) {
-		const short *wkptr = (const short *)_G(user_disabled_data);
+	if (restrict_until == UNTIL_MOVEEND) {
+		short *wkptr = (short *)user_disabled_data;
 		if (wkptr[0] < 1) retval = 0;
-	} else if (_G(restrict_until) == UNTIL_CHARIS0) {
-		const char *chptr = (const char *)_G(user_disabled_data);
+	} else if (restrict_until == UNTIL_CHARIS0) {
+		char *chptr = (char *)user_disabled_data;
 		if (chptr[0] == 0) retval = 0;
-	} else if (_G(restrict_until) == UNTIL_NEGATIVE) {
-		const short *wkptr = (const short *)_G(user_disabled_data);
+	} else if (restrict_until == UNTIL_NEGATIVE) {
+		short *wkptr = (short *)user_disabled_data;
 		if (wkptr[0] < 0) retval = 0;
-	} else if (_G(restrict_until) == UNTIL_INTISNEG) {
-		const int *wkptr = (const int *)_G(user_disabled_data);
+	} else if (restrict_until == UNTIL_INTISNEG) {
+		int *wkptr = (int *)user_disabled_data;
 		if (wkptr[0] < 0) retval = 0;
-	} else if (_G(restrict_until) == UNTIL_NOOVERLAY) {
-		if (_G(is_text_overlay) < 1) retval = 0;
-	} else if (_G(restrict_until) == UNTIL_INTIS0) {
-		const int *wkptr = (const int *)_G(user_disabled_data);
+	} else if (restrict_until == UNTIL_NOOVERLAY) {
+		if (is_text_overlay < 1) retval = 0;
+	} else if (restrict_until == UNTIL_INTIS0) {
+		int *wkptr = (int *)user_disabled_data;
 		if (wkptr[0] == 0) retval = 0;
-	} else if (_G(restrict_until) == UNTIL_SHORTIS0) {
-		const short *wkptr = (const short *)_G(user_disabled_data);
+	} else if (restrict_until == UNTIL_SHORTIS0) {
+		short *wkptr = (short *)user_disabled_data;
 		if (wkptr[0] == 0) retval = 0;
 	} else quit("loop_until: unknown until event");
 
@@ -829,23 +864,25 @@ static int ShouldStayInWaitMode() {
 }
 
 static int UpdateWaitMode() {
-	if (_G(restrict_until) == 0) {
+	if (restrict_until == 0) {
 		return RETURN_CONTINUE;
 	}
 
-	_G(restrict_until) = ShouldStayInWaitMode();
-	_G(our_eip) = 77;
+	restrict_until = ShouldStayInWaitMode();
+	our_eip = 77;
 
-	if (_G(restrict_until) != 0) {
+	if (restrict_until != 0) {
 		return RETURN_CONTINUE;
 	}
 
-	auto was_disabled_for = _G(user_disabled_for);
+	auto was_disabled_for = user_disabled_for;
 
 	set_default_cursor();
-	_G(guis_need_update) = 1;
-	_GP(play).disabled_user_interface--;
-	_G(user_disabled_for) = 0;
+	if (gui_disabled_style != GUIDIS_UNCHANGED) { // If GUI looks change when disabled, then update them all
+		GUI::MarkAllGUIForUpdate();
+	}
+	play.disabled_user_interface--;
+	user_disabled_for = 0;
 
 	switch (was_disabled_for) {
 		// case FOR_ANIMATION:
@@ -857,7 +894,7 @@ static int UpdateWaitMode() {
 		quit("err: for_script obsolete (v2.1 and earlier only)");
 		break;
 	default:
-		quit("Unknown _G(user_disabled_for) in end _G(restrict_until)");
+		quit("Unknown user_disabled_for in end restrict_until");
 	}
 
 	// we shouldn't get here.
@@ -866,37 +903,35 @@ static int UpdateWaitMode() {
 
 // Run single game iteration; calls UpdateGameOnce() internally
 static int GameTick() {
-	if (_G(displayed_room) < 0)
+	if (displayed_room < 0)
 		quit("!A blocking function was called before the first room has been loaded");
 
 	UpdateGameOnce(true);
-
-	if (_G(abort_engine))
-		return -1;
-
 	UpdateMouseOverLocation();
 
-	_G(our_eip) = 76;
+	our_eip = 76;
 
 	int res = UpdateWaitMode();
 	if (res == RETURN_CONTINUE) {
-		return 0;    // continue looping
-	}
+		return 0;
+	} // continue looping 
 	return res;
 }
 
 static void SetupLoopParameters(int untilwhat, const void *udata) {
-	_GP(play).disabled_user_interface++;
-	_G(guis_need_update) = 1;
+	play.disabled_user_interface++;
+	if (gui_disabled_style != GUIDIS_UNCHANGED) { // If GUI looks change when disabled, then update them all
+		GUI::MarkAllGUIForUpdate();
+	}
 	// Only change the mouse cursor if it hasn't been specifically changed first
 	// (or if it's speech, always change it)
-	if (((_G(cur_cursor) == _G(cur_mode)) || (untilwhat == UNTIL_NOOVERLAY)) &&
-		(_G(cur_mode) != CURS_WAIT))
+	if (((cur_cursor == cur_mode) || (untilwhat == UNTIL_NOOVERLAY)) &&
+		(cur_mode != CURS_WAIT))
 		set_mouse_cursor(CURS_WAIT);
 
-	_G(restrict_until) = untilwhat;
-	_G(user_disabled_data) = udata;
-	_G(user_disabled_for) = FOR_EXITLOOP;
+	restrict_until = untilwhat;
+	user_disabled_data = udata;
+	user_disabled_for = FOR_EXITLOOP;
 }
 
 // This function is called from lot of various functions
@@ -908,19 +943,18 @@ static void GameLoopUntilEvent(int untilwhat, const void *daaa) {
 	// this function can get called in a nested context, so
 	// remember the state of these vars in case a higher level
 	// call needs them
-	auto cached_restrict_until = _G(restrict_until);
-	auto cached_user_disabled_data = _G(user_disabled_data);
-	auto cached_user_disabled_for = _G(user_disabled_for);
+	auto cached_restrict_until = restrict_until;
+	auto cached_user_disabled_data = user_disabled_data;
+	auto cached_user_disabled_for = user_disabled_for;
 
 	SetupLoopParameters(untilwhat, daaa);
-	while (GameTick() == 0 && !_G(abort_engine)) {
-	}
+	while (GameTick() == 0);
 
-	_G(our_eip) = 78;
+	our_eip = 78;
 
-	_G(restrict_until) = cached_restrict_until;
-	_G(user_disabled_data) = cached_user_disabled_data;
-	_G(user_disabled_for) = cached_user_disabled_for;
+	restrict_until = cached_restrict_until;
+	user_disabled_data = cached_user_disabled_data;
+	user_disabled_for = cached_user_disabled_for;
 }
 
 void GameLoopUntilValueIsZero(const char *value) {
@@ -955,27 +989,31 @@ void GameLoopUntilNoOverlay() {
 	GameLoopUntilEvent(UNTIL_NOOVERLAY, 0);
 }
 
+
+extern unsigned int load_new_game;
 void RunGameUntilAborted() {
-	// skip ticks to account for time spent starting _GP(game).
+	// skip ticks to account for time spent starting game.
 	skipMissedTicks();
 
-	while (!_G(abort_engine)) {
+	while (!abort_engine) {
 		GameTick();
 
-		if (_G(load_new_game)) {
-			RunAGSGame(nullptr, _G(load_new_game), 0);
-			_G(load_new_game) = 0;
+		if (load_new_game) {
+			RunAGSGame(nullptr, load_new_game, 0);
+			load_new_game = 0;
 		}
 	}
 }
 
 void update_polled_stuff_if_runtime() {
-	if (_G(want_exit)) {
-		_G(want_exit) = 0;
+	SDL_PumpEvents();
+
+	if (want_exit) {
+		want_exit = 0;
 		quit("||exit!");
 	}
 
-	if (_G(editor_debugging_initialized))
+	if (editor_debugging_initialized)
 		check_for_messages_from_editor();
 }
 

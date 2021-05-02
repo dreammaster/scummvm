@@ -1,386 +1,423 @@
-/* ScummVM - Graphic Adventure Engine
- *
- * ScummVM is the legal property of its developers, whose names
- * are too numerous to list here. Please refer to the COPYRIGHT
- * file distributed with this source distribution.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- */
+//=============================================================================
+//
+// Adventure Game Studio (AGS)
+//
+// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
+// The full list of copyright holders can be found in the Copyright.txt
+// file, which is part of this source code distribution.
+//
+// The AGS source code is provided under the Artistic License 2.0.
+// A copy of this license can be found in the file License.txt and at
+// http://www.opensource.org/licenses/artistic-license-2.0.php
+//
+//=============================================================================
 
-#include "ags/engine/ac/event.h"
-#include "ags/shared/ac/common.h"
-#include "ags/engine/ac/draw.h"
-#include "ags/shared/ac/gamesetupstruct.h"
-#include "ags/engine/ac/gamestate.h"
-#include "ags/engine/ac/global_game.h"
-#include "ags/engine/ac/global_room.h"
-#include "ags/engine/ac/global_screen.h"
-#include "ags/engine/ac/gui.h"
-#include "ags/engine/ac/roomstatus.h"
-#include "ags/engine/ac/screen.h"
-#include "ags/shared/script/cc_error.h"
-#include "ags/engine/platform/base/agsplatformdriver.h"
-#include "ags/plugins/agsplugin.h"
-#include "ags/plugins/plugin_engine.h"
-#include "ags/engine/script/script.h"
-#include "ags/shared/gfx/bitmap.h"
-#include "ags/engine/gfx/ddb.h"
-#include "ags/engine/gfx/graphicsdriver.h"
-#include "ags/engine/media/audio/audio_system.h"
-#include "ags/engine/ac/timer.h"
-#include "ags/globals.h"
-
-namespace AGS3 {
+#include "event.h"
+#include "ac/common.h"
+#include "ac/draw.h"
+#include "ac/gamesetupstruct.h"
+#include "ac/gamestate.h"
+#include "ac/global_game.h"
+#include "ac/global_room.h"
+#include "ac/global_screen.h"
+#include "ac/gui.h"
+#include "ac/roomstatus.h"
+#include "ac/screen.h"
+#include "script/cc_error.h"
+#include "platform/base/agsplatformdriver.h"
+#include "plugin/agsplugin.h"
+#include "plugin/plugin_engine.h"
+#include "script/script.h"
+#include "gfx/bitmap.h"
+#include "gfx/ddb.h"
+#include "gfx/graphicsdriver.h"
+#include "media/audio/audio_system.h"
+#include "ac/timer.h"
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
+extern GameSetupStruct game;
+extern RoomStruct thisroom;
+extern RoomStatus*croom;
+extern int displayed_room;
+extern GameState play;
+extern RGB palette[256];
+extern IGraphicsDriver *gfxDriver;
+extern AGSPlatformDriver *platform;
+extern RGB old_palette[256];
+
+int in_enters_screen=0,done_es_error = 0;
+int in_leaves_screen = -1;
+
+EventHappened event[MAXEVENTS+1];
+int numevents=0;
+
+const char*evblockbasename;
+int evblocknum;
+
+int inside_processevent=0;
+int eventClaimed = EVENT_NONE;
+
+const char*tsnames[4]={nullptr, REP_EXEC_NAME, "on_key_press","on_mouse_click"};
+
+
 int run_claimable_event(const char *tsname, bool includeRoom, int numParams, const RuntimeScriptValue *params, bool *eventWasClaimed) {
-	*eventWasClaimed = true;
-	// Run the room script function, and if it is not claimed,
-	// then run the main one
-	// We need to remember the _G(eventClaimed) variable's state, in case
-	// this is a nested event
-	int eventClaimedOldValue = _G(eventClaimed);
-	_G(eventClaimed) = EVENT_INPROGRESS;
-	int toret;
+    *eventWasClaimed = true;
+    // Run the room script function, and if it is not claimed,
+    // then run the main one
+    // We need to remember the eventClaimed variable's state, in case
+    // this is a nested event
+    int eventClaimedOldValue = eventClaimed;
+    eventClaimed = EVENT_INPROGRESS;
+    int toret;
 
-	if (includeRoom && _G(roominst)) {
-		toret = RunScriptFunctionIfExists(_G(roominst), tsname, numParams, params);
-		if (_G(abort_engine))
-			return -1;
+    if (includeRoom && roominst) {
+        toret = RunScriptFunctionIfExists(roominst, tsname, numParams, params);
 
-		if (_G(eventClaimed) == EVENT_CLAIMED) {
-			_G(eventClaimed) = eventClaimedOldValue;
-			return toret;
-		}
-	}
+        if (eventClaimed == EVENT_CLAIMED) {
+            eventClaimed = eventClaimedOldValue;
+            return toret;
+        }
+    }
 
-	// run script modules
-	for (int kk = 0; kk < _G(numScriptModules); kk++) {
-		toret = RunScriptFunctionIfExists(_GP(moduleInst)[kk], tsname, numParams, params);
+    // run script modules
+    for (int kk = 0; kk < numScriptModules; kk++) {
+        toret = RunScriptFunctionIfExists(moduleInst[kk], tsname, numParams, params);
 
-		if (_G(eventClaimed) == EVENT_CLAIMED) {
-			_G(eventClaimed) = eventClaimedOldValue;
-			return toret;
-		}
-	}
+        if (eventClaimed == EVENT_CLAIMED) {
+            eventClaimed = eventClaimedOldValue;
+            return toret;
+        }
+    }
 
-	_G(eventClaimed) = eventClaimedOldValue;
-	*eventWasClaimed = false;
-	return 0;
+    eventClaimed = eventClaimedOldValue;
+    *eventWasClaimed = false;
+    return 0;
 }
 
 // runs the global script on_event function
-void run_on_event(int evtype, RuntimeScriptValue &wparam) {
-	QueueScriptFunction(kScInstGame, "on_event", 2, RuntimeScriptValue().SetInt32(evtype), wparam);
+void run_on_event (int evtype, RuntimeScriptValue &wparam)
+{
+    QueueScriptFunction(kScInstGame, "on_event", 2, RuntimeScriptValue().SetInt32(evtype), wparam);
 }
 
 void run_room_event(int id) {
-	_G(evblockbasename) = "room";
+    evblockbasename="room";
 
-	if (_GP(thisroom).EventHandlers != nullptr) {
-		run_interaction_script(_GP(thisroom).EventHandlers.get(), id);
-	} else {
-		run_interaction_event(&_G(croom)->intrRoom, id);
-	}
+    if (thisroom.EventHandlers != nullptr)
+    {
+        run_interaction_script(thisroom.EventHandlers.get(), id);
+    }
+    else
+    {
+        run_interaction_event (&croom->intrRoom, id);
+    }
 }
 
-void run_event_block_inv(int invNum, int event_) {
-	_G(evblockbasename) = "inventory%d";
-	if (_G(loaded_game_file_version) > kGameVersion_272) {
-		run_interaction_script(_GP(game).invScripts[invNum].get(), event_);
-	} else {
-		run_interaction_event(_GP(game).intrInv[invNum].get(), event_);
-	}
+void run_event_block_inv(int invNum, int event) {
+    evblockbasename="inventory%d";
+    if (loaded_game_file_version > kGameVersion_272)
+    {
+        run_interaction_script(game.invScripts[invNum].get(), event);
+    }
+    else 
+    {
+        run_interaction_event(game.intrInv[invNum].get(), event);
+    }
 
 }
 
 // event list functions
-void setevent(int evtyp, int ev1, int ev2, int ev3) {
-	_G(event)[_G(numevents)].type = evtyp;
-	_G(event)[_G(numevents)].data1 = ev1;
-	_G(event)[_G(numevents)].data2 = ev2;
-	_G(event)[_G(numevents)].data3 = ev3;
-	_G(event)[_G(numevents)].player = _GP(game).playercharacter;
-	_G(numevents)++;
-	if (_G(numevents) >= MAXEVENTS) quit("too many events posted");
+void setevent(int evtyp,int ev1,int ev2,int ev3) {
+    event[numevents].type=evtyp;
+    event[numevents].data1=ev1;
+    event[numevents].data2=ev2;
+    event[numevents].data3=ev3;
+    event[numevents].player=game.playercharacter;
+    numevents++;
+    if (numevents>=MAXEVENTS) quit("too many events posted");
 }
 
 // TODO: this is kind of a hack, which forces event to be processed even if
 // it was fired from insides of other event processing.
 // The proper solution would be to do the event processing overhaul in AGS.
-void force_event(int evtyp, int ev1, int ev2, int ev3) {
-	if (_G(inside_processevent))
-		runevent_now(evtyp, ev1, ev2, ev3);
-	else
-		setevent(evtyp, ev1, ev2, ev3);
+void force_event(int evtyp,int ev1,int ev2,int ev3)
+{
+    if (inside_processevent)
+        runevent_now(evtyp, ev1, ev2, ev3);
+    else
+        setevent(evtyp, ev1, ev2, ev3);
 }
 
-void process_event(EventHappened *evp) {
-	RuntimeScriptValue rval_null;
-	if (evp->type == EV_TEXTSCRIPT) {
-		_G(ccError) = 0;
-		if (evp->data2 > -1000) {
-			QueueScriptFunction(kScInstGame, _G(tsnames)[evp->data1], 1, RuntimeScriptValue().SetInt32(evp->data2));
-		} else {
-			QueueScriptFunction(kScInstGame, _G(tsnames)[evp->data1]);
-		}
-	} else if (evp->type == EV_NEWROOM) {
-		NewRoom(evp->data1);
-	} else if (evp->type == EV_RUNEVBLOCK) {
-		Interaction *evpt = nullptr;
-		PInteractionScripts scriptPtr = nullptr;
-		const char *oldbasename = _G(evblockbasename);
-		int   oldblocknum = _G(evblocknum);
+void process_event(EventHappened*evp) {
+    RuntimeScriptValue rval_null;
+    if (evp->type==EV_TEXTSCRIPT) {
+        ccError=0;
+        if (evp->data2 > -1000) {
+            QueueScriptFunction(kScInstGame, tsnames[evp->data1], 1, RuntimeScriptValue().SetInt32(evp->data2));
+        }
+        else {
+            QueueScriptFunction(kScInstGame, tsnames[evp->data1]);
+        }
+    }
+    else if (evp->type==EV_NEWROOM) {
+        NewRoom(evp->data1);
+    }
+    else if (evp->type==EV_RUNEVBLOCK) {
+        Interaction*evpt=nullptr;
+        PInteractionScripts scriptPtr = nullptr;
+        const char *oldbasename = evblockbasename;
+        int   oldblocknum = evblocknum;
 
-		if (evp->data1 == EVB_HOTSPOT) {
+        if (evp->data1==EVB_HOTSPOT) {
 
-			if (_GP(thisroom).Hotspots[evp->data2].EventHandlers != nullptr)
-				scriptPtr = _GP(thisroom).Hotspots[evp->data2].EventHandlers;
-			else
-				evpt = &_G(croom)->intrHotspot[evp->data2];
+            if (thisroom.Hotspots[evp->data2].EventHandlers != nullptr)
+                scriptPtr = thisroom.Hotspots[evp->data2].EventHandlers;
+            else
+                evpt=&croom->intrHotspot[evp->data2];
 
-			_G(evblockbasename) = "hotspot%d";
-			_G(evblocknum) = evp->data2;
-			//Debug::Printf("Running hotspot interaction for hotspot %d, event %d", evp->data2, evp->data3);
-		} else if (evp->data1 == EVB_ROOM) {
+            evblockbasename="hotspot%d";
+            evblocknum=evp->data2;
+            //Debug::Printf("Running hotspot interaction for hotspot %d, event %d", evp->data2, evp->data3);
+        }
+        else if (evp->data1==EVB_ROOM) {
 
-			if (_GP(thisroom).EventHandlers != nullptr)
-				scriptPtr = _GP(thisroom).EventHandlers;
-			else
-				evpt = &_G(croom)->intrRoom;
+            if (thisroom.EventHandlers != nullptr)
+                scriptPtr = thisroom.EventHandlers;
+            else
+                evpt=&croom->intrRoom;
 
-			_G(evblockbasename) = "room";
-			if (evp->data3 == 5) {
-				_G(in_enters_screen)++;
-				run_on_event(GE_ENTER_ROOM, RuntimeScriptValue().SetInt32(_G(displayed_room)));
+            evblockbasename="room";
+            if (evp->data3 == 5) {
+                in_enters_screen ++;
+                run_on_event (GE_ENTER_ROOM, RuntimeScriptValue().SetInt32(displayed_room));
 
-			}
-			//Debug::Printf("Running room interaction, event %d", evp->data3);
-		}
+            }
+            //Debug::Printf("Running room interaction, event %d", evp->data3);
+        }
 
-		if (scriptPtr != nullptr) {
-			run_interaction_script(scriptPtr.get(), evp->data3);
-		} else if (evpt != nullptr) {
-			run_interaction_event(evpt, evp->data3);
-		} else
-			quit("process_event: RunEvBlock: unknown evb type");
+        if (scriptPtr != nullptr)
+        {
+            run_interaction_script(scriptPtr.get(), evp->data3);
+        }
+        else if (evpt != nullptr)
+        {
+            run_interaction_event(evpt,evp->data3);
+        }
+        else
+            quit("process_event: RunEvBlock: unknown evb type");
 
-		if (_G(abort_engine))
-			return;
+        evblockbasename = oldbasename;
+        evblocknum = oldblocknum;
 
-		_G(evblockbasename) = oldbasename;
-		_G(evblocknum) = oldblocknum;
+        if ((evp->data3 == 5) && (evp->data1 == EVB_ROOM))
+            in_enters_screen --;
+    }
+    else if (evp->type==EV_FADEIN) {
+        // if they change the transition type before the fadein, make
+        // sure the screen doesn't freeze up
+        play.screen_is_faded_out = 0;
 
-		if ((evp->data3 == 5) && (evp->data1 == EVB_ROOM))
-			_G(in_enters_screen)--;
-	} else if (evp->type == EV_FADEIN) {
-		// if they change the transition type before the fadein, make
-		// sure the screen doesn't freeze up
-		_GP(play).screen_is_faded_out = 0;
+        // determine the transition style
+        int theTransition = play.fade_effect;
 
-		// determine the transition style
-		int theTransition = _GP(play).fade_effect;
+        if (play.next_screen_transition >= 0) {
+            // a one-off transition was selected, so use it
+            theTransition = play.next_screen_transition;
+            play.next_screen_transition = -1;
+        }
 
-		if (_GP(play).next_screen_transition >= 0) {
-			// a one-off transition was selected, so use it
-			theTransition = _GP(play).next_screen_transition;
-			_GP(play).next_screen_transition = -1;
-		}
+        if (pl_run_plugin_hooks(AGSE_TRANSITIONIN, 0))
+            return;
 
-		if (pl_run_plugin_hooks(AGSE_TRANSITIONIN, 0))
-			return;
+        if (play.fast_forward)
+            return;
 
-		if (_GP(play).fast_forward)
-			return;
-
-		const bool ignore_transition = (_GP(play).screen_tint > 0);
-		if (((theTransition == FADE_CROSSFADE) || (theTransition == FADE_DISSOLVE)) &&
-			(_G(saved_viewport_bitmap) == nullptr) && !ignore_transition) {
-			// transition type was not crossfade/dissolve when the screen faded out,
-			// but it is now when the screen fades in (Eg. a save game was restored
-			// with a different setting). Therefore just fade normally.
-			my_fade_out(5);
-			theTransition = FADE_NORMAL;
-		}
+        const bool ignore_transition = (play.screen_tint > 0);
+        if (((theTransition == FADE_CROSSFADE) || (theTransition == FADE_DISSOLVE)) &&
+            (saved_viewport_bitmap == nullptr) && !ignore_transition)
+        {
+            // transition type was not crossfade/dissolve when the screen faded out,
+            // but it is now when the screen fades in (Eg. a save game was restored
+            // with a different setting). Therefore just fade normally.
+            my_fade_out(5);
+            theTransition = FADE_NORMAL;
+        }
 
 		// TODO: use normal coordinates instead of "native_size" and multiply_up_*?
-		//const Size &data_res = _GP(game).GetDataRes();
-		const Rect &viewport = _GP(play).GetMainViewport();
+        const Rect &viewport = play.GetMainViewport();
 
-		if ((theTransition == FADE_INSTANT) || ignore_transition)
-			set_palette_range(_G(palette), 0, 255, 0);
-		else if (theTransition == FADE_NORMAL) {
-			my_fade_in(_G(palette), 5);
-		} else if (theTransition == FADE_BOXOUT) {
-			if (!_G(gfxDriver)->UsesMemoryBackBuffer()) {
-				_G(gfxDriver)->BoxOutEffect(false, get_fixed_pixel_size(16), 1000 / GetGameSpeed());
-			} else {
-				// First of all we render the game once again and save backbuffer from further editing.
-				// We put temporary bitmap as a new backbuffer for the transition period, and
-				// will be drawing saved image of the game over to that backbuffer, simulating "box-out".
-				set_palette_range(_G(palette), 0, 255, 0);
-				construct_game_scene(true);
-				construct_game_screen_overlay(false);
-				_G(gfxDriver)->RenderToBackBuffer();
-				Bitmap *saved_backbuf = _G(gfxDriver)->GetMemoryBackBuffer();
-				Bitmap *temp_scr = new Bitmap(saved_backbuf->GetWidth(), saved_backbuf->GetHeight(), saved_backbuf->GetColorDepth());
-				_G(gfxDriver)->SetMemoryBackBuffer(temp_scr);
-				temp_scr->Clear();
-				render_to_screen();
+        if ((theTransition == FADE_INSTANT) || ignore_transition)
+            set_palette_range(palette, 0, 255, 0);
+        else if (theTransition == FADE_NORMAL)
+        {
+            my_fade_in(palette,5);
+        }
+        else if (theTransition == FADE_BOXOUT) 
+        {
+            if (!gfxDriver->UsesMemoryBackBuffer())
+            {
+                gfxDriver->BoxOutEffect(false, get_fixed_pixel_size(16), 1000 / GetGameSpeed());
+            }
+            else
+            {
+                // First of all we render the game once again and save backbuffer from further editing.
+                // We put temporary bitmap as a new backbuffer for the transition period, and
+                // will be drawing saved image of the game over to that backbuffer, simulating "box-out".
+                set_palette_range(palette, 0, 255, 0);
+                construct_game_scene(true);
+                construct_game_screen_overlay(false);
+                gfxDriver->RenderToBackBuffer();
+                Bitmap *saved_backbuf = gfxDriver->GetMemoryBackBuffer();
+                Bitmap *temp_scr = new Bitmap(saved_backbuf->GetWidth(), saved_backbuf->GetHeight(), saved_backbuf->GetColorDepth());
+                gfxDriver->SetMemoryBackBuffer(temp_scr);
+                temp_scr->Clear();
+                render_to_screen();
 
-				const int speed = get_fixed_pixel_size(16);
-				const int yspeed = viewport.GetHeight() / (viewport.GetWidth() / speed);
-				int boxwid = speed, boxhit = yspeed;
-				while (boxwid < temp_scr->GetWidth()) {
-					boxwid += speed;
-					boxhit += yspeed;
-					boxwid = Math::Clamp(boxwid, 0, viewport.GetWidth());
-					boxhit = Math::Clamp(boxhit, 0, viewport.GetHeight());
-					int lxp = viewport.GetWidth() / 2 - boxwid / 2;
-					int lyp = viewport.GetHeight() / 2 - boxhit / 2;
-					_G(gfxDriver)->Vsync();
-					temp_scr->Blit(saved_backbuf, lxp, lyp, lxp, lyp,
-						boxwid, boxhit);
-					render_to_screen();
-					WaitForNextFrame();
-				}
-				_G(gfxDriver)->SetMemoryBackBuffer(saved_backbuf);
-			}
-			_GP(play).screen_is_faded_out = 0;
-		} else if (theTransition == FADE_CROSSFADE) {
-			if (_GP(game).color_depth == 1)
-				quit("!Cannot use crossfade screen transition in 256-colour games");
+                const int speed = get_fixed_pixel_size(16);
+                const int yspeed = viewport.GetHeight() / (viewport.GetWidth() / speed);
+                int boxwid = speed, boxhit = yspeed;
+                while (boxwid < temp_scr->GetWidth())
+                {
+                    boxwid += speed;
+                    boxhit += yspeed;
+                    boxwid = Math::Clamp(boxwid, 0, viewport.GetWidth());
+                    boxhit = Math::Clamp(boxhit, 0, viewport.GetHeight());
+                    int lxp = viewport.GetWidth() / 2 - boxwid / 2;
+                    int lyp = viewport.GetHeight() / 2 - boxhit / 2;
+                    gfxDriver->Vsync();
+                    temp_scr->Blit(saved_backbuf, lxp, lyp, lxp, lyp, 
+                        boxwid, boxhit);
+                    render_to_screen();
+                    WaitForNextFrame();
+                }
+                gfxDriver->SetMemoryBackBuffer(saved_backbuf);
+            }
+            play.screen_is_faded_out = 0;
+        }
+        else if (theTransition == FADE_CROSSFADE) 
+        {
+            if (game.color_depth == 1)
+                quit("!Cannot use crossfade screen transition in 256-colour games");
 
-			IDriverDependantBitmap *ddb = prepare_screen_for_transition_in();
+            IDriverDependantBitmap *ddb = prepare_screen_for_transition_in();
 
-			int transparency = 254;
+            int transparency = 254;
 
-			while (transparency > 0) {
-				// do the crossfade
-				ddb->SetTransparency(transparency);
-				invalidate_screen();
-				construct_game_scene(true);
-				construct_game_screen_overlay(false);
+            while (transparency > 0) {
+                // do the crossfade
+                ddb->SetTransparency(transparency);
+                invalidate_screen();
+                construct_game_scene(true);
+                construct_game_screen_overlay(false);
 
-				if (transparency > 16) {
-					// on last frame of fade (where transparency < 16), don't
-					// draw the old screen on top
-					_G(gfxDriver)->DrawSprite(0, 0, ddb);
-				}
-				render_to_screen();
-				update_polled_stuff_if_runtime();
-				WaitForNextFrame();
-				transparency -= 16;
-			}
-			_G(saved_viewport_bitmap)->Release();
+                if (transparency > 16)
+                {
+                    // on last frame of fade (where transparency < 16), don't
+                    // draw the old screen on top
+                    gfxDriver->DrawSprite(0, 0, ddb);
+                }
+                render_to_screen();
+                update_polled_stuff_if_runtime();
+                WaitForNextFrame();
+                transparency -= 16;
+            }
 
-			delete _G(saved_viewport_bitmap);
-			_G(saved_viewport_bitmap) = nullptr;
-			set_palette_range(_G(palette), 0, 255, 0);
-			_G(gfxDriver)->DestroyDDB(ddb);
-		} else if (theTransition == FADE_DISSOLVE) {
-			int pattern[16] = { 0, 4, 14, 9, 5, 11, 2, 8, 10, 3, 12, 7, 15, 6, 13, 1 };
-			int aa, bb, cc;
-			color interpal[256];
+            delete saved_viewport_bitmap;
+            saved_viewport_bitmap = nullptr;
+            set_palette_range(palette, 0, 255, 0);
+            gfxDriver->DestroyDDB(ddb);
+        }
+        else if (theTransition == FADE_DISSOLVE) {
+            int pattern[16]={0,4,14,9,5,11,2,8,10,3,12,7,15,6,13,1};
+            int aa,bb,cc;
+            RGB interpal[256];
 
-			IDriverDependantBitmap *ddb = prepare_screen_for_transition_in();
-			for (aa = 0; aa < 16; aa++) {
-				// merge the palette while dithering
-				if (_GP(game).color_depth == 1) {
-					fade_interpolate(_G(old_palette), _G(palette), interpal, aa * 4, 0, 255);
-					set_palette_range(interpal, 0, 255, 0);
-				}
-				// do the dissolving
-				int maskCol = _G(saved_viewport_bitmap)->GetMaskColor();
-				for (bb = 0; bb < viewport.GetWidth(); bb += 4) {
-					for (cc = 0; cc < viewport.GetHeight(); cc += 4) {
-						_G(saved_viewport_bitmap)->PutPixel(bb + pattern[aa] / 4, cc + pattern[aa] % 4, maskCol);
-					}
-				}
-				_G(gfxDriver)->UpdateDDBFromBitmap(ddb, _G(saved_viewport_bitmap), false);
-				construct_game_scene(true);
-				construct_game_screen_overlay(false);
-				_G(gfxDriver)->DrawSprite(0, 0, ddb);
-				render_to_screen();
-				update_polled_stuff_if_runtime();
-				WaitForNextFrame();
-			}
+            IDriverDependantBitmap *ddb = prepare_screen_for_transition_in();
+            for (aa=0;aa<16;aa++) {
+                // merge the palette while dithering
+                if (game.color_depth == 1) 
+                {
+                    fade_interpolate(old_palette,palette,interpal,aa*4,0,255);
+                    set_palette_range(interpal, 0, 255, 0);
+                }
+                // do the dissolving
+                int maskCol = saved_viewport_bitmap->GetMaskColor();
+                for (bb=0;bb<viewport.GetWidth();bb+=4) {
+                    for (cc=0;cc<viewport.GetHeight();cc+=4) {
+                        saved_viewport_bitmap->PutPixel(bb+pattern[aa]/4, cc+pattern[aa]%4, maskCol);
+                    }
+                }
+                gfxDriver->UpdateDDBFromBitmap(ddb, saved_viewport_bitmap, false);
+                construct_game_scene(true);
+                construct_game_screen_overlay(false);
+                gfxDriver->DrawSprite(0, 0, ddb);
+                render_to_screen();
+                update_polled_stuff_if_runtime();
+                WaitForNextFrame();
+            }
 
-			delete _G(saved_viewport_bitmap);
-			_G(saved_viewport_bitmap) = nullptr;
-			set_palette_range(_G(palette), 0, 255, 0);
-			_G(gfxDriver)->DestroyDDB(ddb);
-		}
+            delete saved_viewport_bitmap;
+            saved_viewport_bitmap = nullptr;
+            set_palette_range(palette, 0, 255, 0);
+            gfxDriver->DestroyDDB(ddb);
+        }
 
-	} else if (evp->type == EV_IFACECLICK)
-		process_interface_click(evp->data1, evp->data2, evp->data3);
-	else quit("process_event: unknown event to process");
+    }
+    else if (evp->type==EV_IFACECLICK)
+        process_interface_click(evp->data1, evp->data2, evp->data3);
+    else quit("process_event: unknown event to process");
 }
 
 
-void runevent_now(int evtyp, int ev1, int ev2, int ev3) {
-	EventHappened evh;
-	evh.type = evtyp;
-	evh.data1 = ev1;
-	evh.data2 = ev2;
-	evh.data3 = ev3;
-	evh.player = _GP(game).playercharacter;
-	process_event(&evh);
+void runevent_now (int evtyp, int ev1, int ev2, int ev3) {
+    EventHappened evh;
+    evh.type = evtyp;
+    evh.data1 = ev1;
+    evh.data2 = ev2;
+    evh.data3 = ev3;
+    evh.player = game.playercharacter;
+    process_event(&evh);
 }
 
-void processallevents(int numev, EventHappened *evlist) {
-	int dd;
+void processallevents(int numev,EventHappened*evlist) {
+    int dd;
 
-	if (_G(inside_processevent))
-		return;
+    if (inside_processevent)
+        return;
 
-	// make a copy of the events - if processing an event includes
-	// a blocking function it will continue to the next game loop
-	// and wipe out the event pointer we were passed
-	EventHappened copyOfList[MAXEVENTS];
-	memcpy(&copyOfList[0], &evlist[0], sizeof(EventHappened) * numev);
+    // make a copy of the events - if processing an event includes
+    // a blocking function it will continue to the next game loop
+    // and wipe out the event pointer we were passed
+    EventHappened copyOfList[MAXEVENTS];
+    memcpy(&copyOfList[0], &evlist[0], sizeof(EventHappened) * numev);
 
-	int room_was = _GP(play).room_changes;
+    int room_was = play.room_changes;
 
-	_G(inside_processevent)++;
+    inside_processevent++;
 
-	for (dd = 0; dd < numev; dd++) {
-		process_event(&copyOfList[dd]);
+    for (dd=0;dd<numev;dd++) {
 
-		if (room_was != _GP(play).room_changes || _G(abort_engine))
-			break;  // changed room, so discard other events
-	}
+        process_event(&copyOfList[dd]);
 
-	_G(inside_processevent)--;
+        if (room_was != play.room_changes)
+            break;  // changed room, so discard other events
+    }
+
+    inside_processevent--;
 }
 
 void update_events() {
-	processallevents(_G(numevents), &_G(event)[0]);
-	_G(numevents) = 0;
+    processallevents(numevents,&event[0]);
+    numevents=0;
 }
 // end event list functions
 
 
 void ClaimEvent() {
-	if (_G(eventClaimed) == EVENT_NONE)
-		quit("!ClaimEvent: no event to claim");
+    if (eventClaimed == EVENT_NONE)
+        quit("!ClaimEvent: no event to claim");
 
-	_G(eventClaimed) = EVENT_CLAIMED;
+    eventClaimed = EVENT_CLAIMED;
 }
-
-} // namespace AGS3

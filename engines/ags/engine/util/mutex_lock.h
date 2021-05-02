@@ -23,11 +23,12 @@
 #ifndef AGS_ENGINE_UTIL_MUTEX_LOCK_H
 #define AGS_ENGINE_UTIL_MUTEX_LOCK_H
 
-#include "ags/engine/util/mutex.h"
+#include "util/mutex.h"
 
 namespace AGS3 {
 namespace AGS {
 namespace Engine {
+
 
 class MutexLock {
 private:
@@ -58,6 +59,7 @@ public:
 		Release();
 	}
 }; // class MutexLock
+
 
 } // namespace Engine
 } // namespace AGS

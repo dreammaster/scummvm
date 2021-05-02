@@ -27,11 +27,12 @@ namespace AGS3 {
 namespace AGS {
 namespace Engine {
 
+
 class BaseMutex {
 public:
-	BaseMutex() {}
+	BaseMutex() = default;
 
-	virtual ~BaseMutex() {}
+	virtual ~BaseMutex() = default;
 
 	BaseMutex &operator=(const BaseMutex &) = delete;
 	BaseMutex(const BaseMutex &) = delete;
@@ -47,9 +48,9 @@ public:
 } // namespace AGS3
 
 #if 0
-// insert platforms here
+  // insert platforms here
 #else
-#include "ags/engine/util/mutex_std.h"
+#include "mutex_std.h"
 #endif
 
 #endif

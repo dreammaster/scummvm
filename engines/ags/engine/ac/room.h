@@ -1,37 +1,29 @@
-/* ScummVM - Graphic Adventure Engine
- *
- * ScummVM is the legal property of its developers, whose names
- * are too numerous to list here. Please refer to the COPYRIGHT
- * file distributed with this source distribution.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- */
+//=============================================================================
+//
+// Adventure Game Studio (AGS)
+//
+// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
+// The full list of copyright holders can be found in the Copyright.txt
+// file, which is part of this source code distribution.
+//
+// The AGS source code is provided under the Artistic License 2.0.
+// A copy of this license can be found in the file License.txt and at
+// http://www.opensource.org/licenses/artistic-license-2.0.php
+//
+//=============================================================================
+//
+//
+//
+//=============================================================================
+#ifndef AGS_ENGINE_AC__ROOM_H
+#define AGS_ENGINE_AC__ROOM_H
 
-#ifndef AGS_ENGINE_AC_ROOM_H
-#define AGS_ENGINE_AC_ROOM_H
+#include "ac/dynobj/scriptdrawingsurface.h"
+#include "ac/characterinfo.h"
+#include "script/runtimescriptvalue.h"
+#include "game/roomstruct.h"
 
-#include "ags/engine/ac/dynobj/scriptdrawingsurface.h"
-#include "ags/shared/ac/characterinfo.h"
-#include "ags/engine/script/runtimescriptvalue.h"
-#include "ags/shared/game/roomstruct.h"
-
-namespace AGS3 {
-
-ScriptDrawingSurface *Room_GetDrawingSurfaceForBackground(int backgroundNumber);
-ScriptDrawingSurface *Room_GetDrawingSurfaceForMask(RoomAreaMask mask);
+ScriptDrawingSurface* Room_GetDrawingSurfaceForBackground(int backgroundNumber);
 int Room_GetObjectCount();
 int Room_GetWidth();
 int Room_GetHeight();
@@ -41,22 +33,22 @@ int Room_GetRightEdge();
 int Room_GetTopEdge();
 int Room_GetBottomEdge();
 int Room_GetMusicOnLoad();
-const char *Room_GetTextProperty(const char *property);
+const char* Room_GetTextProperty(const char *property);
 int Room_GetProperty(const char *property);
-const char *Room_GetMessages(int index);
+const char* Room_GetMessages(int index);
 RuntimeScriptValue Sc_Room_GetProperty(const RuntimeScriptValue *params, int32_t param_count);
 
 //=============================================================================
 
-void  save_room_data_segment();
+void  save_room_data_segment ();
 void  unload_old_room();
-void  load_new_room(int newnum, CharacterInfo *forchar);
-void  new_room(int newnum, CharacterInfo *forchar);
+void  load_new_room(int newnum,CharacterInfo*forchar);
+void  new_room(int newnum,CharacterInfo*forchar);
 int   find_highest_room_entered();
 void  first_room_initialization();
 void  check_new_room();
 void  compile_room_script();
-void  on_background_frame_change();
+void  on_background_frame_change ();
 // Clear the current room pointer if room status is no longer valid
 void  croom_ptr_clear();
 
@@ -76,6 +68,6 @@ struct MoveList;
 // Convert move path from room's mask resolution to room resolution
 void convert_move_path_to_room_resolution(MoveList *ml);
 
-} // namespace AGS3
+extern AGS::Shared::RoomStruct thisroom;
 
-#endif
+#endif // AGS_ENGINE_AC__ROOM_H

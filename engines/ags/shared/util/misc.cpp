@@ -23,20 +23,20 @@
 /*
   Copyright (c) 2003, Shawn R. Walker
   All rights reserved.
-
+  
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
   are met:
-
-	  * Redistributions of source code must retain the above copyright notice,
-		this list of conditions and the following disclaimer.
-	  * Redistributions in binary form must reproduce the above copyright
-		notice, this list of conditions and the following disclaimer in the
-		documentation and/or other materials provided with the distribution.
-	  * Neither the name of Shawn R. Walker nor names of contributors
-		may be used to endorse or promote products derived from this software
-		without specific prior written permission.
-
+  
+      * Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+      * Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+      * Neither the name of Shawn R. Walker nor names of contributors
+        may be used to endorse or promote products derived from this software
+        without specific prior written permission.
+  
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -50,7 +50,15 @@
 */
 
 #include "ags/shared/core/platform.h"
-#include "ags/lib/allegro.h"
+
+//include <sys/types.h>
+//include <sys/stat.h>
+#if !AGS_PLATFORM_OS_WINDOWS
+//include <dirent.h>
+//include <unistd.h>
+#endif
+
+#include "ags/lib/allegro.h" // file path functions
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/stream.h"
 
@@ -58,7 +66,12 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
+//
+// TODO: rewrite all this in a cleaner way perhaps, and move to our file or path utilities unit
+//
+
 #if !defined (AGS_CASE_SENSITIVE_FILESYSTEM)
+//include <string.h>
 /* File Name Concatenator basically on Windows / DOS */
 char *ci_find_file(const char *dir_name, const char *file_name) {
 	char *diamond = NULL;

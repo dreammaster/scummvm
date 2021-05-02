@@ -46,10 +46,10 @@
 #ifndef AGS_SHARED_UTIL_STRING_H
 #define AGS_SHARED_UTIL_STRING_H
 
+//include <stdarg.h>
 #include "ags/lib/std/vector.h"
 #include "ags/shared/core/platform.h"
 #include "ags/shared/core/types.h"
-#include "common/str.h"
 
 namespace AGS3 {
 namespace AGS {
@@ -59,8 +59,6 @@ class Stream;
 
 class String {
 public:
-	static const uint32 npos = (uint32)-1;
-
 	// Standard constructor: intialize empty string
 	String();
 	// Copy constructor
@@ -71,9 +69,11 @@ public:
 	String(const char *cstr, size_t length);
 	// Initialize by filling N chars with certain value
 	String(char c, size_t count);
-	// Initialize with a ScummVM string
-	String(const Common::String &s);
 	~String();
+
+	// TODO: get rid of condition in GetCStr! either make it nullable and test for consequences in engine code,
+	// or make sure it points to "" literal when string is not assigned; also check if GetNullableCStr may be removed.
+	// OR do opposite: make helper function that returns non-null cstr explicitly.
 
 	// Get underlying C-string for reading; this method guarantees valid C-string
 	inline const char *GetCStr() const {
@@ -81,7 +81,7 @@ public:
 	}
 	// Get C-string or nullptr
 	inline const char *GetNullableCStr() const {
-		return _cstr ? _cstr : nullptr;
+		return _cstr;
 	}
 	// Get character count
 	inline size_t GetLength() const {
@@ -135,19 +135,19 @@ public:
 	int     Compare(const char *cstr) const;
 	int     CompareNoCase(const char *cstr) const;
 	// Compares the leftmost part of this string with given C-string
-	int     CompareLeft(const char *cstr, size_t count = npos) const;
-	int     CompareLeftNoCase(const char *cstr, size_t count = npos) const;
+	int     CompareLeft(const char *cstr, size_t count = -1) const;
+	int     CompareLeftNoCase(const char *cstr, size_t count = -1) const;
 	// Compares any part of this string with given C-string
-	int     CompareMid(const char *cstr, size_t from, size_t count = npos) const;
-	int     CompareMidNoCase(const char *cstr, size_t from, size_t count = npos) const;
+	int     CompareMid(const char *cstr, size_t from, size_t count = -1) const;
+	int     CompareMidNoCase(const char *cstr, size_t from, size_t count = -1) const;
 	// Compares the rightmost part of this string with given C-string
-	int     CompareRight(const char *cstr, size_t count = npos) const;
-	int     CompareRightNoCase(const char *cstr, size_t count = npos) const;
+	int     CompareRight(const char *cstr, size_t count = -1) const;
+	int     CompareRightNoCase(const char *cstr, size_t count = -1) const;
 
 	// These functions search for character or substring inside this string
-	// and return the index of the (first) character, or npos if nothing found.
+	// and return the index of the (first) character, or -1 if nothing found.
 	size_t  FindChar(char c, size_t from = 0) const;
-	size_t  FindCharReverse(char c, size_t from = npos) const;
+	size_t  FindCharReverse(char c, size_t from = -1) const;
 	size_t  FindString(const char *cstr, size_t from = 0) const;
 
 	// Section methods treat string as a sequence of 'fields', separated by
@@ -201,7 +201,7 @@ public:
 	// Extract N leftmost characters as a new string
 	String  Left(size_t count) const;
 	// Extract up to N characters starting from given index
-	String  Mid(size_t from, size_t count = npos) const;
+	String  Mid(size_t from, size_t count = -1) const;
 	// Extract N rightmost characters
 	String  Right(size_t count) const;
 
@@ -240,7 +240,7 @@ public:
 	// Cuts off leftmost N characters
 	void    ClipLeft(size_t count);
 	// Cuts out N characters starting from given index
-	void    ClipMid(size_t from, size_t count = npos);
+	void    ClipMid(size_t from, size_t count = -1);
 	// Cuts off rightmost N characters
 	void    ClipRight(size_t count);
 	// Cuts off leftmost part, separated by the given char; if no separator was
@@ -268,6 +268,8 @@ public:
 	void    MakeLower();
 	// Convert string to uppercase equivalent
 	void    MakeUpper();
+	// Merges sequences of same characters into one
+	void    MergeSequences(char c = 0);
 	// Prepend* methods add content before the string's head, increasing its length
 	// Add C-string before string's head
 	void    Prepend(const char *cstr);
@@ -283,12 +285,12 @@ public:
 	// Overwrite the Nth character of the string; does not change string's length
 	void    SetAt(size_t index, char c);
 	// Makes a new string by copying up to N chars from C-string
-	void    SetString(const char *cstr, size_t length = npos);
+	void    SetString(const char *cstr, size_t length = -1);
 	// For all Trim functions, if given character value is 0, all whitespace
 	// characters (space, tabs, CRLF) are removed.
 	// Remove heading and trailing characters from the string
 	void    Trim(char c = 0);
-	// Remove heading characters from the string;
+	// Remove heading characters from the string; 
 	void    TrimLeft(char c = 0);
 	// Remove trailing characters from the string
 	void    TrimRight(char c = 0);
@@ -296,7 +298,7 @@ public:
 	// Truncate the string to the leftmost N characters
 	void    TruncateToLeft(size_t count);
 	// Truncate the string to the middle N characters
-	void    TruncateToMid(size_t from, size_t count = npos);
+	void    TruncateToMid(size_t from, size_t count = -1);
 	// Truncate the string to the rightmost N characters
 	void    TruncateToRight(size_t count);
 	// Truncate the string to the leftmost part, separated by the given char;
@@ -337,10 +339,6 @@ public:
 	inline bool operator <(const char *cstr) const {
 		return Compare(cstr) < 0;
 	}
-	// Converts an AGS string to a ScummVM one
-	operator Common::String() const {
-		return Common::String(GetNullableCStr());
-	}
 
 private:
 	// Creates new empty string with buffer enough to fit given length
@@ -350,6 +348,8 @@ private:
 	// Aligns data at given offset
 	void    Align(size_t offset);
 
+	// Tells if this object shares its string buffer with others
+	bool    IsShared() const;
 	// Ensure this string is a compact independent copy, with ref counter = 1
 	void    BecomeUnique();
 	// Ensure this string is independent, and there's enough space before

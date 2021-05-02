@@ -20,32 +20,32 @@
  *
  */
 
-#ifndef AGS_ENGINE_GAME_SAVEGAMECOMPONENTS_H
-#define AGS_ENGINE_GAME_SAVEGAMECOMPONENTS_H
+#ifndef AGS_ENGINE_GAME_SAVEGAME_COMPONENTS_H
+#define AGS_ENGINE_GAME_SAVEGAME_COMPONENTS_H
 
-#include "ags/engine/game/savegame.h"
-#include "ags/shared/util/stream.h"
+#include "game/savegame.h"
+#include "util/stream.h"
 
 namespace AGS3 {
 namespace AGS {
 
 namespace Shared {
 struct Interaction;
-} // namespace Shared
+}
 
 namespace Engine {
 
 using Shared::Stream;
-typedef std::shared_ptr<Stream> PStream;
+using Shared::Interaction;
 
 struct PreservedParams;
 struct RestoredData;
 
 namespace SavegameComponents {
 // Reads all available components from the stream
-HSaveError    ReadAll(PStream in, SavegameVersion svg_version, const PreservedParams &pp, RestoredData &r_data);
+HSaveError    ReadAll(Stream *in, SavegameVersion svg_version, const PreservedParams &pp, RestoredData &r_data);
 // Writes a full list of common components to the stream
-HSaveError    WriteAllCommon(PStream out);
+HSaveError    WriteAllCommon(Stream *out);
 
 // Utility functions for reading and writing legacy interactions,
 // or their "times run" counters separately.

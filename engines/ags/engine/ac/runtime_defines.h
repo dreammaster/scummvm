@@ -20,10 +20,12 @@
  *
  */
 
-#ifndef AGS_ENGINE_AC_RUNTIMEDEFINES_H
-#define AGS_ENGINE_AC_RUNTIMEDEFINES_H
+#ifndef AGS_ENGINE_AC_RUNTIME_DEFINES_H
+#define AGS_ENGINE_AC_RUNTIME_DEFINES_H
 
 namespace AGS3 {
+
+#include "ags/shared/ac/common_defines.h"
 
 // xalleg.h pulls in an Allegro-internal definition of MAX_TIMERS which
 // conflicts with the definition in runtime_defines.h. Forget it.
@@ -31,7 +33,7 @@ namespace AGS3 {
 #undef MAX_TIMERS
 #endif
 
-// Max script string length
+// Max old-style script string length
 #define MAX_MAXSTRLEN 200
 #define MAXGLOBALVARS 50
 
@@ -49,7 +51,7 @@ namespace AGS3 {
 #define MAXSAVEGAMES     50
 #define MAX_QUEUED_MUSIC 10
 #define GLED_INTERACTION 1
-#define GLED_EFFECTS     2
+#define GLED_EFFECTS     2 
 #define QUEUED_MUSIC_REPEAT 10000
 #define PLAYMP3FILE_MAX_FILENAME_LEN 50
 #define MAX_AUDIO_TYPES  30
@@ -85,7 +87,7 @@ const int LegacyRoomVolumeFactor = 30;
 
 #define DEBUG_CONSOLE_NUMLINES 6
 #define TXT_SCOREBAR        29
-#define MAXSCORE _GP(play).totalscore
+#define MAXSCORE play.totalscore
 #define CHANIM_REPEAT    2
 #define CHANIM_BACKWARDS 4
 #define ANIM_BACKWARDS 10
@@ -93,9 +95,9 @@ const int LegacyRoomVolumeFactor = 30;
 #define ANIM_REPEAT    2
 #define ANIM_ONCERESET 3
 #define FONT_STATUSBAR  0
-#define FONT_NORMAL     _GP(play).normal_font
+#define FONT_NORMAL     play.normal_font
 //#define FONT_SPEECHBACK 1
-#define FONT_SPEECH     _GP(play).speech_font
+#define FONT_SPEECH     play.speech_font
 #define MODE_WALK 0
 #define MODE_LOOK 1
 #define MODE_HAND 2
@@ -116,7 +118,8 @@ const int LegacyRoomVolumeFactor = 30;
 #define FOR_SCRIPT    2
 #define FOR_EXITLOOP  3
 #define CHMLSOFFS (MAX_ROOM_OBJECTS+1)    // reserve this many movelists for objects & stuff
-#define abort_all_conditions _G(restrict_until)
+#define MAX_SCREEN_OVERLAYS 20
+#define abort_all_conditions restrict_until
 #define MAX_SCRIPT_AT_ONCE 10
 #define EVENT_NONE       0
 #define EVENT_INPROGRESS 1
@@ -158,7 +161,5 @@ const int LegacyRoomVolumeFactor = 30;
 #define MAX_OPEN_SCRIPT_FILES 10
 
 } // namespace AGS3
-
-#include "ags/shared/ac/common_defines.h"
 
 #endif

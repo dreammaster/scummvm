@@ -1,3 +1,5 @@
+//=============================================================================
+//
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -30,8 +32,8 @@
 //
 //=============================================================================
 
-#ifndef AGS_SHARED_API_IAGSSTREAM_H
-#define AGS_SHARED_API_IAGSSTREAM_H
+#ifndef AGS_SHARED_API_STREAM_API_H
+#define AGS_SHARED_API_STREAM_API_H
 
 // TODO: it would probably be better to not include core definition headers
 // in API class headers, but make separate core headers specifically for
@@ -39,6 +41,7 @@
 #include "ags/shared/core/types.h"
 
 namespace AGS3 {
+
 namespace AGS {
 namespace Shared {
 
@@ -50,7 +53,7 @@ enum StreamSeek {
 
 class IAGSStream {
 public:
-	virtual ~IAGSStream() {}
+	virtual ~IAGSStream() = default;
 
 	virtual void        Close() = 0;
 
@@ -78,7 +81,7 @@ public:
 	virtual size_t      ReadArrayOfInt32(int32_t *buffer, size_t count) = 0;
 	virtual size_t      ReadArrayOfInt64(int64_t *buffer, size_t count) = 0;
 
-	virtual size_t      WriteInt8(int8_t val) = 0;
+	virtual size_t      WriteInt8(int8_t val) = 0;;
 	virtual size_t      WriteInt16(int16_t val) = 0;
 	virtual size_t      WriteInt32(int32_t val) = 0;
 	virtual size_t      WriteInt64(int64_t val) = 0;

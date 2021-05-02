@@ -1,46 +1,31 @@
-/* ScummVM - Graphic Adventure Engine
- *
- * ScummVM is the legal property of its developers, whose names
- * are too numerous to list here. Please refer to the COPYRIGHT
- * file distributed with this source distribution.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- */
+//=============================================================================
+//
+// Adventure Game Studio (AGS)
+//
+// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
+// The full list of copyright holders can be found in the Copyright.txt
+// file, which is part of this source code distribution.
+//
+// The AGS source code is provided under the Artistic License 2.0.
+// A copy of this license can be found in the file License.txt and at
+// http://www.opensource.org/licenses/artistic-license-2.0.php
+//
+//=============================================================================
+//
+//
+//
+//=============================================================================
+#ifndef AGS_ENGINE_AC__SCREEN_H
+#define AGS_ENGINE_AC__SCREEN_H
 
-#ifndef AGS_ENGINE_AC_SCREEN_H
-#define AGS_ENGINE_AC_SCREEN_H
-
-namespace AGS3 {
-
-namespace AGS {
-namespace Shared {
-class Bitmap;
-} // namespace Shared
-} // namespace AGS
-
-namespace AGS {
-namespace Engine {
-class IDriverDependantBitmap;
-} // namespace Engine
-} // namespace AGS
+namespace AGS { namespace Shared { class Bitmap; } }
+namespace AGS { namespace Engine { class IDriverDependantBitmap; } }
 
 void my_fade_in(PALETTE p, int speed);
-void current_fade_out_effect();
-AGS::Engine::IDriverDependantBitmap *prepare_screen_for_transition_in();
+void current_fade_out_effect ();
+AGS::Engine::IDriverDependantBitmap* prepare_screen_for_transition_in();
 
-} // namespace AGS3
+// Screenshot made in the last room, used during some of the transition effects
+extern AGS::Shared::Bitmap *saved_viewport_bitmap;
 
-#endif
+#endif // AGS_ENGINE_AC__SCREEN_H

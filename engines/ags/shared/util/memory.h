@@ -29,9 +29,9 @@
 #ifndef AGS_SHARED_UTIL_MEMORY_H
 #define AGS_SHARED_UTIL_MEMORY_H
 
+//include <string.h>
 #include "ags/shared/util/bbop.h"
 #include "ags/shared/util/math.h"
-#include "common/textconsole.h"
 
 namespace AGS3 {
 
@@ -50,13 +50,11 @@ namespace Memory {
 //-------------------------------------------------------------------------
 template <typename T>
 inline int32_t PtrToInt32(T *ptr) {
-	error("TODO: Handle 32-bit pointers in ScummVM if needed");
-	//return static_cast<int32_t>(reinterpret_cast<intptr_t>(ptr));
+	return static_cast<int32_t>(reinterpret_cast<intptr_t>(ptr));
 }
 template <typename T>
 inline T *Int32ToPtr(int32_t value) {
-	error("TODO: Handle 32-bit pointers in ScummVM if needed");
-	//return reinterpret_cast<T *>(static_cast<intptr_t>(value));
+	return reinterpret_cast<T *>(static_cast<intptr_t>(value));
 }
 
 //-------------------------------------------------------------------------
@@ -73,7 +71,7 @@ inline int16_t ReadInt16(const void *ptr) {
 	return (b[1] << 8) | b[0];
 #endif
 #else
-	return *(const int16_t *)ptr;
+	return *(int16_t *)ptr;
 #endif
 }
 
@@ -86,7 +84,7 @@ inline int32_t ReadInt32(const void *ptr) {
 	return (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
 #endif
 #else
-	return *(const int32_t *)ptr;
+	return *(int32_t *)ptr;
 #endif
 }
 
@@ -101,7 +99,7 @@ inline int64_t ReadInt64(const void *ptr) {
 		(b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
 #endif
 #else
-	return *(const int64_t *)ptr;
+	return *(int64_t *)ptr;
 #endif
 }
 

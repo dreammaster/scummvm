@@ -23,14 +23,15 @@
 #ifndef AGS_ENGINE_MEDIA_AUDIO_AUDIO_H
 #define AGS_ENGINE_MEDIA_AUDIO_AUDIO_H
 
-#include "ags/lib/std/array.h"
-#include "ags/engine/media/audio/audiodefines.h"
-#include "ags/shared/ac/dynobj/scriptaudioclip.h"
-#include "ags/engine/ac/dynobj/scriptaudiochannel.h"
-#include "ags/engine/media/audio/ambientsound.h"
-#include "ags/engine/util/mutex.h"
-#include "ags/engine/util/mutex_lock.h"
-#include "ags/engine/ac/timer.h"
+//include <array>
+#include "media/audio/audiodefines.h"
+#include "ac/dynobj/scriptaudioclip.h"
+#include "ac/dynobj/scriptaudiochannel.h"
+#include "media/audio/ambientsound.h"
+#include "util/mutex.h"
+#include "util/mutex_lock.h"
+#include "util/thread.h"
+#include "ac/timer.h"
 
 namespace AGS3 {
 
@@ -47,7 +48,10 @@ private:
 	AudioChannelsLock &operator=(AudioChannelsLock const &); // not copy-assignable
 
 public:
-	AudioChannelsLock();
+	static AGS::Engine::Mutex s_mutex;
+	AudioChannelsLock()
+		: MutexLock(s_mutex) {
+	}
 
 	// Gets a clip from the channel
 	SOUNDCLIP *GetChannel(int index);
@@ -105,6 +109,12 @@ int         play_sound(int val1);
 
 //=============================================================================
 
+// This is an indicator of a music played by an old audio system
+// (to distinguish from the new system API); if it is not set, then old API
+// should "think" that no music is played regardless of channel state
+// TODO: refactor this and hide behind some good interface to prevent misuse!
+extern int current_music_type;
+
 void        clear_music_cache();
 void        play_next_queued();
 int         calculate_max_volume();
@@ -124,9 +134,21 @@ ScriptAudioClip *get_audio_clip_for_music(int mnum);
 SOUNDCLIP *load_music_from_disk(int mnum, bool doRepeat);
 void        newmusic(int mnum);
 
+extern volatile bool _audio_doing_crossfade;
+
 extern void cancel_scheduled_music_update();
 extern void schedule_music_update_at(AGS_Clock::time_point);
 extern void postpone_scheduled_music_update_by(std::chrono::milliseconds);
+
+// crossFading is >0 (channel number of new track), or -1 (old
+// track fading out, no new track)
+extern int crossFading, crossFadeVolumePerStep, crossFadeStep;
+extern int crossFadeVolumeAtStart;
+
+extern SOUNDCLIP *cachedQueuedMusic;
+
+// TODO: double check that ambient sounds array actually needs +1
+extern std::array<AmbientSound, MAX_SOUND_CHANNELS + 1> ambient;
 
 } // namespace AGS3
 

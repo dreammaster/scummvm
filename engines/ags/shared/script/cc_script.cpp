@@ -20,16 +20,22 @@
  *
  */
 
+//include <stdlib.h>
+//include <string.h>
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/cc_script.h"
 #include "ags/shared/script/script_common.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_compat.h"
-#include "ags/globals.h"
 
 namespace AGS3 {
 
 using AGS::Shared::Stream;
+
+// currently executed line
+int currentline;
+// script file format signature
+const char scfilesig[5] = "SCOM";
 
 // [IKM] I reckon this function is almost identical to fgetstring in string_utils
 void freadstring(char **strptr, Stream *in) {
@@ -56,7 +62,7 @@ void fwritestring(const char *strptr, Stream *out) {
 	}
 }
 
-ccScript *ccScript::CreateFromStream(Shared::Stream *in) {
+ccScript *ccScript::CreateFromStream(Stream *in) {
 	ccScript *scri = new ccScript();
 	if (!scri->Read(in)) {
 		delete scri;
@@ -171,9 +177,9 @@ ccScript::~ccScript() {
 	Free();
 }
 
-void ccScript::Write(Shared::Stream *out) {
+void ccScript::Write(Stream *out) {
 	int n;
-	out->Write(_G(scfilesig), 4);
+	out->Write(scfilesig, 4);
 	out->WriteInt32(SCOM_VERSION);
 	out->WriteInt32(globaldatasize);
 	out->WriteInt32(codesize);
@@ -205,18 +211,18 @@ void ccScript::Write(Shared::Stream *out) {
 	out->WriteInt32(ENDFILESIG);
 }
 
-bool ccScript::Read(Shared::Stream *in) {
+bool ccScript::Read(Stream *in) {
 	instances = 0;
 	int n;
 	char gotsig[5];
-	_G(currentline) = -1;
+	currentline = -1;
 	// MACPORT FIX: swap 'size' and 'nmemb'
 	in->Read(gotsig, 4);
 	gotsig[4] = 0;
 
 	int fileVer = in->ReadInt32();
 
-	if ((strcmp(gotsig, _G(scfilesig)) != 0) || (fileVer > SCOM_VERSION)) {
+	if ((strcmp(gotsig, scfilesig) != 0) || (fileVer > SCOM_VERSION)) {
 		cc_error("file was not written by ccScript::Write or seek position is incorrect");
 		return false;
 	}
@@ -290,7 +296,7 @@ bool ccScript::Read(Shared::Stream *in) {
 		sectionOffsets = nullptr;
 	}
 
-	if (in->ReadInt32() != (int32)ENDFILESIG) {
+	if (in->ReadInt32() != ENDFILESIG) {
 		cc_error("internal error rebuilding script");
 		return false;
 	}

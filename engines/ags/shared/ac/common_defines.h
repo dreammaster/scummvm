@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef AGS_SHARED_AC_DEFINES_H
-#define AGS_SHARED_AC_DEFINES_H
+#ifndef AGS_SHARED_AC_COMMON_DEFINES_H
+#define AGS_SHARED_AC_COMMON_DEFINES_H
 
 #include "ags/shared/core/platform.h"
 

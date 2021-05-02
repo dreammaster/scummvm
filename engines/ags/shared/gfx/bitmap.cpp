@@ -87,14 +87,14 @@ Bitmap *AdjustBitmapSize(Bitmap *src, int width, int height) {
 template <class TPx, size_t BPP_>
 struct PixelTransCpy {
 	static const size_t BPP = BPP_;
-	inline void operator()(uint8_t *dst, const uint8_t *src, color_t mask_color, bool use_alpha) const {
-		if (*(const TPx *)src == mask_color)
+	inline void operator ()(uint8_t *dst, const uint8_t *src, color_t mask_color, bool use_alpha) const {
+		if (*(TPx *)src == mask_color)
 			*(TPx *)dst = mask_color;
 	}
 };
 
 struct PixelNoSkip {
-	inline bool operator()(uint8_t *data, color_t mask_color, bool use_alpha) const {
+	inline bool operator ()(uint8_t *data, color_t mask_color, bool use_alpha) const {
 		return false;
 	}
 };
@@ -104,7 +104,7 @@ typedef PixelTransCpy<uint16_t, 2> PixelTransCpy16;
 
 struct PixelTransCpy24 {
 	static const size_t BPP = 3;
-	inline void operator()(uint8_t *dst, const uint8_t *src, color_t mask_color, bool use_alpha) const {
+	inline void operator ()(uint8_t *dst, const uint8_t *src, color_t mask_color, bool use_alpha) const {
 		const uint8_t *mcol_ptr = (const uint8_t *)&mask_color;
 		if (src[0] == mcol_ptr[0] && src[1] == mcol_ptr[1] && src[2] == mcol_ptr[2]) {
 			dst[0] = mcol_ptr[0];
@@ -116,8 +116,8 @@ struct PixelTransCpy24 {
 
 struct PixelTransCpy32 {
 	static const size_t BPP = 4;
-	inline void operator()(uint8_t *dst, const uint8_t *src, color_t mask_color, bool use_alpha) const {
-		if (*(const uint32_t *)src == (uint32_t)mask_color)
+	inline void operator ()(uint8_t *dst, const uint8_t *src, color_t mask_color, bool use_alpha) const {
+		if (*(const uint32_t *)src == mask_color)
 			*(uint32_t *)dst = mask_color;
 		else if (use_alpha)
 			dst[3] = src[3]; // copy alpha channel
@@ -127,8 +127,8 @@ struct PixelTransCpy32 {
 };
 
 struct PixelTransSkip32 {
-	inline bool operator()(uint8_t *data, color_t mask_color, bool use_alpha) const {
-		return *(uint32_t *)data == (uint32_t)mask_color || (use_alpha && data[3] == 0);
+	inline bool operator ()(uint8_t *data, color_t mask_color, bool use_alpha) const {
+		return *(uint32_t *)data == mask_color || (use_alpha && data[3] == 0);
 	}
 };
 

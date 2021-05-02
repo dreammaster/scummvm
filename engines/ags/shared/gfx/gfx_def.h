@@ -26,8 +26,8 @@
 //
 //=============================================================================
 
-#ifndef AGS_SHARED_GFX_GFXDEF_H
-#define AGS_SHARED_GFX_GFXDEF_H
+#ifndef AGS_SHARED_GFX_GFX_DEF_H
+#define AGS_SHARED_GFX_GFX_DEF_H
 
 namespace AGS3 {
 namespace AGS {

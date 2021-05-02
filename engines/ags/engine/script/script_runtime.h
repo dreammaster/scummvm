@@ -37,8 +37,8 @@
 #ifndef AGS_ENGINE_SCRIPT_SCRIPT_RUNTIME_H
 #define AGS_ENGINE_SCRIPT_SCRIPT_RUNTIME_H
 
-#include "ags/shared/script/cc_script.h"      // ccScript
-#include "ags/engine/script/cc_instance.h"    // ccInstance
+#include "script/cc_script.h"      // ccScript
+#include "script/cc_instance.h"    // ccInstance
 
 namespace AGS3 {
 
@@ -74,8 +74,9 @@ extern bool ccAddExternalFunctionForPlugin(const String &name, void *pfn);
 extern void *ccGetSymbolAddressForPlugin(const String &name);
 
 // DEBUG HOOK
-typedef void (*new_line_hook_type)(ccInstance *, int);
+typedef void (*new_line_hook_type) (ccInstance *, int);
 extern void ccSetDebugHook(new_line_hook_type jibble);
+#endif
 
 // Set the number of while loop iterations that aborts the script
 extern void ccSetScriptAliveTimer(int);
@@ -86,5 +87,3 @@ extern int call_function(intptr_t addr, const RuntimeScriptValue *object, int nu
 extern void nullfree(void *data); // in script/script_runtime
 
 } // namespace AGS3
-
-#endif

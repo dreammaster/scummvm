@@ -20,41 +20,56 @@
  *
  */
 
-#include "ags/engine/ac/dynobj/cc_serializer.h"
-#include "ags/engine/ac/dynobj/all_dynamicclasses.h"
-#include "ags/engine/ac/dynobj/all_scriptclasses.h"
-#include "ags/engine/ac/dynobj/scriptcamera.h"
-#include "ags/engine/ac/dynobj/scriptcontainers.h"
-#include "ags/engine/ac/dynobj/scriptfile.h"
-#include "ags/engine/ac/dynobj/scriptuserobject.h"
-#include "ags/engine/ac/dynobj/scriptviewport.h"
-#include "ags/engine/ac/game.h"
-#include "ags/engine/debugging/debug_log.h"
-#include "ags/plugins/agsplugin.h"
-#include "ags/plugins/pluginobjectreader.h"
-#include "ags/globals.h"
+//include <string.h>
+#include "ac/dynobj/cc_serializer.h"
+#include "ac/dynobj/all_dynamicclasses.h"
+#include "ac/dynobj/all_scriptclasses.h"
+#include "ac/dynobj/scriptcamera.h"
+#include "ac/dynobj/scriptcontainers.h"
+#include "ac/dynobj/scriptfile.h"
+#include "ac/dynobj/scriptuserobject.h"
+#include "ac/dynobj/scriptviewport.h"
+#include "ac/game.h"
+#include "debug/debug_log.h"
+#include "plugin/agsplugin.h"
+#include "plugin/pluginobjectreader.h"
 
 namespace AGS3 {
 
+extern CCGUIObject ccDynamicGUIObject;
+extern CCCharacter ccDynamicCharacter;
+extern CCHotspot   ccDynamicHotspot;
+extern CCRegion    ccDynamicRegion;
+extern CCInventory ccDynamicInv;
+extern CCGUI       ccDynamicGUI;
+extern CCObject    ccDynamicObject;
+extern CCDialog    ccDynamicDialog;
+extern ScriptDrawingSurface *dialogOptionsRenderingSurface;
+extern ScriptDialogOptionsRendering ccDialogOptionsRendering;
+extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
+extern int numPluginReaders;
+
 // *** De-serialization of script objects
+
+
 
 void AGSDeSerializer::Unserialize(int index, const char *objectType, const char *serializedData, int dataSize) {
 	if (strcmp(objectType, "GUIObject") == 0) {
-		_GP(ccDynamicGUIObject).Unserialize(index, serializedData, dataSize);
+		ccDynamicGUIObject.Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "Character") == 0) {
-		_GP(ccDynamicCharacter).Unserialize(index, serializedData, dataSize);
+		ccDynamicCharacter.Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "Hotspot") == 0) {
-		_GP(ccDynamicHotspot).Unserialize(index, serializedData, dataSize);
+		ccDynamicHotspot.Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "Region") == 0) {
-		_GP(ccDynamicRegion).Unserialize(index, serializedData, dataSize);
+		ccDynamicRegion.Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "Inventory") == 0) {
-		_GP(ccDynamicInv).Unserialize(index, serializedData, dataSize);
+		ccDynamicInv.Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "Dialog") == 0) {
-		_GP(ccDynamicDialog).Unserialize(index, serializedData, dataSize);
+		ccDynamicDialog.Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "GUI") == 0) {
-		_GP(ccDynamicGUI).Unserialize(index, serializedData, dataSize);
+		ccDynamicGUI.Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "Object") == 0) {
-		_GP(ccDynamicObject).Unserialize(index, serializedData, dataSize);
+		ccDynamicObject.Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "String") == 0) {
 		ScriptString *scf = new ScriptString();
 		scf->Unserialize(index, serializedData, dataSize);
@@ -80,10 +95,10 @@ void AGSDeSerializer::Unserialize(int index, const char *objectType, const char 
 		sds->Unserialize(index, serializedData, dataSize);
 
 		if (sds->isLinkedBitmapOnly) {
-			_G(dialogOptionsRenderingSurface) = sds;
+			dialogOptionsRenderingSurface = sds;
 		}
 	} else if (strcmp(objectType, "DialogOptionsRendering") == 0) {
-		_GP(ccDialogOptionsRendering).Unserialize(index, serializedData, dataSize);
+		ccDialogOptionsRendering.Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "StringDictionary") == 0) {
 		Dict_Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "StringSet") == 0) {
@@ -97,14 +112,16 @@ void AGSDeSerializer::Unserialize(int index, const char *objectType, const char 
 		suo->Unserialize(index, serializedData, dataSize);
 	} else if (!unserialize_audio_script_object(index, objectType, serializedData, dataSize)) {
 		// check if the type is read by a plugin
-		for (int ii = 0; ii < _G(numPluginReaders); ii++) {
-			if (strcmp(objectType, _G(pluginReaders)[ii].type) == 0) {
-				_G(pluginReaders)[ii].reader->Unserialize(index, serializedData, dataSize);
+		for (int ii = 0; ii < numPluginReaders; ii++) {
+			if (strcmp(objectType, pluginReaders[ii].type) == 0) {
+				pluginReaders[ii].reader->Unserialize(index, serializedData, dataSize);
 				return;
 			}
 		}
 		quitprintf("Unserialise: unknown object type: '%s'", objectType);
 	}
 }
+
+AGSDeSerializer ccUnserializer;
 
 } // namespace AGS3

@@ -23,29 +23,46 @@
 #ifndef AGS_ENGINE_UTIL_LIBRARY_H
 #define AGS_ENGINE_UTIL_LIBRARY_H
 
-#include "ags/shared/core/platform.h"
-#include "ags/shared/util/string.h"
+#include "core/platform.h"
+#include "util/string.h"
 
 namespace AGS3 {
 namespace AGS {
 namespace Engine {
 
+
 class BaseLibrary {
 public:
-	BaseLibrary() {}
+	BaseLibrary() = default;
 
-	virtual ~BaseLibrary() {}
+	virtual ~BaseLibrary() = default;
 
-	virtual bool Load(const AGS::Shared::String &libraryName) = 0;
+	virtual AGS::Shared::String GetFilenameForLib(AGS::Shared::String libraryName) = 0;
+
+	virtual bool Load(AGS::Shared::String libraryName) = 0;
 
 	virtual bool Unload() = 0;
 
-	virtual void *GetFunctionAddress(const AGS::Shared::String &functionName) = 0;
+	virtual void *GetFunctionAddress(AGS::Shared::String functionName) = 0;
 };
 
 
 } // namespace Engine
 } // namespace AGS
 } // namespace AGS3
+
+#if AGS_PLATFORM_OS_WINDOWS
+#include "library_windows.h"
+
+#elif AGS_PLATFORM_OS_LINUX \
+   || AGS_PLATFORM_OS_MACOS \
+   || AGS_PLATFORM_OS_ANDROID
+#include "library_posix.h"
+
+#elif AGS_PLATFORM_OS_IOS
+#include "library_dummy.h"
+
+#endif
+
 
 #endif

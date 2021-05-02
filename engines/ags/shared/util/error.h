@@ -114,7 +114,7 @@ public:
 		return ErrorHandle();
 	}
 
-	ErrorHandle() {}
+	ErrorHandle() = default;
 	ErrorHandle(T *err) : _error(err) {
 	}
 	ErrorHandle(std::shared_ptr<T> err) : _error(err) {
@@ -133,7 +133,7 @@ public:
 		return _error.operator->();
 	}
 	T &operator *() const {
-		return _error.operator * ();
+		return _error.operator*();
 	}
 
 private:

@@ -20,12 +20,6 @@
  *
  */
 
-//=============================================================================
-//
-// 'C'-style script compiler
-//
-//=============================================================================
-
 #ifndef AGS_SHARED_SCRIPT_SCRIPT_COMMON_H
 #define AGS_SHARED_SCRIPT_SCRIPT_COMMON_H
 
@@ -132,6 +126,12 @@ namespace AGS3 {
 #define FIXUP_DATADATA    5     // globaldata[fixup] += &globaldata[0]
 #define FIXUP_STACK       6     // code[fixup] += &stack[0]
 
+
+
+
+extern int currentline;
+// Script file signature
+extern const char scfilesig[5];
 #define ENDFILESIG 0xbeefcafe
 
 } // namespace AGS3

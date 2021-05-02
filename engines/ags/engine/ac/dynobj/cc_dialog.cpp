@@ -20,11 +20,10 @@
  *
  */
 
-#include "ags/engine/ac/dynobj/cc_dialog.h"
-#include "ags/engine/ac/dialog.h"
-#include "ags/shared/ac/dialogtopic.h"
-#include "ags/shared/ac/gamestructdefines.h"
-#include "ags/globals.h"
+#include "ac/dynobj/cc_dialog.h"
+#include "ac/dialog.h"
+#include "ac/dialogtopic.h"
+#include "ac/gamestructdefines.h"
 
 namespace AGS3 {
 
@@ -36,7 +35,7 @@ const char *CCDialog::GetType() {
 // serialize the object into BUFFER (which is BUFSIZE bytes)
 // return number of bytes used
 int CCDialog::Serialize(const char *address, char *buffer, int bufsize) {
-	ScriptDialog *shh = (ScriptDialog *)const_cast<char *>(address);
+	ScriptDialog *shh = (ScriptDialog *)address;
 	StartSerialize(buffer);
 	SerializeInt(shh->id);
 	return EndSerialize();
@@ -45,7 +44,7 @@ int CCDialog::Serialize(const char *address, char *buffer, int bufsize) {
 void CCDialog::Unserialize(int index, const char *serializedData, int dataSize) {
 	StartUnserialize(serializedData, dataSize);
 	int num = UnserializeInt();
-	ccRegisterUnserializedObject(index, &_G(scrDialog)[num], this);
+	ccRegisterUnserializedObject(index, &scrDialog[num], this);
 }
 
 } // namespace AGS3

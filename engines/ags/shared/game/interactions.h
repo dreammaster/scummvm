@@ -49,8 +49,8 @@
 #ifndef AGS_SHARED_GAME_INTEREACTIONS_H
 #define AGS_SHARED_GAME_INTEREACTIONS_H
 
-#include "ags/shared/util/string_types.h"
 #include "ags/lib/std/memory.h"
+#include "ags/shared/util/string_types.h"
 
 namespace AGS3 {
 
@@ -64,7 +64,6 @@ namespace AGS {
 namespace Shared {
 
 enum InterValType {
-	kInterValInvalid = 0,
 	kInterValLiteralInt = 1,
 	kInterValVariable = 2,
 	kInterValBoolean = 3,
@@ -82,7 +81,6 @@ struct InteractionValue {
 	int          Extra;
 
 	InteractionValue();
-	void clear();
 
 	void Read(Stream *in);
 	void Write(Stream *out) const;
@@ -132,8 +130,8 @@ struct InteractionCommandList {
 	void Write_v321(Stream *out) const;
 
 protected:
-	void Read_Aligned(Stream *in, std::vector<bool> &cmd_children);
-	void Write_Aligned(Stream *out) const;
+	void Read_Aligned(Shared::Stream *in, std::vector<bool> &cmd_children);
+	void Write_Aligned(Shared::Stream *out) const;
 };
 
 
@@ -208,6 +206,11 @@ typedef std::shared_ptr<InteractionScripts> PInteractionScripts;
 
 } // namespace Shared
 } // namespace AGS
+
+// Legacy global variables
+extern AGS::Shared::InteractionVariable globalvars[MAX_GLOBAL_VARIABLES];
+extern int numGlobalVars;
+
 } // namespace AGS3
 
 #endif

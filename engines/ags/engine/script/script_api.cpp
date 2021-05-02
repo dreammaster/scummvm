@@ -20,12 +20,13 @@
  *
  */
 
-#include "ags/shared/ac/game_version.h"
-#include "ags/shared/script/cc_error.h"
-#include "ags/engine/script/runtimescriptvalue.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/shared/util/math.h"
-#include "ags/globals.h"
+//include <stdio.h>
+//include <string.h>
+#include "ac/game_version.h"
+#include "script/cc_error.h"
+#include "script/runtimescriptvalue.h"
+#include "script/script_api.h"
+#include "util/math.h"
 
 namespace AGS3 {
 
@@ -77,8 +78,7 @@ const char *ScriptSprintf(char *buffer, size_t buf_length, const char *format,
 		cc_error("Internal error in ScriptSprintf: buffer is null");
 		return "";
 	}
-	if (!format) {
-		// NOTE: interpreter (usually) catches null-pointer sent as format at some stage earlier
+	if (!format) {// NOTE: interpreter (usually) catches null-pointer sent as format at some stage earlier
 		cc_error("Internal error in ScriptSprintf: format string is null");
 		return "";
 	}
@@ -186,7 +186,7 @@ const char *ScriptSprintf(char *buffer, size_t buf_length, const char *format,
 					const char *p = GetArgPtr(sc_args, varg_ptr, arg_idx);
 					// Do extra checks for %s placeholder
 					if (fmt_done == kFormatParseArgString && !p) {
-						if (_G(loaded_game_file_version) < kGameVersion_320) {
+						if (loaded_game_file_version < kGameVersion_320) {
 							// explicitly put "(null)" into the placeholder
 							p = "(null)";
 						} else {

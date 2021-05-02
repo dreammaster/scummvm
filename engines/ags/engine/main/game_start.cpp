@@ -24,36 +24,43 @@
 // Game initialization
 //
 
-#include "ags/shared/ac/common.h"
-#include "ags/shared/ac/characterinfo.h"
-#include "ags/engine/ac/game.h"
-#include "ags/shared/ac/gamesetupstruct.h"
-#include "ags/shared/util/directory.h"
-#include "ags/engine/ac/gamestate.h"
-#include "ags/engine/ac/global_game.h"
-#include "ags/engine/ac/mouse.h"
-#include "ags/engine/ac/room.h"
-#include "ags/engine/ac/screen.h"
-#include "ags/engine/debugging/debug_log.h"
-#include "ags/engine/debugging/debugger.h"
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/gfx/ali3dexception.h"
-#include "ags/engine/main/mainheader.h"
-#include "ags/engine/main/game_run.h"
-#include "ags/engine/main/game_start.h"
-#include "ags/engine/script/script.h"
-#include "ags/engine/media/audio/audio_system.h"
-#include "ags/engine/ac/timer.h"
-#include "ags/globals.h"
-#include "ags/ags.h"
+#include "ac/common.h"
+#include "ac/characterinfo.h"
+#include "ac/game.h"
+#include "ac/gamesetupstruct.h"
+#include "ac/gamestate.h"
+#include "ac/global_game.h"
+#include "ac/mouse.h"
+#include "ac/room.h"
+#include "ac/screen.h"
+#include "debug/debug_log.h"
+#include "debug/debugger.h"
+#include "debug/out.h"
+#include "gfx/ali3dexception.h"
+#include "main/mainheader.h"
+#include "main/game_run.h"
+#include "main/game_start.h"
+#include "script/script.h"
+#include "media/audio/audio_system.h"
+#include "ac/timer.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
+extern int our_eip, displayed_room;
+extern volatile char want_exit, abort_engine;
+extern GameSetupStruct game;
+extern GameState play;
+extern const char *loadSaveGameOnStartup;
+extern std::vector<ccInstance *> moduleInst;
+extern int numScriptModules;
+extern CharacterInfo *playerchar;
+extern int convert_16bit_bgr;
+
 void start_game_init_editor_debugging() {
-	if (_G(editor_debugging_enabled)) {
+	if (editor_debugging_enabled) {
 		SetMultitasking(1);
 		if (init_editor_debugging()) {
 			auto waitUntil = AGS_Clock::now() + std::chrono::milliseconds(500);
@@ -68,38 +75,43 @@ void start_game_init_editor_debugging() {
 }
 
 void start_game_load_savegame_on_startup() {
-	if (_G(loadSaveGameOnStartup) != -1) {
+	if (loadSaveGameOnStartup != nullptr) {
+		int saveGameNumber = 1000;
+		const char *sgName = strstr(loadSaveGameOnStartup, "agssave.");
+		if (sgName != nullptr) {
+			sscanf(sgName, "agssave.%03d", &saveGameNumber);
+		}
 		current_fade_out_effect();
-		try_restore_save(_G(loadSaveGameOnStartup));
+		try_restore_save(loadSaveGameOnStartup, saveGameNumber);
 	}
 }
 
 void start_game() {
 	set_cursor_mode(MODE_WALK);
-	_GP(mouse).SetPosition(Point(160, 100));
+	Mouse::SetPosition(Point(160, 100));
 	newmusic(0);
 
-	_G(our_eip) = -42;
+	our_eip = -42;
 
-	// skip ticks to account for initialisation or a restored _GP(game).
+	// skip ticks to account for initialisation or a restored game.
 	skipMissedTicks();
 
-	for (int kk = 0; kk < _G(numScriptModules); kk++)
-		RunTextScript(_GP(moduleInst)[kk], "game_start");
+	for (int kk = 0; kk < numScriptModules; kk++)
+		RunTextScript(moduleInst[kk], "game_start");
 
-	RunTextScript(_G(gameinst), "game_start");
+	RunTextScript(gameinst, "game_start");
 
-	_G(our_eip) = -43;
+	our_eip = -43;
 
 	SetRestartPoint();
 
-	_G(our_eip) = -3;
+	our_eip = -3;
 
-	if (_G(displayed_room) < 0) {
+	if (displayed_room < 0) {
 		current_fade_out_effect();
-		load_new_room(_G(playerchar)->room, _G(playerchar));
+		load_new_room(playerchar->room, playerchar);
 		// load_new_room updates it, but it should be -1 in the first room
-		_G(playerchar)->prevroom = -1;
+		playerchar->prevroom = -1;
 	}
 
 	first_room_initialization();
@@ -107,28 +119,28 @@ void start_game() {
 
 void do_start_game() {
 	// only start if replay playback hasn't loaded a game
-	if (_G(displayed_room) < 0)
+	if (displayed_room < 0)
 		start_game();
 }
 
-void initialize_start_and_play_game(int override_start_room, int loadSaveOnStartup) {
-//	try { // BEGIN try for ALI3DEXception
+void initialize_start_and_play_game(int override_start_room, const char *loadSaveGameOnStartup) {
+	try { // BEGIN try for ALI3DEXception
 
 		set_cursor_mode(MODE_WALK);
 
-		if (_G(convert_16bit_bgr)) {
+		if (convert_16bit_bgr) {
 			// Disable text as speech while displaying the warning message
 			// This happens if the user's graphics card does BGR order 16-bit colour
-			int oldalways = _GP(game).options[OPT_ALWAYSSPCH];
-			_GP(game).options[OPT_ALWAYSSPCH] = 0;
+			int oldalways = game.options[OPT_ALWAYSSPCH];
+			game.options[OPT_ALWAYSSPCH] = 0;
 			// PSP: This is normal. Don't show a warning.
 			//Display ("WARNING: AGS has detected that you have an incompatible graphics card for this game. You may experience colour problems during the game. Try running the game with \"--15bit\" command line parameter and see if that helps.[[Click the mouse to continue.");
-			_GP(game).options[OPT_ALWAYSSPCH] = oldalways;
+			game.options[OPT_ALWAYSSPCH] = oldalways;
 		}
 
-		::AGS::g_vm->setRandomNumberSeed(_GP(play).randseed);
+		srand(play.randseed);
 		if (override_start_room)
-			_G(playerchar)->room = override_start_room;
+			playerchar->room = override_start_room;
 
 		Debug::Printf(kDbgMsg_Info, "Engine initialization complete");
 		Debug::Printf(kDbgMsg_Info, "Starting game");
@@ -141,9 +153,9 @@ void initialize_start_and_play_game(int override_start_room, int loadSaveOnStart
 
 		RunGameUntilAborted();
 
-//	} catch (Ali3DException gfxException) {
-//		quit((char *)gfxException._message);
-//	}
+	} catch (Ali3DException gfxException) {
+		quit((char *)gfxException._message);
+	}
 }
 
 } // namespace AGS3

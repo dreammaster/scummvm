@@ -26,10 +26,10 @@
 //
 //=============================================================================
 
-#ifndef AGS_ENGINE_GFX_AAD3DGFXFILTER_H
-#define AGS_ENGINE_GFX_AAD3DGFXFILTER_H
+#ifndef AGS_ENGINE_GFX_AA_D3D_GFX_FILTER_H
+#define AGS_ENGINE_GFX_AA_D3D_GFX_FILTER_H
 
-#include "ags/engine/gfx/gfxfilter_d3d.h"
+#include "gfx/gfxfilter_d3d.h"
 
 namespace AGS3 {
 namespace AGS {
@@ -42,6 +42,8 @@ public:
 
 	void SetSamplerStateForStandardSprite(void *direct3ddevice9) override;
 	bool NeedToColourEdgeLines() override;
+
+	static const GfxFilterInfo FilterInfo;
 };
 
 } // namespace D3D

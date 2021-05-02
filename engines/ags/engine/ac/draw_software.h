@@ -1,91 +1,27 @@
-/* ScummVM - Graphic Adventure Engine
- *
- * ScummVM is the legal property of its developers, whose names
- * are too numerous to list here. Please refer to the COPYRIGHT
- * file distributed with this source distribution.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- */
-
+//=============================================================================
+//
+// Adventure Game Studio (AGS)
+//
+// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
+// The full list of copyright holders can be found in the Copyright.txt
+// file, which is part of this source code distribution.
+//
+// The AGS source code is provided under the Artistic License 2.0.
+// A copy of this license can be found in the file License.txt and at
+// http://www.opensource.org/licenses/artistic-license-2.0.php
+//
 //=============================================================================
 //
 // Software drawing component. Optimizes drawing for software renderer using
 // dirty rectangles technique.
 //
 //=============================================================================
+#ifndef AGS_ENGINE_AC__DRAWSOFTWARE_H
+#define AGS_ENGINE_AC__DRAWSOFTWARE_H
 
-#ifndef AGS_ENGINE_AC_DRAWSOFTWARE_H
-#define AGS_ENGINE_AC_DRAWSOFTWARE_H
-
-#include "ags/shared/gfx/bitmap.h"
-#include "ags/engine/gfx/ddb.h"
-#include "ags/shared/util/geometry.h"
-#include "ags/engine/util/scaling.h"
-
-namespace AGS3 {
-
-using AGS::Engine::PlaneScaling;
-
-// TODO: choose these values depending on game resolution?
-#define MAXDIRTYREGIONS 25
-#define WHOLESCREENDIRTY (MAXDIRTYREGIONS + 5)
-#define MAX_SPANS_PER_ROW 4
-
-// Dirty rects store coordinate values in the coordinate system of a camera surface,
-// where coords always span from 0,0 to surface width,height.
-// Converting from room to dirty rects would require subtracting room camera offsets.
-struct IRSpan {
-	int x1, x2;
-	int mergeSpan(int tx1, int tx2);
-
-	IRSpan();
-};
-
-struct IRRow {
-	IRSpan span[MAX_SPANS_PER_ROW];
-	int numSpans;
-
-	IRRow();
-};
-
-struct DirtyRects {
-	// Size of the surface managed by this dirty rects object
-	Size SurfaceSize;
-	// Where the surface is rendered on screen
-	Rect Viewport;
-	// Room -> screen coordinate transformation
-	PlaneScaling Room2Screen;
-	// Screen -> dirty surface rect
-	// The dirty rects are saved in coordinates limited to (0,0)->(camera size) rather than room or screen coords
-	PlaneScaling Screen2DirtySurf;
-
-	std::vector<IRRow> DirtyRows;
-	Rect DirtyRegions[MAXDIRTYREGIONS];
-	size_t NumDirtyRegions;
-
-	DirtyRects();
-	bool IsInit() const;
-	// Initialize dirty rects for the given surface size
-	void Init(const Size &surf_size, const Rect &viewport);
-	void SetSurfaceOffsets(int x, int y);
-	// Delete dirty rects
-	void Destroy();
-	// Mark all surface as tidy
-	void Reset();
-};
+#include "gfx/bitmap.h"
+#include "gfx/ddb.h"
+#include "util/geometry.h"
 
 // Inits dirty rects array for the given room camera/viewport pair
 // View_index indicates the room viewport (>= 0) or the main viewport (-1)
@@ -107,6 +43,4 @@ void update_black_invreg_and_reset(AGS::Shared::Bitmap *ds);
 // no_transform flag tells the system that the regions should be plain copied to the ds.
 void update_room_invreg_and_reset(int view_index, AGS::Shared::Bitmap *ds, AGS::Shared::Bitmap *src, bool no_transform);
 
-} // namespace AGS3
-
-#endif
+#endif // AGS_ENGINE_AC__DRAWSOFTWARE_H

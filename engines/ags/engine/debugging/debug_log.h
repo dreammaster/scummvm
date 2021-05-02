@@ -20,16 +20,17 @@
  *
  */
 
-#ifndef AGS_ENGINE_DEBUGGING_LOG_H
-#define AGS_ENGINE_DEBUGGING_LOG_H
+#ifndef AGS_ENGINE_DEBUGGING_DEBUG_LOG_H
+#define AGS_ENGINE_DEBUGGING_DEBUG_LOG_H
 
-#include "ags/engine/script/cc_instance.h"
-#include "ags/engine/ac/runtime_defines.h"
-#include "ags/engine/ac/gamestate.h"
-#include "ags/engine/platform/base/agsplatformdriver.h"
-#include "ags/shared/util/ini_util.h"
+#include "ac/runtime_defines.h"
+#include "debug/out.h"
+#include "util/ini_util.h"
+#include "util/string.h"
 
 namespace AGS3 {
+
+struct ccInstance;
 
 void init_debug(const AGS::Shared::ConfigTree &cfg, bool stderr_only);
 void apply_debug_config(const AGS::Shared::ConfigTree &cfg);
@@ -37,19 +38,26 @@ void shutdown_debug();
 
 void debug_set_console(bool enable);
 
-// debug_script_log prints debug warnings tagged with kDbgGroup_Script,
-// prepending it with current room number and script position identification
+// prints debug messages of given type tagged with kDbgGroup_Script,
+// prepending it with current room number and script position info
+void debug_script_print(const AGS::Shared::String &msg, AGS::Shared::MessageType mt);
+// prints formatted debug warnings tagged with kDbgGroup_Script,
+// prepending it with current room number and script position info
 void debug_script_warn(const char *texx, ...);
-// debug_script_log prints debug message tagged with kDbgGroup_Script,
-// prepending it with current room number and script position identification
+// prints formatted debug message tagged with kDbgGroup_Script,
+// prepending it with current room number and script position info
 void debug_script_log(const char *msg, ...);
-void quitprintf(const char *texx, ...);
-bool init_editor_debugging();
 
+// Same as quit(), but with message formatting
+void quitprintf(const char *texx, ...);
+
+// Connect engine to external debugger, if one is available
+bool init_editor_debugging();
 // allow LShift to single-step,  RShift to pause flow
 void scriptDebugHook(ccInstance *ccinst, int linenum);
 
-
+extern AGS::Shared::String debug_line[DEBUG_CONSOLE_NUMLINES];
+extern int first_debug_line, last_debug_line, display_console;
 
 } // namespace AGS3
 

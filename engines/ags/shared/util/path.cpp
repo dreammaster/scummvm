@@ -22,9 +22,9 @@
 
 #include "ags/shared/core/platform.h"
 #if AGS_PLATFORM_OS_WINDOWS
+#define NOMINMAX
 //include <windows.h>
 #endif
-
 #include "ags/lib/allegro/file.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/stdio_compat.h"
@@ -57,10 +57,24 @@ bool IsFileOrDir(const String &filename) {
 	return ags_path_exists(fixed_path.GetCStr()) != 0;
 }
 
+String GetFilename(const String &path) {
+	return get_filename(path);
+}
+
+String GetFileExtension(const String &path) {
+	return get_extension(path);
+}
+
 int ComparePaths(const String &path1, const String &path2) {
 	// Make minimal absolute paths
 	String fixed_path1 = MakeAbsolutePath(path1);
 	String fixed_path2 = MakeAbsolutePath(path2);
+
+#if AGS_PLATFORM_OS_WINDOWS
+	// On Windows make sure both are represented as short names (at least until we support wide paths)
+	fixed_path1 = GetPathInASCII(fixed_path1);
+	fixed_path2 = GetPathInASCII(fixed_path2);
+#endif
 
 	fixed_path1.TrimRight('/');
 	fixed_path2.TrimRight('/');
@@ -81,7 +95,7 @@ String GetDirectoryPath(const String &path) {
 	String dir = path;
 	FixupPath(dir);
 	size_t slash_at = dir.FindCharReverse('/');
-	if (slash_at != String::npos) {
+	if (slash_at != -1) {
 		dir.ClipMid(slash_at + 1);
 		return dir;
 	}
@@ -108,10 +122,15 @@ bool IsSameOrSubDir(const String &parent, const String &path) {
 	return true;
 }
 
+bool IsRelativePath(const String &path) {
+	return is_relative_filename(path);
+}
+
 void FixupPath(String &path) {
 #if AGS_PLATFORM_OS_WINDOWS
 	path.Replace('\\', '/'); // bring Windows path separators to uniform style
 #endif
+	path.MergeSequences('/');
 }
 
 String MakePathNoSlash(const String &path) {
@@ -130,10 +149,10 @@ String MakePathNoSlash(const String &path) {
 }
 
 String MakeTrailingSlash(const String &path) {
-	String dir_path = path;
+	if (path.GetLast() == '/' || path.GetLast() == '\\')
+		return path;
+	String dir_path = String::FromFormat("%s/", path.GetCStr());
 	FixupPath(dir_path);
-	if (dir_path.GetLast() != '/')
-		dir_path.AppendChar('/');
 	return dir_path;
 }
 
@@ -165,7 +184,7 @@ String MakeRelativePath(const String &base, const String &path) {
 	char relative[MAX_PATH];
 	// canonicalize_filename treats "." as "./." (file in working dir)
 	const char *use_parent = base == "." ? "./" : base;
-	const char *use_path = path == "." ? "./" : path;
+	const char *use_path = path == "." ? "./" : path; // FIXME?
 	canonicalize_filename(can_parent, use_parent, MAX_PATH);
 	canonicalize_filename(can_path, use_path, MAX_PATH);
 	String rel_path = make_relative_filename(relative, can_parent, can_path, MAX_PATH);
@@ -174,12 +193,29 @@ String MakeRelativePath(const String &base, const String &path) {
 }
 
 String ConcatPaths(const String &parent, const String &child) {
-	String path = parent;
+	if (parent.IsEmpty())
+		return child;
+	if (child.IsEmpty())
+		return parent;
+	String path = String::FromFormat("%s/%s", parent.GetCStr(), child.GetCStr());
 	FixupPath(path);
-	if (path.GetLast() != '/')
-		path.AppendChar('/');
-	path.Append(child);
 	return path;
+}
+
+String MakePath(const String &parent, const String &filename) {
+	String path = String::FromFormat("%s/%s", parent.GetCStr(), filename.GetCStr());
+	FixupPath(path);
+	return path;
+}
+
+String MakePath(const String &parent, const String &filename, const String &ext) {
+	String path = String::FromFormat("%s/%s.%s", parent.GetCStr(), filename.GetCStr(), ext.GetCStr());
+	FixupPath(path);
+	return path;
+}
+
+std::vector<String> Split(const String &path) {
+	return path.Split('/');
 }
 
 String FixupSharedFilename(const String &filename) {

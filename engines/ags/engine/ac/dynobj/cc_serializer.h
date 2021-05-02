@@ -20,17 +20,19 @@
  *
  */
 
-#ifndef AGS_ENGINE_AC_DYNOBJ_CCSERIALIZER_H
-#define AGS_ENGINE_AC_DYNOBJ_CCSERIALIZER_H
+#ifndef AGS_ENGINE_AC_DYNOBJ_SERIALIZER_H
+#define AGS_ENGINE_AC_DYNOBJ_SERIALIZER_H
 
-#include "ags/engine/ac/dynobj/cc_dynamicobject.h"
+#include "ac/dynobj/cc_dynamicobject.h"
 
 namespace AGS3 {
 
 struct AGSDeSerializer : ICCObjectReader {
-	virtual ~AGSDeSerializer() {}
+
 	void Unserialize(int index, const char *objectType, const char *serializedData, int dataSize) override;
 };
+
+extern AGSDeSerializer ccUnserializer;
 
 } // namespace AGS3
 

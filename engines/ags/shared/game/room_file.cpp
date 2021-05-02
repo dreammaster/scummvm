@@ -22,19 +22,18 @@
 
 #include "ags/shared/ac/common.h" // update_polled_stuff
 #include "ags/shared/ac/common_defines.h"
-#include "ags/shared/ac/gamestructdefines.h"
-#include "ags/shared/ac/wordsdictionary.h" // TODO: extract string decryption
-#include "ags/shared/core/assetmanager.h"
+#include "ags/shared/ac/game_struct_defines.h"
+#include "ags/shared/ac/words_dictionary.h" // TODO: extract string decryption
+#include "ags/shared/core/asset_manager.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/game/customproperties.h"
+#include "ags/shared/game/custom_properties.h"
 #include "ags/shared/game/room_file.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/game/room_struct.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/cc_script.h"
 #include "ags/shared/util/compress.h"
 #include "ags/shared/util/string_utils.h"
-#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -86,21 +85,36 @@ String GetRoomFileErrorText(RoomFileErrorType err) {
 	return "Unknown error.";
 }
 
+// Read room data header and check that we support this format
+static HRoomFileError OpenRoomFileBase(Stream *in, RoomDataSource &src) {
+	src.DataVersion = (RoomFileVersion)in->ReadInt16();
+	if (src.DataVersion < kRoomVersion_250b || src.DataVersion > kRoomVersion_Current)
+		return new RoomFileError(kRoomFileErr_FormatNotSupported, String::FromFormat("Required format version: %d, supported %d - %d", src.DataVersion, kRoomVersion_250b, kRoomVersion_Current));
+	return HRoomFileError::None();
+}
+
 HRoomFileError OpenRoomFile(const String &filename, RoomDataSource &src) {
 	// Cleanup source struct
 	src = RoomDataSource();
 	// Try to open room file
-	Stream *in = AssetManager::OpenAsset(filename);
+	Stream *in = File::OpenFileRead(filename);
 	if (in == nullptr)
 		return new RoomFileError(kRoomFileErr_FileOpenFailed, String::FromFormat("Filename: %s.", filename.GetCStr()));
-	// Read room header
 	src.Filename = filename;
-	src.DataVersion = (RoomFileVersion)in->ReadInt16();
-	if (src.DataVersion < kRoomVersion_250b || src.DataVersion > kRoomVersion_Current)
-		return new RoomFileError(kRoomFileErr_FormatNotSupported, String::FromFormat("Required format version: %d, supported %d - %d", src.DataVersion, kRoomVersion_250b, kRoomVersion_Current));
-	// Everything is fine, return opened stream
 	src.InputStream.reset(in);
-	return HRoomFileError::None();
+	return OpenRoomFileBase(in, src);
+}
+
+HRoomFileError OpenRoomFileFromAsset(const String &filename, RoomDataSource &src) {
+	// Cleanup source struct
+	src = RoomDataSource();
+	// Try to find and open room file
+	Stream *in = AssetMgr->OpenAsset(filename);
+	if (in == nullptr)
+		return new RoomFileError(kRoomFileErr_FileOpenFailed, String::FromFormat("Filename: %s.", filename.GetCStr()));
+	src.Filename = filename;
+	src.InputStream.reset(in);
+	return OpenRoomFileBase(in, src);
 }
 
 
@@ -127,9 +141,23 @@ enum RoomFileBlock {
 	kRoomFile_EOF = 0xFF
 };
 
+String GetRoomBlockName(RoomFileBlock id) {
+	switch (id) {
+	case kRoomFblk_Main: return "Main";
+	case kRoomFblk_Script: return "TextScript";
+	case kRoomFblk_CompScript: return "CompScript";
+	case kRoomFblk_CompScript2: return "CompScript2";
+	case kRoomFblk_ObjectNames: return "ObjNames";
+	case kRoomFblk_AnimBg: return "AnimBg";
+	case kRoomFblk_CompScript3: return "CompScript3";
+	case kRoomFblk_Properties: return "Properties";
+	case kRoomFblk_ObjectScNames: return "ObjScNames";
+	}
+	return "unknown";
+}
 
 void ReadRoomObject(RoomObjectInfo &obj, Stream *in) {
-	obj.Sprite = in->ReadInt16();
+	obj.Sprite = (uint16_t)in->ReadInt16();
 	obj.X = in->ReadInt16();
 	obj.Y = in->ReadInt16();
 	obj.Room = in->ReadInt16();
@@ -138,7 +166,7 @@ void ReadRoomObject(RoomObjectInfo &obj, Stream *in) {
 
 void WriteRoomObject(const RoomObjectInfo &obj, Stream *out) {
 	// TODO: expand serialization into 32-bit values at least for the sprite index!!
-	out->WriteInt16((int16_t)obj.Sprite);
+	out->WriteInt16((uint16_t)obj.Sprite);
 	out->WriteInt16((int16_t)obj.X);
 	out->WriteInt16((int16_t)obj.Y);
 	out->WriteInt16((int16_t)obj.Room);
@@ -397,7 +425,7 @@ HRoomFileError ReadScriptBlock(char *&buf, Stream *in, RoomFileVersion data_ver)
 	in->Read(buf, len);
 	buf[len] = 0;
 	for (size_t i = 0; i < len; ++i)
-		buf[i] += _G(passwencstring)[i % 11];
+		buf[i] += passwencstring[i % 11];
 	return HRoomFileError::None();
 }
 
@@ -405,14 +433,14 @@ HRoomFileError ReadScriptBlock(char *&buf, Stream *in, RoomFileVersion data_ver)
 HRoomFileError ReadCompSc3Block(RoomStruct *room, Stream *in, RoomFileVersion data_ver) {
 	room->CompiledScript.reset(ccScript::CreateFromStream(in));
 	if (room->CompiledScript == nullptr)
-		return new RoomFileError(kRoomFileErr_ScriptLoadFailed, _G(ccErrorString));
+		return new RoomFileError(kRoomFileErr_ScriptLoadFailed, ccErrorString);
 	return HRoomFileError::None();
 }
 
 // Room object names
 HRoomFileError ReadObjNamesBlock(RoomStruct *room, Stream *in, RoomFileVersion data_ver) {
 	int name_count = in->ReadByte();
-	if (name_count != (int)room->ObjectCount)
+	if (name_count != room->ObjectCount)
 		return new RoomFileError(kRoomFileErr_InconsistentData,
 			String::FromFormat("In the object names block, expected name count: %d, got %d", room->ObjectCount, name_count));
 
@@ -428,11 +456,11 @@ HRoomFileError ReadObjNamesBlock(RoomStruct *room, Stream *in, RoomFileVersion d
 // Room object script names
 HRoomFileError ReadObjScNamesBlock(RoomStruct *room, Stream *in, RoomFileVersion data_ver) {
 	int name_count = in->ReadByte();
-	if (name_count != (int)room->ObjectCount)
+	if (name_count != room->ObjectCount)
 		return new RoomFileError(kRoomFileErr_InconsistentData,
 			String::FromFormat("In the object script names block, expected name count: %d, got %d", room->ObjectCount, name_count));
 
-	for (size_t i = 0; i < (size_t)room->ObjectCount; ++i) {
+	for (size_t i = 0; i < room->ObjectCount; ++i) {
 		if (data_ver >= kRoomVersion_3415)
 			room->Objects[i].ScriptName = StrUtil::ReadString(in);
 		else
@@ -480,74 +508,107 @@ HRoomFileError ReadPropertiesBlock(RoomStruct *room, Stream *in, RoomFileVersion
 	return HRoomFileError::None();
 }
 
-HRoomFileError ReadRoomBlock(RoomStruct *room, Stream *in, RoomFileBlock block, RoomFileVersion data_ver) {
-	soff_t block_len = data_ver < kRoomVersion_350 ? in->ReadInt32() : in->ReadInt64();
-	soff_t block_end = in->GetPosition() + block_len;
-
-	HRoomFileError err;
+HRoomFileError ReadRoomBlock(RoomStruct *room, Stream *in, RoomFileBlock block, const String &ext_id,
+	soff_t block_len, RoomFileVersion data_ver) {
+	//
+	// First check classic block types, identified with a numeric id
+	//
 	switch (block) {
 	case kRoomFblk_Main:
-		err = ReadMainBlock(room, in, data_ver);
-		break;
+		return ReadMainBlock(room, in, data_ver);
 	case kRoomFblk_Script:
 		in->Seek(block_len); // no longer read source script text into RoomStruct
-		break;
+		return HRoomFileError::None();
 	case kRoomFblk_CompScript3:
-		err = ReadCompSc3Block(room, in, data_ver);
-		break;
+		return ReadCompSc3Block(room, in, data_ver);
 	case kRoomFblk_ObjectNames:
-		err = ReadObjNamesBlock(room, in, data_ver);
-		break;
+		return ReadObjNamesBlock(room, in, data_ver);
 	case kRoomFblk_ObjectScNames:
-		err = ReadObjScNamesBlock(room, in, data_ver);
-		break;
+		return ReadObjScNamesBlock(room, in, data_ver);
 	case kRoomFblk_AnimBg:
-		err = ReadAnimBgBlock(room, in, data_ver);
-		break;
+		return ReadAnimBgBlock(room, in, data_ver);
 	case kRoomFblk_Properties:
-		err = ReadPropertiesBlock(room, in, data_ver);
-		break;
+		return ReadPropertiesBlock(room, in, data_ver);
 	case kRoomFblk_CompScript:
 	case kRoomFblk_CompScript2:
 		return new RoomFileError(kRoomFileErr_OldBlockNotSupported,
 			String::FromFormat("Type: %d.", block));
+	case kRoomFblk_None:
+		break; // continue to string ids
 	default:
 		return new RoomFileError(kRoomFileErr_UnknownBlockType,
 			String::FromFormat("Type: %d, known range: %d - %d.", block, kRoomFblk_Main, kRoomFblk_ObjectScNames));
 	}
 
-	if (!err)
-		return err;
+	// Add extensions here checking ext_id, which is an up to 16-chars name, for example:
+	// if (ext_id.CompareNoCase("REGION_NEWPROPS") == 0)
+	// {
+	//     // read new region properties
+	// }
+	return new RoomFileError(kRoomFileErr_UnknownBlockType,
+		String::FromFormat("Type: %s", ext_id.GetCStr()));
+}
 
-	soff_t cur_pos = in->GetPosition();
-	if (cur_pos > block_end) {
-		return new RoomFileError(kRoomFileErr_BlockDataOverlapping,
-			String::FromFormat("Type: %d, expected to end at offset: %u, finished reading at %u.", block, block_end, cur_pos));
-	} else if (cur_pos < block_end) {
-		Debug::Printf(kDbgMsg_Warn, "WARNING: room data blocks nonsequential, block type %d expected to end at %u, finished reading at %u",
-			block, block_end, cur_pos);
-		in->Seek(block_end, Shared::kSeekBegin);
+
+static HRoomFileError OpenNextBlock(Stream *in, RoomFileVersion data_ver, RoomFileBlock &block_id, String &ext_id, soff_t &block_len) {
+	// The block meta format is shared with the main game file extensions
+	//    - 1 byte - an old-style unsigned numeric ID:
+	//               where 0 would indicate following string ID,
+	//               and 0xFF indicates end of extension list.
+	//    - 16 bytes - string ID of an extension (if numeric ID is 0).
+	//    - 4 or 8 bytes - length of extension data, in bytes (size depends on format version).
+	int b = in->ReadByte();
+	if (b < 0)
+		return new RoomFileError(kRoomFileErr_UnexpectedEOF);
+
+	block_id = (RoomFileBlock)b;
+	if (block_id == kRoomFile_EOF)
+		return HRoomFileError::None(); // end of list
+
+	if (block_id > 0) { // old-style block identified by a numeric id
+		ext_id = GetRoomBlockName(block_id);
+		block_len = data_ver < kRoomVersion_350 ? in->ReadInt32() : in->ReadInt64();
+	} else { // new style block identified by a string id
+		ext_id = String::FromStreamCount(in, 16);
+		block_len = in->ReadInt64();
 	}
 	return HRoomFileError::None();
 }
 
-
 HRoomFileError ReadRoomData(RoomStruct *room, Stream *in, RoomFileVersion data_ver) {
 	room->DataVersion = data_ver;
 
-	RoomFileBlock block;
-	do {
+	// Read list of data blocks. The block meta format is shared with the main game file extensions now.
+	//    - 1 byte - old format block ID, 0xFF indicates end of list.
+	//    - 16 bytes - new string ID of an extension. \0 at the first byte indicates end of list.
+	//    - 4 or 8 bytes - length of extension data, in bytes (depends on format version).
+	while (true) {
 		update_polled_stuff_if_runtime();
-		int b = in->ReadByte();
-		if (b < 0)
-			return new RoomFileError(kRoomFileErr_UnexpectedEOF);
-		block = (RoomFileBlock)b;
-		if (block != kRoomFile_EOF) {
-			HRoomFileError err = ReadRoomBlock(room, in, block, data_ver);
-			if (!err)
-				return err;
+		RoomFileBlock block_id;
+		String ext_id;
+		soff_t block_len;
+		HRoomFileError err = OpenNextBlock(in, data_ver, block_id, ext_id, block_len);
+		if (!err)
+			return err;
+		if (ext_id.IsEmpty())
+			break; // end of list
+
+		soff_t block_end = in->GetPosition() + block_len;
+		err = ReadRoomBlock(room, in, block_id, ext_id, block_len, data_ver);
+		if (!err)
+			return err;
+
+		soff_t cur_pos = in->GetPosition();
+		if (cur_pos > block_end) {
+			return new RoomFileError(kRoomFileErr_BlockDataOverlapping,
+				String::FromFormat("Block: %s, expected to end at offset: %u, finished reading at %u.",
+					ext_id.GetCStr(), block_end, cur_pos));
+		} else if (cur_pos < block_end) {
+			Debug::Printf(kDbgMsg_Warn, "WARNING: room data blocks nonsequential, block type %s expected to end at %u, finished reading at %u",
+				ext_id.GetCStr(), block_end, cur_pos);
+			in->Seek(block_end, Shared::kSeekBegin);
 		}
-	} while (block != kRoomFile_EOF);
+	}
 	return HRoomFileError::None();
 }
 
@@ -676,19 +737,22 @@ HRoomFileError UpdateRoomData(RoomStruct *room, RoomFileVersion data_ver, bool g
 	}
 
 	// sync bpalettes[0] with room.pal
-	memcpy(room->BgFrames[0].Palette, room->Palette, sizeof(color) * PALETTE_COUNT);
+	memcpy(room->BgFrames[0].Palette, room->Palette, sizeof(RGB) * 256);
 	return HRoomFileError::None();
 }
 
 HRoomFileError ExtractScriptText(String &script, Stream *in, RoomFileVersion data_ver) {
-	RoomFileBlock block;
-	do {
-		int b = in->ReadByte();
-		if (b < 0)
-			return new RoomFileError(kRoomFileErr_UnexpectedEOF);
-		block = (RoomFileBlock)b;
-		soff_t block_len = data_ver < kRoomVersion_350 ? in->ReadInt32() : in->ReadInt64();
-		if (block == kRoomFblk_Script) {
+	while (true) {
+		RoomFileBlock block_id;
+		String ext_id;
+		soff_t block_len;
+		HRoomFileError err = OpenNextBlock(in, data_ver, block_id, ext_id, block_len);
+		if (!err)
+			return err;
+		if (ext_id.IsEmpty())
+			break; // end of list
+
+		if (block_id == kRoomFblk_Script) {
 			char *buf = nullptr;
 			HRoomFileError err = ReadScriptBlock(buf, in, data_ver);
 			if (err) {
@@ -697,9 +761,8 @@ HRoomFileError ExtractScriptText(String &script, Stream *in, RoomFileVersion dat
 			}
 			return err;
 		}
-		if (block != kRoomFile_EOF)
-			in->Seek(block_len); // skip block
-	} while (block != kRoomFile_EOF);
+		in->Seek(block_len); // skip block
+	};
 	return new RoomFileError(kRoomFileErr_BlockNotFound);
 }
 
@@ -707,9 +770,11 @@ HRoomFileError ExtractScriptText(String &script, Stream *in, RoomFileVersion dat
 // Type of function that writes single room block.
 typedef void(*PfnWriteBlock)(const RoomStruct *room, Stream *out);
 // Generic function that saves a block and automatically adds its size into header
-void WriteBlock(const RoomStruct *room, RoomFileBlock block, PfnWriteBlock writer, Stream *out) {
+void WriteBlock(const RoomStruct *room, RoomFileBlock block, const String &ext_id, PfnWriteBlock writer, Stream *out) {
 	// Write block's header
 	out->WriteByte(block);
+	if (block == kRoomFblk_None) // new-style string id
+		ext_id.WriteCount(out, 16);
 	soff_t sz_at = out->GetPosition();
 	out->WriteInt64(0); // block size placeholder
 	// Call writer to save actual block contents
@@ -723,6 +788,16 @@ void WriteBlock(const RoomStruct *room, RoomFileBlock block, PfnWriteBlock write
 	out->WriteInt64(block_size);
 	// ...and get back to the end of the file
 	out->Seek(0, Shared::kSeekEnd);
+}
+
+// Helper for new-style blocks with string id
+void WriteBlock(const RoomStruct *room, const String &ext_id, PfnWriteBlock writer, Stream *out) {
+	WriteBlock(room, kRoomFblk_None, ext_id, writer, out);
+}
+
+// Helper for old-style blocks with only numeric id
+void WriteBlock(const RoomStruct *room, RoomFileBlock block, PfnWriteBlock writer, Stream *out) {
+	WriteBlock(room, block, String(), writer, out);
 }
 
 void WriteInteractionScripts(const InteractionScripts *interactions, Stream *out) {

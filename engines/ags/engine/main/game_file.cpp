@@ -24,46 +24,54 @@
 // Game data file management
 //
 
-#include "ags/engine/main/mainheader.h"
-#include "ags/engine/main/game_file.h"
-#include "ags/shared/ac/common.h"
-#include "ags/engine/ac/character.h"
-#include "ags/engine/ac/charactercache.h"
-#include "ags/shared/ac/dialogtopic.h"
-#include "ags/engine/ac/draw.h"
-#include "ags/engine/ac/game.h"
-#include "ags/shared/ac/gamesetupstruct.h"
-#include "ags/engine/ac/gamestate.h"
-#include "ags/shared/ac/gamestructdefines.h"
-#include "ags/engine/ac/gui.h"
-#include "ags/engine/ac/viewframe.h"
-#include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/debugging/out.h"
-#include "ags/shared/gui/guilabel.h"
-#include "ags/engine/main/main.h"
-#include "ags/engine/platform/base/agsplatformdriver.h"
-#include "ags/shared/util/stream.h"
-#include "ags/shared/gfx/bitmap.h"
-#include "ags/engine/gfx/blender.h"
-#include "ags/shared/core/assetmanager.h"
-#include "ags/shared/util/alignedstream.h"
-#include "ags/engine/ac/gamesetup.h"
-#include "ags/shared/game/main_game_file.h"
-#include "ags/engine/game/game_init.h"
-#include "ags/plugins/agsplugin.h"
-#include "ags/engine/script/script.h"
-#include "ags/globals.h"
+#include "main/mainheader.h"
+#include "main/game_file.h"
+#include "ac/common.h"
+#include "ac/character.h"
+#include "ac/charactercache.h"
+#include "ac/dialogtopic.h"
+#include "ac/draw.h"
+#include "ac/game.h"
+#include "ac/gamesetupstruct.h"
+#include "ac/gamestate.h"
+#include "ac/gamestructdefines.h"
+#include "ac/gui.h"
+#include "ac/viewframe.h"
+#include "debug/debug_log.h"
+#include "debug/out.h"
+#include "gui/guilabel.h"
+#include "main/main.h"
+#include "platform/base/agsplatformdriver.h"
+#include "util/stream.h"
+#include "gfx/bitmap.h"
+#include "gfx/blender.h"
+#include "core/assetmanager.h"
+#include "util/alignedstream.h"
+#include "ac/gamesetup.h"
+#include "game/main_game_file.h"
+#include "game/game_init.h"
+#include "script/script.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
+extern int ifacepopped;
+
+extern GameSetupStruct game;
+extern ViewStruct *views;
+extern DialogTopic *dialog;
+
+extern AGSPlatformDriver *platform;
+extern int numScriptModules;
+
+
 // Test if engine supports extended capabilities required to run the game
 bool test_game_caps(const std::set<String> &caps, std::set<String> &failed_caps) {
 	// Currently we support nothing special
 	failed_caps = caps;
-	return caps.empty();
+	return caps.size() == 0;
 }
 
 // Forms a simple list of capability names
@@ -88,7 +96,7 @@ HGameFileError game_file_first_open(MainGameSource &src) {
 		Debug::Printf(kDbgMsg_Info, "Opened game data file: %s", src.Filename.GetCStr());
 		Debug::Printf(kDbgMsg_Info, "Game data version: %d", src.DataVersion);
 		Debug::Printf(kDbgMsg_Info, "Compiled with: %s", src.CompiledWith.GetCStr());
-		if (!src.Caps.empty()) {
+		if (src.Caps.size() > 0) {
 			String caps_list = get_caps_list(src.Caps);
 			Debug::Printf(kDbgMsg_Info, "Requested engine caps: %s", caps_list.GetCStr());
 		}
@@ -106,35 +114,37 @@ HGameFileError game_file_first_open(MainGameSource &src) {
 	return HGameFileError::None();
 }
 
-void PreReadSaveFileInfo(Stream *in, GameDataVersion data_ver) {
-	AlignedStream align_s(in, Shared::kAligned_Read);
-	_GP(game).ReadFromFile(&align_s);
-	// Discard game messages we do not need here
-	delete[] _GP(game).load_messages;
-	_GP(game).load_messages = nullptr;
-	_GP(game).read_savegame_info(in, data_ver);
-}
-
 HError preload_game_data() {
 	MainGameSource src;
 	HGameFileError err = game_file_first_open(src);
 	if (!err)
 		return (HError)err;
 	// Read only the particular data we need for preliminary game analysis
-	PreReadSaveFileInfo(src.InputStream.get(), src.DataVersion);
-	_GP(game).compiled_with = src.CompiledWith;
-	FixupSaveDirectory(_GP(game));
+	PreReadGameData(game, src.InputStream.get(), src.DataVersion);
+	game.compiled_with = src.CompiledWith;
+	FixupSaveDirectory(game);
 	return HError::None();
 }
 
 HError load_game_file() {
 	MainGameSource src;
-	LoadedGameEntities ents(_GP(game), _G(dialog), _G(views));
+	LoadedGameEntities ents(game, dialog, views);
 	HGameFileError load_err = OpenMainGameFileFromDefaultAsset(src);
 	if (load_err) {
 		load_err = ReadGameData(ents, src.InputStream.get(), src.DataVersion);
-		if (load_err)
+		if (load_err) {
+			// Upscale mode -- for old games that supported it.
+			// NOTE: this must be done before UpdateGameData, or resolution-dependant
+			// adjustments won't be applied correctly.
+			if ((loaded_game_file_version < kGameVersion_310) && usetup.override_upscale) {
+				if (game.GetResolutionType() == kGameResolution_320x200)
+					game.SetGameResolution(kGameResolution_640x400);
+				else if (game.GetResolutionType() == kGameResolution_320x240)
+					game.SetGameResolution(kGameResolution_640x480);
+			}
+
 			load_err = UpdateGameData(ents, src.DataVersion);
+		}
 	}
 	if (!load_err)
 		return (HError)load_err;
@@ -145,7 +155,7 @@ HError load_game_file() {
 }
 
 void display_game_file_error(HError err) {
-	_G(platform)->DisplayAlert("Loading game failed with error:\n%s.\n\nThe game files may be incomplete, corrupt or from unsupported version of AGS.",
+	platform->DisplayAlert("Loading game failed with error:\n%s.\n\nThe game files may be incomplete, corrupt or from unsupported version of AGS.",
 		err->FullMessage().GetCStr());
 }
 

@@ -1,37 +1,26 @@
-/* ScummVM - Graphic Adventure Engine
- *
- * ScummVM is the legal property of its developers, whose names
- * are too numerous to list here. Please refer to the COPYRIGHT
- * file distributed with this source distribution.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- */
+//=============================================================================
+//
+// Adventure Game Studio (AGS)
+//
+// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
+// The full list of copyright holders can be found in the Copyright.txt
+// file, which is part of this source code distribution.
+//
+// The AGS source code is provided under the Artistic License 2.0.
+// A copy of this license can be found in the file License.txt and at
+// http://www.opensource.org/licenses/artistic-license-2.0.php
+//
+//=============================================================================
 
-#include "ags/engine/ac/global_mouse.h"
-#include "ags/engine/ac/gamestate.h"
-#include "ags/globals.h"
+#include "ac/global_mouse.h"
+#include "ac/gamestate.h"
 
-namespace AGS3 {
+extern GameState play;
 
-void HideMouseCursor() {
-	_GP(play).mouse_cursor_hidden = 1;
+void HideMouseCursor () {
+    play.mouse_cursor_hidden = 1;
 }
 
-void ShowMouseCursor() {
-	_GP(play).mouse_cursor_hidden = 0;
+void ShowMouseCursor () {
+    play.mouse_cursor_hidden = 0;
 }
-
-} // namespace AGS3

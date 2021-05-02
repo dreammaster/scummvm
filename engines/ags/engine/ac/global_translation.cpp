@@ -1,90 +1,70 @@
-/* ScummVM - Graphic Adventure Engine
- *
- * ScummVM is the legal property of its developers, whose names
- * are too numerous to list here. Please refer to the COPYRIGHT
- * file distributed with this source distribution.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- */
+//=============================================================================
+//
+// Adventure Game Studio (AGS)
+//
+// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
+// The full list of copyright holders can be found in the Copyright.txt
+// file, which is part of this source code distribution.
+//
+// The AGS source code is provided under the Artistic License 2.0.
+// A copy of this license can be found in the file License.txt and at
+// http://www.opensource.org/licenses/artistic-license-2.0.php
+//
+//=============================================================================
 
-#include "ags/shared/ac/common.h"
-#include "ags/engine/ac/display.h"
-#include "ags/engine/ac/gamestate.h"
-#include "ags/engine/ac/global_translation.h"
-#include "ags/engine/ac/string.h"
-#include "ags/engine/ac/tree_map.h"
-#include "ags/engine/platform/base/agsplatformdriver.h"
-#include "ags/plugins/agsplugin.h"
-#include "ags/plugins/plugin_engine.h"
-#include "ags/shared/util/memory.h"
+//include <string.h>
+#include "ac/common.h"
+#include "ac/display.h"
+#include "ac/gamestate.h"
+#include "ac/global_translation.h"
+#include "ac/string.h"
+#include "ac/translation.h"
+#include "ac/tree_map.h"
+#include "platform/base/agsplatformdriver.h"
+#include "plugin/agsplugin.h"
+#include "plugin/plugin_engine.h"
+#include "util/memory.h"
 #include "ags/shared/core/types.h"
-#include "ags/globals.h"
-
-namespace AGS3 {
 
 using namespace AGS::Shared::Memory;
 
-const char *get_translation(const char *text) {
-	if (text == nullptr)
-		quit("!Null string supplied to CheckForTranslations");
+extern GameState play;
+extern AGSPlatformDriver *platform;
 
-	_G(source_text_length) = GetTextDisplayLength(text);
+const char *get_translation (const char *text) {
+    if (text == nullptr)
+        quit("!Null string supplied to CheckForTranslations");
+
+    source_text_length = GetTextDisplayLength(text);
 
 #if AGS_PLATFORM_64BIT
-	// check if a plugin wants to translate it - if so, return that
-	char *plResult = (char *)(pl_run_plugin_hooks(AGSE_TRANSLATETEXT,
-		const_cast<char *>(text)))._ptr;
-	if (plResult) {
-		return plResult;
-	}
+    // check if a plugin wants to translate it - if so, return that
+    // TODO: plugin API is currently strictly 32-bit, so this may break on 64-bit systems
+    char *plResult = Int32ToPtr<char>(pl_run_plugin_hooks(AGSE_TRANSLATETEXT, PtrToInt32(text)));
+    if (plResult) {
+        return plResult;
+    }
 #endif
 
-	if (_G(transtree) != nullptr) {
-		// translate the text using the translation file
-		char *transl = _G(transtree)->findValue(text);
-		if (transl != nullptr)
-			return transl;
-	}
-	// return the original text
-	return text;
+    const auto *transtree = get_translation_tree();
+    if (transtree != nullptr) {
+        // translate the text using the translation file
+        const char * transl = transtree->findValue (text);
+        if (transl != nullptr)
+            return transl;
+    }
+    // return the original text
+    return text;
 }
 
-int IsTranslationAvailable() {
-	if (_G(transtree) != nullptr)
-		return 1;
-	return 0;
+int IsTranslationAvailable () {
+    if (get_translation_tree() != nullptr)
+        return 1;
+    return 0;
 }
 
-int GetTranslationName(char *buffer) {
-	VALIDATE_STRING(buffer);
-	const char *copyFrom = _G(transFileName);
-
-	while (strchr(copyFrom, '\\') != nullptr) {
-		copyFrom = strchr(copyFrom, '\\') + 1;
-	}
-	while (strchr(copyFrom, '/') != nullptr) {
-		copyFrom = strchr(copyFrom, '/') + 1;
-	}
-
-	strcpy(buffer, copyFrom);
-	// remove the ".tra" from the end of the filename
-	if (strstr(buffer, ".tra") != nullptr)
-		strstr(buffer, ".tra")[0] = 0;
-
-	return IsTranslationAvailable();
+int GetTranslationName (char* buffer) {
+    VALIDATE_STRING (buffer);
+    strcpy(buffer, get_translation_name().GetCStr());
+    return IsTranslationAvailable();
 }
-
-} // namespace AGS3

@@ -70,6 +70,10 @@ public:
 		return format.ARGBToColor(0, 255, 0, 255);
 	}
 
+	inline const Common::Point getOffsetFromOwner() const {
+		return _owner->getOffsetFromOwner();
+	}
+
 	int getpixel(int x, int y) const;
 
 	void clear() {
@@ -115,6 +119,10 @@ public:
 	 */
 	void stretchDraw(const BITMAP *srcBitmap, const Common::Rect &srcRect,
 		const Common::Rect &destRect, bool skipTrans, int srcAlpha);
+
+	inline bool isSubBitmap() const {
+		return _owner->disposeAfterUse() == DisposeAfterUse::NO;
+	}
 
 private:
 	// True color blender functions

@@ -23,15 +23,16 @@
 #ifndef AGS_GLOBALS_H
 #define AGS_GLOBALS_H
 
+#include "common/events.h"
 #include "ags/shared/ac/game_version.h"
 #include "ags/shared/util/string.h"
 #include "ags/shared/util/version.h"
-#include "ags/shared/gui/guimain.h"
+#include "ags/shared/gui/gui_main.h"
 #include "ags/shared/script/cc_script.h"
 #include "ags/engine/ac/runtime_defines.h"
-#include "ags/engine/ac/walkbehind.h"
+#include "ags/engine/ac/walk_behind.h"
 #include "ags/engine/main/engine.h"
-#include "ags/engine/media/audio/audiodefines.h"
+#include "ags/engine/media/audio/audio_defines.h"
 #include "ags/engine/script/script.h"
 #include "ags/engine/script/script_runtime.h"
 #include "ags/lib/std/array.h"
@@ -40,11 +41,10 @@
 #include "ags/lib/allegro/color.h"
 #include "ags/lib/allegro/fixed.h"
 #include "ags/lib/allegro/aintern.h"
-#include "common/events.h"
 
-namespace Common {
+namespace Shared {
 class DumpFile;
-}
+} // namespace Shared
 
 namespace AGS3 {
 

@@ -20,42 +20,99 @@
  *
  */
 
-#include "ags/engine/ac/character.h"
-#include "ags/engine/ac/charactercache.h"
-#include "ags/engine/ac/dialog.h"
-#include "ags/engine/ac/draw.h"
-#include "ags/engine/ac/file.h"
-#include "ags/engine/ac/game.h"
-#include "ags/engine/ac/gamesetup.h"
-#include "ags/shared/ac/gamesetupstruct.h"
-#include "ags/engine/ac/gamestate.h"
-#include "ags/engine/ac/gui.h"
-#include "ags/engine/ac/movelist.h"
-#include "ags/engine/ac/dynobj/all_dynamicclasses.h"
-#include "ags/engine/ac/dynobj/all_scriptclasses.h"
-#include "ags/engine/ac/statobj/agsstaticobject.h"
-#include "ags/engine/ac/statobj/staticarray.h"
-#include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/debugging/out.h"
-#include "ags/shared/font/agsfontrenderer.h"
-#include "ags/shared/font/fonts.h"
-#include "ags/engine/game/game_init.h"
-#include "ags/shared/gfx/bitmap.h"
-#include "ags/engine/gfx/ddb.h"
-#include "ags/shared/gui/guilabel.h"
-#include "ags/plugins/plugin_engine.h"
-#include "ags/shared/script/cc_error.h"
-#include "ags/engine/script/exports.h"
-#include "ags/engine/script/script.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/shared/util/string_utils.h"
-#include "ags/engine/media/audio/audio_system.h"
-#include "ags/globals.h"
+#include "ac/character.h"
+#include "ac/charactercache.h"
+#include "ac/dialog.h"
+#include "ac/draw.h"
+#include "ac/file.h"
+#include "ac/game.h"
+#include "ac/gamesetup.h"
+#include "ac/gamesetupstruct.h"
+#include "ac/gamestate.h"
+#include "ac/gui.h"
+#include "ac/movelist.h"
+#include "ac/dynobj/all_dynamicclasses.h"
+#include "ac/dynobj/all_scriptclasses.h"
+#include "ac/statobj/agsstaticobject.h"
+#include "ac/statobj/staticarray.h"
+#include "debug/debug_log.h"
+#include "debug/out.h"
+#include "font/agsfontrenderer.h"
+#include "font/fonts.h"
+#include "game/game_init.h"
+#include "gfx/bitmap.h"
+#include "gfx/ddb.h"
+#include "gui/guilabel.h"
+#include "platform/base/agsplatformdriver.h"
+#include "plugin/plugin_engine.h"
+#include "script/cc_error.h"
+#include "script/exports.h"
+#include "script/script.h"
+#include "script/script_runtime.h"
+#include "util/string_utils.h"
+#include "media/audio/audio_system.h"
 
 namespace AGS3 {
 
 using namespace Shared;
 using namespace Engine;
+
+extern GameSetupStruct game;
+extern int actSpsCount;
+extern Bitmap **actsps;
+extern IDriverDependantBitmap **actspsbmp;
+extern Bitmap **actspswb;
+extern IDriverDependantBitmap **actspswbbmp;
+extern CachedActSpsData *actspswbcache;
+extern CharacterCache *charcache;
+
+extern CCGUIObject ccDynamicGUIObject;
+extern CCCharacter ccDynamicCharacter;
+extern CCHotspot   ccDynamicHotspot;
+extern CCRegion    ccDynamicRegion;
+extern CCInventory ccDynamicInv;
+extern CCGUI       ccDynamicGUI;
+extern CCObject    ccDynamicObject;
+extern CCDialog    ccDynamicDialog;
+extern CCAudioChannel ccDynamicAudio;
+extern CCAudioClip ccDynamicAudioClip;
+extern ScriptString myScriptStringImpl;
+extern ScriptObject scrObj[MAX_ROOM_OBJECTS];
+extern ScriptGUI *scrGui;
+extern ScriptHotspot scrHotspot[MAX_ROOM_HOTSPOTS];
+extern ScriptRegion scrRegion[MAX_ROOM_REGIONS];
+extern ScriptInvItem scrInv[MAX_INV];
+extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
+
+extern ScriptDialogOptionsRendering ccDialogOptionsRendering;
+extern ScriptDrawingSurface *dialogOptionsRenderingSurface;
+
+extern AGSStaticObject GlobalStaticManager;
+
+extern StaticArray StaticCharacterArray;
+extern StaticArray StaticObjectArray;
+extern StaticArray StaticGUIArray;
+extern StaticArray StaticHotspotArray;
+extern StaticArray StaticRegionArray;
+extern StaticArray StaticInventoryArray;
+extern StaticArray StaticDialogArray;
+
+extern std::vector<ccInstance *> moduleInst;
+extern std::vector<ccInstance *> moduleInstFork;
+extern std::vector<RuntimeScriptValue> moduleRepExecAddr;
+
+// Old dialog support (defined in ac/dialog)
+extern std::vector< std::shared_ptr<unsigned char> > old_dialog_scripts;
+extern std::vector<String> old_speech_lines;
+
+StaticArray StaticCharacterArray;
+StaticArray StaticObjectArray;
+StaticArray StaticGUIArray;
+StaticArray StaticHotspotArray;
+StaticArray StaticRegionArray;
+StaticArray StaticInventoryArray;
+StaticArray StaticDialogArray;
+
 
 namespace AGS {
 namespace Engine {
@@ -83,89 +140,89 @@ String GetGameInitErrorText(GameInitErrorType err) {
 // Initializes audio channels and clips and registers them in the script system
 void InitAndRegisterAudioObjects() {
 	for (int i = 0; i <= MAX_SOUND_CHANNELS; ++i) {
-		_G(scrAudioChannel)[i].id = i;
-		ccRegisterManagedObject(&_G(scrAudioChannel)[i], &_GP(ccDynamicAudio));
+		scrAudioChannel[i].id = i;
+		ccRegisterManagedObject(&scrAudioChannel[i], &ccDynamicAudio);
 	}
 
-	for (size_t i = 0; i < _GP(game).audioClips.size(); ++i) {
+	for (size_t i = 0; i < game.audioClips.size(); ++i) {
 		// Note that as of 3.5.0 data format the clip IDs are still restricted
 		// to actual item index in array, so we don't make any difference
 		// between game versions, for now.
-		_GP(game).audioClips[i].id = i;
-		ccRegisterManagedObject(&_GP(game).audioClips[i], &_GP(ccDynamicAudioClip));
-		ccAddExternalDynamicObject(_GP(game).audioClips[i].scriptName, &_GP(game).audioClips[i], &_GP(ccDynamicAudioClip));
+		game.audioClips[i].id = i;
+		ccRegisterManagedObject(&game.audioClips[i], &ccDynamicAudioClip);
+		ccAddExternalDynamicObject(game.audioClips[i].scriptName, &game.audioClips[i], &ccDynamicAudioClip);
 	}
 }
 
 // Initializes characters and registers them in the script system
 void InitAndRegisterCharacters() {
-	_GP(characterScriptObjNames).resize(_GP(game).numcharacters);
-	for (int i = 0; i < _GP(game).numcharacters; ++i) {
-		_GP(game).chars[i].walking = 0;
-		_GP(game).chars[i].animating = 0;
-		_GP(game).chars[i].pic_xoffs = 0;
-		_GP(game).chars[i].pic_yoffs = 0;
-		_GP(game).chars[i].blinkinterval = 140;
-		_GP(game).chars[i].blinktimer = _GP(game).chars[i].blinkinterval;
-		_GP(game).chars[i].index_id = i;
-		_GP(game).chars[i].blocking_width = 0;
-		_GP(game).chars[i].blocking_height = 0;
-		_GP(game).chars[i].prevroom = -1;
-		_GP(game).chars[i].loop = 0;
-		_GP(game).chars[i].frame = 0;
-		_GP(game).chars[i].walkwait = -1;
-		ccRegisterManagedObject(&_GP(game).chars[i], &_GP(ccDynamicCharacter));
+	characterScriptObjNames.resize(game.numcharacters);
+	for (int i = 0; i < game.numcharacters; ++i) {
+		game.chars[i].walking = 0;
+		game.chars[i].animating = 0;
+		game.chars[i].pic_xoffs = 0;
+		game.chars[i].pic_yoffs = 0;
+		game.chars[i].blinkinterval = 140;
+		game.chars[i].blinktimer = game.chars[i].blinkinterval;
+		game.chars[i].index_id = i;
+		game.chars[i].blocking_width = 0;
+		game.chars[i].blocking_height = 0;
+		game.chars[i].prevroom = -1;
+		game.chars[i].loop = 0;
+		game.chars[i].frame = 0;
+		game.chars[i].walkwait = -1;
+		ccRegisterManagedObject(&game.chars[i], &ccDynamicCharacter);
 
 		// export the character's script object
-		_GP(characterScriptObjNames)[i] = _GP(game).chars[i].scrname;
-		ccAddExternalDynamicObject(_GP(characterScriptObjNames)[i], &_GP(game).chars[i], &_GP(ccDynamicCharacter));
+		characterScriptObjNames[i] = game.chars[i].scrname;
+		ccAddExternalDynamicObject(characterScriptObjNames[i], &game.chars[i], &ccDynamicCharacter);
 	}
 }
 
 // Initializes dialog and registers them in the script system
 void InitAndRegisterDialogs() {
-	_G(scrDialog) = new ScriptDialog[_GP(game).numdialog];
-	for (int i = 0; i < _GP(game).numdialog; ++i) {
-		_G(scrDialog)[i].id = i;
-		_G(scrDialog)[i].reserved = 0;
-		ccRegisterManagedObject(&_G(scrDialog)[i], &_GP(ccDynamicDialog));
+	scrDialog = new ScriptDialog[game.numdialog];
+	for (int i = 0; i < game.numdialog; ++i) {
+		scrDialog[i].id = i;
+		scrDialog[i].reserved = 0;
+		ccRegisterManagedObject(&scrDialog[i], &ccDynamicDialog);
 
-		if (!_GP(game).dialogScriptNames[i].IsEmpty())
-			ccAddExternalDynamicObject(_GP(game).dialogScriptNames[i], &_G(scrDialog)[i], &_GP(ccDynamicDialog));
+		if (!game.dialogScriptNames[i].IsEmpty())
+			ccAddExternalDynamicObject(game.dialogScriptNames[i], &scrDialog[i], &ccDynamicDialog);
 	}
 }
 
 // Initializes dialog options rendering objects and registers them in the script system
 void InitAndRegisterDialogOptions() {
-	ccRegisterManagedObject(&_GP(ccDialogOptionsRendering), &_GP(ccDialogOptionsRendering));
+	ccRegisterManagedObject(&ccDialogOptionsRendering, &ccDialogOptionsRendering);
 
-	_G(dialogOptionsRenderingSurface) = new ScriptDrawingSurface();
-	_G(dialogOptionsRenderingSurface)->isLinkedBitmapOnly = true;
-	long dorsHandle = ccRegisterManagedObject(_G(dialogOptionsRenderingSurface), _G(dialogOptionsRenderingSurface));
+	dialogOptionsRenderingSurface = new ScriptDrawingSurface();
+	dialogOptionsRenderingSurface->isLinkedBitmapOnly = true;
+	long dorsHandle = ccRegisterManagedObject(dialogOptionsRenderingSurface, dialogOptionsRenderingSurface);
 	ccAddObjectReference(dorsHandle);
 }
 
 // Initializes gui and registers them in the script system
 HError InitAndRegisterGUI() {
-	_G(scrGui) = (ScriptGUI *)malloc(sizeof(ScriptGUI) * _GP(game).numgui);
-	for (int i = 0; i < _GP(game).numgui; ++i) {
-		_G(scrGui)[i].id = -1;
+	scrGui = (ScriptGUI *)malloc(sizeof(ScriptGUI) * game.numgui);
+	for (int i = 0; i < game.numgui; ++i) {
+		scrGui[i].id = -1;
 	}
 
-	_GP(guiScriptObjNames).resize(_GP(game).numgui);
-	for (int i = 0; i < _GP(game).numgui; ++i) {
+	guiScriptObjNames.resize(game.numgui);
+	for (int i = 0; i < game.numgui; ++i) {
 		// link controls to their parent guis
-		HError err = _GP(guis)[i].RebuildArray();
+		HError err = guis[i].RebuildArray();
 		if (!err)
 			return err;
 		// export all the GUI's controls
 		export_gui_controls(i);
 		// copy the script name to its own memory location
 		// because ccAddExtSymbol only keeps a reference
-		_GP(guiScriptObjNames)[i] = _GP(guis)[i].Name;
-		_G(scrGui)[i].id = i;
-		ccAddExternalDynamicObject(_GP(guiScriptObjNames)[i], &_G(scrGui)[i], &_GP(ccDynamicGUI));
-		ccRegisterManagedObject(&_G(scrGui)[i], &_GP(ccDynamicGUI));
+		guiScriptObjNames[i] = guis[i].Name;
+		scrGui[i].id = i;
+		ccAddExternalDynamicObject(guiScriptObjNames[i], &scrGui[i], &ccDynamicGUI);
+		ccRegisterManagedObject(&scrGui[i], &ccDynamicGUI);
 	}
 	return HError::None();
 }
@@ -173,57 +230,57 @@ HError InitAndRegisterGUI() {
 // Initializes inventory items and registers them in the script system
 void InitAndRegisterInvItems() {
 	for (int i = 0; i < MAX_INV; ++i) {
-		_G(scrInv)[i].id = i;
-		_G(scrInv)[i].reserved = 0;
-		ccRegisterManagedObject(&_G(scrInv)[i], &_GP(ccDynamicInv));
+		scrInv[i].id = i;
+		scrInv[i].reserved = 0;
+		ccRegisterManagedObject(&scrInv[i], &ccDynamicInv);
 
-		if (!_GP(game).invScriptNames[i].IsEmpty())
-			ccAddExternalDynamicObject(_GP(game).invScriptNames[i], &_G(scrInv)[i], &_GP(ccDynamicInv));
+		if (!game.invScriptNames[i].IsEmpty())
+			ccAddExternalDynamicObject(game.invScriptNames[i], &scrInv[i], &ccDynamicInv);
 	}
 }
 
 // Initializes room hotspots and registers them in the script system
 void InitAndRegisterHotspots() {
 	for (int i = 0; i < MAX_ROOM_HOTSPOTS; ++i) {
-		_G(scrHotspot)[i].id = i;
-		_G(scrHotspot)[i].reserved = 0;
-		ccRegisterManagedObject(&_G(scrHotspot)[i], &_GP(ccDynamicHotspot));
+		scrHotspot[i].id = i;
+		scrHotspot[i].reserved = 0;
+		ccRegisterManagedObject(&scrHotspot[i], &ccDynamicHotspot);
 	}
 }
 
 // Initializes room objects and registers them in the script system
 void InitAndRegisterRoomObjects() {
 	for (int i = 0; i < MAX_ROOM_OBJECTS; ++i) {
-		ccRegisterManagedObject(&_G(scrObj)[i], &_GP(ccDynamicObject));
+		ccRegisterManagedObject(&scrObj[i], &ccDynamicObject);
 	}
 }
 
 // Initializes room regions and registers them in the script system
 void InitAndRegisterRegions() {
 	for (int i = 0; i < MAX_ROOM_REGIONS; ++i) {
-		_G(scrRegion)[i].id = i;
-		_G(scrRegion)[i].reserved = 0;
-		ccRegisterManagedObject(&_G(scrRegion)[i], &_GP(ccDynamicRegion));
+		scrRegion[i].id = i;
+		scrRegion[i].reserved = 0;
+		ccRegisterManagedObject(&scrRegion[i], &ccDynamicRegion);
 	}
 }
 
 // Registers static entity arrays in the script system
 void RegisterStaticArrays() {
-	_GP(StaticCharacterArray).Create(&_GP(ccDynamicCharacter), sizeof(CharacterInfo), sizeof(CharacterInfo));
-	_GP(StaticObjectArray).Create(&_GP(ccDynamicObject), sizeof(ScriptObject), sizeof(ScriptObject));
-	_GP(StaticGUIArray).Create(&_GP(ccDynamicGUI), sizeof(ScriptGUI), sizeof(ScriptGUI));
-	_GP(StaticHotspotArray).Create(&_GP(ccDynamicHotspot), sizeof(ScriptHotspot), sizeof(ScriptHotspot));
-	_GP(StaticRegionArray).Create(&_GP(ccDynamicRegion), sizeof(ScriptRegion), sizeof(ScriptRegion));
-	_GP(StaticInventoryArray).Create(&_GP(ccDynamicInv), sizeof(ScriptInvItem), sizeof(ScriptInvItem));
-	_GP(StaticDialogArray).Create(&_GP(ccDynamicDialog), sizeof(ScriptDialog), sizeof(ScriptDialog));
+	StaticCharacterArray.Create(&ccDynamicCharacter, sizeof(CharacterInfo), sizeof(CharacterInfo));
+	StaticObjectArray.Create(&ccDynamicObject, sizeof(ScriptObject), sizeof(ScriptObject));
+	StaticGUIArray.Create(&ccDynamicGUI, sizeof(ScriptGUI), sizeof(ScriptGUI));
+	StaticHotspotArray.Create(&ccDynamicHotspot, sizeof(ScriptHotspot), sizeof(ScriptHotspot));
+	StaticRegionArray.Create(&ccDynamicRegion, sizeof(ScriptRegion), sizeof(ScriptRegion));
+	StaticInventoryArray.Create(&ccDynamicInv, sizeof(ScriptInvItem), sizeof(ScriptInvItem));
+	StaticDialogArray.Create(&ccDynamicDialog, sizeof(ScriptDialog), sizeof(ScriptDialog));
 
-	ccAddExternalStaticArray("character", &_GP(game).chars[0], &_GP(StaticCharacterArray));
-	ccAddExternalStaticArray("object", &_G(scrObj)[0], &_GP(StaticObjectArray));
-	ccAddExternalStaticArray("gui", &_G(scrGui)[0], &_GP(StaticGUIArray));
-	ccAddExternalStaticArray("hotspot", &_G(scrHotspot)[0], &_GP(StaticHotspotArray));
-	ccAddExternalStaticArray("region", &_G(scrRegion)[0], &_GP(StaticRegionArray));
-	ccAddExternalStaticArray("inventory", &_G(scrInv)[0], &_GP(StaticInventoryArray));
-	ccAddExternalStaticArray("dialog", &_G(scrDialog)[0], &_GP(StaticDialogArray));
+	ccAddExternalStaticArray("character", &game.chars[0], &StaticCharacterArray);
+	ccAddExternalStaticArray("object", &scrObj[0], &StaticObjectArray);
+	ccAddExternalStaticArray("gui", &scrGui[0], &StaticGUIArray);
+	ccAddExternalStaticArray("hotspot", &scrHotspot[0], &StaticHotspotArray);
+	ccAddExternalStaticArray("region", &scrRegion[0], &StaticRegionArray);
+	ccAddExternalStaticArray("inventory", &scrInv[0], &StaticInventoryArray);
+	ccAddExternalStaticArray("dialog", &scrDialog[0], &StaticDialogArray);
 }
 
 // Initializes various game entities and registers them in the script system
@@ -240,43 +297,43 @@ HError InitAndRegisterGameEntities() {
 	InitAndRegisterHotspots();
 	InitAndRegisterRegions();
 	InitAndRegisterRoomObjects();
-	_GP(play).CreatePrimaryViewportAndCamera();
+	play.CreatePrimaryViewportAndCamera();
 
 	RegisterStaticArrays();
 
-	setup_player_character(_GP(game).playercharacter);
-	if (_G(loaded_game_file_version) >= kGameVersion_270)
-		ccAddExternalStaticObject("player", &_G(sc_PlayerCharPtr), &_GP(GlobalStaticManager));
+	setup_player_character(game.playercharacter);
+	if (loaded_game_file_version >= kGameVersion_270)
+		ccAddExternalStaticObject("player", &_sc_PlayerCharPtr, &GlobalStaticManager);
 	return HError::None();
 }
 
 void LoadFonts(GameDataVersion data_ver) {
-	for (int i = 0; i < _GP(game).numfonts; ++i) {
-		if (!wloadfont_size(i, _GP(game).fonts[i]))
+	for (int i = 0; i < game.numfonts; ++i) {
+		if (!wloadfont_size(i, game.fonts[i]))
 			quitprintf("Unable to load font %d, no renderer could load a matching file", i);
 	}
 }
 
 void AllocScriptModules() {
-	_GP(moduleInst).resize(_G(numScriptModules), nullptr);
-	_GP(moduleInstFork).resize(_G(numScriptModules), nullptr);
-	_GP(moduleRepExecAddr).resize(_G(numScriptModules));
-	_GP(repExecAlways).moduleHasFunction.resize(_G(numScriptModules), true);
-	_GP(lateRepExecAlways).moduleHasFunction.resize(_G(numScriptModules), true);
-	_GP(getDialogOptionsDimensionsFunc).moduleHasFunction.resize(_G(numScriptModules), true);
-	_GP(renderDialogOptionsFunc).moduleHasFunction.resize(_G(numScriptModules), true);
-	_GP(getDialogOptionUnderCursorFunc).moduleHasFunction.resize(_G(numScriptModules), true);
-	_GP(runDialogOptionMouseClickHandlerFunc).moduleHasFunction.resize(_G(numScriptModules), true);
-	_GP(runDialogOptionKeyPressHandlerFunc).moduleHasFunction.resize(_G(numScriptModules), true);
-	_GP(runDialogOptionRepExecFunc).moduleHasFunction.resize(_G(numScriptModules), true);
-	for (int i = 0; i < _G(numScriptModules); ++i) {
-		_GP(moduleRepExecAddr)[i].Invalidate();
+	moduleInst.resize(numScriptModules, nullptr);
+	moduleInstFork.resize(numScriptModules, nullptr);
+	moduleRepExecAddr.resize(numScriptModules);
+	repExecAlways.moduleHasFunction.resize(numScriptModules, true);
+	lateRepExecAlways.moduleHasFunction.resize(numScriptModules, true);
+	getDialogOptionsDimensionsFunc.moduleHasFunction.resize(numScriptModules, true);
+	renderDialogOptionsFunc.moduleHasFunction.resize(numScriptModules, true);
+	getDialogOptionUnderCursorFunc.moduleHasFunction.resize(numScriptModules, true);
+	runDialogOptionMouseClickHandlerFunc.moduleHasFunction.resize(numScriptModules, true);
+	runDialogOptionKeyPressHandlerFunc.moduleHasFunction.resize(numScriptModules, true);
+	runDialogOptionRepExecFunc.moduleHasFunction.resize(numScriptModules, true);
+	for (int i = 0; i < numScriptModules; ++i) {
+		moduleRepExecAddr[i].Invalidate();
 	}
 }
 
 HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion data_ver) {
-	const ScriptAPIVersion base_api = (ScriptAPIVersion)_GP(game).options[OPT_BASESCRIPTAPI];
-	const ScriptAPIVersion compat_api = (ScriptAPIVersion)_GP(game).options[OPT_SCRIPTCOMPATLEV];
+	const ScriptAPIVersion base_api = (ScriptAPIVersion)game.options[OPT_BASESCRIPTAPI];
+	const ScriptAPIVersion compat_api = (ScriptAPIVersion)game.options[OPT_SCRIPTCOMPATLEV];
 	if (data_ver >= kGameVersion_341) {
 		// TODO: find a way to either automate this list of strings or make it more visible (shared & easier to find in engine code)
 		// TODO: stack-allocated strings, here and in other similar places
@@ -287,52 +344,33 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	}
 	// If the game was compiled using unsupported version of the script API,
 	// we warn about potential incompatibilities but proceed further.
-	if (_GP(game).options[OPT_BASESCRIPTAPI] > kScriptAPI_Current)
-		_G(platform)->DisplayAlert("Warning: this game requests a higher version of AGS script API, it may not run correctly or run at all.");
+	if (game.options[OPT_BASESCRIPTAPI] > kScriptAPI_Current)
+		platform->DisplayAlert("Warning: this game requests a higher version of AGS script API, it may not run correctly or run at all.");
 
 	//
 	// 1. Check that the loaded data is valid and compatible with the current
 	// engine capabilities.
 	//
-	if (_GP(game).numfonts == 0)
+	if (game.numfonts == 0)
 		return new GameInitError(kGameInitErr_NoFonts);
-	if (_GP(game).audioClipTypes.size() > MAX_AUDIO_TYPES)
-		return new GameInitError(kGameInitErr_TooManyAudioTypes, String::FromFormat("Required: %u, max: %d", _GP(game).audioClipTypes.size(), MAX_AUDIO_TYPES));
-
-	//
-	// 2. Apply overriding config settings
-	//
-	// The earlier versions of AGS provided support for "upscaling" low-res
-	// games (320x200 and 320x240) to hi-res (640x400 and 640x480
-	// respectively). The script API has means for detecting if the game is
-	// running upscaled, and game developer could use this opportunity to setup
-	// game accordingly (e.g. assign hi-res fonts, etc).
-	// This feature is officially deprecated since 3.1.0, however the engine
-	// itself still supports it, technically.
-	// This overriding option re-enables "upscaling". It works ONLY for low-res
-	// resolutions, such as 320x200 and 320x240.
-	if (_G(loaded_game_file_version) < kGameVersion_310 && _GP(usetup).override_upscale) {
-		if (_GP(game).GetResolutionType() == kGameResolution_320x200)
-			_GP(game).SetGameResolution(kGameResolution_640x400);
-		else if (_GP(game).GetResolutionType() == kGameResolution_320x240)
-			_GP(game).SetGameResolution(kGameResolution_640x480);
-	}
+	if (game.audioClipTypes.size() > MAX_AUDIO_TYPES)
+		return new GameInitError(kGameInitErr_TooManyAudioTypes, String::FromFormat("Required: %u, max: %d", game.audioClipTypes.size(), MAX_AUDIO_TYPES));
 
 	//
 	// 3. Allocate and init game objects
 	//
-	_G(charextra) = (CharacterExtras *)calloc(_GP(game).numcharacters, sizeof(CharacterExtras));
-	_G(charcache) = (CharacterCache *)calloc(1, sizeof(CharacterCache) * _GP(game).numcharacters + 5);
-	_G(mls) = (MoveList *)calloc(_GP(game).numcharacters + MAX_ROOM_OBJECTS + 1, sizeof(MoveList));
-	_G(actSpsCount) = _GP(game).numcharacters + MAX_ROOM_OBJECTS + 2;
-	_G(actsps) = (Bitmap **)calloc(_G(actSpsCount), sizeof(Bitmap *));
-	_G(actspsbmp) = (IDriverDependantBitmap **)calloc(_G(actSpsCount), sizeof(IDriverDependantBitmap *));
-	_G(actspswb) = (Bitmap **)calloc(_G(actSpsCount), sizeof(Bitmap *));
-	_G(actspswbbmp) = (IDriverDependantBitmap **)calloc(_G(actSpsCount), sizeof(IDriverDependantBitmap *));
-	_G(actspswbcache) = (CachedActSpsData *)calloc(_G(actSpsCount), sizeof(CachedActSpsData));
-	_GP(play).charProps.resize(_GP(game).numcharacters);
-	_G(old_dialog_scripts) = ents.OldDialogScripts;
-	_G(old_speech_lines) = ents.OldSpeechLines;
+	charextra = (CharacterExtras *)calloc(game.numcharacters, sizeof(CharacterExtras));
+	charcache = (CharacterCache *)calloc(1, sizeof(CharacterCache) * game.numcharacters + 5);
+	mls = (MoveList *)calloc(game.numcharacters + MAX_ROOM_OBJECTS + 1, sizeof(MoveList));
+	actSpsCount = game.numcharacters + MAX_ROOM_OBJECTS + 2;
+	actsps = (Bitmap **)calloc(actSpsCount, sizeof(Bitmap *));
+	actspsbmp = (IDriverDependantBitmap **)calloc(actSpsCount, sizeof(IDriverDependantBitmap *));
+	actspswb = (Bitmap **)calloc(actSpsCount, sizeof(Bitmap *));
+	actspswbbmp = (IDriverDependantBitmap **)calloc(actSpsCount, sizeof(IDriverDependantBitmap *));
+	actspswbcache = (CachedActSpsData *)calloc(actSpsCount, sizeof(CachedActSpsData));
+	play.charProps.resize(game.numcharacters);
+	old_dialog_scripts = ents.OldDialogScripts;
+	old_speech_lines = ents.OldSpeechLines;
 	HError err = InitAndRegisterGameEntities();
 	if (!err)
 		return new GameInitError(kGameInitErr_EntityInitFail, err);
@@ -341,25 +379,25 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	//
 	// 4. Initialize certain runtime variables
 	//
-	_G(game_paused) = 0;  // reset the game paused flag
-	_G(ifacepopped) = -1;
+	game_paused = 0;  // reset the game paused flag
+	ifacepopped = -1;
 
 	String svg_suffix;
-	if (_GP(game).saveGameFileExtension[0] != 0)
-		svg_suffix.Format(".%s", _GP(game).saveGameFileExtension);
+	if (game.saveGameFileExtension[0] != 0)
+		svg_suffix.Format(".%s", game.saveGameFileExtension);
 	set_save_game_suffix(svg_suffix);
 
-	_GP(play).score_sound = _GP(game).scoreClipID;
-	_GP(play).fade_effect = _GP(game).options[OPT_FADETYPE];
+	play.score_sound = game.scoreClipID;
+	play.fade_effect = game.options[OPT_FADETYPE];
 
 	//
 	// 5. Initialize runtime state of certain game objects
 	//
-	for (int i = 0; i < _G(numguilabels); ++i) {
+	for (int i = 0; i < numguilabels; ++i) {
 		// labels are not clickable by default
-		_GP(guilabels)[i].SetClickable(false);
+		guilabels[i].SetClickable(false);
 	}
-	_GP(play).gui_draw_order = (int32_t *)calloc(_GP(game).numgui * sizeof(int32_t), 1);
+	play.gui_draw_order = (int *)calloc(game.numgui * sizeof(int), 1);
 	update_gui_zorder();
 	calculate_reserved_channel_count();
 
@@ -369,7 +407,7 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	// require access to script API at initialization time.
 	//
 	ccSetScriptAliveTimer(150000);
-	ccSetStringClassImpl(&_GP(myScriptStringImpl));
+	ccSetStringClassImpl(&myScriptStringImpl);
 	setup_script_exports(base_api, compat_api);
 
 	//
@@ -383,13 +421,13 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	// NOTE: we must do this after plugins, because some plugins may export
 	// script symbols too.
 	//
-	_GP(gamescript) = ents.GlobalScript;
-	_GP(dialogScriptsScript) = ents.DialogScript;
-	_G(numScriptModules) = ents.ScriptModules.size();
-	_GP(scriptModules) = ents.ScriptModules;
+	gamescript = ents.GlobalScript;
+	dialogScriptsScript = ents.DialogScript;
+	numScriptModules = ents.ScriptModules.size();
+	scriptModules = ents.ScriptModules;
 	AllocScriptModules();
 	if (create_global_script())
-		return new GameInitError(kGameInitErr_ScriptLinkFailed, _G(ccErrorString));
+		return new GameInitError(kGameInitErr_ScriptLinkFailed, ccErrorString);
 
 	return HGameInitError::None();
 }

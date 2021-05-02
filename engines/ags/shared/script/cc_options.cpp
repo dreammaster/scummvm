@@ -21,19 +21,20 @@
  */
 
 #include "ags/shared/script/cc_options.h"
-#include "ags/globals.h"
 
 namespace AGS3 {
 
+int ccCompOptions = SCOPT_LEFTTORIGHT;
+
 void ccSetOption(int optbit, int onoroff) {
 	if (onoroff)
-		_G(ccCompOptions) |= optbit;
+		ccCompOptions |= optbit;
 	else
-		_G(ccCompOptions) &= ~optbit;
+		ccCompOptions &= ~optbit;
 }
 
 int ccGetOption(int optbit) {
-	if (_G(ccCompOptions) & optbit)
+	if (ccCompOptions & optbit)
 		return 1;
 
 	return 0;

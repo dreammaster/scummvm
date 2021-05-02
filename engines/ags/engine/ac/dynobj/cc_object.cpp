@@ -20,13 +20,14 @@
  *
  */
 
-#include "ags/engine/ac/dynobj/cc_object.h"
-#include "ags/engine/ac/dynobj/scriptobject.h"
-#include "ags/shared/ac/common_defines.h"
-#include "ags/shared/game/roomstruct.h"
-#include "ags/globals.h"
+#include "ac/dynobj/cc_object.h"
+#include "ac/dynobj/scriptobject.h"
+#include "ac/common_defines.h"
+#include "game/roomstruct.h"
 
 namespace AGS3 {
+
+extern ScriptObject scrObj[MAX_ROOM_OBJECTS];
 
 // return the type name of the object
 const char *CCObject::GetType() {
@@ -36,7 +37,7 @@ const char *CCObject::GetType() {
 // serialize the object into BUFFER (which is BUFSIZE bytes)
 // return number of bytes used
 int CCObject::Serialize(const char *address, char *buffer, int bufsize) {
-	ScriptObject *shh = (ScriptObject *)const_cast<char *>(address);
+	ScriptObject *shh = (ScriptObject *)address;
 	StartSerialize(buffer);
 	SerializeInt(shh->id);
 	return EndSerialize();
@@ -45,7 +46,7 @@ int CCObject::Serialize(const char *address, char *buffer, int bufsize) {
 void CCObject::Unserialize(int index, const char *serializedData, int dataSize) {
 	StartUnserialize(serializedData, dataSize);
 	int num = UnserializeInt();
-	ccRegisterUnserializedObject(index, &_G(scrObj)[num], this);
+	ccRegisterUnserializedObject(index, &scrObj[num], this);
 }
 
 } // namespace AGS3

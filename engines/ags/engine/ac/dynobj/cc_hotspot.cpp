@@ -20,13 +20,14 @@
  *
  */
 
-#include "ags/engine/ac/dynobj/cc_hotspot.h"
-#include "ags/engine/ac/dynobj/scripthotspot.h"
-#include "ags/shared/ac/common_defines.h"
-#include "ags/shared/game/roomstruct.h"
-#include "ags/globals.h"
+#include "ac/dynobj/cc_hotspot.h"
+#include "ac/dynobj/scripthotspot.h"
+#include "ac/common_defines.h"
+#include "game/roomstruct.h"
 
 namespace AGS3 {
+
+extern ScriptHotspot scrHotspot[MAX_ROOM_HOTSPOTS];
 
 // return the type name of the object
 const char *CCHotspot::GetType() {
@@ -36,7 +37,7 @@ const char *CCHotspot::GetType() {
 // serialize the object into BUFFER (which is BUFSIZE bytes)
 // return number of bytes used
 int CCHotspot::Serialize(const char *address, char *buffer, int bufsize) {
-	ScriptHotspot *shh = (ScriptHotspot *)const_cast<char *>(address);
+	ScriptHotspot *shh = (ScriptHotspot *)address;
 	StartSerialize(buffer);
 	SerializeInt(shh->id);
 	return EndSerialize();
@@ -45,7 +46,7 @@ int CCHotspot::Serialize(const char *address, char *buffer, int bufsize) {
 void CCHotspot::Unserialize(int index, const char *serializedData, int dataSize) {
 	StartUnserialize(serializedData, dataSize);
 	int num = UnserializeInt();
-	ccRegisterUnserializedObject(index, &_G(scrHotspot)[num], this);
+	ccRegisterUnserializedObject(index, &scrHotspot[num], this);
 }
 
 } // namespace AGS3

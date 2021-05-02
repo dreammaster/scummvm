@@ -1,53 +1,42 @@
-/* ScummVM - Graphic Adventure Engine
- *
- * ScummVM is the legal property of its developers, whose names
- * are too numerous to list here. Please refer to the COPYRIGHT
- * file distributed with this source distribution.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- */
+//=============================================================================
+//
+// Adventure Game Studio (AGS)
+//
+// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
+// The full list of copyright holders can be found in the Copyright.txt
+// file, which is part of this source code distribution.
+//
+// The AGS source code is provided under the Artistic License 2.0.
+// A copy of this license can be found in the file License.txt and at
+// http://www.opensource.org/licenses/artistic-license-2.0.php
+//
+//=============================================================================
 
-#include "ags/engine/ac/global_slider.h"
-#include "ags/shared/ac/common.h"
-#include "ags/shared/ac/gamesetupstruct.h"
-#include "ags/engine/ac/slider.h"
-#include "ags/shared/gui/guimain.h"
-#include "ags/shared/gui/guislider.h"
-#include "ags/globals.h"
-
-namespace AGS3 {
+#include "ac/global_slider.h"
+#include "ac/common.h"
+#include "ac/gamesetupstruct.h"
+#include "ac/slider.h"
+#include "gui/guimain.h"
+#include "gui/guislider.h"
 
 using namespace AGS::Shared;
 
-void SetSliderValue(int guin, int objn, int valn) {
-	if ((guin < 0) | (guin >= _GP(game).numgui)) quit("!SetSliderValue: invalid GUI number");
-	if (_GP(guis)[guin].GetControlType(objn) != kGUISlider)
-		quit("!SetSliderValue: specified control is not a slider");
+extern GameSetupStruct game;
 
-	GUISlider *guisl = (GUISlider *)_GP(guis)[guin].GetControl(objn);
-	Slider_SetValue(guisl, valn);
+void SetSliderValue(int guin,int objn, int valn) {
+    if ((guin<0) | (guin>=game.numgui)) quit("!SetSliderValue: invalid GUI number");
+    if (guis[guin].GetControlType(objn)!=kGUISlider)
+        quit("!SetSliderValue: specified control is not a slider");
+
+    GUISlider*guisl=(GUISlider*)guis[guin].GetControl(objn);
+    Slider_SetValue(guisl, valn);
 }
 
-int GetSliderValue(int guin, int objn) {
-	if ((guin < 0) | (guin >= _GP(game).numgui)) quit("!GetSliderValue: invalid GUI number");
-	if (_GP(guis)[guin].GetControlType(objn) != kGUISlider)
-		quit("!GetSliderValue: specified control is not a slider");
+int GetSliderValue(int guin,int objn) {
+    if ((guin<0) | (guin>=game.numgui)) quit("!GetSliderValue: invalid GUI number");
+    if (guis[guin].GetControlType(objn)!=kGUISlider)
+        quit("!GetSliderValue: specified control is not a slider");
 
-	GUISlider *guisl = (GUISlider *)_GP(guis)[guin].GetControl(objn);
-	return Slider_GetValue(guisl);
+    GUISlider*guisl=(GUISlider*)guis[guin].GetControl(objn);
+    return Slider_GetValue(guisl);
 }
-
-} // namespace AGS3
