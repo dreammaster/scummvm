@@ -31,7 +31,8 @@
 #pragma unmanaged
 #pragma warning (disable: 4996 4312)  // disable deprecation warnings
 #endif
-//include <time.h>
+
+#include "common/system.h"
 #include "ags/shared/ac/common.h" // quit
 #include "ags/shared/ac/game_struct_defines.h"
 #include "ags/shared/ac/sprite_cache.h"
@@ -529,7 +530,7 @@ int SpriteCache::SaveToFile(const char *filename, bool compressOutput, SpriteFil
 			return -1;
 	}
 
-	int spriteFileIDCheck = (int)time(nullptr);
+	int spriteFileIDCheck = g_system->getMillis();
 
 	// sprite file version
 	output->WriteInt16(kSprfVersion_Current);

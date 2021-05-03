@@ -1,24 +1,32 @@
-//=============================================================================
-//
-// Adventure Game Studio (AGS)
-//
-// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
-// The full list of copyright holders can be found in the Copyright.txt
-// file, which is part of this source code distribution.
-//
-// The AGS source code is provided under the Artistic License 2.0.
-// A copy of this license can be found in the file License.txt and at
-// http://www.opensource.org/licenses/artistic-license-2.0.php
-//
-//=============================================================================
-//
-//
-//
-//=============================================================================
-#ifndef AGS_ENGINE_AC__SYS_EVENTS_H
-#define AGS_ENGINE_AC__SYS_EVENTS_H
-#include "ac/keycode.h"
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
+
+#ifndef AGS_ENGINE_AC_SYS_EVENTS_H
+#define AGS_ENGINE_AC_SYS_EVENTS_H
+
+#include "ags/engine/ac/keycode.h"
 //include <SDL_keyboard.h>
+
+namespace AGS3 {
 
 // AGS own mouse button codes
 // TODO: these were internal button codes, but AGS script uses different ones,
@@ -27,12 +35,11 @@
 // then just replace these matching script ones!
 // UPD: even plugin API seem to match script codes and require remap to internals.
 // UPD: or use SDL constants in the engine, but make conversion more visible by using a function.
-enum eAGSMouseButton
-{
-    MouseNone     = -1,
-    MouseLeft     =  0,
-    MouseRight    =  1,
-    MouseMiddle   =  2
+enum eAGSMouseButton {
+	MouseNone = -1,
+	MouseLeft = 0,
+	MouseRight = 1,
+	MouseMiddle = 2
 };
 
 
@@ -49,23 +56,21 @@ eAGSKeyCode ags_keycode_from_sdl(const SDL_Event &event);
 bool ags_key_to_sdl_scan(eAGSKeyCode key, SDL_Scancode(&scan)[3]);
 
 // Tells if key event refers to one of the mod-keys
-inline bool is_mod_key(const SDL_Keysym &key)
-{
-    return key.scancode == SDL_SCANCODE_LCTRL || key.scancode == SDL_SCANCODE_RCTRL ||
-        key.scancode == SDL_SCANCODE_LALT || key.scancode == SDL_SCANCODE_RALT ||
-        key.scancode == SDL_SCANCODE_LSHIFT || key.scancode == SDL_SCANCODE_RSHIFT ||
-        key.scancode == SDL_SCANCODE_MODE;
+inline bool is_mod_key(const SDL_Keysym &key) {
+	return key.scancode == SDL_SCANCODE_LCTRL || key.scancode == SDL_SCANCODE_RCTRL ||
+		key.scancode == SDL_SCANCODE_LALT || key.scancode == SDL_SCANCODE_RALT ||
+		key.scancode == SDL_SCANCODE_LSHIFT || key.scancode == SDL_SCANCODE_RSHIFT ||
+		key.scancode == SDL_SCANCODE_MODE;
 }
 
 // Converts mod key into merged mod (left & right) for easier handling
-inline int make_merged_mod(int mod)
-{
-    int m_mod = 0;
-    if ((mod & KMOD_CTRL) != 0) m_mod |= KMOD_CTRL;
-    if ((mod & KMOD_SHIFT) != 0) m_mod |= KMOD_SHIFT;
-    if ((mod & KMOD_ALT) != 0) m_mod |= KMOD_ALT;
-    // what about KMOD_GUI, and there's also some SDL_SCANCODE_MODE?
-    return m_mod;
+inline int make_merged_mod(int mod) {
+	int m_mod = 0;
+	if ((mod & KMOD_CTRL) != 0) m_mod |= KMOD_CTRL;
+	if ((mod & KMOD_SHIFT) != 0) m_mod |= KMOD_SHIFT;
+	if ((mod & KMOD_ALT) != 0) m_mod |= KMOD_ALT;
+	// what about KMOD_GUI, and there's also some SDL_SCANCODE_MODE?
+	return m_mod;
 }
 
 // Tells if there are any buffered key events
@@ -122,4 +127,6 @@ void sys_evt_process_one(const SDL_Event &event);
 // Process all events in the backend's queue.
 void sys_evt_process_pending(void);
 
-#endif // AGS_ENGINE_AC__SYS_EVENTS_H
+} // namespace AGS3
+
+#endif

@@ -130,11 +130,11 @@ struct DebugGroupID {
 	uint32_t    ID;
 	String      SID;
 
-	DebugGroupID() : ID(kDbgGroup_None) {
+	DebugGroupID() : ID((uint32_t)kDbgGroup_None) {
 	}
 	DebugGroupID(uint32_t id, const String &sid = "") : ID(id), SID(sid) {
 	}
-	DebugGroupID(const String &sid) : ID(kDbgGroup_None), SID(sid) {
+	DebugGroupID(const String &sid) : ID((uint32_t)kDbgGroup_None), SID(sid) {
 	}
 	// Tells if any of the id components is valid
 	bool IsValid() const {

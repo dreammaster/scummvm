@@ -200,4 +200,4 @@ private:
     bool _hasChangedVisible = false;
 };
 
-#endif // AGS_ENGINE_AC__VIEWPORT_H
+#endif // AGS_ENGINE_AC_VIEWPORT_H

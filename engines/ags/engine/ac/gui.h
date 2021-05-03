@@ -1,25 +1,32 @@
-//=============================================================================
-//
-// Adventure Game Studio (AGS)
-//
-// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
-// The full list of copyright holders can be found in the Copyright.txt
-// file, which is part of this source code distribution.
-//
-// The AGS source code is provided under the Artistic License 2.0.
-// A copy of this license can be found in the file License.txt and at
-// http://www.opensource.org/licenses/artistic-license-2.0.php
-//
-//=============================================================================
-//
-//
-//
-//=============================================================================
-#ifndef AGS_ENGINE_AC__GUI_H
-#define AGS_ENGINE_AC__GUI_H
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
-#include "ac/dynobj/scriptgui.h"
-#include "gui/guimain.h"
+#ifndef AGS_ENGINE_AC_GUI_H
+#define AGS_ENGINE_AC_GUI_H
+
+#include "ags/engine/ac/dynobj/script_gui.h"
+#include "ags/engine/gui/gui_main.h"
+
+namespace AGS3 {
 
 using AGS::Shared::GUIMain;
 using AGS::Shared::GUIObject;
@@ -43,7 +50,7 @@ int		GUI_GetZOrder(ScriptGUI *tehgui);
 void	GUI_SetClickable(ScriptGUI *tehgui, int clickable);
 int		GUI_GetClickable(ScriptGUI *tehgui);
 int		GUI_GetID(ScriptGUI *tehgui);
-GUIObject* GUI_GetiControls(ScriptGUI *tehgui, int idx);
+GUIObject *GUI_GetiControls(ScriptGUI *tehgui, int idx);
 int		GUI_GetControlCount(ScriptGUI *tehgui);
 void    GUI_SetPopupYPos(ScriptGUI *tehgui, int newpos);
 int     GUI_GetPopupYPos(ScriptGUI *tehgui);
@@ -70,11 +77,11 @@ void	export_gui_controls(int ee);
 void	unexport_gui_controls(int ee);
 int		convert_gui_disabled_style(int oldStyle);
 void	update_gui_disabled_status();
-int		adjust_x_for_guis (int xx, int yy);
-int		adjust_y_for_guis ( int yy);
+int		adjust_x_for_guis(int xx, int yy);
+int		adjust_y_for_guis(int yy);
 void	recreate_guibg_image(GUIMain *tehgui);
 
-int     gui_get_interactable(int x,int y);
+int     gui_get_interactable(int x, int y);
 int     gui_on_mouse_move();
 void    gui_on_mouse_hold(const int wasongui, const int wasbutdown);
 void    gui_on_mouse_up(const int wasongui, const int wasbutdown);
@@ -85,4 +92,6 @@ extern int ifacepopped;
 extern int ifacepopped;
 extern int mouse_on_iface;
 
-#endif // AGS_ENGINE_AC__GUI_H
+} // namespace AGS3
+
+#endif

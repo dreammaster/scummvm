@@ -1,25 +1,32 @@
-//=============================================================================
-//
-// Adventure Game Studio (AGS)
-//
-// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
-// The full list of copyright holders can be found in the Copyright.txt
-// file, which is part of this source code distribution.
-//
-// The AGS source code is provided under the Artistic License 2.0.
-// A copy of this license can be found in the file License.txt and at
-// http://www.opensource.org/licenses/artistic-license-2.0.php
-//
-//=============================================================================
-//
-//
-//
-//=============================================================================
-#ifndef AGS_ENGINE_AC__EVENT_H
-#define AGS_ENGINE_AC__EVENT_H
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
-#include "ac/runtime_defines.h"
-#include "script/runtimescriptvalue.h"
+#ifndef AGS_ENGINE_AC_EVENT_H
+#define AGS_ENGINE_AC_EVENT_H
+
+#include "ags/engine/ac/runtime_defines.h"
+#include "ags/engine/script/runtime_script_value.h"
+
+namespace AGS3 {
 
 // parameters to run_on_event
 #define GE_LEAVE_ROOM 1
@@ -46,38 +53,39 @@
 #define EVB_ROOM    2
 
 struct EventHappened {
-    int type;
-    int data1,data2,data3;
-    int player;
+	int type;
+	int data1, data2, data3;
+	int player;
 };
 
 int run_claimable_event(const char *tsname, bool includeRoom, int numParams, const RuntimeScriptValue *params, bool *eventWasClaimed);
 // runs the global script on_event fnuction
-void run_on_event (int evtype, RuntimeScriptValue &wparam);
+void run_on_event(int evtype, RuntimeScriptValue &wparam);
 void run_room_event(int id);
 void run_event_block_inv(int invNum, int event);
 // event list functions
-void setevent(int evtyp,int ev1=0,int ev2=-1000,int ev3=0);
-void force_event(int evtyp,int ev1=0,int ev2=-1000,int ev3=0);
-void process_event(EventHappened*evp);
-void runevent_now (int evtyp, int ev1, int ev2, int ev3);
-void processallevents(int numev,EventHappened*evlist);
+void setevent(int evtyp, int ev1 = 0, int ev2 = -1000, int ev3 = 0);
+void force_event(int evtyp, int ev1 = 0, int ev2 = -1000, int ev3 = 0);
+void process_event(EventHappened *evp);
+void runevent_now(int evtyp, int ev1, int ev2, int ev3);
+void processallevents(int numev, EventHappened *evlist);
 void update_events();
 // end event list functions
 void ClaimEvent();
 
-extern int in_enters_screen,done_es_error;
+extern int in_enters_screen, done_es_error;
 extern int in_leaves_screen;
 
-extern EventHappened event[MAXEVENTS+1];
+extern EventHappened event[MAXEVENTS + 1];
 extern int numevents;
 
-extern const char*evblockbasename;
+extern const char *evblockbasename;
 extern int evblocknum;
 
 extern int eventClaimed;
 
-extern const char*tsnames[4];
+extern const char *tsnames[4];
 
-#endif // AGS_ENGINE_AC__EVENT_H
+} // namespace AGS3
 
+#endif

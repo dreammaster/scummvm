@@ -186,7 +186,7 @@ struct GameSetupStructBase {
 	inline bool IsLegacyHiRes() const {
 		if (_resolutionType == kGameResolution_Custom)
 			return (_gameResolution.Width * _gameResolution.Height) > (320 * 240);
-		return ::IsLegacyHiRes(_resolutionType);
+		return AGS3::IsLegacyHiRes(_resolutionType);
 	}
 	// Tells if data has coordinates in default game resolution
 	inline bool IsDataInNativeCoordinates() const {

@@ -89,6 +89,16 @@ ForwardIt lower_bound(ForwardIt first, ForwardIt last, const T &value) {
 	return last;
 }
 
+template<class ForwardIt, class T>
+ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T &value) {
+	for (ForwardIt it = first; it < last; ++it) {
+		if (*it > value)
+			return it;
+	}
+
+	return last;
+}
+
 } // namespace std
 } // namespace AGS3
 

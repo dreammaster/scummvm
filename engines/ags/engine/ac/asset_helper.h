@@ -1,27 +1,45 @@
-//=============================================================================
-//
-// Adventure Game Studio (AGS)
-//
-// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
-// The full list of copyright holders can be found in the Copyright.txt
-// file, which is part of this source code distribution.
-//
-// The AGS source code is provided under the Artistic License 2.0.
-// A copy of this license can be found in the file License.txt and at
-// http://www.opensource.org/licenses/artistic-license-2.0.php
-//
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
+
 //=============================================================================
 //
 // Functions related to finding and opening game assets.
 //
 //=============================================================================
-#ifndef AGS_ENGINE_AC__ASSETHELPER_H
-#define AGS_ENGINE_AC__ASSETHELPER_H
+
+#ifndef AGS_ENGINE_AC_ASSET_HELPER_H
+#define AGS_ENGINE_AC_ASSET_HELPER_H
+
 #include "ags/lib/std/memory.h"
 #include "ags/lib/std/utility.h"
-#include "util/string.h"
+#include "ags/shared/util/string.h"
 
-namespace AGS { namespace Shared {class Stream;}}
+namespace AGS3 {
+
+namespace AGS {
+namespace Shared {
+class Stream;
+}
+}
 using AGS::Shared::Stream;
 using AGS::Shared::String;
 
@@ -29,16 +47,16 @@ using AGS::Shared::String;
 String  find_assetlib(const String &filename);
 
 extern "C" {
-    struct PACKFILE; // Allegro 4's own stream type
+	struct PACKFILE; // Allegro 4's own stream type
 }
 
 // AssetPath combines asset name and optional library filter, that serves to narrow down the search
-struct AssetPath
-{
-    String Name;
-    String Filter;
+struct AssetPath {
+	String Name;
+	String Filter;
 
-    AssetPath(const String &name = "", const String &filter = "") : Name(name), Filter(filter) {}
+	AssetPath(const String &name = "", const String &filter = "") : Name(name), Filter(filter) {
+	}
 };
 
 // Returns the path to the audio asset, considering the given bundling type
@@ -51,11 +69,10 @@ Stream *LocateAsset(const AssetPath &path, size_t &asset_size);
 // Custom AGS PACKFILE user object
 // TODO: it is preferrable to let our Stream define custom readable window instead,
 // keeping this as simple as possible for now (we may require a stream classes overhaul).
-struct AGS_PACKFILE_OBJ
-{
-    std::unique_ptr<Stream> stream;
-    size_t asset_size = 0u;
-    size_t remains = 0u;
+struct AGS_PACKFILE_OBJ {
+	std::unique_ptr<Stream> stream;
+	size_t asset_size = 0u;
+	size_t remains = 0u;
 };
 // Creates PACKFILE stream from AGS asset.
 // This function is supposed to be used only when you have to create Allegro
@@ -63,4 +80,6 @@ struct AGS_PACKFILE_OBJ
 PACKFILE *PackfileFromAsset(const AssetPath &path, size_t &asset_size);
 bool DoesAssetExistInLib(const AssetPath &assetname);
 
-#endif // AGS_ENGINE_AC__ASSETHELPER_H
+} // namespace AGS3
+
+#endif

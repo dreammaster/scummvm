@@ -43,7 +43,7 @@ struct DebugMessage {
 	String       GroupName;
 	MessageType  MT;
 
-	DebugMessage() : GroupID(kDbgGroup_None), MT(kDbgMsg_None) {
+	DebugMessage() : GroupID((uint32_t)kDbgGroup_None), MT(kDbgMsg_None) {
 	}
 	DebugMessage(const String &text, uint32_t group_id, const String &group_name, MessageType mt)
 		: Text(text)

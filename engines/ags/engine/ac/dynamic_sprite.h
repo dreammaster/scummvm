@@ -1,28 +1,35 @@
-//=============================================================================
-//
-// Adventure Game Studio (AGS)
-//
-// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
-// The full list of copyright holders can be found in the Copyright.txt
-// file, which is part of this source code distribution.
-//
-// The AGS source code is provided under the Artistic License 2.0.
-// A copy of this license can be found in the file License.txt and at
-// http://www.opensource.org/licenses/artistic-license-2.0.php
-//
-//=============================================================================
-//
-//
-//
-//=============================================================================
-#ifndef AGS_ENGINE_AC__DYNAMICSPRITE_H
-#define AGS_ENGINE_AC__DYNAMICSPRITE_H
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
-#include "ac/dynobj/scriptdynamicsprite.h"
-#include "ac/dynobj/scriptdrawingsurface.h"
+#ifndef AGS_ENGINE_AC_DYNAMICSPRITE_H
+#define AGS_ENGINE_AC_DYNAMICSPRITE_H
+
+#include "ags/engine/ac/dynobj/script_dynamic_sprite.h"
+#include "ags/engine/ac/dynobj/script_drawing_surface.h"
+
+namespace AGS3 {
 
 void	DynamicSprite_Delete(ScriptDynamicSprite *sds);
-ScriptDrawingSurface* DynamicSprite_GetDrawingSurface(ScriptDynamicSprite *dss);
+ScriptDrawingSurface *DynamicSprite_GetDrawingSurface(ScriptDynamicSprite *dss);
 int		DynamicSprite_GetGraphic(ScriptDynamicSprite *sds);
 int		DynamicSprite_GetWidth(ScriptDynamicSprite *sds);
 int		DynamicSprite_GetHeight(ScriptDynamicSprite *sds);
@@ -34,18 +41,20 @@ void	DynamicSprite_ChangeCanvasSize(ScriptDynamicSprite *sds, int width, int hei
 void	DynamicSprite_Crop(ScriptDynamicSprite *sds, int x1, int y1, int width, int height);
 void	DynamicSprite_Rotate(ScriptDynamicSprite *sds, int angle, int width, int height);
 void	DynamicSprite_Tint(ScriptDynamicSprite *sds, int red, int green, int blue, int saturation, int luminance);
-int		DynamicSprite_SaveToFile(ScriptDynamicSprite *sds, const char* namm);
-ScriptDynamicSprite* DynamicSprite_CreateFromSaveGame(int sgslot, int width, int height);
-ScriptDynamicSprite* DynamicSprite_CreateFromFile(const char *filename);
-ScriptDynamicSprite* DynamicSprite_CreateFromScreenShot(int width, int height);
-ScriptDynamicSprite* DynamicSprite_CreateFromExistingSprite(int slot, int preserveAlphaChannel);
-ScriptDynamicSprite* DynamicSprite_CreateFromDrawingSurface(ScriptDrawingSurface *sds, int x, int y, int width, int height);
-ScriptDynamicSprite* DynamicSprite_Create(int width, int height, int alphaChannel);
-ScriptDynamicSprite* DynamicSprite_CreateFromExistingSprite_Old(int slot);
-ScriptDynamicSprite* DynamicSprite_CreateFromBackground(int frame, int x1, int y1, int width, int height);
+int		DynamicSprite_SaveToFile(ScriptDynamicSprite *sds, const char *namm);
+ScriptDynamicSprite *DynamicSprite_CreateFromSaveGame(int sgslot, int width, int height);
+ScriptDynamicSprite *DynamicSprite_CreateFromFile(const char *filename);
+ScriptDynamicSprite *DynamicSprite_CreateFromScreenShot(int width, int height);
+ScriptDynamicSprite *DynamicSprite_CreateFromExistingSprite(int slot, int preserveAlphaChannel);
+ScriptDynamicSprite *DynamicSprite_CreateFromDrawingSurface(ScriptDrawingSurface *sds, int x, int y, int width, int height);
+ScriptDynamicSprite *DynamicSprite_Create(int width, int height, int alphaChannel);
+ScriptDynamicSprite *DynamicSprite_CreateFromExistingSprite_Old(int slot);
+ScriptDynamicSprite *DynamicSprite_CreateFromBackground(int frame, int x1, int y1, int width, int height);
 
 
 void	add_dynamic_sprite(int gotSlot, Shared::Bitmap *redin, bool hasAlpha = false);
-void	free_dynamic_sprite (int gotSlot);
+void	free_dynamic_sprite(int gotSlot);
 
-#endif // AGS_ENGINE_AC__DYNAMICSPRITE_H
+} // namespace AGS3
+
+#endif

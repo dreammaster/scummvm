@@ -39,6 +39,7 @@
 #ifndef AGS_SHARED_CORE_ASSET_MANAGER_H
 #define AGS_SHARED_CORE_ASSET_MANAGER_H
 
+#include "ags/lib/std/functional.h"
 #include "ags/lib/std/memory.h"
 #include "ags/shared/core/asset.h"
 #include "ags/shared/util/file.h" // TODO: extract filestream mode constants or introduce generic ones

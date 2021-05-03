@@ -1,30 +1,46 @@
-//=============================================================================
-//
-// Adventure Game Studio (AGS)
-//
-// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
-// The full list of copyright holders can be found in the Copyright.txt
-// file, which is part of this source code distribution.
-//
-// The AGS source code is provided under the Artistic License 2.0.
-// A copy of this license can be found in the file License.txt and at
-// http://www.opensource.org/licenses/artistic-license-2.0.php
-//
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
+
 //=============================================================================
 //
 // AGS Runtime header
 //
 //=============================================================================
 
-#ifndef AGS_ENGINE_AC__GAME_H
-#define AGS_ENGINE_AC__GAME_H
+#ifndef AGS_ENGINE_AC_GAME_H
+#define AGS_ENGINE_AC_GAME_H
 
-#include "ac/dynobj/scriptviewframe.h"
-#include "main/game_file.h"
-#include "util/string.h"
+#include "ags/engine/ac/dynobj/script_view_frame.h"
+#include "ags/engine/main/game_file.h"
+#include "ags/shared/util/string.h"
+
+namespace AGS3 {
 
 // Forward declaration
-namespace AGS { namespace Shared { class Bitmap; class Stream; } }
+namespace AGS {
+namespace Shared {
+class Bitmap; class Stream;
+}
+}
 using namespace AGS; // FIXME later
 
 #define RAGMODE_PRESERVEGLOBALINT 1
@@ -45,15 +61,14 @@ using namespace AGS; // FIXME later
 #define GP_NUMINVITEMS   12
 #define GP_ISFRAMEFLIPPED 13
 
-enum CutsceneSkipStyle
-{
-    kSkipSceneUndefined = 0,
-    eSkipSceneEscOnly = 1,
-    eSkipSceneAnyKey = 2,
-    eSkipSceneMouse = 3,
-    eSkipSceneKeyMouse = 4,
-    eSkipSceneEscOrRMB = 5,
-    eSkipSceneScriptOnly = 6
+enum CutsceneSkipStyle {
+	kSkipSceneUndefined = 0,
+	eSkipSceneEscOnly = 1,
+	eSkipSceneAnyKey = 2,
+	eSkipSceneMouse = 3,
+	eSkipSceneKeyMouse = 4,
+	eSkipSceneEscOrRMB = 5,
+	eSkipSceneScriptOnly = 6
 };
 
 //=============================================================================
@@ -82,9 +97,9 @@ bool SetCustomSaveParent(const Shared::String &path);
 // as a relative to system's user saves directory
 bool SetSaveGameDirectoryPath(const char *newFolder, bool explicit_path = false);
 int Game_SetSaveGameDirectory(const char *newFolder);
-const char* Game_GetSaveSlotDescription(int slnum);
+const char *Game_GetSaveSlotDescription(int slnum);
 
-const char* Game_GetGlobalStrings(int index);
+const char *Game_GetGlobalStrings(int index);
 
 int Game_GetInventoryItemCount();
 int Game_GetFontCount();
@@ -98,7 +113,7 @@ int Game_GetSpriteHeight(int spriteNum);
 int Game_GetLoopCountForView(int viewNumber);
 int Game_GetRunNextSettingForLoop(int viewNumber, int loopNumber);
 int Game_GetFrameCountForLoop(int viewNumber, int loopNumber);
-ScriptViewFrame* Game_GetViewFrame(int viewNumber, int loopNumber, int frame);
+ScriptViewFrame *Game_GetViewFrame(int viewNumber, int loopNumber, int frame);
 int Game_DoOnceOnly(const char *token);
 
 int  Game_GetTextReadingSpeed();
@@ -115,15 +130,15 @@ int Game_GetSkippingCutscene();
 int Game_GetInSkippableCutscene();
 
 int Game_GetColorFromRGB(int red, int grn, int blu);
-const char* Game_InputBox(const char *msg);
-const char* Game_GetLocationName(int x, int y);
+const char *Game_InputBox(const char *msg);
+const char *Game_GetLocationName(int x, int y);
 
-const char* Game_GetGlobalMessages(int index);
+const char *Game_GetGlobalMessages(int index);
 
 int Game_GetSpeechFont();
 int Game_GetNormalFont();
 
-const char* Game_GetTranslationFilename();
+const char *Game_GetTranslationFilename();
 int Game_ChangeTranslation(const char *newFilename);
 
 //=============================================================================
@@ -142,7 +157,7 @@ void save_game_dialog();
 void free_do_once_tokens();
 // Free all the memory associated with the game
 void unload_game_file();
-void save_game(int slotn, const char*descript);
+void save_game(int slotn, const char *descript);
 bool read_savedgame_description(const Shared::String &savedgame, Shared::String &description);
 bool read_savedgame_screenshot(const Shared::String &savedgame, int &want_shot);
 // Tries to restore saved game and displays an error on failure; if the error occured
@@ -158,13 +173,13 @@ long write_screen_shot_for_vista(Shared::Stream *out, Shared::Bitmap *screenshot
 
 bool is_in_cutscene();
 CutsceneSkipStyle get_cutscene_skipstyle();
-void start_skipping_cutscene ();
+void start_skipping_cutscene();
 bool check_skip_cutscene_keypress(int kgn);
 bool check_skip_cutscene_mclick(int mbut);
 void initialize_skippable_cutscene();
 void stop_fast_forwarding();
 
-int __GetLocationType(int xxx,int yyy, int allowHotspot0);
+int __GetLocationType(int xxx, int yyy, int allowHotspot0);
 
 // Called whenever game looses input focus
 void display_switch_out();
@@ -175,9 +190,9 @@ void display_switch_out_suspend();
 // Called when the game gets input focus and should resume
 void display_switch_in_resume();
 
-void replace_tokens(const char*srcmes,char*destm, int maxlen = 99999);
-const char *get_global_message (int msnum);
-void get_message_text (int msnum, char *buffer, char giveErr = 1);
+void replace_tokens(const char *srcmes, char *destm, int maxlen = 99999);
+const char *get_global_message(int msnum);
+void get_message_text(int msnum, char *buffer, char giveErr = 1);
 
 bool unserialize_audio_script_object(int index, const char *objectType, const char *serializedData, int dataSize);
 
@@ -197,4 +212,6 @@ extern unsigned int loopcounter;
 extern void set_loop_counter(unsigned int new_counter);
 extern int game_paused;
 
-#endif // AGS_ENGINE_AC__GAME_H
+} // namespace AGS3
+
+#endif

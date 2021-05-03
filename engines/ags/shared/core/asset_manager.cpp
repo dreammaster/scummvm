@@ -20,8 +20,8 @@
  *
  */
 
-#include "ags/shared/core/asset_manager.h"
 #include "ags/lib/std/algorithm.h"
+#include "ags/shared/core/asset_manager.h"
 #include "ags/shared/util/misc.h" // ci_fopen
 #include "ags/shared/util/multi_file_lib.h"
 #include "ags/shared/util/path.h"

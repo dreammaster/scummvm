@@ -20,7 +20,7 @@
  *
  */
 
-//include <alfont.h>
+#include "ags/lib/alfont/alfont.h"
 #include "ags/shared/core/platform.h"
 
 #define AGS_OUTLINE_FONT_FIX (!AGS_PLATFORM_OS_WINDOWS)
@@ -93,12 +93,12 @@ bool TTFFontRenderer::LoadFromDiskEx(int fontNumber, int fontSize, const FontRen
 	String file_name = String::FromFormat("agsfnt%d.ttf", fontNumber);
 	soff_t lenof = 0;
 	Stream *reader = AssetMgr->OpenAsset(file_name, &lenof);
-	char *membuffer;
+	byte *membuffer;
 
 	if (reader == nullptr)
 		return false;
 
-	membuffer = (char *)malloc(lenof);
+	membuffer = (byte *)malloc(lenof);
 	reader->ReadArray(membuffer, lenof, 1);
 	delete reader;
 

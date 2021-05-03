@@ -15,32 +15,33 @@
 //
 //
 //=============================================================================
-#ifndef AGS_ENGINE_AC__DRAW_H
-#define AGS_ENGINE_AC__DRAW_H
+#ifndef AGS_ENGINE_AC_DRAW_H
+#define AGS_ENGINE_AC_DRAW_H
 
 #include "ags/lib/std/memory.h"
 #include "ags/shared/core/types.h"
-#include "ac/common_defines.h"
-#include "gfx/gfx_def.h"
+#include "ags/shared/ac/common_defines.h"
+#include "ags/shared/gfx/gfx_def.h"
 
-namespace AGS
-{
-    namespace Shared
-    {
-        class Bitmap;
-        typedef std::shared_ptr<Shared::Bitmap> PBitmap;
-    }
-    namespace Engine { class IDriverDependantBitmap; }
+namespace AGS3 {
+namespace AGS {
+namespace Shared {
+class Bitmap;
+typedef std::shared_ptr<Shared::Bitmap> PBitmap;
+}
+namespace Engine {
+class IDriverDependantBitmap;
+}
 }
 using namespace AGS; // FIXME later
 
 #define IS_ANTIALIAS_SPRITES usetup.enable_antialiasing && (play.disable_antialiasing == 0)
 
 struct CachedActSpsData {
-    int xWas, yWas;
-    int baselineWas;
-    int isWalkBehindHere;
-    int valid;
+	int xWas, yWas;
+	int baselineWas;
+	int isWalkBehindHere;
+	int valid;
 };
 
 // Converts AGS color index to the actual bitmap color using game's color depth
@@ -86,7 +87,7 @@ void mark_current_background_dirty();
 void invalidate_cached_walkbehinds();
 // Avoid freeing and reallocating the memory if possible
 Shared::Bitmap *recycle_bitmap(Shared::Bitmap *bimp, int coldep, int wid, int hit, bool make_transparent = false);
-Engine::IDriverDependantBitmap* recycle_ddb_bitmap(Engine::IDriverDependantBitmap *bimp, Shared::Bitmap *source, bool hasAlpha = false, bool opaque = false);
+Engine::IDriverDependantBitmap *recycle_ddb_bitmap(Engine::IDriverDependantBitmap *bimp, Shared::Bitmap *source, bool hasAlpha = false, bool opaque = false);
 // Draw everything 
 void render_graphics(Engine::IDriverDependantBitmap *extraBitmap = nullptr, int extraX = 0, int extraY = 0);
 // Construct game scene, scheduling drawing list for the renderer
@@ -95,12 +96,12 @@ void construct_game_scene(bool full_redraw = false);
 void construct_game_screen_overlay(bool draw_mouse = true);
 // Construct engine overlay with debugging tools (fps, console)
 void construct_engine_overlay();
-void add_to_sprite_list(Engine::IDriverDependantBitmap* spp, int xx, int yy, int baseline, int trans, int sprNum, bool isWalkBehind = false);
-void tint_image (Shared::Bitmap *g, Shared::Bitmap *source, int red, int grn, int blu, int light_level, int luminance=255);
+void add_to_sprite_list(Engine::IDriverDependantBitmap *spp, int xx, int yy, int baseline, int trans, int sprNum, bool isWalkBehind = false);
+void tint_image(Shared::Bitmap *g, Shared::Bitmap *source, int red, int grn, int blu, int light_level, int luminance = 255);
 void draw_sprite_support_alpha(Shared::Bitmap *ds, bool ds_has_alpha, int xpos, int ypos, Shared::Bitmap *image, bool src_has_alpha,
-                               Shared::BlendMode blend_mode = Shared::kBlendMode_Alpha, int alpha = 0xFF);
+	Shared::BlendMode blend_mode = Shared::kBlendMode_Alpha, int alpha = 0xFF);
 void draw_sprite_slot_support_alpha(Shared::Bitmap *ds, bool ds_has_alpha, int xpos, int ypos, int src_slot,
-                                    Shared::BlendMode blend_mode = Shared::kBlendMode_Alpha, int alpha = 0xFF);
+	Shared::BlendMode blend_mode = Shared::kBlendMode_Alpha, int alpha = 0xFF);
 void draw_gui_sprite(Shared::Bitmap *ds, int pic, int x, int y, bool use_alpha, Shared::BlendMode blend_mode);
 void draw_gui_sprite_v330(Shared::Bitmap *ds, int pic, int x, int y, bool use_alpha = true, Shared::BlendMode blend_mode = Shared::kBlendMode_Alpha);
 // Render game on screen
@@ -109,7 +110,7 @@ void render_to_screen();
 void draw_game_screen_callback();
 void GfxDriverOnInitCallback(void *data);
 bool GfxDriverNullSpriteCallback(int x, int y);
-void putpixel_compensate (Shared::Bitmap *g, int xx,int yy, int col);
+void putpixel_compensate(Shared::Bitmap *g, int xx, int yy, int col);
 // create the actsps[aa] image with the object drawn correctly
 // returns 1 if nothing at all has changed and actsps is still
 // intact from last time; 0 otherwise
@@ -160,4 +161,6 @@ Shared::PBitmap PrepareSpriteForUse(Shared::PBitmap bitmap, bool has_alpha);
 // of the requested width and height and game's native color depth.
 Shared::Bitmap *CopyScreenIntoBitmap(int width, int height, bool at_native_res = false);
 
-#endif // AGS_ENGINE_AC__DRAW_H
+} // namespace AGS3
+
+#endif

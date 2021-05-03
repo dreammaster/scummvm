@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_SCRIPT_EXECUTING_SCRIPT_H
 #define AGS_ENGINE_SCRIPT_EXECUTING_SCRIPT_H
 
-#include "script/cc_instance.h"
+#include "ags/engine/script/cc_instance.h"
 
 namespace AGS3 {
 

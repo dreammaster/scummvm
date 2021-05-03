@@ -1,15 +1,25 @@
-//=============================================================================
-//
-// Adventure Game Studio (AGS)
-//
-// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
-// The full list of copyright holders can be found in the Copyright.txt
-// file, which is part of this source code distribution.
-//
-// The AGS source code is provided under the Artistic License 2.0.
-// A copy of this license can be found in the file License.txt and at
-// http://www.opensource.org/licenses/artistic-license-2.0.php
-//
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
+
 //=============================================================================
 //
 // Functions related to constructing game and script paths.
@@ -19,10 +29,13 @@
 // not work with explicit paths or creates directories on its own.
 //
 //=============================================================================
-#ifndef AGS_ENGINE_AC__PATHHELPER_H
-#define AGS_ENGINE_AC__PATHHELPER_H
 
-#include "util/string.h"
+#ifndef AGS_ENGINE_AC_PATH_HELPER_H
+#define AGS_ENGINE_AC_PATH_HELPER_H
+
+#include "ags/shared/util/string.h"
+
+namespace AGS3 {
 
 using AGS::Shared::String;
 
@@ -47,17 +60,18 @@ String FixSlashAfterToken(const String &path);
 // a secure path that engine does not own, and sub-path that it owns.
 // The meaning of this is that engine is only allowed to create
 // sub-path subdirectories, and only if secure path exists.
-struct FSLocation
-{
-    String BaseDir; // parent part of the full path that is not our responsibility
-    String FullDir; // full path to the directory
-    FSLocation() = default;
-    FSLocation(const String &base) : BaseDir(base), FullDir(base) {}
-    FSLocation(const String &base, const String &full) : BaseDir(base), FullDir(full) {}
+struct FSLocation {
+	String BaseDir; // parent part of the full path that is not our responsibility
+	String FullDir; // full path to the directory
+	FSLocation() = default;
+	FSLocation(const String &base) : BaseDir(base), FullDir(base) {
+	}
+	FSLocation(const String &base, const String &full) : BaseDir(base), FullDir(full) {
+	}
 };
 // Makes sure that given system location is available, makes directories if have to (and if it's allowed to)
 // Returns full file path on success, empty string on failure.
-String PreparePathForWriting(const FSLocation& fsloc, const String &filename);
+String PreparePathForWriting(const FSLocation &fsloc, const String &filename);
 
 // Following functions calculate paths to directories according to game setup
 // Returns the directory where global user config is to be found
@@ -70,11 +84,10 @@ FSLocation GetGameAppDataDir();
 FSLocation GetGameUserDataDir();
 
 // ResolvedPath describes an actual location pointed by a user path (e.g. from script)
-struct ResolvedPath
-{
-    String BaseDir;  // base directory, which we assume already exists
-    String FullPath; // full path, including filename
-    String AltPath;  // alternative full path, for backwards compatibility
+struct ResolvedPath {
+	String BaseDir;  // base directory, which we assume already exists
+	String FullPath; // full path, including filename
+	String AltPath;  // alternative full path, for backwards compatibility
 };
 // Resolves a file path provided by user (e.g. script) into actual file path,
 // by substituting special keywords with actual platform-specific directory names.
@@ -88,4 +101,6 @@ bool ResolveScriptPath(const String &sc_path, bool read_only, ResolvedPath &rp);
 // forbidden for writing, or if failed to create any subdirectories.
 bool ResolveWritePathAndCreateDirs(const String &sc_path, ResolvedPath &rp);
 
-#endif // AGS_ENGINE_AC__PATHHELPER_H
+} // namespace AGS3
+
+#endif
