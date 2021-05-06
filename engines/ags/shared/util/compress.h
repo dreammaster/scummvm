@@ -25,7 +25,7 @@
 
 namespace AGS3 {
 
-struct RGB;
+#include "ags/shared/core/types.h"
 
 namespace AGS {
 namespace Shared {

@@ -20,38 +20,21 @@
  *
  */
 
-#ifndef AGS_STD_FUNCTIONAL_H
-#define AGS_STD_FUNCTIONAL_H
+#ifndef AGS_SHARED_GFX_IMAGE_H
+#define AGS_SHARED_GFX_IMAGE_H
+
+#include "ags/lib/allegro.h"
 
 namespace AGS3 {
-namespace std {
 
-template <class _Arg, class _Result>
-struct unary_function { // base class for unary functions
-	using argument_type = _Arg;
-	using result_type = _Result;
-};
+BITMAP *load_bitmap(const char *filename, color *pal);
+BITMAP *load_bmp(const char *filename, color *pal);
+BITMAP *load_lbm(const char *filename, color *pal);
+BITMAP *load_pcx(const char *filename, color *pal);
+BITMAP *load_tga(const char *filename, color *pal);
 
-template <class _Arg1, class _Arg2, class _Result>
-struct binary_function { // base class for binary functions
-	using first_argument_type = _Arg1;
-	using second_argument_type = _Arg2;
-	using result_type = _Result;
-};
+int save_bitmap(Common::WriteStream &out, BITMAP *bmp, const RGB *pal);
 
-template <typename _Fty>
-struct function {
-	_Fty *_fn;
-
-	function() : _fn(nullptr) {}
-	function(_Fty *fn) : _fn(fn) {}
-
-	operator _Fty &() {
-		return *_fn;
-	}
-};
-
-} // namespace std
 } // namespace AGS3
 
 #endif

@@ -42,6 +42,11 @@ pair<T1, T2> make_pair(T1 first, T2 second) {
 	return pair<T1, T2>(first, second);
 }
 
+template<class T>
+T move(const T &v) {
+	return v;
+}
+
 } // namespace std
 } // namespace AGS3
 

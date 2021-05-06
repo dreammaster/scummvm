@@ -31,6 +31,7 @@
 #ifndef AGS_SHARED_GAME_MAIN_GAME_FILE_H
 #define AGS_SHARED_GAME_MAIN_GAME_FILE_H
 
+#include "ags/lib/std/functional.h"
 #include "ags/lib/std/memory.h"
 #include "ags/lib/std/set.h"
 #include "ags/lib/std/vector.h"
@@ -122,7 +123,7 @@ struct LoadedGameEntities {
 
 	// Original sprite data (when it was read into const-sized arrays)
 	size_t                  SpriteCount;
-	std::unique_ptr<char[]> SpriteFlags;
+	Common::Array<byte>     SpriteFlags;
 
 	// Old dialog support
 	// legacy compiled dialog script of its own format,

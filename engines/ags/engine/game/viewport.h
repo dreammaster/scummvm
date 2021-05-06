@@ -31,8 +31,8 @@
 
 #include "ags/lib/std/memory.h"
 #include "ags/lib/std/vector.h"
-#include "util/geometry.h"
-#include "util/scaling.h"
+#include "ags/shared/util/geometry.h"
+#include "ags/engine/util/scaling.h"
 
 class Camera;
 class Viewport;

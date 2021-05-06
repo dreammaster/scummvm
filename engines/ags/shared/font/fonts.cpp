@@ -21,7 +21,7 @@
  */
 
 //include <cstdio>
-//include <alfont.h>
+#include "ags/lib/alfont/alfont.h"
 #include "ags/lib/std/vector.h"
 #include "ags/shared/ac/common.h" // set_our_eip
 #include "ags/shared/ac/game_struct_defines.h"
@@ -233,7 +233,7 @@ size_t split_lines(const char *todis, SplitLines &lines, int wii, int fonnt, siz
 	size_t splitAt;
 	char nextCharWas;
 	while (1) {
-		splitAt = -1;
+		splitAt = (size_t)-1;
 
 		if (theline[i] == 0) {
 			// end of the text, add the last line if necessary
@@ -266,7 +266,7 @@ size_t split_lines(const char *todis, SplitLines &lines, int wii, int fonnt, siz
 		// restore the character that was there before
 		theline[i + 1] = nextCharWas;
 
-		if (splitAt != -1) {
+		if (splitAt != (size_t)-1) {
 			if (splitAt == 0 && !((theline[0] == ' ') || (theline[0] == '\n'))) {
 				// cannot split with current width restriction
 				lines.Reset();
@@ -286,7 +286,7 @@ size_t split_lines(const char *todis, SplitLines &lines, int wii, int fonnt, siz
 			// skip the space or new line that caused the line break
 			if ((theline[0] == ' ') || (theline[0] == '\n'))
 				theline++;
-			i = -1;
+			i = (size_t)-1;
 		}
 
 		i++;

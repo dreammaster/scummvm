@@ -38,8 +38,9 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 
-#include "ags/shared/Stream : public Stream {
-#include "ags/shared/	DataStream(DataEndianess stream_endianess = kLittleEndian);
+class DataStream : public Stream {
+public:
+	DataStream(DataEndianess stream_endianess = kLittleEndian);
 	~DataStream() override;
 
 	int16_t ReadInt16() override;

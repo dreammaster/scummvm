@@ -76,7 +76,7 @@ void alfont_textout(BITMAP *bmp, ALFONT_FONT *font, const char *text, int x, int
 
 void alfont_textout_aa(BITMAP *bmp, ALFONT_FONT *font, const char *text, int x, int y, uint32 color) {
 	warning("TODO: alfont_textout_aa");
-	return alfont_textout(bmp, font, text, x, y);
+	return alfont_textout(bmp, font, text, x, y, color);
 }
 
 void alfont_set_font_size(ALFONT_FONT *font, int size) {

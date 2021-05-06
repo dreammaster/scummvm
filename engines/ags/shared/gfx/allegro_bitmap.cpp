@@ -20,9 +20,12 @@
  *
  */
 
+#include "common/config-manager.h"
+#include "common/savefile.h"
+#include "common/system.h"
 #include "ags/lib/aastr-0.1.1/aastr.h"
 #include "ags/shared/gfx/allegro_bitmap.h"
-//include <string.h> // memcpy
+#include "ags/shared/gfx/image.h"
 
 namespace AGS3 {
 
@@ -122,8 +125,25 @@ bool Bitmap::LoadFromFile(const char *filename) {
 	return _alBitmap != nullptr;
 }
 
+bool Bitmap::SaveToFile(Common::WriteStream &out, const void *palette) {
+	return save_bitmap(out, _alBitmap, (const RGB *)palette) == 0;
+}
+
 bool Bitmap::SaveToFile(const char *filename, const void *palette) {
-	return save_bitmap(filename, _alBitmap, (const RGB *)palette) == 0;
+	// Only keeps the file name and add the game target as prefix.
+	Common::String name = filename;
+	size_t lastSlash = name.findLastOf('/');
+	if (lastSlash != Common::String::npos)
+		name = name.substr(lastSlash + 1);
+	name = ConfMan.getActiveDomainName() + "-" + name;
+
+	Common::OutSaveFile *out = g_system->getSavefileManager()->openForSaving(name, false);
+	assert(out);
+	bool result = SaveToFile(*out, palette);
+	out->finalize();
+	delete out;
+
+	return result;
 }
 
 void Bitmap::SetMaskColor(color_t color) {
@@ -353,7 +373,7 @@ void Bitmap::FillTransparent() {
 }
 
 void Bitmap::FloodFill(int x, int y, color_t color) {
-	floodfill(_alBitmap, x, y, color);
+	_alBitmap->floodfill(x, y, color);
 }
 
 //=============================================================================

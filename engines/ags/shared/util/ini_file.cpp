@@ -20,20 +20,12 @@
  *
  */
 
-//include <cctype>
-//include <string.h>
+#include "common/util.h"
 #include "ags/shared/util/ini_file.h"
 #include "ags/shared/util/text_stream_reader.h"
 #include "ags/shared/util/text_stream_writer.h"
 
 namespace AGS3 {
-// TODO: replace with C++11 std::isblank library function
-namespace agsstd {
-inline int isblank(int ch) {
-	return ch == ' ' || ch == '\t';
-}
-} // std
-
 namespace AGS {
 namespace Shared {
 
@@ -152,7 +144,7 @@ void IniFile::RemoveSection(SectionIterator sec) {
 
 // Moves string pointer forward to the first non-space character
 const char *SkipSpace(const char *line, const char *endl) {
-	for (; line != endl && isspace(*line); ++line);
+	for (; line != endl && Common::isSpace(*line); ++line);
 	return line;
 }
 
@@ -165,11 +157,11 @@ const char *SkipSpace(const char *line, const char *endl) {
 const char *ParsePaddedString(const char *line, const char *endl,
 	const char *&str_at, const char *&str_end) {
 	// skip left padding
-	for (; line != endl && agsstd::isblank(*line); ++line);
+	for (; line != endl && Common::isBlank(*line); ++line);
 	str_at = line;
 	// skip right padding
 	const char *p_value = line;
-	for (line = endl; line != p_value && agsstd::isblank(*(line - 1)); --line);
+	for (line = endl; line != p_value && Common::isBlank(*(line - 1)); --line);
 	str_end = line;
 	return line;
 }

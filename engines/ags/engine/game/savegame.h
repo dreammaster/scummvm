@@ -24,16 +24,17 @@
 #define AGS_ENGINE_GAME_SAVEGAME_H
 
 #include "ags/lib/std/memory.h"
-#include "ac/game_version.h"
-#include "util/error.h"
-#include "util/version.h"
+#include "ags/shared/ac/game_version.h"
+#include "ags/shared/util/error.h"
+#include "ags/shared/util/version.h"
 
 namespace AGS3 {
 namespace AGS {
 
 namespace Shared {
-class Bitmap; class Stream;
-}
+class Bitmap;
+class Stream;
+} // namespace Shared
 
 namespace Engine {
 

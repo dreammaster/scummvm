@@ -26,13 +26,14 @@
 namespace AGS3 {
 
 namespace AGS {
-namespace Common {
+namespace Shared {
 class Stream;
-}
-}
+} // namespace Shared
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
-void lzwcompressnamespace Shared *lzw_in, Shared::Stream *out);
+void lzwcompress(Shared::Stream *lzw_in, Shared::Stream *out);
 unsigned char *lzwexpand_to_mem(Shared::Stream *in);
 
 extern long outbytes, maxsize, putbytes;

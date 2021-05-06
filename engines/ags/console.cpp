@@ -23,8 +23,8 @@
 #include "ags/console.h"
 #include "ags/ags.h"
 #include "ags/globals.h"
-#include "ags/shared/ac/spritecache.h"
-#include "ags/shared/gfx/allegrobitmap.h"
+#include "ags/shared/ac/sprite_cache.h"
+#include "ags/shared/gfx/allegro_bitmap.h"
 #include "ags/shared/script/cc_options.h"
 #include "image/png.h"
 
@@ -69,7 +69,6 @@ struct GroupName{
 static const GroupName groupNames[] = {
 	{"Main", AGS3::AGS::Shared::kDbgGroup_Main},
 	{"Game", AGS3::AGS::Shared::kDbgGroup_Game},
-	{"Script", AGS3::AGS::Shared::kDbgGroup_Script},
 	{"SpriteCache", AGS3::AGS::Shared::kDbgGroup_SprCache},
 	{"ManObj", AGS3::AGS::Shared::kDbgGroup_ManObj},
 	{nullptr, (AGS3::uint32_t)-1}

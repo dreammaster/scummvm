@@ -20,64 +20,55 @@
  *
  */
 
-#include "ags/shared/util/file.h"
-
-//include <stdexcept>
 #include "ags/shared/core/platform.h"
 #include "ags/shared/util/stdio_compat.h"
-//include <errno.h>
 #include "ags/shared/util/file_stream.h"
 #include "ags/shared/util/buffered_stream.h"
+#include "ags/shared/util/file.h"
+#include "ags/shared/util/directory.h"
+#include "common/file.h"
+#include "common/savefile.h"
+#include "common/system.h"
 
 namespace AGS3 {
 namespace AGS {
 namespace Shared {
 
 soff_t File::GetFileSize(const String &filename) {
+	if (filename.IsEmpty())
+		return 0;
 	return ags_file_size(filename.GetCStr());
 }
 
 bool File::TestReadFile(const String &filename) {
-	FILE *test_file = fopen(filename, "rb");
-	if (test_file) {
-		fclose(test_file);
-		return true;
-	}
-	return false;
+	if (filename.IsEmpty())
+		return false;
+	return ags_file_exists(filename.GetNullableCStr());
 }
 
 bool File::TestWriteFile(const String &filename) {
-	FILE *test_file = fopen(filename, "r+");
-	if (test_file) {
-		fclose(test_file);
-		return true;
-	}
+	if (filename.IsEmpty())
+		return false;
 	return TestCreateFile(filename);
 }
 
 bool File::TestCreateFile(const String &filename) {
-	FILE *test_file = fopen(filename, "wb");
-	if (test_file) {
-		fclose(test_file);
-		::remove(filename);
-		return true;
-	}
-	return false;
+	if (filename.IsEmpty())
+		return false;
+	Common::DumpFile df;
+	bool result = df.open(getFSNode(filename.GetNullableCStr()));
+	df.close();
+	return result;
 }
 
 bool File::DeleteFile(const String &filename) {
-	if (::remove(filename) != 0) {
-		int err;
-#if AGS_PLATFORM_OS_WINDOWS
-		_get_errno(&err);
-#else
-		err = errno;
-#endif
-		if (err == EACCES) {
-			return false;
-		}
+	// Only allow deleting files in the savegame folder
+	if (filename.CompareLeftNoCase(SAVE_FOLDER_PREFIX) != 0) {
+		warning("Cannot delete file %s. Only files in the savegame directory can be deleted", filename.GetCStr());
+		return false;
 	}
-	return true;
+	Common::String file(filename.GetCStr() + strlen(SAVE_FOLDER_PREFIX));
+	return g_system->getSavefileManager()->removeSavefile(file);
 }
 
 bool File::GetFileModesFromCMode(const String &cmode, FileOpenMode &open_mode, FileWorkMode &work_mode) {
@@ -137,18 +128,19 @@ String File::GetCMode(FileOpenMode open_mode, FileWorkMode work_mode) {
 
 Stream *File::OpenFile(const String &filename, FileOpenMode open_mode, FileWorkMode work_mode) {
 	FileStream *fs = nullptr;
-	try {
-		if (work_mode == kFile_Read) // NOTE: BufferedStream does not work correctly in the write mode
-			fs = new BufferedStream(filename, open_mode, work_mode);
-		else
-			fs = new FileStream(filename, open_mode, work_mode);
-		if (fs != nullptr && !fs->IsValid()) {
-			delete fs;
-			fs = nullptr;
-		}
-	} catch (std::runtime_error) {
+	//	try {
+	if (work_mode == kFile_Read) // NOTE: BufferedStream does not work correctly in the write mode
+		fs = new BufferedStream(filename, open_mode, work_mode);
+	else
+		fs = new FileStream(filename, open_mode, work_mode);
+	if (fs != nullptr && !fs->IsValid()) {
+		delete fs;
 		fs = nullptr;
 	}
+	//	} catch (std::runtime_error) {
+	//		fs = nullptr;
+	//	}
+
 	return fs;
 }
 

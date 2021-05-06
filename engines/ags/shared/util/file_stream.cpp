@@ -20,9 +20,13 @@
  *
  */
 
-#include "ags/shared/util/filestream.h"
+#include "ags/shared/util/file_stream.h"
 #include "ags/shared/util/stdio_compat.h"
 #include "ags/shared/util/string.h"
+#include "ags/shared/util/directory.h"
+#include "ags/ags.h"
+#include "common/file.h"
+#include "common/system.h"
 
 namespace AGS3 {
 namespace AGS {
@@ -30,10 +34,8 @@ namespace Shared {
 
 FileStream::FileStream(const String &file_name, FileOpenMode open_mode, FileWorkMode work_mode,
 	DataEndianess stream_endianess)
-	: DataStream(stream_endianess)
-	, _file(nullptr)
-	, _openMode(open_mode)
-	, _workMode(work_mode) {
+	: DataStream(stream_endianess), _writeBuffer(DisposeAfterUse::YES),
+	_workMode(work_mode), _openMode(open_mode), _file(nullptr), _outSave(nullptr) {
 	Open(file_name, open_mode, work_mode);
 }
 
@@ -42,20 +44,27 @@ FileStream::~FileStream() {
 }
 
 bool FileStream::HasErrors() const {
-	return IsValid() && ferror(_file) != 0;
+	return IsValid() && _file->err();
 }
 
 void FileStream::Close() {
-	if (_file) {
-		fclose(_file);
+	if (_outSave) {
+		_outSave->write(_writeBuffer.getData(), _writeBuffer.size());
+		_outSave->finalize();
+		delete _outSave;
+
+	} else if (_file) {
+		delete _file;
 	}
+
 	_file = nullptr;
 }
 
 bool FileStream::Flush() {
-	if (_file) {
-		return fflush(_file) == 0;
-	}
+	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(_file);
+	if (ws)
+		ws->flush();
+
 	return false;
 }
 
@@ -64,7 +73,8 @@ bool FileStream::IsValid() const {
 }
 
 bool FileStream::EOS() const {
-	return !IsValid() || feof(_file) != 0;
+	Common::ReadStream *rs = dynamic_cast<Common::ReadStream *>(_file);
+	return !rs || rs->eos();
 }
 
 soff_t FileStream::GetLength() const {
@@ -99,30 +109,43 @@ bool FileStream::CanSeek() const {
 }
 
 size_t FileStream::Read(void *buffer, size_t size) {
-	if (_file && buffer) {
-		return fread(buffer, sizeof(uint8_t), size, _file);
+	Common::ReadStream *rs = dynamic_cast<Common::ReadStream *>(_file);
+
+	if (rs && buffer) {
+		return rs->read(buffer, size);
 	}
+
 	return 0;
 }
 
 int32_t FileStream::ReadByte() {
-	if (_file) {
-		return fgetc(_file);
+	Common::ReadStream *rs = dynamic_cast<Common::ReadStream *>(_file);
+
+	if (rs) {
+		return rs->eos() ? -1 : (int32_t)rs->readByte();
 	}
+
 	return -1;
 }
 
 size_t FileStream::Write(const void *buffer, size_t size) {
-	if (_file && buffer) {
-		return fwrite(buffer, sizeof(uint8_t), size, _file);
+	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(_file);
+
+	if (ws && buffer) {
+		return ws->write(buffer, size);
 	}
+
 	return 0;
 }
 
 int32_t FileStream::WriteByte(uint8_t val) {
-	if (_file) {
-		return fputc(val, _file);
+	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(_file);
+
+	if (ws) {
+		ws->writeByte(val);
+		return 1;
 	}
+
 	return -1;
 }
 
@@ -133,9 +156,15 @@ bool FileStream::Seek(soff_t offset, StreamSeek origin) {
 
 	int stdclib_origin;
 	switch (origin) {
-	case kSeekBegin:    stdclib_origin = SEEK_SET; break;
-	case kSeekCurrent:  stdclib_origin = SEEK_CUR; break;
-	case kSeekEnd:      stdclib_origin = SEEK_END; break;
+	case kSeekBegin:
+		stdclib_origin = SEEK_SET;
+		break;
+	case kSeekCurrent:
+		stdclib_origin = SEEK_CUR;
+		break;
+	case kSeekEnd:
+		stdclib_origin = SEEK_END;
+		break;
 	default:
 		// TODO: warning to the log
 		return false;
@@ -145,12 +174,45 @@ bool FileStream::Seek(soff_t offset, StreamSeek origin) {
 }
 
 void FileStream::Open(const String &file_name, FileOpenMode open_mode, FileWorkMode work_mode) {
-	String mode = File::GetCMode(open_mode, work_mode);
-	if (mode.IsEmpty())
-		throw std::runtime_error("Error determining open mode");
-	_file = fopen(file_name, mode);
-	if (_file == nullptr)
-		throw std::runtime_error("Error opening file.");
+	if (open_mode == kFile_Open) {
+		if (!file_name.CompareLeftNoCase(SAVE_FOLDER_PREFIX)) {
+			_file = g_system->getSavefileManager()->openForLoading(
+				file_name.GetNullableCStr() + strlen(SAVE_FOLDER_PREFIX));
+
+		} else {
+			// First try to open file in game folder
+			Common::File *f = new Common::File();
+			if (!f->open(getFSNode(file_name.GetNullableCStr()))) {
+				delete f;
+				_file = nullptr;
+			} else {
+				_file = f;
+			}
+		}
+
+	} else {
+		if (!file_name.CompareLeftNoCase(SAVE_FOLDER_PREFIX)) {
+			_outSave = g_system->getSavefileManager()->openForSaving(
+				file_name + strlen(SAVE_FOLDER_PREFIX), false);
+		} else {
+			Common::String fname = file_name;
+			if (fname.hasPrefix("./"))
+				fname = fname.substr(2);
+			else if (fname.hasPrefix("/"))
+				fname.deleteChar(0);
+			else if (fname.findFirstOf('/') != Common::String::npos)
+				error("Invalid attempt to create file - %s", fname.c_str());
+
+			_outSave = g_system->getSavefileManager()->openForSaving(fname, false);
+		}
+
+		if (!_outSave)
+			error("Invalid attempt to create file - %s", file_name.GetCStr());
+
+		// Any data written has to first go through the memory stream buffer,
+		// since the savegame code uses Seeks, which OutSaveFile doesn't support
+		_file = &_writeBuffer;
+	}
 }
 
 } // namespace Shared

@@ -20,9 +20,12 @@
  *
  */
 
-#ifndef AGS_SHARED_UTIL_FILESTREAM_H
-#define AGS_SHARED_UTIL_FILESTREAM_H
+#ifndef AGS_SHARED_UTIL_FILE_STREAM_H
+#define AGS_SHARED_UTIL_FILE_STREAM_H
 
+#include "common/memstream.h"
+#include "common/savefile.h"
+#include "common/stream.h"
 #include "ags/shared/util/data_stream.h"
 #include "ags/shared/util/file.h" // TODO: extract filestream mode constants
 
@@ -67,9 +70,11 @@ public:
 private:
 	void            Open(const String &file_name, FileOpenMode open_mode, FileWorkMode work_mode);
 
-	FILE *_file;
+	Common::Stream *_file;
 	const FileOpenMode  _openMode;
 	const FileWorkMode  _workMode;
+	Common::MemoryWriteStreamDynamic _writeBuffer;
+	Common::OutSaveFile *_outSave;
 };
 
 } // namespace Shared

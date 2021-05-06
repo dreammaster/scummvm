@@ -20,14 +20,9 @@
  *
  */
 
+#include "common/config-manager.h"
+#include "common/fs.h"
 #include "ags/shared/core/platform.h"
-//include <errno.h>
-#if AGS_PLATFORM_OS_WINDOWS
-//include <direct.h>
-#else
-//include <sys/stat.h>
-//include <unistd.h>
-#endif
 #include "ags/shared/util/directory.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/stdio_compat.h"
@@ -36,31 +31,33 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 
+const char *SAVE_FOLDER_PREFIX = "/saves/";
+
 namespace Directory {
 
 bool CreateDirectory(const String &path) {
-	return mkdir(path
-#if ! AGS_PLATFORM_OS_WINDOWS
-		, 0755
-#endif
-	) == 0 || errno == EEXIST;
+	return Common::FSNode(path.GetNullableCStr()).createDirectory();
 }
 
 bool CreateAllDirectories(const String &parent, const String &path) {
-	if (parent.IsEmpty() || !ags_directory_exists(parent.GetCStr()))
+	if (path == SAVE_FOLDER_PREFIX)
+		// ScummVM save folder doesn't need creating
+		return true;
+
+	if (!ags_directory_exists(parent.GetCStr()))
 		return false;
 	if (path.IsEmpty())
 		return true;
 	if (!Path::IsSameOrSubDir(parent, path))
 		return false;
 
-	String fixup_parent = Path::MakeTrailingSlash(parent);
-	String sub_path = Path::MakeRelativePath(fixup_parent, path);
+	String sub_path = Path::MakeRelativePath(parent, path);
 	String make_path = parent;
-	std::vector<String> dirs = Path::Split(sub_path);
+	std::vector<String> dirs = sub_path.Split('/');
 	for (const String &dir : dirs) {
 		if (dir.IsEmpty() || dir.Compare(".") == 0) continue;
-		make_path = Path::ConcatPaths(make_path, dir);
+		make_path.AppendChar('/');
+		make_path.Append(dir);
 		if (!CreateDirectory(make_path))
 			return false;
 	}
@@ -68,16 +65,22 @@ bool CreateAllDirectories(const String &parent, const String &path) {
 }
 
 String SetCurrentDirectory(const String &path) {
-	chdir(path);
-	return GetCurrentDirectory();
+	warning("TODO: SetCurrentDirectory: %s", path.GetNullableCStr());
+	//	chdir(path);
+	//	return GetCurrentDirectory();
+	return path;
 }
 
 String GetCurrentDirectory() {
+#ifdef TODO
 	char buf[512];
 	getcwd(buf, 512);
 	String str(buf);
 	Path::FixupPath(str);
 	return str;
+#else
+	return ConfMan.get("path");
+#endif
 }
 
 } // namespace Directory

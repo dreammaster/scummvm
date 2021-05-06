@@ -55,6 +55,9 @@ typedef struct _RICH_GAME_MEDIA_HEADER {
 
 	void ReadFromFile(Shared::Stream *in);
 	void WriteToFile(Shared::Stream *out);
+
+	void setSaveName(const Common::String &saveName);
+	Common::String getSaveName() const;
 } RICH_GAME_MEDIA_HEADER;
 #pragma pack(pop)
 

@@ -33,7 +33,7 @@
 #define AGS_ENGINE_UTIL_SCALING_H
 
 #include "ags/shared/core/types.h"
-#include "util/geometry.h"
+#include "ags/shared/util/geometry.h"
 
 namespace AGS3 {
 namespace AGS {

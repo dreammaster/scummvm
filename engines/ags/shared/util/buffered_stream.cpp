@@ -33,14 +33,14 @@ namespace Shared {
 BufferedStream::BufferedStream(const String &file_name, FileOpenMode open_mode, FileWorkMode work_mode, DataEndianess stream_endianess)
 	: FileStream(file_name, open_mode, work_mode, stream_endianess), _buffer(BufferStreamSize), _bufferPosition(0), _position(0) {
 	if (FileStream::Seek(0, kSeekEnd) == false)
-		throw std::runtime_error("Error determining stream end.");
+		error("Error determining stream end.");
 
 	_end = FileStream::GetPosition();
 	if (_end == -1)
-		throw std::runtime_error("Error determining stream end.");
+		error("Error determining stream end.");
 
 	if (FileStream::Seek(0, kSeekBegin) == false)
-		throw std::runtime_error("Error determining stream end.");
+		error("Error determining stream end.");
 
 	_buffer.resize(0);
 
@@ -81,7 +81,7 @@ size_t BufferedStream::Read(void *toBuffer, size_t toSize) {
 		size_t bytesLeft = _buffer.size() - (size_t)bufferOffset;
 		size_t chunkSize = std::min<size_t>(bytesLeft, toSize);
 
-		std::memcpy(to, _buffer.data() + bufferOffset, chunkSize);
+		memcpy(to, _buffer.data() + bufferOffset, chunkSize);
 
 		to += chunkSize;
 		_position += chunkSize;

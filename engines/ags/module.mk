@@ -57,6 +57,7 @@ MODULE_OBJS = \
 	shared/game/room_struct.o \
 	shared/gfx/allegro_bitmap.o \
 	shared/gfx/bitmap.o \
+	shared/gfx/image.o \
 	shared/gui/gui_button.o \
 	shared/gui/gui_inv.o \
 	shared/gui/gui_label.o \
@@ -95,38 +96,7 @@ MODULE_OBJS = \
 	shared/util/text_stream_reader.o \
 	shared/util/text_stream_writer.o \
 	shared/util/version.o \
-	shared/util/wgt2_allg.o \
-	plugins/agsplugin.o \
-	plugins/plugin_base.o \
-	plugins/ags_blend/ags_blend.o \
-	plugins/ags_controller/ags_controller.o \
-	plugins/ags_creditz/ags_creditz.o \
-	plugins/ags_creditz/ags_creditz1.o \
-	plugins/ags_creditz/ags_creditz2.o \
-	plugins/ags_creditz/drawing.o \
-	plugins/ags_flashlight/ags_flashlight.o \
-	plugins/ags_galaxy_steam/ags_wadjeteye_steam.o \
-	plugins/ags_galaxy_steam/ags_galaxy_steam.o \
-	plugins/ags_joy/ags_joy.o \
-	plugins/ags_nickenstien_gfx/ags_nickenstien_gfx.o \
-	plugins/ags_pal_render/ags_pal_render.o \
-	plugins/ags_pal_render/raycast.o \
-	plugins/ags_parallax/ags_parallax.o \
-	plugins/ags_snow_rain/ags_snow_rain.o \
-	plugins/ags_snow_rain/weather.o \
-	plugins/ags_sprite_font/ags_sprite_font.o \
-	plugins/ags_sprite_font/ags_sprite_font_clifftop.o \
-	plugins/ags_sprite_font/character_entry.o \
-	plugins/ags_sprite_font/color.o \
-	plugins/ags_sprite_font/sprite_font.o \
-	plugins/ags_sprite_font/sprite_font_renderer.o \
-	plugins/ags_sprite_font/sprite_font_renderer_clifftop.o \
-	plugins/ags_sprite_font/variable_width_font.o \
-	plugins/ags_sprite_font/variable_width_sprite_font.o \
-	plugins/ags_sprite_font/variable_width_sprite_font_clifftop.o \
-	plugins/ags_shell/ags_shell.o \
-	plugins/ags_tcp_ip/ags_tcp_ip.o \
-	plugins/ags_wadjet_util/ags_wadjet_util.o
+	shared/util/wgt2_allg.o
 
 ifdef ENABLE_AGS_TESTS
 MODULE_OBJS += \

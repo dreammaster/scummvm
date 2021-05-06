@@ -24,6 +24,8 @@
 #include "ags/shared/script/script_common.h"  // current_line
 #include "ags/shared/util/string.h"
 
+#include <functional>
+
 namespace AGS3 {
 
 using namespace AGS::Shared;

@@ -1,6 +1,29 @@
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
-#include "ac/richgamemedia.h"
-#include "util/stream.h"
+#include "ags/engine/ac/richgamemedia.h"
+#include "ags/shared/util/stream.h"
+
+namespace AGS3 {
 
 using AGS::Shared::Stream;
 
@@ -33,3 +56,16 @@ void RICH_GAME_MEDIA_HEADER::WriteToFile(Stream *out)
     out->WriteArrayOfInt16((int16_t*)szLevelName, RM_MAXLENGTH);
     out->WriteArrayOfInt16((int16_t*)szComments, RM_MAXLENGTH);
 }
+
+void RICH_GAME_MEDIA_HEADER::setSaveName(const Common::String &saveName) {
+	uconvert<char, uint16>(saveName.c_str(), szSaveName, RM_MAXLENGTH);
+}
+
+Common::String RICH_GAME_MEDIA_HEADER::getSaveName() const {
+	char buf[RM_MAXLENGTH];
+	uconvert<uint16, char>(szSaveName, buf, RM_MAXLENGTH);
+
+	return Common::String(buf);
+}
+
+} // namespace AGS3

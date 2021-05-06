@@ -132,33 +132,33 @@ bool IsMainGameLibrary(const String &filename) {
 // - *.exe is a MS Win executable; it is included to this case because
 //   users often run AGS ports with Windows versions of games.
 String FindGameData(const String &path, std::function<bool(const String &)> fn_testfile) {
-	al_ffblk ff;
-	String test_file;
-	String pattern = path;
-	pattern.Append("/*");
+	Common::FSNode folder(path.GetCStr());
+	Common::FSList files;
+	if (folder.getChildren(files, Common::FSNode::kListFilesOnly)) {
+		for (Common::FSList::iterator it = files.begin(); it != files.end(); ++it) {
+			Common::String test_file = it->getName();
+			Common::String filePath = it->getPath();
 
-	Debug::Printf("Searching for game data in: %s", path.GetCStr());
-	if (al_findfirst(pattern, &ff, FA_ALL & ~(FA_DIREC)) != 0)
-		return "";
-	do {
-		test_file = ff.name;
-		if (test_file.CompareRightNoCase(".ags") == 0 ||
-			test_file.CompareNoCase("ac2game.dat") == 0 ||
-			test_file.CompareRightNoCase(".exe") == 0) {
-			test_file = Path::ConcatPaths(path, test_file);
-			if (IsMainGameLibrary(test_file) && fn_testfile(path)) {
-				Debug::Printf("Found game data pak: %s", test_file.GetCStr());
-				al_findclose(&ff);
-				return test_file;
+			if (test_file.hasSuffixIgnoreCase(".ags") ||
+					test_file.equalsIgnoreCase("ac2game.dat") ||
+					test_file.hasSuffixIgnoreCase(".exe")) {
+				if (IsMainGameLibrary(test_file.c_str()) && fn_testfile(filePath.c_str())) {
+					Debug::Printf("Found game data pak: %s", test_file.c_str());
+					return test_file.c_str();
+				}
 			}
 		}
-	} while (al_findnext(&ff) == 0);
-	al_findclose(&ff);
+	}
+
 	return "";
 }
 
+static bool comparitor(const String &) {
+	return true;
+}
+
 String FindGameData(const String &path) {
-	return FindGameData(path, [](const String &) { return true; });
+	return FindGameData(path, comparitor);
 }
 
 // Begins reading main game file from a generic stream
@@ -538,15 +538,19 @@ void UpgradeAudio(GameSetupStruct &game, GameDataVersion data_ver) {
 		if (!Path::IsDirectory(game_lib->BasePath))
 			continue; // might be a library
 
-		al_ffblk ff;
-		if (al_findfirst(Path::ConcatPaths(game_lib->BasePath, "*.*"), &ff, FA_ALL & ~(FA_DIREC)) == 0) {
-			do {
-				if (ags_strnicmp(ff.name, "music", 5) == 0 || ags_strnicmp(ff.name, "sound", 5) == 0)
-					assets.push_back(ff.name);
-			} while (al_findnext(&ff) == 0);
-			al_findclose(&ff);
+
+		Common::FSNode folder(game_lib->BasePath.GetCStr());
+		Common::FSList files;
+		folder.getChildren(files, Common::FSNode::kListFilesOnly);
+
+		for (Common::FSList::iterator it = files.begin(); it != files.end(); ++it) {
+			Common::String name = (*it).getName();
+
+			if (name.hasPrefixIgnoreCase("music") || name.hasPrefixIgnoreCase("sound"))
+				assets.push_back(name.c_str());
 		}
 	}
+
 	BuildAudioClipArray(assets, audioclips);
 
 	// Copy gathered data over to game
@@ -668,8 +672,10 @@ HGameFileError ReadSpriteFlags(LoadedGameEntities &ents, Stream *in, GameDataVer
 		return new MainGameFileError(kMGFErr_TooManySprites, String::FromFormat("Count: %u, max: %u", sprcount, (uint32_t)SpriteCache::MAX_SPRITE_INDEX + 1));
 
 	ents.SpriteCount = sprcount;
-	ents.SpriteFlags.reset(new char[sprcount]);
-	in->Read(ents.SpriteFlags.get(), sprcount);
+	ents.SpriteFlags.clear();
+	ents.SpriteFlags.resize(sprcount);
+
+	in->Read(&ents.SpriteFlags[0], sprcount);
 	return HGameFileError::None();
 }
 

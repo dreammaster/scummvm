@@ -69,6 +69,8 @@ public:
 	String(const char *cstr, size_t length);
 	// Initialize by filling N chars with certain value
 	String(char c, size_t count);
+	// Initialize with a ScummVM string
+	String(const Common::String &s);
 	~String();
 
 	// TODO: get rid of condition in GetCStr! either make it nullable and test for consequences in engine code,
@@ -338,6 +340,11 @@ public:
 	}
 	inline bool operator <(const char *cstr) const {
 		return Compare(cstr) < 0;
+	}
+
+	// Converts an AGS string to a ScummVM one
+	operator Common::String() const {
+		return Common::String(GetNullableCStr());
 	}
 
 private:

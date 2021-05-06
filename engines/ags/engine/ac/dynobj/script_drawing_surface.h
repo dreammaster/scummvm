@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef AGS_ENGINE_AC_DYNOBJ_SCRIPTDRAWINGSURFACE_H
-#define AGS_ENGINE_AC_DYNOBJ_SCRIPTDRAWINGSURFACE_H
+#ifndef AGS_ENGINE_AC_DYNOBJ_SCRIPT_DRAWING_SURFACE_H
+#define AGS_ENGINE_AC_DYNOBJ_SCRIPT_DRAWING_SURFACE_H
 
-#include "ac/dynobj/cc_agsdynamicobject.h"
+#include "ags/engine/ac/dynobj/cc_ags_dynamic_object.h"
 
 namespace AGS3 {
 

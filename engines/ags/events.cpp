@@ -20,10 +20,9 @@
  *
  */
 
-#include "ags/events.h"
 #include "common/system.h"
+#include "ags/events.h"
 #include "ags/globals.h"
-#include "ags/engine/ac/keycode.h"
 
 namespace AGS {
 
@@ -101,6 +100,8 @@ bool EventsManager::keypressed() {
 	pollEvents();
 	return !_pendingKeys.empty();
 }
+
+#define EXTENDED_KEY_CODE ('\0')
 
 int EventsManager::readKey() {
 	pollEvents();

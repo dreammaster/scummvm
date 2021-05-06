@@ -20,9 +20,7 @@
  *
  */
 
-//include <stdio.h>
-//include <string.h>
-//include <ctype.h>
+#include "common/util.h"
 #include "ags/shared/util/math.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string.h"
@@ -50,6 +48,11 @@ String::String(const char *cstr)
 	, _len(0)
 	, _buf(nullptr) {
 	*this = cstr;
+}
+
+String::String(const Common::String &s) :
+		_cstr(nullptr), _len(0), _buf(nullptr) {
+	*this = s.c_str();
 }
 
 String::String(const char *cstr, size_t length)
@@ -184,12 +187,12 @@ size_t String::FindChar(char c, size_t from) const {
 		const char *found_cstr = strchr(_cstr + from, c);
 		return found_cstr ? found_cstr - _cstr : -1;
 	}
-	return -1;
+	return (size_t)-1;
 }
 
 size_t String::FindCharReverse(char c, size_t from) const {
 	if (!_cstr || !c) {
-		return -1;
+		return (size_t)-1;
 	}
 
 	from = Math::Min(from, _len - 1);
@@ -200,7 +203,7 @@ size_t String::FindCharReverse(char c, size_t from) const {
 		}
 		seek_ptr--;
 	}
-	return -1;
+	return (size_t)-1;
 }
 
 size_t String::FindString(const char *cstr, size_t from) const {
@@ -208,7 +211,7 @@ size_t String::FindString(const char *cstr, size_t from) const {
 		const char *found_cstr = strstr(_cstr + from, cstr);
 		return found_cstr ? found_cstr - _cstr : -1;
 	}
-	return -1;
+	return (size_t)-1;
 }
 
 bool String::FindSection(char separator, size_t first, size_t last, bool exclude_first_sep, bool exclude_last_sep,
@@ -223,7 +226,7 @@ bool String::FindSection(char separator, size_t first, size_t last, bool exclude
 	size_t this_field = 0;
 	size_t slice_from = 0;
 	size_t slice_to = _len;
-	size_t slice_at = -1;
+	size_t slice_at = (size_t)-1;
 	do {
 		slice_at = FindChar(separator, slice_at + 1);
 		if (slice_at == -1)
@@ -358,17 +361,18 @@ String String::Section(char separator, size_t first, size_t last,
 }
 
 std::vector<String> String::Split(char separator) const {
-	if (separator == 0)
-		return std::vector<String>{GetCStr()};
-
 	std::vector<String> result;
-	const char *ptr = GetCStr();
+	if (!_cstr || !separator)
+		return result;
+
+	const char *ptr = _cstr;
 	while (*ptr) {
 		const char *found_cstr = strchr(ptr, separator);
 		if (!found_cstr) break;
 		result.push_back(String(ptr, found_cstr - ptr));
 		ptr = found_cstr + 1;
 	}
+
 	result.push_back(String(ptr));
 	return result;
 }
@@ -621,7 +625,7 @@ void String::Reverse() {
 	BecomeUnique();
 	for (char *fw = _cstr, *bw = _cstr + _len - 1;
 		fw < bw; ++fw, --bw) {
-		std::swap(*fw, *bw);
+		SWAP(*fw, *bw);
 	}
 }
 
@@ -667,7 +671,7 @@ void String::TrimLeft(char c) {
 		if (c && t != c) {
 			break;
 		}
-		if (!c && !isspace(t)) {
+		if (!c && !Common::isSpace(t)) {
 			break;
 		}
 		trim_ptr++;
@@ -694,7 +698,7 @@ void String::TrimRight(char c) {
 		if (c && t != c) {
 			break;
 		}
-		if (!c && !isspace(t)) {
+		if (!c && !Common::isSpace(t)) {
 			break;
 		}
 		trim_ptr--;

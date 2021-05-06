@@ -138,6 +138,12 @@ public:
 		}
 	}
 
+	const_iterator cbegin() {
+		return this->begin();
+	}
+	const_iterator cend() {
+		return this->end();
+	}
 	reverse_iterator rbegin() {
 		return reverse_iterator(this, (int)Common::Array<T>::size() - 1);
 	}

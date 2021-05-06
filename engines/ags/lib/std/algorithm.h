@@ -56,6 +56,11 @@ void sort(T first, T last) {
 	Common::sort(first, last);
 }
 
+template<class In, class T>
+In find(In first, In last, const T &v) {
+	return Common::find(first, last, v);
+}
+
 template<class T>
 T unique(T first, T last) {
 	T pos;
@@ -93,6 +98,16 @@ template<class ForwardIt, class T>
 ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T &value) {
 	for (ForwardIt it = first; it < last; ++it) {
 		if (*it > value)
+			return it;
+	}
+
+	return last;
+}
+
+template<class ForwardIt, class T, class Compare>
+ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T &value, Compare comp) {
+	for (ForwardIt it = first; it < last; ++it) {
+		if (comp(value, *it))
 			return it;
 	}
 

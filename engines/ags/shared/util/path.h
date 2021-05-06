@@ -36,6 +36,12 @@ namespace AGS {
 namespace Shared {
 
 namespace Path {
+
+// Get a filename from a path
+String get_filename(const String &path);
+// Get an extension from a filename
+String get_extension(const String &path);
+
 // Tells if the given path is a directory
 bool    IsDirectory(const String &directory);
 // Tells if the given path is a file

@@ -21,6 +21,8 @@
  */
 
 #include "ags/lib/std/algorithm.h"
+#include "ags/lib/std/utility.h"
+#include "ags/shared/core/platform.h"
 #include "ags/shared/core/asset_manager.h"
 #include "ags/shared/util/misc.h" // ci_fopen
 #include "ags/shared/util/multi_file_lib.h"
@@ -88,7 +90,11 @@ AssetManager::AssetManager() {
 
 void AssetManager::SetSearchPriority(AssetSearchPriority priority) {
 	_libsByPriority.Priority = kAssetPriorityDir;
+#ifdef TODO
 	std::sort(_activeLibs.begin(), _activeLibs.end(), _libsByPriority);
+#else
+	error("TODO: std::sort");
+#endif
 }
 
 AssetSearchPriority AssetManager::GetSearchPriority() const {
@@ -126,10 +132,15 @@ AssetError AssetManager::AddLibrary(const String &path, const String &filters, c
 }
 
 void AssetManager::RemoveLibrary(const String &path) {
-	for (auto it = _libs.cbegin(); it != _libs.cend(); ++it) {
+	int idx = 0;
+	for (auto it = _libs.cbegin(); it != _libs.cend(); ++it, ++idx) {
 		if (Path::ComparePaths((*it)->BasePath, path) == 0) {
-			std::remove(_activeLibs.begin(), _activeLibs.end(), (*it).get());
-			_libs.erase(it);
+#ifdef TODO
+	std::remove(_activeLibs.begin(), _activeLibs.end(), (*it).get());
+	_libs.erase(it);
+#else
+	error("TODO");
+#endif
 			return;
 		}
 	}
@@ -189,7 +200,11 @@ AssetError AssetManager::RegisterAssetLib(const String &path, AssetLibEx *&out_l
 	}
 
 	out_lib = lib.get();
+#ifdef TODO
 	_libs.push_back(std::move(lib));
+#else
+	error("TODO: std::move");
+#endif
 	return kAssetNoError;
 }
 

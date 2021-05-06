@@ -41,6 +41,19 @@ namespace Shared {
 
 namespace Path {
 
+String get_filename(const String &path) {
+	Common::String p = path;
+	size_t i = p.findLastOf('/');
+	return (i == Common::String::npos) ? path : String(p.c_str() + i + 1);
+}
+
+String get_extension(const String &path) {
+	Common::String filename = get_filename(path);
+	size_t i = filename.findLastOf('.');
+	return (i == Common::String::npos) ?
+		filename : Common::String(filename.c_str() + i + 1);
+}
+
 bool IsDirectory(const String &filename) {
 	// stat() does not like trailing slashes, remove them
 	String fixed_path = MakePathNoSlash(filename);
