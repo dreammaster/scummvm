@@ -39,7 +39,7 @@
 #include "ags/lib/std/map.h"
 #include "ags/lib/std/map.h"
 //include <string.h>
-#include "ags/shared/ac/dynobj/cc_agsdynamicobject.h"
+#include "ags/engine/ac/dynobj/cc_ags_dynamic_object.h"
 #include "ags/shared/util/string.h"
 #include "ags/shared/util/string_types.h"
 

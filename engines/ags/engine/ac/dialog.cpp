@@ -43,7 +43,7 @@
 #include "ags/shared/ac/sys_events.h"
 #include "ags/shared/ac/string.h"
 #include "ags/shared/ac/dynobj/scriptdialogoptionsrendering.h"
-#include "ags/shared/ac/dynobj/scriptdrawingsurface.h"
+#include "ags/engine/ac/dynobj/script_drawing_surface.h"
 #include "ags/shared/ac/system.h"
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/font/fonts.h"

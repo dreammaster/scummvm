@@ -43,6 +43,8 @@ namespace Shared {
 
 class Stream : public IAGSStream {
 public:
+	virtual ~Stream() {}
+
 	// Tells if the stream has errors
 	virtual bool HasErrors() const {
 		return false;

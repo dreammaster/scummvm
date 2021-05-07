@@ -35,6 +35,7 @@
 #include "ags/lib/std/memory.h"
 #include "ags/lib/std/set.h"
 #include "ags/lib/std/vector.h"
+#include "ags/shared/core/platform.h"
 #include "ags/shared/ac/game_version.h"
 #include "ags/shared/game/plugin_info.h"
 #include "ags/shared/script/cc_script.h"
@@ -82,15 +83,19 @@ String GetMainGameFileErrorText(MainGameFileErrorType err);
 
 typedef TypedCodeError<MainGameFileErrorType, GetMainGameFileErrorText> MainGameFileError;
 typedef ErrorHandle<MainGameFileError> HGameFileError;
+#ifdef AGS_PLATFORM_SCUMMVM
+typedef std::shared_ptr<Stream> UStream;
+#else
 typedef std::unique_ptr<Stream> UStream;
+#endif
 
 // MainGameSource defines a successfully opened main game file
 struct MainGameSource {
 	// Standart main game file names for 3.* and 2.* games respectively
-	static const String DefaultFilename_v3;
-	static const String DefaultFilename_v2;
+	static const char *DefaultFilename_v3;
+	static const char *DefaultFilename_v2;
 	// Signature of the current game format
-	static const String Signature;
+	static const char *Signature;
 
 	// Name of the asset file
 	String              Filename;

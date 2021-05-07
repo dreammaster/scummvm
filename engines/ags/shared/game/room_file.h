@@ -33,6 +33,7 @@
 
 #include "ags/lib/std/memory.h"
 #include "ags/lib/std/vector.h"
+#include "ags/shared/core/platform.h"
 #include "ags/shared/game/room_version.h"
 #include "ags/shared/util/error.h"
 #include "ags/shared/util/stream.h"
@@ -66,7 +67,12 @@ String GetRoomFileErrorText(RoomFileErrorType err);
 
 typedef TypedCodeError<RoomFileErrorType, GetRoomFileErrorText> RoomFileError;
 typedef ErrorHandle<RoomFileError> HRoomFileError;
+#ifdef AGS_PLATFORM_SCUMMVM
+typedef std::shared_ptr<Stream> UStream;
+#else
 typedef std::unique_ptr<Stream> UStream;
+#endif
+
 
 
 // RoomDataSource defines a successfully opened room file

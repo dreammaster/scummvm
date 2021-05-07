@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/dynobj/scriptdrawingsurface.h"
+#include "ags/engine/ac/dynobj/script_drawing_surface.h"
 #include "ags/shared/ac/spritecache.h"
 #include "ags/shared/ac/runtime_defines.h"
 #include "ags/shared/ac/common.h"

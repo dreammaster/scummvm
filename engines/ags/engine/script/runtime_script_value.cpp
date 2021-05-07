@@ -22,7 +22,7 @@
 
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/runtimescriptvalue.h"
-#include "ags/shared/ac/dynobj/cc_dynamicobject.h"
+#include "ags/engine/ac/dynobj/cc_dynamic_object.h"
 #include "ags/shared/ac/statobj/staticobject.h"
 #include "ags/shared/util/memory.h"
 

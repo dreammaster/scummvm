@@ -742,11 +742,13 @@ HRoomFileError UpdateRoomData(RoomStruct *room, RoomFileVersion data_ver, bool g
 }
 
 HRoomFileError ExtractScriptText(String &script, Stream *in, RoomFileVersion data_ver) {
+	HRoomFileError err;
+
 	while (true) {
 		RoomFileBlock block_id;
 		String ext_id;
 		soff_t block_len;
-		HRoomFileError err = OpenNextBlock(in, data_ver, block_id, ext_id, block_len);
+		err = OpenNextBlock(in, data_ver, block_id, ext_id, block_len);
 		if (!err)
 			return err;
 		if (ext_id.IsEmpty())
@@ -754,7 +756,7 @@ HRoomFileError ExtractScriptText(String &script, Stream *in, RoomFileVersion dat
 
 		if (block_id == kRoomFblk_Script) {
 			char *buf = nullptr;
-			HRoomFileError err = ReadScriptBlock(buf, in, data_ver);
+			err = ReadScriptBlock(buf, in, data_ver);
 			if (err) {
 				script = buf;
 				delete buf;

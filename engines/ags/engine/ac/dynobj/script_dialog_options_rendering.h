@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef AGS_ENGINE_AC_DYNOBJ_SCRIPTDIALOGOPTIONSRENDERING_H
-#define AGS_ENGINE_AC_DYNOBJ_SCRIPTDIALOGOPTIONSRENDERING_H
+#ifndef AGS_ENGINE_AC_DYNOBJ_SCRIPT_DIALOG_OPTIONS_RENDERING_H
+#define AGS_ENGINE_AC_DYNOBJ_SCRIPT_DIALOG_OPTIONS_RENDERING_H
 
-#include "ags/shared/ac/dynobj/scriptdrawingsurface.h"
+#include "ags/engine/ac/dynobj/script_drawing_surface.h"
 
 namespace AGS3 {
 

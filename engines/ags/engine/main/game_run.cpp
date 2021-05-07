@@ -48,7 +48,7 @@
 #include "ags/shared/ac/overlay.h"
 #include "ags/shared/ac/sys_events.h"
 #include "ags/shared/ac/room.h"
-#include "ags/shared/ac/roomobject.h"
+#include "ags/engine/ac/room_object.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/debug/debugger.h"
 #include "ags/shared/debug/debug_log.h"

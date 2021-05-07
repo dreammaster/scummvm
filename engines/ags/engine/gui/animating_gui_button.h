@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_GUI_ANIMATING_GUI_BUTTON_H
 #define AGS_ENGINE_GUI_ANIMATING_GUI_BUTTON_H
 
-#include "ags/shared/ac/runtime_defines.h"
+#include "ags/engine/ac/runtime_defines.h"
 
 namespace AGS3 {
 

@@ -29,7 +29,7 @@ namespace AGS3 {
 
 #define DOMOUSE_UPDATE 0
 #define DOMOUSE_ENABLE 1
-#include "ags/shared/MOUSE_DISABLE 2
+#define DOMOUSE_DISABLE 2
 #define DOMOUSE_NOCURSOR 5
 
 void Mouse_SetVisible(int isOn);

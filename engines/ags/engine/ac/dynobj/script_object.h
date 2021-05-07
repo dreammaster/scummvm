@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef AGS_ENGINE_DYNOBJ__SCRIPTOBJECT_H
-#define AGS_ENGINE_DYNOBJ__SCRIPTOBJECT_H
+#ifndef AGS_ENGINE_DYNOBJ_SCRIPT_OBJECT_H
+#define AGS_ENGINE_DYNOBJ_SCRIPT_OBJECT_H
 
-#include "ags/shared/ac/roomobject.h"
+#include "ags/engine/ac/room_object.h"
 
 namespace AGS3 {
 

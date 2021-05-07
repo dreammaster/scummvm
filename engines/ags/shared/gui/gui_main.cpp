@@ -709,10 +709,10 @@ GUILabelMacro FindLabelMacros(const String &text) {
 	return (GUILabelMacro)macro_flags;
 }
 
-HError ResortGUI(std::vector<GUIMain> &guis, bool bwcompat_ctrl_zorder = false) {
+HError ResortGUI(std::vector<GUIMain> &theGuis, bool bwcompat_ctrl_zorder = false) {
 	// set up the reverse-lookup array
-	for (size_t gui_index = 0; gui_index < guis.size(); ++gui_index) {
-		GUIMain &gui = guis[gui_index];
+	for (size_t gui_index = 0; gui_index < theGuis.size(); ++gui_index) {
+		GUIMain &gui = theGuis[gui_index];
 		HError err = gui.RebuildArray();
 		if (!err)
 			return err;

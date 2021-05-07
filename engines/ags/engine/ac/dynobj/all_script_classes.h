@@ -26,7 +26,7 @@
 #include "ags/shared/ac/dynobj/scriptdatetime.h"
 #include "ags/shared/ac/dynobj/scriptdialog.h"
 #include "ags/shared/ac/dynobj/scriptdialogoptionsrendering.h"
-#include "ags/shared/ac/dynobj/scriptdrawingsurface.h"
+#include "ags/engine/ac/dynobj/script_drawing_surface.h"
 #include "ags/shared/ac/dynobj/scriptdynamicsprite.h"
 #include "ags/shared/ac/dynobj/scriptgui.h"
 #include "ags/shared/ac/dynobj/scripthotspot.h"

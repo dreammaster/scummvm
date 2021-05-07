@@ -27,7 +27,7 @@
 #include "ags/shared/ac/gamesetupstruct.h"
 #include "ags/shared/ac/object.h"
 #include "ags/shared/ac/room.h"
-#include "ags/shared/ac/roomobject.h"
+#include "ags/engine/ac/room_object.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/walkablearea.h"
 #include "ags/shared/game/roomstruct.h"

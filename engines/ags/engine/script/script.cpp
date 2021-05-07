@@ -41,7 +41,7 @@
 #include "ags/shared/ac/invwindow.h"
 #include "ags/shared/ac/mouse.h"
 #include "ags/shared/ac/room.h"
-#include "ags/shared/ac/roomobject.h"
+#include "ags/engine/ac/room_object.h"
 #include "ags/shared/gui/guimain.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/cc_options.h"

@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_AC_DYNOBJ_ALL_DYNAMIC_CLASSES_H
 #define AGS_ENGINE_AC_DYNOBJ_ALL_DYNAMIC_CLASSES_H
 
-#include "ags/shared/ac/dynobj/cc_agsdynamicobject.h"
+#include "ags/engine/ac/dynobj/cc_ags_dynamic_object.h"
 #include "ags/shared/ac/dynobj/cc_audiochannel.h"
 #include "ags/shared/ac/dynobj/cc_audioclip.h"
 #include "ags/shared/ac/dynobj/cc_character.h"

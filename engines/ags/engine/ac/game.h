@@ -34,12 +34,14 @@
 #include "ags/shared/util/string.h"
 
 namespace AGS3 {
-#include "ags/shared/#include "ags/shared/ declaration
-#include "ags/shared/AGS {
+
+namespace AGS {
 namespace Shared {
-class Bitmap; class Stream;
-}
-}
+class Bitmap;
+class Stream;
+} // namespace Shared
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
 #define RAGMODE_PRESERVEGLOBALINT 1

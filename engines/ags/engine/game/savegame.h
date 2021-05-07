@@ -24,6 +24,7 @@
 #define AGS_ENGINE_GAME_SAVEGAME_H
 
 #include "ags/lib/std/memory.h"
+#include "ags/shared/core/platform.h"
 #include "ags/shared/ac/game_version.h"
 #include "ags/shared/util/error.h"
 #include "ags/shared/util/version.h"
@@ -95,8 +96,13 @@ String GetSavegameErrorText(SavegameErrorType err);
 
 typedef TypedCodeError<SavegameErrorType, GetSavegameErrorText> SavegameError;
 typedef ErrorHandle<SavegameError> HSaveError;
-typedef std::unique_ptr<Stream> UStream;
 typedef std::unique_ptr<Bitmap> UBitmap;
+#ifdef AGS_PLATFORM_SCUMMVM
+typedef std::shared_ptr<Stream> UStream;
+#else
+typedef std::unique_ptr<Stream> UStream;
+#endif
+
 
 // SavegameSource defines a successfully opened savegame stream
 struct SavegameSource {

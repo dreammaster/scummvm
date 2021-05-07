@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef AGS_ENGINE_DYNOBJ__SCRIPTDATETIME_H
-#define AGS_ENGINE_DYNOBJ__SCRIPTDATETIME_H
+#ifndef AGS_ENGINE_DYNOBJ_SCRIPT_DATE_TIME_H
+#define AGS_ENGINE_DYNOBJ_SCRIPT_DATE_TIME_H
 
-#include "ags/shared/ac/dynobj/cc_agsdynamicobject.h"
+#include "ags/engine/ac/dynobj/cc_ags_dynamic_object.h"
 
 namespace AGS3 {
 

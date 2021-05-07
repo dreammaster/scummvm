@@ -30,7 +30,7 @@
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/objectcache.h"
-#include "ags/shared/ac/roomobject.h"
+#include "ags/engine/ac/room_object.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/string.h"
 #include "ags/shared/debug/debug_log.h"

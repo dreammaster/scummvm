@@ -33,7 +33,7 @@
 #include "ags/shared/ac/math.h"    // M_PI
 #include "ags/shared/ac/objectcache.h"
 #include "ags/shared/ac/path_helper.h"
-#include "ags/shared/ac/roomobject.h"
+#include "ags/engine/ac/room_object.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/system.h"
 #include "ags/shared/debug/debug_log.h"

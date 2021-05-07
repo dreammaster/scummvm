@@ -34,7 +34,7 @@
 #include "ags/shared/ac/object.h"
 #include "ags/shared/ac/objectcache.h"
 #include "ags/shared/ac/properties.h"
-#include "ags/shared/ac/roomobject.h"
+#include "ags/engine/ac/room_object.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/string.h"
 #include "ags/shared/ac/viewframe.h"

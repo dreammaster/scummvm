@@ -43,9 +43,9 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 
-const String MainGameSource::DefaultFilename_v3 = "game28.dta";
-const String MainGameSource::DefaultFilename_v2 = "ac2game.dta";
-const String MainGameSource::Signature = "Adventure Creator Game File v2";
+const char *MainGameSource::DefaultFilename_v3 = "game28.dta";
+const char *MainGameSource::DefaultFilename_v2 = "ac2game.dta";
+const char *MainGameSource::Signature = "Adventure Creator Game File v2";
 
 MainGameSource::MainGameSource()
 	: DataVersion(kGameVersion_Undefined) {
@@ -164,7 +164,7 @@ String FindGameData(const String &path) {
 // Begins reading main game file from a generic stream
 static HGameFileError OpenMainGameFileBase(Stream *in, MainGameSource &src) {
 	// Check data signature
-	String data_sig = String::FromStreamCount(in, MainGameSource::Signature.GetLength());
+	String data_sig = String::FromStreamCount(in, strlen(MainGameSource::Signature));
 	if (data_sig.Compare(MainGameSource::Signature))
 		return new MainGameFileError(kMGFErr_SignatureFailed);
 	// Read data format version and requested engine version

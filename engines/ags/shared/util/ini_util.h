@@ -44,6 +44,7 @@ typedef std::map<String, StringOrderMap> ConfigTree;
 typedef ConfigTree::const_iterator       ConfigNode;
 
 namespace IniUtil {
+
 // Parse the contents of given file as INI format and insert values
 // into the tree. The pre-existing tree items, if any, are NOT erased.
 // Returns FALSE if the file could not be opened.
@@ -67,7 +68,8 @@ void WriteToString(String &s, const ConfigTree &tree);
 // or same stream opened for both reading and writing.
 // Returns FALSE if the file could not be opened for writing.
 bool Merge(const String &file, const ConfigTree &tree);
-};
+
+} // namespace IniUtil
 
 } // namespace Shared
 } // namespace AGS

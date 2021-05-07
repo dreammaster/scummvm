@@ -24,22 +24,20 @@
 #define AGS_ENGINE_MAIN_MAIN_HEADER_H
 
 #include "ags/shared/core/platform.h"
-
-#include "ags/shared/main/maindefines_ex.h"
-
-#include "ags/shared/ac/math.h"
-#include "ags/shared/script/script_runtime.h"
-#include "ags/shared/gui/animatingguibutton.h"
-#include "ags/shared/gui/guibutton.h"
-#include "ags/shared/gfx/gfxfilter.h"
+#include "ags/engine/main/main_defines_ex.h"
+#include "ags/engine/ac/math.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/gui/animating_gui_button.h"
+#include "ags/shared/gui/gui_button.h"
+#include "ags/engine/gfx/gfxfilter.h"
 #include "ags/shared/util/string_utils.h"
-#include "ags/shared/device/mousew32.h"
-#include "ags/shared/ac/route_finder.h"
+#include "ags/engine/device/mouse_w32.h"
+#include "ags/engine/ac/route_finder.h"
 #include "ags/shared/util/misc.h"
 #include "ags/shared/script/cc_error.h"
 
 // include last since we affect windows includes
-#include "ags/shared/ac/file.h"
+#include "ags/engine/ac/file.h"
 
 #if AGS_PLATFORM_OS_ANDROID
 //include <sys/stat.h>

@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_DYNOBJ__SCRIPTFILE_H
 #define AGS_ENGINE_DYNOBJ__SCRIPTFILE_H
 
-#include "ags/shared/ac/dynobj/cc_dynamicobject.h"
+#include "ags/engine/ac/dynobj/cc_dynamic_object.h"
 #include "ags/shared/util/file.h"
 
 namespace AGS3 {

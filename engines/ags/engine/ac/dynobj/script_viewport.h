@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_AC_DYNOBJ_SCRIPT_VIEWPORT_H
 #define AGS_ENGINE_AC_DYNOBJ_SCRIPT_VIEWPORT_H
 
-#include "ags/shared/ac/dynobj/cc_agsdynamicobject.h"
+#include "ags/engine/ac/dynobj/cc_ags_dynamic_object.h"
 
 namespace AGS3 {
 

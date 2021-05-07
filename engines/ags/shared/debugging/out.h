@@ -138,11 +138,11 @@ struct DebugGroupID {
 	}
 	// Tells if any of the id components is valid
 	bool IsValid() const {
-		return ID != kDbgGroup_None || !SID.IsEmpty();
+		return ID != (uint32_t)kDbgGroup_None || !SID.IsEmpty();
 	}
 	// Tells if both id components are properly set
 	bool IsComplete() const {
-		return ID != kDbgGroup_None && !SID.IsEmpty();
+		return ID != (uint32_t)kDbgGroup_None && !SID.IsEmpty();
 	}
 };
 

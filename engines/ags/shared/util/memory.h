@@ -71,7 +71,7 @@ inline int16_t ReadInt16(const void *ptr) {
 	return (b[1] << 8) | b[0];
 #endif
 #else
-	return *(int16_t *)ptr;
+	return *(const int16_t *)ptr;
 #endif
 }
 
@@ -84,7 +84,7 @@ inline int32_t ReadInt32(const void *ptr) {
 	return (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
 #endif
 #else
-	return *(int32_t *)ptr;
+	return *(const int32_t *)ptr;
 #endif
 }
 
@@ -99,7 +99,7 @@ inline int64_t ReadInt64(const void *ptr) {
 		(b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
 #endif
 #else
-	return *(int64_t *)ptr;
+	return *(const int64_t *)ptr;
 #endif
 }
 

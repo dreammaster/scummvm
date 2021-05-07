@@ -25,7 +25,6 @@
 
 #include "ags/lib/std/memory.h"
 #include "ags/lib/std/vector.h"
-
 #include "ags/shared/ac/character_info.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/game/room_struct.h"
@@ -41,13 +40,16 @@ namespace AGS3 {
 // Forward declaration
 namespace AGS {
 namespace Shared {
-class Bitmap; class Stream;
+class Bitmap;
+class Stream;
 typedef std::shared_ptr<Bitmap> PBitmap;
-}
+} // namespace Shared
+
 namespace Engine {
 struct RestoredData;
-}
-}
+} // namespace Engine
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 struct ScriptViewport;
 struct ScriptCamera;

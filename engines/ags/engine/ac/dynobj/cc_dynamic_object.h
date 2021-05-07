@@ -38,8 +38,8 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 class Stream;
-}
-}
+} // namespace Shared
+} // namespace AGS
 using namespace AGS; // FIXME later
 
 // A pair of managed handle and abstract object pointer
@@ -90,15 +90,17 @@ struct ICCDynamicObject {
 	virtual void    WriteFloat(const char *address, intptr_t offset, float val) = 0;
 
 protected:
-	ICCDynamicObject() = default;
-	~ICCDynamicObject() = default;
+	ICCDynamicObject() {}
+	virtual ~ICCDynamicObject() {}
 };
 
 struct ICCObjectReader {
+	virtual ~ICCObjectReader() {}
 	// TODO: pass savegame format version
 	virtual void Unserialize(int index, const char *objectType, const char *serializedData, int dataSize) = 0;
 };
 struct ICCStringClass {
+	virtual ~ICCStringClass() {}
 	virtual DynObjectRef CreateString(const char *fromText) = 0;
 };
 

@@ -25,6 +25,7 @@
 
 #include "ags/lib/std/type_traits.h"
 #include "ags/lib/std/chrono.h"
+#include "ags/lib/std/xtr1common.h"
 
 namespace AGS3 {
 

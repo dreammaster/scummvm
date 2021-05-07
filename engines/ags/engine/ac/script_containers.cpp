@@ -29,7 +29,7 @@
 #include "ags/shared/ac/common.h" // quit
 #include "ags/shared/ac/string.h"
 #include "ags/shared/ac/dynobj/cc_dynamicarray.h"
-#include "ags/shared/ac/dynobj/cc_dynamicobject.h"
+#include "ags/engine/ac/dynobj/cc_dynamic_object.h"
 #include "ags/shared/ac/dynobj/scriptdict.h"
 #include "ags/shared/ac/dynobj/scriptset.h"
 #include "ags/shared/ac/dynobj/scriptstring.h"

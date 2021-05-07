@@ -37,12 +37,12 @@ namespace AGS3 {
 
 #define MAXCURSORS 20
 
-
 namespace AGS {
 namespace Shared {
 class Bitmap;
-}
-}
+} // namespace Shared
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
 void msetgraphpos(int, int);
@@ -55,6 +55,7 @@ void msethotspot(int xx, int yy);
 int minstalled();
 
 namespace Mouse {
+
 // Get if mouse is locked to the game window
 bool IsLockedToWindow();
 // Try locking mouse to the game window
@@ -74,9 +75,7 @@ float GetSpeedUnit();
 void SetSpeed(float speed);
 // Get speed factor
 float GetSpeed();
-}
 
-namespace Mouse {
 // Updates limits of the area inside which the standard OS cursor is not shown;
 // uses game's main viewport (in native coordinates) to calculate real area on screen
 void UpdateGraphicArea();
@@ -85,13 +84,6 @@ void UpdateGraphicArea();
 void SetMoveLimit(const Rect &r);
 // Set actual OS cursor position on screen; parameter must be in native game coordinates
 void SetPosition(const Point p);
-}
 
-
-extern int mousex, mousey;
-extern int hotx, hoty;
-extern char currentcursor;
-
-extern Shared::Bitmap *mousecurs[MAXCURSORS];
-
+} // namespace Mouse
 } // namespace AGS3

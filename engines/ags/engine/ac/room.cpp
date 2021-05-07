@@ -46,7 +46,7 @@
 #include "ags/shared/ac/region.h"
 #include "ags/shared/ac/sys_events.h"
 #include "ags/shared/ac/room.h"
-#include "ags/shared/ac/roomobject.h"
+#include "ags/engine/ac/room_object.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/screen.h"
 #include "ags/shared/ac/string.h"

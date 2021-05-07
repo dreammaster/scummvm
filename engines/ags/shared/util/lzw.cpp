@@ -219,12 +219,12 @@ void myputc(int ccc, Stream *out) {
 
 void lzwexpand(Stream *lzw_in, Stream *out) {
 	int bits, ch, i, j, len, mask;
-	char *lzbuffer;
+	char *buf;
 	//  printf(" UnShrinking: %s ",filena);
 	putbytes = 0;
 
-	lzbuffer = (char *)malloc(N);
-	if (lzbuffer == nullptr) {
+	buf = (char *)malloc(N);
+	if (buf == nullptr) {
 		quit("compress.cpp: unable to decompress: insufficient memory");
 	}
 	i = N - F;
@@ -242,13 +242,13 @@ void lzwexpand(Stream *lzw_in, Stream *out) {
 				j = (i - j - 1) & (N - 1);
 
 				while (len--) {
-					myputc(lzbuffer[i] = lzbuffer[j], out);
+					myputc(buf[i] = buf[j], out);
 					j = (j + 1) & (N - 1);
 					i = (i + 1) & (N - 1);
 				}
 			} else {
 				ch = lzw_in->ReadByte();
-				myputc(lzbuffer[i] = ch, out);
+				myputc(buf[i] = ch, out);
 				i = (i + 1) & (N - 1);
 			}
 
@@ -263,7 +263,7 @@ void lzwexpand(Stream *lzw_in, Stream *out) {
 			break;
 	}
 
-	free(lzbuffer);
+	free(buf);
 	expand_to_mem = 0;
 }
 

@@ -29,7 +29,7 @@
 #ifndef AGS_ENGINE_DYNOBJ__SCRIPTUSERSTRUCT_H
 #define AGS_ENGINE_DYNOBJ__SCRIPTUSERSTRUCT_H
 
-#include "ags/shared/ac/dynobj/cc_agsdynamicobject.h"
+#include "ags/engine/ac/dynobj/cc_ags_dynamic_object.h"
 
 namespace AGS3 {
 

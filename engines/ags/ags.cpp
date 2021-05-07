@@ -118,6 +118,7 @@ Common::String AGSEngine::getGameId() const {
 }
 
 Common::Error AGSEngine::run() {
+#ifdef TODO
 	if (debugChannelSet(-1, kDebugScan)) {
 		// Scan the given folder and subfolders for unknown games
 		AGS3::GameScanner scanner;
@@ -192,6 +193,7 @@ Common::Error AGSEngine::run() {
 	else {
 		return initialize_engine_with_exception_handling(initialize_engine, startup_opts);
 	}
+#endif
 #endif
 }
 

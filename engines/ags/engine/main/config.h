@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_MAIN_CONFIG_H
 #define AGS_ENGINE_MAIN_CONFIG_H
 
-#include "ags/shared/main/graphics_mode.h"
+#include "ags/engine/main/graphics_mode.h"
 #include "ags/shared/util/ini_util.h"
 
 namespace AGS3 {
