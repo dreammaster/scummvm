@@ -1,16 +1,25 @@
-//=============================================================================
-//
-// Adventure Game Studio (AGS)
-//
-// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
-// The full list of copyright holders can be found in the Copyright.txt
-// file, which is part of this source code distribution.
-//
-// The AGS source code is provided under the Artistic License 2.0.
-// A copy of this license can be found in the file License.txt and at
-// http://www.opensource.org/licenses/artistic-license-2.0.php
-//
-//=============================================================================
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
+
 #include "ac/global_walkablearea.h"
 #include "ac/common.h"
 #include "ac/common_defines.h"
@@ -20,74 +29,74 @@
 #include "debug/debug_log.h"
 #include "game/roomstruct.h"
 
+namespace AGS3 {
+
 using namespace AGS::Shared;
 
 extern RoomStruct thisroom;
 
 
-int GetScalingAt (int x, int y) {
-    int onarea = get_walkable_area_pixel(x, y);
-    if (onarea < 0)
-        return 100;
+int GetScalingAt(int x, int y) {
+	int onarea = get_walkable_area_pixel(x, y);
+	if (onarea < 0)
+		return 100;
 
-    return get_area_scaling (onarea, x, y);
+	return get_area_scaling(onarea, x, y);
 }
 
 void SetAreaScaling(int area, int min, int max) {
-    if ((area < 0) || (area > MAX_WALK_AREAS))
-        quit("!SetAreaScaling: invalid walkalbe area");
+	if ((area < 0) || (area > MAX_WALK_AREAS))
+		quit("!SetAreaScaling: invalid walkalbe area");
 
-    if (min > max)
-        quit("!SetAreaScaling: min > max");
+	if (min > max)
+		quit("!SetAreaScaling: min > max");
 
-    if ((min < 5) || (max < 5) || (min > 200) || (max > 200))
-        quit("!SetAreaScaling: min and max must be in range 5-200");
+	if ((min < 5) || (max < 5) || (min > 200) || (max > 200))
+		quit("!SetAreaScaling: min and max must be in range 5-200");
 
-    // the values are stored differently
-    min -= 100;
-    max -= 100;
+	// the values are stored differently
+	min -= 100;
+	max -= 100;
 
-    if (min == max) {
-        thisroom.WalkAreas[area].ScalingFar = min;
-        thisroom.WalkAreas[area].ScalingNear = NOT_VECTOR_SCALED;
-    }
-    else {
-        thisroom.WalkAreas[area].ScalingFar = min;
-        thisroom.WalkAreas[area].ScalingNear = max;
-    }
+	if (min == max) {
+		thisroom.WalkAreas[area].ScalingFar = min;
+		thisroom.WalkAreas[area].ScalingNear = NOT_VECTOR_SCALED;
+	} else {
+		thisroom.WalkAreas[area].ScalingFar = min;
+		thisroom.WalkAreas[area].ScalingNear = max;
+	}
 }
 
 void RemoveWalkableArea(int areanum) {
-  if ((areanum<1) | (areanum>15))
-    quit("!RemoveWalkableArea: invalid area number specified (1-15).");
-  play.walkable_areas_on[areanum]=0;
-  redo_walkable_areas();
-  debug_script_log("Walkable area %d removed", areanum);
+	if ((areanum < 1) | (areanum > 15))
+		quit("!RemoveWalkableArea: invalid area number specified (1-15).");
+	play.walkable_areas_on[areanum] = 0;
+	redo_walkable_areas();
+	debug_script_log("Walkable area %d removed", areanum);
 }
 
 void RestoreWalkableArea(int areanum) {
-  if ((areanum<1) | (areanum>15))
-    quit("!RestoreWalkableArea: invalid area number specified (1-15).");
-  play.walkable_areas_on[areanum]=1;
-  redo_walkable_areas();
-  debug_script_log("Walkable area %d restored", areanum);
+	if ((areanum < 1) | (areanum > 15))
+		quit("!RestoreWalkableArea: invalid area number specified (1-15).");
+	play.walkable_areas_on[areanum] = 1;
+	redo_walkable_areas();
+	debug_script_log("Walkable area %d restored", areanum);
 }
 
 int GetWalkableAreaAtScreen(int x, int y) {
-  VpPoint vpt = play.ScreenToRoomDivDown(x, y);
-  if (vpt.second < 0)
-    return 0;
-  return GetWalkableAreaAtRoom(vpt.first.X, vpt.first.Y);
+	VpPoint vpt = play.ScreenToRoomDivDown(x, y);
+	if (vpt.second < 0)
+		return 0;
+	return GetWalkableAreaAtRoom(vpt.first.X, vpt.first.Y);
 }
 
 int GetWalkableAreaAtRoom(int x, int y) {
-  if ((x>=thisroom.Width) | (x<0) | (y<0) | (y>=thisroom.Height))
-    return 0;
-  int result = get_walkable_area_pixel(x, y);
-  if (result <= 0)
-    return 0;
-  return result;
+	if ((x >= thisroom.Width) | (x < 0) | (y < 0) | (y >= thisroom.Height))
+		return 0;
+	int result = get_walkable_area_pixel(x, y);
+	if (result <= 0)
+		return 0;
+	return result;
 }
 
-//=============================================================================
-
+} // namespace AGS3
