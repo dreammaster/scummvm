@@ -25,10 +25,10 @@
 
 #include "ags/lib/std/memory.h"
 #include "ags/lib/std/vector.h"
-#include "ac/common_defines.h"
-#include "game/roomstruct.h"
-#include "gfx/bitmap.h"
-#include "media/audio/audiodefines.h"
+#include "ags/shared/ac/common_defines.h"
+#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/gfx/bitmap.h"
+#include "ags/shared/media/audio/audiodefines.h"
 
 namespace AGS3 {
 namespace AGS {

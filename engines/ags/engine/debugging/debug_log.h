@@ -23,10 +23,10 @@
 #ifndef AGS_ENGINE_DEBUGGING_DEBUG_LOG_H
 #define AGS_ENGINE_DEBUGGING_DEBUG_LOG_H
 
-#include "ac/runtime_defines.h"
-#include "debug/out.h"
-#include "util/ini_util.h"
-#include "util/string.h"
+#include "ags/shared/ac/runtime_defines.h"
+#include "ags/shared/debug/out.h"
+#include "ags/shared/util/ini_util.h"
+#include "ags/shared/util/string.h"
 
 namespace AGS3 {
 

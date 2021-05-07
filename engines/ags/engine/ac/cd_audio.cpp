@@ -20,8 +20,8 @@
  *
  */
 
-#include "ac/cdaudio.h"
-#include "platform/base/agsplatformdriver.h"
+#include "ags/shared/ac/cdaudio.h"
+#include "ags/shared/platform/base/agsplatformdriver.h"
 
 namespace AGS3 {
 

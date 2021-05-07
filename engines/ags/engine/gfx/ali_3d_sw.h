@@ -37,11 +37,11 @@
 
 #include "ags/lib/std/memory.h"
 //include <SDL.h>
-#include "core/platform.h"
-#include "gfx/bitmap.h"
-#include "gfx/ddb.h"
-#include "gfx/gfxdriverfactorybase.h"
-#include "gfx/gfxdriverbase.h"
+#include "ags/shared/core/platform.h"
+#include "ags/shared/gfx/bitmap.h"
+#include "ags/shared/gfx/ddb.h"
+#include "ags/shared/gfx/gfxdriverfactorybase.h"
+#include "ags/shared/gfx/gfxdriverbase.h"
 
 namespace AGS3 {
 namespace AGS

@@ -38,9 +38,9 @@
 #include "ags/lib/std/set.h"
 #include "ags/lib/std/unordered_set.h"
 //include <string.h>
-#include "ac/dynobj/cc_agsdynamicobject.h"
-#include "util/string.h"
-#include "util/string_types.h"
+#include "ags/shared/ac/dynobj/cc_agsdynamicobject.h"
+#include "ags/shared/util/string.h"
+#include "ags/shared/util/string_types.h"
 
 namespace AGS3 {
 

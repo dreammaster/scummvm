@@ -42,7 +42,7 @@
 #include "ags/globals.h"
 
 #if defined (AGS_HAS_CD_AUDIO)
-#include "libcda.h"
+#include "ags/shared/libcda.h"
 #endif
 
 namespace AGS3 {

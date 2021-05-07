@@ -35,8 +35,8 @@
 #ifndef AGS_ENGINE_GFX_GFX_UTIL_H
 #define AGS_ENGINE_GFX_GFX_UTIL_H
 
-#include "gfx/bitmap.h"
-#include "gfx/gfx_def.h"
+#include "ags/shared/gfx/bitmap.h"
+#include "ags/shared/gfx/gfx_def.h"
 
 namespace AGS3 {
 namespace AGS {

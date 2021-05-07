@@ -29,8 +29,8 @@
 #ifndef AGS_ENGINE_MEDIA_AUDIO_SOUND_H
 #define AGS_ENGINE_MEDIA_AUDIO_SOUND_H
 
-#include "ac/asset_helper.h"
-#include "media/audio/soundclip.h"
+#include "ags/shared/ac/asset_helper.h"
+#include "ags/shared/media/audio/soundclip.h"
 
 namespace AGS3 {
 

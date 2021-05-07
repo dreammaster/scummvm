@@ -22,7 +22,7 @@
 
 #include "ags/lib/std/memory.h"
 #include "ags/lib/std/limits.h"
-#include "core/platform.h"
+#include "ags/shared/core/platform.h"
 #if AGS_PLATFORM_OS_WINDOWS
 #define NOMINMAX
 #define BITMAP WINDOWS_BITMAP
@@ -30,29 +30,29 @@
 #undef BITMAP
 #endif
 //include <SDL.h>
-#include "ac/common.h"
-#include "ac/gamesetupstruct.h"
-#include "ac/gamestate.h"
-#include "ac/runtime_defines.h"
-#include "debug/agseditordebugger.h"
-#include "debug/debug_log.h"
-#include "debug/debugger.h"
-#include "debug/debugmanager.h"
-#include "debug/out.h"
-#include "debug/consoleoutputtarget.h"
-#include "debug/logfile.h"
-#include "debug/messagebuffer.h"
-#include "main/config.h"
-#include "media/audio/audio_system.h"
-#include "platform/base/agsplatformdriver.h"
-#include "platform/base/sys_main.h"
-#include "plugin/plugin_engine.h"
-#include "script/script.h"
-#include "script/script_common.h"
-#include "script/cc_error.h"
-#include "util/path.h"
-#include "util/string_utils.h"
-#include "util/textstreamwriter.h"
+#include "ags/shared/ac/common.h"
+#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/gamestate.h"
+#include "ags/shared/ac/runtime_defines.h"
+#include "ags/shared/debug/agseditordebugger.h"
+#include "ags/shared/debug/debug_log.h"
+#include "ags/shared/debug/debugger.h"
+#include "ags/shared/debug/debugmanager.h"
+#include "ags/shared/debug/out.h"
+#include "ags/shared/debug/consoleoutputtarget.h"
+#include "ags/shared/debug/logfile.h"
+#include "ags/shared/debug/messagebuffer.h"
+#include "ags/shared/main/config.h"
+#include "ags/shared/media/audio/audio_system.h"
+#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/shared/platform/base/sys_main.h"
+#include "ags/shared/plugin/plugin_engine.h"
+#include "ags/shared/script/script.h"
+#include "ags/shared/script/script_common.h"
+#include "ags/shared/script/cc_error.h"
+#include "ags/shared/util/path.h"
+#include "ags/shared/util/string_utils.h"
+#include "ags/shared/util/textstreamwriter.h"
 
 namespace AGS3 {
 
@@ -76,7 +76,7 @@ volatile int game_paused_in_debugger = 0;
 
 #if AGS_PLATFORM_OS_WINDOWS
 
-#include "platform/windows/debug/namedpipesagsdebugger.h"
+#include "ags/shared/platform/windows/debug/namedpipesagsdebugger.h"
 
 HWND editor_window_handle = 0;
 

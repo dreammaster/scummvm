@@ -20,18 +20,18 @@
  *
  */
 
-#include "ac/sys_events.h"
+#include "ags/shared/ac/sys_events.h"
 //include <deque>
 //include <SDL.h>
-#include "core/platform.h"
-#include "ac/common.h"
-#include "ac/gamesetupstruct.h"
-#include "ac/keycode.h"
-#include "ac/mouse.h"
-#include "ac/timer.h"
-#include "device/mousew32.h"
-#include "platform/base/agsplatformdriver.h"
-#include "main/engine.h"
+#include "ags/shared/core/platform.h"
+#include "ags/shared/ac/common.h"
+#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/keycode.h"
+#include "ags/shared/ac/mouse.h"
+#include "ags/shared/ac/timer.h"
+#include "ags/shared/device/mousew32.h"
+#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/shared/main/engine.h"
 
 namespace AGS3 {
 

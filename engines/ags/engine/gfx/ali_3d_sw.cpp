@@ -20,15 +20,15 @@
  *
  */
 
-#include "gfx/ali3dsw.h"
+#include "ags/shared/gfx/ali3dsw.h"
 #include "ags/lib/std/algorithm.h"
-#include "ac/sys_events.h"
-#include "gfx/ali3dexception.h"
-#include "gfx/gfxfilter_sdl_renderer.h"
-#include "gfx/gfx_util.h"
-#include "platform/base/agsplatformdriver.h"
-#include "platform/base/sys_main.h"
-#include "ac/timer.h"
+#include "ags/shared/ac/sys_events.h"
+#include "ags/shared/gfx/ali3dexception.h"
+#include "ags/shared/gfx/gfxfilter_sdl_renderer.h"
+#include "ags/shared/gfx/gfx_util.h"
+#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/shared/platform/base/sys_main.h"
+#include "ags/shared/ac/timer.h"
 
 namespace AGS3 {
 namespace AGS {

@@ -21,9 +21,9 @@
  */
 
 //include <string.h>
-#include "debug/logfile.h"
-#include "util/file.h"
-#include "util/stream.h"
+#include "ags/shared/debug/logfile.h"
+#include "ags/shared/util/file.h"
+#include "ags/shared/util/stream.h"
 
 namespace AGS3 {
 namespace AGS {

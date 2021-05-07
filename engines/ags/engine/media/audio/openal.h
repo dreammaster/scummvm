@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_MEDIA_AUDIO_OPENAL_H
 #define AGS_ENGINE_MEDIA_AUDIO_OPENAL_H
 
-#include "core/platform.h"
+#include "ags/shared/core/platform.h"
 
 #if AGS_PLATFORM_OS_MACOS
     //include <OpenAL/OpenAL.h>
@@ -31,7 +31,7 @@
     //include <AL/al.h>
     //include <AL/alc.h>
     // [sonneveld] disabled until I add extension detection
-    // #include "alext.h"
+    // #include "ags/shared/alext.h"
 #endif
 
 #endif

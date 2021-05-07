@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_GUI_MY_TEXTBOX_H
 #define AGS_ENGINE_GUI_MY_TEXTBOX_H
 
-#include "gui/newcontrol.h"
+#include "ags/shared/gui/newcontrol.h"
 
 namespace AGS3 {
 

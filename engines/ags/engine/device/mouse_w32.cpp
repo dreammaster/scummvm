@@ -31,14 +31,14 @@
 //
 //=============================================================================
 
-#include "device/mousew32.h"
+#include "ags/shared/device/mousew32.h"
 //include <SDL.h>
-#include "ac/gamestate.h"
-#include "ac/sys_events.h"
-#include "debug/out.h"
-#include "gfx/bitmap.h"
-#include "main/graphics_mode.h"
-#include "platform/base/sys_main.h"
+#include "ags/shared/ac/gamestate.h"
+#include "ags/shared/ac/sys_events.h"
+#include "ags/shared/debug/out.h"
+#include "ags/shared/gfx/bitmap.h"
+#include "ags/shared/main/graphics_mode.h"
+#include "ags/shared/platform/base/sys_main.h"
 
 namespace AGS3 {
 

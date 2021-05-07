@@ -27,26 +27,23 @@
 #include "ac/gamesetup.h"
 #include "ac/gamesetupstruct.h"
 #include "ac/gamestate.h"
-#include "ac/global_debug.h"
-#include "ac/mouse.h"
-#include "ac/string.h"
-#include "ac/system.h"
-#include "ac/dynobj/scriptsystem.h"
-#include "debug/debug_log.h"
-#include "gfx/graphicsdriver.h"
-#include "main/config.h"
-#include "main/graphics_mode.h"
-#include "main/engine.h"
-#include "main/main.h"
-#include "media/audio/audio_core.h"
-#include "media/audio/audio_system.h"
-#include "util/string_compat.h"
-
-namespace AGS3 {
-
-using namespace AGS::Engine;
-
-extern GameSetupStruct game;
+#include "ags/shared/ac/global_debug.h"
+#include "ags/shared/ac/mouse.h"
+#include "ags/shared/ac/string.h"
+#include "ags/shared/ac/system.h"
+#include "ags/shared/ac/dynobj/scriptsystem.h"
+#include "ags/shared/debug/debug_log.h"
+#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/shared/main/config.h"
+#include "ags/shared/main/graphics_mode.h"
+#include "ags/shared/main/engine.h"
+#include "ags/shared/main/main.h"
+#include "ags/shared/media/audio/audio_core.h"
+#include "ags/shared/media/audio/audio_system.h"
+#include "ags/shared/util/string_compat.h"
+#include "ags/shared/#include "ags/shared/AGS3 {
+#include "ags/shared/#include "ags/shared/space AGS::Engine;
+#include "ags/shared/#include "ags/shared/eSetupStruct game;
 extern GameSetup usetup;
 extern GameState play;
 extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
@@ -219,10 +216,9 @@ void System_SetRenderAtScreenResolution(int enable) {
 #include "ac/dynobj/scriptstring.h"
 
 extern ScriptString myScriptStringImpl;
-
-// int ()
-RuntimeScriptValue Sc_System_GetAudioChannelCount(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_INT(System_GetAudioChannelCount);
+#include "ags/shared/#include "ags/shared/
+#include "ags/shared/iptValue Sc_System_GetAudioChannelCount(const RuntimeScriptValue *params, int32_t param_count) {
+#include "ags/shared/_INT(System_GetAudioChannelCount);
 }
 
 // ScriptAudioChannel* (int index)

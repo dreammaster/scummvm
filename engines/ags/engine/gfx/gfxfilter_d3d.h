@@ -29,7 +29,7 @@
 #ifndef AGS_ENGINE_GFX_D3D_GFX_FILTER_H
 #define AGS_ENGINE_GFX_D3D_GFX_FILTER_H
 
-#include "gfx/gfxfilter_scaling.h"
+#include "ags/shared/gfx/gfxfilter_scaling.h"
 
 namespace AGS3 {
 namespace AGS {

@@ -30,7 +30,7 @@
 #ifndef AGS_ENGINE_DEBUGGING_CONSOLE_OUTPUT_TARGET_H
 #define AGS_ENGINE_DEBUGGING_CONSOLE_OUTPUT_TARGET_H
 
-#include "debug/outputhandler.h"
+#include "ags/shared/debug/outputhandler.h"
 
 namespace AGS3 {
 namespace AGS {

@@ -23,13 +23,12 @@
 #ifndef AGS_ENGINE_UTIL_LIBRARY_H
 #define AGS_ENGINE_UTIL_LIBRARY_H
 
-#include "core/platform.h"
-#include "util/string.h"
+#include "ags/shared/core/platform.h"
+#include "ags/shared/util/string.h"
 
 namespace AGS3 {
 namespace AGS {
 namespace Engine {
-
 
 class BaseLibrary {
 public:
@@ -46,21 +45,20 @@ public:
 	virtual void *GetFunctionAddress(AGS::Shared::String functionName) = 0;
 };
 
-
 } // namespace Engine
 } // namespace AGS
 } // namespace AGS3
 
 #if AGS_PLATFORM_OS_WINDOWS
-#include "library_windows.h"
+#include "ags/shared/library_windows.h"
 
 #elif AGS_PLATFORM_OS_LINUX \
    || AGS_PLATFORM_OS_MACOS \
    || AGS_PLATFORM_OS_ANDROID
-#include "library_posix.h"
+#include "ags/shared/library_posix.h"
 
 #elif AGS_PLATFORM_OS_IOS
-#include "library_dummy.h"
+#include "ags/shared/library_dummy.h"
 
 #endif
 

@@ -26,17 +26,17 @@
 //
 //=============================================================================
 
-#include "ac/route_finder_impl.h"
+#include "ags/shared/ac/route_finder_impl.h"
 
 //include <string.h>
 #include "ags/lib/std/math.h"
 
-#include "ac/common.h"   // quit()
-#include "ac/movelist.h"     // MoveList
-#include "ac/common_defines.h"
-#include "gfx/bitmap.h"
-#include "debug/out.h"
-#include "ac/route_finder_jps.h"
+#include "ags/shared/ac/common.h"   // quit()
+#include "ags/shared/ac/movelist.h"     // MoveList
+#include "ags/shared/ac/common_defines.h"
+#include "ags/shared/gfx/bitmap.h"
+#include "ags/shared/debug/out.h"
+#include "ags/shared/ac/route_finder_jps.h"
 
 namespace AGS3 {
 

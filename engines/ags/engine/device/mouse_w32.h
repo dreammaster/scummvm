@@ -31,7 +31,7 @@
 //
 //=============================================================================
 
-#include "util/geometry.h"
+#include "ags/shared/util/geometry.h"
 
 namespace AGS3 {
 

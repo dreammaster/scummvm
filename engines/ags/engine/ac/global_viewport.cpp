@@ -20,10 +20,10 @@
  *
  */
 
-#include "ac/global_viewport.h"
-#include "ac/draw.h"
-#include "ac/gamestate.h"
-#include "debug/debug_log.h"
+#include "ags/shared/ac/global_viewport.h"
+#include "ags/shared/ac/draw.h"
+#include "ags/shared/ac/gamestate.h"
+#include "ags/shared/debug/debug_log.h"
 
 namespace AGS3 {
 

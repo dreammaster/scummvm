@@ -48,9 +48,9 @@
 
 //include <string.h>
 #include "ags/lib/std/vector.h"
-#include "ac/draw_software.h"
-#include "gfx/bitmap.h"
-#include "util/scaling.h"
+#include "ags/shared/ac/draw_software.h"
+#include "ags/shared/gfx/bitmap.h"
+#include "ags/shared/util/scaling.h"
 
 namespace AGS3 {
 

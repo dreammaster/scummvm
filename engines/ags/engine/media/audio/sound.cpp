@@ -20,8 +20,8 @@
  *
  */
 
-#include "media/audio/sound.h"
-#include "media/audio/clip_openal.h"
+#include "ags/shared/media/audio/sound.h"
+#include "ags/shared/media/audio/clip_openal.h"
 
 namespace AGS3 {
 

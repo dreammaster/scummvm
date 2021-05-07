@@ -21,7 +21,7 @@
  */
 
 //include <string.h>
-#include "ac/interfaceelement.h"
+#include "ags/shared/ac/interfaceelement.h"
 
 namespace AGS3 {
 

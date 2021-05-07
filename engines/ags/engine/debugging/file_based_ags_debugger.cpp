@@ -22,12 +22,12 @@
 
 //include <cstdio>
 //include <string.h>
-#include "debug/filebasedagsdebugger.h"
-#include "util/file.h"
-#include "util/path.h"
-#include "util/stream.h"
-#include "util/textstreamwriter.h"
-#include "platform/base/agsplatformdriver.h"
+#include "ags/shared/debug/filebasedagsdebugger.h"
+#include "ags/shared/util/file.h"
+#include "ags/shared/util/path.h"
+#include "ags/shared/util/stream.h"
+#include "ags/shared/util/textstreamwriter.h"
+#include "ags/shared/platform/base/agsplatformdriver.h"
 
 namespace AGS3 {
 

@@ -24,14 +24,14 @@
 #define AGS_ENGINE_MEDIA_AUDIO_AUDIO_H
 
 //include <array>
-#include "media/audio/audiodefines.h"
-#include "ac/dynobj/scriptaudioclip.h"
-#include "ac/dynobj/scriptaudiochannel.h"
-#include "media/audio/ambientsound.h"
-#include "util/mutex.h"
-#include "util/mutex_lock.h"
-#include "util/thread.h"
-#include "ac/timer.h"
+#include "ags/shared/media/audio/audiodefines.h"
+#include "ags/shared/ac/dynobj/scriptaudioclip.h"
+#include "ags/shared/ac/dynobj/scriptaudiochannel.h"
+#include "ags/shared/media/audio/ambientsound.h"
+#include "ags/shared/util/mutex.h"
+#include "ags/shared/util/mutex_lock.h"
+#include "ags/shared/util/thread.h"
+#include "ags/shared/ac/timer.h"
 
 namespace AGS3 {
 

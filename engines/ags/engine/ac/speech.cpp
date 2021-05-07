@@ -28,10 +28,10 @@
 namespace AGS3 {
 
 int user_to_internal_skip_speech(SkipSpeechStyle userval) {
-	switch (userval) {
-	case kSkipSpeechKeyMouseTime:
-		return SKIP_AUTOTIMER | SKIP_KEYPRESS | SKIP_MOUSECLICK;
-	case kSkipSpeechKeyTime:
+#include "ags/shared/serval) {
+#include "ags/shared/pSpeechKeyMouseTime:
+#include "ags/shared/KIP_AUTOTIMER | SKIP_KEYPRESS | SKIP_MOUSECLICK;
+#include "ags/shared/pSpeechKeyTime:
 		return SKIP_AUTOTIMER | SKIP_KEYPRESS;
 	case kSkipSpeechTime:
 		return SKIP_AUTOTIMER;
@@ -86,14 +86,11 @@ SkipSpeechStyle internal_skip_speech_to_user(int internal_val) {
 #include "script/script_api.h"
 #include "script/script_runtime.h"
 
-extern GameSetupStruct game;
-extern GameState play;
-
-RuntimeScriptValue Sc_Speech_GetAnimationStopTimeMargin(const RuntimeScriptValue *params, int32_t param_count) {
-	API_VARGET_INT(play.close_mouth_speech_time);
-}
-
-RuntimeScriptValue Sc_Speech_SetAnimationStopTimeMargin(const RuntimeScriptValue *params, int32_t param_count) {
+#include "ags/shared/eSetupStruct game;
+#include "ags/shared/eState play;
+#include "ags/shared/#include "ags/shared/iptValue Sc_Speech_GetAnimationStopTimeMargin(const RuntimeScriptValue *params, int32_t param_count) {
+#include "ags/shared/T_INT(play.close_mouth_speech_time);
+#include "ags/shared/#include "ags/shared/RuntimeScriptValue Sc_Speech_SetAnimationStopTimeMargin(const RuntimeScriptValue *params, int32_t param_count) {
 	API_VARSET_PINT(play.close_mouth_speech_time);
 }
 

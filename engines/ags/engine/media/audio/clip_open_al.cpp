@@ -21,11 +21,11 @@
  */
 
 //include <cmath>
-#include "media/audio/clip_openal.h"
-#include "media/audio/audio_core.h"
-#include "media/audio/audiodefines.h"
-#include "util/path.h"
-#include "util/stream.h"
+#include "ags/shared/media/audio/clip_openal.h"
+#include "ags/shared/media/audio/audio_core.h"
+#include "ags/shared/media/audio/audiodefines.h"
+#include "ags/shared/util/path.h"
+#include "ags/shared/util/stream.h"
 
 namespace AGS3 {
 

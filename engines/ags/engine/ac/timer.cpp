@@ -20,11 +20,11 @@
  *
  */
 
-#include "ac/timer.h"
+#include "ags/shared/ac/timer.h"
 
-#include "core/platform.h"
+#include "ags/shared/core/platform.h"
 //include <thread>
-#include "platform/base/agsplatformdriver.h"
+#include "ags/shared/platform/base/agsplatformdriver.h"
 
 namespace AGS3 {
 

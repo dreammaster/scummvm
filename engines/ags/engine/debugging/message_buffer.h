@@ -32,7 +32,7 @@
 #define AGS_ENGINE_DEBUGGING_MESSAGE_BUFFER_H
 
 #include "ags/lib/std/vector.h"
-#include "debugging/outputhandler.h"
+#include "ags/shared/debugging/outputhandler.h"
 
 namespace AGS3 {
 namespace AGS {

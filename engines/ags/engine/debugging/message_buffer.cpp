@@ -20,8 +20,8 @@
  *
  */
 
-#include "debug/debugmanager.h"
-#include "debug/messagebuffer.h"
+#include "ags/shared/debug/debugmanager.h"
+#include "ags/shared/debug/messagebuffer.h"
 
 namespace AGS3 {
 namespace AGS {

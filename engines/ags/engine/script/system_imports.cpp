@@ -22,7 +22,7 @@
 
 //include <stdlib.h>
 //include <string.h>
-#include "script/systemimports.h"
+#include "ags/shared/script/systemimports.h"
 
 namespace AGS3 {
 

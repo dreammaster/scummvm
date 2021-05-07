@@ -22,12 +22,12 @@
 
 //include <string.h> // memset
 //include <stdlib.h> // free
-#include "ac/common.h"
-#include "ac/game_version.h"
-#include "ac/roomstatus.h"
-#include "game/customproperties.h"
-#include "game/savegame_components.h"
-#include "util/alignedstream.h"
+#include "ags/shared/ac/common.h"
+#include "ags/shared/ac/game_version.h"
+#include "ags/shared/ac/roomstatus.h"
+#include "ags/shared/game/customproperties.h"
+#include "ags/shared/game/savegame_components.h"
+#include "ags/shared/util/alignedstream.h"
 
 namespace AGS3 {
 

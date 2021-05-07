@@ -21,9 +21,9 @@
  */
 
 //include <string.h>
-#include "executingscript.h"
-#include "debug/debug_log.h"
-#include "debug/debugger.h"
+#include "ags/shared/executingscript.h"
+#include "ags/shared/debug/debug_log.h"
+#include "ags/shared/debug/debugger.h"
 
 namespace AGS3 {
 

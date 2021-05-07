@@ -30,8 +30,8 @@
 #define AGS_ENGINE_MEDIA_AUDIO_AUDIO_CORE_H
 
 #include "ags/lib/std/vector.h"
-#include "media/audio/audio_core_defs.h"
-#include "util/string.h"
+#include "ags/shared/media/audio/audio_core_defs.h"
+#include "ags/shared/util/string.h"
 
 namespace AGS3 {
 

@@ -20,25 +20,25 @@
  *
  */
 
-#include "gfx/ogl_headers.h"
+#include "ags/shared/gfx/ogl_headers.h"
 
 #if AGS_OPENGL_DRIVER
-#include "gfx/ali3dogl.h"
+#include "ags/shared/gfx/ali3dogl.h"
 #include "ags/lib/std/algorithm.h"
 //include <SDL.h>
-#include "ac/sys_events.h"
-#include "ac/timer.h"
-#include "debug/out.h"
-#include "gfx/ali3dexception.h"
-#include "gfx/gfxfilter_ogl.h"
-#include "gfx/gfxfilter_aaogl.h"
-#include "platform/base/agsplatformdriver.h"
-#include "platform/base/sys_main.h"
+#include "ags/shared/ac/sys_events.h"
+#include "ags/shared/ac/timer.h"
+#include "ags/shared/debug/out.h"
+#include "ags/shared/gfx/ali3dexception.h"
+#include "ags/shared/gfx/gfxfilter_ogl.h"
+#include "ags/shared/gfx/gfxfilter_aaogl.h"
+#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/shared/platform/base/sys_main.h"
 
 // OpenGL Mathematics Library. We could include only the features we need to decrease compilation time.
-#include "glm/glm.hpp"
-#include "glm/ext.hpp"
-#include "glad/glad.h"
+#include "ags/shared/glm/glm.hpp"
+#include "ags/shared/glm/ext.hpp"
+#include "ags/shared/glad/glad.h"
 
 #if AGS_OPENGL_ES2
 

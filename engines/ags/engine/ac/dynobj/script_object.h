@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_DYNOBJ__SCRIPTOBJECT_H
 #define AGS_ENGINE_DYNOBJ__SCRIPTOBJECT_H
 
-#include "ac/roomobject.h"
+#include "ags/shared/ac/roomobject.h"
 
 namespace AGS3 {
 

@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_DYNOBJ__CCAUDIOCHANNEL_H
 #define AGS_ENGINE_DYNOBJ__CCAUDIOCHANNEL_H
 
-#include "ac/dynobj/cc_agsdynamicobject.h"
+#include "ags/shared/ac/dynobj/cc_agsdynamicobject.h"
 
 namespace AGS3 {
 

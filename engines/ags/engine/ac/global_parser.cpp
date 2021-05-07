@@ -21,10 +21,10 @@
  */
 
 //include <cstring> //strcpy()
-#include "ac/global_parser.h"
-#include "ac/common.h"
-#include "ac/gamestate.h"
-#include "ac/string.h"
+#include "ags/shared/ac/global_parser.h"
+#include "ags/shared/ac/common.h"
+#include "ags/shared/ac/gamestate.h"
+#include "ags/shared/ac/string.h"
 
 namespace AGS3 {
 

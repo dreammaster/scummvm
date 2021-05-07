@@ -20,7 +20,7 @@
  *
  */
 
-#include "gfx/blender.h"
+#include "ags/shared/gfx/blender.h"
 #include "ags/lib/allegro.h"
 #include "ags/shared/core/types.h"
 

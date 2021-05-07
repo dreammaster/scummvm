@@ -29,7 +29,7 @@
 #ifndef AGS_ENGINE_GFX_AA_D3D_GFX_FILTER_H
 #define AGS_ENGINE_GFX_AA_D3D_GFX_FILTER_H
 
-#include "gfx/gfxfilter_d3d.h"
+#include "ags/shared/gfx/gfxfilter_d3d.h"
 
 namespace AGS3 {
 namespace AGS {

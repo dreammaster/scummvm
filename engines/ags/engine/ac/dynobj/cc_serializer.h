@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_AC_DYNOBJ_SERIALIZER_H
 #define AGS_ENGINE_AC_DYNOBJ_SERIALIZER_H
 
-#include "ac/dynobj/cc_dynamicobject.h"
+#include "ags/shared/ac/dynobj/cc_dynamicobject.h"
 
 namespace AGS3 {
 

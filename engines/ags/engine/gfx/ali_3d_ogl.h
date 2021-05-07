@@ -30,15 +30,15 @@
 #define AGS_ENGINE_GFX_ALI_3D_OGL_H
 
 #include "ags/lib/std/memory.h"
-#include "glm/glm.hpp"
-#include "gfx/bitmap.h"
-#include "gfx/ddb.h"
-#include "gfx/gfxdriverfactorybase.h"
-#include "gfx/gfxdriverbase.h"
-#include "util/string.h"
-#include "util/version.h"
+#include "ags/shared/glm/glm.hpp"
+#include "ags/shared/gfx/bitmap.h"
+#include "ags/shared/gfx/ddb.h"
+#include "ags/shared/gfx/gfxdriverfactorybase.h"
+#include "ags/shared/gfx/gfxdriverbase.h"
+#include "ags/shared/util/string.h"
+#include "ags/shared/util/version.h"
 
-#include "ogl_headers.h"
+#include "ags/shared/ogl_headers.h"
 
 namespace AGS3 {
 namespace AGS {

@@ -23,8 +23,8 @@
 #ifndef AGS_ENGINE_GAME_SAVEGAME_COMPONENTS_H
 #define AGS_ENGINE_GAME_SAVEGAME_COMPONENTS_H
 
-#include "game/savegame.h"
-#include "util/stream.h"
+#include "ags/shared/game/savegame.h"
+#include "ags/shared/util/stream.h"
 
 namespace AGS3 {
 namespace AGS {

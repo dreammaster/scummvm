@@ -12,7 +12,7 @@
 //
 //=============================================================================
 
-#include "core/platform.h"
+#include "ags/shared/core/platform.h"
 
 #if AGS_PLATFORM_OS_LINUX
 
@@ -21,12 +21,12 @@
 //include <stdio.h>
 //include <unistd.h>
 #include "ags/lib/allegro.h"
-#include "ac/runtime_defines.h"
-#include "gfx/gfxdefines.h"
-#include "platform/base/agsplatformdriver.h"
-#include "plugin/agsplugin.h"
-#include "util/string.h"
-#include "libsrc/libcda-0.5/libcda.h"
+#include "ags/shared/ac/runtime_defines.h"
+#include "ags/shared/gfx/gfxdefines.h"
+#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/shared/plugin/agsplugin.h"
+#include "ags/shared/util/string.h"
+#include "ags/shared/libsrc/libcda-0.5/libcda.h"
 
 //include <pwd.h>
 //include <sys/stat.h>

@@ -20,9 +20,9 @@
  *
  */
 
-#include "media/audio/openaldecoder.h"
+#include "ags/shared/media/audio/openaldecoder.h"
 //include <array>
-#include "debug/out.h"
+#include "ags/shared/debug/out.h"
 
 namespace AGS3 {
 

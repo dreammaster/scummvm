@@ -34,8 +34,8 @@
 #define AGS_ENGINE_GFX_GFX_DRIVER_FACTORY_H
 
 #include "ags/lib/std/memory.h"
-#include "util/string.h"
-#include "util/string_types.h"
+#include "ags/shared/util/string.h"
+#include "ags/shared/util/string_types.h"
 
 namespace AGS3 {
 namespace AGS {

@@ -17,8 +17,8 @@
 #define AGS_ENGINE_UTIL__LIBRARY_PSP_H
 
 //include <pspsdk.h>
-#include "util/string.h"
-#include "debug/out.h"
+#include "ags/shared/util/string.h"
+#include "ags/shared/debug/out.h"
 
 namespace AGS
 {

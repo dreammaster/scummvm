@@ -32,9 +32,9 @@
 #include "ags/lib/std/memory.h"
 #include "ags/lib/allegro.h" // RGB, PALETTE
 //include <glm/mat4x4.hpp>
-#include "gfx/gfxdefines.h"
-#include "gfx/gfxmodelist.h"
-#include "util/geometry.h"
+#include "ags/shared/gfx/gfxdefines.h"
+#include "ags/shared/gfx/gfxmodelist.h"
+#include "ags/shared/util/geometry.h"
 
 namespace AGS3 {
 namespace AGS {

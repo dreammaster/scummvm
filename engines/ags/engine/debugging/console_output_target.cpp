@@ -21,8 +21,8 @@
  */
 
 //include <string.h>
-#include "consoleoutputtarget.h"
-#include "debug/debug_log.h"
+#include "ags/shared/consoleoutputtarget.h"
+#include "ags/shared/debug/debug_log.h"
 
 namespace AGS3 {
 namespace AGS {

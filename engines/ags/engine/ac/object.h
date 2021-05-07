@@ -37,8 +37,8 @@
 namespace AGS3 {
 
 namespace AGS {
-namespace Shared {
-class Bitmap;
+#include "ags/shared/Shared {
+#include "ags/shared/ap;
 }
 }
 using namespace AGS; // FIXME later

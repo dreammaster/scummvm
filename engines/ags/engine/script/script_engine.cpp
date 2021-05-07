@@ -22,10 +22,10 @@
 //=============================================================================
 
 //include <stdlib.h>
-#include "script/cc_instance.h"
-#include "script/cc_error.h"
-#include "util/file.h"
-#include "util/stream.h"
+#include "ags/shared/script/cc_instance.h"
+#include "ags/shared/script/cc_error.h"
+#include "ags/shared/util/file.h"
+#include "ags/shared/util/stream.h"
 
 namespace AGS { namespace Shared { class RoomStruct; } }
 using namespace AGS::Shared;

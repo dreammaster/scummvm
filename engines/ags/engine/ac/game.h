@@ -34,9 +34,8 @@
 #include "ags/shared/util/string.h"
 
 namespace AGS3 {
-
-// Forward declaration
-namespace AGS {
+#include "ags/shared/#include "ags/shared/ declaration
+#include "ags/shared/AGS {
 namespace Shared {
 class Bitmap; class Stream;
 }

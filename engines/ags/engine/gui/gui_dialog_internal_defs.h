@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_GUI_GUI_DIALOG_INTERNAL_DEFS_H
 #define AGS_ENGINE_GUI_GUI_DIALOG_INTERNAL_DEFS_H
 
-#include "gui/guidialogdefines.h"
+#include "ags/shared/gui/guidialogdefines.h"
 
 #define _export
 #ifdef WINAPI

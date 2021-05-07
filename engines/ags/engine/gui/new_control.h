@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_GUI_NEW_CONTROL_H
 #define AGS_ENGINE_GUI_NEW_CONTROL_H
 
-#include "gfx/bitmap.h"
+#include "ags/shared/gfx/bitmap.h"
 
 namespace AGS3 {
 

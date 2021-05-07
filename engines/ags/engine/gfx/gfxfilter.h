@@ -30,8 +30,8 @@
 #define AGS_ENGINE_GFX__GFXFILTER_H
 
 #include "ags/lib/std/memory.h"
-#include "util/geometry.h"
-#include "util/string.h"
+#include "ags/shared/util/geometry.h"
+#include "ags/shared/util/string.h"
 
 namespace AGS3 {
 namespace AGS {

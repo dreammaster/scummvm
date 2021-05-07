@@ -23,19 +23,19 @@
 #include "ags/lib/std/algorithm.h"
 //include <cstdio>
 #include "ags/lib/allegro.h" // find files
-#include "gui/guidialog.h"
-#include "ac/common.h"
-#include "ac/draw.h"
-#include "ac/game.h"
-#include "ac/gamesetup.h"
-#include "ac/gamesetupstruct.h"
-#include "ac/global_game.h"
-#include "gui/cscidialog.h"
+#include "ags/shared/gui/guidialog.h"
+#include "ags/shared/ac/common.h"
+#include "ags/shared/ac/draw.h"
+#include "ags/shared/ac/game.h"
+#include "ags/shared/ac/gamesetup.h"
+#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/global_game.h"
+#include "ags/shared/gui/cscidialog.h"
 //include <cctype> //isdigit()
-#include "gfx/bitmap.h"
-#include "gfx/graphicsdriver.h"
-#include "debug/debug_log.h"
-#include "util/path.h"
+#include "ags/shared/gfx/bitmap.h"
+#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/shared/debug/debug_log.h"
+#include "ags/shared/util/path.h"
 
 namespace AGS3 {
 
