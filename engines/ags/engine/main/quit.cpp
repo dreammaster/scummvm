@@ -27,7 +27,7 @@
 #include "ags/lib/allegro.h" // find files, allegro_exit
 #include "ags/shared/ac/cdaudio.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/gamesetup.h"
+#include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/gamesetupstruct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/roomstatus.h"

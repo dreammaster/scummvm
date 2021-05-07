@@ -29,7 +29,7 @@
 #ifndef AGS_ENGINE_GUI_CSCI_DIALOG_H
 #define AGS_ENGINE_GUI_CSCI_DIALOG_H
 
-#include "ags/shared/gui/guidialoginternaldefs.h"
+#include "ags/engine/gui/gui_dialog_internal_defs.h"
 
 namespace AGS3 {
 

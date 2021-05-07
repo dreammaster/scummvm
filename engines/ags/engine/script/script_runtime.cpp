@@ -43,7 +43,7 @@
 #include "ags/shared/script/cc_options.h"
 #include "ags/shared/ac/dynobj/cc_dynamicarray.h"
 #include "ags/shared/script/systemimports.h"
-#include "ags/shared/ac/statobj/staticobject.h"
+#include "ags/engine/ac/statobj/static_object.h"
 
 namespace AGS3 {
 

@@ -24,7 +24,7 @@
 #define AGS_ENGINE_SCRIPT_CC_SYSTEM_IMPORTS_H
 
 #include "ags/lib/std/map.h"
-#include "ags/shared/script/cc_instance.h"    // ccInstance
+#include "ags/engine/script/cc_instance.h"    // ccInstance
 
 namespace AGS3 {
 

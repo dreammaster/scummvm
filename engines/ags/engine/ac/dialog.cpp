@@ -47,7 +47,7 @@
 #include "ags/shared/ac/system.h"
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/shared/script/cc_instance.h"
+#include "ags/engine/script/cc_instance.h"
 #include "ags/shared/gui/guimain.h"
 #include "ags/shared/gui/guitextbox.h"
 #include "ags/shared/main/game_run.h"

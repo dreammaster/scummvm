@@ -22,7 +22,7 @@
 
 //include <string.h>
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/gamesetup.h"
+#include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/keycode.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gfx/bitmap.h"

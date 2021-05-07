@@ -28,7 +28,7 @@
 #include "ags/shared/ac/game.h"
 #include "ags/shared/ac/gamesetupstruct.h"
 #include "ags/shared/ac/gamestate.h"
-#include "ags/shared/ac/gamesetup.h"
+#include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/global_audio.h"
 #include "ags/shared/ac/global_character.h"
 #include "ags/shared/ac/gui.h"

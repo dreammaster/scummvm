@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef AGS_ENGINE_AC_STATOBJ_STATICARRAY_H
-#define AGS_ENGINE_AC_STATOBJ_STATICARRAY_H
+#ifndef AGS_ENGINE_AC_STATOBJ_STATIC_ARRAY_H
+#define AGS_ENGINE_AC_STATOBJ_STATIC_ARRAY_H
 
-#include "ags/shared/ac/statobj/staticobject.h"
+#include "ags/engine/ac/statobj/static_object.h"
 
 namespace AGS3 {
 

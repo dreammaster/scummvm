@@ -25,7 +25,7 @@
 #include "ags/shared/ac/file.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game.h"
-#include "ags/shared/ac/gamesetup.h"
+#include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/gamesetupstruct.h"
 #include "ags/shared/ac/global_file.h"
 #include "ags/shared/ac/path_helper.h"

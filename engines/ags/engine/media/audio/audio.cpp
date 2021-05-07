@@ -31,7 +31,7 @@
 #include "ags/shared/script/script_runtime.h"
 #include "ags/shared/ac/audiochannel.h"
 #include "ags/shared/ac/audioclip.h"
-#include "ags/shared/ac/gamesetup.h"
+#include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/path_helper.h"
 #include "ags/shared/media/audio/sound.h"
 #include "ags/shared/debug/debug_log.h"

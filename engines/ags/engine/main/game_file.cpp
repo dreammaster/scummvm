@@ -47,7 +47,7 @@
 #include "ags/shared/gfx/blender.h"
 #include "ags/shared/core/assetmanager.h"
 #include "ags/shared/util/alignedstream.h"
-#include "ags/shared/ac/gamesetup.h"
+#include "ags/engine/ac/game_setup.h"
 #include "ags/shared/game/main_game_file.h"
 #include "ags/shared/game/game_init.h"
 #include "ags/shared/script/script.h"

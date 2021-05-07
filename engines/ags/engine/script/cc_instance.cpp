@@ -27,7 +27,7 @@
 #include "ags/shared/ac/dynobj/managedobjectpool.h"
 #include "ags/shared/gui/guidefines.h"
 #include "ags/shared/script/cc_error.h"
-#include "ags/shared/script/cc_instance.h"
+#include "ags/engine/script/cc_instance.h"
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/debug/out.h"
 #include "ags/shared/script/cc_options.h"

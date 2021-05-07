@@ -23,7 +23,7 @@
 //include <cctype>
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/gamesetup.h"
+#include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/gui.h"
 #include "ags/shared/ac/keycode.h"

@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/gamesetup.h"
+#include "ags/engine/ac/game_setup.h"
 
 namespace AGS3 {
 

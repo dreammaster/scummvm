@@ -25,7 +25,7 @@
 //
 //include <ctype.h> // toupper
 #include "ags/shared/core/platform.h"
-#include "ags/shared/ac/gamesetup.h"
+#include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/gamesetupstruct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_translation.h"
