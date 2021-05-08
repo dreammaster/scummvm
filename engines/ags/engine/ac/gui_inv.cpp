@@ -21,9 +21,9 @@
  */
 
 #include "ags/shared/gui/guiinv.h"
-#include "ags/shared/gui/guimain.h"
+#include "ags/shared/gui/gui_main.h"
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/characterextras.h"
 #include "ags/shared/ac/spritecache.h"

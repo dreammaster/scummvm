@@ -26,8 +26,8 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/drawingsurface.h"
 #include "ags/shared/ac/gamestate.h"
-#include "ags/shared/ac/gamesetupstruct.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
+#include "ags/shared/game/room_struct.h"
 #include "ags/shared/gfx/bitmap.h"
 
 namespace AGS3 {

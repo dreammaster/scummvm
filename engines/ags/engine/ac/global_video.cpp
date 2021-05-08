@@ -29,8 +29,8 @@
 #include "ags/shared/core/assetmanager.h"
 #include "ags/shared/debug/debugger.h"
 #include "ags/shared/debug/debug_log.h"
-#include "ags/shared/media/video/video.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/video/video.h"
+#include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/util/string_compat.h"
 

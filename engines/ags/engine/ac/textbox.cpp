@@ -23,7 +23,7 @@
 //include <string.h>
 #include "ags/shared/ac/textbox.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/string.h"
 
 namespace AGS3 {

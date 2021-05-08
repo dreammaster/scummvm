@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/dynobj/cc_hotspot.h"
+#include "ags/engine/ac/dynobj/cc_hotspot.h"
 #include "ags/shared/ac/hotspot.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_hotspot.h"
@@ -29,7 +29,7 @@
 #include "ags/shared/ac/room.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/string.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/game/room_struct.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 

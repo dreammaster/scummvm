@@ -32,7 +32,7 @@
 #include "ags/shared/ac/dialogtopic.h"
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/game.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/gamestructdefines.h"
 #include "ags/shared/ac/gui.h"

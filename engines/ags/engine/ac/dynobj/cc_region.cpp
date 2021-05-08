@@ -23,7 +23,7 @@
 #include "ags/shared/ac/dynobj/cc_region.h"
 #include "ags/shared/ac/dynobj/scriptregion.h"
 #include "ags/shared/ac/common_defines.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/game/room_struct.h"
 
 namespace AGS3 {
 

@@ -76,9 +76,9 @@
 #include "ags/shared/ac/parser.h"
 #include "ags/shared/ac/string.h"
 #include "ags/shared/ac/room.h"
-#include "ags/shared/media/video/video.h"
+#include "ags/engine/media/video/video.h"
 #include "ags/shared/util/string_compat.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 #include "ags/shared/ac/dynobj/scriptstring.h"
 

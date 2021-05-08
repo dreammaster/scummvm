@@ -30,7 +30,7 @@
 #define AGS_ENGINE_MEDIA_AUDIO_SOUND_H
 
 #include "ags/shared/ac/asset_helper.h"
-#include "ags/shared/media/audio/soundclip.h"
+#include "ags/engine/media/audio/sound_clip.h"
 
 namespace AGS3 {
 

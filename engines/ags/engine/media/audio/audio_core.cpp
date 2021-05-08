@@ -29,10 +29,10 @@
 // safer slot look ups (with gen id)
 // generate/load mod/midi offsets
 
-#include "ags/shared/media/audio/audio_core.h"
+#include "ags/engine/media/audio/audio_core.h"
 #include "ags/lib/std/map.h"
 #include "ags/shared/debug/out.h"
-#include "ags/shared/media/audio/openaldecoder.h"
+#include "ags/engine/media/audio/openaldecoder.h"
 #include "ags/shared/util/memory_compat.h"
 
 namespace AGS3 {

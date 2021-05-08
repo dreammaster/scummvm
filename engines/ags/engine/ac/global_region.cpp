@@ -28,7 +28,7 @@
 #include "ags/shared/ac/room.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/debug/debug_log.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/game/room_struct.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/script/script.h"
 

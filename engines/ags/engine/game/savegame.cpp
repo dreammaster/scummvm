@@ -26,7 +26,7 @@
 #include "ags/shared/ac/dynamicsprite.h"
 #include "ags/shared/ac/event.h"
 #include "ags/shared/ac/game.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/global_audio.h"
@@ -61,7 +61,7 @@
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_utils.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 

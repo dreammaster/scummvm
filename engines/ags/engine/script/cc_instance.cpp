@@ -24,7 +24,7 @@
 //include <string.h>
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/dynobj/cc_dynamicarray.h"
-#include "ags/shared/ac/dynobj/managedobjectpool.h"
+#include "ags/engine/ac/dynobj/managed_object_pool.h"
 #include "ags/shared/gui/guidefines.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/engine/script/cc_instance.h"

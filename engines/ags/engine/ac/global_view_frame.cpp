@@ -23,9 +23,9 @@
 #include "ags/shared/ac/global_viewframe.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/view.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/debug/debug_log.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 

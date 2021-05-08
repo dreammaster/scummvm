@@ -27,7 +27,7 @@
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/walkablearea.h"
 #include "ags/shared/debug/debug_log.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/game/room_struct.h"
 
 namespace AGS3 {
 

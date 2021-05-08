@@ -20,10 +20,10 @@
  *
  */
 
-#include "ags/shared/ac/dynobj/cc_guiobject.h"
-#include "ags/shared/ac/dynobj/scriptgui.h"
-#include "ags/shared/gui/guimain.h"
-#include "ags/shared/gui/guiobject.h"
+#include "ags/engine/ac/dynobj/cc_gui_object.h"
+#include "ags/engine/ac/dynobj/script_gui.h"
+#include "ags/shared/gui/gui_main.h"
+#include "ags/shared/gui/gui_object.h"
 
 namespace AGS3 {
 

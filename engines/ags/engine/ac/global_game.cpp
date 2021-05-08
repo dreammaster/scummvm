@@ -32,7 +32,7 @@
 #include "ags/shared/ac/event.h"
 #include "ags/shared/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_character.h"
 #include "ags/shared/ac/global_gui.h"
@@ -67,7 +67,7 @@
 #include "ags/shared/main/game_file.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/string_utils.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/platform/base/sys_main.h"
 
 namespace AGS3 {

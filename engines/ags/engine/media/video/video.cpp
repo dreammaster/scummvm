@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/media/video/video.h"
+#include "ags/engine/media/video/video.h"
 
 #ifndef AGS_NO_VIDEO_PLAYER
 //include <SDL.h>
@@ -32,7 +32,7 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/game_version.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_display.h"
 #include "ags/shared/ac/keycode.h"
@@ -46,7 +46,7 @@
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/util/stream.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 

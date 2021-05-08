@@ -23,11 +23,11 @@
 #include "ags/shared/ac/audiochannel.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_audio.h"
-#include "ags/shared/ac/dynobj/cc_audioclip.h"
+#include "ags/engine/ac/dynobj/cc_audio_clip.h"
 #include "ags/shared/debug/debug_log.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/game/room_struct.h"
 #include "ags/shared/script/runtimescriptvalue.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 

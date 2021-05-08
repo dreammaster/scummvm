@@ -29,7 +29,7 @@
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/dynamicsprite.h"
 #include "ags/shared/ac/game.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/gui.h"
 #include "ags/shared/ac/mouse.h"
@@ -50,7 +50,7 @@
 #include "ags/shared/gui/guiinv.h"
 #include "ags/shared/gui/guilabel.h"
 #include "ags/shared/gui/guilistbox.h"
-#include "ags/shared/gui/guimain.h"
+#include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/guislider.h"
 #include "ags/shared/gui/guitextbox.h"
 #include "ags/shared/plugin/agsplugin.h"
@@ -58,7 +58,7 @@
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/script.h"
 #include "ags/shared/util/filestream.h" // TODO: needed only because plugins expect file handle
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 

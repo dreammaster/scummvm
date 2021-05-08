@@ -34,7 +34,7 @@
 #ifndef AGS_ENGINE_MEDIA_AUDIO_CLIP_OPENAL_H
 #define AGS_ENGINE_MEDIA_AUDIO_CLIP_OPENAL_H
 
-#include "ags/shared/media/audio/soundclip.h"
+#include "ags/engine/media/audio/sound_clip.h"
 #include "ags/shared/ac/asset_helper.h"
 
 namespace AGS3 {

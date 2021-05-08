@@ -34,7 +34,7 @@
 
 #include "ags/shared/ac/common.h"   // quit()
 #include "ags/shared/ac/common_defines.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/game/room_struct.h"
 #include "ags/shared/ac/movelist.h"     // MoveList
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/debug/out.h"

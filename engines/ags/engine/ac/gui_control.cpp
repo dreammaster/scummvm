@@ -28,11 +28,11 @@
 #include "ags/shared/gui/guiinv.h"
 #include "ags/shared/gui/guilabel.h"
 #include "ags/shared/gui/guilistbox.h"
-#include "ags/shared/gui/guimain.h"
+#include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/guislider.h"
 #include "ags/shared/gui/guitextbox.h"
 #include "ags/shared/script/runtimescriptvalue.h"
-#include "ags/shared/ac/dynobj/cc_gui.h"
+#include "ags/engine/ac/dynobj/cc_gui.h"
 #include "ags/shared/ac/dynobj/cc_guiobject.h"
 
 namespace AGS3 {

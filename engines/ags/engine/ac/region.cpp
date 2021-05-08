@@ -22,12 +22,12 @@
 
 #include "ags/shared/ac/region.h"
 #include "ags/shared/ac/common_defines.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_region.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/dynobj/cc_region.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/game/room_struct.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 
 namespace AGS3 {

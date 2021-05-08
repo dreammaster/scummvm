@@ -20,10 +20,10 @@
  *
  */
 
-#include "ags/shared/media/audio/audio.h"
-#include "ags/shared/media/audio/audiodefines.h"
-#include "ags/shared/media/audio/soundclip.h"
-#include "ags/shared/media/audio/audiointernaldefs.h"
+#include "ags/engine/media/audio/audio.h"
+#include "ags/engine/media/audio/audio_defines.h"
+#include "ags/engine/media/audio/sound_clip.h"
+#include "ags/engine/media/audio/audiointernaldefs.h"
 
 namespace AGS3 {
 

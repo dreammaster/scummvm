@@ -23,7 +23,7 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/display.h"
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_game.h"
 #include "ags/shared/ac/global_gui.h"
@@ -33,7 +33,7 @@
 #include "ags/shared/ac/string.h"
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/shared/gui/guimain.h"
+#include "ags/shared/gui/gui_main.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 #include "ags/shared/util/string_compat.h"
 

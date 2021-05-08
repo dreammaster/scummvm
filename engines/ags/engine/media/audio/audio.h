@@ -24,10 +24,10 @@
 #define AGS_ENGINE_MEDIA_AUDIO_AUDIO_H
 
 //include <array>
-#include "ags/shared/media/audio/audiodefines.h"
-#include "ags/shared/ac/dynobj/scriptaudioclip.h"
-#include "ags/shared/ac/dynobj/scriptaudiochannel.h"
-#include "ags/shared/media/audio/ambientsound.h"
+#include "ags/engine/media/audio/audio_defines.h"
+#include "ags/shared/ac/dynobj/script_audio_clip.h"
+#include "ags/engine/ac/dynobj/script_audio_channel.h"
+#include "ags/engine/media/audio/ambient_sound.h"
 #include "ags/shared/util/mutex.h"
 #include "ags/shared/util/mutex_lock.h"
 #include "ags/shared/util/thread.h"

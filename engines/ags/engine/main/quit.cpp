@@ -28,7 +28,7 @@
 #include "ags/shared/ac/cdaudio.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/game_setup.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/translation.h"
@@ -49,7 +49,7 @@
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/platform/base/sys_main.h"
 #include "ags/shared/plugin/plugin_engine.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 

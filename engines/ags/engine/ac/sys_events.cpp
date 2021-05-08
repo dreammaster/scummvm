@@ -25,7 +25,7 @@
 //include <SDL.h>
 #include "ags/shared/core/platform.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/keycode.h"
 #include "ags/shared/ac/mouse.h"
 #include "ags/shared/ac/timer.h"

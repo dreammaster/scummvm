@@ -23,9 +23,9 @@
  //include <SDL.h>
 #include "ac/common.h"
 #include "ac/draw.h"
-#include "ac/dynobj/cc_audiochannel.h"
+#include "ac/dynobj/cc_audio_channel.h"
 #include "ac/gamesetup.h"
-#include "ac/gamesetupstruct.h"
+#include "ac/game_setup_struct.h"
 #include "ac/gamestate.h"
 #include "ags/shared/ac/global_debug.h"
 #include "ags/shared/ac/mouse.h"
@@ -38,8 +38,8 @@
 #include "ags/shared/main/graphics_mode.h"
 #include "ags/shared/main/engine.h"
 #include "ags/shared/main/main.h"
-#include "ags/shared/media/audio/audio_core.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_core.h"
+#include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/util/string_compat.h"
 #include "ags/shared/#include "ags/shared/AGS3 {
 #include "ags/shared/#include "ags/shared/space AGS::Engine;

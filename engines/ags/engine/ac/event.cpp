@@ -23,7 +23,7 @@
 #include "ags/shared/event.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_game.h"
 #include "ags/shared/ac/global_room.h"
@@ -39,7 +39,7 @@
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/ddb.h"
 #include "ags/shared/gfx/graphicsdriver.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/ac/timer.h"
 
 namespace AGS3 {

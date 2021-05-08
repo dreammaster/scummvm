@@ -24,13 +24,13 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/gui.h"
 #include "ags/shared/ac/view.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/string.h"
 #include "ags/shared/ac/viewframe.h"
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/gui/animatingguibutton.h"
-#include "ags/shared/gui/guimain.h"
+#include "ags/shared/gui/gui_main.h"
 
 namespace AGS3 {
 

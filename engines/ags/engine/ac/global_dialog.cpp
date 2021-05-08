@@ -24,7 +24,7 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/dialog.h"
 #include "ags/shared/ac/dialogtopic.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/debug/debugger.h"

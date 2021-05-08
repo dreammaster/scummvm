@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/media/audio/openaldecoder.h"
+#include "ags/engine/media/audio/openaldecoder.h"
 //include <array>
 #include "ags/shared/debug/out.h"
 

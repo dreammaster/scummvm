@@ -26,9 +26,9 @@
 #include "ags/lib/std/memory.h"
 #include "ags/lib/std/vector.h"
 #include "ags/shared/ac/common_defines.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/game/room_struct.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/media/audio/audiodefines.h"
+#include "ags/engine/media/audio/audio_defines.h"
 
 namespace AGS3 {
 namespace AGS {

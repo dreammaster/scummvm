@@ -27,7 +27,7 @@
 #include "ags/shared/ac/file.h"
 #include "ags/shared/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/gui.h"
 #include "ags/shared/ac/movelist.h"
@@ -50,7 +50,7 @@
 #include "ags/shared/script/script.h"
 #include "ags/shared/script/script_runtime.h"
 #include "ags/shared/util/string_utils.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 

@@ -28,7 +28,7 @@
 
 #include "ags/shared/ac/character.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/view.h"
 #include "ags/shared/ac/display.h"
 #include "ags/shared/ac/draw.h"
@@ -53,7 +53,7 @@
 #include "ags/shared/ac/system.h"
 #include "ags/shared/ac/viewframe.h"
 #include "ags/shared/ac/walkablearea.h"
-#include "ags/shared/gui/guimain.h"
+#include "ags/shared/gui/gui_main.h"
 #include "ags/shared/ac/route_finder.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/debug/debug_log.h"
@@ -68,7 +68,7 @@
 #include "ags/shared/ac/dynobj/cc_inventory.h"
 #include "ags/shared/script/script_runtime.h"
 #include "ags/shared/gfx/gfx_def.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/ac/movelist.h"
 
 namespace AGS3 {

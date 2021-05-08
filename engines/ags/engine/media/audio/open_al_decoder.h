@@ -30,9 +30,9 @@
 #define AGS_ENGINE_MEDIA_AUDIO_OPEN_AL_DECODER_H
 
 //include <future>
-#include "ags/shared/media/audio/openal.h"
+#include "ags/engine/media/audio/openal.h"
 //include <SDL_sound.h>
-#include "ags/shared/media/audio/audio_core_defs.h"
+#include "ags/engine/media/audio/audio_core_defs.h"
 #include "ags/shared/util/string.h"
 
 namespace AGS3 {

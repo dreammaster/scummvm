@@ -21,9 +21,9 @@
  */
 
 //include <cmath>
-#include "ags/shared/media/audio/clip_openal.h"
-#include "ags/shared/media/audio/audio_core.h"
-#include "ags/shared/media/audio/audiodefines.h"
+#include "ags/engine/media/audio/clip_openal.h"
+#include "ags/engine/media/audio/audio_core.h"
+#include "ags/engine/media/audio/audio_defines.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/stream.h"
 

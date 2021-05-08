@@ -27,7 +27,7 @@
 #include "ags/shared/ac/characterextras.h"
 #include "ags/shared/ac/display.h"
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_overlay.h"
 #include "ags/shared/ac/global_translation.h"

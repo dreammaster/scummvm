@@ -20,9 +20,9 @@
  *
  */
 
-#include "ags/shared/ac/dynobj/cc_audioclip.h"
-#include "ags/shared/ac/dynobj/scriptaudioclip.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/engine/ac/dynobj/cc_audio_clip.h"
+#include "ags/shared/ac/dynobj/script_audio_clip.h"
+#include "ags/shared/ac/game_setup_struct.h"
 
 namespace AGS3 {
 

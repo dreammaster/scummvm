@@ -31,7 +31,7 @@
 #include "ags/shared/ac/event.h"
 #include "ags/shared/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_audio.h"
 #include "ags/shared/ac/global_character.h"
@@ -54,8 +54,8 @@
 #include "ags/shared/ac/walkablearea.h"
 #include "ags/shared/ac/walkbehind.h"
 #include "ags/shared/ac/dynobj/scriptobject.h"
-#include "ags/shared/ac/dynobj/scripthotspot.h"
-#include "ags/shared/gui/guimain.h"
+#include "ags/engine/ac/dynobj/script_hotspot.h"
+#include "ags/shared/gui/gui_main.h"
 #include "ags/engine/script/cc_instance.h"
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/debug/debugger.h"
@@ -75,7 +75,7 @@
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/gfxfilter.h"
 #include "ags/shared/util/math.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 

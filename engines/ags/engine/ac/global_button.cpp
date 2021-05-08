@@ -23,9 +23,9 @@
 #include "ags/shared/ac/global_button.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/button.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/string.h"
-#include "ags/shared/gui/guimain.h"
+#include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/guibutton.h"
 
 namespace AGS3 {

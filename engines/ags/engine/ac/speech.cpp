@@ -78,7 +78,7 @@ SkipSpeechStyle internal_skip_speech_to_user(int internal_val) {
 //
 //=============================================================================
 
-#include "ac/gamesetupstruct.h"
+#include "ac/game_setup_struct.h"
 #include "ac/gamestate.h"
 #include "ac/global_audio.h"
 #include "ac/global_display.h"

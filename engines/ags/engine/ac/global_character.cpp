@@ -33,7 +33,7 @@
 #include "ags/shared/ac/display.h"
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/event.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_overlay.h"
 #include "ags/shared/ac/global_translation.h"
@@ -43,7 +43,7 @@
 #include "ags/shared/ac/screenoverlay.h"
 #include "ags/shared/ac/string.h"
 #include "ags/shared/debug/debug_log.h"
-#include "ags/shared/game/roomstruct.h"
+#include "ags/shared/game/room_struct.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/script/script.h"
 

@@ -26,7 +26,7 @@
 //include <ctype.h> // toupper
 #include "ags/shared/core/platform.h"
 #include "ags/engine/ac/game_setup.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/path_helper.h"
@@ -42,7 +42,7 @@
 #include "ags/shared/util/textstreamreader.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/string_utils.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 

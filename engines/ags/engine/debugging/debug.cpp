@@ -31,7 +31,7 @@
 #endif
 //include <SDL.h>
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/runtime_defines.h"
 #include "ags/shared/debug/agseditordebugger.h"
@@ -43,7 +43,7 @@
 #include "ags/shared/debug/logfile.h"
 #include "ags/shared/debug/messagebuffer.h"
 #include "ags/shared/main/config.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/platform/base/sys_main.h"
 #include "ags/shared/plugin/plugin_engine.h"

@@ -23,7 +23,7 @@
 #include "ags/engine/ac/room_object.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/common_defines.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/runtime_defines.h"
 #include "ags/shared/ac/viewframe.h"

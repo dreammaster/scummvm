@@ -24,7 +24,7 @@
 #define AGS_SHARED_GUI_GUI_TEXTBOX_H
 
 #include "ags/lib/std/vector.h"
-#include "ags/shared/gui/gui_object.h"
+#include "ags/engine/gui/gui_object.h"
 #include "ags/shared/util/string.h"
 
 namespace AGS3 {

@@ -22,7 +22,7 @@
 
 #include "ags/shared/ac/inventoryitem.h"
 #include "ags/shared/ac/characterinfo.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/ac/global_inventoryitem.h"
 #include "ags/shared/ac/global_translation.h"

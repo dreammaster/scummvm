@@ -22,18 +22,18 @@
 
 #include "ags/lib/std/math.h"
 #include "ags/shared/core/platform.h"
-#include "ags/shared/media/audio/audio.h"
+#include "ags/engine/media/audio/audio.h"
 #include "ags/shared/ac/audiocliptype.h"
-#include "ags/shared/ac/gamesetupstruct.h"
-#include "ags/shared/ac/dynobj/cc_audioclip.h"
-#include "ags/shared/ac/dynobj/cc_audiochannel.h"
+#include "ags/shared/ac/game_setup_struct.h"
+#include "ags/engine/ac/dynobj/cc_audio_clip.h"
+#include "ags/engine/ac/dynobj/cc_audio_channel.h"
 #include "ags/shared/ac/gamestate.h"
 #include "ags/shared/script/script_runtime.h"
 #include "ags/shared/ac/audiochannel.h"
 #include "ags/shared/ac/audioclip.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/path_helper.h"
-#include "ags/shared/media/audio/sound.h"
+#include "ags/engine/media/audio/sound.h"
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/debug/debugger.h"
 #include "ags/shared/ac/common.h"
@@ -44,7 +44,7 @@
 #include "ags/shared/core/assetmanager.h"
 #include "ags/shared/ac/timer.h"
 #include "ags/shared/main/game_run.h"
-#include "ags/shared/media/audio/audio_core.h"
+#include "ags/engine/media/audio/audio_core.h"
 
 namespace AGS3 {
 

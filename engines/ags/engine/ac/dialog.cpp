@@ -28,7 +28,7 @@
 #include "ags/shared/ac/display.h"
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/gamestate.h"
-#include "ags/shared/ac/gamesetupstruct.h"
+#include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/global_character.h"
 #include "ags/shared/ac/global_dialog.h"
 #include "ags/shared/ac/global_display.h"
@@ -48,7 +48,7 @@
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/engine/script/cc_instance.h"
-#include "ags/shared/gui/guimain.h"
+#include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/guitextbox.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
@@ -58,7 +58,7 @@
 #include "ags/shared/gfx/gfx_util.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/ac/mouse.h"
-#include "ags/shared/media/audio/audio_system.h"
+#include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 
