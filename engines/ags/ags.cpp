@@ -195,6 +195,7 @@ Common::Error AGSEngine::run() {
 	}
 #endif
 #endif
+	return Common::kNoError;
 }
 
 SaveStateList AGSEngine::listSaves() const {

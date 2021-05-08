@@ -20,20 +20,33 @@
  *
  */
 
-#ifndef AGS_SHARED_FONT_FONT_H
-#define AGS_SHARED_FONT_FONT_H
+#ifndef AGS_SHARED_FONT_FONTS_H
+#define AGS_SHARED_FONT_FONTS_H
 
 #include "ags/lib/std/vector.h"
 #include "ags/shared/core/types.h"
 #include "ags/shared/util/string.h"
+#include "ags/shared/ac/game_struct_defines.h"
 
 namespace AGS3 {
 
-// TODO: we need to make some kind of TextManager class of this module
+class IAGSFontRenderer;
+class IAGSFontRenderer2;
+struct FontInfo;
+struct FontRenderParams;
 
 namespace AGS {
 namespace Shared {
 class Bitmap;
+
+struct Font {
+	IAGSFontRenderer *Renderer = nullptr;
+	IAGSFontRenderer2 *Renderer2 = nullptr;
+	FontInfo            Info;
+
+	Font();
+};
+
 } // namespace Shared
 } // namespace AGS
 

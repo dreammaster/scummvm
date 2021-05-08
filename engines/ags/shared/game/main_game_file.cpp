@@ -38,6 +38,7 @@
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/string_compat.h"
 #include "ags/shared/util/string_utils.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 namespace AGS {
@@ -742,10 +743,10 @@ HGameFileError ReadGameData(LoadedGameEntities &ents, Stream *in, GameDataVersio
 
 	ReadDialogs(ents.Dialogs, ents.OldDialogScripts, ents.OldDialogSources, ents.OldSpeechLines,
 		in, data_ver, game.numdialog);
-	HError err2 = GUI::ReadGUI(guis, in);
+	HError err2 = GUI::ReadGUI(_GP(guis), in);
 	if (!err2)
 		return new MainGameFileError(kMGFErr_GameEntityFailed, err2);
-	game.numgui = guis.size();
+	game.numgui = _GP(guis).size();
 
 	if (data_ver >= kGameVersion_260) {
 		err = ReadPlugins(ents.PluginInfos, in);

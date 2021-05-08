@@ -32,22 +32,14 @@
 #include "ags/shared/gui/gui_defines.h" // MAXLINE
 #include "ags/shared/util/string_utils.h"
 
-#define STD_BUFFER_SIZE 3000
-
 namespace AGS3 {
+
+#define STD_BUFFER_SIZE 3000
 
 using namespace AGS::Shared;
 
 namespace AGS {
 namespace Shared {
-
-struct Font {
-	IAGSFontRenderer *Renderer;
-	IAGSFontRenderer2 *Renderer2;
-	FontInfo            Info;
-
-	Font();
-};
 
 Font::Font()
 	: Renderer(nullptr)

@@ -20,185 +20,257 @@
  *
  */
 
-//=============================================================================
-//
-// MOUSELIBW32.CPP
-//
-// Library of mouse functions for graphics and text mode
-//
-// (c) 1994 Chris Jones
-// Win32 (allegro) update (c) 1999 Chris Jones
-//
-//=============================================================================
+ //=============================================================================
+ //
+ // MOUSELIBW32.CPP
+ //
+ // Library of mouse functions for graphics and text mode
+ //
+ // (c) 1994 Chris Jones
+ // Win32 (allegro) update (c) 1999 Chris Jones
+ //
+ //=============================================================================
 
-#include "ags/shared/device/mousew32.h"
-//include <SDL.h>
-#include "ags/shared/ac/gamestate.h"
-#include "ags/shared/ac/sys_events.h"
-#include "ags/shared/debug/out.h"
+#include "ags/shared/core/platform.h"
+
+#define AGS_SIMULATE_RIGHT_CLICK (AGS_PLATFORM_OS_MACOS)
+
+#if AGS_PLATFORM_OS_WINDOWS
+//include <dos.h>
+//include <conio.h>
+//include <process.h>
+#endif
+
+#include "ags/shared/util/wgt2allg.h"
+
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
+
+#include "ags/engine/ac/gamestate.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/device/mousew32.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/main/graphics_mode.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/gfx/gfx_util.h"
+#include "ags/engine/main/graphics_mode.h"
+#include "ags/engine/platform/base/agsplatformdriver.h"
+#include "ags/shared/util/math.h"
+#include "ags/globals.h"
+#if AGS_SIMULATE_RIGHT_CLICK
+#include "ags/shared/ac/sys_events.h" // j for ags_iskeypressed
+#endif
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
+enum {
+	NONE = -1, LEFT = 0, RIGHT = 1, MIDDLE = 2
+};
 
-char currentcursor = 0;
-// virtual mouse cursor coordinates
-int mousex = 0, mousey = 0, numcurso = -1, hotx = 0, hoty = 0;
-// real mouse coordinates and bounds
-static int real_mouse_x = 0, real_mouse_y = 0;
-static int boundx1 = 0, boundx2 = 99999, boundy1 = 0, boundy2 = 99999;
-static int disable_mgetgraphpos = 0;
-char ignore_bounds = 0;
-extern char alpha_blend_cursor;
-Bitmap *mousecurs[MAXCURSORS];
-extern RGB palette[256];
-extern volatile bool switched_away;
+static const int MB_ARRAY[3] = { 1, 2, 4 };
 
-namespace Mouse {
-// Tells whether mouse was locked to the game window
-bool LockedToWindow = false;
-
-// Screen rectangle, in which the mouse movement is controlled by engine
-Rect  ControlRect;
-// Mouse control enabled flag
-bool  ControlEnabled = false;
-// Mouse speed value provided by user
-float SpeedVal = 1.f;
-// Mouse speed unit
-float SpeedUnit = 1.f;
-// Actual speed factor (cached)
-float Speed = 1.f;
-
-// Converts real window coordinates to native game coords
-void WindowToGame(int &x, int &y);
+void mgraphconfine(int x1, int y1, int x2, int y2) {
+	_GP(mouse).ControlRect = Rect(x1, y1, x2, y2);
+	set_mouse_range(_GP(mouse).ControlRect.Left, _GP(mouse).ControlRect.Top, _GP(mouse).ControlRect.Right, _GP(mouse).ControlRect.Bottom);
+	Debug::Printf("Mouse confined: (%d,%d)-(%d,%d) (%dx%d)",
+		_GP(mouse).ControlRect.Left, _GP(mouse).ControlRect.Top, _GP(mouse).ControlRect.Right, _GP(mouse).ControlRect.Bottom,
+		_GP(mouse).ControlRect.GetWidth(), _GP(mouse).ControlRect.GetHeight());
 }
 
 void mgetgraphpos() {
-	// TODO: review and possibly rewrite whole thing;
-	// research what disable_mgetgraphpos does, and is this still necessary?
-	// disable or update mouse speed control to sdl
-	// (does sdl support mouse cursor speed? is it even necessary anymore?);
-
-	// TODO: [sonneveld] find out where mgetgraphpos is needed, are events polled before that?
-	sys_evt_process_pending();
-
-	if (disable_mgetgraphpos) {
+	poll_mouse();
+	if (_G(disable_mgetgraphpos)) {
 		// The cursor coordinates are provided from alternate source;
 		// in this case we completely ignore actual cursor movement.
-		if (!ignore_bounds &&
-			// When applying script bounds we only do so while cursor is inside game viewport
-			Mouse::ControlRect.IsInside(mousex, mousey) &&
-			(mousex < boundx1 || mousey < boundy1 || mousex > boundx2 || mousey > boundy2)) {
-			mousex = Math::Clamp(mousex, boundx1, boundx2);
-			mousey = Math::Clamp(mousey, boundy1, boundy2);
-			msetgraphpos(mousex, mousey);
+		if (!_G(ignore_bounds) &&
+			(_G(mousex) < _G(boundx1) || _G(mousey) < _G(boundy1) || _G(mousex) > _G(boundx2) || _G(mousey) > _G(boundy2))) {
+			_G(mousex) = Math::Clamp(_G(mousex), _G(boundx1), _G(boundx2));
+			_G(mousey) = Math::Clamp(_G(mousey), _G(boundy1), _G(boundy2));
+			msetgraphpos(_G(mousex), _G(mousey));
 		}
 		return;
 	}
 
-	if (!switched_away && Mouse::ControlEnabled) {
-		// Use relative mouse movement; speed factor should already be applied by SDL in this mode
-		int rel_x, rel_y;
-		ags_mouse_get_relxy(rel_x, rel_y);
-		real_mouse_x = Math::Clamp(real_mouse_x + rel_x, Mouse::ControlRect.Left, Mouse::ControlRect.Right);
-		real_mouse_y = Math::Clamp(real_mouse_y + rel_y, Mouse::ControlRect.Top, Mouse::ControlRect.Bottom);
+	if (!_G(switched_away) && _GP(mouse).ControlEnabled) {
+		// Control mouse movement by querying mouse mickeys (movement deltas)
+		// and applying them to saved mouse coordinates.
+		int mickey_x, mickey_y;
+		get_mouse_mickeys(&mickey_x, &mickey_y);
+
+		// Apply mouse speed
+		int dx = _GP(mouse).Speed * mickey_x;
+		int dy = _GP(mouse).Speed * mickey_y;
+
+		//
+		// Perform actual cursor update
+		//---------------------------------------------------------------------
+		// If the real cursor is inside the control rectangle (read - game window),
+		// then apply sensitivity factors and adjust real cursor position
+		if (_GP(mouse).ControlRect.IsInside(_G(real_mouse_x) + dx, _G(real_mouse_y) + dy)) {
+			_G(real_mouse_x) += dx;
+			_G(real_mouse_y) += dy;
+			position_mouse(_G(real_mouse_x), _G(real_mouse_y));
+		}
+		// Otherwise, if real cursor was moved outside the control rect, yet we
+		// are required to confine cursor inside one, then adjust cursor position
+		// to stay inside the rect's bounds.
+		else if (_GP(mouse).ConfineInCtrlRect) {
+			_G(real_mouse_x) = Math::Clamp(_G(real_mouse_x) + dx, _GP(mouse).ControlRect.Left, _GP(mouse).ControlRect.Right);
+			_G(real_mouse_y) = Math::Clamp(_G(real_mouse_y) + dy, _GP(mouse).ControlRect.Top, _GP(mouse).ControlRect.Bottom);
+			position_mouse(_G(real_mouse_x), _G(real_mouse_y));
+		}
+		// Lastly, if the real cursor is out of the control rect, simply add
+		// actual movement to keep up with the system cursor coordinates.
+		else {
+			_G(real_mouse_x) += mickey_x;
+			_G(real_mouse_y) += mickey_y;
+		}
+
+		// Do not update the game cursor if the real cursor is beyond the control rect
+		if (!_GP(mouse).ControlRect.IsInside(_G(real_mouse_x), _G(real_mouse_y)))
+			return;
 	} else {
 		// Save real cursor coordinates provided by system
-		real_mouse_x = sys_mouse_x;
-		real_mouse_y = sys_mouse_y;
+		_G(real_mouse_x) = _G(mouse_x);
+		_G(real_mouse_y) = _G(mouse_y);
 	}
 
 	// Set new in-game cursor position
-	mousex = real_mouse_x;
-	mousey = real_mouse_y;
+	_G(mousex) = _G(real_mouse_x);
+	_G(mousey) = _G(real_mouse_y);
 
-	if (!ignore_bounds &&
-		// When applying script bounds we only do so while cursor is inside game viewport
-		Mouse::ControlRect.IsInside(mousex, mousey) &&
-		(mousex < boundx1 || mousey < boundy1 || mousex > boundx2 || mousey > boundy2)) {
-		mousex = Math::Clamp(mousex, boundx1, boundx2);
-		mousey = Math::Clamp(mousey, boundy1, boundy2);
-		msetgraphpos(mousex, mousey);
+	if (!_G(ignore_bounds) &&
+		(_G(mousex) < _G(boundx1) || _G(mousey) < _G(boundy1) || _G(mousex) > _G(boundx2) || _G(mousey) > _G(boundy2))) {
+		_G(mousex) = Math::Clamp(_G(mousex), _G(boundx1), _G(boundx2));
+		_G(mousey) = Math::Clamp(_G(mousey), _G(boundy1), _G(boundy2));
+		msetgraphpos(_G(mousex), _G(mousey));
 	}
 
 	// Convert to virtual coordinates
-	Mouse::WindowToGame(mousex, mousey);
+	_GP(mouse).AdjustPosition(_G(mousex), _G(mousey));
 }
 
 void msetcursorlimit(int x1, int y1, int x2, int y2) {
-	boundx1 = x1;
-	boundy1 = y1;
-	boundx2 = x2;
-	boundy2 = y2;
+	_G(boundx1) = x1;
+	_G(boundy1) = y1;
+	_G(boundx2) = x2;
+	_G(boundy2) = y2;
 }
 
-static int hotxwas = 0, hotywas = 0;
 void domouse(int str) {
-	int poow = mousecurs[currentcursor]->GetWidth();
-	int pooh = mousecurs[currentcursor]->GetHeight();
-	int smx = mousex - hotxwas, smy = mousey - hotywas;
-	const Rect &viewport = play.GetMainViewport();
+	/*
+	   TO USE THIS ROUTINE YOU MUST LOAD A MOUSE CURSOR USING mloadcursor.
+	   YOU MUST ALSO REMEMBER TO CALL mfreemem AT THE END OF THE PROGRAM.
+	*/
+	int poow = _G(mousecurs)[(int)_G(currentcursor)]->GetWidth();
+	int pooh = _G(mousecurs)[(int)_G(currentcursor)]->GetHeight();
+	//int smx = _G(mousex) - _G(hotxwas), smy = _G(mousey) - _G(hotywas);
+	const Rect &viewport = _GP(play).GetMainViewport();
 
 	mgetgraphpos();
+	_G(mousex) -= _G(hotx);
+	_G(mousey) -= _G(hoty);
 
-	// temporarily adjust mousex/y. Original values returned at end of func.
-	mousex -= hotx;
-	mousey -= hoty;
+	if (_G(mousex) + poow >= viewport.GetWidth())
+		poow = viewport.GetWidth() - _G(mousex);
 
-	if (mousex + poow >= viewport.GetWidth())
-		poow = viewport.GetWidth() - mousex;
+	if (_G(mousey) + pooh >= viewport.GetHeight())
+		pooh = viewport.GetHeight() - _G(mousey);
 
-	if (mousey + pooh >= viewport.GetHeight())
-		pooh = viewport.GetHeight() - mousey;
+	_G(mousex) += _G(hotx);
+	_G(mousey) += _G(hoty);
+	_G(hotxwas) = _G(hotx);
+	_G(hotywas) = _G(hoty);
+}
 
-	mousex += hotx;
-	mousey += hoty;
-	hotxwas = hotx;
-	hotywas = hoty;
+int ismouseinbox(int lf, int tp, int rt, int bt) {
+	if ((_G(mousex) >= lf) & (_G(mousex) <= rt) & (_G(mousey) >= tp) & (_G(mousey) <= bt))
+		return TRUE;
+	else
+		return FALSE;
+}
+
+void mfreemem() {
+	for (int re = 0; re < _G(numcurso); re++) {
+		delete _G(mousecurs)[re];
+	}
+}
+
+void mloadwcursor(char *namm) {
+	color dummypal[256];
+	if (wloadsprites(&dummypal[0], namm, _G(mousecurs), 0, MAXCURSORS)) {
+		error("mloadwcursor: Error reading mouse cursor file");
+	}
+}
+
+int mgetbutton() {
+	int toret = NONE;
+	poll_mouse();
+	int butis = _G(mouse_b);
+
+	if ((butis > 0) &(_G(butwas) > 0))
+		return NONE;  // don't allow holding button down
+
+	if (butis & 1) {
+		toret = LEFT;
+#if AGS_SIMULATE_RIGHT_CLICK
+		// j Ctrl-left click should be right-click
+		if (ags_iskeypressed(__allegro_KEY_LCONTROL) || ags_iskeypressed(__allegro_KEY_RCONTROL)) {
+			toret = RIGHT;
+		}
+#endif
+	} else if (butis & 2)
+		toret = RIGHT;
+	else if (butis & 4)
+		toret = MIDDLE;
+
+	_G(butwas) = butis;
+	return toret;
+}
+
+int misbuttondown(int buno) {
+	poll_mouse();
+	if (_G(mouse_b) & MB_ARRAY[buno])
+		return TRUE;
+	return FALSE;
 }
 
 void msetgraphpos(int xa, int ya) {
-	real_mouse_x = xa;
-	real_mouse_y = ya;
-	sys_window_set_mouse(real_mouse_x, real_mouse_y);
+	_G(real_mouse_x) = xa;
+	_G(real_mouse_y) = ya;
+	position_mouse(_G(real_mouse_x), _G(real_mouse_y));
 }
 
 void msethotspot(int xx, int yy) {
-	hotx = xx;  // mousex -= hotx; mousey -= hoty;
-	hoty = yy;  // mousex += hotx; mousey += hoty;
+	_G(hotx) = xx;  // _G(mousex) -= _G(hotx); _G(mousey) -= _G(hoty);
+	_G(hoty) = yy;  // _G(mousex) += _G(hotx); _G(mousey) += _G(hoty);
 }
 
 int minstalled() {
-	// TODO: can SDL tell number of available/supported buttons at all, or whether mouse is present?
-	// this is not that critical, but maybe some game devs would like to detect if player has or not a mouse.
-	return 3; // SDL *theoretically* support 3 mouse buttons, but that does not mean they are physically present...
+	return install_mouse();
 }
 
-void Mouse::WindowToGame(int &x, int &y) {
-	x = GameScaling.X.UnScalePt(x) - play.GetMainViewport().Left;
-	y = GameScaling.Y.UnScalePt(y) - play.GetMainViewport().Top;
+void Mouse::AdjustPosition(int &x, int &y) {
+	x = _GP(GameScaling).X.UnScalePt(x) - _GP(play).GetMainViewport().Left;
+	y = _GP(GameScaling).Y.UnScalePt(y) - _GP(play).GetMainViewport().Top;
 }
 
-void Mouse::UpdateGraphicArea() {
-	Mouse::ControlRect = GameScaling.ScaleRange(play.GetMainViewport());
-	Debug::Printf("Mouse cursor graphic area: (%d,%d)-(%d,%d) (%dx%d)",
-		Mouse::ControlRect.Left, Mouse::ControlRect.Top, Mouse::ControlRect.Right, Mouse::ControlRect.Bottom,
-		Mouse::ControlRect.GetWidth(), Mouse::ControlRect.GetHeight());
+void Mouse::SetGraphicArea() {
+	Rect dst_r = _GP(GameScaling).ScaleRange(_GP(play).GetMainViewport());
+	mgraphconfine(dst_r.Left, dst_r.Top, dst_r.Right, dst_r.Bottom);
 }
 
 void Mouse::SetMoveLimit(const Rect &r) {
-	Rect src_r = OffsetRect(r, play.GetMainViewport().GetLT());
-	Rect dst_r = GameScaling.ScaleRange(src_r);
+	Rect src_r = OffsetRect(r, _GP(play).GetMainViewport().GetLT());
+	Rect dst_r = _GP(GameScaling).ScaleRange(src_r);
 	msetcursorlimit(dst_r.Left, dst_r.Top, dst_r.Right, dst_r.Bottom);
 }
 
 void Mouse::SetPosition(const Point p) {
-	msetgraphpos(GameScaling.X.ScalePt(p.X + play.GetMainViewport().Left), GameScaling.Y.ScalePt(p.Y + play.GetMainViewport().Top));
+	msetgraphpos(_GP(GameScaling).X.ScalePt(p.X + _GP(play).GetMainViewport().Left), _GP(GameScaling).Y.ScalePt(p.Y + _GP(play).GetMainViewport().Top));
 }
 
 bool Mouse::IsLockedToWindow() {
@@ -207,28 +279,23 @@ bool Mouse::IsLockedToWindow() {
 
 bool Mouse::TryLockToWindow() {
 	if (!LockedToWindow)
-		LockedToWindow = sys_window_lock_mouse(true);
+		LockedToWindow = _G(platform)->LockMouseToWindow();
 	return LockedToWindow;
 }
 
 void Mouse::UnlockFromWindow() {
-	sys_window_lock_mouse(false);
+	_G(platform)->UnlockMouse();
 	LockedToWindow = false;
 }
 
-void Mouse::SetMovementControl(bool on) {
-#if defined (SDL_HINT_MOUSE_RELATIVE_SPEED_SCALE)
-	ControlEnabled = on;
-	SDL_SetRelativeMouseMode(static_cast<SDL_bool>(on));
-	if (on)
-		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SPEED_SCALE, String::FromFormat("%.2f", Mouse::Speed).GetCStr());
-	else
-		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SPEED_SCALE, "1.0");
-#else
+void Mouse::EnableControl(bool confine) {
+	ControlEnabled = true;
+	ConfineInCtrlRect = confine;
+}
+
+void Mouse::DisableControl() {
 	ControlEnabled = false;
-	Debug::Printf(kDbgMsg_Warn, "WARNING: SDL_HINT_MOUSE_RELATIVE_SPEED_SCALE not supported, mouse control can't be enabled");
-#endif
-	ags_clear_input_buffer();
+	ConfineInCtrlRect = false;
 }
 
 bool Mouse::IsControlEnabled() {

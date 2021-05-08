@@ -35,6 +35,7 @@
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_utils.h"
 #include "ags/shared/util/string_compat.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -654,7 +655,7 @@ void DrawTextAlignedHor(Bitmap *ds, const char *text, int font, color_t text_col
 }
 
 void MarkAllGUIForUpdate() {
-	for (auto &gui : guis) {
+	for (auto &gui : _GP(guis)) {
 		gui.MarkChanged();
 	}
 }

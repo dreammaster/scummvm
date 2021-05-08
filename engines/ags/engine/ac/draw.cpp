@@ -148,19 +148,7 @@ bool current_background_is_dirty = false;
 
 // Room background sprite
 IDriverDependantBitmap* roomBackgroundBmp = nullptr;
-// Buffer and info flags for viewport/camera pairs rendering in software mode
-struct RoomCameraDrawData
-{
-    // Intermediate bitmap for the software drawing method.
-    // We use this bitmap in case room camera has scaling enabled, we draw dirty room rects on it,
-    // and then pass to software renderer which draws sprite on top and then either blits or stretch-blits
-    // to the virtual screen.
-    // For more details see comment in ALSoftwareGraphicsDriver::RenderToBackBuffer().
-    PBitmap Buffer;      // this is the actual bitmap
-    PBitmap Frame;       // this is either same bitmap reference or sub-bitmap of virtual screen
-    bool    IsOffscreen; // whether room viewport was offscreen (cannot use sub-bitmap)
-    bool    IsOverlap;   // whether room viewport overlaps any others (marking dirty rects is complicated)
-};
+
 std::vector<RoomCameraDrawData> CameraDrawData;
 
 std::vector<SpriteListEntry> sprlist;

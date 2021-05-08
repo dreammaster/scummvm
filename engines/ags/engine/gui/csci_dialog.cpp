@@ -64,8 +64,6 @@ int acdialog_font;
 
 int smcode = 0;
 
-#define MAXCONTROLS 20
-#define MAXSCREENWINDOWS 5
 NewControl *vobjs[MAXCONTROLS];
 OnScreenWindow oswi[MAXSCREENWINDOWS];
 
