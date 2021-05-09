@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_invwindow.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/properties.h"

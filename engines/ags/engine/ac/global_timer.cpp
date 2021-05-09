@@ -21,9 +21,9 @@
  */
 
 #include "ags/shared/ac/global_timer.h"
-#include "ags/shared/ac/runtime_defines.h"
+#include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 
 namespace AGS3 {
 

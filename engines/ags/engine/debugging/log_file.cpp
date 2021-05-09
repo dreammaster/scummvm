@@ -21,7 +21,7 @@
  */
 
 //include <string.h>
-#include "ags/shared/debug/logfile.h"
+#include "ags/shared/debugging/logfile.h"
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/stream.h"
 

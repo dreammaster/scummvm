@@ -23,10 +23,10 @@
 #include "ags/shared/ac/region.h"
 #include "ags/shared/ac/common_defines.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_region.h"
 #include "ags/shared/ac/roomstatus.h"
-#include "ags/shared/ac/dynobj/cc_region.h"
+#include "ags/engine/ac/dynobj/cc_region.h"
 #include "ags/shared/game/room_struct.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 
@@ -137,7 +137,7 @@ void generate_light_table() {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 

@@ -20,8 +20,8 @@
  *
  */
 
-#include "ags/shared/ac/dynobj/scriptcamera.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/dynobj/script_camera.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/util/bbop.h"
 
 namespace AGS3 {

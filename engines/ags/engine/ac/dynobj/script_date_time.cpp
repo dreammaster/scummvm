@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/dynobj/scriptdatetime.h"
+#include "ags/engine/ac/dynobj/script_date_time.h"
 
 namespace AGS3 {
 

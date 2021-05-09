@@ -28,8 +28,8 @@
 //
 //=============================================================================
 
-#ifndef AGS_ENGINE_PLUGIN_AGS_PLUGIN_H
-#define AGS_ENGINE_PLUGIN_AGS_PLUGIN_H
+#ifndef AGS_PLUGINS_AGS_PLUGIN_H
+#define AGS_PLUGINS_AGS_PLUGIN_H
 
 namespace AGS3 {
 

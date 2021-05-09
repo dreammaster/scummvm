@@ -22,7 +22,7 @@
 
 #include "ags/engine/media/audio/openaldecoder.h"
 //include <array>
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 
 namespace AGS3 {
 

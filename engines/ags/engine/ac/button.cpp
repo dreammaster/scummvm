@@ -28,7 +28,7 @@
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/string.h"
 #include "ags/shared/ac/viewframe.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/gui/animatingguibutton.h"
 #include "ags/shared/gui/gui_main.h"
 
@@ -304,10 +304,10 @@ void Button_SetTextAlignment(GUIButton *butt, int align) {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
-#include "ags/shared/ac/dynobj/scriptstring.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;
 

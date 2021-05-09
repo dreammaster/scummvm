@@ -22,7 +22,7 @@
 
 //include <cstdio>
 //include <string.h>
-#include "ags/shared/debug/filebasedagsdebugger.h"
+#include "ags/shared/debugging/filebasedagsdebugger.h"
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/stream.h"

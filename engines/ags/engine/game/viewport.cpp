@@ -21,8 +21,8 @@
  */
 
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/gamestate.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/ac/game_state.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/game/room_struct.h"
 #include "ags/shared/game/viewport.h"
 

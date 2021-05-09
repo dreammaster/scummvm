@@ -21,7 +21,7 @@
 //include <stdio.h>
 //include <unistd.h>
 #include "ags/lib/allegro.h"
-#include "ags/shared/ac/runtime_defines.h"
+#include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/gfx/gfxdefines.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/plugin/agsplugin.h"

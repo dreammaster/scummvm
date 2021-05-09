@@ -26,7 +26,7 @@
 #include "ags/shared/gui/guidialog.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/game.h"
+#include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/global_game.h"
@@ -34,7 +34,7 @@
 //include <cctype> //isdigit()
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/graphicsdriver.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/util/path.h"
 
 namespace AGS3 {

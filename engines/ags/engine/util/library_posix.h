@@ -26,7 +26,7 @@
 //include <dlfcn.h>
 #include "ags/shared/core/platform.h"
 #include "ags/shared/util/string.h"
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 
 namespace AGS3 {
 

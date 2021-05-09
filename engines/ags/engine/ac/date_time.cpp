@@ -75,7 +75,7 @@ int DateTime_GetRawTime(ScriptDateTime *sdt) {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 

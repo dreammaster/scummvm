@@ -20,8 +20,8 @@
  *
  */
 
-#include "ags/shared/ac/dynobj/scriptfile.h"
-#include "ags/shared/ac/global_file.h"
+#include "ags/engine/ac/dynobj/script_file.h"
+#include "ags/engine/ac/global_file.h"
 
 namespace AGS3 {
 

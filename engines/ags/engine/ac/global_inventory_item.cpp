@@ -32,7 +32,7 @@
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/guiinv.h"
 #include "ags/shared/ac/event.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 
 namespace AGS3 {
 

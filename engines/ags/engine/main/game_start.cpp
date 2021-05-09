@@ -25,24 +25,24 @@
 //
 
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/characterinfo.h"
-#include "ags/shared/ac/game.h"
+#include "ags/shared/ac/character_info.h"
+#include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_game.h"
 #include "ags/shared/ac/mouse.h"
 #include "ags/shared/ac/room.h"
 #include "ags/shared/ac/screen.h"
-#include "ags/shared/debug/debug_log.h"
-#include "ags/shared/debug/debugger.h"
-#include "ags/shared/debug/out.h"
+#include "ags/engine/debugging/debug_log.h"
+#include "ags/shared/debugging/debugger.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/gfx/ali3dexception.h"
 #include "ags/shared/main/mainheader.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/main/game_start.h"
 #include "ags/shared/script/script.h"
 #include "ags/engine/media/audio/audio_system.h"
-#include "ags/shared/ac/timer.h"
+#include "ags/engine/ac/timer.h"
 
 namespace AGS3 {
 

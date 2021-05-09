@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_DEBUGGING_FILE_BASED_AGS_DEBUGGER_H
 #define AGS_ENGINE_DEBUGGING_FILE_BASED_AGS_DEBUGGER_H
 
-#include "ags/shared/debug/agseditordebugger.h"
+#include "ags/shared/debugging/agseditordebugger.h"
 
 namespace AGS3 {
 

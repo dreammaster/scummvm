@@ -21,22 +21,22 @@
  */
 
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/drawingsurface.h"
+#include "ags/engine/ac/drawing_surface.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/charactercache.h"
 #include "ags/shared/ac/display.h"
-#include "ags/shared/ac/game.h"
+#include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/objectcache.h"
 #include "ags/engine/ac/room_object.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/string.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/ac/spritecache.h"
+#include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 #include "ags/shared/gfx/gfx_def.h"
 #include "ags/shared/gfx/gfx_util.h"
@@ -393,7 +393,7 @@ int DrawingSurface_GetPixel(ScriptDrawingSurface *sds, int x, int y) {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 

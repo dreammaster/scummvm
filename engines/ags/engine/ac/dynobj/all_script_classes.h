@@ -23,20 +23,20 @@
 #ifndef AGS_ENGINE_AC_DYNOBJ_ALL_SCRIPT_CLASSES_H
 #define AGS_ENGINE_AC_DYNOBJ_ALL_SCRIPT_CLASSES_H
 
-#include "ags/shared/ac/dynobj/scriptdatetime.h"
-#include "ags/shared/ac/dynobj/scriptdialog.h"
-#include "ags/shared/ac/dynobj/scriptdialogoptionsrendering.h"
+#include "ags/engine/ac/dynobj/script_date_time.h"
+#include "ags/engine/ac/dynobj/script_dialog.h"
+#include "ags/engine/ac/dynobj/script_dialog_options_rendering.h"
 #include "ags/engine/ac/dynobj/script_drawing_surface.h"
-#include "ags/shared/ac/dynobj/scriptdynamicsprite.h"
+#include "ags/engine/ac/dynobj/script_dynamic_sprite.h"
 #include "ags/engine/ac/dynobj/script_gui.h"
 #include "ags/engine/ac/dynobj/script_hotspot.h"
-#include "ags/shared/ac/dynobj/scriptinvitem.h"
-#include "ags/shared/ac/dynobj/scriptmouse.h"
-#include "ags/shared/ac/dynobj/scriptobject.h"
-#include "ags/shared/ac/dynobj/scriptoverlay.h"
-#include "ags/shared/ac/dynobj/scriptregion.h"
-#include "ags/shared/ac/dynobj/scriptstring.h"
-#include "ags/shared/ac/dynobj/scriptsystem.h"
-#include "ags/shared/ac/dynobj/scriptviewframe.h"
+#include "ags/engine/ac/dynobj/script_inv_item.h"
+#include "ags/engine/ac/dynobj/script_mouse.h"
+#include "ags/engine/ac/dynobj/script_object.h"
+#include "ags/engine/ac/dynobj/script_overlay.h"
+#include "ags/engine/ac/dynobj/script_region.h"
+#include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/engine/ac/dynobj/script_system.h"
+#include "ags/engine/ac/dynobj/script_view_frame.h"
 
 #endif

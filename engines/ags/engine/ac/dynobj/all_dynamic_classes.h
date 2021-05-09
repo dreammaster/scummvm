@@ -26,15 +26,14 @@
 #include "ags/engine/ac/dynobj/cc_ags_dynamic_object.h"
 #include "ags/engine/ac/dynobj/cc_audio_channel.h"
 #include "ags/engine/ac/dynobj/cc_audio_clip.h"
-#include "ags/shared/ac/dynobj/cc_character.h"
-#include "ags/shared/ac/dynobj/cc_dialog.h"
+#include "ags/engine/ac/dynobj/cc_character.h"
+#include "ags/engine/ac/dynobj/cc_dialog.h"
 #include "ags/engine/ac/dynobj/cc_gui.h"
-#include "ags/shared/ac/dynobj/cc_guiobject.h"
+#include "ags/engine/ac/dynobj/cc_gui_object.h"
 #include "ags/engine/ac/dynobj/cc_hotspot.h"
-#include "ags/shared/ac/dynobj/cc_inventory.h"
-#include "ags/shared/ac/dynobj/cc_object.h"
-#include "ags/shared/ac/dynobj/cc_region.h"
-
-#include "ags/shared/ac/dynobj/cc_serializer.h"
+#include "ags/engine/ac/dynobj/cc_inventory.h"
+#include "ags/engine/ac/dynobj/cc_object.h"
+#include "ags/engine/ac/dynobj/cc_region.h"
+#include "ags/engine/ac/dynobj/cc_serializer.h"
 
 #endif

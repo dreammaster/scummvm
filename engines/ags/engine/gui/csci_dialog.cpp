@@ -24,12 +24,12 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/draw.h"
 #include "ags/engine/ac/game_setup.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/gui.h"
 #include "ags/shared/ac/keycode.h"
 #include "ags/shared/ac/mouse.h"
 #include "ags/shared/ac/sys_events.h"
-#include "ags/shared/ac/runtime_defines.h"
+#include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gui/cscidialog.h"
 #include "ags/shared/gui/guidialog.h"
@@ -40,7 +40,7 @@
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/ac/timer.h"
+#include "ags/engine/ac/timer.h"
 
 namespace AGS3 {
 

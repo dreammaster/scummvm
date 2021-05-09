@@ -30,7 +30,7 @@
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/ac/timer.h"
+#include "ags/engine/ac/timer.h"
 
 namespace AGS3 {
 

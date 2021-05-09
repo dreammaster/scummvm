@@ -118,7 +118,7 @@ void Slider_SetHandleOffset(GUISlider *guisl, int newOffset) {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 

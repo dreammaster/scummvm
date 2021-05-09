@@ -25,12 +25,12 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/display.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/runtime_defines.h"
-#include "ags/shared/ac/dynobj/scriptstring.h"
+#include "ags/engine/ac/runtime_defines.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 #include "ags/shared/util/string_compat.h"
 
@@ -298,7 +298,7 @@ void my_strncpy(char *dest, const char *src, int len) {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 #include "ags/shared/ac/math.h"

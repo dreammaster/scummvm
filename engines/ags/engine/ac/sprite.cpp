@@ -28,7 +28,7 @@
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/plugin/agsplugin.h"
 #include "ags/shared/plugin/plugin_engine.h"
-#include "ags/shared/ac/spritecache.h"
+#include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 

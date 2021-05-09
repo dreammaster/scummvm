@@ -28,8 +28,8 @@
 //include <SDL.h>
 #include "ags/shared/core/platform.h"
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/debug/debugger.h"
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/debugger.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/gfx/ali3dexception.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/gfxdriverfactory.h"

@@ -23,7 +23,7 @@
 //include <string.h>
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/display.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/string.h"
 #include "ags/shared/ac/translation.h"

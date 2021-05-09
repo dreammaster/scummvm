@@ -24,9 +24,9 @@
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/characterextras.h"
-#include "ags/shared/ac/spritecache.h"
+#include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/bitmap.h"
 
 namespace AGS3 {

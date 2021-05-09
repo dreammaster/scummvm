@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_AC_CHARACTER_H
 #define AGS_ENGINE_AC_CHARACTER_H
 
-#include "ags/engine/ac/character_info.h"
+#include "ags/shared/ac/character_info.h"
 #include "ags/engine/ac/character_extras.h"
 #include "ags/engine/ac/dynobj/script_object.h"
 #include "ags/engine/ac/dynobj/script_inv_item.h"

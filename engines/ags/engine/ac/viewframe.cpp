@@ -22,8 +22,8 @@
 
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/viewframe.h"
-#include "ags/shared/debug/debug_log.h"
-#include "ags/shared/ac/spritecache.h"
+#include "ags/engine/debugging/debug_log.h"
+#include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 #include "ags/engine/ac/dynobj/cc_audio_clip.h"
@@ -178,7 +178,7 @@ void DrawViewFrame(Bitmap *ds, const ViewFrame *vframe, int x, int y, bool alpha
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 

@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/overlay.h"
+#include "ags/engine/ac/overlay.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/view.h"
 #include "ags/shared/ac/character.h"
@@ -28,11 +28,11 @@
 #include "ags/shared/ac/display.h"
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_overlay.h"
 #include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/runtime_defines.h"
-#include "ags/shared/ac/screenoverlay.h"
+#include "ags/engine/ac/runtime_defines.h"
+#include "ags/engine/ac/screen_overlay.h"
 #include "ags/shared/ac/string.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/gfx/bitmap.h"
@@ -288,7 +288,7 @@ void recreate_overlay_ddbs() {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 

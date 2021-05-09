@@ -26,7 +26,7 @@
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 
@@ -34,17 +34,17 @@
 #include "ags/shared/ac/display.h"
 #include "ags/shared/ac/dynamicsprite.h"
 #include "ags/shared/ac/event.h"
-#include "ags/shared/ac/game.h"
+#include "ags/engine/ac/game.h"
 #include "ags/shared/ac/global_audio.h"
 #include "ags/shared/ac/global_button.h"
-#include "ags/shared/ac/global_character.h"
+#include "ags/engine/ac/global_character.h"
 #include "ags/shared/ac/global_datetime.h"
 #include "ags/shared/ac/global_debug.h"
 #include "ags/shared/ac/global_dialog.h"
 #include "ags/shared/ac/global_display.h"
 #include "ags/shared/ac/global_drawingsurface.h"
 #include "ags/shared/ac/global_dynamicsprite.h"
-#include "ags/shared/ac/global_file.h"
+#include "ags/engine/ac/global_file.h"
 #include "ags/shared/ac/global_game.h"
 #include "ags/shared/ac/global_gui.h"
 #include "ags/shared/ac/global_hotspot.h"
@@ -80,7 +80,7 @@
 #include "ags/shared/util/string_compat.h"
 #include "ags/engine/media/audio/audio_system.h"
 
-#include "ags/shared/ac/dynobj/scriptstring.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 
 namespace AGS3 {
 

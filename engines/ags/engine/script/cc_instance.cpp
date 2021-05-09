@@ -23,13 +23,13 @@
 //include <cstdio>
 //include <string.h>
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/dynobj/cc_dynamicarray.h"
+#include "ags/engine/ac/dynobj/cc_dynamicarray.h"
 #include "ags/engine/ac/dynobj/managed_object_pool.h"
 #include "ags/shared/gui/guidefines.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/engine/script/cc_instance.h"
-#include "ags/shared/debug/debug_log.h"
-#include "ags/shared/debug/out.h"
+#include "ags/engine/debugging/debug_log.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/cc_options.h"
 #include "ags/shared/script/script.h"
 #include "ags/shared/script/script_runtime.h"
@@ -38,11 +38,11 @@
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/misc.h"
 #include "ags/shared/util/textstreamwriter.h"
-#include "ags/shared/ac/dynobj/scriptstring.h"
-#include "ags/shared/ac/dynobj/scriptuserobject.h"
+#include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/engine/ac/dynobj/script_user_object.h"
 #include "ags/shared/ac/statobj/agsstaticobject.h"
 #include "ags/shared/ac/statobj/staticarray.h"
-#include "ags/shared/ac/dynobj/cc_dynamicobject_addr_and_manager.h"
+#include "ags/engine/ac/dynobj/cc_dynamicobject_addr_and_manager.h"
 #include "ags/shared/util/memory.h"
 #include "ags/shared/util/string_utils.h" // linux strnicmp definition
 

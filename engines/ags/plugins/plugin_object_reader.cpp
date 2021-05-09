@@ -20,18 +20,12 @@
  *
  */
 
-#ifndef AGS_ENGINE_PLUGIN_PLUGIN_OBJECT_READER_H
-#define AGS_ENGINE_PLUGIN_PLUGIN_OBJECT_READER_H
+#include "ags/plugins/plugin_object_reader.h"
+#include "ags/engine/ac/runtime_defines.h"
 
 namespace AGS3 {
 
-class IAGSManagedObjectReader;
-
-struct PluginObjectReader {
-	IAGSManagedObjectReader *reader;
-	const char *type;
-};
+//PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
+//int numPluginReaders = 0;
 
 } // namespace AGS3
-
-#endif

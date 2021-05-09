@@ -28,7 +28,7 @@
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/keycode.h"
 #include "ags/shared/ac/mouse.h"
-#include "ags/shared/ac/timer.h"
+#include "ags/engine/ac/timer.h"
 #include "ags/shared/device/mousew32.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/main/engine.h"

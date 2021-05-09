@@ -23,10 +23,10 @@
 #ifndef AGS_ENGINE_AC_VIEW_FRAME_H
 #define AGS_ENGINE_AC_VIEW_FRAME_H
 
-#include "ags/shared/ac/runtime_defines.h"
+#include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/ac/view.h"
 #include "ags/shared/ac/dynobj/script_audio_clip.h"
-#include "ags/shared/ac/dynobj/script_view_frame.h"
+#include "ags/engine/ac/dynobj/script_view_frame.h"
 #include "ags/shared/gfx/bitmap.h"
 
 namespace AGS3 {

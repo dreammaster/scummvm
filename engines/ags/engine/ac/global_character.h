@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_AC_GLOBAL_CHARACTER_H
 #define AGS_ENGINE_AC_GLOBAL_CHARACTER_H
 
-#include "ags/engine/ac/character_info.h"
+#include "ags/shared/ac/character_info.h"
 
 namespace AGS3 {
 

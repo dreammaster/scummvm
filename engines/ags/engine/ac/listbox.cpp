@@ -25,9 +25,9 @@
 #include "ags/lib/allegro.h" // find files
 #include "ags/shared/ac/listbox.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/game.h"
+#include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_game.h"
 #include "ags/shared/ac/path_helper.h"
 #include "ags/shared/ac/string.h"
@@ -341,7 +341,7 @@ GUIListBox *is_valid_listbox(int guin, int objn) {
 #include "ags/shared/debug/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
-#include "ags/shared/ac/dynobj/scriptstring.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;
 

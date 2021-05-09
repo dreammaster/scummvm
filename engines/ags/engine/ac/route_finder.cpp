@@ -25,7 +25,7 @@
 #include "ags/shared/ac/route_finder_impl.h"
 #include "ags/shared/ac/route_finder_impl_legacy.h"
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 
 namespace AGS3 {
 

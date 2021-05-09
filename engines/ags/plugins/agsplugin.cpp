@@ -58,7 +58,7 @@
 #include "ags/plugins/pluginobjectreader.h"
 #include "ags/engine/script/script.h"
 #include "ags/engine/script/script_runtime.h"
-#include "ags/shared/ac/spritecache.h"
+#include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/gfx/graphics_driver.h"

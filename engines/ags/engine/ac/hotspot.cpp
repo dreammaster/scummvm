@@ -22,7 +22,7 @@
 
 #include "ags/engine/ac/dynobj/cc_hotspot.h"
 #include "ags/shared/ac/hotspot.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_hotspot.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/properties.h"
@@ -140,10 +140,10 @@ int get_hotspot_at(int xpp, int ypp) {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
-#include "ags/shared/ac/dynobj/scriptstring.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;
 

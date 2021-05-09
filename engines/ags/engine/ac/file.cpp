@@ -24,15 +24,15 @@
 #include "ags/shared/ac/audiocliptype.h"
 #include "ags/shared/ac/file.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/game.h"
+#include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/global_file.h"
+#include "ags/engine/ac/global_file.h"
 #include "ags/shared/ac/path_helper.h"
-#include "ags/shared/ac/runtime_defines.h"
+#include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/ac/string.h"
-#include "ags/shared/debug/debug_log.h"
-#include "ags/shared/debug/debugger.h"
+#include "ags/engine/debugging/debug_log.h"
+#include "ags/shared/debugging/debugger.h"
 #include "ags/shared/util/misc.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/util/stream.h"
@@ -550,10 +550,10 @@ Stream *get_valid_file_stream_from_handle(int32_t handle, const char *operation_
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
-#include "ags/shared/ac/dynobj/scriptstring.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;
 

@@ -23,7 +23,7 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/guicontrol.h"
 #include "ags/shared/ac/global_gui.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/gui/guibutton.h"
 #include "ags/shared/gui/guiinv.h"
 #include "ags/shared/gui/guilabel.h"
@@ -33,7 +33,7 @@
 #include "ags/shared/gui/guitextbox.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 #include "ags/engine/ac/dynobj/cc_gui.h"
-#include "ags/shared/ac/dynobj/cc_guiobject.h"
+#include "ags/engine/ac/dynobj/cc_gui_object.h"
 
 namespace AGS3 {
 
@@ -227,7 +227,7 @@ void GUIControl_BringToFront(GUIObject *guio) {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 

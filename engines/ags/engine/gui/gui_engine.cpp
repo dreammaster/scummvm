@@ -40,7 +40,7 @@
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/string.h"
-#include "ags/shared/ac/spritecache.h"
+#include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/blender.h"
 

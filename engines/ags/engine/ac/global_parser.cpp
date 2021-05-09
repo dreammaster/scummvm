@@ -23,7 +23,7 @@
 //include <cstring> //strcpy()
 #include "ags/shared/ac/global_parser.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/string.h"
 
 namespace AGS3 {

@@ -21,10 +21,10 @@
  */
 
 #include "ags/shared/ac/audiochannel.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_audio.h"
 #include "ags/engine/ac/dynobj/cc_audio_clip.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/game/room_struct.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 #include "ags/engine/media/audio/audio_system.h"
@@ -202,7 +202,7 @@ void AudioChannel_SetRoomLocation(ScriptAudioChannel *channel, int xPos, int yPo
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 

@@ -21,13 +21,13 @@
  */
 
 //include <string.h>
-#include "ags/shared/ac/global_file.h"
+#include "ags/engine/ac/global_file.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/file.h"
 #include "ags/shared/ac/path_helper.h"
-#include "ags/shared/ac/runtime_defines.h"
+#include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/ac/string.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/util/directory.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/stream.h"

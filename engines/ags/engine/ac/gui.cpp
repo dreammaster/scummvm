@@ -27,8 +27,8 @@
 #include "ags/shared/ac/event.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
-#include "ags/shared/ac/global_character.h"
+#include "ags/engine/ac/game_state.h"
+#include "ags/engine/ac/global_character.h"
 #include "ags/shared/ac/global_game.h"
 #include "ags/shared/ac/global_gui.h"
 #include "ags/shared/ac/global_inventoryitem.h"
@@ -37,12 +37,12 @@
 #include "ags/shared/ac/interfacebutton.h"
 #include "ags/shared/ac/invwindow.h"
 #include "ags/shared/ac/mouse.h"
-#include "ags/shared/ac/runtime_defines.h"
+#include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/ac/system.h"
-#include "ags/shared/ac/dynobj/cc_guiobject.h"
+#include "ags/engine/ac/dynobj/cc_gui_object.h"
 #include "ags/engine/ac/dynobj/script_gui.h"
 #include "ags/engine/script/cc_instance.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/device/mousew32.h"
 #include "ags/shared/gfx/gfxfilter.h"
 #include "ags/shared/gui/guibutton.h"
@@ -52,7 +52,7 @@
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/ac/dynobj/cc_gui.h"
-#include "ags/shared/ac/dynobj/cc_guiobject.h"
+#include "ags/engine/ac/dynobj/cc_gui_object.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 #include "ags/shared/util/string_compat.h"
 
@@ -684,7 +684,7 @@ void gui_on_mouse_down(const int guin, const int mbut) {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 

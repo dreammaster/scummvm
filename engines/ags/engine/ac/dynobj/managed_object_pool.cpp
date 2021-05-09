@@ -23,8 +23,8 @@
 #include "ags/lib/std/vector.h"
 //include <string.h>
 #include "ags/engine/ac/dynobj/managed_object_pool.h"
-#include "ags/shared/ac/dynobj/cc_dynamicarray.h" // globalDynamicArray, constants
-#include "ags/shared/debug/out.h"
+#include "ags/engine/ac/dynobj/cc_dynamicarray.h" // globalDynamicArray, constants
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/util/string_utils.h"               // fputstring, etc
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/script_common.h"

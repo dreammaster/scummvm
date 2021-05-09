@@ -25,25 +25,25 @@
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/character.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_object.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/objectcache.h"
 #include "ags/shared/ac/properties.h"
 #include "ags/shared/ac/room.h"
 #include "ags/shared/ac/roomstatus.h"
-#include "ags/shared/ac/runtime_defines.h"
+#include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/ac/string.h"
 #include "ags/shared/ac/system.h"
 #include "ags/shared/ac/walkablearea.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/ac/route_finder.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/gfx_def.h"
 #include "ags/shared/script/runtimescriptvalue.h"
-#include "ags/shared/ac/dynobj/cc_object.h"
+#include "ags/engine/ac/dynobj/cc_object.h"
 #include "ags/shared/ac/movelist.h"
 
 namespace AGS3 {
@@ -528,10 +528,10 @@ int check_click_on_object(int roomx, int roomy, int mood) {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
-#include "ags/shared/ac/dynobj/scriptstring.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;
 

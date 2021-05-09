@@ -21,14 +21,14 @@
  */
 
 #include "ags/engine/ac/game_setup.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_audio.h"
 #include "ags/shared/ac/global_game.h"
 #include "ags/shared/ac/global_video.h"
 #include "ags/shared/ac/path_helper.h"
 #include "ags/shared/core/assetmanager.h"
-#include "ags/shared/debug/debugger.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/engine/media/video/video.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"

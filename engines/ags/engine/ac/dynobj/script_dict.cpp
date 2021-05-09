@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/dynobj/scriptdict.h"
+#include "ags/engine/ac/dynobj/script_dict.h"
 
 namespace AGS3 {
 

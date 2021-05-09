@@ -35,7 +35,7 @@
 #include "ags/shared/ac/movelist.h"     // MoveList
 #include "ags/shared/ac/common_defines.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/ac/route_finder_jps.h"
 
 namespace AGS3 {

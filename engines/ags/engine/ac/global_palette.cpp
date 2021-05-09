@@ -23,7 +23,7 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_palette.h"
 #include "ags/shared/util/wgt2allg.h"
 

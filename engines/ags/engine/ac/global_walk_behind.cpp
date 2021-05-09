@@ -26,7 +26,7 @@
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/walkbehind.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 
 namespace AGS3 {
 

@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_AC_DRAWING_SURFACE_H
 #define AGS_ENGINE_AC_DRAWING_SURFACE_H
 
-#include "ags/engine/ac/dynobj/scriptdrawingsurface.h"
+#include "ags/engine/ac/dynobj/script_drawing_surface.h"
 
 namespace AGS3 {
 

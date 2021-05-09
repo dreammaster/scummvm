@@ -26,7 +26,7 @@
 //
 //=============================================================================
 
-#include "ags/shared/ac/global_character.h"
+#include "ags/engine/ac/global_character.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/view.h"
 #include "ags/shared/ac/character.h"
@@ -34,15 +34,15 @@
 #include "ags/shared/ac/draw.h"
 #include "ags/shared/ac/event.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_overlay.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/object.h"
-#include "ags/shared/ac/overlay.h"
+#include "ags/engine/ac/overlay.h"
 #include "ags/shared/ac/properties.h"
-#include "ags/shared/ac/screenoverlay.h"
+#include "ags/engine/ac/screen_overlay.h"
 #include "ags/shared/ac/string.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/game/room_struct.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/script/script.h"

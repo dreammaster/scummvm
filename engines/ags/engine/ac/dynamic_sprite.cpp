@@ -25,9 +25,9 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/charactercache.h"
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/game.h"
+#include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_dynamicsprite.h"
 #include "ags/shared/ac/global_game.h"
 #include "ags/shared/ac/math.h"    // M_PI
@@ -36,10 +36,10 @@
 #include "ags/engine/ac/room_object.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/system.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/game/room_struct.h"
 #include "ags/shared/gui/guibutton.h"
-#include "ags/shared/ac/spritecache.h"
+#include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/script/runtimescriptvalue.h"
 
@@ -489,7 +489,7 @@ void free_dynamic_sprite(int gotSlot) {
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
 

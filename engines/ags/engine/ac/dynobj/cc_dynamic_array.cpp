@@ -21,7 +21,7 @@
  */
 
 //include <string.h>
-#include "ags/shared/cc_dynamicarray.h"
+#include "ags/engine/ac/dynobj/cc_dynamic_array.h"
 
 namespace AGS3 {
 

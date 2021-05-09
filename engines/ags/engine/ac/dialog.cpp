@@ -20,16 +20,16 @@
  *
  */
 
-#include "ags/shared/ac/dialog.h"
+#include "ags/engine/ac/dialog.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/character.h"
-#include "ags/shared/ac/characterinfo.h"
-#include "ags/shared/ac/dialogtopic.h"
+#include "ags/shared/ac/character_info.h"
+#include "ags/shared/ac/dialog_topic.h"
 #include "ags/shared/ac/display.h"
 #include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/global_character.h"
+#include "ags/engine/ac/global_character.h"
 #include "ags/shared/ac/global_dialog.h"
 #include "ags/shared/ac/global_display.h"
 #include "ags/shared/ac/global_game.h"
@@ -37,15 +37,15 @@
 #include "ags/shared/ac/global_room.h"
 #include "ags/shared/ac/global_translation.h"
 #include "ags/shared/ac/keycode.h"
-#include "ags/shared/ac/overlay.h"
+#include "ags/engine/ac/overlay.h"
 #include "ags/shared/ac/mouse.h"
 #include "ags/shared/ac/parser.h"
 #include "ags/shared/ac/sys_events.h"
 #include "ags/shared/ac/string.h"
-#include "ags/shared/ac/dynobj/scriptdialogoptionsrendering.h"
+#include "ags/engine/ac/dynobj/script_dialog_options_rendering.h"
 #include "ags/engine/ac/dynobj/script_drawing_surface.h"
 #include "ags/shared/ac/system.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/engine/script/cc_instance.h"
 #include "ags/shared/gui/gui_main.h"
@@ -53,7 +53,7 @@
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/script/script.h"
-#include "ags/shared/ac/spritecache.h"
+#include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/ddb.h"
 #include "ags/shared/gfx/gfx_util.h"
 #include "ags/shared/gfx/graphicsdriver.h"
@@ -1250,10 +1250,10 @@ void do_conversation(int dlgnum)
 //
 //=============================================================================
 
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/shared/script/script_api.h"
 #include "ags/shared/script/script_runtime.h"
-#include "ags/shared/ac/dynobj/scriptstring.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;
 

@@ -22,7 +22,7 @@
 
 //include <string.h>
 #include "ags/shared/consoleoutputtarget.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 
 namespace AGS3 {
 namespace AGS {
