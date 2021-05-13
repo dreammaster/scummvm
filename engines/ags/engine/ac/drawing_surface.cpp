@@ -20,26 +20,26 @@
  *
  */
 
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/drawing_surface.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/charactercache.h"
-#include "ags/shared/ac/display.h"
+#include "ags/engine/ac/character_cache.h"
+#include "ags/engine/ac/display.h"
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/objectcache.h"
+#include "ags/engine/ac/global_translation.h"
+#include "ags/engine/ac/object_cache.h"
 #include "ags/engine/ac/room_object.h"
-#include "ags/shared/ac/roomstatus.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/room_status.h"
+#include "ags/engine/ac/string.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/ac/sprite_cache.h"
-#include "ags/shared/script/runtimescriptvalue.h"
+#include "ags/engine/script/runtime_script_value.h"
 #include "ags/shared/gfx/gfx_def.h"
-#include "ags/shared/gfx/gfx_util.h"
+#include "ags/engine/gfx/gfx_util.h"
 
 namespace AGS3 {
 
@@ -394,8 +394,8 @@ int DrawingSurface_GetPixel(ScriptDrawingSurface *sds, int x, int y) {
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 
 // void (ScriptDrawingSurface *sds, int colour)
 RuntimeScriptValue Sc_DrawingSurface_Clear(void *self, const RuntimeScriptValue *params, int32_t param_count) {

@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/route_finder.h"
+#include "ags/engine/ac/route_finder.h"
 
 #include "ags/shared/ac/route_finder_impl.h"
 #include "ags/shared/ac/route_finder_impl_legacy.h"

@@ -21,7 +21,7 @@
  */
 
 #include "ags/engine/ac/dynobj/script_dynamic_sprite.h"
-#include "ags/shared/ac/dynamicsprite.h"
+#include "ags/engine/ac/dynamic_sprite.h"
 
 namespace AGS3 {
 

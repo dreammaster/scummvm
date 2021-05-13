@@ -27,6 +27,7 @@
 #include "ags/shared/ac/game_version.h"
 #include "ags/shared/ac/game_struct_defines.h"
 #include "ags/shared/util/string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -34,8 +35,9 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 class Stream;
-}
-}
+} // namespace Shared
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
 struct WordsDictionary;
@@ -186,7 +188,7 @@ struct GameSetupStructBase {
 	inline bool IsLegacyHiRes() const {
 		if (_resolutionType == kGameResolution_Custom)
 			return (_gameResolution.Width * _gameResolution.Height) > (320 * 240);
-		return AGS3::IsLegacyHiRes(_resolutionType);
+		return ::AGS3::IsLegacyHiRes(_resolutionType);
 	}
 	// Tells if data has coordinates in default game resolution
 	inline bool IsDataInNativeCoordinates() const {
@@ -209,7 +211,7 @@ struct GameSetupStructBase {
 
 	// Test if the game is built around old audio system
 	inline bool IsLegacyAudioSystem() const {
-		return loaded_game_file_version < kGameVersion_320;
+		return _G(loaded_game_file_version) < kGameVersion_320;
 	}
 
 	// Returns the expected filename of a digital audio package

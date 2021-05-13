@@ -23,7 +23,7 @@
 //include <string.h>
 #include "ags/shared/ac/display.h"
 #include "ags/engine/ac/game_setup.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/string.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gui/guidefines.h"
 #include "ags/shared/gui/mylabel.h"

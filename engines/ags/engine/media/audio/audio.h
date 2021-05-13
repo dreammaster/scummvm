@@ -23,14 +23,12 @@
 #ifndef AGS_ENGINE_MEDIA_AUDIO_AUDIO_H
 #define AGS_ENGINE_MEDIA_AUDIO_AUDIO_H
 
-//include <array>
 #include "ags/engine/media/audio/audio_defines.h"
 #include "ags/shared/ac/dynobj/script_audio_clip.h"
 #include "ags/engine/ac/dynobj/script_audio_channel.h"
 #include "ags/engine/media/audio/ambient_sound.h"
 #include "ags/engine/util/mutex.h"
 #include "ags/engine/util/mutex_lock.h"
-#include "ags/engine/util/thread.h"
 #include "ags/engine/ac/timer.h"
 
 namespace AGS3 {
@@ -139,16 +137,6 @@ extern volatile bool _audio_doing_crossfade;
 extern void cancel_scheduled_music_update();
 extern void schedule_music_update_at(AGS_Clock::time_point);
 extern void postpone_scheduled_music_update_by(std::chrono::milliseconds);
-
-// crossFading is >0 (channel number of new track), or -1 (old
-// track fading out, no new track)
-extern int crossFading, crossFadeVolumePerStep, crossFadeStep;
-extern int crossFadeVolumeAtStart;
-
-extern SOUNDCLIP *cachedQueuedMusic;
-
-// TODO: double check that ambient sounds array actually needs +1
-extern std::array<AmbientSound, MAX_SOUND_CHANNELS + 1> ambient;
 
 } // namespace AGS3
 

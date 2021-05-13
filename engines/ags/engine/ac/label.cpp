@@ -24,8 +24,8 @@
 #include "ags/shared/ac/label.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/global_translation.h"
+#include "ags/engine/ac/string.h"
 
 namespace AGS3 {
 
@@ -92,8 +92,8 @@ void Label_SetFont(GUILabel *guil, int fontnum) {
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;

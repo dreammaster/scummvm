@@ -20,11 +20,11 @@
  *
  */
 
-#include "ags/shared/ac/asset_helper.h"
-#include "ags/shared/ac/audioclip.h"
-#include "ags/shared/ac/audiochannel.h"
+#include "ags/engine/ac/asset_helper.h"
+#include "ags/engine/ac/audio_clip.h"
+#include "ags/engine/ac/audio_channel.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/script/runtimescriptvalue.h"
+#include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/ac/dynobj/cc_audio_channel.h"
 #include "ags/engine/media/audio/audio_system.h"
 
@@ -81,8 +81,8 @@ ScriptAudioChannel *AudioClip_PlayQueued(ScriptAudioClip *clip, int priority, in
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 
 RuntimeScriptValue Sc_AudioClip_GetID(void *self, const RuntimeScriptValue *params, int32_t param_count) {
 	API_OBJCALL_INT(ScriptAudioClip, AudioClip_GetID);

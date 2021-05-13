@@ -22,42 +22,42 @@
 
 #include "ags/engine/ac/dialog.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/character.h"
+#include "ags/engine/ac/character.h"
 #include "ags/shared/ac/character_info.h"
 #include "ags/shared/ac/dialog_topic.h"
-#include "ags/shared/ac/display.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/display.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/global_character.h"
-#include "ags/shared/ac/global_dialog.h"
-#include "ags/shared/ac/global_display.h"
-#include "ags/shared/ac/global_game.h"
-#include "ags/shared/ac/global_gui.h"
-#include "ags/shared/ac/global_room.h"
-#include "ags/shared/ac/global_translation.h"
+#include "ags/engine/ac/global_dialog.h"
+#include "ags/engine/ac/global_display.h"
+#include "ags/engine/ac/global_game.h"
+#include "ags/engine/ac/global_gui.h"
+#include "ags/engine/ac/global_room.h"
+#include "ags/engine/ac/global_translation.h"
 #include "ags/shared/ac/keycode.h"
 #include "ags/engine/ac/overlay.h"
-#include "ags/shared/ac/mouse.h"
-#include "ags/shared/ac/parser.h"
-#include "ags/shared/ac/sys_events.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/mouse.h"
+#include "ags/engine/ac/parser.h"
+#include "ags/engine/ac/sys_events.h"
+#include "ags/engine/ac/string.h"
 #include "ags/engine/ac/dynobj/script_dialog_options_rendering.h"
 #include "ags/engine/ac/dynobj/script_drawing_surface.h"
-#include "ags/shared/ac/system.h"
+#include "ags/engine/ac/system.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/engine/script/cc_instance.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/gui/guitextbox.h"
-#include "ags/shared/main/game_run.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/script/script.h"
+#include "ags/shared/gui/gui_textbox.h"
+#include "ags/engine/main/game_run.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/engine/script/script.h"
 #include "ags/shared/ac/sprite_cache.h"
-#include "ags/shared/gfx/ddb.h"
-#include "ags/shared/gfx/gfx_util.h"
-#include "ags/shared/gfx/graphicsdriver.h"
-#include "ags/shared/ac/mouse.h"
+#include "ags/engine/gfx/ddb.h"
+#include "ags/engine/gfx/gfx_util.h"
+#include "ags/engine/gfx/graphics_driver.h"
+#include "ags/engine/ac/mouse.h"
 #include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
@@ -587,7 +587,7 @@ void DialogOptions::Show()
     }
     else if (game.options[OPT_DIALOGIFACE] > 0)
     {
-      GUIMain*guib=&guis[game.options[OPT_DIALOGIFACE]];
+      GUIMain*guib=&_GP(guis)[game.options[OPT_DIALOGIFACE]];
       if (guib->IsTextWindow()) {
         // text-window, so do the QFG4-style speech options
         is_textwindow = 1;
@@ -696,7 +696,7 @@ void DialogOptions::Redraw()
       // text window behind the options
       areawid = data_to_game_coord(play.max_dialogoption_width);
       int biggest = 0;
-      padding = guis[game.options[OPT_DIALOGIFACE]].Padding;
+      padding = _GP(guis)[game.options[OPT_DIALOGIFACE]].Padding;
       for (int i = 0; i < numdisp; ++i) {
         break_up_text_into_lines(get_translation(dtop->optionnames[disporder[i]]), Lines, areawid-((2*padding+2)+bullet_wid), usingfont);
         if (longestline > biggest)
@@ -723,7 +723,7 @@ void DialogOptions::Redraw()
       // needs to draw the right text window, not the default
       Bitmap *text_window_ds = nullptr;
       draw_text_window(&text_window_ds, false, &txoffs,&tyoffs,&xspos,&yspos,&areawid,nullptr,needheight, game.options[OPT_DIALOGIFACE]);
-      options_surface_has_alpha = guis[game.options[OPT_DIALOGIFACE]].HasAlphaChannel();
+      options_surface_has_alpha = _GP(guis)[game.options[OPT_DIALOGIFACE]].HasAlphaChannel();
       // since draw_text_window incrases the width, restore it
       areawid = savedwid;
 
@@ -756,7 +756,7 @@ void DialogOptions::Redraw()
           ds->FillRect(Rect(0,dlgyp-1, ui_view.GetWidth()-1, ui_view.GetHeight()-1), draw_color);
         }
         else {
-          GUIMain* guib = &guis[game.options[OPT_DIALOGIFACE]];
+          GUIMain* guib = &_GP(guis)[game.options[OPT_DIALOGIFACE]];
           if (!guib->IsTextWindow())
             draw_gui_for_dialog_options(ds, guib, dlgxp, dlgyp);
         }
@@ -769,7 +769,7 @@ void DialogOptions::Redraw()
       {
         // the whole GUI area should be marked dirty in order
         // to ensure it gets drawn
-        GUIMain* guib = &guis[game.options[OPT_DIALOGIFACE]];
+        GUIMain* guib = &_GP(guis)[game.options[OPT_DIALOGIFACE]];
         dirtyheight = guib->Height;
         dirtyy = dlgyp;
         options_surface_has_alpha = guib->HasAlphaChannel();
@@ -1138,7 +1138,7 @@ void do_conversation(int dlgnum)
   EndSkippingUntilCharStops();
 
   // AGS 2.x always makes the mouse cursor visible when displaying a dialog.
-  if (loaded_game_file_version <= kGameVersion_272)
+  if (_G(loaded_game_file_version) <= kGameVersion_272)
     play.mouse_cursor_hidden = 0;
 
   int dlgnum_was = dlgnum;
@@ -1251,8 +1251,8 @@ void do_conversation(int dlgnum)
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;

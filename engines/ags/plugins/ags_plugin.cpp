@@ -50,7 +50,7 @@
 #include "ags/shared/ac/parser.h"
 #include "ags/shared/ac/path_helper.h"
 #include "ags/shared/ac/roomstatus.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/string.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/engine/ac/dynobj/cc_dynamicobject_addr_and_manager.h"
 #include "ags/engine/ac/dynobj/script_string.h"

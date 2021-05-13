@@ -21,9 +21,8 @@
  */
 
 #include "ags/lib/std/vector.h"
-//include <string.h>
 #include "ags/engine/ac/dynobj/managed_object_pool.h"
-#include "ags/engine/ac/dynobj/cc_dynamicarray.h" // globalDynamicArray, constants
+#include "ags/engine/ac/dynobj/cc_dynamic_array.h" // globalDynamicArray, constants
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/util/string_utils.h"               // fputstring, etc
 #include "ags/shared/script/cc_error.h"
@@ -116,7 +115,7 @@ int32_t ManagedObjectPool::AddressToHandle(const char *addr) {
 	if (it == handleByAddress.end()) {
 		return 0;
 	}
-	return it->second;
+	return it->_value;
 }
 
 // this function is called often (whenever a pointer is used)
@@ -155,7 +154,7 @@ int ManagedObjectPool::RemoveObject(const char *address) {
 		return 0;
 	}
 
-	auto &o = objects[it->second];
+	auto &o = objects[it->_value];
 	return Remove(o, true);
 }
 

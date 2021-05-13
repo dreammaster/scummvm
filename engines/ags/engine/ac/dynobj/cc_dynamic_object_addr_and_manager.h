@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_AC_DYNOBJ_ADDR_AND_MANAGER_H
 #define AGS_ENGINE_AC_DYNOBJ_ADDR_AND_MANAGER_H
 
-#include "ags/shared/script/runtimescriptvalue.h"
+#include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/ac/dynobj/cc_dynamic_object.h"
 
 namespace AGS3 {

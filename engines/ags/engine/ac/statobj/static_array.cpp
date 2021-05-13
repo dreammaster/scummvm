@@ -20,8 +20,7 @@
  *
  */
 
-//include <string.h>
-#include "ags/shared/ac/statobj/staticarray.h"
+#include "ags/engine/ac/statobj/static_array.h"
 #include "ags/engine/ac/dynobj/cc_dynamic_object.h"
 
 namespace AGS3 {

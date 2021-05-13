@@ -24,11 +24,11 @@
 #include "ags/shared/ac/common_defines.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_region.h"
-#include "ags/shared/ac/roomstatus.h"
+#include "ags/engine/ac/global_region.h"
+#include "ags/engine/ac/room_status.h"
 #include "ags/engine/ac/dynobj/cc_region.h"
 #include "ags/shared/game/room_struct.h"
-#include "ags/shared/script/runtimescriptvalue.h"
+#include "ags/engine/script/runtime_script_value.h"
 
 namespace AGS3 {
 
@@ -138,8 +138,8 @@ void generate_light_table() {
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 
 // ScriptRegion *(int xx, int yy)
 RuntimeScriptValue Sc_GetRegionAtRoom(const RuntimeScriptValue *params, int32_t param_count) {

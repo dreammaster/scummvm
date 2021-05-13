@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/global_dialog.h"
+#include "ags/engine/ac/global_dialog.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/dialog.h"
 #include "ags/shared/ac/dialog_topic.h"
@@ -29,7 +29,7 @@
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script.h"
+#include "ags/engine/script/script.h"
 
 namespace AGS3 {
 

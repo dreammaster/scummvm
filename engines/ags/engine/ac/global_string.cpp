@@ -23,9 +23,9 @@
 //include <string.h>
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/global_string.h"
-#include "ags/shared/ac/global_translation.h"
+#include "ags/engine/ac/global_translation.h"
 #include "ags/engine/ac/runtime_defines.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/string.h"
 #include "ags/shared/util/string_compat.h"
 
 namespace AGS3 {

@@ -22,8 +22,8 @@
 
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_invwindow.h"
-#include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/properties.h"
+#include "ags/engine/ac/global_translation.h"
+#include "ags/engine/ac/properties.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/guiinv.h"
 #include "ags/shared/script/executingscript.h"

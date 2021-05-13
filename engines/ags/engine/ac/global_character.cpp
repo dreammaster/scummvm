@@ -29,23 +29,23 @@
 #include "ags/engine/ac/global_character.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/view.h"
-#include "ags/shared/ac/character.h"
-#include "ags/shared/ac/display.h"
-#include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/event.h"
+#include "ags/engine/ac/character.h"
+#include "ags/engine/ac/display.h"
+#include "ags/engine/ac/draw.h"
+#include "ags/engine/ac/event.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_overlay.h"
-#include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/object.h"
+#include "ags/engine/ac/global_translation.h"
+#include "ags/engine/ac/object.h"
 #include "ags/engine/ac/overlay.h"
-#include "ags/shared/ac/properties.h"
+#include "ags/engine/ac/properties.h"
 #include "ags/engine/ac/screen_overlay.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/string.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/game/room_struct.h"
-#include "ags/shared/main/game_run.h"
-#include "ags/shared/script/script.h"
+#include "ags/engine/main/game_run.h"
+#include "ags/engine/script/script.h"
 
 namespace AGS3 {
 
@@ -370,7 +370,7 @@ void MoveCharacterBlocking(int chaa, int xx, int yy, int direct) {
 }
 
 int GetCharacterSpeechAnimationDelay(CharacterInfo *cha) {
-	if ((loaded_game_file_version < kGameVersion_312) && (game.options[OPT_SPEECHTYPE] != 0)) {
+	if ((_G(loaded_game_file_version) < kGameVersion_312) && (game.options[OPT_SPEECHTYPE] != 0)) {
 		// legacy versions of AGS assigned a fixed delay to Sierra-style speech only
 		return 5;
 	}
@@ -397,7 +397,7 @@ void RunCharacterInteraction(int cc, int mood) {
 	else if (mood == MODE_CUSTOM2) passon = 7;
 
 	evblockbasename = "character%d"; evblocknum = cc;
-	if (loaded_game_file_version > kGameVersion_272) {
+	if (_G(loaded_game_file_version) > kGameVersion_272) {
 		if (passon >= 0)
 			run_interaction_script(game.charScripts[cc].get(), passon, 4, (passon == 3));
 		run_interaction_script(game.charScripts[cc].get(), 4);  // any click on char

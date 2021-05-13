@@ -25,8 +25,8 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/parser.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/parser.h"
+#include "ags/engine/ac/string.h"
 #include "ags/shared/ac/wordsdictionary.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/util/string.h"
@@ -302,8 +302,8 @@ int parse_sentence(const char *src_text, int *numwords, short *wordarray, short 
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;

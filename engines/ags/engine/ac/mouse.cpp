@@ -20,10 +20,10 @@
  *
  */
 
-#include "ags/shared/ac/mouse.h"
+#include "ags/engine/ac/mouse.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/character_info.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/dynobj/script_mouse.h"
 #include "ags/engine/ac/dynobj/script_system.h"
 #include "ags/engine/ac/game_setup.h"
@@ -31,18 +31,18 @@
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_mouse.h"
 #include "ags/shared/ac/global_plugin.h"
-#include "ags/shared/ac/global_screen.h"
-#include "ags/shared/ac/sys_events.h"
-#include "ags/shared/ac/system.h"
-#include "ags/shared/ac/viewframe.h"
+#include "ags/engine/ac/global_screen.h"
+#include "ags/engine/ac/sys_events.h"
+#include "ags/engine/ac/system.h"
+#include "ags/engine/ac/view_frame.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/gui/guibutton.h"
+#include "ags/shared/gui/gui_button.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/device/mousew32.h"
 #include "ags/shared/ac/sprite_cache.h"
-#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gfx/gfxfilter.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 
 namespace AGS3 {
 
@@ -251,9 +251,9 @@ void enable_cursor_mode(int modd) {
 	int uu, ww;
 
 	for (uu = 0; uu < game.numgui; uu++) {
-		for (ww = 0; ww < guis[uu].GetControlCount(); ww++) {
-			if (guis[uu].GetControlType(ww) != kGUIButton) continue;
-			GUIButton *gbpt = (GUIButton *)guis[uu].GetControl(ww);
+		for (ww = 0; ww < _GP(guis)[uu].GetControlCount(); ww++) {
+			if (_GP(guis)[uu].GetControlType(ww) != kGUIButton) continue;
+			GUIButton *gbpt = (GUIButton *)_GP(guis)[uu].GetControl(ww);
 			if (gbpt->ClickAction[kMouseLeft] != kGUIAction_SetMode) continue;
 			if (gbpt->ClickData[kMouseLeft] != modd) continue;
 			gbpt->SetEnabled(true);
@@ -267,9 +267,9 @@ void disable_cursor_mode(int modd) {
 	int uu, ww;
 
 	for (uu = 0; uu < game.numgui; uu++) {
-		for (ww = 0; ww < guis[uu].GetControlCount(); ww++) {
-			if (guis[uu].GetControlType(ww) != kGUIButton) continue;
-			GUIButton *gbpt = (GUIButton *)guis[uu].GetControl(ww);
+		for (ww = 0; ww < _GP(guis)[uu].GetControlCount(); ww++) {
+			if (_GP(guis)[uu].GetControlType(ww) != kGUIButton) continue;
+			GUIButton *gbpt = (GUIButton *)_GP(guis)[uu].GetControl(ww);
 			if (gbpt->ClickAction[kMouseLeft] != kGUIAction_SetMode) continue;
 			if (gbpt->ClickData[kMouseLeft] != modd) continue;
 			gbpt->SetEnabled(false);
@@ -373,7 +373,7 @@ void set_new_cursor_graphic(int spriteslot) {
 
 	// It looks like spriteslot 0 can be used in games with version 2.72 and lower.
 	// The NULL check should ensure that the sprite is valid anyway.
-	if (((spriteslot < 1) && (loaded_game_file_version > kGameVersion_272)) || (mousecurs[0] == nullptr)) {
+	if (((spriteslot < 1) && (_G(loaded_game_file_version) > kGameVersion_272)) || (mousecurs[0] == nullptr)) {
 		if (blank_mouse_cursor == nullptr) {
 			blank_mouse_cursor = BitmapHelper::CreateTransparentBitmap(1, 1, game.GetColorDepth());
 		}
@@ -442,9 +442,9 @@ int find_previous_enabled_cursor(int startwith) {
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
-#include "ags/shared/ac/global_game.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/global_game.h"
 
 // void  (int curs, int newslot)
 RuntimeScriptValue Sc_ChangeCursorGraphic(const RuntimeScriptValue *params, int32_t param_count) {

@@ -21,27 +21,27 @@
  */
 
 #include "ags/lib/std/math.h"
-#include "ags/shared/ac/dynamicsprite.h"
+#include "ags/engine/ac/dynamic_sprite.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/charactercache.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/character_cache.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_dynamicsprite.h"
-#include "ags/shared/ac/global_game.h"
-#include "ags/shared/ac/math.h"    // M_PI
-#include "ags/shared/ac/objectcache.h"
+#include "ags/engine/ac/global_game.h"
+#include "ags/engine/ac/math.h"    // M_PI
+#include "ags/engine/ac/object_cache.h"
 #include "ags/shared/ac/path_helper.h"
 #include "ags/engine/ac/room_object.h"
-#include "ags/shared/ac/roomstatus.h"
-#include "ags/shared/ac/system.h"
+#include "ags/engine/ac/room_status.h"
+#include "ags/engine/ac/system.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/game/room_struct.h"
-#include "ags/shared/gui/guibutton.h"
+#include "ags/shared/gui/gui_button.h"
 #include "ags/shared/ac/sprite_cache.h"
-#include "ags/shared/gfx/graphicsdriver.h"
-#include "ags/shared/script/runtimescriptvalue.h"
+#include "ags/engine/gfx/graphics_driver.h"
+#include "ags/engine/script/runtime_script_value.h"
 
 namespace AGS3 {
 
@@ -490,8 +490,8 @@ void free_dynamic_sprite(int gotSlot) {
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 
 // void (ScriptDynamicSprite *sds, int width, int height, int x, int y)
 RuntimeScriptValue Sc_DynamicSprite_ChangeCanvasSize(void *self, const RuntimeScriptValue *params, int32_t param_count) {

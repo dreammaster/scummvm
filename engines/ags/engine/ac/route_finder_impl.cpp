@@ -32,7 +32,7 @@
 #include "ags/lib/std/math.h"
 
 #include "ags/shared/ac/common.h"   // quit()
-#include "ags/shared/ac/movelist.h"     // MoveList
+#include "ags/engine/ac/move_list.h"     // MoveList
 #include "ags/shared/ac/common_defines.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/debugging/out.h"

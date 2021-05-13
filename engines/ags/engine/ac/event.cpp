@@ -20,25 +20,25 @@
  *
  */
 
-#include "ags/shared/event.h"
+#include "ags/engine/ac/event.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_game.h"
-#include "ags/shared/ac/global_room.h"
-#include "ags/shared/ac/global_screen.h"
-#include "ags/shared/ac/gui.h"
-#include "ags/shared/ac/roomstatus.h"
-#include "ags/shared/ac/screen.h"
+#include "ags/engine/ac/global_game.h"
+#include "ags/engine/ac/global_room.h"
+#include "ags/engine/ac/global_screen.h"
+#include "ags/engine/ac/gui.h"
+#include "ags/engine/ac/room_status.h"
+#include "ags/engine/ac/screen.h"
 #include "ags/shared/script/cc_error.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/plugin/agsplugin.h"
-#include "ags/shared/plugin/plugin_engine.h"
-#include "ags/shared/script/script.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/plugins/agsplugin.h"
+#include "ags/plugins/plugin_engine.h"
+#include "ags/engine/script/script.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/ddb.h"
-#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/engine/gfx/ddb.h"
+#include "ags/engine/gfx/graphics_driver.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/timer.h"
 
@@ -123,7 +123,7 @@ void run_room_event(int id) {
 
 void run_event_block_inv(int invNum, int event) {
 	evblockbasename = "inventory%d";
-	if (loaded_game_file_version > kGameVersion_272) {
+	if (_G(loaded_game_file_version) > kGameVersion_272) {
 		run_interaction_script(game.invScripts[invNum].get(), event);
 	} else {
 		run_interaction_event(game.intrInv[invNum].get(), event);

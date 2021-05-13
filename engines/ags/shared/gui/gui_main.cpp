@@ -92,7 +92,7 @@ void GUIMain::InitDefaults() {
 }
 
 int GUIMain::FindControlUnderMouse(int leeway, bool must_be_clickable) const {
-	if (loaded_game_file_version <= kGameVersion_262) {
+	if (_G(loaded_game_file_version) <= kGameVersion_262) {
 		// Ignore draw order On 2.6.2 and lower
 		for (size_t i = 0; i < _controls.size(); ++i) {
 			if (!_controls[i]->IsVisible())
@@ -749,7 +749,7 @@ HError ReadGUI(std::vector<GUIMain> &guis, Stream *in, bool is_savegame) {
 
 	// import the main GUI elements
 	for (size_t i = 0; i < gui_count; ++i) {
-		GUIMain &gui = guis[i];
+		GUIMain &gui = _GP(guis)[i];
 		gui.InitDefaults();
 		gui.ReadFromFile(in, GameGuiVersion);
 
@@ -765,7 +765,7 @@ HError ReadGUI(std::vector<GUIMain> &guis, Stream *in, bool is_savegame) {
 		if (GameGuiVersion < kGuiVersion_331)
 			gui.Padding = TEXTWINDOW_PADDING_DEFAULT;
 		// fix names for 2.x: "GUI" -> "gGui"
-		if (loaded_game_file_version <= kGameVersion_272)
+		if (_G(loaded_game_file_version) <= kGameVersion_272)
 			gui.Name = GUIMain::FixupGUIName(gui.Name);
 
 		// GUI popup style and visibility
@@ -840,7 +840,7 @@ void WriteGUI(const std::vector<GUIMain> &guis, Stream *out) {
 	out->WriteInt32(guis.size());
 
 	for (size_t i = 0; i < guis.size(); ++i) {
-		guis[i].WriteToFile(out);
+		_GP(guis)[i].WriteToFile(out);
 	}
 	out->WriteInt32(numguibuts);
 	for (int i = 0; i < numguibuts; ++i) {

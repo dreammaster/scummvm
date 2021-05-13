@@ -24,7 +24,7 @@
 #define AGS_ENGINE_AC_GUI_H
 
 #include "ags/engine/ac/dynobj/script_gui.h"
-#include "ags/engine/gui/gui_main.h"
+#include "ags/shared/gui/gui_main.h"
 
 namespace AGS3 {
 

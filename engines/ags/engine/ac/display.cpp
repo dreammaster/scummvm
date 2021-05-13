@@ -22,35 +22,35 @@
 
 #include "ags/lib/std/math.h"
 
-#include "ags/shared/ac/display.h"
+#include "ags/engine/ac/display.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/font/agsfontrenderer.h"
+#include "ags/shared/font/ags_font_renderer.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/shared/ac/character.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/character.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_audio.h"
-#include "ags/shared/ac/global_game.h"
-#include "ags/shared/ac/gui.h"
-#include "ags/shared/ac/mouse.h"
+#include "ags/engine/ac/global_audio.h"
+#include "ags/engine/ac/global_game.h"
+#include "ags/engine/ac/gui.h"
+#include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/overlay.h"
-#include "ags/shared/ac/sys_events.h"
+#include "ags/engine/ac/sys_events.h"
 #include "ags/engine/ac/screen_overlay.h"
-#include "ags/shared/ac/speech.h"
-#include "ags/shared/ac/string.h"
-#include "ags/shared/ac/system.h"
-#include "ags/shared/ac/topbarsettings.h"
+#include "ags/engine/ac/speech.h"
+#include "ags/engine/ac/string.h"
+#include "ags/engine/ac/system.h"
+#include "ags/engine/ac/top_bar_settings.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/gui/guibutton.h"
+#include "ags/shared/gui/gui_button.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/main/game_run.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/engine/main/game_run.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/shared/ac/sprite_cache.h"
-#include "ags/shared/gfx/gfx_util.h"
+#include "ags/engine/gfx/gfx_util.h"
 #include "ags/shared/util/string_utils.h"
-#include "ags/shared/ac/mouse.h"
+#include "ags/engine/ac/mouse.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/timer.h"
 
@@ -102,7 +102,7 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 	disp.fulltxtheight = getheightoflines(usingfont, Lines.Count());
 
 	// AGS 2.x: If the screen is faded out, fade in again when displaying a message box.
-	if (!asspch && (loaded_game_file_version <= kGameVersion_272))
+	if (!asspch && (_G(loaded_game_file_version) <= kGameVersion_272))
 		play.screen_is_faded_out = 0;
 
 	// if it's a normal message box and the game was being skipped,
@@ -203,7 +203,7 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 		if (drawBackground) {
 			draw_text_window_and_bar(&text_window_ds, wantFreeScreenop, &ttxleft, &ttxtop, &adjustedXX, &adjustedYY, &wii, &text_color, 0, usingGui);
 			if (usingGui > 0) {
-				alphaChannel = guis[usingGui].HasAlphaChannel();
+				alphaChannel = _GP(guis)[usingGui].HasAlphaChannel();
 			}
 		} else if ((ShouldAntiAliasText()) && (game.GetColorDepth() >= 24))
 			alphaChannel = true;
@@ -216,7 +216,7 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 			if (asspch < 0) {
 				if ((usingGui >= 0) &&
 					((game.options[OPT_SPEECHTYPE] >= 2) || (isThought)))
-					text_color = text_window_ds->GetCompatibleColor(guis[usingGui].FgColor);
+					text_color = text_window_ds->GetCompatibleColor(_GP(guis)[usingGui].FgColor);
 				else
 					text_color = text_window_ds->GetCompatibleColor(-asspch);
 
@@ -232,7 +232,7 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 		draw_text_window_and_bar(&text_window_ds, wantFreeScreenop, &xoffs, &yoffs, &adjustedXX, &adjustedYY, &wii, &text_color);
 
 		if (game.options[OPT_TWCUSTOM] > 0) {
-			alphaChannel = guis[game.options[OPT_TWCUSTOM]].HasAlphaChannel();
+			alphaChannel = _GP(guis)[game.options[OPT_TWCUSTOM]].HasAlphaChannel();
 		}
 
 		adjust_y_coordinate_for_text(&yoffs, usingfont);
@@ -550,7 +550,7 @@ void draw_button_background(Bitmap *ds, int xx1, int yy1, int xx2, int yy2, GUIM
 		/*    draw_color = ds->GetCompatibleColor(opts.tws.backcol); ds->FillRect(Rect(xx1,yy1,xx2,yy2);
 		draw_color = ds->GetCompatibleColor(opts.tws.ds->GetTextColor()); ds->DrawRect(Rect(xx1+1,yy1+1,xx2-1,yy2-1);*/
 	} else {
-		if (loaded_game_file_version < kGameVersion_262) // < 2.62
+		if (_G(loaded_game_file_version) < kGameVersion_262) // < 2.62
 		{
 			// Color 0 wrongly shows as transparent instead of black
 			// From the changelog of 2.62:
@@ -569,7 +569,7 @@ void draw_button_background(Bitmap *ds, int xx1, int yy1, int xx2, int yy2, GUIM
 		int leftRightWidth = game.SpriteInfos[get_but_pic(iep, 4)].Width;
 		int topBottomHeight = game.SpriteInfos[get_but_pic(iep, 6)].Height;
 		if (iep->BgImage > 0) {
-			if ((loaded_game_file_version <= kGameVersion_272) // 2.xx
+			if ((_G(loaded_game_file_version) <= kGameVersion_272) // 2.xx
 				&& (spriteset[iep->BgImage]->GetWidth() == 1)
 				&& (spriteset[iep->BgImage]->GetHeight() == 1)
 				&& (*((unsigned int *)spriteset[iep->BgImage]->GetData()) == 0x00FF00FF)) {
@@ -618,11 +618,11 @@ int get_textwindow_border_width(int twgui) {
 	if (twgui < 0)
 		return 0;
 
-	if (!guis[twgui].IsTextWindow())
+	if (!_GP(guis)[twgui].IsTextWindow())
 		quit("!GUI set as text window but is not actually a text window GUI");
 
-	int borwid = game.SpriteInfos[get_but_pic(&guis[twgui], 4)].Width +
-		game.SpriteInfos[get_but_pic(&guis[twgui], 5)].Width;
+	int borwid = game.SpriteInfos[get_but_pic(&_GP(guis)[twgui], 4)].Width +
+		game.SpriteInfos[get_but_pic(&_GP(guis)[twgui], 5)].Width;
 
 	return borwid;
 }
@@ -632,10 +632,10 @@ int get_textwindow_top_border_height(int twgui) {
 	if (twgui < 0)
 		return 0;
 
-	if (!guis[twgui].IsTextWindow())
+	if (!_GP(guis)[twgui].IsTextWindow())
 		quit("!GUI set as text window but is not actually a text window GUI");
 
-	return game.SpriteInfos[get_but_pic(&guis[twgui], 6)].Height;
+	return game.SpriteInfos[get_but_pic(&_GP(guis)[twgui], 6)].Height;
 }
 
 // Get the padding for a text window
@@ -646,7 +646,7 @@ int get_textwindow_padding(int ifnum) {
 	if (ifnum < 0)
 		ifnum = game.options[OPT_TWCUSTOM];
 	if (ifnum > 0 && ifnum < game.numgui)
-		result = guis[ifnum].Padding;
+		result = _GP(guis)[ifnum].Padding;
 	else
 		result = TEXTWINDOW_PADDING_DEFAULT;
 
@@ -671,10 +671,10 @@ void draw_text_window(Bitmap **text_window_ds, bool should_free_ds,
 	} else {
 		if (ifnum >= game.numgui)
 			quitprintf("!Invalid GUI %d specified as text window (total GUIs: %d)", ifnum, game.numgui);
-		if (!guis[ifnum].IsTextWindow())
+		if (!_GP(guis)[ifnum].IsTextWindow())
 			quit("!GUI set as text window but is not actually a text window GUI");
 
-		int tbnum = get_but_pic(&guis[ifnum], 0);
+		int tbnum = get_but_pic(&_GP(guis)[ifnum], 0);
 
 		wii[0] += get_textwindow_border_width(ifnum);
 		xx[0] -= game.SpriteInfos[tbnum].Width;
@@ -688,9 +688,9 @@ void draw_text_window(Bitmap **text_window_ds, bool should_free_ds,
 		*text_window_ds = BitmapHelper::CreateTransparentBitmap(wii[0], ovrheight + (padding * 2) + game.SpriteInfos[tbnum].Height * 2, game.GetColorDepth());
 		ds = *text_window_ds;
 		int xoffs = game.SpriteInfos[tbnum].Width, yoffs = game.SpriteInfos[tbnum].Height;
-		draw_button_background(ds, xoffs, yoffs, (ds->GetWidth() - xoffs) - 1, (ds->GetHeight() - yoffs) - 1, &guis[ifnum]);
+		draw_button_background(ds, xoffs, yoffs, (ds->GetWidth() - xoffs) - 1, (ds->GetHeight() - yoffs) - 1, &_GP(guis)[ifnum]);
 		if (set_text_color)
-			*set_text_color = ds->GetCompatibleColor(guis[ifnum].FgColor);
+			*set_text_color = ds->GetCompatibleColor(_GP(guis)[ifnum].FgColor);
 		xins[0] = xoffs + padding;
 		yins[0] = yoffs + padding;
 	}

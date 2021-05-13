@@ -20,17 +20,22 @@
  *
  */
 
-#include "ags/shared/ac/button.h"
+#include "ags/engine/ac/button.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/gui.h"
+#include "ags/engine/ac/gui.h"
 #include "ags/shared/ac/view.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/string.h"
-#include "ags/shared/ac/viewframe.h"
+#include "ags/engine/ac/global_translation.h"
+#include "ags/engine/ac/string.h"
+#include "ags/engine/ac/view_frame.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/gui/animatingguibutton.h"
+#include "ags/engine/gui/animating_gui_button.h"
 #include "ags/shared/gui/gui_main.h"
+
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 
 namespace AGS3 {
 
@@ -61,7 +66,7 @@ void Button_Animate(GUIButton *butt, int view, int loop, int speed, int repeat) 
 	if (numAnimButs >= MAX_ANIMATING_BUTTONS)
 		quit("!AnimateButton: too many animating GUI buttons at once");
 
-	int buttonId = guis[guin].GetControlID(objn);
+	int buttonId = _GP(guis)[guin].GetControlID(objn);
 
 	guibuts[buttonId].PushedImage = 0;
 	guibuts[buttonId].MouseOverImage = 0;
@@ -298,18 +303,15 @@ void Button_SetTextAlignment(GUIButton *butt, int align) {
 	}
 }
 
+} // namespace AGS3
+
 //=============================================================================
 //
 // Script API Functions
 //
 //=============================================================================
 
-#include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
-#include "ags/engine/ac/dynobj/script_string.h"
-
-extern ScriptString myScriptStringImpl;
+namespace AGS3 {
 
 // void | GUIButton *butt, int view, int loop, int speed, int repeat
 RuntimeScriptValue Sc_Button_Animate(void *self, const RuntimeScriptValue *params, int32_t param_count) {
@@ -318,7 +320,7 @@ RuntimeScriptValue Sc_Button_Animate(void *self, const RuntimeScriptValue *param
 
 // const char* | GUIButton *butt
 RuntimeScriptValue Sc_Button_GetText_New(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(GUIButton, const char, myScriptStringImpl, Button_GetText_New);
+	API_OBJCALL_OBJ(GUIButton, const char, _GP(myScriptStringImpl), Button_GetText_New);
 }
 
 // void | GUIButton *butt, char *buffer

@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_AC_GUICONTROL_H
 #define AGS_ENGINE_AC_GUICONTROL_H
 
-#include "ags/engine/gui/gui_object.h"
+#include "ags/shared/gui/gui_object.h"
 #include "ags/engine/gui/gui_button.h"
 #include "ags/engine/gui/gui_inv.h"
 #include "ags/engine/gui/gui_label.h"

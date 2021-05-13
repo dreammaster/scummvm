@@ -22,10 +22,10 @@
 
 #include "ags/engine/ac/dialog.h"
 #include "ags/shared/ac/dialog_topic.h"
-#include "ags/shared/ac/dialogoptionsrendering.h"
+#include "ags/engine/ac/dialog_options_rendering.h"
 #include "ags/shared/ac/game_struct_defines.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/script/runtimescriptvalue.h"
+#include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/ac/dynobj/cc_dialog.h"
 
 namespace AGS3 {
@@ -139,8 +139,8 @@ void DialogOptionsRendering_SetActiveOptionID(ScriptDialogOptionsRendering *dlgO
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 
 RuntimeScriptValue Sc_DialogOptionsRendering_Update(void *self, const RuntimeScriptValue *params, int32_t param_count) {
 	API_OBJCALL_VOID(ScriptDialogOptionsRendering, DialogOptionsRendering_Update);

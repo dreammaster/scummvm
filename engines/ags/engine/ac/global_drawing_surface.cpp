@@ -21,21 +21,21 @@
  */
 
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/display.h"
+#include "ags/engine/ac/display.h"
 #include "ags/shared/ac/draw.h"
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_drawingsurface.h"
-#include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/global_translation.h"
+#include "ags/engine/ac/string.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/game/room_struct.h"
 #include "ags/shared/gui/guidefines.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/gfx_def.h"
-#include "ags/shared/gfx/gfx_util.h"
+#include "ags/engine/gfx/gfx_util.h"
 
 namespace AGS3 {
 

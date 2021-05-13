@@ -21,16 +21,16 @@
  */
 
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/sprite.h"
-#include "ags/shared/ac/system.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/plugin/agsplugin.h"
-#include "ags/shared/plugin/plugin_engine.h"
+#include "ags/engine/ac/system.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/plugins/agsplugin.h"
+#include "ags/plugins/plugin_engine.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/engine/gfx/graphics_driver.h"
 
 namespace AGS3 {
 

@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_AC_SYS_EVENTS_H
 #define AGS_ENGINE_AC_SYS_EVENTS_H
 
-#include "ags/engine/ac/keycode.h"
+#include "ags/shared/ac/keycode.h"
 //include <SDL_keyboard.h>
 
 namespace AGS3 {

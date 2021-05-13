@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef AGS_SHARED_UTIL_STRINGTYPES_H
-#define AGS_SHARED_UTIL_STRINGTYPES_H
+#ifndef AGS_SHARED_UTIL_STRING_TYPES_H
+#define AGS_SHARED_UTIL_STRING_TYPES_H
 
 #include "ags/lib/std/map.h"
 #include "ags/lib/std/vector.h"
@@ -51,35 +51,34 @@ inline size_t Hash_LowerCase(const char *data, const size_t len) {
 } // namespace FNV
 } // namespace AGS3
 
-// A std::hash specialization for AGS String
 namespace AGS3 {
 
 struct CaseSensitiveString_EqualTo {
-	bool operator()(const AGS3::AGS::Shared::String &x, const AGS3::AGS::Shared::String &y) const {
+	bool operator()(const ::AGS3::AGS::Shared::String &x, const ::AGS3::AGS::Shared::String &y) const {
 		return x.Compare(y) == 0;
 	}
 };
 
 struct CaseSensitiveString_Hash {
-	uint operator()(const AGS3::AGS::Shared::String &x) const {
+	uint operator()(const ::AGS3::AGS::Shared::String &x) const {
 		return Common::hashit(x.GetNullableCStr());
 	}
 };
 
 struct IgnoreCase_EqualTo {
-	bool operator()(const AGS3::AGS::Shared::String &x, const AGS3::AGS::Shared::String &y) const {
+	bool operator()(const ::AGS3::AGS::Shared::String &x, const ::AGS3::AGS::Shared::String &y) const {
 		return x.CompareNoCase(y) == 0;
 	}
 };
 
 struct IgnoreCase_Hash {
-	uint operator()(const AGS3::AGS::Shared::String &x) const {
+	uint operator()(const ::AGS3::AGS::Shared::String &x) const {
 		return Common::hashit_lower(x.GetNullableCStr());
 	}
 };
 
 struct IgnoreCase_LessThan {
-	bool operator()(const AGS3::AGS::Shared::String &x, const AGS3::AGS::Shared::String &y) const {
+	bool operator()(const ::AGS3::AGS::Shared::String &x, const ::AGS3::AGS::Shared::String &y) const {
 		return x.CompareNoCase(y) < 0;
 	}
 };

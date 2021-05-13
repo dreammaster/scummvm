@@ -26,9 +26,9 @@
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/runtime_defines.h"
-#include "ags/shared/ac/viewframe.h"
+#include "ags/engine/ac/view_frame.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/main/update.h"
+#include "ags/engine/main/update.h"
 #include "ags/shared/util/math.h"
 #include "ags/shared/util/stream.h"
 

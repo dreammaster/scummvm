@@ -21,12 +21,12 @@
  */
 
 #include "ags/shared/ac/global_dynamicsprite.h"
-#include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/dynamicsprite.h"
+#include "ags/engine/ac/draw.h"
+#include "ags/engine/ac/dynamic_sprite.h"
 #include "ags/shared/ac/path_helper.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/engine/ac/runtime_defines.h" //MAX_PATH
-#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gfx/bitmap.h"
 
 namespace AGS3 {

@@ -24,7 +24,7 @@
 
 #include "ags/shared/core/platform.h"
 //include <thread>
-#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 
 namespace AGS3 {
 

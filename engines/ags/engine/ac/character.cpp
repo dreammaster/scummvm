@@ -26,50 +26,50 @@
 //
 //=============================================================================
 
-#include "ags/shared/ac/character.h"
+#include "ags/engine/ac/character.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/view.h"
-#include "ags/shared/ac/display.h"
-#include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/event.h"
+#include "ags/engine/ac/display.h"
+#include "ags/engine/ac/draw.h"
+#include "ags/engine/ac/event.h"
 #include "ags/engine/ac/game.h"
-#include "ags/shared/ac/global_audio.h"
+#include "ags/engine/ac/global_audio.h"
 #include "ags/engine/ac/global_character.h"
-#include "ags/shared/ac/global_game.h"
-#include "ags/shared/ac/global_object.h"
-#include "ags/shared/ac/global_region.h"
-#include "ags/shared/ac/global_room.h"
-#include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/gui.h"
-#include "ags/shared/ac/lipsync.h"
-#include "ags/shared/ac/mouse.h"
-#include "ags/shared/ac/object.h"
+#include "ags/engine/ac/global_game.h"
+#include "ags/engine/ac/global_object.h"
+#include "ags/engine/ac/global_region.h"
+#include "ags/engine/ac/global_room.h"
+#include "ags/engine/ac/global_translation.h"
+#include "ags/engine/ac/gui.h"
+#include "ags/engine/ac/lip_sync.h"
+#include "ags/engine/ac/mouse.h"
+#include "ags/engine/ac/object.h"
 #include "ags/engine/ac/overlay.h"
-#include "ags/shared/ac/properties.h"
-#include "ags/shared/ac/room.h"
+#include "ags/engine/ac/properties.h"
+#include "ags/engine/ac/room.h"
 #include "ags/engine/ac/screen_overlay.h"
-#include "ags/shared/ac/string.h"
-#include "ags/shared/ac/system.h"
-#include "ags/shared/ac/viewframe.h"
-#include "ags/shared/ac/walkablearea.h"
+#include "ags/engine/ac/string.h"
+#include "ags/engine/ac/system.h"
+#include "ags/engine/ac/view_frame.h"
+#include "ags/engine/ac/walkable_area.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/ac/route_finder.h"
+#include "ags/engine/ac/route_finder.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/main/game_run.h"
-#include "ags/shared/main/update.h"
+#include "ags/engine/main/game_run.h"
+#include "ags/engine/main/update.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/util/string_compat.h"
 #include "ags/lib/std/math.h"
-#include "ags/shared/gfx/graphicsdriver.h"
-#include "ags/shared/script/runtimescriptvalue.h"
+#include "ags/engine/gfx/graphics_driver.h"
+#include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/ac/dynobj/cc_character.h"
 #include "ags/engine/ac/dynobj/cc_inventory.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/shared/gfx/gfx_def.h"
 #include "ags/engine/media/audio/audio_system.h"
-#include "ags/shared/ac/movelist.h"
+#include "ags/engine/ac/move_list.h"
 
 namespace AGS3 {
 
@@ -269,7 +269,7 @@ void Character_ChangeRoomSetLoop(CharacterInfo *chaa, int room, int x, int y, in
     if ((x != SCR_NO_VALUE) && (y != SCR_NO_VALUE)) {
         new_room_pos = 0;
 
-        if (loaded_game_file_version <= kGameVersion_272)
+        if (_G(loaded_game_file_version) <= kGameVersion_272)
         {
             // Set position immediately on 2.x.
             chaa->x = x;
@@ -339,7 +339,7 @@ DirectionalLoop GetDirectionalLoop(CharacterInfo *chinfo, int x_diff, int y_diff
     DirectionalLoop next_loop = kDirLoop_Left; // NOTE: default loop was Left for some reason
 
     const ViewStruct &chview  = views[chinfo->view];
-    const bool new_version    = loaded_game_file_version > kGameVersion_272;
+    const bool new_version    = _G(loaded_game_file_version) > kGameVersion_272;
     const bool has_down_loop  = ((chview.numLoops > kDirLoop_Down)  && (chview.loops[kDirLoop_Down].numFrames > 0));
     const bool has_up_loop    = ((chview.numLoops > kDirLoop_Up)    && (chview.loops[kDirLoop_Up].numFrames > 0));
     // NOTE: 3.+ games required left & right loops to be present at all times
@@ -805,7 +805,7 @@ void Character_SetAsPlayer(CharacterInfo *chaa) {
     // But only on versions > 2.61. The relevant entry in the 2.62 changelog is:
     //  - Fixed SetPlayerCharacter to do nothing at all if you pass the current
     //    player character to it (previously it was resetting the inventory layout)
-    if ((loaded_game_file_version > kGameVersion_261) && (game.playercharacter == chaa->index_id))
+    if ((_G(loaded_game_file_version) > kGameVersion_261) && (game.playercharacter == chaa->index_id))
         return;
 
     setup_player_character(chaa->index_id);
@@ -821,7 +821,7 @@ void Character_SetAsPlayer(CharacterInfo *chaa) {
     // Ignore invalid room numbers for the character and just place him in
     // the current room for 2.x. Following script calls to NewRoom() will
     // make sure this still works as intended.
-    if ((loaded_game_file_version <= kGameVersion_272) && (playerchar->room < 0))
+    if ((_G(loaded_game_file_version) <= kGameVersion_272) && (playerchar->room < 0))
         playerchar->room = displayed_room;
 
     if (displayed_room != playerchar->room)
@@ -1986,7 +1986,7 @@ void find_nearest_walkable_area (int *xx, int *yy) {
 
     int pixValue = thisroom.WalkAreaMask->GetPixel(room_to_mask_coord(xx[0]), room_to_mask_coord(yy[0]));
     // only fix this code if the game was built with 2.61 or above
-    if (pixValue == 0 || (loaded_game_file_version >= kGameVersion_261 && pixValue < 1))
+    if (pixValue == 0 || (_G(loaded_game_file_version) >= kGameVersion_261 && pixValue < 1))
     {
         // First, check every 2 pixels within immediate area
         if (!find_nearest_walkable_area_within(xx, yy, 20, 2))
@@ -2123,7 +2123,7 @@ void setup_player_character(int charid) {
     game.playercharacter = charid;
     playerchar = &game.chars[charid];
     _sc_PlayerCharPtr = ccGetObjectHandleFromAddress((char*)playerchar);
-    if (loaded_game_file_version < kGameVersion_270) {
+    if (_G(loaded_game_file_version) < kGameVersion_270) {
         ccAddExternalDynamicObject("player", playerchar, &ccDynamicCharacter);
     }
 }
@@ -2831,7 +2831,7 @@ void _displayspeech(const char*texx, int aschar, int xx, int yy, int widd, int i
         speakingChar->view=oldview;
 
         // Don't reset the loop in 2.x games
-        if (loaded_game_file_version > kGameVersion_272)
+        if (_G(loaded_game_file_version) > kGameVersion_272)
             speakingChar->loop = oldloop;
 
         speakingChar->animating=0;
@@ -2962,8 +2962,8 @@ PViewport FindNearestViewport(int charid)
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;

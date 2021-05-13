@@ -20,8 +20,7 @@
  *
  */
 
-//include <string.h>
-#include "ags/shared/ac/statobj/agsstaticobject.h"
+#include "ags/engine/ac/statobj/ags_static_object.h"
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_state.h"
 

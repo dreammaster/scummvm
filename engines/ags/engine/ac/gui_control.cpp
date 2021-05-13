@@ -22,16 +22,16 @@
 
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/guicontrol.h"
-#include "ags/shared/ac/global_gui.h"
+#include "ags/engine/ac/global_gui.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/gui/guibutton.h"
+#include "ags/shared/gui/gui_button.h"
 #include "ags/shared/gui/guiinv.h"
 #include "ags/shared/gui/guilabel.h"
 #include "ags/shared/gui/guilistbox.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/guislider.h"
-#include "ags/shared/gui/guitextbox.h"
-#include "ags/shared/script/runtimescriptvalue.h"
+#include "ags/shared/gui/gui_textbox.h"
+#include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/ac/dynobj/cc_gui.h"
 #include "ags/engine/ac/dynobj/cc_gui_object.h"
 
@@ -51,15 +51,15 @@ GUIObject *GetGUIControlAtLocation(int xx, int yy) {
 	data_to_game_coords(&xx, &yy);
 
 	int oldmousex = mousex, oldmousey = mousey;
-	mousex = xx - guis[guinum].X;
-	mousey = yy - guis[guinum].Y;
-	int toret = guis[guinum].FindControlUnderMouse(0, false);
+	mousex = xx - _GP(guis)[guinum].X;
+	mousey = yy - _GP(guis)[guinum].Y;
+	int toret = _GP(guis)[guinum].FindControlUnderMouse(0, false);
 	mousex = oldmousex;
 	mousey = oldmousey;
 	if (toret < 0)
 		return nullptr;
 
-	return guis[guinum].GetControl(toret);
+	return _GP(guis)[guinum].GetControl(toret);
 }
 
 int GUIControl_GetVisible(GUIObject *guio) {
@@ -70,7 +70,7 @@ void GUIControl_SetVisible(GUIObject *guio, int visible) {
 	const bool on = visible != 0;
 	if (on != guio->IsVisible()) {
 		guio->SetVisible(on);
-		guis[guio->ParentId].OnControlPositionChanged();
+		_GP(guis)[guio->ParentId].OnControlPositionChanged();
 	}
 }
 
@@ -86,7 +86,7 @@ void GUIControl_SetClickable(GUIObject *guio, int enabled) {
 	else
 		guio->SetClickable(false);
 
-	guis[guio->ParentId].OnControlPositionChanged();
+	_GP(guis)[guio->ParentId].OnControlPositionChanged();
 }
 
 int GUIControl_GetEnabled(GUIObject *guio) {
@@ -97,7 +97,7 @@ void GUIControl_SetEnabled(GUIObject *guio, int enabled) {
 	const bool on = enabled != 0;
 	if (on != guio->IsEnabled()) {
 		guio->SetEnabled(on);
-		guis[guio->ParentId].OnControlPositionChanged();
+		_GP(guis)[guio->ParentId].OnControlPositionChanged();
 	}
 }
 
@@ -111,42 +111,42 @@ ScriptGUI *GUIControl_GetOwningGUI(GUIObject *guio) {
 }
 
 GUIButton *GUIControl_GetAsButton(GUIObject *guio) {
-	if (guis[guio->ParentId].GetControlType(guio->Id) != kGUIButton)
+	if (_GP(guis)[guio->ParentId].GetControlType(guio->Id) != kGUIButton)
 		return nullptr;
 
 	return (GUIButton *)guio;
 }
 
 GUIInvWindow *GUIControl_GetAsInvWindow(GUIObject *guio) {
-	if (guis[guio->ParentId].GetControlType(guio->Id) != kGUIInvWindow)
+	if (_GP(guis)[guio->ParentId].GetControlType(guio->Id) != kGUIInvWindow)
 		return nullptr;
 
 	return (GUIInvWindow *)guio;
 }
 
 GUILabel *GUIControl_GetAsLabel(GUIObject *guio) {
-	if (guis[guio->ParentId].GetControlType(guio->Id) != kGUILabel)
+	if (_GP(guis)[guio->ParentId].GetControlType(guio->Id) != kGUILabel)
 		return nullptr;
 
 	return (GUILabel *)guio;
 }
 
 GUIListBox *GUIControl_GetAsListBox(GUIObject *guio) {
-	if (guis[guio->ParentId].GetControlType(guio->Id) != kGUIListBox)
+	if (_GP(guis)[guio->ParentId].GetControlType(guio->Id) != kGUIListBox)
 		return nullptr;
 
 	return (GUIListBox *)guio;
 }
 
 GUISlider *GUIControl_GetAsSlider(GUIObject *guio) {
-	if (guis[guio->ParentId].GetControlType(guio->Id) != kGUISlider)
+	if (_GP(guis)[guio->ParentId].GetControlType(guio->Id) != kGUISlider)
 		return nullptr;
 
 	return (GUISlider *)guio;
 }
 
 GUITextBox *GUIControl_GetAsTextBox(GUIObject *guio) {
-	if (guis[guio->ParentId].GetControlType(guio->Id) != kGUITextBox)
+	if (_GP(guis)[guio->ParentId].GetControlType(guio->Id) != kGUITextBox)
 		return nullptr;
 
 	return (GUITextBox *)guio;
@@ -158,7 +158,7 @@ int GUIControl_GetX(GUIObject *guio) {
 
 void GUIControl_SetX(GUIObject *guio, int xx) {
 	guio->X = data_to_game_coord(xx);
-	guis[guio->ParentId].OnControlPositionChanged();
+	_GP(guis)[guio->ParentId].OnControlPositionChanged();
 }
 
 int GUIControl_GetY(GUIObject *guio) {
@@ -167,7 +167,7 @@ int GUIControl_GetY(GUIObject *guio) {
 
 void GUIControl_SetY(GUIObject *guio, int yy) {
 	guio->Y = data_to_game_coord(yy);
-	guis[guio->ParentId].OnControlPositionChanged();
+	_GP(guis)[guio->ParentId].OnControlPositionChanged();
 }
 
 int GUIControl_GetZOrder(GUIObject *guio) {
@@ -175,7 +175,7 @@ int GUIControl_GetZOrder(GUIObject *guio) {
 }
 
 void GUIControl_SetZOrder(GUIObject *guio, int zorder) {
-	guis[guio->ParentId].SetControlZOrder(guio->Id, zorder);
+	_GP(guis)[guio->ParentId].SetControlZOrder(guio->Id, zorder);
 }
 
 void GUIControl_SetPosition(GUIObject *guio, int xx, int yy) {
@@ -191,7 +191,7 @@ int GUIControl_GetWidth(GUIObject *guio) {
 void GUIControl_SetWidth(GUIObject *guio, int newwid) {
 	guio->Width = data_to_game_coord(newwid);
 	guio->OnResized();
-	guis[guio->ParentId].OnControlPositionChanged();
+	_GP(guis)[guio->ParentId].OnControlPositionChanged();
 }
 
 int GUIControl_GetHeight(GUIObject *guio) {
@@ -201,7 +201,7 @@ int GUIControl_GetHeight(GUIObject *guio) {
 void GUIControl_SetHeight(GUIObject *guio, int newhit) {
 	guio->Height = data_to_game_coord(newhit);
 	guio->OnResized();
-	guis[guio->ParentId].OnControlPositionChanged();
+	_GP(guis)[guio->ParentId].OnControlPositionChanged();
 }
 
 void GUIControl_SetSize(GUIObject *guio, int newwid, int newhit) {
@@ -214,11 +214,11 @@ void GUIControl_SetSize(GUIObject *guio, int newwid, int newhit) {
 }
 
 void GUIControl_SendToBack(GUIObject *guio) {
-	guis[guio->ParentId].SendControlToBack(guio->Id);
+	_GP(guis)[guio->ParentId].SendControlToBack(guio->Id);
 }
 
 void GUIControl_BringToFront(GUIObject *guio) {
-	guis[guio->ParentId].BringControlToFront(guio->Id);
+	_GP(guis)[guio->ParentId].BringControlToFront(guio->Id);
 }
 
 //=============================================================================
@@ -228,8 +228,8 @@ void GUIControl_BringToFront(GUIObject *guio) {
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 
 // void (GUIObject *guio)
 RuntimeScriptValue Sc_GUIControl_BringToFront(void *self, const RuntimeScriptValue *params, int32_t param_count) {

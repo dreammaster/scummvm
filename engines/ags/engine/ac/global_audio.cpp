@@ -25,13 +25,13 @@
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_audio.h"
-#include "ags/shared/ac/lipsync.h"
+#include "ags/engine/ac/global_audio.h"
+#include "ags/engine/ac/lip_sync.h"
 #include "ags/shared/ac/path_helper.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/debugger.h"
 #include "ags/shared/game/room_struct.h"
-#include "ags/shared/main/engine.h"
+#include "ags/engine/main/engine.h"
 #include "ags/engine/media/audio/audio_core.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/timer.h"
@@ -326,7 +326,7 @@ void SetMusicVolume(int newvol) {
 }
 
 void SetMusicMasterVolume(int newvol) {
-	const int min_volume = loaded_game_file_version < kGameVersion_330 ? 0 :
+	const int min_volume = _G(loaded_game_file_version) < kGameVersion_330 ? 0 :
 		-LegacyMusicMasterVolumeAdjustment - (kRoomVolumeMax * LegacyRoomVolumeFactor);
 	if ((newvol < min_volume) | (newvol > 100))
 		quitprintf("!SetMusicMasterVolume: invalid volume - must be from %d to %d", min_volume, 100);

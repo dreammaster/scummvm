@@ -23,7 +23,7 @@
 #include "ags/shared/ac/global_listbox.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/listbox.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/string.h"
 
 namespace AGS3 {
 

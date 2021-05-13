@@ -20,23 +20,23 @@
  *
  */
 
-#include "ags/shared/ac/global_room.h"
+#include "ags/engine/ac/global_room.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/character.h"
+#include "ags/engine/ac/character.h"
 #include "ags/shared/ac/character_info.h"
-#include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/event.h"
+#include "ags/engine/ac/draw.h"
+#include "ags/engine/ac/event.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/global_character.h"
-#include "ags/shared/ac/global_game.h"
-#include "ags/shared/ac/movelist.h"
-#include "ags/shared/ac/properties.h"
-#include "ags/shared/ac/room.h"
-#include "ags/shared/ac/roomstatus.h"
+#include "ags/engine/ac/global_game.h"
+#include "ags/engine/ac/move_list.h"
+#include "ags/engine/ac/properties.h"
+#include "ags/engine/ac/room.h"
+#include "ags/engine/ac/room_status.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/debugger.h"
-#include "ags/shared/script/script.h"
+#include "ags/engine/script/script.h"
 #include "ags/shared/util/math.h"
 
 namespace AGS3 {

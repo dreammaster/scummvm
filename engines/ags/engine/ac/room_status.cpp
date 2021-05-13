@@ -24,7 +24,7 @@
 //include <stdlib.h> // free
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_version.h"
-#include "ags/shared/ac/roomstatus.h"
+#include "ags/engine/ac/room_status.h"
 #include "ags/shared/game/customproperties.h"
 #include "ags/shared/game/savegame_components.h"
 #include "ags/shared/util/alignedstream.h"
@@ -91,7 +91,7 @@ void RoomStatus::ReadFromFile_v321(Stream *in) {
 	in->ReadArrayOfInt16(walkbehind_base, MAX_WALK_BEHINDS);
 	in->ReadArrayOfInt32(interactionVariableValues, MAX_GLOBAL_VARIABLES);
 
-	if (loaded_game_file_version >= kGameVersion_340_4) {
+	if (_G(loaded_game_file_version) >= kGameVersion_340_4) {
 		Properties::ReadValues(roomProps, in);
 		for (int i = 0; i < MAX_ROOM_HOTSPOTS; ++i) {
 			Properties::ReadValues(hsProps[i], in);
@@ -119,18 +119,18 @@ void RoomStatus::ReadFromSavegame(Stream *in) {
 	for (int i = 0; i < numobj; ++i) {
 		obj[i].ReadFromFile(in);
 		Properties::ReadValues(objProps[i], in);
-		if (loaded_game_file_version <= kGameVersion_272)
+		if (_G(loaded_game_file_version) <= kGameVersion_272)
 			SavegameComponents::ReadInteraction272(intrObject[i], in);
 	}
 	for (int i = 0; i < MAX_ROOM_HOTSPOTS; ++i) {
 		hotspot_enabled[i] = in->ReadInt8();
 		Properties::ReadValues(hsProps[i], in);
-		if (loaded_game_file_version <= kGameVersion_272)
+		if (_G(loaded_game_file_version) <= kGameVersion_272)
 			SavegameComponents::ReadInteraction272(intrHotspot[i], in);
 	}
 	for (int i = 0; i < MAX_ROOM_REGIONS; ++i) {
 		region_enabled[i] = in->ReadInt8();
-		if (loaded_game_file_version <= kGameVersion_272)
+		if (_G(loaded_game_file_version) <= kGameVersion_272)
 			SavegameComponents::ReadInteraction272(intrRegion[i], in);
 	}
 	for (int i = 0; i < MAX_WALK_BEHINDS; ++i) {
@@ -138,7 +138,7 @@ void RoomStatus::ReadFromSavegame(Stream *in) {
 	}
 
 	Properties::ReadValues(roomProps, in);
-	if (loaded_game_file_version <= kGameVersion_272) {
+	if (_G(loaded_game_file_version) <= kGameVersion_272) {
 		SavegameComponents::ReadInteraction272(intrRoom, in);
 		in->ReadArrayOfInt32(interactionVariableValues, MAX_GLOBAL_VARIABLES);
 	}
@@ -156,18 +156,18 @@ void RoomStatus::WriteToSavegame(Stream *out) const {
 	for (int i = 0; i < numobj; ++i) {
 		obj[i].WriteToFile(out);
 		Properties::WriteValues(objProps[i], out);
-		if (loaded_game_file_version <= kGameVersion_272)
+		if (_G(loaded_game_file_version) <= kGameVersion_272)
 			SavegameComponents::WriteInteraction272(intrObject[i], out);
 	}
 	for (int i = 0; i < MAX_ROOM_HOTSPOTS; ++i) {
 		out->WriteInt8(hotspot_enabled[i]);
 		Properties::WriteValues(hsProps[i], out);
-		if (loaded_game_file_version <= kGameVersion_272)
+		if (_G(loaded_game_file_version) <= kGameVersion_272)
 			SavegameComponents::WriteInteraction272(intrHotspot[i], out);
 	}
 	for (int i = 0; i < MAX_ROOM_REGIONS; ++i) {
 		out->WriteInt8(region_enabled[i]);
-		if (loaded_game_file_version <= kGameVersion_272)
+		if (_G(loaded_game_file_version) <= kGameVersion_272)
 			SavegameComponents::WriteInteraction272(intrRegion[i], out);
 	}
 	for (int i = 0; i < MAX_WALK_BEHINDS; ++i) {
@@ -175,7 +175,7 @@ void RoomStatus::WriteToSavegame(Stream *out) const {
 	}
 
 	Properties::WriteValues(roomProps, out);
-	if (loaded_game_file_version <= kGameVersion_272) {
+	if (_G(loaded_game_file_version) <= kGameVersion_272) {
 		SavegameComponents::WriteInteraction272(intrRoom, out);
 		out->WriteArrayOfInt32(interactionVariableValues, MAX_GLOBAL_VARIABLES);
 	}

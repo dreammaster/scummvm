@@ -147,9 +147,9 @@ private:
 };
 
 typedef ScriptSetImpl< std::set<String>, true, true > ScriptSet;
-typedef ScriptSetImpl< std::set<String, StrLessNoCase>, true, false > ScriptSetCI;
+typedef ScriptSetImpl< std::set<String, IgnoreCase_LessThan>, true, false > ScriptSetCI;
 typedef ScriptSetImpl< std::unordered_set<String>, false, true > ScriptHashSet;
-typedef ScriptSetImpl< std::unordered_set<String, HashStrNoCase, StrEqNoCase>, false, false > ScriptHashSetCI;
+typedef ScriptSetImpl< std::unordered_set<String, IgnoreCase_Hash, IgnoreCase_EqualTo>, false, false > ScriptHashSetCI;
 
 } // namespace AGS3
 

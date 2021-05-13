@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/movelist.h"
+#include "ags/engine/ac/move_list.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/util/stream.h"
 

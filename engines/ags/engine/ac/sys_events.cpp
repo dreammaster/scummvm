@@ -20,18 +20,18 @@
  *
  */
 
-#include "ags/shared/ac/sys_events.h"
+#include "ags/engine/ac/sys_events.h"
 //include <deque>
 //include <SDL.h>
 #include "ags/shared/core/platform.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/keycode.h"
-#include "ags/shared/ac/mouse.h"
+#include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/timer.h"
 #include "ags/shared/device/mousew32.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/main/engine.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/engine/main/engine.h"
 
 namespace AGS3 {
 
@@ -425,7 +425,7 @@ void ags_clear_input_buffer() {
 void ags_wait_until_keypress() {
 	do {
 		sys_evt_process_pending();
-		platform->YieldCPU();
+		_G(platform)->YieldCPU();
 	} while (!ags_keyevent_ready());
 	ags_clear_input_buffer();
 }

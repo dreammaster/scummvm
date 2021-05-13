@@ -24,7 +24,7 @@
 #include "ags/shared/ac/global_parser.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/string.h"
 
 namespace AGS3 {
 

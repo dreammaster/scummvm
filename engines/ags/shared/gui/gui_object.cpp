@@ -22,7 +22,7 @@
 
 #include "ags/shared/ac/common.h" // quit
 #include "ags/shared/gui/gui_main.h"
-#include "ags/engine/gui/gui_object.h"
+#include "ags/shared/gui/gui_object.h"
 #include "ags/shared/util/stream.h"
 
 namespace AGS3 {

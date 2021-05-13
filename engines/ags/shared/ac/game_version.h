@@ -149,8 +149,6 @@ enum GameDataVersion {
 	kGameVersion_Current = kGameVersion_350
 };
 
-extern GameDataVersion loaded_game_file_version;
-
 } // namespace AGS3
 
 #endif

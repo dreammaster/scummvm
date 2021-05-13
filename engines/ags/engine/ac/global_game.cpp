@@ -23,48 +23,48 @@
 #include "ags/lib/std/math.h"
 #include "ags/shared/core/platform.h"
 #include "ags/shared/ac/audiocliptype.h"
-#include "ags/shared/ac/global_game.h"
+#include "ags/engine/ac/global_game.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/view.h"
-#include "ags/shared/ac/character.h"
-#include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/dynamicsprite.h"
-#include "ags/shared/ac/event.h"
+#include "ags/engine/ac/character.h"
+#include "ags/engine/ac/draw.h"
+#include "ags/engine/ac/dynamic_sprite.h"
+#include "ags/engine/ac/event.h"
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/global_character.h"
-#include "ags/shared/ac/global_gui.h"
+#include "ags/engine/ac/global_gui.h"
 #include "ags/shared/ac/global_hotspot.h"
 #include "ags/shared/ac/global_inventoryitem.h"
-#include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/gui.h"
+#include "ags/engine/ac/global_translation.h"
+#include "ags/engine/ac/gui.h"
 #include "ags/shared/ac/hotspot.h"
 #include "ags/shared/ac/keycode.h"
-#include "ags/shared/ac/mouse.h"
-#include "ags/shared/ac/object.h"
+#include "ags/engine/ac/mouse.h"
+#include "ags/engine/ac/object.h"
 #include "ags/shared/ac/path_helper.h"
-#include "ags/shared/ac/sys_events.h"
-#include "ags/shared/ac/room.h"
-#include "ags/shared/ac/roomstatus.h"
-#include "ags/shared/ac/string.h"
-#include "ags/shared/ac/system.h"
+#include "ags/engine/ac/sys_events.h"
+#include "ags/engine/ac/room.h"
+#include "ags/engine/ac/room_status.h"
+#include "ags/engine/ac/string.h"
+#include "ags/engine/ac/system.h"
 #include "ags/shared/debugging/debugger.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/gui/guidialog.h"
-#include "ags/shared/main/engine.h"
-#include "ags/shared/main/game_start.h"
-#include "ags/shared/main/game_run.h"
-#include "ags/shared/main/graphics_mode.h"
-#include "ags/shared/script/script.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/main/engine.h"
+#include "ags/engine/main/game_start.h"
+#include "ags/engine/main/game_run.h"
+#include "ags/engine/main/graphics_mode.h"
+#include "ags/engine/script/script.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/core/assetmanager.h"
-#include "ags/shared/main/config.h"
-#include "ags/shared/main/game_file.h"
+#include "ags/engine/main/config.h"
+#include "ags/engine/main/game_file.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/string_utils.h"
 #include "ags/engine/media/audio/audio_system.h"
@@ -619,7 +619,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 		strcpy(tempo, get_translation(thisroom.Objects[aa].Name));
 		// Compatibility: < 3.1.1 games returned space for nameless object
 		// (presumably was a bug, but fixing it affected certain games behavior)
-		if (loaded_game_file_version < kGameVersion_311 && tempo[0] == 0) {
+		if (_G(loaded_game_file_version) < kGameVersion_311 && tempo[0] == 0) {
 			tempo[0] = ' ';
 			tempo[1] = 0;
 		}
@@ -802,7 +802,7 @@ void SetGraphicalVariable(const char *varName, int p_value) {
 }
 
 int WaitImpl(int skip_type, int nloops) {
-	if ((nloops < 1) && (loaded_game_file_version >= kGameVersion_262)) // 2.62+
+	if ((nloops < 1) && (_G(loaded_game_file_version) >= kGameVersion_262)) // 2.62+
 		quit("!Wait: must wait at least 1 loop");
 
 	play.wait_counter = nloops;

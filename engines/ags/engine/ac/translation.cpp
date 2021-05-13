@@ -21,15 +21,15 @@
  */
 
 //include <cstdio>
-#include "ags/shared/ac/asset_helper.h"
+#include "ags/engine/ac/asset_helper.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_game.h"
+#include "ags/engine/ac/global_game.h"
 #include "ags/engine/ac/runtime_defines.h"
-#include "ags/shared/ac/translation.h"
-#include "ags/shared/ac/tree_map.h"
+#include "ags/engine/ac/translation.h"
+#include "ags/engine/ac/tree_map.h"
 #include "ags/shared/ac/wordsdictionary.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/util/misc.h"

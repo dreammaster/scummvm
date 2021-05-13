@@ -24,7 +24,7 @@
 #include "ags/shared/ac/textbox.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/string.h"
 
 namespace AGS3 {
 
@@ -91,8 +91,8 @@ void TextBox_SetShowBorder(GUITextBox *guit, bool on) {
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;

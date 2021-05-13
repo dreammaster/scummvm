@@ -28,9 +28,9 @@
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_game.h"
+#include "ags/engine/ac/global_game.h"
 #include "ags/shared/ac/path_helper.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/string.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/util/path.h"
@@ -123,12 +123,12 @@ int ListBox_FillSaveGameList(GUIListBox *listbox) {
 
 int ListBox_GetItemAtLocation(GUIListBox *listbox, int x, int y) {
 
-	if (!guis[listbox->ParentId].IsDisplayed())
+	if (!_GP(guis)[listbox->ParentId].IsDisplayed())
 		return -1;
 
 	data_to_game_coords(&x, &y);
-	x = (x - listbox->X) - guis[listbox->ParentId].X;
-	y = (y - listbox->Y) - guis[listbox->ParentId].Y;
+	x = (x - listbox->X) - _GP(guis)[listbox->ParentId].X;
+	y = (y - listbox->Y) - _GP(guis)[listbox->ParentId].Y;
 
 	if ((x < 0) || (y < 0) || (x >= listbox->Width) || (y >= listbox->Height))
 		return -1;
@@ -326,10 +326,10 @@ void ListBox_ScrollUp(GUIListBox *listbox) {
 
 GUIListBox *is_valid_listbox(int guin, int objn) {
 	if ((guin < 0) | (guin >= game.numgui)) quit("!ListBox: invalid GUI number");
-	if ((objn < 0) | (objn >= guis[guin].GetControlCount())) quit("!ListBox: invalid object number");
-	if (guis[guin].GetControlType(objn) != kGUIListBox)
+	if ((objn < 0) | (objn >= _GP(guis)[guin].GetControlCount())) quit("!ListBox: invalid object number");
+	if (_GP(guis)[guin].GetControlType(objn) != kGUIListBox)
 		quit("!ListBox: specified control is not a list box");
-	return (GUIListBox *)guis[guin].GetControl(objn);
+	return (GUIListBox *)_GP(guis)[guin].GetControl(objn);
 }
 
 //=============================================================================
@@ -339,8 +339,8 @@ GUIListBox *is_valid_listbox(int guin, int objn) {
 //=============================================================================
 
 #include "ags/shared/debug/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;

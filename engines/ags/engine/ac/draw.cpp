@@ -21,72 +21,61 @@
  */
 
 #include "ags/lib/std/algorithm.h"
-//include <cmath>
-#include "ags/shared/aastr.h"
+#include "ags/lib/std/math.h"
+#include "ags/lib/aastr-0.1.1/aastr.h"
 #include "ags/shared/core/platform.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/util/compress.h"
 #include "ags/shared/ac/view.h"
-#include "ags/shared/ac/charactercache.h"
-#include "ags/shared/ac/characterextras.h"
+#include "ags/engine/ac/character_cache.h"
+#include "ags/engine/ac/character_extras.h"
 #include "ags/shared/ac/character_info.h"
-#include "ags/shared/ac/display.h"
-#include "ags/shared/ac/draw.h"
-#include "ags/shared/ac/draw_software.h"
+#include "ags/engine/ac/display.h"
+#include "ags/engine/ac/draw.h"
+#include "ags/engine/ac/draw_software.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_game.h"
-#include "ags/shared/ac/global_gui.h"
-#include "ags/shared/ac/global_region.h"
-#include "ags/shared/ac/gui.h"
-#include "ags/shared/ac/mouse.h"
-#include "ags/shared/ac/objectcache.h"
+#include "ags/engine/ac/global_game.h"
+#include "ags/engine/ac/global_gui.h"
+#include "ags/engine/ac/global_region.h"
+#include "ags/engine/ac/gui.h"
+#include "ags/engine/ac/mouse.h"
+#include "ags/engine/ac/object_cache.h"
 #include "ags/engine/ac/overlay.h"
-#include "ags/shared/ac/sys_events.h"
+#include "ags/engine/ac/sys_events.h"
 #include "ags/engine/ac/room_object.h"
-#include "ags/shared/ac/roomstatus.h"
+#include "ags/engine/ac/room_status.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/engine/ac/screen_overlay.h"
-#include "ags/shared/ac/sprite.h"
-#include "ags/shared/ac/spritelistentry.h"
-#include "ags/shared/ac/string.h"
-#include "ags/shared/ac/system.h"
-#include "ags/shared/ac/viewframe.h"
-#include "ags/shared/ac/walkablearea.h"
-#include "ags/shared/ac/walkbehind.h"
+#include "ags/engine/ac/sprite.h"
+#include "ags/engine/ac/sprite_list_entry.h"
+#include "ags/engine/ac/string.h"
+#include "ags/engine/ac/system.h"
+#include "ags/engine/ac/view_frame.h"
+#include "ags/engine/ac/walkable_area.h"
+#include "ags/engine/ac/walk_behind.h"
 #include "ags/engine/ac/dynobj/script_system.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/plugin/agsplugin.h"
-#include "ags/shared/plugin/plugin_engine.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/plugins/agsplugin.h"
+#include "ags/plugins/plugin_engine.h"
 #include "ags/shared/ac/sprite_cache.h"
-#include "ags/shared/gfx/gfx_util.h"
-#include "ags/shared/gfx/graphicsdriver.h"
-#include "ags/shared/gfx/ali3dexception.h"
-#include "ags/shared/gfx/blender.h"
+#include "ags/engine/gfx/gfx_util.h"
+#include "ags/engine/gfx/graphics_driver.h"
+#include "ags/engine/gfx/ali_3d_exception.h"
+#include "ags/engine/gfx/blender.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/game.h"
-#include "ags/shared/util/wgt2allg.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-#if AGS_PLATFORM_OS_ANDROID
-//include <sys/stat.h>
-//include <android/log.h>
-
-extern "C" void android_render();
-#endif
-
-#if AGS_PLATFORM_OS_IOS
-extern "C" void ios_render();
-#endif
 
 extern GameSetup usetup;
 extern GameSetupStruct game;
@@ -125,7 +114,7 @@ extern IDriverDependantBitmap *mouseCursor;
 extern int hotx,hoty;
 extern int bg_just_changed;
 
-RGB palette[256];
+color palette[256];
 
 COLOR_MAP maincoltable;
 
@@ -148,7 +137,19 @@ bool current_background_is_dirty = false;
 
 // Room background sprite
 IDriverDependantBitmap* roomBackgroundBmp = nullptr;
-
+// Buffer and info flags for viewport/camera pairs rendering in software mode
+struct RoomCameraDrawData
+{
+    // Intermediate bitmap for the software drawing method.
+    // We use this bitmap in case room camera has scaling enabled, we draw dirty room rects on it,
+    // and then pass to software renderer which draws sprite on top and then either blits or stretch-blits
+    // to the virtual screen.
+    // For more details see comment in ALSoftwareGraphicsDriver::RenderToBackBuffer().
+    PBitmap Buffer;      // this is the actual bitmap
+    PBitmap Frame;       // this is either same bitmap reference or sub-bitmap of virtual screen
+    bool    IsOffscreen; // whether room viewport was offscreen (cannot use sub-bitmap)
+    bool    IsOverlap;   // whether room viewport overlaps any others (marking dirty rects is complicated)
+};
 std::vector<RoomCameraDrawData> CameraDrawData;
 
 std::vector<SpriteListEntry> sprlist;
@@ -779,6 +780,14 @@ void render_to_screen()
                 gfxDriver->ClearRectangle(viewport.Left, viewport.Top, viewport.GetWidth() - 1, play.shake_screen_yoff, nullptr);
             gfxDriver->Render(0, play.shake_screen_yoff, (GlobalFlipType)play.screen_flipped);
 
+#if AGS_PLATFORM_OS_ANDROID
+            if (game.color_depth == 1)
+                android_render();
+#elif AGS_PLATFORM_OS_IOS
+            if (game.color_depth == 1)
+                ios_render();
+#endif
+
             succeeded = true;
         }
         catch (Ali3DFullscreenLostException) 
@@ -873,6 +882,10 @@ void invalidate_cached_walkbehinds()
 int sort_out_walk_behinds(Bitmap *sprit,int xx,int yy,int basel, Bitmap *copyPixelsFrom = nullptr, Bitmap *checkPixelsFrom = nullptr, int zoom=100) {
     if (noWalkBehindsAtAll)
         return 0;
+
+    if ((!thisroom.WalkBehindMask->IsMemoryBitmap()) ||
+        (!sprit->IsMemoryBitmap()))
+        quit("!sort_out_walk_behinds: wb bitmap not linear");
 
     int rr,tmm, toheight;//,tcol;
     // precalculate this to try and shave some time off
@@ -1362,16 +1375,16 @@ int scale_and_flip_sprite(int useindx, int coldept, int zoom_level,
           Bitmap *tempspr = BitmapHelper::CreateBitmap(newwidth, newheight,coldept);
           tempspr->Fill (actsps[useindx]->GetMaskColor());
           if ((IS_ANTIALIAS_SPRITES) && ((game.SpriteInfos[sppic].Flags & SPF_ALPHACHANNEL) == 0))
-              tempspr->AAStretchBlt (spriteset[sppic], RectWH(0, 0, newwidth, newheight), Shared::kBitmap_Transparency);
+              tempspr->AAStretchBlt (spriteset[sppic], RectWH(0, 0, newwidth, newheight), Common::kBitmap_Transparency);
           else
-              tempspr->StretchBlt (spriteset[sppic], RectWH(0, 0, newwidth, newheight), Shared::kBitmap_Transparency);
-          active_spr->FlipBlt(tempspr, 0, 0, Shared::kBitmap_HFlip);
+              tempspr->StretchBlt (spriteset[sppic], RectWH(0, 0, newwidth, newheight), Common::kBitmap_Transparency);
+          active_spr->FlipBlt(tempspr, 0, 0, Common::kBitmap_HFlip);
           delete tempspr;
       }
       else if ((IS_ANTIALIAS_SPRITES) && ((game.SpriteInfos[sppic].Flags & SPF_ALPHACHANNEL) == 0))
-          active_spr->AAStretchBlt(spriteset[sppic],RectWH(0,0,newwidth,newheight), Shared::kBitmap_Transparency);
+          active_spr->AAStretchBlt(spriteset[sppic],RectWH(0,0,newwidth,newheight), Common::kBitmap_Transparency);
       else
-          active_spr->StretchBlt(spriteset[sppic],RectWH(0,0,newwidth,newheight), Shared::kBitmap_Transparency);
+          active_spr->StretchBlt(spriteset[sppic],RectWH(0,0,newwidth,newheight), Common::kBitmap_Transparency);
 
       /*  AASTR2 version of code (doesn't work properly, gives black borders)
       if (IS_ANTIALIAS_SPRITES) {
@@ -1388,7 +1401,7 @@ int scale_and_flip_sprite(int useindx, int coldept, int zoom_level,
       Bitmap *tempspr = BitmapHelper::CreateBitmap_ (coldept, newwidth, newheight);
       ->Clear (tempspr, ->GetMaskColor(actsps[useindx]));
       ->StretchBlt (tempspr, spriteset[sppic], 0, 0, newwidth, newheight);
-      ->FlipBlt(Shared::kBitmap_HFlip, (actsps[useindx], tempspr, 0, 0);
+      ->FlipBlt(Common::kBitmap_HFlip, (actsps[useindx], tempspr, 0, 0);
       wfreeblock (tempspr);
       }
       else
@@ -1404,7 +1417,7 @@ int scale_and_flip_sprite(int useindx, int coldept, int zoom_level,
       our_eip = 339;
 
       if (isMirrored)
-          active_spr->FlipBlt(spriteset[sppic], 0, 0, Shared::kBitmap_HFlip);
+          active_spr->FlipBlt(spriteset[sppic], 0, 0, Common::kBitmap_HFlip);
       else
           actsps_used = 0;
       //->Blit (spriteset[sppic], actsps[useindx], 0, 0, 0, 0, actsps[useindx]->GetWidth(), actsps[useindx]->GetHeight());
@@ -2381,6 +2394,7 @@ void construct_game_scene(bool full_redraw)
         if (displayed_room >= 0)
         {
             construct_room_view();
+            update_polled_mp3();
         }
         else if (!gfxDriver->RequiresFullRedrawEachFrame())
         {

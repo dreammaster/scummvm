@@ -23,10 +23,10 @@
 #include "ags/shared/ac/global_textbox.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/string.h"
 #include "ags/shared/ac/textbox.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/gui/guitextbox.h"
+#include "ags/shared/gui/gui_textbox.h"
 
 namespace AGS3 {
 
@@ -37,32 +37,32 @@ extern GameSetupStruct game;
 void SetTextBoxFont(int guin, int objn, int fontnum) {
 
 	if ((guin < 0) | (guin >= game.numgui)) quit("!SetTextBoxFont: invalid GUI number");
-	if ((objn < 0) | (objn >= guis[guin].GetControlCount())) quit("!SetTextBoxFont: invalid object number");
-	if (guis[guin].GetControlType(objn) != kGUITextBox)
+	if ((objn < 0) | (objn >= _GP(guis)[guin].GetControlCount())) quit("!SetTextBoxFont: invalid object number");
+	if (_GP(guis)[guin].GetControlType(objn) != kGUITextBox)
 		quit("!SetTextBoxFont: specified control is not a text box");
 
-	GUITextBox *guit = (GUITextBox *)guis[guin].GetControl(objn);
+	GUITextBox *guit = (GUITextBox *)_GP(guis)[guin].GetControl(objn);
 	TextBox_SetFont(guit, fontnum);
 }
 
 void GetTextBoxText(int guin, int objn, char *txbuf) {
 	VALIDATE_STRING(txbuf);
 	if ((guin < 0) | (guin >= game.numgui)) quit("!GetTextBoxText: invalid GUI number");
-	if ((objn < 0) | (objn >= guis[guin].GetControlCount())) quit("!GetTextBoxText: invalid object number");
-	if (guis[guin].GetControlType(objn) != kGUITextBox)
+	if ((objn < 0) | (objn >= _GP(guis)[guin].GetControlCount())) quit("!GetTextBoxText: invalid object number");
+	if (_GP(guis)[guin].GetControlType(objn) != kGUITextBox)
 		quit("!GetTextBoxText: specified control is not a text box");
 
-	GUITextBox *guisl = (GUITextBox *)guis[guin].GetControl(objn);
+	GUITextBox *guisl = (GUITextBox *)_GP(guis)[guin].GetControl(objn);
 	TextBox_GetText(guisl, txbuf);
 }
 
 void SetTextBoxText(int guin, int objn, const char *txbuf) {
 	if ((guin < 0) | (guin >= game.numgui)) quit("!SetTextBoxText: invalid GUI number");
-	if ((objn < 0) | (objn >= guis[guin].GetControlCount())) quit("!SetTextBoxText: invalid object number");
-	if (guis[guin].GetControlType(objn) != kGUITextBox)
+	if ((objn < 0) | (objn >= _GP(guis)[guin].GetControlCount())) quit("!SetTextBoxText: invalid object number");
+	if (_GP(guis)[guin].GetControlType(objn) != kGUITextBox)
 		quit("!SetTextBoxText: specified control is not a text box");
 
-	GUITextBox *guisl = (GUITextBox *)guis[guin].GetControl(objn);
+	GUITextBox *guisl = (GUITextBox *)_GP(guis)[guin].GetControl(objn);
 	TextBox_SetText(guisl, txbuf);
 }
 

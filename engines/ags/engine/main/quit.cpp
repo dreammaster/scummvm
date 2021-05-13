@@ -31,7 +31,7 @@
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/roomstatus.h"
-#include "ags/shared/ac/translation.h"
+#include "ags/engine/ac/translation.h"
 #include "ags/shared/debugging/agseditordebugger.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/debugger.h"

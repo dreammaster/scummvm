@@ -20,17 +20,17 @@
  *
  */
 
-#include "ags/shared/ac/global_region.h"
+#include "ags/engine/ac/global_region.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_version.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/region.h"
-#include "ags/shared/ac/room.h"
-#include "ags/shared/ac/roomstatus.h"
+#include "ags/engine/ac/room.h"
+#include "ags/engine/ac/room_status.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/game/room_struct.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/script/script.h"
+#include "ags/engine/script/script.h"
 
 namespace AGS3 {
 
@@ -48,7 +48,7 @@ int GetRegionIDAtRoom(int xxx, int yyy) {
 	xxx = room_to_mask_coord(xxx);
 	yyy = room_to_mask_coord(yyy);
 
-	if (loaded_game_file_version >= kGameVersion_262) // Version 2.6.2+
+	if (_G(loaded_game_file_version) >= kGameVersion_262) // Version 2.6.2+
 	{
 		if (xxx >= thisroom.RegionMask->GetWidth())
 			xxx = thisroom.RegionMask->GetWidth() - 1;

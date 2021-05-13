@@ -21,7 +21,7 @@
  */
 
 #include "ags/lib/std/memory.h"
-#include "ags/engine/script/script_user_object.h"
+#include "ags/engine/ac/dynobj/script_user_object.h"
 
 namespace AGS3 {
 

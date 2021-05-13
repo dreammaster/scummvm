@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/asset_helper.h"
+#include "ags/engine/ac/asset_helper.h"
 #include "ags/shared/ac/audiocliptype.h"
 #include "ags/shared/ac/file.h"
 #include "ags/shared/ac/common.h"
@@ -30,16 +30,16 @@
 #include "ags/engine/ac/global_file.h"
 #include "ags/shared/ac/path_helper.h"
 #include "ags/engine/ac/runtime_defines.h"
-#include "ags/shared/ac/string.h"
+#include "ags/engine/ac/string.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/debugger.h"
 #include "ags/shared/util/misc.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/core/assetmanager.h"
 #include "ags/shared/core/asset.h"
-#include "ags/shared/main/engine.h"
-#include "ags/shared/main/game_file.h"
+#include "ags/engine/main/engine.h"
+#include "ags/engine/main/game_file.h"
 #include "ags/shared/util/directory.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/string.h"
@@ -208,7 +208,7 @@ const String GameDataDirToken = "$APPDATADIR$";
 const String UserConfigFileToken = "$CONFIGFILE$";
 
 void FixupFilename(char *filename) {
-	const char *illegal = platform->GetIllegalFileChars();
+	const char *illegal = _G(platform)->GetIllegalFileChars();
 	for (char *name_ptr = filename; *name_ptr; ++name_ptr) {
 		if (*name_ptr < ' ') {
 			*name_ptr = '_';
@@ -257,14 +257,14 @@ String PreparePathForWriting(const FSLocation &fsloc, const String &filename) {
 }
 
 FSLocation GetGlobalUserConfigDir() {
-	String dir = platform->GetUserGlobalConfigDirectory();
+	String dir = _G(platform)->GetUserGlobalConfigDirectory();
 	if (Path::IsRelativePath(dir)) // relative dir is resolved relative to the game data dir
 		return FSLocation(ResPaths.DataDir, Path::ConcatPaths(ResPaths.DataDir, dir));
 	return FSLocation(dir, dir);
 }
 
 FSLocation GetGameUserConfigDir() {
-	String dir = platform->GetUserConfigDirectory();
+	String dir = _G(platform)->GetUserConfigDirectory();
 	if (Path::IsRelativePath(dir)) // relative dir is resolved relative to the game data dir
 		return FSLocation(ResPaths.DataDir, Path::ConcatPaths(ResPaths.DataDir, dir));
 	else if (usetup.local_user_conf) // directive to use game dir location
@@ -295,11 +295,11 @@ static FSLocation MakeGameDataDir(const String &default_dir, const String &user_
 }
 
 FSLocation GetGameAppDataDir() {
-	return MakeGameDataDir(platform->GetAllUsersDataDirectory(), usetup.shared_data_dir);
+	return MakeGameDataDir(_G(platform)->GetAllUsersDataDirectory(), usetup.shared_data_dir);
 }
 
 FSLocation GetGameUserDataDir() {
-	return MakeGameDataDir(platform->GetUserSavedgamesDirectory(), usetup.user_data_dir);
+	return MakeGameDataDir(_G(platform)->GetUserSavedgamesDirectory(), usetup.user_data_dir);
 }
 
 bool ResolveScriptPath(const String &orig_sc_path, bool read_only, ResolvedPath &rp) {
@@ -551,8 +551,8 @@ Stream *get_valid_file_stream_from_handle(int32_t handle, const char *operation_
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
 extern ScriptString myScriptStringImpl;

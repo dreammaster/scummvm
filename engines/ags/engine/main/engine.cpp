@@ -53,7 +53,7 @@
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/speech.h"
 #include "ags/shared/ac/sprite_cache.h"
-#include "ags/shared/ac/translation.h"
+#include "ags/engine/ac/translation.h"
 #include "ags/shared/ac/viewframe.h"
 #include "ags/engine/ac/dynobj/script_object.h"
 #include "ags/engine/ac/dynobj/script_system.h"

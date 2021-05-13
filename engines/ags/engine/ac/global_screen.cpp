@@ -22,17 +22,17 @@
 
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/game_setup.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_game.h"
-#include "ags/shared/ac/global_screen.h"
+#include "ags/engine/ac/global_game.h"
+#include "ags/engine/ac/global_screen.h"
 #include "ags/engine/ac/runtime_defines.h"
-#include "ags/shared/ac/screen.h"
+#include "ags/engine/ac/screen.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gfx/bitmap.h"
 
 namespace AGS3 {
@@ -74,7 +74,7 @@ void ShakeScreen(int severe) {
 	if (gfxDriver->RequiresFullRedrawEachFrame()) {
 		for (int hh = 0; hh < 40; hh++) {
 			loopcounter++;
-			platform->Delay(50);
+			_G(platform)->Delay(50);
 
 			render_graphics();
 
@@ -85,7 +85,7 @@ void ShakeScreen(int severe) {
 		construct_game_scene();
 		gfxDriver->RenderToBackBuffer();
 		for (int hh = 0; hh < 40; hh++) {
-			platform->Delay(50);
+			_G(platform)->Delay(50);
 			const int yoff = hh % 2 == 0 ? 0 : severe;
 			play.shake_screen_yoff = yoff;
 			render_to_screen();

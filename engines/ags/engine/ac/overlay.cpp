@@ -23,20 +23,20 @@
 #include "ags/engine/ac/overlay.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/view.h"
-#include "ags/shared/ac/character.h"
-#include "ags/shared/ac/characterextras.h"
-#include "ags/shared/ac/display.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/character.h"
+#include "ags/engine/ac/character_extras.h"
+#include "ags/engine/ac/display.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_overlay.h"
-#include "ags/shared/ac/global_translation.h"
+#include "ags/engine/ac/global_translation.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/engine/ac/screen_overlay.h"
-#include "ags/shared/ac/string.h"
-#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/engine/ac/string.h"
+#include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/script/runtimescriptvalue.h"
+#include "ags/engine/script/runtime_script_value.h"
 
 namespace AGS3 {
 
@@ -289,8 +289,8 @@ void recreate_overlay_ddbs() {
 //=============================================================================
 
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/script/script_api.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 
 // ScriptOverlay* (int x, int y, int slot, int transparent)
 RuntimeScriptValue Sc_Overlay_CreateGraphical(const RuntimeScriptValue *params, int32_t param_count) {
