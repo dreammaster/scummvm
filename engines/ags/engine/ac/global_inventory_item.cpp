@@ -38,39 +38,39 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameSetupStruct game;
-extern GameState play;
+
+
 extern int mousex, mousey;
 extern int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
 extern const char *evblockbasename;
 extern int evblocknum;
-extern CharacterInfo *playerchar;
+
 
 
 void set_inv_item_pic(int invi, int piccy) {
-	if ((invi < 1) || (invi > game.numinvitems))
+	if ((invi < 1) || (invi > _GP(game).numinvitems))
 		quit("!SetInvItemPic: invalid inventory item specified");
 
-	if (game.invinfo[invi].pic == piccy)
+	if (_GP(game).invinfo[invi].pic == piccy)
 		return;
 
-	if (game.invinfo[invi].pic == game.invinfo[invi].cursorPic) {
+	if (_GP(game).invinfo[invi].pic == _GP(game).invinfo[invi].cursorPic) {
 		// Backwards compatibility -- there didn't used to be a cursorPic,
 		// so if they're the same update both.
 		set_inv_item_cursorpic(invi, piccy);
 	}
 
-	game.invinfo[invi].pic = piccy;
+	_GP(game).invinfo[invi].pic = piccy;
 	GUI::MarkInventoryForUpdate(-1, false);
 }
 
 void SetInvItemName(int invi, const char *newName) {
-	if ((invi < 1) || (invi > game.numinvitems))
+	if ((invi < 1) || (invi > _GP(game).numinvitems))
 		quit("!SetInvName: invalid inventory item specified");
 
 	// set the new name, making sure it doesn't overflow the buffer
-	strncpy(game.invinfo[invi].name, newName, 25);
-	game.invinfo[invi].name[24] = 0;
+	strncpy(_GP(game).invinfo[invi].name, newName, 25);
+	_GP(game).invinfo[invi].name[24] = 0;
 
 	// might need to redraw the GUI if it has the inv item name on it
 	GUI::MarkSpecialLabelsForUpdate(kLabelMacro_Overhotspot);
@@ -98,18 +98,18 @@ int GetInvAt(int xxx, int yyy) {
 
 void GetInvName(int indx, char *buff) {
 	VALIDATE_STRING(buff);
-	if ((indx < 0) | (indx >= game.numinvitems)) quit("!GetInvName: invalid inventory item specified");
-	strcpy(buff, get_translation(game.invinfo[indx].name));
+	if ((indx < 0) | (indx >= _GP(game).numinvitems)) quit("!GetInvName: invalid inventory item specified");
+	strcpy(buff, get_translation(_GP(game).invinfo[indx].name));
 }
 
 int GetInvGraphic(int indx) {
-	if ((indx < 0) | (indx >= game.numinvitems)) quit("!GetInvGraphic: invalid inventory item specified");
+	if ((indx < 0) | (indx >= _GP(game).numinvitems)) quit("!GetInvGraphic: invalid inventory item specified");
 
-	return game.invinfo[indx].pic;
+	return _GP(game).invinfo[indx].pic;
 }
 
 void RunInventoryInteraction(int iit, int modd) {
-	if ((iit < 0) || (iit >= game.numinvitems))
+	if ((iit < 0) || (iit >= _GP(game).numinvitems))
 		quit("!RunInventoryInteraction: invalid inventory number");
 
 	evblocknum = iit;
@@ -118,7 +118,7 @@ void RunInventoryInteraction(int iit, int modd) {
 	else if (modd == MODE_HAND)
 		run_event_block_inv(iit, 1);
 	else if (modd == MODE_USE) {
-		play.usedinv = playerchar->activeinv;
+		_GP(play).usedinv = _G(playerchar)->activeinv;
 		run_event_block_inv(iit, 3);
 	} else if (modd == MODE_TALK)
 		run_event_block_inv(iit, 2);
@@ -130,12 +130,12 @@ int IsInventoryInteractionAvailable(int item, int mood) {
 	if ((item < 0) || (item >= MAX_INV))
 		quit("!IsInventoryInteractionAvailable: invalid inventory number");
 
-	play.check_interaction_only = 1;
+	_GP(play).check_interaction_only = 1;
 
 	RunInventoryInteraction(item, mood);
 
-	int ciwas = play.check_interaction_only;
-	play.check_interaction_only = 0;
+	int ciwas = _GP(play).check_interaction_only;
+	_GP(play).check_interaction_only = 0;
 
 	if (ciwas == 2)
 		return 1;
@@ -144,11 +144,11 @@ int IsInventoryInteractionAvailable(int item, int mood) {
 }
 
 int GetInvProperty(int item, const char *property) {
-	return get_int_property(game.invProps[item], play.invProps[item], property);
+	return get_int_property(_GP(game).invProps[item], _GP(play).invProps[item], property);
 }
 
 void GetInvPropertyText(int item, const char *property, char *bufer) {
-	get_text_property(game.invProps[item], play.invProps[item], property, bufer);
+	get_text_property(_GP(game).invProps[item], _GP(play).invProps[item], property, bufer);
 }
 
 } // namespace AGS3

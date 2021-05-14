@@ -25,14 +25,14 @@
 
 namespace AGS3 {
 
-extern GameState play;
+
 
 void HideMouseCursor() {
-	play.mouse_cursor_hidden = 1;
+	_GP(play).mouse_cursor_hidden = 1;
 }
 
 void ShowMouseCursor() {
-	play.mouse_cursor_hidden = 0;
+	_GP(play).mouse_cursor_hidden = 0;
 }
 
 } // namespace AGS3

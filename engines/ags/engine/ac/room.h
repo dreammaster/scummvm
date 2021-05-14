@@ -75,7 +75,7 @@ struct MoveList;
 // Convert move path from room's mask resolution to room resolution
 void convert_move_path_to_room_resolution(MoveList *ml);
 
-extern AGS::Shared::RoomStruct thisroom;
+extern AGS::Shared::RoomStruct _GP(thisroom);
 
 } // namespace AGS3
 

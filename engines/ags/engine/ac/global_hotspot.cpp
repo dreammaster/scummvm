@@ -42,10 +42,10 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern RoomStruct thisroom;
+
 extern RoomStatus *croom;
-extern CharacterInfo *playerchar;
-extern GameSetupStruct game;
+
+
 
 
 void DisableHotspot(int hsnum) {
@@ -66,28 +66,28 @@ int GetHotspotPointX(int hotspot) {
 	if ((hotspot < 0) || (hotspot >= MAX_ROOM_HOTSPOTS))
 		quit("!GetHotspotPointX: invalid hotspot");
 
-	if (thisroom.Hotspots[hotspot].WalkTo.X < 1)
+	if (_GP(thisroom).Hotspots[hotspot].WalkTo.X < 1)
 		return -1;
 
-	return thisroom.Hotspots[hotspot].WalkTo.X;
+	return _GP(thisroom).Hotspots[hotspot].WalkTo.X;
 }
 
 int GetHotspotPointY(int hotspot) {
 	if ((hotspot < 0) || (hotspot >= MAX_ROOM_HOTSPOTS))
 		quit("!GetHotspotPointY: invalid hotspot");
 
-	if (thisroom.Hotspots[hotspot].WalkTo.X < 1) // TODO: there was "x" here, why?
+	if (_GP(thisroom).Hotspots[hotspot].WalkTo.X < 1) // TODO: there was "x" here, why?
 		return -1;
 
-	return thisroom.Hotspots[hotspot].WalkTo.Y;
+	return _GP(thisroom).Hotspots[hotspot].WalkTo.Y;
 }
 
 int GetHotspotIDAtScreen(int scrx, int scry) {
-	VpPoint vpt = play.ScreenToRoomDivDown(scrx, scry);
+	VpPoint vpt = _GP(play).ScreenToRoomDivDown(scrx, scry);
 	if (vpt.second < 0)
 		return 0;
 	Point pt = vpt.first;
-	if ((pt.X >= thisroom.Width) | (pt.X < 0) | (pt.Y < 0) | (pt.Y >= thisroom.Height))
+	if ((pt.X >= _GP(thisroom).Width) | (pt.X < 0) | (pt.Y < 0) | (pt.Y >= _GP(thisroom).Height))
 		return 0;
 	return get_hotspot_at(pt.X, pt.Y);
 }
@@ -97,7 +97,7 @@ void GetHotspotName(int hotspot, char *buffer) {
 	if ((hotspot < 0) || (hotspot >= MAX_ROOM_HOTSPOTS))
 		quit("!GetHotspotName: invalid hotspot number");
 
-	strcpy(buffer, get_translation(thisroom.Hotspots[hotspot].Name));
+	strcpy(buffer, get_translation(_GP(thisroom).Hotspots[hotspot].Name));
 }
 
 void RunHotspotInteraction(int hotspothere, int mood) {
@@ -112,14 +112,14 @@ void RunHotspotInteraction(int hotspothere, int mood) {
 	else if (mood == MODE_CUSTOM2) passon = 9;
 	else if (mood == MODE_USE) {
 		passon = 3;
-		cdata = playerchar->activeinv;
-		play.usedinv = cdata;
+		cdata = _G(playerchar)->activeinv;
+		_GP(play).usedinv = cdata;
 	}
 
-	if ((game.options[OPT_WALKONLOOK] == 0) & (mood == MODE_LOOK));
-	else if (play.auto_use_walkto_points == 0);
-	else if ((mood != MODE_WALK) && (play.check_interaction_only == 0))
-		MoveCharacterToHotspot(game.playercharacter, hotspothere);
+	if ((_GP(game).options[OPT_WALKONLOOK] == 0) & (mood == MODE_LOOK));
+	else if (_GP(play).auto_use_walkto_points == 0);
+	else if ((mood != MODE_WALK) && (_GP(play).check_interaction_only == 0))
+		MoveCharacterToHotspot(_GP(game).playercharacter, hotspothere);
 
 	// can't use the setevent functions because this ProcessClick is only
 	// executed once in a eventlist
@@ -129,10 +129,10 @@ void RunHotspotInteraction(int hotspothere, int mood) {
 	evblockbasename = "hotspot%d";
 	evblocknum = hotspothere;
 
-	if (thisroom.Hotspots[hotspothere].EventHandlers != nullptr) {
+	if (_GP(thisroom).Hotspots[hotspothere].EventHandlers != nullptr) {
 		if (passon >= 0)
-			run_interaction_script(thisroom.Hotspots[hotspothere].EventHandlers.get(), passon, 5, (passon == 3));
-		run_interaction_script(thisroom.Hotspots[hotspothere].EventHandlers.get(), 5);  // any click on hotspot
+			run_interaction_script(_GP(thisroom).Hotspots[hotspothere].EventHandlers.get(), passon, 5, (passon == 3));
+		run_interaction_script(_GP(thisroom).Hotspots[hotspothere].EventHandlers.get(), 5);  // any click on hotspot
 	} else {
 		if (passon >= 0) {
 			if (run_interaction_event(&croom->intrHotspot[hotspothere], passon, 5, (passon == 3))) {
@@ -150,11 +150,11 @@ void RunHotspotInteraction(int hotspothere, int mood) {
 }
 
 int GetHotspotProperty(int hss, const char *property) {
-	return get_int_property(thisroom.Hotspots[hss].Properties, croom->hsProps[hss], property);
+	return get_int_property(_GP(thisroom).Hotspots[hss].Properties, croom->hsProps[hss], property);
 }
 
 void GetHotspotPropertyText(int item, const char *property, char *bufer) {
-	get_text_property(thisroom.Hotspots[item].Properties, croom->hsProps[item], property, bufer);
+	get_text_property(_GP(thisroom).Hotspots[item].Properties, croom->hsProps[item], property, bufer);
 }
 
 } // namespace AGS3

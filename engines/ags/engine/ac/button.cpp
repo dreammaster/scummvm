@@ -41,7 +41,7 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameSetupStruct game;
+
 extern ViewStruct *views;
 
 // *** BUTTON FUNCTIONS
@@ -53,7 +53,7 @@ void Button_Animate(GUIButton *butt, int view, int loop, int speed, int repeat) 
 	int guin = butt->ParentId;
 	int objn = butt->Id;
 
-	if ((view < 1) || (view > game.numviews))
+	if ((view < 1) || (view > _GP(game).numviews))
 		quit("!AnimateButton: invalid view specified");
 	view--;
 
@@ -105,7 +105,7 @@ void Button_SetText(GUIButton *butt, const char *newtx) {
 }
 
 void Button_SetFont(GUIButton *butt, int newFont) {
-	if ((newFont < 0) || (newFont >= game.numfonts))
+	if ((newFont < 0) || (newFont >= _GP(game).numfonts))
 		quit("!Button.Font: invalid font number.");
 
 	if (butt->Font != newFont) {
@@ -161,12 +161,12 @@ void Button_SetNormalGraphic(GUIButton *guil, int slotn) {
 		guil->CurrentImage = slotn;
 	guil->Image = slotn;
 	// update the clickable area to the same size as the graphic
-	if (slotn < 0 || (size_t)slotn >= game.SpriteInfos.size()) {
+	if (slotn < 0 || (size_t)slotn >= _GP(game).SpriteInfos.size()) {
 		guil->Width = 0;
 		guil->Height = 0;
 	} else {
-		guil->Width = game.SpriteInfos[slotn].Width;
-		guil->Height = game.SpriteInfos[slotn].Height;
+		guil->Width = _GP(game).SpriteInfos[slotn].Width;
+		guil->Height = _GP(game).SpriteInfos[slotn].Height;
 	}
 
 	guil->NotifyParentChanged();

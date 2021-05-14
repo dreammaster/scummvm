@@ -37,8 +37,8 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 extern ViewStruct *views;
-extern GameState play;
-extern GameSetupStruct game;
+
+
 
 RoomObject::RoomObject() {
 	x = y = 0;
@@ -61,12 +61,12 @@ RoomObject::RoomObject() {
 
 int RoomObject::get_width() {
 	if (last_width == 0)
-		return game.SpriteInfos[num].Width;
+		return _GP(game).SpriteInfos[num].Width;
 	return last_width;
 }
 int RoomObject::get_height() {
 	if (last_height == 0)
-		return game.SpriteInfos[num].Height;
+		return _GP(game).SpriteInfos[num].Height;
 	return last_height;
 }
 int RoomObject::get_baseline() {
@@ -124,7 +124,7 @@ void RoomObject::update_cycle_view_forwards() {
 			cycling = 0;
 			frame--;
 		} else {
-			if (play.no_multiloop_repeat == 0) {
+			if (_GP(play).no_multiloop_repeat == 0) {
 				// multi-loop anims, go back to start of it
 				while ((loop > 0) &&
 					(views[view].loops[loop - 1].RunNextLoop()))

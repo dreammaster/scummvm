@@ -51,15 +51,15 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameSetupStruct game;
-extern GameState play;
+
+
 extern CharacterExtras *charextra;
 extern ScriptInvItem scrInv[MAX_INV];
 extern int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
 extern SpriteCache spriteset;
 extern int mousex, mousey;
 extern int evblocknum;
-extern CharacterInfo *playerchar;
+
 extern AGSPlatformDriver *platform;
 extern CCCharacter ccDynamicCharacter;
 extern CCInventory ccDynamicInv;
@@ -83,7 +83,7 @@ CharacterInfo *InvWindow_GetCharacterToUse(GUIInvWindow *guii) {
 	if (guii->CharId < 0)
 		return nullptr;
 
-	return &game.chars[guii->CharId];
+	return &_GP(game).chars[guii->CharId];
 }
 
 void InvWindow_SetItemWidth(GUIInvWindow *guii, int newwidth) {
@@ -226,7 +226,7 @@ void InventoryScreen::Prepare() {
 	toret = -1;
 	top_item = 0;
 	num_visible_items = 0;
-	MAX_ITEMAREA_HEIGHT = ((play.GetUIViewport().GetHeight() - BUTTONAREAHEIGHT) - get_fixed_pixel_size(20));
+	MAX_ITEMAREA_HEIGHT = ((_GP(play).GetUIViewport().GetHeight() - BUTTONAREAHEIGHT) - get_fixed_pixel_size(20));
 	in_inv_screen++;
 	inv_screen_newroom = -1;
 
@@ -249,9 +249,9 @@ int InventoryScreen::Redraw() {
 	numitems = 0;
 	widest = 0;
 	highest = 0;
-	if (charextra[game.playercharacter].invorder_count < 0)
+	if (charextra[_GP(game).playercharacter].invorder_count < 0)
 		update_invorder();
-	if (charextra[game.playercharacter].invorder_count == 0) {
+	if (charextra[_GP(game).playercharacter].invorder_count == 0) {
 		DisplayMessage(996);
 		in_inv_screen--;
 		return -1;
@@ -263,17 +263,17 @@ int InventoryScreen::Redraw() {
 		return -1;
 	}
 
-	for (int i = 0; i < charextra[game.playercharacter].invorder_count; ++i) {
-		if (game.invinfo[charextra[game.playercharacter].invorder[i]].name[0] != 0) {
-			dii[numitems].num = charextra[game.playercharacter].invorder[i];
-			dii[numitems].sprnum = game.invinfo[charextra[game.playercharacter].invorder[i]].pic;
+	for (int i = 0; i < charextra[_GP(game).playercharacter].invorder_count; ++i) {
+		if (_GP(game).invinfo[charextra[_GP(game).playercharacter].invorder[i]].name[0] != 0) {
+			dii[numitems].num = charextra[_GP(game).playercharacter].invorder[i];
+			dii[numitems].sprnum = _GP(game).invinfo[charextra[_GP(game).playercharacter].invorder[i]].pic;
 			int snn = dii[numitems].sprnum;
-			if (game.SpriteInfos[snn].Width > widest) widest = game.SpriteInfos[snn].Width;
-			if (game.SpriteInfos[snn].Height > highest) highest = game.SpriteInfos[snn].Height;
+			if (_GP(game).SpriteInfos[snn].Width > widest) widest = _GP(game).SpriteInfos[snn].Width;
+			if (_GP(game).SpriteInfos[snn].Height > highest) highest = _GP(game).SpriteInfos[snn].Height;
 			numitems++;
 		}
 	}
-	if (numitems != charextra[game.playercharacter].invorder_count)
+	if (numitems != charextra[_GP(game).playercharacter].invorder_count)
 		quit("inconsistent inventory calculations");
 
 	widest += get_fixed_pixel_size(4);
@@ -289,8 +289,8 @@ int InventoryScreen::Redraw() {
 
 	windowwid = widest * ICONSPERLINE + get_fixed_pixel_size(4);
 	if (windowwid < get_fixed_pixel_size(105)) windowwid = get_fixed_pixel_size(105);
-	windowxp = play.GetUIViewport().GetWidth() / 2 - windowwid / 2;
-	windowyp = play.GetUIViewport().GetHeight() / 2 - windowhit / 2;
+	windowxp = _GP(play).GetUIViewport().GetWidth() / 2 - windowwid / 2;
+	windowyp = _GP(play).GetUIViewport().GetHeight() / 2 - windowhit / 2;
 	buttonyp = windowhit - BUTTONAREAHEIGHT;
 	bartop = get_fixed_pixel_size(2);
 	barxp = get_fixed_pixel_size(2);
@@ -304,7 +304,7 @@ int InventoryScreen::Redraw() {
 }
 
 void InventoryScreen::Draw(Bitmap *ds) {
-	color_t draw_color = ds->GetCompatibleColor(play.sierra_inv_color);
+	color_t draw_color = ds->GetCompatibleColor(_GP(play).sierra_inv_color);
 	ds->FillRect(Rect(0, 0, windowwid, windowhit), draw_color);
 	draw_color = ds->GetCompatibleColor(0);
 	ds->FillRect(Rect(barxp, bartop, windowwid - get_fixed_pixel_size(2), buttonyp - 1), draw_color);
@@ -315,7 +315,7 @@ void InventoryScreen::Draw(Bitmap *ds) {
 		wputblock(ds, barxp + 1 + ((i - top_item) % 4) * widest + widest / 2 - spof->GetWidth() / 2,
 			bartop + 1 + ((i - top_item) / 4) * highest + highest / 2 - spof->GetHeight() / 2, spof, 1);
 	}
-#define BUTTONWID Math::Max(1, game.SpriteInfos[btn_select_sprite].Width)
+#define BUTTONWID Math::Max(1, _GP(game).SpriteInfos[btn_select_sprite].Width)
 	// Draw select, look and OK buttons
 	wputblock(ds, 2, buttonyp + get_fixed_pixel_size(2), spriteset[btn_look_sprite], 1);
 	wputblock(ds, 3 + BUTTONWID, buttonyp + get_fixed_pixel_size(2), spriteset[btn_select_sprite], 1);
@@ -324,7 +324,7 @@ void InventoryScreen::Draw(Bitmap *ds) {
 	// Draw Up and Down buttons if required
 	Bitmap *arrowblock = BitmapHelper::CreateTransparentBitmap(ARROWBUTTONWID, ARROWBUTTONWID);
 	draw_color = arrowblock->GetCompatibleColor(0);
-	if (play.sierra_inv_color == 0)
+	if (_GP(play).sierra_inv_color == 0)
 		draw_color = ds->GetCompatibleColor(14);
 
 	arrowblock->DrawLine(Line(ARROWBUTTONWID / 2, 2, ARROWBUTTONWID - 2, 9), draw_color);
@@ -359,7 +359,7 @@ bool InventoryScreen::Run() {
 	sys_evt_process_pending();
 
 	int kgn;
-	if (run_service_key_controls(kgn) && !play.IsIgnoringInput()) {
+	if (run_service_key_controls(kgn) && !_GP(play).IsIgnoringInput()) {
 		return false; // end inventory screen loop
 	}
 
@@ -377,7 +377,7 @@ bool InventoryScreen::Run() {
 		isonitem = -1;
 
 	int mclick, mwheelz;
-	if (!run_service_mb_controls(mclick, mwheelz) || play.IsIgnoringInput()) {
+	if (!run_service_mb_controls(mclick, mwheelz) || _GP(play).IsIgnoringInput()) {
 		mclick = MouseNone;
 	}
 
@@ -388,7 +388,7 @@ bool InventoryScreen::Run() {
 			int clickedon = isonitem;
 			if (clickedon < 0) return true; // continue inventory screen loop
 			evblocknum = dii[clickedon].num;
-			play.used_inv_on = dii[clickedon].num;
+			_GP(play).used_inv_on = dii[clickedon].num;
 
 			if (cmode == MODE_LOOK) {
 				//ags_domouse(DOMOUSE_DISABLE);
@@ -400,24 +400,24 @@ bool InventoryScreen::Run() {
 				return break_code == 0;
 			} else if (cmode == MODE_USE) {
 				// use objects on each other
-				play.usedinv = toret;
+				_GP(play).usedinv = toret;
 
 				// set the activeinv so the script can check it
-				int activeinvwas = playerchar->activeinv;
-				playerchar->activeinv = toret;
+				int activeinvwas = _G(playerchar)->activeinv;
+				_G(playerchar)->activeinv = toret;
 
 				//ags_domouse(DOMOUSE_DISABLE);
 				run_event_block_inv(dii[clickedon].num, 3);
 
 				// if the script didn't change it, then put it back
-				if (playerchar->activeinv == toret)
-					playerchar->activeinv = activeinvwas;
+				if (_G(playerchar)->activeinv == toret)
+					_G(playerchar)->activeinv = activeinvwas;
 
 				// in case the script did anything to the screen, redraw it
 				UpdateGameOnce();
 
 				// They used the active item and lost it
-				if (playerchar->inv[toret] < 1) {
+				if (_G(playerchar)->inv[toret] < 1) {
 					cmode = CURS_ARROW;
 					set_mouse_cursor(cmode);
 					toret = -1;
@@ -427,11 +427,11 @@ bool InventoryScreen::Run() {
 				return break_code == 0;
 			}
 			toret = dii[clickedon].num;
-			//        int plusng=play.using; play.using=toret;
+			//        int plusng=_GP(play).using; _GP(play).using=toret;
 			update_inv_cursor(toret);
 			set_mouse_cursor(MODE_USE);
 			cmode = MODE_USE;
-			//        play.using=plusng;
+			//        _GP(play).using=plusng;
 			//        break;
 			return true; // continue inventory screen loop
 		} else {
@@ -517,8 +517,8 @@ int __actual_invscreen() {
 int invscreen() {
 	int selt = __actual_invscreen();
 	if (selt < 0) return -1;
-	playerchar->activeinv = selt;
-	GUI::MarkInventoryForUpdate(playerchar->index_id, true);
+	_G(playerchar)->activeinv = selt;
+	GUI::MarkInventoryForUpdate(_G(playerchar)->index_id, true);
 	set_cursor_mode(MODE_USE);
 	return selt;
 }

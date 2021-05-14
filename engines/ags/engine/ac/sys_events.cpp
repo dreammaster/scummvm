@@ -29,7 +29,7 @@
 #include "ags/shared/ac/keycode.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/timer.h"
-#include "ags/shared/device/mousew32.h"
+#include "ags/engine/device/mouse_w32.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/main/engine.h"
 
@@ -38,7 +38,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern GameSetupStruct game;
+
 
 // Converts SDL scan and key codes to the ags keycode
 eAGSKeyCode ags_keycode_from_sdl(const SDL_Event &event) {
@@ -393,7 +393,7 @@ void ags_domouse(int what) {
 }
 
 int ags_check_mouse_wheel() {
-	if (game.options[OPT_MOUSEWHEEL] == 0) {
+	if (_GP(game).options[OPT_MOUSEWHEEL] == 0) {
 		return 0;
 	}
 	if (sys_mouse_z == mouse_z_was) {

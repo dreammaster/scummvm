@@ -55,10 +55,10 @@ using namespace AGS::Shared;
 extern RoomStatus *croom;
 extern RoomObject *objs;
 extern ViewStruct *views;
-extern GameSetupStruct game;
+
 extern ObjectCache objcache[MAX_ROOM_OBJECTS];
-extern RoomStruct thisroom;
-extern CharacterInfo *playerchar;
+
+
 extern int displayed_room;
 extern SpriteCache spriteset;
 extern int actSpsCount;
@@ -71,7 +71,7 @@ int obj_lowest_yp;
 
 int GetObjectIDAtScreen(int scrx, int scry) {
 	// translate screen co-ordinates to room co-ordinates
-	VpPoint vpt = play.ScreenToRoomDivDown(scrx, scry);
+	VpPoint vpt = _GP(play).ScreenToRoomDivDown(scrx, scry);
 	if (vpt.second < 0)
 		return -1;
 	return GetObjectIDAtRoom(vpt.first.X, vpt.first.Y);
@@ -143,8 +143,8 @@ void RemoveObjectTint(int obj) {
 void SetObjectView(int obn, int vii) {
 	if (!is_valid_object(obn)) quit("!SetObjectView: invalid object number specified");
 	debug_script_log("Object %d set to view %d", obn, vii);
-	if ((vii < 1) || (vii > game.numviews)) {
-		quitprintf("!SetObjectView: invalid view number (You said %d, max is %d)", vii, game.numviews);
+	if ((vii < 1) || (vii > _GP(game).numviews)) {
+		quitprintf("!SetObjectView: invalid view number (You said %d, max is %d)", vii, _GP(game).numviews);
 	}
 	vii--;
 
@@ -169,7 +169,7 @@ void SetObjectView(int obn, int vii) {
 void SetObjectFrame(int obn, int viw, int lop, int fra) {
 	if (!is_valid_object(obn)) quit("!SetObjectFrame: invalid object number specified");
 	viw--;
-	if (viw >= game.numviews) quit("!SetObjectFrame: invalid view number used");
+	if (viw >= _GP(game).numviews) quit("!SetObjectFrame: invalid view number used");
 	if (views[viw].numLoops == 0) quit("!SetObjectFrame: specified view has no loops");
 	if (lop >= views[viw].numLoops) quit("!SetObjectFrame: invalid loop number used");
 
@@ -298,15 +298,15 @@ void MergeObject(int obn) {
 	construct_object_gfx(obn, nullptr, &theHeight, true);
 
 	//Bitmap *oldabuf = graphics->bmp;
-	//abuf = thisroom.BgFrames.Graphic[play.bg_frame];
-	PBitmap bg_frame = thisroom.BgFrames[play.bg_frame].Graphic;
+	//abuf = _GP(thisroom).BgFrames.Graphic[_GP(play).bg_frame];
+	PBitmap bg_frame = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic;
 	if (bg_frame->GetColorDepth() != actsps[obn]->GetColorDepth())
 		quit("!MergeObject: unable to merge object due to color depth differences");
 
 	int xpos = data_to_game_coord(objs[obn].x);
 	int ypos = (data_to_game_coord(objs[obn].y) - theHeight);
 
-	draw_sprite_support_alpha(bg_frame.get(), false, xpos, ypos, actsps[obn], (game.SpriteInfos[objs[obn].num].Flags & SPF_ALPHACHANNEL) != 0);
+	draw_sprite_support_alpha(bg_frame.get(), false, xpos, ypos, actsps[obn], (_GP(game).SpriteInfos[objs[obn].num].Flags & SPF_ALPHACHANNEL) != 0);
 	invalidate_screen();
 	mark_current_background_dirty();
 
@@ -405,7 +405,7 @@ void GetObjectName(int obj, char *buffer) {
 	if (!is_valid_object(obj))
 		quit("!GetObjectName: invalid object number");
 
-	strcpy(buffer, get_translation(thisroom.Objects[obj].Name));
+	strcpy(buffer, get_translation(_GP(thisroom).Objects[obj].Name));
 }
 
 void MoveObject(int objj, int xx, int yy, int spp) {
@@ -426,7 +426,7 @@ void SetObjectClickable(int cha, int clik) {
 void SetObjectIgnoreWalkbehinds(int cha, int clik) {
 	if (!is_valid_object(cha))
 		quit("!SetObjectIgnoreWalkbehinds: Invalid object specified");
-	if (game.options[OPT_BASESCRIPTAPI] >= kScriptAPI_v350)
+	if (_GP(game).options[OPT_BASESCRIPTAPI] >= kScriptAPI_v350)
 		debug_script_warn("IgnoreWalkbehinds is not recommended for use, consider other solutions");
 	objs[cha].flags &= ~OBJF_NOWALKBEHINDS;
 	if (clik)
@@ -447,17 +447,17 @@ void RunObjectInteraction(int aa, int mood) {
 	else if (mood == MODE_CUSTOM2) passon = 7;
 	else if (mood == MODE_USE) {
 		passon = 3;
-		cdata = playerchar->activeinv;
-		play.usedinv = cdata;
+		cdata = _G(playerchar)->activeinv;
+		_GP(play).usedinv = cdata;
 	}
 	evblockbasename = "object%d"; evblocknum = aa;
 
-	if (thisroom.Objects[aa].EventHandlers != nullptr) {
+	if (_GP(thisroom).Objects[aa].EventHandlers != nullptr) {
 		if (passon >= 0) {
-			if (run_interaction_script(thisroom.Objects[aa].EventHandlers.get(), passon, 4, (passon == 3)))
+			if (run_interaction_script(_GP(thisroom).Objects[aa].EventHandlers.get(), passon, 4, (passon == 3)))
 				return;
 		}
-		run_interaction_script(thisroom.Objects[aa].EventHandlers.get(), 4);  // any click on obj
+		run_interaction_script(_GP(thisroom).Objects[aa].EventHandlers.get(), 4);  // any click on obj
 	} else {
 		if (passon >= 0) {
 			if (run_interaction_event(&croom->intrObject[aa], passon, 4, (passon == 3)))
@@ -476,14 +476,14 @@ int AreObjectsColliding(int obj1, int obj2) {
 
 int GetThingRect(int thing, _Rect *rect) {
 	if (is_valid_character(thing)) {
-		if (game.chars[thing].room != displayed_room)
+		if (_GP(game).chars[thing].room != displayed_room)
 			return 0;
 
 		int charwid = game_to_data_coord(GetCharacterWidth(thing));
-		rect->x1 = game.chars[thing].x - (charwid / 2);
+		rect->x1 = _GP(game).chars[thing].x - (charwid / 2);
 		rect->x2 = rect->x1 + charwid;
-		rect->y1 = game.chars[thing].get_effective_y() - game_to_data_coord(GetCharacterHeight(thing));
-		rect->y2 = game.chars[thing].get_effective_y();
+		rect->y1 = _GP(game).chars[thing].get_effective_y() - game_to_data_coord(GetCharacterHeight(thing));
+		rect->y2 = _GP(game).chars[thing].get_effective_y();
 	} else if (is_valid_object(thing - OVERLAPPING_OBJECT)) {
 		int objid = thing - OVERLAPPING_OBJECT;
 		if (objs[objid].on != 1)
@@ -531,11 +531,11 @@ int AreThingsOverlapping(int thing1, int thing2) {
 int GetObjectProperty(int hss, const char *property) {
 	if (!is_valid_object(hss))
 		quit("!GetObjectProperty: invalid object");
-	return get_int_property(thisroom.Objects[hss].Properties, croom->objProps[hss], property);
+	return get_int_property(_GP(thisroom).Objects[hss].Properties, croom->objProps[hss], property);
 }
 
 void GetObjectPropertyText(int item, const char *property, char *bufer) {
-	get_text_property(thisroom.Objects[item].Properties, croom->objProps[item], property, bufer);
+	get_text_property(_GP(thisroom).Objects[item].Properties, croom->objProps[item], property, bufer);
 }
 
 Bitmap *GetObjectImage(int obj, int *isFlipped) {

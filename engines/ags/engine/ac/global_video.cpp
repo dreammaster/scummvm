@@ -41,7 +41,7 @@ using namespace AGS::Shared;
 void scrPlayVideo(const char *name, int skip, int flags) {
 	EndSkippingUntilCharStops();
 
-	if (play.fast_forward)
+	if (_GP(play).fast_forward)
 		return;
 	if (debug_flags & DBG_NOVIDEO)
 		return;
@@ -59,7 +59,7 @@ void scrPlayVideo(const char *name, int skip, int flags) {
 #ifndef AGS_NO_VIDEO_PLAYER
 
 void pause_sound_if_necessary_and_play_video(const char *name, int skip, int flags) {
-	int musplaying = play.cur_music_number, i;
+	int musplaying = _GP(play).cur_music_number, i;
 	int ambientWas[MAX_SOUND_CHANNELS];
 	for (i = 1; i < MAX_SOUND_CHANNELS; i++)
 		ambientWas[i] = ambient[i].channel;

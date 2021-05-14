@@ -55,13 +55,13 @@
 
 namespace AGS3 {
 
-extern GameSetupStruct game;
-extern GameState play;
+
+
 extern int gameHasBeenRestored, displayed_room;
 extern unsigned int load_new_game;
 extern RoomObject *objs;
 extern int our_eip;
-extern CharacterInfo *playerchar;
+
 
 ExecutingScript scripts[MAX_SCRIPT_AT_ONCE];
 ExecutingScript *curscript = nullptr;
@@ -87,7 +87,7 @@ NonBlockingScriptFunction runDialogOptionMouseClickHandlerFunc("dialog_options_m
 NonBlockingScriptFunction runDialogOptionKeyPressHandlerFunc("dialog_options_key_press", 2);
 NonBlockingScriptFunction runDialogOptionRepExecFunc("dialog_options_repexec", 1);
 
-ScriptSystem scsystem;
+ScriptSystem _GP(scsystem);
 
 std::vector<PScript> scriptModules;
 std::vector<ccInstance *> moduleInst;
@@ -101,25 +101,25 @@ std::vector<String> guiScriptObjNames;
 
 
 int run_dialog_request(int parmtr) {
-	play.stop_dialog_at_end = DIALOG_RUNNING;
+	_GP(play).stop_dialog_at_end = DIALOG_RUNNING;
 	RunTextScriptIParam(gameinst, "dialog_request", RuntimeScriptValue().SetInt32(parmtr));
 
-	if (play.stop_dialog_at_end == DIALOG_STOP) {
-		play.stop_dialog_at_end = DIALOG_NONE;
+	if (_GP(play).stop_dialog_at_end == DIALOG_STOP) {
+		_GP(play).stop_dialog_at_end = DIALOG_NONE;
 		return -2;
 	}
-	if (play.stop_dialog_at_end >= DIALOG_NEWTOPIC) {
-		int tval = play.stop_dialog_at_end - DIALOG_NEWTOPIC;
-		play.stop_dialog_at_end = DIALOG_NONE;
+	if (_GP(play).stop_dialog_at_end >= DIALOG_NEWTOPIC) {
+		int tval = _GP(play).stop_dialog_at_end - DIALOG_NEWTOPIC;
+		_GP(play).stop_dialog_at_end = DIALOG_NONE;
 		return tval;
 	}
-	if (play.stop_dialog_at_end >= DIALOG_NEWROOM) {
-		int roomnum = play.stop_dialog_at_end - DIALOG_NEWROOM;
-		play.stop_dialog_at_end = DIALOG_NONE;
+	if (_GP(play).stop_dialog_at_end >= DIALOG_NEWROOM) {
+		int roomnum = _GP(play).stop_dialog_at_end - DIALOG_NEWROOM;
+		_GP(play).stop_dialog_at_end = DIALOG_NONE;
 		NewRoom(roomnum);
 		return -2;
 	}
-	play.stop_dialog_at_end = DIALOG_NONE;
+	_GP(play).stop_dialog_at_end = DIALOG_NONE;
 	return -1;
 }
 
@@ -127,7 +127,7 @@ void run_function_on_non_blocking_thread(NonBlockingScriptFunction *funcToRun) {
 
 	update_script_mouse_coords();
 
-	int room_changes_was = play.room_changes;
+	int room_changes_was = _GP(play).room_changes;
 	funcToRun->atLeastOneImplementationExists = false;
 
 	// run modules
@@ -135,13 +135,13 @@ void run_function_on_non_blocking_thread(NonBlockingScriptFunction *funcToRun) {
 	for (int kk = 0; kk < numScriptModules; kk++) {
 		funcToRun->moduleHasFunction[kk] = DoRunScriptFuncCantBlock(moduleInstFork[kk], funcToRun, funcToRun->moduleHasFunction[kk]);
 
-		if (room_changes_was != play.room_changes)
+		if (room_changes_was != _GP(play).room_changes)
 			return;
 	}
 
 	funcToRun->globalScriptHasFunction = DoRunScriptFuncCantBlock(gameinstFork, funcToRun, funcToRun->globalScriptHasFunction);
 
-	if (room_changes_was != play.room_changes)
+	if (room_changes_was != _GP(play).room_changes)
 		return;
 
 	funcToRun->roomHasFunction = DoRunScriptFuncCantBlock(roominstFork, funcToRun, funcToRun->roomHasFunction);
@@ -178,8 +178,8 @@ int run_interaction_event(Interaction *nint, int evnt, int chkAny, int isInv) {
 		return 0;
 	}
 
-	if (play.check_interaction_only) {
-		play.check_interaction_only = 2;
+	if (_GP(play).check_interaction_only) {
+		_GP(play).check_interaction_only = 2;
 		return -1;
 	}
 
@@ -213,12 +213,12 @@ int run_interaction_script(InteractionScripts *nint, int evnt, int chkAny, int i
 		return 0;
 	}
 
-	if (play.check_interaction_only) {
-		play.check_interaction_only = 2;
+	if (_GP(play).check_interaction_only) {
+		_GP(play).check_interaction_only = 2;
 		return -1;
 	}
 
-	int room_was = play.room_changes;
+	int room_was = _GP(play).room_changes;
 
 	RuntimeScriptValue rval_null;
 
@@ -232,7 +232,7 @@ int run_interaction_script(InteractionScripts *nint, int evnt, int chkAny, int i
 
 	int retval = 0;
 	// if the room changed within the action
-	if (room_was != play.room_changes)
+	if (room_was != _GP(play).room_changes)
 		retval = -1;
 
 	return retval;
@@ -431,14 +431,14 @@ int RunTextScript(ccInstance *sci, const char *tsname) {
 		// run module rep_execs
 		// FIXME: in theory the function may be already called for moduleInst[i],
 		// in which case this should not be executed; need to rearrange the code somehow
-		int room_changes_was = play.room_changes;
+		int room_changes_was = _GP(play).room_changes;
 		int restore_game_count_was = gameHasBeenRestored;
 
 		for (int kk = 0; kk < numScriptModules; kk++) {
 			if (!moduleRepExecAddr[kk].IsNull())
 				RunScriptFunctionIfExists(moduleInst[kk], tsname, 0, nullptr);
 
-			if ((room_changes_was != play.room_changes) ||
+			if ((room_changes_was != _GP(play).room_changes) ||
 				(restore_game_count_was != gameHasBeenRestored))
 				return 0;
 		}
@@ -493,7 +493,7 @@ String GetScriptName(ccInstance *sci) {
 		return "Not in a script";
 	else if (sci->instanceof == gamescript)
 		return "Global script";
-	else if (sci->instanceof == thisroom.CompiledScript)
+	else if (sci->instanceof == _GP(thisroom).CompiledScript)
 		return String::FromFormat("Room %d script", displayed_room);
 	return "Unknown script";
 }
@@ -538,7 +538,7 @@ void post_script_cleanup() {
 		case ePSANewRoom:
 			// only change rooms when all scripts are done
 			if (num_scripts == 0) {
-				new_room(thisData, playerchar);
+				new_room(thisData, _G(playerchar));
 				// don't allow any pending room scripts from the old room
 				// in run_another to be executed
 				return;
@@ -589,7 +589,7 @@ void post_script_cleanup() {
 		RunScriptFunction(script.Instance, script.FnName, script.ParamCount, script.Param1, script.Param2);
 		if (script.Instance == kScInstRoom && script.ParamCount == 1) {
 			// some bogus hack for "on_call" event handler
-			play.roomscript_finished = 1;
+			_GP(play).roomscript_finished = 1;
 		}
 
 		// if they've changed rooms, cancel any further pending scripts
@@ -620,8 +620,8 @@ int get_nivalue(InteractionCommandList *nic, int idx, int parm) {
 
 InteractionVariable *get_interaction_variable(int varindx) {
 
-	if ((varindx >= LOCAL_VARIABLE_OFFSET) && ((size_t)varindx < LOCAL_VARIABLE_OFFSET + thisroom.LocalVariables.size()))
-		return &thisroom.LocalVariables[varindx - LOCAL_VARIABLE_OFFSET];
+	if ((varindx >= LOCAL_VARIABLE_OFFSET) && ((size_t)varindx < LOCAL_VARIABLE_OFFSET + _GP(thisroom).LocalVariables.size()))
+		return &_GP(thisroom).LocalVariables[varindx - LOCAL_VARIABLE_OFFSET];
 
 	if ((varindx < 0) || (varindx >= numGlobalVars))
 		quit("!invalid interaction variable specified");
@@ -635,9 +635,9 @@ InteractionVariable *FindGraphicalVariable(const char *varName) {
 		if (ags_stricmp(globalvars[ii].Name, varName) == 0)
 			return &globalvars[ii];
 	}
-	for (size_t i = 0; i < thisroom.LocalVariables.size(); ++i) {
-		if (ags_stricmp(thisroom.LocalVariables[i].Name, varName) == 0)
-			return &thisroom.LocalVariables[i];
+	for (size_t i = 0; i < _GP(thisroom).LocalVariables.size(); ++i) {
+		if (ags_stricmp(_GP(thisroom).LocalVariables[i].Name, varName) == 0)
+			return &_GP(thisroom).LocalVariables[i];
 	}
 	return nullptr;
 }
@@ -670,7 +670,7 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 
 	for (i = 0; i < nicl->Cmds.size(); i++) {
 		cmdsrun[0] ++;
-		int room_was = play.room_changes;
+		int room_was = _GP(play).room_changes;
 
 		switch (nicl->Cmds[i].Type) {
 		case 0:  // Do nothing
@@ -717,11 +717,11 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 			break;
 		case 9:  // Run Dialog
 		{
-			int room_was = play.room_changes;
+			int room_was = _GP(play).room_changes;
 			RunDialog(IPARAM1);
 			// if they changed room within the dialog script,
 			// the interaction command list is no longer valid
-			if (room_was != play.room_changes)
+			if (room_was != _GP(play).room_changes)
 				return -1;
 		}
 		break;
@@ -732,7 +732,7 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 			SetDialogOption(IPARAM1, IPARAM2, 0);
 			break;
 		case 12: // Go To Screen
-			Character_ChangeRoomAutoPosition(playerchar, IPARAM1, IPARAM2);
+			Character_ChangeRoomAutoPosition(_G(playerchar), IPARAM1, IPARAM2);
 			return -1;
 		case 13: // Add Inventory
 			add_inventory(IPARAM1);
@@ -762,21 +762,21 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 				MoveCharacter(IPARAM1, IPARAM2, IPARAM3);
 			break;
 		case 20: // If Inventory Item was used
-			if (play.usedinv == IPARAM1) {
-				if (game.options[OPT_NOLOSEINV] == 0)
-					lose_inventory(play.usedinv);
+			if (_GP(play).usedinv == IPARAM1) {
+				if (_GP(game).options[OPT_NOLOSEINV] == 0)
+					lose_inventory(_GP(play).usedinv);
 				if (run_interaction_commandlist(nicl->Cmds[i].Children.get(), timesrun, cmdsrun))
 					return -1;
 			} else
 				cmdsrun[0] --;
 			break;
 		case 21: // if player has inventory item
-			if (playerchar->inv[IPARAM1] > 0)
+			if (_G(playerchar)->inv[IPARAM1] > 0)
 				if (run_interaction_commandlist(nicl->Cmds[i].Children.get(), timesrun, cmdsrun))
 					return -1;
 			break;
 		case 22: // if a character is moving
-			if (game.chars[IPARAM1].walking)
+			if (_GP(game).chars[IPARAM1].walking)
 				if (run_interaction_commandlist(nicl->Cmds[i].Children.get(), timesrun, cmdsrun))
 					return -1;
 			break;
@@ -794,7 +794,7 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 		case 26: // Move NPC to different room
 			if (!is_valid_character(IPARAM1))
 				quit("!Move NPC to different room: invalid character specified");
-			game.chars[IPARAM1].room = IPARAM2;
+			_GP(game).chars[IPARAM1].room = IPARAM2;
 			break;
 		case 27: // Set character view
 			SetCharacterView(IPARAM1, IPARAM2);
@@ -819,12 +819,12 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 			break;
 		case 34: // Run animation
 			scAnimateCharacter(IPARAM1, IPARAM2, IPARAM3, 0);
-			GameLoopUntilValueIsZero(&game.chars[IPARAM1].animating);
+			GameLoopUntilValueIsZero(&_GP(game).chars[IPARAM1].animating);
 			break;
 		case 35: // Quick animation
 			SetCharacterView(IPARAM1, IPARAM2);
 			scAnimateCharacter(IPARAM1, IPARAM3, IPARAM4, 0);
-			GameLoopUntilValueIsZero(&game.chars[IPARAM1].animating);
+			GameLoopUntilValueIsZero(&_GP(game).chars[IPARAM1].animating);
 			ReleaseCharacterView(IPARAM1);
 			break;
 		case 36: // Set idle animation
@@ -874,7 +874,7 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 		}
 
 		// if the room changed within the action, nicl is no longer valid
-		if (room_was != play.room_changes)
+		if (room_was != _GP(play).room_changes)
 			return -1;
 	}
 	return 0;
@@ -890,7 +890,7 @@ void can_run_delayed_command() {
 
 void run_unhandled_event(int evnt) {
 
-	if (play.check_interaction_only)
+	if (_GP(play).check_interaction_only)
 		return;
 
 	int evtype = 0;

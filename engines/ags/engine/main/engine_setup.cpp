@@ -33,7 +33,7 @@
 #include "ags/shared/ac/walkbehind.h"
 #include "ags/engine/ac/dynobj/script_system.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/device/mousew32.h"
+#include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gfx/ali3dexception.h"
 #include "ags/shared/gfx/graphicsdriver.h"
@@ -50,8 +50,8 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern GameSetupStruct game;
-extern ScriptSystem scsystem;
+
+
 extern int _places_r, _places_g, _places_b;
 extern IGraphicsDriver *gfxDriver;
 
@@ -63,18 +63,18 @@ void convert_gui_to_game_resolution(GameDataVersion filever) {
 	if (filever >= kGameVersion_310)
 		return;
 
-	const int mul = game.GetDataUpscaleMult();
-	for (int i = 0; i < game.numcursors; ++i) {
-		game.mcurs[i].hotx *= mul;
-		game.mcurs[i].hoty *= mul;
+	const int mul = _GP(game).GetDataUpscaleMult();
+	for (int i = 0; i < _GP(game).numcursors; ++i) {
+		_GP(game).mcurs[i].hotx *= mul;
+		_GP(game).mcurs[i].hoty *= mul;
 	}
 
-	for (int i = 0; i < game.numinvitems; ++i) {
-		game.invinfo[i].hotx *= mul;
-		game.invinfo[i].hoty *= mul;
+	for (int i = 0; i < _GP(game).numinvitems; ++i) {
+		_GP(game).invinfo[i].hotx *= mul;
+		_GP(game).invinfo[i].hoty *= mul;
 	}
 
-	for (int i = 0; i < game.numgui; ++i) {
+	for (int i = 0; i < _GP(game).numgui; ++i) {
 		GUIMain *cgp = &_GP(guis)[i];
 		cgp->X *= mul;
 		cgp->Y *= mul;
@@ -83,8 +83,8 @@ void convert_gui_to_game_resolution(GameDataVersion filever) {
 		if (cgp->Height < 1)
 			cgp->Height = 1;
 		// This is probably a way to fix GUIs meant to be covering whole screen
-		if (cgp->Width == game.GetDataRes().Width - 1)
-			cgp->Width = game.GetDataRes().Width;
+		if (cgp->Width == _GP(game).GetDataRes().Width - 1)
+			cgp->Width = _GP(game).GetDataRes().Width;
 
 		cgp->Width *= mul;
 		cgp->Height *= mul;
@@ -106,13 +106,13 @@ void convert_gui_to_game_resolution(GameDataVersion filever) {
 // Convert certain coordinates to data resolution (only if it's different from game resolution).
 // Necessary for 3.1.0 and above games with legacy "low-res coordinates" setting.
 void convert_objects_to_data_resolution(GameDataVersion filever) {
-	if (filever < kGameVersion_310 || game.GetDataUpscaleMult() == 1)
+	if (filever < kGameVersion_310 || _GP(game).GetDataUpscaleMult() == 1)
 		return;
 
-	const int mul = game.GetDataUpscaleMult();
-	for (int i = 0; i < game.numcharacters; ++i) {
-		game.chars[i].x /= mul;
-		game.chars[i].y /= mul;
+	const int mul = _GP(game).GetDataUpscaleMult();
+	for (int i = 0; i < _GP(game).numcharacters; ++i) {
+		_GP(game).chars[i].x /= mul;
+		_GP(game).chars[i].y /= mul;
 	}
 
 	for (int i = 0; i < numguiinv; ++i) {
@@ -123,25 +123,25 @@ void convert_objects_to_data_resolution(GameDataVersion filever) {
 }
 
 void engine_setup_system_gamesize() {
-	scsystem.width = game.GetGameRes().Width;
-	scsystem.height = game.GetGameRes().Height;
-	scsystem.viewport_width = game_to_data_coord(play.GetMainViewport().GetWidth());
-	scsystem.viewport_height = game_to_data_coord(play.GetMainViewport().GetHeight());
+	_GP(scsystem).width = _GP(game).GetGameRes().Width;
+	_GP(scsystem).height = _GP(game).GetGameRes().Height;
+	_GP(scsystem).viewport_width = game_to_data_coord(_GP(play).GetMainViewport().GetWidth());
+	_GP(scsystem).viewport_height = game_to_data_coord(_GP(play).GetMainViewport().GetHeight());
 }
 
 void engine_init_resolution_settings(const Size game_size) {
 	Debug::Printf("Initializing resolution settings");
 	usetup.textheight = getfontheight_outlined(0) + 1;
 
-	Debug::Printf(kDbgMsg_Info, "Game native resolution: %d x %d (%d bit)%s", game_size.Width, game_size.Height, game.color_depth * 8,
-		game.IsLegacyLetterbox() ? " letterbox-by-design" : "");
+	Debug::Printf(kDbgMsg_Info, "Game native resolution: %d x %d (%d bit)%s", game_size.Width, game_size.Height, _GP(game).color_depth * 8,
+		_GP(game).IsLegacyLetterbox() ? " letterbox-by-design" : "");
 
 	convert_gui_to_game_resolution(loaded_game_file_version);
 	convert_objects_to_data_resolution(loaded_game_file_version);
 
 	Rect viewport = RectWH(game_size);
-	play.SetMainViewport(viewport);
-	play.SetUIViewport(viewport);
+	_GP(play).SetMainViewport(viewport);
+	_GP(play).SetUIViewport(viewport);
 	engine_setup_system_gamesize();
 }
 
@@ -267,7 +267,7 @@ void engine_post_gfxmode_mouse_setup(const DisplayMode &dm, const Size &init_des
 	on_coordinates_scaling_changed();
 
 	// If auto lock option is set, lock mouse to the game window
-	if (usetup.mouse_auto_lock && scsystem.windowed != 0)
+	if (usetup.mouse_auto_lock && _GP(scsystem).windowed != 0)
 		Mouse::TryLockToWindow();
 }
 
@@ -278,18 +278,18 @@ void engine_pre_gfxmode_mouse_cleanup() {
 	Mouse::UnlockFromWindow();
 }
 
-// Fill in scsystem struct with display mode parameters
+// Fill in _GP(scsystem) struct with display mode parameters
 void engine_setup_scsystem_screen(const DisplayMode &dm) {
-	scsystem.coldepth = dm.ColorDepth;
-	scsystem.windowed = dm.Windowed;
-	scsystem.vsync = dm.Vsync;
+	_GP(scsystem).coldepth = dm.ColorDepth;
+	_GP(scsystem).windowed = dm.Windowed;
+	_GP(scsystem).vsync = dm.Vsync;
 }
 
 void engine_post_gfxmode_setup(const Size &init_desktop) {
 	DisplayMode dm = gfxDriver->GetDisplayMode();
 	// If color depth has changed (or graphics mode was inited for the
 	// very first time), we also need to recreate bitmaps
-	bool has_driver_changed = scsystem.coldepth != dm.ColorDepth;
+	bool has_driver_changed = _GP(scsystem).coldepth != dm.ColorDepth;
 
 	engine_setup_scsystem_screen(dm);
 	engine_post_gfxmode_driver_setup();
@@ -319,10 +319,10 @@ void on_coordinates_scaling_changed() {
 	// Reset mouse graphic area and bounds
 	Mouse::UpdateGraphicArea();
 	// If mouse bounds do not have valid values yet, then limit cursor to viewport
-	if (play.mboundx1 == 0 && play.mboundy1 == 0 && play.mboundx2 == 0 && play.mboundy2 == 0)
-		Mouse::SetMoveLimit(play.GetMainViewport());
+	if (_GP(play).mboundx1 == 0 && _GP(play).mboundy1 == 0 && _GP(play).mboundx2 == 0 && _GP(play).mboundy2 == 0)
+		Mouse::SetMoveLimit(_GP(play).GetMainViewport());
 	else
-		Mouse::SetMoveLimit(Rect(play.mboundx1, play.mboundy1, play.mboundx2, play.mboundy2));
+		Mouse::SetMoveLimit(Rect(_GP(play).mboundx1, _GP(play).mboundy1, _GP(play).mboundx2, _GP(play).mboundy2));
 }
 
 } // namespace AGS3

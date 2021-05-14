@@ -46,7 +46,7 @@
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/blender.h"
 #include "ags/shared/core/assetmanager.h"
-#include "ags/shared/util/alignedstream.h"
+#include "ags/shared/util/aligned_stream.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/game/main_game_file.h"
 #include "ags/shared/game/game_init.h"
@@ -59,7 +59,7 @@ using namespace AGS::Engine;
 
 extern int ifacepopped;
 
-extern GameSetupStruct game;
+
 extern ViewStruct *views;
 extern DialogTopic *dialog;
 
@@ -121,7 +121,7 @@ HError preload_game_data() {
 		return (HError)err;
 	// Read only the particular data we need for preliminary game analysis
 	PreReadGameData(game, src.InputStream.get(), src.DataVersion);
-	game.compiled_with = src.CompiledWith;
+	_GP(game).compiled_with = src.CompiledWith;
 	FixupSaveDirectory(game);
 	return HError::None();
 }
@@ -137,10 +137,10 @@ HError load_game_file() {
 			// NOTE: this must be done before UpdateGameData, or resolution-dependant
 			// adjustments won't be applied correctly.
 			if ((loaded_game_file_version < kGameVersion_310) && usetup.override_upscale) {
-				if (game.GetResolutionType() == kGameResolution_320x200)
-					game.SetGameResolution(kGameResolution_640x400);
-				else if (game.GetResolutionType() == kGameResolution_320x240)
-					game.SetGameResolution(kGameResolution_640x480);
+				if (_GP(game).GetResolutionType() == kGameResolution_320x200)
+					_GP(game).SetGameResolution(kGameResolution_640x400);
+				else if (_GP(game).GetResolutionType() == kGameResolution_320x240)
+					_GP(game).SetGameResolution(kGameResolution_640x480);
 			}
 
 			load_err = UpdateGameData(ents, src.DataVersion);

@@ -31,10 +31,10 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameSetupStruct game;
+
 
 void SetSliderValue(int guin, int objn, int valn) {
-	if ((guin < 0) | (guin >= game.numgui)) quit("!SetSliderValue: invalid GUI number");
+	if ((guin < 0) | (guin >= _GP(game).numgui)) quit("!SetSliderValue: invalid GUI number");
 	if (_GP(guis)[guin].GetControlType(objn) != kGUISlider)
 		quit("!SetSliderValue: specified control is not a slider");
 
@@ -43,7 +43,7 @@ void SetSliderValue(int guin, int objn, int valn) {
 }
 
 int GetSliderValue(int guin, int objn) {
-	if ((guin < 0) | (guin >= game.numgui)) quit("!GetSliderValue: invalid GUI number");
+	if ((guin < 0) | (guin >= _GP(game).numgui)) quit("!GetSliderValue: invalid GUI number");
 	if (_GP(guis)[guin].GetControlType(objn) != kGUISlider)
 		quit("!GetSliderValue: specified control is not a slider");
 

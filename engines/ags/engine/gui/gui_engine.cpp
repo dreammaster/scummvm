@@ -57,7 +57,7 @@ extern void ensure_text_valid_for_font(char *, int);
 //
 
 extern SpriteCache spriteset; // in ac_runningame
-extern GameSetupStruct game;
+
 
 bool GUIMain::HasAlphaChannel() const {
 	if (this->BgImage > 0) {
@@ -69,11 +69,11 @@ bool GUIMain::HasAlphaChannel() const {
 		return false;
 	}
 	// transparent background, enable alpha blending
-	return game.GetColorDepth() >= 24 &&
+	return _GP(game).GetColorDepth() >= 24 &&
 		// transparent background have alpha channel only since 3.2.0;
 		// "classic" gui rendering mode historically had non-alpha transparent backgrounds
 		// (3.2.0 broke the compatibility, now we restore it)
-		loaded_game_file_version >= kGameVersion_320 && game.options[OPT_NEWGUIALPHA] != kGuiAlphaRender_Legacy;
+		loaded_game_file_version >= kGameVersion_320 && _GP(game).options[OPT_NEWGUIALPHA] != kGuiAlphaRender_Legacy;
 }
 
 //=============================================================================
@@ -97,7 +97,7 @@ int get_adjusted_spriteheight(int spr) {
 }
 
 bool is_sprite_alpha(int spr) {
-	return ((game.SpriteInfos[spr].Flags & SPF_ALPHACHANNEL) != 0);
+	return ((_GP(game).SpriteInfos[spr].Flags & SPF_ALPHACHANNEL) != 0);
 }
 
 void set_eip_guiobj(int eip) {

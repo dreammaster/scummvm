@@ -45,7 +45,7 @@ void audio_core_shutdown();
 // Audio slot controls: slots are abstract holders for a playback.
 //
 // Initializes playback on a free playback slot (reuses spare one or allocates new if there's none).
-// Data array must contain full wave data to play.
+// Data array must contain full wave data to _GP(play).
 // TODO: this method requires having full sound in memory;
 // should we add a streaming method later? is this of any priority for regular builds?
 int  audio_core_slot_init(const std::vector<char> &data, const AGS::Shared::String &extension_hint, bool repeat);

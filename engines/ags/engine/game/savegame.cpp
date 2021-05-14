@@ -42,13 +42,13 @@
 #include "ags/shared/ac/system.h"
 #include "ags/engine/ac/timer.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/device/mousew32.h"
+#include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/ddb.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/game/savegame.h"
 #include "ags/shared/game/savegame_components.h"
-#include "ags/shared/game/savegame_internal.h"
+#include "ags/engine/game/savegame_internal.h"
 #include "ags/shared/main/engine.h"
 #include "ags/shared/main/main.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
@@ -57,7 +57,7 @@
 #include "ags/shared/plugin/plugin_engine.h"
 #include "ags/shared/script/script.h"
 #include "ags/shared/script/cc_error.h"
-#include "ags/shared/util/alignedstream.h"
+#include "ags/shared/util/aligned_stream.h"
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_utils.h"
@@ -71,7 +71,7 @@ using namespace Engine;
 // function is currently implemented in savegame_v321.cpp
 HSaveError restore_game_data(Stream *in, SavegameVersion svg_version, const PreservedParams &pp, RestoredData &r_data);
 
-extern GameSetupStruct game;
+
 extern Bitmap **guibg;
 extern AGS::Engine::IDriverDependantBitmap **guibgbmp;
 extern AGS::Engine::IGraphicsDriver *gfxDriver;
@@ -132,7 +132,7 @@ String GetSavegameErrorText(SavegameErrorType err) {
 	case kSvgErr_IncompatibleEngine:
 		return "Save was written by incompatible engine, or file is corrupted.";
 	case kSvgErr_GameGuidMismatch:
-		return "Game GUID does not match, saved by a different game.";
+		return "Game GUID does not match, saved by a different _GP(game).";
 	case kSvgErr_ComponentListOpeningTagFormat:
 		return "Failed to parse opening tag of the components list.";
 	case kSvgErr_ComponentListClosingTagMissing:
@@ -154,7 +154,7 @@ String GetSavegameErrorText(SavegameErrorType err) {
 	case kSvgErr_UnsupportedComponentVersion:
 		return "Component data version not supported.";
 	case kSvgErr_GameContentAssertion:
-		return "Saved content does not match current game.";
+		return "Saved content does not match current _GP(game).";
 	case kSvgErr_InconsistentData:
 		return "Inconsistent save data, or file is corrupted.";
 	case kSvgErr_InconsistentPlugin:
@@ -330,8 +330,8 @@ HSaveError OpenSavegame(const String &filename, SavegameDescription &desc, Saveg
 
 // Prepares engine for actual save restore (stops processes, cleans up memory)
 void DoBeforeRestore(PreservedParams &pp) {
-	pp.SpeechVOX = play.want_speech;
-	pp.MusicVOX = play.separate_music_lib;
+	pp.SpeechVOX = _GP(play).want_speech;
+	pp.MusicVOX = _GP(play).separate_music_lib;
 
 	unload_old_room();
 	delete raw_saved_screen;
@@ -343,7 +343,7 @@ void DoBeforeRestore(PreservedParams &pp) {
 	// cleanup dynamic sprites
 	// NOTE: sprite 0 is a special constant sprite that cannot be dynamic
 	for (int i = 1; i < spriteset.GetSpriteSlotCount(); ++i) {
-		if (game.SpriteInfos[i].Flags & SPF_DYNAMICALLOC) {
+		if (_GP(game).SpriteInfos[i].Flags & SPF_DYNAMICALLOC) {
 			// do this early, so that it changing guibuts doesn't
 			// affect the restored data
 			free_dynamic_sprite(i);
@@ -351,7 +351,7 @@ void DoBeforeRestore(PreservedParams &pp) {
 	}
 
 	// cleanup GUI backgrounds
-	for (int i = 0; i < game.numgui; ++i) {
+	for (int i = 0; i < _GP(game).numgui; ++i) {
 		delete guibg[i];
 		guibg[i] = nullptr;
 
@@ -374,8 +374,8 @@ void DoBeforeRestore(PreservedParams &pp) {
 		moduleInst[i] = nullptr;
 	}
 
-	play.FreeProperties();
-	play.FreeViewportsAndCameras();
+	_GP(play).FreeProperties();
+	_GP(play).FreeViewportsAndCameras();
 
 	delete roominstFork;
 	delete roominst;
@@ -392,7 +392,7 @@ void DoBeforeRestore(PreservedParams &pp) {
 
 	// unregister gui controls from API exports
 	// TODO: find out why are we doing this here? is this really necessary?
-	for (int i = 0; i < game.numgui; ++i) {
+	for (int i = 0; i < _GP(game).numgui; ++i) {
 		unexport_gui_controls(i);
 	}
 	// Clear the managed object pool
@@ -409,7 +409,7 @@ void DoBeforeRestore(PreservedParams &pp) {
 void RestoreViewportsAndCameras(const RestoredData &r_data) {
 	for (size_t i = 0; i < r_data.Cameras.size(); ++i) {
 		const auto &cam_dat = r_data.Cameras[i];
-		auto cam = play.GetRoomCamera(i);
+		auto cam = _GP(play).GetRoomCamera(i);
 		cam->SetID(cam_dat.ID);
 		if ((cam_dat.Flags & kSvgCamPosLocked) != 0)
 			cam->Lock();
@@ -420,7 +420,7 @@ void RestoreViewportsAndCameras(const RestoredData &r_data) {
 	}
 	for (size_t i = 0; i < r_data.Viewports.size(); ++i) {
 		const auto &view_dat = r_data.Viewports[i];
-		auto view = play.GetRoomViewport(i);
+		auto view = _GP(play).GetRoomViewport(i);
 		view->SetID(view_dat.ID);
 		view->SetVisible((view_dat.Flags & kSvgViewportVisible) != 0);
 		view->SetRect(RectWH(view_dat.Left, view_dat.Top, view_dat.Width, view_dat.Height));
@@ -428,11 +428,11 @@ void RestoreViewportsAndCameras(const RestoredData &r_data) {
 		// Restore camera link
 		int cam_index = view_dat.CamID;
 		if (cam_index < 0) continue;
-		auto cam = play.GetRoomCamera(cam_index);
+		auto cam = _GP(play).GetRoomCamera(cam_index);
 		view->LinkCamera(cam);
 		cam->LinkToViewport(view);
 	}
-	play.InvalidateViewportZOrder();
+	_GP(play).InvalidateViewportZOrder();
 }
 
 // Final processing after successfully restoring from save
@@ -440,20 +440,20 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	// Use a yellow dialog highlight for older game versions
 	// CHECKME: it is dubious that this should be right here
 	if (loaded_game_file_version < kGameVersion_331)
-		play.dialog_options_highlight_color = DIALOG_OPTIONS_HIGHLIGHT_COLOR_DEFAULT;
+		_GP(play).dialog_options_highlight_color = DIALOG_OPTIONS_HIGHLIGHT_COLOR_DEFAULT;
 
 	// Preserve whether the music vox is available
-	play.separate_music_lib = pp.MusicVOX;
+	_GP(play).separate_music_lib = pp.MusicVOX;
 	// If they had the vox when they saved it, but they don't now
-	if ((pp.SpeechVOX < 0) && (play.want_speech >= 0))
-		play.want_speech = (-play.want_speech) - 1;
+	if ((pp.SpeechVOX < 0) && (_GP(play).want_speech >= 0))
+		_GP(play).want_speech = (-_GP(play).want_speech) - 1;
 	// If they didn't have the vox before, but now they do
-	else if ((pp.SpeechVOX >= 0) && (play.want_speech < 0))
-		play.want_speech = (-play.want_speech) - 1;
+	else if ((pp.SpeechVOX >= 0) && (_GP(play).want_speech < 0))
+		_GP(play).want_speech = (-_GP(play).want_speech) - 1;
 
 	// recache queued clips
-	for (int i = 0; i < play.new_music_queue_size; ++i) {
-		play.new_music_queue[i].cachedClip = nullptr;
+	for (int i = 0; i < _GP(play).new_music_queue_size; ++i) {
+		_GP(play).new_music_queue[i].cachedClip = nullptr;
 	}
 
 	// restore these to the ones retrieved from the save game
@@ -462,7 +462,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 		dynamicallyCreatedSurfaces[i] = r_data.DynamicSurfaces[i];
 	}
 
-	for (int i = 0; i < game.numgui; ++i)
+	for (int i = 0; i < _GP(game).numgui; ++i)
 		export_gui_controls(i);
 	update_gui_zorder();
 
@@ -483,16 +483,16 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 				Math::Min((size_t)moduleInst[i]->globaldatasize, r_data.ScriptModules[i].Len));
 	}
 
-	setup_player_character(game.playercharacter);
+	setup_player_character(_GP(game).playercharacter);
 
 	// Save some parameters to restore them after room load
-	int gstimer = play.gscript_timer;
-	int oldx1 = play.mboundx1, oldx2 = play.mboundx2;
-	int oldy1 = play.mboundy1, oldy2 = play.mboundy2;
+	int gstimer = _GP(play).gscript_timer;
+	int oldx1 = _GP(play).mboundx1, oldx2 = _GP(play).mboundx2;
+	int oldy1 = _GP(play).mboundy1, oldy2 = _GP(play).mboundy2;
 
 	// disable the queue momentarily
-	int queuedMusicSize = play.music_queue_size;
-	play.music_queue_size = 0;
+	int queuedMusicSize = _GP(play).music_queue_size;
+	_GP(play).music_queue_size = 0;
 
 	update_polled_stuff_if_runtime();
 
@@ -502,61 +502,61 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 
 	update_polled_stuff_if_runtime();
 
-	play.gscript_timer = gstimer;
+	_GP(play).gscript_timer = gstimer;
 	// restore the correct room volume (they might have modified
 	// it with SetMusicVolume)
-	thisroom.Options.MusicVolume = r_data.RoomVolume;
+	_GP(thisroom).Options.MusicVolume = r_data.RoomVolume;
 
 	Mouse::SetMoveLimit(Rect(oldx1, oldy1, oldx2, oldy2));
 
 	set_cursor_mode(r_data.CursorMode);
 	set_mouse_cursor(r_data.CursorID);
 	if (r_data.CursorMode == MODE_USE)
-		SetActiveInventory(playerchar->activeinv);
+		SetActiveInventory(_G(playerchar)->activeinv);
 	// ensure that the current cursor is locked
-	spriteset.Precache(game.mcurs[r_data.CursorID].pic);
+	spriteset.Precache(_GP(game).mcurs[r_data.CursorID].pic);
 
-	sys_window_set_title(play.game_name);
+	sys_window_set_title(_GP(play).game_name);
 
 	update_polled_stuff_if_runtime();
 
 	if (displayed_room >= 0) {
 		for (int i = 0; i < MAX_ROOM_BGFRAMES; ++i) {
 			if (r_data.RoomBkgScene[i]) {
-				thisroom.BgFrames[i].Graphic = r_data.RoomBkgScene[i];
+				_GP(thisroom).BgFrames[i].Graphic = r_data.RoomBkgScene[i];
 			}
 		}
 
 		in_new_room = 3;  // don't run "enters screen" events
 		// now that room has loaded, copy saved light levels in
 		for (size_t i = 0; i < MAX_ROOM_REGIONS; ++i) {
-			thisroom.Regions[i].Light = r_data.RoomLightLevels[i];
-			thisroom.Regions[i].Tint = r_data.RoomTintLevels[i];
+			_GP(thisroom).Regions[i].Light = r_data.RoomLightLevels[i];
+			_GP(thisroom).Regions[i].Tint = r_data.RoomTintLevels[i];
 		}
 		generate_light_table();
 
 		for (size_t i = 0; i < MAX_WALK_AREAS + 1; ++i) {
-			thisroom.WalkAreas[i].ScalingFar = r_data.RoomZoomLevels1[i];
-			thisroom.WalkAreas[i].ScalingNear = r_data.RoomZoomLevels2[i];
+			_GP(thisroom).WalkAreas[i].ScalingFar = r_data.RoomZoomLevels1[i];
+			_GP(thisroom).WalkAreas[i].ScalingNear = r_data.RoomZoomLevels2[i];
 		}
 
 		on_background_frame_change();
 	}
 
-	gui_disabled_style = convert_gui_disabled_style(game.options[OPT_DISABLEOFF]);
+	gui_disabled_style = convert_gui_disabled_style(_GP(game).options[OPT_DISABLEOFF]);
 
 	// restore the queue now that the music is playing
-	play.music_queue_size = queuedMusicSize;
+	_GP(play).music_queue_size = queuedMusicSize;
 
-	if (play.digital_master_volume >= 0)
-		System_SetVolume(play.digital_master_volume);
+	if (_GP(play).digital_master_volume >= 0)
+		System_SetVolume(_GP(play).digital_master_volume);
 
 	// Run audio clips on channels
 	// these two crossfading parameters have to be temporarily reset
-	const int cf_in_chan = play.crossfading_in_channel;
-	const int cf_out_chan = play.crossfading_out_channel;
-	play.crossfading_in_channel = 0;
-	play.crossfading_out_channel = 0;
+	const int cf_in_chan = _GP(play).crossfading_in_channel;
+	const int cf_out_chan = _GP(play).crossfading_out_channel;
+	_GP(play).crossfading_in_channel = 0;
+	_GP(play).crossfading_out_channel = 0;
 
 	{
 		AudioChannelsLock lock;
@@ -565,11 +565,11 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 			const RestoredData::ChannelInfo &chan_info = r_data.AudioChans[i];
 			if (chan_info.ClipID < 0)
 				continue;
-			if ((size_t)chan_info.ClipID >= game.audioClips.size()) {
+			if ((size_t)chan_info.ClipID >= _GP(game).audioClips.size()) {
 				return new SavegameError(kSvgErr_GameObjectInitFailed,
-					String::FromFormat("Invalid audio clip index: %d (clip count: %u).", chan_info.ClipID, game.audioClips.size()));
+					String::FromFormat("Invalid audio clip index: %d (clip count: %u).", chan_info.ClipID, _GP(game).audioClips.size()));
 			}
-			play_audio_clip_on_channel(i, &game.audioClips[chan_info.ClipID],
+			play_audio_clip_on_channel(i, &_GP(game).audioClips[chan_info.ClipID],
 				chan_info.Priority, chan_info.Repeat, chan_info.Pos);
 
 			auto *ch = lock.GetChannel(i);
@@ -584,9 +584,9 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 			}
 		}
 		if ((cf_in_chan > 0) && (lock.GetChannel(cf_in_chan) != nullptr))
-			play.crossfading_in_channel = cf_in_chan;
+			_GP(play).crossfading_in_channel = cf_in_chan;
 		if ((cf_out_chan > 0) && (lock.GetChannel(cf_out_chan) != nullptr))
-			play.crossfading_out_channel = cf_out_chan;
+			_GP(play).crossfading_out_channel = cf_out_chan;
 
 		// If there were synced audio tracks, the time taken to load in the
 		// different channels will have thrown them out of sync, so re-time it
@@ -607,8 +607,8 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	}
 	update_directional_sound_vol();
 
-	for (int i = 0; i < game.numgui; ++i) {
-		guibg[i] = BitmapHelper::CreateBitmap(_GP(guis)[i].Width, _GP(guis)[i].Height, game.GetColorDepth());
+	for (int i = 0; i < _GP(game).numgui; ++i) {
+		guibg[i] = BitmapHelper::CreateBitmap(_GP(guis)[i].Width, _GP(guis)[i].Height, _GP(game).GetColorDepth());
 		guibg[i] = ReplaceBitmapWithSupportedFormat(guibg[i]);
 	}
 
@@ -618,21 +618,21 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 
 	RestoreViewportsAndCameras(r_data);
 
-	play.ClearIgnoreInput(); // don't keep ignored input after save restore
+	_GP(play).ClearIgnoreInput(); // don't keep ignored input after save restore
 	update_polled_stuff_if_runtime();
 
 	pl_run_plugin_hooks(AGSE_POSTRESTOREGAME, 0);
 
 	if (displayed_room < 0) {
 		// the restart point, no room was loaded
-		load_new_room(playerchar->room, playerchar);
-		playerchar->prevroom = -1;
+		load_new_room(_G(playerchar)->room, _G(playerchar));
+		_G(playerchar)->prevroom = -1;
 
 		first_room_initialization();
 	}
 
-	if ((play.music_queue_size > 0) && (cachedQueuedMusic == nullptr)) {
-		cachedQueuedMusic = load_music_from_disk(play.music_queue[0], 0);
+	if ((_GP(play).music_queue_size > 0) && (cachedQueuedMusic == nullptr)) {
+		cachedQueuedMusic = load_music_from_disk(_GP(play).music_queue[0], 0);
 	}
 
 	// Test if the old-style audio had playing music and it was properly loaded
@@ -681,12 +681,12 @@ void WriteDescription(Stream *out, const String &user_text, const Bitmap *user_i
 	// Enviroment information
 	StrUtil::WriteString("Adventure Game Studio run-time engine", out);
 	StrUtil::WriteString(EngineVersion.LongString, out);
-	StrUtil::WriteString(game.guid, out);
-	StrUtil::WriteString(game.gamename, out);
+	StrUtil::WriteString(_GP(game).guid, out);
+	StrUtil::WriteString(_GP(game).gamename, out);
 	StrUtil::WriteString(ResPaths.GamePak.Name, out);
 	out->WriteInt32(loaded_game_file_version);
-	out->WriteInt32(game.GetColorDepth());
-	out->WriteInt32(game.uniqueid);
+	out->WriteInt32(_GP(game).GetColorDepth());
+	out->WriteInt32(_GP(game).uniqueid);
 	soff_t env_end_pos = out->GetPosition();
 	out->Seek(env_pos, kSeekBegin);
 	out->WriteInt32(env_end_pos - env_pos);
@@ -710,8 +710,8 @@ Stream *StartSavegame(const String &filename, const String &user_text, const Bit
 	vistaHeader.dwThumbnailOffsetHigherDword = 0;
 	vistaHeader.dwThumbnailOffsetLowerDword = 0;
 	vistaHeader.dwThumbnailSize = 0;
-	convert_guid_from_text_to_binary(game.guid, &vistaHeader.guidGameId[0]);
-	uconvert(game.gamename, U_ASCII, (char *)&vistaHeader.szGameName[0], U_UNICODE, RM_MAXLENGTH);
+	convert_guid_from_text_to_binary(_GP(game).guid, &vistaHeader.guidGameId[0]);
+	uconvert(_GP(game).gamename, U_ASCII, (char *)&vistaHeader.szGameName[0], U_UNICODE, RM_MAXLENGTH);
 	uconvert(user_text, U_ASCII, (char *)&vistaHeader.szSaveName[0], U_UNICODE, RM_MAXLENGTH);
 	vistaHeader.szLevelName[0] = 0;
 	vistaHeader.szComments[0] = 0;
@@ -730,9 +730,9 @@ Stream *StartSavegame(const String &filename, const String &user_text, const Bit
 }
 
 void DoBeforeSave() {
-	if (play.cur_music_number >= 0) {
+	if (_GP(play).cur_music_number >= 0) {
 		if (IsMusicPlaying() == 0)
-			play.cur_music_number = -1;
+			_GP(play).cur_music_number = -1;
 	}
 
 	if (displayed_room >= 0) {
@@ -741,8 +741,8 @@ void DoBeforeSave() {
 			save_room_data_segment();
 
 		// Update the saved interaction variable values
-		for (size_t i = 0; i < thisroom.LocalVariables.size() && i < (size_t)MAX_GLOBAL_VARIABLES; ++i)
-			croom->interactionVariableValues[i] = thisroom.LocalVariables[i].Value;
+		for (size_t i = 0; i < _GP(thisroom).LocalVariables.size() && i < (size_t)MAX_GLOBAL_VARIABLES; ++i)
+			croom->interactionVariableValues[i] = _GP(thisroom).LocalVariables[i].Value;
 	}
 }
 

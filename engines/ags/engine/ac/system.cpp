@@ -45,9 +45,9 @@
 #include "ags/shared/#include "ags/shared/space AGS::Engine;
 #include "ags/shared/#include "ags/shared/eSetupStruct game;
 extern GameSetup usetup;
-extern GameState play;
+
 extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
-extern ScriptSystem scsystem;
+
 extern IGraphicsDriver *gfxDriver;
 extern CCAudioChannel ccDynamicAudio;
 extern volatile bool switched_away;
@@ -57,11 +57,11 @@ bool System_HasInputFocus() {
 }
 
 int System_GetColorDepth() {
-	return scsystem.coldepth;
+	return _GP(scsystem).coldepth;
 }
 
 int System_GetOS() {
-	return scsystem.os;
+	return _GP(scsystem).os;
 }
 
 // [IKM] 2014-09-21
@@ -86,19 +86,19 @@ int System_GetOS() {
 // compatibility.
 //
 int System_GetScreenWidth() {
-	return game.GetGameRes().Width;
+	return _GP(game).GetGameRes().Width;
 }
 
 int System_GetScreenHeight() {
-	return game.GetGameRes().Height;
+	return _GP(game).GetGameRes().Height;
 }
 
 int System_GetViewportHeight() {
-	return game_to_data_coord(play.GetMainViewport().GetHeight());
+	return game_to_data_coord(_GP(play).GetMainViewport().GetHeight());
 }
 
 int System_GetViewportWidth() {
-	return game_to_data_coord(play.GetMainViewport().GetWidth());
+	return game_to_data_coord(_GP(play).GetMainViewport().GetWidth());
 }
 
 const char *System_GetVersion() {
@@ -128,20 +128,20 @@ int System_GetScrollLock() {
 }
 
 int System_GetVsync() {
-	return scsystem.vsync;
+	return _GP(scsystem).vsync;
 }
 
 void System_SetVsync(int newValue) {
 	if (ags_stricmp(gfxDriver->GetDriverID(), "D3D9") != 0)
-		scsystem.vsync = newValue;
+		_GP(scsystem).vsync = newValue;
 }
 
 int System_GetWindowed() {
-	return scsystem.windowed;
+	return _GP(scsystem).windowed;
 }
 
 void System_SetWindowed(int windowed) {
-	if (windowed != scsystem.windowed)
+	if (windowed != _GP(scsystem).windowed)
 		engine_try_switch_windowed_gfxmode();
 }
 
@@ -150,16 +150,16 @@ int System_GetSupportsGammaControl() {
 }
 
 int System_GetGamma() {
-	return play.gamma_adjustment;
+	return _GP(play).gamma_adjustment;
 }
 
 void System_SetGamma(int newValue) {
 	if ((newValue < 0) || (newValue > 200))
 		quitprintf("!System.Gamma: value must be between 0-200 (not %d)", newValue);
 
-	if (play.gamma_adjustment != newValue) {
+	if (_GP(play).gamma_adjustment != newValue) {
 		debug_script_log("Gamma control set to %d", newValue);
-		play.gamma_adjustment = newValue;
+		_GP(play).gamma_adjustment = newValue;
 
 		if (gfxDriver->SupportsGammaControl())
 			gfxDriver->SetGamma(newValue);
@@ -178,14 +178,14 @@ ScriptAudioChannel *System_GetAudioChannels(int index) {
 }
 
 int System_GetVolume() {
-	return play.digital_master_volume;
+	return _GP(play).digital_master_volume;
 }
 
 void System_SetVolume(int newvol) {
 	if ((newvol < 0) || (newvol > 100))
 		quit("!System.Volume: invalid volume - must be from 0-100");
 
-	play.digital_master_volume = newvol;
+	_GP(play).digital_master_volume = newvol;
 	auto newvol_f = static_cast<float>(newvol) / 100.0;
 	audio_core_set_master_volume(newvol_f);
 }

@@ -33,16 +33,16 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 extern ExecutingScript *curscript;
-extern GameState play;
+
 
 void sc_invscreen() {
 	curscript->queue_action(ePSAInvScreen, 0, "InventoryScreen");
 }
 
 void SetInvDimensions(int ww, int hh) {
-	play.inv_item_wid = ww;
-	play.inv_item_hit = hh;
-	play.inv_numdisp = 0;
+	_GP(play).inv_item_wid = ww;
+	_GP(play).inv_item_hit = hh;
+	_GP(play).inv_numdisp = 0;
 	// backwards compatibility
 	for (int i = 0; i < numguiinv; i++) {
 		guiinv[i].ItemWidth = ww;

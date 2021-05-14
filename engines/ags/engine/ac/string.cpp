@@ -36,8 +36,8 @@
 
 namespace AGS3 {
 
-extern GameSetupStruct game;
-extern GameState play;
+
+
 extern int longestline;
 extern ScriptString myScriptStringImpl;
 
@@ -230,7 +230,7 @@ DynObjectRef CreateNewScriptStringObj(const char *fromText, bool reAllocate) {
 
 size_t break_up_text_into_lines(const char *todis, SplitLines &lines, int wii, int fonnt, size_t max_lines) {
 	if (fonnt == -1)
-		fonnt = play.normal_font;
+		fonnt = _GP(play).normal_font;
 
 	//  char sofar[100];
 	if (todis[0] == '&') {
@@ -250,7 +250,7 @@ size_t break_up_text_into_lines(const char *todis, SplitLines &lines, int wii, i
 
 	// Right-to-left just means reverse the text then
 	// write it as normal
-	if (game.options[OPT_RIGHTLEFTWRITE])
+	if (_GP(game).options[OPT_RIGHTLEFTWRITE])
 		for (size_t rr = 0; rr < lines.Count(); rr++) {
 			lines[rr].Reverse();
 			line_length = wgettextwidth_compensate(lines[rr], fonnt);
@@ -268,8 +268,8 @@ size_t break_up_text_into_lines(const char *todis, SplitLines &lines, int wii, i
 int MAXSTRLEN = MAX_MAXSTRLEN;
 void check_strlen(char *ptt) {
 	MAXSTRLEN = MAX_MAXSTRLEN;
-	long charstart = (long)&game.chars[0];
-	long charend = charstart + sizeof(CharacterInfo) * game.numcharacters;
+	long charstart = (long)&_GP(game).chars[0];
+	long charend = charstart + sizeof(CharacterInfo) * _GP(game).numcharacters;
 	if (((long)&ptt[0] >= charstart) && ((long)&ptt[0] <= charend))
 		MAXSTRLEN = 30;
 }

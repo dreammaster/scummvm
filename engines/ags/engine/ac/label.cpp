@@ -29,7 +29,7 @@
 
 namespace AGS3 {
 
-extern GameSetupStruct game;
+
 
 // ** LABEL FUNCTIONS
 
@@ -76,7 +76,7 @@ int Label_GetFont(GUILabel *labl) {
 }
 
 void Label_SetFont(GUILabel *guil, int fontnum) {
-	if ((fontnum < 0) || (fontnum >= game.numfonts))
+	if ((fontnum < 0) || (fontnum >= _GP(game).numfonts))
 		quit("!SetLabelFont: invalid font number.");
 
 	if (fontnum != guil->Font) {

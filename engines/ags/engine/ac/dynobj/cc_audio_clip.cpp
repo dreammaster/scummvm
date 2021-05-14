@@ -26,7 +26,7 @@
 
 namespace AGS3 {
 
-extern GameSetupStruct game;
+
 
 const char *CCAudioClip::GetType() {
 	return "AudioClip";
@@ -42,7 +42,7 @@ int CCAudioClip::Serialize(const char *address, char *buffer, int bufsize) {
 void CCAudioClip::Unserialize(int index, const char *serializedData, int dataSize) {
 	StartUnserialize(serializedData, dataSize);
 	int id = UnserializeInt();
-	ccRegisterUnserializedObject(index, &game.audioClips[id], this);
+	ccRegisterUnserializedObject(index, &_GP(game).audioClips[id], this);
 }
 
 } // namespace AGS3

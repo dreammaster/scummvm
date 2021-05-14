@@ -45,7 +45,7 @@
 #include "ags/engine/ac/dynobj/cc_serializer.h"
 #include "ags/shared/game/savegame.h"
 #include "ags/shared/game/savegame_components.h"
-#include "ags/shared/game/savegame_internal.h"
+#include "ags/engine/game/savegame_internal.h"
 #include "ags/shared/gui/animatingguibutton.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/engine/media/audio/audio.h"
@@ -53,7 +53,7 @@
 #include "ags/shared/plugin/plugin_engine.h"
 #include "ags/shared/script/script.h"
 #include "ags/shared/script/cc_error.h"
-#include "ags/shared/util/alignedstream.h"
+#include "ags/shared/util/aligned_stream.h"
 #include "ags/shared/util/string_utils.h"
 
 namespace AGS3 {
@@ -61,8 +61,8 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern GameSetupStruct game;
-extern GameState play;
+
+
 extern ViewStruct *views;
 extern CharacterExtras *charextra;
 extern MoveList *mls;
@@ -97,7 +97,7 @@ static void restore_game_spriteset(Stream *in) {
 	while (sprnum) {
 		unsigned char spriteflag = in->ReadByte();
 		add_dynamic_sprite(sprnum, read_serialized_bitmap(in));
-		game.SpriteInfos[sprnum].Flags = spriteflag;
+		_GP(game).SpriteInfos[sprnum].Flags = spriteflag;
 		sprnum = in->ReadInt32();
 	}
 }
@@ -160,38 +160,38 @@ static void restore_game_room_state(Stream *in) {
 
 static void ReadGameState_Aligned(Stream *in, RestoredData &r_data) {
 	AlignedStream align_s(in, Shared::kAligned_Read);
-	play.ReadFromSavegame(&align_s, kGSSvgVersion_OldFormat, r_data);
+	_GP(play).ReadFromSavegame(&align_s, kGSSvgVersion_OldFormat, r_data);
 }
 
 static void restore_game_play_ex_data(Stream *in) {
 	char rbuffer[200];
-	for (size_t i = 0; i < play.do_once_tokens.size(); ++i) {
+	for (size_t i = 0; i < _GP(play).do_once_tokens.size(); ++i) {
 		StrUtil::ReadCStr(rbuffer, in, sizeof(rbuffer));
-		play.do_once_tokens[i] = rbuffer;
+		_GP(play).do_once_tokens[i] = rbuffer;
 	}
 
-	in->ReadArrayOfInt32(&play.gui_draw_order[0], game.numgui);
+	in->ReadArrayOfInt32(&_GP(play).gui_draw_order[0], _GP(game).numgui);
 }
 
 static void restore_game_play(Stream *in, RestoredData &r_data) {
-	int screenfadedout_was = play.screen_is_faded_out;
-	int roomchanges_was = play.room_changes;
+	int screenfadedout_was = _GP(play).screen_is_faded_out;
+	int roomchanges_was = _GP(play).room_changes;
 	// make sure the pointer is preserved
-	int *gui_draw_order_was = play.gui_draw_order;
+	int *gui_draw_order_was = _GP(play).gui_draw_order;
 
 	ReadGameState_Aligned(in, r_data);
 	r_data.Cameras[0].Flags = r_data.Camera0_Flags;
 
-	play.screen_is_faded_out = screenfadedout_was;
-	play.room_changes = roomchanges_was;
-	play.gui_draw_order = gui_draw_order_was;
+	_GP(play).screen_is_faded_out = screenfadedout_was;
+	_GP(play).room_changes = roomchanges_was;
+	_GP(play).gui_draw_order = gui_draw_order_was;
 
 	restore_game_play_ex_data(in);
 }
 
 static void ReadMoveList_Aligned(Stream *in) {
 	AlignedStream align_s(in, Shared::kAligned_Read);
-	for (int i = 0; i < game.numcharacters + MAX_ROOM_OBJECTS + 1; ++i) {
+	for (int i = 0; i < _GP(game).numcharacters + MAX_ROOM_OBJECTS + 1; ++i) {
 		mls[i].ReadFromFile_Legacy(&align_s);
 
 		align_s.Reset();
@@ -200,12 +200,12 @@ static void ReadMoveList_Aligned(Stream *in) {
 
 static void ReadGameSetupStructBase_Aligned(Stream *in) {
 	AlignedStream align_s(in, Shared::kAligned_Read);
-	game.GameSetupStructBase::ReadFromFile(&align_s);
+	_GP(game).GameSetupStructBase::ReadFromFile(&align_s);
 }
 
 static void ReadCharacterExtras_Aligned(Stream *in) {
 	AlignedStream align_s(in, Shared::kAligned_Read);
-	for (int i = 0; i < game.numcharacters; ++i) {
+	for (int i = 0; i < _GP(game).numcharacters; ++i) {
 		charextra[i].ReadFromFile(&align_s);
 		align_s.Reset();
 	}
@@ -216,7 +216,7 @@ static void restore_game_palette(Stream *in) {
 }
 
 static void restore_game_dialogs(Stream *in) {
-	for (int vv = 0; vv < game.numdialog; vv++)
+	for (int vv = 0; vv < _GP(game).numdialog; vv++)
 		in->ReadArrayOfInt32(&dialog[vv].optionflags[0], MAXTOPICOPTIONS);
 }
 
@@ -240,9 +240,9 @@ static HSaveError restore_game_gui(Stream *in, int numGuisWas) {
 	HError err = GUI::ReadGUI(guis, in, true);
 	if (!err)
 		return new SavegameError(kSvgErr_GameObjectInitFailed, err);
-	game.numgui = guis.size();
+	_GP(game).numgui = guis.size();
 
-	if (numGuisWas != game.numgui) {
+	if (numGuisWas != _GP(game).numgui) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of GUI.");
 	}
 
@@ -252,12 +252,12 @@ static HSaveError restore_game_gui(Stream *in, int numGuisWas) {
 }
 
 static HSaveError restore_game_audiocliptypes(Stream *in) {
-	if (in->ReadInt32() != game.audioClipTypes.size()) {
+	if (in->ReadInt32() != _GP(game).audioClipTypes.size()) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of Audio Clip Types.");
 	}
 
-	for (size_t i = 0; i < game.audioClipTypes.size(); ++i) {
-		game.audioClipTypes[i].ReadFromFile(in);
+	for (size_t i = 0; i < _GP(game).audioClipTypes.size(); ++i) {
+		_GP(game).audioClipTypes[i].ReadFromFile(in);
 	}
 	return HSaveError::None();
 }
@@ -323,7 +323,7 @@ static void restore_game_displayed_room_status(Stream *in, RestoredData &r_data)
 
 		for (bb = 0; bb < MAX_ROOM_BGFRAMES; bb++) {
 			r_data.RoomBkgScene[bb] = nullptr;
-			if (play.raw_modified[bb]) {
+			if (_GP(play).raw_modified[bb]) {
 				r_data.RoomBkgScene[bb].reset(read_serialized_bitmap(in));
 			}
 		}
@@ -355,11 +355,11 @@ static HSaveError restore_game_globalvars(Stream *in) {
 }
 
 static HSaveError restore_game_views(Stream *in) {
-	if (in->ReadInt32() != game.numviews) {
+	if (in->ReadInt32() != _GP(game).numviews) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of Views.");
 	}
 
-	for (int bb = 0; bb < game.numviews; bb++) {
+	for (int bb = 0; bb < _GP(game).numviews; bb++) {
 		for (int cc = 0; cc < views[bb].numLoops; cc++) {
 			for (int dd = 0; dd < views[bb].loops[cc].numFrames; dd++) {
 				views[bb].loops[cc].frames[dd].sound = in->ReadInt32();
@@ -371,7 +371,7 @@ static HSaveError restore_game_views(Stream *in) {
 }
 
 static HSaveError restore_game_audioclips_and_crossfade(Stream *in, RestoredData &r_data) {
-	if (in->ReadInt32() != game.audioClips.size()) {
+	if (in->ReadInt32() != _GP(game).audioClips.size()) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of Audio Clips.");
 	}
 
@@ -380,7 +380,7 @@ static HSaveError restore_game_audioclips_and_crossfade(Stream *in, RestoredData
 		chan_info.Pos = 0;
 		chan_info.ClipID = in->ReadInt32();
 		if (chan_info.ClipID >= 0) {
-			if ((size_t)chan_info.ClipID >= game.audioClips.size()) {
+			if ((size_t)chan_info.ClipID >= _GP(game).audioClips.size()) {
 				return new SavegameError(kSvgErr_GameObjectInitFailed, "Invalid audio clip index.");
 			}
 
@@ -423,42 +423,42 @@ HSaveError restore_game_data(Stream *in, SavegameVersion svg_version, const Pres
 	ReadMoveList_Aligned(in);
 
 	// save pointer members before reading
-	char *gswas = game.globalscript;
-	ccScript *compsc = game.compiled_script;
-	CharacterInfo *chwas = game.chars;
-	WordsDictionary *olddict = game.dict;
+	char *gswas = _GP(game).globalscript;
+	ccScript *compsc = _GP(game).compiled_script;
+	CharacterInfo *chwas = _GP(game).chars;
+	WordsDictionary *olddict = _GP(game).dict;
 	char *mesbk[MAXGLOBALMES];
-	int numchwas = game.numcharacters;
-	for (vv = 0; vv < MAXGLOBALMES; vv++) mesbk[vv] = game.messages[vv];
-	int numdiwas = game.numdialog;
-	int numinvwas = game.numinvitems;
-	int numviewswas = game.numviews;
-	int numGuisWas = game.numgui;
+	int numchwas = _GP(game).numcharacters;
+	for (vv = 0; vv < MAXGLOBALMES; vv++) mesbk[vv] = _GP(game).messages[vv];
+	int numdiwas = _GP(game).numdialog;
+	int numinvwas = _GP(game).numinvitems;
+	int numviewswas = _GP(game).numviews;
+	int numGuisWas = _GP(game).numgui;
 
 	ReadGameSetupStructBase_Aligned(in);
 
 	// Delete unneeded data
 	// TODO: reorganize this (may be solved by optimizing safe format too)
-	delete[] game.load_messages;
-	game.load_messages = nullptr;
+	delete[] _GP(game).load_messages;
+	_GP(game).load_messages = nullptr;
 
-	if (game.numdialog != numdiwas) {
+	if (_GP(game).numdialog != numdiwas) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of Dialogs.");
 	}
-	if (numchwas != game.numcharacters) {
+	if (numchwas != _GP(game).numcharacters) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of Characters.");
 	}
-	if (numinvwas != game.numinvitems) {
+	if (numinvwas != _GP(game).numinvitems) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of Inventory Items.");
 	}
-	if (game.numviews != numviewswas) {
+	if (_GP(game).numviews != numviewswas) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of Views.");
 	}
 
-	game.ReadFromSaveGame_v321(in, gswas, compsc, chwas, olddict, mesbk);
+	_GP(game).ReadFromSaveGame_v321(in, gswas, compsc, chwas, olddict, mesbk);
 
 	// Modified custom properties are read separately to keep existing save format
-	play.ReadCustomProperties_v340(in);
+	_GP(play).ReadCustomProperties_v340(in);
 
 	ReadCharacterExtras_Aligned(in);
 	restore_game_palette(in);

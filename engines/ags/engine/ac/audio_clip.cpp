@@ -30,7 +30,7 @@
 
 namespace AGS3 {
 
-extern GameSetupStruct game;
+
 extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
 extern CCAudioChannel ccDynamicAudio;
 

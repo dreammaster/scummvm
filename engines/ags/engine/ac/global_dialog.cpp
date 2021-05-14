@@ -35,20 +35,20 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameSetupStruct game;
-extern GameState play;
+
+
 extern DialogTopic *dialog;
 
 ScriptPosition last_in_dialog_request_script_pos;
 void RunDialog(int tum) {
-	if ((tum < 0) | (tum >= game.numdialog))
+	if ((tum < 0) | (tum >= _GP(game).numdialog))
 		quit("!RunDialog: invalid topic number specified");
 
 	can_run_delayed_command();
 
-	if (play.stop_dialog_at_end != DIALOG_NONE) {
-		if (play.stop_dialog_at_end == DIALOG_RUNNING)
-			play.stop_dialog_at_end = DIALOG_NEWTOPIC + tum;
+	if (_GP(play).stop_dialog_at_end != DIALOG_NONE) {
+		if (_GP(play).stop_dialog_at_end == DIALOG_RUNNING)
+			_GP(play).stop_dialog_at_end = DIALOG_NEWTOPIC + tum;
 		else
 			quitprintf("!RunDialog: two NewRoom/RunDialog/StopDialog requests within dialog; last was called in \"%s\", line %d",
 				last_in_dialog_request_script_pos.Section.GetCStr(), last_in_dialog_request_script_pos.Line);
@@ -65,17 +65,17 @@ void RunDialog(int tum) {
 
 
 void StopDialog() {
-	if (play.stop_dialog_at_end == DIALOG_NONE) {
+	if (_GP(play).stop_dialog_at_end == DIALOG_NONE) {
 		debug_script_warn("StopDialog called, but was not in a dialog");
 		debug_script_log("StopDialog called but no dialog");
 		return;
 	}
 	get_script_position(last_in_dialog_request_script_pos);
-	play.stop_dialog_at_end = DIALOG_STOP;
+	_GP(play).stop_dialog_at_end = DIALOG_STOP;
 }
 
 void SetDialogOption(int dlg, int opt, int onoroff, bool dlg_script) {
-	if ((dlg < 0) | (dlg >= game.numdialog))
+	if ((dlg < 0) | (dlg >= _GP(game).numdialog))
 		quit("!SetDialogOption: Invalid topic number specified");
 	if ((opt < 1) | (opt > dialog[dlg].numoptions)) {
 		// Pre-3.1.1 games had "dialog scripts" that were written in different language and
@@ -96,7 +96,7 @@ void SetDialogOption(int dlg, int opt, int onoroff, bool dlg_script) {
 }
 
 int GetDialogOption(int dlg, int opt) {
-	if ((dlg < 0) | (dlg >= game.numdialog))
+	if ((dlg < 0) | (dlg >= _GP(game).numdialog))
 		quit("!GetDialogOption: Invalid topic number specified");
 	if ((opt < 1) | (opt > dialog[dlg].numoptions))
 		quit("!GetDialogOption: Invalid option number specified");

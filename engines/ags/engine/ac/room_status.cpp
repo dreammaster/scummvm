@@ -25,9 +25,9 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_version.h"
 #include "ags/engine/ac/room_status.h"
-#include "ags/shared/game/customproperties.h"
+#include "ags/shared/game/custom_properties.h"
 #include "ags/shared/game/savegame_components.h"
-#include "ags/shared/util/alignedstream.h"
+#include "ags/shared/util/aligned_stream.h"
 
 namespace AGS3 {
 

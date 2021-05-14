@@ -34,16 +34,16 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern RoomStruct thisroom;
+
 extern SpriteCache spriteset;
 extern Bitmap *dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
-extern GameState play;
-extern GameSetupStruct game;
+
+
 
 Bitmap *ScriptDrawingSurface::GetBitmapSurface() {
 	// TODO: consider creating weak_ptr here, and store one in the DrawingSurface!
 	if (roomBackgroundNumber >= 0)
-		return thisroom.BgFrames[roomBackgroundNumber].Graphic.get();
+		return _GP(thisroom).BgFrames[roomBackgroundNumber].Graphic.get();
 	else if (dynamicSpriteNumber >= 0)
 		return spriteset[dynamicSpriteNumber];
 	else if (dynamicSurfaceNumber >= 0)
@@ -114,7 +114,7 @@ ScriptDrawingSurface::ScriptDrawingSurface() {
 	dynamicSurfaceNumber = -1;
 	isLinkedBitmapOnly = false;
 	linkedBitmapOnly = nullptr;
-	currentColour = play.raw_color;
+	currentColour = _GP(play).raw_color;
 	currentColourScript = 0;
 	modified = 0;
 	hasAlphaChannel = 0;
@@ -122,7 +122,7 @@ ScriptDrawingSurface::ScriptDrawingSurface() {
 	// NOTE: Normally in contemporary games coordinates ratio will always be 1:1.
 	// But we still support legacy drawing, so have to set this up even for modern games,
 	// otherwise we'd have to complicate conversion conditions further.
-	if (game.IsLegacyHiRes() && game.IsDataInNativeCoordinates()) {
+	if (_GP(game).IsLegacyHiRes() && _GP(game).IsDataInNativeCoordinates()) {
 		highResCoordinates = 1;
 	}
 }

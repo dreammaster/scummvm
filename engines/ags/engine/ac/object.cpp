@@ -53,10 +53,10 @@ using namespace AGS::Shared;
 extern ScriptObject scrObj[MAX_ROOM_OBJECTS];
 extern RoomStatus *croom;
 extern RoomObject *objs;
-extern RoomStruct thisroom;
+
 extern ObjectCache objcache[MAX_ROOM_OBJECTS];
 extern MoveList *mls;
-extern GameSetupStruct game;
+
 extern Bitmap *walkable_areas_temp;
 extern IGraphicsDriver *gfxDriver;
 extern CCObject ccDynamicObject;
@@ -276,15 +276,15 @@ const char *Object_GetName_New(ScriptObject *objj) {
 	if (!is_valid_object(objj->id))
 		quit("!Object.Name: invalid object number");
 
-	return CreateNewScriptString(get_translation(thisroom.Objects[objj->id].Name));
+	return CreateNewScriptString(get_translation(_GP(thisroom).Objects[objj->id].Name));
 }
 
 bool Object_IsInteractionAvailable(ScriptObject *oobj, int mood) {
 
-	play.check_interaction_only = 1;
+	_GP(play).check_interaction_only = 1;
 	RunObjectInteraction(oobj->id, mood);
-	int ciwas = play.check_interaction_only;
-	play.check_interaction_only = 0;
+	int ciwas = _GP(play).check_interaction_only;
+	_GP(play).check_interaction_only = 0;
 	return (ciwas == 2);
 }
 
@@ -405,7 +405,7 @@ void move_object(int objj, int tox, int toy, int spee, int ignwal) {
 	set_route_move_speed(spee, spee);
 	set_color_depth(8);
 	int mslot = find_route(objX, objY, tox, toy, prepare_walkable_areas(-1), objj + 1, 1, ignwal);
-	set_color_depth(game.GetColorDepth());
+	set_color_depth(_GP(game).GetColorDepth());
 	if (mslot > 0) {
 		objs[objj].moving = mslot;
 		mls[mslot].direct = ignwal;
@@ -426,7 +426,7 @@ void Object_GetPropertyText(ScriptObject *objj, const char *property, char *bufe
 }
 
 const char *Object_GetTextProperty(ScriptObject *objj, const char *property) {
-	return get_text_property_dynamic_string(thisroom.Objects[objj->id].Properties, croom->objProps[objj->id], property);
+	return get_text_property_dynamic_string(_GP(thisroom).Objects[objj->id].Properties, croom->objProps[objj->id], property);
 }
 
 bool Object_SetProperty(ScriptObject *objj, const char *property, int value) {
@@ -486,7 +486,7 @@ int is_pos_in_sprite(int xx, int yy, int arx, int ary, Bitmap *sprit, int spww, 
 	if (isposinbox(xx, yy, arx, ary, arx + spww, ary + sphh) == FALSE)
 		return FALSE;
 
-	if (game.options[OPT_PIXPERFECT]) {
+	if (_GP(game).options[OPT_PIXPERFECT]) {
 		// if it's transparent, or off the edge of the sprite, ignore
 		int xpos = data_to_game_coord(xx - arx);
 		int ypos = data_to_game_coord(yy - ary);

@@ -61,10 +61,10 @@ using namespace AGS::Engine;
 
 extern char check_dynamic_sprites_at_exit;
 extern int displayed_room;
-extern RoomStruct thisroom;
+
 extern char pexbuf[STD_BUFFER_SIZE];
 extern volatile char want_exit, abort_engine;
-extern GameSetupStruct game;
+
 
 
 int editor_debugging_enabled = 0;
@@ -245,7 +245,7 @@ void apply_debug_config(const ConfigTree &cfg) {
 		});
 
 	// Init game console if the game was compiled in Debug mode or is run in test mode
-	if (game.options[OPT_DEBUGMODE] != 0 || (debug_flags & DBG_DEBUGMODE) != 0) {
+	if (_GP(game).options[OPT_DEBUGMODE] != 0 || (debug_flags & DBG_DEBUGMODE) != 0) {
 		apply_log_config(cfg, OutputGameConsoleID,
 			/* defaults */
 			true,
@@ -257,7 +257,7 @@ void apply_debug_config(const ConfigTree &cfg) {
 
 	// If the game was compiled in Debug mode *and* there's no regular file log,
 	// then open "warnings.log" for printing script warnings.
-	if (game.options[OPT_DEBUGMODE] != 0 && !DebugLogFile) {
+	if (_GP(game).options[OPT_DEBUGMODE] != 0 && !DebugLogFile) {
 		auto dbgout = create_log_output(OutputFileID, "warnings.log", LogFile::kLogFile_OverwriteAtFirstMessage);
 		if (dbgout)
 			dbgout->SetGroupFilter(kDbgGroup_Game, kDbgMsg_Warn);
@@ -290,7 +290,7 @@ void debug_script_print(const String &msg, MessageType mt) {
 		String scriptname;
 		if (curinst->instanceof == gamescript)
 			scriptname = "G ";
-		else if (curinst->instanceof == thisroom.CompiledScript)
+		else if (curinst->instanceof == _GP(thisroom).CompiledScript)
 			scriptname = "R ";
 		else if (curinst->instanceof == dialogScriptsScript)
 			scriptname = "D ";
@@ -550,7 +550,7 @@ void scriptDebugHook(ccInstance *ccinst, int linenum) {
 int scrlockWasDown = 0;
 
 void check_debug_keys() {
-	if (play.debug_mode) {
+	if (_GP(play).debug_mode) {
 		// do the run-time script debugging
 
 		const Uint8 *ks = SDL_GetKeyboardState(NULL);

@@ -54,7 +54,7 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 
-extern GameSetupStruct game;
+
 extern IGraphicsDriver *gfxDriver;
 extern int psp_video_framedrop;
 
@@ -99,12 +99,12 @@ int fli_callback() {
 
 	update_audio_system_on_game_loop();
 
-	if (game.color_depth > 1) {
+	if (_GP(game).color_depth > 1) {
 		hicol_buf->Blit(fli_buffer, 0, 0, 0, 0, fliwidth, fliheight);
 		usebuf = hicol_buf;
 	}
 
-	const Rect &view = play.GetMainViewport();
+	const Rect &view = _GP(play).GetMainViewport();
 	if (stretch_flc == 0)
 		fli_target->Blit(usebuf, 0, 0, view.GetWidth() / 2 - fliwidth / 2, view.GetHeight() / 2 - fliheight / 2, view.GetWidth(), view.GetHeight());
 	else
@@ -122,9 +122,9 @@ void play_flc_file(int numb, int playflags) {
 
 	// AGS 2.x: If the screen is faded out, fade in again when playing a movie.
 	if (loaded_game_file_version <= kGameVersion_272)
-		play.screen_is_faded_out = 0;
+		_GP(play).screen_is_faded_out = 0;
 
-	if (play.fast_forward)
+	if (_GP(play).fast_forward)
 		return;
 
 	get_palette_range(oldpal, 0, 255);
@@ -160,12 +160,12 @@ void play_flc_file(int numb, int playflags) {
 	fliheight = in->ReadInt16();
 	delete in;
 
-	if (game.color_depth > 1) {
-		hicol_buf = BitmapHelper::CreateBitmap(fliwidth, fliheight, game.GetColorDepth());
+	if (_GP(game).color_depth > 1) {
+		hicol_buf = BitmapHelper::CreateBitmap(fliwidth, fliheight, _GP(game).GetColorDepth());
 		hicol_buf->Clear();
 	}
 	// override the stretch option if necessary
-	const Rect &view = play.GetMainViewport();
+	const Rect &view = _GP(play).GetMainViewport();
 	if ((fliwidth == view.GetWidth()) && (fliheight == view.GetHeight()))
 		stretch_flc = 0;
 	else if ((fliwidth > view.GetWidth()) || (fliheight > view.GetHeight()))
@@ -183,7 +183,7 @@ void play_flc_file(int numb, int playflags) {
 	}
 
 	video_type = kVideoFlic;
-	fli_target = BitmapHelper::CreateBitmap(view.GetWidth(), view.GetHeight(), game.GetColorDepth());
+	fli_target = BitmapHelper::CreateBitmap(view.GetWidth(), view.GetHeight(), _GP(game).GetColorDepth());
 	fli_ddb = gfxDriver->CreateDDBFromBitmap(fli_target, false, true);
 
 	size_t asset_size;
@@ -268,7 +268,7 @@ int theora_playing_callback(BITMAP *theoraBuffer) {
 	gl_TheoraBuffer.WrapAllegroBitmap(theoraBuffer, true);
 
 	int drawAtX = 0, drawAtY = 0;
-	const Rect &viewport = play.GetMainViewport();
+	const Rect &viewport = _GP(play).GetMainViewport();
 	if (fli_ddb == nullptr) {
 		fli_ddb = gfxDriver->CreateDDBFromBitmap(&gl_TheoraBuffer, false, true);
 	}
@@ -330,7 +330,7 @@ APEG_STREAM *get_theora_size(Stream *video_stream, int *width, int *height) {
 
 // TODO: use shared utility function for placing rect in rect
 void calculate_destination_size_maintain_aspect_ratio(int vidWidth, int vidHeight, int *targetWidth, int *targetHeight) {
-	const Rect &viewport = play.GetMainViewport();
+	const Rect &viewport = _GP(play).GetMainViewport();
 	float aspectRatioVideo = (float)vidWidth / (float)vidHeight;
 	float aspectRatioScreen = (float)viewport.GetWidth() / (float)viewport.GetHeight();
 
@@ -350,7 +350,7 @@ void calculate_destination_size_maintain_aspect_ratio(int vidWidth, int vidHeigh
 void play_theora_video(const char *name, int skip, int flags) {
 	std::unique_ptr<Stream> video_stream(AssetMgr->OpenAsset(name));
 	apeg_set_stream_reader(apeg_stream_init, apeg_stream_read, apeg_stream_skip);
-	apeg_set_display_depth(game.GetColorDepth());
+	apeg_set_display_depth(_GP(game).GetColorDepth());
 	// we must disable length detection, otherwise it takes ages to start
 	// playing if the file is large because it seeks through the whole thing
 	apeg_disable_length_detection(TRUE);
@@ -382,7 +382,7 @@ void play_theora_video(const char *name, int skip, int flags) {
 	}
 
 	if ((stretch_flc) && (!gfxDriver->HasAcceleratedTransform())) {
-		fli_target = BitmapHelper::CreateBitmap(play.GetMainViewport().GetWidth(), play.GetMainViewport().GetHeight(), game.GetColorDepth());
+		fli_target = BitmapHelper::CreateBitmap(_GP(play).GetMainViewport().GetWidth(), _GP(play).GetMainViewport().GetHeight(), _GP(game).GetColorDepth());
 		fli_target->Clear();
 		fli_ddb = gfxDriver->CreateDDBFromBitmap(fli_target, false, true);
 	} else {

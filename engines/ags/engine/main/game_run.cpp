@@ -80,15 +80,15 @@ extern int is_text_overlay;
 extern volatile char want_exit, abort_engine;
 extern int proper_exit, our_eip;
 extern int displayed_room, starting_room, in_new_room, new_room_was;
-extern GameSetupStruct game;
-extern RoomStruct thisroom;
+
+
 extern int game_paused;
 extern int getloctype_index;
 extern int in_enters_screen, done_es_error;
 extern int in_leaves_screen;
 extern int inside_script, in_graph_script;
 extern int no_blocking_functions;
-extern CharacterInfo *playerchar;
+
 extern int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
 extern int cur_mode;
 extern RoomObject *objs;
@@ -160,22 +160,22 @@ static void game_loop_do_late_update() {
 }
 
 static int game_loop_check_ground_level_interactions() {
-	if ((play.ground_level_areas_disabled & GLED_INTERACTION) == 0) {
+	if ((_GP(play).ground_level_areas_disabled & GLED_INTERACTION) == 0) {
 		// check if he's standing on a hotspot
-		int hotspotThere = get_hotspot_at(playerchar->x, playerchar->y);
+		int hotspotThere = get_hotspot_at(_G(playerchar)->x, _G(playerchar)->y);
 		// run Stands on Hotspot event
 		setevent(EV_RUNEVBLOCK, EVB_HOTSPOT, hotspotThere, 0);
 
 		// check current region
-		int onRegion = GetRegionIDAtRoom(playerchar->x, playerchar->y);
+		int onRegion = GetRegionIDAtRoom(_G(playerchar)->x, _G(playerchar)->y);
 		int inRoom = displayed_room;
 
-		if (onRegion != play.player_on_region) {
-			// we need to save this and set play.player_on_region
+		if (onRegion != _GP(play).player_on_region) {
+			// we need to save this and set _GP(play).player_on_region
 			// now, so it's correct going into RunRegionInteraction
-			int oldRegion = play.player_on_region;
+			int oldRegion = _GP(play).player_on_region;
 
-			play.player_on_region = onRegion;
+			_GP(play).player_on_region = onRegion;
 			// Walks Off last region
 			if (oldRegion > 0)
 				RunRegionInteraction(oldRegion, 2);
@@ -183,8 +183,8 @@ static int game_loop_check_ground_level_interactions() {
 			if (onRegion > 0)
 				RunRegionInteraction(onRegion, 1);
 		}
-		if (play.player_on_region > 0)   // player stands on region
-			RunRegionInteraction(play.player_on_region, 0);
+		if (_GP(play).player_on_region > 0)   // player stands on region
+			RunRegionInteraction(_GP(play).player_on_region, 0);
 
 		// one of the region interactions sent us to another room
 		if (inRoom != displayed_room) {
@@ -206,12 +206,12 @@ static int game_loop_check_ground_level_interactions() {
 }
 
 static void lock_mouse_on_click() {
-	if (usetup.mouse_auto_lock && scsystem.windowed)
+	if (usetup.mouse_auto_lock && _GP(scsystem).windowed)
 		Mouse::TryLockToWindow();
 }
 
 static void toggle_mouse_lock() {
-	if (scsystem.windowed) {
+	if (_GP(scsystem).windowed) {
 		if (Mouse::IsLockedToWindow())
 			Mouse::UnlockFromWindow();
 		else
@@ -245,11 +245,11 @@ static void check_mouse_controls() {
 
 		check_skip_cutscene_mclick(mbut);
 
-		if (play.fast_forward || play.IsIgnoringInput()) { /* do nothing if skipping cutscene or input disabled */
-		} else if ((play.wait_counter > 0) && (play.key_skip_wait & SKIP_MOUSECLICK) != 0)
-			play.wait_counter = -1;
+		if (_GP(play).fast_forward || _GP(play).IsIgnoringInput()) { /* do nothing if skipping cutscene or input disabled */
+		} else if ((_GP(play).wait_counter > 0) && (_GP(play).key_skip_wait & SKIP_MOUSECLICK) != 0)
+			_GP(play).wait_counter = -1;
 		else if (is_text_overlay > 0) {
-			if (play.cant_skip_speech & SKIP_MOUSECLICK)
+			if (_GP(play).cant_skip_speech & SKIP_MOUSECLICK)
 				remove_screen_overlay(OVER_TEXTMSG);
 		} else if (!IsInterfaceEnabled());  // blocking cutscene, ignore mouse
 		else if (pl_run_plugin_hooks(AGSE_MOUSECLICK, mbut + 1)) {
@@ -352,13 +352,13 @@ bool run_service_key_controls(int &out_key) {
 	}
 
 	// Alt+X, abort (but only once game is loaded)
-	if ((displayed_room >= 0) && (play.abort_key > 0 && agskey == play.abort_key)) {
+	if ((displayed_room >= 0) && (_GP(play).abort_key > 0 && agskey == _GP(play).abort_key)) {
 		check_dynamic_sprites_at_exit = 0;
 		quit("!|");
 	}
 
 	// debug console
-	if ((agskey == '`') && (play.debug_mode > 0)) {
+	if ((agskey == '`') && (_GP(play).debug_mode > 0)) {
 		display_console = !display_console;
 		return false;
 	}
@@ -369,34 +369,34 @@ bool run_service_key_controls(int &out_key) {
 		return false;
 	}
 
-	if ((agskey == eAGSKeyCodeCtrlD) && (play.debug_mode > 0)) {
+	if ((agskey == eAGSKeyCodeCtrlD) && (_GP(play).debug_mode > 0)) {
 		// ctrl+D - show info
 		char infobuf[900];
 		int ff;
 		// MACPORT FIX 9/6/5: added last %s
 		sprintf(infobuf, "In room %d %s[Player at %d, %d (view %d, loop %d, frame %d)%s%s%s",
-			displayed_room, (noWalkBehindsAtAll ? "(has no walk-behinds)" : ""), playerchar->x, playerchar->y,
-			playerchar->view + 1, playerchar->loop, playerchar->frame,
+			displayed_room, (noWalkBehindsAtAll ? "(has no walk-behinds)" : ""), _G(playerchar)->x, _G(playerchar)->y,
+			_G(playerchar)->view + 1, _G(playerchar)->loop, _G(playerchar)->frame,
 			(IsGamePaused() == 0) ? "" : "[Game paused.",
-			(play.ground_level_areas_disabled == 0) ? "" : "[Ground areas disabled.",
+			(_GP(play).ground_level_areas_disabled == 0) ? "" : "[Ground areas disabled.",
 			(IsInterfaceEnabled() == 0) ? "[Game in Wait state" : "");
 		for (ff = 0; ff < croom->numobj; ff++) {
 			if (ff >= 8) break; // buffer not big enough for more than 7
 			sprintf(&infobuf[strlen(infobuf)],
 				"[Object %d: (%d,%d) size (%d x %d) on:%d moving:%s animating:%d slot:%d trnsp:%d clkble:%d",
 				ff, objs[ff].x, objs[ff].y,
-				(spriteset[objs[ff].num] != nullptr) ? game.SpriteInfos[objs[ff].num].Width : 0,
-				(spriteset[objs[ff].num] != nullptr) ? game.SpriteInfos[objs[ff].num].Height : 0,
+				(spriteset[objs[ff].num] != nullptr) ? _GP(game).SpriteInfos[objs[ff].num].Width : 0,
+				(spriteset[objs[ff].num] != nullptr) ? _GP(game).SpriteInfos[objs[ff].num].Height : 0,
 				objs[ff].on,
 				(objs[ff].moving > 0) ? "yes" : "no", objs[ff].cycling,
 				objs[ff].num, objs[ff].transparent,
 				((objs[ff].flags & OBJF_NOINTERACT) != 0) ? 0 : 1);
 		}
 		Display(infobuf);
-		int chd = game.playercharacter;
+		int chd = _GP(game).playercharacter;
 		char bigbuffer[STD_BUFFER_SIZE] = "CHARACTERS IN THIS ROOM:[";
-		for (ff = 0; ff < game.numcharacters; ff++) {
-			if (game.chars[ff].room != displayed_room) continue;
+		for (ff = 0; ff < _GP(game).numcharacters; ff++) {
+			if (_GP(game).chars[ff].room != displayed_room) continue;
 			if (strlen(bigbuffer) > 430) {
 				strcat(bigbuffer, "and more...");
 				Display(bigbuffer);
@@ -405,23 +405,23 @@ bool run_service_key_controls(int &out_key) {
 			chd = ff;
 			sprintf(&bigbuffer[strlen(bigbuffer)],
 				"%s (view/loop/frm:%d,%d,%d  x/y/z:%d,%d,%d  idleview:%d,time:%d,left:%d walk:%d anim:%d follow:%d flags:%X wait:%d zoom:%d)[",
-				game.chars[chd].scrname, game.chars[chd].view + 1, game.chars[chd].loop, game.chars[chd].frame,
-				game.chars[chd].x, game.chars[chd].y, game.chars[chd].z,
-				game.chars[chd].idleview, game.chars[chd].idletime, game.chars[chd].idleleft,
-				game.chars[chd].walking, game.chars[chd].animating, game.chars[chd].following,
-				game.chars[chd].flags, game.chars[chd].wait, charextra[chd].zoom);
+				_GP(game).chars[chd].scrname, _GP(game).chars[chd].view + 1, _GP(game).chars[chd].loop, _GP(game).chars[chd].frame,
+				_GP(game).chars[chd].x, _GP(game).chars[chd].y, _GP(game).chars[chd].z,
+				_GP(game).chars[chd].idleview, _GP(game).chars[chd].idletime, _GP(game).chars[chd].idleleft,
+				_GP(game).chars[chd].walking, _GP(game).chars[chd].animating, _GP(game).chars[chd].following,
+				_GP(game).chars[chd].flags, _GP(game).chars[chd].wait, charextra[chd].zoom);
 		}
 		Display(bigbuffer);
 		return false;
 	}
 
 	if (((agskey == eAGSKeyCodeCtrlV) && (cur_key_mods & KMOD_ALT) != 0)
-		&& (play.wait_counter < 1) && (is_text_overlay == 0) && (restrict_until == 0)) {
+		&& (_GP(play).wait_counter < 1) && (is_text_overlay == 0) && (restrict_until == 0)) {
 		// make sure we can't interrupt a Wait()
 		// and desync the music to cutscene
-		play.debug_mode++;
+		_GP(play).debug_mode++;
 		script_debug(1, 0);
-		play.debug_mode--;
+		_GP(play).debug_mode--;
 		return false;
 	}
 
@@ -450,10 +450,10 @@ static void check_keyboard_controls() {
 	}
 	// Then, check cutscene skip
 	check_skip_cutscene_keypress(kgn);
-	if (play.fast_forward) {
+	if (_GP(play).fast_forward) {
 		return;
 	}
-	if (play.IsIgnoringInput()) {
+	if (_GP(play).IsIgnoringInput()) {
 		return;
 	}
 	// Now check for in-game controls
@@ -464,12 +464,12 @@ static void check_keyboard_controls() {
 	}
 
 	// skip speech if desired by Speech.SkipStyle
-	if ((is_text_overlay > 0) && (play.cant_skip_speech & SKIP_KEYPRESS)) {
+	if ((is_text_overlay > 0) && (_GP(play).cant_skip_speech & SKIP_KEYPRESS)) {
 		// only allow a key to remove the overlay if the icon bar isn't up
 		if (IsGamePaused() == 0) {
 			// check if it requires a specific keypress
-			if ((play.skip_speech_specific_key > 0) &&
-				(kgn != play.skip_speech_specific_key)) {
+			if ((_GP(play).skip_speech_specific_key > 0) &&
+				(kgn != _GP(play).skip_speech_specific_key)) {
 			} else
 				remove_screen_overlay(OVER_TEXTMSG);
 		}
@@ -477,8 +477,8 @@ static void check_keyboard_controls() {
 		return;
 	}
 
-	if ((play.wait_counter > 0) && (play.key_skip_wait & SKIP_KEYPRESS) != 0) {
-		play.wait_counter = -1;
+	if ((_GP(play).wait_counter > 0) && (_GP(play).key_skip_wait & SKIP_KEYPRESS) != 0) {
+		_GP(play).wait_counter = -1;
 		debug_script_log("Keypress code %d ignored - in Wait", kgn);
 		return;
 	}
@@ -497,7 +497,7 @@ static void check_keyboard_controls() {
 	// extended keys (eg. up/down arrow; 256+)
 	if ((((kgn >= 32) && (kgn <= 255) && (kgn != '[')) || (kgn == eAGSKeyCodeReturn) || (kgn == eAGSKeyCodeBackspace))
 		&& !all_buttons_disabled) {
-		for (int guiIndex = 0; guiIndex < game.numgui; guiIndex++) {
+		for (int guiIndex = 0; guiIndex < _GP(game).numgui; guiIndex++) {
 			auto &gui = _GP(guis)[guiIndex];
 
 			if (!gui.IsDisplayed()) continue;
@@ -560,24 +560,24 @@ static void check_room_edges(int numevents_was) {
 		int edgesActivated[4] = { 0, 0, 0, 0 };
 		// Only do it if nothing else has happened (eg. mouseclick)
 		if ((numevents == numevents_was) &&
-			((play.ground_level_areas_disabled & GLED_INTERACTION) == 0)) {
+			((_GP(play).ground_level_areas_disabled & GLED_INTERACTION) == 0)) {
 
-			if (playerchar->x <= thisroom.Edges.Left)
+			if (_G(playerchar)->x <= _GP(thisroom).Edges.Left)
 				edgesActivated[0] = 1;
-			else if (playerchar->x >= thisroom.Edges.Right)
+			else if (_G(playerchar)->x >= _GP(thisroom).Edges.Right)
 				edgesActivated[1] = 1;
-			if (playerchar->y >= thisroom.Edges.Bottom)
+			if (_G(playerchar)->y >= _GP(thisroom).Edges.Bottom)
 				edgesActivated[2] = 1;
-			else if (playerchar->y <= thisroom.Edges.Top)
+			else if (_G(playerchar)->y <= _GP(thisroom).Edges.Top)
 				edgesActivated[3] = 1;
 
-			if ((play.entered_edge >= 0) && (play.entered_edge <= 3)) {
+			if ((_GP(play).entered_edge >= 0) && (_GP(play).entered_edge <= 3)) {
 				// once the player is no longer outside the edge, forget the stored edge
-				if (edgesActivated[play.entered_edge] == 0)
-					play.entered_edge = -10;
+				if (edgesActivated[_GP(play).entered_edge] == 0)
+					_GP(play).entered_edge = -10;
 				// if we are walking in from off-screen, don't activate edges
 				else
-					edgesActivated[play.entered_edge] = 0;
+					edgesActivated[_GP(play).entered_edge] = 0;
 			}
 
 			for (int ii = 0; ii < 4; ii++) {
@@ -621,7 +621,7 @@ static void game_loop_update_animated_buttons() {
 }
 
 static void game_loop_do_render_and_check_mouse(IDriverDependantBitmap *extraBitmap, int extraX, int extraY) {
-	if (!play.fast_forward) {
+	if (!_GP(play).fast_forward) {
 		int mwasatx = mousex, mwasaty = mousey;
 
 		// Only do this if we are not skipping a cutscene
@@ -633,7 +633,7 @@ static void game_loop_do_render_and_check_mouse(IDriverDependantBitmap *extraBit
 		// TODO: if we support rotation then we also need to compare full transform!
 		if (displayed_room < 0)
 			return;
-		auto view = play.GetRoomViewportAt(mousex, mousey);
+		auto view = _GP(play).GetRoomViewportAt(mousex, mousey);
 		auto cam = view ? view->GetCamera() : nullptr;
 		if (cam) {
 			// NOTE: all cameras are in same room right now, so their positions are in same coordinate system;
@@ -676,14 +676,14 @@ static void game_loop_update_events() {
 }
 
 static void game_loop_update_background_animation() {
-	if (play.bg_anim_delay > 0) play.bg_anim_delay--;
-	else if (play.bg_frame_locked);
+	if (_GP(play).bg_anim_delay > 0) _GP(play).bg_anim_delay--;
+	else if (_GP(play).bg_frame_locked);
 	else {
-		play.bg_anim_delay = play.anim_background_speed;
-		play.bg_frame++;
-		if ((size_t)play.bg_frame >= thisroom.BgFrameCount)
-			play.bg_frame = 0;
-		if (thisroom.BgFrameCount >= 2) {
+		_GP(play).bg_anim_delay = _GP(play).anim_background_speed;
+		_GP(play).bg_frame++;
+		if ((size_t)_GP(play).bg_frame >= _GP(thisroom).BgFrameCount)
+			_GP(play).bg_frame = 0;
+		if (_GP(thisroom).BgFrameCount >= 2) {
 			// get the new frame's palette
 			on_background_frame_change();
 		}
@@ -693,8 +693,8 @@ static void game_loop_update_background_animation() {
 static void game_loop_update_loop_counter() {
 	loopcounter++;
 
-	if (play.wait_counter > 0) play.wait_counter--;
-	if (play.shakesc_length > 0) play.shakesc_length--;
+	if (_GP(play).wait_counter > 0) _GP(play).wait_counter--;
+	if (_GP(play).shakesc_length > 0) _GP(play).shakesc_length--;
 
 	if (loopcounter % 5 == 0) {
 		update_ambient_sound_vol();
@@ -748,8 +748,8 @@ void UpdateGameOnce(bool checkControls, IDriverDependantBitmap *extraBitmap, int
 	game_loop_check_problems_at_start();
 
 	// if we're not fading in, don't count the fadeouts
-	if ((play.no_hicolor_fadein) && (game.options[OPT_FADETYPE] == FADE_NORMAL))
-		play.screen_is_faded_out = 0;
+	if ((_GP(play).no_hicolor_fadein) && (_GP(game).options[OPT_FADETYPE] == FADE_NORMAL))
+		_GP(play).screen_is_faded_out = 0;
 
 	our_eip = 1014;
 
@@ -797,7 +797,7 @@ void UpdateGameOnce(bool checkControls, IDriverDependantBitmap *extraBitmap, int
 	game_loop_update_loop_counter();
 
 	// Immediately start the next frame if we are skipping a cutscene
-	if (play.fast_forward)
+	if (_GP(play).fast_forward)
 		return;
 
 	our_eip = 72;
@@ -815,20 +815,20 @@ static void UpdateMouseOverLocation() {
 	char tempo[STD_BUFFER_SIZE];
 	GetLocationName(game_to_data_coord(mousex), game_to_data_coord(mousey), tempo);
 
-	if ((play.get_loc_name_save_cursor >= 0) &&
-		(play.get_loc_name_save_cursor != play.get_loc_name_last_time) &&
+	if ((_GP(play).get_loc_name_save_cursor >= 0) &&
+		(_GP(play).get_loc_name_save_cursor != _GP(play).get_loc_name_last_time) &&
 		(mouse_on_iface < 0) && (ifacepopped < 0)) {
 		// we have saved the cursor, but the mouse location has changed
 		// and it's time to restore it
-		play.get_loc_name_save_cursor = -1;
-		set_cursor_mode(play.restore_cursor_mode_to);
+		_GP(play).get_loc_name_save_cursor = -1;
+		set_cursor_mode(_GP(play).restore_cursor_mode_to);
 
-		if (cur_mode == play.restore_cursor_mode_to) {
+		if (cur_mode == _GP(play).restore_cursor_mode_to) {
 			// make sure it changed -- the new mode might have been disabled
 			// in which case don't change the image
-			set_mouse_cursor(play.restore_cursor_image_to);
+			set_mouse_cursor(_GP(play).restore_cursor_image_to);
 		}
-		debug_script_log("Restore mouse to mode %d cursor %d", play.restore_cursor_mode_to, play.restore_cursor_image_to);
+		debug_script_log("Restore mouse to mode %d cursor %d", _GP(play).restore_cursor_mode_to, _GP(play).restore_cursor_image_to);
 	}
 }
 
@@ -881,7 +881,7 @@ static int UpdateWaitMode() {
 	if (gui_disabled_style != GUIDIS_UNCHANGED) { // If GUI looks change when disabled, then update them all
 		GUI::MarkAllGUIForUpdate();
 	}
-	play.disabled_user_interface--;
+	_GP(play).disabled_user_interface--;
 	user_disabled_for = 0;
 
 	switch (was_disabled_for) {
@@ -919,7 +919,7 @@ static int GameTick() {
 }
 
 static void SetupLoopParameters(int untilwhat, const void *udata) {
-	play.disabled_user_interface++;
+	_GP(play).disabled_user_interface++;
 	if (gui_disabled_style != GUIDIS_UNCHANGED) { // If GUI looks change when disabled, then update them all
 		GUI::MarkAllGUIForUpdate();
 	}
@@ -992,7 +992,7 @@ void GameLoopUntilNoOverlay() {
 
 extern unsigned int load_new_game;
 void RunGameUntilAborted() {
-	// skip ticks to account for time spent starting game.
+	// skip ticks to account for time spent starting _GP(game).
 	skipMissedTicks();
 
 	while (!abort_engine) {

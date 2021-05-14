@@ -53,13 +53,14 @@
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/timer.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameState play;
-extern GameSetupStruct game;
+
+
 extern int longestline;
 extern AGSPlatformDriver *platform;
 extern int loops_per_character;
@@ -79,17 +80,17 @@ struct DisplayVars {
 // allowShrink = 0 for none, 1 for leftwards, 2 for rightwards
 // pass blocking=2 to create permanent overlay
 int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int usingfont, int asspch, int isThought, int allowShrink, bool overlayPositionFixed) {
-	const bool use_speech_textwindow = (asspch < 0) && (game.options[OPT_SPEECHTYPE] >= 2);
-	const bool use_thought_gui = (isThought) && (game.options[OPT_THOUGHTGUI] > 0);
+	const bool use_speech_textwindow = (asspch < 0) && (_GP(game).options[OPT_SPEECHTYPE] >= 2);
+	const bool use_thought_gui = (isThought) && (_GP(game).options[OPT_THOUGHTGUI] > 0);
 
 	bool alphaChannel = false;
 	char todis[STD_BUFFER_SIZE];
 	snprintf(todis, STD_BUFFER_SIZE - 1, "%s", text);
 	int usingGui = -1;
 	if (use_speech_textwindow)
-		usingGui = play.speech_textwindow_gui;
+		usingGui = _GP(play).speech_textwindow_gui;
 	else if (use_thought_gui)
-		usingGui = game.options[OPT_THOUGHTGUI];
+		usingGui = _GP(game).options[OPT_THOUGHTGUI];
 
 	int padding = get_textwindow_padding(usingGui);
 	int paddingScaled = get_fixed_pixel_size(padding);
@@ -103,13 +104,13 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 
 	// AGS 2.x: If the screen is faded out, fade in again when displaying a message box.
 	if (!asspch && (_G(loaded_game_file_version) <= kGameVersion_272))
-		play.screen_is_faded_out = 0;
+		_GP(play).screen_is_faded_out = 0;
 
 	// if it's a normal message box and the game was being skipped,
 	// ensure that the screen is up to date before the message box
 	// is drawn on top of it
 	// TODO: is this really necessary anymore?
-	if ((play.skip_until_char_stops >= 0) && (disp_type == DISPLAYTEXT_MESSAGEBOX))
+	if ((_GP(play).skip_until_char_stops >= 0) && (disp_type == DISPLAYTEXT_MESSAGEBOX))
 		render_graphics();
 
 	EndSkippingUntilCharStops();
@@ -118,7 +119,7 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 		// ensure that the window is wide enough to display
 		// any top bar text
 		int topBarWid = wgettextwidth_compensate(topBar.text, topBar.font);
-		topBarWid += data_to_game_coord(play.top_bar_borderwidth + 2) * 2;
+		topBarWid += data_to_game_coord(_GP(play).top_bar_borderwidth + 2) * 2;
 		if (longestline < topBarWid)
 			longestline = topBarWid;
 		// the top bar should behave like DisplaySpeech wrt blocking
@@ -128,12 +129,12 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 	if (asspch > 0) {
 		// update the all_buttons_disabled variable in advance
 		// of the adjust_x/y_for_guis calls
-		play.disabled_user_interface++;
+		_GP(play).disabled_user_interface++;
 		update_gui_disabled_status();
-		play.disabled_user_interface--;
+		_GP(play).disabled_user_interface--;
 	}
 
-	const Rect &ui_view = play.GetUIViewport();
+	const Rect &ui_view = _GP(play).GetUIViewport();
 	if (xx == OVR_AUTOPLACE);
 	// centre text in middle of screen
 	else if (yy < 0) yy = ui_view.GetHeight() / 2 - disp.fulltxtheight / 2 - padding;
@@ -173,7 +174,7 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 	if (disp_type < DISPLAYTEXT_NORMALOVERLAY)
 		remove_screen_overlay(OVER_TEXTMSG); // remove any previous blocking texts
 
-	Bitmap *text_window_ds = BitmapHelper::CreateTransparentBitmap((wii > 0) ? wii : 2, disp.fulltxtheight + extraHeight, game.GetColorDepth());
+	Bitmap *text_window_ds = BitmapHelper::CreateTransparentBitmap((wii > 0) ? wii : 2, disp.fulltxtheight + extraHeight, _GP(game).GetColorDepth());
 
 	// inform draw_text_window to free the old bitmap
 	const bool wantFreeScreenop = true;
@@ -205,7 +206,7 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 			if (usingGui > 0) {
 				alphaChannel = _GP(guis)[usingGui].HasAlphaChannel();
 			}
-		} else if ((ShouldAntiAliasText()) && (game.GetColorDepth() >= 24))
+		} else if ((ShouldAntiAliasText()) && (_GP(game).GetColorDepth() >= 24))
 			alphaChannel = true;
 
 		for (size_t ee = 0; ee < Lines.Count(); ee++) {
@@ -215,30 +216,30 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 			// centre the text
 			if (asspch < 0) {
 				if ((usingGui >= 0) &&
-					((game.options[OPT_SPEECHTYPE] >= 2) || (isThought)))
+					((_GP(game).options[OPT_SPEECHTYPE] >= 2) || (isThought)))
 					text_color = text_window_ds->GetCompatibleColor(_GP(guis)[usingGui].FgColor);
 				else
 					text_color = text_window_ds->GetCompatibleColor(-asspch);
 
-				wouttext_aligned(text_window_ds, ttxleft, ttyp, oriwid, usingfont, text_color, Lines[ee], play.text_align);
+				wouttext_aligned(text_window_ds, ttxleft, ttyp, oriwid, usingfont, text_color, Lines[ee], _GP(play).text_align);
 			} else {
 				text_color = text_window_ds->GetCompatibleColor(asspch);
 				//wouttext_outline(ttxp,ttyp,usingfont,lines[ee]);
-				wouttext_aligned(text_window_ds, ttxleft, ttyp, wii, usingfont, text_color, Lines[ee], play.speech_text_align);
+				wouttext_aligned(text_window_ds, ttxleft, ttyp, wii, usingfont, text_color, Lines[ee], _GP(play).speech_text_align);
 			}
 		}
 	} else {
 		int xoffs, yoffs, oriwid = wii - padding * 2;
 		draw_text_window_and_bar(&text_window_ds, wantFreeScreenop, &xoffs, &yoffs, &adjustedXX, &adjustedYY, &wii, &text_color);
 
-		if (game.options[OPT_TWCUSTOM] > 0) {
-			alphaChannel = _GP(guis)[game.options[OPT_TWCUSTOM]].HasAlphaChannel();
+		if (_GP(game).options[OPT_TWCUSTOM] > 0) {
+			alphaChannel = _GP(guis)[_GP(game).options[OPT_TWCUSTOM]].HasAlphaChannel();
 		}
 
 		adjust_y_coordinate_for_text(&yoffs, usingfont);
 
 		for (size_t ee = 0; ee < Lines.Count(); ee++)
-			wouttext_aligned(text_window_ds, xoffs, yoffs + ee * disp.linespacing, oriwid, usingfont, text_color, Lines[ee], play.text_align);
+			wouttext_aligned(text_window_ds, xoffs, yoffs + ee * disp.linespacing, oriwid, usingfont, text_color, Lines[ee], _GP(play).text_align);
 	}
 
 	int ovrtype = OVER_TEXTMSG;
@@ -257,16 +258,16 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 	//
 	if (disp_type == DISPLAYTEXT_MESSAGEBOX) {
 		// If fast-forwarding, then skip immediately
-		if (play.fast_forward) {
+		if (_GP(play).fast_forward) {
 			remove_screen_overlay(OVER_TEXTMSG);
-			play.messagetime = -1;
+			_GP(play).messagetime = -1;
 			return 0;
 		}
 
-		if (!play.mouse_cursor_hidden)
+		if (!_GP(play).mouse_cursor_hidden)
 			ags_domouse(DOMOUSE_ENABLE);
 		int countdown = GetTextDisplayTime(todis);
-		int skip_setting = user_to_internal_skip_speech((SkipSpeechStyle)play.skip_display);
+		int skip_setting = user_to_internal_skip_speech((SkipSpeechStyle)_GP(play).skip_display);
 		// Loop until skipped
 		while (true) {
 			sys_evt_process_pending();
@@ -276,32 +277,32 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 			int mbut, mwheelz;
 			if (run_service_mb_controls(mbut, mwheelz) && mbut >= 0) {
 				check_skip_cutscene_mclick(mbut);
-				if (play.fast_forward)
+				if (_GP(play).fast_forward)
 					break;
-				if (skip_setting & SKIP_MOUSECLICK && !play.IsIgnoringInput())
+				if (skip_setting & SKIP_MOUSECLICK && !_GP(play).IsIgnoringInput())
 					break;
 			}
 			int kp;
 			if (run_service_key_controls(kp)) {
 				check_skip_cutscene_keypress(kp);
-				if (play.fast_forward)
+				if (_GP(play).fast_forward)
 					break;
-				if ((skip_setting & SKIP_KEYPRESS) && !play.IsIgnoringInput())
+				if ((skip_setting & SKIP_KEYPRESS) && !_GP(play).IsIgnoringInput())
 					break;
 			}
 
 			update_polled_stuff_if_runtime();
 
-			if (play.fast_forward == 0) {
+			if (_GP(play).fast_forward == 0) {
 				WaitForNextFrame();
 			}
 
 			countdown--;
 
 			// Special behavior when coupled with a voice-over
-			if (play.speech_has_voice) {
+			if (_GP(play).speech_has_voice) {
 				// extend life of text if the voice hasn't finished yet
-				if (channel_is_playing(SCHAN_SPEECH) && (play.fast_forward == 0)) {
+				if (channel_is_playing(SCHAN_SPEECH) && (_GP(play).fast_forward == 0)) {
 					if (countdown <= 1)
 						countdown = 1;
 				} else  // if the voice has finished, remove the speech
@@ -309,26 +310,26 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 			}
 			// Test for the timed auto-skip
 			if ((countdown < 1) && (skip_setting & SKIP_AUTOTIMER)) {
-				play.SetIgnoreInput(play.ignore_user_input_after_text_timeout_ms);
+				_GP(play).SetIgnoreInput(_GP(play).ignore_user_input_after_text_timeout_ms);
 				break;
 			}
 			// if skipping cutscene, don't get stuck on No Auto Remove text boxes
-			if ((countdown < 1) && (play.fast_forward))
+			if ((countdown < 1) && (_GP(play).fast_forward))
 				break;
 		}
-		if (!play.mouse_cursor_hidden)
+		if (!_GP(play).mouse_cursor_hidden)
 			ags_domouse(DOMOUSE_DISABLE);
 		remove_screen_overlay(OVER_TEXTMSG);
 		invalidate_screen();
 	} else {
 		// if the speech does not time out, but we are skipping a cutscene,
 		// allow it to time out
-		if ((play.messagetime < 0) && (play.fast_forward))
-			play.messagetime = 2;
+		if ((_GP(play).messagetime < 0) && (_GP(play).fast_forward))
+			_GP(play).messagetime = 2;
 
 		if (!overlayPositionFixed) {
 			screenover[nse].positionRelativeToScreen = false;
-			VpPoint vpt = play.GetRoomViewport(0)->ScreenToRoom(screenover[nse].x, screenover[nse].y, false);
+			VpPoint vpt = _GP(play).GetRoomViewport(0)->ScreenToRoom(screenover[nse].x, screenover[nse].y, false);
 			screenover[nse].x = vpt.first.X;
 			screenover[nse].y = vpt.first.Y;
 		}
@@ -336,7 +337,7 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 		GameLoopUntilNoOverlay();
 	}
 
-	play.messagetime = -1;
+	_GP(play).messagetime = -1;
 	return 0;
 }
 
@@ -350,7 +351,7 @@ void _display_at(int xx, int yy, int wii, const char *text, int disp_type, int a
 
 	EndSkippingUntilCharStops();
 
-	if (try_auto_play_speech(text, text, play.narrator_speech, true)) {// TODO: is there any need for this flag?
+	if (try_auto_play_speech(text, text, _GP(play).narrator_speech, true)) {// TODO: is there any need for this flag?
 		need_stop_speech = true;
 	}
 	_display_main(xx, yy, wii, text, disp_type, usingfont, asspch, isThought, allowShrink, overlayPositionFixed);
@@ -373,7 +374,7 @@ bool try_auto_play_speech(const char *text, const char *&replace_text, int chari
 	replace_text = src; // skip voice tag
 	if (play_voice_speech(charid, sndid)) {
 		// if Voice Only, then blank out the text
-		if (play.want_speech == 2)
+		if (_GP(play).want_speech == 2)
 			replace_text = "  ";
 		return true;
 	}
@@ -386,7 +387,7 @@ int source_text_length = -1;
 
 int GetTextDisplayLength(const char *text) {
 	int len = (int)strlen(text);
-	if ((text[0] == '&') && (play.unfactor_speech_from_textlength != 0)) {
+	if ((text[0] == '&') && (_GP(play).unfactor_speech_from_textlength != 0)) {
 		// if there's an "&12 text" type line, remove "&12 " from the source length
 		size_t j = 0;
 		while ((text[j] != ' ') && (text[j] != 0))
@@ -402,7 +403,7 @@ int GetTextDisplayTime(const char *text, int canberel) {
 	auto fpstimer = ::lround(get_current_fps());
 
 	// if it's background speech, make it stay relative to game speed
-	if ((canberel == 1) && (play.bgspeech_game_speed == 1))
+	if ((canberel == 1) && (_GP(play).bgspeech_game_speed == 1))
 		fpstimer = 40;
 
 	if (source_text_length >= 0) {
@@ -417,29 +418,29 @@ int GetTextDisplayTime(const char *text, int canberel) {
 	if (uselen <= 0)
 		return 0;
 
-	if (play.text_speed + play.text_speed_modifier <= 0)
-		quit("!Text speed is zero; unable to display text. Check your game.text_speed settings.");
+	if (_GP(play).text_speed + _GP(play).text_speed_modifier <= 0)
+		quit("!Text speed is zero; unable to display text. Check your _GP(game).text_speed settings.");
 
 	// Store how many game loops per character of text
 	// This is calculated using a hard-coded 15 for the text speed,
 	// so that it's always the same no matter how fast the user
 	// can read.
-	loops_per_character = (((uselen / play.lipsync_speed) + 1) * fpstimer) / uselen;
+	loops_per_character = (((uselen / _GP(play).lipsync_speed) + 1) * fpstimer) / uselen;
 
-	int textDisplayTimeInMS = ((uselen / (play.text_speed + play.text_speed_modifier)) + 1) * 1000;
-	if (textDisplayTimeInMS < play.text_min_display_time_ms)
-		textDisplayTimeInMS = play.text_min_display_time_ms;
+	int textDisplayTimeInMS = ((uselen / (_GP(play).text_speed + _GP(play).text_speed_modifier)) + 1) * 1000;
+	if (textDisplayTimeInMS < _GP(play).text_min_display_time_ms)
+		textDisplayTimeInMS = _GP(play).text_min_display_time_ms;
 
 	return (textDisplayTimeInMS * fpstimer) / 1000;
 }
 
 bool ShouldAntiAliasText() {
-	return (game.options[OPT_ANTIALIASFONTS] != 0);
+	return (_GP(game).options[OPT_ANTIALIASFONTS] != 0);
 }
 
 void wouttext_outline(Shared::Bitmap *ds, int xxp, int yyp, int usingfont, color_t text_color, const char *texx) {
 
-	color_t outline_color = ds->GetCompatibleColor(play.speech_text_shadow);
+	color_t outline_color = ds->GetCompatibleColor(_GP(play).speech_text_shadow);
 	if (get_font_outline(usingfont) >= 0) {
 		// MACPORT FIX 9/6/5: cast
 		wouttextxy(ds, xxp, yyp, (int)get_font_outline(usingfont), outline_color, texx);
@@ -530,8 +531,8 @@ void do_corner(Bitmap *ds, int sprn, int x, int y, int offx, int offy) {
 		sprn = 0;
 	}
 
-	x = x + offx * game.SpriteInfos[sprn].Width;
-	y = y + offy * game.SpriteInfos[sprn].Height;
+	x = x + offx * _GP(game).SpriteInfos[sprn].Width;
+	y = y + offy * _GP(game).SpriteInfos[sprn].Height;
 	draw_gui_sprite_v330(ds, sprn, x, y);
 }
 
@@ -566,8 +567,8 @@ void draw_button_background(Bitmap *ds, int xx1, int yy1, int xx2, int yy2, GUIM
 		if (iep->BgColor > 0)
 			ds->FillRect(Rect(xx1, yy1, xx2, yy2), draw_color);
 
-		int leftRightWidth = game.SpriteInfos[get_but_pic(iep, 4)].Width;
-		int topBottomHeight = game.SpriteInfos[get_but_pic(iep, 6)].Height;
+		int leftRightWidth = _GP(game).SpriteInfos[get_but_pic(iep, 4)].Width;
+		int topBottomHeight = _GP(game).SpriteInfos[get_but_pic(iep, 6)].Height;
 		if (iep->BgImage > 0) {
 			if ((_G(loaded_game_file_version) <= kGameVersion_272) // 2.xx
 				&& (spriteset[iep->BgImage]->GetWidth() == 1)
@@ -588,20 +589,20 @@ void draw_button_background(Bitmap *ds, int xx1, int yy1, int xx2, int yy2, GUIM
 					bgoffsy = bgoffsyStart;
 					while (bgoffsy <= bgfinishy) {
 						draw_gui_sprite_v330(ds, iep->BgImage, bgoffsx, bgoffsy);
-						bgoffsy += game.SpriteInfos[iep->BgImage].Height;
+						bgoffsy += _GP(game).SpriteInfos[iep->BgImage].Height;
 					}
-					bgoffsx += game.SpriteInfos[iep->BgImage].Width;
+					bgoffsx += _GP(game).SpriteInfos[iep->BgImage].Width;
 				}
 				// return to normal clipping rectangle
 				ds->SetClip(Rect(0, 0, ds->GetWidth() - 1, ds->GetHeight() - 1));
 			}
 		}
 		int uu;
-		for (uu = yy1; uu <= yy2; uu += game.SpriteInfos[get_but_pic(iep, 4)].Height) {
+		for (uu = yy1; uu <= yy2; uu += _GP(game).SpriteInfos[get_but_pic(iep, 4)].Height) {
 			do_corner(ds, get_but_pic(iep, 4), xx1, uu, -1, 0);   // left side
 			do_corner(ds, get_but_pic(iep, 5), xx2 + 1, uu, 0, 0);  // right side
 		}
-		for (uu = xx1; uu <= xx2; uu += game.SpriteInfos[get_but_pic(iep, 6)].Width) {
+		for (uu = xx1; uu <= xx2; uu += _GP(game).SpriteInfos[get_but_pic(iep, 6)].Width) {
 			do_corner(ds, get_but_pic(iep, 6), uu, yy1, 0, -1);  // top side
 			do_corner(ds, get_but_pic(iep, 7), uu, yy2 + 1, 0, 0); // bottom side
 		}
@@ -621,8 +622,8 @@ int get_textwindow_border_width(int twgui) {
 	if (!_GP(guis)[twgui].IsTextWindow())
 		quit("!GUI set as text window but is not actually a text window GUI");
 
-	int borwid = game.SpriteInfos[get_but_pic(&_GP(guis)[twgui], 4)].Width +
-		game.SpriteInfos[get_but_pic(&_GP(guis)[twgui], 5)].Width;
+	int borwid = _GP(game).SpriteInfos[get_but_pic(&_GP(guis)[twgui], 4)].Width +
+		_GP(game).SpriteInfos[get_but_pic(&_GP(guis)[twgui], 5)].Width;
 
 	return borwid;
 }
@@ -635,7 +636,7 @@ int get_textwindow_top_border_height(int twgui) {
 	if (!_GP(guis)[twgui].IsTextWindow())
 		quit("!GUI set as text window but is not actually a text window GUI");
 
-	return game.SpriteInfos[get_but_pic(&_GP(guis)[twgui], 6)].Height;
+	return _GP(game).SpriteInfos[get_but_pic(&_GP(guis)[twgui], 6)].Height;
 }
 
 // Get the padding for a text window
@@ -644,8 +645,8 @@ int get_textwindow_padding(int ifnum) {
 	int result;
 
 	if (ifnum < 0)
-		ifnum = game.options[OPT_TWCUSTOM];
-	if (ifnum > 0 && ifnum < game.numgui)
+		ifnum = _GP(game).options[OPT_TWCUSTOM];
+	if (ifnum > 0 && ifnum < _GP(game).numgui)
 		result = _GP(guis)[ifnum].Padding;
 	else
 		result = TEXTWINDOW_PADDING_DEFAULT;
@@ -658,7 +659,7 @@ void draw_text_window(Bitmap **text_window_ds, bool should_free_ds,
 
 	Bitmap *ds = *text_window_ds;
 	if (ifnum < 0)
-		ifnum = game.options[OPT_TWCUSTOM];
+		ifnum = _GP(game).options[OPT_TWCUSTOM];
 
 	if (ifnum <= 0) {
 		if (ovrheight)
@@ -669,25 +670,25 @@ void draw_text_window(Bitmap **text_window_ds, bool should_free_ds,
 		xins[0] = 3;
 		yins[0] = 3;
 	} else {
-		if (ifnum >= game.numgui)
-			quitprintf("!Invalid GUI %d specified as text window (total GUIs: %d)", ifnum, game.numgui);
+		if (ifnum >= _GP(game).numgui)
+			quitprintf("!Invalid GUI %d specified as text window (total GUIs: %d)", ifnum, _GP(game).numgui);
 		if (!_GP(guis)[ifnum].IsTextWindow())
 			quit("!GUI set as text window but is not actually a text window GUI");
 
 		int tbnum = get_but_pic(&_GP(guis)[ifnum], 0);
 
 		wii[0] += get_textwindow_border_width(ifnum);
-		xx[0] -= game.SpriteInfos[tbnum].Width;
-		yy[0] -= game.SpriteInfos[tbnum].Height;
+		xx[0] -= _GP(game).SpriteInfos[tbnum].Width;
+		yy[0] -= _GP(game).SpriteInfos[tbnum].Height;
 		if (ovrheight == 0)
 			ovrheight = disp.fulltxtheight;
 
 		if (should_free_ds)
 			delete *text_window_ds;
 		int padding = get_textwindow_padding(ifnum);
-		*text_window_ds = BitmapHelper::CreateTransparentBitmap(wii[0], ovrheight + (padding * 2) + game.SpriteInfos[tbnum].Height * 2, game.GetColorDepth());
+		*text_window_ds = BitmapHelper::CreateTransparentBitmap(wii[0], ovrheight + (padding * 2) + _GP(game).SpriteInfos[tbnum].Height * 2, _GP(game).GetColorDepth());
 		ds = *text_window_ds;
-		int xoffs = game.SpriteInfos[tbnum].Width, yoffs = game.SpriteInfos[tbnum].Height;
+		int xoffs = _GP(game).SpriteInfos[tbnum].Width, yoffs = _GP(game).SpriteInfos[tbnum].Height;
 		draw_button_background(ds, xoffs, yoffs, (ds->GetWidth() - xoffs) - 1, (ds->GetHeight() - yoffs) - 1, &_GP(guis)[ifnum]);
 		if (set_text_color)
 			*set_text_color = ds->GetCompatibleColor(_GP(guis)[ifnum].FgColor);
@@ -705,26 +706,26 @@ void draw_text_window_and_bar(Bitmap **text_window_ds, bool should_free_ds,
 		// top bar on the dialog window with character's name
 		// create an enlarged window, then free the old one
 		Bitmap *ds = *text_window_ds;
-		Bitmap *newScreenop = BitmapHelper::CreateBitmap(ds->GetWidth(), ds->GetHeight() + topBar.height, game.GetColorDepth());
+		Bitmap *newScreenop = BitmapHelper::CreateBitmap(ds->GetWidth(), ds->GetHeight() + topBar.height, _GP(game).GetColorDepth());
 		newScreenop->Blit(ds, 0, 0, 0, topBar.height, ds->GetWidth(), ds->GetHeight());
 		delete *text_window_ds;
 		*text_window_ds = newScreenop;
 		ds = *text_window_ds;
 
 		// draw the top bar
-		color_t draw_color = ds->GetCompatibleColor(play.top_bar_backcolor);
+		color_t draw_color = ds->GetCompatibleColor(_GP(play).top_bar_backcolor);
 		ds->FillRect(Rect(0, 0, ds->GetWidth() - 1, topBar.height - 1), draw_color);
-		if (play.top_bar_backcolor != play.top_bar_bordercolor) {
+		if (_GP(play).top_bar_backcolor != _GP(play).top_bar_bordercolor) {
 			// draw the border
-			draw_color = ds->GetCompatibleColor(play.top_bar_bordercolor);
-			for (int j = 0; j < data_to_game_coord(play.top_bar_borderwidth); j++)
+			draw_color = ds->GetCompatibleColor(_GP(play).top_bar_bordercolor);
+			for (int j = 0; j < data_to_game_coord(_GP(play).top_bar_borderwidth); j++)
 				ds->DrawRect(Rect(j, j, ds->GetWidth() - (j + 1), topBar.height - (j + 1)), draw_color);
 		}
 
 		// draw the text
 		int textx = (ds->GetWidth() / 2) - wgettextwidth_compensate(topBar.text, topBar.font) / 2;
-		color_t text_color = ds->GetCompatibleColor(play.top_bar_textcolor);
-		wouttext_outline(ds, textx, play.top_bar_borderwidth + get_fixed_pixel_size(1), topBar.font, text_color, topBar.text);
+		color_t text_color = ds->GetCompatibleColor(_GP(play).top_bar_textcolor);
+		wouttext_outline(ds, textx, _GP(play).top_bar_borderwidth + get_fixed_pixel_size(1), topBar.font, text_color, topBar.text);
 
 		// don't draw it next time
 		topBar.wantIt = 0;

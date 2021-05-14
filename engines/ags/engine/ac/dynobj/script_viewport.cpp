@@ -61,7 +61,7 @@ ScriptViewport *Viewport_Unserialize(int handle, const char *serializedData, int
 	// script references when Viewport gets removed.
 	const int id = BBOp::Int32FromLE(*((int *)serializedData));
 	if (id >= 0) {
-		auto scview = play.RegisterRoomViewport(id, handle);
+		auto scview = _GP(play).RegisterRoomViewport(id, handle);
 		if (scview)
 			return scview;
 	}

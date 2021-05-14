@@ -46,10 +46,10 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 extern TopBarSettings topBar;
-extern GameState play;
-extern RoomStruct thisroom;
+
+
 extern int display_message_aschar;
-extern GameSetupStruct game;
+
 
 void Display(const char *texx, ...) {
 	char displbuf[STD_BUFFER_SIZE];
@@ -71,26 +71,26 @@ void DisplayTopBar(int ypos, int ttexcol, int backcol, const char *title, const 
 	source_text_length = real_text_sourcelen;
 
 	if (ypos > 0)
-		play.top_bar_ypos = ypos;
+		_GP(play).top_bar_ypos = ypos;
 	if (ttexcol > 0)
-		play.top_bar_textcolor = ttexcol;
+		_GP(play).top_bar_textcolor = ttexcol;
 	if (backcol > 0)
-		play.top_bar_backcolor = backcol;
+		_GP(play).top_bar_backcolor = backcol;
 
 	topBar.wantIt = 1;
 	topBar.font = FONT_NORMAL;
 	topBar.height = getfontheight_outlined(topBar.font);
-	topBar.height += data_to_game_coord(play.top_bar_borderwidth) * 2 + get_fixed_pixel_size(1);
+	topBar.height += data_to_game_coord(_GP(play).top_bar_borderwidth) * 2 + get_fixed_pixel_size(1);
 
 	// they want to customize the font
-	if (play.top_bar_font >= 0)
-		topBar.font = play.top_bar_font;
+	if (_GP(play).top_bar_font >= 0)
+		topBar.font = _GP(play).top_bar_font;
 
 	// DisplaySpeech normally sets this up, but since we're not going via it...
-	if (play.cant_skip_speech & SKIP_AUTOTIMER)
-		play.messagetime = GetTextDisplayTime(text);
+	if (_GP(play).cant_skip_speech & SKIP_AUTOTIMER)
+		_GP(play).messagetime = GetTextDisplayTime(text);
 
-	DisplayAtY(play.top_bar_ypos, text);
+	DisplayAtY(_GP(play).top_bar_ypos, text);
 }
 
 // Display a room/global message in the bar
@@ -123,19 +123,19 @@ void DisplayMessageAtY(int msnum, int ypos) {
 	while (repeatloop) {
 		get_message_text(msnum, msgbufr);
 
-		if (thisroom.MessageInfos[msnum].DisplayAs > 0) {
-			DisplaySpeech(msgbufr, thisroom.MessageInfos[msnum].DisplayAs - 1);
+		if (_GP(thisroom).MessageInfos[msnum].DisplayAs > 0) {
+			DisplaySpeech(msgbufr, _GP(thisroom).MessageInfos[msnum].DisplayAs - 1);
 		} else {
 			// time out automatically if they have set that
-			int oldGameSkipDisp = play.skip_display;
-			if (thisroom.MessageInfos[msnum].Flags & MSG_TIMELIMIT)
-				play.skip_display = 0;
+			int oldGameSkipDisp = _GP(play).skip_display;
+			if (_GP(thisroom).MessageInfos[msnum].Flags & MSG_TIMELIMIT)
+				_GP(play).skip_display = 0;
 
 			DisplayAtY(ypos, msgbufr);
 
-			play.skip_display = oldGameSkipDisp;
+			_GP(play).skip_display = oldGameSkipDisp;
 		}
-		if (thisroom.MessageInfos[msnum].Flags & MSG_DISPLAYNEXT) {
+		if (_GP(thisroom).MessageInfos[msnum].Flags & MSG_DISPLAYNEXT) {
 			msnum++;
 			repeatloop = 1;
 		} else
@@ -152,13 +152,13 @@ void DisplayAt(int xxp, int yyp, int widd, const char *text) {
 	data_to_game_coords(&xxp, &yyp);
 	widd = data_to_game_coord(widd);
 
-	if (widd < 1) widd = play.GetUIViewport().GetWidth() / 2;
-	if (xxp < 0) xxp = play.GetUIViewport().GetWidth() / 2 - widd / 2;
+	if (widd < 1) widd = _GP(play).GetUIViewport().GetWidth() / 2;
+	if (xxp < 0) xxp = _GP(play).GetUIViewport().GetWidth() / 2 - widd / 2;
 	_display_at(xxp, yyp, widd, text, DISPLAYTEXT_MESSAGEBOX, 0, 0, 0, false);
 }
 
 void DisplayAtY(int ypos, const char *texx) {
-	const Rect &ui_view = play.GetUIViewport();
+	const Rect &ui_view = _GP(play).GetUIViewport();
 	if ((ypos < -1) || (ypos >= ui_view.GetHeight()))
 		quitprintf("!DisplayAtY: invalid Y co-ordinate supplied (used: %d; valid: 0..%d)", ypos, ui_view.GetHeight());
 
@@ -169,16 +169,16 @@ void DisplayAtY(int ypos, const char *texx) {
 	if (ypos > 0)
 		ypos = data_to_game_coord(ypos);
 
-	if (game.options[OPT_ALWAYSSPCH])
-		DisplaySpeechAt(-1, (ypos > 0) ? game_to_data_coord(ypos) : ypos, -1, game.playercharacter, texx);
+	if (_GP(game).options[OPT_ALWAYSSPCH])
+		DisplaySpeechAt(-1, (ypos > 0) ? game_to_data_coord(ypos) : ypos, -1, _GP(game).playercharacter, texx);
 	else {
 		// Normal "Display" in text box
 
 		if (is_screen_dirty()) {
 			// erase any previous DisplaySpeech
-			play.disabled_user_interface++;
+			_GP(play).disabled_user_interface++;
 			UpdateGameOnce();
-			play.disabled_user_interface--;
+			_GP(play).disabled_user_interface--;
 		}
 
 		_display_at(-1, ypos, ui_view.GetWidth() / 2 + ui_view.GetWidth() / 4,
@@ -189,7 +189,7 @@ void DisplayAtY(int ypos, const char *texx) {
 void SetSpeechStyle(int newstyle) {
 	if ((newstyle < 0) || (newstyle > 3))
 		quit("!SetSpeechStyle: must use a SPEECH_* constant as parameter");
-	game.options[OPT_SPEECHTYPE] = newstyle;
+	_GP(game).options[OPT_SPEECHTYPE] = newstyle;
 }
 
 void SetSkipSpeech(SkipSpeechStyle newval) {
@@ -197,11 +197,11 @@ void SetSkipSpeech(SkipSpeechStyle newval) {
 		quit("!SetSkipSpeech: invalid skip mode specified");
 
 	debug_script_log("SkipSpeech style set to %d", newval);
-	play.cant_skip_speech = user_to_internal_skip_speech((SkipSpeechStyle)newval);
+	_GP(play).cant_skip_speech = user_to_internal_skip_speech((SkipSpeechStyle)newval);
 }
 
 SkipSpeechStyle GetSkipSpeech() {
-	return internal_skip_speech_to_user(play.cant_skip_speech);
+	return internal_skip_speech_to_user(_GP(play).cant_skip_speech);
 }
 
 } // namespace AGS3

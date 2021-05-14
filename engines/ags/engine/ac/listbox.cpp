@@ -39,8 +39,8 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameState play;
-extern GameSetupStruct game;
+
+
 
 // *** LIST BOX FUNCTIONS
 
@@ -111,7 +111,7 @@ int ListBox_FillSaveGameList(GUIListBox *listbox) {
 
 	// update the global savegameindex[] array for backward compatibilty
 	for (size_t n = 0; n < saves.size(); ++n) {
-		play.filenumbers[n] = saves[n].Slot;
+		_GP(play).filenumbers[n] = saves[n].Slot;
 	}
 
 	listbox->SetSvgIndex(true);
@@ -178,7 +178,7 @@ int ListBox_GetFont(GUIListBox *listbox) {
 
 void ListBox_SetFont(GUIListBox *listbox, int newfont) {
 
-	if ((newfont < 0) || (newfont >= game.numfonts))
+	if ((newfont < 0) || (newfont >= _GP(game).numfonts))
 		quit("!ListBox.Font: invalid font number.");
 
 	if (newfont != listbox->Font) {
@@ -325,7 +325,7 @@ void ListBox_ScrollUp(GUIListBox *listbox) {
 
 
 GUIListBox *is_valid_listbox(int guin, int objn) {
-	if ((guin < 0) | (guin >= game.numgui)) quit("!ListBox: invalid GUI number");
+	if ((guin < 0) | (guin >= _GP(game).numgui)) quit("!ListBox: invalid GUI number");
 	if ((objn < 0) | (objn >= _GP(guis)[guin].GetControlCount())) quit("!ListBox: invalid object number");
 	if (_GP(guis)[guin].GetControlType(objn) != kGUIListBox)
 		quit("!ListBox: specified control is not a list box");

@@ -44,7 +44,7 @@ using namespace AGS::Engine;
 
 extern IGraphicsDriver *gfxDriver;
 extern GameSetup usetup;
-extern GameSetupStruct game;
+
 
 namespace {
 
@@ -85,7 +85,7 @@ Bitmap *prepare_gui_screen(int x, int y, int width, int height, bool opaque) {
 	if (windowBuffer) {
 		windowBuffer = recycle_bitmap(windowBuffer, windowBuffer->GetColorDepth(), windowPosWidth, windowPosHeight, !opaque);
 	} else {
-		windowBuffer = BitmapHelper::CreateBitmap(windowPosWidth, windowPosHeight, game.GetColorDepth());
+		windowBuffer = BitmapHelper::CreateBitmap(windowPosWidth, windowPosHeight, _GP(game).GetColorDepth());
 		windowBuffer = ReplaceBitmapWithSupportedFormat(windowBuffer);
 	}
 	dialogDDB = recycle_ddb_bitmap(dialogDDB, windowBuffer, false, opaque);

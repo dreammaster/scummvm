@@ -49,11 +49,11 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern GameSetupStruct game;
+
 extern GameSetup usetup;
 extern SpriteCache spriteset;
 extern int force_window;
-extern GameState play;
+
 
 // Filename of the default config file, the one found in the game installation
 const String DefaultConfigFileName = "acsetup.cfg";
@@ -184,7 +184,7 @@ int convert_fp_to_scaling(uint32_t scaling) {
 void graphics_mode_get_defaults(bool windowed, ScreenSizeSetup &scsz_setup, GameFrameSetup &frame_setup) {
 	scsz_setup.Size = Size();
 	if (windowed) {
-		// For the windowed we define mode by the scaled game.
+		// For the windowed we define mode by the scaled _GP(game).
 		scsz_setup.SizeDef = kScreenDef_ByGameScaling;
 		scsz_setup.MatchDeviceRatio = false;
 		frame_setup = usetup.Screen.WinGameFrame;
@@ -462,7 +462,7 @@ void save_config_file() {
 	}
 
 	// Other game options that could be changed at runtime
-	if (game.options[OPT_RENDERATSCREENRES] == kRenderAtScreenRes_UserDefined)
+	if (_GP(game).options[OPT_RENDERATSCREENRES] == kRenderAtScreenRes_UserDefined)
 		cfg["graphics"]["render_at_screenres"] = String::FromFormat("%d", usetup.RenderAtScreenRes ? 1 : 0);
 	cfg["mouse"]["control_enabled"] = String::FromFormat("%d", usetup.mouse_ctrl_enabled ? 1 : 0);
 	cfg["mouse"]["speed"] = String::FromFormat("%f", Mouse::GetSpeed());

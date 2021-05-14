@@ -50,7 +50,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 extern GameSetup usetup;
-extern GameSetupStruct game;
+
 extern AGSPlatformDriver *platform;
 
 extern int MAXSTRLEN;
@@ -271,7 +271,7 @@ FSLocation GetGameUserConfigDir() {
 		return FSLocation(ResPaths.DataDir);
 	// For absolute dir, we assume it's a special directory prepared for AGS engine
 	// and therefore amend it with a game own subdir
-	return FSLocation(dir, Path::ConcatPaths(dir, game.saveGameFolderName));
+	return FSLocation(dir, Path::ConcatPaths(dir, _GP(game).saveGameFolderName));
 }
 
 // A helper function that deduces a data directory either using default system location,
@@ -284,7 +284,7 @@ static FSLocation MakeGameDataDir(const String &default_dir, const String &user_
 			return FSLocation(ResPaths.DataDir, Path::ConcatPaths(ResPaths.DataDir, dir));
 		// For absolute dir, we assume it's a special directory prepared for AGS engine
 		// and therefore amend it with a game own subdir
-		return FSLocation(dir, Path::ConcatPaths(dir, game.saveGameFolderName));
+		return FSLocation(dir, Path::ConcatPaths(dir, _GP(game).saveGameFolderName));
 	}
 	// If this location is set up by user config, then use it as is (resolving relative path if necessary)
 	String dir = user_option;
@@ -364,7 +364,7 @@ bool ResolveScriptPath(const String &orig_sc_path, bool read_only, ResolvedPath 
 
 		// For games made in the safe-path-aware versions of AGS, report a warning
 		// if the unsafe path is used for write operation
-		if (!read_only && game.options[OPT_SAFEFILEPATHS]) {
+		if (!read_only && _GP(game).options[OPT_SAFEFILEPATHS]) {
 			debug_script_warn("Attempt to access file '%s' denied (cannot write to game installation directory);\nPath will be remapped to the app data directory: '%s'",
 				sc_path.GetCStr(), parent_dir.FullDir.GetCStr());
 		}

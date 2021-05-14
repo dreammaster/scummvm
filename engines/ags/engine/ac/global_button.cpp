@@ -32,11 +32,11 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameSetupStruct game;
+
 
 void SetButtonText(int guin, int objn, const char *newtx) {
 	VALIDATE_STRING(newtx);
-	if ((guin < 0) | (guin >= game.numgui))
+	if ((guin < 0) | (guin >= _GP(game).numgui))
 		quit("!SetButtonText: invalid GUI number");
 	if ((objn < 0) | (objn >= _GP(guis)[guin].GetControlCount()))
 		quit("!SetButtonText: invalid object number");
@@ -49,7 +49,7 @@ void SetButtonText(int guin, int objn, const char *newtx) {
 
 
 void AnimateButton(int guin, int objn, int view, int loop, int speed, int repeat) {
-	if ((guin < 0) | (guin >= game.numgui)) quit("!AnimateButton: invalid GUI number");
+	if ((guin < 0) | (guin >= _GP(game).numgui)) quit("!AnimateButton: invalid GUI number");
 	if ((objn < 0) | (objn >= _GP(guis)[guin].GetControlCount())) quit("!AnimateButton: invalid object number");
 	if (_GP(guis)[guin].GetControlType(objn) != kGUIButton)
 		quit("!AnimateButton: specified control is not a button");
@@ -59,7 +59,7 @@ void AnimateButton(int guin, int objn, int view, int loop, int speed, int repeat
 
 
 int GetButtonPic(int guin, int objn, int ptype) {
-	if ((guin < 0) | (guin >= game.numgui)) quit("!GetButtonPic: invalid GUI number");
+	if ((guin < 0) | (guin >= _GP(game).numgui)) quit("!GetButtonPic: invalid GUI number");
 	if ((objn < 0) | (objn >= _GP(guis)[guin].GetControlCount())) quit("!GetButtonPic: invalid object number");
 	if (_GP(guis)[guin].GetControlType(objn) != kGUIButton)
 		quit("!GetButtonPic: specified control is not a button");
@@ -86,7 +86,7 @@ int GetButtonPic(int guin, int objn, int ptype) {
 }
 
 void SetButtonPic(int guin, int objn, int ptype, int slotn) {
-	if ((guin < 0) | (guin >= game.numgui)) quit("!SetButtonPic: invalid GUI number");
+	if ((guin < 0) | (guin >= _GP(game).numgui)) quit("!SetButtonPic: invalid GUI number");
 	if ((objn < 0) | (objn >= _GP(guis)[guin].GetControlCount())) quit("!SetButtonPic: invalid object number");
 	if (_GP(guis)[guin].GetControlType(objn) != kGUIButton)
 		quit("!SetButtonPic: specified control is not a button");

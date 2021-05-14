@@ -58,7 +58,7 @@
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/device/mousew32.h"
+#include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/gfx/gfx_util.h"
@@ -103,8 +103,8 @@ using namespace AGS::Engine;
 extern IGraphicsDriver *gfxDriver;
 extern int mousex, mousey;
 extern int displayed_room;
-extern RoomStruct thisroom;
-extern GameSetupStruct game;
+
+
 extern RoomStatus *croom;
 extern SpriteCache spriteset;
 extern ViewStruct *views;
@@ -247,11 +247,11 @@ void IAGSEngine::DrawText(int32 x, int32 y, int32 font, int32 color, char *text)
 
 void IAGSEngine::GetScreenDimensions(int32 *width, int32 *height, int32 *coldepth) {
 	if (width != nullptr)
-		width[0] = play.GetMainViewport().GetWidth();
+		width[0] = _GP(play).GetMainViewport().GetWidth();
 	if (height != nullptr)
-		height[0] = play.GetMainViewport().GetHeight();
+		height[0] = _GP(play).GetMainViewport().GetHeight();
 	if (coldepth != nullptr)
-		coldepth[0] = scsystem.coldepth;
+		coldepth[0] = _GP(scsystem).coldepth;
 }
 
 unsigned char **IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
@@ -280,13 +280,13 @@ int IAGSEngine::GetCurrentRoom() {
 	return displayed_room;
 }
 int IAGSEngine::GetNumBackgrounds() {
-	return thisroom.BgFrameCount;
+	return _GP(thisroom).BgFrameCount;
 }
 int IAGSEngine::GetCurrentBackground() {
-	return play.bg_frame;
+	return _GP(play).bg_frame;
 }
 BITMAP *IAGSEngine::GetBackgroundScene(int32 index) {
-	return (BITMAP *)thisroom.BgFrames[index].Graphic->GetAllegroBitmap();
+	return (BITMAP *)_GP(thisroom).BgFrames[index].Graphic->GetAllegroBitmap();
 }
 void IAGSEngine::GetBitmapDimensions(BITMAP *bmp, int32 *width, int32 *height, int32 *coldepth) {
 	if (bmp == nullptr)
@@ -406,19 +406,19 @@ void IAGSEngine::PollSystem() {
 	domouse(DOMOUSE_NOCURSOR);
 	update_polled_stuff_if_runtime();
 	int mbut, mwheelz;
-	if (run_service_mb_controls(mbut, mwheelz) && mbut >= 0 && !play.IsIgnoringInput())
+	if (run_service_mb_controls(mbut, mwheelz) && mbut >= 0 && !_GP(play).IsIgnoringInput())
 		pl_run_plugin_hooks(AGSE_MOUSECLICK, mbut);
 	int kp;
-	if (run_service_key_controls(kp) && !play.IsIgnoringInput()) {
+	if (run_service_key_controls(kp) && !_GP(play).IsIgnoringInput()) {
 		pl_run_plugin_hooks(AGSE_KEYPRESS, kp);
 	}
 
 }
 AGSCharacter *IAGSEngine::GetCharacter(int32 charnum) {
-	if (charnum >= game.numcharacters)
+	if (charnum >= _GP(game).numcharacters)
 		quit("!AGSEngine::GetCharacter: invalid character request");
 
-	return (AGSCharacter *)&game.chars[charnum];
+	return (AGSCharacter *)&_GP(game).chars[charnum];
 }
 AGSGameOptions *IAGSEngine::GetGameOptions() {
 	return (AGSGameOptions *)&play;
@@ -430,13 +430,13 @@ void IAGSEngine::SetPalette(int32 start, int32 finish, AGSColor *cpl) {
 	set_palette_range((RGB *)cpl, start, finish, 0);
 }
 int IAGSEngine::GetNumCharacters() {
-	return game.numcharacters;
+	return _GP(game).numcharacters;
 }
 int IAGSEngine::GetPlayerCharacter() {
-	return game.playercharacter;
+	return _GP(game).playercharacter;
 }
 void IAGSEngine::RoomToViewport(int32 *x, int32 *y) {
-	Point scrp = play.RoomToScreen(x ? data_to_game_coord(*x) : 0, y ? data_to_game_coord(*y) : 0);
+	Point scrp = _GP(play).RoomToScreen(x ? data_to_game_coord(*x) : 0, y ? data_to_game_coord(*y) : 0);
 	if (x)
 		*x = scrp.X;
 	if (y)
@@ -446,7 +446,7 @@ void IAGSEngine::ViewportToRoom(int32 *x, int32 *y) {
 	// NOTE: This is an old function that did not account for custom/multiple viewports
 	// and does not expect to fail, therefore we always use primary viewport here.
 	// (Not sure if it's good though)
-	VpPoint vpt = play.ScreenToRoom(x ? game_to_data_coord(*x) : 0, y ? game_to_data_coord(*y) : 0);
+	VpPoint vpt = _GP(play).ScreenToRoom(x ? game_to_data_coord(*x) : 0, y ? game_to_data_coord(*y) : 0);
 	if (x)
 		*x = vpt.first.X;
 	if (y)
@@ -478,20 +478,20 @@ BITMAP *IAGSEngine::GetSpriteGraphic(int32 num) {
 }
 BITMAP *IAGSEngine::GetRoomMask(int32 index) {
 	if (index == MASK_WALKABLE)
-		return (BITMAP *)thisroom.WalkAreaMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(thisroom).WalkAreaMask->GetAllegroBitmap();
 	else if (index == MASK_WALKBEHIND)
-		return (BITMAP *)thisroom.WalkBehindMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(thisroom).WalkBehindMask->GetAllegroBitmap();
 	else if (index == MASK_HOTSPOT)
-		return (BITMAP *)thisroom.HotspotMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(thisroom).HotspotMask->GetAllegroBitmap();
 	else if (index == MASK_REGIONS)
-		return (BITMAP *)thisroom.RegionMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(thisroom).RegionMask->GetAllegroBitmap();
 	else
 		quit("!IAGSEngine::GetRoomMask: invalid mask requested");
 	return nullptr;
 }
 AGSViewFrame *IAGSEngine::GetViewFrame(int32 view, int32 loop, int32 frame) {
 	view--;
-	if ((view < 0) || (view >= game.numviews))
+	if ((view < 0) || (view >= _GP(game).numviews))
 		quit("!IAGSEngine::GetViewFrame: invalid view");
 	if ((loop < 0) || (loop >= views[view].numLoops))
 		quit("!IAGSEngine::GetViewFrame: invalid loop");
@@ -506,7 +506,7 @@ int IAGSEngine::GetRawPixelColor(int32 color) {
 	// NOTE: it is unclear whether this has to be game colour depth or display color depth.
 	// there was no difference in the original engine, but there is now.
 	int result;
-	__my_setcolor(&result, color, game.GetColorDepth());
+	__my_setcolor(&result, color, _GP(game).GetColorDepth());
 	return result;
 }
 
@@ -529,13 +529,13 @@ int IAGSEngine::IsGamePaused() {
 	return game_paused;
 }
 int IAGSEngine::GetSpriteWidth(int32 slot) {
-	return game.SpriteInfos[slot].Width;
+	return _GP(game).SpriteInfos[slot].Width;
 }
 int IAGSEngine::GetSpriteHeight(int32 slot) {
-	return game.SpriteInfos[slot].Height;
+	return _GP(game).SpriteInfos[slot].Height;
 }
 void IAGSEngine::GetTextExtent(int32 font, const char *text, int32 *width, int32 *height) {
-	if ((font < 0) || (font >= game.numfonts)) {
+	if ((font < 0) || (font >= _GP(game).numfonts)) {
 		if (width != nullptr) width[0] = 0;
 		if (height != nullptr) height[0] = 0;
 		return;
@@ -556,7 +556,7 @@ void IAGSEngine::PlaySoundChannel(int32 channel, int32 soundType, int32 volume, 
 	stop_and_destroy_channel(channel);
 	// Not sure if it's right to let it play on *any* channel, but this is plugin so let it go...
 	// we must correctly stop background voice speech if it takes over speech chan
-	if (channel == SCHAN_SPEECH && play.IsNonBlockingVoiceSpeech())
+	if (channel == SCHAN_SPEECH && _GP(play).IsNonBlockingVoiceSpeech())
 		stop_voice_nonblocking();
 
 	SOUNDCLIP *newcha = nullptr;
@@ -579,7 +579,7 @@ void IAGSEngine::PlaySoundChannel(int32 channel, int32 soundType, int32 volume, 
 	else if (soundType == PSND_OGGSTATIC)
 		newcha = my_load_static_ogg(asset_name, volume, (loop != 0));
 	else if (soundType == PSND_MIDI) {
-		if (play.silent_midi != 0 || current_music_type == MUS_MIDI)
+		if (_GP(play).silent_midi != 0 || current_music_type == MUS_MIDI)
 			quit("!IAGSEngine::PlaySoundChannel: MIDI already in use");
 		newcha = my_load_midi(asset_name, loop);
 		newcha->set_volume(volume);
@@ -597,10 +597,10 @@ void IAGSEngine::MarkRegionDirty(int32 left, int32 top, int32 right, int32 botto
 	plugins[this->pluginId].invalidatedRegion++;
 }
 AGSMouseCursor *IAGSEngine::GetMouseCursor(int32 cursor) {
-	if ((cursor < 0) || (cursor >= game.numcursors))
+	if ((cursor < 0) || (cursor >= _GP(game).numcursors))
 		return nullptr;
 
-	return (AGSMouseCursor *)&game.mcurs[cursor];
+	return (AGSMouseCursor *)&_GP(game).mcurs[cursor];
 }
 void IAGSEngine::GetRawColorComponents(int32 coldepth, int32 color, int32 *red, int32 *green, int32 *blue, int32 *alpha) {
 	if (red)
@@ -616,7 +616,7 @@ int IAGSEngine::MakeRawColorPixel(int32 coldepth, int32 red, int32 green, int32 
 	return makeacol_depth(coldepth, red, green, blue, alpha);
 }
 int IAGSEngine::GetFontType(int32 fontNum) {
-	if ((fontNum < 0) || (fontNum >= game.numfonts))
+	if ((fontNum < 0) || (fontNum >= _GP(game).numfonts))
 		return FNT_INVALID;
 
 	if (font_supports_extended_characters(fontNum))
@@ -649,7 +649,7 @@ void IAGSEngine::DeleteDynamicSprite(int32 slot) {
 	free_dynamic_sprite(slot);
 }
 int IAGSEngine::IsSpriteAlphaBlended(int32 slot) {
-	if (game.SpriteInfos[slot].Flags & SPF_ALPHACHANNEL)
+	if (_GP(game).SpriteInfos[slot].Flags & SPF_ALPHACHANNEL)
 		return 1;
 	return 0;
 }
@@ -684,10 +684,10 @@ void IAGSEngine::NotifySpriteUpdated(int32 slot) {
 
 void IAGSEngine::SetSpriteAlphaBlended(int32 slot, int32 isAlphaBlended) {
 
-	game.SpriteInfos[slot].Flags &= ~SPF_ALPHACHANNEL;
+	_GP(game).SpriteInfos[slot].Flags &= ~SPF_ALPHACHANNEL;
 
 	if (isAlphaBlended)
-		game.SpriteInfos[slot].Flags |= SPF_ALPHACHANNEL;
+		_GP(game).SpriteInfos[slot].Flags |= SPF_ALPHACHANNEL;
 }
 
 void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, int32 numArgs, long arg1, long arg2) {

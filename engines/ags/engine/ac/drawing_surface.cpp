@@ -46,8 +46,8 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern GameSetupStruct game;
-extern GameState play;
+
+
 extern RoomStatus *croom;
 extern RoomObject *objs;
 extern CharacterCache *charcache;
@@ -60,11 +60,11 @@ extern Bitmap *dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
 void DrawingSurface_Release(ScriptDrawingSurface *sds) {
 	if (sds->roomBackgroundNumber >= 0) {
 		if (sds->modified) {
-			if (sds->roomBackgroundNumber == play.bg_frame) {
+			if (sds->roomBackgroundNumber == _GP(play).bg_frame) {
 				invalidate_screen();
 				mark_current_background_dirty();
 			}
-			play.raw_modified[sds->roomBackgroundNumber] = 1;
+			_GP(play).raw_modified[sds->roomBackgroundNumber] = 1;
 		}
 
 		sds->roomBackgroundNumber = -1;
@@ -171,7 +171,7 @@ void DrawingSurface_DrawImage(ScriptDrawingSurface *sds, int xx, int yy, int slo
 		Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, sourcePic->GetColorDepth());
 
 		newPic->StretchBlt(sourcePic,
-			RectWH(0, 0, game.SpriteInfos[slot].Width, game.SpriteInfos[slot].Height),
+			RectWH(0, 0, _GP(game).SpriteInfos[slot].Width, _GP(game).SpriteInfos[slot].Height),
 			RectWH(0, 0, width, height));
 
 		sourcePic = newPic;
@@ -186,7 +186,7 @@ void DrawingSurface_DrawImage(ScriptDrawingSurface *sds, int xx, int yy, int slo
 		debug_script_warn("RawDrawImage: Sprite %d colour depth %d-bit not same as background depth %d-bit", slot, spriteset[slot]->GetColorDepth(), ds->GetColorDepth());
 	}
 
-	draw_sprite_support_alpha(ds, sds->hasAlphaChannel != 0, xx, yy, sourcePic, (game.SpriteInfos[slot].Flags & SPF_ALPHACHANNEL) != 0,
+	draw_sprite_support_alpha(ds, sds->hasAlphaChannel != 0, xx, yy, sourcePic, (_GP(game).SpriteInfos[slot].Flags & SPF_ALPHACHANNEL) != 0,
 		kBlendMode_Alpha, GfxDef::Trans100ToAlpha255(trans));
 
 	sds->FinishedDrawing();
@@ -214,7 +214,7 @@ int DrawingSurface_GetDrawingColor(ScriptDrawingSurface *sds) {
 }
 
 void DrawingSurface_SetUseHighResCoordinates(ScriptDrawingSurface *sds, int highRes) {
-	if (game.AllowRelativeRes())
+	if (_GP(game).AllowRelativeRes())
 		sds->highResCoordinates = (highRes) ? 1 : 0;
 }
 
@@ -283,7 +283,7 @@ void DrawingSurface_DrawString(ScriptDrawingSurface *sds, int xx, int yy, int fo
 	Bitmap *ds = sds->StartDrawing();
 	// don't use wtextcolor because it will do a 16->32 conversion
 	color_t text_color = sds->currentColour;
-	if ((ds->GetColorDepth() <= 8) && (play.raw_color > 255)) {
+	if ((ds->GetColorDepth() <= 8) && (_GP(play).raw_color > 255)) {
 		text_color = ds->GetCompatibleColor(1);
 		debug_script_warn("RawPrint: Attempted to use hi-color on 256-col background");
 	}

@@ -41,17 +41,18 @@
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/timer.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern GameSetupStruct game;
-extern RoomStruct thisroom;
+
+
 extern RoomStatus *croom;
 extern int displayed_room;
-extern GameState play;
+
 extern RGB palette[256];
 extern IGraphicsDriver *gfxDriver;
 extern AGSPlatformDriver *platform;
@@ -114,8 +115,8 @@ void run_on_event(int evtype, RuntimeScriptValue &wparam) {
 void run_room_event(int id) {
 	evblockbasename = "room";
 
-	if (thisroom.EventHandlers != nullptr) {
-		run_interaction_script(thisroom.EventHandlers.get(), id);
+	if (_GP(thisroom).EventHandlers != nullptr) {
+		run_interaction_script(_GP(thisroom).EventHandlers.get(), id);
 	} else {
 		run_interaction_event(&croom->intrRoom, id);
 	}
@@ -124,9 +125,9 @@ void run_room_event(int id) {
 void run_event_block_inv(int invNum, int event) {
 	evblockbasename = "inventory%d";
 	if (_G(loaded_game_file_version) > kGameVersion_272) {
-		run_interaction_script(game.invScripts[invNum].get(), event);
+		run_interaction_script(_GP(game).invScripts[invNum].get(), event);
 	} else {
-		run_interaction_event(game.intrInv[invNum].get(), event);
+		run_interaction_event(_GP(game).intrInv[invNum].get(), event);
 	}
 
 }
@@ -137,7 +138,7 @@ void setevent(int evtyp, int ev1, int ev2, int ev3) {
 	event[numevents].data1 = ev1;
 	event[numevents].data2 = ev2;
 	event[numevents].data3 = ev3;
-	event[numevents].player = game.playercharacter;
+	event[numevents].player = _GP(game).playercharacter;
 	numevents++;
 	if (numevents >= MAXEVENTS) quit("too many events posted");
 }
@@ -171,8 +172,8 @@ void process_event(EventHappened *evp) {
 
 		if (evp->data1 == EVB_HOTSPOT) {
 
-			if (thisroom.Hotspots[evp->data2].EventHandlers != nullptr)
-				scriptPtr = thisroom.Hotspots[evp->data2].EventHandlers;
+			if (_GP(thisroom).Hotspots[evp->data2].EventHandlers != nullptr)
+				scriptPtr = _GP(thisroom).Hotspots[evp->data2].EventHandlers;
 			else
 				evpt = &croom->intrHotspot[evp->data2];
 
@@ -181,8 +182,8 @@ void process_event(EventHappened *evp) {
 			//Debug::Printf("Running hotspot interaction for hotspot %d, event %d", evp->data2, evp->data3);
 		} else if (evp->data1 == EVB_ROOM) {
 
-			if (thisroom.EventHandlers != nullptr)
-				scriptPtr = thisroom.EventHandlers;
+			if (_GP(thisroom).EventHandlers != nullptr)
+				scriptPtr = _GP(thisroom).EventHandlers;
 			else
 				evpt = &croom->intrRoom;
 
@@ -210,24 +211,24 @@ void process_event(EventHappened *evp) {
 	} else if (evp->type == EV_FADEIN) {
 		// if they change the transition type before the fadein, make
 		// sure the screen doesn't freeze up
-		play.screen_is_faded_out = 0;
+		_GP(play).screen_is_faded_out = 0;
 
 		// determine the transition style
-		int theTransition = play.fade_effect;
+		int theTransition = _GP(play).fade_effect;
 
-		if (play.next_screen_transition >= 0) {
+		if (_GP(play).next_screen_transition >= 0) {
 			// a one-off transition was selected, so use it
-			theTransition = play.next_screen_transition;
-			play.next_screen_transition = -1;
+			theTransition = _GP(play).next_screen_transition;
+			_GP(play).next_screen_transition = -1;
 		}
 
 		if (pl_run_plugin_hooks(AGSE_TRANSITIONIN, 0))
 			return;
 
-		if (play.fast_forward)
+		if (_GP(play).fast_forward)
 			return;
 
-		const bool ignore_transition = (play.screen_tint > 0);
+		const bool ignore_transition = (_GP(play).screen_tint > 0);
 		if (((theTransition == FADE_CROSSFADE) || (theTransition == FADE_DISSOLVE)) &&
 			(saved_viewport_bitmap == nullptr) && !ignore_transition) {
 			// transition type was not crossfade/dissolve when the screen faded out,
@@ -238,7 +239,7 @@ void process_event(EventHappened *evp) {
 		}
 
 		// TODO: use normal coordinates instead of "native_size" and multiply_up_*?
-		const Rect &viewport = play.GetMainViewport();
+		const Rect &viewport = _GP(play).GetMainViewport();
 
 		if ((theTransition == FADE_INSTANT) || ignore_transition)
 			set_palette_range(palette, 0, 255, 0);
@@ -279,9 +280,9 @@ void process_event(EventHappened *evp) {
 				}
 				gfxDriver->SetMemoryBackBuffer(saved_backbuf);
 			}
-			play.screen_is_faded_out = 0;
+			_GP(play).screen_is_faded_out = 0;
 		} else if (theTransition == FADE_CROSSFADE) {
-			if (game.color_depth == 1)
+			if (_GP(game).color_depth == 1)
 				quit("!Cannot use crossfade screen transition in 256-colour games");
 
 			IDriverDependantBitmap *ddb = prepare_screen_for_transition_in();
@@ -318,7 +319,7 @@ void process_event(EventHappened *evp) {
 			IDriverDependantBitmap *ddb = prepare_screen_for_transition_in();
 			for (aa = 0; aa < 16; aa++) {
 				// merge the palette while dithering
-				if (game.color_depth == 1) {
+				if (_GP(game).color_depth == 1) {
 					fade_interpolate(old_palette, palette, interpal, aa * 4, 0, 255);
 					set_palette_range(interpal, 0, 255, 0);
 				}
@@ -356,7 +357,7 @@ void runevent_now(int evtyp, int ev1, int ev2, int ev3) {
 	evh.data1 = ev1;
 	evh.data2 = ev2;
 	evh.data3 = ev3;
-	evh.player = game.playercharacter;
+	evh.player = _GP(game).playercharacter;
 	process_event(&evh);
 }
 
@@ -372,7 +373,7 @@ void processallevents(int numev, EventHappened *evlist) {
 	EventHappened copyOfList[MAXEVENTS];
 	memcpy(&copyOfList[0], &evlist[0], sizeof(EventHappened) * numev);
 
-	int room_was = play.room_changes;
+	int room_was = _GP(play).room_changes;
 
 	inside_processevent++;
 
@@ -380,7 +381,7 @@ void processallevents(int numev, EventHappened *evlist) {
 
 		process_event(&copyOfList[dd]);
 
-		if (room_was != play.room_changes)
+		if (room_was != _GP(play).room_changes)
 			break;  // changed room, so discard other events
 	}
 

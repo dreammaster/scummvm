@@ -43,7 +43,7 @@
 #include "ags/engine/ac/dynobj/script_gui.h"
 #include "ags/engine/script/cc_instance.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/device/mousew32.h"
+#include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/gfx/gfxfilter.h"
 #include "ags/shared/gui/gui_button.h"
 #include "ags/shared/gui/gui_main.h"
@@ -63,11 +63,11 @@ using namespace AGS::Engine;
 
 
 extern GameSetup usetup;
-extern RoomStruct thisroom;
+
 extern int cur_mode, cur_cursor;
 extern ccInstance *gameinst;
 extern ScriptGUI *scrGui;
-extern GameSetupStruct game;
+
 extern CCGUIObject ccDynamicGUIObject;
 extern Bitmap **guibg;
 extern IDriverDependantBitmap **guibgbmp;
@@ -225,8 +225,8 @@ int GUI_GetTransparency(ScriptGUI *tehgui) {
 
 void GUI_Centre(ScriptGUI *sgui) {
 	GUIMain *tehgui = &_GP(guis)[sgui->id];
-	tehgui->X = play.GetUIViewport().GetWidth() / 2 - tehgui->Width / 2;
-	tehgui->Y = play.GetUIViewport().GetHeight() / 2 - tehgui->Height / 2;
+	tehgui->X = _GP(play).GetUIViewport().GetWidth() / 2 - tehgui->Width / 2;
+	tehgui->Y = _GP(play).GetUIViewport().GetHeight() / 2 - tehgui->Height / 2;
 }
 
 void GUI_SetBackgroundGraphic(ScriptGUI *tehgui, int slotn) {
@@ -408,13 +408,13 @@ void replace_macro_tokens(const char *text, String &fixed_text) {
 			macroname[idd] = 0;
 			tempo[0] = 0;
 			if (ags_stricmp(macroname, "score") == 0)
-				sprintf(tempo, "%d", play.score);
+				sprintf(tempo, "%d", _GP(play).score);
 			else if (ags_stricmp(macroname, "totalscore") == 0)
 				sprintf(tempo, "%d", MAXSCORE);
 			else if (ags_stricmp(macroname, "scoretext") == 0)
-				sprintf(tempo, "%d of %d", play.score, MAXSCORE);
+				sprintf(tempo, "%d of %d", _GP(play).score, MAXSCORE);
 			else if (ags_stricmp(macroname, "gamename") == 0)
-				strcpy(tempo, play.game_name);
+				strcpy(tempo, _GP(play).game_name);
 			else if (ags_stricmp(macroname, "overhotspot") == 0) {
 				// While game is in Wait mode, no overhotspot text
 				if (!IsInterfaceEnabled())
@@ -440,19 +440,19 @@ void update_gui_zorder() {
 	int numdone = 0, b;
 
 	// for each GUI
-	for (int a = 0; a < game.numgui; a++) {
+	for (int a = 0; a < _GP(game).numgui; a++) {
 		// find the right place in the draw order array
 		int insertAt = numdone;
 		for (b = 0; b < numdone; b++) {
-			if (_GP(guis)[a].ZOrder < _GP(guis)[play.gui_draw_order[b]].ZOrder) {
+			if (_GP(guis)[a].ZOrder < _GP(guis)[_GP(play).gui_draw_order[b]].ZOrder) {
 				insertAt = b;
 				break;
 			}
 		}
 		// insert the new item
 		for (b = numdone - 1; b >= insertAt; b--)
-			play.gui_draw_order[b + 1] = play.gui_draw_order[b];
-		play.gui_draw_order[insertAt] = a;
+			_GP(play).gui_draw_order[b + 1] = _GP(play).gui_draw_order[b];
+		_GP(play).gui_draw_order[insertAt] = a;
 		numdone++;
 	}
 
@@ -508,7 +508,7 @@ void update_gui_disabled_status() {
 
 	if (all_buttons_was != all_buttons_disabled) {
 		if (gui_disabled_style != GUIDIS_UNCHANGED) {
-			for (int aa = 0; aa < game.numgui; aa++) {
+			for (int aa = 0; aa < _GP(game).numgui; aa++) {
 				_GP(guis)[aa].OnControlPositionChanged(); // this marks GUI for update
 			}
 			invalidate_screen();
@@ -518,10 +518,10 @@ void update_gui_disabled_status() {
 
 
 int adjust_x_for_guis(int xx, int yy) {
-	if ((game.options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0))
+	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0))
 		return xx;
 	// If it's covered by a GUI, move it right a bit
-	for (int aa = 0; aa < game.numgui; aa++) {
+	for (int aa = 0; aa < _GP(game).numgui; aa++) {
 		if (!_GP(guis)[aa].IsDisplayed())
 			continue;
 		if ((_GP(guis)[aa].X > xx) || (_GP(guis)[aa].Y > yy) || (_GP(guis)[aa].Y + _GP(guis)[aa].Height < yy))
@@ -541,10 +541,10 @@ int adjust_x_for_guis(int xx, int yy) {
 }
 
 int adjust_y_for_guis(int yy) {
-	if ((game.options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0))
+	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0))
 		return yy;
 	// If it's covered by a GUI, move it down a bit
-	for (int aa = 0; aa < game.numgui; aa++) {
+	for (int aa = 0; aa < _GP(game).numgui; aa++) {
 		if (!_GP(guis)[aa].IsDisplayed())
 			continue;
 		if (_GP(guis)[aa].Y > yy)
@@ -566,7 +566,7 @@ int adjust_y_for_guis(int yy) {
 void recreate_guibg_image(GUIMain *tehgui) {
 	int ifn = tehgui->ID;
 	delete guibg[ifn];
-	guibg[ifn] = BitmapHelper::CreateBitmap(tehgui->Width, tehgui->Height, game.GetColorDepth());
+	guibg[ifn] = BitmapHelper::CreateBitmap(tehgui->Width, tehgui->Height, _GP(game).GetColorDepth());
 	if (guibg[ifn] == nullptr)
 		quit("SetGUISize: internal error: unable to reallocate gui cache");
 	guibg[ifn] = ReplaceBitmapWithSupportedFormat(guibg[ifn]);
@@ -580,7 +580,7 @@ void recreate_guibg_image(GUIMain *tehgui) {
 extern int is_complete_overlay;
 
 int gui_get_interactable(int x, int y) {
-	if ((game.options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0))
+	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0))
 		return -1;
 	return GetGUIAt(x, y);
 }
@@ -588,22 +588,22 @@ int gui_get_interactable(int x, int y) {
 int gui_on_mouse_move() {
 	int mouse_over_gui = -1;
 	// If all GUIs are off, skip the loop
-	if ((game.options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0));
+	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0));
 	else {
 		// Scan for mouse-y-pos GUIs, and pop one up if appropriate
 		// Also work out the mouse-over GUI while we're at it
 		int ll;
-		for (ll = 0; ll < game.numgui; ll++) {
-			const int guin = play.gui_draw_order[ll];
+		for (ll = 0; ll < _GP(game).numgui; ll++) {
+			const int guin = _GP(play).gui_draw_order[ll];
 			if (_GP(guis)[guin].IsInteractableAt(mousex, mousey)) mouse_over_gui = guin;
 
 			if (_GP(guis)[guin].PopupStyle != kGUIPopupMouseY) continue;
 			if (is_complete_overlay > 0) break;  // interfaces disabled
-			//    if (play.disabled_user_interface>0) break;
+			//    if (_GP(play).disabled_user_interface>0) break;
 			if (ifacepopped == guin) continue;
 			if (!_GP(guis)[guin].IsVisible()) continue;
 			// Don't allow it to be popped up while skipping cutscene
-			if (play.fast_forward) continue;
+			if (_GP(play).fast_forward) continue;
 
 			if (mousey < _GP(guis)[guin].PopupAtMouseY) {
 				set_mouse_cursor(CURS_ARROW);
@@ -646,8 +646,8 @@ void gui_on_mouse_up(const int wasongui, const int wasbutdown) {
 			int iit = offset_over_inv((GUIInvWindow *)guio);
 			if (iit >= 0) {
 				evblocknum = iit;
-				play.used_inv_on = iit;
-				if (game.options[OPT_HANDLEINVCLICKS]) {
+				_GP(play).used_inv_on = iit;
+				if (_GP(game).options[OPT_HANDLEINVCLICKS]) {
 					// Let the script handle the click
 					// LEFTINV is 5, RIGHTINV is 6
 					force_event(EV_TEXTSCRIPT, TS_MCLICK, wasbutdown + 4);

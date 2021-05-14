@@ -28,7 +28,7 @@
 
 namespace AGS3 {
 
-extern GameSetupStruct game;
+
 
 
 // ** TEXT BOX FUNCTIONS
@@ -64,7 +64,7 @@ int TextBox_GetFont(GUITextBox *guit) {
 }
 
 void TextBox_SetFont(GUITextBox *guit, int fontnum) {
-	if ((fontnum < 0) || (fontnum >= game.numfonts))
+	if ((fontnum < 0) || (fontnum >= _GP(game).numfonts))
 		quit("!SetTextBoxFont: invalid font number.");
 
 	if (guit->Font != fontnum) {

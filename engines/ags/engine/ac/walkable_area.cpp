@@ -37,9 +37,9 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern RoomStruct thisroom;
-extern GameState play;
-extern GameSetupStruct game;
+
+
+
 extern int displayed_room;
 extern RoomStatus *croom;
 extern RoomObject *objs;
@@ -47,14 +47,14 @@ extern RoomObject *objs;
 Bitmap *walkareabackup = nullptr, *walkable_areas_temp = nullptr;
 
 void redo_walkable_areas() {
-	thisroom.WalkAreaMask->Blit(walkareabackup, 0, 0, 0, 0, thisroom.WalkAreaMask->GetWidth(), thisroom.WalkAreaMask->GetHeight());
+	_GP(thisroom).WalkAreaMask->Blit(walkareabackup, 0, 0, 0, 0, _GP(thisroom).WalkAreaMask->GetWidth(), _GP(thisroom).WalkAreaMask->GetHeight());
 
 	int hh, ww;
 	for (hh = 0; hh < walkareabackup->GetHeight(); hh++) {
-		uint8_t *walls_scanline = thisroom.WalkAreaMask->GetScanLineForWriting(hh);
+		uint8_t *walls_scanline = _GP(thisroom).WalkAreaMask->GetScanLineForWriting(hh);
 		for (ww = 0; ww < walkareabackup->GetWidth(); ww++) {
-			//      if (play.walkable_areas_on[_getpixel(thisroom.WalkAreaMask,ww,hh)]==0)
-			if (play.walkable_areas_on[walls_scanline[ww]] == 0)
+			//      if (_GP(play).walkable_areas_on[_getpixel(_GP(thisroom).WalkAreaMask,ww,hh)]==0)
+			if (_GP(play).walkable_areas_on[walls_scanline[ww]] == 0)
 				walls_scanline[ww] = 0;
 		}
 	}
@@ -62,7 +62,7 @@ void redo_walkable_areas() {
 }
 
 int get_walkable_area_pixel(int x, int y) {
-	return thisroom.WalkAreaMask->GetPixel(room_to_mask_coord(x), room_to_mask_coord(y));
+	return _GP(thisroom).WalkAreaMask->GetPixel(room_to_mask_coord(x), room_to_mask_coord(y));
 }
 
 int get_area_scaling(int onarea, int xx, int yy) {
@@ -72,29 +72,29 @@ int get_area_scaling(int onarea, int xx, int yy) {
 	yy = room_to_mask_coord(yy);
 
 	if ((onarea >= 0) && (onarea <= MAX_WALK_AREAS) &&
-		(thisroom.WalkAreas[onarea].ScalingNear != NOT_VECTOR_SCALED)) {
+		(_GP(thisroom).WalkAreas[onarea].ScalingNear != NOT_VECTOR_SCALED)) {
 		// We have vector scaling!
 		// In case the character is off the screen, limit the Y co-ordinate
 		// to within the area range (otherwise we get silly zoom levels
 		// that cause Out Of Memory crashes)
-		if (yy > thisroom.WalkAreas[onarea].Bottom)
-			yy = thisroom.WalkAreas[onarea].Bottom;
-		if (yy < thisroom.WalkAreas[onarea].Top)
-			yy = thisroom.WalkAreas[onarea].Top;
+		if (yy > _GP(thisroom).WalkAreas[onarea].Bottom)
+			yy = _GP(thisroom).WalkAreas[onarea].Bottom;
+		if (yy < _GP(thisroom).WalkAreas[onarea].Top)
+			yy = _GP(thisroom).WalkAreas[onarea].Top;
 		// Work it all out without having to use floats
 		// Percent = ((y - top) * 100) / (areabottom - areatop)
 		// Zoom level = ((max - min) * Percent) / 100
-		if (thisroom.WalkAreas[onarea].Bottom != thisroom.WalkAreas[onarea].Top) {
-			int percent = ((yy - thisroom.WalkAreas[onarea].Top) * 100)
-				/ (thisroom.WalkAreas[onarea].Bottom - thisroom.WalkAreas[onarea].Top);
-			zoom_level = ((thisroom.WalkAreas[onarea].ScalingNear - thisroom.WalkAreas[onarea].ScalingFar) * (percent)) / 100 + thisroom.WalkAreas[onarea].ScalingFar;
+		if (_GP(thisroom).WalkAreas[onarea].Bottom != _GP(thisroom).WalkAreas[onarea].Top) {
+			int percent = ((yy - _GP(thisroom).WalkAreas[onarea].Top) * 100)
+				/ (_GP(thisroom).WalkAreas[onarea].Bottom - _GP(thisroom).WalkAreas[onarea].Top);
+			zoom_level = ((_GP(thisroom).WalkAreas[onarea].ScalingNear - _GP(thisroom).WalkAreas[onarea].ScalingFar) * (percent)) / 100 + _GP(thisroom).WalkAreas[onarea].ScalingFar;
 		} else {
 			// Special case for 1px tall walkable area: take bottom line scaling
-			zoom_level = thisroom.WalkAreas[onarea].ScalingNear;
+			zoom_level = _GP(thisroom).WalkAreas[onarea].ScalingNear;
 		}
 		zoom_level += 100;
 	} else if ((onarea >= 0) & (onarea <= MAX_WALK_AREAS))
-		zoom_level = thisroom.WalkAreas[onarea].ScalingFar + 100;
+		zoom_level = _GP(thisroom).WalkAreas[onarea].ScalingFar + 100;
 
 	if (zoom_level == 0)
 		zoom_level = 100;
@@ -103,8 +103,8 @@ int get_area_scaling(int onarea, int xx, int yy) {
 }
 
 void scale_sprite_size(int sppic, int zoom_level, int *newwidth, int *newheight) {
-	newwidth[0] = (game.SpriteInfos[sppic].Width * zoom_level) / 100;
-	newheight[0] = (game.SpriteInfos[sppic].Height * zoom_level) / 100;
+	newwidth[0] = (_GP(game).SpriteInfos[sppic].Width * zoom_level) / 100;
+	newheight[0] = (_GP(game).SpriteInfos[sppic].Height * zoom_level) / 100;
 	if (newwidth[0] < 1)
 		newwidth[0] = 1;
 	if (newheight[0] < 1)
@@ -140,25 +140,25 @@ int is_point_in_rect(int x, int y, int left, int top, int right, int bottom) {
 
 Bitmap *prepare_walkable_areas(int sourceChar) {
 	// copy the walkable areas to the temp bitmap
-	walkable_areas_temp->Blit(thisroom.WalkAreaMask.get(), 0, 0, 0, 0, thisroom.WalkAreaMask->GetWidth(), thisroom.WalkAreaMask->GetHeight());
+	walkable_areas_temp->Blit(_GP(thisroom).WalkAreaMask.get(), 0, 0, 0, 0, _GP(thisroom).WalkAreaMask->GetWidth(), _GP(thisroom).WalkAreaMask->GetHeight());
 	// if the character who's moving doesn't Bitmap *, don't bother checking
 	if (sourceChar < 0);
-	else if (game.chars[sourceChar].flags & CHF_NOBLOCKING)
+	else if (_GP(game).chars[sourceChar].flags & CHF_NOBLOCKING)
 		return walkable_areas_temp;
 
 	int ww;
 	// for each character in the current room, make the area under
 	// them unwalkable
-	for (ww = 0; ww < game.numcharacters; ww++) {
-		if (game.chars[ww].on != 1) continue;
-		if (game.chars[ww].room != displayed_room) continue;
+	for (ww = 0; ww < _GP(game).numcharacters; ww++) {
+		if (_GP(game).chars[ww].on != 1) continue;
+		if (_GP(game).chars[ww].room != displayed_room) continue;
 		if (ww == sourceChar) continue;
-		if (game.chars[ww].flags & CHF_NOBLOCKING) continue;
-		if (room_to_mask_coord(game.chars[ww].y) >= walkable_areas_temp->GetHeight()) continue;
-		if (room_to_mask_coord(game.chars[ww].x) >= walkable_areas_temp->GetWidth()) continue;
-		if ((game.chars[ww].y < 0) || (game.chars[ww].x < 0)) continue;
+		if (_GP(game).chars[ww].flags & CHF_NOBLOCKING) continue;
+		if (room_to_mask_coord(_GP(game).chars[ww].y) >= walkable_areas_temp->GetHeight()) continue;
+		if (room_to_mask_coord(_GP(game).chars[ww].x) >= walkable_areas_temp->GetWidth()) continue;
+		if ((_GP(game).chars[ww].y < 0) || (_GP(game).chars[ww].x < 0)) continue;
 
-		CharacterInfo *char1 = &game.chars[ww];
+		CharacterInfo *char1 = &_GP(game).chars[ww];
 		int cwidth, fromx;
 
 		if (is_char_on_another(sourceChar, ww, &fromx, &cwidth))
@@ -185,7 +185,7 @@ Bitmap *prepare_walkable_areas(int sourceChar) {
 		// if the character is currently standing on the object, ignore
 		// it so as to allow him to escape
 		if ((sourceChar >= 0) &&
-			(is_point_in_rect(game.chars[sourceChar].x, game.chars[sourceChar].y,
+			(is_point_in_rect(_GP(game).chars[sourceChar].x, _GP(game).chars[sourceChar].y,
 				x1, y1, x1 + width, y2)))
 			continue;
 
@@ -204,12 +204,12 @@ int get_walkable_area_at_location(int xx, int yy) {
 	if (onarea < 0) {
 		// the character has walked off the edge of the screen, so stop them
 		// jumping up to full size when leaving
-		if (xx >= thisroom.Width)
-			onarea = get_walkable_area_pixel(thisroom.Width - 1, yy);
+		if (xx >= _GP(thisroom).Width)
+			onarea = get_walkable_area_pixel(_GP(thisroom).Width - 1, yy);
 		else if (xx < 0)
 			onarea = get_walkable_area_pixel(0, yy);
-		else if (yy >= thisroom.Height)
-			onarea = get_walkable_area_pixel(xx, thisroom.Height - 1);
+		else if (yy >= _GP(thisroom).Height)
+			onarea = get_walkable_area_pixel(xx, _GP(thisroom).Height - 1);
 		else if (yy < 0)
 			onarea = get_walkable_area_pixel(xx, 1);
 	}
@@ -232,7 +232,7 @@ int get_walkable_area_at_location(int xx, int yy) {
 }
 
 int get_walkable_area_at_character(int charnum) {
-	CharacterInfo *chin = &game.chars[charnum];
+	CharacterInfo *chin = &_GP(game).chars[charnum];
 	return get_walkable_area_at_location(chin->x, chin->y);
 }
 
