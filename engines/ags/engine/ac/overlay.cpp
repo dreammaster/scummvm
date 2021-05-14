@@ -45,9 +45,9 @@ using namespace AGS::Engine;
 
 
 extern int displayed_room;
-extern int face_talking;
-extern ViewStruct *views;
-extern CharacterExtras *charextra;
+extern int _G(face_talking);
+
+extern CharacterExtras *_G(charextra);
 extern IGraphicsDriver *gfxDriver;
 
 
@@ -176,8 +176,8 @@ void remove_screen_overlay_index(int over_idx) {
 		screenover[i] = screenover[i + 1];
 	// if an overlay before the sierra-style speech one is removed,
 	// update the index
-	if (face_talking > over_idx)
-		face_talking--;
+	if (_G(face_talking) > over_idx)
+		_G(face_talking)--;
 }
 
 void remove_screen_overlay(int type) {
@@ -238,8 +238,8 @@ void get_overlay_position(const ScreenOverlay &over, int *x, int *y) {
 		int charid = over.y;
 
 		auto view = FindNearestViewport(charid);
-		const int charpic = views[_GP(game).chars[charid].view].loops[_GP(game).chars[charid].loop].frames[0].pic;
-		const int height = (charextra[charid].height < 1) ? _GP(game).SpriteInfos[charpic].Height : charextra[charid].height;
+		const int charpic = _G(views)[_GP(game).chars[charid].view].loops[_GP(game).chars[charid].loop].frames[0].pic;
+		const int height = (_G(charextra)[charid].height < 1) ? _GP(game).SpriteInfos[charpic].Height : _G(charextra)[charid].height;
 		Point screenpt = view->RoomToScreen(
 			data_to_game_coord(_GP(game).chars[charid].x),
 			data_to_game_coord(_GP(game).chars[charid].get_effective_y()) - height).first;

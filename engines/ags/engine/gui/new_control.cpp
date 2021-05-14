@@ -26,7 +26,7 @@
 
 namespace AGS3 {
 
-extern int topwindowhandle;
+extern int _G(topwindowhandle);
 
 NewControl::NewControl(int xx, int yy, int wi, int hi) {
 	x = xx;
@@ -50,7 +50,7 @@ NewControl::NewControl() {
 	needredraw = 1;
 }
 int NewControl::mouseisinarea(int mousex, int mousey) {
-	if (topwindowhandle != wlevel)
+	if (_G(topwindowhandle) != wlevel)
 		return 0;
 
 	if ((mousex > x) &(mousex < x + wid) &(mousey > y) &(mousey < y + hit))
@@ -59,7 +59,7 @@ int NewControl::mouseisinarea(int mousex, int mousey) {
 	return 0;
 }
 void NewControl::drawifneeded() {
-	if (topwindowhandle != wlevel)
+	if (_G(topwindowhandle) != wlevel)
 		return;
 	if (needredraw) {
 		needredraw = 0;

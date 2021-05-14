@@ -46,10 +46,10 @@
 #include "ags/shared/#include "ags/shared/eSetupStruct game;
 extern GameSetup usetup;
 
-extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
+
 
 extern IGraphicsDriver *gfxDriver;
-extern CCAudioChannel ccDynamicAudio;
+extern CCAudioChannel _GP(ccDynamicAudio);
 extern volatile bool switched_away;
 
 bool System_HasInputFocus() {
@@ -174,7 +174,7 @@ ScriptAudioChannel *System_GetAudioChannels(int index) {
 	if ((index < 0) || (index >= MAX_SOUND_CHANNELS))
 		quit("!System.AudioChannels: invalid sound channel index");
 
-	return &scrAudioChannel[index];
+	return &_G(scrAudioChannel)[index];
 }
 
 int System_GetVolume() {
@@ -223,7 +223,7 @@ extern ScriptString myScriptStringImpl;
 
 // ScriptAudioChannel* (int index)
 RuntimeScriptValue Sc_System_GetAudioChannels(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT(ScriptAudioChannel, ccDynamicAudio, System_GetAudioChannels);
+	API_SCALL_OBJ_PINT(ScriptAudioChannel, _GP(ccDynamicAudio), System_GetAudioChannels);
 }
 
 // int ()

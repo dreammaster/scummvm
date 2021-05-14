@@ -24,17 +24,17 @@
 
 namespace AGS3 {
 
-int ccCompOptions = SCOPT_LEFTTORIGHT;
+int _G(ccCompOptions) = SCOPT_LEFTTORIGHT;
 
 void ccSetOption(int optbit, int onoroff) {
 	if (onoroff)
-		ccCompOptions |= optbit;
+		_G(ccCompOptions) |= optbit;
 	else
-		ccCompOptions &= ~optbit;
+		_G(ccCompOptions) &= ~optbit;
 }
 
 int ccGetOption(int optbit) {
-	if (ccCompOptions & optbit)
+	if (_G(ccCompOptions) & optbit)
 		return 1;
 
 	return 0;

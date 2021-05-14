@@ -165,8 +165,8 @@ void GameState::UpdateRoomCamera(int index) {
 	if ((real_room_sz.Width > rc.GetWidth()) || (real_room_sz.Height > rc.GetHeight())) {
 		// TODO: split out into Camera Behavior
 		if (!cam->IsLocked()) {
-			int x = data_to_game_coord(_G(playerchar)->x) - rc.GetWidth() / 2;
-			int y = data_to_game_coord(_G(playerchar)->y) - rc.GetHeight() / 2;
+			int x = data_to_game_coord(_G(_G(playerchar))->x) - rc.GetWidth() / 2;
+			int y = data_to_game_coord(_G(_G(playerchar))->y) - rc.GetHeight() / 2;
 			cam->SetAt(x, y);
 		}
 	}

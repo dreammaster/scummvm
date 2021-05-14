@@ -72,8 +72,8 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern AnimatingGUIButton animbuts[MAX_ANIMATING_BUTTONS];
-extern int numAnimButs;
+
+
 extern int mouse_on_iface;   // mouse cursor is over this interface
 extern int ifacepopped;
 extern int is_text_overlay;
@@ -94,7 +94,7 @@ extern int cur_mode;
 extern RoomObject *objs;
 extern char noWalkBehindsAtAll;
 extern RoomStatus *croom;
-extern CharacterExtras *charextra;
+extern CharacterExtras *_G(charextra);
 extern SpriteCache spriteset;
 extern int cur_mode, cur_cursor;
 extern char check_dynamic_sprites_at_exit;
@@ -162,12 +162,12 @@ static void game_loop_do_late_update() {
 static int game_loop_check_ground_level_interactions() {
 	if ((_GP(play).ground_level_areas_disabled & GLED_INTERACTION) == 0) {
 		// check if he's standing on a hotspot
-		int hotspotThere = get_hotspot_at(_G(playerchar)->x, _G(playerchar)->y);
+		int hotspotThere = get_hotspot_at(_G(_G(playerchar))->x, _G(_G(playerchar))->y);
 		// run Stands on Hotspot event
 		setevent(EV_RUNEVBLOCK, EVB_HOTSPOT, hotspotThere, 0);
 
 		// check current region
-		int onRegion = GetRegionIDAtRoom(_G(playerchar)->x, _G(playerchar)->y);
+		int onRegion = GetRegionIDAtRoom(_G(_G(playerchar))->x, _G(_G(playerchar))->y);
 		int inRoom = displayed_room;
 
 		if (onRegion != _GP(play).player_on_region) {
@@ -375,8 +375,8 @@ bool run_service_key_controls(int &out_key) {
 		int ff;
 		// MACPORT FIX 9/6/5: added last %s
 		sprintf(infobuf, "In room %d %s[Player at %d, %d (view %d, loop %d, frame %d)%s%s%s",
-			displayed_room, (noWalkBehindsAtAll ? "(has no walk-behinds)" : ""), _G(playerchar)->x, _G(playerchar)->y,
-			_G(playerchar)->view + 1, _G(playerchar)->loop, _G(playerchar)->frame,
+			displayed_room, (noWalkBehindsAtAll ? "(has no walk-behinds)" : ""), _G(_G(playerchar))->x, _G(_G(playerchar))->y,
+			_G(_G(playerchar))->view + 1, _G(_G(playerchar))->loop, _G(_G(playerchar))->frame,
 			(IsGamePaused() == 0) ? "" : "[Game paused.",
 			(_GP(play).ground_level_areas_disabled == 0) ? "" : "[Ground areas disabled.",
 			(IsInterfaceEnabled() == 0) ? "[Game in Wait state" : "");
@@ -409,7 +409,7 @@ bool run_service_key_controls(int &out_key) {
 				_GP(game).chars[chd].x, _GP(game).chars[chd].y, _GP(game).chars[chd].z,
 				_GP(game).chars[chd].idleview, _GP(game).chars[chd].idletime, _GP(game).chars[chd].idleleft,
 				_GP(game).chars[chd].walking, _GP(game).chars[chd].animating, _GP(game).chars[chd].following,
-				_GP(game).chars[chd].flags, _GP(game).chars[chd].wait, charextra[chd].zoom);
+				_GP(game).chars[chd].flags, _GP(game).chars[chd].wait, _G(charextra)[chd].zoom);
 		}
 		Display(bigbuffer);
 		return false;
@@ -562,13 +562,13 @@ static void check_room_edges(int numevents_was) {
 		if ((numevents == numevents_was) &&
 			((_GP(play).ground_level_areas_disabled & GLED_INTERACTION) == 0)) {
 
-			if (_G(playerchar)->x <= _GP(thisroom).Edges.Left)
+			if (_G(_G(playerchar))->x <= _GP(thisroom).Edges.Left)
 				edgesActivated[0] = 1;
-			else if (_G(playerchar)->x >= _GP(thisroom).Edges.Right)
+			else if (_G(_G(playerchar))->x >= _GP(thisroom).Edges.Right)
 				edgesActivated[1] = 1;
-			if (_G(playerchar)->y >= _GP(thisroom).Edges.Bottom)
+			if (_G(_G(playerchar))->y >= _GP(thisroom).Edges.Bottom)
 				edgesActivated[2] = 1;
-			else if (_G(playerchar)->y <= _GP(thisroom).Edges.Top)
+			else if (_G(_G(playerchar))->y <= _GP(thisroom).Edges.Top)
 				edgesActivated[3] = 1;
 
 			if ((_GP(play).entered_edge >= 0) && (_GP(play).entered_edge <= 3)) {
@@ -612,7 +612,7 @@ static void game_loop_update_animated_buttons() {
 	// update animating GUI buttons
 	// this bit isn't in update_stuff because it always needs to
 	// happen, even when the game is paused
-	for (int aa = 0; aa < numAnimButs; aa++) {
+	for (int aa = 0; aa < _G(numAnimButs); aa++) {
 		if (UpdateAnimatingButton(aa)) {
 			StopButtonAnimation(aa);
 			aa--;

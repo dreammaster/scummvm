@@ -145,9 +145,9 @@ void BITMAP::draw(const BITMAP *srcBitmap, const Common::Rect &srcRect,
 	PALETTE palette;
 	if (src.format.bytesPerPixel == 1 && format.bytesPerPixel != 1) {
 		for (int i = 0; i < PAL_SIZE; ++i) {
-			palette[i].r = VGA_COLOR_TRANS(_G(current_palette)[i].r);
-			palette[i].g = VGA_COLOR_TRANS(_G(current_palette)[i].g);
-			palette[i].b = VGA_COLOR_TRANS(_G(current_palette)[i].b);
+			palette[i].r = VGA_COLOR_TRANS(_G(_G(current_palette))[i].r);
+			palette[i].g = VGA_COLOR_TRANS(_G(_G(current_palette))[i].g);
+			palette[i].b = VGA_COLOR_TRANS(_G(_G(current_palette))[i].b);
 		}
 	}
 
@@ -272,9 +272,9 @@ void BITMAP::stretchDraw(const BITMAP *srcBitmap, const Common::Rect &srcRect,
 	PALETTE palette;
 	if (src.format.bytesPerPixel == 1 && format.bytesPerPixel != 1) {
 		for (int i = 0; i < PAL_SIZE; ++i) {
-			palette[i].r = VGA_COLOR_TRANS(_G(current_palette)[i].r);
-			palette[i].g = VGA_COLOR_TRANS(_G(current_palette)[i].g);
-			palette[i].b = VGA_COLOR_TRANS(_G(current_palette)[i].b);
+			palette[i].r = VGA_COLOR_TRANS(_G(_G(current_palette))[i].r);
+			palette[i].g = VGA_COLOR_TRANS(_G(_G(current_palette))[i].g);
+			palette[i].b = VGA_COLOR_TRANS(_G(_G(current_palette))[i].b);
 		}
 	}
 
@@ -355,7 +355,7 @@ void BITMAP::stretchDraw(const BITMAP *srcBitmap, const Common::Rect &srcRect,
 }
 
 void BITMAP::blendPixel(uint8 aSrc, uint8 rSrc, uint8 gSrc, uint8 bSrc, uint8 &aDest, uint8 &rDest, uint8 &gDest, uint8 &bDest, uint32 alpha) const {
-	switch(_G(_blender_mode)) {
+	switch(_G(_G(_blender_mode))) {
 	case kSourceAlphaBlender:
 		blendSourceAlpha(aSrc, rSrc, gSrc, bSrc, aDest, rDest, gDest, bDest, alpha);
 		break;

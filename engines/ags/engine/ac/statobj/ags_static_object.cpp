@@ -23,11 +23,9 @@
 #include "ags/engine/ac/statobj/ags_static_object.h"
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_state.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-AGSStaticObject GlobalStaticManager;
-StaticGame      GameStaticManager;
 
 const char *AGSStaticObject::GetFieldPtr(const char *address, intptr_t offset) {
 	return address + offset;

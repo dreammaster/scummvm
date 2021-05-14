@@ -22,12 +22,13 @@
 
 #include "ags/lib/std/vector.h"
 #include "ags/engine/ac/dynobj/managed_object_pool.h"
-#include "ags/engine/ac/dynobj/cc_dynamic_array.h" // globalDynamicArray, constants
+#include "ags/engine/ac/dynobj/cc_dynamic_array.h" // _GP(globalDynamicArray), constants
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/util/string_utils.h"               // fputstring, etc
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/script_common.h"
 #include "ags/shared/util/stream.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -48,13 +49,13 @@ int ManagedObjectPool::Remove(ManagedObject &o, bool force) {
 		return 0;
 	}
 
-	auto handle = o.handle;
+	//auto handle = o.handle;
 	available_ids.push(o.handle);
 
 	handleByAddress.erase(o.addr);
 	o = ManagedObject();
 
-	ManagedObjectLog("Line %d Disposed managed object handle=%d", currentline, handle);
+	ManagedObjectLog("Line %d Disposed managed object handle=%d", _G(currentline), handle);
 
 	return 1;
 }
@@ -69,7 +70,7 @@ int32_t ManagedObjectPool::AddRef(int32_t handle) {
 	}
 
 	o.refCount += 1;
-	ManagedObjectLog("Line %d AddRef: handle=%d new refcount=%d", currentline, o.handle, o.refCount);
+	ManagedObjectLog("Line %d AddRef: handle=%d new refcount=%d", _G(currentline), o.handle, o.refCount);
 	return o.refCount;
 }
 
@@ -103,7 +104,7 @@ int32_t ManagedObjectPool::SubRef(int32_t handle) {
 		CheckDispose(handle);
 	}
 	// object could be removed at this point, don't use any values.
-	ManagedObjectLog("Line %d SubRef: handle=%d new refcount=%d canBeDisposed=%d", currentline, handle, newRefCount, canBeDisposed);
+	ManagedObjectLog("Line %d SubRef: handle=%d new refcount=%d canBeDisposed=%d", _G(currentline), handle, newRefCount, canBeDisposed);
 	return newRefCount;
 }
 
@@ -298,7 +299,7 @@ int ManagedObjectPool::ReadFromDisk(Stream *in, ICCObjectReader *reader) {
 				}
 				in->Read(&serializeBuffer.front(), numBytes);
 				if (strcmp(typeNameBuffer, CC_DYNAMIC_ARRAY_TYPE_NAME) == 0) {
-					globalDynamicArray.Unserialize(i, &serializeBuffer.front(), numBytes);
+					_GP(globalDynamicArray).Unserialize(i, &serializeBuffer.front(), numBytes);
 				} else {
 					reader->Unserialize(i, typeNameBuffer, &serializeBuffer.front(), numBytes);
 				}
@@ -323,7 +324,7 @@ int ManagedObjectPool::ReadFromDisk(Stream *in, ICCObjectReader *reader) {
 			}
 			in->Read(&serializeBuffer.front(), numBytes);
 			if (strcmp(typeNameBuffer, CC_DYNAMIC_ARRAY_TYPE_NAME) == 0) {
-				globalDynamicArray.Unserialize(handle, &serializeBuffer.front(), numBytes);
+				_GP(globalDynamicArray).Unserialize(handle, &serializeBuffer.front(), numBytes);
 			} else {
 				reader->Unserialize(handle, typeNameBuffer, &serializeBuffer.front(), numBytes);
 			}

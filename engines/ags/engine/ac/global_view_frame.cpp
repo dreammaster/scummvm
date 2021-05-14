@@ -30,7 +30,7 @@
 namespace AGS3 {
 
 
-extern ViewStruct *views;
+
 
 
 void SetFrameSound(int vii, int loop, int frame, int sound) {
@@ -38,20 +38,20 @@ void SetFrameSound(int vii, int loop, int frame, int sound) {
 		quit("!SetFrameSound: invalid view number");
 	vii--;
 
-	if (loop >= views[vii].numLoops)
+	if (loop >= _G(views)[vii].numLoops)
 		quit("!SetFrameSound: invalid loop number");
 
-	if (frame >= views[vii].loops[loop].numFrames)
+	if (frame >= _G(views)[vii].loops[loop].numFrames)
 		quit("!SetFrameSound: invalid frame number");
 
 	if (sound < 1) {
-		views[vii].loops[loop].frames[frame].sound = -1;
+		_G(views)[vii].loops[loop].frames[frame].sound = -1;
 	} else {
 		ScriptAudioClip *clip = GetAudioClipForOldStyleNumber(game, false, sound);
 		if (clip == nullptr)
 			quitprintf("!SetFrameSound: audio clip aSound%d not found", sound);
 
-		views[vii].loops[loop].frames[frame].sound = clip->id + (_GP(game).IsLegacyAudioSystem() ? 0x10000000 : 0);
+		_G(views)[vii].loops[loop].frames[frame].sound = clip->id + (_GP(game).IsLegacyAudioSystem() ? 0x10000000 : 0);
 	}
 }
 

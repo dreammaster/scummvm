@@ -33,17 +33,17 @@ extern std::pair<String, String> cc_error_at_line(const char *error_msg);
 // Returns script error message without location or callstack
 extern String cc_error_without_line(const char *error_msg);
 
-int ccError = 0;
-int ccErrorLine = 0;
-String ccErrorString;
-String ccErrorCallStack;
-bool ccErrorIsUserError = false;
-const char *ccCurScriptName = "";
+int _G(ccError) = 0;
+int _G(ccErrorLine) = 0;
+String _G(ccErrorString);
+String _G(ccErrorCallStack);
+bool _G(ccErrorIsUserError) = false;
+const char *_G(ccCurScriptName) = "";
 
 void cc_error(const char *descr, ...) {
-	ccErrorIsUserError = false;
+	_G(ccErrorIsUserError) = false;
 	if (descr[0] == '!') {
-		ccErrorIsUserError = true;
+		_G(ccErrorIsUserError) = true;
 		descr++;
 	}
 
@@ -52,18 +52,18 @@ void cc_error(const char *descr, ...) {
 	String displbuf = String::FromFormatV(descr, ap);
 	va_end(ap);
 
-	if (currentline > 0) {
+	if (_G(currentline) > 0) {
 		// [IKM] Implementation is project-specific
 		std::pair<String, String> errinfo = cc_error_at_line(displbuf);
-		ccErrorString = errinfo.first;
-		ccErrorCallStack = errinfo.second;
+		_G(ccErrorString) = errinfo.first;
+		_G(ccErrorCallStack) = errinfo.second;
 	} else {
-		ccErrorString = cc_error_without_line(displbuf);
-		ccErrorCallStack = "";
+		_G(ccErrorString) = cc_error_without_line(displbuf);
+		_G(ccErrorCallStack) = "";
 	}
 
-	ccError = 1;
-	ccErrorLine = currentline;
+	_G(ccError) = 1;
+	_G(ccErrorLine) = _G(currentline);
 }
 
 } // namespace AGS3

@@ -350,10 +350,10 @@ void IAGSEngine::SetVirtualScreen(BITMAP *bmp) {
 	}
 
 	if (bmp) {
-		_GP(glVirtualScreenWrap).WrapAllegroBitmap(bmp, true);
-		_G(gfxDriver)->SetMemoryBackBuffer(&_GP(glVirtualScreenWrap));
+		_GP(_G(glVirtualScreenWrap)).WrapAllegroBitmap(bmp, true);
+		_G(gfxDriver)->SetMemoryBackBuffer(&_GP(_G(glVirtualScreenWrap)));
 	} else {
-		_GP(glVirtualScreenWrap).Destroy();
+		_GP(_G(glVirtualScreenWrap)).Destroy();
 		_G(gfxDriver)->SetMemoryBackBuffer(nullptr);
 	}
 }
@@ -712,7 +712,7 @@ void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, i
 
 int IAGSEngine::RegisterManagedObject(const void *object, IAGSScriptManagedObject *callback) {
 	// TODO: handle loss of const better
-	_GP(GlobalReturnValue).SetPluginObject(const_cast<void *>(object), (ICCDynamicObject *)callback);
+	_GP(_G(GlobalReturnValue)).SetPluginObject(const_cast<void *>(object), (ICCDynamicObject *)callback);
 	return ccRegisterManagedObject(object, (ICCDynamicObject *)callback, true);
 }
 
@@ -735,7 +735,7 @@ void IAGSEngine::AddManagedObjectReader(const char *typeName, IAGSManagedObjectR
 
 void IAGSEngine::RegisterUnserializedObject(int key_, const void *object, IAGSScriptManagedObject *callback) {
 	// TODO: handle loss of const better
-	_GP(GlobalReturnValue).SetPluginObject(const_cast<void *>(object), (ICCDynamicObject *)callback);
+	_GP(_G(GlobalReturnValue)).SetPluginObject(const_cast<void *>(object), (ICCDynamicObject *)callback);
 	ccRegisterUnserializedObject(key_, object, (ICCDynamicObject *)callback, true);
 }
 
@@ -748,9 +748,9 @@ void *IAGSEngine::GetManagedObjectAddressByKey(int key_) {
 	ICCDynamicObject *manager;
 	ScriptValueType obj_type = ccGetObjectAddressAndManagerFromHandle(key_, object, manager);
 	if (obj_type == kScValPluginObject) {
-		_GP(GlobalReturnValue).SetPluginObject(object, manager);
+		_GP(_G(GlobalReturnValue)).SetPluginObject(object, manager);
 	} else {
-		_GP(GlobalReturnValue).SetDynamicObject(object, manager);
+		_GP(_G(GlobalReturnValue)).SetDynamicObject(object, manager);
 	}
 	return object;
 }
@@ -759,7 +759,7 @@ const char *IAGSEngine::CreateScriptString(const char *fromText) {
 	const char *string = CreateNewScriptString(fromText);
 	// Should be still standard dynamic object, because not managed by plugin
 	// TODO: handle loss of const better
-	_GP(GlobalReturnValue).SetDynamicObject(const_cast<char *>(string), &_GP(myScriptStringImpl));
+	_GP(_G(GlobalReturnValue)).SetDynamicObject(const_cast<char *>(string), &_GP(myScriptStringImpl));
 	return string;
 }
 

@@ -56,8 +56,6 @@ struct CCDynamicArray final : ICCDynamicObject {
 	void    WriteFloat(const char *address, intptr_t offset, float val) override;
 };
 
-extern CCDynamicArray globalDynamicArray;
-
 // Helper functions for setting up dynamic arrays.
 namespace DynamicArrayHelpers {
 // Create array of managed strings

@@ -94,7 +94,7 @@ extern AGSPlatformDriver *platform;
 extern int numevents;
 extern CharacterCache *charcache;
 extern ObjectCache objcache[MAX_ROOM_OBJECTS];
-extern CharacterExtras *charextra;
+extern CharacterExtras *_G(charextra);
 extern int done_es_error;
 extern int our_eip;
 extern Bitmap *walkareabackup, *walkable_areas_temp;
@@ -103,7 +103,7 @@ extern SpriteCache spriteset;
 extern int in_new_room, new_room_was;  // 1 in new room, 2 first time in new room, 3 loading saved game
 extern ScriptHotspot scrHotspot[MAX_ROOM_HOTSPOTS];
 extern int in_leaves_screen;
-extern CharacterInfo*_G(playerchar);
+extern CharacterInfo*_G(_G(playerchar));
 extern int starting_room;
 extern unsigned int loopcounter;
 extern IDriverDependantBitmap* roomBackgroundBmp;
@@ -313,7 +313,7 @@ void unload_old_room() {
             charcache[ff].inUse = 0;
         }
         // ensure that any half-moves (eg. with scaled movement) are stopped
-        charextra[ff].xwas = INVALID_X;
+        _G(charextra)[ff].xwas = INVALID_X;
     }
 
     _GP(play).swap_portrait_lastchar = -1;
@@ -458,7 +458,7 @@ static void update_all_viewcams_with_newroom()
     }
 }
 
-// forchar = _G(playerchar) on NewRoom, or NULL if restore saved game
+// forchar = _G(_G(playerchar)) on NewRoom, or NULL if restore saved game
 void load_new_room(int newnum, CharacterInfo*forchar) {
 
     debug_script_log("Loading room %d", newnum);
@@ -711,7 +711,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
                 palette[ff].b = 63;
         }
         create_rgb_table (&rgb_table, palette, nullptr);
-        rgb_map = &rgb_table;
+        _GP(rgb_map) = &rgb_table;
     }
     our_eip = 211;
     if (forchar!=nullptr) {
@@ -873,7 +873,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
         else forchar->view=_GP(thisroom).Options.PlayerView-1;
         forchar->frame=0;   // make him standing
     }
-    color_map = nullptr;
+    _GP(color_map) = nullptr;
 
     our_eip = 209;
     update_polled_stuff_if_runtime();
@@ -939,11 +939,11 @@ void new_room(int newnum,CharacterInfo*forchar) {
     newnum = in_leaves_screen;
     in_leaves_screen = -1;
 
-    if ((_G(playerchar)->following >= 0) &&
-        (_GP(game).chars[_G(playerchar)->following].room != newnum)) {
+    if ((_G(_G(playerchar))->following >= 0) &&
+        (_GP(game).chars[_G(_G(playerchar))->following].room != newnum)) {
             // the player character is following another character,
             // who is not in the new room. therefore, abort the follow
-            _G(playerchar)->following = -1;
+            _G(_G(playerchar))->following = -1;
     }
     update_polled_stuff_if_runtime();
 
@@ -1011,17 +1011,17 @@ void check_new_room() {
 }
 
 void compile_room_script() {
-    ccError = 0;
+    _G(ccError) = 0;
 
     roominst = ccInstance::CreateFromScript(_GP(thisroom).CompiledScript);
 
-    if ((ccError!=0) || (roominst==nullptr)) {
-        quitprintf("Unable to create local script: %s", ccErrorString.GetCStr());
+    if ((_G(ccError)!=0) || (roominst==nullptr)) {
+        quitprintf("Unable to create local script: %s", _G(ccErrorString).GetCStr());
     }
 
     roominstFork = roominst->Fork();
     if (roominstFork == nullptr)
-        quitprintf("Unable to create forked room instance: %s", ccErrorString.GetCStr());
+        quitprintf("Unable to create forked room instance: %s", _G(ccErrorString).GetCStr());
 
     repExecAlways.roomHasFunction = true;
     lateRepExecAlways.roomHasFunction = true;

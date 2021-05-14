@@ -118,7 +118,7 @@ void RunInventoryInteraction(int iit, int modd) {
 	else if (modd == MODE_HAND)
 		run_event_block_inv(iit, 1);
 	else if (modd == MODE_USE) {
-		_GP(play).usedinv = _G(playerchar)->activeinv;
+		_GP(play).usedinv = _G(_G(playerchar))->activeinv;
 		run_event_block_inv(iit, 3);
 	} else if (modd == MODE_TALK)
 		run_event_block_inv(iit, 2);

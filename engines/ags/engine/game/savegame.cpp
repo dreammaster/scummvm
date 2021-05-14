@@ -468,7 +468,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 
 	if (create_global_script()) {
 		return new SavegameError(kSvgErr_GameObjectInitFailed,
-			String::FromFormat("Unable to recreate global script: %s", ccErrorString.GetCStr()));
+			String::FromFormat("Unable to recreate global script: %s", _G(ccErrorString).GetCStr()));
 	}
 
 	// read the global data into the newly created script
@@ -512,7 +512,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	set_cursor_mode(r_data.CursorMode);
 	set_mouse_cursor(r_data.CursorID);
 	if (r_data.CursorMode == MODE_USE)
-		SetActiveInventory(_G(playerchar)->activeinv);
+		SetActiveInventory(_G(_G(playerchar))->activeinv);
 	// ensure that the current cursor is locked
 	spriteset.Precache(_GP(game).mcurs[r_data.CursorID].pic);
 
@@ -603,7 +603,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	// TODO: investigate loop range
 	for (int i = 1; i < MAX_SOUND_CHANNELS; ++i) {
 		if (r_data.DoAmbient[i])
-			PlayAmbientSound(i, r_data.DoAmbient[i], ambient[i].vol, ambient[i].x, ambient[i].y);
+			PlayAmbientSound(i, r_data.DoAmbient[i], _GP(ambient)[i].vol, _GP(ambient)[i].x, _GP(ambient)[i].y);
 	}
 	update_directional_sound_vol();
 
@@ -625,23 +625,23 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 
 	if (displayed_room < 0) {
 		// the restart point, no room was loaded
-		load_new_room(_G(playerchar)->room, _G(playerchar));
-		_G(playerchar)->prevroom = -1;
+		load_new_room(_G(_G(playerchar))->room, _G(_G(playerchar)));
+		_G(_G(playerchar))->prevroom = -1;
 
 		first_room_initialization();
 	}
 
-	if ((_GP(play).music_queue_size > 0) && (cachedQueuedMusic == nullptr)) {
-		cachedQueuedMusic = load_music_from_disk(_GP(play).music_queue[0], 0);
+	if ((_GP(play).music_queue_size > 0) && (_G(cachedQueuedMusic) == nullptr)) {
+		_G(cachedQueuedMusic) = load_music_from_disk(_GP(play).music_queue[0], 0);
 	}
 
 	// Test if the old-style audio had playing music and it was properly loaded
-	if (current_music_type > 0) {
+	if (_G(current_music_type) > 0) {
 		AudioChannelsLock lock;
 
-		if ((crossFading > 0 && !lock.GetChannelIfPlaying(crossFading)) ||
-			(crossFading <= 0 && !lock.GetChannelIfPlaying(SCHAN_MUSIC))) {
-			current_music_type = 0; // playback failed, reset flag
+		if ((_G(crossFading) > 0 && !lock.GetChannelIfPlaying(_G(crossFading))) ||
+			(_G(crossFading) <= 0 && !lock.GetChannelIfPlaying(SCHAN_MUSIC))) {
+			_G(current_music_type) = 0; // playback failed, reset flag
 		}
 	}
 

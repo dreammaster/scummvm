@@ -67,9 +67,9 @@ using namespace Shared;
 
 extern RGB palette[256];
 extern DialogTopic *dialog;
-extern AnimatingGUIButton animbuts[MAX_ANIMATING_BUTTONS];
-extern int numAnimButs;
-extern ViewStruct *views;
+
+
+
 extern Bitmap *dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
 
 extern RoomStatus troom;
@@ -418,16 +418,16 @@ HSaveError WriteAudio(Stream *out)
             out->WriteInt32(-1);
         }
     }
-    out->WriteInt32(crossFading);
-    out->WriteInt32(crossFadeVolumePerStep);
-    out->WriteInt32(crossFadeStep);
-    out->WriteInt32(crossFadeVolumeAtStart);
+    out->WriteInt32(_G(crossFading));
+    out->WriteInt32(_G(crossFadeVolumePerStep));
+    out->WriteInt32(_G(crossFadeStep));
+    out->WriteInt32(_G(crossFadeVolumeAtStart));
     // CHECKME: why this needs to be saved?
-    out->WriteInt32(current_music_type);
+    out->WriteInt32(_G(current_music_type));
 
     // Ambient sound
     for (int i = 0; i < MAX_SOUND_CHANNELS; ++i)
-        ambient[i].WriteToFile(out);
+        _GP(ambient)[i].WriteToFile(out);
     return HSaveError::None();
 }
 
@@ -476,26 +476,26 @@ HSaveError ReadAudio(Stream *in, int32_t cmp_ver, const PreservedParams &pp, Res
             }
         }
     }
-    crossFading = in->ReadInt32();
-    crossFadeVolumePerStep = in->ReadInt32();
-    crossFadeStep = in->ReadInt32();
-    crossFadeVolumeAtStart = in->ReadInt32();
+    _G(crossFading) = in->ReadInt32();
+    _G(crossFadeVolumePerStep) = in->ReadInt32();
+    _G(crossFadeStep) = in->ReadInt32();
+    _G(crossFadeVolumeAtStart) = in->ReadInt32();
     // preserve legacy music type setting
-    current_music_type = in->ReadInt32();
+    _G(current_music_type) = in->ReadInt32();
     
     // Ambient sound
     for (int i = 0; i < MAX_SOUND_CHANNELS; ++i)
-        ambient[i].ReadFromFile(in);
+        _GP(ambient)[i].ReadFromFile(in);
     for (int i = 1; i < MAX_SOUND_CHANNELS; ++i)
     {
-        if (ambient[i].channel == 0)
+        if (_GP(ambient)[i].channel == 0)
         {
             r_data.DoAmbient[i] = 0;
         }
         else
         {
-            r_data.DoAmbient[i] = ambient[i].num;
-            ambient[i].channel = 0;
+            r_data.DoAmbient[i] = _GP(ambient)[i].num;
+            _GP(ambient)[i].channel = 0;
         }
     }
     return err;
@@ -541,7 +541,7 @@ HSaveError WriteCharacters(Stream *out)
     for (int i = 0; i < _GP(game).numcharacters; ++i)
     {
         _GP(game).chars[i].WriteToFile(out);
-        charextra[i].WriteToFile(out);
+        _G(charextra)[i].WriteToFile(out);
         Properties::WriteValues(_GP(play).charProps[i], out);
         if (loaded_game_file_version <= kGameVersion_272)
             WriteTimesRun272(*_GP(game).intrChar[i], out);
@@ -559,7 +559,7 @@ HSaveError ReadCharacters(Stream *in, int32_t cmp_ver, const PreservedParams &pp
     for (int i = 0; i < _GP(game).numcharacters; ++i)
     {
         _GP(game).chars[i].ReadFromFile(in);
-        charextra[i].ReadFromFile(in);
+        _G(charextra)[i].ReadFromFile(in);
         Properties::ReadValues(_GP(play).charProps[i], in);
         if (loaded_game_file_version <= kGameVersion_272)
             ReadTimesRun272(*_GP(game).intrChar[i], in);
@@ -633,9 +633,9 @@ HSaveError WriteGUI(Stream *out)
 
     // Animated buttons
     WriteFormatTag(out, "AnimatedButtons");
-    out->WriteInt32(numAnimButs);
-    for (int i = 0; i < numAnimButs; ++i)
-        animbuts[i].WriteToFile(out);
+    out->WriteInt32(_G(numAnimButs));
+    for (int i = 0; i < _G(numAnimButs); ++i)
+        _G(animbuts)[i].WriteToFile(out);
     return HSaveError::None();
 }
 
@@ -699,9 +699,9 @@ HSaveError ReadGUI(Stream *in, int32_t cmp_ver, const PreservedParams &pp, Resto
     int anim_count = in->ReadInt32();
     if (!AssertCompatLimit(err, anim_count, MAX_ANIMATING_BUTTONS, "animated buttons"))
         return err;
-    numAnimButs = anim_count;
-    for (int i = 0; i < numAnimButs; ++i)
-        animbuts[i].ReadFromFile(in);
+    _G(numAnimButs) = anim_count;
+    for (int i = 0; i < _G(numAnimButs); ++i)
+        _G(animbuts)[i].ReadFromFile(in);
     return err;
 }
 
@@ -760,14 +760,14 @@ HSaveError WriteViews(Stream *out)
     out->WriteInt32(_GP(game).numviews);
     for (int view = 0; view < _GP(game).numviews; ++view)
     {
-        out->WriteInt32(views[view].numLoops);
-        for (int loop = 0; loop < views[view].numLoops; ++loop)
+        out->WriteInt32(_G(views)[view].numLoops);
+        for (int loop = 0; loop < _G(views)[view].numLoops; ++loop)
         {
-            out->WriteInt32(views[view].loops[loop].numFrames);
-            for (int frame = 0; frame < views[view].loops[loop].numFrames; ++frame)
+            out->WriteInt32(_G(views)[view].loops[loop].numFrames);
+            for (int frame = 0; frame < _G(views)[view].loops[loop].numFrames; ++frame)
             {
-                out->WriteInt32(views[view].loops[loop].frames[frame].sound);
-                out->WriteInt32(views[view].loops[loop].frames[frame].pic);
+                out->WriteInt32(_G(views)[view].loops[loop].frames[frame].sound);
+                out->WriteInt32(_G(views)[view].loops[loop].frames[frame].pic);
             }
         }
     }
@@ -781,18 +781,18 @@ HSaveError ReadViews(Stream *in, int32_t cmp_ver, const PreservedParams &pp, Res
         return err;
     for (int view = 0; view < _GP(game).numviews; ++view)
     {
-        if (!AssertGameObjectContent(err, in->ReadInt32(), views[view].numLoops,
+        if (!AssertGameObjectContent(err, in->ReadInt32(), _G(views)[view].numLoops,
             "Loops", "View", view))
             return err;
-        for (int loop = 0; loop < views[view].numLoops; ++loop)
+        for (int loop = 0; loop < _G(views)[view].numLoops; ++loop)
         {
-            if (!AssertGameObjectContent2(err, in->ReadInt32(), views[view].loops[loop].numFrames,
+            if (!AssertGameObjectContent2(err, in->ReadInt32(), _G(views)[view].loops[loop].numFrames,
                 "Frame", "View", view, "Loop", loop))
                 return err;
-            for (int frame = 0; frame < views[view].loops[loop].numFrames; ++frame)
+            for (int frame = 0; frame < _G(views)[view].loops[loop].numFrames; ++frame)
             {
-                views[view].loops[loop].frames[frame].sound = in->ReadInt32();
-                views[view].loops[loop].frames[frame].pic = in->ReadInt32();
+                _G(views)[view].loops[loop].frames[frame].sound = in->ReadInt32();
+                _G(views)[view].loops[loop].frames[frame].pic = in->ReadInt32();
             }
         }
     }
@@ -1106,10 +1106,10 @@ HSaveError WriteManagedPool(Stream *out)
 
 HSaveError ReadManagedPool(Stream *in, int32_t cmp_ver, const PreservedParams &pp, RestoredData &r_data)
 {
-    if (ccUnserializeAllObjects(in, &ccUnserializer))
+    if (ccUnserializeAllObjects(in, &_GP(ccUnserializer)))
     {
         return new SavegameError(kSvgErr_GameObjectInitFailed,
-            String::FromFormat("Managed pool deserialization failed: %s", ccErrorString.GetCStr()));
+            String::FromFormat("Managed pool deserialization failed: %s", _G(ccErrorString).GetCStr()));
     }
     return HSaveError::None();
 }

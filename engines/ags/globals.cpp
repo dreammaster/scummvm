@@ -110,7 +110,7 @@ Globals::Globals() {
 
 	// audio.cpp globals
 	_audioChannels = new std::array<SOUNDCLIP *>(MAX_SOUND_CHANNELS + 1);
-	// TODO: double check that ambient sounds array actually needs +1
+	// TODO: double check that _GP(ambient) sounds array actually needs +1
 	_ambient = new std::array<AmbientSound>(MAX_SOUND_CHANNELS + 1);
 	_scrAudioChannel = new ScriptAudioChannel[MAX_SOUND_CHANNELS + 1];
 

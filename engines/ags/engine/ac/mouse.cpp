@@ -233,11 +233,11 @@ void set_cursor_mode(int newmode) {
 		return;
 	}
 	if (newmode == MODE_USE) {
-		if (_G(playerchar)->activeinv == -1) {
+		if (_G(_G(playerchar))->activeinv == -1) {
 			find_next_enabled_cursor(0);
 			return;
 		}
-		update_inv_cursor(_G(playerchar)->activeinv);
+		update_inv_cursor(_G(_G(playerchar))->activeinv);
 	}
 	cur_mode = newmode;
 	set_default_cursor();
@@ -315,7 +315,7 @@ int IsButtonDown(int which) {
 
 int IsModeEnabled(int which) {
 	return (which < 0) || (which >= _GP(game).numcursors) ? 0 :
-		which == MODE_USE ? _G(playerchar)->activeinv > 0 :
+		which == MODE_USE ? _G(_G(playerchar))->activeinv > 0 :
 	(_GP(game).mcurs[which].flags & MCF_DISABLED) == 0;
 }
 
@@ -392,7 +392,7 @@ bool is_standard_cursor_enabled(int curs) {
 	if ((_GP(game).mcurs[curs].flags & MCF_DISABLED) == 0) {
 		// inventory cursor, and they have an active item
 		if (curs == MODE_USE) {
-			if (_G(playerchar)->activeinv > 0)
+			if (_G(_G(playerchar))->activeinv > 0)
 				return true;
 		}
 		// standard cursor that's not disabled, go with it

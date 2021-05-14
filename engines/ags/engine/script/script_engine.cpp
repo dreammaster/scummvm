@@ -31,14 +31,14 @@ namespace AGS { namespace Shared { class RoomStruct; } }
 using namespace AGS::Shared;
 
 extern void quit(const char *);
-extern int currentline; // in script/script_common
+ // in script/script_common
 
 std::pair<String, String> cc_error_at_line(const char *error_msg)
 {
     ccInstance *sci = ccInstance::GetCurrentInstance();
     if (!sci)
     {
-        return std::make_pair(String::FromFormat("Error (line %d): %s", currentline, error_msg), String());
+        return std::make_pair(String::FromFormat("Error (line %d): %s", _G(currentline), error_msg), String());
     }
     else
     {

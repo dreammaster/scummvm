@@ -107,7 +107,7 @@ extern int displayed_room;
 
 extern RoomStatus *croom;
 extern SpriteCache spriteset;
-extern ViewStruct *views;
+
 extern int game_paused;
 extern GameSetup usetup;
 extern int inside_script;
@@ -118,7 +118,7 @@ extern MoveList *mls;
 extern RGB palette[256];
 extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 extern int numPluginReaders;
-extern RuntimeScriptValue GlobalReturnValue;
+extern RuntimeScriptValue _G(GlobalReturnValue);
 extern ScriptString myScriptStringImpl;
 
 // **************** PLUGIN IMPLEMENTATION ****************
@@ -352,7 +352,7 @@ void IAGSEngine::DrawTextWrapped(int32 xx, int32 yy, int32 wid, int32 font, int3
 		draw_and_invalidate_text(ds, xx, yy + linespacing * i, font, text_color, Lines[i]);
 }
 
-Bitmap glVirtualScreenWrap;
+Bitmap _G(glVirtualScreenWrap);
 void IAGSEngine::SetVirtualScreen(BITMAP *bmp) {
 	if (!gfxDriver->UsesMemoryBackBuffer()) {
 		debug_script_warn("SetVirtualScreen: this plugin requires software graphics driver to work correctly.");
@@ -360,10 +360,10 @@ void IAGSEngine::SetVirtualScreen(BITMAP *bmp) {
 	}
 
 	if (bmp) {
-		glVirtualScreenWrap.WrapAllegroBitmap(bmp, true);
-		gfxDriver->SetMemoryBackBuffer(&glVirtualScreenWrap);
+		_G(glVirtualScreenWrap).WrapAllegroBitmap(bmp, true);
+		gfxDriver->SetMemoryBackBuffer(&_G(glVirtualScreenWrap));
 	} else {
-		glVirtualScreenWrap.Destroy();
+		_G(glVirtualScreenWrap).Destroy();
 		gfxDriver->SetMemoryBackBuffer(nullptr);
 	}
 }
@@ -493,12 +493,12 @@ AGSViewFrame *IAGSEngine::GetViewFrame(int32 view, int32 loop, int32 frame) {
 	view--;
 	if ((view < 0) || (view >= _GP(game).numviews))
 		quit("!IAGSEngine::GetViewFrame: invalid view");
-	if ((loop < 0) || (loop >= views[view].numLoops))
+	if ((loop < 0) || (loop >= _G(views)[view].numLoops))
 		quit("!IAGSEngine::GetViewFrame: invalid loop");
-	if ((frame < 0) || (frame >= views[view].loops[loop].numFrames))
+	if ((frame < 0) || (frame >= _G(views)[view].loops[loop].numFrames))
 		return nullptr;
 
-	return (AGSViewFrame *)&views[view].loops[loop].frames[frame];
+	return (AGSViewFrame *)&_G(views)[view].loops[loop].frames[frame];
 }
 
 int IAGSEngine::GetRawPixelColor(int32 color) {
@@ -579,7 +579,7 @@ void IAGSEngine::PlaySoundChannel(int32 channel, int32 soundType, int32 volume, 
 	else if (soundType == PSND_OGGSTATIC)
 		newcha = my_load_static_ogg(asset_name, volume, (loop != 0));
 	else if (soundType == PSND_MIDI) {
-		if (_GP(play).silent_midi != 0 || current_music_type == MUS_MIDI)
+		if (_GP(play).silent_midi != 0 || _G(current_music_type) == MUS_MIDI)
 			quit("!IAGSEngine::PlaySoundChannel: MIDI already in use");
 		newcha = my_load_midi(asset_name, loop);
 		newcha->set_volume(volume);
@@ -704,7 +704,7 @@ void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, i
 }
 
 int IAGSEngine::RegisterManagedObject(const void *object, IAGSScriptManagedObject *callback) {
-	GlobalReturnValue.SetPluginObject((void *)object, (ICCDynamicObject *)callback);
+	_G(GlobalReturnValue).SetPluginObject((void *)object, (ICCDynamicObject *)callback);
 	return ccRegisterManagedObject(object, (ICCDynamicObject *)callback, true);
 }
 
@@ -726,7 +726,7 @@ void IAGSEngine::AddManagedObjectReader(const char *typeName, IAGSManagedObjectR
 }
 
 void IAGSEngine::RegisterUnserializedObject(int key, const void *object, IAGSScriptManagedObject *callback) {
-	GlobalReturnValue.SetPluginObject((void *)object, (ICCDynamicObject *)callback);
+	_G(GlobalReturnValue).SetPluginObject((void *)object, (ICCDynamicObject *)callback);
 	ccRegisterUnserializedObject(key, object, (ICCDynamicObject *)callback, true);
 }
 
@@ -739,9 +739,9 @@ void *IAGSEngine::GetManagedObjectAddressByKey(int key) {
 	ICCDynamicObject *manager;
 	ScriptValueType obj_type = ccGetObjectAddressAndManagerFromHandle(key, object, manager);
 	if (obj_type == kScValPluginObject) {
-		GlobalReturnValue.SetPluginObject(object, manager);
+		_G(GlobalReturnValue).SetPluginObject(object, manager);
 	} else {
-		GlobalReturnValue.SetDynamicObject(object, manager);
+		_G(GlobalReturnValue).SetDynamicObject(object, manager);
 	}
 	return object;
 }
@@ -749,7 +749,7 @@ void *IAGSEngine::GetManagedObjectAddressByKey(int key) {
 const char *IAGSEngine::CreateScriptString(const char *fromText) {
 	const char *string = CreateNewScriptString(fromText);
 	// Should be still standard dynamic object, because not managed by plugin
-	GlobalReturnValue.SetDynamicObject((void *)string, &myScriptStringImpl);
+	_G(GlobalReturnValue).SetDynamicObject((void *)string, &myScriptStringImpl);
 	return string;
 }
 

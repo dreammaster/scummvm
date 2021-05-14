@@ -37,9 +37,9 @@ using AGS::Shared::Bitmap;
 extern GameSetup usetup;
 extern int numcurso, hotx, hoty;
 
-extern int windowbackgroundcolor;
-extern int cbuttfont;
-extern int smcode;
+extern int _G(windowbackgroundcolor);
+extern int _G(cbuttfont);
+extern int _G(smcode);
 
 MyListBox::MyListBox(int xx, int yy, int wii, int hii) {
 	x = xx;
@@ -66,7 +66,7 @@ MyListBox::~MyListBox() {
 }
 
 void MyListBox::draw(Bitmap *ds) {
-	color_t draw_color = ds->GetCompatibleColor(windowbackgroundcolor);
+	color_t draw_color = ds->GetCompatibleColor(_G(windowbackgroundcolor));
 	ds->FillRect(Rect(x, y, x + wid, y + hit), draw_color);
 	draw_color = ds->GetCompatibleColor(0);
 	ds->DrawRect(Rect(x, y, x + wid, y + hit), draw_color);
@@ -105,7 +105,7 @@ void MyListBox::draw(Bitmap *ds) {
 			text_color = ds->GetCompatibleColor(7);
 		} else text_color = ds->GetCompatibleColor(0);
 
-		wouttextxy(ds, x + 2, thisypos, cbuttfont, text_color, itemnames[inum]);
+		wouttextxy(ds, x + 2, thisypos, _G(cbuttfont), text_color, itemnames[inum]);
 	}
 	wid = widwas;
 }
@@ -127,7 +127,7 @@ int MyListBox::pressedon(int mousex, int mousey) {
 	//    ags_domouse(DOMOUSE_DISABLE);
 	draw(get_gui_screen());
 	//  ags_domouse(DOMOUSE_ENABLE);
-	smcode = CM_SELCHANGE;
+	_G(smcode) = CM_SELCHANGE;
 	return 0;
 }
 
@@ -191,7 +191,7 @@ int MyListBox::processmessage(int mcode, int wParam, long lParam) {
 			topitem = (selected + 1) - numonscreen;
 
 		drawandmouse();
-		smcode = CM_SELCHANGE;
+		_G(smcode) = CM_SELCHANGE;
 	} else
 		return -1;
 

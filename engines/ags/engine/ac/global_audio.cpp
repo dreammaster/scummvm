@@ -45,22 +45,22 @@ extern GameSetup usetup;
 
 
 
-extern SpeechLipSyncLine *splipsync;
-extern int numLipLines, curLipLine, curLipLinePhoneme;
+extern SpeechLipSyncLine *_G(splipsync);
+extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 
 void StopAmbientSound(int channel) {
 	if ((channel < 0) || (channel >= MAX_SOUND_CHANNELS))
 		quit("!StopAmbientSound: invalid channel");
 
-	if (ambient[channel].channel == 0)
+	if (_GP(ambient)[channel].channel == 0)
 		return;
 
 	stop_and_destroy_channel(channel);
-	ambient[channel].channel = 0;
+	_GP(ambient)[channel].channel = 0;
 }
 
 void PlayAmbientSound(int channel, int sndnum, int vol, int x, int y) {
-	// the channel parameter is to allow multiple ambient sounds in future
+	// the channel parameter is to allow multiple _GP(ambient) sounds in future
 	if ((channel < 1) || (channel == SCHAN_SPEECH) || (channel >= MAX_SOUND_CHANNELS))
 		quit("!PlayAmbientSound: invalid channel number");
 	if ((vol < 1) || (vol > 255))
@@ -71,32 +71,32 @@ void PlayAmbientSound(int channel, int sndnum, int vol, int x, int y) {
 		return;
 
 	// only play the sound if it's not already playing
-	if ((ambient[channel].channel < 1) || (!channel_is_playing(ambient[channel].channel)) ||
-		(ambient[channel].num != sndnum)) {
+	if ((_GP(ambient)[channel].channel < 1) || (!channel_is_playing(_GP(ambient)[channel].channel)) ||
+		(_GP(ambient)[channel].num != sndnum)) {
 
 		StopAmbientSound(channel);
-		// in case a normal non-ambient sound was playing, stop it too
+		// in case a normal non-_GP(ambient) sound was playing, stop it too
 		stop_and_destroy_channel(channel);
 
 		SOUNDCLIP *asound = aclip ? load_sound_and_play(aclip, true) : nullptr;
 		if (asound == nullptr) {
-			debug_script_warn("Cannot load ambient sound %d", sndnum);
-			debug_script_log("FAILED to load ambient sound %d", sndnum);
+			debug_script_warn("Cannot load _GP(ambient) sound %d", sndnum);
+			debug_script_log("FAILED to load _GP(ambient) sound %d", sndnum);
 			return;
 		}
 
-		debug_script_log("Playing ambient sound %d on channel %d", sndnum, channel);
-		ambient[channel].channel = channel;
-		asound->priority = 15;  // ambient sound higher priority than normal sfx
+		debug_script_log("Playing _GP(ambient) sound %d on channel %d", sndnum, channel);
+		_GP(ambient)[channel].channel = channel;
+		asound->priority = 15;  // _GP(ambient) sound higher priority than normal sfx
 		set_clip_to_channel(channel, asound);
 	}
 	// calculate the maximum distance away the player can be, using X
 	// only (since X centred is still more-or-less total Y)
-	ambient[channel].maxdist = ((x > _GP(thisroom).Width / 2) ? x : (_GP(thisroom).Width - x)) - AMBIENCE_FULL_DIST;
-	ambient[channel].num = sndnum;
-	ambient[channel].x = x;
-	ambient[channel].y = y;
-	ambient[channel].vol = vol;
+	_GP(ambient)[channel].maxdist = ((x > _GP(thisroom).Width / 2) ? x : (_GP(thisroom).Width - x)) - AMBIENCE_FULL_DIST;
+	_GP(ambient)[channel].num = sndnum;
+	_GP(ambient)[channel].x = x;
+	_GP(ambient)[channel].y = y;
+	_GP(ambient)[channel].vol = vol;
 	update_ambient_sound_vol();
 }
 
@@ -140,7 +140,7 @@ int PlaySoundEx(int val1, int channel) {
 	if ((channel < SCHAN_NORMAL) || (channel >= MAX_SOUND_CHANNELS))
 		quit("!PlaySoundEx: invalid channel specified, must be 3-7");
 
-	// if an ambient sound is playing on this channel, abort it
+	// if an _GP(ambient) sound is playing on this channel, abort it
 	StopAmbientSound(channel);
 
 	if (val1 < 0) {
@@ -182,7 +182,7 @@ void PlayMusicResetQueue(int newmus) {
 }
 
 void SeekMIDIPosition(int position) {
-	if (_GP(play).silent_midi == 0 && current_music_type != MUS_MIDI)
+	if (_GP(play).silent_midi == 0 && _G(current_music_type) != MUS_MIDI)
 		return;
 
 	AudioChannelsLock lock;
@@ -194,7 +194,7 @@ void SeekMIDIPosition(int position) {
 int GetMIDIPosition() {
 	if (_GP(play).fast_forward)
 		return 99999;
-	if (_GP(play).silent_midi == 0 && current_music_type != MUS_MIDI)
+	if (_GP(play).silent_midi == 0 && _G(current_music_type) != MUS_MIDI)
 		return -1; // returns -1 on failure according to old manuals
 
 	AudioChannelsLock lock;
@@ -212,17 +212,17 @@ int IsMusicPlaying() {
 		return 0;
 
 	// This only returns positive if there was a music started by old audio API
-	if (current_music_type == 0)
+	if (_G(current_music_type) == 0)
 		return 0;
 
 	AudioChannelsLock lock;
 	auto *ch = lock.GetChannel(SCHAN_MUSIC);
 	if (ch == nullptr) { // This was probably a hacky fix in case it was not reset by game update; TODO: find out if needed
-		current_music_type = 0;
+		_G(current_music_type) = 0;
 		return 0;
 	}
 
-	bool result = (ch->is_playing()) || (crossFading > 0 && (lock.GetChannelIfPlaying(crossFading) != nullptr));
+	bool result = (ch->is_playing()) || (_G(crossFading) > 0 && (lock.GetChannelIfPlaying(_G(crossFading)) != nullptr));
 	return result ? 1 : 0;
 }
 
@@ -262,7 +262,7 @@ int PlayMusicQueued(int musnum) {
 
 		clear_music_cache();
 
-		cachedQueuedMusic = load_music_from_disk(musnum, (_GP(play).music_repeat > 0));
+		_G(cachedQueuedMusic) = load_music_from_disk(musnum, (_GP(play).music_repeat > 0));
 	}
 
 	return _GP(play).music_queue_size;
@@ -274,7 +274,7 @@ void scr_StopMusic() {
 }
 
 void SeekMODPattern(int patnum) {
-	if (current_music_type != MUS_MOD)
+	if (_G(current_music_type) != MUS_MOD)
 		return;
 
 	AudioChannelsLock lock;
@@ -286,12 +286,12 @@ void SeekMODPattern(int patnum) {
 }
 
 void SeekMP3PosMillis(int posn) {
-	if (current_music_type != MUS_MP3 && current_music_type != MUS_OGG)
+	if (_G(current_music_type) != MUS_MP3 && _G(current_music_type) != MUS_OGG)
 		return;
 
 	AudioChannelsLock lock;
 	auto *mus_ch = lock.GetChannel(SCHAN_MUSIC);
-	auto *cf_ch = (crossFading > 0) ? lock.GetChannel(crossFading) : nullptr;
+	auto *cf_ch = (_G(crossFading) > 0) ? lock.GetChannel(_G(crossFading)) : nullptr;
 	if (cf_ch)
 		cf_ch->seek(posn);
 	else if (mus_ch)
@@ -302,7 +302,7 @@ int GetMP3PosMillis() {
 	// in case they have "while (GetMP3PosMillis() < 5000) "
 	if (_GP(play).fast_forward)
 		return 999999;
-	if (current_music_type != MUS_MP3 && current_music_type != MUS_OGG)
+	if (_G(current_music_type) != MUS_MP3 && _G(current_music_type) != MUS_OGG)
 		return 0;  // returns 0 on failure according to old manuals
 
 	AudioChannelsLock lock;
@@ -353,8 +353,8 @@ void SetChannelVolume(int chan, int newvol) {
 	auto *ch = lock.GetChannelIfPlaying(chan);
 
 	if (ch) {
-		if (chan == ambient[chan].channel) {
-			ambient[chan].vol = newvol;
+		if (chan == _GP(ambient)[chan].channel) {
+			_GP(ambient)[chan].vol = newvol;
 			update_ambient_sound_vol();
 		} else
 			ch->set_volume(newvol);
@@ -395,7 +395,7 @@ void PlayMP3File(const char *filename) {
 		if (clip) {
 			if (clip->play()) {
 				set_clip_to_channel(useChan, clip);
-				current_music_type = MUS_OGG;
+				_G(current_music_type) = MUS_OGG;
 				_GP(play).cur_music_number = 1000;
 				// save the filename (if it's not what we were supplied with)
 				if (filename != &_GP(play).playmp3file_name[0])
@@ -413,7 +413,7 @@ void PlayMP3File(const char *filename) {
 		if (clip) {
 			if (clip->play()) {
 				set_clip_to_channel(useChan, clip);
-				current_music_type = MUS_MP3;
+				_G(current_music_type) = MUS_MP3;
 				_GP(play).cur_music_number = 1000;
 				// save the filename (if it's not what we were supplied with)
 				if (filename != &_GP(play).playmp3file_name[0])
@@ -437,7 +437,7 @@ void PlayMP3File(const char *filename) {
 }
 
 void PlaySilentMIDI(int mnum) {
-	if (current_music_type == MUS_MIDI)
+	if (_G(current_music_type) == MUS_MIDI)
 		quit("!PlaySilentMIDI: proper midi music is in progress");
 
 	_GP(play).silent_midi = mnum;
@@ -502,12 +502,12 @@ int IsMusicVoxAvailable() {
 	return _GP(play).separate_music_lib;
 }
 
-extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
+
 
 ScriptAudioChannel *PlayVoiceClip(CharacterInfo *ch, int sndid, bool as_speech) {
 	if (!play_voice_nonblocking(ch->index_id, sndid, as_speech))
 		return NULL;
-	return &scrAudioChannel[SCHAN_SPEECH];
+	return &_G(scrAudioChannel)[SCHAN_SPEECH];
 }
 
 // Construct an asset name for the voice-over clip for the given character and cue id
@@ -605,17 +605,17 @@ bool play_voice_speech(int charid, int sndid) {
 		return false;
 
 	int ii;  // Compare the base file name to the .pam file name
-	curLipLine = -1;  // See if we have voice lip sync for this line
-	curLipLinePhoneme = -1;
-	for (ii = 0; ii < numLipLines; ii++) {
-		if (ags_stricmp(splipsync[ii].filename, voice_file) == 0) {
-			curLipLine = ii;
+	_G(curLipLine) = -1;  // See if we have voice lip sync for this line
+	_G(curLipLinePhoneme) = -1;
+	for (ii = 0; ii < _G(numLipLines); ii++) {
+		if (ags_stricmp(_G(splipsync)[ii].filename, voice_file) == 0) {
+			_G(curLipLine) = ii;
 			break;
 		}
 	}
 	// if the lip-sync is being used for voice sync, disable
 	// the text-related lipsync
-	if (numLipLines > 0)
+	if (_G(numLipLines) > 0)
 		_GP(game).options[OPT_LIPSYNCTEXT] = 0;
 
 	// change Sierra w/bgrnd  to Sierra without background when voice
@@ -646,7 +646,7 @@ void stop_voice_speech() {
 	stop_voice_clip_impl();
 
 	// Reset lipsync
-	curLipLine = -1;
+	_G(curLipLine) = -1;
 	// Set back to Sierra w/bgrnd
 	if (_GP(play).no_textbg_when_voice == 2) {
 		_GP(play).no_textbg_when_voice = 1;

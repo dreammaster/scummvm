@@ -170,12 +170,12 @@ const char *regnames[] = { "null", "sp", "mar", "ax", "bx", "cx", "op", "dx" };
 
 const char *fixupnames[] = { "null", "fix_gldata", "fix_func", "fix_string", "fix_import", "fix_datadata", "fix_stack" };
 
-ccInstance *current_instance;
+ccInstance *_G(current_instance);
 // [IKM] 2012-10-21:
 // NOTE: This is temporary solution (*sigh*, one of many) which allows certain
 // exported functions return value as a RuntimeScriptValue object;
 // Of 2012-12-20: now used only for plugin exports
-RuntimeScriptValue GlobalReturnValue;
+RuntimeScriptValue _G(GlobalReturnValue);
 
 // Function call stack is used to temporarily store
 // values before passing them to script function
@@ -206,7 +206,7 @@ struct FunctionCallStack
 
 ccInstance *ccInstance::GetCurrentInstance()
 {
-    return current_instance;
+    return _G(current_instance);
 }
 
 ccInstance *ccInstance::CreateFromScript(PScript scri)
@@ -297,8 +297,8 @@ void ccInstance::AbortAndDestroy()
 
 int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const RuntimeScriptValue *params)
 {
-    ccError = 0;
-    currentline = 0;
+    _G(ccError) = 0;
+    _G(currentline) = 0;
 
     if (numargs > 0 && !params)
     {
@@ -359,7 +359,7 @@ int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const 
     // object pointer needs to start zeroed
     registers[SREG_OP].SetDynamicObject(nullptr, nullptr);
 
-    ccInstance* currentInstanceWas = current_instance;
+    ccInstance* currentInstanceWas = _G(current_instance);
     registers[SREG_SP].SetStackPtr( &stack[0] );
     stackdata_ptr = stackdata;
     // NOTE: Pushing parameters to stack in reverse order
@@ -369,7 +369,7 @@ int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const 
         PushValueToStack(params[i]);
     }
     PushValueToStack(RuntimeScriptValue().SetInt32(0)); // return address on stack
-    if (ccError)
+    if (_G(ccError))
     {
         return -1;
     }
@@ -379,7 +379,7 @@ int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const 
     ASSERT_STACK_SIZE(numargs);
     PopValuesFromStack(numargs);
     pc = 0;
-    current_instance = currentInstanceWas;
+    _G(current_instance) = currentInstanceWas;
 
     // NOTE that if proper multithreading is added this will need
     // to be reconsidered, since the GC could be run in the middle 
@@ -405,7 +405,7 @@ int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const 
         cc_error("stack pointer was not zero at completion of script");
         return -5;
     }
-    return ccError;
+    return _G(ccError);
 }
 
 // Macros to maintain the call stack
@@ -426,7 +426,7 @@ int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const 
     } \
     callStackSize--;\
     line_number = callStackLineNumber[callStackSize];\
-    currentline = line_number
+    _G(currentline) = line_number
 
 #define MAXNEST 50  // number of recursive function calls allowed
 int ccInstance::Run(int32_t curpc)
@@ -448,7 +448,7 @@ int ccInstance::Run(int32_t curpc)
     int loopIterationCheckDisabled = 0;
     thisbase[0] = 0;
     funcstart[0] = pc;
-    current_instance = this;
+    _G(current_instance) = this;
     ccInstance *codeInst = runningInst;
     int write_debug_dump = ccGetOption(SCOPT_DEBUGRUN);
 	ScriptOperation codeOp;
@@ -567,9 +567,9 @@ int ccInstance::Run(int32_t curpc)
         switch (codeOp.Instruction.Code) {
       case SCMD_LINENUM:
           line_number = arg1.IValue;
-          currentline = arg1.IValue;
+          _G(currentline) = arg1.IValue;
           if (new_line_hook)
-              new_line_hook(this, currentline);
+              new_line_hook(this, _G(currentline));
           break;
       case SCMD_ADD:
           // If the the register is SREG_SP, we are allocating new variable on the stack
@@ -586,7 +586,7 @@ int ccInstance::Run(int32_t curpc)
             else
             {
               PushDataToStack(arg2.IValue);
-              if (ccError)
+              if (_G(ccError))
               {
                   return -1;
               }
@@ -614,7 +614,7 @@ int ccInstance::Run(int32_t curpc)
                 // This is practically LOADSPOFFS
                 reg1 = GetStackPtrOffsetRw(arg2.IValue);
             }
-            if (ccError)
+            if (_G(ccError))
             {
                 return -1;
             }
@@ -665,7 +665,7 @@ int ccInstance::Run(int32_t curpc)
               returnValue = registers[SREG_AX].IValue;
               return 0;
           }
-          current_instance = this;
+          _G(current_instance) = this;
           POP_CALL_STACK;
           continue; // continue so that the PC doesn't get overwritten
           }
@@ -682,7 +682,7 @@ int ccInstance::Run(int32_t curpc)
           break;
       case SCMD_LOADSPOFFS:
           registers[SREG_MAR] = GetStackPtrOffsetRw(arg1.IValue);
-          if (ccError)
+          if (_G(ccError))
           {
               return -1;
           }
@@ -762,7 +762,7 @@ int ccInstance::Run(int32_t curpc)
 
           ASSERT_STACK_SPACE_AVAILABLE(1);
           PushValueToStack(RuntimeScriptValue().SetInt32(pc + codeOp.ArgCount + 1));
-          if (ccError)
+          if (_G(ccError))
           {
               return -1;
           }
@@ -811,7 +811,7 @@ int ccInstance::Run(int32_t curpc)
           // Push reg[arg1] value to the stack
           ASSERT_STACK_SPACE_AVAILABLE(1);
           PushValueToStack(reg1);
-          if (ccError)
+          if (_G(ccError))
           {
               return -1;
           }
@@ -872,7 +872,7 @@ int ccInstance::Run(int32_t curpc)
           // 64 bit: Handles are always 32 bit values. They are not C pointer.
 
       case SCMD_MEMREADPTR: {
-          ccError = 0;
+          _G(ccError) = 0;
 
           int32_t handle = registers[SREG_MAR].ReadInt32();
           void *object;
@@ -888,7 +888,7 @@ int ccInstance::Run(int32_t curpc)
           }
 
           // if error occurred, cc_error will have been set
-          if (ccError)
+          if (_G(ccError))
               return -1;
           break; }
       case SCMD_MEMWRITEPTR: {
@@ -1015,7 +1015,7 @@ int ccInstance::Run(int32_t curpc)
           // 0, so that the cc_run_code returns
           RuntimeScriptValue oldstack = registers[SREG_SP];
           PushValueToStack(RuntimeScriptValue().SetInt32(0));
-          if (ccError)
+          if (_G(ccError))
           {
               return -1;
           }
@@ -1074,7 +1074,7 @@ int ccInstance::Run(int32_t curpc)
 
           if (reg1.Type == kScValPluginFunction)
           {
-              GlobalReturnValue.Invalidate();
+              _G(GlobalReturnValue).Invalidate();
               int32_t int_ret_val;
               if (next_call_needs_object)
               {
@@ -1087,9 +1087,9 @@ int ccInstance::Run(int32_t curpc)
                   int_ret_val = call_function((intptr_t)reg1.Ptr, nullptr, num_args_to_func, func_callstack.GetHead() + 1);
               }
 
-              if (GlobalReturnValue.IsValid())
+              if (_G(GlobalReturnValue).IsValid())
               {
-                  return_value = GlobalReturnValue;
+                  return_value = _G(GlobalReturnValue);
               }
               else
               {
@@ -1123,13 +1123,13 @@ int ccInstance::Run(int32_t curpc)
             cc_error("invalid pointer type for function call: %d", reg1.Type);
           }
 
-          if (ccError)
+          if (_G(ccError))
           {
             return -1;
           }
 
           registers[SREG_AX] = return_value;
-          current_instance = this;
+          _G(current_instance) = this;
           next_call_needs_object = 0;
           num_args_to_func = -1;
           break;
@@ -1198,8 +1198,8 @@ int ccInstance::Run(int32_t curpc)
                   cc_error("invalid size for dynamic array; requested: %d, range: 1..%d", numElements, INT32_MAX);
                   return -1;
               }
-              DynObjectRef ref = globalDynamicArray.Create(numElements, arg2.IValue, arg3.GetAsBool());
-              reg1.SetDynamicObject(ref.second, &globalDynamicArray);
+              DynObjectRef ref = _GP(globalDynamicArray).Create(numElements, arg2.IValue, arg3.GetAsBool());
+              reg1.SetDynamicObject(ref.second, &_GP(globalDynamicArray));
               break;
           }
       case SCMD_NEWUSEROBJECT:
@@ -1274,13 +1274,13 @@ int ccInstance::Run(int32_t curpc)
           }
           break;
       case SCMD_CREATESTRING:
-          if (stringClassImpl == nullptr) {
+          if (_G(stringClassImpl) == nullptr) {
               cc_error("No string class implementation set, but opcode was used");
               return -1;
           }
           direct_ptr1 = (const char*)reg1.GetDirectPtr();
           reg1.SetDynamicObject(
-              stringClassImpl->CreateString(direct_ptr1).second,
+              _G(stringClassImpl)->CreateString(direct_ptr1).second,
               &myScriptStringImpl);
           break;
       case SCMD_STRINGSEQUAL:
@@ -1449,7 +1449,7 @@ bool ccInstance::IsBeingRun() const
 bool ccInstance::_Create(PScript scri, ccInstance * joined)
 {
     int i;
-    currentline = -1;
+    _G(currentline) = -1;
     if ((scri == nullptr) && (joined != nullptr))
         scri = joined->instanceof;
 
@@ -1695,7 +1695,7 @@ bool ccInstance::CreateGlobalVars(PScript scri)
                 return false;
             }
             // TODO: register this explicitly as a string instead (can do this later)
-            glvar.RValue.SetStaticObject(globaldata + data_addr, &GlobalStaticManager);
+            glvar.RValue.SetStaticObject(globaldata + data_addr, &_G(GlobalStaticManager));
             }
             break;
         default:

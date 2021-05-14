@@ -103,8 +103,8 @@ extern ViewStruct*views;
 extern CharacterCache *charcache;
 extern ObjectCache objcache[MAX_ROOM_OBJECTS];
 extern int displayed_room;
-extern CharacterExtras *charextra;
-extern CharacterInfo*_G(playerchar);
+extern CharacterExtras *_G(charextra);
+extern CharacterInfo*_G(_G(playerchar));
 extern int eip_guinum;
 extern int is_complete_overlay;
 extern int cur_mode,cur_cursor;
@@ -1490,7 +1490,7 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
         light_level = objs[aa].tint_light;
     }
     else {
-        // get the ambient or region tint
+        // get the _GP(ambient) or region tint
         int ignoreRegionTints = 1;
         if (objs[aa].flags & OBJF_USEREGIONTINTS)
             ignoreRegionTints = 0;
@@ -1503,8 +1503,8 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
     // check whether the image should be flipped
     int isMirrored = 0;
     if ( (objs[aa].view != (uint16_t)-1) &&
-        (views[objs[aa].view].loops[objs[aa].loop].frames[objs[aa].frame].pic == objs[aa].num) &&
-        ((views[objs[aa].view].loops[objs[aa].loop].frames[objs[aa].frame].flags & VFLG_FLIPSPRITE) != 0)) {
+        (_G(views)[objs[aa].view].loops[objs[aa].loop].frames[objs[aa].frame].pic == objs[aa].num) &&
+        ((_G(views)[objs[aa].view].loops[objs[aa].loop].frames[objs[aa].frame].flags & VFLG_FLIPSPRITE) != 0)) {
             isMirrored = 1;
     }
 
@@ -1756,16 +1756,16 @@ void prepare_characters_for_drawing() {
                 chin->name, displayed_room);
         }
 
-        if (chin->frame >= views[chin->view].loops[chin->loop].numFrames)
+        if (chin->frame >= _G(views)[chin->view].loops[chin->loop].numFrames)
             chin->frame = 0;
 
-        if ((chin->loop >= views[chin->view].numLoops) ||
-            (views[chin->view].loops[chin->loop].numFrames < 1)) {
+        if ((chin->loop >= _G(views)[chin->view].numLoops) ||
+            (_G(views)[chin->view].loops[chin->loop].numFrames < 1)) {
                 quitprintf("!The character '%s' could not be displayed because there were no frames in loop %d of view %d.",
                     chin->name, chin->loop, chin->view + 1);
         }
 
-        sppic=views[chin->view].loops[chin->loop].frames[chin->frame].pic;
+        sppic=_G(views)[chin->view].loops[chin->loop].frames[chin->frame].pic;
         if (sppic < 0)
             sppic = 0;  // in case it's screwed up somehow
         our_eip = 331;
@@ -1774,31 +1774,31 @@ void prepare_characters_for_drawing() {
         our_eip = 332;
 
         if (chin->flags & CHF_MANUALSCALING)  // character ignores scaling
-            zoom_level = charextra[aa].zoom;
+            zoom_level = _G(charextra)[aa].zoom;
         else if ((onarea <= 0) && (_GP(thisroom).WalkAreas[0].ScalingFar == 0)) {
-            zoom_level = charextra[aa].zoom;
+            zoom_level = _G(charextra)[aa].zoom;
             if (zoom_level == 0)
                 zoom_level = 100;
         }
         else
             zoom_level = get_area_scaling (onarea, chin->x, chin->y);
 
-        charextra[aa].zoom = zoom_level;
+        _G(charextra)[aa].zoom = zoom_level;
 
         tint_red = tint_green = tint_blue = tint_amount = tint_light = light_level = 0;
 
         if (chin->flags & CHF_HASTINT) {
             // object specific tint, use it
-            tint_red = charextra[aa].tint_r;
-            tint_green = charextra[aa].tint_g;
-            tint_blue = charextra[aa].tint_b;
-            tint_amount = charextra[aa].tint_level;
-            tint_light = charextra[aa].tint_light;
+            tint_red = _G(charextra)[aa].tint_r;
+            tint_green = _G(charextra)[aa].tint_g;
+            tint_blue = _G(charextra)[aa].tint_b;
+            tint_amount = _G(charextra)[aa].tint_level;
+            tint_light = _G(charextra)[aa].tint_light;
             light_level = 0;
         }
         else if (chin->flags & CHF_HASLIGHT)
         {
-            light_level = charextra[aa].tint_light;
+            light_level = _G(charextra)[aa].tint_light;
         }
         else {
             get_local_tint(chin->x, chin->y, chin->flags & CHF_NOLIGHTING,
@@ -1814,7 +1814,7 @@ void prepare_characters_for_drawing() {
 
         // adjust the sppic if mirrored, so it doesn't accidentally
         // cache the mirrored frame as the real one
-        if (views[chin->view].loops[chin->loop].frames[chin->frame].flags & VFLG_FLIPSPRITE) {
+        if (_G(views)[chin->view].loops[chin->loop].frames[chin->frame].flags & VFLG_FLIPSPRITE) {
             isMirrored = 1;
             specialpic = -sppic;
         }
@@ -1860,14 +1860,14 @@ void prepare_characters_for_drawing() {
             // it needs to be stretched, so calculate the new dimensions
 
             scale_sprite_size(sppic, zoom_level, &newwidth, &newheight);
-            charextra[aa].width=newwidth;
-            charextra[aa].height=newheight;
+            _G(charextra)[aa].width=newwidth;
+            _G(charextra)[aa].height=newheight;
         }
         else {
             // draw at original size, so just use the sprite width and height
             // TODO: store width and height always, that's much simplier to use for reference!
-            charextra[aa].width=0;
-            charextra[aa].height=0;
+            _G(charextra)[aa].width=0;
+            _G(charextra)[aa].height=0;
             newwidth = _GP(game).SpriteInfos[sppic].Width;
             newheight = _GP(game).SpriteInfos[sppic].Height;
         }
@@ -1950,7 +1950,7 @@ void prepare_characters_for_drawing() {
         }
         else if (walkBehindMethod == DrawAsSeparateCharSprite) 
         {
-            sort_out_char_sprite_walk_behind(useindx, bgX, bgY, usebasel, charextra[aa].zoom, newwidth, newheight);
+            sort_out_char_sprite_walk_behind(useindx, bgX, bgY, usebasel, _G(charextra)[aa].zoom, newwidth, newheight);
         }
         else if (walkBehindMethod == DrawOverCharSprite)
         {
@@ -2161,12 +2161,12 @@ void draw_gui_and_overlays()
     if (((debug_flags & DBG_NOIFACE)==0) && (displayed_room >= 0)) {
         int aa;
 
-        if (_G(playerchar)->activeinv >= MAX_INV) {
+        if (_G(_G(playerchar))->activeinv >= MAX_INV) {
             quit("!The player.activeinv variable has been corrupted, probably as a result\n"
                 "of an incorrect assignment in the game script.");
         }
-        if (_G(playerchar)->activeinv < 1) gui_inv_pic=-1;
-        else gui_inv_pic=_GP(game).invinfo[_G(playerchar)->activeinv].pic;
+        if (_G(_G(playerchar))->activeinv < 1) gui_inv_pic=-1;
+        else gui_inv_pic=_GP(game).invinfo[_G(_G(playerchar))->activeinv].pic;
         our_eip = 37;
         {
             for (aa=0;aa<_GP(game).numgui;aa++) {
@@ -2435,16 +2435,16 @@ void construct_game_screen_overlay(bool draw_mouse)
         else {
             int viewnum = _GP(game).mcurs[cur_cursor].view;
             int loopnum = 0;
-            if (loopnum >= views[viewnum].numLoops)
+            if (loopnum >= _G(views)[viewnum].numLoops)
                 quitprintf("An animating mouse cursor is using view %d which has no loops", viewnum + 1);
-            if (views[viewnum].loops[loopnum].numFrames < 1)
+            if (_G(views)[viewnum].loops[loopnum].numFrames < 1)
                 quitprintf("An animating mouse cursor is using view %d which has no frames in loop %d", viewnum + 1, loopnum);
 
             mouse_frame++;
-            if (mouse_frame >= views[viewnum].loops[loopnum].numFrames)
+            if (mouse_frame >= _G(views)[viewnum].loops[loopnum].numFrames)
                 mouse_frame = 0;
-            set_new_cursor_graphic(views[viewnum].loops[loopnum].frames[mouse_frame].pic);
-            mouse_delay = views[viewnum].loops[loopnum].frames[mouse_frame].speed + 5;
+            set_new_cursor_graphic(_G(views)[viewnum].loops[loopnum].frames[mouse_frame].pic);
+            mouse_delay = _G(views)[viewnum].loops[loopnum].frames[mouse_frame].speed + 5;
             CheckViewFrame(viewnum, loopnum, mouse_frame);
         }
         lastmx = mousex; lastmy = mousey;

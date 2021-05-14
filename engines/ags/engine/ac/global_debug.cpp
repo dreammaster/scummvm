@@ -97,7 +97,7 @@ void script_debug(int cmdd, int dataa) {
 	int rr;
 	if (cmdd == 0) {
 		for (rr = 1; rr < _GP(game).numinvitems; rr++)
-			_G(playerchar)->inv[rr] = 1;
+			_G(_G(playerchar))->inv[rr] = 1;
 		update_invorder();
 		//    Display("invorder decided there are %d items[display %d",_GP(play).inv_numorder,_GP(play).inv_numdisp);
 	} else if (cmdd == 1) {
@@ -105,7 +105,7 @@ void script_debug(int cmdd, int dataa) {
 		Display(toDisplay.GetCStr());
 		//    Display("shftR: %d  shftG: %d  shftB: %d", _rgb_r_shift_16, _rgb_g_shift_16, _rgb_b_shift_16);
 		//    Display("Remaining memory: %d kb",_go32_dpmi_remaining_virtual_memory()/1024);
-		//Display("Play char bcd: %d",->GetColorDepth(spriteset[views[_G(playerchar)->view].frames[_G(playerchar)->loop][_G(playerchar)->frame].pic]));
+		//Display("Play char bcd: %d",->GetColorDepth(spriteset[_G(views)[_G(_G(playerchar))->view].frames[_G(_G(playerchar))->loop][_G(_G(playerchar))->frame].pic]));
 	} else if (cmdd == 2) {  // show walkable areas from here
 		// TODO: support multiple viewports?!
 		const int viewport_index = 0;

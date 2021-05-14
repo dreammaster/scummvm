@@ -169,11 +169,11 @@ RuntimeScriptValue Sc_Dict_GetItemCount(void *self, const RuntimeScriptValue *pa
 }
 
 RuntimeScriptValue Sc_Dict_GetKeysAsArray(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptDictBase, void, globalDynamicArray, Dict_GetKeysAsArray);
+	API_OBJCALL_OBJ(ScriptDictBase, void, _GP(globalDynamicArray), Dict_GetKeysAsArray);
 }
 
 RuntimeScriptValue Sc_Dict_GetValuesAsArray(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptDictBase, void, globalDynamicArray, Dict_GetValuesAsArray);
+	API_OBJCALL_OBJ(ScriptDictBase, void, _GP(globalDynamicArray), Dict_GetValuesAsArray);
 }
 
 //=============================================================================
@@ -286,7 +286,7 @@ RuntimeScriptValue Sc_Set_GetItemCount(void *self, const RuntimeScriptValue *par
 }
 
 RuntimeScriptValue Sc_Set_GetItemAsArray(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptSetBase, void, globalDynamicArray, Set_GetItemsAsArray);
+	API_OBJCALL_OBJ(ScriptSetBase, void, _GP(globalDynamicArray), Set_GetItemsAsArray);
 }
 
 

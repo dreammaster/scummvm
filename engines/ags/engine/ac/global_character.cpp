@@ -52,7 +52,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern ViewStruct *views;
+
 extern RoomObject *objs;
 
 
@@ -60,7 +60,7 @@ extern ScriptObject scrObj[MAX_ROOM_OBJECTS];
 extern ScriptInvItem scrInv[MAX_INV];
 
 // defined in character unit
-extern CharacterExtras *charextra;
+extern CharacterExtras *_G(charextra);
 
 extern int32_t _sc_PlayerCharPtr;
 
@@ -114,33 +114,33 @@ void SetCharacterIdle(int who, int iview, int itime) {
 int GetCharacterWidth(int ww) {
 	CharacterInfo *char1 = &_GP(game).chars[ww];
 
-	if (charextra[ww].width < 1) {
+	if (_G(charextra)[ww].width < 1) {
 		if ((char1->view < 0) ||
-			(char1->loop >= views[char1->view].numLoops) ||
-			(char1->frame >= views[char1->view].loops[char1->loop].numFrames)) {
+			(char1->loop >= _G(views)[char1->view].numLoops) ||
+			(char1->frame >= _G(views)[char1->view].loops[char1->loop].numFrames)) {
 			debug_script_warn("GetCharacterWidth: Character %s has invalid frame: view %d, loop %d, frame %d", char1->scrname, char1->view + 1, char1->loop, char1->frame);
 			return data_to_game_coord(4);
 		}
 
-		return _GP(game).SpriteInfos[views[char1->view].loops[char1->loop].frames[char1->frame].pic].Width;
+		return _GP(game).SpriteInfos[_G(views)[char1->view].loops[char1->loop].frames[char1->frame].pic].Width;
 	} else
-		return charextra[ww].width;
+		return _G(charextra)[ww].width;
 }
 
 int GetCharacterHeight(int charid) {
 	CharacterInfo *char1 = &_GP(game).chars[charid];
 
-	if (charextra[charid].height < 1) {
+	if (_G(charextra)[charid].height < 1) {
 		if ((char1->view < 0) ||
-			(char1->loop >= views[char1->view].numLoops) ||
-			(char1->frame >= views[char1->view].loops[char1->loop].numFrames)) {
+			(char1->loop >= _G(views)[char1->view].numLoops) ||
+			(char1->frame >= _G(views)[char1->view].loops[char1->loop].numFrames)) {
 			debug_script_warn("GetCharacterHeight: Character %s has invalid frame: view %d, loop %d, frame %d", char1->scrname, char1->view + 1, char1->loop, char1->frame);
 			return data_to_game_coord(2);
 		}
 
-		return _GP(game).SpriteInfos[views[char1->view].loops[char1->loop].frames[char1->frame].pic].Height;
+		return _GP(game).SpriteInfos[_G(views)[char1->view].loops[char1->loop].frames[char1->frame].pic].Height;
 	} else
-		return charextra[charid].height;
+		return _G(charextra)[charid].height;
 }
 
 
@@ -390,7 +390,7 @@ void RunCharacterInteraction(int cc, int mood) {
 	else if (mood == MODE_TALK) passon = 2;
 	else if (mood == MODE_USE) {
 		passon = 3;
-		cdata = _G(playerchar)->activeinv;
+		cdata = _G(_G(playerchar))->activeinv;
 		_GP(play).usedinv = cdata;
 	} else if (mood == MODE_PICKUP) passon = 5;
 	else if (mood == MODE_CUSTOM1) passon = 6;
@@ -458,12 +458,12 @@ void SetActiveInventory(int iit) {
 	else if (iit != -1)
 		quitprintf("!SetActiveInventory: invalid inventory number %d", iit);
 
-	Character_SetActiveInventory(_G(playerchar), tosend);
+	Character_SetActiveInventory(_G(_G(playerchar)), tosend);
 }
 
 void update_invorder() {
 	for (int cc = 0; cc < _GP(game).numcharacters; cc++) {
-		charextra[cc].invorder_count = 0;
+		_G(charextra)[cc].invorder_count = 0;
 		int ff, howmany;
 		// Iterate through all inv items, adding them once (or multiple
 		// times if requested) to the list.
@@ -473,16 +473,16 @@ void update_invorder() {
 				howmany = 1;
 
 			for (int ts = 0; ts < howmany; ts++) {
-				if (charextra[cc].invorder_count >= MAX_INVORDER)
+				if (_G(charextra)[cc].invorder_count >= MAX_INVORDER)
 					quit("!Too many inventory items to display: 500 max");
 
-				charextra[cc].invorder[charextra[cc].invorder_count] = ff;
-				charextra[cc].invorder_count++;
+				_G(charextra)[cc].invorder[_G(charextra)[cc].invorder_count] = ff;
+				_G(charextra)[cc].invorder_count++;
 			}
 		}
 	}
 	// backwards compatibility
-	_GP(play).obsolete_inv_numorder = charextra[_GP(game).playercharacter].invorder_count;
+	_GP(play).obsolete_inv_numorder = _G(charextra)[_GP(game).playercharacter].invorder_count;
 	GUI::MarkInventoryForUpdate(_GP(game).playercharacter, true);
 }
 
@@ -490,18 +490,18 @@ void add_inventory(int inum) {
 	if ((inum < 0) || (inum >= MAX_INV))
 		quit("!AddInventory: invalid inventory number");
 
-	Character_AddInventory(_G(playerchar), &scrInv[inum], SCR_NO_VALUE);
+	Character_AddInventory(_G(_G(playerchar)), &scrInv[inum], SCR_NO_VALUE);
 
-	_GP(play).obsolete_inv_numorder = charextra[_GP(game).playercharacter].invorder_count;
+	_GP(play).obsolete_inv_numorder = _G(charextra)[_GP(game).playercharacter].invorder_count;
 }
 
 void lose_inventory(int inum) {
 	if ((inum < 0) || (inum >= MAX_INV))
 		quit("!LoseInventory: invalid inventory number");
 
-	Character_LoseInventory(_G(playerchar), &scrInv[inum]);
+	Character_LoseInventory(_G(_G(playerchar)), &scrInv[inum]);
 
-	_GP(play).obsolete_inv_numorder = charextra[_GP(game).playercharacter].invorder_count;
+	_GP(play).obsolete_inv_numorder = _G(charextra)[_GP(game).playercharacter].invorder_count;
 }
 
 void AddInventoryToCharacter(int charid, int inum) {

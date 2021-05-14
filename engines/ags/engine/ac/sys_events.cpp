@@ -283,7 +283,7 @@ static int sdl_button_to_mask(int button) {
 
 /* [sonneveld]
 Button tracking:
-On OSX, some tap to click up/down events happen too quickly to be detected on the polled mouse_b global variable.
+On OSX, some tap to click up/down events happen too quickly to be detected on the polled _G(mouse_b) global variable.
 Instead we accumulate button presses over a couple of timer loops.
 // TODO: check again when/if we replace polling with different event handling.
 */

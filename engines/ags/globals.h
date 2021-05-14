@@ -208,7 +208,7 @@ public:
 	volatile int _mouse_b = 0;	// Mouse buttons bitflags
 	volatile int _mouse_pos = 0;	// X position in upper 16 bits, Y in lower 16
 
-	volatile int freeze_mouse_flag;
+	//volatile int _freeze_mouse_flag;
 
 	/**@}*/
 
@@ -251,7 +251,7 @@ public:
 	std::array<SOUNDCLIP *> *_audioChannels;
 	std::array<AmbientSound> *_ambient;
 
-	volatile bool _audio_doing_crossfade = false;
+//	volatile bool _audio_doing_crossfade = false;
 	ScriptAudioChannel *_scrAudioChannel;
 	char _acaudio_buffer[256];
 	int _reserved_channel_count = 0;
@@ -377,7 +377,7 @@ public:
 
 	CharacterExtras *_charextra = nullptr;
 	CharacterInfo *_playerchar = nullptr;
-	int32_t _sc_PlayerCharPtr = 0;
+	//int32_t _sc_PlayerCharPtr = 0;
 	int _char_lowest_yp = 0;
 
 	// Sierra-style speech settings
@@ -413,15 +413,13 @@ public:
 	NewControl **_vobjs;
 	OnScreenWindow *_oswi;
 
-	int controlid = 0;
-
 	/**@}*/
 
 	/**
 	 * \defgroup debug globals
 	 * @{
 	 */
-
+//----->
 	int _editor_debugging_enabled = 0;
 	int _editor_debugging_initialized = 0;
 	char _editor_debugger_instance_token[100];

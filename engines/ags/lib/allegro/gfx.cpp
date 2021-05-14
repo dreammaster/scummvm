@@ -145,13 +145,13 @@ void stretch_sprite(BITMAP *bmp, const BITMAP *sprite, int x, int y, int w, int 
 
 void draw_trans_sprite(BITMAP *bmp, const BITMAP *sprite, int x, int y) {
 	bmp->draw(sprite, Common::Rect(0, 0, sprite->w, sprite->h),
-		x, y, false, false, true, _G(trans_blend_alpha));
+		x, y, false, false, true, _G(_G(trans_blend_alpha)));
 }
 
 void draw_lit_sprite(BITMAP *bmp, const BITMAP *sprite, int x, int y, int color) {
 	bmp->draw(sprite, Common::Rect(0, 0, sprite->w, sprite->h),
 		x, y, false, false, true, color,
-		_G(trans_blend_red), _G(trans_blend_green), _G(trans_blend_blue));
+		_G(_G(trans_blend_red)), _G(_G(trans_blend_green)), _G(_G(trans_blend_blue)));
 }
 
 void draw_sprite_h_flip(BITMAP *bmp, const BITMAP *sprite, int x, int y) {

@@ -74,7 +74,7 @@ extern CCInventory ccDynamicInv;
 extern CCGUI       ccDynamicGUI;
 extern CCObject    ccDynamicObject;
 extern CCDialog    ccDynamicDialog;
-extern CCAudioChannel ccDynamicAudio;
+extern CCAudioChannel _GP(ccDynamicAudio);
 
 extern ScriptString myScriptStringImpl;
 extern ScriptObject scrObj[MAX_ROOM_OBJECTS];
@@ -82,12 +82,12 @@ extern ScriptGUI *scrGui;
 extern ScriptHotspot scrHotspot[MAX_ROOM_HOTSPOTS];
 extern ScriptRegion scrRegion[MAX_ROOM_REGIONS];
 extern ScriptInvItem scrInv[MAX_INV];
-extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
+
 
 extern ScriptDialogOptionsRendering ccDialogOptionsRendering;
 extern ScriptDrawingSurface *dialogOptionsRenderingSurface;
 
-extern AGSStaticObject GlobalStaticManager;
+
 
 extern StaticArray StaticCharacterArray;
 extern StaticArray StaticObjectArray;
@@ -140,8 +140,8 @@ String GetGameInitErrorText(GameInitErrorType err) {
 // Initializes audio channels and clips and registers them in the script system
 void InitAndRegisterAudioObjects() {
 	for (int i = 0; i <= MAX_SOUND_CHANNELS; ++i) {
-		scrAudioChannel[i].id = i;
-		ccRegisterManagedObject(&scrAudioChannel[i], &ccDynamicAudio);
+		_G(scrAudioChannel)[i].id = i;
+		ccRegisterManagedObject(&_G(scrAudioChannel)[i], &_GP(ccDynamicAudio));
 	}
 
 	for (size_t i = 0; i < _GP(game).audioClips.size(); ++i) {
@@ -303,7 +303,7 @@ HError InitAndRegisterGameEntities() {
 
 	setup_player_character(_GP(game).playercharacter);
 	if (loaded_game_file_version >= kGameVersion_270)
-		ccAddExternalStaticObject("player", &_sc_PlayerCharPtr, &GlobalStaticManager);
+		ccAddExternalStaticObject("player", &_sc_PlayerCharPtr, &_G(GlobalStaticManager));
 	return HError::None();
 }
 
@@ -359,7 +359,7 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	//
 	// 3. Allocate and init game objects
 	//
-	charextra = (CharacterExtras *)calloc(_GP(game).numcharacters, sizeof(CharacterExtras));
+	_G(charextra) = (CharacterExtras *)calloc(_GP(game).numcharacters, sizeof(CharacterExtras));
 	charcache = (CharacterCache *)calloc(1, sizeof(CharacterCache) * _GP(game).numcharacters + 5);
 	mls = (MoveList *)calloc(_GP(game).numcharacters + MAX_ROOM_OBJECTS + 1, sizeof(MoveList));
 	actSpsCount = _GP(game).numcharacters + MAX_ROOM_OBJECTS + 2;
@@ -427,7 +427,7 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	scriptModules = ents.ScriptModules;
 	AllocScriptModules();
 	if (create_global_script())
-		return new GameInitError(kGameInitErr_ScriptLinkFailed, ccErrorString);
+		return new GameInitError(kGameInitErr_ScriptLinkFailed, _G(ccErrorString));
 
 	return HGameInitError::None();
 }

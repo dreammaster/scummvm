@@ -102,14 +102,14 @@ extern ViewStruct*views;
 extern int displayed_room;
 extern int eip_guinum;
 extern int eip_guiobj;
-extern SpeechLipSyncLine *splipsync;
-extern int numLipLines, curLipLine, curLipLinePhoneme;
+extern SpeechLipSyncLine *_G(splipsync);
+extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 
 extern IGraphicsDriver *gfxDriver;
 extern Bitmap **actsps;
 extern RGB palette[256];
-extern CharacterExtras *charextra;
-extern CharacterInfo*_G(playerchar);
+extern CharacterExtras *_G(charextra);
+extern CharacterInfo*_G(_G(playerchar));
 extern Bitmap **guibg;
 extern IDriverDependantBitmap **guibgbmp;
 
@@ -359,16 +359,16 @@ void engine_locate_speech_pak()
                     Debug::Printf(kDbgMsg_Info, "Unknown speech lip sync format (%d).\nLip sync disabled.", lipsync_fmt);
                 }
                 else {
-                    numLipLines = speechsync->ReadInt32();
-                    splipsync = (SpeechLipSyncLine*)malloc (sizeof(SpeechLipSyncLine) * numLipLines);
-                    for (int ee = 0; ee < numLipLines; ee++)
+                    _G(numLipLines) = speechsync->ReadInt32();
+                    _G(splipsync) = (SpeechLipSyncLine*)malloc (sizeof(SpeechLipSyncLine) * _G(numLipLines));
+                    for (int ee = 0; ee < _G(numLipLines); ee++)
                     {
-                        splipsync[ee].numPhonemes = speechsync->ReadInt16();
-                        speechsync->Read(splipsync[ee].filename, 14);
-                        splipsync[ee].endtimeoffs = (int*)malloc(splipsync[ee].numPhonemes * sizeof(int));
-                        speechsync->ReadArrayOfInt32(splipsync[ee].endtimeoffs, splipsync[ee].numPhonemes);
-                        splipsync[ee].frame = (short*)malloc(splipsync[ee].numPhonemes * sizeof(short));
-                        speechsync->ReadArrayOfInt16(splipsync[ee].frame, splipsync[ee].numPhonemes);
+                        _G(splipsync)[ee].numPhonemes = speechsync->ReadInt16();
+                        speechsync->Read(_G(splipsync)[ee].filename, 14);
+                        _G(splipsync)[ee].endtimeoffs = (int*)malloc(_G(splipsync)[ee].numPhonemes * sizeof(int));
+                        speechsync->ReadArrayOfInt32(_G(splipsync)[ee].endtimeoffs, _G(splipsync)[ee].numPhonemes);
+                        _G(splipsync)[ee].frame = (short*)malloc(_G(splipsync)[ee].numPhonemes * sizeof(short));
+                        speechsync->ReadArrayOfInt16(_G(splipsync)[ee].frame, _G(splipsync)[ee].numPhonemes);
                     }
                 }
                 delete speechsync;
@@ -728,8 +728,8 @@ void engine_init_game_settings()
             precache_view (_GP(game).mcurs[ee].view);
     }
     // may as well preload the character gfx
-    if (_G(playerchar)->view >= 0)
-        precache_view (_G(playerchar)->view);
+    if (_G(_G(playerchar))->view >= 0)
+        precache_view (_G(_G(playerchar))->view);
 
     for (ee = 0; ee < MAX_ROOM_OBJECTS; ee++)
         objcache[ee].image = nullptr;
@@ -759,19 +759,19 @@ void engine_init_game_settings()
         _GP(game).chars[ee].baseline = -1;
         _GP(game).chars[ee].walkwaitcounter = 0;
         _GP(game).chars[ee].z = 0;
-        charextra[ee].xwas = INVALID_X;
-        charextra[ee].zoom = 100;
+        _G(charextra)[ee].xwas = INVALID_X;
+        _G(charextra)[ee].zoom = 100;
         if (_GP(game).chars[ee].view >= 0) {
             // set initial loop to 0
             _GP(game).chars[ee].loop = 0;
             // or to 1 if they don't have up/down frames
-            if (views[_GP(game).chars[ee].view].loops[0].numFrames < 1)
+            if (_G(views)[_GP(game).chars[ee].view].loops[0].numFrames < 1)
                 _GP(game).chars[ee].loop = 1;
         }
-        charextra[ee].process_idle_this_time = 0;
-        charextra[ee].invorder_count = 0;
-        charextra[ee].slow_move_counter = 0;
-        charextra[ee].animwait = 0;
+        _G(charextra)[ee].process_idle_this_time = 0;
+        _G(charextra)[ee].invorder_count = 0;
+        _G(charextra)[ee].slow_move_counter = 0;
+        _G(charextra)[ee].animwait = 0;
     }
     // multiply up gui positions
     guibg = (Bitmap **)malloc(sizeof(Bitmap *) * _GP(game).numgui);
@@ -783,8 +783,8 @@ void engine_init_game_settings()
 
     our_eip=-5;
     for (ee=0;ee<_GP(game).numinvitems;ee++) {
-        if (_GP(game).invinfo[ee].flags & IFLG_STARTWITH) _G(playerchar)->inv[ee]=1;
-        else _G(playerchar)->inv[ee]=0;
+        if (_GP(game).invinfo[ee].flags & IFLG_STARTWITH) _G(_G(playerchar))->inv[ee]=1;
+        else _G(_G(playerchar))->inv[ee]=0;
     }
     _GP(play).score=0;
     _GP(play).sierra_inv_color=7;

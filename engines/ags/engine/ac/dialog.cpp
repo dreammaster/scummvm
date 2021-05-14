@@ -69,7 +69,7 @@ using namespace AGS::Shared;
 
 extern ccInstance *dialogScriptsInst;
 extern int in_new_room;
-extern CharacterInfo*_G(playerchar);
+extern CharacterInfo*_G(_G(playerchar));
 extern SpriteCache spriteset;
 extern AGSPlatformDriver *platform;
 extern int cur_mode,cur_cursor;
@@ -358,7 +358,7 @@ int write_dialog_options(Bitmap *ds, bool ds_has_alpha, int dlgxp, int curyp, in
     }
     else {
       // 'unread' colour
-      text_color = ds->GetCompatibleColor(_G(playerchar)->talkcolor);
+      text_color = ds->GetCompatibleColor(_G(_G(playerchar))->talkcolor);
     }
 
     if (mouseison==ww) {
@@ -807,7 +807,7 @@ void DialogOptions::Redraw()
       // Set up the text box, if present
       parserInput->Y = curyp + data_to_game_coord(_GP(game).options[OPT_DIALOGGAP]);
       parserInput->Width = areawid - get_fixed_pixel_size(10);
-      parserInput->TextColor = _G(playerchar)->talkcolor;
+      parserInput->TextColor = _G(_G(playerchar))->talkcolor;
       if (mouseison == DLG_OPTION_PARSER)
         parserInput->TextColor = forecol;
 

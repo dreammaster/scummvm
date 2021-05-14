@@ -63,7 +63,7 @@ using namespace AGS::Shared;
 
 extern int longestline;
 extern AGSPlatformDriver *platform;
-extern int loops_per_character;
+extern int _G(loops_per_character);
 extern SpriteCache spriteset;
 
 int display_message_aschar = 0;
@@ -425,7 +425,7 @@ int GetTextDisplayTime(const char *text, int canberel) {
 	// This is calculated using a hard-coded 15 for the text speed,
 	// so that it's always the same no matter how fast the user
 	// can read.
-	loops_per_character = (((uselen / _GP(play).lipsync_speed) + 1) * fpstimer) / uselen;
+	_G(loops_per_character) = (((uselen / _GP(play).lipsync_speed) + 1) * fpstimer) / uselen;
 
 	int textDisplayTimeInMS = ((uselen / (_GP(play).text_speed + _GP(play).text_speed_modifier)) + 1) * 1000;
 	if (textDisplayTimeInMS < _GP(play).text_min_display_time_ms)

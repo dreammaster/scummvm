@@ -67,8 +67,8 @@ extern int proper_exit;
 extern char check_dynamic_sprites_at_exit;
 extern int editor_debugging_initialized;
 extern IAGSEditorDebugger *editor_debugger;
-extern int need_to_stop_cd;
-extern int use_cdplayer;
+extern int _G(need_to_stop_cd);
+extern int _G(use_cdplayer);
 extern IGraphicsDriver *gfxDriver;
 
 bool handledErrorInEditor;
@@ -83,7 +83,7 @@ void quit_tell_editor_debugger(const String &qmsg, QuitReason qreason) {
 }
 
 void quit_stop_cd() {
-	if (need_to_stop_cd)
+	if (_G(need_to_stop_cd))
 		cd_manager(3, 0);
 }
 
@@ -114,7 +114,7 @@ void quit_shutdown_platform(QuitReason qreason) {
 
 	quit_check_dynamic_sprites(qreason);
 
-	if (use_cdplayer)
+	if (_G(use_cdplayer))
 		platform->ShutdownCDPlayer();
 }
 

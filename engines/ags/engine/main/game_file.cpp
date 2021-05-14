@@ -60,7 +60,7 @@ using namespace AGS::Engine;
 extern int ifacepopped;
 
 
-extern ViewStruct *views;
+
 extern DialogTopic *dialog;
 
 extern AGSPlatformDriver *platform;

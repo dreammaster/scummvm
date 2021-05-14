@@ -23,6 +23,7 @@
 #include "ags/engine/ac/dynobj/script_viewport.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/util/bbop.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 

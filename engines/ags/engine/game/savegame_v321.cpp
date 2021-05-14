@@ -63,13 +63,13 @@ using namespace AGS::Engine;
 
 
 
-extern ViewStruct *views;
-extern CharacterExtras *charextra;
+
+extern CharacterExtras *_G(charextra);
 extern MoveList *mls;
 extern RGB palette[256];
 extern DialogTopic *dialog;
-extern AnimatingGUIButton animbuts[MAX_ANIMATING_BUTTONS];
-extern int numAnimButs;
+
+
 extern int ifacepopped;
 extern int mouse_on_iface;
 extern Bitmap *raw_saved_screen;
@@ -206,7 +206,7 @@ static void ReadGameSetupStructBase_Aligned(Stream *in) {
 static void ReadCharacterExtras_Aligned(Stream *in) {
 	AlignedStream align_s(in, Shared::kAligned_Read);
 	for (int i = 0; i < _GP(game).numcharacters; ++i) {
-		charextra[i].ReadFromFile(&align_s);
+		_G(charextra)[i].ReadFromFile(&align_s);
 		align_s.Reset();
 	}
 }
@@ -230,8 +230,8 @@ static void restore_game_more_dynamic_values(Stream *in) {
 
 static void ReadAnimatedButtons_Aligned(Stream *in) {
 	AlignedStream align_s(in, Shared::kAligned_Read);
-	for (int i = 0; i < numAnimButs; ++i) {
-		animbuts[i].ReadFromFile(&align_s);
+	for (int i = 0; i < _G(numAnimButs); ++i) {
+		_G(animbuts)[i].ReadFromFile(&align_s);
 		align_s.Reset();
 	}
 }
@@ -246,7 +246,7 @@ static HSaveError restore_game_gui(Stream *in, int numGuisWas) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of GUI.");
 	}
 
-	numAnimButs = in->ReadInt32();
+	_G(numAnimButs) = in->ReadInt32();
 	ReadAnimatedButtons_Aligned(in);
 	return HSaveError::None();
 }
@@ -271,15 +271,15 @@ static void restore_game_thisroom(Stream *in, RestoredData &r_data) {
 
 static void restore_game_ambientsounds(Stream *in, RestoredData &r_data) {
 	for (int i = 0; i < MAX_SOUND_CHANNELS; ++i) {
-		ambient[i].ReadFromFile(in);
+		_GP(ambient)[i].ReadFromFile(in);
 	}
 
 	for (int bb = 1; bb < MAX_SOUND_CHANNELS; bb++) {
-		if (ambient[bb].channel == 0)
+		if (_GP(ambient)[bb].channel == 0)
 			r_data.DoAmbient[bb] = 0;
 		else {
-			r_data.DoAmbient[bb] = ambient[bb].num;
-			ambient[bb].channel = 0;
+			r_data.DoAmbient[bb] = _GP(ambient)[bb].num;
+			_GP(ambient)[bb].channel = 0;
 		}
 	}
 }
@@ -360,10 +360,10 @@ static HSaveError restore_game_views(Stream *in) {
 	}
 
 	for (int bb = 0; bb < _GP(game).numviews; bb++) {
-		for (int cc = 0; cc < views[bb].numLoops; cc++) {
-			for (int dd = 0; dd < views[bb].loops[cc].numFrames; dd++) {
-				views[bb].loops[cc].frames[dd].sound = in->ReadInt32();
-				views[bb].loops[cc].frames[dd].pic = in->ReadInt32();
+		for (int cc = 0; cc < _G(views)[bb].numLoops; cc++) {
+			for (int dd = 0; dd < _G(views)[bb].loops[cc].numFrames; dd++) {
+				_G(views)[bb].loops[cc].frames[dd].sound = in->ReadInt32();
+				_G(views)[bb].loops[cc].frames[dd].pic = in->ReadInt32();
 			}
 		}
 	}
@@ -398,10 +398,10 @@ static HSaveError restore_game_audioclips_and_crossfade(Stream *in, RestoredData
 				chan_info.Speed = in->ReadInt32();
 		}
 	}
-	crossFading = in->ReadInt32();
-	crossFadeVolumePerStep = in->ReadInt32();
-	crossFadeStep = in->ReadInt32();
-	crossFadeVolumeAtStart = in->ReadInt32();
+	_G(crossFading) = in->ReadInt32();
+	_G(crossFadeVolumePerStep) = in->ReadInt32();
+	_G(crossFadeStep) = in->ReadInt32();
+	_G(crossFadeVolumeAtStart) = in->ReadInt32();
 	return HSaveError::None();
 }
 
@@ -506,13 +506,13 @@ HSaveError restore_game_data(Stream *in, SavegameVersion svg_version, const Pres
 	// save the new room music vol for later use
 	r_data.RoomVolume = (RoomVolumeMod)in->ReadInt32();
 
-	if (ccUnserializeAllObjects(in, &ccUnserializer)) {
+	if (ccUnserializeAllObjects(in, &_GP(ccUnserializer))) {
 		return new SavegameError(kSvgErr_GameObjectInitFailed,
-			String::FromFormat("Managed pool deserialization failed: %s.", ccErrorString.GetCStr()));
+			String::FromFormat("Managed pool deserialization failed: %s.", _G(ccErrorString).GetCStr()));
 	}
 
 	// preserve legacy music type setting
-	current_music_type = in->ReadInt32();
+	_G(current_music_type) = in->ReadInt32();
 
 	return HSaveError::None();
 }

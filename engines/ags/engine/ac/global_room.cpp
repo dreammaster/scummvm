@@ -62,7 +62,7 @@ void SetAmbientTint(int red, int green, int blue, int opacity, int luminance) {
 		(luminance < 0) || (luminance > 100))
 		quit("!SetTint: invalid parameter. R,G,B must be 0-255, opacity & luminance 0-100");
 
-	debug_script_log("Set ambient tint RGB(%d,%d,%d) %d%%", red, green, blue, opacity);
+	debug_script_log("Set _GP(ambient) tint RGB(%d,%d,%d) %d%%", red, green, blue, opacity);
 
 	_GP(play).rtint_enabled = opacity > 0;
 	_GP(play).rtint_red = red;
@@ -87,7 +87,7 @@ void NewRoom(int nrnum) {
 
 	if (displayed_room < 0) {
 		// called from game_start; change the room where the game will start
-		_G(playerchar)->room = nrnum;
+		_G(_G(playerchar))->room = nrnum;
 		return;
 	}
 
@@ -120,16 +120,16 @@ void NewRoom(int nrnum) {
 		inv_screen_newroom = nrnum;
 		return;
 	} else if ((inside_script == 0) & (in_graph_script == 0)) {
-		new_room(nrnum, _G(playerchar));
+		new_room(nrnum, _G(_G(playerchar)));
 		return;
 	} else if (inside_script) {
 		curscript->queue_action(ePSANewRoom, nrnum, "NewRoom");
 		// we might be within a MoveCharacterBlocking -- the room
 		// change should abort it
-		if ((_G(playerchar)->walking > 0) && (_G(playerchar)->walking < TURNING_AROUND)) {
+		if ((_G(_G(playerchar))->walking > 0) && (_G(_G(playerchar))->walking < TURNING_AROUND)) {
 			// nasty hack - make sure it doesn't move the character
 			// to a walkable area
-			mls[_G(playerchar)->walking].direct = 1;
+			mls[_G(_G(playerchar))->walking].direct = 1;
 			StopMoving(_GP(game).playercharacter);
 		}
 	} else if (in_graph_script)
@@ -138,7 +138,7 @@ void NewRoom(int nrnum) {
 
 
 void NewRoomEx(int nrnum, int newx, int newy) {
-	Character_ChangeRoom(_G(playerchar), nrnum, newx, newy);
+	Character_ChangeRoom(_G(_G(playerchar)), nrnum, newx, newy);
 }
 
 void NewRoomNPC(int charid, int nrnum, int newx, int newy) {

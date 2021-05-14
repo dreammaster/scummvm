@@ -50,17 +50,17 @@ void color::writeToFile(AGS::Shared::Stream *file) const {
 
 
 void set_color(int idx, const RGB *p) {
-	_G(current_palette)[idx] = *p;
+	_G(_G(current_palette))[idx] = *p;
 }
 
 void set_palette(const PALETTE p) {
 	for (int idx = 0; idx < PAL_SIZE; ++idx)
-		_G(current_palette)[idx] = p[idx];
+		_G(_G(current_palette))[idx] = p[idx];
 }
 
 void set_palette_range(const PALETTE p, int from, int to, int retracesync) {
 	for (int i = from; i <= to; ++i) {
-		_G(current_palette)[i] = p[i];
+		_G(_G(current_palette))[i] = p[i];
 	}
 }
 
@@ -96,15 +96,15 @@ int makeacol32(int r, int g, int b, int a) {
 }
 
 int getr8(int c) {
-	return (int)_G(current_palette)[c].r;
+	return (int)_G(_G(current_palette))[c].r;
 }
 
 int getg8(int c) {
-	return (int)_G(current_palette)[c].g;
+	return (int)_G(_G(current_palette))[c].g;
 }
 
 int getb8(int c) {
-	return (int)_G(current_palette)[c].b;
+	return (int)_G(_G(current_palette))[c].b;
 }
 
 int getr15(int c) {
@@ -187,8 +187,8 @@ void select_palette(AL_CONST PALETTE p) {
 	int c;
 
 	for (c = 0; c < PAL_SIZE; c++) {
-		_G(prev_current_palette)[c] = _G(current_palette)[c];
-		_G(current_palette)[c] = p[c];
+		_G(_G(prev_current_palette))[c] = _G(_G(current_palette))[c];
+		_G(_G(current_palette))[c] = p[c];
 	}
 
 	// TODO: See if the remainder of Allegro's select_palette method is needed for AGS
@@ -198,15 +198,15 @@ void unselect_palette(void) {
 	int c;
 
 	for (c = 0; c < PAL_SIZE; c++)
-		_G(current_palette)[c] = _G(prev_current_palette)[c];
+		_G(_G(current_palette))[c] = _G(_G(prev_current_palette))[c];
 }
 
 void set_blender_mode(BlenderMode m, int r, int g, int b, int a) {
-	_G(_blender_mode) = m;
-	_G(trans_blend_alpha) = a;
-	_G(trans_blend_red) = r;
-	_G(trans_blend_green) = g;
-	_G(trans_blend_blue) = b;
+	_G(_G(_blender_mode)) = m;
+	_G(_G(trans_blend_alpha)) = a;
+	_G(_G(trans_blend_red)) = r;
+	_G(_G(trans_blend_green)) = g;
+	_G(_G(trans_blend_blue)) = b;
 }
 
 void set_alpha_blender(void) {
@@ -477,14 +477,14 @@ int bestfit_color(AL_CONST PALETTE pal, int r, int g, int b) {
 
 /* makecol8:
  *  Converts R, G, and B values (ranging 0-255) to an 8 bit paletted color.
- *  If the global _G(rgb_map) table is initialised, it uses that, otherwise
+ *  If the global _G(_GP(rgb_map)) table is initialised, it uses that, otherwise
  *  it searches through the current palette to find the best match.
  */
 int makecol8(int r, int g, int b) {
-	if (_G(rgb_map))
-		return _G(rgb_map)->data[r >> 3][g >> 3][b >> 3];
+	if (_G(_GP(rgb_map)))
+		return _G(_GP(rgb_map))->data[r >> 3][g >> 3][b >> 3];
 	else
-		return bestfit_color(_G(current_palette), r >> 2, g >> 2, b >> 2);
+		return bestfit_color(_G(_G(current_palette)), r >> 2, g >> 2, b >> 2);
 }
 
 
@@ -819,7 +819,7 @@ void create_light_table(COLOR_MAP *table, AL_CONST PALETTE pal, int r, int g, in
 	assert(g >= 0 && g <= 63);
 	assert(b >= 0 && b <= 63);
 
-	if (_G(rgb_map)) {
+	if (_G(_GP(rgb_map))) {
 		for (x = 0; x < PAL_SIZE - 1; x++) {
 			t1 = x * 0x010101;
 			t2 = 0xFFFFFF - t1;
@@ -833,7 +833,7 @@ void create_light_table(COLOR_MAP *table, AL_CONST PALETTE pal, int r, int g, in
 				g2 = (g1 + pal[y].g * t1) >> 25;
 				b2 = (b1 + pal[y].b * t1) >> 25;
 
-				table->data[x][y] = _G(rgb_map)->data[r2][g2][b2];
+				table->data[x][y] = _G(_GP(rgb_map))->data[r2][g2][b2];
 			}
 		}
 		if (callback)
@@ -898,7 +898,7 @@ void create_trans_table(COLOR_MAP *table, AL_CONST PALETTE pal, int r, int g, in
 	if (b > 128)
 		b++;
 
-	if (_G(rgb_map))
+	if (_G(_GP(rgb_map)))
 		add = 255;
 	else
 		add = 127;
@@ -917,12 +917,12 @@ void create_trans_table(COLOR_MAP *table, AL_CONST PALETTE pal, int r, int g, in
 		p = table->data[x];
 		q = tmp;
 
-		if (_G(rgb_map)) {
+		if (_G(_GP(rgb_map))) {
 			for (y = 0; y < PAL_SIZE; y++) {
 				tr = (i + *(q++)) >> 9;
 				tg = (j + *(q++)) >> 9;
 				tb = (k + *(q++)) >> 9;
-				p[y] = _G(rgb_map)->data[tr][tg][tb];
+				p[y] = _G(_GP(rgb_map))->data[tr][tg][tb];
 			}
 		} else {
 			for (y = 0; y < PAL_SIZE; y++) {

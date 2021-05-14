@@ -33,9 +33,9 @@ namespace AGS3 {
 using AGS::Shared::Stream;
 
 // currently executed line
-int currentline;
+int _G(currentline);
 // script file format signature
-const char scfilesig[5] = "SCOM";
+const char _G(scfilesig)[5] = "SCOM";
 
 // [IKM] I reckon this function is almost identical to fgetstring in string_utils
 void freadstring(char **strptr, Stream *in) {
@@ -179,7 +179,7 @@ ccScript::~ccScript() {
 
 void ccScript::Write(Stream *out) {
 	int n;
-	out->Write(scfilesig, 4);
+	out->Write(_G(scfilesig), 4);
 	out->WriteInt32(SCOM_VERSION);
 	out->WriteInt32(globaldatasize);
 	out->WriteInt32(codesize);
@@ -215,14 +215,14 @@ bool ccScript::Read(Stream *in) {
 	instances = 0;
 	int n;
 	char gotsig[5];
-	currentline = -1;
+	_G(currentline) = -1;
 	// MACPORT FIX: swap 'size' and 'nmemb'
 	in->Read(gotsig, 4);
 	gotsig[4] = 0;
 
 	int fileVer = in->ReadInt32();
 
-	if ((strcmp(gotsig, scfilesig) != 0) || (fileVer > SCOM_VERSION)) {
+	if ((strcmp(gotsig, _G(scfilesig)) != 0) || (fileVer > SCOM_VERSION)) {
 		cc_error("file was not written by ccScript::Write or seek position is incorrect");
 		return false;
 	}

@@ -112,7 +112,7 @@ void RunHotspotInteraction(int hotspothere, int mood) {
 	else if (mood == MODE_CUSTOM2) passon = 9;
 	else if (mood == MODE_USE) {
 		passon = 3;
-		cdata = _G(playerchar)->activeinv;
+		cdata = _G(_G(playerchar))->activeinv;
 		_GP(play).usedinv = cdata;
 	}
 

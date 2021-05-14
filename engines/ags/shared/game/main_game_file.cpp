@@ -225,7 +225,7 @@ HGameFileError ReadDialogScript(PScript &dialog_script, Stream *in, GameDataVers
 	{
 		dialog_script.reset(ccScript::CreateFromStream(in));
 		if (dialog_script == nullptr)
-			return new MainGameFileError(kMGFErr_CreateDialogScriptFailed, ccErrorString);
+			return new MainGameFileError(kMGFErr_CreateDialogScriptFailed, _G(ccErrorString));
 	} else // 2.x and < 3.1.1 dialog
 	{
 		dialog_script.reset();
@@ -241,7 +241,7 @@ HGameFileError ReadScriptModules(std::vector<PScript> &sc_mods, Stream *in, Game
 		for (int i = 0; i < count; ++i) {
 			sc_mods[i].reset(ccScript::CreateFromStream(in));
 			if (sc_mods[i] == nullptr)
-				return new MainGameFileError(kMGFErr_CreateScriptModuleFailed, ccErrorString);
+				return new MainGameFileError(kMGFErr_CreateScriptModuleFailed, _G(ccErrorString));
 		}
 	} else {
 		sc_mods.resize(0);
@@ -264,7 +264,7 @@ void ReadViews(GameSetupStruct &game, ViewStruct *&views, Stream *in, GameDataVe
 	if (data_ver > kGameVersion_272) // 3.x views
 	{
 		for (int i = 0; i < _GP(game).numviews; ++i) {
-			views[i].ReadFromFile(in);
+			_G(views)[i].ReadFromFile(in);
 		}
 	} else // 2.x views
 	{
@@ -507,7 +507,7 @@ void UpgradeAudio(GameSetupStruct &game, GameDataVersion data_ver) {
 	std::vector<AudioClipType> audiocliptypes;
 	std::vector<ScriptAudioClip> audioclips;
 
-	// TODO: find out what is 4 (maybe music, sound, ambient sound, voice?)
+	// TODO: find out what is 4 (maybe music, sound, _GP(ambient) sound, voice?)
 	audiocliptypes.resize(4);
 	for (int i = 0; i < 4; i++) {
 		audiocliptypes[i].reservedChannels = 1;
@@ -721,7 +721,7 @@ HGameFileError ReadGameData(LoadedGameEntities &ents, Stream *in, GameDataVersio
 		return new MainGameFileError(kMGFErr_NoGlobalScript);
 	ents.GlobalScript.reset(ccScript::CreateFromStream(in));
 	if (!ents.GlobalScript)
-		return new MainGameFileError(kMGFErr_CreateGlobalScriptFailed, ccErrorString);
+		return new MainGameFileError(kMGFErr_CreateGlobalScriptFailed, _G(ccErrorString));
 	err = ReadDialogScript(ents.DialogScript, in, data_ver);
 	if (!err)
 		return err;
