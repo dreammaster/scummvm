@@ -23,8 +23,8 @@
 #ifndef AGS_ENGINE_AC_SYS_EVENTS_H
 #define AGS_ENGINE_AC_SYS_EVENTS_H
 
+#include "common/events.h"
 #include "ags/shared/ac/keycode.h"
-//include <SDL_keyboard.h>
 
 namespace AGS3 {
 
@@ -53,23 +53,24 @@ union SDL_Event;
 eAGSKeyCode ags_keycode_from_sdl(const SDL_Event &event);
 // Converts eAGSKeyCode to SDL key scans (up to 3 values, because this is not a 1:1 match);
 // NOTE: fails at Ctrl+ or Alt+ AGS keys, or any unknown key codes.
-bool ags_key_to_sdl_scan(eAGSKeyCode key, SDL_Scancode(&scan)[3]);
+
+bool ags_key_to_sdl_scan(eAGSKeyCode key, Common::KeyState(&scan)[3]);
 
 // Tells if key event refers to one of the mod-keys
-inline bool is_mod_key(const SDL_Keysym &key) {
-	return key.scancode == SDL_SCANCODE_LCTRL || key.scancode == SDL_SCANCODE_RCTRL ||
-		key.scancode == SDL_SCANCODE_LALT || key.scancode == SDL_SCANCODE_RALT ||
-		key.scancode == SDL_SCANCODE_LSHIFT || key.scancode == SDL_SCANCODE_RSHIFT ||
-		key.scancode == SDL_SCANCODE_MODE;
+inline bool is_mod_key(const Common::KeyState &ks) {
+	return ks.keycode == Common::KEYCODE_LCTRL || ks.keycode == Common::KEYCODE_RCTRL ||
+		ks.keycode == Common::KEYCODE_LALT || ks.keycode == Common::KEYCODE_RALT ||
+		ks.keycode == Common::KEYCODE_LSHIFT || ks.keycode == Common::KEYCODE_RSHIFT ||
+		ks.keycode == Common::KEYCODE_MODE;
 }
 
 // Converts mod key into merged mod (left & right) for easier handling
 inline int make_merged_mod(int mod) {
 	int m_mod = 0;
-	if ((mod & KMOD_CTRL) != 0) m_mod |= KMOD_CTRL;
-	if ((mod & KMOD_SHIFT) != 0) m_mod |= KMOD_SHIFT;
-	if ((mod & KMOD_ALT) != 0) m_mod |= KMOD_ALT;
-	// what about KMOD_GUI, and there's also some SDL_SCANCODE_MODE?
+	if ((mod & Common::KBD_CTRL) != 0) m_mod |= Common::KBD_CTRL;
+	if ((mod & Common::KBD_SHIFT) != 0) m_mod |= Common::KBD_SHIFT;
+	if ((mod & Common::KBD_ALT) != 0) m_mod |= Common::KBD_ALT;
+	// what about Common::KBD_GUI, and there's also some Common::KEYCODE_MODE?
 	return m_mod;
 }
 

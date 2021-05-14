@@ -212,14 +212,14 @@ HError InitAndRegisterGUI() {
 	guiScriptObjNames.resize(game.numgui);
 	for (int i = 0; i < game.numgui; ++i) {
 		// link controls to their parent guis
-		HError err = guis[i].RebuildArray();
+		HError err = _GP(guis)[i].RebuildArray();
 		if (!err)
 			return err;
 		// export all the GUI's controls
 		export_gui_controls(i);
 		// copy the script name to its own memory location
 		// because ccAddExtSymbol only keeps a reference
-		guiScriptObjNames[i] = guis[i].Name;
+		guiScriptObjNames[i] = _GP(guis)[i].Name;
 		scrGui[i].id = i;
 		ccAddExternalDynamicObject(guiScriptObjNames[i], &scrGui[i], &ccDynamicGUI);
 		ccRegisterManagedObject(&scrGui[i], &ccDynamicGUI);

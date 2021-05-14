@@ -599,7 +599,7 @@ HSaveError WriteGUI(Stream *out)
     WriteFormatTag(out, "GUIs");
     out->WriteInt32(game.numgui);
     for (int i = 0; i < game.numgui; ++i)
-        guis[i].WriteToSavegame(out);
+        _GP(guis)[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUIButtons");
     out->WriteInt32(numguibuts);
@@ -649,7 +649,7 @@ HSaveError ReadGUI(Stream *in, int32_t cmp_ver, const PreservedParams &pp, Resto
     if (!AssertGameContent(err, in->ReadInt32(), game.numgui, "GUIs"))
         return err;
     for (int i = 0; i < game.numgui; ++i)
-        guis[i].ReadFromSavegame(in, svg_ver);
+        _GP(guis)[i].ReadFromSavegame(in, svg_ver);
 
     if (!AssertFormatTagStrict(err, in, "GUIButtons"))
         return err;

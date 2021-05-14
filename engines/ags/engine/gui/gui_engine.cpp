@@ -118,7 +118,7 @@ bool GUIObject::IsClickable() const {
 }
 
 void GUIObject::NotifyParentChanged() {
-	guis[ParentId].MarkChanged();
+	_GP(guis)[ParentId].MarkChanged();
 }
 
 void GUILabel::PrepareTextToDraw() {

@@ -2170,30 +2170,30 @@ void draw_gui_and_overlays()
         our_eip = 37;
         {
             for (aa=0;aa<game.numgui;aa++) {
-                if (!guis[aa].IsDisplayed()) continue;
-                if (!guis[aa].HasChanged()) continue;
-                if (guis[aa].Transparency == 255) continue;
+                if (!_GP(guis)[aa].IsDisplayed()) continue;
+                if (!_GP(guis)[aa].HasChanged()) continue;
+                if (_GP(guis)[aa].Transparency == 255) continue;
 
-                guis[aa].ClearChanged();
+                _GP(guis)[aa].ClearChanged();
                 if (guibg[aa] == nullptr)
-                    recreate_guibg_image(&guis[aa]);
+                    recreate_guibg_image(&_GP(guis)[aa]);
 
                 eip_guinum = aa;
                 our_eip = 370;
                 guibg[aa]->ClearTransparent();
                 our_eip = 372;
-                guis[aa].DrawAt(guibg[aa], 0,0);
+                _GP(guis)[aa].DrawAt(guibg[aa], 0,0);
                 our_eip = 373;
 
                 bool isAlpha = false;
-                if (guis[aa].HasAlphaChannel()) 
+                if (_GP(guis)[aa].HasAlphaChannel()) 
                 {
                     isAlpha = true;
 
-                    if ((game.options[OPT_NEWGUIALPHA] == kGuiAlphaRender_Legacy) && (guis[aa].BgImage > 0))
+                    if ((game.options[OPT_NEWGUIALPHA] == kGuiAlphaRender_Legacy) && (_GP(guis)[aa].BgImage > 0))
                     {
                         // old-style (pre-3.0.2) GUI alpha rendering
-                        repair_alpha_channel(guibg[aa], spriteset[guis[aa].BgImage]);
+                        repair_alpha_channel(guibg[aa], spriteset[_GP(guis)[aa].BgImage]);
                     }
                 }
 
@@ -2212,21 +2212,21 @@ void draw_gui_and_overlays()
         // Draw the GUIs
         for (gg = 0; gg < game.numgui; gg++) {
             aa = play.gui_draw_order[gg];
-            if (!guis[aa].IsDisplayed()) continue;
-            if (guis[aa].Transparency == 255) continue;
+            if (!_GP(guis)[aa].IsDisplayed()) continue;
+            if (_GP(guis)[aa].Transparency == 255) continue;
 
             // Don't draw GUI if "GUIs Turn Off When Disabled"
             if ((game.options[OPT_DISABLEOFF] == 3) &&
                 (all_buttons_disabled > 0) &&
-                (guis[aa].PopupStyle != kGUIPopupNoAutoRemove))
+                (_GP(guis)[aa].PopupStyle != kGUIPopupNoAutoRemove))
                 continue;
 
-            add_thing_to_draw(guibgbmp[aa], guis[aa].X, guis[aa].Y, guis[aa].Transparency, guis[aa].HasAlphaChannel());
+            add_thing_to_draw(guibgbmp[aa], _GP(guis)[aa].X, _GP(guis)[aa].Y, _GP(guis)[aa].Transparency, _GP(guis)[aa].HasAlphaChannel());
 
             // only poll if the interface is enabled (mouseovers should not
             // work while in Wait state)
             if (IsInterfaceEnabled())
-                guis[aa].Poll();
+                _GP(guis)[aa].Poll();
         }
     }
 
