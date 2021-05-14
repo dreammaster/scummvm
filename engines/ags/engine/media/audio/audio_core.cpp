@@ -86,16 +86,16 @@ void audio_core_init() {
 	 /* Open and initialize a device */
 	g_acore.alcDevice = alcOpenDevice(nullptr);
 	if (!g_acore.alcDevice) {
-		throw std::runtime_error("PlayStateError opening device");
+		error("PlayStateError opening device");
 	}
 
 	g_acore.alcContext = alcCreateContext(g_acore.alcDevice, nullptr);
 	if (!g_acore.alcContext) {
-		throw std::runtime_error("PlayStateError creating context");
+		error("PlayStateError creating context");
 	}
 
 	if (alcMakeContextCurrent(g_acore.alcContext) == ALC_FALSE) {
-		throw std::runtime_error("PlayStateError setting context");
+		error("PlayStateError setting context");
 	}
 
 	const ALCchar *name = nullptr;
