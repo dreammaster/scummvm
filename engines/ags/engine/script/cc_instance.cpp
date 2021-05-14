@@ -1893,7 +1893,7 @@ bool ccInstance::FixupArgument(intptr_t code_value, char fixup_type, RuntimeScri
         break;
     default:
         cc_error("internal fixup type error: %d", fixup_type);
-        return false;;
+        return false;
     }
     return true;
 }

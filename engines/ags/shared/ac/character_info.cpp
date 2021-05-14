@@ -60,7 +60,7 @@ void CharacterInfo::ReadFromFile(Stream *in) {
 	speech_anim_speed = in->ReadInt16();
 	reserved1 = in->ReadInt16();
 	blocking_width = in->ReadInt16();
-	blocking_height = in->ReadInt16();;
+	blocking_height = in->ReadInt16();
 	index_id = in->ReadInt32();
 	pic_xoffs = in->ReadInt16();
 	walkwaitcounter = in->ReadInt16();
@@ -109,7 +109,7 @@ void CharacterInfo::WriteToFile(Stream *out) {
 	out->WriteInt16(speech_anim_speed);
 	out->WriteInt16(reserved1);
 	out->WriteInt16(blocking_width);
-	out->WriteInt16(blocking_height);;
+	out->WriteInt16(blocking_height);
 	out->WriteInt32(index_id);
 	out->WriteInt16(pic_xoffs);
 	out->WriteInt16(walkwaitcounter);

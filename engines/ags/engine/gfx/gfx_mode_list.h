@@ -30,7 +30,7 @@
 #define AGS_ENGINE_GFX__GFXMODELIST_H
 
 #include "ags/shared/core/types.h"
-#include "ags/shared/gfx/gfxdefines.h"
+#include "ags/engine/gfx/gfx_defines.h"
 
 namespace AGS3 {
 namespace AGS

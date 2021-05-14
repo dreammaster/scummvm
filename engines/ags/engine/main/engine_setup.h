@@ -16,7 +16,7 @@
 #define AGS_ENGINE_MAIN_ENGINE_SETUP_H
 
 #include "ags/shared/util/geometry.h"
-#include "ags/shared/gfx/gfxdefines.h"
+#include "ags/engine/gfx/gfx_defines.h"
 
 namespace AGS3 {
 

@@ -71,7 +71,7 @@ MFLError ReadHeader(AssetLibInfo &lib, Stream *in);
 
 void     WriteHeader(const AssetLibInfo &lib, MFLVersion lib_version, int lib_index, Stream *out);
 void     WriteEnder(soff_t lib_offset, MFLVersion lib_index, Stream *out);
-};
+} // namespace MFLUtil
 
 } // namespace Shared
 } // namespace AGS

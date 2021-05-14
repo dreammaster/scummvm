@@ -22,7 +22,7 @@
 //include <unistd.h>
 #include "ags/lib/allegro.h"
 #include "ags/engine/ac/runtime_defines.h"
-#include "ags/shared/gfx/gfxdefines.h"
+#include "ags/engine/gfx/gfx_defines.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/plugin/agsplugin.h"
 #include "ags/shared/util/string.h"
