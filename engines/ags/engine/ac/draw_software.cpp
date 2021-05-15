@@ -50,6 +50,7 @@
 #include "ags/engine/ac/draw_software.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/util/scaling.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -115,17 +116,6 @@ void DirtyRects::Reset() {
 	for (size_t i = 0; i < DirtyRows.size(); ++i)
 		DirtyRows[i].numSpans = 0;
 }
-
-// Dirty rects for the main viewport background (black screen);
-// these are used when the room viewport does not cover whole screen,
-// so that we know when to paint black after mouse cursor and gui.
-DirtyRects _G(BlackRects);
-// Dirty rects object for the single room camera
-std::vector<DirtyRects> _G(RoomCamRects);
-// Saved room camera offsets to know if we must invalidate whole surface.
-// TODO: if we support rotation then we also need to compare full transform!
-std::vector<std::pair<int, int>> _G(RoomCamPositions);
-
 
 void dispose_invalid_regions(bool /* room_only */) {
 	_G(RoomCamRects).clear();

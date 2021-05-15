@@ -141,7 +141,7 @@ String GetGameInitErrorText(GameInitErrorType err) {
 void InitAndRegisterAudioObjects() {
 	for (int i = 0; i <= MAX_SOUND_CHANNELS; ++i) {
 		_G(scrAudioChannel)[i].id = i;
-		ccRegisterManagedObject(&_G(scrAudioChannel)[i], &_GP(_GP(ccDynamicAudio)));
+		ccRegisterManagedObject(&_G(scrAudioChannel)[i], &_GP(ccDynamicAudio));
 	}
 
 	for (size_t i = 0; i < _GP(game).audioClips.size(); ++i) {
@@ -149,8 +149,8 @@ void InitAndRegisterAudioObjects() {
 		// to actual item index in array, so we don't make any difference
 		// between game versions, for now.
 		_GP(game).audioClips[i].id = i;
-		ccRegisterManagedObject(&_GP(game).audioClips[i], &_GP(_GP(ccDynamicAudioClip)));
-		ccAddExternalDynamicObject(_GP(game).audioClips[i].scriptName, &_GP(game).audioClips[i], &_GP(_GP(ccDynamicAudioClip)));
+		ccRegisterManagedObject(&_GP(game).audioClips[i], &_GP(ccDynamicAudioClip));
+		ccAddExternalDynamicObject(_GP(game).audioClips[i].scriptName, &_GP(game).audioClips[i], &_GP(ccDynamicAudioClip));
 	}
 }
 

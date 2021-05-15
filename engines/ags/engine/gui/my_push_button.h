@@ -31,7 +31,7 @@ struct MyPushButton :public NewControl {
 	char text[50];
 	MyPushButton(int xx, int yy, int wi, int hi, const char *tex);
 	void draw(Shared::Bitmap *ds) override;
-	int pressedon(int mousex, int mousey) override;
+	int pressedon(int _G(mousex), int _G(mousey)) override;
 	int processmessage(int mcode, int wParam, long lParam) override;
 };
 

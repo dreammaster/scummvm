@@ -134,10 +134,10 @@ HorAlignment ConvertLegacyGUIAlignment(LegacyGUIAlignment align);
 } // namespace AGS
 
 // Tells if all controls are disabled
-extern int all_buttons_disabled;
+extern int _G(all_buttons_disabled);
 // Tells if the given control is considered enabled, taking global flag into account
 inline bool IsGUIEnabled(AGS::Shared::GUIObject *g) {
-	return !all_buttons_disabled && g->IsEnabled();
+	return !_G(all_buttons_disabled) && g->IsEnabled();
 }
 
 } // namespace AGS3

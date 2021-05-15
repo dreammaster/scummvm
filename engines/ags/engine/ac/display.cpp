@@ -21,7 +21,6 @@
  */
 
 #include "ags/lib/std/math.h"
-
 #include "ags/engine/ac/display.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/font/ags_font_renderer.h"
@@ -369,10 +368,6 @@ bool try_auto_play_speech(const char *text, const char *&replace_text, int chari
 	}
 	return false;
 }
-
-// TODO: refactor this global variable out; currently it is set at the every get_translation call.
-// Be careful: a number of Say/Display functions expect it to be set beforehand.
-int _G(source_text_length) = -1;
 
 int GetTextDisplayLength(const char *text) {
 	int len = (int)strlen(text);

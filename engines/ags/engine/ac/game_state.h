@@ -74,7 +74,7 @@ struct GameState {
 	int  disabled_user_interface;  // >0 while in cutscene/etc
 	int  gscript_timer;    // obsolete
 	int  debug_mode;       // whether we're in debug mode
-	int  globalvars[MAXGLOBALVARS];  // obsolete
+	int  _G(globalvars)[MAXGLOBALVARS];  // obsolete
 	int  messagetime;      // time left for auto-remove messages
 	int  usedinv;          // inventory item last used
 	int  inv_top, inv_numdisp, obsolete_inv_numorder, inv_numinline;

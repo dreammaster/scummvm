@@ -29,28 +29,28 @@
 namespace AGS3 {
 
 // Current engine version
-extern AGS::Shared::Version EngineVersion;
+extern AGS::Shared::Version _G(EngineVersion);
 // Lowest savedgame version, accepted by this engine
-extern AGS::Shared::Version SavedgameLowestBackwardCompatVersion;
+extern AGS::Shared::Version _G(SavedgameLowestBackwardCompatVersion);
 // Lowest engine version, which would accept current savedgames
-extern AGS::Shared::Version SavedgameLowestForwardCompatVersion;
+extern AGS::Shared::Version _G(SavedgameLowestForwardCompatVersion);
 
 //=============================================================================
 
-extern char **global_argv;
+extern char **_G(global_argv);
 
 // Full path to the engine executable
 extern AGS::Shared::String appPath;
 // Engine executable's directory
-extern AGS::Shared::String appDirectory;
+extern AGS::Shared::String _G(appDirectory);
 // Game path from the startup options (before reading config)
-extern AGS::Shared::String cmdGameDataPath;
+extern AGS::Shared::String _G(cmdGameDataPath);
 
 AGS::Shared::String GetPathFromCmdArg(int arg_index);
 
 // Startup flags, set from parameters to engine
-extern int force_window;
-extern int override_start_room;
+extern int _G(force_window);
+extern int _G(override_start_room);
 extern bool justRegisterGame;
 extern bool justUnRegisterGame;
 extern bool justTellInfo;

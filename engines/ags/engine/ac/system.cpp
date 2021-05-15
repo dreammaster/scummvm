@@ -212,7 +212,7 @@ RuntimeScriptValue Sc_System_GetAudioChannelCount(const RuntimeScriptValue *para
 
 // ScriptAudioChannel* (int index)
 RuntimeScriptValue Sc_System_GetAudioChannels(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT(ScriptAudioChannel, _GP(_GP(ccDynamicAudio)), System_GetAudioChannels);
+	API_SCALL_OBJ_PINT(ScriptAudioChannel, _GP(ccDynamicAudio), System_GetAudioChannels);
 }
 
 // int ()

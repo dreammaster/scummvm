@@ -34,7 +34,7 @@ namespace AGS3 {
 #if AGS_PLATFORM_OS_ANDROID
 extern char android_app_directory[256];
 #else
-extern AGS::Shared::String appDirectory;
+extern AGS::Shared::String _G(appDirectory);
 #endif
 
 
@@ -101,7 +101,7 @@ public:
 			sprintf(buffer, "%s%s", android_app_directory, "/lib");
 			_library = dlopen(BuildPath(buffer, libraryName).GetCStr(), RTLD_LAZY);
 #else
-			_library = dlopen(BuildPath(appDirectory, libraryName).GetCStr(), RTLD_LAZY);
+			_library = dlopen(BuildPath(_G(appDirectory), libraryName).GetCStr(), RTLD_LAZY);
 #endif
 
 			AGS::Shared::Debug::Printf("dlopen returned: %s", dlerror());

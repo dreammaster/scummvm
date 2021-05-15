@@ -55,10 +55,10 @@ int  add_screen_overlay(int x, int y, int type, Shared::Bitmap *piccy, int pic_o
 void remove_screen_overlay_index(int over_idx);
 void recreate_overlay_ddbs();
 
-extern int is_complete_overlay;
-extern int is_text_overlay; // blocking text overlay on screen
+extern int _G(is_complete_overlay);
+extern int _G(is_text_overlay); // blocking text overlay on screen
 
-extern ScreenOverlay screenover[MAX_SCREEN_OVERLAYS];
+extern ScreenOverlay _G(screenover)[MAX_SCREEN_OVERLAYS];
 extern int numscreenover;
 
 } // namespace AGS3

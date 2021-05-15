@@ -107,17 +107,17 @@ RuntimeScriptValue Sc_AudioClip_Stop(void *self, const RuntimeScriptValue *param
 
 // ScriptAudioChannel* | ScriptAudioClip *clip, int priority, int repeat
 RuntimeScriptValue Sc_AudioClip_Play(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ_PINT2(ScriptAudioClip, ScriptAudioChannel, _GP(_GP(ccDynamicAudio)), AudioClip_Play);
+	API_OBJCALL_OBJ_PINT2(ScriptAudioClip, ScriptAudioChannel, _GP(ccDynamicAudio), AudioClip_Play);
 }
 
 // ScriptAudioChannel* | ScriptAudioClip *clip, int position, int priority, int repeat
 RuntimeScriptValue Sc_AudioClip_PlayFrom(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ_PINT3(ScriptAudioClip, ScriptAudioChannel, _GP(_GP(ccDynamicAudio)), AudioClip_PlayFrom);
+	API_OBJCALL_OBJ_PINT3(ScriptAudioClip, ScriptAudioChannel, _GP(ccDynamicAudio), AudioClip_PlayFrom);
 }
 
 // ScriptAudioChannel* | ScriptAudioClip *clip, int priority, int repeat
 RuntimeScriptValue Sc_AudioClip_PlayQueued(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ_PINT2(ScriptAudioClip, ScriptAudioChannel, _GP(_GP(ccDynamicAudio)), AudioClip_PlayQueued);
+	API_OBJCALL_OBJ_PINT2(ScriptAudioClip, ScriptAudioChannel, _GP(ccDynamicAudio), AudioClip_PlayQueued);
 }
 
 void RegisterAudioClipAPI() {

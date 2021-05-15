@@ -895,7 +895,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup guislider globals
+	 * \defgroup _G(guislider) globals
 	 * @{
 	 */
 
@@ -929,7 +929,7 @@ public:
 	 * @{
 	 */
 
-	int _in_inv_screen = 0, _inv_screen_newroom = -1;
+//	int _in_inv_screen = 0, _inv_screen_newroom = -1;
 
 	/**@}*/
 
@@ -938,10 +938,10 @@ public:
 	 * @{
 	 */
 
-	char *_lzbuffer = nullptr;
-	int *_node = nullptr;
-	int _pos = 0;
-	long _outbytes = 0, _maxsize = 0, _putbytes = 0;
+//	char *_lzbuffer = nullptr;
+//	int *_node = nullptr;
+//	int _pos = 0;
+//	long _outbytes = 0, _maxsize = 0, _putbytes = 0;
 
 	/**@}*/
 
@@ -954,18 +954,18 @@ public:
 	String _cmdGameDataPath;
 
 	const char **_global_argv = nullptr;
-	int _global_argc = 0;
+//	int _global_argc = 0;
 
 	// Startup flags, set from parameters to engine
 	int _force_window = 0;
 	int _override_start_room = 0;
-	bool _justDisplayHelp = false;
-	bool _justDisplayVersion = false;
-	bool _justRunSetup = false;
-	bool _justRegisterGame = false;
-	bool _justUnRegisterGame = false;
-	bool _justTellInfo = false;
-	std::set<String> _tellInfoKeys;
+//	bool _justDisplayHelp = false;
+//	bool _justDisplayVersion = false;
+//	bool _justRunSetup = false;
+//	bool _justRegisterGame = false;
+//	bool _justUnRegisterGame = false;
+//	bool _justTellInfo = false;
+//	std::set<String> _tellInfoKeys;
 	int _loadSaveGameOnStartup = -1;
 
 #if ! AGS_PLATFORM_DEFINES_PSP_VARS
@@ -1011,22 +1011,23 @@ public:
 
 	char _currentcursor = 0;
 	// virtual mouse cursor coordinates
-	int _mousex = 0, _mousey = 0, _numcurso = -1, _hotx = 0, _hoty = 0;
+	int _mousex = 0, _mousey = 0, _hotx = 0, _hoty = 0;
+	//int _numcurso = -1;
 	// real mouse coordinates and bounds
-	int _real_mouse_x = 0, _real_mouse_y = 0;
-	int _boundx1 = 0, _boundx2 = 99999, _boundy1 = 0, _boundy2 = 99999;
-	int _disable_mgetgraphpos = 0;
-	char _ignore_bounds = 0;
-	AGS::Shared::Bitmap *_mousecurs[MAXCURSORS];
+	//int _real_mouse_x = 0, _real_mouse_y = 0;
+	//int _boundx1 = 0, _boundx2 = 99999, _boundy1 = 0, _boundy2 = 99999;
+	//int _disable_mgetgraphpos = 0;
+	//char _ignore_bounds = 0;
+	//AGS::Shared::Bitmap *_mousecurs[MAXCURSORS];
 
 	ScriptMouse *_scmouse;
 	int _cur_mode = 0, _cur_cursor = 0;
-	int _mouse_frame = 0, _mouse_delay = 0;
-	int _lastmx = -1, _lastmy = -1;
-	char _alpha_blend_cursor = 0;
-	AGS::Shared::Bitmap *_dotted_mouse_cursor = nullptr;
-	AGS::Engine::IDriverDependantBitmap *_mouseCursor = nullptr;
-	AGS::Shared::Bitmap *_blank_mouse_cursor = nullptr;
+	//int _mouse_frame = 0, _mouse_delay = 0;
+	//int _lastmx = -1, _lastmy = -1;
+	//char _alpha_blend_cursor = 0;
+	//AGS::Shared::Bitmap *_dotted_mouse_cursor = nullptr;
+	//AGS::Engine::IDriverDependantBitmap *_mouseCursor = nullptr;
+	//AGS::Shared::Bitmap *_blank_mouse_cursor = nullptr;
 
 	/**@}*/
 
@@ -1035,8 +1036,8 @@ public:
 	 * @{
 	 */
 
-	int _butwas = 0;
-	int _hotxwas = 0, _hotywas = 0;
+	//int _butwas = 0;
+	//int _hotxwas = 0, _hotywas = 0;
 	Mouse *_mouse;
 
 	/**@}*/
@@ -1056,8 +1057,8 @@ public:
 	 * @{
 	 */
 
-	PluginObjectReader *_pluginReaders;
-	int _numPluginReaders = 0;
+//	PluginObjectReader *_pluginReaders;
+//	int _numPluginReaders = 0;
 
 	/**@}*/
 
@@ -1066,9 +1067,9 @@ public:
 	 * @{
 	 */
 
-	bool _handledErrorInEditor = false;
-	char _return_to_roomedit[30] = { '\0' };
-	char _return_to_room[150] = { '\0' };
+	//bool _handledErrorInEditor = false;
+	//char _return_to_roomedit[30] = { '\0' };
+	//char _return_to_room[150] = { '\0' };
 	char _quit_message[256] = { '\0' };
 
 	 /**@}*/
@@ -1078,10 +1079,10 @@ public:
 	 * @{
 	 */
 
-	RGB_MAP *_rgb_table;  // for 256-col antialiasing
-	int _new_room_flags = 0;
-	int _gs_to_newroom = -1;
-	int _bg_just_changed = 0;
+//	RGB_MAP *_rgb_table;  // for 256-col antialiasing
+//	int _new_room_flags = 0;
+//	int _gs_to_newroom = -1;
+//	int _bg_just_changed = 0;
 
 	/**@}*/
 

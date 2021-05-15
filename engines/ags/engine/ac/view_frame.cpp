@@ -203,7 +203,7 @@ RuntimeScriptValue Sc_ViewFrame_SetGraphic(void *self, const RuntimeScriptValue 
 
 // ScriptAudioClip* (ScriptViewFrame *svf)
 RuntimeScriptValue Sc_ViewFrame_GetLinkedAudio(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptViewFrame, ScriptAudioClip, _GP(_GP(ccDynamicAudioClip)), ViewFrame_GetLinkedAudio);
+	API_OBJCALL_OBJ(ScriptViewFrame, ScriptAudioClip, _GP(ccDynamicAudioClip), ViewFrame_GetLinkedAudio);
 }
 
 // void (ScriptViewFrame *svf, ScriptAudioClip* clip)
