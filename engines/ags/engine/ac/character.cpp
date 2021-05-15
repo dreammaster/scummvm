@@ -1060,10 +1060,10 @@ void Character_WalkStraight(CharacterInfo *chaa, int xx, int yy, int blocking) {
     int toYLowres = room_to_mask_coord(yy);
 
     if (!can_see_from(fromXLowres, fromYLowres, toXLowres, toYLowres)) {
-        int lastcx, lastcy;
-        get_lastcpos(lastcx, lastcy);
-        movetox = mask_to_room_coord(lastcx);
-        movetoy = mask_to_room_coord(lastcy);
+        int _G(lastcx), _G(lastcy);
+        get_lastcpos(_G(lastcx), _G(lastcy));
+        movetox = mask_to_room_coord(_G(lastcx));
+        movetoy = mask_to_room_coord(_G(lastcy));
     }
 
     walk_character(chaa->index_id, movetox, movetoy, 1, true);
@@ -1709,17 +1709,17 @@ void walk_character(int chac,int tox,int toy,int ignwal, bool autoWalkAnims) {
     // are still displayed as such
     debug_script_log("%s: Start move to %d,%d", chin->scrname, toxPassedIn, toyPassedIn);
 
-    int move_speed_x = chin->walkspeed;
-    int move_speed_y = chin->walkspeed;
+    int _G(move_speed_x) = chin->walkspeed;
+    int _G(move_speed_y) = chin->walkspeed;
 
     if (chin->walkspeed_y != UNIFORM_WALK_SPEED)
-        move_speed_y = chin->walkspeed_y;
+        _G(move_speed_y) = chin->walkspeed_y;
 
-    if ((move_speed_x == 0) && (move_speed_y == 0)) {
+    if ((_G(move_speed_x) == 0) && (_G(move_speed_y) == 0)) {
         debug_script_warn("Warning: MoveCharacter called for '%s' with walk speed 0", chin->name);
     }
 
-    set_route_move_speed(move_speed_x, move_speed_y);
+    set_route_move_speed(_G(move_speed_x), _G(move_speed_y));
     set_color_depth(8);
     int mslot=find_route(charX, charY, tox, toy, prepare_walkable_areas(chac), chac+CHMLSOFFS, 1, ignwal);
     set_color_depth(_GP(game).GetColorDepth());

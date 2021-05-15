@@ -129,9 +129,9 @@ extern IDriverDependantBitmap **_G(guibgbmp);
 extern CCHotspot _GP(ccDynamicHotspot);
 extern CCObject _GP(ccDynamicObject);
 
-RGB_MAP rgb_table;  // for 256-col antialiasing
-int new_room_flags=0;
-int gs_to_newroom=-1;
+RGB_MAP _GP(rgb_table);  // for 256-col antialiasing
+int _G(new_room_flags)=0;
+int _G(gs_to_newroom)=-1;
 
 ScriptDrawingSurface* Room_GetDrawingSurfaceForBackground(int backgroundNumber)
 {
@@ -715,8 +715,8 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
             if (palette[ff].b > 63)
                 palette[ff].b = 63;
         }
-        create_rgb_table (&rgb_table, palette, nullptr);
-        _GP(rgb_map) = &rgb_table;
+        create_rgb_table (&_GP(rgb_table), palette, nullptr);
+        _GP(rgb_map) = &_GP(rgb_table);
     }
     _G(our_eip) = 211;
     if (forchar!=nullptr) {
@@ -902,7 +902,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
         if (_GP(objs)[cc].on == 2)
             MergeObject(cc);
     }
-    new_room_flags=0;
+    _G(new_room_flags)=0;
     _GP(play).gscript_timer=-1;  // avoid screw-ups with changing screens
     _GP(play).player_on_region = 0;
     // trash any input which they might have done while it was loading
@@ -1033,7 +1033,7 @@ void compile_room_script() {
     getDialogOptionsDimensionsFunc.roomHasFunction = true;
 }
 
-int bg_just_changed = 0;
+int _G(bg_just_changed) = 0;
 
 void on_background_frame_change () {
 
@@ -1059,7 +1059,7 @@ void on_background_frame_change () {
     // 256-colours, tell it to update the palette (will actually be done as
     // close as possible to the screen update to prevent flicker problem)
     if (_GP(game).color_depth == 1)
-        bg_just_changed = 1;
+        _G(bg_just_changed) = 1;
 }
 
 void croom_ptr_clear()

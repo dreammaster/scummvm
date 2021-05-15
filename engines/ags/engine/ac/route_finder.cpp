@@ -35,9 +35,9 @@ class IRouteFinder {
 public:
 	virtual void init_pathfinder() = 0;
 	virtual void shutdown_pathfinder() = 0;
-	virtual void set_wallscreen(Bitmap *wallscreen) = 0;
+	virtual void set_wallscreen(Bitmap *_G(wallscreen)) = 0;
 	virtual int can_see_from(int x1, int y1, int x2, int y2) = 0;
-	virtual void get_lastcpos(int &lastcx, int &lastcy) = 0;
+	virtual void get_lastcpos(int &_G(lastcx), int &_G(lastcy)) = 0;
 	virtual void set_route_move_speed(int speed_x, int speed_y) = 0;
 	virtual int find_route(short srcx, short srcy, short xx, short yy, Bitmap *onscreen, int movlst, int nocross = 0, int ignore_walls = 0) = 0;
 	virtual void calculate_move_stage(MoveList *mlsp, int aaa) = 0;
@@ -51,14 +51,14 @@ public:
 	void shutdown_pathfinder() override {
 		AGS::Engine::RouteFinder::shutdown_pathfinder();
 	}
-	void set_wallscreen(Bitmap *wallscreen) override {
-		AGS::Engine::RouteFinder::set_wallscreen(wallscreen);
+	void set_wallscreen(Bitmap *_G(wallscreen)) override {
+		AGS::Engine::RouteFinder::set_wallscreen(_G(wallscreen));
 	}
 	int can_see_from(int x1, int y1, int x2, int y2) override {
 		return AGS::Engine::RouteFinder::can_see_from(x1, y1, x2, y2);
 	}
-	void get_lastcpos(int &lastcx, int &lastcy) override {
-		AGS::Engine::RouteFinder::get_lastcpos(lastcx, lastcy);
+	void get_lastcpos(int &_G(lastcx), int &_G(lastcy)) override {
+		AGS::Engine::RouteFinder::get_lastcpos(_G(lastcx), _G(lastcy));
 	}
 	void set_route_move_speed(int speed_x, int speed_y) override {
 		AGS::Engine::RouteFinder::set_route_move_speed(speed_x, speed_y);
@@ -79,14 +79,14 @@ public:
 	void shutdown_pathfinder() override {
 		AGS::Engine::RouteFinderLegacy::shutdown_pathfinder();
 	}
-	void set_wallscreen(Bitmap *wallscreen) override {
-		AGS::Engine::RouteFinderLegacy::set_wallscreen(wallscreen);
+	void set_wallscreen(Bitmap *_G(wallscreen)) override {
+		AGS::Engine::RouteFinderLegacy::set_wallscreen(_G(wallscreen));
 	}
 	int can_see_from(int x1, int y1, int x2, int y2) override {
 		return AGS::Engine::RouteFinderLegacy::can_see_from(x1, y1, x2, y2);
 	}
-	void get_lastcpos(int &lastcx, int &lastcy) override {
-		AGS::Engine::RouteFinderLegacy::get_lastcpos(lastcx, lastcy);
+	void get_lastcpos(int &_G(lastcx), int &_G(lastcy)) override {
+		AGS::Engine::RouteFinderLegacy::get_lastcpos(_G(lastcx), _G(lastcy));
 	}
 	void set_route_move_speed(int speed_x, int speed_y) override {
 		AGS::Engine::RouteFinderLegacy::set_route_move_speed(speed_x, speed_y);
@@ -117,16 +117,16 @@ void shutdown_pathfinder() {
 	route_finder_impl->shutdown_pathfinder();
 }
 
-void set_wallscreen(Bitmap *wallscreen) {
-	route_finder_impl->set_wallscreen(wallscreen);
+void set_wallscreen(Bitmap *_G(wallscreen)) {
+	route_finder_impl->set_wallscreen(_G(wallscreen));
 }
 
 int can_see_from(int x1, int y1, int x2, int y2) {
 	return route_finder_impl->can_see_from(x1, y1, x2, y2);
 }
 
-void get_lastcpos(int &lastcx, int &lastcy) {
-	route_finder_impl->get_lastcpos(lastcx, lastcy);
+void get_lastcpos(int &_G(lastcx), int &_G(lastcy)) {
+	route_finder_impl->get_lastcpos(_G(lastcx), _G(lastcy));
 }
 
 void set_route_move_speed(int speed_x, int speed_y) {

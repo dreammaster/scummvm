@@ -98,7 +98,7 @@ extern int mouse_frame,mouse_delay;
 extern int lastmx,lastmy;
 extern IDriverDependantBitmap *mouseCursor;
 extern int hotx,hoty;
-extern int bg_just_changed;
+extern int _G(bg_just_changed);
 
 color palette[256];
 
@@ -2505,9 +2505,9 @@ void render_graphics(IDriverDependantBitmap *extraBitmap, int extraX, int extraY
     if (!_GP(play).screen_is_faded_out) {
         // always update the palette, regardless of whether the plugin
         // vetos the screen update
-        if (bg_just_changed) {
+        if (_G(bg_just_changed)) {
             setpal();
-            bg_just_changed = 0;
+            _G(bg_just_changed) = 0;
         }
     }
 

@@ -1079,10 +1079,10 @@ public:
 	 * @{
 	 */
 
-//	RGB_MAP *_rgb_table;  // for 256-col antialiasing
-//	int _new_room_flags = 0;
-//	int _gs_to_newroom = -1;
-//	int _bg_just_changed = 0;
+	RGB_MAP *_rgb_table;  // for 256-col antialiasing
+	int _new_room_flags = 0;
+	int _gs_to_newroom = -1;
+	int _bg_just_changed = 0;
 
 	/**@}*/
 
@@ -1104,7 +1104,7 @@ public:
 	 * \defgroup screen globals
 	 * @{
 	 */
-
+//----->
 	// Screenshot made in the last room, used during some of the transition effects
 	AGS::Shared::Bitmap *_saved_viewport_bitmap = nullptr;
 	color *_old_palette;
