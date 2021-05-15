@@ -42,6 +42,10 @@
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/engine/script/runtime_script_value.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -54,7 +58,7 @@ using namespace Engine;
 extern RoomObject *_GP(objs);
 extern RoomStatus *_G(croom);
 extern CharacterCache *charcache;
-extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
+
 
 extern RGB palette[256];
 extern AGS::Engine::IGraphicsDriver *_G(gfxDriver);
@@ -488,10 +492,6 @@ void free_dynamic_sprite(int gotSlot) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
 
 // void (ScriptDynamicSprite *sds, int width, int height, int x, int y)
 RuntimeScriptValue Sc_DynamicSprite_ChangeCanvasSize(void *self, const RuntimeScriptValue *params, int32_t param_count) {

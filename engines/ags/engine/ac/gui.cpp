@@ -55,6 +55,10 @@
 #include "ags/engine/ac/dynobj/cc_gui_object.h"
 #include "ags/engine/script/runtime_script_value.h"
 #include "ags/shared/util/string_compat.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -71,7 +75,7 @@ extern ccInstance *gameinst;
 extern CCGUIObject _GP(ccDynamicGUIObject);
 extern Bitmap **_G(guibg);
 extern IDriverDependantBitmap **_G(guibgbmp);
-extern IGraphicsDriver *_G(gfxDriver);
+
 
 extern CCGUI _GP(ccDynamicGUI);
 extern CCGUIObject _GP(ccDynamicGUIObject);
@@ -683,10 +687,6 @@ void gui_on_mouse_down(const int guin, const int mbut) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
 
 // void GUI_Centre(ScriptGUI *sgui)
 RuntimeScriptValue Sc_GUI_Centre(void *self, const RuntimeScriptValue *params, int32_t param_count) {

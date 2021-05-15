@@ -294,15 +294,11 @@ void Button_SetTextAlignment(GUIButton *butt, int align) {
 	}
 }
 
-} // namespace AGS3
-
 //=============================================================================
 //
 // Script API Functions
 //
 //=============================================================================
-
-namespace AGS3 {
 
 // void | GUIButton *butt, int view, int loop, int speed, int repeat
 RuntimeScriptValue Sc_Button_Animate(void *self, const RuntimeScriptValue *params, int32_t param_count) {

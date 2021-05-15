@@ -24,6 +24,10 @@
 #include "ags/engine/ac/math.h"
 #include "ags/shared/ac/common.h" // quit
 #include "ags/shared/util/math.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -147,10 +151,6 @@ int __Rand(int upto) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
 
 // float (float value)
 RuntimeScriptValue Sc_Math_ArcCos(const RuntimeScriptValue *params, int32_t param_count) {

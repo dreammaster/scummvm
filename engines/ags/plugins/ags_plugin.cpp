@@ -100,9 +100,9 @@ using namespace AGS::Engine;
 #endif // BUILTIN_PLUGINS
 
 
-extern IGraphicsDriver *_G(gfxDriver);
+
 extern int mousex, mousey;
-extern int _G(displayed_room);
+
 
 
 extern RoomStatus *_G(croom);
@@ -113,13 +113,13 @@ extern int _G(game_paused);
 extern int inside_script;
 extern ccInstance *gameinst, *roominst;
 extern CharacterCache *charcache;
-extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
+
 
 extern RGB palette[256];
 extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 extern int numPluginReaders;
 extern RuntimeScriptValue _G(GlobalReturnValue);
-extern ScriptString _GP(myScriptStringImpl);
+
 
 // **************** PLUGIN IMPLEMENTATION ****************
 

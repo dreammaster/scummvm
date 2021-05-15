@@ -43,6 +43,11 @@
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gfx/gfxfilter.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/global_game.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -55,7 +60,7 @@ using namespace AGS::Engine;
 extern Bitmap *mousecurs[MAXCURSORS];
 
 
-extern IGraphicsDriver *_G(gfxDriver);
+
 
 extern void ags_domouse(int str);
 
@@ -233,11 +238,11 @@ void set_cursor_mode(int newmode) {
 		return;
 	}
 	if (newmode == MODE_USE) {
-		if (_G(_G(playerchar))->activeinv == -1) {
+		if (_G(playerchar)->activeinv == -1) {
 			find_next_enabled_cursor(0);
 			return;
 		}
-		update_inv_cursor(_G(_G(playerchar))->activeinv);
+		update_inv_cursor(_G(playerchar)->activeinv);
 	}
 	cur_mode = newmode;
 	set_default_cursor();
@@ -315,7 +320,7 @@ int IsButtonDown(int which) {
 
 int IsModeEnabled(int which) {
 	return (which < 0) || (which >= _GP(game).numcursors) ? 0 :
-		which == MODE_USE ? _G(_G(playerchar))->activeinv > 0 :
+		which == MODE_USE ? _G(playerchar)->activeinv > 0 :
 	(_GP(game).mcurs[which].flags & MCF_DISABLED) == 0;
 }
 
@@ -392,7 +397,7 @@ bool is_standard_cursor_enabled(int curs) {
 	if ((_GP(game).mcurs[curs].flags & MCF_DISABLED) == 0) {
 		// inventory cursor, and they have an active item
 		if (curs == MODE_USE) {
-			if (_G(_G(playerchar))->activeinv > 0)
+			if (_G(playerchar)->activeinv > 0)
 				return true;
 		}
 		// standard cursor that's not disabled, go with it
@@ -440,11 +445,6 @@ int find_previous_enabled_cursor(int startwith) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/global_game.h"
 
 // void  (int curs, int newslot)
 RuntimeScriptValue Sc_ChangeCursorGraphic(const RuntimeScriptValue *params, int32_t param_count) {

@@ -44,13 +44,6 @@ bool find_nearest_supported_mode(const AGS::Engine::IGfxModeList &modes, const S
 	const int color_depth, const Size *ratio_reference, const Size *upper_bound,
 	AGS::Engine::DisplayMode &dm, int *mode_index = nullptr);
 
-
-// The game-to-screen transformation
-// TODO: this is only required for low-level mouse processing;
-// when possible, move to mouse "manager" object, and assign at gfxmode init
-extern AGS::Engine::PlaneScaling _GP(GameScaling);
-
-
 // Filter configuration
 struct GfxFilterSetup {
 	String ID;          // internal filter ID

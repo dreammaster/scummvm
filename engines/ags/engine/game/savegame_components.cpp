@@ -66,7 +66,7 @@ using namespace Shared;
 
 
 extern RGB palette[256];
-extern DialogTopic *dialog;
+
 
 
 

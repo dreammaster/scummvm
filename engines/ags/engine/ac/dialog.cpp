@@ -59,37 +59,16 @@
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/media/audio/audio_system.h"
+
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 #include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
-extern ccInstance *dialogScriptsInst;
-extern int _G(in_new_room);
-
-
-extern AGSPlatformDriver *platform;
-extern int cur_mode,cur_cursor;
-extern IGraphicsDriver *_G(gfxDriver);
-
-DialogTopic *dialog;
-ScriptDialogOptionsRendering _GP(ccDialogOptionsRendering);
-ScriptDrawingSurface* _G(dialogOptionsRenderingSurface);
-
-int _G(said_speech_line); // used while in dialog to track whether screen needs updating
-
-// Old dialog support
-std::vector< std::shared_ptr<unsigned char> > _G(old_dialog_scripts);
-std::vector<String> _G(old_speech_lines);
-
-int _G(said_text) = 0;
-int _G(longestline) = 0;
-
-
-
 
 void Dialog_Start(ScriptDialog *sd) {
   RunDialog(sd->id);
@@ -123,50 +102,50 @@ int Dialog_GetOptionState(ScriptDialog *sd, int option) {
 
 int Dialog_HasOptionBeenChosen(ScriptDialog *sd, int option)
 {
-  if ((option < 1) || (option > dialog[sd->id].numoptions))
+  if ((option < 1) || (option > _G(dialog)[sd->id].numoptions))
     quit("!Dialog.HasOptionBeenChosen: Invalid option number specified");
   option--;
 
-  if (dialog[sd->id].optionflags[option] & DFLG_HASBEENCHOSEN)
+  if (_G(dialog)[sd->id].optionflags[option] & DFLG_HASBEENCHOSEN)
     return 1;
   return 0;
 }
 
 void Dialog_SetHasOptionBeenChosen(ScriptDialog *sd, int option, bool chosen)
 {
-    if (option < 1 || option > dialog[sd->id].numoptions)
+    if (option < 1 || option > _G(dialog)[sd->id].numoptions)
     {
         quit("!Dialog.HasOptionBeenChosen: Invalid option number specified");
     }
     option--;
     if (chosen)
     {
-        dialog[sd->id].optionflags[option] |= DFLG_HASBEENCHOSEN;
+        _G(dialog)[sd->id].optionflags[option] |= DFLG_HASBEENCHOSEN;
     }
     else
     {
-        dialog[sd->id].optionflags[option] &= ~DFLG_HASBEENCHOSEN;
+        _G(dialog)[sd->id].optionflags[option] &= ~DFLG_HASBEENCHOSEN;
     }
 }
 
 int Dialog_GetOptionCount(ScriptDialog *sd)
 {
-  return dialog[sd->id].numoptions;
+  return _G(dialog)[sd->id].numoptions;
 }
 
 int Dialog_GetShowTextParser(ScriptDialog *sd)
 {
-  return (dialog[sd->id].topicFlags & DTFLG_SHOWPARSER) ? 1 : 0;
+  return (_G(dialog)[sd->id].topicFlags & DTFLG_SHOWPARSER) ? 1 : 0;
 }
 
 const char* Dialog_GetOptionText(ScriptDialog *sd, int option)
 {
-  if ((option < 1) || (option > dialog[sd->id].numoptions))
+  if ((option < 1) || (option > _G(dialog)[sd->id].numoptions))
     quit("!Dialog.GetOptionText: Invalid option number specified");
 
   option--;
 
-  return CreateNewScriptString(get_translation(dialog[sd->id].optionnames[option]));
+  return CreateNewScriptString(get_translation(_G(dialog)[sd->id].optionnames[option]));
 }
 
 int Dialog_GetID(ScriptDialog *sd) {
@@ -358,7 +337,7 @@ int write_dialog_options(Bitmap *ds, bool ds_has_alpha, int dlgxp, int curyp, in
     }
     else {
       // 'unread' colour
-      text_color = ds->GetCompatibleColor(_G(_G(playerchar))->talkcolor);
+      text_color = ds->GetCompatibleColor(_G(playerchar)->talkcolor);
     }
 
     if (mouseison==ww) {
@@ -526,7 +505,7 @@ void DialogOptions::Prepare(int _dlgnum, bool _runGameLoopsInBackground)
 
   set_mouse_cursor(CURS_ARROW);
 
-  dtop=&dialog[dlgnum];
+  dtop=&_G(dialog)[dlgnum];
 
   chose=-1;
   numdisp=0;
@@ -807,7 +786,7 @@ void DialogOptions::Redraw()
       // Set up the text box, if present
       parserInput->Y = curyp + data_to_game_coord(_GP(game).options[OPT_DIALOGGAP]);
       parserInput->Width = areawid - get_fixed_pixel_size(10);
-      parserInput->TextColor = _G(_G(playerchar))->talkcolor;
+      parserInput->TextColor = _G(playerchar)->talkcolor;
       if (mouseison == DLG_OPTION_PARSER)
         parserInput->TextColor = forecol;
 
@@ -1145,7 +1124,7 @@ void do_conversation(int dlgnum)
   int dlgnum_was = dlgnum;
   int previousTopics[MAX_TOPIC_HISTORY];
   int numPrevTopics = 0;
-  DialogTopic *dtop = &dialog[dlgnum];
+  DialogTopic *dtop = &_G(dialog)[dlgnum];
 
   // run the startup script
   int tocar = run_dialog_script(dtop, dlgnum, dtop->startupentrypoint, 0);
@@ -1165,7 +1144,7 @@ void do_conversation(int dlgnum)
     if (dlgnum >= _GP(game).numdialog)
       quit("!RunDialog: invalid dialog number specified");
 
-    dtop = &dialog[dlgnum];
+    dtop = &_G(dialog)[dlgnum];
 
     if (dlgnum != dlgnum_was) 
     {
@@ -1244,19 +1223,11 @@ void do_conversation(int dlgnum)
 
 // end dialog manager
 
-
 //=============================================================================
 //
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/dynobj/script_string.h"
-
-extern ScriptString _GP(myScriptStringImpl);
 
 // int (ScriptDialog *sd)
 RuntimeScriptValue Sc_Dialog_GetID(void *self, const RuntimeScriptValue *params, int32_t param_count)

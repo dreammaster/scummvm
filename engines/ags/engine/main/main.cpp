@@ -71,8 +71,8 @@ int    global_argc = 0;
 
 
 
-extern int _G(our_eip);
-extern int _G(convert_16bit_bgr);
+
+
 
 
 

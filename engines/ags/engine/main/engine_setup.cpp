@@ -53,7 +53,7 @@ using namespace AGS::Engine;
 
 
 extern int _places_r, _places_g, _places_b;
-extern IGraphicsDriver *_G(gfxDriver);
+
 
 int _G(convert_16bit_bgr) = 0;
 

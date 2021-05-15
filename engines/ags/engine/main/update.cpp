@@ -61,7 +61,7 @@ extern RoomStatus *_G(croom);
 
 extern RoomObject *_GP(objs);
 
-extern int _G(our_eip);
+
 
 
 extern CharacterInfo *_G(facetalkchar);
@@ -72,7 +72,7 @@ extern bool _G(facetalk_qfg4_override_placement_x), _G(facetalk_qfg4_override_pl
 extern SpeechLipSyncLine *_G(splipsync);
 extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 extern int is_text_overlay;
-extern IGraphicsDriver *_G(gfxDriver);
+
 
 int do_movelist_move(short *mlnum, int *xx, int *yy) {
 	int need_to_fix_sprite = 0;
@@ -204,12 +204,12 @@ void update_shadow_areas() {
 	// shadow areas
 	int onwalkarea = get_walkable_area_at_character(_GP(game).playercharacter);
 	if (onwalkarea < 0);
-	else if (_G(_G(playerchar))->flags & CHF_FIXVIEW);
+	else if (_G(playerchar)->flags & CHF_FIXVIEW);
 	else {
 		onwalkarea = _GP(thisroom).WalkAreas[onwalkarea].Light;
-		if (onwalkarea > 0) _G(_G(playerchar))->view = onwalkarea - 1;
-		else if (_GP(thisroom).Options.PlayerView == 0) _G(_G(playerchar))->view = _G(_G(playerchar))->defview;
-		else _G(_G(playerchar))->view = _GP(thisroom).Options.PlayerView - 1;
+		if (onwalkarea > 0) _G(playerchar)->view = onwalkarea - 1;
+		else if (_GP(thisroom).Options.PlayerView == 0) _G(playerchar)->view = _G(playerchar)->defview;
+		else _G(playerchar)->view = _GP(thisroom).Options.PlayerView - 1;
 	}
 }
 

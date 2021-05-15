@@ -31,6 +31,11 @@
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/util/string.h"
 #include "ags/shared/util/string_compat.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -300,13 +305,6 @@ int parse_sentence(const char *src_text, int *numwords, short *wordarray, short 
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/dynobj/script_string.h"
-
-extern ScriptString _GP(myScriptStringImpl);
 
 // int (const char *wordToFind)
 RuntimeScriptValue Sc_Parser_FindWordID(const RuntimeScriptValue *params, int32_t param_count) {

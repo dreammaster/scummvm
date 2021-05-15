@@ -88,7 +88,7 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 extern char _G(check_dynamic_sprites_at_exit);
-extern int _G(our_eip);
+
 extern volatile char _G(want_exit), abort_engine;
 extern bool justRunSetup;
 
@@ -96,17 +96,17 @@ extern bool justRunSetup;
 extern int _G(proper_exit);
 extern char _G(pexbuf)[STD_BUFFER_SIZE];
 
-extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
 
-extern ViewStruct*views;
-extern int _G(displayed_room);
-extern int _G(eip_guinum);
+
+
+
+
 extern int _G(eip_guiobj);
 extern SpeechLipSyncLine *_G(splipsync);
 extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 
-extern IGraphicsDriver *_G(gfxDriver);
-extern Bitmap **_G(actsps);
+
+
 extern RGB palette[256];
 
 
@@ -728,8 +728,8 @@ void engine_init_game_settings()
             precache_view (_GP(game).mcurs[ee].view);
     }
     // may as well preload the character gfx
-    if (_G(_G(playerchar))->view >= 0)
-        precache_view (_G(_G(playerchar))->view);
+    if (_G(playerchar)->view >= 0)
+        precache_view (_G(playerchar)->view);
 
     for (ee = 0; ee < MAX_ROOM_OBJECTS; ee++)
         _GP(objcache)[ee].image = nullptr;
@@ -783,8 +783,8 @@ void engine_init_game_settings()
 
     _G(our_eip)=-5;
     for (ee=0;ee<_GP(game).numinvitems;ee++) {
-        if (_GP(game).invinfo[ee].flags & IFLG_STARTWITH) _G(_G(playerchar))->inv[ee]=1;
-        else _G(_G(playerchar))->inv[ee]=0;
+        if (_GP(game).invinfo[ee].flags & IFLG_STARTWITH) _G(playerchar)->inv[ee]=1;
+        else _G(playerchar)->inv[ee]=0;
     }
     _GP(play).score=0;
     _GP(play).sierra_inv_color=7;

@@ -34,7 +34,7 @@ using namespace AGS::Engine;
 
 
 
-extern IGraphicsDriver *_G(gfxDriver);
+
 
 
 char *walkBehindExists = nullptr;  // whether a WB area is in this column

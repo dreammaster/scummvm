@@ -605,8 +605,8 @@ std::array<AmbientSound,MAX_SOUND_CHANNELS+1> _GP(ambient);
 
 int get_volume_adjusted_for_distance(int volume, int sndX, int sndY, int sndMaxDist)
 {
-    int distx = _G(_G(playerchar))->x - sndX;
-    int disty = _G(_G(playerchar))->y - sndY;
+    int distx = _G(playerchar)->x - sndX;
+    int disty = _G(playerchar)->y - sndY;
     // it uses Allegro's "fix" sqrt without the ::
     int dist = (int)::sqrt((double)(distx*distx + disty*disty));
 

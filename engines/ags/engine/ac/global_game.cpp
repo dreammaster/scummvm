@@ -76,7 +76,7 @@ using namespace AGS::Shared;
 
 
 extern ExecutingScript *curscript;
-extern int _G(displayed_room);
+
 extern int _G(game_paused);
 
 
@@ -88,7 +88,7 @@ extern RoomStatus *_G(croom);
 extern int gui_disabled_style;
 
 extern int _G(getloctype_index);
-extern IGraphicsDriver *_G(gfxDriver);
+
 extern RGB palette[256];
 
 #if AGS_PLATFORM_OS_IOS || AGS_PLATFORM_OS_ANDROID

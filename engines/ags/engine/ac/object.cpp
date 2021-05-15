@@ -45,6 +45,11 @@
 #include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/ac/dynobj/cc_object.h"
 #include "ags/engine/ac/move_list.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -54,11 +59,11 @@ using namespace AGS::Shared;
 extern RoomStatus *_G(croom);
 extern RoomObject *_GP(objs);
 
-extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
+
 
 
 extern Bitmap *walkable_areas_temp;
-extern IGraphicsDriver *_G(gfxDriver);
+
 extern CCObject _GP(ccDynamicObject);
 
 
@@ -527,13 +532,6 @@ int check_click_on_object(int roomx, int roomy, int mood) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/dynobj/script_string.h"
-
-extern ScriptString _GP(myScriptStringImpl);
 
 // void (ScriptObject *objj, int loop, int delay, int repeat, int blocking, int direction)
 RuntimeScriptValue Sc_Object_Animate(void *self, const RuntimeScriptValue *params, int32_t param_count) {

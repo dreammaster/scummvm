@@ -60,7 +60,7 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 extern char _G(check_dynamic_sprites_at_exit);
-extern int _G(displayed_room);
+
 
 extern char _G(pexbuf)[STD_BUFFER_SIZE];
 extern volatile char _G(want_exit), abort_engine;

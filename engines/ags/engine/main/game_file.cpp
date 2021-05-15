@@ -61,7 +61,7 @@ using namespace AGS::Engine;
 
 
 
-extern DialogTopic *dialog;
+
 
 extern AGSPlatformDriver *platform;
 extern int numScriptModules;

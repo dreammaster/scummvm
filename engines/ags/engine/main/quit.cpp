@@ -60,7 +60,7 @@ using namespace AGS::Engine;
 
 
 extern RoomStatus _GP(troom);    // used for non-saveable rooms, eg. intro
-extern int _G(our_eip);
+
 
 extern char _G(pexbuf)[STD_BUFFER_SIZE];
 extern int _G(proper_exit);
@@ -69,7 +69,7 @@ extern char _G(check_dynamic_sprites_at_exit);
 
 extern int _G(need_to_stop_cd);
 extern int _G(use_cdplayer);
-extern IGraphicsDriver *_G(gfxDriver);
+
 
 bool handledErrorInEditor;
 

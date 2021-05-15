@@ -44,7 +44,7 @@ using namespace AGS::Engine;
 
 
 
-extern IGraphicsDriver *_G(gfxDriver);
+
 extern AGSPlatformDriver *platform;
 extern RGB palette[256];
 

@@ -70,29 +70,21 @@
 #include "ags/shared/gfx/gfx_def.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/move_list.h"
+
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
 #include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 
-
-extern int _G(displayed_room),_G(starting_room);
-
-
-extern ViewStruct*views;
-extern RoomObject*_GP(objs);
-
-
 extern Bitmap *walkable_areas_temp;
-extern IGraphicsDriver *_G(gfxDriver);
-extern Bitmap **_G(actsps);
+
+
 extern int is_text_overlay;
-extern int _G(said_speech_line);
-extern int _G(said_text);
-extern int _G(our_eip);
-extern CCCharacter _GP(ccDynamicCharacter);
-extern CCInventory _GP(ccDynamicInv);
 
 //--------------------------------
 
@@ -139,7 +131,7 @@ void Character_AddInventory(CharacterInfo *chaa, ScriptInvItem *invi, int addInd
         for (ee = 0; ee < _G(charextra)[charid].invorder_count; ee++) {
             if (_G(charextra)[charid].invorder[ee] == inum) {
                 // They already have the item, so don't add it to the list
-                if (chaa == _G(_G(playerchar)))
+                if (chaa == _G(playerchar))
                     run_on_event (GE_ADD_INV, RuntimeScriptValue().SetInt32(inum));
                 return;
             }
@@ -163,7 +155,7 @@ void Character_AddInventory(CharacterInfo *chaa, ScriptInvItem *invi, int addInd
     }
     _G(charextra)[charid].invorder_count++;
     GUI::MarkInventoryForUpdate(charid, charid == _GP(game).playercharacter);
-    if (chaa == _G(_G(playerchar)))
+    if (chaa == _G(playerchar))
         run_on_event (GE_ADD_INV, RuntimeScriptValue().SetInt32(inum));
 }
 
@@ -719,7 +711,7 @@ void Character_LoseInventory(CharacterInfo *chap, ScriptInvItem *invi) {
 
     if ((chap->activeinv == inum) & (chap->inv[inum] < 1)) {
         chap->activeinv = -1;
-        if ((chap == _G(_G(playerchar))) && (GetCursorMode() == MODE_USE))
+        if ((chap == _G(playerchar)) && (GetCursorMode() == MODE_USE))
             set_cursor_mode(0);
     }
 
@@ -738,7 +730,7 @@ void Character_LoseInventory(CharacterInfo *chap, ScriptInvItem *invi) {
     }
     GUI::MarkInventoryForUpdate(charid, charid == _GP(game).playercharacter);
 
-    if (chap == _G(_G(playerchar)))
+    if (chap == _G(playerchar))
         run_on_event (GE_LOSE_INV, RuntimeScriptValue().SetInt32(inum));
 }
 
@@ -812,7 +804,7 @@ void Character_SetAsPlayer(CharacterInfo *chaa) {
 
     //update_invorder();
 
-    debug_script_log("%s is new player character", _G(_G(playerchar))->scrname);
+    debug_script_log("%s is new player character", _G(playerchar)->scrname);
 
     // Within game_start, return now
     if (_G(displayed_room) < 0)
@@ -821,23 +813,23 @@ void Character_SetAsPlayer(CharacterInfo *chaa) {
     // Ignore invalid room numbers for the character and just place him in
     // the current room for 2.x. Following script calls to NewRoom() will
     // make sure this still works as intended.
-    if ((_G(loaded_game_file_version) <= kGameVersion_272) && (_G(_G(playerchar))->room < 0))
-        _G(_G(playerchar))->room = _G(displayed_room);
+    if ((_G(loaded_game_file_version) <= kGameVersion_272) && (_G(playerchar)->room < 0))
+        _G(playerchar)->room = _G(displayed_room);
 
-    if (_G(displayed_room) != _G(_G(playerchar))->room)
-        NewRoom(_G(_G(playerchar))->room);
+    if (_G(displayed_room) != _G(playerchar)->room)
+        NewRoom(_G(playerchar)->room);
     else   // make sure it doesn't run the region interactions
-        _GP(play).player_on_region = GetRegionIDAtRoom(_G(_G(playerchar))->x, _G(_G(playerchar))->y);
+        _GP(play).player_on_region = GetRegionIDAtRoom(_G(playerchar)->x, _G(playerchar)->y);
 
-    if ((_G(_G(playerchar))->activeinv >= 0) && (_G(_G(playerchar))->inv[_G(_G(playerchar))->activeinv] < 1))
-        _G(_G(playerchar))->activeinv = -1;
+    if ((_G(playerchar)->activeinv >= 0) && (_G(playerchar)->inv[_G(playerchar)->activeinv] < 1))
+        _G(playerchar)->activeinv = -1;
 
     // They had inv selected, so change the cursor
     if (cur_mode == MODE_USE) {
-        if (_G(_G(playerchar))->activeinv < 0)
+        if (_G(playerchar)->activeinv < 0)
             SetNextCursor ();
         else
-            SetActiveInventory (_G(_G(playerchar))->activeinv);
+            SetActiveInventory (_G(playerchar)->activeinv);
     }
 
 }
@@ -1645,7 +1637,7 @@ void Character_SetZ(CharacterInfo *chaa, int newval) {
     chaa->z = newval;
 }
 
-extern int _G(char_speaking);
+
 
 int Character_GetSpeakingFrame(CharacterInfo *chaa) {
 
@@ -2121,10 +2113,10 @@ int wantMoveNow (CharacterInfo *chi, CharacterExtras *chex) {
 
 void setup_player_character(int charid) {
     _GP(game).playercharacter = charid;
-    _G(_G(playerchar)) = &_GP(game).chars[charid];
-    _sc_PlayerCharPtr = ccGetObjectHandleFromAddress((char*)_G(_G(playerchar)));
+    _G(playerchar) = &_GP(game).chars[charid];
+    _sc_PlayerCharPtr = ccGetObjectHandleFromAddress((char*)_G(playerchar));
     if (_G(loaded_game_file_version) < kGameVersion_270) {
-        ccAddExternalDynamicObject("player", _G(_G(playerchar)), &_GP(ccDynamicCharacter));
+        ccAddExternalDynamicObject("player", _G(playerchar), &_GP(ccDynamicCharacter));
     }
 }
 
@@ -2960,13 +2952,6 @@ PViewport FindNearestViewport(int charid)
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/dynobj/script_string.h"
-
-extern ScriptString _GP(myScriptStringImpl);
 
 // void | CharacterInfo *chaa, ScriptInvItem *invi, int addIndex
 RuntimeScriptValue Sc_Character_AddInventory(void *self, const RuntimeScriptValue *params, int32_t param_count)

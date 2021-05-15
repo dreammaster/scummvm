@@ -46,6 +46,10 @@
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/timer.h"
 #include "ags/shared/util/wgt2allg.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -58,11 +62,11 @@ using namespace AGS::Shared;
 extern int _G(mouse_ifacebut_xoffs), mouse_ifacebut_yoffs;
 
 extern int mousex, mousey;
-extern int _G(evblocknum);
+
 
 extern AGSPlatformDriver *platform;
-extern CCCharacter _GP(ccDynamicCharacter);
-extern CCInventory _GP(ccDynamicInv);
+
+
 
 int in_inv_screen = 0, inv_screen_newroom = -1;
 
@@ -403,21 +407,21 @@ bool InventoryScreen::Run() {
 				_GP(play).usedinv = toret;
 
 				// set the activeinv so the script can check it
-				int activeinvwas = _G(_G(playerchar))->activeinv;
-				_G(_G(playerchar))->activeinv = toret;
+				int activeinvwas = _G(playerchar)->activeinv;
+				_G(playerchar)->activeinv = toret;
 
 				//ags_domouse(DOMOUSE_DISABLE);
 				run_event_block_inv(dii[clickedon].num, 3);
 
 				// if the script didn't change it, then put it back
-				if (_G(_G(playerchar))->activeinv == toret)
-					_G(_G(playerchar))->activeinv = activeinvwas;
+				if (_G(playerchar)->activeinv == toret)
+					_G(playerchar)->activeinv = activeinvwas;
 
 				// in case the script did anything to the screen, redraw it
 				UpdateGameOnce();
 
 				// They used the active item and lost it
-				if (_G(_G(playerchar))->inv[toret] < 1) {
+				if (_G(playerchar)->inv[toret] < 1) {
 					cmode = CURS_ARROW;
 					set_mouse_cursor(cmode);
 					toret = -1;
@@ -517,8 +521,8 @@ int __actual_invscreen() {
 int invscreen() {
 	int selt = __actual_invscreen();
 	if (selt < 0) return -1;
-	_G(_G(playerchar))->activeinv = selt;
-	GUI::MarkInventoryForUpdate(_G(_G(playerchar))->index_id, true);
+	_G(playerchar)->activeinv = selt;
+	GUI::MarkInventoryForUpdate(_G(playerchar)->index_id, true);
 	set_cursor_mode(MODE_USE);
 	return selt;
 }
@@ -528,10 +532,6 @@ int invscreen() {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
 
 // void (GUIInvWindow *guii)
 RuntimeScriptValue Sc_InvWindow_ScrollDown(void *self, const RuntimeScriptValue *params, int32_t param_count) {

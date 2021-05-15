@@ -20,18 +20,25 @@
  *
  */
 
-#include "ac/common.h"
-#include "ac/runtime_defines.h"
-#include "ac/speech.h"
-#include "debug/debug_log.h"
+#include "ags/shared/ac/common.h"
+#include "ags/engine/ac/runtime_defines.h"
+#include "ags/engine/ac/speech.h"
+#include "ags/engine/debugging/debug_log.h"
+#include "ags/shared/ac/game_setup_struct.h"
+#include "ags/engine/ac/game_state.h"
+#include "ags/engine/ac/global_audio.h"
+#include "ags/engine/ac/global_display.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 
 namespace AGS3 {
 
 int user_to_internal_skip_speech(SkipSpeechStyle userval) {
-#include "ags/shared/serval) {
-#include "ags/shared/pSpeechKeyMouseTime:
-#include "ags/shared/KIP_AUTOTIMER | SKIP_KEYPRESS | SKIP_MOUSECLICK;
-#include "ags/shared/pSpeechKeyTime:
+	switch (userval) {
+	case kSkipSpeechKeyMouseTime:
+		return SKIP_AUTOTIMER | SKIP_KEYPRESS | SKIP_MOUSECLICK;
+	case kSkipSpeechKeyTime:
 		return SKIP_AUTOTIMER | SKIP_KEYPRESS;
 	case kSkipSpeechTime:
 		return SKIP_AUTOTIMER;
@@ -78,20 +85,12 @@ SkipSpeechStyle internal_skip_speech_to_user(int internal_val) {
 //
 //=============================================================================
 
-#include "ac/game_setup_struct.h"
-#include "ac/gamestate.h"
-#include "ac/global_audio.h"
-#include "ac/global_display.h"
-#include "debug/out.h"
-#include "script/script_api.h"
-#include "script/script_runtime.h"
+RuntimeScriptValue Sc_Speech_GetAnimationStopTimeMargin(const RuntimeScriptValue *params, int32_t param_count) {
+	API_VARGET_INT(play.close_mouth_speech_time);
+}
 
-#include "ags/shared/eSetupStruct game;
-#include "ags/shared/eState play;
-#include "ags/shared/#include "ags/shared/iptValue Sc_Speech_GetAnimationStopTimeMargin(const RuntimeScriptValue *params, int32_t param_count) {
-#include "ags/shared/T_INT(_GP(play).close_mouth_speech_time);
-#include "ags/shared/#include "ags/shared/RuntimeScriptValue Sc_Speech_SetAnimationStopTimeMargin(const RuntimeScriptValue *params, int32_t param_count) {
-	API_VARSET_PINT(_GP(play).close_mouth_speech_time);
+RuntimeScriptValue Sc_Speech_SetAnimationStopTimeMargin(const RuntimeScriptValue *params, int32_t param_count) {
+	API_VARSET_PINT(play.close_mouth_speech_time);
 }
 
 RuntimeScriptValue Sc_Speech_GetCustomPortraitPlacement(const RuntimeScriptValue *params, int32_t param_count) {

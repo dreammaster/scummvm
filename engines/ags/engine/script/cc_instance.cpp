@@ -57,7 +57,7 @@ extern ExecutingScript*curscript; // in script/script
 extern int maxWhileLoops;
 extern new_line_hook_type new_line_hook;
 
-extern ScriptString _GP(myScriptStringImpl);
+
 
 enum ScriptOpArgIsReg
 {

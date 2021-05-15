@@ -77,11 +77,6 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-
-
-extern int _G(convert_16bit_bgr);
-
 extern AGSPlatformDriver *platform;
 
 extern char noWalkBehindsAtAll;
@@ -95,15 +90,8 @@ extern int walkBehindsCachedForBgNum;
 extern WalkBehindMethodEnum walkBehindMethod;
 extern int walk_behind_baselines_changed;
 
-extern RoomStatus*_G(croom);
-extern int _G(our_eip);
-extern int _G(in_new_room);
-extern RoomObject*_GP(objs);
-extern ViewStruct*views;
 extern CharacterCache *charcache;
-extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
-extern int _G(displayed_room);
-extern int _G(eip_guinum);
+
 extern int is_complete_overlay;
 extern int cur_mode,cur_cursor;
 extern int mouse_frame,mouse_delay;
@@ -114,22 +102,7 @@ extern int bg_just_changed;
 
 color palette[256];
 
-COLOR_MAP _GP(maincoltable);
 
-// _G(actsps) is used for temporary storage of the bitamp image
-// of the latest version of the sprite
-int _G(actSpsCount) = 0;
-Bitmap **_G(actsps);
-IDriverDependantBitmap* *_G(actspsbmp);
-// temporary cache of walk-behind for this _G(actsps) image
-Bitmap **_G(actspswb);
-IDriverDependantBitmap* *_G(actspswbbmp);
-CachedActSpsData* _G(actspswbcache);
-
-bool _G(current_background_is_dirty) = false;
-
-// Room background sprite
-IDriverDependantBitmap* _G(roomBackgroundBmp) = nullptr;
 // Buffer and info flags for viewport/camera pairs rendering in software mode
 struct RoomCameraDrawData
 {
@@ -143,16 +116,6 @@ struct RoomCameraDrawData
     bool    IsOffscreen; // whether room viewport was offscreen (cannot use sub-bitmap)
     bool    IsOverlap;   // whether room viewport overlaps any others (marking dirty rects is complicated)
 };
-
-Bitmap **_G(guibg) = nullptr;
-IDriverDependantBitmap **_G(guibgbmp) = nullptr;
-Bitmap *_G(debugConsoleBuffer) = nullptr;
-
-// whether there are currently remnants of a DisplaySpeech
-bool _G(screen_is_dirty) = false;
-
-Bitmap *_G(raw_saved_screen) = nullptr;
-Bitmap *_G(dynamicallyCreatedSurfaces)[MAX_DYNAMIC_SURFACES];
 
 
 SpriteListEntry::SpriteListEntry()
@@ -2148,12 +2111,12 @@ void draw_gui_and_overlays()
     if (((_G(debug_flags) & DBG_NOIFACE)==0) && (_G(displayed_room) >= 0)) {
         int aa;
 
-        if (_G(_G(playerchar))->activeinv >= MAX_INV) {
+        if (_G(playerchar)->activeinv >= MAX_INV) {
             quit("!The player.activeinv variable has been corrupted, probably as a result\n"
                 "of an incorrect assignment in the game script.");
         }
-        if (_G(_G(playerchar))->activeinv < 1) gui_inv_pic=-1;
-        else gui_inv_pic=_GP(game).invinfo[_G(_G(playerchar))->activeinv].pic;
+        if (_G(playerchar)->activeinv < 1) gui_inv_pic=-1;
+        else gui_inv_pic=_GP(game).invinfo[_G(playerchar)->activeinv].pic;
         _G(our_eip) = 37;
         {
             for (aa=0;aa<_GP(game).numgui;aa++) {

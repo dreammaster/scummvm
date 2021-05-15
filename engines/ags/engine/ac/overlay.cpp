@@ -29,7 +29,7 @@
 #include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_overlay.h"
+#include "ags/engine/ac/global_overlay.h"
 #include "ags/engine/ac/global_translation.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/engine/ac/screen_overlay.h"
@@ -37,20 +37,17 @@
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/script/runtime_script_value.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-extern int _G(displayed_room);
 extern int _G(face_talking);
-
-
-extern IGraphicsDriver *_G(gfxDriver);
-
-
 
 ScreenOverlay screenover[MAX_SCREEN_OVERLAYS];
 int numscreenover = 0;
@@ -287,10 +284,6 @@ void recreate_overlay_ddbs() {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
 
 // ScriptOverlay* (int x, int y, int slot, int transparent)
 RuntimeScriptValue Sc_Overlay_CreateGraphical(const RuntimeScriptValue *params, int32_t param_count) {

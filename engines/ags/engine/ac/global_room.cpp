@@ -47,9 +47,9 @@ using namespace Shared;
 
 extern RoomStatus *_G(croom);
 
-extern int _G(displayed_room);
+
 extern int _G(in_enters_screen);
-extern int _G(in_leaves_screen);
+
 extern int in_inv_screen, inv_screen_newroom;
 
 extern int gs_to_newroom;
@@ -87,7 +87,7 @@ void NewRoom(int nrnum) {
 
 	if (_G(displayed_room) < 0) {
 		// called from game_start; change the room where the game will start
-		_G(_G(playerchar))->room = nrnum;
+		_G(playerchar)->room = nrnum;
 		return;
 	}
 
@@ -120,16 +120,16 @@ void NewRoom(int nrnum) {
 		inv_screen_newroom = nrnum;
 		return;
 	} else if ((inside_script == 0) & (in_graph_script == 0)) {
-		new_room(nrnum, _G(_G(playerchar)));
+		new_room(nrnum, _G(playerchar));
 		return;
 	} else if (inside_script) {
 		curscript->queue_action(ePSANewRoom, nrnum, "NewRoom");
 		// we might be within a MoveCharacterBlocking -- the room
 		// change should abort it
-		if ((_G(_G(playerchar))->walking > 0) && (_G(_G(playerchar))->walking < TURNING_AROUND)) {
+		if ((_G(playerchar)->walking > 0) && (_G(playerchar)->walking < TURNING_AROUND)) {
 			// nasty hack - make sure it doesn't move the character
 			// to a walkable area
-			_G(mls)[_G(_G(playerchar))->walking].direct = 1;
+			_G(mls)[_G(playerchar)->walking].direct = 1;
 			StopMoving(_GP(game).playercharacter);
 		}
 	} else if (in_graph_script)
@@ -138,7 +138,7 @@ void NewRoom(int nrnum) {
 
 
 void NewRoomEx(int nrnum, int newx, int newy) {
-	Character_ChangeRoom(_G(_G(playerchar)), nrnum, newx, newy);
+	Character_ChangeRoom(_G(playerchar), nrnum, newx, newy);
 }
 
 void NewRoomNPC(int charid, int nrnum, int newx, int newy) {

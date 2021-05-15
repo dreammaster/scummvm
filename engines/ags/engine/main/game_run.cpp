@@ -85,7 +85,7 @@ extern int _G(displayed_room), _G(starting_room), _G(in_new_room), _G(new_room_w
 extern int _G(game_paused);
 extern int _G(getloctype_index);
 extern int _G(in_enters_screen), _G(done_es_error);
-extern int _G(in_leaves_screen);
+
 extern int inside_script, in_graph_script;
 extern int no_blocking_functions;
 
@@ -162,12 +162,12 @@ static void game_loop_do_late_update() {
 static int game_loop_check_ground_level_interactions() {
 	if ((_GP(play).ground_level_areas_disabled & GLED_INTERACTION) == 0) {
 		// check if he's standing on a hotspot
-		int hotspotThere = get_hotspot_at(_G(_G(playerchar))->x, _G(_G(playerchar))->y);
+		int hotspotThere = get_hotspot_at(_G(playerchar)->x, _G(playerchar)->y);
 		// run Stands on Hotspot event
 		setevent(EV_RUNEVBLOCK, EVB_HOTSPOT, hotspotThere, 0);
 
 		// check current region
-		int onRegion = GetRegionIDAtRoom(_G(_G(playerchar))->x, _G(_G(playerchar))->y);
+		int onRegion = GetRegionIDAtRoom(_G(playerchar)->x, _G(playerchar)->y);
 		int inRoom = _G(displayed_room);
 
 		if (onRegion != _GP(play).player_on_region) {
@@ -375,8 +375,8 @@ bool run_service_key_controls(int &out_key) {
 		int ff;
 		// MACPORT FIX 9/6/5: added last %s
 		sprintf(infobuf, "In room %d %s[Player at %d, %d (view %d, loop %d, frame %d)%s%s%s",
-			_G(displayed_room), (noWalkBehindsAtAll ? "(has no walk-behinds)" : ""), _G(_G(playerchar))->x, _G(_G(playerchar))->y,
-			_G(_G(playerchar))->view + 1, _G(_G(playerchar))->loop, _G(_G(playerchar))->frame,
+			_G(displayed_room), (noWalkBehindsAtAll ? "(has no walk-behinds)" : ""), _G(playerchar)->x, _G(playerchar)->y,
+			_G(playerchar)->view + 1, _G(playerchar)->loop, _G(playerchar)->frame,
 			(IsGamePaused() == 0) ? "" : "[Game paused.",
 			(_GP(play).ground_level_areas_disabled == 0) ? "" : "[Ground areas disabled.",
 			(IsInterfaceEnabled() == 0) ? "[Game in Wait state" : "");
@@ -562,13 +562,13 @@ static void check_room_edges(int numevents_was) {
 		if ((_G(numevents) == numevents_was) &&
 			((_GP(play).ground_level_areas_disabled & GLED_INTERACTION) == 0)) {
 
-			if (_G(_G(playerchar))->x <= _GP(thisroom).Edges.Left)
+			if (_G(playerchar)->x <= _GP(thisroom).Edges.Left)
 				edgesActivated[0] = 1;
-			else if (_G(_G(playerchar))->x >= _GP(thisroom).Edges.Right)
+			else if (_G(playerchar)->x >= _GP(thisroom).Edges.Right)
 				edgesActivated[1] = 1;
-			if (_G(_G(playerchar))->y >= _GP(thisroom).Edges.Bottom)
+			if (_G(playerchar)->y >= _GP(thisroom).Edges.Bottom)
 				edgesActivated[2] = 1;
-			else if (_G(_G(playerchar))->y <= _GP(thisroom).Edges.Top)
+			else if (_G(playerchar)->y <= _GP(thisroom).Edges.Top)
 				edgesActivated[3] = 1;
 
 			if ((_GP(play).entered_edge >= 0) && (_GP(play).entered_edge <= 3)) {

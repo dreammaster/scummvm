@@ -33,13 +33,13 @@
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/engine/script/runtime_script_value.h"
 #include "ags/shared/util/string_compat.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/math.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-
-
-extern int _G(longestline);
-extern ScriptString _GP(myScriptStringImpl);
 
 int String_IsNullOrEmpty(const char *thisString) {
 	if ((thisString == nullptr) || (thisString[0] == 0))
@@ -297,11 +297,6 @@ void my_strncpy(char *dest, const char *src, int len) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/math.h"
 
 // int (const char *thisString)
 RuntimeScriptValue Sc_String_IsNullOrEmpty(const RuntimeScriptValue *params, int32_t param_count) {

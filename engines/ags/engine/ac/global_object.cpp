@@ -56,15 +56,15 @@ extern RoomStatus *_G(croom);
 extern RoomObject *_GP(objs);
 
 
-extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
 
 
-extern int _G(displayed_room);
+
+
 
 extern int _G(actSpsCount);
-extern Bitmap **_G(actsps);
+
 extern IDriverDependantBitmap **_G(actspsbmp);
-extern IGraphicsDriver *_G(gfxDriver);
+
 
 // Used for deciding whether a char or obj was closer
 int _G(obj_lowest_yp);
@@ -447,7 +447,7 @@ void RunObjectInteraction(int aa, int mood) {
 	else if (mood == MODE_CUSTOM2) passon = 7;
 	else if (mood == MODE_USE) {
 		passon = 3;
-		cdata = _G(_G(playerchar))->activeinv;
+		cdata = _G(playerchar)->activeinv;
 		_GP(play).usedinv = cdata;
 	}
 	_G(evblockbasename) = "object%d"; _G(evblocknum) = aa;

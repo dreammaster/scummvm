@@ -32,15 +32,15 @@
 #include "ags/engine/ac/string.h"
 #include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/ac/dynobj/cc_inventory.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
-
-
 extern int cur_cursor;
-
-extern CCInventory _GP(ccDynamicInv);
-
 
 void InventoryItem_SetCursorGraphic(ScriptInvItem *iitem, int newSprite) {
 	set_inv_item_cursorpic(iitem->id, newSprite);
@@ -114,7 +114,7 @@ bool InventoryItem_SetTextProperty(ScriptInvItem *scii, const char *property, co
 void set_inv_item_cursorpic(int invItemId, int piccy) {
 	_GP(game).invinfo[invItemId].cursorPic = piccy;
 
-	if ((cur_cursor == MODE_USE) && (_G(_G(playerchar))->activeinv == invItemId)) {
+	if ((cur_cursor == MODE_USE) && (_G(playerchar)->activeinv == invItemId)) {
 		update_inv_cursor(invItemId);
 		set_mouse_cursor(cur_cursor);
 	}
@@ -125,13 +125,6 @@ void set_inv_item_cursorpic(int invItemId, int piccy) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/dynobj/script_string.h"
-
-extern ScriptString _GP(myScriptStringImpl);
 
 // ScriptInvItem *(int xx, int yy)
 RuntimeScriptValue Sc_GetInvAtLocation(const RuntimeScriptValue *params, int32_t param_count) {

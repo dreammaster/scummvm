@@ -41,14 +41,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-
-
-extern int _G(displayed_room);
-
-extern int _G(char_speaking);
-
-
-
 #define Random __Rand
 
 int CharacterInfo::get_effective_y() {

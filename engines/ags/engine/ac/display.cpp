@@ -59,17 +59,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-
-
-extern int _G(longestline);
-extern AGSPlatformDriver *platform;
-extern int _G(loops_per_character);
-
-
-int _G(display_message_aschar) = 0;
-
-
-TopBarSettings _GP(topBar);
 struct DisplayVars {
 	int lineheight;    // font's height of single line
 	int linespacing;   // font's line spacing

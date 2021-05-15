@@ -44,6 +44,11 @@
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/string.h"
 #include "ags/shared/util/string_utils.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -549,13 +554,6 @@ Stream *get_valid_file_stream_from_handle(int32_t handle, const char *operation_
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/dynobj/script_string.h"
-
-extern ScriptString _GP(myScriptStringImpl);
 
 // int (const char *fnmm)
 RuntimeScriptValue Sc_File_Delete(const RuntimeScriptValue *params, int32_t param_count) {

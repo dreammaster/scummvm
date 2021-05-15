@@ -390,7 +390,7 @@ void RunCharacterInteraction(int cc, int mood) {
 	else if (mood == MODE_TALK) passon = 2;
 	else if (mood == MODE_USE) {
 		passon = 3;
-		cdata = _G(_G(playerchar))->activeinv;
+		cdata = _G(playerchar)->activeinv;
 		_GP(play).usedinv = cdata;
 	} else if (mood == MODE_PICKUP) passon = 5;
 	else if (mood == MODE_CUSTOM1) passon = 6;
@@ -458,7 +458,7 @@ void SetActiveInventory(int iit) {
 	else if (iit != -1)
 		quitprintf("!SetActiveInventory: invalid inventory number %d", iit);
 
-	Character_SetActiveInventory(_G(_G(playerchar)), tosend);
+	Character_SetActiveInventory(_G(playerchar), tosend);
 }
 
 void update_invorder() {
@@ -490,7 +490,7 @@ void add_inventory(int inum) {
 	if ((inum < 0) || (inum >= MAX_INV))
 		quit("!AddInventory: invalid inventory number");
 
-	Character_AddInventory(_G(_G(playerchar)), &_G(scrInv)[inum], SCR_NO_VALUE);
+	Character_AddInventory(_G(playerchar), &_G(scrInv)[inum], SCR_NO_VALUE);
 
 	_GP(play).obsolete_inv_numorder = _G(charextra)[_GP(game).playercharacter].invorder_count;
 }
@@ -499,7 +499,7 @@ void lose_inventory(int inum) {
 	if ((inum < 0) || (inum >= MAX_INV))
 		quit("!LoseInventory: invalid inventory number");
 
-	Character_LoseInventory(_G(_G(playerchar)), &_G(scrInv)[inum]);
+	Character_LoseInventory(_G(playerchar), &_G(scrInv)[inum]);
 
 	_GP(play).obsolete_inv_numorder = _G(charextra)[_GP(game).playercharacter].invorder_count;
 }

@@ -26,10 +26,13 @@
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/global_translation.h"
 #include "ags/engine/ac/string.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-
 
 // ** LABEL FUNCTIONS
 
@@ -90,13 +93,6 @@ void Label_SetFont(GUILabel *guil, int fontnum) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/dynobj/script_string.h"
-
-extern ScriptString _GP(myScriptStringImpl);
 
 // void (GUILabel *labl, char *buffer)
 RuntimeScriptValue Sc_Label_GetText(void *self, const RuntimeScriptValue *params, int32_t param_count) {

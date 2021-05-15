@@ -37,7 +37,7 @@ using namespace AGS::Shared;
 
 
 
-extern DialogTopic *dialog;
+
 
 ScriptPosition _G(last_in_dialog_request_script_pos);
 void RunDialog(int tum) {

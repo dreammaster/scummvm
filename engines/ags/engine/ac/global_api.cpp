@@ -84,7 +84,7 @@
 
 namespace AGS3 {
 
-extern ScriptString _GP(myScriptStringImpl);
+
 
 // void (char*texx, ...)
 RuntimeScriptValue Sc_sc_AbortGame(const RuntimeScriptValue *params, int32_t param_count)

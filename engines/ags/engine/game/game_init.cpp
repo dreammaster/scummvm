@@ -59,7 +59,7 @@ using namespace Engine;
 
 
 extern int _G(actSpsCount);
-extern Bitmap **_G(actsps);
+
 extern IDriverDependantBitmap **_G(actspsbmp);
 extern Bitmap **_G(actspswb);
 extern IDriverDependantBitmap **_G(actspswbbmp);
@@ -67,16 +67,16 @@ extern CachedActSpsData *_G(actspswbcache);
 extern CharacterCache *charcache;
 
 extern CCGUIObject _GP(ccDynamicGUIObject);
-extern CCCharacter _GP(ccDynamicCharacter);
+
 extern CCHotspot   _GP(ccDynamicHotspot);
 extern CCRegion    _GP(ccDynamicRegion);
-extern CCInventory _GP(ccDynamicInv);
+
 extern CCGUI       _GP(ccDynamicGUI);
 extern CCObject    _GP(ccDynamicObject);
 extern CCDialog    _GP(ccDynamicDialog);
-extern CCAudioChannel _GP(_GP(ccDynamicAudio));
 
-extern ScriptString _GP(myScriptStringImpl);
+
+
 
 
 

@@ -34,6 +34,11 @@
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/debug/debug_log.h"
 #include "ags/shared/util/path.h"
+#include "ags/shared/debug/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -337,13 +342,6 @@ GUIListBox *is_valid_listbox(int guin, int objn) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debug/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/dynobj/script_string.h"
-
-extern ScriptString _GP(myScriptStringImpl);
 
 // int (GUIListBox *lbb, const char *text)
 RuntimeScriptValue Sc_ListBox_AddItem(void *self, const RuntimeScriptValue *params, int32_t param_count) {

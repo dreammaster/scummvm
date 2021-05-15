@@ -27,11 +27,12 @@
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/ac/dynobj/cc_dialog.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-extern DialogTopic *dialog;
-extern CCDialog _GP(ccDynamicDialog);
 
 // ** SCRIPT DIALOGOPTIONSRENDERING OBJECT
 
@@ -122,7 +123,7 @@ int DialogOptionsRendering_GetActiveOptionID(ScriptDialogOptionsRendering *dlgOp
 }
 
 void DialogOptionsRendering_SetActiveOptionID(ScriptDialogOptionsRendering *dlgOptRender, int activeOptionID) {
-	int optionCount = dialog[_G(scrDialog)[dlgOptRender->dialogID].id].numoptions;
+	int optionCount = _G(dialog)[_G(scrDialog)[dlgOptRender->dialogID].id].numoptions;
 	if ((activeOptionID < 0) || (activeOptionID > optionCount))
 		quitprintf("DialogOptionsRenderingInfo.ActiveOptionID: invalid ID specified for this dialog (specified %d, valid range: 1..%d)", activeOptionID, optionCount);
 
@@ -137,10 +138,6 @@ void DialogOptionsRendering_SetActiveOptionID(ScriptDialogOptionsRendering *dlgO
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
 
 RuntimeScriptValue Sc_DialogOptionsRendering_Update(void *self, const RuntimeScriptValue *params, int32_t param_count) {
 	API_OBJCALL_VOID(ScriptDialogOptionsRendering, DialogOptionsRendering_Update);

@@ -39,7 +39,11 @@
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/engine/script/runtime_script_value.h"
 #include "ags/shared/gfx/gfx_def.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/engine/gfx/gfx_util.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -51,7 +55,7 @@ using namespace AGS::Engine;
 extern RoomStatus *_G(croom);
 extern RoomObject *_GP(objs);
 extern CharacterCache *charcache;
-extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
+
 
 
 
@@ -392,10 +396,6 @@ int DrawingSurface_GetPixel(ScriptDrawingSurface *sds, int x, int y) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
 
 // void (ScriptDrawingSurface *sds, int colour)
 RuntimeScriptValue Sc_DrawingSurface_Clear(void *self, const RuntimeScriptValue *params, int32_t param_count) {

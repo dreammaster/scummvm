@@ -76,6 +76,11 @@
 #include "ags/shared/gfx/gfxfilter.h"
 #include "ags/shared/util/math.h"
 #include "ags/engine/media/audio/audio_system.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -85,32 +90,32 @@ using namespace AGS::Engine;
 
 
 
-extern RoomStatus*_G(croom);
+
 extern RoomStatus _GP(troom);    // used for non-saveable rooms, eg. intro
-extern int _G(displayed_room);
-extern RoomObject*_GP(objs);
+
+
 extern ccInstance *roominst;
 extern AGSPlatformDriver *platform;
-extern int _G(numevents);
+
 extern CharacterCache *charcache;
-extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
+
 
 extern int _G(done_es_error);
-extern int _G(our_eip);
+
 extern Bitmap *walkareabackup, *walkable_areas_temp;
 
 
 extern int _G(in_new_room), _G(new_room_was);  // 1 in new room, 2 first time in new room, 3 loading saved game
 
-extern int _G(in_leaves_screen);
+
 
 extern int _G(starting_room);
 
 extern IDriverDependantBitmap* _G(roomBackgroundBmp);
-extern IGraphicsDriver *_G(gfxDriver);
+
 extern Bitmap *_G(raw_saved_screen);
 extern int _G(actSpsCount);
-extern Bitmap **_G(actsps);
+
 extern IDriverDependantBitmap* *_G(actspsbmp);
 extern Bitmap **_G(actspswb);
 extern IDriverDependantBitmap* *_G(actspswbbmp);
@@ -407,7 +412,7 @@ void convert_room_coordinates_to_data_res(RoomStruct *rstruc)
     rstruc->Height /= mul;
 }
 
-extern int _G(convert_16bit_bgr);
+
 
 void update_letterbox_mode()
 {
@@ -458,7 +463,7 @@ static void update_all_viewcams_with_newroom()
     }
 }
 
-// forchar = _G(_G(playerchar)) on NewRoom, or NULL if restore saved game
+// forchar = _G(playerchar) on NewRoom, or NULL if restore saved game
 void load_new_room(int newnum, CharacterInfo*forchar) {
 
     debug_script_log("Loading room %d", newnum);
@@ -939,11 +944,11 @@ void new_room(int newnum,CharacterInfo*forchar) {
     newnum = _G(in_leaves_screen);
     _G(in_leaves_screen) = -1;
 
-    if ((_G(_G(playerchar))->following >= 0) &&
-        (_GP(game).chars[_G(_G(playerchar))->following].room != newnum)) {
+    if ((_G(playerchar)->following >= 0) &&
+        (_GP(game).chars[_G(playerchar)->following].room != newnum)) {
             // the player character is following another character,
             // who is not in the new room. therefore, abort the follow
-            _G(_G(playerchar))->following = -1;
+            _G(playerchar)->following = -1;
     }
     update_polled_stuff_if_runtime();
 
@@ -1115,13 +1120,6 @@ void convert_move_path_to_room_resolution(MoveList *ml)
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
-#include "ags/engine/ac/dynobj/script_string.h"
-
-extern ScriptString _GP(myScriptStringImpl);
 
 // ScriptDrawingSurface* (int backgroundNumber)
 RuntimeScriptValue Sc_Room_GetDrawingSurfaceForBackground(const RuntimeScriptValue *params, int32_t param_count)

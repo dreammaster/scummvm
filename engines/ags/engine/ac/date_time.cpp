@@ -23,6 +23,9 @@
 #include "ags/engine/ac/date_time.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/script/runtime_script_value.h"
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/globals.h"
 
 namespace AGS3 {
@@ -74,10 +77,6 @@ int DateTime_GetRawTime(ScriptDateTime *sdt) {
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
 
 // ScriptDateTime* ()
 RuntimeScriptValue Sc_DateTime_Now(const RuntimeScriptValue *params, int32_t param_count) {

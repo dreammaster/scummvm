@@ -43,7 +43,7 @@ using namespace AGS::Engine;
 
 
 
-extern IGraphicsDriver *_G(gfxDriver);
+
 extern AGSPlatformDriver *platform;
 
 void my_fade_in(PALETTE p, int speed) {

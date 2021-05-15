@@ -40,7 +40,7 @@ using namespace AGS::Shared;
 
 
 
-extern int _G(displayed_room);
+
 extern RoomStatus *_G(croom);
 extern RoomObject *_GP(objs);
 

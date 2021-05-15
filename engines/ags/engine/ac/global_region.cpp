@@ -38,8 +38,8 @@ using namespace AGS::Shared;
 
 
 extern RoomStatus *_G(croom);
-extern const char *_G(evblockbasename);
-extern int _G(evblocknum);
+
+
 
 int GetRegionIDAtRoom(int xxx, int yyy) {
 	// if the co-ordinates are off the edge of the screen,

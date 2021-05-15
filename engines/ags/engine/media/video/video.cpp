@@ -55,7 +55,7 @@ using namespace AGS::Engine;
 
 
 
-extern IGraphicsDriver *_G(gfxDriver);
+
 extern int psp_video_framedrop;
 
 enum VideoPlaybackType {

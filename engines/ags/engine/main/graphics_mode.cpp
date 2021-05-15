@@ -53,7 +53,7 @@ using namespace AGS::Engine;
 
 extern int _G(proper_exit);
 extern AGSPlatformDriver *platform;
-extern IGraphicsDriver *_G(gfxDriver);
+
 
 
 IGfxDriverFactory *_G(GfxFactory) = nullptr;

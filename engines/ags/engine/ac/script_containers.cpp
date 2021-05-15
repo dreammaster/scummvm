@@ -39,7 +39,7 @@
 
 namespace AGS3 {
 
-extern ScriptString _GP(myScriptStringImpl);
+
 
 //=============================================================================
 //

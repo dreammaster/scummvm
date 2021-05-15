@@ -51,10 +51,10 @@ using namespace AGS::Engine;
 
 
 extern RoomStatus *_G(croom);
-extern int _G(displayed_room);
+
 
 extern RGB palette[256];
-extern IGraphicsDriver *_G(gfxDriver);
+
 extern AGSPlatformDriver *platform;
 extern RGB old_palette[256];
 

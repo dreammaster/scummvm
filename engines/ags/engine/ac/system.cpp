@@ -20,14 +20,14 @@
  *
  */
 
- //include <SDL.h>
-#include "ac/common.h"
-#include "ac/draw.h"
-#include "ac/dynobj/cc_audio_channel.h"
-#include "ac/gamesetup.h"
-#include "ac/game_setup_struct.h"
-#include "ac/gamestate.h"
-#include "ags/shared/ac/global_debug.h"
+//include <SDL.h>
+#include "ags/shared/ac/common.h"
+#include "ags/engine/ac/draw.h"
+#include "ags/engine/ac/dynobj/cc_audio_channel.h"
+#include "ags/engine/ac/game_setup.h"
+#include "ags/shared/ac/game_setup_struct.h"
+#include "ags/engine/ac/game_state.h"
+#include "ags/engine/ac/global_debug.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/string.h"
 #include "ags/engine/ac/system.h"
@@ -38,19 +38,15 @@
 #include "ags/engine/main/graphics_mode.h"
 #include "ags/engine/main/engine.h"
 #include "ags/engine/main/main.h"
-#include "ags/engine/media/audio/audio_core.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/util/string_compat.h"
-#include "ags/shared/#include "ags/shared/AGS3 {
-#include "ags/shared/#include "ags/shared/space AGS::Engine;
-#include "ags/shared/#include "ags/shared/eSetupStruct game;
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
+#include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/globals.h"
 
-
-
-
-extern IGraphicsDriver *_G(gfxDriver);
-extern CCAudioChannel _GP(_GP(ccDynamicAudio));
-extern volatile bool _G(switched_away);
+namespace AGS3 {
 
 bool System_HasInputFocus() {
 	return !_G(switched_away);
@@ -210,15 +206,8 @@ void System_SetRenderAtScreenResolution(int enable) {
 //
 //=============================================================================
 
-#include "debug/out.h"
-#include "script/script_api.h"
-#include "script/script_runtime.h"
-#include "ac/dynobj/scriptstring.h"
-
-extern ScriptString _GP(myScriptStringImpl);
-#include "ags/shared/#include "ags/shared/
-#include "ags/shared/iptValue Sc_System_GetAudioChannelCount(const RuntimeScriptValue *params, int32_t param_count) {
-#include "ags/shared/_INT(System_GetAudioChannelCount);
+RuntimeScriptValue Sc_System_GetAudioChannelCount(const RuntimeScriptValue *params, int32_t param_count) {
+	API_SCALL_INT(System_GetAudioChannelCount);
 }
 
 // ScriptAudioChannel* (int index)

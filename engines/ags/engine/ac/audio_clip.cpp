@@ -27,6 +27,10 @@
 #include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/ac/dynobj/cc_audio_channel.h"
 #include "ags/engine/media/audio/audio_system.h"
+
+#include "ags/shared/debugging/out.h"
+#include "ags/engine/script/script_api.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/globals.h"
 
 namespace AGS3 {
@@ -76,10 +80,6 @@ ScriptAudioChannel *AudioClip_PlayQueued(ScriptAudioClip *clip, int priority, in
 // Script API Functions
 //
 //=============================================================================
-
-#include "ags/shared/debugging/out.h"
-#include "ags/engine/script/script_api.h"
-#include "ags/engine/script/script_runtime.h"
 
 RuntimeScriptValue Sc_AudioClip_GetID(void *self, const RuntimeScriptValue *params, int32_t param_count) {
 	API_OBJCALL_INT(ScriptAudioClip, AudioClip_GetID);

@@ -67,7 +67,7 @@ using namespace AGS::Engine;
 
 
 extern RGB palette[256];
-extern DialogTopic *dialog;
+
 
 
 
