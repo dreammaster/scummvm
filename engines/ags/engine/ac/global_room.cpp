@@ -80,7 +80,7 @@ void SetAmbientLightLevel(int light_level) {
 	_GP(play).rtint_light = light_level;
 }
 
-extern ScriptPosition last_in_dialog_request_script_pos;
+extern ScriptPosition _G(last_in_dialog_request_script_pos);
 void NewRoom(int nrnum) {
 	if (nrnum < 0)
 		quitprintf("!NewRoom: room change requested to invalid room number %d.", nrnum);
@@ -102,12 +102,12 @@ void NewRoom(int nrnum) {
 			_GP(play).stop_dialog_at_end = DIALOG_NEWROOM + nrnum;
 		else {
 			quitprintf("!NewRoom: two NewRoom/RunDialog/StopDialog requests within dialog; last was called in \"%s\", line %d",
-				last_in_dialog_request_script_pos.Section.GetCStr(), last_in_dialog_request_script_pos.Line);
+				_G(last_in_dialog_request_script_pos).Section.GetCStr(), _G(last_in_dialog_request_script_pos).Line);
 		}
 		return;
 	}
 
-	get_script_position(last_in_dialog_request_script_pos);
+	get_script_position(_G(last_in_dialog_request_script_pos));
 
 	if (_G(in_leaves_screen) >= 0) {
 		// NewRoom called from the Player Leaves Screen event -- just
@@ -197,11 +197,11 @@ int HasBeenToRoom(int roomnum) {
 }
 
 void GetRoomPropertyText(const char *property, char *bufer) {
-	get_text_property(_GP(_GP(thisroom)).Properties, _G(croom)->roomProps, property, bufer);
+	get_text_property(_GP(thisroom).Properties, _G(croom)->roomProps, property, bufer);
 }
 
 void SetBackgroundFrame(int frnum) {
-	if ((frnum < -1) || (frnum != -1 && (size_t)frnum >= _GP(_GP(thisroom)).BgFrameCount))
+	if ((frnum < -1) || (frnum != -1 && (size_t)frnum >= _GP(thisroom).BgFrameCount))
 		quit("!SetBackgrondFrame: invalid frame number specified");
 	if (frnum < 0) {
 		_GP(play).bg_frame_locked = 0;

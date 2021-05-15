@@ -47,7 +47,7 @@
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gui/animatingguibutton.h"
 #include "ags/shared/gui/guibutton.h"
-#include "ags/shared/gui/guiinv.h"
+#include "ags/shared/gui/_GP(guiinv).h"
 #include "ags/shared/gui/guilabel.h"
 #include "ags/shared/gui/guilistbox.h"
 #include "ags/shared/gui/gui_main.h"
@@ -70,7 +70,7 @@ extern DialogTopic *dialog;
 
 
 
-extern Bitmap *_G(dynamicallyCreatedSurfaces)[MAX_DYNAMIC_SURFACES];
+
 
 extern RoomStatus _GP(troom);
 extern Bitmap *_G(raw_saved_screen);
@@ -244,13 +244,13 @@ HSaveError WriteGameState(Stream *out)
     _GP(play).WriteForSavegame(out);
     // Other dynamic values
     out->WriteInt32(_G(frames_per_second));
-    out->WriteInt32(loopcounter);
-    out->WriteInt32(ifacepopped);
+    out->WriteInt32(_G(loopcounter));
+    out->WriteInt32(_G(ifacepopped));
     out->WriteInt32(_G(game_paused));
     // Mouse cursor
     out->WriteInt32(cur_mode);
     out->WriteInt32(cur_cursor);
-    out->WriteInt32(mouse_on_iface);
+    out->WriteInt32(_G(mouse_on_iface));
 
     // Viewports and cameras
     int viewcam_flags = 0;
@@ -341,12 +341,12 @@ HSaveError ReadGameState(Stream *in, int32_t cmp_ver, const PreservedParams &pp,
     // Other dynamic values
     r_data.FPS = in->ReadInt32();
     set_loop_counter(in->ReadInt32());
-    ifacepopped = in->ReadInt32();
+    _G(ifacepopped) = in->ReadInt32();
     _G(game_paused) = in->ReadInt32();
     // Mouse cursor state
     r_data.CursorMode = in->ReadInt32();
     r_data.CursorID = in->ReadInt32();
-    mouse_on_iface = in->ReadInt32();
+    _G(mouse_on_iface) = in->ReadInt32();
 
     // Viewports and cameras
     if (svg_ver < kGSSvgVersion_350_10)
@@ -602,19 +602,19 @@ HSaveError WriteGUI(Stream *out)
         _GP(guis)[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUIButtons");
-    out->WriteInt32(numguibuts);
-    for (int i = 0; i < numguibuts; ++i)
-        guibuts[i].WriteToSavegame(out);
+    out->WriteInt32(_G(numguibuts));
+    for (int i = 0; i < _G(numguibuts); ++i)
+        _GP(guibuts)[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUILabels");
-    out->WriteInt32(numguilabels);
-    for (int i = 0; i < numguilabels; ++i)
-        guilabels[i].WriteToSavegame(out);
+    out->WriteInt32(_G(numguilabels));
+    for (int i = 0; i < _G(numguilabels); ++i)
+        _GP(guilabels)[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUIInvWindows");
-    out->WriteInt32(numguiinv);
-    for (int i = 0; i < numguiinv; ++i)
-        guiinv[i].WriteToSavegame(out);
+    out->WriteInt32(_G(numguiinv));
+    for (int i = 0; i < _G(numguiinv); ++i)
+        _GP(guiinv)[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUISliders");
     out->WriteInt32(numguislider);
@@ -627,9 +627,9 @@ HSaveError WriteGUI(Stream *out)
         guitext[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUIListBoxes");
-    out->WriteInt32(numguilist);
-    for (int i = 0; i < numguilist; ++i)
-        guilist[i].WriteToSavegame(out);
+    out->WriteInt32(_G(numguilist));
+    for (int i = 0; i < _G(numguilist); ++i)
+        _GP(guilist)[i].WriteToSavegame(out);
 
     // Animated buttons
     WriteFormatTag(out, "AnimatedButtons");
@@ -653,24 +653,24 @@ HSaveError ReadGUI(Stream *in, int32_t cmp_ver, const PreservedParams &pp, Resto
 
     if (!AssertFormatTagStrict(err, in, "GUIButtons"))
         return err;
-    if (!AssertGameContent(err, in->ReadInt32(), numguibuts, "GUI Buttons"))
+    if (!AssertGameContent(err, in->ReadInt32(), _G(numguibuts), "GUI Buttons"))
         return err;
-    for (int i = 0; i < numguibuts; ++i)
-        guibuts[i].ReadFromSavegame(in, svg_ver);
+    for (int i = 0; i < _G(numguibuts); ++i)
+        _GP(guibuts)[i].ReadFromSavegame(in, svg_ver);
 
     if (!AssertFormatTagStrict(err, in, "GUILabels"))
         return err;
-    if (!AssertGameContent(err, in->ReadInt32(), numguilabels, "GUI Labels"))
+    if (!AssertGameContent(err, in->ReadInt32(), _G(numguilabels), "GUI Labels"))
         return err;
-    for (int i = 0; i < numguilabels; ++i)
-        guilabels[i].ReadFromSavegame(in, svg_ver);
+    for (int i = 0; i < _G(numguilabels); ++i)
+        _GP(guilabels)[i].ReadFromSavegame(in, svg_ver);
 
     if (!AssertFormatTagStrict(err, in, "GUIInvWindows"))
         return err;
-    if (!AssertGameContent(err, in->ReadInt32(), numguiinv, "GUI InvWindows"))
+    if (!AssertGameContent(err, in->ReadInt32(), _G(numguiinv), "GUI InvWindows"))
         return err;
-    for (int i = 0; i < numguiinv; ++i)
-        guiinv[i].ReadFromSavegame(in, svg_ver);
+    for (int i = 0; i < _G(numguiinv); ++i)
+        _GP(guiinv)[i].ReadFromSavegame(in, svg_ver);
 
     if (!AssertFormatTagStrict(err, in, "GUISliders"))
         return err;
@@ -688,10 +688,10 @@ HSaveError ReadGUI(Stream *in, int32_t cmp_ver, const PreservedParams &pp, Resto
 
     if (!AssertFormatTagStrict(err, in, "GUIListBoxes"))
         return err;
-    if (!AssertGameContent(err, in->ReadInt32(), numguilist, "GUI ListBoxes"))
+    if (!AssertGameContent(err, in->ReadInt32(), _G(numguilist), "GUI ListBoxes"))
         return err;
-    for (int i = 0; i < numguilist; ++i)
-        guilist[i].ReadFromSavegame(in, svg_ver);
+    for (int i = 0; i < _G(numguilist); ++i)
+        _GP(guilist)[i].ReadFromSavegame(in, svg_ver);
 
     // Animated buttons
     if (!AssertFormatTagStrict(err, in, "AnimatedButtons"))
@@ -1009,7 +1009,7 @@ HSaveError WriteThisRoom(Stream *out)
     {
         out->WriteBool(_GP(play).raw_modified[i] != 0);
         if (_GP(play).raw_modified[i])
-            serialize_bitmap(_GP(_GP(thisroom)).BgFrames[i].Graphic.get(), out);
+            serialize_bitmap(_GP(thisroom).BgFrames[i].Graphic.get(), out);
     }
     out->WriteBool(_G(raw_saved_screen) != nullptr);
     if (_G(raw_saved_screen))
@@ -1018,24 +1018,24 @@ HSaveError WriteThisRoom(Stream *out)
     // room region state
     for (int i = 0; i < MAX_ROOM_REGIONS; ++i)
     {
-        out->WriteInt32(_GP(_GP(thisroom)).Regions[i].Light);
-        out->WriteInt32(_GP(_GP(thisroom)).Regions[i].Tint);
+        out->WriteInt32(_GP(thisroom).Regions[i].Light);
+        out->WriteInt32(_GP(thisroom).Regions[i].Tint);
     }
     for (int i = 0; i < MAX_WALK_AREAS + 1; ++i)
     {
-        out->WriteInt32(_GP(_GP(thisroom)).WalkAreas[i].ScalingFar);
-        out->WriteInt32(_GP(_GP(thisroom)).WalkAreas[i].ScalingNear);
+        out->WriteInt32(_GP(thisroom).WalkAreas[i].ScalingFar);
+        out->WriteInt32(_GP(thisroom).WalkAreas[i].ScalingNear);
     }
 
     // room object movement paths cache
-    out->WriteInt32(_GP(_GP(thisroom)).ObjectCount + 1);
-    for (size_t i = 0; i < _GP(_GP(thisroom)).ObjectCount + 1; ++i)
+    out->WriteInt32(_GP(thisroom).ObjectCount + 1);
+    for (size_t i = 0; i < _GP(thisroom).ObjectCount + 1; ++i)
     {
         _G(mls)[i].WriteToFile(out);
     }
 
     // room music volume
-    out->WriteInt32(_GP(_GP(thisroom)).Options.MusicVolume);
+    out->WriteInt32(_GP(thisroom).Options.MusicVolume);
 
     // persistent room's indicator
     const bool persist = _G(displayed_room) < MAX_ROOMS;

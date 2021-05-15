@@ -161,7 +161,7 @@ void GameState::UpdateRoomCameras() {
 void GameState::UpdateRoomCamera(int index) {
 	auto cam = _roomCameras[index];
 	const Rect &rc = cam->GetRect();
-	const Size real_room_sz = Size(data_to_game_coord(_GP(_GP(thisroom)).Width), data_to_game_coord(_GP(_GP(thisroom)).Height));
+	const Size real_room_sz = Size(data_to_game_coord(_GP(thisroom).Width), data_to_game_coord(_GP(thisroom).Height));
 	if ((real_room_sz.Width > rc.GetWidth()) || (real_room_sz.Height > rc.GetHeight())) {
 		// TODO: split out into Camera Behavior
 		if (!cam->IsLocked()) {

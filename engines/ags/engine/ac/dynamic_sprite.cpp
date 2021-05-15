@@ -49,7 +49,7 @@ using namespace Shared;
 using namespace Engine;
 
 
-extern SpriteCache _GP(spriteset);
+
 
 extern RoomObject *_GP(objs);
 extern RoomStatus *_G(croom);
@@ -415,7 +415,7 @@ ScriptDynamicSprite *DynamicSprite_CreateFromBackground(int frame, int x1, int y
 
 	if (frame == SCR_NO_VALUE) {
 		frame = _GP(play).bg_frame;
-	} else if ((frame < 0) || ((size_t)frame >= _GP(_GP(thisroom)).BgFrameCount))
+	} else if ((frame < 0) || ((size_t)frame >= _GP(thisroom).BgFrameCount))
 		quit("!DynamicSprite.CreateFromBackground: invalid frame specified");
 
 	if (x1 == SCR_NO_VALUE) {
@@ -435,11 +435,11 @@ ScriptDynamicSprite *DynamicSprite_CreateFromBackground(int frame, int x1, int y
 		return nullptr;
 
 	// create a new sprite as a copy of the existing one
-	Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, _GP(_GP(thisroom)).BgFrames[frame].Graphic->GetColorDepth());
+	Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, _GP(thisroom).BgFrames[frame].Graphic->GetColorDepth());
 	if (newPic == nullptr)
 		return nullptr;
 
-	newPic->Blit(_GP(_GP(thisroom)).BgFrames[frame].Graphic.get(), x1, y1, 0, 0, width, height);
+	newPic->Blit(_GP(thisroom).BgFrames[frame].Graphic.get(), x1, y1, 0, 0, width, height);
 
 	// replace the bitmap in the sprite set
 	add_dynamic_sprite(gotSlot, newPic);

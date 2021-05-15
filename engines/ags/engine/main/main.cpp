@@ -69,13 +69,13 @@ char **global_argv = nullptr;
 int    global_argc = 0;
 
 
-extern GameSetup _GP(usetup);
+
 
 extern int _G(our_eip);
 extern int _G(convert_16bit_bgr);
-extern int _G(editor_debugging_enabled);
-extern int _G(editor_debugging_initialized);
-extern char _G(editor_debugger_instance_token)[100];
+
+
+
 
 
 // Startup flags, set from parameters to engine

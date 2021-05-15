@@ -34,7 +34,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern SpriteCache _GP(spriteset);
+
 extern IGraphicsDriver *_G(gfxDriver);
 
 int LoadImageFile(const char *filename) {

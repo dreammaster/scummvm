@@ -35,6 +35,7 @@
 #include "ags/engine/main/update.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/ags.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -46,7 +47,7 @@ extern int _G(displayed_room);
 
 extern int _G(char_speaking);
 
-extern unsigned int loopcounter;
+
 
 #define Random __Rand
 
@@ -402,17 +403,17 @@ void CharacterInfo::update_character_follower(int &aa, int &numSheep, int *follo
 			if (room == _G(displayed_room)) {
 				// only move to the room-entered position if coming into
 				// the current room
-				if (_GP(play).entered_at_x > (_GP(_GP(thisroom)).Width - 8)) {
-					x = _GP(_GP(thisroom)).Width + 8;
+				if (_GP(play).entered_at_x > (_GP(thisroom).Width - 8)) {
+					x = _GP(thisroom).Width + 8;
 					y = _GP(play).entered_at_y;
 				} else if (_GP(play).entered_at_x < 8) {
 					x = -8;
 					y = _GP(play).entered_at_y;
-				} else if (_GP(play).entered_at_y > (_GP(_GP(thisroom)).Height - 8)) {
-					y = _GP(_GP(thisroom)).Height + 8;
+				} else if (_GP(play).entered_at_y > (_GP(thisroom).Height - 8)) {
+					y = _GP(thisroom).Height + 8;
 					x = _GP(play).entered_at_x;
-				} else if (_GP(play).entered_at_y < _GP(_GP(thisroom)).Edges.Top + 8) {
-					y = _GP(_GP(thisroom)).Edges.Top + 1;
+				} else if (_GP(play).entered_at_y < _GP(thisroom).Edges.Top + 8) {
+					y = _GP(thisroom).Edges.Top + 1;
 					x = _GP(play).entered_at_x;
 				} else {
 					// not at one of the edges
@@ -454,7 +455,7 @@ void CharacterInfo::update_character_idle(CharacterExtras *chex, int &doing_noth
 	else if ((doing_nothing == 0) || ((flags & CHF_FIXVIEW) != 0))
 		idleleft = idletime;
 	// count idle time
-	else if ((loopcounter % 40 == 0) || (chex->process_idle_this_time == 1)) {
+	else if ((_G(loopcounter) % 40 == 0) || (chex->process_idle_this_time == 1)) {
 		idleleft--;
 		if (idleleft == -1) {
 			int useloop = loop;

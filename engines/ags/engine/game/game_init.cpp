@@ -89,13 +89,13 @@ extern ScriptString _GP(myScriptStringImpl);
 
 
 
-extern StaticArray StaticCharacterArray;
-extern StaticArray StaticObjectArray;
-extern StaticArray StaticGUIArray;
-extern StaticArray StaticHotspotArray;
-extern StaticArray StaticRegionArray;
-extern StaticArray StaticInventoryArray;
-extern StaticArray StaticDialogArray;
+extern StaticArray _GP(StaticCharacterArray);
+extern StaticArray _GP(StaticObjectArray);
+extern StaticArray _GP(StaticGUIArray);
+extern StaticArray _GP(StaticHotspotArray);
+extern StaticArray _GP(StaticRegionArray);
+extern StaticArray _GP(StaticInventoryArray);
+extern StaticArray _GP(StaticDialogArray);
 
 extern std::vector<ccInstance *> moduleInst;
 extern std::vector<ccInstance *> moduleInstFork;
@@ -105,13 +105,13 @@ extern std::vector<RuntimeScriptValue> moduleRepExecAddr;
 extern std::vector< std::shared_ptr<unsigned char> > _G(old_dialog_scripts);
 extern std::vector<String> _G(old_speech_lines);
 
-StaticArray StaticCharacterArray;
-StaticArray StaticObjectArray;
-StaticArray StaticGUIArray;
-StaticArray StaticHotspotArray;
-StaticArray StaticRegionArray;
-StaticArray StaticInventoryArray;
-StaticArray StaticDialogArray;
+StaticArray _GP(StaticCharacterArray);
+StaticArray _GP(StaticObjectArray);
+StaticArray _GP(StaticGUIArray);
+StaticArray _GP(StaticHotspotArray);
+StaticArray _GP(StaticRegionArray);
+StaticArray _GP(StaticInventoryArray);
+StaticArray _GP(StaticDialogArray);
 
 
 namespace AGS {
@@ -266,21 +266,21 @@ void InitAndRegisterRegions() {
 
 // Registers static entity arrays in the script system
 void RegisterStaticArrays() {
-	StaticCharacterArray.Create(&_GP(ccDynamicCharacter), sizeof(CharacterInfo), sizeof(CharacterInfo));
-	StaticObjectArray.Create(&_GP(ccDynamicObject), sizeof(ScriptObject), sizeof(ScriptObject));
-	StaticGUIArray.Create(&_GP(ccDynamicGUI), sizeof(ScriptGUI), sizeof(ScriptGUI));
-	StaticHotspotArray.Create(&_GP(ccDynamicHotspot), sizeof(ScriptHotspot), sizeof(ScriptHotspot));
-	StaticRegionArray.Create(&_GP(ccDynamicRegion), sizeof(ScriptRegion), sizeof(ScriptRegion));
-	StaticInventoryArray.Create(&_GP(ccDynamicInv), sizeof(ScriptInvItem), sizeof(ScriptInvItem));
-	StaticDialogArray.Create(&_GP(ccDynamicDialog), sizeof(ScriptDialog), sizeof(ScriptDialog));
+	_GP(StaticCharacterArray).Create(&_GP(ccDynamicCharacter), sizeof(CharacterInfo), sizeof(CharacterInfo));
+	_GP(StaticObjectArray).Create(&_GP(ccDynamicObject), sizeof(ScriptObject), sizeof(ScriptObject));
+	_GP(StaticGUIArray).Create(&_GP(ccDynamicGUI), sizeof(ScriptGUI), sizeof(ScriptGUI));
+	_GP(StaticHotspotArray).Create(&_GP(ccDynamicHotspot), sizeof(ScriptHotspot), sizeof(ScriptHotspot));
+	_GP(StaticRegionArray).Create(&_GP(ccDynamicRegion), sizeof(ScriptRegion), sizeof(ScriptRegion));
+	_GP(StaticInventoryArray).Create(&_GP(ccDynamicInv), sizeof(ScriptInvItem), sizeof(ScriptInvItem));
+	_GP(StaticDialogArray).Create(&_GP(ccDynamicDialog), sizeof(ScriptDialog), sizeof(ScriptDialog));
 
-	ccAddExternalStaticArray("character", &_GP(game).chars[0], &StaticCharacterArray);
-	ccAddExternalStaticArray("object", &_G(scrObj)[0], &StaticObjectArray);
-	ccAddExternalStaticArray("gui", &_G(scrGui)[0], &StaticGUIArray);
-	ccAddExternalStaticArray("hotspot", &_G(scrHotspot)[0], &StaticHotspotArray);
-	ccAddExternalStaticArray("region", &_G(scrRegion)[0], &StaticRegionArray);
-	ccAddExternalStaticArray("inventory", &_G(scrInv)[0], &StaticInventoryArray);
-	ccAddExternalStaticArray("dialog", &_G(scrDialog)[0], &StaticDialogArray);
+	ccAddExternalStaticArray("character", &_GP(game).chars[0], &_GP(StaticCharacterArray));
+	ccAddExternalStaticArray("object", &_G(scrObj)[0], &_GP(StaticObjectArray));
+	ccAddExternalStaticArray("gui", &_G(scrGui)[0], &_GP(StaticGUIArray));
+	ccAddExternalStaticArray("hotspot", &_G(scrHotspot)[0], &_GP(StaticHotspotArray));
+	ccAddExternalStaticArray("region", &_G(scrRegion)[0], &_GP(StaticRegionArray));
+	ccAddExternalStaticArray("inventory", &_G(scrInv)[0], &_GP(StaticInventoryArray));
+	ccAddExternalStaticArray("dialog", &_G(scrDialog)[0], &_GP(StaticDialogArray));
 }
 
 // Initializes various game entities and registers them in the script system
@@ -380,7 +380,7 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	// 4. Initialize certain runtime variables
 	//
 	_G(game_paused) = 0;  // reset the game paused flag
-	ifacepopped = -1;
+	_G(ifacepopped) = -1;
 
 	String svg_suffix;
 	if (_GP(game).saveGameFileExtension[0] != 0)
@@ -393,9 +393,9 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	//
 	// 5. Initialize runtime state of certain game objects
 	//
-	for (int i = 0; i < numguilabels; ++i) {
+	for (int i = 0; i < _G(numguilabels); ++i) {
 		// labels are not clickable by default
-		guilabels[i].SetClickable(false);
+		_GP(guilabels)[i].SetClickable(false);
 	}
 	_GP(play).gui_draw_order = (int *)calloc(_GP(game).numgui * sizeof(int), 1);
 	update_gui_zorder();

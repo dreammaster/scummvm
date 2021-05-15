@@ -57,16 +57,16 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 
-extern SpriteCache _GP(spriteset);
+
 
 extern RoomStatus _GP(troom);    // used for non-saveable rooms, eg. intro
 extern int _G(our_eip);
-extern GameSetup _GP(usetup);
+
 extern char _G(pexbuf)[STD_BUFFER_SIZE];
 extern int _G(proper_exit);
 extern char _G(check_dynamic_sprites_at_exit);
-extern int _G(editor_debugging_initialized);
-extern IAGSEditorDebugger *_G(editor_debugger);
+
+
 extern int _G(need_to_stop_cd);
 extern int _G(use_cdplayer);
 extern IGraphicsDriver *_G(gfxDriver);
@@ -180,7 +180,7 @@ void quit_message_on_exit(const char *qmsg, String &alertis, QuitReason qreason)
 
 void quit_release_data() {
 	resetRoomStatuses();
-	_GP(_GP(thisroom)).Free();
+	_GP(thisroom).Free();
 	_GP(play).Free();
 
 	/*  _CrtMemState memstart;

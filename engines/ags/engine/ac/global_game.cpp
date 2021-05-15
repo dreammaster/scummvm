@@ -78,8 +78,8 @@ using namespace AGS::Shared;
 extern ExecutingScript *curscript;
 extern int _G(displayed_room);
 extern int _G(game_paused);
-extern SpriteCache _GP(spriteset);
-extern GameSetup _GP(usetup);
+
+
 extern unsigned int _G(load_new_game);
 extern int _G(load_new_game_restore);
 
@@ -592,7 +592,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 		return;
 	xxx = vpt.first.X;
 	yyy = vpt.first.Y;
-	if ((xxx >= _GP(_GP(thisroom)).Width) | (xxx < 0) | (yyy < 0) | (yyy >= _GP(_GP(thisroom)).Height))
+	if ((xxx >= _GP(thisroom).Width) | (xxx < 0) | (yyy < 0) | (yyy >= _GP(thisroom).Height))
 		return;
 
 	int onhs, aa;
@@ -616,7 +616,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 	// on object
 	if (loctype == LOCTYPE_OBJ) {
 		aa = _G(getloctype_index);
-		strcpy(tempo, get_translation(_GP(_GP(thisroom)).Objects[aa].Name));
+		strcpy(tempo, get_translation(_GP(thisroom).Objects[aa].Name));
 		// Compatibility: < 3.1.1 games returned space for nameless object
 		// (presumably was a bug, but fixing it affected certain games behavior)
 		if (_G(loaded_game_file_version) < kGameVersion_311 && tempo[0] == 0) {
@@ -629,7 +629,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 		return;
 	}
 	onhs = _G(getloctype_index);
-	if (onhs > 0) strcpy(tempo, get_translation(_GP(_GP(thisroom)).Hotspots[onhs].Name));
+	if (onhs > 0) strcpy(tempo, get_translation(_GP(thisroom).Hotspots[onhs].Name));
 	if (_GP(play).get_loc_name_last_time != onhs)
 		GUI::MarkSpecialLabelsForUpdate(kLabelMacro_Overhotspot);
 	_GP(play).get_loc_name_last_time = onhs;
@@ -698,11 +698,11 @@ void RoomProcessClick(int xx, int yy, int mood) {
 	if ((mood == MODE_WALK) && (_GP(game).options[OPT_NOWALKMODE] == 0)) {
 		int hsnum = get_hotspot_at(xx, yy);
 		if (hsnum < 1);
-		else if (_GP(_GP(thisroom)).Hotspots[hsnum].WalkTo.X < 1);
+		else if (_GP(thisroom).Hotspots[hsnum].WalkTo.X < 1);
 		else if (_GP(play).auto_use_walkto_points == 0);
 		else {
-			xx = _GP(_GP(thisroom)).Hotspots[hsnum].WalkTo.X;
-			yy = _GP(_GP(thisroom)).Hotspots[hsnum].WalkTo.Y;
+			xx = _GP(thisroom).Hotspots[hsnum].WalkTo.X;
+			yy = _GP(thisroom).Hotspots[hsnum].WalkTo.Y;
 			debug_script_log("Move to walk-to point hotspot %d", hsnum);
 		}
 		walk_character(_GP(game).playercharacter, xx, yy, 0, true);

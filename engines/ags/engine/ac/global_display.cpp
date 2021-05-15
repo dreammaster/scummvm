@@ -123,19 +123,19 @@ void DisplayMessageAtY(int msnum, int ypos) {
 	while (repeatloop) {
 		get_message_text(msnum, msgbufr);
 
-		if (_GP(_GP(thisroom)).MessageInfos[msnum].DisplayAs > 0) {
-			DisplaySpeech(msgbufr, _GP(_GP(thisroom)).MessageInfos[msnum].DisplayAs - 1);
+		if (_GP(thisroom).MessageInfos[msnum].DisplayAs > 0) {
+			DisplaySpeech(msgbufr, _GP(thisroom).MessageInfos[msnum].DisplayAs - 1);
 		} else {
 			// time out automatically if they have set that
 			int oldGameSkipDisp = _GP(play).skip_display;
-			if (_GP(_GP(thisroom)).MessageInfos[msnum].Flags & MSG_TIMELIMIT)
+			if (_GP(thisroom).MessageInfos[msnum].Flags & MSG_TIMELIMIT)
 				_GP(play).skip_display = 0;
 
 			DisplayAtY(ypos, msgbufr);
 
 			_GP(play).skip_display = oldGameSkipDisp;
 		}
-		if (_GP(_GP(thisroom)).MessageInfos[msnum].Flags & MSG_DISPLAYNEXT) {
+		if (_GP(thisroom).MessageInfos[msnum].Flags & MSG_DISPLAYNEXT) {
 			msnum++;
 			repeatloop = 1;
 		} else

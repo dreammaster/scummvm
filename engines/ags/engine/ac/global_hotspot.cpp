@@ -66,20 +66,20 @@ int GetHotspotPointX(int hotspot) {
 	if ((hotspot < 0) || (hotspot >= MAX_ROOM_HOTSPOTS))
 		quit("!GetHotspotPointX: invalid hotspot");
 
-	if (_GP(_GP(thisroom)).Hotspots[hotspot].WalkTo.X < 1)
+	if (_GP(thisroom).Hotspots[hotspot].WalkTo.X < 1)
 		return -1;
 
-	return _GP(_GP(thisroom)).Hotspots[hotspot].WalkTo.X;
+	return _GP(thisroom).Hotspots[hotspot].WalkTo.X;
 }
 
 int GetHotspotPointY(int hotspot) {
 	if ((hotspot < 0) || (hotspot >= MAX_ROOM_HOTSPOTS))
 		quit("!GetHotspotPointY: invalid hotspot");
 
-	if (_GP(_GP(thisroom)).Hotspots[hotspot].WalkTo.X < 1) // TODO: there was "x" here, why?
+	if (_GP(thisroom).Hotspots[hotspot].WalkTo.X < 1) // TODO: there was "x" here, why?
 		return -1;
 
-	return _GP(_GP(thisroom)).Hotspots[hotspot].WalkTo.Y;
+	return _GP(thisroom).Hotspots[hotspot].WalkTo.Y;
 }
 
 int GetHotspotIDAtScreen(int scrx, int scry) {
@@ -87,7 +87,7 @@ int GetHotspotIDAtScreen(int scrx, int scry) {
 	if (vpt.second < 0)
 		return 0;
 	Point pt = vpt.first;
-	if ((pt.X >= _GP(_GP(thisroom)).Width) | (pt.X < 0) | (pt.Y < 0) | (pt.Y >= _GP(_GP(thisroom)).Height))
+	if ((pt.X >= _GP(thisroom).Width) | (pt.X < 0) | (pt.Y < 0) | (pt.Y >= _GP(thisroom).Height))
 		return 0;
 	return get_hotspot_at(pt.X, pt.Y);
 }
@@ -97,7 +97,7 @@ void GetHotspotName(int hotspot, char *buffer) {
 	if ((hotspot < 0) || (hotspot >= MAX_ROOM_HOTSPOTS))
 		quit("!GetHotspotName: invalid hotspot number");
 
-	strcpy(buffer, get_translation(_GP(_GP(thisroom)).Hotspots[hotspot].Name));
+	strcpy(buffer, get_translation(_GP(thisroom).Hotspots[hotspot].Name));
 }
 
 void RunHotspotInteraction(int hotspothere, int mood) {
@@ -129,10 +129,10 @@ void RunHotspotInteraction(int hotspothere, int mood) {
 	_G(evblockbasename) = "hotspot%d";
 	_G(evblocknum) = hotspothere;
 
-	if (_GP(_GP(thisroom)).Hotspots[hotspothere].EventHandlers != nullptr) {
+	if (_GP(thisroom).Hotspots[hotspothere].EventHandlers != nullptr) {
 		if (passon >= 0)
-			run_interaction_script(_GP(_GP(thisroom)).Hotspots[hotspothere].EventHandlers.get(), passon, 5, (passon == 3));
-		run_interaction_script(_GP(_GP(thisroom)).Hotspots[hotspothere].EventHandlers.get(), 5);  // any click on hotspot
+			run_interaction_script(_GP(thisroom).Hotspots[hotspothere].EventHandlers.get(), passon, 5, (passon == 3));
+		run_interaction_script(_GP(thisroom).Hotspots[hotspothere].EventHandlers.get(), 5);  // any click on hotspot
 	} else {
 		if (passon >= 0) {
 			if (run_interaction_event(&_G(croom)->intrHotspot[hotspothere], passon, 5, (passon == 3))) {
@@ -150,11 +150,11 @@ void RunHotspotInteraction(int hotspothere, int mood) {
 }
 
 int GetHotspotProperty(int hss, const char *property) {
-	return get_int_property(_GP(_GP(thisroom)).Hotspots[hss].Properties, _G(croom)->hsProps[hss], property);
+	return get_int_property(_GP(thisroom).Hotspots[hss].Properties, _G(croom)->hsProps[hss], property);
 }
 
 void GetHotspotPropertyText(int item, const char *property, char *bufer) {
-	get_text_property(_GP(_GP(thisroom)).Hotspots[item].Properties, _G(croom)->hsProps[item], property, bufer);
+	get_text_property(_GP(thisroom).Hotspots[item].Properties, _G(croom)->hsProps[item], property, bufer);
 }
 
 } // namespace AGS3

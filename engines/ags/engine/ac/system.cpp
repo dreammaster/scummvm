@@ -44,7 +44,7 @@
 #include "ags/shared/#include "ags/shared/AGS3 {
 #include "ags/shared/#include "ags/shared/space AGS::Engine;
 #include "ags/shared/#include "ags/shared/eSetupStruct game;
-extern GameSetup _GP(usetup);
+
 
 
 

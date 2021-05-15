@@ -62,7 +62,7 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 
-extern GameSetup _GP(usetup);
+
 
 extern int cur_mode, cur_cursor;
 extern ccInstance *gameinst;
@@ -77,11 +77,11 @@ extern CCGUI _GP(ccDynamicGUI);
 extern CCGUIObject _GP(ccDynamicGUIObject);
 
 
-int ifacepopped = -1;  // currently displayed pop-up GUI (-1 if none)
-int mouse_on_iface = -1;   // mouse cursor is over this interface
-int mouse_ifacebut_xoffs = -1, mouse_ifacebut_yoffs = -1;
+int _G(ifacepopped) = -1;  // currently displayed pop-up GUI (-1 if none)
+int _G(mouse_on_iface) = -1;   // mouse cursor is over this interface
+int _G(mouse_ifacebut_xoffs) = -1, mouse_ifacebut_yoffs = -1;
 
-int eip_guinum, eip_guiobj;
+int _G(eip_guinum), _G(eip_guiobj);
 
 
 ScriptGUI *GUI_AsTextWindow(ScriptGUI *tehgui) { // Internally both GUI and TextWindow are implemented by same class
@@ -321,8 +321,8 @@ void GUI_ProcessClick(int x, int y, int mbut) {
 //=============================================================================
 
 void remove_popup_interface(int ifacenum) {
-	if (ifacepopped != ifacenum) return;
-	ifacepopped = -1; UnPauseGame();
+	if (_G(ifacepopped) != ifacenum) return;
+	_G(ifacepopped) = -1; UnPauseGame();
 	_GP(guis)[ifacenum].SetConceal(true);
 	if (mousey <= _GP(guis)[ifacenum].PopupAtMouseY)
 		Mouse::SetPosition(Point(mousex, _GP(guis)[ifacenum].PopupAtMouseY + 2));
@@ -332,7 +332,7 @@ void remove_popup_interface(int ifacenum) {
 	else if (IsInterfaceEnabled())
 		set_default_cursor();
 
-	if (ifacenum == mouse_on_iface) mouse_on_iface = -1;
+	if (ifacenum == _G(mouse_on_iface)) _G(mouse_on_iface) = -1;
 }
 
 void process_interface_click(int ifce, int btn, int mbut) {
@@ -600,7 +600,7 @@ int gui_on_mouse_move() {
 			if (_GP(guis)[guin].PopupStyle != kGUIPopupMouseY) continue;
 			if (is_complete_overlay > 0) break;  // interfaces disabled
 			//    if (_GP(play).disabled_user_interface>0) break;
-			if (ifacepopped == guin) continue;
+			if (_G(ifacepopped) == guin) continue;
 			if (!_GP(guis)[guin].IsVisible()) continue;
 			// Don't allow it to be popped up while skipping cutscene
 			if (_GP(play).fast_forward) continue;
@@ -608,7 +608,7 @@ int gui_on_mouse_move() {
 			if (mousey < _GP(guis)[guin].PopupAtMouseY) {
 				set_mouse_cursor(CURS_ARROW);
 				_GP(guis)[guin].SetConceal(false);
-				ifacepopped = guin; PauseGame();
+				_G(ifacepopped) = guin; PauseGame();
 				break;
 			}
 		}
@@ -641,7 +641,7 @@ void gui_on_mouse_up(const int wasongui, const int wasbutdown) {
 		if ((cttype == kGUIButton) || (cttype == kGUISlider) || (cttype == kGUIListBox)) {
 			force_event(EV_IFACECLICK, wasongui, i, wasbutdown);
 		} else if (cttype == kGUIInvWindow) {
-			mouse_ifacebut_xoffs = mousex - (guio->X) - _GP(guis)[wasongui].X;
+			_G(mouse_ifacebut_xoffs) = mousex - (guio->X) - _GP(guis)[wasongui].X;
 			mouse_ifacebut_yoffs = mousey - (guio->Y) - _GP(guis)[wasongui].Y;
 			int iit = offset_over_inv((GUIInvWindow *)guio);
 			if (iit >= 0) {

@@ -70,8 +70,8 @@ extern RGB palette[256];
 extern DialogTopic *dialog;
 
 
-extern int ifacepopped;
-extern int mouse_on_iface;
+
+
 extern Bitmap *_G(raw_saved_screen);
 extern RoomStatus _GP(troom);
 
@@ -221,10 +221,10 @@ static void restore_game_dialogs(Stream *in) {
 }
 
 static void restore_game_more_dynamic_values(Stream *in) {
-	mouse_on_iface = in->ReadInt32();
+	_G(mouse_on_iface) = in->ReadInt32();
 	in->ReadInt32(); // mouse_on_iface_button
 	in->ReadInt32(); // mouse_pushed_iface
-	ifacepopped = in->ReadInt32();
+	_G(ifacepopped) = in->ReadInt32();
 	_G(game_paused) = in->ReadInt32();
 }
 

@@ -57,7 +57,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern int ifacepopped;
+
 
 
 

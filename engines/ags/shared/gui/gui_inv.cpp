@@ -28,8 +28,8 @@
 
 namespace AGS3 {
 
-std::vector<AGS::Shared::GUIInvWindow> guiinv;
-int numguiinv = 0;
+std::vector<AGS::Shared::GUIInvWindow> _GP(guiinv);
+int _G(numguiinv) = 0;
 
 namespace AGS {
 namespace Shared {

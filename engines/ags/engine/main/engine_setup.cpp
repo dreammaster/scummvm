@@ -38,7 +38,7 @@
 #include "ags/shared/gfx/ali3dexception.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/gui/guiinv.h"
+#include "ags/shared/gui/_GP(guiinv).h"
 #include "ags/shared/main/graphics_mode.h"
 #include "ags/shared/main/engine_setup.h"
 #include "ags/engine/media/video/video.h"
@@ -115,10 +115,10 @@ void convert_objects_to_data_resolution(GameDataVersion filever) {
 		_GP(game).chars[i].y /= mul;
 	}
 
-	for (int i = 0; i < numguiinv; ++i) {
-		guiinv[i].ItemWidth /= mul;
-		guiinv[i].ItemHeight /= mul;
-		guiinv[i].OnResized();
+	for (int i = 0; i < _G(numguiinv); ++i) {
+		_GP(guiinv)[i].ItemWidth /= mul;
+		_GP(guiinv)[i].ItemHeight /= mul;
+		_GP(guiinv)[i].OnResized();
 	}
 }
 

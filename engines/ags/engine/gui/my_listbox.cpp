@@ -34,7 +34,7 @@ namespace AGS3 {
 
 using AGS::Shared::Bitmap;
 
-extern GameSetup _GP(usetup);
+
 extern int numcurso, hotx, hoty;
 
 extern int _G(windowbackgroundcolor);

@@ -56,17 +56,17 @@ extern AGSPlatformDriver *platform;
 extern IGraphicsDriver *_G(gfxDriver);
 
 
-IGfxDriverFactory *GfxFactory = nullptr;
+IGfxDriverFactory *_G(GfxFactory) = nullptr;
 
 // Last saved fullscreen and windowed configs; they are used when switching
 // between between fullscreen and windowed modes at runtime.
 // If particular mode is modified, e.g. by script command, related config should be overwritten.
-ActiveDisplaySetting SavedFullscreenSetting;
-ActiveDisplaySetting SavedWindowedSetting;
+ActiveDisplaySetting _G(SavedFullscreenSetting);
+ActiveDisplaySetting _GP(SavedWindowedSetting);
 // Current frame scaling setup
-GameFrameSetup     CurFrameSetup;
+GameFrameSetup     _GP(CurFrameSetup);
 // The game-to-screen transformation
-PlaneScaling       GameScaling;
+PlaneScaling       _GP(GameScaling);
 
 
 GameFrameSetup::GameFrameSetup()
@@ -109,13 +109,13 @@ Size get_max_display_size(bool windowed) {
 }
 
 bool create_gfx_driver(const String &gfx_driver_id) {
-	GfxFactory = GetGfxDriverFactory(gfx_driver_id);
-	if (!GfxFactory) {
+	_G(GfxFactory) = GetGfxDriverFactory(gfx_driver_id);
+	if (!_G(GfxFactory)) {
 		Debug::Printf(kDbgMsg_Error, "Failed to initialize %s graphics factory. Error: %s", gfx_driver_id.GetCStr(), SDL_GetError());
 		return false;
 	}
 	Debug::Printf("Using graphics factory: %s", gfx_driver_id.GetCStr());
-	_G(gfxDriver) = GfxFactory->GetDriver();
+	_G(gfxDriver) = _G(GfxFactory)->GetDriver();
 	if (!_G(gfxDriver)) {
 		Debug::Printf(kDbgMsg_Error, "Failed to create graphics driver. Error: %s", SDL_GetError());
 		return false;
@@ -128,7 +128,7 @@ bool create_gfx_driver(const String &gfx_driver_id) {
 bool graphics_mode_set_filter_any(const GfxFilterSetup &setup) {
 	Debug::Printf("Requested gfx filter: %s", setup.UserRequest.GetCStr());
 	if (!graphics_mode_set_filter(setup.ID)) {
-		String def_filter = GfxFactory->GetDefaultFilterID();
+		String def_filter = _G(GfxFactory)->GetDefaultFilterID();
 		if (def_filter.CompareNoCase(setup.ID) == 0)
 			return false;
 		Debug::Printf(kDbgMsg_Error, "Failed to apply gfx filter: %s; will try to use factory default filter '%s' instead",
@@ -136,7 +136,7 @@ bool graphics_mode_set_filter_any(const GfxFilterSetup &setup) {
 		if (!graphics_mode_set_filter(def_filter))
 			return false;
 	}
-	Debug::Printf("Using gfx filter: %s", GfxFactory->GetDriver()->GetGraphicsFilter()->GetInfo().Id.GetCStr());
+	Debug::Printf("Using gfx filter: %s", _G(GfxFactory)->GetDriver()->GetGraphicsFilter()->GetInfo().Id.GetCStr());
 	return true;
 }
 
@@ -497,7 +497,7 @@ bool graphics_mode_init_any(const Size game_size, const ScreenSetup &setup, cons
 }
 
 ActiveDisplaySetting graphics_mode_get_last_setting(bool windowed) {
-	return windowed ? SavedWindowedSetting : SavedFullscreenSetting;
+	return windowed ? _GP(SavedWindowedSetting) : _G(SavedFullscreenSetting);
 }
 
 bool graphics_mode_create_renderer(const String &driver_id) {
@@ -535,9 +535,9 @@ bool graphics_mode_set_dm(const DisplayMode &dm) {
 
 	DisplayMode rdm = _G(gfxDriver)->GetDisplayMode();
 	if (rdm.Windowed)
-		SavedWindowedSetting.Dm = rdm;
+		_GP(SavedWindowedSetting).Dm = rdm;
 	else
-		SavedFullscreenSetting.Dm = rdm;
+		_G(SavedFullscreenSetting).Dm = rdm;
 	Debug::Printf("Succeeded. Using gfx mode %d x %d (%d-bit) %s",
 		rdm.Width, rdm.Height, rdm.ColorDepth, rdm.Windowed ? "windowed" : "fullscreen");
 	return true;
@@ -550,7 +550,7 @@ bool graphics_mode_update_render_frame() {
 	DisplayMode dm = _G(gfxDriver)->GetDisplayMode();
 	Size screen_size = Size(dm.Width, dm.Height);
 	Size native_size = _G(gfxDriver)->GetNativeSize();
-	Size frame_size = set_game_frame_after_screen_size(native_size, screen_size, CurFrameSetup);
+	Size frame_size = set_game_frame_after_screen_size(native_size, screen_size, _GP(CurFrameSetup));
 	Rect render_frame = CenterInRect(RectWH(screen_size), RectWH(frame_size));
 
 	if (!_G(gfxDriver)->SetRenderFrame(render_frame)) {
@@ -564,7 +564,7 @@ bool graphics_mode_update_render_frame() {
 	Debug::Printf("Render frame set, render dest (%d, %d, %d, %d : %d x %d)",
 		dst_rect.Left, dst_rect.Top, dst_rect.Right, dst_rect.Bottom, dst_rect.GetWidth(), dst_rect.GetHeight());
 	// init game scaling transformation
-	GameScaling.Init(native_size, _G(gfxDriver)->GetRenderDestination());
+	_GP(GameScaling).Init(native_size, _G(gfxDriver)->GetRenderDestination());
 	return true;
 }
 
@@ -580,27 +580,27 @@ bool graphics_mode_set_native_size(const Size &native_size) {
 }
 
 GameFrameSetup graphics_mode_get_render_frame() {
-	return CurFrameSetup;
+	return _GP(CurFrameSetup);
 }
 
 bool graphics_mode_set_render_frame(const GameFrameSetup &frame_setup) {
 	if (!frame_setup.IsValid())
 		return false;
-	CurFrameSetup = frame_setup;
+	_GP(CurFrameSetup) = frame_setup;
 	if (_G(gfxDriver)->GetDisplayMode().Windowed)
-		SavedWindowedSetting.FrameSetup = frame_setup;
+		_GP(SavedWindowedSetting).FrameSetup = frame_setup;
 	else
-		SavedFullscreenSetting.FrameSetup = frame_setup;
+		_G(SavedFullscreenSetting).FrameSetup = frame_setup;
 	graphics_mode_update_render_frame();
 	return true;
 }
 
 bool graphics_mode_set_filter(const String &filter_id) {
-	if (!GfxFactory)
+	if (!_G(GfxFactory))
 		return false;
 
 	String filter_error;
-	PGfxFilter filter = GfxFactory->SetFilter(filter_id, filter_error);
+	PGfxFilter filter = _G(GfxFactory)->SetFilter(filter_id, filter_error);
 	if (!filter) {
 		Debug::Printf(kDbgMsg_Error, "Unable to set graphics filter '%s'. Error: %s", filter_id.GetCStr(), filter_error.GetCStr());
 		return false;
@@ -619,9 +619,9 @@ void graphics_mode_on_window_changed(const Size &sz) {
 }
 
 void graphics_mode_shutdown() {
-	if (GfxFactory)
-		GfxFactory->Shutdown();
-	GfxFactory = nullptr;
+	if (_G(GfxFactory))
+		_G(GfxFactory)->Shutdown();
+	_G(GfxFactory) = nullptr;
 	_G(gfxDriver) = nullptr;
 }
 

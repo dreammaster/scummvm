@@ -30,7 +30,7 @@
 #include "ags/engine/ac/properties.h"
 #include "ags/engine/ac/string.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/gui/guiinv.h"
+#include "ags/shared/gui/_GP(guiinv).h"
 #include "ags/engine/ac/event.h"
 #include "ags/engine/ac/game_state.h"
 
@@ -41,7 +41,7 @@ using namespace AGS::Shared;
 
 
 extern int mousex, mousey;
-extern int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
+extern int _G(mouse_ifacebut_xoffs), mouse_ifacebut_yoffs;
 extern const char *_G(evblockbasename);
 extern int _G(evblocknum);
 
@@ -85,7 +85,7 @@ int GetInvAt(int xxx, int yyy) {
 		int onobj = _GP(guis)[ongui].FindControlUnderMouse();
 		GUIObject *guio = _GP(guis)[ongui].GetControl(onobj);
 		if (guio) {
-			mouse_ifacebut_xoffs = mousex - (guio->X);
+			_G(mouse_ifacebut_xoffs) = mousex - (guio->X);
 			mouse_ifacebut_yoffs = mousey - (guio->Y);
 		}
 		mousex = mxwas;
@@ -96,10 +96,10 @@ int GetInvAt(int xxx, int yyy) {
 	return -1;
 }
 
-void GetInvName(int indx, char *buff) {
-	VALIDATE_STRING(buff);
+void GetInvName(int indx, char *_G(buff)) {
+	VALIDATE_STRING(_G(buff));
 	if ((indx < 0) | (indx >= _GP(game).numinvitems)) quit("!GetInvName: invalid inventory item specified");
-	strcpy(buff, get_translation(_GP(game).invinfo[indx].name));
+	strcpy(_G(buff), get_translation(_GP(game).invinfo[indx].name));
 }
 
 int GetInvGraphic(int indx) {

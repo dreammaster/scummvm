@@ -83,7 +83,7 @@ extern int _G(displayed_room),_G(starting_room);
 extern ViewStruct*views;
 extern RoomObject*_GP(objs);
 
-extern SpriteCache _GP(spriteset);
+
 extern Bitmap *walkable_areas_temp;
 extern IGraphicsDriver *_G(gfxDriver);
 extern Bitmap **_G(actsps);
@@ -227,13 +227,13 @@ void Character_ChangeRoomAutoPosition(CharacterInfo *chaa, int room, int newPos)
 
     if (_G(new_room_pos) == 0) {
         // auto place on other side of screen
-        if (chaa->x <= _GP(_GP(thisroom)).Edges.Left + 10)
+        if (chaa->x <= _GP(thisroom).Edges.Left + 10)
             _G(new_room_pos) = 2000;
-        else if (chaa->x >= _GP(_GP(thisroom)).Edges.Right - 10)
+        else if (chaa->x >= _GP(thisroom).Edges.Right - 10)
             _G(new_room_pos) = 1000;
-        else if (chaa->y <= _GP(_GP(thisroom)).Edges.Top + 10)
+        else if (chaa->y <= _GP(thisroom).Edges.Top + 10)
             _G(new_room_pos) = 3000;
-        else if (chaa->y >= _GP(_GP(thisroom)).Edges.Bottom - 10)
+        else if (chaa->y >= _GP(thisroom).Edges.Bottom - 10)
             _G(new_room_pos) = 4000;
 
         if (_G(new_room_pos) < 3000)
@@ -1929,16 +1929,16 @@ int find_nearest_walkable_area_within(int *xx, int *yy, int range, int step)
 {
     int ex, ey, nearest = 99999, thisis, nearx = 0, neary = 0;
     int startx = 0, starty = 14;
-    int roomWidthLowRes = room_to_mask_coord(_GP(_GP(thisroom)).Width);
-    int roomHeightLowRes = room_to_mask_coord(_GP(_GP(thisroom)).Height);
+    int roomWidthLowRes = room_to_mask_coord(_GP(thisroom).Width);
+    int roomHeightLowRes = room_to_mask_coord(_GP(thisroom).Height);
     int xwidth = roomWidthLowRes, yheight = roomHeightLowRes;
 
     int xLowRes = room_to_mask_coord(xx[0]);
     int yLowRes = room_to_mask_coord(yy[0]);
-    int rightEdge = room_to_mask_coord(_GP(_GP(thisroom)).Edges.Right);
-    int leftEdge = room_to_mask_coord(_GP(_GP(thisroom)).Edges.Left);
-    int topEdge = room_to_mask_coord(_GP(_GP(thisroom)).Edges.Top);
-    int bottomEdge = room_to_mask_coord(_GP(_GP(thisroom)).Edges.Bottom);
+    int rightEdge = room_to_mask_coord(_GP(thisroom).Edges.Right);
+    int leftEdge = room_to_mask_coord(_GP(thisroom).Edges.Left);
+    int topEdge = room_to_mask_coord(_GP(thisroom).Edges.Top);
+    int bottomEdge = room_to_mask_coord(_GP(thisroom).Edges.Bottom);
 
     // tweak because people forget to move the edges sometimes
     // if the player is already over the edge, ignore it
@@ -1962,7 +1962,7 @@ int find_nearest_walkable_area_within(int *xx, int *yy, int range, int step)
     for (ex = startx; ex < xwidth; ex += step) {
         for (ey = starty; ey < yheight; ey += step) {
             // non-walkalbe, so don't go here
-            if (_GP(_GP(thisroom)).WalkAreaMask->GetPixel(ex,ey) == 0) continue;
+            if (_GP(thisroom).WalkAreaMask->GetPixel(ex,ey) == 0) continue;
             // off a screen edge, don't move them there
             if ((ex <= leftEdge) || (ex >= rightEdge) ||
                 (ey <= topEdge) || (ey >= bottomEdge))
@@ -1984,7 +1984,7 @@ int find_nearest_walkable_area_within(int *xx, int *yy, int range, int step)
 
 void find_nearest_walkable_area (int *xx, int *yy) {
 
-    int pixValue = _GP(_GP(thisroom)).WalkAreaMask->GetPixel(room_to_mask_coord(xx[0]), room_to_mask_coord(yy[0]));
+    int pixValue = _GP(thisroom).WalkAreaMask->GetPixel(room_to_mask_coord(xx[0]), room_to_mask_coord(yy[0]));
     // only fix this code if the game was built with 2.61 or above
     if (pixValue == 0 || (_G(loaded_game_file_version) >= kGameVersion_261 && pixValue < 1))
     {
@@ -2217,7 +2217,7 @@ CharacterInfo *GetCharacterAtRoom(int x, int y)
     return &_GP(game).chars[hsnum];
 }
 
-extern int _G(char_lowest_yp), obj_lowest_yp;
+extern int _G(char_lowest_yp), _G(obj_lowest_yp);
 
 int is_pos_on_character(int xx,int yy) {
     int cc,sppic,lowestyp=0,lowestwas=-1;

@@ -70,7 +70,7 @@ using namespace AGS::Shared;
 extern ccInstance *dialogScriptsInst;
 extern int _G(in_new_room);
 
-extern SpriteCache _GP(spriteset);
+
 extern AGSPlatformDriver *platform;
 extern int cur_mode,cur_cursor;
 extern IGraphicsDriver *_G(gfxDriver);

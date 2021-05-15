@@ -344,8 +344,8 @@ void MoveCharacterToObject(int chaa, int obbj) {
 void MoveCharacterToHotspot(int chaa, int hotsp) {
 	if ((hotsp < 0) || (hotsp >= MAX_ROOM_HOTSPOTS))
 		quit("!MovecharacterToHotspot: invalid hotspot");
-	if (_GP(_GP(thisroom)).Hotspots[hotsp].WalkTo.X < 1) return;
-	walk_character(chaa, _GP(_GP(thisroom)).Hotspots[hotsp].WalkTo.X, _GP(_GP(thisroom)).Hotspots[hotsp].WalkTo.Y, 0, true);
+	if (_GP(thisroom).Hotspots[hotsp].WalkTo.X < 1) return;
+	walk_character(chaa, _GP(thisroom).Hotspots[hotsp].WalkTo.X, _GP(thisroom).Hotspots[hotsp].WalkTo.Y, 0, true);
 
 	GameLoopUntilNotMoving(&_GP(game).chars[chaa].walking);
 }

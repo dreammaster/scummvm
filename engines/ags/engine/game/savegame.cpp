@@ -75,7 +75,7 @@ HSaveError restore_game_data(Stream *in, SavegameVersion svg_version, const Pres
 extern Bitmap **_G(guibg);
 extern AGS::Engine::IDriverDependantBitmap **_G(guibgbmp);
 extern AGS::Engine::IGraphicsDriver *_G(gfxDriver);
-extern Bitmap *_G(dynamicallyCreatedSurfaces)[MAX_DYNAMIC_SURFACES];
+
 extern Bitmap *_G(raw_saved_screen);
 extern RoomStatus _GP(troom);
 extern RoomStatus *_G(croom);
@@ -344,7 +344,7 @@ void DoBeforeRestore(PreservedParams &pp) {
 	// NOTE: sprite 0 is a special constant sprite that cannot be dynamic
 	for (int i = 1; i < _GP(spriteset).GetSpriteSlotCount(); ++i) {
 		if (_GP(game).SpriteInfos[i].Flags & SPF_DYNAMICALLOC) {
-			// do this early, so that it changing guibuts doesn't
+			// do this early, so that it changing _GP(guibuts) doesn't
 			// affect the restored data
 			free_dynamic_sprite(i);
 		}
@@ -505,7 +505,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	_GP(play).gscript_timer = gstimer;
 	// restore the correct room volume (they might have modified
 	// it with SetMusicVolume)
-	_GP(_GP(thisroom)).Options.MusicVolume = r_data.RoomVolume;
+	_GP(thisroom).Options.MusicVolume = r_data.RoomVolume;
 
 	Mouse::SetMoveLimit(Rect(oldx1, oldy1, oldx2, oldy2));
 
@@ -523,21 +523,21 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	if (_G(displayed_room) >= 0) {
 		for (int i = 0; i < MAX_ROOM_BGFRAMES; ++i) {
 			if (r_data.RoomBkgScene[i]) {
-				_GP(_GP(thisroom)).BgFrames[i].Graphic = r_data.RoomBkgScene[i];
+				_GP(thisroom).BgFrames[i].Graphic = r_data.RoomBkgScene[i];
 			}
 		}
 
 		_G(in_new_room) = 3;  // don't run "enters screen" events
 		// now that room has loaded, copy saved light levels in
 		for (size_t i = 0; i < MAX_ROOM_REGIONS; ++i) {
-			_GP(_GP(thisroom)).Regions[i].Light = r_data.RoomLightLevels[i];
-			_GP(_GP(thisroom)).Regions[i].Tint = r_data.RoomTintLevels[i];
+			_GP(thisroom).Regions[i].Light = r_data.RoomLightLevels[i];
+			_GP(thisroom).Regions[i].Tint = r_data.RoomTintLevels[i];
 		}
 		generate_light_table();
 
 		for (size_t i = 0; i < MAX_WALK_AREAS + 1; ++i) {
-			_GP(_GP(thisroom)).WalkAreas[i].ScalingFar = r_data.RoomZoomLevels1[i];
-			_GP(_GP(thisroom)).WalkAreas[i].ScalingNear = r_data.RoomZoomLevels2[i];
+			_GP(thisroom).WalkAreas[i].ScalingFar = r_data.RoomZoomLevels1[i];
+			_GP(thisroom).WalkAreas[i].ScalingNear = r_data.RoomZoomLevels2[i];
 		}
 
 		on_background_frame_change();
@@ -741,8 +741,8 @@ void DoBeforeSave() {
 			save_room_data_segment();
 
 		// Update the saved interaction variable values
-		for (size_t i = 0; i < _GP(_GP(thisroom)).LocalVariables.size() && i < (size_t)MAX_GLOBAL_VARIABLES; ++i)
-			_G(croom)->interactionVariableValues[i] = _GP(_GP(thisroom)).LocalVariables[i].Value;
+		for (size_t i = 0; i < _GP(thisroom).LocalVariables.size() && i < (size_t)MAX_GLOBAL_VARIABLES; ++i)
+			_G(croom)->interactionVariableValues[i] = _GP(thisroom).LocalVariables[i].Value;
 	}
 }
 

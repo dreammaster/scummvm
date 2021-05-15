@@ -91,17 +91,17 @@ extern char _G(check_dynamic_sprites_at_exit);
 extern int _G(our_eip);
 extern volatile char _G(want_exit), abort_engine;
 extern bool justRunSetup;
-extern GameSetup _GP(usetup);
+
 
 extern int _G(proper_exit);
 extern char _G(pexbuf)[STD_BUFFER_SIZE];
-extern SpriteCache _GP(spriteset);
+
 extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
 
 extern ViewStruct*views;
 extern int _G(displayed_room);
-extern int eip_guinum;
-extern int eip_guiobj;
+extern int _G(eip_guinum);
+extern int _G(eip_guiobj);
 extern SpeechLipSyncLine *_G(splipsync);
 extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 

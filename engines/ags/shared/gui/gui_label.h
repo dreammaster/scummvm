@@ -73,8 +73,8 @@ private:
 } // namespace Shared
 } // namespace AGS
 
-extern std::vector<AGS::Shared::GUILabel> guilabels;
-extern int numguilabels;
+extern std::vector<AGS::Shared::GUILabel> _GP(guilabels);
+extern int _G(numguilabels);
 
 } // namespace AGS3
 

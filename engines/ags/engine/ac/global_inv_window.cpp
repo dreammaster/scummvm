@@ -25,7 +25,7 @@
 #include "ags/engine/ac/global_translation.h"
 #include "ags/engine/ac/properties.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/gui/guiinv.h"
+#include "ags/shared/gui/_GP(guiinv).h"
 #include "ags/shared/script/executingscript.h"
 
 namespace AGS3 {
@@ -44,10 +44,10 @@ void SetInvDimensions(int ww, int hh) {
 	_GP(play).inv_item_hit = hh;
 	_GP(play).inv_numdisp = 0;
 	// backwards compatibility
-	for (int i = 0; i < numguiinv; i++) {
-		guiinv[i].ItemWidth = ww;
-		guiinv[i].ItemHeight = hh;
-		guiinv[i].OnResized();
+	for (int i = 0; i < _G(numguiinv); i++) {
+		_GP(guiinv)[i].ItemWidth = ww;
+		_GP(guiinv)[i].ItemHeight = hh;
+		_GP(guiinv)[i].OnResized();
 	}
 }
 

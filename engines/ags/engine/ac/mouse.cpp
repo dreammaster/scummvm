@@ -53,7 +53,7 @@ using namespace AGS::Engine;
 
 
 extern Bitmap *mousecurs[MAXCURSORS];
-extern SpriteCache _GP(spriteset);
+
 
 extern IGraphicsDriver *_G(gfxDriver);
 

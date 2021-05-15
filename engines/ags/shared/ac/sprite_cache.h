@@ -246,8 +246,6 @@ private:
 	void        InitNullSpriteParams(sprkey_t index);
 };
 
-extern SpriteCache _GP(spriteset);
-
 } // namespace AGS3
 
 #endif

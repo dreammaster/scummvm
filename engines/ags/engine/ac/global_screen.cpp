@@ -40,14 +40,14 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern GameSetup _GP(usetup);
+
 
 
 
 extern IGraphicsDriver *_G(gfxDriver);
 extern AGSPlatformDriver *platform;
 extern RGB palette[256];
-extern unsigned int loopcounter;
+
 
 void FlipScreen(int amount) {
 	if ((amount < 0) | (amount > 3)) quit("!FlipScreen: invalid argument (0-3)");
@@ -73,7 +73,7 @@ void ShakeScreen(int severe) {
 
 	if (_G(gfxDriver)->RequiresFullRedrawEachFrame()) {
 		for (int hh = 0; hh < 40; hh++) {
-			loopcounter++;
+			_G(loopcounter)++;
 			_G(platform)->Delay(50);
 
 			render_graphics();

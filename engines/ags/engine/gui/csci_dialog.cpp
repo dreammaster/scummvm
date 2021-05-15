@@ -49,7 +49,7 @@ namespace BitmapHelper = AGS::Shared::BitmapHelper;
 
 extern char ignore_bounds; // from mousew32
 extern IGraphicsDriver *_G(gfxDriver);
-extern GameSetup _GP(usetup);
+
 
 
 //-----------------------------------------------------------------------------

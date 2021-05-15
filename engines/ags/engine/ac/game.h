@@ -204,7 +204,7 @@ void game_sprite_updated(int sprnum);
 // Those which used that sprite will reset to dummy sprite 0, update their render states and caches.
 void game_sprite_deleted(int sprnum);
 
-extern unsigned int loopcounter;
+
 extern void set_loop_counter(unsigned int new_counter);
 
 } // namespace AGS3

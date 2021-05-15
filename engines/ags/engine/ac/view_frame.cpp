@@ -38,7 +38,7 @@ using AGS::Shared::Graphics;
 
 
 
-extern SpriteCache _GP(spriteset);
+
 
 
 

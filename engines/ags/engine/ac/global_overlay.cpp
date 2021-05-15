@@ -41,7 +41,7 @@ namespace AGS3 {
 using namespace Shared;
 using namespace Engine;
 
-extern SpriteCache _GP(spriteset);
+
 
 
 

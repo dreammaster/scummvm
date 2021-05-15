@@ -33,7 +33,7 @@ void InventoryItem_SetGraphic(ScriptInvItem *iitem, int piccy);
 void InventoryItem_SetName(ScriptInvItem *scii, const char *newname);
 int  InventoryItem_GetID(ScriptInvItem *scii);
 ScriptInvItem *GetInvAtLocation(int xx, int yy);
-void InventoryItem_GetName(ScriptInvItem *iitem, char *buff);
+void InventoryItem_GetName(ScriptInvItem *iitem, char *_G(buff));
 const char* InventoryItem_GetName_New(ScriptInvItem *invitem);
 int  InventoryItem_GetGraphic(ScriptInvItem *iitem);
 void InventoryItem_RunInteraction(ScriptInvItem *iitem, int mood);

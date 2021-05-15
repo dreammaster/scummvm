@@ -111,7 +111,7 @@ int ListBox_FillSaveGameList(GUIListBox *listbox) {
 
 	// update the global savegameindex[] array for backward compatibilty
 	for (size_t n = 0; n < saves.size(); ++n) {
-		_GP(play).filenumbers[n] = saves[n].Slot;
+		_GP(play)._G(filenumbers)[n] = saves[n].Slot;
 	}
 
 	listbox->SetSvgIndex(true);

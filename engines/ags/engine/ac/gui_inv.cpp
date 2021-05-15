@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/gui/guiinv.h"
+#include "ags/shared/gui/_GP(guiinv).h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/game_setup_struct.h"
@@ -35,7 +35,7 @@ namespace AGS3 {
 extern int gui_disabled_style;
 
 
-extern SpriteCache _GP(spriteset);
+
 
 
 namespace AGS {

@@ -28,8 +28,8 @@
 
 namespace AGS3 {
 
-std::vector<AGS::Shared::GUIButton> guibuts;
-int numguibuts = 0;
+std::vector<AGS::Shared::GUIButton> _GP(guibuts);
+int _G(numguibuts) = 0;
 
 namespace AGS {
 namespace Shared {

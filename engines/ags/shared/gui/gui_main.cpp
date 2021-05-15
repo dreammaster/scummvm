@@ -340,17 +340,17 @@ HError GUIMain::RebuildArray() {
 			return new Error(String::FromFormat("GUIMain (%d): invalid control ID %d in ref #%d", ID, thisnum, i));
 
 		if (thistype == kGUIButton)
-			_controls[i] = &guibuts[thisnum];
+			_controls[i] = &_GP(guibuts)[thisnum];
 		else if (thistype == kGUILabel)
-			_controls[i] = &guilabels[thisnum];
+			_controls[i] = &_GP(guilabels)[thisnum];
 		else if (thistype == kGUIInvWindow)
-			_controls[i] = &guiinv[thisnum];
+			_controls[i] = &_GP(guiinv)[thisnum];
 		else if (thistype == kGUISlider)
 			_controls[i] = &guislider[thisnum];
 		else if (thistype == kGUITextBox)
 			_controls[i] = &guitext[thisnum];
 		else if (thistype == kGUIListBox)
-			_controls[i] = &guilist[thisnum];
+			_controls[i] = &_GP(guilist)[thisnum];
 		else
 			return new Error(String::FromFormat("GUIMain (%d): unknown control type %d in ref #%d", ID, thistype, i));
 
@@ -661,7 +661,7 @@ void MarkAllGUIForUpdate() {
 }
 
 void MarkSpecialLabelsForUpdate(GUILabelMacro macro) {
-	for (auto &lbl : guilabels) {
+	for (auto &lbl : _GP(guilabels)) {
 		if ((lbl.GetTextMacros() & macro) != 0) {
 			lbl.NotifyParentChanged();
 		}
@@ -669,7 +669,7 @@ void MarkSpecialLabelsForUpdate(GUILabelMacro macro) {
 }
 
 void MarkInventoryForUpdate(int char_id, bool is_player) {
-	for (auto &inv : guiinv) {
+	for (auto &inv : _GP(guiinv)) {
 		if ((char_id < 0) || (inv.CharId == char_id) || (is_player && inv.CharId < 0)) {
 			inv.NotifyParentChanged();
 		}
@@ -789,22 +789,22 @@ HError ReadGUI(std::vector<GUIMain> &guis, Stream *in, bool is_savegame) {
 	}
 
 	// buttons
-	numguibuts = in->ReadInt32();
-	guibuts.resize(numguibuts);
-	for (int i = 0; i < numguibuts; ++i) {
-		guibuts[i].ReadFromFile(in, GameGuiVersion);
+	_G(numguibuts) = in->ReadInt32();
+	_GP(guibuts).resize(_G(numguibuts));
+	for (int i = 0; i < _G(numguibuts); ++i) {
+		_GP(guibuts)[i].ReadFromFile(in, GameGuiVersion);
 	}
 	// labels
-	numguilabels = in->ReadInt32();
-	guilabels.resize(numguilabels);
-	for (int i = 0; i < numguilabels; ++i) {
-		guilabels[i].ReadFromFile(in, GameGuiVersion);
+	_G(numguilabels) = in->ReadInt32();
+	_GP(guilabels).resize(_G(numguilabels));
+	for (int i = 0; i < _G(numguilabels); ++i) {
+		_GP(guilabels)[i].ReadFromFile(in, GameGuiVersion);
 	}
 	// inv controls
-	numguiinv = in->ReadInt32();
-	guiinv.resize(numguiinv);
-	for (int i = 0; i < numguiinv; ++i) {
-		guiinv[i].ReadFromFile(in, GameGuiVersion);
+	_G(numguiinv) = in->ReadInt32();
+	_GP(guiinv).resize(_G(numguiinv));
+	for (int i = 0; i < _G(numguiinv); ++i) {
+		_GP(guiinv)[i].ReadFromFile(in, GameGuiVersion);
 	}
 
 	if (GameGuiVersion >= kGuiVersion_214) {
@@ -825,10 +825,10 @@ HError ReadGUI(std::vector<GUIMain> &guis, Stream *in, bool is_savegame) {
 	}
 	if (GameGuiVersion >= kGuiVersion_230) {
 		// list boxes
-		numguilist = in->ReadInt32();
-		guilist.resize(numguilist);
-		for (int i = 0; i < numguilist; ++i) {
-			guilist[i].ReadFromFile(in, GameGuiVersion);
+		_G(numguilist) = in->ReadInt32();
+		_GP(guilist).resize(_G(numguilist));
+		for (int i = 0; i < _G(numguilist); ++i) {
+			_GP(guilist)[i].ReadFromFile(in, GameGuiVersion);
 		}
 	}
 	return ResortGUI(guis, GameGuiVersion < kGuiVersion_272e);
@@ -842,17 +842,17 @@ void WriteGUI(const std::vector<GUIMain> &guis, Stream *out) {
 	for (size_t i = 0; i < guis.size(); ++i) {
 		_GP(guis)[i].WriteToFile(out);
 	}
-	out->WriteInt32(numguibuts);
-	for (int i = 0; i < numguibuts; ++i) {
-		guibuts[i].WriteToFile(out);
+	out->WriteInt32(_G(numguibuts));
+	for (int i = 0; i < _G(numguibuts); ++i) {
+		_GP(guibuts)[i].WriteToFile(out);
 	}
-	out->WriteInt32(numguilabels);
-	for (int i = 0; i < numguilabels; ++i) {
-		guilabels[i].WriteToFile(out);
+	out->WriteInt32(_G(numguilabels));
+	for (int i = 0; i < _G(numguilabels); ++i) {
+		_GP(guilabels)[i].WriteToFile(out);
 	}
-	out->WriteInt32(numguiinv);
-	for (int i = 0; i < numguiinv; ++i) {
-		guiinv[i].WriteToFile(out);
+	out->WriteInt32(_G(numguiinv));
+	for (int i = 0; i < _G(numguiinv); ++i) {
+		_GP(guiinv)[i].WriteToFile(out);
 	}
 	out->WriteInt32(numguislider);
 	for (int i = 0; i < numguislider; ++i) {
@@ -862,9 +862,9 @@ void WriteGUI(const std::vector<GUIMain> &guis, Stream *out) {
 	for (int i = 0; i < numguitext; ++i) {
 		guitext[i].WriteToFile(out);
 	}
-	out->WriteInt32(numguilist);
-	for (int i = 0; i < numguilist; ++i) {
-		guilist[i].WriteToFile(out);
+	out->WriteInt32(_G(numguilist));
+	for (int i = 0; i < _G(numguilist); ++i) {
+		_GP(guilist)[i].WriteToFile(out);
 	}
 }
 

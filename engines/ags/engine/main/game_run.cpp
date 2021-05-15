@@ -52,7 +52,7 @@
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/debugging/debugger.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/gui/guiinv.h"
+#include "ags/shared/gui/_GP(guiinv).h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/guitextbox.h"
 #include "ags/shared/main/mainheader.h"
@@ -74,8 +74,8 @@ using namespace AGS::Shared;
 
 
 
-extern int mouse_on_iface;   // mouse cursor is over this interface
-extern int ifacepopped;
+   // mouse cursor is over this interface
+
 extern int is_text_overlay;
 extern volatile char _G(want_exit), abort_engine;
 extern int _G(proper_exit), _G(our_eip);
@@ -89,24 +89,24 @@ extern int _G(in_leaves_screen);
 extern int inside_script, in_graph_script;
 extern int no_blocking_functions;
 
-extern int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
+extern int _G(mouse_ifacebut_xoffs), mouse_ifacebut_yoffs;
 extern int cur_mode;
 extern RoomObject *_GP(objs);
 extern char noWalkBehindsAtAll;
 extern RoomStatus *_G(croom);
 
-extern SpriteCache _GP(spriteset);
+
 extern int cur_mode, cur_cursor;
 extern char _G(check_dynamic_sprites_at_exit);
 
 // Checks if user interface should remain disabled for now
 static int ShouldStayInWaitMode();
 
-static int numEventsAtStartOfFunction;
-static auto t1 = AGS_Clock::now();  // timer for FPS // ... 't1'... how very appropriate.. :)
+static int _G(numEventsAtStartOfFunction);
+static auto _G(t1) = AGS_Clock::now();  // timer for FPS // ... '_G(t1)'... how very appropriate.. :)
 
-static int user_disabled_for = 0;
-static const void *user_disabled_data = nullptr;
+static int _G(user_disabled_for) = 0;
+static const void *_G(user_disabled_data) = nullptr;
 
 #define UNTIL_ANIMEND   1
 #define UNTIL_MOVEEND   2
@@ -117,10 +117,10 @@ static const void *user_disabled_data = nullptr;
 #define UNTIL_SHORTIS0  7
 #define UNTIL_INTISNEG  8
 
-static int restrict_until = 0;
+static int _G(restrict_until) = 0;
 
-unsigned int loopcounter = 0;
-static unsigned int lastcounter = 0;
+unsigned int _G(loopcounter) = 0;
+static unsigned int _G(lastcounter) = 0;
 
 static void ProperExit() {
 	_G(want_exit) = 0;
@@ -194,10 +194,10 @@ static int game_loop_check_ground_level_interactions() {
 		// if in a Wait loop which is no longer valid (probably
 		// because the Region interaction did a NewRoom), abort
 		// the rest of the loop
-		if ((restrict_until) && (!ShouldStayInWaitMode())) {
+		if ((_G(restrict_until)) && (!ShouldStayInWaitMode())) {
 			// cancel the Rep Exec and Stands on Hotspot events that
 			// we just added -- otherwise the event queue gets huge
-			_G(numevents) = numEventsAtStartOfFunction;
+			_G(numevents) = _G(numEventsAtStartOfFunction);
 			return 0;
 		}
 	} // end if checking ground level interactions
@@ -225,9 +225,9 @@ static void check_mouse_controls() {
 
 	mongu = gui_on_mouse_move();
 
-	mouse_on_iface = mongu;
-	if ((ifacepopped >= 0) && (mousey >= _GP(guis)[ifacepopped].Y + _GP(guis)[ifacepopped].Height))
-		remove_popup_interface(ifacepopped);
+	_G(mouse_on_iface) = mongu;
+	if ((_G(ifacepopped) >= 0) && (mousey >= _GP(guis)[_G(ifacepopped)].Y + _GP(guis)[_G(ifacepopped)].Height))
+		remove_popup_interface(_G(ifacepopped));
 
 	// check mouse clicks on GUIs
 	static int wasbutdown = 0, wasongui = 0;
@@ -416,7 +416,7 @@ bool run_service_key_controls(int &out_key) {
 	}
 
 	if (((agskey == eAGSKeyCodeCtrlV) && (cur_key_mods & KMOD_ALT) != 0)
-		&& (_GP(play).wait_counter < 1) && (is_text_overlay == 0) && (restrict_until == 0)) {
+		&& (_GP(play).wait_counter < 1) && (is_text_overlay == 0) && (_G(restrict_until) == 0)) {
 		// make sure we can't interrupt a Wait()
 		// and desync the music to cutscene
 		_GP(play).debug_mode++;
@@ -562,13 +562,13 @@ static void check_room_edges(int numevents_was) {
 		if ((_G(numevents) == numevents_was) &&
 			((_GP(play).ground_level_areas_disabled & GLED_INTERACTION) == 0)) {
 
-			if (_G(_G(playerchar))->x <= _GP(_GP(thisroom)).Edges.Left)
+			if (_G(_G(playerchar))->x <= _GP(thisroom).Edges.Left)
 				edgesActivated[0] = 1;
-			else if (_G(_G(playerchar))->x >= _GP(_GP(thisroom)).Edges.Right)
+			else if (_G(_G(playerchar))->x >= _GP(thisroom).Edges.Right)
 				edgesActivated[1] = 1;
-			if (_G(_G(playerchar))->y >= _GP(_GP(thisroom)).Edges.Bottom)
+			if (_G(_G(playerchar))->y >= _GP(thisroom).Edges.Bottom)
 				edgesActivated[2] = 1;
-			else if (_G(_G(playerchar))->y <= _GP(_GP(thisroom)).Edges.Top)
+			else if (_G(_G(playerchar))->y <= _GP(thisroom).Edges.Top)
 				edgesActivated[3] = 1;
 
 			if ((_GP(play).entered_edge >= 0) && (_GP(play).entered_edge <= 3)) {
@@ -681,9 +681,9 @@ static void game_loop_update_background_animation() {
 	else {
 		_GP(play).bg_anim_delay = _GP(play).anim_background_speed;
 		_GP(play).bg_frame++;
-		if ((size_t)_GP(play).bg_frame >= _GP(_GP(thisroom)).BgFrameCount)
+		if ((size_t)_GP(play).bg_frame >= _GP(thisroom).BgFrameCount)
 			_GP(play).bg_frame = 0;
-		if (_GP(_GP(thisroom)).BgFrameCount >= 2) {
+		if (_GP(thisroom).BgFrameCount >= 2) {
 			// get the new frame's palette
 			on_background_frame_change();
 		}
@@ -691,12 +691,12 @@ static void game_loop_update_background_animation() {
 }
 
 static void game_loop_update_loop_counter() {
-	loopcounter++;
+	_G(loopcounter)++;
 
 	if (_GP(play).wait_counter > 0) _GP(play).wait_counter--;
 	if (_GP(play).shakesc_length > 0) _GP(play).shakesc_length--;
 
-	if (loopcounter % 5 == 0) {
+	if (_G(loopcounter) % 5 == 0) {
 		update_ambient_sound_vol();
 		update_directional_sound_vol();
 	}
@@ -704,13 +704,13 @@ static void game_loop_update_loop_counter() {
 
 static void game_loop_update_fps() {
 	auto t2 = AGS_Clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-	auto frames = loopcounter - lastcounter;
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - _G(t1));
+	auto frames = _G(loopcounter) - _G(lastcounter);
 
 	if (duration >= std::chrono::milliseconds(1000) && frames > 0) {
 		fps = 1000.0f * frames / duration.count();
-		t1 = t2;
-		lastcounter = loopcounter;
+		_G(t1) = t2;
+		_G(lastcounter) = _G(loopcounter);
 	}
 }
 
@@ -724,9 +724,9 @@ float get_current_fps() {
 }
 
 void set_loop_counter(unsigned int new_counter) {
-	loopcounter = new_counter;
-	t1 = AGS_Clock::now();
-	lastcounter = loopcounter;
+	_G(loopcounter) = new_counter;
+	_G(t1) = AGS_Clock::now();
+	_G(lastcounter) = _G(loopcounter);
 	fps = std::numeric_limits<float>::quiet_NaN();
 }
 
@@ -736,7 +736,7 @@ void UpdateGameOnce(bool checkControls, IDriverDependantBitmap *extraBitmap, int
 
 	sys_evt_process_pending();
 
-	numEventsAtStartOfFunction = _G(numevents);
+	_G(numEventsAtStartOfFunction) = _G(numevents);
 
 	if (_G(want_exit)) {
 		ProperExit();
@@ -766,7 +766,7 @@ void UpdateGameOnce(bool checkControls, IDriverDependantBitmap *extraBitmap, int
 		return;
 	}
 
-	mouse_on_iface = -1;
+	_G(mouse_on_iface) = -1;
 
 	check_debug_keys();
 
@@ -817,7 +817,7 @@ static void UpdateMouseOverLocation() {
 
 	if ((_GP(play).get_loc_name_save_cursor >= 0) &&
 		(_GP(play).get_loc_name_save_cursor != _GP(play).get_loc_name_last_time) &&
-		(mouse_on_iface < 0) && (ifacepopped < 0)) {
+		(_G(mouse_on_iface) < 0) && (_G(ifacepopped) < 0)) {
 		// we have saved the cursor, but the mouse location has changed
 		// and it's time to restore it
 		_GP(play).get_loc_name_save_cursor = -1;
@@ -834,29 +834,29 @@ static void UpdateMouseOverLocation() {
 
 // Checks if user interface should remain disabled for now
 static int ShouldStayInWaitMode() {
-	if (restrict_until == 0)
+	if (_G(restrict_until) == 0)
 		quit("end_wait_loop called but game not in loop_until state");
-	int retval = restrict_until;
+	int retval = _G(restrict_until);
 
-	if (restrict_until == UNTIL_MOVEEND) {
-		short *wkptr = (short *)user_disabled_data;
+	if (_G(restrict_until) == UNTIL_MOVEEND) {
+		short *wkptr = (short *)_G(user_disabled_data);
 		if (wkptr[0] < 1) retval = 0;
-	} else if (restrict_until == UNTIL_CHARIS0) {
-		char *chptr = (char *)user_disabled_data;
+	} else if (_G(restrict_until) == UNTIL_CHARIS0) {
+		char *chptr = (char *)_G(user_disabled_data);
 		if (chptr[0] == 0) retval = 0;
-	} else if (restrict_until == UNTIL_NEGATIVE) {
-		short *wkptr = (short *)user_disabled_data;
+	} else if (_G(restrict_until) == UNTIL_NEGATIVE) {
+		short *wkptr = (short *)_G(user_disabled_data);
 		if (wkptr[0] < 0) retval = 0;
-	} else if (restrict_until == UNTIL_INTISNEG) {
-		int *wkptr = (int *)user_disabled_data;
+	} else if (_G(restrict_until) == UNTIL_INTISNEG) {
+		int *wkptr = (int *)_G(user_disabled_data);
 		if (wkptr[0] < 0) retval = 0;
-	} else if (restrict_until == UNTIL_NOOVERLAY) {
+	} else if (_G(restrict_until) == UNTIL_NOOVERLAY) {
 		if (is_text_overlay < 1) retval = 0;
-	} else if (restrict_until == UNTIL_INTIS0) {
-		int *wkptr = (int *)user_disabled_data;
+	} else if (_G(restrict_until) == UNTIL_INTIS0) {
+		int *wkptr = (int *)_G(user_disabled_data);
 		if (wkptr[0] == 0) retval = 0;
-	} else if (restrict_until == UNTIL_SHORTIS0) {
-		short *wkptr = (short *)user_disabled_data;
+	} else if (_G(restrict_until) == UNTIL_SHORTIS0) {
+		short *wkptr = (short *)_G(user_disabled_data);
 		if (wkptr[0] == 0) retval = 0;
 	} else quit("loop_until: unknown until event");
 
@@ -864,25 +864,25 @@ static int ShouldStayInWaitMode() {
 }
 
 static int UpdateWaitMode() {
-	if (restrict_until == 0) {
+	if (_G(restrict_until) == 0) {
 		return RETURN_CONTINUE;
 	}
 
-	restrict_until = ShouldStayInWaitMode();
+	_G(restrict_until) = ShouldStayInWaitMode();
 	_G(our_eip) = 77;
 
-	if (restrict_until != 0) {
+	if (_G(restrict_until) != 0) {
 		return RETURN_CONTINUE;
 	}
 
-	auto was_disabled_for = user_disabled_for;
+	auto was_disabled_for = _G(user_disabled_for);
 
 	set_default_cursor();
 	if (gui_disabled_style != GUIDIS_UNCHANGED) { // If GUI looks change when disabled, then update them all
 		GUI::MarkAllGUIForUpdate();
 	}
 	_GP(play).disabled_user_interface--;
-	user_disabled_for = 0;
+	_G(user_disabled_for) = 0;
 
 	switch (was_disabled_for) {
 		// case FOR_ANIMATION:
@@ -894,7 +894,7 @@ static int UpdateWaitMode() {
 		quit("err: for_script obsolete (v2.1 and earlier only)");
 		break;
 	default:
-		quit("Unknown user_disabled_for in end restrict_until");
+		quit("Unknown _G(user_disabled_for) in end _G(restrict_until)");
 	}
 
 	// we shouldn't get here.
@@ -929,9 +929,9 @@ static void SetupLoopParameters(int untilwhat, const void *udata) {
 		(cur_mode != CURS_WAIT))
 		set_mouse_cursor(CURS_WAIT);
 
-	restrict_until = untilwhat;
-	user_disabled_data = udata;
-	user_disabled_for = FOR_EXITLOOP;
+	_G(restrict_until) = untilwhat;
+	_G(user_disabled_data) = udata;
+	_G(user_disabled_for) = FOR_EXITLOOP;
 }
 
 // This function is called from lot of various functions
@@ -943,18 +943,18 @@ static void GameLoopUntilEvent(int untilwhat, const void *daaa) {
 	// this function can get called in a nested context, so
 	// remember the state of these vars in case a higher level
 	// call needs them
-	auto cached_restrict_until = restrict_until;
-	auto cached_user_disabled_data = user_disabled_data;
-	auto cached_user_disabled_for = user_disabled_for;
+	auto cached_restrict_until = _G(restrict_until);
+	auto cached_user_disabled_data = _G(user_disabled_data);
+	auto cached_user_disabled_for = _G(user_disabled_for);
 
 	SetupLoopParameters(untilwhat, daaa);
 	while (GameTick() == 0);
 
 	_G(our_eip) = 78;
 
-	restrict_until = cached_restrict_until;
-	user_disabled_data = cached_user_disabled_data;
-	user_disabled_for = cached_user_disabled_for;
+	_G(restrict_until) = cached_restrict_until;
+	_G(user_disabled_data) = cached_user_disabled_data;
+	_G(user_disabled_for) = cached_user_disabled_for;
 }
 
 void GameLoopUntilValueIsZero(const char *value) {

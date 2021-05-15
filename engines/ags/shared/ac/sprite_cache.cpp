@@ -684,7 +684,7 @@ int SpriteCache::SaveSpriteIndex(const char *filename, const SpriteFileIndex &in
 
 HError SpriteCache::InitFile(const char *filename, const char *sprindex_filename) {
 	SpriteFileVersion vers;
-	char buff[20];
+	char _G(buff)[20];
 	soff_t spr_initial_offs = 0;
 	int spriteFileID = 0;
 
@@ -696,7 +696,7 @@ HError SpriteCache::InitFile(const char *filename, const char *sprindex_filename
 
 	vers = (SpriteFileVersion)_stream->ReadInt16();
 	// read the "Sprite File" signature
-	_stream->ReadArray(&buff[0], 13, 1);
+	_stream->ReadArray(&_G(buff)[0], 13, 1);
 
 	if (vers < kSprfVersion_Uncompressed || vers > kSprfVersion_Current) {
 		_stream.reset();
@@ -704,8 +704,8 @@ HError SpriteCache::InitFile(const char *filename, const char *sprindex_filename
 	}
 
 	// unknown version
-	buff[13] = 0;
-	if (strcmp(buff, spriteFileSig)) {
+	_G(buff)[13] = 0;
+	if (strcmp(_G(buff), spriteFileSig)) {
 		_stream.reset();
 		return new Error("Uknown _GP(spriteset) format.");
 	}

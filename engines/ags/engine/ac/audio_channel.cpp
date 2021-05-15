@@ -181,7 +181,7 @@ void AudioChannel_SetRoomLocation(ScriptAudioChannel *channel, int xPos, int yPo
 	auto *ch = lock.GetChannelIfPlaying(channel->id);
 
 	if (ch) {
-		int maxDist = ((xPos > _GP(_GP(thisroom)).Width / 2) ? xPos : (_GP(_GP(thisroom)).Width - xPos)) - AMBIENCE_FULL_DIST;
+		int maxDist = ((xPos > _GP(thisroom).Width / 2) ? xPos : (_GP(thisroom).Width - xPos)) - AMBIENCE_FULL_DIST;
 		ch->xSource = (xPos > 0) ? xPos : -1;
 		ch->ySource = yPos;
 		ch->maximumPossibleDistanceAway = maxDist;

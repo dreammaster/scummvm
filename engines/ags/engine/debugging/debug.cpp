@@ -290,7 +290,7 @@ void debug_script_print(const String &msg, MessageType mt) {
 		String scriptname;
 		if (curinst->instanceof == gamescript)
 			scriptname = "G ";
-		else if (curinst->instanceof == _GP(_GP(thisroom)).CompiledScript)
+		else if (curinst->instanceof == _GP(thisroom).CompiledScript)
 			scriptname = "R ";
 		else if (curinst->instanceof == dialogScriptsScript)
 			scriptname = "D ";

@@ -60,14 +60,14 @@ extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
 
 
 extern int _G(displayed_room);
-extern SpriteCache _GP(spriteset);
+
 extern int _G(actSpsCount);
 extern Bitmap **_G(actsps);
 extern IDriverDependantBitmap **_G(actspsbmp);
 extern IGraphicsDriver *_G(gfxDriver);
 
 // Used for deciding whether a char or obj was closer
-int obj_lowest_yp;
+int _G(obj_lowest_yp);
 
 int GetObjectIDAtScreen(int scrx, int scry) {
 	// translate screen co-ordinates to room co-ordinates
@@ -103,7 +103,7 @@ int GetObjectIDAtRoom(int roomx, int roomy) {
 		bestshotwas = aa;
 		bestshotyp = usebasel;
 	}
-	obj_lowest_yp = bestshotyp;
+	_G(obj_lowest_yp) = bestshotyp;
 	return bestshotwas;
 }
 
@@ -298,8 +298,8 @@ void MergeObject(int obn) {
 	construct_object_gfx(obn, nullptr, &theHeight, true);
 
 	//Bitmap *oldabuf = graphics->bmp;
-	//abuf = _GP(_GP(thisroom)).BgFrames.Graphic[_GP(play).bg_frame];
-	PBitmap bg_frame = _GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic;
+	//abuf = _GP(thisroom).BgFrames.Graphic[_GP(play).bg_frame];
+	PBitmap bg_frame = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic;
 	if (bg_frame->GetColorDepth() != _G(actsps)[obn]->GetColorDepth())
 		quit("!MergeObject: unable to merge object due to color depth differences");
 
@@ -405,7 +405,7 @@ void GetObjectName(int obj, char *buffer) {
 	if (!is_valid_object(obj))
 		quit("!GetObjectName: invalid object number");
 
-	strcpy(buffer, get_translation(_GP(_GP(thisroom)).Objects[obj].Name));
+	strcpy(buffer, get_translation(_GP(thisroom).Objects[obj].Name));
 }
 
 void MoveObject(int objj, int xx, int yy, int spp) {
@@ -452,12 +452,12 @@ void RunObjectInteraction(int aa, int mood) {
 	}
 	_G(evblockbasename) = "object%d"; _G(evblocknum) = aa;
 
-	if (_GP(_GP(thisroom)).Objects[aa].EventHandlers != nullptr) {
+	if (_GP(thisroom).Objects[aa].EventHandlers != nullptr) {
 		if (passon >= 0) {
-			if (run_interaction_script(_GP(_GP(thisroom)).Objects[aa].EventHandlers.get(), passon, 4, (passon == 3)))
+			if (run_interaction_script(_GP(thisroom).Objects[aa].EventHandlers.get(), passon, 4, (passon == 3)))
 				return;
 		}
-		run_interaction_script(_GP(_GP(thisroom)).Objects[aa].EventHandlers.get(), 4);  // any click on obj
+		run_interaction_script(_GP(thisroom).Objects[aa].EventHandlers.get(), 4);  // any click on obj
 	} else {
 		if (passon >= 0) {
 			if (run_interaction_event(&_G(croom)->intrObject[aa], passon, 4, (passon == 3)))
@@ -531,11 +531,11 @@ int AreThingsOverlapping(int thing1, int thing2) {
 int GetObjectProperty(int hss, const char *property) {
 	if (!is_valid_object(hss))
 		quit("!GetObjectProperty: invalid object");
-	return get_int_property(_GP(_GP(thisroom)).Objects[hss].Properties, _G(croom)->objProps[hss], property);
+	return get_int_property(_GP(thisroom).Objects[hss].Properties, _G(croom)->objProps[hss], property);
 }
 
 void GetObjectPropertyText(int item, const char *property, char *bufer) {
-	get_text_property(_GP(_GP(thisroom)).Objects[item].Properties, _G(croom)->objProps[item], property, bufer);
+	get_text_property(_GP(thisroom).Objects[item].Properties, _G(croom)->objProps[item], property, bufer);
 }
 
 Bitmap *GetObjectImage(int obj, int *isFlipped) {

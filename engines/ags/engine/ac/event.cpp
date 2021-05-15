@@ -115,8 +115,8 @@ void run_on_event(int evtype, RuntimeScriptValue &wparam) {
 void run_room_event(int id) {
 	_G(evblockbasename) = "room";
 
-	if (_GP(_GP(thisroom)).EventHandlers != nullptr) {
-		run_interaction_script(_GP(_GP(thisroom)).EventHandlers.get(), id);
+	if (_GP(thisroom).EventHandlers != nullptr) {
+		run_interaction_script(_GP(thisroom).EventHandlers.get(), id);
 	} else {
 		run_interaction_event(&_G(croom)->intrRoom, id);
 	}
@@ -172,8 +172,8 @@ void process_event(EventHappened *evp) {
 
 		if (evp->data1 == EVB_HOTSPOT) {
 
-			if (_GP(_GP(thisroom)).Hotspots[evp->data2].EventHandlers != nullptr)
-				scriptPtr = _GP(_GP(thisroom)).Hotspots[evp->data2].EventHandlers;
+			if (_GP(thisroom).Hotspots[evp->data2].EventHandlers != nullptr)
+				scriptPtr = _GP(thisroom).Hotspots[evp->data2].EventHandlers;
 			else
 				evpt = &_G(croom)->intrHotspot[evp->data2];
 
@@ -182,8 +182,8 @@ void process_event(EventHappened *evp) {
 			//Debug::Printf("Running hotspot interaction for hotspot %d, event %d", evp->data2, evp->data3);
 		} else if (evp->data1 == EVB_ROOM) {
 
-			if (_GP(_GP(thisroom)).EventHandlers != nullptr)
-				scriptPtr = _GP(_GP(thisroom)).EventHandlers;
+			if (_GP(thisroom).EventHandlers != nullptr)
+				scriptPtr = _GP(thisroom).EventHandlers;
 			else
 				evpt = &_G(croom)->intrRoom;
 

@@ -50,8 +50,8 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 
-extern GameSetup _GP(usetup);
-extern SpriteCache _GP(spriteset);
+
+
 extern int force_window;
 
 

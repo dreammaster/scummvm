@@ -49,7 +49,7 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameSetup _GP(usetup);
+
 
 extern AGSPlatformDriver *platform;
 

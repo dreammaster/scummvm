@@ -30,12 +30,6 @@ namespace AGS3 {
 struct IAGSEditorDebugger;
 struct ScriptPosition;
 
-extern int _G(editor_debugging_enabled);
-extern int _G(editor_debugging_initialized);
-extern char _G(editor_debugger_instance_token)[100];
-extern IAGSEditorDebugger *_G(editor_debugger);
-extern int _G(break_on_next_script_step);
-
 int check_for_messages_from_editor();
 bool send_message_to_editor(const char *msg);
 bool send_exception_to_editor(const char *qmsg);

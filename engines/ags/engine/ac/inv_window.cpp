@@ -55,8 +55,8 @@ using namespace AGS::Shared;
 
 
 
-extern int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
-extern SpriteCache _GP(spriteset);
+extern int _G(mouse_ifacebut_xoffs), mouse_ifacebut_yoffs;
+
 extern int mousex, mousey;
 extern int _G(evblocknum);
 
@@ -156,7 +156,7 @@ ScriptInvItem *InvWindow_GetItemAtIndex(GUIInvWindow *guii, int index) {
 int offset_over_inv(GUIInvWindow *inv) {
 	if (inv->ItemWidth <= 0 || inv->ItemHeight <= 0)
 		return -1;
-	int mover = mouse_ifacebut_xoffs / data_to_game_coord(inv->ItemWidth);
+	int mover = _G(mouse_ifacebut_xoffs) / data_to_game_coord(inv->ItemWidth);
 	// if it's off the edge of the visible items, ignore
 	if (mover >= inv->ColCount)
 		return -1;

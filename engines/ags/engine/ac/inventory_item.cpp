@@ -69,8 +69,8 @@ ScriptInvItem *GetInvAtLocation(int xx, int yy) {
 	return &_G(scrInv)[hsnum];
 }
 
-void InventoryItem_GetName(ScriptInvItem *iitem, char *buff) {
-	GetInvName(iitem->id, buff);
+void InventoryItem_GetName(ScriptInvItem *iitem, char *_G(buff)) {
+	GetInvName(iitem->id, _G(buff));
 }
 
 const char *InventoryItem_GetName_New(ScriptInvItem *invitem) {
@@ -143,7 +143,7 @@ RuntimeScriptValue Sc_InventoryItem_CheckInteractionAvailable(void *self, const 
 	API_OBJCALL_INT_PINT(ScriptInvItem, InventoryItem_CheckInteractionAvailable);
 }
 
-// void (ScriptInvItem *iitem, char *buff)
+// void (ScriptInvItem *iitem, char *_G(buff))
 RuntimeScriptValue Sc_InventoryItem_GetName(void *self, const RuntimeScriptValue *params, int32_t param_count) {
 	API_OBJCALL_VOID_POBJ(ScriptInvItem, InventoryItem_GetName, char);
 }

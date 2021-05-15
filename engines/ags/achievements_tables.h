@@ -951,7 +951,7 @@ static const AchievementDescriptionList achievementDescriptionList[] = {
 			ACHIEVEMENT_HIDDEN_ENTRY("RestingScowlyFace", "Resting scowly face"),
 			ACHIEVEMENT_HIDDEN_ENTRY("Pyromaniac", "Pyromaniac"),
 			ACHIEVEMENT_HIDDEN_ENTRY("PassiveSmoking", "Passive smoking"),
-			ACHIEVEMENT_HIDDEN_ENTRY("FilmBuff", "Film buff"),
+			ACHIEVEMENT_HIDDEN_ENTRY("FilmBuff", "Film _G(buff)"),
 			ACHIEVEMENT_HIDDEN_ENTRY("Heretic", "Heretic"),
 			ACHIEVEMENT_HIDDEN_ENTRY("TriggerHappy", "Trigger happy"),
 			ACHIEVEMENT_HIDDEN_ENTRY("HookedOnCorleys", "Hooked on Corleys"),

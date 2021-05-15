@@ -54,14 +54,14 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 
-extern GameSetup _GP(usetup);
+
 
 
 
 
 extern int _G(convert_16bit_bgr);
 extern IGraphicsDriver *_G(gfxDriver);
-extern SpriteCache _GP(spriteset);
+
 extern int _G(displayed_room), _G(starting_room);
 
 
@@ -110,12 +110,12 @@ void script_debug(int cmdd, int dataa) {
 		// TODO: support multiple viewports?!
 		const int viewport_index = 0;
 		const int camera_index = 0;
-		Bitmap *tempw = BitmapHelper::CreateBitmap(_GP(_GP(thisroom)).WalkAreaMask->GetWidth(), _GP(_GP(thisroom)).WalkAreaMask->GetHeight());
+		Bitmap *tempw = BitmapHelper::CreateBitmap(_GP(thisroom).WalkAreaMask->GetWidth(), _GP(thisroom).WalkAreaMask->GetHeight());
 		tempw->Blit(prepare_walkable_areas(-1), 0, 0, 0, 0, tempw->GetWidth(), tempw->GetHeight());
 		const Rect &viewport = _GP(play).GetRoomViewport(viewport_index)->GetRect();
 		const Rect &camera = _GP(play).GetRoomCamera(camera_index)->GetRect();
 		Bitmap *view_bmp = BitmapHelper::CreateBitmap(viewport.GetWidth(), viewport.GetHeight());
-		Rect mask_src = Rect(camera.Left / _GP(_GP(thisroom)).MaskResolution, camera.Top / _GP(_GP(thisroom)).MaskResolution, camera.Right / _GP(_GP(thisroom)).MaskResolution, camera.Bottom / _GP(_GP(thisroom)).MaskResolution);
+		Rect mask_src = Rect(camera.Left / _GP(thisroom).MaskResolution, camera.Top / _GP(thisroom).MaskResolution, camera.Right / _GP(thisroom).MaskResolution, camera.Bottom / _GP(thisroom).MaskResolution);
 		view_bmp->StretchBlt(tempw, mask_src, RectWH(0, 0, viewport.GetWidth(), viewport.GetHeight()), Shared::kBitmap_Transparency);
 
 		IDriverDependantBitmap *ddb = _G(gfxDriver)->CreateDDBFromBitmap(view_bmp, false, true);
@@ -150,7 +150,7 @@ void script_debug(int cmdd, int dataa) {
 			Display("Not currently moving.");
 			return;
 		}
-		Bitmap *tempw = BitmapHelper::CreateTransparentBitmap(_GP(_GP(thisroom)).WalkAreaMask->GetWidth(), _GP(_GP(thisroom)).WalkAreaMask->GetHeight());
+		Bitmap *tempw = BitmapHelper::CreateTransparentBitmap(_GP(thisroom).WalkAreaMask->GetWidth(), _GP(thisroom).WalkAreaMask->GetHeight());
 		int mlsnum = _GP(game).chars[dataa].walking;
 		if (_GP(game).chars[dataa].walking >= TURNING_AROUND)
 			mlsnum %= TURNING_AROUND;
@@ -169,7 +169,7 @@ void script_debug(int cmdd, int dataa) {
 		const Rect &viewport = _GP(play).GetRoomViewport(viewport_index)->GetRect();
 		const Rect &camera = _GP(play).GetRoomCamera(camera_index)->GetRect();
 		Bitmap *view_bmp = BitmapHelper::CreateBitmap(viewport.GetWidth(), viewport.GetHeight());
-		Rect mask_src = Rect(camera.Left / _GP(_GP(thisroom)).MaskResolution, camera.Top / _GP(_GP(thisroom)).MaskResolution, camera.Right / _GP(_GP(thisroom)).MaskResolution, camera.Bottom / _GP(_GP(thisroom)).MaskResolution);
+		Rect mask_src = Rect(camera.Left / _GP(thisroom).MaskResolution, camera.Top / _GP(thisroom).MaskResolution, camera.Right / _GP(thisroom).MaskResolution, camera.Bottom / _GP(thisroom).MaskResolution);
 		view_bmp->StretchBlt(tempw, mask_src, RectWH(0, 0, viewport.GetWidth(), viewport.GetHeight()), Shared::kBitmap_Transparency);
 
 		IDriverDependantBitmap *ddb = _G(gfxDriver)->CreateDDBFromBitmap(view_bmp, false, true);

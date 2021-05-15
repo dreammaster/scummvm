@@ -52,8 +52,8 @@ extern RoomStatus *_G(croom);
 extern RoomObject *_GP(objs);
 extern CharacterCache *charcache;
 extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
-extern SpriteCache _GP(spriteset);
-extern Bitmap *_G(dynamicallyCreatedSurfaces)[MAX_DYNAMIC_SURFACES];
+
+
 
 // ** SCRIPT DRAWINGSURFACE OBJECT
 

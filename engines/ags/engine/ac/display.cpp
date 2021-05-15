@@ -64,7 +64,7 @@ using namespace AGS::Shared;
 extern int _G(longestline);
 extern AGSPlatformDriver *platform;
 extern int _G(loops_per_character);
-extern SpriteCache _GP(spriteset);
+
 
 int _G(display_message_aschar) = 0;
 
@@ -538,7 +538,7 @@ void do_corner(Bitmap *ds, int sprn, int x, int y, int offx, int offy) {
 
 int get_but_pic(GUIMain *guo, int indx) {
 	int butid = guo->GetControlID(indx);
-	return butid >= 0 ? guibuts[butid].Image : 0;
+	return butid >= 0 ? _GP(guibuts)[butid].Image : 0;
 }
 
 void draw_button_background(Bitmap *ds, int xx1, int yy1, int xx2, int yy2, GUIMain *iep) {
