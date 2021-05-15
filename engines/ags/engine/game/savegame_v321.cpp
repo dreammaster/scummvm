@@ -65,7 +65,7 @@ using namespace AGS::Engine;
 
 
 
-extern MoveList *mls;
+
 extern RGB palette[256];
 extern DialogTopic *dialog;
 
@@ -136,7 +136,7 @@ static void ReadRoomStatus_Aligned(RoomStatus *roomstat, Stream *in) {
 static void restore_game_room_state(Stream *in) {
 	int vv;
 
-	displayed_room = in->ReadInt32();
+	_G(displayed_room) = in->ReadInt32();
 
 	// read the room state for all the rooms the player has been in
 	RoomStatus *roomstat;
@@ -192,7 +192,7 @@ static void restore_game_play(Stream *in, RestoredData &r_data) {
 static void ReadMoveList_Aligned(Stream *in) {
 	AlignedStream align_s(in, Shared::kAligned_Read);
 	for (int i = 0; i < _GP(game).numcharacters + MAX_ROOM_OBJECTS + 1; ++i) {
-		mls[i].ReadFromFile_Legacy(&align_s);
+		_G(mls)[i].ReadFromFile_Legacy(&align_s);
 
 		align_s.Reset();
 	}
@@ -225,7 +225,7 @@ static void restore_game_more_dynamic_values(Stream *in) {
 	in->ReadInt32(); // mouse_on_iface_button
 	in->ReadInt32(); // mouse_pushed_iface
 	ifacepopped = in->ReadInt32();
-	game_paused = in->ReadInt32();
+	_G(game_paused) = in->ReadInt32();
 }
 
 static void ReadAnimatedButtons_Aligned(Stream *in) {
@@ -319,7 +319,7 @@ static void restore_game_displayed_room_status(Stream *in, RestoredData &r_data)
 	for (bb = 0; bb < MAX_ROOM_BGFRAMES; bb++)
 		r_data.RoomBkgScene[bb].reset();
 
-	if (displayed_room >= 0) {
+	if (_G(displayed_room) >= 0) {
 
 		for (bb = 0; bb < MAX_ROOM_BGFRAMES; bb++) {
 			r_data.RoomBkgScene[bb] = nullptr;
@@ -394,7 +394,7 @@ static HSaveError restore_game_audioclips_and_crossfade(Stream *in, RestoredData
 			chan_info.VolAsPercent = in->ReadInt32();
 			chan_info.PanAsPercent = in->ReadInt32();
 			chan_info.Speed = 1000;
-			if (loaded_game_file_version >= kGameVersion_340_2)
+			if (_G(loaded_game_file_version) >= kGameVersion_340_2)
 				chan_info.Speed = in->ReadInt32();
 		}
 	}

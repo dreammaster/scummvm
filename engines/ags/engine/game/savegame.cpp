@@ -78,7 +78,7 @@ extern AGS::Engine::IGraphicsDriver *_G(gfxDriver);
 extern Bitmap *_G(dynamicallyCreatedSurfaces)[MAX_DYNAMIC_SURFACES];
 extern Bitmap *_G(raw_saved_screen);
 extern RoomStatus _GP(troom);
-extern RoomStatus *croom;
+extern RoomStatus *_G(croom);
 
 
 namespace AGS {
@@ -439,7 +439,7 @@ void RestoreViewportsAndCameras(const RestoredData &r_data) {
 HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data) {
 	// Use a yellow dialog highlight for older game versions
 	// CHECKME: it is dubious that this should be right here
-	if (loaded_game_file_version < kGameVersion_331)
+	if (_G(loaded_game_file_version) < kGameVersion_331)
 		_GP(play).dialog_options_highlight_color = DIALOG_OPTIONS_HIGHLIGHT_COLOR_DEFAULT;
 
 	// Preserve whether the music vox is available
@@ -497,8 +497,8 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	update_polled_stuff_if_runtime();
 
 	// load the room the game was saved in
-	if (displayed_room >= 0)
-		load_new_room(displayed_room, nullptr);
+	if (_G(displayed_room) >= 0)
+		load_new_room(_G(displayed_room), nullptr);
 
 	update_polled_stuff_if_runtime();
 
@@ -520,14 +520,14 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 
 	update_polled_stuff_if_runtime();
 
-	if (displayed_room >= 0) {
+	if (_G(displayed_room) >= 0) {
 		for (int i = 0; i < MAX_ROOM_BGFRAMES; ++i) {
 			if (r_data.RoomBkgScene[i]) {
 				_GP(_GP(thisroom)).BgFrames[i].Graphic = r_data.RoomBkgScene[i];
 			}
 		}
 
-		in_new_room = 3;  // don't run "enters screen" events
+		_G(in_new_room) = 3;  // don't run "enters screen" events
 		// now that room has loaded, copy saved light levels in
 		for (size_t i = 0; i < MAX_ROOM_REGIONS; ++i) {
 			_GP(_GP(thisroom)).Regions[i].Light = r_data.RoomLightLevels[i];
@@ -623,7 +623,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 
 	pl_run_plugin_hooks(AGSE_POSTRESTOREGAME, 0);
 
-	if (displayed_room < 0) {
+	if (_G(displayed_room) < 0) {
 		// the restart point, no room was loaded
 		load_new_room(_G(_G(playerchar))->room, _G(_G(playerchar)));
 		_G(_G(playerchar))->prevroom = -1;
@@ -684,7 +684,7 @@ void WriteDescription(Stream *out, const String &user_text, const Bitmap *user_i
 	StrUtil::WriteString(_GP(game).guid, out);
 	StrUtil::WriteString(_GP(game).gamename, out);
 	StrUtil::WriteString(_GP(ResPaths).GamePak.Name, out);
-	out->WriteInt32(loaded_game_file_version);
+	out->WriteInt32(_G(loaded_game_file_version));
 	out->WriteInt32(_GP(game).GetColorDepth());
 	out->WriteInt32(_GP(game).uniqueid);
 	soff_t env_end_pos = out->GetPosition();
@@ -735,14 +735,14 @@ void DoBeforeSave() {
 			_GP(play).cur_music_number = -1;
 	}
 
-	if (displayed_room >= 0) {
+	if (_G(displayed_room) >= 0) {
 		// update the current room script's data segment copy
 		if (roominst)
 			save_room_data_segment();
 
 		// Update the saved interaction variable values
 		for (size_t i = 0; i < _GP(_GP(thisroom)).LocalVariables.size() && i < (size_t)MAX_GLOBAL_VARIABLES; ++i)
-			croom->interactionVariableValues[i] = _GP(_GP(thisroom)).LocalVariables[i].Value;
+			_G(croom)->interactionVariableValues[i] = _GP(_GP(thisroom)).LocalVariables[i].Value;
 	}
 }
 

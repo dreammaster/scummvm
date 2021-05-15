@@ -50,7 +50,7 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 
-extern GameSetup usetup;
+extern GameSetup _GP(usetup);
 extern SpriteCache _GP(spriteset);
 extern int force_window;
 
@@ -187,18 +187,18 @@ void graphics_mode_get_defaults(bool windowed, ScreenSizeSetup &scsz_setup, Game
 		// For the windowed we define mode by the scaled _GP(game).
 		scsz_setup.SizeDef = kScreenDef_ByGameScaling;
 		scsz_setup.MatchDeviceRatio = false;
-		frame_setup = usetup.Screen.WinGameFrame;
+		frame_setup = _GP(usetup).Screen.WinGameFrame;
 	} else {
 		// For the fullscreen we set current desktop resolution, which
 		// corresponds to most comfortable fullscreen mode for the driver.
 		scsz_setup.SizeDef = kScreenDef_MaxDisplay;
 		scsz_setup.MatchDeviceRatio = true;
-		frame_setup = usetup.Screen.FsGameFrame;
+		frame_setup = _GP(usetup).Screen.FsGameFrame;
 	}
 }
 
 String find_default_cfg_file() {
-	return Path::ConcatPaths(usetup.startup_dir, DefaultConfigFileName);
+	return Path::ConcatPaths(_GP(usetup).startup_dir, DefaultConfigFileName);
 }
 
 String find_user_global_cfg_file() {
@@ -211,12 +211,12 @@ String find_user_cfg_file() {
 
 void config_defaults() {
 #if AGS_PLATFORM_OS_WINDOWS
-	usetup.Screen.DriverID = "D3D9";
+	_GP(usetup).Screen.DriverID = "D3D9";
 #else
-	usetup.Screen.DriverID = "OGL";
+	_GP(usetup).Screen.DriverID = "OGL";
 #endif
-	usetup.audio_backend = 1;
-	usetup.translation = "";
+	_GP(usetup).audio_backend = 1;
+	_GP(usetup).translation = "";
 }
 
 void read_legacy_graphics_config(const ConfigTree &cfg) {
@@ -225,23 +225,23 @@ void read_legacy_graphics_config(const ConfigTree &cfg) {
 	int screen_res = INIreadint(cfg, "misc", "screenres", 0);
 	if ((default_res == kGameResolution_320x200 ||
 		default_res == kGameResolution_320x240) && screen_res > 0) {
-		usetup.override_upscale = true; // run low-res game in high-res mode
+		_GP(usetup).override_upscale = true; // run low-res game in high-res mode
 	}
 
-	usetup.Screen.DisplayMode.Windowed = INIreadint(cfg, "misc", "windowed") > 0;
-	usetup.Screen.DriverID = INIreadstring(cfg, "misc", "gfxdriver", usetup.Screen.DriverID);
+	_GP(usetup).Screen.DisplayMode.Windowed = INIreadint(cfg, "misc", "windowed") > 0;
+	_GP(usetup).Screen.DriverID = INIreadstring(cfg, "misc", "gfxdriver", _GP(usetup).Screen.DriverID);
 
 	{
 		String legacy_filter = INIreadstring(cfg, "misc", "gfxfilter");
 		if (!legacy_filter.IsEmpty()) {
 			// NOTE: legacy scaling config is applied only to windowed setting
-			if (usetup.Screen.DisplayMode.Windowed)
-				usetup.Screen.DisplayMode.ScreenSize.SizeDef = kScreenDef_ByGameScaling;
-			parse_legacy_frame_config(legacy_filter, usetup.Screen.Filter.ID, usetup.Screen.WinGameFrame);
+			if (_GP(usetup).Screen.DisplayMode.Windowed)
+				_GP(usetup).Screen.DisplayMode.ScreenSize.SizeDef = kScreenDef_ByGameScaling;
+			parse_legacy_frame_config(legacy_filter, _GP(usetup).Screen.Filter.ID, _GP(usetup).Screen.WinGameFrame);
 
 			// AGS 3.2.1 and 3.3.0 aspect ratio preferences
-			if (!usetup.Screen.DisplayMode.Windowed) {
-				usetup.Screen.DisplayMode.ScreenSize.MatchDeviceRatio =
+			if (!_GP(usetup).Screen.DisplayMode.Windowed) {
+				_GP(usetup).Screen.DisplayMode.ScreenSize.MatchDeviceRatio =
 					(INIreadint(cfg, "misc", "sideborders") > 0 || INIreadint(cfg, "misc", "forceletterbox") > 0 ||
 						INIreadint(cfg, "misc", "prefer_sideborders") > 0 || INIreadint(cfg, "misc", "prefer_letterbox") > 0);
 			}
@@ -252,12 +252,12 @@ void read_legacy_graphics_config(const ConfigTree &cfg) {
 		if (!uniform_frame_scale.IsEmpty()) {
 			GameFrameSetup frame_setup;
 			parse_scaling_option(uniform_frame_scale, frame_setup);
-			usetup.Screen.FsGameFrame = frame_setup;
-			usetup.Screen.WinGameFrame = frame_setup;
+			_GP(usetup).Screen.FsGameFrame = frame_setup;
+			_GP(usetup).Screen.WinGameFrame = frame_setup;
 		}
 	}
 
-	usetup.Screen.DisplayMode.RefreshRate = INIreadint(cfg, "misc", "refresh");
+	_GP(usetup).Screen.DisplayMode.RefreshRate = INIreadint(cfg, "misc", "refresh");
 }
 
 // Variables used for mobile port configs
@@ -329,87 +329,87 @@ void override_config_ext(ConfigTree &cfg) {
 
 void apply_config(const ConfigTree &cfg) {
 	{
-		usetup.audio_backend = INIreadint(cfg, "sound", "enabled", usetup.audio_backend);
+		_GP(usetup).audio_backend = INIreadint(cfg, "sound", "enabled", _GP(usetup).audio_backend);
 
 		// Legacy graphics settings has to be translated into new options;
 		// they must be read first, to let newer options override them, if ones are present
 		read_legacy_graphics_config(cfg);
 
 		// Graphics mode
-		usetup.Screen.DriverID = INIreadstring(cfg, "graphics", "driver", usetup.Screen.DriverID);
+		_GP(usetup).Screen.DriverID = INIreadstring(cfg, "graphics", "driver", _GP(usetup).Screen.DriverID);
 
-		usetup.Screen.DisplayMode.Windowed = INIreadint(cfg, "graphics", "windowed") > 0;
-		usetup.Screen.DisplayMode.ScreenSize.SizeDef = usetup.Screen.DisplayMode.Windowed ? kScreenDef_ByGameScaling : kScreenDef_MaxDisplay;
-		usetup.Screen.DisplayMode.ScreenSize.SizeDef = parse_screendef(INIreadstring(cfg, "graphics", "screen_def"),
-			usetup.Screen.DisplayMode.ScreenSize.SizeDef);
+		_GP(usetup).Screen.DisplayMode.Windowed = INIreadint(cfg, "graphics", "windowed") > 0;
+		_GP(usetup).Screen.DisplayMode.ScreenSize.SizeDef = _GP(usetup).Screen.DisplayMode.Windowed ? kScreenDef_ByGameScaling : kScreenDef_MaxDisplay;
+		_GP(usetup).Screen.DisplayMode.ScreenSize.SizeDef = parse_screendef(INIreadstring(cfg, "graphics", "screen_def"),
+			_GP(usetup).Screen.DisplayMode.ScreenSize.SizeDef);
 
-		usetup.Screen.DisplayMode.ScreenSize.Size = Size(INIreadint(cfg, "graphics", "screen_width"),
+		_GP(usetup).Screen.DisplayMode.ScreenSize.Size = Size(INIreadint(cfg, "graphics", "screen_width"),
 			INIreadint(cfg, "graphics", "screen_height"));
-		usetup.Screen.DisplayMode.ScreenSize.MatchDeviceRatio = INIreadint(cfg, "graphics", "match_device_ratio", 1) != 0;
+		_GP(usetup).Screen.DisplayMode.ScreenSize.MatchDeviceRatio = INIreadint(cfg, "graphics", "match_device_ratio", 1) != 0;
 		// TODO: move to config overrides (replace values during config load)
 #if AGS_PLATFORM_OS_MACOS
-		usetup.Screen.Filter.ID = "none";
+		_GP(usetup).Screen.Filter.ID = "none";
 #else
-		usetup.Screen.Filter.ID = INIreadstring(cfg, "graphics", "filter", "StdScale");
-		parse_scaling_option(INIreadstring(cfg, "graphics", "game_scale_fs", "proportional"), usetup.Screen.FsGameFrame);
-		parse_scaling_option(INIreadstring(cfg, "graphics", "game_scale_win", "max_round"), usetup.Screen.WinGameFrame);
+		_GP(usetup).Screen.Filter.ID = INIreadstring(cfg, "graphics", "filter", "StdScale");
+		parse_scaling_option(INIreadstring(cfg, "graphics", "game_scale_fs", "proportional"), _GP(usetup).Screen.FsGameFrame);
+		parse_scaling_option(INIreadstring(cfg, "graphics", "game_scale_win", "max_round"), _GP(usetup).Screen.WinGameFrame);
 #endif
 
-		usetup.Screen.DisplayMode.RefreshRate = INIreadint(cfg, "graphics", "refresh");
-		usetup.Screen.DisplayMode.VSync = INIreadint(cfg, "graphics", "vsync") > 0;
-		usetup.RenderAtScreenRes = INIreadint(cfg, "graphics", "render_at_screenres") > 0;
-		usetup.Supersampling = INIreadint(cfg, "graphics", "supersampling", 1);
+		_GP(usetup).Screen.DisplayMode.RefreshRate = INIreadint(cfg, "graphics", "refresh");
+		_GP(usetup).Screen.DisplayMode.VSync = INIreadint(cfg, "graphics", "vsync") > 0;
+		_GP(usetup).RenderAtScreenRes = INIreadint(cfg, "graphics", "render_at_screenres") > 0;
+		_GP(usetup).Supersampling = INIreadint(cfg, "graphics", "supersampling", 1);
 
-		usetup.enable_antialiasing = INIreadint(cfg, "misc", "antialias") > 0;
+		_GP(usetup).enable_antialiasing = INIreadint(cfg, "misc", "antialias") > 0;
 
 		// This option is backwards (usevox is 0 if no_speech_pack)
-		usetup.no_speech_pack = INIreadint(cfg, "sound", "usespeech", 1) == 0;
+		_GP(usetup).no_speech_pack = INIreadint(cfg, "sound", "usespeech", 1) == 0;
 
-		usetup.user_data_dir = INIreadstring(cfg, "misc", "user_data_dir");
-		usetup.shared_data_dir = INIreadstring(cfg, "misc", "shared_data_dir");
+		_GP(usetup).user_data_dir = INIreadstring(cfg, "misc", "user_data_dir");
+		_GP(usetup).shared_data_dir = INIreadstring(cfg, "misc", "shared_data_dir");
 
-		usetup.translation = INIreadstring(cfg, "language", "translation");
+		_GP(usetup).translation = INIreadstring(cfg, "language", "translation");
 
 		int cache_size_kb = INIreadint(cfg, "misc", "cachemax", DEFAULTCACHESIZE_KB);
 		if (cache_size_kb > 0)
 			_GP(spriteset).SetMaxCacheSize((size_t)cache_size_kb * 1024);
 
-		usetup.mouse_auto_lock = INIreadint(cfg, "mouse", "auto_lock") > 0;
+		_GP(usetup).mouse_auto_lock = INIreadint(cfg, "mouse", "auto_lock") > 0;
 
-		usetup.mouse_speed = INIreadfloat(cfg, "mouse", "speed", 1.f);
-		if (usetup.mouse_speed <= 0.f)
-			usetup.mouse_speed = 1.f;
+		_GP(usetup).mouse_speed = INIreadfloat(cfg, "mouse", "speed", 1.f);
+		if (_GP(usetup).mouse_speed <= 0.f)
+			_GP(usetup).mouse_speed = 1.f;
 		const char *mouse_ctrl_options[kNumMouseCtrlOptions] = { "never", "fullscreen", "always" };
 		String mouse_str = INIreadstring(cfg, "mouse", "control_when", "fullscreen");
 		for (int i = 0; i < kNumMouseCtrlOptions; ++i) {
 			if (mouse_str.CompareNoCase(mouse_ctrl_options[i]) == 0) {
-				usetup.mouse_ctrl_when = (MouseControlWhen)i;
+				_GP(usetup).mouse_ctrl_when = (MouseControlWhen)i;
 				break;
 			}
 		}
-		usetup.mouse_ctrl_enabled = INIreadint(cfg, "mouse", "control_enabled", usetup.mouse_ctrl_enabled) > 0;
+		_GP(usetup).mouse_ctrl_enabled = INIreadint(cfg, "mouse", "control_enabled", _GP(usetup).mouse_ctrl_enabled) > 0;
 		const char *mouse_speed_options[kNumMouseSpeedDefs] = { "absolute", "current_display" };
 		mouse_str = INIreadstring(cfg, "mouse", "speed_def", "current_display");
 		for (int i = 0; i < kNumMouseSpeedDefs; ++i) {
 			if (mouse_str.CompareNoCase(mouse_speed_options[i]) == 0) {
-				usetup.mouse_speed_def = (MouseSpeedDef)i;
+				_GP(usetup).mouse_speed_def = (MouseSpeedDef)i;
 				break;
 			}
 		}
 
-		usetup.override_multitasking = INIreadint(cfg, "override", "multitasking", -1);
+		_GP(usetup).override_multitasking = INIreadint(cfg, "override", "multitasking", -1);
 		String override_os = INIreadstring(cfg, "override", "os");
-		usetup.override_script_os = -1;
+		_GP(usetup).override_script_os = -1;
 		if (override_os.CompareNoCase("dos") == 0) {
-			usetup.override_script_os = eOS_DOS;
+			_GP(usetup).override_script_os = eOS_DOS;
 		} else if (override_os.CompareNoCase("win") == 0) {
-			usetup.override_script_os = eOS_Win;
+			_GP(usetup).override_script_os = eOS_Win;
 		} else if (override_os.CompareNoCase("linux") == 0) {
-			usetup.override_script_os = eOS_Linux;
+			_GP(usetup).override_script_os = eOS_Linux;
 		} else if (override_os.CompareNoCase("mac") == 0) {
-			usetup.override_script_os = eOS_Mac;
+			_GP(usetup).override_script_os = eOS_Mac;
 		}
-		usetup.override_upscale = INIreadint(cfg, "override", "upscale", usetup.override_upscale) > 0;
+		_GP(usetup).override_upscale = INIreadint(cfg, "override", "upscale", _GP(usetup).override_upscale) > 0;
 	}
 
 	// Apply logging configuration
@@ -417,23 +417,23 @@ void apply_config(const ConfigTree &cfg) {
 }
 
 void post_config() {
-	if (usetup.Screen.DriverID.IsEmpty() || usetup.Screen.DriverID.CompareNoCase("DX5") == 0)
-		usetup.Screen.DriverID = "Software";
+	if (_GP(usetup).Screen.DriverID.IsEmpty() || _GP(usetup).Screen.DriverID.CompareNoCase("DX5") == 0)
+		_GP(usetup).Screen.DriverID = "Software";
 
 	// FIXME: this correction is needed at the moment because graphics driver
 	// implementation requires some filter to be created anyway
-	usetup.Screen.Filter.UserRequest = usetup.Screen.Filter.ID;
-	if (usetup.Screen.Filter.ID.IsEmpty() || usetup.Screen.Filter.ID.CompareNoCase("none") == 0) {
-		usetup.Screen.Filter.ID = "StdScale";
+	_GP(usetup).Screen.Filter.UserRequest = _GP(usetup).Screen.Filter.ID;
+	if (_GP(usetup).Screen.Filter.ID.IsEmpty() || _GP(usetup).Screen.Filter.ID.CompareNoCase("none") == 0) {
+		_GP(usetup).Screen.Filter.ID = "StdScale";
 	}
 
-	if (!usetup.Screen.FsGameFrame.IsValid())
-		usetup.Screen.FsGameFrame = GameFrameSetup(kFrame_MaxProportional);
-	if (!usetup.Screen.WinGameFrame.IsValid())
-		usetup.Screen.WinGameFrame = GameFrameSetup(kFrame_MaxRound);
+	if (!_GP(usetup).Screen.FsGameFrame.IsValid())
+		_GP(usetup).Screen.FsGameFrame = GameFrameSetup(kFrame_MaxProportional);
+	if (!_GP(usetup).Screen.WinGameFrame.IsValid())
+		_GP(usetup).Screen.WinGameFrame = GameFrameSetup(kFrame_MaxRound);
 
-	usetup.user_data_dir = Path::MakePathNoSlash(usetup.user_data_dir);
-	usetup.shared_data_dir = Path::MakePathNoSlash(usetup.shared_data_dir);
+	_GP(usetup).user_data_dir = Path::MakePathNoSlash(_GP(usetup).user_data_dir);
+	_GP(usetup).shared_data_dir = Path::MakePathNoSlash(_GP(usetup).shared_data_dir);
 }
 
 void save_config_file() {
@@ -453,7 +453,7 @@ void save_config_file() {
 		// in each modes (by explicit width/height values or from game scaling).
 		// This specifically *must* be done if there will be script API for modifying fullscreen
 		// resolution, or size of the window could be changed any way at runtime.
-		if (is_windowed != usetup.Screen.DisplayMode.Windowed) {
+		if (is_windowed != _GP(usetup).Screen.DisplayMode.Windowed) {
 			if (is_windowed)
 				cfg["graphics"]["screen_def"] = "scaling";
 			else
@@ -463,10 +463,10 @@ void save_config_file() {
 
 	// Other game options that could be changed at runtime
 	if (_GP(game).options[OPT_RENDERATSCREENRES] == kRenderAtScreenRes_UserDefined)
-		cfg["graphics"]["render_at_screenres"] = String::FromFormat("%d", usetup.RenderAtScreenRes ? 1 : 0);
-	cfg["mouse"]["control_enabled"] = String::FromFormat("%d", usetup.mouse_ctrl_enabled ? 1 : 0);
+		cfg["graphics"]["render_at_screenres"] = String::FromFormat("%d", _GP(usetup).RenderAtScreenRes ? 1 : 0);
+	cfg["mouse"]["control_enabled"] = String::FromFormat("%d", _GP(usetup).mouse_ctrl_enabled ? 1 : 0);
 	cfg["mouse"]["speed"] = String::FromFormat("%f", Mouse::GetSpeed());
-	cfg["language"]["translation"] = usetup.translation;
+	cfg["language"]["translation"] = _GP(usetup).translation;
 
 	String cfg_file = PreparePathForWriting(GetGameUserConfigDir(), DefaultConfigFileName);
 	if (!cfg_file.IsEmpty())

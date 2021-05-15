@@ -649,7 +649,7 @@ public:
 	CCAudioClip *_ccDynamicAudioClip;
 	CCAudioChannel *_ccDynamicAudio;
 	ScriptString *_myScriptStringImpl;
-//----->
+
 	// TODO: IMPORTANT!!
 	// we cannot simply replace these arrays with vectors, or other C++ containers,
 	// until we implement safe management of such containers in script exports
@@ -666,9 +666,9 @@ public:
 	ObjectCache *_objcache;
 	MoveList *_mls = nullptr;
 	GameSetup *_usetup;
-	AGS::Shared::String _saveGameDirectory;
-	AGS::Shared::String _saveGameParent;
-	AGS::Shared::String _saveGameSuffix;
+//	AGS::Shared::String _saveGameDirectory;
+//	AGS::Shared::String _saveGameParent;
+//	AGS::Shared::String _saveGameSuffix;
 	bool _want_exit = false;
 	bool _abort_engine = false;
 	AGSPlatformDriver *_platform = nullptr;
@@ -687,7 +687,7 @@ public:
 	bool _proper_exit = false;
 	int _our_eip = 0;
 
-	int _oldmouse = 0;
+//	int _oldmouse = 0;
 	GameDataVersion _loaded_game_file_version = kGameVersion_Undefined;
 	int _game_paused = 0;
 	char _pexbuf[STD_BUFFER_SIZE] = { 0 };
@@ -695,7 +695,7 @@ public:
 	int _load_new_game_restore = -1;
 	// TODO: refactor these global vars into function arguments
 	int _getloctype_index = 0, _getloctype_throughgui = 0;
-	char _gamefilenamebuf[200] = { 0 };
+//	char _gamefilenamebuf[200] = { 0 };
 	int _gameHasBeenRestored = 0;
 	int _oldeip = 0;
 
@@ -705,7 +705,7 @@ public:
 	 * \defgroup game_init globals
 	 * @{
 	 */
-
+//----->
 	StaticArray *_StaticCharacterArray;
 	StaticArray *_StaticObjectArray;
 	StaticArray *_StaticGUIArray;

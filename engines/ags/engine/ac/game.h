@@ -204,14 +204,8 @@ void game_sprite_updated(int sprnum);
 // Those which used that sprite will reset to dummy sprite 0, update their render states and caches.
 void game_sprite_deleted(int sprnum);
 
-extern int in_new_room;
-extern int new_room_pos;
-extern int new_room_x, new_room_y, new_room_loop;
-extern int displayed_room;
-extern int frames_per_second; // fixed game fps, set by script
 extern unsigned int loopcounter;
 extern void set_loop_counter(unsigned int new_counter);
-extern int game_paused;
 
 } // namespace AGS3
 

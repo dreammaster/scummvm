@@ -54,14 +54,14 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern MoveList *mls;
-extern RoomStatus *croom;
+
+extern RoomStatus *_G(croom);
 
 
 
-extern RoomObject *objs;
+extern RoomObject *_GP(objs);
 
-extern int our_eip;
+extern int _G(our_eip);
 
 
 extern CharacterInfo *_G(facetalkchar);
@@ -77,7 +77,7 @@ extern IGraphicsDriver *_G(gfxDriver);
 int do_movelist_move(short *mlnum, int *xx, int *yy) {
 	int need_to_fix_sprite = 0;
 	if (mlnum[0] < 1) quit("movelist_move: attempted to move on a non-exist movelist");
-	MoveList *cmls; cmls = &mls[mlnum[0]];
+	MoveList *cmls; cmls = &_G(mls)[mlnum[0]];
 	fixed xpermove = cmls->xpermove[cmls->onstage], ypermove = cmls->ypermove[cmls->onstage];
 
 	short targetx = short((cmls->pos[cmls->onstage + 1] >> 16) & 0x00ffff);
@@ -195,8 +195,8 @@ void update_script_timers() {
 
 void update_cycling_views() {
 	// update graphics for object if cycling view
-	for (int i = 0; i < croom->numobj; ++i) {
-		objs[i].UpdateCyclingView(i);
+	for (int i = 0; i < _G(croom)->numobj; ++i) {
+		_GP(objs)[i].UpdateCyclingView(i);
 	}
 }
 
@@ -432,17 +432,17 @@ void update_sierra_speech() {
 // the like.
 void update_stuff() {
 
-	our_eip = 20;
+	_G(our_eip) = 20;
 
 	update_script_timers();
 
 	update_cycling_views();
 
-	our_eip = 21;
+	_G(our_eip) = 21;
 
 	update_shadow_areas();
 
-	our_eip = 22;
+	_G(our_eip) = 22;
 
 	int numSheep = 0;
 	int followingAsSheep[MAX_SHEEP];
@@ -451,17 +451,17 @@ void update_stuff() {
 
 	update_following_exactly_characters(numSheep, followingAsSheep);
 
-	our_eip = 23;
+	_G(our_eip) = 23;
 
 	update_overlay_timers();
 
 	update_speech_and_messages();
 
-	our_eip = 24;
+	_G(our_eip) = 24;
 
 	update_sierra_speech();
 
-	our_eip = 25;
+	_G(our_eip) = 25;
 }
 
 } // namespace AGS3

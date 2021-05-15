@@ -62,11 +62,11 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 
-extern GameSetup usetup;
+extern GameSetup _GP(usetup);
 
 extern int cur_mode, cur_cursor;
 extern ccInstance *gameinst;
-extern ScriptGUI *scrGui;
+
 
 extern CCGUIObject _GP(ccDynamicGUIObject);
 extern Bitmap **_G(guibg);
@@ -85,7 +85,7 @@ int eip_guinum, eip_guiobj;
 
 
 ScriptGUI *GUI_AsTextWindow(ScriptGUI *tehgui) { // Internally both GUI and TextWindow are implemented by same class
-	return _GP(guis)[tehgui->id].IsTextWindow() ? &scrGui[tehgui->id] : nullptr;
+	return _GP(guis)[tehgui->id].IsTextWindow() ? &_G(scrGui)[tehgui->id] : nullptr;
 }
 
 int GUI_GetPopupStyle(ScriptGUI *tehgui) {
@@ -296,7 +296,7 @@ ScriptGUI *GetGUIAtLocation(int xx, int yy) {
 	int guiid = GetGUIAt(xx, yy);
 	if (guiid < 0)
 		return nullptr;
-	return &scrGui[guiid];
+	return &_G(scrGui)[guiid];
 }
 
 void GUI_Click(ScriptGUI *scgui, int mbut) {
@@ -339,7 +339,7 @@ void process_interface_click(int ifce, int btn, int mbut) {
 	if (btn < 0) {
 		// click on GUI background
 		QueueScriptFunction(kScInstGame, _GP(guis)[ifce].OnClickHandler, 2,
-			RuntimeScriptValue().SetDynamicObject(&scrGui[ifce], &_GP(ccDynamicGUI)),
+			RuntimeScriptValue().SetDynamicObject(&_G(scrGui)[ifce], &_GP(ccDynamicGUI)),
 			RuntimeScriptValue().SetInt32(mbut));
 		return;
 	}

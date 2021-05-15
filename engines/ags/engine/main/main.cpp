@@ -69,9 +69,9 @@ char **global_argv = nullptr;
 int    global_argc = 0;
 
 
-extern GameSetup usetup;
+extern GameSetup _GP(usetup);
 
-extern int our_eip;
+extern int _G(our_eip);
 extern int _G(convert_16bit_bgr);
 extern int _G(editor_debugging_enabled);
 extern int _G(editor_debugging_initialized);
@@ -109,7 +109,7 @@ int psp_gfx_smooth_sprites = 0;
 
 
 void main_pre_init() {
-	our_eip = -999;
+	_G(our_eip) = -999;
 	AssetMgr->SetSearchPriority(Shared::kAssetPriorityDir);
 	_GP(play).takeover_data = 0;
 }
@@ -266,7 +266,7 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 		else if ((ags_stricmp(arg, "--startr") == 0) && (ee < argc - 1)) {
 			override_start_room = atoi(argv[ee + 1]);
 			ee++;
-		} else if (ags_stricmp(arg, "--noexceptionhandler") == 0) usetup.disable_exception_handling = true;
+		} else if (ags_stricmp(arg, "--noexceptionhandler") == 0) _GP(usetup).disable_exception_handling = true;
 		else if (ags_stricmp(arg, "--setup") == 0) {
 			justRunSetup = true;
 		} else if (ags_stricmp(arg, "--registergame") == 0) {
@@ -282,14 +282,14 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 			force_window = 1;
 			ee++;
 		} else if (ags_stricmp(arg, "--conf") == 0 && (argc > ee + 1)) {
-			usetup.conf_path = argv[++ee];
+			_GP(usetup).conf_path = argv[++ee];
 		} else if (ags_stricmp(arg, "--localuserconf") == 0) {
-			usetup.local_user_conf = true;
+			_GP(usetup).local_user_conf = true;
 		} else if (ags_stricmp(arg, "--runfromide") == 0 && (argc > ee + 4)) {
-			usetup.install_dir = argv[ee + 1];
-			usetup.opt_data_dir = argv[ee + 2];
-			usetup.opt_audio_dir = argv[ee + 3];
-			usetup.opt_voice_dir = argv[ee + 4];
+			_GP(usetup).install_dir = argv[ee + 1];
+			_GP(usetup).opt_data_dir = argv[ee + 2];
+			_GP(usetup).opt_audio_dir = argv[ee + 3];
+			_GP(usetup).opt_voice_dir = argv[ee + 4];
 			ee += 4;
 		} else if (ags_stricmp(arg, "--takeover") == 0) {
 			if (argc < ee + 2)
@@ -436,7 +436,7 @@ int ags_entry_point(int argc, char *argv[]) {
 		exit(EXIT_NORMAL);
 
 #ifdef USE_CUSTOM_EXCEPTION_HANDLER
-	if (usetup.disable_exception_handling)
+	if (_GP(usetup).disable_exception_handling)
 #endif
 	{
 		int result = initialize_engine(startup_opts);

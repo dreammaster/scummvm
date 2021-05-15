@@ -31,7 +31,7 @@
 
 namespace AGS3 {
 
-extern int our_eip;
+extern int _G(our_eip);
 
 
 //=============================================================================
@@ -39,11 +39,11 @@ extern int our_eip;
 //=============================================================================
 
 void set_our_eip(int eip) {
-	our_eip = eip;
+	_G(our_eip) = eip;
 }
 
 int get_our_eip() {
-	return our_eip;
+	return _G(our_eip);
 }
 
 } // namespace AGS3

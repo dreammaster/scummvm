@@ -46,7 +46,7 @@ void scrPlayVideo(const char *name, int skip, int flags) {
 	if (_G(debug_flags) & DBG_NOVIDEO)
 		return;
 
-	if ((flags < 10) && (usetup.audio_backend == 0)) {
+	if ((flags < 10) && (_GP(usetup).audio_backend == 0)) {
 		// if game audio is disabled in Setup, then don't
 		// play any sound on the video either
 		flags += 10;

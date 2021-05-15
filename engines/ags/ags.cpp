@@ -90,12 +90,12 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) : Engine
 }
 
 AGSEngine::~AGSEngine() {
-	if (_G(proper_exit) == 0) {
+	if (_G(_G(proper_exit)) == 0) {
 		_G(platform)->DisplayAlert("Error: the program has exited without requesting it.\n"
 			"Program pointer: %+03d  (write this number down), ACI version %s\n"
 			"If you see a list of numbers above, please write them down and contact\n"
 			"developers. Otherwise, note down any other information displayed.",
-			_G(our_eip), _G(EngineVersion).LongString.GetCStr());
+			_G(_G(our_eip)), _G(EngineVersion).LongString.GetCStr());
 	}
 
 	delete _screen;
@@ -178,7 +178,7 @@ Common::Error AGSEngine::run() {
 	_G(loadSaveGameOnStartup) = ConfMan.getInt("save_slot");
 
 #ifdef USE_CUSTOM_EXCEPTION_HANDLER
-	if (_GP(usetup).disable_exception_handling)
+	if (_GP(_GP(usetup)).disable_exception_handling)
 #endif
 	{
 		syncSoundSettings();

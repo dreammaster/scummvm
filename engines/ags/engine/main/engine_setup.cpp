@@ -131,13 +131,13 @@ void engine_setup_system_gamesize() {
 
 void engine_init_resolution_settings(const Size game_size) {
 	Debug::Printf("Initializing resolution settings");
-	usetup.textheight = getfontheight_outlined(0) + 1;
+	_GP(usetup).textheight = getfontheight_outlined(0) + 1;
 
 	Debug::Printf(kDbgMsg_Info, "Game native resolution: %d x %d (%d bit)%s", game_size.Width, game_size.Height, _GP(game).color_depth * 8,
 		_GP(game).IsLegacyLetterbox() ? " letterbox-by-design" : "");
 
-	convert_gui_to_game_resolution(loaded_game_file_version);
-	convert_objects_to_data_resolution(loaded_game_file_version);
+	convert_gui_to_game_resolution(_G(loaded_game_file_version));
+	convert_objects_to_data_resolution(_G(loaded_game_file_version));
 
 	Rect viewport = RectWH(game_size);
 	_GP(play).SetMainViewport(viewport);
@@ -253,21 +253,21 @@ void engine_post_gfxmode_mouse_setup(const DisplayMode &dm, const Size &init_des
 	// NOTE that we setup speed and other related properties regardless of
 	// whether mouse control was requested because it may be enabled later.
 	Mouse::SetSpeedUnit(1.f);
-	if (usetup.mouse_speed_def == kMouseSpeed_CurrentDisplay) {
+	if (_GP(usetup).mouse_speed_def == kMouseSpeed_CurrentDisplay) {
 		Size cur_desktop;
 		if (sys_get_desktop_resolution(cur_desktop.Width, cur_desktop.Height) == 0)
 			Mouse::SetSpeedUnit(Math::Max((float)cur_desktop.Width / (float)init_desktop.Width,
 			(float)cur_desktop.Height / (float)init_desktop.Height));
 	}
 
-	Mouse_EnableControl(usetup.mouse_ctrl_enabled);
+	Mouse_EnableControl(_GP(usetup).mouse_ctrl_enabled);
 	Debug::Printf(kDbgMsg_Info, "Mouse speed control: %s, unit: %f, user value: %f",
-		usetup.mouse_ctrl_enabled ? "enabled" : "disabled", Mouse::GetSpeedUnit(), Mouse::GetSpeed());
+		_GP(usetup).mouse_ctrl_enabled ? "enabled" : "disabled", Mouse::GetSpeedUnit(), Mouse::GetSpeed());
 
 	on_coordinates_scaling_changed();
 
 	// If auto lock option is set, lock mouse to the game window
-	if (usetup.mouse_auto_lock && _GP(scsystem).windowed != 0)
+	if (_GP(usetup).mouse_auto_lock && _GP(scsystem).windowed != 0)
 		Mouse::TryLockToWindow();
 }
 

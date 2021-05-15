@@ -334,12 +334,12 @@ void GameSetupStruct::read_room_names(Stream *in, GameDataVersion data_ver) {
 		roomCount = in->ReadInt32();
 		roomNumbers = new int[roomCount];
 		roomNames = new char *[roomCount];
-		String pexbuf;
+		String _G(pexbuf);
 		for (int bb = 0; bb < roomCount; bb++) {
 			roomNumbers[bb] = in->ReadInt32();
-			pexbuf.Read(in, STD_BUFFER_SIZE);
-			roomNames[bb] = new char[pexbuf.GetLength() + 1];
-			strcpy(roomNames[bb], pexbuf);
+			_G(pexbuf).Read(in, STD_BUFFER_SIZE);
+			roomNames[bb] = new char[_G(pexbuf).GetLength() + 1];
+			strcpy(roomNames[bb], _G(pexbuf));
 		}
 	} else {
 		roomCount = 0;

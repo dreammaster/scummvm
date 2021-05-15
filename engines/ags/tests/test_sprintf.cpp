@@ -86,11 +86,11 @@ void Test_ScriptSprintf() {
 	assert(strcmp(result, "12345678%d") == 0);
 
 	// Test null string pointer in backward-compatibility mode
-	loaded_game_file_version = kGameVersion_312;
+	_G(loaded_game_file_version) = kGameVersion_312;
 	params[0].SetStringLiteral(NULL);
 	result = ScriptSprintf(ScSfBuffer, 10, "A%sB", params, 1);
 	assert(strcmp(result, "A(null)B") == 0);
-	loaded_game_file_version = kGameVersion_Undefined;
+	_G(loaded_game_file_version) = kGameVersion_Undefined;
 
 	//
 	// Called-from-plugin variant
@@ -124,10 +124,10 @@ void Test_ScriptSprintf() {
 	assert(strcmp(result, "1234567812") == 0);
 
 	// Test null string pointer in backward-compatibility mode
-	loaded_game_file_version = kGameVersion_312;
+	_G(loaded_game_file_version) = kGameVersion_312;
 	result = ScriptVSprintf__(ScSfBuffer, 10, "A%sB", NULL);
 	assert(strcmp(result, "A(null)B") == 0);
-	loaded_game_file_version = kGameVersion_Undefined;
+	_G(loaded_game_file_version) = kGameVersion_Undefined;
 }
 
 } // namespace AGS3

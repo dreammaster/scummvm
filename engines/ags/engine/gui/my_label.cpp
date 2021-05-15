@@ -33,7 +33,7 @@ namespace AGS3 {
 
 using namespace Shared;
 
-extern GameSetup usetup;
+extern GameSetup _GP(usetup);
 
 extern int _G(acdialog_font);
 

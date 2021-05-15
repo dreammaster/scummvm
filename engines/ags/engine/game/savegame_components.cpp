@@ -74,7 +74,7 @@ extern Bitmap *_G(dynamicallyCreatedSurfaces)[MAX_DYNAMIC_SURFACES];
 
 extern RoomStatus _GP(troom);
 extern Bitmap *_G(raw_saved_screen);
-extern MoveList *mls;
+
 
 
 namespace AGS
@@ -232,7 +232,7 @@ HSaveError WriteGameState(Stream *out)
     // TODO: probably no need to save this for hi/true-res game
     out->WriteArray(palette, sizeof(RGB), 256);
 
-    if (loaded_game_file_version <= kGameVersion_272)
+    if (_G(loaded_game_file_version) <= kGameVersion_272)
     {
         // Global variables
         out->WriteInt32(numGlobalVars);
@@ -243,10 +243,10 @@ HSaveError WriteGameState(Stream *out)
     // Game state
     _GP(play).WriteForSavegame(out);
     // Other dynamic values
-    out->WriteInt32(frames_per_second);
+    out->WriteInt32(_G(frames_per_second));
     out->WriteInt32(loopcounter);
     out->WriteInt32(ifacepopped);
-    out->WriteInt32(game_paused);
+    out->WriteInt32(_G(game_paused));
     // Mouse cursor
     out->WriteInt32(cur_mode);
     out->WriteInt32(cur_cursor);
@@ -326,7 +326,7 @@ HSaveError ReadGameState(Stream *in, int32_t cmp_ver, const PreservedParams &pp,
     // Game palette
     in->ReadArray(palette, sizeof(RGB), 256);
 
-    if (loaded_game_file_version <= kGameVersion_272)
+    if (_G(loaded_game_file_version) <= kGameVersion_272)
     {
         // Legacy interaction global variables
         if (!AssertGameContent(err, in->ReadInt32(), numGlobalVars, "Global Variables"))
@@ -342,7 +342,7 @@ HSaveError ReadGameState(Stream *in, int32_t cmp_ver, const PreservedParams &pp,
     r_data.FPS = in->ReadInt32();
     set_loop_counter(in->ReadInt32());
     ifacepopped = in->ReadInt32();
-    game_paused = in->ReadInt32();
+    _G(game_paused) = in->ReadInt32();
     // Mouse cursor state
     r_data.CursorMode = in->ReadInt32();
     r_data.CursorID = in->ReadInt32();
@@ -543,10 +543,10 @@ HSaveError WriteCharacters(Stream *out)
         _GP(game).chars[i].WriteToFile(out);
         _G(charextra)[i].WriteToFile(out);
         Properties::WriteValues(_GP(play).charProps[i], out);
-        if (loaded_game_file_version <= kGameVersion_272)
+        if (_G(loaded_game_file_version) <= kGameVersion_272)
             WriteTimesRun272(*_GP(game).intrChar[i], out);
         // character movement path cache
-        mls[CHMLSOFFS + i].WriteToFile(out);
+        _G(mls)[CHMLSOFFS + i].WriteToFile(out);
     }
     return HSaveError::None();
 }
@@ -561,10 +561,10 @@ HSaveError ReadCharacters(Stream *in, int32_t cmp_ver, const PreservedParams &pp
         _GP(game).chars[i].ReadFromFile(in);
         _G(charextra)[i].ReadFromFile(in);
         Properties::ReadValues(_GP(play).charProps[i], in);
-        if (loaded_game_file_version <= kGameVersion_272)
+        if (_G(loaded_game_file_version) <= kGameVersion_272)
             ReadTimesRun272(*_GP(game).intrChar[i], in);
         // character movement path cache
-        err = mls[CHMLSOFFS + i].ReadFromFile(in, cmp_ver > 0 ? 1 : 0);
+        err = _G(mls)[CHMLSOFFS + i].ReadFromFile(in, cmp_ver > 0 ? 1 : 0);
         if (!err)
             return err;
     }
@@ -712,7 +712,7 @@ HSaveError WriteInventory(Stream *out)
     {
         _GP(game).invinfo[i].WriteToSavegame(out);
         Properties::WriteValues(_GP(play).invProps[i], out);
-        if (loaded_game_file_version <= kGameVersion_272)
+        if (_G(loaded_game_file_version) <= kGameVersion_272)
             WriteTimesRun272(*_GP(game).intrInv[i], out);
     }
     return HSaveError::None();
@@ -727,7 +727,7 @@ HSaveError ReadInventory(Stream *in, int32_t cmp_ver, const PreservedParams &pp,
     {
         _GP(game).invinfo[i].ReadFromSavegame(in);
         Properties::ReadValues(_GP(play).invProps[i], in);
-        if (loaded_game_file_version <= kGameVersion_272)
+        if (_G(loaded_game_file_version) <= kGameVersion_272)
             ReadTimesRun272(*_GP(game).intrInv[i], in);
     }
     return err;
@@ -1000,8 +1000,8 @@ HSaveError ReadRoomStates(Stream *in, int32_t cmp_ver, const PreservedParams &pp
 
 HSaveError WriteThisRoom(Stream *out)
 {
-    out->WriteInt32(displayed_room);
-    if (displayed_room < 0)
+    out->WriteInt32(_G(displayed_room));
+    if (_G(displayed_room) < 0)
         return HSaveError::None();
 
     // modified room backgrounds
@@ -1031,14 +1031,14 @@ HSaveError WriteThisRoom(Stream *out)
     out->WriteInt32(_GP(_GP(thisroom)).ObjectCount + 1);
     for (size_t i = 0; i < _GP(_GP(thisroom)).ObjectCount + 1; ++i)
     {
-        mls[i].WriteToFile(out);
+        _G(mls)[i].WriteToFile(out);
     }
 
     // room music volume
     out->WriteInt32(_GP(_GP(thisroom)).Options.MusicVolume);
 
     // persistent room's indicator
-    const bool persist = displayed_room < MAX_ROOMS;
+    const bool persist = _G(displayed_room) < MAX_ROOMS;
     out->WriteBool(persist);
     // write the current _GP(troom) state, in case they save in temporary room
     if (!persist)
@@ -1049,8 +1049,8 @@ HSaveError WriteThisRoom(Stream *out)
 HSaveError ReadThisRoom(Stream *in, int32_t cmp_ver, const PreservedParams &pp, RestoredData &r_data)
 {
     HSaveError err;
-    displayed_room = in->ReadInt32();
-    if (displayed_room < 0)
+    _G(displayed_room) = in->ReadInt32();
+    if (_G(displayed_room) < 0)
         return err;
 
     // modified room backgrounds
@@ -1083,7 +1083,7 @@ HSaveError ReadThisRoom(Stream *in, int32_t cmp_ver, const PreservedParams &pp, 
         return err;
     for (int i = 0; i < objmls_count; ++i)
     {
-        err = mls[i].ReadFromFile(in, cmp_ver > 0 ? 1 : 0);
+        err = _G(mls)[i].ReadFromFile(in, cmp_ver > 0 ? 1 : 0);
         if (!err)
             return err;
     }

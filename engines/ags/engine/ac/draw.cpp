@@ -77,7 +77,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern GameSetup usetup;
+extern GameSetup _GP(usetup);
 
 
 extern int _G(convert_16bit_bgr);
@@ -95,14 +95,14 @@ extern int walkBehindsCachedForBgNum;
 extern WalkBehindMethodEnum walkBehindMethod;
 extern int walk_behind_baselines_changed;
 extern SpriteCache _GP(spriteset);
-extern RoomStatus*croom;
-extern int our_eip;
-extern int in_new_room;
-extern RoomObject*objs;
+extern RoomStatus*_G(croom);
+extern int _G(our_eip);
+extern int _G(in_new_room);
+extern RoomObject*_GP(objs);
 extern ViewStruct*views;
 extern CharacterCache *charcache;
-extern ObjectCache objcache[MAX_ROOM_OBJECTS];
-extern int displayed_room;
+extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
+extern int _G(displayed_room);
 extern int eip_guinum;
 extern int is_complete_overlay;
 extern int cur_mode,cur_cursor;
@@ -923,7 +923,7 @@ int sort_out_walk_behinds(Bitmap *sprit,int xx,int yy,int basel, Bitmap *copyPix
             // since we know it's 8-bit bitmap
             tmm = _GP(_GP(thisroom)).WalkBehindMask->GetScanLine(rr+yy)[ee+xx];
             if (tmm<1) continue;
-            if (croom->walkbehind_base[tmm] <= basel) continue;
+            if (_G(croom)->walkbehind_base[tmm] <= basel) continue;
 
             if (copyPixelsFrom != nullptr)
             {
@@ -1109,7 +1109,7 @@ void draw_gui_sprite(Bitmap *ds, int pic, int x, int y, bool use_alpha, BlendMod
 
 void draw_gui_sprite_v330(Bitmap *ds, int pic, int x, int y, bool use_alpha, BlendMode blend_mode)
 {
-    draw_gui_sprite(ds, pic, x, y, use_alpha && (loaded_game_file_version >= kGameVersion_330), blend_mode);
+    draw_gui_sprite(ds, pic, x, y, use_alpha && (_G(loaded_game_file_version) >= kGameVersion_330), blend_mode);
 }
 
 // function to sort the sprites into baseline order
@@ -1137,7 +1137,7 @@ void draw_sprite_list() {
             if (walkBehindBitmap[ee] != nullptr)
             {
                 add_to_sprite_list(walkBehindBitmap[ee], walkBehindLeft[ee], walkBehindTop[ee],
-                    croom->walkbehind_base[ee], 0, -1, true);
+                    _G(croom)->walkbehind_base[ee], 0, -1, true);
             }
         }
     }
@@ -1350,11 +1350,11 @@ int scale_and_flip_sprite(int useindx, int coldept, int zoom_level,
   if (zoom_level != 100) {
       // Scaled character
 
-      our_eip = 334;
+      _G(our_eip) = 334;
 
       // Ensure that anti-aliasing routines have a palette to
       // use for mapping while faded out
-      if (in_new_room)
+      if (_G(in_new_room))
           select_palette (palette);
 
 
@@ -1394,14 +1394,14 @@ int scale_and_flip_sprite(int useindx, int coldept, int zoom_level,
       else
       ->StretchBlt(_G(actsps)[useindx],_GP(spriteset)[sppic],0,0,newwidth,newheight);
       */
-      if (in_new_room)
+      if (_G(in_new_room))
           unselect_palette();
 
   } 
   else {
       // Not a scaled character, draw at normal size
 
-      our_eip = 339;
+      _G(our_eip) = 339;
 
       if (isMirrored)
           active_spr->FlipBlt(_GP(spriteset)[sppic], 0, 0, Common::kBitmap_HFlip);
@@ -1422,35 +1422,35 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
     int useindx = aa;
     bool hardwareAccelerated = !alwaysUseSoftware && _G(gfxDriver)->HasAcceleratedTransform();
 
-    if (_GP(spriteset)[objs[aa].num] == nullptr)
-        quitprintf("There was an error drawing object %d. Its current sprite, %d, is invalid.", aa, objs[aa].num);
+    if (_GP(spriteset)[_GP(objs)[aa].num] == nullptr)
+        quitprintf("There was an error drawing object %d. Its current sprite, %d, is invalid.", aa, _GP(objs)[aa].num);
 
-    int coldept = _GP(spriteset)[objs[aa].num]->GetColorDepth();
-    int sprwidth = _GP(game).SpriteInfos[objs[aa].num].Width;
-    int sprheight = _GP(game).SpriteInfos[objs[aa].num].Height;
+    int coldept = _GP(spriteset)[_GP(objs)[aa].num]->GetColorDepth();
+    int sprwidth = _GP(game).SpriteInfos[_GP(objs)[aa].num].Width;
+    int sprheight = _GP(game).SpriteInfos[_GP(objs)[aa].num].Height;
 
     int tint_red, tint_green, tint_blue;
     int tint_level, tint_light, light_level;
     int zoom_level = 100;
 
     // calculate the zoom level
-    if (objs[aa].flags & OBJF_USEROOMSCALING) {
-        int onarea = get_walkable_area_at_location(objs[aa].x, objs[aa].y);
+    if (_GP(objs)[aa].flags & OBJF_USEROOMSCALING) {
+        int onarea = get_walkable_area_at_location(_GP(objs)[aa].x, _GP(objs)[aa].y);
 
         if ((onarea <= 0) && (_GP(_GP(thisroom)).WalkAreas[0].ScalingFar == 0)) {
             // just off the edge of an area -- use the scaling we had
             // while on the area
-            zoom_level = objs[aa].last_zoom;
+            zoom_level = _GP(objs)[aa].last_zoom;
         }
         else
-            zoom_level = get_area_scaling(onarea, objs[aa].x, objs[aa].y);
+            zoom_level = get_area_scaling(onarea, _GP(objs)[aa].x, _GP(objs)[aa].y);
 
         if (zoom_level != 100)
-            scale_sprite_size(objs[aa].num, zoom_level, &sprwidth, &sprheight);
+            scale_sprite_size(_GP(objs)[aa].num, zoom_level, &sprwidth, &sprheight);
 
     }
     // save the zoom level for next time
-    objs[aa].last_zoom = zoom_level;
+    _GP(objs)[aa].last_zoom = zoom_level;
 
     // save width/height into parameters if requested
     if (drawnWidth)
@@ -1458,58 +1458,58 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
     if (drawnHeight)
         *drawnHeight = sprheight;
 
-    objs[aa].last_width = sprwidth;
-    objs[aa].last_height = sprheight;
+    _GP(objs)[aa].last_width = sprwidth;
+    _GP(objs)[aa].last_height = sprheight;
 
     tint_red = tint_green = tint_blue = tint_level = tint_light = light_level = 0;
 
-    if (objs[aa].flags & OBJF_HASTINT) {
+    if (_GP(objs)[aa].flags & OBJF_HASTINT) {
         // object specific tint, use it
-        tint_red = objs[aa].tint_r;
-        tint_green = objs[aa].tint_g;
-        tint_blue = objs[aa].tint_b;
-        tint_level = objs[aa].tint_level;
-        tint_light = objs[aa].tint_light;
+        tint_red = _GP(objs)[aa].tint_r;
+        tint_green = _GP(objs)[aa].tint_g;
+        tint_blue = _GP(objs)[aa].tint_b;
+        tint_level = _GP(objs)[aa].tint_level;
+        tint_light = _GP(objs)[aa].tint_light;
         light_level = 0;
     }
-    else if (objs[aa].flags & OBJF_HASLIGHT)
+    else if (_GP(objs)[aa].flags & OBJF_HASLIGHT)
     {
-        light_level = objs[aa].tint_light;
+        light_level = _GP(objs)[aa].tint_light;
     }
     else {
         // get the _GP(ambient) or region tint
         int ignoreRegionTints = 1;
-        if (objs[aa].flags & OBJF_USEREGIONTINTS)
+        if (_GP(objs)[aa].flags & OBJF_USEREGIONTINTS)
             ignoreRegionTints = 0;
 
-        get_local_tint(objs[aa].x, objs[aa].y, ignoreRegionTints,
+        get_local_tint(_GP(objs)[aa].x, _GP(objs)[aa].y, ignoreRegionTints,
             &tint_level, &tint_red, &tint_green, &tint_blue,
             &tint_light, &light_level);
     }
 
     // check whether the image should be flipped
     int isMirrored = 0;
-    if ( (objs[aa].view != (uint16_t)-1) &&
-        (_G(views)[objs[aa].view].loops[objs[aa].loop].frames[objs[aa].frame].pic == objs[aa].num) &&
-        ((_G(views)[objs[aa].view].loops[objs[aa].loop].frames[objs[aa].frame].flags & VFLG_FLIPSPRITE) != 0)) {
+    if ( (_GP(objs)[aa].view != (uint16_t)-1) &&
+        (_G(views)[_GP(objs)[aa].view].loops[_GP(objs)[aa].loop].frames[_GP(objs)[aa].frame].pic == _GP(objs)[aa].num) &&
+        ((_G(views)[_GP(objs)[aa].view].loops[_GP(objs)[aa].loop].frames[_GP(objs)[aa].frame].flags & VFLG_FLIPSPRITE) != 0)) {
             isMirrored = 1;
     }
 
     if ((hardwareAccelerated) &&
         (walkBehindMethod != DrawOverCharSprite) &&
-        (objcache[aa].image != nullptr) &&
-        (objcache[aa].sppic == objs[aa].num) &&
+        (_GP(objcache)[aa].image != nullptr) &&
+        (_GP(objcache)[aa].sppic == _GP(objs)[aa].num) &&
         (_G(actsps)[useindx] != nullptr))
     {
         // HW acceleration
-        objcache[aa].tintamntwas = tint_level;
-        objcache[aa].tintredwas = tint_red;
-        objcache[aa].tintgrnwas = tint_green;
-        objcache[aa].tintbluwas = tint_blue;
-        objcache[aa].tintlightwas = tint_light;
-        objcache[aa].lightlevwas = light_level;
-        objcache[aa].zoomWas = zoom_level;
-        objcache[aa].mirroredWas = isMirrored;
+        _GP(objcache)[aa].tintamntwas = tint_level;
+        _GP(objcache)[aa].tintredwas = tint_red;
+        _GP(objcache)[aa].tintgrnwas = tint_green;
+        _GP(objcache)[aa].tintbluwas = tint_blue;
+        _GP(objcache)[aa].tintlightwas = tint_light;
+        _GP(objcache)[aa].lightlevwas = light_level;
+        _GP(objcache)[aa].zoomWas = zoom_level;
+        _GP(objcache)[aa].mirroredWas = isMirrored;
 
         return 1;
     }
@@ -1518,33 +1518,33 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
     {
         // They want to draw it in software mode with the D3D driver,
         // so force a redraw
-        objcache[aa].sppic = -389538;
+        _GP(objcache)[aa].sppic = -389538;
     }
 
     // If we have the image cached, use it
-    if ((objcache[aa].image != nullptr) &&
-        (objcache[aa].sppic == objs[aa].num) &&
-        (objcache[aa].tintamntwas == tint_level) &&
-        (objcache[aa].tintlightwas == tint_light) &&
-        (objcache[aa].tintredwas == tint_red) &&
-        (objcache[aa].tintgrnwas == tint_green) &&
-        (objcache[aa].tintbluwas == tint_blue) &&
-        (objcache[aa].lightlevwas == light_level) &&
-        (objcache[aa].zoomWas == zoom_level) &&
-        (objcache[aa].mirroredWas == isMirrored)) {
+    if ((_GP(objcache)[aa].image != nullptr) &&
+        (_GP(objcache)[aa].sppic == _GP(objs)[aa].num) &&
+        (_GP(objcache)[aa].tintamntwas == tint_level) &&
+        (_GP(objcache)[aa].tintlightwas == tint_light) &&
+        (_GP(objcache)[aa].tintredwas == tint_red) &&
+        (_GP(objcache)[aa].tintgrnwas == tint_green) &&
+        (_GP(objcache)[aa].tintbluwas == tint_blue) &&
+        (_GP(objcache)[aa].lightlevwas == light_level) &&
+        (_GP(objcache)[aa].zoomWas == zoom_level) &&
+        (_GP(objcache)[aa].mirroredWas == isMirrored)) {
             // the image is the same, we can use it cached!
             if ((walkBehindMethod != DrawOverCharSprite) &&
                 (_G(actsps)[useindx] != nullptr))
                 return 1;
             // Check if the X & Y co-ords are the same, too -- if so, there
             // is scope for further optimisations
-            if ((objcache[aa].xwas == objs[aa].x) &&
-                (objcache[aa].ywas == objs[aa].y) &&
+            if ((_GP(objcache)[aa].xwas == _GP(objs)[aa].x) &&
+                (_GP(objcache)[aa].ywas == _GP(objs)[aa].y) &&
                 (_G(actsps)[useindx] != nullptr) &&
                 (walk_behind_baselines_changed == 0))
                 return 1;
             _G(actsps)[useindx] = recycle_bitmap(_G(actsps)[useindx], coldept, sprwidth, sprheight);
-            _G(actsps)[useindx]->Blit(objcache[aa].image, 0, 0, 0, 0, objcache[aa].image->GetWidth(), objcache[aa].image->GetHeight());
+            _G(actsps)[useindx]->Blit(_GP(objcache)[aa].image, 0, 0, 0, 0, _GP(objcache)[aa].image->GetWidth(), _GP(objcache)[aa].image->GetHeight());
             return 0;
     }
 
@@ -1555,18 +1555,18 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
     {
         // draw the base sprite, scaled and flipped as appropriate
         actspsUsed = scale_and_flip_sprite(useindx, coldept, zoom_level,
-            objs[aa].num, sprwidth, sprheight, isMirrored);
+            _GP(objs)[aa].num, sprwidth, sprheight, isMirrored);
     }
     else
     {
         // ensure _G(actsps) exists
-        _G(actsps)[useindx] = recycle_bitmap(_G(actsps)[useindx], coldept, _GP(game).SpriteInfos[objs[aa].num].Width, _GP(game).SpriteInfos[objs[aa].num].Height);
+        _G(actsps)[useindx] = recycle_bitmap(_G(actsps)[useindx], coldept, _GP(game).SpriteInfos[_GP(objs)[aa].num].Width, _GP(game).SpriteInfos[_GP(objs)[aa].num].Height);
     }
 
     // direct read from source bitmap, where possible
     Bitmap *comeFrom = nullptr;
     if (!actspsUsed)
-        comeFrom = _GP(spriteset)[objs[aa].num];
+        comeFrom = _GP(spriteset)[_GP(objs)[aa].num];
 
     // apply tints or lightenings where appropriate, else just copy
     // the source bitmap
@@ -1577,22 +1577,22 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
             comeFrom);
     }
     else if (!actspsUsed) {
-        _G(actsps)[useindx]->Blit(_GP(spriteset)[objs[aa].num],0,0,0,0,_GP(game).SpriteInfos[objs[aa].num].Width, _GP(game).SpriteInfos[objs[aa].num].Height);
+        _G(actsps)[useindx]->Blit(_GP(spriteset)[_GP(objs)[aa].num],0,0,0,0,_GP(game).SpriteInfos[_GP(objs)[aa].num].Width, _GP(game).SpriteInfos[_GP(objs)[aa].num].Height);
     }
 
     // Re-use the bitmap if it's the same size
-    objcache[aa].image = recycle_bitmap(objcache[aa].image, coldept, sprwidth, sprheight);
+    _GP(objcache)[aa].image = recycle_bitmap(_GP(objcache)[aa].image, coldept, sprwidth, sprheight);
     // Create the cached image and store it
-    objcache[aa].image->Blit(_G(actsps)[useindx], 0, 0, 0, 0, sprwidth, sprheight);
-    objcache[aa].sppic = objs[aa].num;
-    objcache[aa].tintamntwas = tint_level;
-    objcache[aa].tintredwas = tint_red;
-    objcache[aa].tintgrnwas = tint_green;
-    objcache[aa].tintbluwas = tint_blue;
-    objcache[aa].tintlightwas = tint_light;
-    objcache[aa].lightlevwas = light_level;
-    objcache[aa].zoomWas = zoom_level;
-    objcache[aa].mirroredWas = isMirrored;
+    _GP(objcache)[aa].image->Blit(_G(actsps)[useindx], 0, 0, 0, 0, sprwidth, sprheight);
+    _GP(objcache)[aa].sppic = _GP(objs)[aa].num;
+    _GP(objcache)[aa].tintamntwas = tint_level;
+    _GP(objcache)[aa].tintredwas = tint_red;
+    _GP(objcache)[aa].tintgrnwas = tint_green;
+    _GP(objcache)[aa].tintbluwas = tint_blue;
+    _GP(objcache)[aa].tintlightwas = tint_light;
+    _GP(objcache)[aa].lightlevwas = light_level;
+    _GP(objcache)[aa].zoomWas = zoom_level;
+    _GP(objcache)[aa].mirroredWas = isMirrored;
     return 0;
 }
 
@@ -1602,12 +1602,12 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
 // This is only called from draw_screen_background, but it's seperated
 // to help with profiling the program
 void prepare_objects_for_drawing() {
-    our_eip=32;
+    _G(our_eip)=32;
 
-    for (int aa=0; aa<croom->numobj; aa++) {
-        if (objs[aa].on != 1) continue;
+    for (int aa=0; aa<_G(croom)->numobj; aa++) {
+        if (_GP(objs)[aa].on != 1) continue;
         // offscreen, don't draw
-        if ((objs[aa].x >= _GP(_GP(thisroom)).Width) || (objs[aa].y < 1))
+        if ((_GP(objs)[aa].x >= _GP(_GP(thisroom)).Width) || (_GP(objs)[aa].y < 1))
             continue;
 
         const int useindx = aa;
@@ -1615,14 +1615,14 @@ void prepare_objects_for_drawing() {
         int actspsIntact = construct_object_gfx(aa, nullptr, &tehHeight, false);
 
         // update the cache for next time
-        objcache[aa].xwas = objs[aa].x;
-        objcache[aa].ywas = objs[aa].y;
-        int atxp = data_to_game_coord(objs[aa].x);
-        int atyp = data_to_game_coord(objs[aa].y) - tehHeight;
+        _GP(objcache)[aa].xwas = _GP(objs)[aa].x;
+        _GP(objcache)[aa].ywas = _GP(objs)[aa].y;
+        int atxp = data_to_game_coord(_GP(objs)[aa].x);
+        int atyp = data_to_game_coord(_GP(objs)[aa].y) - tehHeight;
 
-        int usebasel = objs[aa].get_baseline();
+        int usebasel = _GP(objs)[aa].get_baseline();
 
-        if (objs[aa].flags & OBJF_NOWALKBEHINDS) {
+        if (_GP(objs)[aa].flags & OBJF_NOWALKBEHINDS) {
             // ignore walk-behinds, do nothing
             if (walkBehindMethod == DrawAsSeparateSprite)
             {
@@ -1631,7 +1631,7 @@ void prepare_objects_for_drawing() {
         }
         else if (walkBehindMethod == DrawAsSeparateCharSprite) 
         {
-            sort_out_char_sprite_walk_behind(useindx, atxp, atyp, usebasel, objs[aa].last_zoom, objs[aa].last_width, objs[aa].last_height);
+            sort_out_char_sprite_walk_behind(useindx, atxp, atyp, usebasel, _GP(objs)[aa].last_zoom, _GP(objs)[aa].last_width, _GP(objs)[aa].last_height);
         }
         else if ((!actspsIntact) && (walkBehindMethod == DrawOverCharSprite))
         {
@@ -1640,7 +1640,7 @@ void prepare_objects_for_drawing() {
 
         if ((!actspsIntact) || (_G(actspsbmp)[useindx] == nullptr))
         {
-            bool hasAlpha = (_GP(game).SpriteInfos[objs[aa].num].Flags & SPF_ALPHACHANNEL) != 0;
+            bool hasAlpha = (_GP(game).SpriteInfos[_GP(objs)[aa].num].Flags & SPF_ALPHACHANNEL) != 0;
 
             if (_G(actspsbmp)[useindx] != nullptr)
                 _G(gfxDriver)->DestroyDDB(_G(actspsbmp)[useindx]);
@@ -1649,26 +1649,26 @@ void prepare_objects_for_drawing() {
 
         if (_G(gfxDriver)->HasAcceleratedTransform())
         {
-            _G(actspsbmp)[useindx]->SetFlippedLeftRight(objcache[aa].mirroredWas != 0);
-            _G(actspsbmp)[useindx]->SetStretch(objs[aa].last_width, objs[aa].last_height);
-            _G(actspsbmp)[useindx]->SetTint(objcache[aa].tintredwas, objcache[aa].tintgrnwas, objcache[aa].tintbluwas, (objcache[aa].tintamntwas * 256) / 100);
+            _G(actspsbmp)[useindx]->SetFlippedLeftRight(_GP(objcache)[aa].mirroredWas != 0);
+            _G(actspsbmp)[useindx]->SetStretch(_GP(objs)[aa].last_width, _GP(objs)[aa].last_height);
+            _G(actspsbmp)[useindx]->SetTint(_GP(objcache)[aa].tintredwas, _GP(objcache)[aa].tintgrnwas, _GP(objcache)[aa].tintbluwas, (_GP(objcache)[aa].tintamntwas * 256) / 100);
 
-            if (objcache[aa].tintamntwas > 0)
+            if (_GP(objcache)[aa].tintamntwas > 0)
             {
-                if (objcache[aa].tintlightwas == 0)  // luminance of 0 -- pass 1 to enable
+                if (_GP(objcache)[aa].tintlightwas == 0)  // luminance of 0 -- pass 1 to enable
                     _G(actspsbmp)[useindx]->SetLightLevel(1);
-                else if (objcache[aa].tintlightwas < 250)
-                    _G(actspsbmp)[useindx]->SetLightLevel(objcache[aa].tintlightwas);
+                else if (_GP(objcache)[aa].tintlightwas < 250)
+                    _G(actspsbmp)[useindx]->SetLightLevel(_GP(objcache)[aa].tintlightwas);
                 else
                     _G(actspsbmp)[useindx]->SetLightLevel(0);
             }
-            else if (objcache[aa].lightlevwas != 0)
-                _G(actspsbmp)[useindx]->SetLightLevel((objcache[aa].lightlevwas * 25) / 10 + 256);
+            else if (_GP(objcache)[aa].lightlevwas != 0)
+                _G(actspsbmp)[useindx]->SetLightLevel((_GP(objcache)[aa].lightlevwas * 25) / 10 + 256);
             else
                 _G(actspsbmp)[useindx]->SetLightLevel(0);
         }
 
-        add_to_sprite_list(_G(actspsbmp)[useindx], atxp, atyp, usebasel, objs[aa].transparent,objs[aa].num);
+        add_to_sprite_list(_G(actspsbmp)[useindx], atxp, atyp, usebasel, _GP(objs)[aa].transparent,_GP(objs)[aa].num);
     }
 }
 
@@ -1726,21 +1726,21 @@ void prepare_characters_for_drawing() {
     int light_level,coldept;
     int tint_red, tint_green, tint_blue, tint_amount, tint_light = 255;
 
-    our_eip=33;
+    _G(our_eip)=33;
 
     // draw characters
     for (int aa=0; aa < _GP(game).numcharacters; aa++) {
         if (_GP(game).chars[aa].on==0) continue;
-        if (_GP(game).chars[aa].room!=displayed_room) continue;
+        if (_GP(game).chars[aa].room!=_G(displayed_room)) continue;
         eip_guinum = aa;
         const int useindx = aa + MAX_ROOM_OBJECTS;
 
         CharacterInfo*chin=&_GP(game).chars[aa];
-        our_eip = 330;
+        _G(our_eip) = 330;
         // if it's on but set to view -1, they're being silly
         if (chin->view < 0) {
             quitprintf("!The character '%s' was turned on in the current room (room %d) but has not been assigned a view number.",
-                chin->name, displayed_room);
+                chin->name, _G(displayed_room));
         }
 
         if (chin->frame >= _G(views)[chin->view].loops[chin->loop].numFrames)
@@ -1755,10 +1755,10 @@ void prepare_characters_for_drawing() {
         sppic=_G(views)[chin->view].loops[chin->loop].frames[chin->frame].pic;
         if (sppic < 0)
             sppic = 0;  // in case it's screwed up somehow
-        our_eip = 331;
+        _G(our_eip) = 331;
         // sort out the stretching if required
         onarea = get_walkable_area_at_character (aa);
-        our_eip = 332;
+        _G(our_eip) = 332;
 
         if (chin->flags & CHF_MANUALSCALING)  // character ignores scaling
             zoom_level = _G(charextra)[aa].zoom;
@@ -1793,7 +1793,7 @@ void prepare_characters_for_drawing() {
                 &tint_light, &light_level);
         }
 
-        our_eip = 3330;
+        _G(our_eip) = 3330;
         int isMirrored = 0, specialpic = sppic;
         bool usingCachedImage = false;
 
@@ -1806,7 +1806,7 @@ void prepare_characters_for_drawing() {
             specialpic = -sppic;
         }
 
-        our_eip = 3331;
+        _G(our_eip) = 3331;
 
         // if the character was the same sprite and scaling last time,
         // just use the cached image
@@ -1841,7 +1841,7 @@ void prepare_characters_for_drawing() {
             charcache[aa].inUse = 0;
         }
 
-        our_eip = 3332;
+        _G(our_eip) = 3332;
 
         if (zoom_level != 100) {
             // it needs to be stretched, so calculate the new dimensions
@@ -1859,7 +1859,7 @@ void prepare_characters_for_drawing() {
             newheight = _GP(game).SpriteInfos[sppic].Height;
         }
 
-        our_eip = 3336;
+        _G(our_eip) = 3336;
 
         // Calculate the X & Y co-ordinates of where the sprite will be
         const int atxp =(data_to_game_coord(chin->x)) - newwidth/2;
@@ -1894,7 +1894,7 @@ void prepare_characters_for_drawing() {
                 _G(actsps)[useindx] = recycle_bitmap(_G(actsps)[useindx], coldept, _GP(game).SpriteInfos[sppic].Width, _GP(game).SpriteInfos[sppic].Height);
             }
 
-            our_eip = 335;
+            _G(our_eip) = 335;
 
             if (((light_level != 0) || (tint_amount != 0)) &&
                 (!_G(gfxDriver)->HasAcceleratedTransform())) {
@@ -1923,7 +1923,7 @@ void prepare_characters_for_drawing() {
 
         int usebasel = chin->get_baseline();
 
-        our_eip = 336;
+        _G(our_eip) = 336;
 
         const int bgX = atxp + chin->pic_xoffs;
         const int bgY = atyp + chin->pic_yoffs;
@@ -1973,7 +1973,7 @@ void prepare_characters_for_drawing() {
 
         }
 
-        our_eip = 337;
+        _G(our_eip) = 337;
 
         chin->actx = atxp;
         chin->acty = atyp;
@@ -2021,11 +2021,11 @@ void prepare_room_sprites()
 
         if ((_G(debug_flags) & DBG_NODRAWSPRITES) == 0)
         {
-            our_eip = 34;
+            _G(our_eip) = 34;
             draw_sprite_list();
         }
     }
-    our_eip = 36;
+    _G(our_eip) = 36;
 }
 
 // Draws the black surface behind (or rather between) the room viewports
@@ -2045,7 +2045,7 @@ void draw_preroom_background()
 // whatsoever.
 PBitmap draw_room_background(Viewport *view, const SpriteTransform &room_trans)
 {
-    our_eip = 31;
+    _G(our_eip) = 31;
 
     // For the sake of software renderer, if there is any kind of camera transform required
     // except screen offset, we tell it to draw on separate bitmap first with zero transformation.
@@ -2095,7 +2095,7 @@ void draw_fps(const Rect &viewport)
 
     char base_buffer[20];
     if (!isTimerFpsMaxed()) {
-        sprintf(base_buffer, "%d", frames_per_second);
+        sprintf(base_buffer, "%d", _G(frames_per_second));
     } else {
         sprintf(base_buffer, "unlimited");
     }
@@ -2144,8 +2144,8 @@ void draw_gui_and_overlays()
 
     // Draw GUIs - they should always be on top of overlays like
     // speech background text
-    our_eip=35;
-    if (((_G(debug_flags) & DBG_NOIFACE)==0) && (displayed_room >= 0)) {
+    _G(our_eip)=35;
+    if (((_G(debug_flags) & DBG_NOIFACE)==0) && (_G(displayed_room) >= 0)) {
         int aa;
 
         if (_G(_G(playerchar))->activeinv >= MAX_INV) {
@@ -2154,7 +2154,7 @@ void draw_gui_and_overlays()
         }
         if (_G(_G(playerchar))->activeinv < 1) gui_inv_pic=-1;
         else gui_inv_pic=_GP(game).invinfo[_G(_G(playerchar))->activeinv].pic;
-        our_eip = 37;
+        _G(our_eip) = 37;
         {
             for (aa=0;aa<_GP(game).numgui;aa++) {
                 if (!_GP(guis)[aa].IsDisplayed()) continue;
@@ -2166,11 +2166,11 @@ void draw_gui_and_overlays()
                     recreate_guibg_image(&_GP(guis)[aa]);
 
                 eip_guinum = aa;
-                our_eip = 370;
+                _G(our_eip) = 370;
                 _G(guibg)[aa]->ClearTransparent();
-                our_eip = 372;
+                _G(our_eip) = 372;
                 _GP(guis)[aa].DrawAt(_G(guibg)[aa], 0,0);
-                our_eip = 373;
+                _G(our_eip) = 373;
 
                 bool isAlpha = false;
                 if (_GP(guis)[aa].HasAlphaChannel()) 
@@ -2192,10 +2192,10 @@ void draw_gui_and_overlays()
                 {
                     _G(guibgbmp)[aa] = _G(gfxDriver)->CreateDDBFromBitmap(_G(guibg)[aa], isAlpha);
                 }
-                our_eip = 374;
+                _G(our_eip) = 374;
             }
         }
-        our_eip = 38;
+        _G(our_eip) = 38;
         // Draw the GUIs
         for (gg = 0; gg < _GP(game).numgui; gg++) {
             aa = _GP(play).gui_draw_order[gg];
@@ -2228,7 +2228,7 @@ void draw_gui_and_overlays()
         }
     }
 
-    our_eip = 1099;
+    _G(our_eip) = 1099;
 }
 
 // Push the gathered list of sprites into the active graphic renderer
@@ -2270,12 +2270,12 @@ void put_sprite_list_on_screen(bool in_room)
             quit("Unknown entry in draw list");
     }
 
-    our_eip = 1100;
+    _G(our_eip) = 1100;
 }
 
 bool GfxDriverNullSpriteCallback(int x, int y)
 {
-    if (displayed_room < 0)
+    if (_G(displayed_room) < 0)
     {
         // if no room loaded, various stuff won't be initialized yet
         return 1;
@@ -2356,13 +2356,13 @@ void construct_game_scene(bool full_redraw)
     if (_GP(play).fast_forward)
         return;
 
-    our_eip=3;
+    _G(our_eip)=3;
 
     // React to changes to viewports and cameras (possibly from script) just before the render
     _GP(play).UpdateViewports();
 
     _G(gfxDriver)->UseSmoothScaling(IS_ANTIALIAS_SPRITES);
-    _G(gfxDriver)->RenderSpritesAtScreenResolution(usetup.RenderAtScreenRes, usetup.Supersampling);
+    _G(gfxDriver)->RenderSpritesAtScreenResolution(_GP(usetup).RenderAtScreenRes, _GP(usetup).Supersampling);
 
     pl_run_plugin_hooks(AGSE_PRERENDER, 0);
 
@@ -2372,13 +2372,13 @@ void construct_game_scene(bool full_redraw)
 
     // TODO: move to game update! don't call update during rendering pass!
     // IMPORTANT: keep the order same because sometimes script may depend on it
-    if (displayed_room >= 0)
+    if (_G(displayed_room) >= 0)
         _GP(play).UpdateRoomCameras();
 
     // Stage: room viewports
     if (_GP(play).screen_is_faded_out == 0 && is_complete_overlay == 0)
     {
-        if (displayed_room >= 0)
+        if (_G(displayed_room) >= 0)
         {
             construct_room_view();
             update_polled_mp3();
@@ -2391,7 +2391,7 @@ void construct_game_scene(bool full_redraw)
         }
     }
 
-    our_eip=4;
+    _G(our_eip)=4;
 
     // Stage: UI overlay
     if (_GP(play).screen_is_faded_out == 0)
@@ -2522,14 +2522,14 @@ void render_graphics(IDriverDependantBitmap *extraBitmap, int extraX, int extraY
         return;
     // Don't render if we've just entered new room and are before fade-in
     // TODO: find out why this is not skipped for 8-bit games
-    if ((in_new_room > 0) & (_GP(game).color_depth > 1))
+    if ((_G(in_new_room) > 0) & (_GP(game).color_depth > 1))
         return;
 
     // TODO: find out if it's okay to move shake to update function
     update_shakescreen();
 
     construct_game_scene(false);
-    our_eip=5;
+    _G(our_eip)=5;
     // NOTE: extraBitmap will always be drawn with the UI render stage
     if (extraBitmap != nullptr)
     {

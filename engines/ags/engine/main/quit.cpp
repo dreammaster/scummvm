@@ -60,10 +60,10 @@ using namespace AGS::Engine;
 extern SpriteCache _GP(spriteset);
 
 extern RoomStatus _GP(troom);    // used for non-saveable rooms, eg. intro
-extern int our_eip;
-extern GameSetup usetup;
-extern char pexbuf[STD_BUFFER_SIZE];
-extern int proper_exit;
+extern int _G(our_eip);
+extern GameSetup _GP(usetup);
+extern char _G(pexbuf)[STD_BUFFER_SIZE];
+extern int _G(proper_exit);
 extern char _G(check_dynamic_sprites_at_exit);
 extern int _G(editor_debugging_initialized);
 extern IAGSEditorDebugger *_G(editor_debugger);
@@ -108,7 +108,7 @@ void quit_shutdown_platform(QuitReason qreason) {
 	sys_window_lock_mouse(false);
 	platform->AboutToQuitGame();
 
-	our_eip = 9016;
+	_G(our_eip) = 9016;
 
 	pl_stop_plugins();
 
@@ -119,7 +119,7 @@ void quit_shutdown_platform(QuitReason qreason) {
 }
 
 void quit_shutdown_audio() {
-	our_eip = 9917;
+	_G(our_eip) = 9917;
 	_GP(game).options[OPT_CROSSFADEMUSIC] = 0;
 	shutdown_sound();
 }
@@ -172,8 +172,8 @@ void quit_message_on_exit(const char *qmsg, String &alertis, QuitReason qreason)
 	// if it is empty).
 	if ((qreason & kQuitKind_NormalExit) == 0 && !handledErrorInEditor) {
 		// Display the message (at this point the window still exists)
-		sprintf(pexbuf, "%s\n", qmsg);
-		alertis.Append(pexbuf);
+		sprintf(_G(pexbuf), "%s\n", qmsg);
+		alertis.Append(_G(pexbuf));
 		platform->DisplayAlert("%s", alertis.GetCStr());
 	}
 }
@@ -234,32 +234,32 @@ void quit(const char *quitmsg) {
 
 	quit_tell_editor_debugger(qmsg, qreason);
 
-	our_eip = 9900;
+	_G(our_eip) = 9900;
 
 	quit_stop_cd();
 
-	our_eip = 9020;
+	_G(our_eip) = 9020;
 
 	quit_shutdown_scripts();
 
 	quit_shutdown_platform(qreason);
 
-	our_eip = 9019;
+	_G(our_eip) = 9019;
 
 	quit_shutdown_audio();
 
-	our_eip = 9901;
+	_G(our_eip) = 9901;
 
 	shutdown_font_renderer();
-	our_eip = 9902;
+	_G(our_eip) = 9902;
 
 	_GP(spriteset).Reset();
 
-	our_eip = 9907;
+	_G(our_eip) = 9907;
 
 	close_translation();
 
-	our_eip = 9908;
+	_G(our_eip) = 9908;
 
 	shutdown_pathfinder();
 
@@ -277,17 +277,17 @@ void quit(const char *quitmsg) {
 
 	platform->PostBackendExit();
 
-	our_eip = 9903;
+	_G(our_eip) = 9903;
 
 	quit_delete_temp_files();
 
-	proper_exit = 1;
+	_G(proper_exit) = 1;
 
 	Debug::Printf(kDbgMsg_Alert, "***** ENGINE HAS SHUTDOWN");
 
 	shutdown_debug();
 
-	our_eip = 9904;
+	_G(our_eip) = 9904;
 	exit(EXIT_NORMAL);
 }
 

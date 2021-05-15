@@ -43,7 +43,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern RoomStatus *croom;
+extern RoomStatus *_G(croom);
 
 
 
@@ -51,14 +51,14 @@ extern RoomStatus *croom;
 void DisableHotspot(int hsnum) {
 	if ((hsnum < 1) | (hsnum >= MAX_ROOM_HOTSPOTS))
 		quit("!DisableHotspot: invalid hotspot specified");
-	croom->hotspot_enabled[hsnum] = 0;
+	_G(croom)->hotspot_enabled[hsnum] = 0;
 	debug_script_log("Hotspot %d disabled", hsnum);
 }
 
 void EnableHotspot(int hsnum) {
 	if ((hsnum < 1) | (hsnum >= MAX_ROOM_HOTSPOTS))
 		quit("!EnableHotspot: invalid hotspot specified");
-	croom->hotspot_enabled[hsnum] = 1;
+	_G(croom)->hotspot_enabled[hsnum] = 1;
 	debug_script_log("Hotspot %d re-enabled", hsnum);
 }
 
@@ -135,14 +135,14 @@ void RunHotspotInteraction(int hotspothere, int mood) {
 		run_interaction_script(_GP(_GP(thisroom)).Hotspots[hotspothere].EventHandlers.get(), 5);  // any click on hotspot
 	} else {
 		if (passon >= 0) {
-			if (run_interaction_event(&croom->intrHotspot[hotspothere], passon, 5, (passon == 3))) {
+			if (run_interaction_event(&_G(croom)->intrHotspot[hotspothere], passon, 5, (passon == 3))) {
 				_G(evblockbasename) = oldbasename;
 				_G(evblocknum) = oldblocknum;
 				return;
 			}
 		}
 		// run the 'any click on hs' event
-		run_interaction_event(&croom->intrHotspot[hotspothere], 5);
+		run_interaction_event(&_G(croom)->intrHotspot[hotspothere], 5);
 	}
 
 	_G(evblockbasename) = oldbasename;
@@ -150,11 +150,11 @@ void RunHotspotInteraction(int hotspothere, int mood) {
 }
 
 int GetHotspotProperty(int hss, const char *property) {
-	return get_int_property(_GP(_GP(thisroom)).Hotspots[hss].Properties, croom->hsProps[hss], property);
+	return get_int_property(_GP(_GP(thisroom)).Hotspots[hss].Properties, _G(croom)->hsProps[hss], property);
 }
 
 void GetHotspotPropertyText(int item, const char *property, char *bufer) {
-	get_text_property(_GP(_GP(thisroom)).Hotspots[item].Properties, croom->hsProps[item], property, bufer);
+	get_text_property(_GP(_GP(thisroom)).Hotspots[item].Properties, _G(croom)->hsProps[item], property, bufer);
 }
 
 } // namespace AGS3

@@ -51,7 +51,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern int proper_exit;
+extern int _G(proper_exit);
 extern AGSPlatformDriver *platform;
 extern IGraphicsDriver *_G(gfxDriver);
 
@@ -421,7 +421,7 @@ bool simple_create_gfx_driver_and_init_mode(const String &gfx_driver_id,
 
 
 void display_gfx_mode_error(const Size &game_size, const ScreenSetup &setup, const int color_depth) {
-	proper_exit = 1;
+	_G(proper_exit) = 1;
 
 	String main_error;
 	ScreenSizeSetup scsz = setup.DisplayMode.ScreenSize;

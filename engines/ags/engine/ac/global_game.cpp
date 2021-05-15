@@ -76,18 +76,18 @@ using namespace AGS::Shared;
 
 
 extern ExecutingScript *curscript;
-extern int displayed_room;
-extern int game_paused;
+extern int _G(displayed_room);
+extern int _G(game_paused);
 extern SpriteCache _GP(spriteset);
-extern GameSetup usetup;
-extern unsigned int load_new_game;
-extern int load_new_game_restore;
+extern GameSetup _GP(usetup);
+extern unsigned int _G(load_new_game);
+extern int _G(load_new_game_restore);
 
 
-extern RoomStatus *croom;
+extern RoomStatus *_G(croom);
 extern int gui_disabled_style;
 
-extern int getloctype_index;
+extern int _G(getloctype_index);
 extern IGraphicsDriver *_G(gfxDriver);
 extern RGB palette[256];
 
@@ -115,7 +115,7 @@ void restart_game() {
 }
 
 void RestoreGameSlot(int slnum) {
-	if (displayed_room < 0)
+	if (_G(displayed_room) < 0)
 		quit("!RestoreGameSlot: a game cannot be restored from within game_start");
 
 	can_run_delayed_command();
@@ -145,18 +145,18 @@ void DeleteSaveSlot(int slnum) {
 }
 
 void PauseGame() {
-	game_paused++;
+	_G(game_paused)++;
 	debug_script_log("Game paused");
 }
 void UnPauseGame() {
-	if (game_paused > 0)
-		game_paused--;
-	debug_script_log("Game UnPaused, pause level now %d", game_paused);
+	if (_G(game_paused) > 0)
+		_G(game_paused)--;
+	debug_script_log("Game UnPaused, pause level now %d", _G(game_paused));
 }
 
 
 int IsGamePaused() {
-	if (game_paused > 0) return 1;
+	if (_G(game_paused) > 0) return 1;
 	return 0;
 }
 
@@ -278,13 +278,13 @@ int RunAGSGame(const char *newgame, unsigned int mode, int data) {
 		_GP(ResPaths).GamePak.Path = PathFromInstallDir(newgame);
 		_GP(ResPaths).GamePak.Name = newgame;
 		_GP(play).takeover_data = data;
-		load_new_game_restore = -1;
+		_G(load_new_game_restore) = -1;
 
 		if (inside_script) {
 			curscript->queue_action(ePSARunAGSGame, mode | RAGMODE_LOADNOW, "RunAGSGame");
 			ccInstance::GetCurrentInstance()->Abort();
 		} else
-			load_new_game = mode | RAGMODE_LOADNOW;
+			_G(load_new_game) = mode | RAGMODE_LOADNOW;
 
 		return 0;
 	}
@@ -292,7 +292,7 @@ int RunAGSGame(const char *newgame, unsigned int mode, int data) {
 	int ee;
 
 	unload_old_room();
-	displayed_room = -10;
+	_G(displayed_room) = -10;
 
 #if defined (AGS_AUTO_WRITE_USER_CONFIG)
 	save_config_file(); // save current user config in case engine fails to run new game
@@ -300,7 +300,7 @@ int RunAGSGame(const char *newgame, unsigned int mode, int data) {
 	unload_game_file();
 
 	// Adjust config (NOTE: normally, RunAGSGame would need a redesign to allow separate config etc per each game)
-	usetup.translation = ""; // reset to default, prevent from trying translation file of game A in game B
+	_GP(usetup).translation = ""; // reset to default, prevent from trying translation file of game A in game B
 
 	AssetMgr->RemoveAllLibraries();
 
@@ -329,9 +329,9 @@ int RunAGSGame(const char *newgame, unsigned int mode, int data) {
 	engine_init_game_settings();
 	_GP(play).screen_is_faded_out = 1;
 
-	if (load_new_game_restore >= 0) {
-		try_restore_save(load_new_game_restore);
-		load_new_game_restore = -1;
+	if (_G(load_new_game_restore) >= 0) {
+		try_restore_save(_G(load_new_game_restore));
+		_G(load_new_game_restore) = -1;
 	} else
 		start_game();
 
@@ -381,7 +381,7 @@ int GetGameParameter(int parm, int data1, int data2, int data3) {
 	case GP_NUMGUIS:
 		return _GP(game).numgui;
 	case GP_NUMOBJECTS:
-		return croom->numobj;
+		return _G(croom)->numobj;
 	case GP_NUMCHARACTERS:
 		return _GP(game).numcharacters;
 	case GP_NUMINVITEMS:
@@ -472,7 +472,7 @@ int GetGameOption(int opt) {
 void SkipUntilCharacterStops(int cc) {
 	if (!is_valid_character(cc))
 		quit("!SkipUntilCharacterStops: invalid character specified");
-	if (_GP(game).chars[cc].room != displayed_room)
+	if (_GP(game).chars[cc].room != _G(displayed_room))
 		quit("!SkipUntilCharacterStops: specified character not in current room");
 
 	// if they are not currently moving, do nothing
@@ -564,7 +564,7 @@ void SaveCursorForLocationChange() {
 }
 
 void GetLocationName(int xxx, int yyy, char *tempo) {
-	if (displayed_room < 0)
+	if (_G(displayed_room) < 0)
 		quit("!GetLocationName: no room has been loaded");
 
 	VALIDATE_STRING(tempo);
@@ -606,7 +606,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 
 	// on character
 	if (loctype == LOCTYPE_CHAR) {
-		onhs = getloctype_index;
+		onhs = _G(getloctype_index);
 		strcpy(tempo, get_translation(_GP(game).chars[onhs].name));
 		if (_GP(play).get_loc_name_last_time != 2000 + onhs)
 			GUI::MarkSpecialLabelsForUpdate(kLabelMacro_Overhotspot);
@@ -615,7 +615,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 	}
 	// on object
 	if (loctype == LOCTYPE_OBJ) {
-		aa = getloctype_index;
+		aa = _G(getloctype_index);
 		strcpy(tempo, get_translation(_GP(_GP(thisroom)).Objects[aa].Name));
 		// Compatibility: < 3.1.1 games returned space for nameless object
 		// (presumably was a bug, but fixing it affected certain games behavior)
@@ -628,7 +628,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 		_GP(play).get_loc_name_last_time = 3000 + aa;
 		return;
 	}
-	onhs = getloctype_index;
+	onhs = _G(getloctype_index);
 	if (onhs > 0) strcpy(tempo, get_translation(_GP(_GP(thisroom)).Hotspots[onhs].Name));
 	if (_GP(play).get_loc_name_last_time != onhs)
 		GUI::MarkSpecialLabelsForUpdate(kLabelMacro_Overhotspot);
@@ -666,8 +666,8 @@ void SetMultitasking(int mode) {
 	if ((mode < 0) | (mode > 1))
 		quit("!SetMultitasking: invalid mode parameter");
 
-	if (usetup.override_multitasking >= 0) {
-		mode = usetup.override_multitasking;
+	if (_GP(usetup).override_multitasking >= 0) {
+		mode = _GP(usetup).override_multitasking;
 	}
 
 	// Don't allow background running if full screen
@@ -684,10 +684,10 @@ void SetMultitasking(int mode) {
 	}
 }
 
-extern int getloctype_throughgui, getloctype_index;
+extern int _G(getloctype_throughgui), _G(getloctype_index);
 
 void RoomProcessClick(int xx, int yy, int mood) {
-	getloctype_throughgui = 1;
+	_G(getloctype_throughgui) = 1;
 	int loctype = GetLocationType(xx, yy);
 	VpPoint vpt = _GP(play).ScreenToRoomDivDown(xx, yy);
 	if (vpt.second < 0)
@@ -712,7 +712,7 @@ void RoomProcessClick(int xx, int yy, int mood) {
 
 	if (loctype == 0) {
 		// click on nothing -> hotspot 0
-		getloctype_index = 0;
+		_G(getloctype_index) = 0;
 		loctype = LOCTYPE_HOTSPOT;
 	}
 
@@ -721,11 +721,11 @@ void RoomProcessClick(int xx, int yy, int mood) {
 	} else if (loctype == LOCTYPE_OBJ) {
 		if (check_click_on_object(xx, yy, mood)) return;
 	} else if (loctype == LOCTYPE_HOTSPOT)
-		RunHotspotInteraction(getloctype_index, mood);
+		RunHotspotInteraction(_G(getloctype_index), mood);
 }
 
 int IsInteractionAvailable(int xx, int yy, int mood) {
-	getloctype_throughgui = 1;
+	_G(getloctype_throughgui) = 1;
 	int loctype = GetLocationType(xx, yy);
 	VpPoint vpt = _GP(play).ScreenToRoomDivDown(xx, yy);
 	if (vpt.second < 0)
@@ -741,7 +741,7 @@ int IsInteractionAvailable(int xx, int yy, int mood) {
 
 	if (loctype == 0) {
 		// click on nothing -> hotspot 0
-		getloctype_index = 0;
+		_G(getloctype_index) = 0;
 		loctype = LOCTYPE_HOTSPOT;
 	}
 
@@ -750,7 +750,7 @@ int IsInteractionAvailable(int xx, int yy, int mood) {
 	} else if (loctype == LOCTYPE_OBJ) {
 		check_click_on_object(xx, yy, mood);
 	} else if (loctype == LOCTYPE_HOTSPOT)
-		RunHotspotInteraction(getloctype_index, mood);
+		RunHotspotInteraction(_G(getloctype_index), mood);
 
 	int ciwas = _GP(play).check_interaction_only;
 	_GP(play).check_interaction_only = 0;

@@ -60,10 +60,10 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 extern char _G(check_dynamic_sprites_at_exit);
-extern int displayed_room;
+extern int _G(displayed_room);
 
-extern char pexbuf[STD_BUFFER_SIZE];
-extern volatile char want_exit, abort_engine;
+extern char _G(pexbuf)[STD_BUFFER_SIZE];
+extern volatile char _G(want_exit), abort_engine;
 
 
 
@@ -299,7 +299,7 @@ void debug_script_print(const String &msg, MessageType mt) {
 		script_ref.Format("[%s%d]", scriptname.GetCStr(), _G(currentline));
 	}
 
-	Debug::Printf(kDbgGroup_Game, mt, "(room:%d)%s %s", displayed_room, script_ref.GetCStr(), msg.GetCStr());
+	Debug::Printf(kDbgGroup_Game, mt, "(room:%d)%s %s", _G(displayed_room), script_ref.GetCStr(), msg.GetCStr());
 }
 
 void debug_script_warn(const char *msg, ...) {
@@ -460,7 +460,7 @@ int check_for_messages_from_editor() {
 			_G(game_paused_in_debugger) = 0;
 			_G(break_on_next_script_step) = 1;
 		} else if (strncmp(msgPtr, "EXIT", 4) == 0) {
-			want_exit = 1;
+			_G(want_exit) = 1;
 			abort_engine = 1;
 			_G(check_dynamic_sprites_at_exit) = 0;
 		}
@@ -477,7 +477,7 @@ int check_for_messages_from_editor() {
 
 bool send_exception_to_editor(const char *qmsg) {
 #if AGS_PLATFORM_OS_WINDOWS
-	want_exit = 0;
+	_G(want_exit) = 0;
 	// allow the editor to break with the error message
 	if (editor_window_handle != NULL)
 		SetForegroundWindow(editor_window_handle);
@@ -485,7 +485,7 @@ bool send_exception_to_editor(const char *qmsg) {
 	if (!send_message_to_editor("ERROR", qmsg))
 		return false;
 
-	while ((check_for_messages_from_editor() == 0) && (want_exit == 0)) {
+	while ((check_for_messages_from_editor() == 0) && (_G(want_exit) == 0)) {
 		platform->Delay(10);
 	}
 #endif

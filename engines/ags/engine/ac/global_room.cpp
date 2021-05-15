@@ -45,13 +45,13 @@ using namespace Shared;
 
 
 
-extern RoomStatus *croom;
+extern RoomStatus *_G(croom);
 
-extern int displayed_room;
+extern int _G(displayed_room);
 extern int _G(in_enters_screen);
 extern int _G(in_leaves_screen);
 extern int in_inv_screen, inv_screen_newroom;
-extern MoveList *mls;
+
 extern int gs_to_newroom;
 
 
@@ -85,7 +85,7 @@ void NewRoom(int nrnum) {
 	if (nrnum < 0)
 		quitprintf("!NewRoom: room change requested to invalid room number %d.", nrnum);
 
-	if (displayed_room < 0) {
+	if (_G(displayed_room) < 0) {
 		// called from game_start; change the room where the game will start
 		_G(_G(playerchar))->room = nrnum;
 		return;
@@ -129,7 +129,7 @@ void NewRoom(int nrnum) {
 		if ((_G(_G(playerchar))->walking > 0) && (_G(_G(playerchar))->walking < TURNING_AROUND)) {
 			// nasty hack - make sure it doesn't move the character
 			// to a walkable area
-			mls[_G(_G(playerchar))->walking].direct = 1;
+			_G(mls)[_G(_G(playerchar))->walking].direct = 1;
 			StopMoving(_GP(game).playercharacter);
 		}
 	} else if (in_graph_script)
@@ -151,7 +151,7 @@ void NewRoomNPC(int charid, int nrnum, int newx, int newy) {
 }
 
 void ResetRoom(int nrnum) {
-	if (nrnum == displayed_room)
+	if (nrnum == _G(displayed_room))
 		quit("!ResetRoom: cannot reset current room");
 	if ((nrnum < 0) | (nrnum >= MAX_ROOMS))
 		quit("!ResetRoom: invalid room number");
@@ -197,7 +197,7 @@ int HasBeenToRoom(int roomnum) {
 }
 
 void GetRoomPropertyText(const char *property, char *bufer) {
-	get_text_property(_GP(_GP(thisroom)).Properties, croom->roomProps, property, bufer);
+	get_text_property(_GP(_GP(thisroom)).Properties, _G(croom)->roomProps, property, bufer);
 }
 
 void SetBackgroundFrame(int frnum) {

@@ -219,9 +219,6 @@ Rect GetCharacterRoomBBox(int charid, bool use_frame_0 = false);
 // or the one that is least far away from its camera; calculated as a perpendicular distance between two AABBs.
 PViewport FindNearestViewport(int charid);
 
-
-
-extern MoveList *mls;
 extern int32_t _sc_PlayerCharPtr;
 
 // order of loops to turn character in circle from down to down

@@ -51,10 +51,10 @@ using namespace Engine;
 
 extern SpriteCache _GP(spriteset);
 
-extern RoomObject *objs;
-extern RoomStatus *croom;
+extern RoomObject *_GP(objs);
+extern RoomStatus *_G(croom);
 extern CharacterCache *charcache;
-extern ObjectCache objcache[MAX_ROOM_OBJECTS];
+extern ObjectCache _GP(objcache)[MAX_ROOM_OBJECTS];
 
 extern RGB palette[256];
 extern AGS::Engine::IGraphicsDriver *_G(gfxDriver);

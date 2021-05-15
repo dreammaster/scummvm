@@ -57,10 +57,10 @@ namespace AGS3 {
 
 
 
-extern int gameHasBeenRestored, displayed_room;
-extern unsigned int load_new_game;
-extern RoomObject *objs;
-extern int our_eip;
+extern int _G(gameHasBeenRestored), _G(displayed_room);
+extern unsigned int _G(load_new_game);
+extern RoomObject *_GP(objs);
+extern int _G(our_eip);
 
 
 ExecutingScript scripts[MAX_SCRIPT_AT_ONCE];
@@ -378,7 +378,7 @@ int PrepareTextScript(ccInstance *sci, const char **tsname) {
 }
 
 int RunScriptFunctionIfExists(ccInstance *sci, const char *tsname, int numParam, const RuntimeScriptValue *params) {
-	int oldRestoreCount = gameHasBeenRestored;
+	int oldRestoreCount = _G(gameHasBeenRestored);
 	// First, save the current _G(ccError) state
 	// This is necessary because we might be attempting
 	// to run Script B, while Script A is still running in the
@@ -420,7 +420,7 @@ int RunScriptFunctionIfExists(ccInstance *sci, const char *tsname, int numParam,
 	_G(ccError) = cachedCcError;
 
 	// if the game has been restored, ensure that any further scripts are not run
-	if ((oldRestoreCount != gameHasBeenRestored) && (_G(eventClaimed) == EVENT_INPROGRESS))
+	if ((oldRestoreCount != _G(gameHasBeenRestored)) && (_G(eventClaimed) == EVENT_INPROGRESS))
 		_G(eventClaimed) = EVENT_CLAIMED;
 
 	return toret;
@@ -432,14 +432,14 @@ int RunTextScript(ccInstance *sci, const char *tsname) {
 		// FIXME: in theory the function may be already called for moduleInst[i],
 		// in which case this should not be executed; need to rearrange the code somehow
 		int room_changes_was = _GP(play).room_changes;
-		int restore_game_count_was = gameHasBeenRestored;
+		int restore_game_count_was = _G(gameHasBeenRestored);
 
 		for (int kk = 0; kk < numScriptModules; kk++) {
 			if (!moduleRepExecAddr[kk].IsNull())
 				RunScriptFunctionIfExists(moduleInst[kk], tsname, 0, nullptr);
 
 			if ((room_changes_was != _GP(play).room_changes) ||
-				(restore_game_count_was != gameHasBeenRestored))
+				(restore_game_count_was != _G(gameHasBeenRestored)))
 				return 0;
 		}
 	}
@@ -447,7 +447,7 @@ int RunTextScript(ccInstance *sci, const char *tsname) {
 	int toret = RunScriptFunctionIfExists(sci, tsname, 0, nullptr);
 	if ((toret == -18) && (sci == roominst)) {
 		// functions in room script must exist
-		quitprintf("prepare_script: error %d (%s) trying to run '%s'   (Room %d)", toret, _G(ccErrorString).GetCStr(), tsname, displayed_room);
+		quitprintf("prepare_script: error %d (%s) trying to run '%s'   (Room %d)", toret, _G(ccErrorString).GetCStr(), tsname, _G(displayed_room));
 	}
 	return toret;
 }
@@ -494,7 +494,7 @@ String GetScriptName(ccInstance *sci) {
 	else if (sci->instanceof == gamescript)
 		return "Global script";
 	else if (sci->instanceof == _GP(_GP(thisroom)).CompiledScript)
-		return String::FromFormat("Room %d script", displayed_room);
+		return String::FromFormat("Room %d script", _G(displayed_room));
 	return "Unknown script";
 }
 
@@ -528,7 +528,7 @@ void post_script_cleanup() {
 	}
 	//  if (abort_executor) user_disabled_data2=aborted_ip;
 
-	int old_room_number = displayed_room;
+	int old_room_number = _G(displayed_room);
 
 	// run the queued post-script actions
 	for (int ii = 0; ii < copyof.numPostScriptActions; ii++) {
@@ -557,7 +557,7 @@ void post_script_cleanup() {
 			return;
 		case ePSARunAGSGame:
 			cancel_all_scripts();
-			load_new_game = thisData;
+			_G(load_new_game) = thisData;
 			return;
 		case ePSARunDialog:
 			do_conversation(thisData);
@@ -576,7 +576,7 @@ void post_script_cleanup() {
 			quitprintf("undefined post script action found: %d", copyof.postScriptActions[ii]);
 		}
 		// if the room changed in a conversation, for example, abort
-		if (old_room_number != displayed_room) {
+		if (old_room_number != _G(displayed_room)) {
 			return;
 		}
 	}
@@ -584,7 +584,7 @@ void post_script_cleanup() {
 
 	int jj;
 	for (jj = 0; jj < copyof.numanother; jj++) {
-		old_room_number = displayed_room;
+		old_room_number = _G(displayed_room);
 		QueuedScript &script = copyof.ScFnQueue[jj];
 		RunScriptFunction(script.Instance, script.FnName, script.ParamCount, script.Param1, script.Param2);
 		if (script.Instance == kScInstRoom && script.ParamCount == 1) {
@@ -593,7 +593,7 @@ void post_script_cleanup() {
 		}
 
 		// if they've changed rooms, cancel any further pending scripts
-		if ((displayed_room != old_room_number) || (load_new_game))
+		if ((_G(displayed_room) != old_room_number) || (_G(load_new_game)))
 			break;
 	}
 	copyof.numanother = 0;
@@ -651,11 +651,11 @@ InteractionVariable *FindGraphicalVariable(const char *varName) {
 struct TempEip {
 	int oldval;
 	TempEip(int newval) {
-		oldval = our_eip;
-		our_eip = newval;
+		oldval = _G(our_eip);
+		_G(our_eip) = newval;
 	}
 	~TempEip() {
-		our_eip = oldval;
+		_G(our_eip) = oldval;
 	}
 };
 
@@ -741,7 +741,7 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 			MoveObject(IPARAM1, IPARAM2, IPARAM3, IPARAM4);
 			// if they want to wait until finished, do so
 			if (IPARAM5)
-				GameLoopUntilNotMoving(&objs[IPARAM1].moving);
+				GameLoopUntilNotMoving(&_GP(objs)[IPARAM1].moving);
 			break;
 		case 15: // Object Off
 			ObjectOff(IPARAM1);

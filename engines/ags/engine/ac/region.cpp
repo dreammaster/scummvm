@@ -34,9 +34,9 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern ScriptRegion scrRegion[MAX_ROOM_REGIONS];
 
-extern RoomStatus *croom;
+
+extern RoomStatus *_G(croom);
 
 extern COLOR_MAP _GP(maincoltable);
 extern RGB palette[256];
@@ -47,7 +47,7 @@ ScriptRegion *GetRegionAtRoom(int xx, int yy) {
 	int hsnum = GetRegionIDAtRoom(xx, yy);
 	if (hsnum < 0)
 		hsnum = 0;
-	return &scrRegion[hsnum];
+	return &_G(scrRegion)[hsnum];
 }
 
 ScriptRegion *GetRegionAtScreen(int x, int y) {
@@ -111,7 +111,7 @@ void Region_SetEnabled(ScriptRegion *ssr, int enable) {
 }
 
 int Region_GetEnabled(ScriptRegion *ssr) {
-	return croom->region_enabled[ssr->id];
+	return _G(croom)->region_enabled[ssr->id];
 }
 
 int Region_GetID(ScriptRegion *ssr) {

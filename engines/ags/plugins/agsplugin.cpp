@@ -268,7 +268,7 @@ void IAGSEngine::GetMousePosition(int32 *x, int32 *y) {
 	if (y) y[0] = _G(mousey);
 }
 int IAGSEngine::GetCurrentRoom() {
-	return _G(displayed_room);
+	return _G(_G(displayed_room));
 }
 int IAGSEngine::GetNumBackgrounds() {
 	return _GP(_GP(_GP(thisroom))).BgFrameCount;
@@ -443,13 +443,13 @@ void IAGSEngine::ViewportToRoom(int32 *x, int32 *y) {
 		*y = vpt.first.Y;
 }
 int IAGSEngine::GetNumObjects() {
-	return _G(croom)->numobj;
+	return _G(_G(croom))->numobj;
 }
 AGSObject *IAGSEngine::GetObject(int32 num) {
-	if (num >= _G(croom)->numobj)
+	if (num >= _G(_G(croom))->numobj)
 		quit("!IAGSEngine::GetObject: invalid object");
 
-	return (AGSObject *)&_G(croom)->obj[num];
+	return (AGSObject *)&_G(_G(croom))->obj[num];
 }
 BITMAP *IAGSEngine::CreateBlankBitmap(int32 width, int32 height, int32 coldep) {
 	// [IKM] We should not create Bitmap object here, because
@@ -503,7 +503,7 @@ int IAGSEngine::GetRawPixelColor(int32 color) {
 int IAGSEngine::GetWalkbehindBaseline(int32 wa) {
 	if ((wa < 1) || (wa >= MAX_WALK_BEHINDS))
 		quit("!IAGSEngine::GetWalkBehindBase: invalid walk-behind area specified");
-	return _G(croom)->walkbehind_base[wa];
+	return _G(_G(croom))->walkbehind_base[wa];
 }
 void *IAGSEngine::GetScriptFunctionAddress(const char *funcName) {
 	return ccGetSymbolAddressForPlugin((const char *)funcName);
@@ -516,7 +516,7 @@ int IAGSEngine::GetAreaScaling(int32 x, int32 y) {
 	return GetScalingAt(x, y);
 }
 int IAGSEngine::IsGamePaused() {
-	return _G(game_paused);
+	return _G(_G(game_paused));
 }
 int IAGSEngine::GetSpriteWidth(int32 slot) {
 	return _GP(game).SpriteInfos[slot].Width;
@@ -648,7 +648,7 @@ int IAGSEngine::IsSpriteAlphaBlended(int32 slot) {
 // disable AGS's sound engine
 void IAGSEngine::DisableSound() {
 	shutdown_sound();
-	_GP(usetup).audio_backend = 0;
+	_GP(_GP(usetup)).audio_backend = 0;
 }
 int IAGSEngine::CanRunScriptFunctionNow() {
 	if (_G(inside_script))
@@ -682,9 +682,9 @@ void IAGSEngine::NotifySpriteUpdated(int32 slot) {
 
 	// clear the object cache
 	for (ff = 0; ff < MAX_ROOM_OBJECTS; ff++) {
-		if ((_G(objcache)[ff].image != nullptr) && (_G(objcache)[ff].sppic == slot)) {
-			delete _G(objcache)[ff].image;
-			_G(objcache)[ff].image = nullptr;
+		if ((_G(_GP(objcache))[ff].image != nullptr) && (_G(_GP(objcache))[ff].sppic == slot)) {
+			delete _G(_GP(objcache))[ff].image;
+			_G(_GP(objcache))[ff].image = nullptr;
 		}
 	}
 }
@@ -781,21 +781,21 @@ void IAGSEngine::SimulateMouseClick(int32 button) {
 }
 
 int IAGSEngine::GetMovementPathWaypointCount(int32 pathId) {
-	return _G(mls)[pathId % TURNING_AROUND].numstage;
+	return _G(_G(mls))[pathId % TURNING_AROUND].numstage;
 }
 
 int IAGSEngine::GetMovementPathLastWaypoint(int32 pathId) {
-	return _G(mls)[pathId % TURNING_AROUND].onstage;
+	return _G(_G(mls))[pathId % TURNING_AROUND].onstage;
 }
 
 void IAGSEngine::GetMovementPathWaypointLocation(int32 pathId, int32 waypoint, int32 *x, int32 *y) {
-	*x = (_G(mls)[pathId % TURNING_AROUND].pos[waypoint] >> 16) & 0x0000ffff;
-	*y = (_G(mls)[pathId % TURNING_AROUND].pos[waypoint] & 0x0000ffff);
+	*x = (_G(_G(mls))[pathId % TURNING_AROUND].pos[waypoint] >> 16) & 0x0000ffff;
+	*y = (_G(_G(mls))[pathId % TURNING_AROUND].pos[waypoint] & 0x0000ffff);
 }
 
 void IAGSEngine::GetMovementPathWaypointSpeed(int32 pathId, int32 waypoint, int32 *xSpeed, int32 *ySpeed) {
-	*xSpeed = _G(mls)[pathId % TURNING_AROUND].xpermove[waypoint];
-	*ySpeed = _G(mls)[pathId % TURNING_AROUND].ypermove[waypoint];
+	*xSpeed = _G(_G(mls))[pathId % TURNING_AROUND].xpermove[waypoint];
+	*ySpeed = _G(_G(mls))[pathId % TURNING_AROUND].ypermove[waypoint];
 }
 
 int IAGSEngine::IsRunningUnderDebugger() {

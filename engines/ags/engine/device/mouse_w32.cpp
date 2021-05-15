@@ -94,7 +94,7 @@ void mgetgraphpos() {
 		return;
 	}
 
-	if (!_G(switched_away) && _GP(mouse).ControlEnabled) {
+	if (!_G(_G(switched_away)) && _GP(mouse).ControlEnabled) {
 		// Control mouse movement by querying mouse mickeys (movement deltas)
 		// and applying them to saved mouse coordinates.
 		int mickey_x, mickey_y;

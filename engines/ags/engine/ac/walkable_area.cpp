@@ -40,9 +40,9 @@ using namespace AGS::Shared;
 
 
 
-extern int displayed_room;
-extern RoomStatus *croom;
-extern RoomObject *objs;
+extern int _G(displayed_room);
+extern RoomStatus *_G(croom);
+extern RoomObject *_GP(objs);
 
 Bitmap *walkareabackup = nullptr, *walkable_areas_temp = nullptr;
 
@@ -151,7 +151,7 @@ Bitmap *prepare_walkable_areas(int sourceChar) {
 	// them unwalkable
 	for (ww = 0; ww < _GP(game).numcharacters; ww++) {
 		if (_GP(game).chars[ww].on != 1) continue;
-		if (_GP(game).chars[ww].room != displayed_room) continue;
+		if (_GP(game).chars[ww].room != _G(displayed_room)) continue;
 		if (ww == sourceChar) continue;
 		if (_GP(game).chars[ww].flags & CHF_NOBLOCKING) continue;
 		if (room_to_mask_coord(_GP(game).chars[ww].y) >= walkable_areas_temp->GetHeight()) continue;
@@ -171,13 +171,13 @@ Bitmap *prepare_walkable_areas(int sourceChar) {
 
 	// check for any blocking objects in the room, and deal with them
 	// as well
-	for (ww = 0; ww < croom->numobj; ww++) {
-		if (objs[ww].on != 1) continue;
-		if ((objs[ww].flags & OBJF_SOLID) == 0)
+	for (ww = 0; ww < _G(croom)->numobj; ww++) {
+		if (_GP(objs)[ww].on != 1) continue;
+		if ((_GP(objs)[ww].flags & OBJF_SOLID) == 0)
 			continue;
-		if (room_to_mask_coord(objs[ww].y) >= walkable_areas_temp->GetHeight()) continue;
-		if (room_to_mask_coord(objs[ww].x) >= walkable_areas_temp->GetWidth()) continue;
-		if ((objs[ww].y < 0) || (objs[ww].x < 0)) continue;
+		if (room_to_mask_coord(_GP(objs)[ww].y) >= walkable_areas_temp->GetHeight()) continue;
+		if (room_to_mask_coord(_GP(objs)[ww].x) >= walkable_areas_temp->GetWidth()) continue;
+		if ((_GP(objs)[ww].y < 0) || (_GP(objs)[ww].x < 0)) continue;
 
 		int x1, y1, width, y2;
 		get_object_blocking_rect(ww, &x1, &y1, &width, &y2);

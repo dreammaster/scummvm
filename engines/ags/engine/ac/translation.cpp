@@ -40,7 +40,7 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameSetup usetup;
+extern GameSetup _GP(usetup);
 
 
 

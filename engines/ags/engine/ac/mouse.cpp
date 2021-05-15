@@ -321,10 +321,10 @@ int IsModeEnabled(int which) {
 
 void Mouse_EnableControl(bool on) {
 	bool should_control_mouse =
-		usetup.mouse_ctrl_when == kMouseCtrl_Always ||
-		(usetup.mouse_ctrl_when == kMouseCtrl_Fullscreen && (_GP(scsystem).windowed == 0));
+		_GP(usetup).mouse_ctrl_when == kMouseCtrl_Always ||
+		(_GP(usetup).mouse_ctrl_when == kMouseCtrl_Fullscreen && (_GP(scsystem).windowed == 0));
 	Mouse::SetMovementControl(should_control_mouse & on);
-	usetup.mouse_ctrl_enabled = on; // remember setting in config
+	_GP(usetup).mouse_ctrl_enabled = on; // remember setting in config
 }
 
 //=============================================================================

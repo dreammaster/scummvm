@@ -39,7 +39,7 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern ScriptGUI *scrGui;
+
 extern CCGUI _GP(ccDynamicGUI);
 extern CCGUIObject _GP(ccDynamicGUIObject);
 
@@ -107,7 +107,7 @@ int GUIControl_GetID(GUIObject *guio) {
 }
 
 ScriptGUI *GUIControl_GetOwningGUI(GUIObject *guio) {
-	return &scrGui[guio->ParentId];
+	return &_G(scrGui)[guio->ParentId];
 }
 
 GUIButton *GUIControl_GetAsButton(GUIObject *guio) {

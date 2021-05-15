@@ -54,7 +54,7 @@ using namespace AGS::Shared;
 
 
 
-extern ScriptInvItem scrInv[MAX_INV];
+
 extern int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
 extern SpriteCache _GP(spriteset);
 extern int mousex, mousey;
@@ -148,7 +148,7 @@ void InvWindow_ScrollUp(GUIInvWindow *guii) {
 ScriptInvItem *InvWindow_GetItemAtIndex(GUIInvWindow *guii, int index) {
 	if ((index < 0) || (index >= _G(charextra)[guii->GetCharacterId()].invorder_count))
 		return nullptr;
-	return &scrInv[_G(charextra)[guii->GetCharacterId()].invorder[index]];
+	return &_G(scrInv)[_G(charextra)[guii->GetCharacterId()].invorder[index]];
 }
 
 //=============================================================================

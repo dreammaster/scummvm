@@ -54,7 +54,7 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 
-extern GameSetup usetup;
+extern GameSetup _GP(usetup);
 
 
 
@@ -62,8 +62,8 @@ extern GameSetup usetup;
 extern int _G(convert_16bit_bgr);
 extern IGraphicsDriver *_G(gfxDriver);
 extern SpriteCache _GP(spriteset);
-extern int displayed_room, starting_room;
-extern MoveList *mls;
+extern int _G(displayed_room), _G(starting_room);
+
 
 String GetRuntimeInfo() {
 	DisplayMode mode = _G(gfxDriver)->GetDisplayMode();
@@ -130,13 +130,13 @@ void script_debug(int cmdd, int dataa) {
 		int goToRoom = -1;
 		if (_GP(game).roomCount == 0) {
 			char inroomtex[80];
-			sprintf(inroomtex, "!Enter new room: (in room %d)", displayed_room);
+			sprintf(inroomtex, "!Enter new room: (in room %d)", _G(displayed_room));
 			setup_for_dialog();
 			goToRoom = enternumberwindow(inroomtex);
 			restore_after_dialog();
 		} else {
 			setup_for_dialog();
-			goToRoom = roomSelectorWindow(displayed_room, _GP(game).roomCount, _GP(game).roomNumbers, _GP(game).roomNames);
+			goToRoom = roomSelectorWindow(_G(displayed_room), _GP(game).roomCount, _GP(game).roomNumbers, _GP(game).roomNames);
 			restore_after_dialog();
 		}
 		if (goToRoom >= 0)
@@ -154,7 +154,7 @@ void script_debug(int cmdd, int dataa) {
 		int mlsnum = _GP(game).chars[dataa].walking;
 		if (_GP(game).chars[dataa].walking >= TURNING_AROUND)
 			mlsnum %= TURNING_AROUND;
-		MoveList *cmls = &mls[mlsnum];
+		MoveList *cmls = &_G(mls)[mlsnum];
 		for (int i = 0; i < cmls->numstage - 1; i++) {
 			short srcx = short((cmls->pos[i] >> 16) & 0x00ffff);
 			short srcy = short(cmls->pos[i] & 0x00ffff);

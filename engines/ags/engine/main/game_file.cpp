@@ -136,7 +136,7 @@ HError load_game_file() {
 			// Upscale mode -- for old games that supported it.
 			// NOTE: this must be done before UpdateGameData, or resolution-dependant
 			// adjustments won't be applied correctly.
-			if ((loaded_game_file_version < kGameVersion_310) && usetup.override_upscale) {
+			if ((_G(loaded_game_file_version) < kGameVersion_310) && _GP(usetup).override_upscale) {
 				if (_GP(game).GetResolutionType() == kGameResolution_320x200)
 					_GP(game).SetGameResolution(kGameResolution_640x400);
 				else if (_GP(game).GetResolutionType() == kGameResolution_320x240)

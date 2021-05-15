@@ -77,11 +77,11 @@ extern CCDialog    _GP(ccDynamicDialog);
 extern CCAudioChannel _GP(_GP(ccDynamicAudio));
 
 extern ScriptString _GP(myScriptStringImpl);
-extern ScriptObject scrObj[MAX_ROOM_OBJECTS];
-extern ScriptGUI *scrGui;
-extern ScriptHotspot scrHotspot[MAX_ROOM_HOTSPOTS];
-extern ScriptRegion scrRegion[MAX_ROOM_REGIONS];
-extern ScriptInvItem scrInv[MAX_INV];
+
+
+
+
+
 
 
 
@@ -181,14 +181,14 @@ void InitAndRegisterCharacters() {
 
 // Initializes dialog and registers them in the script system
 void InitAndRegisterDialogs() {
-	scrDialog = new ScriptDialog[_GP(game).numdialog];
+	_G(scrDialog) = new ScriptDialog[_GP(game).numdialog];
 	for (int i = 0; i < _GP(game).numdialog; ++i) {
-		scrDialog[i].id = i;
-		scrDialog[i].reserved = 0;
-		ccRegisterManagedObject(&scrDialog[i], &_GP(ccDynamicDialog));
+		_G(scrDialog)[i].id = i;
+		_G(scrDialog)[i].reserved = 0;
+		ccRegisterManagedObject(&_G(scrDialog)[i], &_GP(ccDynamicDialog));
 
 		if (!_GP(game).dialogScriptNames[i].IsEmpty())
-			ccAddExternalDynamicObject(_GP(game).dialogScriptNames[i], &scrDialog[i], &_GP(ccDynamicDialog));
+			ccAddExternalDynamicObject(_GP(game).dialogScriptNames[i], &_G(scrDialog)[i], &_GP(ccDynamicDialog));
 	}
 }
 
@@ -204,9 +204,9 @@ void InitAndRegisterDialogOptions() {
 
 // Initializes gui and registers them in the script system
 HError InitAndRegisterGUI() {
-	scrGui = (ScriptGUI *)malloc(sizeof(ScriptGUI) * _GP(game).numgui);
+	_G(scrGui) = (ScriptGUI *)malloc(sizeof(ScriptGUI) * _GP(game).numgui);
 	for (int i = 0; i < _GP(game).numgui; ++i) {
-		scrGui[i].id = -1;
+		_G(scrGui)[i].id = -1;
 	}
 
 	guiScriptObjNames.resize(_GP(game).numgui);
@@ -220,9 +220,9 @@ HError InitAndRegisterGUI() {
 		// copy the script name to its own memory location
 		// because ccAddExtSymbol only keeps a reference
 		guiScriptObjNames[i] = _GP(guis)[i].Name;
-		scrGui[i].id = i;
-		ccAddExternalDynamicObject(guiScriptObjNames[i], &scrGui[i], &_GP(ccDynamicGUI));
-		ccRegisterManagedObject(&scrGui[i], &_GP(ccDynamicGUI));
+		_G(scrGui)[i].id = i;
+		ccAddExternalDynamicObject(guiScriptObjNames[i], &_G(scrGui)[i], &_GP(ccDynamicGUI));
+		ccRegisterManagedObject(&_G(scrGui)[i], &_GP(ccDynamicGUI));
 	}
 	return HError::None();
 }
@@ -230,37 +230,37 @@ HError InitAndRegisterGUI() {
 // Initializes inventory items and registers them in the script system
 void InitAndRegisterInvItems() {
 	for (int i = 0; i < MAX_INV; ++i) {
-		scrInv[i].id = i;
-		scrInv[i].reserved = 0;
-		ccRegisterManagedObject(&scrInv[i], &_GP(ccDynamicInv));
+		_G(scrInv)[i].id = i;
+		_G(scrInv)[i].reserved = 0;
+		ccRegisterManagedObject(&_G(scrInv)[i], &_GP(ccDynamicInv));
 
 		if (!_GP(game).invScriptNames[i].IsEmpty())
-			ccAddExternalDynamicObject(_GP(game).invScriptNames[i], &scrInv[i], &_GP(ccDynamicInv));
+			ccAddExternalDynamicObject(_GP(game).invScriptNames[i], &_G(scrInv)[i], &_GP(ccDynamicInv));
 	}
 }
 
 // Initializes room hotspots and registers them in the script system
 void InitAndRegisterHotspots() {
 	for (int i = 0; i < MAX_ROOM_HOTSPOTS; ++i) {
-		scrHotspot[i].id = i;
-		scrHotspot[i].reserved = 0;
-		ccRegisterManagedObject(&scrHotspot[i], &_GP(ccDynamicHotspot));
+		_G(scrHotspot)[i].id = i;
+		_G(scrHotspot)[i].reserved = 0;
+		ccRegisterManagedObject(&_G(scrHotspot)[i], &_GP(ccDynamicHotspot));
 	}
 }
 
 // Initializes room objects and registers them in the script system
 void InitAndRegisterRoomObjects() {
 	for (int i = 0; i < MAX_ROOM_OBJECTS; ++i) {
-		ccRegisterManagedObject(&scrObj[i], &_GP(ccDynamicObject));
+		ccRegisterManagedObject(&_G(scrObj)[i], &_GP(ccDynamicObject));
 	}
 }
 
 // Initializes room regions and registers them in the script system
 void InitAndRegisterRegions() {
 	for (int i = 0; i < MAX_ROOM_REGIONS; ++i) {
-		scrRegion[i].id = i;
-		scrRegion[i].reserved = 0;
-		ccRegisterManagedObject(&scrRegion[i], &_GP(ccDynamicRegion));
+		_G(scrRegion)[i].id = i;
+		_G(scrRegion)[i].reserved = 0;
+		ccRegisterManagedObject(&_G(scrRegion)[i], &_GP(ccDynamicRegion));
 	}
 }
 
@@ -275,12 +275,12 @@ void RegisterStaticArrays() {
 	StaticDialogArray.Create(&_GP(ccDynamicDialog), sizeof(ScriptDialog), sizeof(ScriptDialog));
 
 	ccAddExternalStaticArray("character", &_GP(game).chars[0], &StaticCharacterArray);
-	ccAddExternalStaticArray("object", &scrObj[0], &StaticObjectArray);
-	ccAddExternalStaticArray("gui", &scrGui[0], &StaticGUIArray);
-	ccAddExternalStaticArray("hotspot", &scrHotspot[0], &StaticHotspotArray);
-	ccAddExternalStaticArray("region", &scrRegion[0], &StaticRegionArray);
-	ccAddExternalStaticArray("inventory", &scrInv[0], &StaticInventoryArray);
-	ccAddExternalStaticArray("dialog", &scrDialog[0], &StaticDialogArray);
+	ccAddExternalStaticArray("object", &_G(scrObj)[0], &StaticObjectArray);
+	ccAddExternalStaticArray("gui", &_G(scrGui)[0], &StaticGUIArray);
+	ccAddExternalStaticArray("hotspot", &_G(scrHotspot)[0], &StaticHotspotArray);
+	ccAddExternalStaticArray("region", &_G(scrRegion)[0], &StaticRegionArray);
+	ccAddExternalStaticArray("inventory", &_G(scrInv)[0], &StaticInventoryArray);
+	ccAddExternalStaticArray("dialog", &_G(scrDialog)[0], &StaticDialogArray);
 }
 
 // Initializes various game entities and registers them in the script system
@@ -302,7 +302,7 @@ HError InitAndRegisterGameEntities() {
 	RegisterStaticArrays();
 
 	setup_player_character(_GP(game).playercharacter);
-	if (loaded_game_file_version >= kGameVersion_270)
+	if (_G(loaded_game_file_version) >= kGameVersion_270)
 		ccAddExternalStaticObject("player", &_sc_PlayerCharPtr, &_G(GlobalStaticManager));
 	return HError::None();
 }
@@ -361,7 +361,7 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	//
 	_G(charextra) = (CharacterExtras *)calloc(_GP(game).numcharacters, sizeof(CharacterExtras));
 	charcache = (CharacterCache *)calloc(1, sizeof(CharacterCache) * _GP(game).numcharacters + 5);
-	mls = (MoveList *)calloc(_GP(game).numcharacters + MAX_ROOM_OBJECTS + 1, sizeof(MoveList));
+	_G(mls) = (MoveList *)calloc(_GP(game).numcharacters + MAX_ROOM_OBJECTS + 1, sizeof(MoveList));
 	_G(actSpsCount) = _GP(game).numcharacters + MAX_ROOM_OBJECTS + 2;
 	_G(actsps) = (Bitmap **)calloc(_G(actSpsCount), sizeof(Bitmap *));
 	_G(actspsbmp) = (IDriverDependantBitmap **)calloc(_G(actSpsCount), sizeof(IDriverDependantBitmap *));
@@ -379,7 +379,7 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	//
 	// 4. Initialize certain runtime variables
 	//
-	game_paused = 0;  // reset the game paused flag
+	_G(game_paused) = 0;  // reset the game paused flag
 	ifacepopped = -1;
 
 	String svg_suffix;

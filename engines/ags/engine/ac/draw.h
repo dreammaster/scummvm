@@ -40,7 +40,7 @@ class IDriverDependantBitmap;
 }
 using namespace AGS; // FIXME later
 
-#define IS_ANTIALIAS_SPRITES usetup.enable_antialiasing && (_GP(play).disable_antialiasing == 0)
+#define IS_ANTIALIAS_SPRITES _GP(usetup).enable_antialiasing && (_GP(play).disable_antialiasing == 0)
 
 struct CachedActSpsData {
 	int xWas, yWas;

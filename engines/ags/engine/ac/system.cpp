@@ -44,16 +44,16 @@
 #include "ags/shared/#include "ags/shared/AGS3 {
 #include "ags/shared/#include "ags/shared/space AGS::Engine;
 #include "ags/shared/#include "ags/shared/eSetupStruct game;
-extern GameSetup usetup;
+extern GameSetup _GP(usetup);
 
 
 
 extern IGraphicsDriver *_G(gfxDriver);
 extern CCAudioChannel _GP(_GP(ccDynamicAudio));
-extern volatile bool switched_away;
+extern volatile bool _G(switched_away);
 
 bool System_HasInputFocus() {
-	return !switched_away;
+	return !_G(switched_away);
 }
 
 int System_GetColorDepth() {
@@ -197,11 +197,11 @@ const char *System_GetRuntimeInfo() {
 }
 
 int System_GetRenderAtScreenResolution() {
-	return usetup.RenderAtScreenRes;
+	return _GP(usetup).RenderAtScreenRes;
 }
 
 void System_SetRenderAtScreenResolution(int enable) {
-	usetup.RenderAtScreenRes = enable != 0;
+	_GP(usetup).RenderAtScreenRes = enable != 0;
 }
 
 //=============================================================================

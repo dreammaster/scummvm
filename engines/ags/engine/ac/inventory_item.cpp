@@ -36,7 +36,7 @@
 namespace AGS3 {
 
 
-extern ScriptInvItem scrInv[MAX_INV];
+
 extern int cur_cursor;
 
 extern CCInventory _GP(ccDynamicInv);
@@ -66,7 +66,7 @@ ScriptInvItem *GetInvAtLocation(int xx, int yy) {
 	int hsnum = GetInvAt(xx, yy);
 	if (hsnum <= 0)
 		return nullptr;
-	return &scrInv[hsnum];
+	return &_G(scrInv)[hsnum];
 }
 
 void InventoryItem_GetName(ScriptInvItem *iitem, char *buff) {

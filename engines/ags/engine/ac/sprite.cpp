@@ -39,7 +39,7 @@ using namespace AGS::Engine;
 
 
 extern SpriteCache _GP(spriteset);
-extern int our_eip, eip_guinum, eip_guiobj;
+extern int _G(our_eip), eip_guinum, eip_guiobj;
 extern RGB palette[256];
 extern IGraphicsDriver *_G(gfxDriver);
 extern AGSPlatformDriver *platform;
@@ -139,8 +139,8 @@ void initialize_sprite(int ee) {
 		_GP(game).SpriteInfos[ee].Height = 0;
 	} else {
 		// stretch sprites to correct resolution
-		int oldeip = our_eip;
-		our_eip = 4300;
+		int _G(oldeip) = _G(our_eip);
+		_G(our_eip) = 4300;
 
 		if (_GP(game).SpriteInfos[ee].Flags & SPF_HADALPHACHANNEL) {
 			// we stripped the alpha channel out last time, put
@@ -178,7 +178,7 @@ void initialize_sprite(int ee) {
 		pl_run_plugin_hooks(AGSE_SPRITELOAD, ee);
 		update_polled_stuff_if_runtime();
 
-		our_eip = oldeip;
+		_G(our_eip) = _G(oldeip);
 	}
 }
 

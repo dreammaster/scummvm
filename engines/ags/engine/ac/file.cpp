@@ -49,7 +49,7 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern GameSetup usetup;
+extern GameSetup _GP(usetup);
 
 extern AGSPlatformDriver *platform;
 
@@ -267,7 +267,7 @@ FSLocation GetGameUserConfigDir() {
 	String dir = _G(platform)->GetUserConfigDirectory();
 	if (Path::IsRelativePath(dir)) // relative dir is resolved relative to the game data dir
 		return FSLocation(_GP(ResPaths).DataDir, Path::ConcatPaths(_GP(ResPaths).DataDir, dir));
-	else if (usetup.local_user_conf) // directive to use game dir location
+	else if (_GP(usetup).local_user_conf) // directive to use game dir location
 		return FSLocation(_GP(ResPaths).DataDir);
 	// For absolute dir, we assume it's a special directory prepared for AGS engine
 	// and therefore amend it with a game own subdir
@@ -295,11 +295,11 @@ static FSLocation MakeGameDataDir(const String &default_dir, const String &user_
 }
 
 FSLocation GetGameAppDataDir() {
-	return MakeGameDataDir(_G(platform)->GetAllUsersDataDirectory(), usetup.shared_data_dir);
+	return MakeGameDataDir(_G(platform)->GetAllUsersDataDirectory(), _GP(usetup).shared_data_dir);
 }
 
 FSLocation GetGameUserDataDir() {
-	return MakeGameDataDir(_G(platform)->GetUserSavedgamesDirectory(), usetup.user_data_dir);
+	return MakeGameDataDir(_G(platform)->GetUserSavedgamesDirectory(), _GP(usetup).user_data_dir);
 }
 
 bool ResolveScriptPath(const String &orig_sc_path, bool read_only, ResolvedPath &rp) {

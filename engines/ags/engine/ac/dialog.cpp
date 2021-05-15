@@ -68,7 +68,7 @@ using namespace AGS::Shared;
 
 
 extern ccInstance *dialogScriptsInst;
-extern int in_new_room;
+extern int _G(in_new_room);
 
 extern SpriteCache _GP(spriteset);
 extern AGSPlatformDriver *platform;
@@ -292,7 +292,7 @@ int run_dialog_script(DialogTopic*dtpp, int dialogID, int offse, int optionIndex
         case DCMD_NEWROOM:
           get_dialog_script_parameters(script, &param1, nullptr);
           NewRoom(param1);
-          in_new_room = 1;
+          _G(in_new_room) = 1;
           result = RUN_DIALOG_STOP_DIALOG;
           script_running = false;
           break;
@@ -325,7 +325,7 @@ int run_dialog_script(DialogTopic*dtpp, int dialogID, int offse, int optionIndex
     }
   }
 
-  if (in_new_room > 0)
+  if (_G(in_new_room) > 0)
     return RUN_DIALOG_STOP_DIALOG;
 
   if (_G(said_speech_line) > 0) {
