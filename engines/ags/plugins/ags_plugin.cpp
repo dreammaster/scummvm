@@ -100,7 +100,7 @@ using namespace AGS::Engine;
 #endif // BUILTIN_PLUGINS
 
 
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 extern int mousex, mousey;
 extern int displayed_room;
 
@@ -170,23 +170,23 @@ void IAGSEngine::RegisterScriptFunction(const char *name, void *addy) {
 	ccAddExternalPluginFunction(name, addy);
 }
 const char *IAGSEngine::GetGraphicsDriverID() {
-	if (gfxDriver == nullptr)
+	if (_G(gfxDriver) == nullptr)
 		return nullptr;
 
-	return gfxDriver->GetDriverID();
+	return _G(gfxDriver)->GetDriverID();
 }
 
 BITMAP *IAGSEngine::GetScreen() {
 	// TODO: we could actually return stage buffer here, will that make a difference?
-	if (!gfxDriver->UsesMemoryBackBuffer())
+	if (!_G(gfxDriver)->UsesMemoryBackBuffer())
 		quit("!This plugin requires software graphics driver.");
 
-	Bitmap *buffer = gfxDriver->GetMemoryBackBuffer();
+	Bitmap *buffer = _G(gfxDriver)->GetMemoryBackBuffer();
 	return buffer ? (BITMAP *)buffer->GetAllegroBitmap() : nullptr;
 }
 
 BITMAP *IAGSEngine::GetVirtualScreen() {
-	Bitmap *stage = gfxDriver->GetStageBackBuffer(true);
+	Bitmap *stage = _G(gfxDriver)->GetStageBackBuffer(true);
 	return stage ? (BITMAP *)stage->GetAllegroBitmap() : nullptr;
 }
 
@@ -238,7 +238,7 @@ int IAGSEngine::GetSavedData(char *buffer, int32 bufsize) {
 }
 
 void IAGSEngine::DrawText(int32 x, int32 y, int32 font, int32 color, char *text) {
-	Bitmap *ds = gfxDriver->GetStageBackBuffer(true);
+	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer(true);
 	if (!ds)
 		return;
 	color_t text_color = ds->GetCompatibleColor(color);
@@ -255,7 +255,7 @@ void IAGSEngine::GetScreenDimensions(int32 *width, int32 *height, int32 *coldept
 }
 
 unsigned char **IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
-	Bitmap *stage = gfxDriver->GetStageBackBuffer(true);
+	Bitmap *stage = _G(gfxDriver)->GetStageBackBuffer(true);
 	if (stage && bmp == stage->GetAllegroBitmap())
 		plugins[this->pluginId].invalidatedRegion = 0;
 
@@ -263,7 +263,7 @@ unsigned char **IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
 }
 
 void IAGSEngine::ReleaseBitmapSurface(BITMAP *bmp) {
-	Bitmap *stage = gfxDriver->GetStageBackBuffer(true);
+	Bitmap *stage = _G(gfxDriver)->GetStageBackBuffer(true);
 	if (stage && bmp == stage->GetAllegroBitmap()) {
 		// plugin does not manaually invalidate stuff, so
 		// we must invalidate the whole screen to be safe
@@ -343,7 +343,7 @@ void IAGSEngine::DrawTextWrapped(int32 xx, int32 yy, int32 wid, int32 font, int3
 	if (break_up_text_into_lines(text, Lines, wid, font) == 0)
 		return;
 
-	Bitmap *ds = gfxDriver->GetStageBackBuffer(true);
+	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer(true);
 	if (!ds)
 		return;
 	color_t text_color = ds->GetCompatibleColor(color);
@@ -354,17 +354,17 @@ void IAGSEngine::DrawTextWrapped(int32 xx, int32 yy, int32 wid, int32 font, int3
 
 Bitmap _G(glVirtualScreenWrap);
 void IAGSEngine::SetVirtualScreen(BITMAP *bmp) {
-	if (!gfxDriver->UsesMemoryBackBuffer()) {
+	if (!_G(gfxDriver)->UsesMemoryBackBuffer()) {
 		debug_script_warn("SetVirtualScreen: this plugin requires software graphics driver to work correctly.");
-		// we let it continue since gfxDriver is supposed to ignore this request without throwing an exception
+		// we let it continue since _G(gfxDriver) is supposed to ignore this request without throwing an exception
 	}
 
 	if (bmp) {
 		_G(glVirtualScreenWrap).WrapAllegroBitmap(bmp, true);
-		gfxDriver->SetMemoryBackBuffer(&_G(glVirtualScreenWrap));
+		_G(gfxDriver)->SetMemoryBackBuffer(&_G(glVirtualScreenWrap));
 	} else {
 		_G(glVirtualScreenWrap).Destroy();
-		gfxDriver->SetMemoryBackBuffer(nullptr);
+		_G(gfxDriver)->SetMemoryBackBuffer(nullptr);
 	}
 }
 
@@ -373,7 +373,7 @@ int IAGSEngine::LookupParserWord(const char *word) {
 }
 
 void IAGSEngine::BlitBitmap(int32 x, int32 y, BITMAP *bmp, int32 masked) {
-	Bitmap *ds = gfxDriver->GetStageBackBuffer(true);
+	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer(true);
 	if (!ds)
 		return;
 	wputblock_raw(ds, x, y, bmp, masked);
@@ -381,18 +381,18 @@ void IAGSEngine::BlitBitmap(int32 x, int32 y, BITMAP *bmp, int32 masked) {
 }
 
 void IAGSEngine::BlitSpriteTranslucent(int32 x, int32 y, BITMAP *bmp, int32 trans) {
-	Bitmap *ds = gfxDriver->GetStageBackBuffer(true);
+	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer(true);
 	if (!ds)
 		return;
 	Bitmap wrap(bmp, true);
-	if (gfxDriver->UsesMemoryBackBuffer())
+	if (_G(gfxDriver)->UsesMemoryBackBuffer())
 		GfxUtil::DrawSpriteWithTransparency(ds, &wrap, x, y, trans);
 	else
 		GfxUtil::DrawSpriteBlend(ds, Point(x, y), &wrap, kBlendMode_Alpha, true, false, trans);
 }
 
 void IAGSEngine::BlitSpriteRotated(int32 x, int32 y, BITMAP *bmp, int32 angle) {
-	Bitmap *ds = gfxDriver->GetStageBackBuffer(true);
+	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer(true);
 	if (!ds)
 		return;
 	// FIXME: call corresponding Graphics Blit
@@ -789,7 +789,7 @@ void IAGSEngine::GetMovementPathWaypointSpeed(int32 pathId, int32 waypoint, int3
 }
 
 int IAGSEngine::IsRunningUnderDebugger() {
-	return (editor_debugging_enabled != 0) ? 1 : 0;
+	return (_G(editor_debugging_enabled) != 0) ? 1 : 0;
 }
 
 void IAGSEngine::GetPathToFileInCompiledFolder(const char *fileName, char *buffer) {
@@ -798,7 +798,7 @@ void IAGSEngine::GetPathToFileInCompiledFolder(const char *fileName, char *buffe
 }
 
 void IAGSEngine::BreakIntoDebugger() {
-	break_on_next_script_step = 1;
+	_G(break_on_next_script_step) = 1;
 }
 
 IAGSFontRenderer *IAGSEngine::ReplaceFontRenderer(int fontNumber, IAGSFontRenderer *newRenderer) {
@@ -807,7 +807,7 @@ IAGSFontRenderer *IAGSEngine::ReplaceFontRenderer(int fontNumber, IAGSFontRender
 
 void IAGSEngine::GetRenderStageDesc(AGSRenderStageDesc *desc) {
 	if (desc->Version >= 25) {
-		gfxDriver->GetStageMatrixes((RenderMatrixes &)desc->Matrixes);
+		_G(gfxDriver)->GetStageMatrixes((RenderMatrixes &)desc->Matrixes);
 	}
 }
 

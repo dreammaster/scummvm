@@ -65,20 +65,20 @@ extern GameSetup usetup;
 extern char pexbuf[STD_BUFFER_SIZE];
 extern int proper_exit;
 extern char check_dynamic_sprites_at_exit;
-extern int editor_debugging_initialized;
-extern IAGSEditorDebugger *editor_debugger;
+extern int _G(editor_debugging_initialized);
+extern IAGSEditorDebugger *_G(editor_debugger);
 extern int _G(need_to_stop_cd);
 extern int _G(use_cdplayer);
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 
 bool handledErrorInEditor;
 
 void quit_tell_editor_debugger(const String &qmsg, QuitReason qreason) {
-	if (editor_debugging_initialized) {
+	if (_G(editor_debugging_initialized)) {
 		if (qreason & kQuitKind_GameException)
 			handledErrorInEditor = send_exception_to_editor(qmsg);
 		send_message_to_editor("EXIT");
-		editor_debugger->Shutdown();
+		_G(editor_debugger)->Shutdown();
 	}
 }
 
@@ -206,7 +206,7 @@ extern IDriverDependantBitmap *test_allegro_ddb;
 void allegro_bitmap_test_release() {
 	delete test_allegro_bitmap;
 	if (test_allegro_ddb)
-		gfxDriver->DestroyDDB(test_allegro_ddb);
+		_G(gfxDriver)->DestroyDDB(test_allegro_ddb);
 }
 
 // quit - exits the engine, shutting down everything gracefully

@@ -63,7 +63,7 @@ extern RoomObject *objs;
 
 extern int our_eip;
 
-extern CharacterExtras *_G(charextra);
+
 extern CharacterInfo *_G(facetalkchar);
 extern int _G(face_talking), _G(facetalkview), _G(facetalkwait), _G(facetalkframe);
 extern int _G(facetalkloop), _G(facetalkrepeat), _G(facetalkAllowBlink);
@@ -72,7 +72,7 @@ extern bool _G(facetalk_qfg4_override_placement_x), _G(facetalk_qfg4_override_pl
 extern SpeechLipSyncLine *_G(splipsync);
 extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 extern int is_text_overlay;
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 
 int do_movelist_move(short *mlnum, int *xx, int *yy) {
 	int need_to_fix_sprite = 0;
@@ -423,7 +423,7 @@ void update_sierra_speech() {
 				DrawViewFrame(frame_pic, blink_vf, view_frame_x, view_frame_y, face_has_alpha);
 			}
 
-			gfxDriver->UpdateDDBFromBitmap(screenover[_G(face_talking)].bmp, screenover[_G(face_talking)].pic, face_has_alpha);
+			_G(gfxDriver)->UpdateDDBFromBitmap(screenover[_G(face_talking)].bmp, screenover[_G(face_talking)].pic, face_has_alpha);
 		}  // end if updatedFrame
 	}
 }

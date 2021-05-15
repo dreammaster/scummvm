@@ -163,7 +163,7 @@ private:
 };
 
 // TODO: move this to the dynamically allocated engine object whenever it is implemented
-extern DebugManager DbgMgr;
+extern DebugManager _G(DbgMgr);
 
 } // namespace Shared
 } // namespace AGS

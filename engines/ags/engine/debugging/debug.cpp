@@ -67,12 +67,12 @@ extern volatile char want_exit, abort_engine;
 
 
 
-int editor_debugging_enabled = 0;
-int editor_debugging_initialized = 0;
-char editor_debugger_instance_token[100];
-IAGSEditorDebugger *editor_debugger = nullptr;
-int break_on_next_script_step = 0;
-volatile int game_paused_in_debugger = 0;
+int _G(editor_debugging_enabled) = 0;
+int _G(editor_debugging_initialized) = 0;
+char _G(editor_debugger_instance_token)[100];
+IAGSEditorDebugger *_G(editor_debugger) = nullptr;
+int _G(break_on_next_script_step) = 0;
+volatile int _G(game_paused_in_debugger) = 0;
 
 #if AGS_PLATFORM_OS_WINDOWS
 
@@ -92,17 +92,17 @@ IAGSEditorDebugger *GetEditorDebugger(const char *instanceToken) {
 
 #endif
 
-int debug_flags = 0;
+int _G(debug_flags) = 0;
 
-String debug_line[DEBUG_CONSOLE_NUMLINES];
-int first_debug_line = 0, last_debug_line = 0, display_console = 0;
+String _G(debug_line)[DEBUG_CONSOLE_NUMLINES];
+int _G(first_debug_line) = 0, _G(last_debug_line) = 0, _G(display_console) = 0;
 
 float fps = std::numeric_limits<float>::quiet_NaN();
-FPSDisplayMode display_fps = kFPS_Hide;
+FPSDisplayMode _G(display_fps) = kFPS_Hide;
 
-std::unique_ptr<MessageBuffer> DebugMsgBuff;
-std::unique_ptr<LogFile> DebugLogFile;
-std::unique_ptr<ConsoleOutputTarget> DebugConsole;
+std::unique_ptr<MessageBuffer> _G(DebugMsgBuff);
+std::unique_ptr<LogFile> _G(DebugLogFile);
+std::unique_ptr<ConsoleOutputTarget> _G(DebugConsole);
 
 const String OutputMsgBufID = "buffer";
 const String OutputFileID = "file";
@@ -114,18 +114,18 @@ const String OutputGameConsoleID = "console";
 PDebugOutput create_log_output(const String &name, const String &path = "", LogFile::OpenMode open_mode = LogFile::kLogFile_Overwrite) {
 	// Else create new one, if we know this ID
 	if (name.CompareNoCase(OutputSystemID) == 0) {
-		return DbgMgr.RegisterOutput(OutputSystemID, AGSPlatformDriver::GetDriver(), kDbgMsg_None);
+		return _G(DbgMgr).RegisterOutput(OutputSystemID, AGSPlatformDriver::GetDriver(), kDbgMsg_None);
 	} else if (name.CompareNoCase(OutputFileID) == 0) {
-		DebugLogFile.reset(new LogFile());
+		_G(DebugLogFile).reset(new LogFile());
 		String logfile_path = !path.IsEmpty() ? path : Path::ConcatPaths(platform->GetAppOutputDirectory(), "ags.log");
-		if (!DebugLogFile->OpenFile(logfile_path, open_mode))
+		if (!_G(DebugLogFile)->OpenFile(logfile_path, open_mode))
 			return nullptr;
 		Debug::Printf(kDbgMsg_Info, "Logging to %s", logfile_path.GetCStr());
-		auto dbgout = DbgMgr.RegisterOutput(OutputFileID, DebugLogFile.get(), kDbgMsg_None);
+		auto dbgout = _G(DbgMgr).RegisterOutput(OutputFileID, _G(DebugLogFile).get(), kDbgMsg_None);
 		return dbgout;
 	} else if (name.CompareNoCase(OutputGameConsoleID) == 0) {
-		DebugConsole.reset(new ConsoleOutputTarget());
-		return DbgMgr.RegisterOutput(OutputGameConsoleID, DebugConsole.get(), kDbgMsg_None);
+		_G(DebugConsole).reset(new ConsoleOutputTarget());
+		return _G(DbgMgr).RegisterOutput(OutputGameConsoleID, _G(DebugConsole).get(), kDbgMsg_None);
 	}
 	return nullptr;
 }
@@ -169,7 +169,7 @@ void apply_log_config(const ConfigTree &cfg, const String &log_id,
 		return;
 
 	// First test if already registered, if not then try create it
-	auto dbgout = DbgMgr.GetOutput(log_id);
+	auto dbgout = _G(DbgMgr).GetOutput(log_id);
 	const bool was_created_earlier = dbgout != nullptr;
 	if (!dbgout) {
 		String path = INIreadstring(cfg, "log", String::FromFormat("%s-path", log_id.GetCStr()));
@@ -207,8 +207,8 @@ void apply_log_config(const ConfigTree &cfg, const String &log_id,
 	}
 
 	// Delegate buffered messages to this new output
-	if (DebugMsgBuff && !was_created_earlier)
-		DebugMsgBuff->Send(log_id);
+	if (_G(DebugMsgBuff) && !was_created_earlier)
+		_G(DebugMsgBuff)->Send(log_id);
 }
 
 void init_debug(const ConfigTree &cfg, bool stderr_only) {
@@ -220,8 +220,8 @@ void init_debug(const ConfigTree &cfg, bool stderr_only) {
 		return;
 
 	// Message buffer to save all messages in case we read different log settings from config file
-	DebugMsgBuff.reset(new MessageBuffer());
-	DbgMgr.RegisterOutput(OutputMsgBufID, DebugMsgBuff.get(), kDbgMsg_All);
+	_G(DebugMsgBuff).reset(new MessageBuffer());
+	_G(DbgMgr).RegisterOutput(OutputMsgBufID, _G(DebugMsgBuff).get(), kDbgMsg_All);
 }
 
 void apply_debug_config(const ConfigTree &cfg) {
@@ -245,7 +245,7 @@ void apply_debug_config(const ConfigTree &cfg) {
 		});
 
 	// Init game console if the game was compiled in Debug mode or is run in test mode
-	if (_GP(game).options[OPT_DEBUGMODE] != 0 || (debug_flags & DBG_DEBUGMODE) != 0) {
+	if (_GP(game).options[OPT_DEBUGMODE] != 0 || (_G(debug_flags) & DBG_DEBUGMODE) != 0) {
 		apply_log_config(cfg, OutputGameConsoleID,
 			/* defaults */
 			true,
@@ -257,29 +257,29 @@ void apply_debug_config(const ConfigTree &cfg) {
 
 	// If the game was compiled in Debug mode *and* there's no regular file log,
 	// then open "warnings.log" for printing script warnings.
-	if (_GP(game).options[OPT_DEBUGMODE] != 0 && !DebugLogFile) {
+	if (_GP(game).options[OPT_DEBUGMODE] != 0 && !_G(DebugLogFile)) {
 		auto dbgout = create_log_output(OutputFileID, "warnings.log", LogFile::kLogFile_OverwriteAtFirstMessage);
 		if (dbgout)
 			dbgout->SetGroupFilter(kDbgGroup_Game, kDbgMsg_Warn);
 	}
 
 	// We don't need message buffer beyond this point
-	DbgMgr.UnregisterOutput(OutputMsgBufID);
-	DebugMsgBuff.reset();
+	_G(DbgMgr).UnregisterOutput(OutputMsgBufID);
+	_G(DebugMsgBuff).reset();
 }
 
 void shutdown_debug() {
 	// Shutdown output subsystem
-	DbgMgr.UnregisterAll();
+	_G(DbgMgr).UnregisterAll();
 
-	DebugMsgBuff.reset();
-	DebugLogFile.reset();
-	DebugConsole.reset();
+	_G(DebugMsgBuff).reset();
+	_G(DebugLogFile).reset();
+	_G(DebugConsole).reset();
 }
 
 void debug_set_console(bool enable) {
-	if (DebugConsole)
-		DbgMgr.GetOutput(OutputGameConsoleID)->SetEnabled(enable);
+	if (_G(DebugConsole))
+		_G(DbgMgr).GetOutput(OutputGameConsoleID)->SetEnabled(enable);
 }
 
 // Prepends message text with current room number and running script info, then logs result
@@ -344,7 +344,7 @@ struct Breakpoint {
 };
 
 std::vector<Breakpoint> breakpoints;
-int numBreakpoints = 0;
+int _G(numBreakpoints) = 0;
 
 bool send_message_to_editor(const char *msg, const char *errorMsg) {
 	String callStack = get_cur_script(25);
@@ -362,7 +362,7 @@ bool send_message_to_editor(const char *msg, const char *errorMsg) {
 	}
 	strcat(messageToSend, "</Debugger>");
 
-	editor_debugger->SendMessageToEditor(messageToSend);
+	_G(editor_debugger)->SendMessageToEditor(messageToSend);
 
 	return true;
 }
@@ -373,17 +373,17 @@ bool send_message_to_editor(const char *msg) {
 
 bool init_editor_debugging() {
 #if AGS_PLATFORM_OS_WINDOWS
-	editor_debugger = GetEditorDebugger(editor_debugger_instance_token);
+	_G(editor_debugger) = GetEditorDebugger(_G(editor_debugger_instance_token));
 #else
 	// Editor isn't ported yet
-	editor_debugger = nullptr;
+	_G(editor_debugger) = nullptr;
 #endif
 
-	if (editor_debugger == nullptr)
-		quit("editor_debugger is NULL but debugger enabled");
+	if (_G(editor_debugger) == nullptr)
+		quit("_G(editor_debugger) is NULL but debugger enabled");
 
-	if (editor_debugger->Initialize()) {
-		editor_debugging_initialized = 1;
+	if (_G(editor_debugger)->Initialize()) {
+		_G(editor_debugging_initialized) = 1;
 
 		// Wait for the editor to send the initial breakpoints
 		// and then its READY message
@@ -399,8 +399,8 @@ bool init_editor_debugging() {
 }
 
 int check_for_messages_from_editor() {
-	if (editor_debugger->IsMessageAvailable()) {
-		char *msg = editor_debugger->GetNextMessage();
+	if (_G(editor_debugger)->IsMessageAvailable()) {
+		char *msg = _G(editor_debugger)->GetNextMessage();
 		if (msg == nullptr) {
 			return 0;
 		}
@@ -440,25 +440,25 @@ int check_for_messages_from_editor() {
 			int lineNumber = atoi(msgPtr);
 
 			if (isDelete) {
-				for (i = 0; i < numBreakpoints; i++) {
-					if ((breakpoints[i].lineNumber == lineNumber) &&
-						(strcmp(breakpoints[i].scriptName, scriptNameBuf) == 0)) {
-						numBreakpoints--;
+				for (i = 0; i < _G(numBreakpoints); i++) {
+					if ((_G(breakpoints)[i].lineNumber == lineNumber) &&
+						(strcmp(_G(breakpoints)[i].scriptName, scriptNameBuf) == 0)) {
+						_G(numBreakpoints)--;
 						breakpoints.erase(breakpoints.begin() + i);
 						break;
 					}
 				}
 			} else {
 				breakpoints.push_back(Breakpoint());
-				strcpy(breakpoints[numBreakpoints].scriptName, scriptNameBuf);
-				breakpoints[numBreakpoints].lineNumber = lineNumber;
-				numBreakpoints++;
+				strcpy(_G(breakpoints)[_G(numBreakpoints)].scriptName, scriptNameBuf);
+				_G(breakpoints)[_G(numBreakpoints)].lineNumber = lineNumber;
+				_G(numBreakpoints)++;
 			}
 		} else if (strncmp(msgPtr, "RESUME", 6) == 0) {
-			game_paused_in_debugger = 0;
+			_G(game_paused_in_debugger) = 0;
 		} else if (strncmp(msgPtr, "STEP", 4) == 0) {
-			game_paused_in_debugger = 0;
-			break_on_next_script_step = 1;
+			_G(game_paused_in_debugger) = 0;
+			_G(break_on_next_script_step) = 1;
 		} else if (strncmp(msgPtr, "EXIT", 4) == 0) {
 			want_exit = 1;
 			abort_engine = 1;
@@ -500,9 +500,9 @@ void break_into_debugger() {
 		SetForegroundWindow(editor_window_handle);
 
 	send_message_to_editor("BREAK");
-	game_paused_in_debugger = 1;
+	_G(game_paused_in_debugger) = 1;
 
-	while (game_paused_in_debugger) {
+	while (_G(game_paused_in_debugger)) {
 		update_polled_stuff_if_runtime();
 		platform->YieldCPU();
 	}
@@ -530,17 +530,17 @@ void scriptDebugHook(ccInstance *ccinst, int linenum) {
 		return;
 	}
 
-	if (break_on_next_script_step) {
-		break_on_next_script_step = 0;
+	if (_G(break_on_next_script_step)) {
+		_G(break_on_next_script_step) = 0;
 		break_into_debugger();
 		return;
 	}
 
 	const char *scriptName = ccinst->runningInst->instanceof->GetSectionName(ccinst->pc);
 
-	for (int i = 0; i < numBreakpoints; i++) {
-		if ((breakpoints[i].lineNumber == linenum) &&
-			(strcmp(breakpoints[i].scriptName, scriptName) == 0)) {
+	for (int i = 0; i < _G(numBreakpoints); i++) {
+		if ((_G(breakpoints)[i].lineNumber == linenum) &&
+			(strcmp(_G(breakpoints)[i].scriptName, scriptName) == 0)) {
 			break_into_debugger();
 			break;
 		}
@@ -558,7 +558,7 @@ void check_debug_keys() {
 			scrlockWasDown = 0;
 		else if ((ks[SDL_SCANCODE_SCROLLLOCK]) && (!scrlockWasDown)) {
 
-			break_on_next_script_step = 1;
+			_G(break_on_next_script_step) = 1;
 			scrlockWasDown = 1;
 		}
 

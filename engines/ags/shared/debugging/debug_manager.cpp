@@ -33,7 +33,7 @@ DebugOutput::DebugOutput(const String &id, IOutputHandler *handler, MessageType 
 	, _handler(handler)
 	, _enabled(enabled)
 	, _defaultVerbosity(def_verbosity) {
-	_groupFilter.resize(DbgMgr._lastGroupID + 1, _defaultVerbosity);
+	_groupFilter.resize(_G(DbgMgr)._lastGroupID + 1, _defaultVerbosity);
 }
 
 String DebugOutput::GetID() const {
@@ -53,7 +53,7 @@ void DebugOutput::SetEnabled(bool enable) {
 }
 
 void DebugOutput::SetGroupFilter(DebugGroupID id, MessageType verbosity) {
-	uint32_t key = DbgMgr.GetGroup(id).UID.ID;
+	uint32_t key = _G(DbgMgr).GetGroup(id).UID.ID;
 	if (key != kDbgGroup_None)
 		_groupFilter[key] = verbosity;
 	else
@@ -77,7 +77,7 @@ void DebugOutput::ResolveGroupID(DebugGroupID id) {
 	if (!id.IsValid())
 		return;
 
-	DebugGroupID real_id = DbgMgr.GetGroup(id).UID;
+	DebugGroupID real_id = _G(DbgMgr).GetGroup(id).UID;
 	if (real_id.IsValid()) {
 		if (_groupFilter.size() <= id.ID)
 			_groupFilter.resize(id.ID + 1, _defaultVerbosity);
@@ -90,7 +90,7 @@ void DebugOutput::ResolveGroupID(DebugGroupID id) {
 }
 
 bool DebugOutput::TestGroup(DebugGroupID id, MessageType mt) const {
-	DebugGroupID real_id = DbgMgr.GetGroup(id).UID;
+	DebugGroupID real_id = _G(DbgMgr).GetGroup(id).UID;
 	if (real_id.ID == kDbgGroup_None || real_id.ID >= _groupFilter.size())
 		return false;
 	return (_groupFilter[real_id.ID] >= mt) != 0;
@@ -125,7 +125,7 @@ DebugGroup DebugManager::RegisterGroup(const String &id, const String &out_name)
 	DebugGroup group = GetGroup(id);
 	if (group.UID.IsValid())
 		return group;
-	group = DebugGroup(DebugGroupID(++DbgMgr._lastGroupID, id), out_name);
+	group = DebugGroup(DebugGroupID(++_G(DbgMgr)._lastGroupID, id), out_name);
 	_groups.push_back(group);
 	_groupByStrLookup[group.UID.SID] = group.UID;
 
@@ -196,7 +196,7 @@ void DebugManager::SendMessage(OutputSlot &out, const DebugMessage &msg) {
 }
 
 // TODO: move this to the dynamically allocated engine object whenever it is implemented
-DebugManager DbgMgr;
+DebugManager _G(DbgMgr);
 
 
 namespace Debug {
@@ -204,21 +204,21 @@ namespace Debug {
 void Printf(const char *fmt, ...) {
 	va_list argptr;
 	va_start(argptr, fmt);
-	DbgMgr.Print(kDbgGroup_Main, kDbgMsg_Default, String::FromFormatV(fmt, argptr));
+	_G(DbgMgr).Print(kDbgGroup_Main, kDbgMsg_Default, String::FromFormatV(fmt, argptr));
 	va_end(argptr);
 }
 
 void Printf(MessageType mt, const char *fmt, ...) {
 	va_list argptr;
 	va_start(argptr, fmt);
-	DbgMgr.Print(kDbgGroup_Main, mt, String::FromFormatV(fmt, argptr));
+	_G(DbgMgr).Print(kDbgGroup_Main, mt, String::FromFormatV(fmt, argptr));
 	va_end(argptr);
 }
 
 void Printf(DebugGroupID group, MessageType mt, const char *fmt, ...) {
 	va_list argptr;
 	va_start(argptr, fmt);
-	DbgMgr.Print(group, mt, String::FromFormatV(fmt, argptr));
+	_G(DbgMgr).Print(group, mt, String::FromFormatV(fmt, argptr));
 	va_end(argptr);
 }
 

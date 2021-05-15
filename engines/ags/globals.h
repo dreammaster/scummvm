@@ -419,7 +419,7 @@ public:
 	 * \defgroup debug globals
 	 * @{
 	 */
-//----->
+
 	int _editor_debugging_enabled = 0;
 	int _editor_debugging_initialized = 0;
 	char _editor_debugger_instance_token[100];
@@ -505,7 +505,7 @@ public:
 	AGS::Engine::IDriverDependantBitmap *_blankImage = nullptr;
 	AGS::Engine::IDriverDependantBitmap *_blankSidebarImage = nullptr;
 	AGS::Engine::IDriverDependantBitmap *_debugConsole = nullptr;
-
+//----->
 	// actsps is used for temporary storage of the bitamp image
 	// of the latest version of the sprite
 	int _actSpsCount = 0;

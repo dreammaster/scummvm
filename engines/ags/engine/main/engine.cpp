@@ -105,11 +105,11 @@ extern int eip_guiobj;
 extern SpeechLipSyncLine *_G(splipsync);
 extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 extern Bitmap **actsps;
 extern RGB palette[256];
-extern CharacterExtras *_G(charextra);
-extern CharacterInfo*_G(_G(playerchar));
+
+
 extern Bitmap **guibg;
 extern IDriverDependantBitmap **guibgbmp;
 
@@ -470,13 +470,13 @@ void engine_init_audio()
 
 void engine_init_debug()
 {
-    if ((debug_flags & (~DBG_DEBUGMODE)) >0) {
+    if ((_G(debug_flags) & (~DBG_DEBUGMODE)) >0) {
         platform->DisplayAlert("Engine debugging enabled.\n"
             "\nNOTE: You have selected to enable one or more engine debugging options.\n"
             "These options cause many parts of the game to behave abnormally, and you\n"
             "may not see the game as you are used to it. The point is to test whether\n"
             "the engine passes a point where it is crashing on you normally.\n"
-            "[Debug flags enabled: 0x%02X]",debug_flags);
+            "[Debug flags enabled: 0x%02X]",_G(debug_flags));
     }
 }
 
@@ -655,24 +655,24 @@ void show_preload()
         Debug::Printf("Displaying preload image");
         if (splashsc->GetColorDepth() == 8)
             set_palette_range(temppal, 0, 255, 0);
-        if (gfxDriver->UsesMemoryBackBuffer())
-            gfxDriver->GetMemoryBackBuffer()->Clear();
+        if (_G(gfxDriver)->UsesMemoryBackBuffer())
+            _G(gfxDriver)->GetMemoryBackBuffer()->Clear();
 
         const Rect &view = _GP(play).GetMainViewport();
         Bitmap *tsc = BitmapHelper::CreateBitmapCopy(splashsc, _GP(game).GetColorDepth());
-        if (!gfxDriver->HasAcceleratedTransform() && view.GetSize() != tsc->GetSize())
+        if (!_G(gfxDriver)->HasAcceleratedTransform() && view.GetSize() != tsc->GetSize())
         {
             Bitmap *stretched = new Bitmap(view.GetWidth(), view.GetHeight(), tsc->GetColorDepth());
             stretched->StretchBlt(tsc, RectWH(0, 0, view.GetWidth(), view.GetHeight()));
             delete tsc;
             tsc = stretched;
         }
-        IDriverDependantBitmap *ddb = gfxDriver->CreateDDBFromBitmap(tsc, false, true);
+        IDriverDependantBitmap *ddb = _G(gfxDriver)->CreateDDBFromBitmap(tsc, false, true);
         ddb->SetStretch(view.GetWidth(), view.GetHeight());
-        gfxDriver->ClearDrawLists();
-        gfxDriver->DrawSprite(0, 0, ddb);
+        _G(gfxDriver)->ClearDrawLists();
+        _G(gfxDriver)->DrawSprite(0, 0, ddb);
         render_to_screen();
-        gfxDriver->DestroyDDB(ddb);
+        _G(gfxDriver)->DestroyDDB(ddb);
         delete splashsc;
         delete tsc;
         platform->Delay(500);
@@ -925,7 +925,7 @@ void engine_init_game_settings()
     for (ee = 0; ee < MAX_ROOM_BGFRAMES; ee++) 
         _GP(play).raw_modified[ee] = 0;
     _GP(play).game_speed_modifier = 0;
-    if (debug_flags & DBG_DEBUGMODE)
+    if (_G(debug_flags) & DBG_DEBUGMODE)
         _GP(play).debug_mode = 1;
     gui_disabled_style = convert_gui_disabled_style(_GP(game).options[OPT_DISABLEOFF]);
     _GP(play).shake_screen_yoff = 0;
@@ -1430,11 +1430,11 @@ bool engine_try_set_gfxmode_any(const ScreenSetup &setup)
 
 bool engine_try_switch_windowed_gfxmode()
 {
-    if (!gfxDriver || !gfxDriver->IsModeSet())
+    if (!_G(gfxDriver) || !_G(gfxDriver)->IsModeSet())
         return false;
 
     // Keep previous mode in case we need to revert back
-    DisplayMode old_dm = gfxDriver->GetDisplayMode();
+    DisplayMode old_dm = _G(gfxDriver)->GetDisplayMode();
     GameFrameSetup old_frame = graphics_mode_get_render_frame();
 
     // Release engine resources that depend on display mode
@@ -1477,7 +1477,7 @@ bool engine_try_switch_windowed_gfxmode()
     {
         // If succeeded (with any case), update engine objects that rely on
         // active display mode.
-        if (gfxDriver->GetDisplayMode().Windowed)
+        if (_G(gfxDriver)->GetDisplayMode().Windowed)
             init_desktop = get_desktop_size();
         engine_post_gfxmode_setup(init_desktop);
     }
@@ -1494,7 +1494,7 @@ void engine_on_window_changed(const Size &sz)
 
 void engine_shutdown_gfxmode()
 {
-    if (!gfxDriver)
+    if (!_G(gfxDriver))
         return;
 
     engine_pre_gfxsystem_shutdown();

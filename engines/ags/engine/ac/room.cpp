@@ -94,7 +94,7 @@ extern AGSPlatformDriver *platform;
 extern int numevents;
 extern CharacterCache *charcache;
 extern ObjectCache objcache[MAX_ROOM_OBJECTS];
-extern CharacterExtras *_G(charextra);
+
 extern int done_es_error;
 extern int our_eip;
 extern Bitmap *walkareabackup, *walkable_areas_temp;
@@ -103,11 +103,11 @@ extern SpriteCache spriteset;
 extern int in_new_room, new_room_was;  // 1 in new room, 2 first time in new room, 3 loading saved game
 extern ScriptHotspot scrHotspot[MAX_ROOM_HOTSPOTS];
 extern int in_leaves_screen;
-extern CharacterInfo*_G(_G(playerchar));
+
 extern int starting_room;
 extern unsigned int loopcounter;
 extern IDriverDependantBitmap* roomBackgroundBmp;
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 extern Bitmap *raw_saved_screen;
 extern int actSpsCount;
 extern Bitmap **actsps;
@@ -281,7 +281,7 @@ void unload_old_room() {
 
     if (roomBackgroundBmp != nullptr)
     {
-        gfxDriver->DestroyDDB(roomBackgroundBmp);
+        _G(gfxDriver)->DestroyDDB(roomBackgroundBmp);
         roomBackgroundBmp = nullptr;
     }
 
@@ -349,14 +349,14 @@ void unload_old_room() {
         actsps[ff] = nullptr;
 
         if (actspsbmp[ff] != nullptr)
-            gfxDriver->DestroyDDB(actspsbmp[ff]);
+            _G(gfxDriver)->DestroyDDB(actspsbmp[ff]);
         actspsbmp[ff] = nullptr;
 
         delete actspswb[ff];
         actspswb[ff] = nullptr;
 
         if (actspswbbmp[ff] != nullptr)
-            gfxDriver->DestroyDDB(actspswbbmp[ff]);
+            _G(gfxDriver)->DestroyDDB(actspswbbmp[ff]);
         actspswbbmp[ff] = nullptr;
 
         actspswbcache[ff].valid = 0;
@@ -742,7 +742,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
     update_polled_stuff_if_runtime();
 
     roominst=nullptr;
-    if (debug_flags & DBG_NOSCRIPT) ;
+    if (_G(debug_flags) & DBG_NOSCRIPT) ;
     else if (_GP(thisroom).CompiledScript!=nullptr) {
         compile_room_script();
         if (croom->tsdatasize>0) {
@@ -962,7 +962,7 @@ void new_room(int newnum,CharacterInfo*forchar) {
             guibg[i] = nullptr;
 
             if (guibgbmp[i])
-                gfxDriver->DestroyDDB(guibgbmp[i]);
+                _G(gfxDriver)->DestroyDDB(guibgbmp[i]);
             guibgbmp[i] = nullptr;
         }
         GUI::MarkAllGUIForUpdate();

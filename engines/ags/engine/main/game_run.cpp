@@ -94,7 +94,7 @@ extern int cur_mode;
 extern RoomObject *objs;
 extern char noWalkBehindsAtAll;
 extern RoomStatus *croom;
-extern CharacterExtras *_G(charextra);
+
 extern SpriteCache spriteset;
 extern int cur_mode, cur_cursor;
 extern char check_dynamic_sprites_at_exit;
@@ -359,11 +359,11 @@ bool run_service_key_controls(int &out_key) {
 
 	// debug console
 	if ((agskey == '`') && (_GP(play).debug_mode > 0)) {
-		display_console = !display_console;
+		_G(display_console) = !_G(display_console);
 		return false;
 	}
 
-	if ((agskey == eAGSKeyCodeCtrlE) && (display_fps == kFPS_Forced)) {
+	if ((agskey == eAGSKeyCodeCtrlE) && (_G(display_fps) == kFPS_Forced)) {
 		// if --fps paramter is used, Ctrl+E will max out frame rate
 		setTimerFps(isTimerFpsMaxed() ? frames_per_second : 1000);
 		return false;
@@ -604,7 +604,7 @@ static void game_loop_check_controls(bool checkControls) {
 }
 
 static void game_loop_do_update() {
-	if (debug_flags & DBG_NOUPDATE);
+	if (_G(debug_flags) & DBG_NOUPDATE);
 	else if (game_paused == 0) update_stuff();
 }
 
@@ -1013,7 +1013,7 @@ void update_polled_stuff_if_runtime() {
 		quit("||exit!");
 	}
 
-	if (editor_debugging_initialized)
+	if (_G(editor_debugging_initialized))
 		check_for_messages_from_editor();
 }
 

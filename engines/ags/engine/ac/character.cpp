@@ -85,11 +85,11 @@ extern RoomObject*objs;
 extern ScriptInvItem scrInv[MAX_INV];
 extern SpriteCache spriteset;
 extern Bitmap *walkable_areas_temp;
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 extern Bitmap **actsps;
 extern int is_text_overlay;
-extern int said_speech_line;
-extern int said_text;
+extern int _G(said_speech_line);
+extern int _G(said_text);
 extern int our_eip;
 extern CCCharacter ccDynamicCharacter;
 extern CCInventory ccDynamicInv;
@@ -2187,7 +2187,7 @@ void CheckViewFrameForCharacter(CharacterInfo *chi) {
 
 Bitmap *GetCharacterImage(int charid, int *isFlipped) 
 {
-    if (!gfxDriver->HasAcceleratedTransform())
+    if (!_G(gfxDriver)->HasAcceleratedTransform())
     {
         if (actsps[charid + MAX_ROOM_OBJECTS] != nullptr) 
         {
@@ -2344,8 +2344,8 @@ void _DisplaySpeechCore(int chid, const char *displbuf) {
     // adjust timing of text (so that DisplaySpeech("%s", str) pauses
     // for the length of the string not 2 frames)
     int len = (int)strlen(displbuf);
-    if (len > source_text_length + 3)
-        source_text_length = len;
+    if (len > _G(source_text_length) + 3)
+        _G(source_text_length) = len;
 
     DisplaySpeech(displbuf, chid);
 }
@@ -2354,8 +2354,8 @@ void _DisplayThoughtCore(int chid, const char *displbuf) {
     // adjust timing of text (so that DisplayThought("%s", str) pauses
     // for the length of the string not 2 frames)
     int len = (int)strlen(displbuf);
-    if (len > source_text_length + 3)
-        source_text_length = len;
+    if (len > _G(source_text_length) + 3)
+        _G(source_text_length) = len;
 
     int xpp = -1, ypp = -1, width = -1;
 
@@ -2389,7 +2389,7 @@ void _displayspeech(const char*texx, int aschar, int xx, int yy, int widd, int i
 
     EndSkippingUntilCharStops();
 
-    said_speech_line = 1;
+    _G(said_speech_line) = 1;
 
     int aa;
     if (_GP(play).bgspeech_stay_on_display == 0) {
@@ -2401,7 +2401,7 @@ void _displayspeech(const char*texx, int aschar, int xx, int yy, int widd, int i
             }
         }
     }
-    said_text = 1;
+    _G(said_text) = 1;
 
     // the strings are pre-translated
     //texx = get_translation(texx);

@@ -33,6 +33,7 @@
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/plugins/ags_plugin.h"
 #include "ags/plugins/plugin_object_reader.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -44,8 +45,6 @@ extern CCInventory ccDynamicInv;
 extern CCGUI       ccDynamicGUI;
 extern CCObject    ccDynamicObject;
 extern CCDialog    ccDynamicDialog;
-extern ScriptDrawingSurface *dialogOptionsRenderingSurface;
-extern ScriptDialogOptionsRendering ccDialogOptionsRendering;
 extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 extern int numPluginReaders;
 
@@ -95,10 +94,10 @@ void AGSDeSerializer::Unserialize(int index, const char *objectType, const char 
 		sds->Unserialize(index, serializedData, dataSize);
 
 		if (sds->isLinkedBitmapOnly) {
-			dialogOptionsRenderingSurface = sds;
+			_G(dialogOptionsRenderingSurface) = sds;
 		}
 	} else if (strcmp(objectType, "DialogOptionsRendering") == 0) {
-		ccDialogOptionsRendering.Unserialize(index, serializedData, dataSize);
+		_GP(ccDialogOptionsRendering).Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "StringDictionary") == 0) {
 		Dict_Unserialize(index, serializedData, dataSize);
 	} else if (strcmp(objectType, "StringSet") == 0) {

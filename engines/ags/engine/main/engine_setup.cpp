@@ -53,7 +53,7 @@ using namespace AGS::Engine;
 
 
 extern int _places_r, _places_g, _places_b;
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 
 int convert_16bit_bgr = 0;
 
@@ -147,17 +147,17 @@ void engine_init_resolution_settings(const Size game_size) {
 
 // Setup gfx driver callbacks and options
 void engine_post_gfxmode_driver_setup() {
-	gfxDriver->SetCallbackForPolling(update_polled_stuff_if_runtime);
-	gfxDriver->SetCallbackToDrawScreen(draw_game_screen_callback, construct_engine_overlay);
-	gfxDriver->SetCallbackForNullSprite(GfxDriverNullSpriteCallback);
+	_G(gfxDriver)->SetCallbackForPolling(update_polled_stuff_if_runtime);
+	_G(gfxDriver)->SetCallbackToDrawScreen(draw_game_screen_callback, construct_engine_overlay);
+	_G(gfxDriver)->SetCallbackForNullSprite(GfxDriverNullSpriteCallback);
 }
 
 // Reset gfx driver callbacks
 void engine_pre_gfxmode_driver_cleanup() {
-	gfxDriver->SetCallbackForPolling(nullptr);
-	gfxDriver->SetCallbackToDrawScreen(nullptr, nullptr);
-	gfxDriver->SetCallbackForNullSprite(nullptr);
-	gfxDriver->SetMemoryBackBuffer(nullptr);
+	_G(gfxDriver)->SetCallbackForPolling(nullptr);
+	_G(gfxDriver)->SetCallbackToDrawScreen(nullptr, nullptr);
+	_G(gfxDriver)->SetCallbackForNullSprite(nullptr);
+	_G(gfxDriver)->SetMemoryBackBuffer(nullptr);
 }
 
 // Setup virtual screen
@@ -179,21 +179,21 @@ void engine_pre_gfxsystem_screen_destroy() {
 // Setup color conversion parameters
 void engine_setup_color_conversions(int coldepth) {
 	// default shifts for how we store the sprite data1
-	_rgb_r_shift_32 = 16;
-	_rgb_g_shift_32 = 8;
-	_rgb_b_shift_32 = 0;
-	_rgb_r_shift_16 = 11;
-	_rgb_g_shift_16 = 5;
-	_rgb_b_shift_16 = 0;
-	_rgb_r_shift_15 = 10;
+	_G(_rgb_r_shift_32) = 16;
+	_G(_rgb_g_shift_32) = 8;
+	_G(_rgb_b_shift_32) = 0;
+	_G(_rgb_r_shift_16) = 11;
+	_G(_rgb_g_shift_16) = 5;
+	_G(_rgb_b_shift_16) = 0;
+	_G(_rgb_r_shift_15) = 10;
 	_rgb_g_shift_15 = 5;
-	_rgb_b_shift_15 = 0;
+	_G(_rgb_b_shift_15) = 0;
 
 	// Most cards do 5-6-5 RGB, which is the format the files are saved in
 	// Some do 5-6-5 BGR, or  6-5-5 RGB, in which case convert the gfx
-	if ((coldepth == 16) && ((_rgb_b_shift_16 != 0) || (_rgb_r_shift_16 != 11))) {
+	if ((coldepth == 16) && ((_G(_rgb_b_shift_16) != 0) || (_G(_rgb_r_shift_16) != 11))) {
 		convert_16bit_bgr = 1;
-		if (_rgb_r_shift_16 == 10) {
+		if (_G(_rgb_r_shift_16) == 10) {
 			// some very old graphics cards lie about being 16-bit when they
 			// are in fact 15-bit ... get around this
 			_places_r = 3;
@@ -204,30 +204,30 @@ void engine_setup_color_conversions(int coldepth) {
 		// when we're using 32-bit colour, it converts hi-color images
 		// the wrong way round - so fix that
 
-		_rgb_r_shift_16 = 11;
-		_rgb_g_shift_16 = 5;
-		_rgb_b_shift_16 = 0;
+		_G(_rgb_r_shift_16) = 11;
+		_G(_rgb_g_shift_16) = 5;
+		_G(_rgb_b_shift_16) = 0;
 	} else if (coldepth == 16) {
 		// ensure that any 32-bit graphics displayed are converted
 		// properly to the current depth
-		_rgb_r_shift_32 = 16;
-		_rgb_g_shift_32 = 8;
-		_rgb_b_shift_32 = 0;
+		_G(_rgb_r_shift_32) = 16;
+		_G(_rgb_g_shift_32) = 8;
+		_G(_rgb_b_shift_32) = 0;
 	} else if (coldepth < 16) {
 		// ensure that any 32-bit graphics displayed are converted
 		// properly to the current depth
 #if AGS_PLATFORM_OS_WINDOWS
-		_rgb_r_shift_32 = 16;
-		_rgb_g_shift_32 = 8;
-		_rgb_b_shift_32 = 0;
+		_G(_rgb_r_shift_32) = 16;
+		_G(_rgb_g_shift_32) = 8;
+		_G(_rgb_b_shift_32) = 0;
 #else
-		_rgb_r_shift_32 = 0;
-		_rgb_g_shift_32 = 8;
-		_rgb_b_shift_32 = 16;
+		_G(_rgb_r_shift_32) = 0;
+		_G(_rgb_g_shift_32) = 8;
+		_G(_rgb_b_shift_32) = 16;
 
-		_rgb_b_shift_15 = 0;
+		_G(_rgb_b_shift_15) = 0;
 		_rgb_g_shift_15 = 5;
-		_rgb_r_shift_15 = 10;
+		_G(_rgb_r_shift_15) = 10;
 #endif
 	}
 
@@ -286,7 +286,7 @@ void engine_setup_scsystem_screen(const DisplayMode &dm) {
 }
 
 void engine_post_gfxmode_setup(const Size &init_desktop) {
-	DisplayMode dm = gfxDriver->GetDisplayMode();
+	DisplayMode dm = _G(gfxDriver)->GetDisplayMode();
 	// If color depth has changed (or graphics mode was inited for the
 	// very first time), we also need to recreate bitmaps
 	bool has_driver_changed = _GP(scsystem).coldepth != dm.ColorDepth;

@@ -61,15 +61,15 @@ using namespace AGS::Shared;
 
 
 
-extern int longestline;
+extern int _G(longestline);
 extern AGSPlatformDriver *platform;
 extern int _G(loops_per_character);
 extern SpriteCache spriteset;
 
-int display_message_aschar = 0;
+int _G(display_message_aschar) = 0;
 
 
-TopBarSettings topBar;
+TopBarSettings _GP(topBar);
 struct DisplayVars {
 	int lineheight;    // font's height of single line
 	int linespacing;   // font's line spacing
@@ -115,13 +115,13 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 
 	EndSkippingUntilCharStops();
 
-	if (topBar.wantIt) {
+	if (_GP(topBar).wantIt) {
 		// ensure that the window is wide enough to display
 		// any top bar text
-		int topBarWid = wgettextwidth_compensate(topBar.text, topBar.font);
+		int topBarWid = wgettextwidth_compensate(_GP(topBar).text, _GP(topBar).font);
 		topBarWid += data_to_game_coord(_GP(play).top_bar_borderwidth + 2) * 2;
-		if (longestline < topBarWid)
-			longestline = topBarWid;
+		if (_G(longestline) < topBarWid)
+			_G(longestline) = topBarWid;
 		// the top bar should behave like DisplaySpeech wrt blocking
 		disp_type = DISPLAYTEXT_SPEECH;
 	}
@@ -145,13 +145,13 @@ int _display_main(int xx, int yy, int wii, const char *text, int disp_type, int 
 		yy = adjust_y_for_guis(yy);
 	}
 
-	if (longestline < wii - paddingDoubledScaled) {
+	if (_G(longestline) < wii - paddingDoubledScaled) {
 		// shrink the width of the dialog box to fit the text
 		int oldWid = wii;
 		//if ((asspch >= 0) || (allowShrink > 0))
 		// If it's not speech, or a shrink is allowed, then shrink it
 		if ((asspch == 0) || (allowShrink > 0))
-			wii = longestline + paddingDoubledScaled;
+			wii = _G(longestline) + paddingDoubledScaled;
 
 		// shift the dialog box right to align it, if necessary
 		if ((allowShrink == 2) && (xx >= 0))
@@ -383,7 +383,7 @@ bool try_auto_play_speech(const char *text, const char *&replace_text, int chari
 
 // TODO: refactor this global variable out; currently it is set at the every get_translation call.
 // Be careful: a number of Say/Display functions expect it to be set beforehand.
-int source_text_length = -1;
+int _G(source_text_length) = -1;
 
 int GetTextDisplayLength(const char *text) {
 	int len = (int)strlen(text);
@@ -406,11 +406,11 @@ int GetTextDisplayTime(const char *text, int canberel) {
 	if ((canberel == 1) && (_GP(play).bgspeech_game_speed == 1))
 		fpstimer = 40;
 
-	if (source_text_length >= 0) {
+	if (_G(source_text_length) >= 0) {
 		// sync to length of original text, to make sure any animations
 		// and music sync up correctly
-		uselen = source_text_length;
-		source_text_length = -1;
+		uselen = _G(source_text_length);
+		_G(source_text_length) = -1;
 	} else {
 		uselen = GetTextDisplayLength(text);
 	}
@@ -702,37 +702,37 @@ void draw_text_window_and_bar(Bitmap **text_window_ds, bool should_free_ds,
 
 	draw_text_window(text_window_ds, should_free_ds, xins, yins, xx, yy, wii, set_text_color, ovrheight, ifnum);
 
-	if ((topBar.wantIt) && (text_window_ds && *text_window_ds)) {
+	if ((_GP(topBar).wantIt) && (text_window_ds && *text_window_ds)) {
 		// top bar on the dialog window with character's name
 		// create an enlarged window, then free the old one
 		Bitmap *ds = *text_window_ds;
-		Bitmap *newScreenop = BitmapHelper::CreateBitmap(ds->GetWidth(), ds->GetHeight() + topBar.height, _GP(game).GetColorDepth());
-		newScreenop->Blit(ds, 0, 0, 0, topBar.height, ds->GetWidth(), ds->GetHeight());
+		Bitmap *newScreenop = BitmapHelper::CreateBitmap(ds->GetWidth(), ds->GetHeight() + _GP(topBar).height, _GP(game).GetColorDepth());
+		newScreenop->Blit(ds, 0, 0, 0, _GP(topBar).height, ds->GetWidth(), ds->GetHeight());
 		delete *text_window_ds;
 		*text_window_ds = newScreenop;
 		ds = *text_window_ds;
 
 		// draw the top bar
 		color_t draw_color = ds->GetCompatibleColor(_GP(play).top_bar_backcolor);
-		ds->FillRect(Rect(0, 0, ds->GetWidth() - 1, topBar.height - 1), draw_color);
+		ds->FillRect(Rect(0, 0, ds->GetWidth() - 1, _GP(topBar).height - 1), draw_color);
 		if (_GP(play).top_bar_backcolor != _GP(play).top_bar_bordercolor) {
 			// draw the border
 			draw_color = ds->GetCompatibleColor(_GP(play).top_bar_bordercolor);
 			for (int j = 0; j < data_to_game_coord(_GP(play).top_bar_borderwidth); j++)
-				ds->DrawRect(Rect(j, j, ds->GetWidth() - (j + 1), topBar.height - (j + 1)), draw_color);
+				ds->DrawRect(Rect(j, j, ds->GetWidth() - (j + 1), _GP(topBar).height - (j + 1)), draw_color);
 		}
 
 		// draw the text
-		int textx = (ds->GetWidth() / 2) - wgettextwidth_compensate(topBar.text, topBar.font) / 2;
+		int textx = (ds->GetWidth() / 2) - wgettextwidth_compensate(_GP(topBar).text, _GP(topBar).font) / 2;
 		color_t text_color = ds->GetCompatibleColor(_GP(play).top_bar_textcolor);
-		wouttext_outline(ds, textx, _GP(play).top_bar_borderwidth + get_fixed_pixel_size(1), topBar.font, text_color, topBar.text);
+		wouttext_outline(ds, textx, _GP(play).top_bar_borderwidth + get_fixed_pixel_size(1), _GP(topBar).font, text_color, _GP(topBar).text);
 
 		// don't draw it next time
-		topBar.wantIt = 0;
+		_GP(topBar).wantIt = 0;
 		// adjust the text Y position
-		yins[0] += topBar.height;
-	} else if (topBar.wantIt)
-		topBar.wantIt = 0;
+		yins[0] += _GP(topBar).height;
+	} else if (_GP(topBar).wantIt)
+		_GP(topBar).wantIt = 0;
 }
 
 } // namespace AGS3

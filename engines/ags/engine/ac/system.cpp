@@ -48,7 +48,7 @@ extern GameSetup usetup;
 
 
 
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 extern CCAudioChannel _GP(ccDynamicAudio);
 extern volatile bool switched_away;
 
@@ -106,7 +106,7 @@ const char *System_GetVersion() {
 }
 
 int System_GetHardwareAcceleration() {
-	return gfxDriver->HasAcceleratedTransform() ? 1 : 0;
+	return _G(gfxDriver)->HasAcceleratedTransform() ? 1 : 0;
 }
 
 int System_GetNumLock() {
@@ -132,7 +132,7 @@ int System_GetVsync() {
 }
 
 void System_SetVsync(int newValue) {
-	if (ags_stricmp(gfxDriver->GetDriverID(), "D3D9") != 0)
+	if (ags_stricmp(_G(gfxDriver)->GetDriverID(), "D3D9") != 0)
 		_GP(scsystem).vsync = newValue;
 }
 
@@ -146,7 +146,7 @@ void System_SetWindowed(int windowed) {
 }
 
 int System_GetSupportsGammaControl() {
-	return gfxDriver->SupportsGammaControl();
+	return _G(gfxDriver)->SupportsGammaControl();
 }
 
 int System_GetGamma() {
@@ -161,8 +161,8 @@ void System_SetGamma(int newValue) {
 		debug_script_log("Gamma control set to %d", newValue);
 		_GP(play).gamma_adjustment = newValue;
 
-		if (gfxDriver->SupportsGammaControl())
-			gfxDriver->SetGamma(newValue);
+		if (_G(gfxDriver)->SupportsGammaControl())
+			_G(gfxDriver)->SetGamma(newValue);
 	}
 }
 

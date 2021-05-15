@@ -220,7 +220,7 @@ Rect GetCharacterRoomBBox(int charid, bool use_frame_0 = false);
 PViewport FindNearestViewport(int charid);
 
 
-extern CharacterExtras *_G(charextra);
+
 extern MoveList *mls;
 extern int32_t _sc_PlayerCharPtr;
 

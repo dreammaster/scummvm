@@ -64,7 +64,7 @@ extern SpriteCache spriteset;
 extern int actSpsCount;
 extern Bitmap **actsps;
 extern IDriverDependantBitmap **actspsbmp;
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 
 // Used for deciding whether a char or obj was closer
 int obj_lowest_yp;
@@ -539,7 +539,7 @@ void GetObjectPropertyText(int item, const char *property, char *bufer) {
 }
 
 Bitmap *GetObjectImage(int obj, int *isFlipped) {
-	if (!gfxDriver->HasAcceleratedTransform()) {
+	if (!_G(gfxDriver)->HasAcceleratedTransform()) {
 		if (actsps[obj] != nullptr) {
 			// the actsps image is pre-flipped, so no longer register the image as such
 			if (isFlipped)

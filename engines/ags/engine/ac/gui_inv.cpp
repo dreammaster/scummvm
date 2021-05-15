@@ -34,7 +34,7 @@ namespace AGS3 {
 
 extern int gui_disabled_style;
 
-extern CharacterExtras *_G(charextra);
+
 extern SpriteCache spriteset;
 
 

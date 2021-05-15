@@ -64,7 +64,7 @@ using namespace AGS::Engine;
 
 
 
-extern CharacterExtras *_G(charextra);
+
 extern MoveList *mls;
 extern RGB palette[256];
 extern DialogTopic *dialog;

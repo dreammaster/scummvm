@@ -42,7 +42,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 extern GameSetup usetup;
 
 
@@ -98,14 +98,14 @@ Bitmap *get_gui_screen() {
 
 void clear_gui_screen() {
 	if (dialogDDB)
-		gfxDriver->DestroyDDB(dialogDDB);
+		_G(gfxDriver)->DestroyDDB(dialogDDB);
 	dialogDDB = nullptr;
 	delete windowBuffer;
 	windowBuffer = nullptr;
 }
 
 void refresh_gui_screen() {
-	gfxDriver->UpdateDDBFromBitmap(dialogDDB, windowBuffer, false);
+	_G(gfxDriver)->UpdateDDBFromBitmap(dialogDDB, windowBuffer, false);
 	render_graphics(dialogDDB, windowPosX, windowPosY);
 }
 

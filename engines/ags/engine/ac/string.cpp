@@ -38,7 +38,7 @@ namespace AGS3 {
 
 
 
-extern int longestline;
+extern int _G(longestline);
 extern ScriptString myScriptStringImpl;
 
 int String_IsNullOrEmpty(const char *thisString) {
@@ -238,7 +238,7 @@ size_t break_up_text_into_lines(const char *todis, SplitLines &lines, int wii, i
 		if (todis[0] == ' ') todis++;
 	}
 	lines.Reset();
-	longestline = 0;
+	_G(longestline) = 0;
 
 	// Don't attempt to display anything if the width is tiny
 	if (wii < 3)
@@ -254,13 +254,13 @@ size_t break_up_text_into_lines(const char *todis, SplitLines &lines, int wii, i
 		for (size_t rr = 0; rr < lines.Count(); rr++) {
 			lines[rr].Reverse();
 			line_length = wgettextwidth_compensate(lines[rr], fonnt);
-			if (line_length > longestline)
-				longestline = line_length;
+			if (line_length > _G(longestline))
+				_G(longestline) = line_length;
 		} else
 			for (size_t rr = 0; rr < lines.Count(); rr++) {
 				line_length = wgettextwidth_compensate(lines[rr], fonnt);
-				if (line_length > longestline)
-					longestline = line_length;
+				if (line_length > _G(longestline))
+					_G(longestline) = line_length;
 			}
 		return lines.Count();
 }

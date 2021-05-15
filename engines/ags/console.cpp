@@ -38,7 +38,7 @@ AGSConsole::AGSConsole(AGSEngine *vm) : GUI::Debugger(), _vm(vm), _logOutputTarg
 	registerCmd("ags_sprite_dump",  WRAP_METHOD(AGSConsole, Cmd_dumpSprite));
 
 	_logOutputTarget = new LogOutputTarget();
-	_agsDebuggerOutput = _GP(DbgMgr).RegisterOutput("ScummVMLog", _logOutputTarget, AGS3::AGS::Shared::kDbgMsg_None);
+	_agsDebuggerOutput = _GP(_G(DbgMgr)).RegisterOutput("ScummVMLog", _logOutputTarget, AGS3::AGS::Shared::kDbgMsg_None);
 }
 
 AGSConsole::~AGSConsole() {

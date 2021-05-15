@@ -58,9 +58,9 @@ static struct {
  * Prepare offsets for direct access to 24bpp bitmap.
  */
 void _aa_prepare_for_24bpp() {
-  _aa.roffset24 = _G(_rgb_r_shift_24) / 8;
-  _aa.goffset24 = _G(_rgb_g_shift_24) / 8;
-  _aa.boffset24 = _G(_rgb_b_shift_24) / 8;
+  _aa.roffset24 = _G(_G(_rgb_r_shift_24)) / 8;
+  _aa.goffset24 = _G(_G(_rgb_g_shift_24)) / 8;
+  _aa.boffset24 = _G(_G(_rgb_b_shift_24)) / 8;
 }
 
 /*

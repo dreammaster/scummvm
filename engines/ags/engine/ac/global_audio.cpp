@@ -130,7 +130,7 @@ int IsSoundPlaying() {
 // returns -1 on failure, channel number on success
 int PlaySoundEx(int val1, int channel) {
 
-	if (debug_flags & DBG_NOSFX)
+	if (_G(debug_flags) & DBG_NOSFX)
 		return -1;
 
 	ScriptAudioClip *aclip = GetAudioClipForOldStyleNumber(game, false, val1);

@@ -88,7 +88,7 @@ extern RoomStatus *croom;
 extern int gui_disabled_style;
 
 extern int getloctype_index;
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 extern RGB palette[256];
 
 #if AGS_PLATFORM_OS_IOS || AGS_PLATFORM_OS_ANDROID
@@ -270,7 +270,7 @@ int RunAGSGame(const char *newgame, unsigned int mode, int data) {
 	if ((mode & (~AllowedModes)) != 0)
 		quit("!RunAGSGame: mode value unknown");
 
-	if (editor_debugging_enabled) {
+	if (_G(editor_debugging_enabled)) {
 		quit("!RunAGSGame cannot be used while running the game from within the AGS Editor. You must build the game EXE and run it from there to use this function.");
 	}
 

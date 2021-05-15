@@ -55,7 +55,7 @@ using namespace AGS::Engine;
 
 
 
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 extern int psp_video_framedrop;
 
 enum VideoPlaybackType {
@@ -110,8 +110,8 @@ int fli_callback() {
 	else
 		fli_target->StretchBlt(usebuf, RectWH(0, 0, fliwidth, fliheight), RectWH(0, 0, view.GetWidth(), view.GetHeight()));
 
-	gfxDriver->UpdateDDBFromBitmap(fli_ddb, fli_target, false);
-	gfxDriver->DrawSprite(0, 0, fli_ddb);
+	_G(gfxDriver)->UpdateDDBFromBitmap(fli_ddb, fli_target, false);
+	_G(gfxDriver)->DrawSprite(0, 0, fli_ddb);
 	render_to_screen();
 
 	return check_if_user_input_should_cancel_video();
@@ -175,8 +175,8 @@ void play_flc_file(int numb, int playflags) {
 	fli_buffer->Clear();
 
 	if (clearScreenAtStart) {
-		if (gfxDriver->UsesMemoryBackBuffer()) {
-			Bitmap *screen_bmp = gfxDriver->GetMemoryBackBuffer();
+		if (_G(gfxDriver)->UsesMemoryBackBuffer()) {
+			Bitmap *screen_bmp = _G(gfxDriver)->GetMemoryBackBuffer();
 			screen_bmp->Clear();
 		}
 		render_to_screen();
@@ -184,7 +184,7 @@ void play_flc_file(int numb, int playflags) {
 
 	video_type = kVideoFlic;
 	fli_target = BitmapHelper::CreateBitmap(view.GetWidth(), view.GetHeight(), _GP(game).GetColorDepth());
-	fli_ddb = gfxDriver->CreateDDBFromBitmap(fli_target, false, true);
+	fli_ddb = _G(gfxDriver)->CreateDDBFromBitmap(fli_target, false, true);
 
 	size_t asset_size;
 	PACKFILE *pf = PackfileFromAsset(AssetPath("", flicname), asset_size);
@@ -232,15 +232,15 @@ void play_flc_file(int numb, int playflags) {
 	delete fli_buffer;
 	fli_buffer = nullptr;
 	// NOTE: the screen bitmap could change in the meanwhile, if the display mode has changed
-	if (gfxDriver->UsesMemoryBackBuffer()) {
-		Bitmap *screen_bmp = gfxDriver->GetMemoryBackBuffer();
+	if (_G(gfxDriver)->UsesMemoryBackBuffer()) {
+		Bitmap *screen_bmp = _G(gfxDriver)->GetMemoryBackBuffer();
 		screen_bmp->Clear();
 	}
 	set_palette_range(oldpal, 0, 255, 0);
 	render_to_screen();
 
 	delete fli_target;
-	gfxDriver->DestroyDDB(fli_ddb);
+	_G(gfxDriver)->DestroyDDB(fli_ddb);
 	fli_target = nullptr;
 	fli_ddb = nullptr;
 
@@ -270,28 +270,28 @@ int theora_playing_callback(BITMAP *theoraBuffer) {
 	int drawAtX = 0, drawAtY = 0;
 	const Rect &viewport = _GP(play).GetMainViewport();
 	if (fli_ddb == nullptr) {
-		fli_ddb = gfxDriver->CreateDDBFromBitmap(&gl_TheoraBuffer, false, true);
+		fli_ddb = _G(gfxDriver)->CreateDDBFromBitmap(&gl_TheoraBuffer, false, true);
 	}
 	if (stretch_flc) {
 		drawAtX = viewport.GetWidth() / 2 - fliTargetWidth / 2;
 		drawAtY = viewport.GetHeight() / 2 - fliTargetHeight / 2;
-		if (!gfxDriver->HasAcceleratedTransform()) {
+		if (!_G(gfxDriver)->HasAcceleratedTransform()) {
 			fli_target->StretchBlt(&gl_TheoraBuffer, RectWH(0, 0, gl_TheoraBuffer.GetWidth(), gl_TheoraBuffer.GetHeight()),
 				RectWH(drawAtX, drawAtY, fliTargetWidth, fliTargetHeight));
-			gfxDriver->UpdateDDBFromBitmap(fli_ddb, fli_target, false);
+			_G(gfxDriver)->UpdateDDBFromBitmap(fli_ddb, fli_target, false);
 			drawAtX = 0;
 			drawAtY = 0;
 		} else {
-			gfxDriver->UpdateDDBFromBitmap(fli_ddb, &gl_TheoraBuffer, false);
+			_G(gfxDriver)->UpdateDDBFromBitmap(fli_ddb, &gl_TheoraBuffer, false);
 			fli_ddb->SetStretch(fliTargetWidth, fliTargetHeight, false);
 		}
 	} else {
-		gfxDriver->UpdateDDBFromBitmap(fli_ddb, &gl_TheoraBuffer, false);
+		_G(gfxDriver)->UpdateDDBFromBitmap(fli_ddb, &gl_TheoraBuffer, false);
 		drawAtX = viewport.GetWidth() / 2 - gl_TheoraBuffer.GetWidth() / 2;
 		drawAtY = viewport.GetHeight() / 2 - gl_TheoraBuffer.GetHeight() / 2;
 	}
 
-	gfxDriver->DrawSprite(drawAtX, drawAtY, fli_ddb);
+	_G(gfxDriver)->DrawSprite(drawAtX, drawAtY, fli_ddb);
 	update_audio_system_on_game_loop();
 	render_to_screen();
 
@@ -381,18 +381,18 @@ void play_theora_video(const char *name, int skip, int flags) {
 		stretch_flc = 0;
 	}
 
-	if ((stretch_flc) && (!gfxDriver->HasAcceleratedTransform())) {
+	if ((stretch_flc) && (!_G(gfxDriver)->HasAcceleratedTransform())) {
 		fli_target = BitmapHelper::CreateBitmap(_GP(play).GetMainViewport().GetWidth(), _GP(play).GetMainViewport().GetHeight(), _GP(game).GetColorDepth());
 		fli_target->Clear();
-		fli_ddb = gfxDriver->CreateDDBFromBitmap(fli_target, false, true);
+		fli_ddb = _G(gfxDriver)->CreateDDBFromBitmap(fli_target, false, true);
 	} else {
 		fli_ddb = nullptr;
 	}
 
 	update_polled_stuff_if_runtime();
 
-	if (gfxDriver->UsesMemoryBackBuffer())
-		gfxDriver->GetMemoryBackBuffer()->Clear();
+	if (_G(gfxDriver)->UsesMemoryBackBuffer())
+		_G(gfxDriver)->GetMemoryBackBuffer()->Clear();
 
 	video_type = kVideoTheora;
 	if (apeg_play_apeg_stream(oggVid, nullptr, 0, theora_playing_callback) == APEG_ERROR) {
@@ -403,7 +403,7 @@ void play_theora_video(const char *name, int skip, int flags) {
 
 	//destroy_bitmap(fli_buffer);
 	delete fli_target;
-	gfxDriver->DestroyDDB(fli_ddb);
+	_G(gfxDriver)->DestroyDDB(fli_ddb);
 	fli_target = nullptr;
 	fli_ddb = nullptr;
 	invalidate_screen();

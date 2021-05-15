@@ -275,9 +275,9 @@ void ReadViews(GameSetupStruct &game, ViewStruct *&views, Stream *in, GameDataVe
 }
 
 void ReadDialogs(DialogTopic *&dialog,
-	std::vector< std::shared_ptr<unsigned char> > &old_dialog_scripts,
+	std::vector< std::shared_ptr<unsigned char> > &_G(old_dialog_scripts),
 	std::vector<String> &old_dialog_src,
-	std::vector<String> &old_speech_lines,
+	std::vector<String> &_G(old_speech_lines),
 	Stream *in, GameDataVersion data_ver, int dlg_count) {
 	// TODO: I suspect +5 was a hacky way to "supress" memory access mistakes;
 	// double check and remove if proved unnecessary
@@ -289,12 +289,12 @@ void ReadDialogs(DialogTopic *&dialog,
 	if (data_ver > kGameVersion_310)
 		return;
 
-	old_dialog_scripts.resize(dlg_count);
+	_G(old_dialog_scripts).resize(dlg_count);
 	old_dialog_src.resize(dlg_count);
 	for (int i = 0; i < dlg_count; ++i) {
 		// NOTE: originally this was read into dialog[i].optionscripts
-		old_dialog_scripts[i].reset(new unsigned char[dialog[i].codesize]);
-		in->Read(old_dialog_scripts[i].get(), dialog[i].codesize);
+		_G(old_dialog_scripts)[i].reset(new unsigned char[dialog[i].codesize]);
+		in->Read(_G(old_dialog_scripts)[i].get(), dialog[i].codesize);
 
 		// Encrypted text script
 		int script_text_len = in->ReadInt32();
@@ -352,7 +352,7 @@ void ReadDialogs(DialogTopic *&dialog,
 			if (end_reached)
 				break;
 
-			old_speech_lines.push_back(buffer);
+			_G(old_speech_lines).push_back(buffer);
 			i++;
 		}
 	} else {
@@ -369,7 +369,7 @@ void ReadDialogs(DialogTopic *&dialog,
 			in->Read(buffer, newlen);
 			buffer[newlen] = 0;
 			decrypt_text(buffer);
-			old_speech_lines.push_back(buffer);
+			_G(old_speech_lines).push_back(buffer);
 			i++;
 		}
 	}

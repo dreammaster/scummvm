@@ -41,7 +41,7 @@ using namespace AGS::Engine;
 extern SpriteCache spriteset;
 extern int our_eip, eip_guinum, eip_guiobj;
 extern RGB palette[256];
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 extern AGSPlatformDriver *platform;
 
 void get_new_size_for_sprite(int ee, int ww, int hh, int &newwid, int &newhit) {

@@ -74,7 +74,7 @@ HSaveError restore_game_data(Stream *in, SavegameVersion svg_version, const Pres
 
 extern Bitmap **guibg;
 extern AGS::Engine::IDriverDependantBitmap **guibgbmp;
-extern AGS::Engine::IGraphicsDriver *gfxDriver;
+extern AGS::Engine::IGraphicsDriver *_G(gfxDriver);
 extern Bitmap *dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
 extern Bitmap *raw_saved_screen;
 extern RoomStatus troom;
@@ -356,7 +356,7 @@ void DoBeforeRestore(PreservedParams &pp) {
 		guibg[i] = nullptr;
 
 		if (guibgbmp[i])
-			gfxDriver->DestroyDDB(guibgbmp[i]);
+			_G(gfxDriver)->DestroyDDB(guibgbmp[i]);
 		guibgbmp[i] = nullptr;
 	}
 

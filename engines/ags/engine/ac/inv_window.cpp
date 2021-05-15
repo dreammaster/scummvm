@@ -53,7 +53,7 @@ using namespace AGS::Shared;
 
 
 
-extern CharacterExtras *_G(charextra);
+
 extern ScriptInvItem scrInv[MAX_INV];
 extern int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
 extern SpriteCache spriteset;

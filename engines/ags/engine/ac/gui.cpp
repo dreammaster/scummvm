@@ -71,7 +71,7 @@ extern ScriptGUI *scrGui;
 extern CCGUIObject ccDynamicGUIObject;
 extern Bitmap **guibg;
 extern IDriverDependantBitmap **guibgbmp;
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 
 extern CCGUI ccDynamicGUI;
 extern CCGUIObject ccDynamicGUIObject;
@@ -572,7 +572,7 @@ void recreate_guibg_image(GUIMain *tehgui) {
 	guibg[ifn] = ReplaceBitmapWithSupportedFormat(guibg[ifn]);
 
 	if (guibgbmp[ifn] != nullptr) {
-		gfxDriver->DestroyDDB(guibgbmp[ifn]);
+		_G(gfxDriver)->DestroyDDB(guibgbmp[ifn]);
 		guibgbmp[ifn] = nullptr;
 	}
 }

@@ -114,7 +114,7 @@ volatile bool _audio_doing_crossfade;
 extern GameSetup usetup;
 
 
-extern CharacterInfo*_G(_G(playerchar));
+
 
 extern volatile int switching_away_from_game;
 
@@ -1124,7 +1124,7 @@ SOUNDCLIP *load_music_from_disk(int mnum, bool doRepeat) {
 
 static void play_new_music(int mnum, SOUNDCLIP *music)
 {
-    if (debug_flags & DBG_NOMUSIC)
+    if (_G(debug_flags) & DBG_NOMUSIC)
         return;
 
     if ((_GP(play).cur_music_number == mnum) && (music == nullptr)) {

@@ -57,7 +57,7 @@ extern CharacterCache *charcache;
 extern ObjectCache objcache[MAX_ROOM_OBJECTS];
 
 extern RGB palette[256];
-extern AGS::Engine::IGraphicsDriver *gfxDriver;
+extern AGS::Engine::IGraphicsDriver *_G(gfxDriver);
 
 char check_dynamic_sprites_at_exit = 1;
 

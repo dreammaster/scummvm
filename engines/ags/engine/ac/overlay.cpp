@@ -47,8 +47,8 @@ using namespace AGS::Engine;
 extern int displayed_room;
 extern int _G(face_talking);
 
-extern CharacterExtras *_G(charextra);
-extern IGraphicsDriver *gfxDriver;
+
+extern IGraphicsDriver *_G(gfxDriver);
 
 
 
@@ -158,7 +158,7 @@ void dispose_overlay(ScreenOverlay &over) {
 	delete over.pic;
 	over.pic = nullptr;
 	if (over.bmp != nullptr)
-		gfxDriver->DestroyDDB(over.bmp);
+		_G(gfxDriver)->DestroyDDB(over.bmp);
 	over.bmp = nullptr;
 	// if the script didn't actually use the Overlay* return
 	// value, dispose of the pointer
@@ -213,7 +213,7 @@ int add_screen_overlay(int x, int y, int type, Shared::Bitmap *piccy, int pic_of
 	}
 	ScreenOverlay &over = screenover[numscreenover++];
 	over.pic = piccy;
-	over.bmp = gfxDriver->CreateDDBFromBitmap(piccy, alphaChannel);
+	over.bmp = _G(gfxDriver)->CreateDDBFromBitmap(piccy, alphaChannel);
 	over.x = x;
 	over.y = y;
 	over._offsetX = pic_offx;
@@ -274,9 +274,9 @@ void get_overlay_position(const ScreenOverlay &over, int *x, int *y) {
 void recreate_overlay_ddbs() {
 	for (int i = 0; i < numscreenover; ++i) {
 		if (screenover[i].bmp)
-			gfxDriver->DestroyDDB(screenover[i].bmp);
+			_G(gfxDriver)->DestroyDDB(screenover[i].bmp);
 		if (screenover[i].pic)
-			screenover[i].bmp = gfxDriver->CreateDDBFromBitmap(screenover[i].pic, false);
+			screenover[i].bmp = _G(gfxDriver)->CreateDDBFromBitmap(screenover[i].pic, false);
 		else
 			screenover[i].bmp = nullptr;
 	}

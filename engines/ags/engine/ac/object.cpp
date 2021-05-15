@@ -58,7 +58,7 @@ extern ObjectCache objcache[MAX_ROOM_OBJECTS];
 extern MoveList *mls;
 
 extern Bitmap *walkable_areas_temp;
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 extern CCObject ccDynamicObject;
 
 
@@ -491,7 +491,7 @@ int is_pos_in_sprite(int xx, int yy, int arx, int ary, Bitmap *sprit, int spww, 
 		int xpos = data_to_game_coord(xx - arx);
 		int ypos = data_to_game_coord(yy - ary);
 
-		if (gfxDriver->HasAcceleratedTransform()) {
+		if (_G(gfxDriver)->HasAcceleratedTransform()) {
 			// hardware acceleration, so the sprite in memory will not have
 			// been stretched, it will be original size. Thus, adjust our
 			// calculations to compensate

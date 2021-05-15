@@ -73,9 +73,9 @@ extern GameSetup usetup;
 
 extern int our_eip;
 extern int convert_16bit_bgr;
-extern int editor_debugging_enabled;
-extern int editor_debugging_initialized;
-extern char editor_debugger_instance_token[100];
+extern int _G(editor_debugging_enabled);
+extern int _G(editor_debugging_initialized);
+extern char _G(editor_debugger_instance_token)[100];
 
 
 // Startup flags, set from parameters to engine
@@ -262,7 +262,7 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 		if (ags_stricmp(arg, "-v") == 0 || ags_stricmp(arg, "--version") == 0) {
 			justDisplayVersion = true;
 		} else if (ags_stricmp(arg, "--updatereg") == 0)
-			debug_flags |= DBG_REGONLY;
+			_G(debug_flags) |= DBG_REGONLY;
 		else if ((ags_stricmp(arg, "--startr") == 0) && (ee < argc - 1)) {
 			override_start_room = atoi(argv[ee + 1]);
 			ee++;
@@ -277,8 +277,8 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 			loadSaveGameOnStartup = argv[ee + 1];
 			ee++;
 		} else if ((ags_stricmp(arg, "--enabledebugger") == 0) && (argc > ee + 1)) {
-			strcpy(editor_debugger_instance_token, argv[ee + 1]);
-			editor_debugging_enabled = 1;
+			strcpy(_G(editor_debugger_instance_token), argv[ee + 1]);
+			_G(editor_debugging_enabled) = 1;
 			force_window = 1;
 			ee++;
 		} else if (ags_stricmp(arg, "--conf") == 0 && (argc > ee + 1)) {
@@ -325,16 +325,16 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 				INIwritestring(cfg, "graphics", "game_scale_win", argv[++ee]);
 			else
 				INIwritestring(cfg, "graphics", "game_scale_win", "max_round");
-		} else if (ags_stricmp(arg, "--fps") == 0) display_fps = kFPS_Forced;
-		else if (ags_stricmp(arg, "--test") == 0) debug_flags |= DBG_DEBUGMODE;
-		else if (ags_stricmp(arg, "--noiface") == 0) debug_flags |= DBG_NOIFACE;
-		else if (ags_stricmp(arg, "--nosprdisp") == 0) debug_flags |= DBG_NODRAWSPRITES;
-		else if (ags_stricmp(arg, "--nospr") == 0) debug_flags |= DBG_NOOBJECTS;
-		else if (ags_stricmp(arg, "--noupdate") == 0) debug_flags |= DBG_NOUPDATE;
-		else if (ags_stricmp(arg, "--nosound") == 0) debug_flags |= DBG_NOSFX;
-		else if (ags_stricmp(arg, "--nomusic") == 0) debug_flags |= DBG_NOMUSIC;
-		else if (ags_stricmp(arg, "--noscript") == 0) debug_flags |= DBG_NOSCRIPT;
-		else if (ags_stricmp(arg, "--novideo") == 0) debug_flags |= DBG_NOVIDEO;
+		} else if (ags_stricmp(arg, "--fps") == 0) _G(display_fps) = kFPS_Forced;
+		else if (ags_stricmp(arg, "--test") == 0) _G(debug_flags) |= DBG_DEBUGMODE;
+		else if (ags_stricmp(arg, "--noiface") == 0) _G(debug_flags) |= DBG_NOIFACE;
+		else if (ags_stricmp(arg, "--nosprdisp") == 0) _G(debug_flags) |= DBG_NODRAWSPRITES;
+		else if (ags_stricmp(arg, "--nospr") == 0) _G(debug_flags) |= DBG_NOOBJECTS;
+		else if (ags_stricmp(arg, "--noupdate") == 0) _G(debug_flags) |= DBG_NOUPDATE;
+		else if (ags_stricmp(arg, "--nosound") == 0) _G(debug_flags) |= DBG_NOSFX;
+		else if (ags_stricmp(arg, "--nomusic") == 0) _G(debug_flags) |= DBG_NOMUSIC;
+		else if (ags_stricmp(arg, "--noscript") == 0) _G(debug_flags) |= DBG_NOSCRIPT;
+		else if (ags_stricmp(arg, "--novideo") == 0) _G(debug_flags) |= DBG_NOVIDEO;
 		else if (ags_strnicmp(arg, "--log-", 6) == 0 && arg[6] != 0) {
 			String logarg = arg + 6;
 			size_t split_at = logarg.FindChar('=');
@@ -403,7 +403,7 @@ int ags_entry_point(int argc, char *argv[]) {
 #if AGS_PLATFORM_OS_WINDOWS
 	setup_malloc_handling();
 #endif
-	debug_flags = 0;
+	_G(debug_flags) = 0;
 
 	ConfigTree startup_opts;
 	int res = main_process_cmdline(startup_opts, argc, argv);
@@ -432,7 +432,7 @@ int ags_entry_point(int argc, char *argv[]) {
 	main_set_gamedir(argc, argv);
 
 	// Update shell associations and exit
-	if (debug_flags & DBG_REGONLY)
+	if (_G(debug_flags) & DBG_REGONLY)
 		exit(EXIT_NORMAL);
 
 #ifdef USE_CUSTOM_EXCEPTION_HANDLER

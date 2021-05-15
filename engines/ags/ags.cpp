@@ -144,10 +144,10 @@ Common::Error AGSEngine::run() {
 #if AGS_PLATFORM_OS_WINDOWS
 	setup_malloc_handling();
 #endif
-	_G(debug_flags) = 0;
+	_G(_G(debug_flags)) = 0;
 
-	if (ConfMan.hasKey("display_fps"))
-		_G(display_fps) = ConfMan.getBool("display_fps") ? AGS3::kFPS_Forced : AGS3::kFPS_Hide;
+	if (ConfMan.hasKey("_G(display_fps)"))
+		_G(_G(display_fps)) = ConfMan.getBool("_G(display_fps)") ? AGS3::kFPS_Forced : AGS3::kFPS_Hide;
 
 	AGS3::ConfigTree startup_opts;
 	int res = AGS3::main_process_cmdline(startup_opts, ARGC, ARGV);
@@ -172,7 +172,7 @@ Common::Error AGSEngine::run() {
 	AGS3::main_set_gamedir(ARGC, ARGV);
 
 	// Update shell associations and exit
-	if (_G(debug_flags) & DBG_REGONLY)
+	if (_G(_G(debug_flags)) & DBG_REGONLY)
 		return Common::kNoError;
 
 	_G(loadSaveGameOnStartup) = ConfMan.getInt("save_slot");

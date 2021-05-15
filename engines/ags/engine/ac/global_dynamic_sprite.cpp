@@ -35,7 +35,7 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 extern SpriteCache spriteset;
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 
 int LoadImageFile(const char *filename) {
 	ResolvedPath rp;

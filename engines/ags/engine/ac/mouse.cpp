@@ -55,7 +55,7 @@ using namespace AGS::Engine;
 extern Bitmap *mousecurs[MAXCURSORS];
 extern SpriteCache spriteset;
 
-extern IGraphicsDriver *gfxDriver;
+extern IGraphicsDriver *_G(gfxDriver);
 
 extern void ags_domouse(int str);
 
@@ -364,8 +364,8 @@ void update_inv_cursor(int invnum) {
 
 void update_cached_mouse_cursor() {
 	if (mouseCursor != nullptr)
-		gfxDriver->DestroyDDB(mouseCursor);
-	mouseCursor = gfxDriver->CreateDDBFromBitmap(mousecurs[0], alpha_blend_cursor != 0);
+		_G(gfxDriver)->DestroyDDB(mouseCursor);
+	mouseCursor = _G(gfxDriver)->CreateDDBFromBitmap(mousecurs[0], alpha_blend_cursor != 0);
 }
 
 void set_new_cursor_graphic(int spriteslot) {
