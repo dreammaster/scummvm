@@ -65,12 +65,12 @@ extern Bitmap *mousecurs[MAXCURSORS];
 extern void ags_domouse(int str);
 
 ScriptMouse scmouse;
-int cur_mode, cur_cursor;
-int mouse_frame = 0, mouse_delay = 0;
-int lastmx = -1, lastmy = -1;
+int _G(cur_mode), _G(cur_cursor);
+int _G(mouse_frame) = 0, _G(mouse_delay) = 0;
+int _G(lastmx) = -1, _G(lastmy) = -1;
 char alpha_blend_cursor = 0;
 Bitmap *dotted_mouse_cursor = nullptr;
-IDriverDependantBitmap *mouseCursor = nullptr;
+IDriverDependantBitmap *_G(mouseCursor) = nullptr;
 Bitmap *blank_mouse_cursor = nullptr;
 
 // The Mouse:: functions are static so the script doesn't pass
@@ -122,16 +122,16 @@ void set_mouse_cursor(int newcurs) {
 	msethotspot(hotspotx, hotspoty);
 
 	// if it's same cursor and there's animation in progress, then don't assign a new pic just yet
-	if (newcurs == cur_cursor && _GP(game).mcurs[newcurs].view >= 0 &&
-		(mouse_frame > 0 || mouse_delay > 0)) {
+	if (newcurs == _G(cur_cursor) && _GP(game).mcurs[newcurs].view >= 0 &&
+		(_G(mouse_frame) > 0 || _G(mouse_delay) > 0)) {
 		return;
 	}
 
 	// reset animation timing only if it's another cursor
-	if (newcurs != cur_cursor) {
-		cur_cursor = newcurs;
-		mouse_frame = 0;
-		mouse_delay = 0;
+	if (newcurs != _G(cur_cursor)) {
+		_G(cur_cursor) = newcurs;
+		_G(mouse_frame) = 0;
+		_G(mouse_delay) = 0;
 	}
 
 	// Assign new pic
@@ -171,7 +171,7 @@ void set_mouse_cursor(int newcurs) {
 
 // set_default_cursor: resets visual appearance to current mode (walk, look, etc)
 void set_default_cursor() {
-	set_mouse_cursor(cur_mode);
+	set_mouse_cursor(_G(cur_mode));
 }
 
 // permanently change cursor graphic
@@ -184,7 +184,7 @@ void ChangeCursorGraphic(int curs, int newslot) {
 
 	_GP(game).mcurs[curs].pic = newslot;
 	_GP(spriteset).Precache(newslot);
-	if (curs == cur_mode)
+	if (curs == _G(cur_mode))
 		set_mouse_cursor(curs);
 }
 
@@ -200,8 +200,8 @@ void ChangeCursorHotspot(int curs, int x, int y) {
 		quit("!ChangeCursorHotspot: invalid mouse cursor");
 	_GP(game).mcurs[curs].hotx = data_to_game_coord(x);
 	_GP(game).mcurs[curs].hoty = data_to_game_coord(y);
-	if (curs == cur_cursor)
-		set_mouse_cursor(cur_cursor);
+	if (curs == _G(cur_cursor))
+		set_mouse_cursor(_G(cur_cursor));
 }
 
 void Mouse_ChangeModeView(int curs, int newview) {
@@ -216,16 +216,16 @@ void Mouse_ChangeModeView(int curs, int newview) {
 		precache_view(newview);
 	}
 
-	if (curs == cur_cursor)
-		mouse_delay = 0;  // force update
+	if (curs == _G(cur_cursor))
+		_G(mouse_delay) = 0;  // force update
 }
 
 void SetNextCursor() {
-	set_cursor_mode(find_next_enabled_cursor(cur_mode + 1));
+	set_cursor_mode(find_next_enabled_cursor(_G(cur_mode) + 1));
 }
 
 void SetPreviousCursor() {
-	set_cursor_mode(find_previous_enabled_cursor(cur_mode - 1));
+	set_cursor_mode(find_previous_enabled_cursor(_G(cur_mode) - 1));
 }
 
 // set_cursor_mode: changes mode and appearance
@@ -244,7 +244,7 @@ void set_cursor_mode(int newmode) {
 		}
 		update_inv_cursor(_G(playerchar)->activeinv);
 	}
-	cur_mode = newmode;
+	_G(cur_mode) = newmode;
 	set_default_cursor();
 
 	debug_script_log("Cursor mode set to %d", newmode);
@@ -280,7 +280,7 @@ void disable_cursor_mode(int modd) {
 			gbpt->SetEnabled(false);
 		}
 	}
-	if (cur_mode == modd) find_next_enabled_cursor(modd);
+	if (_G(cur_mode) == modd) find_next_enabled_cursor(modd);
 }
 
 void RefreshMouse() {
@@ -307,7 +307,7 @@ void SetMousePosition(int newx, int newy) {
 }
 
 int GetCursorMode() {
-	return cur_mode;
+	return _G(cur_mode);
 }
 
 int IsButtonDown(int which) {
@@ -335,7 +335,7 @@ void Mouse_EnableControl(bool on) {
 //=============================================================================
 
 int GetMouseCursor() {
-	return cur_cursor;
+	return _G(cur_cursor);
 }
 
 void update_script_mouse_coords() {
@@ -368,9 +368,9 @@ void update_inv_cursor(int invnum) {
 }
 
 void update_cached_mouse_cursor() {
-	if (mouseCursor != nullptr)
-		_G(gfxDriver)->DestroyDDB(mouseCursor);
-	mouseCursor = _G(gfxDriver)->CreateDDBFromBitmap(mousecurs[0], alpha_blend_cursor != 0);
+	if (_G(mouseCursor) != nullptr)
+		_G(gfxDriver)->DestroyDDB(_G(mouseCursor));
+	_G(mouseCursor) = _G(gfxDriver)->CreateDDBFromBitmap(mousecurs[0], alpha_blend_cursor != 0);
 }
 
 void set_new_cursor_graphic(int spriteslot) {

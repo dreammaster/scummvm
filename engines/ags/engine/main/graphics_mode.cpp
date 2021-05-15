@@ -52,7 +52,7 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 extern int _G(proper_exit);
-extern AGSPlatformDriver *platform;
+
 
 
 

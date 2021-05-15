@@ -112,7 +112,7 @@ extern int _G(game_paused);
 
 extern int _G(inside_script);
 extern ccInstance *_G(gameinst), *_G(roominst);
-extern CharacterCache *charcache;
+extern CharacterCache *_G(charcache);
 
 
 extern RGB palette[256];

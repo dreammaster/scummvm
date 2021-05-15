@@ -52,53 +52,9 @@
 #include "ags/shared/script/script_runtime.h"
 #include "ags/shared/util/string_compat.h"
 #include "ags/engine/media/audio/audio_system.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-
-
-extern int _G(gameHasBeenRestored), _G(displayed_room);
-extern unsigned int _G(load_new_game);
-extern RoomObject *_GP(objs);
-
-
-
-ExecutingScript scripts[MAX_SCRIPT_AT_ONCE];
-ExecutingScript *_G(curscript) = nullptr;
-
-PScript _G(gamescript);
-PScript _G(dialogScriptsScript);
-ccInstance *_G(gameinst) = nullptr, *_G(roominst) = nullptr;
-ccInstance *_G(dialogScriptsInst) = nullptr;
-ccInstance *_G(gameinstFork) = nullptr, *_G(roominstFork) = nullptr;
-
-int _G(num_scripts) = 0;
-int _G(post_script_cleanup_stack) = 0;
-
-int _G(inside_script) = 0, _G(in_graph_script) = 0;
-int _G(no_blocking_functions) = 0; // set to 1 while in rep_Exec_always
-
-NonBlockingScriptFunction _GP(repExecAlways)(REP_EXEC_ALWAYS_NAME, 0);
-NonBlockingScriptFunction _GP(lateRepExecAlways)(LATE_REP_EXEC_ALWAYS_NAME, 0);
-NonBlockingScriptFunction _GP(getDialogOptionsDimensionsFunc)("dialog_options_get_dimensions", 1);
-NonBlockingScriptFunction _GP(renderDialogOptionsFunc)("dialog_options_render", 1);
-NonBlockingScriptFunction _GP(getDialogOptionUnderCursorFunc)("dialog_options_get_active", 1);
-NonBlockingScriptFunction _GP(runDialogOptionMouseClickHandlerFunc)("dialog_options_mouse_click", 2);
-NonBlockingScriptFunction _GP(runDialogOptionKeyPressHandlerFunc)("dialog_options_key_press", 2);
-NonBlockingScriptFunction _GP(runDialogOptionRepExecFunc)("dialog_options_repexec", 1);
-
-ScriptSystem _GP(_GP(scsystem));
-
-std::vector<PScript> _GP(scriptModules);
-std::vector<ccInstance *> _GP(moduleInst);
-std::vector<ccInstance *> _GP(moduleInstFork);
-std::vector<RuntimeScriptValue> _GP(moduleRepExecAddr);
-int _G(numScriptModules) = 0;
-
-std::vector<String> _GP(characterScriptObjNames);
-String              _GP(objectScriptObjNames)[MAX_ROOM_OBJECTS];
-std::vector<String> _GP(guiScriptObjNames);
-
 
 int run_dialog_request(int parmtr) {
 	_GP(play).stop_dialog_at_end = DIALOG_RUNNING;

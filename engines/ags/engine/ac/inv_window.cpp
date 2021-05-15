@@ -64,7 +64,7 @@ extern int _G(mouse_ifacebut_xoffs), mouse_ifacebut_yoffs;
 extern int mousex, mousey;
 
 
-extern AGSPlatformDriver *platform;
+
 
 
 

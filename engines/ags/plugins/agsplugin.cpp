@@ -673,10 +673,10 @@ void IAGSEngine::NotifySpriteUpdated(int32 slot) {
 	int ff;
 	// wipe the character cache when we change rooms
 	for (ff = 0; ff < _GP(game).numcharacters; ff++) {
-		if ((_G(charcache)[ff].inUse) && (_G(charcache)[ff].sppic == slot)) {
-			delete _G(charcache)[ff].image;
-			_G(charcache)[ff].image = nullptr;
-			_G(charcache)[ff].inUse = 0;
+		if ((_G(_G(charcache))[ff].inUse) && (_G(_G(charcache))[ff].sppic == slot)) {
+			delete _G(_G(charcache))[ff].image;
+			_G(_G(charcache))[ff].image = nullptr;
+			_G(_G(charcache))[ff].inUse = 0;
 		}
 	}
 

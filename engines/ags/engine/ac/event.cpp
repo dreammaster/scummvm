@@ -55,7 +55,7 @@ extern RoomStatus *_G(croom);
 
 extern RGB palette[256];
 
-extern AGSPlatformDriver *platform;
+
 extern RGB _GP(old_palette)[256];
 
 int _G(in_enters_screen) = 0, _G(done_es_error) = 0;

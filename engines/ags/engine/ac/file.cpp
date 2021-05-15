@@ -56,7 +56,7 @@ using namespace AGS::Shared;
 
 
 
-extern AGSPlatformDriver *platform;
+
 
 extern int MAXSTRLEN;
 

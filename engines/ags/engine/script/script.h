@@ -84,45 +84,6 @@ InteractionVariable *FindGraphicalVariable(const char *varName);
 void    run_unhandled_event(int evnt);
 void    can_run_delayed_command();
 
-
-extern ExecutingScript scripts[MAX_SCRIPT_AT_ONCE];
-extern ExecutingScript *_G(curscript);
-
-extern PScript _G(gamescript);
-extern PScript _G(dialogScriptsScript);
-extern ccInstance *_G(gameinst), *_G(roominst);
-extern ccInstance *_G(dialogScriptsInst);
-extern ccInstance *_G(gameinstFork), *_G(roominstFork);
-
-extern int _G(num_scripts);
-extern int _G(post_script_cleanup_stack);
-
-extern int _G(inside_script), _G(in_graph_script);
-extern int _G(no_blocking_functions); // set to 1 while in rep_Exec_always
-
-extern NonBlockingScriptFunction _GP(repExecAlways);
-extern NonBlockingScriptFunction _GP(lateRepExecAlways);
-extern NonBlockingScriptFunction _GP(getDialogOptionsDimensionsFunc);
-extern NonBlockingScriptFunction _GP(renderDialogOptionsFunc);
-extern NonBlockingScriptFunction _GP(getDialogOptionUnderCursorFunc);
-extern NonBlockingScriptFunction _GP(runDialogOptionMouseClickHandlerFunc);
-extern NonBlockingScriptFunction _GP(runDialogOptionKeyPressHandlerFunc);
-extern NonBlockingScriptFunction _GP(runDialogOptionRepExecFunc);
-
-
-
-extern std::vector<PScript> _GP(scriptModules);
-extern std::vector<ccInstance *> _GP(moduleInst);
-extern std::vector<ccInstance *> _GP(moduleInstFork);
-extern std::vector<RuntimeScriptValue> _GP(moduleRepExecAddr);
-extern int _G(numScriptModules);
-
-// TODO: find out if these extra arrays are really necessary. This may be remains from the
-// time when the symbol import table was holding raw pointers to char array.
-extern std::vector<AGS::Shared::String> _GP(characterScriptObjNames);
-extern AGS::Shared::String _GP(objectScriptObjNames)[MAX_ROOM_OBJECTS];
-extern std::vector<AGS::Shared::String> _GP(guiScriptObjNames);
-
 } // namespace AGS3
 
 #endif

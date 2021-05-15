@@ -377,7 +377,7 @@ public:
 
 	CharacterExtras *_charextra = nullptr;
 	CharacterInfo *_playerchar = nullptr;
-	//int32_t _sc_PlayerCharPtr = 0;
+	int32_t _sc_PlayerCharPtr = 0;
 	int _char_lowest_yp = 0;
 
 	// Sierra-style speech settings

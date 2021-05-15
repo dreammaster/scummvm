@@ -45,7 +45,7 @@ using namespace AGS::Engine;
 
 
 
-extern AGSPlatformDriver *platform;
+
 extern RGB palette[256];
 
 

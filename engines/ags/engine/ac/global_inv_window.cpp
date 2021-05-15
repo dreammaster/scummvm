@@ -32,7 +32,7 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern ExecutingScript *_G(curscript);
+
 
 
 void sc_invscreen() {

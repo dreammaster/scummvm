@@ -337,8 +337,8 @@ void DoBeforeRestore(PreservedParams &pp) {
 	delete _G(raw_saved_screen);
 	_G(raw_saved_screen) = nullptr;
 	remove_screen_overlay(-1);
-	is_complete_overlay = 0;
-	is_text_overlay = 0;
+	_G(is_complete_overlay) = 0;
+	_G(is_text_overlay) = 0;
 
 	// cleanup dynamic sprites
 	// NOTE: sprite 0 is a special constant sprite that cannot be dynamic

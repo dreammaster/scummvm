@@ -53,8 +53,8 @@ using namespace AGS::Engine;
 
 
 extern RoomStatus *_G(croom);
-extern RoomObject *_GP(objs);
-extern CharacterCache *charcache;
+
+extern CharacterCache *_G(charcache);
 
 
 

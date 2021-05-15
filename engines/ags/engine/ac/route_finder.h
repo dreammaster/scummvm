@@ -31,17 +31,18 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 class Bitmap;
-}
-}
+} // namespace Shared
+} // namespace AGS
+
 struct MoveList;
 
 void init_pathfinder(GameDataVersion game_file_version);
 void shutdown_pathfinder();
 
-void set_wallscreen(AGS::Shared::Bitmap *_G(wallscreen));
+void set_wallscreen(AGS::Shared::Bitmap *wallscreen);
 
 int can_see_from(int x1, int y1, int x2, int y2);
-void get_lastcpos(int &_G(lastcx), int &_G(lastcy));
+void get_lastcpos(int &lastcx, int &lastcy);
 // NOTE: pathfinder implementation mostly needs to know proportion between x and y speed
 void set_route_move_speed(int speed_x, int speed_y);
 

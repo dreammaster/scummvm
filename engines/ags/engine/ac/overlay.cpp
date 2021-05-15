@@ -49,9 +49,9 @@ using namespace AGS::Engine;
 
 extern int _G(face_talking);
 
-ScreenOverlay screenover[MAX_SCREEN_OVERLAYS];
+ScreenOverlay _G(screenover)[MAX_SCREEN_OVERLAYS];
 int numscreenover = 0;
-int is_complete_overlay = 0, is_text_overlay = 0;
+int _G(is_complete_overlay) = 0, _G(is_text_overlay) = 0;
 
 void Overlay_Remove(ScriptOverlay *sco) {
 	sco->Remove();
@@ -61,8 +61,8 @@ void Overlay_SetText(ScriptOverlay *scover, int wii, int fontid, int text_color,
 	int ovri = find_overlay_of_type(scover->overlayId);
 	if (ovri < 0)
 		quit("!Overlay.SetText: invalid overlay ID specified");
-	int xx = game_to_data_coord(screenover[ovri].x) - scover->borderWidth;
-	int yy = game_to_data_coord(screenover[ovri].y) - scover->borderHeight;
+	int xx = game_to_data_coord(_G(screenover)[ovri].x) - scover->borderWidth;
+	int yy = game_to_data_coord(_G(screenover)[ovri].y) - scover->borderHeight;
 
 	RemoveOverlay(scover->overlayId);
 	const int disp_type = scover->overlayId;
@@ -77,7 +77,7 @@ int Overlay_GetX(ScriptOverlay *scover) {
 		quit("!invalid overlay ID specified");
 
 	int tdxp, tdyp;
-	get_overlay_position(screenover[ovri], &tdxp, &tdyp);
+	get_overlay_position(_G(screenover)[ovri], &tdxp, &tdyp);
 
 	return game_to_data_coord(tdxp);
 }
@@ -87,7 +87,7 @@ void Overlay_SetX(ScriptOverlay *scover, int newx) {
 	if (ovri < 0)
 		quit("!invalid overlay ID specified");
 
-	screenover[ovri].x = data_to_game_coord(newx);
+	_G(screenover)[ovri].x = data_to_game_coord(newx);
 }
 
 int Overlay_GetY(ScriptOverlay *scover) {
@@ -96,7 +96,7 @@ int Overlay_GetY(ScriptOverlay *scover) {
 		quit("!invalid overlay ID specified");
 
 	int tdxp, tdyp;
-	get_overlay_position(screenover[ovri], &tdxp, &tdyp);
+	get_overlay_position(_G(screenover)[ovri], &tdxp, &tdyp);
 
 	return game_to_data_coord(tdyp);
 }
@@ -106,7 +106,7 @@ void Overlay_SetY(ScriptOverlay *scover, int newy) {
 	if (ovri < 0)
 		quit("!invalid overlay ID specified");
 
-	screenover[ovri].y = data_to_game_coord(newy);
+	_G(screenover)[ovri].y = data_to_game_coord(newy);
 }
 
 int Overlay_GetValid(ScriptOverlay *scover) {
@@ -141,8 +141,8 @@ ScriptOverlay *Overlay_CreateTextual(int x, int y, int width, int font, int colo
 	sco->overlayId = CreateTextOverlayCore(x, y, width, font, colour, text, DISPLAYTEXT_NORMALOVERLAY, 0);
 
 	int ovri = find_overlay_of_type(sco->overlayId);
-	sco->borderWidth = game_to_data_coord(screenover[ovri].x - x);
-	sco->borderHeight = game_to_data_coord(screenover[ovri].y - y);
+	sco->borderWidth = game_to_data_coord(_G(screenover)[ovri].x - x);
+	sco->borderHeight = game_to_data_coord(_G(screenover)[ovri].y - y);
 	sco->isBackgroundSpeech = 0;
 
 	ccRegisterManagedObject(sco, sco);
@@ -164,13 +164,13 @@ void dispose_overlay(ScreenOverlay &over) {
 }
 
 void remove_screen_overlay_index(int over_idx) {
-	ScreenOverlay &over = screenover[over_idx];
+	ScreenOverlay &over = _G(screenover)[over_idx];
 	dispose_overlay(over);
-	if (over.type == OVER_COMPLETE) is_complete_overlay--;
-	if (over.type == OVER_TEXTMSG) is_text_overlay--;
+	if (over.type == OVER_COMPLETE) _G(is_complete_overlay)--;
+	if (over.type == OVER_TEXTMSG) _G(is_text_overlay)--;
 	numscreenover--;
 	for (int i = over_idx; i < numscreenover; ++i)
-		screenover[i] = screenover[i + 1];
+		_G(screenover)[i] = _G(screenover)[i + 1];
 	// if an overlay before the sierra-style speech one is removed,
 	// update the index
 	if (_G(face_talking) > over_idx)
@@ -179,7 +179,7 @@ void remove_screen_overlay_index(int over_idx) {
 
 void remove_screen_overlay(int type) {
 	for (int i = 0; i < numscreenover;) {
-		if (type < 0 || screenover[i].type == type)
+		if (type < 0 || _G(screenover)[i].type == type)
 			remove_screen_overlay_index(i);
 		else
 			i++;
@@ -188,7 +188,7 @@ void remove_screen_overlay(int type) {
 
 int find_overlay_of_type(int type) {
 	for (int i = 0; i < numscreenover; ++i) {
-		if (screenover[i].type == type) return i;
+		if (_G(screenover)[i].type == type) return i;
 	}
 	return -1;
 }
@@ -198,8 +198,8 @@ int add_screen_overlay(int x, int y, int type, Bitmap *piccy, bool alphaChannel)
 }
 
 int add_screen_overlay(int x, int y, int type, Shared::Bitmap *piccy, int pic_offx, int pic_offy, bool alphaChannel) {
-	if (type == OVER_COMPLETE) is_complete_overlay++;
-	if (type == OVER_TEXTMSG) is_text_overlay++;
+	if (type == OVER_COMPLETE) _G(is_complete_overlay)++;
+	if (type == OVER_TEXTMSG) _G(is_text_overlay)++;
 	if (type == OVER_CUSTOM) {
 		// find an unused custom ID; TODO: find a better approach!
 		for (int id = OVER_CUSTOM + 1; id < OVER_CUSTOM + 100; ++id) {
@@ -208,7 +208,7 @@ int add_screen_overlay(int x, int y, int type, Shared::Bitmap *piccy, int pic_of
 			}
 		}
 	}
-	ScreenOverlay &over = screenover[numscreenover++];
+	ScreenOverlay &over = _G(screenover)[numscreenover++];
 	over.pic = piccy;
 	over.bmp = _G(gfxDriver)->CreateDDBFromBitmap(piccy, alphaChannel);
 	over.x = x;
@@ -270,12 +270,12 @@ void get_overlay_position(const ScreenOverlay &over, int *x, int *y) {
 
 void recreate_overlay_ddbs() {
 	for (int i = 0; i < numscreenover; ++i) {
-		if (screenover[i].bmp)
-			_G(gfxDriver)->DestroyDDB(screenover[i].bmp);
-		if (screenover[i].pic)
-			screenover[i].bmp = _G(gfxDriver)->CreateDDBFromBitmap(screenover[i].pic, false);
+		if (_G(screenover)[i].bmp)
+			_G(gfxDriver)->DestroyDDB(_G(screenover)[i].bmp);
+		if (_G(screenover)[i].pic)
+			_G(screenover)[i].bmp = _G(gfxDriver)->CreateDDBFromBitmap(_G(screenover)[i].pic, false);
 		else
-			screenover[i].bmp = nullptr;
+			_G(screenover)[i].bmp = nullptr;
 	}
 }
 

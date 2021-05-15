@@ -68,7 +68,7 @@ using namespace AGS::Engine;
 
 
 
-extern int cur_mode, cur_cursor;
+extern int _G(cur_mode), _G(cur_cursor);
 extern ccInstance *_G(gameinst);
 
 
@@ -330,7 +330,7 @@ void remove_popup_interface(int ifacenum) {
 	_GP(guis)[ifacenum].SetConceal(true);
 	if (mousey <= _GP(guis)[ifacenum].PopupAtMouseY)
 		Mouse::SetPosition(Point(mousex, _GP(guis)[ifacenum].PopupAtMouseY + 2));
-	if ((!IsInterfaceEnabled()) && (cur_cursor == cur_mode))
+	if ((!IsInterfaceEnabled()) && (_G(cur_cursor) == _G(cur_mode)))
 		// Only change the mouse cursor if it hasn't been specifically changed first
 		set_mouse_cursor(CURS_WAIT);
 	else if (IsInterfaceEnabled())
@@ -581,7 +581,7 @@ void recreate_guibg_image(GUIMain *tehgui) {
 	}
 }
 
-extern int is_complete_overlay;
+extern int _G(is_complete_overlay);
 
 int gui_get_interactable(int x, int y) {
 	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0))
@@ -602,7 +602,7 @@ int gui_on_mouse_move() {
 			if (_GP(guis)[guin].IsInteractableAt(mousex, mousey)) mouse_over_gui = guin;
 
 			if (_GP(guis)[guin].PopupStyle != kGUIPopupMouseY) continue;
-			if (is_complete_overlay > 0) break;  // interfaces disabled
+			if (_G(is_complete_overlay) > 0) break;  // interfaces disabled
 			//    if (_GP(play).disabled_user_interface>0) break;
 			if (_G(ifacepopped) == guin) continue;
 			if (!_GP(guis)[guin].IsVisible()) continue;
@@ -657,10 +657,10 @@ void gui_on_mouse_up(const int wasongui, const int wasbutdown) {
 					force_event(EV_TEXTSCRIPT, TS_MCLICK, wasbutdown + 4);
 				} else if (wasbutdown == 2)  // right-click is always Look
 					run_event_block_inv(iit, 0);
-				else if (cur_mode == MODE_HAND)
+				else if (_G(cur_mode) == MODE_HAND)
 					SetActiveInventory(iit);
 				else
-					RunInventoryInteraction(iit, cur_mode);
+					RunInventoryInteraction(iit, _G(cur_mode));
 				_G(evblocknum) = -1;
 			}
 		} else quit("clicked on unknown control type");

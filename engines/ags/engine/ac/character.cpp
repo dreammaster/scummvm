@@ -70,7 +70,6 @@
 #include "ags/shared/gfx/gfx_def.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/move_list.h"
-
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/script/script_api.h"
 #include "ags/engine/script/script_runtime.h"
@@ -80,36 +79,6 @@
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-extern Bitmap *_G(walkable_areas_temp);
-
-
-extern int is_text_overlay;
-
-//--------------------------------
-
-
-CharacterExtras *_G(charextra);
-int32_t _sc_PlayerCharPtr = 0;
-int _G(char_lowest_yp);
-
-// Sierra-style speech settings
-int _G(face_talking)=-1,_G(facetalkview)=0,_G(facetalkwait)=0,_G(facetalkframe)=0;
-int _G(facetalkloop)=0, _G(facetalkrepeat) = 0, _G(facetalkAllowBlink) = 1;
-int _G(facetalkBlinkLoop) = 0;
-CharacterInfo *_G(facetalkchar) = nullptr;
-// Do override default portrait position during QFG4-style speech overlay update
-bool _G(facetalk_qfg4_override_placement_x) = false;
-bool _G(facetalk_qfg4_override_placement_y) = false;
-
-// lip-sync speech settings
-int _G(loops_per_character), _G(text_lips_offset), _G(char_speaking) = -1;
-int _G(char_thinking) = -1;
-const char *_G(text_lips_text) = nullptr;
-SpeechLipSyncLine *_G(splipsync) = nullptr;
-int _G(numLipLines) = 0, _G(curLipLine) = -1, _G(curLipLinePhoneme) = 0;
-
-// **** CHARACTER: FUNCTIONS ****
 
 void Character_AddInventory(CharacterInfo *chaa, ScriptInvItem *invi, int addIndex) {
     int ee;
@@ -786,7 +755,7 @@ ScriptOverlay* Character_SayBackground(CharacterInfo *chaa, const char *texx) {
     scOver->borderWidth = 0;
     scOver->isBackgroundSpeech = 1;
     int handl = ccRegisterManagedObject(scOver, scOver);
-    screenover[ovri].associatedOverlayHandle = handl;
+    _G(screenover)[ovri].associatedOverlayHandle = handl;
 
     return scOver;
 }
@@ -825,7 +794,7 @@ void Character_SetAsPlayer(CharacterInfo *chaa) {
         _G(playerchar)->activeinv = -1;
 
     // They had inv selected, so change the cursor
-    if (cur_mode == MODE_USE) {
+    if (_G(cur_mode) == MODE_USE) {
         if (_G(playerchar)->activeinv < 0)
             SetNextCursor ();
         else
@@ -2114,7 +2083,7 @@ int wantMoveNow (CharacterInfo *chi, CharacterExtras *chex) {
 void setup_player_character(int charid) {
     _GP(game).playercharacter = charid;
     _G(playerchar) = &_GP(game).chars[charid];
-    _sc_PlayerCharPtr = ccGetObjectHandleFromAddress((char*)_G(playerchar));
+    _G(sc_PlayerCharPtr) = ccGetObjectHandleFromAddress((char*)_G(playerchar));
     if (_G(loaded_game_file_version) < kGameVersion_270) {
         ccAddExternalDynamicObject("player", _G(playerchar), &_GP(ccDynamicCharacter));
     }
@@ -2373,7 +2342,7 @@ void _displayspeech(const char*texx, int aschar, int xx, int yy, int widd, int i
     if ((speakingChar->view < 0) || (speakingChar->view >= _GP(game).numviews))
         quit("!DisplaySpeech: character has invalid view");
 
-    if (is_text_overlay > 0)
+    if (_G(is_text_overlay) > 0)
     {
         debug_script_warn("DisplaySpeech: speech was already displayed (nested DisplaySpeech, perhaps room script and global script conflict?)");
         return;
@@ -2387,8 +2356,8 @@ void _displayspeech(const char*texx, int aschar, int xx, int yy, int widd, int i
     if (_GP(play).bgspeech_stay_on_display == 0) {
         // remove any background speech
         for (aa=0;aa<numscreenover;aa++) {
-            if (screenover[aa].timeout > 0) {
-                remove_screen_overlay(screenover[aa].type);
+            if (_G(screenover)[aa].timeout > 0) {
+                remove_screen_overlay(_G(screenover)[aa].type);
                 aa--;
             }
         }

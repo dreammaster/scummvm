@@ -54,8 +54,8 @@ extern volatile char _G(want_exit), abort_engine;
 
 
 extern const char *loadSaveGameOnStartup;
-extern std::vector<ccInstance *> _GP(moduleInst);
-extern int _G(numScriptModules);
+
+
 
 
 

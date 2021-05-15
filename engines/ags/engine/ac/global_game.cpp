@@ -75,12 +75,12 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern ExecutingScript *_G(curscript);
+
 
 extern int _G(game_paused);
 
 
-extern unsigned int _G(load_new_game);
+
 extern int _G(load_new_game_restore);
 
 

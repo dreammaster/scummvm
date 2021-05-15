@@ -473,7 +473,7 @@ void DialogOptions::Prepare(int _dlgnum, bool _runGameLoopsInBackground)
   usingfont=FONT_NORMAL;
   lineheight = getfontheight_outlined(usingfont);
   linespacing = getfontspacing_outlined(usingfont);
-  curswas=cur_cursor;
+  curswas=_G(_G(cur_cursor));
   bullet_wid = 0;
   ddb = nullptr;
   subBitmap = nullptr;
@@ -910,9 +910,9 @@ bool DialogOptions::Run()
       if (new_custom_render); // do not automatically detect option under mouse
       else if (usingCustomRendering)
       {
-        if ((mousex >= dirtyx) && (mousey >= dirtyy) &&
-            (mousex < dirtyx + tempScrn->GetWidth()) &&
-            (mousey < dirtyy + tempScrn->GetHeight()))
+        if ((_G(mousex) >= dirtyx) && (_G(mousey) >= dirtyy) &&
+            (_G(mousex) < dirtyx + tempScrn->GetWidth()) &&
+            (_G(mousey) < dirtyy + tempScrn->GetHeight()))
         {
           _GP(getDialogOptionUnderCursorFunc).params[0].SetDynamicObject(&_GP(ccDialogOptionsRendering), &_GP(ccDialogOptionsRendering));
           run_function_on_non_blocking_thread(&_GP(getDialogOptionUnderCursorFunc));
@@ -927,18 +927,18 @@ bool DialogOptions::Run()
           _GP(ccDialogOptionsRendering).activeOptionID = -1;
         }
       }
-      else if (mousex >= dialog_abs_x && mousex < (dialog_abs_x + areawid) &&
-               mousey >= dlgyp && mousey < curyp)
+      else if (_G(mousex) >= dialog_abs_x && _G(mousex) < (dialog_abs_x + areawid) &&
+               _G(mousey) >= dlgyp && _G(mousey) < curyp)
       {
         mouseison=numdisp-1;
         for (int i = 0; i < numdisp; ++i) {
-          if (mousey < dispyp[i]) { mouseison=i-1; break; }
+          if (_G(mousey) < dispyp[i]) { mouseison=i-1; break; }
         }
         if ((mouseison<0) | (mouseison>=numdisp)) mouseison=-1;
       }
 
       if (parserInput != nullptr) {
-        int relativeMousey = mousey;
+        int relativeMousey = _G(mousey);
         if (usingCustomRendering)
           relativeMousey -= dirtyy;
 

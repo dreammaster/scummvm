@@ -64,7 +64,7 @@ extern IDriverDependantBitmap **_G(actspsbmp);
 extern Bitmap **_G(actspswb);
 extern IDriverDependantBitmap **_G(actspswbbmp);
 extern CachedActSpsData *_G(actspswbcache);
-extern CharacterCache *charcache;
+extern CharacterCache *_G(charcache);
 
 extern CCGUIObject _GP(ccDynamicGUIObject);
 
@@ -97,9 +97,9 @@ extern StaticArray _GP(StaticRegionArray);
 extern StaticArray _GP(StaticInventoryArray);
 extern StaticArray _GP(StaticDialogArray);
 
-extern std::vector<ccInstance *> _GP(moduleInst);
-extern std::vector<ccInstance *> _GP(moduleInstFork);
-extern std::vector<RuntimeScriptValue> _GP(moduleRepExecAddr);
+
+
+
 
 // Old dialog support (defined in ac/dialog)
 extern std::vector< std::shared_ptr<unsigned char> > _G(old_dialog_scripts);
@@ -303,7 +303,7 @@ HError InitAndRegisterGameEntities() {
 
 	setup_player_character(_GP(game).playercharacter);
 	if (_G(loaded_game_file_version) >= kGameVersion_270)
-		ccAddExternalStaticObject("player", &_sc_PlayerCharPtr, &_G(GlobalStaticManager));
+		ccAddExternalStaticObject("player", &_G(sc_PlayerCharPtr), &_G(GlobalStaticManager));
 	return HError::None();
 }
 
@@ -360,7 +360,7 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	// 3. Allocate and init game objects
 	//
 	_G(charextra) = (CharacterExtras *)calloc(_GP(game).numcharacters, sizeof(CharacterExtras));
-	charcache = (CharacterCache *)calloc(1, sizeof(CharacterCache) * _GP(game).numcharacters + 5);
+	_G(charcache) = (CharacterCache *)calloc(1, sizeof(CharacterCache) * _GP(game).numcharacters + 5);
 	_G(mls) = (MoveList *)calloc(_GP(game).numcharacters + MAX_ROOM_OBJECTS + 1, sizeof(MoveList));
 	_G(actSpsCount) = _GP(game).numcharacters + MAX_ROOM_OBJECTS + 2;
 	_G(actsps) = (Bitmap **)calloc(_G(actSpsCount), sizeof(Bitmap *));

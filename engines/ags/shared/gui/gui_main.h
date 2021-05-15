@@ -234,12 +234,6 @@ void ApplyLegacyVisibility(GUIMain &gui, LegacyGUIVisState vis);
 } // namespace Shared
 } // namespace AGS
 
-
-extern int _G(all_buttons_disabled), _G(gui_inv_pic);
-extern int _G(gui_disabled_style);
-
-extern int _G(mousex), _G(mousey);
-
 extern int get_adjusted_spritewidth(int spr);
 extern int get_adjusted_spriteheight(int spr);
 extern bool is_sprite_alpha(int spr);

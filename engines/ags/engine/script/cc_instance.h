@@ -106,7 +106,7 @@ public:
 	typedef std::shared_ptr<ScVarMap>                   PScVarMap;
 public:
 	int32_t flags;
-	PScVarMap _G(globalvars);
+	PScVarMap globalvars;
 	char *globaldata;
 	int32_t globaldatasize;
 	// Executed byte-code. Unlike ccScript's code array which is int32_t, the one

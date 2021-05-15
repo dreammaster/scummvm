@@ -77,31 +77,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern AGSPlatformDriver *platform;
-
-extern char _G(noWalkBehindsAtAll);
-
-extern char *_G(walkBehindExists);  // whether a WB area is in this column
-extern int *_G(walkBehindStartY), *walkBehindEndY;
-extern int _G(walkBehindLeft)[MAX_WALK_BEHINDS], _G(walkBehindTop)[MAX_WALK_BEHINDS];
-extern int _G(walkBehindRight)[MAX_WALK_BEHINDS], _G(walkBehindBottom)[MAX_WALK_BEHINDS];
-extern IDriverDependantBitmap *_G(walkBehindBitmap)[MAX_WALK_BEHINDS];
-extern int _G(walkBehindsCachedForBgNum);
-extern WalkBehindMethodEnum _G(walkBehindMethod);
-extern int _G(walk_behind_baselines_changed);
-
-extern CharacterCache *charcache;
-
-extern int is_complete_overlay;
-extern int cur_mode,cur_cursor;
-extern int mouse_frame,mouse_delay;
-extern int lastmx,lastmy;
-extern IDriverDependantBitmap *mouseCursor;
-extern int hotx,hoty;
-extern int _G(bg_just_changed);
-
 color palette[256];
-
 
 // Buffer and info flags for viewport/camera pairs rendering in software mode
 struct RoomCameraDrawData
@@ -1773,35 +1749,35 @@ void prepare_characters_for_drawing() {
 
         // if the character was the same sprite and scaling last time,
         // just use the cached image
-        if ((charcache[aa].inUse) &&
-            (charcache[aa].sppic == specialpic) &&
-            (charcache[aa].scaling == zoom_level) &&
-            (charcache[aa].tintredwas == tint_red) &&
-            (charcache[aa].tintgrnwas == tint_green) &&
-            (charcache[aa].tintbluwas == tint_blue) &&
-            (charcache[aa].tintamntwas == tint_amount) &&
-            (charcache[aa].tintlightwas == tint_light) &&
-            (charcache[aa].lightlevwas == light_level)) 
+        if ((_G(charcache)[aa].inUse) &&
+            (_G(charcache)[aa].sppic == specialpic) &&
+            (_G(charcache)[aa].scaling == zoom_level) &&
+            (_G(charcache)[aa].tintredwas == tint_red) &&
+            (_G(charcache)[aa].tintgrnwas == tint_green) &&
+            (_G(charcache)[aa].tintbluwas == tint_blue) &&
+            (_G(charcache)[aa].tintamntwas == tint_amount) &&
+            (_G(charcache)[aa].tintlightwas == tint_light) &&
+            (_G(charcache)[aa].lightlevwas == light_level)) 
         {
             if (_G(walkBehindMethod) == DrawOverCharSprite)
             {
-                _G(actsps)[useindx] = recycle_bitmap(_G(actsps)[useindx], charcache[aa].image->GetColorDepth(), charcache[aa].image->GetWidth(), charcache[aa].image->GetHeight());
-                _G(actsps)[useindx]->Blit (charcache[aa].image, 0, 0, 0, 0, _G(actsps)[useindx]->GetWidth(), _G(actsps)[useindx]->GetHeight());
+                _G(actsps)[useindx] = recycle_bitmap(_G(actsps)[useindx], _G(charcache)[aa].image->GetColorDepth(), _G(charcache)[aa].image->GetWidth(), _G(charcache)[aa].image->GetHeight());
+                _G(actsps)[useindx]->Blit (_G(charcache)[aa].image, 0, 0, 0, 0, _G(actsps)[useindx]->GetWidth(), _G(actsps)[useindx]->GetHeight());
             }
             else 
             {
                 usingCachedImage = true;
             }
         }
-        else if ((charcache[aa].inUse) && 
-            (charcache[aa].sppic == specialpic) &&
+        else if ((_G(charcache)[aa].inUse) && 
+            (_G(charcache)[aa].sppic == specialpic) &&
             (_G(gfxDriver)->HasAcceleratedTransform()))
         {
             usingCachedImage = true;
         }
-        else if (charcache[aa].inUse) {
-            //destroy_bitmap (charcache[aa].image);
-            charcache[aa].inUse = 0;
+        else if (_G(charcache)[aa].inUse) {
+            //destroy_bitmap (_G(charcache)[aa].image);
+            _G(charcache)[aa].inUse = 0;
         }
 
         _G(our_eip) = 3332;
@@ -1830,17 +1806,17 @@ void prepare_characters_for_drawing() {
             // adjust the Y positioning for the character's Z co-ord
             - data_to_game_coord(chin->z);
 
-        charcache[aa].scaling = zoom_level;
-        charcache[aa].sppic = specialpic;
-        charcache[aa].tintredwas = tint_red;
-        charcache[aa].tintgrnwas = tint_green;
-        charcache[aa].tintbluwas = tint_blue;
-        charcache[aa].tintamntwas = tint_amount;
-        charcache[aa].tintlightwas = tint_light;
-        charcache[aa].lightlevwas = light_level;
+        _G(charcache)[aa].scaling = zoom_level;
+        _G(charcache)[aa].sppic = specialpic;
+        _G(charcache)[aa].tintredwas = tint_red;
+        _G(charcache)[aa].tintgrnwas = tint_green;
+        _G(charcache)[aa].tintbluwas = tint_blue;
+        _G(charcache)[aa].tintamntwas = tint_amount;
+        _G(charcache)[aa].tintlightwas = tint_light;
+        _G(charcache)[aa].lightlevwas = light_level;
 
         // If cache needs to be re-drawn
-        if (!charcache[aa].inUse) {
+        if (!_G(charcache)[aa].inUse) {
 
             // create the base sprite in _G(actsps)[useindx], which will
             // be scaled and/or flipped, as appropriate
@@ -1877,10 +1853,10 @@ void prepare_characters_for_drawing() {
             }
 
             // update the character cache with the new image
-            charcache[aa].inUse = 1;
-            //charcache[aa].image = BitmapHelper::CreateBitmap_ (coldept, _G(actsps)[useindx]->GetWidth(), _G(actsps)[useindx]->GetHeight());
-            charcache[aa].image = recycle_bitmap(charcache[aa].image, coldept, _G(actsps)[useindx]->GetWidth(), _G(actsps)[useindx]->GetHeight());
-            charcache[aa].image->Blit (_G(actsps)[useindx], 0, 0, 0, 0, _G(actsps)[useindx]->GetWidth(), _G(actsps)[useindx]->GetHeight());
+            _G(charcache)[aa].inUse = 1;
+            //_G(charcache)[aa].image = BitmapHelper::CreateBitmap_ (coldept, _G(actsps)[useindx]->GetWidth(), _G(actsps)[useindx]->GetHeight());
+            _G(charcache)[aa].image = recycle_bitmap(_G(charcache)[aa].image, coldept, _G(actsps)[useindx]->GetWidth(), _G(actsps)[useindx]->GetHeight());
+            _G(charcache)[aa].image->Blit (_G(actsps)[useindx], 0, 0, 0, 0, _G(actsps)[useindx]->GetWidth(), _G(actsps)[useindx]->GetHeight());
 
         } // end if !cache.inUse
 
@@ -2096,12 +2072,12 @@ void draw_gui_and_overlays()
     // draw overlays, except text boxes and portraits
     for (gg=0;gg<numscreenover;gg++) {
         // complete overlay draw in non-transparent mode
-        if (screenover[gg].type == OVER_COMPLETE)
-            add_thing_to_draw(screenover[gg].bmp, screenover[gg].x, screenover[gg].y, TRANS_OPAQUE, false);
-        else if (screenover[gg].type != OVER_TEXTMSG && screenover[gg].type != OVER_PICTURE) {
+        if (_G(screenover)[gg].type == OVER_COMPLETE)
+            add_thing_to_draw(_G(screenover)[gg].bmp, _G(screenover)[gg].x, _G(screenover)[gg].y, TRANS_OPAQUE, false);
+        else if (_G(screenover)[gg].type != OVER_TEXTMSG && _G(screenover)[gg].type != OVER_PICTURE) {
             int tdxp, tdyp;
-            get_overlay_position(screenover[gg], &tdxp, &tdyp);
-            add_thing_to_draw(screenover[gg].bmp, tdxp, tdyp, 0, screenover[gg].hasAlphaChannel);
+            get_overlay_position(_G(screenover)[gg], &tdxp, &tdyp);
+            add_thing_to_draw(_G(screenover)[gg].bmp, tdxp, tdyp, 0, _G(screenover)[gg].hasAlphaChannel);
         }
     }
 
@@ -2183,11 +2159,11 @@ void draw_gui_and_overlays()
     // draw speech and portraits (so that they appear over GUIs)
     for (gg=0;gg<numscreenover;gg++) 
     {
-        if (screenover[gg].type == OVER_TEXTMSG || screenover[gg].type == OVER_PICTURE)
+        if (_G(screenover)[gg].type == OVER_TEXTMSG || _G(screenover)[gg].type == OVER_PICTURE)
         {
             int tdxp, tdyp;
-            get_overlay_position(screenover[gg], &tdxp, &tdyp);
-            add_thing_to_draw(screenover[gg].bmp, tdxp, tdyp, 0, false);
+            get_overlay_position(_G(screenover)[gg], &tdxp, &tdyp);
+            add_thing_to_draw(_G(screenover)[gg].bmp, tdxp, tdyp, 0, false);
         }
     }
 
@@ -2339,7 +2315,7 @@ void construct_game_scene(bool full_redraw)
         _GP(play).UpdateRoomCameras();
 
     // Stage: room viewports
-    if (_GP(play).screen_is_faded_out == 0 && is_complete_overlay == 0)
+    if (_GP(play).screen_is_faded_out == 0 && _G(is_complete_overlay) == 0)
     {
         if (_G(displayed_room) >= 0)
         {
@@ -2372,32 +2348,32 @@ void construct_game_screen_overlay(bool draw_mouse)
     // TODO: find out if it's okay to move cursor animation and state update
     // to the update loop instead of doing it in the drawing routine
     // update animating mouse cursor
-    if (_GP(game).mcurs[cur_cursor].view >= 0) {
+    if (_GP(game).mcurs[_G(cur_cursor)].view >= 0) {
         ags_domouse(DOMOUSE_NOCURSOR);
         // only on mousemove, and it's not moving
-        if (((_GP(game).mcurs[cur_cursor].flags & MCF_ANIMMOVE) != 0) &&
-            (mousex == lastmx) && (mousey == lastmy));
+        if (((_GP(game).mcurs[_G(cur_cursor)].flags & MCF_ANIMMOVE) != 0) &&
+            (mousex == _G(lastmx)) && (mousey == _G(lastmy)));
         // only on hotspot, and it's not on one
-        else if (((_GP(game).mcurs[cur_cursor].flags & MCF_HOTSPOT) != 0) &&
+        else if (((_GP(game).mcurs[_G(cur_cursor)].flags & MCF_HOTSPOT) != 0) &&
             (GetLocationType(game_to_data_coord(mousex), game_to_data_coord(mousey)) == 0))
-            set_new_cursor_graphic(_GP(game).mcurs[cur_cursor].pic);
-        else if (mouse_delay>0) mouse_delay--;
+            set_new_cursor_graphic(_GP(game).mcurs[_G(cur_cursor)].pic);
+        else if (_G(mouse_delay)>0) _G(mouse_delay)--;
         else {
-            int viewnum = _GP(game).mcurs[cur_cursor].view;
+            int viewnum = _GP(game).mcurs[_G(cur_cursor)].view;
             int loopnum = 0;
             if (loopnum >= _G(views)[viewnum].numLoops)
                 quitprintf("An animating mouse cursor is using view %d which has no loops", viewnum + 1);
             if (_G(views)[viewnum].loops[loopnum].numFrames < 1)
                 quitprintf("An animating mouse cursor is using view %d which has no frames in loop %d", viewnum + 1, loopnum);
 
-            mouse_frame++;
-            if (mouse_frame >= _G(views)[viewnum].loops[loopnum].numFrames)
-                mouse_frame = 0;
-            set_new_cursor_graphic(_G(views)[viewnum].loops[loopnum].frames[mouse_frame].pic);
-            mouse_delay = _G(views)[viewnum].loops[loopnum].frames[mouse_frame].speed + 5;
-            CheckViewFrame(viewnum, loopnum, mouse_frame);
+            _G(mouse_frame)++;
+            if (_G(mouse_frame) >= _G(views)[viewnum].loops[loopnum].numFrames)
+                _G(mouse_frame) = 0;
+            set_new_cursor_graphic(_G(views)[viewnum].loops[loopnum].frames[_G(mouse_frame)].pic);
+            _G(mouse_delay) = _G(views)[viewnum].loops[loopnum].frames[_G(mouse_frame)].speed + 5;
+            CheckViewFrame(viewnum, loopnum, _G(mouse_frame));
         }
-        lastmx = mousex; lastmy = mousey;
+        _G(lastmx) = mousex; _G(lastmy) = mousey;
     }
 
     ags_domouse(DOMOUSE_NOCURSOR);
@@ -2405,8 +2381,8 @@ void construct_game_screen_overlay(bool draw_mouse)
     // Stage: mouse cursor
     if (draw_mouse && !_GP(play).mouse_cursor_hidden && _GP(play).screen_is_faded_out == 0)
     {
-        _G(gfxDriver)->DrawSprite(mousex - hotx, mousey - hoty, mouseCursor);
-        invalidate_sprite(mousex - hotx, mousey - hoty, mouseCursor, false);
+        _G(gfxDriver)->DrawSprite(mousex - hotx, mousey - hoty, _G(mouseCursor));
+        invalidate_sprite(mousex - hotx, mousey - hoty, _G(mouseCursor), false);
     }
 
     if (_GP(play).screen_is_faded_out == 0)

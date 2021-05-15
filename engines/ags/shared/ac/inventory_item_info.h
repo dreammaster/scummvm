@@ -37,7 +37,7 @@ using namespace AGS; // FIXME later
 struct InventoryItemInfo {
 	char name[25];
 	int  pic;
-	int  cursorPic, _G(hotx), _G(hoty);
+	int  cursorPic, hotx, hoty;
 	int  reserved[5];
 	char flags;
 

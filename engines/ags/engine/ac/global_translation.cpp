@@ -38,7 +38,7 @@ namespace AGS3 {
 using namespace AGS::Shared::Memory;
 
 
-extern AGSPlatformDriver *platform;
+
 
 const char *get_translation(const char *text) {
 	if (text == nullptr)

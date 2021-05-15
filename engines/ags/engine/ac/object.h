@@ -31,16 +31,17 @@
 #ifndef AGS_ENGINE_AC_OBJECT_H
 #define AGS_ENGINE_AC_OBJECT_H
 
-#include "ags/engine/ac/common_defines.h"
+#include "ags/shared/ac/common_defines.h"
 #include "ags/engine/ac/dynobj/script_object.h"
 
 namespace AGS3 {
 
 namespace AGS {
-#include "ags/shared/Shared {
-#include "ags/shared/ap;
-}
-}
+namespace Shared {
+class Bitmap;
+} // namespace Shared
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
 extern AGS_INLINE int is_valid_object(int obtest);

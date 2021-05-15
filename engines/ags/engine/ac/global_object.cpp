@@ -53,7 +53,7 @@ using namespace AGS::Shared;
 #define OVERLAPPING_OBJECT 1000
 
 extern RoomStatus *_G(croom);
-extern RoomObject *_GP(objs);
+
 
 
 

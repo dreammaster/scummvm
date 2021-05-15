@@ -117,16 +117,16 @@ void shutdown_pathfinder() {
 	route_finder_impl->shutdown_pathfinder();
 }
 
-void set_wallscreen(Bitmap *_G(wallscreen)) {
-	route_finder_impl->set_wallscreen(_G(wallscreen));
+void set_wallscreen(Bitmap *wallscreen) {
+	route_finder_impl->set_wallscreen(wallscreen);
 }
 
 int can_see_from(int x1, int y1, int x2, int y2) {
 	return route_finder_impl->can_see_from(x1, y1, x2, y2);
 }
 
-void get_lastcpos(int &_G(lastcx), int &_G(lastcy)) {
-	route_finder_impl->get_lastcpos(_G(lastcx), _G(lastcy));
+void get_lastcpos(int &lastcx, int &lastcy) {
+	route_finder_impl->get_lastcpos(lastcx, lastcy);
 }
 
 void set_route_move_speed(int speed_x, int speed_y) {

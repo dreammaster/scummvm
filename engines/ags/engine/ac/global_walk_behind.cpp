@@ -31,7 +31,7 @@
 namespace AGS3 {
 
 extern RoomStatus *_G(croom);
-extern int _G(walk_behind_baselines_changed);
+
 
 void SetWalkBehindBase(int wa, int bl) {
 	if ((wa < 1) || (wa >= MAX_WALK_BEHINDS))

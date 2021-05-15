@@ -248,8 +248,8 @@ HSaveError WriteGameState(Stream *out)
     out->WriteInt32(_G(ifacepopped));
     out->WriteInt32(_G(game_paused));
     // Mouse cursor
-    out->WriteInt32(cur_mode);
-    out->WriteInt32(cur_cursor);
+    out->WriteInt32(_G(cur_mode));
+    out->WriteInt32(_G(cur_cursor));
     out->WriteInt32(_G(mouse_on_iface));
 
     // Viewports and cameras
@@ -848,8 +848,8 @@ HSaveError WriteOverlays(Stream *out)
     out->WriteInt32(numscreenover);
     for (int i = 0; i < numscreenover; ++i)
     {
-        screenover[i].WriteToFile(out);
-        serialize_bitmap(screenover[i].pic, out);
+        _G(screenover)[i].WriteToFile(out);
+        serialize_bitmap(_G(screenover)[i].pic, out);
     }
     return HSaveError::None();
 }
@@ -863,9 +863,9 @@ HSaveError ReadOverlays(Stream *in, int32_t cmp_ver, const PreservedParams &pp, 
     numscreenover = over_count;
     for (int i = 0; i < numscreenover; ++i)
     {
-        screenover[i].ReadFromFile(in, cmp_ver);
-        if (screenover[i].hasSerializedBitmap)
-            screenover[i].pic = read_serialized_bitmap(in);
+        _G(screenover)[i].ReadFromFile(in, cmp_ver);
+        if (_G(screenover)[i].hasSerializedBitmap)
+            _G(screenover)[i].pic = read_serialized_bitmap(in);
     }
     return err;
 }

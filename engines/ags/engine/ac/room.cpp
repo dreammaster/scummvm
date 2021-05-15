@@ -95,9 +95,9 @@ extern RoomStatus _GP(troom);    // used for non-saveable rooms, eg. intro
 
 
 extern ccInstance *_G(roominst);
-extern AGSPlatformDriver *platform;
 
-extern CharacterCache *charcache;
+
+extern CharacterCache *_G(charcache);
 
 
 extern int _G(done_es_error);
@@ -312,10 +312,10 @@ void unload_old_room() {
 
     // wipe the character cache when we change rooms
     for (ff = 0; ff < _GP(game).numcharacters; ff++) {
-        if (charcache[ff].inUse) {
-            delete charcache[ff].image;
-            charcache[ff].image = nullptr;
-            charcache[ff].inUse = 0;
+        if (_G(charcache)[ff].inUse) {
+            delete _G(charcache)[ff].image;
+            _G(charcache)[ff].image = nullptr;
+            _G(charcache)[ff].inUse = 0;
         }
         // ensure that any half-moves (eg. with scaled movement) are stopped
         _G(charextra)[ff].xwas = INVALID_X;

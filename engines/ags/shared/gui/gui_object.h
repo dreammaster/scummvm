@@ -27,6 +27,7 @@
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gui/gui_defines.h"
 #include "ags/shared/util/string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -134,7 +135,7 @@ HorAlignment ConvertLegacyGUIAlignment(LegacyGUIAlignment align);
 } // namespace AGS
 
 // Tells if all controls are disabled
-extern int _G(all_buttons_disabled);
+
 // Tells if the given control is considered enabled, taking global flag into account
 inline bool IsGUIEnabled(AGS::Shared::GUIObject *g) {
 	return !_G(all_buttons_disabled) && g->IsEnabled();

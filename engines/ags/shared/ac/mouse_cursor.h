@@ -41,7 +41,7 @@ using namespace AGS; // FIXME later
 
 struct MouseCursor {
 	int   pic;
-	short _G(hotx), _G(hoty);
+	short hotx, hoty;
 	short view;
 	char  name[10];
 	char  flags;

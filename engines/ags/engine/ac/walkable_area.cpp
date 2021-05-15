@@ -42,7 +42,7 @@ using namespace AGS::Shared;
 
 
 extern RoomStatus *_G(croom);
-extern RoomObject *_GP(objs);
+
 
 Bitmap *_G(walkareabackup) = nullptr, *_G(walkable_areas_temp) = nullptr;
 

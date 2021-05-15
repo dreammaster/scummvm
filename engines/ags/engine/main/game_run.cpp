@@ -76,7 +76,7 @@ using namespace AGS::Shared;
 
    // mouse cursor is over this interface
 
-extern int is_text_overlay;
+extern int _G(is_text_overlay);
 extern volatile char _G(want_exit), abort_engine;
 extern int _G(proper_exit), _G(our_eip);
 extern int _G(displayed_room), _G(starting_room), _G(in_new_room), _G(new_room_was);
@@ -87,16 +87,16 @@ extern int _G(getloctype_index);
 extern int _G(in_enters_screen), _G(done_es_error);
 
 extern int _G(inside_script), _G(in_graph_script);
-extern int _G(no_blocking_functions);
+
 
 extern int _G(mouse_ifacebut_xoffs), mouse_ifacebut_yoffs;
-extern int cur_mode;
-extern RoomObject *_GP(objs);
-extern char _G(noWalkBehindsAtAll);
+extern int _G(cur_mode);
+
+
 extern RoomStatus *_G(croom);
 
 
-extern int cur_mode, cur_cursor;
+extern int _G(cur_mode), _G(cur_cursor);
 extern char _G(check_dynamic_sprites_at_exit);
 
 // Checks if user interface should remain disabled for now
@@ -248,7 +248,7 @@ static void check_mouse_controls() {
 		if (_GP(play).fast_forward || _GP(play).IsIgnoringInput()) { /* do nothing if skipping cutscene or input disabled */
 		} else if ((_GP(play).wait_counter > 0) && (_GP(play).key_skip_wait & SKIP_MOUSECLICK) != 0)
 			_GP(play).wait_counter = -1;
-		else if (is_text_overlay > 0) {
+		else if (_G(is_text_overlay) > 0) {
 			if (_GP(play).cant_skip_speech & SKIP_MOUSECLICK)
 				remove_screen_overlay(OVER_TEXTMSG);
 		} else if (!IsInterfaceEnabled());  // blocking cutscene, ignore mouse
@@ -416,7 +416,7 @@ bool run_service_key_controls(int &out_key) {
 	}
 
 	if (((agskey == eAGSKeyCodeCtrlV) && (cur_key_mods & KMOD_ALT) != 0)
-		&& (_GP(play).wait_counter < 1) && (is_text_overlay == 0) && (_G(restrict_until) == 0)) {
+		&& (_GP(play).wait_counter < 1) && (_G(is_text_overlay) == 0) && (_G(restrict_until) == 0)) {
 		// make sure we can't interrupt a Wait()
 		// and desync the music to cutscene
 		_GP(play).debug_mode++;
@@ -464,7 +464,7 @@ static void check_keyboard_controls() {
 	}
 
 	// skip speech if desired by Speech.SkipStyle
-	if ((is_text_overlay > 0) && (_GP(play).cant_skip_speech & SKIP_KEYPRESS)) {
+	if ((_G(is_text_overlay) > 0) && (_GP(play).cant_skip_speech & SKIP_KEYPRESS)) {
 		// only allow a key to remove the overlay if the icon bar isn't up
 		if (IsGamePaused() == 0) {
 			// check if it requires a specific keypress
@@ -823,7 +823,7 @@ static void UpdateMouseOverLocation() {
 		_GP(play).get_loc_name_save_cursor = -1;
 		set_cursor_mode(_GP(play).restore_cursor_mode_to);
 
-		if (cur_mode == _GP(play).restore_cursor_mode_to) {
+		if (_G(cur_mode) == _GP(play).restore_cursor_mode_to) {
 			// make sure it changed -- the new mode might have been disabled
 			// in which case don't change the image
 			set_mouse_cursor(_GP(play).restore_cursor_image_to);
@@ -851,7 +851,7 @@ static int ShouldStayInWaitMode() {
 		int *wkptr = (int *)_G(user_disabled_data);
 		if (wkptr[0] < 0) retval = 0;
 	} else if (_G(restrict_until) == UNTIL_NOOVERLAY) {
-		if (is_text_overlay < 1) retval = 0;
+		if (_G(is_text_overlay) < 1) retval = 0;
 	} else if (_G(restrict_until) == UNTIL_INTIS0) {
 		int *wkptr = (int *)_G(user_disabled_data);
 		if (wkptr[0] == 0) retval = 0;
@@ -925,8 +925,8 @@ static void SetupLoopParameters(int untilwhat, const void *udata) {
 	}
 	// Only change the mouse cursor if it hasn't been specifically changed first
 	// (or if it's speech, always change it)
-	if (((cur_cursor == cur_mode) || (untilwhat == UNTIL_NOOVERLAY)) &&
-		(cur_mode != CURS_WAIT))
+	if (((_G(cur_cursor) == _G(cur_mode)) || (untilwhat == UNTIL_NOOVERLAY)) &&
+		(_G(cur_mode) != CURS_WAIT))
 		set_mouse_cursor(CURS_WAIT);
 
 	_G(restrict_until) = untilwhat;
@@ -990,7 +990,7 @@ void GameLoopUntilNoOverlay() {
 }
 
 
-extern unsigned int _G(load_new_game);
+
 void RunGameUntilAborted() {
 	// skip ticks to account for time spent starting _GP(game).
 	skipMissedTicks();

@@ -55,9 +55,9 @@ using namespace Engine;
 
 
 
-extern RoomObject *_GP(objs);
+
 extern RoomStatus *_G(croom);
-extern CharacterCache *charcache;
+extern CharacterCache *_G(charcache);
 
 
 extern RGB palette[256];

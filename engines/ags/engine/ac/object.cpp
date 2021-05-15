@@ -57,7 +57,7 @@ using namespace AGS::Shared;
 
 
 extern RoomStatus *_G(croom);
-extern RoomObject *_GP(objs);
+
 
 
 
