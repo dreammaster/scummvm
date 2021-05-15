@@ -28,8 +28,8 @@ namespace AGS3 {
 
 extern void quit(const char *);
 
-SystemImports simp;
-SystemImports simp_for_plugin;
+SystemImports _GP(simp);
+SystemImports _GP(simp_for_plugin);
 
 int SystemImports::add(const String &name, const RuntimeScriptValue &value, ccInstance *anotherscr) {
 	int ixof;

@@ -64,7 +64,7 @@ using namespace AGS::Engine;
 
 
 extern AGSPlatformDriver *platform;
-extern int numScriptModules;
+extern int _G(numScriptModules);
 
 
 // Test if engine supports extended capabilities required to run the game

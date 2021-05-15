@@ -356,9 +356,9 @@ int mgetbutton() {
 #endif
 }
 
-extern int pluginSimulatedClick;
+extern int _G(pluginSimulatedClick);
 extern void domouse(int str);
-int mouse_z_was = 0;
+int _G(mouse_z_was) = 0;
 const int MB_ARRAY[3] = { MouseBitLeft, MouseBitRight, MouseBitMiddle };
 
 bool ags_misbuttondown(int but) {
@@ -368,9 +368,9 @@ bool ags_misbuttondown(int but) {
 int ags_mgetbutton() {
 	int result;
 
-	if (pluginSimulatedClick > MouseNone) {
-		result = pluginSimulatedClick;
-		pluginSimulatedClick = MouseNone;
+	if (_G(pluginSimulatedClick) > MouseNone) {
+		result = _G(pluginSimulatedClick);
+		_G(pluginSimulatedClick) = MouseNone;
 	} else {
 		result = mgetbutton();
 	}
@@ -396,16 +396,16 @@ int ags_check_mouse_wheel() {
 	if (_GP(game).options[OPT_MOUSEWHEEL] == 0) {
 		return 0;
 	}
-	if (sys_mouse_z == mouse_z_was) {
+	if (sys_mouse_z == _G(mouse_z_was)) {
 		return 0;
 	}
 
 	int result = 0;
-	if (sys_mouse_z > mouse_z_was)
+	if (sys_mouse_z > _G(mouse_z_was))
 		result = 1;   // eMouseWheelNorth
 	else
 		result = -1;  // eMouseWheelSouth
-	mouse_z_was = sys_mouse_z;
+	_G(mouse_z_was) = sys_mouse_z;
 	return result;
 }
 

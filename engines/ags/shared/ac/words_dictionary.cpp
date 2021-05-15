@@ -92,13 +92,13 @@ int WordsDictionary::find_index(const char *wrem) {
 	return -1;
 }
 
-const char *passwencstring = "Avis Durgan";
+const char *_G(passwencstring) = "Avis Durgan";
 
 void decrypt_text(char *toenc) {
 	int adx = 0;
 
 	while (1) {
-		toenc[0] -= passwencstring[adx];
+		toenc[0] -= _G(passwencstring)[adx];
 		if (toenc[0] == 0)
 			break;
 
@@ -146,7 +146,7 @@ void encrypt_text(char *toenc) {
 		if (toenc[0] == 0)
 			tobreak = 1;
 
-		toenc[0] += passwencstring[adx];
+		toenc[0] += _G(passwencstring)[adx];
 		adx++;
 		toenc++;
 

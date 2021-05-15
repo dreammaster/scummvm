@@ -81,7 +81,7 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern Bitmap *walkable_areas_temp;
+extern Bitmap *_G(walkable_areas_temp);
 
 
 extern int is_text_overlay;
@@ -2266,8 +2266,8 @@ void get_char_blocking_rect(int charid, int *x1, int *y1, int *width, int *y2) {
         cwidth += fromx;
         fromx = 0;
     }
-    if (fromx + cwidth >= mask_to_room_coord(walkable_areas_temp->GetWidth()))
-        cwidth = mask_to_room_coord(walkable_areas_temp->GetWidth()) - fromx;
+    if (fromx + cwidth >= mask_to_room_coord(_G(walkable_areas_temp)->GetWidth()))
+        cwidth = mask_to_room_coord(_G(walkable_areas_temp)->GetWidth()) - fromx;
 
     if (x1)
         *x1 = fromx;

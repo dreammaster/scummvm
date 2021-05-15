@@ -82,7 +82,7 @@ struct GameSetupStructBase {
 	bool             load_compiled_script;
 	// [IKM] 2013-03-30
 	// NOTE: it looks like nor 'globalscript', not 'compiled_script' are used
-	// to store actual script data anytime; 'ccScript* gamescript' global
+	// to store actual script data anytime; 'ccScript* _G(gamescript)' global
 	// pointer is used for that instead.
 
 	GameSetupStructBase();

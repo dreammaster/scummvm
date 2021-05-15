@@ -55,10 +55,10 @@ const char *get_translation(const char *text) {
 	}
 #endif
 
-	const auto *transtree = get_translation_tree();
-	if (transtree != nullptr) {
+	const auto *_G(transtree) = get_translation_tree();
+	if (_G(transtree) != nullptr) {
 		// translate the text using the translation file
-		const char *transl = transtree->findValue(text);
+		const char *transl = _G(transtree)->findValue(text);
 		if (transl != nullptr)
 			return transl;
 	}

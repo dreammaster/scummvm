@@ -62,7 +62,7 @@ extern RoomObject *_GP(objs);
 
 
 
-extern Bitmap *walkable_areas_temp;
+extern Bitmap *_G(walkable_areas_temp);
 
 extern CCObject _GP(ccDynamicObject);
 
@@ -456,8 +456,8 @@ void get_object_blocking_rect(int objid, int *x1, int *y1, int *width, int *y2) 
 		cwidth += fromx;
 		fromx = 0;
 	}
-	if (fromx + cwidth >= mask_to_room_coord(walkable_areas_temp->GetWidth()))
-		cwidth = mask_to_room_coord(walkable_areas_temp->GetWidth()) - fromx;
+	if (fromx + cwidth >= mask_to_room_coord(_G(walkable_areas_temp)->GetWidth()))
+		cwidth = mask_to_room_coord(_G(walkable_areas_temp)->GetWidth()) - fromx;
 
 	if (x1)
 		*x1 = fromx;

@@ -505,7 +505,7 @@ public:
 	AGS::Engine::IDriverDependantBitmap *_blankImage = nullptr;
 	AGS::Engine::IDriverDependantBitmap *_blankSidebarImage = nullptr;
 	AGS::Engine::IDriverDependantBitmap *_debugConsole = nullptr;
-//----->
+
 	// actsps is used for temporary storage of the bitamp image
 	// of the latest version of the sprite
 	int _actSpsCount = 0;
@@ -705,7 +705,7 @@ public:
 	 * \defgroup game_init globals
 	 * @{
 	 */
-//----->
+
 	StaticArray *_StaticCharacterArray;
 	StaticArray *_StaticObjectArray;
 	StaticArray *_StaticGUIArray;
@@ -1104,7 +1104,7 @@ public:
 	 * \defgroup screen globals
 	 * @{
 	 */
-//----->
+
 	// Screenshot made in the last room, used during some of the transition effects
 	AGS::Shared::Bitmap *_saved_viewport_bitmap = nullptr;
 	color *_old_palette;
@@ -1172,8 +1172,8 @@ public:
 	 * @{
 	 */
 
-	sound_cache_entry_t *_sound_cache_entries = nullptr;
-	unsigned int _sound_cache_counter = 0;
+//	sound_cache_entry_t *_sound_cache_entries = nullptr;
+//	unsigned int _sound_cache_counter = 0;
 
 	/**@}*/
 
@@ -1225,8 +1225,8 @@ public:
 	 */
 
 	TreeMap *_transtree = nullptr;
-	long _lang_offs_start = 0;
-	char _transFileName[MAX_PATH] = { 0 };
+	//long _lang_offs_start = 0;
+	//char _transFileName[MAX_PATH] = { 0 };
 
 	/**@}*/
 

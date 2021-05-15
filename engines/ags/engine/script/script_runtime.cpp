@@ -50,42 +50,42 @@ namespace AGS3 {
 extern ccInstance *_G(current_instance); // in script/cc_instance
 
 bool ccAddExternalStaticFunction(const String &name, ScriptAPIFunction *pfn) {
-	return simp.add(name, RuntimeScriptValue().SetStaticFunction(pfn), nullptr) == 0;
+	return _GP(simp).add(name, RuntimeScriptValue().SetStaticFunction(pfn), nullptr) == 0;
 }
 
 bool ccAddExternalPluginFunction(const String &name, void *pfn) {
-	return simp.add(name, RuntimeScriptValue().SetPluginFunction(pfn), nullptr) == 0;
+	return _GP(simp).add(name, RuntimeScriptValue().SetPluginFunction(pfn), nullptr) == 0;
 }
 
 bool ccAddExternalStaticObject(const String &name, void *ptr, ICCStaticObject *manager) {
-	return simp.add(name, RuntimeScriptValue().SetStaticObject(ptr, manager), nullptr) == 0;
+	return _GP(simp).add(name, RuntimeScriptValue().SetStaticObject(ptr, manager), nullptr) == 0;
 }
 
 bool ccAddExternalStaticArray(const String &name, void *ptr, StaticArray *array_mgr) {
-	return simp.add(name, RuntimeScriptValue().SetStaticArray(ptr, array_mgr), nullptr) == 0;
+	return _GP(simp).add(name, RuntimeScriptValue().SetStaticArray(ptr, array_mgr), nullptr) == 0;
 }
 
 bool ccAddExternalDynamicObject(const String &name, void *ptr, ICCDynamicObject *manager) {
-	return simp.add(name, RuntimeScriptValue().SetDynamicObject(ptr, manager), nullptr) == 0;
+	return _GP(simp).add(name, RuntimeScriptValue().SetDynamicObject(ptr, manager), nullptr) == 0;
 }
 
 bool ccAddExternalObjectFunction(const String &name, ScriptAPIObjectFunction *pfn) {
-	return simp.add(name, RuntimeScriptValue().SetObjectFunction(pfn), nullptr) == 0;
+	return _GP(simp).add(name, RuntimeScriptValue().SetObjectFunction(pfn), nullptr) == 0;
 }
 
 bool ccAddExternalScriptSymbol(const String &name, const RuntimeScriptValue &prval, ccInstance *inst) {
-	return simp.add(name, prval, inst) == 0;
+	return _GP(simp).add(name, prval, inst) == 0;
 }
 
 void ccRemoveExternalSymbol(const String &name) {
-	simp.remove(name);
+	_GP(simp).remove(name);
 }
 
 void ccRemoveAllSymbols() {
-	simp.clear();
+	_GP(simp).clear();
 }
 
-ccInstance *loadedInstances[MAX_LOADED_INSTANCES] = { nullptr,
+ccInstance *_GP(loadedInstances)[MAX_LOADED_INSTANCES] = { nullptr,
 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
@@ -95,7 +95,7 @@ void nullfree(void *data) {
 }
 
 void *ccGetSymbolAddress(const String &name) {
-	const ScriptImport *import = simp.getByName(name);
+	const ScriptImport *import = _GP(simp).getByName(name);
 	if (import) {
 		return import->Value.Ptr;
 	}
@@ -103,16 +103,16 @@ void *ccGetSymbolAddress(const String &name) {
 }
 
 bool ccAddExternalFunctionForPlugin(const String &name, void *pfn) {
-	return simp_for_plugin.add(name, RuntimeScriptValue().SetPluginFunction(pfn), nullptr) == 0;
+	return _GP(simp_for_plugin).add(name, RuntimeScriptValue().SetPluginFunction(pfn), nullptr) == 0;
 }
 
 void *ccGetSymbolAddressForPlugin(const String &name) {
-	const ScriptImport *import = simp_for_plugin.getByName(name);
+	const ScriptImport *import = _GP(simp_for_plugin).getByName(name);
 	if (import) {
 		return import->Value.Ptr;
 	} else {
 		// Also search the internal symbol table for non-function symbols
-		import = simp.getByName(name);
+		import = _GP(simp).getByName(name);
 		if (import) {
 			return import->Value.Ptr;
 		}
@@ -120,16 +120,16 @@ void *ccGetSymbolAddressForPlugin(const String &name) {
 	return nullptr;
 }
 
-new_line_hook_type new_line_hook = nullptr;
+new_line_hook_type _G(new_line_hook) = nullptr;
 
 char ccRunnerCopyright[] = "ScriptExecuter32 v" SCOM_VERSIONSTR " (c) 2001 Chris Jones";
-int maxWhileLoops = 0;
+int _G(maxWhileLoops) = 0;
 
 // If a while loop does this many iterations without the
 // NofityScriptAlive function getting called, the script
 // aborts. Set to 0 to disable.
 void ccSetScriptAliveTimer(int numloop) {
-	maxWhileLoops = numloop;
+	_G(maxWhileLoops) = numloop;
 }
 
 void ccNotifyScriptStillAlive() {
@@ -138,7 +138,7 @@ void ccNotifyScriptStillAlive() {
 }
 
 void ccSetDebugHook(new_line_hook_type jibble) {
-	new_line_hook = jibble;
+	_G(new_line_hook) = jibble;
 }
 
 int call_function(intptr_t addr, const RuntimeScriptValue *object, int numparm, const RuntimeScriptValue *parms) {

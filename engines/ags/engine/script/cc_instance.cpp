@@ -51,11 +51,11 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Shared::Memory;
 
-extern ccInstance *loadedInstances[MAX_LOADED_INSTANCES]; // in script/script_runtime
+extern ccInstance *_GP(loadedInstances)[MAX_LOADED_INSTANCES]; // in script/script_runtime
 extern int _G(gameHasBeenRestored); // in ac/game
-extern ExecutingScript*curscript; // in script/script
-extern int maxWhileLoops;
-extern new_line_hook_type new_line_hook;
+extern ExecutingScript*_G(curscript); // in script/script
+extern int _G(maxWhileLoops);
+extern new_line_hook_type _G(new_line_hook);
 
 
 
@@ -387,8 +387,8 @@ int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const 
     // object with ref count 0 that is in use
     pool.RunGarbageCollectionIfAppropriate();
 
-    if (new_line_hook)
-        new_line_hook(nullptr, 0);
+    if (_G(new_line_hook))
+        _G(new_line_hook)(nullptr, 0);
 
     if (reterr)
         return -6;
@@ -516,7 +516,7 @@ int ccInstance::Run(int32_t curpc)
                     break;
                 case FIXUP_IMPORT:
                     {
-                        const ScriptImport *import = simp.getByIndex((int32_t)codeInst->code[pc_at]);
+                        const ScriptImport *import = _GP(simp).getByIndex((int32_t)codeInst->code[pc_at]);
                         if (import)
                         {
                             codeOp.Args[i] = import->Value;
@@ -568,8 +568,8 @@ int ccInstance::Run(int32_t curpc)
       case SCMD_LINENUM:
           line_number = arg1.IValue;
           _G(currentline) = arg1.IValue;
-          if (new_line_hook)
-              new_line_hook(this, _G(currentline));
+          if (_G(new_line_hook))
+              _G(new_line_hook)(this, _G(currentline));
           break;
       case SCMD_ADD:
           // If the the register is SREG_SP, we are allocating new variable on the stack
@@ -823,14 +823,14 @@ int ccInstance::Run(int32_t curpc)
       case SCMD_JMP:
           pc += arg1.IValue;
 
-          if ((arg1.IValue < 0) && (maxWhileLoops > 0) && (loopIterationCheckDisabled == 0)) {
+          if ((arg1.IValue < 0) && (_G(maxWhileLoops) > 0) && (loopIterationCheckDisabled == 0)) {
               // Make sure it's not stuck in a While loop
               loopIterations ++;
               if (flags & INSTF_RUNNING) {
                   loopIterations = 0;
                   flags &= ~INSTF_RUNNING;
               }
-              else if (loopIterations > maxWhileLoops) {
+              else if (loopIterations > _G(maxWhileLoops)) {
                   cc_error("!Script appears to be hung (a while loop ran %d times). The problem may be in a calling function; check the call stack.", loopIterations);
                   return -1;
               }
@@ -1026,7 +1026,7 @@ int ccInstance::Run(int32_t curpc)
           // extract the instance ID
           int32_t instId = codeOp.Instruction.InstanceId;
           // determine the offset into the code of the instance we want
-          runningInst = loadedInstances[instId];
+          runningInst = _GP(loadedInstances)[instId];
           intptr_t callAddr = reg1.Ptr - (char*)&runningInst->code[0];
           if (callAddr % sizeof(intptr_t) != 0) {
               cc_error("call address not aligned");
@@ -1420,7 +1420,7 @@ void ccInstance::DumpInstruction(const ScriptOperation &op)
             case kScValPluginFunction:
             case kScValPluginObject:
             {
-                String name = simp.findName(arg);
+                String name = _GP(simp).findName(arg);
                 if (!name.IsEmpty())
                 {
                     writer.WriteFormat(" &%s", name.GetCStr());
@@ -1507,8 +1507,8 @@ bool ccInstance::_Create(PScript scri, ccInstance * joined)
 
     // find a LoadedInstance slot for it
     for (i = 0; i < MAX_LOADED_INSTANCES; i++) {
-        if (loadedInstances[i] == nullptr) {
-            loadedInstances[i] = this;
+        if (_GP(loadedInstances)[i] == nullptr) {
+            _GP(loadedInstances)[i] = this;
             loadedInstanceId = i;
             break;
         }
@@ -1594,13 +1594,13 @@ void ccInstance::Free()
         instanceof->instances--;
         if (instanceof->instances == 0)
         {
-            simp.RemoveScriptExports(this);
+            _GP(simp).RemoveScriptExports(this);
         }
     }
 
     // remove from the Active Instances list
-    if (loadedInstances[loadedInstanceId] == this)
-        loadedInstances[loadedInstanceId] = nullptr;
+    if (_GP(loadedInstances)[loadedInstanceId] == this)
+        _GP(loadedInstances)[loadedInstanceId] = nullptr;
 
     if ((flags & INSTF_SHAREDATA) == 0)
     {
@@ -1654,7 +1654,7 @@ bool ccInstance::ResolveScriptImports(PScript scri)
             continue;
         }
 
-        resolved_imports[i] = simp.get_index_of(scri->imports[i]);
+        resolved_imports[i] = _GP(simp).get_index_of(scri->imports[i]);
         if (resolved_imports[i] < 0) {
             cc_error("unresolved import '%s'", scri->imports[i]);
             return false;
@@ -1794,7 +1794,7 @@ bool ccInstance::CreateRuntimeCodeFixups(PScript scri)
             // must fixup the following instruction in certain case
             {
                 int import_index = resolved_imports[code[fixup]];
-                const ScriptImport *import = simp.getByIndex(import_index);
+                const ScriptImport *import = _GP(simp).getByIndex(import_index);
                 if (!import)
                 {
                     cc_error("cannot resolve import, key = %d", import_index);
@@ -1876,7 +1876,7 @@ bool ccInstance::FixupArgument(intptr_t code_value, char fixup_type, RuntimeScri
         break;
     case FIXUP_IMPORT:
         {
-            const ScriptImport *import = simp.getByIndex((int32_t)code_value);
+            const ScriptImport *import = _GP(simp).getByIndex((int32_t)code_value);
             if (import)
             {
                 argument = import->Value;

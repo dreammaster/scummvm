@@ -46,11 +46,11 @@ using namespace AGS::Shared;
 
 String trans_name;
 String trans_filename;
-std::unique_ptr<TreeMap> transtree;
+std::unique_ptr<TreeMap> _G(transtree);
 
 
 void close_translation() {
-	transtree.reset();
+	_G(transtree).reset();
 	trans_name = "";
 	trans_filename = "";
 }
@@ -77,7 +77,7 @@ bool init_translation(const String &lang, const String &fallback_lang, bool quit
 		return false;
 	}
 
-	transtree.reset(new TreeMap());
+	_G(transtree).reset(new TreeMap());
 
 	String parse_error;
 	bool result = parse_translation(language_file, parse_error);
@@ -111,7 +111,7 @@ String get_translation_path() {
 }
 
 const TreeMap *get_translation_tree() {
-	return transtree.get();
+	return _G(transtree).get();
 }
 
 bool parse_translation(Stream *language_file, String &parse_error) {
@@ -133,7 +133,7 @@ bool parse_translation(Stream *language_file, String &parse_error) {
 					parse_error = "Translation file is corrupt";
 					return false;
 				}
-				transtree->addText(original, translation);
+				_G(transtree)->addText(original, translation);
 			}
 
 		} else if (blockType == 2) {
@@ -171,7 +171,7 @@ bool parse_translation(Stream *language_file, String &parse_error) {
 		}
 	}
 
-	if (transtree->text == nullptr) {
+	if (_G(transtree)->text == nullptr) {
 		parse_error = "The translation file was empty.";
 		return false;
 	}

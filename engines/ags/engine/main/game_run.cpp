@@ -86,13 +86,13 @@ extern int _G(game_paused);
 extern int _G(getloctype_index);
 extern int _G(in_enters_screen), _G(done_es_error);
 
-extern int inside_script, in_graph_script;
-extern int no_blocking_functions;
+extern int _G(inside_script), _G(in_graph_script);
+extern int _G(no_blocking_functions);
 
 extern int _G(mouse_ifacebut_xoffs), mouse_ifacebut_yoffs;
 extern int cur_mode;
 extern RoomObject *_GP(objs);
-extern char noWalkBehindsAtAll;
+extern char _G(noWalkBehindsAtAll);
 extern RoomStatus *_G(croom);
 
 
@@ -136,14 +136,14 @@ static void game_loop_check_problems_at_start() {
 		debug_script_warn("Wait() was used in Player Enters Screen - use Enters Screen After Fadein instead");
 		_G(done_es_error) = 1;
 	}
-	if (no_blocking_functions)
+	if (_G(no_blocking_functions))
 		quit("!A blocking function was called from within a non-blocking event such as " REP_EXEC_ALWAYS_NAME);
 }
 
 static void game_loop_check_new_room() {
 	if (_G(in_new_room) == 0) {
 		// Run the room and game script repeatedly_execute
-		run_function_on_non_blocking_thread(&repExecAlways);
+		run_function_on_non_blocking_thread(&_GP(repExecAlways));
 		setevent(EV_TEXTSCRIPT, TS_REPEAT);
 		setevent(EV_RUNEVBLOCK, EVB_ROOM, 0, 6);
 	}
@@ -155,7 +155,7 @@ static void game_loop_check_new_room() {
 static void game_loop_do_late_update() {
 	if (_G(in_new_room) == 0) {
 		// Run the room and game script late_repeatedly_execute
-		run_function_on_non_blocking_thread(&lateRepExecAlways);
+		run_function_on_non_blocking_thread(&_GP(lateRepExecAlways));
 	}
 }
 
@@ -206,12 +206,12 @@ static int game_loop_check_ground_level_interactions() {
 }
 
 static void lock_mouse_on_click() {
-	if (_GP(usetup).mouse_auto_lock && _GP(scsystem).windowed)
+	if (_GP(usetup).mouse_auto_lock && _GP(_GP(scsystem)).windowed)
 		Mouse::TryLockToWindow();
 }
 
 static void toggle_mouse_lock() {
-	if (_GP(scsystem).windowed) {
+	if (_GP(_GP(scsystem)).windowed) {
 		if (Mouse::IsLockedToWindow())
 			Mouse::UnlockFromWindow();
 		else
@@ -262,7 +262,7 @@ static void check_mouse_controls() {
 			wasongui = mongu;
 			wasbutdown = mbut + 1;
 		} else setevent(EV_TEXTSCRIPT, TS_MCLICK, mbut + 1);
-		//    else RunTextScriptIParam(gameinst,"on_mouse_click",aa+1);
+		//    else RunTextScriptIParam(_G(gameinst),"on_mouse_click",aa+1);
 	}
 
 	if (mwheelz < 0)
@@ -375,7 +375,7 @@ bool run_service_key_controls(int &out_key) {
 		int ff;
 		// MACPORT FIX 9/6/5: added last %s
 		sprintf(infobuf, "In room %d %s[Player at %d, %d (view %d, loop %d, frame %d)%s%s%s",
-			_G(displayed_room), (noWalkBehindsAtAll ? "(has no walk-behinds)" : ""), _G(playerchar)->x, _G(playerchar)->y,
+			_G(displayed_room), (_G(noWalkBehindsAtAll) ? "(has no walk-behinds)" : ""), _G(playerchar)->x, _G(playerchar)->y,
 			_G(playerchar)->view + 1, _G(playerchar)->loop, _G(playerchar)->frame,
 			(IsGamePaused() == 0) ? "" : "[Game paused.",
 			(_GP(play).ground_level_areas_disabled == 0) ? "" : "[Ground areas disabled.",
@@ -483,7 +483,7 @@ static void check_keyboard_controls() {
 		return;
 	}
 
-	if (inside_script) {
+	if (_G(inside_script)) {
 		// Don't queue up another keypress if it can't be run instantly
 		debug_script_log("Keypress %d ignored (game blocked)", kgn);
 		return;
@@ -539,7 +539,7 @@ static void check_keyboard_controls() {
 		setevent(EV_TEXTSCRIPT, TS_KEYPRESS, kgn);
 	}
 
-	// RunTextScriptIParam(gameinst,"on_key_press",kgn);
+	// RunTextScriptIParam(_G(gameinst),"on_key_press",kgn);
 }
 
 // check_controls: checks mouse & keyboard interface

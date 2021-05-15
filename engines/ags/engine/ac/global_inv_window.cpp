@@ -32,11 +32,11 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern ExecutingScript *curscript;
+extern ExecutingScript *_G(curscript);
 
 
 void sc_invscreen() {
-	curscript->queue_action(ePSAInvScreen, 0, "InventoryScreen");
+	_G(curscript)->queue_action(ePSAInvScreen, 0, "InventoryScreen");
 }
 
 void SetInvDimensions(int ww, int hh) {

@@ -288,11 +288,11 @@ void debug_script_print(const String &msg, MessageType mt) {
 	ccInstance *curinst = ccInstance::GetCurrentInstance();
 	if (curinst != nullptr) {
 		String scriptname;
-		if (curinst->instanceof == gamescript)
+		if (curinst->instanceof == _G(gamescript))
 			scriptname = "G ";
 		else if (curinst->instanceof == _GP(thisroom).CompiledScript)
 			scriptname = "R ";
-		else if (curinst->instanceof == dialogScriptsScript)
+		else if (curinst->instanceof == _G(dialogScriptsScript))
 			scriptname = "D ";
 		else
 			scriptname = "? ";

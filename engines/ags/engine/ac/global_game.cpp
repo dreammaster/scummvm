@@ -75,7 +75,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern ExecutingScript *curscript;
+extern ExecutingScript *_G(curscript);
 
 extern int _G(game_paused);
 
@@ -107,8 +107,8 @@ void GiveScore(int amnt) {
 
 void restart_game() {
 	can_run_delayed_command();
-	if (inside_script) {
-		curscript->queue_action(ePSARestartGame, 0, "RestartGame");
+	if (_G(inside_script)) {
+		_G(curscript)->queue_action(ePSARestartGame, 0, "RestartGame");
 		return;
 	}
 	try_restore_save(RESTART_POINT_SAVE_GAME_NUMBER);
@@ -119,8 +119,8 @@ void RestoreGameSlot(int slnum) {
 		quit("!RestoreGameSlot: a game cannot be restored from within game_start");
 
 	can_run_delayed_command();
-	if (inside_script) {
-		curscript->queue_action(ePSARestoreGame, slnum, "RestoreGameSlot");
+	if (_G(inside_script)) {
+		_G(curscript)->queue_action(ePSARestoreGame, slnum, "RestoreGameSlot");
 		return;
 	}
 	try_restore_save(slnum);
@@ -280,8 +280,8 @@ int RunAGSGame(const char *newgame, unsigned int mode, int data) {
 		_GP(play).takeover_data = data;
 		_G(load_new_game_restore) = -1;
 
-		if (inside_script) {
-			curscript->queue_action(ePSARunAGSGame, mode | RAGMODE_LOADNOW, "RunAGSGame");
+		if (_G(inside_script)) {
+			_G(curscript)->queue_action(ePSARunAGSGame, mode | RAGMODE_LOADNOW, "RunAGSGame");
 			ccInstance::GetCurrentInstance()->Abort();
 		} else
 			_G(load_new_game) = mode | RAGMODE_LOADNOW;
@@ -671,7 +671,7 @@ void SetMultitasking(int mode) {
 	}
 
 	// Don't allow background running if full screen
-	if ((mode == 1) && (!_GP(scsystem).windowed))
+	if ((mode == 1) && (!_GP(_GP(scsystem)).windowed))
 		mode = 0;
 
 	// Install engine callbacks for switching in and out the window

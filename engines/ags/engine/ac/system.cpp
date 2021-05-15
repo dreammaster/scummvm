@@ -53,11 +53,11 @@ bool System_HasInputFocus() {
 }
 
 int System_GetColorDepth() {
-	return _GP(scsystem).coldepth;
+	return _GP(_GP(scsystem)).coldepth;
 }
 
 int System_GetOS() {
-	return _GP(scsystem).os;
+	return _GP(_GP(scsystem)).os;
 }
 
 // [IKM] 2014-09-21
@@ -124,20 +124,20 @@ int System_GetScrollLock() {
 }
 
 int System_GetVsync() {
-	return _GP(scsystem).vsync;
+	return _GP(_GP(scsystem)).vsync;
 }
 
 void System_SetVsync(int newValue) {
 	if (ags_stricmp(_G(gfxDriver)->GetDriverID(), "D3D9") != 0)
-		_GP(scsystem).vsync = newValue;
+		_GP(_GP(scsystem)).vsync = newValue;
 }
 
 int System_GetWindowed() {
-	return _GP(scsystem).windowed;
+	return _GP(_GP(scsystem)).windowed;
 }
 
 void System_SetWindowed(int windowed) {
-	if (windowed != _GP(scsystem).windowed)
+	if (windowed != _GP(_GP(scsystem)).windowed)
 		engine_try_switch_windowed_gfxmode();
 }
 

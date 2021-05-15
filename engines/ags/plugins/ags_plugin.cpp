@@ -110,8 +110,8 @@ extern RoomStatus *_G(croom);
 
 extern int _G(game_paused);
 
-extern int inside_script;
-extern ccInstance *gameinst, *roominst;
+extern int _G(inside_script);
+extern ccInstance *_G(gameinst), *_G(roominst);
 extern CharacterCache *charcache;
 
 
@@ -251,7 +251,7 @@ void IAGSEngine::GetScreenDimensions(int32 *width, int32 *height, int32 *coldept
 	if (height != nullptr)
 		height[0] = _GP(play).GetMainViewport().GetHeight();
 	if (coldepth != nullptr)
-		coldepth[0] = _GP(scsystem).coldepth;
+		coldepth[0] = _GP(_GP(scsystem)).coldepth;
 }
 
 unsigned char **IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
@@ -660,12 +660,12 @@ void IAGSEngine::DisableSound() {
 	_GP(usetup).audio_backend = 0;
 }
 int IAGSEngine::CanRunScriptFunctionNow() {
-	if (inside_script)
+	if (_G(inside_script))
 		return 0;
 	return 1;
 }
 int IAGSEngine::CallGameScriptFunction(const char *name, int32 globalScript, int32 numArgs, long arg1, long arg2, long arg3) {
-	if (inside_script)
+	if (_G(inside_script))
 		return -300;
 
 	ccInstance *toRun = GetScriptInstanceByType(globalScript ? kScInstGame : kScInstRoom);
@@ -691,7 +691,7 @@ void IAGSEngine::SetSpriteAlphaBlended(int32 slot, int32 isAlphaBlended) {
 }
 
 void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, int32 numArgs, long arg1, long arg2) {
-	if (!inside_script) {
+	if (!_G(inside_script)) {
 		this->CallGameScriptFunction(name, globalScript, numArgs, arg1, arg2, 0);
 		return;
 	}
@@ -699,7 +699,7 @@ void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, i
 	if (numArgs < 0 || numArgs > 2)
 		quit("IAGSEngine::QueueGameScriptFunction: invalid number of arguments");
 
-	curscript->run_another(name, globalScript ? kScInstGame : kScInstRoom, numArgs,
+	_G(curscript)->run_another(name, globalScript ? kScInstGame : kScInstRoom, numArgs,
 		RuntimeScriptValue().SetPluginArgument(arg1), RuntimeScriptValue().SetPluginArgument(arg2));
 }
 

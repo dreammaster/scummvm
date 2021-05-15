@@ -79,16 +79,16 @@ using namespace AGS::Engine;
 
 extern AGSPlatformDriver *platform;
 
-extern char noWalkBehindsAtAll;
+extern char _G(noWalkBehindsAtAll);
 
-extern char *walkBehindExists;  // whether a WB area is in this column
-extern int *walkBehindStartY, *walkBehindEndY;
-extern int walkBehindLeft[MAX_WALK_BEHINDS], walkBehindTop[MAX_WALK_BEHINDS];
-extern int walkBehindRight[MAX_WALK_BEHINDS], walkBehindBottom[MAX_WALK_BEHINDS];
-extern IDriverDependantBitmap *walkBehindBitmap[MAX_WALK_BEHINDS];
-extern int walkBehindsCachedForBgNum;
-extern WalkBehindMethodEnum walkBehindMethod;
-extern int walk_behind_baselines_changed;
+extern char *_G(walkBehindExists);  // whether a WB area is in this column
+extern int *_G(walkBehindStartY), *walkBehindEndY;
+extern int _G(walkBehindLeft)[MAX_WALK_BEHINDS], _G(walkBehindTop)[MAX_WALK_BEHINDS];
+extern int _G(walkBehindRight)[MAX_WALK_BEHINDS], _G(walkBehindBottom)[MAX_WALK_BEHINDS];
+extern IDriverDependantBitmap *_G(walkBehindBitmap)[MAX_WALK_BEHINDS];
+extern int _G(walkBehindsCachedForBgNum);
+extern WalkBehindMethodEnum _G(walkBehindMethod);
+extern int _G(walk_behind_baselines_changed);
 
 extern CharacterCache *charcache;
 
@@ -457,12 +457,12 @@ void init_draw_method()
 {
     if (_G(gfxDriver)->HasAcceleratedTransform())
     {
-        walkBehindMethod = DrawAsSeparateSprite;
+        _G(walkBehindMethod) = DrawAsSeparateSprite;
         create_blank_image(_GP(game).GetColorDepth());
     }
     else
     {
-        walkBehindMethod = DrawOverCharSprite;
+        _G(walkBehindMethod) = DrawOverCharSprite;
     }
 
     on_mainviewport_changed();
@@ -717,7 +717,7 @@ void render_to_screen()
     construct_engine_overlay();
 
     // only vsync in full screen mode, it makes things worse in a window
-    _G(gfxDriver)->EnableVsyncBeforeRender((_GP(scsystem).vsync > 0) && (!_GP(scsystem).windowed));
+    _G(gfxDriver)->EnableVsyncBeforeRender((_GP(_GP(scsystem)).vsync > 0) && (!_GP(_GP(scsystem)).windowed));
 
     bool succeeded = false;
     while (!succeeded)
@@ -830,7 +830,7 @@ void invalidate_cached_walkbehinds()
 // of it with transparent pixels where there are walk-behind areas
 // Returns whether any pixels were updated
 int sort_out_walk_behinds(Bitmap *sprit,int xx,int yy,int basel, Bitmap *copyPixelsFrom = nullptr, Bitmap *checkPixelsFrom = nullptr, int zoom=100) {
-    if (noWalkBehindsAtAll)
+    if (_G(noWalkBehindsAtAll))
         return 0;
 
     if ((!_GP(thisroom).WalkBehindMask->IsMemoryBitmap()) ||
@@ -856,17 +856,17 @@ int sort_out_walk_behinds(Bitmap *sprit,int xx,int yy,int basel, Bitmap *copyPix
         if (ee + xx >= _GP(thisroom).WalkBehindMask->GetWidth())
             break;
 
-        if ((!walkBehindExists[ee+xx]) ||
+        if ((!_G(walkBehindExists)[ee+xx]) ||
             (walkBehindEndY[ee+xx] <= yy) ||
-            (walkBehindStartY[ee+xx] > yy+sprit->GetHeight()))
+            (_G(walkBehindStartY)[ee+xx] > yy+sprit->GetHeight()))
             continue;
 
         toheight = sprit->GetHeight();
 
-        if (walkBehindStartY[ee+xx] < yy)
+        if (_G(walkBehindStartY)[ee+xx] < yy)
             rr = 0;
         else
-            rr = (walkBehindStartY[ee+xx] - yy);
+            rr = (_G(walkBehindStartY)[ee+xx] - yy);
 
         // Since we will use _getpixel, ensure we only check within the screen
         if (rr + yy < 0)
@@ -949,7 +949,7 @@ int sort_out_walk_behinds(Bitmap *sprit,int xx,int yy,int basel, Bitmap *copyPix
 
 void sort_out_char_sprite_walk_behind(int actspsIndex, int xx, int yy, int basel, int zoom, int width, int height)
 {
-    if (noWalkBehindsAtAll)
+    if (_G(noWalkBehindsAtAll))
         return;
 
     if ((!_G(actspswbcache)[actspsIndex].valid) ||
@@ -1018,7 +1018,7 @@ void add_to_sprite_list(IDriverDependantBitmap* spp, int xx, int yy, int baselin
     sprite.y=yy;
     sprite.transparent=trans;
 
-    if (walkBehindMethod == DrawAsSeparateSprite)
+    if (_G(walkBehindMethod) == DrawAsSeparateSprite)
         sprite.takesPriorityIfEqual = !isWalkBehind;
     else
         sprite.takesPriorityIfEqual = isWalkBehind;
@@ -1093,13 +1093,13 @@ bool spritelistentry_less(const SpriteListEntry &e1, const SpriteListEntry &e2)
 
 void draw_sprite_list() {
 
-    if (walkBehindMethod == DrawAsSeparateSprite)
+    if (_G(walkBehindMethod) == DrawAsSeparateSprite)
     {
         for (int ee = 1; ee < MAX_WALK_BEHINDS; ee++)
         {
-            if (walkBehindBitmap[ee] != nullptr)
+            if (_G(walkBehindBitmap)[ee] != nullptr)
             {
-                add_to_sprite_list(walkBehindBitmap[ee], walkBehindLeft[ee], walkBehindTop[ee],
+                add_to_sprite_list(_G(walkBehindBitmap)[ee], _G(walkBehindLeft)[ee], _G(walkBehindTop)[ee],
                     _G(croom)->walkbehind_base[ee], 0, -1, true);
             }
         }
@@ -1459,7 +1459,7 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
     }
 
     if ((hardwareAccelerated) &&
-        (walkBehindMethod != DrawOverCharSprite) &&
+        (_G(walkBehindMethod) != DrawOverCharSprite) &&
         (_GP(objcache)[aa].image != nullptr) &&
         (_GP(objcache)[aa].sppic == _GP(objs)[aa].num) &&
         (_G(actsps)[useindx] != nullptr))
@@ -1496,7 +1496,7 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
         (_GP(objcache)[aa].zoomWas == zoom_level) &&
         (_GP(objcache)[aa].mirroredWas == isMirrored)) {
             // the image is the same, we can use it cached!
-            if ((walkBehindMethod != DrawOverCharSprite) &&
+            if ((_G(walkBehindMethod) != DrawOverCharSprite) &&
                 (_G(actsps)[useindx] != nullptr))
                 return 1;
             // Check if the X & Y co-ords are the same, too -- if so, there
@@ -1504,7 +1504,7 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
             if ((_GP(objcache)[aa].xwas == _GP(objs)[aa].x) &&
                 (_GP(objcache)[aa].ywas == _GP(objs)[aa].y) &&
                 (_G(actsps)[useindx] != nullptr) &&
-                (walk_behind_baselines_changed == 0))
+                (_G(walk_behind_baselines_changed) == 0))
                 return 1;
             _G(actsps)[useindx] = recycle_bitmap(_G(actsps)[useindx], coldept, sprwidth, sprheight);
             _G(actsps)[useindx]->Blit(_GP(objcache)[aa].image, 0, 0, 0, 0, _GP(objcache)[aa].image->GetWidth(), _GP(objcache)[aa].image->GetHeight());
@@ -1587,16 +1587,16 @@ void prepare_objects_for_drawing() {
 
         if (_GP(objs)[aa].flags & OBJF_NOWALKBEHINDS) {
             // ignore walk-behinds, do nothing
-            if (walkBehindMethod == DrawAsSeparateSprite)
+            if (_G(walkBehindMethod) == DrawAsSeparateSprite)
             {
                 usebasel += _GP(thisroom).Height;
             }
         }
-        else if (walkBehindMethod == DrawAsSeparateCharSprite) 
+        else if (_G(walkBehindMethod) == DrawAsSeparateCharSprite) 
         {
             sort_out_char_sprite_walk_behind(useindx, atxp, atyp, usebasel, _GP(objs)[aa].last_zoom, _GP(objs)[aa].last_width, _GP(objs)[aa].last_height);
         }
-        else if ((!actspsIntact) && (walkBehindMethod == DrawOverCharSprite))
+        else if ((!actspsIntact) && (_G(walkBehindMethod) == DrawOverCharSprite))
         {
             sort_out_walk_behinds(_G(actsps)[useindx], atxp, atyp, usebasel);
         }
@@ -1783,7 +1783,7 @@ void prepare_characters_for_drawing() {
             (charcache[aa].tintlightwas == tint_light) &&
             (charcache[aa].lightlevwas == light_level)) 
         {
-            if (walkBehindMethod == DrawOverCharSprite)
+            if (_G(walkBehindMethod) == DrawOverCharSprite)
             {
                 _G(actsps)[useindx] = recycle_bitmap(_G(actsps)[useindx], charcache[aa].image->GetColorDepth(), charcache[aa].image->GetWidth(), charcache[aa].image->GetHeight());
                 _G(actsps)[useindx]->Blit (charcache[aa].image, 0, 0, 0, 0, _G(actsps)[useindx]->GetWidth(), _G(actsps)[useindx]->GetHeight());
@@ -1893,16 +1893,16 @@ void prepare_characters_for_drawing() {
 
         if (chin->flags & CHF_NOWALKBEHINDS) {
             // ignore walk-behinds, do nothing
-            if (walkBehindMethod == DrawAsSeparateSprite)
+            if (_G(walkBehindMethod) == DrawAsSeparateSprite)
             {
                 usebasel += _GP(thisroom).Height;
             }
         }
-        else if (walkBehindMethod == DrawAsSeparateCharSprite) 
+        else if (_G(walkBehindMethod) == DrawAsSeparateCharSprite) 
         {
             sort_out_char_sprite_walk_behind(useindx, bgX, bgY, usebasel, _G(charextra)[aa].zoom, newwidth, newheight);
         }
-        else if (walkBehindMethod == DrawOverCharSprite)
+        else if (_G(walkBehindMethod) == DrawOverCharSprite)
         {
             sort_out_walk_behinds(_G(actsps)[useindx], bgX, bgY, usebasel);
         }
@@ -1964,9 +1964,9 @@ void prepare_room_sprites()
     }
     if (_G(gfxDriver)->RequiresFullRedrawEachFrame())
     {
-        if (_G(current_background_is_dirty) || walkBehindsCachedForBgNum != _GP(play).bg_frame)
+        if (_G(current_background_is_dirty) || _G(walkBehindsCachedForBgNum) != _GP(play).bg_frame)
         {
-            if (walkBehindMethod == DrawAsSeparateSprite)
+            if (_G(walkBehindMethod) == DrawAsSeparateSprite)
             {
                 update_walk_behind_images();
             }
@@ -2257,7 +2257,7 @@ static void construct_room_view()
     draw_preroom_background();
     prepare_room_sprites();
     // reset the Baselines Changed flag now that we've drawn stuff
-    walk_behind_baselines_changed = 0;
+    _G(walk_behind_baselines_changed) = 0;
 
     for (const auto &viewport : _GP(play).GetRoomViewportsZOrdered())
     {

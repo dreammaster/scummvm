@@ -961,14 +961,14 @@ void engine_init_game_settings()
 void engine_setup_scsystem_auxiliary()
 {
     // ScriptSystem::aci_version is only 10 chars long
-    strncpy(_GP(scsystem).aci_version, EngineVersion.LongString, 10);
+    strncpy(_GP(_GP(scsystem)).aci_version, EngineVersion.LongString, 10);
     if (_GP(usetup).override_script_os >= 0)
     {
-        _GP(scsystem).os = _GP(usetup).override_script_os;
+        _GP(_GP(scsystem)).os = _GP(usetup).override_script_os;
     }
     else
     {
-        _GP(scsystem).os = platform->GetSystemOSID();
+        _GP(_GP(scsystem)).os = platform->GetSystemOSID();
     }
 }
 

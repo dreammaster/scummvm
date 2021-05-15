@@ -54,8 +54,8 @@ extern volatile char _G(want_exit), abort_engine;
 
 
 extern const char *loadSaveGameOnStartup;
-extern std::vector<ccInstance *> moduleInst;
-extern int numScriptModules;
+extern std::vector<ccInstance *> _GP(moduleInst);
+extern int _G(numScriptModules);
 
 
 
@@ -96,10 +96,10 @@ void start_game() {
 	// skip ticks to account for initialisation or a restored _GP(game).
 	skipMissedTicks();
 
-	for (int kk = 0; kk < numScriptModules; kk++)
-		RunTextScript(moduleInst[kk], "game_start");
+	for (int kk = 0; kk < _G(numScriptModules); kk++)
+		RunTextScript(_GP(moduleInst)[kk], "game_start");
 
-	RunTextScript(gameinst, "game_start");
+	RunTextScript(_G(gameinst), "game_start");
 
 	_G(our_eip) = -43;
 

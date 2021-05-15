@@ -85,7 +85,7 @@ using namespace AGS::Shared::Memory;
 using namespace AGS::Engine;
 
 void PluginSimulateMouseClick(int pluginButtonID) {
-	_G(pluginSimulatedClick) = pluginButtonID - 1;
+	_G(_G(pluginSimulatedClick)) = pluginButtonID - 1;
 }
 
 // **************** PLUGIN IMPLEMENTATION ****************
@@ -232,7 +232,7 @@ void IAGSEngine::GetScreenDimensions(int32 *width, int32 *height, int32 *coldept
 	if (height != nullptr)
 		height[0] = _GP(play).GetMainViewport().GetHeight();
 	if (coldepth != nullptr)
-		coldepth[0] = _GP(scsystem).coldepth;
+		coldepth[0] = _GP(_GP(scsystem)).coldepth;
 }
 
 uint8 *IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
@@ -651,12 +651,12 @@ void IAGSEngine::DisableSound() {
 	_GP(usetup).audio_backend = 0;
 }
 int IAGSEngine::CanRunScriptFunctionNow() {
-	if (_G(inside_script))
+	if (_G(_G(inside_script)))
 		return 0;
 	return 1;
 }
 int IAGSEngine::CallGameScriptFunction(const char *name, int32 globalScript, int32 numArgs, long arg1, long arg2, long arg3) {
-	if (_G(inside_script))
+	if (_G(_G(inside_script)))
 		return -300;
 
 	ccInstance *toRun = GetScriptInstanceByType(globalScript ? kScInstGame : kScInstRoom);
@@ -698,7 +698,7 @@ void IAGSEngine::SetSpriteAlphaBlended(int32 slot, int32 isAlphaBlended) {
 }
 
 void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, int32 numArgs, long arg1, long arg2) {
-	if (!_G(inside_script)) {
+	if (!_G(_G(inside_script))) {
 		this->CallGameScriptFunction(name, globalScript, numArgs, arg1, arg2, 0);
 		return;
 	}
@@ -706,7 +706,7 @@ void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, i
 	if (numArgs < 0 || numArgs > 2)
 		quit("IAGSEngine::QueueGameScriptFunction: invalid number of arguments");
 
-	_G(curscript)->run_another(name, globalScript ? kScInstGame : kScInstRoom, numArgs,
+	_G(_G(curscript))->run_another(name, globalScript ? kScInstGame : kScInstRoom, numArgs,
 		RuntimeScriptValue().SetPluginArgument(arg1), RuntimeScriptValue().SetPluginArgument(arg2));
 }
 
