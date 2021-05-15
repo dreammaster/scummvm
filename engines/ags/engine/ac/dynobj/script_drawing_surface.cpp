@@ -35,19 +35,19 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern SpriteCache spriteset;
-extern Bitmap *dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
+extern SpriteCache _GP(spriteset);
+extern Bitmap *_G(dynamicallyCreatedSurfaces)[MAX_DYNAMIC_SURFACES];
 
 
 
 Bitmap *ScriptDrawingSurface::GetBitmapSurface() {
 	// TODO: consider creating weak_ptr here, and store one in the DrawingSurface!
 	if (roomBackgroundNumber >= 0)
-		return _GP(thisroom).BgFrames[roomBackgroundNumber].Graphic.get();
+		return _GP(_GP(thisroom)).BgFrames[roomBackgroundNumber].Graphic.get();
 	else if (dynamicSpriteNumber >= 0)
-		return spriteset[dynamicSpriteNumber];
+		return _GP(spriteset)[dynamicSpriteNumber];
 	else if (dynamicSurfaceNumber >= 0)
-		return dynamicallyCreatedSurfaces[dynamicSurfaceNumber];
+		return _G(dynamicallyCreatedSurfaces)[dynamicSurfaceNumber];
 	else if (linkedBitmapOnly != nullptr)
 		return linkedBitmapOnly;
 	else

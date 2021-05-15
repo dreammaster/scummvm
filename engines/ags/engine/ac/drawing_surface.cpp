@@ -52,8 +52,8 @@ extern RoomStatus *croom;
 extern RoomObject *objs;
 extern CharacterCache *charcache;
 extern ObjectCache objcache[MAX_ROOM_OBJECTS];
-extern SpriteCache spriteset;
-extern Bitmap *dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
+extern SpriteCache _GP(spriteset);
+extern Bitmap *_G(dynamicallyCreatedSurfaces)[MAX_DYNAMIC_SURFACES];
 
 // ** SCRIPT DRAWINGSURFACE OBJECT
 
@@ -77,8 +77,8 @@ void DrawingSurface_Release(ScriptDrawingSurface *sds) {
 		sds->dynamicSpriteNumber = -1;
 	}
 	if (sds->dynamicSurfaceNumber >= 0) {
-		delete dynamicallyCreatedSurfaces[sds->dynamicSurfaceNumber];
-		dynamicallyCreatedSurfaces[sds->dynamicSurfaceNumber] = nullptr;
+		delete _G(dynamicallyCreatedSurfaces)[sds->dynamicSurfaceNumber];
+		_G(dynamicallyCreatedSurfaces)[sds->dynamicSurfaceNumber] = nullptr;
 		sds->dynamicSurfaceNumber = -1;
 	}
 	sds->modified = 0;
@@ -105,8 +105,8 @@ ScriptDrawingSurface *DrawingSurface_CreateCopy(ScriptDrawingSurface *sds) {
 	Bitmap *sourceBitmap = sds->GetBitmapSurface();
 
 	for (int i = 0; i < MAX_DYNAMIC_SURFACES; i++) {
-		if (dynamicallyCreatedSurfaces[i] == nullptr) {
-			dynamicallyCreatedSurfaces[i] = BitmapHelper::CreateBitmapCopy(sourceBitmap);
+		if (_G(dynamicallyCreatedSurfaces)[i] == nullptr) {
+			_G(dynamicallyCreatedSurfaces)[i] = BitmapHelper::CreateBitmapCopy(sourceBitmap);
 			ScriptDrawingSurface *newSurface = new ScriptDrawingSurface();
 			newSurface->dynamicSurfaceNumber = i;
 			newSurface->hasAlphaChannel = sds->hasAlphaChannel;
@@ -146,7 +146,7 @@ void DrawingSurface_DrawSurface(ScriptDrawingSurface *target, ScriptDrawingSurfa
 }
 
 void DrawingSurface_DrawImage(ScriptDrawingSurface *sds, int xx, int yy, int slot, int trans, int width, int height) {
-	if ((slot < 0) || (spriteset[slot] == nullptr))
+	if ((slot < 0) || (_GP(spriteset)[slot] == nullptr))
 		quit("!DrawingSurface.DrawImage: invalid sprite slot number specified");
 
 	if ((trans < 0) || (trans > 100))
@@ -156,7 +156,7 @@ void DrawingSurface_DrawImage(ScriptDrawingSurface *sds, int xx, int yy, int slo
 	if (trans == 100)
 		return;
 
-	Bitmap *sourcePic = spriteset[slot];
+	Bitmap *sourcePic = _GP(spriteset)[slot];
 	bool needToFreeBitmap = false;
 
 	if (width != SCR_NO_VALUE) {
@@ -183,7 +183,7 @@ void DrawingSurface_DrawImage(ScriptDrawingSurface *sds, int xx, int yy, int slo
 	sds->PointToGameResolution(&xx, &yy);
 
 	if (sourcePic->GetColorDepth() != ds->GetColorDepth()) {
-		debug_script_warn("RawDrawImage: Sprite %d colour depth %d-bit not same as background depth %d-bit", slot, spriteset[slot]->GetColorDepth(), ds->GetColorDepth());
+		debug_script_warn("RawDrawImage: Sprite %d colour depth %d-bit not same as background depth %d-bit", slot, _GP(spriteset)[slot]->GetColorDepth(), ds->GetColorDepth());
 	}
 
 	draw_sprite_support_alpha(ds, sds->hasAlphaChannel != 0, xx, yy, sourcePic, (_GP(game).SpriteInfos[slot].Flags & SPF_ALPHACHANNEL) != 0,

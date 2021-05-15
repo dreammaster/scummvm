@@ -38,7 +38,7 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 extern int our_eip, eip_guinum, eip_guiobj;
 extern RGB palette[256];
 extern IGraphicsDriver *_G(gfxDriver);
@@ -128,13 +128,13 @@ Bitmap *tmpdbl, *curspr;
 int newwid, newhit;
 void initialize_sprite(int ee) {
 
-	if ((ee < 0) || ((size_t)ee > spriteset.GetSpriteSlotCount()))
+	if ((ee < 0) || ((size_t)ee > _GP(spriteset).GetSpriteSlotCount()))
 		quit("initialize_sprite: invalid sprite number");
 
-	if ((spriteset[ee] == nullptr) && (ee > 0)) {
+	if ((_GP(spriteset)[ee] == nullptr) && (ee > 0)) {
 		// replace empty sprites with blue cups, to avoid crashes
-		spriteset.RemapSpriteToSprite0(ee);
-	} else if (spriteset[ee] == nullptr) {
+		_GP(spriteset).RemapSpriteToSprite0(ee);
+	} else if (_GP(spriteset)[ee] == nullptr) {
 		_GP(game).SpriteInfos[ee].Width = 0;
 		_GP(game).SpriteInfos[ee].Height = 0;
 	} else {
@@ -148,7 +148,7 @@ void initialize_sprite(int ee) {
 			_GP(game).SpriteInfos[ee].Flags |= SPF_ALPHACHANNEL;
 		}
 
-		curspr = spriteset[ee];
+		curspr = _GP(spriteset)[ee];
 		get_new_size_for_sprite(ee, curspr->GetWidth(), curspr->GetHeight(), newwid, newhit);
 
 		eip_guinum = ee;
@@ -160,13 +160,13 @@ void initialize_sprite(int ee) {
 				quit("Not enough memory to load sprite graphics");
 			tmpdbl->StretchBlt(curspr, RectWH(0, 0, tmpdbl->GetWidth(), tmpdbl->GetHeight()), Shared::kBitmap_Transparency);
 			delete curspr;
-			spriteset.SubstituteBitmap(ee, tmpdbl);
+			_GP(spriteset).SubstituteBitmap(ee, tmpdbl);
 		}
 
-		_GP(game).SpriteInfos[ee].Width = spriteset[ee]->GetWidth();
-		_GP(game).SpriteInfos[ee].Height = spriteset[ee]->GetHeight();
+		_GP(game).SpriteInfos[ee].Width = _GP(spriteset)[ee]->GetWidth();
+		_GP(game).SpriteInfos[ee].Height = _GP(spriteset)[ee]->GetHeight();
 
-		spriteset.SubstituteBitmap(ee, PrepareSpriteForUse(spriteset[ee], (_GP(game).SpriteInfos[ee].Flags & SPF_ALPHACHANNEL) != 0));
+		_GP(spriteset).SubstituteBitmap(ee, PrepareSpriteForUse(_GP(spriteset)[ee], (_GP(game).SpriteInfos[ee].Flags & SPF_ALPHACHANNEL) != 0));
 
 		if (_GP(game).GetColorDepth() < 32) {
 			_GP(game).SpriteInfos[ee].Flags &= ~SPF_ALPHACHANNEL;

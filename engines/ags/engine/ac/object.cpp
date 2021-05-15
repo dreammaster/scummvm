@@ -59,7 +59,7 @@ extern MoveList *mls;
 
 extern Bitmap *walkable_areas_temp;
 extern IGraphicsDriver *_G(gfxDriver);
-extern CCObject ccDynamicObject;
+extern CCObject _GP(ccDynamicObject);
 
 
 int Object_IsCollidingWithObject(ScriptObject *objj, ScriptObject *obj2) {
@@ -276,7 +276,7 @@ const char *Object_GetName_New(ScriptObject *objj) {
 	if (!is_valid_object(objj->id))
 		quit("!Object.Name: invalid object number");
 
-	return CreateNewScriptString(get_translation(_GP(thisroom).Objects[objj->id].Name));
+	return CreateNewScriptString(get_translation(_GP(_GP(thisroom)).Objects[objj->id].Name));
 }
 
 bool Object_IsInteractionAvailable(ScriptObject *oobj, int mood) {
@@ -426,7 +426,7 @@ void Object_GetPropertyText(ScriptObject *objj, const char *property, char *bufe
 }
 
 const char *Object_GetTextProperty(ScriptObject *objj, const char *property) {
-	return get_text_property_dynamic_string(_GP(thisroom).Objects[objj->id].Properties, croom->objProps[objj->id], property);
+	return get_text_property_dynamic_string(_GP(_GP(thisroom)).Objects[objj->id].Properties, croom->objProps[objj->id], property);
 }
 
 bool Object_SetProperty(ScriptObject *objj, const char *property, int value) {
@@ -533,7 +533,7 @@ int check_click_on_object(int roomx, int roomy, int mood) {
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 
 // void (ScriptObject *objj, int loop, int delay, int repeat, int blocking, int direction)
 RuntimeScriptValue Sc_Object_Animate(void *self, const RuntimeScriptValue *params, int32_t param_count) {
@@ -566,7 +566,7 @@ RuntimeScriptValue Sc_Object_GetPropertyText(void *self, const RuntimeScriptValu
 
 //const char* (ScriptObject *objj, const char *property)
 RuntimeScriptValue Sc_Object_GetTextProperty(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ_POBJ(ScriptObject, const char, myScriptStringImpl, Object_GetTextProperty, const char);
+	API_OBJCALL_OBJ_POBJ(ScriptObject, const char, _GP(myScriptStringImpl), Object_GetTextProperty, const char);
 }
 
 RuntimeScriptValue Sc_Object_SetProperty(void *self, const RuntimeScriptValue *params, int32_t param_count) {
@@ -663,12 +663,12 @@ RuntimeScriptValue Sc_Object_Tint(void *self, const RuntimeScriptValue *params, 
 }
 
 RuntimeScriptValue Sc_GetObjectAtRoom(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT2(ScriptObject, ccDynamicObject, GetObjectAtRoom);
+	API_SCALL_OBJ_PINT2(ScriptObject, _GP(ccDynamicObject), GetObjectAtRoom);
 }
 
 // ScriptObject *(int xx, int yy)
 RuntimeScriptValue Sc_GetObjectAtScreen(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT2(ScriptObject, ccDynamicObject, GetObjectAtScreen);
+	API_SCALL_OBJ_PINT2(ScriptObject, _GP(ccDynamicObject), GetObjectAtScreen);
 }
 
 // int (ScriptObject *objj)
@@ -768,7 +768,7 @@ RuntimeScriptValue Sc_Object_GetMoving(void *self, const RuntimeScriptValue *par
 
 // const char* (ScriptObject *objj)
 RuntimeScriptValue Sc_Object_GetName_New(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptObject, const char, myScriptStringImpl, Object_GetName_New);
+	API_OBJCALL_OBJ(ScriptObject, const char, _GP(myScriptStringImpl), Object_GetName_New);
 }
 
 // int (ScriptObject *objj)

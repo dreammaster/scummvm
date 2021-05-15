@@ -84,7 +84,7 @@
 
 namespace AGS3 {
 
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 
 // void (char*texx, ...)
 RuntimeScriptValue Sc_sc_AbortGame(const RuntimeScriptValue *params, int32_t param_count)
@@ -808,7 +808,7 @@ RuntimeScriptValue Sc_sc_GetTime(const RuntimeScriptValue *params, int32_t param
 // char * (const char *text)
 RuntimeScriptValue Sc_get_translation(const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_SCALL_OBJ_POBJ(char, myScriptStringImpl, get_translation, const char);
+    API_SCALL_OBJ_POBJ(char, _GP(myScriptStringImpl), get_translation, const char);
 }
 
 // int  (char* buffer)
@@ -1013,7 +1013,7 @@ RuntimeScriptValue Sc_ListBoxDirList(const RuntimeScriptValue *params, int32_t p
 // char* (int guin, int objn, int item, char*buffer)
 RuntimeScriptValue Sc_ListBoxGetItemText(const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_SCALL_OBJ_PINT3_POBJ(char, myScriptStringImpl, ListBoxGetItemText, char);
+    API_SCALL_OBJ_PINT3_POBJ(char, _GP(myScriptStringImpl), ListBoxGetItemText, char);
 }
 
 // int (int guin, int objn)

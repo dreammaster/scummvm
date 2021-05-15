@@ -525,7 +525,7 @@ public:
 	bool _screen_is_dirty = false;
 	AGS::Shared::Bitmap *_raw_saved_screen = nullptr;
 	AGS::Shared::Bitmap **_dynamicallyCreatedSurfaces = nullptr;
-	int _places_r = 3, _places_g = 2, _places_b = 3;
+	//int _places_r = 3, _places_g = 2, _places_b = 3;
 	color *_palette;
 	COLOR_MAP *_maincoltable;
 
@@ -606,11 +606,11 @@ public:
 	// TODO: the asset path configuration should certainly be revamped at some
 	// point, with uniform method of configuring auxiliary paths and packages.
 	// Installation directory, may contain absolute or relative path
-	String _installDirectory;
+//	String _installDirectory;
 	// Installation directory, containing audio files
-	String _installAudioDirectory;
+//	String _installAudioDirectory;
 	// Installation directory, containing voice-over files
-	String _installVoiceDirectory;
+//	String _installVoiceDirectory;
 
 	/**@}*/
 
@@ -649,7 +649,7 @@ public:
 	CCAudioClip *_ccDynamicAudioClip;
 	CCAudioChannel *_ccDynamicAudio;
 	ScriptString *_myScriptStringImpl;
-
+//----->
 	// TODO: IMPORTANT!!
 	// we cannot simply replace these arrays with vectors, or other C++ containers,
 	// until we implement safe management of such containers in script exports

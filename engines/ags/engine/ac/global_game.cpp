@@ -78,7 +78,7 @@ using namespace AGS::Shared;
 extern ExecutingScript *curscript;
 extern int displayed_room;
 extern int game_paused;
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 extern GameSetup usetup;
 extern unsigned int load_new_game;
 extern int load_new_game_restore;
@@ -189,8 +189,8 @@ int LoadSaveSlotScreenshot(int slnum, int width, int height) {
 		return gotSlot;
 
 	// resize the sprite to the requested size
-	Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, spriteset[gotSlot]->GetColorDepth());
-	newPic->StretchBlt(spriteset[gotSlot],
+	Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, _GP(spriteset)[gotSlot]->GetColorDepth());
+	newPic->StretchBlt(_GP(spriteset)[gotSlot],
 		RectWH(0, 0, _GP(game).SpriteInfos[gotSlot].Width, _GP(game).SpriteInfos[gotSlot].Height),
 		RectWH(0, 0, width, height));
 
@@ -275,8 +275,8 @@ int RunAGSGame(const char *newgame, unsigned int mode, int data) {
 	}
 
 	if ((mode & RAGMODE_LOADNOW) == 0) {
-		ResPaths.GamePak.Path = PathFromInstallDir(newgame);
-		ResPaths.GamePak.Name = newgame;
+		_GP(ResPaths).GamePak.Path = PathFromInstallDir(newgame);
+		_GP(ResPaths).GamePak.Name = newgame;
 		_GP(play).takeover_data = data;
 		load_new_game_restore = -1;
 
@@ -305,8 +305,8 @@ int RunAGSGame(const char *newgame, unsigned int mode, int data) {
 	AssetMgr->RemoveAllLibraries();
 
 	// TODO: refactor and share same code with the startup!
-	if (AssetMgr->AddLibrary(ResPaths.GamePak.Path) != Shared::kAssetNoError)
-		quitprintf("!RunAGSGame: unable to load new game file '%s'", ResPaths.GamePak.Path.GetCStr());
+	if (AssetMgr->AddLibrary(_GP(ResPaths).GamePak.Path) != Shared::kAssetNoError)
+		quitprintf("!RunAGSGame: unable to load new game file '%s'", _GP(ResPaths).GamePak.Path.GetCStr());
 	engine_assign_assetpaths();
 
 	show_preload();
@@ -315,8 +315,8 @@ int RunAGSGame(const char *newgame, unsigned int mode, int data) {
 	if (!err)
 		quitprintf("!RunAGSGame: error loading new game file:\n%s", err->FullMessage().GetCStr());
 
-	spriteset.Reset();
-	err = spriteset.InitFile(SpriteCache::DefaultSpriteFileName, SpriteCache::DefaultSpriteIndexName);
+	_GP(spriteset).Reset();
+	err = _GP(spriteset).InitFile(SpriteCache::DefaultSpriteFileName, SpriteCache::DefaultSpriteIndexName);
 	if (!err)
 		quitprintf("!RunAGSGame: error loading new sprites:\n%s", err->FullMessage().GetCStr());
 
@@ -592,7 +592,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 		return;
 	xxx = vpt.first.X;
 	yyy = vpt.first.Y;
-	if ((xxx >= _GP(thisroom).Width) | (xxx < 0) | (yyy < 0) | (yyy >= _GP(thisroom).Height))
+	if ((xxx >= _GP(_GP(thisroom)).Width) | (xxx < 0) | (yyy < 0) | (yyy >= _GP(_GP(thisroom)).Height))
 		return;
 
 	int onhs, aa;
@@ -616,7 +616,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 	// on object
 	if (loctype == LOCTYPE_OBJ) {
 		aa = getloctype_index;
-		strcpy(tempo, get_translation(_GP(thisroom).Objects[aa].Name));
+		strcpy(tempo, get_translation(_GP(_GP(thisroom)).Objects[aa].Name));
 		// Compatibility: < 3.1.1 games returned space for nameless object
 		// (presumably was a bug, but fixing it affected certain games behavior)
 		if (_G(loaded_game_file_version) < kGameVersion_311 && tempo[0] == 0) {
@@ -629,7 +629,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 		return;
 	}
 	onhs = getloctype_index;
-	if (onhs > 0) strcpy(tempo, get_translation(_GP(thisroom).Hotspots[onhs].Name));
+	if (onhs > 0) strcpy(tempo, get_translation(_GP(_GP(thisroom)).Hotspots[onhs].Name));
 	if (_GP(play).get_loc_name_last_time != onhs)
 		GUI::MarkSpecialLabelsForUpdate(kLabelMacro_Overhotspot);
 	_GP(play).get_loc_name_last_time = onhs;
@@ -698,11 +698,11 @@ void RoomProcessClick(int xx, int yy, int mood) {
 	if ((mood == MODE_WALK) && (_GP(game).options[OPT_NOWALKMODE] == 0)) {
 		int hsnum = get_hotspot_at(xx, yy);
 		if (hsnum < 1);
-		else if (_GP(thisroom).Hotspots[hsnum].WalkTo.X < 1);
+		else if (_GP(_GP(thisroom)).Hotspots[hsnum].WalkTo.X < 1);
 		else if (_GP(play).auto_use_walkto_points == 0);
 		else {
-			xx = _GP(thisroom).Hotspots[hsnum].WalkTo.X;
-			yy = _GP(thisroom).Hotspots[hsnum].WalkTo.Y;
+			xx = _GP(_GP(thisroom)).Hotspots[hsnum].WalkTo.X;
+			yy = _GP(_GP(thisroom)).Hotspots[hsnum].WalkTo.Y;
 			debug_script_log("Move to walk-to point hotspot %d", hsnum);
 		}
 		walk_character(_GP(game).playercharacter, xx, yy, 0, true);

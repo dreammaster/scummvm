@@ -59,7 +59,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern char check_dynamic_sprites_at_exit;
+extern char _G(check_dynamic_sprites_at_exit);
 extern int displayed_room;
 
 extern char pexbuf[STD_BUFFER_SIZE];
@@ -290,7 +290,7 @@ void debug_script_print(const String &msg, MessageType mt) {
 		String scriptname;
 		if (curinst->instanceof == gamescript)
 			scriptname = "G ";
-		else if (curinst->instanceof == _GP(thisroom).CompiledScript)
+		else if (curinst->instanceof == _GP(_GP(thisroom)).CompiledScript)
 			scriptname = "R ";
 		else if (curinst->instanceof == dialogScriptsScript)
 			scriptname = "D ";
@@ -462,7 +462,7 @@ int check_for_messages_from_editor() {
 		} else if (strncmp(msgPtr, "EXIT", 4) == 0) {
 			want_exit = 1;
 			abort_engine = 1;
-			check_dynamic_sprites_at_exit = 0;
+			_G(check_dynamic_sprites_at_exit) = 0;
 		}
 
 		free(msg);

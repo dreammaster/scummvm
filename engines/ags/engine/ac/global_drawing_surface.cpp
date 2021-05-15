@@ -42,40 +42,40 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern Bitmap *raw_saved_screen;
+extern Bitmap *_G(raw_saved_screen);
 
 
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 
 
 // Raw screen writing routines - similar to old CapturedStuff
-#define RAW_START() _GP(play).raw_drawing_surface = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic; _GP(play).raw_modified[_GP(play).bg_frame] = 1
+#define RAW_START() _GP(play).raw_drawing_surface = _GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic; _GP(play).raw_modified[_GP(play).bg_frame] = 1
 #define RAW_END()
 #define RAW_SURFACE() (_GP(play).raw_drawing_surface.get())
 
 // RawSaveScreen: copy the current screen to a backup bitmap
 void RawSaveScreen() {
-	if (raw_saved_screen != nullptr)
-		delete raw_saved_screen;
-	PBitmap source = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic;
-	raw_saved_screen = BitmapHelper::CreateBitmapCopy(source.get());
+	if (_G(raw_saved_screen) != nullptr)
+		delete _G(raw_saved_screen);
+	PBitmap source = _GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic;
+	_G(raw_saved_screen) = BitmapHelper::CreateBitmapCopy(source.get());
 }
 // RawRestoreScreen: copy backup bitmap back to screen; we
 // deliberately don't free the Bitmap *cos they can multiple restore
 // and it gets freed on room exit anyway
 void RawRestoreScreen() {
-	if (raw_saved_screen == nullptr) {
+	if (_G(raw_saved_screen) == nullptr) {
 		debug_script_warn("RawRestoreScreen: unable to restore, since the screen hasn't been saved previously.");
 		return;
 	}
-	PBitmap deston = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic;
-	deston->Blit(raw_saved_screen, 0, 0, 0, 0, deston->GetWidth(), deston->GetHeight());
+	PBitmap deston = _GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic;
+	deston->Blit(_G(raw_saved_screen), 0, 0, 0, 0, deston->GetWidth(), deston->GetHeight());
 	invalidate_screen();
 	mark_current_background_dirty();
 }
 // Restores the backup bitmap, but tints it to the specified level
 void RawRestoreScreenTinted(int red, int green, int blue, int opacity) {
-	if (raw_saved_screen == nullptr) {
+	if (_G(raw_saved_screen) == nullptr) {
 		debug_script_warn("RawRestoreScreenTinted: unable to restore, since the screen hasn't been saved previously.");
 		return;
 	}
@@ -86,18 +86,18 @@ void RawRestoreScreenTinted(int red, int green, int blue, int opacity) {
 
 	debug_script_log("RawRestoreTinted RGB(%d,%d,%d) %d%%", red, green, blue, opacity);
 
-	PBitmap deston = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic;
-	tint_image(deston.get(), raw_saved_screen, red, green, blue, opacity);
+	PBitmap deston = _GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic;
+	tint_image(deston.get(), _G(raw_saved_screen), red, green, blue, opacity);
 	invalidate_screen();
 	mark_current_background_dirty();
 }
 
 void RawDrawFrameTransparent(int frame, int translev) {
-	if ((frame < 0) || ((size_t)frame >= _GP(thisroom).BgFrameCount) ||
+	if ((frame < 0) || ((size_t)frame >= _GP(_GP(thisroom)).BgFrameCount) ||
 		(translev < 0) || (translev > 99))
 		quit("!RawDrawFrameTransparent: invalid parameter (transparency must be 0-99, frame a valid BG frame)");
 
-	PBitmap bg = _GP(thisroom).BgFrames[frame].Graphic;
+	PBitmap bg = _GP(_GP(thisroom)).BgFrames[frame].Graphic;
 	if (bg->GetColorDepth() <= 8)
 		quit("!RawDrawFrameTransparent: 256-colour backgrounds not supported");
 
@@ -134,7 +134,7 @@ void RawSetColorRGB(int red, int grn, int blu) {
 		(blu < 0) || (blu > 255))
 		quit("!RawSetColorRGB: colour values must be 0-255");
 
-	_GP(play).raw_color = makecol_depth(_GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic->GetColorDepth(), red, grn, blu);
+	_GP(play).raw_color = makecol_depth(_GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic->GetColorDepth(), red, grn, blu);
 }
 void RawPrint(int xx, int yy, const char *text) {
 	RAW_START();
@@ -175,12 +175,12 @@ void RawPrintMessageWrapped(int xx, int yy, int wid, int font, int msgm) {
 }
 
 void RawDrawImageCore(int xx, int yy, int slot, int alpha) {
-	if ((slot < 0) || (spriteset[slot] == nullptr))
+	if ((slot < 0) || (_GP(spriteset)[slot] == nullptr))
 		quit("!RawDrawImage: invalid sprite slot number specified");
 	RAW_START();
 
-	if (spriteset[slot]->GetColorDepth() != RAW_SURFACE()->GetColorDepth()) {
-		debug_script_warn("RawDrawImage: Sprite %d colour depth %d-bit not same as background depth %d-bit", slot, spriteset[slot]->GetColorDepth(), RAW_SURFACE()->GetColorDepth());
+	if (_GP(spriteset)[slot]->GetColorDepth() != RAW_SURFACE()->GetColorDepth()) {
+		debug_script_warn("RawDrawImage: Sprite %d colour depth %d-bit not same as background depth %d-bit", slot, _GP(spriteset)[slot]->GetColorDepth(), RAW_SURFACE()->GetColorDepth());
 	}
 
 	draw_sprite_slot_support_alpha(RAW_SURFACE(), false, xx, yy, slot, kBlendMode_Alpha, alpha);
@@ -233,7 +233,7 @@ void RawDrawImageTransparent(int xx, int yy, int slot, int legacy_transparency) 
 	update_polled_stuff_if_runtime();  // this operation can be slow so stop music skipping
 }
 void RawDrawImageResized(int xx, int yy, int gotSlot, int width, int height) {
-	if ((gotSlot < 0) || (spriteset[gotSlot] == nullptr))
+	if ((gotSlot < 0) || (_GP(spriteset)[gotSlot] == nullptr))
 		quit("!RawDrawImageResized: invalid sprite slot number specified");
 	// very small, don't draw it
 	if ((width < 1) || (height < 1))
@@ -243,8 +243,8 @@ void RawDrawImageResized(int xx, int yy, int gotSlot, int width, int height) {
 	data_to_game_coords(&width, &height);
 
 	// resize the sprite to the requested size
-	Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, spriteset[gotSlot]->GetColorDepth());
-	newPic->StretchBlt(spriteset[gotSlot],
+	Bitmap *newPic = BitmapHelper::CreateBitmap(width, height, _GP(spriteset)[gotSlot]->GetColorDepth());
+	newPic->StretchBlt(_GP(spriteset)[gotSlot],
 		RectWH(0, 0, _GP(game).SpriteInfos[gotSlot].Width, _GP(game).SpriteInfos[gotSlot].Height),
 		RectWH(0, 0, width, height));
 
@@ -266,7 +266,7 @@ void RawDrawLine(int fromx, int fromy, int tox, int toy) {
 	_GP(play).raw_modified[_GP(play).bg_frame] = 1;
 	int ii, jj;
 	// draw a line thick enough to look the same at all resolutions
-	PBitmap bg = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic;
+	PBitmap bg = _GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic;
 	color_t draw_color = _GP(play).raw_color;
 	for (ii = 0; ii < get_fixed_pixel_size(1); ii++) {
 		for (jj = 0; jj < get_fixed_pixel_size(1); jj++)
@@ -280,7 +280,7 @@ void RawDrawCircle(int xx, int yy, int rad) {
 	rad = data_to_game_coord(rad);
 
 	_GP(play).raw_modified[_GP(play).bg_frame] = 1;
-	PBitmap bg = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic;
+	PBitmap bg = _GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic;
 	bg->FillCircle(Circle(xx, yy, rad), _GP(play).raw_color);
 	invalidate_screen();
 	mark_current_background_dirty();
@@ -290,7 +290,7 @@ void RawDrawRectangle(int x1, int y1, int x2, int y2) {
 	data_to_game_coords(&x1, &y1);
 	data_to_game_round_up(&x2, &y2);
 
-	PBitmap bg = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic;
+	PBitmap bg = _GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic;
 	bg->FillRect(Rect(x1, y1, x2, y2), _GP(play).raw_color);
 	invalidate_screen();
 	mark_current_background_dirty();
@@ -301,7 +301,7 @@ void RawDrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
 	data_to_game_coords(&x2, &y2);
 	data_to_game_coords(&x3, &y3);
 
-	PBitmap bg = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic;
+	PBitmap bg = _GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic;
 	bg->DrawTriangle(Triangle(x1, y1, x2, y2, x3, y3), _GP(play).raw_color);
 	invalidate_screen();
 	mark_current_background_dirty();

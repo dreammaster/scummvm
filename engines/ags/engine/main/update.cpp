@@ -206,10 +206,10 @@ void update_shadow_areas() {
 	if (onwalkarea < 0);
 	else if (_G(_G(playerchar))->flags & CHF_FIXVIEW);
 	else {
-		onwalkarea = _GP(thisroom).WalkAreas[onwalkarea].Light;
+		onwalkarea = _GP(_GP(thisroom)).WalkAreas[onwalkarea].Light;
 		if (onwalkarea > 0) _G(_G(playerchar))->view = onwalkarea - 1;
-		else if (_GP(thisroom).Options.PlayerView == 0) _G(_G(playerchar))->view = _G(_G(playerchar))->defview;
-		else _G(_G(playerchar))->view = _GP(thisroom).Options.PlayerView - 1;
+		else if (_GP(_GP(thisroom)).Options.PlayerView == 0) _G(_G(playerchar))->view = _G(_G(playerchar))->defview;
+		else _G(_G(playerchar))->view = _GP(_GP(thisroom)).Options.PlayerView - 1;
 	}
 }
 

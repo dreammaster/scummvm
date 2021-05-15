@@ -271,13 +271,13 @@ int IAGSEngine::GetCurrentRoom() {
 	return _G(displayed_room);
 }
 int IAGSEngine::GetNumBackgrounds() {
-	return _GP(_GP(thisroom)).BgFrameCount;
+	return _GP(_GP(_GP(thisroom))).BgFrameCount;
 }
 int IAGSEngine::GetCurrentBackground() {
 	return _GP(play).bg_frame;
 }
 BITMAP *IAGSEngine::GetBackgroundScene(int32 index) {
-	return (BITMAP *)_GP(_GP(thisroom)).BgFrames[index].Graphic->GetAllegroBitmap();
+	return (BITMAP *)_GP(_GP(_GP(thisroom))).BgFrames[index].Graphic->GetAllegroBitmap();
 }
 void IAGSEngine::GetBitmapDimensions(BITMAP *bmp, int32 *width, int32 *height, int32 *coldepth) {
 	if (bmp == nullptr)
@@ -331,7 +331,7 @@ void IAGSEngine::DrawTextWrapped(int32 xx, int32 yy, int32 wid, int32 font, int3
 	// TODO: use generic function from the engine instead of having copy&pasted code here
 	int linespacing = getfontspacing_outlined(font);
 
-	if (break_up_text_into_lines(text, _GP(fontLines), wid, font) == 0)
+	if (break_up_text_into_lines(text, _GP(_GP(fontLines)), wid, font) == 0)
 		return;
 
 	Bitmap *ds = _G(_G(gfxDriver))->GetStageBackBuffer();
@@ -339,8 +339,8 @@ void IAGSEngine::DrawTextWrapped(int32 xx, int32 yy, int32 wid, int32 font, int3
 		return;
 	color_t text_color = ds->GetCompatibleColor(color);
 	data_to_game_coords((int *)&xx, (int *)&yy); // stupid! quick tweak
-	for (size_t i = 0; i < _GP(fontLines).Count(); i++)
-		draw_and_invalidate_text(ds, xx, yy + linespacing * i, font, text_color, _GP(fontLines)[i]);
+	for (size_t i = 0; i < _GP(_GP(fontLines)).Count(); i++)
+		draw_and_invalidate_text(ds, xx, yy + linespacing * i, font, text_color, _GP(_GP(fontLines))[i]);
 }
 
 void IAGSEngine::SetVirtualScreen(BITMAP *bmp) {
@@ -464,17 +464,17 @@ void IAGSEngine::FreeBitmap(BITMAP *tofree) {
 		destroy_bitmap(tofree);
 }
 BITMAP *IAGSEngine::GetSpriteGraphic(int32 num) {
-	return _GP(spriteset)[num]->GetAllegroBitmap();
+	return _GP(_GP(spriteset))[num]->GetAllegroBitmap();
 }
 BITMAP *IAGSEngine::GetRoomMask(int32 index) {
 	if (index == MASK_WALKABLE)
-		return (BITMAP *)_GP(_GP(thisroom)).WalkAreaMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(_GP(_GP(thisroom))).WalkAreaMask->GetAllegroBitmap();
 	else if (index == MASK_WALKBEHIND)
-		return (BITMAP *)_GP(_GP(thisroom)).WalkBehindMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(_GP(_GP(thisroom))).WalkBehindMask->GetAllegroBitmap();
 	else if (index == MASK_HOTSPOT)
-		return (BITMAP *)_GP(_GP(thisroom)).HotspotMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(_GP(_GP(thisroom))).HotspotMask->GetAllegroBitmap();
 	else if (index == MASK_REGIONS)
-		return (BITMAP *)_GP(_GP(thisroom)).RegionMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(_GP(_GP(thisroom))).RegionMask->GetAllegroBitmap();
 	else
 		quit("!IAGSEngine::GetRoomMask: invalid mask requested");
 	return nullptr;
@@ -620,7 +620,7 @@ int IAGSEngine::CreateDynamicSprite(int32 coldepth, int32 width, int32 height) {
 	// TODO: why is this implemented right here, should not an existing
 	// script handling implementation be called instead?
 
-	int gotSlot = _GP(spriteset).GetFreeIndex();
+	int gotSlot = _GP(_GP(spriteset)).GetFreeIndex();
 	if (gotSlot <= 0)
 		return 0;
 
@@ -759,7 +759,7 @@ const char *IAGSEngine::CreateScriptString(const char *fromText) {
 	const char *string = CreateNewScriptString(fromText);
 	// Should be still standard dynamic object, because not managed by plugin
 	// TODO: handle loss of const better
-	_GP(_G(GlobalReturnValue)).SetDynamicObject(const_cast<char *>(string), &_GP(myScriptStringImpl));
+	_GP(_G(GlobalReturnValue)).SetDynamicObject(const_cast<char *>(string), &_GP(_GP(myScriptStringImpl)));
 	return string;
 }
 

@@ -343,7 +343,7 @@ GUIListBox *is_valid_listbox(int guin, int objn) {
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 
 // int (GUIListBox *lbb, const char *text)
 RuntimeScriptValue Sc_ListBox_AddItem(void *self, const RuntimeScriptValue *params, int32_t param_count) {
@@ -372,7 +372,7 @@ RuntimeScriptValue Sc_ListBox_GetItemAtLocation(void *self, const RuntimeScriptV
 
 // char *(GUIListBox *listbox, int index, char *buffer)
 RuntimeScriptValue Sc_ListBox_GetItemText(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ_PINT_POBJ(GUIListBox, char, myScriptStringImpl, ListBox_GetItemText, char);
+	API_OBJCALL_OBJ_PINT_POBJ(GUIListBox, char, _GP(myScriptStringImpl), ListBox_GetItemText, char);
 }
 
 // int (GUIListBox *lbb, int index, const char *text)
@@ -453,7 +453,7 @@ RuntimeScriptValue Sc_ListBox_GetItemCount(void *self, const RuntimeScriptValue 
 
 // const char* (GUIListBox *listbox, int index)
 RuntimeScriptValue Sc_ListBox_GetItems(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ_PINT(GUIListBox, const char, myScriptStringImpl, ListBox_GetItems);
+	API_OBJCALL_OBJ_PINT(GUIListBox, const char, _GP(myScriptStringImpl), ListBox_GetItems);
 }
 
 // int (GUIListBox *listbox)

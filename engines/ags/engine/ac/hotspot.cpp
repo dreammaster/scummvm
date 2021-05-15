@@ -40,7 +40,7 @@ using namespace AGS::Shared;
 
 extern RoomStatus *croom;
 extern ScriptHotspot scrHotspot[MAX_ROOM_HOTSPOTS];
-extern CCHotspot ccDynamicHotspot;
+extern CCHotspot _GP(ccDynamicHotspot);
 
 void Hotspot_SetEnabled(ScriptHotspot *hss, int newval) {
 	if (newval)
@@ -90,7 +90,7 @@ void Hotspot_GetName(ScriptHotspot *hss, char *buffer) {
 }
 
 const char *Hotspot_GetName_New(ScriptHotspot *hss) {
-	return CreateNewScriptString(get_translation(_GP(thisroom).Hotspots[hss->id].Name));
+	return CreateNewScriptString(get_translation(_GP(_GP(thisroom)).Hotspots[hss->id].Name));
 }
 
 bool Hotspot_IsInteractionAvailable(ScriptHotspot *hhot, int mood) {
@@ -107,16 +107,16 @@ void Hotspot_RunInteraction(ScriptHotspot *hss, int mood) {
 }
 
 int Hotspot_GetProperty(ScriptHotspot *hss, const char *property) {
-	return get_int_property(_GP(thisroom).Hotspots[hss->id].Properties, croom->hsProps[hss->id], property);
+	return get_int_property(_GP(_GP(thisroom)).Hotspots[hss->id].Properties, croom->hsProps[hss->id], property);
 }
 
 void Hotspot_GetPropertyText(ScriptHotspot *hss, const char *property, char *bufer) {
-	get_text_property(_GP(thisroom).Hotspots[hss->id].Properties, croom->hsProps[hss->id], property, bufer);
+	get_text_property(_GP(_GP(thisroom)).Hotspots[hss->id].Properties, croom->hsProps[hss->id], property, bufer);
 
 }
 
 const char *Hotspot_GetTextProperty(ScriptHotspot *hss, const char *property) {
-	return get_text_property_dynamic_string(_GP(thisroom).Hotspots[hss->id].Properties, croom->hsProps[hss->id], property);
+	return get_text_property_dynamic_string(_GP(_GP(thisroom)).Hotspots[hss->id].Properties, croom->hsProps[hss->id], property);
 }
 
 bool Hotspot_SetProperty(ScriptHotspot *hss, const char *property, int value) {
@@ -128,7 +128,7 @@ bool Hotspot_SetTextProperty(ScriptHotspot *hss, const char *property, const cha
 }
 
 int get_hotspot_at(int xpp, int ypp) {
-	int onhs = _GP(thisroom).HotspotMask->GetPixel(room_to_mask_coord(xpp), room_to_mask_coord(ypp));
+	int onhs = _GP(_GP(thisroom)).HotspotMask->GetPixel(room_to_mask_coord(xpp), room_to_mask_coord(ypp));
 	if (onhs < 0) return 0;
 	if (croom->hotspot_enabled[onhs] == 0) return 0;
 	return onhs;
@@ -145,15 +145,15 @@ int get_hotspot_at(int xpp, int ypp) {
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 
 RuntimeScriptValue Sc_GetHotspotAtRoom(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT2(ScriptHotspot, ccDynamicHotspot, GetHotspotAtRoom);
+	API_SCALL_OBJ_PINT2(ScriptHotspot, _GP(ccDynamicHotspot), GetHotspotAtRoom);
 }
 
 // ScriptHotspot *(int xx, int yy)
 RuntimeScriptValue Sc_GetHotspotAtScreen(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT2(ScriptHotspot, ccDynamicHotspot, GetHotspotAtScreen);
+	API_SCALL_OBJ_PINT2(ScriptHotspot, _GP(ccDynamicHotspot), GetHotspotAtScreen);
 }
 
 // void (ScriptHotspot *hss, char *buffer)
@@ -173,7 +173,7 @@ RuntimeScriptValue Sc_Hotspot_GetPropertyText(void *self, const RuntimeScriptVal
 
 // const char* (ScriptHotspot *hss, const char *property)
 RuntimeScriptValue Sc_Hotspot_GetTextProperty(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ_POBJ(ScriptHotspot, const char, myScriptStringImpl, Hotspot_GetTextProperty, const char);
+	API_OBJCALL_OBJ_POBJ(ScriptHotspot, const char, _GP(myScriptStringImpl), Hotspot_GetTextProperty, const char);
 }
 
 RuntimeScriptValue Sc_Hotspot_SetProperty(void *self, const RuntimeScriptValue *params, int32_t param_count) {
@@ -210,7 +210,7 @@ RuntimeScriptValue Sc_Hotspot_GetID(void *self, const RuntimeScriptValue *params
 
 // const char* (ScriptHotspot *hss)
 RuntimeScriptValue Sc_Hotspot_GetName_New(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptHotspot, const char, myScriptStringImpl, Hotspot_GetName_New);
+	API_OBJCALL_OBJ(ScriptHotspot, const char, _GP(myScriptStringImpl), Hotspot_GetName_New);
 }
 
 // int (ScriptHotspot *hss)

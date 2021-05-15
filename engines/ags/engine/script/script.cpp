@@ -222,7 +222,7 @@ int run_interaction_script(InteractionScripts *nint, int evnt, int chkAny, int i
 
 	RuntimeScriptValue rval_null;
 
-	if ((strstr(evblockbasename, "character") != nullptr) || (strstr(evblockbasename, "inventory") != nullptr)) {
+	if ((strstr(_G(evblockbasename), "character") != nullptr) || (strstr(_G(evblockbasename), "inventory") != nullptr)) {
 		// Character or Inventory (global script)
 		QueueScriptFunction(kScInstGame, nint->ScriptFuncNames[evnt]);
 	} else {
@@ -420,8 +420,8 @@ int RunScriptFunctionIfExists(ccInstance *sci, const char *tsname, int numParam,
 	_G(ccError) = cachedCcError;
 
 	// if the game has been restored, ensure that any further scripts are not run
-	if ((oldRestoreCount != gameHasBeenRestored) && (eventClaimed == EVENT_INPROGRESS))
-		eventClaimed = EVENT_CLAIMED;
+	if ((oldRestoreCount != gameHasBeenRestored) && (_G(eventClaimed) == EVENT_INPROGRESS))
+		_G(eventClaimed) = EVENT_CLAIMED;
 
 	return toret;
 }
@@ -493,7 +493,7 @@ String GetScriptName(ccInstance *sci) {
 		return "Not in a script";
 	else if (sci->instanceof == gamescript)
 		return "Global script";
-	else if (sci->instanceof == _GP(thisroom).CompiledScript)
+	else if (sci->instanceof == _GP(_GP(thisroom)).CompiledScript)
 		return String::FromFormat("Room %d script", displayed_room);
 	return "Unknown script";
 }
@@ -620,8 +620,8 @@ int get_nivalue(InteractionCommandList *nic, int idx, int parm) {
 
 InteractionVariable *get_interaction_variable(int varindx) {
 
-	if ((varindx >= LOCAL_VARIABLE_OFFSET) && ((size_t)varindx < LOCAL_VARIABLE_OFFSET + _GP(thisroom).LocalVariables.size()))
-		return &_GP(thisroom).LocalVariables[varindx - LOCAL_VARIABLE_OFFSET];
+	if ((varindx >= LOCAL_VARIABLE_OFFSET) && ((size_t)varindx < LOCAL_VARIABLE_OFFSET + _GP(_GP(thisroom)).LocalVariables.size()))
+		return &_GP(_GP(thisroom)).LocalVariables[varindx - LOCAL_VARIABLE_OFFSET];
 
 	if ((varindx < 0) || (varindx >= numGlobalVars))
 		quit("!invalid interaction variable specified");
@@ -635,9 +635,9 @@ InteractionVariable *FindGraphicalVariable(const char *varName) {
 		if (ags_stricmp(globalvars[ii].Name, varName) == 0)
 			return &globalvars[ii];
 	}
-	for (size_t i = 0; i < _GP(thisroom).LocalVariables.size(); ++i) {
-		if (ags_stricmp(_GP(thisroom).LocalVariables[i].Name, varName) == 0)
-			return &_GP(thisroom).LocalVariables[i];
+	for (size_t i = 0; i < _GP(_GP(thisroom)).LocalVariables.size(); ++i) {
+		if (ags_stricmp(_GP(_GP(thisroom)).LocalVariables[i].Name, varName) == 0)
+			return &_GP(_GP(thisroom)).LocalVariables[i];
 	}
 	return nullptr;
 }
@@ -679,14 +679,14 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 		{
 			TempEip tempip(4001);
 			RuntimeScriptValue rval_null;
-			if ((strstr(evblockbasename, "character") != nullptr) || (strstr(evblockbasename, "inventory") != nullptr)) {
+			if ((strstr(_G(evblockbasename), "character") != nullptr) || (strstr(_G(evblockbasename), "inventory") != nullptr)) {
 				// Character or Inventory (global script)
-				const char *torun = make_ts_func_name(evblockbasename, evblocknum, nicl->Cmds[i].Data[0].Value);
+				const char *torun = make_ts_func_name(_G(evblockbasename), _G(evblocknum), nicl->Cmds[i].Data[0].Value);
 				// we are already inside the mouseclick event of the script, can't nest calls
 				QueueScriptFunction(kScInstGame, torun);
 			} else {
 				// Other (room script)
-				const char *torun = make_ts_func_name(evblockbasename, evblocknum, nicl->Cmds[i].Data[0].Value);
+				const char *torun = make_ts_func_name(_G(evblockbasename), _G(evblocknum), nicl->Cmds[i].Data[0].Value);
 				QueueScriptFunction(kScInstRoom, torun);
 			}
 			break;
@@ -894,15 +894,15 @@ void run_unhandled_event(int evnt) {
 		return;
 
 	int evtype = 0;
-	if (ags_strnicmp(evblockbasename, "hotspot", 7) == 0) evtype = 1;
-	else if (ags_strnicmp(evblockbasename, "object", 6) == 0) evtype = 2;
-	else if (ags_strnicmp(evblockbasename, "character", 9) == 0) evtype = 3;
-	else if (ags_strnicmp(evblockbasename, "inventory", 9) == 0) evtype = 5;
-	else if (ags_strnicmp(evblockbasename, "region", 6) == 0)
+	if (ags_strnicmp(_G(evblockbasename), "hotspot", 7) == 0) evtype = 1;
+	else if (ags_strnicmp(_G(evblockbasename), "object", 6) == 0) evtype = 2;
+	else if (ags_strnicmp(_G(evblockbasename), "character", 9) == 0) evtype = 3;
+	else if (ags_strnicmp(_G(evblockbasename), "inventory", 9) == 0) evtype = 5;
+	else if (ags_strnicmp(_G(evblockbasename), "region", 6) == 0)
 		return;  // no unhandled_events for regions
 
 	// clicked Hotspot 0, so change the type code
-	if ((evtype == 1) & (evblocknum == 0) & (evnt != 0) & (evnt != 5) & (evnt != 6))
+	if ((evtype == 1) & (_G(evblocknum) == 0) & (evnt != 0) & (evnt != 5) & (evnt != 6))
 		evtype = 4;
 	if ((evtype == 1) & ((evnt == 0) | (evnt == 5) | (evnt == 6)))
 		;  // character stands on hotspot, mouse moves over hotspot, any click

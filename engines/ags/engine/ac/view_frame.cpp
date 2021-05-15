@@ -38,7 +38,7 @@ using AGS::Shared::Graphics;
 
 
 
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 
 
 
@@ -114,7 +114,7 @@ void precache_view(int view) {
 
 	for (int i = 0; i < _G(views)[view].numLoops; i++) {
 		for (int j = 0; j < _G(views)[view].loops[i].numFrames; j++)
-			spriteset.Precache(_G(views)[view].loops[i].frames[j].pic);
+			_GP(spriteset).Precache(_G(views)[view].loops[i].frames[j].pic);
 	}
 }
 
@@ -155,7 +155,7 @@ void DrawViewFrame(Bitmap *ds, const ViewFrame *vframe, int x, int y, bool alpha
 	// NOTE: DrawViewFrame supports alpha blending only since OPT_SPRITEALPHA;
 	// this is why there's no sense in blending if it's not set (will do no good anyway).
 	if (alpha_blend && _GP(game).options[OPT_SPRITEALPHA] == kSpriteAlphaRender_Proper) {
-		Bitmap *vf_bmp = spriteset[vframe->pic];
+		Bitmap *vf_bmp = _GP(spriteset)[vframe->pic];
 		Bitmap *src = vf_bmp;
 		if (vframe->flags & VFLG_FLIPSPRITE) {
 			src = new Bitmap(vf_bmp->GetWidth(), vf_bmp->GetHeight(), vf_bmp->GetColorDepth());
@@ -166,9 +166,9 @@ void DrawViewFrame(Bitmap *ds, const ViewFrame *vframe, int x, int y, bool alpha
 			delete src;
 	} else {
 		if (vframe->flags & VFLG_FLIPSPRITE)
-			ds->FlipBlt(spriteset[vframe->pic], x, y, Shared::kBitmap_HFlip);
+			ds->FlipBlt(_GP(spriteset)[vframe->pic], x, y, Shared::kBitmap_HFlip);
 		else
-			ds->Blit(spriteset[vframe->pic], x, y, Shared::kBitmap_Transparency);
+			ds->Blit(_GP(spriteset)[vframe->pic], x, y, Shared::kBitmap_Transparency);
 	}
 }
 
@@ -203,7 +203,7 @@ RuntimeScriptValue Sc_ViewFrame_SetGraphic(void *self, const RuntimeScriptValue 
 
 // ScriptAudioClip* (ScriptViewFrame *svf)
 RuntimeScriptValue Sc_ViewFrame_GetLinkedAudio(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptViewFrame, ScriptAudioClip, _GP(ccDynamicAudioClip), ViewFrame_GetLinkedAudio);
+	API_OBJCALL_OBJ(ScriptViewFrame, ScriptAudioClip, _GP(_GP(ccDynamicAudioClip)), ViewFrame_GetLinkedAudio);
 }
 
 // void (ScriptViewFrame *svf, ScriptAudioClip* clip)

@@ -72,8 +72,8 @@ extern DialogTopic *dialog;
 
 extern int ifacepopped;
 extern int mouse_on_iface;
-extern Bitmap *raw_saved_screen;
-extern RoomStatus troom;
+extern Bitmap *_G(raw_saved_screen);
+extern RoomStatus _GP(troom);
 
 
 static const int32_t MAGICNUMBER = 0xbeefcafe;
@@ -91,7 +91,7 @@ static HSaveError restore_game_head_dynamic_values(Stream *in, RestoredData &r_d
 static void restore_game_spriteset(Stream *in) {
 	// ensure the sprite set is at least as large as it was
 	// when the game was saved
-	spriteset.EnlargeTo(in->ReadInt32() - 1); // they saved top_index + 1
+	_GP(spriteset).EnlargeTo(in->ReadInt32() - 1); // they saved top_index + 1
 	// get serialized dynamic sprites
 	int sprnum = in->ReadInt32();
 	while (sprnum) {
@@ -330,16 +330,16 @@ static void restore_game_displayed_room_status(Stream *in, RestoredData &r_data)
 		bb = in->ReadInt32();
 
 		if (bb)
-			raw_saved_screen = read_serialized_bitmap(in);
+			_G(raw_saved_screen) = read_serialized_bitmap(in);
 
-		// get the current troom, in case they save in room 600 or whatever
-		ReadRoomStatus_Aligned(&troom, in);
+		// get the current _GP(troom), in case they save in room 600 or whatever
+		ReadRoomStatus_Aligned(&_GP(troom), in);
 
-		if (troom.tsdatasize > 0) {
-			troom.tsdata = (char *)malloc(troom.tsdatasize + 5);
-			in->Read(&troom.tsdata[0], troom.tsdatasize);
+		if (_GP(troom).tsdatasize > 0) {
+			_GP(troom).tsdata = (char *)malloc(_GP(troom).tsdatasize + 5);
+			in->Read(&_GP(troom).tsdata[0], _GP(troom).tsdatasize);
 		} else
-			troom.tsdata = nullptr;
+			_GP(troom).tsdata = nullptr;
 	}
 }
 

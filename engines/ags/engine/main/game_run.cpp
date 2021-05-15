@@ -84,8 +84,8 @@ extern int displayed_room, starting_room, in_new_room, new_room_was;
 
 extern int game_paused;
 extern int getloctype_index;
-extern int in_enters_screen, done_es_error;
-extern int in_leaves_screen;
+extern int _G(in_enters_screen), _G(done_es_error);
+extern int _G(in_leaves_screen);
 extern int inside_script, in_graph_script;
 extern int no_blocking_functions;
 
@@ -95,9 +95,9 @@ extern RoomObject *objs;
 extern char noWalkBehindsAtAll;
 extern RoomStatus *croom;
 
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 extern int cur_mode, cur_cursor;
-extern char check_dynamic_sprites_at_exit;
+extern char _G(check_dynamic_sprites_at_exit);
 
 // Checks if user interface should remain disabled for now
 static int ShouldStayInWaitMode();
@@ -129,12 +129,12 @@ static void ProperExit() {
 }
 
 static void game_loop_check_problems_at_start() {
-	if ((in_enters_screen != 0) & (displayed_room == starting_room))
+	if ((_G(in_enters_screen) != 0) & (displayed_room == starting_room))
 		quit("!A text script run in the Player Enters Screen event caused the\n"
 			"screen to be updated. If you need to use Wait(), do so in After Fadein");
-	if ((in_enters_screen != 0) && (done_es_error == 0)) {
+	if ((_G(in_enters_screen) != 0) && (_G(done_es_error) == 0)) {
 		debug_script_warn("Wait() was used in Player Enters Screen - use Enters Screen After Fadein instead");
-		done_es_error = 1;
+		_G(done_es_error) = 1;
 	}
 	if (no_blocking_functions)
 		quit("!A blocking function was called from within a non-blocking event such as " REP_EXEC_ALWAYS_NAME);
@@ -197,7 +197,7 @@ static int game_loop_check_ground_level_interactions() {
 		if ((restrict_until) && (!ShouldStayInWaitMode())) {
 			// cancel the Rep Exec and Stands on Hotspot events that
 			// we just added -- otherwise the event queue gets huge
-			numevents = numEventsAtStartOfFunction;
+			_G(numevents) = numEventsAtStartOfFunction;
 			return 0;
 		}
 	} // end if checking ground level interactions
@@ -353,7 +353,7 @@ bool run_service_key_controls(int &out_key) {
 
 	// Alt+X, abort (but only once game is loaded)
 	if ((displayed_room >= 0) && (_GP(play).abort_key > 0 && agskey == _GP(play).abort_key)) {
-		check_dynamic_sprites_at_exit = 0;
+		_G(check_dynamic_sprites_at_exit) = 0;
 		quit("!|");
 	}
 
@@ -385,8 +385,8 @@ bool run_service_key_controls(int &out_key) {
 			sprintf(&infobuf[strlen(infobuf)],
 				"[Object %d: (%d,%d) size (%d x %d) on:%d moving:%s animating:%d slot:%d trnsp:%d clkble:%d",
 				ff, objs[ff].x, objs[ff].y,
-				(spriteset[objs[ff].num] != nullptr) ? _GP(game).SpriteInfos[objs[ff].num].Width : 0,
-				(spriteset[objs[ff].num] != nullptr) ? _GP(game).SpriteInfos[objs[ff].num].Height : 0,
+				(_GP(spriteset)[objs[ff].num] != nullptr) ? _GP(game).SpriteInfos[objs[ff].num].Width : 0,
+				(_GP(spriteset)[objs[ff].num] != nullptr) ? _GP(game).SpriteInfos[objs[ff].num].Height : 0,
 				objs[ff].on,
 				(objs[ff].moving > 0) ? "yes" : "no", objs[ff].cycling,
 				objs[ff].num, objs[ff].transparent,
@@ -559,16 +559,16 @@ static void check_room_edges(int numevents_was) {
 		// if not in Player Enters Screen (allow walking in from off-screen)
 		int edgesActivated[4] = { 0, 0, 0, 0 };
 		// Only do it if nothing else has happened (eg. mouseclick)
-		if ((numevents == numevents_was) &&
+		if ((_G(numevents) == numevents_was) &&
 			((_GP(play).ground_level_areas_disabled & GLED_INTERACTION) == 0)) {
 
-			if (_G(_G(playerchar))->x <= _GP(thisroom).Edges.Left)
+			if (_G(_G(playerchar))->x <= _GP(_GP(thisroom)).Edges.Left)
 				edgesActivated[0] = 1;
-			else if (_G(_G(playerchar))->x >= _GP(thisroom).Edges.Right)
+			else if (_G(_G(playerchar))->x >= _GP(_GP(thisroom)).Edges.Right)
 				edgesActivated[1] = 1;
-			if (_G(_G(playerchar))->y >= _GP(thisroom).Edges.Bottom)
+			if (_G(_G(playerchar))->y >= _GP(_GP(thisroom)).Edges.Bottom)
 				edgesActivated[2] = 1;
-			else if (_G(_G(playerchar))->y <= _GP(thisroom).Edges.Top)
+			else if (_G(_G(playerchar))->y <= _GP(_GP(thisroom)).Edges.Top)
 				edgesActivated[3] = 1;
 
 			if ((_GP(play).entered_edge >= 0) && (_GP(play).entered_edge <= 3)) {
@@ -594,7 +594,7 @@ static void game_loop_check_controls(bool checkControls) {
 	// don't let the player do anything before the screen fades in
 	if ((in_new_room == 0) && (checkControls)) {
 		int inRoom = displayed_room;
-		int numevents_was = numevents;
+		int numevents_was = _G(numevents);
 		check_controls();
 		check_room_edges(numevents_was);
 		// If an inventory interaction changed the room
@@ -681,9 +681,9 @@ static void game_loop_update_background_animation() {
 	else {
 		_GP(play).bg_anim_delay = _GP(play).anim_background_speed;
 		_GP(play).bg_frame++;
-		if ((size_t)_GP(play).bg_frame >= _GP(thisroom).BgFrameCount)
+		if ((size_t)_GP(play).bg_frame >= _GP(_GP(thisroom)).BgFrameCount)
 			_GP(play).bg_frame = 0;
-		if (_GP(thisroom).BgFrameCount >= 2) {
+		if (_GP(_GP(thisroom)).BgFrameCount >= 2) {
 			// get the new frame's palette
 			on_background_frame_change();
 		}
@@ -736,7 +736,7 @@ void UpdateGameOnce(bool checkControls, IDriverDependantBitmap *extraBitmap, int
 
 	sys_evt_process_pending();
 
-	numEventsAtStartOfFunction = numevents;
+	numEventsAtStartOfFunction = _G(numevents);
 
 	if (want_exit) {
 		ProperExit();

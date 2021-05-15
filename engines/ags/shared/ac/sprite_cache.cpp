@@ -690,7 +690,7 @@ HError SpriteCache::InitFile(const char *filename, const char *sprindex_filename
 
 	_stream.reset(AssetMgr->OpenAsset(filename));
 	if (_stream == nullptr)
-		return new Error(String::FromFormat("Failed to open spriteset file '%s'.", filename));
+		return new Error(String::FromFormat("Failed to open _GP(spriteset) file '%s'.", filename));
 
 	spr_initial_offs = _stream->GetPosition();
 
@@ -700,14 +700,14 @@ HError SpriteCache::InitFile(const char *filename, const char *sprindex_filename
 
 	if (vers < kSprfVersion_Uncompressed || vers > kSprfVersion_Current) {
 		_stream.reset();
-		return new Error(String::FromFormat("Unsupported spriteset format (requested %d, supported %d - %d).", vers, kSprfVersion_Uncompressed, kSprfVersion_Current));
+		return new Error(String::FromFormat("Unsupported _GP(spriteset) format (requested %d, supported %d - %d).", vers, kSprfVersion_Uncompressed, kSprfVersion_Current));
 	}
 
 	// unknown version
 	buff[13] = 0;
 	if (strcmp(buff, spriteFileSig)) {
 		_stream.reset();
-		return new Error("Uknown spriteset format.");
+		return new Error("Uknown _GP(spriteset) format.");
 	}
 
 	if (vers == kSprfVersion_Uncompressed) {

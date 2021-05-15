@@ -41,7 +41,7 @@ namespace AGS3 {
 using namespace Shared;
 using namespace Engine;
 
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 
 
 
@@ -55,7 +55,7 @@ int CreateGraphicOverlay(int xx, int yy, int slott, int trans) {
 	data_to_game_coords(&xx, &yy);
 
 	Bitmap *screeno = BitmapHelper::CreateTransparentBitmap(_GP(game).SpriteInfos[slott].Width, _GP(game).SpriteInfos[slott].Height, _GP(game).GetColorDepth());
-	wputblock(screeno, 0, 0, spriteset[slott], trans);
+	wputblock(screeno, 0, 0, _GP(spriteset)[slott], trans);
 	bool hasAlpha = (_GP(game).SpriteInfos[slott].Flags & SPF_ALPHACHANNEL) != 0;
 	int nse = add_screen_overlay(xx, yy, OVER_CUSTOM, screeno, hasAlpha);
 	return screenover[nse].type;

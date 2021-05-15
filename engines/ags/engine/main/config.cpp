@@ -51,7 +51,7 @@ using namespace AGS::Engine;
 
 
 extern GameSetup usetup;
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 extern int force_window;
 
 
@@ -372,7 +372,7 @@ void apply_config(const ConfigTree &cfg) {
 
 		int cache_size_kb = INIreadint(cfg, "misc", "cachemax", DEFAULTCACHESIZE_KB);
 		if (cache_size_kb > 0)
-			spriteset.SetMaxCacheSize((size_t)cache_size_kb * 1024);
+			_GP(spriteset).SetMaxCacheSize((size_t)cache_size_kb * 1024);
 
 		usetup.mouse_auto_lock = INIreadint(cfg, "mouse", "auto_lock") > 0;
 

@@ -39,7 +39,7 @@ namespace AGS3 {
 extern ScriptInvItem scrInv[MAX_INV];
 extern int cur_cursor;
 
-extern CCInventory ccDynamicInv;
+extern CCInventory _GP(ccDynamicInv);
 
 
 void InventoryItem_SetCursorGraphic(ScriptInvItem *iitem, int newSprite) {
@@ -131,11 +131,11 @@ void set_inv_item_cursorpic(int invItemId, int piccy) {
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 
 // ScriptInvItem *(int xx, int yy)
 RuntimeScriptValue Sc_GetInvAtLocation(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT2(ScriptInvItem, ccDynamicInv, GetInvAtLocation);
+	API_SCALL_OBJ_PINT2(ScriptInvItem, _GP(ccDynamicInv), GetInvAtLocation);
 }
 
 // int (ScriptInvItem *iitem, int mood)
@@ -160,7 +160,7 @@ RuntimeScriptValue Sc_InventoryItem_GetPropertyText(void *self, const RuntimeScr
 
 // const char* (ScriptInvItem *scii, const char *property)
 RuntimeScriptValue Sc_InventoryItem_GetTextProperty(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ_POBJ(ScriptInvItem, const char, myScriptStringImpl, InventoryItem_GetTextProperty, const char);
+	API_OBJCALL_OBJ_POBJ(ScriptInvItem, const char, _GP(myScriptStringImpl), InventoryItem_GetTextProperty, const char);
 }
 
 RuntimeScriptValue Sc_InventoryItem_SetProperty(void *self, const RuntimeScriptValue *params, int32_t param_count) {
@@ -208,7 +208,7 @@ RuntimeScriptValue Sc_InventoryItem_GetID(void *self, const RuntimeScriptValue *
 
 // const char* (ScriptInvItem *invitem)
 RuntimeScriptValue Sc_InventoryItem_GetName_New(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptInvItem, const char, myScriptStringImpl, InventoryItem_GetName_New);
+	API_OBJCALL_OBJ(ScriptInvItem, const char, _GP(myScriptStringImpl), InventoryItem_GetName_New);
 }
 
 

@@ -56,13 +56,13 @@ using namespace AGS::Shared;
 
 extern ScriptInvItem scrInv[MAX_INV];
 extern int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 extern int mousex, mousey;
-extern int evblocknum;
+extern int _G(evblocknum);
 
 extern AGSPlatformDriver *platform;
-extern CCCharacter ccDynamicCharacter;
-extern CCInventory ccDynamicInv;
+extern CCCharacter _GP(ccDynamicCharacter);
+extern CCInventory _GP(ccDynamicInv);
 
 int in_inv_screen = 0, inv_screen_newroom = -1;
 
@@ -236,11 +236,11 @@ void InventoryScreen::Prepare() {
 	// Fun fact: this fallback does not seem to be intentional, and was a
 	// coincidental result of SpriteCache incorrectly remembering "last seeked
 	// sprite" as 2041/2042/2043 while in fact stream was after sprite 0.
-	if (spriteset[2041] == nullptr || spriteset[2042] == nullptr || spriteset[2043] == nullptr)
+	if (_GP(spriteset)[2041] == nullptr || _GP(spriteset)[2042] == nullptr || _GP(spriteset)[2043] == nullptr)
 		debug_script_warn("InventoryScreen: one or more of the inventory screen graphics (sprites 2041, 2042, 2043) does not exist, fallback to sprites 0, 1, 2 instead");
-	btn_look_sprite = spriteset[2041] != nullptr ? 2041 : 0;
-	btn_select_sprite = spriteset[2042] != nullptr ? 2042 : (spriteset[1] != nullptr ? 1 : 0);
-	btn_ok_sprite = spriteset[2043] != nullptr ? 2043 : (spriteset[2] != nullptr ? 2 : 0);
+	btn_look_sprite = _GP(spriteset)[2041] != nullptr ? 2041 : 0;
+	btn_select_sprite = _GP(spriteset)[2042] != nullptr ? 2042 : (_GP(spriteset)[1] != nullptr ? 1 : 0);
+	btn_ok_sprite = _GP(spriteset)[2043] != nullptr ? 2043 : (_GP(spriteset)[2] != nullptr ? 2 : 0);
 
 	break_code = 0;
 }
@@ -311,15 +311,15 @@ void InventoryScreen::Draw(Bitmap *ds) {
 	for (int i = top_item; i < numitems; ++i) {
 		if (i >= top_item + num_visible_items)
 			break;
-		Bitmap *spof = spriteset[dii[i].sprnum];
+		Bitmap *spof = _GP(spriteset)[dii[i].sprnum];
 		wputblock(ds, barxp + 1 + ((i - top_item) % 4) * widest + widest / 2 - spof->GetWidth() / 2,
 			bartop + 1 + ((i - top_item) / 4) * highest + highest / 2 - spof->GetHeight() / 2, spof, 1);
 	}
 #define BUTTONWID Math::Max(1, _GP(game).SpriteInfos[btn_select_sprite].Width)
 	// Draw select, look and OK buttons
-	wputblock(ds, 2, buttonyp + get_fixed_pixel_size(2), spriteset[btn_look_sprite], 1);
-	wputblock(ds, 3 + BUTTONWID, buttonyp + get_fixed_pixel_size(2), spriteset[btn_select_sprite], 1);
-	wputblock(ds, 4 + BUTTONWID * 2, buttonyp + get_fixed_pixel_size(2), spriteset[btn_ok_sprite], 1);
+	wputblock(ds, 2, buttonyp + get_fixed_pixel_size(2), _GP(spriteset)[btn_look_sprite], 1);
+	wputblock(ds, 3 + BUTTONWID, buttonyp + get_fixed_pixel_size(2), _GP(spriteset)[btn_select_sprite], 1);
+	wputblock(ds, 4 + BUTTONWID * 2, buttonyp + get_fixed_pixel_size(2), _GP(spriteset)[btn_ok_sprite], 1);
 
 	// Draw Up and Down buttons if required
 	Bitmap *arrowblock = BitmapHelper::CreateTransparentBitmap(ARROWBUTTONWID, ARROWBUTTONWID);
@@ -387,7 +387,7 @@ bool InventoryScreen::Run() {
 		if (mousey < buttonyp) {
 			int clickedon = isonitem;
 			if (clickedon < 0) return true; // continue inventory screen loop
-			evblocknum = dii[clickedon].num;
+			_G(evblocknum) = dii[clickedon].num;
 			_GP(play).used_inv_on = dii[clickedon].num;
 
 			if (cmode == MODE_LOOK) {
@@ -545,7 +545,7 @@ RuntimeScriptValue Sc_InvWindow_ScrollUp(void *self, const RuntimeScriptValue *p
 
 // CharacterInfo* (GUIInvWindow *guii)
 RuntimeScriptValue Sc_InvWindow_GetCharacterToUse(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(GUIInvWindow, CharacterInfo, ccDynamicCharacter, InvWindow_GetCharacterToUse);
+	API_OBJCALL_OBJ(GUIInvWindow, CharacterInfo, _GP(ccDynamicCharacter), InvWindow_GetCharacterToUse);
 }
 
 // void (GUIInvWindow *guii, CharacterInfo *chaa)
@@ -555,7 +555,7 @@ RuntimeScriptValue Sc_InvWindow_SetCharacterToUse(void *self, const RuntimeScrip
 
 // ScriptInvItem* (GUIInvWindow *guii, int index)
 RuntimeScriptValue Sc_InvWindow_GetItemAtIndex(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ_PINT(GUIInvWindow, ScriptInvItem, ccDynamicInv, InvWindow_GetItemAtIndex);
+	API_OBJCALL_OBJ_PINT(GUIInvWindow, ScriptInvItem, _GP(ccDynamicInv), InvWindow_GetItemAtIndex);
 }
 
 // int (GUIInvWindow *guii)

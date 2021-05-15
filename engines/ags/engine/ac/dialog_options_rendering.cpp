@@ -31,7 +31,7 @@
 namespace AGS3 {
 
 extern DialogTopic *dialog;
-extern CCDialog ccDynamicDialog;
+extern CCDialog _GP(ccDynamicDialog);
 
 // ** SCRIPT DIALOGOPTIONSRENDERING OBJECT
 
@@ -162,7 +162,7 @@ RuntimeScriptValue Sc_DialogOptionsRendering_SetActiveOptionID(void *self, const
 
 // ScriptDialog* (ScriptDialogOptionsRendering *dlgOptRender)
 RuntimeScriptValue Sc_DialogOptionsRendering_GetDialogToRender(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptDialogOptionsRendering, ScriptDialog, ccDynamicDialog, DialogOptionsRendering_GetDialogToRender);
+	API_OBJCALL_OBJ(ScriptDialogOptionsRendering, ScriptDialog, _GP(ccDynamicDialog), DialogOptionsRendering_GetDialogToRender);
 }
 
 // int (ScriptDialogOptionsRendering *dlgOptRender)

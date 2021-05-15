@@ -59,9 +59,9 @@ extern GameSetup usetup;
 
 
 
-extern int convert_16bit_bgr;
+extern int _G(convert_16bit_bgr);
 extern IGraphicsDriver *_G(gfxDriver);
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 extern int displayed_room, starting_room;
 extern MoveList *mls;
 
@@ -75,11 +75,11 @@ String GetRuntimeInfo() {
 		"[Running %d x %d at %d-bit%s%s[GFX: %s; %s[Draw frame %d x %d["
 		"Sprite cache size: %d KB (limit %d KB; %d locked)",
 		EngineVersion.LongString.GetCStr(), _GP(game).GetGameRes().Width, _GP(game).GetGameRes().Height, _GP(game).GetColorDepth(),
-		mode.Width, mode.Height, mode.ColorDepth, (convert_16bit_bgr) ? " BGR" : "",
+		mode.Width, mode.Height, mode.ColorDepth, (_G(convert_16bit_bgr)) ? " BGR" : "",
 		mode.Windowed ? " W" : "",
 		_G(gfxDriver)->GetDriverName(), filter->GetInfo().Name.GetCStr(),
 		render_frame.GetWidth(), render_frame.GetHeight(),
-		spriteset.GetCacheSize() / 1024, spriteset.GetMaxCacheSize() / 1024, spriteset.GetLockedSize() / 1024);
+		_GP(spriteset).GetCacheSize() / 1024, _GP(spriteset).GetMaxCacheSize() / 1024, _GP(spriteset).GetLockedSize() / 1024);
 	if (_GP(play).separate_music_lib)
 		runtimeInfo.Append("[AUDIO.VOX enabled");
 	if (_GP(play).want_speech >= 1)
@@ -105,17 +105,17 @@ void script_debug(int cmdd, int dataa) {
 		Display(toDisplay.GetCStr());
 		//    Display("shftR: %d  shftG: %d  shftB: %d", _G(_rgb_r_shift_16), _G(_rgb_g_shift_16), _G(_rgb_b_shift_16));
 		//    Display("Remaining memory: %d kb",_go32_dpmi_remaining_virtual_memory()/1024);
-		//Display("Play char bcd: %d",->GetColorDepth(spriteset[_G(views)[_G(_G(playerchar))->view].frames[_G(_G(playerchar))->loop][_G(_G(playerchar))->frame].pic]));
+		//Display("Play char bcd: %d",->GetColorDepth(_GP(spriteset)[_G(views)[_G(_G(playerchar))->view].frames[_G(_G(playerchar))->loop][_G(_G(playerchar))->frame].pic]));
 	} else if (cmdd == 2) {  // show walkable areas from here
 		// TODO: support multiple viewports?!
 		const int viewport_index = 0;
 		const int camera_index = 0;
-		Bitmap *tempw = BitmapHelper::CreateBitmap(_GP(thisroom).WalkAreaMask->GetWidth(), _GP(thisroom).WalkAreaMask->GetHeight());
+		Bitmap *tempw = BitmapHelper::CreateBitmap(_GP(_GP(thisroom)).WalkAreaMask->GetWidth(), _GP(_GP(thisroom)).WalkAreaMask->GetHeight());
 		tempw->Blit(prepare_walkable_areas(-1), 0, 0, 0, 0, tempw->GetWidth(), tempw->GetHeight());
 		const Rect &viewport = _GP(play).GetRoomViewport(viewport_index)->GetRect();
 		const Rect &camera = _GP(play).GetRoomCamera(camera_index)->GetRect();
 		Bitmap *view_bmp = BitmapHelper::CreateBitmap(viewport.GetWidth(), viewport.GetHeight());
-		Rect mask_src = Rect(camera.Left / _GP(thisroom).MaskResolution, camera.Top / _GP(thisroom).MaskResolution, camera.Right / _GP(thisroom).MaskResolution, camera.Bottom / _GP(thisroom).MaskResolution);
+		Rect mask_src = Rect(camera.Left / _GP(_GP(thisroom)).MaskResolution, camera.Top / _GP(_GP(thisroom)).MaskResolution, camera.Right / _GP(_GP(thisroom)).MaskResolution, camera.Bottom / _GP(_GP(thisroom)).MaskResolution);
 		view_bmp->StretchBlt(tempw, mask_src, RectWH(0, 0, viewport.GetWidth(), viewport.GetHeight()), Shared::kBitmap_Transparency);
 
 		IDriverDependantBitmap *ddb = _G(gfxDriver)->CreateDDBFromBitmap(view_bmp, false, true);
@@ -150,7 +150,7 @@ void script_debug(int cmdd, int dataa) {
 			Display("Not currently moving.");
 			return;
 		}
-		Bitmap *tempw = BitmapHelper::CreateTransparentBitmap(_GP(thisroom).WalkAreaMask->GetWidth(), _GP(thisroom).WalkAreaMask->GetHeight());
+		Bitmap *tempw = BitmapHelper::CreateTransparentBitmap(_GP(_GP(thisroom)).WalkAreaMask->GetWidth(), _GP(_GP(thisroom)).WalkAreaMask->GetHeight());
 		int mlsnum = _GP(game).chars[dataa].walking;
 		if (_GP(game).chars[dataa].walking >= TURNING_AROUND)
 			mlsnum %= TURNING_AROUND;
@@ -169,7 +169,7 @@ void script_debug(int cmdd, int dataa) {
 		const Rect &viewport = _GP(play).GetRoomViewport(viewport_index)->GetRect();
 		const Rect &camera = _GP(play).GetRoomCamera(camera_index)->GetRect();
 		Bitmap *view_bmp = BitmapHelper::CreateBitmap(viewport.GetWidth(), viewport.GetHeight());
-		Rect mask_src = Rect(camera.Left / _GP(thisroom).MaskResolution, camera.Top / _GP(thisroom).MaskResolution, camera.Right / _GP(thisroom).MaskResolution, camera.Bottom / _GP(thisroom).MaskResolution);
+		Rect mask_src = Rect(camera.Left / _GP(_GP(thisroom)).MaskResolution, camera.Top / _GP(_GP(thisroom)).MaskResolution, camera.Right / _GP(_GP(thisroom)).MaskResolution, camera.Bottom / _GP(_GP(thisroom)).MaskResolution);
 		view_bmp->StretchBlt(tempw, mask_src, RectWH(0, 0, viewport.GetWidth(), viewport.GetHeight()), Shared::kBitmap_Transparency);
 
 		IDriverDependantBitmap *ddb = _G(gfxDriver)->CreateDDBFromBitmap(view_bmp, false, true);

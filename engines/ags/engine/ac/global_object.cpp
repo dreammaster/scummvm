@@ -60,10 +60,10 @@ extern ObjectCache objcache[MAX_ROOM_OBJECTS];
 
 
 extern int displayed_room;
-extern SpriteCache spriteset;
-extern int actSpsCount;
-extern Bitmap **actsps;
-extern IDriverDependantBitmap **actspsbmp;
+extern SpriteCache _GP(spriteset);
+extern int _G(actSpsCount);
+extern Bitmap **_G(actsps);
+extern IDriverDependantBitmap **_G(actspsbmp);
 extern IGraphicsDriver *_G(gfxDriver);
 
 // Used for deciding whether a char or obj was closer
@@ -298,15 +298,15 @@ void MergeObject(int obn) {
 	construct_object_gfx(obn, nullptr, &theHeight, true);
 
 	//Bitmap *oldabuf = graphics->bmp;
-	//abuf = _GP(thisroom).BgFrames.Graphic[_GP(play).bg_frame];
-	PBitmap bg_frame = _GP(thisroom).BgFrames[_GP(play).bg_frame].Graphic;
-	if (bg_frame->GetColorDepth() != actsps[obn]->GetColorDepth())
+	//abuf = _GP(_GP(thisroom)).BgFrames.Graphic[_GP(play).bg_frame];
+	PBitmap bg_frame = _GP(_GP(thisroom)).BgFrames[_GP(play).bg_frame].Graphic;
+	if (bg_frame->GetColorDepth() != _G(actsps)[obn]->GetColorDepth())
 		quit("!MergeObject: unable to merge object due to color depth differences");
 
 	int xpos = data_to_game_coord(objs[obn].x);
 	int ypos = (data_to_game_coord(objs[obn].y) - theHeight);
 
-	draw_sprite_support_alpha(bg_frame.get(), false, xpos, ypos, actsps[obn], (_GP(game).SpriteInfos[objs[obn].num].Flags & SPF_ALPHACHANNEL) != 0);
+	draw_sprite_support_alpha(bg_frame.get(), false, xpos, ypos, _G(actsps)[obn], (_GP(game).SpriteInfos[objs[obn].num].Flags & SPF_ALPHACHANNEL) != 0);
 	invalidate_screen();
 	mark_current_background_dirty();
 
@@ -405,7 +405,7 @@ void GetObjectName(int obj, char *buffer) {
 	if (!is_valid_object(obj))
 		quit("!GetObjectName: invalid object number");
 
-	strcpy(buffer, get_translation(_GP(thisroom).Objects[obj].Name));
+	strcpy(buffer, get_translation(_GP(_GP(thisroom)).Objects[obj].Name));
 }
 
 void MoveObject(int objj, int xx, int yy, int spp) {
@@ -450,14 +450,14 @@ void RunObjectInteraction(int aa, int mood) {
 		cdata = _G(_G(playerchar))->activeinv;
 		_GP(play).usedinv = cdata;
 	}
-	evblockbasename = "object%d"; evblocknum = aa;
+	_G(evblockbasename) = "object%d"; _G(evblocknum) = aa;
 
-	if (_GP(thisroom).Objects[aa].EventHandlers != nullptr) {
+	if (_GP(_GP(thisroom)).Objects[aa].EventHandlers != nullptr) {
 		if (passon >= 0) {
-			if (run_interaction_script(_GP(thisroom).Objects[aa].EventHandlers.get(), passon, 4, (passon == 3)))
+			if (run_interaction_script(_GP(_GP(thisroom)).Objects[aa].EventHandlers.get(), passon, 4, (passon == 3)))
 				return;
 		}
-		run_interaction_script(_GP(thisroom).Objects[aa].EventHandlers.get(), 4);  // any click on obj
+		run_interaction_script(_GP(_GP(thisroom)).Objects[aa].EventHandlers.get(), 4);  // any click on obj
 	} else {
 		if (passon >= 0) {
 			if (run_interaction_event(&croom->intrObject[aa], passon, 4, (passon == 3)))
@@ -531,25 +531,25 @@ int AreThingsOverlapping(int thing1, int thing2) {
 int GetObjectProperty(int hss, const char *property) {
 	if (!is_valid_object(hss))
 		quit("!GetObjectProperty: invalid object");
-	return get_int_property(_GP(thisroom).Objects[hss].Properties, croom->objProps[hss], property);
+	return get_int_property(_GP(_GP(thisroom)).Objects[hss].Properties, croom->objProps[hss], property);
 }
 
 void GetObjectPropertyText(int item, const char *property, char *bufer) {
-	get_text_property(_GP(thisroom).Objects[item].Properties, croom->objProps[item], property, bufer);
+	get_text_property(_GP(_GP(thisroom)).Objects[item].Properties, croom->objProps[item], property, bufer);
 }
 
 Bitmap *GetObjectImage(int obj, int *isFlipped) {
 	if (!_G(gfxDriver)->HasAcceleratedTransform()) {
-		if (actsps[obj] != nullptr) {
-			// the actsps image is pre-flipped, so no longer register the image as such
+		if (_G(actsps)[obj] != nullptr) {
+			// the _G(actsps) image is pre-flipped, so no longer register the image as such
 			if (isFlipped)
 				*isFlipped = 0;
 
-			return actsps[obj];
+			return _G(actsps)[obj];
 		}
 	}
 
-	return spriteset[objs[obj].num];
+	return _GP(spriteset)[objs[obj].num];
 }
 
 } // namespace AGS3

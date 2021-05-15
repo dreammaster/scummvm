@@ -83,16 +83,16 @@ extern MoveList *mls;
 extern ViewStruct*views;
 extern RoomObject*objs;
 extern ScriptInvItem scrInv[MAX_INV];
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 extern Bitmap *walkable_areas_temp;
 extern IGraphicsDriver *_G(gfxDriver);
-extern Bitmap **actsps;
+extern Bitmap **_G(actsps);
 extern int is_text_overlay;
 extern int _G(said_speech_line);
 extern int _G(said_text);
 extern int our_eip;
-extern CCCharacter ccDynamicCharacter;
-extern CCInventory ccDynamicInv;
+extern CCCharacter _GP(ccDynamicCharacter);
+extern CCInventory _GP(ccDynamicInv);
 
 //--------------------------------
 
@@ -227,13 +227,13 @@ void Character_ChangeRoomAutoPosition(CharacterInfo *chaa, int room, int newPos)
 
     if (new_room_pos == 0) {
         // auto place on other side of screen
-        if (chaa->x <= _GP(thisroom).Edges.Left + 10)
+        if (chaa->x <= _GP(_GP(thisroom)).Edges.Left + 10)
             new_room_pos = 2000;
-        else if (chaa->x >= _GP(thisroom).Edges.Right - 10)
+        else if (chaa->x >= _GP(_GP(thisroom)).Edges.Right - 10)
             new_room_pos = 1000;
-        else if (chaa->y <= _GP(thisroom).Edges.Top + 10)
+        else if (chaa->y <= _GP(_GP(thisroom)).Edges.Top + 10)
             new_room_pos = 3000;
-        else if (chaa->y >= _GP(thisroom).Edges.Bottom - 10)
+        else if (chaa->y >= _GP(_GP(thisroom)).Edges.Bottom - 10)
             new_room_pos = 4000;
 
         if (new_room_pos < 3000)
@@ -394,7 +394,7 @@ void FaceDirectionalLoop(CharacterInfo *char1, int direction, int blockingStyle)
     if (direction != char1->loop)
     {
         if ((_GP(game).options[OPT_TURNTOFACELOC] != 0) &&
-            (in_enters_screen == 0))
+            (_G(in_enters_screen) == 0))
         {
             const int no_diagonal = useDiagonal (char1);
             const int highestLoopForTurning = no_diagonal != 1 ? kDirLoop_Last : kDirLoop_LastOrthogonal;
@@ -1929,16 +1929,16 @@ int find_nearest_walkable_area_within(int *xx, int *yy, int range, int step)
 {
     int ex, ey, nearest = 99999, thisis, nearx = 0, neary = 0;
     int startx = 0, starty = 14;
-    int roomWidthLowRes = room_to_mask_coord(_GP(thisroom).Width);
-    int roomHeightLowRes = room_to_mask_coord(_GP(thisroom).Height);
+    int roomWidthLowRes = room_to_mask_coord(_GP(_GP(thisroom)).Width);
+    int roomHeightLowRes = room_to_mask_coord(_GP(_GP(thisroom)).Height);
     int xwidth = roomWidthLowRes, yheight = roomHeightLowRes;
 
     int xLowRes = room_to_mask_coord(xx[0]);
     int yLowRes = room_to_mask_coord(yy[0]);
-    int rightEdge = room_to_mask_coord(_GP(thisroom).Edges.Right);
-    int leftEdge = room_to_mask_coord(_GP(thisroom).Edges.Left);
-    int topEdge = room_to_mask_coord(_GP(thisroom).Edges.Top);
-    int bottomEdge = room_to_mask_coord(_GP(thisroom).Edges.Bottom);
+    int rightEdge = room_to_mask_coord(_GP(_GP(thisroom)).Edges.Right);
+    int leftEdge = room_to_mask_coord(_GP(_GP(thisroom)).Edges.Left);
+    int topEdge = room_to_mask_coord(_GP(_GP(thisroom)).Edges.Top);
+    int bottomEdge = room_to_mask_coord(_GP(_GP(thisroom)).Edges.Bottom);
 
     // tweak because people forget to move the edges sometimes
     // if the player is already over the edge, ignore it
@@ -1962,7 +1962,7 @@ int find_nearest_walkable_area_within(int *xx, int *yy, int range, int step)
     for (ex = startx; ex < xwidth; ex += step) {
         for (ey = starty; ey < yheight; ey += step) {
             // non-walkalbe, so don't go here
-            if (_GP(thisroom).WalkAreaMask->GetPixel(ex,ey) == 0) continue;
+            if (_GP(_GP(thisroom)).WalkAreaMask->GetPixel(ex,ey) == 0) continue;
             // off a screen edge, don't move them there
             if ((ex <= leftEdge) || (ex >= rightEdge) ||
                 (ey <= topEdge) || (ey >= bottomEdge))
@@ -1984,7 +1984,7 @@ int find_nearest_walkable_area_within(int *xx, int *yy, int range, int step)
 
 void find_nearest_walkable_area (int *xx, int *yy) {
 
-    int pixValue = _GP(thisroom).WalkAreaMask->GetPixel(room_to_mask_coord(xx[0]), room_to_mask_coord(yy[0]));
+    int pixValue = _GP(_GP(thisroom)).WalkAreaMask->GetPixel(room_to_mask_coord(xx[0]), room_to_mask_coord(yy[0]));
     // only fix this code if the game was built with 2.61 or above
     if (pixValue == 0 || (_G(loaded_game_file_version) >= kGameVersion_261 && pixValue < 1))
     {
@@ -2124,7 +2124,7 @@ void setup_player_character(int charid) {
     _G(_G(playerchar)) = &_GP(game).chars[charid];
     _sc_PlayerCharPtr = ccGetObjectHandleFromAddress((char*)_G(_G(playerchar)));
     if (_G(loaded_game_file_version) < kGameVersion_270) {
-        ccAddExternalDynamicObject("player", _G(_G(playerchar)), &ccDynamicCharacter);
+        ccAddExternalDynamicObject("player", _G(_G(playerchar)), &_GP(ccDynamicCharacter));
     }
 }
 
@@ -2189,17 +2189,17 @@ Bitmap *GetCharacterImage(int charid, int *isFlipped)
 {
     if (!_G(gfxDriver)->HasAcceleratedTransform())
     {
-        if (actsps[charid + MAX_ROOM_OBJECTS] != nullptr) 
+        if (_G(actsps)[charid + MAX_ROOM_OBJECTS] != nullptr) 
         {
-            // the actsps image is pre-flipped, so no longer register the image as such
+            // the _G(actsps) image is pre-flipped, so no longer register the image as such
             if (isFlipped)
                 *isFlipped = 0;
-            return actsps[charid + MAX_ROOM_OBJECTS];
+            return _G(actsps)[charid + MAX_ROOM_OBJECTS];
         }
     }
     CharacterInfo*chin=&_GP(game).chars[charid];
     int sppic = _G(views)[chin->view].loops[chin->loop].frames[chin->frame].pic;
-    return spriteset[sppic];
+    return _GP(spriteset)[sppic];
 }
 
 CharacterInfo *GetCharacterAtScreen(int xx, int yy) {
@@ -2639,7 +2639,7 @@ void _displayspeech(const char*texx, int aschar, int xx, int yy, int widd, int i
 
             if (_GP(game).options[OPT_SPEECHTYPE] == 3) {
                 // QFG4-style whole screen picture
-                closeupface = BitmapHelper::CreateBitmap(ui_view.GetWidth(), ui_view.GetHeight(), spriteset[viptr->loops[0].frames[0].pic]->GetColorDepth());
+                closeupface = BitmapHelper::CreateBitmap(ui_view.GetWidth(), ui_view.GetHeight(), _GP(spriteset)[viptr->loops[0].frames[0].pic]->GetColorDepth());
                 closeupface->Clear(0);
                 if (xx < 0 && _GP(play).speech_portrait_placement)
                 {
@@ -2671,7 +2671,7 @@ void _displayspeech(const char*texx, int aschar, int xx, int yy, int widd, int i
                 else
                     ovr_yp = yy;
 
-                closeupface = BitmapHelper::CreateTransparentBitmap(bigx+1,bigy+1,spriteset[viptr->loops[0].frames[0].pic]->GetColorDepth());
+                closeupface = BitmapHelper::CreateTransparentBitmap(bigx+1,bigy+1,_GP(spriteset)[viptr->loops[0].frames[0].pic]->GetColorDepth());
                 ovr_type = OVER_PICTURE;
 
                 if (yy < 0)
@@ -2966,7 +2966,7 @@ PViewport FindNearestViewport(int charid)
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 
 // void | CharacterInfo *chaa, ScriptInvItem *invi, int addIndex
 RuntimeScriptValue Sc_Character_AddInventory(void *self, const RuntimeScriptValue *params, int32_t param_count)
@@ -3059,7 +3059,7 @@ RuntimeScriptValue Sc_Character_GetPropertyText(void *self, const RuntimeScriptV
 // const char* (CharacterInfo *chaa, const char *property)
 RuntimeScriptValue Sc_Character_GetTextProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_OBJCALL_OBJ_POBJ(CharacterInfo, const char, myScriptStringImpl, Character_GetTextProperty, const char);
+    API_OBJCALL_OBJ_POBJ(CharacterInfo, const char, _GP(myScriptStringImpl), Character_GetTextProperty, const char);
 }
 
 RuntimeScriptValue Sc_Character_SetProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
@@ -3313,19 +3313,19 @@ RuntimeScriptValue Sc_Character_WalkStraight(void *self, const RuntimeScriptValu
 
 RuntimeScriptValue Sc_GetCharacterAtRoom(const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_SCALL_OBJ_PINT2(CharacterInfo, ccDynamicCharacter, GetCharacterAtRoom);
+    API_SCALL_OBJ_PINT2(CharacterInfo, _GP(ccDynamicCharacter), GetCharacterAtRoom);
 }
 
 // CharacterInfo *(int xx, int yy)
 RuntimeScriptValue Sc_GetCharacterAtScreen(const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_SCALL_OBJ_PINT2(CharacterInfo, ccDynamicCharacter, GetCharacterAtScreen);
+    API_SCALL_OBJ_PINT2(CharacterInfo, _GP(ccDynamicCharacter), GetCharacterAtScreen);
 }
 
 // ScriptInvItem* (CharacterInfo *chaa)
 RuntimeScriptValue Sc_Character_GetActiveInventory(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_OBJCALL_OBJ(CharacterInfo, ScriptInvItem, ccDynamicInv, Character_GetActiveInventory);
+    API_OBJCALL_OBJ(CharacterInfo, ScriptInvItem, _GP(ccDynamicInv), Character_GetActiveInventory);
 }
 
 // void (CharacterInfo *chaa, ScriptInvItem* iit)
@@ -3581,7 +3581,7 @@ RuntimeScriptValue Sc_Character_GetDestinationY(void *self, const RuntimeScriptV
 // const char* (CharacterInfo *chaa)
 RuntimeScriptValue Sc_Character_GetName(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_OBJCALL_OBJ(CharacterInfo, const char, myScriptStringImpl, Character_GetName);
+    API_OBJCALL_OBJ(CharacterInfo, const char, _GP(myScriptStringImpl), Character_GetName);
 }
 
 // void (CharacterInfo *chaa, const char *newName)

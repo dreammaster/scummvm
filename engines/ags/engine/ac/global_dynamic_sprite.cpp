@@ -34,7 +34,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 extern IGraphicsDriver *_G(gfxDriver);
 
 int LoadImageFile(const char *filename) {
@@ -48,7 +48,7 @@ int LoadImageFile(const char *filename) {
 	if (!loadedFile)
 		return 0;
 
-	int gotSlot = spriteset.GetFreeIndex();
+	int gotSlot = _GP(spriteset).GetFreeIndex();
 	if (gotSlot <= 0)
 		return 0;
 

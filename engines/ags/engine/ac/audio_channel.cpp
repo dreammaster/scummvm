@@ -181,7 +181,7 @@ void AudioChannel_SetRoomLocation(ScriptAudioChannel *channel, int xPos, int yPo
 	auto *ch = lock.GetChannelIfPlaying(channel->id);
 
 	if (ch) {
-		int maxDist = ((xPos > _GP(thisroom).Width / 2) ? xPos : (_GP(thisroom).Width - xPos)) - AMBIENCE_FULL_DIST;
+		int maxDist = ((xPos > _GP(_GP(thisroom)).Width / 2) ? xPos : (_GP(_GP(thisroom)).Width - xPos)) - AMBIENCE_FULL_DIST;
 		ch->xSource = (xPos > 0) ? xPos : -1;
 		ch->ySource = yPos;
 		ch->maximumPossibleDistanceAway = maxDist;
@@ -229,7 +229,7 @@ RuntimeScriptValue Sc_AudioChannel_SetPanning(void *self, const RuntimeScriptVal
 
 // ScriptAudioClip* | ScriptAudioChannel *channel
 RuntimeScriptValue Sc_AudioChannel_GetPlayingClip(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptAudioChannel, ScriptAudioClip, _GP(ccDynamicAudioClip), AudioChannel_GetPlayingClip);
+	API_OBJCALL_OBJ(ScriptAudioChannel, ScriptAudioClip, _GP(_GP(ccDynamicAudioClip)), AudioChannel_GetPlayingClip);
 }
 
 // int | ScriptAudioChannel *channel

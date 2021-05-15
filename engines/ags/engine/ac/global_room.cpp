@@ -48,8 +48,8 @@ using namespace Shared;
 extern RoomStatus *croom;
 
 extern int displayed_room;
-extern int in_enters_screen;
-extern int in_leaves_screen;
+extern int _G(in_enters_screen);
+extern int _G(in_leaves_screen);
 extern int in_inv_screen, inv_screen_newroom;
 extern MoveList *mls;
 extern int gs_to_newroom;
@@ -109,11 +109,11 @@ void NewRoom(int nrnum) {
 
 	get_script_position(last_in_dialog_request_script_pos);
 
-	if (in_leaves_screen >= 0) {
+	if (_G(in_leaves_screen) >= 0) {
 		// NewRoom called from the Player Leaves Screen event -- just
 		// change which room it will go to
-		in_leaves_screen = nrnum;
-	} else if (in_enters_screen) {
+		_G(in_leaves_screen) = nrnum;
+	} else if (_G(in_enters_screen)) {
 		setevent(EV_NEWROOM, nrnum);
 		return;
 	} else if (in_inv_screen) {
@@ -197,11 +197,11 @@ int HasBeenToRoom(int roomnum) {
 }
 
 void GetRoomPropertyText(const char *property, char *bufer) {
-	get_text_property(_GP(thisroom).Properties, croom->roomProps, property, bufer);
+	get_text_property(_GP(_GP(thisroom)).Properties, croom->roomProps, property, bufer);
 }
 
 void SetBackgroundFrame(int frnum) {
-	if ((frnum < -1) || (frnum != -1 && (size_t)frnum >= _GP(thisroom).BgFrameCount))
+	if ((frnum < -1) || (frnum != -1 && (size_t)frnum >= _GP(_GP(thisroom)).BgFrameCount))
 		quit("!SetBackgrondFrame: invalid frame number specified");
 	if (frnum < 0) {
 		_GP(play).bg_frame_locked = 0;

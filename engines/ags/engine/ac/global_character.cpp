@@ -344,8 +344,8 @@ void MoveCharacterToObject(int chaa, int obbj) {
 void MoveCharacterToHotspot(int chaa, int hotsp) {
 	if ((hotsp < 0) || (hotsp >= MAX_ROOM_HOTSPOTS))
 		quit("!MovecharacterToHotspot: invalid hotspot");
-	if (_GP(thisroom).Hotspots[hotsp].WalkTo.X < 1) return;
-	walk_character(chaa, _GP(thisroom).Hotspots[hotsp].WalkTo.X, _GP(thisroom).Hotspots[hotsp].WalkTo.Y, 0, true);
+	if (_GP(_GP(thisroom)).Hotspots[hotsp].WalkTo.X < 1) return;
+	walk_character(chaa, _GP(_GP(thisroom)).Hotspots[hotsp].WalkTo.X, _GP(_GP(thisroom)).Hotspots[hotsp].WalkTo.Y, 0, true);
 
 	GameLoopUntilNotMoving(&_GP(game).chars[chaa].walking);
 }
@@ -396,7 +396,7 @@ void RunCharacterInteraction(int cc, int mood) {
 	else if (mood == MODE_CUSTOM1) passon = 6;
 	else if (mood == MODE_CUSTOM2) passon = 7;
 
-	evblockbasename = "character%d"; evblocknum = cc;
+	_G(evblockbasename) = "character%d"; _G(evblocknum) = cc;
 	if (_G(loaded_game_file_version) > kGameVersion_272) {
 		if (passon >= 0)
 			run_interaction_script(_GP(game).charScripts[cc].get(), passon, 4, (passon == 3));

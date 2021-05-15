@@ -867,7 +867,7 @@ void play_next_queued() {
 
 int calculate_max_volume() {
     // quieter so that sounds can be heard better
-    int newvol=_GP(play).music_master_volume + ((int)_GP(thisroom).Options.MusicVolume) * LegacyRoomVolumeFactor;
+    int newvol=_GP(play).music_master_volume + ((int)_GP(_GP(thisroom)).Options.MusicVolume) * LegacyRoomVolumeFactor;
     if (newvol>255) newvol=255;
     if (newvol<0) newvol=0;
 

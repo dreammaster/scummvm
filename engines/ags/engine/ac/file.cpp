@@ -222,7 +222,7 @@ void FixupFilename(char *filename) {
 
 String PathFromInstallDir(const String &path) {
 	if (Path::IsRelativePath(path))
-		return Path::ConcatPaths(ResPaths.DataDir, path);
+		return Path::ConcatPaths(_GP(ResPaths).DataDir, path);
 	return path;
 }
 
@@ -259,16 +259,16 @@ String PreparePathForWriting(const FSLocation &fsloc, const String &filename) {
 FSLocation GetGlobalUserConfigDir() {
 	String dir = _G(platform)->GetUserGlobalConfigDirectory();
 	if (Path::IsRelativePath(dir)) // relative dir is resolved relative to the game data dir
-		return FSLocation(ResPaths.DataDir, Path::ConcatPaths(ResPaths.DataDir, dir));
+		return FSLocation(_GP(ResPaths).DataDir, Path::ConcatPaths(_GP(ResPaths).DataDir, dir));
 	return FSLocation(dir, dir);
 }
 
 FSLocation GetGameUserConfigDir() {
 	String dir = _G(platform)->GetUserConfigDirectory();
 	if (Path::IsRelativePath(dir)) // relative dir is resolved relative to the game data dir
-		return FSLocation(ResPaths.DataDir, Path::ConcatPaths(ResPaths.DataDir, dir));
+		return FSLocation(_GP(ResPaths).DataDir, Path::ConcatPaths(_GP(ResPaths).DataDir, dir));
 	else if (usetup.local_user_conf) // directive to use game dir location
-		return FSLocation(ResPaths.DataDir);
+		return FSLocation(_GP(ResPaths).DataDir);
 	// For absolute dir, we assume it's a special directory prepared for AGS engine
 	// and therefore amend it with a game own subdir
 	return FSLocation(dir, Path::ConcatPaths(dir, _GP(game).saveGameFolderName));
@@ -281,15 +281,15 @@ static FSLocation MakeGameDataDir(const String &default_dir, const String &user_
 	if (user_option.IsEmpty()) {
 		String dir = default_dir;
 		if (Path::IsRelativePath(dir)) // relative dir is resolved relative to the game data dir
-			return FSLocation(ResPaths.DataDir, Path::ConcatPaths(ResPaths.DataDir, dir));
+			return FSLocation(_GP(ResPaths).DataDir, Path::ConcatPaths(_GP(ResPaths).DataDir, dir));
 		// For absolute dir, we assume it's a special directory prepared for AGS engine
 		// and therefore amend it with a game own subdir
 		return FSLocation(dir, Path::ConcatPaths(dir, _GP(game).saveGameFolderName));
 	}
 	// If this location is set up by user config, then use it as is (resolving relative path if necessary)
 	String dir = user_option;
-	if (Path::IsSameOrSubDir(ResPaths.DataDir, dir)) // check if it's inside game dir
-		return FSLocation(ResPaths.DataDir, Path::MakeRelativePath(ResPaths.DataDir, dir));
+	if (Path::IsSameOrSubDir(_GP(ResPaths).DataDir, dir)) // check if it's inside game dir
+		return FSLocation(_GP(ResPaths).DataDir, Path::MakeRelativePath(_GP(ResPaths).DataDir, dir));
 	dir = Path::MakeAbsolutePath(dir);
 	return FSLocation(dir, dir);
 }
@@ -336,7 +336,7 @@ bool ResolveScriptPath(const String &orig_sc_path, bool read_only, ResolvedPath 
 				sc_path.GetCStr());
 			return false;
 		}
-		parent_dir = FSLocation(ResPaths.DataDir);
+		parent_dir = FSLocation(_GP(ResPaths).DataDir);
 		child_path = sc_path.Mid(GameInstallRootToken.GetLength());
 	} else if (sc_path.CompareLeft(GameSavedgamesDirToken, GameSavedgamesDirToken.GetLength()) == 0) {
 		parent_dir = FSLocation(get_save_game_directory()); // FIXME: get FSLocation of save dir 
@@ -360,7 +360,7 @@ bool ResolveScriptPath(const String &orig_sc_path, bool read_only, ResolvedPath 
 		parent_dir = GetGameAppDataDir();
 		// Set alternate non-remapped "unsafe" path for read-only operations
 		if (read_only)
-			alt_path = Path::ConcatPaths(ResPaths.DataDir, sc_path);
+			alt_path = Path::ConcatPaths(_GP(ResPaths).DataDir, sc_path);
 
 		// For games made in the safe-path-aware versions of AGS, report a warning
 		// if the unsafe path is used for write operation
@@ -487,12 +487,12 @@ bool DoesAssetExistInLib(const AssetPath &path) {
 }
 
 String find_assetlib(const String &filename) {
-	String libname = cbuf_to_string_and_free(ci_find_file(ResPaths.DataDir, filename));
+	String libname = cbuf_to_string_and_free(ci_find_file(_GP(ResPaths).DataDir, filename));
 	if (AssetManager::IsDataFile(libname))
 		return libname;
-	if (Path::ComparePaths(ResPaths.DataDir, ResPaths.DataDir2) != 0) {
+	if (Path::ComparePaths(_GP(ResPaths).DataDir, _GP(ResPaths).DataDir2) != 0) {
 		// Hack for running in Debugger
-		libname = cbuf_to_string_and_free(ci_find_file(ResPaths.DataDir2, filename));
+		libname = cbuf_to_string_and_free(ci_find_file(_GP(ResPaths).DataDir2, filename));
 		if (AssetManager::IsDataFile(libname))
 			return libname;
 	}
@@ -555,7 +555,7 @@ Stream *get_valid_file_stream_from_handle(int32_t handle, const char *operation_
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 
 // int (const char *fnmm)
 RuntimeScriptValue Sc_File_Delete(const RuntimeScriptValue *params, int32_t param_count) {
@@ -599,7 +599,7 @@ RuntimeScriptValue Sc_File_ReadRawLine(void *self, const RuntimeScriptValue *par
 
 // const char* (sc_File *fil)
 RuntimeScriptValue Sc_File_ReadRawLineBack(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(sc_File, const char, myScriptStringImpl, File_ReadRawLineBack);
+	API_OBJCALL_OBJ(sc_File, const char, _GP(myScriptStringImpl), File_ReadRawLineBack);
 }
 
 // void (sc_File *fil, char *toread)
@@ -609,7 +609,7 @@ RuntimeScriptValue Sc_File_ReadString(void *self, const RuntimeScriptValue *para
 
 // const char* (sc_File *fil)
 RuntimeScriptValue Sc_File_ReadStringBack(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(sc_File, const char, myScriptStringImpl, File_ReadStringBack);
+	API_OBJCALL_OBJ(sc_File, const char, _GP(myScriptStringImpl), File_ReadStringBack);
 }
 
 // void (sc_File *fil, int towrite)

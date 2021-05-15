@@ -59,11 +59,11 @@ void SetAreaScaling(int area, int min, int max) {
 	max -= 100;
 
 	if (min == max) {
-		_GP(thisroom).WalkAreas[area].ScalingFar = min;
-		_GP(thisroom).WalkAreas[area].ScalingNear = NOT_VECTOR_SCALED;
+		_GP(_GP(thisroom)).WalkAreas[area].ScalingFar = min;
+		_GP(_GP(thisroom)).WalkAreas[area].ScalingNear = NOT_VECTOR_SCALED;
 	} else {
-		_GP(thisroom).WalkAreas[area].ScalingFar = min;
-		_GP(thisroom).WalkAreas[area].ScalingNear = max;
+		_GP(_GP(thisroom)).WalkAreas[area].ScalingFar = min;
+		_GP(_GP(thisroom)).WalkAreas[area].ScalingNear = max;
 	}
 }
 
@@ -91,7 +91,7 @@ int GetWalkableAreaAtScreen(int x, int y) {
 }
 
 int GetWalkableAreaAtRoom(int x, int y) {
-	if ((x >= _GP(thisroom).Width) | (x < 0) | (y < 0) | (y >= _GP(thisroom).Height))
+	if ((x >= _GP(_GP(thisroom)).Width) | (x < 0) | (y < 0) | (y >= _GP(_GP(thisroom)).Height))
 		return 0;
 	int result = get_walkable_area_pixel(x, y);
 	if (result <= 0)

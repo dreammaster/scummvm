@@ -64,7 +64,7 @@ using namespace AGS::Shared;
 extern int _G(longestline);
 extern AGSPlatformDriver *platform;
 extern int _G(loops_per_character);
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 
 int _G(display_message_aschar) = 0;
 
@@ -527,7 +527,7 @@ int wgettextwidth_compensate(const char *tex, int font) {
 
 void do_corner(Bitmap *ds, int sprn, int x, int y, int offx, int offy) {
 	if (sprn < 0) return;
-	if (spriteset[sprn] == nullptr) {
+	if (_GP(spriteset)[sprn] == nullptr) {
 		sprn = 0;
 	}
 
@@ -571,9 +571,9 @@ void draw_button_background(Bitmap *ds, int xx1, int yy1, int xx2, int yy2, GUIM
 		int topBottomHeight = _GP(game).SpriteInfos[get_but_pic(iep, 6)].Height;
 		if (iep->BgImage > 0) {
 			if ((_G(loaded_game_file_version) <= kGameVersion_272) // 2.xx
-				&& (spriteset[iep->BgImage]->GetWidth() == 1)
-				&& (spriteset[iep->BgImage]->GetHeight() == 1)
-				&& (*((unsigned int *)spriteset[iep->BgImage]->GetData()) == 0x00FF00FF)) {
+				&& (_GP(spriteset)[iep->BgImage]->GetWidth() == 1)
+				&& (_GP(spriteset)[iep->BgImage]->GetHeight() == 1)
+				&& (*((unsigned int *)_GP(spriteset)[iep->BgImage]->GetData()) == 0x00FF00FF)) {
 				// Don't draw fully transparent dummy GUI backgrounds
 			} else {
 				// offset the background image and clip it so that it is drawn

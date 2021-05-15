@@ -66,7 +66,6 @@ struct ResourcePaths {
 	String       AudioDir2;  // optional audio directory
 	String       VoiceDir2;  // optional voice-over directory
 };
-extern ResourcePaths ResPaths;
 
 // (Re-)Assign all known asset search paths to the AssetManager
 void engine_assign_assetpaths();

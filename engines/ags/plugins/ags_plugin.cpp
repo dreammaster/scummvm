@@ -106,7 +106,7 @@ extern int displayed_room;
 
 
 extern RoomStatus *croom;
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 
 extern int game_paused;
 extern GameSetup usetup;
@@ -119,7 +119,7 @@ extern RGB palette[256];
 extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 extern int numPluginReaders;
 extern RuntimeScriptValue _G(GlobalReturnValue);
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 
 // **************** PLUGIN IMPLEMENTATION ****************
 
@@ -280,13 +280,13 @@ int IAGSEngine::GetCurrentRoom() {
 	return displayed_room;
 }
 int IAGSEngine::GetNumBackgrounds() {
-	return _GP(thisroom).BgFrameCount;
+	return _GP(_GP(thisroom)).BgFrameCount;
 }
 int IAGSEngine::GetCurrentBackground() {
 	return _GP(play).bg_frame;
 }
 BITMAP *IAGSEngine::GetBackgroundScene(int32 index) {
-	return (BITMAP *)_GP(thisroom).BgFrames[index].Graphic->GetAllegroBitmap();
+	return (BITMAP *)_GP(_GP(thisroom)).BgFrames[index].Graphic->GetAllegroBitmap();
 }
 void IAGSEngine::GetBitmapDimensions(BITMAP *bmp, int32 *width, int32 *height, int32 *coldepth) {
 	if (bmp == nullptr)
@@ -474,17 +474,17 @@ void IAGSEngine::FreeBitmap(BITMAP *tofree) {
 		destroy_bitmap(tofree);
 }
 BITMAP *IAGSEngine::GetSpriteGraphic(int32 num) {
-	return (BITMAP *)spriteset[num]->GetAllegroBitmap();
+	return (BITMAP *)_GP(spriteset)[num]->GetAllegroBitmap();
 }
 BITMAP *IAGSEngine::GetRoomMask(int32 index) {
 	if (index == MASK_WALKABLE)
-		return (BITMAP *)_GP(thisroom).WalkAreaMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(_GP(thisroom)).WalkAreaMask->GetAllegroBitmap();
 	else if (index == MASK_WALKBEHIND)
-		return (BITMAP *)_GP(thisroom).WalkBehindMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(_GP(thisroom)).WalkBehindMask->GetAllegroBitmap();
 	else if (index == MASK_HOTSPOT)
-		return (BITMAP *)_GP(thisroom).HotspotMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(_GP(thisroom)).HotspotMask->GetAllegroBitmap();
 	else if (index == MASK_REGIONS)
-		return (BITMAP *)_GP(thisroom).RegionMask->GetAllegroBitmap();
+		return (BITMAP *)_GP(_GP(thisroom)).RegionMask->GetAllegroBitmap();
 	else
 		quit("!IAGSEngine::GetRoomMask: invalid mask requested");
 	return nullptr;
@@ -629,7 +629,7 @@ int IAGSEngine::CreateDynamicSprite(int32 coldepth, int32 width, int32 height) {
 	// TODO: why is this implemented right here, should not an existing
 	// script handling implementation be called instead?
 
-	int gotSlot = spriteset.GetFreeIndex();
+	int gotSlot = _GP(spriteset).GetFreeIndex();
 	if (gotSlot <= 0)
 		return 0;
 
@@ -749,7 +749,7 @@ void *IAGSEngine::GetManagedObjectAddressByKey(int key) {
 const char *IAGSEngine::CreateScriptString(const char *fromText) {
 	const char *string = CreateNewScriptString(fromText);
 	// Should be still standard dynamic object, because not managed by plugin
-	_G(GlobalReturnValue).SetDynamicObject((void *)string, &myScriptStringImpl);
+	_G(GlobalReturnValue).SetDynamicObject((void *)string, &_GP(myScriptStringImpl));
 	return string;
 }
 

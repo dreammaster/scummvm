@@ -53,7 +53,7 @@ using namespace AGS::Engine;
 
 
 extern Bitmap *mousecurs[MAXCURSORS];
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 
 extern IGraphicsDriver *_G(gfxDriver);
 
@@ -178,7 +178,7 @@ void ChangeCursorGraphic(int curs, int newslot) {
 		debug_script_warn("Mouse.ChangeModeGraphic should not be used on the Inventory cursor when the cursor is linked to the active inventory item");
 
 	_GP(game).mcurs[curs].pic = newslot;
-	spriteset.Precache(newslot);
+	_GP(spriteset).Precache(newslot);
 	if (curs == cur_mode)
 		set_mouse_cursor(curs);
 }
@@ -349,7 +349,7 @@ void update_inv_cursor(int invnum) {
 
 		_GP(game).mcurs[MODE_USE].pic = cursorSprite;
 		// all cursor images must be pre-cached
-		spriteset.Precache(cursorSprite);
+		_GP(spriteset).Precache(cursorSprite);
 
 		if ((_GP(game).invinfo[invnum].hotx > 0) || (_GP(game).invinfo[invnum].hoty > 0)) {
 			// if the hotspot was set (unfortunately 0,0 isn't a valid co-ord)
@@ -369,7 +369,7 @@ void update_cached_mouse_cursor() {
 }
 
 void set_new_cursor_graphic(int spriteslot) {
-	mousecurs[0] = spriteset[spriteslot];
+	mousecurs[0] = _GP(spriteset)[spriteslot];
 
 	// It looks like spriteslot 0 can be used in games with version 2.72 and lower.
 	// The NULL check should ensure that the sprite is valid anyway.

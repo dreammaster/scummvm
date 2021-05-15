@@ -70,10 +70,10 @@ extern DialogTopic *dialog;
 
 
 
-extern Bitmap *dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
+extern Bitmap *_G(dynamicallyCreatedSurfaces)[MAX_DYNAMIC_SURFACES];
 
-extern RoomStatus troom;
-extern Bitmap *raw_saved_screen;
+extern RoomStatus _GP(troom);
+extern Bitmap *_G(raw_saved_screen);
 extern MoveList *mls;
 
 
@@ -806,7 +806,7 @@ HSaveError WriteDynamicSprites(Stream *out)
     out->WriteInt32(0); // top index
     int count = 0;
     int top_index = 1;
-    for (size_t i = 1; i < spriteset.GetSpriteSlotCount(); ++i)
+    for (size_t i = 1; i < _GP(spriteset).GetSpriteSlotCount(); ++i)
     {
         if (_GP(game).SpriteInfos[i].Flags & SPF_DYNAMICALLOC)
         {
@@ -814,7 +814,7 @@ HSaveError WriteDynamicSprites(Stream *out)
             top_index = i;
             out->WriteInt32(i);
             out->WriteInt32(_GP(game).SpriteInfos[i].Flags);
-            serialize_bitmap(spriteset[i], out);
+            serialize_bitmap(_GP(spriteset)[i], out);
         }
     }
     const soff_t end_pos = out->GetPosition();
@@ -832,7 +832,7 @@ HSaveError ReadDynamicSprites(Stream *in, int32_t cmp_ver, const PreservedParams
     // ensure the sprite set is at least large enough
     // to accomodate top dynamic sprite index
     const int top_index = in->ReadInt32();
-    spriteset.EnlargeTo(top_index);
+    _GP(spriteset).EnlargeTo(top_index);
     for (int i = 0; i < spr_count; ++i)
     {
         int id = in->ReadInt32();
@@ -875,14 +875,14 @@ HSaveError WriteDynamicSurfaces(Stream *out)
     out->WriteInt32(MAX_DYNAMIC_SURFACES);
     for (int i = 0; i < MAX_DYNAMIC_SURFACES; ++i)
     {
-        if (dynamicallyCreatedSurfaces[i] == nullptr)
+        if (_G(dynamicallyCreatedSurfaces)[i] == nullptr)
         {
             out->WriteInt8(0);
         }
         else
         {
             out->WriteInt8(1);
-            serialize_bitmap(dynamicallyCreatedSurfaces[i], out);
+            serialize_bitmap(_G(dynamicallyCreatedSurfaces)[i], out);
         }
     }
     return HSaveError::None();
@@ -1009,40 +1009,40 @@ HSaveError WriteThisRoom(Stream *out)
     {
         out->WriteBool(_GP(play).raw_modified[i] != 0);
         if (_GP(play).raw_modified[i])
-            serialize_bitmap(_GP(thisroom).BgFrames[i].Graphic.get(), out);
+            serialize_bitmap(_GP(_GP(thisroom)).BgFrames[i].Graphic.get(), out);
     }
-    out->WriteBool(raw_saved_screen != nullptr);
-    if (raw_saved_screen)
-        serialize_bitmap(raw_saved_screen, out);
+    out->WriteBool(_G(raw_saved_screen) != nullptr);
+    if (_G(raw_saved_screen))
+        serialize_bitmap(_G(raw_saved_screen), out);
 
     // room region state
     for (int i = 0; i < MAX_ROOM_REGIONS; ++i)
     {
-        out->WriteInt32(_GP(thisroom).Regions[i].Light);
-        out->WriteInt32(_GP(thisroom).Regions[i].Tint);
+        out->WriteInt32(_GP(_GP(thisroom)).Regions[i].Light);
+        out->WriteInt32(_GP(_GP(thisroom)).Regions[i].Tint);
     }
     for (int i = 0; i < MAX_WALK_AREAS + 1; ++i)
     {
-        out->WriteInt32(_GP(thisroom).WalkAreas[i].ScalingFar);
-        out->WriteInt32(_GP(thisroom).WalkAreas[i].ScalingNear);
+        out->WriteInt32(_GP(_GP(thisroom)).WalkAreas[i].ScalingFar);
+        out->WriteInt32(_GP(_GP(thisroom)).WalkAreas[i].ScalingNear);
     }
 
     // room object movement paths cache
-    out->WriteInt32(_GP(thisroom).ObjectCount + 1);
-    for (size_t i = 0; i < _GP(thisroom).ObjectCount + 1; ++i)
+    out->WriteInt32(_GP(_GP(thisroom)).ObjectCount + 1);
+    for (size_t i = 0; i < _GP(_GP(thisroom)).ObjectCount + 1; ++i)
     {
         mls[i].WriteToFile(out);
     }
 
     // room music volume
-    out->WriteInt32(_GP(thisroom).Options.MusicVolume);
+    out->WriteInt32(_GP(_GP(thisroom)).Options.MusicVolume);
 
     // persistent room's indicator
     const bool persist = displayed_room < MAX_ROOMS;
     out->WriteBool(persist);
-    // write the current troom state, in case they save in temporary room
+    // write the current _GP(troom) state, in case they save in temporary room
     if (!persist)
-        troom.WriteToSavegame(out);
+        _GP(troom).WriteToSavegame(out);
     return HSaveError::None();
 }
 
@@ -1063,7 +1063,7 @@ HSaveError ReadThisRoom(Stream *in, int32_t cmp_ver, const PreservedParams &pp, 
             r_data.RoomBkgScene[i] = nullptr;
     }
     if (in->ReadBool())
-        raw_saved_screen = read_serialized_bitmap(in);
+        _G(raw_saved_screen) = read_serialized_bitmap(in);
 
     // room region state
     for (int i = 0; i < MAX_ROOM_REGIONS; ++i)
@@ -1091,9 +1091,9 @@ HSaveError ReadThisRoom(Stream *in, int32_t cmp_ver, const PreservedParams &pp, 
     // save the new room music vol for later use
     r_data.RoomVolume = (RoomVolumeMod)in->ReadInt32();
 
-    // read the current troom state, in case they saved in temporary room
+    // read the current _GP(troom) state, in case they saved in temporary room
     if (!in->ReadBool())
-        troom.ReadFromSavegame(in);
+        _GP(troom).ReadFromSavegame(in);
 
     return HSaveError::None();
 }

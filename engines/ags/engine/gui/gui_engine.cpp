@@ -56,7 +56,7 @@ extern void replace_macro_tokens(const char *, String &);
 extern void ensure_text_valid_for_font(char *, int);
 //
 
-extern SpriteCache spriteset; // in ac_runningame
+extern SpriteCache _GP(spriteset); // in ac_runningame
 
 
 bool GUIMain::HasAlphaChannel() const {
@@ -89,11 +89,11 @@ void check_font(int *fontnum) {
 //=============================================================================
 
 int get_adjusted_spritewidth(int spr) {
-	return spriteset[spr]->GetWidth();
+	return _GP(spriteset)[spr]->GetWidth();
 }
 
 int get_adjusted_spriteheight(int spr) {
-	return spriteset[spr]->GetHeight();
+	return _GP(spriteset)[spr]->GetHeight();
 }
 
 bool is_sprite_alpha(int spr) {

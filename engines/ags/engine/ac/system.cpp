@@ -49,7 +49,7 @@ extern GameSetup usetup;
 
 
 extern IGraphicsDriver *_G(gfxDriver);
-extern CCAudioChannel _GP(ccDynamicAudio);
+extern CCAudioChannel _GP(_GP(ccDynamicAudio));
 extern volatile bool switched_away;
 
 bool System_HasInputFocus() {
@@ -215,7 +215,7 @@ void System_SetRenderAtScreenResolution(int enable) {
 #include "script/script_runtime.h"
 #include "ac/dynobj/scriptstring.h"
 
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 #include "ags/shared/#include "ags/shared/
 #include "ags/shared/iptValue Sc_System_GetAudioChannelCount(const RuntimeScriptValue *params, int32_t param_count) {
 #include "ags/shared/_INT(System_GetAudioChannelCount);
@@ -223,7 +223,7 @@ extern ScriptString myScriptStringImpl;
 
 // ScriptAudioChannel* (int index)
 RuntimeScriptValue Sc_System_GetAudioChannels(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT(ScriptAudioChannel, _GP(ccDynamicAudio), System_GetAudioChannels);
+	API_SCALL_OBJ_PINT(ScriptAudioChannel, _GP(_GP(ccDynamicAudio)), System_GetAudioChannels);
 }
 
 // int ()
@@ -287,7 +287,7 @@ RuntimeScriptValue Sc_System_GetSupportsGammaControl(const RuntimeScriptValue *p
 
 // const char *()
 RuntimeScriptValue Sc_System_GetVersion(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ(const char, myScriptStringImpl, System_GetVersion);
+	API_SCALL_OBJ(const char, _GP(myScriptStringImpl), System_GetVersion);
 }
 
 // int ()
@@ -330,7 +330,7 @@ RuntimeScriptValue Sc_System_SetWindowed(const RuntimeScriptValue *params, int32
 
 // const char *()
 RuntimeScriptValue Sc_System_GetRuntimeInfo(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ(const char, myScriptStringImpl, System_GetRuntimeInfo);
+	API_SCALL_OBJ(const char, _GP(myScriptStringImpl), System_GetRuntimeInfo);
 }
 
 RuntimeScriptValue Sc_System_GetRenderAtScreenResolution(const RuntimeScriptValue *params, int32_t param_count) {

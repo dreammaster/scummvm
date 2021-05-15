@@ -48,7 +48,7 @@ void EventsManager::pollEvents() {
 		case Common::EVENT_RETURN_TO_LAUNCHER:
 			_G(want_exit) = true;
 			_G(abort_engine) = true;
-			_G(check_dynamic_sprites_at_exit) = false;
+			_G(_G(check_dynamic_sprites_at_exit)) = false;
 			break;
 
 		case Common::EVENT_JOYAXIS_MOTION:

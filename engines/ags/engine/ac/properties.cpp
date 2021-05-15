@@ -33,7 +33,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 
 // begin custom property functions
 

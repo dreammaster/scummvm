@@ -306,7 +306,7 @@ int parse_sentence(const char *src_text, int *numwords, short *wordarray, short 
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 
-extern ScriptString myScriptStringImpl;
+extern ScriptString _GP(myScriptStringImpl);
 
 // int (const char *wordToFind)
 RuntimeScriptValue Sc_Parser_FindWordID(const RuntimeScriptValue *params, int32_t param_count) {
@@ -320,7 +320,7 @@ RuntimeScriptValue Sc_ParseText(const RuntimeScriptValue *params, int32_t param_
 
 // const char* ()
 RuntimeScriptValue Sc_Parser_SaidUnknownWord(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ(const char, myScriptStringImpl, Parser_SaidUnknownWord);
+	API_SCALL_OBJ(const char, _GP(myScriptStringImpl), Parser_SaidUnknownWord);
 }
 
 // int  (char*checkwords)

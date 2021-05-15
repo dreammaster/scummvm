@@ -68,13 +68,13 @@ extern int cur_mode, cur_cursor;
 extern ccInstance *gameinst;
 extern ScriptGUI *scrGui;
 
-extern CCGUIObject ccDynamicGUIObject;
-extern Bitmap **guibg;
-extern IDriverDependantBitmap **guibgbmp;
+extern CCGUIObject _GP(ccDynamicGUIObject);
+extern Bitmap **_G(guibg);
+extern IDriverDependantBitmap **_G(guibgbmp);
 extern IGraphicsDriver *_G(gfxDriver);
 
-extern CCGUI ccDynamicGUI;
-extern CCGUIObject ccDynamicGUIObject;
+extern CCGUI _GP(ccDynamicGUI);
+extern CCGUIObject _GP(ccDynamicGUIObject);
 
 
 int ifacepopped = -1;  // currently displayed pop-up GUI (-1 if none)
@@ -339,7 +339,7 @@ void process_interface_click(int ifce, int btn, int mbut) {
 	if (btn < 0) {
 		// click on GUI background
 		QueueScriptFunction(kScInstGame, _GP(guis)[ifce].OnClickHandler, 2,
-			RuntimeScriptValue().SetDynamicObject(&scrGui[ifce], &ccDynamicGUI),
+			RuntimeScriptValue().SetDynamicObject(&scrGui[ifce], &_GP(ccDynamicGUI)),
 			RuntimeScriptValue().SetInt32(mbut));
 		return;
 	}
@@ -367,11 +367,11 @@ void process_interface_click(int ifce, int btn, int mbut) {
 			// control-specific event handler
 			if (strchr(theObj->GetEventArgs(0), ',') != nullptr)
 				QueueScriptFunction(kScInstGame, theObj->EventHandlers[0], 2,
-					RuntimeScriptValue().SetDynamicObject(theObj, &ccDynamicGUIObject),
+					RuntimeScriptValue().SetDynamicObject(theObj, &_GP(ccDynamicGUIObject)),
 					RuntimeScriptValue().SetInt32(mbut));
 			else
 				QueueScriptFunction(kScInstGame, theObj->EventHandlers[0], 1,
-					RuntimeScriptValue().SetDynamicObject(theObj, &ccDynamicGUIObject));
+					RuntimeScriptValue().SetDynamicObject(theObj, &_GP(ccDynamicGUIObject)));
 		} else
 			QueueScriptFunction(kScInstGame, "interface_click", 2,
 				RuntimeScriptValue().SetInt32(ifce),
@@ -463,8 +463,8 @@ void export_gui_controls(int ee) {
 	for (int ff = 0; ff < _GP(guis)[ee].GetControlCount(); ff++) {
 		GUIObject *guio = _GP(guis)[ee].GetControl(ff);
 		if (!guio->Name.IsEmpty())
-			ccAddExternalDynamicObject(guio->Name, guio, &ccDynamicGUIObject);
-		ccRegisterManagedObject(guio, &ccDynamicGUIObject);
+			ccAddExternalDynamicObject(guio->Name, guio, &_GP(ccDynamicGUIObject));
+		ccRegisterManagedObject(guio, &_GP(ccDynamicGUIObject));
 	}
 }
 
@@ -565,15 +565,15 @@ int adjust_y_for_guis(int yy) {
 
 void recreate_guibg_image(GUIMain *tehgui) {
 	int ifn = tehgui->ID;
-	delete guibg[ifn];
-	guibg[ifn] = BitmapHelper::CreateBitmap(tehgui->Width, tehgui->Height, _GP(game).GetColorDepth());
-	if (guibg[ifn] == nullptr)
+	delete _G(guibg)[ifn];
+	_G(guibg)[ifn] = BitmapHelper::CreateBitmap(tehgui->Width, tehgui->Height, _GP(game).GetColorDepth());
+	if (_G(guibg)[ifn] == nullptr)
 		quit("SetGUISize: internal error: unable to reallocate gui cache");
-	guibg[ifn] = ReplaceBitmapWithSupportedFormat(guibg[ifn]);
+	_G(guibg)[ifn] = ReplaceBitmapWithSupportedFormat(_G(guibg)[ifn]);
 
-	if (guibgbmp[ifn] != nullptr) {
-		_G(gfxDriver)->DestroyDDB(guibgbmp[ifn]);
-		guibgbmp[ifn] = nullptr;
+	if (_G(guibgbmp)[ifn] != nullptr) {
+		_G(gfxDriver)->DestroyDDB(_G(guibgbmp)[ifn]);
+		_G(guibgbmp)[ifn] = nullptr;
 	}
 }
 
@@ -645,7 +645,7 @@ void gui_on_mouse_up(const int wasongui, const int wasbutdown) {
 			mouse_ifacebut_yoffs = mousey - (guio->Y) - _GP(guis)[wasongui].Y;
 			int iit = offset_over_inv((GUIInvWindow *)guio);
 			if (iit >= 0) {
-				evblocknum = iit;
+				_G(evblocknum) = iit;
 				_GP(play).used_inv_on = iit;
 				if (_GP(game).options[OPT_HANDLEINVCLICKS]) {
 					// Let the script handle the click
@@ -657,7 +657,7 @@ void gui_on_mouse_up(const int wasongui, const int wasbutdown) {
 					SetActiveInventory(iit);
 				else
 					RunInventoryInteraction(iit, cur_mode);
-				evblocknum = -1;
+				_G(evblocknum) = -1;
 			}
 		} else quit("clicked on unknown control type");
 		if (_GP(guis)[wasongui].PopupStyle == kGUIPopupMouseY)
@@ -695,7 +695,7 @@ RuntimeScriptValue Sc_GUI_Centre(void *self, const RuntimeScriptValue *params, i
 
 // ScriptGUI *(int xx, int yy)
 RuntimeScriptValue Sc_GetGUIAtLocation(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT2(ScriptGUI, ccDynamicGUI, GetGUIAtLocation);
+	API_SCALL_OBJ_PINT2(ScriptGUI, _GP(ccDynamicGUI), GetGUIAtLocation);
 }
 
 // void (ScriptGUI *tehgui, int xx, int yy)
@@ -759,7 +759,7 @@ RuntimeScriptValue Sc_GUI_GetControlCount(void *self, const RuntimeScriptValue *
 
 // GUIObject* (ScriptGUI *tehgui, int idx)
 RuntimeScriptValue Sc_GUI_GetiControls(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ_PINT(ScriptGUI, GUIObject, ccDynamicGUIObject, GUI_GetiControls);
+	API_OBJCALL_OBJ_PINT(ScriptGUI, GUIObject, _GP(ccDynamicGUIObject), GUI_GetiControls);
 }
 
 // int (ScriptGUI *sgui)
@@ -854,7 +854,7 @@ RuntimeScriptValue Sc_GUI_SetZOrder(void *self, const RuntimeScriptValue *params
 }
 
 RuntimeScriptValue Sc_GUI_AsTextWindow(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(ScriptGUI, ScriptGUI, ccDynamicGUI, GUI_AsTextWindow);
+	API_OBJCALL_OBJ(ScriptGUI, ScriptGUI, _GP(ccDynamicGUI), GUI_AsTextWindow);
 }
 
 RuntimeScriptValue Sc_GUI_GetPopupStyle(void *self, const RuntimeScriptValue *params, int32_t param_count) {

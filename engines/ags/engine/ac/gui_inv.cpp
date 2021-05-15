@@ -35,7 +35,7 @@ namespace AGS3 {
 extern int gui_disabled_style;
 
 
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 
 
 namespace AGS {

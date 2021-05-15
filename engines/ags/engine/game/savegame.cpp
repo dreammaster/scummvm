@@ -72,12 +72,12 @@ using namespace Engine;
 HSaveError restore_game_data(Stream *in, SavegameVersion svg_version, const PreservedParams &pp, RestoredData &r_data);
 
 
-extern Bitmap **guibg;
-extern AGS::Engine::IDriverDependantBitmap **guibgbmp;
+extern Bitmap **_G(guibg);
+extern AGS::Engine::IDriverDependantBitmap **_G(guibgbmp);
 extern AGS::Engine::IGraphicsDriver *_G(gfxDriver);
-extern Bitmap *dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
-extern Bitmap *raw_saved_screen;
-extern RoomStatus troom;
+extern Bitmap *_G(dynamicallyCreatedSurfaces)[MAX_DYNAMIC_SURFACES];
+extern Bitmap *_G(raw_saved_screen);
+extern RoomStatus _GP(troom);
 extern RoomStatus *croom;
 
 
@@ -334,15 +334,15 @@ void DoBeforeRestore(PreservedParams &pp) {
 	pp.MusicVOX = _GP(play).separate_music_lib;
 
 	unload_old_room();
-	delete raw_saved_screen;
-	raw_saved_screen = nullptr;
+	delete _G(raw_saved_screen);
+	_G(raw_saved_screen) = nullptr;
 	remove_screen_overlay(-1);
 	is_complete_overlay = 0;
 	is_text_overlay = 0;
 
 	// cleanup dynamic sprites
 	// NOTE: sprite 0 is a special constant sprite that cannot be dynamic
-	for (int i = 1; i < spriteset.GetSpriteSlotCount(); ++i) {
+	for (int i = 1; i < _GP(spriteset).GetSpriteSlotCount(); ++i) {
 		if (_GP(game).SpriteInfos[i].Flags & SPF_DYNAMICALLOC) {
 			// do this early, so that it changing guibuts doesn't
 			// affect the restored data
@@ -352,12 +352,12 @@ void DoBeforeRestore(PreservedParams &pp) {
 
 	// cleanup GUI backgrounds
 	for (int i = 0; i < _GP(game).numgui; ++i) {
-		delete guibg[i];
-		guibg[i] = nullptr;
+		delete _G(guibg)[i];
+		_G(guibg)[i] = nullptr;
 
-		if (guibgbmp[i])
-			_G(gfxDriver)->DestroyDDB(guibgbmp[i]);
-		guibgbmp[i] = nullptr;
+		if (_G(guibgbmp)[i])
+			_G(gfxDriver)->DestroyDDB(_G(guibgbmp)[i]);
+		_G(guibgbmp)[i] = nullptr;
 	}
 
 	// preserve script data sizes and cleanup scripts
@@ -386,8 +386,8 @@ void DoBeforeRestore(PreservedParams &pp) {
 	dialogScriptsInst = nullptr;
 
 	resetRoomStatuses();
-	troom.FreeScriptData();
-	troom.FreeProperties();
+	_GP(troom).FreeScriptData();
+	_GP(troom).FreeProperties();
 	free_do_once_tokens();
 
 	// unregister gui controls from API exports
@@ -459,7 +459,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	// restore these to the ones retrieved from the save game
 	const size_t dynsurf_num = Math::Min((size_t)MAX_DYNAMIC_SURFACES, r_data.DynamicSurfaces.size());
 	for (size_t i = 0; i < dynsurf_num; ++i) {
-		dynamicallyCreatedSurfaces[i] = r_data.DynamicSurfaces[i];
+		_G(dynamicallyCreatedSurfaces)[i] = r_data.DynamicSurfaces[i];
 	}
 
 	for (int i = 0; i < _GP(game).numgui; ++i)
@@ -505,7 +505,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	_GP(play).gscript_timer = gstimer;
 	// restore the correct room volume (they might have modified
 	// it with SetMusicVolume)
-	_GP(thisroom).Options.MusicVolume = r_data.RoomVolume;
+	_GP(_GP(thisroom)).Options.MusicVolume = r_data.RoomVolume;
 
 	Mouse::SetMoveLimit(Rect(oldx1, oldy1, oldx2, oldy2));
 
@@ -514,7 +514,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	if (r_data.CursorMode == MODE_USE)
 		SetActiveInventory(_G(_G(playerchar))->activeinv);
 	// ensure that the current cursor is locked
-	spriteset.Precache(_GP(game).mcurs[r_data.CursorID].pic);
+	_GP(spriteset).Precache(_GP(game).mcurs[r_data.CursorID].pic);
 
 	sys_window_set_title(_GP(play).game_name);
 
@@ -523,21 +523,21 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	if (displayed_room >= 0) {
 		for (int i = 0; i < MAX_ROOM_BGFRAMES; ++i) {
 			if (r_data.RoomBkgScene[i]) {
-				_GP(thisroom).BgFrames[i].Graphic = r_data.RoomBkgScene[i];
+				_GP(_GP(thisroom)).BgFrames[i].Graphic = r_data.RoomBkgScene[i];
 			}
 		}
 
 		in_new_room = 3;  // don't run "enters screen" events
 		// now that room has loaded, copy saved light levels in
 		for (size_t i = 0; i < MAX_ROOM_REGIONS; ++i) {
-			_GP(thisroom).Regions[i].Light = r_data.RoomLightLevels[i];
-			_GP(thisroom).Regions[i].Tint = r_data.RoomTintLevels[i];
+			_GP(_GP(thisroom)).Regions[i].Light = r_data.RoomLightLevels[i];
+			_GP(_GP(thisroom)).Regions[i].Tint = r_data.RoomTintLevels[i];
 		}
 		generate_light_table();
 
 		for (size_t i = 0; i < MAX_WALK_AREAS + 1; ++i) {
-			_GP(thisroom).WalkAreas[i].ScalingFar = r_data.RoomZoomLevels1[i];
-			_GP(thisroom).WalkAreas[i].ScalingNear = r_data.RoomZoomLevels2[i];
+			_GP(_GP(thisroom)).WalkAreas[i].ScalingFar = r_data.RoomZoomLevels1[i];
+			_GP(_GP(thisroom)).WalkAreas[i].ScalingNear = r_data.RoomZoomLevels2[i];
 		}
 
 		on_background_frame_change();
@@ -608,8 +608,8 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	update_directional_sound_vol();
 
 	for (int i = 0; i < _GP(game).numgui; ++i) {
-		guibg[i] = BitmapHelper::CreateBitmap(_GP(guis)[i].Width, _GP(guis)[i].Height, _GP(game).GetColorDepth());
-		guibg[i] = ReplaceBitmapWithSupportedFormat(guibg[i]);
+		_G(guibg)[i] = BitmapHelper::CreateBitmap(_GP(guis)[i].Width, _GP(guis)[i].Height, _GP(game).GetColorDepth());
+		_G(guibg)[i] = ReplaceBitmapWithSupportedFormat(_G(guibg)[i]);
 	}
 
 	recreate_overlay_ddbs();
@@ -683,7 +683,7 @@ void WriteDescription(Stream *out, const String &user_text, const Bitmap *user_i
 	StrUtil::WriteString(EngineVersion.LongString, out);
 	StrUtil::WriteString(_GP(game).guid, out);
 	StrUtil::WriteString(_GP(game).gamename, out);
-	StrUtil::WriteString(ResPaths.GamePak.Name, out);
+	StrUtil::WriteString(_GP(ResPaths).GamePak.Name, out);
 	out->WriteInt32(loaded_game_file_version);
 	out->WriteInt32(_GP(game).GetColorDepth());
 	out->WriteInt32(_GP(game).uniqueid);
@@ -741,8 +741,8 @@ void DoBeforeSave() {
 			save_room_data_segment();
 
 		// Update the saved interaction variable values
-		for (size_t i = 0; i < _GP(thisroom).LocalVariables.size() && i < (size_t)MAX_GLOBAL_VARIABLES; ++i)
-			croom->interactionVariableValues[i] = _GP(thisroom).LocalVariables[i].Value;
+		for (size_t i = 0; i < _GP(_GP(thisroom)).LocalVariables.size() && i < (size_t)MAX_GLOBAL_VARIABLES; ++i)
+			croom->interactionVariableValues[i] = _GP(_GP(thisroom)).LocalVariables[i].Value;
 	}
 }
 

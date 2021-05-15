@@ -72,7 +72,7 @@ int    global_argc = 0;
 extern GameSetup usetup;
 
 extern int our_eip;
-extern int convert_16bit_bgr;
+extern int _G(convert_16bit_bgr);
 extern int _G(editor_debugging_enabled);
 extern int _G(editor_debugging_initialized);
 extern char _G(editor_debugger_instance_token)[100];

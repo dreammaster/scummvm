@@ -57,14 +57,14 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 
-extern RoomStatus troom;    // used for non-saveable rooms, eg. intro
+extern RoomStatus _GP(troom);    // used for non-saveable rooms, eg. intro
 extern int our_eip;
 extern GameSetup usetup;
 extern char pexbuf[STD_BUFFER_SIZE];
 extern int proper_exit;
-extern char check_dynamic_sprites_at_exit;
+extern char _G(check_dynamic_sprites_at_exit);
 extern int _G(editor_debugging_initialized);
 extern IAGSEditorDebugger *_G(editor_debugger);
 extern int _G(need_to_stop_cd);
@@ -92,11 +92,11 @@ void quit_shutdown_scripts() {
 }
 
 void quit_check_dynamic_sprites(QuitReason qreason) {
-	if ((qreason & kQuitKind_NormalExit) && (check_dynamic_sprites_at_exit) &&
+	if ((qreason & kQuitKind_NormalExit) && (_G(check_dynamic_sprites_at_exit)) &&
 		(_GP(game).options[OPT_DEBUGMODE] != 0)) {
 		// game exiting normally -- make sure the dynamic sprites
 		// have been deleted
-		for (size_t i = 1; i < spriteset.GetSpriteSlotCount(); i++) {
+		for (size_t i = 1; i < _GP(spriteset).GetSpriteSlotCount(); i++) {
 			if (_GP(game).SpriteInfos[i].Flags & SPF_DYNAMICALLOC)
 				debug_script_warn("Dynamic sprite %d was never deleted", i);
 		}
@@ -180,7 +180,7 @@ void quit_message_on_exit(const char *qmsg, String &alertis, QuitReason qreason)
 
 void quit_release_data() {
 	resetRoomStatuses();
-	_GP(thisroom).Free();
+	_GP(_GP(thisroom)).Free();
 	_GP(play).Free();
 
 	/*  _CrtMemState memstart;
@@ -253,7 +253,7 @@ void quit(const char *quitmsg) {
 	shutdown_font_renderer();
 	our_eip = 9902;
 
-	spriteset.Reset();
+	_GP(spriteset).Reset();
 
 	our_eip = 9907;
 

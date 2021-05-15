@@ -38,9 +38,9 @@ extern ScriptRegion scrRegion[MAX_ROOM_REGIONS];
 
 extern RoomStatus *croom;
 
-extern COLOR_MAP maincoltable;
+extern COLOR_MAP _GP(maincoltable);
 extern RGB palette[256];
-extern CCRegion ccDynamicRegion;
+extern CCRegion _GP(ccDynamicRegion);
 
 
 ScriptRegion *GetRegionAtRoom(int xx, int yy) {
@@ -62,37 +62,37 @@ void Region_SetLightLevel(ScriptRegion *ssr, int brightness) {
 }
 
 int Region_GetLightLevel(ScriptRegion *ssr) {
-	return _GP(thisroom).GetRegionLightLevel(ssr->id);
+	return _GP(_GP(thisroom)).GetRegionLightLevel(ssr->id);
 }
 
 int Region_GetTintEnabled(ScriptRegion *srr) {
-	if (_GP(thisroom).Regions[srr->id].Tint & 0xFF000000)
+	if (_GP(_GP(thisroom)).Regions[srr->id].Tint & 0xFF000000)
 		return 1;
 	return 0;
 }
 
 int Region_GetTintRed(ScriptRegion *srr) {
 
-	return _GP(thisroom).Regions[srr->id].Tint & 0x000000ff;
+	return _GP(_GP(thisroom)).Regions[srr->id].Tint & 0x000000ff;
 }
 
 int Region_GetTintGreen(ScriptRegion *srr) {
 
-	return (_GP(thisroom).Regions[srr->id].Tint >> 8) & 0x000000ff;
+	return (_GP(_GP(thisroom)).Regions[srr->id].Tint >> 8) & 0x000000ff;
 }
 
 int Region_GetTintBlue(ScriptRegion *srr) {
 
-	return (_GP(thisroom).Regions[srr->id].Tint >> 16) & 0x000000ff;
+	return (_GP(_GP(thisroom)).Regions[srr->id].Tint >> 16) & 0x000000ff;
 }
 
 int Region_GetTintSaturation(ScriptRegion *srr) {
 
-	return (_GP(thisroom).Regions[srr->id].Tint >> 24) & 0xFF;
+	return (_GP(_GP(thisroom)).Regions[srr->id].Tint >> 24) & 0xFF;
 }
 
 int Region_GetTintLuminance(ScriptRegion *srr) {
-	return _GP(thisroom).GetRegionTintLuminance(srr->id);
+	return _GP(_GP(thisroom)).GetRegionTintLuminance(srr->id);
 }
 
 void Region_Tint(ScriptRegion *srr, int red, int green, int blue, int amount, int luminance) {
@@ -126,8 +126,8 @@ void Region_RunInteraction(ScriptRegion *ssr, int mood) {
 
 void generate_light_table() {
 	if (_GP(game).color_depth == 1 && _GP(color_map) == nullptr) {
-		create_light_table(&maincoltable, palette, 0, 0, 0, nullptr);
-		_GP(color_map) = &maincoltable;
+		create_light_table(&_GP(maincoltable), palette, 0, 0, 0, nullptr);
+		_GP(color_map) = &_GP(maincoltable);
 	}
 }
 
@@ -143,11 +143,11 @@ void generate_light_table() {
 
 // ScriptRegion *(int xx, int yy)
 RuntimeScriptValue Sc_GetRegionAtRoom(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT2(ScriptRegion, ccDynamicRegion, GetRegionAtRoom);
+	API_SCALL_OBJ_PINT2(ScriptRegion, _GP(ccDynamicRegion), GetRegionAtRoom);
 }
 
 RuntimeScriptValue Sc_GetRegionAtScreen(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ_PINT2(ScriptRegion, ccDynamicRegion, GetRegionAtScreen);
+	API_SCALL_OBJ_PINT2(ScriptRegion, _GP(ccDynamicRegion), GetRegionAtScreen);
 }
 
 RuntimeScriptValue Sc_Region_Tint(void *self, const RuntimeScriptValue *params, int32_t param_count) {

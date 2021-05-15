@@ -87,7 +87,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern char check_dynamic_sprites_at_exit;
+extern char _G(check_dynamic_sprites_at_exit);
 extern int our_eip;
 extern volatile char want_exit, abort_engine;
 extern bool justRunSetup;
@@ -95,7 +95,7 @@ extern GameSetup usetup;
 
 extern int proper_exit;
 extern char pexbuf[STD_BUFFER_SIZE];
-extern SpriteCache spriteset;
+extern SpriteCache _GP(spriteset);
 extern ObjectCache objcache[MAX_ROOM_OBJECTS];
 extern ScriptObject scrObj[MAX_ROOM_OBJECTS];
 extern ViewStruct*views;
@@ -106,16 +106,16 @@ extern SpeechLipSyncLine *_G(splipsync);
 extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 
 extern IGraphicsDriver *_G(gfxDriver);
-extern Bitmap **actsps;
+extern Bitmap **_G(actsps);
 extern RGB palette[256];
 
 
-extern Bitmap **guibg;
-extern IDriverDependantBitmap **guibgbmp;
+extern Bitmap **_G(guibg);
+extern IDriverDependantBitmap **_G(guibgbmp);
 
-ResourcePaths ResPaths;
+ResourcePaths _GP(ResPaths);
 
-t_engine_pre_init_callback engine_pre_init_callback = nullptr;
+t_engine_pre_init_callback _G(engine_pre_init_callback) = nullptr;
 
 bool engine_init_backend()
 {
@@ -147,7 +147,7 @@ bool engine_init_backend()
 void winclosehook() {
   want_exit = 1;
   abort_engine = 1;
-  check_dynamic_sprites_at_exit = 0;
+  _G(check_dynamic_sprites_at_exit) = 0;
 }
 
 void engine_setup_window()
@@ -376,14 +376,14 @@ void engine_locate_speech_pak()
             Debug::Printf(kDbgMsg_Info, "Voice pack found and initialized.");
             _GP(play).want_speech=1;
         }
-        else if (Path::ComparePaths(ResPaths.DataDir, ResPaths.VoiceDir2) != 0)
+        else if (Path::ComparePaths(_GP(ResPaths).DataDir, _GP(ResPaths).VoiceDir2) != 0)
         {
             // If we have custom voice directory set, we will enable voice-over even if speech.vox does not exist
             Debug::Printf(kDbgMsg_Info, "Voice pack was not found, but explicit voice directory is defined: enabling voice-over.");
             _GP(play).want_speech=1;
         }
-        ResPaths.SpeechPak.Name = speech_file;
-        ResPaths.SpeechPak.Path = speech_filepath;
+        _GP(ResPaths).SpeechPak.Name = speech_file;
+        _GP(ResPaths).SpeechPak.Path = speech_filepath;
     }
 }
 
@@ -398,8 +398,8 @@ void engine_locate_audio_pak()
         {
             Debug::Printf(kDbgMsg_Info, "%s found and initialized.", music_file.GetCStr());
             _GP(play).separate_music_lib = 1;
-            ResPaths.AudioPak.Name = music_file;
-            ResPaths.AudioPak.Path = music_filepath;
+            _GP(ResPaths).AudioPak.Name = music_file;
+            _GP(ResPaths).AudioPak.Path = music_filepath;
         }
         else
         {
@@ -407,7 +407,7 @@ void engine_locate_audio_pak()
                 music_file.GetCStr());
         }
     }
-    else if (Path::ComparePaths(ResPaths.DataDir, ResPaths.AudioDir2) != 0)
+    else if (Path::ComparePaths(_GP(ResPaths).DataDir, _GP(ResPaths).AudioDir2) != 0)
     {
         Debug::Printf(kDbgMsg_Info, "Audio pack was not found, but explicit audio directory is defined.");
     }
@@ -416,7 +416,7 @@ void engine_locate_audio_pak()
 // Assign asset locations to the AssetManager
 void engine_assign_assetpaths()
 {
-    AssetMgr->AddLibrary(ResPaths.GamePak.Path, ",audio"); // main pack may have audio bundled too
+    AssetMgr->AddLibrary(_GP(ResPaths).GamePak.Path, ",audio"); // main pack may have audio bundled too
     // The asset filters are currently a workaround for limiting search to certain locations;
     // this is both an optimization and to prevent unexpected behavior.
     // - empty filter is for regular files
@@ -424,18 +424,18 @@ void engine_assign_assetpaths()
     // voice - voice-over clips
     // NOTE: we add extra optional directories first because they should have higher priority
     // TODO: maybe change AssetManager library order to stack-like later (last added = top priority)?
-    if (!ResPaths.DataDir2.IsEmpty() && Path::ComparePaths(ResPaths.DataDir2, ResPaths.DataDir) != 0)
-        AssetMgr->AddLibrary(ResPaths.DataDir2, ",audio,voice"); // dir may have anything
-    if (!ResPaths.AudioDir2.IsEmpty() && Path::ComparePaths(ResPaths.AudioDir2, ResPaths.DataDir) != 0)
-        AssetMgr->AddLibrary(ResPaths.AudioDir2, "audio");
-    if (!ResPaths.VoiceDir2.IsEmpty() && Path::ComparePaths(ResPaths.VoiceDir2, ResPaths.DataDir) != 0)
-        AssetMgr->AddLibrary(ResPaths.VoiceDir2, "voice");
+    if (!_GP(ResPaths).DataDir2.IsEmpty() && Path::ComparePaths(_GP(ResPaths).DataDir2, _GP(ResPaths).DataDir) != 0)
+        AssetMgr->AddLibrary(_GP(ResPaths).DataDir2, ",audio,voice"); // dir may have anything
+    if (!_GP(ResPaths).AudioDir2.IsEmpty() && Path::ComparePaths(_GP(ResPaths).AudioDir2, _GP(ResPaths).DataDir) != 0)
+        AssetMgr->AddLibrary(_GP(ResPaths).AudioDir2, "audio");
+    if (!_GP(ResPaths).VoiceDir2.IsEmpty() && Path::ComparePaths(_GP(ResPaths).VoiceDir2, _GP(ResPaths).DataDir) != 0)
+        AssetMgr->AddLibrary(_GP(ResPaths).VoiceDir2, "voice");
 
-    AssetMgr->AddLibrary(ResPaths.DataDir, ",audio,voice"); // dir may have anything
-    if (!ResPaths.AudioPak.Path.IsEmpty())
-        AssetMgr->AddLibrary(ResPaths.AudioPak.Path, "audio");
-    if (!ResPaths.SpeechPak.Path.IsEmpty())
-        AssetMgr->AddLibrary(ResPaths.SpeechPak.Path, "voice");
+    AssetMgr->AddLibrary(_GP(ResPaths).DataDir, ",audio,voice"); // dir may have anything
+    if (!_GP(ResPaths).AudioPak.Path.IsEmpty())
+        AssetMgr->AddLibrary(_GP(ResPaths).AudioPak.Path, "audio");
+    if (!_GP(ResPaths).SpeechPak.Path.IsEmpty())
+        AssetMgr->AddLibrary(_GP(ResPaths).SpeechPak.Path, "voice");
 }
 
 void engine_init_keyboard()
@@ -683,7 +683,7 @@ int engine_init_sprites()
 {
     Debug::Printf(kDbgMsg_Info, "Initialize sprites");
 
-    HError err = spriteset.InitFile(SpriteCache::DefaultSpriteFileName, SpriteCache::DefaultSpriteIndexName);
+    HError err = _GP(spriteset).InitFile(SpriteCache::DefaultSpriteFileName, SpriteCache::DefaultSpriteIndexName);
     if (!err) 
     {
         sys_main_shutdown();
@@ -706,7 +706,7 @@ void engine_init_game_settings()
     int ee;
 
     for (ee = 0; ee < MAX_ROOM_OBJECTS + _GP(game).numcharacters; ee++)
-        actsps[ee] = nullptr;
+        _G(actsps)[ee] = nullptr;
 
     for (ee=0;ee<256;ee++) {
         if (_GP(game).paluses[ee]!=PAL_BACKGROUND)
@@ -718,7 +718,7 @@ void engine_init_game_settings()
         // The cursor graphics are assigned to mousecurs[] and so cannot
         // be removed from memory
         if (_GP(game).mcurs[ee].pic >= 0)
-            spriteset.Precache(_GP(game).mcurs[ee].pic);
+            _GP(spriteset).Precache(_GP(game).mcurs[ee].pic);
 
         // just in case they typed an invalid view number in the editor
         if (_GP(game).mcurs[ee].view >= _GP(game).numviews)
@@ -774,11 +774,11 @@ void engine_init_game_settings()
         _G(charextra)[ee].animwait = 0;
     }
     // multiply up gui positions
-    guibg = (Bitmap **)malloc(sizeof(Bitmap *) * _GP(game).numgui);
-    guibgbmp = (IDriverDependantBitmap**)malloc(sizeof(IDriverDependantBitmap*) * _GP(game).numgui);
+    _G(guibg) = (Bitmap **)malloc(sizeof(Bitmap *) * _GP(game).numgui);
+    _G(guibgbmp) = (IDriverDependantBitmap**)malloc(sizeof(IDriverDependantBitmap*) * _GP(game).numgui);
     for (ee=0;ee<_GP(game).numgui;ee++) {
-        guibg[ee] = nullptr;
-        guibgbmp[ee] = nullptr;
+        _G(guibg)[ee] = nullptr;
+        _G(guibgbmp)[ee] = nullptr;
     }
 
     our_eip=-5;
@@ -1091,22 +1091,22 @@ bool engine_init_gamedata()
         return false;
     }
 
-    // Setup ResPaths, so that we know out main locations further
-    ResPaths.GamePak.Path = usetup.main_data_file;
-    ResPaths.GamePak.Name = Path::GetFilename(usetup.main_data_file);
-    ResPaths.DataDir = usetup.install_dir.IsEmpty() ? usetup.main_data_dir : Path::MakeAbsolutePath(usetup.install_dir);
-    ResPaths.DataDir2 = Path::MakeAbsolutePath(usetup.opt_data_dir);
-    ResPaths.AudioDir2 = Path::MakeAbsolutePath(usetup.opt_audio_dir);
-    ResPaths.VoiceDir2 = Path::MakeAbsolutePath(usetup.opt_voice_dir);
+    // Setup _GP(ResPaths), so that we know out main locations further
+    _GP(ResPaths).GamePak.Path = usetup.main_data_file;
+    _GP(ResPaths).GamePak.Name = Path::GetFilename(usetup.main_data_file);
+    _GP(ResPaths).DataDir = usetup.install_dir.IsEmpty() ? usetup.main_data_dir : Path::MakeAbsolutePath(usetup.install_dir);
+    _GP(ResPaths).DataDir2 = Path::MakeAbsolutePath(usetup.opt_data_dir);
+    _GP(ResPaths).AudioDir2 = Path::MakeAbsolutePath(usetup.opt_audio_dir);
+    _GP(ResPaths).VoiceDir2 = Path::MakeAbsolutePath(usetup.opt_voice_dir);
 
     Debug::Printf(kDbgMsg_Info, "Startup directory: %s", usetup.startup_dir.GetCStr());
-    Debug::Printf(kDbgMsg_Info, "Data directory: %s", ResPaths.DataDir.GetCStr());
-    if (!ResPaths.DataDir2.IsEmpty())
-        Debug::Printf(kDbgMsg_Info, "Opt data directory: %s", ResPaths.DataDir2.GetCStr());
-    if (!ResPaths.AudioDir2.IsEmpty())
-        Debug::Printf(kDbgMsg_Info, "Opt audio directory: %s", ResPaths.AudioDir2.GetCStr());
-    if (!ResPaths.VoiceDir2.IsEmpty())
-        Debug::Printf(kDbgMsg_Info, "Opt voice-over directory: %s", ResPaths.VoiceDir2.GetCStr());
+    Debug::Printf(kDbgMsg_Info, "Data directory: %s", _GP(ResPaths).DataDir.GetCStr());
+    if (!_GP(ResPaths).DataDir2.IsEmpty())
+        Debug::Printf(kDbgMsg_Info, "Opt data directory: %s", _GP(ResPaths).DataDir2.GetCStr());
+    if (!_GP(ResPaths).AudioDir2.IsEmpty())
+        Debug::Printf(kDbgMsg_Info, "Opt audio directory: %s", _GP(ResPaths).AudioDir2.GetCStr());
+    if (!_GP(ResPaths).VoiceDir2.IsEmpty())
+        Debug::Printf(kDbgMsg_Info, "Opt voice-over directory: %s", _GP(ResPaths).VoiceDir2.GetCStr());
     return true;
 }
 
@@ -1224,7 +1224,7 @@ static void engine_print_info(const std::set<String> &keys, ConfigTree *user_cfg
         data["data"]["gamename"] = _GP(game).gamename;
         data["data"]["version"] = StrUtil::IntToString(loaded_game_file_version);
         data["data"]["compiledwith"] = _GP(game).compiled_with;
-        data["data"]["basepack"] = ResPaths.GamePak.Path;
+        data["data"]["basepack"] = _GP(ResPaths).GamePak.Path;
     }
     if (all || keys.count("gameproperties") > 0)
     {
@@ -1234,12 +1234,12 @@ static void engine_print_info(const std::set<String> &keys, ConfigTree *user_cfg
     {
         data["filepath"]["exe"] = appPath;
         data["filepath"]["cwd"] = Directory::GetCurrentDirectory();
-        data["filepath"]["datadir"] = Path::MakePathNoSlash(ResPaths.DataDir);
-        if (!ResPaths.DataDir2.IsEmpty())
+        data["filepath"]["datadir"] = Path::MakePathNoSlash(_GP(ResPaths).DataDir);
+        if (!_GP(ResPaths).DataDir2.IsEmpty())
         {
-            data["filepath"]["datadir2"] = Path::MakePathNoSlash(ResPaths.DataDir2);
-            data["filepath"]["audiodir2"] = Path::MakePathNoSlash(ResPaths.AudioDir2);
-            data["filepath"]["voicedir2"] = Path::MakePathNoSlash(ResPaths.VoiceDir2);
+            data["filepath"]["datadir2"] = Path::MakePathNoSlash(_GP(ResPaths).DataDir2);
+            data["filepath"]["audiodir2"] = Path::MakePathNoSlash(_GP(ResPaths).AudioDir2);
+            data["filepath"]["voicedir2"] = Path::MakePathNoSlash(_GP(ResPaths).VoiceDir2);
         }
         data["filepath"]["savegamedir"] = Path::MakePathNoSlash(GetGameUserDataDir().FullDir);
         data["filepath"]["appdatadir"] = Path::MakePathNoSlash(GetGameAppDataDir().FullDir);
@@ -1267,8 +1267,8 @@ static int al_find_resource(char *dest, const char* resource, int dest_size)
 // data init into either InitGameState() or other game method as appropriate.
 int initialize_engine(const ConfigTree &startup_opts)
 {
-    if (engine_pre_init_callback) {
-        engine_pre_init_callback();
+    if (_G(engine_pre_init_callback)) {
+        _G(engine_pre_init_callback)();
     }
 
     //-----------------------------------------------------
@@ -1511,7 +1511,7 @@ const char *get_engine_version() {
 }
 
 void engine_set_pre_init_callback(t_engine_pre_init_callback callback) {
-    engine_pre_init_callback = callback;
+    _G(engine_pre_init_callback) = callback;
 }
 
 } // namespace AGS3
