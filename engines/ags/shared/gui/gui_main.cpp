@@ -43,7 +43,7 @@ using namespace AGS::Shared;
 
 #define MOVER_MOUSEDOWNLOCKED -4000
 
-int all_buttons_disabled = 0, _G(gui_inv_pic) = -1;
+int _G(all_buttons_disabled) = 0, _G(gui_inv_pic) = -1;
 int _G(gui_disabled_style) = 0;
 
 namespace AGS {
@@ -240,7 +240,7 @@ void GUIMain::DrawAt(Bitmap *ds, int x, int y) {
 
 	SET_EIP(379)
 
-		if (all_buttons_disabled && _G(gui_disabled_style) == GUIDIS_BLACKOUT)
+		if (_G(all_buttons_disabled) && _G(gui_disabled_style) == GUIDIS_BLACKOUT)
 			return; // don't draw GUI controls
 
 	for (size_t ctrl_index = 0; ctrl_index < _controls.size(); ++ctrl_index) {

@@ -1299,16 +1299,16 @@ int scale_and_flip_sprite(int useindx, int coldept, int zoom_level,
           Bitmap *tempspr = BitmapHelper::CreateBitmap(newwidth, newheight,coldept);
           tempspr->Fill (_G(actsps)[useindx]->GetMaskColor());
           if ((IS_ANTIALIAS_SPRITES) && ((_GP(game).SpriteInfos[sppic].Flags & SPF_ALPHACHANNEL) == 0))
-              tempspr->AAStretchBlt (_GP(spriteset)[sppic], RectWH(0, 0, newwidth, newheight), Common::kBitmap_Transparency);
+              tempspr->AAStretchBlt (_GP(spriteset)[sppic], RectWH(0, 0, newwidth, newheight), Shared::kBitmap_Transparency);
           else
-              tempspr->StretchBlt (_GP(spriteset)[sppic], RectWH(0, 0, newwidth, newheight), Common::kBitmap_Transparency);
-          active_spr->FlipBlt(tempspr, 0, 0, Common::kBitmap_HFlip);
+              tempspr->StretchBlt (_GP(spriteset)[sppic], RectWH(0, 0, newwidth, newheight), Shared::kBitmap_Transparency);
+          active_spr->FlipBlt(tempspr, 0, 0, Shared::kBitmap_HFlip);
           delete tempspr;
       }
       else if ((IS_ANTIALIAS_SPRITES) && ((_GP(game).SpriteInfos[sppic].Flags & SPF_ALPHACHANNEL) == 0))
-          active_spr->AAStretchBlt(_GP(spriteset)[sppic],RectWH(0,0,newwidth,newheight), Common::kBitmap_Transparency);
+          active_spr->AAStretchBlt(_GP(spriteset)[sppic],RectWH(0,0,newwidth,newheight), Shared::kBitmap_Transparency);
       else
-          active_spr->StretchBlt(_GP(spriteset)[sppic],RectWH(0,0,newwidth,newheight), Common::kBitmap_Transparency);
+          active_spr->StretchBlt(_GP(spriteset)[sppic],RectWH(0,0,newwidth,newheight), Shared::kBitmap_Transparency);
 
       /*  AASTR2 version of code (doesn't work properly, gives black borders)
       if (IS_ANTIALIAS_SPRITES) {
@@ -1325,7 +1325,7 @@ int scale_and_flip_sprite(int useindx, int coldept, int zoom_level,
       Bitmap *tempspr = BitmapHelper::CreateBitmap_ (coldept, newwidth, newheight);
       ->Clear (tempspr, ->GetMaskColor(_G(actsps)[useindx]));
       ->StretchBlt (tempspr, _GP(spriteset)[sppic], 0, 0, newwidth, newheight);
-      ->FlipBlt(Common::kBitmap_HFlip, (_G(actsps)[useindx], tempspr, 0, 0);
+      ->FlipBlt(Shared::kBitmap_HFlip, (_G(actsps)[useindx], tempspr, 0, 0);
       wfreeblock (tempspr);
       }
       else
@@ -1341,7 +1341,7 @@ int scale_and_flip_sprite(int useindx, int coldept, int zoom_level,
       _G(our_eip) = 339;
 
       if (isMirrored)
-          active_spr->FlipBlt(_GP(spriteset)[sppic], 0, 0, Common::kBitmap_HFlip);
+          active_spr->FlipBlt(_GP(spriteset)[sppic], 0, 0, Shared::kBitmap_HFlip);
       else
           actsps_used = 0;
       //->Blit (_GP(spriteset)[sppic], _G(actsps)[useindx], 0, 0, 0, 0, _G(actsps)[useindx]->GetWidth(), _G(actsps)[useindx]->GetHeight());
@@ -2039,8 +2039,8 @@ void draw_fps(const Rect &viewport)
 
     char fps_buffer[60];
     // Don't display fps if we don't have enough information (because loop count was just reset)
-    if (!std::isnan(fps)) {
-        snprintf(fps_buffer, sizeof(fps_buffer), "FPS: %2.1f / %s", fps, base_buffer);
+    if (!std::isUndefined(_G(fps))) {
+        snprintf(fps_buffer, sizeof(fps_buffer), "FPS: %2.1f / %s", _G(fps), base_buffer);
     } else {
         snprintf(fps_buffer, sizeof(fps_buffer), "FPS: --.- / %s", base_buffer);
     }
@@ -2143,7 +2143,7 @@ void draw_gui_and_overlays()
 
             // Don't draw GUI if "GUIs Turn Off When Disabled"
             if ((_GP(game).options[OPT_DISABLEOFF] == 3) &&
-                (all_buttons_disabled > 0) &&
+                (_G(all_buttons_disabled) > 0) &&
                 (_GP(guis)[aa].PopupStyle != kGUIPopupNoAutoRemove))
                 continue;
 

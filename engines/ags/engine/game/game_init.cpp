@@ -309,7 +309,7 @@ HError InitAndRegisterGameEntities() {
 
 void LoadFonts(GameDataVersion data_ver) {
 	for (int i = 0; i < _GP(game).numfonts; ++i) {
-		if (!wloadfont_size(i, _GP(game)._G(fonts)[i]))
+		if (!wloadfont_size(i, _GP(game)._GP(fonts)[i]))
 			quitprintf("Unable to load font %d, no renderer could load a matching file", i);
 	}
 }

@@ -579,7 +579,7 @@ InteractionVariable *get_interaction_variable(int varindx) {
 	if ((varindx >= LOCAL_VARIABLE_OFFSET) && ((size_t)varindx < LOCAL_VARIABLE_OFFSET + _GP(thisroom).LocalVariables.size()))
 		return &_GP(thisroom).LocalVariables[varindx - LOCAL_VARIABLE_OFFSET];
 
-	if ((varindx < 0) || (varindx >= numGlobalVars))
+	if ((varindx < 0) || (varindx >= _G(numGlobalVars)))
 		quit("!invalid interaction variable specified");
 
 	return &globalvars[varindx];
@@ -587,7 +587,7 @@ InteractionVariable *get_interaction_variable(int varindx) {
 
 InteractionVariable *FindGraphicalVariable(const char *varName) {
 	int ii;
-	for (ii = 0; ii < numGlobalVars; ii++) {
+	for (ii = 0; ii < _G(numGlobalVars); ii++) {
 		if (ags_stricmp(globalvars[ii].Name, varName) == 0)
 			return &globalvars[ii];
 	}

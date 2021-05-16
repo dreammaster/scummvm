@@ -680,7 +680,7 @@ void _aa_masked_add_rgb8(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, u
 	unsigned char *sline;
 	int sx, sx1i, sx1f, sx2i, sx2f;
 	int sy, sy1i, sy1f, sy2i, sy2f;
-	unsigned long r1, g1, b1, t1;
+	unsigned long r1, g1, b1;
 	unsigned long r2, g2, b2, t2;
 	unsigned long scolor;
 
@@ -838,7 +838,7 @@ void _aa_masked_add_rgb15(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 	unsigned short *sline;
 	int sx, sx1i, sx1f, sx2i, sx2f;
 	int sy, sy1i, sy1f, sy2i, sy2f;
-	unsigned int r1, g1, b1, t1;
+	unsigned int r1, g1, b1;
 	unsigned int r2, g2, b2, t2;
 	unsigned int scolor;
 
@@ -995,7 +995,7 @@ void _aa_masked_add_rgb16(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 	unsigned short *sline;
 	int sx, sx1i, sx1f, sx2i, sx2f;
 	int sy, sy1i, sy1f, sy2i, sy2f;
-	unsigned int r1, g1, b1, t1;
+	unsigned int r1, g1, b1;
 	unsigned int r2, g2, b2, t2;
 	unsigned int scolor;
 
@@ -1154,7 +1154,7 @@ void _aa_masked_add_rgb24(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 	unsigned char *sline;
 	int sx, sx1i, sx1f, sx2i, sx2f;
 	int sy, sy1i, sy1f, sy2i, sy2f;
-	unsigned int r1, g1, b1, t1;
+	unsigned int r1, g1, b1;
 	unsigned int r2, g2, b2, t2;
 	unsigned int scolor;
 
@@ -1376,7 +1376,7 @@ void _aa_masked_add_rgb32(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 	unsigned int *sline;
 	int sx, sx1i, sx1f, sx2i, sx2f;
 	int sy, sy1i, sy1f, sy2i, sy2f;
-	unsigned int r1, g1, b1, t1;
+	unsigned int r1, g1, b1;
 	unsigned int r2, g2, b2, t2;
 	unsigned int scolor;
 

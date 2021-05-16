@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/global_button.h"
+#include "ags/engine/ac/global_button.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/button.h"
 #include "ags/shared/ac/game_setup_struct.h"

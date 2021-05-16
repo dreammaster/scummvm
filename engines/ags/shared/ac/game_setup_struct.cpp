@@ -25,8 +25,10 @@
 #include "ags/shared/ac/old_game_setup_struct.h"
 #include "ags/shared/ac/words_dictionary.h"
 #include "ags/shared/ac/dynobj/script_audio_clip.h"
+#include "ags/shared/font/fonts.h"
 #include "ags/shared/game/interactions.h"
 #include "ags/shared/util/aligned_stream.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -120,24 +122,24 @@ void GameSetupStruct::read_font_infos(Shared::Stream *in, GameDataVersion data_v
 	fonts.resize(numfonts);
 	if (data_ver < kGameVersion_350) {
 		for (int i = 0; i < numfonts; ++i)
-			SetFontInfoFromLegacyFlags(_G(fonts)[i], in->ReadInt8());
+			SetFontInfoFromLegacyFlags(_GP(fonts)[i], in->ReadInt8());
 		for (int i = 0; i < numfonts; ++i)
-			_G(fonts)[i].Outline = in->ReadInt8(); // size of char
+			_GP(fonts)[i].Outline = in->ReadInt8(); // size of char
 		if (data_ver < kGameVersion_341)
 			return;
 		for (int i = 0; i < numfonts; ++i) {
-			_G(fonts)[i].YOffset = in->ReadInt32();
+			_GP(fonts)[i].YOffset = in->ReadInt32();
 			if (data_ver >= kGameVersion_341_2)
-				_G(fonts)[i].LineSpacing = Math::Max(0, in->ReadInt32());
+				_GP(fonts)[i].LineSpacing = Math::Max(0, in->ReadInt32());
 		}
 	} else {
 		for (int i = 0; i < numfonts; ++i) {
 			uint32_t flags = in->ReadInt32();
-			_G(fonts)[i].SizePt = in->ReadInt32();
-			_G(fonts)[i].Outline = in->ReadInt32();
-			_G(fonts)[i].YOffset = in->ReadInt32();
-			_G(fonts)[i].LineSpacing = Math::Max(0, in->ReadInt32());
-			AdjustFontInfoUsingFlags(_G(fonts)[i], flags);
+			_GP(fonts)[i].SizePt = in->ReadInt32();
+			_GP(fonts)[i].Outline = in->ReadInt32();
+			_GP(fonts)[i].YOffset = in->ReadInt32();
+			_GP(fonts)[i].LineSpacing = Math::Max(0, in->ReadInt32());
+			AdjustFontInfoUsingFlags(_GP(fonts)[i], flags);
 		}
 	}
 }
@@ -167,7 +169,7 @@ HGameFileError GameSetupStruct::read_cursors(Shared::Stream *in, GameDataVersion
 }
 
 void GameSetupStruct::read_interaction_scripts(Shared::Stream *in, GameDataVersion data_ver) {
-	numGlobalVars = 0;
+	_G(numGlobalVars) = 0;
 
 	if (data_ver > kGameVersion_272) // 3.x
 	{
@@ -186,9 +188,9 @@ void GameSetupStruct::read_interaction_scripts(Shared::Stream *in, GameDataVersi
 		for (size_t i = 0; i < (size_t)numinvitems; ++i)
 			intrInv[i].reset(Interaction::CreateFromStream(in));
 
-		numGlobalVars = in->ReadInt32();
-		for (size_t i = 0; i < (size_t)numGlobalVars; ++i)
-			globalvars[i].Read(in);
+		_G(numGlobalVars) = in->ReadInt32();
+		for (size_t i = 0; i < (size_t)_G(numGlobalVars); ++i)
+			_G(globalvars)[i].Read(in);
 	}
 }
 
@@ -405,8 +407,8 @@ void ConvertOldGameStruct(OldGameSetupStruct *ogss, GameSetupStruct *gss) {
 	gss->uniqueid = ogss->uniqueid;
 	gss->numgui = ogss->numgui;
 	for (int i = 0; i < 10; ++i) {
-		SetFontInfoFromLegacyFlags(gss->_G(fonts)[i], ogss->fontflags[i]);
-		gss->_G(fonts)[i].Outline = ogss->fontoutline[i];
+		SetFontInfoFromLegacyFlags(gss->_GP(fonts)[i], ogss->fontflags[i]);
+		gss->_GP(fonts)[i].Outline = ogss->fontoutline[i];
 	}
 
 	for (int i = 0; i < LEGACY_MAX_SPRITES_V25; ++i) {

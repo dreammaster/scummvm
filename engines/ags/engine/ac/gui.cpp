@@ -480,14 +480,14 @@ int convert_gui_disabled_style(int oldStyle) {
 void update_gui_disabled_status() {
 	// update GUI display status (perhaps we've gone into
 	// an interface disabled state)
-	int all_buttons_was = all_buttons_disabled;
-	all_buttons_disabled = 0;
+	int all_buttons_was = _G(all_buttons_disabled);
+	_G(all_buttons_disabled) = 0;
 
 	if (!IsInterfaceEnabled()) {
-		all_buttons_disabled = _G(gui_disabled_style);
+		_G(all_buttons_disabled) = _G(gui_disabled_style);
 	}
 
-	if (all_buttons_was != all_buttons_disabled) {
+	if (all_buttons_was != _G(all_buttons_disabled)) {
 		if (_G(gui_disabled_style) != GUIDIS_UNCHANGED) {
 			for (int aa = 0; aa < _GP(game).numgui; aa++) {
 				_GP(guis)[aa].OnControlPositionChanged(); // this marks GUI for update
@@ -499,7 +499,7 @@ void update_gui_disabled_status() {
 
 
 int adjust_x_for_guis(int xx, int yy) {
-	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0))
+	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (_G(all_buttons_disabled) > 0))
 		return xx;
 	// If it's covered by a GUI, move it right a bit
 	for (int aa = 0; aa < _GP(game).numgui; aa++) {
@@ -522,7 +522,7 @@ int adjust_x_for_guis(int xx, int yy) {
 }
 
 int adjust_y_for_guis(int yy) {
-	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0))
+	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (_G(all_buttons_disabled) > 0))
 		return yy;
 	// If it's covered by a GUI, move it down a bit
 	for (int aa = 0; aa < _GP(game).numgui; aa++) {
@@ -561,7 +561,7 @@ void recreate_guibg_image(GUIMain *tehgui) {
 extern int _G(is_complete_overlay);
 
 int gui_get_interactable(int x, int y) {
-	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0))
+	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (_G(all_buttons_disabled) > 0))
 		return -1;
 	return GetGUIAt(x, y);
 }
@@ -569,7 +569,7 @@ int gui_get_interactable(int x, int y) {
 int gui_on_mouse_move() {
 	int mouse_over_gui = -1;
 	// If all GUIs are off, skip the loop
-	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (all_buttons_disabled > 0));
+	if ((_GP(game).options[OPT_DISABLEOFF] == 3) && (_G(all_buttons_disabled) > 0));
 	else {
 		// Scan for mouse-y-pos GUIs, and pop one up if appropriate
 		// Also work out the mouse-over GUI while we're at it

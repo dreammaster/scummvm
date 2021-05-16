@@ -84,9 +84,9 @@ struct SpriteTransform {
 
 // Describes 3 render matrixes: world, view and projection
 struct RenderMatrixes {
-	Math::Matrix<4, 4> World;
-	Math::Matrix<4, 4> View;
-	Math::Matrix<4, 4> Projection;
+	::Math::Matrix<4, 4> World;
+	::Math::Matrix<4, 4> View;
+	::Math::Matrix<4, 4> Projection;
 };
 
 

@@ -36,7 +36,7 @@
 #include "ags/engine/ac/event.h"
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/global_audio.h"
-#include "ags/shared/ac/global_button.h"
+#include "ags/engine/ac/global_button.h"
 #include "ags/engine/ac/global_character.h"
 #include "ags/shared/ac/global_datetime.h"
 #include "ags/shared/ac/global_debug.h"

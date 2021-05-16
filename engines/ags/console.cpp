@@ -38,7 +38,7 @@ AGSConsole::AGSConsole(AGSEngine *vm) : GUI::Debugger(), _vm(vm), _logOutputTarg
 	registerCmd("ags_sprite_dump",  WRAP_METHOD(AGSConsole, Cmd_dumpSprite));
 
 	_logOutputTarget = new LogOutputTarget();
-	_agsDebuggerOutput = _GP(_G(DbgMgr)).RegisterOutput("ScummVMLog", _logOutputTarget, AGS3::AGS::Shared::kDbgMsg_None);
+	_agsDebuggerOutput = _GP(DbgMgr).RegisterOutput("ScummVMLog", _logOutputTarget, AGS3::AGS::Shared::kDbgMsg_None);
 }
 
 AGSConsole::~AGSConsole() {
@@ -191,12 +191,12 @@ bool AGSConsole::Cmd_getSpriteInfo(int argc, const char **argv) {
 	}
 
 	int spriteId = atoi(argv[1]);
-	if (!_GP(_GP(spriteset)).DoesSpriteExist(spriteId)) {
+	if (!_GP(spriteset).DoesSpriteExist(spriteId)) {
 		debugPrintf("Sprite %d does not exist\n", spriteId);
 		return true;
 	}
 
-	AGS3::Shared::Bitmap *sprite = _GP(_GP(spriteset))[spriteId];
+	AGS3::Shared::Bitmap *sprite = _GP(spriteset)[spriteId];
 	if (!sprite) {
 		debugPrintf("Failed to get sprite %d\n", spriteId);
 		return true;
@@ -214,12 +214,12 @@ bool AGSConsole::Cmd_dumpSprite(int argc, const char **argv) {
 	}
 
 	int spriteId = atoi(argv[1]);
-	if (!_GP(_GP(spriteset)).DoesSpriteExist(spriteId)) {
+	if (!_GP(spriteset).DoesSpriteExist(spriteId)) {
 		debugPrintf("Sprite %d does not exist\n", spriteId);
 		return true;
 	}
 
-	AGS3::Shared::Bitmap *sprite = _GP(_GP(spriteset))[spriteId];
+	AGS3::Shared::Bitmap *sprite = _GP(spriteset)[spriteId];
 	if (!sprite) {
 		debugPrintf("Failed to get sprite %d\n", spriteId);
 		return true;

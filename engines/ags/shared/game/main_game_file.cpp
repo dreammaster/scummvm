@@ -477,7 +477,7 @@ void ApplySpriteData(GameSetupStruct &game, const LoadedGameEntities &ents, Game
 void UpgradeFonts(GameSetupStruct &game, GameDataVersion data_ver) {
 	if (data_ver < kGameVersion_350) {
 		for (int i = 0; i < _GP(game).numfonts; ++i) {
-			FontInfo &finfo = _GP(game)._G(fonts)[i];
+			FontInfo &finfo = _GP(game)._GP(fonts)[i];
 			// If the game is hi-res but font is designed for low-res, then scale it up
 			if (_GP(game).IsLegacyHiRes() && _GP(game).options[OPT_HIRES_FONTS] == 0) {
 				finfo.SizeMultiplier = HIRES_COORD_MULTIPLIER;
