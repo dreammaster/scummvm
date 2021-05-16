@@ -30,16 +30,12 @@
 #include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/script/script.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 
-
-
-
-
-ScriptPosition _G(last_in_dialog_request_script_pos);
 void RunDialog(int tum) {
 	if ((tum < 0) | (tum >= _GP(game).numdialog))
 		quit("!RunDialog: invalid topic number specified");

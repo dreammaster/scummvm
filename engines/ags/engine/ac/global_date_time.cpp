@@ -24,6 +24,7 @@
 #include "ags/engine/ac/global_date_time.h"
 #include "ags/engine/ac/date_time.h"
 #include "ags/shared/ac/common.h"
+#include "common/system.h"
 
 namespace AGS3 {
 
@@ -45,8 +46,7 @@ int sc_GetTime(int whatti) {
 }
 
 int GetRawTime() {
-	// TODO: we might need to modify script API to support larger time type
-	return static_cast<int>(time(nullptr));
+	return g_system->getMillis();
 }
 
 } // namespace AGS3

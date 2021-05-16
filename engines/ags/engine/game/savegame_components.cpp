@@ -619,12 +619,12 @@ HSaveError WriteGUI(Stream *out)
     WriteFormatTag(out, "GUISliders");
     out->WriteInt32(numguislider);
     for (int i = 0; i < numguislider; ++i)
-        guislider[i].WriteToSavegame(out);
+        _GP(guislider)[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUITextBoxes");
     out->WriteInt32(numguitext);
     for (int i = 0; i < numguitext; ++i)
-        guitext[i].WriteToSavegame(out);
+        _GP(guitext)[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUIListBoxes");
     out->WriteInt32(_G(numguilist));
@@ -677,14 +677,14 @@ HSaveError ReadGUI(Stream *in, int32_t cmp_ver, const PreservedParams &pp, Resto
     if (!AssertGameContent(err, in->ReadInt32(), numguislider, "GUI Sliders"))
         return err;
     for (int i = 0; i < numguislider; ++i)
-        guislider[i].ReadFromSavegame(in, svg_ver);
+        _GP(guislider)[i].ReadFromSavegame(in, svg_ver);
 
     if (!AssertFormatTagStrict(err, in, "GUITextBoxes"))
         return err;
     if (!AssertGameContent(err, in->ReadInt32(), numguitext, "GUI TextBoxes"))
         return err;
     for (int i = 0; i < numguitext; ++i)
-        guitext[i].ReadFromSavegame(in, svg_ver);
+        _GP(guitext)[i].ReadFromSavegame(in, svg_ver);
 
     if (!AssertFormatTagStrict(err, in, "GUIListBoxes"))
         return err;

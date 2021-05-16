@@ -20,22 +20,16 @@
  *
  */
 
-//include <stdlib.h>
-//include <string.h>
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/cc_script.h"
 #include "ags/shared/script/script_common.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_compat.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using AGS::Shared::Stream;
-
-// currently executed line
-int _G(currentline);
-// script file format signature
-const char _G(scfilesig)[5] = "SCOM";
 
 // [IKM] I reckon this function is almost identical to fgetstring in string_utils
 void freadstring(char **strptr, Stream *in) {
@@ -296,7 +290,7 @@ bool ccScript::Read(Stream *in) {
 		sectionOffsets = nullptr;
 	}
 
-	if (in->ReadInt32() != ENDFILESIG) {
+	if ((uint32)in->ReadInt32() != ENDFILESIG) {
 		cc_error("internal error rebuilding script");
 		return false;
 	}

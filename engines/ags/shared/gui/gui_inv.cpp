@@ -27,10 +27,6 @@
 #include "ags/shared/util/stream.h"
 
 namespace AGS3 {
-
-std::vector<AGS::Shared::GUIInvWindow> _GP(guiinv);
-int _G(numguiinv) = 0;
-
 namespace AGS {
 namespace Shared {
 

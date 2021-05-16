@@ -43,9 +43,6 @@ using namespace AGS::Shared;
 
 #define MOVER_MOUSEDOWNLOCKED -4000
 
-int _G(all_buttons_disabled) = 0, _G(gui_inv_pic) = -1;
-int _G(gui_disabled_style) = 0;
-
 namespace AGS {
 namespace Shared {
 
@@ -99,7 +96,7 @@ int GUIMain::FindControlUnderMouse(int leeway, bool must_be_clickable) const {
 				continue;
 			if (!_controls[i]->IsClickable() && must_be_clickable)
 				continue;
-			if (_controls[i]->IsOverControl(mousex, mousey, leeway))
+			if (_controls[i]->IsOverControl(_G(mousex), _G(mousey), leeway))
 				return i;
 		}
 	} else {
@@ -109,7 +106,7 @@ int GUIMain::FindControlUnderMouse(int leeway, bool must_be_clickable) const {
 				continue;
 			if (!_controls[ctrl_index]->IsClickable() && must_be_clickable)
 				continue;
-			if (_controls[ctrl_index]->IsOverControl(mousex, mousey, leeway))
+			if (_controls[ctrl_index]->IsOverControl(_G(mousex), _G(mousey), leeway))
 				return ctrl_index;
 		}
 	}
@@ -289,15 +286,15 @@ void GUIMain::DrawBlob(Bitmap *ds, int x, int y, color_t draw_color) {
 }
 
 void GUIMain::Poll() {
-	int mxwas = mousex, mywas = mousey;
+	int mxwas = _G(mousex), mywas = _G(mousey);
 
-	mousex -= X;
-	mousey -= Y;
-	if (mousex != MouseWasAt.X || mousey != MouseWasAt.Y) {
+	_G(mousex) -= X;
+	_G(mousey) -= Y;
+	if (_G(mousex) != MouseWasAt.X || _G(mousey) != MouseWasAt.Y) {
 		int ctrl_index = FindControlUnderMouse();
 
 		if (MouseOverCtrl == MOVER_MOUSEDOWNLOCKED)
-			_controls[MouseDownCtrl]->OnMouseMove(mousex, mousey);
+			_controls[MouseDownCtrl]->OnMouseMove(_G(mousex), _G(mousey));
 		else if (ctrl_index != MouseOverCtrl) {
 			if (MouseOverCtrl >= 0)
 				_controls[MouseOverCtrl]->OnMouseLeave();
@@ -313,18 +310,18 @@ void GUIMain::Poll() {
 				MouseOverCtrl = ctrl_index;
 				if (MouseOverCtrl >= 0) {
 					_controls[MouseOverCtrl]->OnMouseEnter();
-					_controls[MouseOverCtrl]->OnMouseMove(mousex, mousey);
+					_controls[MouseOverCtrl]->OnMouseMove(_G(mousex), _G(mousey));
 				}
 			}
 			MarkChanged(); // TODO: only do if anything really changed
 		} else if (MouseOverCtrl >= 0)
-			_controls[MouseOverCtrl]->OnMouseMove(mousex, mousey);
+			_controls[MouseOverCtrl]->OnMouseMove(_G(mousex), _G(mousey));
 	}
 
-	MouseWasAt.X = mousex;
-	MouseWasAt.Y = mousey;
-	mousex = mxwas;
-	mousey = mywas;
+	MouseWasAt.X = _G(mousex);
+	MouseWasAt.Y = _G(mousey);
+	_G(mousex) = mxwas;
+	_G(mousey) = mywas;
 }
 
 HError GUIMain::RebuildArray() {
@@ -346,9 +343,9 @@ HError GUIMain::RebuildArray() {
 		else if (thistype == kGUIInvWindow)
 			_controls[i] = &_GP(guiinv)[thisnum];
 		else if (thistype == kGUISlider)
-			_controls[i] = &guislider[thisnum];
+			_controls[i] = &_GP(guislider)[thisnum];
 		else if (thistype == kGUITextBox)
-			_controls[i] = &guitext[thisnum];
+			_controls[i] = &_GP(guitext)[thisnum];
 		else if (thistype == kGUIListBox)
 			_controls[i] = &_GP(guilist)[thisnum];
 		else
@@ -462,7 +459,7 @@ void GUIMain::OnMouseButtonDown() {
 	MouseDownCtrl = MouseOverCtrl;
 	if (_controls[MouseOverCtrl]->OnMouseDown())
 		MouseOverCtrl = MOVER_MOUSEDOWNLOCKED;
-	_controls[MouseDownCtrl]->OnMouseMove(mousex - X, mousey - Y);
+	_controls[MouseDownCtrl]->OnMouseMove(_G(mousex) - X, _G(mousey) - Y);
 	MarkChanged(); // TODO: only do if anything really changed
 }
 
@@ -692,7 +689,7 @@ GUILabelMacro FindLabelMacros(const String &text) {
 				// Test which macro it is (if any)
 				macro_at++;
 				const size_t macro_len = ptr - macro_at;
-				if (macro_len == -1 || macro_len > 20); // skip zero-length or too long substrings
+				if (macro_len == (size_t)-1 || macro_len > 20); // skip zero-length or too long substrings
 				else if (ags_strnicmp(macro_at, "gamename", macro_len) == 0)
 					macro_flags |= kLabelMacro_Gamename;
 				else if (ags_strnicmp(macro_at, "overhotspot", macro_len) == 0)
@@ -809,18 +806,18 @@ HError ReadGUI(std::vector<GUIMain> &guis, Stream *in, bool is_savegame) {
 
 	if (GameGuiVersion >= kGuiVersion_214) {
 		// sliders
-		numguislider = in->ReadInt32();
-		guislider.resize(numguislider);
-		for (int i = 0; i < numguislider; ++i) {
-			guislider[i].ReadFromFile(in, GameGuiVersion);
+		_G(numguislider) = in->ReadInt32();
+		_GP(guislider).resize(_G(numguislider));
+		for (int i = 0; i < _G(numguislider); ++i) {
+			_GP(guislider)[i].ReadFromFile(in, GameGuiVersion);
 		}
 	}
 	if (GameGuiVersion >= kGuiVersion_222) {
 		// text boxes
-		numguitext = in->ReadInt32();
-		guitext.resize(numguitext);
-		for (int i = 0; i < numguitext; ++i) {
-			guitext[i].ReadFromFile(in, GameGuiVersion);
+		_G(numguitext) = in->ReadInt32();
+		_GP(guitext).resize(_G(numguitext));
+		for (int i = 0; i < _G(numguitext); ++i) {
+			_GP(guitext)[i].ReadFromFile(in, GameGuiVersion);
 		}
 	}
 	if (GameGuiVersion >= kGuiVersion_230) {
@@ -854,13 +851,13 @@ void WriteGUI(const std::vector<GUIMain> &guis, Stream *out) {
 	for (int i = 0; i < _G(numguiinv); ++i) {
 		_GP(guiinv)[i].WriteToFile(out);
 	}
-	out->WriteInt32(numguislider);
-	for (int i = 0; i < numguislider; ++i) {
-		guislider[i].WriteToFile(out);
+	out->WriteInt32(_G(numguislider));
+	for (int i = 0; i < _G(numguislider); ++i) {
+		_GP(guislider)[i].WriteToFile(out);
 	}
-	out->WriteInt32(numguitext);
-	for (int i = 0; i < numguitext; ++i) {
-		guitext[i].WriteToFile(out);
+	out->WriteInt32(_G(numguitext));
+	for (int i = 0; i < _G(numguitext); ++i) {
+		_GP(guitext)[i].WriteToFile(out);
 	}
 	out->WriteInt32(_G(numguilist));
 	for (int i = 0; i < _G(numguilist); ++i) {

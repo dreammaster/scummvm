@@ -27,10 +27,6 @@
 #include "ags/shared/util/string_utils.h"
 
 namespace AGS3 {
-
-std::vector<AGS::Shared::GUIListBox> _GP(guilist);
-int _G(numguilist) = 0;
-
 namespace AGS {
 namespace Shared {
 

@@ -66,12 +66,6 @@ MODULE_OBJS = \
 	shared/gui/gui_object.o \
 	shared/gui/gui_slider.o \
 	shared/gui/gui_textbox.o \
-	shared/gui/custom_properties.o \
-	shared/gui/interactions.o \
-	shared/gui/main_game_file.o \
-	shared/gui/room_file.o \
-	shared/gui/room_file_deprecated.o \
-	shared/gui/room_struct.o \
 	shared/script/cc_error.o \
 	shared/script/cc_options.o \
 	shared/script/cc_script.o \

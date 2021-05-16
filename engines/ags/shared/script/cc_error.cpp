@@ -23,6 +23,7 @@
 #include "ags/lib/std/utility.h"
 #include "ags/shared/script/script_common.h"  // current_line
 #include "ags/shared/util/string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -32,13 +33,6 @@ using namespace AGS::Shared;
 extern std::pair<String, String> cc_error_at_line(const char *error_msg);
 // Returns script error message without location or callstack
 extern String cc_error_without_line(const char *error_msg);
-
-int _G(ccError) = 0;
-int _G(ccErrorLine) = 0;
-String _G(ccErrorString);
-String _G(ccErrorCallStack);
-bool _G(ccErrorIsUserError) = false;
-const char *_G(ccCurScriptName) = "";
 
 void cc_error(const char *descr, ...) {
 	_G(ccErrorIsUserError) = false;

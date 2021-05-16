@@ -27,9 +27,6 @@
 
 namespace AGS3 {
 
-std::vector<AGS::Shared::GUISlider> guislider;
-int numguislider = 0;
-
 namespace AGS {
 namespace Shared {
 

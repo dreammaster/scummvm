@@ -21,10 +21,9 @@
  */
 
 #include "ags/shared/script/cc_options.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-int _G(ccCompOptions) = SCOPT_LEFTTORIGHT;
 
 void ccSetOption(int optbit, int onoroff) {
 	if (onoroff)

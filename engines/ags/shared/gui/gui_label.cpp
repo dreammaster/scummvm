@@ -27,13 +27,9 @@
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_utils.h"
 
-namespace AGS3 {
-
-std::vector<AGS::Shared::GUILabel> _GP(guilabels);
-int _G(numguilabels) = 0;
-
 #define GUILABEL_TEXTLENGTH_PRE272 200
 
+namespace AGS3 {
 namespace AGS {
 namespace Shared {
 

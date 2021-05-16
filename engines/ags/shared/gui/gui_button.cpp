@@ -25,11 +25,9 @@
 #include "ags/shared/gui/gui_main.h" // TODO: extract helper functions
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_utils.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-std::vector<AGS::Shared::GUIButton> _GP(guibuts);
-int _G(numguibuts) = 0;
 
 namespace AGS {
 namespace Shared {
@@ -54,6 +52,8 @@ FrameAlignment ConvertLegacyButtonAlignment(LegacyButtonAlignment align) {
 		return kAlignBottomCenter;
 	case kLegacyButtonAlign_BottomRight:
 		return kAlignBottomRight;
+	default:
+		break;
 	}
 	return kAlignNone;
 }
