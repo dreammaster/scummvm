@@ -456,7 +456,7 @@ void GameState::ReadFromSavegame(Shared::Stream *in, GameStateSvgVersion svg_ver
 	dialog_options_highlight_color = in->ReadInt32();
 	if (old_save)
 		in->ReadArrayOfInt32(reserved, GAME_STATE_RESERVED_INTS);
-	// ** up to here is referenced in the script "_GP(game)." object
+	// ** up to here is referenced in the script "game." object
 	if (old_save) {
 		in->ReadInt32(); // recording
 		in->ReadInt32(); // playback
@@ -672,7 +672,7 @@ void GameState::WriteForSavegame(Shared::Stream *out) const {
 	out->WriteInt32(speech_portrait_y);
 	out->WriteInt32(speech_display_post_time_ms);
 	out->WriteInt32(dialog_options_highlight_color);
-	// ** up to here is referenced in the script "_GP(game)." object
+	// ** up to here is referenced in the script "game." object
 	out->WriteInt32(randseed);    // random seed
 	out->WriteInt32(player_on_region);    // player's current region
 	out->WriteInt32(check_interaction_only);

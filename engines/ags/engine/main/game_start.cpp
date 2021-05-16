@@ -53,7 +53,7 @@ extern int _G(our_eip), _G(displayed_room);
 extern volatile char _G(want_exit), abort_engine;
 
 
-extern const char *loadSaveGameOnStartup;
+
 
 
 
@@ -75,14 +75,14 @@ void start_game_init_editor_debugging() {
 }
 
 void start_game_load_savegame_on_startup() {
-	if (loadSaveGameOnStartup != nullptr) {
+	if (_G(loadSaveGameOnStartup) != nullptr) {
 		int saveGameNumber = 1000;
-		const char *sgName = strstr(loadSaveGameOnStartup, "agssave.");
+		const char *sgName = strstr(_G(loadSaveGameOnStartup), "agssave.");
 		if (sgName != nullptr) {
 			sscanf(sgName, "agssave.%03d", &saveGameNumber);
 		}
 		current_fade_out_effect();
-		try_restore_save(loadSaveGameOnStartup, saveGameNumber);
+		try_restore_save(_G(loadSaveGameOnStartup), saveGameNumber);
 	}
 }
 
@@ -123,7 +123,7 @@ void do_start_game() {
 		start_game();
 }
 
-void initialize_start_and_play_game(int override_start_room, const char *loadSaveGameOnStartup) {
+void initialize_start_and_play_game(int override_start_room, const char *_G(loadSaveGameOnStartup)) {
 	try { // BEGIN try for ALI3DEXception
 
 		set_cursor_mode(MODE_WALK);

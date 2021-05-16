@@ -920,7 +920,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
     //  MSS_CHECK_ALL_BLOCKS;
 }
 
-extern int psp_clear_cache_on_room_change;
+extern int _G(psp_clear_cache_on_room_change);
 
 // new_room: changes the current room number, and loads the new room from disk
 void new_room(int newnum,CharacterInfo*forchar) {
@@ -955,7 +955,7 @@ void new_room(int newnum,CharacterInfo*forchar) {
     // change rooms
     unload_old_room();
 
-    if (psp_clear_cache_on_room_change)
+    if (_G(psp_clear_cache_on_room_change))
     {
         // Delete all cached sprites
         _GP(spriteset).DisposeAll();

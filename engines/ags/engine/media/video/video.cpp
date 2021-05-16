@@ -56,7 +56,7 @@ using namespace AGS::Engine;
 
 
 
-extern int psp_video_framedrop;
+extern int _G(psp_video_framedrop);
 
 enum VideoPlaybackType {
 	kVideoNone,
@@ -355,7 +355,7 @@ void play_theora_video(const char *name, int skip, int flags) {
 	// playing if the file is large because it seeks through the whole thing
 	apeg_disable_length_detection(TRUE);
 	// Disable framedrop because it can lead to the PSP not playing the video at all.
-	apeg_enable_framedrop(psp_video_framedrop);
+	apeg_enable_framedrop(_G(psp_video_framedrop));
 	update_polled_stuff_if_runtime();
 
 	stretch_flc = (flags % 10);

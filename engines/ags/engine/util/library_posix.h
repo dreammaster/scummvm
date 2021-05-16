@@ -34,7 +34,7 @@ namespace AGS3 {
 #if AGS_PLATFORM_OS_ANDROID
 extern char android_app_directory[256];
 #else
-extern AGS::Shared::String _G(appDirectory);
+
 #endif
 
 

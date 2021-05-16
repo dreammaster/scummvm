@@ -1416,7 +1416,7 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
         light_level = _GP(objs)[aa].tint_light;
     }
     else {
-        // get the _GP(ambient) or region tint
+        // get the ambient or region tint
         int ignoreRegionTints = 1;
         if (_GP(objs)[aa].flags & OBJF_USEREGIONTINTS)
             ignoreRegionTints = 0;

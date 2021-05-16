@@ -90,7 +90,7 @@ using namespace AGS::Engine;
 extern char _G(check_dynamic_sprites_at_exit);
 
 extern volatile char _G(want_exit), abort_engine;
-extern bool justRunSetup;
+extern bool _G(justRunSetup);
 
 
 extern int _G(proper_exit);
@@ -102,7 +102,7 @@ extern char _G(pexbuf)[STD_BUFFER_SIZE];
 
 
 extern int _G(eip_guiobj);
-extern SpeechLipSyncLine *_G(splipsync);
+
 extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 
 
@@ -531,14 +531,14 @@ int engine_load_game_data()
 
 int engine_check_register_game()
 {
-    if (justRegisterGame) 
+    if (_G(justRegisterGame)) 
     {
         platform->RegisterGameWithGameExplorer();
         _G(proper_exit) = 1;
         return EXIT_NORMAL;
     }
 
-    if (justUnRegisterGame) 
+    if (_G(justUnRegisterGame)) 
     {
         platform->UnRegisterGameWithGameExplorer();
         _G(proper_exit) = 1;
@@ -1149,7 +1149,7 @@ void engine_read_config(ConfigTree &cfg)
     // Apply overriding options from mobile port settings
     // TODO: normally, those should be instead stored in the same config file in a uniform way
     // NOTE: the variable is historically called "ignore" but we use it in "override" meaning here
-    if (psp_ignore_acsetup_cfg_file)
+    if (_G(psp_ignore_acsetup_cfg_file))
         override_config_ext(cfg);
 }
 
@@ -1176,7 +1176,7 @@ void engine_set_config(const ConfigTree cfg)
 //
 // --tell command support: printing engine/game info by request
 //
-extern std::set<String> tellInfoKeys;
+extern std::set<String> _G(tellInfoKeys);
 static bool print_info_needs_game(const std::set<String> &keys)
 {
     return keys.count("all") > 0 || keys.count("config") > 0 || keys.count("configpath") > 0 ||
@@ -1278,9 +1278,9 @@ int initialize_engine(const ConfigTree &startup_opts)
 
     //-----------------------------------------------------
     // Locate game data and assemble game config
-    if (justTellInfo && !print_info_needs_game(tellInfoKeys))
+    if (_G(justTellInfo) && !print_info_needs_game(_G(tellInfoKeys)))
     {
-        engine_print_info(tellInfoKeys, nullptr);
+        engine_print_info(_G(tellInfoKeys), nullptr);
         return EXIT_NORMAL;
     }
 
@@ -1289,7 +1289,7 @@ int initialize_engine(const ConfigTree &startup_opts)
     ConfigTree cfg;
     engine_prepare_config(cfg, startup_opts);
     // Test if need to run built-in setup program (where available)
-    if (!justTellInfo && justRunSetup)
+    if (!_G(justTellInfo) && _G(justRunSetup))
     {
         int res;
         if (!engine_run_setup(cfg, res))
@@ -1298,9 +1298,9 @@ int initialize_engine(const ConfigTree &startup_opts)
     // Set up game options from user config
     engine_set_config(cfg);
     engine_force_window();
-    if (justTellInfo)
+    if (_G(justTellInfo))
     {
-        engine_print_info(tellInfoKeys, &cfg);
+        engine_print_info(_G(tellInfoKeys), &cfg);
         return EXIT_NORMAL;
     }
 
@@ -1410,7 +1410,7 @@ int initialize_engine(const ConfigTree &startup_opts)
 
 	allegro_bitmap_test_init();
 
-    initialize_start_and_play_game(override_start_room, loadSaveGameOnStartup);
+    initialize_start_and_play_game(override_start_room, _G(loadSaveGameOnStartup));
 
     quit("|bye!");
     return EXIT_NORMAL;

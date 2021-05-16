@@ -507,7 +507,7 @@ void UpgradeAudio(GameSetupStruct &game, GameDataVersion data_ver) {
 	std::vector<AudioClipType> audiocliptypes;
 	std::vector<ScriptAudioClip> audioclips;
 
-	// TODO: find out what is 4 (maybe music, sound, _GP(ambient) sound, voice?)
+	// TODO: find out what is 4 (maybe music, sound, ambient sound, voice?)
 	audiocliptypes.resize(4);
 	for (int i = 0; i < 4; i++) {
 		audiocliptypes[i].reservedChannels = 1;

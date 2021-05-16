@@ -535,9 +535,9 @@ void stop_and_destroy_channel_ex(int chid, bool resetLegacyMusicSettings)
         _GP(play).crossfading_in_channel = 0;
     if (_GP(play).crossfading_out_channel == chid)
         _GP(play).crossfading_out_channel = 0;
-    // don't update '_G(crossFading)' here as it is updated in all the cross-fading functions.
+    // don't update 'crossFading' here as it is updated in all the cross-fading functions.
 
-    // destroyed an _GP(ambient) sound channel
+    // destroyed an ambient sound channel
     if (_GP(ambient)[chid].channel > 0)
         _GP(ambient)[chid].channel = 0;
 
@@ -599,9 +599,6 @@ SOUNDCLIP *load_sound_clip_from_old_style_number(bool isMusic, int indexNumber, 
 }
 
 //=============================================================================
-
-// TODO: double check that _GP(ambient) sounds array actually needs +1
-std::array<AmbientSound,MAX_SOUND_CHANNELS+1> _GP(ambient);
 
 int get_volume_adjusted_for_distance(int volume, int sndX, int sndY, int sndMaxDist)
 {
@@ -669,7 +666,7 @@ void update_ambient_sound_vol ()
                 sourceVolume = 255;
         }
 
-        // Adjust _GP(ambient) volume so it maxes out at overall sound volume
+        // Adjust ambient volume so it maxes out at overall sound volume
         int ambientvol = (sourceVolume * _GP(play).sound_volume) / 255;
 
         int wantvol;
@@ -708,7 +705,7 @@ void stop_all_sound_and_music()
     stop_voice_nonblocking();
     // make sure it doesn't start crossfading when it comes back
     _G(crossFading) = 0;
-    // any _GP(ambient) sound will be aborted
+    // any ambient sound will be aborted
     for (int i = 0; i <= MAX_SOUND_CHANNELS; ++i)
         stop_and_destroy_channel(i);
 }

@@ -959,13 +959,13 @@ public:
 	// Startup flags, set from parameters to engine
 	int _force_window = 0;
 	int _override_start_room = 0;
-//	bool _justDisplayHelp = false;
-//	bool _justDisplayVersion = false;
-//	bool _justRunSetup = false;
-//	bool _justRegisterGame = false;
-//	bool _justUnRegisterGame = false;
-//	bool _justTellInfo = false;
-//	std::set<String> _tellInfoKeys;
+	bool _justDisplayHelp = false;
+	bool _justDisplayVersion = false;
+	bool _justRunSetup = false;
+	bool _justRegisterGame = false;
+	bool _justUnRegisterGame = false;
+	bool _justTellInfo = false;
+	std::set<String> _tellInfoKeys;
 	int _loadSaveGameOnStartup = -1;
 
 #if ! AGS_PLATFORM_DEFINES_PSP_VARS

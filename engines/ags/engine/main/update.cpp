@@ -69,7 +69,7 @@ extern int _G(face_talking), _G(facetalkview), _G(facetalkwait), _G(facetalkfram
 extern int _G(facetalkloop), _G(facetalkrepeat), _G(facetalkAllowBlink);
 extern int _G(facetalkBlinkLoop);
 extern bool _G(facetalk_qfg4_override_placement_x), _G(facetalk_qfg4_override_placement_y);
-extern SpeechLipSyncLine *_G(splipsync);
+
 extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 extern int _G(is_text_overlay);
 

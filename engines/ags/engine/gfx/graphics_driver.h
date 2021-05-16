@@ -29,6 +29,7 @@
 #ifndef AGS_ENGINE_GFX_GRAPHICS_DRIVER_H
 #define AGS_ENGINE_GFX_GRAPHICS_DRIVER_H
 
+#include "math/matrix.h"
 #include "ags/lib/std/memory.h"
 #include "ags/lib/allegro.h" // RGB, PALETTE
 //include <glm/mat4x4.hpp>
@@ -83,9 +84,9 @@ struct SpriteTransform {
 
 // Describes 3 render matrixes: world, view and projection
 struct RenderMatrixes {
-	glm::mat4 World;
-	glm::mat4 View;
-	glm::mat4 Projection;
+	Math::Matrix<4, 4> World;
+	Math::Matrix<4, 4> View;
+	Math::Matrix<4, 4> Projection;
 };
 
 

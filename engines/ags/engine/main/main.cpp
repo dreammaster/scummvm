@@ -81,24 +81,24 @@ int    global_argc = 0;
 // Startup flags, set from parameters to engine
 int force_window = 0;
 int override_start_room = 0;
-bool justDisplayHelp = false;
-bool justDisplayVersion = false;
-bool justRunSetup = false;
-bool justRegisterGame = false;
-bool justUnRegisterGame = false;
-bool justTellInfo = false;
+bool _G(justDisplayHelp) = false;
+bool _G(justDisplayVersion) = false;
+bool _G(justRunSetup) = false;
+bool _G(justRegisterGame) = false;
+bool _G(justUnRegisterGame) = false;
+bool _G(justTellInfo) = false;
 bool attachToParentConsole = false;
 bool hideMessageBoxes = false;
-std::set<String> tellInfoKeys;
-const char *loadSaveGameOnStartup = nullptr;
+std::set<String> _G(tellInfoKeys);
+const char *_G(loadSaveGameOnStartup) = nullptr;
 
 #if ! AGS_PLATFORM_DEFINES_PSP_VARS
-int psp_video_framedrop = 1;
-int psp_ignore_acsetup_cfg_file = 0;
-int psp_clear_cache_on_room_change = 0; // clear --sprite cache-- when room is unloaded
+int _G(psp_video_framedrop) = 1;
+int _G(psp_ignore_acsetup_cfg_file) = 0;
+int _G(psp_clear_cache_on_room_change) = 0; // clear --sprite cache-- when room is unloaded
 
-char psp_game_file_name[] = "";
-char psp_translation[] = "default";
+char _G(psp_game_file_name)[] = "";
+char _G(psp_translation)[] = "default";
 
 int psp_gfx_renderer = 0;
 int psp_gfx_scaling = 1;
@@ -257,10 +257,10 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 		// Startup options
 		//
 		if (ags_stricmp(arg, "--help") == 0 || ags_stricmp(arg, "/?") == 0 || ags_stricmp(arg, "-?") == 0) {
-			justDisplayHelp = true;
+			_G(justDisplayHelp) = true;
 		}
 		if (ags_stricmp(arg, "-v") == 0 || ags_stricmp(arg, "--version") == 0) {
-			justDisplayVersion = true;
+			_G(justDisplayVersion) = true;
 		} else if (ags_stricmp(arg, "--updatereg") == 0)
 			_G(debug_flags) |= DBG_REGONLY;
 		else if ((ags_stricmp(arg, "--startr") == 0) && (ee < argc - 1)) {
@@ -268,13 +268,13 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 			ee++;
 		} else if (ags_stricmp(arg, "--noexceptionhandler") == 0) _GP(usetup).disable_exception_handling = true;
 		else if (ags_stricmp(arg, "--setup") == 0) {
-			justRunSetup = true;
+			_G(justRunSetup) = true;
 		} else if (ags_stricmp(arg, "--registergame") == 0) {
-			justRegisterGame = true;
+			_G(justRegisterGame) = true;
 		} else if (ags_stricmp(arg, "--unregistergame") == 0) {
-			justUnRegisterGame = true;
+			_G(justUnRegisterGame) = true;
 		} else if ((ags_stricmp(arg, "--loadsavedgame") == 0) && (argc > ee + 1)) {
-			loadSaveGameOnStartup = argv[ee + 1];
+			_G(loadSaveGameOnStartup) = argv[ee + 1];
 			ee++;
 		} else if ((ags_stricmp(arg, "--enabledebugger") == 0) && (argc > ee + 1)) {
 			strcpy(_G(editor_debugger_instance_token), argv[ee + 1]);
@@ -300,9 +300,9 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 			ee += 2;
 		} else if (ags_strnicmp(arg, "--tell", 6) == 0) {
 			if (arg[6] == 0)
-				tellInfoKeys.insert(String("all"));
+				_G(tellInfoKeys).insert(String("all"));
 			else if (arg[6] == '-' && arg[7] != 0)
-				tellInfoKeys.insert(String(arg + 7));
+				_G(tellInfoKeys).insert(String(arg + 7));
 		}
 		//
 		// Config overrides
@@ -354,11 +354,11 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 		cmdGameDataPath = GetPathFromCmdArg(datafile_argv);
 	} else {
 		// assign standard path for mobile/consoles (defined in their own platform implementation)
-		cmdGameDataPath = psp_game_file_name;
+		cmdGameDataPath = _G(psp_game_file_name);
 	}
 
-	if (tellInfoKeys.size() > 0)
-		justTellInfo = true;
+	if (_G(tellInfoKeys).size() > 0)
+		_G(justTellInfo) = true;
 
 	return 0;
 }
@@ -413,20 +413,20 @@ int ags_entry_point(int argc, char *argv[]) {
 	if (attachToParentConsole)
 		platform->AttachToParentConsole();
 
-	if (justDisplayVersion) {
+	if (_G(justDisplayVersion)) {
 		platform->WriteStdOut(get_engine_string());
 		return EXIT_NORMAL;
 	}
 
-	if (justDisplayHelp) {
+	if (_G(justDisplayHelp)) {
 		main_print_help();
 		return EXIT_NORMAL;
 	}
 
-	if (!justTellInfo && !hideMessageBoxes)
+	if (!_G(justTellInfo) && !hideMessageBoxes)
 		platform->SetGUIMode(true);
 
-	init_debug(startup_opts, justTellInfo);
+	init_debug(startup_opts, _G(justTellInfo));
 	Debug::Printf(kDbgMsg_Alert, get_engine_string());
 
 	main_set_gamedir(argc, argv);

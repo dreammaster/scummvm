@@ -137,7 +137,7 @@ struct SavegameDescription {
 	// Name of the engine that saved the game
 	String              EngineName;
 	// Version of the engine that saved the game
-	Version             _G(EngineVersion);
+	Version             EngineVersion;
 	// Guid of the game which made this save
 	String              GameGuid;
 	// Legacy uniqueid of the game, for use in older games with no GUID

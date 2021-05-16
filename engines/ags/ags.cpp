@@ -90,12 +90,12 @@ AGSEngine::AGSEngine(OSystem *syst, const AGSGameDescription *gameDesc) : Engine
 }
 
 AGSEngine::~AGSEngine() {
-	if (_G(_G(proper_exit)) == 0) {
+	if (_G(proper_exit) == 0) {
 		_G(platform)->DisplayAlert("Error: the program has exited without requesting it.\n"
 			"Program pointer: %+03d  (write this number down), ACI version %s\n"
 			"If you see a list of numbers above, please write them down and contact\n"
 			"developers. Otherwise, note down any other information displayed.",
-			_G(_G(our_eip)), _G(EngineVersion).LongString.GetCStr());
+			_G(our_eip), _G(EngineVersion).LongString.GetCStr());
 	}
 
 	delete _screen;
@@ -216,12 +216,12 @@ void AGSEngine::setGraphicsMode(size_t w, size_t h) {
 }
 
 bool AGSEngine::canLoadGameStateCurrently() {
-	return !_GP(_GP(thisroom)).Options.SaveLoadDisabled &&
+	return !_GP(thisroom).Options.SaveLoadDisabled &&
 		!_G(inside_script) && !_GP(play).fast_forward && !_G(no_blocking_functions);
 }
 
 bool AGSEngine::canSaveGameStateCurrently() {
-	return !_GP(_GP(thisroom)).Options.SaveLoadDisabled &&
+	return !_GP(thisroom).Options.SaveLoadDisabled &&
 		!_G(inside_script) && !_GP(play).fast_forward && !_G(no_blocking_functions);
 }
 

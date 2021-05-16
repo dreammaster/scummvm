@@ -41,13 +41,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-
-
-
-
-extern SpeechLipSyncLine *_G(splipsync);
-extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
-
 void StopAmbientSound(int channel) {
 	if ((channel < 0) || (channel >= MAX_SOUND_CHANNELS))
 		quit("!StopAmbientSound: invalid channel");
@@ -60,7 +53,7 @@ void StopAmbientSound(int channel) {
 }
 
 void PlayAmbientSound(int channel, int sndnum, int vol, int x, int y) {
-	// the channel parameter is to allow multiple _GP(ambient) sounds in future
+	// the channel parameter is to allow multiple ambient sounds in future
 	if ((channel < 1) || (channel == SCHAN_SPEECH) || (channel >= MAX_SOUND_CHANNELS))
 		quit("!PlayAmbientSound: invalid channel number");
 	if ((vol < 1) || (vol > 255))
@@ -75,19 +68,19 @@ void PlayAmbientSound(int channel, int sndnum, int vol, int x, int y) {
 		(_GP(ambient)[channel].num != sndnum)) {
 
 		StopAmbientSound(channel);
-		// in case a normal non-_GP(ambient) sound was playing, stop it too
+		// in case a normal non-ambient sound was playing, stop it too
 		stop_and_destroy_channel(channel);
 
 		SOUNDCLIP *asound = aclip ? load_sound_and_play(aclip, true) : nullptr;
 		if (asound == nullptr) {
-			debug_script_warn("Cannot load _GP(ambient) sound %d", sndnum);
-			debug_script_log("FAILED to load _GP(ambient) sound %d", sndnum);
+			debug_script_warn("Cannot load ambient sound %d", sndnum);
+			debug_script_log("FAILED to load ambient sound %d", sndnum);
 			return;
 		}
 
-		debug_script_log("Playing _GP(ambient) sound %d on channel %d", sndnum, channel);
+		debug_script_log("Playing ambient sound %d on channel %d", sndnum, channel);
 		_GP(ambient)[channel].channel = channel;
-		asound->priority = 15;  // _GP(ambient) sound higher priority than normal sfx
+		asound->priority = 15;  // ambient sound higher priority than normal sfx
 		set_clip_to_channel(channel, asound);
 	}
 	// calculate the maximum distance away the player can be, using X
@@ -140,7 +133,7 @@ int PlaySoundEx(int val1, int channel) {
 	if ((channel < SCHAN_NORMAL) || (channel >= MAX_SOUND_CHANNELS))
 		quit("!PlaySoundEx: invalid channel specified, must be 3-7");
 
-	// if an _GP(ambient) sound is playing on this channel, abort it
+	// if an ambient sound is playing on this channel, abort it
 	StopAmbientSound(channel);
 
 	if (val1 < 0) {

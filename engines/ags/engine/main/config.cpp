@@ -266,7 +266,7 @@ extern int psp_gfx_scaling;
 extern int psp_gfx_super_sampling;
 extern int psp_gfx_smoothing;
 extern int psp_gfx_smooth_sprites;
-extern char psp_translation[];
+extern char _G(psp_translation)[];
 #if AGS_PLATFORM_OS_ANDROID
 extern int config_mouse_control_mode;
 #endif
@@ -324,7 +324,7 @@ void override_config_ext(ConfigTree &cfg) {
 #endif
 
 	INIwriteint(cfg, "misc", "antialias", psp_gfx_smooth_sprites != 0);
-	INIwritestring(cfg, "language", "translation", psp_translation);
+	INIwritestring(cfg, "language", "translation", _G(psp_translation));
 }
 
 void apply_config(const ConfigTree &cfg) {
