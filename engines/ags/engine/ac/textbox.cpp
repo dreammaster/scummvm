@@ -20,8 +20,7 @@
  *
  */
 
-//include <string.h>
-#include "ags/shared/ac/textbox.h"
+#include "ags/engine/ac/textbox.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/string.h"
@@ -32,9 +31,6 @@
 #include "ags/globals.h"
 
 namespace AGS3 {
-
-
-
 
 // ** TEXT BOX FUNCTIONS
 
@@ -126,7 +122,7 @@ RuntimeScriptValue Sc_TextBox_SetShowBorder(void *self, const RuntimeScriptValue
 
 // const char* (GUITextBox *texbox)
 RuntimeScriptValue Sc_TextBox_GetText_New(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(GUITextBox, const char *, _GP(myScriptStringImpl), TextBox_GetText_New);
+	API_CONST_OBJCALL_OBJ(GUITextBox, const char *, _GP(myScriptStringImpl), TextBox_GetText_New);
 }
 
 // int (GUITextBox *guit)

@@ -20,8 +20,7 @@
  *
  */
 
-//include <string.h>
-#include "ags/shared/ac/label.h"
+#include "ags/engine/ac/label.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/global_translation.h"
@@ -125,7 +124,7 @@ RuntimeScriptValue Sc_Label_SetFont(void *self, const RuntimeScriptValue *params
 
 // const char* (GUILabel *labl)
 RuntimeScriptValue Sc_Label_GetText_New(void *self, const RuntimeScriptValue *params, int32_t param_count) {
-	API_OBJCALL_OBJ(GUILabel, const char, _GP(myScriptStringImpl), Label_GetText_New);
+	API_CONST_OBJCALL_OBJ(GUILabel, const char, _GP(myScriptStringImpl), Label_GetText_New);
 }
 
 // int (GUILabel *labl)
