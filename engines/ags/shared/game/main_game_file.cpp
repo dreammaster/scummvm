@@ -20,7 +20,6 @@
  *
  */
 
-//include <cstdio>
 #include "ags/shared/ac/audio_clip_type.h"
 #include "ags/shared/ac/dialog_topic.h"
 #include "ags/shared/ac/game_setup_struct.h"
@@ -275,9 +274,9 @@ void ReadViews(GameSetupStruct &game, ViewStruct *&views, Stream *in, GameDataVe
 }
 
 void ReadDialogs(DialogTopic *&dialog,
-	std::vector< std::shared_ptr<unsigned char> > &_G(old_dialog_scripts),
+	std::vector< std::shared_ptr<unsigned char> > &old_dialog_scripts,
 	std::vector<String> &old_dialog_src,
-	std::vector<String> &_G(old_speech_lines),
+	std::vector<String> &old_speech_lines,
 	Stream *in, GameDataVersion data_ver, int dlg_count) {
 	// TODO: I suspect +5 was a hacky way to "supress" memory access mistakes;
 	// double check and remove if proved unnecessary
@@ -289,12 +288,12 @@ void ReadDialogs(DialogTopic *&dialog,
 	if (data_ver > kGameVersion_310)
 		return;
 
-	_G(old_dialog_scripts).resize(dlg_count);
+	old_dialog_scripts.resize(dlg_count);
 	old_dialog_src.resize(dlg_count);
 	for (int i = 0; i < dlg_count; ++i) {
 		// NOTE: originally this was read into dialog[i].optionscripts
-		_G(old_dialog_scripts)[i].reset(new unsigned char[dialog[i].codesize]);
-		in->Read(_G(old_dialog_scripts)[i].get(), dialog[i].codesize);
+		old_dialog_scripts[i].reset(new unsigned char[dialog[i].codesize]);
+		in->Read(old_dialog_scripts[i].get(), dialog[i].codesize);
 
 		// Encrypted text script
 		int script_text_len = in->ReadInt32();
@@ -352,14 +351,14 @@ void ReadDialogs(DialogTopic *&dialog,
 			if (end_reached)
 				break;
 
-			_G(old_speech_lines).push_back(buffer);
+			old_speech_lines.push_back(buffer);
 			i++;
 		}
 	} else {
 		// Encrypted text on > 2.60
 		while (1) {
 			size_t newlen = in->ReadInt32();
-			if (static_cast<int32_t>(newlen) == 0xCAFEBEEF)  // GUI magic
+			if (static_cast<uint32_t>(newlen) == 0xCAFEBEEF)  // GUI magic
 			{
 				in->Seek(-4);
 				break;
@@ -369,7 +368,7 @@ void ReadDialogs(DialogTopic *&dialog,
 			in->Read(buffer, newlen);
 			buffer[newlen] = 0;
 			decrypt_text(buffer);
-			_G(old_speech_lines).push_back(buffer);
+			old_speech_lines.push_back(buffer);
 			i++;
 		}
 	}
@@ -477,7 +476,7 @@ void ApplySpriteData(GameSetupStruct &game, const LoadedGameEntities &ents, Game
 void UpgradeFonts(GameSetupStruct &game, GameDataVersion data_ver) {
 	if (data_ver < kGameVersion_350) {
 		for (int i = 0; i < _GP(game).numfonts; ++i) {
-			FontInfo &finfo = _GP(game)._GP(fonts)[i];
+			FontInfo &finfo = _GP(game).fonts[i];
 			// If the game is hi-res but font is designed for low-res, then scale it up
 			if (_GP(game).IsLegacyHiRes() && _GP(game).options[OPT_HIRES_FONTS] == 0) {
 				finfo.SizeMultiplier = HIRES_COORD_MULTIPLIER;

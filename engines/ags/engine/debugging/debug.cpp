@@ -99,18 +99,18 @@ const String OutputGameConsoleID = "console";
 PDebugOutput create_log_output(const String &name, const String &path = "", LogFile::OpenMode open_mode = LogFile::kLogFile_Overwrite) {
 	// Else create new one, if we know this ID
 	if (name.CompareNoCase(OutputSystemID) == 0) {
-		return _G(DbgMgr).RegisterOutput(OutputSystemID, AGSPlatformDriver::GetDriver(), kDbgMsg_None);
+		return _GP(DbgMgr).RegisterOutput(OutputSystemID, AGSPlatformDriver::GetDriver(), kDbgMsg_None);
 	} else if (name.CompareNoCase(OutputFileID) == 0) {
 		_G(DebugLogFile).reset(new LogFile());
 		String logfile_path = !path.IsEmpty() ? path : Path::ConcatPaths(platform->GetAppOutputDirectory(), "ags.log");
 		if (!_G(DebugLogFile)->OpenFile(logfile_path, open_mode))
 			return nullptr;
 		Debug::Printf(kDbgMsg_Info, "Logging to %s", logfile_path.GetCStr());
-		auto dbgout = _G(DbgMgr).RegisterOutput(OutputFileID, _G(DebugLogFile).get(), kDbgMsg_None);
+		auto dbgout = _GP(DbgMgr).RegisterOutput(OutputFileID, _G(DebugLogFile).get(), kDbgMsg_None);
 		return dbgout;
 	} else if (name.CompareNoCase(OutputGameConsoleID) == 0) {
 		_G(DebugConsole).reset(new ConsoleOutputTarget());
-		return _G(DbgMgr).RegisterOutput(OutputGameConsoleID, _G(DebugConsole).get(), kDbgMsg_None);
+		return _GP(DbgMgr).RegisterOutput(OutputGameConsoleID, _G(DebugConsole).get(), kDbgMsg_None);
 	}
 	return nullptr;
 }
@@ -154,7 +154,7 @@ void apply_log_config(const ConfigTree &cfg, const String &log_id,
 		return;
 
 	// First test if already registered, if not then try create it
-	auto dbgout = _G(DbgMgr).GetOutput(log_id);
+	auto dbgout = _GP(DbgMgr).GetOutput(log_id);
 	const bool was_created_earlier = dbgout != nullptr;
 	if (!dbgout) {
 		String path = INIreadstring(cfg, "log", String::FromFormat("%s-path", log_id.GetCStr()));
@@ -206,7 +206,7 @@ void init_debug(const ConfigTree &cfg, bool stderr_only) {
 
 	// Message buffer to save all messages in case we read different log settings from config file
 	_G(DebugMsgBuff).reset(new MessageBuffer());
-	_G(DbgMgr).RegisterOutput(OutputMsgBufID, _G(DebugMsgBuff).get(), kDbgMsg_All);
+	_GP(DbgMgr).RegisterOutput(OutputMsgBufID, _G(DebugMsgBuff).get(), kDbgMsg_All);
 }
 
 void apply_debug_config(const ConfigTree &cfg) {
@@ -249,13 +249,13 @@ void apply_debug_config(const ConfigTree &cfg) {
 	}
 
 	// We don't need message buffer beyond this point
-	_G(DbgMgr).UnregisterOutput(OutputMsgBufID);
+	_GP(DbgMgr).UnregisterOutput(OutputMsgBufID);
 	_G(DebugMsgBuff).reset();
 }
 
 void shutdown_debug() {
 	// Shutdown output subsystem
-	_G(DbgMgr).UnregisterAll();
+	_GP(DbgMgr).UnregisterAll();
 
 	_G(DebugMsgBuff).reset();
 	_G(DebugLogFile).reset();
@@ -264,7 +264,7 @@ void shutdown_debug() {
 
 void debug_set_console(bool enable) {
 	if (_G(DebugConsole))
-		_G(DbgMgr).GetOutput(OutputGameConsoleID)->SetEnabled(enable);
+		_GP(DbgMgr).GetOutput(OutputGameConsoleID)->SetEnabled(enable);
 }
 
 // Prepends message text with current room number and running script info, then logs result

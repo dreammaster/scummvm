@@ -50,12 +50,12 @@ void MessageBuffer::Send(const String &out_id) {
 	if (_buffer.empty())
 		return;
 	if (_msgLost > 0) {
-		DebugGroup gr = _G(DbgMgr).GetGroup(kDbgGroup_Main);
-		_G(DbgMgr).SendMessage(out_id, DebugMessage(String::FromFormat("WARNING: output %s lost exceeding buffer: %u debug messages\n", out_id.GetCStr(), (unsigned)_msgLost),
+		DebugGroup gr = _GP(DbgMgr).GetGroup(kDbgGroup_Main);
+		_GP(DbgMgr).SendMessage(out_id, DebugMessage(String::FromFormat("WARNING: output %s lost exceeding buffer: %u debug messages\n", out_id.GetCStr(), (unsigned)_msgLost),
 			gr.UID.ID, gr.OutputName, kDbgMsg_All));
 	}
 	for (std::vector<DebugMessage>::const_iterator it = _buffer.begin(); it != _buffer.end(); ++it) {
-		_G(DbgMgr).SendMessage(out_id, *it);
+		_GP(DbgMgr).SendMessage(out_id, *it);
 	}
 }
 

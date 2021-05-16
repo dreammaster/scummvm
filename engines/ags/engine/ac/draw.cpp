@@ -26,6 +26,7 @@
 #include "ags/shared/core/platform.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/util/compress.h"
+#include "ags/shared/util/wgt2_allg.h"
 #include "ags/shared/ac/view.h"
 #include "ags/engine/ac/character_cache.h"
 #include "ags/engine/ac/character_extras.h"
@@ -395,19 +396,19 @@ void create_blank_image(int coldepth)
 {
     // this is the first time that we try to use the graphics driver,
     // so it's the most likey place for a crash
-    try
-    {
+    //try
+    //{
         Bitmap *blank = BitmapHelper::CreateBitmap(16, 16, coldepth);
         blank = ReplaceBitmapWithSupportedFormat(blank);
         blank->Clear();
         _G(blankImage) = _G(gfxDriver)->CreateDDBFromBitmap(blank, false, true);
         _G(blankSidebarImage) = _G(gfxDriver)->CreateDDBFromBitmap(blank, false, true);
         delete blank;
-    }
+    /*}
     catch (Ali3DException gfxException)
     {
         quit((char*)gfxException._message);
-    }
+    }*/
 }
 
 void destroy_blank_image()
@@ -2320,7 +2321,6 @@ void construct_game_scene(bool full_redraw)
         if (_G(displayed_room) >= 0)
         {
             construct_room_view();
-            update_polled_mp3();
         }
         else if (!_G(gfxDriver)->RequiresFullRedrawEachFrame())
         {

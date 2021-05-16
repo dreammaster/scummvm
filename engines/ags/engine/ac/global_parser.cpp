@@ -20,15 +20,13 @@
  *
  */
 
-//include <cstring> //strcpy()
-#include "ags/shared/ac/global_parser.h"
+#include "ags/engine/ac/global_parser.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/string.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-
 
 int SaidUnknownWord(char *buffer) {
 	VALIDATE_STRING(buffer);

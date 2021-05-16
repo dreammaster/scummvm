@@ -20,11 +20,11 @@
  *
  */
 
-//include <string.h>
 #include "ags/lib/std/algorithm.h"
 #include "ags/shared/ac/words_dictionary.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_compat.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -91,8 +91,6 @@ int WordsDictionary::find_index(const char *wrem) {
 	}
 	return -1;
 }
-
-const char *_G(passwencstring) = "Avis Durgan";
 
 void decrypt_text(char *toenc) {
 	int adx = 0;

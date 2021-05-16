@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/global_listbox.h"
+#include "ags/engine/ac/global_listbox.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/listbox.h"
 #include "ags/engine/ac/string.h"

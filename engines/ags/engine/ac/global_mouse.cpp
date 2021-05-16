@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/global_mouse.h"
+#include "ags/engine/ac/global_mouse.h"
 #include "ags/engine/ac/game_state.h"
 
 namespace AGS3 {

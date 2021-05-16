@@ -29,7 +29,7 @@
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_mouse.h"
+#include "ags/engine/ac/global_mouse.h"
 #include "ags/shared/ac/global_plugin.h"
 #include "ags/engine/ac/global_screen.h"
 #include "ags/engine/ac/sys_events.h"

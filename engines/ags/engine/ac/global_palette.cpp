@@ -24,7 +24,7 @@
 #include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_palette.h"
+#include "ags/engine/ac/global_palette.h"
 #include "ags/shared/util/wgt2allg.h"
 
 namespace AGS3 {

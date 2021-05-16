@@ -496,10 +496,10 @@ void SpriteCache::CompressSprite(Bitmap *sprite, Stream *out) {
 			cpackbitl(&sprite->GetScanLineForWriting(y)[0], sprite->GetWidth(), out);
 	} else if (depth == 2) {
 		for (int y = 0; y < sprite->GetHeight(); y++)
-			cpackbitl16((unsigned short *)&sprite->GetScanLine(y)[0], sprite->GetWidth(), out);
+			cpackbitl16((const unsigned short *)&sprite->GetScanLine(y)[0], sprite->GetWidth(), out);
 	} else {
 		for (int y = 0; y < sprite->GetHeight(); y++)
-			cpackbitl32((unsigned int *)&sprite->GetScanLine(y)[0], sprite->GetWidth(), out);
+			cpackbitl32((const unsigned int *)&sprite->GetScanLine(y)[0], sprite->GetWidth(), out);
 	}
 }
 
@@ -684,7 +684,7 @@ int SpriteCache::SaveSpriteIndex(const char *filename, const SpriteFileIndex &in
 
 HError SpriteCache::InitFile(const char *filename, const char *sprindex_filename) {
 	SpriteFileVersion vers;
-	char _G(buff)[20];
+	char buff[20];
 	soff_t spr_initial_offs = 0;
 	int spriteFileID = 0;
 
@@ -696,7 +696,7 @@ HError SpriteCache::InitFile(const char *filename, const char *sprindex_filename
 
 	vers = (SpriteFileVersion)_stream->ReadInt16();
 	// read the "Sprite File" signature
-	_stream->ReadArray(&_G(buff)[0], 13, 1);
+	_stream->ReadArray(&buff[0], 13, 1);
 
 	if (vers < kSprfVersion_Uncompressed || vers > kSprfVersion_Current) {
 		_stream.reset();
@@ -704,8 +704,8 @@ HError SpriteCache::InitFile(const char *filename, const char *sprindex_filename
 	}
 
 	// unknown version
-	_G(buff)[13] = 0;
-	if (strcmp(_G(buff), spriteFileSig)) {
+	buff[13] = 0;
+	if (strcmp(buff, spriteFileSig)) {
 		_stream.reset();
 		return new Error("Uknown _GP(spriteset) format.");
 	}
@@ -866,7 +866,7 @@ void SpriteCache::DetachFile() {
 }
 
 int SpriteCache::AttachFile(const char *filename) {
-	_stream.reset(AssetMgr->OpenAsset((char *)filename));
+	_stream.reset(AssetMgr->OpenAsset(filename));
 	if (_stream == nullptr)
 		return -1;
 	return 0;

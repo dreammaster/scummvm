@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/common.h" // _G(our_eip)
+#include "ags/shared/ac/common.h" // our_eip
 #include "ags/shared/core/asset_manager.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/font/wfn_font.h"
@@ -80,7 +80,7 @@ int WFNFontRenderer::GetTextHeight(const char *text, int fontNumber) {
 
 Bitmap render_wrapper;
 void WFNFontRenderer::RenderText(const char *text, int fontNumber, BITMAP *destination, int x, int y, int colour) {
-	int _G(oldeip) = get_our_eip();
+	int oldeip = get_our_eip();
 	set_our_eip(415);
 
 	const WFNFont *font = _fontData[fontNumber].Font;
@@ -90,7 +90,7 @@ void WFNFontRenderer::RenderText(const char *text, int fontNumber, BITMAP *desti
 	for (; *text; ++text)
 		x += RenderChar(&render_wrapper, x, y, font->GetChar(GetCharCode(*text, font)), params.SizeMultiplier, colour);
 
-	set_our_eip(_G(oldeip));
+	set_our_eip(oldeip);
 }
 
 int RenderChar(Bitmap *ds, const int at_x, const int at_y, const WFNChar &wfn_char, const int scale, const color_t text_color) {

@@ -259,11 +259,11 @@ static void audio_core_entry() {
 		for (auto &entry : g_acore.slots_) {
 			auto &slot = entry.second;
 
-			try {
+			//try {
 				slot->decoder_.Poll();
-			} catch (const std::exception & e) {
+			/*} catch (const std::exception & e) {
 				agsdbg::Printf(ags::kDbgMsg_Error, "OpenALDecoder poll exception %s", e.what());
-			}
+			}*/
 		}
 
 		g_acore.mixer_cv.wait_for(lk, std::chrono::milliseconds(50));

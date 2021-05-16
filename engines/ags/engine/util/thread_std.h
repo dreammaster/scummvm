@@ -60,11 +60,11 @@ public:
 			return false;
 		}
 
-		try {
+		//try {
 			thread_ = std::thread(thread_start_, this);
-		} catch (std::system_error) {
+		/*} catch (std::system_error) {
 			return false;
-		}
+		}*/
 		return thread_.joinable();
 	}
 

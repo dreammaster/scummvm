@@ -761,20 +761,20 @@ bool OGLGraphicsDriver::SetDisplayMode(const DisplayMode &mode)
     return false;
   }
 
-  try
-  {
+  //try
+  //{
     if (!InitGlScreen(mode))
       return false;
     if (!_firstTimeInit)
       FirstTimeInit();
     InitGlParams(mode);
-  }
+  /*}
   catch (Ali3DException exception)
   {
     if (exception._message != SDL_GetError())
       SDL_SetError("%s", exception._message);
     return false;
-  }
+  }*/
 
   OnInit();
 

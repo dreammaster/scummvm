@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/global_overlay.h"
+#include "ags/engine/ac/global_overlay.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/display.h"
 #include "ags/engine/ac/draw.h"

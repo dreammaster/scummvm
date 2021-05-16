@@ -25,7 +25,6 @@
 #include "ags/shared/ac/old_game_setup_struct.h"
 #include "ags/shared/ac/words_dictionary.h"
 #include "ags/shared/ac/dynobj/script_audio_clip.h"
-#include "ags/shared/font/fonts.h"
 #include "ags/shared/game/interactions.h"
 #include "ags/shared/util/aligned_stream.h"
 #include "ags/globals.h"
@@ -122,24 +121,24 @@ void GameSetupStruct::read_font_infos(Shared::Stream *in, GameDataVersion data_v
 	fonts.resize(numfonts);
 	if (data_ver < kGameVersion_350) {
 		for (int i = 0; i < numfonts; ++i)
-			SetFontInfoFromLegacyFlags(_GP(fonts)[i], in->ReadInt8());
+			SetFontInfoFromLegacyFlags(fonts[i], in->ReadInt8());
 		for (int i = 0; i < numfonts; ++i)
-			_GP(fonts)[i].Outline = in->ReadInt8(); // size of char
+			fonts[i].Outline = in->ReadInt8(); // size of char
 		if (data_ver < kGameVersion_341)
 			return;
 		for (int i = 0; i < numfonts; ++i) {
-			_GP(fonts)[i].YOffset = in->ReadInt32();
+			fonts[i].YOffset = in->ReadInt32();
 			if (data_ver >= kGameVersion_341_2)
-				_GP(fonts)[i].LineSpacing = Math::Max(0, in->ReadInt32());
+				fonts[i].LineSpacing = Math::Max(0, in->ReadInt32());
 		}
 	} else {
 		for (int i = 0; i < numfonts; ++i) {
 			uint32_t flags = in->ReadInt32();
-			_GP(fonts)[i].SizePt = in->ReadInt32();
-			_GP(fonts)[i].Outline = in->ReadInt32();
-			_GP(fonts)[i].YOffset = in->ReadInt32();
-			_GP(fonts)[i].LineSpacing = Math::Max(0, in->ReadInt32());
-			AdjustFontInfoUsingFlags(_GP(fonts)[i], flags);
+			fonts[i].SizePt = in->ReadInt32();
+			fonts[i].Outline = in->ReadInt32();
+			fonts[i].YOffset = in->ReadInt32();
+			fonts[i].LineSpacing = Math::Max(0, in->ReadInt32());
+			AdjustFontInfoUsingFlags(fonts[i], flags);
 		}
 	}
 }
@@ -336,12 +335,12 @@ void GameSetupStruct::read_room_names(Stream *in, GameDataVersion data_ver) {
 		roomCount = in->ReadInt32();
 		roomNumbers = new int[roomCount];
 		roomNames = new char *[roomCount];
-		String _G(pexbuf);
+		String pexbuf;
 		for (int bb = 0; bb < roomCount; bb++) {
 			roomNumbers[bb] = in->ReadInt32();
-			_G(pexbuf).Read(in, STD_BUFFER_SIZE);
-			roomNames[bb] = new char[_G(pexbuf).GetLength() + 1];
-			strcpy(roomNames[bb], _G(pexbuf));
+			pexbuf.Read(in, STD_BUFFER_SIZE);
+			roomNames[bb] = new char[pexbuf.GetLength() + 1];
+			strcpy(roomNames[bb], pexbuf);
 		}
 	} else {
 		roomCount = 0;
@@ -407,8 +406,8 @@ void ConvertOldGameStruct(OldGameSetupStruct *ogss, GameSetupStruct *gss) {
 	gss->uniqueid = ogss->uniqueid;
 	gss->numgui = ogss->numgui;
 	for (int i = 0; i < 10; ++i) {
-		SetFontInfoFromLegacyFlags(gss->_GP(fonts)[i], ogss->fontflags[i]);
-		gss->_GP(fonts)[i].Outline = ogss->fontoutline[i];
+		SetFontInfoFromLegacyFlags(gss->fonts[i], ogss->fontflags[i]);
+		gss->fonts[i].Outline = ogss->fontoutline[i];
 	}
 
 	for (int i = 0; i < LEGACY_MAX_SPRITES_V25; ++i) {

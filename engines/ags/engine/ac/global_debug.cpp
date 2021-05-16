@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/global_debug.h"
+#include "ags/engine/ac/global_debug.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/character_info.h"
 #include "ags/engine/ac/draw.h"

@@ -34,6 +34,7 @@
 #include "ags/shared/script/cc_script.h"
 #include "ags/shared/util/compress.h"
 #include "ags/shared/util/string_utils.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -152,6 +153,7 @@ String GetRoomBlockName(RoomFileBlock id) {
 	case kRoomFblk_CompScript3: return "CompScript3";
 	case kRoomFblk_Properties: return "Properties";
 	case kRoomFblk_ObjectScNames: return "ObjScNames";
+	default: break;
 	}
 	return "unknown";
 }
