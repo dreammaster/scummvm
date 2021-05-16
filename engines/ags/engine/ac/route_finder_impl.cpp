@@ -26,25 +26,19 @@
 //
 //=============================================================================
 
-#include "ags/shared/ac/route_finder_impl.h"
-
-//include <string.h>
+#include "ags/engine/ac/route_finder_impl.h"
 #include "ags/lib/std/math.h"
-
 #include "ags/shared/ac/common.h"   // quit()
 #include "ags/engine/ac/move_list.h"     // MoveList
 #include "ags/shared/ac/common_defines.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/ac/route_finder_jps.h"
+#include "ags/engine/ac/route_finder_jps.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
-
-
 using AGS::Shared::Bitmap;
-
-// #define DEBUG_PATHFINDER
 
 namespace AGS {
 namespace Engine {
@@ -53,12 +47,6 @@ namespace RouteFinder {
 #define MAKE_INTCOORD(x,y) (((unsigned short)x << 16) | ((unsigned short)y))
 
 static const int MAXNAVPOINTS = MAXNEEDSTAGES;
-static int _G(navpoints)[MAXNAVPOINTS];
-static int _G(num_navpoints);
-static fixed _G(move_speed_x), _G(move_speed_y);
-static Navigation _G(nav);
-static Bitmap *_G(wallscreen);
-static int _G(lastcx), _G(lastcy);
 
 void init_pathfinder() {
 }
@@ -72,10 +60,10 @@ void set_wallscreen(Bitmap *wallscreen_) {
 
 static void sync_nav_wallscreen() {
 	// FIXME: this is dumb, but...
-	_G(nav).Resize(_G(wallscreen)->GetWidth(), _G(wallscreen)->GetHeight());
+	_GP(nav).Resize(_G(wallscreen)->GetWidth(), _G(wallscreen)->GetHeight());
 
 	for (int y = 0; y < _G(wallscreen)->GetHeight(); y++)
-		_G(nav).SetMapRow(y, _G(wallscreen)->GetScanLine(y));
+		_GP(nav).SetMapRow(y, _G(wallscreen)->GetScanLine(y));
 }
 
 int can_see_from(int x1, int y1, int x2, int y2) {
@@ -87,7 +75,7 @@ int can_see_from(int x1, int y1, int x2, int y2) {
 
 	sync_nav_wallscreen();
 
-	return !_G(nav).TraceLine(x1, y1, x2, y2, _G(lastcx), _G(lastcy));
+	return !_GP(nav).TraceLine(x1, y1, x2, y2, _G(lastcx), _G(lastcy));
 }
 
 void get_lastcpos(int &lastcx_, int &lastcy_) {
@@ -103,7 +91,7 @@ static int find_route_jps(int fromx, int fromy, int destx, int desty) {
 	path.clear();
 	cpath.clear();
 
-	if (_G(nav).NavigateRefined(fromx, fromy, destx, desty, path, cpath) == Navigation::NAV_UNREACHABLE)
+	if (_GP(nav).NavigateRefined(fromx, fromy, destx, desty, path, cpath) == Navigation::NAV_UNREACHABLE)
 		return 0;
 
 	_G(num_navpoints) = 0;
@@ -113,7 +101,7 @@ static int find_route_jps(int fromx, int fromy, int destx, int desty) {
 
 	for (int i = 0; i < count; i++) {
 		int x, y;
-		_G(nav).UnpackSquare(cpath[i], x, y);
+		_GP(nav).UnpackSquare(cpath[i], x, y);
 
 		_G(navpoints)[_G(num_navpoints)++] = MAKE_INTCOORD(x, y);
 	}

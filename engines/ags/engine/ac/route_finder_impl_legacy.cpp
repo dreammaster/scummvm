@@ -27,9 +27,7 @@
 //
 //=============================================================================
 
-#include "ags/shared/ac/route_finder_impl_legacy.h"
-
-//include <string.h>
+#include "ags/engine/ac/route_finder_impl_legacy.h"
 #include "ags/lib/std/math.h"
 
 #include "ags/shared/ac/common.h"   // quit()
@@ -38,12 +36,11 @@
 #include "ags/engine/ac/move_list.h"     // MoveList
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/debugging/out.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 extern void update_polled_stuff_if_runtime();
-
-
 
 using AGS::Shared::Bitmap;
 namespace BitmapHelper = AGS::Shared::BitmapHelper;
@@ -66,22 +63,16 @@ static int *pathbacky = nullptr;
 static int waspossible = 1;
 static int suggestx;
 static int suggesty;
-static fixed _G(move_speed_x);
-static fixed _G(move_speed_y);
+static int line_failed = 0;
 
 void init_pathfinder() {
 	pathbackx = (int *)malloc(sizeof(int) * MAXPATHBACK);
 	pathbacky = (int *)malloc(sizeof(int) * MAXPATHBACK);
 }
 
-static Bitmap *_G(wallscreen);
-
 void set_wallscreen(Bitmap *wallscreen_) {
 	_G(wallscreen) = wallscreen_;
 }
-
-static int line_failed = 0;
-static int _G(lastcx), _G(lastcy);
 
 // TODO: find a way to reimpl this with Bitmap
 static void line_callback(BITMAP *bmpp, int x, int y, int d) {

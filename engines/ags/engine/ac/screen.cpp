@@ -35,16 +35,12 @@
 #include "ags/plugins/plugin_engine.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/gfx/graphics_driver.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-
-
-
-
 
 void my_fade_in(PALETTE p, int speed) {
 	if (_GP(game).color_depth > 1) {
@@ -60,8 +56,6 @@ void my_fade_in(PALETTE p, int speed) {
 	_G(gfxDriver)->FadeIn(speed, p, _GP(play).fade_to_red, _GP(play).fade_to_green, _GP(play).fade_to_blue);
 }
 
-Bitmap *_G(saved_viewport_bitmap) = nullptr;
-RGB _GP(old_palette)[256];
 void current_fade_out_effect() {
 	if (pl_run_plugin_hooks(AGSE_TRANSITIONOUT, 0))
 		return;
@@ -82,7 +76,7 @@ void current_fade_out_effect() {
 		_G(gfxDriver)->BoxOutEffect(true, get_fixed_pixel_size(16), 1000 / GetGameSpeed());
 		_GP(play).screen_is_faded_out = 1;
 	} else {
-		get_palette(_GP(old_palette));
+		get_palette(_G(old_palette));
 		const Rect &viewport = _GP(play).GetMainViewport();
 		_G(saved_viewport_bitmap) = CopyScreenIntoBitmap(viewport.GetWidth(), viewport.GetHeight());
 	}

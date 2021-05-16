@@ -27,7 +27,7 @@
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/parser.h"
 #include "ags/engine/ac/string.h"
-#include "ags/shared/ac/wordsdictionary.h"
+#include "ags/shared/ac/words_dictionary.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/util/string.h"
 #include "ags/shared/util/string_compat.h"
@@ -94,7 +94,7 @@ int find_word_in_dictionary(const char *lookfor) {
 }
 
 int is_valid_word_char(char theChar) {
-	if ((isalnum((unsigned char)theChar)) || (theChar == '\'') || (theChar == '-')) {
+	if ((Common::isAlnum((unsigned char)theChar)) || (theChar == '\'') || (theChar == '-')) {
 		return 1;
 	}
 	return 0;
@@ -244,7 +244,7 @@ int parse_sentence(const char *src_text, int *numwords, short *wordarray, short 
 
 						const char *textStart = &text[1];
 
-						while ((text[0] == ',') || (isalnum((unsigned char)text[0]) != 0))
+						while ((text[0] == ',') || (Common::isAlnum((unsigned char)text[0]) != 0))
 							text++;
 
 						continueSearching = 0;

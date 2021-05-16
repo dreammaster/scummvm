@@ -31,6 +31,7 @@
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/script/script_api.h"
 #include "ags/engine/script/script_runtime.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -86,11 +87,11 @@ SkipSpeechStyle internal_skip_speech_to_user(int internal_val) {
 //=============================================================================
 
 RuntimeScriptValue Sc_Speech_GetAnimationStopTimeMargin(const RuntimeScriptValue *params, int32_t param_count) {
-	API_VARGET_INT(play.close_mouth_speech_time);
+	API_VARGET_INT(_GP(play).close_mouth_speech_time);
 }
 
 RuntimeScriptValue Sc_Speech_SetAnimationStopTimeMargin(const RuntimeScriptValue *params, int32_t param_count) {
-	API_VARSET_PINT(play.close_mouth_speech_time);
+	API_VARSET_PINT(_GP(play).close_mouth_speech_time);
 }
 
 RuntimeScriptValue Sc_Speech_GetCustomPortraitPlacement(const RuntimeScriptValue *params, int32_t param_count) {

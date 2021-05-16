@@ -42,7 +42,7 @@ bool get_property_desc(PropertyDesc &desc, const char *property, PropertyType wa
 	if (sch_it == _GP(game).propSchema.end())
 		quit("!GetProperty: no such property found in schema. Make sure you are using the property's name, and not its description, when calling this command.");
 
-	desc = sch_it->second;
+	desc = sch_it->_value;
 	if (want_type == kPropertyString && desc.Type != kPropertyString)
 		quit("!GetTextProperty: need to use GetProperty for a non-text property");
 	else if (want_type != kPropertyString && desc.Type == kPropertyString)
@@ -55,10 +55,10 @@ String get_property_value(const StringIMap &st_prop, const StringIMap &rt_prop, 
 	// if no matching entry was found, use default schema value
 	StringIMap::const_iterator it = rt_prop.find(property);
 	if (it != rt_prop.end())
-		return it->second;
+		return it->_value;
 	it = st_prop.find(property);
 	if (it != st_prop.end())
-		return it->second;
+		return it->_value;
 	return def_val;
 }
 

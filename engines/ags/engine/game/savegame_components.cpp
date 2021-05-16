@@ -42,7 +42,7 @@
 #include "ags/shared/ac/system.h"
 #include "ags/engine/ac/dynobj/cc_serializer.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/game/savegame_components.h"
+#include "ags/engine/game/savegame_components.h"
 #include "ags/engine/game/savegame_internal.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gui/animatingguibutton.h"

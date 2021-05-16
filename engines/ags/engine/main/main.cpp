@@ -39,7 +39,7 @@
 #include "ags/shared/main/main.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/engine/platform/base/sys_main.h"
-#include "ags/shared/ac/route_finder.h"
+#include "ags/engine/ac/route_finder.h"
 #include "ags/shared/core/asset_manager.h"
 #include "ags/shared/util/directory.h"
 #include "ags/shared/util/path.h"

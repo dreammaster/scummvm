@@ -23,15 +23,16 @@
 #ifndef AGS_SHARED_UTIL_COMPRESS_H
 #define AGS_SHARED_UTIL_COMPRESS_H
 
-namespace AGS3 {
-
 #include "ags/shared/core/types.h"
+
+namespace AGS3 {
 
 namespace AGS {
 namespace Shared {
 class Stream; class Bitmap;
-}
-}
+} // namespace Shared
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
 void csavecompressed(Shared::Stream *out, const unsigned char *tobesaved, const RGB pala[256]);

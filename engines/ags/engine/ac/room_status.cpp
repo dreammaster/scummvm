@@ -20,14 +20,13 @@
  *
  */
 
-//include <string.h> // memset
-//include <stdlib.h> // free
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_version.h"
 #include "ags/engine/ac/room_status.h"
 #include "ags/shared/game/custom_properties.h"
-#include "ags/shared/game/savegame_components.h"
+#include "ags/engine/game/savegame_components.h"
 #include "ags/shared/util/aligned_stream.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 

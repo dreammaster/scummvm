@@ -30,7 +30,7 @@
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/engine/ac/translation.h"
 #include "ags/engine/ac/tree_map.h"
-#include "ags/shared/ac/wordsdictionary.h"
+#include "ags/shared/ac/words_dictionary.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/util/misc.h"
 #include "ags/shared/util/stream.h"

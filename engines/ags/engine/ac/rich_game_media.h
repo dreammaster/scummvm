@@ -23,6 +23,8 @@
 #ifndef AGS_ENGINE_AC_RICH_GAME_MEDIA_H
 #define AGS_ENGINE_AC_RICH_GAME_MEDIA_H
 
+#include "common/str.h"
+
 namespace AGS3 {
 
 // Windows Vista Rich Save Games, modified to be platform-agnostic
@@ -34,13 +36,24 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 class Stream;
-}
-}
+} // namespace Shared
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
 #pragma pack(push)
 #pragma pack(1)
 typedef struct _RICH_GAME_MEDIA_HEADER {
+private:
+	template<class SRC, class DEST>
+	static void uconvert(const SRC *src, DEST *dest, size_t maxSize) {
+		do {
+			*dest++ = *src;
+		} while (*src++ != 0 && --maxSize > 1);
+
+		*dest = '\0';
+	}
+public:
 	int       dwMagicNumber;
 	int       dwHeaderVersion;
 	int       dwHeaderSize;

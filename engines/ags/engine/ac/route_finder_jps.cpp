@@ -31,9 +31,8 @@
 #include "ags/lib/std/vector.h"
 #include "ags/lib/std/algorithm.h"
 #include "ags/lib/std/functional.h"
-//include <assert.h>
-//include <stddef.h>
 #include "ags/lib/std/math.h"
+#include "ags/lib/std/xutility.h"
 
 namespace AGS3 {
 
@@ -124,7 +123,7 @@ private:
 	std::vector<NodeInfo> mapNodes;
 	tFrameId frameId;
 
-	std::priority_queue<Entry, std::vector<Entry>, std::greater<Entry> > pq;
+	std::priority_queue<Entry, std::vector<Entry>, Common::Greater<Entry> > pq;
 
 	// temporary buffers:
 	mutable std::vector<int> fpath;

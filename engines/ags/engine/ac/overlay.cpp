@@ -47,12 +47,6 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern int _G(face_talking);
-
-ScreenOverlay _GP(screenover)[MAX_SCREEN_OVERLAYS];
-int _G(numscreenover) = 0;
-int _G(is_complete_overlay) = 0, _G(is_text_overlay) = 0;
-
 void Overlay_Remove(ScriptOverlay *sco) {
 	sco->Remove();
 }
