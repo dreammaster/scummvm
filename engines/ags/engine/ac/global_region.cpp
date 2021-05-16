@@ -31,15 +31,11 @@
 #include "ags/shared/game/room_struct.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/script/script.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
-
-
 
 int GetRegionIDAtRoom(int xxx, int yyy) {
 	// if the co-ordinates are off the edge of the screen,

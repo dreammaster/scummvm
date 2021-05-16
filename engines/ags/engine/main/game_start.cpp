@@ -123,7 +123,7 @@ void do_start_game() {
 		start_game();
 }
 
-void initialize_start_and_play_game(int override_start_room, const char *_G(loadSaveGameOnStartup)) {
+void initialize_start_and_play_game(int override_start_room, const char *loadSaveGameOnStartup) {
 	//try { // BEGIN try for ALI3DEXception
 
 		set_cursor_mode(MODE_WALK);

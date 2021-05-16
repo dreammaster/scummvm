@@ -28,7 +28,7 @@
 #include "ags/engine/ac/global_game.h"
 #include "ags/engine/ac/global_gui.h"
 #include "ags/engine/ac/gui.h"
-#include "ags/shared/ac/guicontrol.h"
+#include "ags/engine/ac/gui_control.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/string.h"
 #include "ags/engine/debugging/debug_log.h"

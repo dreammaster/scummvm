@@ -126,7 +126,7 @@ void GameState::UpdateViewports() {
 		}
 		_roomViewportZOrderChanged = false;
 	}
-	size_t vp_changed = -1;
+	size_t vp_changed = (size_t)-1;
 	for (size_t i = _roomViewportsSorted.size(); i-- > 0;) {
 		auto vp = _roomViewportsSorted[i];
 		if (vp->HasChangedSize() || vp->HasChangedPosition() || vp->HasChangedVisible()) {

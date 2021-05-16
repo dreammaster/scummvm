@@ -27,7 +27,7 @@
 //=============================================================================
 
 #include "ags/lib/allegro.h"
-#include "ags/shared/util/wgt2allg.h"
+#include "ags/shared/util/wgt2_allg.h"
 
 namespace AGS3 {
 

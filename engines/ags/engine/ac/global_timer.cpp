@@ -20,15 +20,13 @@
  *
  */
 
-#include "ags/shared/ac/global_timer.h"
+#include "ags/engine/ac/global_timer.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/game_state.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-
-
 
 void script_SetTimer(int tnum, int timeout) {
 	if ((tnum < 1) || (tnum >= MAX_TIMERS))

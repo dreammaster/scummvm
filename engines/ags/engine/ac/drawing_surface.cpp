@@ -371,10 +371,10 @@ int DrawingSurface_GetPixel(ScriptDrawingSurface *sds, int x, int y) {
 		rawPixel = SCR_COLOR_TRANSPARENT;
 	} else if (colDepth > 8) {
 		int r = getr_depth(colDepth, rawPixel);
-		int ds = getg_depth(colDepth, rawPixel);
+		int g = getg_depth(colDepth, rawPixel);
 		int b = getb_depth(colDepth, rawPixel);
 
-		rawPixel = Game_GetColorFromRGB(r, ds, b);
+		rawPixel = Game_GetColorFromRGB(r, g, b);
 	}
 
 	sds->FinishedDrawingReadOnly();

@@ -20,18 +20,16 @@
  *
  */
 
-#include "ags/shared/ac/global_walkbehind.h"
+#include "ags/engine/ac/global_walk_behind.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/common_defines.h"
 #include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/room_status.h"
 #include "ags/engine/ac/walk_behind.h"
 #include "ags/engine/debugging/debug_log.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-
-
 
 void SetWalkBehindBase(int wa, int bl) {
 	if ((wa < 1) || (wa >= MAX_WALK_BEHINDS))

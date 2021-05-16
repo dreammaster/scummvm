@@ -37,7 +37,7 @@
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/engine/debugging/debugger.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/file.h"
+#include "ags/engine/ac/file.h"
 #include "ags/shared/ac/global_audio.h"
 #include "ags/lib/std/math.h"
 #include "ags/shared/util/stream.h"

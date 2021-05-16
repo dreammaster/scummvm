@@ -26,14 +26,12 @@
 #include "ags/engine/ac/properties.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/gui_inv.h"
-#include "ags/shared/script/executingscript.h"
+#include "ags/engine/script/executing_script.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
 
 void sc_invscreen() {
 	_G(curscript)->queue_action(ePSAInvScreen, 0, "InventoryScreen");

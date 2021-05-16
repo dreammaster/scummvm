@@ -20,10 +20,9 @@
  *
  */
 
-//include <string.h>
 #include "ags/engine/ac/global_file.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/file.h"
+#include "ags/engine/ac/file.h"
 #include "ags/engine/ac/path_helper.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/engine/ac/string.h"

@@ -348,7 +348,7 @@ void SetObjectGraphic(int obn, int slott) {
 	_G(objs)[obn].cycling = 0;
 	_G(objs)[obn].frame = 0;
 	_G(objs)[obn].loop = 0;
-	_G(objs)[obn].view = -1;
+	_G(objs)[obn].view = (uint16_t)-1;
 }
 
 int GetObjectGraphic(int obn) {

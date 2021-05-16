@@ -33,11 +33,13 @@ namespace AGS {
 namespace Shared {
 class Bitmap;
 typedef std::shared_ptr<Shared::Bitmap> PBitmap;
-}
+} // namespace Shared
+
 namespace Engine {
 class IDriverDependantBitmap;
-}
-}
+} // namespace Engine
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
 #define IS_ANTIALIAS_SPRITES _GP(usetup).enable_antialiasing && (_GP(play).disable_antialiasing == 0)

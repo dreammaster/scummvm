@@ -20,13 +20,16 @@
  *
  */
 
-//include <string.h>
-#include "ags/shared/ac/interfaceelement.h"
+#include "common/str.h"
+#include "ags/shared/ac/interface_element.h"
 
 namespace AGS3 {
 
 InterfaceElement::InterfaceElement() {
-	vtextxp = 0; vtextyp = 1; strcpy(vtext, "@SCORETEXT@$r@GAMENAME@");
+	vtextxp = 0;
+	vtextyp = 1;
+	strcpy(vtext, "@SCORETEXT@$r@GAMENAME@");
+
 	numbuttons = 0; bgcol = 8; fgcol = 15; bordercol = 0; on = 1; flags = 0;
 }
 

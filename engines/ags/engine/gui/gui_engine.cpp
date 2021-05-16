@@ -33,8 +33,8 @@
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/guibutton.h"
-#include "ags/shared/gui/guilabel.h"
-#include "ags/shared/gui/guilistbox.h"
+#include "ags/shared/gui/gui_label.h"
+#include "ags/shared/gui/gui_listbox.h"
 #include "ags/shared/gui/guitextbox.h"
 //include <ctype.h>
 #include "ags/shared/ac/game_setup_struct.h"

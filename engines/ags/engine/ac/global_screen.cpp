@@ -180,7 +180,7 @@ void FadeIn(int sppd) {
 	if (_GP(play).fast_forward)
 		return;
 
-	my_fade_in(palette, sppd);
+	my_fade_in(_G(palette), sppd);
 }
 
 } // namespace AGS3

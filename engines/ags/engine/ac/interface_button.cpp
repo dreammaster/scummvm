@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/interfacebutton.h"
+#include "ags/shared/ac/interface_button.h"
 
 namespace AGS3 {
 

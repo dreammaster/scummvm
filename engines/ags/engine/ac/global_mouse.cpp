@@ -22,10 +22,9 @@
 
 #include "ags/engine/ac/global_mouse.h"
 #include "ags/engine/ac/game_state.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-
 
 void HideMouseCursor() {
 	_GP(play).mouse_cursor_hidden = 1;

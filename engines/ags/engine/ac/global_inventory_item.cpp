@@ -87,10 +87,10 @@ int GetInvAt(int xxx, int yyy) {
 	return -1;
 }
 
-void GetInvName(int indx, char *_G(buff)) {
-	VALIDATE_STRING(_G(buff));
+void GetInvName(int indx, char *buff) {
+	VALIDATE_STRING(buff);
 	if ((indx < 0) | (indx >= _GP(game).numinvitems)) quit("!GetInvName: invalid inventory item specified");
-	strcpy(_G(buff), get_translation(_GP(game).invinfo[indx].name));
+	strcpy(buff, get_translation(_GP(game).invinfo[indx].name));
 }
 
 int GetInvGraphic(int indx) {

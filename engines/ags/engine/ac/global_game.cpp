@@ -69,6 +69,7 @@
 #include "ags/shared/util/string_utils.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/platform/base/sys_main.h"
+#include "ags/ags.h"
 #include "ags/globals.h"
 
 namespace AGS3 {
@@ -190,21 +191,22 @@ void FillSaveList(std::vector<SaveListItem> &saves, size_t max_count) {
 	String svg_dir = get_save_game_directory();
 	String svg_suff = get_save_game_suffix();
 	String searchPath = Path::ConcatPaths(svg_dir, String::FromFormat("agssave.???%s", svg_suff.GetCStr()));
+	time_t time = 0;
 
-	al_ffblk ffb;
-	for (int don = al_findfirst(searchPath, &ffb, FA_SEARCH); !don; don = al_findnext(&ffb)) {
-		const char *numberExtension = strstr(ffb.name, ".") + 1;
-		int saveGameSlot = atoi(numberExtension);
+	SaveStateList saveList = ::AGS::g_vm->listSaves();
+	for (uint idx = 0; idx < saveList.size(); ++idx) {
+		int saveGameSlot = saveList[idx].getSaveSlot();
+
 		// only list games .000 to .099 (to allow higher slots for other perposes)
 		if (saveGameSlot > 99)
 			continue;
+
 		String description;
 		GetSaveSlotDescription(saveGameSlot, description);
-		saves.push_back(SaveListItem(saveGameSlot, description, ffb.time));
+		saves.push_back(SaveListItem(saveGameSlot, description, time));
 		if (saves.size() >= max_count)
 			break;
 	}
-	al_findclose(&ffb);
 }
 
 void SetGlobalInt(int index, int valu) {
@@ -533,7 +535,7 @@ int GetLocationType(int xxx, int yyy) {
 void SaveCursorForLocationChange() {
 	// update the current location name
 	char tempo[100];
-	GetLocationName(game_to_data_coord(mousex), game_to_data_coord(mousey), tempo);
+	GetLocationName(game_to_data_coord(_G(mousex)), game_to_data_coord(_G(mousey)), tempo);
 
 	if (_GP(play).get_loc_name_save_cursor != _GP(play).get_loc_name_last_time) {
 		_GP(play).get_loc_name_save_cursor = _GP(play).get_loc_name_last_time;
@@ -634,7 +636,7 @@ int SaveScreenShot(const char *namm) {
 		fileName = Path::ConcatPaths(svg_dir, namm);
 
 	Bitmap *buffer = CopyScreenIntoBitmap(_GP(play).GetMainViewport().GetWidth(), _GP(play).GetMainViewport().GetHeight());
-	if (!buffer->SaveToFile(fileName, palette) != 0) {
+	if (!buffer->SaveToFile(fileName, _G(palette)) != 0) {
 		delete buffer;
 		return 0;
 	}

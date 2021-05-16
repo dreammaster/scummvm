@@ -24,7 +24,7 @@
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/global_audio.h"
 #include "ags/engine/ac/global_game.h"
-#include "ags/shared/ac/global_video.h"
+#include "ags/engine/ac/global_video.h"
 #include "ags/engine/ac/path_helper.h"
 #include "ags/shared/core/asset_manager.h"
 #include "ags/engine/debugging/debugger.h"
@@ -33,6 +33,7 @@
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/shared/util/string_compat.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 

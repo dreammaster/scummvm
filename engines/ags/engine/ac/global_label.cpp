@@ -23,7 +23,7 @@
 #include "ags/engine/ac/global_label.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/label.h"
+#include "ags/engine/ac/label.h"
 #include "ags/engine/ac/string.h"
 #include "ags/shared/gui/gui_main.h"
 

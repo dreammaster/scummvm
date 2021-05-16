@@ -37,7 +37,7 @@
 #include "ags/engine/ac/translation.h"
 #include "ags/engine/ac/tree_map.h"
 #include "ags/engine/ac/walkable_area.h"
-#include "ags/engine/gfx/gfx_filter.h"
+#include "ags/engine/gfx/gfxfilter.h"
 #include "ags/engine/gui/gui_dialog.h"
 #include "ags/shared/script/cc_options.h"
 #include "ags/engine/debugging/debug_log.h"
@@ -62,7 +62,7 @@ String GetRuntimeInfo() {
 		"[Game resolution %d x %d (%d-bit)"
 		"[Running %d x %d at %d-bit%s%s[GFX: %s; %s[Draw frame %d x %d["
 		"Sprite cache size: %d KB (limit %d KB; %d locked)",
-		EngineVersion.LongString.GetCStr(), _GP(game).GetGameRes().Width, _GP(game).GetGameRes().Height, _GP(game).GetColorDepth(),
+		_G(EngineVersion).LongString.GetCStr(), _GP(game).GetGameRes().Width, _GP(game).GetGameRes().Height, _GP(game).GetColorDepth(),
 		mode.Width, mode.Height, mode.ColorDepth, (_G(convert_16bit_bgr)) ? " BGR" : "",
 		mode.Windowed ? " W" : "",
 		_G(gfxDriver)->GetDriverName(), filter->GetInfo().Name.GetCStr(),

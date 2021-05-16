@@ -20,18 +20,15 @@
  *
  */
 
-#include "ags/shared/ac/global_viewframe.h"
+#include "ags/engine/ac/global_view_frame.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/view.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/engine/media/audio/audio_system.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-
-
-
 
 void SetFrameSound(int vii, int loop, int frame, int sound) {
 	if ((vii < 1) || (vii > _GP(game).numviews))
@@ -47,7 +44,7 @@ void SetFrameSound(int vii, int loop, int frame, int sound) {
 	if (sound < 1) {
 		_G(views)[vii].loops[loop].frames[frame].sound = -1;
 	} else {
-		ScriptAudioClip *clip = GetAudioClipForOldStyleNumber(game, false, sound);
+		ScriptAudioClip *clip = GetAudioClipForOldStyleNumber(_GP(game), false, sound);
 		if (clip == nullptr)
 			quitprintf("!SetFrameSound: audio clip aSound%d not found", sound);
 

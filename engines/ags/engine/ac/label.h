@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_AC_LABEL_H
 #define AGS_ENGINE_AC_LABEL_H
 
-#include "ags/engine/gui/guilabel.h"
+#include "ags/shared/gui/gui_label.h"
 
 namespace AGS3 {
 

@@ -72,6 +72,7 @@ typedef int64 intptr_t;
 
 #undef INT16_MIN
 #undef INT16_MAX
+#undef UINT16_MAX
 #undef INT32_MIN
 #undef INT32_MAX
 #undef INT_MIN
@@ -80,6 +81,7 @@ typedef int64 intptr_t;
 #undef SIZE_MAX
 #define INT16_MIN     -32768
 #define INT16_MAX     0x7fff
+#define UINT16_MAX    0xffff
 #define INT32_MIN     (-2147483647 - 1)
 #define INT32_MAX       2147483647
 #define INT_MIN     (-2147483647 - 1)

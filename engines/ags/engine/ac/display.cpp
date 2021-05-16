@@ -460,7 +460,7 @@ void wouttext_aligned(Bitmap *ds, int usexp, int yy, int oriwid, int usingfont, 
 	else if (align & kMAlignRight)
 		usexp = usexp + (oriwid - wgettextwidth_compensate(text, usingfont));
 
-	wouttext_outline(ds, usexp, yy, usingfont, text_color, (char *)text);
+	wouttext_outline(ds, usexp, yy, usingfont, text_color, text);
 }
 
 int get_outline_adjustment(int font) {
@@ -557,7 +557,7 @@ void draw_button_background(Bitmap *ds, int xx1, int yy1, int xx2, int yy2, GUIM
 			if ((_G(loaded_game_file_version) <= kGameVersion_272) // 2.xx
 				&& (_GP(spriteset)[iep->BgImage]->GetWidth() == 1)
 				&& (_GP(spriteset)[iep->BgImage]->GetHeight() == 1)
-				&& (*((unsigned int *)_GP(spriteset)[iep->BgImage]->GetData()) == 0x00FF00FF)) {
+				&& (*((const unsigned int *)_GP(spriteset)[iep->BgImage]->GetData()) == 0x00FF00FF)) {
 				// Don't draw fully transparent dummy GUI backgrounds
 			} else {
 				// offset the background image and clip it so that it is drawn

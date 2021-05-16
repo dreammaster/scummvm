@@ -330,7 +330,7 @@ int write_dialog_options(Bitmap *ds, bool ds_has_alpha, int dlgxp, int curyp, in
   color_t text_color;
   for (ww=0;ww<numdisp;ww++) {
 
-    if ((dtop->optionflags[disporder[ww]] & DFLG_HASBEENCHOSEN) &&
+    if ((dtop->optionflags[(int)disporder[ww]] & DFLG_HASBEENCHOSEN) &&
         (_GP(play).read_dialog_option_colour >= 0)) {
       // 'read' colour
       text_color = ds->GetCompatibleColor(_GP(play).read_dialog_option_colour);
@@ -346,7 +346,7 @@ int write_dialog_options(Bitmap *ds, bool ds_has_alpha, int dlgxp, int curyp, in
       else text_color = ds->GetCompatibleColor(utextcol);
     }
 
-    break_up_text_into_lines(get_translation(dtop->optionnames[disporder[ww]]), Lines, areawid-(2*padding+2+bullet_wid), usingfont);
+    break_up_text_into_lines(get_translation(dtop->optionnames[(int)disporder[ww]]), Lines, areawid-(2*padding+2+bullet_wid), usingfont);
     dispyp[ww]=curyp;
     if (_GP(game).dialog_bullet > 0)
     {
@@ -376,7 +376,7 @@ int write_dialog_options(Bitmap *ds, bool ds_has_alpha, int dlgxp, int curyp, in
 #define GET_OPTIONS_HEIGHT {\
   needheight = 0;\
   for (int i = 0; i < numdisp; ++i) {\
-    break_up_text_into_lines(get_translation(dtop->optionnames[disporder[i]]), Lines, areawid-(2*padding+2+bullet_wid), usingfont);\
+    break_up_text_into_lines(get_translation(dtop->optionnames[(int)disporder[i]]), Lines, areawid-(2*padding+2+bullet_wid), usingfont);\
     needheight += getheightoflines(usingfont, Lines.Count()) + data_to_game_coord(_GP(game).options[OPT_DIALOGGAP]);\
   }\
   if (parserInput) needheight += parserInput->Height + data_to_game_coord(_GP(game).options[OPT_DIALOGGAP]);\
@@ -678,7 +678,7 @@ void DialogOptions::Redraw()
       int biggest = 0;
       padding = _GP(guis)[_GP(game).options[OPT_DIALOGIFACE]].Padding;
       for (int i = 0; i < numdisp; ++i) {
-        break_up_text_into_lines(get_translation(dtop->optionnames[disporder[i]]), Lines, areawid-((2*padding+2)+bullet_wid), usingfont);
+        break_up_text_into_lines(get_translation(dtop->optionnames[(int)disporder[i]]), Lines, areawid-((2*padding+2)+bullet_wid), usingfont);
         if (_G(longestline) > biggest)
           biggest = _G(longestline);
       }

@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/slider.h"
+#include "ags/engine/ac/slider.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/script/script_api.h"

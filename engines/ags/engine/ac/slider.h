@@ -31,7 +31,7 @@ using AGS::Shared::GUISlider;
 
 void	Slider_SetMax(GUISlider *guisl, int valn);
 int		Slider_GetMax(GUISlider *guisl);
-void	SAGS::Sharedn(GUISlider *guisl, int valn);
+void	Slider_SetMin(GUISlider *guisl, int valn);
 int		Slider_GetMin(GUISlider *guisl);
 void	Slider_SetValue(GUISlider *guisl, int valn);
 int		Slider_GetValue(GUISlider *guisl);

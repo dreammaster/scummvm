@@ -90,12 +90,12 @@ void NewRoom(int nrnum) {
 			_GP(play).stop_dialog_at_end = DIALOG_NEWROOM + nrnum;
 		else {
 			quitprintf("!NewRoom: two NewRoom/RunDialog/StopDialog requests within dialog; last was called in \"%s\", line %d",
-				_G(last_in_dialog_request_script_pos).Section.GetCStr(), _G(last_in_dialog_request_script_pos).Line);
+				_GP(last_in_dialog_request_script_pos).Section.GetCStr(), _GP(last_in_dialog_request_script_pos).Line);
 		}
 		return;
 	}
 
-	get_script_position(_G(last_in_dialog_request_script_pos));
+	get_script_position(_GP(last_in_dialog_request_script_pos));
 
 	if (_G(in_leaves_screen) >= 0) {
 		// NewRoom called from the Player Leaves Screen event -- just

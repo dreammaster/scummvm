@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/global_walkablearea.h"
+#include "ags/engine/ac/global_walkable_area.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/common_defines.h"
 #include "ags/engine/ac/draw.h"
@@ -28,13 +28,11 @@
 #include "ags/engine/ac/walkable_area.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/game/room_struct.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
 
 int GetScalingAt(int x, int y) {
 	int onarea = get_walkable_area_pixel(x, y);

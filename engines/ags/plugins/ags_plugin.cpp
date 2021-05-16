@@ -42,7 +42,7 @@
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_audio.h"
 #include "ags/shared/ac/global_plugin.h"
-#include "ags/shared/ac/global_walkablearea.h"
+#include "ags/engine/ac/global_walkable_area.h"
 #include "ags/shared/ac/keycode.h"
 #include "ags/shared/ac/mouse.h"
 #include "ags/shared/ac/movelist.h"
@@ -79,7 +79,7 @@
 #include "ags/shared/util/memory.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_compat.h"
-#include "ags/shared/util/wgt2allg.h"
+#include "ags/shared/util/wgt2_allg.h"
 
 #if defined(BUILTIN_PLUGINS)
 #include "ags/shared/../Plugins/AGSflashlight/agsflashlight.h"

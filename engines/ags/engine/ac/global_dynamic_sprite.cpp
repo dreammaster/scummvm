@@ -28,14 +28,12 @@
 #include "ags/engine/ac/runtime_defines.h" //MAX_PATH
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gfx/bitmap.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-
-
 
 int LoadImageFile(const char *filename) {
 	ResolvedPath rp;

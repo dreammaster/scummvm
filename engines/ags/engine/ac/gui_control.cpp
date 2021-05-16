@@ -21,15 +21,15 @@
  */
 
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/guicontrol.h"
+#include "ags/engine/ac/gui_control.h"
 #include "ags/engine/ac/global_gui.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/gui/gui_button.h"
 #include "ags/shared/gui/gui_inv.h"
-#include "ags/shared/gui/guilabel.h"
-#include "ags/shared/gui/guilistbox.h"
+#include "ags/shared/gui/gui_label.h"
+#include "ags/shared/gui/gui_listbox.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/gui/guislider.h"
+#include "ags/shared/gui/gui_slider.h"
 #include "ags/shared/gui/gui_textbox.h"
 #include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/ac/dynobj/cc_gui.h"
@@ -43,10 +43,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-
-
-
-
 GUIObject *GetGUIControlAtLocation(int xx, int yy) {
 	int guinum = GetGUIAt(xx, yy);
 	if (guinum == -1)
@@ -54,12 +50,12 @@ GUIObject *GetGUIControlAtLocation(int xx, int yy) {
 
 	data_to_game_coords(&xx, &yy);
 
-	int oldmousex = mousex, oldmousey = mousey;
-	mousex = xx - _GP(guis)[guinum].X;
-	mousey = yy - _GP(guis)[guinum].Y;
+	int oldmousex = _G(mousex), oldmousey = _G(mousey);
+	_G(mousex) = xx - _GP(guis)[guinum].X;
+	_G(mousey) = yy - _GP(guis)[guinum].Y;
 	int toret = _GP(guis)[guinum].FindControlUnderMouse(0, false);
-	mousex = oldmousex;
-	mousey = oldmousey;
+	_G(mousex) = oldmousex;
+	_G(mousey) = oldmousey;
 	if (toret < 0)
 		return nullptr;
 

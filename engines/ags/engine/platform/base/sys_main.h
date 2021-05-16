@@ -30,7 +30,7 @@
 
 #include "ags/shared/core/platform.h"
 #include "ags/lib/std/vector.h"
-#include "ags/shared/gfx/gfx_defines.h"
+#include "ags/engine/gfx/gfx_defines.h"
 
 namespace AGS3 {
 

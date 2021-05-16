@@ -34,17 +34,12 @@
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/engine/ac/system.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/util/wgt2allg.h"
+#include "ags/shared/util/wgt2_allg.h"
 
 namespace AGS3 {
 
 using namespace Shared;
 using namespace Engine;
-
-
-
-
-
 
 void RemoveOverlay(int ovrid) {
 	if (find_overlay_of_type(ovrid) < 0) quit("!RemoveOverlay: invalid overlay id passed");

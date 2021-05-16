@@ -41,7 +41,7 @@
 //include <process.h>
 #endif
 
-#include "ags/shared/util/wgt2allg.h"
+#include "ags/shared/util/wgt2_allg.h"
 
 #ifndef TRUE
 #define TRUE 1

@@ -23,7 +23,7 @@
 #include "ags/lib/std/algorithm.h"
 #include "ags/lib/std/set.h"
 #include "ags/lib/allegro.h" // find files
-#include "ags/shared/ac/listbox.h"
+#include "ags/engine/ac/listbox.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"

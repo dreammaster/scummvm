@@ -39,7 +39,7 @@
 #include "ags/shared/ac/viewframe.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/gui/guilabel.h"
+#include "ags/shared/gui/gui_label.h"
 #include "ags/shared/main/main.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/util/stream.h"
