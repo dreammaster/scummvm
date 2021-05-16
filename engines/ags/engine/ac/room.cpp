@@ -472,11 +472,11 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
     // do the palette
     for (cc=0;cc<256;cc++) {
         if (_GP(game).paluses[cc]==PAL_BACKGROUND)
-            palette[cc]=_GP(thisroom).Palette[cc];
+            _G(palette)[cc]=_GP(thisroom).Palette[cc];
         else {
             // copy the gamewide colours into the room palette
             for (size_t i = 0; i < _GP(thisroom).BgFrameCount; ++i)
-                _GP(thisroom).BgFrames[i].Palette[cc] = palette[cc];
+                _GP(thisroom).BgFrames[i].Palette[cc] = _G(palette)[cc];
         }
     }
 
@@ -556,7 +556,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
             _G(croom)->obj[cc].y=_GP(thisroom).Objects[cc].Y;
             _G(croom)->obj[cc].num = Math::InRangeOrDef<uint16_t>(_GP(thisroom).Objects[cc].Sprite, 0);
             _G(croom)->obj[cc].on=_GP(thisroom).Objects[cc].IsOn;
-            _G(croom)->obj[cc].view=-1;
+            _G(croom)->obj[cc].view=(uint16)-1;
             _G(croom)->obj[cc].loop=0;
             _G(croom)->obj[cc].frame=0;
             _G(croom)->obj[cc].wait=0;
@@ -643,7 +643,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
     /*  THIS IS DONE IN THE EDITOR NOW
     _GP(thisroom).BgFrames.IsPaletteShared[0] = 1;
     for (dd = 1; dd < _GP(thisroom).BgFrameCount; dd++) {
-    if (memcmp (&_GP(thisroom).BgFrames.Palette[dd][0], &palette[0], sizeof(color) * 256) == 0)
+    if (memcmp (&_GP(thisroom).BgFrames.Palette[dd][0], &_G(palette)[0], sizeof(color) * 256) == 0)
     _GP(thisroom).BgFrames.IsPaletteShared[dd] = 1;
     else
     _GP(thisroom).BgFrames.IsPaletteShared[dd] = 0;
@@ -660,15 +660,15 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
         // the create_rgb_table call
         // so, fix them
         for (int ff = 0; ff < 256; ff++) {
-            if (palette[ff].r > 63)
-                palette[ff].r = 63;
-            if (palette[ff].g > 63)
-                palette[ff].g = 63;
-            if (palette[ff].b > 63)
-                palette[ff].b = 63;
+            if (_G(palette)[ff].r > 63)
+                _G(palette)[ff].r = 63;
+            if (_G(palette)[ff].g > 63)
+                _G(palette)[ff].g = 63;
+            if (_G(palette)[ff].b > 63)
+                _G(palette)[ff].b = 63;
         }
-        create_rgb_table (&_GP(rgb_table), palette, nullptr);
-        _GP(rgb_map) = &_GP(rgb_table);
+        create_rgb_table (&_GP(rgb_table), _G(palette), nullptr);
+        _G(rgb_map) = &_GP(rgb_table);
     }
     _G(our_eip) = 211;
     if (forchar!=nullptr) {
@@ -872,8 +872,6 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
     //  MSS_CHECK_ALL_BLOCKS;
 }
 
-extern int _G(psp_clear_cache_on_room_change);
-
 // new_room: changes the current room number, and loads the new room from disk
 void new_room(int newnum,CharacterInfo*forchar) {
     EndSkippingUntilCharStops();
@@ -985,8 +983,6 @@ void compile_room_script() {
     _GP(getDialogOptionsDimensionsFunc).roomHasFunction = true;
 }
 
-int _G(bg_just_changed) = 0;
-
 void on_background_frame_change () {
 
     invalidate_screen();
@@ -994,7 +990,7 @@ void on_background_frame_change () {
     invalidate_cached_walkbehinds();
 
     // get the new frame's palette
-    memcpy (palette, _GP(thisroom).BgFrames[_GP(play).bg_frame].Palette, sizeof(RGB) * 256);
+    memcpy(_G(palette), _GP(thisroom).BgFrames[_GP(play).bg_frame].Palette, sizeof(RGB) * 256);
 
     // hi-colour, update the palette. It won't have an immediate effect
     // but will be drawn properly when the screen fades in

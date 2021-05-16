@@ -39,6 +39,7 @@
 #include "ags/engine/script/script_api.h"
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
+#include "ags/ags.h"
 #include "ags/globals.h"
 
 namespace AGS3 {
@@ -98,27 +99,34 @@ int ListBox_GetSaveGameSlots(GUIListBox *listbox, int index) {
 }
 
 int ListBox_FillSaveGameList(GUIListBox *listbox) {
-	// TODO: find out if limiting to MAXSAVEGAMES is still necessary here
-	std::vector<SaveListItem> saves;
-	FillSaveList(saves, MAXSAVEGAMES);
-	std::sort(saves.rbegin(), saves.rend());
+	SaveStateList saveList = ::AGS::g_vm->listSaves();
+
+	// The original AGS sorts the list from most recent to oldest.
+	// We don't have the modification date in ScummVM though. We could try to
+	// parse the date string, but for now, sort by decreasing slot number, which
+	// should work better than the default sort by increasing slot.
+	Common::sort(saveList.begin(), saveList.end(),
+		[](const SaveStateDescriptor &x, const SaveStateDescriptor &y) {return x.getSaveSlot() > y.getSaveSlot(); });
 
 	// fill in the list box
 	listbox->Clear();
 	// TODO: method for adding item batch to speed up update
-	for (const auto &item : saves) {
-		listbox->AddItem(item.Description);
-		listbox->SavedGameIndex[listbox->ItemCount - 1] = item.Slot;
+	for (const auto &item : saveList) {
+		int slot = item.getSaveSlot();
+		Common::String desc = item.getDescription();
+
+		listbox->AddItem(desc);
+		listbox->SavedGameIndex[listbox->ItemCount - 1] = slot;
 	}
 
 	// update the global savegameindex[] array for backward compatibilty
-	for (size_t n = 0; n < saves.size(); ++n) {
-		_GP(play).filenumbers[n] = saves[n].Slot;
+	for (size_t n = 0; n < saveList.size(); ++n) {
+		_GP(play).filenumbers[n] = saveList[n].getSaveSlot();
 	}
 
 	listbox->SetSvgIndex(true);
 
-	if (saves.size() >= MAXSAVEGAMES)
+	if (saveList.size() >= MAXSAVEGAMES)
 		return 1;
 	return 0;
 }

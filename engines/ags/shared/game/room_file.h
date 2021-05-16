@@ -34,7 +34,7 @@
 #include "ags/lib/std/memory.h"
 #include "ags/lib/std/vector.h"
 #include "ags/shared/core/platform.h"
-#include "ags/engine/game/room_version.h"
+#include "ags/shared/game/room_version.h"
 #include "ags/shared/util/error.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string.h"

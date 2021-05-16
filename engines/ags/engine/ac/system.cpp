@@ -37,6 +37,7 @@
 #include "ags/engine/main/graphics_mode.h"
 #include "ags/engine/main/engine.h"
 #include "ags/engine/main/main.h"
+#include "ags/engine/media/audio/audio_core.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/util/string_compat.h"
 #include "ags/shared/debugging/out.h"
