@@ -320,4 +320,8 @@ float Mouse::GetSpeed() {
 	return SpeedVal;
 }
 
+void Mouse::UpdateGraphicArea() {
+	// TODO
+}
+
 } // namespace AGS3

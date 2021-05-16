@@ -44,7 +44,7 @@
 #include "ags/engine/script/cc_instance.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/engine/device/mouse_w32.h"
-#include "ags/engine/gfx/gfx_filter.h"
+#include "ags/engine/gfx/gfxfilter.h"
 #include "ags/shared/gui/gui_button.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/engine/script/script.h"

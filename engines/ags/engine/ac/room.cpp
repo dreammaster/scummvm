@@ -73,7 +73,7 @@
 #include "ags/shared/core/asset_manager.h"
 #include "ags/engine/ac/dynobj/all_dynamic_classes.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/engine/gfx/gfx_filter.h"
+#include "ags/engine/gfx/gfxfilter.h"
 #include "ags/shared/util/math.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/debugging/out.h"

@@ -368,7 +368,7 @@ int DrawingSurface_GetPixel(ScriptDrawingSurface *sds, int x, int y) {
 	int colDepth = ds->GetColorDepth();
 
 	if (rawPixel == maskColor) {
-		rawPixel = SCR_COLOR_TRANSPARENT;
+		rawPixel = (unsigned int)SCR_COLOR_TRANSPARENT;
 	} else if (colDepth > 8) {
 		int r = getr_depth(colDepth, rawPixel);
 		int g = getg_depth(colDepth, rawPixel);

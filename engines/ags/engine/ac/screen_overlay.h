@@ -23,6 +23,8 @@
 #ifndef AGS_ENGINE_AC_SCREEN_OVERLAY_H
 #define AGS_ENGINE_AC_SCREEN_OVERLAY_H
 
+#include "ags/shared/core/types.h"
+
 namespace AGS3 {
 
 // Forward declaration

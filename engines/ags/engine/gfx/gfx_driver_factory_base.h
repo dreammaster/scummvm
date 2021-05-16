@@ -35,7 +35,7 @@
 
 #include "ags/lib/std/vector.h"
 #include "ags/shared/gfx/gfxdriverfactory.h"
-#include "ags/engine/gfx/gfx_filter.h"
+#include "ags/engine/gfx/gfxfilter.h"
 
 namespace AGS3 {
 namespace AGS {

@@ -33,7 +33,7 @@
 #include "ags/shared/gfx/ali3dexception.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/gfxdriverfactory.h"
-#include "ags/engine/gfx/gfx_filter.h"
+#include "ags/engine/gfx/gfxfilter.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/main/config.h"
 #include "ags/shared/main/engine_setup.h"

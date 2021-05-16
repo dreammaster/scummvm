@@ -30,7 +30,7 @@
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/global_mouse.h"
-#include "ags/shared/ac/global_plugin.h"
+#include "ags/engine/ac/global_plugin.h"
 #include "ags/engine/ac/global_screen.h"
 #include "ags/engine/ac/sys_events.h"
 #include "ags/engine/ac/system.h"
@@ -41,7 +41,7 @@
 #include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/engine/gfx/graphics_driver.h"
-#include "ags/engine/gfx/gfx_filter.h"
+#include "ags/engine/gfx/gfxfilter.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/script/script_api.h"
@@ -54,24 +54,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-
-
-extern Bitmap *mousecurs[MAXCURSORS];
-
-
-
-
 extern void ags_domouse(int str);
-
-ScriptMouse scmouse;
-int _G(cur_mode), _G(cur_cursor);
-int _G(mouse_frame) = 0, _G(mouse_delay) = 0;
-int _G(lastmx) = -1, _G(lastmy) = -1;
-char alpha_blend_cursor = 0;
-Bitmap *dotted_mouse_cursor = nullptr;
-IDriverDependantBitmap *_G(mouseCursor) = nullptr;
-Bitmap *blank_mouse_cursor = nullptr;
 
 // The Mouse:: functions are static so the script doesn't pass
 // in an object parameter
@@ -136,35 +119,35 @@ void set_mouse_cursor(int newcurs) {
 
 	// Assign new pic
 	set_new_cursor_graphic(_GP(game).mcurs[newcurs].pic);
-	delete dotted_mouse_cursor;
-	dotted_mouse_cursor = nullptr;
+	delete _G(dotted_mouse_cursor);
+	_G(dotted_mouse_cursor) = nullptr;
 
 	// If it's inventory cursor, draw hotspot crosshair sprite upon it
 	if ((newcurs == MODE_USE) && (_GP(game).mcurs[newcurs].pic > 0) &&
 		((_GP(game).hotdot > 0) || (_GP(game).invhotdotsprite > 0))) {
 		// If necessary, create a copy of the cursor and put the hotspot
 		// dot onto it
-		dotted_mouse_cursor = BitmapHelper::CreateBitmapCopy(mousecurs[0]);
+		_G(dotted_mouse_cursor) = BitmapHelper::CreateBitmapCopy(_G(mousecurs)[0]);
 
 		if (_GP(game).invhotdotsprite > 0) {
-			draw_sprite_slot_support_alpha(dotted_mouse_cursor,
+			draw_sprite_slot_support_alpha(_G(dotted_mouse_cursor),
 				(_GP(game).SpriteInfos[_GP(game).mcurs[newcurs].pic].Flags & SPF_ALPHACHANNEL) != 0,
 				hotspotx - _GP(game).SpriteInfos[_GP(game).invhotdotsprite].Width / 2,
 				hotspoty - _GP(game).SpriteInfos[_GP(game).invhotdotsprite].Height / 2,
 				_GP(game).invhotdotsprite);
 		} else {
-			putpixel_compensate(dotted_mouse_cursor, hotspotx, hotspoty, MakeColor(_GP(game).hotdot));
+			putpixel_compensate(_G(dotted_mouse_cursor), hotspotx, hotspoty, MakeColor(_GP(game).hotdot));
 
 			if (_GP(game).hotdotouter > 0) {
 				int outercol = MakeColor(_GP(game).hotdotouter);
 
-				putpixel_compensate(dotted_mouse_cursor, hotspotx + get_fixed_pixel_size(1), hotspoty, outercol);
-				putpixel_compensate(dotted_mouse_cursor, hotspotx, hotspoty + get_fixed_pixel_size(1), outercol);
-				putpixel_compensate(dotted_mouse_cursor, hotspotx - get_fixed_pixel_size(1), hotspoty, outercol);
-				putpixel_compensate(dotted_mouse_cursor, hotspotx, hotspoty - get_fixed_pixel_size(1), outercol);
+				putpixel_compensate(_G(dotted_mouse_cursor), hotspotx + get_fixed_pixel_size(1), hotspoty, outercol);
+				putpixel_compensate(_G(dotted_mouse_cursor), hotspotx, hotspoty + get_fixed_pixel_size(1), outercol);
+				putpixel_compensate(_G(dotted_mouse_cursor), hotspotx - get_fixed_pixel_size(1), hotspoty, outercol);
+				putpixel_compensate(_G(dotted_mouse_cursor), hotspotx, hotspoty - get_fixed_pixel_size(1), outercol);
 			}
 		}
-		mousecurs[0] = dotted_mouse_cursor;
+		_G(mousecurs)[0] = _G(dotted_mouse_cursor);
 		update_cached_mouse_cursor();
 	}
 }
@@ -285,8 +268,8 @@ void disable_cursor_mode(int modd) {
 
 void RefreshMouse() {
 	ags_domouse(DOMOUSE_NOCURSOR);
-	scmouse.x = game_to_data_coord(mousex);
-	scmouse.y = game_to_data_coord(mousey);
+	_G(scmouse).x = game_to_data_coord(mousex);
+	_G(scmouse).y = game_to_data_coord(mousey);
 }
 
 void SetMousePosition(int newx, int newy) {
@@ -339,8 +322,8 @@ int GetMouseCursor() {
 }
 
 void update_script_mouse_coords() {
-	scmouse.x = game_to_data_coord(mousex);
-	scmouse.y = game_to_data_coord(mousey);
+	_G(scmouse).x = game_to_data_coord(mousex);
+	_G(scmouse).y = game_to_data_coord(mousey);
 }
 
 void update_inv_cursor(int invnum) {
@@ -370,25 +353,25 @@ void update_inv_cursor(int invnum) {
 void update_cached_mouse_cursor() {
 	if (_G(mouseCursor) != nullptr)
 		_G(gfxDriver)->DestroyDDB(_G(mouseCursor));
-	_G(mouseCursor) = _G(gfxDriver)->CreateDDBFromBitmap(mousecurs[0], alpha_blend_cursor != 0);
+	_G(mouseCursor) = _G(gfxDriver)->CreateDDBFromBitmap(_G(mousecurs)[0], _G(alpha_blend_cursor) != 0);
 }
 
 void set_new_cursor_graphic(int spriteslot) {
-	mousecurs[0] = _GP(spriteset)[spriteslot];
+	_G(mousecurs)[0] = _GP(spriteset)[spriteslot];
 
 	// It looks like spriteslot 0 can be used in games with version 2.72 and lower.
 	// The NULL check should ensure that the sprite is valid anyway.
-	if (((spriteslot < 1) && (_G(loaded_game_file_version) > kGameVersion_272)) || (mousecurs[0] == nullptr)) {
-		if (blank_mouse_cursor == nullptr) {
-			blank_mouse_cursor = BitmapHelper::CreateTransparentBitmap(1, 1, _GP(game).GetColorDepth());
+	if (((spriteslot < 1) && (_G(loaded_game_file_version) > kGameVersion_272)) || (_G(mousecurs)[0] == nullptr)) {
+		if (_G(blank_mouse_cursor) == nullptr) {
+			_G(blank_mouse_cursor) = BitmapHelper::CreateTransparentBitmap(1, 1, _GP(game).GetColorDepth());
 		}
-		mousecurs[0] = blank_mouse_cursor;
+		_G(mousecurs)[0] = _G(blank_mouse_cursor);
 	}
 
 	if (_GP(game).SpriteInfos[spriteslot].Flags & SPF_ALPHACHANNEL)
-		alpha_blend_cursor = 1;
+		_G(alpha_blend_cursor) = 1;
 	else
-		alpha_blend_cursor = 0;
+		_G(alpha_blend_cursor) = 0;
 
 	update_cached_mouse_cursor();
 }

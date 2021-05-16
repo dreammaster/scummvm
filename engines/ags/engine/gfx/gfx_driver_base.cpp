@@ -22,7 +22,7 @@
 
 #include "ags/shared/gfx/ali3dexception.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/engine/gfx/gfx_filter.h"
+#include "ags/engine/gfx/gfxfilter.h"
 #include "ags/shared/gfx/gfxdriverbase.h"
 #include "ags/shared/gfx/gfx_util.h"
 

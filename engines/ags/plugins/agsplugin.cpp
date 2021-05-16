@@ -62,7 +62,7 @@
 #include "ags/shared/util/stream.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/gfx/graphics_driver.h"
-#include "ags/engine/gfx/gfx_filter.h"
+#include "ags/engine/gfx/gfxfilter.h"
 #include "ags/engine/script/runtime_script_value.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/ac/dynobj/script_string.h"

@@ -1025,10 +1025,10 @@ public:
 	int _cur_mode = 0, _cur_cursor = 0;
 	int _mouse_frame = 0, _mouse_delay = 0;
 	int _lastmx = -1, _lastmy = -1;
-	//char _alpha_blend_cursor = 0;
-	//AGS::Shared::Bitmap *_dotted_mouse_cursor = nullptr;
+	char _alpha_blend_cursor = 0;
+	AGS::Shared::Bitmap *_dotted_mouse_cursor = nullptr;
 	AGS::Engine::IDriverDependantBitmap *_mouseCursor = nullptr;
-	//AGS::Shared::Bitmap *_blank_mouse_cursor = nullptr;
+	AGS::Shared::Bitmap *_blank_mouse_cursor = nullptr;
 
 	/**@}*/
 

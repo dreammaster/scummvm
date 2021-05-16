@@ -110,6 +110,8 @@ struct Mouse {
 	void SetMoveLimit(const Rect &r);
 	// Set actual OS cursor position on screen; parameter must be in native game coordinates
 	void SetPosition(const Point p);
+
+	void UpdateGraphicArea();
 };
 
 } // namespace AGS3
