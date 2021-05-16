@@ -738,12 +738,12 @@ void Character_Say(CharacterInfo *chaa, const char *text) {
 
 void Character_SayAt(CharacterInfo *chaa, int x, int y, int width, const char *texx) {
 
-    DisplaySpeechAt(x, y, width, chaa->index_id, (char*)texx);
+    DisplaySpeechAt(x, y, width, chaa->index_id, texx);
 }
 
 ScriptOverlay* Character_SayBackground(CharacterInfo *chaa, const char *texx) {
 
-    int ovltype = DisplaySpeechBackground(chaa->index_id, (char*)texx);
+    int ovltype = DisplaySpeechBackground(chaa->index_id, texx);
     int ovri = find_overlay_of_type(ovltype);
     if (ovri<0)
         quit("!SayBackground internal error: no overlay");
@@ -1029,10 +1029,10 @@ void Character_WalkStraight(CharacterInfo *chaa, int xx, int yy, int blocking) {
     int toYLowres = room_to_mask_coord(yy);
 
     if (!can_see_from(fromXLowres, fromYLowres, toXLowres, toYLowres)) {
-        int _G(lastcx), _G(lastcy);
-        get_lastcpos(_G(lastcx), _G(lastcy));
-        movetox = mask_to_room_coord(_G(lastcx));
-        movetoy = mask_to_room_coord(_G(lastcy));
+        int lastcx, lastcy;
+        get_lastcpos(lastcx, lastcy);
+        movetox = mask_to_room_coord(lastcx);
+        movetoy = mask_to_room_coord(lastcy);
     }
 
     walk_character(chaa->index_id, movetox, movetoy, 1, true);
@@ -2329,7 +2329,7 @@ void _DisplayThoughtCore(int chid, const char *displbuf) {
         ypp = -1;
     }
 
-    _displayspeech ((char*)displbuf, chid, xpp, ypp, width, 1);
+    _displayspeech(displbuf, chid, xpp, ypp, width, 1);
 }
 
 void _displayspeech(const char*texx, int aschar, int xx, int yy, int widd, int isThought) {

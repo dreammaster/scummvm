@@ -23,9 +23,9 @@
 #ifndef AGS_ENGINE_AC_RUNTIME_DEFINES_H
 #define AGS_ENGINE_AC_RUNTIME_DEFINES_H
 
-namespace AGS3 {
-
 #include "ags/shared/ac/common_defines.h"
+
+namespace AGS3 {
 
 // xalleg.h pulls in an Allegro-internal definition of MAX_TIMERS which
 // conflicts with the definition in runtime_defines.h. Forget it.
