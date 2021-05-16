@@ -98,7 +98,7 @@ struct AGSGameOptions {
 	int32 disabled_user_interface;  // >0 while in cutscene/etc
 	int32 gscript_timer;    // obsolete
 	int32 debug_mode;       // whether we're in debug mode
-	int32 _G(globalvars)[50];   // obsolete
+	int32 globalvars[50];   // obsolete
 	int32 messagetime;      // time left for auto-remove messages
 	int32 usedinv;          // inventory item last used
 	int32 inv_top, inv_numdisp, inv_numorder, inv_numinline;
@@ -207,7 +207,7 @@ struct AGSViewFrame {
 
 struct AGSMouseCursor {
 	int32 pic;            // sprite slot number
-	short _G(hotx), _G(hoty);     // x,y hotspot co-ordinates
+	short hotx, hoty;     // x,y hotspot co-ordinates
 	short view;           // view (for animating cursors) or -1
 	char  name[10];       // name of cursor mode
 	char  flags;          // MCF_flags above

@@ -272,11 +272,11 @@ void GUIButton::DrawImageButton(Bitmap *ds, bool draw_disabled) {
 		draw_gui_sprite(ds, CurrentImage, X, Y, true);
 
 	// Draw active inventory item
-	if (_placeholder != kButtonPlace_None && gui_inv_pic >= 0) {
+	if (_placeholder != kButtonPlace_None && _G(gui_inv_pic) >= 0) {
 		GUIButtonPlaceholder place = _placeholder;
 		if (place == kButtonPlace_InvItemAuto) {
-			if ((get_adjusted_spritewidth(gui_inv_pic) > Width - 6) ||
-				(get_adjusted_spriteheight(gui_inv_pic) > Height - 6)) {
+			if ((get_adjusted_spritewidth(_G(gui_inv_pic)) > Width - 6) ||
+				(get_adjusted_spriteheight(_G(gui_inv_pic)) > Height - 6)) {
 				place = kButtonPlace_InvItemStretch;
 			} else {
 				place = kButtonPlace_InvItemCenter;
@@ -284,11 +284,11 @@ void GUIButton::DrawImageButton(Bitmap *ds, bool draw_disabled) {
 		}
 
 		if (place == kButtonPlace_InvItemStretch) {
-			ds->StretchBlt(_GP(spriteset)[gui_inv_pic], RectWH(X + 3, Y + 3, Width - 6, Height - 6), Shared::kBitmap_Transparency);
+			ds->StretchBlt(_GP(spriteset)[_G(gui_inv_pic)], RectWH(X + 3, Y + 3, Width - 6, Height - 6), Shared::kBitmap_Transparency);
 		} else if (place == kButtonPlace_InvItemCenter) {
-			draw_gui_sprite(ds, gui_inv_pic,
-				X + Width / 2 - get_adjusted_spritewidth(gui_inv_pic) / 2,
-				Y + Height / 2 - get_adjusted_spriteheight(gui_inv_pic) / 2,
+			draw_gui_sprite(ds, _G(gui_inv_pic),
+				X + Width / 2 - get_adjusted_spritewidth(_G(gui_inv_pic)) / 2,
+				Y + Height / 2 - get_adjusted_spriteheight(_G(gui_inv_pic)) / 2,
 				true);
 		}
 	}

@@ -38,9 +38,6 @@ namespace AGS3 {
 #define NUM_CONDIT    (120 + NUMOTCON)
 #endif
 
-
-
-
 #define MAX_SCRIPT_NAME_LEN 20
 
 //const int MISC_COND = MAX_WALK_BEHINDS * 4 + NUMOTCON + MAX_ROOM_OBJECTS * 4;

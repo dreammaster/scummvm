@@ -35,8 +35,9 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 class Stream;
-}
-}
+} // namespace Shared
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
 struct Pointer_Hash {
@@ -62,11 +63,13 @@ private:
 			return obj_type != kScValUndefined;
 		}
 
-		ManagedObject()
-			: obj_type(kScValUndefined), handle(0), addr(nullptr), callback(nullptr), refCount(0) {
+		ManagedObject() : obj_type(kScValUndefined), handle(0), addr(nullptr),
+			callback(nullptr), refCount(0) {
 		}
-		ManagedObject(ScriptValueType obj_type, int32_t handle, const char *addr, ICCDynamicObject *callback)
-			: obj_type(obj_type), handle(handle), addr(addr), callback(callback), refCount(0) {
+		ManagedObject(ScriptValueType theType, int32_t theHandle,
+				const char *theAddr, ICCDynamicObject *theCallback)
+			: obj_type(theType), handle(theHandle), addr(theAddr),
+			callback(theCallback), refCount(0) {
 		}
 	};
 

@@ -32,6 +32,7 @@
 #ifndef AGS_SHARED_GFX_ALLEGRO_BITMAP_H
 #define AGS_SHARED_GFX_ALLEGRO_BITMAP_H
 
+#include "graphics/screen.h"
 #include "ags/lib/allegro.h" // BITMAP
 #include "ags/shared/core/types.h"
 #include "ags/shared/gfx/bitmap.h"
@@ -71,6 +72,19 @@ public:
 	// use of raw BITMAP struct with Bitmap
 	inline BITMAP *GetAllegroBitmap() {
 		return _alBitmap;
+	}
+
+	// Is this a "normal" bitmap created by application which data can be directly accessed for reading and writing
+	inline bool IsMemoryBitmap() const {
+		return true;
+	}
+	// Is this a video bitmap
+	inline bool IsVideoBitmap() const {
+		return dynamic_cast<Graphics::Screen *>(_alBitmap) != nullptr;
+	}
+	// Is this a linear bitmap, the one that can be accessed linearly within each scanline
+	inline bool IsLinearBitmap() const {
+		return true;
 	}
 
 	// Is this a subbitmap, referencing a part of another, bigger one?

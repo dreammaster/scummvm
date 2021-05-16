@@ -755,7 +755,7 @@ ScriptOverlay* Character_SayBackground(CharacterInfo *chaa, const char *texx) {
     scOver->borderWidth = 0;
     scOver->isBackgroundSpeech = 1;
     int handl = ccRegisterManagedObject(scOver, scOver);
-    _G(screenover)[ovri].associatedOverlayHandle = handl;
+    _GP(screenover)[ovri].associatedOverlayHandle = handl;
 
     return scOver;
 }
@@ -1678,17 +1678,17 @@ void walk_character(int chac,int tox,int toy,int ignwal, bool autoWalkAnims) {
     // are still displayed as such
     debug_script_log("%s: Start move to %d,%d", chin->scrname, toxPassedIn, toyPassedIn);
 
-    int _G(move_speed_x) = chin->walkspeed;
-    int _G(move_speed_y) = chin->walkspeed;
+    int move_speed_x = chin->walkspeed;
+    int move_speed_y = chin->walkspeed;
 
     if (chin->walkspeed_y != UNIFORM_WALK_SPEED)
-        _G(move_speed_y) = chin->walkspeed_y;
+        move_speed_y = chin->walkspeed_y;
 
-    if ((_G(move_speed_x) == 0) && (_G(move_speed_y) == 0)) {
+    if ((move_speed_x == 0) && (move_speed_y == 0)) {
         debug_script_warn("Warning: MoveCharacter called for '%s' with walk speed 0", chin->name);
     }
 
-    set_route_move_speed(_G(move_speed_x), _G(move_speed_y));
+    set_route_move_speed(move_speed_x, move_speed_y);
     set_color_depth(8);
     int mslot=find_route(charX, charY, tox, toy, prepare_walkable_areas(chac), chac+CHMLSOFFS, 1, ignwal);
     set_color_depth(_GP(game).GetColorDepth());
@@ -2279,7 +2279,7 @@ int my_getpixel(Bitmap *blk, int x, int y) {
     // strip the alpha channel
 	// TODO: is there a way to do this vtable thing with Bitmap?
 	BITMAP *al_bmp = (BITMAP*)blk->GetAllegroBitmap();
-    return al_bmp->vtable->getpixel(al_bmp, x, y) & 0x00ffffff;
+	return al_bmp->getpixel(x, y) & 0x00ffffff;
 }
 
 int check_click_on_character(int xx,int yy,int mood) {
@@ -2354,8 +2354,8 @@ void _displayspeech(const char*texx, int aschar, int xx, int yy, int widd, int i
     if (_GP(play).bgspeech_stay_on_display == 0) {
         // remove any background speech
         for (aa=0;aa<_G(numscreenover);aa++) {
-            if (_G(screenover)[aa].timeout > 0) {
-                remove_screen_overlay(_G(screenover)[aa].type);
+            if (_GP(screenover)[aa].timeout > 0) {
+                remove_screen_overlay(_GP(screenover)[aa].type);
                 aa--;
             }
         }

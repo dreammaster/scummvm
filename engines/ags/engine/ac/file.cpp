@@ -21,8 +21,8 @@
  */
 
 #include "ags/engine/ac/asset_helper.h"
-#include "ags/shared/ac/audiocliptype.h"
-#include "ags/shared/ac/file.h"
+#include "ags/shared/ac/audio_clip_type.h"
+#include "ags/engine/ac/file.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
@@ -115,7 +115,7 @@ void File_ReadRawLine(sc_File *fil, char *buffer) {
 	Stream *in = get_valid_file_stream_from_handle(fil->handle, "File.ReadRawLine");
 	check_strlen(buffer);
 	int i = 0;
-	while (i < MAXSTRLEN - 1) {
+	while (i < _G(MAXSTRLEN) - 1) {
 		buffer[i] = in->ReadInt8();
 		if (buffer[i] == 13) {
 			// CR -- skip LF and abort

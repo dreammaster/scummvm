@@ -29,13 +29,15 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 class Bitmap; class Stream;
-}
-}
+} // namespace Shared
+} // namespace AGS
+
 namespace AGS {
 namespace Engine {
 class IDriverDependantBitmap;
-}
-}
+} // namespace Engine
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
 

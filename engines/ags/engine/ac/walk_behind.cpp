@@ -38,7 +38,7 @@ using namespace AGS::Engine;
 
 
 char *_G(walkBehindExists) = nullptr;  // whether a WB area is in this column
-int *_G(walkBehindStartY) = nullptr, *walkBehindEndY = nullptr;
+int *_G(walkBehindStartY) = nullptr, *_G(walkBehindEndY) = nullptr;
 char _G(noWalkBehindsAtAll) = 0;
 int _G(walkBehindLeft)[MAX_WALK_BEHINDS], _G(walkBehindTop)[MAX_WALK_BEHINDS];
 int _G(walkBehindRight)[MAX_WALK_BEHINDS], _G(walkBehindBottom)[MAX_WALK_BEHINDS];
@@ -87,12 +87,12 @@ void recache_walk_behinds() {
 	if (_G(walkBehindExists)) {
 		free(_G(walkBehindExists));
 		free(_G(walkBehindStartY));
-		free(walkBehindEndY);
+		free(_G(walkBehindEndY));
 	}
 
 	_G(walkBehindExists) = (char *)malloc(_GP(thisroom).WalkBehindMask->GetWidth());
 	_G(walkBehindStartY) = (int *)malloc(_GP(thisroom).WalkBehindMask->GetWidth() * sizeof(int));
-	walkBehindEndY = (int *)malloc(_GP(thisroom).WalkBehindMask->GetWidth() * sizeof(int));
+	_G(walkBehindEndY) = (int *)malloc(_GP(thisroom).WalkBehindMask->GetWidth() * sizeof(int));
 	_G(noWalkBehindsAtAll) = 1;
 
 	int ee, rr, tmm;
@@ -122,7 +122,7 @@ void recache_walk_behinds() {
 					_G(walkBehindExists)[ee] = tmm;
 					_G(noWalkBehindsAtAll) = 0;
 				}
-				walkBehindEndY[ee] = rr + 1;  // +1 to allow bottom line of screen to work
+				_G(walkBehindEndY)[ee] = rr + 1;  // +1 to allow bottom line of screen to work
 
 				if (ee < _G(walkBehindLeft)[tmm]) _G(walkBehindLeft)[tmm] = ee;
 				if (rr < _G(walkBehindTop)[tmm]) _G(walkBehindTop)[tmm] = rr;

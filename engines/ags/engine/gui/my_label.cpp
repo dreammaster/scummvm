@@ -20,7 +20,6 @@
  *
  */
 
-//include <string.h>
 #include "ags/shared/ac/display.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/engine/ac/string.h"

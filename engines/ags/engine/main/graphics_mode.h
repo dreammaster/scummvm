@@ -24,6 +24,7 @@
 #define AGS_ENGINE_MAIN_GRAPHICS_MODE_H
 
 #include "ags/engine/gfx/gfx_defines.h"
+#include "ags/shared/util/geometry.h"
 #include "ags/engine/util/scaling.h"
 #include "ags/shared/util/string.h"
 

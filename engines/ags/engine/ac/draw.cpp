@@ -831,7 +831,7 @@ int sort_out_walk_behinds(Bitmap *sprit,int xx,int yy,int basel, Bitmap *copyPix
             break;
 
         if ((!_G(walkBehindExists)[ee+xx]) ||
-            (walkBehindEndY[ee+xx] <= yy) ||
+            (_G(walkBehindEndY)[ee+xx] <= yy) ||
             (_G(walkBehindStartY)[ee+xx] > yy+sprit->GetHeight()))
             continue;
 
@@ -847,8 +847,8 @@ int sort_out_walk_behinds(Bitmap *sprit,int xx,int yy,int basel, Bitmap *copyPix
             rr = 0 - yy;
         if (toheight + yy > screenhit)
             toheight = screenhit - yy;
-        if (toheight + yy > walkBehindEndY[ee+xx])
-            toheight = walkBehindEndY[ee+xx] - yy;
+        if (toheight + yy > _G(walkBehindEndY)[ee+xx])
+            toheight = _G(walkBehindEndY)[ee+xx] - yy;
         if (rr < 0)
             rr = 0;
 
@@ -2070,12 +2070,12 @@ void draw_gui_and_overlays()
     // draw overlays, except text boxes and portraits
     for (gg=0;gg<_G(numscreenover);gg++) {
         // complete overlay draw in non-transparent mode
-        if (_G(screenover)[gg].type == OVER_COMPLETE)
-            add_thing_to_draw(_G(screenover)[gg].bmp, _G(screenover)[gg].x, _G(screenover)[gg].y, TRANS_OPAQUE, false);
-        else if (_G(screenover)[gg].type != OVER_TEXTMSG && _G(screenover)[gg].type != OVER_PICTURE) {
+        if (_GP(screenover)[gg].type == OVER_COMPLETE)
+            add_thing_to_draw(_GP(screenover)[gg].bmp, _GP(screenover)[gg].x, _GP(screenover)[gg].y, TRANS_OPAQUE, false);
+        else if (_GP(screenover)[gg].type != OVER_TEXTMSG && _GP(screenover)[gg].type != OVER_PICTURE) {
             int tdxp, tdyp;
-            get_overlay_position(_G(screenover)[gg], &tdxp, &tdyp);
-            add_thing_to_draw(_G(screenover)[gg].bmp, tdxp, tdyp, 0, _G(screenover)[gg].hasAlphaChannel);
+            get_overlay_position(_GP(screenover)[gg], &tdxp, &tdyp);
+            add_thing_to_draw(_GP(screenover)[gg].bmp, tdxp, tdyp, 0, _GP(screenover)[gg].hasAlphaChannel);
         }
     }
 
@@ -2089,8 +2089,10 @@ void draw_gui_and_overlays()
             quit("!The player.activeinv variable has been corrupted, probably as a result\n"
                 "of an incorrect assignment in the game script.");
         }
-        if (_G(playerchar)->activeinv < 1) gui_inv_pic=-1;
-        else gui_inv_pic=_GP(game).invinfo[_G(playerchar)->activeinv].pic;
+        if (_G(playerchar)->activeinv < 1)
+			_G(gui_inv_pic)=-1;
+        else
+			_G(gui_inv_pic)=_GP(game).invinfo[_G(playerchar)->activeinv].pic;
         _G(our_eip) = 37;
         {
             for (aa=0;aa<_GP(game).numgui;aa++) {
@@ -2157,11 +2159,11 @@ void draw_gui_and_overlays()
     // draw speech and portraits (so that they appear over GUIs)
     for (gg=0;gg<_G(numscreenover);gg++) 
     {
-        if (_G(screenover)[gg].type == OVER_TEXTMSG || _G(screenover)[gg].type == OVER_PICTURE)
+        if (_GP(screenover)[gg].type == OVER_TEXTMSG || _GP(screenover)[gg].type == OVER_PICTURE)
         {
             int tdxp, tdyp;
-            get_overlay_position(_G(screenover)[gg], &tdxp, &tdyp);
-            add_thing_to_draw(_G(screenover)[gg].bmp, tdxp, tdyp, 0, false);
+            get_overlay_position(_GP(screenover)[gg], &tdxp, &tdyp);
+            add_thing_to_draw(_GP(screenover)[gg].bmp, tdxp, tdyp, 0, false);
         }
     }
 
@@ -2379,7 +2381,8 @@ void construct_game_screen_overlay(bool draw_mouse)
     // Stage: mouse cursor
     if (draw_mouse && !_GP(play).mouse_cursor_hidden && _GP(play).screen_is_faded_out == 0)
     {
-        _G(gfxDriver)->DrawSprite(_G(mousex) - _G(hotx), _G(mousey) - _G(hoty), _G(mouseCursor));
+        _G(gfxDriver)->DrawSprite(_G(mousex) - _G(hotx), _G(mousey) - _G(hoty),
+			_G(mouseCursor));
         invalidate_sprite(_G(mousex) - _G(hotx), _G(mousey) - _G(hoty), _G(mouseCursor), false);
     }
 

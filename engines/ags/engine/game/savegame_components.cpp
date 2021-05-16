@@ -848,8 +848,8 @@ HSaveError WriteOverlays(Stream *out)
     out->WriteInt32(_G(numscreenover));
     for (int i = 0; i < _G(numscreenover); ++i)
     {
-        _G(screenover)[i].WriteToFile(out);
-        serialize_bitmap(_G(screenover)[i].pic, out);
+        _GP(screenover)[i].WriteToFile(out);
+        serialize_bitmap(_GP(screenover)[i].pic, out);
     }
     return HSaveError::None();
 }
@@ -863,9 +863,9 @@ HSaveError ReadOverlays(Stream *in, int32_t cmp_ver, const PreservedParams &pp, 
     _G(numscreenover) = over_count;
     for (int i = 0; i < _G(numscreenover); ++i)
     {
-        _G(screenover)[i].ReadFromFile(in, cmp_ver);
-        if (_G(screenover)[i].hasSerializedBitmap)
-            _G(screenover)[i].pic = read_serialized_bitmap(in);
+        _GP(screenover)[i].ReadFromFile(in, cmp_ver);
+        if (_GP(screenover)[i].hasSerializedBitmap)
+            _GP(screenover)[i].pic = read_serialized_bitmap(in);
     }
     return err;
 }

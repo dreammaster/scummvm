@@ -43,7 +43,7 @@ using namespace AGS::Shared;
 
 #define MOVER_MOUSEDOWNLOCKED -4000
 
-int all_buttons_disabled = 0, gui_inv_pic = -1;
+int all_buttons_disabled = 0, _G(gui_inv_pic) = -1;
 int _G(gui_disabled_style) = 0;
 
 namespace AGS {

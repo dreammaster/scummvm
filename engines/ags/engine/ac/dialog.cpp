@@ -473,7 +473,7 @@ void DialogOptions::Prepare(int _dlgnum, bool _runGameLoopsInBackground)
   usingfont=FONT_NORMAL;
   lineheight = getfontheight_outlined(usingfont);
   linespacing = getfontspacing_outlined(usingfont);
-  curswas=_G(_G(cur_cursor));
+  curswas=_G(cur_cursor);
   bullet_wid = 0;
   ddb = nullptr;
   subBitmap = nullptr;

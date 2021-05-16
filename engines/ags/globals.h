@@ -41,6 +41,7 @@
 #include "ags/lib/allegro/color.h"
 #include "ags/lib/allegro/fixed.h"
 #include "ags/lib/allegro/aintern.h"
+#include "ags/globals.h"
 
 namespace Shared {
 class DumpFile;
@@ -666,7 +667,7 @@ public:
 	ObjectCache *_objcache;
 	MoveList *_mls = nullptr;
 	GameSetup *_usetup;
-//	AGS::Shared::String _saveGameDirectory;
+	AGS::Shared::String _saveGameDirectory;
 //	AGS::Shared::String _saveGameParent;
 //	AGS::Shared::String _saveGameSuffix;
 	bool _want_exit = false;
@@ -1018,7 +1019,7 @@ public:
 	//int _boundx1 = 0, _boundx2 = 99999, _boundy1 = 0, _boundy2 = 99999;
 	//int _disable_mgetgraphpos = 0;
 	//char _ignore_bounds = 0;
-	//AGS::Shared::Bitmap *_mousecurs[MAXCURSORS];
+	AGS::Shared::Bitmap *_mousecurs[MAXCURSORS];
 
 	ScriptMouse *_scmouse;
 	int _cur_mode = 0, _cur_cursor = 0;
@@ -1026,7 +1027,7 @@ public:
 	int _lastmx = -1, _lastmy = -1;
 	//char _alpha_blend_cursor = 0;
 	//AGS::Shared::Bitmap *_dotted_mouse_cursor = nullptr;
-	//AGS::Engine::IDriverDependantBitmap *_mouseCursor = nullptr;
+	AGS::Engine::IDriverDependantBitmap *_mouseCursor = nullptr;
 	//AGS::Shared::Bitmap *_blank_mouse_cursor = nullptr;
 
 	/**@}*/
