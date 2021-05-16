@@ -324,4 +324,8 @@ void Mouse::UpdateGraphicArea() {
 	// TODO
 }
 
+void Mouse::SetMovementControl(bool flag) {
+	// TODO
+}
+
 } // namespace AGS3

@@ -20,24 +20,16 @@
  *
  */
 
+#include "ags/lib/std/thread.h"
 #include "ags/engine/ac/timer.h"
-
 #include "ags/shared/core/platform.h"
-//include <thread>
 #include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 namespace {
-
 const auto MAXIMUM_FALL_BEHIND = 3;
-
-auto _G(tick_duration) = std::chrono::microseconds(1000000LL / 40);
-auto _G(framerate_maxed) = false;
-
-auto _G(last_tick_time) = AGS_Clock::now();
-auto _G(next_frame_timestamp) = AGS_Clock::now();
-
 }
 
 std::chrono::microseconds GetFrameDuration() {

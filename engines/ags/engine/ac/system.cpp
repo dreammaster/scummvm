@@ -20,7 +20,6 @@
  *
  */
 
-//include <SDL.h>
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/dynobj/cc_audio_channel.h"
@@ -45,6 +44,7 @@
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 #include "ags/globals.h"
+#include "ags/events.h"
 
 namespace AGS3 {
 
@@ -98,7 +98,7 @@ int System_GetViewportWidth() {
 }
 
 const char *System_GetVersion() {
-	return CreateNewScriptString(EngineVersion.LongString);
+	return CreateNewScriptString(_G(EngineVersion).LongString);
 }
 
 int System_GetHardwareAcceleration() {
@@ -106,21 +106,15 @@ int System_GetHardwareAcceleration() {
 }
 
 int System_GetNumLock() {
-	SDL_PumpEvents();
-	SDL_Keymod mod_state = SDL_GetModState();
-	return (mod_state & KMOD_NUM) ? 1 : 0;
+	return (::AGS::g_events->getModifierFlags() & __allegro_KB_NUMLOCK_FLAG) ? 1 : 0;
 }
 
 int System_GetCapsLock() {
-	SDL_PumpEvents();
-	SDL_Keymod mod_state = SDL_GetModState();
-	return (mod_state & KMOD_CAPS) ? 1 : 0;
+	return (::AGS::g_events->getModifierFlags() & __allegro_KB_CAPSLOCK_FLAG) ? 1 : 0;
 }
 
 int System_GetScrollLock() {
-	SDL_PumpEvents();
-	const Uint8 *state = SDL_GetKeyboardState(NULL);
-	return (state[SDL_SCANCODE_SCROLLLOCK]) ? 1 : 0;
+	return (::AGS::g_events->getModifierFlags() & __allegro_KB_SCROLOCK_FLAG) ? 1 : 0;
 }
 
 int System_GetVsync() {

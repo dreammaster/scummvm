@@ -55,18 +55,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-
-
-
-
-
-
-
-extern Bitmap *_G(walkable_areas_temp);
-
-
-
-
 int Object_IsCollidingWithObject(ScriptObject *objj, ScriptObject *obj2) {
 	return AreObjectsColliding(objj->id, obj2->id);
 }

@@ -112,6 +112,7 @@ struct Mouse {
 	void SetPosition(const Point p);
 
 	void UpdateGraphicArea();
+	void SetMovementControl(bool flag);
 };
 
 } // namespace AGS3

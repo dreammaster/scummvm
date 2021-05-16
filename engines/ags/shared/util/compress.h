@@ -24,6 +24,7 @@
 #define AGS_SHARED_UTIL_COMPRESS_H
 
 #include "ags/shared/core/types.h"
+#include "ags/shared/util/wgt2_allg.h"
 
 namespace AGS3 {
 

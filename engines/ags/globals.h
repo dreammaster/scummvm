@@ -1227,6 +1227,8 @@ public:
 	 */
 
 	TreeMap *_transtree = nullptr;
+	String _trans_name;
+	String _trans_filename;
 	//long _lang_offs_start = 0;
 	//char _transFileName[MAX_PATH] = { 0 };
 

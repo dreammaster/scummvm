@@ -20,8 +20,7 @@
  *
  */
 
-//include <string.h>
-//include <stdlib.h>
+#include "common/str.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/tree_map.h"
 

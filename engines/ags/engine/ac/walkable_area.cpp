@@ -32,19 +32,11 @@
 #include "ags/engine/ac/walkable_area.h"
 #include "ags/shared/game/room_struct.h"
 #include "ags/shared/gfx/bitmap.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
-
-
-
-
-
-Bitmap *_G(walkareabackup) = nullptr, *_G(walkable_areas_temp) = nullptr;
 
 void redo_walkable_areas() {
 	_GP(thisroom).WalkAreaMask->Blit(_G(walkareabackup), 0, 0, 0, 0, _GP(thisroom).WalkAreaMask->GetWidth(), _GP(thisroom).WalkAreaMask->GetHeight());

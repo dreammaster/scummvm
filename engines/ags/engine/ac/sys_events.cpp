@@ -20,9 +20,9 @@
  *
  */
 
+#include "common/events.h"
 #include "ags/engine/ac/sys_events.h"
 //include <deque>
-//include <SDL.h>
 #include "ags/shared/core/platform.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
@@ -32,16 +32,20 @@
 #include "ags/engine/device/mouse_w32.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/main/engine.h"
+#include "ags/globals.h"
+
+// TODO: Replace me
+typedef int SDL_Scancode;
+
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-
 // Converts SDL scan and key codes to the ags keycode
 eAGSKeyCode ags_keycode_from_sdl(const SDL_Event &event) {
+#ifdef TODO
 	// Printable ASCII characters are returned only from SDL_TEXTINPUT event,
 	// as it has key presses + mods correctly converted using current system locale already,
 	// so no need to do that manually.
@@ -49,18 +53,18 @@ eAGSKeyCode ags_keycode_from_sdl(const SDL_Event &event) {
 	// received when user presses for example Shift + 1 on regular keyboard, but only on
 	// systems where single keypress can produce that symbol.
 	// NOTE: following will not work for Unicode, will need to reimplement whole thing
-	if (event.type == SDL_TEXTINPUT) {
-		unsigned char textch = event.text.text[0];
+	if (_G(event).type == SDL_TEXTINPUT) {
+		unsigned char textch = _G(event).text.text[0];
 		if (textch >= 32 && textch <= 255) {
 			return static_cast<eAGSKeyCode>(textch);
 		}
 		return eAGSKeyCodeNone;
 	}
 
-	if (event.type != SDL_KEYDOWN)
+	if (_G(event).type != SDL_KEYDOWN)
 		return eAGSKeyCodeNone;
 
-	const SDL_Keysym key = event.key.keysym;
+	const SDL_Keysym key = _G(event).key.keysym;
 	const SDL_Keycode sym = key.sym;
 	const Uint16 mod = key.mod;
 	// Ctrl and Alt combinations realign the letter code to certain offset
@@ -120,6 +124,9 @@ eAGSKeyCode ags_keycode_from_sdl(const SDL_Event &event) {
 
 	default: return eAGSKeyCodeNone;
 	}
+#else
+	error("TODO: ags_keycode_from_sdl");
+#endif
 	return eAGSKeyCodeNone;
 }
 
@@ -127,6 +134,7 @@ eAGSKeyCode ags_keycode_from_sdl(const SDL_Event &event) {
 // NOTE: will ignore Ctrl+ or Alt+ script keys.
 // TODO: double check and ammend later if anything is missing
 bool ags_key_to_sdl_scan(eAGSKeyCode key, SDL_Scancode(&scan)[3]) {
+#ifdef TODO
 	scan[0] = SDL_SCANCODE_UNKNOWN;
 	scan[1] = SDL_SCANCODE_UNKNOWN;
 	scan[2] = SDL_SCANCODE_UNKNOWN;
@@ -188,6 +196,9 @@ bool ags_key_to_sdl_scan(eAGSKeyCode key, SDL_Scancode(&scan)[3]) {
 
 	default: return false;
 	}
+#else
+	error("TODO: ags_key_to_sdl_scan");
+#endif
 	return false;
 }
 
@@ -201,9 +212,10 @@ bool ags_key_to_sdl_scan(eAGSKeyCode key, SDL_Scancode(&scan)[3]) {
 // KEYBOARD INPUT
 // ----------------------------------------------------------------------------
 
+#ifdef TODO
 // Because our game engine still uses input polling, we have to accumulate
 // key events for our internal use whenever engine have to query key input.
-static std::deque<SDL_Event> g_keyEvtQueue;
+static Common::Queue<Common::Event> g_keyEvtQueue;
 
 bool ags_keyevent_ready() {
 	return g_keyEvtQueue.size() > 0;
@@ -234,9 +246,9 @@ void ags_simulate_keypress(eAGSKeyCode ags_key) {
 		return;
 	// Push a key event to the event queue; note that this won't affect the key states array
 	SDL_Event sdlevent = {};
-	sdlevent.type = SDL_KEYDOWN;
-	sdlevent.key.keysym.sym = SDL_GetKeyFromScancode(scan[0]);
-	sdlevent.key.keysym.scancode = scan[0];
+	sdl_G(event).type = SDL_KEYDOWN;
+	sdl_G(event).key.keysym.sym = SDL_GetKeyFromScancode(scan[0]);
+	sdl_G(event).key.keysym.scancode = scan[0];
 	SDL_PushEvent(&sdlevent);
 }
 
@@ -304,26 +316,26 @@ static int mouse_button_poll() {
 }
 
 static void on_sdl_mouse_motion(const SDL_MouseMotionEvent &event) {
-	sys_mouse_x = event.x;
-	sys_mouse_y = event.y;
-	mouse_accum_relx += event.xrel;
-	mouse_accum_rely += event.yrel;
+	sys_mouse_x = _G(event).x;
+	sys_mouse_y = _G(event).y;
+	mouse_accum_relx += _G(event).xrel;
+	mouse_accum_rely += _G(event).yrel;
 }
 
 static void on_sdl_mouse_button(const SDL_MouseButtonEvent &event) {
-	sys_mouse_x = event.x;
-	sys_mouse_y = event.y;
+	sys_mouse_x = _G(event).x;
+	sys_mouse_y = _G(event).y;
 
-	if (event.type == SDL_MOUSEBUTTONDOWN) {
-		mouse_button_state |= sdl_button_to_mask(event.button);
-		mouse_accum_button_state |= sdl_button_to_mask(event.button);
+	if (_G(event).type == SDL_MOUSEBUTTONDOWN) {
+		mouse_button_state |= sdl_button_to_mask(_G(event).button);
+		mouse_accum_button_state |= sdl_button_to_mask(_G(event).button);
 	} else {
-		mouse_button_state &= ~sdl_button_to_mask(event.button);
+		mouse_button_state &= ~sdl_button_to_mask(_G(event).button);
 	}
 }
 
 static void on_sdl_mouse_wheel(const SDL_MouseWheelEvent &event) {
-	sys_mouse_z += event.y;
+	sys_mouse_z += _G(event).y;
 }
 
 int butwas = 0;
@@ -448,7 +460,7 @@ void sys_evt_set_focus_callbacks(void(*switch_in)(void), void(*switch_out)(void)
 }
 
 void sys_evt_process_one(const SDL_Event &event) {
-	switch (event.type) {
+	switch (_G(event).type) {
 		// GENERAL
 	case SDL_QUIT:
 		if (_on_quit_callback) {
@@ -457,7 +469,7 @@ void sys_evt_process_one(const SDL_Event &event) {
 		break;
 		// WINDOW
 	case SDL_WINDOWEVENT:
-		switch (event.window.event) {
+		switch (_G(event).window.event) {
 		case SDL_WINDOWEVENT_FOCUS_GAINED:
 			if (_on_switchin_callback) {
 				_on_switchin_callback();
@@ -469,7 +481,7 @@ void sys_evt_process_one(const SDL_Event &event) {
 			}
 			break;
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
-			engine_on_window_changed(Size(event.window.data1, event.window.data2));
+			engine_on_window_changed(Size(_G(event).window.data1, _G(event).window.data2));
 			break;
 		}
 		break;
@@ -481,14 +493,14 @@ void sys_evt_process_one(const SDL_Event &event) {
 		on_sdl_textinput(event);
 		break;
 	case SDL_MOUSEMOTION:
-		on_sdl_mouse_motion(event.motion);
+		on_sdl_mouse_motion(_G(event).motion);
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 	case SDL_MOUSEBUTTONUP:
-		on_sdl_mouse_button(event.button);
+		on_sdl_mouse_button(_G(event).button);
 		break;
 	case SDL_MOUSEWHEEL:
-		on_sdl_mouse_wheel(event.wheel);
+		on_sdl_mouse_wheel(_G(event).wheel);
 		break;
 	}
 }
@@ -499,5 +511,6 @@ void sys_evt_process_pending(void) {
 		sys_evt_process_one(event);
 	}
 }
+#endif
 
 } // namespace AGS3

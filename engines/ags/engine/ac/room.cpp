@@ -20,8 +20,6 @@
  *
  */
 
-//include <ctype.h> // for toupper
-
 #include "ags/shared/core/platform.h"
 #include "ags/shared/util/string_utils.h" //strlwr()
 #include "ags/shared/ac/common.h"
@@ -280,10 +278,10 @@ void unload_old_room() {
 
     for (ff = 0; ff < _G(croom)->numobj; ff++) {
         // un-export the object's script object
-        if (_GP(objectScriptObjNames)[ff].IsEmpty())
+        if (_G(objectScriptObjNames)[ff].IsEmpty())
             continue;
 
-        ccRemoveExternalSymbol(_GP(objectScriptObjNames)[ff]);
+        ccRemoveExternalSymbol(_G(objectScriptObjNames)[ff]);
     }
 
     for (ff = 0; ff < MAX_ROOM_HOTSPOTS; ff++) {
@@ -623,15 +621,15 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
     for (cc = 0; cc < MAX_ROOM_OBJECTS; cc++) {
         // 64 bit: Using the id instead
         // _G(scrObj)[cc].obj = &_G(croom)->obj[cc];
-        _GP(objectScriptObjNames)[cc].Free();
+        _G(objectScriptObjNames)[cc].Free();
     }
 
     for (cc = 0; cc < _G(croom)->numobj; cc++) {
         // export the object's script object
         if (_GP(thisroom).Objects[cc].ScriptName.IsEmpty())
             continue;
-        _GP(objectScriptObjNames)[cc] = _GP(thisroom).Objects[cc].ScriptName;
-        ccAddExternalDynamicObject(_GP(objectScriptObjNames)[cc], &_G(scrObj)[cc], &_GP(ccDynamicObject));
+        _G(objectScriptObjNames)[cc] = _GP(thisroom).Objects[cc].ScriptName;
+        ccAddExternalDynamicObject(_G(objectScriptObjNames)[cc], &_G(scrObj)[cc], &_GP(ccDynamicObject));
     }
 
     for (cc = 0; cc < MAX_ROOM_HOTSPOTS; cc++) {

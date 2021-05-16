@@ -340,10 +340,10 @@ Navigation::NavResult Navigation::Navigate(int sx, int sy, int ex, int ey, std::
 	if (!TraceLine(sx, sy, ex, ey, &opath))
 		return NAV_STRAIGHT;
 
-	NodeInfo &ni = mapNodes[sy * mapWidth + sx];
-	ni.dist = 0;
-	ni.frameId = frameId;
-	ni.prev = -1;
+	NodeInfo &nodeInfo = mapNodes[sy * mapWidth + sx];
+	nodeInfo.dist = 0;
+	nodeInfo.frameId = frameId;
+	nodeInfo.prev = -1;
 
 	closest = 0x7fffffff;
 	cnode = PackSquare(sx, sy);
@@ -409,48 +409,48 @@ Navigation::NavResult Navigation::Navigate(int sx, int sy, int ex, int ey, std::
 			// filter
 			int px, py;
 			UnpackSquare(prev, px, py);
-			int dx = sign(x - px);
-			int dy = sign(y - py);
-			assert(dx || dy);
+			int vdx = sign(x - px);
+			int vdy = sign(y - py);
+			assert(vdx || vdy);
 
-			if (!dy) {
-				AddPruned(pneig, ncount, x + dx, y);
+			if (!vdy) {
+				AddPruned(pneig, ncount, x + vdx, y);
 
 				// add corners
-				if (!nodiag || Passable(x + dx, y)) {
+				if (!nodiag || Passable(x + vdx, y)) {
 					if (!Passable(x, y + 1))
-						AddPruned(pneig, ncount, x + dx, y + 1);
+						AddPruned(pneig, ncount, x + vdx, y + 1);
 
 					if (!Passable(x, y - 1))
-						AddPruned(pneig, ncount, x + dx, y - 1);
+						AddPruned(pneig, ncount, x + vdx, y - 1);
 				}
-			} else if (!dx) {
+			} else if (!vdx) {
 				// same as above but transposed
-				AddPruned(pneig, ncount, x, y + dy);
+				AddPruned(pneig, ncount, x, y + vdy);
 
 				// add corners
-				if (!nodiag || Passable(x, y + dy)) {
+				if (!nodiag || Passable(x, y + vdy)) {
 					if (!Passable(x + 1, y))
-						AddPruned(pneig, ncount, x + 1, y + dy);
+						AddPruned(pneig, ncount, x + 1, y + vdy);
 
 					if (!Passable(x - 1, y))
-						AddPruned(pneig, ncount, x - 1, y + dy);
+						AddPruned(pneig, ncount, x - 1, y + vdy);
 				}
 			} else {
 				// diagonal case
-				AddPruned(pneig, ncount, x, y + dy);
-				AddPruned(pneig, ncount, x + dx, y);
+				AddPruned(pneig, ncount, x, y + vdy);
+				AddPruned(pneig, ncount, x + vdx, y);
 
-				if (!nodiag || Reachable(x, y, x + dx, y + dy))
-					AddPruned(pneig, ncount, x + dx, y + dy);
+				if (!nodiag || Reachable(x, y, x + vdx, y + vdy))
+					AddPruned(pneig, ncount, x + vdx, y + vdy);
 
-				if (!Passable(x - dx, y) &&
-					(nodiag || Reachable(x, y, x - dx, y + dy)))
-					AddPruned(pneig, ncount, x - dx, y + dy);
+				if (!Passable(x - vdx, y) &&
+					(nodiag || Reachable(x, y, x - vdx, y + vdy)))
+					AddPruned(pneig, ncount, x - vdx, y + vdy);
 
-				if (!Passable(x, y - dy) &&
-					(nodiag || Reachable(x, y, x + dx, y - dy)))
-					AddPruned(pneig, ncount, x + dx, y - dy);
+				if (!Passable(x, y - vdy) &&
+					(nodiag || Reachable(x, y, x + vdx, y - vdy)))
+					AddPruned(pneig, ncount, x + vdx, y - vdy);
 			}
 		}
 
@@ -478,9 +478,9 @@ Navigation::NavResult Navigation::Navigate(int sx, int sy, int ex, int ey, std::
 			int nx, ny;
 			UnpackSquare(pneig[ni], nx, ny);
 
-			int dx = nx - x;
-			int dy = ny - y;
-			int j = FindJump(x, y, dx, dy, ex, ey);
+			int vdx = nx - x;
+			int vdy = ny - y;
+			int j = FindJump(x, y, vdx, vdy, ex, ey);
 
 			if (j < 0)
 				continue;

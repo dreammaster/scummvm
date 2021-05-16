@@ -35,24 +35,17 @@
 #include "ags/shared/util/misc.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/core/asset_manager.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 
-
-
-
-
-String trans_name;
-String trans_filename;
-std::unique_ptr<TreeMap> _G(transtree);
-
-
 void close_translation() {
-	_G(transtree).reset();
-	trans_name = "";
-	trans_filename = "";
+	delete _G(transtree);
+	_G(transtree) = nullptr;
+	_G(trans_name) = "";
+	_G(trans_filename) = "";
 }
 
 bool parse_translation(Stream *language_file, String &parse_error);
@@ -61,30 +54,31 @@ bool init_translation(const String &lang, const String &fallback_lang, bool quit
 
 	if (lang.IsEmpty())
 		return false;
-	trans_filename = String::FromFormat("%s.tra", lang.GetCStr());
+	_G(trans_filename) = String::FromFormat("%s.tra", lang.GetCStr());
 
-	Stream *language_file = AssetMgr->OpenAsset(trans_filename);
+	Stream *language_file = AssetMgr->OpenAsset(_G(trans_filename));
 	if (language_file == nullptr) {
-		Debug::Printf(kDbgMsg_Error, "Cannot open translation: %s", trans_filename.GetCStr());
+		Debug::Printf(kDbgMsg_Error, "Cannot open translation: %s", _G(trans_filename).GetCStr());
 		return false;
 	}
 
 	char transsig[16] = { 0 };
 	language_file->Read(transsig, 15);
 	if (strcmp(transsig, "AGSTranslation") != 0) {
-		Debug::Printf(kDbgMsg_Error, "Translation signature mismatch: %s", trans_filename.GetCStr());
+		Debug::Printf(kDbgMsg_Error, "Translation signature mismatch: %s", _G(trans_filename).GetCStr());
 		delete language_file;
 		return false;
 	}
 
-	_G(transtree).reset(new TreeMap());
+	delete _G(transtree);
+	_G(transtree) = new TreeMap();
 
 	String parse_error;
 	bool result = parse_translation(language_file, parse_error);
 	delete language_file;
 
 	if (!result) {
-		parse_error.Prepend(String::FromFormat("Failed to read translation file: %s:\n", trans_filename.GetCStr()));
+		parse_error.Prepend(String::FromFormat("Failed to read translation file: %s:\n", _G(trans_filename).GetCStr()));
 		close_translation();
 		if (quit_on_error) {
 			parse_error.PrependChar('!');
@@ -98,20 +92,20 @@ bool init_translation(const String &lang, const String &fallback_lang, bool quit
 			return false;
 		}
 	}
-	Debug::Printf("Translation initialized: %s", trans_filename.GetCStr());
+	Debug::Printf("Translation initialized: %s", _G(trans_filename).GetCStr());
 	return true;
 }
 
 String get_translation_name() {
-	return trans_name;
+	return _G(trans_name);
 }
 
 String get_translation_path() {
-	return trans_filename;
+	return _G(trans_filename);
 }
 
 const TreeMap *get_translation_tree() {
-	return _G(transtree).get();
+	return _G(transtree);
 }
 
 bool parse_translation(Stream *language_file, String &parse_error) {

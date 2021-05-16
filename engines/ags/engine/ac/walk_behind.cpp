@@ -26,26 +26,12 @@
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gfx/bitmap.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-
-
-
-
-
-char *_G(walkBehindExists) = nullptr;  // whether a WB area is in this column
-int *_G(walkBehindStartY) = nullptr, *_G(walkBehindEndY) = nullptr;
-char _G(noWalkBehindsAtAll) = 0;
-int _G(walkBehindLeft)[MAX_WALK_BEHINDS], _G(walkBehindTop)[MAX_WALK_BEHINDS];
-int _G(walkBehindRight)[MAX_WALK_BEHINDS], _G(walkBehindBottom)[MAX_WALK_BEHINDS];
-IDriverDependantBitmap *_G(walkBehindBitmap)[MAX_WALK_BEHINDS];
-int _G(walkBehindsCachedForBgNum) = 0;
-WalkBehindMethodEnum _G(walkBehindMethod) = DrawOverCharSprite;
-int _G(walk_behind_baselines_changed) = 0;
 
 void update_walk_behind_images() {
 	int ee, rr;

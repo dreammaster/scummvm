@@ -23,7 +23,7 @@
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/sprite.h"
+#include "ags/engine/ac/sprite.h"
 #include "ags/engine/ac/system.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/plugins/agsplugin.h"
@@ -36,13 +36,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-
-
-extern int _G(our_eip), _G(eip_guinum), _G(eip_guiobj);
-
-
-
 
 void get_new_size_for_sprite(int ee, int ww, int hh, int &newwid, int &newhit) {
 	newwid = ww;
@@ -139,7 +132,7 @@ void initialize_sprite(int ee) {
 		_GP(game).SpriteInfos[ee].Height = 0;
 	} else {
 		// stretch sprites to correct resolution
-		int _G(oldeip) = _G(our_eip);
+		int oldeip = _G(our_eip);
 		_G(our_eip) = 4300;
 
 		if (_GP(game).SpriteInfos[ee].Flags & SPF_HADALPHACHANNEL) {
@@ -178,7 +171,7 @@ void initialize_sprite(int ee) {
 		pl_run_plugin_hooks(AGSE_SPRITELOAD, ee);
 		update_polled_stuff_if_runtime();
 
-		_G(our_eip) = _G(oldeip);
+		_G(our_eip) = oldeip;
 	}
 }
 

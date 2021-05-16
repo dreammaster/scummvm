@@ -274,7 +274,7 @@ void engine_post_gfxmode_mouse_setup(const DisplayMode &dm, const Size &init_des
 // Reset mouse controls before changing gfx mode
 void engine_pre_gfxmode_mouse_cleanup() {
 	// Always disable mouse control and unlock mouse when releasing down gfx mode
-	Mouse::SetMovementControl(false);
+	_GP(mouse).SetMovementControl(false);
 	Mouse::UnlockFromWindow();
 }
 

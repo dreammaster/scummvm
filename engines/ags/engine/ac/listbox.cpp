@@ -20,6 +20,7 @@
  *
  */
 
+#include "common/config-manager.h"
 #include "ags/lib/std/algorithm.h"
 #include "ags/lib/std/set.h"
 #include "ags/lib/allegro.h" // find files
@@ -32,9 +33,9 @@
 #include "ags/engine/ac/path_helper.h"
 #include "ags/engine/ac/string.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/debug/debug_log.h"
+#include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/util/path.h"
-#include "ags/shared/debug/out.h"
+#include "ags/shared/debugging/out.h"
 #include "ags/engine/script/script_api.h"
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/dynobj/script_string.h"
@@ -43,9 +44,6 @@
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
 
 // *** LIST BOX FUNCTIONS
 
@@ -66,13 +64,12 @@ void ListBox_Clear(GUIListBox *listbox) {
 }
 
 void FillDirList(std::set<String> &files, const String &path) {
-	al_ffblk dfb;
-	int	dun = al_findfirst(path, &dfb, FA_SEARCH);
-	while (!dun) {
-		files.insert(dfb.name);
-		dun = al_findnext(&dfb);
+	Common::FSDirectory dir(path);
+	Common::ArchiveMemberList fileList;
+	dir.listMatchingMembers(fileList, "*.*");
+	for (Common::ArchiveMemberList::iterator iter = fileList.begin(); iter != fileList.end(); ++iter) {
+		files.insert((*iter)->getName());
 	}
-	al_findclose(&dfb);
 }
 
 void ListBox_FillDirList(GUIListBox *listbox, const char *filemask) {
@@ -116,7 +113,7 @@ int ListBox_FillSaveGameList(GUIListBox *listbox) {
 
 	// update the global savegameindex[] array for backward compatibilty
 	for (size_t n = 0; n < saves.size(); ++n) {
-		_GP(play)._G(filenumbers)[n] = saves[n].Slot;
+		_GP(play).filenumbers[n] = saves[n].Slot;
 	}
 
 	listbox->SetSvgIndex(true);
