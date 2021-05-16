@@ -48,9 +48,9 @@ static bool isMouseEvent(Common::EventType type) {
 
 
 int install_mouse() {
-	_G(_G(mouse_x)) = _G(_G(mouse_y)) = _G(_G(mouse_z)) = 0;
-	_G(_G(mouse_b)) = 0;
-	_G(_G(mouse_pos)) = 0;
+	_G(mouse_x) = _G(mouse_y) = _G(mouse_z) = 0;
+	_G(mouse_b) = 0;
+	_G(mouse_pos) = 0;
 
 	return 0;
 }
@@ -64,35 +64,35 @@ int poll_mouse() {
 	Common::Event e;
 	while ((e = ::AGS::g_events->readEvent()).type != Common::EVENT_INVALID) {
 		if (isMouseEvent(e.type)) {
-			_G(_G(mouse_x)) = e.mouse.x;
-			_G(_G(mouse_y)) = e.mouse.y;
-			_G(_G(mouse_pos)) = (e.mouse.x << 16) | e.mouse.y;
+			_G(mouse_x) = e.mouse.x;
+			_G(mouse_y) = e.mouse.y;
+			_G(mouse_pos) = (e.mouse.x << 16) | e.mouse.y;
 		}
 
 		switch (e.type) {
 		case Common::EVENT_LBUTTONDOWN:
-			_G(_G(mouse_b)) |= 1;
+			_G(mouse_b) |= 1;
 			break;
 		case Common::EVENT_LBUTTONUP:
-			_G(_G(mouse_b)) &= ~1;
+			_G(mouse_b) &= ~1;
 			break;
 		case Common::EVENT_RBUTTONDOWN:
-			_G(_G(mouse_b)) |= 2;
+			_G(mouse_b) |= 2;
 			break;
 		case Common::EVENT_RBUTTONUP:
-			_G(_G(mouse_b)) &= ~2;
+			_G(mouse_b) &= ~2;
 			break;
 		case Common::EVENT_MBUTTONDOWN:
-			_G(_G(mouse_b)) |= 4;
+			_G(mouse_b) |= 4;
 			break;
 		case Common::EVENT_MBUTTONUP:
-			_G(_G(mouse_b)) &= ~4;
+			_G(mouse_b) &= ~4;
 			break;
 		case Common::EVENT_WHEELDOWN:
-			++_G(_G(mouse_z));
+			++_G(mouse_z);
 			break;
 		case Common::EVENT_WHEELUP:
-			--_G(_G(mouse_z));
+			--_G(mouse_z);
 			break;
 		default:
 			break;
@@ -127,14 +127,14 @@ void unscare_mouse() {
 }
 
 void position_mouse(int x, int y) {
-	_G(_G(mouse_x)) = x;
-	_G(_G(mouse_y)) = y;
-	_G(_G(mouse_pos)) = (x << 16) | y;
+	_G(mouse_x) = x;
+	_G(mouse_y) = y;
+	_G(mouse_pos) = (x << 16) | y;
 	::AGS::g_events->warpMouse(Common::Point(x, y));
 }
 
 void position_mouse_z(int z) {
-	_G(_G(mouse_z)) = z;
+	_G(mouse_z) = z;
 }
 
 void set_mouse_range(int x1, int y_1, int x2, int y2) {

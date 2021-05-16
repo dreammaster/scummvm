@@ -232,9 +232,9 @@ bool AGSConsole::Cmd_dumpSprite(int argc, const char **argv) {
 		if (sprite->GetColorDepth() == 8) {
 			palette = new byte[256 * 3];
 			for (int c = 0, i = 0 ; c < 256 ; ++c, i += 3) {
-				palette[i] = _G(_G(current_palette))[c].r * 255 / 63;
-				palette[i + 1] = _G(_G(current_palette))[c].g * 255 / 63;
-				palette[i + 2] = _G(_G(current_palette))[c].b * 255 / 63;
+				palette[i] = _G(current_palette)[c].r * 255 / 63;
+				palette[i + 1] = _G(current_palette)[c].g * 255 / 63;
+				palette[i + 2] = _G(current_palette)[c].b * 255 / 63;
 			}
 		}
 		Image::writePNG(df, sprite->GetAllegroBitmap()->getSurface().rawSurface(), palette);

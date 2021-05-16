@@ -212,7 +212,7 @@ int cd_player_init() {
 	int erro = cd_init();
 	if (erro) return -1;
 	numcddrives = 1;
-	_G(_G(use_cdplayer)) = 1;
+	_G(use_cdplayer) = 1;
 	return 0;
 }
 
@@ -223,7 +223,7 @@ int cd_player_control(int cmdd, int datt) {
 		return 0;
 	} else if (cmdd == 2) {
 		cd_play_from(datt);
-		_G(_G(need_to_stop_cd)) = 1;
+		_G(need_to_stop_cd) = 1;
 	} else if (cmdd == 3)
 		cd_pause();
 	else if (cmdd == 4)
@@ -256,7 +256,8 @@ void AGSPlatformDriver::Delay(int millis) {
 			break;
 		}
 
-		auto duration = std::min<std::chrono::milliseconds>(delayUntil - now, _G(_G(MaximumDelayBetweenPolling)));
+		auto duration = std::min<std::chrono::milliseconds>(delayUntil - now,
+			_G(MaximumDelayBetweenPolling));
 		std::this_thread::sleep_for(duration);
 		now = AGS_Clock::now(); // update now
 

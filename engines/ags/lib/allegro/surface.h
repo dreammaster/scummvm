@@ -258,7 +258,7 @@ private:
 	}
 
 	// kTintBlenderMode and kTintLightBlenderMode
-	void blendTintSprite(uint8 aSrc, uint8 rSrc, uint8 gSrc, uint8 bSrc, uint8 &aDest, uint8 &rDest, uint8 &gDest, uint8 &bDest, uint32 alpha, bool light) const ;
+	void blendTintSprite(uint8 aSrc, uint8 rSrc, uint8 gSrc, uint8 bSrc, uint8 &aDest, uint8 &rDest, uint8 &gDest, uint8 &bDest, uint32 alpha, bool light) const;
 
 
 	inline uint32 getColor(const byte *data, byte bpp) const {
@@ -281,13 +281,13 @@ private:
 class Surface : public Graphics::ManagedSurface, public BITMAP {
 public:
 	Surface(int width, int height, const Graphics::PixelFormat &pixelFormat) :
-			Graphics::ManagedSurface(width, height, pixelFormat), BITMAP(this) {
+		Graphics::ManagedSurface(width, height, pixelFormat), BITMAP(this) {
 		// Allegro uses 255, 0, 255 RGB as the transparent color
 		if (pixelFormat.bytesPerPixel == 2 || pixelFormat.bytesPerPixel == 4)
 			setTransparentColor(pixelFormat.RGBToColor(255, 0, 255));
 	}
 	Surface(Graphics::ManagedSurface &surf, const Common::Rect &bounds) :
-			Graphics::ManagedSurface(surf, bounds), BITMAP(this) {
+		Graphics::ManagedSurface(surf, bounds), BITMAP(this) {
 		// Allegro uses 255, 0, 255 RGB as the transparent color
 		if (surf.format.bytesPerPixel == 2 || surf.format.bytesPerPixel == 4)
 			setTransparentColor(surf.format.RGBToColor(255, 0, 255));

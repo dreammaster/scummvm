@@ -85,7 +85,7 @@ using namespace AGS::Shared::Memory;
 using namespace AGS::Engine;
 
 void PluginSimulateMouseClick(int pluginButtonID) {
-	_G(_G(pluginSimulatedClick)) = pluginButtonID - 1;
+	_G(pluginSimulatedClick) = pluginButtonID - 1;
 }
 
 // **************** PLUGIN IMPLEMENTATION ****************
@@ -151,23 +151,23 @@ void IAGSEngine::RegisterScriptFunction(const char *name, void *addy) {
 	ccAddExternalPluginFunction(name, addy);
 }
 const char *IAGSEngine::GetGraphicsDriverID() {
-	if (_G(_G(gfxDriver)) == nullptr)
+	if (_G(gfxDriver) == nullptr)
 		return nullptr;
 
-	return _G(_G(gfxDriver))->GetDriverID();
+	return _G(gfxDriver)->GetDriverID();
 }
 
 BITMAP *IAGSEngine::GetScreen() {
 	// TODO: we could actually return stage buffer here, will that make a difference?
-	if (!_G(_G(gfxDriver))->UsesMemoryBackBuffer())
+	if (!_G(gfxDriver)->UsesMemoryBackBuffer())
 		quit("!This plugin requires software graphics driver.");
 
-	Bitmap *buffer = _G(_G(gfxDriver))->GetMemoryBackBuffer();
+	Bitmap *buffer = _G(gfxDriver)->GetMemoryBackBuffer();
 	return buffer ? (BITMAP *)buffer->GetAllegroBitmap() : nullptr;
 }
 
 BITMAP *IAGSEngine::GetVirtualScreen() {
-	Bitmap *stage = _G(_G(gfxDriver))->GetStageBackBuffer();
+	Bitmap *stage = _G(gfxDriver)->GetStageBackBuffer();
 	return stage ? (BITMAP *)stage->GetAllegroBitmap() : nullptr;
 }
 
@@ -219,7 +219,7 @@ int IAGSEngine::GetSavedData(char *buffer, int32 bufsize) {
 }
 
 void IAGSEngine::DrawText(int32 x, int32 y, int32 font, int32 color, const char *text) {
-	Bitmap *ds = _G(_G(gfxDriver))->GetStageBackBuffer();
+	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer();
 	if (!ds)
 		return;
 	color_t text_color = ds->GetCompatibleColor(color);
@@ -240,7 +240,7 @@ uint8 *IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
 		quit("!IAGSEngine::GetRawBitmapSurface: invalid bitmap for access to surface");
 	acquire_bitmap(bmp);
 
-	Bitmap *stage = _G(_G(gfxDriver))->GetStageBackBuffer();
+	Bitmap *stage = _G(gfxDriver)->GetStageBackBuffer();
 	if (stage && bmp == stage->GetAllegroBitmap())
 		plugins[this->pluginId].invalidatedRegion = 0;
 
@@ -254,7 +254,7 @@ int IAGSEngine::GetBitmapPitch(BITMAP *bmp) {
 void IAGSEngine::ReleaseBitmapSurface(BITMAP *bmp) {
 	release_bitmap(bmp);
 
-	Bitmap *stage = _G(_G(gfxDriver))->GetStageBackBuffer();
+	Bitmap *stage = _G(gfxDriver)->GetStageBackBuffer();
 	if (stage && bmp == stage->GetAllegroBitmap()) {
 		// plugin does not manaually invalidate stuff, so
 		// we must invalidate the whole screen to be safe
@@ -268,7 +268,7 @@ void IAGSEngine::GetMousePosition(int32 *x, int32 *y) {
 	if (y) y[0] = _G(mousey);
 }
 int IAGSEngine::GetCurrentRoom() {
-	return _G(_G(displayed_room));
+	return _G(displayed_room);
 }
 int IAGSEngine::GetNumBackgrounds() {
 	return _GP(thisroom).BgFrameCount;
@@ -334,7 +334,7 @@ void IAGSEngine::DrawTextWrapped(int32 xx, int32 yy, int32 wid, int32 font, int3
 	if (break_up_text_into_lines(text, _GP(fontLines), wid, font) == 0)
 		return;
 
-	Bitmap *ds = _G(_G(gfxDriver))->GetStageBackBuffer();
+	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer();
 	if (!ds)
 		return;
 	color_t text_color = ds->GetCompatibleColor(color);
@@ -344,17 +344,17 @@ void IAGSEngine::DrawTextWrapped(int32 xx, int32 yy, int32 wid, int32 font, int3
 }
 
 void IAGSEngine::SetVirtualScreen(BITMAP *bmp) {
-	if (!_G(_G(gfxDriver))->UsesMemoryBackBuffer()) {
+	if (!_G(gfxDriver)->UsesMemoryBackBuffer()) {
 		debug_script_warn("SetVirtualScreen: this plugin requires software graphics driver to work correctly.");
-		// we let it continue since _G(_G(gfxDriver)) is supposed to ignore this request without throwing an exception
+		// we let it continue since _G(gfxDriver) is supposed to ignore this request without throwing an exception
 	}
 
 	if (bmp) {
 		_GP(_G(glVirtualScreenWrap)).WrapAllegroBitmap(bmp, true);
-		_G(_G(gfxDriver))->SetMemoryBackBuffer(&_GP(_G(glVirtualScreenWrap)));
+		_G(gfxDriver)->SetMemoryBackBuffer(&_GP(_G(glVirtualScreenWrap)));
 	} else {
 		_GP(_G(glVirtualScreenWrap)).Destroy();
-		_G(_G(gfxDriver))->SetMemoryBackBuffer(nullptr);
+		_G(gfxDriver)->SetMemoryBackBuffer(nullptr);
 	}
 }
 
@@ -363,7 +363,7 @@ int IAGSEngine::LookupParserWord(const char *word) {
 }
 
 void IAGSEngine::BlitBitmap(int32 x, int32 y, BITMAP *bmp, int32 masked) {
-	Bitmap *ds = _G(_G(gfxDriver))->GetStageBackBuffer();
+	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer();
 	if (!ds)
 		return;
 	wputblock_raw(ds, x, y, bmp, masked);
@@ -371,18 +371,18 @@ void IAGSEngine::BlitBitmap(int32 x, int32 y, BITMAP *bmp, int32 masked) {
 }
 
 void IAGSEngine::BlitSpriteTranslucent(int32 x, int32 y, BITMAP *bmp, int32 trans) {
-	Bitmap *ds = _G(_G(gfxDriver))->GetStageBackBuffer();
+	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer();
 	if (!ds)
 		return;
 	Bitmap wrap(bmp, true);
-	if (_G(_G(gfxDriver))->UsesMemoryBackBuffer())
+	if (_G(gfxDriver)->UsesMemoryBackBuffer())
 		GfxUtil::DrawSpriteWithTransparency(ds, &wrap, x, y, trans);
 	else
 		GfxUtil::DrawSpriteBlend(ds, Point(x, y), &wrap, kBlendMode_Alpha, true, false, trans);
 }
 
 void IAGSEngine::BlitSpriteRotated(int32 x, int32 y, BITMAP *bmp, int32 angle) {
-	Bitmap *ds = _G(_G(gfxDriver))->GetStageBackBuffer();
+	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer();
 	if (!ds)
 		return;
 	// FIXME: call corresponding Graphics Blit
@@ -443,13 +443,13 @@ void IAGSEngine::ViewportToRoom(int32 *x, int32 *y) {
 		*y = vpt.first.Y;
 }
 int IAGSEngine::GetNumObjects() {
-	return _G(_G(croom))->numobj;
+	return _G(croom)->numobj;
 }
 AGSObject *IAGSEngine::GetObject(int32 num) {
-	if (num >= _G(_G(croom))->numobj)
+	if (num >= _G(croom)->numobj)
 		quit("!IAGSEngine::GetObject: invalid object");
 
-	return (AGSObject *)&_G(_G(croom))->obj[num];
+	return (AGSObject *)&_G(croom)->obj[num];
 }
 BITMAP *IAGSEngine::CreateBlankBitmap(int32 width, int32 height, int32 coldep) {
 	// [IKM] We should not create Bitmap object here, because
@@ -503,7 +503,7 @@ int IAGSEngine::GetRawPixelColor(int32 color) {
 int IAGSEngine::GetWalkbehindBaseline(int32 wa) {
 	if ((wa < 1) || (wa >= MAX_WALK_BEHINDS))
 		quit("!IAGSEngine::GetWalkBehindBase: invalid walk-behind area specified");
-	return _G(_G(croom))->walkbehind_base[wa];
+	return _G(croom)->walkbehind_base[wa];
 }
 void *IAGSEngine::GetScriptFunctionAddress(const char *funcName) {
 	return ccGetSymbolAddressForPlugin((const char *)funcName);
@@ -516,7 +516,7 @@ int IAGSEngine::GetAreaScaling(int32 x, int32 y) {
 	return GetScalingAt(x, y);
 }
 int IAGSEngine::IsGamePaused() {
-	return _G(_G(game_paused));
+	return _G(game_paused);
 }
 int IAGSEngine::GetSpriteWidth(int32 slot) {
 	return _GP(game).SpriteInfos[slot].Width;
@@ -651,12 +651,12 @@ void IAGSEngine::DisableSound() {
 	_GP(usetup).audio_backend = 0;
 }
 int IAGSEngine::CanRunScriptFunctionNow() {
-	if (_G(_G(inside_script)))
+	if (_G(inside_script))
 		return 0;
 	return 1;
 }
 int IAGSEngine::CallGameScriptFunction(const char *name, int32 globalScript, int32 numArgs, long arg1, long arg2, long arg3) {
-	if (_G(_G(inside_script)))
+	if (_G(inside_script))
 		return -300;
 
 	ccInstance *toRun = GetScriptInstanceByType(globalScript ? kScInstGame : kScInstRoom);
@@ -673,18 +673,18 @@ void IAGSEngine::NotifySpriteUpdated(int32 slot) {
 	int ff;
 	// wipe the character cache when we change rooms
 	for (ff = 0; ff < _GP(game).numcharacters; ff++) {
-		if ((_G(_G(charcache))[ff].inUse) && (_G(_G(charcache))[ff].sppic == slot)) {
-			delete _G(_G(charcache))[ff].image;
-			_G(_G(charcache))[ff].image = nullptr;
-			_G(_G(charcache))[ff].inUse = 0;
+		if ((_GP(charcache)[ff].inUse) && (_GP(charcache)[ff].sppic == slot)) {
+			delete _GP(charcache)[ff].image;
+			_GP(charcache)[ff].image = nullptr;
+			_GP(charcache)[ff].inUse = 0;
 		}
 	}
 
 	// clear the object cache
 	for (ff = 0; ff < MAX_ROOM_OBJECTS; ff++) {
-		if ((_G(_G(objcache))[ff].image != nullptr) && (_G(_G(objcache))[ff].sppic == slot)) {
-			delete _G(_G(objcache))[ff].image;
-			_G(_G(objcache))[ff].image = nullptr;
+		if ((_GP(objcache)[ff].image != nullptr) && (_GP(objcache)[ff].sppic == slot)) {
+			delete _GP(objcache)[ff].image;
+			_GP(objcache)[ff].image = nullptr;
 		}
 	}
 }
@@ -698,7 +698,7 @@ void IAGSEngine::SetSpriteAlphaBlended(int32 slot, int32 isAlphaBlended) {
 }
 
 void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, int32 numArgs, long arg1, long arg2) {
-	if (!_G(_G(inside_script))) {
+	if (!_G(inside_script)) {
 		this->CallGameScriptFunction(name, globalScript, numArgs, arg1, arg2, 0);
 		return;
 	}
@@ -706,36 +706,36 @@ void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, i
 	if (numArgs < 0 || numArgs > 2)
 		quit("IAGSEngine::QueueGameScriptFunction: invalid number of arguments");
 
-	_G(_G(curscript))->run_another(name, globalScript ? kScInstGame : kScInstRoom, numArgs,
+	_G(curscript)->run_another(name, globalScript ? kScInstGame : kScInstRoom, numArgs,
 		RuntimeScriptValue().SetPluginArgument(arg1), RuntimeScriptValue().SetPluginArgument(arg2));
 }
 
 int IAGSEngine::RegisterManagedObject(const void *object, IAGSScriptManagedObject *callback) {
 	// TODO: handle loss of const better
-	_GP(_G(GlobalReturnValue)).SetPluginObject(const_cast<void *>(object), (ICCDynamicObject *)callback);
+	_GP(GlobalReturnValue).SetPluginObject(const_cast<void *>(object), (ICCDynamicObject *)callback);
 	return ccRegisterManagedObject(object, (ICCDynamicObject *)callback, true);
 }
 
 void IAGSEngine::AddManagedObjectReader(const char *typeName, IAGSManagedObjectReader *reader) {
-	if (_G(_G(numPluginReaders)) >= MAX_PLUGIN_OBJECT_READERS)
+	if (_G(numPluginReaders) >= MAX_PLUGIN_OBJECT_READERS)
 		quit("Plugin error: IAGSEngine::AddObjectReader: Too many object readers added");
 
 	if ((typeName == nullptr) || (typeName[0] == 0))
 		quit("Plugin error: IAGSEngine::AddObjectReader: invalid name for type");
 
-	for (int ii = 0; ii < _G(_G(numPluginReaders)); ii++) {
-		if (strcmp(_G(_G(pluginReaders))[ii].type, typeName) == 0)
+	for (int ii = 0; ii < _G(numPluginReaders); ii++) {
+		if (strcmp(_GP(pluginReaders)[ii].type, typeName) == 0)
 			quitprintf("Plugin error: IAGSEngine::AddObjectReader: type '%s' has been registered already", typeName);
 	}
 
-	_G(_G(pluginReaders))[_G(_G(numPluginReaders))].reader = reader;
-	_G(_G(pluginReaders))[_G(_G(numPluginReaders))].type = typeName;
-	_G(_G(numPluginReaders))++;
+	_GP(pluginReaders)[_G(numPluginReaders)].reader = reader;
+	_GP(pluginReaders)[_G(numPluginReaders)].type = typeName;
+	_G(numPluginReaders)++;
 }
 
 void IAGSEngine::RegisterUnserializedObject(int key_, const void *object, IAGSScriptManagedObject *callback) {
 	// TODO: handle loss of const better
-	_GP(_G(GlobalReturnValue)).SetPluginObject(const_cast<void *>(object), (ICCDynamicObject *)callback);
+	_GP(GlobalReturnValue).SetPluginObject(const_cast<void *>(object), (ICCDynamicObject *)callback);
 	ccRegisterUnserializedObject(key_, object, (ICCDynamicObject *)callback, true);
 }
 
@@ -748,9 +748,9 @@ void *IAGSEngine::GetManagedObjectAddressByKey(int key_) {
 	ICCDynamicObject *manager;
 	ScriptValueType obj_type = ccGetObjectAddressAndManagerFromHandle(key_, object, manager);
 	if (obj_type == kScValPluginObject) {
-		_GP(_G(GlobalReturnValue)).SetPluginObject(object, manager);
+		_GP(GlobalReturnValue).SetPluginObject(object, manager);
 	} else {
-		_GP(_G(GlobalReturnValue)).SetDynamicObject(object, manager);
+		_GP(GlobalReturnValue).SetDynamicObject(object, manager);
 	}
 	return object;
 }
@@ -759,7 +759,7 @@ const char *IAGSEngine::CreateScriptString(const char *fromText) {
 	const char *string = CreateNewScriptString(fromText);
 	// Should be still standard dynamic object, because not managed by plugin
 	// TODO: handle loss of const better
-	_GP(_G(GlobalReturnValue)).SetDynamicObject(const_cast<char *>(string), &_GP(myScriptStringImpl));
+	_GP(GlobalReturnValue).SetDynamicObject(const_cast<char *>(string), &_GP(myScriptStringImpl));
 	return string;
 }
 
@@ -781,25 +781,25 @@ void IAGSEngine::SimulateMouseClick(int32 button) {
 }
 
 int IAGSEngine::GetMovementPathWaypointCount(int32 pathId) {
-	return _G(_G(mls))[pathId % TURNING_AROUND].numstage;
+	return _GP(mls)[pathId % TURNING_AROUND].numstage;
 }
 
 int IAGSEngine::GetMovementPathLastWaypoint(int32 pathId) {
-	return _G(_G(mls))[pathId % TURNING_AROUND].onstage;
+	return _GP(mls)[pathId % TURNING_AROUND].onstage;
 }
 
 void IAGSEngine::GetMovementPathWaypointLocation(int32 pathId, int32 waypoint, int32 *x, int32 *y) {
-	*x = (_G(_G(mls))[pathId % TURNING_AROUND].pos[waypoint] >> 16) & 0x0000ffff;
-	*y = (_G(_G(mls))[pathId % TURNING_AROUND].pos[waypoint] & 0x0000ffff);
+	*x = (_GP(mls)[pathId % TURNING_AROUND].pos[waypoint] >> 16) & 0x0000ffff;
+	*y = (_GP(mls)[pathId % TURNING_AROUND].pos[waypoint] & 0x0000ffff);
 }
 
 void IAGSEngine::GetMovementPathWaypointSpeed(int32 pathId, int32 waypoint, int32 *xSpeed, int32 *ySpeed) {
-	*xSpeed = _G(_G(mls))[pathId % TURNING_AROUND].xpermove[waypoint];
-	*ySpeed = _G(_G(mls))[pathId % TURNING_AROUND].ypermove[waypoint];
+	*xSpeed = _GP(mls)[pathId % TURNING_AROUND].xpermove[waypoint];
+	*ySpeed = _GP(mls)[pathId % TURNING_AROUND].ypermove[waypoint];
 }
 
 int IAGSEngine::IsRunningUnderDebugger() {
-	return (_G(_G(editor_debugging_enabled)) != 0) ? 1 : 0;
+	return (_G(editor_debugging_enabled) != 0) ? 1 : 0;
 }
 
 void IAGSEngine::GetPathToFileInCompiledFolder(const char *fileName, char *buffer) {
@@ -807,7 +807,7 @@ void IAGSEngine::GetPathToFileInCompiledFolder(const char *fileName, char *buffe
 }
 
 void IAGSEngine::BreakIntoDebugger() {
-	_G(_G(break_on_next_script_step)) = 1;
+	_G(break_on_next_script_step) = 1;
 }
 
 IAGSFontRenderer *IAGSEngine::ReplaceFontRenderer(int fontNumber, IAGSFontRenderer *newRenderer) {

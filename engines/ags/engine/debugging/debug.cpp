@@ -365,7 +365,7 @@ bool init_editor_debugging() {
 #endif
 
 	if (_G(editor_debugger) == nullptr)
-		quit("_G(editor_debugger) is NULL but debugger enabled");
+		quit("editor_debugger is NULL but debugger enabled");
 
 	if (_G(editor_debugger)->Initialize()) {
 		_G(editor_debugging_initialized) = 1;
