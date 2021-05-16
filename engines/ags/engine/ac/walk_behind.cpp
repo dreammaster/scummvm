@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/walkbehind.h"
+#include "ags/engine/ac/walk_behind.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/common_defines.h"
 #include "ags/engine/ac/game_state.h"

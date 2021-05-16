@@ -25,7 +25,7 @@
 #include "ags/engine/ac/game_setup.h"
 #include "ags/engine/ac/string.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/shared/gui/guidefines.h"
+#include "ags/shared/gui/gui_defines.h"
 #include "ags/shared/gui/mylabel.h"
 #include "ags/shared/gui/guidialoginternaldefs.h"
 

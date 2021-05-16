@@ -36,7 +36,7 @@
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/debugging/agseditordebugger.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/debugmanager.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/debugging/consoleoutputtarget.h"
@@ -45,7 +45,7 @@
 #include "ags/shared/main/config.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/platform/base/sys_main.h"
 #include "ags/shared/plugin/plugin_engine.h"
 #include "ags/shared/script/script.h"
 #include "ags/shared/script/script_common.h"
@@ -58,21 +58,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-extern char _G(check_dynamic_sprites_at_exit);
-
-
-extern char _G(pexbuf)[STD_BUFFER_SIZE];
-extern volatile char _G(want_exit), abort_engine;
-
-
-
-int _G(editor_debugging_enabled) = 0;
-int _G(editor_debugging_initialized) = 0;
-char _G(editor_debugger_instance_token)[100];
-IAGSEditorDebugger *_G(editor_debugger) = nullptr;
-int _G(break_on_next_script_step) = 0;
-volatile int _G(game_paused_in_debugger) = 0;
 
 #if AGS_PLATFORM_OS_WINDOWS
 
@@ -461,7 +446,7 @@ int check_for_messages_from_editor() {
 			_G(break_on_next_script_step) = 1;
 		} else if (strncmp(msgPtr, "EXIT", 4) == 0) {
 			_G(want_exit) = 1;
-			abort_engine = 1;
+			_G(abort_engine) = 1;
 			_G(check_dynamic_sprites_at_exit) = 0;
 		}
 

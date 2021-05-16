@@ -43,7 +43,7 @@
 #include "ags/engine/ac/object_cache.h"
 #include "ags/engine/ac/overlay.h"
 #include "ags/engine/ac/properties.h"
-#include "ags/shared/ac/region.h"
+#include "ags/engine/ac/region.h"
 #include "ags/engine/ac/sys_events.h"
 #include "ags/engine/ac/room.h"
 #include "ags/engine/ac/room_object.h"
@@ -52,13 +52,13 @@
 #include "ags/engine/ac/string.h"
 #include "ags/engine/ac/system.h"
 #include "ags/engine/ac/walkable_area.h"
-#include "ags/shared/ac/walkbehind.h"
+#include "ags/engine/ac/walk_behind.h"
 #include "ags/engine/ac/dynobj/script_object.h"
 #include "ags/engine/ac/dynobj/script_hotspot.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/engine/script/cc_instance.h"
-#include "ags/shared/debugging/debug_log.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debug_log.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/game/room_version.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
@@ -70,10 +70,10 @@
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/util/stream.h"
 #include "ags/engine/gfx/graphics_driver.h"
-#include "ags/shared/core/assetmanager.h"
+#include "ags/shared/core/asset_manager.h"
 #include "ags/engine/ac/dynobj/all_dynamic_classes.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/gfxfilter.h"
+#include "ags/engine/gfx/gfx_filter.h"
 #include "ags/shared/util/math.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/debugging/out.h"
@@ -86,52 +86,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-
-
-
-
-extern RoomStatus _GP(troom);    // used for non-saveable rooms, eg. intro
-
-
-extern ccInstance *_G(roominst);
-
-
-extern CharacterCache *_G(charcache);
-
-
-extern int _G(done_es_error);
-
-extern Bitmap *_G(walkareabackup), *_G(walkable_areas_temp);
-
-
-extern int _G(in_new_room), _G(new_room_was);  // 1 in new room, 2 first time in new room, 3 loading saved game
-
-
-
-extern int _G(starting_room);
-
-extern IDriverDependantBitmap* _G(roomBackgroundBmp);
-
-extern Bitmap *_G(raw_saved_screen);
-extern int _G(actSpsCount);
-
-extern IDriverDependantBitmap* *_G(actspsbmp);
-extern Bitmap **_G(actspswb);
-extern IDriverDependantBitmap* *_G(actspswbbmp);
-extern CachedActSpsData* _G(actspswbcache);
-extern RGB palette[256];
-extern int _G(mouse_z_was);
-
-extern Bitmap **_G(guibg);
-extern IDriverDependantBitmap **_G(guibgbmp);
-
-extern CCHotspot _GP(ccDynamicHotspot);
-extern CCObject _GP(ccDynamicObject);
-
-RGB_MAP _GP(rgb_table);  // for 256-col antialiasing
-int _G(new_room_flags)=0;
-int _G(gs_to_newroom)=-1;
 
 ScriptDrawingSurface* Room_GetDrawingSurfaceForBackground(int backgroundNumber)
 {
@@ -274,7 +228,7 @@ void unload_old_room() {
     dispose_room_drawdata();
 
     for (ff=0;ff<_G(croom)->numobj;ff++)
-        _GP(objs)[ff].moving = 0;
+        _G(objs)[ff].moving = 0;
 
     if (!_GP(play).ambient_sounds_persist) {
         for (ff = 1; ff < MAX_SOUND_CHANNELS; ff++)
@@ -343,8 +297,8 @@ void unload_old_room() {
 
     // clear the object cache
     for (ff = 0; ff < MAX_ROOM_OBJECTS; ff++) {
-        delete _GP(objcache)[ff].image;
-        _GP(objcache)[ff].image = nullptr;
+        delete _G(objcache)[ff].image;
+        _G(objcache)[ff].image = nullptr;
     }
     // clear the _G(actsps) buffers to save memory, since the
     // objects/characters involved probably aren't on the
@@ -664,7 +618,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
             _G(croom)->intrRegion[cc] = *_GP(thisroom).Regions[cc].Interaction;
     }
 
-    _GP(objs)=&_G(croom)->obj[0];
+    _G(objs)=&_G(croom)->obj[0];
 
     for (cc = 0; cc < MAX_ROOM_OBJECTS; cc++) {
         // 64 bit: Using the id instead
@@ -878,7 +832,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
         else forchar->view=_GP(thisroom).Options.PlayerView-1;
         forchar->frame=0;   // make him standing
     }
-    _GP(color_map) = nullptr;
+    _G(color_map) = nullptr;
 
     _G(our_eip) = 209;
     update_polled_stuff_if_runtime();
@@ -899,7 +853,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
     _G(our_eip) = 212;
     invalidate_screen();
     for (cc=0;cc<_G(croom)->numobj;cc++) {
-        if (_GP(objs)[cc].on == 2)
+        if (_G(objs)[cc].on == 2)
             MergeObject(cc);
     }
     _G(new_room_flags)=0;
@@ -1065,7 +1019,7 @@ void on_background_frame_change () {
 void croom_ptr_clear()
 {
     _G(croom) = nullptr;
-    _GP(objs) = nullptr;
+    _G(objs) = nullptr;
 }
 
 

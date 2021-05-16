@@ -38,7 +38,7 @@
 #include "ags/shared/ac/character.h"
 #include "ags/shared/ac/characterextras.h"
 #include "ags/shared/ac/character_info.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
@@ -48,7 +48,7 @@
 #include "ags/shared/ac/gui.h"
 #include "ags/shared/ac/lipsync.h"
 #include "ags/shared/ac/objectcache.h"
-#include "ags/shared/ac/path_helper.h"
+#include "ags/engine/ac/path_helper.h"
 #include "ags/shared/ac/sys_events.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/shared/ac/speech.h"
@@ -57,9 +57,9 @@
 #include "ags/shared/ac/viewframe.h"
 #include "ags/engine/ac/dynobj/script_object.h"
 #include "ags/engine/ac/dynobj/script_system.h"
-#include "ags/shared/core/assetmanager.h"
+#include "ags/shared/core/asset_manager.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/font/agsfontrenderer.h"
 #include "ags/shared/font/fonts.h"
@@ -74,7 +74,7 @@
 #include "ags/shared/main/graphics_mode.h"
 #include "ags/shared/main/main.h"
 #include "ags/engine/media/audio/audio_core.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/platform/base/sys_main.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
 #include "ags/shared/platform/util/pe.h"
 #include "ags/shared/util/directory.h"
@@ -87,14 +87,14 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-extern char _G(check_dynamic_sprites_at_exit);
 
-extern volatile char _G(want_exit), abort_engine;
+
+extern volatile char _G(want_exit), _G(abort_engine);
 extern bool _G(justRunSetup);
 
 
 extern int _G(proper_exit);
-extern char _G(pexbuf)[STD_BUFFER_SIZE];
+
 
 
 
@@ -107,11 +107,11 @@ extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
 
 
 
-extern RGB palette[256];
 
 
-extern Bitmap **_G(guibg);
-extern IDriverDependantBitmap **_G(guibgbmp);
+
+
+
 
 ResourcePaths _GP(ResPaths);
 
@@ -146,7 +146,7 @@ bool engine_init_backend()
 
 void winclosehook() {
   _G(want_exit) = 1;
-  abort_engine = 1;
+  _G(abort_engine) = 1;
   _G(check_dynamic_sprites_at_exit) = 0;
 }
 
@@ -732,7 +732,7 @@ void engine_init_game_settings()
         precache_view (_G(playerchar)->view);
 
     for (ee = 0; ee < MAX_ROOM_OBJECTS; ee++)
-        _GP(objcache)[ee].image = nullptr;
+        _G(objcache)[ee].image = nullptr;
 
     /*  dummygui.guiId = -1;
     dummyguicontrol.guin = -1;
@@ -927,7 +927,7 @@ void engine_init_game_settings()
     _GP(play).game_speed_modifier = 0;
     if (_G(debug_flags) & DBG_DEBUGMODE)
         _GP(play).debug_mode = 1;
-    gui_disabled_style = convert_gui_disabled_style(_GP(game).options[OPT_DISABLEOFF]);
+    _G(gui_disabled_style) = convert_gui_disabled_style(_GP(game).options[OPT_DISABLEOFF]);
     _GP(play).shake_screen_yoff = 0;
 
     memset(&_GP(play).walkable_areas_on[0],1,MAX_WALK_AREAS+1);
@@ -961,14 +961,14 @@ void engine_init_game_settings()
 void engine_setup_scsystem_auxiliary()
 {
     // ScriptSystem::aci_version is only 10 chars long
-    strncpy(_GP(_GP(scsystem)).aci_version, EngineVersion.LongString, 10);
+    strncpy(_GP(scsystem).aci_version, EngineVersion.LongString, 10);
     if (_GP(usetup).override_script_os >= 0)
     {
-        _GP(_GP(scsystem)).os = _GP(usetup).override_script_os;
+        _GP(scsystem).os = _GP(usetup).override_script_os;
     }
     else
     {
-        _GP(_GP(scsystem)).os = platform->GetSystemOSID();
+        _GP(scsystem).os = platform->GetSystemOSID();
     }
 }
 

@@ -26,7 +26,7 @@
 #include "ags/shared/ac/character.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/dialog_topic.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/dynamicsprite.h"
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
@@ -47,7 +47,7 @@
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gui/animatingguibutton.h"
 #include "ags/shared/gui/guibutton.h"
-#include "ags/shared/gui/_GP(guiinv).h"
+#include "ags/shared/gui/gui_inv.h"
 #include "ags/shared/gui/guilabel.h"
 #include "ags/shared/gui/guilistbox.h"
 #include "ags/shared/gui/gui_main.h"
@@ -65,15 +65,15 @@ namespace AGS3 {
 using namespace Shared;
 
 
-extern RGB palette[256];
 
 
 
 
 
 
-extern RoomStatus _GP(troom);
-extern Bitmap *_G(raw_saved_screen);
+
+
+
 
 
 
@@ -845,8 +845,8 @@ HSaveError ReadDynamicSprites(Stream *in, int32_t cmp_ver, const PreservedParams
 
 HSaveError WriteOverlays(Stream *out)
 {
-    out->WriteInt32(numscreenover);
-    for (int i = 0; i < numscreenover; ++i)
+    out->WriteInt32(_G(numscreenover));
+    for (int i = 0; i < _G(numscreenover); ++i)
     {
         _G(screenover)[i].WriteToFile(out);
         serialize_bitmap(_G(screenover)[i].pic, out);
@@ -860,8 +860,8 @@ HSaveError ReadOverlays(Stream *in, int32_t cmp_ver, const PreservedParams &pp, 
     int over_count = in->ReadInt32();
     if (!AssertCompatLimit(err, over_count, MAX_SCREEN_OVERLAYS, "overlays"))
         return err;
-    numscreenover = over_count;
-    for (int i = 0; i < numscreenover; ++i)
+    _G(numscreenover) = over_count;
+    for (int i = 0; i < _G(numscreenover); ++i)
     {
         _G(screenover)[i].ReadFromFile(in, cmp_ver);
         if (_G(screenover)[i].hasSerializedBitmap)

@@ -66,14 +66,14 @@ using namespace AGS::Engine;
 
 
 
-extern RGB palette[256];
 
 
 
 
 
-extern Bitmap *_G(raw_saved_screen);
-extern RoomStatus _GP(troom);
+
+
+
 
 
 static const int32_t MAGICNUMBER = 0xbeefcafe;
@@ -286,16 +286,16 @@ static void restore_game_ambientsounds(Stream *in, RestoredData &r_data) {
 
 static void ReadOverlays_Aligned(Stream *in) {
 	AlignedStream align_s(in, Shared::kAligned_Read);
-	for (int i = 0; i < numscreenover; ++i) {
+	for (int i = 0; i < _G(numscreenover); ++i) {
 		_G(screenover)[i].ReadFromFile(&align_s, 0);
 		align_s.Reset();
 	}
 }
 
 static void restore_game_overlays(Stream *in) {
-	numscreenover = in->ReadInt32();
+	_G(numscreenover) = in->ReadInt32();
 	ReadOverlays_Aligned(in);
-	for (int bb = 0; bb < numscreenover; bb++) {
+	for (int bb = 0; bb < _G(numscreenover); bb++) {
 		if (_G(screenover)[bb].hasSerializedBitmap)
 			_G(screenover)[bb].pic = read_serialized_bitmap(in);
 	}

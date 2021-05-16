@@ -45,12 +45,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 
-extern TopBarSettings _GP(topBar);
-
-
-extern int _G(display_message_aschar);
-
-
 void Display(const char *texx, ...) {
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;

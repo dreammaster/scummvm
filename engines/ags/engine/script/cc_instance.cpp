@@ -25,7 +25,7 @@
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/dynobj/cc_dynamicarray.h"
 #include "ags/engine/ac/dynobj/managed_object_pool.h"
-#include "ags/shared/gui/guidefines.h"
+#include "ags/shared/gui/gui_defines.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/engine/script/cc_instance.h"
 #include "ags/engine/debugging/debug_log.h"
@@ -385,7 +385,7 @@ int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const 
     // to be reconsidered, since the GC could be run in the middle 
     // of a RET from a function or something where there is an 
     // object with ref count 0 that is in use
-    pool.RunGarbageCollectionIfAppropriate();
+    _GP(pool).RunGarbageCollectionIfAppropriate();
 
     if (_G(new_line_hook))
         _G(new_line_hook)(nullptr, 0);
@@ -972,9 +972,9 @@ int ccInstance::Run(int32_t curpc)
           // Note: we might be freeing a dynamic array which contains the DisableDispose
           // object, that will be handled inside the recursive call to SubRef.
           // CHECKME!! what type of data may reg1 point to?
-          pool.disableDisposeForObject = (const char*)registers[SREG_AX].Ptr;
+          _GP(pool).disableDisposeForObject = (const char*)registers[SREG_AX].Ptr;
           ccReleaseObjectReference(handle);
-          pool.disableDisposeForObject = nullptr;
+          _GP(pool).disableDisposeForObject = nullptr;
           registers[SREG_MAR].WriteInt32(0);
           break;
                               }

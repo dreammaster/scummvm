@@ -69,10 +69,6 @@ private:
 
 } // namespace Shared
 } // namespace AGS
-
-extern std::vector<AGS::Shared::GUIInvWindow> _GP(guiinv);
-extern int _G(numguiinv);
-
 } // namespace AGS3
 
 #endif

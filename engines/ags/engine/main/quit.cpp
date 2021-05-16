@@ -34,7 +34,7 @@
 #include "ags/engine/ac/translation.h"
 #include "ags/shared/debugging/agseditordebugger.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/main/config.h"
@@ -45,9 +45,9 @@
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/core/assetmanager.h"
+#include "ags/shared/core/asset_manager.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/platform/base/sys_main.h"
 #include "ags/shared/plugin/plugin_engine.h"
 #include "ags/engine/media/audio/audio_system.h"
 
@@ -59,12 +59,12 @@ using namespace AGS::Engine;
 
 
 
-extern RoomStatus _GP(troom);    // used for non-saveable rooms, eg. intro
+    // used for non-saveable rooms, eg. intro
 
 
-extern char _G(pexbuf)[STD_BUFFER_SIZE];
+
 extern int _G(proper_exit);
-extern char _G(check_dynamic_sprites_at_exit);
+
 
 
 extern int _G(need_to_stop_cd);

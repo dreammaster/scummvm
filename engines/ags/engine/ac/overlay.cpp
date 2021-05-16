@@ -50,7 +50,7 @@ using namespace AGS::Engine;
 extern int _G(face_talking);
 
 ScreenOverlay _G(screenover)[MAX_SCREEN_OVERLAYS];
-int numscreenover = 0;
+int _G(numscreenover) = 0;
 int _G(is_complete_overlay) = 0, _G(is_text_overlay) = 0;
 
 void Overlay_Remove(ScriptOverlay *sco) {
@@ -168,8 +168,8 @@ void remove_screen_overlay_index(int over_idx) {
 	dispose_overlay(over);
 	if (over.type == OVER_COMPLETE) _G(is_complete_overlay)--;
 	if (over.type == OVER_TEXTMSG) _G(is_text_overlay)--;
-	numscreenover--;
-	for (int i = over_idx; i < numscreenover; ++i)
+	_G(numscreenover)--;
+	for (int i = over_idx; i < _G(numscreenover); ++i)
 		_G(screenover)[i] = _G(screenover)[i + 1];
 	// if an overlay before the sierra-style speech one is removed,
 	// update the index
@@ -178,7 +178,7 @@ void remove_screen_overlay_index(int over_idx) {
 }
 
 void remove_screen_overlay(int type) {
-	for (int i = 0; i < numscreenover;) {
+	for (int i = 0; i < _G(numscreenover);) {
 		if (type < 0 || _G(screenover)[i].type == type)
 			remove_screen_overlay_index(i);
 		else
@@ -187,7 +187,7 @@ void remove_screen_overlay(int type) {
 }
 
 int find_overlay_of_type(int type) {
-	for (int i = 0; i < numscreenover; ++i) {
+	for (int i = 0; i < _G(numscreenover); ++i) {
 		if (_G(screenover)[i].type == type) return i;
 	}
 	return -1;
@@ -208,7 +208,7 @@ int add_screen_overlay(int x, int y, int type, Shared::Bitmap *piccy, int pic_of
 			}
 		}
 	}
-	ScreenOverlay &over = _G(screenover)[numscreenover++];
+	ScreenOverlay &over = _G(screenover)[_G(numscreenover)++];
 	over.pic = piccy;
 	over.bmp = _G(gfxDriver)->CreateDDBFromBitmap(piccy, alphaChannel);
 	over.x = x;
@@ -221,7 +221,7 @@ int add_screen_overlay(int x, int y, int type, Shared::Bitmap *piccy, int pic_of
 	over.associatedOverlayHandle = 0;
 	over.hasAlphaChannel = alphaChannel;
 	over.positionRelativeToScreen = true;
-	return numscreenover - 1;
+	return _G(numscreenover) - 1;
 }
 
 
@@ -269,7 +269,7 @@ void get_overlay_position(const ScreenOverlay &over, int *x, int *y) {
 }
 
 void recreate_overlay_ddbs() {
-	for (int i = 0; i < numscreenover; ++i) {
+	for (int i = 0; i < _G(numscreenover); ++i) {
 		if (_G(screenover)[i].bmp)
 			_G(gfxDriver)->DestroyDDB(_G(screenover)[i].bmp);
 		if (_G(screenover)[i].pic)

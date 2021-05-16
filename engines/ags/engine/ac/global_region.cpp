@@ -24,7 +24,7 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_version.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/region.h"
+#include "ags/engine/ac/region.h"
 #include "ags/engine/ac/room.h"
 #include "ags/engine/ac/room_status.h"
 #include "ags/engine/debugging/debug_log.h"
@@ -37,7 +37,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern RoomStatus *_G(croom);
+
 
 
 

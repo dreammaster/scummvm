@@ -31,7 +31,7 @@ namespace AGS3 {
 
 
 
-extern RGB palette[256];
+
 
 
 void CyclePalette(int strt, int eend) {

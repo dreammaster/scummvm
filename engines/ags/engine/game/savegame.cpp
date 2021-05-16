@@ -22,7 +22,7 @@
 
 #include "ags/shared/ac/character.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/dynamicsprite.h"
 #include "ags/shared/ac/event.h"
 #include "ags/engine/ac/game.h"
@@ -34,7 +34,7 @@
 #include "ags/shared/ac/gui.h"
 #include "ags/shared/ac/mouse.h"
 #include "ags/engine/ac/overlay.h"
-#include "ags/shared/ac/region.h"
+#include "ags/engine/ac/region.h"
 #include "ags/shared/ac/richgamemedia.h"
 #include "ags/shared/ac/room.h"
 #include "ags/shared/ac/roomstatus.h"
@@ -52,7 +52,7 @@
 #include "ags/shared/main/engine.h"
 #include "ags/shared/main/main.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/platform/base/sys_main.h"
 #include "ags/shared/plugin/agsplugin.h"
 #include "ags/shared/plugin/plugin_engine.h"
 #include "ags/shared/script/script.h"
@@ -72,13 +72,13 @@ using namespace Engine;
 HSaveError restore_game_data(Stream *in, SavegameVersion svg_version, const PreservedParams &pp, RestoredData &r_data);
 
 
-extern Bitmap **_G(guibg);
-extern AGS::Engine::IDriverDependantBitmap **_G(guibgbmp);
-extern AGS::Engine::IGraphicsDriver *_G(gfxDriver);
 
-extern Bitmap *_G(raw_saved_screen);
-extern RoomStatus _GP(troom);
-extern RoomStatus *_G(croom);
+extern AGS::Engine::IDriverDependantBitmap **_G(guibgbmp);
+
+
+
+
+
 
 
 namespace AGS {
@@ -543,7 +543,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 		on_background_frame_change();
 	}
 
-	gui_disabled_style = convert_gui_disabled_style(_GP(game).options[OPT_DISABLEOFF]);
+	_G(gui_disabled_style) = convert_gui_disabled_style(_GP(game).options[OPT_DISABLEOFF]);
 
 	// restore the queue now that the music is playing
 	_GP(play).music_queue_size = queuedMusicSize;

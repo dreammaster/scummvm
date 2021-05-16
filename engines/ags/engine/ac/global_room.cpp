@@ -35,25 +35,14 @@
 #include "ags/engine/ac/room.h"
 #include "ags/engine/ac/room_status.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/engine/script/script.h"
 #include "ags/shared/util/math.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace Shared;
-
-
-
-extern RoomStatus *_G(croom);
-
-
-extern int _G(in_enters_screen);
-
-extern int in_inv_screen, inv_screen_newroom;
-
-extern int _G(gs_to_newroom);
-
 
 void SetAmbientTint(int red, int green, int blue, int opacity, int luminance) {
 	if ((red < 0) || (green < 0) || (blue < 0) ||
@@ -80,7 +69,6 @@ void SetAmbientLightLevel(int light_level) {
 	_GP(play).rtint_light = light_level;
 }
 
-extern ScriptPosition _G(last_in_dialog_request_script_pos);
 void NewRoom(int nrnum) {
 	if (nrnum < 0)
 		quitprintf("!NewRoom: room change requested to invalid room number %d.", nrnum);
@@ -116,8 +104,8 @@ void NewRoom(int nrnum) {
 	} else if (_G(in_enters_screen)) {
 		setevent(EV_NEWROOM, nrnum);
 		return;
-	} else if (in_inv_screen) {
-		inv_screen_newroom = nrnum;
+	} else if (_G(in_inv_screen)) {
+		_G(inv_screen_newroom) = nrnum;
 		return;
 	} else if ((_G(inside_script) == 0) & (_G(in_graph_script) == 0)) {
 		new_room(nrnum, _G(playerchar));

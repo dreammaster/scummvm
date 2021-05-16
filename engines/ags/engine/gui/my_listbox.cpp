@@ -26,7 +26,7 @@
 #include "ags/shared/ac/keycode.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gui/guidialog.h"
+#include "ags/engine/gui/gui_dialog.h"
 #include "ags/shared/gui/guidialoginternaldefs.h"
 #include "ags/shared/gui/mylistbox.h"
 

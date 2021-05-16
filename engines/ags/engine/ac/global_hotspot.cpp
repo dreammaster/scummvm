@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/global_hotspot.h"
+#include "ags/engine/ac/global_hotspot.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/common_defines.h"
 #include "ags/shared/ac/character_info.h"
@@ -30,7 +30,7 @@
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/global_character.h"
 #include "ags/engine/ac/global_translation.h"
-#include "ags/shared/ac/hotspot.h"
+#include "ags/engine/ac/hotspot.h"
 #include "ags/engine/ac/properties.h"
 #include "ags/engine/ac/room_status.h"
 #include "ags/engine/ac/string.h"
@@ -43,7 +43,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern RoomStatus *_G(croom);
+
 
 
 

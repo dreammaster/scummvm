@@ -428,7 +428,7 @@ void Character_FaceObject(CharacterInfo *char1, ScriptObject *obj, int blockingS
     if (obj == nullptr) 
         quit("!FaceObject: invalid object specified");
 
-    FaceLocationXY(char1, _GP(objs)[obj->id].x, _GP(objs)[obj->id].y, blockingStyle);
+    FaceLocationXY(char1, _G(objs)[obj->id].x, _G(objs)[obj->id].y, blockingStyle);
 }
 
 void Character_FaceCharacter(CharacterInfo *char1, CharacterInfo *char2, int blockingStyle) {
@@ -510,14 +510,14 @@ int Character_IsCollidingWithObject(CharacterInfo *chin, ScriptObject *objid) {
 
     if (chin->room != _G(displayed_room))
         return 0;
-    if (_GP(objs)[objid->id].on != 1)
+    if (_G(objs)[objid->id].on != 1)
         return 0;
 
     Bitmap *checkblk = GetObjectImage(objid->id, nullptr);
     int objWidth = checkblk->GetWidth();
     int objHeight = checkblk->GetHeight();
-    int o1x = _GP(objs)[objid->id].x;
-    int o1y = _GP(objs)[objid->id].y - game_to_data_coord(objHeight);
+    int o1x = _G(objs)[objid->id].x;
+    int o1y = _G(objs)[objid->id].y - game_to_data_coord(objHeight);
 
     Bitmap *charpic = GetCharacterImage(chin->index_id, nullptr);
 
@@ -2178,8 +2178,6 @@ CharacterInfo *GetCharacterAtRoom(int x, int y)
     return &_GP(game).chars[hsnum];
 }
 
-extern int _G(char_lowest_yp), _G(obj_lowest_yp);
-
 int is_pos_on_character(int xx,int yy) {
     int cc,sppic,lowestyp=0,lowestwas=-1;
     for (cc=0;cc<_GP(game).numcharacters;cc++) {
@@ -2355,7 +2353,7 @@ void _displayspeech(const char*texx, int aschar, int xx, int yy, int widd, int i
     int aa;
     if (_GP(play).bgspeech_stay_on_display == 0) {
         // remove any background speech
-        for (aa=0;aa<numscreenover;aa++) {
+        for (aa=0;aa<_G(numscreenover);aa++) {
             if (_G(screenover)[aa].timeout > 0) {
                 remove_screen_overlay(_G(screenover)[aa].type);
                 aa--;

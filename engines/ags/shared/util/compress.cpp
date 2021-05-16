@@ -327,11 +327,11 @@ void load_lzw(Stream *in, Bitmap **dst_bmp, int dst_bpp, RGB *pall) {
 	int           arin;
 
 	in->Read(&pall[0], sizeof(RGB) * 256);
-	maxsize = in->ReadInt32();
+	_G(maxsize) = in->ReadInt32();
 	uncompsiz = in->ReadInt32();
 
 	uncompsiz += in->GetPosition();
-	outbytes = 0; putbytes = 0;
+	_G(outbytes) = 0; _G(putbytes) = 0;
 
 	update_polled_stuff_if_runtime();
 	membuffer = lzwexpand_to_mem(in);

@@ -41,7 +41,7 @@ using namespace AGS::Shared;
 
 
 
-extern RoomStatus *_G(croom);
+
 
 
 Bitmap *_G(walkareabackup) = nullptr, *_G(walkable_areas_temp) = nullptr;
@@ -172,12 +172,12 @@ Bitmap *prepare_walkable_areas(int sourceChar) {
 	// check for any blocking objects in the room, and deal with them
 	// as well
 	for (ww = 0; ww < _G(croom)->numobj; ww++) {
-		if (_GP(objs)[ww].on != 1) continue;
-		if ((_GP(objs)[ww].flags & OBJF_SOLID) == 0)
+		if (_G(objs)[ww].on != 1) continue;
+		if ((_G(objs)[ww].flags & OBJF_SOLID) == 0)
 			continue;
-		if (room_to_mask_coord(_GP(objs)[ww].y) >= _G(walkable_areas_temp)->GetHeight()) continue;
-		if (room_to_mask_coord(_GP(objs)[ww].x) >= _G(walkable_areas_temp)->GetWidth()) continue;
-		if ((_GP(objs)[ww].y < 0) || (_GP(objs)[ww].x < 0)) continue;
+		if (room_to_mask_coord(_G(objs)[ww].y) >= _G(walkable_areas_temp)->GetHeight()) continue;
+		if (room_to_mask_coord(_G(objs)[ww].x) >= _G(walkable_areas_temp)->GetWidth()) continue;
+		if ((_G(objs)[ww].y < 0) || (_G(objs)[ww].x < 0)) continue;
 
 		int x1, y1, width, y2;
 		get_object_blocking_rect(ww, &x1, &y1, &width, &y2);

@@ -29,7 +29,7 @@
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/global_game.h"
-#include "ags/shared/ac/path_helper.h"
+#include "ags/engine/ac/path_helper.h"
 #include "ags/engine/ac/string.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/debug/debug_log.h"

@@ -232,7 +232,7 @@ void IAGSEngine::GetScreenDimensions(int32 *width, int32 *height, int32 *coldept
 	if (height != nullptr)
 		height[0] = _GP(play).GetMainViewport().GetHeight();
 	if (coldepth != nullptr)
-		coldepth[0] = _GP(_GP(scsystem)).coldepth;
+		coldepth[0] = _GP(scsystem).coldepth;
 }
 
 uint8 *IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
@@ -682,9 +682,9 @@ void IAGSEngine::NotifySpriteUpdated(int32 slot) {
 
 	// clear the object cache
 	for (ff = 0; ff < MAX_ROOM_OBJECTS; ff++) {
-		if ((_G(_GP(objcache))[ff].image != nullptr) && (_G(_GP(objcache))[ff].sppic == slot)) {
-			delete _G(_GP(objcache))[ff].image;
-			_G(_GP(objcache))[ff].image = nullptr;
+		if ((_G(_G(objcache))[ff].image != nullptr) && (_G(_G(objcache))[ff].sppic == slot)) {
+			delete _G(_G(objcache))[ff].image;
+			_G(_G(objcache))[ff].image = nullptr;
 		}
 	}
 }
@@ -717,20 +717,20 @@ int IAGSEngine::RegisterManagedObject(const void *object, IAGSScriptManagedObjec
 }
 
 void IAGSEngine::AddManagedObjectReader(const char *typeName, IAGSManagedObjectReader *reader) {
-	if (_G(numPluginReaders) >= MAX_PLUGIN_OBJECT_READERS)
+	if (_G(_G(numPluginReaders)) >= MAX_PLUGIN_OBJECT_READERS)
 		quit("Plugin error: IAGSEngine::AddObjectReader: Too many object readers added");
 
 	if ((typeName == nullptr) || (typeName[0] == 0))
 		quit("Plugin error: IAGSEngine::AddObjectReader: invalid name for type");
 
-	for (int ii = 0; ii < _G(numPluginReaders); ii++) {
-		if (strcmp(_G(pluginReaders)[ii].type, typeName) == 0)
+	for (int ii = 0; ii < _G(_G(numPluginReaders)); ii++) {
+		if (strcmp(_G(_G(pluginReaders))[ii].type, typeName) == 0)
 			quitprintf("Plugin error: IAGSEngine::AddObjectReader: type '%s' has been registered already", typeName);
 	}
 
-	_G(pluginReaders)[_G(numPluginReaders)].reader = reader;
-	_G(pluginReaders)[_G(numPluginReaders)].type = typeName;
-	_G(numPluginReaders)++;
+	_G(_G(pluginReaders))[_G(_G(numPluginReaders))].reader = reader;
+	_G(_G(pluginReaders))[_G(_G(numPluginReaders))].type = typeName;
+	_G(_G(numPluginReaders))++;
 }
 
 void IAGSEngine::RegisterUnserializedObject(int key_, const void *object, IAGSScriptManagedObject *callback) {

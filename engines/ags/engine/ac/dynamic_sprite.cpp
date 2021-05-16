@@ -28,11 +28,11 @@
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_dynamicsprite.h"
+#include "ags/engine/ac/global_dynamic_sprite.h"
 #include "ags/engine/ac/global_game.h"
 #include "ags/engine/ac/math.h"    // M_PI
 #include "ags/engine/ac/object_cache.h"
-#include "ags/shared/ac/path_helper.h"
+#include "ags/engine/ac/path_helper.h"
 #include "ags/engine/ac/room_object.h"
 #include "ags/engine/ac/room_status.h"
 #include "ags/engine/ac/system.h"
@@ -51,19 +51,6 @@ namespace AGS3 {
 
 using namespace Shared;
 using namespace Engine;
-
-
-
-
-
-extern RoomStatus *_G(croom);
-extern CharacterCache *_G(charcache);
-
-
-extern RGB palette[256];
-extern AGS::Engine::IGraphicsDriver *_G(gfxDriver);
-
-char _G(check_dynamic_sprites_at_exit) = 1;
 
 // ** SCRIPT DYNAMIC SPRITE
 

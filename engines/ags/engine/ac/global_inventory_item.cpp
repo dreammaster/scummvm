@@ -23,29 +23,20 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/global_gui.h"
-#include "ags/shared/ac/global_inventoryitem.h"
+#include "ags/engine/ac/global_inventory_item.h"
 #include "ags/engine/ac/global_translation.h"
-#include "ags/shared/ac/inventoryitem.h"
-#include "ags/shared/ac/invwindow.h"
+#include "ags/engine/ac/inventory_item.h"
+#include "ags/engine/ac/inv_window.h"
 #include "ags/engine/ac/properties.h"
 #include "ags/engine/ac/string.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/gui/_GP(guiinv).h"
+#include "ags/shared/gui/gui_inv.h"
 #include "ags/engine/ac/event.h"
 #include "ags/engine/ac/game_state.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
-extern int mousex, mousey;
-extern int _G(mouse_ifacebut_xoffs), mouse_ifacebut_yoffs;
-
-
-
-
 
 void set_inv_item_pic(int invi, int piccy) {
 	if ((invi < 1) || (invi > _GP(game).numinvitems))
@@ -79,17 +70,17 @@ void SetInvItemName(int invi, const char *newName) {
 int GetInvAt(int xxx, int yyy) {
 	int ongui = GetGUIAt(xxx, yyy);
 	if (ongui >= 0) {
-		int mxwas = mousex, mywas = mousey;
-		mousex = data_to_game_coord(xxx) - _GP(guis)[ongui].X;
-		mousey = data_to_game_coord(yyy) - _GP(guis)[ongui].Y;
+		int mxwas = _G(mousex), mywas = _G(mousey);
+		_G(mousex) = data_to_game_coord(xxx) - _GP(guis)[ongui].X;
+		_G(mousey) = data_to_game_coord(yyy) - _GP(guis)[ongui].Y;
 		int onobj = _GP(guis)[ongui].FindControlUnderMouse();
 		GUIObject *guio = _GP(guis)[ongui].GetControl(onobj);
 		if (guio) {
-			_G(mouse_ifacebut_xoffs) = mousex - (guio->X);
-			mouse_ifacebut_yoffs = mousey - (guio->Y);
+			_G(mouse_ifacebut_xoffs) = _G(mousex) - (guio->X);
+			_G(mouse_ifacebut_yoffs) = _G(mousey) - (guio->Y);
 		}
-		mousex = mxwas;
-		mousey = mywas;
+		_G(mousex) = mxwas;
+		_G(mousey) = mywas;
 		if (guio && (_GP(guis)[ongui].GetControlType(onobj) == kGUIInvWindow))
 			return offset_over_inv((GUIInvWindow *)guio);
 	}

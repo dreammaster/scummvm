@@ -31,11 +31,11 @@
 #include "ags/engine/ac/global_character.h"
 #include "ags/engine/ac/global_game.h"
 #include "ags/engine/ac/global_gui.h"
-#include "ags/shared/ac/global_inventoryitem.h"
+#include "ags/engine/ac/global_inventory_item.h"
 #include "ags/engine/ac/global_screen.h"
 #include "ags/shared/ac/guicontrol.h"
 #include "ags/shared/ac/interfacebutton.h"
-#include "ags/shared/ac/invwindow.h"
+#include "ags/engine/ac/inv_window.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/engine/ac/system.h"
@@ -44,7 +44,7 @@
 #include "ags/engine/script/cc_instance.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/engine/device/mouse_w32.h"
-#include "ags/shared/gfx/gfxfilter.h"
+#include "ags/engine/gfx/gfx_filter.h"
 #include "ags/shared/gui/gui_button.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/engine/script/script.h"
@@ -64,29 +64,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-
-
-
-extern int _G(cur_mode), _G(cur_cursor);
-extern ccInstance *_G(gameinst);
-
-
-extern CCGUIObject _GP(ccDynamicGUIObject);
-extern Bitmap **_G(guibg);
-extern IDriverDependantBitmap **_G(guibgbmp);
-
-
-extern CCGUI _GP(ccDynamicGUI);
-extern CCGUIObject _GP(ccDynamicGUIObject);
-
-
-int _G(ifacepopped) = -1;  // currently displayed pop-up GUI (-1 if none)
-int _G(mouse_on_iface) = -1;   // mouse cursor is over this interface
-int _G(mouse_ifacebut_xoffs) = -1, mouse_ifacebut_yoffs = -1;
-
-int _G(eip_guinum), _G(eip_guiobj);
-
 
 ScriptGUI *GUI_AsTextWindow(ScriptGUI *tehgui) { // Internally both GUI and TextWindow are implemented by same class
 	return _GP(guis)[tehgui->id].IsTextWindow() ? &_G(scrGui)[tehgui->id] : nullptr;
@@ -507,11 +484,11 @@ void update_gui_disabled_status() {
 	all_buttons_disabled = 0;
 
 	if (!IsInterfaceEnabled()) {
-		all_buttons_disabled = gui_disabled_style;
+		all_buttons_disabled = _G(gui_disabled_style);
 	}
 
 	if (all_buttons_was != all_buttons_disabled) {
-		if (gui_disabled_style != GUIDIS_UNCHANGED) {
+		if (_G(gui_disabled_style) != GUIDIS_UNCHANGED) {
 			for (int aa = 0; aa < _GP(game).numgui; aa++) {
 				_GP(guis)[aa].OnControlPositionChanged(); // this marks GUI for update
 			}
@@ -646,7 +623,7 @@ void gui_on_mouse_up(const int wasongui, const int wasbutdown) {
 			force_event(EV_IFACECLICK, wasongui, i, wasbutdown);
 		} else if (cttype == kGUIInvWindow) {
 			_G(mouse_ifacebut_xoffs) = mousex - (guio->X) - _GP(guis)[wasongui].X;
-			mouse_ifacebut_yoffs = mousey - (guio->Y) - _GP(guis)[wasongui].Y;
+			_G(mouse_ifacebut_yoffs) = mousey - (guio->Y) - _GP(guis)[wasongui].Y;
 			int iit = offset_over_inv((GUIInvWindow *)guio);
 			if (iit >= 0) {
 				_G(evblocknum) = iit;

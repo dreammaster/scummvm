@@ -29,10 +29,10 @@
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/global_translation.h"
-#include "ags/shared/ac/path_helper.h"
+#include "ags/engine/ac/path_helper.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/ac/system.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/main/mainheader.h"
 #include "ags/shared/main/config.h"
@@ -261,7 +261,7 @@ void read_legacy_graphics_config(const ConfigTree &cfg) {
 }
 
 // Variables used for mobile port configs
-extern int psp_gfx_renderer;
+extern int _G(psp_gfx_renderer);
 extern int psp_gfx_scaling;
 extern int psp_gfx_super_sampling;
 extern int psp_gfx_smoothing;
@@ -277,16 +277,16 @@ void override_config_ext(ConfigTree &cfg) {
 	INIwriteint(cfg, "graphics", "windowed", 0);
 #endif
 
-	// psp_gfx_renderer - rendering mode
+	// _G(psp_gfx_renderer) - rendering mode
 	//    * 0 - software renderer
 	//    * 1 - hardware, render to screen
 	//    * 2 - hardware, render to texture
-	if (psp_gfx_renderer == 0) {
+	if (_G(psp_gfx_renderer) == 0) {
 		INIwritestring(cfg, "graphics", "driver", "Software");
 		INIwriteint(cfg, "graphics", "render_at_screenres", 1);
 	} else {
 		INIwritestring(cfg, "graphics", "driver", "OGL");
-		INIwriteint(cfg, "graphics", "render_at_screenres", psp_gfx_renderer == 1);
+		INIwriteint(cfg, "graphics", "render_at_screenres", _G(psp_gfx_renderer) == 1);
 	}
 
 	// psp_gfx_scaling - scaling style:
@@ -311,7 +311,7 @@ void override_config_ext(ConfigTree &cfg) {
 	// psp_gfx_super_sampling - enable super sampling
 	//    * 0 - x1
 	//    * 1 - x2
-	if (psp_gfx_renderer == 2)
+	if (_G(psp_gfx_renderer) == 2)
 		INIwriteint(cfg, "graphics", "supersampling", psp_gfx_super_sampling + 1);
 	else
 		INIwriteint(cfg, "graphics", "supersampling", 0);

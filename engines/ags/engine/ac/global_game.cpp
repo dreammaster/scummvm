@@ -22,7 +22,7 @@
 
 #include "ags/lib/std/math.h"
 #include "ags/shared/core/platform.h"
-#include "ags/shared/ac/audiocliptype.h"
+#include "ags/shared/ac/audio_clip_type.h"
 #include "ags/engine/ac/global_game.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/view.h"
@@ -36,23 +36,23 @@
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/global_character.h"
 #include "ags/engine/ac/global_gui.h"
-#include "ags/shared/ac/global_hotspot.h"
-#include "ags/shared/ac/global_inventoryitem.h"
+#include "ags/engine/ac/global_hotspot.h"
+#include "ags/engine/ac/global_inventory_item.h"
 #include "ags/engine/ac/global_translation.h"
 #include "ags/engine/ac/gui.h"
-#include "ags/shared/ac/hotspot.h"
+#include "ags/engine/ac/hotspot.h"
 #include "ags/shared/ac/keycode.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/object.h"
-#include "ags/shared/ac/path_helper.h"
+#include "ags/engine/ac/path_helper.h"
 #include "ags/engine/ac/sys_events.h"
 #include "ags/engine/ac/room.h"
 #include "ags/engine/ac/room_status.h"
 #include "ags/engine/ac/string.h"
 #include "ags/engine/ac/system.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/gui/guidialog.h"
+#include "ags/engine/gui/gui_dialog.h"
 #include "ags/engine/main/engine.h"
 #include "ags/engine/main/game_start.h"
 #include "ags/engine/main/game_run.h"
@@ -62,38 +62,18 @@
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/gfx/graphics_driver.h"
-#include "ags/shared/core/assetmanager.h"
+#include "ags/shared/core/asset_manager.h"
 #include "ags/engine/main/config.h"
 #include "ags/engine/main/game_file.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/string_utils.h"
 #include "ags/engine/media/audio/audio_system.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/platform/base/sys_main.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
-
-extern int _G(game_paused);
-
-
-
-extern int _G(load_new_game_restore);
-
-
-extern RoomStatus *_G(croom);
-extern int gui_disabled_style;
-
-extern int _G(getloctype_index);
-
-extern RGB palette[256];
-
-#if AGS_PLATFORM_OS_IOS || AGS_PLATFORM_OS_ANDROID
-extern int psp_gfx_renderer;
-#endif
 
 void GiveScore(int amnt) {
 	GUI::MarkSpecialLabelsForUpdate(kLabelMacro_AllScore);
@@ -449,7 +429,7 @@ int SetGameOption(int opt, int setting) {
 	if (opt == OPT_DUPLICATEINV)
 		update_invorder();
 	else if (opt == OPT_DISABLEOFF) {
-		gui_disabled_style = convert_gui_disabled_style(_GP(game).options[OPT_DISABLEOFF]);
+		_G(gui_disabled_style) = convert_gui_disabled_style(_GP(game).options[OPT_DISABLEOFF]);
 		// If GUI was disabled at this time then also update it, as visual style could've changed
 		if (_GP(play).disabled_user_interface > 0) {
 			GUI::MarkAllGUIForUpdate();
@@ -671,7 +651,7 @@ void SetMultitasking(int mode) {
 	}
 
 	// Don't allow background running if full screen
-	if ((mode == 1) && (!_GP(_GP(scsystem)).windowed))
+	if ((mode == 1) && (!_GP(scsystem).windowed))
 		mode = 0;
 
 	// Install engine callbacks for switching in and out the window
@@ -683,8 +663,6 @@ void SetMultitasking(int mode) {
 		sys_evt_set_focus_callbacks(display_switch_in, display_switch_out);
 	}
 }
-
-extern int _G(getloctype_throughgui), _G(getloctype_index);
 
 void RoomProcessClick(int xx, int yy, int mood) {
 	_G(getloctype_throughgui) = 1;

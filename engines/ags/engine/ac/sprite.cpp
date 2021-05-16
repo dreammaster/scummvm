@@ -40,7 +40,7 @@ using namespace AGS::Engine;
 
 
 extern int _G(our_eip), _G(eip_guinum), _G(eip_guiobj);
-extern RGB palette[256];
+
 
 
 

@@ -25,7 +25,7 @@
 #include "ags/shared/ac/sys_events.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gui/mypushbutton.h"
-#include "ags/shared/gui/guidialog.h"
+#include "ags/engine/gui/gui_dialog.h"
 #include "ags/shared/gui/guidialoginternaldefs.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/gfx/bitmap.h"

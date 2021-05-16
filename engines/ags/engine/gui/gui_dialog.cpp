@@ -23,9 +23,9 @@
 #include "ags/lib/std/algorithm.h"
 //include <cstdio>
 #include "ags/lib/allegro.h" // find files
-#include "ags/shared/gui/guidialog.h"
+#include "ags/engine/gui/gui_dialog.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"

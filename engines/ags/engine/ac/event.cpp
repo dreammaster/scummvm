@@ -48,31 +48,6 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-
-extern RoomStatus *_G(croom);
-
-
-extern RGB palette[256];
-
-
-extern RGB _GP(old_palette)[256];
-
-int _G(in_enters_screen) = 0, _G(done_es_error) = 0;
-int _G(in_leaves_screen) = -1;
-
-EventHappened event[MAXEVENTS + 1];
-int _G(numevents) = 0;
-
-const char *_G(evblockbasename);
-int _G(evblocknum);
-
-int _G(inside_processevent) = 0;
-int _G(eventClaimed) = EVENT_NONE;
-
-const char *_G(tsnames)[4] = { nullptr, REP_EXEC_NAME, "on_key_press","on_mouse_click" };
-
-
 int run_claimable_event(const char *tsname, bool includeRoom, int numParams, const RuntimeScriptValue *params, bool *eventWasClaimed) {
 	*eventWasClaimed = true;
 	// Run the room script function, and if it is not claimed,

@@ -70,10 +70,6 @@ private:
 
 } // namespace Shared
 } // namespace AGS
-
-extern std::vector<AGS::Shared::GUISlider> _G(guislider);
-extern int _G(numguislider);
-
 } // namespace AGS3
 
 #endif

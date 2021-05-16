@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/ac/region.h"
+#include "ags/engine/ac/region.h"
 #include "ags/shared/ac/common_defines.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
@@ -37,15 +37,6 @@
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
-extern RoomStatus *_G(croom);
-
-extern COLOR_MAP _GP(maincoltable);
-extern RGB palette[256];
-extern CCRegion _GP(ccDynamicRegion);
-
 
 ScriptRegion *GetRegionAtRoom(int xx, int yy) {
 	int hsnum = GetRegionIDAtRoom(xx, yy);
@@ -129,9 +120,9 @@ void Region_RunInteraction(ScriptRegion *ssr, int mood) {
 //=============================================================================
 
 void generate_light_table() {
-	if (_GP(game).color_depth == 1 && _GP(color_map) == nullptr) {
-		create_light_table(&_GP(maincoltable), palette, 0, 0, 0, nullptr);
-		_GP(color_map) = &_GP(maincoltable);
+	if (_GP(game).color_depth == 1 && _G(color_map) == nullptr) {
+		create_light_table(&_GP(maincoltable), _G(palette), 0, 0, 0, nullptr);
+		_G(color_map) = &_GP(maincoltable);
 	}
 }
 

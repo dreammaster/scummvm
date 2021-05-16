@@ -25,7 +25,7 @@
 #include "ags/engine/ac/global_gui.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/gui/gui_button.h"
-#include "ags/shared/gui/_GP(guiinv).h"
+#include "ags/shared/gui/gui_inv.h"
 #include "ags/shared/gui/guilabel.h"
 #include "ags/shared/gui/guilistbox.h"
 #include "ags/shared/gui/gui_main.h"
@@ -44,8 +44,8 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern CCGUI _GP(ccDynamicGUI);
-extern CCGUIObject _GP(ccDynamicGUIObject);
+
+
 
 GUIObject *GetGUIControlAtLocation(int xx, int yy) {
 	int guinum = GetGUIAt(xx, yy);

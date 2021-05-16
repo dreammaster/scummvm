@@ -50,15 +50,6 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-
-extern RoomStatus *_G(croom);
-
-extern CharacterCache *_G(charcache);
-
-
-
-
 // ** SCRIPT DRAWINGSURFACE OBJECT
 
 void DrawingSurface_Release(ScriptDrawingSurface *sds) {

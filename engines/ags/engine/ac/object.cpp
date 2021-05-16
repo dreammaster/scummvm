@@ -56,7 +56,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern RoomStatus *_G(croom);
+
 
 
 
@@ -64,7 +64,7 @@ extern RoomStatus *_G(croom);
 
 extern Bitmap *_G(walkable_areas_temp);
 
-extern CCObject _GP(ccDynamicObject);
+
 
 
 int Object_IsCollidingWithObject(ScriptObject *objj, ScriptObject *obj2) {
@@ -110,7 +110,7 @@ int Object_GetTransparency(ScriptObject *objj) {
 	if (!is_valid_object(objj->id))
 		quit("!Object.Transparent: invalid object number specified");
 
-	return GfxDef::LegacyTrans255ToTrans100(_GP(objs)[objj->id].transparent);
+	return GfxDef::LegacyTrans255ToTrans100(_G(objs)[objj->id].transparent);
 }
 
 void Object_SetBaseline(ScriptObject *objj, int basel) {
@@ -147,9 +147,9 @@ void Object_StopAnimating(ScriptObject *objj) {
 	if (!is_valid_object(objj->id))
 		quit("!Object.StopAnimating: invalid object number");
 
-	if (_GP(objs)[objj->id].cycling) {
-		_GP(objs)[objj->id].cycling = 0;
-		_GP(objs)[objj->id].wait = 0;
+	if (_G(objs)[objj->id].cycling) {
+		_G(objs)[objj->id].cycling = 0;
+		_G(objs)[objj->id].wait = 0;
 	}
 }
 
@@ -169,21 +169,21 @@ void Object_SetVisible(ScriptObject *objj, int onoroff) {
 }
 
 int Object_GetView(ScriptObject *objj) {
-	if (_GP(objs)[objj->id].view == (uint16_t)-1)
+	if (_G(objs)[objj->id].view == (uint16_t)-1)
 		return 0;
-	return _GP(objs)[objj->id].view + 1;
+	return _G(objs)[objj->id].view + 1;
 }
 
 int Object_GetLoop(ScriptObject *objj) {
-	if (_GP(objs)[objj->id].view == (uint16_t)-1)
+	if (_G(objs)[objj->id].view == (uint16_t)-1)
 		return 0;
-	return _GP(objs)[objj->id].loop;
+	return _G(objs)[objj->id].loop;
 }
 
 int Object_GetFrame(ScriptObject *objj) {
-	if (_GP(objs)[objj->id].view == (uint16_t)-1)
+	if (_G(objs)[objj->id].view == (uint16_t)-1)
 		return 0;
-	return _GP(objs)[objj->id].frame;
+	return _G(objs)[objj->id].frame;
 }
 
 int Object_GetVisible(ScriptObject *objj) {
@@ -200,7 +200,7 @@ int Object_GetGraphic(ScriptObject *objj) {
 
 int GetObjectX(int objj) {
 	if (!is_valid_object(objj)) quit("!GetObjectX: invalid object number");
-	return _GP(objs)[objj].x;
+	return _G(objs)[objj].x;
 }
 
 int Object_GetX(ScriptObject *objj) {
@@ -220,15 +220,15 @@ int Object_GetMoving(ScriptObject *objj) {
 }
 
 bool Object_HasExplicitLight(ScriptObject *obj) {
-	return _GP(objs)[obj->id].has_explicit_light();
+	return _G(objs)[obj->id].has_explicit_light();
 }
 
 bool Object_HasExplicitTint(ScriptObject *obj) {
-	return _GP(objs)[obj->id].has_explicit_tint();
+	return _G(objs)[obj->id].has_explicit_tint();
 }
 
 int Object_GetLightLevel(ScriptObject *obj) {
-	return _GP(objs)[obj->id].has_explicit_light() ? _GP(objs)[obj->id].tint_light : 0;
+	return _G(objs)[obj->id].has_explicit_light() ? _G(objs)[obj->id].tint_light : 0;
 }
 
 void Object_SetLightLevel(ScriptObject *objj, int light_level) {
@@ -236,29 +236,29 @@ void Object_SetLightLevel(ScriptObject *objj, int light_level) {
 	if (!is_valid_object(obj))
 		quit("!SetObjectTint: invalid object number specified");
 
-	_GP(objs)[obj].tint_light = light_level;
-	_GP(objs)[obj].flags &= ~OBJF_HASTINT;
-	_GP(objs)[obj].flags |= OBJF_HASLIGHT;
+	_G(objs)[obj].tint_light = light_level;
+	_G(objs)[obj].flags &= ~OBJF_HASTINT;
+	_G(objs)[obj].flags |= OBJF_HASLIGHT;
 }
 
 int Object_GetTintRed(ScriptObject *obj) {
-	return _GP(objs)[obj->id].has_explicit_tint() ? _GP(objs)[obj->id].tint_r : 0;
+	return _G(objs)[obj->id].has_explicit_tint() ? _G(objs)[obj->id].tint_r : 0;
 }
 
 int Object_GetTintGreen(ScriptObject *obj) {
-	return _GP(objs)[obj->id].has_explicit_tint() ? _GP(objs)[obj->id].tint_g : 0;
+	return _G(objs)[obj->id].has_explicit_tint() ? _G(objs)[obj->id].tint_g : 0;
 }
 
 int Object_GetTintBlue(ScriptObject *obj) {
-	return _GP(objs)[obj->id].has_explicit_tint() ? _GP(objs)[obj->id].tint_b : 0;
+	return _G(objs)[obj->id].has_explicit_tint() ? _G(objs)[obj->id].tint_b : 0;
 }
 
 int Object_GetTintSaturation(ScriptObject *obj) {
-	return _GP(objs)[obj->id].has_explicit_tint() ? _GP(objs)[obj->id].tint_level : 0;
+	return _G(objs)[obj->id].has_explicit_tint() ? _G(objs)[obj->id].tint_level : 0;
 }
 
 int Object_GetTintLuminance(ScriptObject *obj) {
-	return _GP(objs)[obj->id].has_explicit_tint() ? ((_GP(objs)[obj->id].tint_light * 10) / 25) : 0;
+	return _G(objs)[obj->id].has_explicit_tint() ? ((_G(objs)[obj->id].tint_light * 10) / 25) : 0;
 }
 
 void Object_SetPosition(ScriptObject *objj, int xx, int yy) {
@@ -266,11 +266,11 @@ void Object_SetPosition(ScriptObject *objj, int xx, int yy) {
 }
 
 void Object_SetX(ScriptObject *objj, int xx) {
-	SetObjectPosition(objj->id, xx, _GP(objs)[objj->id].y);
+	SetObjectPosition(objj->id, xx, _G(objs)[objj->id].y);
 }
 
 void Object_SetY(ScriptObject *objj, int yy) {
-	SetObjectPosition(objj->id, _GP(objs)[objj->id].x, yy);
+	SetObjectPosition(objj->id, _G(objs)[objj->id].x, yy);
 }
 
 void Object_GetName(ScriptObject *objj, char *buffer) {
@@ -304,7 +304,7 @@ void Object_Move(ScriptObject *objj, int x, int y, int speed, int blocking, int 
 	move_object(objj->id, x, y, speed, direct);
 
 	if ((blocking == BLOCKING) || (blocking == 1))
-		GameLoopUntilValueIsZero(&_GP(objs)[objj->id].moving);
+		GameLoopUntilValueIsZero(&_G(objs)[objj->id].moving);
 	else if ((blocking != IN_BACKGROUND) && (blocking != 0))
 		quit("Object.Move: invalid BLOCKING paramter");
 }
@@ -317,7 +317,7 @@ int Object_GetClickable(ScriptObject *objj) {
 	if (!is_valid_object(objj->id))
 		quit("!Object.Clickable: Invalid object specified");
 
-	if (_GP(objs)[objj->id].flags & OBJF_NOINTERACT)
+	if (_G(objs)[objj->id].flags & OBJF_NOINTERACT)
 		return 0;
 	return 1;
 }
@@ -326,49 +326,49 @@ void Object_SetIgnoreScaling(ScriptObject *objj, int newval) {
 	if (!is_valid_object(objj->id))
 		quit("!Object.IgnoreScaling: Invalid object specified");
 
-	_GP(objs)[objj->id].flags &= ~OBJF_USEROOMSCALING;
+	_G(objs)[objj->id].flags &= ~OBJF_USEROOMSCALING;
 	if (!newval)
-		_GP(objs)[objj->id].flags |= OBJF_USEROOMSCALING;
+		_G(objs)[objj->id].flags |= OBJF_USEROOMSCALING;
 
 	// clear the cache
-	_GP(objcache)[objj->id].ywas = -9999;
+	_G(objcache)[objj->id].ywas = -9999;
 }
 
 int Object_GetIgnoreScaling(ScriptObject *objj) {
 	if (!is_valid_object(objj->id))
 		quit("!Object.IgnoreScaling: Invalid object specified");
 
-	if (_GP(objs)[objj->id].flags & OBJF_USEROOMSCALING)
+	if (_G(objs)[objj->id].flags & OBJF_USEROOMSCALING)
 		return 0;
 	return 1;
 }
 
 void Object_SetSolid(ScriptObject *objj, int solid) {
-	_GP(objs)[objj->id].flags &= ~OBJF_SOLID;
+	_G(objs)[objj->id].flags &= ~OBJF_SOLID;
 	if (solid)
-		_GP(objs)[objj->id].flags |= OBJF_SOLID;
+		_G(objs)[objj->id].flags |= OBJF_SOLID;
 }
 
 int Object_GetSolid(ScriptObject *objj) {
-	if (_GP(objs)[objj->id].flags & OBJF_SOLID)
+	if (_G(objs)[objj->id].flags & OBJF_SOLID)
 		return 1;
 	return 0;
 }
 
 void Object_SetBlockingWidth(ScriptObject *objj, int bwid) {
-	_GP(objs)[objj->id].blocking_width = bwid;
+	_G(objs)[objj->id].blocking_width = bwid;
 }
 
 int Object_GetBlockingWidth(ScriptObject *objj) {
-	return _GP(objs)[objj->id].blocking_width;
+	return _G(objs)[objj->id].blocking_width;
 }
 
 void Object_SetBlockingHeight(ScriptObject *objj, int bhit) {
-	_GP(objs)[objj->id].blocking_height = bhit;
+	_G(objs)[objj->id].blocking_height = bhit;
 }
 
 int Object_GetBlockingHeight(ScriptObject *objj) {
-	return _GP(objs)[objj->id].blocking_height;
+	return _G(objs)[objj->id].blocking_height;
 }
 
 int Object_GetID(ScriptObject *objj) {
@@ -383,7 +383,7 @@ int Object_GetIgnoreWalkbehinds(ScriptObject *chaa) {
 	if (!is_valid_object(chaa->id))
 		quit("!Object.IgnoreWalkbehinds: Invalid object specified");
 
-	if (_GP(objs)[chaa->id].flags & OBJF_NOWALKBEHINDS)
+	if (_G(objs)[chaa->id].flags & OBJF_NOWALKBEHINDS)
 		return 1;
 	return 0;
 }
@@ -395,15 +395,15 @@ void move_object(int objj, int tox, int toy, int spee, int ignwal) {
 
 	// AGS <= 2.61 uses MoveObject with spp=-1 internally instead of SetObjectPosition
 	if ((_G(loaded_game_file_version) <= kGameVersion_261) && (spee == -1)) {
-		_GP(objs)[objj].x = tox;
-		_GP(objs)[objj].y = toy;
+		_G(objs)[objj].x = tox;
+		_G(objs)[objj].y = toy;
 		return;
 	}
 
 	debug_script_log("Object %d start move to %d,%d", objj, tox, toy);
 
-	int objX = room_to_mask_coord(_GP(objs)[objj].x);
-	int objY = room_to_mask_coord(_GP(objs)[objj].y);
+	int objX = room_to_mask_coord(_G(objs)[objj].x);
+	int objY = room_to_mask_coord(_G(objs)[objj].y);
 	tox = room_to_mask_coord(tox);
 	toy = room_to_mask_coord(toy);
 
@@ -412,7 +412,7 @@ void move_object(int objj, int tox, int toy, int spee, int ignwal) {
 	int mslot = find_route(objX, objY, tox, toy, prepare_walkable_areas(-1), objj + 1, 1, ignwal);
 	set_color_depth(_GP(game).GetColorDepth());
 	if (mslot > 0) {
-		_GP(objs)[objj].moving = mslot;
+		_G(objs)[objj].moving = mslot;
 		_G(mls)[mslot].direct = ignwal;
 		convert_move_path_to_room_resolution(&_G(mls)[mslot]);
 	}
@@ -443,7 +443,7 @@ bool Object_SetTextProperty(ScriptObject *objj, const char *property, const char
 }
 
 void get_object_blocking_rect(int objid, int *x1, int *y1, int *width, int *y2) {
-	RoomObject *tehobj = &_GP(objs)[objid];
+	RoomObject *tehobj = &_G(objs)[objid];
 	int cwidth, fromx;
 
 	if (tehobj->blocking_width < 1)

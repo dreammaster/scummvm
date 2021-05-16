@@ -20,11 +20,11 @@
  *
  */
 
-#include "ags/shared/ac/inventoryitem.h"
+#include "ags/engine/ac/inventory_item.h"
 #include "ags/shared/ac/character_info.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_inventoryitem.h"
+#include "ags/engine/ac/global_inventory_item.h"
 #include "ags/engine/ac/global_translation.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/properties.h"
@@ -39,8 +39,6 @@
 #include "ags/globals.h"
 
 namespace AGS3 {
-
-extern int _G(cur_cursor);
 
 void InventoryItem_SetCursorGraphic(ScriptInvItem *iitem, int newSprite) {
 	set_inv_item_cursorpic(iitem->id, newSprite);
@@ -69,8 +67,8 @@ ScriptInvItem *GetInvAtLocation(int xx, int yy) {
 	return &_G(scrInv)[hsnum];
 }
 
-void InventoryItem_GetName(ScriptInvItem *iitem, char *_G(buff)) {
-	GetInvName(iitem->id, _G(buff));
+void InventoryItem_GetName(ScriptInvItem *iitem, char *buff) {
+	GetInvName(iitem->id, buff);
 }
 
 const char *InventoryItem_GetName_New(ScriptInvItem *invitem) {

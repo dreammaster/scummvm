@@ -27,7 +27,7 @@
 #include "ags/shared/gfx/gfxfilter_sdl_renderer.h"
 #include "ags/shared/gfx/gfx_util.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/platform/base/sys_main.h"
 #include "ags/engine/ac/timer.h"
 
 namespace AGS3 {

@@ -34,7 +34,7 @@
 #include "ags/shared/ac/room.h"
 #include "ags/shared/ac/screen.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/gfx/ali3dexception.h"
 #include "ags/shared/main/mainheader.h"
@@ -50,7 +50,7 @@ using namespace AGS::Shared;
 using namespace AGS::Engine;
 
 extern int _G(our_eip), _G(displayed_room);
-extern volatile char _G(want_exit), abort_engine;
+extern volatile char _G(want_exit), _G(abort_engine);
 
 
 

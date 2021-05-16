@@ -23,14 +23,14 @@
 #include "ags/shared/core/platform.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/display.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/game_version.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/mouse.h"
 #include "ags/engine/ac/runtime_defines.h"
-#include "ags/shared/ac/walkbehind.h"
+#include "ags/engine/ac/walk_behind.h"
 #include "ags/engine/ac/dynobj/script_system.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/device/mouse_w32.h"
@@ -38,12 +38,12 @@
 #include "ags/shared/gfx/ali3dexception.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/gui/_GP(guiinv).h"
+#include "ags/shared/gui/gui_inv.h"
 #include "ags/shared/main/graphics_mode.h"
 #include "ags/shared/main/engine_setup.h"
 #include "ags/engine/media/video/video.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/platform/base/sys_main.h"
 
 namespace AGS3 {
 
@@ -123,10 +123,10 @@ void convert_objects_to_data_resolution(GameDataVersion filever) {
 }
 
 void engine_setup_system_gamesize() {
-	_GP(_GP(scsystem)).width = _GP(game).GetGameRes().Width;
-	_GP(_GP(scsystem)).height = _GP(game).GetGameRes().Height;
-	_GP(_GP(scsystem)).viewport_width = game_to_data_coord(_GP(play).GetMainViewport().GetWidth());
-	_GP(_GP(scsystem)).viewport_height = game_to_data_coord(_GP(play).GetMainViewport().GetHeight());
+	_GP(scsystem).width = _GP(game).GetGameRes().Width;
+	_GP(scsystem).height = _GP(game).GetGameRes().Height;
+	_GP(scsystem).viewport_width = game_to_data_coord(_GP(play).GetMainViewport().GetWidth());
+	_GP(scsystem).viewport_height = game_to_data_coord(_GP(play).GetMainViewport().GetHeight());
 }
 
 void engine_init_resolution_settings(const Size game_size) {
@@ -267,7 +267,7 @@ void engine_post_gfxmode_mouse_setup(const DisplayMode &dm, const Size &init_des
 	on_coordinates_scaling_changed();
 
 	// If auto lock option is set, lock mouse to the game window
-	if (_GP(usetup).mouse_auto_lock && _GP(_GP(scsystem)).windowed != 0)
+	if (_GP(usetup).mouse_auto_lock && _GP(scsystem).windowed != 0)
 		Mouse::TryLockToWindow();
 }
 
@@ -278,18 +278,18 @@ void engine_pre_gfxmode_mouse_cleanup() {
 	Mouse::UnlockFromWindow();
 }
 
-// Fill in _GP(_GP(scsystem)) struct with display mode parameters
+// Fill in _GP(scsystem) struct with display mode parameters
 void engine_setup_scsystem_screen(const DisplayMode &dm) {
-	_GP(_GP(scsystem)).coldepth = dm.ColorDepth;
-	_GP(_GP(scsystem)).windowed = dm.Windowed;
-	_GP(_GP(scsystem)).vsync = dm.Vsync;
+	_GP(scsystem).coldepth = dm.ColorDepth;
+	_GP(scsystem).windowed = dm.Windowed;
+	_GP(scsystem).vsync = dm.Vsync;
 }
 
 void engine_post_gfxmode_setup(const Size &init_desktop) {
 	DisplayMode dm = _G(gfxDriver)->GetDisplayMode();
 	// If color depth has changed (or graphics mode was inited for the
 	// very first time), we also need to recreate bitmaps
-	bool has_driver_changed = _GP(_GP(scsystem)).coldepth != dm.ColorDepth;
+	bool has_driver_changed = _GP(scsystem).coldepth != dm.ColorDepth;
 
 	engine_setup_scsystem_screen(dm);
 	engine_post_gfxmode_driver_setup();

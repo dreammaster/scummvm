@@ -30,7 +30,7 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/characterextras.h"
 #include "ags/shared/ac/character_info.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/event.h"
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
@@ -42,7 +42,7 @@
 #include "ags/shared/ac/global_gui.h"
 #include "ags/shared/ac/global_region.h"
 #include "ags/shared/ac/gui.h"
-#include "ags/shared/ac/hotspot.h"
+#include "ags/engine/ac/hotspot.h"
 #include "ags/shared/ac/keycode.h"
 #include "ags/shared/ac/mouse.h"
 #include "ags/engine/ac/overlay.h"
@@ -50,9 +50,9 @@
 #include "ags/shared/ac/room.h"
 #include "ags/engine/ac/room_object.h"
 #include "ags/shared/ac/roomstatus.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/gui/_GP(guiinv).h"
+#include "ags/shared/gui/gui_inv.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/guitextbox.h"
 #include "ags/shared/main/mainheader.h"
@@ -76,28 +76,28 @@ using namespace AGS::Shared;
 
    // mouse cursor is over this interface
 
-extern int _G(is_text_overlay);
-extern volatile char _G(want_exit), abort_engine;
+
+extern volatile char _G(want_exit), _G(abort_engine);
 extern int _G(proper_exit), _G(our_eip);
 extern int _G(displayed_room), _G(starting_room), _G(in_new_room), _G(new_room_was);
 
 
-extern int _G(game_paused);
-extern int _G(getloctype_index);
+
+
 extern int _G(in_enters_screen), _G(done_es_error);
 
 extern int _G(inside_script), _G(in_graph_script);
 
 
-extern int _G(mouse_ifacebut_xoffs), mouse_ifacebut_yoffs;
+extern int _G(mouse_ifacebut_xoffs), _G(mouse_ifacebut_yoffs);
 extern int _G(cur_mode);
 
 
-extern RoomStatus *_G(croom);
+
 
 
 extern int _G(cur_mode), _G(cur_cursor);
-extern char _G(check_dynamic_sprites_at_exit);
+
 
 // Checks if user interface should remain disabled for now
 static int ShouldStayInWaitMode();
@@ -206,12 +206,12 @@ static int game_loop_check_ground_level_interactions() {
 }
 
 static void lock_mouse_on_click() {
-	if (_GP(usetup).mouse_auto_lock && _GP(_GP(scsystem)).windowed)
+	if (_GP(usetup).mouse_auto_lock && _GP(scsystem).windowed)
 		Mouse::TryLockToWindow();
 }
 
 static void toggle_mouse_lock() {
-	if (_GP(_GP(scsystem)).windowed) {
+	if (_GP(scsystem).windowed) {
 		if (Mouse::IsLockedToWindow())
 			Mouse::UnlockFromWindow();
 		else
@@ -384,13 +384,13 @@ bool run_service_key_controls(int &out_key) {
 			if (ff >= 8) break; // buffer not big enough for more than 7
 			sprintf(&infobuf[strlen(infobuf)],
 				"[Object %d: (%d,%d) size (%d x %d) on:%d moving:%s animating:%d slot:%d trnsp:%d clkble:%d",
-				ff, _GP(objs)[ff].x, _GP(objs)[ff].y,
-				(_GP(spriteset)[_GP(objs)[ff].num] != nullptr) ? _GP(game).SpriteInfos[_GP(objs)[ff].num].Width : 0,
-				(_GP(spriteset)[_GP(objs)[ff].num] != nullptr) ? _GP(game).SpriteInfos[_GP(objs)[ff].num].Height : 0,
-				_GP(objs)[ff].on,
-				(_GP(objs)[ff].moving > 0) ? "yes" : "no", _GP(objs)[ff].cycling,
-				_GP(objs)[ff].num, _GP(objs)[ff].transparent,
-				((_GP(objs)[ff].flags & OBJF_NOINTERACT) != 0) ? 0 : 1);
+				ff, _G(objs)[ff].x, _G(objs)[ff].y,
+				(_GP(spriteset)[_G(objs)[ff].num] != nullptr) ? _GP(game).SpriteInfos[_G(objs)[ff].num].Width : 0,
+				(_GP(spriteset)[_G(objs)[ff].num] != nullptr) ? _GP(game).SpriteInfos[_G(objs)[ff].num].Height : 0,
+				_G(objs)[ff].on,
+				(_G(objs)[ff].moving > 0) ? "yes" : "no", _G(objs)[ff].cycling,
+				_G(objs)[ff].num, _G(objs)[ff].transparent,
+				((_G(objs)[ff].flags & OBJF_NOINTERACT) != 0) ? 0 : 1);
 		}
 		Display(infobuf);
 		int chd = _GP(game).playercharacter;
@@ -878,7 +878,7 @@ static int UpdateWaitMode() {
 	auto was_disabled_for = _G(user_disabled_for);
 
 	set_default_cursor();
-	if (gui_disabled_style != GUIDIS_UNCHANGED) { // If GUI looks change when disabled, then update them all
+	if (_G(gui_disabled_style) != GUIDIS_UNCHANGED) { // If GUI looks change when disabled, then update them all
 		GUI::MarkAllGUIForUpdate();
 	}
 	_GP(play).disabled_user_interface--;
@@ -920,7 +920,7 @@ static int GameTick() {
 
 static void SetupLoopParameters(int untilwhat, const void *udata) {
 	_GP(play).disabled_user_interface++;
-	if (gui_disabled_style != GUIDIS_UNCHANGED) { // If GUI looks change when disabled, then update them all
+	if (_G(gui_disabled_style) != GUIDIS_UNCHANGED) { // If GUI looks change when disabled, then update them all
 		GUI::MarkAllGUIForUpdate();
 	}
 	// Only change the mouse cursor if it hasn't been specifically changed first
@@ -995,7 +995,7 @@ void RunGameUntilAborted() {
 	// skip ticks to account for time spent starting _GP(game).
 	skipMissedTicks();
 
-	while (!abort_engine) {
+	while (!_G(abort_engine)) {
 		GameTick();
 
 		if (_G(load_new_game)) {

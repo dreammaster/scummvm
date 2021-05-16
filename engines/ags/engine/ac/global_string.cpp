@@ -30,7 +30,7 @@
 
 namespace AGS3 {
 
-extern int MAXSTRLEN;
+
 
 int StrGetCharAt(const char *strin, int posn) {
 	if ((posn < 0) || (posn >= (int)strlen(strin)))

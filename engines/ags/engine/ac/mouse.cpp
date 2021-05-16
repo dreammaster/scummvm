@@ -41,7 +41,7 @@
 #include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/engine/gfx/graphics_driver.h"
-#include "ags/shared/gfx/gfxfilter.h"
+#include "ags/engine/gfx/gfx_filter.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/script/script_api.h"
@@ -327,7 +327,7 @@ int IsModeEnabled(int which) {
 void Mouse_EnableControl(bool on) {
 	bool should_control_mouse =
 		_GP(usetup).mouse_ctrl_when == kMouseCtrl_Always ||
-		(_GP(usetup).mouse_ctrl_when == kMouseCtrl_Fullscreen && (_GP(_GP(scsystem)).windowed == 0));
+		(_GP(usetup).mouse_ctrl_when == kMouseCtrl_Fullscreen && (_GP(scsystem).windowed == 0));
 	Mouse::SetMovementControl(should_control_mouse & on);
 	_GP(usetup).mouse_ctrl_enabled = on; // remember setting in config
 }

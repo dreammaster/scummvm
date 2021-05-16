@@ -33,7 +33,7 @@
 #include "ags/shared/gfx/gfxfilter_ogl.h"
 #include "ags/shared/gfx/gfxfilter_aaogl.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/platform/base/sys_main.h"
 
 // OpenGL Mathematics Library. We could include only the features we need to decrease compilation time.
 #include "ags/shared/glm/glm.hpp"
@@ -65,7 +65,7 @@ const void (*glSwapIntervalEXT)(int) = NULL;
 #endif //AGS_OPENGL_ES2
 
 // Necessary to update textures from 8-bit bitmaps
-extern RGB palette[256];
+
 
 
 namespace AGS

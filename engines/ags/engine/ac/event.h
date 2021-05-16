@@ -73,8 +73,6 @@ void update_events();
 // end event list functions
 void ClaimEvent();
 
-extern EventHappened event[MAXEVENTS + 1];
-
 } // namespace AGS3
 
 #endif

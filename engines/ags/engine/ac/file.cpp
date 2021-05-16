@@ -28,15 +28,15 @@
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/global_file.h"
-#include "ags/shared/ac/path_helper.h"
+#include "ags/engine/ac/path_helper.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/engine/ac/string.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/shared/util/misc.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/shared/util/stream.h"
-#include "ags/shared/core/assetmanager.h"
+#include "ags/shared/core/asset_manager.h"
 #include "ags/shared/core/asset.h"
 #include "ags/engine/main/engine.h"
 #include "ags/engine/main/game_file.h"
@@ -53,12 +53,6 @@
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
-
-
-extern int MAXSTRLEN;
 
 // object-based File routines
 

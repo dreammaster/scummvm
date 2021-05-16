@@ -34,7 +34,7 @@
 #include "ags/shared/ac/view.h"
 #include "ags/shared/ac/charactercache.h"
 #include "ags/shared/ac/display.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/dynamicsprite.h"
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
@@ -48,7 +48,7 @@
 #include "ags/shared/ac/movelist.h"
 #include "ags/shared/ac/objectcache.h"
 #include "ags/shared/ac/parser.h"
-#include "ags/shared/ac/path_helper.h"
+#include "ags/engine/ac/path_helper.h"
 #include "ags/shared/ac/roomstatus.h"
 #include "ags/engine/ac/string.h"
 #include "ags/shared/ac/sprite_cache.h"
@@ -56,14 +56,14 @@
 #include "ags/engine/ac/dynobj/script_string.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/gfx/gfx_util.h"
-#include "ags/shared/gfx/gfxfilter.h"
-#include "ags/shared/gui/guidefines.h"
+#include "ags/engine/gfx/gfx_filter.h"
+#include "ags/shared/gui/gui_defines.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/main/graphics_mode.h"
 #include "ags/shared/main/engine.h"
@@ -81,13 +81,6 @@
 #include "ags/shared/util/string_compat.h"
 #include "ags/shared/util/wgt2allg.h"
 
-namespace AGS3 {
-
-using namespace AGS::Shared;
-using namespace AGS::Shared::Memory;
-using namespace AGS::Engine;
-
-
 #if defined(BUILTIN_PLUGINS)
 #include "ags/shared/../Plugins/AGSflashlight/agsflashlight.h"
 #include "ags/shared/../Plugins/agsblend/agsblend.h"
@@ -99,30 +92,13 @@ using namespace AGS::Engine;
 #endif // AGS_PLATFORM_OS_IOS
 #endif // BUILTIN_PLUGINS
 
+namespace AGS3 {
 
-
-extern int mousex, mousey;
-
-
-
-extern RoomStatus *_G(croom);
-
-
-extern int _G(game_paused);
-
-extern int _G(inside_script);
-extern ccInstance *_G(gameinst), *_G(roominst);
-extern CharacterCache *_G(charcache);
-
-
-extern RGB palette[256];
-extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
-extern int numPluginReaders;
-extern RuntimeScriptValue _G(GlobalReturnValue);
-
+using namespace AGS::Shared;
+using namespace AGS::Shared::Memory;
+using namespace AGS::Engine;
 
 // **************** PLUGIN IMPLEMENTATION ****************
-
 
 const int PLUGIN_API_VERSION = 25;
 struct EnginePlugin {
@@ -251,7 +227,7 @@ void IAGSEngine::GetScreenDimensions(int32 *width, int32 *height, int32 *coldept
 	if (height != nullptr)
 		height[0] = _GP(play).GetMainViewport().GetHeight();
 	if (coldepth != nullptr)
-		coldepth[0] = _GP(_GP(scsystem)).coldepth;
+		coldepth[0] = _GP(scsystem).coldepth;
 }
 
 unsigned char **IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
@@ -709,20 +685,20 @@ int IAGSEngine::RegisterManagedObject(const void *object, IAGSScriptManagedObjec
 }
 
 void IAGSEngine::AddManagedObjectReader(const char *typeName, IAGSManagedObjectReader *reader) {
-	if (numPluginReaders >= MAX_PLUGIN_OBJECT_READERS)
+	if (_G(numPluginReaders) >= MAX_PLUGIN_OBJECT_READERS)
 		quit("Plugin error: IAGSEngine::AddObjectReader: Too many object readers added");
 
 	if ((typeName == nullptr) || (typeName[0] == 0))
 		quit("Plugin error: IAGSEngine::AddObjectReader: invalid name for type");
 
-	for (int ii = 0; ii < numPluginReaders; ii++) {
-		if (strcmp(pluginReaders[ii].type, typeName) == 0)
+	for (int ii = 0; ii < _G(numPluginReaders); ii++) {
+		if (strcmp(_G(pluginReaders)[ii].type, typeName) == 0)
 			quitprintf("Plugin error: IAGSEngine::AddObjectReader: type '%s' has been registered already", typeName);
 	}
 
-	pluginReaders[numPluginReaders].reader = reader;
-	pluginReaders[numPluginReaders].type = typeName;
-	numPluginReaders++;
+	_G(pluginReaders)[_G(numPluginReaders)].reader = reader;
+	_G(pluginReaders)[_G(numPluginReaders)].type = typeName;
+	_G(numPluginReaders)++;
 }
 
 void IAGSEngine::RegisterUnserializedObject(int key, const void *object, IAGSScriptManagedObject *callback) {

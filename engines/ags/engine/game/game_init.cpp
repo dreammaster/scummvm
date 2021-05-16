@@ -23,7 +23,7 @@
 #include "ags/shared/ac/character.h"
 #include "ags/shared/ac/charactercache.h"
 #include "ags/engine/ac/dialog.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/file.h"
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
@@ -58,15 +58,15 @@ using namespace Shared;
 using namespace Engine;
 
 
-extern int _G(actSpsCount);
 
-extern IDriverDependantBitmap **_G(actspsbmp);
-extern Bitmap **_G(actspswb);
+
+
+
 extern IDriverDependantBitmap **_G(actspswbbmp);
 extern CachedActSpsData *_G(actspswbcache);
-extern CharacterCache *_G(charcache);
 
-extern CCGUIObject _GP(ccDynamicGUIObject);
+
+
 
 extern CCHotspot   _GP(ccDynamicHotspot);
 extern CCRegion    _GP(ccDynamicRegion);

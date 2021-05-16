@@ -929,7 +929,7 @@ public:
 	 * @{
 	 */
 
-//	int _in_inv_screen = 0, _inv_screen_newroom = -1;
+	int _in_inv_screen = 0, _inv_screen_newroom = -1;
 
 	/**@}*/
 
@@ -938,10 +938,10 @@ public:
 	 * @{
 	 */
 
-//	char *_lzbuffer = nullptr;
-//	int *_node = nullptr;
-//	int _pos = 0;
-//	long _outbytes = 0, _maxsize = 0, _putbytes = 0;
+	char *_lzbuffer = nullptr;
+	int *_node = nullptr;
+	int _pos = 0;
+	long _outbytes = 0, _maxsize = 0, _putbytes = 0;
 
 	/**@}*/
 
@@ -1022,8 +1022,8 @@ public:
 
 	ScriptMouse *_scmouse;
 	int _cur_mode = 0, _cur_cursor = 0;
-	//int _mouse_frame = 0, _mouse_delay = 0;
-	//int _lastmx = -1, _lastmy = -1;
+	int _mouse_frame = 0, _mouse_delay = 0;
+	int _lastmx = -1, _lastmy = -1;
 	//char _alpha_blend_cursor = 0;
 	//AGS::Shared::Bitmap *_dotted_mouse_cursor = nullptr;
 	//AGS::Engine::IDriverDependantBitmap *_mouseCursor = nullptr;
@@ -1049,6 +1049,7 @@ public:
 
 	std::vector<ScreenOverlay> *_screenover;
 	int _is_complete_overlay = 0, _is_text_overlay = 0;
+	int _numscreenover = 0;
 
 	/**@}*/
 
@@ -1057,8 +1058,8 @@ public:
 	 * @{
 	 */
 
-//	PluginObjectReader *_pluginReaders;
-//	int _numPluginReaders = 0;
+	PluginObjectReader *_pluginReaders;
+	int _numPluginReaders = 0;
 
 	/**@}*/
 

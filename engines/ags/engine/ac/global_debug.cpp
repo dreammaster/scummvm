@@ -37,11 +37,11 @@
 #include "ags/engine/ac/translation.h"
 #include "ags/engine/ac/tree_map.h"
 #include "ags/engine/ac/walkable_area.h"
-#include "ags/shared/gfx/gfxfilter.h"
-#include "ags/shared/gui/guidialog.h"
+#include "ags/engine/gfx/gfx_filter.h"
+#include "ags/engine/gui/gui_dialog.h"
 #include "ags/shared/script/cc_options.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/engine/main/main.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/bitmap.h"
@@ -52,18 +52,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-
-
-
-
-
-
-
-
-
-extern int _G(displayed_room), _G(starting_room);
-
 
 String GetRuntimeInfo() {
 	DisplayMode mode = _G(gfxDriver)->GetDisplayMode();

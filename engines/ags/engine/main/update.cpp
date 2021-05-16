@@ -28,7 +28,7 @@
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/character.h"
 #include "ags/shared/ac/characterextras.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/global_character.h"
@@ -48,31 +48,12 @@
 #include "ags/engine/ac/timer.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/ac/movelist.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-
-extern RoomStatus *_G(croom);
-
-
-
-
-
-
-
-
-extern CharacterInfo *_G(facetalkchar);
-extern int _G(face_talking), _G(facetalkview), _G(facetalkwait), _G(facetalkframe);
-extern int _G(facetalkloop), _G(facetalkrepeat), _G(facetalkAllowBlink);
-extern int _G(facetalkBlinkLoop);
-extern bool _G(facetalk_qfg4_override_placement_x), _G(facetalk_qfg4_override_placement_y);
-
-extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
-extern int _G(is_text_overlay);
-
 
 int do_movelist_move(short *mlnum, int *xx, int *yy) {
 	int need_to_fix_sprite = 0;
@@ -196,7 +177,7 @@ void update_script_timers() {
 void update_cycling_views() {
 	// update graphics for object if cycling view
 	for (int i = 0; i < _G(croom)->numobj; ++i) {
-		_GP(objs)[i].UpdateCyclingView(i);
+		_G(objs)[i].UpdateCyclingView(i);
 	}
 }
 
@@ -236,7 +217,7 @@ void update_following_exactly_characters(int &numSheep, int *followingAsSheep) {
 
 void update_overlay_timers() {
 	// update overlay timers
-	for (int aa = 0; aa < numscreenover; aa++) {
+	for (int aa = 0; aa < _G(numscreenover); aa++) {
 		if (_G(screenover)[aa].timeout > 0) {
 			_G(screenover)[aa].timeout--;
 			if (_G(screenover)[aa].timeout == 0)

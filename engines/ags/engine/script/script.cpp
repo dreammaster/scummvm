@@ -35,17 +35,17 @@
 #include "ags/shared/ac/global_display.h"
 #include "ags/shared/ac/global_game.h"
 #include "ags/shared/ac/global_gui.h"
-#include "ags/shared/ac/global_hotspot.h"
+#include "ags/engine/ac/global_hotspot.h"
 #include "ags/shared/ac/global_object.h"
 #include "ags/shared/ac/global_room.h"
-#include "ags/shared/ac/invwindow.h"
+#include "ags/engine/ac/inv_window.h"
 #include "ags/shared/ac/mouse.h"
 #include "ags/shared/ac/room.h"
 #include "ags/engine/ac/room_object.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/cc_options.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/engine/media/video/video.h"
@@ -697,7 +697,7 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 			MoveObject(IPARAM1, IPARAM2, IPARAM3, IPARAM4);
 			// if they want to wait until finished, do so
 			if (IPARAM5)
-				GameLoopUntilNotMoving(&_GP(objs)[IPARAM1].moving);
+				GameLoopUntilNotMoving(&_G(objs)[IPARAM1].moving);
 			break;
 		case 15: // Object Off
 			ObjectOff(IPARAM1);

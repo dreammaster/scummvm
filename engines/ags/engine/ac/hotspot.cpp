@@ -21,9 +21,9 @@
  */
 
 #include "ags/engine/ac/dynobj/cc_hotspot.h"
-#include "ags/shared/ac/hotspot.h"
+#include "ags/engine/ac/hotspot.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_hotspot.h"
+#include "ags/engine/ac/global_hotspot.h"
 #include "ags/engine/ac/global_translation.h"
 #include "ags/engine/ac/properties.h"
 #include "ags/engine/ac/room.h"
@@ -43,9 +43,9 @@ namespace AGS3 {
 using namespace AGS::Shared;
 
 
-extern RoomStatus *_G(croom);
 
-extern CCHotspot _GP(ccDynamicHotspot);
+
+
 
 void Hotspot_SetEnabled(ScriptHotspot *hss, int newval) {
 	if (newval)

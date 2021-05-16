@@ -22,7 +22,7 @@
 
 //include <cctype>
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/draw.h"
+#include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/gui.h"
@@ -32,7 +32,7 @@
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gui/cscidialog.h"
-#include "ags/shared/gui/guidialog.h"
+#include "ags/engine/gui/gui_dialog.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/mycontrols.h"
 #include "ags/shared/main/game_run.h"

@@ -34,7 +34,7 @@
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/util/misc.h"
 #include "ags/shared/util/stream.h"
-#include "ags/shared/core/assetmanager.h"
+#include "ags/shared/core/asset_manager.h"
 
 namespace AGS3 {
 

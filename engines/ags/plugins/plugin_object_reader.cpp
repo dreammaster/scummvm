@@ -25,7 +25,7 @@
 
 namespace AGS3 {
 
-//PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
-//int numPluginReaders = 0;
+//PluginObjectReader _G(pluginReaders)[MAX_PLUGIN_OBJECT_READERS];
+//int _G(numPluginReaders) = 0;
 
 } // namespace AGS3

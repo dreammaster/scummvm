@@ -27,19 +27,19 @@
 #include "ags/lib/std/algorithm.h"
 //include <SDL.h>
 #include "ags/shared/core/platform.h"
-#include "ags/shared/ac/draw.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/ac/draw.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/gfx/ali3dexception.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/gfxdriverfactory.h"
-#include "ags/shared/gfx/gfxfilter.h"
+#include "ags/engine/gfx/gfx_filter.h"
 #include "ags/shared/gfx/graphicsdriver.h"
 #include "ags/shared/main/config.h"
 #include "ags/shared/main/engine_setup.h"
 #include "ags/shared/main/graphics_mode.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/platform/base/sys_main.h"
 
 namespace AGS3 {
 

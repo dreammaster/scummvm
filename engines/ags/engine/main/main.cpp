@@ -30,7 +30,7 @@
 #include "ags/engine/ac/game_setup.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/core/def_version.h"
-#include "ags/shared/debugging/debugger.h"
+#include "ags/engine/debugging/debugger.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/main/config.h"
@@ -38,9 +38,9 @@
 #include "ags/shared/main/mainheader.h"
 #include "ags/shared/main/main.h"
 #include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/platform/base/sys_main.h"
+#include "ags/engine/platform/base/sys_main.h"
 #include "ags/shared/ac/route_finder.h"
-#include "ags/shared/core/assetmanager.h"
+#include "ags/shared/core/asset_manager.h"
 #include "ags/shared/util/directory.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/string_compat.h"
@@ -100,7 +100,7 @@ int _G(psp_clear_cache_on_room_change) = 0; // clear --sprite cache-- when room 
 char _G(psp_game_file_name)[] = "";
 char _G(psp_translation)[] = "default";
 
-int psp_gfx_renderer = 0;
+int _G(psp_gfx_renderer) = 0;
 int psp_gfx_scaling = 1;
 int psp_gfx_smoothing = 0;
 int psp_gfx_super_sampling = 1;

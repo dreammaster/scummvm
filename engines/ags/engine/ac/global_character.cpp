@@ -336,7 +336,7 @@ void MoveCharacterToObject(int chaa, int obbj) {
 	if (!is_valid_object(obbj))
 		return;
 
-	walk_character(chaa, _GP(objs)[obbj].x + 5, _GP(objs)[obbj].y + 6, 0, true);
+	walk_character(chaa, _G(objs)[obbj].x + 5, _G(objs)[obbj].y + 6, 0, true);
 
 	GameLoopUntilNotMoving(&_GP(game).chars[chaa].walking);
 }
@@ -547,7 +547,7 @@ void DisplaySpeechAt(int xx, int yy, int wii, int aschar, const char *spch) {
 int DisplaySpeechBackground(int charid, const char *speel) {
 	// remove any previous background speech for this character
 	int cc;
-	for (cc = 0; cc < numscreenover; cc++) {
+	for (cc = 0; cc < _G(numscreenover); cc++) {
 		if (_G(screenover)[cc].bgSpeechForChar == charid) {
 			remove_screen_overlay_index(cc);
 			cc--;

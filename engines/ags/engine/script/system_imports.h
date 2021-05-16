@@ -63,11 +63,6 @@ public:
 	void clear();
 };
 
-extern SystemImports _GP(simp);
-// This is to register symbols exclusively for plugins, to allow them
-// perform old style unsafe function calls
-extern SystemImports _GP(simp_for_plugin);
-
 } // namespace AGS3
 
 #endif
