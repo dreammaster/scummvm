@@ -28,7 +28,7 @@
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_translation.h"
+#include "ags/engine/ac/global_translation.h"
 #include "ags/engine/ac/path_helper.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/engine/ac/system.h"

@@ -20,21 +20,16 @@
  *
  */
 
-//include <string.h>
 #include "ags/shared/ac/keycode.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/shared/gui/mytextbox.h"
-#include "ags/shared/gui/guidialoginternaldefs.h"
+#include "ags/engine/gui/my_textbox.h"
+#include "ags/engine/gui/gui_dialog_internal_defs.h"
 #include "ags/shared/gfx/bitmap.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using AGS::Shared::Bitmap;
-
-
-
-extern int _G(windowbackgroundcolor);
-extern int _G(cbuttfont);
 
 MyTextBox::MyTextBox(int xx, int yy, int wii, const char *tee) {
 	x = xx;

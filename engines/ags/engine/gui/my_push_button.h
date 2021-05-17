@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_GUI_MY_PUSH_BUTTON_H
 #define AGS_ENGINE_GUI_MY_PUSH_BUTTON_H
 
-#include "ags/shared/gui/newcontrol.h"
+#include "ags/engine/gui/new_control.h"
 
 namespace AGS3 {
 

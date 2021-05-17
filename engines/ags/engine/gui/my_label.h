@@ -23,7 +23,7 @@
 #ifndef AGS_ENGINE_GUI_MY_LABEL_H
 #define AGS_ENGINE_GUI_MY_LABEL_H
 
-#include "ags/shared/gui/newcontrol.h"
+#include "ags/engine/gui/new_control.h"
 
 namespace AGS3 {
 

@@ -43,7 +43,7 @@
 #include "ags/shared/util/stream.h"
 #include "ags/shared/core/asset_manager.h"
 #include "ags/engine/ac/timer.h"
-#include "ags/shared/main/game_run.h"
+#include "ags/engine/main/game_run.h"
 #include "ags/engine/media/audio/audio_core.h"
 
 namespace AGS3 {

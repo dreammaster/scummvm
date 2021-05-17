@@ -26,8 +26,6 @@
 //
 //=============================================================================
 
-// Headers, as they are in acgui.cpp
-#pragma unmanaged
 #include "ags/shared/ac/game_version.h"
 #include "ags/engine/ac/system.h"
 #include "ags/shared/font/fonts.h"
@@ -36,20 +34,19 @@
 #include "ags/shared/gui/gui_label.h"
 #include "ags/shared/gui/gui_listbox.h"
 #include "ags/shared/gui/gui_textbox.h"
-//include <ctype.h>
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/global_translation.h"
+#include "ags/engine/ac/global_translation.h"
 #include "ags/engine/ac/string.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/blender.h"
+#include "ags/engine/gfx/blender.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 
 // For engine these are defined in ac.cpp
-extern int _G(eip_guiobj);
 extern void replace_macro_tokens(const char *, String &);
 
 // For engine these are defined in acfonts.cpp

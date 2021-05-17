@@ -27,19 +27,12 @@
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/gui/gui_dialog.h"
-#include "ags/shared/gui/guidialoginternaldefs.h"
-#include "ags/shared/gui/mylistbox.h"
+#include "ags/engine/gui/gui_dialog_internal_defs.h"
+#include "ags/engine/gui/my_listbox.h"
 
 namespace AGS3 {
 
 using AGS::Shared::Bitmap;
-
-
-extern int numcurso, hotx, hoty;
-
-extern int _G(windowbackgroundcolor);
-extern int _G(cbuttfont);
-extern int _G(smcode);
 
 MyListBox::MyListBox(int xx, int yy, int wii, int hii) {
 	x = xx;

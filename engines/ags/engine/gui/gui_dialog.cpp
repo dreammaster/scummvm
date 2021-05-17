@@ -29,45 +29,22 @@
 #include "ags/engine/ac/game.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
-#include "ags/shared/ac/global_game.h"
-#include "ags/shared/gui/cscidialog.h"
-//include <cctype> //isdigit()
+#include "ags/engine/ac/global_game.h"
+#include "ags/engine/gui/csci_dialog.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/util/path.h"
+#include "ags/ags.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-
-
-
-namespace {
-
-// TODO: store drawing surface inside old gui classes instead
-int _G(windowPosX), _G(windowPosY), _G(windowPosWidth), _G(windowPosHeight);
-Bitmap *_G(windowBuffer);
-IDriverDependantBitmap *_G(dialogDDB);
-
 #undef MAXSAVEGAMES
 #define MAXSAVEGAMES 20
-DisplayProperties dispp;
-char *_G(lpTemp), *_G(lpTemp2);
-char _G(bufTemp)[260], _G(buffer2)[260];
-int _G(numsaves) = 0, _G(toomanygames);
-int _G(filenumbers)[MAXSAVEGAMES];
-unsigned long _G(filedates)[MAXSAVEGAMES];
-
-CSCIMessage _GP(smes);
-
-char _G(buff)[200];
-int _G(myscrnwid) = 320, _G(myscrnhit) = 200;
-
-}
 
 char *get_gui_dialog_buffer() {
 	return _G(buffer2);
@@ -296,16 +273,23 @@ int savegamedialog() {
 }
 
 void preparesavegamelist(int ctrllist) {
-	// TODO: find out if limiting to MAXSAVEGAMES is still necessary here
-	std::vector<SaveListItem> saves;
-	FillSaveList(saves, MAXSAVEGAMES);
-	std::sort(saves.rbegin(), saves.rend());
+	// Get a list of savegames
+	SaveStateList saveList = ::AGS::g_vm->listSaves();
+
+	// The original AGS sorts the list from most recent to oldest.
+	// We don't have the modification date in ScummVM though. We could try to
+	// parse the date string, but for now, sort by decreasing slot number, which
+	// should work better than the default sort by increasing slot.
+	Common::sort(saveList.begin(), saveList.end(),
+		[](const SaveStateDescriptor &x, const SaveStateDescriptor &y) {return x.getSaveSlot() > y.getSaveSlot(); });
 
 	// fill in the list box and global savegameindex[] array for backward compatibilty
-	for (_G(numsaves) = 0; _G(numsaves) < (size_t)saves.size(); ++_G(numsaves)) {
-		CSCISendControlMessage(ctrllist, CLB_ADDITEM, 0, (long)saves[_G(numsaves)].Description.GetCStr());
-		_G(filenumbers)[_G(numsaves)] = saves[_G(numsaves)].Slot;
-		_G(filedates)[_G(numsaves)] = (long int)saves[_G(numsaves)].FileTime;
+	for (_G(numsaves) = 0; _G(numsaves) < (int)saveList.size(); ++_G(numsaves)) {
+		CSCISendControlMessage(ctrllist, CLB_ADDITEM, 0,
+			(long)saveList[_G(numsaves)].getDescription().c_str());
+		_G(filenumbers)[_G(numsaves)] = saveList[_G(numsaves)].getSaveSlot();
+		_G(filedates)[_G(numsaves)] = 0;
+		//(long int)saveList[_G(numsaves)].FileTime;
 	}
 	_G(toomanygames) = (_G(numsaves) >= MAXSAVEGAMES) ? 1 : 0;
 	// Select the first item
@@ -398,7 +382,7 @@ int roomSelectorWindow(int currentRoom, int numRooms, int *roomNumbers, char **r
 		if (mes.code == CM_COMMAND) {
 			if (mes.id == ctrlok) {
 				CSCISendControlMessage(ctrltbox, CTB_GETTEXT, 0, (long)&_G(buffer2)[0]);
-				if (isdigit(_G(buffer2)[0])) {
+				if (Common::isDigit(_G(buffer2)[0])) {
 					toret = atoi(_G(buffer2));
 				}
 			} else if (mes.id == ctrlcancel) {

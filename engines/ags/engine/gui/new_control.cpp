@@ -20,13 +20,12 @@
  *
  */
 
-#include "ags/shared/gui/newcontrol.h"
+#include "ags/engine/gui/new_control.h"
 #include "ags/engine/gui/gui_dialog.h"
-#include "ags/shared/gui/guidialoginternaldefs.h"
+#include "ags/engine/gui/gui_dialog_internal_defs.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
-
-extern int _G(topwindowhandle);
 
 NewControl::NewControl(int xx, int yy, int wi, int hi) {
 	x = xx;

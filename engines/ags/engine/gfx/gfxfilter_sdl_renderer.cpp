@@ -12,7 +12,7 @@
 //
 //=============================================================================
 
-#include "ags/shared/gfx/gfxfilter_sdl_renderer.h"
+#include "ags/engine/gfx/gfxfilter_sdl_renderer.h"
 
 namespace AGS3 {
 namespace AGS {

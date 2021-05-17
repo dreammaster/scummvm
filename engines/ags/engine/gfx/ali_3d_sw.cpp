@@ -22,9 +22,9 @@
 
 #include "ags/shared/gfx/ali3dsw.h"
 #include "ags/lib/std/algorithm.h"
-#include "ags/shared/ac/sys_events.h"
-#include "ags/shared/gfx/ali3dexception.h"
-#include "ags/shared/gfx/gfxfilter_sdl_renderer.h"
+#include "ags/engine/ac/sys_events.h"
+#include "ags/engine/gfx/ali_3d_exception.h"
+#include "ags/engine/gfx/gfxfilter_sdl_renderer.h"
 #include "ags/shared/gfx/gfx_util.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/platform/base/sys_main.h"

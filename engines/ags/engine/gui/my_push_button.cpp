@@ -20,14 +20,13 @@
  *
  */
 
-//include <string.h>
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/sys_events.h"
+#include "ags/engine/ac/sys_events.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/shared/gui/mypushbutton.h"
+#include "ags/engine/gui/my_push_button.h"
 #include "ags/engine/gui/gui_dialog.h"
-#include "ags/shared/gui/guidialoginternaldefs.h"
-#include "ags/shared/main/game_run.h"
+#include "ags/engine/gui/gui_dialog_internal_defs.h"
+#include "ags/engine/main/game_run.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/ac/timer.h"
@@ -35,10 +34,6 @@
 namespace AGS3 {
 
 using AGS::Shared::Bitmap;
-
-extern int _G(windowbackgroundcolor), _G(pushbuttondarkcolor);
-extern int _G(pushbuttonlightcolor);
-extern int _G(cbuttfont);
 
 MyPushButton::MyPushButton(int xx, int yy, int wi, int hi, const char *tex) {                             //wlevel=2;
 	x = xx;

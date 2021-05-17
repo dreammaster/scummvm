@@ -20,7 +20,7 @@
  *
  */
 
-#include "ags/shared/gfx/ali3dexception.h"
+#include "ags/engine/gfx/ali_3d_exception.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/gfx/gfxfilter.h"
 #include "ags/shared/gfx/gfxdriverbase.h"

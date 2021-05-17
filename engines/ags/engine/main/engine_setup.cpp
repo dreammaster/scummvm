@@ -22,7 +22,7 @@
 
 #include "ags/shared/core/platform.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/display.h"
+#include "ags/engine/ac/display.h"
 #include "ags/engine/ac/draw.h"
 #include "ags/shared/ac/game_version.h"
 #include "ags/engine/ac/game_setup.h"
@@ -35,7 +35,7 @@
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/shared/gfx/ali3dexception.h"
+#include "ags/engine/gfx/ali_3d_exception.h"
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/gui_inv.h"

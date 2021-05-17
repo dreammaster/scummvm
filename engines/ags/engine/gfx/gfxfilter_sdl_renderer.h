@@ -30,7 +30,7 @@
 #ifndef AGS_ENGINE_GFX_SDL_RENDERER_FILTER_H
 #define AGS_ENGINE_GFX_SDL_RENDERER_FILTER_H
 
-#include "ags/shared/gfx/gfxfilter_scaling.h"
+#include "ags/engine/gfx/gfxfilter_scaling.h"
 
 namespace AGS3 {
 namespace AGS {

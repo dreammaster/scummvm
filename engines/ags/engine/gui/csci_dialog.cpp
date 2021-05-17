@@ -28,19 +28,20 @@
 #include "ags/engine/ac/gui.h"
 #include "ags/shared/ac/keycode.h"
 #include "ags/engine/ac/mouse.h"
-#include "ags/shared/ac/sys_events.h"
+#include "ags/engine/ac/sys_events.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/shared/gui/cscidialog.h"
+#include "ags/engine/gui/csci_dialog.h"
 #include "ags/engine/gui/gui_dialog.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/gui/mycontrols.h"
-#include "ags/shared/main/game_run.h"
+#include "ags/engine/gui/my_controls.h"
+#include "ags/engine/main/game_run.h"
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/ac/timer.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -48,27 +49,6 @@ using AGS::Shared::Bitmap;
 namespace BitmapHelper = AGS::Shared::BitmapHelper;
 
 extern char ignore_bounds; // from mousew32
-
-
-
-
-//-----------------------------------------------------------------------------
-// DIALOG SYSTEM STUFF below
-
-int _G(windowbackgroundcolor) = COL254, _G(pushbuttondarkcolor) = COL255;
-int _G(pushbuttonlightcolor) = COL253;
-int _G(topwindowhandle) = -1;
-int _G(cbuttfont);
-
-int _G(acdialog_font);
-
-int _G(smcode) = 0;
-
-NewControl *_GP(vobjs)[MAXCONTROLS];
-OnScreenWindow _GP(oswi)[MAXSCREENWINDOWS];
-
-int _G(controlid) = 0;
-
 
 //-----------------------------------------------------------------------------
 
@@ -98,7 +78,7 @@ int CSCIDrawWindow(int xx, int yy, int wid, int hit) {
 	multiply_up(&xx, &yy, &wid, &hit);
 	int drawit = -1;
 	for (int aa = 0; aa < MAXSCREENWINDOWS; aa++) {
-		if (_GP(oswi)[aa].handle < 0) {
+		if (_G(oswi)[aa].handle < 0) {
 			drawit = aa;
 			break;
 		}
@@ -114,13 +94,13 @@ int CSCIDrawWindow(int xx, int yy, int wid, int hit) {
 	wid += 4;
 	hit += 4;
 	Bitmap *ds = prepare_gui_screen(xx, yy, wid, hit, true);
-	_GP(oswi)[drawit].x = xx;
-	_GP(oswi)[drawit].y = yy;
+	_G(oswi)[drawit].x = xx;
+	_G(oswi)[drawit].y = yy;
 	__my_wbutt(ds, 0, 0, wid - 1, hit - 1);    // wbutt goes outside its area
 	//  ags_domouse(DOMOUSE_ENABLE);
-	_GP(oswi)[drawit].oldtop = _G(topwindowhandle);
+	_G(oswi)[drawit].oldtop = _G(topwindowhandle);
 	_G(topwindowhandle) = drawit;
-	_GP(oswi)[drawit].handle = _G(topwindowhandle);
+	_G(oswi)[drawit].handle = _G(topwindowhandle);
 	win_x = xx;
 	win_y = yy;
 	win_width = wid;
@@ -131,8 +111,8 @@ int CSCIDrawWindow(int xx, int yy, int wid, int hit) {
 void CSCIEraseWindow(int handl) {
 	//  ags_domouse(DOMOUSE_DISABLE);
 	ignore_bounds--;
-	_G(topwindowhandle) = _GP(oswi)[handl].oldtop;
-	_GP(oswi)[handl].handle = -1;
+	_G(topwindowhandle) = _G(oswi)[handl].oldtop;
+	_G(oswi)[handl].handle = -1;
 	//  ags_domouse(DOMOUSE_ENABLE);
 	windowcount--;
 	clear_gui_screen();
@@ -140,9 +120,9 @@ void CSCIEraseWindow(int handl) {
 
 int CSCIWaitMessage(CSCIMessage *cscim) {
 	for (int uu = 0; uu < MAXCONTROLS; uu++) {
-		if (_GP(vobjs)[uu] != nullptr) {
+		if (_G(vobjs)[uu] != nullptr) {
 			//      ags_domouse(DOMOUSE_DISABLE);
-			_GP(vobjs)[uu]->drawifneeded();
+			_G(vobjs)[uu]->drawifneeded();
 			//      ags_domouse(DOMOUSE_ENABLE);
 		}
 	}
@@ -168,9 +148,9 @@ int CSCIWaitMessage(CSCIMessage *cscim) {
 				cscim->code = CM_COMMAND;
 			} else if ((keywas < eAGSKeyCodeSpace) && (keywas != eAGSKeyCodeBackspace));
 			else if ((keywas >= eAGSKeyCodeUpArrow) & (keywas <= eAGSKeyCodePageDown) & (finddefaultcontrol(CNT_LISTBOX) >= 0))
-				_GP(vobjs)[finddefaultcontrol(CNT_LISTBOX)]->processmessage(CTB_KEYPRESS, keywas, 0);
+				_G(vobjs)[finddefaultcontrol(CNT_LISTBOX)]->processmessage(CTB_KEYPRESS, keywas, 0);
 			else if (finddefaultcontrol(CNT_TEXTBOX) >= 0)
-				_GP(vobjs)[finddefaultcontrol(CNT_TEXTBOX)]->processmessage(CTB_KEYPRESS, keywas, 0);
+				_G(vobjs)[finddefaultcontrol(CNT_TEXTBOX)]->processmessage(CTB_KEYPRESS, keywas, 0);
 
 			if (cscim->id < 0) {
 				cscim->code = CM_KEYPRESS;
@@ -204,7 +184,7 @@ int CSCICreateControl(int typeandflags, int xx, int yy, int wii, int hii, const 
 	multiply_up(&xx, &yy, &wii, &hii);
 	int usec = -1;
 	for (int hh = 1; hh < MAXCONTROLS; hh++) {
-		if (_GP(vobjs)[hh] == nullptr) {
+		if (_G(vobjs)[hh] == nullptr) {
 			usec = hh;
 			break;
 		}
@@ -218,34 +198,34 @@ int CSCICreateControl(int typeandflags, int xx, int yy, int wii, int hii, const 
 		if (wii == -1)
 			wii = wgettextwidth(title, _G(cbuttfont)) + 20;
 
-		_GP(vobjs)[usec] = new MyPushButton(xx, yy, wii, hii, title);
+		_G(vobjs)[usec] = new MyPushButton(xx, yy, wii, hii, title);
 
 	} else if (type == CNT_LISTBOX) {
-		_GP(vobjs)[usec] = new MyListBox(xx, yy, wii, hii);
+		_G(vobjs)[usec] = new MyListBox(xx, yy, wii, hii);
 	} else if (type == CNT_LABEL) {
-		_GP(vobjs)[usec] = new MyLabel(xx, yy, wii, title);
+		_G(vobjs)[usec] = new MyLabel(xx, yy, wii, title);
 	} else if (type == CNT_TEXTBOX) {
-		_GP(vobjs)[usec] = new MyTextBox(xx, yy, wii, title);
+		_G(vobjs)[usec] = new MyTextBox(xx, yy, wii, title);
 	} else
 		quit("Unknown control type requested");
 
-	_GP(vobjs)[usec]->typeandflags = typeandflags;
-	_GP(vobjs)[usec]->wlevel = _G(topwindowhandle);
+	_G(vobjs)[usec]->typeandflags = typeandflags;
+	_G(vobjs)[usec]->wlevel = _G(topwindowhandle);
 	//  ags_domouse(DOMOUSE_DISABLE);
-	_GP(vobjs)[usec]->draw(get_gui_screen());
+	_G(vobjs)[usec]->draw(get_gui_screen());
 	//  ags_domouse(DOMOUSE_ENABLE);
 	return usec;
 }
 
 void CSCIDeleteControl(int haa) {
-	delete _GP(vobjs)[haa];
-	_GP(vobjs)[haa] = nullptr;
+	delete _G(vobjs)[haa];
+	_G(vobjs)[haa] = nullptr;
 }
 
 int CSCISendControlMessage(int haa, int mess, int wPar, long lPar) {
-	if (_GP(vobjs)[haa] == nullptr)
+	if (_G(vobjs)[haa] == nullptr)
 		return -1;
-	return _GP(vobjs)[haa]->processmessage(mess, wPar, lPar);
+	return _G(vobjs)[haa]->processmessage(mess, wPar, lPar);
 }
 
 void multiply_up_to_game_res(int *x, int *y) {
@@ -274,15 +254,15 @@ void multiply_up(int *x1, int *y1, int *x2, int *y2) {
 
 int checkcontrols() {
 	// NOTE: this is because old code was working with full game screen
-	const int mousex = ::mousex - win_x;
-	const int mousey = ::mousey - win_y;
+	const int mousex = _G(mousex) - win_x;
+	const int mousey = _G(mousey) - win_y;
 
 	_G(smcode) = 0;
 	for (int kk = 0; kk < MAXCONTROLS; kk++) {
-		if (_GP(vobjs)[kk] != nullptr) {
-			if (_GP(vobjs)[kk]->mouseisinarea(mousex, mousey)) {
+		if (_G(vobjs)[kk] != nullptr) {
+			if (_G(vobjs)[kk]->mouseisinarea(mousex, mousey)) {
 				_G(controlid) = kk;
-				return _GP(vobjs)[kk]->pressedon(mousex, mousey);
+				return _G(vobjs)[kk]->pressedon(mousex, mousey);
 			}
 		}
 	}
@@ -291,13 +271,13 @@ int checkcontrols() {
 
 int finddefaultcontrol(int flagmask) {
 	for (int ff = 0; ff < MAXCONTROLS; ff++) {
-		if (_GP(vobjs)[ff] == nullptr)
+		if (_G(vobjs)[ff] == nullptr)
 			continue;
 
-		if (_GP(vobjs)[ff]->wlevel != _G(topwindowhandle))
+		if (_G(vobjs)[ff]->wlevel != _G(topwindowhandle))
 			continue;
 
-		if (_GP(vobjs)[ff]->typeandflags & flagmask)
+		if (_G(vobjs)[ff]->typeandflags & flagmask)
 			return ff;
 	}
 

@@ -59,7 +59,7 @@
 #include "ags/shared/util/math.h"
 #include "ags/globals.h"
 #if AGS_SIMULATE_RIGHT_CLICK
-#include "ags/shared/ac/sys_events.h" // j for ags_iskeypressed
+#include "ags/engine/ac/sys_events.h" // j for ags_iskeypressed
 #endif
 
 namespace AGS3 {

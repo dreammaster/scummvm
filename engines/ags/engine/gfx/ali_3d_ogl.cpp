@@ -20,18 +20,18 @@
  *
  */
 
-#include "ags/shared/gfx/ogl_headers.h"
+#include "ags/engine/gfx/ogl_headers.h"
 
 #if AGS_OPENGL_DRIVER
-#include "ags/shared/gfx/ali3dogl.h"
+#include "ags/engine/gfx/ali_3d_ogl.h"
 #include "ags/lib/std/algorithm.h"
 //include <SDL.h>
-#include "ags/shared/ac/sys_events.h"
+#include "ags/engine/ac/sys_events.h"
 #include "ags/engine/ac/timer.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/gfx/ali3dexception.h"
-#include "ags/shared/gfx/gfxfilter_ogl.h"
-#include "ags/shared/gfx/gfxfilter_aaogl.h"
+#include "ags/engine/gfx/ali_3d_exception.h"
+#include "ags/engine/gfx/gfxfilter_ogl.h"
+#include "ags/engine/gfx/gfxfilter_aaogl.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/platform/base/sys_main.h"
 
@@ -41,6 +41,8 @@
 #include "ags/shared/glad/glad.h"
 
 #if AGS_OPENGL_ES2
+
+namespace AGS3 {
 
 #define glOrtho glOrthof
 #define GL_CLAMP GL_CLAMP_TO_EDGE
@@ -62,18 +64,17 @@ const void (*glSwapIntervalEXT)(int) = NULL;
 #define GL_FRAMEBUFFER_EXT GL_FRAMEBUFFER
 #define GL_COLOR_ATTACHMENT0_EXT GL_COLOR_ATTACHMENT0
 
+} // namespace AGS3
+
 #endif //AGS_OPENGL_ES2
 
 // Necessary to update textures from 8-bit bitmaps
 
 
 
-namespace AGS
-{
-namespace Engine
-{
-namespace OGL
-{
+namespace AGS {
+namespace Engine {
+namespace OGL {
 
 using namespace AGS::Shared;
 

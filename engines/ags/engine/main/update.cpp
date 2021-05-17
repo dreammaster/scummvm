@@ -34,7 +34,7 @@
 #include "ags/engine/ac/global_character.h"
 #include "ags/shared/ac/lipsync.h"
 #include "ags/engine/ac/overlay.h"
-#include "ags/shared/ac/sys_events.h"
+#include "ags/engine/ac/sys_events.h"
 #include "ags/engine/ac/room_object.h"
 #include "ags/engine/ac/room_status.h"
 #include "ags/shared/main/mainheader.h"
@@ -46,7 +46,7 @@
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/timer.h"
-#include "ags/shared/main/game_run.h"
+#include "ags/engine/main/game_run.h"
 #include "ags/engine/ac/move_list.h"
 #include "ags/globals.h"
 

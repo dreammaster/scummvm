@@ -233,7 +233,16 @@ MODULE_OBJS = \
 	engine/game/savegame.o \
 	engine/game/savegame_components.o \
 	engine/game/savegame_v321.o \
-	engine/game/viewport.o
+	engine/game/viewport.o \
+	engine/gui/animating_gui_button.o \
+	engine/gui/csci_dialog.o \
+	engine/gui/gui_dialog.o \
+	engine/gui/gui_engine.o \
+	engine/gui/my_label.o \
+	engine/gui/my_listbox.o \
+	engine/gui/my_push_button.o \
+	engine/gui/my_textbox.o \
+	engine/gui/new_control.o
 
 ifdef ENABLE_AGS_TESTS
 MODULE_OBJS += \
