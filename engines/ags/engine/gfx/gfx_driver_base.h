@@ -30,8 +30,8 @@
 #define AGS_ENGINE_GFX_GFX_DRIVER_BASE_H
 
 #include "ags/lib/std/vector.h"
-#include "ags/shared/gfx/ddb.h"
-#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/engine/gfx/ddb.h"
+#include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/util/scaling.h"
 
 namespace AGS3 {

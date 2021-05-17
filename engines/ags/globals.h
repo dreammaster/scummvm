@@ -1013,12 +1013,12 @@ public:
 	char _currentcursor = 0;
 	// virtual mouse cursor coordinates
 	int _mousex = 0, _mousey = 0, _hotx = 0, _hoty = 0;
-	//int _numcurso = -1;
+	int _numcurso = -1;
 	// real mouse coordinates and bounds
-	//int _real_mouse_x = 0, _real_mouse_y = 0;
-	//int _boundx1 = 0, _boundx2 = 99999, _boundy1 = 0, _boundy2 = 99999;
-	//int _disable_mgetgraphpos = 0;
-	//char _ignore_bounds = 0;
+	int _real_mouse_x = 0, _real_mouse_y = 0;
+	int _boundx1 = 0, _boundx2 = 99999, _boundy1 = 0, _boundy2 = 99999;
+	int _disable_mgetgraphpos = 0;
+	char _ignore_bounds = 0;
 	AGS::Shared::Bitmap *_mousecurs[MAXCURSORS];
 
 	ScriptMouse *_scmouse;
@@ -1037,8 +1037,8 @@ public:
 	 * @{
 	 */
 
-	//int _butwas = 0;
-	//int _hotxwas = 0, _hotywas = 0;
+	int _butwas = 0;
+	int _hotxwas = 0, _hotywas = 0;
 	Mouse *_mouse;
 
 	/**@}*/

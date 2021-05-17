@@ -34,11 +34,11 @@
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/gfx/gfxdriverfactory.h"
 #include "ags/engine/gfx/gfxfilter.h"
-#include "ags/shared/gfx/graphicsdriver.h"
-#include "ags/shared/main/config.h"
+#include "ags/engine/gfx/graphics_driver.h"
+#include "ags/engine/main/config.h"
 #include "ags/shared/main/engine_setup.h"
 #include "ags/shared/main/graphics_mode.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/platform/base/sys_main.h"
 
 namespace AGS3 {

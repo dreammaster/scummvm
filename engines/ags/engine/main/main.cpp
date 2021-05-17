@@ -33,11 +33,11 @@
 #include "ags/engine/debugging/debugger.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/main/config.h"
-#include "ags/shared/main/engine.h"
+#include "ags/engine/main/config.h"
+#include "ags/engine/main/engine.h"
 #include "ags/shared/main/mainheader.h"
-#include "ags/shared/main/main.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/engine/main/main.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/platform/base/sys_main.h"
 #include "ags/engine/ac/route_finder.h"
 #include "ags/shared/core/asset_manager.h"
@@ -133,7 +133,7 @@ void main_create_platform_driver() {
 // Current engine version
 AGS::Shared::Version EngineVersion;
 // Lowest savedgame version, accepted by this engine
-AGS::Shared::Version SavedgameLowestBackwardCompatVersion;
+AGS::Shared::Version _G(SavedgameLowestBackwardCompatVersion);
 // Lowest engine version, which would accept current savedgames
 AGS::Shared::Version SavedgameLowestForwardCompatVersion;
 
@@ -142,7 +142,7 @@ void main_init(int argc, char *argv[]) {
 #if defined (BUILD_STR)
 	EngineVersion.BuildInfo = BUILD_STR;
 #endif
-	SavedgameLowestBackwardCompatVersion = Version(SVG_VERSION_BWCOMPAT_MAJOR, SVG_VERSION_BWCOMPAT_MINOR, SVG_VERSION_BWCOMPAT_RELEASE, SVG_VERSION_BWCOMPAT_REVISION);
+	_G(SavedgameLowestBackwardCompatVersion) = Version(SVG_VERSION_BWCOMPAT_MAJOR, SVG_VERSION_BWCOMPAT_MINOR, SVG_VERSION_BWCOMPAT_RELEASE, SVG_VERSION_BWCOMPAT_REVISION);
 	SavedgameLowestForwardCompatVersion = Version(SVG_VERSION_FWCOMPAT_MAJOR, SVG_VERSION_FWCOMPAT_MINOR, SVG_VERSION_FWCOMPAT_RELEASE, SVG_VERSION_FWCOMPAT_REVISION);
 
 	AssetMgr.reset(new AssetManager());

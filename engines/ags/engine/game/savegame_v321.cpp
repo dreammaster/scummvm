@@ -30,28 +30,28 @@
 //=============================================================================
 
 #include "ags/shared/core/types.h"
-#include "ags/shared/ac/characterextras.h"
+#include "ags/engine/ac/character_extras.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/dialog_topic.h"
-#include "ags/shared/ac/dynamicsprite.h"
+#include "ags/engine/ac/dynamic_sprite.h"
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/movelist.h"
+#include "ags/engine/ac/move_list.h"
 #include "ags/engine/ac/overlay.h"
 #include "ags/shared/ac/sprite_cache.h"
-#include "ags/shared/ac/roomstatus.h"
+#include "ags/engine/ac/room_status.h"
 #include "ags/shared/ac/view.h"
 #include "ags/engine/ac/dynobj/cc_serializer.h"
 #include "ags/engine/game/savegame.h"
 #include "ags/engine/game/savegame_components.h"
 #include "ags/engine/game/savegame_internal.h"
-#include "ags/shared/gui/animatingguibutton.h"
+#include "ags/engine/gui/animating_gui_button.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/engine/media/audio/audio.h"
-#include "ags/shared/plugin/agsplugin.h"
-#include "ags/shared/plugin/plugin_engine.h"
-#include "ags/shared/script/script.h"
+#include "ags/plugins/ags_plugin.h"
+#include "ags/plugins/plugin_engine.h"
+#include "ags/engine/script/script.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/util/aligned_stream.h"
 #include "ags/shared/util/string_utils.h"
@@ -61,23 +61,7 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 static const int32_t MAGICNUMBER = 0xbeefcafe;
-
 
 static HSaveError restore_game_head_dynamic_values(Stream *in, RestoredData &r_data) {
 	r_data.FPS = in->ReadInt32();
@@ -117,7 +101,7 @@ static HSaveError restore_game_scripts(Stream *in, const PreservedParams &pp, Re
 	}
 	r_data.ScriptModules.resize(_G(numScriptModules));
 	for (int i = 0; i < _G(numScriptModules); ++i) {
-		size_t module_size = in->ReadInt32();
+		int module_size = in->ReadInt32();
 		if (pp.ScMdDataSize[i] != module_size) {
 			return new SavegameError(kSvgErr_GameContentAssertion, String::FromFormat("Mismatching size of script module data, module %d.", i));
 		}
@@ -212,12 +196,12 @@ static void ReadCharacterExtras_Aligned(Stream *in) {
 }
 
 static void restore_game_palette(Stream *in) {
-	in->ReadArray(&palette[0], sizeof(RGB), 256);
+	in->ReadArray(&_G(palette)[0], sizeof(RGB), 256);
 }
 
 static void restore_game_dialogs(Stream *in) {
 	for (int vv = 0; vv < _GP(game).numdialog; vv++)
-		in->ReadArrayOfInt32(&dialog[vv].optionflags[0], MAXTOPICOPTIONS);
+		in->ReadArrayOfInt32(&_G(dialog)[vv].optionflags[0], MAXTOPICOPTIONS);
 }
 
 static void restore_game_more_dynamic_values(Stream *in) {
@@ -237,10 +221,10 @@ static void ReadAnimatedButtons_Aligned(Stream *in) {
 }
 
 static HSaveError restore_game_gui(Stream *in, int numGuisWas) {
-	HError err = GUI::ReadGUI(guis, in, true);
+	HError err = GUI::ReadGUI(_GP(guis), in, true);
 	if (!err)
 		return new SavegameError(kSvgErr_GameObjectInitFailed, err);
-	_GP(game).numgui = guis.size();
+	_GP(game).numgui = _GP(guis).size();
 
 	if (numGuisWas != _GP(game).numgui) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of GUI.");
@@ -252,7 +236,7 @@ static HSaveError restore_game_gui(Stream *in, int numGuisWas) {
 }
 
 static HSaveError restore_game_audiocliptypes(Stream *in) {
-	if (in->ReadInt32() != _GP(game).audioClipTypes.size()) {
+	if (in->ReadInt32() != (int)_GP(game).audioClipTypes.size()) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of Audio Clip Types.");
 	}
 
@@ -349,7 +333,7 @@ static HSaveError restore_game_globalvars(Stream *in) {
 	}
 
 	for (int i = 0; i < _G(numGlobalVars); ++i) {
-		globalvars[i].Read(in);
+		_G(globalvars)[i].Read(in);
 	}
 	return HSaveError::None();
 }

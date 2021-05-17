@@ -23,8 +23,8 @@
 #include "ags/lib/allegro.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/engine/gfx/gfx_defines.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/plugin/agsplugin.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/plugins/ags_plugin.h"
 #include "ags/shared/util/string.h"
 #include "ags/shared/libsrc/libcda-0.5/libcda.h"
 

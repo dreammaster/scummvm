@@ -37,7 +37,7 @@
 //include <stdlib.h>
 //include <stdarg.h>
 //include <string.h>
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/shared/script/script_common.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/cc_options.h"

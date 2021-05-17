@@ -39,7 +39,7 @@
 //include <SDL.h>
 #include "ags/shared/core/platform.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/ddb.h"
+#include "ags/engine/gfx/ddb.h"
 #include "ags/shared/gfx/gfxdriverfactorybase.h"
 #include "ags/shared/gfx/gfxdriverbase.h"
 

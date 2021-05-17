@@ -32,7 +32,7 @@
 #include "ags/shared/gfx/ali3dexception.h"
 #include "ags/shared/gfx/gfxfilter_ogl.h"
 #include "ags/shared/gfx/gfxfilter_aaogl.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/platform/base/sys_main.h"
 
 // OpenGL Mathematics Library. We could include only the features we need to decrease compilation time.

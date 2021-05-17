@@ -32,7 +32,7 @@
 #include "ags/lib/std/memory.h"
 #include "ags/shared/glm/glm.hpp"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/ddb.h"
+#include "ags/engine/gfx/ddb.h"
 #include "ags/shared/gfx/gfxdriverfactorybase.h"
 #include "ags/shared/gfx/gfxdriverbase.h"
 #include "ags/shared/util/string.h"

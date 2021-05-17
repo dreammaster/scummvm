@@ -221,7 +221,19 @@ MODULE_OBJS = \
 	engine/ac/dynobj/script_viewport.o \
 	engine/ac/dynobj/script_view_frame.o \
 	engine/ac/statobj/ags_static_object.o \
-	engine/ac/statobj/static_array.o
+	engine/ac/statobj/static_array.o \
+	engine/debugging/console_output_target.o \
+	engine/debugging/debug.o \
+	engine/debugging/file_based_ags_debugger.o \
+	engine/debugging/log_file.o \
+	engine/debugging/message_buffer.o \
+	engine/device/mouse_w32.o \
+	engine/font/fonts_engine.o \
+	engine/game/game_init.o \
+	engine/game/savegame.o \
+	engine/game/savegame_components.o \
+	engine/game/savegame_v321.o \
+	engine/game/viewport.o
 
 ifdef ENABLE_AGS_TESTS
 MODULE_OBJS += \
@@ -246,4 +258,3 @@ include $(srcdir)/rules.mk
 
 # Detection objects
 DETECT_OBJS += $(MODULE)/detection.o
-

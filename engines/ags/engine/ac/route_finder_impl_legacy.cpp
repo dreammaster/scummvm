@@ -114,7 +114,7 @@ void get_lastcpos(int &lastcx_, int &lastcy_) {
 int find_nearest_walkable_area(Bitmap *tempw, int fromX, int fromY, int toX, int toY, int destX, int destY, int granularity) {
 	assert(tempw != nullptr);
 
-	int ex, ey, nearest = 99999, thisis, nearx, neary;
+	int ex, ey, nearest = 99999, thisis, nearx = 0, neary = 0;
 	if (fromX < 0) fromX = 0;
 	if (fromY < 0) fromY = 0;
 	if (toX >= tempw->GetWidth()) toX = tempw->GetWidth() - 1;

@@ -31,6 +31,7 @@
  //
  //=============================================================================
 
+#include "common/util.h"
 #include "ags/shared/core/platform.h"
 
 #define AGS_SIMULATE_RIGHT_CLICK (AGS_PLATFORM_OS_MACOS)
@@ -48,13 +49,13 @@
 #define FALSE 0
 #endif
 
-#include "ags/engine/ac/gamestate.h"
+#include "ags/engine/ac/game_state.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/engine/device/mousew32.h"
+#include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/gfx/gfx_util.h"
 #include "ags/engine/main/graphics_mode.h"
-#include "ags/engine/platform/base/agsplatformdriver.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/shared/util/math.h"
 #include "ags/globals.h"
 #if AGS_SIMULATE_RIGHT_CLICK
@@ -87,8 +88,8 @@ void mgetgraphpos() {
 		// in this case we completely ignore actual cursor movement.
 		if (!_G(ignore_bounds) &&
 			(_G(mousex) < _G(boundx1) || _G(mousey) < _G(boundy1) || _G(mousex) > _G(boundx2) || _G(mousey) > _G(boundy2))) {
-			_G(mousex) = Math::Clamp(_G(mousex), _G(boundx1), _G(boundx2));
-			_G(mousey) = Math::Clamp(_G(mousey), _G(boundy1), _G(boundy2));
+			_G(mousex) = CLIP(_G(mousex), _G(boundx1), _G(boundx2));
+			_G(mousey) = CLIP(_G(mousey), _G(boundy1), _G(boundy2));
 			msetgraphpos(_G(mousex), _G(mousey));
 		}
 		return;
@@ -118,8 +119,8 @@ void mgetgraphpos() {
 		// are required to confine cursor inside one, then adjust cursor position
 		// to stay inside the rect's bounds.
 		else if (_GP(mouse).ConfineInCtrlRect) {
-			_G(real_mouse_x) = Math::Clamp(_G(real_mouse_x) + dx, _GP(mouse).ControlRect.Left, _GP(mouse).ControlRect.Right);
-			_G(real_mouse_y) = Math::Clamp(_G(real_mouse_y) + dy, _GP(mouse).ControlRect.Top, _GP(mouse).ControlRect.Bottom);
+			_G(real_mouse_x) = CLIP(_G(real_mouse_x) + dx, _GP(mouse).ControlRect.Left, _GP(mouse).ControlRect.Right);
+			_G(real_mouse_y) = CLIP(_G(real_mouse_y) + dy, _GP(mouse).ControlRect.Top, _GP(mouse).ControlRect.Bottom);
 			position_mouse(_G(real_mouse_x), _G(real_mouse_y));
 		}
 		// Lastly, if the real cursor is out of the control rect, simply add
@@ -144,8 +145,8 @@ void mgetgraphpos() {
 
 	if (!_G(ignore_bounds) &&
 		(_G(mousex) < _G(boundx1) || _G(mousey) < _G(boundy1) || _G(mousex) > _G(boundx2) || _G(mousey) > _G(boundy2))) {
-		_G(mousex) = Math::Clamp(_G(mousex), _G(boundx1), _G(boundx2));
-		_G(mousey) = Math::Clamp(_G(mousey), _G(boundy1), _G(boundy2));
+		_G(mousex) = CLIP(_G(mousex), _G(boundx1), _G(boundx2));
+		_G(mousey) = CLIP(_G(mousey), _G(boundy1), _G(boundy2));
 		msetgraphpos(_G(mousex), _G(mousey));
 	}
 
@@ -200,10 +201,12 @@ void mfreemem() {
 }
 
 void mloadwcursor(char *namm) {
+#ifdef TODO
 	color dummypal[256];
 	if (wloadsprites(&dummypal[0], namm, _G(mousecurs), 0, MAXCURSORS)) {
 		error("mloadwcursor: Error reading mouse cursor file");
 	}
+#endif
 }
 
 int mgetbutton() {

@@ -20,14 +20,13 @@
  *
  */
 
-//include <cstdio>
-//include <string.h>
-#include "ags/shared/debugging/filebasedagsdebugger.h"
+#include "ags/engine/debugging/file_based_ags_debugger.h"
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/stream.h"
-#include "ags/shared/util/textstreamwriter.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/shared/util/text_stream_writer.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -47,7 +46,7 @@ void FileBasedAGSDebugger::Shutdown() {
 
 bool FileBasedAGSDebugger::SendMessageToEditor(const char *message) {
 	while (Path::IsFile(SENT_MESSAGE_FILE_NAME)) {
-		platform->YieldCPU();
+		_G(platform)->YieldCPU();
 	}
 
 	Stream *out = Shared::File::CreateFile(SENT_MESSAGE_FILE_NAME);

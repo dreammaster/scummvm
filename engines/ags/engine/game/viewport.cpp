@@ -24,13 +24,12 @@
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/game/room_struct.h"
-#include "ags/shared/game/viewport.h"
+#include "ags/engine/game/viewport.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
 
 void Camera::SetID(int id) {
 	_id = id;

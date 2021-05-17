@@ -20,8 +20,8 @@
  *
  */
 
-#include "ags/shared/ac/character.h"
-#include "ags/shared/ac/charactercache.h"
+#include "ags/engine/ac/character.h"
+#include "ags/engine/ac/character_cache.h"
 #include "ags/engine/ac/dialog.h"
 #include "ags/engine/ac/draw.h"
 #include "ags/engine/ac/file.h"
@@ -29,90 +29,34 @@
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/gui.h"
-#include "ags/shared/ac/movelist.h"
+#include "ags/engine/ac/gui.h"
+#include "ags/engine/ac/move_list.h"
 #include "ags/engine/ac/dynobj/all_dynamic_classes.h"
 #include "ags/engine/ac/dynobj/all_script_classes.h"
-#include "ags/shared/ac/statobj/agsstaticobject.h"
-#include "ags/shared/ac/statobj/staticarray.h"
+#include "ags/engine/ac/statobj/ags_static_object.h"
+#include "ags/engine/ac/statobj/static_array.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/shared/font/agsfontrenderer.h"
+#include "ags/shared/font/ags_font_renderer.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/shared/game/game_init.h"
+#include "ags/engine/game/game_init.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/ddb.h"
+#include "ags/engine/gfx/ddb.h"
 #include "ags/shared/gui/gui_label.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
-#include "ags/shared/plugin/plugin_engine.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
+#include "ags/plugins/plugin_engine.h"
 #include "ags/shared/script/cc_error.h"
-#include "ags/shared/script/exports.h"
-#include "ags/shared/script/script.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/exports.h"
+#include "ags/engine/script/script.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/shared/util/string_utils.h"
 #include "ags/engine/media/audio/audio_system.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace Shared;
 using namespace Engine;
-
-
-
-
-
-
-extern IDriverDependantBitmap **_G(actspswbbmp);
-extern CachedActSpsData *_G(actspswbcache);
-
-
-
-
-extern CCHotspot   _GP(ccDynamicHotspot);
-extern CCRegion    _GP(ccDynamicRegion);
-
-extern CCGUI       _GP(ccDynamicGUI);
-extern CCObject    _GP(ccDynamicObject);
-extern CCDialog    _GP(ccDynamicDialog);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-extern StaticArray _GP(StaticCharacterArray);
-extern StaticArray _GP(StaticObjectArray);
-extern StaticArray _GP(StaticGUIArray);
-extern StaticArray _GP(StaticHotspotArray);
-extern StaticArray _GP(StaticRegionArray);
-extern StaticArray _GP(StaticInventoryArray);
-extern StaticArray _GP(StaticDialogArray);
-
-
-
-
-
-// Old dialog support (defined in ac/dialog)
-extern std::vector< std::shared_ptr<unsigned char> > _G(old_dialog_scripts);
-extern std::vector<String> _G(old_speech_lines);
-
-StaticArray _GP(StaticCharacterArray);
-StaticArray _GP(StaticObjectArray);
-StaticArray _GP(StaticGUIArray);
-StaticArray _GP(StaticHotspotArray);
-StaticArray _GP(StaticRegionArray);
-StaticArray _GP(StaticInventoryArray);
-StaticArray _GP(StaticDialogArray);
-
 
 namespace AGS {
 namespace Engine {
@@ -303,13 +247,13 @@ HError InitAndRegisterGameEntities() {
 
 	setup_player_character(_GP(game).playercharacter);
 	if (_G(loaded_game_file_version) >= kGameVersion_270)
-		ccAddExternalStaticObject("player", &_G(sc_PlayerCharPtr), &_G(GlobalStaticManager));
+		ccAddExternalStaticObject("player", &_G(sc_PlayerCharPtr), &_GP(GlobalStaticManager));
 	return HError::None();
 }
 
 void LoadFonts(GameDataVersion data_ver) {
 	for (int i = 0; i < _GP(game).numfonts; ++i) {
-		if (!wloadfont_size(i, _GP(game)._GP(fonts)[i]))
+		if (!wloadfont_size(i, _GP(game).fonts[i]))
 			quitprintf("Unable to load font %d, no renderer could load a matching file", i);
 	}
 }
@@ -345,7 +289,7 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	// If the game was compiled using unsupported version of the script API,
 	// we warn about potential incompatibilities but proceed further.
 	if (_GP(game).options[OPT_BASESCRIPTAPI] > kScriptAPI_Current)
-		platform->DisplayAlert("Warning: this game requests a higher version of AGS script API, it may not run correctly or run at all.");
+		_G(platform)->DisplayAlert("Warning: this game requests a higher version of AGS script API, it may not run correctly or run at all.");
 
 	//
 	// 1. Check that the loaded data is valid and compatible with the current
@@ -421,8 +365,8 @@ HGameInitError InitGameState(const LoadedGameEntities &ents, GameDataVersion dat
 	// NOTE: we must do this after plugins, because some plugins may export
 	// script symbols too.
 	//
-	_G(gamescript) = ents.GlobalScript;
-	_G(dialogScriptsScript) = ents.DialogScript;
+	_GP(gamescript) = ents.GlobalScript;
+	_GP(dialogScriptsScript) = ents.DialogScript;
 	_G(numScriptModules) = ents.ScriptModules.size();
 	_GP(scriptModules) = ents.ScriptModules;
 	AllocScriptModules();

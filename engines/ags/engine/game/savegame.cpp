@@ -20,48 +20,49 @@
  *
  */
 
-#include "ags/shared/ac/character.h"
+#include "ags/engine/ac/character.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/draw.h"
-#include "ags/shared/ac/dynamicsprite.h"
-#include "ags/shared/ac/event.h"
+#include "ags/engine/ac/dynamic_sprite.h"
+#include "ags/engine/ac/event.h"
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/game_setup.h"
-#include "ags/shared/ac/global_audio.h"
+#include "ags/engine/ac/global_audio.h"
 #include "ags/engine/ac/global_character.h"
-#include "ags/shared/ac/gui.h"
-#include "ags/shared/ac/mouse.h"
+#include "ags/engine/ac/gui.h"
+#include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/overlay.h"
 #include "ags/engine/ac/region.h"
-#include "ags/shared/ac/rich_game_media.h"
-#include "ags/shared/ac/room.h"
-#include "ags/shared/ac/roomstatus.h"
+#include "ags/engine/ac/rich_game_media.h"
+#include "ags/engine/ac/room.h"
+#include "ags/engine/ac/room_status.h"
 #include "ags/shared/ac/sprite_cache.h"
-#include "ags/shared/ac/system.h"
+#include "ags/engine/ac/system.h"
 #include "ags/engine/ac/timer.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/ddb.h"
-#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/engine/gfx/ddb.h"
+#include "ags/engine/gfx/graphics_driver.h"
 #include "ags/engine/game/savegame.h"
 #include "ags/engine/game/savegame_components.h"
 #include "ags/engine/game/savegame_internal.h"
-#include "ags/shared/main/engine.h"
-#include "ags/shared/main/main.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/engine/main/engine.h"
+#include "ags/engine/main/main.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/platform/base/sys_main.h"
-#include "ags/shared/plugin/agsplugin.h"
-#include "ags/shared/plugin/plugin_engine.h"
-#include "ags/shared/script/script.h"
+#include "ags/plugins/ags_plugin.h"
+#include "ags/plugins/plugin_engine.h"
+#include "ags/engine/script/script.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/util/aligned_stream.h"
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_utils.h"
 #include "ags/engine/media/audio/audio_system.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -70,16 +71,6 @@ using namespace Engine;
 
 // function is currently implemented in savegame_v321.cpp
 HSaveError restore_game_data(Stream *in, SavegameVersion svg_version, const PreservedParams &pp, RestoredData &r_data);
-
-
-
-extern AGS::Engine::IDriverDependantBitmap **_G(guibgbmp);
-
-
-
-
-
-
 
 namespace AGS {
 namespace Engine {
@@ -245,11 +236,11 @@ HSaveError ReadDescription_v321(Stream *in, SavegameVersion &svg_ver, SavegameDe
 
 	String version_str = String::FromStream(in);
 	Version eng_version(version_str);
-	if (eng_version > EngineVersion ||
-		eng_version < SavedgameLowestBackwardCompatVersion) {
+	if (eng_version > _G(EngineVersion) ||
+		eng_version < _G(SavedgameLowestBackwardCompatVersion)) {
 		// Engine version is either non-forward or non-backward compatible
 		return new SavegameError(kSvgErr_IncompatibleEngine,
-			String::FromFormat("Required: %s, supported: %s - %s.", eng_version.LongString.GetCStr(), SavedgameLowestBackwardCompatVersion.LongString.GetCStr(), EngineVersion.LongString.GetCStr()));
+			String::FromFormat("Required: %s, supported: %s - %s.", eng_version.LongString.GetCStr(), _G(SavedgameLowestBackwardCompatVersion).LongString.GetCStr(), _G(EngineVersion).LongString.GetCStr()));
 	}
 	if (elems & kSvgDesc_EnvInfo) {
 		desc.MainDataFilename.Read(in);
@@ -507,7 +498,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	// it with SetMusicVolume)
 	_GP(thisroom).Options.MusicVolume = r_data.RoomVolume;
 
-	Mouse::SetMoveLimit(Rect(oldx1, oldy1, oldx2, oldy2));
+	_GP(mouse).SetMoveLimit(Rect(oldx1, oldy1, oldx2, oldy2));
 
 	set_cursor_mode(r_data.CursorMode);
 	set_mouse_cursor(r_data.CursorID);
@@ -680,7 +671,7 @@ void WriteDescription(Stream *out, const String &user_text, const Bitmap *user_i
 	out->WriteInt32(0);
 	// Enviroment information
 	StrUtil::WriteString("Adventure Game Studio run-time engine", out);
-	StrUtil::WriteString(EngineVersion.LongString, out);
+	StrUtil::WriteString(_G(EngineVersion).LongString, out);
 	StrUtil::WriteString(_GP(game).guid, out);
 	StrUtil::WriteString(_GP(game).gamename, out);
 	StrUtil::WriteString(_GP(ResPaths).GamePak.Name, out);
@@ -704,15 +695,16 @@ Stream *StartSavegame(const String &filename, const String &user_text, const Bit
 	// Initialize and write Vista header
 	RICH_GAME_MEDIA_HEADER vistaHeader;
 	memset(&vistaHeader, 0, sizeof(RICH_GAME_MEDIA_HEADER));
-	memcpy(&vistaHeader.dwMagicNumber, RM_MAGICNUMBER, sizeof(int));
+	vistaHeader.dwMagicNumber = RM_MAGICNUMBER;
 	vistaHeader.dwHeaderVersion = 1;
 	vistaHeader.dwHeaderSize = sizeof(RICH_GAME_MEDIA_HEADER);
 	vistaHeader.dwThumbnailOffsetHigherDword = 0;
 	vistaHeader.dwThumbnailOffsetLowerDword = 0;
 	vistaHeader.dwThumbnailSize = 0;
 	convert_guid_from_text_to_binary(_GP(game).guid, &vistaHeader.guidGameId[0]);
-	uconvert(_GP(game).gamename, U_ASCII, (char *)&vistaHeader.szGameName[0], U_UNICODE, RM_MAXLENGTH);
-	uconvert(user_text, U_ASCII, (char *)&vistaHeader.szSaveName[0], U_UNICODE, RM_MAXLENGTH);
+
+	vistaHeader.setSaveName(user_text);
+
 	vistaHeader.szLevelName[0] = 0;
 	vistaHeader.szComments[0] = 0;
 	// MS Windows Vista rich media header

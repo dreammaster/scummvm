@@ -21,15 +21,15 @@
  */
 
 //include <string.h>
-#include "ags/shared/script/script.h"
+#include "ags/engine/script/script.h"
 #include "ags/shared/ac/common.h"
-#include "ags/shared/ac/character.h"
+#include "ags/engine/ac/character.h"
 #include "ags/engine/ac/dialog.h"
-#include "ags/shared/ac/event.h"
+#include "ags/engine/ac/event.h"
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_audio.h"
+#include "ags/engine/ac/global_audio.h"
 #include "ags/engine/ac/global_character.h"
 #include "ags/shared/ac/global_dialog.h"
 #include "ags/shared/ac/global_display.h"
@@ -39,8 +39,8 @@
 #include "ags/shared/ac/global_object.h"
 #include "ags/shared/ac/global_room.h"
 #include "ags/engine/ac/inv_window.h"
-#include "ags/shared/ac/mouse.h"
-#include "ags/shared/ac/room.h"
+#include "ags/engine/ac/mouse.h"
+#include "ags/engine/ac/room.h"
 #include "ags/engine/ac/room_object.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/script/cc_error.h"
@@ -49,7 +49,7 @@
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/engine/media/video/video.h"
-#include "ags/shared/script/script_runtime.h"
+#include "ags/engine/script/script_runtime.h"
 #include "ags/shared/util/string_compat.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/globals.h"
@@ -207,7 +207,7 @@ int create_global_script() {
 
 		_GP(moduleRepExecAddr)[kk] = _GP(moduleInst)[kk]->GetSymbolAddress(REP_EXEC_NAME);
 	}
-	_G(gameinst) = ccInstance::CreateFromScript(_G(gamescript));
+	_G(gameinst) = ccInstance::CreateFromScript(_GP(gamescript));
 	if (_G(gameinst) == nullptr)
 		return -3;
 	// create a forked instance for rep_exec_always
@@ -215,8 +215,8 @@ int create_global_script() {
 	if (_G(gameinstFork) == nullptr)
 		return -3;
 
-	if (_G(dialogScriptsScript) != nullptr) {
-		_G(dialogScriptsInst) = ccInstance::CreateFromScript(_G(dialogScriptsScript));
+	if (_GP(dialogScriptsScript) != nullptr) {
+		_G(dialogScriptsInst) = ccInstance::CreateFromScript(_GP(dialogScriptsScript));
 		if (_G(dialogScriptsInst) == nullptr)
 			return -3;
 	}
@@ -447,7 +447,7 @@ String GetScriptName(ccInstance *sci) {
 	// TODO: check script modules too?
 	if (!sci)
 		return "Not in a script";
-	else if (sci->instanceof == _G(gamescript))
+	else if (sci->instanceof == _GP(gamescript))
 		return "Global script";
 	else if (sci->instanceof == _GP(thisroom).CompiledScript)
 		return String::FromFormat("Room %d script", _G(displayed_room));

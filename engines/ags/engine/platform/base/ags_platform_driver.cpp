@@ -27,7 +27,7 @@
 //=============================================================================
 
 #include "ags/shared/util/wgt2_allg.h"
-#include "ags/engine/platform/base/agsplatformdriver.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/runtime_defines.h"
 #include "ags/shared/util/string_utils.h"

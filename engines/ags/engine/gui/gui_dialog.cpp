@@ -33,7 +33,7 @@
 #include "ags/shared/gui/cscidialog.h"
 //include <cctype> //isdigit()
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/graphicsdriver.h"
+#include "ags/engine/gfx/graphics_driver.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/util/path.h"
 

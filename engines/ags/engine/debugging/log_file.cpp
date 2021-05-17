@@ -20,8 +20,7 @@
  *
  */
 
-//include <string.h>
-#include "ags/shared/debugging/logfile.h"
+#include "ags/engine/debugging/log_file.h"
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/stream.h"
 

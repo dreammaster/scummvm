@@ -97,7 +97,7 @@ String GetSavegameErrorText(SavegameErrorType err);
 typedef TypedCodeError<SavegameErrorType, GetSavegameErrorText> SavegameError;
 typedef ErrorHandle<SavegameError> HSaveError;
 typedef std::unique_ptr<Bitmap> UBitmap;
-#ifdef AGS_PLATFORM_SCUMMVM
+#ifdef UNUSED_AGS_PLATFORM_SCUMMVM
 typedef std::shared_ptr<Stream> UStream;
 #else
 typedef std::unique_ptr<Stream> UStream;

@@ -21,69 +21,52 @@
  */
 
 #include "ags/lib/std/map.h"
-
-#include "ags/shared/ac/audiocliptype.h"
-#include "ags/shared/ac/character.h"
+#include "ags/shared/ac/audio_clip_type.h"
+#include "ags/engine/ac/character.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/dialog_topic.h"
 #include "ags/engine/ac/draw.h"
-#include "ags/shared/ac/dynamicsprite.h"
+#include "ags/engine/ac/dynamic_sprite.h"
 #include "ags/engine/ac/game.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/gui.h"
-#include "ags/shared/ac/mouse.h"
-#include "ags/shared/ac/movelist.h"
+#include "ags/engine/ac/gui.h"
+#include "ags/engine/ac/mouse.h"
+#include "ags/engine/ac/move_list.h"
 #include "ags/engine/ac/overlay.h"
-#include "ags/shared/ac/roomstatus.h"
+#include "ags/engine/ac/room_status.h"
 #include "ags/engine/ac/screen_overlay.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/shared/ac/view.h"
-#include "ags/shared/ac/system.h"
+#include "ags/engine/ac/system.h"
 #include "ags/engine/ac/dynobj/cc_serializer.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/game/savegame_components.h"
 #include "ags/engine/game/savegame_internal.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gui/animatingguibutton.h"
-#include "ags/shared/gui/guibutton.h"
+#include "ags/engine/gui/animating_gui_button.h"
+#include "ags/shared/gui/gui_button.h"
 #include "ags/shared/gui/gui_inv.h"
 #include "ags/shared/gui/gui_label.h"
 #include "ags/shared/gui/gui_listbox.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/gui_slider.h"
-#include "ags/shared/gui/guitextbox.h"
-#include "ags/shared/plugin/agsplugin.h"
-#include "ags/shared/plugin/plugin_engine.h"
+#include "ags/shared/gui/gui_textbox.h"
+#include "ags/plugins/ags_plugin.h"
+#include "ags/plugins/plugin_engine.h"
 #include "ags/shared/script/cc_error.h"
-#include "ags/shared/script/script.h"
-#include "ags/shared/util/filestream.h" // TODO: needed only because plugins expect file handle
+#include "ags/engine/script/script.h"
+#include "ags/shared/util/file_stream.h" // TODO: needed only because plugins expect file handle
 #include "ags/engine/media/audio/audio_system.h"
 
 namespace AGS3 {
 
 using namespace Shared;
 
+namespace AGS {
+namespace Engine {
 
-
-
-
-
-
-
-
-
-
-
-
-
-namespace AGS
-{
-namespace Engine
-{
-
-namespace SavegameComponents
-{
+namespace SavegameComponents {
 
 const String ComponentListTag = "Components";
 
@@ -230,14 +213,14 @@ HSaveError WriteGameState(Stream *out)
     _GP(game).WriteForSavegame(out);
     // Game palette
     // TODO: probably no need to save this for hi/true-res game
-    out->WriteArray(palette, sizeof(RGB), 256);
+    out->WriteArray(_G(palette), sizeof(RGB), 256);
 
     if (_G(loaded_game_file_version) <= kGameVersion_272)
     {
         // Global variables
         out->WriteInt32(_G(numGlobalVars));
         for (int i = 0; i < _G(numGlobalVars); ++i)
-            globalvars[i].Write(out);
+            _G(globalvars)[i].Write(out);
     }
 
     // Game state
@@ -324,7 +307,7 @@ HSaveError ReadGameState(Stream *in, int32_t cmp_ver, const PreservedParams &pp,
     // Game base
     _GP(game).ReadFromSavegame(in);
     // Game palette
-    in->ReadArray(palette, sizeof(RGB), 256);
+    in->ReadArray(_G(palette), sizeof(RGB), 256);
 
     if (_G(loaded_game_file_version) <= kGameVersion_272)
     {
@@ -332,7 +315,7 @@ HSaveError ReadGameState(Stream *in, int32_t cmp_ver, const PreservedParams &pp,
         if (!AssertGameContent(err, in->ReadInt32(), _G(numGlobalVars), "Global Variables"))
             return err;
         for (int i = 0; i < _G(numGlobalVars); ++i)
-            globalvars[i].Read(in);
+            _G(globalvars)[i].Read(in);
     }
 
     // Game state
@@ -576,7 +559,7 @@ HSaveError WriteDialogs(Stream *out)
     out->WriteInt32(_GP(game).numdialog);
     for (int i = 0; i < _GP(game).numdialog; ++i)
     {
-        dialog[i].WriteToSavegame(out);
+        _G(dialog)[i].WriteToSavegame(out);
     }
     return HSaveError::None();
 }
@@ -588,7 +571,7 @@ HSaveError ReadDialogs(Stream *in, int32_t cmp_ver, const PreservedParams &pp, R
         return err;
     for (int i = 0; i < _GP(game).numdialog; ++i)
     {
-        dialog[i].ReadFromSavegame(in);
+        _G(dialog)[i].ReadFromSavegame(in);
     }
     return err;
 }
@@ -617,13 +600,13 @@ HSaveError WriteGUI(Stream *out)
         _GP(guiinv)[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUISliders");
-    out->WriteInt32(numguislider);
-    for (int i = 0; i < numguislider; ++i)
+    out->WriteInt32(_G(numguislider));
+    for (int i = 0; i < _G(numguislider); ++i)
         _GP(guislider)[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUITextBoxes");
-    out->WriteInt32(numguitext);
-    for (int i = 0; i < numguitext; ++i)
+    out->WriteInt32(_G(numguitext));
+    for (int i = 0; i < _G(numguitext); ++i)
         _GP(guitext)[i].WriteToSavegame(out);
 
     WriteFormatTag(out, "GUIListBoxes");
@@ -674,16 +657,16 @@ HSaveError ReadGUI(Stream *in, int32_t cmp_ver, const PreservedParams &pp, Resto
 
     if (!AssertFormatTagStrict(err, in, "GUISliders"))
         return err;
-    if (!AssertGameContent(err, in->ReadInt32(), numguislider, "GUI Sliders"))
+    if (!AssertGameContent(err, in->ReadInt32(), _G(numguislider), "GUI Sliders"))
         return err;
-    for (int i = 0; i < numguislider; ++i)
+    for (int i = 0; i < _G(numguislider); ++i)
         _GP(guislider)[i].ReadFromSavegame(in, svg_ver);
 
     if (!AssertFormatTagStrict(err, in, "GUITextBoxes"))
         return err;
-    if (!AssertGameContent(err, in->ReadInt32(), numguitext, "GUI TextBoxes"))
+    if (!AssertGameContent(err, in->ReadInt32(), _G(numguitext), "GUI TextBoxes"))
         return err;
-    for (int i = 0; i < numguitext; ++i)
+    for (int i = 0; i < _G(numguitext); ++i)
         _GP(guitext)[i].ReadFromSavegame(in, svg_ver);
 
     if (!AssertFormatTagStrict(err, in, "GUIListBoxes"))
@@ -1313,7 +1296,7 @@ HSaveError ReadComponent(Stream *in, SvgCmpReadHelper &hlp, ComponentInfo &info)
     const ComponentHandler *handler = nullptr;
     std::map<String, ComponentHandler>::const_iterator it_hdr = hlp.Handlers.find(info.Name);
     if (it_hdr != hlp.Handlers.end())
-        handler = &it_hdr->second;
+        handler = &it_hdr->_value;
 
     if (!handler || !handler->Unserialize)
         return new SavegameError(kSvgErr_UnsupportedComponent);

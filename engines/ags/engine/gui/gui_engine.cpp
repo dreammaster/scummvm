@@ -29,13 +29,13 @@
 // Headers, as they are in acgui.cpp
 #pragma unmanaged
 #include "ags/shared/ac/game_version.h"
-#include "ags/shared/ac/system.h"
+#include "ags/engine/ac/system.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/gui/gui_main.h"
-#include "ags/shared/gui/guibutton.h"
+#include "ags/shared/gui/gui_button.h"
 #include "ags/shared/gui/gui_label.h"
 #include "ags/shared/gui/gui_listbox.h"
-#include "ags/shared/gui/guitextbox.h"
+#include "ags/shared/gui/gui_textbox.h"
 //include <ctype.h>
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/global_translation.h"

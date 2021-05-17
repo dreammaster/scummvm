@@ -29,7 +29,7 @@
 #include "ags/shared/gui/guidialoginternaldefs.h"
 #include "ags/shared/main/game_run.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/platform/base/agsplatformdriver.h"
+#include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/ac/timer.h"
 
 namespace AGS3 {
