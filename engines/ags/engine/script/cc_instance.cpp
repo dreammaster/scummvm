@@ -23,7 +23,7 @@
 //include <cstdio>
 //include <string.h>
 #include "ags/shared/ac/common.h"
-#include "ags/engine/ac/dynobj/cc_dynamicarray.h"
+#include "ags/engine/ac/dynobj/cc_dynamic_array.h"
 #include "ags/engine/ac/dynobj/managed_object_pool.h"
 #include "ags/shared/gui/gui_defines.h"
 #include "ags/shared/script/cc_error.h"
@@ -33,7 +33,7 @@
 #include "ags/shared/script/cc_options.h"
 #include "ags/engine/script/script.h"
 #include "ags/engine/script/script_runtime.h"
-#include "ags/shared/script/systemimports.h"
+#include "ags/engine/script/system_imports.h"
 #include "ags/shared/util/bbop.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/misc.h"
@@ -42,22 +42,15 @@
 #include "ags/engine/ac/dynobj/script_user_object.h"
 #include "ags/engine/ac/statobj/ags_static_object.h"
 #include "ags/engine/ac/statobj/static_array.h"
-#include "ags/engine/ac/dynobj/cc_dynamicobject_addr_and_manager.h"
+#include "ags/engine/ac/dynobj/cc_dynamic_object_addr_and_manager.h"
 #include "ags/shared/util/memory.h"
 #include "ags/shared/util/string_utils.h" // linux strnicmp definition
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Shared::Memory;
-
-extern ccInstance *_GP(loadedInstances)[MAX_LOADED_INSTANCES]; // in script/script_runtime
-extern int _G(gameHasBeenRestored); // in ac/game
-extern ExecutingScript*_G(curscript); // in script/script
-extern int _G(maxWhileLoops);
-extern new_line_hook_type _G(new_line_hook);
-
-
 
 enum ScriptOpArgIsReg
 {
@@ -169,13 +162,6 @@ const ScriptCommandInfo sccmd_info[CC_NUM_SCCMDS] =
 const char *regnames[] = { "null", "sp", "mar", "ax", "bx", "cx", "op", "dx" };
 
 const char *fixupnames[] = { "null", "fix_gldata", "fix_func", "fix_string", "fix_import", "fix_datadata", "fix_stack" };
-
-ccInstance *_G(current_instance);
-// [IKM] 2012-10-21:
-// NOTE: This is temporary solution (*sigh*, one of many) which allows certain
-// exported functions return value as a RuntimeScriptValue object;
-// Of 2012-12-20: now used only for plugin exports
-RuntimeScriptValue _G(GlobalReturnValue);
 
 // Function call stack is used to temporarily store
 // values before passing them to script function
@@ -1026,7 +1012,7 @@ int ccInstance::Run(int32_t curpc)
           // extract the instance ID
           int32_t instId = codeOp.Instruction.InstanceId;
           // determine the offset into the code of the instance we want
-          runningInst = _GP(loadedInstances)[instId];
+          runningInst = _G(loadedInstances)[instId];
           intptr_t callAddr = reg1.Ptr - (char*)&runningInst->code[0];
           if (callAddr % sizeof(intptr_t) != 0) {
               cc_error("call address not aligned");
@@ -1074,7 +1060,7 @@ int ccInstance::Run(int32_t curpc)
 
           if (reg1.Type == kScValPluginFunction)
           {
-              _G(GlobalReturnValue).Invalidate();
+              _GP(GlobalReturnValue).Invalidate();
               int32_t int_ret_val;
               if (next_call_needs_object)
               {
@@ -1087,9 +1073,9 @@ int ccInstance::Run(int32_t curpc)
                   int_ret_val = call_function((intptr_t)reg1.Ptr, nullptr, num_args_to_func, func_callstack.GetHead() + 1);
               }
 
-              if (_G(GlobalReturnValue).IsValid())
+              if (_GP(GlobalReturnValue).IsValid())
               {
-                  return_value = _G(GlobalReturnValue);
+                  return_value = _GP(GlobalReturnValue);
               }
               else
               {
@@ -1485,7 +1471,7 @@ bool ccInstance::_Create(PScript scri, ccInstance * joined)
             code = (intptr_t*)malloc(codesize * sizeof(intptr_t));
             // 64 bit: Read code into 8 byte array, necessary for being able to perform
             // relocations on the references.
-            for (int i = 0; i < codesize; ++i)
+            for (i = 0; i < codesize; ++i)
                 code[i] = scri->code[i];
         }
     }
@@ -1507,8 +1493,8 @@ bool ccInstance::_Create(PScript scri, ccInstance * joined)
 
     // find a LoadedInstance slot for it
     for (i = 0; i < MAX_LOADED_INSTANCES; i++) {
-        if (_GP(loadedInstances)[i] == nullptr) {
-            _GP(loadedInstances)[i] = this;
+        if (_G(loadedInstances)[i] == nullptr) {
+            _G(loadedInstances)[i] = this;
             loadedInstanceId = i;
             break;
         }
@@ -1599,8 +1585,8 @@ void ccInstance::Free()
     }
 
     // remove from the Active Instances list
-    if (_GP(loadedInstances)[loadedInstanceId] == this)
-        _GP(loadedInstances)[loadedInstanceId] = nullptr;
+    if (_G(loadedInstances)[loadedInstanceId] == this)
+        _G(loadedInstances)[loadedInstanceId] = nullptr;
 
     if ((flags & INSTF_SHAREDATA) == 0)
     {
@@ -1695,7 +1681,7 @@ bool ccInstance::CreateGlobalVars(PScript scri)
                 return false;
             }
             // TODO: register this explicitly as a string instead (can do this later)
-            glvar.RValue.SetStaticObject(globaldata + data_addr, &_G(GlobalStaticManager));
+            glvar.RValue.SetStaticObject(globaldata + data_addr, &_GP(GlobalStaticManager));
             }
             break;
         default:
@@ -1754,7 +1740,7 @@ ScriptVariable *ccInstance::FindGlobalVar(int32_t var_addr)
         Debug::Printf(kDbgMsg_Warn, "WARNING: looking up for global variable beyond allocated buffer (%d, %d)", var_addr, globaldatasize);
     }
     ScVarMap::iterator it = globalvars->find(var_addr);
-    return it != globalvars->end() ? &it->second : nullptr;
+    return it != globalvars->end() ? &it->_value : nullptr;
 }
 
 bool ccInstance::CreateRuntimeCodeFixups(PScript scri)

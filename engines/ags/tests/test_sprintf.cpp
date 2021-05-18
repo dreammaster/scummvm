@@ -25,7 +25,7 @@
 #include "ags/shared/ac/game_version.h"
 #include "ags/shared/debugging/assert.h"
 #include "ags/engine/script/script_api.h"
-#include "ags/engine/script/runtimescriptvalue.h"
+#include "ags/engine/script/runtime_script_value.h"
 
 namespace AGS3 {
 

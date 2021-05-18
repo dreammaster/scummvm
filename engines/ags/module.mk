@@ -242,7 +242,16 @@ MODULE_OBJS = \
 	engine/gui/my_listbox.o \
 	engine/gui/my_push_button.o \
 	engine/gui/my_textbox.o \
-	engine/gui/new_control.o
+	engine/gui/new_control.o \
+	engine/script/cc_instance.o \
+	engine/script/executing_script.o \
+	engine/script/exports.o \
+	engine/script/runtime_script_value.o \
+	engine/script/script.o \
+	engine/script/script_api.o \
+	engine/script/script_engine.o \
+	engine/script/script_runtime.o \
+	engine/script/system_imports.o
 
 ifdef ENABLE_AGS_TESTS
 MODULE_OBJS += \

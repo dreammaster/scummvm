@@ -71,7 +71,7 @@
 #include "ags/plugins/plugin_engine.h"
 #include "ags/shared/plugin/plugin_builtin.h"
 #include "ags/plugins/plugin_object_reader.h"
-#include "ags/shared/script/runtimescriptvalue.h"
+#include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/script/script.h"
 #include "ags/engine/script/script_runtime.h"
 #include "ags/shared/util/file_stream.h"

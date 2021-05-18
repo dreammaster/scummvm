@@ -22,14 +22,11 @@
 
 //include <stdlib.h>
 //include <string.h>
-#include "ags/shared/script/systemimports.h"
+#include "ags/engine/script/system_imports.h"
 
 namespace AGS3 {
 
 extern void quit(const char *);
-
-SystemImports _GP(simp);
-SystemImports _GP(simp_for_plugin);
 
 int SystemImports::add(const String &name, const RuntimeScriptValue &value, ccInstance *anotherscr) {
 	int ixof;
@@ -52,7 +49,7 @@ int SystemImports::add(const String &name, const RuntimeScriptValue &value, ccIn
 	}
 
 	btree[name] = ixof;
-	if (ixof == imports.size())
+	if (ixof == (int)imports.size())
 		imports.push_back(ScriptImport());
 	imports[ixof].Name = name; // TODO: rather make a string copy here for safety reasons
 	imports[ixof].Value = value;
@@ -88,14 +85,14 @@ const ScriptImport *SystemImports::getByIndex(int index) {
 int SystemImports::get_index_of(const String &name) {
 	IndexMap::const_iterator it = btree.find(name);
 	if (it != btree.end())
-		return it->second;
+		return it->_value;
 
 	// CHECKME: what are "mangled names" and where do they come from?
 	String mangled_name = String::FromFormat("%s$", name.GetCStr());
 	// if it's a function with a mangled name, allow it
 	it = btree.lower_bound(mangled_name);
-	if (it != btree.end() && it->first.CompareLeft(mangled_name) == 0)
-		return it->second;
+	if (it != btree.end() && it->_key.CompareLeft(mangled_name) == 0)
+		return it->_value;
 
 	if (name.GetLength() > 3) {
 		size_t c = name.FindCharReverse('^');

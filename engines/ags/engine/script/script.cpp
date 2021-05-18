@@ -31,13 +31,13 @@
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/global_audio.h"
 #include "ags/engine/ac/global_character.h"
-#include "ags/shared/ac/global_dialog.h"
-#include "ags/shared/ac/global_display.h"
+#include "ags/engine/ac/global_dialog.h"
+#include "ags/engine/ac/global_display.h"
 #include "ags/engine/ac/global_game.h"
-#include "ags/shared/ac/global_gui.h"
+#include "ags/engine/ac/global_gui.h"
 #include "ags/engine/ac/global_hotspot.h"
-#include "ags/shared/ac/global_object.h"
-#include "ags/shared/ac/global_room.h"
+#include "ags/engine/ac/global_object.h"
+#include "ags/engine/ac/global_room.h"
 #include "ags/engine/ac/inv_window.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/room.h"
@@ -229,11 +229,11 @@ void cancel_all_scripts() {
 	int aa;
 
 	for (aa = 0; aa < _G(num_scripts); aa++) {
-		if (scripts[aa].forked)
-			scripts[aa].inst->AbortAndDestroy();
+		if (_G(scripts)[aa].forked)
+			_G(scripts)[aa].inst->AbortAndDestroy();
 		else
-			scripts[aa].inst->Abort();
-		scripts[aa].numanother = 0;
+			_G(scripts)[aa].inst->Abort();
+		_G(scripts)[aa].numanother = 0;
 	}
 	_G(num_scripts) = 0;
 	/*  if (_G(gameinst)!=NULL) ->Abort(_G(gameinst));
@@ -309,17 +309,17 @@ int PrepareTextScript(ccInstance *sci, const char **tsname) {
 		_G(ccErrorString) = "script is already in execution";
 		return -3;
 	}
-	scripts[_G(num_scripts)].init();
-	scripts[_G(num_scripts)].inst = sci;
+	_G(scripts)[_G(num_scripts)].init();
+	_G(scripts)[_G(num_scripts)].inst = sci;
 	// CHECKME: this conditional block will never run, because
 	// function would have quit earlier (deprecated functionality?)
 	if (sci->IsBeingRun()) {
-		scripts[_G(num_scripts)].inst = sci->Fork();
-		if (scripts[_G(num_scripts)].inst == nullptr)
+		_G(scripts)[_G(num_scripts)].inst = sci->Fork();
+		if (_G(scripts)[_G(num_scripts)].inst == nullptr)
 			quit("unable to fork instance for secondary script");
-		scripts[_G(num_scripts)].forked = 1;
+		_G(scripts)[_G(num_scripts)].forked = 1;
 	}
-	_G(curscript) = &scripts[_G(num_scripts)];
+	_G(curscript) = &_G(scripts)[_G(num_scripts)];
 	_G(num_scripts)++;
 	if (_G(num_scripts) >= MAX_SCRIPT_AT_ONCE)
 		quit("too many nested text script instances created");
@@ -471,14 +471,14 @@ char *make_ts_func_name(const char *base, int iii, int subd) {
 void post_script_cleanup() {
 	// should do any post-script stuff here, like go to new room
 	if (_G(ccError)) quit(_G(ccErrorString));
-	ExecutingScript copyof = scripts[_G(num_scripts) - 1];
-	if (scripts[_G(num_scripts) - 1].forked)
-		delete scripts[_G(num_scripts) - 1].inst;
+	ExecutingScript copyof = _G(scripts)[_G(num_scripts) - 1];
+	if (_G(scripts)[_G(num_scripts) - 1].forked)
+		delete _G(scripts)[_G(num_scripts) - 1].inst;
 	_G(num_scripts)--;
 	_G(inside_script)--;
 
 	if (_G(num_scripts) > 0)
-		_G(curscript) = &scripts[_G(num_scripts) - 1];
+		_G(curscript) = &_G(scripts)[_G(num_scripts) - 1];
 	else {
 		_G(curscript) = nullptr;
 	}
@@ -582,14 +582,14 @@ InteractionVariable *get_interaction_variable(int varindx) {
 	if ((varindx < 0) || (varindx >= _G(numGlobalVars)))
 		quit("!invalid interaction variable specified");
 
-	return &globalvars[varindx];
+	return &_G(globalvars)[varindx];
 }
 
 InteractionVariable *FindGraphicalVariable(const char *varName) {
 	int ii;
 	for (ii = 0; ii < _G(numGlobalVars); ii++) {
-		if (ags_stricmp(globalvars[ii].Name, varName) == 0)
-			return &globalvars[ii];
+		if (ags_stricmp(_G(globalvars)[ii].Name, varName) == 0)
+			return &_G(globalvars)[ii];
 	}
 	for (size_t i = 0; i < _GP(thisroom).LocalVariables.size(); ++i) {
 		if (ags_stricmp(_GP(thisroom).LocalVariables[i].Name, varName) == 0)
@@ -673,11 +673,11 @@ int run_interaction_commandlist(InteractionCommandList *nicl, int *timesrun, int
 			break;
 		case 9:  // Run Dialog
 		{
-			int room_was = _GP(play).room_changes;
+			int roomWas = _GP(play).room_changes;
 			RunDialog(IPARAM1);
 			// if they changed room within the dialog script,
 			// the interaction command list is no longer valid
-			if (room_was != _GP(play).room_changes)
+			if (roomWas != _GP(play).room_changes)
 				return -1;
 		}
 		break;

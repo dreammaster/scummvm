@@ -34,20 +34,18 @@
 //
 //=============================================================================
 
-//include <stdlib.h>
-//include <stdarg.h>
-//include <string.h>
 #include "ags/engine/script/script_runtime.h"
 #include "ags/shared/script/script_common.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/script/cc_options.h"
-#include "ags/engine/ac/dynobj/cc_dynamicarray.h"
-#include "ags/shared/script/systemimports.h"
+#include "ags/engine/ac/dynobj/cc_dynamic_array.h"
+#include "ags/engine/script/system_imports.h"
 #include "ags/engine/ac/statobj/static_object.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
-extern ccInstance *_G(current_instance); // in script/cc_instance
+static const char ccRunnerCopyright[] = "ScriptExecuter32 v" SCOM_VERSIONSTR " (c) 2001 Chris Jones";
 
 bool ccAddExternalStaticFunction(const String &name, ScriptAPIFunction *pfn) {
 	return _GP(simp).add(name, RuntimeScriptValue().SetStaticFunction(pfn), nullptr) == 0;
@@ -85,10 +83,6 @@ void ccRemoveAllSymbols() {
 	_GP(simp).clear();
 }
 
-ccInstance *_GP(loadedInstances)[MAX_LOADED_INSTANCES] = { nullptr,
-nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-
 void nullfree(void *data) {
 	if (data != nullptr)
 		free(data);
@@ -119,11 +113,6 @@ void *ccGetSymbolAddressForPlugin(const String &name) {
 	}
 	return nullptr;
 }
-
-new_line_hook_type _G(new_line_hook) = nullptr;
-
-char ccRunnerCopyright[] = "ScriptExecuter32 v" SCOM_VERSIONSTR " (c) 2001 Chris Jones";
-int _G(maxWhileLoops) = 0;
 
 // If a while loop does this many iterations without the
 // NofityScriptAlive function getting called, the script

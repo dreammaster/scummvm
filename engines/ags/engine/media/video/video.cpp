@@ -34,7 +34,7 @@
 #include "ags/shared/ac/game_version.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
-#include "ags/shared/ac/global_display.h"
+#include "ags/engine/ac/global_display.h"
 #include "ags/shared/ac/keycode.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/sys_events.h"

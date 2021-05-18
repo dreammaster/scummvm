@@ -21,32 +21,37 @@
 //
 //=============================================================================
 
-//include <stdlib.h>
+#include "ags/lib/std/utility.h"
 #include "ags/engine/script/cc_instance.h"
 #include "ags/shared/script/cc_error.h"
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/stream.h"
+#include "ags/globals.h"
 
-namespace AGS { namespace Shared { class RoomStruct; } }
+namespace AGS3 {
+
+namespace AGS {
+namespace Shared {
+class RoomStruct;
+} // namespace Shared
+} // namespace AGS
+
 using namespace AGS::Shared;
 
 extern void quit(const char *);
- // in script/script_common
+// in script/script_common
 
-std::pair<String, String> cc_error_at_line(const char *error_msg)
-{
-    ccInstance *sci = ccInstance::GetCurrentInstance();
-    if (!sci)
-    {
-        return std::make_pair(String::FromFormat("Error (line %d): %s", _G(currentline), error_msg), String());
-    }
-    else
-    {
-        return std::make_pair(String::FromFormat("Error: %s\n", error_msg), ccInstance::GetCurrentInstance()->GetCallStack(5));
-    }
+std::pair<String, String> cc_error_at_line(const char *error_msg) {
+	ccInstance *sci = ccInstance::GetCurrentInstance();
+	if (!sci) {
+		return std::make_pair(String::FromFormat("Error (line %d): %s", _G(currentline), error_msg), String());
+	} else {
+		return std::make_pair(String::FromFormat("Error: %s\n", error_msg), ccInstance::GetCurrentInstance()->GetCallStack(5));
+	}
 }
 
-String cc_error_without_line(const char *error_msg)
-{
-    return String::FromFormat("Runtime error: %s", error_msg);
+String cc_error_without_line(const char *error_msg) {
+	return String::FromFormat("Runtime error: %s", error_msg);
 }
+
+} // namespace AGS3
