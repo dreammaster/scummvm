@@ -42,6 +42,7 @@
 #include "ags/shared/util/compress.h"
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/stream.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -688,7 +689,7 @@ HError SpriteCache::InitFile(const char *filename, const char *sprindex_filename
 	soff_t spr_initial_offs = 0;
 	int spriteFileID = 0;
 
-	_stream.reset(AssetMgr->OpenAsset(filename));
+	_stream.reset(_GP(AssetMgr)->OpenAsset(filename));
 	if (_stream == nullptr)
 		return new Error(String::FromFormat("Failed to open _GP(spriteset) file '%s'.", filename));
 
@@ -790,7 +791,7 @@ HError SpriteCache::RebuildSpriteIndex(AGS::Shared::Stream *in, sprkey_t topmost
 }
 
 bool SpriteCache::LoadSpriteIndexFile(const char *filename, int expectedFileID, soff_t spr_initial_offs, sprkey_t topmost) {
-	Stream *fidx = AssetMgr->OpenAsset(filename);
+	Stream *fidx = _GP(AssetMgr)->OpenAsset(filename);
 	if (fidx == nullptr) {
 		return false;
 	}
@@ -866,7 +867,7 @@ void SpriteCache::DetachFile() {
 }
 
 int SpriteCache::AttachFile(const char *filename) {
-	_stream.reset(AssetMgr->OpenAsset(filename));
+	_stream.reset(_GP(AssetMgr)->OpenAsset(filename));
 	if (_stream == nullptr)
 		return -1;
 	return 0;

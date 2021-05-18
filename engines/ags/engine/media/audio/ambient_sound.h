@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef AGS_ENGINE_MEDIA_AUDIO_AMBIENT_SOUND_H
-#define AGS_ENGINE_MEDIA_AUDIO_AMBIENT_SOUND_H
+#ifndef AGS_ENGINE_MEDIA_AUDIO_AMBIENTSOUND_H
+#define AGS_ENGINE_MEDIA_AUDIO_AMBIENTSOUND_H
 
 namespace AGS3 {
 
@@ -29,8 +29,9 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 class Stream;
-}
-}
+} // namespace Shared
+} // namespace AGS
+
 using namespace AGS; // FIXME later
 
 #define AMBIENCE_FULL_DIST 25

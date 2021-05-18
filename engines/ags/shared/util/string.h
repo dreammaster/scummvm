@@ -73,6 +73,8 @@ public:
 	String(const Common::String &s);
 	~String();
 
+	static const uint32 npos = 0xffffffff;
+
 	// TODO: get rid of condition in GetCStr! either make it nullable and test for consequences in engine code,
 	// or make sure it points to "" literal when string is not assigned; also check if GetNullableCStr may be removed.
 	// OR do opposite: make helper function that returns non-null cstr explicitly.
@@ -137,19 +139,19 @@ public:
 	int     Compare(const char *cstr) const;
 	int     CompareNoCase(const char *cstr) const;
 	// Compares the leftmost part of this string with given C-string
-	int     CompareLeft(const char *cstr, size_t count = -1) const;
-	int     CompareLeftNoCase(const char *cstr, size_t count = -1) const;
+	int     CompareLeft(const char *cstr, size_t count = npos) const;
+	int     CompareLeftNoCase(const char *cstr, size_t count = npos) const;
 	// Compares any part of this string with given C-string
-	int     CompareMid(const char *cstr, size_t from, size_t count = -1) const;
-	int     CompareMidNoCase(const char *cstr, size_t from, size_t count = -1) const;
+	int     CompareMid(const char *cstr, size_t from, size_t count = npos) const;
+	int     CompareMidNoCase(const char *cstr, size_t from, size_t count = npos) const;
 	// Compares the rightmost part of this string with given C-string
-	int     CompareRight(const char *cstr, size_t count = -1) const;
-	int     CompareRightNoCase(const char *cstr, size_t count = -1) const;
+	int     CompareRight(const char *cstr, size_t count = npos) const;
+	int     CompareRightNoCase(const char *cstr, size_t count = npos) const;
 
 	// These functions search for character or substring inside this string
 	// and return the index of the (first) character, or -1 if nothing found.
 	size_t  FindChar(char c, size_t from = 0) const;
-	size_t  FindCharReverse(char c, size_t from = -1) const;
+	size_t  FindCharReverse(char c, size_t from = npos) const;
 	size_t  FindString(const char *cstr, size_t from = 0) const;
 
 	// Section methods treat string as a sequence of 'fields', separated by
@@ -203,7 +205,7 @@ public:
 	// Extract N leftmost characters as a new string
 	String  Left(size_t count) const;
 	// Extract up to N characters starting from given index
-	String  Mid(size_t from, size_t count = -1) const;
+	String  Mid(size_t from, size_t count = npos) const;
 	// Extract N rightmost characters
 	String  Right(size_t count) const;
 
@@ -242,7 +244,7 @@ public:
 	// Cuts off leftmost N characters
 	void    ClipLeft(size_t count);
 	// Cuts out N characters starting from given index
-	void    ClipMid(size_t from, size_t count = -1);
+	void    ClipMid(size_t from, size_t count = npos);
 	// Cuts off rightmost N characters
 	void    ClipRight(size_t count);
 	// Cuts off leftmost part, separated by the given char; if no separator was
@@ -287,7 +289,7 @@ public:
 	// Overwrite the Nth character of the string; does not change string's length
 	void    SetAt(size_t index, char c);
 	// Makes a new string by copying up to N chars from C-string
-	void    SetString(const char *cstr, size_t length = -1);
+	void    SetString(const char *cstr, size_t length = npos);
 	// For all Trim functions, if given character value is 0, all whitespace
 	// characters (space, tabs, CRLF) are removed.
 	// Remove heading and trailing characters from the string
@@ -300,7 +302,7 @@ public:
 	// Truncate the string to the leftmost N characters
 	void    TruncateToLeft(size_t count);
 	// Truncate the string to the middle N characters
-	void    TruncateToMid(size_t from, size_t count = -1);
+	void    TruncateToMid(size_t from, size_t count = npos);
 	// Truncate the string to the rightmost N characters
 	void    TruncateToRight(size_t count);
 	// Truncate the string to the leftmost part, separated by the given char;

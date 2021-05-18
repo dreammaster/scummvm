@@ -243,6 +243,14 @@ MODULE_OBJS = \
 	engine/gui/my_push_button.o \
 	engine/gui/my_textbox.o \
 	engine/gui/new_control.o \
+	engine/media/audio/ambient_sound.o \
+	engine/media/audio/audio.o \
+	engine/media/audio/clip_my_midi.o \
+	engine/media/audio/queued_audio_item.o \
+	engine/media/audio/sound.o \
+	engine/media/audio/sound_cache.o \
+	engine/media/audio/sound_clip.o \
+	engine/media/video/video.o \
 	engine/script/cc_instance.o \
 	engine/script/executing_script.o \
 	engine/script/exports.o \

@@ -20,18 +20,52 @@
  *
  */
 
-#ifndef AGS_ENGINE_MEDIA_VIDEO_VIDEO_H
-#define AGS_ENGINE_MEDIA_VIDEO_VIDEO_H
+#ifndef AGS_ENGINE_MEDIA_AUDIO_CLIP_MYMIDI_H
+#define AGS_ENGINE_MEDIA_AUDIO_CLIP_MYMIDI_H
+
+#include "ags/engine/media/audio/sound_clip.h"
+#include "ags/engine/media/audio/audio_defines.h"
 
 namespace AGS3 {
 
-extern bool play_avi_video(const char *name, int skip, int flags, bool showError);
-extern bool play_mpeg_video(const char *name, int skip, int flags, bool showError);
-extern bool play_theora_video(const char *name, int skip, int flags, bool showError);
-extern bool play_flc_file(int numb, int playflags);
+// MIDI
+struct MYMIDI : public SOUNDCLIP {
+	Audio::Mixer *_mixer;
+	Common::SeekableReadStream *_data;
+	int lengthInSeconds;
+	SoundClipState _state;
 
-// Update video playback if the display mode has changed
-void video_on_gfxmode_changed();
+	MYMIDI(Common::SeekableReadStream *data, bool repeat);
+	~MYMIDI() override { destroy(); }
+
+	void destroy() override;
+
+	void poll() override;
+
+	void seek(int pos) override;
+
+	int get_pos() override;
+
+	int get_pos_ms() override;
+
+	int get_length_ms() override;
+
+	void pause() override;
+
+	void resume() override;
+
+	int get_sound_type() const override {
+		return MUS_MIDI;
+	}
+
+	int play() override;
+	int play_from(int position) override;
+	bool is_playing() const override;
+	void set_volume(int volume) override;
+	void set_panning(int newPanning) override;
+	void set_speed(int new_speed) override;
+	void adjust_volume() override;
+};
 
 } // namespace AGS3
 

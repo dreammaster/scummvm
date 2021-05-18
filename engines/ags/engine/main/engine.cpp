@@ -345,12 +345,12 @@ void engine_locate_speech_pak()
         String speech_filepath = find_assetlib(speech_file);
         if (!speech_filepath.IsEmpty()) {
             Debug::Printf("Initializing speech vox");
-            if (AssetMgr->AddLibrary(speech_filepath) != Shared::kAssetNoError) {
+            if (_GP(AssetMgr)->AddLibrary(speech_filepath) != Shared::kAssetNoError) {
                 platform->DisplayAlert("Unable to read voice pack, file could be corrupted or of unknown format.\nSpeech voice-over will be disabled.");
                 return;
             }
             // TODO: why is this read right here??? move this to InitGameState!
-            Stream *speechsync = AssetMgr->OpenAsset("syncdata.dat");
+            Stream *speechsync = _GP(AssetMgr)->OpenAsset("syncdata.dat");
             if (speechsync != nullptr) {
                 // this game has voice lip sync
                 int lipsync_fmt = speechsync->ReadInt32();
@@ -394,7 +394,7 @@ void engine_locate_audio_pak()
     String music_filepath = find_assetlib(music_file);
     if (!music_filepath.IsEmpty())
     {
-        if (AssetMgr->AddLibrary(music_filepath) == kAssetNoError)
+        if (_GP(AssetMgr)->AddLibrary(music_filepath) == kAssetNoError)
         {
             Debug::Printf(kDbgMsg_Info, "%s found and initialized.", music_file.GetCStr());
             _GP(play).separate_music_lib = 1;
@@ -416,7 +416,7 @@ void engine_locate_audio_pak()
 // Assign asset locations to the AssetManager
 void engine_assign_assetpaths()
 {
-    AssetMgr->AddLibrary(_GP(ResPaths).GamePak.Path, ",audio"); // main pack may have audio bundled too
+    _GP(AssetMgr)->AddLibrary(_GP(ResPaths).GamePak.Path, ",audio"); // main pack may have audio bundled too
     // The asset filters are currently a workaround for limiting search to certain locations;
     // this is both an optimization and to prevent unexpected behavior.
     // - empty filter is for regular files
@@ -425,17 +425,17 @@ void engine_assign_assetpaths()
     // NOTE: we add extra optional directories first because they should have higher priority
     // TODO: maybe change AssetManager library order to stack-like later (last added = top priority)?
     if (!_GP(ResPaths).DataDir2.IsEmpty() && Path::ComparePaths(_GP(ResPaths).DataDir2, _GP(ResPaths).DataDir) != 0)
-        AssetMgr->AddLibrary(_GP(ResPaths).DataDir2, ",audio,voice"); // dir may have anything
+        _GP(AssetMgr)->AddLibrary(_GP(ResPaths).DataDir2, ",audio,voice"); // dir may have anything
     if (!_GP(ResPaths).AudioDir2.IsEmpty() && Path::ComparePaths(_GP(ResPaths).AudioDir2, _GP(ResPaths).DataDir) != 0)
-        AssetMgr->AddLibrary(_GP(ResPaths).AudioDir2, "audio");
+        _GP(AssetMgr)->AddLibrary(_GP(ResPaths).AudioDir2, "audio");
     if (!_GP(ResPaths).VoiceDir2.IsEmpty() && Path::ComparePaths(_GP(ResPaths).VoiceDir2, _GP(ResPaths).DataDir) != 0)
-        AssetMgr->AddLibrary(_GP(ResPaths).VoiceDir2, "voice");
+        _GP(AssetMgr)->AddLibrary(_GP(ResPaths).VoiceDir2, "voice");
 
-    AssetMgr->AddLibrary(_GP(ResPaths).DataDir, ",audio,voice"); // dir may have anything
+    _GP(AssetMgr)->AddLibrary(_GP(ResPaths).DataDir, ",audio,voice"); // dir may have anything
     if (!_GP(ResPaths).AudioPak.Path.IsEmpty())
-        AssetMgr->AddLibrary(_GP(ResPaths).AudioPak.Path, "audio");
+        _GP(AssetMgr)->AddLibrary(_GP(ResPaths).AudioPak.Path, "audio");
     if (!_GP(ResPaths).SpeechPak.Path.IsEmpty())
-        AssetMgr->AddLibrary(_GP(ResPaths).SpeechPak.Path, "voice");
+        _GP(AssetMgr)->AddLibrary(_GP(ResPaths).SpeechPak.Path, "voice");
 }
 
 void engine_init_keyboard()
@@ -1073,7 +1073,7 @@ bool engine_init_gamedata()
         return false;
 
     // Try init game lib
-    AssetError asset_err = AssetMgr->AddLibrary(_GP(usetup).main_data_file);
+    AssetError asset_err = _GP(AssetMgr)->AddLibrary(_GP(usetup).main_data_file);
     if (asset_err != kAssetNoError)
     {
         platform->DisplayAlert("ERROR: The game data is missing, is of unsupported format or corrupt.\nFile: '%s'", _GP(usetup).main_data_file.GetCStr());
@@ -1253,7 +1253,7 @@ static void engine_print_info(const std::set<String> &keys, ConfigTree *user_cfg
 // It helps us direct Allegro to our game data location, because it won't know.
 static int al_find_resource(char *dest, const char* resource, int dest_size)
 {
-    String path = AssetMgr->FindAssetFileOnly(resource);
+    String path = _GP(AssetMgr)->FindAssetFileOnly(resource);
     if (!path.IsEmpty())
     {
         snprintf(dest, dest_size, "%s", path.GetCStr());

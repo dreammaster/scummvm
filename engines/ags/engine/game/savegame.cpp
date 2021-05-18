@@ -333,7 +333,7 @@ void DoBeforeRestore(PreservedParams &pp) {
 
 	// cleanup dynamic sprites
 	// NOTE: sprite 0 is a special constant sprite that cannot be dynamic
-	for (int i = 1; i < _GP(spriteset).GetSpriteSlotCount(); ++i) {
+	for (int i = 1; i < (int)_GP(spriteset).GetSpriteSlotCount(); ++i) {
 		if (_GP(game).SpriteInfos[i].Flags & SPF_DYNAMICALLOC) {
 			// do this early, so that it changing _GP(guibuts) doesn't
 			// affect the restored data
@@ -568,10 +568,10 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 				ch->set_volume_direct(chan_info.VolAsPercent, chan_info.Vol);
 				ch->set_speed(chan_info.Speed);
 				ch->set_panning(chan_info.Pan);
-				ch->panningAsPercentage = chan_info.PanAsPercent;
-				ch->xSource = chan_info.XSource;
-				ch->ySource = chan_info.YSource;
-				ch->maximumPossibleDistanceAway = chan_info.MaxDist;
+				ch->_panningAsPercentage = chan_info.PanAsPercent;
+				ch->_xSource = chan_info.XSource;
+				ch->_ySource = chan_info.YSource;
+				ch->_maximumPossibleDistanceAway = chan_info.MaxDist;
 			}
 		}
 		if ((cf_in_chan > 0) && (lock.GetChannel(cf_in_chan) != nullptr))

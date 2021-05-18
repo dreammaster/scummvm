@@ -110,7 +110,7 @@ HRoomFileError OpenRoomFileFromAsset(const String &filename, RoomDataSource &src
 	// Cleanup source struct
 	src = RoomDataSource();
 	// Try to find and open room file
-	Stream *in = AssetMgr->OpenAsset(filename);
+	Stream *in = _GP(AssetMgr)->OpenAsset(filename);
 	if (in == nullptr)
 		return new RoomFileError(kRoomFileErr_FileOpenFailed, String::FromFormat("Filename: %s.", filename.GetCStr()));
 	src.Filename = filename;

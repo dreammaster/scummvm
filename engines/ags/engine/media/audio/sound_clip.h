@@ -26,10 +26,13 @@
 //
 //=============================================================================
 
-#ifndef AGS_ENGINE_MEDIA_AUDIO_SOUND_CLIP_H
-#define AGS_ENGINE_MEDIA_AUDIO_SOUND_CLIP_H
+#ifndef AGS_ENGINE_MEDIA_AUDIO_SOUNDCLIP_H
+#define AGS_ENGINE_MEDIA_AUDIO_SOUNDCLIP_H
 
 #include "ags/engine/util/mutex.h"
+#include "audio/mixer.h"
+#include "audio/audiostream.h"
+#include "common/stream.h"
 
 namespace AGS3 {
 
@@ -39,34 +42,34 @@ namespace AGS3 {
 // Improving this situation is only possible with massive refactory of
 // sound clip use, taking backwards-compatible audio system in account.
 
+enum SoundClipState {
+	SoundClipInitial, SoundClipPlaying, SoundClipPaused, SoundClipStopped
+};
+
 struct SOUNDCLIP {
-	int priority;
-	int sourceClipType;
-	// absolute volume, set by implementations only!
-	int vol;
-	// current relative volume, in percents
-	int volAsPercentage;
-	// volModifier is used when there's a need to temporarily change and
-	// the restore the clip's absolute volume (vol)
-	int volModifier;
-	int panning;
-	int panningAsPercentage;
-	int xSource, ySource;
-	int maximumPossibleDistanceAway;
-	int directionalVolModifier;
-	bool repeat;
-	void *sourceClip;
+	int _priority;
+	int _sourceClipType;
+	int _vol;
+	int _volAsPercentage;
+	int _volModifier;
+	int _panning;
+	int _panningAsPercentage;
+	int _xSource, _ySource;		// Used for positioning sounds in game rooms
+	int _maximumPossibleDistanceAway;
+	int _directionalVolModifier;
+	bool _repeat;
+	void *_sourceClip;		// Pointer to source object that spawned the clip
 
 	virtual void poll() = 0;
 	virtual void destroy() = 0;
 	// apply volume directly to playback; volume is given in units of 255
 	// NOTE: this completely ignores volAsPercentage and muted property
-	virtual void set_volume(int) = 0;
-	virtual void seek(int) = 0;
-	virtual int get_pos() = 0;    // return 0 to indicate seek not supported
+	virtual void set_volume(int volume) = 0;
+	virtual void seek(int offset) = 0;
+	virtual int get_pos() = 0; // return 0 to indicate seek not supported
 	virtual int get_pos_ms() = 0; // this must always return valid value if poss
 	virtual int get_length_ms() = 0; // return total track length in ms (or 0)
-	virtual int get_sound_type() = 0;
+	virtual int get_sound_type() const = 0;
 	virtual int play() = 0;
 	virtual int play_from(int position) = 0;
 
@@ -79,32 +82,34 @@ struct SOUNDCLIP {
 	virtual bool is_playing() const = 0; // true if playing or paused. false if never played or stopped.
 
 	inline int get_speed() const {
-		return speed;
+		return _speed;
 	}
 
 	// Gets clip's volume property, as percentage (0 - 100);
 	// note this may not be the real volume of playback (which could e.g. be muted)
 	inline int get_volume() const {
-		return volAsPercentage;
+		return _volAsPercentage;
 	}
 
 	inline bool is_muted() const {
-		return muted;
+		return _muted;
 	}
 
 	// Sets the current volume property, as percentage (0 - 100).
 	inline void set_volume_percent(int volume) {
-		volAsPercentage = volume;
-		if (!muted)
+		_volAsPercentage = volume;
+		if (!_muted)
 			set_volume((volume * 255) / 100);
 	}
 
-	// Explicitly defines both percentage and absolute volume value,
-	// without calculating it from given percentage.
-	// NOTE: this overrides the mute
+	/**
+	 * Explicitly defines both percentage and absolute volume value,
+	 * without calculating it from given percentage.
+	 * NOTE: this overrides the mute
+	 */
 	inline void set_volume_direct(int vol_percent, int vol_absolute) {
-		muted = false;
-		volAsPercentage = vol_percent;
+		_muted = false;
+		_volAsPercentage = vol_percent;
 		set_volume(vol_absolute);
 	}
 
@@ -112,48 +117,83 @@ struct SOUNDCLIP {
 	// for the future reference; when unmuted, that property is
 	// used to restart previous volume.
 	inline void set_mute(bool enable) {
-		muted = enable;
+		_muted = enable;
 		if (enable)
 			set_volume(0);
 		else
-			set_volume((volAsPercentage * 255) / 100);
+			set_volume((_volAsPercentage * 255) / 100);
 	}
 
 	// Apply arbitrary permanent volume modifier, in absolute units (0 - 255);
 	// this is distinct value that is used in conjunction with current volume
 	// (can be both positive and negative).
 	inline void apply_volume_modifier(int mod) {
-		volModifier = mod;
+		_volModifier = mod;
 		adjust_volume();
 	}
 
-	// Apply permanent directional volume modifier, in absolute units (0 - 255)
-	// this is distinct value that is used in conjunction with current volume
-	// (can be both positive and negative).
+	/**
+	 * Apply permanent directional volume modifier, in absolute units (0 - 255)
+	 * this is distinct value that is used in conjunction with current volume
+	 * (can be both positive and negative).
+	 */
 	inline void apply_directional_modifier(int mod) {
-		directionalVolModifier = mod;
+		_directionalVolModifier = mod;
 		adjust_volume();
 	}
 
 	virtual void adjust_volume() = 0;
 
 	SOUNDCLIP();
-	virtual ~SOUNDCLIP();
-
+	virtual ~SOUNDCLIP() {}
 
 protected:
 	// mute mode overrides the volume; if set, any volume assigned is stored
 	// in properties, but not applied to playback itself
-	bool muted;
+	bool _muted;
 
 	// speed of playback, in clip ms per real second
-	int speed;
+	int _speed;
 
 	// helper function for calculating volume with applied modifiers
 	inline int get_final_volume() const {
-		int final_vol = vol + volModifier + directionalVolModifier;
+		int final_vol = _vol + _volModifier + _directionalVolModifier;
 		return final_vol >= 0 ? final_vol : 0;
 	}
+};
+
+struct SoundClipWaveBase : public SOUNDCLIP {
+	Audio::Mixer *_mixer;
+	Audio::AudioStream *_stream;
+	Audio::SoundHandle _soundHandle;
+	SoundClipState _state;
+	Audio::Mixer::SoundType _soundType = Audio::Mixer::kPlainSoundType;
+
+	SoundClipWaveBase(Audio::AudioStream *stream, int volume, bool repeat = false);
+	~SoundClipWaveBase() override { destroy(); }
+
+	void destroy() override;
+	void poll() override;
+	int play() override;
+	int play_from(int position) override;
+	void pause() override;
+	void resume() override;
+	bool is_playing() const override;
+	void seek(int offset) override;
+	int get_pos() override;
+	int get_pos_ms() override;
+	int get_length_ms() override;
+	void set_volume(int volume) override;
+	void set_panning(int newPanning) override;
+	void set_speed(int new_speed) override;
+	void adjust_volume() override;
+};
+
+template<int SOUND_TYPE>
+struct SoundClipWave : public SoundClipWaveBase {
+	SoundClipWave(Audio::AudioStream *stream, int volume, bool repeat = false) :
+		SoundClipWaveBase(stream, volume, repeat) {}
+	int get_sound_type() const { return SOUND_TYPE; }
 };
 
 } // namespace AGS3

@@ -27,6 +27,7 @@
 #include "ags/shared/font/wfn_font_renderer.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/util/stream.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -134,11 +135,11 @@ bool WFNFontRenderer::LoadFromDiskEx(int fontNumber, int fontSize, const FontRen
 	soff_t asset_size = 0;
 
 	file_name.Format("agsfnt%d.wfn", fontNumber);
-	ffi = AssetMgr->OpenAsset(file_name, &asset_size);
+	ffi = _GP(AssetMgr)->OpenAsset(file_name, &asset_size);
 	if (ffi == nullptr) {
 		// actual font not found, try font 0 instead
 		file_name = "agsfnt0.wfn";
-		ffi = AssetMgr->OpenAsset(file_name, &asset_size);
+		ffi = _GP(AssetMgr)->OpenAsset(file_name, &asset_size);
 		if (ffi == nullptr)
 			return false;
 	}

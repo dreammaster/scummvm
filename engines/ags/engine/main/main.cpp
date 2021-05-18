@@ -110,7 +110,7 @@ int psp_gfx_smooth_sprites = 0;
 
 void main_pre_init() {
 	_G(our_eip) = -999;
-	AssetMgr->SetSearchPriority(Shared::kAssetPriorityDir);
+	_GP(AssetMgr)->SetSearchPriority(Shared::kAssetPriorityDir);
 	_GP(play).takeover_data = 0;
 }
 

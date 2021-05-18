@@ -22,6 +22,7 @@
 
 #include "ags/lib/alfont/alfont.h"
 #include "ags/shared/core/platform.h"
+#include "ags/globals.h"
 
 #define AGS_OUTLINE_FONT_FIX (!AGS_PLATFORM_OS_WINDOWS)
 
@@ -92,7 +93,7 @@ bool TTFFontRenderer::IsBitmapFont() {
 bool TTFFontRenderer::LoadFromDiskEx(int fontNumber, int fontSize, const FontRenderParams *params) {
 	String file_name = String::FromFormat("agsfnt%d.ttf", fontNumber);
 	soff_t lenof = 0;
-	Stream *reader = AssetMgr->OpenAsset(file_name, &lenof);
+	Stream *reader = _GP(AssetMgr)->OpenAsset(file_name, &lenof);
 	byte *membuffer;
 
 	if (reader == nullptr)

@@ -56,7 +56,7 @@ bool init_translation(const String &lang, const String &fallback_lang, bool quit
 		return false;
 	_G(trans_filename) = String::FromFormat("%s.tra", lang.GetCStr());
 
-	Stream *language_file = AssetMgr->OpenAsset(_G(trans_filename));
+	Stream *language_file = _GP(AssetMgr)->OpenAsset(_G(trans_filename));
 	if (language_file == nullptr) {
 		Debug::Printf(kDbgMsg_Error, "Cannot open translation: %s", _G(trans_filename).GetCStr());
 		return false;

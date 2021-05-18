@@ -355,7 +355,7 @@ static HSaveError restore_game_views(Stream *in) {
 }
 
 static HSaveError restore_game_audioclips_and_crossfade(Stream *in, RestoredData &r_data) {
-	if (in->ReadInt32() != _GP(game).audioClips.size()) {
+	if (in->ReadInt32() != (int)_GP(game).audioClips.size()) {
 		return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching number of Audio Clips.");
 	}
 

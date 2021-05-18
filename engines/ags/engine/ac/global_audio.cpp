@@ -32,7 +32,6 @@
 #include "ags/engine/debugging/debugger.h"
 #include "ags/shared/game/room_struct.h"
 #include "ags/engine/main/engine.h"
-#include "ags/engine/media/audio/audio_core.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/timer.h"
 #include "ags/shared/util/string_compat.h"
@@ -80,7 +79,7 @@ void PlayAmbientSound(int channel, int sndnum, int vol, int x, int y) {
 
 		debug_script_log("Playing ambient sound %d on channel %d", sndnum, channel);
 		_GP(ambient)[channel].channel = channel;
-		asound->priority = 15;  // ambient sound higher priority than normal sfx
+		asound->_priority = 15;  // ambient sound higher priority than normal sfx
 		set_clip_to_channel(channel, asound);
 	}
 	// calculate the maximum distance away the player can be, using X
@@ -155,7 +154,7 @@ int PlaySoundEx(int val1, int channel) {
 		return -1;
 	}
 
-	soundfx->priority = 10;
+	soundfx->_priority = 10;
 	soundfx->set_volume(_GP(play).sound_volume);
 	set_clip_to_channel(channel, soundfx);
 	return channel;
@@ -358,8 +357,10 @@ void SetDigitalMasterVolume(int newvol) {
 	if ((newvol < 0) | (newvol > 100))
 		quit("!SetDigitalMasterVolume: invalid volume - must be from 0-100");
 	_GP(play).digital_master_volume = newvol;
+#if !AGS_PLATFORM_SCUMMVM
 	auto newvol_f = static_cast<float>(newvol) / 100.0;
 	audio_core_set_master_volume(newvol_f);
+#endif
 }
 
 int GetCurrentMusic() {

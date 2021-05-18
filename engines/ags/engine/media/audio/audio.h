@@ -23,6 +23,7 @@
 #ifndef AGS_ENGINE_MEDIA_AUDIO_AUDIO_H
 #define AGS_ENGINE_MEDIA_AUDIO_AUDIO_H
 
+#include "ags/lib/std/array.h"
 #include "ags/engine/media/audio/audio_defines.h"
 #include "ags/shared/ac/dynobj/script_audio_clip.h"
 #include "ags/engine/ac/dynobj/script_audio_channel.h"
@@ -46,10 +47,7 @@ private:
 	AudioChannelsLock &operator=(AudioChannelsLock const &); // not copy-assignable
 
 public:
-	static AGS::Engine::Mutex s_mutex;
-	AudioChannelsLock()
-		: MutexLock(s_mutex) {
-	}
+	AudioChannelsLock();
 
 	// Gets a clip from the channel
 	SOUNDCLIP *GetChannel(int index);
@@ -125,8 +123,6 @@ int         prepare_for_new_music();
 ScriptAudioClip *get_audio_clip_for_music(int mnum);
 SOUNDCLIP *load_music_from_disk(int mnum, bool doRepeat);
 void        newmusic(int mnum);
-
-extern volatile bool _audio_doing_crossfade;
 
 extern void cancel_scheduled_music_update();
 extern void schedule_music_update_at(AGS_Clock::time_point);

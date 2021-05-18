@@ -57,6 +57,7 @@ using Version = AGS::Shared::Version;
 namespace AGS {
 namespace Shared {
 
+class AssetManager;
 class Bitmap;
 class DebugManager;
 struct Font;
@@ -214,7 +215,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup agsplatformdriver globals
+	 * \defgroup ags_platform_driver globals
 	 * @{
 	 */
 
@@ -226,7 +227,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup agsplugin globals
+	 * \defgroup ags_plugin globals
 	 * @{
 	 */
 
@@ -235,12 +236,21 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup agsstaticobject globals
+	 * \defgroup ags_static_object globals
 	 * @{
 	 */
 
 	AGSStaticObject *_GlobalStaticManager;
 	StaticGame      *_GameStaticManager;
+
+	/**@}*/
+
+	/**
+	 * \defgroup asset_manager globals
+	 * @{
+	 */
+
+	std::unique_ptr<Shared::AssetManager> *_AssetMgr;
 
 	/**@}*/
 
@@ -252,7 +262,7 @@ public:
 	std::array<SOUNDCLIP *> *_audioChannels;
 	std::array<AmbientSound> *_ambient;
 
-//	volatile bool _audio_doing_crossfade = false;
+	volatile bool _audio_doing_crossfade = false;
 	ScriptAudioChannel *_scrAudioChannel;
 	char _acaudio_buffer[256];
 	int _reserved_channel_count = 0;
@@ -260,7 +270,7 @@ public:
 	// This is an indicator of a music played by an old audio system
 	// (to distinguish from the new system API)
 	int _current_music_type = 0;
-	// _G(crossFading) is >0 (channel number of new track), or -1 (old
+	// crossFading is >0 (channel number of new track), or -1 (old
 	// track fading out, no new track)
 	int _crossFading = 0, _crossFadeVolumePerStep = 0, _crossFadeStep = 0;
 	int _crossFadeVolumeAtStart = 0;
@@ -400,7 +410,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup cscdialog globals
+	 * \defgroup csc_dialog globals
 	 * @{
 	 */
 
@@ -823,7 +833,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup guibutton globals
+	 * \defgroup gui_button globals
 	 * @{
 	 */
 
@@ -833,7 +843,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup guidialog globals
+	 * \defgroup gui_dialog globals
 	 * @{
 	 */
 
@@ -855,7 +865,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup guiinv globals
+	 * \defgroup gui_inv globals
 	 * @{
 	 */
 
@@ -865,7 +875,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup guilabel globals
+	 * \defgroup gui_label globals
 	 * @{
 	 */
 
@@ -875,7 +885,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup guilistbox globals
+	 * \defgroup gui_listbox globals
 	 * @{
 	 */
 
@@ -885,7 +895,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup guimain globals
+	 * \defgroup gui_main globals
 	 * @{
 	 */
 
@@ -896,7 +906,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup _G(guislider) globals
+	 * \defgroup gui_slider globals
 	 * @{
 	 */
 
@@ -906,7 +916,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup guitextbox globals
+	 * \defgroup gui_textbox globals
 	 * @{
 	 */
 
@@ -926,7 +936,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup invwindow globals
+	 * \defgroup inv_window globals
 	 * @{
 	 */
 
@@ -997,7 +1007,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup managedobjectpool globals
+	 * \defgroup managed_object_pool globals
 	 * @{
 	 */
 
@@ -1033,7 +1043,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup mousew32 globals
+	 * \defgroup mouse_w32 globals
 	 * @{
 	 */
 
@@ -1170,12 +1180,12 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup soundcache globals
+	 * \defgroup sound_cache globals
 	 * @{
 	 */
 
-//	sound_cache_entry_t *_sound_cache_entries = nullptr;
-//	unsigned int _sound_cache_counter = 0;
+	sound_cache_entry_t *_sound_cache_entries = nullptr;
+	unsigned int _sound_cache_counter = 0;
 
 	/**@}*/
 
@@ -1189,7 +1199,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup systemimports globals
+	 * \defgroup system_imports globals
 	 * @{
 	 */
 
@@ -1235,7 +1245,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup walkablearea globals
+	 * \defgroup walkable_area globals
 	 * @{
 	 */
 
@@ -1244,7 +1254,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup walkbehind globals
+	 * \defgroup walk_behind globals
 	 * @{
 	 */
 
@@ -1261,7 +1271,7 @@ public:
 	/**@}*/
 
 	/**
-	 * \defgroup wordsdictionary globals
+	 * \defgroup words_dictionary globals
 	 * @{
 	 */
 

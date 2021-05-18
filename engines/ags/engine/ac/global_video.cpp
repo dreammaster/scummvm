@@ -23,6 +23,7 @@
 #include "ags/engine/ac/game_setup.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/global_audio.h"
+#include "ags/engine/ac/global_display.h"
 #include "ags/engine/ac/global_game.h"
 #include "ags/engine/ac/global_video.h"
 #include "ags/engine/ac/path_helper.h"
@@ -66,10 +67,17 @@ void pause_sound_if_necessary_and_play_video(const char *name, int skip, int fla
 		ambientWas[i] = _GP(ambient)[i].channel;
 
 	if ((strlen(name) > 3) && (ags_stricmp(&name[strlen(name) - 3], "ogv") == 0)) {
-		play_theora_video(name, skip, flags);
+		play_theora_video(name, skip, flags, true);
+	} else if ((strlen(name) > 3) && (ags_stricmp(&name[strlen(name) - 3], "mpg") == 0)) {
+		play_mpeg_video(name, skip, flags, true);
+	} else if ((strlen(name) > 3) && (ags_stricmp(&name[strlen(name) - 3], "avi") == 0)) {
+		play_avi_video(name, skip, flags, true);
 	} else {
-		debug_script_warn("PlayVideo: file '%s' is an unsupported format.", name);
-		return;
+		// Unsure what the video type is, so try each in turn
+		if (!play_avi_video(name, skip, flags, false) &&
+			!play_mpeg_video(name, skip, flags, false) &&
+			!play_theora_video(name, skip, flags, false))
+			Display("Unsupported video '%s'", name);
 	}
 
 	if (flags < 10) {

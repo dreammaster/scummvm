@@ -37,7 +37,6 @@
 #include "ags/engine/main/graphics_mode.h"
 #include "ags/engine/main/engine.h"
 #include "ags/engine/main/main.h"
-#include "ags/engine/media/audio/audio_core.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/shared/util/string_compat.h"
 #include "ags/shared/debugging/out.h"
@@ -177,8 +176,10 @@ void System_SetVolume(int newvol) {
 		quit("!System.Volume: invalid volume - must be from 0-100");
 
 	_GP(play).digital_master_volume = newvol;
+#if !AGS_PLATFORM_SCUMMVM
 	auto newvol_f = static_cast<float>(newvol) / 100.0;
 	audio_core_set_master_volume(newvol_f);
+#endif
 }
 
 const char *System_GetRuntimeInfo() {

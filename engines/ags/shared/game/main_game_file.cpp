@@ -207,10 +207,10 @@ HGameFileError OpenMainGameFileFromDefaultAsset(MainGameSource &src) {
 	src = MainGameSource();
 	// Try to find and open main game file
 	String filename = MainGameSource::DefaultFilename_v3;
-	Stream *in = AssetMgr->OpenAsset(filename);
+	Stream *in = _GP(AssetMgr)->OpenAsset(filename);
 	if (!in) {
 		filename = MainGameSource::DefaultFilename_v2;
-		in = AssetMgr->OpenAsset(filename);
+		in = _GP(AssetMgr)->OpenAsset(filename);
 	}
 	if (!in)
 		return new MainGameFileError(kMGFErr_FileOpenFailed, String::FromFormat("Filename: %s.", filename.GetCStr()));
@@ -518,8 +518,8 @@ void UpgradeAudio(GameSetupStruct &game, GameDataVersion data_ver) {
 	audioclips.reserve(1000);
 	std::vector<String> assets;
 	// Read audio clip names from from registered libraries
-	for (size_t i = 0; i < AssetMgr->GetLibraryCount(); ++i) {
-		const AssetLibInfo *game_lib = AssetMgr->GetLibraryInfo(i);
+	for (size_t i = 0; i < _GP(AssetMgr)->GetLibraryCount(); ++i) {
+		const AssetLibInfo *game_lib = _GP(AssetMgr)->GetLibraryInfo(i);
 		if (Path::IsDirectory(game_lib->BasePath))
 			continue; // might be a directory
 
@@ -533,8 +533,8 @@ void UpgradeAudio(GameSetupStruct &game, GameDataVersion data_ver) {
 	// within AssetManager to avoid doing this in place here. Alternatively we could maybe
 	// make AssetManager to do directory scans by demand and fill AssetInfos...
 	// but that have to be done consistently if done at all.
-	for (size_t i = 0; i < AssetMgr->GetLibraryCount(); ++i) {
-		const AssetLibInfo *game_lib = AssetMgr->GetLibraryInfo(i);
+	for (size_t i = 0; i < _GP(AssetMgr)->GetLibraryCount(); ++i) {
+		const AssetLibInfo *game_lib = _GP(AssetMgr)->GetLibraryInfo(i);
 		if (!Path::IsDirectory(game_lib->BasePath))
 			continue; // might be a library
 

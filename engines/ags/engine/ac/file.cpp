@@ -397,7 +397,7 @@ Stream *LocateAsset(const AssetPath &path, size_t &asset_size) {
 	String assetname = path.Name;
 	String filter = path.Filter;
 	soff_t asset_sz = 0;
-	Stream *asset_stream = AssetMgr->OpenAsset(assetname, filter, &asset_sz);
+	Stream *asset_stream = _GP(AssetMgr)->OpenAsset(assetname, filter, &asset_sz);
 	asset_size = asset_sz;
 	return asset_stream;
 }
@@ -482,7 +482,7 @@ PACKFILE *PackfileFromAsset(const AssetPath &path, size_t &asset_size) {
 bool DoesAssetExistInLib(const AssetPath &path) {
 	String assetname = path.Name;
 	String filter = path.Filter;
-	return AssetMgr->DoesAssetExist(assetname, filter);
+	return _GP(AssetMgr)->DoesAssetExist(assetname, filter);
 }
 
 String find_assetlib(const String &filename) {

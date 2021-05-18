@@ -20,26 +20,34 @@
  *
  */
 
-//=============================================================================
-//
-// Common definitions for audio core system.
-//
-//=============================================================================
+#ifndef AGS_ENGINE_MEDIA_AUDIO_SOUNDCACHE_H
+#define AGS_ENGINE_MEDIA_AUDIO_SOUNDCACHE_H
 
-#ifndef AGS_ENGINE_MEDIA_AUDIO_AUDIO_CORE_DEFS_H
-#define AGS_ENGINE_MEDIA_AUDIO_AUDIO_CORE_DEFS_H
+#include "ags/engine/ac/asset_helper.h"
+#include "common/stream.h"
 
 namespace AGS3 {
 
-// Audio slot (playback status
-enum AudioCorePlayState {
-	PlayStateInitial,
-	PlayStatePlaying,
-	PlayStatePaused,
-	PlayStateStopped,
-	PlayStateFinished,
-	PlayStateError
+// PSP: A simple sound cache. The size can be configured in the config file.
+// The data rate while reading from disk on the PSP is usually between 500 to 900 kiB/s,
+// caching the last used sound files therefore improves game performance.
+
+//#define SOUND_CACHE_DEBUG
+
+struct sound_cache_entry_t {
+	char *file_name;
+	int number;
+	int free;
+	unsigned int last_used;
+	unsigned int size;
+	char *data;
+	int reference;
 };
+
+void clear_sound_cache();
+void sound_cache_free(char *buffer);
+char *get_cached_sound(const AssetPath &asset_name, size_t &size);
+Common::SeekableReadStream *get_cached_sound(const AssetPath &asset_name);
 
 } // namespace AGS3
 

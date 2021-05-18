@@ -23,6 +23,7 @@
 #include "ags/globals.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/shared/ac/sprite_cache.h"
+#include "ags/shared/core/asset_manager.h"
 #include "ags/shared/debugging/debug_manager.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/shared/font/ttf_font_renderer.h"
@@ -101,12 +102,15 @@ Globals *g_globals;
 Globals::Globals() {
 	g_globals = this;
 
-	// agsplugin.cpp globals
+	// ags_plugin.cpp globals
 	_glVirtualScreenWrap = new AGS::Shared::Bitmap();
 
-	// agsstaticobject.cpp globals
+	// ags_static_object.cpp globals
 	_GlobalStaticManager = new AGSStaticObject();
 	_GameStaticManager = new StaticGame();
+
+	// asset_manager.cpp globals
+	_AssetMgr = new std::unique_ptr<Shared::AssetManager>();
 
 	// audio.cpp globals
 	_audioChannels = new std::array<SOUNDCLIP *>(MAX_SOUND_CHANNELS + 1);
@@ -129,7 +133,7 @@ Globals::Globals() {
 	// cc_dynamicarray.cpp globals
 	_globalDynamicArray = new CCDynamicArray();
 
-	// cscdialog.cpp globals
+	// csc_dialog.cpp globals
 	_vobjs = new NewControl *[MAXCONTROLS];
 	_oswi = new OnScreenWindow[MAXSCREENWINDOWS];
 	Common::fill(_vobjs, _vobjs + MAXCONTROLS, (NewControl *)nullptr);
@@ -145,7 +149,7 @@ Globals::Globals() {
 	_DebugLogFile = new std::unique_ptr<AGS::Engine::LogFile>();
 	_DebugConsole = new std::unique_ptr<AGS::Engine::ConsoleOutputTarget>();
 
-	// debugmanager.cpp globals
+	// debug_manager.cpp globals
 	_DbgMgr = new AGS::Shared::DebugManager();
 
 	// dialog.cpp globals
@@ -238,10 +242,10 @@ Globals::Globals() {
 	_CurFrameSetup = new GameFrameSetup();
 	_GameScaling = new AGS::Engine::PlaneScaling();
 
-	// guibutton.cpp globals
+	// gui_button.cpp globals
 	_guibuts = new std::vector<AGS::Shared::GUIButton>();
 
-	// guidlaog.cpp globals
+	// gui_dlaog.cpp globals
 	Common::fill(_filenumbers, _filenumbers + MAXSAVEGAMES_20, 0);
 	Common::fill(_filedates, _filedates + MAXSAVEGAMES_20, 0);
 	Common::fill(_bufTemp, _bufTemp + 260, 0);
@@ -249,39 +253,39 @@ Globals::Globals() {
 	Common::fill(_buff, _buff + 200, 0);
 	_smes = new CSCIMessage();
 
-	// guiinv.cpp globals
+	// gui_inv.cpp globals
 	_guiinv = new std::vector<AGS::Shared::GUIInvWindow>();
 
-	// guilabel.cpp globals
+	// gui_label.cpp globals
 	_guilabels = new std::vector<AGS::Shared::GUILabel>();
 
-	// guilistbox.cpp globals
+	// gui_listbox.cpp globals
 	_guilist = new std::vector<AGS::Shared::GUIListBox>();
 
-	// guislider.cpp globals
+	// gui_slider.cpp globals
 	_guislider = new std::vector<AGS::Shared::GUISlider>();
 
-	// guitextbox.cpp globals
+	// gui_textbox.cpp globals
 	_guitext = new std::vector<AGS::Shared::GUITextBox>();
 
 	// interactions.cpp globals
 	_globalvars = new InteractionVariable[MAX_GLOBAL_VARIABLES];
 	_globalvars[0] = InteractionVariable("Global 1", 0, 0);
 
-	// managedobjectpool.cpp globals
+	// managed_object_pool.cpp globals
 	_pool = new ManagedObjectPool();
 
 	// mouse.cpp globals
 	_scmouse = new ScriptMouse();
 	Common::fill(&_mousecurs[0], &_mousecurs[MAXCURSORS], nullptr);
 
-	// mousew32.cpp globals
+	// mouse_w32.cpp globals
 	_mouse = new Mouse();
 
 	// overlay.cpp globals
 	_screenover = new std::vector<ScreenOverlay>();
 
-	// pluginobjectreader.cpp globals
+	// plugin_object_reader.cpp globals
 	_pluginReaders = new PluginObjectReader[MAX_PLUGIN_OBJECT_READERS];
 
 	// room.cpp globals
@@ -319,11 +323,11 @@ Globals::Globals() {
 	Common::fill(_loadedInstances, _loadedInstances + MAX_LOADED_INSTANCES,
 		(ccInstance *)nullptr);
 
-	// systemimports.cpp globals
+	// system_imports.cpp globals
 	_simp = new SystemImports();
 	_simp_for_plugin = new SystemImports();
 
-	// walkbehind.cpp globals
+	// walk_behind.cpp globals
 	Common::fill(_walkBehindLeft, _walkBehindLeft + MAX_WALK_BEHINDS, 0);
 	Common::fill(_walkBehindTop, _walkBehindTop + MAX_WALK_BEHINDS, 0);
 	Common::fill(_walkBehindRight, _walkBehindRight + MAX_WALK_BEHINDS, 0);
@@ -335,12 +339,15 @@ Globals::Globals() {
 Globals::~Globals() {
 	g_globals = nullptr;
 
-	// agsplugin.cpp globals
+	// ags_plugin.cpp globals
 	delete _glVirtualScreenWrap;
 
-	// agsstaticobject.cpp globals
+	// ags_static_object.cpp globals
 	delete _GlobalStaticManager;
 	delete _GameStaticManager;
+
+	// asset_manager.cpp globals
+	delete _AssetMgr;
 
 	// audio.cpp globals
 	delete _audioChannels;
@@ -357,7 +364,7 @@ Globals::~Globals() {
 	// cc_serializer.cpp globals
 	delete _ccUnserializer;
 
-	// cc_dynamicarray.cpp globals
+	// cc_dynamic_array.cpp globals
 	delete _globalDynamicArray;
 
 	// cscdialog.cpp globals
@@ -370,7 +377,7 @@ Globals::~Globals() {
 	delete _DebugLogFile;
 	delete _DebugConsole;
 
-	// debugmanager.cpp globals
+	// debug_manager.cpp globals
 	delete _DbgMgr;
 
 	// dialog.cpp globals
@@ -458,43 +465,43 @@ Globals::~Globals() {
 	delete _CurFrameSetup;
 	delete _GameScaling;
 
-	// guibutton.cpp globals
+	// gui_button.cpp globals
 	delete _guibuts;
 
-	// guidlaog.cpp globals
+	// gui_dlaog.cpp globals
 	delete _smes;
 
-	// guiinv.cpp globals
+	// gui_inv.cpp globals
 	delete _guiinv;
 
-	// guilabel.cpp globals
+	// gui_label.cpp globals
 	delete _guilabels;
 
-	// guilistbox.cpp globals
+	// gui_listbox.cpp globals
 	delete _guilist;
 
-	// guislider.cpp globals
+	// gui_slider.cpp globals
 	delete _guislider;
 
-	// guitextbox.cpp globals
+	// gui_textbox.cpp globals
 	delete _guitext;
 
 	// interactions.cpp globals
 	delete[] _globalvars;
 
-	// managedobjectpool.cpp globals
+	// managed_object_pool.cpp globals
 	delete _pool;
 
 	// mouse.cpp globals
 	delete _scmouse;
 
-	// mousew32.cpp globals
+	// mouse_w32.cpp globals
 	delete _mouse;
 
 	// overlay.cpp globals
 	delete _screenover;
 
-	// pluginobjectreader.cpp globals
+	// plugin_object_reader.cpp globals
 	delete[] _pluginReaders;
 
 	// room.cpp globals
@@ -527,6 +534,10 @@ Globals::~Globals() {
 	delete _characterScriptObjNames;
 	delete[] _objectScriptObjNames;
 	delete _guiScriptObjNames;
+
+	// system_imports.cpp globals
+	delete _simp;
+	delete _simp_for_plugin;
 }
 
 } // namespace AGS3

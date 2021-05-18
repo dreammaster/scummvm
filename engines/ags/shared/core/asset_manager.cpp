@@ -33,11 +33,6 @@ namespace AGS3 {
 namespace AGS {
 namespace Shared {
 
-// TODO: move elsewhere later
-std::unique_ptr<AssetManager> AssetMgr;
-
-
-
 AssetLocation::AssetLocation()
 	: Offset(0)
 	, Size(0) {
