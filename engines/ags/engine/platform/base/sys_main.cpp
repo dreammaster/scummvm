@@ -20,8 +20,7 @@
  *
  */
 
-//include <SDL.h>
-//include <SDL_syswm.h>
+#include "common/system.h"
 #include "ags/engine/platform/base/sys_main.h"
 #include "ags/shared/util/geometry.h"
 #include "ags/shared/util/string.h"
@@ -35,19 +34,11 @@ namespace ags = AGS::Shared;
 // ----------------------------------------------------------------------------
 
 int sys_main_init(/*config*/) {
-	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE); // TODO: backend log verbosity from config
-
-	// TODO: setup these subsystems in config rather than keep hardcoded?
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER) != 0) {
-		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
-		return -1;
-	}
 	return 0;
 }
 
 void sys_main_shutdown() {
 	sys_window_destroy();
-	SDL_Quit();
 }
 
 void sys_set_background_mode(bool on) {
@@ -61,17 +52,18 @@ void sys_set_background_mode(bool on) {
 const int DEFAULT_DISPLAY_INDEX = 0; // TODO: is this always right?
 
 int sys_get_desktop_resolution(int &width, int &height) {
-	SDL_Rect r;
-	if (SDL_GetDisplayBounds(DEFAULT_DISPLAY_INDEX, &r) != 0) {
-		SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
-		return -1;
-	}
-	width = r.w;
-	height = r.h;
+	// TODO: ScummVM has a hardcoded dummy desktop resolution. See if there's any
+	// need to change the values, given we're hardcoded for pretend full-screen
+	if (width)
+		width = 640;
+	if (height)
+		height = 480;
+
 	return 0;
 }
 
 void sys_get_desktop_modes(std::vector<AGS::Engine::DisplayMode> &dms) {
+#ifdef TODO
 	SDL_DisplayMode mode;
 	const int display_id = DEFAULT_DISPLAY_INDEX;
 	const int count = SDL_GetNumDisplayModes(display_id);
@@ -88,6 +80,7 @@ void sys_get_desktop_modes(std::vector<AGS::Engine::DisplayMode> &dms) {
 		dm.RefreshRate = mode.refresh_rate;
 		dms.push_back(dm);
 	}
+#endif
 }
 
 
@@ -95,6 +88,8 @@ void sys_get_desktop_modes(std::vector<AGS::Engine::DisplayMode> &dms) {
 // WINDOW UTILS
 // ----------------------------------------------------------------------------
 // TODO: support multiple windows? in case we need some for diag purposes etc
+
+#ifdef TODO
 static SDL_Window *window = nullptr;
 
 SDL_Window *sys_window_create(const char *window_title, int w, int h, bool windowed, int ex_flags) {
@@ -118,64 +113,63 @@ SDL_Window *sys_window_create(const char *window_title, int w, int h, bool windo
 	);
 	return window;
 }
+#else
+SDL_Window *sys_window_create(const char *window_title, int w, int h, bool windowed, int ex_flags) {
+	error("TODO: sys_window_create");
+	return nullptr;
+}
+#endif
 
 SDL_Window *sys_get_window() {
-	return window;
+	//return window;
+	return nullptr;
 }
 
 void sys_window_set_style(bool windowed) {
+#ifdef TODO
 	if (!window) return;
 	// TODO: support separate fullscreen and desktop (borderless fullscreen window) modes
 	// TODO: support resizable window later, might need callback for engine and/or gfx renderer
 	SDL_SetWindowFullscreen(window, windowed ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
+#endif
 }
 
 void sys_window_show_cursor(bool on) {
-	SDL_ShowCursor(on ? SDL_ENABLE : SDL_DISABLE);
+	g_system->showMouse(on);
 }
 
 bool sys_window_lock_mouse(bool on) {
+#ifdef TODO
 	if (!window) return false;
 	SDL_SetWindowGrab(window, static_cast<SDL_bool>(on));
 	return on; // TODO: test if successful?
+#endif
+	return false;
 }
 
 void sys_window_set_mouse(int x, int y) {
-	if (!window) return;
-	SDL_WarpMouseInWindow(window, x, y);
+	g_system->warpMouse(x, y);
 }
 
 void sys_window_destroy() {
+#ifdef TODO
 	if (window) {
 		SDL_DestroyWindow(window);
 		window = nullptr;
 	}
+#endif
 }
 
 void sys_window_set_title(const char *title) {
-	if (window) {
-		SDL_SetWindowTitle(window, title);
-	}
+	// No implementation in ScummVM
 }
 
 void sys_window_set_icon() {
-	if (window) {
-		// TODO: actually support getting icon from resources and converting into SDL_Surface.
-		//  - on Linux we had platform/linux/icon.xpm
-		//  - on Windows we had standard embedded resource under ID = 101
-		SDL_SetWindowIcon(window, nullptr);
-	}
+	// No implementation in ScummVM
 }
 
 bool sys_window_set_size(int w, int h, bool center) {
-	if (window) {
-		SDL_SetWindowSize(window, w, h);
-		if (center)
-			SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-		int new_w, new_h;
-		SDL_GetWindowSize(window, &new_w, &new_h);
-		return new_w == w && new_h == h;
-	}
+	error("TODO: sys_window_set_size");
 	return false;
 }
 

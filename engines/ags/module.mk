@@ -251,6 +251,9 @@ MODULE_OBJS = \
 	engine/media/audio/sound_cache.o \
 	engine/media/audio/sound_clip.o \
 	engine/media/video/video.o \
+	engine/platform/base/ags_platform_driver.o \
+	engine/platform/base/sys_main.o \
+	engine/platform/scummvm/scummvm_platform_driver.o \
 	engine/script/cc_instance.o \
 	engine/script/executing_script.o \
 	engine/script/exports.o \
