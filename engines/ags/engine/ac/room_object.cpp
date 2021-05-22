@@ -160,14 +160,20 @@ void RoomObject::update_cycle_view_backwards() {
 void RoomObject::ReadFromFile(Stream *in) {
 	in->ReadArrayOfInt32(&x, 3);
 	in->ReadArrayOfInt16(&tint_r, 15);
-	in->ReadArrayOfInt8((int8_t *)&cycling, 4);
+	cycling = in->ReadByte();
+	overall_speed = in->ReadByte();
+	on = in->ReadByte();
+	flags = in->ReadByte();
 	in->ReadArrayOfInt16(&blocking_width, 2);
 }
 
 void RoomObject::WriteToFile(Stream *out) const {
 	out->WriteArrayOfInt32(&x, 3);
 	out->WriteArrayOfInt16(&tint_r, 15);
-	out->WriteArrayOfInt8((int8_t *)&cycling, 4);
+	out->WriteByte(cycling);
+	out->WriteByte(overall_speed);
+	out->WriteByte(on);
+	out->WriteByte(flags);
 	out->WriteArrayOfInt16(&blocking_width, 2);
 }
 

@@ -81,7 +81,7 @@ private:
 namespace ScriptStructHelpers {
 // Creates a managed Point object, represented as a pair of X and Y coordinates.
 ScriptUserObject *CreatePoint(int x, int y);
-};
+} // namespace ScriptStructHelpers
 
 } // namespace AGS3
 

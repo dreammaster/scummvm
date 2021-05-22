@@ -326,7 +326,7 @@ String String::Right(size_t count) const {
 String String::LeftSection(char separator, bool exclude_separator) const {
 	if (_cstr && separator) {
 		size_t slice_at = FindChar(separator);
-		if (slice_at != -1) {
+		if (slice_at != (size_t)-1) {
 			slice_at = exclude_separator ? slice_at : slice_at + 1;
 			return Left(slice_at);
 		}
@@ -337,7 +337,7 @@ String String::LeftSection(char separator, bool exclude_separator) const {
 String String::RightSection(char separator, bool exclude_separator) const {
 	if (_cstr && separator) {
 		size_t slice_at = FindCharReverse(separator);
-		if (slice_at != -1) {
+		if (slice_at != (size_t)-1) {
 			size_t count = exclude_separator ? _len - slice_at - 1 : _len - slice_at;
 			return Right(count);
 		}
@@ -460,7 +460,7 @@ void String::ClipRight(size_t count) {
 void String::ClipLeftSection(char separator, bool include_separator) {
 	if (_cstr && separator) {
 		size_t slice_at = FindChar(separator);
-		if (slice_at != -1) {
+		if (slice_at != (size_t)-1) {
 			ClipLeft(include_separator ? slice_at + 1 : slice_at);
 		} else
 			Empty();
@@ -470,7 +470,7 @@ void String::ClipLeftSection(char separator, bool include_separator) {
 void String::ClipRightSection(char separator, bool include_separator) {
 	if (_cstr && separator) {
 		size_t slice_at = FindCharReverse(separator);
-		if (slice_at != -1) {
+		if (slice_at != (size_t)-1) {
 			ClipRight(include_separator ? _len - slice_at : _len - slice_at - 1);
 		} else
 			Empty();
@@ -748,7 +748,7 @@ void String::TruncateToRight(size_t count) {
 void String::TruncateToLeftSection(char separator, bool exclude_separator) {
 	if (_cstr && separator) {
 		size_t slice_at = FindChar(separator);
-		if (slice_at != -1) {
+		if (slice_at != (size_t)-1) {
 			TruncateToLeft(exclude_separator ? slice_at : slice_at + 1);
 		}
 	}
@@ -757,7 +757,7 @@ void String::TruncateToLeftSection(char separator, bool exclude_separator) {
 void String::TruncateToRightSection(char separator, bool exclude_separator) {
 	if (_cstr && separator) {
 		size_t slice_at = FindCharReverse(separator);
-		if (slice_at != -1) {
+		if (slice_at != (size_t)-1) {
 			TruncateToRight(exclude_separator ? _len - slice_at - 1 : _len - slice_at);
 		}
 	}
