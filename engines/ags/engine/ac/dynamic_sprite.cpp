@@ -272,7 +272,7 @@ int DynamicSprite_SaveToFile(ScriptDynamicSprite *sds, const char *namm) {
 		quit("!DynamicSprite.SaveToFile: sprite has been deleted");
 
 	auto filename = String(namm);
-	if (filename.FindChar('.') == -1)
+	if (filename.FindChar('.') == (size_t)-1)
 		filename.Append(".bmp");
 
 	ResolvedPath rp;

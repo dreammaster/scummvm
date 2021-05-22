@@ -87,36 +87,6 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-
-extern volatile char _G(want_exit), _G(abort_engine);
-extern bool _G(justRunSetup);
-
-
-extern int _G(proper_exit);
-
-
-
-
-
-
-
-extern int _G(eip_guiobj);
-
-extern int _G(numLipLines), _G(curLipLine), _G(curLipLinePhoneme);
-
-
-
-
-
-
-
-
-
-ResourcePaths _GP(ResPaths);
-
-t_engine_pre_init_callback _G(engine_pre_init_callback) = nullptr;
-
 bool engine_init_backend()
 {
     _G(our_eip) = -199;
@@ -134,7 +104,7 @@ bool engine_init_backend()
     
     // Initialize stripped allegro library
     set_uformat(U_ASCII);
-    if (install_allegro(SYSTEM_NONE, &errno, atexit))
+    if (install_allegro(SYSTEM_NONE, &_G(errnum), atexit))
     {
         platform->DisplayAlert("Internal error: unable to initialize stripped Allegro 4 library.");
         return false;

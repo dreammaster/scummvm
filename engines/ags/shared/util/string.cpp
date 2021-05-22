@@ -148,36 +148,36 @@ int String::CompareNoCase(const char *cstr) const {
 
 int String::CompareLeft(const char *cstr, size_t count) const {
 	cstr = cstr ? cstr : "";
-	return strncmp(GetCStr(), cstr, count != -1 ? count : strlen(cstr));
+	return strncmp(GetCStr(), cstr, count != (size_t)-1 ? count : strlen(cstr));
 }
 
 int String::CompareLeftNoCase(const char *cstr, size_t count) const {
 	cstr = cstr ? cstr : "";
-	return ags_strnicmp(GetCStr(), cstr, count != -1 ? count : strlen(cstr));
+	return ags_strnicmp(GetCStr(), cstr, count != (size_t)-1 ? count : strlen(cstr));
 }
 
 int String::CompareMid(const char *cstr, size_t from, size_t count) const {
 	cstr = cstr ? cstr : "";
 	from = Math::Min(from, GetLength());
-	return strncmp(GetCStr() + from, cstr, count != -1 ? count : strlen(cstr));
+	return strncmp(GetCStr() + from, cstr, count != (size_t)-1 ? count : strlen(cstr));
 }
 
 int String::CompareMidNoCase(const char *cstr, size_t from, size_t count) const {
 	cstr = cstr ? cstr : "";
 	from = Math::Min(from, GetLength());
-	return ags_strnicmp(GetCStr() + from, cstr, count != -1 ? count : strlen(cstr));
+	return ags_strnicmp(GetCStr() + from, cstr, count != (size_t)-1 ? count : strlen(cstr));
 }
 
 int String::CompareRight(const char *cstr, size_t count) const {
 	cstr = cstr ? cstr : "";
-	count = count != -1 ? count : strlen(cstr);
+	count = count != (size_t)-1 ? count : strlen(cstr);
 	size_t off = Math::Min(GetLength(), count);
 	return strncmp(GetCStr() + GetLength() - off, cstr, count);
 }
 
 int String::CompareRightNoCase(const char *cstr, size_t count) const {
 	cstr = cstr ? cstr : "";
-	count = count != -1 ? count : strlen(cstr);
+	count = count != (size_t)-1 ? count : strlen(cstr);
 	size_t off = Math::Min(GetLength(), count);
 	return ags_strnicmp(GetCStr() + GetLength() - off, cstr, count);
 }

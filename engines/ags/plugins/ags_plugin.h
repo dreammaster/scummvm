@@ -223,6 +223,8 @@ public:
 	int32 pluginId;   // used internally, do not touch this
 
 public:
+	virtual ~IAGSEditor() {}
+
 	// get the HWND of the main editor frame
 	AGSIFUNC(HWND) GetEditorHandle();
 	// get the HWND of the current active window
@@ -231,7 +233,6 @@ public:
 	AGSIFUNC(void) RegisterScriptHeader(const char *header);
 	// de-register a script header (pass same pointer as when added)
 	AGSIFUNC(void) UnregisterScriptHeader(const char *header);
-
 };
 
 

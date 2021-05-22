@@ -73,7 +73,7 @@ int File_Delete(const char *fnmm) {
 
 	if (::remove(rp.FullPath) == 0)
 		return 1;
-	if (errno == ENOENT && !rp.AltPath.IsEmpty() && rp.AltPath.Compare(rp.FullPath) != 0)
+	if (_G(errnum) == AL_ENOENT && !rp.AltPath.IsEmpty() && rp.AltPath.Compare(rp.FullPath) != 0)
 		return ::remove(rp.AltPath) == 0 ? 1 : 0;
 	return 0;
 }

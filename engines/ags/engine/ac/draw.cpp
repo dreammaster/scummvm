@@ -100,7 +100,7 @@ Bitmap *convert_16_to_16bgr(Bitmap *tempbl) {
     unsigned short c,r,ds,b;
 
     for (y=0; y < tempbl->GetHeight(); y++) {
-        unsigned short*p16 = (unsigned short *)tempbl->GetScanLine(y);
+        unsigned short *p16 = (unsigned short *)tempbl->GetScanLine(y);
 
         for (x=0; x < tempbl->GetWidth(); x++) {
             c = p16[x];
@@ -160,7 +160,7 @@ Bitmap *convert_32_to_32bgr(Bitmap *tempbl) {
 Bitmap *AdjustBitmapForUseWithDisplayMode(Bitmap* bitmap, bool has_alpha)
 {
     const int bmp_col_depth = bitmap->GetColorDepth();
-    const int sys_col_depth = System_GetColorDepth();
+    // const int sys_col_depth = System_GetColorDepth();
     const int game_col_depth = _GP(game).GetColorDepth();
     Bitmap *new_bitmap = bitmap;
 
@@ -634,7 +634,7 @@ void mark_current_background_dirty()
 
 void draw_and_invalidate_text(Bitmap *ds, int x1, int y1, int font, color_t text_color, const char *text)
 {
-    wouttext_outline(ds, x1, y1, font, text_color, (char*)text);
+    wouttext_outline(ds, x1, y1, font, text_color, text);
     invalidate_rect(x1, y1, x1 + wgettextwidth_compensate(text, font), y1 + getfontheight_outlined(font) + get_fixed_pixel_size(1), false);
 }
 
