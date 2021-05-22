@@ -45,6 +45,7 @@ public:
 	}
 	// Legacy support for reading and writing object values by their relative offset
 	virtual const char *GetElementPtr(const char *address, intptr_t legacy_offset);
+	virtual char *GetElementPtr(char *address, intptr_t legacy_offset);
 
 	const char *GetFieldPtr(const char *address, intptr_t offset) override;
 	void    Read(const char *address, intptr_t offset, void *dest, int size) override;

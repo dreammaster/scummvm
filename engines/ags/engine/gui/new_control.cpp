@@ -38,7 +38,8 @@ NewControl::NewControl(int xx, int yy, int wi, int hi) {
 	visible = 1;
 	enabled = 1;
 	needredraw = 1;
-};
+}
+
 NewControl::NewControl() {
 	x = y = wid = hit = 0;
 	state = 0;

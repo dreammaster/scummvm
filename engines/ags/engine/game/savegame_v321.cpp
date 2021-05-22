@@ -472,7 +472,7 @@ HSaveError restore_game_data(Stream *in, SavegameVersion svg_version, const Pres
 	if (!err)
 		return err;
 
-	if (in->ReadInt32() != MAGICNUMBER + 1) {
+	if ((uint32)in->ReadInt32() != (uint32)(MAGICNUMBER + 1)) {
 		return new SavegameError(kSvgErr_InconsistentFormat, "MAGICNUMBER not found before Audio Clips.");
 	}
 
@@ -484,7 +484,7 @@ HSaveError restore_game_data(Stream *in, SavegameVersion svg_version, const Pres
 	pl_set_file_handle(pluginFileHandle, in);
 	pl_run_plugin_hooks(AGSE_RESTOREGAME, pluginFileHandle);
 	pl_clear_file_handle();
-	if (in->ReadInt32() != (unsigned)MAGICNUMBER)
+	if ((uint32)in->ReadInt32() != (uint32)MAGICNUMBER)
 		return new SavegameError(kSvgErr_InconsistentPlugin);
 
 	// save the new room music vol for later use
