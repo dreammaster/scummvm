@@ -178,7 +178,7 @@ Common::Error AGSEngine::run() {
 	_G(loadSaveGameOnStartup) = ConfMan.getInt("save_slot");
 
 #ifdef USE_CUSTOM_EXCEPTION_HANDLER
-	if (_GP(_GP(usetup)).disable_exception_handling)
+	if (_GP(usetup).disable_exception_handling)
 #endif
 	{
 		syncSoundSettings();

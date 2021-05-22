@@ -24,7 +24,7 @@
 #define AGS_PLUGINS_AGS_SPRITE_FONT_VAR_WIDTH_SPR_FONT_H
 
 #include "ags/plugins/plugin_base.h"
-#include "ags/plugins/agsplugin.h"
+#include "ags/plugins/ags_plugin.h"
 #include "ags/plugins/ags_sprite_font/variable_width_font.h"
 
 namespace AGS3 {

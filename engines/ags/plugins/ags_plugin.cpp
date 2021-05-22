@@ -20,15 +20,9 @@
  *
  */
 
+#include "ags/lib/allegro.h"
 #include "ags/lib/std/vector.h"
 #include "ags/shared/core/platform.h"
-#include "ags/lib/allegro.h"
-#if AGS_PLATFORM_OS_WINDOWS
-#define NOMINMAX
-#define BITMAP WINDOWS_BITMAP
-//include <windows.h>
-#undef BITMAP
-#endif
 #include "ags/plugins/ags_plugin.h"
 #include "ags/shared/ac/common.h"
 #include "ags/shared/ac/view.h"
@@ -46,13 +40,13 @@
 #include "ags/shared/ac/keycode.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/move_list.h"
-#include "ags/shared/ac/objectcache.h"
-#include "ags/shared/ac/parser.h"
+#include "ags/engine/ac/object_cache.h"
+#include "ags/engine/ac/parser.h"
 #include "ags/engine/ac/path_helper.h"
 #include "ags/engine/ac/room_status.h"
 #include "ags/engine/ac/string.h"
 #include "ags/shared/ac/sprite_cache.h"
-#include "ags/engine/ac/dynobj/cc_dynamicobject_addr_and_manager.h"
+#include "ags/engine/ac/dynobj/cc_dynamic_object_addr_and_manager.h"
 #include "ags/engine/ac/dynobj/script_string.h"
 #include "ags/shared/font/fonts.h"
 #include "ags/engine/debugging/debug_log.h"
@@ -61,44 +55,31 @@
 #include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/gfx/graphics_driver.h"
-#include "ags/shared/gfx/gfx_util.h"
+#include "ags/engine/gfx/gfx_util.h"
 #include "ags/engine/gfx/gfxfilter.h"
 #include "ags/shared/gui/gui_defines.h"
 #include "ags/engine/main/game_run.h"
-#include "ags/shared/main/graphics_mode.h"
+#include "ags/engine/main/graphics_mode.h"
 #include "ags/engine/main/engine.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/plugins/plugin_engine.h"
-#include "ags/shared/plugin/plugin_builtin.h"
 #include "ags/plugins/plugin_object_reader.h"
 #include "ags/engine/script/runtime_script_value.h"
 #include "ags/engine/script/script.h"
 #include "ags/engine/script/script_runtime.h"
 #include "ags/shared/util/file_stream.h"
-#include "ags/shared/util/library.h"
+#include "ags/engine/util/library.h"
+#include "ags/engine/util/library_scummvm.h"
 #include "ags/shared/util/memory.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_compat.h"
 #include "ags/shared/util/wgt2_allg.h"
-
-#if defined(BUILTIN_PLUGINS)
-#include "ags/shared/../Plugins/AGSflashlight/agsflashlight.h"
-#include "ags/shared/../Plugins/agsblend/agsblend.h"
-#include "ags/shared/../Plugins/ags_snowrain/ags_snowrain.h"
-#include "ags/shared/../Plugins/ags_parallax/ags_parallax.h"
-#include "ags/shared/../Plugins/agspalrender/agspalrender.h"
-#if AGS_PLATFORM_OS_IOS
-#include "ags/shared/../Plugins/agstouch/agstouch.h"
-#endif // AGS_PLATFORM_OS_IOS
-#endif // BUILTIN_PLUGINS
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Shared::Memory;
 using namespace AGS::Engine;
-
-// **************** PLUGIN IMPLEMENTATION ****************
 
 const int PLUGIN_API_VERSION = 25;
 struct EnginePlugin {
@@ -134,7 +115,11 @@ EnginePlugin plugins[MAXPLUGINS];
 int numPlugins = 0;
 int pluginsWantingDebugHooks = 0;
 
-std::vector<InbuiltPluginDetails> _registered_builtin_plugins;
+// On save/restore, the Engine will provide the plugin with a handle. Because we only ever save to one file at a time,
+// we can reuse the same handle.
+
+static long pl_file_handle = -1;
+static Stream *pl_file_stream = nullptr;
 
 void IAGSEngine::AbortGame(const char *reason) {
 	quit(reason);
@@ -230,12 +215,12 @@ void IAGSEngine::GetScreenDimensions(int32 *width, int32 *height, int32 *coldept
 		coldepth[0] = _GP(scsystem).coldepth;
 }
 
-unsigned char **IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
+uint8 *IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
 	Bitmap *stage = _G(gfxDriver)->GetStageBackBuffer(true);
 	if (stage && bmp == stage->GetAllegroBitmap())
 		plugins[this->pluginId].invalidatedRegion = 0;
 
-	return bmp->line;
+	return (uint8 *)bmp->getPixels();
 }
 
 void IAGSEngine::ReleaseBitmapSurface(BITMAP *bmp) {
@@ -249,21 +234,26 @@ void IAGSEngine::ReleaseBitmapSurface(BITMAP *bmp) {
 }
 
 void IAGSEngine::GetMousePosition(int32 *x, int32 *y) {
-	if (x) x[0] = mousex;
-	if (y) y[0] = mousey;
+	if (x) x[0] = _G(mousex);
+	if (y) y[0] = _G(mousey);
 }
+
 int IAGSEngine::GetCurrentRoom() {
 	return _G(displayed_room);
 }
+
 int IAGSEngine::GetNumBackgrounds() {
 	return _GP(thisroom).BgFrameCount;
 }
+
 int IAGSEngine::GetCurrentBackground() {
 	return _GP(play).bg_frame;
 }
+
 BITMAP *IAGSEngine::GetBackgroundScene(int32 index) {
 	return (BITMAP *)_GP(thisroom).BgFrames[index].Graphic->GetAllegroBitmap();
 }
+
 void IAGSEngine::GetBitmapDimensions(BITMAP *bmp, int32 *width, int32 *height, int32 *coldepth) {
 	if (bmp == nullptr)
 		return;
@@ -275,12 +265,6 @@ void IAGSEngine::GetBitmapDimensions(BITMAP *bmp, int32 *width, int32 *height, i
 	if (coldepth != nullptr)
 		coldepth[0] = bitmap_color_depth(bmp);
 }
-
-// On save/restore, the Engine will provide the plugin with a handle. Because we only ever save to one file at a time,
-// we can reuse the same handle.
-
-static long pl_file_handle = -1;
-static Stream *pl_file_stream = nullptr;
 
 void pl_set_file_handle(long data, Stream *stream) {
 	pl_file_handle = data;
@@ -328,7 +312,7 @@ void IAGSEngine::DrawTextWrapped(int32 xx, int32 yy, int32 wid, int32 font, int3
 		draw_and_invalidate_text(ds, xx, yy + linespacing * i, font, text_color, Lines[i]);
 }
 
-Bitmap _G(glVirtualScreenWrap);
+Bitmap glVirtualScreenWrap;
 void IAGSEngine::SetVirtualScreen(BITMAP *bmp) {
 	if (!_G(gfxDriver)->UsesMemoryBackBuffer()) {
 		debug_script_warn("SetVirtualScreen: this plugin requires software graphics driver to work correctly.");
@@ -336,10 +320,10 @@ void IAGSEngine::SetVirtualScreen(BITMAP *bmp) {
 	}
 
 	if (bmp) {
-		_G(glVirtualScreenWrap).WrapAllegroBitmap(bmp, true);
-		_G(gfxDriver)->SetMemoryBackBuffer(&_G(glVirtualScreenWrap));
+		glVirtualScreenWrap.WrapAllegroBitmap(bmp, true);
+		_G(gfxDriver)->SetMemoryBackBuffer(&glVirtualScreenWrap);
 	} else {
-		_G(glVirtualScreenWrap).Destroy();
+		glVirtualScreenWrap.Destroy();
 		_G(gfxDriver)->SetMemoryBackBuffer(nullptr);
 	}
 }
@@ -397,10 +381,10 @@ AGSCharacter *IAGSEngine::GetCharacter(int32 charnum) {
 	return (AGSCharacter *)&_GP(game).chars[charnum];
 }
 AGSGameOptions *IAGSEngine::GetGameOptions() {
-	return (AGSGameOptions *)&play;
+	return (AGSGameOptions *)&_GP(play);
 }
 AGSColor *IAGSEngine::GetPalette() {
-	return (AGSColor *)&palette[0];
+	return (AGSColor *)&_G(palette)[0];
 }
 void IAGSEngine::SetPalette(int32 start, int32 finish, AGSColor *cpl) {
 	set_palette_range((RGB *)cpl, start, finish, 0);
@@ -526,7 +510,7 @@ void IAGSEngine::PrintDebugConsole(const char *text) {
 	debug_script_log("[PLUGIN] %s", text);
 }
 int IAGSEngine::IsChannelPlaying(int32 channel) {
-	return ::IsChannelPlaying(channel);
+	return AGS3::IsChannelPlaying(channel);
 }
 void IAGSEngine::PlaySoundChannel(int32 channel, int32 soundType, int32 volume, int32 loop, const char *filename) {
 	stop_and_destroy_channel(channel);
@@ -680,7 +664,7 @@ void IAGSEngine::QueueGameScriptFunction(const char *name, int32 globalScript, i
 }
 
 int IAGSEngine::RegisterManagedObject(const void *object, IAGSScriptManagedObject *callback) {
-	_G(GlobalReturnValue).SetPluginObject((void *)object, (ICCDynamicObject *)callback);
+	_GP(GlobalReturnValue).SetPluginObject((void *)object, (ICCDynamicObject *)callback);
 	return ccRegisterManagedObject(object, (ICCDynamicObject *)callback, true);
 }
 
@@ -702,7 +686,7 @@ void IAGSEngine::AddManagedObjectReader(const char *typeName, IAGSManagedObjectR
 }
 
 void IAGSEngine::RegisterUnserializedObject(int key, const void *object, IAGSScriptManagedObject *callback) {
-	_G(GlobalReturnValue).SetPluginObject((void *)object, (ICCDynamicObject *)callback);
+	_GP(GlobalReturnValue).SetPluginObject((void *)object, (ICCDynamicObject *)callback);
 	ccRegisterUnserializedObject(key, object, (ICCDynamicObject *)callback, true);
 }
 
@@ -715,9 +699,9 @@ void *IAGSEngine::GetManagedObjectAddressByKey(int key) {
 	ICCDynamicObject *manager;
 	ScriptValueType obj_type = ccGetObjectAddressAndManagerFromHandle(key, object, manager);
 	if (obj_type == kScValPluginObject) {
-		_G(GlobalReturnValue).SetPluginObject(object, manager);
+		_GP(GlobalReturnValue).SetPluginObject(object, manager);
 	} else {
-		_G(GlobalReturnValue).SetDynamicObject(object, manager);
+		_GP(GlobalReturnValue).SetDynamicObject(object, manager);
 	}
 	return object;
 }
@@ -725,7 +709,7 @@ void *IAGSEngine::GetManagedObjectAddressByKey(int key) {
 const char *IAGSEngine::CreateScriptString(const char *fromText) {
 	const char *string = CreateNewScriptString(fromText);
 	// Should be still standard dynamic object, because not managed by plugin
-	_G(GlobalReturnValue).SetDynamicObject((void *)string, &_GP(myScriptStringImpl));
+	_GP(GlobalReturnValue).SetDynamicObject((void *)string, &_GP(myScriptStringImpl));
 	return string;
 }
 
@@ -738,7 +722,7 @@ int IAGSEngine::DecrementManagedObjectRefCount(const char *address) {
 }
 
 void IAGSEngine::SetMousePosition(int32 x, int32 y) {
-	Mouse::SetPosition(Point(x, y));
+	_GP(mouse).SetPosition(Point(x, y));
 	RefreshMouse();
 }
 
@@ -851,10 +835,12 @@ void pl_run_plugin_init_gfx_hooks(const char *driverName, void *data) {
 	}
 }
 
-int pl_register_builtin_plugin(InbuiltPluginDetails const &details) {
+#if 0
+int pl_register_builtin_plugin(const InbuiltPluginDetails &details) {
 	_registered_builtin_plugins.push_back(details);
 	return 0;
 }
+#endif
 
 bool pl_use_builtin_plugin(EnginePlugin *apl) {
 #if defined(BUILTIN_PLUGINS)
@@ -917,7 +903,7 @@ bool pl_use_builtin_plugin(EnginePlugin *apl) {
 	}
 #endif // IOS_VERSION
 #endif // BUILTIN_PLUGINS
-
+#if 0
 	for (std::vector<InbuiltPluginDetails>::iterator it = _registered_builtin_plugins.begin(); it != _registered_builtin_plugins.end(); ++it) {
 		if (ags_stricmp(apl->filename, it->filename) == 0) {
 			apl->engineStartup = it->engineStartup;
@@ -930,6 +916,7 @@ bool pl_use_builtin_plugin(EnginePlugin *apl) {
 			return true;
 		}
 	}
+#endif
 	return false;
 }
 

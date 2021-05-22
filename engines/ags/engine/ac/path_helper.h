@@ -63,7 +63,7 @@ String FixSlashAfterToken(const String &path);
 struct FSLocation {
 	String BaseDir; // parent part of the full path that is not our responsibility
 	String FullDir; // full path to the directory
-	FSLocation() = default;
+	FSLocation() {}
 	FSLocation(const String &base) : BaseDir(base), FullDir(base) {
 	}
 	FSLocation(const String &base, const String &full) : BaseDir(base), FullDir(full) {

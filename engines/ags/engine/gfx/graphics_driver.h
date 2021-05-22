@@ -198,7 +198,7 @@ public:
 	virtual bool RequiresFullRedrawEachFrame() = 0;
 	virtual bool HasAcceleratedTransform() = 0;
 	virtual bool UsesMemoryBackBuffer() = 0;
-	virtual ~IGraphicsDriver() = default;
+	virtual ~IGraphicsDriver() {}
 };
 
 } // namespace Engine

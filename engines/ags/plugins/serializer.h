@@ -23,7 +23,7 @@
 #ifndef AGS_PLUGINS_SERIALIZER_H
 #define AGS_PLUGINS_SERIALIZER_H
 
-#include "ags/plugins/agsplugin.h"
+#include "ags/plugins/ags_plugin.h"
 #include "common/serializer.h"
 
 namespace AGS3 {

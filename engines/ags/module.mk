@@ -262,7 +262,11 @@ MODULE_OBJS = \
 	engine/script/script_api.o \
 	engine/script/script_engine.o \
 	engine/script/script_runtime.o \
-	engine/script/system_imports.o
+	engine/script/system_imports.o \
+	plugins/ags_plugin.o \
+	plugins/ags_plugin.o \
+	plugins/plugin_base.o \
+	plugins/plugin_object_reader.o
 
 ifdef ENABLE_AGS_TESTS
 MODULE_OBJS += \

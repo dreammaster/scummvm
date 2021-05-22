@@ -31,7 +31,15 @@
 #ifndef AGS_PLUGINS_AGS_PLUGIN_H
 #define AGS_PLUGINS_AGS_PLUGIN_H
 
+#include "ags/shared/core/types.h"
+#include "common/array.h"
+
 namespace AGS3 {
+
+class ScriptMethodParams : public Common::Array<intptr_t> {
+public:
+	NumberPtr _result;
+};
 
 // If the plugin isn't using DDraw, don't require the headers
 #ifndef DIRECTDRAW_VERSION
@@ -47,7 +55,6 @@ typedef void *LPDIRECTSOUND;
 typedef void *LPDIRECTINPUTDEVICE;
 #endif
 
-// Forward declaration of BITMAP class
 class BITMAP;
 
 // If not using windows.h, define HWND
@@ -372,7 +379,7 @@ public:
 	// get screen dimensions
 	AGSIFUNC(void) GetScreenDimensions(int32 *width, int32 *height, int32 *coldepth);
 	// get screen surface to draw on
-	AGSIFUNC(unsigned char **) GetRawBitmapSurface(BITMAP *);
+	AGSIFUNC(uint8 *) GetRawBitmapSurface(BITMAP *);
 	// release the surface
 	AGSIFUNC(void) ReleaseBitmapSurface(BITMAP *);
 	// get the current mouse co-ordinates

@@ -57,7 +57,7 @@ template <>
 class numeric_limits<uint16_t> {
 public:
 	static constexpr uint16_t quiet_undefined() {
-		return FLOAT_UNASSIGNED;
+		return 0;
 	}
 
 	static constexpr uint16_t min() {

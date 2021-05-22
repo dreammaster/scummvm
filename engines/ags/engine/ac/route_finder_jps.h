@@ -76,7 +76,7 @@ private:
 		float cost;
 		int index;
 
-		inline Entry() = default;
+		inline Entry() {}
 
 		inline Entry(float ncost, int nindex)
 			: cost(ncost)

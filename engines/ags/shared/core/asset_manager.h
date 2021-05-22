@@ -76,7 +76,7 @@ struct AssetLocation {
 class AssetManager {
 public:
 	AssetManager();
-	~AssetManager() = default;
+	~AssetManager() {}
 
 	// Test if given file is main data file
 	static bool         IsDataFile(const String &data_file);
