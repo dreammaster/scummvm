@@ -36,7 +36,7 @@ const char *CCHotspot::GetType() {
 // serialize the object into BUFFER (which is BUFSIZE bytes)
 // return number of bytes used
 int CCHotspot::Serialize(const char *address, char *buffer, int bufsize) {
-	ScriptHotspot *shh = (ScriptHotspot *)address;
+	const ScriptHotspot *shh = (const ScriptHotspot *)address;
 	StartSerialize(buffer);
 	SerializeInt(shh->id);
 	return EndSerialize();

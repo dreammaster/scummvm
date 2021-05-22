@@ -272,7 +272,7 @@ RuntimeScriptValue Sc_System_GetSupportsGammaControl(const RuntimeScriptValue *p
 
 // const char *()
 RuntimeScriptValue Sc_System_GetVersion(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ(const char, _GP(myScriptStringImpl), System_GetVersion);
+	API_CONST_SCALL_OBJ(const char, _GP(myScriptStringImpl), System_GetVersion);
 }
 
 // int ()
@@ -315,7 +315,7 @@ RuntimeScriptValue Sc_System_SetWindowed(const RuntimeScriptValue *params, int32
 
 // const char *()
 RuntimeScriptValue Sc_System_GetRuntimeInfo(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ(const char, _GP(myScriptStringImpl), System_GetRuntimeInfo);
+	API_CONST_SCALL_OBJ(const char, _GP(myScriptStringImpl), System_GetRuntimeInfo);
 }
 
 RuntimeScriptValue Sc_System_GetRenderAtScreenResolution(const RuntimeScriptValue *params, int32_t param_count) {

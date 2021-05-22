@@ -36,7 +36,7 @@ const char *CCRegion::GetType() {
 // serialize the object into BUFFER (which is BUFSIZE bytes)
 // return number of bytes used
 int CCRegion::Serialize(const char *address, char *buffer, int bufsize) {
-	ScriptRegion *shh = (ScriptRegion *)address;
+	const ScriptRegion *shh = (const ScriptRegion *)address;
 	StartSerialize(buffer);
 	SerializeInt(shh->id);
 	return EndSerialize();

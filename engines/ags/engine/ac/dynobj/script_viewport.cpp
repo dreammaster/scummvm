@@ -60,7 +60,7 @@ ScriptViewport *Viewport_Unserialize(int handle, const char *serializedData, int
 	// but acquire one from the GameState, which keeps the first reference.
 	// This is essential because GameState should be able to invalidate any
 	// script references when Viewport gets removed.
-	const int id = BBOp::Int32FromLE(*((int *)serializedData));
+	const int id = BBOp::Int32FromLE(*((const int *)serializedData));
 	if (id >= 0) {
 		auto scview = _GP(play).RegisterRoomViewport(id, handle);
 		if (scview)

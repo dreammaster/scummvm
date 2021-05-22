@@ -229,7 +229,7 @@ bool String::FindSection(char separator, size_t first, size_t last, bool exclude
 	size_t slice_at = (size_t)-1;
 	do {
 		slice_at = FindChar(separator, slice_at + 1);
-		if (slice_at == -1)
+		if (slice_at == (size_t)-1)
 			slice_at = _len;
 		// found where previous field ends
 		if (this_field == last) {

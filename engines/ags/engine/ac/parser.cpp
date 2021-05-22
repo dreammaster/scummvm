@@ -318,14 +318,13 @@ RuntimeScriptValue Sc_ParseText(const RuntimeScriptValue *params, int32_t param_
 
 // const char* ()
 RuntimeScriptValue Sc_Parser_SaidUnknownWord(const RuntimeScriptValue *params, int32_t param_count) {
-	API_SCALL_OBJ(const char, _GP(myScriptStringImpl), Parser_SaidUnknownWord);
+	API_CONST_SCALL_OBJ(const char, _GP(myScriptStringImpl), Parser_SaidUnknownWord);
 }
 
 // int  (char*checkwords)
 RuntimeScriptValue Sc_Said(const RuntimeScriptValue *params, int32_t param_count) {
 	API_SCALL_INT_POBJ(Said, /*const*/ char);
 }
-
 
 
 void RegisterParserAPI() {

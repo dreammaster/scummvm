@@ -35,7 +35,7 @@ const char *CCInventory::GetType() {
 // serialize the object into BUFFER (which is BUFSIZE bytes)
 // return number of bytes used
 int CCInventory::Serialize(const char *address, char *buffer, int bufsize) {
-	ScriptInvItem *shh = (ScriptInvItem *)address;
+	const ScriptInvItem *shh = (const ScriptInvItem *)address;
 	StartSerialize(buffer);
 	SerializeInt(shh->id);
 	return EndSerialize();

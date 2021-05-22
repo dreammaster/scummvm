@@ -861,7 +861,7 @@ void convert_guid_from_text_to_binary(const char *guidText, unsigned char *buffe
         tempString[0] = guidText[0];
         tempString[1] = guidText[1];
         tempString[2] = 0;
-        int thisByte = 0;
+        uint thisByte = 0;
         sscanf(tempString, "%X", &thisByte);
 
         buffer[bytesDone] = thisByte;

@@ -61,6 +61,7 @@
 #include "ags/shared/util/file.h"
 #include "ags/shared/util/stream.h"
 #include "ags/shared/util/string_utils.h"
+#include "ags/shared/util/math.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/globals.h"
 
@@ -154,6 +155,8 @@ String GetSavegameErrorText(SavegameErrorType err) {
 		return "Saved with the engine running at a different colour depth.";
 	case kSvgErr_GameObjectInitFailed:
 		return "Game object initialization failed after save restoration.";
+	default:
+		break;
 	}
 	return "Unknown error.";
 }
@@ -448,7 +451,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
 	}
 
 	// restore these to the ones retrieved from the save game
-	const size_t dynsurf_num = Math::Min((size_t)MAX_DYNAMIC_SURFACES, r_data.DynamicSurfaces.size());
+	const size_t dynsurf_num = Math::Min((uint)MAX_DYNAMIC_SURFACES, r_data.DynamicSurfaces.size());
 	for (size_t i = 0; i < dynsurf_num; ++i) {
 		_G(dynamicallyCreatedSurfaces)[i] = r_data.DynamicSurfaces[i];
 	}

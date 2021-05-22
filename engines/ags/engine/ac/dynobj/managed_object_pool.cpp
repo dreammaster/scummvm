@@ -141,7 +141,7 @@ ScriptValueType ManagedObjectPool::HandleToAddressAndManager(int32_t handle, voi
 		return kScValUndefined;
 	}
 
-	object = (void *)o.addr;  // WARNING: This strips the const from the char* pointer.
+	object = const_cast<char *>(o.addr);  // WARNING: This strips the const from the char* pointer.
 	manager = o.callback;
 	return o.obj_type;
 }
@@ -256,7 +256,7 @@ void ManagedObjectPool::WriteToDisk(Stream *out) {
 		// handle
 		out->WriteInt32(o.handle);
 		// write the type of the object
-		StrUtil::WriteCStr((char *)o.callback->GetType(), out);
+		StrUtil::WriteCStr(const_cast<char *>(o.callback->GetType()), out);
 		// now write the object data
 		int bytesWritten = o.callback->Serialize(o.addr, &serializeBuffer.front(), serializeBuffer.size());
 		if ((bytesWritten < 0) && ((size_t)(-bytesWritten) > serializeBuffer.size())) {

@@ -866,6 +866,8 @@ stage_again:
 #ifdef DEBUG_PATHFINDER
 		// getch();
 #endif
+		(void)lastpbs;
+
 		return mlist;
 	} else {
 		return 0;
