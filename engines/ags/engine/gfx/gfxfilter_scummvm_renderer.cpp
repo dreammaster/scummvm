@@ -20,36 +20,20 @@
  *
  */
 
-//=============================================================================
-//
-// Graphics driver exception class
-//
-//=============================================================================
-
-#ifndef AGS_ENGINE_GFX_ALI_3D_EXCEPTION_H
-#define AGS_ENGINE_GFX_ALI_3D_EXCEPTION_H
+#include "ags/engine/gfx/gfxfilter_scummvm_renderer.h"
 
 namespace AGS3 {
 namespace AGS {
 namespace Engine {
+namespace ALSW {
 
-class Ali3DException {
-public:
-	Ali3DException(const char *message) {
-		_message = message;
-	}
+const GfxFilterInfo ScummVMRendererGfxFilter::FilterInfo = GfxFilterInfo("StdScale", "Nearest-neighbour");
 
-	const char *_message;
-};
+const GfxFilterInfo &ScummVMRendererGfxFilter::GetInfo() const {
+	return FilterInfo;
+}
 
-class Ali3DFullscreenLostException : public Ali3DException {
-public:
-	Ali3DFullscreenLostException() : Ali3DException("User has switched away from application") {
-	}
-};
-
+} // namespace ALSW
 } // namespace Engine
 } // namespace AGS
 } // namespace AGS3
-
-#endif

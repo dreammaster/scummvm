@@ -67,7 +67,6 @@
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/engine/gfx/gfx_util.h"
 #include "ags/engine/gfx/graphics_driver.h"
-#include "ags/engine/gfx/ali_3d_exception.h"
 #include "ags/engine/gfx/blender.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/game.h"

@@ -36,7 +36,6 @@
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/engine/gfx/ali_3d_exception.h"
 #include "ags/engine/main/main_header.h"
 #include "ags/engine/main/game_run.h"
 #include "ags/engine/main/game_start.h"

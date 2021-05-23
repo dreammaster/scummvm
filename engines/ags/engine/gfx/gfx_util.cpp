@@ -21,7 +21,7 @@
  */
 
 #include "ags/shared/core/platform.h"
-#include "ags/shared/gfx/gfx_util.h"
+#include "ags/engine/gfx/gfx_util.h"
 #include "ags/engine/gfx/blender.h "
 
 namespace AGS3 {

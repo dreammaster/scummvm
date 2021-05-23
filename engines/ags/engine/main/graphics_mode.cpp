@@ -25,12 +25,10 @@
 //
 
 #include "ags/lib/std/algorithm.h"
-//include <SDL.h>
 #include "ags/shared/core/platform.h"
 #include "ags/engine/ac/draw.h"
 #include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
-#include "ags/engine/gfx/ali_3d_exception.h"
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/engine/gfx/gfx_driver_factory.h"
 #include "ags/engine/gfx/gfxfilter.h"

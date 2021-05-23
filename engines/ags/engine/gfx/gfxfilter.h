@@ -26,8 +26,8 @@
 //
 //=============================================================================
 
-#ifndef AGS_ENGINE_GFX__GFXFILTER_H
-#define AGS_ENGINE_GFX__GFXFILTER_H
+#ifndef AGS_ENGINE_GFX_GFXFILTER_H
+#define AGS_ENGINE_GFX_GFXFILTER_H
 
 #include "ags/lib/std/memory.h"
 #include "ags/shared/util/geometry.h"

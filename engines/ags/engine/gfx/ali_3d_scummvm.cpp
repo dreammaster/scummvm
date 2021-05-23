@@ -20,15 +20,15 @@
  *
  */
 
-#include "ags/shared/gfx/ali3dsw.h"
+#include "ags/engine/gfx/ali_3d_scummvm.h"
 #include "ags/lib/std/algorithm.h"
 #include "ags/engine/ac/sys_events.h"
-#include "ags/engine/gfx/ali_3d_exception.h"
-#include "ags/engine/gfx/gfxfilter_sdl_renderer.h"
-#include "ags/shared/gfx/gfx_util.h"
+#include "ags/engine/gfx/gfxfilter_scummvm_renderer.h"
+#include "ags/engine/gfx/gfx_util.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/platform/base/sys_main.h"
 #include "ags/engine/ac/timer.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 namespace AGS {
@@ -38,81 +38,68 @@ namespace ALSW {
 using namespace Shared;
 
 static unsigned long _trans_alpha_blender32(unsigned long x, unsigned long y, unsigned long n);
-RGB faded_out_palette[256];
+static RGB faded_out_palette[256];
 
 
 // ----------------------------------------------------------------------------
-// SDLRendererGraphicsDriver
+// ScummVMRendererGraphicsDriver
 // ----------------------------------------------------------------------------
 
-#if SDL_VERSION_ATLEAST(2, 0, 5)
-// used to add alpha back to rendered screen.
-static auto fix_alpha_blender = SDL_ComposeCustomBlendMode(
-	SDL_BLENDFACTOR_ZERO,
-	SDL_BLENDFACTOR_ONE,
-	SDL_BLENDOPERATION_ADD,
-	SDL_BLENDFACTOR_ONE,
-	SDL_BLENDFACTOR_ZERO,
-	SDL_BLENDOPERATION_ADD
-);
-#endif
-
-SDLRendererGraphicsDriver::SDLRendererGraphicsDriver() {
+ScummVMRendererGraphicsDriver::ScummVMRendererGraphicsDriver() {
 	_tint_red = 0;
 	_tint_green = 0;
 	_tint_blue = 0;
-	_origVirtualScreen = nullptr;
 	virtualScreen = nullptr;
 	_stageVirtualScreen = nullptr;
 
 	// Initialize default sprite batch, it will be used when no other batch was activated
-	SDLRendererGraphicsDriver::InitSpriteBatch(0, _spriteBatchDesc[0]);
+	ScummVMRendererGraphicsDriver::InitSpriteBatch(0, _spriteBatchDesc[0]);
 }
 
-bool SDLRendererGraphicsDriver::IsModeSupported(const DisplayMode &mode) {
+bool ScummVMRendererGraphicsDriver::IsModeSupported(const DisplayMode &mode) {
 	if (mode.Width <= 0 || mode.Height <= 0) {
-		SDL_SetError("Invalid resolution parameters: %d x %d", mode.Width, mode.Height);
+		warning("Invalid resolution parameters: %d x %d", mode.Width, mode.Height);
 		return false;
 	}
 	if (mode.ColorDepth != 32) {
-		SDL_SetError("Display colour depth not supported: %d", mode.ColorDepth);
+		warning("Display colour depth not supported: %d", mode.ColorDepth);
 		return false;
 	}
 	return true;
 }
 
-int SDLRendererGraphicsDriver::GetDisplayDepthForNativeDepth(int native_color_depth) const {
+int ScummVMRendererGraphicsDriver::GetDisplayDepthForNativeDepth(int native_color_depth) const {
 	// TODO: check for device caps to know which depth is supported?
 	if (native_color_depth > 8)
 		return 32;
 	return native_color_depth;
 }
 
-IGfxModeList *SDLRendererGraphicsDriver::GetSupportedModeList(int color_depth) {
+IGfxModeList *ScummVMRendererGraphicsDriver::GetSupportedModeList(int color_depth) {
 	std::vector<DisplayMode> modes;
 	sys_get_desktop_modes(modes);
-	return new SDLRendererGfxModeList(modes);
+	return new ScummVMRendererGfxModeList(modes);
 }
 
-PGfxFilter SDLRendererGraphicsDriver::GetGraphicsFilter() const {
+PGfxFilter ScummVMRendererGraphicsDriver::GetGraphicsFilter() const {
 	return _filter;
 }
 
-void SDLRendererGraphicsDriver::SetGraphicsFilter(PSDLRenderFilter filter) {
+void ScummVMRendererGraphicsDriver::SetGraphicsFilter(PSDLRenderFilter filter) {
 	_filter = filter;
 	OnSetFilter();
 
 	// TODO: support separate nearest and linear filters, initialize hint by calls to filter object
 	// e.g like D3D and OGL filters act
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+//	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 	// SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");  // make the scaled rendering look smoother.
 }
 
-void SDLRendererGraphicsDriver::SetTintMethod(TintMethod method) {
+void ScummVMRendererGraphicsDriver::SetTintMethod(TintMethod method) {
 	// TODO: support new D3D-style tint method
 }
 
-bool SDLRendererGraphicsDriver::SetDisplayMode(const DisplayMode &mode) {
+bool ScummVMRendererGraphicsDriver::SetDisplayMode(const DisplayMode &mode) {
 	ReleaseDisplayMode();
 
 	set_color_depth(mode.ColorDepth);
@@ -124,11 +111,12 @@ bool SDLRendererGraphicsDriver::SetDisplayMode(const DisplayMode &mode) {
 		return false;
 
 	if (sys_get_window() == nullptr) {
+#ifdef TODO
 		SDL_Window *window = sys_window_create("", mode.Width, mode.Height, mode.Windowed);
 
 		_hasGamma = SDL_GetWindowGammaRamp(window, _defaultGammaRed, _defaultGammaGreen, _defaultGammaBlue) == 0;
 
-		Uint32 rendererFlags = SDL_RENDERER_ACCELERATED;
+		uint32 rendererFlags = SDL_RENDERER_ACCELERATED;
 		if (mode.Vsync) {
 			rendererFlags |= SDL_RENDERER_PRESENTVSYNC;
 		}
@@ -142,6 +130,7 @@ bool SDLRendererGraphicsDriver::SetDisplayMode(const DisplayMode &mode) {
 				Debug::Printf("\t- %s", SDL_GetPixelFormatName(rinfo.texture_formats[i]));
 			}
 		}
+#endif
 	} else {
 		sys_window_set_style(mode.Windowed);
 		if (mode.Windowed)
@@ -157,7 +146,7 @@ bool SDLRendererGraphicsDriver::SetDisplayMode(const DisplayMode &mode) {
 	return true;
 }
 
-void SDLRendererGraphicsDriver::UpdateDeviceScreen(const Size &screen_sz) {
+void ScummVMRendererGraphicsDriver::UpdateDeviceScreen(const Size &screen_sz) {
 	_mode.Width = screen_sz.Width;
 	_mode.Height = screen_sz.Height;
 #if AGS_PLATFORM_OS_ANDROID
@@ -165,7 +154,7 @@ void SDLRendererGraphicsDriver::UpdateDeviceScreen(const Size &screen_sz) {
 #endif
 }
 
-void SDLRendererGraphicsDriver::CreateVirtualScreen() {
+void ScummVMRendererGraphicsDriver::CreateVirtualScreen() {
 	if (!IsNativeSizeValid())
 		return;
 	DestroyVirtualScreen();
@@ -176,6 +165,7 @@ void SDLRendererGraphicsDriver::CreateVirtualScreen() {
 	virtualScreen = _origVirtualScreen.get();
 	_stageVirtualScreen = virtualScreen;
 
+#ifdef TODO
 	_screenTex = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, vscreen_w, vscreen_h);
 
 	// Fake bitmap that will wrap over texture pixels for simplier conversion
@@ -198,104 +188,108 @@ void SDLRendererGraphicsDriver::CreateVirtualScreen() {
 	_fakeTexBitmap->write_bank = tmpbitmap->write_bank;
 	_fakeTexBitmap->read_bank = tmpbitmap->read_bank;
 	destroy_bitmap(tmpbitmap);
-
+#endif
 	_lastTexPixels = nullptr;
 	_lastTexPitch = -1;
 }
 
-void SDLRendererGraphicsDriver::DestroyVirtualScreen() {
+void ScummVMRendererGraphicsDriver::DestroyVirtualScreen() {
 	delete[] _fakeTexBitmap; // don't use destroy_bitmap(), because it's a fake structure
 	_fakeTexBitmap = nullptr;
+#ifdef TODO
 	if (_screenTex != nullptr) {
 		SDL_DestroyTexture(_screenTex);
 	}
-	_screenTex = nullptr;
 
+	_screenTex = nullptr;
+#endif
 	_origVirtualScreen.reset();
 	virtualScreen = nullptr;
 	_stageVirtualScreen = nullptr;
 }
 
-void SDLRendererGraphicsDriver::ReleaseDisplayMode() {
+void ScummVMRendererGraphicsDriver::ReleaseDisplayMode() {
 	OnModeReleased();
 	ClearDrawLists();
 }
 
-bool SDLRendererGraphicsDriver::SetNativeSize(const Size &src_size) {
+bool ScummVMRendererGraphicsDriver::SetNativeSize(const Size &src_size) {
 	OnSetNativeSize(src_size);
 	CreateVirtualScreen();
 	return !_srcRect.IsEmpty();
 }
 
-bool SDLRendererGraphicsDriver::SetRenderFrame(const Rect &dst_rect) {
+bool ScummVMRendererGraphicsDriver::SetRenderFrame(const Rect &dst_rect) {
 	OnSetRenderFrame(dst_rect);
 	return !_dstRect.IsEmpty();
 }
 
-void SDLRendererGraphicsDriver::ClearRectangle(int x1, int y1, int x2, int y2, RGB *colorToUse) {
+void ScummVMRendererGraphicsDriver::ClearRectangle(int x1, int y1, int x2, int y2, RGB *colorToUse) {
 	// TODO: but maybe is not necessary, as we use SDL_Renderer with accelerated gfx here?
 	// See SDL_RenderDrawRect
 }
 
-SDLRendererGraphicsDriver::~SDLRendererGraphicsDriver() {
-	SDLRendererGraphicsDriver::UnInit();
+ScummVMRendererGraphicsDriver::~ScummVMRendererGraphicsDriver() {
+	ScummVMRendererGraphicsDriver::UnInit();
 }
 
-void SDLRendererGraphicsDriver::UnInit() {
+void ScummVMRendererGraphicsDriver::UnInit() {
 	OnUnInit();
 	ReleaseDisplayMode();
 	DestroyVirtualScreen();
-
+#ifdef TODO
 	if (_renderer) {
 		SDL_DestroyRenderer(_renderer);
 		_renderer = nullptr;
 	}
+#endif
 
 	sys_window_destroy();
 }
 
-bool SDLRendererGraphicsDriver::SupportsGammaControl() {
+bool ScummVMRendererGraphicsDriver::SupportsGammaControl() {
 	return _hasGamma;
 }
 
-void SDLRendererGraphicsDriver::SetGamma(int newGamma) {
+void ScummVMRendererGraphicsDriver::SetGamma(int newGamma) {
 	if (!_hasGamma) {
 		return;
 	}
 
-	Uint16 gamma_red[256];
-	Uint16 gamma_green[256];
-	Uint16 gamma_blue[256];
+	uint16 gamma_red[256];
+	uint16 gamma_green[256];
+	uint16 gamma_blue[256];
 
 	for (int i = 0; i < 256; i++) {
 		gamma_red[i] = std::min(((int)_defaultGammaRed[i] * newGamma) / 100, 0xffff);
 		gamma_green[i] = std::min(((int)_defaultGammaGreen[i] * newGamma) / 100, 0xffff);
 		gamma_blue[i] = std::min(((int)_defaultGammaBlue[i] * newGamma) / 100, 0xffff);
 	}
-
+#ifdef TODO
 	SDL_SetWindowGammaRamp(sys_get_window(), gamma_red, gamma_green, gamma_blue);
+#endif
 }
 
-int SDLRendererGraphicsDriver::GetCompatibleBitmapFormat(int color_depth) {
+int ScummVMRendererGraphicsDriver::GetCompatibleBitmapFormat(int color_depth) {
 	return color_depth;
 }
 
-IDriverDependantBitmap *SDLRendererGraphicsDriver::CreateDDBFromBitmap(Bitmap *bitmap, bool hasAlpha, bool opaque) {
+IDriverDependantBitmap *ScummVMRendererGraphicsDriver::CreateDDBFromBitmap(Bitmap *bitmap, bool hasAlpha, bool opaque) {
 	ALSoftwareBitmap *newBitmap = new ALSoftwareBitmap(bitmap, opaque, hasAlpha);
 	return newBitmap;
 }
 
-void SDLRendererGraphicsDriver::UpdateDDBFromBitmap(IDriverDependantBitmap *bitmapToUpdate, Bitmap *bitmap, bool hasAlpha) {
+void ScummVMRendererGraphicsDriver::UpdateDDBFromBitmap(IDriverDependantBitmap *bitmapToUpdate, Bitmap *bitmap, bool hasAlpha) {
 	ALSoftwareBitmap *alSwBmp = (ALSoftwareBitmap *)bitmapToUpdate;
 	alSwBmp->_bmp = bitmap;
 	alSwBmp->_hasAlpha = hasAlpha;
 }
 
-void SDLRendererGraphicsDriver::DestroyDDB(IDriverDependantBitmap *bitmap) {
+void ScummVMRendererGraphicsDriver::DestroyDDB(IDriverDependantBitmap *bitmap) {
 	delete bitmap;
 }
 
-void SDLRendererGraphicsDriver::InitSpriteBatch(size_t index, const SpriteBatchDesc &desc) {
+void ScummVMRendererGraphicsDriver::InitSpriteBatch(size_t index, const SpriteBatchDesc &desc) {
 	if (_spriteBatches.size() <= index)
 		_spriteBatches.resize(index + 1);
 	ALSpriteBatch &batch = _spriteBatches[index];
@@ -335,28 +329,28 @@ void SDLRendererGraphicsDriver::InitSpriteBatch(size_t index, const SpriteBatchD
 	}
 }
 
-void SDLRendererGraphicsDriver::ResetAllBatches() {
+void ScummVMRendererGraphicsDriver::ResetAllBatches() {
 	for (ALSpriteBatches::iterator it = _spriteBatches.begin(); it != _spriteBatches.end(); ++it)
 		it->List.clear();
 }
 
-void SDLRendererGraphicsDriver::DrawSprite(int x, int y, IDriverDependantBitmap *bitmap) {
+void ScummVMRendererGraphicsDriver::DrawSprite(int x, int y, IDriverDependantBitmap *bitmap) {
 	_spriteBatches[_actSpriteBatch].List.push_back(ALDrawListEntry((ALSoftwareBitmap *)bitmap, x, y));
 }
 
-void SDLRendererGraphicsDriver::SetScreenFade(int red, int green, int blue) {
+void ScummVMRendererGraphicsDriver::SetScreenFade(int red, int green, int blue) {
 	// TODO: was not necessary atm
 	// TODO: checkme later
 }
 
-void SDLRendererGraphicsDriver::SetScreenTint(int red, int green, int blue) {
+void ScummVMRendererGraphicsDriver::SetScreenTint(int red, int green, int blue) {
 	_tint_red = red; _tint_green = green; _tint_blue = blue;
 	if (((_tint_red > 0) || (_tint_green > 0) || (_tint_blue > 0)) && (_mode.ColorDepth > 8)) {
 		_spriteBatches[_actSpriteBatch].List.push_back(ALDrawListEntry((ALSoftwareBitmap *)0x1, 0, 0));
 	}
 }
 
-void SDLRendererGraphicsDriver::RenderToBackBuffer() {
+void ScummVMRendererGraphicsDriver::RenderToBackBuffer() {
 	// Render all the sprite batches with necessary transformations
 	//
 	// NOTE: that's not immediately clear whether it would be faster to first draw upon a camera-sized
@@ -393,7 +387,7 @@ void SDLRendererGraphicsDriver::RenderToBackBuffer() {
 	ClearDrawLists();
 }
 
-void SDLRendererGraphicsDriver::RenderSpriteBatch(const ALSpriteBatch &batch, Shared::Bitmap *surface, int surf_offx, int surf_offy) {
+void ScummVMRendererGraphicsDriver::RenderSpriteBatch(const ALSpriteBatch &batch, Shared::Bitmap *surface, int surf_offx, int surf_offy) {
 	const std::vector<ALDrawListEntry> &drawlist = batch.List;
 	for (size_t i = 0; i < drawlist.size(); i++) {
 		if (drawlist[i].bitmap == nullptr) {
@@ -438,7 +432,8 @@ void SDLRendererGraphicsDriver::RenderSpriteBatch(const ALSpriteBatch &batch, Sh
 	}
 }
 
-void SDLRendererGraphicsDriver::BlitToTexture() {
+void ScummVMRendererGraphicsDriver::BlitToTexture() {
+#ifdef TODO
 	void *pixels = nullptr;
 	int pitch = 0;
 	auto res = SDL_LockTexture(_screenTex, NULL, &pixels, &pitch);
@@ -465,9 +460,11 @@ void SDLRendererGraphicsDriver::BlitToTexture() {
 	blit(virtualScreen->GetAllegroBitmap(), _fakeTexBitmap, 0, 0, 0, 0, vwidth, vheight);
 
 	SDL_UnlockTexture(_screenTex);
+#endif
 }
 
-void SDLRendererGraphicsDriver::Present() {
+void ScummVMRendererGraphicsDriver::Present() {
+#ifdef TODO
 	if (!_renderer) {
 		return;
 	}
@@ -486,9 +483,11 @@ void SDLRendererGraphicsDriver::Present() {
 	SDL_RenderCopyEx(_renderer, _screenTex, nullptr, &dst, 0.0, nullptr, _renderFlip);
 
 	SDL_RenderPresent(_renderer);
+#endif
 }
 
-void SDLRendererGraphicsDriver::Render(int /*xoff*/, int /*yoff*/, GlobalFlipType flip) {
+void ScummVMRendererGraphicsDriver::Render(int /*xoff*/, int /*yoff*/, GlobalFlipType flip) {
+#ifdef TODO
 	switch (flip) {
 	case kFlip_Both: _renderFlip = (SDL_RendererFlip)(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL); break;
 	case kFlip_Horizontal: _renderFlip = SDL_FLIP_HORIZONTAL; break;
@@ -498,20 +497,21 @@ void SDLRendererGraphicsDriver::Render(int /*xoff*/, int /*yoff*/, GlobalFlipTyp
 
 	RenderToBackBuffer();
 	Present();
+#endif
 }
 
-void SDLRendererGraphicsDriver::Render() {
+void ScummVMRendererGraphicsDriver::Render() {
 	Render(0, 0, kFlip_None);
 }
 
-void SDLRendererGraphicsDriver::Vsync() {
+void ScummVMRendererGraphicsDriver::Vsync() {
 }
 
-Bitmap *SDLRendererGraphicsDriver::GetMemoryBackBuffer() {
+Bitmap *ScummVMRendererGraphicsDriver::GetMemoryBackBuffer() {
 	return virtualScreen;
 }
 
-void SDLRendererGraphicsDriver::SetMemoryBackBuffer(Bitmap *backBuffer) {
+void ScummVMRendererGraphicsDriver::SetMemoryBackBuffer(Bitmap *backBuffer) {
 	if (backBuffer) {
 		virtualScreen = backBuffer;
 	} else {
@@ -526,11 +526,11 @@ void SDLRendererGraphicsDriver::SetMemoryBackBuffer(Bitmap *backBuffer) {
 	}
 }
 
-Bitmap *SDLRendererGraphicsDriver::GetStageBackBuffer(bool /*mark_dirty*/) {
+Bitmap *ScummVMRendererGraphicsDriver::GetStageBackBuffer(bool /*mark_dirty*/) {
 	return _stageVirtualScreen;
 }
 
-bool SDLRendererGraphicsDriver::GetCopyOfScreenIntoBitmap(Bitmap *destination, bool at_native_res, GraphicResolution *want_fmt) {
+bool ScummVMRendererGraphicsDriver::GetCopyOfScreenIntoBitmap(Bitmap *destination, bool at_native_res, GraphicResolution *want_fmt) {
 	(void)at_native_res; // software driver always renders at native resolution at the moment
 	// software filter is taught to copy to any size
 	if (destination->GetColorDepth() != _mode.ColorDepth) {
@@ -556,7 +556,7 @@ bool SDLRendererGraphicsDriver::GetCopyOfScreenIntoBitmap(Bitmap *destination, b
 
 	Author: Matthew Leverton
 **/
-void SDLRendererGraphicsDriver::highcolor_fade_in(Bitmap *vs, void(*draw_callback)(), int offx, int offy, int speed, int targetColourRed, int targetColourGreen, int targetColourBlue) {
+void ScummVMRendererGraphicsDriver::highcolor_fade_in(Bitmap *vs, void(*draw_callback)(), int offx, int offy, int speed, int targetColourRed, int targetColourGreen, int targetColourBlue) {
 	Bitmap *bmp_orig = vs;
 	const int col_depth = bmp_orig->GetColorDepth();
 	const int clearColor = makecol_depth(col_depth, targetColourRed, targetColourGreen, targetColourBlue);
@@ -589,7 +589,7 @@ void SDLRendererGraphicsDriver::highcolor_fade_in(Bitmap *vs, void(*draw_callbac
 	Present();
 }
 
-void SDLRendererGraphicsDriver::highcolor_fade_out(Bitmap *vs, void(*draw_callback)(), int offx, int offy, int speed, int targetColourRed, int targetColourGreen, int targetColourBlue) {
+void ScummVMRendererGraphicsDriver::highcolor_fade_out(Bitmap *vs, void(*draw_callback)(), int offx, int offy, int speed, int targetColourRed, int targetColourGreen, int targetColourBlue) {
 	Bitmap *bmp_orig = vs;
 	const int col_depth = vs->GetColorDepth();
 	const int clearColor = makecol_depth(col_depth, targetColourRed, targetColourGreen, targetColourBlue);
@@ -635,7 +635,7 @@ void initialize_fade_256(int r, int g, int b) {
 	}
 }
 
-void SDLRendererGraphicsDriver::__fade_from_range(PALETTE source, PALETTE dest, int speed, int from, int to) {
+void ScummVMRendererGraphicsDriver::__fade_from_range(PALETTE source, PALETTE dest, int speed, int from, int to) {
 	PALETTE temp;
 	int c;
 
@@ -657,7 +657,7 @@ void SDLRendererGraphicsDriver::__fade_from_range(PALETTE source, PALETTE dest, 
 	set_palette_range(dest, from, to, TRUE);
 }
 
-void SDLRendererGraphicsDriver::__fade_out_range(int speed, int from, int to, int targetColourRed, int targetColourGreen, int targetColourBlue) {
+void ScummVMRendererGraphicsDriver::__fade_out_range(int speed, int from, int to, int targetColourRed, int targetColourGreen, int targetColourBlue) {
 	PALETTE temp;
 
 	initialize_fade_256(targetColourRed, targetColourGreen, targetColourBlue);
@@ -665,7 +665,7 @@ void SDLRendererGraphicsDriver::__fade_out_range(int speed, int from, int to, in
 	__fade_from_range(temp, faded_out_palette, speed, from, to);
 }
 
-void SDLRendererGraphicsDriver::FadeOut(int speed, int targetColourRed, int targetColourGreen, int targetColourBlue) {
+void ScummVMRendererGraphicsDriver::FadeOut(int speed, int targetColourRed, int targetColourGreen, int targetColourBlue) {
 	if (_mode.ColorDepth > 8) {
 		highcolor_fade_out(virtualScreen, _drawPostScreenCallback, 0, 0, speed * 4, targetColourRed, targetColourGreen, targetColourBlue);
 	} else {
@@ -673,7 +673,7 @@ void SDLRendererGraphicsDriver::FadeOut(int speed, int targetColourRed, int targ
 	}
 }
 
-void SDLRendererGraphicsDriver::FadeIn(int speed, PALETTE p, int targetColourRed, int targetColourGreen, int targetColourBlue) {
+void ScummVMRendererGraphicsDriver::FadeIn(int speed, PALETTE p, int targetColourRed, int targetColourGreen, int targetColourBlue) {
 	if (_drawScreenCallback) {
 		_drawScreenCallback();
 		RenderToBackBuffer();
@@ -686,7 +686,7 @@ void SDLRendererGraphicsDriver::FadeIn(int speed, PALETTE p, int targetColourRed
 	}
 }
 
-void SDLRendererGraphicsDriver::BoxOutEffect(bool blackingOut, int speed, int delay) {
+void ScummVMRendererGraphicsDriver::BoxOutEffect(bool blackingOut, int speed, int delay) {
 	if (blackingOut) {
 		int yspeed = _srcRect.GetHeight() / (_srcRect.GetWidth() / speed);
 		int boxwid = speed, boxhit = yspeed;
@@ -712,7 +712,7 @@ void SDLRendererGraphicsDriver::BoxOutEffect(bool blackingOut, int speed, int de
 			if (_pollingCallback)
 				_pollingCallback();
 
-			platform->Delay(delay);
+			_G(platform)->Delay(delay);
 		}
 		delete bmp_buff;
 		SetMemoryBackBuffer(bmp_orig);
@@ -744,44 +744,44 @@ static unsigned long _trans_alpha_blender32(unsigned long x, unsigned long y, un
 }
 
 
-SDLRendererGraphicsFactory *SDLRendererGraphicsFactory::_factory = nullptr;
+ScummVMRendererGraphicsFactory *ScummVMRendererGraphicsFactory::_factory = nullptr;
 
-SDLRendererGraphicsFactory::~SDLRendererGraphicsFactory() {
+ScummVMRendererGraphicsFactory::~ScummVMRendererGraphicsFactory() {
 	_factory = nullptr;
 }
 
-size_t SDLRendererGraphicsFactory::GetFilterCount() const {
+size_t ScummVMRendererGraphicsFactory::GetFilterCount() const {
 	return 1;
 }
 
-const GfxFilterInfo *SDLRendererGraphicsFactory::GetFilterInfo(size_t index) const {
+const GfxFilterInfo *ScummVMRendererGraphicsFactory::GetFilterInfo(size_t index) const {
 	switch (index) {
 	case 0:
-		return &SDLRendererGfxFilter::FilterInfo;
+		return &ScummVMRendererGfxFilter::FilterInfo;
 	default:
 		return nullptr;
 	}
 }
 
-String SDLRendererGraphicsFactory::GetDefaultFilterID() const {
-	return SDLRendererGfxFilter::FilterInfo.Id;
+String ScummVMRendererGraphicsFactory::GetDefaultFilterID() const {
+	return ScummVMRendererGfxFilter::FilterInfo.Id;
 }
 
-/* static */ SDLRendererGraphicsFactory *SDLRendererGraphicsFactory::GetFactory() {
+/* static */ ScummVMRendererGraphicsFactory *ScummVMRendererGraphicsFactory::GetFactory() {
 	if (!_factory)
-		_factory = new SDLRendererGraphicsFactory();
+		_factory = new ScummVMRendererGraphicsFactory();
 	return _factory;
 }
 
-SDLRendererGraphicsDriver *SDLRendererGraphicsFactory::EnsureDriverCreated() {
+ScummVMRendererGraphicsDriver *ScummVMRendererGraphicsFactory::EnsureDriverCreated() {
 	if (!_driver)
-		_driver = new SDLRendererGraphicsDriver();
+		_driver = new ScummVMRendererGraphicsDriver();
 	return _driver;
 }
 
-SDLRendererGfxFilter *SDLRendererGraphicsFactory::CreateFilter(const String &id) {
-	if (SDLRendererGfxFilter::FilterInfo.Id.CompareNoCase(id) == 0)
-		return new SDLRendererGfxFilter();
+ScummVMRendererGfxFilter *ScummVMRendererGraphicsFactory::CreateFilter(const String &id) {
+	if (ScummVMRendererGfxFilter::FilterInfo.Id.CompareNoCase(id) == 0)
+		return new ScummVMRendererGfxFilter();
 	return nullptr;
 }
 

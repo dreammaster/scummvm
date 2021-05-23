@@ -35,7 +35,6 @@
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/device/mouse_w32.h"
 #include "ags/shared/font/fonts.h"
-#include "ags/engine/gfx/ali_3d_exception.h"
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/gui_inv.h"

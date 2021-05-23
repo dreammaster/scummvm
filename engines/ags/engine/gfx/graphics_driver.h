@@ -32,7 +32,6 @@
 #include "math/matrix.h"
 #include "ags/lib/std/memory.h"
 #include "ags/lib/allegro.h" // RGB, PALETTE
-//include <glm/mat4x4.hpp>
 #include "ags/engine/gfx/gfx_defines.h"
 #include "ags/engine/gfx/gfx_mode_list.h"
 #include "ags/shared/util/geometry.h"

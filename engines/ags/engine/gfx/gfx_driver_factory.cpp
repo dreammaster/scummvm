@@ -20,52 +20,23 @@
  *
  */
 
-#include "ags/shared/gfx/gfxdriverfactory.h"
-
-#include "ags/shared/core/platform.h"
-
-#define AGS_HAS_DIRECT3D (AGS_PLATFORM_OS_WINDOWS)
-#define AGS_HAS_OPENGL (AGS_PLATFORM_OS_WINDOWS || AGS_PLATFORM_OS_ANDROID || AGS_PLATFORM_OS_IOS || AGS_PLATFORM_OS_LINUX)
-
-#include "ags/shared/gfx/ali3dsw.h"
-#include "ags/engine/gfx/gfxfilter_sdl_renderer.h"
-
-#if AGS_HAS_OPENGL
-#include "ags/engine/gfx/ali_3d_ogl.h"
-#include "ags/engine/gfx/gfxfilter_ogl.h"
-#endif
-
-#if AGS_HAS_DIRECT3D
-#include "ags/shared/platform/windows/gfx/ali3dd3d.h"
-#include "ags/engine/gfx/gfxfilter_d3d.h"
-#endif
+#include "common/textconsole.h"
+#include "ags/engine/gfx/gfx_driver_factory.h"
+#include "ags/engine/gfx/ali_3d_scummvm.h"
 
 namespace AGS3 {
 namespace AGS {
 namespace Engine {
 
 void GetGfxDriverFactoryNames(StringV &ids) {
-#if AGS_HAS_DIRECT3D
-	ids.push_back("D3D9");
-#endif
-#if AGS_HAS_OPENGL
-	ids.push_back("OGL");
-#endif
-	ids.push_back("Software");
+	ids.push_back("ScummVM");
 }
 
 IGfxDriverFactory *GetGfxDriverFactory(const String id) {
-#if AGS_HAS_DIRECT3D
-	if (id.CompareNoCase("D3D9") == 0)
-		return D3D::D3DGraphicsFactory::GetFactory();
-#endif
-#if AGS_HAS_OPENGL
-	if (id.CompareNoCase("OGL") == 0)
-		return OGL::OGLGraphicsFactory::GetFactory();
-#endif
-	if (id.CompareNoCase("Software") == 0)
-		return ALSW::SDLRendererGraphicsFactory::GetFactory();
-	SDL_SetError("No graphics factory with such id: %s", id.GetCStr());
+	if (id.CompareNoCase("ScummVM") == 0)
+		return ALSW::ScummVMRendererGraphicsFactory::GetFactory();
+
+	error("No graphics factory with such id: %s", id.GetCStr());
 	return nullptr;
 }
 

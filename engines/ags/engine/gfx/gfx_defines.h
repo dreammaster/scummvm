@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef AGS_ENGINE_GFX__GFXDEFINES_H
-#define AGS_ENGINE_GFX__GFXDEFINES_H
+#ifndef AGS_ENGINE_GFX_GFX_DEFINES_H
+#define AGS_ENGINE_GFX_GFX_DEFINES_H
 
 #include "ags/shared/core/types.h"
 

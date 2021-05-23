@@ -20,34 +20,33 @@
  *
  */
 
-#include "ags/shared/core/platform.h"
+//=============================================================================
+//
+// SDL software renderer filter. Technically a non-op, as SDL_Renderer
+// does the job.
+//
+//=============================================================================
 
-#if AGS_PLATFORM_OS_WINDOWS || AGS_PLATFORM_OS_ANDROID || AGS_PLATFORM_OS_IOS || AGS_PLATFORM_OS_LINUX
+#ifndef AGS_ENGINE_GFX_SCUMMVM_RENDERER_FILTER_H
+#define AGS_ENGINE_GFX_SCUMMVM_RENDERER_FILTER_H
 
-#include "ags/engine/gfx/gfxfilter_aaogl.h"
-#include "ags/shared/ogl_headers.h"
+#include "ags/engine/gfx/gfxfilter_scaling.h"
 
 namespace AGS3 {
 namespace AGS {
 namespace Engine {
-namespace OGL {
+namespace ALSW {
 
-const GfxFilterInfo AAOGLGfxFilter::FilterInfo = GfxFilterInfo("Linear", "Linear interpolation");
+class ScummVMRendererGfxFilter : public ScalingGfxFilter {
+public:
+	virtual ~ScummVMRendererGfxFilter() {}
 
-bool AAOGLGfxFilter::UseLinearFiltering() const {
-	return true;
-}
+	virtual const GfxFilterInfo &GetInfo() const;
 
-void AAOGLGfxFilter::SetFilteringForStandardSprite() {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-}
+	static const GfxFilterInfo FilterInfo;
+};
 
-const GfxFilterInfo &AAOGLGfxFilter::GetInfo() const {
-	return FilterInfo;
-}
-
-} // namespace OGL
+} // namespace ALSW
 } // namespace Engine
 } // namespace AGS
 } // namespace AGS3

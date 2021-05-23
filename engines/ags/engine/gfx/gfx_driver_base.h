@@ -32,7 +32,7 @@
 #include "ags/lib/std/vector.h"
 #include "ags/engine/gfx/ddb.h"
 #include "ags/engine/gfx/graphics_driver.h"
-#include "ags/shared/util/scaling.h"
+#include "ags/engine/util/scaling.h"
 
 namespace AGS3 {
 namespace AGS {
