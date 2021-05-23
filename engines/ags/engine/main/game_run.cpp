@@ -67,11 +67,14 @@
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/ac/timer.h"
 #include "ags/shared/ac/keycode.h"
+#include "ags/events.h"
 #include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
+
+static int ShouldStayInWaitMode();
 
 #define UNTIL_ANIMEND   1
 #define UNTIL_MOVEEND   2
@@ -170,6 +173,7 @@ static void lock_mouse_on_click() {
 		_GP(mouse).TryLockToWindow();
 }
 
+#ifdef DEPRECATED
 static void toggle_mouse_lock() {
 	if (_GP(scsystem).windowed) {
 		if (_GP(mouse).IsLockedToWindow())
@@ -178,6 +182,7 @@ static void toggle_mouse_lock() {
 			_GP(mouse).TryLockToWindow();
 	}
 }
+#endif
 
 // Runs default mouse button handling
 static void check_mouse_controls() {
@@ -186,7 +191,7 @@ static void check_mouse_controls() {
 	mongu = gui_on_mouse_move();
 
 	_G(mouse_on_iface) = mongu;
-	if ((_G(ifacepopped) >= 0) && (mousey >= _GP(guis)[_G(ifacepopped)].Y + _GP(guis)[_G(ifacepopped)].Height))
+	if ((_G(ifacepopped) >= 0) && (_G(mousey) >= _GP(guis)[_G(ifacepopped)].Y + _GP(guis)[_G(ifacepopped)].Height))
 		remove_popup_interface(_G(ifacepopped));
 
 	// check mouse clicks on GUIs
@@ -243,6 +248,7 @@ int old_key_mod = 0; // for saving previous key mods
 // Runs service key controls, returns false if service key combinations were handled
 // and no more processing required, otherwise returns true and provides current keycode and key shifts.
 bool run_service_key_controls(int &out_key) {
+#ifdef TODO
 	bool handled = false;
 	const bool key_valid = ags_keyevent_ready();
 	const SDL_Event key_evt = key_valid ? ags_get_next_keyevent() : SDL_Event();
@@ -387,6 +393,7 @@ bool run_service_key_controls(int &out_key) {
 
 	// No service operation triggered? return active keypress and mods to caller
 	out_key = agskey;
+#endif
 	return true;
 }
 
@@ -582,7 +589,7 @@ static void game_loop_update_animated_buttons() {
 
 static void game_loop_do_render_and_check_mouse(IDriverDependantBitmap *extraBitmap, int extraX, int extraY) {
 	if (!_GP(play).fast_forward) {
-		int mwasatx = mousex, mwasaty = mousey;
+		int mwasatx = _G(mousex), mwasaty = _G(mousey);
 
 		// Only do this if we are not skipping a cutscene
 		render_graphics(extraBitmap, extraX, extraY);
@@ -593,7 +600,7 @@ static void game_loop_do_render_and_check_mouse(IDriverDependantBitmap *extraBit
 		// TODO: if we support rotation then we also need to compare full transform!
 		if (_G(displayed_room) < 0)
 			return;
-		auto view = _GP(play).GetRoomViewportAt(mousex, mousey);
+		auto view = _GP(play).GetRoomViewportAt(_G(mousex), _G(mousey));
 		auto cam = view ? view->GetCamera() : nullptr;
 		if (cam) {
 			// NOTE: all cameras are in same room right now, so their positions are in same coordinate system;
@@ -602,10 +609,10 @@ static void game_loop_do_render_and_check_mouse(IDriverDependantBitmap *extraBit
 			int offsetx = cam->GetRect().Left;
 			int offsety = cam->GetRect().Top;
 
-			if (((mwasatx != mousex) || (mwasaty != mousey) ||
+			if (((mwasatx != _G(mousex)) || (mwasaty != _G(mousey)) ||
 				(offsetxWas != offsetx) || (offsetyWas != offsety))) {
 				// mouse moves over hotspot
-				if (__GetLocationType(game_to_data_coord(mousex), game_to_data_coord(mousey), 1) == LOCTYPE_HOTSPOT) {
+				if (__GetLocationType(game_to_data_coord(_G(mousex)), game_to_data_coord(_G(mousey)), 1) == LOCTYPE_HOTSPOT) {
 					int onhs = _G(getloctype_index);
 
 					setevent(EV_RUNEVBLOCK, EVB_HOTSPOT, onhs, 6);
@@ -668,7 +675,7 @@ static void game_loop_update_fps() {
 	auto frames = _G(loopcounter) - _G(lastcounter);
 
 	if (duration >= std::chrono::milliseconds(1000) && frames > 0) {
-		fps = 1000.0f * frames / duration.count();
+		_G(fps) = 1000.0f * frames / duration.count();
 		_G(t1) = t2;
 		_G(lastcounter) = _G(loopcounter);
 	}
@@ -677,8 +684,8 @@ static void game_loop_update_fps() {
 float get_current_fps() {
 	// if we have maxed out framerate then return the frame rate we're seeing instead
 	// fps must be greater that 0 or some timings will take forever.
-	if (isTimerFpsMaxed() && fps > 0.0f) {
-		return fps;
+	if (isTimerFpsMaxed() && _G(fps) > 0.0f) {
+		return _G(fps);
 	}
 	return _G(frames_per_second);
 }
@@ -687,7 +694,7 @@ void set_loop_counter(unsigned int new_counter) {
 	_G(loopcounter) = new_counter;
 	_G(t1) = AGS_Clock::now();
 	_G(lastcounter) = _G(loopcounter);
-	fps = std::numeric_limits<float>::quiet_NaN();
+	_G(fps) = std::numeric_limits<float>::quiet_undefined();
 }
 
 void UpdateGameOnce(bool checkControls, IDriverDependantBitmap *extraBitmap, int extraX, int extraY) {
@@ -773,7 +780,7 @@ static void UpdateMouseOverLocation() {
 	// Call GetLocationName - it will internally force a GUI refresh
 	// if the result it returns has changed from last time
 	char tempo[STD_BUFFER_SIZE];
-	GetLocationName(game_to_data_coord(mousex), game_to_data_coord(mousey), tempo);
+	GetLocationName(game_to_data_coord(_G(mousex)), game_to_data_coord(_G(mousey)), tempo);
 
 	if ((_GP(play).get_loc_name_save_cursor >= 0) &&
 		(_GP(play).get_loc_name_save_cursor != _GP(play).get_loc_name_last_time) &&
@@ -966,7 +973,7 @@ void RunGameUntilAborted() {
 }
 
 void update_polled_stuff_if_runtime() {
-	SDL_PumpEvents();
+	::AGS::g_events->pollEvents();
 
 	if (_G(want_exit)) {
 		_G(want_exit) = 0;

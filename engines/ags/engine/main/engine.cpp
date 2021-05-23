@@ -63,6 +63,7 @@
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/font/ags_font_renderer.h"
 #include "ags/shared/font/fonts.h"
+#include "ags/shared/gfx/image.h"
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/engine/gfx/gfx_driver_factory.h"
 #include "ags/engine/gfx/ddb.h"
@@ -81,6 +82,8 @@
 #include "ags/shared/util/path.h"
 //#include "ags/engine/media/audio/audio_core.h"
 //#include "ags/engine/platform/util/pe.h"
+#include "ags/ags.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -275,16 +278,16 @@ String search_for_game_data_file(String &was_searching_in)
         return data_path;
 
     // 2.3 Look in executable's directory (if it's different from current dir)
-    if (Path::ComparePaths(appDirectory, cur_dir) == 0)
+    if (Path::ComparePaths(_G(appDirectory), cur_dir) == 0)
         return ""; // no luck
-    was_searching_in = appDirectory;
+    was_searching_in = _G(appDirectory);
     Debug::Printf("Searching in (exe dir): %s", was_searching_in.GetCStr());
     // first scan for config
-    data_path = find_game_data_in_config(appDirectory);
+    data_path = find_game_data_in_config(_G(appDirectory));
     if (!data_path.IsEmpty())
         return data_path;
     // if not found in config, lookup for data in same dir
-    return FindGameData(appDirectory);
+    return FindGameData(_G(appDirectory));
 }
 
 void engine_init_fonts()
@@ -301,7 +304,7 @@ void engine_init_mouse()
         Debug::Printf(kDbgMsg_Info, "Initializing mouse: failed");
     else
         Debug::Printf(kDbgMsg_Info, "Initializing mouse: number of buttons reported is %d", res);
-    Mouse::SetSpeed(_GP(usetup).mouse_speed);
+    _GP(mouse).SetSpeed(_GP(usetup).mouse_speed);
 }
 
 void engine_locate_speech_pak()
@@ -418,13 +421,14 @@ void engine_init_timer()
     skipMissedTicks();
 }
 
-void engine_init_audio()
-{
-    if (_GP(usetup).audio_backend != 0)
-    {
+void engine_init_audio() {
+#if !AGS_PLATFORM_SCUMMVM
+	if (_GP(usetup).audio_backend != 0) {
         Debug::Printf("Initializing audio");
         audio_core_init(); // audio core system
     }
+#endif
+
     _G(our_eip) = -181;
 
     if (_GP(usetup).audio_backend == 0)
@@ -454,7 +458,7 @@ void atexit_handler() {
             "Program pointer: %+03d  (write this number down), ACI version %s\n"
             "If you see a list of numbers above, please write them down and contact\n"
             "developers. Otherwise, note down any other information displayed.",
-            _G(our_eip), EngineVersion.LongString.GetCStr());
+            _G(our_eip), _G(EngineVersion).LongString.GetCStr());
     }
 }
 
@@ -467,8 +471,8 @@ void engine_init_exit_handler()
 
 void engine_init_rand()
 {
-    _GP(play).randseed = time(nullptr);
-    srand (_GP(play).randseed);
+	_GP(play).randseed = g_system->getMillis();
+	::AGS::g_vm->setRandomNumberSeed(_GP(play).randseed);
 }
 
 void engine_init_pathfinder()
@@ -617,7 +621,7 @@ int engine_check_font_was_loaded()
 void show_preload()
 {
     RGB temppal[256];
-	Bitmap *splashsc = BitmapHelper::CreateRawBitmapOwner( load_pcx("preload.pcx",temppal) );
+	Bitmap *splashsc = BitmapHelper::CreateRawBitmapOwner(load_pcx("preload.pcx", temppal));
     if (splashsc != nullptr)
     {
         Debug::Printf("Displaying preload image");
@@ -678,7 +682,7 @@ void engine_init_game_settings()
 
     for (ee=0;ee<256;ee++) {
         if (_GP(game).paluses[ee]!=PAL_BACKGROUND)
-            palette[ee]=_GP(game).defpal[ee];
+            _G(palette)[ee]=_GP(game).defpal[ee];
     }
 
     for (ee = 0; ee < _GP(game).numcursors; ee++) 
@@ -915,9 +919,9 @@ void engine_init_game_settings()
     update_invorder();
     _G(displayed_room) = -10;
 
-    currentcursor=0;
+    _G(currentcursor)=0;
     _G(our_eip)=-4;
-    mousey=100;  // stop icon bar popping up
+    _G(mousey)=100;  // stop icon bar popping up
 
     // We use same variable to read config and be used at runtime for now,
     // so update it here with regards to game design option
@@ -929,7 +933,7 @@ void engine_init_game_settings()
 void engine_setup_scsystem_auxiliary()
 {
     // ScriptSystem::aci_version is only 10 chars long
-    strncpy(_GP(scsystem).aci_version, EngineVersion.LongString, 10);
+    strncpy(_GP(scsystem).aci_version, _G(EngineVersion).LongString, 10);
     if (_GP(usetup).override_script_os >= 0)
     {
         _GP(scsystem).os = _GP(usetup).override_script_os;
@@ -1129,8 +1133,8 @@ void engine_prepare_config(ConfigTree &cfg, const ConfigTree &startup_opts)
     engine_read_config(cfg);
     // Merge startup options in
     for (const auto &sectn : startup_opts)
-        for (const auto &opt : sectn.second)
-            cfg[sectn.first][opt.first] = opt.second;
+        for (const auto &opt : sectn._value)
+            cfg[sectn._key][opt._key] = opt._value;
 }
 
 // Applies configuration to the running game
@@ -1141,10 +1145,6 @@ void engine_set_config(const ConfigTree cfg)
     post_config();
 }
 
-//
-// --tell command support: printing engine/game info by request
-//
-extern std::set<String> _G(tellInfoKeys);
 static bool print_info_needs_game(const std::set<String> &keys)
 {
     return keys.count("all") > 0 || keys.count("config") > 0 || keys.count("configpath") > 0 ||
@@ -1182,9 +1182,9 @@ static void engine_print_info(const std::set<String> &keys, ConfigTree *user_cfg
     {
         for (const auto &sectn : *user_cfg)
         {
-            String cfg_sectn = String::FromFormat("config@%s", sectn.first.GetCStr());
-            for (const auto &opt : sectn.second)
-                data[cfg_sectn][opt.first] = opt.second;
+            String cfg_sectn = String::FromFormat("config@%s", sectn._key.GetCStr());
+            for (const auto &opt : sectn._value)
+                data[cfg_sectn][opt._key] = opt._value;
         }
     }
     if (all || keys.count("data") > 0)
@@ -1215,19 +1215,6 @@ static void engine_print_info(const std::set<String> &keys, ConfigTree *user_cfg
     String full;
     IniUtil::WriteToString(full, data);
     _G(platform)->WriteStdOut("%s", full.GetCStr());
-}
-
-// Custom resource search callback for Allegro's system driver.
-// It helps us direct Allegro to our game data location, because it won't know.
-static int al_find_resource(char *dest, const char* resource, int dest_size)
-{
-    String path = _GP(AssetMgr)->FindAssetFileOnly(resource);
-    if (!path.IsEmpty())
-    {
-        snprintf(dest, dest_size, "%s", path.GetCStr());
-        return 0;
-    }
-    return -1;
 }
 
 // TODO: this function is still a big mess, engine/system-related initialization
@@ -1378,7 +1365,7 @@ int initialize_engine(const ConfigTree &startup_opts)
 
 	allegro_bitmap_test_init();
 
-    initialize_start_and_play_game(override_start_room, _G(loadSaveGameOnStartup));
+    initialize_start_and_play_game(_G(override_start_room), _G(loadSaveGameOnStartup));
 
     quit("|bye!");
     return EXIT_NORMAL;
@@ -1475,7 +1462,7 @@ const char *get_engine_name()
 }
 
 const char *get_engine_version() {
-    return EngineVersion.LongString.GetCStr();
+    return _G(EngineVersion).LongString.GetCStr();
 }
 
 void engine_set_pre_init_callback(t_engine_pre_init_callback callback) {

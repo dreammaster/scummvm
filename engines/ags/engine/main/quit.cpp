@@ -20,10 +20,12 @@
  *
  */
 
+ //
+ // Quit game procedure
+ //
+
 #include "ags/shared/core/platform.h"
-#include "ags/lib/allegro.h"
 #include "ags/engine/ac/cd_audio.h"
-#include "ags/shared/ac/common.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
@@ -44,10 +46,10 @@
 #include "ags/shared/gfx/bitmap.h"
 #include "ags/shared/core/asset_manager.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
-#include "ags/engine/platform/base/sys_main.h"
 #include "ags/plugins/plugin_engine.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/globals.h"
+#include "ags/ags.h"
 
 namespace AGS3 {
 
@@ -86,8 +88,8 @@ void quit_check_dynamic_sprites(QuitReason qreason) {
 
 void quit_shutdown_platform(QuitReason qreason) {
 	// Be sure to unlock mouse on exit, or users will hate us
-	sys_window_lock_mouse(false);
-	G(platform)->AboutToQuitGame();
+	_G(platform)->UnlockMouse();
+	_G(platform)->AboutToQuitGame();
 
 	_G(our_eip) = 9016;
 
@@ -95,8 +97,10 @@ void quit_shutdown_platform(QuitReason qreason) {
 
 	quit_check_dynamic_sprites(qreason);
 
+	_G(platform)->FinishedUsingGraphicsMode();
+
 	if (_G(use_cdplayer))
-		G(platform)->ShutdownCDPlayer();
+		_G(platform)->ShutdownCDPlayer();
 }
 
 void quit_shutdown_audio() {
@@ -122,8 +126,8 @@ QuitReason quit_check_for_error_state(const char *&qmsg, String &alertis) {
 		} else {
 			qreason = kQuit_GameError;
 			alertis.Format("An error has occurred. Please contact the game author for support, as this "
-				"is likely to be an error in game logic or script and not a bug in AGS engine.\n"
-				"(ACI version %s)\n\n", EngineVersion.LongString.GetCStr());
+				"is likely to be a scripting error and not a bug in AGS.\n"
+				"(ACI version %s)\n\n", _G(EngineVersion).LongString.GetCStr());
 		}
 
 		alertis.Append(get_cur_script(5));
@@ -137,13 +141,12 @@ QuitReason quit_check_for_error_state(const char *&qmsg, String &alertis) {
 		qmsg++;
 		alertis.Format("A warning has been generated. This is not normally fatal, but you have selected "
 			"to treat warnings as errors.\n"
-			"(ACI version %s)\n\n%s\n", EngineVersion.LongString.GetCStr(), get_cur_script(5).GetCStr());
+			"(ACI version %s)\n\n%s\n", _G(EngineVersion).LongString.GetCStr(), get_cur_script(5).GetCStr());
 		return kQuit_GameWarning;
 	} else {
 		alertis.Format("An internal error has occurred. Please note down the following information.\n"
-			"If the problem persists, contact the game author for support or post these details on the AGS Technical Forum.\n"
 			"(ACI version %s)\n"
-			"\nError: ", EngineVersion.LongString.GetCStr());
+			"\nError: ", _G(EngineVersion).LongString.GetCStr());
 		return kQuit_FatalError;
 	}
 }
@@ -155,7 +158,7 @@ void quit_message_on_exit(const char *qmsg, String &alertis, QuitReason qreason)
 		// Display the message (at this point the window still exists)
 		sprintf(_G(pexbuf), "%s\n", qmsg);
 		alertis.Append(_G(pexbuf));
-		G(platform)->DisplayAlert("%s", alertis.GetCStr());
+		_G(platform)->DisplayAlert("%s", alertis.GetCStr());
 	}
 }
 
@@ -163,31 +166,19 @@ void quit_release_data() {
 	resetRoomStatuses();
 	_GP(thisroom).Free();
 	_GP(play).Free();
-
-	/*  _CrtMemState memstart;
-	_CrtMemCheckpoint(&memstart);
-	_CrtMemDumpStatistics( &memstart );*/
-
-	AssetMgr.reset();
+	_GP(AssetMgr).reset();
 }
 
 void quit_delete_temp_files() {
-	al_ffblk dfb;
-	int	dun = al_findfirst("~ac*.tmp", &dfb, FA_SEARCH);
+#ifdef TODO
+	al_ffblk    dfb;
+	int dun = al_findfirst("~ac*.tmp", &dfb, FA_SEARCH);
 	while (!dun) {
 		::remove(dfb.name);
 		dun = al_findnext(&dfb);
 	}
 	al_findclose(&dfb);
-}
-
-// TODO: move to test unit
-extern Bitmap *test_allegro_bitmap;
-extern IDriverDependantBitmap *test_allegro_ddb;
-void allegro_bitmap_test_release() {
-	delete test_allegro_bitmap;
-	if (test_allegro_ddb)
-		_G(gfxDriver)->DestroyDDB(test_allegro_ddb);
+#endif
 }
 
 // quit - exits the engine, shutting down everything gracefully
@@ -198,22 +189,27 @@ void allegro_bitmap_test_release() {
 // error.
 // "!|" is a special code used to mean that the player has aborted (Alt+X)
 void quit(const char *quitmsg) {
-	String alertis;
-	QuitReason qreason = quit_check_for_error_state(quitmsg, alertis);
-	// Need to copy it in case it's from a plugin (since we're
-	// about to free plugins)
-	String qmsg = quitmsg;
+	if (!_G(abort_engine)) {
+		strncpy(_G(quit_message), quitmsg, sizeof(_G(quit_message)) - 1);
+		_G(quit_message)[sizeof(_G(quit_message)) - 1] = '\0';
+		_G(abort_engine) = true;
+	}
+}
 
-#if defined (AGS_AUTO_WRITE_USER_CONFIG)
+void quit_free() {
+	String alertis;
+	if (strlen(_G(quit_message)) == 0)
+		strcpy(_G(quit_message), "|bye!");
+
+	const char *quitmsg = _G(quit_message);
+	QuitReason qreason = quit_check_for_error_state(quitmsg, alertis);
+
 	if (qreason & kQuitKind_NormalExit)
 		save_config_file();
-#endif // AGS_AUTO_WRITE_USER_CONFIG
-
-	allegro_bitmap_test_release();
 
 	_G(handledErrorInEditor) = false;
 
-	quit_tell_editor_debugger(qmsg, qreason);
+	quit_tell_editor_debugger(_G(quit_message), qreason);
 
 	_G(our_eip) = 9900;
 
@@ -246,17 +242,16 @@ void quit(const char *quitmsg) {
 
 	engine_shutdown_gfxmode();
 
-	quit_message_on_exit(qmsg, alertis, qreason);
+	quit_message_on_exit(quitmsg, alertis, qreason);
 
 	quit_release_data();
 
 	// release backed library
 	// WARNING: no Allegro objects should remain in memory after this,
 	// if their destruction is called later, program will crash!
-	sys_main_shutdown();
 	allegro_exit();
 
-	G(platform)->PostBackendExit();
+	_G(platform)->PostAllegroExit();
 
 	_G(our_eip) = 9903;
 
@@ -269,13 +264,6 @@ void quit(const char *quitmsg) {
 	shutdown_debug();
 
 	_G(our_eip) = 9904;
-	exit(EXIT_NORMAL);
-}
-
-extern "C" {
-	void quit_c(char *msg) {
-		quit(msg);
-	}
 }
 
 } // namespace AGS3

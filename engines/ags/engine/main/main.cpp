@@ -340,6 +340,7 @@ String GetPathFromCmdArg(int arg_index) {
 	return _G(global_argv)[arg_index];
 }
 
+#ifdef DEPRECATED
 int ags_entry_point(int argc, char *argv[]) {
 
 #ifdef AGS_RUN_TESTS
@@ -399,5 +400,6 @@ int ags_entry_point(int argc, char *argv[]) {
 	}
 #endif
 }
+#endif
 
 } // namespace AGS3
