@@ -39,23 +39,17 @@
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/gui_inv.h"
-#include "ags/shared/main/graphics_mode.h"
-#include "ags/shared/main/engine_setup.h"
+#include "ags/engine/main/graphics_mode.h"
+#include "ags/engine/main/engine_setup.h"
 #include "ags/engine/media/video/video.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/platform/base/sys_main.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-
-
-extern int _places_r, _places_g, _places_b;
-
-
-int _G(convert_16bit_bgr) = 0;
 
 // Convert guis position and size to proper game resolution.
 // Necessary for pre 3.1.0 games only to sync with modern engine.
@@ -186,7 +180,7 @@ void engine_setup_color_conversions(int coldepth) {
 	_G(_rgb_g_shift_16) = 5;
 	_G(_rgb_b_shift_16) = 0;
 	_G(_rgb_r_shift_15) = 10;
-	_rgb_g_shift_15 = 5;
+	_G(_rgb_g_shift_15) = 5;
 	_G(_rgb_b_shift_15) = 0;
 
 	// Most cards do 5-6-5 RGB, which is the format the files are saved in
@@ -196,8 +190,8 @@ void engine_setup_color_conversions(int coldepth) {
 		if (_G(_rgb_r_shift_16) == 10) {
 			// some very old graphics cards lie about being 16-bit when they
 			// are in fact 15-bit ... get around this
-			_places_r = 3;
-			_places_g = 3;
+			_G(places_r) = 3;
+			_G(places_g) = 3;
 		}
 	}
 	if (coldepth > 16) {
@@ -226,7 +220,7 @@ void engine_setup_color_conversions(int coldepth) {
 		_G(_rgb_b_shift_32) = 16;
 
 		_G(_rgb_b_shift_15) = 0;
-		_rgb_g_shift_15 = 5;
+		_G(_rgb_g_shift_15) = 5;
 		_G(_rgb_r_shift_15) = 10;
 #endif
 	}
@@ -252,30 +246,30 @@ void engine_post_gfxmode_mouse_setup(const DisplayMode &dm, const Size &init_des
 	//
 	// NOTE that we setup speed and other related properties regardless of
 	// whether mouse control was requested because it may be enabled later.
-	Mouse::SetSpeedUnit(1.f);
+	_GP(mouse).SetSpeedUnit(1.f);
 	if (_GP(usetup).mouse_speed_def == kMouseSpeed_CurrentDisplay) {
 		Size cur_desktop;
 		if (sys_get_desktop_resolution(cur_desktop.Width, cur_desktop.Height) == 0)
-			Mouse::SetSpeedUnit(Math::Max((float)cur_desktop.Width / (float)init_desktop.Width,
+			_GP(mouse).SetSpeedUnit(Math::Max((float)cur_desktop.Width / (float)init_desktop.Width,
 			(float)cur_desktop.Height / (float)init_desktop.Height));
 	}
 
 	Mouse_EnableControl(_GP(usetup).mouse_ctrl_enabled);
 	Debug::Printf(kDbgMsg_Info, "Mouse speed control: %s, unit: %f, user value: %f",
-		_GP(usetup).mouse_ctrl_enabled ? "enabled" : "disabled", Mouse::GetSpeedUnit(), Mouse::GetSpeed());
+		_GP(usetup).mouse_ctrl_enabled ? "enabled" : "disabled", _GP(mouse).GetSpeedUnit(), _GP(mouse).GetSpeed());
 
 	on_coordinates_scaling_changed();
 
 	// If auto lock option is set, lock mouse to the game window
 	if (_GP(usetup).mouse_auto_lock && _GP(scsystem).windowed != 0)
-		Mouse::TryLockToWindow();
+		_GP(mouse).TryLockToWindow();
 }
 
 // Reset mouse controls before changing gfx mode
 void engine_pre_gfxmode_mouse_cleanup() {
 	// Always disable mouse control and unlock mouse when releasing down gfx mode
 	_GP(mouse).SetMovementControl(false);
-	Mouse::UnlockFromWindow();
+	_GP(mouse).UnlockFromWindow();
 }
 
 // Fill in _GP(scsystem) struct with display mode parameters
@@ -317,12 +311,12 @@ void engine_pre_gfxsystem_shutdown() {
 
 void on_coordinates_scaling_changed() {
 	// Reset mouse graphic area and bounds
-	Mouse::UpdateGraphicArea();
+	_GP(mouse).UpdateGraphicArea();
 	// If mouse bounds do not have valid values yet, then limit cursor to viewport
 	if (_GP(play).mboundx1 == 0 && _GP(play).mboundy1 == 0 && _GP(play).mboundx2 == 0 && _GP(play).mboundy2 == 0)
-		Mouse::SetMoveLimit(_GP(play).GetMainViewport());
+		_GP(mouse).SetMoveLimit(_GP(play).GetMainViewport());
 	else
-		Mouse::SetMoveLimit(Rect(_GP(play).mboundx1, _GP(play).mboundy1, _GP(play).mboundx2, _GP(play).mboundy2));
+		_GP(mouse).SetMoveLimit(Rect(_GP(play).mboundx1, _GP(play).mboundy1, _GP(play).mboundx2, _GP(play).mboundy2));
 }
 
 } // namespace AGS3

@@ -32,32 +32,24 @@
 #include "ags/engine/ac/global_game.h"
 #include "ags/engine/ac/mouse.h"
 #include "ags/engine/ac/room.h"
-#include "ags/shared/ac/screen.h"
+#include "ags/engine/ac/screen.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/engine/debugging/debugger.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/gfx/ali_3d_exception.h"
-#include "ags/shared/main/mainheader.h"
+#include "ags/engine/main/main_header.h"
 #include "ags/engine/main/game_run.h"
-#include "ags/shared/main/game_start.h"
+#include "ags/engine/main/game_start.h"
 #include "ags/engine/script/script.h"
 #include "ags/engine/media/audio/audio_system.h"
 #include "ags/engine/ac/timer.h"
+#include "ags/ags.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-extern int _G(our_eip), _G(displayed_room);
-extern volatile char _G(want_exit), _G(abort_engine);
-
-
-
-
-
-
-
 
 void start_game_init_editor_debugging() {
 	if (_G(editor_debugging_enabled)) {
@@ -75,20 +67,15 @@ void start_game_init_editor_debugging() {
 }
 
 void start_game_load_savegame_on_startup() {
-	if (_G(loadSaveGameOnStartup) != nullptr) {
-		int saveGameNumber = 1000;
-		const char *sgName = strstr(_G(loadSaveGameOnStartup), "agssave.");
-		if (sgName != nullptr) {
-			sscanf(sgName, "agssave.%03d", &saveGameNumber);
-		}
+	if (_G(loadSaveGameOnStartup) != -1) {
 		current_fade_out_effect();
-		try_restore_save(_G(loadSaveGameOnStartup), saveGameNumber);
+		try_restore_save(_G(loadSaveGameOnStartup));
 	}
 }
 
 void start_game() {
 	set_cursor_mode(MODE_WALK);
-	Mouse::SetPosition(Point(160, 100));
+	_GP(mouse).SetPosition(Point(160, 100));
 	newmusic(0);
 
 	_G(our_eip) = -42;
@@ -123,7 +110,7 @@ void do_start_game() {
 		start_game();
 }
 
-void initialize_start_and_play_game(int override_start_room, const char *loadSaveGameOnStartup) {
+void initialize_start_and_play_game(int override_start_room, int loadSaveGameOnStartup) {
 	//try { // BEGIN try for ALI3DEXception
 
 		set_cursor_mode(MODE_WALK);
@@ -138,7 +125,7 @@ void initialize_start_and_play_game(int override_start_room, const char *loadSav
 			_GP(game).options[OPT_ALWAYSSPCH] = oldalways;
 		}
 
-		srand(_GP(play).randseed);
+		::AGS::g_vm->setRandomNumberSeed(_GP(play).randseed);
 		if (override_start_room)
 			_G(playerchar)->room = override_start_room;
 

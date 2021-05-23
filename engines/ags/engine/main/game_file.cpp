@@ -24,8 +24,8 @@
 // Game data file management
 //
 
-#include "ags/shared/main/mainheader.h"
-#include "ags/shared/main/game_file.h"
+#include "ags/engine/main/main_header.h"
+#include "ags/engine/main/game_file.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/character.h"
 #include "ags/engine/ac/character_cache.h"
@@ -36,7 +36,7 @@
 #include "ags/engine/ac/game_state.h"
 #include "ags/shared/ac/game_struct_defines.h"
 #include "ags/engine/ac/gui.h"
-#include "ags/shared/ac/viewframe.h"
+#include "ags/engine/ac/view_frame.h"
 #include "ags/engine/debugging/debug_log.h"
 #include "ags/shared/debugging/out.h"
 #include "ags/shared/gui/gui_label.h"
@@ -51,21 +51,12 @@
 #include "ags/shared/game/main_game_file.h"
 #include "ags/engine/game/game_init.h"
 #include "ags/engine/script/script.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-
-
-
-
-
-
-
-
-
 
 // Test if engine supports extended capabilities required to run the game
 bool test_game_caps(const std::set<String> &caps, std::set<String> &failed_caps) {
@@ -120,15 +111,15 @@ HError preload_game_data() {
 	if (!err)
 		return (HError)err;
 	// Read only the particular data we need for preliminary game analysis
-	PreReadGameData(game, src.InputStream.get(), src.DataVersion);
+	PreReadGameData(_GP(game), src.InputStream.get(), src.DataVersion);
 	_GP(game).compiled_with = src.CompiledWith;
-	FixupSaveDirectory(game);
+	FixupSaveDirectory(_GP(game));
 	return HError::None();
 }
 
 HError load_game_file() {
 	MainGameSource src;
-	LoadedGameEntities ents(game, dialog, views);
+	LoadedGameEntities ents(_GP(game), _G(dialog), _G(views));
 	HGameFileError load_err = OpenMainGameFileFromDefaultAsset(src);
 	if (load_err) {
 		load_err = ReadGameData(ents, src.InputStream.get(), src.DataVersion);
@@ -155,7 +146,7 @@ HError load_game_file() {
 }
 
 void display_game_file_error(HError err) {
-	platform->DisplayAlert("Loading game failed with error:\n%s.\n\nThe game files may be incomplete, corrupt or from unsupported version of AGS.",
+	_G(platform)->DisplayAlert("Loading game failed with error:\n%s.\n\nThe game files may be incomplete, corrupt or from unsupported version of AGS.",
 		err->FullMessage().GetCStr());
 }
 

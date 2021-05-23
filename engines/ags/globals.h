@@ -536,7 +536,7 @@ public:
 	bool _screen_is_dirty = false;
 	AGS::Shared::Bitmap *_raw_saved_screen = nullptr;
 	AGS::Shared::Bitmap **_dynamicallyCreatedSurfaces = nullptr;
-	//int _places_r = 3, _places_g = 2, _places_b = 3;
+	int _places_r = 3, _places_g = 2, _places_b = 3;
 	color *_palette;
 	COLOR_MAP *_maincoltable;
 
@@ -965,7 +965,7 @@ public:
 	String _cmdGameDataPath;
 
 	const char **_global_argv = nullptr;
-//	int _global_argc = 0;
+	int _global_argc = 0;
 
 	// Startup flags, set from parameters to engine
 	int _force_window = 0;
@@ -1079,7 +1079,7 @@ public:
 	 * @{
 	 */
 
-	//bool _handledErrorInEditor = false;
+	bool _handledErrorInEditor = false;
 	//char _return_to_roomedit[30] = { '\0' };
 	//char _return_to_room[150] = { '\0' };
 	char _quit_message[256] = { '\0' };

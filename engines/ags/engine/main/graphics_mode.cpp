@@ -32,14 +32,15 @@
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/gfx/ali_3d_exception.h"
 #include "ags/shared/gfx/bitmap.h"
-#include "ags/shared/gfx/gfxdriverfactory.h"
+#include "ags/engine/gfx/gfx_driver_factory.h"
 #include "ags/engine/gfx/gfxfilter.h"
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/engine/main/config.h"
-#include "ags/shared/main/engine_setup.h"
-#include "ags/shared/main/graphics_mode.h"
+#include "ags/engine/main/engine_setup.h"
+#include "ags/engine/main/graphics_mode.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/platform/base/sys_main.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -50,24 +51,6 @@ namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
-
-extern int _G(proper_exit);
-
-
-
-
-IGfxDriverFactory *_G(GfxFactory) = nullptr;
-
-// Last saved fullscreen and windowed configs; they are used when switching
-// between between fullscreen and windowed modes at runtime.
-// If particular mode is modified, e.g. by script command, related config should be overwritten.
-ActiveDisplaySetting _G(SavedFullscreenSetting);
-ActiveDisplaySetting _GP(SavedWindowedSetting);
-// Current frame scaling setup
-GameFrameSetup     _GP(CurFrameSetup);
-// The game-to-screen transformation
-PlaneScaling       _GP(GameScaling);
-
 
 GameFrameSetup::GameFrameSetup()
 	: ScaleDef(kFrame_IntScale)
@@ -104,20 +87,20 @@ Size get_desktop_size() {
 Size get_max_display_size(bool windowed) {
 	Size device_size = get_desktop_size();
 	if (windowed)
-		platform->ValidateWindowSize(device_size.Width, device_size.Height, false);
+		_G(platform)->ValidateWindowSize(device_size.Width, device_size.Height, false);
 	return device_size;
 }
 
 bool create_gfx_driver(const String &gfx_driver_id) {
 	_G(GfxFactory) = GetGfxDriverFactory(gfx_driver_id);
 	if (!_G(GfxFactory)) {
-		Debug::Printf(kDbgMsg_Error, "Failed to initialize %s graphics factory. Error: %s", gfx_driver_id.GetCStr(), SDL_GetError());
+		Debug::Printf(kDbgMsg_Error, "Failed to initialize %s graphics factory", gfx_driver_id.GetCStr());
 		return false;
 	}
 	Debug::Printf("Using graphics factory: %s", gfx_driver_id.GetCStr());
 	_G(gfxDriver) = _G(GfxFactory)->GetDriver();
 	if (!_G(gfxDriver)) {
-		Debug::Printf(kDbgMsg_Error, "Failed to create graphics driver. Error: %s", SDL_GetError());
+		Debug::Printf(kDbgMsg_Error, "Failed to create graphics driver");
 		return false;
 	}
 	Debug::Printf("Created graphics driver: %s", _G(gfxDriver)->GetDriverName());
@@ -434,11 +417,10 @@ void display_gfx_mode_error(const Size &game_size, const ScreenSetup &setup, con
 		main_error.Format("There was a problem finding and/or creating valid graphics mode for game size %d x %d (%d-bit) and requested filter '%s'.",
 			game_size.Width, game_size.Height, color_depth, setup.Filter.UserRequest.IsEmpty() ? "Undefined" : setup.Filter.UserRequest.GetCStr());
 
-	platform->DisplayAlert("%s\n"
-		"(Problem: '%s')\n"
+	_G(platform)->DisplayAlert("%s\n"
 		"Try to correct the problem, or seek help from the AGS homepage."
 		"%s",
-		main_error.GetCStr(), SDL_GetError(), platform->GetGraphicsTroubleshootingText());
+		main_error.GetCStr(), _G(platform)->GetGraphicsTroubleshootingText());
 }
 
 bool graphics_mode_init_any(const Size game_size, const ScreenSetup &setup, const ColorDepthOption &color_depth) {
@@ -469,20 +451,20 @@ bool graphics_mode_init_any(const Size game_size, const ScreenSetup &setup, cons
 		if (it->CompareNoCase(setup.DriverID) == 0) break;
 	}
 	if (it != ids.end())
-		std::rotate(ids.begin(), it, ids.end());
+		ids.rotate(it);
 	else
 		Debug::Printf(kDbgMsg_Error, "Requested graphics driver '%s' not found, will try existing drivers instead", setup.DriverID.GetCStr());
 
 	// Try to create renderer and init gfx mode, choosing one factory at a time
 	bool result = false;
-	for (StringV::const_iterator it = ids.begin(); it != ids.end(); ++it) {
+	for (StringV::const_iterator sit = ids.begin(); sit != ids.end(); ++sit) {
 		result =
 #ifdef USE_SIMPLE_GFX_INIT
 			simple_create_gfx_driver_and_init_mode
 #else
 			create_gfx_driver_and_init_mode_any
 #endif
-			(*it, game_size, setup.DisplayMode, color_depth, gameframe, setup.Filter);
+			(*sit, game_size, setup.DisplayMode, color_depth, gameframe, setup.Filter);
 
 		if (result)
 			break;
@@ -497,7 +479,7 @@ bool graphics_mode_init_any(const Size game_size, const ScreenSetup &setup, cons
 }
 
 ActiveDisplaySetting graphics_mode_get_last_setting(bool windowed) {
-	return windowed ? _GP(SavedWindowedSetting) : _G(SavedFullscreenSetting);
+	return windowed ? _GP(SavedWindowedSetting) : _GP(SavedFullscreenSetting);
 }
 
 bool graphics_mode_create_renderer(const String &driver_id) {
@@ -529,7 +511,7 @@ bool graphics_mode_set_dm(const DisplayMode &dm) {
 	set_color_depth(dm.ColorDepth);
 
 	if (!_G(gfxDriver)->SetDisplayMode(dm)) {
-		Debug::Printf(kDbgMsg_Error, "Failed to init gfx mode. Error: %s", SDL_GetError());
+		Debug::Printf(kDbgMsg_Error, "Failed to init gfx mode");
 		return false;
 	}
 
@@ -537,7 +519,7 @@ bool graphics_mode_set_dm(const DisplayMode &dm) {
 	if (rdm.Windowed)
 		_GP(SavedWindowedSetting).Dm = rdm;
 	else
-		_G(SavedFullscreenSetting).Dm = rdm;
+		_GP(SavedFullscreenSetting).Dm = rdm;
 	Debug::Printf("Succeeded. Using gfx mode %d x %d (%d-bit) %s",
 		rdm.Width, rdm.Height, rdm.ColorDepth, rdm.Windowed ? "windowed" : "fullscreen");
 	return true;
@@ -554,9 +536,9 @@ bool graphics_mode_update_render_frame() {
 	Rect render_frame = CenterInRect(RectWH(screen_size), RectWH(frame_size));
 
 	if (!_G(gfxDriver)->SetRenderFrame(render_frame)) {
-		Debug::Printf(kDbgMsg_Error, "Failed to set render frame (%d, %d, %d, %d : %d x %d). Error: %s",
+		Debug::Printf(kDbgMsg_Error, "Failed to set render frame (%d, %d, %d, %d : %d x %d)",
 			render_frame.Left, render_frame.Top, render_frame.Right, render_frame.Bottom,
-			render_frame.GetWidth(), render_frame.GetHeight(), SDL_GetError());
+			render_frame.GetWidth(), render_frame.GetHeight());
 		return false;
 	}
 
@@ -590,7 +572,7 @@ bool graphics_mode_set_render_frame(const GameFrameSetup &frame_setup) {
 	if (_G(gfxDriver)->GetDisplayMode().Windowed)
 		_GP(SavedWindowedSetting).FrameSetup = frame_setup;
 	else
-		_G(SavedFullscreenSetting).FrameSetup = frame_setup;
+		_GP(SavedFullscreenSetting).FrameSetup = frame_setup;
 	graphics_mode_update_render_frame();
 	return true;
 }

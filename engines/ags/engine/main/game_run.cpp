@@ -40,7 +40,7 @@
 #include "ags/engine/ac/global_display.h"
 #include "ags/engine/ac/global_game.h"
 #include "ags/engine/ac/global_gui.h"
-#include "ags/shared/ac/global_region.h"
+#include "ags/engine/ac/global_region.h"
 #include "ags/engine/ac/gui.h"
 #include "ags/engine/ac/hotspot.h"
 #include "ags/shared/ac/keycode.h"
@@ -55,10 +55,10 @@
 #include "ags/shared/gui/gui_inv.h"
 #include "ags/shared/gui/gui_main.h"
 #include "ags/shared/gui/gui_textbox.h"
-#include "ags/shared/main/mainheader.h"
+#include "ags/engine/main/main_header.h"
 #include "ags/engine/main/engine.h"
 #include "ags/engine/main/game_run.h"
-#include "ags/shared/main/update.h"
+#include "ags/engine/main/update.h"
 #include "ags/plugins/ags_plugin.h"
 #include "ags/plugins/plugin_engine.h"
 #include "ags/engine/script/script.h"
@@ -67,46 +67,11 @@
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/ac/timer.h"
 #include "ags/shared/ac/keycode.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
-
-
-
-   // mouse cursor is over this interface
-
-
-extern volatile char _G(want_exit), _G(abort_engine);
-extern int _G(proper_exit), _G(our_eip);
-extern int _G(displayed_room), _G(starting_room), _G(in_new_room), _G(new_room_was);
-
-
-
-
-extern int _G(in_enters_screen), _G(done_es_error);
-
-extern int _G(inside_script), _G(in_graph_script);
-
-
-extern int _G(mouse_ifacebut_xoffs), _G(mouse_ifacebut_yoffs);
-extern int _G(cur_mode);
-
-
-
-
-
-extern int _G(cur_mode), _G(cur_cursor);
-
-
-// Checks if user interface should remain disabled for now
-static int ShouldStayInWaitMode();
-
-static int _G(numEventsAtStartOfFunction);
-static auto _G(t1) = AGS_Clock::now();  // timer for FPS // ... '_G(t1)'... how very appropriate.. :)
-
-static int _G(user_disabled_for) = 0;
-static const void *_G(user_disabled_data) = nullptr;
 
 #define UNTIL_ANIMEND   1
 #define UNTIL_MOVEEND   2
@@ -116,11 +81,6 @@ static const void *_G(user_disabled_data) = nullptr;
 #define UNTIL_INTIS0    6
 #define UNTIL_SHORTIS0  7
 #define UNTIL_INTISNEG  8
-
-static int _G(restrict_until) = 0;
-
-unsigned int _G(loopcounter) = 0;
-static unsigned int _G(lastcounter) = 0;
 
 static void ProperExit() {
 	_G(want_exit) = 0;
@@ -207,15 +167,15 @@ static int game_loop_check_ground_level_interactions() {
 
 static void lock_mouse_on_click() {
 	if (_GP(usetup).mouse_auto_lock && _GP(scsystem).windowed)
-		Mouse::TryLockToWindow();
+		_GP(mouse).TryLockToWindow();
 }
 
 static void toggle_mouse_lock() {
 	if (_GP(scsystem).windowed) {
-		if (Mouse::IsLockedToWindow())
-			Mouse::UnlockFromWindow();
+		if (_GP(mouse).IsLockedToWindow())
+			_GP(mouse).UnlockFromWindow();
 		else
-			Mouse::TryLockToWindow();
+			_GP(mouse).TryLockToWindow();
 	}
 }
 

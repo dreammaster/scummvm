@@ -119,6 +119,9 @@ struct AGSPlatformDriver
 	virtual void InitialiseAbufAtStartup();
 	virtual void PostAllegroInit(bool windowed);
 	virtual void PostAllegroExit() = 0;
+	virtual void PostBackendInit() {}
+	virtual void PostBackendExit() {}
+	virtual const char *GetBackendFailUserHint() { return nullptr; }
 	virtual void FinishedUsingGraphicsMode();
 	virtual SetupReturnValue RunSetup(const Shared::ConfigTree &cfg_in, Shared::ConfigTree &cfg_out);
 	virtual void SetGameWindowIcon();
@@ -158,6 +161,9 @@ struct AGSPlatformDriver
 	virtual int  InitializeCDPlayer() = 0;  // return 0 on success
 	virtual int  CDPlayerCommand(int cmdd, int datt) = 0;
 	virtual void ShutdownCDPlayer() = 0;
+
+	// Allows adjusting parameters and other fixes before engine is initialized
+	virtual void MainInitAdjustments() {}
 
 	virtual bool LockMouseToWindow();
 	virtual void UnlockMouse();

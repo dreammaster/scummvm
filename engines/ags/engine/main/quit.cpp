@@ -20,12 +20,9 @@
  *
  */
 
-//
-// Quit game procedure
-//
 #include "ags/shared/core/platform.h"
-#include "ags/lib/allegro.h" // find files, allegro_exit
-#include "ags/shared/ac/cdaudio.h"
+#include "ags/lib/allegro.h"
+#include "ags/engine/ac/cd_audio.h"
 #include "ags/shared/ac/common.h"
 #include "ags/engine/ac/game_setup.h"
 #include "ags/shared/ac/game_setup_struct.h"
@@ -40,8 +37,8 @@
 #include "ags/engine/main/config.h"
 #include "ags/engine/main/engine.h"
 #include "ags/engine/main/main.h"
-#include "ags/shared/main/mainheader.h"
-#include "ags/shared/main/quit.h"
+#include "ags/engine/main/main_header.h"
+#include "ags/engine/main/quit.h"
 #include "ags/shared/ac/sprite_cache.h"
 #include "ags/engine/gfx/graphics_driver.h"
 #include "ags/shared/gfx/bitmap.h"
@@ -50,33 +47,17 @@
 #include "ags/engine/platform/base/sys_main.h"
 #include "ags/plugins/plugin_engine.h"
 #include "ags/engine/media/audio/audio_system.h"
+#include "ags/globals.h"
 
 namespace AGS3 {
 
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-
-
-    // used for non-saveable rooms, eg. intro
-
-
-
-extern int _G(proper_exit);
-
-
-
-extern int _G(need_to_stop_cd);
-extern int _G(use_cdplayer);
-
-
-bool handledErrorInEditor;
-
 void quit_tell_editor_debugger(const String &qmsg, QuitReason qreason) {
 	if (_G(editor_debugging_initialized)) {
 		if (qreason & kQuitKind_GameException)
-			handledErrorInEditor = send_exception_to_editor(qmsg);
+			_G(handledErrorInEditor) = send_exception_to_editor(qmsg);
 		send_message_to_editor("EXIT");
 		_G(editor_debugger)->Shutdown();
 	}
@@ -106,7 +87,7 @@ void quit_check_dynamic_sprites(QuitReason qreason) {
 void quit_shutdown_platform(QuitReason qreason) {
 	// Be sure to unlock mouse on exit, or users will hate us
 	sys_window_lock_mouse(false);
-	platform->AboutToQuitGame();
+	G(platform)->AboutToQuitGame();
 
 	_G(our_eip) = 9016;
 
@@ -115,7 +96,7 @@ void quit_shutdown_platform(QuitReason qreason) {
 	quit_check_dynamic_sprites(qreason);
 
 	if (_G(use_cdplayer))
-		platform->ShutdownCDPlayer();
+		G(platform)->ShutdownCDPlayer();
 }
 
 void quit_shutdown_audio() {
@@ -170,11 +151,11 @@ QuitReason quit_check_for_error_state(const char *&qmsg, String &alertis) {
 void quit_message_on_exit(const char *qmsg, String &alertis, QuitReason qreason) {
 	// successful exit displays no messages (because Windoze closes the dos-box
 	// if it is empty).
-	if ((qreason & kQuitKind_NormalExit) == 0 && !handledErrorInEditor) {
+	if ((qreason & kQuitKind_NormalExit) == 0 && !_G(handledErrorInEditor)) {
 		// Display the message (at this point the window still exists)
 		sprintf(_G(pexbuf), "%s\n", qmsg);
 		alertis.Append(_G(pexbuf));
-		platform->DisplayAlert("%s", alertis.GetCStr());
+		G(platform)->DisplayAlert("%s", alertis.GetCStr());
 	}
 }
 
@@ -230,7 +211,7 @@ void quit(const char *quitmsg) {
 
 	allegro_bitmap_test_release();
 
-	handledErrorInEditor = false;
+	_G(handledErrorInEditor) = false;
 
 	quit_tell_editor_debugger(qmsg, qreason);
 
@@ -275,7 +256,7 @@ void quit(const char *quitmsg) {
 	sys_main_shutdown();
 	allegro_exit();
 
-	platform->PostBackendExit();
+	G(platform)->PostBackendExit();
 
 	_G(our_eip) = 9903;
 

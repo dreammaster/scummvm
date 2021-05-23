@@ -243,6 +243,16 @@ MODULE_OBJS = \
 	engine/gui/my_push_button.o \
 	engine/gui/my_textbox.o \
 	engine/gui/new_control.o \
+	engine/main/config.o \
+	engine/main/engine.o \
+	engine/main/engine_setup.o \
+	engine/main/game_file.o \
+	engine/main/game_run.o \
+	engine/main/game_start.o \
+	engine/main/graphics_mode.o \
+	engine/main/main.o \
+	engine/main/quit.o \
+	engine/main/update.o \
 	engine/media/audio/ambient_sound.o \
 	engine/media/audio/audio.o \
 	engine/media/audio/clip_my_midi.o \

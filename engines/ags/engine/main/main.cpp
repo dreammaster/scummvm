@@ -1,16 +1,24 @@
-//=============================================================================
-//
-// Adventure Game Studio (AGS)
-//
-// Copyright (C) 1999-2011 Chris Jones and 2011-20xx others
-// The full list of copyright holders can be found in the Copyright.txt
-// file, which is part of this source code distribution.
-//
-// The AGS source code is provided under the Artistic License 2.0.
-// A copy of this license can be found in the file License.txt and at
-// http://www.opensource.org/licenses/artistic-license-2.0.php
-//
-//=============================================================================
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
 //
 // Entry point of the application here.
@@ -35,7 +43,7 @@
 #include "ags/shared/debugging/out.h"
 #include "ags/engine/main/config.h"
 #include "ags/engine/main/engine.h"
-#include "ags/shared/main/mainheader.h"
+#include "ags/engine/main/main_header.h"
 #include "ags/engine/main/main.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/engine/platform/base/sys_main.h"
@@ -44,13 +52,7 @@
 #include "ags/shared/util/directory.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/string_compat.h"
-
-#if AGS_PLATFORM_OS_WINDOWS
-#include "ags/shared/platform/windows/win_ex_handling.h"
-#endif
-#if AGS_PLATFORM_DEBUG
-#include "ags/shared/test/test_all.h"
-#endif
+#include "ags/globals.h"
 
 namespace AGS3 {
 
@@ -61,53 +63,6 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-String appPath; // engine exe path
-String appDirectory; // engine dir
-String cmdGameDataPath; // game path received from cmdline
-
-char **global_argv = nullptr;
-int    global_argc = 0;
-
-
-
-
-
-
-
-
-
-
-
-// Startup flags, set from parameters to engine
-int force_window = 0;
-int override_start_room = 0;
-bool _G(justDisplayHelp) = false;
-bool _G(justDisplayVersion) = false;
-bool _G(justRunSetup) = false;
-bool _G(justRegisterGame) = false;
-bool _G(justUnRegisterGame) = false;
-bool _G(justTellInfo) = false;
-bool attachToParentConsole = false;
-bool hideMessageBoxes = false;
-std::set<String> _G(tellInfoKeys);
-const char *_G(loadSaveGameOnStartup) = nullptr;
-
-#if ! AGS_PLATFORM_DEFINES_PSP_VARS
-int _G(psp_video_framedrop) = 1;
-int _G(psp_ignore_acsetup_cfg_file) = 0;
-int _G(psp_clear_cache_on_room_change) = 0; // clear --sprite cache-- when room is unloaded
-
-char _G(psp_game_file_name)[] = "";
-char _G(psp_translation)[] = "default";
-
-int _G(psp_gfx_renderer) = 0;
-int psp_gfx_scaling = 1;
-int psp_gfx_smoothing = 0;
-int psp_gfx_super_sampling = 1;
-int psp_gfx_smooth_sprites = 0;
-#endif
-
-
 void main_pre_init() {
 	_G(our_eip) = -999;
 	_GP(AssetMgr)->SetSearchPriority(Shared::kAssetPriorityDir);
@@ -115,7 +70,7 @@ void main_pre_init() {
 }
 
 void main_create_platform_driver() {
-	platform = AGSPlatformDriver::GetDriver();
+	_G(platform) = AGSPlatformDriver::GetDriver();
 }
 
 // this needs to be updated if the "play" struct changes
@@ -130,28 +85,21 @@ void main_create_platform_driver() {
 #define SVG_VERSION_FWCOMPAT_RELEASE    1
 #define SVG_VERSION_FWCOMPAT_REVISION   1111
 
-// Current engine version
-AGS::Shared::Version EngineVersion;
-// Lowest savedgame version, accepted by this engine
-AGS::Shared::Version _G(SavedgameLowestBackwardCompatVersion);
-// Lowest engine version, which would accept current savedgames
-AGS::Shared::Version SavedgameLowestForwardCompatVersion;
-
-void main_init(int argc, char *argv[]) {
-	EngineVersion = Version(ACI_VERSION_STR " " SPECIAL_VERSION);
+void main_init(int argc, const char *argv[]) {
+	_G(EngineVersion) = Version(ACI_VERSION_STR " " SPECIAL_VERSION);
 #if defined (BUILD_STR)
-	EngineVersion.BuildInfo = BUILD_STR;
+	_G(EngineVersion).BuildInfo = BUILD_STR;
 #endif
 	_G(SavedgameLowestBackwardCompatVersion) = Version(SVG_VERSION_BWCOMPAT_MAJOR, SVG_VERSION_BWCOMPAT_MINOR, SVG_VERSION_BWCOMPAT_RELEASE, SVG_VERSION_BWCOMPAT_REVISION);
-	SavedgameLowestForwardCompatVersion = Version(SVG_VERSION_FWCOMPAT_MAJOR, SVG_VERSION_FWCOMPAT_MINOR, SVG_VERSION_FWCOMPAT_RELEASE, SVG_VERSION_FWCOMPAT_REVISION);
+	_G(SavedgameLowestForwardCompatVersion) = Version(SVG_VERSION_FWCOMPAT_MAJOR, SVG_VERSION_FWCOMPAT_MINOR, SVG_VERSION_FWCOMPAT_RELEASE, SVG_VERSION_FWCOMPAT_REVISION);
 
 	AssetMgr.reset(new AssetManager());
 	main_pre_init();
 	main_create_platform_driver();
-	platform->MainInitAdjustments();
+	_G(platform)->MainInitAdjustments();
 
-	global_argv = argv;
-	global_argc = argc;
+	_G(global_argv) = argv;
+	_G(global_argc) = argc;
 }
 
 String get_engine_string() {
@@ -159,14 +107,14 @@ String get_engine_string() {
 		"Copyright (c) 1999-2011 Chris Jones and " ACI_COPYRIGHT_YEARS " others\n"
 #ifdef BUILD_STR
 		"ACI version %s (Build: %s)\n",
-		EngineVersion.ShortString.GetCStr(), EngineVersion.LongString.GetCStr(), EngineVersion.BuildInfo.GetCStr());
+		_G(EngineVersion).ShortString.GetCStr(), _G(EngineVersion).LongString.GetCStr(), _G(EngineVersion).BuildInfo.GetCStr());
 #else
-		"ACI version %s\n", EngineVersion.ShortString.GetCStr(), EngineVersion.LongString.GetCStr());
+		"ACI version %s\n", _G(EngineVersion).ShortString.GetCStr(), _G(EngineVersion).LongString.GetCStr());
 #endif
 }
 
 void main_print_help() {
-	platform->WriteStdOut("%s",
+	_G(platform)->WriteStdOut("%s",
 		"Usage: ags [OPTIONS] [GAMEFILE or DIRECTORY]\n\n"
 		//--------------------------------------------------------------------------------|
 		"Options:\n"
@@ -264,7 +212,7 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 		} else if (ags_stricmp(arg, "--updatereg") == 0)
 			_G(debug_flags) |= DBG_REGONLY;
 		else if ((ags_stricmp(arg, "--startr") == 0) && (ee < argc - 1)) {
-			override_start_room = atoi(argv[ee + 1]);
+			_G(override_start_room) = atoi(argv[ee + 1]);
 			ee++;
 		} else if (ags_stricmp(arg, "--noexceptionhandler") == 0) _GP(usetup).disable_exception_handling = true;
 		else if (ags_stricmp(arg, "--setup") == 0) {
@@ -274,12 +222,12 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 		} else if (ags_stricmp(arg, "--unregistergame") == 0) {
 			_G(justUnRegisterGame) = true;
 		} else if ((ags_stricmp(arg, "--loadsavedgame") == 0) && (argc > ee + 1)) {
-			_G(loadSaveGameOnStartup) = argv[ee + 1];
+			_G(loadSaveGameOnStartup) = atoi(argv[ee + 1]);
 			ee++;
 		} else if ((ags_stricmp(arg, "--enabledebugger") == 0) && (argc > ee + 1)) {
 			strcpy(_G(editor_debugger_instance_token), argv[ee + 1]);
 			_G(editor_debugging_enabled) = 1;
-			force_window = 1;
+			_G(force_window) = 1;
 			ee++;
 		} else if (ags_stricmp(arg, "--conf") == 0 && (argc > ee + 1)) {
 			_GP(usetup).conf_path = argv[++ee];
@@ -312,9 +260,9 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 		else if ((ags_stricmp(arg, "--shared-data-dir") == 0) && (argc > ee + 1))
 			cfg["misc"]["shared_data_dir"] = argv[++ee];
 		else if (ags_stricmp(arg, "--windowed") == 0)
-			force_window = 1;
+			_G(force_window) = 1;
 		else if (ags_stricmp(arg, "--fullscreen") == 0)
-			force_window = 2;
+			_G(force_window) = 2;
 		else if ((ags_stricmp(arg, "--gfxdriver") == 0) && (argc > ee + 1)) {
 			INIwritestring(cfg, "graphics", "driver", argv[++ee]);
 		} else if ((ags_stricmp(arg, "--gfxfilter") == 0) && (argc > ee + 1)) {
@@ -342,8 +290,7 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 				cfg["log"][logarg.Left(split_at)] = logarg.Mid(split_at + 1);
 			else
 				cfg["log"][logarg] = "";
-		} else if (ags_stricmp(arg, "--console-attach") == 0) attachToParentConsole = true;
-		else if (ags_stricmp(arg, "--no-message-box") == 0) hideMessageBoxes = true;
+		}
 		//
 		// Special case: data file location
 		//
@@ -351,10 +298,10 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 	}
 
 	if (datafile_argv > 0) {
-		cmdGameDataPath = GetPathFromCmdArg(datafile_argv);
+		_G(cmdGameDataPath) = GetPathFromCmdArg(datafile_argv);
 	} else {
 		// assign standard path for mobile/consoles (defined in their own platform implementation)
-		cmdGameDataPath = _G(psp_game_file_name);
+		_G(cmdGameDataPath) = _G(psp_game_file_name);
 	}
 
 	if (_G(tellInfoKeys).size() > 0)
@@ -364,8 +311,8 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 }
 
 void main_set_gamedir(int argc, char *argv[]) {
-	appPath = GetPathFromCmdArg(0);
-	appDirectory = Path::GetDirectoryPath(appPath);
+	_G(appPath) = GetPathFromCmdArg(0);
+	_G(appDirectory) = Path::GetDirectoryPath(_G(appPath));
 
 	// TODO: remove following when supporting unicode paths
 	{
@@ -384,13 +331,13 @@ void main_set_gamedir(int argc, char *argv[]) {
 }
 
 String GetPathFromCmdArg(int arg_index) {
-	if (arg_index < 0 || arg_index >= global_argc)
+	if (arg_index < 0 || arg_index >= _G(global_argc))
 		return "";
-	String path = Path::GetCmdLinePathInASCII(global_argv[arg_index], arg_index);
+	String path = Path::GetCmdLinePathInASCII(_G(global_argv)[arg_index], arg_index);
 	if (!path.IsEmpty())
 		return Path::MakeAbsolutePath(path);
-	Debug::Printf(kDbgMsg_Error, "Unable to determine path: GetCmdLinePathInASCII failed.\nCommand line argument %i: %s", arg_index, global_argv[arg_index]);
-	return global_argv[arg_index];
+	Debug::Printf(kDbgMsg_Error, "Unable to determine path: GetCmdLinePathInASCII failed.\nCommand line argument %i: %s", arg_index, _G(global_argv)[arg_index]);
+	return _G(global_argv)[arg_index];
 }
 
 int ags_entry_point(int argc, char *argv[]) {
@@ -411,10 +358,10 @@ int ags_entry_point(int argc, char *argv[]) {
 		return res;
 
 	if (attachToParentConsole)
-		platform->AttachToParentConsole();
+		_G(platform)->AttachToParentConsole();
 
 	if (_G(justDisplayVersion)) {
-		platform->WriteStdOut(get_engine_string());
+		_G(platform)->WriteStdOut(get_engine_string());
 		return EXIT_NORMAL;
 	}
 
@@ -424,7 +371,7 @@ int ags_entry_point(int argc, char *argv[]) {
 	}
 
 	if (!_G(justTellInfo) && !hideMessageBoxes)
-		platform->SetGUIMode(true);
+		_G(platform)->SetGUIMode(true);
 
 	init_debug(startup_opts, _G(justTellInfo));
 	Debug::Printf(kDbgMsg_Alert, get_engine_string());
@@ -443,7 +390,7 @@ int ags_entry_point(int argc, char *argv[]) {
 		// TODO: refactor engine shutdown routine (must shutdown and delete everything started and created)
 		sys_main_shutdown();
 		allegro_exit();
-		platform->PostBackendExit();
+		_G(platform)->PostBackendExit();
 		return result;
 	}
 #ifdef USE_CUSTOM_EXCEPTION_HANDLER

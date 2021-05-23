@@ -34,12 +34,12 @@
 #include "ags/engine/ac/system.h"
 #include "ags/engine/debugging/debugger.h"
 #include "ags/engine/debugging/debug_log.h"
-#include "ags/shared/main/mainheader.h"
+#include "ags/engine/main/main_header.h"
 #include "ags/engine/main/config.h"
 #include "ags/engine/platform/base/ags_platform_driver.h"
 #include "ags/shared/util/directory.h"
 #include "ags/shared/util/ini_util.h"
-#include "ags/shared/util/textstreamreader.h"
+#include "ags/shared/util/text_stream_reader.h"
 #include "ags/shared/util/path.h"
 #include "ags/shared/util/string_utils.h"
 #include "ags/engine/media/audio/audio_system.h"
@@ -49,21 +49,15 @@ namespace AGS3 {
 using namespace AGS::Shared;
 using namespace AGS::Engine;
 
-
-
-
-extern int force_window;
-
-
 // Filename of the default config file, the one found in the game installation
 const String DefaultConfigFileName = "acsetup.cfg";
 
 bool INIreaditem(const ConfigTree &cfg, const String &sectn, const String &item, String &value) {
 	ConfigNode sec_it = cfg.find(sectn);
 	if (sec_it != cfg.end()) {
-		StrStrOIter item_it = sec_it->second.find(item);
-		if (item_it != sec_it->second.end()) {
-			value = item_it->second;
+		StrStrOIter item_it = sec_it->_value.find(item);
+		if (item_it != sec_it->_value.end()) {
+			value = item_it->_value;
 			return true;
 		}
 	}
@@ -260,24 +254,13 @@ void read_legacy_graphics_config(const ConfigTree &cfg) {
 	_GP(usetup).Screen.DisplayMode.RefreshRate = INIreadint(cfg, "misc", "refresh");
 }
 
-// Variables used for mobile port configs
-extern int _G(psp_gfx_renderer);
-extern int psp_gfx_scaling;
-extern int psp_gfx_super_sampling;
-extern int psp_gfx_smoothing;
-extern int psp_gfx_smooth_sprites;
-extern char _G(psp_translation)[];
-#if AGS_PLATFORM_OS_ANDROID
-extern int config_mouse_control_mode;
-#endif
-
 void override_config_ext(ConfigTree &cfg) {
 	// Mobile ports always run in fullscreen mode
 #if AGS_PLATFORM_OS_ANDROID || AGS_PLATFORM_OS_IOS
 	INIwriteint(cfg, "graphics", "windowed", 0);
 #endif
 
-	// _G(psp_gfx_renderer) - rendering mode
+	// psp_gfx_renderer - rendering mode
 	//    * 0 - software renderer
 	//    * 1 - hardware, render to screen
 	//    * 2 - hardware, render to texture
@@ -293,9 +276,9 @@ void override_config_ext(ConfigTree &cfg) {
 	//    * 0 - no scaling
 	//    * 1 - stretch and preserve aspect ratio
 	//    * 2 - stretch to whole screen
-	if (psp_gfx_scaling == 0)
+	if (_G(psp_gfx_scaling) == 0)
 		INIwritestring(cfg, "graphics", "game_scale_fs", "1");
-	else if (psp_gfx_scaling == 1)
+	else if (_G(psp_gfx_scaling) == 1)
 		INIwritestring(cfg, "graphics", "game_scale_fs", "proportional");
 	else
 		INIwritestring(cfg, "graphics", "game_scale_fs", "stretch");
@@ -303,7 +286,7 @@ void override_config_ext(ConfigTree &cfg) {
 	// psp_gfx_smoothing - scaling filter:
 	//    * 0 - nearest-neighbour
 	//    * 1 - linear
-	if (psp_gfx_smoothing == 0)
+	if (_G(psp_gfx_smoothing) == 0)
 		INIwritestring(cfg, "graphics", "filter", "StdScale");
 	else
 		INIwritestring(cfg, "graphics", "filter", "Linear");
@@ -312,7 +295,7 @@ void override_config_ext(ConfigTree &cfg) {
 	//    * 0 - x1
 	//    * 1 - x2
 	if (_G(psp_gfx_renderer) == 2)
-		INIwriteint(cfg, "graphics", "supersampling", psp_gfx_super_sampling + 1);
+		INIwriteint(cfg, "graphics", "supersampling", _G(psp_gfx_super_sampling) + 1);
 	else
 		INIwriteint(cfg, "graphics", "supersampling", 0);
 
@@ -323,7 +306,7 @@ void override_config_ext(ConfigTree &cfg) {
 	INIwriteint(cfg, "mouse", "control_enabled", config_mouse_control_mode);
 #endif
 
-	INIwriteint(cfg, "misc", "antialias", psp_gfx_smooth_sprites != 0);
+	INIwriteint(cfg, "misc", "antialias", _G(psp_gfx_smooth_sprites) != 0);
 	INIwritestring(cfg, "language", "translation", _G(psp_translation));
 }
 
@@ -441,7 +424,7 @@ void save_config_file() {
 
 	// Last display mode
 	// TODO: force_window check is a temporary workaround (see comment below)
-	if (force_window == 0) {
+	if (_G(force_window) == 0) {
 		bool is_windowed = System_GetWindowed() != 0;
 		cfg["graphics"]["windowed"] = String::FromFormat("%d", is_windowed ? 1 : 0);
 		// TODO: this is a hack, necessary because the original config system was designed when
@@ -465,7 +448,7 @@ void save_config_file() {
 	if (_GP(game).options[OPT_RENDERATSCREENRES] == kRenderAtScreenRes_UserDefined)
 		cfg["graphics"]["render_at_screenres"] = String::FromFormat("%d", _GP(usetup).RenderAtScreenRes ? 1 : 0);
 	cfg["mouse"]["control_enabled"] = String::FromFormat("%d", _GP(usetup).mouse_ctrl_enabled ? 1 : 0);
-	cfg["mouse"]["speed"] = String::FromFormat("%f", Mouse::GetSpeed());
+	cfg["mouse"]["speed"] = String::FromFormat("%f", _GP(mouse).GetSpeed());
 	cfg["language"]["translation"] = _GP(usetup).translation;
 
 	String cfg_file = PreparePathForWriting(GetGameUserConfigDir(), DefaultConfigFileName);
