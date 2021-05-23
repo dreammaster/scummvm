@@ -216,8 +216,15 @@ public:
 	volatile int _mouse_z = 0;	// Mouse wheel vertical
 	volatile int _mouse_b = 0;	// Mouse buttons bitflags
 	volatile int _mouse_pos = 0;	// X position in upper 16 bits, Y in lower 16
-
+	volatile int sys_mouse_x = 0; // mouse x position
+	volatile int sys_mouse_y = 0; // mouse y position
+	volatile int sys_mouse_z = 0; // mouse wheel position
 	volatile int _freeze_mouse_flag;
+
+	int _mouse_button_state = 0;
+	int _mouse_accum_button_state = 0;
+	uint32 _mouse_clear_at_time = 0;
+	int _mouse_accum_relx = 0, _mouse_accum_rely = 0;
 
 	/**@}*/
 

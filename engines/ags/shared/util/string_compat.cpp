@@ -22,6 +22,7 @@
 
 #include "ags/shared/util/string_compat.h"
 #include "ags/shared/core/platform.h"
+#include "common/str.h"
 
 namespace AGS3 {
 
@@ -40,19 +41,11 @@ char *ags_strupr(char *s) {
 }
 
 int ags_stricmp(const char *s1, const char *s2) {
-#if AGS_PLATFORM_OS_WINDOWS
-	return stricmp(s1, s2);
-#else
-	return strcasecmp(s1, s2);
-#endif
+	return scumm_stricmp(s1, s2);
 }
 
 int ags_strnicmp(const char *s1, const char *s2, size_t n) {
-#if AGS_PLATFORM_OS_WINDOWS
-	return strnicmp(s1, s2, n);
-#else
-	return strncasecmp(s1, s2, n);
-#endif
+	return scumm_strnicmp(s1, s2, n);
 }
 
 char *ags_strdup(const char *s) {

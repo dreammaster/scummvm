@@ -92,7 +92,7 @@ struct EnginePlugin {
 	int         invalidatedRegion;
 	void      (*engineStartup) (IAGSEngine *) = nullptr;
 	void      (*engineShutdown) () = nullptr;
-	int       (*onEvent) (int, int) = nullptr;
+	int       (*onEvent) (int, NumberPtr) = nullptr;
 	void      (*initGfxHook) (const char *driverName, void *data) = nullptr;
 	int       (*debugHook) (const char *whichscript, int lineNumber, int reserved) = nullptr;
 	IAGSEngine  eiface;
@@ -198,7 +198,7 @@ int IAGSEngine::GetSavedData(char *buffer, int32 bufsize) {
 	return savedatasize;
 }
 
-void IAGSEngine::DrawText(int32 x, int32 y, int32 font, int32 color, char *text) {
+void IAGSEngine::DrawText(int32 x, int32 y, int32 font, int32 color, const char *text) {
 	Bitmap *ds = _G(gfxDriver)->GetStageBackBuffer(true);
 	if (!ds)
 		return;
@@ -213,6 +213,10 @@ void IAGSEngine::GetScreenDimensions(int32 *width, int32 *height, int32 *coldept
 		height[0] = _GP(play).GetMainViewport().GetHeight();
 	if (coldepth != nullptr)
 		coldepth[0] = _GP(scsystem).coldepth;
+}
+
+int IAGSEngine::GetBitmapPitch(BITMAP *bmp) {
+	return bmp->pitch;
 }
 
 uint8 *IAGSEngine::GetRawBitmapSurface(BITMAP *bmp) {
@@ -803,7 +807,7 @@ void pl_startup_plugins() {
 	}
 }
 
-int pl_run_plugin_hooks(int event, int data) {
+NumberPtr pl_run_plugin_hooks(int event, NumberPtr data) {
 	int i, retval = 0;
 	for (i = 0; i < numPlugins; i++) {
 		if (plugins[i].wantHook & event) {
@@ -812,6 +816,7 @@ int pl_run_plugin_hooks(int event, int data) {
 				return retval;
 		}
 	}
+
 	return 0;
 }
 
@@ -966,7 +971,7 @@ Engine::GameInitError pl_register_plugins(const std::vector<Shared::PluginInfo> 
 			if (apl->engineStartup == nullptr) {
 				quitprintf("Plugin '%s' is not a valid AGS plugin (no engine startup entry point)", apl->filename);
 			}
-			apl->onEvent = (int(*)(int, int))apl->library.GetFunctionAddress("AGS_EngineOnEvent");
+			apl->onEvent = (int(*)(int, NumberPtr))apl->library.GetFunctionAddress("AGS_EngineOnEvent");
 			apl->debugHook = (int(*)(const char *, int, int))apl->library.GetFunctionAddress("AGS_EngineDebugHook");
 			apl->initGfxHook = (void(*)(const char *, void *))apl->library.GetFunctionAddress("AGS_EngineInitGfx");
 		} else {

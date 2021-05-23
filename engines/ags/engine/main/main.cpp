@@ -197,6 +197,7 @@ void main_print_help() {
 	);
 }
 
+#ifdef DEPRECATED
 static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 	int datafile_argv = 0;
 	for (int ee = 1; ee < argc; ++ee) {
@@ -309,6 +310,7 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[]) {
 
 	return 0;
 }
+#endif
 
 void main_set_gamedir(int argc, char *argv[]) {
 	_G(appPath) = GetPathFromCmdArg(0);

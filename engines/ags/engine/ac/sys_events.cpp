@@ -40,8 +40,24 @@ typedef int SDL_Scancode;
 
 namespace AGS3 {
 
+// TODO: check later, if this may be useful in other places (then move to header)
+enum eAGSMouseButtonMask {
+	MouseBitLeft = 0x01,
+	MouseBitRight = 0x02,
+	MouseBitMiddle = 0x04,
+	MouseBitX1 = 0x08,
+	MouseBitX2 = 0x10
+};
+
 using namespace AGS::Shared;
 using namespace AGS::Engine;
+
+extern void domouse(int str);
+const int MB_ARRAY[3] = { MouseBitLeft, MouseBitRight, MouseBitMiddle };
+static void(*_on_quit_callback)(void) = nullptr;
+static void(*_on_switchin_callback)(void) = nullptr;
+static void(*_on_switchout_callback)(void) = nullptr;
+
 
 // Converts SDL scan and key codes to the ags keycode
 eAGSKeyCode ags_keycode_from_sdl(const SDL_Event &event) {
@@ -203,11 +219,6 @@ bool ags_key_to_sdl_scan(eAGSKeyCode key, SDL_Scancode(&scan)[3]) {
 }
 
 
-
-
-
-
-
 // ----------------------------------------------------------------------------
 // KEYBOARD INPUT
 // ----------------------------------------------------------------------------
@@ -216,11 +227,17 @@ bool ags_key_to_sdl_scan(eAGSKeyCode key, SDL_Scancode(&scan)[3]) {
 // Because our game engine still uses input polling, we have to accumulate
 // key events for our internal use whenever engine have to query key input.
 static Common::Queue<Common::Event> g_keyEvtQueue;
+#endif
 
 bool ags_keyevent_ready() {
+#ifdef TODO
 	return g_keyEvtQueue.size() > 0;
+#else
+	return false;
+#endif
 }
 
+#ifdef TODO
 SDL_Event ags_get_next_keyevent() {
 	if (g_keyEvtQueue.size() > 0) {
 		auto evt = g_keyEvtQueue.front();
@@ -230,17 +247,23 @@ SDL_Event ags_get_next_keyevent() {
 	SDL_Event empty = {};
 	return empty;
 }
+#endif
 
 int ags_iskeydown(eAGSKeyCode ags_key) {
+#ifdef TODO
 	SDL_PumpEvents();
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 	SDL_Scancode scan[3];
 	if (!ags_key_to_sdl_scan(ags_key, scan))
 		return -1;
 	return (state[scan[0]] || state[scan[1]] || state[scan[2]]);
+#else
+	return 0;
+#endif
 }
 
 void ags_simulate_keypress(eAGSKeyCode ags_key) {
+#ifdef TODO
 	SDL_Scancode scan[3];
 	if (!ags_key_to_sdl_scan(ags_key, scan))
 		return;
@@ -250,39 +273,32 @@ void ags_simulate_keypress(eAGSKeyCode ags_key) {
 	sdl_G(event).key.keysym.sym = SDL_GetKeyFromScancode(scan[0]);
 	sdl_G(event).key.keysym.scancode = scan[0];
 	SDL_PushEvent(&sdlevent);
+#endif
 }
 
 static void on_sdl_key_down(const SDL_Event &event) {
+#ifdef TODO
 	// Engine is not structured very well yet, and we cannot pass this event where it's needed;
 	// instead we save it in the queue where it will be ready whenever any component asks for one.
 	g_keyEvtQueue.push_back(event);
+#endif
 }
 
 static void on_sdl_textinput(const SDL_Event &event) {
+#ifdef TODO
 	// We also push text input events to the same queue, as this is only valid way to get proper
 	// text interpretation of the pressed key combination based on current system locale.
 	g_keyEvtQueue.push_back(event);
+#endif
 }
 
 
 // ----------------------------------------------------------------------------
 // MOUSE INPUT
 // ----------------------------------------------------------------------------
-volatile int sys_mouse_x = 0; // mouse x position
-volatile int sys_mouse_y = 0; // mouse y position
-volatile int sys_mouse_z = 0; // mouse wheel position
-
-
-// TODO: check later, if this may be useful in other places (then move to header)
-enum eAGSMouseButtonMask {
-	MouseBitLeft = 0x01,
-	MouseBitRight = 0x02,
-	MouseBitMiddle = 0x04,
-	MouseBitX1 = 0x08,
-	MouseBitX2 = 0x10
-};
 
 static int sdl_button_to_mask(int button) {
+#ifdef TODO
 	switch (button) {
 	case SDL_BUTTON_LEFT: return MouseBitLeft;
 	case SDL_BUTTON_RIGHT: return MouseBitRight;
@@ -290,22 +306,13 @@ static int sdl_button_to_mask(int button) {
 	case SDL_BUTTON_X1: return MouseBitX1;
 	case SDL_BUTTON_X2: return MouseBitX2;
 	}
+#endif
 	return 0;
 }
 
-/* [sonneveld]
-Button tracking:
-On OSX, some tap to click up/down events happen too quickly to be detected on the polled _G(mouse_b) global variable.
-Instead we accumulate button presses over a couple of timer loops.
-// TODO: check again when/if we replace polling with different event handling.
-*/
-static int mouse_button_state = 0;
-static int mouse_accum_button_state = 0;
-static auto mouse_clear_at_time = AGS_Clock::now();
-static int mouse_accum_relx = 0, mouse_accum_rely = 0;
-
 // Returns accumulated mouse button state and clears internal cache by timer
 static int mouse_button_poll() {
+#ifdef TODO
 	auto now = AGS_Clock::now();
 	int result = mouse_button_state | mouse_accum_button_state;
 	if (now >= mouse_clear_at_time) {
@@ -313,18 +320,22 @@ static int mouse_button_poll() {
 		mouse_clear_at_time = now + std::chrono::milliseconds(50);
 	}
 	return result;
+#else
+	return 0;
+#endif
 }
 
+#ifdef TODO
 static void on_sdl_mouse_motion(const SDL_MouseMotionEvent &event) {
-	sys_mouse_x = _G(event).x;
-	sys_mouse_y = _G(event).y;
-	mouse_accum_relx += _G(event).xrel;
-	mouse_accum_rely += _G(event).yrel;
+	_G(sys_mouse_x) = _G(event).x;
+	_G(sys_mouse_y) = _G(event).y;
+	_G(mouse_accum_relx) += _G(event).xrel;
+	_G(mouse_accum_rely) += _G(event).yrel;
 }
 
 static void on_sdl_mouse_button(const SDL_MouseButtonEvent &event) {
-	sys_mouse_x = _G(event).x;
-	sys_mouse_y = _G(event).y;
+	_G(sys_mouse_x) = _G(event).x;
+	_G(sys_mouse_y) = _G(event).y;
 
 	if (_G(event).type == SDL_MOUSEBUTTONDOWN) {
 		mouse_button_state |= sdl_button_to_mask(_G(event).button);
@@ -337,13 +348,14 @@ static void on_sdl_mouse_button(const SDL_MouseButtonEvent &event) {
 static void on_sdl_mouse_wheel(const SDL_MouseWheelEvent &event) {
 	sys_mouse_z += _G(event).y;
 }
+#endif
 
-int butwas = 0;
 int mgetbutton() {
+#ifdef TODO
 	int toret = MouseNone;
 	int butis = mouse_button_poll();
 
-	if ((butis > 0) &(butwas > 0))
+	if ((butis > 0) &(_G(butwas) > 0))
 		return MouseNone;  // don't allow holding button down
 
 	if (butis & MouseBitLeft)
@@ -353,8 +365,11 @@ int mgetbutton() {
 	else if (butis & MouseBitMiddle)
 		toret = MouseMiddle;
 
-	butwas = butis;
+	_G(butwas) = butis;
 	return toret;
+#else
+	return 0;
+#endif
 
 	// TODO: presumably this was a hack for 1-button Mac mouse;
 	// is this still necessary?
@@ -367,11 +382,6 @@ int mgetbutton() {
 	}
 #endif
 }
-
-extern int _G(pluginSimulatedClick);
-extern void domouse(int str);
-int _G(mouse_z_was) = 0;
-const int MB_ARRAY[3] = { MouseBitLeft, MouseBitRight, MouseBitMiddle };
 
 bool ags_misbuttondown(int but) {
 	return mouse_button_poll() & MB_ARRAY[but];
@@ -390,10 +400,10 @@ int ags_mgetbutton() {
 }
 
 void ags_mouse_get_relxy(int &x, int &y) {
-	x = mouse_accum_relx;
-	y = mouse_accum_rely;
-	mouse_accum_relx = 0;
-	mouse_accum_rely = 0;
+	x = _G(mouse_accum_relx);
+	y = _G(mouse_accum_rely);
+	_G(mouse_accum_relx) = 0;
+	_G(mouse_accum_rely) = 0;
 }
 
 void ags_domouse(int what) {
@@ -424,12 +434,14 @@ int ags_check_mouse_wheel() {
 
 
 void ags_clear_input_buffer() {
+#ifdef TODO
 	g_keyEvtQueue.clear();
 	mouse_button_state = 0;
 	mouse_accum_button_state = 0;
 	mouse_clear_at_time = AGS_Clock::now() + std::chrono::milliseconds(50);
-	mouse_accum_relx = 0;
-	mouse_accum_rely = 0;
+	_G(mouse_accum_relx) = 0;
+	_G(mouse_accum_rely) = 0;
+#endif
 }
 
 // TODO: this is an awful function that should be removed eventually.
@@ -446,9 +458,6 @@ void ags_wait_until_keypress() {
 // ----------------------------------------------------------------------------
 // EVENTS
 // ----------------------------------------------------------------------------
-static void(*_on_quit_callback)(void) = nullptr;
-static void(*_on_switchin_callback)(void) = nullptr;
-static void(*_on_switchout_callback)(void) = nullptr;
 
 void sys_evt_set_quit_callback(void(*proc)(void)) {
 	_on_quit_callback = proc;
@@ -459,6 +468,7 @@ void sys_evt_set_focus_callbacks(void(*switch_in)(void), void(*switch_out)(void)
 	_on_switchout_callback = switch_out;
 }
 
+#ifdef TODO
 void sys_evt_process_one(const SDL_Event &event) {
 	switch (_G(event).type) {
 		// GENERAL
@@ -504,13 +514,15 @@ void sys_evt_process_one(const SDL_Event &event) {
 		break;
 	}
 }
+#endif
 
 void sys_evt_process_pending(void) {
+#ifdef TODO
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		sys_evt_process_one(event);
 	}
-}
 #endif
+}
 
 } // namespace AGS3

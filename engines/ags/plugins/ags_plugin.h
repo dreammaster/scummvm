@@ -62,18 +62,6 @@ class BITMAP;
 typedef int HWND;
 #endif
 
-// This file is distributed as part of the Plugin API docs, so
-// ensure that WINDOWS_VERSION is defined (if applicable)
-#if defined(_WIN32)
-#undef WINDOWS_VERSION
-#define WINDOWS_VERSION
-#endif
-
-// DOS engine doesn't know about stdcall / neither does Linux version
-#if !defined (_WIN32)
-#define __stdcall
-#endif
-
 #ifndef int32
 typedef int int32;
 #endif
@@ -378,9 +366,11 @@ public:
 	// get the virtual screen
 	AGSIFUNC(BITMAP *) GetVirtualScreen();
 	// write text to the screen in the specified font and colour
-	AGSIFUNC(void) DrawText(int32 x, int32 y, int32 font, int32 color, char *text);
+	AGSIFUNC(void) DrawText(int32 x, int32 y, int32 font, int32 color, const char *text);
 	// get screen dimensions
 	AGSIFUNC(void) GetScreenDimensions(int32 *width, int32 *height, int32 *coldepth);
+	// get screen surface pitch
+	AGSIFUNC(int) GetBitmapPitch(BITMAP *);
 	// get screen surface to draw on
 	AGSIFUNC(uint8 *) GetRawBitmapSurface(BITMAP *);
 	// release the surface
