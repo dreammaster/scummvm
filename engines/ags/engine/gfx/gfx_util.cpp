@@ -22,7 +22,7 @@
 
 #include "ags/shared/core/platform.h"
 #include "ags/engine/gfx/gfx_util.h"
-#include "ags/engine/gfx/blender.h "
+#include "ags/engine/gfx/blender.h"
 
 namespace AGS3 {
 

@@ -100,12 +100,6 @@ void ags_domouse(int what);
 // TODO: introduce constants for this
 int  ags_check_mouse_wheel();
 
-// TODO: hide these later after refactoring mousew32.cpp
-extern volatile int sys_mouse_x; // mouse x position
-extern volatile int sys_mouse_y; // mouse y position
-extern volatile int sys_mouse_z; // mouse wheel position
-
-
 // Other input utilities
 //
 // Clears buffered keypresses and mouse clicks, if any

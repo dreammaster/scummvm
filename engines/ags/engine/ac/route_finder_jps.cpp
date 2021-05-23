@@ -493,9 +493,9 @@ Navigation::NavResult Navigation::Navigate(int sx, int sy, int ex, int ey, std::
 			UnpackSquare(succ[ni], nx, ny);
 			assert(Walkable(nx, ny));
 
-			NodeInfo &nodeInfo = mapNodes[ny * mapWidth + nx];
+			NodeInfo &mapNode = mapNodes[ny * mapWidth + nx];
 
-			float ndist = nodeInfo.frameId != frameId ? INFINITY : nodeInfo.dist * DIST_SCALE_UNPACK;
+			float ndist = mapNode.frameId != frameId ? INFINITY : mapNode.dist * DIST_SCALE_UNPACK;
 
 			float dx = (float)(nx - x);
 			float dy = (float)(ny - y);
@@ -516,9 +516,9 @@ Navigation::NavResult Navigation::Navigate(int sx, int sy, int ex, int ey, std::
 				if (ecost > 65535.0f)
 					continue;
 
-				nodeInfo.dist = (unsigned short)(ecost + 0.5f);
-				nodeInfo.frameId = frameId;
-				nodeInfo.prev = PackSquare(x, y);
+				mapNode.dist = (unsigned short)(ecost + 0.5f);
+				mapNode.frameId = frameId;
+				mapNode.prev = PackSquare(x, y);
 				pq.push(Entry(ecost + heur, PackSquare(nx, ny)));
 			}
 		}
@@ -750,7 +750,6 @@ Navigation::NavResult Navigation::NavigateRefined(int sx, int sy, int ex, int ey
 	opath.push_back(ncpath[0]);
 
 	for (int i = 1; i < (int)ncpath.size(); i++) {
-		int fx, fy;
 		int tx, ty;
 
 		UnpackSquare(ncpath[i - 1], fx, fy);

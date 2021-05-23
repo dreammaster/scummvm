@@ -216,9 +216,9 @@ public:
 	volatile int _mouse_z = 0;	// Mouse wheel vertical
 	volatile int _mouse_b = 0;	// Mouse buttons bitflags
 	volatile int _mouse_pos = 0;	// X position in upper 16 bits, Y in lower 16
-	volatile int sys_mouse_x = 0; // mouse x position
-	volatile int sys_mouse_y = 0; // mouse y position
-	volatile int sys_mouse_z = 0; // mouse wheel position
+	volatile int _sys_mouse_x = 0; // mouse x position
+	volatile int _sys_mouse_y = 0; // mouse y position
+	volatile int _sys_mouse_z = 0; // mouse wheel position
 	volatile int _freeze_mouse_flag;
 
 	int _mouse_button_state = 0;
@@ -454,7 +454,8 @@ public:
 	NewControl **_vobjs;
 	OnScreenWindow *_oswi;
 
-	int controlid = 0;
+	int _windowcount = 0, _curswas = 0;
+	int _win_x = 0, _win_y = 0, _win_width = 0, _win_height = 0;
 
 	/**@}*/
 

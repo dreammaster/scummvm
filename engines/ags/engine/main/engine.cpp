@@ -186,8 +186,8 @@ bool engine_run_setup(const ConfigTree &cfg, int &app_res)
             sys_main_shutdown();
             allegro_exit();
             char quotedpath[MAX_PATH];
-            snprintf(quotedpath, MAX_PATH, "\"%s\"", appPath.GetCStr());
-            _spawnl(_P_OVERLAY, appPath, quotedpath, NULL);
+            snprintf(quotedpath, MAX_PATH, "\"%s\"", _G(appPath).GetCStr());
+            _spawnl(_P_OVERLAY, _G(appPath), quotedpath, NULL);
     }
 #endif
     return true;
@@ -257,11 +257,11 @@ String search_for_game_data_file(String &was_searching_in)
 
     // 2. Look in other known locations
     // 2.1. Look for attachment in the running executable
-    if (!appPath.IsEmpty() && Shared::AssetManager::IsDataFile(appPath))
+    if (!_G(appPath).IsEmpty() && Shared::AssetManager::IsDataFile(_G(appPath)))
     {
         Debug::Printf("Found game data embedded in executable");
-        was_searching_in = Path::GetDirectoryPath(appPath);
-        return appPath;
+        was_searching_in = Path::GetDirectoryPath(_G(appPath));
+        return _G(appPath);
     }
 
     // 2.2 Look in current working directory
@@ -1200,7 +1200,7 @@ static void engine_print_info(const std::set<String> &keys, ConfigTree *user_cfg
     }
     if (all || keys.count("filepath") > 0)
     {
-        data["filepath"]["exe"] = appPath;
+        data["filepath"]["exe"] = _G(appPath);
         data["filepath"]["cwd"] = Directory::GetCurrentDirectory();
         data["filepath"]["datadir"] = Path::MakePathNoSlash(_GP(ResPaths).DataDir);
         if (!_GP(ResPaths).DataDir2.IsEmpty())

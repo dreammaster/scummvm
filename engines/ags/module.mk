@@ -237,8 +237,11 @@ MODULE_OBJS = \
 	engine/game/savegame_v321.o \
 	engine/game/viewport.o \
 	engine/gfx/ali_3d_scummvm.o \
+	engine/gfx/blender.o \
+	engine/gfx/color_engine.o \
 	engine/gfx/gfx_driver_factory.o \
 	engine/gfx/gfx_util.o \
+	engine/gfx/gfxfilter_scaling.o \
 	engine/gfx/gfxfilter_scummvm_renderer.o \
 	engine/gui/animating_gui_button.o \
 	engine/gui/csci_dialog.o \

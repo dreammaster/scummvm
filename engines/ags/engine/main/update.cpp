@@ -87,7 +87,7 @@ int do_movelist_move(short *mlnum, int *xx, int *yy) {
 		else if ((ypermove & 0xffff0000) == 0)
 			targety -= adjAmnt;
 		// Y per move is -1 exactly, don't snap to finish
-		else if (ypermove == 0xffff0000) {
+		else if (ypermove == (fixed)0xffff0000) {
 		}
 		// Y per move is > -1, so finish the move
 		else if ((ypermove & 0xffff0000) == 0xffff0000)
@@ -110,7 +110,7 @@ int do_movelist_move(short *mlnum, int *xx, int *yy) {
 		else if ((xpermove & 0xffff0000) == 0)
 			targetx -= adjAmnt;
 		// X per move is -1 exactly, don't snap to finish
-		else if (xpermove == 0xffff0000) {
+		else if (xpermove == (fixed)0xffff0000) {
 		}
 		// X per move is > -1, so finish the move
 		else if ((xpermove & 0xffff0000) == 0xffff0000)

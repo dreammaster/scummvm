@@ -806,24 +806,24 @@ static int ShouldStayInWaitMode() {
 	int retval = _G(restrict_until);
 
 	if (_G(restrict_until) == UNTIL_MOVEEND) {
-		short *wkptr = (short *)_G(user_disabled_data);
+		const int16 *wkptr = (const int16 *)_G(user_disabled_data);
 		if (wkptr[0] < 1) retval = 0;
 	} else if (_G(restrict_until) == UNTIL_CHARIS0) {
-		char *chptr = (char *)_G(user_disabled_data);
+		const char *chptr = (const char *)_G(user_disabled_data);
 		if (chptr[0] == 0) retval = 0;
 	} else if (_G(restrict_until) == UNTIL_NEGATIVE) {
-		short *wkptr = (short *)_G(user_disabled_data);
+		const int16 *wkptr = (const int16 *)_G(user_disabled_data);
 		if (wkptr[0] < 0) retval = 0;
 	} else if (_G(restrict_until) == UNTIL_INTISNEG) {
-		int *wkptr = (int *)_G(user_disabled_data);
+		const int *wkptr = (const int *)_G(user_disabled_data);
 		if (wkptr[0] < 0) retval = 0;
 	} else if (_G(restrict_until) == UNTIL_NOOVERLAY) {
 		if (_G(is_text_overlay) < 1) retval = 0;
 	} else if (_G(restrict_until) == UNTIL_INTIS0) {
-		int *wkptr = (int *)_G(user_disabled_data);
+		const int *wkptr = (const int *)_G(user_disabled_data);
 		if (wkptr[0] == 0) retval = 0;
 	} else if (_G(restrict_until) == UNTIL_SHORTIS0) {
-		short *wkptr = (short *)_G(user_disabled_data);
+		const int16 *wkptr = (const int16 *)_G(user_disabled_data);
 		if (wkptr[0] == 0) retval = 0;
 	} else quit("loop_until: unknown until event");
 

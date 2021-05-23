@@ -276,29 +276,29 @@ void ags_simulate_keypress(eAGSKeyCode ags_key) {
 #endif
 }
 
-static void on_sdl_key_down(const SDL_Event &event) {
 #ifdef TODO
+static void on_sdl_key_down(const SDL_Event &event) {
 	// Engine is not structured very well yet, and we cannot pass this event where it's needed;
 	// instead we save it in the queue where it will be ready whenever any component asks for one.
 	g_keyEvtQueue.push_back(event);
-#endif
 }
+#endif
 
-static void on_sdl_textinput(const SDL_Event &event) {
 #ifdef TODO
+static void on_sdl_textinput(const SDL_Event &event) {
 	// We also push text input events to the same queue, as this is only valid way to get proper
 	// text interpretation of the pressed key combination based on current system locale.
 	g_keyEvtQueue.push_back(event);
-#endif
 }
+#endif
 
 
 // ----------------------------------------------------------------------------
 // MOUSE INPUT
 // ----------------------------------------------------------------------------
 
-static int sdl_button_to_mask(int button) {
 #ifdef TODO
+static int sdl_button_to_mask(int button) {
 	switch (button) {
 	case SDL_BUTTON_LEFT: return MouseBitLeft;
 	case SDL_BUTTON_RIGHT: return MouseBitRight;
@@ -306,9 +306,10 @@ static int sdl_button_to_mask(int button) {
 	case SDL_BUTTON_X1: return MouseBitX1;
 	case SDL_BUTTON_X2: return MouseBitX2;
 	}
-#endif
+
 	return 0;
 }
+#endif
 
 // Returns accumulated mouse button state and clears internal cache by timer
 static int mouse_button_poll() {
@@ -346,7 +347,7 @@ static void on_sdl_mouse_button(const SDL_MouseButtonEvent &event) {
 }
 
 static void on_sdl_mouse_wheel(const SDL_MouseWheelEvent &event) {
-	sys_mouse_z += _G(event).y;
+	_G(sys_mouse_z) += _G(event).y;
 }
 #endif
 
@@ -418,16 +419,16 @@ int ags_check_mouse_wheel() {
 	if (_GP(game).options[OPT_MOUSEWHEEL] == 0) {
 		return 0;
 	}
-	if (sys_mouse_z == _G(mouse_z_was)) {
+	if (_G(sys_mouse_z) == _G(mouse_z_was)) {
 		return 0;
 	}
 
 	int result = 0;
-	if (sys_mouse_z > _G(mouse_z_was))
+	if (_G(sys_mouse_z) > _G(mouse_z_was))
 		result = 1;   // eMouseWheelNorth
 	else
 		result = -1;  // eMouseWheelSouth
-	_G(mouse_z_was) = sys_mouse_z;
+	_G(mouse_z_was) = _G(sys_mouse_z);
 	return result;
 }
 

@@ -255,7 +255,7 @@ void ScummVMRendererGraphicsDriver::SetGamma(int newGamma) {
 	if (!_hasGamma) {
 		return;
 	}
-
+#ifdef TODO
 	uint16 gamma_red[256];
 	uint16 gamma_green[256];
 	uint16 gamma_blue[256];
@@ -265,7 +265,7 @@ void ScummVMRendererGraphicsDriver::SetGamma(int newGamma) {
 		gamma_green[i] = std::min(((int)_defaultGammaGreen[i] * newGamma) / 100, 0xffff);
 		gamma_blue[i] = std::min(((int)_defaultGammaBlue[i] * newGamma) / 100, 0xffff);
 	}
-#ifdef TODO
+
 	SDL_SetWindowGammaRamp(sys_get_window(), gamma_red, gamma_green, gamma_blue);
 #endif
 }

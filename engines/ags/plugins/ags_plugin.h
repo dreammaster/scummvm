@@ -66,7 +66,7 @@ typedef int HWND;
 typedef int int32;
 #endif
 
-#define AGSIFUNC(type) virtual type __stdcall
+#define AGSIFUNC(type) virtual type
 
 #define MASK_WALKABLE   1
 #define MASK_WALKBEHIND 2

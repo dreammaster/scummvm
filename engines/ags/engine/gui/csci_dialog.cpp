@@ -48,8 +48,6 @@ namespace AGS3 {
 using AGS::Shared::Bitmap;
 namespace BitmapHelper = AGS::Shared::BitmapHelper;
 
-extern char ignore_bounds; // from mousew32
-
 //-----------------------------------------------------------------------------
 
 void __my_wbutt(Bitmap *ds, int x1, int y1, int x2, int y2) {
@@ -71,10 +69,8 @@ int CSCIGetVersion() {
 	return 0x0100;
 }
 
-int windowcount = 0, curswas = 0;
-int win_x = 0, win_y = 0, win_width = 0, win_height = 0;
 int CSCIDrawWindow(int xx, int yy, int wid, int hit) {
-	ignore_bounds++;
+	_G(ignore_bounds)++;
 	multiply_up(&xx, &yy, &wid, &hit);
 	int drawit = -1;
 	for (int aa = 0; aa < MAXSCREENWINDOWS; aa++) {
@@ -87,7 +83,7 @@ int CSCIDrawWindow(int xx, int yy, int wid, int hit) {
 	if (drawit < 0)
 		quit("Too many windows created.");
 
-	windowcount++;
+	_G(windowcount)++;
 	//  ags_domouse(DOMOUSE_DISABLE);
 	xx -= 2;
 	yy -= 2;
@@ -101,20 +97,20 @@ int CSCIDrawWindow(int xx, int yy, int wid, int hit) {
 	_G(oswi)[drawit].oldtop = _G(topwindowhandle);
 	_G(topwindowhandle) = drawit;
 	_G(oswi)[drawit].handle = _G(topwindowhandle);
-	win_x = xx;
-	win_y = yy;
-	win_width = wid;
-	win_height = hit;
+	_G(win_x) = xx;
+	_G(win_y) = yy;
+	_G(win_width) = wid;
+	_G(win_height) = hit;
 	return drawit;
 }
 
 void CSCIEraseWindow(int handl) {
 	//  ags_domouse(DOMOUSE_DISABLE);
-	ignore_bounds--;
+	_G(ignore_bounds)--;
 	_G(topwindowhandle) = _G(oswi)[handl].oldtop;
 	_G(oswi)[handl].handle = -1;
 	//  ags_domouse(DOMOUSE_ENABLE);
-	windowcount--;
+	_G(windowcount)--;
 	clear_gui_screen();
 }
 
@@ -127,7 +123,7 @@ int CSCIWaitMessage(CSCIMessage *cscim) {
 		}
 	}
 
-	prepare_gui_screen(win_x, win_y, win_width, win_height, true);
+	prepare_gui_screen(_G(win_x), _G(win_y), _G(win_width), _G(win_height), true);
 
 	while (1) {
 		sys_evt_process_pending();
@@ -254,8 +250,8 @@ void multiply_up(int *x1, int *y1, int *x2, int *y2) {
 
 int checkcontrols() {
 	// NOTE: this is because old code was working with full game screen
-	const int mousex = _G(mousex) - win_x;
-	const int mousey = _G(mousey) - win_y;
+	const int mousex = _G(mousex) - _G(win_x);
+	const int mousey = _G(mousey) - _G(win_y);
 
 	_G(smcode) = 0;
 	for (int kk = 0; kk < MAXCONTROLS; kk++) {

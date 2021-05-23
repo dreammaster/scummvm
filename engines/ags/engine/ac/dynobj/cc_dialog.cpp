@@ -36,7 +36,7 @@ const char *CCDialog::GetType() {
 // serialize the object into BUFFER (which is BUFSIZE bytes)
 // return number of bytes used
 int CCDialog::Serialize(const char *address, char *buffer, int bufsize) {
-	ScriptDialog *shh = (ScriptDialog *)address;
+	const ScriptDialog *shh = (const ScriptDialog *)address;
 	StartSerialize(buffer);
 	SerializeInt(shh->id);
 	return EndSerialize();

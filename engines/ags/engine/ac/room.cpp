@@ -942,7 +942,7 @@ int find_highest_room_entered() {
 void first_room_initialization() {
     _G(starting_room) = _G(displayed_room);
     set_loop_counter(0);
-    _G(mouse_z_was) = sys_mouse_z;
+    _G(mouse_z_was) = _G(sys_mouse_z);
 }
 
 void check_new_room() {

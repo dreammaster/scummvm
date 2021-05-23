@@ -20,20 +20,32 @@
  *
  */
 
-#ifndef AGS_ENGINE_MAIN_MAIN_H
-#define AGS_ENGINE_MAIN_MAIN_H
-
-#include "ags/shared/core/platform.h"
-#include "ags/shared/util/version.h"
+#include "ags/engine/gfx/gfxfilter_scaling.h"
 
 namespace AGS3 {
+namespace AGS {
+namespace Engine {
 
-AGS::Shared::String GetPathFromCmdArg(int arg_index);
+bool ScalingGfxFilter::Initialize(const int color_depth, String &err_str) {
+	// succeed by default
+	return true;
+}
 
-void main_print_help();
+void ScalingGfxFilter::UnInitialize() {
+	// do nothing by default
+}
 
-int ags_entry_point(int argc, char *argv[]);
+Rect ScalingGfxFilter::SetTranslation(const Size src_size, const Rect dst_rect) {
+	// do not restrict scaling by default
+	_dstRect = dst_rect;
+	_scaling.Init(src_size, dst_rect);
+	return _dstRect;
+}
 
+Rect ScalingGfxFilter::GetDestination() const {
+	return _dstRect;
+}
+
+} // namespace Engine
+} // namespace AGS
 } // namespace AGS3
-
-#endif
