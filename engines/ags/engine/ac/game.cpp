@@ -209,19 +209,15 @@ void set_game_speed(int new_fps) {
         setTimerFps(new_fps);
 }
 
-extern int cbuttfont;
-extern int acdialog_font;
-
-int oldmouse;
 void setup_for_dialog() {
-    cbuttfont = _GP(play).normal_font;
-    acdialog_font = _GP(play).normal_font;
+    _G(cbuttfont) = _GP(play).normal_font;
+    _G(acdialog_font) = _GP(play).normal_font;
     if (!_GP(play).mouse_cursor_hidden)
         ags_domouse(DOMOUSE_ENABLE);
-    oldmouse=_G(cur_cursor); set_mouse_cursor(CURS_ARROW);
+    _G(oldmouse) = _G(cur_cursor); set_mouse_cursor(CURS_ARROW);
 }
 void restore_after_dialog() {
-    set_mouse_cursor(oldmouse);
+    set_mouse_cursor(_G(oldmouse));
     if (!_GP(play).mouse_cursor_hidden)
         ags_domouse(DOMOUSE_DISABLE);
     invalidate_screen();

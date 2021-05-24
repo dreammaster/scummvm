@@ -121,6 +121,10 @@ int pluginsWantingDebugHooks = 0;
 static long pl_file_handle = -1;
 static Stream *pl_file_stream = nullptr;
 
+void PluginSimulateMouseClick(int pluginButtonID) {
+	_G(pluginSimulatedClick) = pluginButtonID - 1;
+}
+
 void IAGSEngine::AbortGame(const char *reason) {
 	quit(reason);
 }

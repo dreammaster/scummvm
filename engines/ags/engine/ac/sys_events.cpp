@@ -351,8 +351,8 @@ static void on_sdl_mouse_wheel(const SDL_MouseWheelEvent &event) {
 }
 #endif
 
-int mgetbutton() {
 #ifdef TODO
+int mgetbutton() {
 	int toret = MouseNone;
 	int butis = mouse_button_poll();
 
@@ -368,9 +368,6 @@ int mgetbutton() {
 
 	_G(butwas) = butis;
 	return toret;
-#else
-	return 0;
-#endif
 
 	// TODO: presumably this was a hack for 1-button Mac mouse;
 	// is this still necessary?
@@ -383,12 +380,14 @@ int mgetbutton() {
 	}
 #endif
 }
+#endif
 
 bool ags_misbuttondown(int but) {
 	return mouse_button_poll() & MB_ARRAY[but];
 }
 
 int ags_mgetbutton() {
+#ifdef TODO
 	int result;
 
 	if (_G(pluginSimulatedClick) > MouseNone) {
@@ -398,6 +397,8 @@ int ags_mgetbutton() {
 		result = mgetbutton();
 	}
 	return result;
+#endif
+	return 0;
 }
 
 void ags_mouse_get_relxy(int &x, int &y) {

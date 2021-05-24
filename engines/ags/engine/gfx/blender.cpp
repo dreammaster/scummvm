@@ -20,18 +20,12 @@
  *
  */
 
+#include "ags/lib/allegro/col_blend.h"
 #include "ags/engine/gfx/blender.h"
 #include "ags/lib/allegro.h"
 #include "ags/shared/core/types.h"
 
 namespace AGS3 {
-
-extern "C" {
-	unsigned long _blender_trans16(unsigned long x, unsigned long y, unsigned long n);
-	unsigned long _blender_trans15(unsigned long x, unsigned long y, unsigned long n);
-}
-
-
 
 // Take hue and saturation of blend colour, luminance of image
 unsigned long _myblender_color15_light(unsigned long x, unsigned long y, unsigned long n) {

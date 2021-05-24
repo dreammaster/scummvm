@@ -12,6 +12,7 @@ MODULE_OBJS = \
 	lib/aastr-0.1.1/aastr.o \
 	lib/aastr-0.1.1/aautil.o \
 	lib/alfont/alfont.o \
+	lib/allegro/col_blend.o \
 	lib/allegro/color.o \
 	lib/allegro/config.o \
 	lib/allegro/draw.o \
@@ -239,6 +240,7 @@ MODULE_OBJS = \
 	engine/gfx/ali_3d_scummvm.o \
 	engine/gfx/blender.o \
 	engine/gfx/color_engine.o \
+	engine/gfx/gfx_driver_base.o \
 	engine/gfx/gfx_driver_factory.o \
 	engine/gfx/gfx_util.o \
 	engine/gfx/gfxfilter_scaling.o \

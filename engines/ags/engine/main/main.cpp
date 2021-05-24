@@ -93,7 +93,7 @@ void main_init(int argc, const char *argv[]) {
 	_G(SavedgameLowestBackwardCompatVersion) = Version(SVG_VERSION_BWCOMPAT_MAJOR, SVG_VERSION_BWCOMPAT_MINOR, SVG_VERSION_BWCOMPAT_RELEASE, SVG_VERSION_BWCOMPAT_REVISION);
 	_G(SavedgameLowestForwardCompatVersion) = Version(SVG_VERSION_FWCOMPAT_MAJOR, SVG_VERSION_FWCOMPAT_MINOR, SVG_VERSION_FWCOMPAT_RELEASE, SVG_VERSION_FWCOMPAT_REVISION);
 
-	AssetMgr.reset(new AssetManager());
+	_GP(AssetMgr).reset(new AssetManager());
 	main_pre_init();
 	main_create_platform_driver();
 	_G(platform)->MainInitAdjustments();
