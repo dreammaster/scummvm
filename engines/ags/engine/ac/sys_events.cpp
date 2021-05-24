@@ -351,8 +351,8 @@ static void on_sdl_mouse_wheel(const SDL_MouseWheelEvent &event) {
 }
 #endif
 
-#ifdef TODO
 int mgetbutton() {
+#ifdef TODO
 	int toret = MouseNone;
 	int butis = mouse_button_poll();
 
@@ -379,8 +379,9 @@ int mgetbutton() {
 		toret = RIGHT;
 	}
 #endif
-}
 #endif
+	return 0;
+}
 
 bool ags_misbuttondown(int but) {
 	return mouse_button_poll() & MB_ARRAY[but];

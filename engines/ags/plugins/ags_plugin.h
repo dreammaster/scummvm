@@ -607,6 +607,8 @@ DLLEXPORT int    AGS_PluginV2() {
 
 #endif // THIS_IS_THE_PLUGIN
 
+extern void PluginSimulateMouseClick(int pluginButtonID);
+
 } // namespace AGS3
 
 #endif

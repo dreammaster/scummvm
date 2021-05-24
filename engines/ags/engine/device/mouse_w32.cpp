@@ -209,6 +209,7 @@ void mloadwcursor(char *namm) {
 #endif
 }
 
+#ifdef TODO
 int mgetbutton() {
 	int toret = NONE;
 	poll_mouse();
@@ -233,6 +234,7 @@ int mgetbutton() {
 	_G(butwas) = butis;
 	return toret;
 }
+#endif
 
 int misbuttondown(int buno) {
 	poll_mouse();

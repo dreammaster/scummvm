@@ -30,7 +30,6 @@
 #include "ags/shared/ac/game_setup_struct.h"
 #include "ags/engine/ac/game_state.h"
 #include "ags/engine/ac/global_mouse.h"
-#include "ags/engine/ac/global_plugin.h"
 #include "ags/engine/ac/global_screen.h"
 #include "ags/engine/ac/sys_events.h"
 #include "ags/engine/ac/system.h"
@@ -47,6 +46,7 @@
 #include "ags/engine/script/script_api.h"
 #include "ags/engine/script/script_runtime.h"
 #include "ags/engine/ac/global_game.h"
+#include "ags/plugins/ags_plugin.h"
 #include "ags/globals.h"
 
 namespace AGS3 {

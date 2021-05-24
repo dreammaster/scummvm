@@ -21,6 +21,7 @@
  */
 
 #include "common/textconsole.h"
+#include "ags/engine/gfx/gfxfilter_scummvm_renderer.h"
 #include "ags/engine/gfx/gfx_driver_factory.h"
 #include "ags/engine/gfx/ali_3d_scummvm.h"
 

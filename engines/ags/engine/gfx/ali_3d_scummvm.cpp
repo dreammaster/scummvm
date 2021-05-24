@@ -20,6 +20,7 @@
  *
  */
 
+#include "ags/engine/gfx/gfxfilter_scummvm_renderer.h"
 #include "ags/engine/gfx/ali_3d_scummvm.h"
 #include "ags/lib/std/algorithm.h"
 #include "ags/engine/ac/sys_events.h"
