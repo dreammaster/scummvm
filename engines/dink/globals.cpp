@@ -223,12 +223,12 @@ char midi_cur[20];
 char midi_last[20];
 
 int *pvision, *plife, *presult, *pspeed, *ptiming, *plifemax,
-	*pexper, *pmap, *pstrength, *pcur_weapon, *pcur_magic,
-	*pdefense, *pgold, *pmagic, *plevel, *plast_text, *pmagic_level;
+    *pexper, *pmap, *pstrength, *pcur_weapon, *pcur_magic,
+    *pdefense, *pgold, *pmagic, *plevel, *plast_text, *pmagic_level;
 int *pupdate_status, *pmissile_target, *penemy_sprite, *pmagic_cost,
-	*pmissle_source;
+    *pmissle_source;
 int flife, fexp, fstrength, fdefense, fgold, fmagic, fmagic_level,
-	flifemax, fraise, last_magic_draw;
+    flifemax, fraise, last_magic_draw;
 int fcur_weapon, fcur_magic;
 int mbase_timing;
 idata id[max_idata];
@@ -251,7 +251,7 @@ player_short_info short_play;
 int push_active = 1;
 
 
-LOGFONT lf = { 0,0,0,0,0,0,0,0,0,0,0,0,0,"" };
+LOGFONT lf = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "" };
 
 bool turn_on_plane = false;
 HFONT hfont = nullptr;

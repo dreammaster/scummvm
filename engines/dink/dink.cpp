@@ -59,7 +59,7 @@ Common::Error DinkEngine::run() {
 	mycode = getRandomNumber(1, 200000);
 
 	if (isDemo()) {
-		//if (chdir("story")) 
+		//if (chdir("story"))
 		error("Error finding story dir.");
 		mcc = sound_support;
 
@@ -86,11 +86,11 @@ void DinkEngine::initialize() {
 	_events = new EventsManager();
 
 	if (Common::File::exists("cd.dat"))
-		burn_revision = 1;	
+		burn_revision = 1;
 
 	Graphics::PixelFormat format = truecolor ?
-		Graphics::PixelFormat(4, 8, 8, 8, 8, 24, 16, 8, 0) :
-		Graphics::PixelFormat::createFormatCLUT8();
+	                               Graphics::PixelFormat(4, 8, 8, 8, 8, 24, 16, 8, 0) :
+	                               Graphics::PixelFormat::createFormatCLUT8();
 	initGraphics(640, 480, &format);
 
 	// create arrow cursor

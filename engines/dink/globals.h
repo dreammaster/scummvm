@@ -433,7 +433,7 @@ struct player_info {
 	int x, y, die, size, defense, dir, pframe, pseq, seq, frame, strength, base_walk, base_idle,
 
 
-		base_hit, que;
+	    base_hit, que;
 
 	item_struct mitem[9]; //added one to these, because I don't like referring to a 0 item
 	item_struct item[17];
@@ -576,7 +576,7 @@ extern int regcode, mycode;
 extern time_t time_start;
 extern bool item_screen;
 extern bool midi_active;
- 
+
 //redink1 code for version change
 extern char dversion_string[6];
 //redink1 lets make a new save info thing
@@ -637,32 +637,32 @@ extern font_color font_colors[16];
 extern show_bmp showb;
 extern int keep_mouse;
 extern int mcc, sound_support;
-extern attackinfo_struct bow; 
+extern attackinfo_struct bow;
 extern soundstruct soundinfo[num_soundbanks + 1];
-extern int screenlock; 
+extern int screenlock;
 extern talk_struct talk;
 extern char last_midi[15];
 extern char midi_cur[20];
 extern char midi_last[20];
 
 extern int *pvision, *plife, *presult, *pspeed, *ptiming,
-	*plifemax, *pexper, *pmap, *pstrength, *pcur_weapon,
-	*pcur_magic, *pdefense, *pgold, *pmagic, *plevel,
-	*plast_text, *pmagic_level;
+       *plifemax, *pexper, *pmap, *pstrength, *pcur_weapon,
+       *pcur_magic, *pdefense, *pgold, *pmagic, *plevel,
+       *plast_text, *pmagic_level;
 extern int *pupdate_status, *pmissile_target, *penemy_sprite,
-	*pmagic_cost, *pmissle_source;
+       *pmagic_cost, *pmissle_source;
 extern int flife, fexp, fstrength, fdefense, fgold, fmagic,
-	fmagic_level, flifemax, fraise, last_magic_draw;
+       fmagic_level, flifemax, fraise, last_magic_draw;
 extern int fcur_weapon, fcur_magic;
 extern int mbase_timing;
 extern idata id[max_idata];
 extern uint32 mold;
 extern int item_timer;
-extern int item_pic; 
+extern int item_pic;
 extern int mbase_count;
 extern bool no_transition;
 extern seth_sound ssound[max_sounds];
-extern LPDIRECTSOUND lpDS; 
+extern LPDIRECTSOUND lpDS;
 extern player_short_info short_play;
 extern int push_active;
 extern LOGFONT lf;
@@ -670,7 +670,7 @@ extern bool turn_on_plane;
 extern HFONT hfont;
 extern HFONT hfont_small;
 extern int stop_entire_game;
- 
+
 extern bool in_enabled;
 extern char *in_string;
 extern bool first_frame;

@@ -94,7 +94,9 @@ bool FastFileInit(const char *fname, int max_handles) {
 			return false;
 		}
 
-		ODS("FastFileInit: opened resource: "); ODS(fname); ODS("");
+		ODS("FastFileInit: opened resource: ");
+		ODS(fname);
+		ODS("");
 	} else {
 #endif
 		/*
@@ -118,7 +120,7 @@ bool FastFileInit(const char *fname, int max_handles) {
 			return false;
 		}
 #if 0
-}
+	}
 #endif
 
 	// Get initial data from the memory mapped file
@@ -155,7 +157,7 @@ HFASTFILE FastFileOpen(const char *name) {
 		error("FastFileOpen: invalid name");
 
 	PFileEntry pfe = Common::find_if(&index[0], &index[indexCount - 1],
-		FilenameTest(name));
+	                                 FilenameTest(name));
 
 	if (pfe != nullptr) {
 		uint32 i;
@@ -252,7 +254,7 @@ bool FastFileRead(HFASTFILE ff, void *ptr, int size) {
 
 bool FastFileSeek(HFASTFILE ff, int off, int how) {
 	PFileHandle pfh = (PFileHandle)ff;
-	PFileEntry	pfe;
+	PFileEntry  pfe;
 
 	if (pfh == nullptr || pfh->inuse != true) {
 		error("FastFileSeek: invalid handle");
