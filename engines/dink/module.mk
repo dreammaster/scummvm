@@ -2,6 +2,7 @@ MODULE := engines/dink
 
 MODULE_OBJS = \
 	dink.o \
+	var.o \
 	fast_file.o \
 	metaengine.o
 
