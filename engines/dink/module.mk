@@ -2,6 +2,7 @@ MODULE := engines/dink
 
 MODULE_OBJS = \
 	dink.o \
+	fast_file.o \
 	metaengine.o
 
 # This module can be built as a plugin
