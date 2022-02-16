@@ -149,7 +149,7 @@ bool PlayMidi(char *sFileName);
 void get_word(char line[300], int word, char *crap);
 void Msg(const char *fmt, ... );
 void run_script (int script);
-void add_text(char *tex ,char *filename);
+void add_text(const char *tex, const char *filename);
 void program_idata(void);
 int map_vision = 0;  
 void draw_map_game( void);

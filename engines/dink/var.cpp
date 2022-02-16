@@ -55,7 +55,7 @@ void SoundLoadBanks(void) {
 void replace(const char *this1, const char *that, char *line) {
     char hold[500];
     char thisup[200],lineup[500];
-    int u,i;
+    uint u,i;
     int checker;
 start:
     strcpy(hold,"");
@@ -525,9 +525,9 @@ void log_path(bool playing) {
 #endif
 }
 
-#if 0
 bool ReadData(LPDIRECTSOUNDBUFFER lpDSB, Common::SeekableReadStream *pFile, uint32 dwSize, uint32 dwPos) {
-    // Seek to correct position in file (if necessary)
+#ifdef TODO
+	// Seek to correct position in file (if necessary)
     if (dwPos != 0xffffffff) 
     {
         if (pFile->seek(dwPos, SEEK_SET) != 0) 
@@ -576,7 +576,7 @@ bool ReadData(LPDIRECTSOUNDBUFFER lpDSB, Common::SeekableReadStream *pFile, uint
     {
         return false;
     }
-
+#endif
     // Yahoo!
     return true;
 }
@@ -675,7 +675,7 @@ bool init_mouse(HWND hwnd)
 
 
 
-bool CreateBufferFromWaveFile(const char *fileName, uint32 dwBuf) {
+bool CreateBufferFromWaveFile(const char *filename, uint32 dwBuf) {
     // Open the wave file
 	Common::File f;
 
@@ -685,7 +685,7 @@ bool CreateBufferFromWaveFile(const char *fileName, uint32 dwBuf) {
 	if (!exist(crap)) sprintf(crap, "..\\dink\\sound\\%s",FileName);
 #endif
 	if (!f.open(Common::String::format("sound/%s", filename))) {
-        warning("Error, cannot load sound file %s", fileName);
+        warning("Error, cannot load sound file %s", filename);
         return false;
     }
     // Read in the wave header          
@@ -700,7 +700,7 @@ bool CreateBufferFromWaveFile(const char *fileName, uint32 dwBuf) {
 
     // Create the sound buffer for the wave file
     if (!CreateSoundBuffer(dwBuf, dwSize, wavHdr.dwSRate, wavHdr.BitsPerSample, wavHdr.wBlkAlign, bStereo)) {
-        warning("Couldn't create sound buffer for sound %s.", fileName);
+        warning("Couldn't create sound buffer for sound %s.", filename);
 		f.close();
 		return false;
     }
@@ -733,64 +733,29 @@ int GetKeyboard(int key) {
 #endif
 }
 
-void Msg( LPSTR fmt, ... )
-{
-    char    buff[350];
+void Msg(const char *fmt, ...) {
     va_list  va;
-
     va_start(va, fmt);
+	Common::String s = Common::String::vformat(fmt, va);
+	va_end(va);
 
-    //
-    // format message with header
-    //
+    debug("%s", s.c_str());
+    if (debug_mode)
+		add_text(s.c_str(), "DEBUG.TXT");
+}
 
-    lstrcpy( buff, "Dink:" );
-    wvsprintf( &buff[lstrlen(buff)], fmt, va );
-    lstrcat( buff, "\r\n" );
+void TRACE(const char *fmt, ...) {
+	va_list  va;
+	va_start(va, fmt);
+	Common::String s = Common::String::vformat(fmt, va);
+	va_end(va);
 
-    //
-    // To the debugger unless we need to be quiet
-    //
+	debug("%s", s.c_str());
+	if (debug_mode)
+		add_text(s.c_str(), "DEBUG.TXT");
+}
 
-
-
-    OutputDebugString( buff );
-    strcpy(last_debug, buff);
-    if (debug_mode) add_text(buff, "DEBUG.TXT");
-
-
-} /* Msg */
-
-void TRACE( LPSTR fmt, ... )
-{
-    char    buff[350];
-    va_list  va;
-
-    va_start(va, fmt);
-
-    //
-    // format message with header
-    //
-
-    lstrcpy( buff, "Dink:" );
-    wvsprintf( &buff[lstrlen(buff)], fmt, va );
-    lstrcat( buff, "\r\n" );
-
-    //
-    // To the debugger unless we need to be quiet
-    //
-
-
-
-    OutputDebugString( buff );
-    strcpy(last_debug, buff);
-    if (debug_mode) add_text(buff, "DEBUG.TXT");
-
-
-} /* Msg */
-
-
-
+#if 0
 extern "C" IDirectDrawSurface * DDSethLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite)
 {
     HBITMAP             hbm;
