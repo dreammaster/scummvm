@@ -4,7 +4,8 @@ MODULE_OBJS = \
 	dink.o \
 	var.o \
 	fast_file.o \
-	metaengine.o
+	metaengine.o \
+	sound.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_DINK), DYNAMIC_PLUGIN)

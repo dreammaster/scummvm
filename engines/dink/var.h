@@ -301,23 +301,6 @@ struct seth_sound
 seth_sound ssound[max_sounds];
 
 
-struct WaveHeader
-{
-    byte        RIFF[4];          // "RIFF"
-    uint32       dwSize;           // Size of data to follow
-    byte        WAVE[4];          // "WAVE"
-    byte        fmt_[4];          // "fmt "
-    uint32       dw16;             // 16
-    uint16        wOne_0;           // 1
-    uint16        wChnls;           // Number of Channels
-    uint32       dwSRate;          // Sample Rate
-    uint32       BytesPerSec;      // Sample Rate
-    uint16        wBlkAlign;        // 1
-    uint16        BitsPerSample;    // Sample size
-    byte        DATA[4];          // "DATA"
-    uint32       dwDSize;          // Number of Samples
-};
-
 LPDIRECTSOUND lpDS;
 
 

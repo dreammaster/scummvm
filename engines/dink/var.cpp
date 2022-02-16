@@ -19,13 +19,16 @@
  *
  */
 
+#include "common/debug.h"
+#include "common/file.h"
+#include "common/textconsole.h"
 #include "dink/var.h"
+#include "dink/sound.h"
 
 namespace Dink {
 
-#if 0
-
 void SoundLoadBanks(void) {
+#ifdef TODO
 	HRESULT ddsound;
 
 	lpDS->DuplicateSoundBuffer(ssound[1].sound, &bowsound);
@@ -45,13 +48,11 @@ void SoundLoadBanks(void) {
 			ddsound = lpDS->DuplicateSoundBuffer(ssound[1].sound, &soundbank[i]);
 			if (ddsound != DS_OK) Msg("Couldn't load soundbank %d.", i);
 		}
-
 	}
+#endif
 }
 
-void replace(const char *this1, char *that, char *line)
-{
-
+void replace(const char *this1, const char *that, char *line) {
     char hold[500];
     char thisup[200],lineup[500];
     int u,i;
@@ -174,8 +175,8 @@ char * lmon(long money, char *dest)
     int k,c;
     char lmon1[30];
     char buffer[30];
-    BOOL quit1;
-    quit1 = FALSE;
+    bool quit1;
+    quit1 = false;
 
     strcpy(lmon1, ltoa(money,buffer,10));
     // prf("ORG IS '%s'",lmon1);
@@ -202,8 +203,8 @@ char * lmon(long money, char *dest)
                 c = 0;
             }
         }
-        if (k < 0) quit1 = TRUE;
-    }while (quit1 == FALSE);
+        if (k < 0) quit1 = true;
+    }while (quit1 == false);
     reverse(lmon1);
 
     strcpy(dest, lmon1);
@@ -212,8 +213,8 @@ char * lmon(long money, char *dest)
 
 
 
-void dderror(HRESULT hErr)
-{       
+void dderror(HRESULT hErr) {
+#ifdef TODO
     switch (hErr)
     {
     case DDERR_ALREADYINITIALIZED:
@@ -420,6 +421,7 @@ void dderror(HRESULT hErr)
         Msg("Unknown Error"); break;
     }
     Msg("\n");
+#endif
 }
 
 
@@ -436,7 +438,7 @@ bool compare(char *orig, char *comp)
     if (strlen(orig) != len) return(false);
 
 
-    if (strnicmp(orig,comp,len) == 0)
+    if (scumm_strnicmp(orig,comp,len) == 0)
     {
         return(true);
     }
@@ -458,9 +460,9 @@ bool compare(char *orig, char *comp)
 //
 //----------------------------------------------------------------------
 
-BOOL CreateSoundBuffer(DWORD dwBuf, DWORD dwBufSize, DWORD dwFreq, DWORD dwBitsPerSample, DWORD dwBlkAlign, BOOL bStereo)
+bool CreateSoundBuffer(uint32 dwBuf, uint32 dwBufSize, uint32 dwFreq, uint32 dwBitsPerSample, uint32 dwBlkAlign, bool bStereo)
 {
-
+#ifdef TODO
     if (!sound_on) return(false);
 
     PCMWAVEFORMAT pcmwf;
@@ -488,9 +490,9 @@ BOOL CreateSoundBuffer(DWORD dwBuf, DWORD dwBufSize, DWORD dwFreq, DWORD dwBitsP
 
     // Query for the 3D Sound Buffer interface.
     //  TRY_DS(g_lpSounds[dwBuf]->QueryInterface(IID_IDirectSound3DBuffer, (void**) &g_lp3dSounds[dwBuf]));
-
+#endif
     // Yahoo!
-    return TRUE;
+    return true;
 }
 
 //----------------------------------------------------------------------
@@ -501,9 +503,8 @@ BOOL CreateSoundBuffer(DWORD dwBuf, DWORD dwBufSize, DWORD dwFreq, DWORD dwBitsP
 //
 //----------------------------------------------------------------------
 
-void log_path(bool playing)
-{
-
+void log_path(bool playing) {
+#ifdef TODO
     if (g_b_no_write_ini) return; //fix problem with NT security if -noini is set
 
     char dumb[100];
@@ -518,36 +519,34 @@ void log_path(bool playing)
     add_text(dinkpath,dumb2);
     add_text("\r\n",dumb2);
     if (playing)
-        add_text("TRUE\r\n",dumb2);
+        add_text("true\r\n",dumb2);
     else
-        add_text("FALSE\r\n",dumb2);
-
+        add_text("false\r\n",dumb2);
+#endif
 }
 
-
-
-BOOL ReadData(LPDIRECTSOUNDBUFFER lpDSB, FILE* pFile, DWORD dwSize, DWORD dwPos) 
-{
+#if 0
+bool ReadData(LPDIRECTSOUNDBUFFER lpDSB, Common::SeekableReadStream *pFile, uint32 dwSize, uint32 dwPos) {
     // Seek to correct position in file (if necessary)
     if (dwPos != 0xffffffff) 
     {
-        if (fseek(pFile, dwPos, SEEK_SET) != 0) 
+        if (pFile->seek(dwPos, SEEK_SET) != 0) 
         {
-            return FALSE;
+            return false;
         }
     }
 
     // Lock data in buffer for writing
-    LPVOID pData1;
-    DWORD  dwData1Size;
-    LPVOID pData2;
-    DWORD  dwData2Size;
+    void *pData1;
+    uint32  dwData1Size;
+    void *pData2;
+    uint32  dwData2Size;
     HRESULT rval;
 
     rval = lpDSB->Lock(0, dwSize, &pData1, &dwData1Size, &pData2, &dwData2Size, DSBLOCK_FROMWRITECURSOR);
     if (rval != DS_OK)
     {
-        return FALSE;
+        return false;
     }
 
     // Read in first chunk of data
@@ -558,7 +557,7 @@ BOOL ReadData(LPDIRECTSOUNDBUFFER lpDSB, FILE* pFile, DWORD dwSize, DWORD dwPos)
             char holder[256];
             wsprintf(holder,"Error reading .wav: %d, dwdata: %d, pFile: %d",pData1,dwData1Size,pFile);
             OutputDebugString(holder);
-            return FALSE;
+            return false;
         }
     }
 
@@ -567,7 +566,7 @@ BOOL ReadData(LPDIRECTSOUNDBUFFER lpDSB, FILE* pFile, DWORD dwSize, DWORD dwPos)
     {
         if (fread(pData2, dwData2Size, 1, pFile) != 1) 
         {
-            return FALSE;
+            return false;
         }
     }
 
@@ -575,16 +574,17 @@ BOOL ReadData(LPDIRECTSOUNDBUFFER lpDSB, FILE* pFile, DWORD dwSize, DWORD dwPos)
     rval = lpDSB->Unlock(pData1, dwData1Size, pData2, dwData2Size);
     if (rval != DS_OK)
     {
-        return FALSE;
+        return false;
     }
 
     // Yahoo!
-    return TRUE;
+    return true;
 }
 
 
-BOOL init_mouse(HWND hwnd)
+bool init_mouse(HWND hwnd)
 {
+#ifdef TODO
     if (g_pdi)
     {
         Msg("Mouse already initted? what the?");
@@ -600,7 +600,7 @@ BOOL init_mouse(HWND hwnd)
 
     if (FAILED(hr)) {
         Msg( "DirectInputCreate");
-        return FALSE;
+        return false;
     }
 
     /*
@@ -610,7 +610,7 @@ BOOL init_mouse(HWND hwnd)
 
     if (FAILED(hr)) {
         Msg("CreateDevice(SysMouse)");
-        return FALSE;
+        return false;
     }
 
     /*
@@ -620,7 +620,7 @@ BOOL init_mouse(HWND hwnd)
 
     if (FAILED(hr)) {
         Msg("SetDataFormat(SysMouse, dfDIMouse)");
-        return FALSE;
+        return false;
     }
 
     /*
@@ -631,12 +631,12 @@ BOOL init_mouse(HWND hwnd)
 
     if (FAILED(hr)) {
         Msg( "Error: SetCooperativeLevel(SysMouse)");
-        return FALSE;
+        return false;
     }
 
     /*
     *  Set the buffer size to DINPUT_BUFFERSIZE elements.
-    *  The buffer size is a DWORD property associated with the device.
+    *  The buffer size is a uint32 property associated with the device.
     */
     DIPROPDWORD dipdw =
     {
@@ -653,12 +653,12 @@ BOOL init_mouse(HWND hwnd)
 
     if (FAILED(hr)) {
         Msg( "Set buffer size(SysMouse)");
-        return FALSE;
+        return false;
     }
 
+#endif
 
-
-    return TRUE;
+    return true;
 
 }
 
@@ -675,76 +675,62 @@ BOOL init_mouse(HWND hwnd)
 
 
 
-BOOL PASCAL CreateBufferFromWaveFile(char* FileName, DWORD dwBuf)
-{
-    // Open the wave file       
-    char crap[150];
+bool CreateBufferFromWaveFile(const char *fileName, uint32 dwBuf) {
+    // Open the wave file
+	Common::File f;
 
+#ifdef TODO
     sprintf(crap, "sound\\%s",FileName);
-    if (!exist(crap)) sprintf(crap, "..\\dink\\sound\\%s",FileName);
 
-    FILE *pFile = fopen(crap,"rb");
-
-    if (pFile == NULL)
-    {
-        Msg("Error, cannot load sound file %s, tried two dirs even!", FileName);
-        return FALSE;
+	if (!exist(crap)) sprintf(crap, "..\\dink\\sound\\%s",FileName);
+#endif
+	if (!f.open(Common::String::format("sound/%s", filename))) {
+        warning("Error, cannot load sound file %s", fileName);
+        return false;
     }
     // Read in the wave header          
     WaveHeader wavHdr;
-    if (fread(&wavHdr, sizeof(wavHdr), 1, pFile) != 1) 
-    {
-        fclose(pFile);
-        return NULL;
-    }
+	wavHdr.load(&f);
 
     // Figure out the size of the data region
-    DWORD dwSize = wavHdr.dwDSize;
+    uint32 dwSize = wavHdr.dwDSize;
 
     // Is this a stereo or mono file?
-    BOOL bStereo = wavHdr.wChnls > 1 ? TRUE : FALSE;
+    bool bStereo = wavHdr.wChnls > 1 ? true : false;
 
     // Create the sound buffer for the wave file
-    if (!CreateSoundBuffer(dwBuf, dwSize, wavHdr.dwSRate, wavHdr.BitsPerSample, wavHdr.wBlkAlign, bStereo))
-    {
-        Msg("Couldn't create sound buffer for sound %s.",FileName);
-        // Close the file
-        fclose(pFile);
-
-        return FALSE;
+    if (!CreateSoundBuffer(dwBuf, dwSize, wavHdr.dwSRate, wavHdr.BitsPerSample, wavHdr.wBlkAlign, bStereo)) {
+        warning("Couldn't create sound buffer for sound %s.", fileName);
+		f.close();
+		return false;
     }
 
     // Read the data for the wave file into the sound buffer
-
-    if (!ReadData(ssound[dwBuf].sound, pFile, dwSize, sizeof(wavHdr))) 
-    {
-        fclose(pFile);
-        return FALSE;
+    if (!ReadData(ssound[dwBuf].sound, &f, dwSize, sizeof(wavHdr))) {
+        f.close();
+        return false;
     }   
 
     // Close out the wave file
-    fclose(pFile);
+	f.close();
 
     // Yahoo!
-    return TRUE;
+    return true;
 }
 
-
-
-
-
-
-bool getkey(int key)
-
-{
+bool getkey(int key) {
     if (sjoy.realkey[key]) return(true); else return(false);
 
 }
 
-int GetKeyboard(int key)
-{
-    // returns 0 if the key has been depressed, else returns 1 and sets key to code recd.
+int GetKeyboard(int key) {
+#ifdef TODO
+	// returns 0 if the key has been depressed, else returns 1 and sets key to code recd.
     return (GetAsyncKeyState(key));
+#else
+	error("TODO");
+	return 0;
+#endif
 }
 
 void Msg( LPSTR fmt, ... )
@@ -1052,7 +1038,7 @@ void add_text(char *tex ,char *filename)
     FILE *          fp;
     if (strlen(tex) < 1) return;
 
-    if (exist(filename) == FALSE)
+    if (exist(filename) == false)
     {
 
         fp = fopen(filename, "wb");
@@ -1166,17 +1152,17 @@ extern "C" IDirectDrawSurface * DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, in
     return pdds;
 }
 
-BOOL DSDisable( void )
+bool DSDisable( void )
 {
     if (lpDS == NULL)
     {
-        return TRUE;
+        return true;
     }
 
     lpDS->Release();
     lpDS = NULL;
 
-    return TRUE;
+    return true;
 
 } /* DSDisable */
 
@@ -2224,10 +2210,10 @@ void draw_wait()
 
 
 LPDIRECTDRAWSURFACE DDCreateSurface(
-                                    DWORD width,
-                                    DWORD height,
-                                    BOOL sysmem,
-                                    BOOL trans )
+                                    uint32 width,
+                                    uint32 height,
+                                    bool sysmem,
+                                    bool trans )
 {
     DDSURFACEDESC   ddsd;
     HRESULT     ddrval;
@@ -2269,7 +2255,7 @@ LPDIRECTDRAWSURFACE DDCreateSurface(
     }
     else
     {
-        Msg( "CreateSurface FAILED, rc = %ld", (DWORD) LOWORD( ddrval ) );
+        Msg( "CreateSurface FAILED, rc = %ld", (uint32) LOWORD( ddrval ) );
         psurf = NULL;
     }
 
@@ -2295,14 +2281,14 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
     int x,y,dib_pitch;
     BYTE *src, *dst;
-    DWORD ddst;
+    uint32 ddst;
     char fname[20];
     LPTSTR dump;
 
     //IDirectDrawSurface *pdds;
 
     int sprite = 71;
-    BOOL                       trans = FALSE;
+    bool                       trans = false;
     bool reload = false;
 
     PALETTEENTRY    holdpal[256];     
@@ -2417,10 +2403,10 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
             //position.  Should work fine with 16-24-32 bit color depth.
 #define _RGBXBIT(r, g, b) ( (r >> (8 - wRBits) << wRPos) | (g >> (8 - wGBits) << wGPos) | (b >> (8 - wBBits) << wBPos) )
             PALETTEENTRY ape[256];
-            DWORD dwBlack;
-            DWORD dwNearBlack;
-            DWORD dwWhite;
-            DWORD dwNearWhite;
+            uint32 dwBlack;
+            uint32 dwNearBlack;
+            uint32 dwWhite;
+            uint32 dwNearWhite;
 
             if (truecolor)
             {
@@ -2466,7 +2452,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
             ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT |DDSD_WIDTH;
             ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
             ddsd.dwWidth = pbi->biWidth;
-            ddsd.dwHeight = pbi->biHeight; // + 1; //redink1 fixed crashing in 16-bit mode... would overflow by a byte or two by writing dwords, really weird bug. Eh, actually moved solution to everywhere we update a DWORD, include any trailing bits that were there before.  Saves memory.
+            ddsd.dwHeight = pbi->biHeight; // + 1; //redink1 fixed crashing in 16-bit mode... would overflow by a byte or two by writing dwords, really weird bug. Eh, actually moved solution to everywhere we update a uint32, include any trailing bits that were there before.  Saves memory.
 
             if (k[sprite].k != NULL) k[sprite].k->Release();
 
@@ -2488,9 +2474,9 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
                     dib_pitch = (pbi->biWidth+3)&~3;
                     src = (BYTE *)pic + dib_pitch * (pbi->biHeight-1);
                     dst = (BYTE *)ddsd.lpSurface;
-                    ddst = (DWORD)ddsd.lpSurface;
+                    ddst = (uint32)ddsd.lpSurface;
                     int bytesPerPixel = ddsd.ddpfPixelFormat.dwRGBBitCount >> 3; //Divide by 8, basically
-                    DWORD dwPixel;
+                    uint32 dwPixel;
                     if (leftalign)
                     {
                         //Msg("left aligning..");
@@ -2511,8 +2497,8 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
                                         {
                                             dwPixel = dwNearWhite;
                                         }
-                                        //Make sure to or it with the rest of the DWORD present, just in case it overflows the buffer
-                                        *((DWORD*)ddst) = dwPixel | *((DWORD*)ddst) & ~dwWhite;
+                                        //Make sure to or it with the rest of the uint32 present, just in case it overflows the buffer
+                                        *((uint32*)ddst) = dwPixel | *((uint32*)ddst) & ~dwWhite;
 
                                         ddst += bytesPerPixel;
                                 }
@@ -2533,7 +2519,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
                             }
 
                             //redink1 switched to 'better' version
-                            ((DWORD)ddst) += ddsd.lPitch - ((int)pbi->biWidth) * bytesPerPixel; //ddst += ddsd.lPitch / 4;
+                            ((uint32)ddst) += ddsd.lPitch - ((int)pbi->biWidth) * bytesPerPixel; //ddst += ddsd.lPitch / 4;
                             dst += ddsd.lPitch;
                             src -= dib_pitch;
                         }
@@ -2560,7 +2546,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
                                         {
                                             dwPixel = dwWhite;
                                         }
-                                        *((DWORD*)ddst) = dwPixel | *((DWORD*)ddst) & ~dwWhite;;
+                                        *((uint32*)ddst) = dwPixel | *((uint32*)ddst) & ~dwWhite;;
 
                                         ddst += bytesPerPixel;
                                         /*ddst[x] = _RGB24BIT(ape[src[x]].peRed, ape[src[x]].peGreen, ape[src[x]].peBlue);
@@ -2594,7 +2580,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
 
                                 //redink1 switched to 'better' version
-                                ((DWORD)ddst) += ddsd.lPitch - ((int)pbi->biWidth) * bytesPerPixel; //
+                                ((uint32)ddst) += ddsd.lPitch - ((int)pbi->biWidth) * bytesPerPixel; //
                                 dst += ddsd.lPitch;
                                 src -= dib_pitch;
                             }
@@ -2619,7 +2605,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
                                         {
                                             dwPixel = dwBlack;
                                         }
-                                        *((DWORD*)ddst) = dwPixel | *((DWORD*)ddst) & ~dwWhite;;
+                                        *((uint32*)ddst) = dwPixel | *((uint32*)ddst) & ~dwWhite;;
 
                                         ddst += bytesPerPixel;
                                         /*ddst[x] = _RGB24BIT(ape[src[x]].peRed, ape[src[x]].peGreen, ape[src[x]].peBlue);
@@ -2650,7 +2636,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
                                 }
 
                                 //redink1 switched to 'better' version
-                                ((DWORD)ddst) += ddsd.lPitch - ((int)pbi->biWidth) * bytesPerPixel; //ddst += ddsd.lPitch / 4;
+                                ((uint32)ddst) += ddsd.lPitch - ((int)pbi->biWidth) * bytesPerPixel; //ddst += ddsd.lPitch / 4;
                                 dst += ddsd.lPitch;
                                 src -= dib_pitch;
                             }
@@ -3893,12 +3879,12 @@ int add_sprite_dumb(int x1, int y, int brain,int pseq, int pframe,int size )
 
     for (int x=1; x < max_sprites_at_once; x++)
     {
-        if (spr[x].active == FALSE)
+        if (spr[x].active == false)
         {
             memset(&spr[x], 0, sizeof(spr[x]));
 
             //Msg("Making sprite %d.",x);
-            spr[x].active = TRUE;
+            spr[x].active = true;
             spr[x].x = x1;
             spr[x].y = y;
             spr[x].my = 0;
@@ -5177,11 +5163,11 @@ int add_sprite(int x1, int y, int brain,int pseq, int pframe )
 
     for (int x=1; x < max_sprites_at_once; x++)
     {
-        if (spr[x].active == FALSE)
+        if (spr[x].active == false)
         {
             memset(&spr[x], 0, sizeof(spr[x]));
 
-            spr[x].active = TRUE;
+            spr[x].active = true;
             spr[x].x = x1;
             spr[x].y = y;
             spr[x].my = 0;
@@ -5337,7 +5323,7 @@ void check_base(int base)
 {
     for (int i=1; i < 10; i++)
     {
-        if (seq[base+i].active == TRUE) check_seq_status(base+i);
+        if (seq[base+i].active == true) check_seq_status(base+i);
 
     }
 
@@ -6144,7 +6130,7 @@ bool nothing_playing(void)
 {
     //int crap = (mciSendString("status MUSIC offset", NULL, 0, NULL));
     //int crap =  (mciSendString("play MUSIC from 0", NULL, 0, g_hWnd));
-    DWORD dwReturn;   
+    uint32 dwReturn;   
     MCI_OPEN_PARMS mciOpenParms;
     MCI_PLAY_PARMS mciPlayParms;
     MCI_STATUS_PARMS mciStatusParms;
@@ -6155,7 +6141,7 @@ bool nothing_playing(void)
     //MCI_STATUS_LENGTH
     mciStatusParms.dwItem = MCI_STATUS_MODE;
     if (dwReturn = mciSendCommand(midi_id, MCI_STATUS, 
-        MCI_STATUS_ITEM, (DWORD)(LPVOID) &mciStatusParms))   
+        MCI_STATUS_ITEM, (uint32)(LPVOID) &mciStatusParms))   
     {
 
         Msg("Error reading status from midi mapper!");
@@ -6176,7 +6162,7 @@ bool cdplaying(void)
 {
     //int crap = (mciSendString("status MUSIC offset", NULL, 0, NULL));
     //int crap =  (mciSendString("play MUSIC from 0", NULL, 0, g_hWnd));
-    DWORD dwReturn;   
+    uint32 dwReturn;   
     MCI_OPEN_PARMS mciOpenParms;
     MCI_PLAY_PARMS mciPlayParms;
     MCI_STATUS_PARMS mciStatusParms;
@@ -6191,7 +6177,7 @@ bool cdplaying(void)
 
     mciStatusParms.dwItem = MCI_STATUS_CURRENT_TRACK ;
     if (dwReturn = mciSendCommand(CD_ID, MCI_STATUS, 
-        MCI_STATUS_ITEM, (DWORD)(LPVOID) &mciStatusParms))   
+        MCI_STATUS_ITEM, (uint32)(LPVOID) &mciStatusParms))   
     {
         Msg("Error reading status from midi mapper!");
         return(false);
@@ -6212,7 +6198,7 @@ void init_midi(void)
 }
 
 
-DWORD playMIDIFile(HWND hWndNotify, LPSTR lpszMIDIFileName)
+uint32 playMIDIFile(HWND hWndNotify, LPSTR lpszMIDIFileName)
 
 { 
 
@@ -6223,7 +6209,7 @@ DWORD playMIDIFile(HWND hWndNotify, LPSTR lpszMIDIFileName)
 
     Msg("Attempting to play midi %s.",lpszMIDIFileName);
 
-    DWORD dwReturn;   
+    uint32 dwReturn;   
     MCI_OPEN_PARMS mciOpenParms;
     MCI_PLAY_PARMS mciPlayParms;
     MCI_STATUS_PARMS mciStatusParms;
@@ -6235,7 +6221,7 @@ DWORD playMIDIFile(HWND hWndNotify, LPSTR lpszMIDIFileName)
     mciOpenParms.lpstrElementName = lpszMIDIFileName;
 
     if (dwReturn = mciSendCommand(0, MCI_OPEN,
-        MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,        (DWORD)(LPVOID) &mciOpenParms))
+        MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,        (uint32)(LPVOID) &mciOpenParms))
     {   
         // Failed to open device. Don't close it; just return error.
         char ermess[129];
@@ -6254,7 +6240,7 @@ DWORD playMIDIFile(HWND hWndNotify, LPSTR lpszMIDIFileName)
     // Check if the output port is the MIDI mapper.
     mciStatusParms.dwItem = MCI_SEQ_STATUS_PORT;
     if (dwReturn = mciSendCommand(midi_id, MCI_STATUS, 
-        MCI_STATUS_ITEM, (DWORD)(LPVOID) &mciStatusParms))   
+        MCI_STATUS_ITEM, (uint32)(LPVOID) &mciStatusParms))   
     {
         Msg("Status says no?");
         mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);     
@@ -6281,9 +6267,9 @@ DWORD playMIDIFile(HWND hWndNotify, LPSTR lpszMIDIFileName)
     // Begin playback. The window procedure function for the parent 
     // window will be notified with an MM_MCINOTIFY message when 
     // playback is complete. At this time, the window procedure closes 
-    // the device.    mciPlayParms.dwCallback = (DWORD) hWndNotify;
+    // the device.    mciPlayParms.dwCallback = (uint32) hWndNotify;
     if (dwReturn = mciSendCommand(midi_id, MCI_PLAY, MCI_NOTIFY, 
-        (DWORD)(LPVOID) &mciPlayParms))    
+        (uint32)(LPVOID) &mciPlayParms))    
     {
         mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);        return (dwReturn);
     }
@@ -6298,7 +6284,7 @@ DWORD playMIDIFile(HWND hWndNotify, LPSTR lpszMIDIFileName)
 
 
 
-BOOL PlayMidi(char *sFileName)
+bool PlayMidi(char *sFileName)
 {
     //no midi stuff right now
     if (::sound_on == false) return true;
@@ -6345,23 +6331,23 @@ BOOL PlayMidi(char *sFileName)
     if (mciSendString("close MUSIC", NULL, 0, NULL) != 0)
     {
         Msg("Couldn't close current midi..");
-        //  return(FALSE);
+        //  return(false);
     }
 
     if (mciSendString(buf, NULL, 0, NULL) != 0)
     {
         Msg("Couldn't clear midi buffer");
-        return(FALSE);
+        return(false);
     }
 
 
     if (mciSendString("play MUSIC from 0", NULL, 0, g_hWnd) != 0)
     {
         Msg("Playmidi command failed");
-        return(FALSE);
+        return(false);
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -6410,17 +6396,17 @@ void check_midi(void)
 }
 
 
-DWORD killcd(HWND hWndNotify, BYTE bTrack){    
+uint32 killcd(HWND hWndNotify, BYTE bTrack){    
 
 
-    DWORD dwReturn;  
+    uint32 dwReturn;  
     MCI_OPEN_PARMS mciOpenParms;
     MCI_SET_PARMS mciSetParms; 
     MCI_PLAY_PARMS mciPlayParms;
     // Open the CD audio device by specifying the device name.
     mciOpenParms.lpstrDeviceType = "cdaudio";
     if (dwReturn = mciSendCommand(NULL, MCI_OPEN,
-        MCI_OPEN_TYPE, (DWORD)(LPVOID) &mciOpenParms))   
+        MCI_OPEN_TYPE, (uint32)(LPVOID) &mciOpenParms))   
     {
         // Failed to open device. Don't close it; just return error.
         return (dwReturn);   
@@ -6430,7 +6416,7 @@ DWORD killcd(HWND hWndNotify, BYTE bTrack){
     // Set the time format to track/minute/second/frame (TMSF).
     mciSetParms.dwTimeFormat = MCI_FORMAT_TMSF;
     if (dwReturn = mciSendCommand(CD_ID, MCI_SET, 
-        MCI_SET_TIME_FORMAT, (DWORD)(LPVOID) &mciSetParms))   
+        MCI_SET_TIME_FORMAT, (uint32)(LPVOID) &mciSetParms))   
     {
         mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);        return (dwReturn);
     }     // Begin playback from the given track and play until the beginning 
@@ -6441,9 +6427,9 @@ DWORD killcd(HWND hWndNotify, BYTE bTrack){
     mciPlayParms.dwTo = 0L;
     mciPlayParms.dwFrom = MCI_MAKE_TMSF(bTrack, 0, 0, 0);
     mciPlayParms.dwTo = MCI_MAKE_TMSF(bTrack + 1, 0, 0, 0);
-    mciPlayParms.dwCallback = (DWORD) hWndNotify;
+    mciPlayParms.dwCallback = (uint32) hWndNotify;
     if (dwReturn = mciSendCommand(CD_ID, MCI_STOP,
-        MCI_FROM | MCI_TO | MCI_NOTIFY, (DWORD)(LPVOID) &mciPlayParms))   
+        MCI_FROM | MCI_TO | MCI_NOTIFY, (uint32)(LPVOID) &mciPlayParms))   
     {
         mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);        return (dwReturn);
     }    return (0L);
@@ -6455,10 +6441,10 @@ DWORD killcd(HWND hWndNotify, BYTE bTrack){
 
 
 
-DWORD PlayCD(HWND hWndNotify, BYTE bTrack){    
+uint32 PlayCD(HWND hWndNotify, BYTE bTrack){    
 
 
-    DWORD dwReturn;  
+    uint32 dwReturn;  
     MCI_OPEN_PARMS mciOpenParms;
     MCI_SET_PARMS mciSetParms; 
     MCI_PLAY_PARMS mciPlayParms;
@@ -6474,7 +6460,7 @@ DWORD PlayCD(HWND hWndNotify, BYTE bTrack){
 
     mciOpenParms.lpstrDeviceType = "cdaudio";
     if (dwReturn = mciSendCommand(NULL, MCI_OPEN,
-        MCI_OPEN_TYPE, (DWORD)(LPVOID) &mciOpenParms))   
+        MCI_OPEN_TYPE, (uint32)(LPVOID) &mciOpenParms))   
     {
         // Failed to open device. Don't close it; just return error.
         Msg("Couldn't open CD music...");
@@ -6489,7 +6475,7 @@ DWORD PlayCD(HWND hWndNotify, BYTE bTrack){
     // Set the time format to track/minute/second/frame (TMSF).
     mciSetParms.dwTimeFormat = MCI_FORMAT_TMSF;
     if (dwReturn = mciSendCommand(CD_ID, MCI_SET, 
-        MCI_SET_TIME_FORMAT, (DWORD)(LPVOID) &mciSetParms))   
+        MCI_SET_TIME_FORMAT, (uint32)(LPVOID) &mciSetParms))   
     {
         mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);        return (dwReturn);
     }     // Begin playback from the given track and play until the beginning 
@@ -6500,9 +6486,9 @@ DWORD PlayCD(HWND hWndNotify, BYTE bTrack){
     mciPlayParms.dwTo = 0L;
     mciPlayParms.dwFrom = MCI_MAKE_TMSF(bTrack, 0, 0, 0);
     mciPlayParms.dwTo = MCI_MAKE_TMSF(bTrack + 1, 0, 0, 0);
-    mciPlayParms.dwCallback = (DWORD) hWndNotify;
+    mciPlayParms.dwCallback = (uint32) hWndNotify;
     if (dwReturn = mciSendCommand(CD_ID, MCI_PLAY,
-        MCI_FROM | MCI_TO | MCI_NOTIFY, (DWORD)(LPVOID) &mciPlayParms))   
+        MCI_FROM | MCI_TO | MCI_NOTIFY, (uint32)(LPVOID) &mciPlayParms))   
     {
         mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);        return (dwReturn);
     }    return (0L);
@@ -6514,12 +6500,12 @@ DWORD PlayCD(HWND hWndNotify, BYTE bTrack){
 
 
 
-DWORD getCDTrackStartTimes(VOID)
+uint32 getCDTrackStartTimes(VOID)
 
 {    UINT wDeviceID;    int i, iNumTracks;
 
 cd_inserted = false;
-DWORD dwReturn;    DWORD dwPosition;    DWORD *pMem;
+uint32 dwReturn;    uint32 dwPosition;    uint32 *pMem;
 char szTempString[64];
 char szTimeString[512] = "\0";  // room for 20 tracks
 MCI_OPEN_PARMS mciOpenParms; 
@@ -6531,7 +6517,7 @@ MCI_STATUS_PARMS mciStatusParms;
 Msg("Opening cd..");
 mciOpenParms.lpstrDeviceType = "cdaudio";
 if (dwReturn = mciSendCommand(NULL, MCI_OPEN,
-    MCI_OPEN_TYPE, (DWORD)(LPVOID) &mciOpenParms))  
+    MCI_OPEN_TYPE, (uint32)(LPVOID) &mciOpenParms))  
 {
     // Failed to open device. 
     // Don't close device; just return error.    
@@ -6549,13 +6535,13 @@ wDeviceID = mciOpenParms.wDeviceID;
 // Set the time format to minute/second/frame (MSF) format. 
 mciSetParms.dwTimeFormat = MCI_FORMAT_MSF;
 if (dwReturn = mciSendCommand(wDeviceID, MCI_SET, 
-    MCI_SET_TIME_FORMAT,         (DWORD)(LPVOID) &mciSetParms))     {
+    MCI_SET_TIME_FORMAT,         (uint32)(LPVOID) &mciSetParms))     {
         mciSendCommand(wDeviceID, MCI_CLOSE, 0, NULL);        return (dwReturn);
     }    // Get the number of tracks; 
     // limit to number that can be displayed (20).
     mciStatusParms.dwItem = MCI_STATUS_NUMBER_OF_TRACKS;
     if (dwReturn = mciSendCommand(wDeviceID, MCI_STATUS, 
-        MCI_STATUS_ITEM, (DWORD)(LPVOID) &mciStatusParms))    
+        MCI_STATUS_ITEM, (uint32)(LPVOID) &mciStatusParms))    
     {
         Msg("Error reading cd 44.");
         mciSendCommand(wDeviceID, MCI_CLOSE, 0, NULL);       
@@ -6579,7 +6565,7 @@ if (dwReturn = mciSendCommand(wDeviceID, MCI_SET,
 
     iNumTracks = min(iNumTracks, 20);
     // Allocate memory to hold starting positions.
-    pMem = (DWORD *)LocalAlloc(LPTR,         iNumTracks * sizeof(DWORD));
+    pMem = (uint32 *)LocalAlloc(LPTR,         iNumTracks * sizeof(uint32));
     if (pMem == NULL)     {
         mciSendCommand(wDeviceID, MCI_CLOSE, 0, NULL);        return (-1);    } 
     // For each track, get and save the starting location and
@@ -6590,7 +6576,7 @@ if (dwReturn = mciSendCommand(wDeviceID, MCI_SET,
         mciStatusParms.dwTrack = i;
         if (dwReturn = mciSendCommand(wDeviceID, 
             MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK, 
-            (DWORD)(LPVOID) &mciStatusParms)) 
+            (uint32)(LPVOID) &mciStatusParms)) 
         {
             mciSendCommand(wDeviceID, MCI_CLOSE, 0, NULL);
             return (dwReturn);     
@@ -6651,17 +6637,17 @@ if (dwReturn = mciSendCommand(wDeviceID, MCI_SET,
 //
 //------------------------------------------------------------------
 
-BOOL PauseMidi()
+bool PauseMidi()
 {
     // Pause if we're not already paused...
     if (mciSendString("stop MUSIC", NULL, 0, NULL) != 0)
     {
-        return(FALSE);
+        return(false);
     }
 
 
     // Yahoo!
-    return TRUE;
+    return true;
 }
 
 //------------------------------------------------------------------
@@ -6672,16 +6658,16 @@ BOOL PauseMidi()
 //
 //------------------------------------------------------------------
 
-BOOL ResumeMidi()
+bool ResumeMidi()
 {       
     // Resume midi
     if (mciSendString("play MUSIC notify", NULL, 0, g_hWnd) != 0)
     {
-        return(FALSE);
+        return(false);
     }
 
     // Yahoo!
-    return TRUE;
+    return true;
 }
 
 //------------------------------------------------------------------
@@ -6692,13 +6678,13 @@ BOOL ResumeMidi()
 //
 //------------------------------------------------------------------
 
-BOOL StopMidi()
+bool StopMidi()
 {
 
     playMIDIFile(g_hWnd, "");
 
     // Yahoo!
-    return TRUE;
+    return true;
 }
 
 //------------------------------------------------------------------
@@ -6709,16 +6695,16 @@ BOOL StopMidi()
 //
 //------------------------------------------------------------------
 
-BOOL ReplayMidi()
+bool ReplayMidi()
 {
     // Replay midi
     if (mciSendString("play MUSIC from 0 notify", NULL, 0, g_hWnd) != 0)
     {
-        return(FALSE);
+        return(false);
     }
 
     // Yahoo!
-    return TRUE;
+    return true;
 }
 void get_right(char line[200], char thing[100], char *ret)
 {
@@ -7291,7 +7277,7 @@ void place_sprites_game(void )
 {
     int sprite;
 
-    BOOL bs[max_sprites_at_once];
+    bool bs[max_sprites_at_once];
     int rank[max_sprites_at_once];
     int highest_sprite;
 
@@ -7310,7 +7296,7 @@ void place_sprites_game(void )
 
         for (int h1 = 1; h1 < 100;  h1++)
         {
-            if (bs[h1] == FALSE)
+            if (bs[h1] == false)
             {
                 if (pam.sprite[h1].active)
                 {
@@ -7325,7 +7311,7 @@ void place_sprites_game(void )
             }
         }
         if (rank[r1] != 0)  
-            bs[rank[r1]] = TRUE;
+            bs[rank[r1]] = true;
     }
 
 
@@ -7502,7 +7488,7 @@ crazy:;
 
         }
         if (found > 1) 
-        {spr[found].active = FALSE;
+        {spr[found].active = false;
         if (nosetlast == false)
             last_sprite_created = found -1;
         return(true);
@@ -7596,7 +7582,7 @@ again1:
 }
 
 
-BOOL playing( int sound)
+bool playing( int sound)
 {
     unsigned long crap;
     HRESULT ddsound;    
@@ -7605,7 +7591,7 @@ BOOL playing( int sound)
 
     if( !lpDS || !pdsb )
     {
-        return FALSE;
+        return false;
     }
 
     pdsb->GetStatus(&crap);
@@ -7799,7 +7785,7 @@ int playbank( int sound, int min,int plus, int sound3d, bool repeat )
         {
 
             Msg("soundbank %d not initted!",i);
-            return FALSE;
+            return false;
         }
 
 
@@ -7902,7 +7888,7 @@ int SoundPlayEffect( int sound, int min,int plus , int sound3d, bool repeat)
 * SoundStopEffect
 *
 * Stops the sound effect specified.
-* Returns TRUE if succeeded.
+* Returns true if succeeded.
 */
 int hurt_thing(int h, int damage, int special)
 {
@@ -7958,13 +7944,13 @@ void random_blood(int mx, int my, int h)
 
 
 
-BOOL SoundStopEffect( int sound )
+bool SoundStopEffect( int sound )
 {
     HRESULT     dsrval;
 
     if( !lpDS || !ssound[sound].sound )
     {
-        return FALSE;
+        return false;
     }
 
     dsrval = ssound[sound].sound->Stop();
@@ -7974,25 +7960,25 @@ BOOL SoundStopEffect( int sound )
 } /* SoundStopEffect */
 
 
-BOOL DSEnable( HWND hwnd )
+bool DSEnable( HWND hwnd )
 {
     HRESULT             dsrval;
-    BOOL                bUseDSound;
+    bool                bUseDSound;
 
-    bUseDSound = TRUE;
+    bUseDSound = true;
     //GetProfileInt("FoxBear", "use_dsound", bWantSound);
 
     if (!bUseDSound)
     {
         lpDS = NULL;
         Msg("Aborting sound init");
-        return TRUE;
+        return true;
     }
 
     if (lpDS != NULL)
     {
         Msg( "DSEnable, already enabled" );
-        return TRUE;
+        return true;
     }
 
     dsrval = DirectSoundCreate(NULL, &lpDS, NULL);
@@ -8006,7 +7992,7 @@ BOOL DSEnable( HWND hwnd )
         if (dsrval == DSERR_NODRIVER) TRACE("DSERR_NODRIVER");
 
         TRACE("DirectSoundCreate FAILED");
-        return FALSE;
+        return false;
     }
 
 
@@ -8016,10 +8002,10 @@ BOOL DSEnable( HWND hwnd )
     {
         DSDisable();
         Msg("SetCooperativeLevel FAILED");
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 
 } /* DSEnable */
 
@@ -8034,11 +8020,11 @@ BOOL DSEnable( HWND hwnd )
 * InitSound
 *
 * Sets up the DirectSound object and loads all sounds into secondary
-* DirectSound buffers.  Returns FALSE on error, or TRUE if successful
+* DirectSound buffers.  Returns false on error, or true if successful
 */
 
 
-BOOL InitSound( HWND hwndOwner )
+bool InitSound( HWND hwndOwner )
 {
     int idx;
     Msg("initting sound");
@@ -8051,7 +8037,7 @@ BOOL InitSound( HWND hwndOwner )
     if (lpDS == NULL)
     {
         Msg("lpds wasn't initted in dsenable!");
-        return FALSE;
+        return false;
     }
     /*
     * Load all sounds -- any that can't load for some reason will have NULL
@@ -8101,18 +8087,18 @@ BOOL InitSound( HWND hwndOwner )
         if (!SUCCEEDED(lpPrimary->Play(0, 0, DSBPLAY_LOOPING)))
         {
             Msg("Unable to play Primary sound buffer");
-            return FALSE;
+            return false;
         }
-        return TRUE;
+        return true;
         //  IDirectSoundBuffer_Release(lpPrimary);
     }
     else
     {
-        return FALSE;
+        return false;
         // TRACE("Unable to create Primary sound buffer");
     }
 
-    return TRUE;
+    return true;
 
 } /* InitSound */
 
@@ -8185,7 +8171,7 @@ void place_sprites_game_background(void )
 {
     int sprite;
 
-    BOOL bs[max_sprites_at_once];
+    bool bs[max_sprites_at_once];
     int rank[max_sprites_at_once];
     int highest_sprite;
     memset(&bs,0,sizeof(bs));
@@ -8198,7 +8184,7 @@ void place_sprites_game_background(void )
 
         for (int h1 = 1; h1 < 100;  h1++)
         {
-            if (bs[h1] == FALSE)
+            if (bs[h1] == false)
             {
                 if (pam.sprite[h1].active) if (pam.sprite[h1].type == 0)
                 {
@@ -8213,7 +8199,7 @@ void place_sprites_game_background(void )
             }
         }
         if (rank[r1] != 0)  
-            bs[rank[r1]] = TRUE;
+            bs[rank[r1]] = true;
     }
 
 
@@ -8290,7 +8276,7 @@ void fill_back_sprites(void )
 {
     int sprite;
 
-    BOOL bs[max_sprites_at_once];
+    bool bs[max_sprites_at_once];
     int rank[max_sprites_at_once];
     int highest_sprite;
 
@@ -8307,7 +8293,7 @@ void fill_back_sprites(void )
 
         for (int h1 = 1; h1 < 100;  h1++)
         {
-            if (bs[h1] == FALSE)
+            if (bs[h1] == false)
             {
                 if (pam.sprite[h1].active) if (pam.sprite[h1].type != 1) if (pam.sprite[h1].hard == 0)
                 {
@@ -8322,7 +8308,7 @@ void fill_back_sprites(void )
             }
         }
         if (rank[r1] != 0)  
-            bs[rank[r1]] = TRUE;
+            bs[rank[r1]] = true;
     }
 
 
@@ -8438,7 +8424,7 @@ void fill_screen(int num)
 void fill_hard_sprites(void )
 {
     int sprite;
-    BOOL bs[max_sprites_at_once];
+    bool bs[max_sprites_at_once];
     int rank[max_sprites_at_once];
     int highest_sprite;
     int h;  
@@ -8461,7 +8447,7 @@ void fill_hard_sprites(void )
         {
             if (spr[h1].active)
             { 
-                if (bs[h1] == FALSE)
+                if (bs[h1] == false)
                 {
                     //Msg( "Ok,  %d is %d", h1,(spr[h1].y + k[spr[h1].pic].yoffset) );
                     if (spr[h1].que != 0) height = spr[h1].que; else height = spr[h1].y;
@@ -8474,7 +8460,7 @@ void fill_hard_sprites(void )
             }
         }
         if (rank[r1] != 0)  
-            bs[rank[r1]] = TRUE;
+            bs[rank[r1]] = true;
     }
 
 
@@ -9168,7 +9154,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int p[20] = {2,1,1,0,0,0,0,0,0,0};  
-            if ( get_parms(ev[1], script, h, p) && spr[nlist[1]].active == TRUE )
+            if ( get_parms(ev[1], script, h, p) && spr[nlist[1]].active == true )
             {
                 if ( nlist[1] < 1 || spr[nlist[1]].active == false )
                 {
