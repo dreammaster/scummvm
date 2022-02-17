@@ -2,10 +2,13 @@ MODULE := engines/dink
 
 MODULE_OBJS = \
 	dink.o \
-	var.o \
 	fast_file.o \
+	freedink.o \
 	metaengine.o \
-	sound.o
+	sound.o \
+	var.o \
+	directdraw\ddraw.o \
+	directdraw\dsound.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_DINK), DYNAMIC_PLUGIN)

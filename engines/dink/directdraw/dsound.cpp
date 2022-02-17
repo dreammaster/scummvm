@@ -19,36 +19,9 @@
  *
  */
 
-#ifndef DINK_TYPES_H
-#define DINK_TYPES_H
-
-#include "common/scummsys.h"
+#include "dink/directdraw/ddraw.h"
 
 namespace Dink {
 
-struct DDBLTFX {
-};
-
-struct JOYINFOEX {
-};
-
-struct LOGFONT {
-	int32 lfHeight;
-	int32 lfWidth;
-	int32 lfEscapement;
-	int32 lfOrientation;
-	int32 lfWeight;
-	byte lfItalic;
-	byte lfUnderline;
-	byte lfStrikeOut;
-	byte lfCharSet;
-	byte lfOutPrecision;
-	byte lfClipPrecision;
-	byte lfQuality;
-	byte lfPitchAndFamily;
-	char lfFaceName[32];
-};
 
 } // namespace Dink
-
-#endif

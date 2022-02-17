@@ -74,7 +74,7 @@ start:
         {
             if (toupper(line[u]) == toupper(this1[checker]))
             {
-                if (checker+1 == strlen(this1))
+                if (checker+1 == (int)strlen(this1))
                 {
 doit:
                     u = u - strlen(this1);
@@ -110,7 +110,7 @@ doit:
 bool seperate_string (char str[255], int num, char liney, char *return1) 
 {
     int l;
-    int k;
+    uint k;
 
     l = 1;
     strcpy(return1 ,"");

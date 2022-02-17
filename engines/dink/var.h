@@ -26,6 +26,7 @@
 #include "common/rect.h"
 #include "common/str.h"
 #include "dink/types.h"
+#include "dink/directdraw/ddraw.h"
 
 namespace Dink {
 
@@ -827,6 +828,8 @@ bool joystick = false;
 bool disablejoystick = false;
 hardness hmap;
 Common::Rect tilerect[tile_screens];
+
+extern void fill_screen(int num);
 
 } // namespace Dink
 
