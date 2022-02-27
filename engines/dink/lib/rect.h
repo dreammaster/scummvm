@@ -19,30 +19,31 @@
  *
  */
 
-#ifndef DINK_TYPES_H
-#define DINK_TYPES_H
+#ifndef DINK_LIB_RECT_H
+#define DINK_LIB_RECT_H
 
-#include "common/scummsys.h"
-#include "dink/directdraw/joystickapi.h"
+#include "common/rect.h"
 
 namespace Dink {
 
-struct LOGFONT {
-	int32 lfHeight;
-	int32 lfWidth;
-	int32 lfEscapement;
-	int32 lfOrientation;
-	int32 lfWeight;
-	byte lfItalic;
-	byte lfUnderline;
-	byte lfStrikeOut;
-	byte lfCharSet;
-	byte lfOutPrecision;
-	byte lfClipPrecision;
-	byte lfQuality;
-	byte lfPitchAndFamily;
-	char lfFaceName[32];
-};
+typedef Common::Rect RECT;
+typedef Common::Point POINT;
+typedef RECT *LPRECT;
+
+inline void CopyRect(LPRECT lprcDst, const LPRECT lprcSrc) {
+	*lprcDst = *lprcSrc;
+}
+
+inline void InflateRect(LPRECT lprc, int dx, int dy) {
+	lprc->left -= dx;
+	lprc->right += dx;
+	lprc->top -= dy;
+	lprc->bottom += dy;
+}
+
+inline bool inside_box(int16 x, int16 y, const RECT &rect) {
+	return rect.contains(x, y);
+}
 
 } // namespace Dink
 

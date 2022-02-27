@@ -71,10 +71,10 @@ public:
 	}
 
 	/**
-	 * Sets the random number seed
+	 * Gets a random number
 	 */
-	void setRandomNumberSeed(uint32 seed) {
-		_randomSource.setSeed(seed);
+	uint32 getRandomNumber(uint minNum, uint maxNum) {
+		return minNum + _randomSource.getRandomNumber(maxNum - minNum);
 	}
 
 	bool hasFeature(EngineFeature f) const override {

@@ -4,11 +4,14 @@ MODULE_OBJS = \
 	dink.o \
 	fast_file.o \
 	freedink.o \
+	globals.o \
 	metaengine.o \
 	sound.o \
 	var.o \
 	directdraw\ddraw.o \
-	directdraw\dsound.o
+	directdraw\dinput.o \
+	directdraw\dsound.o \
+	lib\graphics.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_DINK), DYNAMIC_PLUGIN)

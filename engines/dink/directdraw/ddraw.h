@@ -23,13 +23,23 @@
 #define DINK_DIRECTDRAW_DDRAW_H
 
 #include "common/scummsys.h"
+#include "common/textconsole.h"
 #include "common/rect.h"
 #include "graphics/managed_surface.h"
+#include "graphics/screen.h"
+#include "dink/lib/wintypes.h"
+#include "dink/lib/rect.h"
 
 namespace Dink {
 
 #define DD_OK 0
 #define DD_FALSE 1
+
+// Errors
+#define MAKE_DDHRESULT(X) (HRESULT)X
+#define DDERR_SURFACELOST                       MAKE_DDHRESULT( 450 )
+#define DDERR_WASSTILLDRAWING                   MAKE_DDHRESULT( 540 )
+#define DIERR_INPUTLOST MAKE_DDHRESULT( 1 )
 
 /*
  * DrawText() Format Flags
@@ -50,31 +60,114 @@ namespace Dink {
 #define DT_NOPREFIX                 0x00000800
 #define DT_INTERNAL                 0x00001000
 
-typedef uint32 HDC;
-typedef uint32 PALETTEENTRY;
-typedef uint32 *LPDIRECTDRAWPALETTE;
+// DirectDraw return values
+#define DD_OK 0
 
-typedef void *LPDIRECTSOUNDBUFFER;
+// Blit flags
+#define DDBLT_COLORFILL                         0x00000400l
+#define DDBLT_WAIT                              0x01000000l
+
+// BltFast flags
+#define DDBLTFAST_NOCOLORKEY                    0x00000000
+#define DDBLTFAST_SRCCOLORKEY                   0x00000001
+#define DDBLTFAST_DESTCOLORKEY                  0x00000002
+#define DDBLTFAST_WAIT                          0x00000010
+#define DDBLTFAST_DONOTWAIT                     0x00000020
+
+// Lock modes
+#define DDLOCK_DONOTWAIT                        0x00004000L
+
+// Flip flags
+#define DDFLIP_WAIT                          0x00000001L
+#define DDFLIP_EVEN                          0x00000002L
+#define DDFLIP_ODD                           0x00000004L
+#define DDFLIP_NOVSYNC                       0x00000008L
+
+
+enum BlankFlag {
+	DDWAITVB_BLOCKBEGIN,
+	DDWAITVB_BLOCKBEGINEVENT,
+	DDWAITVB_BLOCKEND
+};
+
+struct IDirectDraw {
+	HRESULT WaitForVerticalBlank(BlankFlag flags, void *unused) {
+		assert(!unused);
+		return DD_OK;
+	}
+	HRESULT RestoreDisplayMode() {
+		return DD_OK;
+	}
+	HRESULT Release() {
+		return DD_OK;
+	}
+};
+typedef IDirectDraw *LPDIRECTDRAW;
+
+
+#include "common/pack-start.h"	// START STRUCT PACKING
+struct PALETTEENTRY {
+	byte peRed = 0;
+	byte peGreen = 0;
+	byte peBlue = 0;
+	byte peFlags = 0;
+} PACKED_STRUCT;
+#include "common/pack-end.h"	// END STRUCT PACKING
+typedef PALETTEENTRY *LPPALETTEENTRY;
+
+struct IDirectDrawPalette {
+	PALETTEENTRY _palette[PALETTE_SIZE];
+
+	HRESULT GetEntries(uint unused, uint start, uint count, LPPALETTEENTRY dest);
+	HRESULT SetEntries(uint unused, uint start, uint count, const LPPALETTEENTRY src);
+	void Release();
+};
+typedef IDirectDrawPalette *LPDIRECTDRAWPALETTE;
+
+struct DIRECTSOUNDBUFFER {
+public:
+	void Release() {}
+};
+
+typedef DIRECTSOUNDBUFFER *LPDIRECTSOUNDBUFFER;
 typedef void *LPDIRECTSOUND;
-typedef void *HFONT;
-typedef void *HINSTANCE;
-typedef void *LPDIRECTDRAW;
-typedef uint32 HRESULT;
-
-typedef void *LPDIRECTINPUT;
-typedef void *LPDIRECTINPUTDEVICE;
-typedef void *HANDLE;
-typedef void *HWND;
 
 struct DIRECTDRAWCLIPPER {
 };
 typedef DIRECTDRAWCLIPPER *LPDIRECTDRAWCLIPPER;
+
+struct DDSURFACEDESC {
+	DWORD dwSize;
+	DWORD dwFlags;
+	DWORD dwHeight;
+	DWORD dwWidth;
+	DWORD lPitch;
+	void *lpSurface;
+};
+typedef DDSURFACEDESC *LPDDSURFACEDESC;
+
+struct DDBLTFX {
+	uint32 dwSize;
+	uint dwFillColor;
+};
+typedef DDBLTFX *LPDDBLTFX;
 
 struct DIRECTDRAWSURFACE : public Graphics::ManagedSurface {
 public:
 	HRESULT Restore() {
 		return DD_OK;
 	}
+
+	HRESULT Lock(const LPRECT rect, LPDDSURFACEDESC desc, uint32 flags, HANDLE handle);
+	HRESULT Unlock(const LPRECT rect);
+	void Release();
+	HRESULT BltFast(int16 x, int16 y, const DIRECTDRAWSURFACE *src,
+		LPRECT rect, uint32 flags);
+	HRESULT Blt(const LPRECT dstRect, const DIRECTDRAWSURFACE *src,
+		const LPRECT srcRect, uint32 flags, LPDDBLTFX lpDDBltFx);
+	HRESULT Flip(DIRECTDRAWSURFACE *surface, uint32 flags);
+	HRESULT GetDC(HDC *hdc);
+	HRESULT ReleaseDC(HDC hdc);
 };
 typedef DIRECTDRAWSURFACE *LPDIRECTDRAWSURFACE;
 
@@ -97,6 +190,10 @@ inline COLORREF SetTextColor(HDC hdc, COLORREF color) {
 inline int DrawText(HDC hdc, const char *lpchText, int cchText,
 	Common::Rect *lprc, uint format) {
 	return 0;
+}
+
+inline void dderror(int v) {
+	::error("dderror - %d", v);
 }
 
 } // namespace Dink

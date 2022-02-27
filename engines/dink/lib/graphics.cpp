@@ -19,31 +19,16 @@
  *
  */
 
-#ifndef DINK_TYPES_H
-#define DINK_TYPES_H
-
-#include "common/scummsys.h"
-#include "dink/directdraw/joystickapi.h"
+#include "dink/lib/graphics.h"
 
 namespace Dink {
 
-struct LOGFONT {
-	int32 lfHeight;
-	int32 lfWidth;
-	int32 lfEscapement;
-	int32 lfOrientation;
-	int32 lfWeight;
-	byte lfItalic;
-	byte lfUnderline;
-	byte lfStrikeOut;
-	byte lfCharSet;
-	byte lfOutPrecision;
-	byte lfClipPrecision;
-	byte lfQuality;
-	byte lfPitchAndFamily;
-	char lfFaceName[32];
-};
+HRESULT SelectObject(HDC hdc, HGDIOBJ h) {
+	return S_OK;
+}
+
+HRESULT SetBkMode(HDC hdc, int mode) {
+	return S_OK;
+}
 
 } // namespace Dink
-
-#endif

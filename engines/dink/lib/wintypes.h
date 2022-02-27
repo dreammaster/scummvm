@@ -19,30 +19,39 @@
  *
  */
 
-#ifndef DINK_TYPES_H
-#define DINK_TYPES_H
+#ifndef DINK_LIB_WINTYPES_H
+#define DINK_LIB_WINTYPES_H
 
 #include "common/scummsys.h"
-#include "dink/directdraw/joystickapi.h"
+#include "dink/lib/rect.h"
 
 namespace Dink {
 
-struct LOGFONT {
-	int32 lfHeight;
-	int32 lfWidth;
-	int32 lfEscapement;
-	int32 lfOrientation;
-	int32 lfWeight;
-	byte lfItalic;
-	byte lfUnderline;
-	byte lfStrikeOut;
-	byte lfCharSet;
-	byte lfOutPrecision;
-	byte lfClipPrecision;
-	byte lfQuality;
-	byte lfPitchAndFamily;
-	char lfFaceName[32];
-};
+typedef void *HFONT;
+typedef void *HINSTANCE;
+typedef uint32 HDC;
+typedef uint32 DWORD;
+typedef uint16 WORD;
+typedef uint32 *LPDWORD;
+typedef int32 *LONG_PTR;
+typedef uint *UINT_PTR;
+typedef void *HANDLE;
+typedef void *HWND;
+
+typedef uint32 HRESULT;
+#define S_OK 0
+
+#define lstrlen strlen
+#define FAILED(hr) (((HRESULT)(hr)) < 0)
+
+#define MCI_CLOSE 1
+inline void mciSendCommand(int v1, int v2, int v3, void *v4) {}
+inline int mciSendString(const char *lpstrCommand,
+	const char *lpstrReturnString, uint uReturnLength, HWND hwndCallback) {
+	return 0;
+}
+inline bool GetClientRect(HWND hWnd, LPRECT lpRect) { return false; }
+inline void CloseHandle(HANDLE) {}
 
 } // namespace Dink
 

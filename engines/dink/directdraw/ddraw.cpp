@@ -23,5 +23,53 @@
 
 namespace Dink {
 
+HRESULT IDirectDrawPalette::GetEntries(uint unused, uint start, uint count, LPPALETTEENTRY dest) {
+	assert((start + count) <= PALETTE_SIZE);
+	Common::copy(&_palette[start], &_palette[start] + count, dest);
+	return DD_OK;
+}
+
+HRESULT IDirectDrawPalette::SetEntries(uint unused, uint start, uint count, const LPPALETTEENTRY src) {
+	assert((start + count) <= PALETTE_SIZE);
+	Common::copy(src, src + count, &_palette[start]);
+	return DD_OK;
+}
+
+void IDirectDrawPalette::Release() {
+}
+
+
+HRESULT DIRECTDRAWSURFACE::Lock(const LPRECT rect, LPDDSURFACEDESC desc, uint32 flags, HANDLE handle) {
+	return DD_OK;
+}
+
+HRESULT DIRECTDRAWSURFACE::Unlock(const LPRECT rect) {
+	return DD_OK;
+}
+
+void DIRECTDRAWSURFACE::Release() {
+}
+
+HRESULT DIRECTDRAWSURFACE::BltFast(int16 x, int16 y, const DIRECTDRAWSURFACE *src,
+	LPRECT rect, uint32 flags) {
+	return DD_OK;
+}
+
+HRESULT DIRECTDRAWSURFACE::Blt(const LPRECT dstRect, const DIRECTDRAWSURFACE *src,
+	const LPRECT srcRect, uint32 flags, LPDDBLTFX lpDDBltFx) {
+	return DD_OK;
+}
+
+HRESULT DIRECTDRAWSURFACE::Flip(DIRECTDRAWSURFACE *surface, uint32 flags) {
+	return DD_OK;
+}
+
+HRESULT DIRECTDRAWSURFACE::GetDC(HDC *hdc) {
+	return DD_OK;
+}
+
+HRESULT DIRECTDRAWSURFACE::ReleaseDC(HDC hdc) {
+	return DD_OK;
+}
 
 } // namespace Dink

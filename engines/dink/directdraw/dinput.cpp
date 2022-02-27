@@ -19,31 +19,31 @@
  *
  */
 
-#ifndef DINK_TYPES_H
-#define DINK_TYPES_H
-
-#include "common/scummsys.h"
-#include "dink/directdraw/joystickapi.h"
+#include "dink/directdraw/dinput.h"
+#include "dink/directdraw/ddraw.h"
 
 namespace Dink {
 
-struct LOGFONT {
-	int32 lfHeight;
-	int32 lfWidth;
-	int32 lfEscapement;
-	int32 lfOrientation;
-	int32 lfWeight;
-	byte lfItalic;
-	byte lfUnderline;
-	byte lfStrikeOut;
-	byte lfCharSet;
-	byte lfOutPrecision;
-	byte lfClipPrecision;
-	byte lfQuality;
-	byte lfPitchAndFamily;
-	char lfFaceName[32];
-};
+HRESULT IDirectInput::Release() {
+	return DD_OK;
+}
+
+
+HRESULT IDirectInputDevice::GetDeviceData(DWORD dwSize, LPDIDEVICEOBJECTDATA rgdod,
+	LPDWORD pdwInOut, DWORD dwFlags) {
+	return DD_OK;
+}
+
+HRESULT IDirectInputDevice::Acquire() {
+	return DD_OK;
+}
+
+HRESULT IDirectInputDevice::Unacquire() {
+	return DD_OK;
+}
+
+HRESULT IDirectInputDevice::Release() {
+	return DD_OK;
+}
 
 } // namespace Dink
-
-#endif

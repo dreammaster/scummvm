@@ -19,30 +19,40 @@
  *
  */
 
-#ifndef DINK_TYPES_H
-#define DINK_TYPES_H
+#ifndef DINK_DIRECTDRAW_DINPUT_H
+#define DINK_DIRECTDRAW_DINPUT_H
 
-#include "common/scummsys.h"
-#include "dink/directdraw/joystickapi.h"
+#include "dink/lib/wintypes.h"
 
 namespace Dink {
 
-struct LOGFONT {
-	int32 lfHeight;
-	int32 lfWidth;
-	int32 lfEscapement;
-	int32 lfOrientation;
-	int32 lfWeight;
-	byte lfItalic;
-	byte lfUnderline;
-	byte lfStrikeOut;
-	byte lfCharSet;
-	byte lfOutPrecision;
-	byte lfClipPrecision;
-	byte lfQuality;
-	byte lfPitchAndFamily;
-	char lfFaceName[32];
+#define DIMOFS_X 1
+#define DIMOFS_Y 2
+#define DIMOFS_Z 3
+#define DIDFT_BUTTON 4
+
+struct DIDEVICEOBJECTDATA {
+	DWORD dwOfs;
+	DWORD dwData;
+	DWORD dwTimeStamp;
+	DWORD dwSequence;
+	UINT_PTR uAppData;
 };
+typedef DIDEVICEOBJECTDATA *LPDIDEVICEOBJECTDATA;
+
+struct IDirectInput {
+	HRESULT Release();
+};
+typedef IDirectInput *LPDIRECTINPUT;
+
+struct IDirectInputDevice {
+	HRESULT GetDeviceData(DWORD dwSize, LPDIDEVICEOBJECTDATA rgdod,
+		LPDWORD pdwInOut, DWORD dwFlags);
+	HRESULT Acquire();
+	HRESULT Unacquire();
+	HRESULT Release();
+};
+typedef IDirectInputDevice *LPDIRECTINPUTDEVICE;
 
 } // namespace Dink
 

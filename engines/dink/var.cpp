@@ -110,24 +110,24 @@ doit:
 bool seperate_string (char str[255], int num, char liney, char *return1) 
 {
     int l;
-    uint k;
+    uint i;
 
     l = 1;
     strcpy(return1 ,"");
 
-    for (k = 0; k <= strlen(str); k++)
+    for (i = 0; i <= strlen(str); i++)
     {
 
-        if (str[k] == liney)
+        if (str[i] == liney)
         {
             l++;
             if (l == num+1)
                 goto done;
 
-            if (k < strlen(str)) strcpy(return1,"");
+            if (i < strlen(str)) strcpy(return1,"");
         }
-        if (str[k] != liney)
-            sprintf(return1, "%s%c",return1 ,str[k]);
+        if (str[i] != liney)
+            sprintf(return1, "%s%c",return1 ,str[i]);
     }
     if (l < num)  strcpy(return1,"");
 
@@ -172,7 +172,7 @@ void reverse(char *st)
 char * lmon(long money, char *dest)
 {
     char ho[30];
-    int k,c;
+    int len,c;
     char lmon1[30];
     char buffer[30];
     bool quit1;
@@ -188,22 +188,22 @@ char * lmon(long money, char *dest)
     }
 
     strcpy(ho, ltoa(money, buffer, 10));
-    k = strlen(ho);
+    len = strlen(ho);
     c = -1;
     lmon1[0]=0;
     do {
-        strchar(lmon1,ho[k]);
-        k--;
+        strchar(lmon1,ho[len]);
+        len--;
         c++;
         if (c == 3)
         {
-            if (k > -1)
+            if (len > -1)
             {
                 strchar(lmon1,',');
                 c = 0;
             }
         }
-        if (k < 0) quit1 = true;
+        if (len < 0) quit1 = true;
     }while (quit1 == false);
     reverse(lmon1);
 
@@ -428,7 +428,7 @@ void dderror(HRESULT hErr) {
 bool compare(char *orig, char *comp)
 {
 
-    int len;
+    uint len;
 
     //strcpy(comp, _strupr(comp));
     //strcpy(orig, _strupr(orig));
@@ -582,7 +582,7 @@ bool ReadData(LPDIRECTSOUNDBUFFER lpDSB, Common::SeekableReadStream *pFile, uint
 }
 
 
-bool init_mouse(HWND hwnd)
+bool init_mouse(HWND hWnd)
 {
 #ifdef TODO
     if (g_pdi)
@@ -626,7 +626,7 @@ bool init_mouse(HWND hwnd)
     /*
     *  Set the cooperativity level.
     */
-    hr = g_pMouse->SetCooperativeLevel(hwnd,
+    hr = g_pMouse->SetCooperativeLevel(hWnd,
         DISCL_EXCLUSIVE | DISCL_FOREGROUND);
 
     if (FAILED(hr)) {
@@ -1451,7 +1451,7 @@ void fix_dead_sprites( void )
 }
 
 
-void load_map(const int num)
+void load_map(int num)
 {
     FILE *          fp;
     long holdme,lsize;
@@ -3821,24 +3821,6 @@ again3:
         draw_mlevel(*pmagic_level / static_cast<double>(*pmagic_cost) / 100.0 );
 }
 
-
-
-
-bool inside_box(int x1, int y1, RECT box)
-{
-
-    if (x1 > box.right) return(false);
-    if (x1 < box.left) return(false);
-
-    if (y1 > box.bottom) return(false);
-    if (y1 < box.top) return(false);
-
-    return(true);
-
-}
-
-
-
 int add_sprite_dumb(int x1, int y, int brain,int pseq, int pframe,int size )
 {
 
@@ -4423,7 +4405,7 @@ void decompress_nocomp (FILE *in)
 }
 
 
-int load_script(char filename[15], int sprite, bool set_sprite)
+int load_script(const char *filename, int sprite, bool set_sprite)
 {
 
     char temp[100];
@@ -4589,7 +4571,7 @@ void strip_beginning_spaces(char *s)
 
 
 
-bool locate(int script, char proc[20])
+bool locate(int script, const char *proc)
 {
 
     if (rinfo[script] == NULL) 
@@ -5311,7 +5293,7 @@ void check_sprite_status_full(int h)
 }
 
 
-int say_text(char text[200], int h, int script)
+int say_text(const char *text, int h, int script)
 {
     int crap2;
     //Msg("Creating new sprite with %s connect to %d.",text, h);
@@ -5346,7 +5328,7 @@ int say_text(char text[200], int h, int script)
 }
 
 
-int say_text_xy(char text[200], int mx, int my, int script)
+int say_text_xy(const char *text, int mx, int my, int script)
 {
     int crap2;
     //Msg("Creating new sprite with %s connect to %d.",text, h);

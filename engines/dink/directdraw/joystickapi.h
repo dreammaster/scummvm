@@ -19,30 +19,40 @@
  *
  */
 
-#ifndef DINK_TYPES_H
-#define DINK_TYPES_H
+#ifndef DINK_DIRECTDRAW_JOYSTICKAPI_H
+#define DINK_DIRECTDRAW_JOYSTICKAPI_H
 
 #include "common/scummsys.h"
-#include "dink/directdraw/joystickapi.h"
 
 namespace Dink {
 
-struct LOGFONT {
-	int32 lfHeight;
-	int32 lfWidth;
-	int32 lfEscapement;
-	int32 lfOrientation;
-	int32 lfWeight;
-	byte lfItalic;
-	byte lfUnderline;
-	byte lfStrikeOut;
-	byte lfCharSet;
-	byte lfOutPrecision;
-	byte lfClipPrecision;
-	byte lfQuality;
-	byte lfPitchAndFamily;
-	char lfFaceName[32];
+enum {
+	JOYERR_UNPLUGGED = -1,
+	JOY_RETURNALL = 0,
+	JOYSTICKID1 = 1
 };
+
+struct JOYINFOEX {
+	uint32 dwSize = 0;
+	uint32 dwFlags = 0;
+	uint32 dwXpos = 0;
+	uint32 dwYpos = 0;
+	uint32 dwZpos = 0;
+	uint32 dwRpos = 0;
+	uint32 dwUpos = 0;
+	uint32 dwVpos = 0;
+	uint32 dwButtons = 0;
+	uint32 dwButtonNumber = 0;
+	uint32 dwPOV = 0;
+	uint32 dwReserved1 = 0;
+	uint32 dwReserved2 = 0;
+};
+typedef JOYINFOEX *LPJOYINFOEX;
+typedef int MMRESULT;
+
+inline MMRESULT joyGetPosEx(uint uJoyID, LPJOYINFOEX pji) {
+	return 0;
+}
 
 } // namespace Dink
 

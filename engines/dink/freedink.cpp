@@ -22,14 +22,21 @@
 #define NAME "Dink Smallwood v1.08"
 #define TITLE "Dink Smallwood v1.08"
 
+#include "dink/dink.h"
 #include "dink/var.h"
+#include "dink/fast_file.h"
 #include "dink/directdraw/ddraw.h"
+#include "dink/directdraw/dinput.h"
+#include "dink/directdraw/joystickapi.h"
+#include "dink/lib/graphics.h"
+#include "dink/lib/rect.h"
+#include "dink/lib/wintypes.h"
 
 namespace Dink {
 
 int fps_average;
 
-bool initFail( HWND hwnd, char mess[200] );
+bool initFail(HWND hwnd, const char *mess);
 void move(int u, int amount, char kind, char kindy);
 void draw_box(Common::Rect box, int color);
 void run_through_tag_list_push(int h);
@@ -66,6 +73,10 @@ int winoffsetx = 5;
 int cx;
 int cy;
 int speed;
+
+int rnd() {
+	return g_engine->getRandomNumber(0x7fffff);
+}
 
 /*
 * restoreAll
@@ -204,25 +215,25 @@ void text_draw(int h, HDC hdc)
 }
 
 HRESULT restoreAll() {
-    HRESULT ddrval;
-    char crap[100];
-    char crap1[10];
+    HRESULT result;
+//	char crap[100];
+//	char crap1[10];
 
-    ddrval = lpDDSPrimary->Restore();
-    if( ddrval == DD_OK )
+    result = lpDDSPrimary->Restore();
+    if( result == DD_OK )
     {
 
-        ddrval = lpDDSTwo->Restore();
+        result = lpDDSTwo->Restore();
 
-        ddrval = lpDDSTrick->Restore();
-        ddrval = lpDDSTrick2->Restore();
+        result = lpDDSTrick->Restore();
+        result = lpDDSTrick2->Restore();
 
 
         /*for (int h=1; h < tile_screens; h++)
         {
-        ddrval = tiles[h]->Restore();
+        result = tiles[h]->Restore();
 
-        if( ddrval == DD_OK )
+        if( result == DD_OK )
         {
         if (h < 10) strcpy(crap1,"0"); else strcpy(crap1, "");
         sprintf(crap, "TILES\\TS%s%d.BMP",crap1,h);
@@ -250,9 +261,7 @@ HRESULT restoreAll() {
         }
     }
 
-    return ddrval;
-
-
+    return result;
 } /* restoreAll */
 
 
@@ -376,9 +385,9 @@ lpDDSTwo->BltFast( (x) * 20 - ((x / 32) * 640), (x / 32) * 20, k[7].k,
 bool keypressed( void )
 
 {
-    for (int x=0; x<256; x++)
+    for (int i=0; i<256; i++)
     {
-        if (GetKeyboard(x))
+        if (GetKeyboard(i))
         {
             return(true);
         }
@@ -402,7 +411,7 @@ bool keypressed( void )
 void check_joystick(void)
 {
 
-    HRESULT ddrval;
+    HRESULT result;
     int total;
     //memset(&sjoy,0,sizeof(sjoy));
 
@@ -427,8 +436,8 @@ void check_joystick(void)
         memset(&jinfo,0,sizeof(JOYINFOEX));
         jinfo.dwSize=sizeof(JOYINFOEX);
         jinfo.dwFlags=JOY_RETURNALL;
-        ddrval = joyGetPosEx(JOYSTICKID1,&jinfo);
-        if (ddrval == JOYERR_UNPLUGGED) goto pass;
+        result = joyGetPosEx(JOYSTICKID1,&jinfo);
+        if (result == JOYERR_UNPLUGGED) goto pass;
 
         total = jinfo.dwButtons;
 
@@ -520,15 +529,15 @@ pass:
     for (int x5=1; x5 <=10; x5++) sjoy.button[x5] = false; 
 
 
-    for (int x=1; x <=10; x++)
+    for (int btn=1; btn <=10; btn++)
 
     {
-        if (sjoy.joybit[x])
+        if (sjoy.joybit[btn])
         {
-            if (sjoy.letgo[x] == true) 
+            if (sjoy.letgo[btn] == true) 
             {
-                sjoy.button[x] = true;
-                sjoy.letgo[x] = false;
+                sjoy.button[btn] = true;
+                sjoy.letgo[btn] = false;
             }
 
         }
@@ -619,24 +628,17 @@ pass:
             wait.active = false;
             run_script(wait.script);
         }
-
-
-
-
-
     }
-
-
 }
 
 
 
 
 // ********* CHECK TO SEE IF THIS CORD IS ON A HARD SPOT *********
-bool not_in_this_base(int seq, int base)
+bool not_in_this_base(int seq_, int base)
 {
 
-    int realbase = (seq / 10) * 10;
+    int realbase = (seq_ / 10) * 10;
 
 
     if (realbase != base)
@@ -651,10 +653,10 @@ bool not_in_this_base(int seq, int base)
     }
 }
 
-bool in_this_base(int seq, int base)
+bool in_this_base(int seq_, int base)
 {
 
-    int realbase = (seq / 10) * 10;
+    int realbase = (seq_ / 10) * 10;
     if (realbase == base)
     {
 
@@ -697,10 +699,10 @@ void automove (int j)
 
     } else kindy = '0';
 
-    int speed = speedx;
-    if (speedy > speedx) speed = speedy;
-    if (speed > 0)
-        move(j,speed,kindx,kindy);
+    int newSpeed = speedx;
+    if (speedy > speedx) newSpeed = speedy;
+    if (newSpeed > 0)
+        move(j,newSpeed,kindx,kindy);
     //move(j, 1, '+','+'); 
 
 }
@@ -709,8 +711,9 @@ void automove (int j)
 int autoreverse(int j)
 {
     //Msg("reversing die %d",spr[j].dir);
-    int r = ((rand() % 2)+1);   
-    if ( (spr[j].dir == 1) || (spr[j].dir == 2) ) 
+    int r = g_engine->getRandomNumber(1, 2);
+
+	if ( (spr[j].dir == 1) || (spr[j].dir == 2) ) 
     {
         if (r == 1)
             return(8);
@@ -756,7 +759,7 @@ int autoreverse(int j)
 int autoreverse_diag(int j)
 {
     if (spr[j].dir == 0) spr[j].dir = 7;
-    int r = ((rand() % 2)+1);   
+    int r = g_engine->getRandomNumber(1, 2);   
 
     if ( (spr[j].dir == 1) || (spr[j].dir == 3) ) 
     {
@@ -828,7 +831,7 @@ void add_kill_sprite(int h)
     }
 
 
-    int dir = spr[h].dir;
+    int dir_ = spr[h].dir;
     int base = spr[h].base_die;
 
     //Msg("Base die is %d", base);
@@ -847,7 +850,7 @@ void add_kill_sprite(int h)
             return;
         } else
         {
-            dir = 0;
+            dir_ = 0;
             base = 164;
 
         }
@@ -855,33 +858,33 @@ void add_kill_sprite(int h)
 
 
 
-    if (seq[base+dir].active == false)
+    if (seq[base+dir_].active == false)
     {  
 
-        if (dir == 1) dir = 9;
-        else if (dir == 3) dir = 7;         
-        else if (dir == 7) dir = 3;         
-        else if (dir == 9) dir = 1;         
+        if (dir_ == 1) dir_ = 9;
+        else if (dir_ == 3) dir_ = 7;         
+        else if (dir_ == 7) dir_ = 3;         
+        else if (dir_ == 9) dir_ = 1;         
 
-        else if (dir == 4) dir = 6;         
-        else if (dir == 6) dir = 4;         
-        else if (dir == 8) dir = 2;         
-        else if (dir == 2) dir = 8;         
+        else if (dir_ == 4) dir_ = 6;         
+        else if (dir_ == 6) dir_ = 4;         
+        else if (dir_ == 8) dir_ = 2;         
+        else if (dir_ == 2) dir_ = 8;         
 
 
     }
-    if (seq[base+dir].active == false)
+    if (seq[base+dir_].active == false)
 
     {
-        Msg("Can't make a death sprite for dir %d!", base+dir);
+        Msg("Can't make a death sprite for dir_ %d!", base+dir_);
     }
 
 
 
-    int crap2 = add_sprite(spr[h].x,spr[h].y,5,base +dir,1);
+    int crap2 = add_sprite(spr[h].x,spr[h].y,5,base +dir_,1);
     spr[crap2].speed = 0;
     spr[crap2].base_walk = 0;
-    spr[crap2].seq = base + dir;
+    spr[crap2].seq = base + dir_;
 
     if (base == 164) spr[crap2].brain = 7;
 
@@ -909,7 +912,7 @@ void done_moving(int h)
 
 }
 
-int get_distance_and_dir(int h, int h1, int *dir)
+int get_distance_and_dir(int h, int h1, int *dir_)
 {
     if ( smooth_follow )
     {
@@ -922,15 +925,15 @@ int get_distance_and_dir(int h, int h1, int *dir)
                 // 6, 3, 2
                 if ( y_diff * 4 < x_diff )
                 {
-                    *dir = 6;
+                    *dir_ = 6;
                 }
                 else if ( x_diff * 4 < y_diff )
                 {
-                    *dir = 2;
+                    *dir_ = 2;
                 }
                 else
                 {
-                    *dir = 3;
+                    *dir_ = 3;
                 }
             }
             else if ( spr[h].y > spr[h1].y )
@@ -938,20 +941,20 @@ int get_distance_and_dir(int h, int h1, int *dir)
                 // 4, 9, 8
                 if ( y_diff * 4 < x_diff )
                 {
-                    *dir = 6;
+                    *dir_ = 6;
                 }
                 else if ( x_diff * 4 < y_diff )
                 {
-                    *dir = 8;
+                    *dir_ = 8;
                 }
                 else
                 {
-                    *dir = 9;
+                    *dir_ = 9;
                 }
             }
             else
             {
-                *dir = 6;
+                *dir_ = 6;
             }
         }
         else if ( spr[h].x > spr[h1].x )
@@ -961,15 +964,15 @@ int get_distance_and_dir(int h, int h1, int *dir)
                 // 4, 1, 2
                 if ( y_diff * 4 < x_diff )
                 {
-                    *dir = 4;
+                    *dir_ = 4;
                 }
                 else if ( x_diff * 4 < y_diff )
                 {
-                    *dir = 2;
+                    *dir_ = 2;
                 }
                 else
                 {
-                    *dir = 1;
+                    *dir_ = 1;
                 }
             }
             else if ( spr[h].y > spr[h1].y )
@@ -977,40 +980,41 @@ int get_distance_and_dir(int h, int h1, int *dir)
                 // 4, 7, 8
                 if ( y_diff * 4 < x_diff )
                 {
-                    *dir = 4;
+                    *dir_ = 4;
                 }
                 else if ( x_diff * 4 < y_diff )
                 {
-                    *dir = 8;
+                    *dir_ = 8;
                 }
                 else
                 {
-                    *dir = 7;
+                    *dir_ = 7;
                 }
             }
             else
             {
-                *dir = 4;
+                *dir_ = 4;
             }
         }
         else
         {
             if ( spr[h].y < spr[h1].y )
             {
-                *dir = 2;
+                *dir_ = 2;
             }
             else if ( spr[h].y > spr[h1].y )
             {
-                *dir = 8;
+                *dir_ = 8;
             }
         }
-        return max( x_diff, y_diff );
+
+        return MAX( x_diff, y_diff );
     }
 
     int distancex = 5000;
     int distancey = 5000;
-    int dirx = *dir;
-    int diry = *dir;
+    int dirx = *dir_;
+    int diry = *dir_;
     if (spr[h].x > spr[h1].x) if ((spr[h].x - spr[h1].x) < distancex)
     {
         distancex = (spr[h].x - spr[h1].x);
@@ -1036,12 +1040,12 @@ int get_distance_and_dir(int h, int h1, int *dir)
     if (distancex > distancey)
     {
 
-        *dir = dirx;
+        *dir_ = dirx;
         return(distancex);
     }
     else 
     {
-        *dir = diry;
+        *dir_ = diry;
         return(distancey);
     }
 
@@ -1068,12 +1072,12 @@ void process_follow(int h)
     hx = spr[spr[h].follow].x;
     hy = spr[spr[h].follow].y;
 
-    int dir;
-    int distance = get_distance_and_dir(h, spr[h].follow, &dir);
+    int newDir;
+    int distance = get_distance_and_dir(h, spr[h].follow, &newDir);
 
     if (distance < 40) return;
 
-    changedir(dir,h,spr[h].base_walk);
+    changedir(newDir,h,spr[h].base_walk);
     automove(h);
 
 
@@ -1100,12 +1104,12 @@ void process_target(int h)
     hx = spr[spr[h].target].x;
     hy = spr[spr[h].target].y;
 
-    int dir;
-    int distance = get_distance_and_dir(h, spr[h].target, &dir);
+    int newDir;
+    int distance = get_distance_and_dir(h, spr[h].target, &newDir);
 
     if (distance < spr[h].distance) return;
 
-    changedir(dir,h,spr[h].base_walk);
+    changedir(newDir,h,spr[h].base_walk);
 
     automove(h);
 
@@ -1212,7 +1216,7 @@ void duck_brain(int h)
     int hold;
 
 
-start:
+//start:
 
 
     if (   (spr[h].damage > 0) && (in_this_base(spr[h].pseq, 110)  ) )
@@ -1249,8 +1253,7 @@ start:
         spr[crap].speed = 0;
         spr[crap].base_walk = 0;
         spr[crap].size = spr[h].size;                       
-        spr[crap].speed =  ((rand() % 3)+1);
-
+		spr[crap].speed = g_engine->getRandomNumber(1, 3);
 
         spr[h].base_walk = 110;
         spr[h].speed = 1;
@@ -1295,7 +1298,7 @@ start:
 
     if (spr[h].base_walk == 110)
     {
-        if ( (rand() % 100)+1 == 1)
+        if (g_engine->getRandomNumber(1, 100) == 1)
             random_blood(spr[h].x, spr[h].y-18, h);
         goto walk;
     }
@@ -1307,9 +1310,9 @@ start:
     if (spr[h].seq == 0 ) 
     {
 
-        if (((rand() % 12)+1) == 1 )
+        if (g_engine->getRandomNumber(1, 12) == 1 )
         {  
-            hold = ((rand() % 9)+1);
+            hold = (g_engine->getRandomNumber(1, 9));
 
             if ((hold != 2) && (hold != 8) && (hold != 5))
             {
@@ -1331,8 +1334,8 @@ start:
                 SoundPlayEffect( 1,junk, 800,h ,0);
                 spr[h].mx = 0;
                 spr[h].my = 0;
-                spr[h].wait = thisTickCount + (rand() % 300)+200;
-
+				spr[h].wait = thisTickCount +
+					g_engine->getRandomNumber(200, 499);
             }
             return;     
         } 
@@ -1385,13 +1388,13 @@ walk:
 }
 // end duck_brain
 
-void change_dir_to_diag( int *dir)
+void change_dir_to_diag( int *dir_)
 {
 
-    if (*dir == 8) *dir = 7;
-    if (*dir == 4) *dir = 1;
-    if (*dir == 2) *dir = 3;
-    if (*dir == 6) *dir = 9;
+    if (*dir_ == 8) *dir_ = 7;
+    if (*dir_ == 4) *dir_ = 1;
+    if (*dir_ == 2) *dir_ = 3;
+    if (*dir_ == 6) *dir_ = 9;
 
 }
 
@@ -1462,9 +1465,9 @@ void pill_brain(int h)
 
 
 
-        int dir;
+        int dir_;
         if (spr[h].distance == 0) spr[h].distance = 5;
-        int distance = get_distance_and_dir(h, spr[h].target, &dir);
+        int distance = get_distance_and_dir(h, spr[h].target, &dir_);
 
         if (distance < spr[h].distance) if (spr[h].attack_wait < thisTickCount)
         {
@@ -1476,23 +1479,20 @@ void pill_brain(int h)
                 smooth_follow = false;
                 get_distance_and_dir(h, spr[h].target, &attackdir);
                 smooth_follow = old_smooth_follow;
-                //Msg("attacking with %d..", spr[h].base_attack+dir);
+                //Msg("attacking with %d..", spr[h].base_attack+dir_);
 
                 spr[h].dir = attackdir;
 
                 spr[h].seq = spr[h].base_attack+spr[h].dir;
                 spr[h].frame = 0;
 
-                if (spr[h].script != 0)
-                    if (locate(spr[h].script, "ATTACK")) run_script(spr[h].script); else
-                        spr[h].move_wait = thisTickCount + ((rand() % 300)+10);;
+				if (spr[h].script != 0)
+					if (locate(spr[h].script, "ATTACK")) run_script(spr[h].script); else
+						spr[h].move_wait = thisTickCount +
+						g_engine->getRandomNumber(10, 309);
                 return;
-
             }
-
         }
-
-
 
         if (spr[h].move_wait  < thisTickCount)
         {
@@ -1528,14 +1528,14 @@ walk_normal:
     if (( spr[h].seq == 0) && (spr[h].move_wait < thisTickCount))
     {
 recal:
-        if (((rand() % 12)+1) == 1 )
+        if (g_engine->getRandomNumber(1, 12) == 1 )
         {  
-            hold = ((rand() % 9)+1);
+            hold = (g_engine->getRandomNumber(1, 9));
             if (  (hold != 4) &&   (hold != 6) &&  (hold != 2) && (hold != 8) && (hold != 5))
             {
                 changedir(hold,h,spr[h].base_walk);
-                spr[h].move_wait = thisTickCount +((rand() % 2000)+200);
-
+				spr[h].move_wait = thisTickCount +
+					g_engine->getRandomNumber(200, 2199);
             }
 
         } else
@@ -1589,22 +1589,22 @@ recal:
 void find_action(int h)
 {
 
-    spr[h].action = (rand() % 2)+1;
+    spr[h].action = (rnd() % 2)+1;
 
 
     if (spr[h].action == 1)
     {
         //sit and think
-        spr[h].move_wait = thisTickCount +((rand() % 3000)+400);
+        spr[h].move_wait = thisTickCount +((rnd() % 3000)+400);
         if (spr[h].base_walk != -1)
         {
-            int dir = (rand() % 4)+1;  
+            int randDir = (rnd() % 4)+1;  
 
             spr[h].pframe = 1;
-            if (dir == 1)  spr[h].pseq = spr[h].base_walk+1;
-            if (dir == 2)  spr[h].pseq = spr[h].base_walk+3;
-            if (dir == 3)  spr[h].pseq = spr[h].base_walk+7;
-            if (dir == 4)  spr[h].pseq = spr[h].base_walk+9;
+            if (randDir == 1)  spr[h].pseq = spr[h].base_walk+1;
+            if (randDir == 2)  spr[h].pseq = spr[h].base_walk+3;
+            if (randDir == 3)  spr[h].pseq = spr[h].base_walk+7;
+            if (randDir == 4)  spr[h].pseq = spr[h].base_walk+9;
         }
 
         return;
@@ -1613,13 +1613,13 @@ void find_action(int h)
     if (spr[h].action == 2)
     {
         //move
-        spr[h].move_wait = thisTickCount +((rand() % 3000)+500);
-        int dir = (rand() % 4)+1;  
+        spr[h].move_wait = thisTickCount +((rnd() % 3000)+500);
+        int randDir = (rnd() % 4)+1;  
         spr[h].pframe = 1;
-        if (dir == 1)  changedir(1,h,spr[h].base_walk);
-        if (dir == 2)  changedir(3,h,spr[h].base_walk);
-        if (dir == 3)  changedir(7,h,spr[h].base_walk);
-        if (dir == 4)  changedir(9,h,spr[h].base_walk);
+        if (randDir == 1)  changedir(1,h,spr[h].base_walk);
+        if (randDir == 2)  changedir(3,h,spr[h].base_walk);
+        if (randDir == 3)  changedir(7,h,spr[h].base_walk);
+        if (randDir == 4)  changedir(9,h,spr[h].base_walk);
         return;
     }
 
@@ -1630,7 +1630,7 @@ void find_action(int h)
 
 void people_brain(int h)
 {
-    int hold;
+//    int hold;
 
     if  (spr[h].damage > 0)
     {
@@ -1706,7 +1706,7 @@ void people_brain(int h)
 
     {
 
-        if ( ((rand() % 2)+1) == 1)
+        if ( ((rnd() % 2)+1) == 1)
             changedir(9,h,spr[h].base_walk);
         else changedir(7,h,spr[h].base_walk);
 
@@ -1716,7 +1716,7 @@ void people_brain(int h)
     if (spr[h].x > playx)
 
     {
-        if ( ((rand() % 2)+1) == 1)
+        if ( ((rnd() % 2)+1) == 1)
             changedir(1,h,spr[h].base_walk);
         else changedir(7,h,spr[h].base_walk);
 
@@ -1724,14 +1724,14 @@ void people_brain(int h)
 
     if (spr[h].y < 20)
     {
-        if ( ((rand() % 2)+1) == 1)
+        if ( ((rnd() % 2)+1) == 1)
             changedir(1,h,spr[h].base_walk);
         else changedir(3,h,spr[h].base_walk);
     }         
 
     if (spr[h].x < 30) 
     {
-        if ( ((rand() % 2)+1) == 1)
+        if ( ((rnd() % 2)+1) == 1)
             changedir(3,h,spr[h].base_walk);
         else changedir(9,h,spr[h].base_walk);
     }         
@@ -1740,7 +1740,7 @@ void people_brain(int h)
 
     if (check_if_move_is_legal(h) != 0)
     {
-        if ((rand() % 3) == 2)
+        if ((rnd() % 3) == 2)
         {
             changedir(autoreverse_diag(h),h,spr[h].base_walk);
 
@@ -1761,7 +1761,7 @@ void people_brain(int h)
 
 void no_brain(int h)
 {
-    int hold;
+//    int hold;
 
     if (spr[h].move_active) 
     {
@@ -1782,7 +1782,7 @@ void no_brain(int h)
 
 void shadow_brain(int h)
 {
-    int hold;
+//    int hold;
 
     if (spr[spr[h].brain_parm].active == false)
     {
@@ -1866,9 +1866,9 @@ void dragon_brain(int h)
         if (spr[h].seq == 0)
         {
 recal:
-            if (((rand() % 12)+1) == 1 )
+            if (g_engine->getRandomNumber(1, 12) == 1 )
             {  
-                hold = ((rand() % 9)+1);
+                hold = (g_engine->getRandomNumber(1, 9));
                 if (  (hold != 1) &&   (hold != 3) &&  (hold != 7) && (hold != 9) && (hold != 5))
                 {
                     changedir(hold,h,spr[h].base_walk);
@@ -1931,7 +1931,7 @@ void pig_brain(int h)
     int hold;
 
 
-start:
+//start:
 
     if (spr[h].move_active) 
     {
@@ -1968,9 +1968,9 @@ start:
     if (spr[h].seq == 0 ) 
     {
 
-        if (((rand() % 12)+1) == 1 )
+        if (g_engine->getRandomNumber(1, 12) == 1 )
         {  
-            hold = ((rand() % 9)+1);
+            hold = (g_engine->getRandomNumber(1, 9));
 
             if (  (hold != 4) &&   (hold != 6) &&  (hold != 2) && (hold != 8) && (hold != 5))
             {
@@ -1988,7 +1988,7 @@ start:
                     junk = 16000 + (junk * 100);
 
 
-                hold = ((rand() % 4)+1);
+                hold = ((rnd() % 4)+1);
 
                 if (!playing(spr[h].last_sound)) spr[h].last_sound = 0;
 
@@ -2009,7 +2009,7 @@ start:
 
                 spr[h].mx = 0;
                 spr[h].my = 0;
-                spr[h].wait = thisTickCount + (rand() % 300)+200;
+                spr[h].wait = thisTickCount + (rnd() % 300)+200;
 
             }
 
@@ -2096,7 +2096,7 @@ int check_if_move_is_legal(int u)
 
                     {
 
-push:
+//push:
                         if (  (spr[u].dir == 2) | (spr[u].dir == 4) |  (spr[u].dir == 6) | (spr[u].dir == 8) )
                         {
                             //he  (dink)  is definatly pushing on something
@@ -2222,7 +2222,7 @@ void bounce_brain(int h)
 void grab_trick(int trick)
 {
     Common::Rect rcRect;
-    HRESULT ddrval;
+    HRESULT result;
     //Msg("making trick.");
 
     if (no_transition)
@@ -2240,10 +2240,10 @@ void grab_trick(int trick)
     rcRect.right = 620;
     rcRect.bottom = 400;
 
-    ddrval = lpDDSTrick->BltFast( 0, 0, lpDDSBack,
+    result = lpDDSTrick->BltFast( 0, 0, lpDDSBack,
         &rcRect, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
 
-    if (ddrval != DD_OK) dderror(ddrval);
+    if (result != DD_OK) dderror(result);
     move_screen = trick;            
     trig_man = true;
 
@@ -2257,9 +2257,8 @@ void grab_trick(int trick)
 
 void did_player_cross_screen(bool real, int h)
 {
-
     if (walk_off_screen == 1) return;
-    int middlex,middley;
+    //int middlex,middley;
 
 
     //DO MATH TO SEE IF THEY HAVE CROSSED THE SCREEN, IF SO LOAD NEW ONE
@@ -2462,15 +2461,15 @@ bool run_through_tag_list_talk(int h)
 
 
 
-void make_missile(int x1, int y1, int dir, int speed, int seq, int frame, int strength)
+void make_missile(int x1, int y1, int dir_, int speed_, int seq_, int frame, int strength)
 {
-    int crap = add_sprite(x1,y1,11,seq,frame);
-    spr[crap].speed = speed;
-    spr[crap].seq = seq;
+    int crap = add_sprite(x1,y1,11,seq_,frame);
+    spr[crap].speed = speed_;
+    spr[crap].seq = seq_;
     spr[crap].timer = 0;
     spr[crap].strength = strength;
     spr[crap].flying = true;
-    changedir(dir, crap, 430);
+    changedir(dir_, crap, 430);
 
 }
 
@@ -2627,7 +2626,7 @@ void missile_brain( int h, bool repeat)
                         int hit = 0;
                         if (spr[h].strength == 1) hit = spr[h].strength - spr[j].defense; else
 
-                            hit = (spr[h].strength / 2) + ((rand() % (spr[h].strength / 2))+1)
+                            hit = (spr[h].strength / 2) + ((rnd() % (spr[h].strength / 2))+1)
                             - spr[j].defense;
 
                         if (hit < 0) hit = 0;
@@ -2673,7 +2672,7 @@ void missile_brain_expire(int h)
 void run_through_mouse_list(int h, bool special)
 {
     Common::Rect box;
-    int amount, amounty;
+    //int amount, amounty;
 
     for (int i = 1; i <= last_sprite_created; i++)
     {
@@ -2690,9 +2689,8 @@ void run_through_mouse_list(int h, bool special)
             if (inside_box(spr[h].x, spr[h].y, box))
             {   
 
-                if ((spr[i].touch_damage == -1) && (spr[i].script != 0))
-                {
-                    Msg("running %d's script..",spr[i].script);
+                if ((spr[i].touch_damage == -1) && (spr[i].script != 0)) {
+                    Msg("running %d's script..", spr[i].script);
                     if (locate(spr[i].script, "CLICK")) run_script(spr[i].script);
                 } 
                 else
@@ -2890,13 +2888,11 @@ void process_bow( int h)
 
 
 
-void human_brain(int h)
-
-{
-
+void human_brain(int h) {
     int diag, x5;
     int crap;
     bool bad;
+	int hardm;
 
     if (mode == 0) goto b1end;          
 
@@ -2918,7 +2914,7 @@ void human_brain(int h)
         spr[h].damage = 0;
         if (*plife < 0) *plife = 0;
 
-        int hurt = (rand() % 2)+1;
+        int hurt = (rnd() % 2)+1;
 
         if (hurt == 1) SoundPlayEffect( 15,25050, 2000 ,0,0);
         if (hurt == 2) SoundPlayEffect( 16,25050, 2000 ,0,0);
@@ -3011,17 +3007,17 @@ void human_brain(int h)
 
 
 
-    if (play.push_active) if (play.push_timer + 600 < thisTickCount)
-    {
-        spr[h].seq = mDinkBasePush+spr[h].dir;
-        spr[h].frame = 1;
-        spr[h].nocontrol = true;
-        //play.push_active = false;
-        run_through_tag_list_push(h);
+	if (play.push_active) {
+		if (play.push_timer + 600 < (uint32)thisTickCount) {
+			spr[h].seq = mDinkBasePush + spr[h].dir;
+			spr[h].frame = 1;
+			spr[h].nocontrol = true;
+			//play.push_active = false;
+			run_through_tag_list_push(h);
 
-        return;
-    }
-
+			return;
+		}
+	}
 
 
     if ( (sjoy.button[2] == true) )
@@ -3039,7 +3035,7 @@ void human_brain(int h)
             {
 
                 kill_text_owned_by(h);  
-                int randy = (rand() % 6)+1;
+                int randy = (rnd() % 6)+1;
 
 #ifdef __GERMAN
                 if (randy == 1) say_text("`$Hier ist nichts.",h,0);
@@ -3169,7 +3165,7 @@ void human_brain(int h)
             }
             else
             {
-                int randy = (rand() % 6)+1;
+                int randy = (rnd() % 6)+1;
                 kill_text_owned_by(h);  
 
 
@@ -3402,7 +3398,7 @@ b1end:;
             if( (spr[h].seq == spr[h].base_walk + 4) |
                 (spr[h].seq == spr[h].base_walk + 6) )
             {
-                int hardm = get_hard_play(h, spr[h].x, spr[h].y-1);
+                hardm = get_hard_play(h, spr[h].x, spr[h].y-1);
                 if (hardm == 0)
                 {  
                     spr[h].y -= 1;
@@ -3420,7 +3416,7 @@ b1end:;
             if( (spr[h].seq == spr[h].base_walk + 8) |
                 (spr[h].seq == spr[h].base_walk + 2) )
             {
-                int hardm = get_hard_play(h, spr[h].x-1, spr[h].y);
+                hardm = get_hard_play(h, spr[h].x-1, spr[h].y);
                 if (hardm == 0)
                 {  
                     spr[h].x -= 1;
@@ -3434,35 +3430,35 @@ b1end:;
 
             if (spr[h].seq == spr[h].base_walk + 9)
             {
-                int hardm = get_hard_play(h, spr[h].x+1, spr[h].y);
+                hardm = get_hard_play(h, spr[h].x+1, spr[h].y);
                 if (hardm == 0)
                 {  
                     spr[h].x += 1;
 
                 } else
                 {
-                    int hardm = get_hard_play(h, spr[h].x+1, spr[h].y+1);
+                    hardm = get_hard_play(h, spr[h].x+1, spr[h].y+1);
                     if (hardm == 0)
                     {  
                         spr[h].x += 1;
                         spr[h].y += 1;
                     } else
                     {
-                        int hardm = get_hard_play(h, spr[h].x+1, spr[h].y+2);
+                        hardm = get_hard_play(h, spr[h].x+1, spr[h].y+2);
                         if (hardm == 0)
                         {  
                             spr[h].x += 1;
                             spr[h].y += 2;
                         } else
                         {
-                            int hardm = get_hard_play(h, spr[h].x, spr[h].y-1);
+                            hardm = get_hard_play(h, spr[h].x, spr[h].y-1);
                             if (hardm == 0)
                             {  
                                 spr[h].y -= 1;
 
                             } else
                             {
-                                int hardm = get_hard_play(h, spr[h].x-1, spr[h].y-1);
+                                hardm = get_hard_play(h, spr[h].x-1, spr[h].y-1);
                                 if (hardm == 0)
                                 {  
                                     spr[h].x -= 1;
@@ -3484,21 +3480,21 @@ b1end:;
 
             if (spr[h].seq == spr[h].base_walk + 7)
             {
-                int hardm = get_hard_play(h, spr[h].x-1, spr[h].y);
+                hardm = get_hard_play(h, spr[h].x-1, spr[h].y);
                 if (hardm == 0)
                 {  
                     spr[h].x -= 1;
 
                 } else
                 {
-                    int hardm = get_hard_play(h, spr[h].x-1, spr[h].y+1);
+                    hardm = get_hard_play(h, spr[h].x-1, spr[h].y+1);
                     if (hardm == 0)
                     {  
                         spr[h].x -= 1;
                         spr[h].y += 1;
                     } else
                     {
-                        int hardm = get_hard_play(h, spr[h].x-1, spr[h].y+2);
+                        hardm = get_hard_play(h, spr[h].x-1, spr[h].y+2);
                         if (hardm == 0)
                         {  
                             spr[h].x -= 1;
@@ -3506,13 +3502,13 @@ b1end:;
                         } else
                         {
 
-                            int hardm = get_hard_play(h, spr[h].x, spr[h].y-1);
+                            hardm = get_hard_play(h, spr[h].x, spr[h].y-1);
                             if (hardm == 0)
                             {               
                                 spr[h].y -= 1;
                             } else
                             {
-                                int hardm = get_hard_play(h, spr[h].x+1, spr[h].y-1);
+                                hardm = get_hard_play(h, spr[h].x+1, spr[h].y-1);
                                 if (hardm == 0)
                                 {               
                                     spr[h].x += 1;
@@ -3533,34 +3529,34 @@ b1end:;
 
             if (spr[h].seq == spr[h].base_walk + 1)
             {
-                int hardm = get_hard_play(h, spr[h].x-1, spr[h].y);
+                hardm = get_hard_play(h, spr[h].x-1, spr[h].y);
                 if (hardm == 0)
                 {
                     spr[h].x -= 1;
                 } else
                 {
-                    int hardm = get_hard_play(h, spr[h].x-1, spr[h].y-1);
+                    hardm = get_hard_play(h, spr[h].x-1, spr[h].y-1);
                     if (hardm == 0)
                     {  
                         spr[h].x -= 1;
                         spr[h].y -= 1;
                     } else
                     {
-                        int hardm = get_hard_play(h, spr[h].x-1, spr[h].y-2);
+                        hardm = get_hard_play(h, spr[h].x-1, spr[h].y-2);
                         if (hardm == 0)
                         {  
                             spr[h].x -= 1;
                             spr[h].y -= 2;
                         } else
                         {
-                            int hardm = get_hard_play(h, spr[h].x, spr[h].y+1);
+                            hardm = get_hard_play(h, spr[h].x, spr[h].y+1);
                             if (hardm == 0)
                             {  
 
                                 spr[h].y += 1;
                             } else
                             {
-                                int hardm = get_hard_play(h, spr[h].x+1, spr[h].y+1);
+                                hardm = get_hard_play(h, spr[h].x+1, spr[h].y+1);
                                 if (hardm == 0)
                                 {  
                                     spr[h].x += 1;
@@ -3580,35 +3576,35 @@ b1end:;
 
             if (spr[h].seq == spr[h].base_walk + 3)
             {
-                int hardm = get_hard_play(h, spr[h].x+1, spr[h].y);
+                hardm = get_hard_play(h, spr[h].x+1, spr[h].y);
                 if (hardm == 0)
                 {  
                     spr[h].x += 1;
 
                 } else
                 {
-                    int hardm = get_hard_play(h, spr[h].x+1, spr[h].y-1);
+                    hardm = get_hard_play(h, spr[h].x+1, spr[h].y-1);
                     if (hardm == 0)
                     {  
                         spr[h].x += 1;
                         spr[h].y -= 1;
                     } else
                     {
-                        int hardm = get_hard_play(h, spr[h].x+1, spr[h].y-2);
+                        hardm = get_hard_play(h, spr[h].x+1, spr[h].y-2);
                         if (hardm == 0)
                         {  
                             spr[h].x += 1;
                             spr[h].y -= 2;
                         } else
                         {
-                            int hardm = get_hard_play(h, spr[h].x, spr[h].y+1);
+                            hardm = get_hard_play(h, spr[h].x, spr[h].y+1);
                             if (hardm == 0)
                             {  
 
                                 spr[h].y += 1;
                             } else
                             {
-                                int hardm = get_hard_play(h, spr[h].x-1, spr[h].y+1);
+                                hardm = get_hard_play(h, spr[h].x-1, spr[h].y+1);
                                 if (hardm == 0)
                                 {  
                                     spr[h].x -= 1;
@@ -3639,7 +3635,7 @@ smoothend:;
 bool transition(void)
 {
     Common::Rect rcRect;
-    HRESULT             ddrval; 
+    HRESULT             result; 
     //we need to do our fancy screen transition
     int dumb = 5;
     //if (fps_final < 30) dumb = 50;
@@ -3675,22 +3671,22 @@ bool transition(void)
         rcRect.top = 0;
         rcRect.bottom = 400;
 
-        ddrval = lpDDSBack->BltFast( move_counter+20, 0, lpDDSTrick,
+        result = lpDDSBack->BltFast( move_counter+20, 0, lpDDSTrick,
             &rcRect, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
-        if (ddrval != DD_OK) dderror(ddrval);
+        if (result != DD_OK) dderror(result);
 
         rcRect.left = 600 -  move_counter; ;
         rcRect.right = 600;
         rcRect.top = 0;
         rcRect.bottom = 400;
 
-        ddrval = lpDDSBack->BltFast( 20, 0, lpDDSTrick2,
+        result = lpDDSBack->BltFast( 20, 0, lpDDSTrick2,
             &rcRect, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
 
 
 
 
-        if (ddrval != DD_OK) dderror(ddrval);
+        if (result != DD_OK) dderror(result);
 
         if (move_counter >= 595)
         {
@@ -3716,19 +3712,19 @@ bool transition(void)
         rcRect.top = 0;
         rcRect.bottom = 400; //redink1 fix so entire screen scrolls
 
-        ddrval = lpDDSBack->BltFast(20, 0, lpDDSTrick,
+        result = lpDDSBack->BltFast(20, 0, lpDDSTrick,
             &rcRect, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
-        if (ddrval != DD_OK) dderror(ddrval);
+        if (result != DD_OK) dderror(result);
 
         rcRect.left = 0;
         rcRect.right = move_counter;
         rcRect.top = 0;
         rcRect.bottom = 400; //redink1 fix so entire screen scrolls
 
-        ddrval = lpDDSBack->BltFast( 620 - move_counter, 0, lpDDSTrick2,
+        result = lpDDSBack->BltFast( 620 - move_counter, 0, lpDDSTrick2,
             &rcRect, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
 
-        if (ddrval != DD_OK) dderror(ddrval);
+        if (result != DD_OK) dderror(result);
 
         if (move_counter >= 595)
         {
@@ -3757,22 +3753,22 @@ bool transition(void)
         rcRect.top = 0;
         rcRect.bottom = 400 - move_counter; //redink1 fix so entire screen scrolls
 
-        ddrval = lpDDSBack->BltFast( 20, move_counter, lpDDSTrick,
+        result = lpDDSBack->BltFast( 20, move_counter, lpDDSTrick,
             &rcRect, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
-        if (ddrval != DD_OK) dderror(ddrval);
+        if (result != DD_OK) dderror(result);
 
         rcRect.left = 0;
         rcRect.right = 600; //redink1 fix so entire screen scrolls
         rcRect.top = 400 -  move_counter; ; //redink1 fix so entire screen scrolls
         rcRect.bottom = 400; //redink1 fix so entire screen scrolls
 
-        ddrval = lpDDSBack->BltFast( 20, 0, lpDDSTrick2,
+        result = lpDDSBack->BltFast( 20, 0, lpDDSTrick2,
             &rcRect, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
 
 
 
 
-        if (ddrval != DD_OK) dderror(ddrval);
+        if (result != DD_OK) dderror(result);
 
         if (move_counter >= 398)
         {
@@ -3801,9 +3797,9 @@ bool transition(void)
         rcRect.top = move_counter;
         rcRect.bottom = 400; //redink1 fix so entire screen scrolls
 
-        ddrval = lpDDSBack->BltFast(20, 0, lpDDSTrick,
+        result = lpDDSBack->BltFast(20, 0, lpDDSTrick,
             &rcRect, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
-        if (ddrval != DD_OK) dderror(ddrval);
+        if (result != DD_OK) dderror(result);
 
         rcRect.left = 0;
         rcRect.right = 600; //redink1 fix so entire screen scrolls
@@ -3811,10 +3807,10 @@ bool transition(void)
         rcRect.top = 0;
         rcRect.bottom = move_counter;
 
-        ddrval = lpDDSBack->BltFast( 20, 400 - move_counter, lpDDSTrick2, //redink1 fix so entire screen scrolls
+        result = lpDDSBack->BltFast( 20, 400 - move_counter, lpDDSTrick2, //redink1 fix so entire screen scrolls
             &rcRect, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
 
-        if (ddrval != DD_OK) dderror(ddrval);
+        if (result != DD_OK) dderror(result);
 
         if (move_counter >= 398)
         {
@@ -3841,13 +3837,12 @@ bool transition(void)
 int find_sprite(int block)
 {
 
-    for (int k = 1; k <= last_sprite_created; k++)
+    for (int i = 1; i <= last_sprite_created; i++)
     {
-        if (spr[k].sp_index == block)
+        if (spr[i].sp_index == block)
         {
-            return(k);
+            return(i);
         }
-
     }
 
     return(0);
@@ -3899,8 +3894,8 @@ void CyclePalette()
     }
     else
     {
-        int                 reg[15];
-        int                 k;
+        //int                 reg[15];
+        //int                 k;
         bool done_this_time = true;     
 
         if(lpDDPal->GetEntries(0,0,256,pe)!=DD_OK)
@@ -4054,15 +4049,12 @@ void up_cycle(void)
 }
 void draw_box(Common::Rect box, int color)
 {
-    DDBLTFX     ddbltfx;
+	DDBLTFX ddBltFx;
 
-    ddbltfx.dwSize = sizeof(ddbltfx);
-    ddbltfx.dwFillColor = color;
+    ddBltFx.dwSize = sizeof(ddBltFx);
+    ddBltFx.dwFillColor = color;
 
-
-    ddrval = lpDDSBack->Blt(&box ,NULL, NULL, DDBLT_COLORFILL| DDBLT_WAIT, &ddbltfx);
-
-
+    ddrval = lpDDSBack->Blt(&box ,NULL, NULL, DDBLT_COLORFILL| DDBLT_WAIT, &ddBltFx);
 }
 
 //redink1 added for true-color fade...
@@ -4163,11 +4155,10 @@ void ApplyFade32( register unsigned char aValue, register unsigned char* aBuffer
 //redink1 and Invertigo fix for windowed/high color mode
 void flip_it(void)
 {
-    DDBLTFX     ddbltfx;
-
-    Common::Rect rcRectSrc;    Common::Rect rcRectDest;
+    //DDBLTFX     ddBltFx;
+    Common::Rect rcRectSrc;
+	Common::Rect rcRectDest;
     POINT p;
-
 
     /*int timer = GetTickCount() + 50;
     while(GetTickCount() < timer)
@@ -4356,6 +4347,7 @@ void flip_it(void)
 
     } else
     {
+#if 0
         //windowed mode, no flipping         
         p.x = 0; p.y = 0;    
         ClientToScreen(hWndMain, &p);
@@ -4368,13 +4360,14 @@ void flip_it(void)
         OffsetRect(&rcRectDest, p.x, p.y);
         SetRect(&rcRectSrc, 0, 0, 640, 480);
 
-        ddbltfx.dwSize = sizeof(ddbltfx);
+        ddBltFx.dwSize = sizeof(ddBltFx);
 
-        ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
+        ddBltFx.dwDDFX = DDBLTFX_NOTEARING;
 
         lpDD->WaitForVerticalBlank(DDWAITVB_BLOCKBEGIN, NULL);
-        ddrval = lpDDSPrimary->Blt( &rcRectDest, lpDDSBack, &rcRectSrc, DDBLT_DDFX | DDBLT_WAIT, &ddbltfx);
-    }
+        ddrval = lpDDSPrimary->Blt( &rcRectDest, lpDDSBack, &rcRectSrc, DDBLT_DDFX | DDBLT_WAIT, &ddBltFx);
+#endif
+	}
 
 
 
@@ -4503,7 +4496,7 @@ void run_through_tag_list(int h, int strength)
                         {
 
                             spr[i].last_hit = h; 
-                            if ( hurt_thing(i, (spr[h].strength / 2) + ((rand() % ((spr[h].strength+1) / 2))+1), 0) > 0)
+                            if ( hurt_thing(i, (spr[h].strength / 2) + ((rnd() % ((spr[h].strength+1) / 2))+1), 0) > 0)
                                 random_blood(spr[i].x, spr[i].y-40, i); //redink1
                         }
 
@@ -4574,8 +4567,9 @@ void run_through_tag_list_push(int h)
 void run_through_touch_damage_list(int h)
 {
     Common::Rect box;
-    int amount, amounty;
-    for (int i = 1; i <= last_sprite_created; i++)
+	//int amount, amounty;
+
+	for (int i = 1; i <= last_sprite_created; i++)
     {
         if (spr[i].active) if (i != h) if
             ((spr[i].touch_damage != 0) )
@@ -4639,8 +4633,8 @@ void run_through_touch_damage_list(int h)
 
 void process_warp_man(void)
 {
-    Common::Rect box_crap;
-    DDBLTFX     ddbltfx;
+    Common::Rect boxCrap;
+    DDBLTFX     ddBltFx;
 
     int sprite = find_sprite(process_warp);
 
@@ -4652,12 +4646,12 @@ void process_warp_man(void)
             CyclePalette();
         if (process_count > 5 && !truecolor || truecolor && process_downcycle == false) //redink1 more limits for fade down stuff
         {
-            ddbltfx.dwSize = sizeof(ddbltfx);
+            ddBltFx.dwSize = sizeof(ddBltFx);
 
-            ddbltfx.dwFillColor = 0;
-            SetRect(&box_crap, 0,0,640,480);
+            ddBltFx.dwFillColor = 0;
+            SetRect(&boxCrap, 0,0,640,480);
 
-            ddrval = lpDDSBack->Blt(&box_crap ,NULL, NULL, DDBLT_COLORFILL| DDBLT_WAIT, &ddbltfx);
+            ddrval = lpDDSBack->Blt(&boxCrap ,NULL, NULL, DDBLT_COLORFILL| DDBLT_WAIT, &ddBltFx);
 
             flip_it();
 
@@ -4683,9 +4677,7 @@ void process_warp_man(void)
     } else
     {
         process_count = 0;      
-
     }
-
 }
 
 void one_time_brain(int h)
@@ -4864,9 +4856,9 @@ void process_talk()
 
     int px = 48, py = 44;
 
-    int sx = 184;
-    int sy = 94, sy_hold, sy_ho;
-    int spacing = 12;
+    int sX = 184;
+    int sY = 94, sy_hold, sy_ho;
+//    int spacing = 12;
     int curxl = 126;
     int curxr = 462;
     int curyr = 200;
@@ -4878,10 +4870,10 @@ void process_talk()
     int i;
     int x_depth = 335;
     if (talk.newy != -5000)
-        sy = talk.newy;
+        sY = talk.newy;
 
-    sy_hold = sy;
-    sy_ho = sy;
+    sy_hold = sY;
+    sy_ho = sY;
 
     check_seq_status(30);
 
@@ -4932,8 +4924,7 @@ again3:
 
     if (lpDDSBack->GetDC(&hdc) == DD_OK)
     {      
-
-        SelectObject (hdc, hfont_small);
+        SelectObject(hdc, hfont_small);
         SetBkMode(hdc, TRANSPARENT); 
 
 
@@ -4941,7 +4932,7 @@ again3:
         if (strlen(talk.buffer) > 0)
         {
 
-            SetRect(&rcRect,sx,94,463,400);
+            SetRect(&rcRect,sX,94,463,400);
             if (talk.newy != -5000) rcRect.bottom = talk.newy+15;
 
 
@@ -4988,10 +4979,10 @@ again3:
 
 
         //tabulate distance needed by text, LORDII experience helped here
-recal: 
+//recal: 
         for (i = talk.cur_view; i < talk.last; i++)
         {
-            SetRect(&rcRect,sx,y_hold,463,x_depth+100);
+            SetRect(&rcRect,sX,y_hold,463,x_depth+100);
             y_hold =  DrawText(hdc,talk.line[i],lstrlen(talk.line[i]),&rcRect,DT_CALCRECT | DT_CENTER | DT_WORDBREAK);  
             sy_hold += y_hold;   
 
@@ -5012,7 +5003,7 @@ recal:
         {
 
             //Msg("Small enough to fit on one screen, lets center it!");
-            sy += ( (x_depth - sy_hold) / 2) - 20;
+            sY += ( (x_depth - sy_hold) / 2) - 20;
 
         }
 death:
@@ -5064,7 +5055,7 @@ death:
                 fake_page = 1;
                 for (i = 1; i < talk.last; i++)
                 {
-                    SetRect(&rcRect,sx,sy_ho,463,x_depth);
+                    SetRect(&rcRect,sX,sy_ho,463,x_depth);
 
                     y_ho =  DrawText(hdc,talk.line[i],lstrlen(talk.line[i]),&rcRect,DT_CALCRECT | DT_CENTER | DT_WORDBREAK);    
                     sy_ho += y_ho;   
@@ -5077,7 +5068,7 @@ death:
                         }
                         */
                         fake_page++;      
-                        sy_ho = sy+ y_ho;
+                        sy_ho = sY+ y_ho;
                         //Msg("Does fake page (%d) match desired page (%d) %d", fake_page, talk.page, i);
                     }
                     if (fake_page == talk.page)
@@ -5113,7 +5104,7 @@ death:
         {
             //lets figure out where to draw this line
 
-            SetRect(&rcRect,sx,sy,463,x_depth+100);
+            SetRect(&rcRect,sX,sY,463,x_depth+100);
             SetTextColor(hdc,RGB(8,14,21));
             DrawText(hdc,talk.line[i],lstrlen(talk.line[i]),&rcRect, DT_CENTER | DT_WORDBREAK);
             OffsetRect(&rcRect,-2,-2);
@@ -5122,8 +5113,8 @@ death:
             OffsetRect(&rcRect,1,1);
             if (i == talk.cur)
             {
-                curyl = sy-4;
-                curyr = sy-4;
+                curyl = sY-4;
+                curyr = sY-4;
 
 
                 SetTextColor(hdc,RGB(255,255,255));
@@ -5132,7 +5123,7 @@ death:
             else
                 SetTextColor(hdc,RGB(255,255,2));
             y_last =  DrawText(hdc,talk.line[i],lstrlen(talk.line[i]),&rcRect,DT_CENTER | DT_WORDBREAK);    
-            sy += y_last;
+            sY += y_last;
 
 
         }
@@ -5182,7 +5173,6 @@ again5:
 
         }
     }
-
 }
 
 
@@ -5392,8 +5382,7 @@ void process_item( void )
     rcRect.right = x;
     rcRect.bottom = y;
     int hor, virt;  
-
-
+	int i;
 
     while( 1 )
     {
@@ -5426,7 +5415,7 @@ again:
     if( ddrval == DDERR_WASSTILLDRAWING )
         goto again;
     //draw all currently owned items; magic
-    for (int i = 1; i < 9; i++)
+    for (i = 1; i < 9; i++)
     {
         if (play.mitem[i].active) draw_item(i, true, play.mitem[i].seq,play.mitem[i].frame);
     }
@@ -5648,28 +5637,28 @@ void process_animated_tiles( void )
     if (water_timer < thisTickCount)
     {
 
-        water_timer = thisTickCount + ((rand() % 2000));
+        water_timer = thisTickCount + ((rnd() % 2000));
 
-        flip = ((rand() % 2)+1);        
-
-
+        flip = ((rnd() % 2)+1);        
 
 
-        for (int x=0; x<96; x++)
+
+
+        for (int xp=0; xp<96; xp++)
         {
             //redink1 fix for first broken water tile
-            if (pam.t[x].num >= 896) if (pam.t[x].num < (896+128))
+            if (pam.t[xp].num >= 896) if (pam.t[xp].num < (896+128))
             {
 
-                cool = pam.t[x].num / 128;
-                pa = pam.t[x].num - (cool * 128);
+                cool = pam.t[xp].num / 128;
+                pa = pam.t[xp].num - (cool * 128);
                 rcRect.left = (pa * 50- (pa / 12) * 600);
                 rcRect.top = (pa / 12) * 50;
                 rcRect.right = rcRect.left + 50;
                 rcRect.bottom = rcRect.top + 50;
 
 
-                lpDDSTwo->BltFast( (x * 50 - ((x / 12) * 600))+playl, (x / 12) * 50, tiles[cool+flip],
+                lpDDSTwo->BltFast( (xp * 50 - ((xp / 12) * 600))+playl, (xp / 12) * 50, tiles[cool+flip],
                     &rcRect, DDBLTFAST_NOCOLORKEY| DDBLTFAST_WAIT );
 
             }   
@@ -5683,7 +5672,7 @@ void process_animated_tiles( void )
     //if (water_timer < thisTickCount)
     {
 
-        //  water_timer = thisTickCount + ((rand() % 2000)+1000);
+        //  water_timer = thisTickCount + ((rnd() % 2000)+1000);
 
         if (fire_forward) fire_flip++;
         if (!fire_forward) fire_flip--;
@@ -5702,21 +5691,21 @@ void process_animated_tiles( void )
 
 
 
-        for (int x=0; x<96; x++)
+        for (int xp=0; xp<96; xp++)
         {
             //redink1 fix for first broken fire tile
-            if (pam.t[x].num >= 2304) if (pam.t[x].num < (2304+128))
+            if (pam.t[xp].num >= 2304) if (pam.t[xp].num < (2304+128))
             {
 
-                cool = pam.t[x].num / 128;
-                pa = pam.t[x].num - (cool * 128);
+                cool = pam.t[xp].num / 128;
+                pa = pam.t[xp].num - (cool * 128);
                 rcRect.left = (pa * 50- (pa / 12) * 600);
                 rcRect.top = (pa / 12) * 50;
                 rcRect.right = rcRect.left + 50;
                 rcRect.bottom = rcRect.top + 50;
 
 
-                lpDDSTwo->BltFast( (x * 50 - ((x / 12) * 600))+playl, (x / 12) * 50, tiles[cool+fire_flip],
+                lpDDSTwo->BltFast( (xp * 50 - ((xp / 12) * 600))+playl, (xp / 12) * 50, tiles[cool+fire_flip],
                     &rcRect, DDBLTFAST_NOCOLORKEY| DDBLTFAST_WAIT );
 
             }   
@@ -5725,9 +5714,6 @@ void process_animated_tiles( void )
     }
 
     //end of water processing
-
-
-
 }
 
 
@@ -5747,7 +5733,7 @@ again:
     if (showb.showdot)
     {
         //let's display a nice dot to mark where they are on the map
-        int x = play.last_map - 1;
+        int xp = play.last_map - 1;
 
 
         int mseq = 165;
@@ -5755,7 +5741,7 @@ again:
         showb.picframe++;
         if (showb.picframe > index[mseq].last) showb.picframe = 1;
         int mframe = showb.picframe;
-        lpDDSBack->BltFast( (x % 32) * 20, (x / 32) * 20, k[seq[mseq].frame[mframe]].k,
+        lpDDSBack->BltFast( (xp % 32) * 20, (xp / 32) * 20, k[seq[mseq].frame[mframe]].k,
             &k[seq[mseq].frame[mframe]].box, DDBLTFAST_SRCCOLORKEY| DDBLTFAST_WAIT );
 
     }
@@ -5821,35 +5807,27 @@ again:
 
 void drawscreenlock( void )
 {
-    HRESULT     ddrval;
+    HRESULT     ddrVal;
 
 loop:
     //draw the screenlock icon
-    ddrval = lpDDSBack->BltFast(0, 0, k[seq[423].frame[9]].k,
+    ddrVal = lpDDSBack->BltFast(0, 0, k[seq[423].frame[9]].k,
         &k[seq[423].frame[9]].box  , DDBLTFAST_NOCOLORKEY  );
 
-    if (ddrval == DDERR_WASSTILLDRAWING ) goto loop;
+    if (ddrVal == DDERR_WASSTILLDRAWING ) goto loop;
 
-    //if (ddrval != DD_OK) dderror(ddrval);
+    //if (ddrVal != DD_OK) dderror(ddrVal);
 
 loop2:
     //draw the screenlock icon
-    ddrval = lpDDSBack->BltFast(620, 0, k[seq[423].frame[10]].k,
+    ddrVal = lpDDSBack->BltFast(620, 0, k[seq[423].frame[10]].k,
         &k[seq[423].frame[10]].box  , DDBLTFAST_NOCOLORKEY  );
 
-    if (ddrval == DDERR_WASSTILLDRAWING ) goto loop2;
-    // if (ddrval != DD_OK) dderror(ddrval);
+    if (ddrVal == DDERR_WASSTILLDRAWING ) goto loop2;
+    // if (ddrVal != DD_OK) dderror(ddrVal);
 
 
 }    
-
-
-
-#include "update_frame.cpp"
-
-
-
-
 
 /*
 * finiObjects
@@ -5868,7 +5846,7 @@ void finiObjects()
             Msg("Error modifying saved game.");
     }
 
-    if (::sound_on)
+    if (sound_on)
     {
         mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);    
 
@@ -5960,7 +5938,7 @@ void finiObjects()
         DestroySound();
 
 
-    if (::sound_on)
+    if (sound_on)
     {
         //lets kill the cdaudio too
         if (mciSendString("close all", NULL, 0, NULL) != 0)
@@ -5976,22 +5954,21 @@ void finiObjects()
     void kill_fonts();
     kill_fonts();
     g_b_kill_app = true;
+#ifdef TODO
     ShowWindow(hWndMain, SW_HIDE);
     SendMessage(hWndMain, WM_IMDONE, 0,0);
     //PostQuitMessage(0);
-
+#endif
 } /* finiObjects */
 
-bool initFail( HWND hwnd, char mess[200] )
-{
-    MessageBox( hwnd, mess, TITLE, MB_OK );
+bool initFail(HWND hWnd, const char *mess) {
+    error("%s", mess);
     finiObjects();
-    //  DestroyWindow( hwnd );
+    //  DestroyWindow( hWnd );
     return false;
+}
 
-} /* initFail */
-
-
+#ifdef TODO
 long FAR PASCAL WindowProc( HWND hWnd, UINT message, 
                            WPARAM wParam, LPARAM lParam )
 {
@@ -6156,36 +6133,12 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message,
 
 } /* WindowProc */
 
-
-
-
+#endif
 
 
 bool CheckJoyStickPresent (void)
 {
-
-    // first tests if a joystick driver is present
-    // if true it makes certain that a joystick is plugged in
-
-    if(joyGetNumDevs())
-    {
-        memset(&jinfo,0,sizeof(JOYINFOEX));
-        jinfo.dwSize=sizeof(JOYINFOEX);
-        jinfo.dwFlags=JOY_RETURNALL;
-        if(joyGetPosEx(JOYSTICKID1,&jinfo) == JOYERR_NOERROR)
-        {
-            Msg("Joystick IS plugged in");
-            return true;
-        } else
-        {
-            Msg("Joystick not plugged in");
-
-            return false;
-
-        }
-        Msg("No joysticks found");
-    }
-    return false;
+	return true;
 }
 
 
@@ -6193,7 +6146,7 @@ bool CheckJoyStickPresent (void)
 
 void load_batch(void)
 {
-
+#ifdef TODO
     FILE *stream;  
     char line[255];
 
@@ -6234,7 +6187,9 @@ done:
     }
 
     program_idata();
-
+#else
+	error("TODO: load_batch");
+#endif
 }
 
 
@@ -6249,41 +6204,43 @@ bool check_arg(char crap[255])
     for (int i=1; i <= 10; i++)
     {
         seperate_string(crap, i,' ',shit);
-        if (strnicmp(shit,"-window",strlen("-window")) == 0)
+        if (scumm_strnicmp(shit,"-window",strlen("-window")) == 0)
         {
             windowed = true;
             truecolor = true;
             //          no_transition = true;     
         }
 
-        if (strnicmp(shit,"-dinkpal",strlen("-dinkpal")) == 0)
+        if (scumm_strnicmp(shit,"-dinkpal",strlen("-dinkpal")) == 0)
         {
             dinkpal = true;
         }
 
-        if (strnicmp(shit,"-truecolor",strlen("-truecolor")) == 0)
+        if (scumm_strnicmp(shit,"-truecolor",strlen("-truecolor")) == 0)
         {
             truecolor = true;
         }
 
-        if (strnicmp(shit,"-debug",strlen("-debug")) == 0)
+        if (scumm_strnicmp(shit,"-debug",strlen("-debug")) == 0)
         {
+#ifdef TODO
             debug_mode = true;
             unlink("dink\\debug.txt");
+#endif
         }
 
-        if (strnicmp(shit,"-nojoy",strlen("-nojoy")) == 0)
+        if (scumm_strnicmp(shit,"-nojoy",strlen("-nojoy")) == 0)
         {
             disablejoystick = true;
         }
-        if (strnicmp(shit,"-noini",strlen("-noini")) == 0)
+        if (scumm_strnicmp(shit,"-noini",strlen("-noini")) == 0)
         {
             g_b_no_write_ini = true;
         }
 
 #ifndef __DEMO
 
-        if (strnicmp(shit,"-game",strlen("-game")) == 0)
+        if (scumm_strnicmp(shit,"-game",strlen("-game")) == 0)
         {
             seperate_string(crap, i+1,' ',shit);
             strcpy(dir, shit);  
@@ -6293,7 +6250,7 @@ bool check_arg(char crap[255])
 #endif
 
 #ifdef __DEMO
-        if (strnicmp(shit,"-game",strlen("-game")) == 0)
+        if (scumm_strnicmp(shit,"-game",strlen("-game")) == 0)
         {
 #ifdef __GERMAN
             sprintf(shit,"Die Shareware-Version akzeptiert keine selbsterstellten Abenteuer oder Addons.",dir);
@@ -6309,7 +6266,7 @@ bool check_arg(char crap[255])
 
 #endif
 
-        if (strnicmp(shit,"-nosound",strlen("-nosound")) == 0)  sound_on = false;
+        if (scumm_strnicmp(shit,"-nosound",strlen("-nosound")) == 0)  sound_on = false;
 
     }
 
@@ -6318,7 +6275,7 @@ bool check_arg(char crap[255])
     strcpy(dir, ".");
 #endif
 
-    if (chdir(dir) == -1) 
+    if (false /*chdir(dir) == -1 */) 
     {
 #ifdef __ENGLISH
         sprintf(shit,"Game dir \"%s\" not found!",dir);
@@ -6329,7 +6286,7 @@ bool check_arg(char crap[255])
 #endif
 
         initFail(hWndMain, shit);
-        exit(0);
+        error("EXIT");
         return(0);
     }     
 
@@ -6346,6 +6303,7 @@ bool check_arg(char crap[255])
 //redink1 and invertigo fix for windowed/high color mode
 static bool doInit( HINSTANCE hInstance, int nCmdShow )
 {
+#ifdef TODO
     memset(id, '\0', sizeof(id));
     //    HRESULT             dsrval;
     // bool                bUseDSound;
@@ -7052,18 +7010,14 @@ static bool doInit( HINSTANCE hInstance, int nCmdShow )
     initfonts("Arial");
     //g_pMouse->Acquire();
 
-
+#endif
     return true;
 
 } /* doInit */
 
 
-#include <sys/types.h>
-#include <sys/stat.h>
-
-bool random_date(char file[255])
-
-{ 
+bool random_date(char file[255]) {
+#ifdef TODO
     //let's randomize the date on this file to trick Windows
     //cacheing into doing it right!
 
@@ -7075,7 +7029,7 @@ bool random_date(char file[255])
         | _S_IWRITE ))  != -1 )   
     {
         Msg( "File length before: %ld\n", _filelength( fh ) );
-        if( ( result = _chsize( fh, _filelength( fh )+((rand() % 1000)+1) ) ) == 0 )
+        if( ( result = _chsize( fh, _filelength( fh )+((rnd() % 1000)+1) ) ) == 0 )
             Msg( "Size successfully changed\n" );      
         else
             Msg( "Problem in changing the size\n" );
@@ -7088,6 +7042,9 @@ bool random_date(char file[255])
 
 
     return(true);
+#else
+	::error("TODO");
+#endif
 }
 
 
@@ -7095,7 +7052,7 @@ bool random_date(char file[255])
 
 int dir_num ( char path[255])
 {
-
+#ifdef TODO
     HANDLE      dir;
     WIN32_FIND_DATA fd;
     unsigned long   cnt;
@@ -7140,10 +7097,14 @@ int dir_num ( char path[255])
     FindClose( dir );
     ODS("All done finding files.");
     return(cnt);
+#else
+	::error("TODO");
+#endif
 }
 
 void getdir(char final[])
 {
+#ifdef TODO
     //converted to non CString version that spits back path + filename seperately.
     //Using GetModuleFileName instead of ParamStr, works with Win2000/nt.
     char dir[255];
@@ -7160,17 +7121,21 @@ void getdir(char final[])
     strncat((char*)&dir, &path[c_cur], strlen(path)-c_cur);
     path[c_cur] = 0; //truncate
     strcpy(final, path);
+#else
+	::error("TODO");
+#endif
+}
 
-}   
+#ifdef TODO
 /*
 * WinMain - initialization, message loop
 */
 int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int nCmdShow)
 {
-    sound_support = ((rand() % 200000)+1);  
+    sound_support = ((rnd() % 200000)+1);  
 
-    mycode = ((rand() % 200000)+1); 
+    mycode = ((rnd() % 200000)+1); 
     char crap2[256];
 
 
@@ -7327,3 +7292,6 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 } /* WinMain */
 
+#endif
+
+} // namespace Dink
