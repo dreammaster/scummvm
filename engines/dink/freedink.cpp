@@ -3172,7 +3172,7 @@ void human_brain(int h) {
 #ifdef __GERMAN
 
                 //if (randy == 3) 
-                if (randy == 1) say_text("`$Ich muß erst die Magie erlernen, bevor ich dies ausprobieren kann..",h,0);
+                if (randy == 1) say_text("`$Ich mu\xdf erst die Magie erlernen, bevor ich dies ausprobieren kann..",h,0);
                 if (randy == 2) say_text("`$Ich gestikuliere hier wie wirr!",h,0);
                 if (randy == 3) say_text("`$Ich gestikuliere hier wie wirr!",h,0);
                 if (randy == 4) say_text("`$Ich gestikuliere hier wie wirr!",h,0);
