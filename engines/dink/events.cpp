@@ -83,20 +83,6 @@ void EventsManager::pollEvents() {
 	}
 }
 
-#if 0
-bool EventsManager::keypressed() {
-	pollEvents();
-	return !_pendingKeys.empty();
-}
-
-#define EXTENDED_KEY_CODE ('\0')
-
-Common::Event EventsManager::readKey() {
-	pollEvents();
-	return _pendingKeys.empty() ? Common::Event() : _pendingKeys.pop();
-}
-#endif
-
 Common::Event EventsManager::readEvent() {
 	pollEvents();
 	return _pendingEvents.empty() ? Common::Event() : _pendingEvents.pop();

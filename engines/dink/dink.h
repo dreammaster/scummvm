@@ -46,6 +46,7 @@ private:
 	Common::RandomSource _randomSource;
 
 	void initialize();
+	void initializeFlags();
 protected:
 	// Engine APIs
 	Common::Error run() override;
@@ -58,6 +59,9 @@ public:
 //	void GUIError(const Common::String &msg);
 
 	uint32 getFeatures() const;
+	bool isDemo() const {
+		return getFeatures() & ADGF_DEMO;
+	}
 
 	/**
 	 * Returns the game Id

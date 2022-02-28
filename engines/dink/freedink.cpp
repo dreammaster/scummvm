@@ -396,18 +396,6 @@ bool keypressed( void )
     return(false);
 }
 
-/*
-* updateFrame
-* 
-* Decide what needs to be blitted next, wait for flip to complete,
-* then flip the buffers.
-*/
-
-
-
-
-
-
 void check_joystick(void)
 {
 
@@ -6192,108 +6180,6 @@ done:
 #endif
 }
 
-
-//redink1 and Invertigo fix for windowed/high color mode
-bool check_arg(char crap[255])
-{
-    truecolor = false;
-    char shit[200];
-
-    //  strupr(crap);
-    strcpy(dir, "dink");
-    for (int i=1; i <= 10; i++)
-    {
-        seperate_string(crap, i,' ',shit);
-        if (scumm_strnicmp(shit,"-window",strlen("-window")) == 0)
-        {
-            windowed = true;
-            truecolor = true;
-            //          no_transition = true;     
-        }
-
-        if (scumm_strnicmp(shit,"-dinkpal",strlen("-dinkpal")) == 0)
-        {
-            dinkpal = true;
-        }
-
-        if (scumm_strnicmp(shit,"-truecolor",strlen("-truecolor")) == 0)
-        {
-            truecolor = true;
-        }
-
-        if (scumm_strnicmp(shit,"-debug",strlen("-debug")) == 0)
-        {
-#ifdef TODO
-            debug_mode = true;
-            unlink("dink\\debug.txt");
-#endif
-        }
-
-        if (scumm_strnicmp(shit,"-nojoy",strlen("-nojoy")) == 0)
-        {
-            disablejoystick = true;
-        }
-        if (scumm_strnicmp(shit,"-noini",strlen("-noini")) == 0)
-        {
-            g_b_no_write_ini = true;
-        }
-
-#ifndef __DEMO
-
-        if (scumm_strnicmp(shit,"-game",strlen("-game")) == 0)
-        {
-            seperate_string(crap, i+1,' ',shit);
-            strcpy(dir, shit);  
-            Msg("Working directory %s requested.",dir);  
-        }
-
-#endif
-
-#ifdef __DEMO
-        if (scumm_strnicmp(shit,"-game",strlen("-game")) == 0)
-        {
-#ifdef __GERMAN
-            sprintf(shit,"Die Shareware-Version akzeptiert keine selbsterstellten Abenteuer oder Addons.",dir);
-#endif
-#ifdef __ENGLISH
-
-            sprintf(shit,"The shareware version cannot play player made quests or addons.",dir);
-            initFail(hWndMain, shit);
-#endif
-
-            return(0);
-        }
-
-#endif
-
-        if (scumm_strnicmp(shit,"-nosound",strlen("-nosound")) == 0)  sound_on = false;
-
-    }
-
-    //redink1 code so DMOD version can't run D-Mods
-#ifdef DMOD
-    strcpy(dir, ".");
-#endif
-
-    if (false /*chdir(dir) == -1 */) 
-    {
-#ifdef __ENGLISH
-        sprintf(shit,"Game dir \"%s\" not found!",dir);
-#endif
-#ifdef __GERMAN
-
-        sprintf(shit,"Spiele-direktory \"%s\" nicht gefunden!",dir);
-#endif
-
-        initFail(hWndMain, shit);
-        error("EXIT");
-        return(0);
-    }     
-
-
-    Msg("Dir is now %s.",dir);
-    return(true);
-}
 /*
 * doInit - do work required for every instance of the application:
 *                create the window, initialize data
@@ -7013,7 +6899,7 @@ static bool doInit( HINSTANCE hInstance, int nCmdShow )
 #endif
     return true;
 
-} /* doInit */
+}
 
 
 bool random_date(char file[255]) {
@@ -7050,8 +6936,7 @@ bool random_date(char file[255]) {
 
 
 
-int dir_num ( char path[255])
-{
+int dir_num (const char *path) {
 #ifdef TODO
     HANDLE      dir;
     WIN32_FIND_DATA fd;
@@ -7125,173 +7010,5 @@ void getdir(char final[])
 	::error("TODO");
 #endif
 }
-
-#ifdef TODO
-/*
-* WinMain - initialization, message loop
-*/
-int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine, int nCmdShow)
-{
-    sound_support = ((rnd() % 200000)+1);  
-
-    mycode = ((rnd() % 200000)+1); 
-    char crap2[256];
-
-
-    //    strcpy(crap2, GetCommandLine());
-    ///*      
-    getdir((char*)&crap2);
-
-
-
-    //   crap2[strlen(crap2)-1] = 0;
-
-    //    char st_temp[500];
-    //    getdir(st_temp, crap2);     
-
-    strcpy(dinkpath, crap2);
-
-
-
-
-    if (chdir(crap2)) 
-    {
-        char crap[256];
-        sprintf(crap, "Dink Error: Couldn't change to dir %s.  Why?", crap2);
-        initFail(hWndMain, crap2);
-        return(0);   
-    }
-
-
-
-
-
-#ifdef __DEMO
-
-    //if (chdir("story")) 
-    Msg("Error finding story dir.");
-    mcc = sound_support;
-
-    if (dir_num("dink\\story") != 250+9)
-    {
-
-        mcc = 0;
-
-#ifdef __GERMAN 
-        sprintf(crap, "Die Shareware-Version akzeptiert keine selbsterstellten Abenteuer.", crap2);
-#endif
-
-#ifdef __ENGLISH
-
-        sprintf(crap, "Shareware version cannot run player made quests.", crap2);
-#endif
-
-
-
-        initFail(hWndMain, crap);
-        return(0);   
-    }
-
-    //if (chdir("..")) 
-
-#endif
-
-    if (exist("cd.dat")) burn_revision = 1;
-
-
-    //int junk = GetTickCount() + 5000;
-
-    //yeah:
-    //    if (junk > GetTickCount()) goto yeah;
-
-    //random_date("DMOVIE.EXE");
-
-
-    MSG         msg;
-    lpCmdLine = lpCmdLine; 
-
-    command_line = lpCmdLine; 
-    /*
-    if (compare("", command_line))
-    {
-    if (exist("DMOVIE.EXE"))
-    {
-    Msg("No command line.  Let's run movies.");
-    char run_this[255];
-    sprintf(run_this, "%s\\DMOVIE.EXE",dinkpath); 
-
-    int myreturn =  _execl( run_this,run_this, NULL );
-    if (myreturn == 1)
-    {
-    ODS("Spawn error:  Path not found.");
-
-    }
-    if (myreturn == 2)
-    {
-    ODS("Spawn error:  Not enough memory.");
-
-    }
-
-
-    return(0);
-    }
-    } else
-    {
-
-    //  Msg("Older version of Dink detected.");
-    }
-    */
-    MyhInstance = hInstance;
-    hPrevInstance = hPrevInstance;
-    //return(0);
-    if( !doInit( hInstance, nCmdShow ) )
-    {
-
-        //  return false;
-    }
-
-    log_path(true);   
-
-
-
-
-
-    while( 1 )
-    {
-        if( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            //  Msg("Got %d", msg.message);
-            if( !GetMessage( &msg, NULL, 0, 0 ) )
-            {
-                return msg.wParam;
-            }
-            
-            //Msg("Got message - %d and %d", msg.wParam, msg.lParam);
-            TranslateMessage(&msg); 
-            DispatchMessage(&msg);
-        }
-        else if(  (bActive) || ( (debug_mode) && (windowed))   )
-        {
-            if (g_b_kill_app == false)
-            {
-                SetFocus( hwnd );
-                updateFrame();
-            }
-            //WaitMessage();
-
-        }
-        else
-        {
-            // make sure we go to sleep if we have nothing else to do
-            Sleep(1);
-            SetFocus( NULL );
-            WaitMessage();
-
-        }
-    }
-} /* WinMain */
-
-#endif
 
 } // namespace Dink

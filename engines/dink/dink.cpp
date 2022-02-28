@@ -22,6 +22,9 @@
 #include "dink/dink.h"
 #include "dink/detection.h"
 #include "dink/events.h"
+#include "dink/freedink.h"
+#include "dink/globals.h"
+#include "dink/var.h"
 #include "common/scummsys.h"
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
@@ -52,13 +55,55 @@ Common::String DinkEngine::getGameId() const {
 }
 
 Common::Error DinkEngine::run() {
+	sound_support = getRandomNumber(1, 200000);
+	mycode = getRandomNumber(1, 200000);
+
+	if (isDemo()) {
+		//if (chdir("story")) 
+		error("Error finding story dir.");
+		mcc = sound_support;
+
+		if (dir_num("dink\\story") != 250 + 9) {
+			mcc = 0;
+			error("Shareware version cannot run player made quests.", crap2);
+		}
+	}
+
 	initialize();
+	initializeFlags();
+
+	log_path(true);
+
+	while (!shouldQuit()) {
+		_events->pollEvents();
+		//updateFrame();
+	}
+
 	return Common::kNoError;
 }
 
 void DinkEngine::initialize() {
 	_events = new EventsManager();
+
+	if (Common::File::exists("cd.dat"))
+		burn_revision = 1;	
 }
 
+void DinkEngine::initializeFlags() {
+	if (ConfMan.hasKey("dinkpal"))
+		dinkpal = ConfMan.getBool("dinkpal");
+
+	if (ConfMan.hasKey("truecolor"))
+		truecolor = ConfMan.getBool("truecolor");
+
+	debug_mode = gDebugLevel > 0;
+
+	if (ConfMan.hasKey("nojoy"))
+		disablejoystick = ConfMan.hasKey("nojoy");
+
+	g_b_no_write_ini = true;
+
+	//if (scumm_strnicmp(shit, "-nosound", strlen("-nosound")) == 0)  sound_on = false;
+}
 
 } // namespace Dink
