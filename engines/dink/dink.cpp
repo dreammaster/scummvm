@@ -21,6 +21,7 @@
 
 #include "dink/dink.h"
 #include "dink/detection.h"
+#include "dink/events.h"
 #include "common/scummsys.h"
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
@@ -39,6 +40,7 @@ DinkEngine::DinkEngine(OSystem *syst, const DinkGameDescription *gameDesc) : Eng
 }
 
 DinkEngine::~DinkEngine() {
+	delete _events;
 }
 
 uint32 DinkEngine::getFeatures() const {
@@ -50,7 +52,13 @@ Common::String DinkEngine::getGameId() const {
 }
 
 Common::Error DinkEngine::run() {
+	initialize();
 	return Common::kNoError;
 }
+
+void DinkEngine::initialize() {
+	_events = new EventsManager();
+}
+
 
 } // namespace Dink

@@ -2,6 +2,7 @@ MODULE := engines/dink
 
 MODULE_OBJS = \
 	dink.o \
+	events.o \
 	fast_file.o \
 	freedink.o \
 	globals.o \

@@ -37,15 +37,21 @@
 
 namespace Dink {
 
+class EventsManager;
 struct DinkGameDescription;
 
 class DinkEngine : public Engine {
 private:
 	const DinkGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
+
+	void initialize();
 protected:
 	// Engine APIs
 	Common::Error run() override;
+public:
+	EventsManager *_events = nullptr;
+
 public:
 	DinkEngine(OSystem *syst, const DinkGameDescription *gameDesc);
 	~DinkEngine() override;
