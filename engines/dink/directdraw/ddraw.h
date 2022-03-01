@@ -152,33 +152,21 @@ struct DDBLTFX {
 };
 typedef DDBLTFX *LPDDBLTFX;
 
-struct DIRECTDRAWSURFACE : public Graphics::ManagedSurface {
+struct IDirectDrawSurface : public Graphics::ManagedSurface {
 public:
-	HRESULT Restore() {
-		return DD_OK;
-	}
-
 	HRESULT Lock(const LPRECT rect, LPDDSURFACEDESC desc, uint32 flags, HANDLE handle);
 	HRESULT Unlock(const LPRECT rect);
 	void Release();
-	HRESULT BltFast(int16 x, int16 y, const DIRECTDRAWSURFACE *src,
+	HRESULT Restore();
+	HRESULT BltFast(int16 x, int16 y, const IDirectDrawSurface *src,
 		LPRECT rect, uint32 flags);
-	HRESULT Blt(const LPRECT dstRect, const DIRECTDRAWSURFACE *src,
+	HRESULT Blt(const LPRECT dstRect, const IDirectDrawSurface *src,
 		const LPRECT srcRect, uint32 flags, LPDDBLTFX lpDDBltFx);
-	HRESULT Flip(DIRECTDRAWSURFACE *surface, uint32 flags);
+	HRESULT Flip(IDirectDrawSurface *surface, uint32 flags);
 	HRESULT GetDC(HDC *hdc);
 	HRESULT ReleaseDC(HDC hdc);
 };
-typedef DIRECTDRAWSURFACE *LPDIRECTDRAWSURFACE;
-
-
-inline void SetRect(Common::Rect *r, int16 x1, int16 y1, int16 x2, int16 y2) {
-	*r = Common::Rect(x1, y1, x2, y2);
-}
-
-inline void OffsetRect(Common::Rect *r, int16 dx, int16 dy) {
-	r->translate(dx, dy);
-}
+typedef IDirectDrawSurface *LPDIRECTDRAWSURFACE;
 
 typedef uint32 COLORREF;
 #define RGB(r,g,b) ((COLORREF)(((byte)(r)|((uint16)((byte)(g))<<8))|(((uint32)(byte)(b))<<16)))

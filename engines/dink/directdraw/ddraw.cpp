@@ -39,36 +39,40 @@ void IDirectDrawPalette::Release() {
 }
 
 
-HRESULT DIRECTDRAWSURFACE::Lock(const LPRECT rect, LPDDSURFACEDESC desc, uint32 flags, HANDLE handle) {
+HRESULT IDirectDrawSurface::Lock(const LPRECT rect, LPDDSURFACEDESC desc, uint32 flags, HANDLE handle) {
 	return DD_OK;
 }
 
-HRESULT DIRECTDRAWSURFACE::Unlock(const LPRECT rect) {
+HRESULT IDirectDrawSurface::Unlock(const LPRECT rect) {
 	return DD_OK;
 }
 
-void DIRECTDRAWSURFACE::Release() {
+void IDirectDrawSurface::Release() {
 }
 
-HRESULT DIRECTDRAWSURFACE::BltFast(int16 x, int16 y, const DIRECTDRAWSURFACE *src,
+HRESULT IDirectDrawSurface::Restore() {
+	return DD_OK;
+}
+
+HRESULT IDirectDrawSurface::BltFast(int16 x, int16 y, const IDirectDrawSurface *src,
 	LPRECT rect, uint32 flags) {
 	return DD_OK;
 }
 
-HRESULT DIRECTDRAWSURFACE::Blt(const LPRECT dstRect, const DIRECTDRAWSURFACE *src,
+HRESULT IDirectDrawSurface::Blt(const LPRECT dstRect, const IDirectDrawSurface *src,
 	const LPRECT srcRect, uint32 flags, LPDDBLTFX lpDDBltFx) {
 	return DD_OK;
 }
 
-HRESULT DIRECTDRAWSURFACE::Flip(DIRECTDRAWSURFACE *surface, uint32 flags) {
+HRESULT IDirectDrawSurface::Flip(IDirectDrawSurface *surface, uint32 flags) {
 	return DD_OK;
 }
 
-HRESULT DIRECTDRAWSURFACE::GetDC(HDC *hdc) {
+HRESULT IDirectDrawSurface::GetDC(HDC *hdc) {
 	return DD_OK;
 }
 
-HRESULT DIRECTDRAWSURFACE::ReleaseDC(HDC hdc) {
+HRESULT IDirectDrawSurface::ReleaseDC(HDC hdc) {
 	return DD_OK;
 }
 

@@ -65,7 +65,7 @@ Common::Error DinkEngine::run() {
 
 		if (dir_num("dink\\story") != 250 + 9) {
 			mcc = 0;
-			error("Shareware version cannot run player made quests.", crap2);
+			error("Shareware version cannot run player made quests.");
 		}
 	}
 
@@ -87,6 +87,15 @@ void DinkEngine::initialize() {
 
 	if (Common::File::exists("cd.dat"))
 		burn_revision = 1;	
+
+	Graphics::PixelFormat format = truecolor ?
+		Graphics::PixelFormat(4, 8, 8, 8, 8, 24, 16, 8, 0) :
+		Graphics::PixelFormat::createFormatCLUT8();
+	initGraphics(640, 480, &format);
+
+	// create arrow cursor
+
+	lpDD = new IDirectDraw();
 }
 
 void DinkEngine::initializeFlags() {

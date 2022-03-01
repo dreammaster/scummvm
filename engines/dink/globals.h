@@ -230,12 +230,24 @@ struct seth_joy {
 };
 
 struct mega_y {
-	byte y[401];
+	byte y[401] = { 0 };
+
+	void clear() {
+		Common::fill(y, y + 401, 0);
+	}
 };
 
 //struct for hardness map
 struct hit_map {
 	mega_y x[601];
+
+	hit_map() {
+		clear();
+	}
+	void clear() {
+		for (int i = 0; i < 601; ++i)
+			x[i].clear();
+	}
 };
 
 //sub struct for tile hardness

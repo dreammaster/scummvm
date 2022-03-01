@@ -6187,353 +6187,22 @@ done:
 
 
 //redink1 and invertigo fix for windowed/high color mode
-static bool doInit( HINSTANCE hInstance, int nCmdShow )
-{
-#ifdef TODO
-    memset(id, '\0', sizeof(id));
-    //    HRESULT             dsrval;
-    // bool                bUseDSound;
-    WNDCLASS            wc;
-    DDSURFACEDESC       ddsd;
-    DDSCAPS             ddscaps;
-    HRESULT             ddrval;
-    Common::Rect                rcRect;
-
-
-    char crap[30];
-    char crap1[10];
-
-    Common::Rect rcRectSrc;    Common::Rect rcRectDest;
-    POINT p;
-    /*
-    * set up and register window class
-    */
-
-
-
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = WindowProc;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = hInstance;
-    wc.hIcon = LoadIcon( hInstance, MAKEINTRESOURCE(IDI_ICON1) );
-    wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-    wc.hbrBackground = GetStockBrush(BLACK_BRUSH);
-    wc.lpszMenuName = NAME;
-    wc.lpszClassName = NAME;
-    RegisterClass( &wc );
-    /*
-    * create a window
-    */
-
-    windowed = false;
-    //  hWndMain = hwnd;   
-
-
-    if (!check_arg(command_line))
-    {
-        return(0);
-        //return initFail(hwnd, "Bad game directory.  Check your -game setting.");      
-    }
-
-
-
-
-
-    if (windowed)
-    {
-        /*hwnd = CreateWindowEx(
-            0,
-            NAME,
-            TITLE,
-            //        WS_POPUP,
-
-            WS_SYSMENU|WS_CAPTION,
-
-            0,
-            0,
-            640, 480,
-            //GetSystemMetrics(SM_CXSCREEN),
-            //GetSystemMetrics(SM_CYSCREEN),
-            NULL,
-            NULL,
-            hInstance,
-            NULL );
-
-        if( !hwnd )
-        {
-            return false;
-        }
-
-        // Now check actual size of client area
-        Common::Rect check;
-        GetClientRect(hwnd, &check);
-        int ExtendWidth = 640 - (check.right - check.left);
-        int ExtendHeight = 480 - (check.bottom - check.top);
-
-        DestroyWindow(hwnd);*/
-
-        hwnd = CreateWindowEx(
-            0,
-            NAME,
-            TITLE,
-            //        WS_POPUP,
-
-            WS_SYSMENU|WS_CAPTION,
-
-            0,
-            0,
-            640,480,
-            //        GetSystemMetrics(SM_CXSCREEN),
-            //      GetSystemMetrics(SM_CYSCREEN),
-            NULL,
-            NULL,
-            hInstance,
-            NULL );
-        hWndMain = hwnd;   
-
-        if( !hwnd )
-        {
-            return false;
-        }
-
-        Common::Rect check;
-        GetClientRect(hwnd, &check);
-        int ExtendWidth = 640 - (check.right - check.left);
-        int ExtendHeight = 480 - (check.bottom - check.top);
-
-        MoveWindow( hWndMain, check.left, check.top, 640 + ExtendWidth, 480 + ExtendHeight, true );
-
-        ShowWindow( hwnd, nCmdShow );
-        UpdateWindow( hwnd );
-        SetFocus( hwnd );
-        /*
-        * create the main DirectDraw object
-        */
-        ddrval = DirectDrawCreate( NULL, &lpDD, NULL );
-        if( ddrval != DD_OK )
-        {
-            return initFail(hwnd, "Couldn't use DirectX 8+...  Install it first.");
-        }
-
-
-
-        // Get exclusive mode
-
-
-        // using DDSCL_NORMAL means we will coexist with GDI
-        ddrval = lpDD->SetCooperativeLevel( hwnd, DDSCL_NORMAL );
-
-        if( ddrval != DD_OK )  
-        {        
-            lpDD->Release(); 
-            return initFail(hwnd, "Couldn't make windowed screen.");
-
-        }   
-        memset( &ddsd, 0, sizeof(ddsd) );
-        ddsd.dwSize = sizeof( ddsd );
-        ddsd.dwFlags = DDSD_CAPS;
-        ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-
-        // The primary surface is not a page flipping surface this time
-        ddrval = lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL );
-
-        if( ddrval != DD_OK )    
-        {        lpDD->Release();  
-        return initFail(hwnd, "Couldn't make primary surface.");
-
-
-        } 
-
-        memset( &ddsd, 0, sizeof(ddsd) ); 
-        ddsd.dwSize = sizeof( ddsd );
-        ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-        //redink1 added SYSTEMMEMORY to speed things up
-        ddsd.ddsCaps.dwCaps = DDSCAPS_BACKBUFFER;
-        ddsd.dwWidth = 640;
-        ddsd.dwHeight = 480;    // create the backbuffer separately
-
-        ddrval = lpDD->CreateSurface( &ddsd, &lpDDSBack, NULL );
-        if( ddrval != DD_OK )
-        {        lpClipper-> Release();
-
-        lpDDSPrimary->Release();    
-        lpDD->Release(); 
-        return initFail(hwnd, "Couldn't make Back buffer in Windowed mode.");
-        }   
-
-
-
-        // Create a clipper to ensure that our drawing stays inside our window
-        ddrval = lpDD->CreateClipper( 0, &lpClipper, NULL );
-        if( ddrval != DD_OK )   
-        {      
-            lpDDSPrimary->Release();
-
-            lpDD->Release();  
-            return initFail(hwnd, "Couldn't make a Clipper object, god knows why.");
-
-        }
-
-
-        // setting it to our hwnd gives the clipper the coordinates from our window
-        ddrval = lpClipper->SetHWnd( 0, hwnd );   
-        if( ddrval != DD_OK )  
-        {
-            lpClipper-> Release();   
-            lpDDSPrimary->Release();
-
-            lpDD->Release();     
-            return initFail(hwnd, "Couldn't give Clipper window cords.");
-
-        }
-        // attach the clipper to the primary surface
-        ddrval = lpDDSPrimary->SetClipper( lpClipper ); 
-        if( ddrval != DD_OK )
-        {  
-            lpClipper-> Release();   
-            lpDDSPrimary->Release();
-            lpDD->Release();    
-
-            return initFail(hwnd, "Couldn't attach Clipper to primary buffer.");
-        }
-
-
-    }
-
-    if (!windowed)
-    {
-
-        hwnd = CreateWindowEx(
-            0,
-            NAME,
-            TITLE,
-            WS_POPUP ,
-
-            //WS_SYSMENU|WS_CAPTION,
-
-            0,
-            0,
-            640, 480,
-            //        GetSystemMetrics(SM_CXSCREEN),
-            //      GetSystemMetrics(SM_CYSCREEN),
-            NULL,
-            NULL,
-            hInstance,
-            NULL );
-        hWndMain = hwnd;   
-
-        if( !hwnd )
-        {
-            return false;
-        }
-
-        ShowWindow( hwnd, nCmdShow );
-        UpdateWindow( hwnd );
-        SetFocus( hwnd );
-
-
-        /*
-        * create the main DirectDraw object
-        */
-        ddrval = DirectDrawCreate( NULL, &lpDD, NULL );
-        if( ddrval != DD_OK )
-        {
-            return initFail(hwnd, "Couldn't use DirectX 3+...  Install it first.");
-        }
-
-        // Get exclusive mode
-
-
-
-
-        ddrval = lpDD->SetCooperativeLevel( hwnd, DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN );
-
-
-        if( ddrval != DD_OK )
-        {
-            return initFail(hwnd, "SetCooperative level failed.");
-        }
-
-
-        // Set the video mode to 640x480xX
-        if ( truecolor == true )
-        {
-            // Keep trying until one works, or not.  There should be a way to see what DirectX supports... hrm
-            ddrval = lpDD->SetDisplayMode( x, y, 32 );
-            if ( ddrval != DD_OK )
-            {
-                ddrval = lpDD->SetDisplayMode( x, y, 24 );
-                if ( ddrval != DD_OK )
-                {
-                    ddrval = lpDD->SetDisplayMode( x, y, 16 );
-                    if ( ddrval != DD_OK )
-                    {
-                        return initFail( hwnd, "640 X 480, true color mode not supported." );
-                    }
-                }
-            }
-        }
-        else
-        {
-            ddrval = lpDD->SetDisplayMode( x, y, 8 );
-            if ( ddrval != DD_OK )
-            {
-                return initFail( hwnd, "640 X 480, 8 bit not supported." );
-            }
-        }
-
-        // finiObjects();   
-        //  return false;
-
-        ZeroMemory(&hm, sizeof(hit_map));
-
-
-
-        // Create the primary surface with 1 back buffer
-        ddsd.dwSize = sizeof( ddsd );
-        ddsd.dwFlags = DDSD_CAPS | DDSD_BACKBUFFERCOUNT;
-        ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE |
-            DDSCAPS_FLIP |
-            DDSCAPS_COMPLEX;
-
-        ddsd.dwBackBufferCount = 1;
-        ddrval = lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL );
-        if( ddrval != DD_OK )
-        {
-            return initFail(hwnd, "Could not create primary surface.");
-        }
-
-        ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
-
-        /* if (ddsd.ddsCaps.dwCaps == DDCAPS_BLTSTRETCH)
-        {
-        return initFail(hwnd, "Hardware blit stretching available.");
-        }
-        */
-        ddrval = lpDDSPrimary->GetAttachedSurface(&ddscaps, &lpDDSBack);
-        if( ddrval != DD_OK )
-        {
-            return initFail(hwnd, "Could not create backbuffer,");
-        }
-
-    }
+bool doInit(/* HINSTANCE hInstance, int nCmdShow */) {
+	// Create the primary surface with 1 back buffer
+	lpDDSPrimary = new IDirectDrawSurface();
+	lpDDSBack = new IDirectDrawSurface();
+	lpDDSFade = new IDirectDrawSurface();
 
     //redink1 init for color depth information
-    if (truecolor)
-    {
-        DDSURFACEDESC dds;
-        memset(&dds, 0, sizeof(DDSURFACEDESC));
-        dds.dwSize = sizeof(DDSURFACEDESC); 
-        lpDDSBack->GetSurfaceDesc(&dds);
-        if ( dds.ddpfPixelFormat.dwGBitMask == 0x07E0 )
-        {
+    if (truecolor) {
+		const Graphics::PixelFormat &fmt = lpDDSBack->format;
+
+		if (fmt.rBits() == 5 && fmt.gBits() == 6 && fmt.bBits() == 5) {
             // 565
             mColorDepth = ColorDepth16Bit_565;
             m16BitFadeValues = new unsigned short[65536][30];
 
-            for ( unsigned short lFade( 0 ); lFade < 30; lFade++ )
-            {
+            for ( unsigned short lFade( 0 ); lFade < 30; lFade++ ) {
                 float lFadeAdjustment( ( 30.0f - static_cast<float>( lFade ) ) / 30.0f );
                 for ( unsigned short lRed( 0 ); lRed < 32; lRed++ )
                 {
@@ -6555,9 +6224,7 @@ static bool doInit( HINSTANCE hInstance, int nCmdShow )
                     }
                 }
             }
-        }
-        else if ( dds.ddpfPixelFormat.dwGBitMask == 0x03E0 )
-        {
+        } else if (fmt.rBits() == 5 && fmt.gBits() == 5 && fmt.bBits() == 5) {
             // 555
             mColorDepth = ColorDepth16Bit_555;
             m16BitFadeValues = new unsigned short[65536][30];
@@ -6586,18 +6253,18 @@ static bool doInit( HINSTANCE hInstance, int nCmdShow )
                 }
             }
         }
-        else if ( dds.ddpfPixelFormat.dwRGBBitCount == 32 || dds.ddpfPixelFormat.dwRGBBitCount == 24 )
-        {
+        else if (fmt.bytesPerPixel > 2) {
             // 32 & 24
-            if ( dds.ddpfPixelFormat.dwRGBBitCount == 32 )
-            {
+            if (fmt.bytesPerPixel == 4)
+			{
                 mColorDepth = ColorDepth32Bit;
             }
             else
             {
                 mColorDepth = ColorDepth24Bit;
             }
-            m8BitFadeValues = new unsigned char[256][30];
+
+			m8BitFadeValues = new unsigned char[256][30];
             for ( unsigned char lFade( 0 ); lFade < 30; lFade++ )
             {
                 double lFadeAdjustment( ( 30.0 - static_cast<double>( lFade ) ) / 30.0 );
@@ -6613,35 +6280,19 @@ static bool doInit( HINSTANCE hInstance, int nCmdShow )
             // No fade
         }
 
-        dwRMask = dds.ddpfPixelFormat.dwRBitMask;
-        dwGMask = dds.ddpfPixelFormat.dwGBitMask;
-        dwBMask = dds.ddpfPixelFormat.dwBBitMask;
-        wRBits=GetNumberOfBits(dwRMask);
-        wGBits=GetNumberOfBits(dwGMask);
-        wBBits=GetNumberOfBits(dwBMask);
+		dwRMask = fmt.aMax() << fmt.rShift;
+		dwGMask = fmt.gMax() << fmt.gShift;
+		dwBMask = fmt.bMax() << fmt.bShift;
+		wRBits = fmt.rBits();
+		wGBits = fmt.gBits();
+		wBBits = fmt.bBits();
         
         wRPos  = GetMaskPos(dwRMask);
         wGPos  = GetMaskPos(dwGMask);
         wBPos  = GetMaskPos(dwBMask);
-
-        memset( &ddsd, 0, sizeof(ddsd) ); 
-        ddsd.dwSize = sizeof( ddsd );
-        ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-        ddsd.ddsCaps.dwCaps = DDSCAPS_BACKBUFFER | DDSCAPS_SYSTEMMEMORY;
-        ddsd.dwWidth = 640;
-        ddsd.dwHeight = 480;
-        ddrval = lpDD->CreateSurface( &ddsd, &lpDDSFade, NULL );
     }
-
-    //init is finished, now lets load some more junk
-    //return initFail(hwnd, "Couldn't make a Clipper object, god knows why.");
-    // create and set the palette
-
-    //  getCDTrackStartTimes();
-
-
-
-    if (exist("tiles\\TS01.bmp"))
+#ifdef TODO
+    if (Common::File::exists("tiles/ts01.bmp"))
         lpDDPal = DDLoadPalette(lpDD, "tiles\\TS01.BMP"); else
         lpDDPal = DDLoadPalette(lpDD, "..\\dink\\tiles\\TS01.BMP");
     if (lpDDPal)
@@ -6898,7 +6549,6 @@ static bool doInit( HINSTANCE hInstance, int nCmdShow )
 
 #endif
     return true;
-
 }
 
 

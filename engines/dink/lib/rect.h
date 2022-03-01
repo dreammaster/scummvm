@@ -45,6 +45,16 @@ inline bool inside_box(int16 x, int16 y, const RECT &rect) {
 	return rect.contains(x, y);
 }
 
+
+inline void SetRect(Common::Rect *r, int16 x1, int16 y1, int16 x2, int16 y2) {
+	*r = Common::Rect(x1, y1, x2, y2);
+}
+
+inline void OffsetRect(Common::Rect *r, int16 dx, int16 dy) {
+	r->translate(dx, dy);
+}
+
+
 } // namespace Dink
 
 #endif
