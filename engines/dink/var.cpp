@@ -25,6 +25,8 @@
 #include "dink/var.h"
 #include "dink/sound.h"
 #include "dink/lib/graphics.h"
+#include "dink/lib/wintypes.h"
+#include "dink/directdraw/ddutil.h"
 
 namespace Dink {
 
@@ -108,7 +110,7 @@ doit:
 }
 
 
-bool seperate_string (char str[255], int num, char liney, char *return1) 
+bool seperate_string (const char *str, int num, char liney, char *return1) 
 {
     int l;
     uint i;
@@ -426,7 +428,7 @@ void dderror(HRESULT hErr) {
 }
 
 
-bool compare(const char *orig, char *comp) {
+bool compare(const char *orig, const char *comp) {
     uint len;
 
     //strcpy(comp, _strupr(comp));
@@ -796,10 +798,10 @@ IDirectDrawSurface * DDSethLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int d
     DeleteObject(hbm);
     if (sprite > 0)
     {
-        k[sprite].box.top = 0;
-        k[sprite].box.left = 0;
-        k[sprite].box.right = ddsd.dwWidth;
-        k[sprite].box.bottom = ddsd.dwHeight;
+        picInfo[sprite].box.top = 0;
+        picInfo[sprite].box.left = 0;
+        picInfo[sprite].box.right = ddsd.dwWidth;
+        picInfo[sprite].box.bottom = ddsd.dwHeight;
 
     }
 
@@ -1023,9 +1025,9 @@ int getpic(int h)
 void add_hardness (int sprite, int num)
 {
 
-    for (int  xx = spr[sprite].x + k[getpic(sprite)].hardbox.left; xx < spr[sprite].x + k[getpic(sprite)].hardbox.right; xx++)
+    for (int  xx = spr[sprite].x + picInfo[getpic(sprite)].hardbox.left; xx < spr[sprite].x + picInfo[getpic(sprite)].hardbox.right; xx++)
     {
-        for (int yy = spr[sprite].y + k[getpic(sprite)].hardbox.top; yy < spr[sprite].y + k[getpic(sprite)].hardbox.bottom; yy++)
+        for (int yy = spr[sprite].y + picInfo[getpic(sprite)].hardbox.top; yy < spr[sprite].y + picInfo[getpic(sprite)].hardbox.bottom; yy++)
         {
             if ( (xx-20 > 600) | (xx-20 < 0)| (yy > 400) | (yy < 0))
             {
@@ -1242,10 +1244,10 @@ void add_exp(int num, int h, bool addEvenIfNotLastSpriteHit)
 
         int crap2 = add_sprite(spr[h].x,spr[h].y,8,0,0);
 
-        spr[crap2].y -= k[seq[spr[h].pseq].frame[spr[h].pframe]].yoffset;
-        spr[crap2].x -= k[seq[spr[h].pseq].frame[spr[h].pframe]].xoffset;
-        spr[crap2].y -= k[seq[spr[h].pseq].frame[spr[h].pframe]].box.bottom / 3;
-        spr[crap2].x += k[seq[spr[h].pseq].frame[spr[h].pframe]].box.right / 5;
+        spr[crap2].y -= picInfo[seq[spr[h].pseq].frame[spr[h].pframe]].yoffset;
+        spr[crap2].x -= picInfo[seq[spr[h].pseq].frame[spr[h].pframe]].xoffset;
+        spr[crap2].y -= picInfo[seq[spr[h].pseq].frame[spr[h].pframe]].box.bottom / 3;
+        spr[crap2].x += picInfo[seq[spr[h].pseq].frame[spr[h].pframe]].box.right / 5;
         spr[crap2].y -= 30;
         spr[crap2].speed = 1;
         spr[crap2].hard = 1;
@@ -2160,13 +2162,13 @@ void draw_wait()
 
         if (please_wait)
         {
-            ddrval = lpDDSPrimary->BltFast( 232, 0, k[seq[423].frame[7]].k,
-                &k[seq[423].frame[7]].box, DDBLTFAST_SRCCOLORKEY);
+            ddrval = lpDDSPrimary->BltFast( 232, 0, picInfo[seq[423].frame[7]].k,
+                &picInfo[seq[423].frame[7]].box, DDBLTFAST_SRCCOLORKEY);
             please_wait = false;
         } else
         {
-            ddrval = lpDDSPrimary->BltFast( 232, 0, k[seq[423].frame[8]].k,
-                &k[seq[423].frame[7]].box, DDBLTFAST_SRCCOLORKEY);
+            ddrval = lpDDSPrimary->BltFast( 232, 0, picInfo[seq[423].frame[8]].k,
+                &picInfo[seq[423].frame[7]].box, DDBLTFAST_SRCCOLORKEY);
             please_wait = true;
 
         }
@@ -2175,12 +2177,9 @@ void draw_wait()
 }
 
 
-LPDIRECTDRAWSURFACE DDCreateSurface(
-                                    uint32 width,
-                                    uint32 height,
-                                    bool sysmem,
-                                    bool trans )
-{
+LPDIRECTDRAWSURFACE DDCreateSurface(uint32 width, uint32 height,
+		bool sysmem, bool trans) {
+
     DDSURFACEDESC   ddsd;
     HRESULT     ddrVal;
     LPDIRECTDRAWSURFACE psurf;
@@ -2221,7 +2220,7 @@ LPDIRECTDRAWSURFACE DDCreateSurface(
     }
     else
     {
-        Msg( "CreateSurface FAILED, rc = %ld", (uint32) LOWORD( ddrVal ) );
+        Msg("CreateSurface FAILED, rc = %ld", (uint32)LOWORD(ddrVal));
         psurf = NULL;
     }
 
@@ -2421,9 +2420,9 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
             ddsd.dwWidth = pbi->biWidth;
             ddsd.dwHeight = pbi->biHeight; // + 1; //redink1 fixed crashing in 16-bit mode... would overflow by a byte or two by writing dwords, really weird bug. Eh, actually moved solution to everywhere we update a uint32, include any trailing bits that were there before.  Saves memory.
 
-            if (k[sprite].k != NULL) k[sprite].k->Release();
+            if (picInfo[sprite].k != NULL) picInfo[sprite].k->Release();
 
-            if (lpDD->CreateSurface(&ddsd, &k[sprite].k, NULL) != DD_OK)
+            if (lpDD->CreateSurface(&ddsd, &picInfo[sprite].k, NULL) != DD_OK)
             {
                 Msg("Failed to create pdd surface description");
 
@@ -2434,7 +2433,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
                 ddsd.dwSize = sizeof(ddsd);
                 ddrval = IDirectDrawSurface_Lock(
-                    k[sprite].k, NULL, &ddsd, DDLOCK_WAIT, NULL);
+                    picInfo[sprite].k, NULL, &ddsd, DDLOCK_WAIT, NULL);
 
                 if( ddrval == DD_OK )
                 {
@@ -2612,7 +2611,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
 
 
-                        IDirectDrawSurface_Unlock(k[sprite].k, NULL);
+                        IDirectDrawSurface_Unlock(picInfo[sprite].k, NULL);
                 }
                 else
                 {
@@ -2622,26 +2621,26 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
                 if (sprite > 0)
                 {
-                    k[sprite].box.top = 0;
-                    k[sprite].box.left = 0;
-                    k[sprite].box.right = ddsd.dwWidth;
-                    k[sprite].box.bottom =ddsd.dwHeight;
+                    picInfo[sprite].box.top = 0;
+                    picInfo[sprite].box.left = 0;
+                    picInfo[sprite].box.right = ddsd.dwWidth;
+                    picInfo[sprite].box.bottom =ddsd.dwHeight;
 
 
 
                     if ( (oo > 1) & (notanim) )
                     {
 
-                        k[cur_sprite].yoffset = k[index[nummy].s+1].yoffset;
+                        picInfo[cur_sprite].yoffset = picInfo[index[nummy].s+1].yoffset;
                     } else
                     {
                         if (yoffset > 0)
-                            k[cur_sprite].yoffset = yoffset; else
+                            picInfo[cur_sprite].yoffset = yoffset; else
                         {
 
 
-                            k[cur_sprite].yoffset = (k[cur_sprite].box.bottom - 
-                                (k[cur_sprite].box.bottom / 4)) - (k[cur_sprite].box.bottom / 30);
+                            picInfo[cur_sprite].yoffset = (picInfo[cur_sprite].box.bottom - 
+                                (picInfo[cur_sprite].box.bottom / 4)) - (picInfo[cur_sprite].box.bottom / 30);
 
                         }
                     }
@@ -2649,18 +2648,18 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
                     if ( (oo > 1 ) & (notanim))
                     {
 
-                        k[cur_sprite].xoffset =  k[index[nummy].s+1].xoffset;
+                        picInfo[cur_sprite].xoffset =  picInfo[index[nummy].s+1].xoffset;
                     } else
                     {
 
                         if (xoffset > 0)
-                            k[cur_sprite].xoffset = xoffset; else
+                            picInfo[cur_sprite].xoffset = xoffset; else
 
                         {
 
 
-                            k[cur_sprite].xoffset = (k[cur_sprite].box.right - 
-                                (k[cur_sprite].box.right / 2)) + (k[cur_sprite].box.right / 6);
+                            picInfo[cur_sprite].xoffset = (picInfo[cur_sprite].box.right - 
+                                (picInfo[cur_sprite].box.right / 2)) + (picInfo[cur_sprite].box.right / 6);
 
 
                         }
@@ -2670,15 +2669,15 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
                     if (hardbox.right > 0) 
                     {     
                         //forced setting      
-                        k[cur_sprite].hardbox.left = hardbox.left;
-                        k[cur_sprite].hardbox.right = hardbox.right;
+                        picInfo[cur_sprite].hardbox.left = hardbox.left;
+                        picInfo[cur_sprite].hardbox.right = hardbox.right;
                     }
                     else
                     {
                         //guess setting   
-                        work = k[cur_sprite].box.right / 4;
-                        k[cur_sprite].hardbox.left -= work;
-                        k[cur_sprite].hardbox.right += work;
+                        work = picInfo[cur_sprite].box.right / 4;
+                        picInfo[cur_sprite].hardbox.left -= work;
+                        picInfo[cur_sprite].hardbox.right += work;
 
                     }
 
@@ -2686,35 +2685,35 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
                     if (hardbox.bottom > 0) 
                     {
-                        k[cur_sprite].hardbox.top = hardbox.top;                  
-                        k[cur_sprite].hardbox.bottom = hardbox.bottom;
+                        picInfo[cur_sprite].hardbox.top = hardbox.top;                  
+                        picInfo[cur_sprite].hardbox.bottom = hardbox.bottom;
 
                     }
                     else
                     {
 
-                        work = k[cur_sprite].box.bottom / 10;
-                        k[cur_sprite].hardbox.top -= work;
-                        k[cur_sprite].hardbox.bottom += work;
+                        work = picInfo[cur_sprite].box.bottom / 10;
+                        picInfo[cur_sprite].hardbox.top -= work;
+                        picInfo[cur_sprite].hardbox.bottom += work;
 
                     }
 
                     if (black)
 
                     {
-                        ddck.dwColorSpaceLowValue  = DDColorMatch(k[cur_sprite].k, RGB(255,255,255));
+                        ddck.dwColorSpaceLowValue  = DDColorMatch(picInfo[cur_sprite].k, RGB(255,255,255));
 
                         ddck.dwColorSpaceHighValue = ddck.dwColorSpaceLowValue;
-                        k[cur_sprite].k->SetColorKey(DDCKEY_SRCBLT, &ddck);
+                        picInfo[cur_sprite].k->SetColorKey(DDCKEY_SRCBLT, &ddck);
 
                     }
 
                     else
 
                     {
-                        ddck.dwColorSpaceLowValue  = DDColorMatch(k[cur_sprite].k, RGB(0,0,0));                 
+                        ddck.dwColorSpaceLowValue  = DDColorMatch(picInfo[cur_sprite].k, RGB(0,0,0));                 
                         ddck.dwColorSpaceHighValue = ddck.dwColorSpaceLowValue;
-                        k[cur_sprite].k->SetColorKey(DDCKEY_SRCBLT, &ddck);
+                        picInfo[cur_sprite].k->SetColorKey(DDCKEY_SRCBLT, &ddck);
 
                     }
                     cur_sprite++;
@@ -2815,24 +2814,24 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
         sprintf(crap, "%s%s%d.BMP",org,hold,oo);
 
 
-        k[cur_sprite].k = DDSethLoad(lpDD, crap, 0, 0,cur_sprite); 
+        picInfo[cur_sprite].k = DDSethLoad(lpDD, crap, 0, 0,cur_sprite); 
 
 
-        if( k[cur_sprite].k != NULL )
+        if( picInfo[cur_sprite].k != NULL )
         {    
             if ( (oo > 1) & (notanim) )
             {
 
-                k[cur_sprite].yoffset = k[index[nummy].s+1].yoffset;
+                picInfo[cur_sprite].yoffset = picInfo[index[nummy].s+1].yoffset;
             } else
             {
                 if (yoffset > 0)
-                    k[cur_sprite].yoffset = yoffset; else
+                    picInfo[cur_sprite].yoffset = yoffset; else
                 {
 
 
-                    k[cur_sprite].yoffset = (k[cur_sprite].box.bottom - 
-                        (k[cur_sprite].box.bottom / 4)) - (k[cur_sprite].box.bottom / 30);
+                    picInfo[cur_sprite].yoffset = (picInfo[cur_sprite].box.bottom - 
+                        (picInfo[cur_sprite].box.bottom / 4)) - (picInfo[cur_sprite].box.bottom / 30);
 
                 }
             }
@@ -2840,16 +2839,16 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
             if ( (oo > 1 ) & (notanim))
             {
 
-                k[cur_sprite].xoffset =  k[index[nummy].s+1].xoffset;
+                picInfo[cur_sprite].xoffset =  picInfo[index[nummy].s+1].xoffset;
             } else
             {
 
                 if (xoffset > 0)
-                    k[cur_sprite].xoffset = xoffset; else
+                    picInfo[cur_sprite].xoffset = xoffset; else
 
                 {
-                    k[cur_sprite].xoffset = (k[cur_sprite].box.right - 
-                        (k[cur_sprite].box.right / 2)) + (k[cur_sprite].box.right / 6);
+                    picInfo[cur_sprite].xoffset = (picInfo[cur_sprite].box.right - 
+                        (picInfo[cur_sprite].box.right / 2)) + (picInfo[cur_sprite].box.right / 6);
                 }
             }
             //ok, setup main offsets, lets build the hard block
@@ -2857,42 +2856,42 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
             if (hardbox.right > 0) 
             {     
                 //forced setting      
-                k[cur_sprite].hardbox.left = hardbox.left;
-                k[cur_sprite].hardbox.right = hardbox.right;
+                picInfo[cur_sprite].hardbox.left = hardbox.left;
+                picInfo[cur_sprite].hardbox.right = hardbox.right;
             }
             else
             {
                 //guess setting   
-                work = k[cur_sprite].box.right / 4;
-                k[cur_sprite].hardbox.left -= work;
-                k[cur_sprite].hardbox.right += work;
+                work = picInfo[cur_sprite].box.right / 4;
+                picInfo[cur_sprite].hardbox.left -= work;
+                picInfo[cur_sprite].hardbox.right += work;
 
             }
 
             if (hardbox.bottom > 0) 
             {
-                k[cur_sprite].hardbox.top = hardbox.top;                  
-                k[cur_sprite].hardbox.bottom = hardbox.bottom;
+                picInfo[cur_sprite].hardbox.top = hardbox.top;                  
+                picInfo[cur_sprite].hardbox.bottom = hardbox.bottom;
 
             }
             else
             {
-                work = k[cur_sprite].box.bottom / 10;
-                k[cur_sprite].hardbox.top -= work;
-                k[cur_sprite].hardbox.bottom += work;
+                work = picInfo[cur_sprite].box.bottom / 10;
+                picInfo[cur_sprite].hardbox.top -= work;
+                picInfo[cur_sprite].hardbox.bottom += work;
             }
 
         }
 
         if (leftalign)
         {         
-            //     k[cur_sprite].xoffset = 0;
-            //     k[cur_sprite].yoffset = 0;
+            //     picInfo[cur_sprite].xoffset = 0;
+            //     picInfo[cur_sprite].yoffset = 0;
         }
 
         //add_text(crap,"LOG.TXT"); 
 
-        if( k[cur_sprite].k == NULL )
+        if( picInfo[cur_sprite].k == NULL )
         {
             if (oo < 2)
             {
@@ -2913,8 +2912,8 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
 
 
         if (black)
-            DDSetColorKey(k[cur_sprite].k, RGB(0,0,0));
-        else DDSetColorKey(k[cur_sprite].k, RGB(255,255,255));
+            DDSetColorKey(picInfo[cur_sprite].k, RGB(0,0,0));
+        else DDSetColorKey(picInfo[cur_sprite].k, RGB(255,255,255));
 
 
         cur_sprite++;
@@ -2980,16 +2979,16 @@ void figure_out(char line[255], int load_seq)
         //           name   seq    speed       offsetx     offsety       hardx      hardy   
 
 
-        //if (k[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
+        //if (picInfo[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
 
         myseq = atol(ev[2]);
         myframe = atol(ev[3]);
-        k[seq[myseq].frame[myframe]].xoffset = atol(ev[4]);
-        k[seq[myseq].frame[myframe]].yoffset = atol(ev[5]);
-        k[seq[myseq].frame[myframe]].hardbox.left = atol(ev[6]);
-        k[seq[myseq].frame[myframe]].hardbox.top = atol(ev[7]);
-        k[seq[myseq].frame[myframe]].hardbox.right = atol(ev[8]);
-        k[seq[myseq].frame[myframe]].hardbox.bottom = atol(ev[9]);
+        picInfo[seq[myseq].frame[myframe]].xoffset = atol(ev[4]);
+        picInfo[seq[myseq].frame[myframe]].yoffset = atol(ev[5]);
+        picInfo[seq[myseq].frame[myframe]].hardbox.left = atol(ev[6]);
+        picInfo[seq[myseq].frame[myframe]].hardbox.top = atol(ev[7]);
+        picInfo[seq[myseq].frame[myframe]].hardbox.right = atol(ev[8]);
+        picInfo[seq[myseq].frame[myframe]].hardbox.bottom = atol(ev[9]);
     }
 
     if (compare(ev[1],"SET_FRAME_SPECIAL"))
@@ -2997,7 +2996,7 @@ void figure_out(char line[255], int load_seq)
         //           name   seq    speed       offsetx     offsety       hardx      hardy   
 
 
-        //if (k[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
+        //if (picInfo[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
 
         myseq = atol(ev[2]);
         myframe = atol(ev[3]);
@@ -3012,7 +3011,7 @@ void figure_out(char line[255], int load_seq)
         //           name   seq    speed       offsetx     offsety       hardx      hardy   
 
 
-        //if (k[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
+        //if (picInfo[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
 
         myseq = atol(ev[2]);
         myframe = atol(ev[3]);
@@ -3044,7 +3043,7 @@ void figure_out(char line[255], int load_seq)
         //           name   seq    speed       offsetx     offsety       hardx      hardy   
 
 
-        //if (k[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
+        //if (picInfo[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
 
         myseq = atol(ev[2]);
         myframe = atol(ev[3]);
@@ -3068,9 +3067,9 @@ void program_idata(void)
 
         if (id[i].type == 1)
         {
-            k[seq[id[i].seq].frame[id[i].frame]].xoffset = id[i].xoffset;
-            k[seq[id[i].seq].frame[id[i].frame]].yoffset = id[i].yoffset;
-            CopyRect(&k[seq[id[i].seq].frame[id[i].frame]].hardbox, &id[i].hardbox);
+            picInfo[seq[id[i].seq].frame[id[i].frame]].xoffset = id[i].xoffset;
+            picInfo[seq[id[i].seq].frame[id[i].frame]].yoffset = id[i].yoffset;
+            CopyRect(&picInfo[seq[id[i].seq].frame[id[i].frame]].hardbox, &id[i].hardbox);
 
             //   Msg("Programming idata type %d in %d...Seq %d Frame %d (Hardbox is %d %d %d %d)", id[i].type, i,
             //  id[i].seq, id[i].frame, id[i].hardbox.left,id[i].hardbox.right, id[i].hardbox.top, id[i].hardbox.bottom);
@@ -3244,7 +3243,7 @@ void pre_figure_out(char line[255], int load_seq)
         //           name   seq    speed       offsetx     offsety       hardx      hardy   
 
 
-        //if (k[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
+        //if (picInfo[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
 
         myseq = atol(ev[2]);
         myframe = atol(ev[3]);
@@ -3293,7 +3292,7 @@ void pre_figure_out(char line[255], int load_seq)
         //           name   seq    speed       offsetx     offsety       hardx      hardy   
 
 
-        //if (k[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
+        //if (picInfo[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
 
         myseq = atol(ev[2]);
         myframe = atol(ev[3]);
@@ -3385,10 +3384,10 @@ void kill_fonts()
 int draw_num(int mseq, char nums[50], int mx, int my)
 {
     int length = 0;
-    HRESULT             ddrval;
+    HRESULT ddrVal;
     int rnum = 0;
 
-    for (int i=0; i < strlen(nums); i++)
+    for (int i=0; i < (int)strlen(nums); i++)
     {
 
         if (nums[i] == '0') rnum = 10;
@@ -3404,25 +3403,25 @@ int draw_num(int mseq, char nums[50], int mx, int my)
         else if (nums[i] == '/') rnum = 11;
 again:          
         if ( (rnum != 11) && (!(mseq == 442)) )
-            ddrval = lpDDSTwo->BltFast( mx+length, my, k[seq[mseq].frame[rnum]].k,
-            &k[seq[mseq].frame[rnum]].box  , DDBLTFAST_NOCOLORKEY);
+            ddrVal = lpDDSTwo->BltFast( mx+length, my, picInfo[seq[mseq].frame[rnum]].k,
+            &picInfo[seq[mseq].frame[rnum]].box  , DDBLTFAST_NOCOLORKEY);
 
         else 
-            ddrval = lpDDSTwo->BltFast( mx+length, my, k[seq[mseq].frame[rnum]].k,
-            &k[seq[mseq].frame[rnum]].box  , DDBLTFAST_SRCCOLORKEY);
+            ddrVal = lpDDSTwo->BltFast( mx+length, my, picInfo[seq[mseq].frame[rnum]].k,
+            &picInfo[seq[mseq].frame[rnum]].box  , DDBLTFAST_SRCCOLORKEY);
 
 
-        if (ddrval != DD_OK)
+        if (ddrVal != DD_OK)
         {
 
-            if (ddrval == DDERR_WASSTILLDRAWING) goto again;
+            if (ddrVal == DDERR_WASSTILLDRAWING) goto again;
 
-            //dderror(ddrval);
+            //dderror(ddrVal);
 
         } else
         {
 
-            length += k[seq[mseq].frame[rnum]].box.right;
+            length += picInfo[seq[mseq].frame[rnum]].box.right;
         }
     }
     return(length);
@@ -3443,21 +3442,21 @@ void draw_exp()
 {
     char buffer[30];
     char nums[30];
-    char buf[30];
+    //char buf[30];
     char final[30];
 
     //Msg("Drawing exp.. which is %d and %d",fexp, *pexp);
     strcpy(final, "");
     strcpy(nums,ltoa(fexp, buffer, 10));
     if (strlen(nums) < 5)
-        for (int i = 1; i < (6 - strlen(nums)); i++)
+        for (int i = 1; i < (6 - (int)strlen(nums)); i++)
             strcat(final, "0");
     strcat(final, nums);
     strcat(final,"/");
 
     strcpy(nums,ltoa(fraise, buffer, 10));
     if (strlen(nums) < 5)
-        for (int i = 1; i < (6 - strlen(nums)); i++)
+        for (int i = 1; i < (6 - (int)strlen(nums)); i++)
             strcat(final, "0");
     strcat(final, nums);
     draw_num(181, final, 404, 459);
@@ -3475,7 +3474,7 @@ void draw_strength()
 
     strcpy(nums,ltoa(fstrength, buffer, 10));
     if (strlen(nums) < 3)
-        for (int i = 1; i < (4 - strlen(nums)); i++)
+        for (int i = 1; i < (4 - (int)strlen(nums)); i++)
             strcat(final, "0");
     strcat(final, nums);
     //Msg("Drawing %s..",final);
@@ -3492,7 +3491,7 @@ void draw_defense()
     strcpy(final, "");
     strcpy(nums,ltoa(fdefense, buffer, 10));
     if (strlen(nums) < 3)
-        for (int i = 1; i < (4 - strlen(nums)); i++)
+        for (int i = 1; i < (4 - (int)strlen(nums)); i++)
             strcat(final, "0");
     strcat(final, nums);
     draw_num(183, final, 81, 437);
@@ -3508,7 +3507,7 @@ void draw_magic()
     strcpy(final, "");
     strcpy(nums,ltoa(fmagic, buffer, 10));
     if (strlen(nums) < 3)
-        for (int i = 1; i < (4 - strlen(nums)); i++)
+        for (int i = 1; i < (4 - (int)strlen(nums)); i++)
             strcat(final, "0");
     strcat(final, nums);
     draw_num(184, final, 81, 459);
@@ -3519,7 +3518,7 @@ void draw_level()
 {
     char final[30];
     char buffer[30];
-    char nums[30];
+    //char nums[30];
     //*plevel = 15;
     //Msg("Drawing level.. which is %d ",*plevel);
     strcpy(final, ltoa(*plevel, buffer, 10));
@@ -3541,7 +3540,7 @@ void draw_gold()
     strcpy(final, "");
     strcpy(nums,ltoa(fgold, buffer, 10));
     if (strlen(nums) < 5)
-        for (int i = 1; i < (6 - strlen(nums)); i++)
+        for (int i = 1; i < (6 - (int)strlen(nums)); i++)
             strcat(final, "0");
     strcat(final, nums);
     draw_num(185, final, 298, 457);
@@ -3570,12 +3569,12 @@ void draw_bar(int life, int seqman)
             if (rem != 0)
             {
 
-                CopyRect(&box, &k[seq[seqman].frame[rnum]].box);
+                CopyRect(&box, &picInfo[seq[seqman].frame[rnum]].box);
                 //Msg("Drawing part bar . cur is %d", rem);
                 box.right = (box.right * ((rem) * 10)/100);
                 //woah, there is part of a bar remaining.  Lets do it.
 again:
-                ddrval = lpDDSTwo->BltFast( curx, cury, k[seq[seqman].frame[rnum]].k,
+                ddrval = lpDDSTwo->BltFast( curx, cury, picInfo[seq[seqman].frame[rnum]].k,
                     &box                      , DDBLTFAST_NOCOLORKEY);
 
                 if (ddrval == DDERR_WASSTILLDRAWING) goto again;
@@ -3595,15 +3594,15 @@ again:
         {
 
 again2:
-            ddrval = lpDDSTwo->BltFast( curx, cury, k[seq[seqman].frame[rnum]].k,
-                &k[seq[seqman].frame[rnum]].box  , DDBLTFAST_NOCOLORKEY);
+            ddrval = lpDDSTwo->BltFast( curx, cury, picInfo[seq[seqman].frame[rnum]].k,
+                &picInfo[seq[seqman].frame[rnum]].box  , DDBLTFAST_NOCOLORKEY);
 
             if (ddrval == DDERR_WASSTILLDRAWING) goto again2;
 
             //if (ddrval != DD_OK) dderror(ddrval);
-            curx += k[seq[seqman].frame[rnum]].box.right;
+            curx += picInfo[seq[seqman].frame[rnum]].box.right;
             if (cur == 110)
-            {cury += k[seq[seqman].frame[rnum]].box.bottom+5;
+            {cury += picInfo[seq[seqman].frame[rnum]].box.bottom+5;
             curx = curx_start;
 
             }
@@ -3634,8 +3633,8 @@ again:
         check_seq_status(play.item[*pcur_weapon].seq);
 
 
-        ddrval = lpDDSTwo->BltFast( 557, 413, k[seq[play.item[*pcur_weapon].seq].frame[play.item[*pcur_weapon].frame]].k,
-            &k[seq[play.item[*pcur_weapon].seq].frame[play.item[*pcur_weapon].frame]].box, DDBLTFAST_SRCCOLORKEY);
+        ddrval = lpDDSTwo->BltFast( 557, 413, picInfo[seq[play.item[*pcur_weapon].seq].frame[play.item[*pcur_weapon].frame]].k,
+            &picInfo[seq[play.item[*pcur_weapon].seq].frame[play.item[*pcur_weapon].frame]].box, DDBLTFAST_SRCCOLORKEY);
 
         if (ddrval == DDERR_WASSTILLDRAWING) goto again;
 
@@ -3650,8 +3649,8 @@ again:
 
 
 again2:
-        ddrval = lpDDSTwo->BltFast( 153, 413, k[seq[play.mitem[*pcur_magic].seq].frame[play.mitem[*pcur_magic].frame]].k,
-            &k[seq[play.mitem[*pcur_magic].seq].frame[play.mitem[*pcur_magic].frame]].box, DDBLTFAST_SRCCOLORKEY);
+        ddrval = lpDDSTwo->BltFast( 153, 413, picInfo[seq[play.mitem[*pcur_magic].seq].frame[play.mitem[*pcur_magic].frame]].k,
+            &picInfo[seq[play.mitem[*pcur_magic].seq].frame[play.mitem[*pcur_magic].frame]].box, DDBLTFAST_SRCCOLORKEY);
 
         if (ddrval == DDERR_WASSTILLDRAWING) goto again2;
 
@@ -3668,14 +3667,14 @@ void draw_virtical(int percent, int mx, int my, int mseq, int mframe)
     if (percent > 25) percent = 25;
     percent = (percent * 4);
     RECT myrect;
-    CopyRect(&myrect, &k[seq[mseq].frame[mframe]].box);
+    CopyRect(&myrect, &picInfo[seq[mseq].frame[mframe]].box);
     int full = myrect.bottom;
     cut = (full * percent) / 100;
 
     myrect.bottom = cut;
     my += (full - cut);
 
-    ddrval = lpDDSTwo->BltFast( mx, my, k[seq[mseq].frame[mframe]].k,
+    ddrval = lpDDSTwo->BltFast( mx, my, picInfo[seq[mseq].frame[mframe]].k,
         &myrect, DDBLTFAST_NOCOLORKEY);
 
 
@@ -3687,14 +3686,14 @@ void draw_virt2(int percent, int mx, int my, int mseq, int mframe)
     if (percent > 25) percent = 25;
     percent = (percent * 4);
     RECT myrect;
-    CopyRect(&myrect, &k[seq[mseq].frame[mframe]].box);
+    CopyRect(&myrect, &picInfo[seq[mseq].frame[mframe]].box);
     int full = myrect.bottom;
     cut = (full * percent) / 100;
     myrect.bottom = cut;
 
 
 again:
-    ddrval = lpDDSTwo->BltFast( mx, my, k[seq[mseq].frame[mframe]].k,
+    ddrval = lpDDSTwo->BltFast( mx, my, picInfo[seq[mseq].frame[mframe]].k,
         &myrect, DDBLTFAST_NOCOLORKEY);
 
     if (ddrval == DDERR_WASSTILLDRAWING) goto again;
@@ -3708,13 +3707,13 @@ void draw_hor(int percent, int mx, int my, int mseq, int mframe)
     if (percent > 25) percent = 25;
     percent = (percent * 4);
     RECT myrect;
-    CopyRect(&myrect, &k[seq[mseq].frame[mframe]].box);
+    CopyRect(&myrect, &picInfo[seq[mseq].frame[mframe]].box);
     int full = myrect.right;
     cut = (full * percent) / 100;
     full = cut;
     myrect.right = full;
 again:
-    ddrval = lpDDSTwo->BltFast( mx, my, k[seq[mseq].frame[mframe]].k,
+    ddrval = lpDDSTwo->BltFast( mx, my, picInfo[seq[mseq].frame[mframe]].k,
         &myrect, DDBLTFAST_NOCOLORKEY);
 
     if (ddrval == DDERR_WASSTILLDRAWING) goto again;
@@ -3728,7 +3727,7 @@ void draw_hor2(int percent, int mx, int my, int mseq, int mframe)
     if (percent > 25) percent = 25;
     percent = (percent * 4);
     RECT myrect;
-    CopyRect(&myrect, &k[seq[mseq].frame[mframe]].box);
+    CopyRect(&myrect, &picInfo[seq[mseq].frame[mframe]].box);
     int full = myrect.right;
     cut = (full * percent) / 100;
 
@@ -3737,7 +3736,7 @@ void draw_hor2(int percent, int mx, int my, int mseq, int mframe)
 
 
 again:
-    ddrval = lpDDSTwo->BltFast( mx, my, k[seq[mseq].frame[mframe]].k,
+    ddrval = lpDDSTwo->BltFast( mx, my, picInfo[seq[mseq].frame[mframe]].k,
         &myrect, DDBLTFAST_NOCOLORKEY);
 
     if (ddrval == DDERR_WASSTILLDRAWING) goto again;
@@ -3777,7 +3776,7 @@ void draw_status_all(void)
     rcRect.bottom = 80;
 
 again:
-    ddrval = lpDDSTwo->BltFast( 0, 400, k[seq[180].frame[3]].k,
+    ddrval = lpDDSTwo->BltFast( 0, 400, picInfo[seq[180].frame[3]].k,
         &rcRect  , DDBLTFAST_NOCOLORKEY );
 
     if (ddrval == DDERR_WASSTILLDRAWING) goto again;
@@ -3787,14 +3786,14 @@ again:
     rcRect.right = 20;
     rcRect.bottom = 400;
 again2:
-    ddrval = lpDDSTwo->BltFast( 0, 0, k[seq[180].frame[1]].k,
+    ddrval = lpDDSTwo->BltFast( 0, 0, picInfo[seq[180].frame[1]].k,
         &rcRect  , DDBLTFAST_NOCOLORKEY  );
 
     if (ddrval == DDERR_WASSTILLDRAWING) goto again2;
 
 
 again3:
-    ddrval = lpDDSTwo->BltFast( 620, 0,k[seq[180].frame[2]].k,
+    ddrval = lpDDSTwo->BltFast( 620, 0,picInfo[seq[180].frame[2]].k,
         &rcRect  , DDBLTFAST_NOCOLORKEY  );
 
     if (ddrval == DDERR_WASSTILLDRAWING) goto again3;
@@ -3877,7 +3876,7 @@ int add_sprite_dumb(int x1, int y, int brain,int pseq, int pframe,int size )
 
             if ( spr[x].custom == NULL )
             {
-                spr[x].custom = new std::map<std::string, int>;
+                spr[x].custom = new Common::HashMap<Common::String, int>();
             }
             else
             {
@@ -3894,10 +3893,10 @@ int add_sprite_dumb(int x1, int y, int brain,int pseq, int pframe,int size )
 
 
 
-bool get_box (int h, RECT * box_crap, RECT * box_real )
+bool get_box (int h, RECT * boxCrap, RECT * boxReal )
 {
-    RECT math;
-    int sz,sy,x_offset,y_offset;
+    RECT mathRect;
+    int sZ,sY,xOffset,yOffset;
 
     int mplayx = playx;
     int mplayl = playl;
@@ -3926,36 +3925,36 @@ bool get_box (int h, RECT * box_crap, RECT * box_real )
         //spr[h].pic = 44;
     }
 
-    int txoffset = k[getpic(h)].xoffset;
-    int tyoffset = k[getpic(h)].yoffset;
+    int txoffset = picInfo[getpic(h)].xoffset;
+    int tyoffset = picInfo[getpic(h)].yoffset;
 
 
 
 
-    *box_real = k[getpic(h)].box;
-    CopyRect(&krect, &k[getpic(h)].box);
+    *boxReal = picInfo[getpic(h)].box;
+    CopyRect(&krect, &picInfo[getpic(h)].box);
 
-    if (spr[h].size != 100) sz =    ((krect.right * spr[h].size) / 100); else sz = 0;
-    if (spr[h].size != 100) sy =    ((krect.bottom * spr[h].size) / 100); else sy = 0;
+    if (spr[h].size != 100) sZ =    ((krect.right * spr[h].size) / 100); else sZ = 0;
+    if (spr[h].size != 100) sY =    ((krect.bottom * spr[h].size) / 100); else sY = 0;
 
     if (spr[h].size != 100)
     {
-        sz = ((sz - krect.right) / 2);
-        sy = ((sy - krect.bottom) / 2);
+        sZ = ((sZ - krect.right) / 2);
+        sY = ((sY - krect.bottom) / 2);
     }
 
 
-    box_crap->left = spr[h].x-txoffset-sz;
-    math.left = spr[h].x-txoffset;
+    boxCrap->left = spr[h].x-txoffset-sZ;
+    mathRect.left = spr[h].x-txoffset;
 
-    box_crap->top = spr[h].y - tyoffset-sy;
-    math.top = spr[h].y-tyoffset;
+    boxCrap->top = spr[h].y - tyoffset-sY;
+    mathRect.top = spr[h].y-tyoffset;
 
-    box_crap->right = (math.left+ (krect.right -krect.left)) + sz;
-    math.right = math.left+ krect.right;
+    boxCrap->right = (mathRect.left+ (krect.right -krect.left)) + sZ;
+    mathRect.right = mathRect.left+ krect.right;
 
-    box_crap->bottom = (math.top + (krect.bottom - krect.top)) + sy;
-    math.bottom = math.top + krect.bottom;
+    boxCrap->bottom = (mathRect.top + (krect.bottom - krect.top)) + sY;
+    mathRect.bottom = mathRect.top + krect.bottom;
     //if (OffsetRect(&spr[h].alt2,44,33) == 0) Msg("Error with set rect");
 
 
@@ -3964,26 +3963,26 @@ bool get_box (int h, RECT * box_crap, RECT * box_real )
         //redink1 checks for correct box stuff
         if (spr[h].alt.left < 0)
             spr[h].alt.left = 0;
-        if (spr[h].alt.left > k[getpic(h)].box.right)
-            spr[h].alt.left =  k[getpic(h)].box.right;
+        if (spr[h].alt.left > picInfo[getpic(h)].box.right)
+            spr[h].alt.left =  picInfo[getpic(h)].box.right;
         if (spr[h].alt.top < 0)
             spr[h].alt.top = 0;
-        if (spr[h].alt.top > k[getpic(h)].box.bottom)
-            spr[h].alt.top =  k[getpic(h)].box.bottom;
+        if (spr[h].alt.top > picInfo[getpic(h)].box.bottom)
+            spr[h].alt.top =  picInfo[getpic(h)].box.bottom;
         if (spr[h].alt.right < 0)
             spr[h].alt.right = 0;
-        if (spr[h].alt.right > k[getpic(h)].box.right)
-            spr[h].alt.right =  k[getpic(h)].box.right;
+        if (spr[h].alt.right > picInfo[getpic(h)].box.right)
+            spr[h].alt.right =  picInfo[getpic(h)].box.right;
         if (spr[h].alt.bottom < 0)
             spr[h].alt.bottom = 0;
-        if (spr[h].alt.bottom > k[getpic(h)].box.bottom)
-            spr[h].alt.bottom =  k[getpic(h)].box.bottom;
+        if (spr[h].alt.bottom > picInfo[getpic(h)].box.bottom)
+            spr[h].alt.bottom =  picInfo[getpic(h)].box.bottom;
         //spr[h].alt.bottom = 10;   
-        box_crap->left = box_crap->left +  spr[h].alt.left;
-        box_crap->top = box_crap->top + spr[h].alt.top;
-        box_crap->right = box_crap->right -  (k[getpic(h)].box.right - spr[h].alt.right);
-        box_crap->bottom = box_crap->bottom - (k[getpic(h)].box.bottom - spr[h].alt.bottom);
-        CopyRect(box_real, &spr[h].alt);
+        boxCrap->left = boxCrap->left +  spr[h].alt.left;
+        boxCrap->top = boxCrap->top + spr[h].alt.top;
+        boxCrap->right = boxCrap->right -  (picInfo[getpic(h)].box.right - spr[h].alt.right);
+        boxCrap->bottom = boxCrap->bottom - (picInfo[getpic(h)].box.bottom - spr[h].alt.bottom);
+        CopyRect(boxReal, &spr[h].alt);
         //Msg("I should be changing box size... %d %d,%d,%d",spr[h].alt.right,spr[h].alt.left,spr[h].alt.top,spr[h].alt.bottom);
 
     } 
@@ -4000,54 +3999,54 @@ bool get_box (int h, RECT * box_crap, RECT * box_real )
 
     if (dinkedit) if ( (mode == 1) | (mode == 5) ) if (draw_map_tiny < 1) goto do_draw;
 
-    if (box_crap->left < mplayl)
+    if (boxCrap->left < mplayl)
     {
-        x_offset = box_crap->left * (-1) + mplayl;
-        box_crap->left = mplayl;
-        //box_real->left += (math.left * (-1)) + mplayl;
+        xOffset = boxCrap->left * (-1) + mplayl;
+        boxCrap->left = mplayl;
+        //boxReal->left += (mathRect.left * (-1)) + mplayl;
 
         if (spr[h].size != 100)
-            box_real->left += (((x_offset * 100) / (spr[h].size )) ); else
+            boxReal->left += (((xOffset * 100) / (spr[h].size )) ); else
 
-            box_real->left += x_offset;
-        if (box_crap->right-1 < mplayl) goto nodraw;
+            boxReal->left += xOffset;
+        if (boxCrap->right-1 < mplayl) goto nodraw;
     }
 
-    if (box_crap->top < 0)
+    if (boxCrap->top < 0)
     {
-        y_offset = box_crap->top * (-1);
-        box_crap->top = 0;
+        yOffset = boxCrap->top * (-1);
+        boxCrap->top = 0;
 
-        //box_real->top += math.top * (-1) + 0;
+        //boxReal->top += mathRect.top * (-1) + 0;
         if (spr[h].size != 100)
-            box_real->top += (((y_offset * 100) / (spr[h].size ))  );
+            boxReal->top += (((yOffset * 100) / (spr[h].size ))  );
 
-        else box_real->top += y_offset;
-        if (box_crap->bottom-1 < 0) goto nodraw;
+        else boxReal->top += yOffset;
+        if (boxCrap->bottom-1 < 0) goto nodraw;
     }
 
 
-    if (box_crap->right > mplayx)
+    if (boxCrap->right > mplayx)
     {
-        x_offset = (box_crap->right) - mplayx;
-        box_crap->right = mplayx;
-        //x_real->right -= math.right - mplayx;
+        xOffset = (boxCrap->right) - mplayx;
+        boxCrap->right = mplayx;
+        //x_real->right -= mathRect.right - mplayx;
         if (spr[h].size != 100)
-            box_real->right -= ((x_offset * 100) / (spr[h].size ));
-        else box_real->right -= x_offset;
-        if (box_crap->left+1 > mplayx) goto nodraw;
+            boxReal->right -= ((xOffset * 100) / (spr[h].size ));
+        else boxReal->right -= xOffset;
+        if (boxCrap->left+1 > mplayx) goto nodraw;
 
-        //  Msg("ok, crap right is %d, real right is %d.",box_crap->right - box_crap->left,box_real->right);
+        //  Msg("ok, crap right is %d, real right is %d.",boxCrap->right - boxCrap->left,boxReal->right);
     }
 
-    if (box_crap->bottom > mplayy)
+    if (boxCrap->bottom > mplayy)
     {
-        y_offset = (box_crap->bottom) - mplayy;
-        box_crap->bottom = mplayy;
+        yOffset = (boxCrap->bottom) - mplayy;
+        boxCrap->bottom = mplayy;
         if (spr[h].size != 100)
-            box_real->bottom -= ((y_offset * 100) / (spr[h].size ));
-        else box_real->bottom -= y_offset;
-        if (box_crap->top+1 > mplayy) goto nodraw;
+            boxReal->bottom -= ((yOffset * 100) / (spr[h].size ));
+        else boxReal->bottom -= yOffset;
+        if (boxCrap->top+1 > mplayy) goto nodraw;
     }
 
 
@@ -4058,7 +4057,7 @@ do_draw:
 
 
 
-    /*if (  (box_crap->right-box_crap->left) != (box_real->right-box_real->left) )
+    /*if (  (boxCrap->right-boxCrap->left) != (boxReal->right-boxReal->left) )
     {
     Msg("Ok, sprite %d is being scaled.", h);
     }
@@ -4074,7 +4073,7 @@ nodraw:
 
 void reload_sprites(char name[100], int nummy, int junk)
 {
-    HRESULT     ddrval;
+    HRESULT     ddrVal;
     PALETTEENTRY    holdpal[256];     
 
     char crap[100],hold[10];
@@ -4092,15 +4091,15 @@ void reload_sprites(char name[100], int nummy, int junk)
         //  Msg( "%s", crap);
 
         //  initFail(hWndMain, crap);
-        ddrval = k[oo].k->Restore();
-        if( ddrval == DD_OK )
+        ddrVal = picInfo[oo].k->Restore();
+        if( ddrVal == DD_OK )
         {
 
 
             if (n < 10) strcpy(hold, "0"); else strcpy(hold,"");
             sprintf(crap, "%s%s%d.BMP",name,hold,n);
 
-            DDReLoadBitmap(k[oo].k, crap);
+            DDReLoadBitmap(picInfo[oo].k, crap);
             //Msg("Sprite %s%d.bmp reloaded into area %d. ",name,n,oo);
 
 
@@ -4113,12 +4112,12 @@ void reload_sprites(char name[100], int nummy, int junk)
 
 
 
-void refigure_out(char line[255])
+void refigure_out(const char *line)
 {
     char ev[15][100];
     RECT hardbox;
     ZeroMemory(&ev,sizeof(ev));
-    int myseq = 0,myframe = 0;
+    //int myseq = 0, myframe = 0;
 
     for (int i=1; i <= 14; i++)
     {
@@ -4139,43 +4138,22 @@ void refigure_out(char line[255])
 
 void reload_batch(void)
 {
-    int crapint;
-
-    FILE *stream;  
-    char line[255];
+	Common::File f;
+	Common::String line;
 
     Msg("reoading .ini");     
-    if (!exist("dink.ini")) 
-    {
+
+	if (!f.open("dink.ini")) {
         Msg("File not found.");   
 
-        //    sprintf(line,"Error finding the dink.ini file in the %s dir.",dir);
-        //   TRACE(line);
-
-    }
-
-
-
-
-    if( (stream = fopen( "dink.ini", "r" )) != NULL )   
-    {
-        while(1)
-        {
-            if( fgets( line, 255, stream ) == NULL) 
-                goto done;
-            else    
-            {
-                refigure_out(line);
-            }
+	} else {
+        while (f.eos()) {
+			line = f.readLine();
+            refigure_out(line.c_str());
         }
 
-done:
-        fclose( stream );  
-    } else
-    {
-        //  TRACE("Dink.ini missing.");
+		f.close();
     }
-
 }
 
 void strchar(char *string, char ch)
@@ -4204,35 +4182,30 @@ void kill_callbacks_owned_by_script(int script)
 
 
 }
-void kill_script(int k)
-{
-    int i;
-    if (rinfo[k] != NULL)
-    {
 
-        kill_callbacks_owned_by_script(k);
+void kill_script(int num) {
+    if (rinfo[num] != NULL) {
+
+        kill_callbacks_owned_by_script(num);
 
         //now lets kill all local vars assocated with this script
 
         for (int i = 1; i < max_vars; i++)
         {
-            if (play.var[i].active) if (play.var[i].scope == k)
+            if (play.var[i].active) if (play.var[i].scope == num)
             {
                 play.var[i].active = false;
             }
 
         }
-        if (debug_mode) Msg("Killed script %s. (num %d)", rinfo[k]->name, k);
+        if (debug_mode) Msg("Killed script %s. (num %d)", rinfo[num]->name, num);
 
 
-        free(rinfo[k]);
-        rinfo[k] = NULL;
-        free(rbuf[k]);
-        rbuf[k] = NULL;
+        free(rinfo[num]);
+        rinfo[num] = NULL;
+        free(rbuf[num]);
+        rbuf[num] = NULL;
     }
-
-
-
 }
 
 
@@ -4240,24 +4213,26 @@ void kill_script(int k)
 
 void kill_all_scripts(void)
 {
-    for (int k = 1; k < max_scripts; k++)
+	int ii;
+
+    for (ii = 1; ii < max_scripts; ii++)
     {
 
-        if (rinfo[k] != NULL) if (rinfo[k]->sprite != 1000)
-            kill_script(k);
+        if (rinfo[ii] != NULL) if (rinfo[ii]->sprite != 1000)
+            kill_script(ii);
     }
 
-    for ( k = 1; k <= max_callbacks; k++)
+    for ( ii = 1; ii <= max_callbacks; ii++)
     {
-        if (callback[k].active)
+        if (callback[ii].active)
         {
-            if ( (rinfo[callback[k].owner] != NULL) && (rinfo[callback[k].owner]->sprite == 1000) )
+            if ( (rinfo[callback[ii].owner] != NULL) && (rinfo[callback[ii].owner]->sprite == 1000) )
             {
 
             } else
             {
-                if (debug_mode) Msg("Killed callback %d.  (was attached to script %d.)",k, callback[k].owner);      
-                callback[k].active = 0;
+                if (debug_mode) Msg("Killed callback %d.  (was attached to script %d.)",ii, callback[ii].owner);      
+                callback[ii].active = 0;
             }
         }
     }
@@ -4265,17 +4240,19 @@ void kill_all_scripts(void)
 
 void kill_all_scripts_for_real(void)
 {
-    for (int k = 1; k < max_scripts; k++)
+	int ii;
+
+    for (ii = 1; ii < max_scripts; ii++)
     {
 
-        if (rinfo[k] != NULL) 
-            kill_script(k);
+        if (rinfo[ii] != NULL) 
+            kill_script(ii);
     }
 
-    for ( k = 1; k <= max_callbacks; k++)
+    for ( ii = 1; ii <= max_callbacks; ii++)
     {
 
-        callback[k].active = 0;
+        callback[ii].active = 0;
     }
 }
 
@@ -4304,15 +4281,15 @@ bool read_next_line(int script, char *line)
 
     strcpy(line, "");
 
-    for (int k = rinfo[script]->current;  (k < rinfo[script]->end); k++)
+    for (int ii = rinfo[script]->current;  (ii < rinfo[script]->end); ii++)
     {
 
 
-        //      Msg("..%d",k);
-        strchar(line, rbuf[script][k]);
+        //      Msg("..%d",ii);
+        strchar(line, rbuf[script][ii]);
         rinfo[script]->current++;
 
-        if (  (rbuf[script][k] == '\n') || (rbuf[script][k] == '\r')  )
+        if (  (rbuf[script][ii] == '\n') || (rbuf[script][ii] == '\r')  )
         {
             return(true);
         }
@@ -4325,30 +4302,31 @@ bool read_next_line(int script, char *line)
 }
 
 
-void decompress (FILE *in)
-{
+void decompress(Common::SeekableReadStream *in) {
     unsigned char stack[16], pair[128][2];
-    short c, top = 0;
+    byte c, top = 0;
 
     /* Check for optional pair count and pair table */
-    if ((c = getc(in)) > 127)
-        fread(pair,2,c-128,in);
-    else
-    {
-        if (c == '\r') c = '\n';
-        if (c == 9) c = ' ';
+    if ((c = in->readByte()) > 127) {
+        in->read(pair, 2 * (c - 128));
+	} else {
+        if (c == '\r')
+			c = '\n';
+        if (c == 9)
+			c = ' ';
 
         strchar(cbuf,c);
     }
-    //    putc(c,out);
 
     for (;;) {
-
         /* Pop byte from stack or read byte from file */
         if (top)
             c = stack[--top];
-        else if ((c = getc(in)) == EOF)
-            break;
+		else {
+			c = in->readByte();
+			if (in->eos())
+				break;
+		}
 
         /* Push pair on stack or output byte to file */
         if (c > 127) {
@@ -4366,9 +4344,11 @@ void decompress (FILE *in)
 }
 
 
-void decompress_nocomp (FILE *in)
-{
-    //let's do it, only this time decompile OUR style
+void decompress_nocomp(Common::SeekableReadStream *in) {
+	// TODO: Check for getc below for > 255.
+	// Does getc support UTF8 or Unicode?
+#ifdef TODO
+	//let's do it, only this time decompile OUR style
 
     unsigned char stack[16], pair[128][2];
     short c, top = 0;
@@ -4406,6 +4386,7 @@ void decompress_nocomp (FILE *in)
             strchar(cbuf,c);//     putc(c,out);
         }
     }
+#endif
 }
 
 
@@ -4414,12 +4395,12 @@ int load_script(const char *filename, int sprite, bool set_sprite)
 
     char temp[100];
     int script;
-    FILE *stream;  
-    int fh;
+	Common::File f;
+//    int fh;
     bool comp = false;
     char tab[10];
 
-    char line[500];
+//    char line[500];
 
     Msg("LOADING %s",filename);
     sprintf(tab, "%c",9);
@@ -4460,14 +4441,13 @@ int load_script(const char *filename, int sprite, bool set_sprite)
     if (temp[strlen(temp)-1] == 'D') comp = true; else comp = false;
 
 
-    for (int k=1; k < max_scripts; k++)
+    for (int ii=1; ii < max_scripts; ii++)
     {
-        if (rbuf[k] == NULL)
+        if (rbuf[ii] == NULL)
         {
             //found one not being used
             goto found;
         }
-
     }
 
     Msg("Couldn't find unused buffer for script.");
@@ -4477,7 +4457,7 @@ int load_script(const char *filename, int sprite, bool set_sprite)
 found:
 
 
-    script = k;
+    script = max_scripts;
 
     rinfo[script] = (struct refinfo *) malloc( sizeof(struct refinfo));
 
@@ -4487,8 +4467,7 @@ found:
     //if compiled
     {
         //load compiled script
-        if ((stream =fopen(temp, "rb"))==NULL) 
-        {
+        if (!f.open(temp)) {
             Msg("Script %s not found. (checked for .C and .D) (requested by %d?)",temp, sprite);
             return(0);
         }
@@ -4497,11 +4476,11 @@ found:
         //Msg("decompressing!");
 
         if (comp)
-            decompress(stream);
+            decompress(&f);
         else 
-            decompress_nocomp(stream);
+            decompress_nocomp(&f);
 
-        fclose( stream );  
+		f.close();
 
         //Msg("done decompressing!");
 
@@ -4638,7 +4617,7 @@ bool locate_goto(char proc[50], int script)
     rinfo[script]->current = 0;
     char line[200];
     char ev[3][100];
-    char temp[100];
+//    char temp[100];
     replace(";", "",proc);
     strchar(proc, ':');
     //  Msg("locate is looking for %s", proc);
@@ -5085,20 +5064,20 @@ int add_callback(char name[20], int n1, int n2, int script)
 {
 
 
-    for (int k = 1; k < max_callbacks; k++)
+    for (int ii = 1; ii < max_callbacks; ii++)
     {
-        if (callback[k].active == false)
+        if (callback[ii].active == false)
         {
-            memset(&callback[k],0, sizeof(callback[k]));
+            memset(&callback[ii],0, sizeof(callback[ii]));
 
-            callback[k].active = true;
-            callback[k].min = n1;
-            callback[k].max = n2;
-            callback[k].owner = script;
-            strcpy(callback[k].name, name);
+            callback[ii].active = true;
+            callback[ii].min = n1;
+            callback[ii].max = n2;
+            callback[ii].owner = script;
+            strcpy(callback[ii].name, name);
 
-            if (debug_mode) Msg("Callback added to %d.", k);
-            return(k);
+            if (debug_mode) Msg("Callback added to %d.", ii);
+            return(ii);
         }
 
     }
@@ -5145,7 +5124,7 @@ int add_sprite(int x1, int y, int brain,int pseq, int pframe )
 
             if ( spr[x].custom == NULL )
             {
-                spr[x].custom = new std::map<std::string, int>;
+                spr[x].custom = new Common::HashMap<Common::String, int>();
             }
             else
             {
@@ -5177,7 +5156,7 @@ void check_sprite_status(int h)
             //it's been loaded before.. is it lost or still there?
             //Msg("Sprite %d's seq is %d",h,spr[h].seq);
 
-            dderror = k[seq[spr[h].pseq].frame[1]].k->IsLost();
+            dderror = picInfo[seq[spr[h].pseq].frame[1]].k->IsLost();
 
             if (dderror == DDERR_SURFACELOST)
             {
@@ -5200,7 +5179,7 @@ void check_sprite_status(int h)
 void check_frame_status(int h, int frame)
 
 {
-    HRESULT dderror;
+//    HRESULT dderror;
     char word1[80];
 
     if (seq[h].active == false) return;
@@ -5219,11 +5198,11 @@ void check_frame_status(int h, int frame)
             //it's been loaded before.. is it lost or still there?
             //Msg("Sprite %d's seq is %d",h,spr[h].seq);
 
-            if (k[seq[h].frame[1]].k == NULL)
+            if (picInfo[seq[h].frame[1]].k == NULL)
             {
                 figure_out(seq[h].data, 0);
             }
-            else if (k[seq[h].frame[1]].k->IsLost() == DDERR_SURFACELOST)
+            else if (picInfo[seq[h].frame[1]].k->IsLost() == DDERR_SURFACELOST)
             {
                 get_word(seq[h].data, 2, word1);
 
@@ -5239,7 +5218,7 @@ void check_frame_status(int h, int frame)
 void check_seq_status(int h)
 
 {
-    HRESULT dderror;
+//    HRESULT dderror;
     char word1[80];
 
     if (seq[h].active == false) return;
@@ -5247,7 +5226,7 @@ void check_seq_status(int h)
     {
         // Msg("Smartload: Loading seq %d..", spr[h].seq);
 
-        if (seq[h].frame[1] == 0 || k[seq[h].frame[1]].k == NULL)
+        if (seq[h].frame[1] == 0 || picInfo[seq[h].frame[1]].k == NULL)
         {   
             figure_out(seq[h].data, 0);
         }
@@ -5256,7 +5235,7 @@ void check_seq_status(int h)
             //it's been loaded before.. is it lost or still there?
             //Msg("Sprite %d's seq is %d",h,spr[h].seq);
 
-            if (k[seq[h].frame[1]].k->IsLost() == DDERR_SURFACELOST)
+            if (picInfo[seq[h].frame[1]].k->IsLost() == DDERR_SURFACELOST)
             {
                 get_word(seq[h].data, 2, word1);
 
@@ -5283,8 +5262,8 @@ void check_base(int base)
 
 void check_sprite_status_full(int h)
 {
-    HRESULT dderror;
-    char word1[80];
+//    HRESULT dderror;
+//    char word1[80];
     //same as above but checks for all seq's used by the (base) commands
 
     //is sprite in memory?
@@ -5323,7 +5302,7 @@ int say_text(const char *text, int h, int script)
     //spr[h].x - spr[crap2;
     spr[crap2].nohit = 1;
     check_seq_status(spr[spr[crap2].owner].seq);
-    spr[crap2].defense = ( ((k[getpic(spr[crap2].owner)].box.bottom) - k[getpic(spr[crap2].owner)].yoffset) + 100);
+    spr[crap2].defense = ( ((picInfo[getpic(spr[crap2].owner)].box.bottom) - picInfo[getpic(spr[crap2].owner)].yoffset) + 100);
 
     spr[crap2].x = spr[spr[crap2].owner].x - spr[crap2].strength;
     spr[crap2].y = spr[spr[crap2].owner].y - spr[crap2].defense;
@@ -5473,7 +5452,7 @@ void make_int(char name[80], int value, int scope, int script)
     Msg("ERROR: Out of var space, all %d used.", max_vars);
 }
 
-int var_equals(char name[20], char newname[20], char math, int script, char rest[200])
+int var_equals(char name[20], char newname[20], char math_, int script, char rest[200])
 {
     int k;  
     //redink1 set newret to NULL so debug errors did not appear.
@@ -5633,19 +5612,19 @@ next:
 
 next2:
 
-    if (math == '=')
+    if (math_ == '=')
         play.var[i].var = newval;
 
-    if (math == '+')
+    if (math_ == '+')
         play.var[i].var += newval;
 
-    if (math == '-')
+    if (math_ == '-')
         play.var[i].var -= newval;
 
-    if (math == '/')
+    if (math_ == '/')
         play.var[i].var = play.var[i].var / newval;
 
-    if (math == '*')
+    if (math_ == '*')
         play.var[i].var = play.var[i].var * newval;
 
     return(newret);
@@ -5662,7 +5641,7 @@ void get_word(char line[300], int word, char *crap)
     char save_word[100];
     save_word[0] = 0;
 
-    for (int k = 0; k < strlen(line); k++)
+    for (int k = 0; k < (int)strlen(line); k++)
     {
 
         if (space_mode == true)
@@ -5881,10 +5860,11 @@ void kill_sprite_all (int sprite)
 
 void kill_returning_stuff( int script)
 {
+	int i;
 
     //Msg("Checking callbacks..");
     //check callbacks
-    for (int i = 1; i < max_callbacks; i++)
+    for (i = 1; i < max_callbacks; i++)
     {
         if (callback[i].active) if (callback[i].owner == script)
             //  if (compare(callback[i].name, ""))
@@ -5916,7 +5896,7 @@ bool talk_get(int script)
     char line[200], check[200], checker[200];
     int cur = 1;
     char *p;
-    int num;
+    //int num;
     int retnum = 0;
     clear_talk();                
     talk.newy = -5000;
@@ -6079,6 +6059,7 @@ morestuff:
 
 bool nothing_playing(void)
 {
+#ifdef TODO
     //int crap = (mciSendString("status MUSIC offset", NULL, 0, NULL));
     //int crap =  (mciSendString("play MUSIC from 0", NULL, 0, g_hWnd));
     uint32 dwReturn;   
@@ -6106,11 +6087,15 @@ bool nothing_playing(void)
 
     if (mciStatusParms.dwReturn == MCI_MODE_PLAY) return(true); else
         return(false);
+#else
+	error("TODO");
+#endif
 }
 
 
 bool cdplaying(void)
 {
+#ifdef TODO
     //int crap = (mciSendString("status MUSIC offset", NULL, 0, NULL));
     //int crap =  (mciSendString("play MUSIC from 0", NULL, 0, g_hWnd));
     uint32 dwReturn;   
@@ -6138,7 +6123,9 @@ bool cdplaying(void)
     Msg("Mode returned %d..",   mciStatusParms.dwReturn);
 
     if (mciStatusParms.dwReturn != last_cd) return(false); else return(true);
-
+#else
+	error("TODO");
+#endif
 }
 //thing to play the midi
 
@@ -6149,10 +6136,8 @@ void init_midi(void)
 }
 
 
-uint32 playMIDIFile(HWND hWndNotify, LPSTR lpszMIDIFileName)
-
-{ 
-
+uint32 playMIDIFile(HWND hWndNotify, LPCSTR lpszMIDIFileName) { 
+#ifdef TODO
 
     mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);     
 
@@ -6228,9 +6213,9 @@ uint32 playMIDIFile(HWND hWndNotify, LPSTR lpszMIDIFileName)
 
     return (0L);
 
-
-
-
+#else
+	error("TODO");
+#endif
 } 
 
 
@@ -6238,7 +6223,7 @@ uint32 playMIDIFile(HWND hWndNotify, LPSTR lpszMIDIFileName)
 bool PlayMidi(char *sFileName)
 {
     //no midi stuff right now
-    if (::sound_on == false) return true;
+    if (sound_on == false) return true;
 
     char buf[256];
     char crap[256];
@@ -6348,7 +6333,7 @@ void check_midi(void)
 
 
 uint32 killcd(HWND hWndNotify, BYTE bTrack){    
-
+#ifdef TODO
 
     uint32 dwReturn;  
     MCI_OPEN_PARMS mciOpenParms;
@@ -6387,14 +6372,15 @@ uint32 killcd(HWND hWndNotify, BYTE bTrack){
 
     mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);    
 
-
+#else
+	error("TODO");
+#endif
 } 
 
 
 
 uint32 PlayCD(HWND hWndNotify, BYTE bTrack){    
-
-
+#ifdef TODO
     uint32 dwReturn;  
     MCI_OPEN_PARMS mciOpenParms;
     MCI_SET_PARMS mciSetParms; 
@@ -6444,16 +6430,16 @@ uint32 PlayCD(HWND hWndNotify, BYTE bTrack){
         mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);        return (dwReturn);
     }    return (0L);
 
-
-
-
+#else
+	error("TODO");
+#endif
 } 
 
 
 
-uint32 getCDTrackStartTimes(VOID)
-
-{    UINT wDeviceID;    int i, iNumTracks;
+uint32 getCDTrackStartTimes() {
+#ifdef TODO
+	UINT wDeviceID;    int i, iNumTracks;
 
 cd_inserted = false;
 uint32 dwReturn;    uint32 dwPosition;    uint32 *pMem;
@@ -6574,7 +6560,9 @@ if (dwReturn = mciSendCommand(wDeviceID, MCI_SET,
         return (dwReturn);    
     } 
     return (0L);
-
+#else
+error("TODO");
+#endif
 } 
 
 
@@ -6769,56 +6757,56 @@ int change_sprite_noreturn(int h,  int val, int * change)
 
 void draw_sprite_game(LPDIRECTDRAWSURFACE lpdest,int h)
 {
-    if (::g_b_kill_app) return; //don't try, we're quitting
+    if (g_b_kill_app) return; //don't try, we're quitting
     if (spr[h].brain == 8) return;
 
     if (spr[h].nodraw == 1) return;
-    RECT box_crap,box_real;
+    RECT boxCrap,boxReal;
 
-    HRESULT             ddrval;
+    HRESULT             ddrVal;
 
-    DDBLTFX     ddbltfx;
-    ddbltfx.dwSize = sizeof( ddbltfx);
-    ddbltfx.dwFillColor = 0;
+    DDBLTFX     ddBltFx;
+    ddBltFx.dwSize = sizeof( ddBltFx);
+    ddBltFx.dwFillColor = 0;
 
-    if (get_box(h, &box_crap, &box_real))
+    if (get_box(h, &boxCrap, &boxReal))
     {
         //redink1 error checking for invalid rectangle
-        if (box_crap.left >= box_crap.right || box_crap.top >= box_crap.bottom)
+        if (boxCrap.left >= boxCrap.right || boxCrap.top >= boxCrap.bottom)
             return;
 
 
         //redink1 error checking for out-of-bounds clipping
-        /*if (box_crap.left < 0)
-        box_crap.left = 0;
-        if (box_crap.top < box_real.top)
-        box_crap.top = box_crap.top;
-        if (box_crap.right > box_real.right)
-        box_crap.right = box_real.right;
-        if (box_crap.bottom > box_real.bottom)
-        box_crap.bottom = box_real.bottom;*/
+        /*if (boxCrap.left < 0)
+        boxCrap.left = 0;
+        if (boxCrap.top < boxReal.top)
+        boxCrap.top = boxCrap.top;
+        if (boxCrap.right > boxReal.right)
+        boxCrap.right = boxReal.right;
+        if (boxCrap.bottom > boxReal.bottom)
+        boxCrap.bottom = boxReal.bottom;*/
         while( 1)
         {
 
-            //  Msg("Box_crap: %d %d %d %d, Box_real: %d %d %d %d",box_crap.left,box_crap.top,
-            //      box_crap.right, box_crap.bottom,box_real.left,box_real.top,
-            //      box_real.right, box_real.bottom);
+            //  Msg("Box_crap: %d %d %d %d, Box_real: %d %d %d %d",boxCrap.left,boxCrap.top,
+            //      boxCrap.right, boxCrap.bottom,boxReal.left,boxReal.top,
+            //      boxReal.right, boxReal.bottom);
 
 again:
-            ddrval = lpdest->Blt(&box_crap, k[getpic(h)].k,
-                &box_real  , DDBLT_KEYSRC ,&ddbltfx );
+            ddrVal = lpdest->Blt(&boxCrap, picInfo[getpic(h)].k,
+                &boxReal  , DDBLT_KEYSRC ,&ddBltFx );
 
 
-            if (ddrval == DDERR_WASSTILLDRAWING) goto again;
+            if (ddrVal == DDERR_WASSTILLDRAWING) goto again;
 
-            if (ddrval != DD_OK)
+            if (ddrVal != DD_OK)
             {
-                dderror(ddrval);
+                dderror(ddrVal);
 
                 Msg("MainSpriteDraw(): Could not draw sprite %d, pic %d.",h,getpic(h));
-                Msg("Box_crap: %d %d %d %d, Box_real: %d %d %d %d",box_crap.left,box_crap.top,
-                    box_crap.right, box_crap.bottom,box_real.left,box_real.top,
-                    box_real.right, box_real.bottom);
+                Msg("Box_crap: %d %d %d %d, Box_real: %d %d %d %d",boxCrap.left,boxCrap.top,
+                    boxCrap.right, boxCrap.bottom,boxReal.left,boxReal.top,
+                    boxReal.right, boxReal.bottom);
                 if (spr[h].pseq != 0) check_seq_status(spr[h].pseq);
                 break;
             } else
@@ -7475,8 +7463,8 @@ void show_bmp( char name[80], int showdot, int reserved, int script)
 
     RECT rcRect;
     SetRect(&rcRect, 0,0,640, 480);
-    HDC hdc;
-    char msg[200];
+    //HDC hdc;
+    //char msg[200];
 
 again:
     ddrval = lpDDSBack->BltFast( 0, 0, lpDDSTrick,
@@ -7510,8 +7498,8 @@ void copy_bmp( char name[80])
 
     RECT rcRect;
     SetRect(&rcRect, 0,0,640, 480);
-    HDC hdc;
-    char msg[200];
+    //HDC hdc;
+    //char msg[200];
 
 again:
     ddrval = lpDDSBack->BltFast( 0, 0, lpDDSTrick,
@@ -8400,7 +8388,7 @@ void fill_hard_sprites(void )
             { 
                 if (bs[h1] == false)
                 {
-                    //Msg( "Ok,  %d is %d", h1,(spr[h1].y + k[spr[h1].pic].yoffset) );
+                    //Msg( "Ok,  %d is %d", h1,(spr[h1].y + picInfo[spr[h1].pic].yoffset) );
                     if (spr[h1].que != 0) height = spr[h1].que; else height = spr[h1].y;
                     if ( height < highest_sprite )
                     {
@@ -9930,7 +9918,7 @@ pass:
                 update_play_changes();
                 int l = nlist[0];
                 RECT mhard;
-                CopyRect(&mhard, &k[seq[spr[l].pseq].frame[spr[l].pframe]].hardbox);
+                CopyRect(&mhard, &picInfo[seq[spr[l].pseq].frame[spr[l].pframe]].hardbox);
                 OffsetRect(&mhard, (spr[l].x- 20), spr[l].y);
 
                 fill_hardxy(mhard);

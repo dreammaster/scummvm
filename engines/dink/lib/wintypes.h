@@ -30,22 +30,32 @@ namespace Dink {
 typedef void *HFONT;
 typedef void *HINSTANCE;
 typedef uint32 HDC;
-typedef uint32 DWORD;
+typedef byte BYTE;
 typedef uint16 WORD;
+typedef uint32 DWORD;
 typedef uint32 *LPDWORD;
 typedef int32 *LONG_PTR;
 typedef uint *UINT_PTR;
 typedef const char *LPCSTR;
+typedef char *LPSTR;
 typedef void *HANDLE;
 typedef void *HWND;
 
 typedef uint32 HRESULT;
+
+struct IUnknown {
+};
+
 #define S_OK 0
 
 #define lstrlen strlen
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
+#define LOWORD(dw) (dw & 0xffff)
+#define HIWORD(dw) ((dw) >> 16)
 
 #define MCI_CLOSE 1
+#define MCI_STOP 2
+
 inline void mciSendCommand(int v1, int v2, int v3, void *v4) {}
 inline int mciSendString(const char *lpstrCommand,
 	const char *lpstrReturnString, uint uReturnLength, HWND hwndCallback) {
@@ -55,6 +65,15 @@ inline bool GetClientRect(HWND hWnd, LPRECT lpRect) { return false; }
 inline void CloseHandle(HANDLE) {}
 inline void FillMemory(void *p, size_t size, byte v) {
 	memset((byte *)p, v, size);
+}
+inline void ZeroMemory(void *p, size_t size) {
+	memset((byte *)p, 0, size);
+}
+inline void DeleteObject(void *obj) {
+	delete (byte *)obj;
+}
+inline void CopyMemory(void *dst, void *src, size_t len) {
+	Common::copy((byte *)src, (byte *)src + len, (byte *)dst);
 }
 
 } // namespace Dink

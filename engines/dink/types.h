@@ -27,23 +27,6 @@
 
 namespace Dink {
 
-struct LOGFONT {
-	int32 lfHeight;
-	int32 lfWidth;
-	int32 lfEscapement;
-	int32 lfOrientation;
-	int32 lfWeight;
-	byte lfItalic;
-	byte lfUnderline;
-	byte lfStrikeOut;
-	byte lfCharSet;
-	byte lfOutPrecision;
-	byte lfClipPrecision;
-	byte lfQuality;
-	byte lfPitchAndFamily;
-	char lfFaceName[32];
-};
-
 } // namespace Dink
 
 #endif

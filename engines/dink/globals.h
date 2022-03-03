@@ -29,6 +29,7 @@
 #include "dink/directdraw/ddraw.h"
 #include "dink/directdraw/dinput.h"
 #include "dink/directdraw/dsound.h"
+#include "dink/lib/graphics.h"
 
 namespace Dink {
 
@@ -526,7 +527,7 @@ extern bool trig_man;
 extern bool total_trigger;
 extern bool debug_mode;
 
-extern pic_info     k[max_sprites];       // Sprite data
+extern pic_info     picInfo[max_sprites];       // Sprite data
 extern player_info play;
 
 extern LPDIRECTDRAWSURFACE     lpDDSPrimary;   // DirectDraw primary surface

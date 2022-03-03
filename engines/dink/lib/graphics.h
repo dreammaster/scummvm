@@ -31,15 +31,34 @@ namespace Dink {
 // SetBkMode flags
 #define TRANSPARENT 1
 
+struct LOGFONT {
+	int32 lfHeight;
+	int32 lfWidth;
+	int32 lfEscapement;
+	int32 lfOrientation;
+	int32 lfWeight;
+	byte lfItalic;
+	byte lfUnderline;
+	byte lfStrikeOut;
+	byte lfCharSet;
+	byte lfOutPrecision;
+	byte lfClipPrecision;
+	byte lfQuality;
+	byte lfPitchAndFamily;
+	char lfFaceName[32];
+};
+
 typedef void *HGDIOBJ;
 typedef Graphics::Surface *HBITMAP;
 
-HRESULT SelectObject(HDC hdc, HGDIOBJ h);
-HRESULT SetBkMode(HDC hdc, int mode);
-int GetTextFace(HDC hdc, int c, const char *lpName);
+extern HRESULT SelectObject(HDC hdc, HGDIOBJ h);
+extern HRESULT SetBkMode(HDC hdc, int mode);
+extern int GetTextFace(HDC hdc, int c, const char *lpName);
 inline bool ClientToScreen(HWND hWnd, LPPOINT lpPoint) {
 	return true;
 }
+
+extern HFONT CreateFontIndirect(LOGFONT *lf);
 
 } // namespace Dink
 

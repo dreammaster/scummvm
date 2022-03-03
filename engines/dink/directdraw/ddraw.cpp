@@ -23,6 +23,11 @@
 
 namespace Dink {
 
+HRESULT IDirectDraw::CreateSurface(LPDDSURFACEDESC ddsd, LPDIRECTDRAWSURFACE *surf, IUnknown *) {
+	error("TODO: IDirectDraw::CreateSurface");
+}
+
+
 HRESULT IDirectDrawPalette::GetEntries(uint unused, uint start, uint count, LPPALETTEENTRY dest) {
 	assert((start + count) <= PALETTE_SIZE);
 	Common::copy(&_palette[start], &_palette[start] + count, dest);
@@ -74,6 +79,14 @@ HRESULT IDirectDrawSurface::GetDC(HDC *hdc) {
 
 HRESULT IDirectDrawSurface::ReleaseDC(HDC hdc) {
 	return DD_OK;
+}
+
+HRESULT IDirectDrawSurface::IsLost() const {
+	return empty() ? DDERR_SURFACELOST : DD_OK;
+}
+
+HRESULT SetPalette(LPDIRECTDRAWPALETTE pal) {
+	error("TODO");
 }
 
 } // namespace Dink

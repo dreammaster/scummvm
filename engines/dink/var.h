@@ -83,7 +83,7 @@ extern bool trig_man;
 extern bool total_trigger;
 extern bool debug_mode;
 
-extern pic_info     k[max_sprites];       // Sprite data
+extern pic_info     picInfo[max_sprites];       // Sprite data
 extern player_info play;
 
 extern LPDIRECTDRAWSURFACE     lpDDSPrimary;   // DirectDraw primary surface
@@ -140,7 +140,7 @@ extern int say_text_xy(const char *text, int mx, int my, int script);
 extern bool add_time_to_saved_game(int num);
 extern void log_path(bool playing);
 extern void kill_all_scripts_for_real();
-extern bool seperate_string(char str[255], int num, char liney, char *return1);
+extern bool seperate_string(const char *str, int num, char liney, char *return1);
 extern void finiObjects();
 extern void check_midi();
 

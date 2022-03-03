@@ -67,6 +67,7 @@ namespace Dink {
 #define DDBLT_DDFX                              0x00000800l
 #define DDBLT_COLORFILL                         0x00000400l
 #define DDBLT_WAIT                              0x01000000l
+#define DDBLT_KEYSRC                            0x00008000l
 
 // BltFast flags
 #define DDBLTFAST_NOCOLORKEY                    0x00000000
@@ -93,20 +94,13 @@ enum BlankFlag {
 
 #define DDBLTFX_NOTEARING 1
 
-struct IDirectDraw {
-	HRESULT WaitForVerticalBlank(BlankFlag flags, void *unused) {
-		assert(!unused);
-		return DD_OK;
-	}
-	HRESULT RestoreDisplayMode() {
-		return DD_OK;
-	}
-	HRESULT Release() {
-		return DD_OK;
-	}
-};
-typedef IDirectDraw *LPDIRECTDRAW;
+// ddsCaps flags
+#define DDSD_CAPS               0x00000001l
+#define DDSD_HEIGHT             0x00000002l
+#define DDSD_WIDTH              0x00000004l
+#define DDSCAPS_OFFSCREENPLAIN  0x00000040l
 
+#define IDirectDraw_CreateSurface(p, a, b, c)       (p)->CreateSurface(a, b, c)
 
 #include "common/pack-start.h"	// START STRUCT PACKING
 struct PALETTEENTRY {
@@ -131,6 +125,10 @@ struct DIRECTDRAWCLIPPER {
 };
 typedef DIRECTDRAWCLIPPER *LPDIRECTDRAWCLIPPER;
 
+struct DDSCAPS {
+	DWORD dwCaps;
+};
+
 struct DDSURFACEDESC {
 	DWORD dwSize;
 	DWORD dwFlags;
@@ -138,6 +136,7 @@ struct DDSURFACEDESC {
 	DWORD dwWidth;
 	DWORD lPitch;
 	void *lpSurface;
+	DDSCAPS ddsCaps;
 };
 typedef DDSURFACEDESC *LPDDSURFACEDESC;
 
@@ -161,8 +160,27 @@ public:
 	HRESULT Flip(IDirectDrawSurface *surface, uint32 flags);
 	HRESULT GetDC(HDC *hdc);
 	HRESULT ReleaseDC(HDC hdc);
+	HRESULT IsLost() const;
+	HRESULT SetPalette(LPDIRECTDRAWPALETTE pal);
 };
 typedef IDirectDrawSurface *LPDIRECTDRAWSURFACE;
+
+
+struct IDirectDraw {
+	HRESULT WaitForVerticalBlank(BlankFlag flags, void *unused) {
+		assert(!unused);
+		return DD_OK;
+	}
+	HRESULT RestoreDisplayMode() {
+		return DD_OK;
+	}
+	HRESULT Release() {
+		return DD_OK;
+	}
+	HRESULT CreateSurface(LPDDSURFACEDESC ddsd, LPDIRECTDRAWSURFACE *surf, IUnknown *);
+};
+typedef IDirectDraw *LPDIRECTDRAW;
+
 
 typedef uint32 COLORREF;
 #define RGB(r,g,b) ((COLORREF)(((byte)(r)|((uint16)((byte)(g))<<8))|(((uint32)(byte)(b))<<16)))

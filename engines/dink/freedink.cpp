@@ -366,12 +366,12 @@ for (int x=0; x<768; x++)
 {
 
 if (map.loc[x+1] == 0)  
-lpDDSTwo->BltFast( (x) * 20 - ((x / 32) * 640), (x / 32) * 20, k[6].k,
-&k[6].box, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
+lpDDSTwo->BltFast( (x) * 20 - ((x / 32) * 640), (x / 32) * 20, picInfo[6].k,
+&picInfo[6].box, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
 
 if (map.loc[x+1] > 0)   
-lpDDSTwo->BltFast( (x) * 20 - ((x / 32) * 640), (x / 32) * 20, k[7].k,
-&k[7].box, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT );
+lpDDSTwo->BltFast( (x) * 20 - ((x / 32) * 640), (x / 32) * 20, picInfo[7].k,
+&picInfo[7].box, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT );
 
 }
 
@@ -789,10 +789,10 @@ void draw_damage(int h)
 
     int crap2 = add_sprite(spr[h].x,spr[h].y,8,0,0);
 
-    spr[crap2].y -= k[seq[spr[h].pseq].frame[spr[h].pframe]].yoffset;
-    spr[crap2].x -= k[seq[spr[h].pseq].frame[spr[h].pframe]].xoffset;
-    spr[crap2].y -= k[seq[spr[h].pseq].frame[spr[h].pframe]].box.bottom / 3;
-    spr[crap2].x += k[seq[spr[h].pseq].frame[spr[h].pframe]].box.right / 5;
+    spr[crap2].y -= picInfo[seq[spr[h].pseq].frame[spr[h].pframe]].yoffset;
+    spr[crap2].x -= picInfo[seq[spr[h].pseq].frame[spr[h].pframe]].xoffset;
+    spr[crap2].y -= picInfo[seq[spr[h].pseq].frame[spr[h].pframe]].box.bottom / 3;
+    spr[crap2].x += picInfo[seq[spr[h].pseq].frame[spr[h].pframe]].box.right / 5;
 
     spr[crap2].speed = 1;
     spr[crap2].hard = 1;
@@ -2012,12 +2012,12 @@ void pig_brain(int h)
     }
 
 
-    if (spr[h].y > (playy-k[getpic(h)].box.bottom / 4))
+    if (spr[h].y > (playy-picInfo[getpic(h)].box.bottom / 4))
     {
         changedir(9,h,spr[h].base_walk);
     }         
 
-    if (spr[h].x > (x-k[getpic(h)].box.right-10))
+    if (spr[h].x > (x-picInfo[getpic(h)].box.right-10))
     {
         changedir(1,h,spr[h].base_walk);
     }         
@@ -2174,12 +2174,12 @@ void move(int u, int amount, char kind,  char kindy)
 
 void bounce_brain(int h)
 {
-    if (spr[h].y > (playy-k[getpic(h)].box.bottom))
+    if (spr[h].y > (playy-picInfo[getpic(h)].box.bottom))
     {
         spr[h].my -= (spr[h].my * 2);
     }         
 
-    if (spr[h].x > (x-k[getpic(h)].box.right))
+    if (spr[h].x > (x-picInfo[getpic(h)].box.right))
     {
         spr[h].mx -= (spr[h].mx * 2);
     }         
@@ -2381,7 +2381,7 @@ bool run_through_tag_list_talk(int h)
         {
 
 
-            CopyRect(&box, &k[getpic(i)].hardbox);
+            CopyRect(&box, &picInfo[getpic(i)].hardbox);
             OffsetRect(&box, spr[i].x, spr[i].y);
 
             InflateRect(&box, 10,10);
@@ -2569,7 +2569,7 @@ void missile_brain( int h, bool repeat)
             if (spr[h].brain_parm != j) if (spr[h].brain_parm2!= j) //if (spr[j].brain != 15) if
                 //(spr[j].brain != 11)
             {
-                CopyRect(&box, &k[getpic(j)].hardbox);
+                CopyRect(&box, &picInfo[getpic(j)].hardbox);
                 OffsetRect(&box, spr[j].x, spr[j].y);
 
                 if (spr[h].range != 0)
@@ -2666,7 +2666,7 @@ void run_through_mouse_list(int h, bool special)
         {
 
             if (spr[i].touch_damage != -1) if (spr[h].notouch) return;
-            CopyRect(&box, &k[getpic(i)].hardbox);
+            CopyRect(&box, &picInfo[getpic(i)].hardbox);
             OffsetRect(&box, spr[i].x, spr[i].y);
 
 
@@ -4370,7 +4370,7 @@ void run_through_tag_list(int h, int strength)
             (! ( (spr[i].nohit == 1) && (spr[i].script == 0)) )
         {
 
-            CopyRect(&box, &k[getpic(i)].hardbox);
+            CopyRect(&box, &picInfo[getpic(i)].hardbox);
             OffsetRect(&box, spr[i].x, spr[i].y);
 
             //InflateRect(&box, 10,10);
@@ -4523,7 +4523,7 @@ void run_through_tag_list_push(int h)
             ((spr[i].script != 0) )
         {
 
-            CopyRect(&box, &k[getpic(i)].hardbox);
+            CopyRect(&box, &picInfo[getpic(i)].hardbox);
             OffsetRect(&box, spr[i].x, spr[i].y);
 
             //InflateRect(&box, 10,10);
@@ -4560,7 +4560,7 @@ void run_through_touch_damage_list(int h)
         {
 
             if (spr[i].touch_damage != -1) if (spr[h].notouch) return;
-            CopyRect(&box, &k[getpic(i)].hardbox);
+            CopyRect(&box, &picInfo[getpic(i)].hardbox);
             OffsetRect(&box, spr[i].x, spr[i].y);
 
             //InflateRect(&box, 10,10);
@@ -4863,19 +4863,19 @@ void process_talk()
 
     int fake_page;
 again:
-    ddrval = lpDDSBack->BltFast( px, py, k[seq[30].frame[2]].k,
-        &k[seq[30].frame[2]].box  , DDBLTFAST_SRCCOLORKEY  );
+    ddrval = lpDDSBack->BltFast( px, py, picInfo[seq[30].frame[2]].k,
+        &picInfo[seq[30].frame[2]].box  , DDBLTFAST_SRCCOLORKEY  );
 
     if (ddrval == DDERR_WASSTILLDRAWING) goto again;
 
 again2: 
-    ddrval = lpDDSBack->BltFast( px+169, py+42, k[seq[30].frame[3]].k,
-        &k[seq[30].frame[3]].box  , DDBLTFAST_SRCCOLORKEY  );
+    ddrval = lpDDSBack->BltFast( px+169, py+42, picInfo[seq[30].frame[3]].k,
+        &picInfo[seq[30].frame[3]].box  , DDBLTFAST_SRCCOLORKEY  );
     if (ddrval == DDERR_WASSTILLDRAWING) goto again2;
 
 again3:
-    ddrval = lpDDSBack->BltFast( px+169+180, py+1, k[seq[30].frame[4]].k,
-        &k[seq[30].frame[4]].box  , DDBLTFAST_SRCCOLORKEY  );
+    ddrval = lpDDSBack->BltFast( px+169+180, py+1, picInfo[seq[30].frame[4]].k,
+        &picInfo[seq[30].frame[4]].box  , DDBLTFAST_SRCCOLORKEY  );
 
     if (ddrval == DDERR_WASSTILLDRAWING) goto again3;
 
@@ -5129,13 +5129,13 @@ fin:
 
         if (talk.curf > 7) talk.curf = 1;
 again4:
-        ddrval = lpDDSBack->BltFast( curxl, curyl, k[seq[456].frame[talk.curf]].k,
-            &k[seq[456].frame[talk.curf]].box  , DDBLTFAST_SRCCOLORKEY  );
+        ddrval = lpDDSBack->BltFast( curxl, curyl, picInfo[seq[456].frame[talk.curf]].k,
+            &picInfo[seq[456].frame[talk.curf]].box  , DDBLTFAST_SRCCOLORKEY  );
         if (ddrval == DDERR_WASSTILLDRAWING) goto again4;
 
 again5:
-        ddrval = lpDDSBack->BltFast( curxr, curyr, k[seq[457].frame[talk.curf]].k,
-            &k[seq[456].frame[talk.curf]].box  , DDBLTFAST_SRCCOLORKEY  );
+        ddrval = lpDDSBack->BltFast( curxr, curyr, picInfo[seq[457].frame[talk.curf]].k,
+            &picInfo[seq[456].frame[talk.curf]].box  , DDBLTFAST_SRCCOLORKEY  );
         if (ddrval == DDERR_WASSTILLDRAWING) goto again5;
 
 
@@ -5261,7 +5261,7 @@ void button_brain(int h )
 
     if (spr[h].script == 0) return;
 
-    CopyRect(&box, &k[getpic(h)].hardbox);
+    CopyRect(&box, &picInfo[getpic(h)].hardbox);
     OffsetRect(&box, spr[h].x, spr[h].y);
 
     if (spr[h].brain_parm == 0)
@@ -5329,7 +5329,7 @@ again:
 
     check_seq_status(mseq);
 
-    if (k[seq[mseq].frame[mframe]].k == NULL) 
+    if (picInfo[seq[mseq].frame[mframe]].k == NULL) 
     {
 
         if (!magic)
@@ -5348,8 +5348,8 @@ again:
         return;
     }
 
-    ddrval = lpDDSBack->BltFast( mx, my, k[seq[mseq].frame[mframe]].k,
-        &k[seq[mseq].frame[mframe]].box, DDBLTFAST_SRCCOLORKEY);
+    ddrval = lpDDSBack->BltFast( mx, my, picInfo[seq[mseq].frame[mframe]].k,
+        &picInfo[seq[mseq].frame[mframe]].box, DDBLTFAST_SRCCOLORKEY);
 
     if( ddrval == DDERR_WASSTILLDRAWING ) goto again;
 
@@ -5393,8 +5393,8 @@ void process_item( void )
     check_seq_status(423);
     //lets blit the main screen over it
 again:  
-    ddrval = lpDDSBack->BltFast( 20, 0, k[seq[423].frame[1]].k,
-        &k[seq[423].frame[1]].box, DDBLTFAST_SRCCOLORKEY);
+    ddrval = lpDDSBack->BltFast( 20, 0, picInfo[seq[423].frame[1]].k,
+        &picInfo[seq[423].frame[1]].box, DDBLTFAST_SRCCOLORKEY);
 
     if( ddrval == DDERR_WASSTILLDRAWING )
         goto again;
@@ -5725,8 +5725,8 @@ again:
         showb.picframe++;
         if (showb.picframe > index[mseq].last) showb.picframe = 1;
         int mframe = showb.picframe;
-        lpDDSBack->BltFast( (xp % 32) * 20, (xp / 32) * 20, k[seq[mseq].frame[mframe]].k,
-            &k[seq[mseq].frame[mframe]].box, DDBLTFAST_SRCCOLORKEY| DDBLTFAST_WAIT );
+        lpDDSBack->BltFast( (xp % 32) * 20, (xp / 32) * 20, picInfo[seq[mseq].frame[mframe]].k,
+            &picInfo[seq[mseq].frame[mframe]].box, DDBLTFAST_SRCCOLORKEY| DDBLTFAST_WAIT );
 
     }
 
@@ -5795,8 +5795,8 @@ void drawscreenlock( void )
 
 loop:
     //draw the screenlock icon
-    ddrVal = lpDDSBack->BltFast(0, 0, k[seq[423].frame[9]].k,
-        &k[seq[423].frame[9]].box  , DDBLTFAST_NOCOLORKEY  );
+    ddrVal = lpDDSBack->BltFast(0, 0, picInfo[seq[423].frame[9]].k,
+        &picInfo[seq[423].frame[9]].box  , DDBLTFAST_NOCOLORKEY  );
 
     if (ddrVal == DDERR_WASSTILLDRAWING ) goto loop;
 
@@ -5804,8 +5804,8 @@ loop:
 
 loop2:
     //draw the screenlock icon
-    ddrVal = lpDDSBack->BltFast(620, 0, k[seq[423].frame[10]].k,
-        &k[seq[423].frame[10]].box  , DDBLTFAST_NOCOLORKEY  );
+    ddrVal = lpDDSBack->BltFast(620, 0, picInfo[seq[423].frame[10]].k,
+        &picInfo[seq[423].frame[10]].box  , DDBLTFAST_NOCOLORKEY  );
 
     if (ddrVal == DDERR_WASSTILLDRAWING ) goto loop2;
     // if (ddrVal != DD_OK) dderror(ddrVal);
@@ -5882,11 +5882,11 @@ void finiObjects()
         /*for (int oo = 1; oo <= max_sprites; oo++)   
         {
 
-        if( k[oo].k != NULL )
+        if( picInfo[oo].k != NULL )
         {
 
-        k[oo].k->Release();
-        k[oo].k = NULL;
+        picInfo[oo].k->Release();
+        picInfo[oo].k = NULL;
         }
 
 

@@ -35,4 +35,8 @@ int GetTextFace(HDC hdc, int c, const char *lpName) {
 	return 0;
 }
 
+HFONT CreateFontIndirect(LOGFONT *lf) {
+	error("TODO: CreateFontIndirect");
+}
+
 } // namespace Dink
