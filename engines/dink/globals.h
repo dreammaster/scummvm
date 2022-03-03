@@ -28,6 +28,7 @@
 #include "dink/types.h"
 #include "dink/directdraw/ddraw.h"
 #include "dink/directdraw/dinput.h"
+#include "dink/directdraw/dsound.h"
 
 namespace Dink {
 

@@ -64,6 +64,7 @@ namespace Dink {
 #define DD_OK 0
 
 // Blit flags
+#define DDBLT_DDFX                              0x00000800l
 #define DDBLT_COLORFILL                         0x00000400l
 #define DDBLT_WAIT                              0x01000000l
 
@@ -89,6 +90,8 @@ enum BlankFlag {
 	DDWAITVB_BLOCKBEGINEVENT,
 	DDWAITVB_BLOCKEND
 };
+
+#define DDBLTFX_NOTEARING 1
 
 struct IDirectDraw {
 	HRESULT WaitForVerticalBlank(BlankFlag flags, void *unused) {
@@ -124,14 +127,6 @@ struct IDirectDrawPalette {
 };
 typedef IDirectDrawPalette *LPDIRECTDRAWPALETTE;
 
-struct DIRECTSOUNDBUFFER {
-public:
-	void Release() {}
-};
-
-typedef DIRECTSOUNDBUFFER *LPDIRECTSOUNDBUFFER;
-typedef void *LPDIRECTSOUND;
-
 struct DIRECTDRAWCLIPPER {
 };
 typedef DIRECTDRAWCLIPPER *LPDIRECTDRAWCLIPPER;
@@ -149,6 +144,7 @@ typedef DDSURFACEDESC *LPDDSURFACEDESC;
 struct DDBLTFX {
 	uint32 dwSize;
 	uint dwFillColor;
+	int dwDDFX;
 };
 typedef DDBLTFX *LPDDBLTFX;
 

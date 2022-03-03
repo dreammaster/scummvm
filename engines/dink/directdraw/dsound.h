@@ -24,6 +24,21 @@
 
 namespace Dink {
 
+struct DIRECTSOUNDBUFFER {
+public:
+	void Release() {
+	}
+};
+
+typedef DIRECTSOUNDBUFFER *LPDIRECTSOUNDBUFFER;
+
+struct IDirectSound {
+	void Release() {
+	}
+};
+
+typedef IDirectSound *LPDIRECTSOUND;
+
 
 } // namespace Dink
 

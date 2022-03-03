@@ -10,6 +10,7 @@ MODULE_OBJS = \
 	sound.o \
 	var.o \
 	directdraw\ddraw.o \
+	directdraw\ddutil.o \
 	directdraw\dinput.o \
 	directdraw\dsound.o \
 	lib\graphics.o

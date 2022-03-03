@@ -22,7 +22,9 @@
 #ifndef DINK_LIB_GRAPHICS_H
 #define DINK_LIB_GRAPHICS_H
 
+#include "graphics/surface.h"
 #include "dink/lib/wintypes.h"
+#include "dink/lib/rect.h"
 
 namespace Dink {
 
@@ -30,9 +32,14 @@ namespace Dink {
 #define TRANSPARENT 1
 
 typedef void *HGDIOBJ;
+typedef Graphics::Surface *HBITMAP;
 
 HRESULT SelectObject(HDC hdc, HGDIOBJ h);
 HRESULT SetBkMode(HDC hdc, int mode);
+int GetTextFace(HDC hdc, int c, const char *lpName);
+inline bool ClientToScreen(HWND hWnd, LPPOINT lpPoint) {
+	return true;
+}
 
 } // namespace Dink
 

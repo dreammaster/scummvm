@@ -24,6 +24,7 @@
 #include "common/textconsole.h"
 #include "dink/var.h"
 #include "dink/sound.h"
+#include "dink/lib/graphics.h"
 
 namespace Dink {
 
@@ -425,9 +426,7 @@ void dderror(HRESULT hErr) {
 }
 
 
-bool compare(char *orig, char *comp)
-{
-
+bool compare(const char *orig, char *comp) {
     uint len;
 
     //strcpy(comp, _strupr(comp));
@@ -755,10 +754,10 @@ void TRACE(const char *fmt, ...) {
 		add_text(s.c_str(), "DEBUG.TXT");
 }
 
-#if 0
-extern "C" IDirectDrawSurface * DDSethLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite)
+IDirectDrawSurface * DDSethLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite)
 {
-    HBITMAP             hbm;
+#ifdef TODO
+	HBITMAP             hbm;
     BITMAP              bm;
     DDSURFACEDESC       ddsd;
     IDirectDrawSurface *pdds;
@@ -807,6 +806,9 @@ extern "C" IDirectDrawSurface * DDSethLoad(IDirectDraw *pdd, LPCSTR szBitmap, in
 
 
     return pdds;
+#else
+	error("TODO");
+#endif
 }
 
 char key_convert(int key)
@@ -834,11 +836,8 @@ char key_convert(int key)
     if (key == 191) if (getkey(16)) key = '?'; else key = '/';
     if (key == 220) if (getkey(16)) key = '|'; else key = '\\';
 
-
     return(key);
-
 }
-
 
 void SaySmall(char thing[500], int px, int py, int r,int g,int b)
 {
@@ -862,8 +861,6 @@ void SaySmall(char thing[500], int px, int py, int r,int g,int b)
         dum =  GetTextFace(hdc,100,shit) ;
         lpDDSBack->ReleaseDC(hdc);
     }   
-
-
 }
 
 
@@ -926,9 +923,9 @@ void Saytiny(char thing[2000], int px, int py, int r,int g,int b)
 
 void flip_it_second(void)
 {
-    DDBLTFX     ddbltfx;
-
-    RECT rcRectSrc;    RECT rcRectDest;
+    DDBLTFX ddBltFx;
+    RECT rcRectSrc;
+	RECT rcRectDest;
     POINT p;
 
     if (!windowed)
@@ -969,37 +966,22 @@ void flip_it_second(void)
         OffsetRect(&rcRectDest, p.x, p.y);
         SetRect(&rcRectSrc, 0, 0, 640, 480);
 
-        ddbltfx.dwSize = sizeof(ddbltfx);
+        ddBltFx.dwSize = sizeof(ddBltFx);
 
-        ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
-        ddrval = lpDDSPrimary->Blt( &rcRectDest, lpDDSBack, &rcRectSrc, DDBLT_DDFX | DDBLT_WAIT, &ddbltfx);
+        ddBltFx.dwDDFX = DDBLTFX_NOTEARING;
+        ddrval = lpDDSPrimary->Blt(&rcRectDest, lpDDSBack,
+			&rcRectSrc, DDBLT_DDFX | DDBLT_WAIT, &ddBltFx);
     }
+}
 
-
-
+bool exist(const char *name) {
+	return Common::File::exists(name);
 }
 
 
 
-
-bool exist(char name[255])
-{
-    FILE *fp;
-    fp = fopen(name, "rb");
-    if (!fp)
-    {
-        //    fclose(fp);
-        return(false);
-    }
-
-    fclose(fp);
-    return(true);
-}
-
-
-
-void add_text(char *tex ,char *filename)
-{
+void add_text(char *tex ,char *filename) {
+#ifdef TODO
     FILE *          fp;
     if (strlen(tex) < 1) return;
 
@@ -1016,6 +998,9 @@ void add_text(char *tex ,char *filename)
         fwrite( tex, strlen(tex), 1, fp);       /* current player */
         fclose(fp);
     }
+#else
+	error("TODO");
+#endif
 }
 
 
@@ -1073,8 +1058,9 @@ void setup_anim (int fr, int start,int delay)
 
 
 
-extern "C" IDirectDrawSurface * DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite)
+IDirectDrawSurface * DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite)
 {
+#ifdef TODO
     HBITMAP             hbm;
     BITMAP              bm;
     DDSURFACEDESC       ddsd;
@@ -1115,6 +1101,9 @@ extern "C" IDirectDrawSurface * DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, in
     DeleteObject(hbm);
 
     return pdds;
+#else
+	error("TODO");
+#endif
 }
 
 bool DSDisable( void )
@@ -1302,20 +1291,14 @@ void fill_whole_hard(void)
 
             }
         }
-
-
     }
-
-
-
-
 }
 
 void drawallhard( void)
 {
-    RECT box_crap;
-    int ddrval;
-    DDBLTFX     ddbltfx;
+    RECT boxCrap;
+    int ddrVal;
+    DDBLTFX     ddBltFx;
 
 
     for (int x1=0; x1 < 600; x1++)
@@ -1323,39 +1306,39 @@ void drawallhard( void)
         {
             if (hm.x[x1].y[y1] == 1) 
             {
-                ddbltfx.dwFillColor = 1;
-                ddbltfx.dwSize = sizeof(ddbltfx);
-                box_crap.top = y1;
-                box_crap.bottom = y1+1;
-                box_crap.left = x1+playl; //20 is to compensate for the border
-                box_crap.right = x1+1+playl;
-                ddrval = lpDDSBack->Blt(&box_crap ,NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
-                if (ddrval != DD_OK) Msg("There was an error!");
+                ddBltFx.dwFillColor = 1;
+                ddBltFx.dwSize = sizeof(ddBltFx);
+                boxCrap.top = y1;
+                boxCrap.bottom = y1+1;
+                boxCrap.left = x1+playl; //20 is to compensate for the border
+                boxCrap.right = x1+1+playl;
+                ddrVal = lpDDSBack->Blt(&boxCrap ,NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
+                if (ddrVal != DD_OK) Msg("There was an error!");
             }
 
             if (hm.x[x1].y[y1] == 2) 
             {
-                ddbltfx.dwFillColor = 128;
-                ddbltfx.dwSize = sizeof(ddbltfx);
-                box_crap.top = y1;
-                box_crap.bottom = y1+1;
-                box_crap.left = x1+playl; //20 is to compensate for the border
-                box_crap.right = x1+1+playl;
-                ddrval = lpDDSBack->Blt(&box_crap ,NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
-                if (ddrval != DD_OK) Msg("There was an error!");
+                ddBltFx.dwFillColor = 128;
+                ddBltFx.dwSize = sizeof(ddBltFx);
+                boxCrap.top = y1;
+                boxCrap.bottom = y1+1;
+                boxCrap.left = x1+playl; //20 is to compensate for the border
+                boxCrap.right = x1+1+playl;
+                ddrVal = lpDDSBack->Blt(&boxCrap ,NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
+                if (ddrVal != DD_OK) Msg("There was an error!");
             }
 
 
             if (hm.x[x1].y[y1] == 3) 
             {
-                ddbltfx.dwFillColor = 45;
-                ddbltfx.dwSize = sizeof(ddbltfx);
-                box_crap.top = y1;
-                box_crap.bottom = y1+1;
-                box_crap.left = x1+playl; //20 is to compensate for the border
-                box_crap.right = x1+1+playl;
-                ddrval = lpDDSBack->Blt(&box_crap ,NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
-                if (ddrval != DD_OK) Msg("There was an error!");
+                ddBltFx.dwFillColor = 45;
+                ddBltFx.dwSize = sizeof(ddBltFx);
+                boxCrap.top = y1;
+                boxCrap.bottom = y1+1;
+                boxCrap.left = x1+playl; //20 is to compensate for the border
+                boxCrap.right = x1+1+playl;
+                ddrVal = lpDDSBack->Blt(&boxCrap ,NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
+                if (ddrVal != DD_OK) Msg("There was an error!");
             }
 
 
@@ -1366,42 +1349,30 @@ void drawallhard( void)
                 if (pam.sprite[  (hm.x[x1].y[y1]) - 100].prop == 1)
                 {
                     //draw a little pixel
-                    ddbltfx.dwFillColor = 20;
-                    ddbltfx.dwSize = sizeof(ddbltfx);
-                    box_crap.top = y1;
-                    box_crap.bottom = y1+1;
-                    box_crap.left = x1+playl; //20 is to compensate for the border
-                    box_crap.right = x1+1+playl;
-                    ddrval = lpDDSBack->Blt(&box_crap ,NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
-                    if (ddrval != DD_OK) Msg("There was an error!");
+                    ddBltFx.dwFillColor = 20;
+                    ddBltFx.dwSize = sizeof(ddBltFx);
+                    boxCrap.top = y1;
+                    boxCrap.bottom = y1+1;
+                    boxCrap.left = x1+playl; //20 is to compensate for the border
+                    boxCrap.right = x1+1+playl;
+                    ddrVal = lpDDSBack->Blt(&boxCrap ,NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
+                    if (ddrVal != DD_OK) Msg("There was an error!");
 
 
                 } else
                 {
                     //draw a little pixel
-                    ddbltfx.dwFillColor = 23;
-                    ddbltfx.dwSize = sizeof(ddbltfx);
-                    box_crap.top = y1;
-                    box_crap.bottom = y1+1;
-                    box_crap.left = x1+playl; //20 is to compensate for the border
-                    box_crap.right = x1+1+playl;
-                    ddrval = lpDDSBack->Blt(&box_crap ,NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
-                    if (ddrval != DD_OK) Msg("There was an error!");
-
-
+                    ddBltFx.dwFillColor = 23;
+                    ddBltFx.dwSize = sizeof(ddBltFx);
+                    boxCrap.top = y1;
+                    boxCrap.bottom = y1+1;
+                    boxCrap.left = x1+playl; //20 is to compensate for the border
+                    boxCrap.right = x1+1+playl;
+                    ddrVal = lpDDSBack->Blt(&boxCrap ,NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
+                    if (ddrVal != DD_OK) Msg("There was an error!");
                 }
-
-
-
             }
-
-
-
-
-
         }
-
-
 }
 
 
@@ -1453,6 +1424,7 @@ void fix_dead_sprites( void )
 
 void load_map(int num)
 {
+#ifdef TODO
     FILE *          fp;
     long holdme,lsize;
     //RECT box;
@@ -1492,13 +1464,14 @@ void load_map(int num)
         check_midi();
 
     //   draw_map_game();
-
-
-
+#else
+	error("TODO");
+#endif
 }
 
 void save_map(const int num)
 {
+#ifdef TODO
     FILE *          fp;
     long holdme,lsize;
     char crap[80];
@@ -1519,7 +1492,9 @@ void save_map(const int num)
 
 
     Msg("Done saving map data..");
-
+#else
+	error("TODO");
+#endif
 }
 
 
@@ -1527,6 +1502,7 @@ void save_map(const int num)
 
 void save_info(void)
 {
+#ifdef TODO
     FILE *          fp;
     char crap[80];
     //redink1
@@ -1534,10 +1510,14 @@ void save_info(void)
     fp = fopen(crap, "wb");
     fwrite(&map,sizeof(struct map_info),1,fp);
     fclose(fp);
+#else
+	error("TODO");
+#endif
 }
 
 void save_game(int num)
 {
+#ifdef TODO
     FILE *          fp;
     char crap[80];
     //redink1 created this
@@ -1584,8 +1564,9 @@ void save_game(int num)
     fp = fopen(crap, "wb");
     fwrite(&play,sizeof(play),1,fp);
     fclose(fp);
-
-
+#else
+	error("TODO");
+#endif
 }
 
 
@@ -1660,6 +1641,7 @@ void attach(void)
 
 bool add_time_to_saved_game(int num)
 {
+#ifdef TODO
     FILE *          fp;
     char crap[80];
 
@@ -1699,7 +1681,10 @@ bool add_time_to_saved_game(int num)
     }
     Msg("Wrote it.(%d of time)", play.minutes);
 
-    return(true);   
+    return(true);
+#else
+	error("TODO");
+#endif
 }
 
 
@@ -1707,6 +1692,7 @@ bool add_time_to_saved_game(int num)
 
 bool load_game(int num)
 {
+#ifdef TODO
     FILE *          fp;
     char crap[80];
 
@@ -1893,7 +1879,9 @@ bool load_game(int num)
 
         return(true);
     }
-
+#else
+	error("TODO");
+#endif
 }
 
 void kill_cur_item( void )
@@ -2043,6 +2031,7 @@ void update_screen_time(void )
 
 bool load_game_small(int num, char * line, int *mytime)
 {
+#ifdef TODO
     FILE *          fp;
     char crap[80];
     sprintf(crap, "SAVE%d.DAT", num);
@@ -2063,12 +2052,15 @@ bool load_game_small(int num, char * line, int *mytime)
         strcpy(line, short_play.gameinfo); 
         return(true);
     }
-
+#else
+	error("TODO");
+#endif
 }
 
 
 void load_info(void)
 {
+#ifdef TODO
     FILE *          fp;
     //redink1 changed 'crap' to 'current_dat'
     fp = fopen(current_dat, "rb");
@@ -2088,11 +2080,14 @@ void load_info(void)
         fclose(fp);
 
     }
-
+#else
+	error("TODO");
+#endif
 }
 
 void save_hard(void)
 {
+#ifdef TODO
     FILE *          fp;
     char crap[80];
     sprintf(crap, "HARD.DAT");
@@ -2105,11 +2100,15 @@ void save_hard(void)
     }
     fwrite(&hmap,sizeof(struct hardness),1,fp);
     fclose(fp);
+#else
+	error("TODO");
+#endif
 }
 
 
 void load_hard(void)
 {
+#ifdef TODO
     FILE *          fp;
     char crap[80];
     sprintf(crap, "HARD.DAT");
@@ -2134,7 +2133,9 @@ void load_hard(void)
         fclose(fp);
 
     }
-
+#else
+	error("TODO");
+#endif
 }
 
 
@@ -2181,7 +2182,7 @@ LPDIRECTDRAWSURFACE DDCreateSurface(
                                     bool trans )
 {
     DDSURFACEDESC   ddsd;
-    HRESULT     ddrval;
+    HRESULT     ddrVal;
     LPDIRECTDRAWSURFACE psurf;
 
 
@@ -2201,12 +2202,12 @@ LPDIRECTDRAWSURFACE DDCreateSurface(
     ddsd.dwHeight = height;
     ddsd.dwWidth = width;
 
-    ddrval = IDirectDraw_CreateSurface( lpDD, &ddsd, &psurf, NULL );
+    ddrVal = IDirectDraw_CreateSurface( lpDD, &ddsd, &psurf, NULL );
 
     /*
     * set the color key for this bitmap
     */
-    if( ddrval == DD_OK )
+    if( ddrVal == DD_OK )
     {
 
         /*  if( trans && !bTransDest )
@@ -2220,7 +2221,7 @@ LPDIRECTDRAWSURFACE DDCreateSurface(
     }
     else
     {
-        Msg( "CreateSurface FAILED, rc = %ld", (uint32) LOWORD( ddrval ) );
+        Msg( "CreateSurface FAILED, rc = %ld", (uint32) LOWORD( ddrVal ) );
         psurf = NULL;
     }
 
@@ -2232,7 +2233,8 @@ LPDIRECTDRAWSURFACE DDCreateSurface(
 void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffset,
                      RECT hardbox, bool notanim, bool black, bool leftalign, bool samedir)
 {
-    int work;
+#ifdef TODO
+	int work;
 
     HFASTFILE                  pfile;   
     BITMAPFILEHEADER UNALIGNED *pbf;
@@ -2734,8 +2736,9 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
     return;
 
-
-
+#else
+	error("TODO");
+#endif
 }
 
 
@@ -2921,6 +2924,7 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
     }
     cur_sprite = save_cur;
 }
+
 void figure_out(char line[255], int load_seq)
 {
     char ev[15][100];

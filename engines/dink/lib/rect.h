@@ -29,6 +29,7 @@ namespace Dink {
 typedef Common::Rect RECT;
 typedef Common::Point POINT;
 typedef RECT *LPRECT;
+typedef POINT *LPPOINT;
 
 inline void CopyRect(LPRECT lprcDst, const LPRECT lprcSrc) {
 	*lprcDst = *lprcSrc;

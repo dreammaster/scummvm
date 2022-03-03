@@ -34,8 +34,6 @@
 
 namespace Dink {
 
-int fps_average;
-
 bool initFail(HWND hwnd, const char *mess);
 void move(int u, int amount, char kind, char kindy);
 void draw_box(Common::Rect box, int color);
@@ -45,8 +43,12 @@ int check_if_move_is_legal(int u);
 void change_dir_to_diag( int *dir);
 int hurt_thing(int h, int damage, int special);
 
+extern bool InitSound( HWND );
+extern bool DestroySound( void );
+extern bool DSDisable( void );
+extern bool DSEnable( HWND );
 
-
+int fps_average;
 int but_timer = 0;
 int water_timer;
 bool fire_forward;
@@ -56,12 +58,6 @@ int fps_show = 0;
 
 //idirectsound
 LPDIRECTDRAWCLIPPER lpClipper;
-
-bool InitSound( HWND );
-bool DestroySound( void );
-bool DSDisable( void );
-bool DSEnable( HWND );
-
 
 int drawthistime = true;
 int x = 640;

@@ -31,4 +31,8 @@ HRESULT SetBkMode(HDC hdc, int mode) {
 	return S_OK;
 }
 
+int GetTextFace(HDC hdc, int c, const char *lpName) {
+	return 0;
+}
+
 } // namespace Dink

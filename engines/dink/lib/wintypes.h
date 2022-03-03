@@ -35,6 +35,7 @@ typedef uint16 WORD;
 typedef uint32 *LPDWORD;
 typedef int32 *LONG_PTR;
 typedef uint *UINT_PTR;
+typedef const char *LPCSTR;
 typedef void *HANDLE;
 typedef void *HWND;
 
@@ -52,6 +53,9 @@ inline int mciSendString(const char *lpstrCommand,
 }
 inline bool GetClientRect(HWND hWnd, LPRECT lpRect) { return false; }
 inline void CloseHandle(HANDLE) {}
+inline void FillMemory(void *p, size_t size, byte v) {
+	memset((byte *)p, v, size);
+}
 
 } // namespace Dink
 
