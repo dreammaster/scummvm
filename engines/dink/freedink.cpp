@@ -5935,7 +5935,6 @@ void finiObjects()
 
     kill_all_scripts_for_real();
     FastFileFini();
-    void kill_fonts();
     kill_fonts();
     g_b_kill_app = true;
 #ifdef TODO

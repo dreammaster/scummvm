@@ -5062,7 +5062,7 @@ bool get_parms(char proc_name[20], int script, char *h, const int p[10])
 }
 
 
-int add_callback(char name[20], int n1, int n2, int script)
+int add_callback(const char *name, int n1, int n2, int script)
 {
 
 
@@ -6688,7 +6688,7 @@ void int_prepare(char line[100], int script)
 
 }
 
-int change_sprite(int h,  int val, int * change)
+int change_sprite_inner(int h,  int val, int * change)
 {
     //Msg("Searching sprite %s with val %d.  Cur is %d", h, val, *change);
 
@@ -6708,9 +6708,14 @@ int change_sprite(int h,  int val, int * change)
 }
 
 //redink1 added for long values
-long change_sprite(int h,  int val, long * change)
+template<typename TYPE>
+long change_sprite(int h,  int val, TYPE *change)
 {
-    return (long)change_sprite(h, val, (int*)change);       
+	int temp = *change;
+    long result = (long)change_sprite_inner(h, val, &temp);
+	*change = temp;
+
+	return result;
 }
 
 int change_edit(int h,  int val, unsigned short * change)
@@ -8449,15 +8454,15 @@ int process_line (int script, char *s, bool doelse)
     char ev[15][100];
     char temp[100];
     char first[2];
-    char rstring[200];
-    int rint;
+    //char rstring[200];
+    //int rint;
     int sprite = 0;
 
     if (rinfo[script]->level < 1) rinfo[script]->level = 1;
 
 
     for (int kk =1; kk < 15; kk++) ev[kk][0] = 0;
-    refinfo save_rinfo;
+    //refinfo save_rinfo;
     h = s;
     if (h[0] == 0) return(0);    
     if (  (h[0] == '/') && (h[1] == '/'))
@@ -8750,7 +8755,7 @@ pass:
             h = &h[strlen(ev[1])];
             mConsoleActive = true;
             /*int ARR[20] = {1,0,0,0,0,0,0,0,0,0};
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if ( nlist[0] >= 1 )
                 {
@@ -9291,7 +9296,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 //Yeah... they can only modify valid tiles
                 if (nlist[0] > 0 && nlist[0] <= 96)
@@ -9314,7 +9319,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 //Msg("UnFreeze called for %d.", nlist[0]);
                 if (spr[nlist[0]].active) spr[nlist[0]].freeze = 0; else
@@ -9331,7 +9336,7 @@ pass:
             //Msg("Freeze called (%s)", h);     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 if (spr[nlist[0]].active) spr[nlist[0]].freeze = script; else
@@ -9349,7 +9354,7 @@ pass:
             Msg("setting callback random");
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 int cb = add_callback(slist[0],nlist[1],nlist[2],script); 
                 //got all parms, let do it
@@ -9366,7 +9371,7 @@ pass:
             Msg("setting callback random");
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if ( nlist[0] >= 0 && nlist[0] <= 99)
                 {
@@ -9382,7 +9387,7 @@ pass:
             Msg("setting callback random");
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p) && nlist[0] != 0)
+            if (get_parms(ev[1], script, h, ARR) && nlist[0] != 0)
             {
                 dinkspeed = nlist[0];
             }
@@ -9397,7 +9402,7 @@ pass:
             Msg("setting callback random");
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 mDinkBasePush = nlist[0];
             }
@@ -9407,11 +9412,15 @@ pass:
 
         if (compare(ev[1], "reset_timer"))
         {
+#ifdef TODO
             h = &h[strlen(ev[1])];
             time(&time_start);
             play.minutes = 0;
             strcpy(s, h);  
             return(0);
+#else
+			error("TODO: reset_timer");
+#endif
         }
 
 
@@ -9420,7 +9429,7 @@ pass:
             Msg("setting callback random");
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 keep_mouse = nlist[0];
 
@@ -9438,7 +9447,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 add_item(slist[0], nlist[1], nlist[2], false);
             }
@@ -9452,7 +9461,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 add_exp(nlist[0], nlist[1], true);
             }
@@ -9467,7 +9476,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 add_item(slist[0], nlist[1], nlist[2], true);
             }
@@ -9482,7 +9491,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 kill_cur_item_script(slist[0]);
             }
@@ -9496,7 +9505,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 kill_cur_magic_script(slist[0]);
             }
@@ -9512,7 +9521,7 @@ pass:
             Msg("showing BMP");
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 wait.active = false;
                 show_bmp(slist[0], nlist[1], nlist[2], script);
@@ -9547,7 +9556,7 @@ pass:
             Msg("copying BMP");
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 copy_bmp(slist[0]);
             }
@@ -9564,7 +9573,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 if (nlist[1] == 0)
@@ -9600,7 +9609,7 @@ pass:
         if (compare(ev[1], "free_items"))
         {
             returnint = 0;
-            for (int i = 1; i < 17; i ++)
+            for (i = 1; i < 17; i ++)
             {
                 if (play.item[i].active == false)
                 {
@@ -9633,7 +9642,7 @@ pass:
         {
             returnint = 0;
 
-            for (int i = 1; i < 9; i ++)
+            for (i = 1; i < 9; i ++)
             {
                 if (play.mitem[i].active == false)
                 {
@@ -9709,7 +9718,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (nlist[1] == 0)
                 {
@@ -9746,7 +9755,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 if (text_owned_by(nlist[1])) 
@@ -9776,7 +9785,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 Msg("Say_stop_xy: Adding %s", slist[0]);
@@ -9802,7 +9811,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 kill_returning_stuff(script);
                 decipher_string(slist[0], script);               
@@ -9829,10 +9838,10 @@ pass:
             FillMemory(&hm, sizeof(hm), 0);
             for (int u = 1; u <= 10; u++)
                 play.button[u] = u;
-            int script = load_script("main", 0, true);
+            int scriptMain = load_script("main", 0, true);
 
-            locate(script, "main");
-            run_script(script);
+            locate(scriptMain, "main");
+            run_script(scriptMain);
             //lets attach our vars to the scripts
             attach();
             return(2);
@@ -9843,12 +9852,12 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 //           Msg("Wait called for %d.", nlist[0]);
                 strcpy(s, h);  
                 kill_returning_stuff(script);
-                int cb1 = add_callback("",nlist[0],0,script);        
+                add_callback("",nlist[0],0,script);        
 
                 return(2);
             }
@@ -9862,7 +9871,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 check_seq_status(nlist[0]);
             }
@@ -9879,7 +9888,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 rinfo[script]->sprite = nlist[0];
@@ -9893,7 +9902,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 update_play_changes();
                 int l = nlist[0];
@@ -9917,7 +9926,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,1,1,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 spr[nlist[0]].move_active = true;
@@ -9940,7 +9949,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,2,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (nlist[0] == 0)
                 {
@@ -9978,7 +9987,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 int mysc = load_script(slist[0], 1000, true);
                 if (mysc == 0)
@@ -10001,7 +10010,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,2,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (locate(nlist[0], slist[1]))
                 {
@@ -10089,7 +10098,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 //DSDisable();
 
@@ -10114,7 +10123,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if ( nlist[0] > 0 )
                 {
@@ -10132,7 +10141,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 //StopMidi();
                 int regm = atol(slist[0]);      
@@ -10206,7 +10215,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,1,1,1,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (sound_on)  
                     returnint = SoundPlayEffect(nlist[0], nlist[1], nlist[2], nlist[3],nlist[4]);
@@ -10225,7 +10234,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (sound_on)  
                 {
@@ -10245,7 +10254,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (sound_on)  
                 {
@@ -10269,7 +10278,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (sound_on)  
                 {
@@ -10291,7 +10300,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 save_game(nlist[0]);
@@ -10307,7 +10316,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 *pvision = nlist[0];
@@ -10327,7 +10336,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 fill_screen(nlist[0]);
 
@@ -10343,7 +10352,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 kill_all_scripts_for_real();    
                 returnint = load_game(nlist[0]);
@@ -10365,7 +10374,7 @@ pass:
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 sprintf(temp, "save%d.dat",nlist[0]);
                 if (exist(temp)) returnint = 1; else returnint = 0;
@@ -10383,7 +10392,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,1,1,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 //Msg("Move stop running %d to %d..", nlist[0], nlist[0]);  
                 spr[nlist[0]].move_active = true;
@@ -10409,7 +10418,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (sound_on)
                 {
@@ -10430,7 +10439,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 decipher_string(slist[0], script);       
@@ -10455,7 +10464,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,2,0,0,0,0,0,0,0,0};
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 make_function(slist[0], slist[1]);
@@ -10470,7 +10479,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 make_int(slist[0], nlist[1],0, script);
@@ -10512,7 +10521,7 @@ pass:
             h = &h[strlen(ev[1])];
             // Msg("Running busy, h is %s", h);    
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (nlist[0] == 0) Msg("ERROR:  Busy cannot get info on sprite 0 in %s.",rinfo[script]->name);
                 else
@@ -10536,7 +10545,7 @@ pass:
             h = &h[strlen(ev[1])];
             // Msg("Running busy, h is %s", h);    
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 // Set the value
                 if ( nlist[1] == 0 )
@@ -10569,7 +10578,7 @@ pass:
             h = &h[strlen(ev[1])];
             Msg("Running pigs with h", h);
             int ARR[20] = {1,1,1,1,1,1,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 RECT myrect;
@@ -10592,7 +10601,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = RANDOM(nlist[1], nlist[0]);
             }  else Msg("Failed getting parms for Random()");
@@ -10605,7 +10614,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 initfonts(slist[0]);
@@ -10637,7 +10646,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 mode = nlist[0];
                 returnint = mode;
@@ -10651,7 +10660,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 for (int jj = 1; jj <= last_sprite_created; jj++)
@@ -10676,7 +10685,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,1,1,1,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 returnint = add_sprite_dumb(nlist[0],nlist[1],nlist[2],
@@ -10695,7 +10704,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 for (int ii = 1; ii <= last_sprite_created; ii++)
                 {
@@ -10724,7 +10733,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
 
@@ -10740,7 +10749,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].speed);
 
@@ -10757,7 +10766,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].range);
 
@@ -10772,7 +10781,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].nocontrol);
                 return(0);
@@ -10785,7 +10794,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].nodraw);
                 return(0);
@@ -10799,7 +10808,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].picfreeze);
                 return(0);
@@ -10814,9 +10823,9 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
-                for (int i = 1; i <= last_sprite_created; i++)
+                for (i = 1; i <= last_sprite_created; i++)
                 {
                     if (   (spr[i].brain == nlist[0]) && (i != nlist[1]) ) if
                         (spr[i].active == 1)
@@ -10839,9 +10848,9 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,1,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
-                for (int i = nlist[2]; i <= last_sprite_created; i++)
+                for (i = nlist[2]; i <= last_sprite_created; i++)
                 {
                     if (   (spr[i].brain == nlist[0]) && (i != nlist[1]) ) if
                         (spr[i].active == 1)
@@ -10864,11 +10873,11 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 int cter = 0;
-                for (int i = 1; i <= last_sprite_created; i++)
+                for (i = 1; i <= last_sprite_created; i++)
                 {
                     if (   (spr[i].brain == nlist[0]) && (i != nlist[1]) ) if
                         (spr[i].active == 1)
@@ -10917,7 +10926,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].sound);
 
@@ -10936,7 +10945,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 returnint = change_sprite(nlist[0], nlist[1]+thisTickCount, &spr[nlist[0]].attack_wait);
@@ -10951,7 +10960,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].active);
@@ -10967,7 +10976,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].disabled);
@@ -10983,7 +10992,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].size);
                 return(0);
@@ -11024,7 +11033,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].que);
                 return(0);
@@ -11037,7 +11046,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].gold);
                 return(0);
@@ -11050,7 +11059,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_walk);
                 return(0);
@@ -11064,7 +11073,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].target);
                 return(0);
@@ -11086,7 +11095,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_hit);
                 return(0);
@@ -11099,7 +11108,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_attack);
                 return(0);
@@ -11113,7 +11122,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_idle);
                 return(0);
@@ -11127,7 +11136,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_die);
                 return(0);
@@ -11155,7 +11164,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].pseq);
                 return(0);
@@ -11169,7 +11178,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].pframe);
                 return(0);
@@ -11183,7 +11192,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].seq);
                 return(0);
@@ -11196,7 +11205,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 //Msg("Setting editor_type..");
                 returnint = change_edit_char(nlist[0], nlist[1], &play.spmap[*pmap].type[nlist[0]]);
@@ -11209,7 +11218,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_edit(nlist[0], nlist[1], &play.spmap[*pmap].seq[nlist[0]]);
                 return(0);
@@ -11222,7 +11231,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_edit_char(nlist[0], nlist[1], &play.spmap[*pmap].frame[nlist[0]]);
                 return(0);
@@ -11237,7 +11246,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = spr[nlist[0]].sp_index;
                 return(0);
@@ -11250,7 +11259,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].brain);
                 return(0);
@@ -11263,7 +11272,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].exp);
                 return(0);
@@ -11275,7 +11284,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 play.button[nlist[0]] = nlist[1];
@@ -11291,7 +11300,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].reverse);
                 return(0);
@@ -11305,7 +11314,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].noclip);
                 return(0);
@@ -11319,7 +11328,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].touch_damage);
                 return(0);
@@ -11334,7 +11343,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].brain_parm);
                 return(0);
@@ -11346,7 +11355,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].brain_parm2);
                 return(0);
@@ -11359,7 +11368,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].follow);
                 return(0);
@@ -11372,7 +11381,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if ( nlist[0] == 0 )
                 {
@@ -11392,7 +11401,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].frame);
                 return(0);
@@ -11405,7 +11414,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].frame_delay);
                 return(0);
@@ -11419,7 +11428,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 //redink1 fix for freeze if hurt value is less than 0
                 if (nlist[1] < 0)
@@ -11459,7 +11468,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].hard);
                 if (spr[nlist[0]].sp_index != 0) if (nlist[1] != -1)
@@ -11477,7 +11486,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].move_nohard);
                 return(0);
@@ -11489,7 +11498,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].flying);
                 return(0);
@@ -11505,7 +11514,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 spr[nlist[0]].wait = 0;
                 return(0);
@@ -11517,7 +11526,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 spr[nlist[0]].kill = nlist[1];
                 return(0);
@@ -11530,7 +11539,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if ( nlist[0] == 0 || nlist[0] == 1 )
                 {
@@ -11546,7 +11555,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 stop_entire_game = nlist[0];
 
@@ -11593,7 +11602,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 walk_off_screen = nlist[0];
                 return(0);
@@ -11606,7 +11615,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 push_active = nlist[0];
                 return(0);
@@ -11620,7 +11629,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].x);
                 return(0);
@@ -11634,10 +11643,10 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = 0;
-                for (int i = 1; i < 17; i++)
+                for (i = 1; i < 17; i++)
                 {
                     if (play.item[i].active)
                     {
@@ -11657,10 +11666,10 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = 0;
-                for (int i = 1; i < 9; i++)
+                for (i = 1; i < 9; i++)
                 {
                     if (play.mitem[i].active)
                     {
@@ -11680,7 +11689,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].mx);
                 return(0);
@@ -11693,7 +11702,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].mx);
                 return(0);
@@ -11705,7 +11714,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].my);
                 return(0);
@@ -11718,7 +11727,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].my);
                 return(0);
@@ -11730,7 +11739,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int m = 0;
-            for (int i = 1; i < max_scripts; i++)
+            for (i = 1; i < max_scripts; i++)
                 if (rinfo[i] != NULL) m++;
             returnint = m;
             return(0);
@@ -11743,7 +11752,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].dir);
 
@@ -11758,7 +11767,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].hitpoints);
 
@@ -11773,7 +11782,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].attack_hit_sound);
 
@@ -11788,7 +11797,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].attack_hit_sound_speed);
 
@@ -11803,7 +11812,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].strength);
 
@@ -11817,7 +11826,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].defense);
 
@@ -11831,7 +11840,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
 
                 figure_out(slist[0], 0);
@@ -11846,7 +11855,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].distance);
 
@@ -11861,7 +11870,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].nohit);
                 return(0);
@@ -11875,7 +11884,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].notouch);
                 return(0);
@@ -11890,7 +11899,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = 0;
                 if (*pcur_weapon == 0)
@@ -11915,7 +11924,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = 0;
                 if (*pcur_magic == 0)
@@ -11941,7 +11950,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,2,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = 0;
 
@@ -11983,7 +11992,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].y);
                 return(0);
@@ -11997,7 +12006,7 @@ pass:
         {     
             h = &h[strlen(ev[1])];
             int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].timer);
                 return(0);
@@ -12156,7 +12165,7 @@ pass:
             h = &h[strlen(ev[1])];
             int ARR[20] = {2,2,1,1,1,1,1,1,1,1};
             memset(slist, 0, 10 * 200);
-            get_parms(ev[1], script, h, p);
+            get_parms(ev[1], script, h, ARR);
             if (strlen(slist[0]) > 0 && strlen(slist[1]) > 0)
             {
                 int myscript1 = load_script(slist[0],rinfo[script]->sprite, false);
@@ -12200,7 +12209,7 @@ pass:
             h = &h[strlen(ev[1])];
 
             int ARR[20] = {1,1,1,1,1,1,1,1,1,1};
-            get_parms(ev[1], script, h, p);
+            get_parms(ev[1], script, h, ARR);
 
             if (locate( myscript, ev[1]))
             {
@@ -12219,7 +12228,7 @@ pass:
                 return(2);
             } else
             {
-                for (int i = 0; strlen(play.func[i].func) > 0 && i < 100; i++)
+                for (i = 0; strlen(play.func[i].func) > 0 && i < 100; i++)
                 {
                     if (compare(play.func[i].func, ev[1]))
                     {
@@ -12403,7 +12412,7 @@ redo2:
 
 void process_callbacks(void)
 {
-    int thist = GetTickCount();
+    int thist = g_events->getTickCount();
 
 
     for (int i = 1; i < max_scripts; i++)
@@ -12453,7 +12462,7 @@ void process_callbacks(void)
                 } else
                 {
 
-                    if (callback[k].timer < thist)
+                    if ((int)callback[k].timer < thist)
                     {
                         callback[k].timer = 0;
 
@@ -12592,6 +12601,5 @@ void init_font_colors(void)
     font_colors[15].green = 255;
     font_colors[15].blue  = 255;
 }
-#endif
 
 } // namespace Dink

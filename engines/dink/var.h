@@ -155,7 +155,6 @@ extern int add_sprite(int x1, int y, int brain, int pseq, int pframe);
 extern void load_info(); //redink1
 extern void add_exp(int num, int h, bool addEvenIfNotLastSpriteHit = false);
 extern bool locate(int script, const char *proc);
-extern bool exist(char name[255]);
 extern bool SoundStopEffect(int sound);
 extern void draw_status_all();
 extern bool SoundDestroyEffect(int sound);
@@ -179,6 +178,7 @@ extern void kill_repeat_sounds_all();
 extern void decipher_string(char line[200], int script);
 //redink1 added for recursive scope checking
 extern int get_var(int script, char *name);
+extern void kill_fonts();
 
 } // namespace Dink
 
