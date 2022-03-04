@@ -709,6 +709,103 @@ extern int in_master;
 extern bool sound_on;
 extern char dir[80];
 
+/*------------------------------------*/
+
+
+extern bool please_wait;
+extern int  show_dot;
+extern int  plane_process;
+extern hit_map hm;
+
+extern HWND     g_hWnd;
+extern sprite_index index[max_sequences];
+extern int last_sprite_added;
+extern uint32 timer;
+extern const char *command_line;
+extern bool dinkedit;
+extern int base_timing;
+extern int weapon_script;
+extern int magic_script;
+
+extern int sp_mode;
+extern int fps, fps_final;
+extern int last_sprite_created;
+extern int move_screen;
+extern bool move_gonna;
+extern int move_counter;
+extern int m1x, m1y;
+extern int m2x, m2y;
+extern int m3x, m3y;
+extern int playx;
+extern bool windowed;
+extern int playl;
+extern HINSTANCE MyhInstance;
+extern bool mouse1;
+extern int cur_sprite;
+extern int playy; //redink1's fix for the 'no sprites on pixel line above status bar' bug
+extern int cur_map, cur_tile;
+extern seth_joy sjoy;
+extern int32               thisTickCount, lastTickCount;
+extern uint32 timecrap;
+extern Common::Rect math, box_crap, box_real;
+
+extern HRESULT             ddrval;
+extern int sz, sy, x_offset, y_offset;
+extern DDBLTFX     ddbltfx;
+
+extern int mode;
+
+extern sequence seq[max_sequences];
+extern map_info map;
+extern small_map pam;
+extern LPDIRECTDRAW            lpDD;           // DirectDraw object
+//LPDIRECTDRAWSURFACE     lpDDSOne;       // Offscreen surface 1
+extern LPDIRECTDRAWSURFACE     lpDDSTwo;       // Offscreen surface 2
+extern LPDIRECTDRAWSURFACE     lpDDSTrick;       // Offscreen surface 2
+extern LPDIRECTDRAWSURFACE     lpDDSTrick2;       // Offscreen surface 2
+extern LPDIRECTDRAWSURFACE     lpDDSFade;       //redink1 surface for true-color fade-downs
+
+extern bool trig_man;
+extern bool total_trigger;
+extern bool debug_mode;
+
+extern pic_info     picInfo[max_sprites];       // Sprite data
+extern player_info play;
+
+extern LPDIRECTDRAWSURFACE     lpDDSPrimary;   // DirectDraw primary surface
+extern LPDIRECTDRAWSURFACE     lpDDSBack;      // DirectDraw back surface
+
+extern LPDIRECTDRAWSURFACE     tiles[tile_screens];       // Game pieces
+extern LPDIRECTDRAWSURFACE     game[max_game];       // Game pieces
+
+extern sp spr[max_sprites_at_once]; //max sprite control systems at once
+
+extern LPDIRECTDRAWPALETTE lpDDPal;        // The primary surface palette
+extern PALETTEENTRY pe[256];
+extern PALETTEENTRY real_pal[256];
+
+extern bool bActive;        // is application active?
+//LPDIRECTINPUT lpDI;
+
+
+//direct input stuff for mouse reading
+
+extern LPDIRECTINPUT       g_pdi;
+extern LPDIRECTINPUTDEVICE g_pMouse;
+extern HANDLE              g_hevtMouse;
+
+
+//LPCDIDATAFORMAT lpc;
+
+extern byte torusColors[256];  // Marks the colors used in the torus
+
+extern HWND hWndMain;
+extern JOYINFOEX jinfo;
+extern bool joystick;
+extern bool disablejoystick;
+extern hardness hmap;
+extern Common::Rect tilerect[tile_screens];
+
 } // namespace Dink
 
 #endif

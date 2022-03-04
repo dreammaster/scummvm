@@ -984,7 +984,7 @@ bool exist(const char *name) {
 
 
 
-void add_text(char *tex ,char *filename) {
+void add_text(const char *tex, const char *filename) {
 #ifdef TODO
     FILE *          fp;
     if (strlen(tex) < 1) return;

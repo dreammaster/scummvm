@@ -82,7 +82,7 @@ bool trig_man = false;
 bool total_trigger = false;
 bool debug_mode = false;
 
-pic_info     k[max_sprites];       // Sprite data
+pic_info picInfo[max_sprites];       // Sprite data
 player_info play;
 
 

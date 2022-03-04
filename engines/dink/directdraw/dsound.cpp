@@ -28,7 +28,7 @@ HRESULT DirectSoundCreate(void *pcGuidDevice, LPDIRECTSOUND *ppDS, LPUNKNOWN pUn
 	error("TODO");
 }
 
-HRESULT Play(uint32 dwReserved1, uint32 dwPriority, uint32 dwFlags) {
+HRESULT IDirectSoundBuffer::Play(uint32 dwReserved1, uint32 dwPriority, uint32 dwFlags) {
 	error("TODO");
 }
 
@@ -62,6 +62,10 @@ HRESULT IDirectSoundBuffer::GetStatus(unsigned long *status) {
 
 
 HRESULT CreateSoundBuffer(LPCDSBUFFERDESC pcDSBufferDesc, LPDIRECTSOUNDBUFFER *ppDSBuffer, LPUNKNOWN pUnkOuter) {
+	error("TODO");
+}
+
+HRESULT IDirectSound::CreateSoundBuffer(LPCDSBUFFERDESC pcDSBufferDesc, LPDIRECTSOUNDBUFFER *ppDSBuffer, LPUNKNOWN pUnkOuter) {
 	error("TODO");
 }
 

@@ -85,7 +85,7 @@ HRESULT IDirectDrawSurface::IsLost() const {
 	return empty() ? DDERR_SURFACELOST : DD_OK;
 }
 
-HRESULT SetPalette(LPDIRECTDRAWPALETTE pal) {
+HRESULT IDirectDrawSurface::SetPalette(LPDIRECTDRAWPALETTE pal) {
 	error("TODO");
 }
 
