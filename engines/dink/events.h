@@ -128,6 +128,18 @@ public:
 		_joystickButton[button] = false;
 		return result;
 	}
+
+	/**
+	 * Return the number of game ticks
+	 */
+	uint32 getTickCount() const;
+
+	/**
+	 * Get playtime in seconds
+	 */
+	uint32 getTotalSeconds() {
+		return getTickCount() / 1000;
+	}
 };
 
 extern EventsManager *g_events;

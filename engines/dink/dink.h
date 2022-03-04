@@ -97,6 +97,7 @@ public:
 
 extern DinkEngine *g_engine;
 #define SHOULD_QUIT ::Dink::g_engine->shouldQuit()
+#define RANDOM(MINVAL, COUNT) g_engine->getRandomNumber((MINVAL), (MINVAL + COUNT - 1))
 
 } // namespace Dink
 

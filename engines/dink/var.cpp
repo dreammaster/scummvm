@@ -22,6 +22,8 @@
 #include "common/debug.h"
 #include "common/file.h"
 #include "common/textconsole.h"
+#include "dink/dink.h"
+#include "dink/events.h"
 #include "dink/var.h"
 #include "dink/sound.h"
 #include "dink/lib/graphics.h"
@@ -4440,8 +4442,8 @@ int load_script(const char *filename, int sprite, bool set_sprite)
     Msg("Temp thingie is %c",temp[strlen(temp)-1]);
     if (temp[strlen(temp)-1] == 'D') comp = true; else comp = false;
 
-
-    for (int ii=1; ii < max_scripts; ii++)
+	int ii;
+    for (ii=1; ii < max_scripts; ii++)
     {
         if (rbuf[ii] == NULL)
         {
@@ -4457,7 +4459,7 @@ int load_script(const char *filename, int sprite, bool set_sprite)
 found:
 
 
-    script = max_scripts;
+    script = ii;
 
     rinfo[script] = (struct refinfo *) malloc( sizeof(struct refinfo));
 
@@ -4931,7 +4933,7 @@ void decipher_string(char line[200], int script)
 
 
 
-bool get_parms(char proc_name[20], int script, char *h, int p[10])
+bool get_parms(char proc_name[20], int script, char *h, const int p[10])
 {
     memset(nlist, 0, 10 * sizeof(int));
 
@@ -7524,8 +7526,8 @@ again1:
 bool playing( int sound)
 {
     unsigned long crap;
-    HRESULT ddsound;    
-    HRESULT     dsrval;
+    //HRESULT ddsound;    
+    //HRESULT     dsrval;
     IDirectSoundBuffer *pdsb = ssound[sound].sound;
 
     if( !lpDS || !pdsb )
@@ -7714,10 +7716,11 @@ int playbank( int sound, int min,int plus, int sound3d, bool repeat )
     HRESULT     dsrval;
     unsigned long crap;
     HRESULT ddsound;    
+	int i;
 
     //Msg("Playing bank %d..", sound);
 
-    for (int i=1; i <= num_soundbanks; i++)
+    for (i = 1; i <= num_soundbanks; i++)
     {
 
         if( !lpDS || !soundbank[i])
@@ -7766,9 +7769,9 @@ madeit:
     */
     soundbank[i]->SetCurrentPosition( 0);
 
-    if (plus == 0)
-        soundbank[i]->SetFrequency(min); else
-        soundbank[i]->SetFrequency((rand() % plus)+min);
+	if (plus == 0)
+		soundbank[i]->SetFrequency(min); else
+		soundbank[i]->SetFrequency(RANDOM(min, plus));
     if (sound3d > 0) 
     {
         soundbank[i]->SetPan(get_pan(sound3d));
@@ -7804,8 +7807,8 @@ madeit:
 
 int SoundPlayEffect( int sound, int min,int plus , int sound3d, bool repeat)
 {
-    HRESULT     dsrval;
-    IDirectSoundBuffer *pdsb = ssound[sound].sound;
+//    HRESULT     dsrval;
+//    IDirectSoundBuffer *pdsb = ssound[sound].sound;
 
     //  if (playing(sound))
     //main mixing buffer is busy, lets use a 'bank' instead.
@@ -7840,7 +7843,8 @@ int hurt_thing(int h, int damage, int special)
 
     if (num == 0) 
     {
-        if ((rand() % 2)+1 == 1) num = 1;
+        if (RANDOM(1, 2) == 1)
+			num = 1;
     }
 
     spr[h].damage += num;
@@ -7850,7 +7854,7 @@ int hurt_thing(int h, int damage, int special)
 
 void random_blood(int mx, int my, int h)
 {
-    //if ((rand() % 2) == 1) myseq = 188; else myseq = 187;
+    //if (RANDOM(0, 2) == 1) myseq = 188; else myseq = 187;
     //redink1 - customizable blood depending on what sprite we hit!!
     int myseq;
     int randy;
@@ -7866,7 +7870,7 @@ void random_blood(int mx, int my, int h)
         randy = 3;
     }
 
-    myseq += (rand() % randy);
+	myseq += RANDOM(0, randy);
 
     int crap2 = add_sprite(mx,my,5,myseq,1);
     spr[crap2].speed = 0;
@@ -7899,7 +7903,7 @@ bool SoundStopEffect( int sound )
 } /* SoundStopEffect */
 
 
-bool DSEnable( HWND hwnd )
+bool DSEnable(HWND hWnd)
 {
     HRESULT             dsrval;
     bool                bUseDSound;
@@ -7935,7 +7939,7 @@ bool DSEnable( HWND hwnd )
     }
 
 
-    dsrval = lpDS->SetCooperativeLevel(hwnd, DSSCL_NORMAL);
+    dsrval = lpDS->SetCooperativeLevel(hWnd, DSSCL_NORMAL);
 
     if (dsrval != DS_OK)
     {
@@ -7965,7 +7969,6 @@ bool DSEnable( HWND hwnd )
 
 bool InitSound( HWND hwndOwner )
 {
-    int idx;
     Msg("initting sound");
     DSBUFFERDESC dsBD;
     IDirectSoundBuffer *lpPrimary;
@@ -8045,10 +8048,7 @@ bool InitSound( HWND hwndOwner )
 void draw_map_game( void)
 {
     RECT                rcRect;
-
-
-
-    int pa, cool,crap;   
+	int pa, cool;
 
 
     *pvision = 0;
@@ -8098,11 +8098,9 @@ void draw_map_game( void)
     //if script for overall screen, run it
 
     //Msg("Done loading screen.");
-    thisTickCount = GetTickCount();
+	thisTickCount = g_events->getTickCount();
 
     init_scripts();
-
-
 }
 
 
@@ -8186,7 +8184,7 @@ void draw_map_game_background( void)
 
 
 
-    int pa, cool,crap;   
+    int pa, cool;   
 
 
     for (int x=0; x<96; x++)
@@ -8344,31 +8342,31 @@ void add_item(char name[10], int mseq, int mframe, bool magic)
 void fill_screen(int num)
 {
     int crap;   
-    DDBLTFX     ddbltfx;
-    ZeroMemory(&ddbltfx, sizeof(ddbltfx));
-    ddbltfx.dwSize = sizeof( ddbltfx);
+    DDBLTFX     ddBltFx;
+    ZeroMemory(&ddBltFx, sizeof(ddBltFx));
+    ddBltFx.dwSize = sizeof( ddBltFx);
     //redink1 fix for correct fill_screen colors in truecolor mode
     if (truecolor)
     {
         lpDDPal->GetEntries(0,0,256,pe);
-        ddbltfx.dwFillColor = pe[num].peBlue << wBPos | pe[num].peGreen << wGPos | pe[num].peRed << wRPos;
+        ddBltFx.dwFillColor = pe[num].peBlue << wBPos | pe[num].peGreen << wGPos | pe[num].peRed << wRPos;
     }
     else
-        ddbltfx.dwFillColor = num;
-    crap = lpDDSTwo->Blt(NULL ,NULL,NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
+        ddBltFx.dwFillColor = num;
+    crap = lpDDSTwo->Blt(NULL ,NULL,NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
 
 }
 
 
 void fill_hard_sprites(void )
 {
-    int sprite;
+//    int sprite;
     bool bs[max_sprites_at_once];
     int rank[max_sprites_at_once];
     int highest_sprite;
     int h;  
     memset(&bs,0,sizeof(bs));
-    int hs;
+//    int hs;
 
     //Msg("filling sprite hardness...");
 
@@ -8751,7 +8749,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             mConsoleActive = true;
-            /*int p[20] = {1,0,0,0,0,0,0,0,0,0};
+            /*int ARR[20] = {1,0,0,0,0,0,0,0,0,0};
             if (get_parms(ev[1], script, h, p))
             {
                 if ( nlist[0] >= 1 )
@@ -8774,8 +8772,8 @@ pass:
         if (compare(ev[1], "set_font_color"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,1,1,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            const int ARR[20] = {1,1,1,1,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (nlist[0] >= 1 && nlist[0] <= 15 &&
                     nlist[1] >= 0 && nlist[1] <= 255 &&
@@ -8796,14 +8794,14 @@ pass:
         if (compare(ev[1], "clear_editor_info"))
         {
             h = &h[strlen(ev[1])];
-            for (int i = 0; i < 769; i++)
+            for (int ii = 0; ii < 769; ii++)
             {
                 for (int j = 0; j < 100; j++)
                 {
-                    play.spmap[i].seq[j] = 0;
-                    play.spmap[i].frame[j] = 0;
-                    play.spmap[i].type[j] = 0;
-                    play.spmap[i].last_time = 0;
+                    play.spmap[ii].seq[j] = 0;
+                    play.spmap[ii].frame[j] = 0;
+                    play.spmap[ii].type[j] = 0;
+                    play.spmap[ii].last_time = 0;
                 }
             }
             returnint = 1;
@@ -8815,8 +8813,8 @@ pass:
         {
             h = &h[strlen(ev[1])];
             int m = 0;
-            for (int i = 1; i < max_vars; i++)
-                if (play.var[i].active == true)
+            for (int ii = 1; ii < max_vars; ii++)
+                if (play.var[ii].active == true)
                     m++;
             returnint = m;
             return(0);
@@ -8826,8 +8824,8 @@ pass:
         if (compare(ev[1], "load_map"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {2,2,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {2,2,0,0,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {
                 strcpy(current_map,slist[0]);
                 strcpy(current_dat,slist[1]);
@@ -8843,8 +8841,8 @@ pass:
         if (compare(ev[1], "load_palette"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {
                 if (exist(slist[0])) 
                 {
@@ -8870,8 +8868,8 @@ pass:
         if (compare(ev[1], "load_tile"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {   
                 if (!exist(slist[0]))
                 {
@@ -8898,8 +8896,8 @@ pass:
         if (compare(ev[1], "set_save_game_info"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {
                 strcpy(save_game_info,slist[0]);
             }
@@ -8922,8 +8920,8 @@ pass:
         returnint = 0;
 
         h = &h[strlen(ev[1])];
-        int p[20] = {2,1,0,0,0,0,0,0,0,0};  
-        if (get_parms(ev[1], script, h, p))
+        int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
+        if (get_parms(ev[1], script, h, ARR))
         {
         if (compare(slist[0],"get_compatibility"))
         {
@@ -8941,9 +8939,8 @@ pass:
         if (compare(ev[1], "get_time_game"))
         {
             h = &h[strlen(ev[1])];
-            time_t ct;
-            time(&ct);
-            returnint = play.minutes + (difftime(ct,time_start) / 60);
+            returnint = play.minutes +
+				(g_events->getTotalSeconds() / 60);
             strcpy(s, h);  
             return(0);
         }
@@ -8952,15 +8949,10 @@ pass:
         if (compare(ev[1], "get_time_real"))
         {
             h = &h[strlen(ev[1])];
-            char mytime[5];
-            time_t ct;
-            struct tm *time_now;
-            time(&ct);
-            time_now = localtime(&ct);
-            strftime(mytime,5,"%M",time_now);
-            returnint = atoi(mytime);
-            strftime(mytime,5,"%H",time_now);
-            returnint += 60*atoi(mytime);
+			TimeDate td;
+			g_system->getTimeAndDate(td);
+
+			returnint = td.tm_hour * 60 + td.tm_min;
             strcpy(s, h);  
             return(0);
         }
@@ -8969,13 +8961,9 @@ pass:
         if (compare(ev[1], "get_date_year"))
         {
             h = &h[strlen(ev[1])];
-            char mytime[5];
-            time_t ct;
-            struct tm *time_now;
-            time(&ct);
-            time_now = localtime(&ct);
-            strftime(mytime,5,"%Y",time_now);
-            returnint = atoi(mytime);
+			TimeDate td;
+			g_system->getTimeAndDate(td);
+			returnint = td.tm_year;
             strcpy(s, h);  
             return(0);
         }
@@ -8984,13 +8972,9 @@ pass:
         if (compare(ev[1], "get_date_month"))
         {
             h = &h[strlen(ev[1])];
-            char mytime[5];
-            time_t ct;
-            struct tm *time_now;
-            time(&ct);
-            time_now = localtime(&ct);
-            strftime(mytime,5,"%m",time_now);
-            returnint = atoi(mytime);
+			TimeDate td;
+			g_system->getTimeAndDate(td);
+			returnint = td.tm_mon;
             strcpy(s, h);  
             return(0);
         }
@@ -8999,23 +8983,19 @@ pass:
         if (compare(ev[1], "get_date_day"))
         {
             h = &h[strlen(ev[1])];
-            char mytime[5];
-            time_t ct;
-            struct tm *time_now;
-            time(&ct);
-            time_now = localtime(&ct);
-            strftime(mytime,5,"%d",time_now);
-            returnint = atoi(mytime);
-            strcpy(s, h);  
-            return(0);
-        }
+			TimeDate td;
+			g_system->getTimeAndDate(td);
+			returnint = td.tm_mday;
+			strcpy(s, h);
+			return(0);
+		}
 
         //redink1 added this function
         if (compare(ev[1], "math_abs"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = abs(nlist[0]);
             }
@@ -9027,8 +9007,8 @@ pass:
         /*if (compare(ev[1], "math_sin"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = sin((double)nlist[0]);
             }
@@ -9040,8 +9020,8 @@ pass:
         if (compare(ev[1], "math_cos"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = cos((double)nlist[0]);
             }
@@ -9053,8 +9033,8 @@ pass:
         if (compare(ev[1], "math_tan"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = tan((double)nlist[0]);
             }
@@ -9066,8 +9046,8 @@ pass:
         if (compare(ev[1], "math_sqrt"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = sqrt((double)abs(nlist[0]));
             }
@@ -9079,8 +9059,8 @@ pass:
         if (compare(ev[1], "math_mod"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = (nlist[0] % nlist[1]);
             }
@@ -9092,8 +9072,8 @@ pass:
         if (compare(ev[1], "sp_custom"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,1,0,0,0,0,0,0,0};  
-            if ( get_parms(ev[1], script, h, p) && spr[nlist[1]].active == true )
+            int ARR[20] = {2,1,1,0,0,0,0,0,0,0};
+            if ( get_parms(ev[1], script, h, ARR) && spr[nlist[1]].active == true )
             {
                 if ( nlist[1] < 1 || spr[nlist[1]].active == false )
                 {
@@ -9104,17 +9084,17 @@ pass:
                     // If key doesn't exist, create it.
                     if ( spr[nlist[1]].custom->find( slist[0] ) == spr[nlist[1]].custom->end() )
                     {
-                        spr[nlist[1]].custom->insert( std::make_pair( slist[0], 0 ) );
+						(*spr[nlist[1]].custom)[slist[0]] = 0;
                     }
 
                     // Set the value
                     if ( nlist[2] != -1 )
                     {
                         spr[nlist[1]].custom->erase( slist[0] );
-                        spr[nlist[1]].custom->insert( std::make_pair( slist[0], nlist[2] ) );
+						(*spr[nlist[1]].custom)[slist[0]] = nlist[2];
                     }
 
-                    returnint = spr[nlist[1]].custom->find( slist[0] )->second;
+                    returnint = spr[nlist[1]].custom->find( slist[0] )->_value;
                 }
                 return(0);
             }
@@ -9126,8 +9106,8 @@ pass:
         if (compare(ev[1], "sp_blood_seq"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};
+            if (get_parms(ev[1], script, h, ARR))
             {
                 change_sprite(nlist[0], nlist[1], &spr[nlist[0]].bloodseq);
 
@@ -9143,8 +9123,8 @@ pass:
         if (compare(ev[1], "sp_blood_num"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};
+            if (get_parms(ev[1], script, h, ARR))
             {
                 change_sprite(nlist[0], nlist[1], &spr[nlist[0]].bloodnum);
 
@@ -9160,11 +9140,11 @@ pass:
         if (compare(ev[1], "get_item"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = 0;
-                for (int i = 1; i < 17; i++)
+                for (i = 1; i < 17; i++)
                 {
                     if (play.item[i].active)
                     {
@@ -9185,11 +9165,11 @@ pass:
         if (compare(ev[1], "get_magic"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};
+            if (get_parms(ev[1], script, h, ARR))
             {
                 returnint = 0;
-                for (int i = 1; i < 9; i++)
+                for (i = 1; i < 9; i++)
                 {
                     if (play.mitem[i].active)
                     {
@@ -9210,8 +9190,8 @@ pass:
         if (compare(ev[1], "sp_clip_left"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};
+            if (get_parms(ev[1], script, h, ARR))
             {
                 change_sprite(nlist[0], nlist[1], &spr[nlist[0]].alt.left);
 
@@ -9227,8 +9207,8 @@ pass:
         if (compare(ev[1], "sp_clip_top"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};
+            if (get_parms(ev[1], script, h, ARR))
             {
                 change_sprite(nlist[0], nlist[1], &spr[nlist[0]].alt.top);
 
@@ -9244,8 +9224,8 @@ pass:
         if (compare(ev[1], "sp_clip_right"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};
+            if (get_parms(ev[1], script, h, ARR))
             {
                 change_sprite(nlist[0], nlist[1], &spr[nlist[0]].alt.right);
 
@@ -9261,8 +9241,8 @@ pass:
         if (compare(ev[1], "sp_clip_bottom"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};
+            if (get_parms(ev[1], script, h, ARR))
             {
                 change_sprite(nlist[0], nlist[1], &spr[nlist[0]].alt.bottom);
 
@@ -9287,8 +9267,8 @@ pass:
         if (compare(ev[1], "map_tile"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
-            if (get_parms(ev[1], script, h, p))
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
+            if (get_parms(ev[1], script, h, ARR))
             {
                 //Yeah... they can only modify valid tiles
                 if (nlist[0] > 0 && nlist[0] <= 96)
@@ -9310,7 +9290,7 @@ pass:
         if (compare(ev[1], "map_hard_tile"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 //Yeah... they can only modify valid tiles
@@ -9333,7 +9313,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 //Msg("UnFreeze called for %d.", nlist[0]);
@@ -9350,7 +9330,7 @@ pass:
         {
             //Msg("Freeze called (%s)", h);     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -9368,7 +9348,7 @@ pass:
         {
             Msg("setting callback random");
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,1,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 int cb = add_callback(slist[0],nlist[1],nlist[2],script); 
@@ -9385,7 +9365,7 @@ pass:
         {
             Msg("setting callback random");
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if ( nlist[0] >= 0 && nlist[0] <= 99)
@@ -9401,7 +9381,7 @@ pass:
         {
             Msg("setting callback random");
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p) && nlist[0] != 0)
             {
                 dinkspeed = nlist[0];
@@ -9416,7 +9396,7 @@ pass:
         {
             Msg("setting callback random");
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 mDinkBasePush = nlist[0];
@@ -9439,7 +9419,7 @@ pass:
         {
             Msg("setting callback random");
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 keep_mouse = nlist[0];
@@ -9457,7 +9437,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,1,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 add_item(slist[0], nlist[1], nlist[2], false);
@@ -9471,7 +9451,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 add_exp(nlist[0], nlist[1], true);
@@ -9486,7 +9466,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,1,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 add_item(slist[0], nlist[1], nlist[2], true);
@@ -9501,7 +9481,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 kill_cur_item_script(slist[0]);
@@ -9515,7 +9495,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 kill_cur_magic_script(slist[0]);
@@ -9531,7 +9511,7 @@ pass:
         {
             Msg("showing BMP");
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,1,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 wait.active = false;
@@ -9566,7 +9546,7 @@ pass:
         {
             Msg("copying BMP");
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 copy_bmp(slist[0]);
@@ -9583,7 +9563,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -9728,7 +9708,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if (nlist[1] == 0)
@@ -9765,7 +9745,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -9795,7 +9775,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,1,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -9821,7 +9801,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,1,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,1,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 kill_returning_stuff(script);
@@ -9862,7 +9842,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 //           Msg("Wait called for %d.", nlist[0]);
@@ -9881,7 +9861,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 check_seq_status(nlist[0]);
@@ -9898,7 +9878,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -9912,7 +9892,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 update_play_changes();
@@ -9936,7 +9916,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,1,1,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,1,1,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -9959,7 +9939,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,2,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,2,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if (nlist[0] == 0)
@@ -9997,7 +9977,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 int mysc = load_script(slist[0], 1000, true);
@@ -10020,7 +10000,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,2,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,2,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if (locate(nlist[0], slist[1]))
@@ -10108,7 +10088,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 //DSDisable();
@@ -10133,7 +10113,7 @@ pass:
         if (compare(ev[1], "loopmidi"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if ( nlist[0] > 0 )
@@ -10151,7 +10131,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 //StopMidi();
@@ -10225,7 +10205,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,1,1,1,0,0,0,0,0};  
+            int ARR[20] = {1,1,1,1,1,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if (sound_on)  
@@ -10244,7 +10224,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if (sound_on)  
@@ -10264,7 +10244,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if (sound_on)  
@@ -10288,7 +10268,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if (sound_on)  
@@ -10310,7 +10290,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10326,7 +10306,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10346,7 +10326,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 fill_screen(nlist[0]);
@@ -10362,7 +10342,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 kill_all_scripts_for_real();    
@@ -10384,7 +10364,7 @@ pass:
         {
             // (sprite, direction, until, nohard);
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 sprintf(temp, "save%d.dat",nlist[0]);
@@ -10402,7 +10382,7 @@ pass:
             // (sprite, direction, until, nohard);
 
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,1,1,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,1,1,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 //Msg("Move stop running %d to %d..", nlist[0], nlist[0]);  
@@ -10428,7 +10408,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if (sound_on)
@@ -10449,7 +10429,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10474,7 +10454,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,2,0,0,0,0,0,0,0,0};
+            int ARR[20] = {2,2,0,0,0,0,0,0,0,0};
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10489,7 +10469,7 @@ pass:
         {
 
             h = &h[strlen(ev[1])];
-            int p[20] = {2,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10531,7 +10511,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             // Msg("Running busy, h is %s", h);    
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if (nlist[0] == 0) Msg("ERROR:  Busy cannot get info on sprite 0 in %s.",rinfo[script]->name);
@@ -10555,7 +10535,7 @@ pass:
         {
             h = &h[strlen(ev[1])];
             // Msg("Running busy, h is %s", h);    
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 // Set the value
@@ -10588,7 +10568,7 @@ pass:
 
             h = &h[strlen(ev[1])];
             Msg("Running pigs with h", h);
-            int p[20] = {1,1,1,1,1,1,0,0,0,0};  
+            int ARR[20] = {1,1,1,1,1,1,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10611,10 +10591,10 @@ pass:
         if (compare(ev[1], "random"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
-                returnint = (rand() % nlist[0])+nlist[1];
+                returnint = RANDOM(nlist[1], nlist[0]);
             }  else Msg("Failed getting parms for Random()");
 
             strcpy(s, h);  
@@ -10624,7 +10604,7 @@ pass:
         if (compare(ev[1], "initfont"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10656,7 +10636,7 @@ pass:
         if (compare(ev[1], "set_mode"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 mode = nlist[0];
@@ -10670,7 +10650,7 @@ pass:
         if (compare(ev[1], "kill_shadow"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10695,7 +10675,7 @@ pass:
         if (compare(ev[1], "create_sprite"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,1,1,1,0,0,0,0,0};  
+            int ARR[20] = {1,1,1,1,1,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10714,7 +10694,7 @@ pass:
         if (compare(ev[1], "sp"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 for (int ii = 1; ii <= last_sprite_created; ii++)
@@ -10743,7 +10723,7 @@ pass:
         if (compare(ev[1], "is_script_attached"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10759,7 +10739,7 @@ pass:
         if (compare(ev[1], "sp_speed"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].speed);
@@ -10776,7 +10756,7 @@ pass:
         if (compare(ev[1], "sp_range"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].range);
@@ -10791,7 +10771,7 @@ pass:
         if (compare(ev[1], "sp_nocontrol"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].nocontrol);
@@ -10804,7 +10784,7 @@ pass:
         if (compare(ev[1], "sp_nodraw"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].nodraw);
@@ -10818,7 +10798,7 @@ pass:
         if (compare(ev[1], "sp_picfreeze"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].picfreeze);
@@ -10833,7 +10813,7 @@ pass:
         if (compare(ev[1], "get_sprite_with_this_brain"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 for (int i = 1; i <= last_sprite_created; i++)
@@ -10858,7 +10838,7 @@ pass:
         if (compare(ev[1], "get_next_sprite_with_this_brain"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,1,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,1,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 for (int i = nlist[2]; i <= last_sprite_created; i++)
@@ -10883,7 +10863,7 @@ pass:
         if (compare(ev[1], "get_rand_sprite_with_this_brain"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10906,7 +10886,7 @@ pass:
                     return(0);
                 }
 
-                int mypick = (rand() % cter)+1;
+				int mypick = RANDOM(1, cter);
                 cter = 0;
                 for (int ii = 1; ii <= last_sprite_created; ii++)
                 {
@@ -10936,7 +10916,7 @@ pass:
         if (compare(ev[1], "sp_sound"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].sound);
@@ -10955,7 +10935,7 @@ pass:
         if (compare(ev[1], "sp_attack_wait"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10970,7 +10950,7 @@ pass:
         if (compare(ev[1], "sp_active"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -10986,7 +10966,7 @@ pass:
         if (compare(ev[1], "sp_disabled"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -11002,7 +10982,7 @@ pass:
         if (compare(ev[1], "sp_size"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].size);
@@ -11043,7 +11023,7 @@ pass:
         if (compare(ev[1], "sp_que"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].que);
@@ -11056,7 +11036,7 @@ pass:
         if (compare(ev[1], "sp_gold"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].gold);
@@ -11069,7 +11049,7 @@ pass:
         if (compare(ev[1], "sp_base_walk"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_walk);
@@ -11083,7 +11063,7 @@ pass:
         if (compare(ev[1], "sp_target"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].target);
@@ -11105,7 +11085,7 @@ pass:
         if (compare(ev[1], "sp_base_hit"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_hit);
@@ -11118,7 +11098,7 @@ pass:
         if (compare(ev[1], "sp_base_attack"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_attack);
@@ -11132,7 +11112,7 @@ pass:
         if (compare(ev[1], "sp_base_idle"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_idle);
@@ -11146,7 +11126,7 @@ pass:
         if ( (compare(ev[1], "sp_base_die")) || (compare(ev[1], "sp_base_death"))  )
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_die);
@@ -11174,7 +11154,7 @@ pass:
         if (compare(ev[1], "sp_pseq"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].pseq);
@@ -11188,7 +11168,7 @@ pass:
         if (compare(ev[1], "sp_pframe"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].pframe);
@@ -11202,7 +11182,7 @@ pass:
         if (compare(ev[1], "sp_seq"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].seq);
@@ -11215,7 +11195,7 @@ pass:
         if (compare(ev[1], "editor_type"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 //Msg("Setting editor_type..");
@@ -11228,7 +11208,7 @@ pass:
         if (compare(ev[1], "editor_seq"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_edit(nlist[0], nlist[1], &play.spmap[*pmap].seq[nlist[0]]);
@@ -11241,7 +11221,7 @@ pass:
         if (compare(ev[1], "editor_frame"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_edit_char(nlist[0], nlist[1], &play.spmap[*pmap].frame[nlist[0]]);
@@ -11256,7 +11236,7 @@ pass:
         if (compare(ev[1], "sp_editor_num"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = spr[nlist[0]].sp_index;
@@ -11269,7 +11249,7 @@ pass:
         if (compare(ev[1], "sp_brain"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].brain);
@@ -11282,7 +11262,7 @@ pass:
         if (compare(ev[1], "sp_exp"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].exp);
@@ -11294,7 +11274,7 @@ pass:
         if (compare(ev[1], "set_button"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -11310,7 +11290,7 @@ pass:
         if (compare(ev[1], "sp_reverse"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].reverse);
@@ -11324,7 +11304,7 @@ pass:
         if (compare(ev[1], "sp_noclip"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].noclip);
@@ -11338,7 +11318,7 @@ pass:
         if (compare(ev[1], "sp_touch_damage"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].touch_damage);
@@ -11353,7 +11333,7 @@ pass:
         if (compare(ev[1], "sp_brain_parm"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].brain_parm);
@@ -11365,7 +11345,7 @@ pass:
         if (compare(ev[1], "sp_brain_parm2"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].brain_parm2);
@@ -11378,7 +11358,7 @@ pass:
         if (compare(ev[1], "sp_follow"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].follow);
@@ -11391,7 +11371,7 @@ pass:
         if (compare(ev[1], "set_smooth_follow"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if ( nlist[0] == 0 )
@@ -11411,7 +11391,7 @@ pass:
         if (compare(ev[1], "sp_frame"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].frame);
@@ -11424,7 +11404,7 @@ pass:
         if (compare(ev[1], "sp_frame_delay"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].frame_delay);
@@ -11438,7 +11418,7 @@ pass:
         if (compare(ev[1], "hurt"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 //redink1 fix for freeze if hurt value is less than 0
@@ -11478,7 +11458,7 @@ pass:
         if (compare(ev[1], "sp_hard"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].hard);
@@ -11496,7 +11476,7 @@ pass:
         if (compare(ev[1], "sp_move_nohard"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].move_nohard);
@@ -11508,7 +11488,7 @@ pass:
         if (compare(ev[1], "sp_flying"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].flying);
@@ -11524,7 +11504,7 @@ pass:
         if (compare(ev[1], "sp_kill_wait"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 spr[nlist[0]].wait = 0;
@@ -11536,7 +11516,7 @@ pass:
         if (compare(ev[1], "sp_kill"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 spr[nlist[0]].kill = nlist[1];
@@ -11549,7 +11529,7 @@ pass:
         if (compare(ev[1], "screenlock"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 if ( nlist[0] == 0 || nlist[0] == 1 )
@@ -11565,7 +11545,7 @@ pass:
         if (compare(ev[1], "stop_entire_game"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 stop_entire_game = nlist[0];
@@ -11612,7 +11592,7 @@ pass:
         if (compare(ev[1], "dink_can_walk_off_screen"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 walk_off_screen = nlist[0];
@@ -11625,7 +11605,7 @@ pass:
         if (compare(ev[1], "push_active"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 push_active = nlist[0];
@@ -11639,7 +11619,7 @@ pass:
         if (compare(ev[1], "sp_x"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].x);
@@ -11653,7 +11633,7 @@ pass:
         if (compare(ev[1], "count_item"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = 0;
@@ -11676,7 +11656,7 @@ pass:
         if (compare(ev[1], "count_magic"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = 0;
@@ -11699,7 +11679,7 @@ pass:
         if (compare(ev[1], "sp_mx"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].mx);
@@ -11712,7 +11692,7 @@ pass:
         if (compare(ev[1], "sp_move_x"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].mx);
@@ -11724,7 +11704,7 @@ pass:
         if (compare(ev[1], "sp_my"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].my);
@@ -11737,7 +11717,7 @@ pass:
         if (compare(ev[1], "sp_move_y"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].my);
@@ -11762,7 +11742,7 @@ pass:
         if (compare(ev[1], "sp_dir"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].dir);
@@ -11777,7 +11757,7 @@ pass:
         if (compare(ev[1], "sp_hitpoints"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].hitpoints);
@@ -11792,7 +11772,7 @@ pass:
         if (compare(ev[1], "sp_attack_hit_sound"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].attack_hit_sound);
@@ -11807,7 +11787,7 @@ pass:
         if (compare(ev[1], "sp_attack_hit_sound_speed"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].attack_hit_sound_speed);
@@ -11822,7 +11802,7 @@ pass:
         if (compare(ev[1], "sp_strength"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].strength);
@@ -11836,7 +11816,7 @@ pass:
         if (compare(ev[1], "sp_defense"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].defense);
@@ -11850,7 +11830,7 @@ pass:
         if (compare(ev[1], "init"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
 
@@ -11865,7 +11845,7 @@ pass:
         if (compare(ev[1], "sp_distance"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].distance);
@@ -11880,7 +11860,7 @@ pass:
         if (compare(ev[1], "sp_nohit"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].nohit);
@@ -11894,7 +11874,7 @@ pass:
         if (compare(ev[1], "sp_notouch"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].notouch);
@@ -11909,7 +11889,7 @@ pass:
         if (compare(ev[1], "compare_weapon"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = 0;
@@ -11934,7 +11914,7 @@ pass:
         if (compare(ev[1], "compare_magic"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {2,0,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {2,0,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = 0;
@@ -11960,7 +11940,7 @@ pass:
         if (compare(ev[1], "compare_sprite_script"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,2,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,2,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = 0;
@@ -12002,7 +11982,7 @@ pass:
         if (compare(ev[1], "sp_y"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].y);
@@ -12016,7 +11996,7 @@ pass:
         if (compare(ev[1], "sp_timing"))
         {     
             h = &h[strlen(ev[1])];
-            int p[20] = {1,1,0,0,0,0,0,0,0,0};  
+            int ARR[20] = {1,1,0,0,0,0,0,0,0,0};  
             if (get_parms(ev[1], script, h, p))
             {
                 returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].timer);
@@ -12174,7 +12154,7 @@ pass:
         if (compare(ev[1], "external"))
         {
             h = &h[strlen(ev[1])];
-            int p[20] = {2,2,1,1,1,1,1,1,1,1};
+            int ARR[20] = {2,2,1,1,1,1,1,1,1,1};
             memset(slist, 0, 10 * 200);
             get_parms(ev[1], script, h, p);
             if (strlen(slist[0]) > 0 && strlen(slist[1]) > 0)
@@ -12219,7 +12199,7 @@ pass:
 
             h = &h[strlen(ev[1])];
 
-            int p[20] = {1,1,1,1,1,1,1,1,1,1};
+            int ARR[20] = {1,1,1,1,1,1,1,1,1,1};
             get_parms(ev[1], script, h, p);
 
             if (locate( myscript, ev[1]))
@@ -12465,10 +12445,11 @@ void process_callbacks(void)
                 {
                     //set timer
 
-                    if (callback[k].max > 0)    
-                        callback[k].timer = thist + (rand() % callback[k].max)+callback[k].min;
-                    else callback[k].timer = thist + callback[k].min;
-
+                    if (callback[k].max > 0) {
+                        callback[k].timer = thist + RANDOM(callback[k].min, callback[k].max);
+					} else {
+						callback[k].timer = thist + callback[k].min;
+					}
                 } else
                 {
 

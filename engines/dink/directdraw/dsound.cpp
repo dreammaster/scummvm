@@ -19,9 +19,62 @@
  *
  */
 
-#include "dink/directdraw/ddraw.h"
+#include "common/textconsole.h"
+#include "dink/directdraw/dsound.h"
 
 namespace Dink {
 
+HRESULT DirectSoundCreate(void *pcGuidDevice, LPDIRECTSOUND *ppDS, LPUNKNOWN pUnkOuter) {
+	error("TODO");
+}
+
+HRESULT Play(uint32 dwReserved1, uint32 dwPriority, uint32 dwFlags) {
+	error("TODO");
+}
+
+HRESULT IDirectSoundBuffer::SetVolume(int lVolume) {
+	error("TODO");
+}
+
+HRESULT IDirectSoundBuffer::SetPan(int lPan) {
+	error("TODO");
+}
+
+HRESULT IDirectSoundBuffer::SetFrequency(uint32 freq) {
+	error("TODO");
+}
+
+HRESULT IDirectSoundBuffer::SetCurrentPosition(uint32 dwNewPosition) {
+	error("TODO");
+}
+
+HRESULT IDirectSoundBuffer::Stop() {
+	error("TODO");
+}
+
+HRESULT IDirectSoundBuffer::Release() {
+	error("TODO");
+}
+
+HRESULT IDirectSoundBuffer::GetStatus(unsigned long *status) {
+	error("TODO");
+}
+
+
+HRESULT CreateSoundBuffer(LPCDSBUFFERDESC pcDSBufferDesc, LPDIRECTSOUNDBUFFER *ppDSBuffer, LPUNKNOWN pUnkOuter) {
+	error("TODO");
+}
+
+HRESULT IDirectSound::SetCooperativeLevel(HWND hwnd, DWORD dwLevel) {
+	error("TODO");
+}
+
+HRESULT IDirectSound::DuplicateSoundBuffer(LPDIRECTSOUNDBUFFER pDSBufferOriginal, _Outptr_ LPDIRECTSOUNDBUFFER *ppDSBufferDuplicate) {
+	error("TODO");
+}
+
+HRESULT IDirectSound::Release() {
+	error("TODO");
+}
 
 } // namespace Dink

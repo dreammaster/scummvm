@@ -45,10 +45,12 @@ typedef uint32 HRESULT;
 
 struct IUnknown {
 };
+typedef IUnknown *LPUNKNOWN;
 
 #define S_OK 0
 
 #define lstrlen strlen
+#define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
 #define LOWORD(dw) (dw & 0xffff)
 #define HIWORD(dw) ((dw) >> 16)

@@ -570,8 +570,8 @@ extern bool g_b_kill_app; //if true, will close app as soon as the message pump 
 extern int dinkspeed;
 extern int last_cd;
 //redink1... uh... increased these to 255?  I'm honestly not quite sure.  It has been a while. They might have been hard-coded, and I created char strings for them?
-extern const char *current_map;
-extern const char *current_dat;
+extern char current_map[50];
+extern char current_dat[50];
 extern int regcode, mycode;
 extern time_t time_start;
 extern bool item_screen;

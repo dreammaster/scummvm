@@ -134,4 +134,8 @@ void EventsManager::updateKeys(const Common::Event &event, bool isDown) {
 	_keys[event.kbd.keycode] = isDown;
 }
 
+uint32 EventsManager::getTickCount() const {
+	return g_system->getMillis();
+}
+
 } // namespace Dink

@@ -132,9 +132,11 @@ bool g_b_kill_app = false; //if true, will close app as soon as the message pump
 //empty
 int dinkspeed = 3;
 int last_cd;
+
 //redink1... uh... increased these to 255?  I'm honestly not quite sure.  It has been a while. They might have been hard-coded, and I created char strings for them?
-const char *current_map = "MAP.DAT";
-const char *current_dat = "DINK.DAT";
+char current_map[50] = "MAP.DAT";
+char current_dat[50] = "DINK.DAT";
+
 int regcode, mycode;
 time_t time_start;
 bool item_screen = false;
