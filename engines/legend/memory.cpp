@@ -19,27 +19,8 @@
  *
  */
 
-#ifndef LEGEND_GLOBALS_H
-#define LEGEND_GLOBALS_H
-
-#include "legend/graphics.h"
+#include "legend/memory.h"
 
 namespace Legend {
 
-struct Globals {
-	Globals();
-	~Globals();
-
-	Palette _default_palette = { 0 };
-	bool _cycling_on = false;
-	int _palette_off = 0;
-	Display _display;
-	int _dirty_y1 = 0, _dirty_y2 = 0;
-};
-
-extern Globals *g_globals;
-#define _G(FIELD) (::Legend::g_globals->_##FIELD)
-
 } // namespace Legend
-
-#endif

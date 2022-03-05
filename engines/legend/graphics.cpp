@@ -26,6 +26,39 @@
 
 namespace Legend {
 
+gxResult gxClearVirtual(Display *gx, int color) {
+	if (gx && gx->_pixels) {
+		Common::fill(gx->_pixels->_ptr,
+			gx->_pixels->_ptr + gx->_size, color);
+		return GX_SUCCESS;
+	} else {
+		return GX_20;
+	}
+}
+
+gxResult gxClearDisplay(int color) {
+	gxClearVirtual(&_G(display), color);
+	gxDirtyDisplay(0, SCREEN_HEIGHT - 1);
+	return GX_SUCCESS;
+}
+
+void gxDirtyDisplay(int minY, int maxY) {
+	if (minY > maxY)
+		SWAP(minY, maxY);
+
+	if (minY < 0)
+		_G(dirty_y1) = 0;
+	else if (minY < _G(dirty_y1))
+		_G(dirty_y1) = minY;
+
+	if (maxY >= SCREEN_HEIGHT)
+		_G(dirty_y2) = SCREEN_HEIGHT - 1;
+	else if (maxY > _G(dirty_y2))
+		_G(dirty_y2) = maxY;
+}
+
+
+
 void set_palette_range(const byte *pal, int start, int count) {
 	g_system->getPaletteManager()->setPalette(pal, start, count);
 }

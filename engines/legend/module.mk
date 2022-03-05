@@ -4,6 +4,7 @@ MODULE_OBJS = \
 	globals.o \
 	graphics.o \
 	legend.o \
+	memory.o \
 	metaengine.o
 
 # This module can be built as a plugin
