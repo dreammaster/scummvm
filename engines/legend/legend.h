@@ -37,15 +37,20 @@
 
 namespace Legend {
 
+struct Globals;
 struct LegendGameDescription;
 
 class LegendEngine : public Engine {
 private:
 	const LegendGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
+
+	void initialize();
 protected:
 	// Engine APIs
 	Common::Error run() override;
+public:
+	Globals *_globals = nullptr;
 public:
 	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);
 	~LegendEngine() override;

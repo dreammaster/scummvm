@@ -19,43 +19,21 @@
  *
  */
 
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
-#include "common/events.h"
-#include "common/file.h"
-#include "common/util.h"
-#include "engines/util.h"
-#include "legend/legend.h"
-#include "legend/detection.h"
-#include "legend/globals.h"
+#ifndef LEGEND_GRAPHICS_H
+#define LEGEND_GRAPHICS_H
+
+#include "graphics/screen.h"
 
 namespace Legend {
 
-LegendEngine *g_engine;
+typedef byte Palette[PALETTE_SIZE];
 
-LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) : Engine(syst),
-	_gameDescription(gameDesc), _randomSource("Legend") {
-	g_engine = this;
-}
+extern void set_palette_range(const byte *pal, int start, int end);
 
-LegendEngine::~LegendEngine() {
-	delete _globals;
-}
+extern void set_palette(const Palette &pal);
 
-uint32 LegendEngine::getFeatures() const {
-	return _gameDescription->desc.flags;
-}
-
-Common::String LegendEngine::getGameId() const {
-	return _gameDescription->desc.gameId;
-}
-
-Common::Error LegendEngine::run() {
-	return Common::kNoError;
-}
-
-void LegendEngine::initialize() {
-	_globals = new Globals();
-}
+extern void black_palette();
 
 } // namespace Legend
+
+#endif
