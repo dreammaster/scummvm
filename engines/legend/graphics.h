@@ -23,10 +23,30 @@
 #define LEGEND_GRAPHICS_H
 
 #include "graphics/screen.h"
+#include "legend/memory.h"
 
 namespace Legend {
 
+constexpr int SCREEN_WIDTH = 640;
+constexpr int SCREEN_HEIGHT = 480;
+
+enum gxResult {
+	GX_SUCCESS = 0,
+	GX_20 = -20
+};
+
 typedef byte Palette[PALETTE_SIZE];
+
+struct Display {
+	void *_ptr = nullptr;
+	int _field4 = 0;
+	MemoryBlock *_pixels = nullptr;
+	int _size = 0;
+};
+
+extern gxResult gxClearVirtual(Display *gx, int color);
+extern void gxDirtyDisplay(int minY, int maxY);
+extern gxResult gxClearDisplay(int color);
 
 extern void set_palette_range(const byte *pal, int start, int end);
 
