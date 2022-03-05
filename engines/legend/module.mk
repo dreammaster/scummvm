@@ -1,6 +1,8 @@
 MODULE := engines/legend
 
 MODULE_OBJS = \
+	globals.o \
+	graphics.o \
 	legend.o \
 	metaengine.o
 

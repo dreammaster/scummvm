@@ -19,43 +19,28 @@
  *
  */
 
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
-#include "common/events.h"
-#include "common/file.h"
-#include "common/util.h"
-#include "engines/util.h"
-#include "legend/legend.h"
-#include "legend/detection.h"
+#include "common/system.h"
+#include "graphics/palette.h"
+#include "legend/graphics.h"
 #include "legend/globals.h"
 
 namespace Legend {
 
-LegendEngine *g_engine;
-
-LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) : Engine(syst),
-	_gameDescription(gameDesc), _randomSource("Legend") {
-	g_engine = this;
+void set_palette_range(const byte *pal, int start, int count) {
+	g_system->getPaletteManager()->setPalette(pal, start, count);
 }
 
-LegendEngine::~LegendEngine() {
-	delete _globals;
+void set_palette(const Palette &pal) {
+	set_palette_range(pal, 0, PALETTE_COUNT - 1);
 }
 
-uint32 LegendEngine::getFeatures() const {
-	return _gameDescription->desc.flags;
+void black_palette() {
+	_G(cycling_on) = false;
+	Common::fill(&_G(default_palette)[0],
+		&_G(default_palette)[PALETTE_SIZE], 0);
+	set_palette(_G(default_palette));
+	_G(palette_off) = 1;
 }
 
-Common::String LegendEngine::getGameId() const {
-	return _gameDescription->desc.gameId;
-}
-
-Common::Error LegendEngine::run() {
-	return Common::kNoError;
-}
-
-void LegendEngine::initialize() {
-	_globals = new Globals();
-}
 
 } // namespace Legend

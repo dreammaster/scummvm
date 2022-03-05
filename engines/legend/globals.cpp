@@ -19,43 +19,18 @@
  *
  */
 
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
-#include "common/events.h"
-#include "common/file.h"
-#include "common/util.h"
-#include "engines/util.h"
-#include "legend/legend.h"
-#include "legend/detection.h"
 #include "legend/globals.h"
 
 namespace Legend {
 
-LegendEngine *g_engine;
+Globals *g_globals;
 
-LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) : Engine(syst),
-	_gameDescription(gameDesc), _randomSource("Legend") {
-	g_engine = this;
+Globals::Globals() {
+	g_globals = this;
 }
 
-LegendEngine::~LegendEngine() {
-	delete _globals;
-}
-
-uint32 LegendEngine::getFeatures() const {
-	return _gameDescription->desc.flags;
-}
-
-Common::String LegendEngine::getGameId() const {
-	return _gameDescription->desc.gameId;
-}
-
-Common::Error LegendEngine::run() {
-	return Common::kNoError;
-}
-
-void LegendEngine::initialize() {
-	_globals = new Globals();
+Globals::~Globals() {
+	g_globals = nullptr;
 }
 
 } // namespace Legend
