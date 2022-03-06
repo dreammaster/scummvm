@@ -28,8 +28,8 @@ namespace Legend {
 
 gxResult gxClearVirtual(Display *gx, int color) {
 	if (gx && gx->_pixels) {
-		Common::fill(gx->_pixels->_ptr,
-			gx->_pixels->_ptr + gx->_size, color);
+		Common::fill((byte *)gx->_pixels->_ptr,
+			(byte *)gx->_pixels->_ptr + gx->_size, color);
 		return GX_SUCCESS;
 	} else {
 		return GX_20;
