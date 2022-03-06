@@ -26,9 +26,32 @@
 
 namespace Legend {
 
-struct MemoryBlock {
-	byte *_ptr = nullptr;
+enum MemFlag {
+	MEMFLAG_10 = 0x10,
+	MEMFLAG_HAS_TYPE = 0x20,
+	MEMFLAG_40 = 0x40,
+	MEMFLAG_80 = 0x80
 };
+
+enum MemType {
+	MEMTYPE_0 = 0,
+	MEMTYPE_1 = 1,
+	MEMTYPE_2 = 2
+};
+
+struct MemoryBlock {
+	void *_ptr;
+	int16 _handleIndex;
+	size_t _size;
+	byte _flags;
+	byte _type;
+
+	void clear();
+};
+
+extern void init_memory();
+extern MemoryBlock *insert_master(void *ptr, size_t size);
+extern void set_pointer_type(void *ptr, int type);
 
 } // namespace Legend
 

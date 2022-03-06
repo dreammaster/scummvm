@@ -35,6 +35,18 @@ struct Globals {
 	int _palette_off = 0;
 	Display _display;
 	int _dirty_y1 = 0, _dirty_y2 = 0;
+
+	// memory
+	size_t _master_table_size = 0x300;
+	size_t _memory_avail = 0;
+	byte *_master_ptr = nullptr;
+	MemoryBlock *_master_table = nullptr;
+	size_t _master_table_end = 0;
+	int _max_handles = 0x200;
+	void **_handle_table;
+	bool _disable_compact_memory = false;
+	int _purge_vector_tbl[20] = { 0 };
+
 };
 
 extern Globals *g_globals;
