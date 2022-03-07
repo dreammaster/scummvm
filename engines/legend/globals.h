@@ -46,6 +46,7 @@ struct Globals {
 	void **_handle_table;
 	bool _disable_compact_memory = false;
 	int _purge_vector_tbl[20] = { 0 };
+	int _min_memory = 0;
 
 };
 

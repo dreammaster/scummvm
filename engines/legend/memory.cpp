@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/debug.h"
 #include "legend/memory.h"
 #include "legend/globals.h"
 
@@ -26,12 +27,31 @@ namespace Legend {
 
 #define MAX_MEMORY 0x7FFFFF
 
+static const char *MEM_TYPE[16] = {
+	"DOS",
+	"SYSTEM",
+	"FILE",
+	"INI",
+	"GRAFX",
+	"PIC",
+	"PIC (PATCH)",
+	"PIC (ICON)",
+	"WINDOW",
+	"REGION",
+	"FONT",
+	"AUDIO",
+	"MUSIC",
+	"SOUND",
+	"STRING",
+	"UNDO"
+};
+
 void MemoryBlock::clear() {
 	_ptr = nullptr;
 	_handleIndex = 0;
 	_size = 0;
 	_flags = 0;
-	_type = MEMTYPE_0;
+	_type = MEMTYPE_DOS;
 }
 
 static void compact_memory() {
@@ -45,7 +65,7 @@ static void compact_memory() {
 			byte *ptrNext = (byte *)mb2->_ptr;
 
 			if (ptrEnd < ptrNext && (mb2->_flags & MEMFLAG_80) != 0
-					&& (mb2->_flags & MEMFLAG_10) == 0) {
+				&& (mb2->_flags & MEMFLAG_10) == 0) {
 				void *handle = _G(handle_table)[mb2->_handleIndex];
 				if (handle) {
 					memmove(ptrEnd, handle, mb2->_size);
@@ -70,6 +90,126 @@ static MemoryBlock *find_master(void *ptr) {
 	return nullptr;
 }
 
+static int freemem_block() {
+	int size = 0;
+
+	if (_G(master_table_end) > 1) {
+		MemoryBlock *mb1 = _G(master_table),
+			*mb2 = _G(master_table) + 1;
+		for (uint i = 0; i < _G(master_table_end); ++i, ++mb1, ++mb2) {
+			byte *ptrEnd = (byte *)mb1->_ptr + mb1->_size;
+			byte *ptrNext = (byte *)mb2->_ptr;
+
+			size = MAX(ptrEnd - ptrNext, size);
+		}
+	}
+
+	return 0;
+}
+
+static void purge_memory(int size) {
+	for (int i = 1; i <= 64; ++i) {
+		if (freemem_block() >= size)
+			break;
+	}
+}
+
+static MemoryBlock *get_master(size_t size, int type) {
+	if (size < 1)
+		return nullptr;
+
+	int roundedSize = (size + 15) & 0xFFFFF0;
+	bool flag = false;
+	MemoryBlock *result = nullptr;
+	MemoryBlock *mb1, *mb2;
+	int i;
+
+	for (;;) {
+		switch (type) {
+		case 0:
+			mb1 = _G(master_table) + (_G(master_table_end) - 1);
+			mb2 = mb1 + 1;
+
+			for (i = _G(master_table_end) - 1; i >= 0; --i, --mb1, --mb2) {
+				byte *ptrEnd = (byte *)mb1->_ptr + mb1->_size;
+				byte *ptrNext = (byte *)mb2->_ptr;
+
+				int diff = ptrNext - ptrEnd;
+				if (roundedSize <= diff) {
+					result = insert_master((byte *)mb2->_ptr - roundedSize, roundedSize);
+					break;
+				}
+			}
+			break;
+
+		case 1:
+			if (_G(master_table_end) > 0) {
+				mb1 = _G(master_table);
+				mb2 = _G(master_table) + 1;
+
+				for (i = 0; i < (int)_G(master_table_end); ++i) {
+					byte *ptrEnd = (byte *)mb1->_ptr + mb1->_size;
+					byte *ptrNext = (byte *)mb2->_ptr;
+
+					// TODO: Numeric comparison of pointer is weird
+					if ((long)ptrNext < 0x100000) {
+						int diff = ptrNext - ptrEnd;
+						if (roundedSize <= diff) {
+							result = insert_master(ptrEnd, roundedSize);
+							break;
+						}
+					}
+				}
+			}
+
+			if ((!result || flag) && _G(master_table_end) > 0) {
+				mb1 = _G(master_table) + (_G(master_table_end) - 1);
+				mb2 = mb1 + 1;
+
+				for (i = _G(master_table_end) - 1; i >= 0; --i, --mb1, --mb2) {
+					byte *ptrEnd = (byte *)mb1->_ptr + mb1->_size;
+					byte *ptrNext = (byte *)mb2->_ptr;
+
+					int diff = ptrNext - ptrEnd;
+					if (roundedSize <= diff) {
+						result = insert_master((byte *)mb2->_ptr - roundedSize, roundedSize);
+						break;
+					}
+				}
+			}
+			break;
+
+		case 2:
+			mb1 = _G(master_table);
+			mb2 = _G(master_table) + 1;
+
+			for (i = 0; i < (int)_G(master_table_end); ++i) {
+				byte *ptrEnd = (byte *)mb1->_ptr + mb1->_size;
+				byte *ptrNext = (byte *)mb2->_ptr;
+
+				// TODO: Numeric comparison of pointer is weird
+				if ((long)ptrNext < 0x100000) {
+					int diff = ptrNext - ptrEnd;
+					if (roundedSize <= diff) {
+						result = insert_master(ptrEnd, roundedSize);
+						break;
+					}
+				}
+			}
+			break;
+
+		default:
+			break;
+		}
+
+		if (result || !flag)
+			return result;
+
+		purge_memory(roundedSize);
+		flag = true;	// Only allow a second loop
+	}
+}
+
 void init_memory() {
 	// Return if the memory manager is already initialized
 	if (_G(master_ptr))
@@ -92,19 +232,19 @@ void init_memory() {
 	mb->_handleIndex = -1;
 	mb->_size = 0;
 	mb->_flags = MEMFLAG_10;
-	mb->_type = MEMTYPE_1;
+	mb->_type = MEMTYPE_SYSTEM;
 
 	++mb;
 	mb->_ptr = nullptr;
 	mb->_handleIndex = -1;
 	mb->_size = 0;
 	mb->_flags = MEMFLAG_10;
-	mb->_type = MEMTYPE_1;
+	mb->_type = MEMTYPE_SYSTEM;
 
 	_G(master_table_end) = 1;
 	mb = insert_master(_G(master_table),
 		_G(master_table_size) * sizeof(MemoryBlock));
-	mb->_type = MEMTYPE_2;
+	mb->_type = MEMTYPE_FILE;
 
 	// TODO: DPMI real table entry created.
 	// Not sure if needed in ScummVM
@@ -137,12 +277,24 @@ MemoryBlock *insert_master(void *ptr, size_t size) {
 	mb1->_handleIndex = -1;
 	mb1->_size = size;
 	mb1->_flags = MEMFLAG_10;
-	mb1->_type = MEMTYPE_0;
+	mb1->_type = MEMTYPE_DOS;
 
 	return mb1;
 }
 
-void set_pointer_type(void *ptr, int type) {
+void *new_pointer(size_t size) {
+	compact_memory();
+	MemoryBlock *mb = get_master(size, 0);
+	int memSize = freemem_block();
+
+	if (memSize < _G(min_memory)) {
+		_G(min_memory) = MIN(_G(min_memory), memSize);
+	}
+
+	return mb ? mb->_ptr : nullptr;
+}
+
+void set_pointer_type(void *ptr, MemType type) {
 	MemoryBlock *mb = find_master(ptr);
 	if (mb && (mb->_flags & MEMFLAG_80) == 0) {
 		mb->_flags &= ~MEMFLAG_10;
@@ -157,6 +309,28 @@ void set_pointer_type(void *ptr, int type) {
 
 		mb->_type = type;
 	}
+}
+
+void dump_master_table() {
+	int handleCount = 0;
+	for (int i = 0; i < _G(max_handles); ++i) {
+		if (_G(handle_table)[i])
+			++handleCount;
+	}
+
+	debug("memmgr: managing %d total bytes", _G(memory_avail));
+	debug("%d of %d master table entries used",
+		_G(master_table_end), _G(master_table_size));
+	debug("%d of %d handles allocated", handleCount,
+		_G(max_handles));
+/*
+	MemoryBlock *mb1 = &_G(master_table)[0];
+	MemoryBlock *mb2 = &_G(master_table)[1];
+	for (int idx = 0; idx < _G(master_table_end); ++idx) {
+		printf()
+		(mb1->_flags & MEMFLAG_HAS_TYPE) ? 
+	}
+	*/
 }
 
 } // namespace Legend
