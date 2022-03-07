@@ -34,9 +34,22 @@ enum MemFlag {
 };
 
 enum MemType {
-	MEMTYPE_0 = 0,
-	MEMTYPE_1 = 1,
-	MEMTYPE_2 = 2
+	MEMTYPE_DOS = 0,
+	MEMTYPE_SYSTEM = 1,
+	MEMTYPE_FILE = 2,
+	MEMTYPE_INI = 3,
+	MEMTYPE_GRAFX = 4,
+	MEMTYPE_PIC = 5,
+	MEMTYPE_PIC_PATCH = 6,
+	MEMTYPE_PIC_ICON = 7,
+	MEMTYPE_WINDOW = 8,
+	MEMTYPE_REGION = 9,
+	MEMTYPE_FONT = 10,
+	MEMTYPE_AUDIO = 11,
+	MEMTYPE_MUSIC = 12,
+	MEMTYPE_SOUND = 13,
+	MEMTYPE_STRING = 14,
+	MEMTYPE_UNDO = 15
 };
 
 struct MemoryBlock {
@@ -44,14 +57,15 @@ struct MemoryBlock {
 	int16 _handleIndex;
 	size_t _size;
 	byte _flags;
-	byte _type;
+	MemType _type;
 
 	void clear();
 };
 
 extern void init_memory();
 extern MemoryBlock *insert_master(void *ptr, size_t size);
-extern void set_pointer_type(void *ptr, int type);
+extern void set_pointer_type(void *ptr, MemType type);
+extern void dump_master_table();
 
 } // namespace Legend
 

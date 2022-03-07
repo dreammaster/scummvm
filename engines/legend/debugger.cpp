@@ -19,46 +19,21 @@
  *
  */
 
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
-#include "common/events.h"
-#include "common/file.h"
-#include "common/util.h"
-#include "engines/util.h"
-#include "legend/legend.h"
 #include "legend/debugger.h"
-#include "legend/detection.h"
-#include "legend/globals.h"
+#include "legend/memory.h"
 
 namespace Legend {
 
-LegendEngine *g_engine;
-
-LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) : Engine(syst),
-	_gameDescription(gameDesc), _randomSource("Legend") {
-	g_engine = this;
+Debugger::Debugger() : GUI::Debugger() {
+	registerCmd("dump_master_table", WRAP_METHOD(Debugger, Cmd_DumpMasterTable));
 }
 
-LegendEngine::~LegendEngine() {
-	delete _globals;
+Debugger::~Debugger() {
 }
 
-uint32 LegendEngine::getFeatures() const {
-	return _gameDescription->desc.flags;
+bool Debugger::Cmd_DumpMasterTable(int argc, const char **argv) {
+	dump_master_table();
+	return true;
 }
 
-Common::String LegendEngine::getGameId() const {
-	return _gameDescription->desc.gameId;
-}
-
-Common::Error LegendEngine::run() {
-	return Common::kNoError;
-}
-
-void LegendEngine::initialize() {
-	_globals = new Globals();
-
-	setDebugger(new Debugger());
-}
-
-} // namespace Legend
+} // namespace Chewy
