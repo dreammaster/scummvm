@@ -64,8 +64,8 @@ static void compact_memory() {
 			byte *ptrEnd = (byte *)mb->_ptr + mb->_size;
 			byte *ptrNext = (byte *)mb2->_ptr;
 
-			if (ptrEnd < ptrNext && (mb2->_flags & MEMFLAG_80) != 0
-				&& (mb2->_flags & MEMFLAG_10) == 0) {
+			if (ptrEnd < ptrNext && (mb2->_flags & MEMFLAG_HAS_HANDLE) != 0
+				&& (mb2->_flags & MEMFLAG_LOCKED) == 0) {
 				void *handle = _G(handle_table)[mb2->_handleIndex];
 				if (handle) {
 					memmove(ptrEnd, handle, mb2->_size);
@@ -107,14 +107,37 @@ static int freemem_block() {
 	return 0;
 }
 
-static void purge_memory(int size) {
-	for (int i = 1; i <= 64; ++i) {
-		if (freemem_block() >= size)
+static void purge_block(int shift, size_t size) {
+	do {
+		if (_G(master_table_end) <= 0)
 			break;
+
+		uint shiftSize = size / shift;
+		bool purgeResult = false;
+		MemoryBlock *mb = _G(master_table);
+		for (uint i = 0; !purgeResult && i < _G(master_table_end); ++i, ++mb) {
+			if (mb->_size >= shiftSize && !(mb->_flags & MEMFLAG_LOCKED) &&
+					(mb->_flags & MEMFLAG_HAS_TYPE) &&
+					_G(purge_vector_tbl)[mb->_type]) {
+				void *ptr = (mb->_flags & MEMFLAG_HAS_HANDLE) ?
+					_G(handle_table)[mb->_handleIndex] : mb->_ptr;
+				purgeResult = _G(purge_vector_tbl)[mb->_type](ptr);
+			}
+		}
+		if (!purgeResult)
+			break;
+
+		compact_memory();
+	} while (freemem_block() <= (int)size);
+}
+
+static void purge_memory(size_t size) {
+	for (int i = 1; freemem_block() >= (int)size && i <= 64; i *= 2) {
+		purge_block(i, size);
 	}
 }
 
-static MemoryBlock *get_master(size_t size, int type) {
+static MemoryBlock *get_master(size_t size, MemArea type) {
 	if (size < 1)
 		return nullptr;
 
@@ -126,7 +149,7 @@ static MemoryBlock *get_master(size_t size, int type) {
 
 	for (;;) {
 		switch (type) {
-		case 0:
+		case MEMAREA_DEFAULT:
 			mb1 = _G(master_table) + (_G(master_table_end) - 1);
 			mb2 = mb1 + 1;
 
@@ -142,7 +165,7 @@ static MemoryBlock *get_master(size_t size, int type) {
 			}
 			break;
 
-		case 1:
+		case MEMAREA_1:
 			if (_G(master_table_end) > 0) {
 				mb1 = _G(master_table);
 				mb2 = _G(master_table) + 1;
@@ -179,7 +202,7 @@ static MemoryBlock *get_master(size_t size, int type) {
 			}
 			break;
 
-		case 2:
+		case MEMAREA_REAL:
 			mb1 = _G(master_table);
 			mb2 = _G(master_table) + 1;
 
@@ -209,6 +232,52 @@ static MemoryBlock *get_master(size_t size, int type) {
 		flag = true;	// Only allow a second loop
 	}
 }
+/*
+static int freemem_min(int amount) {
+	int total = 0;
+	MemoryBlock *mbEnd = _G(master_table) +
+		(_G(master_table_end) - 1),
+		*mb1 = _G(master_table),
+		*mb2 = _G(master_table) + 1;
+
+	for (; mb1 < mbEnd; ++mb1, ++mb2) {
+		// edi
+		byte *ptrEnd = (byte *)mb1->_ptr + mb1->_size;
+		byte *ptrNext = (byte *)mb2->_ptr;
+		int diff = ptrNext - ptrEnd;
+
+		if (diff >= amount)
+			total += diff;
+	}
+
+	return total;
+}
+*/
+/*
+static MemType get_pointer_type(void *ptr) {
+	MemoryBlock *mb = find_master(ptr);
+	return mb ? mb->_type : MEMTYPE_DOS;
+}
+*/
+static void delete_master(MemoryBlock *mb) {
+	MemoryBlock *tableEnd = _G(master_table) + _G(master_table_end),
+		*mb1 = mb + 1;
+	memmove(mb, mb1, (tableEnd - mb1) * sizeof(MemoryBlock));
+
+	tableEnd->clear();
+	_G(master_table_end)--;
+}
+
+static int get_handle_num() {
+	if (_G(handle_table)) {
+		for (int i = 0; i < _G(max_handles); ++i) {
+			if (!_G(handle_table)[i])
+				return i;
+		}
+	}
+
+	return -1;
+}
 
 void init_memory() {
 	// Return if the memory manager is already initialized
@@ -231,14 +300,14 @@ void init_memory() {
 	mb->_ptr = nullptr;
 	mb->_handleIndex = -1;
 	mb->_size = 0;
-	mb->_flags = MEMFLAG_10;
+	mb->_flags = MEMFLAG_LOCKED;
 	mb->_type = MEMTYPE_SYSTEM;
 
 	++mb;
 	mb->_ptr = nullptr;
 	mb->_handleIndex = -1;
 	mb->_size = 0;
-	mb->_flags = MEMFLAG_10;
+	mb->_flags = MEMFLAG_LOCKED;
 	mb->_type = MEMTYPE_SYSTEM;
 
 	_G(master_table_end) = 1;
@@ -251,6 +320,23 @@ void init_memory() {
 
 	//_G(handle_table) = (void **)new_pointer(_G(max_handles) * 4, 2);
 	// TODO: Other stuff
+}
+
+void set_purge_routine(MemType type, PurgeMethod proc) {
+	if (type >= MEMTYPE_INI && type < _G(next_handle_type))
+		_G(purge_vector_tbl)[type] = proc;
+}
+
+int add_purge_routine(PurgeMethod proc, int memType) {
+	int next = _G(next_handle_type);
+	if (next < 20) {
+		_G(next_handle_type)++;
+		_G(mem_type)[next] = memType;
+		set_purge_routine((MemType)next, proc);
+		return next;
+	} else {
+		return 0;
+	}
 }
 
 MemoryBlock *insert_master(void *ptr, size_t size) {
@@ -276,7 +362,7 @@ MemoryBlock *insert_master(void *ptr, size_t size) {
 	mb1->_ptr = ptr;
 	mb1->_handleIndex = -1;
 	mb1->_size = size;
-	mb1->_flags = MEMFLAG_10;
+	mb1->_flags = MEMFLAG_LOCKED;
 	mb1->_type = MEMTYPE_DOS;
 
 	return mb1;
@@ -284,7 +370,19 @@ MemoryBlock *insert_master(void *ptr, size_t size) {
 
 void *new_pointer(size_t size) {
 	compact_memory();
-	MemoryBlock *mb = get_master(size, 0);
+	MemoryBlock *mb = get_master(size, MEMAREA_DEFAULT);
+	int memSize = freemem_block();
+
+	if (memSize < _G(min_memory)) {
+		_G(min_memory) = MIN(_G(min_memory), memSize);
+	}
+
+	return mb ? mb->_ptr : nullptr;
+}
+
+void *new_real_pointer(size_t size) {
+	compact_memory();
+	MemoryBlock *mb = get_master(size, MEMAREA_REAL);
 	int memSize = freemem_block();
 
 	if (memSize < _G(min_memory)) {
@@ -296,8 +394,8 @@ void *new_pointer(size_t size) {
 
 void set_pointer_type(void *ptr, MemType type) {
 	MemoryBlock *mb = find_master(ptr);
-	if (mb && (mb->_flags & MEMFLAG_80) == 0) {
-		mb->_flags &= ~MEMFLAG_10;
+	if (mb && (mb->_flags & MEMFLAG_HAS_HANDLE) == 0) {
+		mb->_flags &= ~MEMFLAG_LOCKED;
 
 		if (type) {
 			assert(type < 20);
@@ -309,6 +407,145 @@ void set_pointer_type(void *ptr, MemType type) {
 
 		mb->_type = type;
 	}
+}
+
+int kill_pointer(void *ptr) {
+	if (ptr) {
+		MemoryBlock *mb = find_master(ptr);
+		if (mb && !(mb->_flags & MEMFLAG_HAS_HANDLE)) {
+			delete_master(mb);
+			return 0;
+		}
+	}
+
+	return -1;
+}
+
+void *resize_pointer(void *ptr, size_t newSize) {
+	MemoryBlock *mb = find_master(ptr);
+	assert(mb);
+	MemType type = mb->_type;
+	size_t oldSize = mb->_size;
+
+	// Destroy the old pointer and recreate with new size
+	kill_pointer(ptr);
+	_G(disable_compact_memory) = true;
+	void *newPtr = new_pointer(newSize);
+	_G(disable_compact_memory) = false;
+
+	if (newPtr) {
+		if (ptr) {
+			memmove(newPtr, ptr, MIN(oldSize, newSize));
+			set_pointer_type(newPtr, type);
+		}
+	}
+
+	return newPtr;
+}
+
+void *new_handle(size_t size) {
+	int handleNum = get_handle_num();
+
+	if (handleNum >= 0) {
+		compact_memory();
+		MemoryBlock *mb = get_master(size, MEMAREA_1);
+		if (mb) {
+			mb->_flags |= MEMFLAG_HAS_HANDLE;
+			mb->_handleIndex = handleNum;
+			_G(handle_table)[handleNum] = mb->_ptr;
+		}
+
+		int freeMem = freemem_block();
+		if (freeMem < _G(min_memory)) {
+			_G(low_memory) = MIN(freeMem, _G(low_memory));
+			_G(min_memory) = freeMem;
+		}
+
+		if (mb)
+			return mb->_ptr;
+	}
+
+	return 0;
+}
+
+size_t get_handle_size(void **handle) {
+	MemoryBlock *mb = find_master(*handle);
+	return mb && (mb->_flags & MEMFLAG_HAS_HANDLE) ?
+		mb->_size : 0;
+}
+
+void set_handle_type(void **handle, MemType type) {
+	MemoryBlock *mb = find_master(*handle);
+
+	if (mb && (mb->_flags & MEMFLAG_HAS_HANDLE)) {
+		if (!type) {
+			mb->_flags &= ~MEMFLAG_HAS_TYPE;
+		} else if (_G(purge_vector_tbl)[type]) {
+			mb->_flags |= MEMFLAG_HAS_TYPE;
+		}
+
+		mb->_type = type;
+	}
+}
+
+int lock_handle(void **handle) {
+	if (handle) {
+		MemoryBlock *mb = find_master(*handle);
+		if (mb && (mb->_flags & MEMFLAG_HAS_HANDLE)) {
+			void *&ptr = _G(handle_table)[mb->_handleIndex];
+			if (ptr == *handle) {
+				mb->_flags |= MEMFLAG_LOCKED;
+				return 0;
+			}
+		}
+	}
+
+	return -1;
+}
+
+int unlock_handle(void **handle) {
+	if (handle) {
+		MemoryBlock *mb = find_master(*handle);
+		if (mb && (mb->_flags & MEMFLAG_HAS_HANDLE)) {
+			void *&ptr = _G(handle_table)[mb->_handleIndex];
+			if (ptr == *handle) {
+				mb->_flags |= MEMFLAG_LOCKED;
+				return 0;
+			}
+		}
+	}
+
+	return -1;
+}
+
+void **resize_handle(void **handle, size_t newSize) {
+	if (!handle)
+		return nullptr;
+
+	MemoryBlock *mb = find_master(*handle);
+	if (mb && (mb->_flags & MEMFLAG_HAS_HANDLE)) {
+		void *ptr = _G(handle_table)[mb->_handleIndex];
+		if (ptr == *handle && newSize <= mb->_size) {
+			mb->_size = (newSize + 15) & 0xFFFFF0;
+		}
+	}
+
+	return handle;
+}
+
+int kill_handle(void **handle) {
+	if (handle) {
+		MemoryBlock *mb = find_master(*handle);
+		if (mb && (mb->_flags & MEMFLAG_HAS_HANDLE)) {
+			void *&ptr = _G(handle_table)[mb->_handleIndex];
+			if (ptr == *handle) {
+				ptr = nullptr;
+				delete_master(mb);
+			}
+		}
+	}
+
+	return -1;
 }
 
 void dump_master_table() {
@@ -331,6 +568,29 @@ void dump_master_table() {
 		(mb1->_flags & MEMFLAG_HAS_TYPE) ? 
 	}
 	*/
+}
+
+void memsetx(void *ptr, byte v, size_t count) {
+	for (byte *p = (byte *)ptr; count > 0; --count, ++p)
+		*p ^= v;	
+}
+
+void memxor(void *dest, const void *src, size_t count) {
+	byte *destP = (byte *)dest;
+	const byte *srcP = (const byte *)src;
+
+	for (; count > 0; --count, ++srcP, ++destP)
+		*destP ^= *srcP;
+}
+
+void memcpynotn(const void *src, void *dest, size_t count, byte val) {
+	byte *destP = (byte *)dest;
+	const byte *srcP = (const byte *)src;
+
+	for (; count > 0; --count, ++srcP, ++destP) {
+		if (*srcP != val)
+			*destP = *srcP;
+	}
 }
 
 } // namespace Legend
