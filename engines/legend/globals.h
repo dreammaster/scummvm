@@ -23,6 +23,7 @@
 #define LEGEND_GLOBALS_H
 
 #include "legend/graphics.h"
+#include "legend/memory.h"
 
 namespace Legend {
 
@@ -43,11 +44,13 @@ struct Globals {
 	MemoryBlock *_master_table = nullptr;
 	size_t _master_table_end = 0;
 	int _max_handles = 0x200;
+	int _next_handle_type = 0;
 	void **_handle_table;
 	bool _disable_compact_memory = false;
-	int _purge_vector_tbl[20] = { 0 };
+	PurgeMethod _purge_vector_tbl[20] = { nullptr };
+	int _mem_type[20] = { 0 };
 	int _min_memory = 0;
-
+	int _low_memory = 0;
 };
 
 extern Globals *g_globals;

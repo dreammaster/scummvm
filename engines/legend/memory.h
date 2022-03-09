@@ -26,11 +26,13 @@
 
 namespace Legend {
 
+typedef bool(*PurgeMethod)(void *ptr);
+
 enum MemFlag {
-	MEMFLAG_10 = 0x10,
+	MEMFLAG_LOCKED = 0x10,
 	MEMFLAG_HAS_TYPE = 0x20,
 	MEMFLAG_40 = 0x40,
-	MEMFLAG_80 = 0x80
+	MEMFLAG_HAS_HANDLE = 0x80
 };
 
 enum MemType {
@@ -52,6 +54,12 @@ enum MemType {
 	MEMTYPE_UNDO = 15
 };
 
+enum MemArea {
+	MEMAREA_DEFAULT = 0,
+	MEMAREA_1 = 1,
+	MEMAREA_REAL = 2
+};
+
 struct MemoryBlock {
 	void *_ptr;
 	int16 _handleIndex;
@@ -63,9 +71,27 @@ struct MemoryBlock {
 };
 
 extern void init_memory();
+extern void set_purge_routine(MemType type, PurgeMethod proc);
+extern int add_purge_routine(PurgeMethod proc, int memType);
 extern MemoryBlock *insert_master(void *ptr, size_t size);
+extern void *new_pointer(size_t size);
+extern void *new_real_pointer(size_t size);
 extern void set_pointer_type(void *ptr, MemType type);
+extern void *resize_pointer(void *ptr, size_t newSize);
+extern int kill_pointer(void *ptr);
+
+extern void *new_handle(size_t size);
+extern size_t get_handle_size(void **handle);
+extern void set_handle_type(void **handle, MemType type);
+extern int lock_handle(void **handle);
+extern int unlock_handle(void **handle);
+extern void **resize_handle(void **handle, size_t newSize);
+extern int kill_handle(void **handle);
+
 extern void dump_master_table();
+extern void memsetx(void *ptr, byte v, size_t count);
+extern void memxor(void *dest, const void *src, size_t count);
+extern void memcpynotn(const void *src, void *dest, size_t count, byte val);
 
 } // namespace Legend
 
