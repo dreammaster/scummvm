@@ -71,6 +71,7 @@ struct MemoryBlock {
 };
 
 extern void init_memory();
+extern void release_memory();
 extern void set_purge_routine(MemType type, PurgeMethod proc);
 extern int add_purge_routine(PurgeMethod proc, int memType);
 extern MemoryBlock *insert_master(void *ptr, size_t size);
