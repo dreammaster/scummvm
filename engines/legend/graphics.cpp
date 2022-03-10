@@ -42,6 +42,11 @@ gxResult gxClearDisplay(int color) {
 	return GX_SUCCESS;
 }
 
+byte *gxVideoAddr(int x, int y) {
+	int offset = _G(display)._pitch * y + x;
+	return (byte *)_G(display)._pixels->_ptr + offset;
+}
+
 void gxDirtyDisplay(int minY, int maxY) {
 	if (minY > maxY)
 		SWAP(minY, maxY);

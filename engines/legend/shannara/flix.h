@@ -23,9 +23,12 @@
 #define LEGEND_SHANNARA_FLIX_H
 
 #include "common/stream.h"
+#include "legend/graphics.h"
 
 namespace Legend {
 namespace Shannara {
+
+extern void q_init(int y, PalettePtr pal);
 
 } // namespace Shannara
 } // namespace Legend
