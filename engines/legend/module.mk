@@ -2,6 +2,7 @@ MODULE := engines/legend
 
 MODULE_OBJS = \
 	debugger.o \
+	file.o \
 	globals.o \
 	graphics.o \
 	legend.o \

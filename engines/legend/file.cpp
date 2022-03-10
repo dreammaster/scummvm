@@ -19,50 +19,41 @@
  *
  */
 
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
-#include "common/events.h"
 #include "common/file.h"
-#include "common/util.h"
-#include "engines/util.h"
-#include "legend/legend.h"
-#include "legend/debugger.h"
-#include "legend/detection.h"
-#include "legend/globals.h"
-#include "legend/memory.h"
+#include "legend/file.h"
 
 namespace Legend {
 
-LegendEngine *g_engine;
+Stream *fp_open(const char *filename, const char *mode) {
+	assert(!strcmp(mode, "rb"));
+	Common::File *f = new Common::File();
 
-LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) : Engine(syst),
-	_gameDescription(gameDesc), _randomSource("Legend") {
-	g_engine = this;
+	if (f->open(filename)) {
+		return f;
+	} else {
+		delete f;
+		return nullptr;
+	}
 }
 
-LegendEngine::~LegendEngine() {
-	release_memory();
-
-	delete _globals;
+void fc_close(Stream *fp) {
+	delete fp;
 }
 
-void LegendEngine::initialize() {
-	_globals = new Globals();
-	setDebugger(new Debugger());
-
-	init_memory();
+size_t fp_size(Stream *fp) {
+	return fp->size();
 }
 
-uint32 LegendEngine::getFeatures() const {
-	return _gameDescription->desc.flags;
+void fp_set_bufsiz(Stream *fp, size_t bufSize) {
+	// No implementation in ScummVM
 }
 
-Common::String LegendEngine::getGameId() const {
-	return _gameDescription->desc.gameId;
+size_t fp_read(Stream *fp, void *buf, size_t size) {
+	return fp->read(buf, size);
 }
 
-Common::Error LegendEngine::run() {
-	return Common::kNoError;
+int fp_seek(Stream *fp, int offset, int origin) {
+	return fp->seek(offset, origin);
 }
 
 } // namespace Legend
