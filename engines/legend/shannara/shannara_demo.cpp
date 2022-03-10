@@ -19,28 +19,25 @@
  *
  */
 
+#include "legend/shannara/shannara_demo.h"
+#include "legend/shannara/flix.h"
+#include "legend/shannara/globals.h"
+#include "legend/debugger.h"
+
 namespace Legend {
+namespace Shannara {
 
-const PlainGameDescriptor GAME_NAMES[] = {
-	{ "shannara", "Shannara" },
-	{ 0, 0 }
-};
+ShannaraDemo::ShannaraDemo(OSystem *syst, const LegendGameDescription *gameDesc) :
+		::Legend::LegendEngine(syst, gameDesc) {
+}
 
-const LegendGameDescription GAME_DESCRIPTIONS[] = {
-	{
-		{
-			"shannara",
-			"Demo",
-			AD_ENTRY1s("Logosvga.q", "9b3dd12beb1bbd1e32e55641ee1420b7", 321496),
-			Common::EN_ANY,
-			Common::kPlatformDOS,
-			ADGF_DEMO | ADGF_UNSTABLE,
-			GUIO0()
-		},
-		GAME_SHANNARA
-	},
+ShannaraDemo::~ShannaraDemo() {
+}
 
-	{ AD_TABLE_END_MARKER, (GameId)0 }
-};
+void ShannaraDemo::initialize() {
+	_globals = new ShannaraGlobals();
+	setDebugger(new Debugger());
+}
 
+} // namespace Shannara
 } // namespace Legend

@@ -44,11 +44,11 @@ class LegendEngine : public Engine {
 private:
 	const LegendGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
-
-	void initialize();
 protected:
 	// Engine APIs
 	Common::Error run() override;
+
+	virtual void initialize();
 public:
 	Globals *_globals = nullptr;
 public:
@@ -61,7 +61,7 @@ public:
 	/**
 	 * Returns the game Id
 	 */
-	Common::String getGameId() const;
+	GameId getGameId() const;
 
 	/**
 	 * Sets the random number seed

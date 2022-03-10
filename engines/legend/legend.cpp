@@ -26,7 +26,6 @@
 #include "common/util.h"
 #include "engines/util.h"
 #include "legend/legend.h"
-#include "legend/debugger.h"
 #include "legend/detection.h"
 #include "legend/globals.h"
 #include "legend/memory.h"
@@ -47,18 +46,15 @@ LegendEngine::~LegendEngine() {
 }
 
 void LegendEngine::initialize() {
-	_globals = new Globals();
-	setDebugger(new Debugger());
-
 	init_memory();
 }
 
 uint32 LegendEngine::getFeatures() const {
-	return _gameDescription->desc.flags;
+	return _gameDescription->_desc.flags;
 }
 
-Common::String LegendEngine::getGameId() const {
-	return _gameDescription->desc.gameId;
+GameId LegendEngine::getGameId() const {
+	return _gameDescription->_gameId;
 }
 
 Common::Error LegendEngine::run() {

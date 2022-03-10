@@ -7,7 +7,10 @@ MODULE_OBJS = \
 	graphics.o \
 	legend.o \
 	memory.o \
-	metaengine.o
+	metaengine.o \
+	shannara/flix.o \
+	shannara/globals.o \
+	shannara/shannara_demo.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_LEGEND), DYNAMIC_PLUGIN)
