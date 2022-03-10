@@ -19,28 +19,15 @@
  *
  */
 
+#ifndef LEGEND_SHANNARA_FLIX_H
+#define LEGEND_SHANNARA_FLIX_H
+
+#include "common/stream.h"
+
 namespace Legend {
+namespace Shannara {
 
-const PlainGameDescriptor GAME_NAMES[] = {
-	{ "shannara", "Shannara" },
-	{ 0, 0 }
-};
-
-const LegendGameDescription GAME_DESCRIPTIONS[] = {
-	{
-		{
-			"shannara",
-			"Demo",
-			AD_ENTRY1s("Logosvga.q", "9b3dd12beb1bbd1e32e55641ee1420b7", 321496),
-			Common::EN_ANY,
-			Common::kPlatformDOS,
-			ADGF_DEMO | ADGF_UNSTABLE,
-			GUIO0()
-		},
-		GAME_SHANNARA
-	},
-
-	{ AD_TABLE_END_MARKER, (GameId)0 }
-};
-
+} // namespace Shannara
 } // namespace Legend
+
+#endif

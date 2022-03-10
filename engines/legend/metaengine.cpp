@@ -22,6 +22,7 @@
 #include "legend/metaengine.h"
 #include "legend/detection.h"
 #include "legend/legend.h"
+#include "legend/shannara/shannara_demo.h"
 
 const char *LegendMetaEngine::getName() const {
 	return "legend";
@@ -30,8 +31,13 @@ const char *LegendMetaEngine::getName() const {
 Common::Error LegendMetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const {
 	const Legend::LegendGameDescription *gd = (const Legend::LegendGameDescription *)desc;
 
-	*engine = new Legend::LegendEngine(syst, gd);
-	return Common::kNoError;
+	if (gd->_gameId == Legend::GAME_SHANNARA && (gd->_desc.flags & ADGF_DEMO)) {
+		*engine = new Legend::Shannara::ShannaraDemo(syst, gd);
+		return Common::kNoError;
+	} else {
+		// Unknown Legend game
+		return Common::kUnsupportedGameidError;
+	}
 }
 
 bool LegendMetaEngine::hasFeature(MetaEngineFeature f) const {

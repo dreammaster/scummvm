@@ -26,6 +26,12 @@
 
 namespace Legend {
 
+enum GameId {
+	GAME_XANTH,
+	GAME_SHANNARA,
+	GAME_DEATH_GATE
+};
+
 enum LegendDebugChannels {
 	kDebugGraphics = 1 << 0,
 	kDebugPath     = 1 << 1,
@@ -35,7 +41,8 @@ enum LegendDebugChannels {
 };
 
 struct LegendGameDescription {
-	ADGameDescription desc;
+	ADGameDescription _desc;
+	GameId _gameId;
 };
 
 extern const PlainGameDescriptor GAME_NAMES[];
