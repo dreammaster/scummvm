@@ -29,6 +29,7 @@
 #include "legend/debugger.h"
 #include "legend/detection.h"
 #include "legend/globals.h"
+#include "legend/memory.h"
 
 namespace Legend {
 
@@ -40,6 +41,8 @@ LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc)
 }
 
 LegendEngine::~LegendEngine() {
+	release_memory();
+
 	delete _globals;
 }
 

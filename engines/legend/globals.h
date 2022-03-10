@@ -41,6 +41,8 @@ struct Globals {
 	size_t _master_table_size = 0x300;
 	size_t _memory_avail = 0;
 	byte *_master_ptr = nullptr;
+	size_t _real_avail = 0xfffff;
+	byte *_real_ptr = nullptr;
 	MemoryBlock *_master_table = nullptr;
 	size_t _master_table_end = 0;
 	int _max_handles = 0x200;
@@ -49,7 +51,7 @@ struct Globals {
 	bool _disable_compact_memory = false;
 	PurgeMethod _purge_vector_tbl[20] = { nullptr };
 	int _mem_type[20] = { 0 };
-	int _min_memory = 0;
+	int _min_memory = 0, _max_memory = 0;
 	int _low_memory = 0;
 };
 

@@ -315,11 +315,23 @@ void init_memory() {
 		_G(master_table_size) * sizeof(MemoryBlock));
 	mb->_type = MEMTYPE_FILE;
 
-	// TODO: DPMI real table entry created.
-	// Not sure if needed in ScummVM
+	// TODO: real setup/setting
+	_G(master_table)[0]._size = _G(real_avail);
+	mb = insert_master(_G(real_ptr), _G(real_avail));
 
-	//_G(handle_table) = (void **)new_pointer(_G(max_handles) * 4, 2);
-	// TODO: Other stuff
+	_G(handle_table) = (void **)new_pointer(_G(max_handles) * sizeof(void *));
+	set_pointer_type(_G(handle_table), MEMTYPE_FILE);
+	Common::fill(_G(handle_table), _G(handle_table) + _G(max_handles), nullptr);
+
+	Common::fill(_G(purge_vector_tbl), _G(purge_vector_tbl), nullptr);
+	_G(next_handle_type) = 17;
+
+	_G(max_memory) = _G(min_memory) = _G(low_memory) = _G(memory_avail);
+}
+
+void release_memory() {
+	delete[] _G(master_ptr);
+	delete[] _G(real_ptr);
 }
 
 void set_purge_routine(MemType type, PurgeMethod proc) {
