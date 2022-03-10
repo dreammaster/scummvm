@@ -20,10 +20,26 @@
  */
 
 #include "legend/shannara/flix.h"
+#include "legend/memory.h"
+#include "legend/shannara/globals.h"
 
 namespace Legend {
 namespace Shannara {
 
+void q_init(int y, PalettePtr pal) {
+	if (!_GS(qbuffer) && pal) {
+		_GS(qpalette) = pal;
+		_GS(qbuffer) = (byte *)new_pointer(0x13C06);
+
+		if (_GS(qbuffer)) {
+			_GS(qbuffer_orig) = _GS(qbuffer);
+			_GS(video_buffer) = gxVideoAddr(0, y);
+			_GS(q_y1) = y;
+			_GS(q_y2) = y + 287;
+			memset(_GS(qpalette), 0, PALETTE_SIZE);
+		}
+	}
+}
 
 } // namespace Shannara
 } // namespace Legend

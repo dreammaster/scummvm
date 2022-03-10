@@ -36,10 +36,11 @@ enum gxResult {
 };
 
 typedef byte Palette[PALETTE_SIZE];
+typedef byte *PalettePtr;
 
 struct Display {
 	void *_ptr = nullptr;
-	int _field4 = 0;
+	int _pitch = 0;
 	MemoryBlock *_pixels = nullptr;
 	int _size = 0;
 };
@@ -47,11 +48,10 @@ struct Display {
 extern gxResult gxClearVirtual(Display *gx, int color);
 extern void gxDirtyDisplay(int minY, int maxY);
 extern gxResult gxClearDisplay(int color);
+extern byte *gxVideoAddr(int x, int y);
 
 extern void set_palette_range(const byte *pal, int start, int end);
-
 extern void set_palette(const Palette &pal);
-
 extern void black_palette();
 
 } // namespace Legend

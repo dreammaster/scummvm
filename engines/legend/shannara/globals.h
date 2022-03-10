@@ -31,12 +31,14 @@ namespace Shannara {
 struct ShannaraGlobals : public ::Legend::Globals {
 	ShannaraGlobals() : ::Legend::Globals() {}
 
-	Palette _qpalette = { 0 };
+	PalettePtr _qpalette = nullptr;
 	byte *_qbuffer = nullptr;
+	byte *_qbuffer_orig = nullptr;
+	byte *_video_buffer = nullptr;
+	int _q_y1 = 0, _q_y2 = 0;
 };
 
-#undef _G
-#define _G(FIELD) ((::Legend::Shannara::ShannaraGlobals *)::Legend::g_globals)->_##FIELD)
+#define _GS(FIELD) (((::Legend::Shannara::ShannaraGlobals *)::Legend::g_globals)->_##FIELD)
 
 } // namespasce Shannara
 } // namespace Legend
