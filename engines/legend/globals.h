@@ -36,6 +36,10 @@ struct Globals {
 	int _palette_off = 0;
 	Display _display;
 	int _dirty_y1 = 0, _dirty_y2 = 0;
+	int _gx_clipx1 = 0, _gx_clipx2 = 0;
+	int _gx_clipy1 = 0, _gx_clipy2 = 0;
+	int _clipx1 = 0, _clipx2 = 0;
+	int _clipy1 = 0, _clipy2 = 0;
 
 	// memory
 	size_t _master_table_size = 0x300;
