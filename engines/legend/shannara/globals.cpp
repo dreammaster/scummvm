@@ -20,9 +20,20 @@
  */
 
 #include "legend/shannara/globals.h"
+#include "legend/shannara/flix.h"
 
 namespace Legend {
 namespace Shannara {
+
+ShannaraGlobals::ShannaraGlobals() : Globals() {
+	_qheader = new QHeader();
+	_qinfo = new QInfo();
+}
+
+ShannaraGlobals::~ShannaraGlobals() {
+	delete _qheader;
+	delete _qinfo;
+}
 
 } // namespace Shannara
 } // namespace Legend

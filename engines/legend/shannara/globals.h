@@ -23,19 +23,36 @@
 #define LEGEND_SHANNARA_GLOBALS_H
 
 #include "legend/globals.h"
+#include "legend/file.h"
 #include "legend/graphics.h"
 
 namespace Legend {
 namespace Shannara {
 
+struct QHeader;
+struct QInfo;
+
 struct ShannaraGlobals : public ::Legend::Globals {
-	ShannaraGlobals() : ::Legend::Globals() {}
+	ShannaraGlobals();
+	virtual ~ShannaraGlobals();
 
 	PalettePtr _qpalette = nullptr;
+	PalettePtr _new_palette = nullptr;
 	byte *_qbuffer = nullptr;
 	byte *_qbuffer_orig = nullptr;
 	byte *_video_buffer = nullptr;
+	size_t _qaudio_buffer_size = 0;
 	int _q_y1 = 0, _q_y2 = 0;
+	QHeader *_qheader;
+	QInfo *_qinfo;
+	Stream *_q_fp = nullptr;
+	byte _next_qprefix[6] = { 0 };
+	void *_qframe = nullptr;
+	int _next_qframe = 0;
+
+	void *_composite_addr_tbl = nullptr;
+	void *_composite_buffer = nullptr;
+	int _qloop2 = 0;
 };
 
 #define _GS(FIELD) (((::Legend::Shannara::ShannaraGlobals *)::Legend::g_globals)->_##FIELD)

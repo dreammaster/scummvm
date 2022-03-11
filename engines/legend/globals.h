@@ -29,7 +29,7 @@ namespace Legend {
 
 struct Globals {
 	Globals();
-	~Globals();
+	virtual ~Globals();
 
 	Palette _default_palette = { 0 };
 	bool _cycling_on = false;
