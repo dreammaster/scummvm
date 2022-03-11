@@ -24,11 +24,22 @@ namespace Dink {
 const PlainGameDescriptor GAME_NAMES[] = {
 	{ "dink", "Dink Smallwood Game Module" },
 	{ "dinksmallwood", "Dink Smallwood" },
+
+	{ "pq", "Pilgrim's Quest" },
 	{ 0, 0 }
 };
 
+#define DETECTION_ENTRY(ID, FILENAME, MD5, SIZE, LANG, PLATFORM, GUIO, FLAGS) \
+	{{ ID, PLATFORM, AD_ENTRY1s(FILENAME, MD5, SIZE), LANG, \
+	Common::kPlatformUnknown, FLAGS, GUIO }}
+
+#define GAME_ENTRY(ID, FILENAME, MD5, SIZE) \
+	DETECTION_ENTRY(ID, FILENAME, MD5, SIZE, Common::UNK_LANG, nullptr, GUIO1(GUIO_NOLANG), ADGF_UNSTABLE)
+
 const DinkGameDescription GAME_DESCRIPTIONS[] = {
-	{ AD_TABLE_END_MARKER }
+	GAME_ENTRY("pq", "pq.dmod", "98ae54ad2264db226bf697545d60a727", 35324007),
+
+{ AD_TABLE_END_MARKER }
 };
 
 /**
