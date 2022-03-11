@@ -22,13 +22,38 @@
 #ifndef LEGEND_SHANNARA_FLIX_H
 #define LEGEND_SHANNARA_FLIX_H
 
-#include "common/stream.h"
+#include "legend/file.h"
 #include "legend/graphics.h"
 
 namespace Legend {
 namespace Shannara {
 
+struct QHeader {
+	int _id = 0;
+	int _field2 = 0;
+	int _field4 = 0;
+	int _field6 = 0;
+	int _field8 = 0;
+	int _field9 = 0;
+	int _fieldA = 0;
+	int _fieldC = 0;
+	int _field10 = 0;
+	int _field16 = 0;
+
+	void load(Stream *src);
+};
+
+struct QInfo {
+	int _field0 = 0;
+	int _field2 = 0;
+	int _field4 = 0;
+	int _field6 = 0;
+};
+
 extern void q_init(int y, PalettePtr pal);
+extern void q_open(const char *filename, size_t bufSize = 0x8000);
+extern void q_close();
+extern void q_kill();
 
 } // namespace Shannara
 } // namespace Legend

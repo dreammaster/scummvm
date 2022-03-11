@@ -29,7 +29,7 @@ namespace Legend {
 typedef Common::SeekableReadStream Stream;
 
 extern Stream *fp_open(const char *filename, const char *mode = "rb");
-extern void fc_close(Stream *fp);
+extern void fp_close(Stream *fp);
 extern size_t fp_size(Stream *fp);
 extern void fp_set_bufsiz(Stream *fp, size_t bufSize);
 extern size_t fp_read(Stream *fp, void *buf, size_t size);

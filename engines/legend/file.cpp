@@ -19,10 +19,43 @@
  *
  */
 
-#include "legend/shannara/flix.h"
+#include "common/file.h"
+#include "legend/file.h"
 
 namespace Legend {
 namespace Shannara {
+
+Stream *fp_open(const char *filename, const char *mode) {
+	assert(!strcmp(mode, "rb"));
+	Common::File *f = new Common::File();
+
+	if (f->open(filename)) {
+		return f;
+	} else {
+		delete f;
+		return nullptr;
+	}
+}
+
+void fp_close(Stream *fp) {
+	delete fp;
+}
+
+size_t fp_size(Stream *fp) {
+	return fp->size();
+}
+
+void fp_set_bufsiz(Stream *fp, size_t bufSize) {
+	// No implementation
+}
+
+size_t fp_read(Stream *fp, void *buf, size_t size) {
+	return fp->read(buf, size);
+}
+
+int fp_seek(Stream *fp, int offset, int origin) {
+	return fp->seek(offset, origin);
+}
 
 } // namespace Shannara
 } // namespace Legend
