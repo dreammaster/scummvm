@@ -42,6 +42,23 @@ gxResult gxClearDisplay(int color) {
 	return GX_SUCCESS;
 }
 
+int find_rgb(byte r, byte g, byte b) {
+	int palIndex = 0, minDiff = 0xffff;
+	const byte *palP = _G(default_palette);
+
+	for (int i = 0; i < PALETTE_COUNT; ++i, palP += 3) {
+		int diff = ABS(palP[0] - r) + ABS(palP[1] - g) +
+			ABS(palP[2] - b);
+
+		if (diff < minDiff) {
+			minDiff = diff;
+			palIndex = i;
+		}
+	}
+
+	return palIndex;
+}
+
 byte *gxVideoAddr(int x, int y) {
 	int offset = _G(display)._pitch * y + x;
 	return (byte *)_G(display)._pixels->_ptr + offset;
