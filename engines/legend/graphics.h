@@ -32,7 +32,8 @@ constexpr int SCREEN_HEIGHT = 480;
 
 enum gxResult {
 	GX_SUCCESS = 0,
-	GX_20 = -20
+	GX_20 = -20,
+	GX_28 = -28
 };
 
 typedef byte Palette[PALETTE_SIZE];
@@ -41,6 +42,7 @@ typedef byte *PalettePtr;
 struct Display {
 	void *_ptr = nullptr;
 	int _pitch = 0;
+	int _field6 = 0;
 	MemoryBlock *_pixels = nullptr;
 	int _size = 0;
 };
@@ -49,7 +51,9 @@ extern gxResult gxClearVirtual(Display *gx, int color);
 extern void gxDirtyDisplay(int minY, int maxY);
 extern gxResult gxClearDisplay(int color);
 extern byte *gxVideoAddr(int x, int y);
-
+extern gxResult gxDestroyVirtual(Display *gx);
+extern void gxSetClipRegion(int x1, int y1, int x2, int y2);
+extern void reset_clip_region();
 extern void set_palette_range(const byte *pal, int start, int end);
 extern void set_palette(const Palette &pal);
 extern void black_palette();

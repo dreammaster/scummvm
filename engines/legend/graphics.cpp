@@ -79,7 +79,36 @@ void gxDirtyDisplay(int minY, int maxY) {
 		_G(dirty_y2) = maxY;
 }
 
+gxResult gxDestroyVirtual(Display *gx) {
+	if (gx) {
+		if (gx->_pixels) {
+			// TODO: kill_handle call for a memory block?
+			//kill_handle(gx->_pixels);
+			gx->_pixels = nullptr;
+			return GX_SUCCESS;
+		} else if (gx->_pitch == 0 && gx->_field6 == 0) {
+			return GX_SUCCESS;
+		}
+	}
 
+	return GX_28;
+}
+
+void gxSetClipRegion(int x1, int y1, int x2, int y2) {
+	_G(gx_clipx1) = (x1 < 0 || x1 >= SCREEN_WIDTH) ? 0 : x1;
+	_G(gx_clipy1) = (y1 < 0 || y1 >= SCREEN_HEIGHT) ? 0 : y1;
+	_G(gx_clipx2) = (x2 < 0 || x2 >= SCREEN_WIDTH) ? SCREEN_WIDTH - 1 : x2;
+	_G(gx_clipy2) = (y2 < 0 || y2 >= SCREEN_HEIGHT) ? SCREEN_HEIGHT - 1 : y2;
+
+	_G(clipx1) = _G(gx_clipx1) >> 16;
+	_G(clipy1) = _G(gx_clipy1) >> 16;
+	_G(clipx2) = _G(gx_clipx2) >> 16;
+	_G(clipy2) = _G(gx_clipy2) >> 16;
+}
+
+void reset_clip_region() {
+	gxSetClipRegion(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
+}
 
 void set_palette_range(const byte *pal, int start, int count) {
 	g_system->getPaletteManager()->setPalette(pal, start, count);
