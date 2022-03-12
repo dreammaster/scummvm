@@ -69,8 +69,8 @@ Common::Error DinkEngine::run() {
 		}
 	}
 
-	initialize();
 	initializeFlags();
+	initialize();
 
 	log_path(true);
 
