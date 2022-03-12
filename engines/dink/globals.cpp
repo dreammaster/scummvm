@@ -294,5 +294,25 @@ int in_master = 0;
 bool sound_on = true;
 char dir[80];
 
+int fps_average;
+int but_timer = 0;
+int water_timer;
+bool fire_forward;
+int fire_flip;
+int fps_show = 0;
+
+//idirectsound
+LPDIRECTDRAWCLIPPER lpClipper;
+
+int drawthistime = true;
+int currX = 640;
+int currY = 480;
+Common::Rect                rc;
+int winoffset = 25;
+int winoffsetx = 5;
+
+int cx;
+int cy;
+int speed;
 
 } // namespace Dink

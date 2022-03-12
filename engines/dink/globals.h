@@ -802,6 +802,15 @@ extern bool disablejoystick;
 extern hardness hmap;
 extern Common::Rect tilerect[tile_screens];
 
+extern int fps_average;
+extern int but_timer;
+extern int water_timer;
+extern bool fire_forward;
+extern int fire_flip;
+extern int fps_show;
+extern int drawthistime;
+extern int currX, currY;
+
 } // namespace Dink
 
 #endif

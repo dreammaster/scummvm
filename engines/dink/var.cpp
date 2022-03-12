@@ -32,7 +32,7 @@
 
 namespace Dink {
 
-void SoundLoadBanks(void) {
+void SoundLoadBanks() {
 #ifdef TODO
 	HRESULT ddsound;
 
@@ -144,7 +144,7 @@ done:
 
 
 
-void clear_talk(void) {
+void clear_talk() {
 	memset(&talk, 0, sizeof(talk));
 	play.mouse = 0;
 }
@@ -975,7 +975,7 @@ void Saytiny(char thing[2000], int px, int py, int r, int g, int b) {
 }
 
 
-void flip_it_second(void) {
+void flip_it_second() {
 	DDBLTFX ddBltFx;
 	RECT rcRectSrc;
 	RECT rcRectDest;
@@ -1143,7 +1143,7 @@ IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy
 #endif
 }
 
-bool DSDisable(void) {
+bool DSDisable() {
 	if (lpDS == NULL) {
 		return true;
 	}
@@ -1295,7 +1295,7 @@ int realhard(int tile) {
 }
 
 
-void fill_whole_hard(void) {
+void fill_whole_hard() {
 
 	for (int til = 0; til < 96; til++) {
 		int offx = (til * 50 - ((til / 12) * 600));
@@ -1313,7 +1313,7 @@ void fill_whole_hard(void) {
 	}
 }
 
-void drawallhard(void) {
+void drawallhard() {
 	RECT boxCrap;
 	int ddrVal;
 	DDBLTFX     ddBltFx;
@@ -1387,7 +1387,7 @@ void drawallhard(void) {
 }
 
 
-void fix_dead_sprites(void) {
+void fix_dead_sprites() {
 
 	if (dinkedit) return;
 
@@ -1500,7 +1500,7 @@ void save_map(const int num) {
 
 
 
-void save_info(void) {
+void save_info() {
 #ifdef TODO
 	FILE           *fp;
 	char crap[80];
@@ -1568,13 +1568,13 @@ void save_game(int num) {
 }
 
 
-void kill_all_vars(void) {
+void kill_all_vars() {
 
 	FillMemory(&play, sizeof(play), 0);
 
 }
 
-void attach(void) {
+void attach() {
 
 	for (int i = 1; i < max_vars; i++) {
 		if (compare("&life", play.var[i].name)) {
@@ -1848,7 +1848,7 @@ bool load_game(int num) {
 #endif
 }
 
-void kill_cur_item(void) {
+void kill_cur_item() {
 
 	if (*pcur_weapon != 0) {
 		if (play.item[*pcur_weapon].active == true) {
@@ -1951,7 +1951,7 @@ found:
 
 
 
-void kill_cur_magic(void) {
+void kill_cur_magic() {
 
 	if (*pcur_magic != 0) {
 		if (play.mitem[*pcur_magic].active == true) {
@@ -1971,7 +1971,7 @@ void kill_cur_magic(void) {
 }
 
 
-void update_screen_time(void) {
+void update_screen_time() {
 	//Msg("Cur time is %d", play.spmap[*pmap].last_time);
 	//Msg("Map is %d..", *pmap);
 	play.spmap[*pmap].last_time = thisTickCount;
@@ -2003,7 +2003,7 @@ bool load_game_small(int num, char *line, int *mytime) {
 }
 
 
-void load_info(void) {
+void load_info() {
 #ifdef TODO
 	FILE           *fp;
 	//redink1 changed 'crap' to 'current_dat'
@@ -2026,7 +2026,7 @@ void load_info(void) {
 #endif
 }
 
-void save_hard(void) {
+void save_hard() {
 #ifdef TODO
 	FILE           *fp;
 	char crap[80];
@@ -2045,7 +2045,7 @@ void save_hard(void) {
 }
 
 
-void load_hard(void) {
+void load_hard() {
 #ifdef TODO
 	FILE           *fp;
 	char crap[80];
@@ -2074,7 +2074,7 @@ void load_hard(void) {
 
 
 
-void blit_background(void) {
+void blit_background() {
 	RECT rcRect;
 
 	SetRect(&rcRect, 0, 0, 640, 480);
@@ -2894,7 +2894,7 @@ void figure_out(char line[255], int load_seq) {
 }
 
 
-void program_idata(void) {
+void program_idata() {
 	for (int i = 1; i < max_idata; i++) {
 		if (id[i].type == 0) return;
 
@@ -3233,7 +3233,7 @@ again:
 	return (length);
 }
 
-int next_raise(void) {
+int next_raise() {
 	int crap = *plevel;
 	int num = ((100 * crap) * crap);
 
@@ -3408,14 +3408,14 @@ again2:
 }
 
 
-void draw_health(void) {
+void draw_health() {
 	flifemax = *plifemax;
 	draw_bar(flifemax, 190);
 	flife = *plife;
 	draw_bar(flife, 451);
 }
 
-void draw_icons(void) {
+void draw_icons() {
 
 	if (*pcur_weapon != 0) if (play.item[*pcur_weapon].active) {
 			//disarm old weapon
@@ -3553,7 +3553,7 @@ void draw_mlevel(int percent) {
 }
 
 
-void draw_status_all(void) {
+void draw_status_all() {
 	RECT rcRect;
 	rcRect.left = 0;
 	rcRect.top = 0;
@@ -3901,7 +3901,7 @@ void refigure_out(const char *line) {
 
 
 
-void reload_batch(void) {
+void reload_batch() {
 	Common::File f;
 	Common::String line;
 
@@ -3970,7 +3970,7 @@ void kill_script(int num) {
 
 
 
-void kill_all_scripts(void) {
+void kill_all_scripts() {
 	int ii;
 
 	for (ii = 1; ii < max_scripts; ii++) {
@@ -3991,7 +3991,7 @@ void kill_all_scripts(void) {
 	}
 }
 
-void kill_all_scripts_for_real(void) {
+void kill_all_scripts_for_real() {
 	int ii;
 
 	for (ii = 1; ii < max_scripts; ii++) {
@@ -5623,7 +5623,7 @@ morestuff:
 
 }
 
-bool nothing_playing(void) {
+bool nothing_playing() {
 #ifdef TODO
 	//int crap = (mciSendString("status MUSIC offset", NULL, 0, NULL));
 	//int crap =  (mciSendString("play MUSIC from 0", NULL, 0, g_hWnd));
@@ -5658,7 +5658,7 @@ bool nothing_playing(void) {
 }
 
 
-bool cdplaying(void) {
+bool cdplaying() {
 #ifdef TODO
 	//int crap = (mciSendString("status MUSIC offset", NULL, 0, NULL));
 	//int crap =  (mciSendString("play MUSIC from 0", NULL, 0, g_hWnd));
@@ -5693,7 +5693,7 @@ bool cdplaying(void) {
 }
 //thing to play the midi
 
-void init_midi(void) {
+void init_midi() {
 
 
 }
@@ -5839,7 +5839,7 @@ bool PlayMidi(char *sFileName) {
 }
 
 
-void check_midi(void) {
+void check_midi() {
 
 	char hold[20];
 
@@ -6504,7 +6504,7 @@ void changedir(int dir1, int k, int base) {
 }
 
 
-void update_play_changes(void) {
+void update_play_changes() {
 
 	for (int j = 1; j < 100; j++) {
 		if (pam.sprite[j].active)
@@ -6561,7 +6561,7 @@ void update_play_changes(void) {
 	}
 }
 
-void update_status_all(void) {
+void update_status_all() {
 	bool drawexp = false;
 	int next = next_raise();
 	int script;
@@ -6687,7 +6687,7 @@ void update_status_all(void) {
 
 
 
-void place_sprites_game(void) {
+void place_sprites_game() {
 	int sprite;
 
 	bool bs[max_sprites_at_once];
@@ -6866,7 +6866,7 @@ void place_sprites_game(void) {
 
 
 
-bool kill_last_sprite(void) {
+bool kill_last_sprite() {
 	int found;
 	found = 0;
 	bool nosetlast = false;
@@ -7060,7 +7060,7 @@ int get_vol(int h) {
 }
 
 
-void kill_repeat_sounds(void) {
+void kill_repeat_sounds() {
 	if (!sound_on) return;
 
 	for (int i = 1; i <= num_soundbanks; i++) {
@@ -7080,7 +7080,7 @@ void kill_repeat_sounds(void) {
 }
 
 
-void kill_repeat_sounds_all(void) {
+void kill_repeat_sounds_all() {
 	if (!sound_on) return;
 
 	for (int i = 1; i <= num_soundbanks; i++) {
@@ -7100,7 +7100,7 @@ void kill_repeat_sounds_all(void) {
 }
 
 
-void update_sound(void) {
+void update_sound() {
 	unsigned long crap;
 
 	if (!sound_on) return;
@@ -7452,7 +7452,7 @@ bool InitSound(HWND hwndOwner) {
 } /* InitSound */
 
 
-void draw_map_game(void) {
+void draw_map_game() {
 	RECT                rcRect;
 	int pa, cool;
 
@@ -7507,7 +7507,7 @@ void draw_map_game(void) {
 }
 
 
-void place_sprites_game_background(void) {
+void place_sprites_game_background() {
 	int sprite;
 
 	bool bs[max_sprites_at_once];
@@ -7574,7 +7574,7 @@ void place_sprites_game_background(void) {
 }
 
 
-void draw_map_game_background(void) {
+void draw_map_game_background() {
 	RECT                rcRect;
 
 
@@ -7603,7 +7603,7 @@ void draw_map_game_background(void) {
 
 
 
-void fill_back_sprites(void) {
+void fill_back_sprites() {
 	int sprite;
 
 	bool bs[max_sprites_at_once];
@@ -7734,7 +7734,7 @@ void fill_screen(int num) {
 }
 
 
-void fill_hard_sprites(void) {
+void fill_hard_sprites() {
 //    int sprite;
 	bool bs[max_sprites_at_once];
 	int rank[max_sprites_at_once];
@@ -11279,7 +11279,7 @@ redo2:
 }
 
 
-void process_callbacks(void) {
+void process_callbacks() {
 	int thist = g_events->getTickCount();
 
 
@@ -11357,7 +11357,7 @@ void process_callbacks(void) {
 
 
 
-void init_scripts(void) {
+void init_scripts() {
 	for (int k = 1; k < max_scripts; k++) {
 		if (rinfo[k] != NULL && rinfo[k]->sprite != 0 && rinfo[k]->sprite < 300 && spr[rinfo[k]->sprite].active) {
 			if (locate(k, "main")) {
@@ -11375,7 +11375,7 @@ void init_scripts(void) {
 }
 
 //redink1 added for font colors
-void init_font_colors(void) {
+void init_font_colors() {
 	//Light Magenta
 	font_colors[1].red   = 255;
 	font_colors[1].green = 198;

@@ -181,19 +181,6 @@ struct IDirectDraw {
 };
 typedef IDirectDraw *LPDIRECTDRAW;
 
-
-typedef uint32 COLORREF;
-#define RGB(r,g,b) ((COLORREF)(((byte)(r)|((uint16)((byte)(g))<<8))|(((uint32)(byte)(b))<<16)))
-
-inline COLORREF SetTextColor(HDC hdc, COLORREF color) {
-	return color;
-}
-
-inline int DrawText(HDC hdc, const char *lpchText, int cchText,
-	Common::Rect *lprc, uint format) {
-	return 0;
-}
-
 inline void dderror(int v) {
 	::error("dderror - %d", v);
 }

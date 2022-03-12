@@ -31,6 +31,10 @@ HRESULT SetBkMode(HDC hdc, int mode) {
 	return S_OK;
 }
 
+COLORREF SetBkColor(HDC hdc, COLORREF color) {
+	return S_OK;
+}
+
 int GetTextFace(HDC hdc, int c, const char *lpName) {
 	return 0;
 }

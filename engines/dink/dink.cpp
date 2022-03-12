@@ -24,6 +24,7 @@
 #include "dink/events.h"
 #include "dink/freedink.h"
 #include "dink/globals.h"
+#include "dink/update_frame.h"
 #include "dink/var.h"
 #include "common/scummsys.h"
 #include "common/config-manager.h"

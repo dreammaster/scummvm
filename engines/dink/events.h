@@ -140,6 +140,11 @@ public:
 	uint32 getTotalSeconds() {
 		return getTickCount() / 1000;
 	}
+
+	/**
+	 * Sleep for a given number of seconds
+	 */
+	void sleep(size_t numSeconds);
 };
 
 extern EventsManager *g_events;

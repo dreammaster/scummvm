@@ -139,4 +139,8 @@ uint32 EventsManager::getTickCount() const {
 	return g_system->getMillis();
 }
 
+void EventsManager::sleep(size_t numSeconds) {
+	g_system->delayMillis(numSeconds * 1000);
+}
+
 } // namespace Dink

@@ -1,18 +1,52 @@
-void updateFrame(void) {
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "common/scummsys.h"
+#include "dink/update_frame.h"
+#include "dink/freedink.h"
+#include "dink/globals.h"
+#include "dink/var.h"
+#include "dink/lib/graphics.h"
+#include "dink/lib/rect.h"
+#include "dink/lib/wintypes.h"
+#include "dink/directdraw/ddraw.h"
+
+namespace Dink {
+
+#define FALSE false
+#define TRUE true
+
+void updateFrame() {
 	byte state[256];
-	RECT                rcRect, box_crap, box_real;
-	DDBLTFX     ddbltfx;
+	RECT                rcRect, boxCrap, boxReal;
+	DDBLTFX     ddBltFx;
 	char msg[100];
 
 	HDC         hdc;
-	HRESULT             ddrval;
-	int sz = 0;
-	int move_result ;
-	int sy = 0;
+	HRESULT             ddrVal;
+	int move_result;
 	bool get_frame = false;
 	int h, max_s, j;
 	//HBRUSH brush;
-	BOOL bs[max_sprites_at_once];
+	bool bs[max_sprites_at_once];
 
 	int rank[max_sprites_at_once];
 	int highest_sprite;
@@ -52,8 +86,9 @@ trigger_start:
 		return;
 	}
 
-	if (mode == 1) Scrawl_OnMouseInput();
-	else {
+	if (mode == 1) {
+		Scrawl_OnMouseInput();
+	} else {
 		if (keep_mouse) {
 			if ((talk.active) || (spr[1].brain == 13))
 				Scrawl_OnMouseInput();
@@ -118,8 +153,8 @@ demon:
 
 
 	if (debug_mode) if (!no_cheat) {
-			spr[1].speed = 20;
-		}
+		spr[1].speed = 20;
+	}
 	//junk3;
 
 #ifdef __DEMO
@@ -173,7 +208,7 @@ demon:
 
 	mbase_count++;
 
-	if (thisTickCount > mold + 100) {
+	if (thisTickCount > (int)mold + 100) {
 		mbase_timing = (mbase_count / 100);
 		mold = thisTickCount;
 		if (bow.active) bow.hitme = true;
@@ -205,10 +240,13 @@ demon:
 	}
 
 
-	if (process_upcycle) up_cycle();
+	if (process_upcycle)
+		up_cycle();
 
-	if (process_warp > 0) process_warp_man();
-	if (process_downcycle) CyclePalette();
+	if (process_warp > 0)
+		process_warp_man();
+	if (process_downcycle)
+		CyclePalette();
 
 
 	if (plane_process) {
@@ -227,18 +265,18 @@ demon:
 
 			for (int h1 = 1; h1 < max_s + 1; h1++) {
 				if (spr[h1].active) if (spr[h1].disabled == false) {
-						if (bs[h1] == FALSE) {
-							//Msg( "Ok,  %d is %d", h1,(spr[h1].y + k[spr[h1].pic].yoffset) );
-							if (spr[h1].que != 0) height = spr[h1].que;
-							else height = spr[h1].y;
-							if (height < highest_sprite) {
-								highest_sprite = height;
-								rank[r1] = h1;
-							}
-
+					if (bs[h1] == FALSE) {
+						//Msg( "Ok,  %d is %d", h1,(spr[h1].y + picInfo[spr[h1].pic].yoffset) );
+						if (spr[h1].que != 0) height = spr[h1].que;
+						else height = spr[h1].y;
+						if (height < highest_sprite) {
+							highest_sprite = height;
+							rank[r1] = h1;
 						}
 
 					}
+
+				}
 
 			}
 			if (rank[r1] != 0)
@@ -253,30 +291,30 @@ demon:
 
 	rcRect.left = 0;
 	rcRect.top = 0;
-	rcRect.right = x;
-	rcRect.bottom = y;
+	rcRect.right = currX;
+	rcRect.bottom = currY;
 
 	{
 
 
 		//Blit from Two, which holds the base scene.
 		while (1) {
-			ddrval = lpDDSBack->BltFast(0, 0, lpDDSTwo,
-			                            &rcRect, DDBLTFAST_NOCOLORKEY);
+			ddrVal = lpDDSBack->BltFast(0, 0, lpDDSTwo,
+				&rcRect, DDBLTFAST_NOCOLORKEY);
 
-			if (ddrval == DD_OK) {
+			if (ddrVal == DD_OK) {
 				break;
 			}
-			if (ddrval == DDERR_SURFACELOST) {
-				ddrval = restoreAll();
-				if (ddrval != DD_OK) {
+			if (ddrVal == DDERR_SURFACELOST) {
+				ddrVal = restoreAll();
+				if (ddrVal != DD_OK) {
 					//    return;
 				}
 
 				goto demon;
 			}
-			if (ddrval != DDERR_WASSTILLDRAWING) {
-				dderror(ddrval);
+			if (ddrVal != DDERR_WASSTILLDRAWING) {
+				dderror(ddrVal);
 				return;
 			}
 		}
@@ -320,7 +358,7 @@ demon:
 
 				spr[h].skiptimer++;
 				//inc delay, used by "skip" by all sprites
-				box_crap = k[getpic(h)].box;
+				boxCrap = picInfo[getpic(h)].box;
 				if (spr[h].kill > 0) {
 					if (spr[h].kill_timer == 0) spr[h].kill_timer = thisTickCount;
 					if (spr[h].kill_timer + spr[h].kill < thisTickCount) {
@@ -343,7 +381,7 @@ demon:
 				}
 
 				if (spr[h].timer > 0) {
-					if (thisTickCount > spr[h].wait) {
+					if (thisTickCount > (int)spr[h].wait) {
 						spr[h].wait = thisTickCount + spr[h].timer;
 
 					} else {
@@ -355,7 +393,10 @@ demon:
 
 				//brains - predefined bahavior patterns available to any sprite
 
-				if (spr[h].notouch) if (thisTickCount > spr[h].notouch_timer) spr[h].notouch = false;
+				if (spr[h].notouch)
+					if (thisTickCount > (int)spr[h].notouch_timer)
+						spr[h].notouch = false;
+
 				if (get_frame == false) {
 					if ((spr[h].brain == 1)/* || (spr[h].brain == 9) || (spr[h].brain == 3) */) {
 
@@ -389,7 +430,8 @@ demon:
 				} else {
 					goto past;
 				}
-				if (::g_b_kill_app) return;
+				if (g_b_kill_app)
+					return;
 animate:
 
 				move_result = check_if_move_is_legal(h);
@@ -401,9 +443,9 @@ animate:
 				}
 
 				if (spr[h].brain == 1) if (move_result > 100) {
-						if (pam.sprite[move_result - 100].prop == 1)
-							special_block(move_result - 100, h);
-					}
+					if (pam.sprite[move_result - 100].prop == 1)
+						special_block(move_result - 100, h);
+				}
 
 
 				if (spr[h].reverse) {
@@ -418,14 +460,12 @@ animate:
 							if (spr[h].frame_delay != 0) spr[h].delay = (thisTickCount + spr[h].frame_delay);
 							else
 								spr[h].delay = (thisTickCount + seq[spr[h].seq].delay[index[spr[h].seq].last]);
-						}   else {
+						} else {
 							// not new anim
 
 							//is it time?
 
-							if (thisTickCount > spr[h].delay) {
-
-
+							if (thisTickCount > (int)spr[h].delay) {
 								spr[h].frame--;
 
 
@@ -438,7 +478,7 @@ animate:
 								spr[h].pframe = spr[h].frame;
 
 
-								if (seq[spr[h].seq].frame[spr[h].frame]  < 2) {
+								if (seq[spr[h].seq].frame[spr[h].frame] < 2) {
 
 									spr[h].pseq = spr[h].seq;
 									spr[h].pframe = spr[h].frame + 1;
@@ -451,27 +491,27 @@ animate:
 
 									if (h == 1) if (in_this_base(spr[h].seq_orig, mDinkBasePush))
 
-										{
+									{
 
 
-											play.push_active = false;
-											if (play.push_dir == 2) if (sjoy.down) play.push_active = true;
-											if (play.push_dir == 4) if (sjoy.left) play.push_active = true;
-											if (play.push_dir == 6) if (sjoy.right) play.push_active = true;
-											if (play.push_dir == 8) if (sjoy.up) play.push_active = true;
+										play.push_active = false;
+										if (play.push_dir == 2) if (sjoy.down) play.push_active = true;
+										if (play.push_dir == 4) if (sjoy.left) play.push_active = true;
+										if (play.push_dir == 6) if (sjoy.right) play.push_active = true;
+										if (play.push_dir == 8) if (sjoy.up) play.push_active = true;
 
 
-											goto past;
-
-										}
-								}
-								if (spr[h].seq > 0) if (seq[spr[h].seq].special[spr[h].frame] == 1) {
-										//this sprite can damage others right now!
-										//lets run through the list and tag sprites who were hit with their damage
-
-										run_through_tag_list(h, spr[h].strength);
+										goto past;
 
 									}
+								}
+								if (spr[h].seq > 0) if (seq[spr[h].seq].special[spr[h].frame] == 1) {
+									//this sprite can damage others right now!
+									//lets run through the list and tag sprites who were hit with their damage
+
+									run_through_tag_list(h, spr[h].strength);
+
+								}
 
 
 
@@ -484,93 +524,93 @@ animate:
 				} else {
 
 					if (spr[h].seq > 0) if (spr[h].picfreeze == 0) {
-							if (spr[h].frame < 1) {
-								// new anim
-								spr[h].pseq = spr[h].seq;
-								spr[h].pframe = 1;
-								spr[h].frame = 1;
+						if (spr[h].frame < 1) {
+							// new anim
+							spr[h].pseq = spr[h].seq;
+							spr[h].pframe = 1;
+							spr[h].frame = 1;
+							if (spr[h].frame_delay != 0) spr[h].delay = thisTickCount + spr[h].frame_delay;
+							else
+
+								spr[h].delay = (thisTickCount + seq[spr[h].seq].delay[1]);
+						} else {
+							// not new anim
+
+							//is it time?
+
+							if (thisTickCount > (int)spr[h].delay) {
+
+
+								spr[h].frame++;
 								if (spr[h].frame_delay != 0) spr[h].delay = thisTickCount + spr[h].frame_delay;
 								else
 
-									spr[h].delay = (thisTickCount + seq[spr[h].seq].delay[1]);
-							}   else {
-								// not new anim
+									spr[h].delay = (thisTickCount + seq[spr[h].seq].delay[spr[h].frame]);
 
-								//is it time?
+								spr[h].pseq = spr[h].seq;
+								spr[h].pframe = spr[h].frame;
 
-								if (thisTickCount > spr[h].delay) {
-
-
-									spr[h].frame++;
+								if (seq[spr[h].seq].frame[spr[h].frame] == -1) {
+									spr[h].frame = 1;
+									spr[h].pseq = spr[h].seq;
+									spr[h].pframe = spr[h].frame;
 									if (spr[h].frame_delay != 0) spr[h].delay = thisTickCount + spr[h].frame_delay;
 									else
 
 										spr[h].delay = (thisTickCount + seq[spr[h].seq].delay[spr[h].frame]);
 
+								}
+
+								if (seq[spr[h].seq].frame[spr[h].frame] < 1) {
+
 									spr[h].pseq = spr[h].seq;
-									spr[h].pframe = spr[h].frame;
+									spr[h].pframe = spr[h].frame - 1;
 
-									if (seq[spr[h].seq].frame[spr[h].frame] == -1) {
-										spr[h].frame = 1;
-										spr[h].pseq = spr[h].seq;
-										spr[h].pframe = spr[h].frame;
-										if (spr[h].frame_delay != 0) spr[h].delay = thisTickCount + spr[h].frame_delay;
-										else
+									spr[h].frame = 0;
+									spr[h].seq_orig = spr[h].seq;
+									spr[h].seq = 0;
+									spr[h].nocontrol = false;
 
-											spr[h].delay = (thisTickCount + seq[spr[h].seq].delay[spr[h].frame]);
+
+									if (h == 1) if (in_this_base(spr[h].seq_orig, mDinkBasePush))
+
+									{
+
+
+										play.push_active = false;
+										if (play.push_dir == 2) if (sjoy.down) play.push_active = true;
+										if (play.push_dir == 4) if (sjoy.left) play.push_active = true;
+										if (play.push_dir == 6) if (sjoy.right) play.push_active = true;
+										if (play.push_dir == 8) if (sjoy.up) play.push_active = true;
+
+
+										goto past;
 
 									}
+								}
+								if (spr[h].seq > 0) if (seq[spr[h].seq].special[spr[h].frame] == 1) {
+									//this sprite can damage others right now!
+									//lets run through the list and tag sprites who were hit with their damage
 
-									if (seq[spr[h].seq].frame[spr[h].frame]  < 1) {
-
-										spr[h].pseq = spr[h].seq;
-										spr[h].pframe = spr[h].frame - 1;
-
-										spr[h].frame = 0;
-										spr[h].seq_orig = spr[h].seq;
-										spr[h].seq = 0;
-										spr[h].nocontrol = false;
-
-
-										if (h == 1) if (in_this_base(spr[h].seq_orig, mDinkBasePush))
-
-											{
-
-
-												play.push_active = false;
-												if (play.push_dir == 2) if (sjoy.down) play.push_active = true;
-												if (play.push_dir == 4) if (sjoy.left) play.push_active = true;
-												if (play.push_dir == 6) if (sjoy.right) play.push_active = true;
-												if (play.push_dir == 8) if (sjoy.up) play.push_active = true;
-
-
-												goto past;
-
-											}
-									}
-									if (spr[h].seq > 0) if (seq[spr[h].seq].special[spr[h].frame] == 1) {
-											//this sprite can damage others right now!
-											//lets run through the list and tag sprites who were hit with their damage
-
-											run_through_tag_list(h, spr[h].strength);
-
-										}
-
-
-
+									run_through_tag_list(h, spr[h].strength);
 
 								}
+
+
+
+
 							}
 						}
+					}
 
 
 				}
 
 
 				if (spr[h].active) if (spr[h].brain == 1) {
-						did_player_cross_screen(true, h);
-						// if (move_gonna) goto past;
-					}
+					did_player_cross_screen(true, h);
+					// if (move_gonna) goto past;
+				}
 
 past:
 				check_seq_status(spr[h].seq);
@@ -586,53 +626,53 @@ past:
 				if (show_dot) {
 
 
-					ddbltfx.dwSize = sizeof(ddbltfx);
+					ddBltFx.dwSize = sizeof(ddBltFx);
 					if (drawthistime) {
-						ddbltfx.dwFillColor = 1;
+						ddBltFx.dwFillColor = 1;
 
-						box_crap = k[getpic(h)].hardbox;
-						//box_crap.bottom = spr[h].y + k[spr[h].pic].hardbox.bottom;
-						//box_crap.left = spr[h].x + k[spr[h].pic].hardbox.left;
-						//box_crap.right = spr[h].x + k[spr[h].pic].hardbox.right;
+						boxCrap = picInfo[getpic(h)].hardbox;
+						//boxCrap.bottom = spr[h].y + picInfo[spr[h].pic].hardbox.bottom;
+						//boxCrap.left = spr[h].x + picInfo[spr[h].pic].hardbox.left;
+						//boxCrap.right = spr[h].x + picInfo[spr[h].pic].hardbox.right;
 
-						//OffsetRect(&box_crap, spr[h].x, spr[h].y);
+						//OffsetRect(&boxCrap, spr[h].x, spr[h].y);
 
-						//  ddrval = lpDDSBack->Blt(&box_crap ,NULL, &box_real, DDBLT_COLORFILL| DDBLT_WAIT, &ddbltfx);
+						//  ddrVal = lpDDSBack->Blt(&boxCrap ,NULL, &boxReal, DDBLT_COLORFILL| DDBLT_WAIT, &ddBltFx);
 
 
 						//to show center pixel
-						ddbltfx.dwFillColor = 100;
+						ddBltFx.dwFillColor = 100;
 
-						box_crap.top = spr[h].y;
-						box_crap.bottom = spr[h].y + 1;
-						box_crap.left = spr[h].x ;
-						box_crap.right = spr[h].x + 1;
-
-
-						ddrval = lpDDSBack->Blt(&box_crap, NULL, &box_real, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
+						boxCrap.top = spr[h].y;
+						boxCrap.bottom = spr[h].y + 1;
+						boxCrap.left = spr[h].x;
+						boxCrap.right = spr[h].x + 1;
 
 
-						for (int oo = 0; oo <  spr[h].moveman + 1; oo++) {
-							ddbltfx.dwFillColor = 50;
-
-							box_crap.top = spr[h].lpy[oo];
-							box_crap.bottom = box_crap.top + 1;
-							box_crap.left = spr[h].lpx[oo];
-							box_crap.right = box_crap.left + 1;
+						ddrVal = lpDDSBack->Blt(&boxCrap, NULL, &boxReal, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
 
 
-							ddrval = lpDDSBack->Blt(&box_crap, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
+						for (int oo = 0; oo < spr[h].moveman + 1; oo++) {
+							ddBltFx.dwFillColor = 50;
+
+							boxCrap.top = spr[h].lpy[oo];
+							boxCrap.bottom = boxCrap.top + 1;
+							boxCrap.left = spr[h].lpx[oo];
+							boxCrap.right = boxCrap.left + 1;
+
+
+							ddrVal = lpDDSBack->Blt(&boxCrap, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
 
 						}
-						ddbltfx.dwFillColor = 1;
+						ddBltFx.dwFillColor = 1;
 
-						box_crap.top = spr[h].lpy[0];
-						box_crap.bottom = box_crap.top + 1;
-						box_crap.left = spr[h].lpx[0];
-						box_crap.right = box_crap.left + 1;
+						boxCrap.top = spr[h].lpy[0];
+						boxCrap.bottom = boxCrap.top + 1;
+						boxCrap.left = spr[h].lpx[0];
+						boxCrap.right = boxCrap.left + 1;
 
 
-						ddrval = lpDDSBack->Blt(&box_crap, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
+						ddrVal = lpDDSBack->Blt(&boxCrap, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
 
 					}
 				}
@@ -654,7 +694,7 @@ past:
 
 	if (regcode != mycode) {
 		if (no_cheat)
-			if (((rand() % 9000) + 1) == 1) {
+			if (((rnd() % 9000) + 1) == 1) {
 				initFail(hWndMain, "Error 49 with CD, contact RTsoft, Inc.");
 				return;
 			}
@@ -734,7 +774,7 @@ past:
 				}
 				if (g_pdi) {
 					g_pdi->Release();
-					g_pdi    = NULL;
+					g_pdi = NULL;
 				}
 
 			}
@@ -764,9 +804,9 @@ past:
 		if (no_transition) return;
 		//return;
 
-		ddrval = lpDDSTrick2->BltFast(0, 0, lpDDSBack,
-		                              &rcRect1, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
-		if (ddrval != DD_OK) dderror(ddrval);
+		ddrVal = lpDDSTrick2->BltFast(0, 0, lpDDSBack,
+			&rcRect1, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
+		if (ddrVal != DD_OK) dderror(ddrVal);
 
 		return;
 	}
@@ -806,8 +846,8 @@ past:
 
 
 				sprintf(msg, "Sprites: %d  FPS: %d  Show_dot: %d Plane_process: %d Moveman X%d X%d: %d Y%d Y%d Map %d",
-				        last_sprite_created, fps_show, show_dot, plane_process, spr[1].lpx[0], spr[1].lpy[0], spr[1].moveman, spr[1].lpx[1],
-				        spr[1].lpy[1], *pmap);
+					last_sprite_created, fps_show, show_dot, plane_process, spr[1].lpx[0], spr[1].lpy[0], spr[1].moveman, spr[1].lpx[1],
+					spr[1].lpy[1], *pmap);
 
 			}
 			rcRect.left = 0;
@@ -878,7 +918,7 @@ past:
 	process_callbacks();
 
 flip:
-	if (::g_b_kill_app) return;
+	if (g_b_kill_app) return;
 	if (!abort_this_flip)
 		flip_it();
 
@@ -886,4 +926,4 @@ flip:
 
 } /* updateFrame */
 
-
+} // namespace Dink

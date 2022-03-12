@@ -30,6 +30,19 @@ namespace Dink {
 
 // SetBkMode flags
 #define TRANSPARENT 1
+#define OPAQUE 2
+
+typedef uint32 COLORREF;
+#define RGB(r,g,b) ((COLORREF)(((byte)(r)|((uint16)((byte)(g))<<8))|(((uint32)(byte)(b))<<16)))
+
+inline COLORREF SetTextColor(HDC hdc, COLORREF color) {
+	return color;
+}
+
+inline int DrawText(HDC hdc, const char *lpchText, int cchText,
+	Common::Rect *lprc, uint format) {
+	return 0;
+}
 
 struct LOGFONT {
 	int32 lfHeight;
@@ -53,6 +66,7 @@ typedef Graphics::Surface *HBITMAP;
 
 extern HRESULT SelectObject(HDC hdc, HGDIOBJ h);
 extern HRESULT SetBkMode(HDC hdc, int mode);
+extern COLORREF SetBkColor(HDC hdc, COLORREF color);
 extern int GetTextFace(HDC hdc, int c, const char *lpName);
 inline bool ClientToScreen(HWND hWnd, LPPOINT lpPoint) {
 	return true;

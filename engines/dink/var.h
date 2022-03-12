@@ -26,6 +26,7 @@
 
 namespace Dink {
 
+extern bool init_mouse(HWND hWnd);
 extern void fill_screen(int num);
 extern int GetKeyboard(int key);
 extern void changedir(int dir1, int k, int base);
@@ -84,6 +85,13 @@ extern void decipher_string(char line[200], int script);
 //redink1 added for recursive scope checking
 extern int get_var(int script, char *name);
 extern void kill_fonts();
+extern bool nothing_playing();
+extern void update_sound();
+extern void drawallhard();
+extern void process_callbacks();
+extern int hurt_thing(int h, int damage, int special);
+extern void random_blood(int mx, int my, int h);
+extern void replace(const char *this1, const char *that, char *line);
 
 } // namespace Dink
 

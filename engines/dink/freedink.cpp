@@ -22,7 +22,9 @@
 #define NAME "Dink Smallwood v1.08"
 #define TITLE "Dink Smallwood v1.08"
 
+#include "dink/freedink.h"
 #include "dink/dink.h"
+#include "dink/events.h"
 #include "dink/var.h"
 #include "dink/fast_file.h"
 #include "dink/directdraw/ddraw.h"
@@ -34,41 +36,11 @@
 
 namespace Dink {
 
-bool initFail(HWND hwnd, const char *mess);
-void move(int u, int amount, char kind, char kindy);
-void draw_box(Common::Rect box, int color);
-void run_through_tag_list_push(int h);
-void random_blood(int mx, int my, int h);
-int check_if_move_is_legal(int u);
-void change_dir_to_diag(int *dir);
-int hurt_thing(int h, int damage, int special);
-
 extern bool InitSound(HWND);
 extern bool DestroySound(void);
 extern bool DSDisable(void);
 extern bool DSEnable(HWND);
 
-int fps_average;
-int but_timer = 0;
-int water_timer;
-bool fire_forward;
-int fire_flip;
-//const NUM_SOUND_EFFECTS = 10;
-int fps_show = 0;
-
-//idirectsound
-LPDIRECTDRAWCLIPPER lpClipper;
-
-int drawthistime = true;
-int x = 640;
-int y = 480;
-Common::Rect                rc;
-int winoffset = 25;
-int winoffsetx = 5;
-
-int cx;
-int cy;
-int speed;
 
 int rnd() {
 	return g_engine->getRandomNumber(0x7fffff);
@@ -248,7 +220,7 @@ HRESULT restoreAll() {
 
 
 
-void get_last_sprite(void) {
+void get_last_sprite() {
 
 	for (int i = max_sprites_at_once - 1; i > 2; i--) {
 
@@ -277,7 +249,7 @@ void get_last_sprite(void) {
 *
 * Undoes everything that was done in a InitSound call
 */
-bool DestroySound(void) {
+bool DestroySound() {
 	DWORD       idxKill;
 
 	for (idxKill = 0; idxKill < max_sounds; idxKill++) {
@@ -369,7 +341,7 @@ bool keypressed(void)
 	return (false);
 }
 
-void check_joystick(void) {
+void check_joystick() {
 
 	HRESULT result;
 	int total;
@@ -1667,7 +1639,7 @@ recal:
 		changedir(8, h, spr[h].base_walk);
 	}
 
-	if (spr[h].x > x) {
+	if (spr[h].x > currX) {
 		changedir(4, h, spr[h].base_walk);
 	}
 
@@ -1793,7 +1765,7 @@ void pig_brain(int h) {
 		changedir(9, h, spr[h].base_walk);
 	}
 
-	if (spr[h].x > (x - picInfo[getpic(h)].box.right - 10)) {
+	if (spr[h].x > (currX - picInfo[getpic(h)].box.right - 10)) {
 		changedir(1, h, spr[h].base_walk);
 	}
 
@@ -1819,9 +1791,7 @@ void pig_brain(int h) {
 
 
 
-int check_if_move_is_legal(int u)
-
-{
+int check_if_move_is_legal(int u) {
 	//redink1 removed so move_nohard is active for all movements, not just active moves.
 	//if (spr[u].move_active)
 	if (spr[u].move_nohard == 1)
@@ -1937,7 +1907,7 @@ void bounce_brain(int h) {
 		spr[h].my -= (spr[h].my * 2);
 	}
 
-	if (spr[h].x > (x - picInfo[getpic(h)].box.right)) {
+	if (spr[h].x > (currX - picInfo[getpic(h)].box.right)) {
 		spr[h].mx -= (spr[h].mx * 2);
 	}
 
@@ -2285,8 +2255,8 @@ void missile_brain(int h, bool repeat) {
 								if (spr[h].range != 0)
 									InflateRect(&box, spr[h].range, spr[h].range);
 
-								if (debug_mode) draw_box(box, 33);
-
+								if (debug_mode)
+									draw_box(box, 33);
 
 								if (inside_box(spr[h].x, spr[h].y, box)) {
 
@@ -3191,7 +3161,7 @@ smoothend:
 
 }
 
-bool transition(void) {
+bool transition() {
 	Common::Rect rcRect;
 	HRESULT             result;
 	//we need to do our fancy screen transition
@@ -3496,7 +3466,7 @@ void CyclePalette() {
 }
 
 
-void up_cycle(void) {
+void up_cycle() {
 	//redink1 added this for true-color fade support
 	if (truecolor) {
 		process_upcycle = true;
@@ -3656,7 +3626,7 @@ void ApplyFade32(register unsigned char aValue, register unsigned char *aBuffer,
 }
 
 //redink1 and Invertigo fix for windowed/high color mode
-void flip_it(void) {
+void flip_it() {
 	//DDBLTFX     ddBltFx;
 	Common::Rect rcRectSrc;
 	Common::Rect rcRectDest;
@@ -4078,7 +4048,7 @@ void run_through_touch_damage_list(int h) {
 
 
 
-void process_warp_man(void) {
+void process_warp_man() {
 	Common::Rect boxCrap;
 	DDBLTFX     ddBltFx;
 
@@ -4601,7 +4571,7 @@ void UpdateCursorPosition(int dx, int dy) {
 }
 
 
-void  Scrawl_OnMouseInput(void) {
+void  Scrawl_OnMouseInput() {
 
 	mouse1 = false;
 
@@ -4758,13 +4728,13 @@ again:
 }
 
 
-void process_item(void) {
+void process_item() {
 
 	Common::Rect                rcRect;
 	rcRect.left = 0;
 	rcRect.top = 0;
-	rcRect.right = x;
-	rcRect.bottom = y;
+	rcRect.right = currX;
+	rcRect.bottom = currY;
 	int hor, virt;
 	int i;
 
@@ -4969,7 +4939,7 @@ again:
 
 }
 
-void process_animated_tiles(void) {
+void process_animated_tiles() {
 	Common::Rect rcRect;
 	int cool;
 	int flip;
@@ -5054,10 +5024,10 @@ void process_animated_tiles(void) {
 }
 
 
-void process_show_bmp(void) {
+void process_show_bmp() {
 
 	Common::Rect rcRect;
-	SetRect(&rcRect, 0, 0, x, y);
+	SetRect(&rcRect, 0, 0, currX, currY);
 
 again:
 	ddrval = lpDDSBack->BltFast(0, 0, lpDDSTrick,
@@ -5138,7 +5108,7 @@ again:
 	*/
 }
 
-void drawscreenlock(void) {
+void drawscreenlock() {
 	HRESULT     ddrVal;
 
 loop:
@@ -5161,11 +5131,6 @@ loop2:
 
 }
 
-/*
-* finiObjects
-*
-* finished with all objects we use; release them
-*/
 void finiObjects() {
 	//wDeviceID = mciGetDeviceID("MCI_ALL_DEVICE_ID");
 
@@ -5434,14 +5399,14 @@ long FAR PASCAL WindowProc(HWND hWnd, UINT message,
 #endif
 
 
-bool CheckJoyStickPresent(void) {
+bool CheckJoyStickPresent() {
 	return true;
 }
 
 
 
 
-void load_batch(void) {
+void load_batch() {
 #ifdef TODO
 	FILE *stream;
 	char line[255];
@@ -5929,6 +5894,14 @@ void getdir(char final[]) {
 #else
 	::error("TODO");
 #endif
+}
+
+uint32 GetTickCount() {
+	return g_events->getTickCount();
+}
+
+void Sleep(size_t seconds) {
+	g_events->sleep(1);
 }
 
 } // namespace Dink
