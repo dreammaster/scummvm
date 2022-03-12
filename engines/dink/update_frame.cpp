@@ -36,18 +36,15 @@ namespace Dink {
 
 void updateFrame() {
 	byte state[256];
-	RECT                rcRect, boxCrap, boxReal;
-	DDBLTFX     ddBltFx;
+	RECT rcRect, boxCrap, boxReal;
+	DDBLTFX ddBltFx;
 	char msg[100];
-
-	HDC         hdc;
-	HRESULT             ddrVal;
+	HDC hdc;
+	HRESULT ddrVal;
 	int move_result;
 	bool get_frame = false;
 	int h, max_s, j;
-	//HBRUSH brush;
 	bool bs[max_sprites_at_once];
-
 	int rank[max_sprites_at_once];
 	int highest_sprite;
 
@@ -93,7 +90,6 @@ trigger_start:
 			if ((talk.active) || (spr[1].brain == 13))
 				Scrawl_OnMouseInput();
 		}
-
 	}
 
 demon:
@@ -163,8 +159,6 @@ demon:
 
 #endif
 
-
-
 	//force free mode
 	//if (!no_cheat)
 
@@ -181,11 +175,8 @@ demon:
 	if (showb.active) {
 		//grab main loop and divert it to show a bmp instead
 		process_show_bmp();
-
 		flip_it();
-
 		return;
-
 	}
 	/*
 	if (!cd_inserted)
@@ -219,8 +210,6 @@ demon:
 		process_animated_tiles();
 	}
 
-
-
 	state[1] = 0;
 
 	//figure out frame rate
@@ -231,14 +220,10 @@ demon:
 		return;
 	}
 
-
-	if (total_trigger)
-
-	{
+	if (total_trigger) {
 		if (transition()) goto flip;
 		else return;
 	}
-
 
 	if (process_upcycle)
 		up_cycle();
@@ -250,15 +235,11 @@ demon:
 
 
 	if (plane_process) {
-
 		memset(&bs, 0, sizeof(bs));
-
 		max_s = last_sprite_created;
-
 		int height;
 
 		for (int r1 = 1; r1 < max_s + 1; r1++) {
-
 			highest_sprite = 22024; //more than it could ever be
 
 			rank[r1] = 0;
@@ -273,17 +254,13 @@ demon:
 							highest_sprite = height;
 							rank[r1] = h1;
 						}
-
 					}
-
 				}
-
 			}
+
 			if (rank[r1] != 0)
 				bs[rank[r1]] = TRUE;
-
 		}
-
 	} else {
 		//not processing planes
 		max_s = max_sprites_at_once;
@@ -295,8 +272,6 @@ demon:
 	rcRect.bottom = currY;
 
 	{
-
-
 		//Blit from Two, which holds the base scene.
 		while (1) {
 			ddrVal = lpDDSBack->BltFast(0, 0, lpDDSTwo,
@@ -318,9 +293,7 @@ demon:
 				return;
 			}
 		}
-
 	}
-
 
 	if (stop_entire_game == 1) {
 		if (talk.active) {
@@ -330,15 +303,9 @@ demon:
 
 			draw_map_game_background();
 			draw_status_all();
-
 		}
 		goto flip;
-
 	}
-
-
-
-
 
 	for (j = 1; j < max_s + 1; j++) {
 		//h  = 1;
@@ -371,13 +338,8 @@ demon:
 							//  Msg("Callback running script %d.", spr[h].script);
 
 							run_script(spr[h].callback);
-
-
 						}
-
-
 					}
-
 				}
 
 				if (spr[h].timer > 0) {
@@ -387,9 +349,7 @@ demon:
 					} else {
 						goto animate;
 					}
-
 				}
-
 
 				//brains - predefined bahavior patterns available to any sprite
 
@@ -399,10 +359,7 @@ demon:
 
 				if (get_frame == false) {
 					if ((spr[h].brain == 1)/* || (spr[h].brain == 9) || (spr[h].brain == 3) */) {
-
 						run_through_touch_damage_list(h);
-
-
 					}
 
 					if (spr[h].brain == 1) {
@@ -433,7 +390,6 @@ demon:
 				if (g_b_kill_app)
 					return;
 animate:
-
 				move_result = check_if_move_is_legal(h);
 
 				if (flub_mode != -500) {
@@ -447,9 +403,7 @@ animate:
 						special_block(move_result - 100, h);
 				}
 
-
 				if (spr[h].reverse) {
-
 					//reverse instructions
 					if (spr[h].seq > 0) {
 						if (spr[h].frame < 1) {
@@ -464,22 +418,17 @@ animate:
 							// not new anim
 
 							//is it time?
-
 							if (thisTickCount > (int)spr[h].delay) {
 								spr[h].frame--;
 
-
 								if (spr[h].frame_delay != 0) spr[h].delay = (thisTickCount + spr[h].frame_delay);
 								else
-
 									spr[h].delay = (thisTickCount + seq[spr[h].seq].delay[spr[h].frame]);
 
 								spr[h].pseq = spr[h].seq;
 								spr[h].pframe = spr[h].frame;
 
-
 								if (seq[spr[h].seq].frame[spr[h].frame] < 2) {
-
 									spr[h].pseq = spr[h].seq;
 									spr[h].pframe = spr[h].frame + 1;
 
@@ -488,50 +437,36 @@ animate:
 									spr[h].seq = 0;
 									spr[h].nocontrol = false;
 
-
-									if (h == 1) if (in_this_base(spr[h].seq_orig, mDinkBasePush))
-
-									{
-
-
+									if (h == 1) if (in_this_base(spr[h].seq_orig, mDinkBasePush)) {
 										play.push_active = false;
 										if (play.push_dir == 2) if (sjoy.down) play.push_active = true;
 										if (play.push_dir == 4) if (sjoy.left) play.push_active = true;
 										if (play.push_dir == 6) if (sjoy.right) play.push_active = true;
 										if (play.push_dir == 8) if (sjoy.up) play.push_active = true;
 
-
 										goto past;
-
 									}
 								}
+
 								if (spr[h].seq > 0) if (seq[spr[h].seq].special[spr[h].frame] == 1) {
 									//this sprite can damage others right now!
 									//lets run through the list and tag sprites who were hit with their damage
 
 									run_through_tag_list(h, spr[h].strength);
-
 								}
-
-
-
-
 							}
 						}
 					}
-
-
 				} else {
-
 					if (spr[h].seq > 0) if (spr[h].picfreeze == 0) {
 						if (spr[h].frame < 1) {
 							// new anim
 							spr[h].pseq = spr[h].seq;
 							spr[h].pframe = 1;
 							spr[h].frame = 1;
-							if (spr[h].frame_delay != 0) spr[h].delay = thisTickCount + spr[h].frame_delay;
+							if (spr[h].frame_delay != 0)
+								spr[h].delay = thisTickCount + spr[h].frame_delay;
 							else
-
 								spr[h].delay = (thisTickCount + seq[spr[h].seq].delay[1]);
 						} else {
 							// not new anim
@@ -539,12 +474,9 @@ animate:
 							//is it time?
 
 							if (thisTickCount > (int)spr[h].delay) {
-
-
 								spr[h].frame++;
 								if (spr[h].frame_delay != 0) spr[h].delay = thisTickCount + spr[h].frame_delay;
 								else
-
 									spr[h].delay = (thisTickCount + seq[spr[h].seq].delay[spr[h].frame]);
 
 								spr[h].pseq = spr[h].seq;
@@ -556,13 +488,10 @@ animate:
 									spr[h].pframe = spr[h].frame;
 									if (spr[h].frame_delay != 0) spr[h].delay = thisTickCount + spr[h].frame_delay;
 									else
-
 										spr[h].delay = (thisTickCount + seq[spr[h].seq].delay[spr[h].frame]);
-
 								}
 
 								if (seq[spr[h].seq].frame[spr[h].frame] < 1) {
-
 									spr[h].pseq = spr[h].seq;
 									spr[h].pframe = spr[h].frame - 1;
 
@@ -571,41 +500,26 @@ animate:
 									spr[h].seq = 0;
 									spr[h].nocontrol = false;
 
-
-									if (h == 1) if (in_this_base(spr[h].seq_orig, mDinkBasePush))
-
-									{
-
-
+									if (h == 1) if (in_this_base(spr[h].seq_orig, mDinkBasePush)) {
 										play.push_active = false;
 										if (play.push_dir == 2) if (sjoy.down) play.push_active = true;
 										if (play.push_dir == 4) if (sjoy.left) play.push_active = true;
 										if (play.push_dir == 6) if (sjoy.right) play.push_active = true;
 										if (play.push_dir == 8) if (sjoy.up) play.push_active = true;
 
-
 										goto past;
-
 									}
 								}
+
 								if (spr[h].seq > 0) if (seq[spr[h].seq].special[spr[h].frame] == 1) {
 									//this sprite can damage others right now!
 									//lets run through the list and tag sprites who were hit with their damage
-
 									run_through_tag_list(h, spr[h].strength);
-
 								}
-
-
-
-
 							}
 						}
 					}
-
-
 				}
-
 
 				if (spr[h].active) if (spr[h].brain == 1) {
 					did_player_cross_screen(true, h);
@@ -618,14 +532,11 @@ past:
 				if (mcc == sound_support)
 					draw_sprite_game(lpDDSBack, h);
 
-
 				move_gonna = false;
 
 				//draw a dot to show where the computer is guessing the start of the shadow is
 
 				if (show_dot) {
-
-
 					ddBltFx.dwSize = sizeof(ddBltFx);
 					if (drawthistime) {
 						ddBltFx.dwFillColor = 1;
@@ -648,9 +559,7 @@ past:
 						boxCrap.left = spr[h].x;
 						boxCrap.right = spr[h].x + 1;
 
-
 						ddrVal = lpDDSBack->Blt(&boxCrap, NULL, &boxReal, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
-
 
 						for (int oo = 0; oo < spr[h].moveman + 1; oo++) {
 							ddBltFx.dwFillColor = 50;
@@ -671,26 +580,19 @@ past:
 						boxCrap.left = spr[h].lpx[0];
 						boxCrap.right = boxCrap.left + 1;
 
-
 						ddrVal = lpDDSBack->Blt(&boxCrap, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
-
 					}
 				}
 			}
 	}
 
-	if ((sjoy.joybit[7] == TRUE))
-
-	{
+	if ((sjoy.joybit[7] == TRUE)) {
 		//space is pressed, lets draw the hitmap, why not?
 
 		if (!no_cheat) drawallhard();
 	}
 
-
-
 	///copy protection check
-
 
 	if (regcode != mycode) {
 		if (no_cheat)
@@ -700,9 +602,7 @@ past:
 			}
 	}
 
-
 	if (mode == 0) {
-
 		FillMemory(&spr[1], sizeof(spr[1]), 0);
 
 		spr[1].speed = 3;
@@ -729,7 +629,6 @@ past:
 
 		int crap2 = add_sprite(0, 450, 8, 0, 0);
 
-
 		spr[crap2].hard = 1;
 		spr[crap2].noclip = 1;
 		strcpy(spr[crap2].text, dversion_string);
@@ -737,21 +636,16 @@ past:
 		spr[crap2].damage = -1;
 		spr[crap2].owner = 1000;
 
-
-
 		int scr = load_script("START", 1000, true);
 		if (locate(scr, "MAIN") == false) {
 			Msg("Error: Can't locate MAIN in script START!");
 		}
+
 		run_script(scr);
 		mode = 1;
-
 	}
 
-
-
 	if (mode == 2) {
-
 		//   if (  (keypressed()) | (jinfo.dwButtons) | (sjoy.right) | (sjoy.left)
 		//       | (sjoy.up)   | (sjoy.down))
 		{
@@ -761,8 +655,6 @@ past:
 			flife = *plife;
 
 			if (keep_mouse == 0) {
-
-
 				if (g_pMouse) {
 					g_pMouse->Release();
 					g_pMouse = NULL;
@@ -776,20 +668,18 @@ past:
 					g_pdi->Release();
 					g_pdi = NULL;
 				}
-
 			}
 
 			// draw_status_all();
 		}
 	}
 
-
-
-	if (spr[1].active) if (spr[1].brain == 1) did_player_cross_screen(false, 1);
+	if (spr[1].active)
+		if (spr[1].brain == 1)
+			did_player_cross_screen(false, 1);
 
 	if (trig_man) {
 		goto trigger_start;
-
 	}
 
 	if (get_frame) {
@@ -811,24 +701,17 @@ past:
 		return;
 	}
 
-
-
 	if (screenlock == 1) {
 		//Msg("Drawing screenlock.");
 		drawscreenlock();
-
 	}
 
-
-
 	if (lpDDSBack->GetDC(&hdc) == DD_OK) {
-
 		if (debug_mode) {
-
-
 			SetBkMode(hdc, OPAQUE);
 			//      TextOut(hdc,0,0, msg,lstrlen(msg));
-			if (mode == 0) strcpy(msg, "");
+			if (mode == 0)
+				strcpy(msg, "");
 			if (mode == 1) {
 				sprintf(msg, "X is %d y is %d", spr[1].x, spr[1].y);
 				//let's add the key info to it.
@@ -837,19 +720,14 @@ past:
 						sprintf(msg, "%s (Key %i)", msg, x);
 					}
 				}
-
-
 			}
-			if (mode == 3)
 
-			{
-
-
+			if (mode == 3) {
 				sprintf(msg, "Sprites: %d  FPS: %d  Show_dot: %d Plane_process: %d Moveman X%d X%d: %d Y%d Y%d Map %d",
 					last_sprite_created, fps_show, show_dot, plane_process, spr[1].lpx[0], spr[1].lpy[0], spr[1].moveman, spr[1].lpx[1],
 					spr[1].lpy[1], *pmap);
-
 			}
+
 			rcRect.left = 0;
 			rcRect.top = 0;
 			rcRect.right = playx;
@@ -868,6 +746,7 @@ past:
 				DrawText(hdc, msg, lstrlen(msg), &rcRect, DT_WORDBREAK);
 			}
 		}
+
 		// Console
 		if (mConsoleActive == true) {
 			SetBkMode(hdc, OPAQUE);
@@ -889,41 +768,41 @@ past:
 			SetTextColor(hdc, RGB(255, 0, 0));
 			DrawText(hdc, lLine, lstrlen(lLine), &lConsoleRectangle, DT_WORDBREAK);
 		}
+
 		SelectObject(hdc, hfont_small);
 		SetBkMode(hdc, TRANSPARENT);
 
 		for (j = 1; j < max_s + 1; j++) {
 			if (plane_process)
 				h = rank[j];
-			else h = j;
+			else
+				h = j;
+
 			if (h > 0)
 				if (spr[h].active) {
 					if (spr[h].brain == 8) {
 						//Msg("Drawing text %d..", h);
 						text_draw(h, hdc);
 					}
-
 				}
 		}
 
-
 		lpDDSBack->ReleaseDC(hdc);
-
 	}
 
-
-	if (talk.active) process_talk();
-
+	if (talk.active)
+		process_talk();
 
 	process_callbacks();
 
 flip:
-	if (g_b_kill_app) return;
+	if (g_b_kill_app)
+		return;
 	if (!abort_this_flip)
 		flip_it();
 
-	if (turn_on_plane) plane_process = TRUE;
-
-} /* updateFrame */
+	if (turn_on_plane)
+		plane_process = TRUE;
+}
 
 } // namespace Dink
