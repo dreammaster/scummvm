@@ -72,8 +72,6 @@ Common::Error DinkEngine::run() {
 	initializeFlags();
 	initialize();
 
-	log_path(true);
-
 	while (!shouldQuit()) {
 		_events->pollEvents();
 		//updateFrame();
@@ -109,8 +107,6 @@ void DinkEngine::initializeFlags() {
 
 	if (ConfMan.hasKey("nojoy"))
 		disablejoystick = ConfMan.hasKey("nojoy");
-
-	g_b_no_write_ini = true;
 
 	//if (scumm_strnicmp(shit, "-nosound", strlen("-nosound")) == 0)  sound_on = false;
 }

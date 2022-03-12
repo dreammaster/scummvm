@@ -5182,9 +5182,6 @@ void finiObjects() {
 		Msg("Shutting down CD stuff.");
 		killcd(g_hWnd, 1);
 	}
-	log_path(false);
-
-
 
 	if (lpDD != NULL) {
 

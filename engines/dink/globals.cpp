@@ -119,13 +119,6 @@ extern HWND hwnd;
 
 uint32 midi_id;
 
-//redink1 code so dink will not write to the ini when in DMOD mode
-#ifdef DMOD
-bool g_b_no_write_ini = true;
-#else
-bool g_b_no_write_ini = false;
-#endif
-
 bool no_cheat = true;
 int last_saved_game = 0;
 bool g_b_kill_app = false; //if true, will close app as soon as the message pump is

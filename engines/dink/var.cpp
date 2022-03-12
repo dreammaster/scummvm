@@ -589,28 +589,6 @@ bool CreateSoundBuffer(uint32 dwBuf, uint32 dwBufSize, uint32 dwFreq, uint32 dwB
 //
 //----------------------------------------------------------------------
 
-void log_path(bool playing) {
-#ifdef TODO
-	if (g_b_no_write_ini) return; //fix problem with NT security if -noini is set
-
-	char dumb[100];
-	char dumb2[256];
-	GetWindowsDirectory(&dumb[0], 256);
-
-	sprintf(dumb2, "%s\\dinksmallwood.ini", dumb);
-
-	unlink(dumb2);
-
-	add_text("[Dink Smallwood Directory Information for the CD to read]\r\n", dumb2);
-	add_text(dinkpath, dumb2);
-	add_text("\r\n", dumb2);
-	if (playing)
-		add_text("true\r\n", dumb2);
-	else
-		add_text("false\r\n", dumb2);
-#endif
-}
-
 bool ReadData(LPDIRECTSOUNDBUFFER lpDSB, Common::SeekableReadStream *pFile, uint32 dwSize, uint32 dwPos) {
 #ifdef TODO
 	// Seek to correct position in file (if necessary)
@@ -6058,7 +6036,6 @@ uint32 getCDTrackStartTimes() {
 
 	if (iNumTracks == (1000 - 981)) {
 		cd_inserted = true;
-		//log_path(false);
 	} else
 
 	{

@@ -44,7 +44,6 @@ extern byte get_hard_play(int h, int x1, int y1);
 extern void draw_sprite_game(LPDIRECTDRAWSURFACE lpdest, int h);
 extern int say_text_xy(const char *text, int mx, int my, int script);
 extern bool add_time_to_saved_game(int num);
-extern void log_path(bool playing);
 extern void kill_all_scripts_for_real();
 extern bool seperate_string(const char *str, int num, char liney, char *return1);
 extern void finiObjects();

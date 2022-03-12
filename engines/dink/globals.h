@@ -558,11 +558,7 @@ extern Common::Rect tilerect[tile_screens];
 
 //redink1 moves this here so could ignore keystrokes
 extern HWND hwnd;
-
 extern uint32 midi_id;
-
-//redink1 code so dink will not write to the ini when in DMOD mode
-extern bool g_b_no_write_ini;
 extern bool no_cheat;
 extern int last_saved_game;
 extern bool g_b_kill_app; //if true, will close app as soon as the message pump is
