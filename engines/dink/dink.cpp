@@ -74,7 +74,7 @@ Common::Error DinkEngine::run() {
 
 	while (!shouldQuit()) {
 		_events->pollEvents();
-		//updateFrame();
+		updateFrame();
 	}
 
 	return Common::kNoError;

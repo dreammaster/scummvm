@@ -39,6 +39,7 @@ EventsManager::~EventsManager() {
 
 void EventsManager::pollEvents() {
 	Common::Event e;
+	g_system->delayMillis(10);
 
 	while (g_system->getEventManager()->pollEvent(e)) {
 		switch (e.type) {

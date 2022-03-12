@@ -8,6 +8,7 @@ MODULE_OBJS = \
 	globals.o \
 	metaengine.o \
 	sound.o \
+	update_frame.o \
 	var.o \
 	directdraw\ddraw.o \
 	directdraw\ddutil.o \
