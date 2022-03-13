@@ -5448,14 +5448,7 @@ done:
 #endif
 }
 
-/*
-* doInit - do work required for every instance of the application:
-*                create the window, initialize data
-*/
-
-
-//redink1 and invertigo fix for windowed/high color mode
-bool doInit(/* HINSTANCE hInstance, int nCmdShow */) {
+bool doInit() {
 	// Create the primary surface with 1 back buffer
 	lpDDSPrimary = new IDirectDrawSurface();
 	lpDDSBack = new IDirectDrawSurface();

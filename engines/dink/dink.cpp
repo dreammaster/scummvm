@@ -73,9 +73,11 @@ Common::Error DinkEngine::run() {
 	initializeFlags();
 	initialize();
 
-	while (!shouldQuit()) {
-		_events->pollEvents();
-		updateFrame();
+	if (doInit()) {
+		while (!shouldQuit()) {
+			_events->pollEvents();
+			updateFrame();
+		}
 	}
 
 	return Common::kNoError;

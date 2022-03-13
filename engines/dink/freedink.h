@@ -81,6 +81,11 @@ extern int check_if_move_is_legal(int u);
 extern void draw_box(Common::Rect box, int color);
 
 /**
+ * Do work required for initializing graphics and data
+ */
+extern bool doInit();
+
+/**
  * Finished with all objects we use; release them
  */
 extern void finiObjects();
