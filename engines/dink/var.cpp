@@ -3122,9 +3122,7 @@ void pre_figure_out(char line[255], int load_seq) {
 
 }
 
-
-
-void initfonts(char fontname[255]) {
+void initfonts(const char *fontname) {
 	lf.lfHeight = 20;
 	lf.lfWidth = 0;
 	/*lf.lfEscapement;
@@ -11374,7 +11372,6 @@ void init_scripts() {
 
 }
 
-//redink1 added for font colors
 void init_font_colors() {
 	//Light Magenta
 	font_colors[1].red   = 255;

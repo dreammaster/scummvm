@@ -28,6 +28,7 @@
 #include "dink/var.h"
 #include "dink/fast_file.h"
 #include "dink/directdraw/ddraw.h"
+#include "dink/directdraw/ddutil.h"
 #include "dink/directdraw/dinput.h"
 #include "dink/directdraw/joystickapi.h"
 #include "dink/lib/graphics.h"
@@ -5416,7 +5417,7 @@ void load_batch() {
 
 
 	Msg("Loading .ini");
-	if (!exist("dink.ini")) {
+	if (!Common::File::exists("dink.ini")) {
 		Msg("File not found.");
 
 		sprintf(line, "Error finding the dink.ini file in the %s dir.", dir);
@@ -5449,6 +5450,12 @@ done:
 }
 
 bool doInit() {
+	char crap[30];
+	char crap1[10];
+	RECT rcRectSrc, rcRectDest;
+	RECT rcRect;
+	POINT p;
+
 	// Create the primary surface with 1 back buffer
 	lpDDSPrimary = new IDirectDrawSurface();
 	lpDDSBack = new IDirectDrawSurface();
@@ -5535,11 +5542,11 @@ bool doInit() {
 		wGPos  = GetMaskPos(dwGMask);
 		wBPos  = GetMaskPos(dwBMask);
 	}
-#ifdef TODO
+
 	if (Common::File::exists("tiles/ts01.bmp"))
-		lpDDPal = DDLoadPalette(lpDD, "tiles\\TS01.BMP");
+		lpDDPal = DDLoadPalette(lpDD, "tiles/ts01.bmp");
 	else
-		lpDDPal = DDLoadPalette(lpDD, "..\\dink\\tiles\\TS01.BMP");
+		lpDDPal = DDLoadPalette(lpDD, "../dink/tiles/TS01.BMP");
 	if (lpDDPal)
 		lpDDSPrimary->SetPalette(lpDDPal);
 
@@ -5579,7 +5586,7 @@ bool doInit() {
 	    }
 	}*/
 
-	if (exist("tiles\\splash.bmp"))
+	if (Common::File::exists("tiles\\splash.bmp"))
 		lpDDPal = DDLoadPalette(lpDD, "tiles\\SPLASH.BMP");
 	else
 		lpDDPal = DDLoadPalette(lpDD, "..\\dink\\tiles\\SPLASH.BMP");
@@ -5594,10 +5601,10 @@ bool doInit() {
 	for (int h = 1; h < tile_screens; h++) {
 		if (h < 10) strcpy(crap1, "0");
 		else strcpy(crap1, "");
-		sprintf(crap, "TILES\\TS%s%d.BMP", crap1, h);
+		sprintf(crap, "TILES/TS%s%d.BMP", crap1, h);
 
-		if (!exist(crap)) {
-			sprintf(crap, "..\\DINK\\TILES\\TS%s%d.BMP", crap1, h);
+		if (!Common::File::exists(crap)) {
+			sprintf(crap, "../DINK/TILES/TS%s%d.BMP", crap1, h);
 		}
 
 		tiles[h] = DDTileLoad(lpDD, crap, 0, 0, h);
@@ -5625,12 +5632,12 @@ bool doInit() {
 
 	PlayMidi("4.MID");
 #endif
-	srand((unsigned)time(NULL));
+//	srand((unsigned)time(NULL));
 
-	if (exist("tiles\\splash.bmp"))
-		lpDDSTwo = DDLoadBitmap(lpDD, "tiles\\splash.BMP", 0, 0);
+	if (Common::File::exists("tiles/splash.bmp"))
+		lpDDSTwo = DDLoadBitmap(lpDD, "tiles/splash.bmp", 0, 0);
 	else
-		lpDDSTwo = DDLoadBitmap(lpDD, "..\\dink\\tiles\\splash.BMP", 0, 0);
+		lpDDSTwo = DDLoadBitmap(lpDD, "../dink/tiles/splash.bmp", 0, 0);
 	DDSetColorKey(lpDDSTwo, RGB(0, 0, 0));
 #ifndef __DEMO
 
@@ -5651,13 +5658,11 @@ bool doInit() {
 
 	rcRect.left = 0;
 	rcRect.top = 0;
-	rcRect.right = x;
-	rcRect.bottom = y;
+	rcRect.right = currX;
+	rcRect.bottom = currY;
 
 	//if (lpDDSBack->GetBltStatus( DDGBS_ISBLTDONE) == DD_OK)
 	//draw version #
-
-
 
 	ddrval = lpDDSBack->BltFast(0, 0, lpDDSTwo,
 	                            &rcRect, DDBLTFAST_NOCOLORKEY);
@@ -5684,7 +5689,6 @@ bool doInit() {
 			//goto done;
 		}
 	} else {
-
 		// instead of a flip, this will work for Windowed mode:
 		// first we need to figure out where on the primary surface our window lives
 		p.x = 0;
@@ -5720,8 +5724,7 @@ bool doInit() {
 	spr[1].y = play.y;
 
 
-
-	if (exist("tiles\\TS01.bmp"))
+	if (Common::File::exists("tiles\\TS01.bmp"))
 		lpDDPal = DDLoadPalette(lpDD, "tiles\\TS01.BMP");
 	else
 		lpDDPal = DDLoadPalette(lpDD, "..\\dink\\tiles\\TS01.BMP");
@@ -5729,13 +5732,13 @@ bool doInit() {
 		lpDDSPrimary->SetPalette(lpDDPal);
 
 	Msg("Loading splash");
-	if (exist("tiles\\SPLASH.bmp"))
+	if (Common::File::exists("tiles\\SPLASH.bmp"))
 		lpDDSTrick = DDLoadBitmap(lpDD, "tiles\\SPLASH.BMP", 0, 0);
 	else
 		lpDDSTrick = DDLoadBitmap(lpDD, "..\\dink\\tiles\\SPLASH.BMP", 0, 0);
 	DDSetColorKey(lpDDSTrick, RGB(0, 0, 0));
 
-	if (exist("tiles\\SPLASH.bmp"))
+	if (Common::File::exists("tiles\\SPLASH.bmp"))
 		lpDDSTrick2 = DDLoadBitmap(lpDD, "tiles\\SPLASH.BMP", 0, 0);
 	else
 		lpDDSTrick2 = DDLoadBitmap(lpDD, "..\\dink\\tiles\\SPLASH.BMP", 0, 0);
@@ -5781,7 +5784,6 @@ bool doInit() {
 	initfonts("Arial");
 	//g_pMouse->Acquire();
 
-#endif
 	return true;
 }
 

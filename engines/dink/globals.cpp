@@ -115,7 +115,7 @@ Common::Rect tilerect[tile_screens];
 
 
 //redink1 moves this here so could ignore keystrokes
-extern HWND hwnd;
+HWND hwnd;
 
 uint32 midi_id;
 
@@ -233,16 +233,8 @@ int item_pic;
 
 int mbase_count;
 bool no_transition = false;
-
-extern seth_sound ssound[max_sounds];
-extern LPDIRECTSOUND lpDS;
-
-
 player_short_info short_play;
-
-
 int push_active = 1;
-
 
 LOGFONT lf = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "" };
 

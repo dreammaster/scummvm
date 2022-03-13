@@ -92,6 +92,13 @@ extern void process_callbacks();
 extern int hurt_thing(int h, int damage, int special);
 extern void random_blood(int mx, int my, int h);
 extern void replace(const char *this1, const char *that, char *line);
+extern uint32 getCDTrackStartTimes();
+extern void load_hard();
+extern IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite);
+extern void attach();
+//redink1 added for font colors
+extern void init_font_colors();
+extern void initfonts(const char *fontname);
 
 } // namespace Dink
 
