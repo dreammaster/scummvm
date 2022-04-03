@@ -78,6 +78,7 @@ extern void SoundLoadBanks();
 extern bool StopMidi();
 extern void check_seq_status(int h);
 extern bool PlayMidi(const char *sFileName);
+extern void update_sound();
 
 } // namespace Dink
 

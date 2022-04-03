@@ -21,520 +21,21 @@
 
 #include "common/debug.h"
 #include "common/file.h"
-#include "common/textconsole.h"
 #include "image/bmp.h"
 #include "dink/dink.h"
 #include "dink/events.h"
 #include "dink/var.h"
 #include "dink/sound.h"
+#include "dink/text.h"
 #include "dink/lib/graphics.h"
 #include "dink/lib/wintypes.h"
 #include "dink/directdraw/ddutil.h"
 
 namespace Dink {
 
-void SoundLoadBanks() {
-#ifdef TODO
-	HRESULT ddsound;
-
-	lpDS->DuplicateSoundBuffer(ssound[1].sound, &bowsound);
-
-
-	for (int i = 1; i <= num_soundbanks; i++) {
-
-
-		if (lpDS && soundbank[i] == nullptr)
-
-		{
-			//
-			//  use DSLoadSoundBuffer (in ..\misc\dsutil.c) to load
-			//  a sound from a resource.
-			//
-
-			ddsound = lpDS->DuplicateSoundBuffer(ssound[1].sound, &soundbank[i]);
-			if (ddsound != DS_OK) Msg("Couldn't load soundbank %d.", i);
-		}
-	}
-#endif
-}
-
-void replace(const char *this1, const char *that, char *line) {
-	char hold[500];
-	char thisup[200], lineup[500];
-	uint u, i;
-	int checker;
-start:
-	strcpy(hold, "");
-
-	strcpy(lineup, line);
-	strcpy(thisup, this1);
-
-	strupr(lineup);
-	strupr(thisup);
-	if (strstr(lineup, thisup) == NULL) return;
-	checker = -1;
-	strcpy(hold, "");
-	for (u = 0; u < strlen(line); u++) {
-		if (checker > -1) {
-			if (toupper(line[u]) == toupper(this1[checker])) {
-				if (checker + 1 == (int)strlen(this1)) {
-doit:
-					u = u - strlen(this1);
-					u++;
-					for (i = 0; i < u; i++) hold[i] = line[i];
-					for (i = 0; i < strlen(that); i++) hold[(u) + i] = that[i];
-					hold[strlen(that) + u] = 0;
-					for (i = 0; i < (strlen(line) - u) - strlen(this1); i++) {
-						hold[(u + strlen(that)) + i] = line[(u + strlen(this1)) + i];
-					}
-					hold[(strlen(line) - strlen(this1)) + strlen(that)] = 0;
-					strcpy(line, hold);
-					goto start;
-				}
-				checker++;
-			} else {
-				checker = -1;
-			}
-		}
-		if (checker == -1) {
-			if (toupper(line[u]) == toupper(this1[0])) {
-
-				//  if (line[u] < 97) that[0] = toupper(that[0]);
-				checker = 1;
-				if (strlen(this1) == 1) goto doit;
-			}
-		}
-	}
-}
-
-
-bool seperate_string(const char *str, int num, char liney, char *return1) {
-	int l;
-	uint i;
-
-	l = 1;
-	strcpy(return1, "");
-
-	for (i = 0; i <= strlen(str); i++) {
-
-		if (str[i] == liney) {
-			l++;
-			if (l == num + 1)
-				goto done;
-
-			if (i < strlen(str)) strcpy(return1, "");
-		}
-		if (str[i] != liney)
-			sprintf(return1, "%s%c", return1, str[i]);
-	}
-	if (l < num)  strcpy(return1, "");
-
-	replace("\n", "", return1); //Take the /n off it.
-
-	return (false);
-
-done:
-
-	if (l < num)  strcpy(return1, "");
-
-	replace("\n", "", return1); //Take the /n off it.
-
-	//Msg("Took %s and turned it to %s.",str, return1);
-	return (true);
-}
-
-
-
 void clear_talk() {
 	memset(&talk, 0, sizeof(talk));
 	play.mouse = 0;
-}
-
-
-
-void reverse(char *st) {
-	int i, ii;
-	char don[255];
-	don[0] = 0;
-	ii = strlen(st);
-	for (i = ii; i > -1; i--) {
-		strchar(don, st[i]);
-	}
-	strcpy(st, don);
-}
-
-
-char *lmon(long money, char *dest) {
-	char ho[30];
-	int len, c;
-	char lmon1[30];
-	char buffer[30];
-	bool quit1;
-	quit1 = false;
-
-	strcpy(lmon1, ltoa(money, buffer, 10));
-	// prf("ORG IS '%s'",lmon1);
-
-	if (strlen(lmon1) < 4) {
-		strcpy(dest, lmon1);
-		return (dest);
-	}
-
-	strcpy(ho, ltoa(money, buffer, 10));
-	len = strlen(ho);
-	c = -1;
-	lmon1[0] = 0;
-	do {
-		strchar(lmon1, ho[len]);
-		len--;
-		c++;
-		if (c == 3) {
-			if (len > -1) {
-				strchar(lmon1, ',');
-				c = 0;
-			}
-		}
-		if (len < 0) quit1 = true;
-	} while (quit1 == false);
-	reverse(lmon1);
-
-	strcpy(dest, lmon1);
-	return (dest);
-}
-
-
-
-void dderror(HRESULT hErr) {
-#ifdef TODO
-	switch (hErr) {
-	case DDERR_ALREADYINITIALIZED:
-		Msg("DDERR_ALREADYINITIALIZED");
-		break;
-	case DDERR_CANNOTATTACHSURFACE:
-		Msg("DDERR_CANNOTATTACHSURFACE");
-		break;
-	case DDERR_CANNOTDETACHSURFACE:
-		Msg("DDERR_CANNOTDETACHSURFACE");
-		break;
-	case DDERR_CURRENTLYNOTAVAIL:
-		Msg("DDERR_CURRENTLYNOTAVAIL");
-		break;
-	case DDERR_EXCEPTION:
-		Msg("DDERR_EXCEPTION");
-		break;
-	case DDERR_GENERIC:
-		Msg("DDERR_GENERIC");
-		break;
-	case DDERR_HEIGHTALIGN:
-		Msg("DDERR_HEIGHTALIGN");
-		break;
-	case DDERR_INCOMPATIBLEPRIMARY:
-		Msg("DDERR_INCOMPATIBLEPRIMARY");
-		break;
-	case DDERR_INVALIDCAPS:
-		Msg("DDERR_INVALIDCAPS");
-		break;
-	case DDERR_INVALIDCLIPLIST:
-		Msg("DDERR_INVALIDCLIPLIST");
-		break;
-	case DDERR_INVALIDMODE:
-		Msg("DDERR_INVALIDMODE");
-		break;
-	case DDERR_INVALIDOBJECT:
-		Msg("DDERR_INVALIDOBJECT");
-		break;
-	case DDERR_INVALIDPARAMS:
-		Msg("DDERR_INVALIDPARAMS");
-		break;
-	case DDERR_INVALIDPIXELFORMAT:
-		Msg("DDERR_INVALIDPIXELFORMAT");
-		break;
-	case DDERR_INVALIDRECT:
-		Msg("DDERR_INVALIDRECT");
-		break;
-	case DDERR_LOCKEDSURFACES:
-		Msg("DDERR_LOCKEDSURFACES");
-		break;
-	case DDERR_NO3D:
-		Msg("DDERR_NO3D");
-		break;
-	case DDERR_NOALPHAHW:
-		Msg("DDERR_NOALPHAHW");
-		break;
-	case DDERR_NOCLIPLIST:
-		Msg("DDERR_NOCLIPLIST");
-		break;
-	case DDERR_NOCOLORCONVHW:
-		Msg("DDERR_NOCOLORCONVHW");
-		break;
-	case DDERR_NOCOOPERATIVELEVELSET:
-		Msg("DDERR_NOCOOPERATIVELEVELSET");
-		break;
-	case DDERR_NOCOLORKEY:
-		Msg("DDERR_NOCOLORKEY");
-		break;
-	case DDERR_NOCOLORKEYHW:
-		Msg("DDERR_NOCOLORKEYHW");
-		break;
-	case DDERR_NODIRECTDRAWSUPPORT:
-		Msg("DDERR_NODIRECTDRAWSUPPORT");
-		break;
-	case DDERR_NOEXCLUSIVEMODE:
-		Msg("DDERR_NOEXCLUSIVEMODE");
-		break;
-	case DDERR_NOFLIPHW:
-		Msg("DDERR_NOFLIPHW");
-		break;
-	case DDERR_NOGDI:
-		Msg("DDERR_NOGDI");
-		break;
-	case DDERR_NOMIRRORHW:
-		Msg("DDERR_NOMIRRORHW");
-		break;
-	case DDERR_NOTFOUND:
-		Msg("DDERR_NOTFOUND");
-		break;
-	case DDERR_NOOVERLAYHW:
-		Msg("DDERR_NOOVERLAYHW");
-		break;
-	case DDERR_NORASTEROPHW:
-		Msg("DDERR_NORASTEROPHW");
-		break;
-	case DDERR_NOROTATIONHW:
-		Msg("DDERR_NOROTATIONHW");
-		break;
-	case DDERR_NOSTRETCHHW:
-		Msg("DDERR_NOSTRETCHHW");
-		break;
-	case DDERR_NOT4BITCOLOR:
-		Msg("DDERR_NOT4BITCOLOR");
-		break;
-	case DDERR_NOT4BITCOLORINDEX:
-		Msg("DDERR_NOT4BITCOLORINDEX");
-		break;
-	case DDERR_NOT8BITCOLOR:
-		Msg("DDERR_NOT8BITCOLOR");
-		break;
-	case DDERR_NOTEXTUREHW:
-		Msg("DDERR_NOTEXTUREHW");
-		break;
-	case DDERR_NOVSYNCHW:
-		Msg("DDERR_NOVSYNCHW");
-		break;
-	case DDERR_NOZBUFFERHW:
-		Msg("DDERR_NOZBUFFERHW");
-		break;
-	case DDERR_NOZOVERLAYHW:
-		Msg("DDERR_NOZOVERLAYHW");
-		break;
-	case DDERR_OUTOFCAPS:
-		Msg("DDERR_OUTOFCAPS");
-		break;
-	case DDERR_OUTOFMEMORY:
-		Msg("DDERR_OUTOFMEMORY");
-		break;
-	case DDERR_OUTOFVIDEOMEMORY:
-		Msg("DDERR_OUTOFVIDEOMEMORY");
-		break;
-	case DDERR_OVERLAYCANTCLIP:
-		Msg("DDERR_OVERLAYCANTCLIP");
-		break;
-	case DDERR_OVERLAYCOLORKEYONLYONEACTIVE:
-		Msg("DDERR_OVERLAYCOLORKEYONLYONEACTIVE");
-		break;
-	case DDERR_PALETTEBUSY:
-		Msg("DDERR_PALETTEBUSY");
-		break;
-	case DDERR_COLORKEYNOTSET:
-		Msg("DDERR_COLORKEYNOTSET");
-		break;
-	case DDERR_SURFACEALREADYATTACHED:
-		Msg("DDERR_SURFACEALREADYATTACHED");
-		break;
-	case DDERR_SURFACEALREADYDEPENDENT:
-		Msg("DDERR_SURFACEALREADYDEPENDENT");
-		break;
-	case DDERR_SURFACEBUSY:
-		Msg("DDERR_SURFACEBUSY");
-		break;
-	case DDERR_CANTLOCKSURFACE:
-		Msg("DDERR_CANTLOCKSURFACE");
-		break;
-	case DDERR_SURFACEISOBSCURED:
-		Msg("DDERR_SURFACEISOBSCURED");
-		break;
-	case DDERR_SURFACELOST:
-		Msg("DDERR_SURFACELOST");
-		break;
-	case DDERR_SURFACENOTATTACHED:
-		Msg("DDERR_SURFACENOTATTACHED");
-		break;
-	case DDERR_TOOBIGHEIGHT:
-		Msg("DDERR_TOOBIGHEIGHT");
-		break;
-	case DDERR_TOOBIGSIZE:
-		Msg("DDERR_TOOBIGSIZE");
-		break;
-	case DDERR_TOOBIGWIDTH:
-		Msg("DDERR_TOOBIGWIDTH");
-		break;
-	case DDERR_UNSUPPORTED:
-		Msg("DDERR_UNSUPPORTED");
-		break;
-	case DDERR_UNSUPPORTEDFORMAT:
-		Msg("DDERR_UNSUPPORTEDFORMAT");
-		break;
-	case DDERR_UNSUPPORTEDMASK:
-		Msg("DDERR_UNSUPPORTEDMASK");
-		break;
-	case DDERR_VERTICALBLANKINPROGRESS:
-		Msg("DDERR_VERTICALBLANKINPROGRESS");
-		break;
-	case DDERR_WASSTILLDRAWING:
-		Msg("DDERR_WASSTILLDRAWING");
-		break;
-	case DDERR_XALIGN:
-		Msg("DDERR_XALIGN");
-		break;
-	case DDERR_INVALIDDIRECTDRAWGUID:
-		Msg("DDERR_INVALIDDIRECTDRAWGUID");
-		break;
-	case DDERR_DIRECTDRAWALREADYCREATED:
-		Msg("DDERR_DIRECTDRAWALREADYCREATED");
-		break;
-	case DDERR_NODIRECTDRAWHW:
-		Msg("DDERR_NODIRECTDRAWHW");
-		break;
-	case DDERR_PRIMARYSURFACEALREADYEXISTS:
-		Msg("DDERR_PRIMARYSURFACEALREADYEXISTS");
-		break;
-	case DDERR_NOEMULATION:
-		Msg("DDERR_NOEMULATION");
-		break;
-	case DDERR_REGIONTOOSMALL:
-		Msg("DDERR_REGIONTOOSMALL");
-		break;
-	case DDERR_CLIPPERISUSINGHWND:
-		Msg("DDERR_CLIPPERISUSINGHWND");
-		break;
-	case DDERR_NOCLIPPERATTACHED:
-		Msg("DDERR_NOCLIPPERATTACHED");
-		break;
-	case DDERR_NOHWND:
-		Msg("DDERR_NOHWND");
-		break;
-	case DDERR_HWNDSUBCLASSED:
-		Msg("DDERR_HWNDSUBCLASSED");
-		break;
-	case DDERR_HWNDALREADYSET:
-		Msg("DDERR_HWNDALREADYSET");
-		break;
-	case DDERR_NOPALETTEATTACHED:
-		Msg("DDERR_NOPALETTEATTACHED");
-		break;
-	case DDERR_NOPALETTEHW:
-		Msg("DDERR_NOPALETTEHW");
-		break;
-	case DDERR_BLTFASTCANTCLIP:
-		Msg("DDERR_BLTFASTCANTCLIP");
-		break;
-	case DDERR_NOBLTHW:
-		Msg("DDERR_NOBLTHW");
-		break;
-	case DDERR_NODDROPSHW:
-		Msg("DDERR_NODDROPSHW");
-		break;
-	case DDERR_OVERLAYNOTVISIBLE:
-		Msg("DDERR_OVERLAYNOTVISIBLE");
-		break;
-	case DDERR_NOOVERLAYDEST:
-		Msg("DDERR_NOOVERLAYDEST");
-		break;
-	case DDERR_INVALIDPOSITION:
-		Msg("DDERR_INVALIDPOSITION");
-		break;
-	case DDERR_NOTAOVERLAYSURFACE:
-		Msg("DDERR_NOTAOVERLAYSURFACE");
-		break;
-	case DDERR_EXCLUSIVEMODEALREADYSET:
-		Msg("DDERR_EXCLUSIVEMODEALREADYSET");
-		break;
-	case DDERR_NOTFLIPPABLE:
-		Msg("DDERR_NOTFLIPPABLE");
-		break;
-	case DDERR_CANTDUPLICATE:
-		Msg("DDERR_CANTDUPLICATE");
-		break;
-	case DDERR_NOTLOCKED:
-		Msg("DDERR_NOTLOCKED");
-		break;
-	case DDERR_CANTCREATEDC:
-		Msg("DDERR_CANTCREATEDC");
-		break;
-	case DDERR_NODC:
-		Msg("DDERR_NODC");
-		break;
-	case DDERR_WRONGMODE:
-		Msg("DDERR_WRONGMODE");
-		break;
-	case DDERR_IMPLICITLYCREATED:
-		Msg("DDERR_IMPLICITLYCREATED");
-		break;
-	case DDERR_NOTPALETTIZED:
-		Msg("DDERR_NOTPALETTIZED");
-		break;
-	case DDERR_UNSUPPORTEDMODE:
-		Msg("DDERR_UNSUPPORTEDMODE");
-		break;
-	case DDERR_NOMIPMAPHW:
-		Msg("DDERR_NOMIPMAPHW");
-		break;
-	case DDERR_INVALIDSURFACETYPE:
-		Msg("DDERR_INVALIDSURFACETYPE");
-		break;
-	case DDERR_DCALREADYCREATED:
-		Msg("DDERR_DCALREADYCREATED");
-		break;
-	case DDERR_CANTPAGELOCK:
-		Msg("DDERR_CANTPAGELOCK");
-		break;
-	case DDERR_CANTPAGEUNLOCK:
-		Msg("DDERR_CANTPAGEUNLOCK");
-		break;
-	case DDERR_NOTPAGELOCKED:
-		Msg("DDERR_NOTPAGELOCKED");
-		break;
-	case DDERR_NOTINITIALIZED:
-		Msg("DDERR_NOTINITIALIZED");
-		break;
-	default:
-		Msg("Unknown Error");
-		break;
-	}
-	Msg("\n");
-#endif
-}
-
-
-bool compare(const char *orig, const char *comp) {
-	uint len;
-
-	//strcpy(comp, _strupr(comp));
-	//strcpy(orig, _strupr(orig));
-
-
-	len = strlen(comp);
-	if (strlen(orig) != len) return (false);
-
-
-	if (scumm_strnicmp(orig, comp, len) == 0) {
-		return (true);
-	}
-
-	//Msg("I'm sorry, but %s does not equal %s.",orig, comp);
-
-	return (false);
-
 }
 
 bool init_mouse(HWND hWnd) {
@@ -616,7 +117,7 @@ bool init_mouse(HWND hWnd) {
 
 bool getkey(int key) {
 	if (sjoy.realkey[key]) return (true);
-	else return (false);
+	else return false;
 
 }
 
@@ -628,28 +129,6 @@ int GetKeyboard(int key) {
 	error("TODO");
 	return 0;
 #endif
-}
-
-void Msg(const char *fmt, ...) {
-	va_list  va;
-	va_start(va, fmt);
-	Common::String s = Common::String::vformat(fmt, va);
-	va_end(va);
-
-	debug("%s", s.c_str());
-	if (debug_mode)
-		add_text(s.c_str(), "DEBUG.TXT");
-}
-
-void TRACE(const char *fmt, ...) {
-	va_list  va;
-	va_start(va, fmt);
-	Common::String s = Common::String::vformat(fmt, va);
-	va_end(va);
-
-	debug("%s", s.c_str());
-	if (debug_mode)
-		add_text(s.c_str(), "DEBUG.TXT");
 }
 
 IDirectDrawSurface *DDSethLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite) {
@@ -863,34 +342,6 @@ void flip_it_second() {
 		                           &rcRectSrc, DDBLT_DDFX | DDBLT_WAIT, &ddBltFx);
 	}
 }
-
-bool exist(const char *name) {
-	return Common::File::exists(name);
-}
-
-
-
-void add_text(const char *tex, const char *filename) {
-#ifdef TODO
-	FILE           *fp;
-	if (strlen(tex) < 1) return;
-
-	if (exist(filename) == false) {
-
-		fp = fopen(filename, "wb");
-		fwrite(tex, strlen(tex), 1, fp);        /* current player */
-		fclose(fp);
-		return;
-	} else {
-		fp = fopen(filename, "ab");
-		fwrite(tex, strlen(tex), 1, fp);        /* current player */
-		fclose(fp);
-	}
-#else
-	error("TODO");
-#endif
-}
-
 
 //add hardness from a sprite
 
@@ -1437,7 +888,7 @@ bool add_time_to_saved_game(int num) {
 	fp = fopen(crap, "rb");
 	if (!fp) {
 		Msg("Couldn't load save game %d", num);
-		return (false);
+		return false;
 	} else {
 
 		fread(&play, sizeof(play), 1, fp);
@@ -1516,7 +967,7 @@ bool load_game(int num) {
 	fp = fopen(crap, "rb");
 	if (!fp) {
 		Msg("Couldn't load save game %d", num);
-		return (false);
+		return false;
 	} else {
 
 		fread(&play, sizeof(play), 1, fp);
@@ -1548,13 +999,13 @@ bool load_game(int num) {
 			//Which tiles are we loading, new or default?
 			if (strlen(play.tile[i].file) > 0) {
 				//Check the original directory
-				if (!exist(play.tile[i].file))
+				if (!Common::File::exists(play.tile[i].file))
 					sprintf(tile, "..\\DINK\\%s", play.tile[i].file);
 				else
 					strcpy(tile, play.tile[i].file);
 			} else {
 				sprintf(tile, "tiles\\TS%02d.bmp", i);
-				if (!exist(tile))
+				if (!Common::File::exists(tile))
 					sprintf(tile, "..\\dink\\tiles\\TS%02d.BMP", i);
 			}
 
@@ -1787,7 +1238,7 @@ bool load_game_small(int num, char *line, int *mytime) {
 	fp = fopen(crap, "rb");
 	if (!fp) {
 		Msg("Couldn't quickload save game %d", num);
-		return (false);
+		return false;
 	} else {
 
 		fread(&short_play, sizeof(player_short_info), 1, fp);
@@ -1850,7 +1301,7 @@ void load_hard() {
 	char crap[80];
 	sprintf(crap, "HARD.DAT");
 	if (!dinkedit) {
-		if (!exist(crap)) sprintf(crap, "..\\dink\\hard.dat");
+		if (!Common::File::exists(crap)) sprintf(crap, "..\\dink\\hard.dat");
 	}
 
 	fp = fopen(crap, "rb");
@@ -2423,19 +1874,19 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
 
 	sprintf(crap, "%s\\dir.ff", crap2);
 	//Msg("Checking for %s..", crap);
-	if (exist(crap)) {
+	if (Common::File::exists(crap)) {
 		load_sprite_pak(org, nummy, speed, xoffset, yoffset, hardbox, notanim, black, leftalign, true);
 		return;
 	}
 
 	sprintf(crap, "%s01.BMP", org);
-	if (!exist(crap))
+	if (!Common::File::exists(crap))
 
 	{
 
 		sprintf(crap, "..\\dink\\%s\\dir.ff", crap2);
 		//Msg("Checking for %s..", crap);
-		if (exist(crap)) {
+		if (Common::File::exists(crap)) {
 			load_sprite_pak(org, nummy, speed, xoffset, yoffset, hardbox, notanim, black, leftalign, false);
 			return;
 		}
@@ -3633,7 +3084,7 @@ do_draw:
 
 nodraw:
 
-	return (false);
+	return false;
 
 }
 
@@ -3808,12 +3259,12 @@ bool read_next_line(int script, char *line) {
 	if ((rinfo[script] == NULL) || (rbuf == NULL)) {
 
 		Msg("  ERROR:  Tried to read script %d, it doesn't exist.", script);
-		return (false);
+		return false;
 	}
 
 	if (rinfo[script]->current >= rinfo[script]->end) {
 		//at end of buffer
-		return (false);
+		return false;
 	}
 
 	/*      if (rinfo[script]->current < -1);
@@ -3836,11 +3287,11 @@ bool read_next_line(int script, char *line) {
 			return (true);
 		}
 
-		if (rinfo[script]->current >= rinfo[script]->end) return (false);
+		if (rinfo[script]->current >= rinfo[script]->end) return false;
 
 	}
 
-	return (false);
+	return false;
 }
 
 
@@ -3943,17 +3394,17 @@ int load_script(const char *filename, int sprite, bool set_sprite) {
 
 	sprintf(temp, "story\\%s.d", filename);
 
-	if (!exist(temp)) {
+	if (!Common::File::exists(temp)) {
 
 
 		sprintf(temp, "story\\%s.c", filename);
-		if (!exist(temp)) {
+		if (!Common::File::exists(temp)) {
 
 
 			sprintf(temp, "..\\dink\\story\\%s.d", filename);
-			if (!exist(temp)) {
+			if (!Common::File::exists(temp)) {
 				sprintf(temp, "..\\dink\\story\\%s.c", filename);
-				if (!exist(temp)) {
+				if (!Common::File::exists(temp)) {
 
 					Msg("Script %s not found. (checked for .C and .D) (requested by %d?)", temp, sprite);
 					return (0);
@@ -4081,7 +3532,7 @@ void strip_beginning_spaces(char *s) {
 bool locate(int script, const char *proc) {
 
 	if (rinfo[script] == NULL) {
-		return (false);
+		return false;
 
 	}
 	int saveme = rinfo[script]->current;
@@ -4126,7 +3577,7 @@ bool locate(int script, const char *proc) {
 
 	//Msg("Locate ended on %d.", saveme);
 	rinfo[script]->current = saveme;
-	return (false);
+	return false;
 
 }
 
@@ -4159,7 +3610,7 @@ bool locate_goto(char proc[50], int script) {
 
 	}
 	Msg("ERROR:  Cannot goto %s in %s.", proc, rinfo[script]->name);
-	return (false);
+	return false;
 
 }
 
@@ -4392,7 +3843,7 @@ void decipher_string(char line[200], int script) {
 	if (decipher_savegame != 0)
 		if (compare(line, "&savegameinfo")) {
 			sprintf(crap, "save%d.dat", decipher_savegame);
-			if (exist(crap)) {
+			if (Common::File::exists(crap)) {
 				load_game_small(decipher_savegame, crab, &mytime);
 				//redink1 fix for savegame time bug
 				sprintf(line, "Slot %d - %d:%02d - %s", decipher_savegame, (mytime / 60), mytime - ((mytime / 60) * 60), crab);
@@ -4431,7 +3882,7 @@ bool get_parms(char proc_name[20], int script, char *h, const int p[10]) {
 		Msg("Missing ( in %s, offset %d.", rinfo[script]->name, rinfo[script]->current);
 
 
-		return (false);
+		return false;
 	}
 
 
@@ -4488,7 +3939,7 @@ bool get_parms(char proc_name[20], int script, char *h, const int p[10]) {
 				Msg("Missing ) in %s, offset %d.", rinfo[script]->name, rinfo[script]->current);
 				h = &h[1];
 
-				return (false);
+				return false;
 			}
 
 			strip_beginning_spaces(h);
@@ -4522,7 +3973,7 @@ bool get_parms(char proc_name[20], int script, char *h, const int p[10]) {
 		} else {
 			Msg("Procedure %s does not take %d parms in %s, offset %d. (%s?)", proc_name, i + 1, rinfo[script]->name, rinfo[script]->current, h);
 
-			return (false);
+			return false;
 		}
 
 	}
@@ -5032,188 +4483,6 @@ next2:
 	return (newret);
 }
 
-
-
-
-void get_word(char line[300], int word, char *crap) {
-	int cur = 0;
-
-	bool space_mode = false;
-	char save_word[100];
-	save_word[0] = 0;
-
-	for (int k = 0; k < (int)strlen(line); k++) {
-
-		if (space_mode == true) {
-			if (line[k] != ' ') {
-				space_mode = false;
-				strcpy(save_word, "");
-
-			}
-		}
-
-
-
-		if (space_mode == false) {
-			if (line[k] == ' ') {
-				cur++;
-				if (word == cur) goto done;
-				space_mode = true;
-				strcpy(save_word, "");
-
-				goto dooba;
-			} else {
-				strchar(save_word, line[k]);
-
-			}
-		}
-
-
-dooba:
-		;
-
-	}
-
-	if (space_mode == false) {
-
-		if (cur + 1 != word) strcpy(save_word, "");
-	}
-
-
-done:
-
-	strcpy(crap, save_word);
-
-	//Msg("word %d of %s is %s.", word, line, crap);
-}
-
-
-
-
-int var_figure(char h[200], int script) {
-	char crap[200];
-	int ret = 0;
-	int n1 = 0, n2 = 0;
-	//Msg("Figuring out %s...", h);
-	get_word(h, 2, crap);
-	//Msg("Word two is %s...", crap);
-
-	if (compare(crap, "")) {
-		//one word equation
-
-		if (h[0] == '&') {
-			//its a var possibly
-			decipher_string(h, script);
-		}
-
-		//Msg("truth is %s", h);
-		ret =  atol(h);
-		//  Msg("returning %d, happy?", ret);
-		return (ret);
-	}
-
-
-	//
-
-
-	get_word(h, 1, crap);
-	//Msg("Comparing %s...", crap);
-
-	decipher_string(crap, script);
-	n1 = atol(crap);
-
-	get_word(h, 3, crap);
-	replace(")", "", crap);
-	//Msg("to  %s...", crap);
-	decipher_string(crap, script);
-	n2 = atol(crap);
-
-	get_word(h, 2, crap);
-	if (debug_mode)
-		Msg("Compared %d to %d", n1, n2);
-
-	if (compare(crap, "==")) {
-		if (n1 == n2) ret = 1;
-		else ret = 0;
-		return (ret);
-	}
-
-	if (compare(crap, ">")) {
-		if (n1 > n2) ret = 1;
-		else ret = 0;
-		return (ret);
-	}
-
-	if (compare(crap, ">=")) {
-		if (n1 >= n2) ret = 1;
-		else ret = 0;
-		return (ret);
-	}
-
-
-	if (compare(crap, "<")) {
-		if (n1 < n2) ret = 1;
-		else ret = 0;
-		return (ret);
-	}
-	if (compare(crap, "<=")) {
-		if (n1 <= n2) ret = 1;
-		else ret = 0;
-		return (ret);
-	}
-
-	if (compare(crap, "!=")) {
-		if (n1 != n2) ret = 1;
-		else ret = 0;
-		return (ret);
-	}
-
-	return (ret);
-
-}
-
-void kill_text_owned_by(int sprite) {
-	for (int i = 1; i < max_sprites_at_once; i++) {
-		if (spr[i].active)
-			if (spr[i].brain == 8) if (spr[i].owner == sprite) {
-					spr[i].active = false;
-
-
-				}
-	}
-
-}
-
-bool text_owned_by(int sprite) {
-	for (int i = 1; i < max_sprites_at_once; i++) {
-		if (spr[i].active)
-			if (spr[i].brain == 8) if (spr[i].owner == sprite) {
-
-					return (true);
-
-
-
-				}
-	}
-	return (false);
-}
-
-
-void kill_text_owned_by_safe(int sprite) {
-	for (int i = 1; i < max_sprites_at_once; i++) {
-		if (spr[i].active)
-			if (spr[i].brain == 8) if (spr[i].owner == sprite) {
-					spr[i].active = false;
-
-					if (spr[i].callback != 0) run_script(spr[i].callback);
-				}
-	}
-
-}
-
-
-
-
 void kill_scripts_owned_by(int sprite) {
 	for (int i = 1; i < max_scripts; i++) {
 		if (rinfo[i] != NULL) {
@@ -5349,7 +4618,7 @@ morestuff:
 				Msg("Error: choice() has 0 options in script %s, offset %d.",
 				    rinfo[script]->name, rinfo[script]->current);
 
-				return (false);
+				return false;
 			}
 			//all done, lets jam
 			//Msg("found choice_end, leaving!");
@@ -5377,7 +4646,7 @@ morestuff:
 			{
 				Msg("Error with choice() statement in script %s, offset %d. (%s?)",
 				    rinfo[script]->name, rinfo[script]->current, check);
-				return (false);
+				return false;
 			}
 
 			seperate_string(check, 2, '(', checker);
@@ -5438,7 +4707,7 @@ bool nothing_playing() {
 	                              MCI_STATUS_ITEM, (uint32)(LPVOID) &mciStatusParms)) {
 
 		Msg("Error reading status from midi mapper!");
-		return (false);
+		return false;
 		//mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);
 	}
 	//  return (dwReturn);
@@ -5448,7 +4717,7 @@ bool nothing_playing() {
 
 	if (mciStatusParms.dwReturn == MCI_MODE_PLAY) return (true);
 	else
-		return (false);
+		return false;
 #else
 	error("TODO");
 #endif
@@ -5476,13 +4745,13 @@ bool cdplaying() {
 	if (dwReturn = mciSendCommand(CD_ID, MCI_STATUS,
 	                              MCI_STATUS_ITEM, (uint32)(LPVOID) &mciStatusParms)) {
 		Msg("Error reading status from midi mapper!");
-		return (false);
+		return false;
 		//mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);
 	}
 	//  return (dwReturn);
 	Msg("Mode returned %d..",   mciStatusParms.dwReturn);
 
-	if (mciStatusParms.dwReturn != last_cd) return (false);
+	if (mciStatusParms.dwReturn != last_cd) return false;
 	else return (true);
 #else
 	error("TODO");
@@ -5586,19 +4855,19 @@ bool PlayMidi(const char *sFileName) {
 	if (compare(last_midi, sFileName)) {
 		if (nothing_playing()) {
 			Msg("I think %s is already playing, I should skip it...", sFileName);
-			return (false);
+			return false;
 		}
 
 	}
 
 	sprintf(crap, "sound\\%s", sFileName);
-	if (exist(crap)) {
+	if (Common::File::exists(crap)) {
 
 	} else {
 		sprintf(crap, "..\\dink\\sound\\%s", sFileName);
-		if (!exist(crap)) {
+		if (!Common::File::exists(crap)) {
 			Msg("Error playing midi %s, doesn't exist in any dir.", sFileName);
-			return (false);
+			return false;
 		}
 
 	}
@@ -5621,13 +4890,13 @@ bool PlayMidi(const char *sFileName) {
 
 	if (mciSendString(buf, NULL, 0, NULL) != 0) {
 		Msg("Couldn't clear midi buffer");
-		return (false);
+		return false;
 	}
 
 
 	if (mciSendString("play MUSIC from 0", NULL, 0, g_hWnd) != 0) {
 		Msg("Playmidi command failed");
-		return (false);
+		return false;
 	}
 
 	return true;
@@ -5916,7 +5185,7 @@ uint32 getCDTrackStartTimes() {
 bool PauseMidi() {
 	// Pause if we're not already paused...
 	if (mciSendString("stop MUSIC", NULL, 0, NULL) != 0) {
-		return (false);
+		return false;
 	}
 
 
@@ -5935,7 +5204,7 @@ bool PauseMidi() {
 bool ResumeMidi() {
 	// Resume midi
 	if (mciSendString("play MUSIC notify", NULL, 0, g_hWnd) != 0) {
-		return (false);
+		return false;
 	}
 
 	// Yahoo!
@@ -5969,7 +5238,7 @@ bool StopMidi() {
 bool ReplayMidi() {
 	// Replay midi
 	if (mciSendString("play MUSIC from 0 notify", NULL, 0, g_hWnd) != 0) {
-		return (false);
+		return false;
 	}
 
 	// Yahoo!
@@ -6690,14 +5959,14 @@ crazy:
 	}
 
 	//we didn't kill any sprites, only 1 remains
-	return (false);
+	return false;
 }
 
 
 void show_bmp(char name[80], int showdot, int reserved, int script) {
 
 
-	if (!exist(name)) {
+	if (!Common::File::exists(name)) {
 		Msg("Error: Can't find bitmap at %s.", name);
 		return;
 	}
@@ -6734,7 +6003,7 @@ again:
 
 
 void copy_bmp(char name[80]) {
-	if (!exist(name)) {
+	if (!Common::File::exists(name)) {
 		Msg("Error: Can't find bitmap at %s.", name);
 		return;
 	}
@@ -7534,7 +6803,7 @@ pass:
 			h = &h[strlen(ev[1])];
 			int ARR[20] = {2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
-				if (exist(slist[0])) {
+				if (Common::File::exists(slist[0])) {
 					LPDIRECTDRAWSURFACE oldTrick = DDLoadBitmap(lpDD, slist[0], 0, 0);
 					lpDDPal = DDLoadPalette(lpDD, slist[0]);
 					if (lpDDPal) {
@@ -7557,11 +6826,11 @@ pass:
 			h = &h[strlen(ev[1])];
 			int ARR[20] = {2, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
-				if (!exist(slist[0])) {
+				if (!Common::File::exists(slist[0])) {
 					sprintf(slist[0], "..\\DINK\\%s", slist[0]);
 				}
 
-				if (exist(slist[0]) && nlist[1] > 0 && nlist[1] < tile_screens) {
+				if (Common::File::exists(slist[0]) && nlist[1] > 0 && nlist[1] < tile_screens) {
 					//Need to unload old tiles...
 					tiles[nlist[1]]->Release();
 					//Load in the new tiles...
@@ -8881,7 +8150,7 @@ pass:
 			int ARR[20] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				sprintf(temp, "save%d.dat", nlist[0]);
-				if (exist(temp)) returnint = 1;
+				if (Common::File::exists(temp)) returnint = 1;
 				else returnint = 0;
 
 			}

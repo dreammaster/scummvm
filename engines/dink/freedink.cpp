@@ -27,6 +27,7 @@
 #include "dink/events.h"
 #include "dink/fast_file.h"
 #include "dink/sound.h"
+#include "dink/text.h"
 #include "dink/var.h"
 #include "dink/directdraw/ddraw.h"
 #include "dink/directdraw/ddutil.h"
@@ -255,7 +256,7 @@ bool keypressed(void)
 		}
 	}
 
-	return (false);
+	return false;
 }
 
 void check_joystick() {
@@ -474,7 +475,7 @@ bool not_in_this_base(int seq_, int base) {
 
 		return (true);
 	} else {
-		return (false);
+		return false;
 	}
 }
 
@@ -488,7 +489,7 @@ bool in_this_base(int seq_, int base) {
 	} else {
 		//  Msg("false - Ok, realbase is %d, compared to the base, which is %d.", realbase, base);
 
-		return (false);
+		return false;
 	}
 }
 
@@ -878,7 +879,7 @@ bool check_for_kill_script(int i) {
 		return (true);
 	}
 
-	return (false);
+	return false;
 }
 
 bool check_for_duck_script(int i) {
@@ -892,7 +893,7 @@ bool check_for_duck_script(int i) {
 		return (true);
 	}
 
-	return (false);
+	return false;
 }
 
 
@@ -2053,7 +2054,7 @@ bool run_through_tag_list_talk(int h) {
 	}
 
 
-	return (false);
+	return false;
 }
 
 
@@ -3096,7 +3097,7 @@ bool transition() {
 		move_counter = 0;
 		trig_man = 0;
 		//draw_map();
-		return (false);
+		return false;
 	}
 
 
@@ -3137,7 +3138,7 @@ bool transition() {
 			move_counter = 0;
 			trig_man = 0;
 			//draw_map();
-			return (false);
+			return false;
 		}
 
 		return (true);
@@ -3173,7 +3174,7 @@ bool transition() {
 			move_counter = 0;
 			trig_man = 0;
 			//draw_map();
-			return (false);
+			return false;
 		}
 
 		return (true);
@@ -3215,7 +3216,7 @@ bool transition() {
 			move_counter = 0;
 			trig_man = 0;
 			//draw_map();
-			return (false);
+			return false;
 		}
 
 		return (true);
@@ -3255,7 +3256,7 @@ bool transition() {
 			move_counter = 0;
 			trig_man = 0;
 			//draw_map();
-			return (false);
+			return false;
 		}
 
 		return (true);
@@ -3264,7 +3265,7 @@ bool transition() {
 
 
 
-	return (false);
+	return false;
 }
 
 
@@ -5640,7 +5641,7 @@ bool random_date(char file[255]) {
 
 		_close(fh);
 
-	} else return (false);
+	} else return false;
 
 
 	return (true);

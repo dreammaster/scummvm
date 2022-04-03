@@ -37,13 +37,10 @@ extern byte get_hard(int h, int x1, int y1);
 extern void update_screen_time();
 extern void load_map(int num);
 extern void kill_returning_stuff(int script);
-extern void kill_text_owned_by(int sprite);
-extern int say_text(const char *text, int h, int script);
 extern bool PauseMidi();
 extern bool ResumeMidi();
 extern byte get_hard_play(int h, int x1, int y1);
 extern void draw_sprite_game(LPDIRECTDRAWSURFACE lpdest, int h);
-extern int say_text_xy(const char *text, int mx, int my, int script);
 extern bool add_time_to_saved_game(int num);
 extern void kill_all_scripts_for_real();
 extern bool seperate_string(const char *str, int num, char liney, char *return1);
@@ -52,7 +49,6 @@ extern void check_midi();
 
 extern void init_scripts();
 extern int load_script(const char *filename, int sprite, bool set_sprite);
-extern void strchar(char *string, char ch);
 extern uint32 PlayCD(HWND hWndNotify, byte bTrack);
 extern uint32 killcd(HWND hWndNotify, byte bTrack);
 extern void update_status_all();
@@ -64,26 +60,19 @@ extern bool locate(int script, const char *proc);
 extern void draw_status_all();
 extern int process_line(int script, char *s, bool doelse);
 
-extern void get_word(char line[300], int word, char *crap);
-extern void Msg(const char *fmt, ...);
 extern void run_script(int script);
-extern void add_text(const char *tex, const char *filename);
 extern void program_idata();
 extern void draw_map_game();
 extern void draw_map_game_background();
 extern int realhard(int tile);
-//redink1 added this prototype to fix this save info declaration error thing
-extern void decipher_string(char line[200], int script);
 //redink1 added for recursive scope checking
 extern int get_var(int script, char *name);
 extern void kill_fonts();
 extern bool nothing_playing();
-extern void update_sound();
 extern void drawallhard();
 extern void process_callbacks();
 extern int hurt_thing(int h, int damage, int special);
 extern void random_blood(int mx, int my, int h);
-extern void replace(const char *this1, const char *that, char *line);
 extern uint32 getCDTrackStartTimes();
 extern void load_hard();
 extern IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite);
@@ -91,7 +80,6 @@ extern void attach();
 //redink1 added for font colors
 extern void init_font_colors();
 extern void initfonts(const char *fontname);
-extern void TRACE(const char *fmt, ...);
 
 } // namespace Dink
 

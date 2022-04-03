@@ -181,10 +181,6 @@ struct IDirectDraw {
 };
 typedef IDirectDraw *LPDIRECTDRAW;
 
-inline void dderror(int v) {
-	::error("dderror - %d", v);
-}
-
 } // namespace Dink
 
 #endif

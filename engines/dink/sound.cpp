@@ -23,6 +23,7 @@
 #include "dink/sound.h"
 #include "dink/dink.h"
 #include "dink/globals.h"
+#include "dink/text.h"
 #include "dink/var.h"
 
 namespace Dink {
@@ -99,7 +100,7 @@ static bool ReadData(LPDIRECTSOUNDBUFFER lpDSB, Common::SeekableReadStream *pFil
  */
 static bool CreateSoundBuffer(uint32 dwBuf, uint32 dwBufSize, uint32 dwFreq, uint32 dwBitsPerSample, uint32 dwBlkAlign, bool bStereo) {
 #ifdef TODO
-	if (!sound_on) return (false);
+	if (!sound_on) return false;
 
 	PCMWAVEFORMAT pcmwf;
 	DSBUFFERDESC dsbdesc;
@@ -318,6 +319,31 @@ bool DestroySound() {
 	return true;
 }
 
+void SoundLoadBanks() {
+#ifdef TODO
+	HRESULT ddsound;
+
+	lpDS->DuplicateSoundBuffer(ssound[1].sound, &bowsound);
+
+
+	for (int i = 1; i <= num_soundbanks; i++) {
+
+
+		if (lpDS && soundbank[i] == nullptr)
+
+		{
+			//
+			//  use DSLoadSoundBuffer (in ..\misc\dsutil.c) to load
+			//  a sound from a resource.
+			//
+
+			ddsound = lpDS->DuplicateSoundBuffer(ssound[1].sound, &soundbank[i]);
+			if (ddsound != DS_OK) Msg("Couldn't load soundbank %d.", i);
+		}
+	}
+#endif
+}
+
 bool SoundStopEffect(int sound) {
 	HRESULT     dsrval;
 
@@ -442,7 +468,7 @@ int playbank(int sound, int min, int plus, int sound3d, bool repeat) {
 
 	}
 
-	return (false);
+	return false;
 
 madeit:
 
@@ -463,7 +489,7 @@ madeit:
 		if (ddsound == DSERR_OUTOFMEMORY) Msg("DSOUND: DSERR_OUTOFMEMORY");
 		if (ddsound == DSERR_UNINITIALIZED) Msg("DSOUND: DSERR_UNINITIALIZED");
 
-		return (false);
+		return false;
 	}
 	//we need to copy the sound to the bank now
 
@@ -576,7 +602,7 @@ bool playing(int sound) {
 
 	pdsb->GetStatus(&crap);
 	if (crap == DSBSTATUS_PLAYING) return (true);
-	else return (false);
+	else return false;
 
 }
 
