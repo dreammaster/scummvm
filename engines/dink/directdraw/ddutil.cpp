@@ -83,79 +83,10 @@ HRESULT DDCopyBitmap(IDirectDrawSurface *surf, HBITMAP hbm, int x, int y, int dx
 }
 
 IDirectDrawPalette *DDLoadPalette(IDirectDraw *pdd, LPCSTR szBitmap) {
-#ifdef TODO
-	IDirectDrawPalette *ddpal;
-	int                 i;
-	int                 n;
-	int                 fh;
-	HRSRC               h;
-	LPBITMAPINFOHEADER  lpbi;
-	RGBQUAD *prgb;
+	Common::File f;
+	Image::BitmapDecoder bmp;
 
-	//
-	// get a pointer to the bitmap resource.
-	//
-	if (szBitmap && (h = FindResource(NULL, szBitmap, RT_BITMAP))) {
-		lpbi = (LPBITMAPINFOHEADER)LockResource(LoadResource(NULL, h));
-		if (!lpbi)
-			OutputDebugString("lock resource failed\n");
-		prgb = (RGBQUAD *)((byte *)lpbi + lpbi->biSize);
-
-		if (lpbi == NULL || lpbi->biSize < sizeof(BITMAPINFOHEADER))
-			n = 0;
-		else if (lpbi->biBitCount > 8)
-			n = 0;
-		else if (lpbi->biClrUsed == 0)
-			n = 1 << lpbi->biBitCount;
-		else
-			n = lpbi->biClrUsed;
-
-		//
-		//  a DIB color table has its colors stored BGR not RGB
-		//  so flip them around.
-		//
-		for (i = 0; i < n; i++) {
-			ape[i].peRed = prgb[i].rgbRed;
-			ape[i].peGreen = prgb[i].rgbGreen;
-			ape[i].peBlue = prgb[i].rgbBlue;
-			ape[i].peFlags = 0;
-		}
-	} else if (szBitmap && (fh = _lopen(szBitmap, OF_READ)) != -1) {
-		BITMAPFILEHEADER bf;
-		BITMAPINFOHEADER bi;
-
-		_lread(fh, &bf, sizeof(bf));
-		_lread(fh, &bi, sizeof(bi));
-		_lread(fh, ape, sizeof(ape));
-		_lclose(fh);
-
-		if (bi.biSize != sizeof(BITMAPINFOHEADER))
-			n = 0;
-		else if (bi.biBitCount > 8)
-			n = 0;
-		else if (bi.biClrUsed == 0)
-			n = 1 << bi.biBitCount;
-		else
-			n = bi.biClrUsed;
-
-		//
-		//  a DIB color table has its colors stored BGR not RGB
-		//  so flip them around.
-		//
-		for (i = 0; i < n; i++) {
-			byte r = ape[i].peRed;
-			ape[i].peRed = ape[i].peBlue;
-			ape[i].peBlue = r;
-		}
-	}
-
-	pdd->CreatePalette(DDPCAPS_8BIT, ape, &ddpal, NULL);
-
-	return ddpal;
-#endif
-	//
-	// build a 332 palette as the default.
-	//
+	// Build a 332 palette as the default.
 	IDirectDrawPalette *pal = new IDirectDrawPalette();
 	PALETTEENTRY *ape = pal->_palette;
 
@@ -166,9 +97,7 @@ IDirectDrawPalette *DDLoadPalette(IDirectDraw *pdd, LPCSTR szBitmap) {
 		ape[i].peFlags = (byte)0;
 	}
 
-	Common::File f;
-	Image::BitmapDecoder bmp;
-
+	// Load and decode the bitmap, and get it's palette
 	if (f.open(szBitmap) && bmp.loadStream(f)) {
 		const byte *srcP = bmp.getPalette();
 		int palCount = bmp.getPaletteColorCount();
