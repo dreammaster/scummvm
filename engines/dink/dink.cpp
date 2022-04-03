@@ -85,6 +85,10 @@ Common::Error DinkEngine::run() {
 }
 
 void DinkEngine::initialize() {
+	// Add in the dink subfolder for easy access
+	const Common::FSNode gameDataDir(ConfMan.get("path"));
+	SearchMan.addSubDirectoryMatching(gameDataDir, "dink", 0, 2);
+
 	_events = new EventsManager();
 
 	if (Common::File::exists("cd.dat"))

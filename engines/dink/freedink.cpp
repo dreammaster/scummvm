@@ -5545,8 +5545,7 @@ bool doInit() {
 
 	if (Common::File::exists("tiles/ts01.bmp"))
 		lpDDPal = DDLoadPalette(lpDD, "tiles/ts01.bmp");
-	else
-		lpDDPal = DDLoadPalette(lpDD, "../dink/tiles/TS01.BMP");
+
 	if (lpDDPal)
 		lpDDSPrimary->SetPalette(lpDDPal);
 
