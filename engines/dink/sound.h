@@ -72,8 +72,17 @@ extern bool SoundStopEffect(int sound);
 extern bool CreateBufferFromWaveFile(const char *filename, uint32 dwBuf);
 extern void kill_repeat_sounds();
 extern void kill_repeat_sounds_all();
-extern bool SoundDestroyEffect(int sound);
+
+/**
+ * Plays the sound effect specified. Returns true if succeeded.
+ */
 extern int SoundPlayEffect(int sound, int min, int plus, int sound3d, bool repeat);
+
+/**
+ * Frees up resources associated with a sound effect
+ */
+extern bool SoundDestroyEffect(int sound);
+
 extern void SoundLoadBanks();
 extern bool StopMidi();
 extern void check_seq_status(int h);

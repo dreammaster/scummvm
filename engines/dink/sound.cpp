@@ -184,7 +184,6 @@ int get_vol(int h) {
 	return pan;
 }
 
-
 bool DSEnable(HWND hWnd) {
 	HRESULT             dsrval;
 	bool                bUseDSound;
@@ -327,11 +326,7 @@ void SoundLoadBanks() {
 
 
 	for (int i = 1; i <= num_soundbanks; i++) {
-
-
-		if (lpDS && soundbank[i] == nullptr)
-
-		{
+		if (lpDS && soundbank[i] == nullptr) {
 			//
 			//  use DSLoadSoundBuffer (in ..\misc\dsutil.c) to load
 			//  a sound from a resource.
@@ -354,8 +349,7 @@ bool SoundStopEffect(int sound) {
 	dsrval = ssound[sound].sound->Stop();
 
 	return SUCCEEDED(dsrval);
-
-} /* SoundStopEffect */
+}
 
 bool CreateBufferFromWaveFile(const char *filename, uint32 dwBuf) {
 	// Open the wave file
@@ -403,42 +397,32 @@ bool CreateBufferFromWaveFile(const char *filename, uint32 dwBuf) {
 void update_sound() {
 	unsigned long crap;
 
-	if (!sound_on) return;
+	if (!sound_on)
+		return;
 
 	for (int i = 1; i <= num_soundbanks; i++) {
 		if (soundinfo[i].repeat) if (soundinfo[i].owner != 0) {
-
-			if ((spr[soundinfo[i].owner].sound == 0) | (soundinfo[i].owner == 0)
-
-				| (spr[soundinfo[i].owner].active == false)) {
+			if ((spr[soundinfo[i].owner].sound == 0) ||
+					(soundinfo[i].owner == 0) ||
+					(spr[soundinfo[i].owner].active == false)) {
 				soundbank[i]->Stop();
-				//Msg("Killed bank %d", i);
-				//Msg("REPEAT Sound %d playing.. owner is %d.", i,soundinfo[i].owner);
 				soundinfo[i].owner = 0;
 				soundinfo[i].repeat = 0;
 			} else {
 				soundbank[i]->SetPan(get_pan(soundinfo[i].owner));
 				soundbank[i]->SetVolume(get_vol(soundinfo[i].owner));
-
 			}
 		}
 
 		soundbank[i]->GetStatus(&crap);
 		if (crap == DSBSTATUS_PLAYING) {
-			{
-				//Msg("Sound %d playing.. owner is %d.", i,soundinfo[i].owner);
-				if (soundinfo[i].owner != 0) {
+			if (soundinfo[i].owner != 0) {
+				if (spr[soundinfo[i].owner].active == false) {
+					soundbank[i]->Stop();
 
-					if (spr[soundinfo[i].owner].active == false) {
-						//Msg("Killed bank %d", i);
-
-						soundbank[i]->Stop();
-
-					} else {
-						soundbank[i]->SetPan(get_pan(soundinfo[i].owner));
-						soundbank[i]->SetVolume(get_vol(soundinfo[i].owner));
-					}
-
+				} else {
+					soundbank[i]->SetPan(get_pan(soundinfo[i].owner));
+					soundbank[i]->SetVolume(get_vol(soundinfo[i].owner));
 				}
 			}
 		}
@@ -451,36 +435,27 @@ int playbank(int sound, int min, int plus, int sound3d, bool repeat) {
 	HRESULT ddsound;
 	int i;
 
-	//Msg("Playing bank %d..", sound);
-
 	for (i = 1; i <= num_soundbanks; i++) {
-
 		if (!lpDS || !soundbank[i]) {
-
 			Msg("soundbank %d not initted!", i);
 			return false;
 		}
 
-
 		ddsound = soundbank[i]->GetStatus(&crap);
-		if (ddsound != DS_OK) Msg("Couldn't get status of soundbank %d..", i);
-		if (crap != DSBSTATUS_PLAYING) if (!soundinfo[i].repeat) goto madeit;
-
+		if (ddsound != DS_OK)
+			Msg("Couldn't get status of soundbank %d..", i);
+		if (crap != DSBSTATUS_PLAYING)
+			if (!soundinfo[i].repeat)
+				goto madeit;
 	}
 
 	return false;
 
 madeit:
-
-	//Msg("Adding sound to bank %d", i);
-	//soundbank[i]->Stop();
 	soundbank[i]->Release();
 
 	ddsound = lpDS->DuplicateSoundBuffer(ssound[sound].sound, &soundbank[i]);
-	if (ddsound != DS_OK)
-
-	{
-
+	if (ddsound != DS_OK) {
 		Msg("Problem programming new sound %d in soundbank %d.", sound, i);
 
 		if (ddsound == DSERR_ALLOCATED) Msg("DSOUND: DSERR_ALLOCATED");
@@ -491,13 +466,8 @@ madeit:
 
 		return false;
 	}
-	//we need to copy the sound to the bank now
 
-
-
-	/*
-	* Rewind the play cursor to the start of the effect, and play
-	*/
+	// Rewind the play cursor to the start of the effect, and play
 	soundbank[i]->SetCurrentPosition(0);
 
 	if (plus == 0)
@@ -513,15 +483,12 @@ madeit:
 		dsrval = soundbank[i]->Play(0, 0, DSBPLAY_LOOPING);
 		Msg("Making looping with buffer %d..", i);
 	} else {
-
-		//Msg("Making reg sound with buffer %d..",i);
 		dsrval = soundbank[i]->Play(0, 0, 0);
 	}
 	if (dsrval == DSERR_BUFFERLOST) {
 		Msg("** Soundbank Buffer needs restoring");
-
-		//dsrval = pdsb->Restore();
 	}
+
 	soundinfo[i].owner = sound3d;
 	soundinfo[i].repeat = repeat;
 	soundinfo[i].survive = 0;
@@ -530,14 +497,7 @@ madeit:
 	return i;
 }
 
-
 int SoundPlayEffect(int sound, int min, int plus, int sound3d, bool repeat) {
-	//    HRESULT     dsrval;
-	//    IDirectSoundBuffer *pdsb = ssound[sound].sound;
-
-		//  if (playing(sound))
-		//main mixing buffer is busy, lets use a 'bank' instead.
-
 	int bank = playbank(sound, min, plus, sound3d, repeat);
 
 	if (!bank) {
@@ -549,51 +509,17 @@ int SoundPlayEffect(int sound, int min, int plus, int sound3d, bool repeat) {
 	return bank;
 }
 
-
-/*
-
-/*
-* SoundDestroyEffect
-*
-* Frees up resources associated with a sound effect
-*/
 bool SoundDestroyEffect(int sound) {
 	if (ssound[sound].sound) {
 		ssound[sound].sound->Release();
 		ssound[sound].sound = NULL;
 	}
+
 	return true;
-
-} /* SoundDestryEffect */
-
-/*
-* SoundLoadEffect
-*
-* Initializes a sound effect by loading the WAV file from a resource
-*/
-/*bool SoundLoadEffect( int sound)
-{
-if (lpDS && lpSoundEffects[sound] == NULL && *szSoundEffects[sound])
-{
-//
-//  use DSLoadSoundBuffer (in ..\misc\dsutil.c) to load
-//  a sound from a resource.
-//
-lpSoundEffects[sound] = DSLoadSoundBuffer(lpDS, szSoundEffects[sound]);
-if (lpSoundEffects[sound] == NULL) Msg("Damn, got a null one for sound %d.",sound);
 }
-
-return lpSoundEffects[sound] != NULL;
-
-}
-
-*/
-
 
 bool playing(int sound) {
 	unsigned long crap;
-	//HRESULT ddsound;
-	//HRESULT     dsrval;
 	IDirectSoundBuffer *pdsb = ssound[sound].sound;
 
 	if (!lpDS || !pdsb) {
@@ -601,28 +527,22 @@ bool playing(int sound) {
 	}
 
 	pdsb->GetStatus(&crap);
-	if (crap == DSBSTATUS_PLAYING) return true;
-	else return false;
-
+	if (crap == DSBSTATUS_PLAYING)
+		return true;
+	else
+		return false;
 }
 
 void kill_repeat_sounds() {
 	if (!sound_on) return;
 
 	for (int i = 1; i <= num_soundbanks; i++) {
-
-
 		if (soundinfo[i].repeat) if (soundinfo[i].owner == 0) if (soundinfo[i].survive == 0) {
-
 			soundbank[i]->Stop();
-			//Msg("REPEAT Sound %d playing.. owner is %d.", i,soundinfo[i].owner);
 			soundinfo[i].owner = 0;
 			soundinfo[i].repeat = 0;
-
 		}
 	}
-
-
 }
 
 void kill_repeat_sounds_all() {
@@ -632,30 +552,10 @@ void kill_repeat_sounds_all() {
 	for (int i = 1; i <= num_soundbanks; i++) {
 		if (soundinfo[i].repeat) if (soundinfo[i].owner == 0) {
 			soundbank[i]->Stop();
-			//Msg("REPEAT Sound %d playing.. owner is %d.", i,soundinfo[i].owner);
 			soundinfo[i].owner = 0;
 			soundinfo[i].repeat = 0;
 		}
 	}
 }
-
-
-
-
-/*
-* SoundPlayEffect
-*
-* Plays the sound effect specified.
-* Returns true if succeeded.
-*/
-
-
-//----------------------------------------------------------------------
-//
-// Function     : StopAllSounds()
-//
-// Purpose      : Stops all sounds
-//
-//----------------------------------------------------------------------
 
 } // namespace Dink
