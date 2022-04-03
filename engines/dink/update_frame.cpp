@@ -23,6 +23,7 @@
 #include "dink/update_frame.h"
 #include "dink/freedink.h"
 #include "dink/globals.h"
+#include "dink/sound.h"
 #include "dink/var.h"
 #include "dink/lib/graphics.h"
 #include "dink/lib/rect.h"

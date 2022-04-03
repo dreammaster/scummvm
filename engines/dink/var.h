@@ -61,14 +61,7 @@ extern int add_sprite(int x1, int y, int brain, int pseq, int pframe);
 extern void load_info(); //redink1
 extern void add_exp(int num, int h, bool addEvenIfNotLastSpriteHit = false);
 extern bool locate(int script, const char *proc);
-extern bool SoundStopEffect(int sound);
 extern void draw_status_all();
-extern bool SoundDestroyEffect(int sound);
-extern int SoundPlayEffect(int sound, int min, int plus, int sound3d, bool repeat);
-extern void SoundLoadBanks();
-extern bool StopMidi();
-extern void check_seq_status(int h);
-extern bool PlayMidi(const char *sFileName);
 extern int process_line(int script, char *s, bool doelse);
 
 extern void get_word(char line[300], int word, char *crap);
@@ -79,7 +72,6 @@ extern void program_idata();
 extern void draw_map_game();
 extern void draw_map_game_background();
 extern int realhard(int tile);
-extern void kill_repeat_sounds_all();
 //redink1 added this prototype to fix this save info declaration error thing
 extern void decipher_string(char line[200], int script);
 //redink1 added for recursive scope checking
@@ -99,6 +91,7 @@ extern void attach();
 //redink1 added for font colors
 extern void init_font_colors();
 extern void initfonts(const char *fontname);
+extern void TRACE(const char *fmt, ...);
 
 } // namespace Dink
 

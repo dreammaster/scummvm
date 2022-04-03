@@ -53,9 +53,6 @@ extern IDirectDrawPalette *DDLoadPalette(IDirectDraw *pdd, LPCSTR szBitmap);
 
 /**
  * Convert a RGB color to a pysical color.
- *
- * We do this by leting GDI SetPixel() do the color matching
- * then we lock the memory and see what it got mapped to.
  */
 extern DWORD DDColorMatch(IDirectDrawSurface *pdds, COLORREF rgb);
 

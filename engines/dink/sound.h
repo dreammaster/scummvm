@@ -23,6 +23,7 @@
 #define DINK_SOUND_H
 
 #include "common/stream.h"
+#include "dink/lib/wintypes.h"
 
 namespace Dink {
 
@@ -43,6 +44,40 @@ struct WaveHeader {
 
 	void load(Common::SeekableReadStream *rs);
 };
+
+
+/**
+ * Sets up the DirectSound object and loads all sounds into secondary
+ * DirectSound buffers.  Returns false on error, or true if successful
+ */
+extern bool InitSound(HWND);
+
+/**
+ *Undoes everything that was done in a InitSound call
+ */
+extern bool DestroySound();
+
+extern bool DSEnable(HWND);
+
+/**
+ * Turn off DirectSound
+ */
+extern bool DSDisable();
+
+/**
+ * Stops the sound effect specified. Returns true if succeeded.
+ */
+extern bool SoundStopEffect(int sound);
+
+extern bool CreateBufferFromWaveFile(const char *filename, uint32 dwBuf);
+extern void kill_repeat_sounds();
+extern void kill_repeat_sounds_all();
+extern bool SoundDestroyEffect(int sound);
+extern int SoundPlayEffect(int sound, int min, int plus, int sound3d, bool repeat);
+extern void SoundLoadBanks();
+extern bool StopMidi();
+extern void check_seq_status(int h);
+extern bool PlayMidi(const char *sFileName);
 
 } // namespace Dink
 

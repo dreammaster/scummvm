@@ -25,8 +25,9 @@
 #include "dink/freedink.h"
 #include "dink/dink.h"
 #include "dink/events.h"
-#include "dink/var.h"
 #include "dink/fast_file.h"
+#include "dink/sound.h"
+#include "dink/var.h"
 #include "dink/directdraw/ddraw.h"
 #include "dink/directdraw/ddutil.h"
 #include "dink/directdraw/dinput.h"
@@ -36,12 +37,6 @@
 #include "dink/lib/wintypes.h"
 
 namespace Dink {
-
-extern bool InitSound(HWND);
-extern bool DestroySound(void);
-extern bool DSDisable(void);
-extern bool DSEnable(HWND);
-
 
 int rnd() {
 	return g_engine->getRandomNumber(0x7fffff);
@@ -232,85 +227,6 @@ void get_last_sprite() {
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-* DestroySound
-*
-* Undoes everything that was done in a InitSound call
-*/
-bool DestroySound() {
-	DWORD       idxKill;
-
-	for (idxKill = 0; idxKill < max_sounds; idxKill++) {
-		SoundDestroyEffect(idxKill);
-	}
-
-	DSDisable();
-	return true;
-
-} /* DestroySound */
-
-/*
-* SoundDestroyEffect
-*
-* Frees up resources associated with a sound effect
-*/
-bool SoundDestroyEffect(int sound) {
-	if (ssound[sound].sound) {
-		ssound[sound].sound->Release();
-		ssound[sound].sound = NULL;
-	}
-	return true;
-
-} /* SoundDestryEffect */
-
-/*
-* SoundLoadEffect
-*
-* Initializes a sound effect by loading the WAV file from a resource
-*/
-/*bool SoundLoadEffect( int sound)
-{
-if (lpDS && lpSoundEffects[sound] == NULL && *szSoundEffects[sound])
-{
-//
-//  use DSLoadSoundBuffer (in ..\misc\dsutil.c) to load
-//  a sound from a resource.
-//
-lpSoundEffects[sound] = DSLoadSoundBuffer(lpDS, szSoundEffects[sound]);
-if (lpSoundEffects[sound] == NULL) Msg("Damn, got a null one for sound %d.",sound);
-}
-
-return lpSoundEffects[sound] != NULL;
-
-}
-
-*/
-/* SoundLoadEffect */
-
-
-
-
-/*
-* SoundPlayEffect
-*
-* Plays the sound effect specified.
-* Returns true if succeeded.
-*/
-
-
 
 /*void draw_used( void)
 {
@@ -5218,11 +5134,8 @@ void finiObjects() {
 		g_pdi    = NULL;
 	}
 
-
-
 	if (sound_on)
 		DestroySound();
-
 
 	if (sound_on) {
 		//lets kill the cdaudio too
