@@ -116,7 +116,7 @@ bool init_mouse(HWND hWnd) {
 }
 
 bool getkey(int key) {
-	if (sjoy.realkey[key]) return (true);
+	if (sjoy.realkey[key]) return true;
 	else return false;
 
 }
@@ -124,7 +124,7 @@ bool getkey(int key) {
 int GetKeyboard(int key) {
 #ifdef TODO
 	// returns 0 if the key has been depressed, else returns 1 and sets key to code recd.
-	return (GetAsyncKeyState(key));
+	return GetAsyncKeyState(key);
 #else
 	error("TODO");
 	return 0;
@@ -218,7 +218,7 @@ char key_convert(int key) {
 	if (key == 220) if (getkey(16)) key = '|';
 		else key = '\\';
 
-	return (key);
+	return key;
 }
 
 void SaySmall(char thing[500], int px, int py, int r, int g, int b) {
@@ -346,14 +346,14 @@ void flip_it_second() {
 //add hardness from a sprite
 
 int getpic(int h) {
-	if (spr[h].pseq == 0) return (0);
+	if (spr[h].pseq == 0)
+		return 0;
 	if (spr[h].pseq > max_sequences) {
-
 		Msg("Sequence %d?  But max is %d!", spr[h].pseq, max_sequences);
-		return (0);
+		return 0;
 	}
-	return (seq[spr[h].pseq].frame[spr[h].pframe]);
 
+	return seq[spr[h].pseq].frame[spr[h].pframe];
 }
 
 
@@ -417,12 +417,12 @@ byte get_hard(int h, int x1, int y1) {
 		if (y1 < 0 && y1 > -5) y1 = 0;
 		else if (y1 > 399 && x1 < 405) y1 = 399;
 	}
-	if (x1 < 0 || y1 < 0 || x1 > 599 || y1 > 399) return (0);
+	if (x1 < 0 || y1 < 0 || x1 > 599 || y1 > 399) return 0;
 
 	value =  hm.x[x1].y[y1];
 
 
-	return (value);
+	return value;
 }
 
 byte get_hard_play(int h, int x1, int y1) {
@@ -437,7 +437,7 @@ byte get_hard_play(int h, int x1, int y1) {
 		if (y1 < 0 && y1 > -5) y1 = 0;
 		else if (y1 > 399 && x1 < 405) y1 = 399;
 	}
-	if (x1 < 0 || y1 < 0 || x1 > 599 || y1 > 399) return (0);
+	if (x1 < 0 || y1 < 0 || x1 > 599 || y1 > 399) return 0;
 
 	value =  hm.x[x1].y[y1];
 
@@ -451,16 +451,16 @@ byte get_hard_play(int h, int x1, int y1) {
 		}
 	}
 
-	return (value);
+	return value;
 }
 
 
 byte get_hard_map(int h, int x1, int y1) {
 
 
-	if ((x1 < 0) || (y1 < 0)) return (0);
-	if ((x1 > 599)) return (0);
-	if (y1 > 399) return (0);
+	if ((x1 < 0) || (y1 < 0)) return 0;
+	if ((x1 > 599)) return 0;
+	if (y1 > 399) return 0;
 
 
 	int til = (x1 / 50) + (((y1 / 50)) * 12);
@@ -473,8 +473,7 @@ byte get_hard_map(int h, int x1, int y1) {
 
 	//Msg("tile %d ",til);
 
-	return (hmap.tile[ realhard(til)  ].x[offx].y[offy]);
-
+	return hmap.tile[ realhard(til)  ].x[offx].y[offy];
 }
 
 
@@ -539,8 +538,10 @@ void add_exp(int num, int h, bool addEvenIfNotLastSpriteHit) {
 int realhard(int tile) {
 
 	//  if (pam.t[tile].num > 3000) Msg("Hard is %d", pam.t[tile].num );
-	if (pam.t[tile].althard > 0) return (pam.t[tile].althard);
-	else return (hmap.index[pam.t[tile].num]);
+	if (pam.t[tile].althard > 0)
+		return pam.t[tile].althard;
+	else
+		return hmap.index[pam.t[tile].num];
 
 }
 
@@ -915,7 +916,7 @@ bool add_time_to_saved_game(int num) {
 	}
 	Msg("Wrote it.(%d of time)", play.minutes);
 
-	return (true);
+	return true;
 #else
 	error("TODO");
 #endif
@@ -1091,7 +1092,7 @@ bool load_game(int num) {
 
 		last_saved_game = num;
 
-		return (true);
+		return true;
 	}
 #else
 	error("TODO");
@@ -1245,7 +1246,7 @@ bool load_game_small(int num, char *line, int *mytime) {
 		fclose(fp);
 		*mytime = short_play.minutes;
 		strcpy(line, short_play.gameinfo);
-		return (true);
+		return true;
 	}
 #else
 	error("TODO");
@@ -2478,7 +2479,7 @@ again:
 			length += picInfo[seq[mseq].frame[rnum]].box.right;
 		}
 	}
-	return (length);
+	return length;
 }
 
 int next_raise() {
@@ -2486,7 +2487,7 @@ int next_raise() {
 	int num = ((100 * crap) * crap);
 
 	if (num > 99999) num = 99999;
-	return (num);
+	return num;
 
 }
 
@@ -2907,12 +2908,11 @@ int add_sprite_dumb(int x1, int y, int brain, int pseq, int pframe, int size) {
 				spr[x].custom->clear();
 			}
 
-			return (x);
+			return x;
 		}
-
 	}
 
-	return (0);
+	return 0;
 }
 
 
@@ -3080,7 +3080,7 @@ do_draw:
 	Msg("Ok, sprite %d is being scaled.", h);
 	}
 	*/
-	return (true);
+	return true;
 
 nodraw:
 
@@ -3270,7 +3270,7 @@ bool read_next_line(int script, char *line) {
 	/*      if (rinfo[script]->current < -1);
 	{
 	//something errored out, why did it go negetive?
-	return(false);
+	return false;
 	}
 	*/
 
@@ -3284,7 +3284,7 @@ bool read_next_line(int script, char *line) {
 		rinfo[script]->current++;
 
 		if ((rbuf[script][ii] == '\n') || (rbuf[script][ii] == '\r')) {
-			return (true);
+			return true;
 		}
 
 		if (rinfo[script]->current >= rinfo[script]->end) return false;
@@ -3407,7 +3407,7 @@ int load_script(const char *filename, int sprite, bool set_sprite) {
 				if (!Common::File::exists(temp)) {
 
 					Msg("Script %s not found. (checked for .C and .D) (requested by %d?)", temp, sprite);
-					return (0);
+					return 0;
 				}
 			}
 		}
@@ -3432,7 +3432,7 @@ int load_script(const char *filename, int sprite, bool set_sprite) {
 	}
 
 	Msg("Couldn't find unused buffer for script.");
-	return (0);
+	return 0;
 
 	Msg("Loading script %s..", temp);
 found:
@@ -3450,7 +3450,7 @@ found:
 		//load compiled script
 		if (!f.open(temp)) {
 			Msg("Script %s not found. (checked for .C and .D) (requested by %d?)", temp, sprite);
-			return (0);
+			return 0;
 		}
 
 		cbuf[0] = 0;
@@ -3478,7 +3478,7 @@ found:
 		if (rbuf[script] == NULL) {
 
 			Msg("Couldn't allocate rbuff %d.", script);
-			return (0);
+			return 0;
 		}
 
 
@@ -3488,7 +3488,7 @@ found:
 		if (rinfo[script] == NULL) {
 
 			Msg("Couldn't allocate rscript %d.", script);
-			return (0);
+			return 0;
 		}
 
 
@@ -3502,7 +3502,7 @@ found:
 		if (sprite != 0) if (sprite != 1000)
 				spr[sprite].script = script;
 	}
-	return (script);
+	return script;
 
 }
 
@@ -3567,7 +3567,7 @@ bool locate(int script, const char *proc) {
 				rinfo[script]->onlevel = 0;
 				rinfo[script]->level = 0;
 
-				return (true);
+				return true;
 				//this is desired proc
 
 			}
@@ -3604,7 +3604,7 @@ bool locate_goto(char proc[50], int script) {
 			rinfo[script]->level = 0;
 
 
-			return (true);
+			return true;
 			//this is desired proc
 		}
 
@@ -3952,14 +3952,14 @@ bool get_parms(char proc_name[20], int script, char *h, const int p[10]) {
 				//Msg("Missing ; in %s, offset %d.", rinfo[script]->name, rinfo[script]->current);
 				//  h = &h[1];
 
-				return (true);
+				return true;
 			}
 
 
 
 
 
-			return (true);
+			return true;
 		}
 
 
@@ -3979,7 +3979,7 @@ bool get_parms(char proc_name[20], int script, char *h, const int p[10]) {
 	}
 
 
-	return (true);
+	return true;
 }
 
 
@@ -3997,14 +3997,14 @@ int add_callback(const char *name, int n1, int n2, int script) {
 			strcpy(callback[ii].name, name);
 
 			if (debug_mode) Msg("Callback added to %d.", ii);
-			return (ii);
+			return ii;
 		}
 
 	}
 
 	Msg("Couldn't add callback, all out of space");
 
-	return (0);
+	return 0;
 
 }
 
@@ -4045,12 +4045,12 @@ int add_sprite(int x1, int y, int brain, int pseq, int pframe) {
 				spr[x].custom->clear();
 			}
 
-			return (x);
+			return x;
 		}
 
 	}
 
-	return (0);
+	return 0;
 }
 
 void check_sprite_status(int h) {
@@ -4177,7 +4177,7 @@ int say_text(const char *text, int h, int script) {
 
 	if (crap2 == 0) {
 		Msg("Couldn't say something, out of sprites.");
-		return (0);
+		return 0;
 
 	}
 	*plast_text = crap2;
@@ -4198,7 +4198,7 @@ int say_text(const char *text, int h, int script) {
 	spr[crap2].x = spr[spr[crap2].owner].x - spr[crap2].strength;
 	spr[crap2].y = spr[spr[crap2].owner].y - spr[crap2].defense;
 
-	return (crap2);
+	return crap2;
 }
 
 
@@ -4209,7 +4209,7 @@ int say_text_xy(const char *text, int mx, int my, int script) {
 
 	if (crap2 == 0) {
 		Msg("Couldn't say something, out of sprites.");
-		return (0);
+		return 0;
 
 	}
 	*plast_text = crap2;
@@ -4221,7 +4221,7 @@ int say_text_xy(const char *text, int mx, int my, int script) {
 	spr[crap2].owner = 1000;
 	spr[crap2].hard = 1;
 	spr[crap2].script = script;
-	return (crap2);
+	return crap2;
 }
 
 
@@ -4232,12 +4232,12 @@ int does_sprite_have_text(int sprite) {
 		if (spr[k].active) if (spr[k].owner == sprite) if (spr[k].brain == 8) {
 					//Msg("Found it!  returning %d.", k);
 
-					return (k);
+					return k;
 				}
 
 	}
 
-	return (0);
+	return 0;
 
 }
 
@@ -4249,7 +4249,7 @@ int var_exists(char name[20], int scope) {
 
 				if (play.var[i].scope == scope) { //redink1 changed to check recursively... then changed back.  Hrm.
 					//Msg("Found match for %s.", name);
-					return (i);
+					return i;
 				}
 			}
 
@@ -4258,7 +4258,7 @@ int var_exists(char name[20], int scope) {
 		}
 	}
 
-	return (0);
+	return 0;
 }
 
 //redink1 added this to make new global functions
@@ -4328,7 +4328,7 @@ int var_equals(char name[20], char newname[20], char math_, int script, char res
 
 	if (name[0] != '&') {
 		Msg("ERROR (var equals): Unknown var %s in %s offset %d.", name, rinfo[script]->name, rinfo[script]->current);
-		return (0);
+		return 0;
 	}
 
 	int i = get_var(script, name);
@@ -4358,7 +4358,7 @@ int var_equals(char name[20], char newname[20], char math_, int script, char res
 
 
 	Msg("ERROR: (var equals2) Unknown var %s in %s offset %d.", name, rinfo[script]->name, rinfo[script]->current);
-	return (0);
+	return 0;
 
 next:
 
@@ -4480,7 +4480,7 @@ next2:
 	if (math_ == '*')
 		play.var[i].var = play.var[i].var * newval;
 
-	return (newret);
+	return newret;
 }
 
 void kill_scripts_owned_by(int sprite) {
@@ -4628,7 +4628,7 @@ morestuff:
 			talk.page = 1;
 			talk.cur_view = 1;
 			talk.script = script;
-			return (true);
+			return true;
 
 		}
 
@@ -4710,12 +4710,12 @@ bool nothing_playing() {
 		return false;
 		//mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);
 	}
-	//  return (dwReturn);
+	//  return dwReturn;
 
 
 
 
-	if (mciStatusParms.dwReturn == MCI_MODE_PLAY) return (true);
+	if (mciStatusParms.dwReturn == MCI_MODE_PLAY) return true;
 	else
 		return false;
 #else
@@ -4748,11 +4748,11 @@ bool cdplaying() {
 		return false;
 		//mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);
 	}
-	//  return (dwReturn);
+	//  return dwReturn;
 	Msg("Mode returned %d..",   mciStatusParms.dwReturn);
 
 	if (mciStatusParms.dwReturn != last_cd) return false;
-	else return (true);
+	else return true;
 #else
 	error("TODO");
 #endif
@@ -4796,7 +4796,7 @@ uint32 playMIDIFile(HWND hWndNotify, LPCSTR lpszMIDIFileName) {
 
 		mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);
 
-		return (dwReturn);
+		return dwReturn;
 	}
 	// The device opened successfully; get the device ID.
 	midi_id = mciOpenParms.wDeviceID;
@@ -4807,7 +4807,7 @@ uint32 playMIDIFile(HWND hWndNotify, LPCSTR lpszMIDIFileName) {
 	                              MCI_STATUS_ITEM, (uint32)(LPVOID) &mciStatusParms)) {
 		Msg("Status says no?");
 		mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);
-		return (dwReturn);
+		return dwReturn;
 	}    // The output port is not the MIDI mapper.
 	// Ask if the user wants to continue.
 	/*if (LOWORD(mciStatusParms.dwReturn) != MIDI_MAPPER)
@@ -4823,7 +4823,7 @@ uint32 playMIDIFile(HWND hWndNotify, LPCSTR lpszMIDIFileName) {
 	mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);
 
 
-	return (0L);
+	return 0L;
 
 	}
 	*/
@@ -4834,11 +4834,11 @@ uint32 playMIDIFile(HWND hWndNotify, LPCSTR lpszMIDIFileName) {
 	if (dwReturn = mciSendCommand(midi_id, MCI_PLAY, MCI_NOTIFY,
 	                              (uint32)(LPVOID) &mciPlayParms)) {
 		mciSendCommand(midi_id, MCI_CLOSE, 0, NULL);
-		return (dwReturn);
+		return dwReturn;
 	}
 
 
-	return (0L);
+	return 0L;
 
 #else
 	error("TODO");
@@ -4879,13 +4879,13 @@ bool PlayMidi(const char *sFileName) {
 	//killcd(g_hWnd, 1);
 
 	playMIDIFile(g_hWnd, crap);
-	return (true);
+	return true;
 
 	sprintf(buf, "open %s type sequencer alias MUSIC", crap);
 
 	if (mciSendString("close MUSIC", NULL, 0, NULL) != 0) {
 		Msg("Couldn't close current midi..");
-		//  return(false);
+		//  return false;
 	}
 
 	if (mciSendString(buf, NULL, 0, NULL) != 0) {
@@ -4954,7 +4954,7 @@ uint32 killcd(HWND hWndNotify, BYTE bTrack) {
 	if (dwReturn = mciSendCommand(NULL, MCI_OPEN,
 	                              MCI_OPEN_TYPE, (uint32)(LPVOID) &mciOpenParms)) {
 		// Failed to open device. Don't close it; just return error.
-		return (dwReturn);
+		return dwReturn;
 	}
 	// The device opened successfully; get the device ID.
 	CD_ID = mciOpenParms.wDeviceID;
@@ -4963,7 +4963,7 @@ uint32 killcd(HWND hWndNotify, BYTE bTrack) {
 	if (dwReturn = mciSendCommand(CD_ID, MCI_SET,
 	                              MCI_SET_TIME_FORMAT, (uint32)(LPVOID) &mciSetParms)) {
 		mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);
-		return (dwReturn);
+		return dwReturn;
 	}     // Begin playback from the given track and play until the beginning
 	// of the next track. The window procedure function for the parent
 	// window will be notified with an MM_MCINOTIFY message when
@@ -4976,9 +4976,9 @@ uint32 killcd(HWND hWndNotify, BYTE bTrack) {
 	if (dwReturn = mciSendCommand(CD_ID, MCI_STOP,
 	                              MCI_FROM | MCI_TO | MCI_NOTIFY, (uint32)(LPVOID) &mciPlayParms)) {
 		mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);
-		return (dwReturn);
+		return dwReturn;
 	}
-	return (0L);
+	return 0L;
 
 	mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);
 
@@ -5009,7 +5009,7 @@ uint32 PlayCD(HWND hWndNotify, BYTE bTrack) {
 	                              MCI_OPEN_TYPE, (uint32)(LPVOID) &mciOpenParms)) {
 		// Failed to open device. Don't close it; just return error.
 		Msg("Couldn't open CD music...");
-		return (dwReturn);
+		return dwReturn;
 	}
 	// The device opened successfully; get the device ID.
 
@@ -5022,7 +5022,7 @@ uint32 PlayCD(HWND hWndNotify, BYTE bTrack) {
 	if (dwReturn = mciSendCommand(CD_ID, MCI_SET,
 	                              MCI_SET_TIME_FORMAT, (uint32)(LPVOID) &mciSetParms)) {
 		mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);
-		return (dwReturn);
+		return dwReturn;
 	}     // Begin playback from the given track and play until the beginning
 	// of the next track. The window procedure function for the parent
 	// window will be notified with an MM_MCINOTIFY message when
@@ -5035,9 +5035,9 @@ uint32 PlayCD(HWND hWndNotify, BYTE bTrack) {
 	if (dwReturn = mciSendCommand(CD_ID, MCI_PLAY,
 	                              MCI_FROM | MCI_TO | MCI_NOTIFY, (uint32)(LPVOID) &mciPlayParms)) {
 		mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);
-		return (dwReturn);
+		return dwReturn;
 	}
-	return (0L);
+	return 0L;
 
 #else
 	error("TODO");
@@ -5073,7 +5073,7 @@ uint32 getCDTrackStartTimes() {
 
 		mciGetErrorString(dwReturn, error, 200);
 		Msg(":  %s", error);
-		return (dwReturn);
+		return dwReturn;
 	}
 // The device opened successfully; get the device ID.
 
@@ -5085,7 +5085,7 @@ uint32 getCDTrackStartTimes() {
 	if (dwReturn = mciSendCommand(wDeviceID, MCI_SET,
 	                              MCI_SET_TIME_FORMAT, (uint32)(LPVOID) &mciSetParms))     {
 		mciSendCommand(wDeviceID, MCI_CLOSE, 0, NULL);
-		return (dwReturn);
+		return dwReturn;
 	}    // Get the number of tracks;
 	// limit to number that can be displayed (20).
 	mciStatusParms.dwItem = MCI_STATUS_NUMBER_OF_TRACKS;
@@ -5093,7 +5093,7 @@ uint32 getCDTrackStartTimes() {
 	                              MCI_STATUS_ITEM, (uint32)(LPVOID) &mciStatusParms)) {
 		Msg("Error reading cd 44.");
 		mciSendCommand(wDeviceID, MCI_CLOSE, 0, NULL);
-		return (dwReturn);
+		return dwReturn;
 	}
 
 	iNumTracks = mciStatusParms.dwReturn;
@@ -5105,7 +5105,7 @@ uint32 getCDTrackStartTimes() {
 	{
 		mciSendCommand(wDeviceID, MCI_CLOSE, 0, NULL);
 
-		return (dwReturn);
+		return dwReturn;
 
 	}
 
@@ -5114,7 +5114,7 @@ uint32 getCDTrackStartTimes() {
 	pMem = (uint32 *)LocalAlloc(LPTR,         iNumTracks * sizeof(uint32));
 	if (pMem == NULL)     {
 		mciSendCommand(wDeviceID, MCI_CLOSE, 0, NULL);
-		return (-1);
+		return -1;
 	}
 	// For each track, get and save the starting location and
 	// build a string containing starting locations.
@@ -5125,7 +5125,7 @@ uint32 getCDTrackStartTimes() {
 		                              MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK,
 		                              (uint32)(LPVOID) &mciStatusParms)) {
 			mciSendCommand(wDeviceID, MCI_CLOSE, 0, NULL);
-			return (dwReturn);
+			return dwReturn;
 		}
 		pMem[i - 1] = mciStatusParms.dwReturn;
 		wsprintf(szTempString,
@@ -5163,9 +5163,9 @@ uint32 getCDTrackStartTimes() {
 
 
 
-		return (dwReturn);
+		return dwReturn;
 	}
-	return (0L);
+	return 0L;
 #else
 	error("TODO");
 #endif
@@ -5290,14 +5290,14 @@ int change_sprite_inner(int h,  int val, int *change) {
 
 	if (h < 1) {
 		Msg("Error with an SP command - Sprite %d is invalid.", h);
-		return (-1);
+		return -1;
 	}
-	if (spr[h].active == false) return (-1);
+	if (spr[h].active == false) return -1;
 	if (val != -1) {
 		*change = val;
 	}
 
-	return (*change);
+	return *change;
 
 }
 
@@ -5314,38 +5314,37 @@ long change_sprite(int h,  int val, TYPE *change) {
 int change_edit(int h,  int val, unsigned short *change) {
 	//Msg("Searching sprite %s with val %d.  Cur is %d", h, val, *change);
 
-	if (h > 99) return (-1);
-	if (h < 1) return (-1);
+	if (h > 99) return -1;
+	if (h < 1) return -1;
 	if (val != -1) {
 		*change = val;
 	}
 
-	return (*change);
+	return *change;
 
 }
 int change_edit_char(int h,  int val, unsigned char *change) {
 	//Msg("Searching sprite %s with val %d.  Cur is %d", h, val, *change);
 	//  Msg("h is %d..",val);
-	if (h > 99) return (-1);
-	if (h < 1) return (-1);
+	if (h > 99) return -1;
+	if (h < 1) return -1;
 	if (val != -1) {
 		*change = val;
 	}
 
-	return (*change);
-
+	return *change;
 }
 
 
 int change_sprite_noreturn(int h,  int val, int *change) {
 	//Msg("Searching sprite %s with val %d.  Cur is %d", h, val, *change);
-	if (spr[h].active == false) return (-1);
+	if (spr[h].active == false) return -1;
 
 	{
 		*change = val;
 	}
 
-	return (*change);
+	return *change;
 
 }
 
@@ -5955,7 +5954,7 @@ crazy:
 		spr[found].active = false;
 		if (nosetlast == false)
 			last_sprite_created = found - 1;
-		return (true);
+		return true;
 	}
 
 	//we didn't kill any sprites, only 1 remains
@@ -6043,7 +6042,7 @@ again1:
 
 int hurt_thing(int h, int damage, int special) {
 	//lets hurt this sprite but good
-	if (damage < 1) return (0);
+	if (damage < 1) return 0;
 	int num = damage - spr[h].defense;
 
 	//  Msg("num is %d.. defense was %d.of sprite %d", num, spr[h].defense, h);
@@ -6055,7 +6054,7 @@ int hurt_thing(int h, int damage, int special) {
 	}
 
 	spr[h].damage += num;
-	return (num);
+	return num;
 	//draw blood here
 }
 
@@ -6456,7 +6455,7 @@ int process_line(int script, char *s, bool doelse) {
 	for (int kk = 1; kk < 15; kk++) ev[kk][0] = 0;
 	//refinfo save_rinfo;
 	h = s;
-	if (h[0] == 0) return (0);
+	if (h[0] == 0) return 0;
 	if ((h[0] == '/') && (h[1] == '/'))
 
 	{
@@ -6480,14 +6479,14 @@ pass:
 		}
 
 		//Msg("returning..");
-		return (2);
+		return 2;
 	}
 	//replace("\n","",ev[1]);
 	if (ev[1][strlen(ev[1]) - 1] == ':') if (strlen(ev[2]) < 2) if (strncmp(ev[1], "say", 3) != 0)
 
 			{
 				//  Msg("Found label %s..",ev[1]);
-				return (0); //its a label
+				return 0; //its a label
 			}
 	if (ev[1][0] == '(') {
 		//this procedure has been passed a conditional statement finder
@@ -6513,7 +6512,7 @@ pass:
 			sprintf(line, "%d == %s", returnint, temp);
 			returnint = var_figure(line, script);
 			strcpy(h, "\n");
-			return (0);
+			return 0;
 		}
 
 		if (strchr(temp, '>') != NULL) {
@@ -6524,7 +6523,7 @@ pass:
 			sprintf(line, "%d > %s", returnint, temp);
 			returnint = var_figure(line, script);
 			strcpy(h, "\n");
-			return (0);
+			return 0;
 		}
 
 		if (strchr(temp, '<') != NULL) {
@@ -6535,7 +6534,7 @@ pass:
 			sprintf(line, "%d < %s", returnint, temp);
 			returnint = var_figure(line, script);
 			strcpy(h, "\n");
-			return (0);
+			return 0;
 		}
 		if (strchr(temp, '<=') != NULL) {
 			h = &h[1];
@@ -6545,7 +6544,7 @@ pass:
 			sprintf(line, "%d <= %s", returnint, temp);
 			returnint = var_figure(line, script);
 			strcpy(h, "\n");
-			return (0);
+			return 0;
 		}
 		if (strchr(temp, '>=') != NULL) {
 			h = &h[1];
@@ -6555,7 +6554,7 @@ pass:
 			sprintf(line, "%d >= %s", returnint, temp);
 			returnint = var_figure(line, script);
 			strcpy(h, "\n");
-			return (0);
+			return 0;
 		}
 
 		if (strchr(temp, '!=') != NULL) {
@@ -6566,7 +6565,7 @@ pass:
 			sprintf(line, "%d != %s", returnint, temp);
 			returnint = var_figure(line, script);
 			strcpy(h, "\n");
-			return (0);
+			return 0;
 		}
 
 
@@ -6583,7 +6582,7 @@ pass:
 			strcpy(s, line);
 
 			//  Msg("Returing %s..", s);
-			return (0);
+			return 0;
 		} else {
 			h = &h[1];
 
@@ -6593,7 +6592,7 @@ pass:
 
 			strcpy(s, h);
 
-			return (0);
+			return 0;
 		}
 
 		strip_beginning_spaces(h);
@@ -6645,7 +6644,7 @@ pass:
 				strip_beginning_spaces(h);
 
 				strcpy(s, h);
-				return (4);
+				return 4;
 			}
 		goto good;
 	}
@@ -6665,7 +6664,7 @@ pass:
 			kill_script(script);
 		}
 
-		return (2);
+		return 2;
 	}
 
 
@@ -6674,7 +6673,7 @@ pass:
 
 
 		if (rinfo[script]->onlevel > 0) {
-			if (rinfo[script]->level > rinfo[script]->onlevel) return (0);
+			if (rinfo[script]->level > rinfo[script]->onlevel) return 0;
 
 		}
 		rinfo[script]->onlevel = 0;
@@ -6683,7 +6682,7 @@ pass:
 			//sorry, can't do it, you were told to skip the next thing
 			rinfo[script]->skipnext = false;
 			strcpy(s, h);
-			return (3);
+			return 3;
 		}
 
 		//if (debug_mode) Msg("%s",s);
@@ -6692,7 +6691,7 @@ pass:
 		if (compare(ev[1], "void")) {
 			Msg("ERROR: Missing } in %s, offset %d.", rinfo[script]->name, rinfo[script]->current);
 			strcpy(s, h);
-			return (2);
+			return 2;
 		}
 
 		if (compare(ev[1], "else")) {
@@ -6712,7 +6711,7 @@ pass:
 
 			}
 			strcpy(s, h);
-			return (1);
+			return 1;
 
 		}
 
@@ -6754,7 +6753,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 - clears the editor information, useful for save games and such
@@ -6769,7 +6768,7 @@ pass:
 				}
 			}
 			returnint = 1;
-			return (0);
+			return 0;
 		}
 
 		//redink1 - returns the number of variables used
@@ -6780,7 +6779,7 @@ pass:
 				if (play.var[ii].active == true)
 					m++;
 			returnint = m;
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function to load a new map/dink.dat
@@ -6794,7 +6793,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -6818,7 +6817,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function to load new tiles, because he is a l33t guy
@@ -6842,7 +6841,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function to change the save game 'info'
@@ -6853,7 +6852,7 @@ pass:
 				strcpy(save_game_info, slist[0]);
 			}
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function to show the item screen
@@ -6861,7 +6860,7 @@ pass:
 			h = &h[strlen(ev[1])];
 			item_screen = true;
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function,, and took it away.
@@ -6882,7 +6881,7 @@ pass:
 		}
 		}
 		strcpy(s, h);
-		return(0);
+		return 0;
 		}*/
 
 		//redink1 added this function
@@ -6891,7 +6890,7 @@ pass:
 			returnint = play.minutes +
 			            (g_events->getTotalSeconds() / 60);
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function
@@ -6902,7 +6901,7 @@ pass:
 
 			returnint = td.tm_hour * 60 + td.tm_min;
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function
@@ -6912,7 +6911,7 @@ pass:
 			g_system->getTimeAndDate(td);
 			returnint = td.tm_year;
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function
@@ -6922,7 +6921,7 @@ pass:
 			g_system->getTimeAndDate(td);
 			returnint = td.tm_mon;
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function
@@ -6932,7 +6931,7 @@ pass:
 			g_system->getTimeAndDate(td);
 			returnint = td.tm_mday;
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function
@@ -6943,7 +6942,7 @@ pass:
 				returnint = abs(nlist[0]);
 			}
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function
@@ -6956,7 +6955,7 @@ pass:
 		        returnint = sin((double)nlist[0]);
 		    }
 		    strcpy(s, h);
-		    return(0);
+		    return 0;
 		}
 
 		//redink1 added this function
@@ -6969,7 +6968,7 @@ pass:
 		        returnint = cos((double)nlist[0]);
 		    }
 		    strcpy(s, h);
-		    return(0);
+		    return 0;
 		}
 
 		//redink1 added this function
@@ -6982,7 +6981,7 @@ pass:
 		        returnint = tan((double)nlist[0]);
 		    }
 		    strcpy(s, h);
-		    return(0);
+		    return 0;
 		}*/
 
 		//redink1 added this function
@@ -6993,7 +6992,7 @@ pass:
 				returnint = sqrt((double)abs(nlist[0]));
 			}
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this function
@@ -7004,7 +7003,7 @@ pass:
 				returnint = (nlist[0] % nlist[1]);
 			}
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1
@@ -7028,10 +7027,10 @@ pass:
 
 					returnint = spr[nlist[1]].custom->find(slist[0])->_value;
 				}
-				return (0);
+				return 0;
 			}
 			returnint = -1;
-			return (0);
+			return 0;
 		}
 
 		//redink1
@@ -7043,10 +7042,10 @@ pass:
 
 				returnint = spr[nlist[0]].bloodseq;
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		//redink1
@@ -7058,10 +7057,10 @@ pass:
 
 				returnint = spr[nlist[0]].bloodseq;
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		//redink1 added to get index of specified item
@@ -7078,10 +7077,10 @@ pass:
 						}
 					}
 				}
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		//redink1 added to get index of specified magic spell
@@ -7098,10 +7097,10 @@ pass:
 						}
 					}
 				}
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		//redink1 clip stuff
@@ -7113,10 +7112,10 @@ pass:
 
 				returnint = spr[nlist[0]].alt.left;
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		//redink1 clip stuff
@@ -7128,10 +7127,10 @@ pass:
 
 				returnint = spr[nlist[0]].alt.top;
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		//redink1 clip stuff
@@ -7143,10 +7142,10 @@ pass:
 
 				returnint = spr[nlist[0]].alt.right;
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		//redink1 clip stuff
@@ -7158,10 +7157,10 @@ pass:
 
 				returnint = spr[nlist[0]].alt.bottom;
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		//redink1 added so users can check truecolor or not
@@ -7169,7 +7168,7 @@ pass:
 			h = &h[strlen(ev[1])];
 			returnint = truecolor;
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added so developers can change or see what tile is at any given position
@@ -7184,11 +7183,11 @@ pass:
 						pam.t[nlist[0] - 1].num = nlist[1];
 					}
 					returnint = pam.t[nlist[0] - 1].num;
-					return (0);
+					return 0;
 				}
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		//redink1 added so a developer can retrieve/modify a hard tile
@@ -7203,11 +7202,11 @@ pass:
 						pam.t[nlist[0] - 1].althard = nlist[1];
 					}
 					returnint = pam.t[nlist[0] - 1].althard;
-					return (0);
+					return 0;
 				}
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "unfreeze")) {
@@ -7223,7 +7222,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "freeze")) {
@@ -7239,7 +7238,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7254,7 +7253,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		// redink1 added
@@ -7268,7 +7267,7 @@ pass:
 				}
 			}
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "set_dink_speed")) {
@@ -7280,7 +7279,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1
@@ -7292,7 +7291,7 @@ pass:
 				mDinkBasePush = nlist[0];
 			}
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "reset_timer")) {
@@ -7301,7 +7300,7 @@ pass:
 			time(&time_start);
 			play.minutes = 0;
 			strcpy(s, h);
-			return (0);
+			return 0;
 #else
 			error("TODO: reset_timer");
 #endif
@@ -7318,7 +7317,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7333,7 +7332,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "add_exp")) {
@@ -7345,7 +7344,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7358,7 +7357,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7371,7 +7370,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "kill_this_magic")) {
@@ -7383,7 +7382,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7398,7 +7397,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (2);
+			return 2;
 		}
 
 
@@ -7409,13 +7408,13 @@ pass:
 			wait.script = script;
 			wait.active = true;
 			wait.button = 0;
-			return (2);
+			return 2;
 		}
 
 		if (compare(ev[1], "stop_wait_for_button")) {
 			wait.active = false;
 
-			return (0);
+			return 0;
 		}
 
 
@@ -7428,7 +7427,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7442,7 +7441,7 @@ pass:
 
 				if (nlist[1] == 0) {
 					Msg("Say_stop error:  Sprite 0 can talk? Yeah, didn't think so.");
-					return (0);
+					return 0;
 				}
 
 				if (nlist[1] != 1000)
@@ -7453,17 +7452,17 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "draw_screen")) {
 
 			if (rinfo[script]->sprite == 1000) {
 				draw_map_game();
-				return (0);
+				return 0;
 			}
 			draw_map_game();
-			return (2);
+			return 2;
 		}
 
 
@@ -7474,14 +7473,14 @@ pass:
 					returnint += 1;
 				}
 			}
-			return (0);
+			return 0;
 		}
 
 
 		if (compare(ev[1], "kill_cur_item")) {
 			returnint = 0;
 			kill_cur_item();
-			return (2);
+			return 2;
 		}
 
 
@@ -7489,7 +7488,7 @@ pass:
 		if (compare(ev[1], "kill_cur_magic")) {
 			returnint = 0;
 			kill_cur_magic();
-			return (2);
+			return 2;
 		}
 
 
@@ -7502,7 +7501,7 @@ pass:
 					returnint += 1;
 				}
 			}
-			return (0);
+			return 0;
 		}
 
 
@@ -7510,7 +7509,7 @@ pass:
 
 		if (compare(ev[1], "draw_status")) {
 			draw_status_all();
-			return (0);
+			return 0;
 		}
 
 
@@ -7521,7 +7520,7 @@ pass:
 			if (locate(weapon_script, "ARM")) run_script(weapon_script);
 
 
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "arm_magic")) {
@@ -7531,7 +7530,7 @@ pass:
 			magic_script = load_script(play.mitem[*pcur_magic].name, 1000, false);
 			if (locate(magic_script, "ARM")) run_script(magic_script);
 
-			return (0);
+			return 0;
 		}
 
 
@@ -7543,7 +7542,7 @@ pass:
 			//redink1 fix for correct indicator on mini-map
 			if (map.indoor[*pmap] == 0)
 				play.last_map = *pmap;
-			return (0);
+			return 0;
 		}
 
 
@@ -7553,10 +7552,10 @@ pass:
 			if (talk_get(script)) {
 
 				//      Msg("Question gathered successfully.");
-				return (2);
+				return 2;
 			}
 
-			return (0);
+			return 0;
 		}
 
 
@@ -7567,7 +7566,7 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				if (nlist[1] == 0) {
 					Msg("Say_stop error:  Sprite 0 can talk? Yeah, didn't think so.");
-					return (0);
+					return 0;
 				}
 
 				kill_text_owned_by(nlist[1]);
@@ -7583,12 +7582,12 @@ pass:
 
 				strcpy(s, h);
 
-				return (2);
+				return 2;
 
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7602,7 +7601,7 @@ pass:
 
 				if (text_owned_by(nlist[1])) {
 					returnint = 0;
-					return (0);
+					return 0;
 				}
 
 				kill_returning_stuff(script);
@@ -7612,12 +7611,12 @@ pass:
 				spr[sprite].callback = script;
 				strcpy(s, h);
 
-				return (2);
+				return 2;
 
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7636,12 +7635,12 @@ pass:
 				play.last_talk = script;
 				strcpy(s, h);
 
-				return (2);
+				return 2;
 
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7655,12 +7654,12 @@ pass:
 				sprite = say_text_xy(slist[0], nlist[1], nlist[2], script);
 				returnint = sprite;
 				strcpy(s, h);
-				return (0);
+				return 0;
 
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "restart_game")) {
@@ -7680,7 +7679,7 @@ pass:
 			run_script(scriptMain);
 			//lets attach our vars to the scripts
 			attach();
-			return (2);
+			return 2;
 		}
 
 		if (compare(ev[1], "wait")) {
@@ -7693,11 +7692,11 @@ pass:
 				kill_returning_stuff(script);
 				add_callback("", nlist[0], 0, script);
 
-				return (2);
+				return 2;
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "preload_seq")) {
@@ -7709,7 +7708,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7724,7 +7723,7 @@ pass:
 				rinfo[script]->sprite = nlist[0];
 			}
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "draw_hard_sprite")) {
@@ -7745,7 +7744,7 @@ pass:
 
 			}
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7766,7 +7765,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7777,12 +7776,12 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				if (nlist[0] == 0) {
 					Msg("Error: sp_script cannot process sprite 0??");
-					return (0);
+					return 0;
 				}
 				kill_scripts_owned_by(nlist[0]);
 				if (load_script(slist[1], nlist[0], true) == 0) {
 					returnint = 0;
-					return (0);
+					return 0;
 				}
 				if (no_running_main == true) Msg("Not running %s until later..", rinfo[spr[nlist[0]].script]->name);
 
@@ -7800,7 +7799,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7812,7 +7811,7 @@ pass:
 				int mysc = load_script(slist[0], 1000, true);
 				if (mysc == 0) {
 					returnint = 0;
-					return (0);
+					return 0;
 				}
 				locate(mysc, "MAIN");
 				int tempreturn = mysc;
@@ -7821,7 +7820,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "run_script_by_number")) {
@@ -7836,7 +7835,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7849,7 +7848,7 @@ pass:
 			fill_hard_sprites();
 			fill_back_sprites();
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -7859,7 +7858,7 @@ pass:
 			// (sprite, direction, until, nohard);
 			draw_map_game_background();
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "fade_down")) {
@@ -7870,7 +7869,7 @@ pass:
 
 			strcpy(s, h);
 
-			return (2);
+			return 2;
 		}
 
 		if (compare(ev[1], "fade_up")) {
@@ -7880,7 +7879,7 @@ pass:
 			cycle_script = script;
 
 			strcpy(s, h);
-			return (2);
+			return 2;
 		}
 
 		if (compare(ev[1], "kill_this_task")) {
@@ -7889,7 +7888,7 @@ pass:
 				run_script(rinfo[script]->proc_return);
 			}
 			kill_script(script);
-			return (2);
+			return 2;
 		}
 
 		if (compare(ev[1], "kill_game")) {
@@ -7898,7 +7897,7 @@ pass:
 			Msg("Was told to kill game, so doing it like a good boy.");
 			//  PostMessage(hWndMain, WM_CLOSE, 0, 0);
 			finiObjects();
-			return (2);
+			return 2;
 		}
 
 
@@ -7923,7 +7922,7 @@ pass:
 		    }
 		    //InitSound(hWndMain);
 		    strcpy(s, h);
-		    return(2);
+		    return 2;
 
 		}*/
 
@@ -7956,12 +7955,12 @@ pass:
 					if (cd_inserted) {
 						if (regm == last_cd)
 							if (cdplaying())
-								return (2);
+								return 2;
 						Msg("Playing CD track %d.", regm - 1000);
 
 						PlayCD(g_hWnd, regm - 1000);
 						strcpy(s, h);
-						return (0);
+						return 0;
 					}   else {
 						char hold[255];
 						//cd isn't instered, can't play CD song!!!
@@ -7974,33 +7973,33 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 		if (compare(ev[1], "stopmidi")) {
 			// (sprite, direction, until, nohard);
 			h = &h[strlen(ev[1])];
 			StopMidi();
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "kill_all_sounds")) {
 			kill_repeat_sounds_all();
 			strcpy(s, h);
-			return (0);
+			return 0;
 
 		}
 
 		if (compare(ev[1], "turn_midi_off")) {
 			midi_active = false;
 			strcpy(s, h);
-			return (0);
+			return 0;
 
 		}
 		if (compare(ev[1], "turn_midi_on")) {
 			midi_active = true;
 			strcpy(s, h);
-			return (0);
+			return 0;
 
 		}
 
@@ -8018,7 +8017,7 @@ pass:
 				returnint = 0;
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8035,7 +8034,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8055,7 +8054,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8073,7 +8072,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8088,7 +8087,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8107,7 +8106,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "fill_screen")) {
@@ -8120,7 +8119,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8137,11 +8136,11 @@ pass:
 
 				*pupdate_status = 1;
 				draw_status_all();
-				return (2);
+				return 2;
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "game_exist")) {
@@ -8156,7 +8155,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8174,12 +8173,12 @@ pass:
 				spr[nlist[0]].move_script = script;
 				strcpy(s, h);
 				if (debug_mode) Msg("Move_stop: Sprite %d, dir %d, num %d", nlist[0], nlist[1], nlist[2]);
-				return (2);
+				return 2;
 
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8197,7 +8196,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8214,14 +8213,14 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
 		if (compare(ev[1], "goto")) {
 
 			locate_goto(ev[2], script);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added for global functions
@@ -8235,7 +8234,7 @@ pass:
 				//Msg(slist[0]);
 			}
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "make_global_int")) {
@@ -8249,7 +8248,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8266,10 +8265,10 @@ pass:
 				strip_beginning_spaces(h);
 				//Msg("Found =...continuing equation");
 				strcpy(s, h);
-				return (4);
+				return 4;
 			}
 
-			return (0);
+			return 0;
 
 		}
 
@@ -8293,7 +8292,7 @@ pass:
 			}  else Msg("Failed getting parms for Busy()");
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		//redink1 added
@@ -8318,7 +8317,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "inside_box")) {
@@ -8340,7 +8339,7 @@ pass:
 			}  else Msg("Failed getting parms for inside_box");
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8352,7 +8351,7 @@ pass:
 			}  else Msg("Failed getting parms for Random()");
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "initfont")) {
@@ -8365,7 +8364,7 @@ pass:
 			}  else Msg("Failed getting parms for Initfont()");
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8373,14 +8372,14 @@ pass:
 			h = &h[strlen(ev[1])];
 			returnint = dversion;
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "get_burn")) {
 			h = &h[strlen(ev[1])];
 			returnint = burn_revision;
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "set_mode")) {
@@ -8392,7 +8391,7 @@ pass:
 			}  else Msg("Failed to set mode");
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "kill_shadow")) {
@@ -8411,7 +8410,7 @@ pass:
 			}
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -8425,10 +8424,10 @@ pass:
 				                            nlist[3], nlist[4],
 				                            100);
 
-				return (0);
+				return 0;
 			}
 			returnint =  0;
-			return (0);
+			return 0;
 		}
 
 
@@ -8443,7 +8442,7 @@ pass:
 
 						if (debug_mode) Msg("Sp returned %d.", ii);
 						returnint = ii;
-						return (0);
+						return 0;
 					}
 
 				}
@@ -8453,7 +8452,7 @@ pass:
 
 			}
 			returnint =  0;
-			return (0);
+			return 0;
 		}
 
 
@@ -8466,7 +8465,7 @@ pass:
 				returnint =  spr[nlist[0]].script;
 
 			}
-			return (0);
+			return 0;
 		}
 
 
@@ -8479,10 +8478,10 @@ pass:
 
 				if (nlist[1] != -1) changedir(spr[nlist[0]].dir, nlist[0], spr[nlist[0]].base_walk);
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8492,10 +8491,10 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].range);
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8504,10 +8503,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].nocontrol);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_nodraw")) {
@@ -8515,10 +8514,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].nodraw);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8527,10 +8526,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].picfreeze);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8544,7 +8543,7 @@ pass:
 						(spr[i].active == 1) {
 							Msg("Ok, sprite with brain %d is %d", nlist[0], i);
 							returnint = i;
-							return (0);
+							return 0;
 						}
 
 				}
@@ -8552,7 +8551,7 @@ pass:
 			Msg("Ok, sprite with brain %d is 0", nlist[0], i);
 
 			returnint =  0;
-			return (0);
+			return 0;
 		}
 
 		//redink1 added this to make Paul Pliska's life more fulfilling
@@ -8565,7 +8564,7 @@ pass:
 						(spr[i].active == 1) {
 							Msg("Ok, sprite with brain %d is %d", nlist[0], i);
 							returnint = i;
-							return (0);
+							return 0;
 						}
 
 				}
@@ -8573,7 +8572,7 @@ pass:
 			Msg("Ok, sprite with brain %d is 0", nlist[0], i);
 
 			returnint =  0;
-			return (0);
+			return 0;
 		}
 
 
@@ -8595,7 +8594,7 @@ pass:
 				if (cter == 0) {
 					Msg("Get rand brain can't find any brains with %d.", nlist[0]);
 					returnint =  0;
-					return (0);
+					return 0;
 				}
 
 				int mypick = RANDOM(1, cter);
@@ -8606,7 +8605,7 @@ pass:
 							cter++;
 							if (cter == mypick) {
 								returnint = ii;
-								return (0);
+								return 0;
 							}
 						}
 
@@ -8617,7 +8616,7 @@ pass:
 
 
 			returnint =  0;
-			return (0);
+			return 0;
 		}
 
 
@@ -8632,10 +8631,10 @@ pass:
 					SoundPlayEffect(spr[nlist[0]].sound, 22050, 0, nlist[0], 1);
 
 				}
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_attack_wait")) {
@@ -8644,10 +8643,10 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 
 				returnint = change_sprite(nlist[0], nlist[1] + thisTickCount, &spr[nlist[0]].attack_wait);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8659,10 +8658,10 @@ pass:
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].active);
 
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_disabled")) {
@@ -8673,10 +8672,10 @@ pass:
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].disabled);
 
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_size")) {
@@ -8684,10 +8683,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].size);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 		if (compare(ev[1], "activate_bow")) {
 
@@ -8705,14 +8704,14 @@ pass:
 			bowsound->Play(0, 0, DSBPLAY_LOOPING);
 			*/
 
-			return (2);
+			return 2;
 		}
 
 		if (compare(ev[1], "get_last_bow_power")) {
 
 
 			returnint = bow.last_power;
-			return (0);
+			return 0;
 		}
 
 
@@ -8721,10 +8720,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].que);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_gold")) {
@@ -8732,10 +8731,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].gold);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_base_walk")) {
@@ -8743,10 +8742,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_walk);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8755,17 +8754,17 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].target);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "stopcd")) {
 			mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);
 			Msg("Stopped cd");
 			killcd(hWndMain, 1);
-			return (0);
+			return 0;
 		}
 
 
@@ -8774,10 +8773,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_hit);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_base_attack")) {
@@ -8785,10 +8784,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_attack);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8797,10 +8796,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_idle);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8809,22 +8808,22 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].base_die);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
 		if (compare(ev[1], "disable_all_sprites")) {
 			for (int jj = 1; jj < last_sprite_created; jj++)
 				if (spr[jj].active) spr[jj].disabled = true;
-			return (0);
+			return 0;
 		}
 		if (compare(ev[1], "enable_all_sprites")) {
 			for (int jj = 1; jj < last_sprite_created; jj++)
 				if (spr[jj].active) spr[jj].disabled = false;
-			return (0);
+			return 0;
 		}
 
 
@@ -8833,10 +8832,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].pseq);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8845,10 +8844,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].pframe);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8857,10 +8856,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].seq);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "editor_type")) {
@@ -8869,20 +8868,20 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				//Msg("Setting editor_type..");
 				returnint = change_edit_char(nlist[0], nlist[1], &play.spmap[*pmap].type[nlist[0]]);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 		if (compare(ev[1], "editor_seq")) {
 			h = &h[strlen(ev[1])];
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_edit(nlist[0], nlist[1], &play.spmap[*pmap].seq[nlist[0]]);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "editor_frame")) {
@@ -8890,10 +8889,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_edit_char(nlist[0], nlist[1], &play.spmap[*pmap].frame[nlist[0]]);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8903,10 +8902,10 @@ pass:
 			int ARR[20] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = spr[nlist[0]].sp_index;
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_brain")) {
@@ -8914,10 +8913,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].brain);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_exp")) {
@@ -8925,10 +8924,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].exp);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 		if (compare(ev[1], "set_button")) {
 			h = &h[strlen(ev[1])];
@@ -8937,10 +8936,10 @@ pass:
 
 				play.button[nlist[0]] = nlist[1];
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8949,10 +8948,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].reverse);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8961,10 +8960,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].noclip);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8973,10 +8972,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].touch_damage);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -8986,20 +8985,20 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].brain_parm);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 		if (compare(ev[1], "sp_brain_parm2")) {
 			h = &h[strlen(ev[1])];
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].brain_parm2);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_follow")) {
@@ -9007,10 +9006,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].follow);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "set_smooth_follow")) {
@@ -9022,10 +9021,10 @@ pass:
 				} else if (nlist[0] == 1) {
 					smooth_follow = true;
 				}
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_frame")) {
@@ -9033,10 +9032,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].frame);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_frame_delay")) {
@@ -9044,10 +9043,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].frame_delay);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9057,7 +9056,7 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				//redink1 fix for freeze if hurt value is less than 0
 				if (nlist[1] < 0)
-					return (0);
+					return 0;
 				if (hurt_thing(nlist[0], nlist[1], 0) > 0)
 					random_blood(spr[nlist[0]].x, spr[nlist[0]].y - 40, nlist[0]);
 				if (spr[nlist[0]].nohit != 1)
@@ -9075,10 +9074,10 @@ pass:
 							run_script(spr[nlist[0]].script);
 						}
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9096,10 +9095,10 @@ pass:
 
 						pam.sprite[spr[nlist[0]].sp_index].hard = returnint;
 					}
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_move_nohard")) {
@@ -9107,20 +9106,20 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].move_nohard);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 		if (compare(ev[1], "sp_flying")) {
 			h = &h[strlen(ev[1])];
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].flying);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9131,20 +9130,20 @@ pass:
 			int ARR[20] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				spr[nlist[0]].wait = 0;
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 		if (compare(ev[1], "sp_kill")) {
 			h = &h[strlen(ev[1])];
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				spr[nlist[0]].kill = nlist[1];
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "screenlock")) {
@@ -9157,7 +9156,7 @@ pass:
 			}
 			//redink1 - set screenlock() to return the screenlock value
 			returnint = screenlock;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "stop_entire_game")) {
@@ -9182,7 +9181,7 @@ pass:
 					}
 					if (ddrval != DDERR_WASSTILLDRAWING) {
 						dderror(ddrval);
-						return (0);
+						return 0;
 					}
 				}
 
@@ -9195,10 +9194,10 @@ pass:
 
 
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9207,10 +9206,10 @@ pass:
 			int ARR[20] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				walk_off_screen = nlist[0];
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "push_active")) {
@@ -9218,10 +9217,10 @@ pass:
 			int ARR[20] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				push_active = nlist[0];
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9230,10 +9229,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].x);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9249,10 +9248,10 @@ pass:
 
 				}
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9268,10 +9267,10 @@ pass:
 
 				}
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9280,10 +9279,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].mx);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_move_x")) {
@@ -9291,9 +9290,9 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].mx);
-				return (0);
+				return 0;
 			}
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_my")) {
@@ -9301,10 +9300,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].my);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_move_y")) {
@@ -9312,9 +9311,9 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				change_sprite_noreturn(nlist[0], nlist[1], &spr[nlist[0]].my);
-				return (0);
+				return 0;
 			}
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "scripts_used")) {
@@ -9323,7 +9322,7 @@ pass:
 			for (i = 1; i < max_scripts; i++)
 				if (rinfo[i] != NULL) m++;
 			returnint = m;
-			return (0);
+			return 0;
 		}
 
 
@@ -9336,10 +9335,10 @@ pass:
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].dir);
 
 				if (nlist[1] != -1) changedir(spr[nlist[0]].dir, nlist[0], spr[nlist[0]].base_walk);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_hitpoints")) {
@@ -9348,10 +9347,10 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].hitpoints);
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9361,10 +9360,10 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].attack_hit_sound);
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9374,10 +9373,10 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].attack_hit_sound_speed);
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9387,10 +9386,10 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].strength);
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "sp_defense")) {
@@ -9399,10 +9398,10 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].defense);
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[1], "init")) {
@@ -9411,10 +9410,10 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 
 				figure_out(slist[0], 0);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9424,10 +9423,10 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].distance);
 
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9436,10 +9435,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].nohit);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9448,10 +9447,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].notouch);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9462,18 +9461,18 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = 0;
 				if (*pcur_weapon == 0) {
-					return (0);
+					return 0;
 				}
 
 				if (compare(play.item[*pcur_weapon].name, slist[0])) {
 					returnint = 1;
 
 				}
-				return (0);
+				return 0;
 			}
 
 
-			return (0);
+			return 0;
 		}
 
 
@@ -9483,7 +9482,7 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = 0;
 				if (*pcur_magic == 0) {
-					return (0);
+					return 0;
 				}
 
 				//redink1 fix so compare_magic works!
@@ -9491,11 +9490,11 @@ pass:
 					returnint = 1;
 
 				}
-				return (0);
+				return 0;
 			}
 
 
-			return (0);
+			return 0;
 		}
 
 
@@ -9507,17 +9506,17 @@ pass:
 
 				if (nlist[0] == 0) {
 					Msg("Error: Can't compare sprite script for sprite 0!??!?!");
-					return (0);
+					return 0;
 				}
 				if (spr[nlist[0]].active) {
 
 					if (spr[nlist[0]].script == 0) {
 						Msg("Compare sprite script says: Sprite %d has no script.", nlist[0]);
-						return (0);
+						return 0;
 					}
 					if (compare(slist[1], rinfo[spr[nlist[0]].script]->name)) {
 						returnint = 1;
-						return (0);
+						return 0;
 					}
 
 				} else {
@@ -9526,11 +9525,11 @@ pass:
 
 
 
-				return (0);
+				return 0;
 			}
 
 
-			return (0);
+			return 0;
 		}
 
 
@@ -9539,10 +9538,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].y);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9551,10 +9550,10 @@ pass:
 			int ARR[20] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = change_sprite(nlist[0], nlist[1], &spr[nlist[0]].timer);
-				return (0);
+				return 0;
 			}
 			returnint =  -1;
-			return (0);
+			return 0;
 		}
 
 
@@ -9568,7 +9567,7 @@ pass:
 				kill_script(script);
 			}
 
-			return (2);
+			return 2;
 		}
 
 		//redink1 added so we can have return values and crap.
@@ -9586,7 +9585,7 @@ pass:
 				kill_script(script);
 			}
 
-			return (2);
+			return 2;
 		}
 
 
@@ -9614,9 +9613,7 @@ pass:
 			strcpy(s, h);
 			//g("continuing to run line %s..", h);
 
-
-			return (5);
-
+			return 5;
 		}
 
 
@@ -9628,7 +9625,7 @@ pass:
 			strip_beginning_spaces(h);
 			var_equals(ev[1], ev[3], '=', script, h);
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[2], "+=")) {
@@ -9638,7 +9635,7 @@ pass:
 			strip_beginning_spaces(h);
 			var_equals(ev[1], ev[3], '+', script, h);
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[2], "*=")) {
@@ -9648,7 +9645,7 @@ pass:
 			strip_beginning_spaces(h);
 			var_equals(ev[1], ev[3], '*', script, h);
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -9662,7 +9659,7 @@ pass:
 			var_equals(ev[1], ev[3], '-', script, h);
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -9675,7 +9672,7 @@ pass:
 			var_equals(ev[1], ev[3], '/', script, h);
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 		if (compare(ev[2], "*") || compare(ev[2], "*=")) {
@@ -9687,7 +9684,7 @@ pass:
 			var_equals(ev[1], ev[3], '*', script, h);
 
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 		if (compare(ev[1], "external")) {
 			h = &h[strlen(ev[1])];
@@ -9698,7 +9695,7 @@ pass:
 				int myscript1 = load_script(slist[0], rinfo[script]->sprite, false);
 				if (myscript1 == 0) {
 					Msg("Error:  Couldn't find %s.c (for procedure %s)", slist[0], slist[1]);
-					return (0);
+					return 0;
 				}
 				rinfo[myscript1]->arg1 = nlist[2];
 				rinfo[myscript1]->arg2 = nlist[3];
@@ -9712,14 +9709,14 @@ pass:
 					rinfo[myscript1]->proc_return = script;
 					run_script(myscript1);
 
-					return (2);
+					return 2;
 				} else {
 					Msg("Error:  Couldn't find procedure %s in %s.", slist[1], slist[0]);
 					kill_script(myscript1);
 				}
 			}
 			strcpy(s, h);
-			return (0);
+			return 0;
 		}
 
 
@@ -9747,7 +9744,7 @@ pass:
 
 				rinfo[myscript]->proc_return = script;
 				run_script(myscript);
-				return (2);
+				return 2;
 			} else {
 				for (i = 0; strlen(play.func[i].func) > 0 && i < 100; i++) {
 					if (compare(play.func[i].func, ev[1])) {
@@ -9764,7 +9761,7 @@ pass:
 						if (locate(myscript, ev[1])) {
 							rinfo[myscript]->proc_return = script;
 							run_script(myscript);
-							return (2);
+							return 2;
 						}
 						break;
 					}
@@ -9783,7 +9780,7 @@ pass:
 			{
 			rinfo[myscript]->proc_return = script;
 			run_script(myscript);
-			return(2);
+			return 2;
 			} else
 			{
 			Msg("ERROR:  Procedure void %s( void ); not found in script %s. (word 2 was %s) ", line,
@@ -9792,7 +9789,7 @@ pass:
 			}*/
 
 
-			return (0);
+			return 0;
 
 		}
 
@@ -9810,13 +9807,13 @@ pass:
 
 bad:
 	strcpy(s, h);
-	return (0);
+	return 0;
 
 good:
 	strcpy(s, h);
 	//s = h
 	//Msg("ok, continuing with running %s..",s);
-	return (1);
+	return 1;
 
 }
 

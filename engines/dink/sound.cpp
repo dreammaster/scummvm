@@ -542,11 +542,11 @@ int SoundPlayEffect(int sound, int min, int plus, int sound3d, bool repeat) {
 
 	if (!bank) {
 		Msg("Ran out of banks.");
-		return (0);
+		return 0;
 
 	}
 
-	return (bank);
+	return bank;
 }
 
 
@@ -601,7 +601,7 @@ bool playing(int sound) {
 	}
 
 	pdsb->GetStatus(&crap);
-	if (crap == DSBSTATUS_PLAYING) return (true);
+	if (crap == DSBSTATUS_PLAYING) return true;
 	else return false;
 
 }

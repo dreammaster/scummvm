@@ -252,7 +252,7 @@ bool keypressed(void)
 {
 	for (int i = 0; i < 256; i++) {
 		if (GetKeyboard(i)) {
-			return (true);
+			return true;
 		}
 	}
 
@@ -473,7 +473,7 @@ bool not_in_this_base(int seq_, int base) {
 	if (realbase != base) {
 
 
-		return (true);
+		return true;
 	} else {
 		return false;
 	}
@@ -485,7 +485,7 @@ bool in_this_base(int seq_, int base) {
 	if (realbase == base) {
 
 		//  Msg("true - Ok, realbase is %d, compared to the base, which is %d.", realbase, base);
-		return (true);
+		return true;
 	} else {
 		//  Msg("false - Ok, realbase is %d, compared to the base, which is %d.", realbase, base);
 
@@ -537,40 +537,40 @@ int autoreverse(int j) {
 
 	if ((spr[j].dir == 1) || (spr[j].dir == 2)) {
 		if (r == 1)
-			return (8);
+			return 8;
 		if (r == 2)
-			return (6);
+			return 6;
 
 	}
 
 	if ((spr[j].dir == 3) || (spr[j].dir == 6)) {
 		if (r == 1)
-			return (2);
+			return 2;
 		if (r == 2)
 
-			return (4);
+			return 4;
 
 	}
 
 	if ((spr[j].dir == 9) || (spr[j].dir == 8)) {
 		if (r == 1)
-			return (2);
+			return 2;
 		if (r == 2)
 
-			return (6);
+			return 6;
 
 
 	}
 
 	if ((spr[j].dir == 7) || (spr[j].dir == 4)) {
 		if (r == 1)
-			return (8);
+			return 8;
 		if (r == 2)
-			return (6);
+			return 6;
 
 	}
 
-	return (0);
+	return 0;
 }
 
 
@@ -581,36 +581,36 @@ int autoreverse_diag(int j) {
 	if ((spr[j].dir == 1) || (spr[j].dir == 3)) {
 
 		if (r == 1)
-			return (9);
+			return 9;
 		if (r == 2)
-			return (7);
+			return 7;
 	}
 
 	if ((spr[j].dir == 3) || (spr[j].dir == 6)) {
 		if (r == 1)
-			return (7);
+			return 7;
 		if (r == 2)
-			return (1);
+			return 1;
 
 	}
 
 	if ((spr[j].dir == 9) || (spr[j].dir == 8)) {
 		if (r == 1)
-			return (1);
+			return 1;
 		if (r == 2)
-			return (7);
+			return 7;
 	}
 
 	if ((spr[j].dir == 7) || (spr[j].dir == 4)) {
 		if (r == 1)
-			return (3);
+			return 3;
 		if (r == 2)
-			return (9);
+			return 9;
 
 	}
 
 	Msg("Auto Reverse Diag was sent a dir %d sprite, base %d walk.", spr[j].dir, spr[j].base_walk);
-	return (0);
+	return 0;
 }
 
 void draw_damage(int h) {
@@ -800,10 +800,10 @@ int get_distance_and_dir(int h, int h1, int *dir_) {
 	if (distancex > distancey) {
 
 		*dir_ = dirx;
-		return (distancex);
+		return distancex;
 	} else {
 		*dir_ = diry;
-		return (distancey);
+		return distancey;
 	}
 
 
@@ -876,7 +876,7 @@ bool check_for_kill_script(int i) {
 
 		if (locate(spr[i].script, "DIE")) run_script(spr[i].script);
 
-		return (true);
+		return true;
 	}
 
 	return false;
@@ -890,7 +890,7 @@ bool check_for_duck_script(int i) {
 
 		if (locate(spr[i].script, "DUCKDIE")) run_script(spr[i].script);
 
-		return (true);
+		return true;
 	}
 
 	return false;
@@ -1713,10 +1713,10 @@ int check_if_move_is_legal(int u) {
 	//redink1 removed so move_nohard is active for all movements, not just active moves.
 	//if (spr[u].move_active)
 	if (spr[u].move_nohard == 1)
-		return (0);
-	if (u == 1) if (in_this_base(spr[u].seq, mDinkBasePush)) return (0);
+		return 0;
+	if (u == 1) if (in_this_base(spr[u].seq, mDinkBasePush)) return 0;
 
-	if (u == 1) if (!no_cheat) if (debug_mode) return (0);
+	if (u == 1) if (!no_cheat) if (debug_mode) return 0;
 	int hardness = 0;
 	if (spr[u].moveman > 0) {
 		for (int i = 1; i <= spr[u].moveman; i++) {
@@ -1724,7 +1724,7 @@ int check_if_move_is_legal(int u) {
 			if (hardness == 2) if (spr[u].flying) {
 					spr[u].moveman = 0;
 					// redink1 changed so flying works properly
-					return (0);
+					return 0;
 				}
 			if (hardness > 0) {
 
@@ -1748,7 +1748,7 @@ int check_if_move_is_legal(int u) {
 							} else {
 								if (play.push_dir != spr[1].dir) play.push_active = false;
 							}
-				return (hardness);
+				return hardness;
 			}
 
 		}
@@ -1757,7 +1757,7 @@ int check_if_move_is_legal(int u) {
 
 
 	if (u == 1)  play.push_active = false;
-	return (0);
+	return 0;
 }
 
 
@@ -2039,7 +2039,7 @@ bool run_through_tag_list_talk(int h) {
 								kill_returning_stuff(spr[i].script);
 
 								run_script(spr[i].script);
-								return (true);
+								return true;
 							}
 
 
@@ -3102,7 +3102,7 @@ bool transition() {
 
 
 	//total_trigger = false;
-	//return(false);
+	//return false;
 
 	if (move_screen == 4) {
 		//move_counter =+ 20;
@@ -3141,7 +3141,7 @@ bool transition() {
 			return false;
 		}
 
-		return (true);
+		return true;
 	}
 
 	if (move_screen == 6) {
@@ -3177,7 +3177,7 @@ bool transition() {
 			return false;
 		}
 
-		return (true);
+		return true;
 	}
 
 
@@ -3219,7 +3219,7 @@ bool transition() {
 			return false;
 		}
 
-		return (true);
+		return true;
 	}
 
 
@@ -3259,7 +3259,7 @@ bool transition() {
 			return false;
 		}
 
-		return (true);
+		return true;
 	}
 
 
@@ -3272,15 +3272,13 @@ bool transition() {
 
 
 int find_sprite(int block) {
-
 	for (int i = 1; i <= last_sprite_created; i++) {
 		if (spr[i].sp_index == block) {
-			return (i);
+			return i;
 		}
 	}
 
-	return (0);
-
+	return 0;
 }
 
 int special_block(int block, int h) {
@@ -3301,7 +3299,7 @@ int special_block(int block, int h) {
 				spr[sprite].seq = pam.sprite[block].parm_seq;
 				process_warp = block;
 			}
-			return (1);
+			return 1;
 		}
 		process_warp = block;
 		/*spr[1].x = pam.sprite[block].warp_x;
@@ -3311,9 +3309,9 @@ int special_block(int block, int h) {
 		load_map(map.loc[pam.sprite[block].warp_map]);
 		draw_map();
 		*/
-		return (1); //redraw screen with fade
+		return 1; //redraw screen with fade
 	}
-	return (0);
+	return 0;
 }
 
 void CyclePalette() {
@@ -5142,7 +5140,7 @@ void finiObjects() {
 		//lets kill the cdaudio too
 		if (mciSendString("close all", NULL, 0, NULL) != 0) {
 			Msg("Couldn't close all MCI events..");
-			//  return(false);
+			//  return false;
 		}
 
 	}
@@ -5644,7 +5642,7 @@ bool random_date(char file[255]) {
 	} else return false;
 
 
-	return (true);
+	return true;
 #else
 	::error("TODO");
 #endif
@@ -5673,7 +5671,7 @@ int dir_num(const char *path) {
 	dir = FindFirstFile(search_specs, &fd);
 	if (dir == NULL) {
 		ODS("Could not open current directory\n");
-		return (0);
+		return 0;
 	}
 
 
@@ -5695,7 +5693,7 @@ int dir_num(const char *path) {
 
 	FindClose(dir);
 	ODS("All done finding files.");
-	return (cnt);
+	return cnt;
 #else
 	::error("TODO");
 #endif
