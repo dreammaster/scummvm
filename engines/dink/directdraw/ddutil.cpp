@@ -159,15 +159,8 @@ DWORD DDColorMatch(IDirectDrawSurface *pdds, COLORREF rgb) {
 }
 
 HRESULT DDSetColorKey(IDirectDrawSurface * pdds, COLORREF rgb) {
-#ifdef TODO
-	DDCOLORKEY          ddck;
-
-	ddck.dwColorSpaceLowValue = DDColorMatch(pdds, rgb);
-	ddck.dwColorSpaceHighValue = ddck.dwColorSpaceLowValue;
-	return pdds->SetColorKey(DDCKEY_SRCBLT, &ddck);
-#else
-	error("TODO");
-#endif
+	pdds->setTransparentColor(rgb);
+	return DD_OK;
 }
 
 } // namespace Dink
