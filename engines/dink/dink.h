@@ -31,6 +31,7 @@
 #include "common/util.h"
 #include "engines/engine.h"
 #include "engines/savestate.h"
+#include "graphics/screen.h"
 #include "graphics/surface.h"
 
 #include "dink/detection.h"
@@ -52,6 +53,7 @@ protected:
 	Common::Error run() override;
 public:
 	EventsManager *_events = nullptr;
+	Graphics::Screen *_screen = nullptr;
 
 public:
 	DinkEngine(OSystem *syst, const DinkGameDescription *gameDesc);

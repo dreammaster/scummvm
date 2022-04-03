@@ -45,6 +45,7 @@ DinkEngine::DinkEngine(OSystem *syst, const DinkGameDescription *gameDesc) : Eng
 
 DinkEngine::~DinkEngine() {
 	delete _events;
+	delete _screen;
 }
 
 uint32 DinkEngine::getFeatures() const {
@@ -93,6 +94,7 @@ void DinkEngine::initialize() {
 	                               Graphics::PixelFormat(4, 8, 8, 8, 8, 24, 16, 8, 0) :
 	                               Graphics::PixelFormat::createFormatCLUT8();
 	initGraphics(640, 480, &format);
+	_screen = new Graphics::Screen();
 
 	// create arrow cursor
 
