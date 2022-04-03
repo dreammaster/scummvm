@@ -22,6 +22,7 @@
 #include "common/debug.h"
 #include "common/file.h"
 #include "common/textconsole.h"
+#include "image/bmp.h"
 #include "dink/dink.h"
 #include "dink/events.h"
 #include "dink/var.h"
@@ -1097,50 +1098,19 @@ void setup_anim(int fr, int start, int delay) {
 
 
 IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite) {
-#ifdef TODO
-	HBITMAP             hbm;
-	BITMAP              bm;
-	DDSURFACEDESC       ddsd;
-	IDirectDrawSurface *pdds;
+	Image::BitmapDecoder decoder;
+	Common::File f;
 
-	//
-	//  try to load the bitmap as a resource, if that fails, try it as a file
-	//
-	hbm = (HBITMAP)LoadImage(GetModuleHandle(NULL), szBitmap, IMAGE_BITMAP, dx, dy, LR_CREATEDIBSECTION);
+	if (!f.open(szBitmap) || !decoder.loadStream(f))
+		return nullptr;
 
-	if (hbm == NULL)
-		hbm = (HBITMAP)LoadImage(NULL, szBitmap, IMAGE_BITMAP, dx, dy, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	IDirectDrawSurface *surf = new IDirectDrawSurface();
+	surf->copyFrom(decoder.getSurface());
 
-	if (hbm == NULL)
-		return NULL;
+	if (decoder.hasPalette())
+		surf->setPalette(decoder.getPalette(), 0, decoder.getPaletteColorCount());
 
-	//
-	// get size of the bitmap
-	//
-	GetObject(hbm, sizeof(bm), &bm);      // get size of bitmap
-
-	//
-	// create a DirectDrawSurface for this bitmap
-	//
-	ZeroMemory(&ddsd, sizeof(ddsd));
-	ddsd.dwSize = sizeof(ddsd);
-	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
-	ddsd.dwWidth = bm.bmWidth;
-	ddsd.dwHeight = bm.bmHeight;
-	if (pdd->CreateSurface(&ddsd, &pdds, NULL) != DD_OK)
-		return NULL;
-
-	DDCopyBitmap(pdds, hbm, 0, 0, 0, 0);
-	tilerect[sprite].bottom = bm.bmHeight;
-	tilerect[sprite].right = bm.bmWidth;
-
-	DeleteObject(hbm);
-
-	return pdds;
-#else
-	error("TODO");
-#endif
+	return surf;
 }
 
 bool DSDisable() {

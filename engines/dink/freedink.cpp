@@ -5560,7 +5560,7 @@ bool doInit() {
 	Msg("loading tilescreens...");
 
 	for (int h = 1; h < tile_screens; h++) {
-		Common::String fname = Common::String::format("tiles/ts%.2d", h);
+		Common::String fname = Common::String::format("tiles/ts%.2d.bmp", h);
 		tiles[h] = DDTileLoad(lpDD, fname.c_str(), 0, 0, h);
 
 		if (tiles[h] == nullptr) {
