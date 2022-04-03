@@ -5777,9 +5777,7 @@ uint32 playMIDIFile(HWND hWndNotify, LPCSTR lpszMIDIFileName) {
 #endif
 }
 
-
-
-bool PlayMidi(char *sFileName) {
+bool PlayMidi(const char *sFileName) {
 	//no midi stuff right now
 	if (sound_on == false) return true;
 

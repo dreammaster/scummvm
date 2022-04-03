@@ -88,7 +88,7 @@ HRESULT IDirectDrawSurface::IsLost() const {
 HRESULT IDirectDrawSurface::SetPalette(LPDIRECTDRAWPALETTE pal) {
 	Graphics::ManagedSurface *surf = this;
 	surf->setPalette(reinterpret_cast<const uint32 *>(&pal->_palette[0]), 0, PALETTE_COUNT);
-	return S_OK;
+	return DD_OK;
 }
 
 } // namespace Dink

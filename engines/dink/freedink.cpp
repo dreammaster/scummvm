@@ -5450,8 +5450,6 @@ done:
 }
 
 bool doInit() {
-	char crap[30];
-	char crap1[10];
 	RECT rcRectSrc, rcRectDest;
 	RECT rcRect;
 	POINT p;
@@ -5553,98 +5551,47 @@ bool doInit() {
 		Msg("error with getting entries in beginning");
 	}
 
-	//redink1 Faster true-color fades
-	/*if ( truecolor )
-	{
-	    mPrecalculatedFadeValues = new std::map<DWORD, FadeValues>;
-	    DWORD dwWhite    = dwRMask | dwGMask | dwBMask;
-	    PALETTEENTRY lPaletteEntries[256];
-	    lpDDPal->GetEntries( 0, 0, 256, lPaletteEntries );
-	    for ( int lPaletteEntry = 0; lPaletteEntry < 256; lPaletteEntry++ )
-	    {
-	        DWORD lColor = ( lPaletteEntries[lPaletteEntry].peRed >> (8 - wRBits) << wRPos |
-	                         lPaletteEntries[lPaletteEntry].peGreen >> (8 - wGBits) << wGPos |
-	                         lPaletteEntries[lPaletteEntry].peBlue >> (8 - wBBits) << wBPos );
-	        mPrecalculatedFadeValues->[lColor].reserve(256);
-	        for ( int lFadeValue = 0; lFadeValue < 256; lFadeValue += 1 )
-	        {
-	            DWORD red   = (lColor & dwRMask) << (8 - wRBits) >> wRPos;
-	            red   = (red   >= lFadeValue ? red   - lFadeValue : 0);
-
-	            DWORD green = (lColor & dwGMask) << (8 - wGBits) >> wGPos;
-	            green = (green >= lFadeValue ? green - lFadeValue : 0);
-
-	            DWORD blue  = (lColor & dwBMask) << (8 - wBBits) >> wBPos;
-	            blue  = (blue  >= lFadeValue ? blue  - lFadeValue : 0);
-
-	            DWORD lResult = ( red >> (8 - wRBits) << wRPos |
-	                  green >> (8 - wGBits) << wGPos |
-	                  blue >> (8 - wBBits) << wBPos );
-	            mPrecalculatedFadeValues[lColor].push_back( lResult );
-	        }
-	    }
-	}*/
-
-	if (Common::File::exists("tiles\\splash.bmp"))
-		lpDDPal = DDLoadPalette(lpDD, "tiles\\SPLASH.BMP");
-	else
-		lpDDPal = DDLoadPalette(lpDD, "..\\dink\\tiles\\SPLASH.BMP");
+	if (Common::File::exists("tiles/splash.bmp"))
+		lpDDPal = DDLoadPalette(lpDD, "tiles/splash.bmp");
 
 	if (lpDDPal)
 		lpDDSPrimary->SetPalette(lpDDPal);
 
-
-	//crashes here!
 	Msg("loading tilescreens...");
 
 	for (int h = 1; h < tile_screens; h++) {
-		if (h < 10) strcpy(crap1, "0");
-		else strcpy(crap1, "");
-		sprintf(crap, "TILES/TS%s%d.BMP", crap1, h);
+		Common::String fname = Common::String::format("tiles/ts%.2d", h);
+		tiles[h] = DDTileLoad(lpDD, fname.c_str(), 0, 0, h);
 
-		if (!Common::File::exists(crap)) {
-			sprintf(crap, "../DINK/TILES/TS%s%d.BMP", crap1, h);
-		}
-
-		tiles[h] = DDTileLoad(lpDD, crap, 0, 0, h);
-
-
-		if (tiles[h] == NULL) {
+		if (tiles[h] == nullptr) {
 			return initFail(hwnd, "Couldn't find one of the tilescreens!");
 		} else {
-			//tilerect[h].right =  lpDD->dwWidth;
-
 			DDSetColorKey(tiles[h], RGB(0, 0, 0));
 		}
 	}
+
 	Msg("Done with tilescreens...");
 
 	// Create the offscreen surface, by loading our bitmap.
-	//lpDDSOne = DDLoadBitmap(lpDD, szBitmap, 0, 0);
 	if (sound_on) {
 		Msg("Initting sound");
 		sound_on = InitSound(hwnd);
 	}
 
-
-#ifdef __DEMO
-
-	PlayMidi("4.MID");
-#endif
-//	srand((unsigned)time(NULL));
+	if (g_engine->isDemo())
+		PlayMidi("4.mid");
 
 	if (Common::File::exists("tiles/splash.bmp"))
 		lpDDSTwo = DDLoadBitmap(lpDD, "tiles/splash.bmp", 0, 0);
-	else
-		lpDDSTwo = DDLoadBitmap(lpDD, "../dink/tiles/splash.bmp", 0, 0);
+
 	DDSetColorKey(lpDDSTwo, RGB(0, 0, 0));
-#ifndef __DEMO
 
-	getCDTrackStartTimes();
+	if (!g_engine->isDemo()) {
+		getCDTrackStartTimes();
 
-	if (cd_inserted)
-		PlayCD(g_hWnd, 7);
-#endif
+		if (cd_inserted)
+			PlayCD(g_hWnd, 7);
+	}
 
 	if (disablejoystick == false) {
 		if (CheckJoyStickPresent() == false) {
@@ -5660,14 +5607,12 @@ bool doInit() {
 	rcRect.right = currX;
 	rcRect.bottom = currY;
 
-	//if (lpDDSBack->GetBltStatus( DDGBS_ISBLTDONE) == DD_OK)
 	//draw version #
-
-	ddrval = lpDDSBack->BltFast(0, 0, lpDDSTwo,
-	                            &rcRect, DDBLTFAST_NOCOLORKEY);
+	ddrval = lpDDSBack->BltFast(0, 0, lpDDSTwo, &rcRect,
+		DDBLTFAST_NOCOLORKEY);
 
 	if (!windowed) {
-		while (1) {
+		for (;;) {
 			ddrval = lpDDSPrimary->Flip(NULL, DDFLIP_WAIT);
 			if (ddrval == DD_OK) {
 				break;
@@ -5678,14 +5623,8 @@ bool doInit() {
 					break;
 				}
 			}
-			if (ddrval != DDERR_WASSTILLDRAWING) {
-
-				//              ddrval = DD_OK;
+			if (ddrval != DDERR_WASSTILLDRAWING)
 				dderror(ddrval);
-				//  return;
-				//        ddrval = DD_OK;
-			}
-			//goto done;
 		}
 	} else {
 		// instead of a flip, this will work for Windowed mode:
@@ -5699,48 +5638,32 @@ bool doInit() {
 		ddrval = lpDDSPrimary->Blt(&rcRectDest, lpDDSBack, &rcRectSrc, DDBLT_WAIT, NULL);
 	}
 
-
-
-
-	//dinks normal walk
-
-
+	// Dinks normal walk
 	Msg("loading batch");
 	load_batch();
-
-
 	Msg("done loading batch");
-
 
 	load_hard();
 
-	//Activate dink, but don't really turn him on
-	//spr[1].active = true;
+	// Activate dink, but don't really turn him on
 	spr[1].timer = 33;
 
-	//copy from player info
+	// Copy from player info
 	spr[1].x = play.x;
 	spr[1].y = play.y;
 
-
-	if (Common::File::exists("tiles\\TS01.bmp"))
-		lpDDPal = DDLoadPalette(lpDD, "tiles\\TS01.BMP");
-	else
-		lpDDPal = DDLoadPalette(lpDD, "..\\dink\\tiles\\TS01.BMP");
+	if (Common::File::exists("tiles/ts01.bmp"))
+		lpDDPal = DDLoadPalette(lpDD, "tiles/ts01.bmp");
 	if (lpDDPal)
 		lpDDSPrimary->SetPalette(lpDDPal);
 
 	Msg("Loading splash");
-	if (Common::File::exists("tiles\\SPLASH.bmp"))
-		lpDDSTrick = DDLoadBitmap(lpDD, "tiles\\SPLASH.BMP", 0, 0);
-	else
-		lpDDSTrick = DDLoadBitmap(lpDD, "..\\dink\\tiles\\SPLASH.BMP", 0, 0);
+	if (Common::File::exists("tiles/splash.bmp"))
+		lpDDSTrick = DDLoadBitmap(lpDD, "tiles/splash.bmp", 0, 0);
 	DDSetColorKey(lpDDSTrick, RGB(0, 0, 0));
 
-	if (Common::File::exists("tiles\\SPLASH.bmp"))
-		lpDDSTrick2 = DDLoadBitmap(lpDD, "tiles\\SPLASH.BMP", 0, 0);
-	else
-		lpDDSTrick2 = DDLoadBitmap(lpDD, "..\\dink\\tiles\\SPLASH.BMP", 0, 0);
+	if (Common::File::exists("tiles/splash.bmp"))
+		lpDDSTrick2 = DDLoadBitmap(lpDD, "tiles/splash.bmp", 0, 0);
 	DDSetColorKey(lpDDSTrick2, RGB(0, 0, 0));
 
 	// ** SETUP **
@@ -5767,21 +5690,17 @@ bool doInit() {
 		sjoy.letgo[x1] = true;
 	}
 
-	//lets run our init script
+	// Lets run our init script
 	int script = load_script("main", 0, true);
 	locate(script, "main");
 	run_script(script);
-	//lets attach our vars to the scripts
 
+	// Lets attach our vars to the scripts
 	attach();
-
-
-	//init_mouse(hwnd);
 
 	memset(&spr, NULL, sizeof(spr));
 	init_font_colors();
 	initfonts("Arial");
-	//g_pMouse->Acquire();
 
 	return true;
 }

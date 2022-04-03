@@ -68,7 +68,7 @@ extern int SoundPlayEffect(int sound, int min, int plus, int sound3d, bool repea
 extern void SoundLoadBanks();
 extern bool StopMidi();
 extern void check_seq_status(int h);
-extern bool PlayMidi(char *sFileName);
+extern bool PlayMidi(const char *sFileName);
 extern int process_line(int script, char *s, bool doelse);
 
 extern void get_word(char line[300], int word, char *crap);
