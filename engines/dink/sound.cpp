@@ -24,7 +24,6 @@
 #include "dink/globals.h"
 #include "dink/text.h"
 #include "dink/var.h"
-#include "audio/decoders/wave.h"
 #include "common/file.h"
 
 namespace Dink {
@@ -214,24 +213,18 @@ bool DestroySound() {
 }
 
 void SoundLoadBanks() {
-#ifdef TODO
 	HRESULT ddsound;
 
 	lpDS->DuplicateSoundBuffer(ssound[1].sound, &bowsound);
 
-
 	for (int i = 1; i <= num_soundbanks; i++) {
 		if (lpDS && soundbank[i] == nullptr) {
-			//
-			//  use DSLoadSoundBuffer (in ..\misc\dsutil.c) to load
-			//  a sound from a resource.
-			//
-
+			// Duplicate the sound
 			ddsound = lpDS->DuplicateSoundBuffer(ssound[1].sound, &soundbank[i]);
-			if (ddsound != DS_OK) Msg("Couldn't load soundbank %d.", i);
+			if (ddsound != DS_OK)
+				Msg("Couldn't load soundbank %d.", i);
 		}
 	}
-#endif
 }
 
 bool SoundStopEffect(int sound) {
@@ -247,28 +240,9 @@ bool SoundStopEffect(int sound) {
 }
 
 bool CreateBufferFromWaveFile(const char *filename, uint32 dwBuf) {
-	// Open the wave file
-	Common::File f;
-
-	// Open wave file
-	if (!f.open(Common::String::format("sound/%s", filename))) {
-		warning("Error, cannot load sound file %s", filename);
-		return false;
-	}
-
-	// Decode it
-	Audio::AudioStream *wavStream = Audio::makeWAVStream(
-		f.readStream(f.size()), DisposeAfterUse::YES);
-	f.close();
-
-	if (!wavStream) {
-		warning("Couldn't create sound buffer for sound %s.", filename);
-		return false;
-	}
-
-	// Create the sound buffer for the wave file
-	ssound[dwBuf].sound = new IDirectSoundBuffer(wavStream);
-	return true;
+	Common::String fname = Common::String::format("sound/%s", filename);
+	ssound[dwBuf].sound = IDirectSoundBuffer::createWav(fname);
+	return ssound[dwBuf].sound != nullptr;
 }
 
 void update_sound() {

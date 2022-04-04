@@ -79,11 +79,16 @@ typedef const DSBUFFERDESC *LPCDSBUFFERDESC;
 
 struct IDirectSoundBuffer {
 private:
+	Common::Array<byte> _buffer;
 	Audio::AudioStream *_audioStream = nullptr;
 	Audio::SoundHandle _soundHandle;
+
+	IDirectSoundBuffer() {}
 public:
-	IDirectSoundBuffer(Audio::AudioStream *audioStream) :
-		_audioStream(audioStream) {}
+	static IDirectSoundBuffer *createWav(const Common::String &name);
+public:
+	IDirectSoundBuffer(const IDirectSoundBuffer &src);
+	~IDirectSoundBuffer();
 
 	HRESULT Play(uint32 dwReserved1, uint32 dwPriority, uint32 dwFlags);
 	HRESULT SetVolume(int lVolume);
@@ -98,15 +103,18 @@ public:
 typedef IDirectSoundBuffer *LPDIRECTSOUNDBUFFER;
 
 struct IDirectSound {
-	HRESULT CreateSoundBuffer(LPCDSBUFFERDESC pcDSBufferDesc, LPDIRECTSOUNDBUFFER *ppDSBuffer, LPUNKNOWN pUnkOuter);
+	HRESULT CreateSoundBuffer(LPCDSBUFFERDESC pcDSBufferDesc,
+		LPDIRECTSOUNDBUFFER *ppDSBuffer, LPUNKNOWN pUnkOuter);
 	HRESULT SetCooperativeLevel(HWND hwnd, DWORD dwLevel);
-	HRESULT DuplicateSoundBuffer(LPDIRECTSOUNDBUFFER pDSBufferOriginal, _Outptr_ LPDIRECTSOUNDBUFFER *ppDSBufferDuplicate);
+	HRESULT DuplicateSoundBuffer(LPDIRECTSOUNDBUFFER pDSBufferOriginal,
+		LPDIRECTSOUNDBUFFER *ppDSBufferDuplicate);
 	HRESULT Release();
 };
 
 typedef IDirectSound *LPDIRECTSOUND;
 
-extern HRESULT DirectSoundCreate(void *pcGuidDevice, LPDIRECTSOUND *ppDS, LPUNKNOWN pUnkOuter);
+extern HRESULT DirectSoundCreate(void *pcGuidDevice,
+	LPDIRECTSOUND *ppDS, LPUNKNOWN pUnkOuter);
 
 } // namespace Dink
 

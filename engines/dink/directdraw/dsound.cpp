@@ -19,14 +19,56 @@
  *
  */
 
-#include "common/textconsole.h"
 #include "dink/directdraw/dsound.h"
+#include "audio/decoders/wave.h"
+#include "common/file.h"
+#include "common/memstream.h"
+#include "common/textconsole.h"
 
 namespace Dink {
 
 HRESULT DirectSoundCreate(void *pcGuidDevice, LPDIRECTSOUND *ppDS, LPUNKNOWN pUnkOuter) {
 	*ppDS = new IDirectSound();
 	return DS_OK;
+}
+
+IDirectSoundBuffer *IDirectSoundBuffer::createWav(const Common::String &name) {
+	Common::File f;
+	if (!f.open(name))
+		return false;
+
+	// Create the buffer and read the file contents
+	IDirectSoundBuffer *buf = new IDirectSoundBuffer();
+	buf->_buffer.resize(f.size());
+	f.read(&buf->_buffer[0], f.size());
+
+	// Create the wave file decoder
+	buf->_audioStream = Audio::makeWAVStream(
+		new Common::MemoryReadStream(&buf->_buffer[0], f.size(), DisposeAfterUse::NO),
+		DisposeAfterUse::YES);
+	if (!buf->_audioStream) {
+		delete buf;
+		return nullptr;
+	}
+
+	return buf;
+}
+
+IDirectSoundBuffer::IDirectSoundBuffer(const IDirectSoundBuffer &src) {
+	// Copy the buffer
+	size_t size = src._buffer.size();
+	_buffer.resize(size);
+	Common::copy(&src._buffer[0], &src._buffer[0] + size, &_buffer[0]);
+
+	// Make a new audio stream
+	_audioStream = Audio::makeWAVStream(
+		new Common::MemoryReadStream(&_buffer[0], size, DisposeAfterUse::NO),
+		DisposeAfterUse::YES);
+	assert(_audioStream);
+}
+
+IDirectSoundBuffer::~IDirectSoundBuffer() {
+	delete _audioStream;
 }
 
 HRESULT IDirectSoundBuffer::Play(uint32 dwReserved1, uint32 dwPriority, uint32 dwFlags) {
@@ -74,12 +116,13 @@ HRESULT IDirectSound::SetCooperativeLevel(HWND hwnd, DWORD dwLevel) {
 	return DS_OK;
 }
 
-HRESULT IDirectSound::DuplicateSoundBuffer(LPDIRECTSOUNDBUFFER pDSBufferOriginal, _Outptr_ LPDIRECTSOUNDBUFFER *ppDSBufferDuplicate) {
-	error("TODO");
+HRESULT IDirectSound::DuplicateSoundBuffer(LPDIRECTSOUNDBUFFER pDSBufferOriginal, LPDIRECTSOUNDBUFFER *ppDSBufferDuplicate) {
+	*ppDSBufferDuplicate = new IDirectSoundBuffer(*pDSBufferOriginal);
+	return DS_OK;
 }
 
 HRESULT IDirectSound::Release() {
-	error("TODO");
+	return DS_OK;
 }
 
 } // namespace Dink
