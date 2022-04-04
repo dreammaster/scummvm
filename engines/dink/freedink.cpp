@@ -5486,7 +5486,7 @@ bool doInit() {
 
 	if (sound_on) {
 		Msg("Initting sound");
-		sound_on = InitSound(hwnd);
+		sound_on = InitSound();
 	}
 
 	if (g_engine->isDemo())

@@ -80,7 +80,7 @@ static int get_vol(int h) {
 	return pan;
 }
 
-bool DSEnable(HWND hWnd) {
+bool DSEnable() {
 	HRESULT             dsrval;
 	bool                bUseDSound;
 
@@ -110,7 +110,7 @@ bool DSEnable(HWND hWnd) {
 		return false;
 	}
 
-	dsrval = lpDS->SetCooperativeLevel(hWnd, DSSCL_NORMAL);
+	dsrval = lpDS->SetCooperativeLevel(0, DSSCL_NORMAL);
 
 	if (dsrval != DS_OK) {
 		DSDisable();
@@ -132,9 +132,9 @@ bool DSDisable() {
 	return true;
 }
 
-bool InitSound(HWND hwndOwner) {
+bool InitSound() {
 	Msg("initting sound");
-	DSEnable(hwndOwner);
+	DSEnable();
 
 	if (lpDS == NULL) {
 		Msg("lpds wasn't initted in dsenable!");

@@ -31,14 +31,14 @@ namespace Dink {
  * Sets up the DirectSound object and loads all sounds into secondary
  * DirectSound buffers.  Returns false on error, or true if successful
  */
-extern bool InitSound(HWND);
+extern bool InitSound();
 
 /**
  *Undoes everything that was done in a InitSound call
  */
 extern bool DestroySound();
 
-extern bool DSEnable(HWND);
+extern bool DSEnable();
 
 /**
  * Turn off DirectSound
