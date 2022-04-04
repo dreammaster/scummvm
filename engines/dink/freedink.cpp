@@ -5061,7 +5061,7 @@ void finiObjects() {
 		mciSendCommand(CD_ID, MCI_CLOSE, 0, NULL);
 
 		Msg("Shutting down CD stuff.");
-		killcd(g_hWnd, 1);
+		killCD(1);
 	}
 
 	if (lpDD != NULL) {
@@ -5499,10 +5499,9 @@ bool doInit() {
 	DDSetColorKey(lpDDSTwo, RGB(0, 0, 0));
 
 	if (!g_engine->isDemo()) {
-		getCDTrackStartTimes();
-
+		openCD();
 		if (cd_inserted)
-			PlayCD(g_hWnd, 7);
+			PlayCD(7);
 	}
 
 	if (disablejoystick == false) {

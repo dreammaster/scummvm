@@ -49,8 +49,6 @@ extern void check_midi();
 
 extern void init_scripts();
 extern int load_script(const char *filename, int sprite, bool set_sprite);
-extern uint32 PlayCD(HWND hWndNotify, byte bTrack);
-extern uint32 killcd(HWND hWndNotify, byte bTrack);
 extern void update_status_all();
 extern int add_sprite(int x1, int y, int brain, int pseq, int pframe);
 
@@ -73,7 +71,6 @@ extern void drawallhard();
 extern void process_callbacks();
 extern int hurt_thing(int h, int damage, int special);
 extern void random_blood(int mx, int my, int h);
-extern uint32 getCDTrackStartTimes();
 extern void load_hard();
 extern IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite);
 extern void attach();
