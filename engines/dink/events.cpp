@@ -20,7 +20,9 @@
  */
 
 #include "common/system.h"
+#include "common/config-manager.h"
 #include "dink/events.h"
+#include "dink/globals.h"
 
 namespace Dink {
 
@@ -141,6 +143,138 @@ uint32 EventsManager::getTickCount() const {
 
 void EventsManager::sleep(size_t numSeconds) {
 	g_system->delayMillis(numSeconds * 1000);
+}
+
+bool CheckJoyStickPresent() {
+	int joystickNum = ConfMan.getInt("joystick_num");
+	return joystickNum != -1;
+}
+
+bool init_mouse() {
+#ifdef TODO
+	if (g_pdi) {
+		Msg("Mouse already initted? what the?");
+		return true;
+	}
+
+	HRESULT hr;
+
+	/*
+	*  Register with DirectInput and get an IDirectInput to play with.
+	*/
+	hr = DirectInputCreate(MyhInstance, DIRECTINPUT_VERSION, &g_pdi, NULL);
+
+	if (FAILED(hr)) {
+		Msg("DirectInputCreate");
+		return false;
+	}
+
+	/*
+	*  Obtain an interface to the system mouse device.
+	*/
+	hr = g_pdi->CreateDevice(GUID_SysMouse, &g_pMouse, NULL);
+
+	if (FAILED(hr)) {
+		Msg("CreateDevice(SysMouse)");
+		return false;
+	}
+
+	/*
+	*  Set the data format to "mouse format".
+	*/
+	hr = g_pMouse->SetDataFormat(&c_dfDIMouse);
+
+	if (FAILED(hr)) {
+		Msg("SetDataFormat(SysMouse, dfDIMouse)");
+		return false;
+	}
+
+	/*
+	*  Set the cooperativity level.
+	*/
+	hr = g_pMouse->SetCooperativeLevel(hWnd,
+		DISCL_EXCLUSIVE | DISCL_FOREGROUND);
+
+	if (FAILED(hr)) {
+		Msg("Error: SetCooperativeLevel(SysMouse)");
+		return false;
+	}
+
+	/*
+	*  Set the buffer size to DINPUT_BUFFERSIZE elements.
+	*  The buffer size is a uint32 property associated with the device.
+	*/
+	DIPROPDWORD dipdw = {
+		{
+			sizeof(DIPROPDWORD),        // diph.dwSize
+			sizeof(DIPROPHEADER),       // diph.dwHeaderSize
+			0,                          // diph.dwObj
+			DIPH_DEVICE,                // diph.dwHow
+		},
+		DINPUT_BUFFERSIZE,              // dwData
+	};
+
+	hr = g_pMouse->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph);
+
+	if (FAILED(hr)) {
+		Msg("Set buffer size(SysMouse)");
+		return false;
+	}
+
+#endif
+
+	return true;
+}
+
+bool getkey(int key) {
+	if (sjoy.realkey[key]) return true;
+	else return false;
+
+}
+
+int GetKeyboard(int key) {
+#ifdef TODO
+	// returns 0 if the key has been depressed, else returns 1 and sets key to code recd.
+	return GetAsyncKeyState(key);
+#else
+	error("TODO");
+	return 0;
+#endif
+}
+
+char key_convert(int key) {
+	if (!getkey(16)) key = tolower(key);
+
+	if (key == 190) if (getkey(16)) key = '>';
+	else key = '.';
+	if (key == 188) if (getkey(16)) key = '<';
+	else key = ',';
+
+	if (key == 49) if (getkey(16)) key = '!';
+	if (key == 50) if (getkey(16)) key = '@';
+	if (key == 51) if (getkey(16)) key = '#';
+	if (key == 52) if (getkey(16)) key = '$';
+	if (key == 53) if (getkey(16)) key = '%';
+	if (key == 54) if (getkey(16)) key = '^';
+	if (key == 55) if (getkey(16)) key = '&';
+	if (key == 56) if (getkey(16)) key = '*';
+	if (key == 57) if (getkey(16)) key = '(';
+	if (key == 48) if (getkey(16)) key = ')';
+
+	if (key == 189) if (getkey(16)) key = '_';
+	else key = '-';
+	if (key == 187) if (getkey(16)) key = '+';
+	else key = '=';
+	if (key == 186) if (getkey(16)) key = ':';
+	else key = ';';
+	if (key == 222) if (getkey(16)) key = '\"';
+	else key = '\'';
+	if (key == 191) if (getkey(16)) key = '?';
+	else key = '/';
+	if (key == 220) if (getkey(16)) key = '|';
+	else key = '\\';
+
+	return key;
 }
 
 } // namespace Dink

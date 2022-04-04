@@ -5311,14 +5311,6 @@ long FAR PASCAL WindowProc(HWND hWnd, UINT message,
 
 #endif
 
-
-bool CheckJoyStickPresent() {
-	return true;
-}
-
-
-
-
 void load_batch() {
 #ifdef TODO
 	FILE *stream;

@@ -53,6 +53,7 @@ extern bool SoundStopEffect(int sound);
 extern bool CreateBufferFromWaveFile(const char *filename, uint32 dwBuf);
 extern void kill_repeat_sounds();
 extern void kill_repeat_sounds_all();
+extern bool playing(int sound);
 
 /**
  * Plays the sound effect specified. Returns true if succeeded.

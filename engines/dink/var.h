@@ -26,12 +26,9 @@
 
 namespace Dink {
 
-extern bool init_mouse(HWND hWnd);
 extern void fill_screen(int num);
-extern int GetKeyboard(int key);
 extern void changedir(int dir1, int k, int base);
 extern void kill_sprite_all(int sprite);
-extern bool playing(int sound);
 extern int getpic(int h);
 extern byte get_hard(int h, int x1, int y1);
 extern void update_screen_time();

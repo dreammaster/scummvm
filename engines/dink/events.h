@@ -149,6 +149,10 @@ public:
 
 extern EventsManager *g_events;
 
+extern bool CheckJoyStickPresent();
+extern bool init_mouse();
+extern int GetKeyboard(int key);
+
 } // namespace Dink
 
 #endif

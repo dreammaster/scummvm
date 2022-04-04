@@ -22,6 +22,7 @@
 #include "common/scummsys.h"
 #include "dink/update_frame.h"
 #include "dink/freedink.h"
+#include "dink/events.h"
 #include "dink/globals.h"
 #include "dink/sound.h"
 #include "dink/text.h"
@@ -608,7 +609,7 @@ past:
 		FillMemory(&spr[1], sizeof(spr[1]), 0);
 
 		spr[1].speed = 3;
-		init_mouse(hWndMain);
+		init_mouse();
 		g_pMouse->Acquire();
 
 		spr[1].timer = 0;
