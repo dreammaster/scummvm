@@ -134,69 +134,21 @@ bool DSDisable() {
 
 bool InitSound(HWND hwndOwner) {
 	Msg("initting sound");
-	DSBUFFERDESC dsBD;
-	IDirectSoundBuffer *lpPrimary;
-
 	DSEnable(hwndOwner);
 
 	if (lpDS == NULL) {
 		Msg("lpds wasn't initted in dsenable!");
 		return false;
 	}
+
 	/*
-	* Load all sounds -- any that can't load for some reason will have NULL
-	* pointers instead of valid SOUNDEFFECT data, and we will know not to
-	* play them later on.
-	*/
-
-
-	/*  for( idx = 0; idx < NUM_SOUND_EFFECTS; idx++ )
-	{
-	if (SoundLoadEffect(idx))
-	{
-	DSBCAPS  caps;
-
-	caps.dwSize = sizeof(caps);
-	lpSoundEffects[idx]->GetCaps(&caps);
-
-	if (caps.dwFlags & DSBCAPS_LOCHARDWARE)
-	Msg( "Sound effect %s in hardware", szSoundEffects[idx]);
-	else
-	Msg( "Sound effect %s in software", szSoundEffects[idx]);
-	}
-	else
-	{
-	Msg( "cant load sound effect %s", szSoundEffects[idx]);
-	}
-	}
-	*/
-
+	 * Load all sounds -- any that can't load for some reason will have NULL
+	 * pointers instead of valid SOUNDEFFECT data, and we will know not to
+	 * play them later on.
+	 */
 	CreateBufferFromWaveFile("gold.wav", 1);
 
 	SoundLoadBanks();
-
-	/*
-	* get the primary buffer and start it playing
-	*
-	* by playing the primary buffer, DirectSound knows to keep the
-	* mixer active, even though we are not making any noise.
-	*/
-
-	ZeroMemory(&dsBD, sizeof(DSBUFFERDESC));
-	dsBD.dwSize = sizeof(dsBD);
-	dsBD.dwFlags = DSBCAPS_PRIMARYBUFFER;
-
-	if (SUCCEEDED(lpDS->CreateSoundBuffer(&dsBD, &lpPrimary, NULL))) {
-		if (!SUCCEEDED(lpPrimary->Play(0, 0, DSBPLAY_LOOPING))) {
-			Msg("Unable to play Primary sound buffer");
-			return false;
-		}
-		return true;
-		//  IDirectSoundBuffer_Release(lpPrimary);
-	} else {
-		return false;
-		// TRACE("Unable to create Primary sound buffer");
-	}
 
 	return true;
 }
