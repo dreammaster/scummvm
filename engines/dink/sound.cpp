@@ -19,118 +19,15 @@
  *
  */
 
-#include "common/file.h"
 #include "dink/sound.h"
 #include "dink/dink.h"
 #include "dink/globals.h"
 #include "dink/text.h"
 #include "dink/var.h"
+#include "audio/decoders/wave.h"
+#include "common/file.h"
 
 namespace Dink {
-
-void WaveHeader::load(Common::SeekableReadStream *rs) {
-	rs->read(RIFF, 4);
-	dwSize = rs->readUint32LE();
-	rs->read(WAVE, 4);
-	rs->read(fmt_, 4);
-	dw16 = rs->readUint32LE();
-	wOne_0 = rs->readUint16LE();
-	wChnls = rs->readUint16LE();
-	dwSRate = rs->readUint32LE();
-	BytesPerSec = rs->readUint32LE();
-	wBlkAlign = rs->readUint16LE();
-	BitsPerSample = rs->readUint16LE();
-	rs->read(DATA, 4);
-	dwDSize = rs->readUint32LE();
-}
-
-/**
- * Reads in data from a wave file
- */
-static bool ReadData(LPDIRECTSOUNDBUFFER lpDSB, Common::SeekableReadStream *pFile, uint32 dwSize, uint32 dwPos) {
-#ifdef TODO
-	// Seek to correct position in file (if necessary)
-	if (dwPos != 0xffffffff) {
-		if (pFile->seek(dwPos, SEEK_SET) != 0) {
-			return false;
-		}
-	}
-
-	// Lock data in buffer for writing
-	void *pData1;
-	uint32  dwData1Size;
-	void *pData2;
-	uint32  dwData2Size;
-	HRESULT rval;
-
-	rval = lpDSB->Lock(0, dwSize, &pData1, &dwData1Size, &pData2, &dwData2Size, DSBLOCK_FROMWRITECURSOR);
-	if (rval != DS_OK) {
-		return false;
-	}
-
-	// Read in first chunk of data
-	if (dwData1Size > 0) {
-		if (fread(pData1, dwData1Size, 1, pFile) != 1) {
-			char holder[256];
-			wsprintf(holder, "Error reading .wav: %d, dwdata: %d, pFile: %d", pData1, dwData1Size, pFile);
-			OutputDebugString(holder);
-			return false;
-		}
-}
-
-	// read in second chunk if necessary
-	if (dwData2Size > 0) {
-		if (fread(pData2, dwData2Size, 1, pFile) != 1) {
-			return false;
-		}
-	}
-
-	// Unlock data in buffer
-	rval = lpDSB->Unlock(pData1, dwData1Size, pData2, dwData2Size);
-	if (rval != DS_OK) {
-		return false;
-	}
-#endif
-	// Yahoo!
-	return true;
-}
-
-/**
- * Creates a DirectSound buffer
- */
-static bool CreateSoundBuffer(uint32 dwBuf, uint32 dwBufSize, uint32 dwFreq, uint32 dwBitsPerSample, uint32 dwBlkAlign, bool bStereo) {
-#ifdef TODO
-	if (!sound_on) return false;
-
-	PCMWAVEFORMAT pcmwf;
-	DSBUFFERDESC dsbdesc;
-
-	// Set up wave format structure.
-	memset(&pcmwf, 0, sizeof(PCMWAVEFORMAT));
-	pcmwf.wf.wFormatTag = WAVE_FORMAT_PCM;
-	pcmwf.wf.nChannels = bStereo ? 2 : 1;
-	pcmwf.wf.nSamplesPerSec = dwFreq;
-	pcmwf.wf.nBlockAlign = (WORD)dwBlkAlign;
-	pcmwf.wf.nAvgBytesPerSec = pcmwf.wf.nSamplesPerSec * pcmwf.wf.nBlockAlign;
-	pcmwf.wBitsPerSample = (WORD)dwBitsPerSample;
-
-	// Set up DSBUFFERDESC structure.
-	memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));  // Zero it out.
-	dsbdesc.dwSize = sizeof(DSBUFFERDESC);
-	dsbdesc.dwFlags = DSBCAPS_STATIC | DSBCAPS_GETCURRENTPOSITION2
-		| DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_LOCSOFTWARE;               // Needed creation flag for Direct 3D Sound
-//SETH    dsbdesc.dwFlags             = DSBCAPS_STATIC | DSBCAPS_CTRLDEFAULT | DSBCAPS_GETCURRENTPOSITION2;               // Needed creation flag for Direct 3D Sound
-	dsbdesc.dwBufferBytes = dwBufSize;
-	dsbdesc.lpwfxFormat = (LPWAVEFORMATEX)&pcmwf;
-
-	lpDS->CreateSoundBuffer(&dsbdesc, &ssound[dwBuf].sound, NULL);
-
-	// Query for the 3D Sound Buffer interface.
-	//  TRY_DS(g_lpSounds[dwBuf]->QueryInterface(IID_IDirectSound3DBuffer, (void**) &g_lp3dSounds[dwBuf]));
-#endif
-	// Yahoo!
-	return true;
-}
 
 static int get_pan(int h) {
 	int pan = 0;
@@ -152,7 +49,7 @@ static int get_pan(int h) {
 	return pan;
 }
 
-int get_vol(int h) {
+static int get_vol(int h) {
 	int pan = 0;
 	int pan2 = 0;
 
@@ -205,7 +102,6 @@ bool DSEnable(HWND hWnd) {
 	dsrval = DirectSoundCreate(NULL, &lpDS, NULL);
 
 	if (dsrval != DS_OK) {
-
 		if (dsrval == DSERR_INVALIDPARAM) TRACE("DSERR_INVALIDPARAM");
 		if (dsrval == DSERR_ALLOCATED) TRACE("DSERR_ALLOCATED");
 		if (dsrval == DSERR_OUTOFMEMORY) TRACE("DSERR_OUTOFMEMORY");
@@ -214,7 +110,6 @@ bool DSEnable(HWND hWnd) {
 		TRACE("DirectSoundCreate FAILED");
 		return false;
 	}
-
 
 	dsrval = lpDS->SetCooperativeLevel(hWnd, DSSCL_NORMAL);
 
@@ -277,7 +172,7 @@ bool InitSound(HWND hwndOwner) {
 	}
 	*/
 
-	CreateBufferFromWaveFile("GOLD.WAV", 1);
+	CreateBufferFromWaveFile("gold.wav", 1);
 
 	SoundLoadBanks();
 
@@ -355,42 +250,24 @@ bool CreateBufferFromWaveFile(const char *filename, uint32 dwBuf) {
 	// Open the wave file
 	Common::File f;
 
-#ifdef TODO
-	sprintf(crap, "sound/%s", FileName);
-
-	if (!exist(crap)) sprintf(crap, "../dink/sound/%s", FileName);
-#endif
+	// Open wave file
 	if (!f.open(Common::String::format("sound/%s", filename))) {
 		warning("Error, cannot load sound file %s", filename);
 		return false;
 	}
-	// Read in the wave header
-	WaveHeader wavHdr;
-	wavHdr.load(&f);
 
-	// Figure out the size of the data region
-	uint32 dwSize = wavHdr.dwDSize;
-
-	// Is this a stereo or mono file?
-	bool bStereo = wavHdr.wChnls > 1 ? true : false;
-
-	// Create the sound buffer for the wave file
-	if (!CreateSoundBuffer(dwBuf, dwSize, wavHdr.dwSRate, wavHdr.BitsPerSample, wavHdr.wBlkAlign, bStereo)) {
-		warning("Couldn't create sound buffer for sound %s.", filename);
-		f.close();
-		return false;
-	}
-
-	// Read the data for the wave file into the sound buffer
-	if (!ReadData(ssound[dwBuf].sound, &f, dwSize, sizeof(wavHdr))) {
-		f.close();
-		return false;
-	}
-
-	// Close out the wave file
+	// Decode it
+	Audio::AudioStream *wavStream = Audio::makeWAVStream(
+		f.readStream(f.size()), DisposeAfterUse::YES);
 	f.close();
 
-	// Yahoo!
+	if (!wavStream) {
+		warning("Couldn't create sound buffer for sound %s.", filename);
+		return false;
+	}
+
+	// Create the sound buffer for the wave file
+	ssound[dwBuf].sound = new IDirectSoundBuffer(wavStream);
 	return true;
 }
 

@@ -25,7 +25,8 @@
 namespace Dink {
 
 HRESULT DirectSoundCreate(void *pcGuidDevice, LPDIRECTSOUND *ppDS, LPUNKNOWN pUnkOuter) {
-	error("TODO");
+	*ppDS = new IDirectSound();
+	return DS_OK;
 }
 
 HRESULT IDirectSoundBuffer::Play(uint32 dwReserved1, uint32 dwPriority, uint32 dwFlags) {
@@ -70,7 +71,7 @@ HRESULT IDirectSound::CreateSoundBuffer(LPCDSBUFFERDESC pcDSBufferDesc, LPDIRECT
 }
 
 HRESULT IDirectSound::SetCooperativeLevel(HWND hwnd, DWORD dwLevel) {
-	error("TODO");
+	return DS_OK;
 }
 
 HRESULT IDirectSound::DuplicateSoundBuffer(LPDIRECTSOUNDBUFFER pDSBufferOriginal, _Outptr_ LPDIRECTSOUNDBUFFER *ppDSBufferDuplicate) {

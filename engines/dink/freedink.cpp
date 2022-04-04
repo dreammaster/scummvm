@@ -5484,7 +5484,6 @@ bool doInit() {
 
 	Msg("Done with tilescreens...");
 
-	// Create the offscreen surface, by loading our bitmap.
 	if (sound_on) {
 		Msg("Initting sound");
 		sound_on = InitSound(hwnd);
@@ -5493,6 +5492,7 @@ bool doInit() {
 	if (g_engine->isDemo())
 		PlayMidi("4.mid");
 
+	// Create the offscreen surface, by loading our bitmap.
 	if (Common::File::exists("tiles/splash.bmp"))
 		lpDDSTwo = DDLoadBitmap(lpDD, "tiles/splash.bmp", 0, 0);
 

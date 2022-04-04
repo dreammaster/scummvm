@@ -22,6 +22,8 @@
 #ifndef DINK_DIRECTDRAW_DSOUND_H
 #define DINK_DIRECTDRAW_DSOUND_H
 
+#include "audio/audiostream.h"
+#include "audio/mixer.h"
 #include "dink/lib/wintypes.h"
 
 namespace Dink {
@@ -76,7 +78,13 @@ typedef const DSBUFFERDESC *LPCDSBUFFERDESC;
 
 
 struct IDirectSoundBuffer {
+private:
+	Audio::AudioStream *_audioStream = nullptr;
+	Audio::SoundHandle _soundHandle;
 public:
+	IDirectSoundBuffer(Audio::AudioStream *audioStream) :
+		_audioStream(audioStream) {}
+
 	HRESULT Play(uint32 dwReserved1, uint32 dwPriority, uint32 dwFlags);
 	HRESULT SetVolume(int lVolume);
 	HRESULT SetPan(int lPan);
