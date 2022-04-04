@@ -50,6 +50,7 @@ HRESULT DDReLoadBitmap(IDirectDrawSurface *dds, LPCSTR szBitmap) {
 	Common::String name(szBitmap);
 	const Graphics::Surface *surf;
 	Image::BitmapDecoder bmp;
+	Image::ImageDecoder *decoder = nullptr;
 
 	if (!f.open(name)) {
 		warning("Could not open image - %s", szBitmap);
@@ -58,13 +59,15 @@ HRESULT DDReLoadBitmap(IDirectDrawSurface *dds, LPCSTR szBitmap) {
 
 	if (name.hasSuffixIgnoreCase(".bmp") &&
 		(surf = loadImage(bmp, f)) != nullptr) {
-		// Do nothing
+		decoder = &bmp;
 	} else {
 		warning("Unknown image type - %s", szBitmap);
 		return DD_FALSE;
 	}
 
 	dds->copyFrom(surf);
+	if (decoder->hasPalette())
+		dds->setPalette(decoder->getPalette(), 0, decoder->getPaletteColorCount());
 
 	return DD_OK;
 }
