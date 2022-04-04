@@ -2078,35 +2078,25 @@ void make_idata(int type, int myseq, int myframe, int xoffset, int yoffset, RECT
 	Msg("Out of idata spots (max is %d), no more sprite corrections can be allowed.", max_idata);
 }
 
-void pre_figure_out(char line[255], int load_seq) {
+void pre_figure_out(char line[255]) {
 	char ev[15][100];
 	RECT hardbox;
-	//redink1 set hardbox to zero memory by default... fixed some weird compiler warnings in debug mode.  Might screw up default hard box?
-	hardbox.bottom = 0;
-	hardbox.left = 0;
-	hardbox.right = 0;
-	hardbox.top = 0;
-	//ZeroMemory(&hardbox, sizeof(RECT));
 	ZeroMemory(&ev, sizeof(ev));
 	int myseq = 0, myframe = 0;
 	int special = 0;
 	int special2 = 0;
+
 	for (int i = 1; i <= 14; i++) {
 		seperate_string(line, i, ' ', ev[i]);
-		//   Msg("Word %d is \"%s\"",i,ev[i]);
 	}
-
 
 	if (compare(ev[1], "playmidi")) {
 		if (!dinkedit)
 			PlayMidi(ev[2]);
 	}
 
-	if (compare(ev[1], "LOAD_SEQUENCE_NOW"))
-		//  if (     (load_seq == -1) | (load_seq == atol(ev[3]))  )
-	{
-		//           name   seq    speed       offsetx     offsety       hardx      hardy
-
+	if (compare(ev[1], "LOAD_SEQUENCE_NOW")) {
+		// name   seq    speed       offsetx     offsety       hardx      hardy
 		ZeroMemory(&hardbox, sizeof(RECT));
 		seq[atol(ev[3])].active = true;
 		strcpy(seq[atol(ev[3])].data, line);
@@ -2114,87 +2104,41 @@ void pre_figure_out(char line[255], int load_seq) {
 			load_sprites(ev[2], atol(ev[3]), atol(ev[4]), atol(ev[5]), atol(ev[6]), hardbox, true, true, false);
 		} else if (compare(ev[4], "LEFTALIGN")) {
 			load_sprites(ev[2], atol(ev[3]), atol(ev[4]), atol(ev[5]), atol(ev[6]), hardbox, false, false, true);
-		} else
+		} else if (compare(ev[4], "NOTANIM")) {
+			//not an animation!
+			load_sprites(ev[2], atol(ev[3]), atol(ev[4]), atol(ev[5]), atol(ev[6]), hardbox, false, false, false); //Crap
+		} else {
+			//yes, an animation!
+			hardbox.left = atol(ev[7]);
+			hardbox.top = atol(ev[8]);
+			hardbox.right = atol(ev[9]);
+			hardbox.bottom = atol(ev[10]);
 
-			if (compare(ev[4], "NOTANIM")) {
-
-				//not an animation!
-				load_sprites(ev[2], atol(ev[3]), atol(ev[4]), atol(ev[5]), atol(ev[6]), hardbox, false, false, false); //Crap
-			} else {
-				//yes, an animation!
-				hardbox.left = atol(ev[7]);
-				hardbox.top = atol(ev[8]);
-				hardbox.right = atol(ev[9]);
-				hardbox.bottom = atol(ev[10]);
-
-				load_sprites(ev[2], atol(ev[3]), atol(ev[4]), atol(ev[5]), atol(ev[6]), hardbox, true, false, false); //Crap
-			}
-
+			load_sprites(ev[2], atol(ev[3]), atol(ev[4]), atol(ev[5]), atol(ev[6]), hardbox, true, false, false); //Crap
+		}
 
 		myseq = atol(ev[2]);
 		myframe = atol(ev[3]);
 		SetRect(&hardbox, atol(ev[6]), atol(ev[7]), atol(ev[8]), atol(ev[9]));
 		make_idata(1, myseq, myframe, atol(ev[4]), atol(ev[5]), hardbox);
-
-		//    program_idata();
 		return;
 	}
-	/*
-	if (compare(ev[1],"LOAD_SEQUENCE_NOW"))
-	//  if (     (load_seq == -1) | (load_seq == atol(ev[3]))  )
-	{
-	//           name   seq    speed       offsetx     offsety       hardx      hardy
 
-	ZeroMemory(&hardbox, sizeof(RECT));
-	strcpy(seq[atol(ev[3])].data, line);
-	seq[atol(ev[3])].active = true;
-
-
-	if (compare(ev[4], "NOTANIM"))
-	{
-
-	//not an animation!
-	load_sprites(ev[2],atol(ev[3]),atol(ev[4]),atol(ev[5]),atol(ev[6]), hardbox,false, false); //Crap
-	} else
-	{
-	//yes, an animation!
-	hardbox.left = atol(ev[7]);
-	hardbox.top = atol(ev[8]);
-	hardbox.right = atol(ev[9]);
-	hardbox.bottom = atol(ev[10]);
-
-	load_sprites(ev[2],atol(ev[3]),atol(ev[4]),atol(ev[5]),atol(ev[6]), hardbox,true, false); //Crap
-	}
-
-
-	//program_idata();
-	return;
-	}
-
-	*/
-	if (compare(ev[1], "LOAD_SEQUENCE"))
-
-	{
-		//           name   seq    speed       offsetx     offsety       hardx      hardy
+	if (compare(ev[1], "LOAD_SEQUENCE")) {
+		// name   seq    speed       offsetx     offsety       hardx      hardy
 		strcpy(seq[atol(ev[3])].data, line);
 		seq[atol(ev[3])].active = true;
 		return;
 	}
 
 	if (compare(ev[1], "SET_SPRITE_INFO")) {
-		//           name   seq    speed       offsetx     offsety       hardx      hardy
-
-
-		//if (picInfo[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
-
+		// name   seq    speed       offsetx     offsety       hardx      hardy
 		myseq = atol(ev[2]);
 		myframe = atol(ev[3]);
 		SetRect(&hardbox, atol(ev[6]), atol(ev[7]), atol(ev[8]), atol(ev[9]));
 		make_idata(1, myseq, myframe, atol(ev[4]), atol(ev[5]), hardbox);
 		return;
 	}
-
-
 
 	if (compare(ev[1], "SET_FRAME_SPECIAL")) {
 		myseq = atol(ev[2]);
@@ -2215,7 +2159,6 @@ void pre_figure_out(char line[255], int load_seq) {
 	if (compare(ev[1], "STARTING_DINK_X")) {
 		myseq = atol(ev[2]);
 		play.x = myseq;
-
 	}
 
 	if (compare(ev[1], "STARTING_DINK_Y")) {
@@ -2223,26 +2166,15 @@ void pre_figure_out(char line[255], int load_seq) {
 		play.y = myseq;
 	}
 
-
-
 	if (compare(ev[1], "SET_FRAME_FRAME")) {
-		//           name   seq    speed       offsetx     offsety       hardx      hardy
-
-
-		//if (picInfo[seq[myseq].frame[myframe]].frame = 0) Msg("Changing sprite that doesn't exist...");
-
+		// name   seq    speed       offsetx     offsety       hardx      hardy
 		myseq = atol(ev[2]);
 		myframe = atol(ev[3]);
 		special = atol(ev[4]);
 		special2 = atol(ev[5]);
 
-
 		make_idata(4, myseq, myframe, atol(ev[4]), atol(ev[5]), hardbox);
-
-		//   Msg("Set frame.  %d %d %d",myseq, myframe, special);
-
 	}
-
 }
 
 void initfonts(const char *fontname) {

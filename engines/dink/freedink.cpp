@@ -5312,8 +5312,7 @@ long FAR PASCAL WindowProc(HWND hWnd, UINT message,
 #endif
 
 void load_batch() {
-#ifdef TODO
-	FILE *stream;
+	Common::File f;
 	char line[255];
 
 	spr[1].x = 200;
@@ -5326,31 +5325,23 @@ void load_batch() {
 
 		sprintf(line, "Error finding the dink.ini file in the %s dir.", dir);
 		TRACE(line);
-
 	}
 
-	if ((stream = fopen("dink.ini", "r")) != NULL) {
+	if (f.open("dink.ini")) {
+		while (!f.eos()) {
+			Common::String l = f.readLine();
+			strncpy(line, l.c_str(), 254);
+			line[254] = '\0';
 
-		while (1) {
-			if (fgets(line, 255, stream) == NULL)
-				goto done;
-			else {
-
-				pre_figure_out(line, 0);
-			}
-
+			pre_figure_out(line);
 		}
 
-done:
-		fclose(stream);
+		f.close();
 	} else {
 		TRACE("Dink.ini missing.");
 	}
 
 	program_idata();
-#else
-	error("TODO: load_batch");
-#endif
 }
 
 bool doInit() {

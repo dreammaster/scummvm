@@ -74,6 +74,7 @@ extern void attach();
 //redink1 added for font colors
 extern void init_font_colors();
 extern void initfonts(const char *fontname);
+extern void pre_figure_out(char line[255]);
 
 } // namespace Dink
 
