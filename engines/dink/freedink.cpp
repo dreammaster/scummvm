@@ -27,6 +27,7 @@
 #include "dink/events.h"
 #include "dink/fast_file.h"
 #include "dink/file.h"
+#include "dink/graphics.h"
 #include "dink/sound.h"
 #include "dink/text.h"
 #include "dink/var.h"
@@ -34,7 +35,6 @@
 #include "dink/directdraw/ddutil.h"
 #include "dink/directdraw/dinput.h"
 #include "dink/directdraw/joystickapi.h"
-#include "dink/lib/graphics.h"
 #include "dink/lib/rect.h"
 #include "dink/lib/wintypes.h"
 
@@ -5589,7 +5589,7 @@ bool doInit() {
 		spr[i].clear();
 
 	init_font_colors();
-	initfonts("Arial");
+	initfonts("FreeSans");
 
 	return true;
 }

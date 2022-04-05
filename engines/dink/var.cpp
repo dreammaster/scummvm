@@ -25,10 +25,10 @@
 #include "dink/dink.h"
 #include "dink/events.h"
 #include "dink/file.h"
-#include "dink/var.h"
+#include "dink/graphics.h"
 #include "dink/sound.h"
 #include "dink/text.h"
-#include "dink/lib/graphics.h"
+#include "dink/var.h"
 #include "dink/lib/wintypes.h"
 #include "dink/directdraw/ddutil.h"
 
@@ -2000,73 +2000,6 @@ void pre_figure_out(char line[255]) {
 		make_idata(4, myseq, myframe, atol(ev[4]), atol(ev[5]), hardbox);
 	}
 }
-
-void initfonts(const char *fontname) {
-	lf.lfHeight = 20;
-	lf.lfWidth = 0;
-	/*lf.lfEscapement;
-	lf.lfOrientation;
-	*/
-	lf.lfWeight = 400;
-	/*
-	lf.lfItalic;
-	lf.lfUnderline;
-	lf.lfStrikeOut;
-	lf.lfCharSet;
-	*/
-	// lf.lfOutPrecision = OUT_TT_PRECIS;
-
-
-	//lf.lfClipPrecision;
-	//lf.lfQuality = PROOF_QUALITY;
-	// lf.lfPitchAndFamily;
-	//strcpy(lf.lfFaceName,"Comic Sans MS");
-	strcpy(lf.lfFaceName, fontname);
-
-	//draw shadow
-	hfont = CreateFontIndirect(&lf);
-
-
-	lf.lfHeight = 18;
-	//lf.lfWidth = 0;
-	/*lf.lfEscapement;
-	lf.lfOrientation;
-	*/
-	//lf.lfWeight = 300;
-	lf.lfWeight = 600;
-
-	/*
-	lf.lfItalic;
-	lf.lfUnderline;
-	lf.lfStrikeOut;
-	lf.lfCharSet;
-	*/
-	// lf.lfOutPrecision = OUT_TT_PRECIS;
-
-
-	//lf.lfClipPrecision;
-	//lf.lfQuality = PROOF_QUALITY;
-	// lf.lfPitchAndFamily;
-	//strcpy(lf.lfFaceName,"Comic Sans MS");
-	strcpy(lf.lfFaceName, fontname);
-
-	//draw shadow
-	hfont_small = CreateFontIndirect(&lf);
-
-}
-
-void kill_fonts() {
-	if (hfont) {
-		DeleteObject(hfont);
-		hfont = NULL;
-	}
-	if (hfont_small) {
-		DeleteObject(hfont_small);
-		hfont_small = NULL;
-	}
-
-}
-
 
 int draw_num(int mseq, char nums[50], int mx, int my) {
 	int length = 0;

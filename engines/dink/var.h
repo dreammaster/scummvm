@@ -61,7 +61,6 @@ extern void draw_map_game_background();
 extern int realhard(int tile);
 //redink1 added for recursive scope checking
 extern int get_var(int script, char *name);
-extern void kill_fonts();
 extern bool nothing_playing();
 extern void drawallhard();
 extern void process_callbacks();
@@ -71,7 +70,6 @@ extern IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx,
 extern void attach();
 //redink1 added for font colors
 extern void init_font_colors();
-extern void initfonts(const char *fontname);
 extern void pre_figure_out(char line[255]);
 
 } // namespace Dink

@@ -19,8 +19,11 @@
  *
  */
 
-#include "dink/graph"
-#include "dink/lib/graphics.h"
+#include "dink/graphics.h"
+#include "dink/globals.h"
+#include "dink/lib/wintypes.h"
+#include "common/unzip.h"
+#include "graphics/fonts/ttf.h"
 
 namespace Dink {
 
@@ -28,7 +31,7 @@ HRESULT SelectObject(HDC hdc, HGDIOBJ h) {
 	return S_OK;
 }
 
-HRESULT SetBkMode(HDC hdc, int mode) {
+HRESULT SetBkMode(HDC hdc, int bkMode) {
 	return S_OK;
 }
 
@@ -40,74 +43,29 @@ int GetTextFace(HDC hdc, int c, const char *lpName) {
 	return 0;
 }
 
-HFONT CreateFontIndirect(LOGFONT *lf) {
-	error("TODO: CreateFontIndirect");
-}
+void initfonts(const Common::String &fontName) {
+/*	Common::Archive *archive;
+	if ((archive = Common::makeZipArchive("fonts.dat")) == nullptr)
+		error("Could not locate fonts");
+*/
+	// 
+	// TODO: Set up fonts most matching FreeDink
 
-void initfonts(const char *fontname) {
-	lf.lfHeight = 20;
-	lf.lfWidth = 0;
-	/*lf.lfEscapement;
-	lf.lfOrientation;
-	*/
-	lf.lfWeight = 400;
-	/*
-	lf.lfItalic;
-	lf.lfUnderline;
-	lf.lfStrikeOut;
-	lf.lfCharSet;
-	*/
-	// lf.lfOutPrecision = OUT_TT_PRECIS;
-
-
-	//lf.lfClipPrecision;
-	//lf.lfQuality = PROOF_QUALITY;
-	// lf.lfPitchAndFamily;
-	//strcpy(lf.lfFaceName,"Comic Sans MS");
-	strcpy(lf.lfFaceName, fontname);
-
-	//draw shadow
-	hfont = CreateFontIndirect(&lf);
-
-
-	lf.lfHeight = 18;
-	//lf.lfWidth = 0;
-	/*lf.lfEscapement;
-	lf.lfOrientation;
-	*/
-	//lf.lfWeight = 300;
-	lf.lfWeight = 600;
-
-	/*
-	lf.lfItalic;
-	lf.lfUnderline;
-	lf.lfStrikeOut;
-	lf.lfCharSet;
-	*/
-	// lf.lfOutPrecision = OUT_TT_PRECIS;
-
-
-	//lf.lfClipPrecision;
-	//lf.lfQuality = PROOF_QUALITY;
-	// lf.lfPitchAndFamily;
-	//strcpy(lf.lfFaceName,"Comic Sans MS");
-	strcpy(lf.lfFaceName, fontname);
-
-	//draw shadow
-	hfont_small = CreateFontIndirect(&lf);
-
+	// lfHeight = 20, lfWeight = 400
+	hfont = Graphics::loadTTFFontFromArchive("FreeSans.ttf", 20);
+	// lfHeight = 18, lfWeight = 600
+	hfont_small = Graphics::loadTTFFontFromArchive("FreeSans.ttf", 18);
 }
 
 void kill_fonts() {
 	if (hfont) {
-		DeleteObject(hfont);
-		hfont = NULL;
+		delete hfont;
+		hfont = nullptr;
 	}
 	if (hfont_small) {
-		DeleteObject(hfont_small);
-		hfont_small = NULL;
+		delete hfont_small;
+		hfont_small = nullptr;
 	}
-
 }
 
 } // namespace Dink

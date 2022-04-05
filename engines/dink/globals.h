@@ -25,12 +25,12 @@
 #include "common/hashmap.h"
 #include "common/rect.h"
 #include "common/str.h"
+#include "graphics/font.h"
 #include "dink/types.h"
 #include "dink/data.h"
 #include "dink/directdraw/ddraw.h"
 #include "dink/directdraw/dinput.h"
 #include "dink/directdraw/dsound.h"
-#include "dink/lib/graphics.h"
 
 namespace Dink {
 
@@ -546,10 +546,9 @@ extern seth_sound ssound[max_sounds];
 extern LPDIRECTSOUND lpDS;
 extern player_short_info short_play;
 extern int push_active;
-extern LOGFONT lf;
 extern bool turn_on_plane;
-extern HFONT hfont;
-extern HFONT hfont_small;
+extern Graphics::Font *hfont;
+extern Graphics::Font *hfont_small;
 extern int stop_entire_game;
 
 extern bool in_enabled;

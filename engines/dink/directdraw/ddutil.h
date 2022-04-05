@@ -22,7 +22,7 @@
 #ifndef DINK_DIRECTDRAW_DDUTIL_H
 #define DINK_DIRECTDRAW_DDUTIL_H
 
-#include "dink/lib/graphics.h"
+#include "dink/graphics.h"
 #include "dink/directdraw/ddraw.h"
 
 namespace Dink {

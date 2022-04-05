@@ -44,6 +44,7 @@ inline int DrawText(HDC hdc, const char *lpchText, int cchText,
 	return 0;
 }
 
+/*
 struct LOGFONT {
 	int32 lfHeight;
 	int32 lfWidth;
@@ -60,7 +61,7 @@ struct LOGFONT {
 	byte lfPitchAndFamily;
 	char lfFaceName[32];
 };
-
+*/
 typedef void *HGDIOBJ;
 typedef Graphics::Surface *HBITMAP;
 
@@ -72,7 +73,8 @@ inline bool ClientToScreen(HWND hWnd, LPPOINT lpPoint) {
 	return true;
 }
 
-extern HFONT CreateFontIndirect(LOGFONT *lf);
+extern void initfonts(const Common::String &fontName);
+extern void kill_fonts();
 
 } // namespace Dink
 

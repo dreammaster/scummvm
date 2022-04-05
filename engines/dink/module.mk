@@ -8,6 +8,7 @@ MODULE_OBJS = \
 	fast_file.o \
 	freedink.o \
 	globals.o \
+	graphics.o \
 	metaengine.o \
 	sound.o \
 	text.o \
@@ -16,8 +17,7 @@ MODULE_OBJS = \
 	directdraw\ddraw.o \
 	directdraw\ddutil.o \
 	directdraw\dinput.o \
-	directdraw\dsound.o \
-	lib\graphics.o
+	directdraw\dsound.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_DINK), DYNAMIC_PLUGIN)

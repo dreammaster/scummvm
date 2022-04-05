@@ -19,6 +19,7 @@
  *
  */
 
+#include "graphics/font.h"
 #include "dink/globals.h"
 
 namespace Dink {
@@ -236,11 +237,9 @@ bool no_transition = false;
 player_short_info short_play;
 int push_active = 1;
 
-LOGFONT lf = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "" };
-
 bool turn_on_plane = false;
-HFONT hfont = nullptr;
-HFONT hfont_small = nullptr;
+Graphics::Font *hfont = nullptr;
+Graphics::Font *hfont_small = nullptr;
 int stop_entire_game;
 
 bool in_enabled = false;
