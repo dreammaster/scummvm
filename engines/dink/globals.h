@@ -163,7 +163,7 @@ struct sp {
 	int base_hit;
 	int last_sound;
 	int hard;
-	Common::Rect alt;
+	RECT alt;
 	int althard;
 	int sp_index;
 	bool nocontrol;
@@ -301,7 +301,7 @@ struct sprite_placement {
 	char talk[13];
 	int speed, base_walk, base_idle, base_attack, base_hit, timer, que;
 	int hard;
-	Common::Rect alt;
+	RECT alt;
 	int prop;
 	int warp_map;
 	int warp_x;
@@ -334,7 +334,7 @@ struct sprite_index {
 
 struct pic_info {
 	LPDIRECTDRAWSURFACE     k;       // Sprites
-	Common::Rect                box, hardbox;
+	RECT                box, hardbox;
 
 	int yoffset;
 	int xoffset;
@@ -379,7 +379,7 @@ struct idata {
 	int seq;
 	int frame;
 	int xoffset, yoffset;
-	Common::Rect hardbox;
+	RECT hardbox;
 };
 
 struct mydata {
@@ -506,7 +506,7 @@ extern int cur_map, cur_tile;
 extern seth_joy sjoy;
 extern int32 thisTickCount, lastTickCount;
 extern uint32 timecrap;
-extern Common::Rect math, box_crap, box_real;
+extern RECT math, box_crap, box_real;
 extern wait_for_button wait;
 extern HRESULT ddrval;
 extern int sz, sy, x_offset, y_offset;
@@ -554,7 +554,7 @@ extern JOYINFOEX jinfo; //joystick info
 extern bool joystick;
 extern bool disablejoystick;
 extern hardness hmap;
-extern Common::Rect tilerect[tile_screens];
+extern RECT tilerect[tile_screens];
 
 //redink1 moves this here so could ignore keystrokes
 extern HWND hwnd;
@@ -690,7 +690,7 @@ extern int sp_speed;
 extern char slist[10][200];
 extern long nlist[10];
 extern int process_count;
-extern Common::Rect sp_alt;
+extern RECT sp_alt;
 extern int hard_tile;
 extern bool sp_screenmatch;
 extern char in_temp[200];
@@ -743,7 +743,7 @@ extern int cur_map, cur_tile;
 extern seth_joy sjoy;
 extern int32               thisTickCount, lastTickCount;
 extern uint32 timecrap;
-extern Common::Rect math, box_crap, box_real;
+extern RECT math, box_crap, box_real;
 
 extern HRESULT             ddrval;
 extern int sz, sy, x_offset, y_offset;
@@ -800,7 +800,7 @@ extern JOYINFOEX jinfo;
 extern bool joystick;
 extern bool disablejoystick;
 extern hardness hmap;
-extern Common::Rect tilerect[tile_screens];
+extern RECT tilerect[tile_screens];
 
 extern int fps_average;
 extern int but_timer;

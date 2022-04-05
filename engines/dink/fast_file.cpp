@@ -22,6 +22,7 @@
 #include "common/debug.h"
 #include "common/textconsole.h"
 #include "dink/fast_file.h"
+#include "dink/file.h"
 
 namespace Dink {
 
@@ -46,7 +47,7 @@ struct FileHandle {
 typedef FileHandle *PFileHandle;
 
 static int LockCount = 0;
-static Common::File *hFile = nullptr;
+static File *hFile = nullptr;
 static byte *pBase = nullptr;
 static uint32 indexCount = 0;
 static PFileEntry index = nullptr;
@@ -102,7 +103,7 @@ bool FastFileInit(const char *fname, int max_handles) {
 		/*
 		 * create a memory mapped file for the master file
 		 */
-		hFile = new Common::File();
+		hFile = new File();
 
 		if (!hFile->open(fname)) {
 			warning("FastFileInit: CreateFile(%s)", fname);

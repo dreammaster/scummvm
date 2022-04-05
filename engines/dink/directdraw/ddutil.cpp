@@ -21,6 +21,7 @@
 
 #include "common/file.h"
 #include "image/bmp.h"
+#include "dink/file.h"
 #include "dink/directdraw/ddutil.h"
 
 namespace Dink {
@@ -46,7 +47,7 @@ IDirectDrawSurface *DDLoadBitmap(IDirectDraw * pdd, LPCSTR szBitmap, int dx, int
 }
 
 HRESULT DDReLoadBitmap(IDirectDrawSurface *dds, LPCSTR szBitmap) {
-	Common::File f;
+	File f;
 	Common::String name(szBitmap);
 	const Graphics::Surface *surf;
 	Image::BitmapDecoder bmp;
@@ -86,7 +87,7 @@ HRESULT DDCopyBitmap(IDirectDrawSurface *surf, HBITMAP hbm, int x, int y, int dx
 }
 
 IDirectDrawPalette *DDLoadPalette(IDirectDraw *pdd, LPCSTR szBitmap) {
-	Common::File f;
+	File f;
 	Image::BitmapDecoder bmp;
 
 	// Build a 332 palette as the default.

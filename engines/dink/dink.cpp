@@ -22,6 +22,7 @@
 #include "dink/dink.h"
 #include "dink/detection.h"
 #include "dink/events.h"
+#include "dink/file.h"
 #include "dink/freedink.h"
 #include "dink/globals.h"
 #include "dink/update_frame.h"
@@ -91,7 +92,7 @@ void DinkEngine::initialize() {
 
 	_events = new EventsManager();
 
-	if (Common::File::exists("cd.dat"))
+	if (File::exists("cd.dat"))
 		burn_revision = 1;
 
 	Graphics::PixelFormat format = truecolor ?

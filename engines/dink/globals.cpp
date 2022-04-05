@@ -60,7 +60,7 @@ int cur_map, cur_tile;
 seth_joy sjoy;
 int32               thisTickCount, lastTickCount;
 uint32 timecrap;
-Common::Rect math, box_crap, box_real;
+RECT math, box_crap, box_real;
 wait_for_button wait;
 HRESULT             ddrval;
 int sz, sy, x_offset, y_offset;
@@ -111,7 +111,7 @@ JOYINFOEX jinfo; //joystick info
 bool joystick = false;
 bool disablejoystick = false;
 hardness hmap;
-Common::Rect tilerect[tile_screens];
+RECT tilerect[tile_screens];
 
 
 //redink1 moves this here so could ignore keystrokes
@@ -271,7 +271,7 @@ int sp_speed = 0;
 char slist[10][200];
 long nlist[10];
 int process_count = 0;
-Common::Rect sp_alt;
+RECT sp_alt;
 int hard_tile = 0;
 bool sp_screenmatch = 0;
 char in_temp[200];
@@ -299,7 +299,7 @@ LPDIRECTDRAWCLIPPER lpClipper;
 int drawthistime = true;
 int currX = 640;
 int currY = 480;
-Common::Rect                rc;
+RECT                rc;
 int winoffset = 25;
 int winoffsetx = 5;
 

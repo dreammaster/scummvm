@@ -24,6 +24,7 @@
 #include "image/bmp.h"
 #include "dink/dink.h"
 #include "dink/events.h"
+#include "dink/file.h"
 #include "dink/var.h"
 #include "dink/sound.h"
 #include "dink/text.h"
@@ -39,58 +40,18 @@ void clear_talk() {
 }
 
 IDirectDrawSurface *DDSethLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite) {
-#ifdef TODO
-	HBITMAP             hbm;
-	BITMAP              bm;
-	DDSURFACEDESC       ddsd;
-	IDirectDrawSurface *pdds;
+	IDirectDrawSurface *surf = DDLoadBitmap(pdd, szBitmap);
+	if (!surf)
+		return nullptr;
 
-	//
-	//  try to load the bitmap as a resource, if that fails, try it as a file
-	//
-	hbm = (HBITMAP)LoadImage(GetModuleHandle(NULL), szBitmap, IMAGE_BITMAP, dx, dy, LR_CREATEDIBSECTION);
-
-	if (hbm == NULL)
-		hbm = (HBITMAP)LoadImage(NULL, szBitmap, IMAGE_BITMAP, dx, dy, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-
-	if (hbm == NULL)
-		return NULL;
-
-	//
-	// get size of the bitmap
-	//
-	GetObject(hbm, sizeof(bm), &bm);      // get size of bitmap
-
-	//
-	// create a DirectDrawSurface for this bitmap
-	//
-	ZeroMemory(&ddsd, sizeof(ddsd));
-	ddsd.dwSize = sizeof(ddsd);
-	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
-	ddsd.dwWidth = bm.bmWidth;
-	ddsd.dwHeight = bm.bmHeight;
-
-	if (pdd->CreateSurface(&ddsd, &pdds, NULL) != DD_OK)
-		return NULL;
-
-	DDCopyBitmap(pdds, hbm, 0, 0, 0, 0);
-
-	DeleteObject(hbm);
 	if (sprite > 0) {
 		picInfo[sprite].box.top = 0;
 		picInfo[sprite].box.left = 0;
-		picInfo[sprite].box.right = ddsd.dwWidth;
-		picInfo[sprite].box.bottom = ddsd.dwHeight;
-
+		picInfo[sprite].box.right = surf->w;
+		picInfo[sprite].box.bottom = surf->h;
 	}
 
-
-
-	return pdds;
-#else
-	error("TODO");
-#endif
+	return surf;
 }
 
 void SaySmall(char thing[500], int px, int py, int r, int g, int b) {
@@ -264,7 +225,7 @@ void setup_anim(int fr, int start, int delay) {
 
 IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite) {
 	Image::BitmapDecoder decoder;
-	Common::File f;
+	File f;
 
 	if (!f.open(szBitmap) || !decoder.loadStream(f))
 		return nullptr;
@@ -872,13 +833,13 @@ bool load_game(int num) {
 			//Which tiles are we loading, new or default?
 			if (strlen(play.tile[i].file) > 0) {
 				//Check the original directory
-				if (!Common::File::exists(play.tile[i].file))
+				if (!File::exists(play.tile[i].file))
 					sprintf(tile, "..\\DINK\\%s", play.tile[i].file);
 				else
 					strcpy(tile, play.tile[i].file);
 			} else {
 				sprintf(tile, "tiles\\TS%02d.bmp", i);
-				if (!Common::File::exists(tile))
+				if (!File::exists(tile))
 					sprintf(tile, "..\\dink\\tiles\\TS%02d.BMP", i);
 			}
 
@@ -1174,7 +1135,7 @@ void load_hard() {
 	char crap[80];
 	sprintf(crap, "HARD.DAT");
 	if (!dinkedit) {
-		if (!Common::File::exists(crap)) sprintf(crap, "..\\dink\\hard.dat");
+		if (!File::exists(crap)) sprintf(crap, "..\\dink\\hard.dat");
 	}
 
 	fp = fopen(crap, "rb");
@@ -1734,9 +1695,10 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
                   RECT hardbox, bool notanim, bool black, bool leftalign) {
 	int work;
 	PALETTEENTRY    holdpal[256];
-	char crap[200], hold[5];
+	char crap[200];
 
-	if (no_running_main) draw_wait();
+	if (no_running_main)
+		draw_wait();
 
 	char crap2[200];
 	strcpy(crap2, org);
@@ -1747,30 +1709,23 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
 
 	sprintf(crap, "%s\\dir.ff", crap2);
 	//Msg("Checking for %s..", crap);
-	if (Common::File::exists(crap)) {
+	if (File::exists(crap)) {
 		load_sprite_pak(org, nummy, speed, xoffset, yoffset, hardbox, notanim, black, leftalign, true);
 		return;
 	}
 
-	sprintf(crap, "%s01.BMP", org);
-	if (!Common::File::exists(crap))
-
-	{
-
+	sprintf(crap, "%s01.bmp", org);
+	if (!File::exists(crap)) {
 		sprintf(crap, "..\\dink\\%s\\dir.ff", crap2);
 		//Msg("Checking for %s..", crap);
-		if (Common::File::exists(crap)) {
+		if (File::exists(crap)) {
 			load_sprite_pak(org, nummy, speed, xoffset, yoffset, hardbox, notanim, black, leftalign, false);
 			return;
 		}
 
-
-
-
 		//  Msg("Dir bad for sprite, changing");
 		sprintf(crap, "..\\dink\\%s", org);
 		strcpy(org, crap);
-
 	}
 
 	// redink1 added to fix bug where loading sequences over others wouldn't work quite right.
@@ -1789,58 +1744,42 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
 		lpDDPal->GetEntries(0, 0, 256, holdpal);
 		lpDDPal->SetEntries(0, 0, 256, real_pal);
 	}
+
 	for (int oo = 1; oo <= 1000; oo++) {
-
-		if (oo < 10) strcpy(hold, "0");
-		else strcpy(hold, "");
-		sprintf(crap, "%s%s%d.BMP", org, hold, oo);
-
-
+		sprintf(crap, "%s%.2d.BMP", org, oo);
 		picInfo[cur_sprite].k = DDSethLoad(lpDD, crap, 0, 0, cur_sprite);
-
 
 		if (picInfo[cur_sprite].k != NULL) {
 			if ((oo > 1) & (notanim)) {
-
 				picInfo[cur_sprite].yoffset = picInfo[index[nummy].s + 1].yoffset;
 			} else {
 				if (yoffset > 0)
 					picInfo[cur_sprite].yoffset = yoffset;
 				else {
-
-
 					picInfo[cur_sprite].yoffset = (picInfo[cur_sprite].box.bottom -
-					                               (picInfo[cur_sprite].box.bottom / 4)) - (picInfo[cur_sprite].box.bottom / 30);
-
+						(picInfo[cur_sprite].box.bottom / 4)) - (picInfo[cur_sprite].box.bottom / 30);
 				}
 			}
 
 			if ((oo > 1) & (notanim)) {
-
 				picInfo[cur_sprite].xoffset =  picInfo[index[nummy].s + 1].xoffset;
+			} else if (xoffset > 0) {
+				picInfo[cur_sprite].xoffset = xoffset;
 			} else {
-
-				if (xoffset > 0)
-					picInfo[cur_sprite].xoffset = xoffset;
-				else
-
-				{
-					picInfo[cur_sprite].xoffset = (picInfo[cur_sprite].box.right -
-					                               (picInfo[cur_sprite].box.right / 2)) + (picInfo[cur_sprite].box.right / 6);
-				}
+				picInfo[cur_sprite].xoffset = (picInfo[cur_sprite].box.right -
+					(picInfo[cur_sprite].box.right / 2)) + (picInfo[cur_sprite].box.right / 6);
 			}
-			//ok, setup main offsets, lets build the hard block
 
+			// Ok, setup main offsets, lets build the hard block
 			if (hardbox.right > 0) {
-				//forced setting
+				// Forced setting
 				picInfo[cur_sprite].hardbox.left = hardbox.left;
 				picInfo[cur_sprite].hardbox.right = hardbox.right;
 			} else {
-				//guess setting
+				// Guess setting
 				work = picInfo[cur_sprite].box.right / 4;
 				picInfo[cur_sprite].hardbox.left -= work;
 				picInfo[cur_sprite].hardbox.right += work;
-
 			}
 
 			if (hardbox.bottom > 0) {
@@ -1852,21 +1791,12 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
 				picInfo[cur_sprite].hardbox.top -= work;
 				picInfo[cur_sprite].hardbox.bottom += work;
 			}
-
 		}
-
-		if (leftalign) {
-			//     picInfo[cur_sprite].xoffset = 0;
-			//     picInfo[cur_sprite].yoffset = 0;
-		}
-
-		//add_text(crap,"LOG.TXT");
 
 		if (picInfo[cur_sprite].k == NULL) {
 			if (oo < 2) {
 				Msg("load_sprites:  Anim %s not found.", org);
 			}
-
 
 			index[nummy].last = (oo - 1);
 			//     initFail(hWndMain, crap);
@@ -1876,20 +1806,16 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
 			return;
 		}
 
-		//if (show_dot) Msg( "%s", crap);
-
-
-
 		if (black)
 			DDSetColorKey(picInfo[cur_sprite].k, RGB(0, 0, 0));
-		else DDSetColorKey(picInfo[cur_sprite].k, RGB(255, 255, 255));
-
+		else
+			DDSetColorKey(picInfo[cur_sprite].k, RGB(255, 255, 255));
 
 		cur_sprite++;
 		if (!reload)
 			save_cur++;
-		//if (first_frame) if  (oo == 1) return;
 	}
+
 	cur_sprite = save_cur;
 }
 
@@ -2954,7 +2880,7 @@ void refigure_out(const char *line) {
 
 
 void reload_batch() {
-	Common::File f;
+	File f;
 	Common::String line;
 
 	Msg("reoading .ini");
@@ -3186,7 +3112,7 @@ int load_script(const char *filename, int sprite, bool set_sprite) {
 
 	char temp[100];
 	int script;
-	Common::File f;
+	File f;
 //    int fh;
 	bool comp = false;
 	char tab[10];
@@ -3198,17 +3124,17 @@ int load_script(const char *filename, int sprite, bool set_sprite) {
 
 	sprintf(temp, "story\\%s.d", filename);
 
-	if (!Common::File::exists(temp)) {
+	if (!File::exists(temp)) {
 
 
 		sprintf(temp, "story\\%s.c", filename);
-		if (!Common::File::exists(temp)) {
+		if (!File::exists(temp)) {
 
 
 			sprintf(temp, "..\\dink\\story\\%s.d", filename);
-			if (!Common::File::exists(temp)) {
+			if (!File::exists(temp)) {
 				sprintf(temp, "..\\dink\\story\\%s.c", filename);
-				if (!Common::File::exists(temp)) {
+				if (!File::exists(temp)) {
 
 					Msg("Script %s not found. (checked for .C and .D) (requested by %d?)", temp, sprite);
 					return 0;
@@ -3647,7 +3573,7 @@ void decipher_string(char line[200], int script) {
 	if (decipher_savegame != 0)
 		if (compare(line, "&savegameinfo")) {
 			sprintf(crap, "save%d.dat", decipher_savegame);
-			if (Common::File::exists(crap)) {
+			if (File::exists(crap)) {
 				load_game_small(decipher_savegame, crab, &mytime);
 				//redink1 fix for savegame time bug
 				sprintf(line, "Slot %d - %d:%02d - %s", decipher_savegame, (mytime / 60), mytime - ((mytime / 60) * 60), crab);
@@ -5214,7 +5140,7 @@ crazy:
 void show_bmp(char name[80], int showdot, int reserved, int script) {
 
 
-	if (!Common::File::exists(name)) {
+	if (!File::exists(name)) {
 		Msg("Error: Can't find bitmap at %s.", name);
 		return;
 	}
@@ -5251,7 +5177,7 @@ again:
 
 
 void copy_bmp(char name[80]) {
-	if (!Common::File::exists(name)) {
+	if (!File::exists(name)) {
 		Msg("Error: Can't find bitmap at %s.", name);
 		return;
 	}
@@ -6051,7 +5977,7 @@ pass:
 			h = &h[strlen(ev[1])];
 			int ARR[20] = {2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
-				if (Common::File::exists(slist[0])) {
+				if (File::exists(slist[0])) {
 					LPDIRECTDRAWSURFACE oldTrick = DDLoadBitmap(lpDD, slist[0], 0, 0);
 					lpDDPal = DDLoadPalette(lpDD, slist[0]);
 					if (lpDDPal) {
@@ -6074,11 +6000,11 @@ pass:
 			h = &h[strlen(ev[1])];
 			int ARR[20] = {2, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
-				if (!Common::File::exists(slist[0])) {
+				if (!File::exists(slist[0])) {
 					sprintf(slist[0], "..\\DINK\\%s", slist[0]);
 				}
 
-				if (Common::File::exists(slist[0]) && nlist[1] > 0 && nlist[1] < tile_screens) {
+				if (File::exists(slist[0]) && nlist[1] > 0 && nlist[1] < tile_screens) {
 					//Need to unload old tiles...
 					tiles[nlist[1]]->Release();
 					//Load in the new tiles...
@@ -7398,7 +7324,7 @@ pass:
 			int ARR[20] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			if (get_parms(ev[1], script, h, ARR)) {
 				sprintf(temp, "save%d.dat", nlist[0]);
-				if (Common::File::exists(temp)) returnint = 1;
+				if (File::exists(temp)) returnint = 1;
 				else returnint = 0;
 
 			}

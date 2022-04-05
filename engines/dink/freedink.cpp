@@ -26,6 +26,7 @@
 #include "dink/dink.h"
 #include "dink/events.h"
 #include "dink/fast_file.h"
+#include "dink/file.h"
 #include "dink/sound.h"
 #include "dink/text.h"
 #include "dink/var.h"
@@ -60,7 +61,7 @@ void text_draw(int h, HDC hdc) {
 
 	char crap[200];
 	char *cr;
-	Common::Rect rcRect;
+	RECT rcRect;
 	int color = 0;
 
 	if (spr[h].damage == -1) {
@@ -1847,7 +1848,7 @@ void bounce_brain(int h) {
 //end bounce brain
 
 void grab_trick(int trick) {
-	Common::Rect rcRect;
+	RECT rcRect;
 	HRESULT result;
 	//Msg("making trick.");
 
@@ -1996,7 +1997,7 @@ b1end:
 
 
 bool run_through_tag_list_talk(int h) {
-	Common::Rect box;
+	RECT box;
 	int amount, amounty;
 
 	for (int i = 1; i <= last_sprite_created; i++) {
@@ -2076,7 +2077,7 @@ void make_missile(int x1, int y1, int dir_, int speed_, int seq_, int frame, int
 
 
 void missile_brain(int h, bool repeat) {
-	Common::Rect box;
+	RECT box;
 	automove(h);
 
 	*pmissle_source = h;
@@ -2243,7 +2244,7 @@ void missile_brain_expire(int h) {
 }
 
 void run_through_mouse_list(int h, bool special) {
-	Common::Rect box;
+	RECT box;
 	//int amount, amounty;
 
 	for (int i = 1; i <= last_sprite_created; i++) {
@@ -3080,7 +3081,7 @@ smoothend:
 }
 
 bool transition() {
-	Common::Rect rcRect;
+	RECT rcRect;
 	HRESULT             result;
 	//we need to do our fancy screen transition
 	int dumb = 5;
@@ -3455,7 +3456,7 @@ void up_cycle() {
 	}
 
 }
-void draw_box(Common::Rect box, int color) {
+void draw_box(RECT box, int color) {
 	DDBLTFX ddBltFx;
 
 	ddBltFx.dwSize = sizeof(ddBltFx);
@@ -3544,8 +3545,8 @@ void ApplyFade32(register unsigned char aValue, register unsigned char *aBuffer,
 //redink1 and Invertigo fix for windowed/high color mode
 void flip_it() {
 	//DDBLTFX     ddBltFx;
-	Common::Rect rcRectSrc;
-	Common::Rect rcRectDest;
+	RECT rcRectSrc;
+	RECT rcRectDest;
 	POINT p;
 
 	/*int timer = GetTickCount() + 50;
@@ -3557,7 +3558,7 @@ void flip_it() {
 	//redink1 fix for true-color transition
 	//The idea is to apply the fade to the backbuffer right before the main flip/blt.
 	if (truecolor && (process_downcycle || process_upcycle || bFadedDown)) {
-		Common::Rect r;
+		RECT r;
 		r.bottom = 480;
 		r.left = 0;
 		r.right = 640;
@@ -3738,7 +3739,7 @@ void flip_it() {
 
 
 void run_through_tag_list(int h, int strength) {
-	Common::Rect box;
+	RECT box;
 	int amount, amounty;
 
 	for (int i = 1; i <= last_sprite_created; i++) {
@@ -3875,7 +3876,7 @@ void run_through_tag_list(int h, int strength) {
 
 
 void run_through_tag_list_push(int h) {
-	Common::Rect box;
+	RECT box;
 
 	for (int i = 1; i <= last_sprite_created; i++) {
 		if (spr[i].active) if (i != h) if
@@ -3906,7 +3907,7 @@ void run_through_tag_list_push(int h) {
 
 
 void run_through_touch_damage_list(int h) {
-	Common::Rect box;
+	RECT box;
 	//int amount, amounty;
 
 	for (int i = 1; i <= last_sprite_created; i++) {
@@ -3965,7 +3966,7 @@ void run_through_touch_damage_list(int h) {
 
 
 void process_warp_man() {
-	Common::Rect boxCrap;
+	RECT boxCrap;
 	DDBLTFX     ddBltFx;
 
 	int sprite = find_sprite(process_warp);
@@ -4171,7 +4172,7 @@ void process_talk() {
 
 	int y_last = 0, y_hold = 0, y_ho;
 	HDC         hdc;
-	Common::Rect rcRect;
+	RECT rcRect;
 	int i;
 	int x_depth = 335;
 	if (talk.newy != -5000)
@@ -4552,7 +4553,7 @@ void  Scrawl_OnMouseInput() {
 }
 
 void button_brain(int h) {
-	Common::Rect box;
+	RECT box;
 	if (spr[h].move_active) {
 		process_move(h);
 		return;
@@ -4645,8 +4646,7 @@ again:
 
 
 void process_item() {
-
-	Common::Rect                rcRect;
+	RECT rcRect;
 	rcRect.left = 0;
 	rcRect.top = 0;
 	rcRect.right = currX;
@@ -4856,7 +4856,7 @@ again:
 }
 
 void process_animated_tiles() {
-	Common::Rect rcRect;
+	RECT rcRect;
 	int cool;
 	int flip;
 	int pa;
@@ -4942,7 +4942,7 @@ void process_animated_tiles() {
 
 void process_show_bmp() {
 
-	Common::Rect rcRect;
+	RECT rcRect;
 	SetRect(&rcRect, 0, 0, currX, currY);
 
 again:
@@ -5312,7 +5312,7 @@ long FAR PASCAL WindowProc(HWND hWnd, UINT message,
 #endif
 
 void load_batch() {
-	Common::File f;
+	File f;
 	char line[255];
 
 	spr[1].x = 200;
@@ -5320,7 +5320,7 @@ void load_batch() {
 
 
 	Msg("Loading .ini");
-	if (!Common::File::exists("dink.ini")) {
+	if (!File::exists("dink.ini")) {
 		Msg("File not found.");
 
 		sprintf(line, "Error finding the dink.ini file in the %s dir.", dir);
@@ -5436,7 +5436,7 @@ bool doInit() {
 		wBPos  = GetMaskPos(dwBMask);
 	}
 
-	if (Common::File::exists("tiles/ts01.bmp"))
+	if (File::exists("tiles/ts01.bmp"))
 		lpDDPal = DDLoadPalette(lpDD, "tiles/ts01.bmp");
 
 	if (lpDDPal)
@@ -5446,7 +5446,7 @@ bool doInit() {
 		Msg("error with getting entries in beginning");
 	}
 
-	if (Common::File::exists("tiles/splash.bmp"))
+	if (File::exists("tiles/splash.bmp"))
 		lpDDPal = DDLoadPalette(lpDD, "tiles/splash.bmp");
 
 	if (lpDDPal)
@@ -5476,7 +5476,7 @@ bool doInit() {
 		PlayMidi("4.mid");
 
 	// Create the offscreen surface, by loading our bitmap.
-	if (Common::File::exists("tiles/splash.bmp"))
+	if (File::exists("tiles/splash.bmp"))
 		lpDDSTwo = DDLoadBitmap(lpDD, "tiles/splash.bmp", 0, 0);
 
 	DDSetColorKey(lpDDSTwo, RGB(0, 0, 0));
@@ -5546,17 +5546,17 @@ bool doInit() {
 	spr[1].x = play.x;
 	spr[1].y = play.y;
 
-	if (Common::File::exists("tiles/ts01.bmp"))
+	if (File::exists("tiles/ts01.bmp"))
 		lpDDPal = DDLoadPalette(lpDD, "tiles/ts01.bmp");
 	if (lpDDPal)
 		lpDDSPrimary->SetPalette(lpDDPal);
 
 	Msg("Loading splash");
-	if (Common::File::exists("tiles/splash.bmp"))
+	if (File::exists("tiles/splash.bmp"))
 		lpDDSTrick = DDLoadBitmap(lpDD, "tiles/splash.bmp", 0, 0);
 	DDSetColorKey(lpDDSTrick, RGB(0, 0, 0));
 
-	if (Common::File::exists("tiles/splash.bmp"))
+	if (File::exists("tiles/splash.bmp"))
 		lpDDSTrick2 = DDLoadBitmap(lpDD, "tiles/splash.bmp", 0, 0);
 	DDSetColorKey(lpDDSTrick2, RGB(0, 0, 0));
 

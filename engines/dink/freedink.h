@@ -78,7 +78,7 @@ extern void text_draw(int h, HDC hdc);
 extern int check_if_move_is_legal(int u);
 extern void run_through_tag_list_push(int h);
 extern int check_if_move_is_legal(int u);
-extern void draw_box(Common::Rect box, int color);
+extern void draw_box(RECT box, int color);
 
 /**
  * Do work required for initializing graphics and data

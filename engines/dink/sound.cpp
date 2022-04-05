@@ -21,6 +21,7 @@
 
 #include "dink/sound.h"
 #include "dink/dink.h"
+#include "dink/file.h"
 #include "dink/globals.h"
 #include "dink/text.h"
 #include "dink/var.h"
@@ -501,11 +502,11 @@ bool PlayMidi(const char *sFileName) {
 	}
 
 	sprintf(crap, "sound\\%s", sFileName);
-	if (Common::File::exists(crap)) {
+	if (File::exists(crap)) {
 
 	} else {
 		sprintf(crap, "..\\dink\\sound\\%s", sFileName);
-		if (!Common::File::exists(crap)) {
+		if (!File::exists(crap)) {
 			Msg("Error playing midi %s, doesn't exist in any dir.", sFileName);
 			return false;
 		}

@@ -26,7 +26,30 @@
 
 namespace Dink {
 
-typedef Common::Rect RECT;
+/**
+ * Rectangle class. Note that we're not deriving from Common::Rect
+ * because some rects defined in the dink.ini setup have invalid
+ * right < left values, so RECT asserts on them
+ */
+struct RECT {
+public:
+	int16 left = 0, top = 0, right = 0, bottom = 0;
+
+	RECT() {}
+	RECT(int16 x1, int16 y1, int16 x2, int16 y2) :
+		left(x1), top(y1), right(x2), bottom(y2) {}
+
+	bool contains(int16 x, int16 y) const {
+		return (x >= left && x <= right && y >= top && y <= bottom);
+	}
+	void translate(int16 dx, int16 dy) {
+		left += dx;
+		right += dx;
+		top += dy;
+		bottom += dy;
+	}
+};
+
 typedef Common::Point POINT;
 typedef RECT *LPRECT;
 typedef POINT *LPPOINT;
@@ -47,11 +70,11 @@ inline bool inside_box(int16 x, int16 y, const RECT &rect) {
 }
 
 
-inline void SetRect(Common::Rect *r, int16 x1, int16 y1, int16 x2, int16 y2) {
-	*r = Common::Rect(x1, y1, x2, y2);
+inline void SetRect(RECT *r, int16 x1, int16 y1, int16 x2, int16 y2) {
+	*r = RECT(x1, y1, x2, y2);
 }
 
-inline void OffsetRect(Common::Rect *r, int16 dx, int16 dy) {
+inline void OffsetRect(RECT *r, int16 dx, int16 dy) {
 	r->translate(dx, dy);
 }
 

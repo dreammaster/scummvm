@@ -30,7 +30,8 @@ namespace Dink {
 /**
  * Create a DirectDrawSurface from a bitmap resource.
  */
-extern IDirectDrawSurface *DDLoadBitmap(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy);
+extern IDirectDrawSurface *DDLoadBitmap(IDirectDraw *pdd, LPCSTR szBitmap,
+	int dx = 0, int dy = 0);
 
 /**
  * Load a bitmap from a file or resource into a directdraw surface.

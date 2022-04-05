@@ -40,7 +40,7 @@ inline COLORREF SetTextColor(HDC hdc, COLORREF color) {
 }
 
 inline int DrawText(HDC hdc, const char *lpchText, int cchText,
-	Common::Rect *lprc, uint format) {
+	RECT *lprc, uint format) {
 	return 0;
 }
 

@@ -20,8 +20,8 @@
  */
 
 #include "dink/directdraw/dsound.h"
+#include "dink/file.h"
 #include "audio/decoders/wave.h"
-#include "common/file.h"
 #include "common/memstream.h"
 #include "common/textconsole.h"
 
@@ -33,7 +33,7 @@ HRESULT DirectSoundCreate(void *pcGuidDevice, LPDIRECTSOUND *ppDS, LPUNKNOWN pUn
 }
 
 IDirectSoundBuffer *IDirectSoundBuffer::createWav(const Common::String &name) {
-	Common::File f;
+	File f;
 	if (!f.open(name))
 		return false;
 
