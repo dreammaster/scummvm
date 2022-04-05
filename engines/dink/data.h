@@ -23,6 +23,8 @@
 #define DINK_DATA_H
 
 #include "common/file.h"
+#include "dink/types.h"
+#include "dink/lib/rect.h"
 
 namespace Dink {
 
@@ -69,6 +71,93 @@ struct map_info {
 	void load(Common::SeekableReadStream &s);
 };
 
+
+struct sp {
+	int x, moveman;
+	int y;
+	int mx, my;
+	int lpx[51], lpy[51];
+	int speed;
+	int brain;
+	int seq_orig, dir;
+	int seq;
+	int frame;
+	uint32 delay;
+	int pseq;
+	int pframe;
+
+	bool active;
+	int attrib;
+	uint32 wait;
+	int timer;
+	int skip;
+	int skiptimer;
+	int size;
+	int que;
+	int base_walk;
+	int base_idle;
+	int base_attack;
+
+	int base_hit;
+	int last_sound;
+	int hard;
+	RECT alt;
+	int althard;
+	int sp_index;
+	bool nocontrol;
+	int idle;
+	int strength;
+	int damage;
+	int defense;
+	int hitpoints;
+	int exp;
+	int gold;
+	int base_die;
+	int kill;
+	int kill_timer;
+	int script_num;
+	char text[200];
+	int owner;
+	int script;
+	int sound;
+	int callback;
+	int freeze;
+	bool move_active;
+	int move_script;
+	int move_dir;
+	int move_num;
+	bool move_nohard;
+	int follow;
+	int nohit;
+	bool notouch;
+	uint32 notouch_timer;
+	bool flying;
+	int touch_damage;
+	int brain_parm;
+	int brain_parm2;
+	bool noclip;
+	bool reverse;
+	bool disabled;
+	int target;
+	int attack_wait;
+	int move_wait;
+	int distance;
+	int last_hit;
+	bool live;
+	int range;
+	int attack_hit_sound;
+	int attack_hit_sound_speed;
+	int action;
+	int nodraw;
+	int frame_delay;
+	int picfreeze;
+	//redink1
+	int bloodseq;
+	int bloodnum;
+	Common::HashMap<Common::String, int> *custom;
+
+	void clear();
+};
 
 } // namespace Dink
 

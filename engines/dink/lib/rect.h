@@ -39,6 +39,9 @@ public:
 	RECT(int16 x1, int16 y1, int16 x2, int16 y2) :
 		left(x1), top(y1), right(x2), bottom(y2) {}
 
+	void clear() {
+		left = top = right = bottom = 0;
+	}
 	bool contains(int16 x, int16 y) const {
 		return (x >= left && x <= right && y >= top && y <= bottom);
 	}

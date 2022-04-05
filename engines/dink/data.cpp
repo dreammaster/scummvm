@@ -78,4 +78,88 @@ void map_info::load(Common::SeekableReadStream &src) {
 	src.read(buffer, 2000);
 }
 
+void sp::clear() {
+	x = y = 0;
+	moveman = 0;
+	mx = my = 0;
+	Common::fill(lpx, lpx + 51, 0);
+	Common::fill(lpy, lpy + 51, 0);
+	speed = 0;
+	brain = 0;
+	seq_orig = dir = 0;
+	seq = 0;
+	frame = 0;
+	delay = 0;
+	pseq = 0;
+	pframe = 0;
+	active = false;
+	attrib = 0;
+	wait = 0;
+	timer = 0;
+	skip = 0;
+	skiptimer = 0;
+	size = 0;
+	que = 0;
+	base_walk = 0;
+	base_idle = 0;
+	base_attack = 0;
+
+	base_hit = 0;
+	last_sound = 0;
+	hard = 0;
+	alt.clear();
+	althard = 0;
+	sp_index = 0;
+	nocontrol = false;
+	idle = 0;
+	strength = 0;
+	damage = 0;
+	defense = 0;
+	hitpoints = 0;
+	exp = 0;
+	gold = 0;
+	base_die = 0;
+	kill = 0;
+	kill_timer = 0;
+	script_num = 0;
+	Common::fill(text, text + 200, '\0');
+	owner = 0;
+	script = 0;
+	sound = 0;
+	callback = 0;
+	freeze = 0;
+	move_active = false;
+	move_script = 0;
+	move_dir = 0;
+	move_num = 0;
+	move_nohard = false;
+	follow = 0;
+	nohit = 0;
+	notouch = false;
+	notouch_timer = 0;
+	flying = false;
+	touch_damage = 0;
+	brain_parm = 0;
+	brain_parm2 = 0;
+	noclip = false;
+	reverse = false;
+	disabled = false;
+	target = 0;
+	attack_wait = 0;
+	move_wait = 0;
+	distance = 0;
+	last_hit = 0;
+	live = false;
+	range = 0;
+	attack_hit_sound = 0;
+	attack_hit_sound_speed = 0;
+	action = 0;
+	nodraw = 0;
+	frame_delay = 0;
+	picfreeze = 0;
+	bloodseq = 0;
+	bloodnum = 0;
+	custom = nullptr;
+}
+
 } // namespace Dink

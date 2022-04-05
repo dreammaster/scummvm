@@ -653,39 +653,29 @@ void save_game(int num) {
 
 
 void kill_all_vars() {
-
 	FillMemory(&play, sizeof(play), 0);
-
 }
 
 void attach() {
-
 	for (int i = 1; i < max_vars; i++) {
 		if (compare("&life", play.var[i].name)) {
 			plife = &play.var[i].var;
-
 		}
 		if (compare("&vision", play.var[i].name)) {
 			pvision = &play.var[i].var;
-
 		}
 		if (compare("&result", play.var[i].name)) {
 			presult = &play.var[i].var;
-
 		}
 		if (compare("&speed", play.var[i].name)) {
 			pspeed = &play.var[i].var;
-
 		}
 		if (compare("&timing", play.var[i].name)) {
 			ptiming = &play.var[i].var;
-
 		}
-
 
 		if (compare("&lifemax", play.var[i].name)) {
 			plifemax = &play.var[i].var;
-
 		}
 
 		if (compare("&exp", play.var[i].name))  pexper = &play.var[i].var;
@@ -704,13 +694,8 @@ void attach() {
 		if (compare("&enemy_sprite", play.var[i].name))  penemy_sprite = &play.var[i].var;
 		if (compare("&magic_cost", play.var[i].name))  pmagic_cost = &play.var[i].var;
 		if (compare("&missle_source", play.var[i].name))  pmissle_source = &play.var[i].var;
-
-
 	}
-
 }
-
-
 
 bool add_time_to_saved_game(int num) {
 #ifdef TODO

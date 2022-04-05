@@ -5571,18 +5571,11 @@ bool doInit() {
 
 	map_info::load();
 
-	for (int x = 0; x < 256; x++) {
-		if (GetKeyboard(x)) {
-		}
-	}  //clear keyboard buffer
-
+	g_events->clearEvents();
 	for (int u = 0; u < 10; u++)
 		play.button[u] = u;
-
-
-	for (int x1 = 1; x1 <= 10; x1++) {
+	for (int x1 = 1; x1 <= 10; x1++)
 		sjoy.letgo[x1] = true;
-	}
 
 	// Lets run our init script
 	int script = load_script("main", 0, true);
@@ -5592,7 +5585,9 @@ bool doInit() {
 	// Lets attach our vars to the scripts
 	attach();
 
-	memset(&spr, NULL, sizeof(spr));
+	for (int i = 0; i < max_sprites_at_once; ++i)
+		spr[i].clear();
+
 	init_font_colors();
 	initfonts("Arial");
 
