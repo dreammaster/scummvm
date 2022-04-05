@@ -1086,30 +1086,6 @@ bool load_game_small(int num, char *line, int *mytime) {
 #endif
 }
 
-
-void load_info() {
-#ifdef TODO
-	FILE           *fp;
-	//redink1 changed 'crap' to 'current_dat'
-	fp = fopen(current_dat, "rb");
-	if (!fp) {
-		//fclose(fp);
-		fp = fopen(current_dat, "wb");
-		//make new data file
-		strcpy(map.name, "Smallwood");
-		fwrite(&map, sizeof(struct map_info), 1, fp);
-		fclose(fp);
-	} else {
-		Msg("World data loaded.");
-		fread(&map, sizeof(struct map_info), 1, fp);
-		fclose(fp);
-
-	}
-#else
-	error("TODO");
-#endif
-}
-
 void blit_background() {
 	RECT rcRect;
 
@@ -5901,7 +5877,7 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				strcpy(current_map, slist[0]);
 				strcpy(current_dat, slist[1]);
-				load_info();
+				map_info::load();
 			}
 
 			strcpy(s, h);

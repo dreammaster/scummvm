@@ -1,6 +1,7 @@
 MODULE := engines/dink
 
 MODULE_OBJS = \
+	data.o \
 	dink.o \
 	events.o \
 	file.o \

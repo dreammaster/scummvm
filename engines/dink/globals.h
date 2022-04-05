@@ -26,7 +26,7 @@
 #include "common/rect.h"
 #include "common/str.h"
 #include "dink/types.h"
-#include "dink/file.h"
+#include "dink/data.h"
 #include "dink/directdraw/ddraw.h"
 #include "dink/directdraw/dinput.h"
 #include "dink/directdraw/dsound.h"
@@ -251,17 +251,6 @@ struct hit_map {
 		for (int i = 0; i < 601; ++i)
 			x[i].clear();
 	}
-};
-
-struct map_info {
-	char name[20];
-	int loc[769];
-	int music[769];
-	int indoor[769];
-	int v[40];
-	char s[80];
-	char buffer[2000];
-
 };
 
 struct tile {

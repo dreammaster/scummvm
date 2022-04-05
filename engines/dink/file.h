@@ -34,36 +34,6 @@ public:
 	static bool exists(const Common::String &name);
 };
 
-/**
- * Sub-structure for tile hardness
- */
-struct block_y {
-	byte y[51] = { 0 };
-
-	void load(Common::SeekableReadStream &s);
-};
-
-struct ts_block {
-	block_y x[51];
-	bool used = false;
-	int hold = 0;
-
-	void load(Common::SeekableReadStream &s);
-};
-
-/**
- * Structure for hardness info, INDEX controls which
- * hardness each block has. 800 max types available.
- */
-struct hardness {
-	ts_block tile[800];
-	int index[8000];
-
-	void load(Common::SeekableReadStream &s);
-	bool load();
-};
-
-
 } // namespace Dink
 
 #endif

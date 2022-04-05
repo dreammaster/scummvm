@@ -49,7 +49,6 @@ extern int load_script(const char *filename, int sprite, bool set_sprite);
 extern void update_status_all();
 extern int add_sprite(int x1, int y, int brain, int pseq, int pframe);
 
-extern void load_info(); //redink1
 extern void add_exp(int num, int h, bool addEvenIfNotLastSpriteHit = false);
 extern bool locate(int script, const char *proc);
 extern void draw_status_all();

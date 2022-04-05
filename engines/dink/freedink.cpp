@@ -5537,8 +5537,7 @@ bool doInit() {
 	load_batch();
 	Msg("done loading batch");
 
-	if (!hmap.load())
-		ZeroMemory(&hmap, sizeof(hardness));
+	hardness::load();
 
 	// Activate dink, but don't really turn him on
 	spr[1].timer = 33;
@@ -5568,16 +5567,16 @@ bool doInit() {
 	rcRect.right = 639;
 	rcRect.bottom = 79;
 	last_sprite_created = 1;
-
 	mode = 0;
 
-	load_info();
+	map_info::load();
+
 	for (int x = 0; x < 256; x++) {
 		if (GetKeyboard(x)) {
 		}
 	}  //clear keyboard buffer
 
-	for (int u = 1; u <= 10; u++)
+	for (int u = 0; u < 10; u++)
 		play.button[u] = u;
 
 

@@ -19,26 +19,57 @@
  *
  */
 
-#include "dink/file.h"
+#ifndef DINK_DATA_H
+#define DINK_DATA_H
+
+#include "common/file.h"
 
 namespace Dink {
 
-bool File::open(const Common::String &name) {
-	return Common::File::open(Common::Path(formatPath(name)));
-}
+/**
+ * Sub-structure for tile hardness
+ */
+struct block_y {
+	byte y[51] = { 0 };
 
-bool File::exists(const Common::String &name) {
-	return Common::File::exists(Common::Path(formatPath(name)));
-}
+	void load(Common::SeekableReadStream &s);
+};
 
-Common::String File::formatPath(const Common::String &name) {
-	size_t pos = 0;
-	Common::String result = name;
-	while ((pos = result.findFirstOf('\\', pos)) != Common::String::npos) {
-		result.setChar('/', pos);
-	}
+struct ts_block {
+	block_y x[51];
+	bool used = false;
+	int hold = 0;
 
-	return result;
-}
+	void load(Common::SeekableReadStream &s);
+};
+
+/**
+ * Structure for hardness info, INDEX controls which
+ * hardness each block has. 800 max types available.
+ */
+struct hardness {
+	ts_block tile[800];
+	int index[8000];
+
+	static void load();
+	void load(Common::SeekableReadStream &s);
+};
+
+
+struct map_info {
+	char name[20];
+	int loc[769];
+	int music[769];
+	int indoor[769];
+	int v[40];
+	char s[80];
+	char buffer[2000];
+
+	static void load();
+	void load(Common::SeekableReadStream &s);
+};
+
 
 } // namespace Dink
+
+#endif
