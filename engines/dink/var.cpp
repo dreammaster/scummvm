@@ -2964,174 +2964,122 @@ void decompress(Common::SeekableReadStream *in) {
 
 
 void decompress_nocomp(Common::SeekableReadStream *in) {
-	// TODO: Check for getc below for > 255.
-	// Does getc support UTF8 or Unicode?
-#ifdef TODO
-	//let's do it, only this time decompile OUR style
-
 	unsigned char stack[16], pair[128][2];
-	short c, top = 0;
+	byte c;
+	int top = 0;
 
-	/* Check for optional pair count and pair table */
-	if ((c = getc(in)) > 255)
-		fread(pair, 2, c - 128, in);
-	else {
-		if (c == '\r') c = '\n';
-		if (c == 9) c = ' ';
+	c = in->readByte();
+	if (c == '\r')
+		c = '\n';
+	if (c == 9)
+		c = ' ';
+
+	strchar(cbuf, c);
+
+	for (;;) {
+		// Pop byte from stack or read byte from file
+		if (top) {
+			c = stack[--top];
+		} else {
+			c = in->readByte();
+			if (in->eos())
+				break;
+		}
+
+		if (c == '\r')
+			c = '\n';
+		if (c == 9)
+			c = ' ';
 
 		strchar(cbuf, c);
 	}
-	//    putc(c,out);
-
-	for (;;) {
-
-		/* Pop byte from stack or read byte from file */
-		if (top)
-			c = stack[--top];
-		else if ((c = getc(in)) == EOF)
-			break;
-
-		/* Push pair on stack or output byte to file */
-		if (c > 255) {
-			stack[top++] = pair[c - 128][1];
-			stack[top++] = pair[c - 128][0];
-		} else {
-			if (c == '\r') c = '\n';
-			if (c == 9) c = ' ';
-
-			strchar(cbuf, c); //     putc(c,out);
-		}
-	}
-#endif
 }
 
 
 int load_script(const char *filename, int sprite, bool set_sprite) {
-
 	char temp[100];
 	int script;
 	File f;
-//    int fh;
 	bool comp = false;
 	char tab[10];
 
-//    char line[500];
-
-	Msg("LOADING %s", filename);
+	Msg("Loading %s", filename);
 	sprintf(tab, "%c", 9);
 
 	sprintf(temp, "story\\%s.d", filename);
 
 	if (!File::exists(temp)) {
-
-
 		sprintf(temp, "story\\%s.c", filename);
 		if (!File::exists(temp)) {
-
-
-			sprintf(temp, "..\\dink\\story\\%s.d", filename);
-			if (!File::exists(temp)) {
-				sprintf(temp, "..\\dink\\story\\%s.c", filename);
-				if (!File::exists(temp)) {
-
-					Msg("Script %s not found. (checked for .C and .D) (requested by %d?)", temp, sprite);
-					return 0;
-				}
-			}
+			Msg("Script %s not found. (checked for .C and .D) (requested by %d?)", temp, sprite);
+			return 0;
 		}
-
-
-
-	} else {
-
 	}
 
 	strupr(temp);
 	Msg("Temp thingie is %c", temp[strlen(temp) - 1]);
-	if (temp[strlen(temp) - 1] == 'D') comp = true;
-	else comp = false;
+	if (temp[strlen(temp) - 1] == 'D')
+		comp = true;
+	else
+		comp = false;
 
 	int ii;
 	for (ii = 1; ii < max_scripts; ii++) {
 		if (rbuf[ii] == NULL) {
-			//found one not being used
-			goto found;
+			// Found one not being used
+			break;
 		}
 	}
 
-	Msg("Couldn't find unused buffer for script.");
-	return 0;
-
-	Msg("Loading script %s..", temp);
-found:
-
+	if (ii == max_scripts) {
+		Msg("Couldn't find unused buffer for script.");
+		return 0;
+	}
 
 	script = ii;
+	rinfo[script] = (refinfo *)malloc(sizeof(refinfo));
 
-	rinfo[script] = (struct refinfo *) malloc(sizeof(struct refinfo));
+	memset(rinfo[script], 0, sizeof(refinfo));
 
-	memset(rinfo[script], 0, sizeof(struct refinfo));
-
-
-	//if compiled
-	{
-		//load compiled script
-		if (!f.open(temp)) {
-			Msg("Script %s not found. (checked for .C and .D) (requested by %d?)", temp, sprite);
-			return 0;
-		}
-
-		cbuf[0] = 0;
-		//Msg("decompressing!");
-
-		if (comp)
-			decompress(&f);
-		else
-			decompress_nocomp(&f);
-
-		f.close();
-
-		//Msg("done decompressing!");
-
-		//file is now in cbuf!!
-
-		rinfo[script]->end = (strlen(cbuf));
-		//Msg("dlength is %d!", rinfo[script]->end);
-
-		rbuf[script] = (char *) malloc(rinfo[script]->end);
-
-		//rbuf[script] = new [script]->end;
-
-
-		if (rbuf[script] == NULL) {
-
-			Msg("Couldn't allocate rbuff %d.", script);
-			return 0;
-		}
-
-
-		CopyMemory(rbuf[script], &cbuf, rinfo[script]->end);
-
-
-		if (rinfo[script] == NULL) {
-
-			Msg("Couldn't allocate rscript %d.", script);
-			return 0;
-		}
-
-
+	//load compiled script
+	if (!f.open(temp)) {
+		Msg("Script %s not found. (checked for .c and .d) (requested by %d?)", temp, sprite);
+		return 0;
 	}
-	//Msg("Script %s loaded by sprite %d into space %d.",temp, sprite,script);
+
+	cbuf[0] = 0;
+
+	if (comp)
+		decompress(&f);
+	else
+		decompress_nocomp(&f);
+
+	f.close();
+
+	rinfo[script]->end = strlen(cbuf);
+	rbuf[script] = (char *)malloc(rinfo[script]->end);
+
+	if (rbuf[script] == nullptr) {
+		Msg("Couldn't allocate rbuff %d.", script);
+		return 0;
+	}
+
+	CopyMemory(rbuf[script], &cbuf, rinfo[script]->end);
+
+	if (rinfo[script] == nullptr) {
+		Msg("Couldn't allocate rscript %d.", script);
+		return 0;
+	}
+
 	strcpy(rinfo[script]->name, filename);
 	rinfo[script]->sprite = sprite;
 
-
 	if (set_sprite) {
 		if (sprite != 0) if (sprite != 1000)
-				spr[sprite].script = script;
+			spr[sprite].script = script;
 	}
-	return script;
 
+	return script;
 }
 
 
@@ -8894,11 +8842,13 @@ good:
 void run_script(int script) {
 	int result;
 	char line[200];
+
 	if (bKeepReturnInt) {
 		bKeepReturnInt = false;
 	} else {
 		returnint = 0;
 	}
+
 	returnstring[0] = 0;
 	if (rinfo[script] != NULL) {
 		if (debug_mode)
@@ -8909,10 +8859,9 @@ void run_script(int script) {
 
 	while (read_next_line(script, line)) {
 		while (1) {
-
 			strip_beginning_spaces(line);
-			if (compare(line, "\n")) break;
-
+			if (compare(line, "\n"))
+				break;
 
 			result = process_line(script, line, false);
 			if (result == 3) {
@@ -8926,30 +8875,22 @@ crappa:
 				result = process_line(script, line, true);
 			}
 
-			if (result == 5) goto crappa;
-
-			if (result == 3) {
-
+			if (result == 5)
+				goto crappa;
+			if (result == 3)
 				goto redo;
-			}
 
 			if (result == 2) {
 				if (debug_mode) Msg("giving script the boot");
-				//quit script
+				// Quit script
 				return;
 			}
-			if (result == 0) break;
-
-
+			if (result == 0)
+				break;
 
 			if (result == 4) {
-
-
-				//   Msg("Was sent %s, length %d", line, strlen(line));
-
 				if (strlen(line) < 2) {
 redo2:
-
 					read_next_line(script, line);
 					strip_beginning_spaces(line);
 					//Msg("Comparing to %s.", line);
@@ -8959,19 +8900,15 @@ redo2:
 				result = process_line(script, line, true);
 			}
 
-
 			if (result == 2) {
 				if (debug_mode) Msg("giving script the boot");
-				//quit script
+				// Quit script
 				return;
 			}
-			if (result == 0) break;
-
-
+			if (result == 0)
+				break;
 		}
-
 	}
-
 
 	if (rinfo[script] != NULL) {
 		if (rinfo[script]->proc_return != 0) {
@@ -8980,7 +8917,6 @@ redo2:
 		}
 	}
 }
-
 
 void process_callbacks() {
 	int thist = g_events->getTickCount();

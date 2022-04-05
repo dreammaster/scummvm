@@ -5572,7 +5572,7 @@ bool doInit() {
 	map_info::load();
 
 	g_events->clearEvents();
-	for (int u = 0; u < 10; u++)
+	for (int u = 1; u <= 10; u++)
 		play.button[u] = u;
 	for (int x1 = 1; x1 <= 10; x1++)
 		sjoy.letgo[x1] = true;

@@ -328,9 +328,8 @@ struct player_info {
 	int counter;
 	bool idle;
 	mydata spmap[769];
-	int button[10];
+	int button[11];
 	varman var[max_vars];
-
 
 	bool push_active;
 	int push_dir;
