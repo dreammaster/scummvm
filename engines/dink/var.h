@@ -68,7 +68,6 @@ extern void drawallhard();
 extern void process_callbacks();
 extern int hurt_thing(int h, int damage, int special);
 extern void random_blood(int mx, int my, int h);
-extern void load_hard();
 extern IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite);
 extern void attach();
 //redink1 added for font colors

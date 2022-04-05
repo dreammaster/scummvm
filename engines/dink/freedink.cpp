@@ -5537,7 +5537,8 @@ bool doInit() {
 	load_batch();
 	Msg("done loading batch");
 
-	load_hard();
+	if (!hmap.load())
+		ZeroMemory(&hmap, sizeof(hardness));
 
 	// Activate dink, but don't really turn him on
 	spr[1].timer = 33;

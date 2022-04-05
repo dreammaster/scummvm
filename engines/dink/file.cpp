@@ -41,5 +41,33 @@ Common::String File::formatPath(const Common::String &name) {
 	return result;
 }
 
+bool hardness::load() {
+	File f;
+
+	if (f.open("hard.dat")) {
+		load(f);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void hardness::load(Common::SeekableReadStream &s) {
+	for (int i = 0; i < 800; ++i)
+		tile[i].load(s);
+	for (int i = 0; i < 8000; ++i)
+		index[i] = s.readUint32LE();
+}
+
+void ts_block::load(Common::SeekableReadStream &s) {
+	for (int i = 0; i < 51; ++i)
+		x[i].load(s);
+	used = s.readByte() != 0;
+	hold = s.readUint32LE();
+}
+
+void block_y::load(Common::SeekableReadStream &s) {
+	s.read(y, 51);
+}
 
 } // namespace Dink

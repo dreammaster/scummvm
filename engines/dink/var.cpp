@@ -1110,54 +1110,6 @@ void load_info() {
 #endif
 }
 
-void save_hard() {
-#ifdef TODO
-	FILE           *fp;
-	char crap[80];
-	sprintf(crap, "HARD.DAT");
-	fp = fopen(crap, "wb");
-
-	if (!fp) {
-
-		Msg("Couldn't save hard.dat for some reason.  Out of disk space?");
-	}
-	fwrite(&hmap, sizeof(struct hardness), 1, fp);
-	fclose(fp);
-#else
-	error("TODO");
-#endif
-}
-
-
-void load_hard() {
-#ifdef TODO
-	FILE           *fp;
-	char crap[80];
-	sprintf(crap, "HARD.DAT");
-	if (!dinkedit) {
-		if (!File::exists(crap)) sprintf(crap, "..\\dink\\hard.dat");
-	}
-
-	fp = fopen(crap, "rb");
-	if (!fp) {
-		//fclose(fp);
-		fp = fopen(crap, "wb");
-		//make new data file
-		ZeroMemory(&hmap, sizeof(struct hardness));
-		fwrite(&hmap, sizeof(struct hardness), 1, fp);
-		fclose(fp);
-	} else {
-		fread(&hmap, sizeof(struct hardness), 1, fp);
-		fclose(fp);
-
-	}
-#else
-	error("TODO");
-#endif
-}
-
-
-
 void blit_background() {
 	RECT rcRect;
 
@@ -1945,60 +1897,45 @@ void figure_out(char line[255], int load_seq) {
 
 void program_idata() {
 	for (int i = 1; i < max_idata; i++) {
-		if (id[i].type == 0) return;
+		if (id[i].type == 0)
+			return;
 
 		if (id[i].type == 1) {
 			picInfo[seq[id[i].seq].frame[id[i].frame]].xoffset = id[i].xoffset;
 			picInfo[seq[id[i].seq].frame[id[i].frame]].yoffset = id[i].yoffset;
 			CopyRect(&picInfo[seq[id[i].seq].frame[id[i].frame]].hardbox, &id[i].hardbox);
-
-			//   Msg("Programming idata type %d in %d...Seq %d Frame %d (Hardbox is %d %d %d %d)", id[i].type, i,
-			//  id[i].seq, id[i].frame, id[i].hardbox.left,id[i].hardbox.right, id[i].hardbox.top, id[i].hardbox.bottom);
-
 		}
 
 		if (id[i].type == 2) {
-			//set special
+			// Set special
 			seq[id[i].seq].special[id[i].frame] = id[i].xoffset;
 		}
 		if (id[i].type == 3) {
-			//set delay
-
+			// Set delay
 			seq[id[i].seq].delay[id[i].frame] = id[i].xoffset;
 		}
 
 		if (id[i].type == 4) {
-
-
 			if (id[i].xoffset == -1)
 				seq[id[i].seq].frame[id[i].frame] = id[i].xoffset;
 			else
 				seq[id[i].seq].frame[id[i].frame] = seq[id[i].xoffset].frame[id[i].yoffset];
-
 		}
-
 	}
-
-
-
 }
 
 void make_idata(int type, int myseq, int myframe, int xoffset, int yoffset, RECT crect) {
-
 	for (int i = 1; i < max_idata; i++) {
 		if (id[i].type == 0) {
-			//  Msg("Loading idata type %d in %d...", type, i);
-			//found empty one
+			// Found empty one
 			id[i].type = type;
 			id[i].seq = myseq;
 			id[i].frame = myframe;
 			id[i].xoffset = xoffset;
 			id[i].yoffset = yoffset;
 			CopyRect(&id[i].hardbox, &crect);
-
 			return;
 		}
-
 	}
 
 	Msg("Out of idata spots (max is %d), no more sprite corrections can be allowed.", max_idata);

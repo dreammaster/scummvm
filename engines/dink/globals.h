@@ -26,6 +26,7 @@
 #include "common/rect.h"
 #include "common/str.h"
 #include "dink/types.h"
+#include "dink/file.h"
 #include "dink/directdraw/ddraw.h"
 #include "dink/directdraw/dinput.h"
 #include "dink/directdraw/dsound.h"
@@ -250,25 +251,6 @@ struct hit_map {
 		for (int i = 0; i < 601; ++i)
 			x[i].clear();
 	}
-};
-
-//sub struct for tile hardness
-struct block_y {
-	byte y[51];
-};
-
-struct ts_block {
-	block_y x[51];
-	bool used;
-	int hold;
-};
-
-//struct for hardness info, INDEX controls which hardness each block has.
-// 800 max types available.
-struct hardness {
-	ts_block tile[800];
-	int index[8000];
-
 };
 
 struct map_info {
