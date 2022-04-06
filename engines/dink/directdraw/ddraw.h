@@ -148,7 +148,11 @@ struct DDBLTFX {
 typedef DDBLTFX *LPDDBLTFX;
 
 struct IDirectDrawSurface : public Graphics::ManagedSurface {
+private:
+	void setScreenPalette();
 public:
+	IDirectDrawSurface();
+
 	HRESULT Lock(const LPRECT rect, LPDDSURFACEDESC desc, uint32 flags, HANDLE handle);
 	HRESULT Unlock(const LPRECT rect);
 	void Release();
@@ -157,7 +161,7 @@ public:
 		LPRECT rect, uint32 flags);
 	HRESULT Blt(const LPRECT dstRect, const IDirectDrawSurface *src,
 		const LPRECT srcRect, uint32 flags, LPDDBLTFX lpDDBltFx);
-	HRESULT Flip(IDirectDrawSurface *surface, uint32 flags);
+	static HRESULT Flip(IDirectDrawSurface *, uint32 flags);
 	HRESULT GetDC(HDC *hdc);
 	HRESULT ReleaseDC(HDC hdc);
 	HRESULT IsLost() const;

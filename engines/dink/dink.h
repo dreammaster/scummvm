@@ -53,7 +53,6 @@ protected:
 	Common::Error run() override;
 public:
 	EventsManager *_events = nullptr;
-	Graphics::Screen *_screen = nullptr;
 
 public:
 	DinkEngine(OSystem *syst, const DinkGameDescription *gameDesc);

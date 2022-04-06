@@ -51,6 +51,10 @@ public:
 		top += dy;
 		bottom += dy;
 	}
+
+	operator Common::Rect() {
+		return Common::Rect(left, top, right, bottom);
+	}
 };
 
 typedef Common::Point POINT;

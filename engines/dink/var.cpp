@@ -2897,7 +2897,7 @@ void decompress(Common::SeekableReadStream *in) {
 
 
 void decompress_nocomp(Common::SeekableReadStream *in) {
-	unsigned char stack[16], pair[128][2];
+	unsigned char stack[16];
 	byte c;
 	int top = 0;
 

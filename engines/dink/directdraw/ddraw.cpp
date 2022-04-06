@@ -20,6 +20,10 @@
  */
 
 #include "dink/directdraw/ddraw.h"
+#include "dink/dink.h"
+#include "dink/globals.h"
+#include "common/algorithm.h"
+#include "graphics/palette.h"
 
 namespace Dink {
 
@@ -44,6 +48,11 @@ void IDirectDrawPalette::Release() {
 }
 
 
+IDirectDrawSurface::IDirectDrawSurface() {
+	create(g_system->getWidth(), g_system->getHeight(),
+		g_system->getScreenFormat());
+}
+
 HRESULT IDirectDrawSurface::Lock(const LPRECT rect, LPDDSURFACEDESC desc, uint32 flags, HANDLE handle) {
 	return DD_OK;
 }
@@ -59,8 +68,13 @@ HRESULT IDirectDrawSurface::Restore() {
 	return DD_OK;
 }
 
-HRESULT IDirectDrawSurface::BltFast(int16 x, int16 y, const IDirectDrawSurface *src,
-	LPRECT rect, uint32 flags) {
+HRESULT IDirectDrawSurface::BltFast(int16 x, int16 y,
+		const IDirectDrawSurface *src, LPRECT rect, uint32 flags) {
+	blitFrom(*src, *rect, Common::Point(x, y));
+
+	if (src->getPalette() != nullptr)
+		setPalette(src->getPalette(), 0, PALETTE_COUNT);
+
 	return DD_OK;
 }
 
@@ -69,8 +83,31 @@ HRESULT IDirectDrawSurface::Blt(const LPRECT dstRect, const IDirectDrawSurface *
 	return DD_OK;
 }
 
-HRESULT IDirectDrawSurface::Flip(IDirectDrawSurface *surface, uint32 flags) {
+HRESULT IDirectDrawSurface::Flip(IDirectDrawSurface *, uint32 flags) {
+	SWAP(lpDDSPrimary, lpDDSBack);
+
+	if (lpDDSPrimary->getPalette() != nullptr)
+		lpDDSPrimary->setScreenPalette();
+
+	g_system->copyRectToScreen(lpDDSPrimary->getPixels(),
+		lpDDSPrimary->w, 0, 0, lpDDSPrimary->w, lpDDSPrimary->h);
+	g_system->updateScreen();
+
 	return DD_OK;
+}
+
+void IDirectDrawSurface::setScreenPalette() {
+	byte pal[PALETTE_SIZE];
+	const uint32 *src = getPalette();
+	byte *dest = pal;
+
+	for (int i = 0; i < PALETTE_COUNT; ++i, ++src, dest += 3) {
+		dest[0] = *src & 0xff;
+		dest[1] = (*src >> 8) & 0xff;
+		dest[2] = (*src >> 16) & 0xff;
+	}
+
+	g_system->getPaletteManager()->setPalette(pal, 0, PALETTE_COUNT);
 }
 
 HRESULT IDirectDrawSurface::GetDC(HDC *hdc) {

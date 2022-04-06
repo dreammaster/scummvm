@@ -5501,7 +5501,7 @@ bool doInit() {
 	rcRect.right = currX;
 	rcRect.bottom = currY;
 
-	//draw version #
+	// Draw version #
 	ddrval = lpDDSBack->BltFast(0, 0, lpDDSTwo, &rcRect,
 		DDBLTFAST_NOCOLORKEY);
 
