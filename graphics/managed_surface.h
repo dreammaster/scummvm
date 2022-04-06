@@ -673,11 +673,18 @@ public:
 	}
 
 	/**
-	 * Return a sub-area of the screen, but only add a single initial dirty rect
+	 * Return a sub-area of the surface, but only add a single initial dirty rect
 	 * for the retrieved area.
 	 */
 	Surface getSubArea(const Common::Rect &area) {
 		addDirtyRect(area);
+		return _innerSurface.getSubArea(area);
+	}
+
+	/**
+	 * Return a sub-area of the surface for read-only access
+	 */
+	const Surface getSubArea(const Common::Rect &area) const {
 		return _innerSurface.getSubArea(area);
 	}
 
