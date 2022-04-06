@@ -609,7 +609,6 @@ past:
 		FillMemory(&spr[1], sizeof(spr[1]), 0);
 
 		spr[1].speed = 3;
-		init_mouse();
 		g_pMouse->Acquire();
 
 		spr[1].timer = 0;

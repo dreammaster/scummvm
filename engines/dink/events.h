@@ -67,6 +67,11 @@ public:
 	}
 
 	/**
+	 * Returns true if a key is pressed, and clears the flag
+	 */
+	bool isKeyPressed(int key);
+
+	/**
 	 * Returns the bitset of currently pressed modifier keys
 	 */
 	uint getModifierFlags() const {
@@ -150,7 +155,6 @@ public:
 extern EventsManager *g_events;
 
 extern bool CheckJoyStickPresent();
-extern bool init_mouse();
 extern int GetKeyboard(int key);
 
 } // namespace Dink

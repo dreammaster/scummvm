@@ -137,6 +137,12 @@ void EventsManager::updateKeys(const Common::Event &event, bool isDown) {
 	_keys[event.kbd.keycode] = isDown;
 }
 
+bool EventsManager::isKeyPressed(int key) {
+	bool result = _keys[key];
+	_keys[key] = false;
+	return result;
+}
+
 uint32 EventsManager::getTickCount() const {
 	return g_system->getMillis();
 }
@@ -150,82 +156,6 @@ bool CheckJoyStickPresent() {
 	return joystickNum != -1;
 }
 
-bool init_mouse() {
-#ifdef TODO
-	if (g_pdi) {
-		Msg("Mouse already initted? what the?");
-		return true;
-	}
-
-	HRESULT hr;
-
-	/*
-	*  Register with DirectInput and get an IDirectInput to play with.
-	*/
-	hr = DirectInputCreate(MyhInstance, DIRECTINPUT_VERSION, &g_pdi, NULL);
-
-	if (FAILED(hr)) {
-		Msg("DirectInputCreate");
-		return false;
-	}
-
-	/*
-	*  Obtain an interface to the system mouse device.
-	*/
-	hr = g_pdi->CreateDevice(GUID_SysMouse, &g_pMouse, NULL);
-
-	if (FAILED(hr)) {
-		Msg("CreateDevice(SysMouse)");
-		return false;
-	}
-
-	/*
-	*  Set the data format to "mouse format".
-	*/
-	hr = g_pMouse->SetDataFormat(&c_dfDIMouse);
-
-	if (FAILED(hr)) {
-		Msg("SetDataFormat(SysMouse, dfDIMouse)");
-		return false;
-	}
-
-	/*
-	*  Set the cooperativity level.
-	*/
-	hr = g_pMouse->SetCooperativeLevel(hWnd,
-		DISCL_EXCLUSIVE | DISCL_FOREGROUND);
-
-	if (FAILED(hr)) {
-		Msg("Error: SetCooperativeLevel(SysMouse)");
-		return false;
-	}
-
-	/*
-	*  Set the buffer size to DINPUT_BUFFERSIZE elements.
-	*  The buffer size is a uint32 property associated with the device.
-	*/
-	DIPROPDWORD dipdw = {
-		{
-			sizeof(DIPROPDWORD),        // diph.dwSize
-			sizeof(DIPROPHEADER),       // diph.dwHeaderSize
-			0,                          // diph.dwObj
-			DIPH_DEVICE,                // diph.dwHow
-		},
-		DINPUT_BUFFERSIZE,              // dwData
-	};
-
-	hr = g_pMouse->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph);
-
-	if (FAILED(hr)) {
-		Msg("Set buffer size(SysMouse)");
-		return false;
-	}
-
-#endif
-
-	return true;
-}
-
 bool getkey(int key) {
 	if (sjoy.realkey[key]) return true;
 	else return false;
@@ -233,13 +163,7 @@ bool getkey(int key) {
 }
 
 int GetKeyboard(int key) {
-#ifdef TODO
-	// returns 0 if the key has been depressed, else returns 1 and sets key to code recd.
-	return GetAsyncKeyState(key);
-#else
-	error("TODO");
-	return 0;
-#endif
+	return g_events->isKeyPressed(key) ? 0 : 1;
 }
 
 char key_convert(int key) {
