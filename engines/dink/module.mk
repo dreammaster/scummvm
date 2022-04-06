@@ -10,6 +10,7 @@ MODULE_OBJS = \
 	globals.o \
 	graphics.o \
 	metaengine.o \
+	music.o \
 	sound.o \
 	text.o \
 	update_frame.o \

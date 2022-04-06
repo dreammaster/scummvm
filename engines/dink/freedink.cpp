@@ -28,6 +28,7 @@
 #include "dink/fast_file.h"
 #include "dink/file.h"
 #include "dink/graphics.h"
+#include "dink/music.h"
 #include "dink/sound.h"
 #include "dink/text.h"
 #include "dink/var.h"

@@ -66,16 +66,8 @@ extern int SoundPlayEffect(int sound, int min, int plus, int sound3d, bool repea
 extern bool SoundDestroyEffect(int sound);
 
 extern void SoundLoadBanks();
-extern bool StopMidi();
 extern void check_seq_status(int h);
-extern bool PlayMidi(const char *sFileName);
 extern void update_sound();
-
-extern void openCD();
-extern void closeCD();
-extern uint32 PlayCD(byte bTrack);
-extern uint32 killCD(byte bTrack);
-extern bool cdplaying();
 
 } // namespace Dink
 

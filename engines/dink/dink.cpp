@@ -25,6 +25,7 @@
 #include "dink/file.h"
 #include "dink/freedink.h"
 #include "dink/globals.h"
+#include "dink/music.h"
 #include "dink/update_frame.h"
 #include "dink/var.h"
 #include "common/scummsys.h"
@@ -46,6 +47,7 @@ DinkEngine::DinkEngine(OSystem *syst, const DinkGameDescription *gameDesc) : Eng
 
 DinkEngine::~DinkEngine() {
 	delete _events;
+	delete _music;
 }
 
 uint32 DinkEngine::getFeatures() const {
@@ -90,6 +92,7 @@ void DinkEngine::initialize() {
 	SearchMan.addSubDirectoryMatching(gameDataDir, "dink", 0, 2);
 
 	_events = new EventsManager();
+	_music = new Music();
 
 	if (File::exists("cd.dat"))
 		burn_revision = 1;

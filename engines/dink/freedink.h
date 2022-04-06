@@ -30,7 +30,6 @@ extern int rnd();
 extern int dir_num(const char *path);
 extern void check_joystick();
 extern int GetKeyboard(int key);
-extern bool StopMidi();
 extern void Scrawl_OnMouseInput();
 extern uint32 GetTickCount();
 extern void Sleep(size_t seconds);

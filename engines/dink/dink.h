@@ -39,6 +39,7 @@
 namespace Dink {
 
 class EventsManager;
+class Music;
 struct DinkGameDescription;
 
 class DinkEngine : public Engine {
@@ -53,6 +54,7 @@ protected:
 	Common::Error run() override;
 public:
 	EventsManager *_events = nullptr;
+	Music *_music;
 
 public:
 	DinkEngine(OSystem *syst, const DinkGameDescription *gameDesc);
