@@ -69,6 +69,7 @@ IDirectSoundBuffer::IDirectSoundBuffer(const IDirectSoundBuffer &src) {
 }
 
 IDirectSoundBuffer::~IDirectSoundBuffer() {
+	Stop();
 	delete _audioStream;
 }
 
@@ -89,15 +90,24 @@ HRESULT IDirectSoundBuffer::SetFrequency(uint32 freq) {
 }
 
 HRESULT IDirectSoundBuffer::SetCurrentPosition(uint32 dwNewPosition) {
-	error("TODO");
+	Audio::SeekableAudioStream *stream =
+		dynamic_cast<Audio::SeekableAudioStream *>(_audioStream);
+	if (stream) {
+		stream->seek(dwNewPosition);
+		return DS_OK;
+	} else {
+		return DSERR_INVALIDCALL;
+	}
 }
 
 HRESULT IDirectSoundBuffer::Stop() {
-	error("TODO");
+	g_engine->_mixer->stopHandle(_soundHandle);
+	return DS_OK;
 }
 
 HRESULT IDirectSoundBuffer::Release() {
-	error("TODO");
+	Stop();
+	return DS_OK;
 }
 
 HRESULT IDirectSoundBuffer::GetStatus(unsigned long *status) {
@@ -121,8 +131,13 @@ HRESULT IDirectSound::SetCooperativeLevel(HWND hwnd, DWORD dwLevel) {
 }
 
 HRESULT IDirectSound::DuplicateSoundBuffer(LPDIRECTSOUNDBUFFER pDSBufferOriginal, LPDIRECTSOUNDBUFFER *ppDSBufferDuplicate) {
-	*ppDSBufferDuplicate = new IDirectSoundBuffer(*pDSBufferOriginal);
-	return DS_OK;
+	if (pDSBufferOriginal) {
+		delete *ppDSBufferDuplicate;
+		*ppDSBufferDuplicate = new IDirectSoundBuffer(*pDSBufferOriginal);
+		return DS_OK;
+	} else {
+		return DSERR_INVALIDPARAM;
+	}
 }
 
 HRESULT IDirectSound::Release() {
