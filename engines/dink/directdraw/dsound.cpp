@@ -20,6 +20,7 @@
  */
 
 #include "dink/directdraw/dsound.h"
+#include "dink/dink.h"
 #include "dink/file.h"
 #include "audio/decoders/wave.h"
 #include "common/memstream.h"
@@ -100,7 +101,10 @@ HRESULT IDirectSoundBuffer::Release() {
 }
 
 HRESULT IDirectSoundBuffer::GetStatus(unsigned long *status) {
-	error("TODO");
+	if (g_engine->_mixer->isSoundHandleActive(_soundHandle))
+		return DSBSTATUS_PLAYING;
+
+	return 0;
 }
 
 
