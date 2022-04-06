@@ -62,7 +62,7 @@ void EventsManager::pollEvents() {
 
 		case Common::EVENT_KEYDOWN:
 			updateKeys(e, true);
-			_keyEvents.push(e);
+			//_keyEvents.push(e);
 			break;
 
 		case Common::EVENT_KEYUP:
@@ -70,30 +70,50 @@ void EventsManager::pollEvents() {
 			break;
 
 		default:
-			if (e.type == Common::EVENT_MOUSEMOVE)
+			if (e.type == Common::EVENT_MOUSEMOVE) {
 				_mousePos = Common::Point(e.mouse.x, e.mouse.y);
 
-			// Add other event types to the pending events queue. If the event is a
-			// mouse move and the prior one was also, then discard the prior one.
-			// This'll help prevent too many mouse move events accumulating
-			if (e.type == Common::EVENT_MOUSEMOVE && !_pendingEvents.empty() &&
-			        _pendingEvents.back().type == Common::EVENT_MOUSEMOVE)
-				_pendingEvents.back() = e;
-			else
-				_pendingEvents.push(e);
+				UpdateCursorPosition(e.mouse.x, 0);
+				UpdateCursorPosition(0, e.mouse.y);
+			} else {
+				if (e.type == Common::EVENT_LBUTTONDOWN)
+					mouse1 = true;
+			}
 			break;
 		}
 	}
 }
 
-Common::Event EventsManager::readEvent() {
-	pollEvents();
-	return _pendingEvents.empty() ? Common::Event() : _pendingEvents.pop();
+void EventsManager::UpdateCursorPosition(int dx, int dy) {
+	/*
+	*  Pick up any leftover fuzz from last time.  This is important
+	*  when scaling down mouse motions.  Otherwise, the user can
+	*  drag to the right extremely slow for the length of the table
+	*  and not get anywhere.
+	*/
+	if (spr[1].active) if (spr[1].brain == 13) {
+		spr[1].x += dx;
+		spr[1].y += dy;
+		/* Clip the cursor to our client area */
+
+		if (spr[1].x > 640) spr[1].x = 640;
+		if (spr[1].y > 480) spr[1].y = 480;
+		if (spr[1].x < 0) spr[1].x = 0;
+		if (spr[1].y < 0) spr[1].y = 0;
+	}
+	if (mode == 1) {
+		play.mouse += dy;
+		//Msg("play mousey is now %d", play.mouse);
+	}
+
 }
 
-void EventsManager::warpMouse(const Common::Point &newPos) {
-	g_system->warpMouse(newPos.x, newPos.y);
+void EventsManager::clearEvents() {
+	Common::Event e;
+	while (g_system->getEventManager()->pollEvent(e)) {
+	}
 }
+
 
 bool EventsManager::isModifierKey(const Common::KeyCode &keycode) const {
 	return keycode == Common::KEYCODE_LCTRL || keycode == Common::KEYCODE_LALT

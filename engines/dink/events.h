@@ -30,7 +30,6 @@ namespace Dink {
 
 class EventsManager {
 private:
-	Common::Queue<Common::Event> _pendingEvents;
 	Common::Queue<Common::Event> _keyEvents;
 	Common::Array<int16> _keys;
 	Common::Point _mousePos;
@@ -42,7 +41,7 @@ private:
 	bool isExtendedKey(const Common::KeyCode &keycode) const;
 
 	void updateKeys(const Common::Event &event, bool isDown);
-
+	void UpdateCursorPosition(int dx, int dy);
 public:
 	EventsManager();
 	~EventsManager();
@@ -86,20 +85,7 @@ public:
 		_keyEvents.push(evt);
 	}
 
-	/**
-	 * Returns the next event, if any
-	 */
-	Common::Event readEvent();
-
-	/**
-	 * Sets the mouse position
-	 */
-	void warpMouse(const Common::Point &newPos);
-
-	void clearEvents() {
-		_pendingEvents.clear();
-		_keyEvents.clear();
-	}
+	void clearEvents();
 
 	/**
 	 * Get the current mouse position
