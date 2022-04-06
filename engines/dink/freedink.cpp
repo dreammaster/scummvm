@@ -261,15 +261,14 @@ bool keypressed(void)
 }
 
 void check_joystick() {
-
 	HRESULT result;
 	int total;
 	//memset(&sjoy,0,sizeof(sjoy));
 
 	for (int e2 = 1; e2 <= 10; e2++) {
 		sjoy.joybit[e2] = false;
-
 	}
+
 	sjoy.right = false;
 	sjoy.left = false;
 	sjoy.up = false;
@@ -364,12 +363,10 @@ pass:
 		if (GetKeyboard(55)) sjoy.joybit[7] = true;
 	}
 
-	for (int x5 = 1; x5 <= 10; x5++) sjoy.button[x5] = false;
+	for (int x5 = 1; x5 <= 10; x5++)
+		sjoy.button[x5] = false;
 
-
-	for (int btn = 1; btn <= 10; btn++)
-
-	{
+	for (int btn = 1; btn <= 10; btn++)	{
 		if (sjoy.joybit[btn]) {
 			if (sjoy.letgo[btn] == true) {
 				sjoy.button[btn] = true;
@@ -393,46 +390,53 @@ pass:
 
 	}
 
-	if (sjoy.right) if (sjoy.rightold == true) {
+	if (sjoy.right)
+		if (sjoy.rightold == true) {
 			sjoy.rightd = true;
 			sjoy.rightold = false;
 		}
 
-	if (sjoy.right) sjoy.rightold = false;
-	else sjoy.rightold = true;
+	if (sjoy.right)
+		sjoy.rightold = false;
+	else
+		sjoy.rightold = true;
 
 
-	if (sjoy.left) if (sjoy.leftold == true) {
+	if (sjoy.left)
+		if (sjoy.leftold == true) {
 			sjoy.leftd = true;
 			sjoy.leftold = false;
 		}
 
-	if (sjoy.left) sjoy.leftold = false;
-	else sjoy.leftold = true;
+	if (sjoy.left)
+		sjoy.leftold = false;
+	else
+		sjoy.leftold = true;
 
-
-	if (sjoy.up) if (sjoy.upold == true) {
+	if (sjoy.up)
+		if (sjoy.upold == true) {
 			sjoy.upd = true;
 			sjoy.upold = false;
 		}
 
-	if (sjoy.up) sjoy.upold = false;
-	else sjoy.upold = true;
+	if (sjoy.up)
+		sjoy.upold = false;
+	else
+		sjoy.upold = true;
 
-
-	if (sjoy.down) if (sjoy.downold == true) {
+	if (sjoy.down)
+		if (sjoy.downold == true) {
 			sjoy.downd = true;
 			sjoy.downold = false;
 		}
 
-	if (sjoy.down) sjoy.downold = false;
-	else sjoy.downold = true;
-
+	if (sjoy.down)
+		sjoy.downold = false;
+	else
+		sjoy.downold = true;
 
 	if (wait.active) {
-
-		//check for dirs
-
+		// Check for dirs
 		if (sjoy.rightd) wait.button = 16;
 		if (sjoy.leftd) wait.button = 14;
 		if (sjoy.upd) wait.button = 18;
@@ -451,7 +455,6 @@ pass:
 
 			}
 			sjoy.button[ll] = false;
-
 		}
 
 		if (wait.button != 0) {
@@ -461,9 +464,6 @@ pass:
 		}
 	}
 }
-
-
-
 
 // ********* CHECK TO SEE IF THIS CORD IS ON A HARD SPOT *********
 bool not_in_this_base(int seq_, int base) {

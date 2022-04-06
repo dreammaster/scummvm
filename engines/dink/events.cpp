@@ -134,12 +134,12 @@ bool EventsManager::isExtendedKey(const Common::KeyCode &keycode) const {
 void EventsManager::updateKeys(const Common::Event &event, bool isDown) {
 	_keyModifierFlags = event.kbd.flags;
 
-	_keys[event.kbd.keycode] = isDown;
+	_keys[event.kbd.keycode] = isDown ? -1 : 0;
 }
 
-bool EventsManager::isKeyPressed(int key) {
-	bool result = _keys[key];
-	_keys[key] = false;
+short EventsManager::getAsyncState(int key) {
+	short result = _keys[key];
+	_keys[key] &= ~1;
 	return result;
 }
 
@@ -163,7 +163,7 @@ bool getkey(int key) {
 }
 
 int GetKeyboard(int key) {
-	return g_events->isKeyPressed(key) ? 0 : 1;
+	return g_events->getAsyncState(key);
 }
 
 char key_convert(int key) {

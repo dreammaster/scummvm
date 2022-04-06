@@ -32,7 +32,7 @@ class EventsManager {
 private:
 	Common::Queue<Common::Event> _pendingEvents;
 	Common::Queue<Common::Event> _keyEvents;
-	Common::Array<bool> _keys;
+	Common::Array<int16> _keys;
 	Common::Point _mousePos;
 	int16 _joystickAxis[32];
 	bool _joystickButton[32];
@@ -69,7 +69,7 @@ public:
 	/**
 	 * Returns true if a key is pressed, and clears the flag
 	 */
-	bool isKeyPressed(int key);
+	short getAsyncState(int key);
 
 	/**
 	 * Returns the bitset of currently pressed modifier keys
