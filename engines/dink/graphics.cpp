@@ -30,30 +30,11 @@
 
 namespace Dink {
 
-HRESULT SelectObject(HDC hdc, HGDIOBJ h) {
-	return S_OK;
-}
-
-HRESULT SetBkMode(HDC hdc, int bkMode) {
-	return S_OK;
-}
-
-COLORREF SetBkColor(HDC hdc, COLORREF color) {
-	return S_OK;
-}
-
-int GetTextFace(HDC hdc, int c, const char *lpName) {
-	return 0;
-}
+static Graphics::Font *currFont;
+static COLORREF textColor;
+static BkMode backMode;
 
 void initfonts(const Common::String &fontName) {
-/*	Common::Archive *archive;
-	if ((archive = Common::makeZipArchive("fonts.dat")) == nullptr)
-		error("Could not locate fonts");
-*/
-	// 
-	// TODO: Set up fonts most matching FreeDink
-
 	// lfHeight = 20, lfWeight = 400
 	hfont = Graphics::loadTTFFontFromArchive("FreeSans.ttf", 20);
 	// lfHeight = 18, lfWeight = 600
@@ -70,6 +51,39 @@ void kill_fonts() {
 		hfont_small = nullptr;
 	}
 }
+
+HRESULT SelectObject(HDC hdc, HGDIOBJ h) {
+	currFont = (Graphics::Font *)h;
+	return S_OK;
+}
+
+COLORREF SetTextColor(HDC hdc, COLORREF color) {
+	COLORREF oldColor = textColor;
+	textColor = color;
+	return oldColor;
+}
+
+HRESULT SetBkMode(HDC hdc, int bkMode) {
+	backMode = (BkMode)bkMode;
+	return S_OK;
+}
+
+COLORREF SetBkColor(HDC hdc, COLORREF color) {
+	return S_OK;
+}
+
+int GetTextFace(HDC hdc, int c, const char *lpName) {
+	return 0;
+}
+
+int DrawText(HDC hdc, const char *lpchText,
+	int cchText, RECT *lprc, uint format) {
+	Graphics::Surface dest = lpDDSPrimary->getSubArea(*lprc);
+	currFont->drawString(&dest, lpchText, 0, 0, dest.w, textColor);
+
+	return currFont->getFontHeight();
+}
+
 
 void flip_it_second() {
 	DDBLTFX ddBltFx;

@@ -29,46 +29,27 @@
 namespace Dink {
 
 // SetBkMode flags
-#define TRANSPARENT 1
-#define OPAQUE 2
+enum BkMode {
+	BKMODE_NONE = 0,
+	TRANSPARENT = 1,
+	OPAQUE = 2
+};
+
+typedef void *HGDIOBJ;
+typedef Graphics::Surface *HBITMAP;
 
 typedef uint32 COLORREF;
 #define RGB(r,g,b) ((COLORREF)(((byte)(r)|((uint16)((byte)(g))<<8))|(((uint32)(byte)(b))<<16)))
-
-inline COLORREF SetTextColor(HDC hdc, COLORREF color) {
-	return color;
-}
-
-inline int DrawText(HDC hdc, const char *lpchText, int cchText,
-	RECT *lprc, uint format) {
-	return 0;
-}
-
-/*
-struct LOGFONT {
-	int32 lfHeight;
-	int32 lfWidth;
-	int32 lfEscapement;
-	int32 lfOrientation;
-	int32 lfWeight;
-	byte lfItalic;
-	byte lfUnderline;
-	byte lfStrikeOut;
-	byte lfCharSet;
-	byte lfOutPrecision;
-	byte lfClipPrecision;
-	byte lfQuality;
-	byte lfPitchAndFamily;
-	char lfFaceName[32];
-};
-*/
-typedef void *HGDIOBJ;
-typedef Graphics::Surface *HBITMAP;
 
 extern HRESULT SelectObject(HDC hdc, HGDIOBJ h);
 extern HRESULT SetBkMode(HDC hdc, int mode);
 extern COLORREF SetBkColor(HDC hdc, COLORREF color);
 extern int GetTextFace(HDC hdc, int c, const char *lpName);
+extern COLORREF SetTextColor(HDC hdc, COLORREF color);
+extern int DrawText(HDC hdc, const char *lpchText,
+	int cchText, RECT *lprc, uint format);
+
+
 inline bool ClientToScreen(HWND hWnd, LPPOINT lpPoint) {
 	return true;
 }

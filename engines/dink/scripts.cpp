@@ -4044,7 +4044,6 @@ good:
 	//s = h
 	//Msg("ok, continuing with running %s..",s);
 	return 1;
-
 }
 
 void init_scripts() {
