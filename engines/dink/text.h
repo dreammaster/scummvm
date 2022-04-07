@@ -33,11 +33,19 @@ extern void kill_text_owned_by(int sprite);
 extern bool text_owned_by(int sprite);
 extern int say_text(const char *text, int h, int script);
 extern int say_text_xy(const char *text, int mx, int my, int script);
+
+/**
+ * This acts in the same way as strcat except it combines
+ * a string an a single character, updating the null at the end.
+ */
 extern void strchar(char *string, char ch);
+
 extern void replace(const char *this1, const char *that, char *line);
 extern bool compare(const char *orig, const char *comp);
 //redink1 added this prototype to fix this save info declaration error thing
 extern void decipher_string(char line[200], int script);
+extern bool seperate_string(const char *str, int num, char liney, char *return1);
+extern void strip_beginning_spaces(char *s);
 
 } // namespace Dink
 

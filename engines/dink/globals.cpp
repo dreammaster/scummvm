@@ -198,7 +198,7 @@ int burn_revision = 0;
 bool abort_this_flip = false;
 font_color font_colors[16];
 
-show_bmp showb;
+ShowBmp showb;
 
 int keep_mouse = 0;
 

@@ -24,6 +24,7 @@
 #include "common/textconsole.h"
 #include "dink/text.h"
 #include "dink/globals.h"
+#include "dink/scripts.h"
 #include "dink/var.h"
 
 namespace Dink {
@@ -342,6 +343,28 @@ void kill_text_owned_by_safe(int sprite) {
 			}
 		}
 	}
+}
+
+void strip_beginning_spaces(char *s) {
+	char *h;
+	h = s;
+
+	if (s[0] != 32) {
+		return;
+	}
+
+	while (h[0] == 32) {
+		h = &h[1];
+	}
+
+	strcpy(s, h);
+}
+
+void strchar(char *string, char ch) {
+	int last;
+	last = strlen(string);
+	string[last] = ch;
+	string[last + 1] = 0;
 }
 
 } // namespace Dink

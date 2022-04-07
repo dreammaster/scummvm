@@ -75,6 +75,9 @@ inline bool ClientToScreen(HWND hWnd, LPPOINT lpPoint) {
 
 extern void initfonts(const Common::String &fontName);
 extern void kill_fonts();
+extern void flip_it_second();
+extern void copy_bmp(const char *name);
+extern void show_bmp(char name[80], int showdot, int reserved, int script);
 
 } // namespace Dink
 

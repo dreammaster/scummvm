@@ -64,6 +64,8 @@ extern DWORD DDColorMatch(IDirectDrawSurface *pdds, COLORREF rgb);
  */
 extern HRESULT DDSetColorKey(IDirectDrawSurface *pdds, COLORREF rgb);
 
+extern IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite);
+
 } // namespace Dink
 
 #endif

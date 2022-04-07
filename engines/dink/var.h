@@ -39,38 +39,40 @@ extern bool ResumeMidi();
 extern byte get_hard_play(int h, int x1, int y1);
 extern void draw_sprite_game(LPDIRECTDRAWSURFACE lpdest, int h);
 extern bool add_time_to_saved_game(int num);
-extern void kill_all_scripts_for_real();
-extern bool seperate_string(const char *str, int num, char liney, char *return1);
 extern void finiObjects();
 extern void check_midi();
 
-extern void init_scripts();
-extern int load_script(const char *filename, int sprite, bool set_sprite);
 extern void update_status_all();
 extern int add_sprite(int x1, int y, int brain, int pseq, int pframe);
 
 extern void add_exp(int num, int h, bool addEvenIfNotLastSpriteHit = false);
 extern bool locate(int script, const char *proc);
 extern void draw_status_all();
-extern int process_line(int script, char *s, bool doelse);
 
-extern void run_script(int script);
 extern void program_idata();
 extern void draw_map_game();
 extern void draw_map_game_background();
 extern int realhard(int tile);
 //redink1 added for recursive scope checking
-extern int get_var(int script, char *name);
 extern bool nothing_playing();
 extern void drawallhard();
 extern void process_callbacks();
 extern int hurt_thing(int h, int damage, int special);
 extern void random_blood(int mx, int my, int h);
-extern IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite);
 extern void attach();
 //redink1 added for font colors
 extern void init_font_colors();
 extern void pre_figure_out(char line[255]);
+
+extern bool talk_get(int script);
+extern int add_sprite_dumb(int x1, int y, int brain, int pseq, int pframe, int size);
+extern void fill_whole_hard();
+extern void fill_hardxy(RECT box);
+extern void fill_back_sprites();
+extern void fill_hard_sprites();
+extern void update_play_changes();
+extern bool kill_last_sprite();
+extern void figure_out(char line[255], int load_seq);
 
 } // namespace Dink
 

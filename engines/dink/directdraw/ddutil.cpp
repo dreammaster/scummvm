@@ -167,4 +167,20 @@ HRESULT DDSetColorKey(IDirectDrawSurface * pdds, COLORREF rgb) {
 	return DD_OK;
 }
 
+IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy, int sprite) {
+	Image::BitmapDecoder decoder;
+	File f;
+
+	if (!f.open(szBitmap) || !decoder.loadStream(f))
+		return nullptr;
+
+	IDirectDrawSurface *surf = new IDirectDrawSurface();
+	surf->copyFrom(decoder.getSurface());
+
+	if (decoder.hasPalette())
+		surf->setPalette(decoder.getPalette(), 0, decoder.getPaletteColorCount());
+
+	return surf;
+}
+
 } // namespace Dink

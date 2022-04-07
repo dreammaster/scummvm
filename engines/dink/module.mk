@@ -11,6 +11,8 @@ MODULE_OBJS = \
 	graphics.o \
 	metaengine.o \
 	music.o \
+	savegame.o \
+	scripts.o \
 	sound.o \
 	text.o \
 	update_frame.o \

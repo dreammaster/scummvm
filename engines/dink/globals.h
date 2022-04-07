@@ -86,7 +86,7 @@ struct soundstruct {
 	int vol;
 };
 
-struct show_bmp {
+struct ShowBmp {
 	bool active;
 	bool showdot;
 	int reserved;
@@ -515,7 +515,7 @@ extern bool cd_inserted;
 extern int burn_revision;
 extern bool abort_this_flip;
 extern font_color font_colors[16];
-extern show_bmp showb;
+extern ShowBmp showb;
 extern int keep_mouse;
 extern int mcc, sound_support;
 extern attackinfo_struct bow;

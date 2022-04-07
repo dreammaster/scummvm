@@ -20,8 +20,11 @@
  */
 
 #include "dink/graphics.h"
+#include "dink/file.h"
 #include "dink/globals.h"
+#include "dink/text.h"
 #include "dink/lib/wintypes.h"
+#include "dink/directdraw/ddutil.h"
 #include "common/unzip.h"
 #include "graphics/fonts/ttf.h"
 
@@ -66,6 +69,120 @@ void kill_fonts() {
 		delete hfont_small;
 		hfont_small = nullptr;
 	}
+}
+
+void flip_it_second() {
+	DDBLTFX ddBltFx;
+	RECT rcRectSrc;
+	RECT rcRectDest;
+	POINT p;
+
+	if (!windowed) {
+		while (1) {
+			ddrval = lpDDSPrimary->Flip(NULL, DDFLIP_WAIT);
+			if (ddrval == DD_OK) {
+				break;
+			}
+			if (ddrval == DDERR_SURFACELOST) {
+				if (ddrval != DD_OK) {
+					break;
+				}
+			}
+			if (ddrval != DDERR_WASSTILLDRAWING) {
+			}
+		}
+
+	} else {
+		//windowed mode, no flipping
+		p.x = 0;
+		p.y = 0;
+		ClientToScreen(hWndMain, &p);
+		GetClientRect(hWndMain, &rcRectDest);
+
+		//rcRectDest.top += winoffset;
+		rcRectDest.bottom = 480;
+		rcRectDest.right = 640;
+
+		OffsetRect(&rcRectDest, p.x, p.y);
+		SetRect(&rcRectSrc, 0, 0, 640, 480);
+
+		ddBltFx.dwSize = sizeof(ddBltFx);
+
+		ddBltFx.dwDDFX = DDBLTFX_NOTEARING;
+		ddrval = lpDDSPrimary->Blt(&rcRectDest, lpDDSBack,
+			&rcRectSrc, DDBLT_DDFX | DDBLT_WAIT, &ddBltFx);
+	}
+}
+
+void copy_bmp(const char *name) {
+	if (!File::exists(name)) {
+		Msg("Error: Can't find bitmap at %s.", name);
+		return;
+	}
+
+	lpDDSTrick = DDLoadBitmap(lpDD, name, 0, 0);
+
+	lpDDPal = DDLoadPalette(lpDD, name);
+	if (lpDDPal)
+		lpDDSPrimary->SetPalette(lpDDPal);
+
+	lpDDSTrick = DDLoadBitmap(lpDD, name, 0, 0);
+	abort_this_flip = true;
+
+	RECT rcRect;
+	SetRect(&rcRect, 0, 0, 640, 480);
+	//HDC hdc;
+	//char msg[200];
+
+again:
+	ddrval = lpDDSBack->BltFast(0, 0, lpDDSTrick,
+		&rcRect, DDBLTFAST_NOCOLORKEY);
+
+	if (ddrval == DDERR_WASSTILLDRAWING)
+		goto again;
+
+again1:
+	ddrval = lpDDSTwo->BltFast(0, 0, lpDDSTrick,
+		&rcRect, DDBLTFAST_NOCOLORKEY);
+
+	if (ddrval == DDERR_WASSTILLDRAWING)
+		goto again1;
+
+	flip_it_second();
+}
+
+void show_bmp(char name[80], int showdot, int reserved, int script) {
+	if (!File::exists(name)) {
+		Msg("Error: Can't find bitmap at %s.", name);
+		return;
+	}
+
+	lpDDSTrick = DDLoadBitmap(lpDD, name, 0, 0);
+
+	lpDDPal = DDLoadPalette(lpDD, name);
+	if (lpDDPal)
+		lpDDSPrimary->SetPalette(lpDDPal);
+
+	lpDDSTrick = DDLoadBitmap(lpDD, name, 0, 0);
+	showb.active = true;
+	showb.showdot = showdot;
+	showb.script = script;
+
+	abort_this_flip = true;
+
+	RECT rcRect;
+	SetRect(&rcRect, 0, 0, 640, 480);
+	//HDC hdc;
+	//char msg[200];
+
+again:
+	ddrval = lpDDSBack->BltFast(0, 0, lpDDSTrick,
+		&rcRect, DDBLTFAST_NOCOLORKEY);
+
+	if (ddrval == DDERR_WASSTILLDRAWING)
+		goto again;
+
+	flip_it_second();
 }
 
 } // namespace Dink
