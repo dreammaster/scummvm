@@ -41,6 +41,8 @@ typedef Graphics::Surface *HBITMAP;
 typedef uint32 COLORREF;
 #define RGB(r,g,b) ((COLORREF)(((byte)(r)|((uint16)((byte)(g))<<8))|(((uint32)(byte)(b))<<16)))
 
+extern void initfonts(const Common::String &fontName);
+extern void kill_fonts();
 extern HRESULT SelectObject(HDC hdc, HGDIOBJ h);
 extern HRESULT SetBkMode(HDC hdc, int mode);
 extern COLORREF SetBkColor(HDC hdc, COLORREF color);
@@ -49,13 +51,15 @@ extern COLORREF SetTextColor(HDC hdc, COLORREF color);
 extern int DrawText(HDC hdc, const char *lpchText,
 	int cchText, RECT *lprc, uint format);
 
-
 inline bool ClientToScreen(HWND hWnd, LPPOINT lpPoint) {
 	return true;
 }
 
-extern void initfonts(const Common::String &fontName);
-extern void kill_fonts();
+/**
+ * This function is called if the initialization function fails
+ */
+extern void text_draw(int h, HDC hdc);
+
 extern void flip_it_second();
 extern void copy_bmp(const char *name);
 extern void show_bmp(char name[80], int showdot, int reserved, int script);

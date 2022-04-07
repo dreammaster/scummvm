@@ -111,10 +111,12 @@ void IDirectDrawSurface::setScreenPalette() {
 }
 
 HRESULT IDirectDrawSurface::GetDC(HDC *hdc) {
+	*hdc = this;
 	return DD_OK;
 }
 
-HRESULT IDirectDrawSurface::ReleaseDC(HDC hdc) {
+HRESULT IDirectDrawSurface::ReleaseDC(HDC &hdc) {
+	hdc = nullptr;
 	return DD_OK;
 }
 

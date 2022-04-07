@@ -51,126 +51,6 @@ int rnd() {
 *
 * restore all lost objects
 */
-
-
-
-/*
-* This function is called if the initialization function fails
-*/
-
-
-void text_draw(int h, HDC hdc) {
-
-	char crap[200];
-	char *cr;
-	RECT rcRect;
-	int color = 0;
-
-	if (spr[h].damage == -1) {
-		//redink1 fix for : and '%deee bugs?
-		strcpy(crap, spr[h].text);
-		//sprintf(crap, "%s", spr[h].text);
-		cr = &crap[0];
-		color = 14;
-		while (cr[0] == '`') {
-			//color code at top
-			if (cr[1] == '#') color = 13;
-			if (cr[1] == '1') color = 1;
-			if (cr[1] == '2') color = 2;
-			if (cr[1] == '3') color = 3;
-			if (cr[1] == '5') color = 5;
-			if (cr[1] == '6') color = 6;
-			if (cr[1] == '7') color = 7;
-			if (cr[1] == '8') color = 8;
-			if (cr[1] == '9') color = 9;
-			if (cr[1] == '0') color = 10;
-			if (cr[1] == '$') color = 14;
-			if (cr[1] == '%') color = 15;
-			//redink1 support for additional colors
-			if (cr[1] == '@') color = 12;
-			if (cr[1] == '!') color = 11;
-
-			if (cr[1] == '4') color = 4;
-			cr = &cr[2];
-		}
-
-		//Msg("Final is %s.",cr);
-		if (spr[h].owner == 1000) {
-			SetRect(&rcRect, spr[h].x, spr[h].y, spr[h].x + 620, spr[h].y + 400);
-		} else {
-
-			SetRect(&rcRect, spr[h].x, spr[h].y, spr[h].x + 150, spr[h].y + 150);
-
-			if (spr[h].x + 150 > 620)
-				OffsetRect(&rcRect, ((spr[h].x + 150) - 620) - (((spr[h].x + 150) - 620) * 2), 0);
-
-
-
-		}
-
-	} else {
-
-
-		sprintf(crap, "%d", spr[h].damage);
-		cr = &crap[0];
-		if (spr[h].brain_parm == 5000)
-			color = 14;
-
-
-		if (spr[h].y < 0) spr[h].y = 0;
-		SetRect(&rcRect, spr[h].x, spr[h].y, spr[h].x + 50, spr[h].y + 50);
-
-
-	}
-
-	if (truecolor && (bFadedDown || process_downcycle))
-		color = 15;
-
-	SetTextColor(hdc, RGB(8, 14, 21));
-	if (spr[h].owner == 1200) {
-		//this text has no sprite, and doesn't want to be centered.
-		DrawText(hdc, cr, strlen(cr), &rcRect, DT_WORDBREAK);
-
-		OffsetRect(&rcRect, -2, 0);
-		DrawText(hdc, cr, strlen(cr), &rcRect, DT_WORDBREAK);
-
-		OffsetRect(&rcRect, 1, 1);
-		DrawText(hdc, cr, strlen(cr), &rcRect, DT_WORDBREAK);
-		OffsetRect(&rcRect, 0, -2);
-		DrawText(hdc, cr, strlen(cr), &rcRect, DT_WORDBREAK);
-
-
-	} else {
-
-		DrawText(hdc, cr, strlen(cr), &rcRect, DT_CENTER | DT_WORDBREAK);
-		OffsetRect(&rcRect, -2, 0);
-		DrawText(hdc, cr, strlen(cr), &rcRect, DT_CENTER | DT_WORDBREAK);
-
-		OffsetRect(&rcRect, 1, 1);
-		DrawText(hdc, cr, strlen(cr), &rcRect, DT_CENTER | DT_WORDBREAK);
-		OffsetRect(&rcRect, 0, -2);
-		DrawText(hdc, cr, strlen(cr), &rcRect, DT_CENTER | DT_WORDBREAK);
-
-	}
-
-	OffsetRect(&rcRect, 0, 1);
-
-	//redink1 support for custom colors
-	if (color >= 1 && color <= 15) {
-		SetTextColor(hdc, RGB(font_colors[color].red, font_colors[color].green, font_colors[color].blue));
-	} else {
-		SetTextColor(hdc, RGB(255, 255, 255));
-	}
-
-	if (spr[h].owner == 1200)
-
-		DrawText(hdc, cr, strlen(cr), &rcRect, DT_WORDBREAK);
-	else
-		DrawText(hdc, cr, strlen(cr), &rcRect, DT_CENTER | DT_WORDBREAK);
-
-
-}
-
 HRESULT restoreAll() {
 	HRESULT result;
 //	char crap[100];
@@ -3546,19 +3426,12 @@ void ApplyFade32(register unsigned char aValue, register unsigned char *aBuffer,
 
 //redink1 and Invertigo fix for windowed/high color mode
 void flip_it() {
-	//DDBLTFX     ddBltFx;
 	RECT rcRectSrc;
 	RECT rcRectDest;
 	POINT p;
 
-	/*int timer = GetTickCount() + 50;
-	while(GetTickCount() < timer)
-	{
-	}
-	*/
-
-	//redink1 fix for true-color transition
-	//The idea is to apply the fade to the backbuffer right before the main flip/blt.
+	// redink1 fix for true-color transition
+	// The idea is to apply the fade to the backbuffer right before the main flip/blt.
 	if (truecolor && (process_downcycle || process_upcycle || bFadedDown)) {
 		RECT r;
 		r.bottom = 480;
@@ -3566,36 +3439,19 @@ void flip_it() {
 		r.right = 640;
 		r.top = 0;
 
-		//Make sure we're not 'stuck'... i.e. fade down when already black, or fade up when not black
+		// Make sure we're not 'stuck'... i.e. fade down when already black, or fade up when not black
 		if (process_downcycle && bFadedDown || process_upcycle && !bFadedDown) {
 			if (process_downcycle)
 				process_downcycle = false;
 			if (process_upcycle) {
 				process_upcycle = false;
 				if (mSwapped) {
-//                    if ( windowed )
-//                    {
 					lpDDSFade->BltFast(0, 0, lpDDSBack, &r, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
 					LPDIRECTDRAWSURFACE lTemp;
 					lTemp = lpDDSBack;
 					lpDDSBack = lpDDSFade;
 					lpDDSFade = lTemp;
-					/*                    }
-					                    else
-					                    {
-					                        DDSURFACEDESC ddsd;
-					                        lpDDSBack->GetSurfaceDesc( &ddsd );
-					                        ddsd.ddsCaps.dwCaps = DDSCAPS_BACKBUFFER;
-
-					                        LPDIRECTDRAWSURFACE lTemp;
-					                        ddrval = lpDDSPrimary->GetAttachedSurface( &ddsd.ddsCaps, &lTemp );
-
-					                        lTemp->BltFast( 0, 0, lpDDSBack, &r, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
-
-					                        lpDDSBack->Release();
-					                        lpDDSBack = lTemp;
-					                    }
-					*/                    mSwapped = false;
+					mSwapped = false;
 				}
 			}
 			if (cycle_script != 0) {
@@ -3606,31 +3462,12 @@ void flip_it() {
 		}
 		if (process_downcycle || bFadedDown || process_upcycle) {
 			if (mSwapped == false) {
-//                if ( windowed )
-//                {
 				lpDDSFade->BltFast(0, 0, lpDDSBack, &r, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
 				LPDIRECTDRAWSURFACE lTemp;
 				lTemp = lpDDSBack;
 				lpDDSBack = lpDDSFade;
 				lpDDSFade = lTemp;
-				/*                }
-				                else
-				                {
-				                    DDSURFACEDESC ddsd;
-				                    lpDDSBack->GetSurfaceDesc( &ddsd );
-				                    ddsd.ddsCaps.dwCaps = DDSCAPS_BACKBUFFER | DDSCAPS_SYSTEMMEMORY;
-
-				                    lpDDSBack->Release();
-
-				                    LPDIRECTDRAWSURFACE lTemp;
-				                    ddrval = lpDDSPrimary->GetAttachedSurface( &ddsd.ddsCaps, &lTemp );
-
-				                    lTemp->BltFast( 0, 0, lpDDSBack, &r, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
-
-				                    lpDDSBack->Release();
-				                    lpDDSBack = lTemp;
-				                }
-				*/                mSwapped = true;
+				mSwapped = true;
 			}
 
 			unsigned char lFadeValue = static_cast<unsigned char>(30.0f * (static_cast<float>(iTrueColorFadeTime) / 400.0f));
@@ -3651,18 +3488,12 @@ void flip_it() {
 				lFadeValue = 29;
 			}
 
-			//Setup surface description data-structure
+			// Setup surface description data-structure
 			memset(&sdBack, 0, sizeof(DDSURFACEDESC));
 			sdBack.dwSize = sizeof(DDSURFACEDESC);
 
-			//Lock our surfaces
+			// Lock our surfaces
 			lpDDSBack->Lock(NULL, &sdBack, DDLOCK_DONOTWAIT, NULL);
-
-			//Copy backbuffer to fade surface
-//            HRESULT h = lpDDSFade->BltFast( 0, 0, lpDDSBack, &r, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
-
-			//Lock our surfaces
-//            lpDDSFade->Lock(NULL, &sdBack, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, NULL);
 
 			if (mColorDepth == ColorDepth16Bit_565 ||  mColorDepth == ColorDepth16Bit_555) {
 				unsigned short *lBuffer = (unsigned short *)sdBack.lpSurface;
@@ -3682,34 +3513,22 @@ void flip_it() {
 			if (!windowed) {
 				lpDDSFade->BltFast(0, 0, lpDDSBack, &r, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
 			}
-
-//            lpDDSFade->Unlock( NULL );
-//            h = lpDDSBack->BltFast( 0, 0, lpDDSFade, &r, DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT);
 		}
 	}
 
 	if (!windowed) {
-
-
-
 		while (1) {
 			ddrval = lpDDSPrimary->Flip(NULL, DDFLIP_WAIT);
 			if (ddrval == DD_OK) {
 				break;
 			}
 			if (ddrval == DDERR_SURFACELOST) {
-
 				restoreAll();
 				if (ddrval != DD_OK) {
 					break;
 				}
 			}
-			if (ddrval != DDERR_WASSTILLDRAWING) {
-
-
-			}
 		}
-
 	} else {
 #if 0
 		//windowed mode, no flipping
@@ -3733,9 +3552,6 @@ void flip_it() {
 		ddrval = lpDDSPrimary->Blt(&rcRectDest, lpDDSBack, &rcRectSrc, DDBLT_DDFX | DDBLT_WAIT, &ddBltFx);
 #endif
 	}
-
-
-
 }
 
 

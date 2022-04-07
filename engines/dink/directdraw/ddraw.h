@@ -163,7 +163,7 @@ public:
 		const LPRECT srcRect, uint32 flags, LPDDBLTFX lpDDBltFx);
 	static HRESULT Flip(IDirectDrawSurface *, uint32 flags);
 	HRESULT GetDC(HDC *hdc);
-	HRESULT ReleaseDC(HDC hdc);
+	HRESULT ReleaseDC(HDC &hdc);
 	HRESULT IsLost() const;
 	HRESULT SetPalette(LPDIRECTDRAWPALETTE pal);
 };

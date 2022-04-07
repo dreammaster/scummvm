@@ -28,7 +28,7 @@
 namespace Dink {
 
 typedef void *HINSTANCE;
-typedef uint32 HDC;
+typedef void *HDC;
 typedef byte BYTE;
 typedef uint16 WORD;
 typedef uint32 DWORD;
