@@ -32,6 +32,11 @@ private:
 public:
 	bool open(const Common::String &name);
 	static bool exists(const Common::String &name);
+
+	/**
+	 * Returns true if there are CD tracks in the game folder
+	 */
+	static bool audioTracksExists();
 };
 
 } // namespace Dink

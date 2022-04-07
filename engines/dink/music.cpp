@@ -91,30 +91,23 @@ void Music::playMusic(Common::SeekableReadStream *midi, bool repeat) {
 	}
 }
 
-bool Music::playMusic(const Common::String &filename, bool repeat) {
-	Common::File f;
-	if (!f.open(filename))
-		return false;
-
-	playMusic(&f, repeat);
-	return true;
-}
-
-
 void init_midi() {
 }
 
 uint32 playMIDIFile(HWND hWndNotify, LPCSTR lpszMIDIFileName) {
-	g_music->playMusic(lpszMIDIFileName);
-	return 0L;
+	File f;
+	if (!f.open(lpszMIDIFileName))
+		return false;
+
+	g_music->playMusic(&f);
+	return 0;
 }
 
 bool PlayMidi(const char *sFileName) {
-	//no midi stuff right now
+	// No midi stuff right now
 	if (sound_on == false)
 		return true;
 
-	char buf[256];
 	char crap[256];
 
 	if (compare(last_midi, sFileName)) {
@@ -139,25 +132,6 @@ bool PlayMidi(const char *sFileName) {
 	killCD(1);
 
 	playMIDIFile(g_hWnd, crap);
-	return true;
-
-	sprintf(buf, "open %s type sequencer alias MUSIC", crap);
-
-	if (mciSendString("close MUSIC", NULL, 0, NULL) != 0) {
-		Msg("Couldn't close current midi..");
-		//  return false;
-	}
-
-	if (mciSendString(buf, NULL, 0, NULL) != 0) {
-		Msg("Couldn't clear midi buffer");
-		return false;
-	}
-
-	if (mciSendString("play MUSIC from 0", NULL, 0, g_hWnd) != 0) {
-		Msg("Playmidi command failed");
-		return false;
-	}
-
 	return true;
 }
 
@@ -303,7 +277,8 @@ bool nothing_playing() {
 //thing to play the midi
 
 void openCD() {
-	cd_inserted = g_system->getAudioCDManager()->open();
+	cd_inserted = g_system->getAudioCDManager()->open()
+		&& File::audioTracksExists();
 }
 
 void closeCD() {

@@ -2183,19 +2183,18 @@ pass:
 					Msg("playmidi - cd play command detected.");
 
 					//cd directive
-
 					if (cd_inserted) {
 						if (regm == last_cd)
 							if (cdplaying())
 								return 2;
-						Msg("Playing CD track %d.", regm - 1000);
 
+						Msg("Playing CD track %d.", regm - 1000);
 						PlayCD(regm - 1000);
 						strcpy(s, h);
 						return 0;
 					} else {
 						char hold[255];
-						//cd isn't instered, can't play CD song!!!
+						// cd isn't instered, can't play CD song!!!
 						sprintf(hold, "%d.mid", regm - 1000);
 						PlayMidi(hold);
 					}

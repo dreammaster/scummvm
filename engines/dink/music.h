@@ -44,7 +44,6 @@ public:
 	 * Play music
 	 */
 	void playMusic(Common::SeekableReadStream *midi, bool repeat = false);
-	bool playMusic(const Common::String &filename, bool repeat = false);
 };
 
 extern Music *g_music;

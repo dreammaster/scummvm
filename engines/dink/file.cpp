@@ -20,6 +20,7 @@
  */
 
 #include "dink/file.h"
+#include "common/config-manager.h"
 
 namespace Dink {
 
@@ -40,5 +41,20 @@ Common::String File::formatPath(const Common::String &name) {
 
 	return result;
 }
+
+bool File::audioTracksExists() {
+	Common::FSNode gameDir(ConfMan.get("path"));
+	Common::FSList files;
+
+	if (gameDir.getChildren(files, Common::FSNode::kListFilesOnly)) {
+		for (Common::FSList::iterator it = files.begin(); it != files.end(); ++it) {
+			if (it->getName().hasPrefix("track0"))
+				return true;
+		}
+	}
+
+	return false;
+}
+
 
 } // namespace Dink
