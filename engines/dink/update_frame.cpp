@@ -277,7 +277,7 @@ demon:
 	rcRect.bottom = currY;
 
 	{
-		//Blit from Two, which holds the base scene.
+		// Blit from Two, which holds the base scene.
 		while (1) {
 			ddrVal = lpDDSBack->BltFast(0, 0, lpDDSTwo,
 				&rcRect, DDBLTFAST_NOCOLORKEY);

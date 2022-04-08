@@ -3841,18 +3841,17 @@ void fill_back_sprites() {
 }
 
 void fill_screen(int num) {
-	int crap;
-	DDBLTFX     ddBltFx;
-	ZeroMemory(&ddBltFx, sizeof(ddBltFx));
-	ddBltFx.dwSize = sizeof(ddBltFx);
-	//redink1 fix for correct fill_screen colors in truecolor mode
+	uint32 col;
+
 	if (truecolor) {
 		lpDDPal->GetEntries(0, 0, 256, pe);
-		ddBltFx.dwFillColor = pe[num].peBlue << wBPos | pe[num].peGreen << wGPos | pe[num].peRed << wRPos;
-	} else
-		ddBltFx.dwFillColor = num;
-	crap = lpDDSTwo->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
+		col = pe[num].peBlue << wBPos | pe[num].peGreen << wGPos | pe[num].peRed << wRPos;
+	} else {
+		col = num;
+	}
 
+	lpDDSTwo->clearTransparentColor();
+	lpDDSTwo->fillRect(lpDDSTwo->getBounds(), col);
 }
 
 

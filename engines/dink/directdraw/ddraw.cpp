@@ -70,7 +70,7 @@ HRESULT IDirectDrawSurface::Restore() {
 
 HRESULT IDirectDrawSurface::BltFast(int16 x, int16 y,
 		const IDirectDrawSurface *src, LPRECT rect, uint32 flags) {
-	blitFrom(*src, *rect, Common::Point(x, y));
+	rawBlitFrom(*src, *rect, Common::Point(x, y), nullptr);
 
 	if (src->getPalette() != nullptr)
 		setPalette(src->getPalette(), 0, PALETTE_COUNT);

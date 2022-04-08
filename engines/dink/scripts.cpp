@@ -2346,7 +2346,6 @@ pass:
 			int ARR[20] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 			if (get_parms(ev[1], script, h, ARR)) {
 				fill_screen(nlist[0]);
-
 			}
 
 			strcpy(s, h);
