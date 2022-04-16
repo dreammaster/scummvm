@@ -3,11 +3,13 @@ MODULE := engines/legend
 MODULE_OBJS = \
 	debugger.o \
 	file.o \
+	font.o \
 	globals.o \
 	graphics.o \
 	legend.o \
 	memory.o \
 	metaengine.o \
+	windows.o \
 	shannara/flix.o \
 	shannara/globals.o \
 	shannara/shannara_demo.o
