@@ -35,7 +35,8 @@ namespace Legend {
 LegendEngine *g_engine;
 
 LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) : Engine(syst),
-	_gameDescription(gameDesc), _randomSource("Legend") {
+		_gameDescription(gameDesc), _randomSource("Legend"),
+		_globals(nullptr), _screen(nullptr) {
 	g_engine = this;
 }
 
@@ -43,9 +44,13 @@ LegendEngine::~LegendEngine() {
 	release_memory();
 
 	delete _globals;
+	delete _screen;
 }
 
 void LegendEngine::initialize() {
+	_globals = new Globals();
+	_screen = new Graphics::Screen();
+
 	init_memory();
 }
 

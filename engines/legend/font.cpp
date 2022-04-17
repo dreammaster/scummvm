@@ -19,11 +19,30 @@
  *
  */
 
-#include "common/events.h"
+#include "common/debug.h"
 #include "legend/font.h"
-//#include "legend/globals.h"
+#include "legend/graphics.h"
+#include "legend/globals.h"
 
 namespace Legend {
+
+int Font::getWidth(int c) const {
+	assert(c != '\t' && c != '\n' && c != 18);
+
+	if (_width2 < 0) {
+		int w1 = static_cast<const byte *>(_data1->_ptr)[c];
+		int w2 = static_cast<const byte *>(_data1->_ptr)[c];
+		return w1 + (w2 >> 4) + (w2 & 0xf);
+
+	} else if (_width1 < 0) {
+		int w1 = static_cast<const byte *>(_data1->_ptr)[c];
+		int w2 = _width2;
+		return w1 + w2;
+
+	} else {
+		return _width1 + _width2;
+	}
+}
 
 Fonts::Fonts() {
 	_font = nullptr;
@@ -33,6 +52,9 @@ Fonts::Fonts() {
 	_font_bk_color = 0;
 	_half_font_w = _half_font_h = 0;
 	_font_w = _font_h = 0;
+	_cursor_on = false;
+	_print_char_col_fg = 0;
+	_print_char_col_bg = 0;
 }
 
 int Fonts::set_tab_width(int w) {
@@ -65,22 +87,89 @@ int Fonts::get_char_width(int c) {
 	return w;
 }
 
-int Font::getWidth(int c) const {
-	assert(c != '\t' && c != '\n' && c != 18);
+int Fonts::get_string_width(const StringPtr &str) {
+	const char *s = str;
+	int w = 0;
 
-	if (_width2 < 0) {
-		int w1 = static_cast<const byte *>(_data1->_ptr)[c];
-		int w2 = static_cast<const byte *>(_data1->_ptr)[c];
-		return w1 + (w2 >> 4) + (w2 & 0xf);
+	for (; *s; ++s)
+		w += get_char_width(*s);
 
-	} else if (_width1 < 0) {
-		int w1 = static_cast<const byte *>(_data1->_ptr)[c];
-		int w2 = _width2;
-		return w1 + w2;
+	return w;
+}
 
+void Fonts::get_font_color(uint32 *fg, uint32 *bg) {
+	*fg = _font_color;
+	*bg = _font_bk_color;
+}
+
+void Fonts::set_font_color(uint32 fg, uint32 bg) {
+	_font_color = fg;
+	_font_bk_color = bg;
+}
+
+void Fonts::set_font_position(int x, int y) {
+	_font_x = x;
+	_font_y = y;
+}
+
+void Fonts::print_font(const StringPtr &str) {
+	const char *s = str;
+	if (_font->_fontNum == -1) {
+		debug("%s", s);
 	} else {
-		return _width1 + _width2;
+		for (; *s; ++s)
+			print_font_char(*s);
 	}
+}
+
+void Fonts::print_font_char(int c) {
+	Font &f = getFont();
+	if (_cursor_on)
+		toggle_cursor();
+
+	if (c == '\n') {
+		_font_x = 0;
+		_font_y += _font_h;
+	} else if (c == '\t') {
+		int adjust = (_font_x >= 0) ? 0 : -1;
+		_font_x += _tab_width - adjust;
+
+		if (_font_x >= _G(video_x2)) {
+			_font_x = 0;
+			_font_y += _font_h;
+		}
+	} else if (c == 18) {
+		if (!_print_char_flag) {
+			_print_char_col_fg = _font_color;
+			_print_char_col_bg = _font_bk_color;
+			SWAP(_font_color, _font_bk_color);
+			_print_char_flag = true;
+		} else {
+			_font_color = _print_char_col_fg;
+			_font_bk_color = _print_char_col_bg;
+			_print_char_flag = false;
+		}
+	} else {
+		int x1 = f._width1 >= 0 ? f._width1 :
+			static_cast<byte *>(f._data1->_ptr)[c];
+		int x2 = x1 + (f._width2 >= 0 ? f._width2 :
+			static_cast<byte *>(f._data2->_ptr)[c]);
+		int h2 = f._height2;
+
+		if (_font_bk_color && _font_outline < 0) {
+			gxSaveColors(0, _font_bk_color);
+			int y2 = _font_y + _font_h - 1;
+
+			// TODO
+		}
+	}
+
+	if (_cursor_on)
+		toggle_cursor();
+}
+
+void Fonts::toggle_cursor() {
+	draw_xor(_font_x, _font_y, _font_w, _font_h, 13);
 }
 
 } // namespace Legend

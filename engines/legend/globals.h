@@ -40,6 +40,14 @@ struct Globals {
 	int _gx_clipy1 = 0, _gx_clipy2 = 0;
 	int _clipx1 = 0, _clipx2 = 0;
 	int _clipy1 = 0, _clipy2 = 0;
+	byte *_screenPtr = nullptr;
+	int _video_modeState = 0;
+	int _video_pitch = 0;
+	int _video_ctr = 0;
+	int _grafx_mode = 0;
+	bool _fontCharFlag = false;
+	int _video_x2 = 0;
+	int _video_saved_fg = 0, _video_saved_bg = 0;
 
 	// memory
 	size_t _master_table_size = 0x300;
