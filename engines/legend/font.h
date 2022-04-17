@@ -24,6 +24,7 @@
 
 #include "common/rect.h"
 #include "legend/memory.h"
+#include "legend/resources.h"
 
 namespace Legend {
 
@@ -54,13 +55,19 @@ private:
 public:
 	static Font *_font;
 	static int _tab_width;
-	static int _font_color;
+	static uint32 _font_color;
+	static uint32 _font_bk_color;
 	static int _font_outline;
-	static int _font_bk_color;
 	static int _half_font_w;
 	static int _half_font_h;
 	static int _font_w;
 	static int _font_h;
+	static int _font_x, _font_y;
+	static bool _cursor_on;
+	static bool _print_char_flag;
+	static int _print_char_col_fg;
+	static int _print_char_col_bg;
+
 public:
 	Fonts();
 
@@ -83,6 +90,41 @@ public:
 	 * Get a character width in the current font
 	 */
 	static int get_char_width(int c);
+
+	/**
+	 * Returns a string width
+	 */
+	static int get_string_width(const StringPtr &str);
+
+	/**
+	 * Gets the font color
+	 */
+	static void get_font_color(uint32 *fg, uint32 *bg);
+
+	/**
+	 * Sets the font color
+	 */
+	static void set_font_color(uint32 fg, uint32 bg);
+
+	/**
+	 * Sets the screen position for writing text
+	 */
+	static void set_font_position(int x, int y);
+
+	/**
+	 * Prints out a text string
+	 */
+	static void print_font(const StringPtr &str);
+
+	/**
+	 * Prints out a character
+	 */
+	static void print_font_char(int c);
+
+	/**
+	 * Toggles display of the text cursor
+	 */
+	static void toggle_cursor();
 };
 
 } // namespace Legend

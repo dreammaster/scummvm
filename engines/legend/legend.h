@@ -31,7 +31,7 @@
 #include "common/util.h"
 #include "engines/engine.h"
 #include "engines/savestate.h"
-#include "graphics/surface.h"
+#include "graphics/screen.h"
 
 #include "legend/detection.h"
 
@@ -51,6 +51,8 @@ protected:
 	virtual void initialize();
 public:
 	Globals *_globals = nullptr;
+	Graphics::Screen *_screen = nullptr;
+
 public:
 	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);
 	~LegendEngine() override;

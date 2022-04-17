@@ -9,6 +9,7 @@ MODULE_OBJS = \
 	legend.o \
 	memory.o \
 	metaengine.o \
+	resources.o \
 	windows.o \
 	shannara/flix.o \
 	shannara/globals.o \

@@ -23,6 +23,7 @@
 #include "graphics/palette.h"
 #include "legend/graphics.h"
 #include "legend/globals.h"
+#include "legend/legend.h"
 
 namespace Legend {
 
@@ -60,8 +61,21 @@ int find_rgb(byte r, byte g, byte b) {
 }
 
 byte *gxVideoAddr(int x, int y) {
+/*
 	int offset = _G(display)._pitch * y + x;
 	return (byte *)_G(display)._pixels->_ptr + offset;
+	*/
+	int videoOffset = y * _G(video_pitch) + x;
+	byte *screenP = (byte *)g_engine->_screen->getPixels();
+
+	if (_G(video_modeState)) {
+		return _G(screenPtr) + videoOffset;
+	} else if (_G(grafx_mode) == 5) {
+		gxSetCtr(videoOffset >> 16);
+		return screenP + (videoOffset & 0xffff);
+	} else {
+		return screenP + videoOffset;
+	}
 }
 
 void gxDirtyDisplay(int minY, int maxY) {
@@ -126,5 +140,33 @@ void black_palette() {
 	_G(palette_off) = 1;
 }
 
+void draw_xor(int x, int y, int w, int h, int mask) {
+	//byte *videoAddr = gxVideoPtr();
+}
+
+int gxSetModeState(int state) {
+	int oldState = state;
+	if (state != _G(video_modeState) && _G(screenPtr))
+		_G(video_modeState) = state ? 1 : 0;
+
+	return oldState;
+}
+
+int gxSetCtr(int val) {
+	if (val < 0) {
+		++_G(video_ctr);
+		return _G(video_ctr);
+	} else if (val != _G(video_ctr)) {
+		_G(video_ctr) = val;
+	}
+
+	return _G(video_ctr);
+}
+
+int gxSaveColors(int fg, int bg) {
+	_G(video_saved_fg) = fg;
+	_G(video_saved_bg) = bg;
+	return 0;
+}
 
 } // namespace Legend

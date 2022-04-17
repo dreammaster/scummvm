@@ -57,6 +57,10 @@ extern void reset_clip_region();
 extern void set_palette_range(const byte *pal, int start, int end);
 extern void set_palette(const Palette &pal);
 extern void black_palette();
+extern void draw_xor(int x, int y, int w, int h, int mask);
+extern int gxSetModeState(int state);
+extern int gxSetCtr(int val);
+extern int gxSaveColors(int fg, int bg);
 
 } // namespace Legend
 
