@@ -27,7 +27,7 @@
 #include "bagel/bagel.h"
 
 static const PlainGameDescriptor plumbersGames[] = {
-	{"Bagel", "Bagel"},
+	{"bagel", "Bagel"},
 	{nullptr, nullptr}
 };
 
@@ -39,6 +39,15 @@ static const DebugChannelDef debugFlagList[] = {
 namespace Bagel {
 
 static const ADGameDescription gameDescriptions[] = {
+	{
+		"bagel",
+		"",
+		AD_ENTRY1("TESTBED", 0),	// Game-data file for detection
+		Common::EN_ANY,
+		Common::kPlatformDOS,
+		ADGF_NO_FLAGS,
+		GUIO1(GUIO_NOLAUNCHLOAD)
+	},
 	AD_TABLE_END_MARKER
 };
 

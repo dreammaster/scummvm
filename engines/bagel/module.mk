@@ -2,6 +2,7 @@ MODULE := engines/bagel
 
 MODULE_OBJS = \
 	bagel.o \
+	console.o \
 	metaengine.o
 
 # This module can be built as a plugin

@@ -19,43 +19,19 @@
  *
  */
 
-#include "bagel/bagel.h"
-#include "bagel/console.h"
-#include "common/debug.h"
-#include "common/debug-channels.h"
-#include "common/error.h"
-#include "common/events.h"
-#include "common/file.h"
-#include "common/system.h"
-#include "common/timer.h"
+#ifndef BAGEL_CONSOLE_H
+#define BAGEL_CONSOLE_H
 
-#include "engines/util.h"
+#include "gui/debugger.h"
 
 namespace Bagel {
 
-BagelEngine::BagelEngine(OSystem *syst, const ADGameDescription *gameDesc) :
-		Engine(syst), _gameDescription(gameDesc) {
-}
+class Console : public GUI::Debugger {
+public:
+	explicit Console();
+	~Console(void) override {}
+};
 
-BagelEngine::~BagelEngine() {
-}
+} // namespace Bagel
 
-Common::Error BagelEngine::run() {
-	initGraphics(320, 200);
-	setDebugger(new Console());
-	getDebugger()->attach();
-
-	// Simple main event loop
-	Common::Event evt;
-	while (!shouldQuit()) {
-		while (g_system->getEventManager()->pollEvent(evt)) {
-		}
-
-		g_system->delayMillis(10);
-		g_system->updateScreen();
-	}
-
-	return Common::kNoError;
-}
-
-} // End of namespace Bagel
+#endif

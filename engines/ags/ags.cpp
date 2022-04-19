@@ -115,6 +115,8 @@ Common::String AGSEngine::getGameId() const {
 }
 
 Common::Error AGSEngine::run() {
+	getDebugger()->attach();
+
 	if (debugChannelSet(-1, kDebugScan)) {
 		// Scan the given folder and subfolders for unknown games
 		AGS3::GameScanner scanner;
