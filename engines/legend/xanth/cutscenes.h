@@ -19,26 +19,44 @@
  *
  */
 
-#ifndef LEGEND_XANTH_GLOBALS_H
-#define LEGEND_XANTH_GLOBALS_H
+#ifndef LEGEND_XANTH_CUTSCENES_H
+#define LEGEND_XANTH_CUTSCENES_H
 
-#include "legend/globals.h"
-#include "legend/file.h"
-#include "legend/graphics.h"
+#include "common/scummsys.h"
+#include "legend/xanth/globals.h"
 
 namespace Legend {
 namespace Xanth {
 
-enum Mode1 { MODE1_0, MODE1_1 };
-
-struct XanthGlobals : public ::Legend::Globals {
-	XanthGlobals();
-	virtual ~XanthGlobals();
-
-	Mode1 _mode1 = MODE1_1;
+struct CutsceneText {
+	uint16 _field0;
+	uint32 _message;
+	uint16 _field6;
+	uint16 _field8;
+	int16 _x1;
+	int16 _x2;
+	int16 _yp;
 };
 
-#define _GX(FIELD) (((::Legend::Xanth::XanthGlobals *)::Legend::g_globals)->_##FIELD)
+class Cutscene {
+private:
+	Mode1 _saved;
+public:
+	Cutscene();
+	virtual ~Cutscene();
+};
+
+class DemonCutscene : public Cutscene {
+protected:
+	void showDemonConv(const CutsceneText *data);
+};
+
+class TitleCutscene : public DemonCutscene {
+public:
+	void execute();
+};
+
+extern void show_cutscene(int num);
 
 } // namespasce Xanth
 } // namespace Legend

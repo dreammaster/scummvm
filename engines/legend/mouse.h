@@ -19,28 +19,14 @@
  *
  */
 
-#ifndef LEGEND_XANTH_GLOBALS_H
-#define LEGEND_XANTH_GLOBALS_H
-
-#include "legend/globals.h"
-#include "legend/file.h"
-#include "legend/graphics.h"
+#ifndef LEGEND_MOUSE_H
+#define LEGEND_MOUSE_H
 
 namespace Legend {
-namespace Xanth {
 
-enum Mode1 { MODE1_0, MODE1_1 };
+extern void push_mouse();
+extern void pop_mouse();
 
-struct XanthGlobals : public ::Legend::Globals {
-	XanthGlobals();
-	virtual ~XanthGlobals();
-
-	Mode1 _mode1 = MODE1_1;
-};
-
-#define _GX(FIELD) (((::Legend::Xanth::XanthGlobals *)::Legend::g_globals)->_##FIELD)
-
-} // namespasce Xanth
 } // namespace Legend
 
 #endif

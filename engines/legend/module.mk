@@ -9,11 +9,13 @@ MODULE_OBJS = \
 	legend.o \
 	memory.o \
 	metaengine.o \
+	mouse.o \
 	resources.o \
 	windows.o \
 	shannara/flix.o \
 	shannara/globals.o \
 	shannara/shannara_demo.o \
+	xanth/cutscenes.o \
 	xanth/globals.o \
 	xanth/xanth.o
 

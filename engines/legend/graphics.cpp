@@ -169,4 +169,12 @@ int gxSaveColors(int fg, int bg) {
 	return 0;
 }
 
+void fade_out_palette() {
+
+}
+
+void fade_in_palette() {
+
+}
+
 } // namespace Legend

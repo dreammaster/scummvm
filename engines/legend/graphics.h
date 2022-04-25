@@ -54,13 +54,16 @@ extern byte *gxVideoAddr(int x, int y);
 extern gxResult gxDestroyVirtual(Display *gx);
 extern void gxSetClipRegion(int x1, int y1, int x2, int y2);
 extern void reset_clip_region();
-extern void set_palette_range(const byte *pal, int start, int end);
-extern void set_palette(const Palette &pal);
-extern void black_palette();
 extern void draw_xor(int x, int y, int w, int h, int mask);
 extern int gxSetModeState(int state);
 extern int gxSetCtr(int val);
 extern int gxSaveColors(int fg, int bg);
+
+extern void set_palette_range(const byte *pal, int start, int end);
+extern void set_palette(const Palette &pal);
+extern void black_palette();
+extern void fade_out_palette();
+extern void fade_in_palette();
 
 } // namespace Legend
 
