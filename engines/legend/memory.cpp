@@ -330,8 +330,10 @@ void init_memory() {
 }
 
 void release_memory() {
-	delete[] _G(master_ptr);
-	delete[] _G(real_ptr);
+	if (g_globals) {
+		delete[] _G(master_ptr);
+		delete[] _G(real_ptr);
+	}
 }
 
 void set_purge_routine(MemType type, PurgeMethod proc) {

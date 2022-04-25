@@ -13,7 +13,9 @@ MODULE_OBJS = \
 	windows.o \
 	shannara/flix.o \
 	shannara/globals.o \
-	shannara/shannara_demo.o
+	shannara/shannara_demo.o \
+	xanth/globals.o \
+	xanth/xanth.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_LEGEND), DYNAMIC_PLUGIN)

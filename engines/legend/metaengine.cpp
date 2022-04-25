@@ -31,10 +31,17 @@ const char *LegendMetaEngine::getName() const {
 Common::Error LegendMetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const {
 	const Legend::LegendGameDescription *gd = (const Legend::LegendGameDescription *)desc;
 
-	if (gd->_gameId == Legend::GAME_SHANNARA && (gd->_desc.flags & ADGF_DEMO)) {
+	switch (gd->_gameId) {
+	case Legend::GAME_XANTH:
 		*engine = new Legend::Shannara::ShannaraDemo(syst, gd);
 		return Common::kNoError;
-	} else {
+	case Legend::GAME_SHANNARA:
+		if (gd->_desc.flags & ADGF_DEMO) {
+			*engine = new Legend::Shannara::ShannaraDemo(syst, gd);
+			return Common::kNoError;
+		}
+		// Fall-through
+	default:
 		// Unknown Legend game
 		return Common::kUnsupportedGameidError;
 	}

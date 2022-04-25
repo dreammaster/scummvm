@@ -19,43 +19,16 @@
  *
  */
 
+#include "legend/xanth/globals.h"
+
 namespace Legend {
+namespace Xanth {
 
-const PlainGameDescriptor GAME_NAMES[] = {
-	{ "xanth", "Companions of Xanth" },
-	{ "shannara", "Shannara" },
-	{ 0, 0 }
-};
+XanthGlobals::XanthGlobals() : Globals() {
+}
 
-const LegendGameDescription GAME_DESCRIPTIONS[] = {
-	{
-		// Companions of Xanth
-		{
-			"xanth",
-			0,
-			AD_ENTRY1s("xanth_00.pic", "17f720a5648a8fc98d81f7f86750414c", 60113),
-			Common::EN_ANY,
-			Common::kPlatformDOS,
-			ADGF_NO_FLAGS,
-			GUIO0()
-		},
-		GAME_XANTH
-	},
+XanthGlobals::~XanthGlobals() {
+}
 
-	{
-		{
-			"shannara",
-			"Demo",
-			AD_ENTRY1s("Logosvga.q", "9b3dd12beb1bbd1e32e55641ee1420b7", 321496),
-			Common::EN_ANY,
-			Common::kPlatformDOS,
-			ADGF_DEMO | ADGF_UNSTABLE,
-			GUIO0()
-		},
-		GAME_SHANNARA
-	},
-
-	{ AD_TABLE_END_MARKER, (GameId)0 }
-};
-
+} // namespace Xanth
 } // namespace Legend

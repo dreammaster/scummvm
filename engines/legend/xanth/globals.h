@@ -19,52 +19,28 @@
  *
  */
 
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
-#include "common/events.h"
-#include "common/file.h"
-#include "common/util.h"
-#include "engines/util.h"
-#include "legend/legend.h"
-#include "legend/detection.h"
+#ifndef LEGEND_XANTH_GLOBALS_H
+#define LEGEND_XANTH_GLOBALS_H
+
 #include "legend/globals.h"
-#include "legend/memory.h"
+#include "legend/file.h"
+#include "legend/graphics.h"
 
 namespace Legend {
+namespace Xanth {
 
-LegendEngine *g_engine;
+struct QHeader;
+struct QInfo;
 
-LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) : Engine(syst),
-		_gameDescription(gameDesc), _randomSource("Legend"),
-		_globals(nullptr), _screen(nullptr) {
-	g_engine = this;
-	g_globals = nullptr;
-}
+struct XanthGlobals : public ::Legend::Globals {
+	XanthGlobals();
+	virtual ~XanthGlobals();
 
-LegendEngine::~LegendEngine() {
-	release_memory();
+};
 
-	delete _globals;
-	delete _screen;
-}
+#define _GS(FIELD) (((::Legend::Xanth::XanthGlobals *)::Legend::g_globals)->_##FIELD)
 
-void LegendEngine::initialize() {
-	_globals = new Globals();
-	_screen = new Graphics::Screen();
-
-	init_memory();
-}
-
-uint32 LegendEngine::getFeatures() const {
-	return _gameDescription->_desc.flags;
-}
-
-GameId LegendEngine::getGameId() const {
-	return _gameDescription->_gameId;
-}
-
-Common::Error LegendEngine::run() {
-	return Common::kNoError;
-}
-
+} // namespasce Xanth
 } // namespace Legend
+
+#endif
