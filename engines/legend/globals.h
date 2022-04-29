@@ -31,6 +31,7 @@ struct Globals {
 	Globals();
 	virtual ~Globals();
 
+	Memory _memory;
 	Palette _default_palette = { 0 };
 	bool _cycling_on = false;
 	int _palette_off = 0;
@@ -49,22 +50,6 @@ struct Globals {
 	int _video_x2 = 0;
 	int _video_saved_fg = 0, _video_saved_bg = 0;
 
-	// memory
-	size_t _master_table_size = 0x300;
-	size_t _memory_avail = 0;
-	byte *_master_ptr = nullptr;
-	size_t _real_avail = 0xfffff;
-	byte *_real_ptr = nullptr;
-	MemoryBlock *_master_table = nullptr;
-	size_t _master_table_end = 0;
-	int _max_handles = 0x200;
-	int _next_handle_type = 0;
-	void **_handle_table;
-	bool _disable_compact_memory = false;
-	PurgeMethod _purge_vector_tbl[20] = { nullptr };
-	int _mem_type[20] = { 0 };
-	int _min_memory = 0, _max_memory = 0;
-	int _low_memory = 0;
 };
 
 extern Globals *g_globals;

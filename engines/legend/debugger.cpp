@@ -32,7 +32,7 @@ Debugger::~Debugger() {
 }
 
 bool Debugger::Cmd_DumpMasterTable(int argc, const char **argv) {
-	dump_master_table();
+	g_mem->dump_master_table();
 	return true;
 }
 

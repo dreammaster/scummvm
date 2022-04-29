@@ -42,8 +42,6 @@ LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc)
 }
 
 LegendEngine::~LegendEngine() {
-	release_memory();
-
 	delete _globals;
 	delete _screen;
 }
@@ -51,8 +49,6 @@ LegendEngine::~LegendEngine() {
 void LegendEngine::initialize() {
 	_globals = new Globals();
 	_screen = new Graphics::Screen();
-
-	init_memory();
 }
 
 uint32 LegendEngine::getFeatures() const {

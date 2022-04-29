@@ -45,7 +45,7 @@ void QHeader::load(Stream *src) {
 void q_init(int y, PalettePtr pal) {
 	if (!_GS(qbuffer) && pal) {
 		_GS(qpalette) = pal;
-		_GS(qbuffer) = (byte *)new_pointer(0x13C06);
+		_GS(qbuffer) = (byte *)g_mem->new_pointer(0x13C06);
 
 		if (_GS(qbuffer)) {
 			_GS(qbuffer_orig) = _GS(qbuffer);
@@ -96,15 +96,15 @@ void q_close() {
 
 void q_kill() {
 	if (_GS(composite_addr_tbl))
-		kill_pointer(_GS(composite_addr_tbl));
+		g_mem->kill_pointer(_GS(composite_addr_tbl));
 
 	if (_GS(composite_buffer))
-		kill_pointer(_GS(composite_buffer));
+		g_mem->kill_pointer(_GS(composite_buffer));
 
 	if (_GS(qbuffer)) {
 		_GS(qbuffer) = _GS(qbuffer_orig);
 		q_close();
-		kill_pointer(_GS(qbuffer));
+		g_mem->kill_pointer(_GS(qbuffer));
 		_GS(qbuffer) = nullptr;
 		_GS(video_buffer) = nullptr;
 	}

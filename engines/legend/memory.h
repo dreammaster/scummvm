@@ -55,41 +55,91 @@ enum MemType {
 };
 
 enum MemArea {
-	MEMAREA_DEFAULT = 0,
-	MEMAREA_1 = 1,
-	MEMAREA_REAL = 2
+	MEMAREA_END,
+	MEMAREA_START	
 };
 
+class Memory;
 struct MemoryBlock {
-	void *_ptr;
+	void *_ptr;		// Pointer to data when block is locked
 	int16 _handleIndex;
 	size_t _size;
 	byte _flags;
 	MemType _type;
 
 	void clear();
+private:
+	friend class Memory;
+	void *_rawPtr;
 };
 
-extern void init_memory();
-extern void release_memory();
-extern void set_purge_routine(MemType type, PurgeMethod proc);
-extern int add_purge_routine(PurgeMethod proc, int memType);
-extern MemoryBlock *insert_master(void *ptr, size_t size);
-extern void *new_pointer(size_t size);
-extern void *new_real_pointer(size_t size);
-extern void set_pointer_type(void *ptr, MemType type);
-extern void *resize_pointer(void *ptr, size_t newSize);
-extern int kill_pointer(void *ptr);
+class Memory {
+private:
+	// Size of the memory allocated to the memory manager
+	// TODO: Figure out a suitable size
+	const size_t MEMORY_AVAILABLE = 0xffffff;
+	byte *_master_ptr;
+	MemoryBlock *_master_table;
+	size_t _master_table_size = 0x300;
+	size_t _real_avail = 0xfffff;
+	size_t _master_table_end = 0;
+	int _max_handles = 0x200;
+	int _next_handle_type = 0;
+	void **_handle_table;
+	bool _disable_compact_memory = false;
+	PurgeMethod _purge_vector_tbl[MEMTYPE_UNDO + 1] = { nullptr };
+	//int _mem_type[20] = { 0 };
+	int _min_memory = -1, __min_memory = -1;
+	int _max_memory = 0;
+	int _low_memory = 0;
 
-extern void *new_handle(size_t size);
-extern size_t get_handle_size(void **handle);
-extern void set_handle_type(void **handle, MemType type);
-extern int lock_handle(void **handle);
-extern int unlock_handle(void **handle);
-extern void **resize_handle(void **handle, size_t newSize);
-extern int kill_handle(void **handle);
+private:
+	void compact_memory();
+	int freemem_block();
+	MemoryBlock *find_master(void *ptr);
+	void *purge_block(size_t size, int *purgeIndex);
+	MemoryBlock *get_master(size_t size, MemArea memArea);
+	void delete_master(MemoryBlock *mb);
+	int get_handle_num();
 
-extern void dump_master_table();
+public:
+	Memory();
+	~Memory();
+
+	void set_purge_routine(MemType type, PurgeMethod proc);
+	int add_purge_routine(PurgeMethod proc);
+	MemoryBlock *insert_master(void *ptr, size_t size);
+	void *new_pointer(size_t size);
+	void *resize_pointer(void *ptr, size_t newSize);
+	int kill_pointer(void *ptr);
+
+	void *new_handle(size_t size);
+	size_t get_handle_size(void **handle);
+	void set_handle_type(void **handle, MemType type);
+	int lock_handle(void **handle);
+	int unlock_handle(void **handle);
+	int kill_handle(void **handle);
+
+	void *new_real_pointer(size_t size) {
+		return new_pointer(size);
+	}
+	void kill_real_pointer(void *ptr) {
+		kill_pointer(ptr);
+	}
+	size_t get_low_memory() {
+		int result = _min_memory * 16;
+		_min_memory = -1;
+		return result;
+	}
+	size_t get_min_memory() const {
+		return __min_memory * 16;
+	}
+
+	void dump_master_table();
+};
+
+extern Memory *g_mem;
+
 extern void memsetx(void *ptr, byte v, size_t count);
 extern void memxor(void *dest, const void *src, size_t count);
 extern void memcpynotn(const void *src, void *dest, size_t count, byte val);
