@@ -22,6 +22,7 @@
 #ifndef LEGEND_GLOBALS_H
 #define LEGEND_GLOBALS_H
 
+#include "legend/font.h"
 #include "legend/graphics.h"
 #include "legend/memory.h"
 
@@ -49,6 +50,7 @@ struct Globals {
 	bool _fontCharFlag = false;
 	int _video_x2 = 0;
 	int _video_saved_fg = 0, _video_saved_bg = 0;
+	Fonts _fonts;
 
 };
 

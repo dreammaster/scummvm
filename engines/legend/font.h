@@ -28,19 +28,28 @@
 
 namespace Legend {
 
+#define FONT_COUNT 2
+
 struct Font {
+	int _counter = 0;
 	int _fontNum = 0;
 	int16 _height1 = 0;
 	int16 _height2 = 0;
 	int8 _width1 = 0;
 	int8 _width2 = 0;
-	MemoryBlock *_data1 = nullptr;
-	MemoryBlock *_data2 = nullptr;
+	MemoryBlock *_charWidths = nullptr;
+	MemoryBlock *_charSpacings = nullptr;
+	MemoryBlock *_pixelData = nullptr;
 
 	/**
 	 * Get a character width
 	 */
 	int getWidth(int c) const;
+
+	/**
+	 * Frees the data associated with the font
+	 */
+	void close();
 };
 
 class Fonts {
@@ -48,83 +57,96 @@ private:
 	/**
 	 * Returns a reference to the current font
 	 */
-	static Font &getFont() {
+	Font &getFont() {
 		assert(_font);
 		return *_font;
 	}
+
+	Font *get_font_rec();
 public:
-	static Font *_font;
-	static int _tab_width;
-	static uint32 _font_color;
-	static uint32 _font_bk_color;
-	static int _font_outline;
-	static int _half_font_w;
-	static int _half_font_h;
-	static int _font_w;
-	static int _font_h;
-	static int _font_x, _font_y;
-	static bool _cursor_on;
-	static bool _print_char_flag;
-	static int _print_char_col_fg;
-	static int _print_char_col_bg;
+	Font _fonts[FONT_COUNT];
+	Font *_font = nullptr;
+	int _tab_width = 0;
+	uint32 _font_color = 0;
+	uint32 _font_bk_color = 0;
+	int _font_outline = 0;
+	int _half_font_w = 0;
+	int _half_font_h = 0;
+	int _font_w = 0;
+	int _font_h = 0;
+	int _font_x = 0, _font_y = 0;
+	bool _cursor_on = false;
+	bool _print_char_flag = false;
+	int _print_char_col_fg = 0;
+	int _print_char_col_bg = 0;
 
 public:
-	Fonts();
+	Fonts() = default;
+
+	/**
+	 * Sets the font
+	 */
+	Font *set_font(int fontNum);
+
+	/**
+	 * Closes a font
+	 */
+	void close_font(Font *font);
 
 	/**
 	 * Returns the current font
 	 */
-	static Font *get_font() { return _font; }
+	Font *get_font() { return _font; }
 
 	/**
 	 * Sets the width of tab characters
 	 */
-	static int set_tab_width(int w);
+	int set_tab_width(int w);
 
 	/**
 	 * Get the current font's height
 	 */
-	static int get_font_height();
+	int get_font_height();
 
 	/**
 	 * Get a character width in the current font
 	 */
-	static int get_char_width(int c);
+	int get_char_width(int c);
 
 	/**
 	 * Returns a string width
 	 */
-	static int get_string_width(const StringPtr &str);
+	int get_string_width(const StringPtr &str);
 
 	/**
 	 * Gets the font color
 	 */
-	static void get_font_color(uint32 *fg, uint32 *bg);
+	void get_font_color(uint32 *fg, uint32 *bg);
 
 	/**
 	 * Sets the font color
 	 */
-	static void set_font_color(uint32 fg, uint32 bg);
+	void set_font_color(uint32 fg, uint32 bg);
 
 	/**
 	 * Sets the screen position for writing text
 	 */
-	static void set_font_position(int x, int y);
+	void set_font_position(int x, int y);
 
 	/**
 	 * Prints out a text string
 	 */
-	static void print_font(const StringPtr &str);
+	void print_font(const StringPtr &str);
 
 	/**
 	 * Prints out a character
 	 */
-	static void print_font_char(int c);
+	void print_font_char(int c);
 
 	/**
 	 * Toggles display of the text cursor
 	 */
-	static void toggle_cursor();
+	void toggle_cursor();
 };
 
 } // namespace Legend

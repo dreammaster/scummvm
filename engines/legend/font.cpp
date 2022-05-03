@@ -26,6 +26,17 @@
 
 namespace Legend {
 
+void Font::close() {
+	_counter = 0;
+	_fontNum = -1;
+	kill_handle(_charWidths);
+	kill_handle(_charSpacings);
+	kill_handle(_pixelData);
+	_charWidths = nullptr;
+	_charSpacings = nullptr;
+	_pixelData = nullptr;
+}
+
 int Font::getWidth(int c) const {
 	assert(c != '\t' && c != '\n' && c != 18);
 
@@ -44,17 +55,65 @@ int Font::getWidth(int c) const {
 	}
 }
 
-Fonts::Fonts() {
+Font *Fonts::set_font(int fontNum) {
+	for (auto &font : _fonts) {
+		if (font._counter != 0)
+			font._counter++;
+	}
+
+	// Scan for font
 	_font = nullptr;
-	_tab_width = 0;
-	_font_color = 0;
-	_font_outline = 0;
-	_font_bk_color = 0;
-	_half_font_w = _half_font_h = 0;
-	_font_w = _font_h = 0;
-	_cursor_on = false;
-	_print_char_col_fg = 0;
-	_print_char_col_bg = 0;
+	for (auto &font : _fonts) {
+		if (font._fontNum == fontNum) {
+			_font = &font;
+			font._counter = 1;
+			break;
+		}
+	}
+
+	if (!_font) {
+		bool flag = false;
+		_font = get_font_rec();
+
+		for (;;) {
+			if (fontNum == -1) {
+
+			} else {
+				
+			}
+		}
+	}
+
+	_font_w = get_char_width('M');
+	_font_h = get_font_height();
+	_half_font_w = _font_w / 2;
+	_half_font_h = _font_h / 2;
+
+	return _font;
+}
+
+Font *Fonts::get_font_rec() {
+	int ctr = _fonts[0]._counter;
+	Font *font = &_fonts[0];
+
+	if (ctr > 0) {
+		for (int i = 1; i < FONT_COUNT; ++i) {
+			if (_fonts[i]._counter == 0 || _fonts[i]._counter > ctr) {
+				font = &_fonts[i];
+				ctr = font->_counter;
+			}
+		}
+	}
+
+	close_font(font);
+	return font;
+}
+
+void Fonts::close_font(Font *font) {
+	if (font->_counter)
+		font->close();
+
+	_font = &_fonts[0];
 }
 
 int Fonts::set_tab_width(int w) {
