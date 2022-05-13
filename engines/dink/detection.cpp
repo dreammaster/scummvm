@@ -29,6 +29,11 @@
 #include "dink/detection.h"
 #include "dink/detection_tables.h"
 
+static const char *const directoryGlobs[] = {
+	"dink",
+	nullptr
+};
+
 const DebugChannelDef DinkMetaEngineDetection::debugFlagList[] = {
 	{ Dink::kDebugGraphics, "Graphics", "Graphics debug level" },
 	{ Dink::kDebugPath, "Path", "Pathfinding debug level" },
@@ -40,6 +45,8 @@ const DebugChannelDef DinkMetaEngineDetection::debugFlagList[] = {
 
 DinkMetaEngineDetection::DinkMetaEngineDetection() : AdvancedMetaEngineDetection(Dink::GAME_DESCRIPTIONS,
 	        sizeof(Dink::DinkGameDescription), Dink::GAME_NAMES) {
+	_maxScanDepth = 2;
+	_directoryGlobs = directoryGlobs;
 }
 
 ADDetectedGame DinkMetaEngineDetection::fallbackDetect(const FileMap &allFiles, const Common::FSList &fslist, ADDetectedGameExtraInfo **extra) const {

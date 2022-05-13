@@ -37,9 +37,10 @@ const PlainGameDescriptor GAME_NAMES[] = {
 	DETECTION_ENTRY(ID, FILENAME, MD5, SIZE, Common::UNK_LANG, nullptr, GUIO1(GUIO_NOLANG), ADGF_UNSTABLE)
 
 const DinkGameDescription GAME_DESCRIPTIONS[] = {
-	GAME_ENTRY("pq", "pq.dmod", "98ae54ad2264db226bf697545d60a727", 35324007),
+	GAME_ENTRY("dinksmallwood", "dink.dat", "019120cef0d2555c72afeba30a5d18ec", 11488),
+	//GAME_ENTRY("pq", "pq.dmod", "98ae54ad2264db226bf697545d60a727", 35324007),
 
-{ AD_TABLE_END_MARKER }
+	{ AD_TABLE_END_MARKER }
 };
 
 /**
