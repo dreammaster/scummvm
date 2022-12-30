@@ -39,8 +39,6 @@
 
 namespace Legend {
 
-struct LegendGameDescription;
-
 class LegendEngine : public Engine, public Events {
 private:
 	const LegendGameDescription *_gameDescription;
@@ -48,6 +46,12 @@ private:
 protected:
 	// Engine APIs
 	Common::Error run() override;
+
+	/**
+	 * Initalize the game
+	 */
+	virtual bool initialize() = 0;
+
 public:
 	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);
 	~LegendEngine() override;

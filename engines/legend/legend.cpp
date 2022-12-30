@@ -19,23 +19,20 @@
  *
  */
 
-#include "legend/legend.h"
-#include "legend/detection.h"
-#include "legend/console.h"
 #include "common/scummsys.h"
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
 #include "common/events.h"
 #include "common/system.h"
-#include "engines/util.h"
-#include "graphics/palette.h"
+#include "legend/legend.h"
+#include "legend/detection.h"
 
 namespace Legend {
 
 LegendEngine *g_engine;
 
-LegendEngine::LegendEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
-	_gameDescription(gameDesc), _randomSource("Legend") {
+LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
+		Engine(syst), _gameDescription(gameDesc), _randomSource("Legend") {
 	g_engine = this;
 }
 
@@ -43,21 +40,17 @@ LegendEngine::~LegendEngine() {
 }
 
 uint32 LegendEngine::getFeatures() const {
-	return _gameDescription->flags;
+	return _gameDescription->desc.flags;
 }
 
 Common::String LegendEngine::getGameId() const {
-	return _gameDescription->gameId;
+	return _gameDescription->desc.gameId;
 }
 
 Common::Error LegendEngine::run() {
-	// Initialize 320x200 paletted graphics mode
-	initGraphics(320, 200);
-
-	// Set the engine's debugger console
-	setDebugger(new Console());
-
-	runGame();
+	if (initialize()) {
+		runGame();
+	}
 
 	return Common::kNoError;
 }

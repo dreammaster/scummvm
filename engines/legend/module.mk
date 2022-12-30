@@ -1,6 +1,8 @@
 MODULE := engines/legend
 
 MODULE_OBJS = \
+	utils/engine_data.o \
+	games/gateway/engine.o \
 	legend.o \
 	console.o \
 	events.o \

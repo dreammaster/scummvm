@@ -1,0 +1,38 @@
+Function Keys:
+<F1>	this display
+<F2>	menu mode
+<F3>	half screen mode
+<F4>	text mode
+<F5>	save game
+<F6>	map mode
+<F7>	load game
+<F8>	look mode
+<F9>	status mode
+<F10>	inventory mode
+
+Special Keys when Typing:
+<Tab>	change to Mouse Mode
+<Backspace>	delete last character
+<Esc>	erases all typing
+<Enter>	execute command
+	nullptr, nullptr,
+Mouse Commands on the Pictures:
+Single-click:	"look at" object
+Double-click:	do 'obvious' thing to object
+	nullptr, nullptr,
+Mouse Commands on the Menus:
+Single-click:	select word
+Double-click:	execute comand
+
+Menu Control Keys:
+<Tab>	change to Typing Mode
+<PgUp>	move one page up in the menu
+<PgDn>	move one page down in the menu
+<Home>	move to the top of the menu
+<End>	move to the bottom of the menu
+<Shift><Letter>	move to the word
+<Up>, <Down>	move up or down in the meu
+<Left>, <Right>	select the other menu
+<Backspace>	delete last word
+<Space>	select word from list
+<Enter>	execute command

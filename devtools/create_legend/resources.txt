@@ -1,0 +1,4 @@
+The following resources are extracted from game executables:
+
+File                   Origin        Offset   Size
+gateway/commands.bin   gatemain.exe  1064eh   824
