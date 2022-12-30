@@ -23,7 +23,7 @@
 
 #include "legend/metaengine.h"
 #include "legend/detection.h"
-#include "legend/legend.h"
+#include "legend/games/gateway/engine.h"
 
 namespace Legend {
 
@@ -53,7 +53,16 @@ const ADExtraGuiOptionsMap *LegendMetaEngine::getAdvancedExtraGuiOptions() const
 }
 
 Common::Error LegendMetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const {
-	*engine = new Legend::LegendEngine(syst, desc);
+	Legend::LegendGameDescription *dsc = (Legend::LegendGameDescription *)desc;
+
+	switch (dsc->gameID) {
+	case Legend::GType_Gateway:
+		*engine = new Legend::Early::Gateway::GatewayEngine(syst, dsc);
+		break;
+	default:
+		return Common::kUnsupportedGameidError;
+	}
+
 	return Common::kNoError;
 }
 
