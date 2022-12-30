@@ -39,17 +39,21 @@
 
 namespace Legend {
 
-struct LegendGameDescription;
-
 class LegendEngine : public Engine, public Events {
 private:
-	const ADGameDescription *_gameDescription;
+	const LegendGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
 protected:
 	// Engine APIs
 	Common::Error run() override;
+
+	/**
+	 * Initalize the game
+	 */
+	virtual bool initialize() = 0;
+
 public:
-	LegendEngine(OSystem *syst, const ADGameDescription *gameDesc);
+	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);
 	~LegendEngine() override;
 
 	uint32 getFeatures() const;

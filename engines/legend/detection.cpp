@@ -39,7 +39,7 @@ const DebugChannelDef LegendMetaEngineDetection::debugFlagList[] = {
 };
 
 LegendMetaEngineDetection::LegendMetaEngineDetection() : AdvancedMetaEngineDetection(Legend::gameDescriptions,
-	sizeof(ADGameDescription), Legend::legendGames) {
+	sizeof(Legend::LegendGameDescription), Legend::legendGames) {
 }
 
 REGISTER_PLUGIN_STATIC(LEGEND_DETECTION, PLUGIN_TYPE_ENGINE_DETECTION, LegendMetaEngineDetection);
