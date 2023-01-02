@@ -36,6 +36,7 @@
 
 #include "legend/detection.h"
 #include "legend/events.h"
+#include "legend/utils/file.h"
 
 namespace Legend {
 
@@ -61,7 +62,12 @@ public:
 	/**
 	 * Returns the game Id
 	 */
-	Common::String getGameId() const;
+	GameType getGameId() const;
+
+	/**
+	 * Returns whether the game is one of the later all-graphical ones
+	 */
+	bool isLater() const;
 
 	/**
 	 * Gets a random number
@@ -98,6 +104,11 @@ public:
 		Common::Serializer s(stream, nullptr);
 		return syncGame(s);
 	}
+
+	/**
+	 * Returns a formatted filename for a given resource type and file number
+	 */
+	Common::String getFilename(FileType fileType, int fileNumber);
 };
 
 extern LegendEngine *g_engine;

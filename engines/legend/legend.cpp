@@ -43,8 +43,15 @@ uint32 LegendEngine::getFeatures() const {
 	return _gameDescription->desc.flags;
 }
 
-Common::String LegendEngine::getGameId() const {
-	return _gameDescription->desc.gameId;
+GameType LegendEngine::getGameId() const {
+	return _gameDescription->gameID;
+}
+
+bool LegendEngine::isLater() const {
+	auto id = _gameDescription->gameID;
+	return id == GType_CompanionsOfXanth ||
+		id == GType_Shannara ||
+		id == GType_DeathGate;
 }
 
 Common::Error LegendEngine::run() {
@@ -64,6 +71,19 @@ Common::Error LegendEngine::syncGame(Common::Serializer &s) {
 	s.syncAsUint32LE(dummy);
 
 	return Common::kNoError;
+}
+
+Common::String LegendEngine::getFilename(FileType fileType, int fileNumber) {
+	static const char *const EXTENSIONS[] = { "PIC", "RGN", "FNT", "MUS", "SAV", "SAV" };
+
+	switch (getGameId()) {
+	case GType_Gateway:
+		return Common::String::format("gate_%03d.%s", fileNumber, EXTENSIONS[fileType]);
+	case GType_CompanionsOfXanth:
+		return Common::String::format("xanth_%02d.%s", fileNumber, EXTENSIONS[fileType]);
+	default:
+		error("Unknown game");
+	}
 }
 
 } // End of namespace Legend

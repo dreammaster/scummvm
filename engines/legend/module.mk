@@ -1,7 +1,9 @@
 MODULE := engines/legend
 
 MODULE_OBJS = \
+	gfx/font.o \
 	utils/engine_data.o \
+	utils/file.o \
 	games/gateway/engine.o \
 	legend.o \
 	console.o \
