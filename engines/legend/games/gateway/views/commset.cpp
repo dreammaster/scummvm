@@ -32,7 +32,7 @@ enum {
 };
 
 CommSetContents::CommSetContents(UIElement *parent, const Common::Rect &area) :
-	Legend::Early::Gfx::View(parent, area) {
+	Legend::Gfx::ViewElement(parent, area) {
 }
 
 void CommSetContents::draw() {

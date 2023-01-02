@@ -20,57 +20,38 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_BUTTON_H
-#define LEGEND_EARLY_GFX_BUTTON_H
+#ifndef LEGEND_EARLY_GFX_SCREEN_H
+#define LEGEND_EARLY_GFX_SCREEN_H
 
-#include "legend/gfx/view_element.h"
+#include "common/list.h"
+#include "common/rect.h"
+#include "legend/gfx/font.h"
 
 namespace Legend {
 namespace Early {
 namespace Gfx {
 
-class Button : public Legend::Gfx::ViewElement {
-private:
-	Common::String _text;
-public:
-	Button(UIElement *parent, const Common::String &text, const Common::Rect &r) :
-			Legend::Gfx::ViewElement(parent, r), _text(text) {
-		setFont(1);
-	}
-	virtual ~Button() {}
-
-	/**
-	 * Draws the button on the screen
-	 */
-	void draw() override;
-
-	/**
-	 * Handle mouse clicks
-	 */
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-
-	/**
-	 * Execute the button action
-	 */
-	virtual void execute() = 0;
+enum {
+	WHITE = 0,
+	LIGHT_GRAY = 1,
+	DARK_GRAY = 2,
+	BLACK = 15
 };
 
-/**
- * Derived button class that stores an Id, and generates a message
- * to it's immediate owner when clicked
- */
-class ValueButton : public Button {
+class Screen {
 private:
-	int _value;
-public:
-	ValueButton(UIElement *parent, const Common::String &text, int value, const Common::Rect &r) :
-		Button(parent, text, r), _value(value) {}
-	virtual ~ValueButton() {}
-
 	/**
-	 * Execute the button action
+	 * Set an EGA palette
 	 */
-	virtual void execute();
+	static void setEGAPalette(byte *destPalette);
+
+public:
+	static const int TEXT_ROWS, TEXT_COLUMNS;
+public:
+	/**
+	 * Sets the EGA palette
+	 */
+	static void setPalette();
 };
 
 } // namespace Gfx

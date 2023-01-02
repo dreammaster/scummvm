@@ -19,22 +19,24 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_VIEW_H
-#define LEGEND_EARLY_GFX_VIEW_H
+#ifndef LEGEND_EARLY_ENGINE_H
+#define LEGEND_EARLY_ENGINE_H
 
-#include "legend/gfx/view.h"
+#include "legend/legend.h"
 
 namespace Legend {
 namespace Early {
-namespace Gfx {
 
-class View : public Legend::Gfx::View {
+class Engine : public LegendEngine {
 public:
-	View(const Common::String &name) : Legend::Gfx::View(name) {}
-	~View() override {}
+	Engine(OSystem *syst, const LegendGameDescription *gameDesc) :
+		LegendEngine(syst, gameDesc) {}
+	~Engine() override {}
+
+	bool initialize() override;
+	void deinitialize() override;
 };
 
-} // namespace Gfx
 } // namespace Early
 } // namespace Legend
 

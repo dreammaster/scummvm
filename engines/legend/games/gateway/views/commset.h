@@ -33,7 +33,7 @@ namespace Views {
  /**
   * Implements the contents area of the CommSet
   */
-class CommSetContents : public Legend::Early::Gfx::View {
+class CommSetContents : public Legend::Gfx::ViewElement {
 public:
 	CommSetContents(UIElement *parent, const Common::Rect &area);
 	~CommSetContents() override {}

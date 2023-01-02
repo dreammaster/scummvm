@@ -19,23 +19,20 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_VIEW_H
-#define LEGEND_EARLY_GFX_VIEW_H
-
-#include "legend/gfx/view.h"
+#include "legend/early/engine.h"
+#include "legend/gfx/font.h"
 
 namespace Legend {
 namespace Early {
-namespace Gfx {
 
-class View : public Legend::Gfx::View {
-public:
-	View(const Common::String &name) : Legend::Gfx::View(name) {}
-	~View() override {}
-};
+bool Engine::initialize() {
+	Gfx::Font::init();
+	return true;
+}
 
-} // namespace Gfx
+void Engine::deinitialize() {
+	Gfx::Font::deinit();
+}
+
 } // namespace Early
 } // namespace Legend
-
-#endif

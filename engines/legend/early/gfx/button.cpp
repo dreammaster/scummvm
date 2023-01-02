@@ -21,13 +21,14 @@
  */
 
 #include "legend/early/gfx/button.h"
+#include "legend/early/gfx/screen.h"
 
 namespace Legend {
 namespace Early {
 namespace Gfx {
 
 void Button::draw() {
-	View::draw();
+	ViewElement::draw();
 
 	// Get the surface
 	Graphics::ManagedSurface s = getSurface();
