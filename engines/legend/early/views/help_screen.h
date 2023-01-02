@@ -20,42 +20,32 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_SCREEN_H
-#define LEGEND_EARLY_GFX_SCREEN_H
+#ifndef LEGEND_EARLY_VIEWS_HELP_SCREEN_H
+#define LEGEND_EARLY_VIEWS_HELP_SCREEN_H
 
-#include "common/list.h"
-#include "common/rect.h"
-#include "legend/gfx/font.h"
+#include "legend/gfx/view.h"
 
 namespace Legend {
 namespace Early {
-namespace Gfx {
+namespace Views {
 
-enum {
-	WHITE = 0,
-	LIGHT_GRAY = 1,
-	DARK_GRAY = 2,
-	BLACK = 15,
-	DEFAULT_TEXT_COLOR = BLACK
+class HelpScreen : public Gfx::View {
+public:
+	HelpScreen() : Gfx::View("Help") {
+		setFont(1);
+	}
+	~HelpScreen() override {}
+
+	/**
+	 * Draws the visual item on the screen
+	 */
+	virtual void draw();
+
+	bool msgMouseDown(const MouseDownMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
-class Screen {
-private:
-	/**
-	 * Set an EGA palette
-	 */
-	static void setEGAPalette(byte *destPalette);
-
-public:
-	static const int TEXT_ROWS, TEXT_COLUMNS;
-public:
-	/**
-	 * Sets the EGA palette
-	 */
-	static void setPalette();
-};
-
-} // namespace Gfx
+} // namespace Views
 } // namespace Early
 } // namespace Legend
 
