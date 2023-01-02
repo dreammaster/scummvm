@@ -7,8 +7,10 @@ MODULE_OBJS = \
 	utils/engine_data.o \
 	utils/file.o \
 	early/engine.o \
+	early/gfx/boxed_element.o \
 	early/gfx/button.o \
 	early/gfx/screen.o \
+	early/gfx/text_area.o \
 	early/gfx/view.o \
 	early/views/help_screen.o \
 	games/gateway/engine.o \
