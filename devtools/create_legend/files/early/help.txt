@@ -15,11 +15,11 @@ Special Keys when Typing:
 <Backspace>	delete last character
 <Esc>	erases all typing
 <Enter>	execute command
-	nullptr, nullptr,
+
 Mouse Commands on the Pictures:
 Single-click:	"look at" object
 Double-click:	do 'obvious' thing to object
-	nullptr, nullptr,
+
 Mouse Commands on the Menus:
 Single-click:	select word
 Double-click:	execute comand
