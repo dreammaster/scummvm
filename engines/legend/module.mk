@@ -2,10 +2,13 @@ MODULE := engines/legend
 
 MODULE_OBJS = \
 	gfx/font.o \
+	gfx/view_element.o \
 	gfx/view.o \
 	utils/engine_data.o \
 	utils/file.o \
+	early/engine.o \
 	early/gfx/button.o \
+	early/gfx/screen.o \
 	early/gfx/view.o \
 	games/gateway/engine.o \
 	games/gateway/views/commset.o \

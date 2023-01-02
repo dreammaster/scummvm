@@ -53,6 +53,11 @@ protected:
 	 */
 	virtual bool initialize() = 0;
 
+	/**
+	 * Deinitalize the game
+	 */
+	virtual void deinitialize() = 0;
+
 public:
 	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);
 	~LegendEngine() override;

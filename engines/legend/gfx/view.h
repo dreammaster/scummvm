@@ -22,55 +22,15 @@
 #ifndef LEGEND_GFX_VIEW_H
 #define LEGEND_GFX_VIEW_H
 
-#include "legend/gfx/font.h"
-#include "legend/events.h"
+#include "legend/gfx/view_element.h"
 
 namespace Legend {
 namespace Gfx {
 
-class View : public UIElement {
-private:
-	int _fontNumber = -1;
-protected:
-	Gfx::Font *_font = nullptr;
-	Common::Point _textPos;
-
-	/**
-	 * Draw a view's elements
-	 */
-	void drawElements() override;
-
+class View : public ViewElement {
 public:
-	View(const Common::String &name, UIElement *uiParent = nullptr) :
-		UIElement(name, uiParent) {}
-	View() : UIElement("", nullptr) {}
-	View(UIElement *uiParent) : UIElement("", uiParent) {}
-	View(UIElement *uiParent, const Common::Rect &area);
-	View(const Common::Rect &area);
-
+	View(const Common::String &name);
 	~View() override {}
-
-	/**
-	 * Set the font the element uses, if any
-	 */
-	void setFont(int fontNumber) {
-		if (fontNumber != _fontNumber) {
-			_fontNumber = fontNumber;
-			_needsRedraw = true;
-		}
-	}
-
-	/**
-	 * Write a string
-	 */
-	void writeString(const Common::Point &pt, const Common::String &str);
-	void writeString(const Common::String &str);
-
-	/**
-	 * Write a character
-	 */
-	void writeChar(const Common::Point &pt, char c);
-	void writeChar(char c);
 };
 
 } // namespace Gfx

@@ -32,6 +32,8 @@ namespace Views {
 class Views {
 public:
 	CommSet _commSet;
+public:
+	Views() {}
 };
 
 } // namespace Views

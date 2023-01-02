@@ -21,17 +21,22 @@
 
 #include "engines/util.h"
 #include "legend/games/gateway/engine.h"
+#include "legend/games/gateway/views/views.h"
+#include "legend/early/gfx/screen.h"
 #include "legend/utils/engine_data.h"
 #include "legend/console.h"
-#include "common/file.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
 
 bool GatewayEngine::initialize() {
+	if (!Engine::initialize())
+		return false;
+
 	// Initialize 640x480 paletted graphics mode
 	initGraphics(640, 480);
+	Legend::Early::Gfx::Screen::setPalette();
 
 	// Set the engine's debugger console
 	setDebugger(new Console());
@@ -43,6 +48,15 @@ bool GatewayEngine::initialize() {
 	}
 
 	return true;
+}
+
+void GatewayEngine::runGame() {
+	// Create the collection of game views and set the active view
+	Views::Views views;
+	g_events->replaceView("CommSet");
+
+	// Run the game
+	Engine::runGame();
 }
 
 } // namespace Gateway
