@@ -31,10 +31,11 @@ namespace Legend {
 namespace Early {
 namespace Gfx {
 
-static const byte INITIAL_LOW_PALETTE[16 * 3] = {
-	0xff, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55, 0xaa, 0x55,
-	0x55, 0xaa, 0x55, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0xaa, 0x55, 0xaa,
-	0xaa, 0x55, 0xaa, 0x55, 0x55, 0xff, 0x55, 0xff, 0x55, 0x55, 0xff, 0xff
+static const uint32 EGA_PALETTE[16] = {
+	0xffffff, 0x0000aa, 0x00aa00, 0x00aaaa,
+	0xaa0000, 0xaa00aa, 0xaa5500, 0xaaaaaa,
+	0x555555, 0x5555ff, 0x55ff55, 0x55ffff,
+	0xff5555, 0xff55ff, 0xffff55, 0x000000
 };
 
 const int Screen::TEXT_ROWS = 30;
@@ -52,12 +53,12 @@ void Screen::setPalette() {
 void Screen::setEGAPalette(byte *destPalette) {
 	byte tempPalette[PALETTE_SIZE];
 
-	const byte *srcP = INITIAL_LOW_PALETTE;
+	const uint32 *srcP = EGA_PALETTE;
 	byte *destP = &tempPalette[0];
-	for (int idx = 0; idx < PALETTE_COUNT; ++idx, ++srcP, destP += 3) {
-		destP[0] = (*srcP >> 2 & 1) * 0xaa + (*srcP >> 5 & 1) * 0x55;
-		destP[1] = (*srcP >> 1 & 1) * 0xaa + (*srcP >> 4 & 1) * 0x55;
-		destP[2] = (*srcP & 1) * 0xaa + (*srcP >> 3 & 1) * 0x55;
+	for (int idx = 0; idx < 16; ++idx, ++srcP, destP += 3) {
+		destP[0] = *srcP & 0xff;
+		destP[1] = (*srcP >> 8) & 0xff;
+		destP[2] = (*srcP >> 16) & 0xff;
 	}
 
 	Common::copy(&tempPalette[0], &tempPalette[16 * 3], destPalette);
