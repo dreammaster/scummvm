@@ -53,7 +53,7 @@ bool GatewayEngine::initialize() {
 void GatewayEngine::runGame() {
 	// Create the collection of game views and set the active view
 	Views::Views views;
-	g_events->replaceView("CommSet");
+	g_events->replaceView("Help");
 
 	// Run the game
 	Engine::runGame();

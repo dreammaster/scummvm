@@ -10,6 +10,7 @@ MODULE_OBJS = \
 	early/gfx/button.o \
 	early/gfx/screen.o \
 	early/gfx/view.o \
+	early/views/help_screen.o \
 	games/gateway/engine.o \
 	games/gateway/views/commset.o \
 	legend.o \

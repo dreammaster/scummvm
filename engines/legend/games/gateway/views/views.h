@@ -22,6 +22,7 @@
 #ifndef LEGEND_GAMES_GATEWAY_VIEWS_H
 #define LEGEND_GAMES_GATEWAY_VIEWS_H
 
+#include "legend/early/views/help_screen.h"
 #include "legend/games/gateway/views/commset.h"
 
 namespace Legend {
@@ -31,6 +32,7 @@ namespace Views {
 
 class Views {
 public:
+	Legend::Early::Views::HelpScreen _helpScreen;
 	CommSet _commSet;
 public:
 	Views() {}

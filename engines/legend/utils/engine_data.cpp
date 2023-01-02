@@ -258,15 +258,16 @@ Common::SeekableReadStream *DataArchiveProxy::createReadStreamForMember(const Co
 }
 
 Common::FSNode DataArchiveProxy::getNode(const Common::String &name) const {
-	Common::String remainingName = name.substr(_publicFolder.size());
 	size_t pos;
 
 	Common::FSNode node = _folder1;
 	for (int i = 0; i < 2; ++i, node = _folder2) {
+		Common::String remainingName = name.substr(_publicFolder.size());
+
 		while ((pos = remainingName.findFirstOf('/')) != Common::String::npos) {
 			node = node.getChild(remainingName.substr(0, pos));
 			if (!node.exists())
-				return node;
+				break;
 
 			remainingName = remainingName.substr(pos + 1);
 		}
