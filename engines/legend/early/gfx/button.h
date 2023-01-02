@@ -33,8 +33,8 @@ class Button : public Legend::Early::Gfx::View {
 private:
 	Common::String _text;
 public:
-	Button(const Common::String &text, const Common::Rect &r) :
-			Early::Gfx::View(r), _text(text) {
+	Button(UIElement *parent, const Common::String &text, const Common::Rect &r) :
+			Early::Gfx::View(parent, r), _text(text) {
 		setFont(1);
 	}
 	virtual ~Button() {}
@@ -63,7 +63,8 @@ class ValueButton : public Button {
 private:
 	int _value;
 public:
-	ValueButton(const Common::String &text, int value, const Common::Rect &r) : Button(text, r), _value(value) {}
+	ValueButton(UIElement *parent, const Common::String &text, int value, const Common::Rect &r) :
+		Button(parent, text, r), _value(value) {}
 	virtual ~ValueButton() {}
 
 	/**
