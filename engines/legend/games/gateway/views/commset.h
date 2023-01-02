@@ -22,15 +22,37 @@
 #ifndef LEGEND_GAMES_GATEWAY_VIEWS_COMMSET_H
 #define LEGEND_GAMES_GATEWAY_VIEWS_COMMSET_H
 
-#include "legend/gfx/view.h"
+#include "legend/early/gfx/view.h"
+#include "legend/early/gfx/button.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
 namespace Views {
 
-class CommSet : public Legend::Gfx::View {
+ /**
+  * Implements the contents area of the CommSet
+  */
+class CommSetContents : public Legend::Early::Gfx::View {
 public:
+	CommSetContents(UIElement *parent, const Common::Rect &area);
+	~CommSetContents() override {}
+
+	/**
+	 * Draw the contents
+	 */
+	void draw() override;
+};
+
+class CommSet : public Legend::Early::Gfx::View {
+private:
+	CommSetContents _contents;
+	Graphics::ManagedSurface *_logo;
+	Gfx::ValueButton _btn1, _btn2, _btn3, _btn4, _btn5, _btn6;
+	Gfx::ValueButton _btn7, _btn8, _btn9, _btnPrev, _btn0, _btnNext;
+public:
+	CommSet();
+	~CommSet() override;
 	void draw() override;
 };
 
