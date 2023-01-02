@@ -104,13 +104,13 @@ protected:
 	 */
 	virtual void timeout();
 
-private:
 	/**
 	 * Outer method for doing drawing
 	 *
 	 */
-	void drawElements();
+	virtual void drawElements();
 
+private:
 	/**
 	 * Finds a view globally
 	 */
