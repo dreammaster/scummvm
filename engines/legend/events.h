@@ -271,7 +271,7 @@ public:
 	/**
 	 * Main game loop
 	 */
-	void runGame();
+	virtual void runGame();
 
 	/**
 	 * Sets the focus to a new view

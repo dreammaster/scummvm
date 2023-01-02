@@ -57,6 +57,7 @@ bool LegendEngine::isLater() const {
 Common::Error LegendEngine::run() {
 	if (initialize()) {
 		runGame();
+		deinitialize();
 	}
 
 	return Common::kNoError;

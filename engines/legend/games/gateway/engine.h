@@ -22,13 +22,13 @@
 #ifndef LEGEND_GAMES_GATEWAY_H
 #define LEGEND_GAMES_GATEWAY_H
 
-#include "legend/legend.h"
+#include "legend/early/engine.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
 
-class GatewayEngine : public LegendEngine {
+class GatewayEngine : public Early::Engine {
 protected:
 	/**
 	 * Initialize the game
@@ -37,9 +37,10 @@ protected:
 
 public:
 	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		LegendEngine(syst, gameDesc) {}
+		Early::Engine(syst, gameDesc) {}
 	~GatewayEngine() override {}
 
+	void runGame() override;
 };
 
 } // namespace Gateway

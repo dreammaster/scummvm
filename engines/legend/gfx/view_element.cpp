@@ -20,12 +20,49 @@
  */
 
 #include "legend/gfx/view.h"
-#include "legend/legend.h"
 
 namespace Legend {
 namespace Gfx {
 
-View::View(const Common::String &name) : ViewElement(name, g_engine) {
+ViewElement::ViewElement(UIElement *uiParent, const Common::Rect &area) :
+		UIElement("", uiParent) {
+	setBounds(area);
+}
+
+ViewElement::ViewElement(const Common::Rect &area) : UIElement("", nullptr) {
+	setBounds(area);
+}
+
+void ViewElement::drawElements() {
+	// Ensure the correct font is active
+	if (_fontNumber != -1)
+		_font = Gfx::Font::loadFont(_fontNumber);
+
+	UIElement::drawElements();
+}
+
+void ViewElement::writeString(const Common::Point &pt, const Common::String &str) {
+	_textPos = pt;
+	writeString(str);
+}
+
+void ViewElement::writeString(const Common::String &str) {
+	assert(_font);
+	Graphics::ManagedSurface s = getSurface();
+	_font->writeString(s, _textPos, str);
+	_textPos.x += _font->stringWidth(str);
+}
+
+void ViewElement::writeChar(const Common::Point &pt, char c) {
+	_textPos = pt;
+	writeChar(c);
+}
+
+void ViewElement::writeChar(char c) {
+	assert(_font);
+	Graphics::ManagedSurface s = getSurface();
+	_font->writeChar(s, _textPos, c);
+	_textPos.x += _font->charWidth(c);
 }
 
 } // namespace Gfx
