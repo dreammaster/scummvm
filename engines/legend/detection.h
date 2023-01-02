@@ -35,15 +35,16 @@ enum LegendDebugChannels {
 };
 
 enum GameType {
-	GType_Spellcasting101 = 0,
-	GType_Spellcasting201 = 1,
-	GType_Spellcasting301 = 2,
-	GType_Timequest = 3,
-	GType_Gateway = 4,
-	GType_Gateway2 = 5,
-	GType_EricTheUnready = 6,
-	GType_CompanionsOfXanth = 7,
-	GType_DeathGate = 8
+	GType_Spellcasting101,
+	GType_Spellcasting201,
+	GType_Spellcasting301,
+	GType_Timequest,
+	GType_Gateway,
+	GType_Gateway2,
+	GType_EricTheUnready,
+	GType_CompanionsOfXanth,
+	GType_Shannara,
+	GType_DeathGate
 };
 
 struct LegendGameDescription {
