@@ -19,27 +19,32 @@
  *
  */
 
-#ifndef LEGEND_EARLY_ENGINE_H
-#define LEGEND_EARLY_ENGINE_H
+#ifndef LEGEND_EARLY_UTILS_VOCAB_H
+#define LEGEND_EARLY_UTILS_VOCAB_H
 
-#include "legend/legend.h"
-#include "legend/early/utils/vocab.h"
+#include "common/array.h"
+#include "common/str.h"
 
 namespace Legend {
 namespace Early {
 
-class Engine : public LegendEngine {
+class VocabEntry : public Common::String {
 public:
-	Vocab *_vocab = nullptr;
+	byte _flags;
+	int _field6;
+	byte _field8;
 public:
-	Engine(OSystem *syst, const LegendGameDescription *gameDesc);
-	~Engine() override;
-
-	bool initialize() override;
-	void deinitialize() override;
+	VocabEntry() : Common::String(), _flags(0), _field6(0), _field8(0) {}
+	VocabEntry(const char *text, byte flags = 0) : Common::String(text),
+		_flags(flags), _field6(0), _field8(0) {}
+	VocabEntry(const Common::String &text, byte flags = 0) : Common::String(text),
+		_flags(flags), _field6(0), _field8(0) {}
 };
 
-extern Engine *g_engine;
+class Vocab : public Common::Array<VocabEntry> {
+public:
+	Vocab();
+};
 
 } // namespace Early
 } // namespace Legend
