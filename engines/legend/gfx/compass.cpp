@@ -19,30 +19,21 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_TEXT_AREA_H
-#define LEGEND_EARLY_GFX_TEXT_AREA_H
-
-#include "legend/early/gfx/boxed_element.h"
+#include "legend/gfx/compass.h"
 
 namespace Legend {
-namespace Early {
 namespace Gfx {
 
-class TextArea : public BoxedElement {
-public:
-	TextArea(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {}
-	TextArea(UIElement *parent, const Common::String &name, const Common::Rect &r) :
-		BoxedElement(parent, name, r) {}
-	~TextArea() override {}
+void Compass::load(uint picNum) {
+	picNum |= 0x8000;
+	_images.load(picNum);
+	_images.loadRange(16, picNum + 1, 1);
+}
 
-	/**
-	 * Draws the visual item on the screen
-	 */
-	void draw() override;
-};
+void Compass::draw() {
+	Graphics::ManagedSurface s = getSurface();
+	s.blitFrom(*_images[0]);
+}
 
 } // namespace Gfx
-} // namespace Early
 } // namespace Legend
-
-#endif

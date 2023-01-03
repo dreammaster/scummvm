@@ -48,6 +48,9 @@ public:
 	ViewElement() : UIElement("", nullptr) {}
 	ViewElement(UIElement *uiParent) : UIElement("", uiParent) {}
 	ViewElement(UIElement *uiParent, const Common::Rect &area);
+	ViewElement(UIElement *uiParent, const Common::String &name);
+	ViewElement(UIElement *uiParent, const Common::String &name,
+		const Common::Rect &area);
 	ViewElement(const Common::Rect &area);
 
 	~ViewElement() override {}
