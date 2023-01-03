@@ -33,8 +33,8 @@ class Image : public ViewElement {
 	bool msgFocus(const FocusMessage &msg);
 	bool msgUnfocus(const UnfocusMessage &msg); 
 private:
-	int _picNum;
-	int _frameNumber;
+	int _picNum = -1;
+	int _frameNumber = 0;
 private:
 	/**
 	 * Sets up the state for a blank image
@@ -46,16 +46,18 @@ private:
 	 */
 	bool loadImage();
 public:
-	bool _active;
-	byte _field1;
-	byte _fieldA;
-	byte _fieldB;
-	Picture *_pic;
+	bool _active = false;
+	byte _field1 = 0;
+	byte _fieldA = 0;
+	byte _fieldB = 0;
+	Picture *_pic = nullptr;
+
 public:
-	Image();
-	Image(UIElement *parent, const Common::Rect &r);
-	Image(UIElement *parent, const Common::String &name);
-	Image(UIElement *parent, const Common::String &name, const Common::Rect &r);
+	Image() : ViewElement() {}
+	Image(UIElement *parent, const Common::Rect &r) : ViewElement(parent, r) {}
+	Image(UIElement *parent, const Common::String &name) : ViewElement(parent, name) {}
+	Image(UIElement *parent, const Common::String &name, const Common::Rect &r) :
+		ViewElement(parent, name, r) {}
 	~Image();
 
 	/**

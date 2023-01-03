@@ -19,30 +19,44 @@
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_VIEWS_H
-#define LEGEND_GAMES_GATEWAY_VIEWS_H
-
-#include "legend/early/views/help_screen.h"
-#include "legend/games/gateway/views/commset.h"
 #include "legend/games/gateway/views/part_title.h"
+#include "legend/early/gfx/screen.h"
+#include "legend/legend.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
 namespace Views {
 
-class Views {
-public:
-	Legend::Early::Views::HelpScreen _helpScreen;
-	CommSet _commSet;
-	PartTitle _partTitle;
-public:
-	Views() {}
-};
+PartTitle::PartTitle() : Legend::Gfx::View("PartTitle"),
+		_title(this, _bounds) {
+}
+
+bool PartTitle::msgFocus(const FocusMessage &msg) {
+	// Set up for the display of the part number image
+	_title.load(259 + _partNumber);
+
+	// Set up an expirty time to close the view after 2 seconds
+	_closeTime = g_system->getMillis() + 2000;
+
+	return Legend::Gfx::View::msgFocus(msg);
+}
+
+bool PartTitle::tick() {
+	if (g_system->getMillis() >= _closeTime) {
+		// TODO: Close window
+	}
+
+	return true;
+}
+
+void PartTitle::draw() {
+	// Fill the entire screen with black. The title sub-item
+	// will then draw itself on top of that
+	getSurface().clear(Gfx::BLACK);
+}
 
 } // namespace Views
 } // namespace Gateway
 } // namespace Early
 } // namespace Legend
-
-#endif

@@ -19,25 +19,32 @@
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_VIEWS_H
-#define LEGEND_GAMES_GATEWAY_VIEWS_H
+#ifndef LEGEND_GAMES_GATEWAY_VIEWS_PART_TITLE_H
+#define LEGEND_GAMES_GATEWAY_VIEWS_PART_TITLE_H
 
-#include "legend/early/views/help_screen.h"
-#include "legend/games/gateway/views/commset.h"
-#include "legend/games/gateway/views/part_title.h"
+#include "legend/gfx/view.h"
+#include "legend/gfx/image.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
 namespace Views {
 
-class Views {
+class PartTitle : public Legend::Gfx::View {
+private:
+	Legend::Gfx::Image _title;
+	uint32 _closeTime = 0;
+	int _partNumber = 1;
 public:
-	Legend::Early::Views::HelpScreen _helpScreen;
-	CommSet _commSet;
-	PartTitle _partTitle;
-public:
-	Views() {}
+	PartTitle();
+
+	/**
+	 * Draws the image on the screen
+	 */
+	void draw() override;
+
+	bool msgFocus(const FocusMessage &msg) override;
+	bool tick() override;
 };
 
 } // namespace Views
