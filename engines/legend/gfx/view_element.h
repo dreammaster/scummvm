@@ -23,6 +23,7 @@
 #define LEGEND_GFX_VIEW_ELEMENT_H
 
 #include "legend/gfx/font.h"
+#include "legend/gfx/region.h"
 #include "legend/events.h"
 
 namespace Legend {
@@ -34,6 +35,7 @@ private:
 protected:
 	Gfx::Font *_font = nullptr;
 	Common::Point _textPos;
+	Regions _regions;
 
 	/**
 	 * Draw a view's elements

@@ -19,29 +19,29 @@
  *
  */
 
-#ifndef LEGEND_EARLY_ENGINE_H
-#define LEGEND_EARLY_ENGINE_H
+#ifndef LEGEND_EARLY_UTILS_HUFFMAN_H
+#define LEGEND_EARLY_UTILS_HUFFMAN_H
 
-#include "legend/legend.h"
-#include "legend/early/utils/vocab.h"
+#include "common/stream.h"
+#include "common/memstream.h"
 
 namespace Legend {
 namespace Early {
 
-class Engine : public LegendEngine {
+/**
+ * Huffman decoder
+ * TODO: See if engine can be refactored to use the common Huffman class
+ */
+class Huffman {
 public:
-	Vocab *_vocab = nullptr;
-public:
-	Engine(OSystem *syst, const LegendGameDescription *gameDesc);
-	~Engine() override;
-
-	bool initialize() override;
-	void deinitialize() override;
+	/**
+	 * Decompress Huffman encoded stream
+	 */
+	static Common::MemoryWriteStreamDynamic *decompress(Common::SeekableReadStream &stream,
+		const int16 *huffmanTable, size_t nodeCount, byte **symbols = nullptr, int symbolsCount = 0);
 };
 
-extern Engine *g_engine;
-
-} // namespace Early
-} // namespace Legend
+} // End of namespace Early
+} // End of namespace Legend
 
 #endif

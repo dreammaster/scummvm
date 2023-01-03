@@ -26,11 +26,24 @@
 namespace Legend {
 namespace Early {
 
+Engine *g_engine;
+
+Engine::Engine(OSystem *syst, const LegendGameDescription *gameDesc) :
+		LegendEngine(syst, gameDesc) {
+	g_engine = this;
+}
+
+
+Engine::~Engine() {
+	delete _vocab;
+}
+
 bool Engine::initialize() {
 	(void)LegendEngine::initialize();
 
 	Legend::Gfx::Font::init();
 	_screen = new Early::Gfx::Screen();
+	_vocab = new Vocab();
 
 	return true;
 }
