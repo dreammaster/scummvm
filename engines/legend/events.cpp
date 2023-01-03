@@ -86,6 +86,10 @@ void Events::processEvent(Common::Event &ev) {
 	//case Common::EVENT_MBUTTONUP:
 		msgMouseUp(MouseUpMessage(ev.type, ev.mouse));
 		break;
+	case Common::EVENT_WHEELDOWN:
+	case Common::EVENT_WHEELUP:
+		msgMouseWheel(MouseWheelMessage(ev.type == Common::EVENT_WHEELUP, ev.mouse));
+		break;
 	default:
 		break;
 	}
