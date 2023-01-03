@@ -19,30 +19,37 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_TEXT_AREA_H
-#define LEGEND_EARLY_GFX_TEXT_AREA_H
+#ifndef LEGEND_GFX_COMPASS_H
+#define LEGEND_GFX_COMPASS_H
 
-#include "legend/early/gfx/boxed_element.h"
+#include "legend/gfx/view_element.h"
+#include "legend/gfx/image.h"
 
 namespace Legend {
-namespace Early {
 namespace Gfx {
 
-class TextArea : public BoxedElement {
+class Compass : public ViewElement {
+private:
+	PictureArray _images;
+private:
+	/**
+	 * Loads the pictures for the compass
+	 */
+	void load(uint picNum = 0);
 public:
-	TextArea(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {}
-	TextArea(UIElement *parent, const Common::String &name, const Common::Rect &r) :
-		BoxedElement(parent, name, r) {}
-	~TextArea() override {}
+	Compass() : ViewElement() { load(); }
+	Compass(UIElement *parent, const Common::Rect &r) : ViewElement(parent, r) { load(); }
+	Compass(UIElement *parent, const Common::String &name) : ViewElement(parent, name) { load(); }
+	Compass(UIElement *parent, const Common::String &name, const Common::Rect &r) : ViewElement(parent, name, r) { load(); }
+	virtual ~Compass() {}
 
 	/**
-	 * Draws the visual item on the screen
+	 * Draws the container by iterating through each child and letting it draw
 	 */
-	void draw() override;
+	virtual void draw();
 };
 
-} // namespace Gfx
-} // namespace Early
-} // namespace Legend
+} // End of namespace Gfx
+} // End of namespace Legend
 
 #endif

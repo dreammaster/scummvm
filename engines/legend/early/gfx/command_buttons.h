@@ -19,26 +19,37 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_TEXT_AREA_H
-#define LEGEND_EARLY_GFX_TEXT_AREA_H
+#ifndef LEGEND_EARLY_GFX_COMMAND_BUTTONS_H
+#define LEGEND_EARLY_GFX_COMMAND_BUTTONS_H
 
-#include "legend/early/gfx/boxed_element.h"
+#include "legend/gfx/view_element.h"
+#include "legend/early/gfx/button.h"
 
 namespace Legend {
 namespace Early {
 namespace Gfx {
 
-class TextArea : public BoxedElement {
+class CommandButtons : public Legend::Gfx::ViewElement {
+private:
+	ValueButton _btnHelp;
+	ValueButton _btnHalf;
+	ValueButton _btnText;
+	ValueButton _btnErase;
+	ValueButton _btnPicture;
+	ValueButton _btnStatus;
+	ValueButton _btnInventory;
+	ValueButton _btnLook;
+	ValueButton _btnDo;
 public:
-	TextArea(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {}
-	TextArea(UIElement *parent, const Common::String &name, const Common::Rect &r) :
-		BoxedElement(parent, name, r) {}
-	~TextArea() override {}
+	CommandButtons(UIElement *parent, const Common::String &name, const Common::Rect &r);
+	virtual ~CommandButtons() {}
 
 	/**
 	 * Draws the visual item on the screen
 	 */
 	void draw() override;
+
+	bool msgValue(const ValueMessage &msg) override;
 };
 
 } // namespace Gfx
