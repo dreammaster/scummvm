@@ -33,36 +33,8 @@ void TextIndexEntry::load(Common::SeekableReadStream &f) {
 
 /*-------------------------------------------------------------------*/
 
-Resources::Resources(LegendEngine *vm) : _currentTextIndexNum(-1) {
-	loadResourceIndex();
+Resources::Resources(LegendEngine *vm) {
 	loadText();
-}
-
-void Resources::loadResourceIndex() {
-	if (!_datFile.open("legend.dat"))
-		error("Could not find titanic.dat data file");
-
-	uint headerId = _datFile.readUint32BE();
-	uint version = _datFile.readUint16LE();
-	if (headerId != MKTAG('L', 'G', 'N', 'D') || version < 1)
-		error("Invalid data file");
-
-	// Read in entries
-	uint offset, size;
-	char c;
-	String resourceName;
-	for (;;) {
-		offset = _datFile.readUint32LE();
-		size = _datFile.readUint32LE();
-		if (offset == 0 && size == 0)
-			break;
-
-		String resName;
-		while ((c = _datFile.readByte()) != '\0')
-			resName += c;
-
-		_resources[resName] = ResourceEntry(offset, size);
-	}
 }
 
 void Resources::loadText() {
@@ -229,14 +201,5 @@ String Resources::decompressText(Common::SeekableReadStream *stream) {
 }
 
 #undef EOS
-
-Common::SeekableReadStream *Resources::getResource(const String &name) {
-	ResourceEntry resEntry = _resources[name];
-
-	_datFile.seek(resEntry._offset);
-
-	return (resEntry._size > 0) ? _datFile.readStream(resEntry._size) :
-		new Common::MemoryReadStream(nullptr, 0);
-}
 
 } // End of namespace Legend

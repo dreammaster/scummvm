@@ -46,35 +46,20 @@ public:
 };
 
 class Resources {
-	struct ResourceEntry {
-		uint _offset;
-		uint _size;
-
-		ResourceEntry() : _offset(0), _size(0) {}
-		ResourceEntry(uint offset, uint size) : _offset(offset), _size(size) {}
-	};
-	typedef Common::HashMap<Common::String, ResourceEntry> ResourceHash;
-
 	struct TextEntry {
 		uint _id;
 		String _text;
 	};
 private:
-	ResourceHash _resources;
 	Common::File _datFile;
 	File _textFile;
 	Common::Array<TextIndexEntry> _textList;
 	Common::Array<int> _decryptionTable;
 	StringArray _wordList;
 	Common::Array<TextEntry> _textCache;
-	int _currentTextIndexNum;
+	int _currentTextIndexNum = -1;
 	Common::Array<int> _currentTextIndexVals;
 private:
-	/**
-	 * Load the index of the legend.dat file
-	 */
-	void loadResourceIndex();
-
 	/**
 	 * Load text for the game
 	 */
@@ -86,11 +71,6 @@ private:
 	String decompressText(Common::SeekableReadStream *stream);
 public:
 	Resources(LegendEngine *vm);
-
-	/**
-	* Get a resource from the legend.dat
-	*/
-	Common::SeekableReadStream *getResource(const String &name);
 
 	/**
 	 * Get the text message for a given Id
