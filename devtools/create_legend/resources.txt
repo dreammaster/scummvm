@@ -1,4 +1,10 @@
 The following resources are extracted from game executables:
 
 File                   Origin        Offset   Size
+early/cursors.bin      xanth.exe     29b20h   68
+	Currently the default cursor I'm using for the early games
+	is one of the cursors from Companions of Xanth. To create
+	cursors.bin, put 4 00 bytes in a new file for the hotspot,
+	followed by the 68 bytes listed above for the cursor image
+early/help.txt         gatemain.exe  1f5a7h
 gateway/commands.bin   gatemain.exe  1064eh   824
