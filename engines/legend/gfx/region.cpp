@@ -19,29 +19,24 @@
  *
  */
 
-#ifndef LEGEND_EARLY_ENGINE_H
-#define LEGEND_EARLY_ENGINE_H
-
-#include "legend/legend.h"
-#include "legend/early/utils/vocab.h"
+#include "legend/gfx/region.h"
 
 namespace Legend {
-namespace Early {
+namespace Gfx {
 
-class Engine : public LegendEngine {
-public:
-	Vocab *_vocab = nullptr;
-public:
-	Engine(OSystem *syst, const LegendGameDescription *gameDesc);
-	~Engine() override;
+Regions::Regions(const Common::Rect *array, size_type n) : Common::Array<Region>(n) {
+	for (size_type idx = 0; idx < n; ++idx, ++array)
+		(*this)[idx] = *array;
+}
 
-	bool initialize() override;
-	void deinitialize() override;
-};
+int Regions::indexOf(const Common::Point &pt) {
+	for (uint idx = 0; idx < size(); ++idx) {
+		if ((*this)[idx].contains(pt))
+			return idx;
+	}
 
-extern Engine *g_engine;
+	return -1;
+}
 
-} // namespace Early
-} // namespace Legend
-
-#endif
+} // End of namespace Gfx
+} // End of namespace Legend

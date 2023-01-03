@@ -3,6 +3,7 @@ MODULE := engines/legend
 MODULE_OBJS = \
 	gfx/font.o \
 	gfx/picture.o \
+	gfx/region.o \
 	gfx/screen.o \
 	gfx/view_element.o \
 	gfx/view.o \
@@ -13,9 +14,12 @@ MODULE_OBJS = \
 	early/engine.o \
 	early/gfx/boxed_element.o \
 	early/gfx/button.o \
+	early/gfx/listbox.o \
 	early/gfx/screen.o \
 	early/gfx/text_area.o \
 	early/gfx/view.o \
+	early/utils/huffman.o \
+	early/utils/vocab.o \
 	early/views/help_screen.o \
 	games/gateway/engine.o \
 	games/gateway/views/commset.o \
