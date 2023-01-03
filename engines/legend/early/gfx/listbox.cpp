@@ -66,13 +66,13 @@ void Listbox::load(const StringArray &lines) {
 void Listbox::load(const String &resName) {
 	init();
 
-	Common::SeekableReadStream *stream = g_engine->_res->getResource(resName);
-	int valsPerLine = stream->readUint32LE();
+	File f(resName);
+	int valsPerLine = f.readUint32LE();
 
-	while (stream->pos() < stream->size()) {
+	while (f.pos() < f.size()) {
 		String line;
 		for (int idx = 0; idx < valsPerLine; ++idx) {
-			uint id = stream->readUint16LE();
+			uint id = f.readUint16LE();
 
 			if (id) {
 				assert(id != 0xffff);
@@ -86,7 +86,7 @@ void Listbox::load(const String &resName) {
 		_lines.push_back(line);
 	}
 
-	delete stream;
+	f.close();
 	updateThumbnail();
 }
 
