@@ -31,8 +31,6 @@ namespace Early {
 namespace Gateway {
 
 bool GatewayEngine::initialize() {
-	(void)Engine::initialize();
-
 	// Initialize 640x480 paletted graphics mode
 	initGraphics(640, 480);
 
@@ -45,6 +43,8 @@ bool GatewayEngine::initialize() {
 		return false;
 	}
 
+	(void)Engine::initialize();
+
 	return true;
 }
 
@@ -52,6 +52,7 @@ void GatewayEngine::runGame() {
 	// Create the collection of game views and set the active view
 	Views::Views views;
 	g_events->replaceView("Help");
+	_mouseCursor->show();
 
 	// Run the game
 	Engine::runGame();
