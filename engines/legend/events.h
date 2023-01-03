@@ -232,6 +232,7 @@ public:
 	MESSAGE(Keypress);
 	MESSAGE(MouseDown);
 	MESSAGE(MouseUp);
+	MESSAGE(MouseWheel);
 	MESSAGE(Action);
 	MESSAGE(Game);
 	MESSAGE(Value);
@@ -264,7 +265,8 @@ protected:
 	MESSAGE(Keypress);
 	MESSAGE(MouseDown);
 	MESSAGE(MouseUp);
-	#undef MESSAGE
+	MESSAGE(MouseWheel);
+#undef MESSAGE
 public:
 	Events();
 	virtual ~Events();
