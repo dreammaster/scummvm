@@ -124,7 +124,7 @@ void Events::replaceView(UIElement *ui, bool replaceAllViews) {
 	ui->msgFocus(FocusMessage());
 }
 
-void Events::replaceView(const Common::String &name, bool replaceAllViews) {
+void Events::replaceView(const String &name, bool replaceAllViews) {
 	replaceView(findView(name));
 }
 
@@ -138,7 +138,7 @@ void Events::addView(UIElement *ui) {
 	ui->msgFocus(FocusMessage());
 }
 
-void Events::addView(const Common::String &name) {
+void Events::addView(const String &name) {
 	addView(findView(name));
 }
 
@@ -152,7 +152,7 @@ void Events::popView() {
 	}
 }
 
-bool Events::isPresent(const Common::String &name) const {
+bool Events::isPresent(const String &name) const {
 	for (uint i = 0; i < _views.size(); ++i) {
 		if (_views[i]->_name == name)
 			return true;
@@ -192,7 +192,7 @@ void Bounds::setBorderSize(size_t borderSize) {
 
 /*------------------------------------------------------------------------*/
 
-UIElement::UIElement(const Common::String &name, UIElement *uiParent) :
+UIElement::UIElement(const String &name, UIElement *uiParent) :
 		_name(name), _parent(uiParent),
 		_bounds(_innerBounds) {
 	if (_parent)
@@ -216,7 +216,7 @@ void UIElement::drawElements() {
 		_children[i]->drawElements();
 }
 
-UIElement *UIElement::findViewGlobally(const Common::String &name) {
+UIElement *UIElement::findViewGlobally(const String &name) {
 	return g_events->findView(name);
 }
 
@@ -239,9 +239,6 @@ void UIElement::clearSurface() {
 }
 
 void UIElement::draw() {
-	for (size_t i = 0; i < _children.size(); ++i) {
-		_children[i]->draw();
-	}
 }
 
 bool UIElement::tick() {
@@ -257,7 +254,7 @@ bool UIElement::tick() {
 	return false;
 }
 
-UIElement *UIElement::findView(const Common::String &name) {
+UIElement *UIElement::findView(const String &name) {
 	if (_name.equalsIgnoreCase(name))
 		return this;
 
@@ -274,7 +271,7 @@ void UIElement::replaceView(UIElement *ui, bool replaceAllViews) {
 	g_events->replaceView(ui, replaceAllViews);
 }
 
-void UIElement::replaceView(const Common::String &name, bool replaceAllViews) {
+void UIElement::replaceView(const String &name, bool replaceAllViews) {
 	g_events->replaceView(name, replaceAllViews);
 }
 
@@ -282,7 +279,7 @@ void UIElement::addView(UIElement *ui) {
 	g_events->addView(ui);
 }
 
-void UIElement::addView(const Common::String &name) {
+void UIElement::addView(const String &name) {
 	g_events->addView(name);
 }
 

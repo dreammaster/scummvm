@@ -19,14 +19,44 @@
  *
  */
 
-#include "legend/gfx/view.h"
+#include "legend/games/gateway/views/part_title.h"
+#include "legend/early/gfx/screen.h"
 #include "legend/legend.h"
 
 namespace Legend {
-namespace Gfx {
+namespace Early {
+namespace Gateway {
+namespace Views {
 
-View::View(const String &name) : ViewElement(name, g_engine) {
+PartTitle::PartTitle() : Legend::Gfx::View("PartTitle"),
+		_title(this, _bounds) {
 }
 
-} // namespace Gfx
+bool PartTitle::msgFocus(const FocusMessage &msg) {
+	// Set up for the display of the part number image
+	_title.load(259 + _partNumber);
+
+	// Set up an expirty time to close the view after 2 seconds
+	_closeTime = g_system->getMillis() + 2000;
+
+	return Legend::Gfx::View::msgFocus(msg);
+}
+
+bool PartTitle::tick() {
+	if (g_system->getMillis() >= _closeTime) {
+		// TODO: Close window
+	}
+
+	return true;
+}
+
+void PartTitle::draw() {
+	// Fill the entire screen with black. The title sub-item
+	// will then draw itself on top of that
+	getSurface().clear(Gfx::BLACK);
+}
+
+} // namespace Views
+} // namespace Gateway
+} // namespace Early
 } // namespace Legend

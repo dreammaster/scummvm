@@ -90,7 +90,7 @@ void Resources::loadText() {
 	}
 }
 
-Common::String Resources::getMessage(uint id) {
+String Resources::getMessage(uint id) {
 	assert((id >> 16) >= 0xF000 && (id >> 16) <= 0xF100);
 	id &= 0xFFFFFFF;
 	int sectionNum = id >> 16;

@@ -19,14 +19,35 @@
  *
  */
 
+#ifndef LEGEND_EARLY_VIEWS_INTERFACE_H
+#define LEGEND_EARLY_VIEWS_INTERFACE_H
+
 #include "legend/gfx/view.h"
-#include "legend/legend.h"
+#include "legend/gfx/compass.h"
+#include "legend/early/gfx/command_buttons.h"
+#include "legend/early/gfx/scene.h"
+#include "legend/early/gfx/listbox.h"
+#include "legend/early/gfx/text_area.h"
 
 namespace Legend {
-namespace Gfx {
+namespace Early {
+namespace Views {
 
-View::View(const String &name) : ViewElement(name, g_engine) {
-}
+class Interface : public Legend::Gfx::View {
+private:
+	Legend::Gfx::Compass _compass;
+	Gfx::CommandButtons _commandButtons;
+	Gfx::Scene _scene;
+	Gfx::Listbox _commands;
+	Gfx::Listbox _items;
+	Gfx::TextArea _textArea;
+public:
+	Interface();
+	~Interface() override {}
+};
 
-} // namespace Gfx
+} // namespace Views
+} // namespace Early
 } // namespace Legend
+
+#endif

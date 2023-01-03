@@ -101,10 +101,10 @@ public:
 	Listbox(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {
 		init();
 	}
-	Listbox(UIElement *parent, const Common::String &name) : BoxedElement(parent, name) {
+	Listbox(UIElement *parent, const String &name) : BoxedElement(parent, name) {
 		init();
 	}
-	Listbox(UIElement *parent, const Common::String &name, const Common::Rect &r) :
+	Listbox(UIElement *parent, const String &name, const Common::Rect &r) :
 		BoxedElement(parent, name, r) {
 		init();
 	}

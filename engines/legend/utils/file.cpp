@@ -25,8 +25,8 @@
 
 namespace Legend {
 
-Common::String readStringFromStream(Common::SeekableReadStream *s) {
-	Common::String result;
+String readStringFromStream(Common::SeekableReadStream *s) {
+	String result;
 	char c;
 	while ((c = s->readByte()) != '\0')
 		result += c;
@@ -39,11 +39,6 @@ Common::String readStringFromStream(Common::SeekableReadStream *s) {
 
 #define ERROR error("Could not open file - %s", name.c_str())
 #define PERROR error("Could not open file - %s", path.baseName().c_str())
-
-File::File(const Common::String &name) : Common::File() {
-	if (!Common::File::open(name.c_str()))
-		ERROR;
-}
 
 File::File(const Common::Path &path) : Common::File() {
 	if (!Common::File::open(path))
@@ -63,7 +58,7 @@ bool File::open(const Common::Path &path, Common::Archive &archive) {
 }
 
 bool File::open(const Common::FSNode &node) {
-	Common::String name = node.getName();
+	String name = node.getName();
 	if (!Common::File::open(node))
 		ERROR;
 	return true;
@@ -76,13 +71,13 @@ bool File::open(SeekableReadStream *stream, const Common::String &name) {
 }
 
 void File::open(FileType fileType, int fileNumber) {
-	Common::String name = getFilename(fileType, fileNumber);
+	String name = getFilename(fileType, fileNumber);
 	open(name.c_str());
 }
 
 #undef ERROR
 
-Common::String File::getFilename(FileType fileType, int fileNumber) {
+String File::getFilename(FileType fileType, int fileNumber) {
 	return g_engine->getFilename(fileType, fileNumber);
 }
 
@@ -156,9 +151,9 @@ uint SimpleFile::readUint32LE() {
 	return READ_LE_UINT32(&val);
 }
 
-Common::String SimpleFile::readString() {
+String SimpleFile::readString() {
 	char c;
-	Common::String result;
+	String result;
 	bool backslashFlag = false;
 
 	// First skip any spaces
@@ -244,7 +239,7 @@ int SimpleFile::readNumber() {
 
 double SimpleFile::readFloat() {
 	char c;
-	Common::String result;
+	String result;
 
 	// First skip any spaces
 	do {
@@ -302,7 +297,7 @@ Common::Rect SimpleFile::readBounds() {
 }
 
 void SimpleFile::readBuffer(char *buffer, size_t count) {
-	Common::String tempString = readString();
+	String tempString = readString();
 	if (buffer) {
 		strncpy(buffer, tempString.c_str(), count);
 		buffer[count - 1] = '\0';
@@ -323,12 +318,12 @@ void SimpleFile::writeUint32LE(uint val) {
 	writeUint16LE(hi);
 }
 
-void SimpleFile::writeLine(const Common::String &str) const {
+void SimpleFile::writeLine(const String &str) const {
 	write(str.c_str(), str.size());
 	write("\r\n", 2);
 }
 
-void SimpleFile::writeString(const Common::String &str) const {
+void SimpleFile::writeString(const String &str) const {
 	if (str.empty())
 		return;
 
@@ -365,20 +360,20 @@ void SimpleFile::writeString(const Common::String &str) const {
 	}
 }
 
-void SimpleFile::writeQuotedString(const Common::String &str) const {
+void SimpleFile::writeQuotedString(const String &str) const {
 	write("\"", 1);
 	writeString(str);
 	write("\" ", 2);
 }
 
-void SimpleFile::writeQuotedLine(const Common::String &str, int indent) const {
+void SimpleFile::writeQuotedLine(const String &str, int indent) const {
 	writeIndent(indent);
 	writeQuotedString(str);
 	write("\n", 1);
 }
 
 void SimpleFile::writeNumber(int val) const {
-	Common::String str = Common::String::format("%d ", val);
+	String str = String::format("%d ", val);
 	write(str.c_str(), str.size());
 }
 
@@ -389,7 +384,7 @@ void SimpleFile::writeNumberLine(int val, int indent) const {
 }
 
 void SimpleFile::writeFloat(double val) const {
-	Common::String valStr = Common::String::format("%f ", val);
+	String valStr = String::format("%f ", val);
 	write(valStr.c_str(), valStr.size());
 }
 
@@ -420,7 +415,7 @@ void SimpleFile::writeFormat(const char *format, ...) const {
 	// Convert the format specifier and params to a string
 	va_list va;
 	va_start(va, format);
-	Common::String line = Common::String::vformat(format, va);
+	String line = String::vformat(format, va);
 	va_end(va);
 
 	// Write out the string
@@ -443,7 +438,7 @@ bool SimpleFile::IsClassStart() {
 	return c == '{';
 }
 
-void SimpleFile::writeClassStart(const Common::String &classStr, int indent) {
+void SimpleFile::writeClassStart(const String &classStr, int indent) {
 	write("\n", 1);
 	writeIndent(indent);
 	write("{\n", 2);
@@ -462,7 +457,7 @@ bool SimpleFile::scanf(const char *format, ...) {
 	va_start(va, format);
 	char c;
 
-	Common::String formatStr(format);
+	String formatStr(format);
 	while (!formatStr.empty()) {
 		if (formatStr.hasPrefix(" ")) {
 			formatStr.deleteChar(0);
@@ -475,7 +470,7 @@ bool SimpleFile::scanf(const char *format, ...) {
 			skipSpaces();
 		} else if (formatStr.hasPrefix("%d")) {
 			// Read in a number
-			formatStr = Common::String(formatStr.c_str() + 2);
+			formatStr = String(formatStr.c_str() + 2);
 			int *param = (int *)va_arg(va, int *);
 			*param = readNumber();
 
@@ -483,8 +478,8 @@ bool SimpleFile::scanf(const char *format, ...) {
 				_inStream->seek(-1, SEEK_CUR);
 		} else if (formatStr.hasPrefix("%s")) {
 			// Read in text until the next space
-			formatStr = Common::String(formatStr.c_str() + 2);
-			Common::String *str = (Common::String *)va_arg(va, Common::String *);
+			formatStr = String(formatStr.c_str() + 2);
+			String *str = (String *)va_arg(va, String *);
 			str->clear();
 			while (!eos() && !Common::isSpace(c = readByte()))
 				*str += c;

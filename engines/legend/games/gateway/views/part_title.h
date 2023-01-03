@@ -19,34 +19,36 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_INTERFACE_H
-#define LEGEND_EARLY_GFX_INTERFACE_H
+#ifndef LEGEND_GAMES_GATEWAY_VIEWS_PART_TITLE_H
+#define LEGEND_GAMES_GATEWAY_VIEWS_PART_TITLE_H
 
-#include "legend/gfx/view_element.h"
-#include "legend/gfx/compass.h"
-#include "legend/early/gfx/command_buttons.h"
-#include "legend/early/gfx/scene.h"
-#include "legend/early/gfx/listbox.h"
-#include "legend/early/gfx/text_area.h"
+#include "legend/gfx/view.h"
+#include "legend/gfx/image.h"
 
 namespace Legend {
 namespace Early {
-namespace Gfx {
+namespace Gateway {
+namespace Views {
 
-class Interface : public Legend::Gfx::ViewElement {
+class PartTitle : public Legend::Gfx::View {
 private:
-	CommandButtons _commandButtons;
-	Legend::Gfx::Compass _compass;
-	Scene _scene;
-	Listbox _commands;
-	Listbox _items;
-	TextArea _textArea;
+	Legend::Gfx::Image _title;
+	uint32 _closeTime = 0;
+	int _partNumber = 1;
 public:
-	Interface(UIElement *parent);
-	~Interface() override {}
+	PartTitle();
+
+	/**
+	 * Draws the image on the screen
+	 */
+	void draw() override;
+
+	bool msgFocus(const FocusMessage &msg) override;
+	bool tick() override;
 };
 
-} // namespace Gfx
+} // namespace Views
+} // namespace Gateway
 } // namespace Early
 } // namespace Legend
 

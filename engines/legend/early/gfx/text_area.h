@@ -31,7 +31,7 @@ namespace Gfx {
 class TextArea : public BoxedElement {
 public:
 	TextArea(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {}
-	TextArea(UIElement *parent, const Common::String &name, const Common::Rect &r) :
+	TextArea(UIElement *parent, const String &name, const Common::Rect &r) :
 		BoxedElement(parent, name, r) {}
 	~TextArea() override {}
 

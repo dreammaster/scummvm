@@ -31,7 +31,7 @@ enum Commands {
 	STATUS = 5, INVENTORY = 6, LOOK = 7, DO = 8
 };
 
-CommandButtons::CommandButtons(UIElement *parent, const Common::String &name,
+CommandButtons::CommandButtons(UIElement *parent, const String &name,
 		const Common::Rect &r) : ViewElement(parent, name, r),
 		_btnPicture(this, "Picture", PICTURE, Common::Rect(51, 3, 115, 26)),
 		_btnStatus(this, "Status", STATUS, Common::Rect(51, 30, 115, 53)),

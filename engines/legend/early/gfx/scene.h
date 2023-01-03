@@ -30,14 +30,14 @@ namespace Gfx {
 
 class Scene : public Gfx::BoxedElement {
 public:
-	Scene(UIElement *parent, const Common::String &name, const Common::Rect &r) :
+	Scene(UIElement *parent, const String &name, const Common::Rect &r) :
 		BoxedElement(parent, name, r) {}
 	~Scene() override {}
 
 	/**
-	 * Draws the visual item on the screen
+	 * Draws the scene
 	 */
-	virtual void draw();
+	void draw() override;
 };
 
 } // namespace Views

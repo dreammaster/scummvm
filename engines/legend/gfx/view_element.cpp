@@ -33,11 +33,11 @@ ViewElement::ViewElement(const Common::Rect &area) : UIElement("", nullptr) {
 	setBounds(area);
 }
 
-ViewElement::ViewElement(UIElement *uiParent, const Common::String &name) :
+ViewElement::ViewElement(UIElement *uiParent, const String &name) :
 		UIElement(name, uiParent) {
 }
 
-ViewElement::ViewElement(UIElement *uiParent, const Common::String &name,
+ViewElement::ViewElement(UIElement *uiParent, const String &name,
 		const Common::Rect &area) : UIElement(name, uiParent) {
 	setBounds(area);
 }
@@ -51,12 +51,12 @@ void ViewElement::drawElements() {
 	UIElement::drawElements();
 }
 
-void ViewElement::writeString(const Common::Point &pt, const Common::String &str) {
+void ViewElement::writeString(const Common::Point &pt, const String &str) {
 	_textPos = pt;
 	writeString(str);
 }
 
-void ViewElement::writeString(const Common::String &str) {
+void ViewElement::writeString(const String &str) {
 	assert(_font);
 	Graphics::ManagedSurface s = getSurface();
 	_font->writeString(s, _textPos, str);

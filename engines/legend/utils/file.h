@@ -26,6 +26,7 @@
 #include "common/rect.h"
 #include "common/savefile.h"
 #include "common/stream.h"
+#include "legend/utils/string.h"
 
 namespace Legend {
 
@@ -47,7 +48,6 @@ enum FileType {
 class File : public Common::File {
 public:
 	File() : Common::File() {}
-	File(const Common::String &name);
 	File(const Common::Path &path);
 
 	/**
@@ -69,7 +69,7 @@ public:
 	/**
 	 * Returns a formatted filename for a given resource type and file number
 	 */
-	static Common::String getFilename(FileType fileType, int fileNumber);
+	static String getFilename(FileType fileType, int fileNumber);
 };
 
 /**
@@ -144,7 +144,7 @@ public:
 	/**
 	 * Read a string from the file
 	 */
-	Common::String readString();
+	String readString();
 
 	/**
 	 * Read a number from the file
@@ -199,22 +199,22 @@ public:
 	/**
 	 * Write a string line
 	 */
-	void writeLine(const Common::String &str) const;
+	void writeLine(const String &str) const;
 
 	/**
 	 * Write a string
 	 */
-	void writeString(const Common::String &str) const;
+	void writeString(const String &str) const;
 
 	/**
 	 * Write a quoted string
 	 */
-	void writeQuotedString(const Common::String &str) const;
+	void writeQuotedString(const String &str) const;
 
 	/**
 	 * Write a quoted string line
 	 */
-	void writeQuotedLine(const Common::String &str, int indent) const;
+	void writeQuotedLine(const String &str, int indent) const;
 
 	/**
 	 * Write a number to file
@@ -271,7 +271,7 @@ public:
 	/**
 	 * Write the starting header for a class definition
 	 */
-	void writeClassStart(const Common::String &classStr, int indent);
+	void writeClassStart(const String &classStr, int indent);
 
 	/**
 	 * Write out the ending footer for a class definition
@@ -290,7 +290,7 @@ public:
 /**
  * General purpose support method for reading an ASCIIZ string from a stream
  */
-Common::String readStringFromStream(Common::SeekableReadStream *s);
+String readStringFromStream(Common::SeekableReadStream *s);
 
 } // End of namespace Legend
 
