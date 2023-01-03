@@ -26,6 +26,7 @@
 #include "common/stack.h"
 #include "graphics/screen.h"
 #include "legend/messages.h"
+#include "legend/gfx/screen.h"
 
 namespace Legend {
 
@@ -55,7 +56,7 @@ public:
 	operator const Common::Rect &() const { return _bounds; }
 	Bounds &operator=(const Common::Rect &r);
 	void setBorderSize(size_t borderSize);
-	size_t borderSize() const { return _borderSize; }
+	int borderSize() const { return _borderSize; }
 	int16 width() const { return _bounds.width(); }
 	int16 height() const { return _bounds.height(); }
 };
@@ -271,7 +272,7 @@ public:
 	/**
 	 * Main game loop
 	 */
-	virtual void runGame();
+	virtual void runGame(Gfx::Screen *screen);
 
 	/**
 	 * Sets the focus to a new view

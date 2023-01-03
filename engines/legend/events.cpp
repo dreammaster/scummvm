@@ -36,9 +36,9 @@ Events::~Events() {
 	g_events = nullptr;
 }
 
-void Events::runGame() {
+void Events::runGame(Legend::Gfx::Screen *screen) {
 	uint currTime, nextFrameTime = 0;
-	_screen = new Graphics::Screen();
+	_screen = screen;
 
 	// Run the game
 	int saveSlot = ConfMan.getInt("save_slot");

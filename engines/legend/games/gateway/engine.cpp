@@ -36,7 +36,6 @@ bool GatewayEngine::initialize() {
 
 	// Initialize 640x480 paletted graphics mode
 	initGraphics(640, 480);
-	Legend::Early::Gfx::Screen::setPalette();
 
 	// Set the engine's debugger console
 	setDebugger(new Console());
