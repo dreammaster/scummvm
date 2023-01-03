@@ -39,6 +39,7 @@
 #include "legend/gfx/picture.h"
 #include "legend/gfx/screen.h"
 #include "legend/utils/file.h"
+#include "legend/utils/resources.h"
 
 namespace Legend {
 
@@ -62,6 +63,7 @@ protected:
 
 public:
 	Gfx::PicFile *_picFile = nullptr;
+	Resources *_res = nullptr;
 	Gfx::Screen *_screen = nullptr;
 
 public:
@@ -74,6 +76,11 @@ public:
 	 * Returns the game Id
 	 */
 	GameType getGameId() const;
+
+	/**
+	 * Returns the file prefix for the games data files
+	 */
+	Common::String getGameFilePrefix() const;
 
 	/**
 	 * Returns whether the game is one of the later all-graphical ones
