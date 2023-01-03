@@ -36,6 +36,7 @@
 
 #include "legend/detection.h"
 #include "legend/events.h"
+#include "legend/gfx/screen.h"
 #include "legend/utils/file.h"
 
 namespace Legend {
@@ -57,6 +58,9 @@ protected:
 	 * Deinitalize the game
 	 */
 	virtual void deinitialize() = 0;
+
+public:
+	Gfx::Screen *_screen = nullptr;
 
 public:
 	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);
@@ -87,6 +91,14 @@ public:
 		    (f == kSupportsSavingDuringRuntime) ||
 		    (f == kSupportsReturnToLauncher);
 	};
+
+	void runGame(Gfx::Screen *screen) override final {
+		Events::runGame(screen);
+	}
+	virtual void runGame() {
+		runGame(_screen);
+	}
+
 
 	bool canLoadGameStateCurrently() override {
 		return true;
