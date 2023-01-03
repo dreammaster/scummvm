@@ -63,6 +63,15 @@ Common::Error LegendEngine::run() {
 	return Common::kNoError;
 }
 
+bool LegendEngine::initialize() {
+	_picFile = new Gfx::PicFile();
+	return true;
+}
+
+void LegendEngine::deinitialize() {
+	delete _picFile;
+}
+
 Common::Error LegendEngine::syncGame(Common::Serializer &s) {
 	// The Serializer has methods isLoading() and isSaving()
 	// if you need to specific steps; for example setting
