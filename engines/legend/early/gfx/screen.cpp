@@ -40,7 +40,7 @@ static const uint32 EGA_PALETTE[16] = {
 const int Screen::TEXT_ROWS = 30;
 const int Screen::TEXT_COLUMNS = 80;
 
-void Screen::setPalette() {
+void Screen::resetPalette() {
 	byte pal[PALETTE_SIZE];
 
 	Common::fill(&pal[0], &pal[PALETTE_SIZE], 0);

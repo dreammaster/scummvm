@@ -19,48 +19,11 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_SCREEN_H
-#define LEGEND_EARLY_GFX_SCREEN_H
-
-#include "common/list.h"
-#include "common/rect.h"
-#include "legend/gfx/font.h"
 #include "legend/gfx/screen.h"
+#include "legend/legend.h"
 
 namespace Legend {
-namespace Early {
 namespace Gfx {
 
-enum {
-	WHITE = 0,
-	LIGHT_GRAY = 1,
-	DARK_GRAY = 2,
-	BLACK = 15,
-	DEFAULT_TEXT_COLOR = BLACK
-};
-
-class Screen : public Legend::Gfx::Screen {
-private:
-	/**
-	 * Set an EGA palette
-	 */
-	static void setEGAPalette(byte *destPalette);
-
-public:
-	static const int TEXT_ROWS, TEXT_COLUMNS;
-public:
-	Screen() : Legend::Gfx::Screen(640, 480) {
-		resetPalette();
-	}
-
-	/**
-	 * Sets the EGA palette
-	 */
-	void resetPalette() override;
-};
-
 } // namespace Gfx
-} // namespace Early
 } // namespace Legend
-
-#endif

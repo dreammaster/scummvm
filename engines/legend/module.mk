@@ -2,6 +2,8 @@ MODULE := engines/legend
 
 MODULE_OBJS = \
 	gfx/font.o \
+	gfx/pic_file.o \
+	gfx/screen.o \
 	gfx/view_element.o \
 	gfx/view.o \
 	utils/engine_data.o \

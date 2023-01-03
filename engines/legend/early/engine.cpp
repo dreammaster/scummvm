@@ -20,18 +20,21 @@
  */
 
 #include "legend/early/engine.h"
+#include "legend/early/gfx/screen.h"
 #include "legend/gfx/font.h"
 
 namespace Legend {
 namespace Early {
 
 bool Engine::initialize() {
-	Gfx::Font::init();
+	Legend::Gfx::Font::init();
+	_screen = new Early::Gfx::Screen();
+
 	return true;
 }
 
 void Engine::deinitialize() {
-	Gfx::Font::deinit();
+	Legend::Gfx::Font::deinit();
 }
 
 } // namespace Early
