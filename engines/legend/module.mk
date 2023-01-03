@@ -4,6 +4,7 @@ MODULE_OBJS = \
 	gfx/compass.o \
 	gfx/font.o \
 	gfx/image.o \
+	gfx/mouse_cursor.o \
 	gfx/picture.o \
 	gfx/region.o \
 	gfx/screen.o \

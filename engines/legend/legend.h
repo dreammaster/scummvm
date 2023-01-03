@@ -36,6 +36,7 @@
 
 #include "legend/detection.h"
 #include "legend/events.h"
+#include "legend/gfx/mouse_cursor.h"
 #include "legend/gfx/picture.h"
 #include "legend/gfx/screen.h"
 #include "legend/utils/file.h"
@@ -62,9 +63,10 @@ protected:
 	virtual void deinitialize();
 
 public:
+	Gfx::MouseCursor *_mouseCursor = nullptr;
 	Gfx::PicFile *_picFile = nullptr;
-	Resources *_res = nullptr;
 	Gfx::Screen *_screen = nullptr;
+	Resources *_res = nullptr;
 
 public:
 	LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc);

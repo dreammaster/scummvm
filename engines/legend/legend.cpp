@@ -37,6 +37,7 @@ LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc)
 }
 
 LegendEngine::~LegendEngine() {
+	delete _mouseCursor;
 	delete _picFile;
 	delete _res;
 }
@@ -78,6 +79,7 @@ Common::Error LegendEngine::run() {
 }
 
 bool LegendEngine::initialize() {
+	_mouseCursor = new Gfx::MouseCursor();
 	_picFile = new Gfx::PicFile();
 	_res = new Resources(this);
 	return true;
