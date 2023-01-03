@@ -336,8 +336,8 @@ bool Listbox::msgMouseUp(const MouseUpMessage &msg) {
 
 	return true;
 }
-/*
-bool Listbox::MouseDragMsg(CMouseDragMsg &msg) {
+
+bool Listbox::msgMouseDrag(const MouseDragMessage &msg) {
 	if (_draggingThumbnail) {
 		// Figure out new position based on mouse position
 		int yStart = _regions[LB_SCROLLBAR].top;
@@ -355,7 +355,7 @@ bool Listbox::MouseDragMsg(CMouseDragMsg &msg) {
 
 	return true;
 }
-*/
+
 } // namespace Gfx
 } // namespace Early
 } // namespace Legend
