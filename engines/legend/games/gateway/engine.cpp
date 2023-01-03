@@ -31,8 +31,7 @@ namespace Early {
 namespace Gateway {
 
 bool GatewayEngine::initialize() {
-	if (!Engine::initialize())
-		return false;
+	(void)Engine::initialize();
 
 	// Initialize 640x480 paletted graphics mode
 	initGraphics(640, 480);

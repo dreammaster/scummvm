@@ -19,11 +19,16 @@
  *
  */
 
+#include "common/system.h"
+#include "graphics/paletteman.h"
 #include "legend/gfx/screen.h"
-#include "legend/legend.h"
 
 namespace Legend {
 namespace Gfx {
+
+void Screen::setPalette(const byte pal[Graphics::PALETTE_SIZE]) {
+	g_system->getPaletteManager()->setPalette(pal, 0, Graphics::PALETTE_COUNT);
+}
 
 } // namespace Gfx
 } // namespace Legend

@@ -41,16 +41,16 @@ const int Screen::TEXT_ROWS = 30;
 const int Screen::TEXT_COLUMNS = 80;
 
 void Screen::resetPalette() {
-	byte pal[PALETTE_SIZE];
+	byte pal[Graphics::PALETTE_SIZE];
 
-	Common::fill(&pal[0], &pal[PALETTE_SIZE], 0);
+	Common::fill(&pal[0], &pal[Graphics::PALETTE_SIZE], 0);
 	setEGAPalette(pal);
 
-	g_system->getPaletteManager()->setPalette(pal, 0, PALETTE_COUNT);
+	g_system->getPaletteManager()->setPalette(pal, 0, Graphics::PALETTE_COUNT);
 }
 
 void Screen::setEGAPalette(byte *destPalette) {
-	byte tempPalette[PALETTE_SIZE];
+	byte tempPalette[Graphics::PALETTE_SIZE];
 
 	const uint32 *srcP = EGA_PALETTE;
 	byte *destP = &tempPalette[0];

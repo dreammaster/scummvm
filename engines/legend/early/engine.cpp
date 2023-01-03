@@ -27,6 +27,8 @@ namespace Legend {
 namespace Early {
 
 bool Engine::initialize() {
+	(void)LegendEngine::initialize();
+
 	Legend::Gfx::Font::init();
 	_screen = new Early::Gfx::Screen();
 
