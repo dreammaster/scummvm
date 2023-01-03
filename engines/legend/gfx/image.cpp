@@ -25,15 +25,6 @@
 namespace Legend {
 namespace Gfx {
 
-void Image::setup() {
-	_pic = nullptr;
-	_picNum = -1;
-	_frameNumber = 0;
-	_active = false;
-	_field1 = 0;
-	_fieldA = _fieldB = 0;
-}
-
 Image::~Image() {
 	delete _pic;
 }
