@@ -19,30 +19,24 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_TEXT_AREA_H
-#define LEGEND_EARLY_GFX_TEXT_AREA_H
-
-#include "legend/early/gfx/boxed_element.h"
+#include "legend/early/gfx/interface.h"
+#include "legend/legend.h"
 
 namespace Legend {
 namespace Early {
 namespace Gfx {
 
-class TextArea : public BoxedElement {
-public:
-	TextArea(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {}
-	TextArea(UIElement *parent, const Common::String &name, const Common::Rect &r) :
-		BoxedElement(parent, name, r) {}
-	~TextArea() override {}
-
-	/**
-	 * Draws the visual item on the screen
-	 */
-	void draw() override;
-};
+Interface::Interface(UIElement *parent) : ViewElement(parent, "Interface"),
+		_commandButtons(parent, "CommandButtons", Common::Rect(0, 0, 120, 136)),
+		_compass(parent, "Compass", Common::Rect(120, 0, 260, 136)),
+		_scene(parent, "ScenePicture", Common::Rect(260, 0, 640, 232)),
+		_commands(parent, "Commands", Common::Rect(0, 136, 117, 480)),
+		_items(parent, "Items", Common::Rect(117, 136, 260, 480)),
+		_textArea(parent, "TextArea", Common::Rect(260, 232, 640, 480)) {
+	_commands.load("commands.bin");
+	_commands.setDividerIndex(16);
+}
 
 } // namespace Gfx
 } // namespace Early
 } // namespace Legend
-
-#endif

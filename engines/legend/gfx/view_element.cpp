@@ -33,6 +33,16 @@ ViewElement::ViewElement(const Common::Rect &area) : UIElement("", nullptr) {
 	setBounds(area);
 }
 
+ViewElement::ViewElement(UIElement *uiParent, const Common::String &name) :
+		UIElement(name, uiParent) {
+}
+
+ViewElement::ViewElement(UIElement *uiParent, const Common::String &name,
+		const Common::Rect &area) : UIElement(name, uiParent) {
+	setBounds(area);
+}
+
+
 void ViewElement::drawElements() {
 	// Ensure the correct font is active
 	if (_fontNumber != -1)

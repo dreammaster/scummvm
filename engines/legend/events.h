@@ -59,6 +59,7 @@ public:
 	int borderSize() const { return _borderSize; }
 	int16 width() const { return _bounds.width(); }
 	int16 height() const { return _bounds.height(); }
+	bool isEmpty() const { return _bounds.isEmpty(); }
 };
 
 /**

@@ -19,26 +19,31 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_TEXT_AREA_H
-#define LEGEND_EARLY_GFX_TEXT_AREA_H
+#ifndef LEGEND_EARLY_GFX_INTERFACE_H
+#define LEGEND_EARLY_GFX_INTERFACE_H
 
-#include "legend/early/gfx/boxed_element.h"
+#include "legend/gfx/view_element.h"
+#include "legend/gfx/compass.h"
+#include "legend/early/gfx/command_buttons.h"
+#include "legend/early/gfx/scene.h"
+#include "legend/early/gfx/listbox.h"
+#include "legend/early/gfx/text_area.h"
 
 namespace Legend {
 namespace Early {
 namespace Gfx {
 
-class TextArea : public BoxedElement {
+class Interface : public Legend::Gfx::ViewElement {
+private:
+	CommandButtons _commandButtons;
+	Legend::Gfx::Compass _compass;
+	Scene _scene;
+	Listbox _commands;
+	Listbox _items;
+	TextArea _textArea;
 public:
-	TextArea(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {}
-	TextArea(UIElement *parent, const Common::String &name, const Common::Rect &r) :
-		BoxedElement(parent, name, r) {}
-	~TextArea() override {}
-
-	/**
-	 * Draws the visual item on the screen
-	 */
-	void draw() override;
+	Interface(UIElement *parent);
+	~Interface() override {}
 };
 
 } // namespace Gfx

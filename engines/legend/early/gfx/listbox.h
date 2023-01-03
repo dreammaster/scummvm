@@ -104,6 +104,10 @@ public:
 	Listbox(UIElement *parent, const Common::String &name) : BoxedElement(parent, name) {
 		init();
 	}
+	Listbox(UIElement *parent, const Common::String &name, const Common::Rect &r) :
+		BoxedElement(parent, name, r) {
+		init();
+	}
 	~Listbox() override;
 
 	/**

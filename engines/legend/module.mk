@@ -1,7 +1,9 @@
 MODULE := engines/legend
 
 MODULE_OBJS = \
+	gfx/compass.o \
 	gfx/font.o \
+	gfx/image.o \
 	gfx/picture.o \
 	gfx/region.o \
 	gfx/screen.o \
@@ -14,6 +16,8 @@ MODULE_OBJS = \
 	early/engine.o \
 	early/gfx/boxed_element.o \
 	early/gfx/button.o \
+	early/gfx/command_buttons.o \
+	early/gfx/interface.o \
 	early/gfx/listbox.o \
 	early/gfx/screen.o \
 	early/gfx/text_area.o \
