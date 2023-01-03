@@ -36,6 +36,7 @@
 
 #include "legend/detection.h"
 #include "legend/events.h"
+#include "legend/gfx/picture.h"
 #include "legend/gfx/screen.h"
 #include "legend/utils/file.h"
 
@@ -52,14 +53,15 @@ protected:
 	/**
 	 * Initalize the game
 	 */
-	virtual bool initialize() = 0;
+	virtual bool initialize();
 
 	/**
 	 * Deinitalize the game
 	 */
-	virtual void deinitialize() = 0;
+	virtual void deinitialize();
 
 public:
+	Gfx::PicFile *_picFile = nullptr;
 	Gfx::Screen *_screen = nullptr;
 
 public:

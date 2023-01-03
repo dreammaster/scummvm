@@ -32,6 +32,8 @@ namespace Gfx {
  */
 class Screen : public Graphics::Screen {
 public:
+	bool _picPalette = false;
+public:
 	Screen() : Graphics::Screen() {}
 	Screen(int w, int h) : Graphics::Screen(w, h) {}
 
@@ -39,6 +41,11 @@ public:
 	 * Reset the palette back to default
 	 */
 	virtual void resetPalette() = 0;
+
+	/**
+	 * Set the palette
+	 */
+	void setPalette(const byte pal[PALETTE_SIZE]);
 };
 
 } // namespace Gfx
