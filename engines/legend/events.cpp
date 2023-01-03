@@ -78,17 +78,31 @@ void Events::processEvent(Common::Event &ev) {
 		break;
 	case Common::EVENT_LBUTTONDOWN:
 	case Common::EVENT_RBUTTONDOWN:
-		//case Common::EVENT_MBUTTONDOWN:
+	//case Common::EVENT_MBUTTONDOWN:
+		if (ev.type == Common::EVENT_LBUTTONDOWN) {
+			_dragState = DS_PRESSED;
+			_dragStartPos = ev.mouse;
+		}
 		msgMouseDown(MouseDownMessage(ev.type, ev.mouse));
 		break;
 	case Common::EVENT_LBUTTONUP:
 	case Common::EVENT_RBUTTONUP:
 	//case Common::EVENT_MBUTTONUP:
+		if (ev.type == Common::EVENT_LBUTTONUP)
+			_dragState = DS_UNPRESSED;
 		msgMouseUp(MouseUpMessage(ev.type, ev.mouse));
 		break;
 	case Common::EVENT_WHEELDOWN:
 	case Common::EVENT_WHEELUP:
 		msgMouseWheel(MouseWheelMessage(ev.type == Common::EVENT_WHEELUP, ev.mouse));
+		break;
+	case Common::EVENT_MOUSEMOVE:
+		if (_dragState == DS_PRESSED && (
+			ABS(ev.mouse.x - _dragStartPos.x) > 5 ||
+			ABS(ev.mouse.y - _dragStartPos.y) > 5))
+			_dragState = DS_DRAGGING;
+		if (_dragState == DS_DRAGGING)
+			msgMouseDrag(MouseDragMessage(ev.mouse));
 		break;
 	default:
 		break;
