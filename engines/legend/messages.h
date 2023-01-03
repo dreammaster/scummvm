@@ -62,6 +62,14 @@ struct MouseUpMessage : public MouseMessage {
 	MouseUpMessage(Common::EventType type, const Common::Point &pos) :
 		MouseMessage(type, pos) {}
 };
+struct MouseWheelMessage : public MouseMessage {
+	bool _wheelUp;
+
+	MouseWheelMessage() : MouseMessage(MB_MIDDLE, Common::Point()), _wheelUp(false) {}
+	MouseWheelMessage(bool wheelUp, const Common::Point &pos) :
+		MouseMessage(MB_MIDDLE, pos), _wheelUp(wheelUp) {
+	}
+};
 
 struct GameMessage : public Message {
 	Common::String _name;
