@@ -37,6 +37,8 @@ LegendEngine::LegendEngine(OSystem *syst, const LegendGameDescription *gameDesc)
 }
 
 LegendEngine::~LegendEngine() {
+	delete _picFile;
+	delete _res;
 }
 
 uint32 LegendEngine::getFeatures() const {
@@ -54,6 +56,18 @@ bool LegendEngine::isLater() const {
 		id == GType_DeathGate;
 }
 
+Common::String LegendEngine::getGameFilePrefix() const {
+	switch (getGameId()) {
+	case GType_Gateway:
+		return "gate";
+	case GType_CompanionsOfXanth:
+		return "xanth";
+	default:
+		return "";
+	}
+}
+
+
 Common::Error LegendEngine::run() {
 	if (initialize()) {
 		runGame();
@@ -65,11 +79,11 @@ Common::Error LegendEngine::run() {
 
 bool LegendEngine::initialize() {
 	_picFile = new Gfx::PicFile();
+	_res = new Resources(this);
 	return true;
 }
 
 void LegendEngine::deinitialize() {
-	delete _picFile;
 }
 
 Common::Error LegendEngine::syncGame(Common::Serializer &s) {
