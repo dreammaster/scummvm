@@ -233,6 +233,7 @@ public:
 	MESSAGE(MouseDown);
 	MESSAGE(MouseUp);
 	MESSAGE(MouseWheel);
+	MESSAGE(MouseDrag);
 	MESSAGE(Action);
 	MESSAGE(Game);
 	MESSAGE(Value);
@@ -246,6 +247,12 @@ class Events : public UIElement {
 private:
 	Graphics::Screen *_screen = nullptr;
 	Common::Stack<UIElement *> _views;
+	enum DragState {
+		DS_UNPRESSED, DS_PRESSED, DS_DRAGGING
+	};
+	DragState _dragState = DS_UNPRESSED;
+	Common::Point _dragStartPos;
+
 protected:
 	/**
 	 * Process an event
@@ -266,6 +273,7 @@ protected:
 	MESSAGE(MouseDown);
 	MESSAGE(MouseUp);
 	MESSAGE(MouseWheel);
+	MESSAGE(MouseDrag);
 #undef MESSAGE
 public:
 	Events();

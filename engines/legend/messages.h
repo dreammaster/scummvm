@@ -70,6 +70,11 @@ struct MouseWheelMessage : public MouseMessage {
 		MouseMessage(MB_MIDDLE, pos), _wheelUp(wheelUp) {
 	}
 };
+struct MouseDragMessage : public MouseMessage {
+	MouseDragMessage() : MouseMessage() {}
+	MouseDragMessage(const Common::Point &pos) :
+		MouseMessage(MB_LEFT, pos) {}
+};
 
 struct GameMessage : public Message {
 	Common::String _name;

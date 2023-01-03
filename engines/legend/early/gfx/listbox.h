@@ -140,7 +140,7 @@ public:
 	bool msgMouseWheel(const MouseWheelMessage &msg) override;
 	bool msgMouseDown(const MouseDownMessage &msg) override;
 	bool msgMouseUp(const MouseUpMessage &msg) override;
-	//	bool msgMouseDrag(const MouseDragMsg &msg) override;
+	bool msgMouseDrag(const MouseDragMessage &msg) override;
 };
 
 } // namespace Gfx
