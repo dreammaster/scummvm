@@ -8,6 +8,8 @@ MODULE_OBJS = \
 	gfx/view.o \
 	utils/engine_data.o \
 	utils/file.o \
+	utils/resources.o \
+	utils/string.o \
 	early/engine.o \
 	early/gfx/boxed_element.o \
 	early/gfx/button.o \
