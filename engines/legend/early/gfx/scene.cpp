@@ -24,9 +24,11 @@
 
 namespace Legend {
 namespace Early {
+namespace Gfx {
 
 void Scene::draw() {
 }
 
-} // End of namespace Early
-} // End of namespace Legend
+} // namespace Gfx
+} // namespace Early
+} // namespace Legend

@@ -35,9 +35,9 @@ public:
 	~Scene() override {}
 
 	/**
-	 * Draws the visual item on the screen
+	 * Draws the scene
 	 */
-	virtual void draw();
+	void draw() override;
 };
 
 } // namespace Views
