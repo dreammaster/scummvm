@@ -26,6 +26,7 @@
 #include "common/rect.h"
 #include "common/savefile.h"
 #include "common/stream.h"
+#include "legend/utils/string.h"
 
 namespace Legend {
 
@@ -47,20 +48,20 @@ enum FileType {
 class File : public Common::File {
 public:
 	File() : Common::File() {}
-	File(const Common::String &name);
+	File(const String &name);
 
 	/**
 	 * Open the file with the given filename, by searching SearchMan.
 	 * @param	name	the name of the file to open
 	 */
-	virtual bool open(const Common::String &name);
+	virtual bool open(const String &name);
 
 	/**
 	 * Open the file with the given filename from within the given archive.
 	 * @param	name	the name of the file to open
 	 * @param	archive		the archive in which to search for the file
 	 */
-	virtual bool open(const Common::String &name, Common::Archive &archive);
+	virtual bool open(const String &name, Common::Archive &archive);
 
 	/**
 	 * Open the file corresponding to the give node.
@@ -73,7 +74,7 @@ public:
 	 * @param	stream		a pointer to a SeekableReadStream, or 0
 	 * @param	name		a string describing the 'file' corresponding to stream
 	 */
-	virtual bool open(SeekableReadStream *stream, const Common::String &name);
+	virtual bool open(SeekableReadStream *stream, const String &name);
 
 	/**
 	 * Open a file of a specified type and number
@@ -85,7 +86,7 @@ public:
 	/**
 	 * Returns a formatted filename for a given resource type and file number
 	 */
-	static Common::String getFilename(FileType fileType, int fileNumber);
+	static String getFilename(FileType fileType, int fileNumber);
 };
 
 /**
@@ -160,7 +161,7 @@ public:
 	/**
 	 * Read a string from the file
 	 */
-	Common::String readString();
+	String readString();
 
 	/**
 	 * Read a number from the file
@@ -215,22 +216,22 @@ public:
 	/**
 	 * Write a string line
 	 */
-	void writeLine(const Common::String &str) const;
+	void writeLine(const String &str) const;
 
 	/**
 	 * Write a string
 	 */
-	void writeString(const Common::String &str) const;
+	void writeString(const String &str) const;
 
 	/**
 	 * Write a quoted string
 	 */
-	void writeQuotedString(const Common::String &str) const;
+	void writeQuotedString(const String &str) const;
 
 	/**
 	 * Write a quoted string line
 	 */
-	void writeQuotedLine(const Common::String &str, int indent) const;
+	void writeQuotedLine(const String &str, int indent) const;
 
 	/**
 	 * Write a number to file
@@ -287,7 +288,7 @@ public:
 	/**
 	 * Write the starting header for a class definition
 	 */
-	void writeClassStart(const Common::String &classStr, int indent);
+	void writeClassStart(const String &classStr, int indent);
 
 	/**
 	 * Write out the ending footer for a class definition
@@ -306,7 +307,7 @@ public:
 /**
  * General purpose support method for reading an ASCIIZ string from a stream
  */
-Common::String readStringFromStream(Common::SeekableReadStream *s);
+String readStringFromStream(Common::SeekableReadStream *s);
 
 } // End of namespace Legend
 

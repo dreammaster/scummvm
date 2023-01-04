@@ -29,7 +29,7 @@ namespace Gfx {
 
 class View : public ViewElement {
 public:
-	View(const Common::String &name);
+	View(const String &name);
 	~View() override {}
 };
 

@@ -57,7 +57,7 @@ bool LegendEngine::isLater() const {
 		id == GType_DeathGate;
 }
 
-Common::String LegendEngine::getGameFilePrefix() const {
+String LegendEngine::getGameFilePrefix() const {
 	switch (getGameId()) {
 	case GType_Gateway:
 		return "gate";
@@ -99,14 +99,14 @@ Common::Error LegendEngine::syncGame(Common::Serializer &s) {
 	return Common::kNoError;
 }
 
-Common::String LegendEngine::getFilename(FileType fileType, int fileNumber) {
+String LegendEngine::getFilename(FileType fileType, int fileNumber) {
 	static const char *const EXTENSIONS[] = { "PIC", "RGN", "FNT", "MUS", "SAV", "SAV" };
 
 	switch (getGameId()) {
 	case GType_Gateway:
-		return Common::String::format("gate_%03d.%s", fileNumber, EXTENSIONS[fileType]);
+		return String::format("gate_%03d.%s", fileNumber, EXTENSIONS[fileType]);
 	case GType_CompanionsOfXanth:
-		return Common::String::format("xanth_%02d.%s", fileNumber, EXTENSIONS[fileType]);
+		return String::format("xanth_%02d.%s", fileNumber, EXTENSIONS[fileType]);
 	default:
 		error("Unknown game");
 	}

@@ -75,7 +75,7 @@ public:
 	/**
 	 * Get the text message for a given Id
 	 */
-	Common::String getMessage(uint id);
+	String getMessage(uint id);
 };
 
 } // End of namespace Legend

@@ -82,7 +82,7 @@ public:
 	/**
 	 * Returns the file prefix for the games data files
 	 */
-	Common::String getGameFilePrefix() const;
+	String getGameFilePrefix() const;
 
 	/**
 	 * Returns whether the game is one of the later all-graphical ones
@@ -136,7 +136,7 @@ public:
 	/**
 	 * Returns a formatted filename for a given resource type and file number
 	 */
-	Common::String getFilename(FileType fileType, int fileNumber);
+	String getFilename(FileType fileType, int fileNumber);
 };
 
 extern LegendEngine *g_engine;
