@@ -37,7 +37,7 @@ public:
 	VocabEntry() : Common::String(), _flags(0), _field6(0), _field8(0) {}
 	VocabEntry(const char *text, byte flags = 0) : Common::String(text),
 		_flags(flags), _field6(0), _field8(0) {}
-	VocabEntry(const Common::String &text, byte flags = 0) : Common::String(text),
+	VocabEntry(const String &text, byte flags = 0) : Common::String(text),
 		_flags(flags), _field6(0), _field8(0) {}
 };
 

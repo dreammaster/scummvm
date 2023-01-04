@@ -25,7 +25,7 @@
 
 namespace Legend {
 
-String::String(uint id) : Common::String(g_engine->_res->getMessage(id)) {
+String::String(uint id) : String(g_engine->_res->getMessage(id)) {
 }
 
 void String::capitalize() {

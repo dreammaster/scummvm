@@ -25,6 +25,7 @@
 #include "common/array.h"
 #include "common/stream.h"
 #include "graphics/managed_surface.h"
+#include "legend/utils/string.h"
 
 namespace Legend {
 namespace Gfx {
@@ -136,7 +137,7 @@ public:
 	/**
 	 * Write out a string
 	 */
-	void writeString(Graphics::ManagedSurface &surface, Common::Point &textPos, const Common::String &msg);
+	void writeString(Graphics::ManagedSurface &surface, Common::Point &textPos, const String &msg);
 
 	/**
 	 * Return the width of a character
@@ -146,7 +147,7 @@ public:
 	/**
 	 * Return the width of a string
 	 */
-	uint stringWidth(const Common::String &msg) const;
+	uint stringWidth(const String &msg) const;
 
 	/**
 	 * Returns the height of the font

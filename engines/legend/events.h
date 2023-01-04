@@ -75,7 +75,7 @@ protected:
 	Common::Rect _innerBounds;
 	Bounds _bounds;
 	bool _needsRedraw = true;
-	Common::String _name;
+	String _name;
 protected:
 	/**
 	 * Set a delay countdown in seconds
@@ -116,9 +116,9 @@ private:
 	/**
 	 * Finds a view globally
 	 */
-	static UIElement *findViewGlobally(const Common::String &name);
+	static UIElement *findViewGlobally(const String &name);
 public:
-	UIElement(const Common::String &name, UIElement *uiParent);
+	UIElement(const String &name, UIElement *uiParent);
 	virtual ~UIElement() {}
 
 	/**
@@ -151,13 +151,13 @@ public:
 	 * Sets the focus to a new view
 	 */
 	void replaceView(UIElement *ui, bool replaceAllViews = false);
-	void replaceView(const Common::String &name, bool replaceAllViews = false);
+	void replaceView(const String &name, bool replaceAllViews = false);
 
 	/**
 	 * Adds a focused view to the view stack without replacing current one
 	 */
 	void addView(UIElement *ui);
-	void addView(const Common::String &name);
+	void addView(const String &name);
 	void addView();
 	void open() { addView(); }
 
@@ -204,7 +204,7 @@ public:
 	/**
 	 * Find a view by name
 	 */
-	virtual UIElement *findView(const Common::String &name);
+	virtual UIElement *findView(const String &name);
 
 	/**
 	 * Handles events
@@ -219,7 +219,7 @@ public:
 			return false; \
 		} \
 	public: \
-		bool send(const Common::String &viewName, const NAME##Message &msg) { \
+		bool send(const String &viewName, const NAME##Message &msg) { \
 			UIElement *view = UIElement::findViewGlobally(viewName); \
 			assert(view); \
 			return view->msg##NAME(msg); \
@@ -289,13 +289,13 @@ public:
 	 * Sets the focus to a new view
 	 */
 	void replaceView(UIElement *ui, bool replaceAllViews = false);
-	void replaceView(const Common::String &name, bool replaceAllViews = false);
+	void replaceView(const String &name, bool replaceAllViews = false);
 
 	/**
 	 * Adds a focused view to the view stack without replacing current one
 	 */
 	void addView(UIElement *ui);
-	void addView(const Common::String &name);
+	void addView(const String &name);
 
 	/**
 	 * Clears the view list
@@ -326,7 +326,7 @@ public:
 	 * Returns true if a view of a given name is present
 	 * at all in the visible view stack
 	 */
-	bool isPresent(const Common::String &name) const;
+	bool isPresent(const String &name) const;
 
 	Graphics::Screen *getScreen() const {
 		return _screen;

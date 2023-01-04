@@ -42,10 +42,10 @@ void HelpScreen::draw() {
 		Common::String msg2, msg1 = f.readLine();
 		size_t p = msg1.findFirstOf('\t');
 
-		if (p != Common::String::npos) {
+		if (p != String::npos) {
 			// If a tab is present, split the line in two
-			msg2 = Common::String(msg1.c_str() + p + 1);
-			msg1 = Common::String(msg1.c_str(), msg1.c_str() + p);
+			msg2 = String(msg1.c_str() + p + 1);
+			msg1 = String(msg1.c_str(), msg1.c_str() + p);
 		}
 
 		int xp = idx < 22 ? 24 : 312;

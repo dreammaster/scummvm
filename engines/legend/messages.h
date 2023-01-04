@@ -24,7 +24,7 @@
 
 #include "common/array.h"
 #include "common/events.h"
-#include "common/str.h"
+#include "legend/utils/string.h"
 
 namespace Legend {
 
@@ -77,16 +77,16 @@ struct MouseDragMessage : public MouseMessage {
 };
 
 struct GameMessage : public Message {
-	Common::String _name;
+	String _name;
 	int _value;
-	Common::String _stringValue;
+	String _stringValue;
 
 	GameMessage() : Message(), _value(-1) {}
-	GameMessage(const Common::String &name) : Message(),
+	GameMessage(const String &name) : Message(),
 		_name(name), _value(-1) {}
-	GameMessage(const Common::String &name, int value) : Message(),
+	GameMessage(const String &name, int value) : Message(),
 		_name(name), _value(value) {}
-	GameMessage(const Common::String &name, const Common::String &value) :
+	GameMessage(const String &name, const String &value) :
 		Message(), _name(name), _stringValue(value) {}
 };
 

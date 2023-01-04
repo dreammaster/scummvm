@@ -30,9 +30,9 @@ namespace Gfx {
 
 class Button : public Legend::Gfx::ViewElement {
 private:
-	Common::String _text;
+	String _text;
 public:
-	Button(UIElement *parent, const Common::String &text, const Common::Rect &r) :
+	Button(UIElement *parent, const String &text, const Common::Rect &r) :
 			Legend::Gfx::ViewElement(parent, r), _text(text) {
 		setFont(1);
 	}
@@ -62,7 +62,7 @@ class ValueButton : public Button {
 private:
 	int _value;
 public:
-	ValueButton(UIElement *parent, const Common::String &text, int value, const Common::Rect &r) :
+	ValueButton(UIElement *parent, const String &text, int value, const Common::Rect &r) :
 		Button(parent, text, r), _value(value) {}
 	virtual ~ValueButton() {}
 

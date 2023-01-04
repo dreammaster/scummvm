@@ -41,7 +41,7 @@ private:
 	ValueButton _btnLook;
 	ValueButton _btnDo;
 public:
-	CommandButtons(UIElement *parent, const Common::String &name, const Common::Rect &r);
+	CommandButtons(UIElement *parent, const String &name, const Common::Rect &r);
 	virtual ~CommandButtons() {}
 
 	/**

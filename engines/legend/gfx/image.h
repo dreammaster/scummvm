@@ -55,8 +55,8 @@ public:
 public:
 	Image() : ViewElement() {}
 	Image(UIElement *parent, const Common::Rect &r) : ViewElement(parent, r) {}
-	Image(UIElement *parent, const Common::String &name) : ViewElement(parent, name) {}
-	Image(UIElement *parent, const Common::String &name, const Common::Rect &r) :
+	Image(UIElement *parent, const String &name) : ViewElement(parent, name) {}
+	Image(UIElement *parent, const String &name, const Common::Rect &r) :
 		ViewElement(parent, name, r) {}
 	~Image();
 

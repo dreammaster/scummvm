@@ -43,13 +43,13 @@ protected:
 	void drawElements() override;
 
 public:
-	ViewElement(const Common::String &name, UIElement *uiParent = nullptr) :
+	ViewElement(const String &name, UIElement *uiParent = nullptr) :
 		UIElement(name, uiParent) {}
 	ViewElement() : UIElement("", nullptr) {}
 	ViewElement(UIElement *uiParent) : UIElement("", uiParent) {}
 	ViewElement(UIElement *uiParent, const Common::Rect &area);
-	ViewElement(UIElement *uiParent, const Common::String &name);
-	ViewElement(UIElement *uiParent, const Common::String &name,
+	ViewElement(UIElement *uiParent, const String &name);
+	ViewElement(UIElement *uiParent, const String &name,
 		const Common::Rect &area);
 	ViewElement(const Common::Rect &area);
 
@@ -68,8 +68,8 @@ public:
 	/**
 	 * Write a string
 	 */
-	void writeString(const Common::Point &pt, const Common::String &str);
-	void writeString(const Common::String &str);
+	void writeString(const Common::Point &pt, const String &str);
+	void writeString(const String &str);
 
 	/**
 	 * Write a character

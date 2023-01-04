@@ -25,7 +25,7 @@
 namespace Legend {
 namespace Gfx {
 
-View::View(const Common::String &name) : ViewElement(name, g_engine) {
+View::View(const String &name) : ViewElement(name, g_engine) {
 }
 
 } // namespace Gfx

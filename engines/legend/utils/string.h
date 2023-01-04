@@ -36,6 +36,7 @@ public:
 	String(const char *str) : Common::String(str) {}
 	String(const char *str, uint32 len) : Common::String(str, len) {}
 	String(const char *beginP, const char *endP) : Common::String(beginP, endP) {}
+	String(const String &str) : Common::String(str) {}
 	String(const Common::String &str) : Common::String(str) {}
 	explicit String(char c) : Common::String(c) {}
 

@@ -39,8 +39,8 @@ private:
 public:
 	Compass() : ViewElement() { load(); }
 	Compass(UIElement *parent, const Common::Rect &r) : ViewElement(parent, r) { load(); }
-	Compass(UIElement *parent, const Common::String &name) : ViewElement(parent, name) { load(); }
-	Compass(UIElement *parent, const Common::String &name, const Common::Rect &r) : ViewElement(parent, name, r) { load(); }
+	Compass(UIElement *parent, const String &name) : ViewElement(parent, name) { load(); }
+	Compass(UIElement *parent, const String &name, const Common::Rect &r) : ViewElement(parent, name, r) { load(); }
 	virtual ~Compass() {}
 
 	/**

@@ -40,11 +40,11 @@ public:
 			Legend::Gfx::ViewElement(parent, r) {
 		_bounds.setBorderSize(1);
 	}
-	BoxedElement(UIElement *parent, const Common::String &name) :
+	BoxedElement(UIElement *parent, const String &name) :
 			Legend::Gfx::ViewElement(name, parent) {
 		_bounds.setBorderSize(1);
 	}
-	BoxedElement(UIElement *parent, const Common::String &name,
+	BoxedElement(UIElement *parent, const String &name,
 			const Common::Rect &r) : Legend::Gfx::ViewElement(parent, name, r) {
 		_bounds.setBorderSize(1);
 	}

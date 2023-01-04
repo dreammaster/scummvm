@@ -30,7 +30,7 @@ namespace Gfx {
 
 class View : public Legend::Gfx::View {
 public:
-	View(const Common::String &name) : Legend::Gfx::View(name) {}
+	View(const String &name) : Legend::Gfx::View(name) {}
 	~View() override {}
 };
 
