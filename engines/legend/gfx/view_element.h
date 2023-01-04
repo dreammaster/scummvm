@@ -31,7 +31,7 @@ namespace Gfx {
 
 class ViewElement : public UIElement {
 private:
-	int _fontNumber = -1;
+	int _fontNumber = 1;
 protected:
 	Gfx::Font *_font = nullptr;
 	Common::Point _textPos;

@@ -23,6 +23,7 @@
 #define LEGEND_GAMES_GATEWAY_VIEWS_H
 
 #include "legend/early/views/help_screen.h"
+#include "legend/early/views/interface.h"
 #include "legend/games/gateway/views/commset.h"
 #include "legend/games/gateway/views/part_title.h"
 
@@ -34,6 +35,7 @@ namespace Views {
 class Views {
 public:
 	Legend::Early::Views::HelpScreen _helpScreen;
+	Legend::Early::Views::Interface _interface;
 	CommSet _commSet;
 	PartTitle _partTitle;
 public:

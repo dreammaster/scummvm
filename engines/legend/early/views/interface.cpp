@@ -19,24 +19,24 @@
  *
  */
 
-#include "legend/early/gfx/interface.h"
+#include "legend/early/views/interface.h"
 #include "legend/legend.h"
 
 namespace Legend {
 namespace Early {
-namespace Gfx {
+namespace Views {
 
-Interface::Interface(UIElement *parent) : ViewElement(parent, "Interface"),
-		_commandButtons(parent, "CommandButtons", Common::Rect(0, 0, 120, 136)),
-		_compass(parent, "Compass", Common::Rect(120, 0, 260, 136)),
-		_scene(parent, "ScenePicture", Common::Rect(260, 0, 640, 232)),
-		_commands(parent, "Commands", Common::Rect(0, 136, 117, 480)),
-		_items(parent, "Items", Common::Rect(117, 136, 260, 480)),
-		_textArea(parent, "TextArea", Common::Rect(260, 232, 640, 480)) {
+Interface::Interface() : View("Interface"),
+		_commandButtons(this, "CommandButtons", Common::Rect(0, 0, 120, 136)),
+		_compass(this, "Compass", Common::Rect(120, 0, 260, 136)),
+		_scene(this, "ScenePicture", Common::Rect(260, 0, 640, 232)),
+		_commands(this, "Commands", Common::Rect(0, 136, 117, 480)),
+		_items(this, "Items", Common::Rect(117, 136, 260, 480)),
+		_textArea(this, "TextArea", Common::Rect(260, 232, 640, 480)) {
 	_commands.load("commands.bin");
 	_commands.setDividerIndex(16);
 }
 
-} // namespace Gfx
+} // namespace Views
 } // namespace Early
 } // namespace Legend

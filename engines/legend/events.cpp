@@ -239,9 +239,6 @@ void UIElement::clearSurface() {
 }
 
 void UIElement::draw() {
-	for (size_t i = 0; i < _children.size(); ++i) {
-		_children[i]->draw();
-	}
 }
 
 bool UIElement::tick() {
