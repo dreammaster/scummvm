@@ -22,6 +22,7 @@ MODULE_OBJS = \
 	early/gfx/scene.o \
 	early/gfx/screen.o \
 	early/gfx/text_area.o \
+	early/gfx/text_window.o \
 	early/gfx/view.o \
 	early/utils/huffman.o \
 	early/utils/vocab.o \

@@ -107,6 +107,15 @@ struct ActionMessage : public Message {
 	}
 };
 
+struct TextMessage : public Message {
+	String _text;
+	bool _wrapped = true;
+
+	TextMessage() : Message() {}
+	TextMessage(const String &text, bool wrapped = true) :
+		Message(), _text(text), _wrapped(wrapped) {}
+};
+
 } // namespace Legend
 
 #endif

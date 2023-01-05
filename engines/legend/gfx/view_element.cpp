@@ -45,10 +45,22 @@ ViewElement::ViewElement(UIElement *uiParent, const String &name,
 
 void ViewElement::drawElements() {
 	// Ensure the correct font is active
-	if (_fontNumber != -1)
+	if (_fontNumber != -1) {
 		_font = Gfx::Font::loadFont(_fontNumber);
+		_font->setColor(_fgColor, _bgColor);
+	}
 
 	UIElement::drawElements();
+}
+
+void ViewElement::setFontColor(int fgColor, int bgColor) {
+	assert(_fontNumber != -1);
+	_fgColor = fgColor;
+	_bgColor = bgColor;
+
+	auto font = Gfx::Font::loadFont(_fontNumber);
+	if (font == _font)
+		_font->setColor(_fgColor, _bgColor);
 }
 
 void ViewElement::writeString(const Common::Point &pt, const String &str) {

@@ -19,31 +19,50 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_TEXT_AREA_H
-#define LEGEND_EARLY_GFX_TEXT_AREA_H
+#ifndef LEGEND_EARLY_GFX_TEXT_WINDOW_H
+#define LEGEND_EARLY_GFX_TEXT_WINDOW_H
 
-#include "legend/early/gfx/text_window.h"
+#include "legend/early/gfx/boxed_element.h"
+#include "common/stream.h"
 
 namespace Legend {
 namespace Early {
 namespace Gfx {
 
-class TextArea : public TextWindow {
-public:
-	TextArea(UIElement *parent, const Common::Rect &r) : TextWindow(parent, r) {}
-	TextArea(UIElement *parent, const String &name, const Common::Rect &r) :
-		TextWindow(parent, name, r) {}
-	~TextArea() override {}
+class TextWindow : public BoxedElement {
+private:
+	Common::WriteStream *_logFile = nullptr;
+	bool _cached = false;
+	String _cachedText;
+
+protected:
+	/**
+	 * Adds lines to the text window, taking care of wrapping on
+	 * word breaks if the line is too long
+	 */
+	void addLines(const String &msg);
 
 	/**
 	 * Adds text to the display
 	 */
-	void add(const String &text);
+	void add(const String &msg);
+
+public:
+	TextWindow(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {}
+	TextWindow(UIElement *parent, const String &name, const Common::Rect &r,
+		bool cached = true) : BoxedElement(parent, name, r),
+		_cached(cached) {}
+	~TextWindow() override;
 
 	/**
 	 * Draws the visual item on the screen
 	 */
 	void draw() override;
+
+	/**
+	 * Handles text display messages
+	 */
+	bool msgText(const TextMessage &msg) override;
 };
 
 } // namespace Gfx
