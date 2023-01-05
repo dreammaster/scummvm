@@ -35,6 +35,7 @@ private:
 protected:
 	Gfx::Font *_font = nullptr;
 	Common::Point _textPos;
+	int _fgColor = 0, _bgColor = 0;
 	Regions _regions;
 
 	/**
@@ -76,6 +77,11 @@ public:
 	 */
 	void writeChar(const Common::Point &pt, char c);
 	void writeChar(char c);
+
+	/**
+	 * Set the font color
+	 */
+	void setFontColor(int fgColor, int bgColor);
 };
 
 } // namespace Gfx
