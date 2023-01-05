@@ -60,6 +60,13 @@ public:
 	int16 width() const { return _bounds.width(); }
 	int16 height() const { return _bounds.height(); }
 	bool isEmpty() const { return _bounds.isEmpty(); }
+
+	Common::Point topLeft() const {
+		return Common::Point(left, top);
+	}
+	Common::Point bottomRight() const {
+		return Common::Point(right, bottom);
+	}
 };
 
 /**
@@ -238,6 +245,7 @@ public:
 	MESSAGE(Action);
 	MESSAGE(Game);
 	MESSAGE(Value);
+	MESSAGE(Text);
 	#undef MESSAGE
 };
 
@@ -275,6 +283,7 @@ protected:
 	MESSAGE(MouseUp);
 	MESSAGE(MouseWheel);
 	MESSAGE(MouseDrag);
+	MESSAGE(Text);
 #undef MESSAGE
 public:
 	Events();
