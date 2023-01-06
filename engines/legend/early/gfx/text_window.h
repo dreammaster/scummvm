@@ -47,6 +47,7 @@ protected:
 	 */
 	void add(const String &msg);
 
+	void newLine();
 public:
 	TextWindow(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {}
 	TextWindow(UIElement *parent, const String &name, const Common::Rect &r,

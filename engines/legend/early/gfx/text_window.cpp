@@ -76,6 +76,10 @@ void TextWindow::add(const String &msg) {
 
 }
 
+void TextWindow::newLine() {
+	int xp = _bounds.left + _font->_xCenter;
+}
+
 void TextWindow::draw() {
 }
 

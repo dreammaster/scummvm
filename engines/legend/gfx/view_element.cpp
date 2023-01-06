@@ -25,30 +25,30 @@ namespace Legend {
 namespace Gfx {
 
 ViewElement::ViewElement(UIElement *uiParent, const Common::Rect &area) :
-		UIElement("", uiParent) {
+		UIElement("", uiParent), _font(_fontNumber) {
 	setBounds(area);
 }
 
-ViewElement::ViewElement(const Common::Rect &area) : UIElement("", nullptr) {
+ViewElement::ViewElement(const Common::Rect &area) :
+		UIElement("", nullptr), _font(_fontNumber) {
 	setBounds(area);
 }
 
 ViewElement::ViewElement(UIElement *uiParent, const String &name) :
-		UIElement(name, uiParent) {
+		UIElement(name, uiParent), _font(_fontNumber) {
 }
 
 ViewElement::ViewElement(UIElement *uiParent, const String &name,
-		const Common::Rect &area) : UIElement(name, uiParent) {
+		const Common::Rect &area) :
+		UIElement(name, uiParent), _font(_fontNumber) {
 	setBounds(area);
 }
 
 
 void ViewElement::drawElements() {
 	// Ensure the correct font is active
-	if (_fontNumber != -1) {
-		_font = Gfx::Font::loadFont(_fontNumber);
+	if (_fontNumber != -1)
 		_font->setColor(_fgColor, _bgColor);
-	}
 
 	UIElement::drawElements();
 }
@@ -57,10 +57,7 @@ void ViewElement::setFontColor(int fgColor, int bgColor) {
 	assert(_fontNumber != -1);
 	_fgColor = fgColor;
 	_bgColor = bgColor;
-
-	auto font = Gfx::Font::loadFont(_fontNumber);
-	if (font == _font)
-		_font->setColor(_fgColor, _bgColor);
+	_font->setColor(_fgColor, _bgColor);
 }
 
 void ViewElement::writeString(const Common::Point &pt, const String &str) {
@@ -69,7 +66,6 @@ void ViewElement::writeString(const Common::Point &pt, const String &str) {
 }
 
 void ViewElement::writeString(const String &str) {
-	assert(_font);
 	Graphics::ManagedSurface s = getSurface();
 	_font->writeString(s, _textPos, str);
 	_textPos.x += _font->stringWidth(str);
@@ -81,7 +77,6 @@ void ViewElement::writeChar(const Common::Point &pt, char c) {
 }
 
 void ViewElement::writeChar(char c) {
-	assert(_font);
 	Graphics::ManagedSurface s = getSurface();
 	_font->writeChar(s, _textPos, c);
 	_textPos.x += _font->charWidth(c);
