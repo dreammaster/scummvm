@@ -30,10 +30,20 @@ namespace Legend {
 namespace Gfx {
 
 class ViewElement : public UIElement {
+	class FontPtr {
+	private:
+		const int &_fontNumber;
+	public:
+		FontPtr(int &fontNumber) : _fontNumber(fontNumber) {
+		}
+		Gfx::Font * operator->() const {
+			return Gfx::Font::loadFont(_fontNumber);
+		}
+	};
 private:
 	int _fontNumber = 1;
 protected:
-	Gfx::Font *_font = nullptr;
+	FontPtr _font;
 	Common::Point _textPos;
 	int _fgColor = 0, _bgColor = 0;
 	Regions _regions;
@@ -45,9 +55,9 @@ protected:
 
 public:
 	ViewElement(const String &name, UIElement *uiParent = nullptr) :
-		UIElement(name, uiParent) {}
-	ViewElement() : UIElement("", nullptr) {}
-	ViewElement(UIElement *uiParent) : UIElement("", uiParent) {}
+		UIElement(name, uiParent), _font(_fontNumber) {}
+	ViewElement() : UIElement("", nullptr), _font(_fontNumber) {}
+	ViewElement(UIElement *uiParent) : UIElement("", uiParent), _font(_fontNumber) {}
 	ViewElement(UIElement *uiParent, const Common::Rect &area);
 	ViewElement(UIElement *uiParent, const String &name);
 	ViewElement(UIElement *uiParent, const String &name,
