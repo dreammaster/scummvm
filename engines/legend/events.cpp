@@ -170,7 +170,8 @@ void Events::clearViews() {
 
 /*------------------------------------------------------------------------*/
 
-Bounds::Bounds(Common::Rect &innerBounds) :
+Bounds::Bounds(UIElement *owner, Common::Rect &innerBounds) :
+		_owner(owner),
 		_bounds(0, 0, g_system->getWidth(), g_system->getHeight()),
 		_innerBounds(innerBounds),
 		left(_bounds.left), top(_bounds.top),
@@ -179,22 +180,30 @@ Bounds::Bounds(Common::Rect &innerBounds) :
 
 Bounds &Bounds::operator=(const Common::Rect &r) {
 	_bounds = r;
-	_innerBounds = r;
-	_innerBounds.grow(-_borderSize);
+	setBorderSize(_borderXSize, _borderYSize);
 	return *this;
 }
 
 void Bounds::setBorderSize(size_t borderSize) {
-	_borderSize = borderSize;
-	_innerBounds = *this;
-	_innerBounds.grow(-_borderSize);
+	setBorderSize(borderSize, borderSize);
+}
+
+void Bounds::setBorderSize(size_t xSize, size_t ySize) {
+	_borderXSize = xSize;
+	_borderYSize = ySize;
+	_innerBounds = Common::Rect(
+		_bounds.left + xSize, _bounds.top + ySize,
+		_bounds.right - xSize, _bounds.bottom - ySize
+	);
+
+	_owner->metricsChanged();
 }
 
 /*------------------------------------------------------------------------*/
 
 UIElement::UIElement(const String &name, UIElement *uiParent) :
 		_name(name), _parent(uiParent),
-		_bounds(_innerBounds) {
+		_bounds(this, _innerBounds) {
 	if (_parent)
 		_parent->_children.push_back(this);
 }

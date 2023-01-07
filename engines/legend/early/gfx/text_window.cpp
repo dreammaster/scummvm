@@ -32,6 +32,19 @@ TextWindow::~TextWindow() {
 	delete _logFile;
 }
 
+void TextWindow::clear() {
+	assert(hasFont());
+
+	// Reset the lines array
+	int numLines = _innerBounds.height() / _font->_lineHeight;
+	_lines.clear();
+	_lines.resize(numLines);
+
+	// Reset row variables
+	_lineNum = 0;
+	_linesRemaining = numLines - 1;
+}
+
 void TextWindow::addLines(const String &msg) {
 	const char *lineP = msg.c_str();
 
@@ -48,7 +61,6 @@ void TextWindow::addLines(const String &msg) {
 			}
 
 			String line(lineP, lineP + lineEnd + 1);
-			line += '\n';
 			add(line);
 
 			lineP += lineEnd + 1;
@@ -62,6 +74,12 @@ void TextWindow::addLines(const String &msg) {
 }
 
 void TextWindow::add(const String &msg) {
+	if (_hasMore) {
+		// Waiting for user, so cache further adds
+		_pendingAdds.push_back(msg);
+		return;
+	}
+
 	// If logging is enabled, write out the text
 	if (_logFile)
 		_logFile->writeString(msg);
@@ -74,13 +92,63 @@ void TextWindow::add(const String &msg) {
 	}
 	text += msg;
 
+	while (!text.empty()) {
+		size_t endPos = text.findFirstOf(" \t\n-");
+		if (endPos == String::npos && _cached)
+			break;
+
+		if (text[endPos] == '-')
+			// Dashes are included on line
+			++endPos;
+
+		String word(text.c_str(), text.c_str() + endPos);
+		size_t wordWidth = _font->stringWidth(word);
+
+
+	}
+
+	for (const char *msgP = text.c_str(); *msgP;) {
+		const char *endP = 
+		for (endP = msgP; *endP != )
+	}
 }
 
 void TextWindow::newLine() {
-	int xp = _bounds.left + _font->_xCenter;
+	if (_lineNum < ((int)_lines.size() - 1)) {
+		// Move to next line
+		++_lineNum;
+	} else {
+		// On last line already, so scroll text
+		_lines.remove_at(0);
+		_lines.push_back(String());
+	}
+
+	needsRedraw();
+}
+
+void TextWindow::flush() {
+	if (!_pendingAdds.empty()) {
+		Common::Array<String> adds = _pendingAdds;
+		_pendingAdds.clear();
+
+		for (uint i = 0; i < adds.size(); ++i)
+			add(adds[i]);
+	}
 }
 
 void TextWindow::draw() {
+	BoxedElement::draw();
+
+	for (uint i = 0; i < _lines.size(); ++i) {
+		Common::Point pt(_innerBounds.left,
+			_innerBounds.top + _font->_lineHeight * i);
+
+		if (i == (_lines.size() - 1) && _hasMore) {
+			writeString(pt, "- MORE -");
+		} else {
+			writeString(pt, _lines[i]);
+		}
+	}
 }
 
 bool TextWindow::msgText(const TextMessage &msg) {

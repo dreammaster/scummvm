@@ -34,8 +34,21 @@ private:
 	Common::WriteStream *_logFile = nullptr;
 	bool _cached = false;
 	String _cachedText;
+	Common::Array<String> _pendingAdds;
+	Common::Array<String> _lines;
+	int _lineNum = 0;				// Line to add text to
+	int _linesRemaining = 0;		// Lines remaining before "MORE"
+	bool _hasMore = false;
 
 protected:
+	/**
+	 * Returns true if window is showing the MORE
+	 * indicator, and is waiting for a keypress
+	 */
+	bool hasMore() const {
+		return _hasMore;
+	}
+
 	/**
 	 * Adds lines to the text window, taking care of wrapping on
 	 * word breaks if the line is too long
@@ -47,13 +60,39 @@ protected:
 	 */
 	void add(const String &msg);
 
+	/**
+	 * Moves to the next line
+	 */
 	void newLine();
+
+	/**
+	 * Flushes out any further adds done whilst waiting
+	 * for - MORE - to be clicked
+	 */
+	void flush();
+
 public:
-	TextWindow(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {}
+	TextWindow(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {
+		clear();
+	}
 	TextWindow(UIElement *parent, const String &name, const Common::Rect &r,
-		bool cached = true) : BoxedElement(parent, name, r),
-		_cached(cached) {}
+			bool cached = true) : BoxedElement(parent, name, r),
+			_cached(cached) {
+		clear();
+	}
 	~TextWindow() override;
+
+	/**
+	 * Clears the contents
+	 */
+	void clear();
+
+	/**
+	 * Called when bounds or font are changed
+	 */
+	void metricsChanged() override {
+		clear();
+	}
 
 	/**
 	 * Draws the visual item on the screen

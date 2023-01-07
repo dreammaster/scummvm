@@ -34,6 +34,7 @@ namespace Legend {
 #define FRAME_DELAY (1000 / FRAME_RATE)
 
 class Events;
+class UIElement;
 
 /**
  * Implements a thunk layer around an element's
@@ -43,20 +44,21 @@ class Events;
  */
 struct Bounds {
 private:
+	UIElement *_owner;
 	Common::Rect _bounds;
 	Common::Rect &_innerBounds;
-	int _borderSize = 0;
+	int _borderXSize = 0, _borderYSize = 0;
 public:
 	const int16 &left;
 	const int16 &top;
 	const int16 &right;
 	const int16 &bottom;
 public:
-	Bounds(Common::Rect &innerBounds);
+	Bounds(UIElement *owner, Common::Rect &innerBounds);
 	operator const Common::Rect &() const { return _bounds; }
 	Bounds &operator=(const Common::Rect &r);
 	void setBorderSize(size_t borderSize);
-	int borderSize() const { return _borderSize; }
+	void setBorderSize(size_t xSize, size_t ySize);
 	int16 width() const { return _bounds.width(); }
 	int16 height() const { return _bounds.height(); }
 	bool isEmpty() const { return _bounds.isEmpty(); }
@@ -207,6 +209,11 @@ public:
 	 * Called for game frame ticks
 	 */
 	virtual bool tick();
+
+	/**
+	 * Called when the bounds are canged
+	 */
+	virtual void metricsChanged() {}
 
 	/**
 	 * Find a view by name
