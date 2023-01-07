@@ -29,10 +29,8 @@ namespace Gfx {
 
 void BoxedElement::draw() {
 	Graphics::ManagedSurface s = getSurface();
-	Common::Rect r = s.getBounds();
-	s.frameRect(r, Gfx::BLACK);
-	r.grow(-_bounds.borderSize());
-	s.fillRect(r, Gfx::WHITE);
+	s.fillRect(_bounds, Gfx::WHITE);
+	s.frameRect(_bounds, Gfx::BLACK);
 }
 
 } // namespace Gfx

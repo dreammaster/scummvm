@@ -74,6 +74,14 @@ public:
 			_fontNumber = fontNumber;
 			_needsRedraw = true;
 		}
+		metricsChanged();
+	}
+
+	/**
+	 * Returns true if the view has an associated font
+	 */
+	bool hasFont() const {
+		return _fontNumber != -1;
 	}
 
 	/**
