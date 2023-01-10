@@ -108,8 +108,8 @@ void TextWindow::add(const String &msg) {
 	}
 
 	for (const char *msgP = text.c_str(); *msgP;) {
-		const char *endP = 
-		for (endP = msgP; *endP != )
+//		const char *endP = 
+//		for (endP = msgP; *endP != )
 	}
 }
 
@@ -121,6 +121,15 @@ void TextWindow::newLine() {
 		// On last line already, so scroll text
 		_lines.remove_at(0);
 		_lines.push_back(String());
+	}
+
+	if (--_linesRemaining <= 0) {
+		// Flag for displaying has more indicator
+		_hasMore = true;
+
+		// Until the Has More is dismissed, the text window will
+		// have complete focus to get key or mouse events
+		g_events->addView(this);
 	}
 
 	needsRedraw();
@@ -158,6 +167,30 @@ bool TextWindow::msgText(const TextMessage &msg) {
 		add(msg._text);
 
 	return true;
+}
+
+bool TextWindow::msgKeypress(const KeypressMessage &msg) {
+	if (_hasMore) {
+		_hasMore = false;
+		needsRedraw();
+
+		flush();
+		return true;
+	}
+
+	return false;
+}
+
+bool TextWindow::msgMouseDown(const MouseDownMessage &msg) {
+	if (_hasMore) {
+		_hasMore = false;
+		needsRedraw();
+
+		flush();
+		return true;
+	}
+
+	return false;
 }
 
 } // namespace Gfx

@@ -103,6 +103,16 @@ public:
 	 * Handles text display messages
 	 */
 	bool msgText(const TextMessage &msg) override;
+
+	/**
+	 * Handle keypresses
+	 */
+	bool msgKeypress(const KeypressMessage &msg) override;
+
+	/**
+	 * Handle mouse clicks
+	 */
+	bool msgMouseDown(const MouseDownMessage &msg) override;
 };
 
 } // namespace Gfx
