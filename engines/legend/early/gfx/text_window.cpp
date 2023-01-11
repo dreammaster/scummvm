@@ -91,7 +91,6 @@ void TextWindow::add(const String &msg) {
 		addDirect(text); \
 		return; \
 	} \
-	currentLine = _lines[_lineNum]; \
 	xPos = 0; \
 	widthRemaining = width
 
@@ -107,10 +106,9 @@ void TextWindow::addDirect(const String &msg) {
 		_logFile->writeString(msg);
 
 	// Get the current line being added to
-	String &currentLine = _lines[_lineNum];
 	const int width = _innerBounds.width();
 	const int spaceWidth = _font->charWidth(' ');
-	int xPos = getLineWidth(currentLine);
+	int xPos = getLineWidth(_lines[_lineNum]);
 	int widthRemaining;
 
 	// Form the text to add
@@ -122,6 +120,7 @@ void TextWindow::addDirect(const String &msg) {
 	text += msg;
 
 	while (!text.empty()) {
+		assert(xPos == getLineWidth(_lines[_lineNum]));
 		size_t endPos = text.findFirstOf(" \t\n-");
 		if (endPos == String::npos && _cached)
 			break;
@@ -160,19 +159,20 @@ void TextWindow::addDirect(const String &msg) {
 
 		// Update word, and strip it off the text
 		word = String(text.c_str(), text.c_str() + endPos);
-		currentLine += word;
+		_lines[_lineNum] += word;
 		text = String(text.c_str() + endPos);
 
 		// Update the total pixel width of the line wih the word added
 		xPos += _font->stringWidth(word);
+		widthRemaining = width - xPos;
 
 		switch (text.firstChar()) {
 		case '\t':
 			// Tab characters get included in the line, since draw handles
 			// them specially
 			text.deleteChar(0);
-			currentLine += '\t';
-			xPos = _font->_xCenter + getLineWidth(currentLine);
+			_lines[_lineNum] += '\t';
+			xPos = _font->_xCenter + getLineWidth(_lines[_lineNum]);
 			widthRemaining = width - xPos;
 			break;
 
@@ -187,7 +187,7 @@ void TextWindow::addDirect(const String &msg) {
 				NEWLINE;
 
 			} else {
-				currentLine += ' ';
+				_lines[_lineNum] += ' ';
 				xPos += spaceWidth;
 				widthRemaining -= spaceWidth;
 			}

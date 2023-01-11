@@ -238,16 +238,20 @@ void Font::writeString(Graphics::ManagedSurface &surface, Common::Point &textPos
 }
 
 uint Font::charWidth(char c) const {
+	int w;
+
 	if (c == '\t')
 		return _tabWidth;
 	else if (c == '\n')
 		return 0;
 	else if (_fixedSpacing < 0)
-		return _charWidths[c] + _charSpacings[c]._vals.leftSpacing + _charSpacings[c]._vals.rightSpacing;
+		w = _charWidths[c] + _charSpacings[c]._vals.leftSpacing + _charSpacings[c]._vals.rightSpacing;
 	else if (_fixedWidth < 0)
-		return _charWidths[c] + _fixedSpacing;
+		w = _charWidths[c] + _fixedSpacing;
 	else
-		return _fixedWidth + _fixedSpacing;
+		w = _fixedWidth + _fixedSpacing;
+
+	return w + 1;
 }
 
 uint Font::stringWidth(const String &msg) const {
