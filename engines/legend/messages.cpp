@@ -20,6 +20,7 @@
  */
 
 #include "legend/messages.h"
+#include "legend/events.h"
 
 namespace Legend {
 
@@ -36,6 +37,19 @@ MouseMessage::MouseMessage(Common::EventType type,
 		_button = MB_LEFT;
 		break;
 	}
+}
+
+void TextMessage::display(const String &msg) {
+	g_events->send(TextMessage(msg));
+}
+
+void TextMessage::display(const char *fmt, ...) {
+	va_list va;
+	va_start(va, fmt);
+	String line = String::vformat(fmt, va);
+	va_end(va);
+
+	display(line);
 }
 
 } // namespace Legend

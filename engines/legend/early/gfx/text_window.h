@@ -40,6 +40,13 @@ private:
 	int _linesRemaining = 0;		// Lines remaining before "MORE"
 	bool _hasMore = false;
 
+private:
+	/**
+	 * Calculates the pixel width of a line, taking into account
+	 * any tab characters in it
+	 */
+	size_t getLineWidth(const String &line) const;
+
 protected:
 	/**
 	 * Returns true if window is showing the MORE
@@ -50,15 +57,15 @@ protected:
 	}
 
 	/**
-	 * Adds lines to the text window, taking care of wrapping on
-	 * word breaks if the line is too long
+	 * Adds text to the text window. The original version was a
+	 * vardiac method that allowed for string formatting.
 	 */
-	void addLines(const String &msg);
+	void add(const String &msg);
 
 	/**
 	 * Adds text to the display
 	 */
-	void add(const String &msg);
+	void addDirect(const String &msg);
 
 	/**
 	 * Moves to the next line
