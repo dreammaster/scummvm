@@ -19,8 +19,8 @@
  *
  */
 
-#include "legend/early/gfx/text_window.h"
 #include "common/savefile.h"
+#include "legend/early/gfx/text_window.h"
 
 namespace Legend {
 namespace Early {
@@ -45,7 +45,13 @@ void TextWindow::clear() {
 	_linesRemaining = numLines - 1;
 }
 
-void TextWindow::addLines(const String &msg) {
+void TextWindow::add(const String &msg) {
+	// Unlike the original, which took care of doing vardiac formatting
+	// here, in ScummVM string formatting will be done before calling this.
+	// As such, I don't think this method needs any implementation
+#if 1
+	addDirect(msg);
+#else
 	const char *lineP = msg.c_str();
 
 	for (int lineEnd = 0; lineP[lineEnd] || lineEnd > 0; ++lineEnd) {
@@ -61,7 +67,7 @@ void TextWindow::addLines(const String &msg) {
 			}
 
 			String line(lineP, lineP + lineEnd + 1);
-			add(line);
+			addDirect(line);
 
 			lineP += lineEnd + 1;
 			lineEnd = -1;
@@ -71,9 +77,10 @@ void TextWindow::addLines(const String &msg) {
 				break;
 		}
 	}
+#endif
 }
 
-void TextWindow::add(const String &msg) {
+void TextWindow::addDirect(const String &msg) {
 	if (_hasMore) {
 		// Waiting for user, so cache further adds
 		_pendingAdds.push_back(msg);
@@ -83,6 +90,13 @@ void TextWindow::add(const String &msg) {
 	// If logging is enabled, write out the text
 	if (_logFile)
 		_logFile->writeString(msg);
+
+	// Get the current line being added to
+	String &currentLine = _lines[_lineNum];
+	const int width = _innerBounds.width();
+	const int spaceWidth = _font->charWidth(' ');
+	int xPos = _font->_xCenter + getLineWidth(currentLine);
+	int widthRemaining;
 
 	// Form the text to add
 	String text;
@@ -102,14 +116,86 @@ void TextWindow::add(const String &msg) {
 			++endPos;
 
 		String word(text.c_str(), text.c_str() + endPos);
-		size_t wordWidth = _font->stringWidth(word);
+		int wordWidth = _font->stringWidth(word);
 
+		if (wordWidth > width) {
+			// Word is too big to fit in the entire line. Must be something like
+			// antidisestablishmentarism. Figure out how much of it we can fit
+			// into the current line, given whatever position the cursor is at
+			widthRemaining = width - xPos;
+			wordWidth = 0;
 
-	}
+			for (endPos = 0; text[endPos]; ++endPos) {
+				wordWidth += _font->charWidth(text[endPos]);
+				if (wordWidth > widthRemaining)
+					break;
+			}
 
-	for (const char *msgP = text.c_str(); *msgP;) {
-//		const char *endP = 
-//		for (endP = msgP; *endP != )
+			word = String(text.c_str(), text.c_str() + endPos);
+
+		} else {
+			// Word can fit on a line. Now see if it will fit on the current one
+			widthRemaining = width - xPos;
+
+			if (wordWidth > widthRemaining) {
+				// Yep. It won't fit on the line
+				newLine();
+				if (_hasMore) {
+					// This will cache remaining text until after user dismisses MORE
+					addDirect(text);
+					return;
+				}
+			}
+		}
+
+		// Update word, and strip it off the text
+		word = String(text.c_str(), text.c_str() + endPos);
+		currentLine += word;
+		text = String(text.c_str() + endPos);
+
+		// Update the total pixel width of the line wih the word added
+		xPos += _font->stringWidth(word);
+
+		switch (text.firstChar()) {
+		case '\t':
+			// Tab characters get included in the line, since draw handles
+			// them specially
+			text.deleteChar(0);
+			currentLine += '\t';
+			xPos = _font->_xCenter + getLineWidth(currentLine);
+			widthRemaining = width - xPos;
+			break;
+
+		case '\n':
+			text.deleteChar(0);
+			newLine();
+			if (_hasMore) {
+				// This will cache remaining text until after user dismisses MORE
+				addDirect(text);
+				return;
+			}
+			break;
+
+		case ' ':
+			text.deleteChar(0);
+			if (spaceWidth > widthRemaining) {
+				newLine();
+				if (_hasMore) {
+					// This will cache remaining text until after user dismisses MORE
+					addDirect(text);
+					return;
+				}
+
+			} else {
+				currentLine += ' ';
+				xPos += spaceWidth;
+				widthRemaining -= spaceWidth;
+			}
+			break;
+
+		default:
+			break;
+		}
 	}
 }
 
@@ -141,30 +227,69 @@ void TextWindow::flush() {
 		_pendingAdds.clear();
 
 		for (uint i = 0; i < adds.size(); ++i)
-			add(adds[i]);
+			addDirect(adds[i]);
 	}
+}
+
+size_t TextWindow::getLineWidth(const String &line) const {
+	String str = line;
+	int width = 0;
+	Legend::Gfx::Font *font = _font;
+	size_t pos;
+
+	// Handle any text up to tab characters
+	while ((pos = str.findFirstOf('\t')) != String::npos) {
+		width += font->stringWidth(String(str.c_str(), str.c_str() + pos));
+		width = ((width + font->_tabWidth - 1) / font->_tabWidth) * font->_tabWidth;
+		str = String(str.c_str() + pos + 1);
+	}
+
+	// Handle remaining text
+	width += font->stringWidth(str);
+	return width;
 }
 
 void TextWindow::draw() {
 	BoxedElement::draw();
+	Legend::Gfx::Font *font = _font;
+	size_t pos;
 
 	for (uint i = 0; i < _lines.size(); ++i) {
 		Common::Point pt(_innerBounds.left,
-			_innerBounds.top + _font->_lineHeight * i);
+			_innerBounds.top + font->_lineHeight * i);
+		pos = _lines[i].findFirstOf('\t');
 
 		if (i == (_lines.size() - 1) && _hasMore) {
 			writeString(pt, "- MORE -");
-		} else {
+		} else if (pos == String::npos) {
 			writeString(pt, _lines[i]);
+		} else {
+			// Line containing tab characters
+			String str = _lines[i];
+			_textPos = pt;
+			do {
+				String fragment(str.c_str(), str.c_str() + pos);
+				writeString(fragment);
+
+				// FIgure out increment for tab
+				int width = font->stringWidth(fragment);
+				_textPos.x += font->_tabWidth - ((width + font->_tabWidth) % font->_tabWidth);
+
+				pos = str.findFirstOf('\t');
+			} while (pos != String::npos);
+
+			// Handle anything after last tab
+			if (!str.empty())
+				writeString(str);
 		}
 	}
 }
 
 bool TextWindow::msgText(const TextMessage &msg) {
-	if (msg._wrapped)
-		addLines(msg._text);
-	else
+	if (msg._formatted)
 		add(msg._text);
+	else
+		addDirect(msg._text);
 
 	return true;
 }
@@ -184,6 +309,7 @@ bool TextWindow::msgKeypress(const KeypressMessage &msg) {
 bool TextWindow::msgMouseDown(const MouseDownMessage &msg) {
 	if (_hasMore) {
 		_hasMore = false;
+		_linesRemaining = (int)_lines.size() - 1;
 		needsRedraw();
 
 		flush();
