@@ -54,6 +54,10 @@ void GatewayEngine::runGame() {
 	g_events->replaceView("Interface");
 	_mouseCursor->show();
 
+	// Some dummy text
+	for (int i = 0; i < 10; ++i)
+		TextMessage::display("This is a test. This is only a test. ");
+
 	// Run the game
 	Engine::runGame();
 }

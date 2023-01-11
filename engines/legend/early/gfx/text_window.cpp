@@ -21,6 +21,7 @@
 
 #include "common/savefile.h"
 #include "legend/early/gfx/text_window.h"
+#include "legend/early/gfx/screen.h"
 
 namespace Legend {
 namespace Early {
@@ -34,6 +35,10 @@ TextWindow::~TextWindow() {
 
 void TextWindow::clear() {
 	assert(hasFont());
+
+	setFontColor(Gfx::BLACK, Gfx::WHITE);
+	_innerBounds = Common::Rect(_font->_xCenter, _font->_yCenter,
+		_bounds.width() - _font->_xCenter, _bounds.height() - _font->_yCenter);
 
 	// Reset the lines array
 	int numLines = _innerBounds.height() / _font->_lineHeight;
@@ -80,6 +85,16 @@ void TextWindow::add(const String &msg) {
 #endif
 }
 
+#define NEWLINE \
+	newLine(); \
+	if (_hasMore) { \
+		addDirect(text); \
+		return; \
+	} \
+	currentLine = _lines[_lineNum]; \
+	xPos = 0; \
+	widthRemaining = width
+
 void TextWindow::addDirect(const String &msg) {
 	if (_hasMore) {
 		// Waiting for user, so cache further adds
@@ -95,7 +110,7 @@ void TextWindow::addDirect(const String &msg) {
 	String &currentLine = _lines[_lineNum];
 	const int width = _innerBounds.width();
 	const int spaceWidth = _font->charWidth(' ');
-	int xPos = _font->_xCenter + getLineWidth(currentLine);
+	int xPos = getLineWidth(currentLine);
 	int widthRemaining;
 
 	// Form the text to add
@@ -139,12 +154,7 @@ void TextWindow::addDirect(const String &msg) {
 
 			if (wordWidth > widthRemaining) {
 				// Yep. It won't fit on the line
-				newLine();
-				if (_hasMore) {
-					// This will cache remaining text until after user dismisses MORE
-					addDirect(text);
-					return;
-				}
+				NEWLINE;
 			}
 		}
 
@@ -168,23 +178,13 @@ void TextWindow::addDirect(const String &msg) {
 
 		case '\n':
 			text.deleteChar(0);
-			newLine();
-			if (_hasMore) {
-				// This will cache remaining text until after user dismisses MORE
-				addDirect(text);
-				return;
-			}
+			NEWLINE;
 			break;
 
 		case ' ':
 			text.deleteChar(0);
 			if (spaceWidth > widthRemaining) {
-				newLine();
-				if (_hasMore) {
-					// This will cache remaining text until after user dismisses MORE
-					addDirect(text);
-					return;
-				}
+				NEWLINE;
 
 			} else {
 				currentLine += ' ';
@@ -197,7 +197,11 @@ void TextWindow::addDirect(const String &msg) {
 			break;
 		}
 	}
+
+	needsRedraw();
 }
+
+#undef NEWLINE
 
 void TextWindow::newLine() {
 	if (_lineNum < ((int)_lines.size() - 1)) {

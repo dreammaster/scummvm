@@ -26,6 +26,7 @@ namespace Early {
 namespace Gfx {
 
 void TextArea::draw() {
+	TextWindow::draw();
 }
 
 } // namespace Gfx
