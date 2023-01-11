@@ -39,6 +39,9 @@ class ViewElement : public UIElement {
 		Gfx::Font * operator->() const {
 			return Gfx::Font::loadFont(_fontNumber);
 		}
+		operator Gfx::Font *() const {
+			return Gfx::Font::loadFont(_fontNumber);
+		}
 	};
 private:
 	int _fontNumber = 1;
