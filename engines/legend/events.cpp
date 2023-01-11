@@ -191,9 +191,8 @@ void Bounds::setBorderSize(size_t borderSize) {
 void Bounds::setBorderSize(size_t xSize, size_t ySize) {
 	_borderXSize = xSize;
 	_borderYSize = ySize;
-	_innerBounds = Common::Rect(
-		_bounds.left + xSize, _bounds.top + ySize,
-		_bounds.right - xSize, _bounds.bottom - ySize
+	_innerBounds = Common::Rect(xSize, ySize,
+		_bounds.width() - xSize, _bounds.height() - ySize
 	);
 
 	_owner->metricsChanged();
