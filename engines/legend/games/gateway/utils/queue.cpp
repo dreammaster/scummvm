@@ -19,56 +19,39 @@
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_H
-#define LEGEND_GAMES_GATEWAY_H
-
-#include "legend/early/engine.h"
 #include "legend/games/gateway/utils/queue.h"
+#include "legend/messages.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
+namespace Utils {
 
-struct STRUC24 {
-	byte _dummy = 0;
-	void clear() {
-		_dummy = 0;
+void Queue::add(int param1, int param2) {
+	int index = indexOf(param1);
+
+	if (index != -1) {
+		_queue[index]._field2 = param2;
+
+	} else if (_queue.size() < QUEUE_SIZE) {
+		_queue.push_back(QueueEntry(param1, param2));
+
+	} else {
+		TextMessage::display("[ERROR: Queue overflow]\n");
 	}
-};
+}
 
-class GatewayEngine : public Early::Engine {
-protected:
-	/**
-	 * Initialize the game
-	 */
-	bool initialize() override;
+int Queue::indexOf(int param1) const {
+	for (uint i = 0; i < _queue.size(); ++i) {
+		if (_queue[i]._field0 == param1)
+			return i;
+	}
 
-	void showStartup();
+	return -1;
+}
 
-	/**
-	 * Start the gameplay
-	 */
-	void startGameplay();
 
-public:
-	int _val1 = 0;
-	int _val2 = 8;
-	byte _array1[8];
-	byte _random04[5];
-
-	Utils::Queue _queue;
-	STRUC24 _struc24;
-
-public:
-	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		Early::Engine(syst, gameDesc) {}
-	~GatewayEngine() override {}
-
-	void runGame() override;
-};
-
+} // namespace Utils
 } // namespace Gateway
 } // namespace Early
 } // namespace Legend
-
-#endif
