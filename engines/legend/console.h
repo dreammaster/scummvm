@@ -29,7 +29,7 @@ namespace Legend {
 
 class Console : public GUI::Debugger {
 private:
-	bool Cmd_test(int argc, const char **argv);
+	bool cmdString(int argc, const char **argv);
 public:
 	Console();
 	~Console() override;
