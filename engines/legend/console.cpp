@@ -20,17 +20,32 @@
  */
 
 #include "legend/console.h"
+#include "legend/utils/string.h"
 
 namespace Legend {
 
 Console::Console() : GUI::Debugger() {
-	registerCmd("test",   WRAP_METHOD(Console, Cmd_test));
+	registerCmd("string",   WRAP_METHOD(Console, cmdString));
 }
 
 Console::~Console() {
 }
 
-bool Console::Cmd_test(int argc, const char **argv) {
+bool Console::cmdString(int argc, const char **argv) {
+	if (argc == 2) {
+		uint val = strtol(argv[1], nullptr, 16);
+		if (val <= 0xffff)
+			val += 0xf0000000;
+
+		String msg(val);
+		debugPrintf("%s\n", msg.c_str());
+
+	} else {
+		debugPrintf("string <hexadecimal>\n");
+	}
+
+	return true;
+
 	debugPrintf("Test\n");
 	return true;
 }
