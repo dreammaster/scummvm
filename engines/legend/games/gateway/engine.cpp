@@ -62,6 +62,28 @@ void GatewayEngine::runGame() {
 	Engine::runGame();
 }
 
+void GatewayEngine::showStartup() {
+
+}
+
+void GatewayEngine::startGameplay() {
+	_struc24.clear();
+	Common::fill(&_array1[0], &_array1[8], 0);
+	for (int i = 0; i < 5; ++i)
+		_random04[i] = getRandomNumber(4);
+
+	_val1 = 720;
+	_val2 = 8;
+
+	_queue.add(33, 179);
+	_queue.add(23, 1200 - _val1);
+	_queue.add(24, 1320 - _val1);
+	_queue.add(37, 1440 - _val1);
+	_queue.add(42, 1500 - _val1);
+
+
+}
+
 } // namespace Gateway
 } // namespace Early
 } // namespace Legend
