@@ -19,54 +19,38 @@
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_H
-#define LEGEND_GAMES_GATEWAY_H
+#ifndef LEGEND_GAMES_GATEWAY_UTILS_QUEUE_H
+#define LEGEND_GAMES_GATEWAY_UTILS_QUEUE_H
 
-#include "legend/early/engine.h"
-#include "legend/games/gateway/utils/queue.h"
+#include "common/array.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
+namespace Utils {
 
-struct STRUC24 {
-	byte _dummy = 0;
-	void clear() {
-		_dummy = 0;
-	}
-};
+#define QUEUE_SIZE 16
 
-class GatewayEngine : public Early::Engine {
-protected:
-	/**
-	 * Initialize the game
-	 */
-	bool initialize() override;
-
-	void showStartup();
+class Queue {
+	struct QueueEntry {
+		int _field0 = 0;
+		int _field2 = 0;
+		QueueEntry() : _field0(0), _field2(0) {}
+		QueueEntry(int field0, int field2) :
+			_field0(field0), _field2(field2) {}
+	};
+private:
+	Common::Array<QueueEntry> _queue;
 
 	/**
-	 * Start the gameplay
+	 * Returns the index of an entry with the given Id
 	 */
-	void startGameplay();
-
+	int indexOf(int param1) const;
 public:
-	int _val1 = 0;
-	int _val2 = 8;
-	byte _array1[8];
-	byte _random04[5];
-
-	Utils::Queue _queue;
-	STRUC24 _struc24;
-
-public:
-	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		Early::Engine(syst, gameDesc) {}
-	~GatewayEngine() override {}
-
-	void runGame() override;
+	void add(int param1, int param2);
 };
 
+} // namespace Utils
 } // namespace Gateway
 } // namespace Early
 } // namespace Legend

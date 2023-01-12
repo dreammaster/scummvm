@@ -29,6 +29,7 @@ MODULE_OBJS = \
 	early/views/help_screen.o \
 	early/views/interface.o \
 	games/gateway/engine.o \
+	games/gateway/utils/queue.o \
 	games/gateway/views/commset.o \
 	games/gateway/views/part_title.o \
 	legend.o \
