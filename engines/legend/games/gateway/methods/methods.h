@@ -30,6 +30,12 @@ namespace Gateway {
 
 #define METHODS_COUNT 734
 
+enum MethodsEnum {
+	MTHD_START = 25
+};
+
+namespace Methods {
+
 struct MethodBase {
 	int _sectionNum = 0;
 
@@ -57,14 +63,16 @@ typedef MethodSection68 MethodSection8;
  * Placeholder for not yet implemented methods
  */
 struct MethodNull : public MethodSection1 {
-	int call(int param) const override { return 0; }
+	int call(int param) const override {
+		return 0;
+	}
 };
 
 #define METHOD(INDEX, SECTION, NAME) \
-	struct Method##NAME : public MethodSection##SECTION { \
+	struct Method##INDEX##_##NAME : public MethodSection##SECTION { \
 		int call(int param) const override; \
 	}; \
-	Method##NAME _method##INDEX
+	Method##INDEX##_##NAME _method##INDEX
 
 class Methods {
 private:
@@ -814,9 +822,10 @@ private:
 public:
 	Methods();
 
-	int call(uint index, int param);
+	int call(MethodsEnum index, int param);
 };
 
+} // namespace Methods
 } // namespace Gateway
 } // namespace Early
 } // namespace Legend

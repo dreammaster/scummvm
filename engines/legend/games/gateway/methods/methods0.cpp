@@ -19,58 +19,18 @@
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_H
-#define LEGEND_GAMES_GATEWAY_H
-
-#include "legend/early/engine.h"
 #include "legend/games/gateway/methods/methods.h"
-#include "legend/games/gateway/utils/queue.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
+namespace Methods {
 
-struct STRUC24 {
-	byte _dummy = 0;
-	void clear() {
-		_dummy = 0;
-	}
-};
+int Methods::Method025_Start::call(int param) const {
+	return 0;
+}
 
-class GatewayEngine : public Early::Engine {
-protected:
-	/**
-	 * Initialize the game
-	 */
-	bool initialize() override;
-
-	void showStartup();
-
-	/**
-	 * Start the gameplay
-	 */
-	void startGameplay();
-
-public:
-	int _val1 = 0;
-	int _val2 = 8;
-	byte _array1[8];
-	byte _random04[5];
-
-	Methods::Methods _methods;
-	Utils::Queue _queue;
-	STRUC24 _struc24;
-
-public:
-	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		Early::Engine(syst, gameDesc) {}
-	~GatewayEngine() override {}
-
-	void runGame() override;
-};
-
+} // namespace Methods
 } // namespace Gateway
 } // namespace Early
 } // namespace Legend
-
-#endif

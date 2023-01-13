@@ -21,6 +21,7 @@
 
 #include "engines/util.h"
 #include "legend/games/gateway/engine.h"
+#include "legend/games/gateway/methods/methods.h"
 #include "legend/games/gateway/views/views.h"
 #include "legend/early/gfx/screen.h"
 #include "legend/utils/engine_data.h"
@@ -81,7 +82,7 @@ void GatewayEngine::startGameplay() {
 	_queue.add(37, 1440 - _val1);
 	_queue.add(42, 1500 - _val1);
 
-
+	_methods.call(MTHD_START, 0);
 }
 
 } // namespace Gateway
