@@ -28,7 +28,7 @@ namespace Legend {
 
 void TextIndexEntry::load(Common::SeekableReadStream &f) {
 	_count = f.readUint16LE();
-	_size = f.readUint32LE();
+	_size = g_engine->isLater() ? f.readUint32LE() : f.readUint16LE();
 }
 
 /*-------------------------------------------------------------------*/
@@ -93,8 +93,15 @@ void Resources::loadText() {
 String Resources::getMessage(uint id) {
 	assert((id >> 16) >= 0xF000 && (id >> 16) <= 0xF100);
 	id &= 0xFFFFFFF;
-	int sectionNum = id >> 16;
-	int subNum = id & 0xffff;
+
+	int sectionNum, subNum;
+	if (g_engine->isLater()) {
+		sectionNum = id >> 16;
+		subNum = id & 0xffff;
+	} else {
+		sectionNum = id >> 10;
+		subNum = id & 7;
+	}
 
 	// Check for the presence of the Id in the cache
 	for (uint idx = 0; idx < _textCache.size(); ++idx) {
@@ -131,7 +138,7 @@ String Resources::getMessage(uint id) {
 
 	// Figure out the offset of the data for the message
 	size_t offset = indexEntry._dataOffset;
-	for (int idx = 0; idx < subNum; ++subNum)
+	for (int idx = 0; idx < subNum; ++idx)
 		offset += _currentTextIndexVals[idx];
 
 	// Prepare a new cache entry, re-using the oldest if there are now
