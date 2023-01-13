@@ -19,11 +19,12 @@
  *
  */
 
-#include "legend/games/gateway/methods.h"
+#include "legend/games/gateway/methods/methods.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
+namespace Methods {
 
 #define INIT10(PREFIX) \
 	&_method##PREFIX##0, &_method##PREFIX##1, &_method##PREFIX##2, &_method##PREFIX##3, &_method##PREFIX##4, &_method##PREFIX##5, \
@@ -49,11 +50,7 @@ Methods::Methods() : _METHODS{
 } {
 }
 
-int Methods::MethodStart::call(int param) const {
-	return 0;
-}
-
-int Methods::call(uint index, int param) {
+int Methods::call(MethodsEnum index, int param) {
 	if (index == 0 || index > METHODS_COUNT)
 		// No method specified
 		return 0;
@@ -62,6 +59,7 @@ int Methods::call(uint index, int param) {
 	return _METHODS[index]->call(param);
 }
 
+} // namespace Methods
 } // namespace Gateway
 } // namespace Early
 } // namespace Legend
