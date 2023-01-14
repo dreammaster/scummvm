@@ -31,8 +31,8 @@ MODULE_OBJS = \
 	early/views/interface.o \
 	games/gateway/engine.o \
 	games/gateway/core/persisted.o \
-	games/gateway/methods/methods.o \
-	games/gateway/methods/methods0.o \
+	games/gateway/logic/logic.o \
+	games/gateway/logic/rooms/room238.o \
 	games/gateway/utils/queue.o \
 	games/gateway/views/commset.o \
 	games/gateway/views/part_title.o \
