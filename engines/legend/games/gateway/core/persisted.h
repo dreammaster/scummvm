@@ -19,55 +19,19 @@
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_H
-#define LEGEND_GAMES_GATEWAY_H
+#ifndef LEGEND_GAMES_GATEWAY_CORE_PERSISTED_H
+#define LEGEND_GAMES_GATEWAY_CORE_PERSISTED_H
 
-#include "legend/early/engine.h"
-#include "legend/games/gateway/core/persisted.h"
-#include "legend/games/gateway/methods/methods.h"
-#include "legend/games/gateway/utils/queue.h"
+#include "legend/early/core/persisted.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
 
-struct STRUC24 {
-	byte _dummy = 0;
-	void clear() {
-		_dummy = 0;
-	}
-};
-
-class GatewayEngine : public Early::Engine, public Gateway::Persisted {
-protected:
-	/**
-	 * Initialize the game
-	 */
-	bool initialize() override;
-
-	void showStartup();
-
-	/**
-	 * Start the gameplay
-	 */
-	void startGameplay();
-
-public:
-	int _val1 = 0;
-	int _val2 = 8;
-	byte _array1[8];
-	byte _random04[5];
-
-	Methods::Methods _methods;
-	Utils::Queue _queue;
-	STRUC24 _struc24;
-
-public:
-	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		Early::Engine(syst, gameDesc) {}
-	~GatewayEngine() override {}
-
-	void runGame() override;
+/**
+ * Container for all the fields that are persisted to save files
+ */
+struct Persisted : public Legend::Early::Persisted {
 };
 
 } // namespace Gateway
