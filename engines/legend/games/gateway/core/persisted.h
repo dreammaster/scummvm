@@ -56,6 +56,7 @@ struct STRUC20 {
 	struct Entry {
 		byte _v1;
 		uint16 _v2;
+		void synchronize(Common::Serializer &s);
 	};
 	Entry _v1;
 	Entry _v2;
@@ -65,6 +66,8 @@ struct STRUC20 {
 	Entry _v6;
 	Entry _v7;
 	Entry _v8;
+
+	void synchronize(Common::Serializer &);
 };
 
 struct STRUC10 {
@@ -84,6 +87,8 @@ struct STRUC10 {
 	byte _fieldd = 1;
 	byte _fielde = 0;
 	byte _fieldf = 0;
+
+	void synchronize(Common::Serializer &);
 };
 
 struct STRUC16 {
@@ -98,6 +103,8 @@ struct STRUC16 {
 	uint16 _field10 = 0;
 	uint16 _field12 = 0;
 	uint16 _field14 = 0;
+
+	void synchronize(Common::Serializer &s);
 };
 
 /**
@@ -374,6 +381,8 @@ struct Persisted : public Legend::Early::Persisted {
 	uint8 _val255[17] = { 0 };
 	uint8 _val256[17] = { 0 };
 	uint16 _val257 = 0;
+
+	void synchronize(Common::Serializer &s) override;
 };
 
 } // namespace Gateway
