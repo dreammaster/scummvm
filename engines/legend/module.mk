@@ -15,6 +15,7 @@ MODULE_OBJS = \
 	utils/resources.o \
 	utils/string.o \
 	early/engine.o \
+	early/core/persisted.o \
 	early/gfx/boxed_element.o \
 	early/gfx/button.o \
 	early/gfx/command_buttons.o \
@@ -29,6 +30,7 @@ MODULE_OBJS = \
 	early/views/help_screen.o \
 	early/views/interface.o \
 	games/gateway/engine.o \
+	games/gateway/core/persisted.o \
 	games/gateway/methods/methods.o \
 	games/gateway/methods/methods0.o \
 	games/gateway/utils/queue.o \
