@@ -19,46 +19,19 @@
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_H
-#define LEGEND_GAMES_GATEWAY_H
-
-#include "legend/early/engine.h"
-#include "legend/games/gateway/core/persisted.h"
-#include "legend/games/gateway/logic/logic.h"
-#include "legend/games/gateway/utils/queue.h"
+#include "legend/games/gateway/logic/rooms/room238.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
+namespace Logic {
 
-class GatewayEngine : public Early::Engine, public Gateway::Persisted {
-protected:
-	/**
-	 * Initialize the game
-	 */
-	bool initialize() override;
+int Room238::call(int param) const {
+	// TODO
+	return 0;
+}
 
-	void showStartup();
-
-	/**
-	 * Start the gameplay
-	 */
-	void startGameplay();
-
-public:
-	Logic::Logic _logic;
-	Utils::Queue _queue;
-
-public:
-	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		Early::Engine(syst, gameDesc) {}
-	~GatewayEngine() override {}
-
-	void runGame() override;
-};
-
+} // namespace Methods
 } // namespace Gateway
 } // namespace Early
 } // namespace Legend
-
-#endif
