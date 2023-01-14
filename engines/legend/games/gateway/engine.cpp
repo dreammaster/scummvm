@@ -73,14 +73,14 @@ void GatewayEngine::startGameplay() {
 	for (int i = 0; i < 5; ++i)
 		_random04[i] = getRandomNumber(4);
 
-	_val1 = 720;
-	_val2 = 8;
+	_val4 = 720;
+	_val1 = 8;
 
 	_queue.add(33, 179);
-	_queue.add(23, 1200 - _val1);
-	_queue.add(24, 1320 - _val1);
-	_queue.add(37, 1440 - _val1);
-	_queue.add(42, 1500 - _val1);
+	_queue.add(23, 1200 - _val4);
+	_queue.add(24, 1320 - _val4);
+	_queue.add(37, 1440 - _val4);
+	_queue.add(42, 1500 - _val4);
 
 	_methods.call(MTHD_START, 0);
 }

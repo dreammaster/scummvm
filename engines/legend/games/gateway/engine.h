@@ -31,13 +31,6 @@ namespace Legend {
 namespace Early {
 namespace Gateway {
 
-struct STRUC24 {
-	byte _dummy = 0;
-	void clear() {
-		_dummy = 0;
-	}
-};
-
 class GatewayEngine : public Early::Engine, public Gateway::Persisted {
 protected:
 	/**
@@ -53,14 +46,8 @@ protected:
 	void startGameplay();
 
 public:
-	int _val1 = 0;
-	int _val2 = 8;
-	byte _array1[8];
-	byte _random04[5];
-
 	Methods::Methods _methods;
 	Utils::Queue _queue;
-	STRUC24 _struc24;
 
 public:
 	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
