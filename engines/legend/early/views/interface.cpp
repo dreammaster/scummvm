@@ -37,6 +37,15 @@ Interface::Interface() : View("Interface"),
 	_commands.setDividerIndex(16);
 }
 
+bool Interface::msgGame(const GameMessage &msg) {
+	if (msg._name == "INPUT") {
+		_parser.parse(msg._stringValue);
+		return true;
+	}
+
+	return false;
+}
+
 } // namespace Views
 } // namespace Early
 } // namespace Legend

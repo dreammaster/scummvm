@@ -114,6 +114,9 @@ struct TextMessage : public Message {
 	TextMessage() : Message() {}
 	TextMessage(const String &text, bool wrapped = true) :
 		Message(), _text(text), _formatted(wrapped) {}
+	TextMessage(const Common::U32String &text, bool wrapped = true) :
+		Message(), _text(text), _formatted(wrapped) {
+	}
 
 	static void display(const String &msg);
 	static void display(const char *fmt, ...);

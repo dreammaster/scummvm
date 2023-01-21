@@ -20,12 +20,31 @@
  *
  */
 
+#include "common/translation.h"
 #include "legend/early/parser/parser.h"
+#include "legend/events.h"
 
 namespace Legend {
 namespace Early {
 namespace Parser {
 
+void Parser::parse(const Common::String &srcLine) {
+	// Trim and lowercase the source line
+	Common::String line = srcLine;
+	if (!line.empty() && Common::isSpace(line.firstChar()))
+		line.deleteChar(0);
+	if (!line.empty() && Common::isSpace(line.lastChar()))
+		line.deleteLastChar();
+
+	// If the line is empty, abort parsing
+	if (line.empty()) {
+		g_events->send(TextMessage(_("[I beg your pardon?]\n")));
+		return;
+	}
+
+	// TODO
+}
+
 } // namespace Parser
 } // namespace Early
-} // namespaceCo Legend
+} // namespace Legend
