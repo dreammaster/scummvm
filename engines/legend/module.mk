@@ -25,8 +25,9 @@ MODULE_OBJS = \
 	early/gfx/text_area.o \
 	early/gfx/text_window.o \
 	early/gfx/view.o \
+	early/parser/parser.o \
+	early/parser/vocab.o \
 	early/utils/huffman.o \
-	early/utils/vocab.o \
 	early/views/help_screen.o \
 	early/views/interface.o \
 	games/gateway/engine.o \
