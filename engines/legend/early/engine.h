@@ -23,14 +23,14 @@
 #define LEGEND_EARLY_ENGINE_H
 
 #include "legend/legend.h"
-#include "legend/early/utils/vocab.h"
+#include "legend/early/parser/vocab.h"
 
 namespace Legend {
 namespace Early {
 
 class Engine : public LegendEngine {
 public:
-	Vocab *_vocab = nullptr;
+	Parser::Vocab *_vocab = nullptr;
 public:
 	Engine(OSystem *syst, const LegendGameDescription *gameDesc);
 	~Engine() override;

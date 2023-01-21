@@ -43,7 +43,7 @@ bool Engine::initialize() {
 
 	Legend::Gfx::Font::init();
 	_screen = new Early::Gfx::Screen();
-	_vocab = new Vocab();
+	_vocab = new Parser::Vocab();
 
 	return true;
 }
