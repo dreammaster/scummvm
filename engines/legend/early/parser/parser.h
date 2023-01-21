@@ -30,6 +30,14 @@ namespace Legend {
 namespace Early {
 namespace Parser {
 
+class Parser {
+public:
+	/**
+	 * Parses a passed input line
+	 */
+	void parse(const Common::String &srcLine);
+};
+
 } // namespace Parser
 } // namespace Early
 } // namespace Legend

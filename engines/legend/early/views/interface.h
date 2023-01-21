@@ -28,6 +28,7 @@
 #include "legend/early/gfx/scene.h"
 #include "legend/early/gfx/listbox.h"
 #include "legend/early/gfx/text_area.h"
+#include "legend/early/parser/parser.h"
 
 namespace Legend {
 namespace Early {
@@ -41,9 +42,15 @@ private:
 	Gfx::Listbox _commands;
 	Gfx::Listbox _items;
 	Gfx::TextArea _textArea;
+	Parser::Parser _parser;
 public:
 	Interface();
 	~Interface() override {}
+
+	/**
+	 * Handles game control messages
+	 */
+	bool msgGame(const GameMessage &msg) override;
 };
 
 } // namespace Views
