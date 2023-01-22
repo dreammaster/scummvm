@@ -59,6 +59,8 @@ void GatewayEngine::runGame() {
 	for (int i = 0; i < 10; ++i)
 		TextMessage::display("This is a test. This is only a test. ");
 
+	send("Input", GameMessage("GET_LINE"));
+
 	// Run the game
 	Engine::runGame();
 }

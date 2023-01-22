@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef LEGEND_EARLY_GFX_TEXT_AREA_H
-#define LEGEND_EARLY_GFX_TEXT_AREA_H
+#ifndef LEGEND_EARLY_GFX_INPUT_WINDOW_H
+#define LEGEND_EARLY_GFX_INPUT_WINDOW_H
 
 #include "legend/early/gfx/text_window.h"
 
@@ -28,20 +28,48 @@ namespace Legend {
 namespace Early {
 namespace Gfx {
 
-class TextArea : public TextWindow {
-public:
-	TextArea(UIElement *parent, const Common::Rect &r) : TextWindow(parent, r) {}
-	TextArea(UIElement *parent, const String &name, const Common::Rect &r) :
-		TextWindow(parent, name, r) {}
-	~TextArea() override {}
+class InputWindow : public TextWindow {
+	enum LineMode { LMODE_NONE, LMODE_PENDING, LMODE_DISPLAYED };
+private:
+	String _line;
+	LineMode _mode = LMODE_NONE;
 
 	/**
-	 * Adds text to the display
+	 * Turn on input line for input
 	 */
-	void add(const String &text);
+	void addInputLine();
 
 	/**
-	 * Draws the visual item on the screen
+	 * A line has been entered
+	 */
+	void lineDone();
+
+protected:
+	void setHasMore(bool state) override;
+
+public:
+	InputWindow(UIElement *parent, const Common::Rect &r) : TextWindow(parent, r) {}
+	InputWindow(UIElement *parent, const String &name, const Common::Rect &r) :
+		TextWindow(parent, name, r) {}
+	~InputWindow() override {}
+
+	/**
+	 * Handles game messages
+	 */
+	bool msgGame(const GameMessage &msg) override;
+
+	/**
+	 * Keypress handler
+	 */
+	bool msgKeypress(const KeypressMessage &msg) override;
+
+	/**
+	 * Mouse press
+	 */
+	bool msgMouseDown(const MouseDownMessage &msg) override;
+
+	/**
+	 * Draw the window
 	 */
 	void draw() override;
 };

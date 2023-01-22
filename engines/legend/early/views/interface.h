@@ -25,9 +25,9 @@
 #include "legend/gfx/view.h"
 #include "legend/gfx/compass.h"
 #include "legend/early/gfx/command_buttons.h"
-#include "legend/early/gfx/scene.h"
+#include "legend/early/gfx/input_window.h"
 #include "legend/early/gfx/listbox.h"
-#include "legend/early/gfx/text_area.h"
+#include "legend/early/gfx/scene.h"
 #include "legend/early/parser/parser.h"
 
 namespace Legend {
@@ -41,7 +41,7 @@ private:
 	Gfx::Scene _scene;
 	Gfx::Listbox _commands;
 	Gfx::Listbox _items;
-	Gfx::TextArea _textArea;
+	Gfx::InputWindow _inputWindow;
 	Parser::Parser _parser;
 public:
 	Interface();

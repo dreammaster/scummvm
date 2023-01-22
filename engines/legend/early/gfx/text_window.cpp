@@ -50,6 +50,23 @@ void TextWindow::clear() {
 	_linesRemaining = numLines - 1;
 }
 
+void TextWindow::setHasMore(bool state) {
+	_hasMore = state;
+
+	if (_hasMore) {
+		// Until the Has More is dismissed, the text window will
+		// have complete focus to get key or mouse events
+		g_events->addView(this);
+	} else {
+		g_events->popView();
+
+		_linesRemaining = (int)_lines.size() - 1;
+		needsRedraw();
+
+		flush();
+	}
+}
+
 void TextWindow::add(const String &msg) {
 	// Unlike the original, which took care of doing vardiac formatting
 	// here, in ScummVM string formatting will be done before calling this.
@@ -108,7 +125,7 @@ void TextWindow::addDirect(const String &msg) {
 	// Get the current line being added to
 	const int width = _innerBounds.width();
 	const int spaceWidth = _font->charWidth(' ');
-	int xPos = getLineWidth(_lines[_lineNum]);
+	uint xPos = getLineWidth(_lines[_lineNum]);
 	int widthRemaining;
 
 	// Form the text to add
@@ -215,11 +232,7 @@ void TextWindow::newLine() {
 
 	if (--_linesRemaining <= 0) {
 		// Flag for displaying has more indicator
-		_hasMore = true;
-
-		// Until the Has More is dismissed, the text window will
-		// have complete focus to get key or mouse events
-		g_events->addView(this);
+		setHasMore(true);
 	}
 
 	needsRedraw();
@@ -259,8 +272,7 @@ void TextWindow::draw() {
 	size_t pos;
 
 	for (uint i = 0; i < _lines.size(); ++i) {
-		Common::Point pt(_innerBounds.left,
-			_innerBounds.top + font->_lineHeight * i);
+		Common::Point pt = getLinePos(i);
 		pos = _lines[i].findFirstOf('\t');
 
 		if (i == (_lines.size() - 1) && _hasMore) {
@@ -289,6 +301,14 @@ void TextWindow::draw() {
 	}
 }
 
+Common::Point TextWindow::getLinePos(int lineNum) const {
+	if (lineNum == -1)
+		lineNum = _lineNum;
+
+	return Common::Point(_innerBounds.left,
+		_innerBounds.top + _font->_lineHeight * lineNum);
+}
+
 bool TextWindow::msgText(const TextMessage &msg) {
 	if (msg._formatted)
 		add(msg._text);
@@ -300,10 +320,7 @@ bool TextWindow::msgText(const TextMessage &msg) {
 
 bool TextWindow::msgKeypress(const KeypressMessage &msg) {
 	if (_hasMore) {
-		_hasMore = false;
-		needsRedraw();
-
-		flush();
+		setHasMore(false);
 		return true;
 	}
 
@@ -312,11 +329,7 @@ bool TextWindow::msgKeypress(const KeypressMessage &msg) {
 
 bool TextWindow::msgMouseDown(const MouseDownMessage &msg) {
 	if (_hasMore) {
-		_hasMore = false;
-		_linesRemaining = (int)_lines.size() - 1;
-		needsRedraw();
-
-		flush();
+		setHasMore(false);
 		return true;
 	}
 
