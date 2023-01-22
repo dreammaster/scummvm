@@ -51,6 +51,11 @@ public:
 	 * Handles game control messages
 	 */
 	bool msgGame(const GameMessage &msg) override;
+
+	/**
+	 * Handle mouse presses
+	 */
+	bool msgMouseDown(const MouseDownMessage &msg) override;
 };
 
 } // namespace Views

@@ -38,12 +38,21 @@ Interface::Interface() : View("Interface"),
 }
 
 bool Interface::msgGame(const GameMessage &msg) {
-	if (msg._name == "INPUT") {
+	if (msg._name == "LINE") {
 		_parser.parse(msg._stringValue);
 		return true;
 	}
 
 	return false;
+}
+
+bool Interface::msgMouseDown(const MouseDownMessage &msg) {
+	// When the mouse isn't visible, all clicks go to the input window
+	if (!g_engine->_mouseCursor->isVisible())
+		return _inputWindow.msgMouseDown(msg);
+
+	// Otherwise, handle the click normally
+	return Legend::Gfx::View::msgMouseDown(msg);
 }
 
 } // namespace Views

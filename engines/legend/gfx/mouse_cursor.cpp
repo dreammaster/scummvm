@@ -103,5 +103,9 @@ void MouseCursor::hide() {
 	CursorMan.showMouse(false);
 }
 
+bool MouseCursor::isVisible() const {
+	return CursorMan.isVisible();
+}
+
 } // namespace Gfx
 } // namespace Legend

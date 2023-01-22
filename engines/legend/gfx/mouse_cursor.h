@@ -102,6 +102,11 @@ public:
 	 * Hide the mouse cursor
 	 */
 	void hide();
+
+	/**
+	 * Return true if the mouse cursor is visible
+	 */
+	bool isVisible() const;
 };
 
 } // namespace Gfx
