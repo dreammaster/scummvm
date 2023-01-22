@@ -110,7 +110,7 @@ struct STRUC16 {
 /**
  * Container for all the fields that are persisted to save files
  */
-struct Persisted : public Legend::Early::Persisted {
+struct Persisted : public virtual Legend::Early::Persisted {
 	uint16 _val1 = 0;
 	uint8 _val2 = 1;
 	uint16 _val3 = 0;

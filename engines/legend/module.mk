@@ -33,7 +33,7 @@ MODULE_OBJS = \
 	early/views/interface.o \
 	games/gateway/engine.o \
 	games/gateway/core/persisted.o \
-	games/gateway/logic/logic.o \
+	games/gateway/logic/logics.o \
 	games/gateway/logic/rooms/room238.o \
 	games/gateway/utils/queue.o \
 	games/gateway/views/commset.o \

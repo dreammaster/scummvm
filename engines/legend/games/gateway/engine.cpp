@@ -21,7 +21,7 @@
 
 #include "engines/util.h"
 #include "legend/games/gateway/engine.h"
-#include "legend/games/gateway/logic/logic.h"
+#include "legend/games/gateway/logic/logics.h"
 #include "legend/games/gateway/views/views.h"
 #include "legend/early/gfx/screen.h"
 #include "legend/utils/engine_data.h"
@@ -45,6 +45,8 @@ bool GatewayEngine::initialize() {
 	}
 
 	(void)Engine::initialize();
+
+	_logics = new Logic::Logics();
 
 	return true;
 }
@@ -84,7 +86,7 @@ void GatewayEngine::startGameplay() {
 	_queue.add(37, 1440 - _val4);
 	_queue.add(42, 1500 - _val4);
 
-	_logic.call(LOGIC_START, 0);
+	(*_logics)[LOGIC_START]->call(0);
 }
 
 } // namespace Gateway

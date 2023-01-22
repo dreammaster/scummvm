@@ -23,20 +23,31 @@
 #define LEGEND_EARLY_ENGINE_H
 
 #include "legend/legend.h"
+#include "legend/early/core/persisted.h"
+#include "legend/early/logic/logics.h"
+#include "legend/early/logic/room.h"
 #include "legend/early/parser/vocab.h"
 
 namespace Legend {
 namespace Early {
 
-class Engine : public LegendEngine {
+class Engine : public LegendEngine, virtual public Early::Persisted {
 public:
+	Logics *_logics = nullptr;
 	Parser::Vocab *_vocab = nullptr;
+	const Room *_currentRoom = nullptr;
+
 public:
 	Engine(OSystem *syst, const LegendGameDescription *gameDesc);
 	~Engine() override;
 
 	bool initialize() override;
 	void deinitialize() override;
+
+	/**
+	 * Sets the current room
+	 */
+	void setRoom(int roomNum);
 };
 
 extern Engine *g_engine;

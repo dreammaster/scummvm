@@ -26,7 +26,7 @@ namespace Legend {
 namespace Early {
 
 void Persisted::synchronize(Common::Serializer &s) {
-	s.syncAsUint16LE(_roomMethodNum);
+	s.syncAsUint16LE(_roomLogicNum);
 }
 
 } // namespace Early
