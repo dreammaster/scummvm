@@ -24,7 +24,7 @@
 #define LEGEND_EARLY_PARSER_VOCAB_H
 
 #include "common/array.h"
-#include "common/str.h"
+#include "legend/utils/string.h"
 
 namespace Legend {
 namespace Early {
@@ -49,6 +49,11 @@ public:
 class Vocab : public Common::Array<VocabEntry> {
 public:
 	Vocab();
+
+	/**
+	 * Get the index of a vocab entry
+	 */
+	int indexOf(const String &word) const;
 };
 
 } // namespace Parser
