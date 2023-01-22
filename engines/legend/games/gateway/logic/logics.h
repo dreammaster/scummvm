@@ -19,18 +19,18 @@
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_logicS_H
-#define LEGEND_GAMES_GATEWAY_logicS_H
+#ifndef LEGEND_GAMES_GATEWAY_lOGICS_H
+#define LEGEND_GAMES_GATEWAY_lOGICS_H
 
 #include "common/scummsys.h"
-#include "legend/early/logic/logic_base.h"
+#include "legend/early/logic/logics.h"
 #include "legend/games/gateway/logic/rooms/rooms.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
 
-#define METHODS_COUNT 734
+#define LOGICS_COUNT 734
 
 enum LogicEnum {
 	LOGIC_START = 25,
@@ -39,9 +39,9 @@ enum LogicEnum {
 
 namespace Logic {
 
-class Logic {
+class Logics : public Early::Logics {
 private:
-	const LogicBase *const _logics[METHODS_COUNT];
+	const LogicBase *const _logics[LOGICS_COUNT];
 	LogicNull _logic001;
 	LogicNull _logic002;
 	LogicNull _logic003;
@@ -785,9 +785,9 @@ private:
 	LogicNull _logic734;
 
 public:
-	Logic();
+	Logics();
 
-	int call(LogicEnum index, int param);
+	const LogicBase *operator[](int index) override;
 };
 
 } // namespace Logic

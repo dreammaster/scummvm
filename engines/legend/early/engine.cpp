@@ -35,6 +35,7 @@ Engine::Engine(OSystem *syst, const LegendGameDescription *gameDesc) :
 
 
 Engine::~Engine() {
+	delete _logics;
 	delete _vocab;
 }
 
@@ -50,6 +51,11 @@ bool Engine::initialize() {
 
 void Engine::deinitialize() {
 	Legend::Gfx::Font::deinit();
+}
+
+void Engine::setRoom(int roomNum) {
+	_roomLogicNum = roomNum;
+	_currentRoom = dynamic_cast<const Room *>((*_logics)[roomNum]);
 }
 
 } // namespace Early

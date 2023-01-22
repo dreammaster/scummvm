@@ -31,7 +31,7 @@ namespace Early {
  * Container for all the fields that are persisted to save files
  */
 struct Persisted {
-	int16 _roomMethodNum;
+	int16 _roomLogicNum;
 
 	/**
 	 * Synchronize the persisted fields

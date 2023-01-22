@@ -19,7 +19,8 @@
  *
  */
 
-#include "legend/games/gateway/logic/logic.h"
+#include "common/textconsole.h"
+#include "legend/games/gateway/logic/logics.h"
 
 namespace Legend {
 namespace Early {
@@ -42,7 +43,7 @@ namespace Logic {
 	INIT001, INIT10(01), INIT10(02), INIT10(03), INIT10(04), INIT10(05), \
 	INIT10(06), INIT10(07), INIT10(08), INIT10(09)
 
-Logic::Logic() : _logics{
+Logics::Logics() : _logics{
 	INIT001_100, INIT100(1), INIT100(2), INIT100(3), INIT100(4),
 	INIT100(5), INIT100(6),
 	INIT10(70), INIT10(71), INIT10(72),
@@ -50,13 +51,12 @@ Logic::Logic() : _logics{
 } {
 }
 
-int Logic::call(LogicEnum index, int param) {
-	if (index == 0 || index > METHODS_COUNT)
-		// No method specified
-		return 0;
+const LogicBase *Logics::operator[](int index) {
+	if (index == 0 || index > LOGICS_COUNT)
+		error("Invalid logic specified");
 
 	// Call the appropriate method
-	return _logics[index]->call(param);
+	return _logics[index];
 }
 
 } // namespace Logic
