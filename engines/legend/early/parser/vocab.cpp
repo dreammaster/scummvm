@@ -71,6 +71,36 @@ Vocab::Vocab() {
 	delete data;
 }
 
+int Vocab::indexOf(const String &word) const {
+	int count = size(), offset = 0;
+	int val = -1;
+	int index = 0;
+
+	// Do a binary search
+	while ((count - offset) >= 8) {
+		index = (count + offset) / 2;
+		val = strcmp(word.c_str(), (*this)[index].c_str());
+
+		if (val < 0) {
+			count = index;
+			continue;
+		} else if (val > 0) {
+			offset = index;
+			continue;
+		} else {
+			break;
+		}
+	}
+
+	if (val != 0) {
+		for (; index < count && val > 0; ++index) {
+			val = strcmp(word.c_str(), (*this)[index].c_str());
+		}
+	}
+
+	return (val == 0) ? index + 1 : 0;
+}
+
 } // namespace Parser
 } // namespace Early
 } // namespace Legend
