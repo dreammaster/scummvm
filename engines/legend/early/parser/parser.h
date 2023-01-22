@@ -42,12 +42,13 @@ private:
 	int _startIndex = 0;
 	int _val1 = -1;
 	int _val2 = 0;
+	int _result = -1;
 	int _wordIndex = 0;
 	uint32 _number = 0;
 	String _word;
 	String _quotedString;
 
-	void process(ParserString &srcLine);
+	int process(ParserString &srcLine);
 
 public:
 	/**

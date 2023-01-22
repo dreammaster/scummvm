@@ -56,8 +56,15 @@ void Parser::parse(const String &srcLine) {
 		_number = _number * 10 + (c - '\0'); \
 		c = srcLine[srcLine._charIndex++]; \
 	}
+#define SET_RESULT(VAL) \
+	if (_startIndex != firstIndex) \
+		_val1 = _result; \
+	\
+	_result = VAL; \
+	_startIndex = firstIndex; \
+	break
 
-void Parser::process(ParserString &srcLine) {
+int Parser::process(ParserString &srcLine) {
 	if (srcLine._charIndex <= _startIndex)
 		_val1 = -1;
 
@@ -72,8 +79,12 @@ void Parser::process(ParserString &srcLine) {
 
 		int firstIndex = srcLine._charIndex++;
 		char c = srcLine[firstIndex];
-		if (!c)
+		if (!c) {
+			_val1 = _result;
+			_result = -1;
+			_startIndex = firstIndex;
 			break;
+		}
 
 		if (Common::isAlpha(c) && c == '\'') {
 			while (c != '\0' && strchr(" \t.,;!?\"", c) == nullptr) {
@@ -126,8 +137,20 @@ void Parser::process(ParserString &srcLine) {
 			}
 		}
 
+		if (_word == ",") {
+			SET_RESULT(-18);
+
+		} else if (_word == "." || _word == "!") {
+			SET_RESULT(-19);
+
+		} else if (_word == ";") {
+			SET_RESULT(-20);
+		}
+
 		// TODO
 	}
+
+	return _result;
 }
 
 
