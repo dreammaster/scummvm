@@ -40,7 +40,6 @@ void InputWindow::addInputLine() {
 
 	// Focus on the view
 	_mode = LMODE_DISPLAYED;
-	addView();
 	g_engine->_mouseCursor->hide();
 }
 
@@ -62,8 +61,8 @@ void InputWindow::draw() {
 	writeString(pt, ">");
 	writeString(_line);
 
-	// If the view is focused, also show the text cursor
-	if (isFocused()) {
+	// Show the text cursor only if the mouse cursor is hidden
+	if (!g_engine->_mouseCursor->isVisible()) {
 		Graphics::ManagedSurface s = getSurface();
 		s.fillRect(Common::Rect(_textPos.x, _textPos.y,
 			_textPos.x + 8, _textPos.y + _font->_lineHeight), Gfx::BLACK);
@@ -83,11 +82,8 @@ bool InputWindow::msgKeypress(const KeypressMessage &msg) {
 	if (_mode != LMODE_DISPLAYED)
 		return TextWindow::msgKeypress(msg);
 
-	// If the window isn't focused, do so
-	if (!isFocused()) {
-		addView();
-		g_engine->_mouseCursor->hide();
-	}
+	// Hide the mouse cursor if it's visible
+	g_engine->_mouseCursor->hide();
 
 	if (msg.keycode == Common::KEYCODE_BACKSPACE) {
 		if (!_line.empty())
@@ -111,15 +107,14 @@ bool InputWindow::msgKeypress(const KeypressMessage &msg) {
 
 bool InputWindow::msgMouseDown(const MouseDownMessage &msg) {
 	if (_mode == LMODE_DISPLAYED) {
-		// When the mouse is clicked when text entry is active,
-		// stop being the focused view, and show the mouse.
-		// This will let the mouse move anywhere on the screen,
-		// and the interface will still route keypresses to us
+		// Clicking the mouse hides the text cursor and shows
+		// the mouse cursor
 		g_engine->_mouseCursor->show();
-		return true;
+		redraw();
+		return false;
+	} else {
+		return TextWindow::msgMouseDown(msg);
 	}
-
-	return false;
 }
 
 void InputWindow::lineDone() {
