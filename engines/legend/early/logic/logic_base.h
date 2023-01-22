@@ -36,7 +36,7 @@ struct LogicBase {
 	LogicType _type;
 	LogicBase(LogicType type) : _type(type) {}
 
-	virtual int call(int param = 0) const = 0;
+	virtual int call(int action = 0) const = 0;
 };
 
 

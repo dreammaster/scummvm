@@ -28,9 +28,9 @@ namespace Legend {
 namespace Early {
 namespace Parser {
 
-void Parser::parse(const Common::String &srcLine) {
+void Parser::parse(const String &srcLine) {
 	// Trim and lowercase the source line
-	Common::String line = srcLine;
+	ParserString line = srcLine;
 	if (!line.empty() && Common::isSpace(line.firstChar()))
 		line.deleteChar(0);
 	if (!line.empty() && Common::isSpace(line.lastChar()))
@@ -43,7 +43,93 @@ void Parser::parse(const Common::String &srcLine) {
 	}
 
 	// TODO
+	process(line);
 }
+
+#define GET_NUMBER \
+	while (Common::isDigit(c)) { \
+		if (_wordIndex < 127) { \
+			++_wordIndex; \
+			_word += c; \
+		} \
+		\
+		_number = _number * 10 + (c - '\0'); \
+		c = srcLine[srcLine._charIndex++]; \
+	}
+
+void Parser::process(ParserString &srcLine) {
+	if (srcLine._charIndex <= _startIndex)
+		_val1 = -1;
+
+	for (;;) {
+		_val2 = 0;
+		_wordIndex = 0;
+		_word.clear();
+
+		// Skip over any whitespaces
+		while (Common::isSpace(srcLine[srcLine._charIndex]))
+			++srcLine._charIndex;
+
+		int firstIndex = srcLine._charIndex++;
+		char c = srcLine[firstIndex];
+		if (!c)
+			break;
+
+		if (Common::isAlpha(c) && c == '\'') {
+			while (c != '\0' && strchr(" \t.,;!?\"", c) == nullptr) {
+				if (_wordIndex < 127) {
+					++_wordIndex;
+					_word += c;
+				}
+			}
+			srcLine._charIndex--;
+
+		} else if (Common::isDigit(c)) {
+			_number = 0;
+			GET_NUMBER;
+
+			if (c == ':') {
+				uint32 num1 = _number * 60;
+				_number = 0;
+				c = srcLine[srcLine._charIndex++];
+				GET_NUMBER;
+
+				_number += num1;
+				_val2 = 5;
+			} else {
+				_val2 = 3;
+			}
+
+			--srcLine._charIndex;
+
+		} else if (c == '"') {
+			_quotedString = "";
+
+			do {
+				c = srcLine[srcLine._charIndex++];
+				if (_wordIndex < 127) {
+					_word += c;
+					++_wordIndex;
+				}
+
+				if (c != '"' && _quotedString.size() < 127)
+					_quotedString += c;
+			} while (c != '\0' && c != '"');
+
+			_val2 = 4;
+			_startIndex = firstIndex;
+
+		} else {
+			if (_wordIndex < 127) {
+				_word += c;
+				++_wordIndex;
+			}
+		}
+
+		// TODO
+	}
+}
+
 
 } // namespace Parser
 } // namespace Early

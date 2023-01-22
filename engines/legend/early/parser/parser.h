@@ -23,19 +23,37 @@
 #ifndef LEGEND_EARLY_PARSER_PARSER_H
 #define LEGEND_EARLY_PARSER_PARSER_H
 
-#include "common/array.h"
-#include "common/str.h"
+#include "legend/utils/string.h"
 
 namespace Legend {
 namespace Early {
 namespace Parser {
 
+class ParserString : public String {
+public:
+	int _charIndex = 0;
+
+	ParserString() {}
+	ParserString(const String &str, int charIndex = 0) : String(str) {}
+};
+
 class Parser {
+private:
+	int _startIndex = 0;
+	int _val1 = -1;
+	int _val2 = 0;
+	int _wordIndex = 0;
+	uint32 _number = 0;
+	String _word;
+	String _quotedString;
+
+	void process(ParserString &srcLine);
+
 public:
 	/**
 	 * Parses a passed input line
 	 */
-	void parse(const Common::String &srcLine);
+	void parse(const String &srcLine);
 };
 
 } // namespace Parser
