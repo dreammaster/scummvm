@@ -31,6 +31,8 @@ namespace Legend {
 namespace Early {
 namespace Gateway {
 
+#define STARTING_ROOM 238
+
 bool GatewayEngine::initialize() {
 	// Initialize 640x480 paletted graphics mode
 	initGraphics(640, 480);
@@ -47,6 +49,7 @@ bool GatewayEngine::initialize() {
 	(void)Engine::initialize();
 
 	_logics = new Logic::Logics();
+	setRoom(STARTING_ROOM);
 
 	return true;
 }
@@ -61,7 +64,7 @@ void GatewayEngine::runGame() {
 	for (int i = 0; i < 10; ++i)
 		TextMessage::display("This is a test. This is only a test. ");
 
-	send("Input", GameMessage("GET_LINE"));
+	send("Input", GameMessage("GET_INPUT"));
 
 	// Run the game
 	Engine::runGame();

@@ -38,9 +38,12 @@ void InputWindow::addInputLine() {
 	// Add a newline
 	addDirect("\n");
 
-	// Focus on the view
+	// Switch mode
 	_mode = LMODE_DISPLAYED;
 	g_engine->_mouseCursor->hide();
+
+	// Signal to the current room that we're getting input
+	send(LogicMessage(ROOMACTION_GET_INPUT));
 }
 
 void InputWindow::setHasMore(bool state) {
@@ -70,7 +73,7 @@ void InputWindow::draw() {
 }
 
 bool InputWindow::msgGame(const GameMessage &msg) {
-	if (msg._name == "GET_LINE") {
+	if (msg._name == "GET_INPUT") {
 		addInputLine();
 		return true;
 	}

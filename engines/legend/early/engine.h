@@ -45,6 +45,11 @@ public:
 	void deinitialize() override;
 
 	/**
+	 * Handles logic messages
+	 */
+	bool msgLogic(const LogicMessage &msg) override;
+
+	/**
 	 * Sets the current room
 	 */
 	void setRoom(int roomNum);

@@ -253,6 +253,7 @@ public:
 	MESSAGE(Game);
 	MESSAGE(Value);
 	MESSAGE(Text);
+	MESSAGE(Logic);
 	#undef MESSAGE
 };
 
