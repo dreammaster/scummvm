@@ -22,11 +22,20 @@
 
 #include "common/translation.h"
 #include "legend/early/parser/parser.h"
+#include "legend/early/engine.h"
 #include "legend/events.h"
 
 namespace Legend {
 namespace Early {
 namespace Parser {
+
+#define PARSER_27 27
+#define PARSER_41 41
+#define PARSER_50 50
+#define PARSER_273 273
+#define PARSER_1521 1521
+#define PARSER_2346 2346
+#define PARSER_2382 2382
 
 void Parser::parse(const String &srcLine) {
 	// Trim and lowercase the source line
@@ -61,15 +70,15 @@ void Parser::parse(const String &srcLine) {
 		_val1 = _result; \
 	\
 	_result = VAL; \
-	_startIndex = firstIndex; \
-	break
+	_startIndex = firstIndex
+#define CHECK_VOCAB(ID) (ID != 0 && (_vocabId == ID || ve._field6 == ID))
 
 int Parser::process(ParserString &srcLine) {
 	if (srcLine._charIndex <= _startIndex)
 		_val1 = -1;
 
 	for (;;) {
-		_val2 = 0;
+		_vocabId = 0;
 		_wordIndex = 0;
 		_word.clear();
 
@@ -81,7 +90,7 @@ int Parser::process(ParserString &srcLine) {
 		char c = srcLine[firstIndex];
 		if (!c) {
 			_val1 = _result;
-			_result = -1;
+			_result = PR_END_OF_STRING;
 			_startIndex = firstIndex;
 			break;
 		}
@@ -106,9 +115,9 @@ int Parser::process(ParserString &srcLine) {
 				GET_NUMBER;
 
 				_number += num1;
-				_val2 = 5;
+				_vocabId = 5;
 			} else {
-				_val2 = 3;
+				_vocabId = 3;
 			}
 
 			--srcLine._charIndex;
@@ -127,7 +136,7 @@ int Parser::process(ParserString &srcLine) {
 					_quotedString += c;
 			} while (c != '\0' && c != '"');
 
-			_val2 = 4;
+			_vocabId = 4;
 			_startIndex = firstIndex;
 
 		} else {
@@ -138,13 +147,48 @@ int Parser::process(ParserString &srcLine) {
 		}
 
 		if (_word == ",") {
-			SET_RESULT(-18);
+			SET_RESULT(PR_COMMA);
+			break;
 
 		} else if (_word == "." || _word == "!") {
-			SET_RESULT(-19);
+			SET_RESULT(PR_PERIOD);
+			break;
 
 		} else if (_word == ";") {
-			SET_RESULT(-20);
+			SET_RESULT(PR_SEMICOLON);
+			break;
+		}
+
+		if (!_vocabId)
+			_vocabId = g_engine->_vocab->indexOf(_word);
+
+		if (!_vocabId) {
+			_unknownWord = _word;
+			_unknownFirstIndex = firstIndex;
+			_unknownWordIndex = _wordIndex;
+
+			_startIndex = firstIndex;
+			_val1 = _result;
+			_result = PR_UNKOWN;
+			break;
+		}
+
+		const VocabEntry &ve = (*g_engine->_vocab)[_vocabId - 1];
+		if (CHECK_VOCAB(PARSER_41)) {
+			SET_RESULT(PR_15);
+			break;
+		} else if (CHECK_VOCAB(PARSER_50)) {
+			SET_RESULT(PR_13);
+			break;
+		} else if (CHECK_VOCAB(PARSER_273)) {
+			SET_RESULT(PR_16);
+			break;
+		} else if (CHECK_VOCAB(PARSER_2346)) {
+			SET_RESULT(PR_17);
+			break;
+		} else if (CHECK_VOCAB(PARSER_2382)) {
+			SET_RESULT(PR_14);
+			break;
 		}
 
 		// TODO
@@ -152,7 +196,6 @@ int Parser::process(ParserString &srcLine) {
 
 	return _result;
 }
-
 
 } // namespace Parser
 } // namespace Early
