@@ -32,7 +32,7 @@ Interface::Interface() : View("Interface"),
 		_scene(this, "ScenePicture", Common::Rect(260, 0, 640, 232)),
 		_commands(this, "Commands", Common::Rect(0, 136, 117, 480)),
 		_items(this, "Items", Common::Rect(117, 136, 260, 480)),
-		_textArea(this, "TextArea", Common::Rect(260, 232, 640, 480)) {
+		_inputWindow(this, "Input", Common::Rect(260, 232, 640, 480)) {
 	_commands.load("commands.bin");
 	_commands.setDividerIndex(16);
 }

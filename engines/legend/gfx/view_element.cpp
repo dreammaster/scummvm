@@ -68,7 +68,6 @@ void ViewElement::writeString(const Common::Point &pt, const String &str) {
 void ViewElement::writeString(const String &str) {
 	Graphics::ManagedSurface s = getSurface();
 	_font->writeString(s, _textPos, str);
-	_textPos.x += _font->stringWidth(str);
 }
 
 void ViewElement::writeChar(const Common::Point &pt, char c) {

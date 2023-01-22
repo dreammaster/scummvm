@@ -57,6 +57,11 @@ protected:
 	}
 
 	/**
+	 * Sets whether the has more indicator is active
+	 */
+	virtual void setHasMore(bool state);
+
+	/**
 	 * Adds text to the text window. The original version was a
 	 * vardiac method that allowed for string formatting.
 	 */
@@ -77,6 +82,11 @@ protected:
 	 * for - MORE - to be clicked
 	 */
 	void flush();
+
+	/**
+	 * Get the position to draw a line at
+	 */
+	Common::Point getLinePos(int lineNum = -1) const;
 
 public:
 	TextWindow(UIElement *parent, const Common::Rect &r) : BoxedElement(parent, r) {
