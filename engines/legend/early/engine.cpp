@@ -53,6 +53,12 @@ void Engine::deinitialize() {
 	Legend::Gfx::Font::deinit();
 }
 
+bool Engine::msgLogic(const LogicMessage &msg) {
+	int logicNum = msg._logicNum == -1 ? _roomLogicNum : msg._logicNum;
+	(*_logics)[logicNum]->call(msg._action);
+	return true;
+}
+
 void Engine::setRoom(int roomNum) {
 	_roomLogicNum = roomNum;
 	_currentRoom = dynamic_cast<const Room *>((*_logics)[roomNum]);

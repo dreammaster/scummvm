@@ -27,6 +27,10 @@
 namespace Legend {
 namespace Early {
 
+enum RoomAction {
+	ROOMACTION_GET_INPUT = 28
+};
+
 struct Room : public LogicBase {
 	Room() : LogicBase(LT_ROOM) {}
 };

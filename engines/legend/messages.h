@@ -122,6 +122,27 @@ struct TextMessage : public Message {
 	static void display(const char *fmt, ...);
 };
 
+struct LogicMessage : public Message {
+	int _logicNum = -1;
+	int _action = -1;
+
+	/**
+	 * Default constructor
+	 */
+	LogicMessage() : Message() {}
+
+	/**
+	 * Action for the current room
+	 */
+	LogicMessage(int action) : Message(), _action(action) {}
+
+	/**
+	 * Call a logic with a given action
+	 */
+	LogicMessage(int logicNum, int action) : Message(),
+		_logicNum(logicNum), _action(action) {}
+};
+
 } // namespace Legend
 
 #endif
