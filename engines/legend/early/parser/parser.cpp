@@ -36,6 +36,7 @@ namespace Parser {
 #define PARSER_1521 1521
 #define PARSER_2346 2346
 #define PARSER_2382 2382
+#define PARSER_2473 2473
 
 void Parser::parse(const String &srcLine) {
 	// Trim and lowercase the source line
@@ -51,8 +52,47 @@ void Parser::parse(const String &srcLine) {
 		return;
 	}
 
+	_val3 = _val2;
+	_val4 = 0;
+
+	if (_v600) {
+		// Start processing line
+		(void)parseWord(line);
+
+		if (_vocabId) {
+			const VocabEntry &ve = (*g_engine->_vocab)[_vocabId - 1];
+			if ((ve._flags & VFLAG_1) &&
+					(_vocabId == _v600 || ve._field6 == _v600)) {
+				if (proc1() > 0)
+					parseLoop();
+				return;
+			}
+		}
+
+		line._charIndex = 0;
+	}
+
+	if (PARSER_2473) {
+		(void)parseWord(line);
+		if (_vocabId) {
+			const VocabEntry &ve = (*g_engine->_vocab)[_vocabId - 1];
+			if (ve._flags & VFLAG_1) {
+				if (_vocabId == PARSER_2473 || ve._field6 == PARSER_2473) {
+					if (!performUndo())
+						_val5 = 0;
+					return;
+				}
+			}
+		}
+
+		line._charIndex = 0;
+	}
+
+	parseLoop();
+}
+
+void Parser::parseLoop() {
 	// TODO
-	process(line);
 }
 
 #define GET_NUMBER \
@@ -73,7 +113,7 @@ void Parser::parse(const String &srcLine) {
 	_startIndex = firstIndex
 #define CHECK_VOCAB(ID) (ID != 0 && (_vocabId == ID || ve._field6 == ID))
 
-int Parser::process(ParserString &srcLine) {
+int Parser::parseWord(ParserString &srcLine) {
 	if (srcLine._charIndex <= _startIndex)
 		_val1 = -1;
 
@@ -189,12 +229,122 @@ int Parser::process(ParserString &srcLine) {
 		} else if (CHECK_VOCAB(PARSER_2382)) {
 			SET_RESULT(PR_14);
 			break;
+		} else if (PARSER_1521 != 0 && _vocabId == PARSER_1521) {
+			if (_result == PR_12) {
+				if (_val1 == PR_END_OF_STRING || _val1 == PR_PERIOD ||
+						_val1 == PR_COMMA || _val1 == PR_SEMICOLON ||
+						_val1 == PR_17 || _val1 == PR_13 || _val1 == PR_14) {
+					SET_RESULT(PR_3);
+					break;
+				} else {
+					continue;
+				}
+			} else if (_result == PR_3) {
+				continue;
+			} else if (_result == PR_2 || _result == PR_5) {
+				SET_RESULT(PR_3);
+				break;
+			} else {
+				SET_RESULT(PR_4);
+				break;
+			}
+		} else if (ve._flags & VFLAG_1) {
+			if ((ve._flags & VFLAG_20) && _result == PR_END_OF_STRING) {
+				_result = PR_2;
+				_startIndex = firstIndex;
+				break;
+			} else if (ve._flags & VFLAG_8) {
+				if (_result == PR_12) {
+					if (_val1 == -1) {
+						SET_RESULT(PR_12);
+						break;
+					} else if (_val1 == PR_PERIOD) {
+						SET_RESULT(PR_PERIOD);
+						break;
+					} else {
+						if (_val1 == PR_COMMA || _val1 == PR_SEMICOLON ||
+								_val1 == PR_17 || _val1 == PR_13 || _val1 == PR_14) {
+							SET_RESULT(PR_12);
+							break;
+						} else {
+							continue;
+						}
+					}
+				} else if (_result == PR_3) {
+					SET_RESULT(PR_12);
+					break;
+				} else {
+					continue;
+				}
+			} else if (ve._flags & VFLAG_4) {
+				int result = (ve._flags & VFLAG_2) ? PR_10 : PR_9;
+				SET_RESULT(result);
+				break;
+			} else {
+				if (ve._flags & VFLAG_2)
+					_val1 = _result;
+				_result = PR_2;
+				_startIndex = firstIndex;
+				break;
+			}
+		} else if (ve._flags & VFLAG_4) {
+			int result = (ve._flags & VFLAG_2) ? PR_11 : PR_4;
+			SET_RESULT(result);
+			break;
+		} else if (ve._flags & VFLAG_2) {
+			SET_RESULT(PR_5);
+			break;
+		} else if (ve._flags & VFLAG_8) {
+			if (_result == PR_12) {
+				if (_val1 == PR_END_OF_STRING || _val1 == PR_PERIOD ||
+					_val1 == PR_COMMA || _val1 == PR_SEMICOLON ||
+					_val1 == PR_17 || _val1 == PR_13 || _val1 == PR_14) {
+					SET_RESULT(PR_3);
+					break;
+				} else {
+					continue;
+				}
+			} else if (_result == PR_3) {
+				continue;
+			} else {
+				SET_RESULT(PR_3);
+				break;
+			}
+		} else if (ve._flags & VFLAG_10) {
+			SET_RESULT(VFLAG_10);
+			break;
+		} else if (_word.size() == 1) {
+			_result = _word[0];
+			break;
+		} else {
+			SET_RESULT(PR_21);
+			break;
 		}
-
-		// TODO
 	}
 
 	return _result;
+}
+
+#undef GET_NUMBER
+#undef SET_RESULT
+#undef CHECK_VOCAB
+
+int Parser::proc1() {
+	// TODO
+	return -1;
+}
+
+bool Parser::performUndo() {
+	if (_val6 && _val7) {
+		if (g_engine->loadGame(LOAD_UNDO))
+			return true;
+	}
+
+	g_engine->send(TextMessage(
+		_val7 ? _("[You can't use \"undo\" after that.]\n") :
+		_("[There isn't enough memory to use \"undo\" right now.]\n")
+	));
+	return false;
 }
 
 } // namespace Parser

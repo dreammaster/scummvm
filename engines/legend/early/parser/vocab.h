@@ -30,6 +30,11 @@ namespace Legend {
 namespace Early {
 namespace Parser {
 
+enum VocabFlag {
+	VFLAG_1 = 1, VFLAG_2 = 2, VFLAG_4 = 4, VFLAG_8 = 8,
+	VFLAG_10 = 0x10, VFLAG_20 = 0x20
+};
+
 class VocabEntry : public Common::String {
 public:
 	byte _flags;

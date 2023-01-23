@@ -111,6 +111,8 @@ void STRUC10::synchronize(Common::Serializer &s) {
 }
 
 void Persisted::synchronize(Common::Serializer &s) {
+	Legend::Early::Persisted::synchronize(s);
+
 	s.syncAsUint16LE(_val1);
 	s.syncAsUint16LE(_val2);
 	s.syncAsUint16LE(_val3);
