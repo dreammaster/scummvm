@@ -64,10 +64,17 @@ private:
 	int _val5 = 0;
 	int _val6 = 0;
 	int _val7 = 0;
-	int _v600 = 0x600;
+	int _val8 = 0;
+	int _val9 = 0;
+	int _val10 = 0;
+	int _val11 = 0;
 
+	int _v600 = 0x600;
 	int _wordIndex = 0;
 	uint32 _number = 0;
+	ParserString _inputLine;
+	ParserString _inputLineCopy;
+	String _subLine;
 	String _word;
 	String _quotedString;
 	String _unknownWord;
@@ -76,6 +83,7 @@ private:
 
 	void parseLoop();
 	int proc1();
+	int proc3();
 
 	/**
 	 * Displays that an undo can't be done
@@ -85,7 +93,7 @@ private:
 	/**
 	 * Parses a word within the sentence
 	 */
-	int parseWord(ParserString &srcLine);
+	int parseWord(ParserString &line);
 
 public:
 	/**
