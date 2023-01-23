@@ -68,6 +68,7 @@ private:
 	int _val9 = 0;
 	int _val10 = 0;
 	int _val11 = 0;
+	int _val12 = 0;
 
 	int _v600 = 0x600;
 	int _wordIndex = 0;
@@ -84,6 +85,7 @@ private:
 	void parseLoop();
 	int proc1();
 	int proc3();
+	int proc4();
 
 	/**
 	 * Displays that an undo can't be done

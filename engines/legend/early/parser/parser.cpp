@@ -116,6 +116,13 @@ void Parser::parseLoop() {
 			}
 		}
 
+		if (proc4() <= 0) {
+			_val11 = 0;
+			_val5 = 0;
+			return;
+		}
+
+
 		// TODO
 
 	}
@@ -391,6 +398,11 @@ int Parser::proc3() {
 		_inputLine._charIndex = 0;
 		return 1;
 	}
+}
+
+int Parser::proc4() {
+	// TODO
+	return 0;
 }
 
 bool Parser::performUndo() {
