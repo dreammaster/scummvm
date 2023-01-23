@@ -31,6 +31,8 @@
 namespace Legend {
 namespace Early {
 
+enum LoadType { LOAD_NONE = 0, LOAD_2 = 2, LOAD_UNDO = 3 };
+
 class Engine : public LegendEngine, virtual public Early::Persisted {
 public:
 	Logics *_logics = nullptr;
@@ -53,6 +55,8 @@ public:
 	 * Sets the current room
 	 */
 	void setRoom(int roomNum);
+
+	int loadGame(LoadType mode);
 };
 
 extern Engine *g_engine;

@@ -64,5 +64,10 @@ void Engine::setRoom(int roomNum) {
 	_currentRoom = dynamic_cast<const Room *>((*_logics)[roomNum]);
 }
 
+int Engine::loadGame(LoadType mode) {
+	// TODO
+	error("TODO: loadGame/undo");
+}
+
 } // namespace Early
 } // namespace Legend

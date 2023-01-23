@@ -31,10 +31,10 @@ namespace Parser {
 
 enum ParserResult {
 	PR_UNKOWN = 0, PR_END_OF_STRING = -1,
-	PR_2 = -2, PR_3 = -3, PR_4 = -4, PR_8 = -8, PR_9 = -9,
-	PR_10 = -10, PR_13 = -13, PR_14 = -14, PR_15 = -15,
-	PR_16 = -16, PR_17 = -17, PR_COMMA = -18, PR_PERIOD = -19,
-	PR_SEMICOLON = -20
+	PR_2 = -2, PR_3 = -3, PR_4 = -4, PR_5 = -5, PR_8 = -8,
+	PR_9 = -9, PR_10 = -10, PR_11 = -11, PR_12 = -12, PR_13 = -13,
+	PR_14 = -14, PR_15 = -15, PR_16 = -16, PR_17 = -17,
+	PR_COMMA = -18, PR_PERIOD = -19, PR_SEMICOLON = -20, PR_21 = -21
 };
 
 /**
@@ -55,9 +55,17 @@ public:
 class Parser {
 private:
 	int _startIndex = 0;
-	int _val1 = -1;
 	int _vocabId = 0;
+	int _val1 = -1;
 	int _result = -1;
+	int _val2 = 211;
+	int _val3 = 211;
+	int _val4 = 0;
+	int _val5 = 0;
+	int _val6 = 0;
+	int _val7 = 0;
+	int _v600 = 0x600;
+
 	int _wordIndex = 0;
 	uint32 _number = 0;
 	String _word;
@@ -66,7 +74,18 @@ private:
 	int _unknownFirstIndex = 0;
 	int _unknownWordIndex = 0;
 
-	int process(ParserString &srcLine);
+	void parseLoop();
+	int proc1();
+
+	/**
+	 * Displays that an undo can't be done
+	 */
+	bool performUndo();
+
+	/**
+	 * Parses a word within the sentence
+	 */
+	int parseWord(ParserString &srcLine);
 
 public:
 	/**
