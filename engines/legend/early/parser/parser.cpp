@@ -40,14 +40,14 @@ namespace Parser {
 
 void Parser::parse(const String &srcLine) {
 	// Trim and lowercase the source line
-	ParserString line = srcLine;
-	if (!line.empty() && Common::isSpace(line.firstChar()))
-		line.deleteChar(0);
-	if (!line.empty() && Common::isSpace(line.lastChar()))
-		line.deleteLastChar();
+	_inputLine = srcLine;
+	if (!_inputLine.empty() && Common::isSpace(_inputLine.firstChar()))
+		_inputLine.deleteChar(0);
+	if (!_inputLine.empty() && Common::isSpace(_inputLine.lastChar()))
+		_inputLine.deleteLastChar();
 
 	// If the line is empty, abort parsing
-	if (line.empty()) {
+	if (_inputLine.empty()) {
 		g_events->send(TextMessage(_("[I beg your pardon?]\n")));
 		return;
 	}
@@ -57,7 +57,7 @@ void Parser::parse(const String &srcLine) {
 
 	if (_v600) {
 		// Start processing line
-		(void)parseWord(line);
+		(void)parseWord(_inputLine);
 
 		if (_vocabId) {
 			const VocabEntry &ve = (*g_engine->_vocab)[_vocabId - 1];
@@ -69,11 +69,11 @@ void Parser::parse(const String &srcLine) {
 			}
 		}
 
-		line._charIndex = 0;
+		_inputLine._charIndex = 0;
 	}
 
 	if (PARSER_2473) {
-		(void)parseWord(line);
+		(void)parseWord(_inputLine);
 		if (_vocabId) {
 			const VocabEntry &ve = (*g_engine->_vocab)[_vocabId - 1];
 			if (ve._flags & VFLAG_1) {
@@ -85,14 +85,40 @@ void Parser::parse(const String &srcLine) {
 			}
 		}
 
-		line._charIndex = 0;
+		_inputLine._charIndex = 0;
 	}
 
 	parseLoop();
 }
 
 void Parser::parseLoop() {
-	// TODO
+	for (;;) {
+		if (PARSER_27) {
+			(void)parseWord(_inputLine);
+
+			if (_vocabId) {
+				const VocabEntry &ve = (*g_engine->_vocab)[_vocabId - 1];
+
+				if (!(ve._flags & VFLAG_1)) {
+					_inputLine._charIndex = 0;
+				} else if (_vocabId != PARSER_27 && ve._field6 != PARSER_27) {
+					_inputLine._charIndex = 0;
+					_val8 = 0;
+					_val9 = 0;
+				} else if (proc3() <= 0) {
+					_val5 = 0;
+					return;
+				} else {
+					_val4 = 1;
+					_val8 = 0;
+					_val9 = 0;
+				}
+			}
+		}
+
+		// TODO
+
+	}
 }
 
 #define GET_NUMBER \
@@ -103,7 +129,7 @@ void Parser::parseLoop() {
 		} \
 		\
 		_number = _number * 10 + (c - '\0'); \
-		c = srcLine[srcLine._charIndex++]; \
+		c = line[line._charIndex++]; \
 	}
 #define SET_RESULT(VAL) \
 	if (_startIndex != firstIndex) \
@@ -113,8 +139,8 @@ void Parser::parseLoop() {
 	_startIndex = firstIndex
 #define CHECK_VOCAB(ID) (ID != 0 && (_vocabId == ID || ve._field6 == ID))
 
-int Parser::parseWord(ParserString &srcLine) {
-	if (srcLine._charIndex <= _startIndex)
+int Parser::parseWord(ParserString &line) {
+	if (line._charIndex <= _startIndex)
 		_val1 = -1;
 
 	for (;;) {
@@ -123,11 +149,11 @@ int Parser::parseWord(ParserString &srcLine) {
 		_word.clear();
 
 		// Skip over any whitespaces
-		while (Common::isSpace(srcLine[srcLine._charIndex]))
-			++srcLine._charIndex;
+		while (Common::isSpace(line[line._charIndex]))
+			++line._charIndex;
 
-		int firstIndex = srcLine._charIndex++;
-		char c = srcLine[firstIndex];
+		int firstIndex = line._charIndex++;
+		char c = line[firstIndex];
 		if (!c) {
 			_val1 = _result;
 			_result = PR_END_OF_STRING;
@@ -142,7 +168,7 @@ int Parser::parseWord(ParserString &srcLine) {
 					_word += c;
 				}
 			}
-			srcLine._charIndex--;
+			line._charIndex--;
 
 		} else if (Common::isDigit(c)) {
 			_number = 0;
@@ -151,7 +177,7 @@ int Parser::parseWord(ParserString &srcLine) {
 			if (c == ':') {
 				uint32 num1 = _number * 60;
 				_number = 0;
-				c = srcLine[srcLine._charIndex++];
+				c = line[line._charIndex++];
 				GET_NUMBER;
 
 				_number += num1;
@@ -160,13 +186,13 @@ int Parser::parseWord(ParserString &srcLine) {
 				_vocabId = 3;
 			}
 
-			--srcLine._charIndex;
+			--line._charIndex;
 
 		} else if (c == '"') {
 			_quotedString = "";
 
 			do {
-				c = srcLine[srcLine._charIndex++];
+				c = line[line._charIndex++];
 				if (_wordIndex < 127) {
 					_word += c;
 					++_wordIndex;
@@ -332,6 +358,39 @@ int Parser::parseWord(ParserString &srcLine) {
 int Parser::proc1() {
 	// TODO
 	return -1;
+}
+
+int Parser::proc3() {
+	int charIndex = _inputLine._charIndex;
+	int wordResult = parseWord(_inputLine);
+
+	if (wordResult == PR_PERIOD || _vocabId == PARSER_2346) {
+		charIndex = _inputLine._charIndex;
+		wordResult = parseWord(_inputLine);
+	}
+
+	if (wordResult == PR_END_OF_STRING) {
+		_subLine.clear();
+	} else {
+		_subLine = String(_inputLine.c_str() + charIndex);
+	}
+
+	_val10 = 0;
+
+	if (!_val11) {
+		g_engine->send(TextMessage(_("[You can't use \"again\" after that.]\n")));
+		return -1;
+	} else {
+		if (_val8 || _val9) {
+			_val8 = 0;
+			_val9 = 0;
+			_val5 = 0;
+		}
+
+		_inputLine = _inputLineCopy;
+		_inputLine._charIndex = 0;
+		return 1;
+	}
 }
 
 bool Parser::performUndo() {
