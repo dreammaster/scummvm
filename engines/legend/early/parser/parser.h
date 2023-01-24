@@ -70,7 +70,6 @@ private:
 	int _val11 = 0;
 	int _val12 = 0;
 
-	int _v600 = 0x600;
 	int _wordIndex = 0;
 	uint32 _number = 0;
 	ParserString _inputLine;
@@ -83,7 +82,7 @@ private:
 	int _unknownWordIndex = 0;
 
 	void parseLoop();
-	int proc1();
+	int oops();
 	int proc3();
 	int proc4();
 
@@ -108,6 +107,7 @@ protected:
 	const int _AND;
 	const int _BUT;
 	const int _OF;
+	const int _OOPS;
 	const int _THEN;
 	const int _TO;
 	const int _UNDO;
@@ -118,7 +118,7 @@ public:
 	 */
 	Parser(const String &emptyLine,
 		int againId, int allId, int andId, int butId,
-		int ofId, int thenId, int toId, int undoId);
+		int ofId, int oopsId, int thenId, int toId, int undoId);
 
 	/**
 	 * Parses a passed input line

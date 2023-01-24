@@ -30,9 +30,11 @@ namespace Early {
 namespace Parser {
 
 Parser::Parser(const String &emptyLine, int againId, int allId,
-		int andId, int butId, int ofId, int thenId, int toId, int undoId) :
+		int andId, int butId, int ofId, int oopsId, int thenId,
+		int toId, int undoId) :
 		_EMPTY_LINE(emptyLine), _AGAIN(againId), _ALL(allId), _AND(andId),
-		_BUT(butId), _OF(ofId), _THEN(thenId), _TO(toId), _UNDO(undoId) {
+		_BUT(butId), _OF(ofId), _OOPS(oopsId), _THEN(thenId), _TO(toId),
+		_UNDO(undoId) {
 }
 
 void Parser::parse(const String &srcLine) {
@@ -52,15 +54,15 @@ void Parser::parse(const String &srcLine) {
 	_val3 = _val2;
 	_val4 = 0;
 
-	if (_v600) {
+	if (_OOPS) {
 		// Start processing line
 		(void)parseWord(_inputLine);
 
 		if (_vocabId) {
 			const VocabEntry &ve = (*g_engine->_vocab)[_vocabId];
 			if ((ve._flags & VFLAG_1) &&
-					(_vocabId == _v600 || ve._altVocabId == _v600)) {
-				if (proc1() > 0)
+					(_vocabId == _OOPS || ve._altVocabId == _OOPS)) {
+				if (oops() > 0)
 					parseLoop();
 				return;
 			}
@@ -358,7 +360,7 @@ int Parser::parseWord(ParserString &line) {
 #undef SET_RESULT
 #undef CHECK_VOCAB
 
-int Parser::proc1() {
+int Parser::oops() {
 	// TODO
 	return -1;
 }
