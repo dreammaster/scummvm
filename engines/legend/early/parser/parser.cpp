@@ -21,6 +21,7 @@
  */
 
 #include "common/translation.h"
+#include "common/translation.h"
 #include "legend/early/parser/parser.h"
 #include "legend/early/engine.h"
 #include "legend/events.h"
@@ -234,7 +235,7 @@ int Parser::parseWord(ParserString &line) {
 			_vocabId = g_engine->_vocab->indexOf(_word);
 
 		if (!_vocabId) {
-			_unknownWord = _word;
+			_unknownWord = _word.c_str();
 			_unknownFirstIndex = firstIndex;
 			_unknownWordIndex = _wordIndex;
 
@@ -360,11 +361,89 @@ int Parser::parseWord(ParserString &line) {
 #undef SET_RESULT
 #undef CHECK_VOCAB
 
-int Parser::oops() {
-	// TODO
-	return -1;
+void Parser::addLine(const Common::U32String &line) {
+	g_engine->send(TextMessage(line));
 }
 
+int Parser::oops() {
+	String *inputLinePtr = &_inputLine;
+	int unknownWordIndex = _unknownFirstIndex;
+
+	if (!_unknownWordIndex) {
+		addLine(_("[There was no misspelled word to replace.]\n"));
+		return 0;
+	}
+
+	int wordResult = parseWord(_inputLine);
+
+	if (wordResult >= PR_21) {
+		if (wordResult <= PR_COMMA) {
+			addLine(_("[You can't use that word with \"oops.\"]\n"));
+			return -1;
+		} else if (wordResult == PR_END_OF_STRING) {
+			addLine(_("[Please specify a word to replace the unknown one.]\n"));
+			return -1;
+		}
+	}
+
+	int vocabId = _vocabId;
+	int wordIndex = _wordIndex;
+	String tempWord = _word;
+
+	if (vocabId) {
+		wordResult = parseWord(_inputLine);
+		if (wordResult == PR_PERIOD)
+			wordResult = parseWord(_inputLine);
+		if (wordResult == PR_END_OF_STRING)
+			addLine(_("[Everything except the first word after \"oops\" is ignored.]\n"));
+	}
+
+	_inputLine = _inputLineCopy;
+	int index1 = wordIndex - (unknownWordIndex >> 8);
+	int index2 = (unknownWordIndex & 0xff) + (unknownWordIndex >> 8);
+	int lineLen = _inputLine.size();
+
+	if (index1) {
+		int tmp = index2;
+		lineLen = index2;
+		if (lineLen >= 0x100) {
+			tmp -= lineLen - 0xff;
+			lineLen = 0xff;
+		}
+
+		if (tmp) {
+			// TODO: Double-check. I think this inserts space for the
+			// replacement word at the tiven index
+			for (int i = 0; i < tmp; ++i)
+				inputLinePtr->insertChar(' ', index2);
+		}
+	}
+
+	// Insert in the replacement word
+	for (uint i = 0; i < tempWord.size(); ++i)
+		inputLinePtr->setChar(tempWord[i], unknownWordIndex + i);
+
+	if (vocabId) {
+		_inputLine._charIndex = 0;
+		return 1;
+	}
+
+	_inputLineCopy = _inputLine;
+	_unknownWord = _inputLine.c_str();
+	_unknownFirstIndex = unknownWordIndex;
+	_unknownWordIndex = _wordIndex;
+
+	youDontNeed(_word);
+	return -1;
+}
+/*
+	PR_UNKOWN = 0, PR_END_OF_STRING = -1,
+	PR_2 = -2, PR_3 = -3, PR_4 = -4, PR_5 = -5, PR_8 = -8,
+	PR_9 = -9, PR_10 = -10, PR_11 = -11, PR_12 = -12, PR_13 = -13,
+	PR_14 = -14, PR_15 = -15, PR_16 = -16, PR_17 = -17,
+	PR_COMMA = -18, PR_PERIOD = -19, PR_SEMICOLON = -20, PR_21 = -21
+
+*/
 int Parser::proc3() {
 	int charIndex = _inputLine._charIndex;
 	int wordResult = parseWord(_inputLine);
@@ -383,7 +462,7 @@ int Parser::proc3() {
 	_val10 = 0;
 
 	if (!_val11) {
-		g_engine->send(TextMessage(_("[You can't use \"again\" after that.]\n")));
+		addLine(_("[You can't use \"again\" after that.]\n"));
 		return -1;
 	} else {
 		if (_val8 || _val9) {
@@ -403,16 +482,21 @@ int Parser::proc4() {
 	return 0;
 }
 
+void Parser::youDontNeed(const String &word) {
+	String msg(0xc401);
+	addLine(String::format(msg.c_str(), word.c_str()));
+}
+
 bool Parser::performUndo() {
 	if (_val6 && _val7) {
 		if (g_engine->loadGame(LOAD_UNDO))
 			return true;
 	}
 
-	g_engine->send(TextMessage(
+	addLine(
 		_val7 ? _("[You can't use \"undo\" after that.]\n") :
 		_("[There isn't enough memory to use \"undo\" right now.]\n")
-	));
+	);
 	return false;
 }
 

@@ -1,2 +1,3 @@
 engines/legend/metaengine.cpp
+engines/legend/parser/parser.cpp
 engines/legend/games/gateway/parser/parser.cpp
