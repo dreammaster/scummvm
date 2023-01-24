@@ -29,10 +29,10 @@ namespace Legend {
 namespace Early {
 namespace Parser {
 
-Parser::Parser(int againId, int allId, int andId, int butId, int ofId,
-		int thenId, int toId, int undoId) :
-		_AGAIN(againId), _ALL(allId), _AND(andId), _BUT(butId),
-		_OF(ofId), _THEN(thenId), _TO(toId), _UNDO(undoId) {
+Parser::Parser(const String &emptyLine, int againId, int allId,
+		int andId, int butId, int ofId, int thenId, int toId, int undoId) :
+		_EMPTY_LINE(emptyLine), _AGAIN(againId), _ALL(allId), _AND(andId),
+		_BUT(butId), _OF(ofId), _THEN(thenId), _TO(toId), _UNDO(undoId) {
 }
 
 void Parser::parse(const String &srcLine) {
@@ -45,7 +45,7 @@ void Parser::parse(const String &srcLine) {
 
 	// If the line is empty, abort parsing
 	if (_inputLine.empty()) {
-		g_events->send(TextMessage(_("[I beg your pardon?]\n")));
+		g_events->send(TextMessage(_EMPTY_LINE));
 		return;
 	}
 
@@ -118,7 +118,6 @@ void Parser::parseLoop() {
 			_val5 = 0;
 			return;
 		}
-
 
 		// TODO
 
