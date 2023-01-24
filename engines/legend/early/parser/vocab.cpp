@@ -62,7 +62,7 @@ Vocab::Vocab() {
 		VocabEntry &v = _items[vocabNum];
 
 		for (uint idx = 0; idx < linkCount; ++idx) {
-			v._field6 = f.readUint16LE();
+			v._altVocabId = f.readUint16LE();
 			v._field8 = f.readUint16LE() & 0xff;
 		}
 	}

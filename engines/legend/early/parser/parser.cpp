@@ -59,7 +59,7 @@ void Parser::parse(const String &srcLine) {
 		if (_vocabId) {
 			const VocabEntry &ve = (*g_engine->_vocab)[_vocabId];
 			if ((ve._flags & VFLAG_1) &&
-					(_vocabId == _v600 || ve._field6 == _v600)) {
+					(_vocabId == _v600 || ve._altVocabId == _v600)) {
 				if (proc1() > 0)
 					parseLoop();
 				return;
@@ -74,7 +74,7 @@ void Parser::parse(const String &srcLine) {
 		if (_vocabId) {
 			const VocabEntry &ve = (*g_engine->_vocab)[_vocabId];
 			if (ve._flags & VFLAG_1) {
-				if (_vocabId == _UNDO || ve._field6 == _UNDO) {
+				if (_vocabId == _UNDO || ve._altVocabId == _UNDO) {
 					if (!performUndo())
 						_val5 = 0;
 					return;
@@ -98,7 +98,7 @@ void Parser::parseLoop() {
 
 				if (!(ve._flags & VFLAG_1)) {
 					_inputLine._charIndex = 0;
-				} else if (_vocabId != _AGAIN && ve._field6 != _AGAIN) {
+				} else if (_vocabId != _AGAIN && ve._altVocabId != _AGAIN) {
 					_inputLine._charIndex = 0;
 					_val8 = 0;
 					_val9 = 0;
@@ -141,7 +141,7 @@ void Parser::parseLoop() {
 	\
 	_result = VAL; \
 	_startIndex = firstIndex
-#define CHECK_VOCAB(ID) (ID != 0 && (_vocabId == ID || ve._field6 == ID))
+#define CHECK_VOCAB(ID) (ID != 0 && (_vocabId == ID || ve._altVocabId == ID))
 
 int Parser::parseWord(ParserString &line) {
 	if (line._charIndex <= _startIndex)
