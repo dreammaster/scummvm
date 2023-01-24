@@ -22,6 +22,7 @@
 #include "engines/util.h"
 #include "legend/games/gateway/engine.h"
 #include "legend/games/gateway/logic/logics.h"
+#include "legend/games/gateway/parser/parser.h"
 #include "legend/games/gateway/views/views.h"
 #include "legend/early/gfx/screen.h"
 #include "legend/utils/engine_data.h"
@@ -49,6 +50,7 @@ bool GatewayEngine::initialize() {
 	(void)Engine::initialize();
 
 	_logics = new Logic::Logics();
+	_parser = new Gateway::Parser::Parser();
 	setRoom(STARTING_ROOM);
 
 	return true;

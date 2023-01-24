@@ -19,56 +19,24 @@
  *
  */
 
-#include "legend/early/engine.h"
-#include "legend/early/gfx/screen.h"
-#include "legend/gfx/font.h"
+#ifndef LEGEND_GAMES_GATEWAY_PARSER_PARSER_H
+#define LEGEND_GAMES_GATEWAY_PARSER_PARSER_H
+
+#include "legend/early/parser/parser.h"
 
 namespace Legend {
 namespace Early {
+namespace Gateway {
+namespace Parser {
 
-Engine *g_engine;
+class Parser : public Legend::Early::Parser::Parser {
+public:
+	Parser();
+};
 
-Engine::Engine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		LegendEngine(syst, gameDesc) {
-	g_engine = this;
-}
-
-
-Engine::~Engine() {
-	delete _logics;
-	delete _vocab;
-	delete _parser;
-}
-
-bool Engine::initialize() {
-	(void)LegendEngine::initialize();
-
-	Legend::Gfx::Font::init();
-	_screen = new Early::Gfx::Screen();
-	_vocab = new Parser::Vocab();
-
-	return true;
-}
-
-void Engine::deinitialize() {
-	Legend::Gfx::Font::deinit();
-}
-
-bool Engine::msgLogic(const LogicMessage &msg) {
-	int logicNum = msg._logicNum == -1 ? _roomLogicNum : msg._logicNum;
-	(*_logics)[logicNum]->call(msg._action);
-	return true;
-}
-
-void Engine::setRoom(int roomNum) {
-	_roomLogicNum = roomNum;
-	_currentRoom = dynamic_cast<const Room *>((*_logics)[roomNum]);
-}
-
-int Engine::loadGame(LoadType mode) {
-	// TODO
-	error("TODO: loadGame/undo");
-}
-
+} // namespace Parser
+} // namespace Gateway
 } // namespace Early
 } // namespace Legend
+
+#endif
