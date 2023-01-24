@@ -39,15 +39,15 @@ class VocabEntry : public Common::String {
 public:
 	byte _flags;
 	int _altVocabId;
-	byte _field8;
+	int _logicNum;
 public:
-	VocabEntry() : Common::String(), _flags(0), _altVocabId(0), _field8(0) {
+	VocabEntry() : Common::String(), _flags(0), _altVocabId(0), _logicNum(0) {
 	}
 	VocabEntry(const char *text, byte flags = 0) : Common::String(text),
-		_flags(flags), _altVocabId(0), _field8(0) {
+		_flags(flags), _altVocabId(0), _logicNum(0) {
 	}
 	VocabEntry(const Common::String &text, byte flags = 0) : Common::String(text),
-		_flags(flags), _altVocabId(0), _field8(0) {
+		_flags(flags), _altVocabId(0), _logicNum(0) {
 	}
 };
 

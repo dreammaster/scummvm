@@ -436,14 +436,7 @@ int Parser::oops() {
 	youDontNeed(_word);
 	return -1;
 }
-/*
-	PR_UNKOWN = 0, PR_END_OF_STRING = -1,
-	PR_2 = -2, PR_3 = -3, PR_4 = -4, PR_5 = -5, PR_8 = -8,
-	PR_9 = -9, PR_10 = -10, PR_11 = -11, PR_12 = -12, PR_13 = -13,
-	PR_14 = -14, PR_15 = -15, PR_16 = -16, PR_17 = -17,
-	PR_COMMA = -18, PR_PERIOD = -19, PR_SEMICOLON = -20, PR_21 = -21
 
-*/
 int Parser::proc3() {
 	int charIndex = _inputLine._charIndex;
 	int wordResult = parseWord(_inputLine);
