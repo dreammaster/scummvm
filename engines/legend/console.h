@@ -30,6 +30,7 @@ namespace Legend {
 class Console : public GUI::Debugger {
 private:
 	bool cmdString(int argc, const char **argv);
+	bool cmdVocab(int argc, const char **argv);
 public:
 	Console();
 	~Console() override;

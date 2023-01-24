@@ -21,11 +21,13 @@
 
 #include "legend/console.h"
 #include "legend/utils/string.h"
+#include "legend/early/engine.h"
 
 namespace Legend {
 
 Console::Console() : GUI::Debugger() {
 	registerCmd("string",   WRAP_METHOD(Console, cmdString));
+	registerCmd("vocab", WRAP_METHOD(Console, cmdVocab));
 }
 
 Console::~Console() {
@@ -50,4 +52,25 @@ bool Console::cmdString(int argc, const char **argv) {
 	return true;
 }
 
-} // End of namespace Legend
+bool Console::cmdVocab(int argc, const char **argv) {
+	if (Legend::g_engine->isLater()) {
+		debugPrintf("Not supported for games\n");
+
+	} else if (argc != 2) {
+		debugPrintf("vocab <id>\n");
+
+	} else {
+		int vocabId = atoi(argv[1]);
+
+		if (vocabId < 1 || vocabId >= (int)Early::g_engine->_vocab->size()) {
+			debugPrintf("Invalid vocab Id\n");
+
+		} else {
+			debugPrintf("%s\n", (*Early::g_engine->_vocab)[vocabId].c_str());
+		}
+	}
+
+	return true;
+}
+
+} // namespace Legend
