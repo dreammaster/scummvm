@@ -29,14 +29,14 @@ namespace Legend {
 namespace Early {
 namespace Parser {
 
-#define PARSER_27 27
-#define PARSER_41 41
-#define PARSER_50 50
-#define PARSER_273 273
-#define PARSER_1521 1521
-#define PARSER_2346 2346
-#define PARSER_2382 2382
-#define PARSER_2473 2473
+#define PARSER_AGAIN 27
+#define PARSER_ALL 41
+#define PARSER_AND 50
+#define PARSER_BUT 273
+#define PARSER_OF 1521
+#define PARSER_THEN 2346
+#define PARSER_TO 2382
+#define PARSER_UNDO 2473
 
 void Parser::parse(const String &srcLine) {
 	// Trim and lowercase the source line
@@ -72,12 +72,12 @@ void Parser::parse(const String &srcLine) {
 		_inputLine._charIndex = 0;
 	}
 
-	if (PARSER_2473) {
+	if (PARSER_UNDO) {
 		(void)parseWord(_inputLine);
 		if (_vocabId) {
 			const VocabEntry &ve = (*g_engine->_vocab)[_vocabId];
 			if (ve._flags & VFLAG_1) {
-				if (_vocabId == PARSER_2473 || ve._field6 == PARSER_2473) {
+				if (_vocabId == PARSER_UNDO || ve._field6 == PARSER_UNDO) {
 					if (!performUndo())
 						_val5 = 0;
 					return;
@@ -93,7 +93,7 @@ void Parser::parse(const String &srcLine) {
 
 void Parser::parseLoop() {
 	for (;;) {
-		if (PARSER_27) {
+		if (PARSER_AGAIN) {
 			(void)parseWord(_inputLine);
 
 			if (_vocabId) {
@@ -101,7 +101,7 @@ void Parser::parseLoop() {
 
 				if (!(ve._flags & VFLAG_1)) {
 					_inputLine._charIndex = 0;
-				} else if (_vocabId != PARSER_27 && ve._field6 != PARSER_27) {
+				} else if (_vocabId != PARSER_AGAIN && ve._field6 != PARSER_AGAIN) {
 					_inputLine._charIndex = 0;
 					_val8 = 0;
 					_val9 = 0;
@@ -247,22 +247,22 @@ int Parser::parseWord(ParserString &line) {
 		}
 
 		const VocabEntry &ve = (*g_engine->_vocab)[_vocabId];
-		if (CHECK_VOCAB(PARSER_41)) {
+		if (CHECK_VOCAB(PARSER_ALL)) {
 			SET_RESULT(PR_15);
 			break;
-		} else if (CHECK_VOCAB(PARSER_50)) {
+		} else if (CHECK_VOCAB(PARSER_AND)) {
 			SET_RESULT(PR_13);
 			break;
-		} else if (CHECK_VOCAB(PARSER_273)) {
+		} else if (CHECK_VOCAB(PARSER_BUT)) {
 			SET_RESULT(PR_16);
 			break;
-		} else if (CHECK_VOCAB(PARSER_2346)) {
+		} else if (CHECK_VOCAB(PARSER_THEN)) {
 			SET_RESULT(PR_17);
 			break;
-		} else if (CHECK_VOCAB(PARSER_2382)) {
+		} else if (CHECK_VOCAB(PARSER_TO)) {
 			SET_RESULT(PR_14);
 			break;
-		} else if (PARSER_1521 != 0 && _vocabId == PARSER_1521) {
+		} else if (PARSER_OF != 0 && _vocabId == PARSER_OF) {
 			if (_result == PR_12) {
 				if (_val1 == PR_END_OF_STRING || _val1 == PR_PERIOD ||
 						_val1 == PR_COMMA || _val1 == PR_SEMICOLON ||
@@ -371,7 +371,7 @@ int Parser::proc3() {
 	int charIndex = _inputLine._charIndex;
 	int wordResult = parseWord(_inputLine);
 
-	if (wordResult == PR_PERIOD || _vocabId == PARSER_2346) {
+	if (wordResult == PR_PERIOD || _vocabId == PARSER_THEN) {
 		charIndex = _inputLine._charIndex;
 		wordResult = parseWord(_inputLine);
 	}
