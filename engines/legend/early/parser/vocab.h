@@ -51,7 +51,9 @@ public:
 	}
 };
 
-class Vocab : public Common::Array<VocabEntry> {
+class Vocab {
+private:
+	Common::Array<VocabEntry> _items;
 public:
 	Vocab();
 
@@ -59,6 +61,21 @@ public:
 	 * Get the index of a vocab entry
 	 */
 	int indexOf(const String &word) const;
+
+	/**
+	 * Return the vocab size
+	 */
+	size_t size() const {
+		return _items.size();
+	}
+
+	/**
+	 * Get a vocab entry
+	 */
+	const VocabEntry &operator[](uint vocabId) const {
+		assert(vocabId != 0 && vocabId <= _items.size());
+		return _items[vocabId - 1];
+	}
 };
 
 } // namespace Parser

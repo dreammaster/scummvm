@@ -37,29 +37,29 @@ Vocab::Vocab() {
 		error("Unable to open vocab");
 
 	// Read in the table
-	size_type nodeCount = f.readUint16LE();
-	for (size_type idx = 0; idx < nodeCount; ++idx)
+	size_t nodeCount = f.readUint16LE();
+	for (size_t idx = 0; idx < nodeCount; ++idx)
 		huffmanTable[idx] = f.readSint16LE();
 
-	size_type streamSize = f.readUint16LE();
+	size_t streamSize = f.readUint16LE();
 	Common::SeekableSubReadStream substream(&f, f.pos(), f.pos() + streamSize);
 	Common::MemoryWriteStreamDynamic *data = Huffman::decompress(substream, huffmanTable, nodeCount);
 
-	size_type vocabCount = f.readUint16LE();
-	reserve(vocabCount);
+	size_t vocabCount = f.readUint16LE();
+	_items.reserve(vocabCount);
 
-	for (size_type vocabIdx = 0; vocabIdx < vocabCount; ++vocabIdx) {
+	for (size_t vocabIdx = 0; vocabIdx < vocabCount; ++vocabIdx) {
 		uint16 vocabOffset = f.readUint16LE();
 		uint16 flags = f.readUint16LE();
-		push_back(VocabEntry((const char *)data->getData() + vocabOffset, flags));
+		_items.push_back(VocabEntry((const char *)data->getData() + vocabOffset, flags));
 	}
 
 	vocabCount = f.readUint16LE();
 
-	for (size_type vocabIdx = 0; vocabIdx < vocabCount; ++vocabIdx) {
+	for (size_t vocabIdx = 0; vocabIdx < vocabCount; ++vocabIdx) {
 		uint16 vocabNum = f.readUint16LE();
 		uint16 linkCount = f.readUint16LE() & 0xff;
-		VocabEntry &v = (*this)[vocabNum];
+		VocabEntry &v = _items[vocabNum];
 
 		for (uint idx = 0; idx < linkCount; ++idx) {
 			v._field6 = f.readUint16LE();
