@@ -32,14 +32,15 @@ namespace Parser {
 #define PARSER_AND 50
 #define PARSER_BUT 273
 #define PARSER_OF 1521
+#define PARSER_OOPS 1536
 #define PARSER_THEN 2346
 #define PARSER_TO 2382
 #define PARSER_UNDO 2473
 
 Parser::Parser() : Legend::Early::Parser::Parser(
 		String(_("[I beg your pardon?]\n")),
-		PARSER_AGAIN, PARSER_ALL, PARSER_AND, PARSER_BUT,
-		PARSER_OF, PARSER_THEN, PARSER_TO, PARSER_UNDO) {
+		PARSER_AGAIN, PARSER_ALL, PARSER_AND, PARSER_BUT, PARSER_OF,
+		PARSER_OOPS, PARSER_THEN, PARSER_TO, PARSER_UNDO) {
 }
 
 } // namespace Parser
