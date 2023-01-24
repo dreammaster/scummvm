@@ -97,7 +97,23 @@ private:
 	 */
 	int parseWord(ParserString &line);
 
+protected:
+	const int _AGAIN;
+	const int _ALL;
+	const int _AND;
+	const int _BUT;
+	const int _OF;
+	const int _THEN;
+	const int _TO;
+	const int _UNDO;
+
 public:
+	/**
+	 * Constructor
+	 */
+	Parser(int againId, int allId, int andId, int butId,
+		int ofId, int thenId, int toId, int undoId);
+
 	/**
 	 * Parses a passed input line
 	 */

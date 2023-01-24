@@ -28,7 +28,6 @@
 #include "legend/early/gfx/input_window.h"
 #include "legend/early/gfx/listbox.h"
 #include "legend/early/gfx/scene.h"
-#include "legend/early/parser/parser.h"
 
 namespace Legend {
 namespace Early {
@@ -42,7 +41,6 @@ private:
 	Gfx::Listbox _commands;
 	Gfx::Listbox _items;
 	Gfx::InputWindow _inputWindow;
-	Parser::Parser _parser;
 public:
 	Interface();
 	~Interface() override {}

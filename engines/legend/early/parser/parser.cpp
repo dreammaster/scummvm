@@ -29,14 +29,11 @@ namespace Legend {
 namespace Early {
 namespace Parser {
 
-#define PARSER_AGAIN 27
-#define PARSER_ALL 41
-#define PARSER_AND 50
-#define PARSER_BUT 273
-#define PARSER_OF 1521
-#define PARSER_THEN 2346
-#define PARSER_TO 2382
-#define PARSER_UNDO 2473
+Parser::Parser(int againId, int allId, int andId, int butId, int ofId,
+		int thenId, int toId, int undoId) :
+		_AGAIN(againId), _ALL(allId), _AND(andId), _BUT(butId),
+		_OF(ofId), _THEN(thenId), _TO(toId), _UNDO(undoId) {
+}
 
 void Parser::parse(const String &srcLine) {
 	// Trim and lowercase the source line
@@ -72,12 +69,12 @@ void Parser::parse(const String &srcLine) {
 		_inputLine._charIndex = 0;
 	}
 
-	if (PARSER_UNDO) {
+	if (_UNDO) {
 		(void)parseWord(_inputLine);
 		if (_vocabId) {
 			const VocabEntry &ve = (*g_engine->_vocab)[_vocabId];
 			if (ve._flags & VFLAG_1) {
-				if (_vocabId == PARSER_UNDO || ve._field6 == PARSER_UNDO) {
+				if (_vocabId == _UNDO || ve._field6 == _UNDO) {
 					if (!performUndo())
 						_val5 = 0;
 					return;
@@ -93,7 +90,7 @@ void Parser::parse(const String &srcLine) {
 
 void Parser::parseLoop() {
 	for (;;) {
-		if (PARSER_AGAIN) {
+		if (_AGAIN) {
 			(void)parseWord(_inputLine);
 
 			if (_vocabId) {
@@ -101,7 +98,7 @@ void Parser::parseLoop() {
 
 				if (!(ve._flags & VFLAG_1)) {
 					_inputLine._charIndex = 0;
-				} else if (_vocabId != PARSER_AGAIN && ve._field6 != PARSER_AGAIN) {
+				} else if (_vocabId != _AGAIN && ve._field6 != _AGAIN) {
 					_inputLine._charIndex = 0;
 					_val8 = 0;
 					_val9 = 0;
@@ -247,22 +244,22 @@ int Parser::parseWord(ParserString &line) {
 		}
 
 		const VocabEntry &ve = (*g_engine->_vocab)[_vocabId];
-		if (CHECK_VOCAB(PARSER_ALL)) {
+		if (CHECK_VOCAB(_ALL)) {
 			SET_RESULT(PR_15);
 			break;
-		} else if (CHECK_VOCAB(PARSER_AND)) {
+		} else if (CHECK_VOCAB(_AND)) {
 			SET_RESULT(PR_13);
 			break;
-		} else if (CHECK_VOCAB(PARSER_BUT)) {
+		} else if (CHECK_VOCAB(_BUT)) {
 			SET_RESULT(PR_16);
 			break;
-		} else if (CHECK_VOCAB(PARSER_THEN)) {
+		} else if (CHECK_VOCAB(_THEN)) {
 			SET_RESULT(PR_17);
 			break;
-		} else if (CHECK_VOCAB(PARSER_TO)) {
+		} else if (CHECK_VOCAB(_TO)) {
 			SET_RESULT(PR_14);
 			break;
-		} else if (PARSER_OF != 0 && _vocabId == PARSER_OF) {
+		} else if (_OF != 0 && _vocabId == _OF) {
 			if (_result == PR_12) {
 				if (_val1 == PR_END_OF_STRING || _val1 == PR_PERIOD ||
 						_val1 == PR_COMMA || _val1 == PR_SEMICOLON ||
@@ -371,7 +368,7 @@ int Parser::proc3() {
 	int charIndex = _inputLine._charIndex;
 	int wordResult = parseWord(_inputLine);
 
-	if (wordResult == PR_PERIOD || _vocabId == PARSER_THEN) {
+	if (wordResult == PR_PERIOD || _vocabId == _THEN) {
 		charIndex = _inputLine._charIndex;
 		wordResult = parseWord(_inputLine);
 	}

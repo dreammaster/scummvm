@@ -26,6 +26,7 @@
 #include "legend/early/core/persisted.h"
 #include "legend/early/logic/logics.h"
 #include "legend/early/logic/room.h"
+#include "legend/early/parser/parser.h"
 #include "legend/early/parser/vocab.h"
 
 namespace Legend {
@@ -36,6 +37,7 @@ enum LoadType { LOAD_NONE = 0, LOAD_2 = 2, LOAD_UNDO = 3 };
 class Engine : public LegendEngine, virtual public Early::Persisted {
 public:
 	Logics *_logics = nullptr;
+	Parser::Parser *_parser = nullptr;
 	Parser::Vocab *_vocab = nullptr;
 	const Room *_currentRoom = nullptr;
 

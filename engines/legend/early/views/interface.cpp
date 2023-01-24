@@ -20,7 +20,7 @@
  */
 
 #include "legend/early/views/interface.h"
-#include "legend/legend.h"
+#include "legend/early/engine.h"
 
 namespace Legend {
 namespace Early {
@@ -39,7 +39,7 @@ Interface::Interface() : View("Interface"),
 
 bool Interface::msgGame(const GameMessage &msg) {
 	if (msg._name == "LINE") {
-		_parser.parse(msg._stringValue);
+		g_engine->_parser->parse(msg._stringValue);
 		return true;
 	}
 
