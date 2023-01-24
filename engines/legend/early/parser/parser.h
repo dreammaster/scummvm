@@ -77,9 +77,14 @@ private:
 	String _subLine;
 	String _word;
 	String _quotedString;
-	String _unknownWord;
+	const char *_unknownWord;
 	int _unknownFirstIndex = 0;
 	int _unknownWordIndex = 0;
+
+	/**
+	 * Adds a line to the text window
+	 */
+	void addLine(const Common::U32String &line);
 
 	void parseLoop();
 	int oops();
@@ -89,6 +94,11 @@ private:
 	/**
 	 * Gets the index of the parser handler function
 	 */
+
+	/**
+	 * Displays that you don't need a given word
+	 */
+	void youDontNeed(const String &word);
 
 	/**
 	 * Displays that an undo can't be done

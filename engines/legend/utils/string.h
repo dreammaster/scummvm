@@ -38,7 +38,6 @@ public:
 	String(const char *beginP, const char *endP) : Common::String(beginP, endP) {}
 	String(const String &str) : Common::String(str) {}
 	String(const Common::String &str) : Common::String(str) {}
-	explicit String(char c) : Common::String(c) {}
 
 	/**
 	 * Initialises a string from a given resource Id
