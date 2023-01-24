@@ -37,15 +37,6 @@ Interface::Interface() : View("Interface"),
 	_commands.setDividerIndex(16);
 }
 
-bool Interface::msgGame(const GameMessage &msg) {
-	if (msg._name == "LINE") {
-		g_engine->_parser->parse(msg._stringValue);
-		return true;
-	}
-
-	return false;
-}
-
 bool Interface::msgMouseDown(const MouseDownMessage &msg) {
 	// When the mouse isn't visible, all clicks go to the input window
 	if (!g_engine->_mouseCursor->isVisible())

@@ -49,6 +49,11 @@ public:
 	void deinitialize() override;
 
 	/**
+	 * Handles game control messages
+	 */
+	bool msgGame(const GameMessage &msg) override;
+
+	/**
 	 * Handles logic messages
 	 */
 	bool msgLogic(const LogicMessage &msg) override;

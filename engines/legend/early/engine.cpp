@@ -54,6 +54,15 @@ void Engine::deinitialize() {
 	Legend::Gfx::Font::deinit();
 }
 
+bool Engine::msgGame(const GameMessage &msg) {
+	if (msg._name == "LINE") {
+		_parser->parse(msg._stringValue);
+		return true;
+	}
+
+	return false;
+}
+
 bool Engine::msgLogic(const LogicMessage &msg) {
 	int logicNum = msg._logicNum == -1 ? _roomLogicNum : msg._logicNum;
 	(*_logics)[logicNum]->call(msg._action);
