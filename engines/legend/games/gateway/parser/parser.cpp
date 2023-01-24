@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/translation.h"
 #include "legend/games/gateway/parser/parser.h"
 
 namespace Legend {
@@ -36,8 +37,9 @@ namespace Parser {
 #define PARSER_UNDO 2473
 
 Parser::Parser() : Legend::Early::Parser::Parser(
-	PARSER_AGAIN, PARSER_ALL, PARSER_AND, PARSER_BUT,
-	PARSER_OF, PARSER_THEN, PARSER_TO, PARSER_UNDO) {
+		String(_("[I beg your pardon?]\n")),
+		PARSER_AGAIN, PARSER_ALL, PARSER_AND, PARSER_BUT,
+		PARSER_OF, PARSER_THEN, PARSER_TO, PARSER_UNDO) {
 }
 
 } // namespace Parser

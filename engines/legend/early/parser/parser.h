@@ -88,6 +88,10 @@ private:
 	int proc4();
 
 	/**
+	 * Gets the index of the parser handler function
+	 */
+
+	/**
 	 * Displays that an undo can't be done
 	 */
 	bool performUndo();
@@ -98,6 +102,7 @@ private:
 	int parseWord(ParserString &line);
 
 protected:
+	const String _EMPTY_LINE;
 	const int _AGAIN;
 	const int _ALL;
 	const int _AND;
@@ -111,7 +116,8 @@ public:
 	/**
 	 * Constructor
 	 */
-	Parser(int againId, int allId, int andId, int butId,
+	Parser(const String &emptyLine,
+		int againId, int allId, int andId, int butId,
 		int ofId, int thenId, int toId, int undoId);
 
 	/**
