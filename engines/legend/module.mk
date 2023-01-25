@@ -26,6 +26,8 @@ MODULE_OBJS = \
 	early/gfx/text_window.o \
 	early/gfx/view.o \
 	early/logic/logic_base.o \
+	early/logic/logics.o \
+	early/logic/room.o \
 	early/parser/parser.o \
 	early/parser/vocab.o \
 	early/utils/huffman.o \

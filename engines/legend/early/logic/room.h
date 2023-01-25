@@ -33,6 +33,11 @@ enum RoomAction {
 
 struct Room : public LogicBase {
 	Room() : LogicBase(LT_ROOM) {}
+
+	/**
+	 * Synchronize the data fields of the logic
+	 */
+	void synchronize(Common::Serializer &s) override;
 };
 
 } // namespace Early

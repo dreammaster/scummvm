@@ -74,9 +74,76 @@ void Engine::setRoom(int roomNum) {
 	_currentRoom = dynamic_cast<const Room *>((*_logics)[roomNum]);
 }
 
-int Engine::loadGame(LoadType mode) {
+int Engine::loadGame(LoadType mode, const char *filename) {
+	String name;
+	Common::SeekableReadStream *stream = nullptr;
+
+	switch (mode) {
+	case LOAD_RESTART:
+	case LOAD_SAVE:
+		if (mode == LOAD_RESTART) {
+			// restart.dat contains the initial game state
+			name = "restart.dat";
+			Common::File *f = new Common::File();
+			if (f->open(name)) {
+				stream = f;
+			} else {
+				delete f;
+			}
+		} else {
+			// Load from a savegame
+			assert(filename);
+			stream = g_system->getSavefileManager()->openForLoading(filename);
+		}
+		assert(stream);
+
+
+	}
+
 	// TODO
 	error("TODO: loadGame/undo");
+}
+
+Common::Error Engine::loadGameState(int slot) {
+	// In case autosaves are on, do a save first before loading the new save
+	saveAutosaveIfEnabled();
+
+	Common::InSaveFile *saveFile = _saveFileMan->openForLoading(getSaveStateName(slot));
+
+	if (!saveFile)
+		return Common::kReadingFailed;
+
+	// Check for an original save
+	saveFile->seek(-4, SEEK_END);
+	saveFile->seek(saveFile->readUint32LE());
+	char buffer[6];
+	saveFile->read(buffer, 5);
+	buffer[5] = '\0';
+	saveFile->seek(0);
+
+	bool isOriginal = strcmp(buffer, "SVMCR") != 0;
+	if (isOriginal)
+		// Not present, so it's an original save. Hopefully.
+		// Skip over savegame name field
+		saveFile->seek(34);
+
+	Common::Error result = loadGameStream(saveFile);
+
+	if (!isOriginal && result.getCode() == Common::kNoError) {
+		ExtendedSavegameHeader header;
+		if (MetaEngine::readSavegameHeader(saveFile, &header))
+			setTotalPlayTime(header.playtime);
+	}
+
+	delete saveFile;
+	return result;
+}
+
+Common::Error Engine::syncGameStream(Common::Serializer &s) {
+	 // Synchronize the logic object states
+	_logics->synchronize(s);
+
+	return Common::kNoError;
 }
 
 } // namespace Early

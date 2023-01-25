@@ -32,7 +32,7 @@
 namespace Legend {
 namespace Early {
 
-enum LoadType { LOAD_NONE = 0, LOAD_2 = 2, LOAD_UNDO = 3 };
+enum LoadType { LOAD_NONE = 0, LOAD_RESTART = 1, LOAD_SAVE = 2, LOAD_UNDO = 3 };
 
 class Engine : public LegendEngine, virtual public Early::Persisted {
 public:
@@ -49,6 +49,32 @@ public:
 	void deinitialize() override;
 
 	/**
+	 * Load game
+	 */
+	Common::Error loadGameState(int slot);
+
+	/**
+	 * Load game data
+	 */
+	Common::Error loadGameStream(Common::SeekableReadStream *stream) override {
+		Common::Serializer s(stream, nullptr);
+		return syncGameStream(s);
+	}
+
+	/**
+	 * Save game data
+	 */
+	Common::Error saveGameStream(Common::WriteStream *stream, bool isAutosave = false) override {
+		Common::Serializer s(nullptr, stream);
+		return syncGameStream(s);
+	}
+
+	/**
+	 * Synchronize savegame data
+	 */
+	Common::Error syncGameStream(Common::Serializer &s);
+
+	/**
 	 * Handles game control messages
 	 */
 	bool msgGame(const GameMessage &msg) override;
@@ -63,7 +89,7 @@ public:
 	 */
 	void setRoom(int roomNum);
 
-	int loadGame(LoadType mode);
+	int loadGame(LoadType mode, const char *filename = nullptr);
 };
 
 extern Engine *g_engine;
