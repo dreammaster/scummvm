@@ -33,7 +33,7 @@ public:
 	/**
 	 * Array indexing operator
 	 */
-	virtual LogicBase *operator[](int index) = 0;
+	virtual LogicBase *operator[](int index) const = 0;
 
 	/**
 	 * Size of the logic array
@@ -44,6 +44,27 @@ public:
 	 * Synchronize logic data
 	 */
 	void synchronize(Common::Serializer &s);
+
+	int getVal1(int logicNum) const {
+		return (*this)[logicNum]->_val1;
+	}
+	void setVal1(int logicNum, int val1) {
+		(*this)[logicNum]->_val1 = val1;
+	}
+	int getVal2(int logicNum) const {
+		return (*this)[logicNum]->_val2;
+	}
+	void setVal2(int logicNum, int val2) {
+		(*this)[logicNum]->_val1 = val2;
+	}
+	int getPrehandlerId(int logicNum) const {
+		return (*this)[logicNum]->_prehandlerId;
+	}
+	void setPrehandlerId(int logicNum, int id) {
+		(*this)[logicNum]->_prehandlerId = id;
+	}
+
+	void proc1(int logicNum, int v2, int v3);
 };
 
 } // namespace Early

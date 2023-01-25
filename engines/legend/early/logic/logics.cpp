@@ -30,5 +30,9 @@ void Logics::synchronize(Common::Serializer &s) {
 		(*this)[i]->synchronize(s);
 }
 
+void Logics::proc1(int logicNum, int v2, int v3) {
+	// TODO
+}
+
 } // namespace Early
 } // namespace Legend

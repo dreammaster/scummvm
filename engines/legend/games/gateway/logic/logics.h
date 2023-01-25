@@ -790,7 +790,7 @@ public:
 	/**
 	 * Returns the logic at a given index
 	 */
-	LogicBase *operator[](int index) override;
+	LogicBase *operator[](int index) const override;
 
 	/**
 	 * Return number of logics
