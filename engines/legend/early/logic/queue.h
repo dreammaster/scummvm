@@ -46,7 +46,15 @@ class Queue {
 private:
 	Common::Array<QueueEntry> _items;
 public:
+	/**
+	 * Add a new queue entry
+	 */
 	void add(int val1, int val2);
+
+	/**
+	 * Returns the index of an entry with the given Id
+	 */
+	int indexOf(int param1) const;
 
 	/**
 	 * Synchronize the queue

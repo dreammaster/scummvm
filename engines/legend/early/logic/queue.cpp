@@ -47,6 +47,15 @@ void Queue::add(int val1, int val2) {
 	}
 }
 
+int Queue::indexOf(int param1) const {
+	for (uint i = 0; i < _items.size(); ++i) {
+		if (_items[i]._val1 == param1)
+			return i;
+	}
+
+	return -1;
+}
+
 void Queue::synchronize(Common::Serializer &s) {
 	uint count = _items.size();
 	s.syncAsUint16LE(count);

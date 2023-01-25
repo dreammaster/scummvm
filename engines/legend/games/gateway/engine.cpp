@@ -83,7 +83,7 @@ void GatewayEngine::startGameplay() {
 		_random04[i] = getRandomNumber(4);
 
 	_val4 = 720;
-	_val1 = 8;
+	_val194 = 8;
 
 	_queue.add(33, 179);
 	_queue.add(23, 1200 - _val4);
