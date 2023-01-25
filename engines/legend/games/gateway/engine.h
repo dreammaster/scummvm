@@ -25,7 +25,6 @@
 #include "legend/early/engine.h"
 #include "legend/games/gateway/core/persisted.h"
 #include "legend/games/gateway/logic/logics.h"
-#include "legend/games/gateway/utils/queue.h"
 
 namespace Legend {
 namespace Early {
@@ -44,9 +43,6 @@ protected:
 	 * Start the gameplay
 	 */
 	void startGameplay();
-
-public:
-	Utils::Queue _queue;
 
 public:
 	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
