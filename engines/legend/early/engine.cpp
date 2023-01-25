@@ -140,8 +140,10 @@ Common::Error Engine::loadGameState(int slot) {
 }
 
 Common::Error Engine::syncGameStream(Common::Serializer &s) {
-	 // Synchronize the logic object states
+	 // Synchronize game logic, persisted fields, and queue
 	_logics->synchronize(s);
+	Persisted::synchronize(s);
+	_queue.synchronize(s);
 
 	return Common::kNoError;
 }

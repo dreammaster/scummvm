@@ -26,6 +26,7 @@
 #include "legend/early/core/persisted.h"
 #include "legend/early/logic/logics.h"
 #include "legend/early/logic/room.h"
+#include "legend/early/logic/queue.h"
 #include "legend/early/parser/parser.h"
 #include "legend/early/parser/vocab.h"
 
@@ -40,6 +41,7 @@ public:
 	Parser::Parser *_parser = nullptr;
 	Parser::Vocab *_vocab = nullptr;
 	const Room *_currentRoom = nullptr;
+	Queue _queue;
 
 public:
 	Engine(OSystem *syst, const LegendGameDescription *gameDesc);
