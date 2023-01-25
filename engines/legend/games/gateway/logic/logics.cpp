@@ -51,7 +51,7 @@ Logics::Logics() : _logics{
 } {
 }
 
-LogicBase *Logics::operator[](int index) {
+LogicBase *Logics::operator[](int index) const {
 	if (index == 0 || index > LOGICS_COUNT)
 		error("Invalid logic specified");
 

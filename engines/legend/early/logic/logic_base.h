@@ -38,6 +38,8 @@ enum LogicType {
 struct LogicBase {
 	LogicType _type;
 	int _prehandlerId = 0;
+	int _val1 = 0;
+	int _val2 = 0;
 
 	LogicBase(LogicType type) : _type(type) {}
 
