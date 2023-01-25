@@ -22,7 +22,7 @@
 #ifndef LEGEND_EARLY_LOGIC_LOGIC_BASE_H
 #define LEGEND_EARLY_LOGIC_LOGIC_BASE_H
 
-#include "common/scummsys.h"
+#include "common/serializer.h"
 
 namespace Legend {
 namespace Early {
@@ -32,34 +32,100 @@ enum LogicType {
 	LT_5 = 5, LT_6 = 6, LT_7 = 7, LT_8 = 8
 };
 
+/**
+ * Base class for game logic
+ */
 struct LogicBase {
 	LogicType _type;
 	LogicBase(LogicType type) : _type(type) {}
 
+	/**
+	 * Perform an action
+	 */
 	virtual int call(int action = 0) const = 0;
+
+	/**
+	 * Synchronize the data fields of the logic
+	 */
+	virtual void synchronize(Common::Serializer &s) = 0;
 };
 
 
 struct LogicType2 : public LogicBase {
 	LogicType2() : LogicBase(LT_2) {}
+	
+	/**
+	 * Synchronize the data fields of the logic
+	 */
+	void synchronize(Common::Serializer &s) override {
+		// TODO: implement
+	}
 };
+
 struct LogicType3 : public LogicBase {
 	LogicType3() : LogicBase(LT_3) {}
+
+	/**
+	 * Synchronize the data fields of the logic
+	 */
+	void synchronize(Common::Serializer &s) override {
+		// TODO: implement
+	}
 };
+
 struct LogicType4 : public LogicBase {
 	LogicType4() : LogicBase(LT_4) {}
+
+	/**
+	 * Synchronize the data fields of the logic
+	 */
+	void synchronize(Common::Serializer &s) override {
+		// TODO: implement
+	}
 };
+
 struct LogicType5 : public LogicBase {
 	LogicType5() : LogicBase(LT_5) {}
+
+	/**
+	 * Synchronize the data fields of the logic
+	 */
+	void synchronize(Common::Serializer &s) override {
+		// TODO: implement
+	}
 };
+
 struct LogicType6 : public LogicBase {
 	LogicType6() : LogicBase(LT_6) {}
+
+	/**
+	 * Synchronize the data fields of the logic
+	 */
+	void synchronize(Common::Serializer &s) override {
+		// TODO: implement
+	}
 };
+
 struct LogicType7 : public LogicBase {
 	LogicType7() : LogicBase(LT_7) {}
+
+	/**
+	 * Synchronize the data fields of the logic
+	 */
+	void synchronize(Common::Serializer &s) override {
+		// TODO: implement
+	}
 };
+
 struct LogicType8 : public LogicBase {
 	LogicType8() : LogicBase(LT_8) {}
+
+	/**
+	 * Synchronize the data fields of the logic
+	 */
+	void synchronize(Common::Serializer &s) override {
+		// TODO: implement
+	}
 };
 
 /**
@@ -70,6 +136,13 @@ struct LogicNull : public LogicBase {
 
 	int call(int param) const override {
 		return 0;
+	}
+
+	/**
+	 * Synchronize the data fields of the logic
+	 */
+	void synchronize(Common::Serializer &s) override {
+		// TODO: implement
 	}
 };
 

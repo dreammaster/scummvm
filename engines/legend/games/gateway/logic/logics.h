@@ -41,7 +41,7 @@ namespace Logic {
 
 class Logics : public Early::Logics {
 private:
-	const LogicBase *const _logics[LOGICS_COUNT];
+	LogicBase *const _logics[LOGICS_COUNT];
 	LogicNull _logic001;
 	LogicNull _logic002;
 	LogicNull _logic003;
@@ -787,7 +787,17 @@ private:
 public:
 	Logics();
 
-	const LogicBase *operator[](int index) override;
+	/**
+	 * Returns the logic at a given index
+	 */
+	LogicBase *operator[](int index) override;
+
+	/**
+	 * Return number of logics
+	 */
+	size_t size() const override {
+		return LOGICS_COUNT;
+	}
 };
 
 } // namespace Logic

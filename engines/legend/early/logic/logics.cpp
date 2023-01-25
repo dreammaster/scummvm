@@ -19,34 +19,16 @@
  *
  */
 
-#ifndef LEGEND_EARLY_LOGIC_LOGICS_H
-#define LEGEND_EARLY_LOGIC_LOGICS_H
-
-#include "common/serializer.h"
-#include "legend/early/logic/logic_base.h"
+#include "legend/early/logic/logics.h"
 
 namespace Legend {
 namespace Early {
 
-class Logics {
-public:
-	/**
-	 * Array indexing operator
-	 */
-	virtual LogicBase *operator[](int index) = 0;
-
-	/**
-	 * Size of the logic array
-	 */
-	virtual size_t size() const = 0;
-
-	/**
-	 * Synchronize logic data
-	 */
-	void synchronize(Common::Serializer &s);
-};
+void Logics::synchronize(Common::Serializer &s) {
+	size_t count = size();
+	for (size_t i = 0; i < count; ++i)
+		(*this)[i]->synchronize(s);
+}
 
 } // namespace Early
 } // namespace Legend
-
-#endif
