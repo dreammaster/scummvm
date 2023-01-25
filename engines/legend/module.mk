@@ -28,6 +28,7 @@ MODULE_OBJS = \
 	early/logic/logic_base.o \
 	early/logic/logics.o \
 	early/logic/room.o \
+	early/logic/queue.o \
 	early/parser/parser.o \
 	early/parser/vocab.o \
 	early/utils/huffman.o \
