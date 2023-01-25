@@ -37,6 +37,8 @@ enum LogicType {
  */
 struct LogicBase {
 	LogicType _type;
+	int _prehandlerId = 0;
+
 	LogicBase(LogicType type) : _type(type) {}
 
 	/**
@@ -48,6 +50,10 @@ struct LogicBase {
 	 * Synchronize the data fields of the logic
 	 */
 	virtual void synchronize(Common::Serializer &s) = 0;
+
+	int getPrehandlerId() const {
+		return _prehandlerId;
+	}
 };
 
 

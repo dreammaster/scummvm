@@ -356,8 +356,8 @@ struct Persisted : public virtual Legend::Early::Persisted {
 	uint16 _val230 = 0;
 	uint16 _val231 = 0;
 	uint16 _val232 = 0;
-	uint8 _val233[16] = { 0 };
-	uint8 _val234[16] = { 0 };
+	uint32 _val233[4] = { 0 };
+	uint32 _val234[4] = { 0 };
 	uint8 _val235[4] = { 0 };
 	uint8 _val236 = 0;
 	uint8 _val237 = 0;

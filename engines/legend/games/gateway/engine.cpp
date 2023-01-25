@@ -32,8 +32,6 @@ namespace Legend {
 namespace Early {
 namespace Gateway {
 
-#define STARTING_ROOM 238
-
 bool GatewayEngine::initialize() {
 	// Initialize 640x480 paletted graphics mode
 	initGraphics(640, 480);
@@ -51,7 +49,7 @@ bool GatewayEngine::initialize() {
 
 	_logics = new Logic::Logics();
 	_parser = new Gateway::Parser::Parser();
-	setRoom(STARTING_ROOM);
+	setRoom(LOGIC_STARTING_ROOM);
 
 	return true;
 }
@@ -91,8 +89,27 @@ void GatewayEngine::startGameplay() {
 	_queue.add(37, 1440 - _val4);
 	_queue.add(42, 1500 - _val4);
 
-	(*_logics)[LOGIC_START]->call(0);
+	initPersisted(238);
+	initPersisted(247);
+	initPersisted(248);
+	initPersisted(249);
+
+	_currentRoom->call(25);
+	// TODO: ?
+	_currentRoom->call(7);
 }
+
+void GatewayEngine::initPersisted(int roomNum) {
+	const uint16 ROOMS[4] = { 238,  247,  248,  249 };
+	int idx;
+	for (idx = 0; idx < 4 && ROOMS[idx] != roomNum; ++idx) {
+	}
+
+	if (idx != 4) {
+		// TODO: Stuff
+	}
+}
+
 
 } // namespace Gateway
 } // namespace Early

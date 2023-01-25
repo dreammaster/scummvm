@@ -34,7 +34,7 @@ namespace Gateway {
 
 enum LogicEnum {
 	LOGIC_START = 25,
-	LOGIC_ROOM1 = 238
+	LOGIC_STARTING_ROOM = 238
 };
 
 namespace Logic {

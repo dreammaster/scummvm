@@ -31,6 +31,12 @@ namespace Early {
 namespace Gateway {
 
 class GatewayEngine : public Early::Engine, public Gateway::Persisted {
+private:
+	/**
+	 * Initialize persisted data for a room
+	 */
+	void initPersisted(int roomNum);
+
 protected:
 	/**
 	 * Initialize the game
