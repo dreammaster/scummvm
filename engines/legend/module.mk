@@ -37,6 +37,7 @@ MODULE_OBJS = \
 	games/gateway/engine.o \
 	games/gateway/core/persisted.o \
 	games/gateway/logic/logics.o \
+	games/gateway/logic/logic_strings.o \
 	games/gateway/logic/rooms/room238.o \
 	games/gateway/parser/parser.o \
 	games/gateway/views/commset.o \
