@@ -795,7 +795,7 @@ public:
 	/**
 	 * Return number of logics
 	 */
-	size_t size() const override {
+	int size() const override {
 		return LOGICS_COUNT;
 	}
 };
