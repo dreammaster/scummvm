@@ -40,6 +40,7 @@ enum LogicType {
 struct LogicBase {
 	LogicType _type;
 	int _prehandlerId[MAX_HANDLERS] = { 0, 0 };
+	int _unkHandlerId[3] = { 0, 0, 0 };
 	int _val1 = 0;
 	int _val2 = 0;
 	int _val3 = 0;
@@ -120,6 +121,8 @@ struct LogicType6 : public LogicBase {
 
 struct LogicType7 : public LogicBase {
 	LogicType7() : LogicBase(LT_7) {}
+
+	uint32 _data1 = 0;
 
 	/**
 	 * Synchronize the data fields of the logic
