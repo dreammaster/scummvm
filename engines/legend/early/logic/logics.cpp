@@ -102,6 +102,21 @@ const uint32 *Logics::getData7(int logicNum) const {
 	}
 }
 
+const char *Logics::getName(int logicNum) {
+	const char *result = nullptr;
+	int index = 0;
+
+	if (logicNum >= 1 && logicNum <= size()) {
+
+	}
+
+	return result;
+}
+
+const char *Logics::getString1(int logicNum) {
+	return nullptr;
+}
+
 void Logics::updateHandler(int logicNum, int handlerId, int handlerIndex) {
 	int prehandlerId = getPrehandler(logicNum);
 	int newIndex = getVal2(logicNum);
