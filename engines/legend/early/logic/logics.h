@@ -100,6 +100,8 @@ public:
 	void setUnkHandler(int logicNum, int handlerIndex, int newId);
 
 	const uint32 *getData7(int logicNum) const;
+	const char *getName(int logicNum);
+	const char *getString1(int logicNum);
 
 	void updateHandler(int logicNum, int handlerId, int handlerIndex);
 };
