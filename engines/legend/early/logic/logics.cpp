@@ -132,31 +132,31 @@ void Logics::setUnkHandler(int logicNum, int handlerIndex, int newId) {
 	}
 }
 
-const byte *Logics::getData7(int logicNum) const {
+byte *Logics::getBits(int logicNum) {
 	if (logicNum < 1 || logicNum > size()) {
 		return nullptr;
 	} else {
-		const LogicBase *lb = (*this)[logicNum];
+		LogicBase *lb = (*this)[logicNum];
 		if (lb->_type != LT_7)
 			return nullptr;
 
-		return &static_cast<const LogicType7 *>(lb)->_data1[0];
+		return &static_cast<LogicType7 *>(lb)->_data1[0];
 	}
 }
 
-const byte *Logics::getDataEntry(int logicNum, int index, byte *dest) {
-	const byte *result = nullptr;
+byte *Logics::getBitPtr(int logicNum, int index, int *bitNum) {
+	byte *result = nullptr;
 
 	if (logicNum >= 1 && logicNum <= size()) {
-		const LogicBase *lb = (*this)[logicNum];
-		const byte *dataPtr = getData7(logicNum);
+		LogicBase *lb = (*this)[logicNum];
+		byte *dataPtr = getBits(logicNum);
 
 		if (index > 0 && dataPtr) {
 			byte typeBits = _ARRAY[index - 1]._typeBits;
 			if ((1 << (lb->_type - 1)) & typeBits) {
 				// Is enabled for this type
 				byte newIndex = _ARRAY[index - 1]._index;
-				*dest = newIndex & 7;
+				*bitNum = newIndex & 7;
 
 				assert((newIndex >> 3) < 4);
 				result = dataPtr + (newIndex >> 3);
@@ -167,11 +167,11 @@ const byte *Logics::getDataEntry(int logicNum, int index, byte *dest) {
 	return result;
 }
 
-int Logics::getDataEntryBit(int logicNum, int index) {
-	byte bit = 0;
-	const byte *data = getDataEntry(logicNum, index, &bit);
+int Logics::getBit(int logicNum, int index) {
+	int bitNum = 0;
+	byte *data = getBitPtr(logicNum, index, &bitNum);
 
-	return data ? (*data >> bit) & 1 : 0;
+	return data ? (*data >> bitNum) & 1 : 0;
 }
 
 const char *Logics::getName(int logicNum) {

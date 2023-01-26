@@ -116,8 +116,11 @@ void GatewayEngine::initPersisted(int roomNum) {
 			logicNum = _logics->getVal1(logicNum);
 		}
 
-		_val233[idx] = *_logics->getData7(353);
-		_val234[idx] = *_logics->getData7(354);
+		const byte *bits1 = _logics->getBits(353);
+		const byte *bits2 = _logics->getBits(354);
+		Common::copy(bits1, bits1 + 4, &_val233[idx][0]);
+		Common::copy(bits2, bits1 + 4, &_val234[idx][0]);
+
 		_logics->updateHandler(365, 353, 0);
 	}
 }

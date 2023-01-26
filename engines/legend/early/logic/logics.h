@@ -108,9 +108,9 @@ public:
 	int getUnkHandler(int logicNum, int handlerIndex);
 	void setUnkHandler(int logicNum, int handlerIndex, int newId);
 
-	const byte *getData7(int logicNum) const;
-	const byte *getDataEntry(int logicNum, int index, byte *dest);
-	int getDataEntryBit(int logicNum, int index);
+	byte *getBits(int logicNum);
+	byte *getBitPtr(int logicNum, int index, int *bitNum);
+	int getBit(int logicNum, int index);
 	const char *getName(int logicNum);
 	const char *getString1(int logicNum);
 
