@@ -52,7 +52,7 @@ Logics::Logics() : _logics{
 }
 
 LogicBase *Logics::operator[](int index) const {
-	if (index == 0 || index > LOGICS_COUNT)
+	if (index < 1 || index > LOGICS_COUNT)
 		error("Invalid logic specified");
 
 	// Call the appropriate method
