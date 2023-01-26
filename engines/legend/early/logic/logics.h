@@ -38,8 +38,14 @@ class Logics {
 			_handlerCount(handlerCount), _unkHandlerCount(unkHandlerCount),
 			_size(size) {}
 	};
+	struct ArrayEntry {
+		byte _index;
+		byte _typeBits;
+		ArrayEntry(uint16 index, uint16 typeBits) : _index(index), _typeBits(typeBits) {}
+	};
 private:
 	const LogicType _METADATA[8];
+	const ArrayEntry _ARRAY[40];	// TODO: Is this Gateway specific?
 protected:
 	LogicStrings _strings;
 public:
@@ -102,7 +108,9 @@ public:
 	int getUnkHandler(int logicNum, int handlerIndex);
 	void setUnkHandler(int logicNum, int handlerIndex, int newId);
 
-	const uint32 *getData7(int logicNum) const;
+	const byte *getData7(int logicNum) const;
+	const byte *getDataEntry(int logicNum, int index, byte *dest);
+	int getDataEntryBit(int logicNum, int index);
 	const char *getName(int logicNum);
 	const char *getString1(int logicNum);
 
