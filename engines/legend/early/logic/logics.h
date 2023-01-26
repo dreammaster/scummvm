@@ -31,13 +31,14 @@ namespace Early {
 class Logics {
 	struct LogicType {
 		const int _handlerCount;
-		const int _val2;
+		const int _unkHandlerCount;
 		const uint _size;
-		LogicType(int handlerCount, int v2, uint size) :
-			_handlerCount(handlerCount), _val2(v2), _size(size) {}
+		LogicType(int handlerCount, int unkHandlerCount, uint size) :
+			_handlerCount(handlerCount), _unkHandlerCount(unkHandlerCount),
+			_size(size) {}
 	};
 private:
-	const LogicType _METADATA[6];
+	const LogicType _METADATA[8];
 public:
 	Logics();
 	virtual ~Logics() {}
@@ -94,9 +95,13 @@ public:
 	}
 
 	int getPrehandlerMode(int logicNum, int val1);
-	void setPrehandlerMode(int logicNum, int val1, uint newId);
+	void setPrehandlerMode(int logicNum, int val1, int newId);
+	int getUnkHandler(int logicNum, int handlerIndex);
+	void setUnkHandler(int logicNum, int handlerIndex, int newId);
 
-	void proc1(int logicNum, int v2, int v3);
+	const uint32 *getData7(int logicNum) const;
+
+	void updateHandler(int logicNum, int handlerId, int handlerIndex);
 };
 
 } // namespace Early

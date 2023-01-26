@@ -30,8 +30,10 @@ Logics::Logics() : _METADATA{
 		LogicType(0, 0, 12),
 		LogicType(0, 2, 20),
 		LogicType(0, 2, 22),
-		LogicType(2, 2, 24)
-} {
+		LogicType(2, 2, 24),
+		LogicType(1, 3, 32),
+		LogicType(1, 0, 24)
+	} {
 }
 
 void Logics::synchronize(Common::Serializer &s) {
@@ -55,8 +57,8 @@ int Logics::getPrehandlerMode(int logicNum, int handlerIndex) {
 	}
 }
 
-void Logics::setPrehandlerMode(int logicNum, int handlerIndex, uint newId) {
-	if (logicNum != 0 && logicNum <= size()) {
+void Logics::setPrehandlerMode(int logicNum, int handlerIndex, int newId) {
+	if (logicNum >= 1 && logicNum <= size()) {
 		LogicBase *lb = (*this)[logicNum];
 		if (lb->_type != LT_6) {
 			setPrehandler(logicNum, newId);
@@ -66,9 +68,67 @@ void Logics::setPrehandlerMode(int logicNum, int handlerIndex, uint newId) {
 	}
 }
 
-void Logics::proc1(int logicNum, int v2, int v3) {
-	
-	// TODO
+int Logics::getUnkHandler(int logicNum, int handlerIndex) {
+	if (logicNum < 1 || logicNum > size()) {
+		return 0;
+	} else {
+		const LogicBase *lb = (*this)[logicNum];
+		if (handlerIndex < 0 || handlerIndex >= _METADATA[lb->_type - 1]._unkHandlerCount)
+			return 0;
+
+		return lb->_unkHandlerId[handlerIndex];
+	}
+}
+
+void Logics::setUnkHandler(int logicNum, int handlerIndex, int newId) {
+	if (logicNum >= 1 && logicNum <= size()) {
+		LogicBase *lb = (*this)[logicNum];
+
+		if (handlerIndex >= 0 && handlerIndex < _METADATA[lb->_type - 1]._unkHandlerCount) {
+			lb->_unkHandlerId[handlerIndex] = newId;
+		}
+	}
+}
+
+const uint32 *Logics::getData7(int logicNum) const {
+	if (logicNum < 1 || logicNum > size()) {
+		return nullptr;
+	} else {
+		const LogicBase *lb = (*this)[logicNum];
+		if (lb->_type != LT_7)
+			return nullptr;
+
+		return &static_cast<const LogicType7 *>(lb)->_data1;
+	}
+}
+
+void Logics::updateHandler(int logicNum, int handlerId, int handlerIndex) {
+	int prehandlerId = getPrehandler(logicNum);
+	int newIndex = getVal2(logicNum);
+	int unkHandlerId = getUnkHandler(prehandlerId, newIndex);
+
+
+	if (logicNum == unkHandlerId) {
+		setUnkHandler(prehandlerId, newIndex, getVal1(logicNum));
+	} else {
+		int newId;
+		for (; unkHandlerId; unkHandlerId = newId) {
+			newId = getVal1(unkHandlerId);
+			if (logicNum == newId) {
+				setVal1(unkHandlerId, getVal1(logicNum));
+				break;
+			}
+		}
+	}
+
+	setPrehandler(logicNum, handlerId);
+	setVal2(logicNum, handlerIndex);
+
+	if (handlerId) {
+		unkHandlerId = getUnkHandler(handlerId, handlerIndex);
+		setUnkHandler(handlerId, handlerIndex, logicNum);
+		setVal1(logicNum, unkHandlerId);
+	}
 }
 
 } // namespace Early
