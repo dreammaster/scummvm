@@ -106,7 +106,19 @@ void GatewayEngine::initPersisted(int roomNum) {
 	}
 
 	if (idx != 4) {
-		// TODO: Stuff
+		_logics->updateHandler(365, 0, 0);
+		int logicNum = _logics->getUnkHandler(353, 0);
+		_val235[idx] = logicNum;
+		_logics->setUnkHandler(353, 0, 0);
+
+		while (logicNum) {
+			_logics->setPrehandler(logicNum, 0);
+			logicNum = _logics->getVal1(logicNum);
+		}
+
+		_val233[idx] = *_logics->getData7(353);
+		_val234[idx] = *_logics->getData7(354);
+		_logics->updateHandler(365, 353, 0);
 	}
 }
 
