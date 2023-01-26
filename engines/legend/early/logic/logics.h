@@ -24,6 +24,7 @@
 
 #include "common/serializer.h"
 #include "legend/early/logic/logic_base.h"
+#include "legend/early/logic/logic_strings.h"
 
 namespace Legend {
 namespace Early {
@@ -39,6 +40,8 @@ class Logics {
 	};
 private:
 	const LogicType _METADATA[8];
+protected:
+	LogicStrings _strings;
 public:
 	Logics();
 	virtual ~Logics() {}
