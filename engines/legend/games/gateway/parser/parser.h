@@ -32,6 +32,7 @@ namespace Parser {
 class Parser : public Legend::Early::Parser::Parser {
 public:
 	Parser();
+	virtual ~Parser() {}
 };
 
 } // namespace Parser

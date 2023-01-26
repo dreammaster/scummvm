@@ -27,6 +27,8 @@
 namespace Legend {
 namespace Early {
 
+#define MAX_HANDLERS 2
+
 enum LogicType {
 	LT_NULL = 0, LT_ROOM = 1, LT_2 = 2, LT_3 = 3, LT_4 = 4,
 	LT_5 = 5, LT_6 = 6, LT_7 = 7, LT_8 = 8
@@ -37,9 +39,11 @@ enum LogicType {
  */
 struct LogicBase {
 	LogicType _type;
-	int _prehandlerId = 0;
+	int _prehandlerId[MAX_HANDLERS] = { 0, 0 };
 	int _val1 = 0;
 	int _val2 = 0;
+	int _val3 = 0;
+	int _val4 = 0;
 
 	LogicBase(LogicType type) : _type(type) {}
 
@@ -54,7 +58,7 @@ struct LogicBase {
 	virtual void synchronize(Common::Serializer &s) = 0;
 
 	int getPrehandlerId() const {
-		return _prehandlerId;
+		return _prehandlerId[0];
 	}
 };
 

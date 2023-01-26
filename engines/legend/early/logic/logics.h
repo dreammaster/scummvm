@@ -29,7 +29,19 @@ namespace Legend {
 namespace Early {
 
 class Logics {
+	struct LogicType {
+		const int _handlerCount;
+		const int _val2;
+		const uint _size;
+		LogicType(int handlerCount, int v2, uint size) :
+			_handlerCount(handlerCount), _val2(v2), _size(size) {}
+	};
+private:
+	const LogicType _METADATA[6];
 public:
+	Logics();
+	virtual ~Logics() {}
+
 	/**
 	 * Array indexing operator
 	 */
@@ -38,7 +50,7 @@ public:
 	/**
 	 * Size of the logic array
 	 */
-	virtual size_t size() const = 0;
+	virtual int size() const = 0;
 
 	/**
 	 * Synchronize logic data
@@ -46,23 +58,43 @@ public:
 	void synchronize(Common::Serializer &s);
 
 	int getVal1(int logicNum) const {
-		return (*this)[logicNum]->_val1;
+		return (logicNum < 1 || logicNum > size()) ? 0 :
+			(*this)[logicNum]->_val1;
 	}
 	void setVal1(int logicNum, int val1) {
 		(*this)[logicNum]->_val1 = val1;
 	}
 	int getVal2(int logicNum) const {
-		return (*this)[logicNum]->_val2;
+		return (logicNum < 1 || logicNum > size()) ? 0 :
+			(*this)[logicNum]->_val2;
 	}
 	void setVal2(int logicNum, int val2) {
-		(*this)[logicNum]->_val1 = val2;
+		(*this)[logicNum]->_val2 = val2;
 	}
-	int getPrehandlerId(int logicNum) const {
-		return (*this)[logicNum]->_prehandlerId;
+	int getVal3(int logicNum) const {
+		return (logicNum < 1 || logicNum > size()) ? 0 :
+			(*this)[logicNum]->_val3;
 	}
-	void setPrehandlerId(int logicNum, int id) {
-		(*this)[logicNum]->_prehandlerId = id;
+	void setVal3(int logicNum, int val3) {
+		(*this)[logicNum]->_val3 = val3;
 	}
+	int getVal4(int logicNum) const {
+		return (logicNum < 1 || logicNum > size()) ? 0 :
+			(*this)[logicNum]->_val4;
+	}
+	void setVal4(int logicNum, int val4) {
+		(*this)[logicNum]->_val4 = val4;
+	}
+	int getPrehandler(int logicNum) const {
+		return (logicNum < 1 || logicNum > size()) ? 0 :
+			(*this)[logicNum]->_prehandlerId[0];
+	}
+	void setPrehandler(int logicNum, int id) {
+		(*this)[logicNum]->_prehandlerId[0] = id;
+	}
+
+	int getPrehandlerMode(int logicNum, int val1);
+	void setPrehandlerMode(int logicNum, int val1, uint newId);
 
 	void proc1(int logicNum, int v2, int v3);
 };

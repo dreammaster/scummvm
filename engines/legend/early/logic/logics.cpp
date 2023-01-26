@@ -24,13 +24,50 @@
 namespace Legend {
 namespace Early {
 
+Logics::Logics() : _METADATA{
+		LogicType(0, 1, 26),
+		LogicType(1, 3, 36),
+		LogicType(0, 0, 12),
+		LogicType(0, 2, 20),
+		LogicType(0, 2, 22),
+		LogicType(2, 2, 24)
+} {
+}
+
 void Logics::synchronize(Common::Serializer &s) {
 	size_t count = size();
 	for (size_t i = 0; i < count; ++i)
 		(*this)[i]->synchronize(s);
 }
 
+int Logics::getPrehandlerMode(int logicNum, int handlerIndex) {
+	if (logicNum < 1 || logicNum > size()) {
+		return 0;
+	} else {
+		const LogicBase *lb = (*this)[logicNum];
+		if (lb->_type != LT_6)
+			return getPrehandler(logicNum);
+
+		if (handlerIndex < 0 || handlerIndex >= _METADATA[6 - 1]._handlerCount)
+			return 0;
+
+		return lb->_prehandlerId[handlerIndex];
+	}
+}
+
+void Logics::setPrehandlerMode(int logicNum, int handlerIndex, uint newId) {
+	if (logicNum != 0 && logicNum <= size()) {
+		LogicBase *lb = (*this)[logicNum];
+		if (lb->_type != LT_6) {
+			setPrehandler(logicNum, newId);
+		} else if (handlerIndex >= 0 && handlerIndex < _METADATA[6 - 1]._handlerCount) {
+			lb->_prehandlerId[handlerIndex] = newId;
+		}
+	}
+}
+
 void Logics::proc1(int logicNum, int v2, int v3) {
+	
 	// TODO
 }
 
