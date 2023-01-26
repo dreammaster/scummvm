@@ -33,6 +33,48 @@ Logics::Logics() : _METADATA{
 		LogicType(2, 2, 24),
 		LogicType(1, 3, 32),
 		LogicType(1, 0, 24)
+	},
+	_ARRAY{
+		ArrayEntry(0, 255),
+		ArrayEntry(1, 255),
+		ArrayEntry(2, 255),
+		ArrayEntry(3, 255),
+		ArrayEntry(4, 255),
+		ArrayEntry(5, 255),
+		ArrayEntry(6, 255),
+		ArrayEntry(7, 242),
+		ArrayEntry(8, 211),
+		ArrayEntry(9, 218),
+		ArrayEntry(10, 210),
+		ArrayEntry(11, 50),
+		ArrayEntry(12, 146),
+		ArrayEntry(13, 50),
+		ArrayEntry(14, 34),
+		ArrayEntry(15, 34),
+		ArrayEntry(16, 66),
+		ArrayEntry(17, 130),
+		ArrayEntry(18, 18),
+		ArrayEntry(19, 130),
+		ArrayEntry(20, 130),
+		ArrayEntry(21, 3),
+		ArrayEntry(22, 130),
+		ArrayEntry(23, 130),
+		ArrayEntry(24, 130),
+		ArrayEntry(25, 130),
+		ArrayEntry(26, 130),
+		ArrayEntry(27, 18),
+		ArrayEntry(28, 130),
+		ArrayEntry(29, 2),
+		ArrayEntry(30, 2),
+		ArrayEntry(31, 2),
+		ArrayEntry(32, 2),
+		ArrayEntry(33, 2),
+		ArrayEntry(34, 2),
+		ArrayEntry(35, 2),
+		ArrayEntry(36, 2),
+		ArrayEntry(37, 2),
+		ArrayEntry(7, 1),
+		ArrayEntry(11, 64)
 	} {
 }
 
@@ -90,7 +132,7 @@ void Logics::setUnkHandler(int logicNum, int handlerIndex, int newId) {
 	}
 }
 
-const uint32 *Logics::getData7(int logicNum) const {
+const byte *Logics::getData7(int logicNum) const {
 	if (logicNum < 1 || logicNum > size()) {
 		return nullptr;
 	} else {
@@ -98,22 +140,47 @@ const uint32 *Logics::getData7(int logicNum) const {
 		if (lb->_type != LT_7)
 			return nullptr;
 
-		return &static_cast<const LogicType7 *>(lb)->_data1;
+		return &static_cast<const LogicType7 *>(lb)->_data1[0];
 	}
 }
 
-const char *Logics::getName(int logicNum) {
-	const char *result = nullptr;
-	int index = 0;
+const byte *Logics::getDataEntry(int logicNum, int index, byte *dest) {
+	const byte *result = nullptr;
 
 	if (logicNum >= 1 && logicNum <= size()) {
+		const LogicBase *lb = (*this)[logicNum];
+		const byte *dataPtr = getData7(logicNum);
 
+		if (index > 0 && dataPtr) {
+			byte typeBits = _ARRAY[index - 1]._typeBits;
+			if ((1 << (lb->_type - 1)) & typeBits) {
+				// Is enabled for this type
+				byte newIndex = _ARRAY[index - 1]._index;
+				*dest = newIndex & 7;
+
+				assert((newIndex >> 3) < 4);
+				result = dataPtr + (newIndex >> 3);
+			}
+		}
 	}
 
 	return result;
 }
 
+int Logics::getDataEntryBit(int logicNum, int index) {
+	byte bit = 0;
+	const byte *data = getDataEntry(logicNum, index, &bit);
+
+	return data ? (*data >> bit) & 1 : 0;
+}
+
+const char *Logics::getName(int logicNum) {
+	// TODO
+	return nullptr;
+}
+
 const char *Logics::getString1(int logicNum) {
+	// TODO
 	return nullptr;
 }
 
