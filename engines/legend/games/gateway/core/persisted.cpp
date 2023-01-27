@@ -267,8 +267,7 @@ void Persisted::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_val147);
 	s.syncAsUint16LE(_val148);
 	s.syncAsUint16LE(_val149);
-	for (int i = 0; i < 9; ++i)
-		s.syncAsUint16LE(_val150[i]);
+	s.syncBytes(&_val150[0][0], 3 * 6);
 	s.syncAsUint16LE(_val151);
 	s.syncBytes(_val152, 20);
 	s.syncAsUint16LE(_val153);

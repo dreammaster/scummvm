@@ -200,168 +200,349 @@ String LogicStrings::fn301(LogicStringAction action) {
 }
 
 String LogicStrings::fn310(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17) {
+		if (g_engine->_logics->isPrehandler1(211, 310)) {
+			g_engine->_logics->setBit(310, 4);
+			g_engine->_logics->clearBit(310, 5);
+			return action == LSA_17 ? "my seat" : "your seat";
+
+		} else {
+			g_engine->_logics->clearBit(310, 4);
+			g_engine->_logics->setBit(310, 5);
+			return "empty seat";
+		}
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn311(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17) {
+		if (g_engine->_logics->isPrehandler1(256, 311))
+			return "Thom's seat";
+		if (g_engine->_logics->isPrehandler1(267, 311))
+			return "Nubar's seat";
+		if (g_engine->_logics->isPrehandler1(266, 311) ||
+			g_engine->_logics->isPrehandler1(309, 311))
+			return "Terri's seat";
+
+		return "other seat";
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn317(LogicStringAction action) {
-	// TODO
+	if (action == LSA_18 && g_engine->_logics->isPrehandler1(317, 316))
+		return String(0x183c);
+
 	return nullptr;
 }
 
 String LogicStrings::fn318(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17) {
+		if (g_engine->_logics->isPrehandler1(318, 256))
+			return "Thom's drink";
+		if (g_engine->_logics->isPrehandler1(318, 267))
+			return "Nubar's drink";
+		if (g_engine->_logics->isPrehandler1(318, 266))
+			return "Terri's drink";
+
+		return "other drink";
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn433(LogicStringAction action) {
-	// TODO
-	return nullptr;
+	if (action == LSA_16 || action == LSA_17) {
+		return g_engine->_roomLogicNum == 433 ? "Ship Cabin" : "ship";
+	} else {
+		return nullptr;
+	}
 }
 
 String LogicStrings::fn444(LogicStringAction action) {
-	// TODO
-	return nullptr;
+	if (action == LSA_16 || action == LSA_17) {
+		return g_engine->_val157 ? "Abandoned Mine" : "Deep Shaft";
+	} else {
+		return nullptr;
+	}
 }
 
 String LogicStrings::fn452(LogicStringAction action) {
-	// TODO
+	static const char *const TREES[3] = { "distant tree", "huge tree", "Tree House" };
+
+	if (action == LSA_16 || action == LSA_17) {
+		int idx;
+		switch (g_engine->_roomLogicNum) {
+		case 445:
+		case 449:
+			idx = 0;
+			break;
+		case 446:
+		case 448:
+		case 450:
+		case 453:
+			idx = 1;
+			break;
+		default:
+			idx = 2;
+			break;
+		}
+
+		return TREES[idx];
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn463(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(463);
 	return nullptr;
 }
 
 String LogicStrings::fn468(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17) {
+		if (g_engine->_val142)
+			return "metal cane";
+		if (g_engine->_val159)
+			return "metal strut";
+		return "metallic glint";
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn472(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(472);
 	return nullptr;
 }
 
 String LogicStrings::fn477(LogicStringAction action) {
-	// TODO
+	int idx;
+	for (idx = 0; idx < 3 && g_engine->_val150[idx][0] != g_engine->_roomLogicNum; ++idx) {
+	}
+
+	assert(idx < 3);
+	const byte *row = &g_engine->_val150[idx][0];
+
+	switch (action) {
+	case LSA_16:
+	case LSA_17:
+		return row[2] ? "cairn" : "pile of rocks";
+	case LSA_18:
+	case LSA_19:
+		return String::format("There is a %s on the ground.",
+			row[2] ? "cairn" : "pile of rocks");
+	default:
+		break;
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn479(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(479);
 	return nullptr;
 }
 
 String LogicStrings::fn480(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17) {
+		String line = getThingName(479);
+		line += " egg";
+		return line;
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn481(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(481);
 	return nullptr;
 }
 
 String LogicStrings::fn485(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(485);
 	return nullptr;
 }
 
 String LogicStrings::fn491(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return g_engine->_roomLogicNum == 448 ? "piles of dirt" : "piles of rocks";
 	return nullptr;
 }
 
 String LogicStrings::fn492(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(492);
 	return nullptr;
 }
 
 String LogicStrings::fn493(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17) {
+		String line = "dead ";
+		line += getThingName(492);
+		return line;
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn494(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return g_engine->_logics->isPrehandler1(494, 489) ? "actuator cell" : "robbed cell";
 	return nullptr;
 }
 
 String LogicStrings::fn495(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(495);
 	return nullptr;
 }
 
 String LogicStrings::fn505(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(505);
 	return nullptr;
 }
 
 String LogicStrings::fn506(LogicStringAction action) {
-	// TODO
+	switch (action) {
+	case LSA_16: {
+		String line = getThingName(505);
+		line += " leaves";
+		return line;
+	}
+	case LSA_17:
+		return "red leaves";
+	default:
+		break;
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn509(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(509);
 	return nullptr;
 }
 
 String LogicStrings::fn510(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17) {
+		String line = getThingName(509);
+		line += " limb";
+		return line;
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn511(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17) {
+		String line = getThingName(509);
+		line += " seeds";
+		return line;
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn512(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return g_engine->_logics->isPrehandler1(512, 459) ?
+			"piece of glass" : "focal lens";
+
 	return nullptr;
 }
 
 String LogicStrings::fn517(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return g_engine->_logics->isPrehandler1(517, 510) ?
+			"long rope" : "coil of rope";
+
 	return nullptr;
 }
 
 String LogicStrings::fn557(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(557);
 	return nullptr;
 }
 
 String LogicStrings::fn558(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return getThingName(558);
 	return nullptr;
 }
 
 String LogicStrings::fn591(LogicStringAction action) {
-	// TODO
+	if (action == LSA_18 || action == LSA_19) {
+		String line(0x943c);
+		line += g_engine->_logics->printObjLower(g_engine->_roomLogicNum);
+		line += '.';
+		return line;
+	}
+
 	return nullptr;
 }
 
 String LogicStrings::fn603(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return g_engine->_logics->getBit(603, 21) ? "spider" : "dead spider";
 	return nullptr;
 }
 
 String LogicStrings::fn606(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return g_engine->_logics->getBit(606, 21) ? "tentacle" : "octopus";
 	return nullptr;
 }
 
 String LogicStrings::fn727(LogicStringAction action) {
-	// TODO
+	if (action == LSA_16 || action == LSA_17)
+		return g_engine->_val37 > 2 ? "chasm" : "crack";
 	return nullptr;
+}
+
+String LogicStrings::getThingName(int logicNum) {
+	struct Thing {
+		uint16 _id;
+		const char *_str1;
+		const char *_str2;
+		const char *_str3;
+	};
+	static const Thing THINGS[11] = {
+		{ 479, "weird bird", "pterodactyl", "gyranthymus" },
+		{ 472, "cactus", "saguaro cactus", "geraldo cactus" },
+		{ 463, "strange bush", "creosote bush", "mendobrillium" },
+		{ 481, "dinosaur", "Tyrannosaurus", "gopheria" },
+		{ 505, "plant", "palm", "jubifruitus" },
+		{ 509, "elm", "elm", "winnerpeller" },
+		{ 492, "animal", "horse", "canterlope" },
+		{ 558, "horned insect", "scorpion", "phylangomorph" },
+		{ 557, "small rodent", "prairie dog", "rodenta" },
+		{ 495, "ore", "purple ore", "vermaculite" },
+		{ 485, "parrot", "singing parrot", "parroo" }
+	};
+
+	for (int idx = 0; idx < 11; ++idx) {
+		if (THINGS[idx]._id == logicNum) {
+			if (!g_engine->_logics->getBit(logicNum, 9))
+				return THINGS[idx]._str1;
+			if (!g_engine->_val152[idx])
+				return THINGS[idx]._str2;
+			return THINGS[idx]._str3;
+		}
+	}
+
+	return "unknown thing";
 }
 
 } // namespace Logic

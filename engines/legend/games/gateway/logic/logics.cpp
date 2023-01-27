@@ -59,6 +59,11 @@ LogicBase *Logics::operator[](int index) const {
 	return _logics[index];
 }
 
+String Logics::printObj(int val1, int logicNum) {
+	// TODO
+	return nullptr;
+}
+
 } // namespace Logic
 } // namespace Gateway
 } // namespace Early

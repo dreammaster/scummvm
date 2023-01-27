@@ -75,6 +75,8 @@ private:
 	static String fn603(LogicStringAction action);
 	static String fn606(LogicStringAction action);
 	static String fn727(LogicStringAction action);
+private:
+	static String getThingName(int logicNum);
 public:
 	LogicStrings();
 };

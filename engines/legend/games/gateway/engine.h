@@ -51,6 +51,9 @@ protected:
 	void startGameplay();
 
 public:
+	String _name1;
+
+public:
 	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc);
 	~GatewayEngine() override;
 

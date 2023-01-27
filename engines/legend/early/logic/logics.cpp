@@ -242,5 +242,11 @@ void Logics::updateHandler(int logicNum, int handlerId, int handlerIndex) {
 	}
 }
 
+String Logics::printObjLower(int logicNum) {
+	String str = printObj(2, logicNum);
+	str.toLowercase();
+	return str;
+}
+
 } // namespace Early
 } // namespace Legend
