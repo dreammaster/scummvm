@@ -103,14 +103,18 @@ public:
 		(*this)[logicNum]->_prehandlerId[0] = id;
 	}
 
-	int getPrehandlerMode(int logicNum, int val1);
+	int getPrehandlerMode(int logicNum, int val1) const;
 	void setPrehandlerMode(int logicNum, int val1, int newId);
-	int getUnkHandler(int logicNum, int handlerIndex);
+	int getUnkHandler(int logicNum, int handlerIndex) const;
 	void setUnkHandler(int logicNum, int handlerIndex, int newId);
+	bool isPrehandler1(int logicNum, int val) const;
 
 	byte *getBits(int logicNum);
 	byte *getBitPtr(int logicNum, int index, int *bitNum);
 	int getBit(int logicNum, int index);
+	void setBit(int logicNum, int index);
+	void clearBit(int logicNum, int index);
+
 	const char *getName(int logicNum);
 	const char *getString1(int logicNum);
 
