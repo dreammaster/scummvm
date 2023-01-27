@@ -20,6 +20,7 @@
  */
 
 #include "legend/games/gateway/logic/logic_strings.h"
+#include "legend/games/gateway/engine.h"
 
 namespace Legend {
 namespace Early {
@@ -73,222 +74,292 @@ LogicStrings::LogicStrings() {
 	(*this)[727] = fn727;
 }
 
-const char *LogicStrings::fn36(int action)  {
+String LogicStrings::fn36(LogicStringAction action)  {
+	if (action >= LSA_16 && action <= LSA_17) {
+		return g_engine->_val95 ? "Demon Chamber" : "Empty Chamber";
+	} else {
+		return nullptr;
+	}
+}
+
+String LogicStrings::fn41(LogicStringAction action)  {
+	if (action == LSA_17) {
+		return g_engine->_logics->getBit(41, 9) ? "shiny sword" : "rusty sword";
+	} else {
+		return nullptr;
+	}
+}
+
+String LogicStrings::fn43(LogicStringAction action)  {
+	if (action == LSA_18 && g_engine->_val9)
+		return String(0x40bb);
+	return nullptr;
+}
+
+String LogicStrings::fn44(LogicStringAction action)  {
+	if (action == LSA_16) {
+		return g_engine->_val24 ? "magic ring" : "ring";
+	} else {
+		return nullptr;
+	}
+}
+
+String LogicStrings::fn115(LogicStringAction action) {
+	if (action == LSA_17) {
+		return g_engine->_roomLogicNum == 73 ? "slots" : "slot";
+	} else {
+		return nullptr;
+	}
+}
+
+String LogicStrings::fn162(LogicStringAction action) {
+	switch (action) {
+	case LSA_16:
+		return String(g_engine->_val177 ? 0x4c3f : 0x4c80);
+	case LSA_17:
+		return g_engine->_val177 ? "crystal" : "shard";
+	case LSA_19:
+		if (!g_engine->_val177)
+			return String(0x4c3e);
+		break;
+	default:
+		break;
+	}
+
+	return nullptr;
+}
+
+String LogicStrings::fn171(LogicStringAction action) {
+	String line;
+
+	switch (action) {
+	case LSA_16:
+	case LSA_17:
+		return g_engine->_roomLogicNum == 143 ? "berry bushes" : "bushes";
+	case LSA_18:
+	case LSA_19:
+		line = String(0x4848);
+		if (g_engine->_roomLogicNum == 143)
+			line += String(0x4849);
+		return line;
+	default:
+		break;
+	}
+
+	return nullptr;
+}
+
+String LogicStrings::fn190(LogicStringAction action) {
+	switch (action) {
+	case LSA_16:
+		if (g_engine->_val177)
+			return "crystal garden";
+		return String(0x4842);
+	case LSA_17:
+		return g_engine->_val177 ? "crystal garden" : "outcropping";
+	case LSA_18:
+	case LSA_19:
+		return g_engine->_val177 ?
+			"There is a small garden of crystals growing" :
+			"There is a mud - spattered outcropping";
+	default:
+		break;
+	}
+
+	return nullptr;
+}
+
+String LogicStrings::fn222(LogicStringAction action) {
+	if (action >= LSA_16 && action <= LSA_17) {
+		return g_engine->_logics->getBit(g_engine->_roomLogicNum, 39) ?
+			"sky" : "ceiling";
+	} else {
+		return nullptr;
+	}
+}
+
+String LogicStrings::fn224(LogicStringAction action) {
+	if (action >= LSA_16 && action <= LSA_17) {
+		return g_engine->_logics->getBit(g_engine->_roomLogicNum, 39) ?
+			"ground" : "floor";
+	} else {
+		return nullptr;
+	}
+}
+
+String LogicStrings::fn301(LogicStringAction action) {
+	if (action >= LSA_16 && action <= LSA_17) {
+		if (g_engine->_val226)
+			return "hologram";
+		if (g_engine->_logics->getBit(301, 9))
+			return "metal disk";
+		return "medallion";
+	} else {
+		return nullptr;
+	}
+}
+
+String LogicStrings::fn310(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn41(int action)  {
+String LogicStrings::fn311(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn43(int action)  {
+String LogicStrings::fn317(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn44(int action)  {
+String LogicStrings::fn318(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn115(int action) {
+String LogicStrings::fn433(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn162(int action) {
+String LogicStrings::fn444(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn171(int action) {
+String LogicStrings::fn452(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn190(int action) {
+String LogicStrings::fn463(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn222(int action) {
+String LogicStrings::fn468(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn224(int action) {
+String LogicStrings::fn472(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn301(int action) {
+String LogicStrings::fn477(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn310(int action) {
+String LogicStrings::fn479(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn311(int action) {
+String LogicStrings::fn480(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn317(int action) {
+String LogicStrings::fn481(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn318(int action) {
+String LogicStrings::fn485(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn433(int action) {
+String LogicStrings::fn491(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn444(int action) {
+String LogicStrings::fn492(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn452(int action) {
+String LogicStrings::fn493(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn463(int action) {
+String LogicStrings::fn494(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn468(int action) {
+String LogicStrings::fn495(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn472(int action) {
+String LogicStrings::fn505(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn477(int action) {
+String LogicStrings::fn506(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn479(int action) {
+String LogicStrings::fn509(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn480(int action) {
+String LogicStrings::fn510(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn481(int action) {
+String LogicStrings::fn511(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn485(int action) {
+String LogicStrings::fn512(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn491(int action) {
+String LogicStrings::fn517(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn492(int action) {
+String LogicStrings::fn557(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn493(int action) {
+String LogicStrings::fn558(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn494(int action) {
+String LogicStrings::fn591(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn495(int action) {
+String LogicStrings::fn603(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn505(int action) {
+String LogicStrings::fn606(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
 
-const char *LogicStrings::fn506(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn509(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn510(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn511(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn512(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn517(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn557(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn558(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn591(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn603(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn606(int action) {
-	// TODO
-	return nullptr;
-}
-
-const char *LogicStrings::fn727(int action) {
+String LogicStrings::fn727(LogicStringAction action) {
 	// TODO
 	return nullptr;
 }
