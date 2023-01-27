@@ -243,7 +243,7 @@ void Logics::updateHandler(int logicNum, int handlerId, int handlerIndex) {
 	}
 }
 
-String Logics::printObj(int action, int logicNum) {
+String Logics::printObj(int action, int logicNum, const char *strParam) {
 	String article;
 	bool capitalize = false;
 	int actionMask = action & 7;
@@ -252,7 +252,7 @@ String Logics::printObj(int action, int logicNum) {
 	if (logicNum < 1 || logicNum > size())
 		return nullptr;
 
-	String str1;
+	const char **str1 = &strParam;
 	String str = getString1(logicNum);
 
 	if (actionMask) {
@@ -358,10 +358,63 @@ String Logics::printObj(int action, int logicNum) {
 	}
 
 	if (action & 0x40) {
+		const char *str2 = *str1++;
+		int strLength = strlen(str2);
+		int strLength2 = strLength - 2;
+		const char *suffix = str2 + strLength2;
 
+		if (str2 && *str2) {
+			desc += ' ';
+
+			if (logicNum == g_engine->_parser->_val2 || logicNum == g_engine->_logicNum1 ||
+					(getBit(logicNum, 6) && !getBit(logicNum, 1))) {
+				desc += str2;
+			} else {
+				static const char *const TERMS[5][2] = {
+					{ "are", "is" }, { "were", "was" }, { "have", "has" },
+					{ "do", "does" }, { "go", "goes" }
+				};
+				int idx;
+				for (idx = 0; idx < 5; ++idx) {
+					if (!strcmp(str2, TERMS[idx][0])) {
+						desc += TERMS[idx][1];
+						break;
+					}
+				}
+				if (idx == 5) {
+					if (strLength <= 2) {
+						idx = 6;
+					} else {
+						static const char *const SUFFIXES[6] = {
+							"ry", "ly", "ss", "zz", "sh", "ch"
+						};
+						for (idx = 0; idx < 6; ++idx) {
+							if (!strcmp(suffix, SUFFIXES[idx]))
+								break;
+						}
+					}
+
+					desc += str2;
+					if (idx < 2)
+						desc += "ies";
+					else if (idx < 6)
+						desc += "es";
+					else
+						desc += "s";
+				}
+			}
+		}
 	}
 
-	// TODO
+	if (action & 0x20) {
+		desc += ".\n";
+	}
+
+	if (desc.size() > 128) {
+		g_engine->send(TextMessage("  ERROR: print_obj not enough storage "));
+		desc.clear();
+	}
+
 	return desc;
 }
 
