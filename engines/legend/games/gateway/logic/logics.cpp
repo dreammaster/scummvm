@@ -61,25 +61,26 @@ LogicBase *Logics::operator[](int index) const {
 }
 
 String Logics::printObj(int action, int logicNum) {
-	const char *article = nullptr;
-	bool flag = false;
-	int val3 = action & 7;
+	String article;
+	bool capitalize = false;
+	int actionMask = action & 7;
 	String desc;
 
 	if (logicNum < 1 || logicNum > size())
 		return nullptr;
 
-	String str1 = getString1(logicNum);
+	String str1;
+	String str = getString1(logicNum);
 
-	if (val3) {
+	if (actionMask) {
 		if (action & 16) {
-			flag = true;
+			capitalize = true;
 		} else {
 			desc += ' ';
-			flag = false;
+			capitalize = false;
 		}
 
-		switch (val3) {
+		switch (actionMask) {
 		case 2:
 			if (!getBit(logicNum, 4))
 				article = "the";
@@ -155,11 +156,31 @@ String Logics::printObj(int action, int logicNum) {
 		default:
 			break;
 		}
+
+		if (!article.empty()) {
+			if (capitalize)
+				article.capitalize();
+			desc += article;
+			desc += ' ';
+		}
+
+		if (actionMask >= 1 && actionMask <= 3) {
+			if (!str.empty()) {
+				if (capitalize)
+					str.capitalize();
+				desc += str;
+
+			}
+		}
+	}
+
+	if (action & 0x40) {
+
 	}
 
 
 	// TODO
-	return nullptr;
+	return desc;
 }
 
 } // namespace Logic
