@@ -411,7 +411,7 @@ String Logics::printObj(int action, int logicNum, const char *strParam) {
 	}
 
 	if (desc.size() > 128) {
-		g_engine->send(TextMessage("  ERROR: print_obj not enough storage "));
+		g_engine->send(TextMessage("[ERROR: print_obj not enough storage]\n"));
 		desc.clear();
 	}
 

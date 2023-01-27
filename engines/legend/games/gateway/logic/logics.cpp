@@ -57,7 +57,12 @@ LogicBase *Logics::operator[](int index) const {
 		error("Invalid logic specified");
 
 	// Call the appropriate method
-	return _logics[index];
+	return _logics[index - 1];
+}
+
+int Logics::getRoomPicNumber(int logicNum) {
+	// TODO
+	return 0;
 }
 
 } // namespace Logic
