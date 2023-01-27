@@ -262,7 +262,9 @@ struct Persisted : public virtual Legend::Early::Persisted {
 	uint16 _val147 = 657;
 	uint16 _val148 = 0;
 	uint8 _val149 = 0;
-	uint16 _val150[9] = { 445, 0, 7, 453, 0, 4, 448, 0, 7 };
+	uint8 _val150[3][6] = {
+		{ 189, 1, 0, 0, 7, 0 }, { 197, 1, 0, 0, 4, 0 }, { 192, 1, 0, 0, 7, 0 }
+	};
 	uint16 _val151 = 0;
 	byte _val152[20] = { 0 };
 	uint8 _val153 = 0;
