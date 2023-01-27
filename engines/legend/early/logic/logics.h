@@ -117,7 +117,7 @@ public:
 
 	const char *getName(int logicNum);
 	const char *getString1(int logicNum);
-	virtual String printObj(int val1, int logicNum) = 0;
+	String printObj(int val1, int logicNum);
 	String printObjLower(int logicNum);
 
 	void updateHandler(int logicNum, int handlerId, int handlerIndex);

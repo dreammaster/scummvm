@@ -52,7 +52,6 @@ protected:
 
 public:
 	String _name1;
-	int _logicNum1 = 211;
 
 public:
 	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc);

@@ -798,8 +798,6 @@ public:
 	int size() const override {
 		return LOGICS_COUNT;
 	}
-
-	String printObj(int val1, int logicNum) override;
 };
 
 } // namespace Logic

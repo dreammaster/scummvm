@@ -42,6 +42,7 @@ public:
 	Parser::Vocab *_vocab = nullptr;
 	const Room *_currentRoom = nullptr;
 	Queue _queue;
+	int _logicNum1 = 211;
 
 public:
 	Engine(OSystem *syst, const LegendGameDescription *gameDesc);
