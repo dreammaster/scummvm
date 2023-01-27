@@ -32,6 +32,17 @@ namespace Legend {
 namespace Early {
 namespace Gateway {
 
+GatewayEngine *g_engine;
+
+GatewayEngine::GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
+		Early::Engine(syst, gameDesc) {
+	g_engine = this;
+}
+
+GatewayEngine::~GatewayEngine() {
+	g_engine = nullptr;
+}
+
 bool GatewayEngine::initialize() {
 	// Initialize 640x480 paletted graphics mode
 	initGraphics(640, 480);

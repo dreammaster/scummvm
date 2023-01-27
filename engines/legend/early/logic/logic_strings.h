@@ -23,11 +23,16 @@
 #define LEGEND_EARLY_LOGIC_LOGIC_STRINGS_H
 
 #include "common/hashmap.h"
+#include "legend/utils/string.h"
 
 namespace Legend {
 namespace Early {
 
-typedef const char *(*LogicStringFn)(int action);
+enum LogicStringAction {
+	LSA_16 = 16, LSA_17 = 17, LSA_18 = 18, LSA_19 = 19
+};
+
+typedef String (*LogicStringFn)(LogicStringAction action);
 
 class LogicStrings : public Common::HashMap<int, LogicStringFn> {
 };

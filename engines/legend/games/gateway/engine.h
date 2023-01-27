@@ -51,12 +51,13 @@ protected:
 	void startGameplay();
 
 public:
-	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc) :
-		Early::Engine(syst, gameDesc) {}
-	~GatewayEngine() override {}
+	GatewayEngine(OSystem *syst, const LegendGameDescription *gameDesc);
+	~GatewayEngine() override;
 
 	void runGame() override;
 };
+
+extern GatewayEngine *g_engine;
 
 } // namespace Gateway
 } // namespace Early
