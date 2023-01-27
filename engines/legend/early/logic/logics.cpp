@@ -84,7 +84,7 @@ void Logics::synchronize(Common::Serializer &s) {
 		(*this)[i]->synchronize(s);
 }
 
-int Logics::getPrehandlerMode(int logicNum, int handlerIndex) {
+int Logics::getPrehandlerMode(int logicNum, int handlerIndex) const {
 	if (logicNum < 1 || logicNum > size()) {
 		return 0;
 	} else {
@@ -110,7 +110,7 @@ void Logics::setPrehandlerMode(int logicNum, int handlerIndex, int newId) {
 	}
 }
 
-int Logics::getUnkHandler(int logicNum, int handlerIndex) {
+int Logics::getUnkHandler(int logicNum, int handlerIndex) const {
 	if (logicNum < 1 || logicNum > size()) {
 		return 0;
 	} else {
@@ -130,6 +130,19 @@ void Logics::setUnkHandler(int logicNum, int handlerIndex, int newId) {
 			lb->_unkHandlerId[handlerIndex] = newId;
 		}
 	}
+}
+
+bool Logics::isPrehandler1(int logicNum, int val) const {
+	const LogicBase *lb = (*this)[logicNum];
+	const LogicType &metaData = _METADATA[lb->_type - 1];
+	int idx = 0;
+
+	do {
+		if (idx >= metaData._handlerCount)
+			return false;
+	} while (getPrehandlerMode(logicNum, idx) != val);
+
+	return true;
 }
 
 byte *Logics::getBits(int logicNum) {
@@ -172,6 +185,22 @@ int Logics::getBit(int logicNum, int index) {
 	byte *data = getBitPtr(logicNum, index, &bitNum);
 
 	return data ? (*data >> bitNum) & 1 : 0;
+}
+
+void Logics::setBit(int logicNum, int index) {
+	int bitNum;
+	byte *data = getBitPtr(logicNum, index, &bitNum);
+
+	if (data)
+		*data |= 1 << bitNum;
+}
+
+void Logics::clearBit(int logicNum, int index) {
+	int bitNum;
+	byte *data = getBitPtr(logicNum, index, &bitNum);
+
+	if (data)
+		*data &= ~(1 << bitNum);
 }
 
 const char *Logics::getName(int logicNum) {
