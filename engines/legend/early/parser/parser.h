@@ -58,7 +58,6 @@ private:
 	int _vocabId = 0;
 	int _val1 = -1;
 	int _result = -1;
-	int _val2 = 211;
 	int _val3 = 211;
 	int _val4 = 0;
 	int _val5 = 0;
@@ -123,14 +122,20 @@ protected:
 	const int _UNDO;
 
 public:
-	virtual ~Parser() {}
+	int _val2 = 211;
 
+public:
 	/**
 	 * Constructor
 	 */
 	Parser(const String &emptyLine,
 		int againId, int allId, int andId, int butId,
 		int ofId, int oopsId, int thenId, int toId, int undoId);
+
+	/**
+	 * Destructor
+	 */
+	virtual ~Parser() {}
 
 	/**
 	 * Parses a passed input line

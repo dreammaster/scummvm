@@ -21,6 +21,7 @@
 
 #include "common/textconsole.h"
 #include "legend/games/gateway/logic/logics.h"
+#include "legend/games/gateway/engine.h"
 
 namespace Legend {
 namespace Early {
@@ -59,7 +60,104 @@ LogicBase *Logics::operator[](int index) const {
 	return _logics[index];
 }
 
-String Logics::printObj(int val1, int logicNum) {
+String Logics::printObj(int action, int logicNum) {
+	const char *article = nullptr;
+	bool flag = false;
+	int val3 = action & 7;
+	String desc;
+
+	if (logicNum < 1 || logicNum > size())
+		return nullptr;
+
+	String str1 = getString1(logicNum);
+
+	if (val3) {
+		if (action & 16) {
+			flag = true;
+		} else {
+			desc += ' ';
+			flag = false;
+		}
+
+		switch (val3) {
+		case 2:
+			if (!getBit(logicNum, 4))
+				article = "the";
+			break;
+		case 3:
+			if (!getBit(logicNum, 4)) {
+				if (getBit(logicNum, 6) || getBit(logicNum, 1))
+					article = "some";
+				else if (getBit(logicNum, 5))
+					article = "an";
+				else
+					article = "a";
+			}
+			break;
+		case 4:
+			if (logicNum == g_engine->_parser->_val2 || logicNum == g_engine->_logicNum1) {
+				article = "you";
+			} else if (getBit(logicNum, 6) && !getBit(logicNum, 1)) {
+				article = "they";
+			} else {
+				const LogicBase *lb = (*this)[logicNum];
+				if (lb->_type == LT_7) {
+					article = getBit(logicNum, 40) ? "she" : "he";
+				} else {
+					article = "it";
+				}
+			}
+			break;
+		case 5:
+			if (logicNum == g_engine->_parser->_val2 || logicNum == g_engine->_logicNum1) {
+				article = "your";
+			} else if (getBit(logicNum, 6) && !getBit(logicNum, 1)) {
+				article = "their";
+			} else {
+				const LogicBase *lb = (*this)[logicNum];
+
+				if (lb->_type == LT_7) {
+					article = getBit(logicNum, 40) ? "her" : "his";
+				} else {
+					article = "its";
+				}
+			}
+			break;
+		case 6:
+			if (logicNum == g_engine->_parser->_val2 || logicNum == g_engine->_logicNum1) {
+				article = "you";
+			} else if (getBit(logicNum, 6) && !getBit(logicNum, 1)) {
+				article = "them";
+			} else {
+				const LogicBase *lb = (*this)[logicNum];
+
+				if (lb->_type == LT_7) {
+					article = getBit(logicNum, 40) ? "her" : "his";
+				} else {
+					article = "its";
+				}
+			}
+			break;
+		case 7:
+			if (logicNum == g_engine->_parser->_val2) {
+				article = "yourself";
+			} else if (getBit(logicNum, 6) && !getBit(logicNum, 1)) {
+				article = "themselves";
+			} else {
+				const LogicBase *lb = (*this)[logicNum];
+
+				if (lb->_type == LT_7) {
+					article = getBit(logicNum, 40) ? "herself" : "himself";
+				} else {
+					article = "itself";
+				}
+			}
+		default:
+			break;
+		}
+	}
+
+
 	// TODO
 	return nullptr;
 }
