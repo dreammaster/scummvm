@@ -33,7 +33,7 @@ class Room236 : public Room {
 public:
 	Room236() : Room() {}
 
-	int call(int action) const override;
+	int call(int action) override;
 
 	/**
 	 * Gets the picture number for the room
