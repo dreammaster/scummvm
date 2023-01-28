@@ -27,7 +27,7 @@ namespace Early {
 namespace Gateway {
 namespace Logic {
 
-int Room035::call(int action) const {
+int Room035::call(int action) {
 	// TODO
 	return 0;
 }

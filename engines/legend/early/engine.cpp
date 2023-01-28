@@ -71,7 +71,8 @@ bool Engine::msgLogic(const LogicMessage &msg) {
 
 void Engine::setRoom(int roomNum) {
 	_roomLogicNum = roomNum;
-	_currentRoom = dynamic_cast<const Room *>((*_logics)[roomNum]);
+	_currentRoom = dynamic_cast<Room *>((*_logics)[roomNum]);
+	assert(_currentRoom);
 }
 
 int Engine::loadGame(LoadType mode, const char *filename) {

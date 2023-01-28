@@ -40,7 +40,7 @@ public:
 	Logics *_logics = nullptr;
 	Parser::Parser *_parser = nullptr;
 	Parser::Vocab *_vocab = nullptr;
-	const Room *_currentRoom = nullptr;
+	Room *_currentRoom = nullptr;
 	Queue _queue;
 	int _logicNum1 = 211;
 

@@ -51,7 +51,7 @@ struct LogicBase {
 	/**
 	 * Perform an action
 	 */
-	virtual int call(int action = 0) const = 0;
+	virtual int call(int action) = 0;
 
 	/**
 	 * Synchronize the data fields of the logic
@@ -156,7 +156,7 @@ struct LogicType8 : public LogicBase {
 struct LogicNull : public LogicBase {
 	LogicNull() : LogicBase(LT_NULL) {}
 
-	int call(int param) const override {
+	int call(int param) override {
 		return 0;
 	}
 
