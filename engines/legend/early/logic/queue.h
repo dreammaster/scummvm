@@ -33,10 +33,10 @@ namespace Early {
  */
 class Queue {
 	struct QueueEntry {
-		int _val1 = 0;
+		int _id = 0;
 		int _val2 = 0;
 		QueueEntry() {}
-		QueueEntry(int val1, int val2) : _val1(val1), _val2(val2) {}
+		QueueEntry(int val1, int val2) : _id(val1), _val2(val2) {}
 
 		/**
 		 * Synchronize the entry
@@ -54,7 +54,14 @@ public:
 	/**
 	 * Returns the index of an entry with the given Id
 	 */
-	int indexOf(int param1) const;
+	int indexOf(int id) const;
+
+	/**
+	 * Returns true if an entry with the given id exists
+	 */
+	bool exists(int id) const {
+		return indexOf(id) != -1;
+	}
 
 	/**
 	 * Synchronize the queue

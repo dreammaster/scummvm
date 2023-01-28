@@ -28,14 +28,14 @@ namespace Early {
 #define QUEUE_MAX_COUNT 16
 
 void Queue::QueueEntry::synchronize(Common::Serializer &s) {
-	s.syncAsByte(_val1);
+	s.syncAsByte(_id);
 	s.skip(1);
 	s.syncAsUint16LE(_val2);
 }
 
 void Queue::add(int val1, int val2) {
 	uint idx;
-	for (idx = 0; idx < _items.size() && _items[idx]._val1 != val1; ++idx) {
+	for (idx = 0; idx < _items.size() && _items[idx]._id != val1; ++idx) {
 	}
 
 	if (idx != _items.size()) {
@@ -47,9 +47,9 @@ void Queue::add(int val1, int val2) {
 	}
 }
 
-int Queue::indexOf(int param1) const {
+int Queue::indexOf(int id) const {
 	for (uint i = 0; i < _items.size(); ++i) {
-		if (_items[i]._val1 == param1)
+		if (_items[i]._id == id)
 			return i;
 	}
 

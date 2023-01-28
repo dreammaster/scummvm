@@ -20,6 +20,7 @@
  */
 
 #include "legend/games/gateway/logic/rooms/room247.h"
+#include "legend/games/gateway/engine.h"
 
 namespace Legend {
 namespace Early {
@@ -29,6 +30,16 @@ namespace Logic {
 int Room247::call(int action) const {
 	// TODO
 	return 0;
+}
+
+int Room247::getPicNumber() const {
+	if (g_engine->_queue.exists(34)) {
+		return 556;
+	} else if (g_engine->_val194 != 10 || !g_engine->_logics->getBit(247, 9)) {
+		return 555;
+	} else {
+		return 553;
+	}
 }
 
 } // namespace Methods

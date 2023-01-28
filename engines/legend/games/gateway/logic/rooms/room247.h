@@ -38,7 +38,7 @@ public:
 	/**
 	 * Gets the picture number for the room
 	 */
-	int getPicNumber() const override { return 0; }
+	int getPicNumber() const override;
 };
 
 } // namespace Logic

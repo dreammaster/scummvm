@@ -129,7 +129,7 @@ struct LogicType6 : public LogicBase {
 struct LogicType7 : public LogicBase {
 	LogicType7() : LogicBase(LT_7) {}
 
-	byte _data1[4] = { 0, 0, 0, 0 };
+	byte _bits[4] = { 0, 0, 0, 0 };
 
 	/**
 	 * Synchronize the data fields of the logic

@@ -19,31 +19,24 @@
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_LOGIC_ROOMS_ROOM248_H
-#define LEGEND_GAMES_GATEWAY_LOGIC_ROOMS_ROOM248_H
-
-#include "legend/early/logic/room.h"
+#include "legend/games/gateway/logic/rooms/room717.h"
+#include "legend/games/gateway/engine.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
 namespace Logic {
 
-class Room248 : public Room {
-public:
-	Room248() : Room() {}
+int Room717::call(int action) const {
+	// TODO
+	return 0;
+}
 
-	int call(int action) const override;
+int Room717::getPicNumber() const {
+	return g_engine->_logics->getBit(717, 9) ? 3372 : 553;
+}
 
-	/**
-	 * Gets the picture number for the room
-	 */
-	int getPicNumber() const override;
-};
-
-} // namespace Logic
+} // namespace Methods
 } // namespace Gateway
 } // namespace Early
 } // namespace Legend
-
-#endif

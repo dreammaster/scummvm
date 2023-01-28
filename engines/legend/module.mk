@@ -49,6 +49,7 @@ MODULE_OBJS = \
 	games/gateway/logic/rooms/room009.o \
 	games/gateway/logic/rooms/room010.o \
 	games/gateway/logic/rooms/room018.o \
+	games/gateway/logic/rooms/room019.o \
 	games/gateway/logic/rooms/room033.o \
 	games/gateway/logic/rooms/room034.o \
 	games/gateway/logic/rooms/room035.o \
@@ -144,6 +145,7 @@ MODULE_OBJS = \
 	games/gateway/logic/rooms/room686.o \
 	games/gateway/logic/rooms/room700.o \
 	games/gateway/logic/rooms/room715.o \
+	games/gateway/logic/rooms/room717.o \
 	games/gateway/parser/parser.o \
 	games/gateway/views/commset.o \
 	games/gateway/views/part_title.o \
