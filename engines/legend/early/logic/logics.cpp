@@ -424,5 +424,10 @@ String Logics::printObjLower(int logicNum) {
 	return str;
 }
 
+int Logics::getRoomPicNumber(int logicNum) const {
+	Room *room = dynamic_cast<Room *>((*this)[logicNum]);
+	return room ? room->getPicNumber() : -1;
+}
+
 } // namespace Early
 } // namespace Legend

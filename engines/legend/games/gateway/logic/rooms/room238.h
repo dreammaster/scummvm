@@ -34,6 +34,11 @@ public:
 	Room238() : Room() {}
 
 	int call(int action) const override;
+
+	/**
+	 * Gets the picture number for the room
+	 */
+	int getPicNumber() const override { return 527; }
 };
 
 } // namespace Logic

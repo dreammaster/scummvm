@@ -58,6 +58,13 @@ struct LogicBase {
 	 */
 	virtual void synchronize(Common::Serializer &s) = 0;
 
+	/**
+	 * Get a picture number for rooms
+	 */
+	virtual int getPicNumber() const {
+		return -1;
+	}
+
 	int getPrehandlerId() const {
 		return _prehandlerId[0];
 	}

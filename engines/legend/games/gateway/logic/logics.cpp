@@ -60,11 +60,6 @@ LogicBase *Logics::operator[](int index) const {
 	return _logics[index - 1];
 }
 
-int Logics::getRoomPicNumber(int logicNum) {
-	// TODO
-	return 0;
-}
-
 } // namespace Logic
 } // namespace Gateway
 } // namespace Early

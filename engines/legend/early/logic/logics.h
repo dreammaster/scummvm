@@ -63,11 +63,6 @@ public:
 	virtual int size() const = 0;
 
 	/**
-	 * Get the picture number for a given room number
-	 */
-	virtual int getRoomPicNumber(int logicNum) = 0;
-
-	/**
 	 * Synchronize logic data
 	 */
 	void synchronize(Common::Serializer &s);
@@ -126,6 +121,11 @@ public:
 	String printObjLower(int logicNum);
 
 	void updateHandler(int logicNum, int handlerId, int handlerIndex);
+
+	/**
+	 * Get the picture number for a given room number
+	 */
+	int getRoomPicNumber(int logicNum) const;
 };
 
 } // namespace Early

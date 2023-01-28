@@ -798,11 +798,6 @@ public:
 	int size() const override {
 		return LOGICS_COUNT;
 	}
-
-	/**
-	 * Get the picture number for a given room number
-	 */
-	int getRoomPicNumber(int logicNum) override;
 };
 
 } // namespace Logic
