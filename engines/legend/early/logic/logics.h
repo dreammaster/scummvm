@@ -110,8 +110,11 @@ public:
 	bool isPrehandler1(int logicNum, int val) const;
 
 	byte *getBits(int logicNum);
+	const byte *getBits(int logicNum) const;
+	int getBitOffset(int logicNum, int index, int *bitNum) const;
 	byte *getBitPtr(int logicNum, int index, int *bitNum);
-	int getBit(int logicNum, int index);
+	const byte *getBitPtr(int logicNum, int index, int *bitNum) const;
+	int getBit(int logicNum, int index) const;
 	void setBit(int logicNum, int index);
 	void clearBit(int logicNum, int index);
 
@@ -125,7 +128,7 @@ public:
 	/**
 	 * Get the picture number for a given room number
 	 */
-	int getRoomPicNumber(int logicNum) const;
+	virtual int getRoomPicNumber(int logicNum) const;
 };
 
 } // namespace Early

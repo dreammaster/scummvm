@@ -60,6 +60,21 @@ LogicBase *Logics::operator[](int index) const {
 	return _logics[index - 1];
 }
 
+int Logics::getRoomPicNumber(int logicNum) const {
+	if (logicNum == 238 || (logicNum >= 247 && logicNum <= 249)) {
+		if ((logicNum == 238 && isPrehandler1(211, 293)) ||
+			(logicNum == 249 && isPrehandler1(211, 333)) ||
+			(logicNum == 247 && isPrehandler1(211, 323)) ||
+			(logicNum == 248 && isPrehandler1(211, 324))
+		) {
+			return getBit(354, 12) ? 532 : 531;
+		} else if (g_engine->_roomLogicNum == g_engine->_val225 &&
+				isPrehandler1(330, 353) && getBit(354, 12)) {
+			return 532;
+		}
+	}
+}
+
 } // namespace Logic
 } // namespace Gateway
 } // namespace Early

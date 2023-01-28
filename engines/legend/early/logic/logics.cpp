@@ -154,16 +154,28 @@ byte *Logics::getBits(int logicNum) {
 		if (lb->_type != LT_7)
 			return nullptr;
 
-		return &static_cast<LogicType7 *>(lb)->_data1[0];
+		return &static_cast<LogicType7 *>(lb)->_bits[0];
 	}
 }
 
-byte *Logics::getBitPtr(int logicNum, int index, int *bitNum) {
-	byte *result = nullptr;
+const byte *Logics::getBits(int logicNum) const {
+	if (logicNum < 1 || logicNum > size()) {
+		return nullptr;
+	} else {
+		const LogicBase *lb = (*this)[logicNum];
+		if (lb->_type != LT_7)
+			return nullptr;
+
+		return &static_cast<const LogicType7 *>(lb)->_bits[0];
+	}
+}
+
+int Logics::getBitOffset(int logicNum, int index, int *bitNum) const {
+	int offset = -1;
 
 	if (logicNum >= 1 && logicNum <= size()) {
 		LogicBase *lb = (*this)[logicNum];
-		byte *dataPtr = getBits(logicNum);
+		const byte *dataPtr = getBits(logicNum);
 
 		if (index > 0 && dataPtr) {
 			byte typeBits = _ARRAY[index - 1]._typeBits;
@@ -173,17 +185,28 @@ byte *Logics::getBitPtr(int logicNum, int index, int *bitNum) {
 				*bitNum = newIndex & 7;
 
 				assert((newIndex >> 3) < 4);
-				result = dataPtr + (newIndex >> 3);
+				offset = newIndex >> 3;
 			}
 		}
 	}
 
-	return result;
+	return offset;
 }
 
-int Logics::getBit(int logicNum, int index) {
+
+byte *Logics::getBitPtr(int logicNum, int index, int *bitNum) {
+	int offset = getBitOffset(logicNum, index, bitNum);
+	return (offset == -1) ? nullptr : getBits(logicNum) + offset;
+}
+
+const byte *Logics::getBitPtr(int logicNum, int index, int *bitNum) const {
+	int offset = getBitOffset(logicNum, index, bitNum);
+	return (offset == -1) ? nullptr : getBits(logicNum) + offset;
+}
+
+int Logics::getBit(int logicNum, int index) const {
 	int bitNum = 0;
-	byte *data = getBitPtr(logicNum, index, &bitNum);
+	const byte *data = getBitPtr(logicNum, index, &bitNum);
 
 	return data ? (*data >> bitNum) & 1 : 0;
 }

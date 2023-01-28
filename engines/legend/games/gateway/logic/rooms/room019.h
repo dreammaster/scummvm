@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_LOGIC_ROOMS_ROOM248_H
-#define LEGEND_GAMES_GATEWAY_LOGIC_ROOMS_ROOM248_H
+#ifndef LEGEND_GAMES_GATEWAY_LOGIC_ROOMS_ROOM019_H
+#define LEGEND_GAMES_GATEWAY_LOGIC_ROOMS_ROOM019_H
 
 #include "legend/early/logic/room.h"
 
@@ -29,9 +29,9 @@ namespace Early {
 namespace Gateway {
 namespace Logic {
 
-class Room248 : public Room {
+class Room019 : public Room {
 public:
-	Room248() : Room() {}
+	Room019() : Room() {}
 
 	int call(int action) const override;
 
