@@ -73,6 +73,8 @@ int Logics::getRoomPicNumber(int logicNum) const {
 			return 532;
 		}
 	}
+
+	return (*this)[logicNum]->getPicNumber();
 }
 
 } // namespace Logic
