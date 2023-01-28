@@ -20,6 +20,7 @@
  */
 
 #include "legend/games/gateway/logic/rooms/room444.h"
+#include "legend/games/gateway/engine.h"
 
 namespace Legend {
 namespace Early {
