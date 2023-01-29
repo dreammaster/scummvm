@@ -107,6 +107,67 @@ int ParserHandlers::compare(const ParserHandlerEntry &entry) const {
 	}
 }
 
+int ParserHandlers::arrayGetIndex() {
+	_val1 = -1;
+	_val2 = -1;
+
+	int limit = _array1_size;
+	int offset = 0;
+	int compResult = 0;
+	int middle = 0;
+	int idx1;
+
+	for (idx1 = limit; (idx1 - offset) >= 8; ) {
+		middle = (offset + idx1) / 2;
+		const ParserHandlerArrEntry &ae = _array1[middle];
+
+		compResult = arrayCompare(&ae);
+		if (compResult < 0) {
+			idx1 = middle;
+		} else if (compResult > 0) {
+			offset = middle;
+		} else {
+			offset = middle;
+		}
+	}
+
+	compResult = arrayCompare(&_array1[offset]);
+
+	if (compResult == 0) {
+		middle = offset; 
+		if (middle) {
+			while (!compResult) {
+				--middle;
+				compResult = arrayCompare(&_array1[middle]);
+			}
+
+			++middle;
+			compResult = 0;
+		}
+	} else if (compResult > 0) {
+		for (middle = offset + 1; middle < idx1; ++middle) {
+			compResult = arrayCompare(&_array1[middle]);
+			if (compResult <= 0)
+				break;
+		}
+	}
+
+	if (compResult)
+		return 0;
+
+	const ParserHandlerArrEntry &ae = _array1[middle];
+
+
+
+	// TODO
+	return 0;
+}
+
+int ParserHandlers::arrayCompare(const ParserHandlerArrEntry *entry) const {
+	// TODO
+	return 0;
+}
+
 } // namespace Parser
 } // namespace Early
 } // namespace Legend

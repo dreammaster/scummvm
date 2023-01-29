@@ -35,6 +35,11 @@ Parser::Parser(const String &emptyLine, int againId, int allId,
 		_EMPTY_LINE(emptyLine), _AGAIN(againId), _ALL(allId), _AND(andId),
 		_BUT(butId), _OF(ofId), _OOPS(oopsId), _THEN(thenId), _TO(toId),
 		_UNDO(undoId) {
+
+	_handlers.add(ParserHandlerEntry(0, 12, &Parser::speakHandler));
+	_handlers.add(ParserHandlerEntry(0, 12, &Parser::speakHandler));
+	_handlers.add(ParserHandlerEntry(0, 12, &Parser::speakHandler));
+	_handlers.add(ParserHandlerEntry(0, 15, &Parser::zeroHandler));
 }
 
 void Parser::parse(const String &srcLine) {
@@ -125,7 +130,7 @@ void Parser::parseLoop() {
 			int handlerIndex = _handlers.getIndex();
 			if (handlerIndex >= 0) {
 				HandlerFunction fn = _handlers._functions[handlerIndex]._fn;
-				if ((*fn)() != 0)
+				if ((this->*fn)() != 0)
 					return;
 			} else if (_handlers._field34 >= 2 || !_handlers._newVocabId) {
 				pleaseRephrase();
@@ -179,8 +184,11 @@ void Parser::parseLoop() {
 			}
 		} else if (_handlers._sub1._val10) {
 			_handlers._field2c = 15;
-			// TODO call speaker handler
+			if (speakHandler())
+				return;
 		}
+
+		_val12 = 0;
 
 
 		// TODO

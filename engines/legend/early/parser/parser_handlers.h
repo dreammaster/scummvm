@@ -29,16 +29,17 @@ namespace Legend {
 namespace Early {
 namespace Parser {
 
-typedef int (*HandlerFunction)();
+class Parser;
+typedef int (Parser::*HandlerFunction)();
 
 struct ParserHandlerEntry {
+	HandlerFunction _fn = nullptr;
 	int _minId = 0;
 	int _maxId = 0;
 	int _val3 = 0;
-	HandlerFunction _fn = nullptr;
 	ParserHandlerEntry() {}
-	ParserHandlerEntry(int minId, int maxId, int val3, HandlerFunction fn) :
-		_minId(minId), _maxId(maxId), _val3(val3), _fn(fn) {}
+	ParserHandlerEntry(int maxId, int val3, HandlerFunction fn) :
+		_minId(0), _maxId(maxId), _val3(val3), _fn(fn) {}
 };
 
 struct HandlerData2 {
@@ -77,6 +78,14 @@ struct HandlerDataSub2 {
 	void clear();
 };
 
+struct ParserHandlerArrEntry {
+	int _val1;
+	int _val2;
+	int _val3;
+	int _val4;
+	int _val5;
+};
+
 /**
  * Special parser handling for character instructions,
  * like "ask", "order", "tell", etc.
@@ -97,11 +106,21 @@ struct ParserHandlers {
 	int _field52;
 	HandlerData2 _data1;
 
+	const ParserHandlerArrEntry *_array1;
+	size_t _array1_size = 0;
+	int _val1 = 0;
+	int _val2 = 0;
+
 	ParserHandlers() { clear(); }
 	void clear();
 
 	void add(const ParserHandlerEntry &entry) {
 		_functions.push_back(entry);
+	}
+
+	void setArray(const ParserHandlerArrEntry *arr, size_t size) {
+		_array1 = arr;
+		_array1_size = size;
 	}
 
 	/**
@@ -113,6 +132,9 @@ struct ParserHandlers {
 	 * Compare handler state to a given handler entry
 	 */
 	int compare(const ParserHandlerEntry &entry) const;
+
+	int arrayGetIndex();
+	int arrayCompare(const ParserHandlerArrEntry *entry) const;
 };
 
 } // namespace Parser

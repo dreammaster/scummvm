@@ -49,10 +49,10 @@ Parser::Parser() : Legend::Early::Parser::Parser(
 		String(_("[I beg your pardon?]\n")),
 		PARSER_AGAIN, PARSER_ALL, PARSER_AND, PARSER_BUT, PARSER_OF,
 		PARSER_OOPS, PARSER_THEN, PARSER_TO, PARSER_UNDO) {
-	_handlers.add(Early::Parser::ParserHandlerEntry(ASK, 0, 12, speakHandler));
-	_handlers.add(Early::Parser::ParserHandlerEntry(ORDER, 0, 12, speakHandler));
-	_handlers.add(Early::Parser::ParserHandlerEntry(TELL, 0, 12, speakHandler));
-	_handlers.add(Early::Parser::ParserHandlerEntry(USE, 0, 15, zeroHandler));
+	_handlers._functions[0]._minId = ASK;
+	_handlers._functions[0]._minId = ORDER;
+	_handlers._functions[0]._minId = TELL;
+	_handlers._functions[0]._minId = USE;
 }
 
 int Parser::speakHandler() {

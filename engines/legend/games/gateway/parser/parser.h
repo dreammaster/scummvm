@@ -30,9 +30,6 @@ namespace Gateway {
 namespace Parser {
 
 class Parser : public Legend::Early::Parser::Parser {
-private:
-	static int speakHandler();
-	static int zeroHandler() { return 0; }
 public:
 	Parser();
 	virtual ~Parser() {}
