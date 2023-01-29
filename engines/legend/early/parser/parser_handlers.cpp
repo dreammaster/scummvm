@@ -35,6 +35,24 @@ void HandlerDataSub::clear() {
 	_val4 = 0;
 }
 
+void HandlerDataSub2::clear() {
+	_sub.clear();
+	_val5 = 0;
+	_val6 = 0;
+	_val7 = 0;
+	_val8 = 0;
+	_val9 = 0;
+	_val10 = 0;
+}
+
+void HandlerData2::clear() {
+	_val1 = 0;
+	_val2 = 0;
+	_val3 = 0;
+	Common::fill(&_vocabIds[0], &_vocabIds[16], 0);
+	_val4 = 0;
+}
+
 void ParserHandlers::clear() {
 	_minVocabId = 0;
 	_maxVocabId = 0;

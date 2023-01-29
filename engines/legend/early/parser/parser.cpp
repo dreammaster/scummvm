@@ -135,12 +135,51 @@ void Parser::parseLoop() {
 				if (!(ve._flags & (VFLAG_2 | VFLAG_4))) {
 					pleaseRephrase();
 					return;
+				} else {
+					_handlers._sub1._sub = _handlers._sub2;
+
+					if ((!_handlers._field34 || !_handlers._sub3._val1) && (ve._flags & VFLAG_2)) {
+						_handlers._data1.clear();
+						_handlers._sub3.clear();
+						_handlers._data1._val4 = _handlers._newVocabId;
+						_handlers._sub3._val1 = 1;
+						_handlers._sub3._ptr = &_handlers._data1;
+
+					} else if (!(ve._flags & VFLAG_4)) {
+						pleaseRephrase();
+						return;
+
+					} else {
+						HandlerData2 *d2 = _handlers._sub3._ptr;
+						int idx = d2->_val3;
+						if (idx < 16)
+							d2->_val3++;
+						else
+							--idx;
+
+						memmove(&d2->_vocabIds[1], &d2->_vocabIds[0], idx * 2);
+						d2->_vocabIds[0] = _handlers._newVocabId;
+					}
+
+					_tmpSub = _handlers._sub1;
+					_handlers._sub2.clear();
+					_handlers._sub2._val1 = 1;
+					_handlers._sub2._ptr = &_tmpSub2;
+					_handlers._field34 = 2;
+
+					_handlers._newVocabId = _handlers._minVocabId;
+					_handlers._field30 = _handlers._maxVocabId;
+
+					_handlers._field32 = _TO;
+					_handlers._minVocabId = 0;
+					_handlers._maxVocabId = 0;
+
+					_handlers._sub1.clear();
 				}
-
-
 			}
-		} else {
-
+		} else if (_handlers._sub1._val10) {
+			_handlers._field2c = 15;
+			// TODO call speaker handler
 		}
 
 
