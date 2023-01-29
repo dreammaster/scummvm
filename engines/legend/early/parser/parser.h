@@ -68,6 +68,7 @@ private:
 	int _val9 = 0;
 	int _val10 = 0;
 	int _val11 = 0;
+	int _val12 = 0;
 
 	int _wordIndex = 0;
 	uint32 _number = 0;
@@ -110,6 +111,9 @@ private:
 	 * Parses a word within the sentence
 	 */
 	int parseWord(ParserString &line);
+
+	int speakHandler();
+	int zeroHandler() { return 0; }
 
 protected:
 	ParserHandlers _handlers;
