@@ -21,26 +21,47 @@
 
 #include "common/translation.h"
 #include "legend/games/gateway/parser/parser.h"
+#include "legend/games/gateway/engine.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
 namespace Parser {
 
-#define PARSER_AGAIN 27
-#define PARSER_ALL 41
-#define PARSER_AND 50
-#define PARSER_BUT 273
-#define PARSER_OF 1521
-#define PARSER_OOPS 1536
-#define PARSER_THEN 2346
-#define PARSER_TO 2382
-#define PARSER_UNDO 2473
+enum {
+	PARSER_AGAIN = 27,
+	PARSER_ALL = 41,
+	PARSER_AND = 50,
+	PARSER_BUT = 273,
+	PARSER_OF = 1521,
+	PARSER_OOPS = 1536,
+	PARSER_THEN = 2346,
+	PARSER_TO = 2382,
+	PARSER_UNDO = 2473,
+
+	ASK = 83,
+	ORDER = 1548,
+	TELL = 2325,
+	USE = 2495
+};
 
 Parser::Parser() : Legend::Early::Parser::Parser(
 		String(_("[I beg your pardon?]\n")),
 		PARSER_AGAIN, PARSER_ALL, PARSER_AND, PARSER_BUT, PARSER_OF,
 		PARSER_OOPS, PARSER_THEN, PARSER_TO, PARSER_UNDO) {
+	_handlers.add(Early::Parser::ParserHandlerEntry(ASK, 0, 12, speakHandler));
+	_handlers.add(Early::Parser::ParserHandlerEntry(ORDER, 0, 12, speakHandler));
+	_handlers.add(Early::Parser::ParserHandlerEntry(TELL, 0, 12, speakHandler));
+	_handlers.add(Early::Parser::ParserHandlerEntry(USE, 0, 15, zeroHandler));
+}
+
+int Parser::speakHandler() {
+	// TODO: Gateway default handler
+	return 0;
+}
+
+void Parser::pleaseRephrase() {
+	g_engine->send(TextMessage(String(0xc402)));
 }
 
 } // namespace Parser

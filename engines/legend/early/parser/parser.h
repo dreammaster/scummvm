@@ -24,6 +24,7 @@
 #define LEGEND_EARLY_PARSER_PARSER_H
 
 #include "legend/utils/string.h"
+#include "legend/early/parser/parser_handlers.h"
 
 namespace Legend {
 namespace Early {
@@ -67,7 +68,6 @@ private:
 	int _val9 = 0;
 	int _val10 = 0;
 	int _val11 = 0;
-	int _val12 = 0;
 
 	int _wordIndex = 0;
 	uint32 _number = 0;
@@ -110,6 +110,7 @@ private:
 	int parseWord(ParserString &line);
 
 protected:
+	ParserHandlers _handlers;
 	const String _EMPTY_LINE;
 	const int _AGAIN;
 	const int _ALL;
@@ -120,6 +121,11 @@ protected:
 	const int _THEN;
 	const int _TO;
 	const int _UNDO;
+
+	/**
+	 * Asks the user to rephrase the question
+	 */
+	virtual void pleaseRephrase() = 0;
 
 public:
 	int _val2 = 211;

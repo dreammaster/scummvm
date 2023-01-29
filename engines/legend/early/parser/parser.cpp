@@ -21,7 +21,6 @@
  */
 
 #include "common/translation.h"
-#include "common/translation.h"
 #include "legend/early/parser/parser.h"
 #include "legend/early/engine.h"
 #include "legend/events.h"
@@ -122,8 +121,30 @@ void Parser::parseLoop() {
 			return;
 		}
 
-		// TODO
+		if (_handlers._minVocabId != 0) {
+			int handlerIndex = _handlers.getIndex();
+			if (handlerIndex >= 0) {
+				HandlerFunction fn = _handlers._functions[handlerIndex]._fn;
+				if ((*fn)() != 0)
+					return;
+			} else if (_handlers._field34 >= 2 || !_handlers._newVocabId) {
+				pleaseRephrase();
+				return;
+			} else {
+				const VocabEntry &ve = (*g_engine->_vocab)[_handlers._newVocabId];
+				if (!(ve._flags & (VFLAG_2 | VFLAG_4))) {
+					pleaseRephrase();
+					return;
+				}
 
+
+			}
+		} else {
+
+		}
+
+
+		// TODO
 	}
 }
 
