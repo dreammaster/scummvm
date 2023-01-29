@@ -30,6 +30,7 @@ MODULE_OBJS = \
 	early/logic/room.o \
 	early/logic/queue.o \
 	early/parser/parser.o \
+	early/parser/parser_handlers.o \
 	early/parser/vocab.o \
 	early/utils/huffman.o \
 	early/views/help_screen.o \
