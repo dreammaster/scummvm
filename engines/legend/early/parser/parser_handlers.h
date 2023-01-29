@@ -41,13 +41,39 @@ struct ParserHandlerEntry {
 		_minId(minId), _maxId(maxId), _val3(val3), _fn(fn) {}
 };
 
+struct HandlerData2 {
+	int _val1;
+	int _val2;
+	int _val3;
+	uint16 _vocabIds[16];
+	int _val4;
+
+	HandlerData2() {
+		clear();
+	}
+	void clear();
+};
+
 struct HandlerDataSub {
 	int _val1 = 0;
-	void *_ptr = 0;
+	HandlerData2 *_ptr = nullptr;
 	int _val2 = 0;
 	int _val3 = 0;
 	int _val4 = 0;
 
+	void clear();
+};
+
+struct HandlerDataSub2 {
+	HandlerDataSub _sub;
+	int _val5 = 0;
+	int _val6 = 0;
+	int _val7 = 0;
+	int _val8 = 0;
+	int _val9 = 0;
+	int _val10 = 0;
+
+	HandlerDataSub2() { clear(); }
 	void clear();
 };
 
@@ -60,7 +86,7 @@ struct ParserHandlers {
 
 	int _minVocabId;
 	int _maxVocabId;
-	HandlerDataSub _sub1;
+	HandlerDataSub2 _sub1;
 	int _field2c;
 	int _newVocabId;
 	int _field30;
@@ -69,6 +95,7 @@ struct ParserHandlers {
 	HandlerDataSub _sub2;
 	HandlerDataSub _sub3;
 	int _field52;
+	HandlerData2 _data1;
 
 	ParserHandlers() { clear(); }
 	void clear();
