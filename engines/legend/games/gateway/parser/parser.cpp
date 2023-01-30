@@ -42,7 +42,8 @@ enum {
 	ASK = 83,
 	ORDER = 1548,
 	TELL = 2325,
-	USE = 2495
+	USE = 2495,
+	MY = 1439
 };
 
 #define ARRAY2_OFFSET1 176
@@ -72,8 +73,53 @@ void Parser::whatDoYouWant() {
 		g_engine->_logics->printObj(130, objNum);
 
 	g_engine->addText(" to ");
-//	g_engine-
-	// TODO
+	g_engine->_vocab->display(_handlers._newVocabId1);
+
+	int vocabId = _handlers._newVocabId2;
+	if (vocabId) {
+		g_engine->addText(" ");
+		g_engine->_vocab->display(vocabId);
+	}
+
+	if (_handlers._field34) {
+		bool flag = false;
+
+		for (int idx = 0; idx < _handlers._sub2._val1; ++idx) {
+			if (idx > 0) {
+				if ((idx + 1) == _handlers._sub2._val1) {
+					g_engine->addText(" and");
+				} else {
+					g_engine->addText(",");
+				}
+			}
+
+			const Early::Parser::HandlerData2 *entryP = &_handlers._sub2._ptr[idx];
+			for (int idx2 = 0; idx2 < entryP->_vocabCount && !flag; ++idx2) {
+				flag = entryP->_vocabIds[idx2] == MY;
+			}
+
+			if (!flag && !entryP->_val2)
+				g_engine->addText(" the ");
+			else
+				g_engine->addText(" ");
+
+			entryP->display();
+		}
+
+		for (int idx = 0; idx < _handlers._sub2._val2; ++idx) {
+			if (idx == 0) {
+				g_engine->addText(" but");
+			} else if ((idx + 1) == _handlers._sub2._val2) {
+				g_engine->addText(" and");
+			} else {
+				g_engine->addText(",");
+			}
+
+			// TODO
+		}
+	}
+
+	g_engine->addText("?]\n");
 }
 
 } // namespace Parser

@@ -46,11 +46,23 @@ void HandlerDataSub2::clear() {
 }
 
 void HandlerData2::clear() {
-	_val1 = 0;
+	_prefixVocabId = 0;
 	_val2 = 0;
-	_val3 = 0;
+	_vocabCount = 0;
 	Common::fill(&_vocabIds[0], &_vocabIds[16], 0);
-	_val4 = 0;
+	_suffixVocabId = 0;
+}
+
+void HandlerData2::display() const {
+	if (!_suffixVocabId)
+		g_engine->_vocab->display(_prefixVocabId);
+
+	for (int idx = 0; idx < _vocabCount; ++idx) {
+		g_engine->_vocab->display(_vocabIds[idx]);
+		g_engine->addText(" ");
+	}
+
+	g_engine->_vocab->display(_suffixVocabId);
 }
 
 void ParserHandlers::clear() {

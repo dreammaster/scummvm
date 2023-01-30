@@ -43,16 +43,21 @@ struct ParserHandlerEntry {
 };
 
 struct HandlerData2 {
-	int _val1;
+	int _prefixVocabId;
 	int _val2;
-	int _val3;
+	int _vocabCount;
 	uint16 _vocabIds[16];
-	int _val4;
+	int _suffixVocabId;
 
 	HandlerData2() {
 		clear();
 	}
 	void clear();
+
+	/**
+	 * Add to text window
+	 */
+	void display() const;
 };
 
 struct HandlerDataSub {
