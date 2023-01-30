@@ -148,7 +148,7 @@ void Parser::parseLoop() {
 					if ((!_handlers._field34 || !_handlers._sub3._val1) && (ve._flags & VFLAG_2)) {
 						_handlers._data1.clear();
 						_handlers._sub3.clear();
-						_handlers._data1._val4 = _handlers._newVocabId1;
+						_handlers._data1._suffixVocabId = _handlers._newVocabId1;
 						_handlers._sub3._val1 = 1;
 						_handlers._sub3._ptr = &_handlers._data1;
 
@@ -158,9 +158,9 @@ void Parser::parseLoop() {
 
 					} else {
 						HandlerData2 *d2 = _handlers._sub3._ptr;
-						int idx = d2->_val3;
+						int idx = d2->_vocabCount;
 						if (idx < 16)
-							d2->_val3++;
+							d2->_vocabCount++;
 						else
 							--idx;
 
