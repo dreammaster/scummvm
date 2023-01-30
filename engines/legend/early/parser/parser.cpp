@@ -29,6 +29,8 @@ namespace Legend {
 namespace Early {
 namespace Parser {
 
+//const int Parser::NUMBER_VOCAB_ID = 3;
+
 Parser::Parser(const String &emptyLine, int againId, int allId,
 		int andId, int butId, int ofId, int oopsId, int thenId,
 		int toId, int undoId) :

@@ -22,8 +22,10 @@
 
 #include "common/file.h"
 #include "common/substream.h"
+#include "legend/early/parser/parser.h"
 #include "legend/early/parser/vocab.h"
 #include "legend/early/utils/huffman.h"
+#include "legend/early/engine.h"
 
 namespace Legend {
 namespace Early {
@@ -99,6 +101,23 @@ int Vocab::indexOf(const String &word) const {
 	}
 
 	return (val == 0) ? index + 1 : 0;
+}
+
+void Vocab::display(int vocabId) {
+	if (vocabId >= 1 && vocabId <= (int)size()) {
+		String str = (*this)[vocabId];
+
+		if (vocabId == Parser::NUMBER_VOCAB_ID) {
+			g_engine->addText(String::format("%ld", g_engine->_parser->_number));
+		}
+
+		if (!str.empty()) {
+			if (capitalizeVocab(vocabId))
+				str.capitalize();
+
+			g_engine->addText(str);
+		}
+	}
 }
 
 } // namespace Parser

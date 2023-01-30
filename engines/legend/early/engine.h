@@ -93,6 +93,11 @@ public:
 	void setRoom(int roomNum);
 
 	int loadGame(LoadType mode, const char *filename = nullptr);
+
+	/**
+	 * Adds text to the text window
+	 */
+	void addText(const String &str);
 };
 
 extern Engine *g_engine;

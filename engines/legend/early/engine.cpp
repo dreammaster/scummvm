@@ -45,7 +45,6 @@ bool Engine::initialize() {
 
 	Legend::Gfx::Font::init();
 	_screen = new Early::Gfx::Screen();
-	_vocab = new Parser::Vocab();
 
 	return true;
 }
@@ -147,6 +146,10 @@ Common::Error Engine::syncGameStream(Common::Serializer &s) {
 	_queue.synchronize(s);
 
 	return Common::kNoError;
+}
+
+void Engine::addText(const String &str) {
+	send(TextMessage(str));
 }
 
 } // namespace Early

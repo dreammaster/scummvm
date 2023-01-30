@@ -54,6 +54,13 @@ public:
 class Vocab {
 private:
 	Common::Array<VocabEntry> _items;
+
+protected:
+	/**
+	 * Returns true if a given vocab should be capitalized
+	 */
+	virtual bool capitalizeVocab(int vocabId) const { return false; }
+
 public:
 	Vocab();
 
@@ -76,6 +83,11 @@ public:
 		assert(vocabId != 0 && vocabId <= _items.size());
 		return _items[vocabId - 1];
 	}
+
+	/**
+	 * Display a vocab in lowercase in the text window
+	 */
+	void display(int vocabId);
 };
 
 } // namespace Parser

@@ -61,7 +61,19 @@ Parser::Parser() : Legend::Early::Parser::Parser(
 }
 
 void Parser::pleaseRephrase() {
-	g_engine->send(TextMessage(String(0xc402)));
+	g_engine->addText(0xc402);
+}
+
+void Parser::whatDoYouWant() {
+	g_engine->addText(0xc403);
+
+	int objNum = g_engine->_logics->_logicNum211;
+	if (_val2 != objNum)
+		g_engine->_logics->printObj(130, objNum);
+
+	g_engine->addText(" to ");
+//	g_engine-
+	// TODO
 }
 
 } // namespace Parser
