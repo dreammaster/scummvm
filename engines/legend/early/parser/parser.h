@@ -79,7 +79,7 @@ private:
 	int _unknownFirstIndex = 0;
 	int _unknownWordIndex = 0;
 	HandlerDataSub2 _tmpSub;
-	HandlerData2 _tmpSub2;
+	VocabSet _tmpSub2;
 
 	/**
 	 * Adds a line to the text window

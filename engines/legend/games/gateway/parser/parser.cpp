@@ -93,7 +93,7 @@ void Parser::whatDoYouWant() {
 				}
 			}
 
-			const Early::Parser::HandlerData2 *entryP = &_handlers._sub2._ptr[idx];
+			const Early::Parser::VocabSet *entryP = &_handlers._sub2._set1[idx];
 			for (int idx2 = 0; idx2 < entryP->_vocabCount && !flag; ++idx2) {
 				flag = entryP->_vocabIds[idx2] == MY;
 			}
@@ -115,7 +115,7 @@ void Parser::whatDoYouWant() {
 				g_engine->addText(",");
 			}
 
-			const Early::Parser::HandlerData2 *entry = &_handlers._sub2._ptr2[idx];
+			const Early::Parser::VocabSet *entry = &_handlers._sub2._set2[idx];
 			if (!entry->_val2)
 				g_engine->addText(" the ");
 			else

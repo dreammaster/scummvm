@@ -32,6 +32,7 @@ MODULE_OBJS = \
 	early/parser/parser.o \
 	early/parser/parser_handlers.o \
 	early/parser/vocab.o \
+	early/parser/vocab_set.o \
 	early/utils/huffman.o \
 	early/views/help_screen.o \
 	early/views/interface.o \
