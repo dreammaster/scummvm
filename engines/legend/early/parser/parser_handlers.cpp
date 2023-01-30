@@ -29,10 +29,9 @@ namespace Parser {
 
 void HandlerDataSub::clear() {
 	_val1 = 0;
-	_ptr = 0;
+	_ptr = nullptr;
 	_val2 = 0;
-	_val3 = 0;
-	_val4 = 0;
+	_ptr2 = nullptr;
 }
 
 void HandlerDataSub2::clear() {

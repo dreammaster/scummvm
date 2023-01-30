@@ -115,7 +115,12 @@ void Parser::whatDoYouWant() {
 				g_engine->addText(",");
 			}
 
-			// TODO
+			const Early::Parser::HandlerData2 *entry = &_handlers._sub2._ptr2[idx];
+			if (!entry->_val2)
+				g_engine->addText(" the ");
+			else
+				g_engine->addText(" ");
+			entry->display();
 		}
 	}
 
