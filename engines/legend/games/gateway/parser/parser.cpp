@@ -127,6 +127,30 @@ void Parser::whatDoYouWant() {
 	g_engine->addText("?]\n");
 }
 
+int Parser::getAltVocab(int vocabId1, int vocabId2) const {
+	static const uint16 IDS[12][2] = {
+		{ 1486, 1 },
+		{ 1487, 2 },
+		{ 1490, 8 },
+		{ 2137, 5 },
+		{ 2138, 4 },
+		{ 2141, 6 },
+		{ 677, 3 },
+		{ 2578, 7 },
+		{ 2489, 9 },
+		{ 638, 10 },
+		{ 1130, 11 },
+		{ 1554, 12 }
+	};
+
+	for (int i = 0; i < 12; ++i) {
+		if (IDS[i][0] == vocabId1 || IDS[i][0] == vocabId2)
+			return IDS[i][1];
+	}
+
+	return -1;
+}
+
 } // namespace Parser
 } // namespace Gateway
 } // namespace Early

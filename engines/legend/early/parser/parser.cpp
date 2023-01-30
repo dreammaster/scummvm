@@ -210,11 +210,11 @@ void Parser::parseLoop() {
 			int logicNum = 0;
 
 			if (val) {
-				// TOD: logicNum = sub1(val, 0);
+				logicNum = g_engine->_logics->resetSavedLogic(g_engine->_roomLogicNum, val, 0);
 			}
 
 			if (logicNum < 1 || logicNum > g_engine->_logics->size()) {
-				// TODO: sub2();
+				whatDoYouWant();
 				_val11 = 0;
 				_val5 = 1;
 				return;
@@ -223,6 +223,25 @@ void Parser::parseLoop() {
 			_val2 = logicNum;
 		}
 
+		_val21 = 0;
+
+		for (int idx = 0; idx < _handlers._field34; ++idx) {
+			int vocabId;
+			if (idx == 0) {
+				vocabId = _handlers._newVocabId1;
+			} else {
+				assert(idx == 1 || idx == 2);
+				const HandlerDataSub *sub = (idx == 1) ? &_handlers._sub2 : &_handlers._sub3;
+				vocabId = sub->_ptr->_suffixVocabId;
+			}
+
+			const VocabEntry &ve = (*g_engine->_vocab)[vocabId];
+			int altVocabId = ve._altVocabId;
+
+			int val = getAltVocab(vocabId, altVocabId);
+			if (val >= 0)
+				_val21 = val;
+		}
 
 		// TODO
 	}
