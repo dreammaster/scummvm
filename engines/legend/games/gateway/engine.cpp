@@ -23,6 +23,7 @@
 #include "legend/games/gateway/engine.h"
 #include "legend/games/gateway/logic/logics.h"
 #include "legend/games/gateway/parser/parser.h"
+#include "legend/games/gateway/parser/vocab.h"
 #include "legend/games/gateway/views/views.h"
 #include "legend/early/gfx/screen.h"
 #include "legend/utils/engine_data.h"
@@ -60,6 +61,7 @@ bool GatewayEngine::initialize() {
 
 	_logics = new Logic::Logics();
 	_parser = new Gateway::Parser::Parser();
+	_vocab = new Gateway::Parser::Vocab();
 	setRoom(LOGIC_STARTING_ROOM);
 
 	return true;

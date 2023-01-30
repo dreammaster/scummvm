@@ -4,10 +4,10 @@
  * are too numerous to list here. Please refer to the COPYRIGHT
  * file distributed with this source distribution.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,35 +15,27 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
 
-#ifndef LEGEND_GAMES_GATEWAY_PARSER_PARSER_H
-#define LEGEND_GAMES_GATEWAY_PARSER_PARSER_H
+#ifndef LEGEND_GAMES_GATEWAY_PARSER_VOCAB_H
+#define LEGEND_GAMES_GATEWAY_PARSER_VOCAB_H
 
-#include "legend/early/parser/parser.h"
+#include "legend/early/parser/vocab.h"
 
 namespace Legend {
 namespace Early {
 namespace Gateway {
 namespace Parser {
 
-class Parser : public Legend::Early::Parser::Parser {
-public:
-	Parser();
-	virtual ~Parser() {}
-
+class Vocab : public Legend::Early::Parser::Vocab {
+protected:
 	/**
-	 * Asks the user to rephrase the question
+	 * Returns true if a given vocab should be capitalized
 	 */
-	void pleaseRephrase() override;
-
-	/**
-	 * What do you want to do method
-	 */
-	virtual void whatDoYouWant() override;
-
+	bool capitalizeVocab(int vocabId) const override;
 };
 
 } // namespace Parser

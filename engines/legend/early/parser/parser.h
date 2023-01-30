@@ -70,7 +70,6 @@ private:
 	int _val12 = 0;
 
 	int _wordIndex = 0;
-	uint32 _number = 0;
 	ParserString _inputLine;
 	ParserString _inputLineCopy;
 	String _subLine;
@@ -139,9 +138,16 @@ protected:
 	 */
 	virtual void pleaseRephrase() = 0;
 
+	/**
+	 * What do you want to do method
+	 */
+	virtual void whatDoYouWant() = 0;
+
 public:
 	int _val2 = 211;
 	int _val20 = 0;
+	static constexpr int NUMBER_VOCAB_ID = 3;
+	uint32 _number = 0;
 
 public:
 	/**

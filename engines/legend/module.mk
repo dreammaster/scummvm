@@ -148,6 +148,7 @@ MODULE_OBJS = \
 	games/gateway/logic/rooms/room715.o \
 	games/gateway/logic/rooms/room717.o \
 	games/gateway/parser/parser.o \
+	games/gateway/parser/vocab.o \
 	games/gateway/views/commset.o \
 	games/gateway/views/part_title.o \
 	legend.o \
