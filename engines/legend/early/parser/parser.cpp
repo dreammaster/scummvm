@@ -39,7 +39,7 @@ Parser::Parser(const String &emptyLine, int againId, int allId,
 	_handlers.add(ParserHandlerEntry(0, 12, &Parser::speakHandler));
 	_handlers.add(ParserHandlerEntry(0, 12, &Parser::speakHandler));
 	_handlers.add(ParserHandlerEntry(0, 12, &Parser::speakHandler));
-	_handlers.add(ParserHandlerEntry(0, 15, &Parser::zeroHandler));
+	_handlers.add(ParserHandlerEntry(0, 15, &Parser::useHandler));
 }
 
 void Parser::parse(const String &srcLine) {
@@ -132,11 +132,11 @@ void Parser::parseLoop() {
 				HandlerFunction fn = _handlers._functions[handlerIndex]._fn;
 				if ((this->*fn)() != 0)
 					return;
-			} else if (_handlers._field34 >= 2 || !_handlers._newVocabId) {
+			} else if (_handlers._field34 >= 2 || !_handlers._newVocabId1) {
 				pleaseRephrase();
 				return;
 			} else {
-				const VocabEntry &ve = (*g_engine->_vocab)[_handlers._newVocabId];
+				const VocabEntry &ve = (*g_engine->_vocab)[_handlers._newVocabId1];
 				if (!(ve._flags & (VFLAG_2 | VFLAG_4))) {
 					pleaseRephrase();
 					return;
@@ -146,7 +146,7 @@ void Parser::parseLoop() {
 					if ((!_handlers._field34 || !_handlers._sub3._val1) && (ve._flags & VFLAG_2)) {
 						_handlers._data1.clear();
 						_handlers._sub3.clear();
-						_handlers._data1._val4 = _handlers._newVocabId;
+						_handlers._data1._val4 = _handlers._newVocabId1;
 						_handlers._sub3._val1 = 1;
 						_handlers._sub3._ptr = &_handlers._data1;
 
@@ -163,7 +163,7 @@ void Parser::parseLoop() {
 							--idx;
 
 						memmove(&d2->_vocabIds[1], &d2->_vocabIds[0], idx * 2);
-						d2->_vocabIds[0] = _handlers._newVocabId;
+						d2->_vocabIds[0] = _handlers._newVocabId1;
 					}
 
 					_tmpSub = _handlers._sub1;
@@ -172,8 +172,8 @@ void Parser::parseLoop() {
 					_handlers._sub2._ptr = &_tmpSub2;
 					_handlers._field34 = 2;
 
-					_handlers._newVocabId = _handlers._minVocabId;
-					_handlers._field30 = _handlers._maxVocabId;
+					_handlers._newVocabId1 = _handlers._minVocabId;
+					_handlers._newVocabId2 = _handlers._maxVocabId;
 
 					_handlers._field32 = _TO;
 					_handlers._minVocabId = 0;
@@ -559,6 +559,11 @@ bool Parser::performUndo() {
 		_("[There isn't enough memory to use \"undo\" right now.]\n")
 	);
 	return false;
+}
+
+int Parser::speakHandler() {
+	// TODO
+	return 0;
 }
 
 } // namespace Parser

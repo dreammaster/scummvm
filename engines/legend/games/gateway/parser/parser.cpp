@@ -45,6 +45,9 @@ enum {
 	USE = 2495
 };
 
+#define ARRAY2_OFFSET1 176
+#define ARRAY2_COUNT1 13
+
 Parser::Parser() : Legend::Early::Parser::Parser(
 		String(_("[I beg your pardon?]\n")),
 		PARSER_AGAIN, PARSER_ALL, PARSER_AND, PARSER_BUT, PARSER_OF,
@@ -53,11 +56,8 @@ Parser::Parser() : Legend::Early::Parser::Parser(
 	_handlers._functions[0]._minId = ORDER;
 	_handlers._functions[0]._minId = TELL;
 	_handlers._functions[0]._minId = USE;
-}
 
-int Parser::speakHandler() {
-	// TODO: Gateway default handler
-	return 0;
+	// TODO: Set arrays and sizes
 }
 
 void Parser::pleaseRephrase() {

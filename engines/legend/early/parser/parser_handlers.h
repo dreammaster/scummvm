@@ -78,12 +78,17 @@ struct HandlerDataSub2 {
 	void clear();
 };
 
-struct ParserHandlerArrEntry {
-	int _val1;
-	int _val2;
+struct ParserHandlerArrEntry1 {
+	int _vocabId1;
+	int _vocabId2;
 	int _val3;
 	int _val4;
-	int _val5;
+	byte _array[4];
+};
+
+struct ParserHandlerArrEntry2 {
+	int _vocabId;
+	byte _arr[4];
 };
 
 /**
@@ -97,18 +102,25 @@ struct ParserHandlers {
 	int _maxVocabId;
 	HandlerDataSub2 _sub1;
 	int _field2c;
-	int _newVocabId;
-	int _field30;
+	int _newVocabId1;
+	int _newVocabId2;
 	int _field32;
 	int _field34;
+	int _field35;
+	int _field36;
+	int _field37;
+	int _field38;
 	HandlerDataSub _sub2;
 	HandlerDataSub _sub3;
 	int _field52;
 	HandlerData2 _data1;
 
-	const ParserHandlerArrEntry *_array1;
-	size_t _array1_size = 0;
-	int _val1 = 0;
+	const ParserHandlerArrEntry1 *_array1;
+	int _array1_size = 0;
+	const ParserHandlerArrEntry2 *_array2;
+	int _array2_offset1, _array2_size1;
+
+	int _arrIndex = 0;
 	int _val2 = 0;
 
 	ParserHandlers() { clear(); }
@@ -118,7 +130,7 @@ struct ParserHandlers {
 		_functions.push_back(entry);
 	}
 
-	void setArray(const ParserHandlerArrEntry *arr, size_t size) {
+	void setArray(const ParserHandlerArrEntry1 *arr, size_t size) {
 		_array1 = arr;
 		_array1_size = size;
 	}
@@ -134,7 +146,8 @@ struct ParserHandlers {
 	int compare(const ParserHandlerEntry &entry) const;
 
 	int arrayGetIndex();
-	int arrayCompare(const ParserHandlerArrEntry *entry) const;
+	int array1Compare(const ParserHandlerArrEntry1 *entry) const;
+	int array2Compare(const ParserHandlerArrEntry2 *entry) const;
 };
 
 } // namespace Parser
