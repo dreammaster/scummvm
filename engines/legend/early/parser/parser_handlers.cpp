@@ -29,9 +29,9 @@ namespace Parser {
 
 void HandlerDataSub::clear() {
 	_val1 = 0;
-	_ptr = nullptr;
+	_set1 = nullptr;
 	_val2 = 0;
-	_ptr2 = nullptr;
+	_set2 = nullptr;
 }
 
 void HandlerDataSub2::clear() {
@@ -42,26 +42,6 @@ void HandlerDataSub2::clear() {
 	_val8 = 0;
 	_val9 = 0;
 	_val10 = 0;
-}
-
-void HandlerData2::clear() {
-	_prefixVocabId = 0;
-	_val2 = 0;
-	_vocabCount = 0;
-	Common::fill(&_vocabIds[0], &_vocabIds[16], 0);
-	_suffixVocabId = 0;
-}
-
-void HandlerData2::display() const {
-	if (!_suffixVocabId)
-		g_engine->_vocab->display(_prefixVocabId);
-
-	for (int idx = 0; idx < _vocabCount; ++idx) {
-		g_engine->_vocab->display(_vocabIds[idx]);
-		g_engine->addText(" ");
-	}
-
-	g_engine->_vocab->display(_suffixVocabId);
 }
 
 void ParserHandlers::clear() {

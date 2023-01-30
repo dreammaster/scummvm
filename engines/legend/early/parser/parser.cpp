@@ -150,14 +150,14 @@ void Parser::parseLoop() {
 						_handlers._sub3.clear();
 						_handlers._data1._suffixVocabId = _handlers._newVocabId1;
 						_handlers._sub3._val1 = 1;
-						_handlers._sub3._ptr = &_handlers._data1;
+						_handlers._sub3._set1 = &_handlers._data1;
 
 					} else if (!(ve._flags & VFLAG_4)) {
 						pleaseRephrase();
 						return;
 
 					} else {
-						HandlerData2 *d2 = _handlers._sub3._ptr;
+						VocabSet *d2 = _handlers._sub3._set1;
 						int idx = d2->_vocabCount;
 						if (idx < 16)
 							d2->_vocabCount++;
@@ -171,7 +171,7 @@ void Parser::parseLoop() {
 					_tmpSub = _handlers._sub1;
 					_handlers._sub2.clear();
 					_handlers._sub2._val1 = 1;
-					_handlers._sub2._ptr = &_tmpSub2;
+					_handlers._sub2._set1 = &_tmpSub2;
 					_handlers._field34 = 2;
 
 					_handlers._newVocabId1 = _handlers._minVocabId;
@@ -232,7 +232,7 @@ void Parser::parseLoop() {
 			} else {
 				assert(idx == 1 || idx == 2);
 				const HandlerDataSub *sub = (idx == 1) ? &_handlers._sub2 : &_handlers._sub3;
-				vocabId = sub->_ptr->_suffixVocabId;
+				vocabId = sub->_set1->_suffixVocabId;
 			}
 
 			const VocabEntry &ve = (*g_engine->_vocab)[vocabId];

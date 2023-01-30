@@ -24,6 +24,7 @@
 #define LEGEND_EARLY_PARSER_PARSER_HANDLERS_H
 
 #include "legend/utils/string.h"
+#include "legend/early/parser/vocab_set.h"
 
 namespace Legend {
 namespace Early {
@@ -42,29 +43,11 @@ struct ParserHandlerEntry {
 		_minId(0), _maxId(maxId), _val3(val3), _fn(fn) {}
 };
 
-struct HandlerData2 {
-	int _prefixVocabId;
-	int _val2;
-	int _vocabCount;
-	uint16 _vocabIds[16];
-	int _suffixVocabId;
-
-	HandlerData2() {
-		clear();
-	}
-	void clear();
-
-	/**
-	 * Add to text window
-	 */
-	void display() const;
-};
-
 struct HandlerDataSub {
 	int _val1 = 0;
-	HandlerData2 *_ptr = nullptr;
+	VocabSet *_set1 = nullptr;
 	int _val2 = 0;
-	HandlerData2 *_ptr2 = nullptr;
+	VocabSet *_set2 = nullptr;
 
 	void clear();
 };
@@ -119,7 +102,7 @@ struct ParserHandlers {
 	HandlerDataSub _sub2;
 	HandlerDataSub _sub3;
 	int _field52;
-	HandlerData2 _data1;
+	VocabSet _data1;
 
 	const ParserHandlerArrEntry1 *_array1;
 	int _array1_size = 0;
