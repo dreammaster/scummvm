@@ -452,5 +452,125 @@ int Logics::getRoomPicNumber(int logicNum) const {
 	return room ? room->getPicNumber() : -1;
 }
 
+bool Logics::defaultSavedLogic(int logicNum, int, int) {
+	Logics &l = *g_engine->_logics;
+
+	if (l._logicType) {
+		if (l[logicNum]->_type == l._logicType)
+			return false;
+	}
+
+	if (!l.getBit(logicNum, l._logicBit) || !l._savedLogicNum)
+		return false;
+
+	l._savedLogicNum = l.size() + 1;
+	return true;
+}
+
+bool Logics::getLogicHandlerBit(int logicNum, int handlerIndex) const {
+	const LogicBase *lb = (*this)[logicNum];
+	if (lb->_type == LT_ROOM || lb->_type == LT_7)
+		return true;
+
+	switch (handlerIndex) {
+	case 0:
+		return getBit(logicNum, 19) && (getBit(logicNum, 12) || getBit(logicNum, 31));
+	case 1:
+		return getBit(logicNum, 28);
+	case 2:
+		return true;
+	default:
+		return false;
+	}
+}
+
+int Logics::resetSavedLogic(int roomLogicNum, int logicBit, int logicType) {
+	_savedLogicNum = 0;
+	_logicBit = logicBit;
+	_logicType = logicType;
+
+	savedLogicHandler(roomLogicNum, defaultSavedLogic, 1);
+	return _savedLogicNum;
+}
+
+void Logics::savedLogicHandler(int roomLogicNum, SavedLogicFn fn, int arg3) {
+	int val1 = -1, val2 = 0, val3 = -1;
+	int val4 = 0;
+	int logicNum = roomLogicNum;
+	int handlerIndex;
+	int idx = 0;
+	struct ArrEntry {
+		byte _handlerIndex;
+		byte _val2;
+		uint16 _logicNum;
+	};
+	ArrEntry array[16];
+
+	// TODO: Figure out how to properly loopify this method.
+	// Seriously, even with IDA, I couldn't figure out how to
+	// cleanly create the needed nested loop structure
+loop1:
+	handlerIndex = 0;
+
+loop2:
+	if (!logicNum || fn(logicNum, val2, val3))
+		return;
+
+loop3:
+	idx = 0;
+	for (int logicType = (*this)[logicNum]->_type;
+		handlerIndex < _METADATA[logicType - 1]._unkHandlerCount;
+		++handlerIndex) {
+		if (!arg3 || getLogicHandlerBit(logicNum, handlerIndex)) {
+			idx = getUnkHandler(logicNum, handlerIndex);
+			if (idx)
+				break;
+		}
+	}
+
+	if (idx) {
+		if (logicNum == roomLogicNum && (*this)[roomLogicNum]->_type == LT_ROOM) {
+			val4 = 0;
+		} else if (logicNum == _logicNum211) {
+			val4 = 1;
+		} else if (val3 == 0) {
+			val4 = 2;
+		} else if (val3 == 1) {
+			val4 = 3;
+		}
+
+		++val1;
+		array[val1]._logicNum = logicNum;
+		array[val1]._handlerIndex = handlerIndex;
+		array[val1]._val2 = val3;
+
+		logicNum = idx;
+		handlerIndex = 0;
+		val3 = val4;
+		++val2;
+		goto loop2;
+	}
+
+	if (val1 < 0) {
+		logicNum = 0;
+		goto loop2;
+	}
+
+	idx = getVal1(logicNum);
+	if (idx) {
+		logicNum = idx;
+		goto loop1;
+	}
+
+	logicNum = array[val1]._logicNum;
+	handlerIndex = array[val1]._handlerIndex;
+	val3 = array[val1]._val2;
+
+	--val1;
+	--val2;
+	++handlerIndex;
+	goto loop3;
+}
+
 } // namespace Early
 } // namespace Legend

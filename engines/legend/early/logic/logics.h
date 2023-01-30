@@ -29,6 +29,8 @@
 namespace Legend {
 namespace Early {
 
+typedef bool (*SavedLogicFn)(int logicNum, int arg2, int arg3);
+
 class Logics {
 	struct LogicType {
 		const int _handlerCount;
@@ -46,8 +48,20 @@ class Logics {
 private:
 	const LogicType _METADATA[8];
 	const ArrayEntry _ARRAY[40];	// TODO: Is this Gateway specific?
+	int _logicType = 0;
+	int _savedLogicNum = 0;
+	int _logicBit = 0;
+	SavedLogicFn _savedFn = nullptr;
+
+private:
+	static bool defaultSavedLogic(int logicNum, int, int);
+
 protected:
 	LogicStrings _strings;
+
+public:
+	int _logicNum211 = 211;
+
 public:
 	Logics();
 	virtual ~Logics() {}
@@ -61,6 +75,11 @@ public:
 	 * Size of the logic array
 	 */
 	virtual int size() const = 0;
+
+	/**
+	 * Get the picture number for a given room number
+	 */
+	virtual int getRoomPicNumber(int logicNum) const;
 
 	/**
 	 * Synchronize logic data
@@ -125,10 +144,9 @@ public:
 
 	void updateHandler(int logicNum, int handlerId, int handlerIndex);
 
-	/**
-	 * Get the picture number for a given room number
-	 */
-	virtual int getRoomPicNumber(int logicNum) const;
+	bool getLogicHandlerBit(int logicNum, int mode) const;
+	int resetSavedLogic(int roomLogicNum, int logicBit, int logicType);
+	void savedLogicHandler(int roomLogicNum, SavedLogicFn fn, int arg3);
 };
 
 } // namespace Early

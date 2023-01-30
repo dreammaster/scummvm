@@ -110,6 +110,8 @@ struct ParserHandlers {
 	int _field36;
 	int _field37;
 	int _field38;
+	int _field39;
+//	byte _arr[4];
 	HandlerDataSub _sub2;
 	HandlerDataSub _sub3;
 	int _field52;

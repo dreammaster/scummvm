@@ -219,7 +219,7 @@ int ParserHandlers::arrayGetIndex() {
 				}
 			}
 		} else {
-			int val5 = entry->_array[val1];
+			val5 = entry->_array[val1];
 
 			if (val5) {
 				_field52 = val5;
