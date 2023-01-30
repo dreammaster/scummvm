@@ -30,10 +30,7 @@ namespace Gateway {
 namespace Parser {
 
 class Parser : public Legend::Early::Parser::Parser {
-public:
-	Parser();
-	virtual ~Parser() {}
-
+protected:
 	/**
 	 * Asks the user to rephrase the question
 	 */
@@ -44,6 +41,11 @@ public:
 	 */
 	virtual void whatDoYouWant() override;
 
+	int getAltVocab(int vocabId1, int vocabId2) const override;
+
+public:
+	Parser();
+	virtual ~Parser() {}
 };
 
 } // namespace Parser

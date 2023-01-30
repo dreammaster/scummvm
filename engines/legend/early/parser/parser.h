@@ -143,11 +143,14 @@ protected:
 	 */
 	virtual void whatDoYouWant() = 0;
 
+	virtual int getAltVocab(int vocabId1, int vocabId2) const = 0;
+
 public:
-	int _val2 = 211;
-	int _val20 = 0;
 	static constexpr int NUMBER_VOCAB_ID = 3;
 	uint32 _number = 0;
+	int _val2 = 211;
+	int _val20 = 0;
+	int _val21 = 0;
 
 public:
 	/**
