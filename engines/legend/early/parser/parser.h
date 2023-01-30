@@ -112,8 +112,15 @@ private:
 	 */
 	int parseWord(ParserString &line);
 
+	/**
+	 * Special handler for speaking to characters
+	 */
 	int speakHandler();
-	int zeroHandler() { return 0; }
+
+	/**
+	 * No special handler for use actions
+	 */
+	int useHandler() { return 0; }
 
 protected:
 	ParserHandlers _handlers;
