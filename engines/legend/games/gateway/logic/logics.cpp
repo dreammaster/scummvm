@@ -50,6 +50,7 @@ Logics::Logics() : _logics{
 	INIT10(70), INIT10(71), INIT10(72),
 	&_logic730, &_logic731, &_logic732, &_logic733, &_logic734
 } {
+	_logicNum211 = 211;
 }
 
 LogicBase *Logics::operator[](int index) const {

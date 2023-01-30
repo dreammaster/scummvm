@@ -59,7 +59,6 @@ private:
 	int _vocabId = 0;
 	int _val1 = -1;
 	int _result = -1;
-	int _val3 = 211;
 	int _val4 = 0;
 	int _val5 = 0;
 	int _val6 = 0;
@@ -142,6 +141,7 @@ protected:
 
 public:
 	int _val2 = 211;
+	int _val20 = 0;
 
 public:
 	/**

@@ -56,7 +56,7 @@ void Parser::parse(const String &srcLine) {
 		return;
 	}
 
-	_val3 = _val2;
+	g_engine->_logics->_logicNum211 = _val2;
 	_val4 = 0;
 
 	if (_OOPS) {
@@ -189,6 +189,37 @@ void Parser::parseLoop() {
 		}
 
 		_val12 = 0;
+
+		int dir = _handlers.arrayGetIndex();
+		_val20 = _handlers._field52;
+
+		if (dir == 0) {
+			pleaseRephrase();
+			_val11 = 0;
+			_val5 = 0;
+			return;
+		}
+
+		if (dir > 0) {
+			_val5 = 0;
+		} else {
+			assert(_handlers._field34 < 2);
+			int val = (_handlers._field34 == 1) ? _handlers._field38 : _handlers._field37;
+			int logicNum = 0;
+
+			if (val) {
+				// TOD: logicNum = sub1(val, 0);
+			}
+
+			if (logicNum < 1 || logicNum > g_engine->_logics->size()) {
+				// TODO: sub2();
+				_val11 = 0;
+				_val5 = 1;
+				return;
+			}
+
+			_val2 = logicNum;
+		}
 
 
 		// TODO
