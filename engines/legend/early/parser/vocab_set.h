@@ -49,7 +49,7 @@ struct VocabSet {
 	/**
 	 * Asks the player to clarify which item they mean
 	 */
-	void whichDoYouMean(const byte *ids) const;
+	void whichDoYouMean(const void *items) const;
 };
 
 } // namespace Parser

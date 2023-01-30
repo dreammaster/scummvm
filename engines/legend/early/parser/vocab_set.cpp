@@ -47,8 +47,21 @@ void VocabSet::display() const {
 	g_engine->_vocab->display(_suffixVocabId);
 }
 
-void VocabSet::whichDoYouMean(const byte *ids) const {
-	// TODO	
+void VocabSet::whichDoYouMean(const void *items) const {
+	error("TODO");
+	/*
+	int val1 = 0, val2 = 0;
+	int logicNum = 0;
+
+	g_engine->addText("[Which ");
+	display();
+	g_engine->addText(" do you mean");
+
+	for (int idx = 0; idx < *count || (logicNum && val1 > 1); ++idx) {
+		if (idx < *count || g_engine->_logics->getBit())
+	}
+*/
+	g_engine->addText("?]\n");
 }
 
 } // namespace Parser
