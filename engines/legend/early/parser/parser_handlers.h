@@ -64,8 +64,7 @@ struct HandlerDataSub {
 	int _val1 = 0;
 	HandlerData2 *_ptr = nullptr;
 	int _val2 = 0;
-	int _val3 = 0;
-	int _val4 = 0;
+	HandlerData2 *_ptr2 = nullptr;
 
 	void clear();
 };
