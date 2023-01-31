@@ -31,6 +31,7 @@ MODULE_OBJS = \
 	early/logic/queue.o \
 	early/parser/parser.o \
 	early/parser/parser_handlers.o \
+	early/parser/parser_line.o \
 	early/parser/vocab.o \
 	early/parser/vocab_set.o \
 	early/utils/huffman.o \

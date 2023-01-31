@@ -72,7 +72,7 @@ public:
 	/**
 	 * Return the vocab size
 	 */
-	size_t size() const {
+	int size() const {
 		return _items.size();
 	}
 
