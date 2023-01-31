@@ -31,11 +31,16 @@ namespace Early {
 namespace Parser {
 
 enum ParserResult {
-	PR_UNKOWN = 0, PR_END_OF_STRING = -1,
+	PR_UNKNOWN = 0, PR_END_OF_STRING = -1,
 	PR_2 = -2, PR_3 = -3, PR_4 = -4, PR_5 = -5, PR_8 = -8,
 	PR_9 = -9, PR_10 = -10, PR_11 = -11, PR_12 = -12, PR_13 = -13,
 	PR_14 = -14, PR_15 = -15, PR_16 = -16, PR_17 = -17,
-	PR_COMMA = -18, PR_PERIOD = -19, PR_SEMICOLON = -20, PR_21 = -21
+	PR_COMMA = -18, PR_PERIOD = -19, PR_SEMICOLON = -20, PR_21 = -21,
+	PR_END_OF_LIST = -22
+};
+
+enum ParserMode {
+	PM_0, PM_1, PM_2, PM_3, PM_4, PM_5, PM_6, PM_7
 };
 
 /**
@@ -48,6 +53,14 @@ public:
 
 	ParserString() {}
 	ParserString(const String &str, int charIndex = 0) : String(str) {}
+};
+
+/**
+ * Holds a pair of the parser result from parsing a word and it's vocab Id
+ */
+struct StateVocab {
+	int _status;
+	int _vocabId;
 };
 
 /**
@@ -80,6 +93,9 @@ private:
 	int _unknownWordIndex = 0;
 	HandlerDataSub2 _tmpSub;
 	VocabSet _tmpSub2;
+	ParserMode _mode = PM_0;
+	StateVocab _stateArray[100];
+	bool _firstTimeSetup = false;
 
 	/**
 	 * Adds a line to the text window
@@ -88,8 +104,10 @@ private:
 
 	void parseLoop();
 	int oops();
+	void parseLine(ParserString &inputLine);
+	void parseLineSetup();
+	int handleLine();
 	int proc3();
-	int proc4();
 
 	/**
 	 * Gets the index of the parser handler function

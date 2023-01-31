@@ -42,6 +42,8 @@ Parser::Parser(const String &emptyLine, int againId, int allId,
 	_handlers.add(ParserHandlerEntry(0, 12, &Parser::speakHandler));
 	_handlers.add(ParserHandlerEntry(0, 12, &Parser::speakHandler));
 	_handlers.add(ParserHandlerEntry(0, 15, &Parser::useHandler));
+
+	parseLineSetup();
 }
 
 void Parser::parse(const String &srcLine) {
@@ -122,7 +124,7 @@ void Parser::parseLoop() {
 			}
 		}
 
-		if (proc4() <= 0) {
+		if (handleLine() <= 0) {
 			_val11 = 0;
 			_val5 = 0;
 			return;
@@ -361,7 +363,7 @@ int Parser::parseWord(ParserString &line) {
 
 			_startIndex = firstIndex;
 			_val1 = _result;
-			_result = PR_UNKOWN;
+			_result = PR_UNKNOWN;
 			break;
 		}
 
@@ -588,11 +590,6 @@ int Parser::proc3() {
 		_inputLine._charIndex = 0;
 		return 1;
 	}
-}
-
-int Parser::proc4() {
-	// TODO
-	return 0;
 }
 
 void Parser::youDontNeed(const String &word) {
