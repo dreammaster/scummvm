@@ -36,6 +36,23 @@
 
 namespace Dink {
 
+void dink_strcpy(char *dst, const char *s) {
+	Common::strcpy_s(dst, 255, s);
+}
+
+void dink_strcat(char *dst, const char *s) {
+	Common::strcat_s(dst, 255, s);
+}
+
+void dink_sprintf(char *dst, const char *fmt, ...) {
+	va_list va;
+	va_start(va, fmt);
+	Common::String tmp = Common::String::vformat(fmt, va);
+	va_end(va);
+
+	dink_strcpy(dst, tmp.c_str());
+}
+
 void clear_talk() {
 	memset(&talk, 0, sizeof(talk));
 	play.mouse = 0;
@@ -493,7 +510,7 @@ bool load_game_small(int num, char *line, int *mytime) {
 #ifdef TODO
 	FILE           *fp;
 	char crap[80];
-	sprintf(crap, "SAVE%d.DAT", num);
+	dink_sprintf(crap, "SAVE%d.DAT", num);
 
 
 	fp = fopen(crap, "rb");
@@ -505,7 +522,7 @@ bool load_game_small(int num, char *line, int *mytime) {
 		fread(&short_play, sizeof(player_short_info), 1, fp);
 		fclose(fp);
 		*mytime = short_play.minutes;
-		strcpy(line, short_play.gameinfo);
+		dink_strcpy(line, short_play.gameinfo);
 		return true;
 	}
 #else
@@ -637,18 +654,18 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 	if (no_running_main) draw_wait();
 
 	char crap2[200];
-	strcpy(crap2, org);
+	dink_strcpy(crap2, org);
 	while (crap2[strlen(crap2) - 1] != '\\') {
 		crap2[strlen(crap2) - 1] = 0;
 	}
 	crap2[strlen(crap2) - 1] = 0;
 
 	int num = strlen(org) - strlen(crap2) - 1;
-	strcpy(fname, &org[strlen(org) - num]);
+	dink_strcpy(fname, &org[strlen(org) - num]);
 	if (samedir)
-		sprintf(crap, "%s\\dir.ff", crap2);
+		dink_sprintf(crap, "%s\\dir.ff", crap2);
 	else
-		sprintf(crap, "..\\dink\\%s\\dir.ff", crap2);
+		dink_sprintf(crap, "..\\dink\\%s\\dir.ff", crap2);
 
 
 	if (!FastFileInit((LPSTR)crap, 5)) {
@@ -676,9 +693,9 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 		char dumb[100];
 		sprite = cur_sprite;
 		//if (reload) Msg("Ok, programming sprite %d", sprite);
-		if (oo < 10) strcpy(crap2, "0");
-		else strcpy(crap2, "");
-		wsprintf(crap, "%s%s%d.bmp", fname, crap2, oo);
+		if (oo < 10) dink_strcpy(crap2, "0");
+		else dink_strcpy(crap2, "");
+		wdink_sprintf(crap, "%s%s%d.bmp", fname, crap2, oo);
 
 		pfile = FastFileOpen((LPSTR) crap);
 
@@ -1056,22 +1073,22 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
 		draw_wait();
 
 	char crap2[200];
-	strcpy(crap2, org);
+	dink_strcpy(crap2, org);
 	while (crap2[strlen(crap2) - 1] != '\\') {
 		crap2[strlen(crap2) - 1] = 0;
 	}
 	crap2[strlen(crap2) - 1] = 0;
 
-	sprintf(crap, "%s\\dir.ff", crap2);
+	dink_sprintf(crap, "%s\\dir.ff", crap2);
 	//Msg("Checking for %s..", crap);
 	if (File::exists(crap)) {
 		load_sprite_pak(org, nummy, speed, xoffset, yoffset, hardbox, notanim, black, leftalign, true);
 		return;
 	}
 
-	sprintf(crap, "%s01.bmp", org);
+	dink_sprintf(crap, "%s01.bmp", org);
 	if (!File::exists(crap)) {
-		sprintf(crap, "..\\dink\\%s\\dir.ff", crap2);
+		dink_sprintf(crap, "..\\dink\\%s\\dir.ff", crap2);
 		//Msg("Checking for %s..", crap);
 		if (File::exists(crap)) {
 			load_sprite_pak(org, nummy, speed, xoffset, yoffset, hardbox, notanim, black, leftalign, false);
@@ -1079,8 +1096,8 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
 		}
 
 		//  Msg("Dir bad for sprite, changing");
-		sprintf(crap, "..\\dink\\%s", org);
-		strcpy(org, crap);
+		dink_sprintf(crap, "..\\dink\\%s", org);
+		dink_strcpy(org, crap);
 	}
 
 	// redink1 added to fix bug where loading sequences over others wouldn't work quite right.
@@ -1101,7 +1118,7 @@ void load_sprites(char org[100], int nummy, int speed, int xoffset, int yoffset,
 	}
 
 	for (int oo = 1; oo <= 1000; oo++) {
-		sprintf(crap, "%s%.2d.BMP", org, oo);
+		dink_sprintf(crap, "%s%.2d.BMP", org, oo);
 		picInfo[cur_sprite].k = DDSethLoad(lpDD, crap, 0, 0, cur_sprite);
 
 		if (picInfo[cur_sprite].k != NULL) {
@@ -1193,7 +1210,7 @@ void figure_out(char line[255], int load_seq) {
 
 		ZeroMemory(&hardbox, sizeof(RECT));
 		seq[atol(ev[3])].active = true;
-		strcpy(seq[atol(ev[3])].data, line);
+		dink_strcpy(seq[atol(ev[3])].data, line);
 		if (compare(ev[4], "BLACK")) {
 			load_sprites(ev[2], atol(ev[3]), atol(ev[4]), atol(ev[5]), atol(ev[6]), hardbox, true, true, false);
 		} else if (compare(ev[4], "LEFTALIGN")) {
@@ -1365,7 +1382,7 @@ void pre_figure_out(char line[255]) {
 		// name   seq    speed       offsetx     offsety       hardx      hardy
 		ZeroMemory(&hardbox, sizeof(RECT));
 		seq[atol(ev[3])].active = true;
-		strcpy(seq[atol(ev[3])].data, line);
+		dink_strcpy(seq[atol(ev[3])].data, line);
 		if (compare(ev[4], "BLACK")) {
 			load_sprites(ev[2], atol(ev[3]), atol(ev[4]), atol(ev[5]), atol(ev[6]), hardbox, true, true, false);
 		} else if (compare(ev[4], "LEFTALIGN")) {
@@ -1392,7 +1409,7 @@ void pre_figure_out(char line[255]) {
 
 	if (compare(ev[1], "LOAD_SEQUENCE")) {
 		// name   seq    speed       offsetx     offsety       hardx      hardy
-		strcpy(seq[atol(ev[3])].data, line);
+		dink_strcpy(seq[atol(ev[3])].data, line);
 		seq[atol(ev[3])].active = true;
 		return;
 	}
@@ -1502,19 +1519,19 @@ void draw_exp() {
 	char final[30];
 
 	//Msg("Drawing exp.. which is %d and %d",fexp, *pexp);
-	strcpy(final, "");
-	strcpy(nums, ltoa(fexp, buffer, 10));
+	dink_strcpy(final, "");
+	dink_strcpy(nums, ltoa(fexp, buffer, 10));
 	if (strlen(nums) < 5)
 		for (int i = 1; i < (6 - (int)strlen(nums)); i++)
-			strcat(final, "0");
-	strcat(final, nums);
-	strcat(final, "/");
+			dink_strcat(final, "0");
+	dink_strcat(final, nums);
+	dink_strcat(final, "/");
 
-	strcpy(nums, ltoa(fraise, buffer, 10));
+	dink_strcpy(nums, ltoa(fraise, buffer, 10));
 	if (strlen(nums) < 5)
 		for (int i = 1; i < (6 - (int)strlen(nums)); i++)
-			strcat(final, "0");
-	strcat(final, nums);
+			dink_strcat(final, "0");
+	dink_strcat(final, nums);
 	draw_num(181, final, 404, 459);
 
 }
@@ -1525,13 +1542,13 @@ void draw_strength() {
 	char buffer[30];
 	char nums[30];
 	//Msg("Drawing exp.. which is %d and %d",fexp, *pexp);
-	strcpy(final, "");
+	dink_strcpy(final, "");
 
-	strcpy(nums, ltoa(fstrength, buffer, 10));
+	dink_strcpy(nums, ltoa(fstrength, buffer, 10));
 	if (strlen(nums) < 3)
 		for (int i = 1; i < (4 - (int)strlen(nums)); i++)
-			strcat(final, "0");
-	strcat(final, nums);
+			dink_strcat(final, "0");
+	dink_strcat(final, nums);
 	//Msg("Drawing %s..",final);
 	draw_num(182, final, 81, 415);
 }
@@ -1542,12 +1559,12 @@ void draw_defense() {
 	char buffer[30];
 	char nums[30];
 	//Msg("Drawing exp.. which is %d and %d",fexp, *pexp);
-	strcpy(final, "");
-	strcpy(nums, ltoa(fdefense, buffer, 10));
+	dink_strcpy(final, "");
+	dink_strcpy(nums, ltoa(fdefense, buffer, 10));
 	if (strlen(nums) < 3)
 		for (int i = 1; i < (4 - (int)strlen(nums)); i++)
-			strcat(final, "0");
-	strcat(final, nums);
+			dink_strcat(final, "0");
+	dink_strcat(final, nums);
 	draw_num(183, final, 81, 437);
 }
 
@@ -1557,12 +1574,12 @@ void draw_magic() {
 	char buffer[30];
 	char nums[30];
 	//Msg("Drawing exp.. which is %d and %d",fexp, *pexp);
-	strcpy(final, "");
-	strcpy(nums, ltoa(fmagic, buffer, 10));
+	dink_strcpy(final, "");
+	dink_strcpy(nums, ltoa(fmagic, buffer, 10));
 	if (strlen(nums) < 3)
 		for (int i = 1; i < (4 - (int)strlen(nums)); i++)
-			strcat(final, "0");
-	strcat(final, nums);
+			dink_strcat(final, "0");
+	dink_strcat(final, nums);
 	draw_num(184, final, 81, 459);
 }
 
@@ -1573,7 +1590,7 @@ void draw_level() {
 	//char nums[30];
 	//*plevel = 15;
 	//Msg("Drawing level.. which is %d ",*plevel);
-	strcpy(final, ltoa(*plevel, buffer, 10));
+	dink_strcpy(final, ltoa(*plevel, buffer, 10));
 
 	if (strlen(final) == 1)
 
@@ -1589,12 +1606,12 @@ void draw_gold() {
 	char buffer[30];
 	char nums[30];
 	//Msg("Drawing exp.. which is %d and %d",fexp, *pexp);
-	strcpy(final, "");
-	strcpy(nums, ltoa(fgold, buffer, 10));
+	dink_strcpy(final, "");
+	dink_strcpy(nums, ltoa(fgold, buffer, 10));
 	if (strlen(nums) < 5)
 		for (int i = 1; i < (6 - (int)strlen(nums)); i++)
-			strcat(final, "0");
-	strcat(final, nums);
+			dink_strcat(final, "0");
+	dink_strcat(final, nums);
 	draw_num(185, final, 298, 457);
 }
 
@@ -2113,9 +2130,9 @@ void reload_sprites(char name[100], int nummy, int junk) {
 		if (ddrVal == DD_OK) {
 
 
-			if (n < 10) strcpy(hold, "0");
-			else strcpy(hold, "");
-			sprintf(crap, "%s%s%d.BMP", name, hold, n);
+			if (n < 10) dink_strcpy(hold, "0");
+			else dink_strcpy(hold, "");
+			dink_sprintf(crap, "%s%s%d.BMP", name, hold, n);
 
 			DDReLoadBitmap(picInfo[oo].k, crap);
 			//Msg("Sprite %s%d.bmp reloaded into area %d. ",name,n,oo);
@@ -2251,12 +2268,12 @@ int load_script(const char *filename, int sprite, bool set_sprite) {
 	char tab[10];
 
 	Msg("Loading %s", filename);
-	sprintf(tab, "%c", 9);
+	dink_sprintf(tab, "%c", 9);
 
-	sprintf(temp, "story\\%s.d", filename);
+	dink_sprintf(temp, "story\\%s.d", filename);
 
 	if (!File::exists(temp)) {
-		sprintf(temp, "story\\%s.c", filename);
+		dink_sprintf(temp, "story\\%s.c", filename);
 		if (!File::exists(temp)) {
 			Msg("Script %s not found. (checked for .C and .D) (requested by %d?)", temp, sprite);
 			return 0;
@@ -2318,7 +2335,7 @@ int load_script(const char *filename, int sprite, bool set_sprite) {
 		return 0;
 	}
 
-	strcpy(rinfo[script]->name, filename);
+	dink_strcpy(rinfo[script]->name, filename);
 	rinfo[script]->sprite = sprite;
 
 	if (set_sprite) {
@@ -2457,7 +2474,7 @@ bool recurse_var_replace(int i, int script, char *line, char *prevar) {
 			if (!recurse_var_replace(i + 1, script, line, play.var[i].name)) {
 				//we didn't find any, so we replace!
 				char crap[20];
-				sprintf(crap, "%d", play.var[i].var);
+				dink_sprintf(crap, "%d", play.var[i].var);
 				replace(play.var[i].name, crap, line);
 				//return true;
 			}
@@ -2481,7 +2498,7 @@ void decipher_string(char line[200], int script) {
 	if (play.var[i].active == true)
 	if (  (play.var[i].scope == 0) || recurse_scope(play.var[i].scope, script) )
 	{
-	sprintf(crap, "%d", play.var[i].var);
+	dink_sprintf(crap, "%d", play.var[i].var);
 	replace(play.var[i].name, crap, line);
 
 	//        check_for_real_vars(crap, i);
@@ -2524,20 +2541,20 @@ void decipher_string(char line[200], int script) {
 
 	if (decipher_savegame != 0)
 		if (compare(line, "&savegameinfo")) {
-			sprintf(crap, "save%d.dat", decipher_savegame);
+			dink_sprintf(crap, "save%d.dat", decipher_savegame);
 			if (File::exists(crap)) {
 				load_game_small(decipher_savegame, crab, &mytime);
 				//redink1 fix for savegame time bug
-				sprintf(line, "Slot %d - %d:%02d - %s", decipher_savegame, (mytime / 60), mytime - ((mytime / 60) * 60), crab);
-				//sprintf(line, "In Use");
+				dink_sprintf(line, "Slot %d - %d:%02d - %s", decipher_savegame, (mytime / 60), mytime - ((mytime / 60) * 60), crab);
+				//dink_sprintf(line, "In Use");
 			} else {
 
 #ifdef __GERMAN
-				sprintf(line, "Slot %d - Ungebraucht", decipher_savegame);
+				dink_sprintf(line, "Slot %d - Ungebraucht", decipher_savegame);
 #endif
 
 #ifdef __ENGLISH
-				sprintf(line, "Slot %d - Empty", decipher_savegame);
+				dink_sprintf(line, "Slot %d - Empty", decipher_savegame);
 #endif
 
 
@@ -2719,7 +2736,7 @@ int say_text(const char *text, int h, int script) {
 
 	}
 	*plast_text = crap2;
-	strcpy(spr[crap2].text, text);
+	dink_strcpy(spr[crap2].text, text);
 	spr[crap2].kill = strlen(text) * text_timer;
 	if (spr[crap2].kill < text_min) spr[crap2].kill = text_min;
 	spr[crap2].damage = -1;
@@ -2751,7 +2768,7 @@ int say_text_xy(const char *text, int mx, int my, int script) {
 
 	}
 	*plast_text = crap2;
-	strcpy(spr[crap2].text, text);
+	dink_strcpy(spr[crap2].text, text);
 	spr[crap2].kill = strlen(text) * text_timer;
 	if (spr[crap2].kill < text_min) spr[crap2].kill = text_min;
 	spr[crap2].damage = -1;
@@ -2854,7 +2871,7 @@ morestuff:
 
 			while (read_next_line(script, line)) {
 
-				strcpy(check, line);
+				dink_strcpy(check, line);
 				strip_beginning_spaces(line);
 				get_word(line, 1, checker);
 				seperate_string(line, 1, '(', check);
@@ -2872,7 +2889,7 @@ morestuff:
 				//Msg("LINE IS: %s: Like it?",line);
 
 				decipher_string(line, script);
-				strcat(talk.buffer, line);
+				dink_strcat(talk.buffer, line);
 				//talk.buffer[strlen(talk.buffer)-1] = 0;
 			}
 
@@ -2930,10 +2947,10 @@ morestuff:
 
 			p = &line[strlen(check) + 1];
 
-			strcpy(check, p);
+			dink_strcpy(check, p);
 
 
-			strcpy(line, check);
+			dink_strcpy(line, check);
 
 			//Msg("new line is %s, happy?", line);
 			goto morestuff;
@@ -2948,7 +2965,7 @@ morestuff:
 		decipher_savegame = retnum;
 		decipher_string(check, script);
 		decipher_savegame = 0;
-		strcpy(talk.line[cur], check);
+		dink_strcpy(talk.line[cur], check);
 		talk.line_return[cur] = retnum;
 		cur++;
 	}
@@ -2961,13 +2978,13 @@ void get_right(char line[200], char thing[100], char *ret) {
 
 
 	if (pos == NULL) {
-		strcpy(ret, "");
+		dink_strcpy(ret, "");
 		return;
 	}
 
 
 	dumb = &ret[pos + 1];
-	strcpy(ret, dumb);
+	dink_strcpy(ret, dumb);
 }
 
 void draw_sprite_game(LPDIRECTDRAWSURFACE lpdest, int h) {
@@ -3236,7 +3253,7 @@ void update_play_changes() {
 
 				pam.sprite[j].seq = play.spmap[*pmap].seq[j];
 				pam.sprite[j].frame = play.spmap[*pmap].frame[j];
-				strcpy(pam.sprite[j].script, "");
+				dink_strcpy(pam.sprite[j].script, "");
 
 
 			}

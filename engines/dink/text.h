@@ -35,7 +35,7 @@ extern int say_text(const char *text, int h, int script);
 extern int say_text_xy(const char *text, int mx, int my, int script);
 
 /**
- * This acts in the same way as strcat except it combines
+ * This acts in the same way as dink_strcat except it combines
  * a string an a single character, updating the null at the end.
  */
 extern void strchar(char *string, char ch);

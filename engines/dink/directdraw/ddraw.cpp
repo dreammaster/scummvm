@@ -70,10 +70,13 @@ HRESULT IDirectDrawSurface::Restore() {
 
 HRESULT IDirectDrawSurface::BltFast(int16 x, int16 y,
 		const IDirectDrawSurface *src, LPRECT rect, uint32 flags) {
-	rawBlitFrom(*src, *rect, Common::Point(x, y), nullptr);
+	rawBlitFrom(*src, *rect, Common::Point(x, y));
 
-	if (src->getPalette() != nullptr)
-		setPalette(src->getPalette(), 0, PALETTE_COUNT);
+	if (src->hasPalette()) {
+		byte pal[PALETTE_SIZE];
+		src->grabPalette(pal, 0, PALETTE_COUNT);
+		setPalette(pal, 0, PALETTE_COUNT);
+	}
 
 	return DD_OK;
 }
@@ -86,7 +89,7 @@ HRESULT IDirectDrawSurface::Blt(const LPRECT dstRect, const IDirectDrawSurface *
 HRESULT IDirectDrawSurface::Flip(IDirectDrawSurface *, uint32 flags) {
 	SWAP(lpDDSPrimary, lpDDSBack);
 
-	if (lpDDSPrimary->getPalette() != nullptr)
+	if (lpDDSPrimary->hasPalette())
 		lpDDSPrimary->setScreenPalette();
 
 	g_system->copyRectToScreen(lpDDSPrimary->getPixels(),
@@ -98,15 +101,7 @@ HRESULT IDirectDrawSurface::Flip(IDirectDrawSurface *, uint32 flags) {
 
 void IDirectDrawSurface::setScreenPalette() {
 	byte pal[PALETTE_SIZE];
-	const uint32 *src = getPalette();
-	byte *dest = pal;
-
-	for (int i = 0; i < PALETTE_COUNT; ++i, ++src, dest += 3) {
-		dest[0] = *src & 0xff;
-		dest[1] = (*src >> 8) & 0xff;
-		dest[2] = (*src >> 16) & 0xff;
-	}
-
+	grabPalette(pal, 0, PALETTE_COUNT);
 	g_system->getPaletteManager()->setPalette(pal, 0, PALETTE_COUNT);
 }
 
@@ -126,7 +121,17 @@ HRESULT IDirectDrawSurface::IsLost() const {
 
 HRESULT IDirectDrawSurface::SetPalette(LPDIRECTDRAWPALETTE pal) {
 	Graphics::ManagedSurface *surf = this;
-	surf->setPalette(reinterpret_cast<const uint32 *>(&pal->_palette[0]), 0, PALETTE_COUNT);
+
+	byte palette[PALETTE_SIZE];
+	const PALETTEENTRY *srcP = pal->_palette;
+	byte *destP = palette;
+	for (int i = 0; i < PALETTE_COUNT; ++i, ++srcP) {
+		*destP++ = srcP->peRed;
+		*destP++ = srcP->peGreen;
+		*destP++ = srcP->peBlue;
+	}
+
+	surf->setPalette(palette, 0, PALETTE_COUNT);
 	return DD_OK;
 }
 

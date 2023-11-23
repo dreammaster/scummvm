@@ -75,7 +75,7 @@ trigger_start:
 			if (debug_mode) {
 				debug_mode = false;
 			} else {
-				strcpy(last_debug, "");
+				dink_strcpy(last_debug, "");
 				debug_mode = true;
 			}
 		}
@@ -635,7 +635,7 @@ past:
 
 		spr[crap2].hard = 1;
 		spr[crap2].noclip = 1;
-		strcpy(spr[crap2].text, dversion_string);
+		dink_strcpy(spr[crap2].text, dversion_string);
 
 		spr[crap2].damage = -1;
 		spr[crap2].owner = 1000;
@@ -715,19 +715,19 @@ past:
 			SetBkMode(hdc, OPAQUE);
 			//      TextOut(hdc,0,0, msg,lstrlen(msg));
 			if (mode == 0)
-				strcpy(msg, "");
+				dink_strcpy(msg, "");
 			if (mode == 1) {
-				sprintf(msg, "X is %d y is %d", spr[1].x, spr[1].y);
+				dink_sprintf(msg, "X is %d y is %d", spr[1].x, spr[1].y);
 				//let's add the key info to it.
 				for (int x = 0; x < 256; x++) {
 					if (GetKeyboard(x)) {
-						sprintf(msg, "%s (Key %i)", msg, x);
+						dink_sprintf(msg, "%s (Key %i)", msg, x);
 					}
 				}
 			}
 
 			if (mode == 3) {
-				sprintf(msg, "Sprites: %d  FPS: %d  Show_dot: %d Plane_process: %d Moveman X%d X%d: %d Y%d Y%d Map %d",
+				dink_sprintf(msg, "Sprites: %d  FPS: %d  Show_dot: %d Plane_process: %d Moveman X%d X%d: %d Y%d Y%d Map %d",
 					last_sprite_created, fps_show, show_dot, plane_process, spr[1].lpx[0], spr[1].lpy[0], spr[1].moveman, spr[1].lpx[1],
 					spr[1].lpy[1], *pmap);
 			}
@@ -741,7 +741,7 @@ past:
 
 			if (strlen(last_debug) > 0) {
 				//let's also draw this...
-				strcpy(msg, last_debug);
+				dink_strcpy(msg, last_debug);
 				rcRect.left = 0;
 				rcRect.top = 20;
 				rcRect.right = playx;
@@ -768,7 +768,7 @@ past:
 			DrawText(hdc, lLine, lstrlen(lLine), &lConsoleRectangle, DT_WORDBREAK);
 			lConsoleRectangle.top = 360;
 			lConsoleRectangle.bottom = 380;
-			sprintf(lLine, "%d", mConsoleReturnValue);
+			dink_sprintf(lLine, "%d", mConsoleReturnValue);
 			SetTextColor(hdc, RGB(255, 0, 0));
 			DrawText(hdc, lLine, lstrlen(lLine), &lConsoleRectangle, DT_WORDBREAK);
 		}

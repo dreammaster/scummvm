@@ -118,13 +118,13 @@ bool PlayMidi(const char *sFileName) {
 
 	}
 
-	sprintf(crap, "sound/%s", sFileName);
+	dink_sprintf(crap, "sound/%s", sFileName);
 	if (!File::exists(crap)) {
 		Msg("Error playing midi %s, doesn't exist in any dir.", sFileName);
 		return false;
 	}
 
-	strcpy(last_midi, sFileName);
+	dink_strcpy(last_midi, sFileName);
 	Msg("Killing cd...");
 	last_cd = 0;
 	//mciSendCommand(CD_ID, MCI_STOP, 0, NULL);
@@ -155,14 +155,14 @@ void check_midi() {
 				PlayCD(map.music[*pmap] - 1000);
 			} else {
 
-				sprintf(hold, "%d.mid", map.music[*pmap] - 1000);
+				dink_sprintf(hold, "%d.mid", map.music[*pmap] - 1000);
 				PlayMidi(hold);
 			}
 			return;
 		}
 
 		//there is music associated with this screen
-		sprintf(hold, "%d.mid", map.music[*pmap]);
+		dink_sprintf(hold, "%d.mid", map.music[*pmap]);
 		PlayMidi(hold);
 	}
 }

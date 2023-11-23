@@ -26,6 +26,9 @@
 
 namespace Dink {
 
+extern void dink_strcpy(char *dst, const char *s);
+extern void dink_strcat(char *dst, const char *s);
+extern void dink_sprintf(char *dst, const char *fmt, ...);
 extern void fill_screen(int num);
 extern void changedir(int dir1, int k, int base);
 extern void kill_sprite_all(int sprite);

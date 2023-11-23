@@ -64,7 +64,7 @@ void get_word(char line[300], int word, char *crap) {
 		if (space_mode == true) {
 			if (line[k] != ' ') {
 				space_mode = false;
-				strcpy(save_word, "");
+				dink_strcpy(save_word, "");
 			}
 		}
 
@@ -73,7 +73,7 @@ void get_word(char line[300], int word, char *crap) {
 				cur++;
 				if (word == cur) goto done;
 				space_mode = true;
-				strcpy(save_word, "");
+				dink_strcpy(save_word, "");
 
 				goto dooba;
 			} else {
@@ -85,11 +85,11 @@ dooba: ;
 
 	if (space_mode == false) {
 		if (cur + 1 != word)
-			strcpy(save_word, "");
+			dink_strcpy(save_word, "");
 	}
 
 done:
-	strcpy(crap, save_word);
+	dink_strcpy(crap, save_word);
 }
 
 void reverse(char *st) {
@@ -100,7 +100,7 @@ void reverse(char *st) {
 	for (i = ii; i > -1; i--) {
 		strchar(don, st[i]);
 	}
-	strcpy(st, don);
+	dink_strcpy(st, don);
 }
 
 char *lmon(long money, char *dest) {
@@ -111,15 +111,15 @@ char *lmon(long money, char *dest) {
 	bool quit1;
 	quit1 = false;
 
-	strcpy(lmon1, ltoa(money, buffer, 10));
+	dink_strcpy(lmon1, ltoa(money, buffer, 10));
 	// prf("ORG IS '%s'",lmon1);
 
 	if (strlen(lmon1) < 4) {
-		strcpy(dest, lmon1);
+		dink_strcpy(dest, lmon1);
 		return dest;
 	}
 
-	strcpy(ho, ltoa(money, buffer, 10));
+	dink_strcpy(ho, ltoa(money, buffer, 10));
 	len = strlen(ho);
 	c = -1;
 	lmon1[0] = 0;
@@ -137,7 +137,7 @@ char *lmon(long money, char *dest) {
 	} while (quit1 == false);
 
 	reverse(lmon1);
-	strcpy(dest, lmon1);
+	dink_strcpy(dest, lmon1);
 
 	return dest;
 }
@@ -162,16 +162,16 @@ void replace(const char *this1, const char *that, char *line) {
 	uint u, i;
 	int checker;
 start:
-	strcpy(hold, "");
+	dink_strcpy(hold, "");
 
-	strcpy(lineup, line);
-	strcpy(thisup, this1);
+	dink_strcpy(lineup, line);
+	dink_strcpy(thisup, this1);
 
 	strupr(lineup);
 	strupr(thisup);
 	if (strstr(lineup, thisup) == NULL) return;
 	checker = -1;
-	strcpy(hold, "");
+	dink_strcpy(hold, "");
 	for (u = 0; u < strlen(line); u++) {
 		if (checker > -1) {
 			if (toupper(line[u]) == toupper(this1[checker])) {
@@ -186,7 +186,7 @@ doit:
 						hold[(u + strlen(that)) + i] = line[(u + strlen(this1)) + i];
 					}
 					hold[(strlen(line) - strlen(this1)) + strlen(that)] = 0;
-					strcpy(line, hold);
+					dink_strcpy(line, hold);
 					goto start;
 				}
 				checker++;
@@ -210,7 +210,7 @@ bool seperate_string(const char *str, int num, char liney, char *return1) {
 	uint i;
 
 	l = 1;
-	strcpy(return1, "");
+	dink_strcpy(return1, "");
 
 	for (i = 0; i <= strlen(str); i++) {
 		if (str[i] == liney) {
@@ -219,13 +219,13 @@ bool seperate_string(const char *str, int num, char liney, char *return1) {
 				goto done;
 
 			if (i < strlen(str))
-				strcpy(return1, "");
+				dink_strcpy(return1, "");
 		}
 		if (str[i] != liney)
-			sprintf(return1, "%s%c", return1, str[i]);
+			dink_sprintf(return1, "%s%c", return1, str[i]);
 	}
 	if (l < num)
-		strcpy(return1, "");
+		dink_strcpy(return1, "");
 
 	replace("\n", "", return1); //Take the /n off it.
 
@@ -233,7 +233,7 @@ bool seperate_string(const char *str, int num, char liney, char *return1) {
 
 done:
 
-	if (l < num)  strcpy(return1, "");
+	if (l < num)  dink_strcpy(return1, "");
 
 	replace("\n", "", return1); //Take the /n off it.
 
@@ -357,7 +357,7 @@ void strip_beginning_spaces(char *s) {
 		h = &h[1];
 	}
 
-	strcpy(s, h);
+	dink_strcpy(s, h);
 }
 
 void strchar(char *string, char ch) {

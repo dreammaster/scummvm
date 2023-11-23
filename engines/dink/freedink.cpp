@@ -71,10 +71,10 @@ HRESULT restoreAll() {
 
 		if( result == DD_OK )
 		{
-		if (h < 10) strcpy(crap1,"0"); else strcpy(crap1, "");
-		sprintf(crap, "TILES\\TS%s%d.BMP",crap1,h);
+		if (h < 10) dink_strcpy(crap1,"0"); else dink_strcpy(crap1, "");
+		dink_sprintf(crap, "TILES\\TS%s%d.BMP",crap1,h);
 
-		//      sprintf(crap, "TS%d.BMP",h);
+		//      dink_sprintf(crap, "TS%d.BMP",h);
 		DDReLoadBitmap(tiles[h], crap);
 		Msg("Loading tile %d",h);
 		}
@@ -2507,7 +2507,7 @@ void human_brain(int h) {
 
 				char msg[30];
 				if (GetKeyboard(x5)) {
-					sprintf(msg, "key-%d", x5);
+					dink_sprintf(msg, "key-%d", x5);
 					but_timer = thisTickCount + 200;
 
 					int mycrap = load_script(msg, 1, false);
@@ -4736,7 +4736,7 @@ again:
 	{
 	SelectObject (hdc, hfont_small);
 	SetBkMode(hdc, TRANSPARENT);
-	sprintf(msg, "Please wait, checking CD.  (or Alt-Q to abort and exit program)");
+	dink_sprintf(msg, "Please wait, checking CD.  (or Alt-Q to abort and exit program)");
 	rcRect.left = 0;
 	rcRect.top = 430;
 	rcRect.right = playx;
@@ -5053,7 +5053,7 @@ void load_batch() {
 	if (!File::exists("dink.ini")) {
 		Msg("File not found.");
 
-		sprintf(line, "Error finding the dink.ini file in the %s dir.", dir);
+		dink_sprintf(line, "Error finding the dink.ini file in the %s dir.", dir);
 		TRACE(line);
 	}
 
@@ -5372,7 +5372,7 @@ int dir_num(const char *path) {
 
 	char search_specs[255];
 
-	sprintf(search_specs, "%s\\*.*", path);
+	dink_sprintf(search_specs, "%s\\*.*", path);
 	cnt = 0;
 	ODS("ASking for dir info.");
 	dir = FindFirstFile(search_specs, &fd);
@@ -5418,11 +5418,11 @@ void getdir(char final[]) {
 	for (int k = strlen(path); path[k] != '\\'; k--) {
 		c_cur = k;
 	}
-	strcpy(dir, "");
+	dink_strcpy(dir, "");
 	//copy file name
 	strncat((char *)&dir, &path[c_cur], strlen(path) - c_cur);
 	path[c_cur] = 0; //truncate
-	strcpy(final, path);
+	dink_strcpy(final, path);
 #else
 	::error("TODO");
 #endif

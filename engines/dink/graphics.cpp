@@ -25,7 +25,8 @@
 #include "dink/text.h"
 #include "dink/lib/wintypes.h"
 #include "dink/directdraw/ddutil.h"
-#include "common/unzip.h"
+#include "dink/var.h"
+#include "common/compression/unzip.h"
 #include "graphics/fonts/ttf.h"
 
 namespace Dink {
@@ -93,8 +94,8 @@ void text_draw(int h, HDC hdc) {
 
 	if (spr[h].damage == -1) {
 		//redink1 fix for : and '%deee bugs?
-		strcpy(crap, spr[h].text);
-		//sprintf(crap, "%s", spr[h].text);
+		dink_strcpy(crap, spr[h].text);
+		//dink_sprintf(crap, "%s", spr[h].text);
 		cr = &crap[0];
 		color = 14;
 		while (cr[0] == '`') {
@@ -129,7 +130,7 @@ void text_draw(int h, HDC hdc) {
 				OffsetRect(&rcRect, ((spr[h].x + 150) - 620) - (((spr[h].x + 150) - 620) * 2), 0);
 		}
 	} else {
-		sprintf(crap, "%d", spr[h].damage);
+		dink_sprintf(crap, "%d", spr[h].damage);
 		cr = &crap[0];
 		if (spr[h].brain_parm == 5000)
 			color = 14;

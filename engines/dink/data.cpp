@@ -22,6 +22,7 @@
 #include "dink/data.h"
 #include "dink/file.h"
 #include "dink/globals.h"
+#include "dink/var.h"
 
 namespace Dink {
 
@@ -60,7 +61,7 @@ void map_info::load() {
 		map.load(f);
 	} else {
 		ZeroMemory(&hmap, sizeof(hardness));
-		strcpy(map.name, "Smallwood");
+		dink_strcpy(map.name, "Smallwood");
 	}
 }
 

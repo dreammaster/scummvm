@@ -43,7 +43,7 @@ Common::String File::formatPath(const Common::String &name) {
 }
 
 bool File::audioTracksExists() {
-	Common::FSNode gameDir(ConfMan.get("path"));
+	Common::FSNode gameDir(ConfMan.getPath("path"));
 	Common::FSList files;
 
 	if (gameDir.getChildren(files, Common::FSNode::kListFilesOnly)) {

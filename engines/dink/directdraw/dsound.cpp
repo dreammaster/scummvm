@@ -36,7 +36,7 @@ HRESULT DirectSoundCreate(void *pcGuidDevice, LPDIRECTSOUND *ppDS, LPUNKNOWN pUn
 IDirectSoundBuffer *IDirectSoundBuffer::createWav(const Common::String &name) {
 	File f;
 	if (!f.open(name))
-		return false;
+		return nullptr;
 
 	// Create the buffer and read the file contents
 	IDirectSoundBuffer *buf = new IDirectSoundBuffer();

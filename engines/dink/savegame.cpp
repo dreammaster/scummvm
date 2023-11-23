@@ -73,7 +73,7 @@ bool add_time_to_saved_game(int num) {
 	FILE *fp;
 	char crap[80];
 
-	sprintf(crap, "SAVE%d.DAT", num);
+	dink_sprintf(crap, "SAVE%d.DAT", num);
 
 	fp = fopen(crap, "rb");
 	if (!fp) {
@@ -97,7 +97,7 @@ bool add_time_to_saved_game(int num) {
 
 
 
-	sprintf(crap, "SAVE%d.DAT", num);
+	dink_sprintf(crap, "SAVE%d.DAT", num);
 	fp = fopen(crap, "wb");
 	if (fp) {
 		fwrite(&play, sizeof(play), 1, fp);
@@ -147,7 +147,7 @@ bool load_game(int num) {
 	}
 	StopMidi();
 
-	sprintf(crap, "SAVE%d.DAT", num);
+	dink_sprintf(crap, "SAVE%d.DAT", num);
 
 
 
@@ -162,8 +162,8 @@ bool load_game(int num) {
 
 		//redink1 - new map, if exist
 		if (strlen(play.mapdat) > 0 && strlen(play.dinkdat) > 0) {
-			strcpy(current_map, play.mapdat);
-			strcpy(current_dat, play.dinkdat);
+			dink_strcpy(current_map, play.mapdat);
+			dink_strcpy(current_dat, play.dinkdat);
 			load_info();
 		}
 		//redink1 - load palette
@@ -187,13 +187,13 @@ bool load_game(int num) {
 			if (strlen(play.tile[i].file) > 0) {
 				//Check the original directory
 				if (!File::exists(play.tile[i].file))
-					sprintf(tile, "..\\DINK\\%s", play.tile[i].file);
+					dink_sprintf(tile, "..\\DINK\\%s", play.tile[i].file);
 				else
-					strcpy(tile, play.tile[i].file);
+					dink_strcpy(tile, play.tile[i].file);
 			} else {
-				sprintf(tile, "tiles\\TS%02d.bmp", i);
+				dink_sprintf(tile, "tiles\\TS%02d.bmp", i);
 				if (!File::exists(tile))
-					sprintf(tile, "..\\dink\\tiles\\TS%02d.BMP", i);
+					dink_sprintf(tile, "..\\dink\\tiles\\TS%02d.BMP", i);
 			}
 
 			//Load in the tiles...
@@ -293,7 +293,7 @@ void save_map(const int num) {
 
 
 	Msg("Saving map data..");
-	strcpy(crap, current_map);
+	dink_strcpy(crap, current_map);
 	if (num > 0) {
 		fp = fopen(crap, "r+b");
 		lsize = sizeof(struct small_map);
@@ -316,7 +316,7 @@ void save_info() {
 	FILE *fp;
 	char crap[80];
 	//redink1
-	sprintf(crap, current_dat);
+	dink_sprintf(crap, current_dat);
 	fp = fopen(crap, "wb");
 	fwrite(&map, sizeof(struct map_info), 1, fp);
 	fclose(fp);
@@ -362,14 +362,14 @@ void save_game(int num) {
 	strncpy(play.dinkdat, current_dat, 50);
 
 	//redink1 code for custom save game names
-	strcpy(info_temp, save_game_info);
+	dink_strcpy(info_temp, save_game_info);
 	decipher_string(info_temp, 0);
 	strncpy(play.gameinfo, info_temp, 77);
-	//sprintf(play.gameinfo, "Level %d",*plevel);
+	//dink_sprintf(play.gameinfo, "Level %d",*plevel);
 
 
 	last_saved_game = num;
-	sprintf(crap, "SAVE%d.DAT", num);
+	dink_sprintf(crap, "SAVE%d.DAT", num);
 	fp = fopen(crap, "wb");
 	fwrite(&play, sizeof(play), 1, fp);
 	fclose(fp);

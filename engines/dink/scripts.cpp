@@ -182,63 +182,63 @@ next2:
 
 static void decipher(char *crap, int script) {
 	if (compare(crap, "&current_sprite")) {
-		sprintf(crap, "%d", rinfo[script]->sprite);
+		dink_sprintf(crap, "%d", rinfo[script]->sprite);
 		return;
 	}
 
 	if (compare(crap, "&current_script")) {
-		sprintf(crap, "%d", script);
+		dink_sprintf(crap, "%d", script);
 		return;
 	}
 
 	// v1.08 special variables.
 	if (compare(crap, "&return")) {
-		sprintf(crap, "%d", returnint);
+		dink_sprintf(crap, "%d", returnint);
 		return;
 	}
 
 	if (compare(crap, "&arg1")) {
-		sprintf(crap, "%d", rinfo[script]->arg1);
+		dink_sprintf(crap, "%d", rinfo[script]->arg1);
 		return;
 	}
 
 	if (compare(crap, "&arg2")) {
-		sprintf(crap, "%d", rinfo[script]->arg2);
+		dink_sprintf(crap, "%d", rinfo[script]->arg2);
 		return;
 	}
 
 	if (compare(crap, "&arg3")) {
-		sprintf(crap, "%d", rinfo[script]->arg3);
+		dink_sprintf(crap, "%d", rinfo[script]->arg3);
 		return;
 	}
 
 	if (compare(crap, "&arg4")) {
-		sprintf(crap, "%d", rinfo[script]->arg4);
+		dink_sprintf(crap, "%d", rinfo[script]->arg4);
 		return;
 	}
 
 	if (compare(crap, "&arg5")) {
-		sprintf(crap, "%d", rinfo[script]->arg5);
+		dink_sprintf(crap, "%d", rinfo[script]->arg5);
 		return;
 	}
 
 	if (compare(crap, "&arg6")) {
-		sprintf(crap, "%d", rinfo[script]->arg6);
+		dink_sprintf(crap, "%d", rinfo[script]->arg6);
 		return;
 	}
 
 	if (compare(crap, "&arg7")) {
-		sprintf(crap, "%d", rinfo[script]->arg7);
+		dink_sprintf(crap, "%d", rinfo[script]->arg7);
 		return;
 	}
 
 	if (compare(crap, "&arg8")) {
-		sprintf(crap, "%d", rinfo[script]->arg8);
+		dink_sprintf(crap, "%d", rinfo[script]->arg8);
 		return;
 	}
 
 	if (compare(crap, "&arg9")) {
-		sprintf(crap, "%d", rinfo[script]->arg9);
+		dink_sprintf(crap, "%d", rinfo[script]->arg9);
 		return;
 	}
 
@@ -246,7 +246,7 @@ static void decipher(char *crap, int script) {
 		if (play.var[i].active == true) if (i == get_var(script, play.var[i].name))
 			// redink1 changed for recursive scoping
 			if (compare(play.var[i].name, crap)) {
-				sprintf(crap, "%d", play.var[i].var);
+				dink_sprintf(crap, "%d", play.var[i].var);
 				//        check_for_real_vars(crap, i);
 				return;
 			}
@@ -291,7 +291,7 @@ static bool get_parms(char proc_name[20], int script, char *h, const int p[10]) 
 			h = &h[strlen(crap) + 2];
 
 			//Msg("Found %s",crap);
-			strcpy(slist[i], crap);
+			dink_strcpy(slist[i], crap);
 		}
 
 		if (p[i + 1] == 0) {
@@ -346,7 +346,7 @@ static int add_callback(const char *name, int n1, int n2, int script) {
 			callback[ii].min = n1;
 			callback[ii].max = n2;
 			callback[ii].owner = script;
-			strcpy(callback[ii].name, name);
+			dink_strcpy(callback[ii].name, name);
 
 			if (debug_mode)
 				Msg("Callback added to %d.", ii);
@@ -368,7 +368,7 @@ static void add_item(char name[10], int mseq, int mframe, bool magic) {
 					Msg("Weapon/item %s added to inventory.", name);
 				play.item[i].seq = mseq;
 				play.item[i].frame = mframe;
-				strcpy(play.item[i].name, name);
+				dink_strcpy(play.item[i].name, name);
 				play.item[i].active = true;
 
 				int crap1 = load_script(play.item[i].name, 1000, false);
@@ -386,7 +386,7 @@ static void add_item(char name[10], int mseq, int mframe, bool magic) {
 					Msg("Magic %s added to inventory.", name);
 				play.mitem[i].seq = mseq;
 				play.mitem[i].frame = mframe;
-				strcpy(play.mitem[i].name, name);
+				dink_strcpy(play.mitem[i].name, name);
 
 				play.mitem[i].active = true;
 
@@ -621,7 +621,7 @@ static void make_int(char name[80], int value, int scope, int script) {
 		if (play.var[i].active == false) {
 			play.var[i].active = true;
 			play.var[i].scope = scope;
-			strcpy(play.var[i].name, name);
+			dink_strcpy(play.var[i].name, name);
 			//g("var %s created, used slot %d ", name,i);
 			play.var[i].var = value;
 			return;
@@ -634,11 +634,11 @@ static void make_int(char name[80], int value, int scope, int script) {
 static void int_prepare(char line[100], int script) {
 	int def = 0;
 	char hold[100];
-	strcpy(hold, line);
+	dink_strcpy(hold, line);
 	char name[100];
 	char crap[100];
 	replace("=", " ", line);
-	strcpy(crap, line);
+	dink_strcpy(crap, line);
 	seperate_string(crap, 1, ';', line);
 	get_word(line, 2, name);
 
@@ -649,7 +649,7 @@ static void int_prepare(char line[100], int script) {
 
 	make_int(name, def, script, script);
 
-	strcpy(line, hold);
+	dink_strcpy(line, hold);
 }
 
 static void kill_all_vars() {
@@ -747,9 +747,9 @@ pass:
 			strip_beginning_spaces(h);
 			process_line(script, h, false);
 			replace("==", "", temp);
-			sprintf(line, "%d == %s", returnint, temp);
+			dink_sprintf(line, "%d == %s", returnint, temp);
 			returnint = var_figure(line, script);
-			strcpy(h, "\n");
+			dink_strcpy(h, "\n");
 			return 0;
 		}
 
@@ -758,9 +758,9 @@ pass:
 			strip_beginning_spaces(h);
 			process_line(script, h, false);
 			replace("==", "", temp);
-			sprintf(line, "%d > %s", returnint, temp);
+			dink_sprintf(line, "%d > %s", returnint, temp);
 			returnint = var_figure(line, script);
-			strcpy(h, "\n");
+			dink_strcpy(h, "\n");
 			return 0;
 		}
 
@@ -769,9 +769,9 @@ pass:
 			strip_beginning_spaces(h);
 			process_line(script, h, false);
 			replace("==", "", temp);
-			sprintf(line, "%d < %s", returnint, temp);
+			dink_sprintf(line, "%d < %s", returnint, temp);
 			returnint = var_figure(line, script);
-			strcpy(h, "\n");
+			dink_strcpy(h, "\n");
 			return 0;
 		}
 		if (strchr(temp, '<=') != NULL) {
@@ -779,9 +779,9 @@ pass:
 			strip_beginning_spaces(h);
 			process_line(script, h, false);
 			replace("==", "", temp);
-			sprintf(line, "%d <= %s", returnint, temp);
+			dink_sprintf(line, "%d <= %s", returnint, temp);
 			returnint = var_figure(line, script);
-			strcpy(h, "\n");
+			dink_strcpy(h, "\n");
 			return 0;
 		}
 		if (strchr(temp, '>=') != NULL) {
@@ -789,9 +789,9 @@ pass:
 			strip_beginning_spaces(h);
 			process_line(script, h, false);
 			replace("==", "", temp);
-			sprintf(line, "%d >= %s", returnint, temp);
+			dink_sprintf(line, "%d >= %s", returnint, temp);
 			returnint = var_figure(line, script);
-			strcpy(h, "\n");
+			dink_strcpy(h, "\n");
 			return 0;
 		}
 
@@ -800,9 +800,9 @@ pass:
 			strip_beginning_spaces(h);
 			process_line(script, h, false);
 			replace("==", "", temp);
-			sprintf(line, "%d != %s", returnint, temp);
+			dink_sprintf(line, "%d != %s", returnint, temp);
 			returnint = var_figure(line, script);
-			strcpy(h, "\n");
+			dink_strcpy(h, "\n");
 			return 0;
 		}
 
@@ -811,13 +811,13 @@ pass:
 			//its a procedure in the if statement!!!
 			h = &h[1];
 			p = &p[1];
-			strcpy(line, p);
+			dink_strcpy(line, p);
 			process_line(script, h, false);
 
 			//8
 			Msg("Returned %d for the returnint", returnint);
 			h = s;
-			strcpy(s, line);
+			dink_strcpy(s, line);
 
 			//  Msg("Returing %s..", s);
 			return 0;
@@ -828,7 +828,7 @@ pass:
 			h = &h[strlen(line) + 1];
 			returnint = var_figure(line, script);
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 
 			return 0;
 		}
@@ -854,7 +854,7 @@ pass:
 
 	}
 
-	sprintf(first, "%c", ev[1][0]);
+	dink_sprintf(first, "%c", ev[1][0]);
 
 
 
@@ -881,7 +881,7 @@ pass:
 		if (rinfo[script]->onlevel > 0) if (rinfo[script]->level == rinfo[script]->onlevel) {
 			strip_beginning_spaces(h);
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 4;
 		}
 		goto good;
@@ -896,7 +896,7 @@ pass:
 
 	if (compare(ev[1], "void")) {
 		//     Msg("Next procedure starting, lets quit");
-		strcpy(s, h);
+		dink_strcpy(s, h);
 		if (rinfo[script]->proc_return != 0) {
 			run_script(rinfo[script]->proc_return);
 			kill_script(script);
@@ -919,7 +919,7 @@ pass:
 		if (rinfo[script]->skipnext) {
 			//sorry, can't do it, you were told to skip the next thing
 			rinfo[script]->skipnext = false;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 3;
 		}
 
@@ -928,7 +928,7 @@ pass:
 
 		if (compare(ev[1], "void")) {
 			Msg("ERROR: Missing } in %s, offset %d.", rinfo[script]->name, rinfo[script]->current);
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 2;
 		}
 
@@ -948,7 +948,7 @@ pass:
 				//Msg("No to else...");
 
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 1;
 
 		}
@@ -990,7 +990,7 @@ pass:
 				}
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1025,12 +1025,12 @@ pass:
 			h = &h[strlen(ev[1])];
 			int ARR[20] = { 2, 2, 0, 0, 0, 0, 0, 0, 0, 0 };
 			if (get_parms(ev[1], script, h, ARR)) {
-				strcpy(current_map, slist[0]);
-				strcpy(current_dat, slist[1]);
+				dink_strcpy(current_map, slist[0]);
+				dink_strcpy(current_dat, slist[1]);
 				map_info::load();
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1054,7 +1054,7 @@ pass:
 				}
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1064,7 +1064,7 @@ pass:
 			int ARR[20] = { 2, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
 			if (get_parms(ev[1], script, h, ARR)) {
 				if (!File::exists(slist[0])) {
-					sprintf(slist[0], "..\\DINK\\%s", slist[0]);
+					dink_sprintf(slist[0], "..\\DINK\\%s", slist[0]);
 				}
 
 				if (File::exists(slist[0]) && nlist[1] > 0 && nlist[1] < tile_screens) {
@@ -1078,7 +1078,7 @@ pass:
 				}
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1087,9 +1087,9 @@ pass:
 			h = &h[strlen(ev[1])];
 			int ARR[20] = { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 			if (get_parms(ev[1], script, h, ARR)) {
-				strcpy(save_game_info, slist[0]);
+				dink_strcpy(save_game_info, slist[0]);
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1097,7 +1097,7 @@ pass:
 		if (compare(ev[1], "show_inventory")) {
 			h = &h[strlen(ev[1])];
 			item_screen = true;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1118,7 +1118,7 @@ pass:
 		}
 		}
 		}
-		strcpy(s, h);
+		dink_strcpy(s, h);
 		return 0;
 		}*/
 
@@ -1127,7 +1127,7 @@ pass:
 			h = &h[strlen(ev[1])];
 			returnint = play.minutes +
 				(g_events->getTotalSeconds() / 60);
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1138,7 +1138,7 @@ pass:
 			g_system->getTimeAndDate(td);
 
 			returnint = td.tm_hour * 60 + td.tm_min;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1148,7 +1148,7 @@ pass:
 			TimeDate td;
 			g_system->getTimeAndDate(td);
 			returnint = td.tm_year;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1158,7 +1158,7 @@ pass:
 			TimeDate td;
 			g_system->getTimeAndDate(td);
 			returnint = td.tm_mon;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1168,7 +1168,7 @@ pass:
 			TimeDate td;
 			g_system->getTimeAndDate(td);
 			returnint = td.tm_mday;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1179,7 +1179,7 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = abs(nlist[0]);
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1192,7 +1192,7 @@ pass:
 			{
 				returnint = sin((double)nlist[0]);
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1205,7 +1205,7 @@ pass:
 			{
 				returnint = cos((double)nlist[0]);
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1218,7 +1218,7 @@ pass:
 			{
 				returnint = tan((double)nlist[0]);
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}*/
 
@@ -1229,7 +1229,7 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = sqrt((double)abs(nlist[0]));
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1240,7 +1240,7 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				returnint = (nlist[0] % nlist[1]);
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1405,7 +1405,7 @@ pass:
 		if (compare(ev[1], "get_truecolor")) {
 			h = &h[strlen(ev[1])];
 			returnint = truecolor;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1459,7 +1459,7 @@ pass:
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1475,7 +1475,7 @@ pass:
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1490,7 +1490,7 @@ pass:
 				returnint = cb;
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1504,7 +1504,7 @@ pass:
 					callback[nlist[0]].active = false;
 				}
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1516,7 +1516,7 @@ pass:
 				dinkspeed = nlist[0];
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1528,7 +1528,7 @@ pass:
 			if (get_parms(ev[1], script, h, ARR)) {
 				mDinkBasePush = nlist[0];
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1537,7 +1537,7 @@ pass:
 			h = &h[strlen(ev[1])];
 			time(&time_start);
 			play.minutes = 0;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 #else
 			error("TODO: reset_timer");
@@ -1554,7 +1554,7 @@ pass:
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1569,7 +1569,7 @@ pass:
 				add_item(slist[0], nlist[1], nlist[2], false);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1581,7 +1581,7 @@ pass:
 				add_exp(nlist[0], nlist[1], true);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1594,7 +1594,7 @@ pass:
 				add_item(slist[0], nlist[1], nlist[2], true);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1607,7 +1607,7 @@ pass:
 				kill_cur_item_script(slist[0]);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1619,7 +1619,7 @@ pass:
 				kill_cur_magic_script(slist[0]);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1634,7 +1634,7 @@ pass:
 				show_bmp(slist[0], nlist[1], nlist[2], script);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 2;
 		}
 
@@ -1642,7 +1642,7 @@ pass:
 		if (compare(ev[1], "wait_for_button")) {
 			Msg("waiting for button with script %d", script);
 			h = &h[strlen(ev[1])];
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			wait.script = script;
 			wait.active = true;
 			wait.button = 0;
@@ -1663,7 +1663,7 @@ pass:
 				copy_bmp(slist[0]);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1684,7 +1684,7 @@ pass:
 				//Msg("Just said %s.", slist[0]);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1813,13 +1813,13 @@ pass:
 				play.last_talk = script;
 				//Msg("Sprite %d marked callback true.", sprite);
 
-				strcpy(s, h);
+				dink_strcpy(s, h);
 
 				return 2;
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1842,13 +1842,13 @@ pass:
 				sprite = say_text(slist[0], nlist[1], script);
 				returnint = sprite;
 				spr[sprite].callback = script;
-				strcpy(s, h);
+				dink_strcpy(s, h);
 
 				return 2;
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1866,13 +1866,13 @@ pass:
 				spr[sprite].callback = script;
 				spr[sprite].live = true;
 				play.last_talk = script;
-				strcpy(s, h);
+				dink_strcpy(s, h);
 
 				return 2;
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1886,12 +1886,12 @@ pass:
 				decipher_string(slist[0], script);
 				sprite = say_text_xy(slist[0], nlist[1], nlist[2], script);
 				returnint = sprite;
-				strcpy(s, h);
+				dink_strcpy(s, h);
 				return 0;
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1920,14 +1920,14 @@ pass:
 			int ARR[20] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 			if (get_parms(ev[1], script, h, ARR)) {
 				//           Msg("Wait called for %d.", nlist[0]);
-				strcpy(s, h);
+				dink_strcpy(s, h);
 				kill_returning_stuff(script);
 				add_callback("", nlist[0], 0, script);
 
 				return 2;
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1939,7 +1939,7 @@ pass:
 				check_seq_status(nlist[0]);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1954,7 +1954,7 @@ pass:
 
 				rinfo[script]->sprite = nlist[0];
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1975,7 +1975,7 @@ pass:
 
 
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -1996,7 +1996,7 @@ pass:
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2030,7 +2030,7 @@ pass:
 				returnint = tempreturn;
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2051,7 +2051,7 @@ pass:
 				returnint = tempreturn;
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2066,7 +2066,7 @@ pass:
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2079,7 +2079,7 @@ pass:
 			fill_whole_hard();
 			fill_hard_sprites();
 			fill_back_sprites();
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2089,7 +2089,7 @@ pass:
 		if (compare(ev[1], "draw_background")) {
 			// (sprite, direction, until, nohard);
 			draw_map_game_background();
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2099,7 +2099,7 @@ pass:
 			cycle_clock = thisTickCount + 1000;
 			cycle_script = script;
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 
 			return 2;
 		}
@@ -2110,7 +2110,7 @@ pass:
 			process_upcycle = true;
 			cycle_script = script;
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 2;
 		}
 
@@ -2153,7 +2153,7 @@ pass:
 				//SetFocus(hWndMain);
 			}
 			//InitSound(hWndMain);
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 2;
 
 		}*/
@@ -2190,12 +2190,12 @@ pass:
 
 						Msg("Playing CD track %d.", regm - 1000);
 						PlayCD(regm - 1000);
-						strcpy(s, h);
+						dink_strcpy(s, h);
 						return 0;
 					} else {
 						char hold[255];
 						// cd isn't instered, can't play CD song!!!
-						sprintf(hold, "%d.mid", regm - 1000);
+						dink_sprintf(hold, "%d.mid", regm - 1000);
 						PlayMidi(hold);
 					}
 				}
@@ -2203,33 +2203,33 @@ pass:
 				PlayMidi(slist[0]);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 		if (compare(ev[1], "stopmidi")) {
 			// (sprite, direction, until, nohard);
 			h = &h[strlen(ev[1])];
 			StopMidi();
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
 		if (compare(ev[1], "kill_all_sounds")) {
 			kill_repeat_sounds_all();
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 
 		}
 
 		if (compare(ev[1], "turn_midi_off")) {
 			midi_active = false;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 
 		}
 		if (compare(ev[1], "turn_midi_on")) {
 			midi_active = true;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 
 		}
@@ -2247,7 +2247,7 @@ pass:
 			} else
 				returnint = 0;
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2264,7 +2264,7 @@ pass:
 				}
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2284,7 +2284,7 @@ pass:
 				}
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2302,7 +2302,7 @@ pass:
 				}
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2317,7 +2317,7 @@ pass:
 				save_game(nlist[0]);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2336,7 +2336,7 @@ pass:
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2348,7 +2348,7 @@ pass:
 				fill_screen(nlist[0]);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2369,7 +2369,7 @@ pass:
 				return 2;
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2378,13 +2378,13 @@ pass:
 			h = &h[strlen(ev[1])];
 			int ARR[20] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 			if (get_parms(ev[1], script, h, ARR)) {
-				sprintf(temp, "save%d.dat", nlist[0]);
+				dink_sprintf(temp, "save%d.dat", nlist[0]);
 				if (File::exists(temp)) returnint = 1;
 				else returnint = 0;
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2401,13 +2401,13 @@ pass:
 				spr[nlist[0]].move_num = nlist[2];
 				spr[nlist[0]].move_nohard = nlist[3];
 				spr[nlist[0]].move_script = script;
-				strcpy(s, h);
+				dink_strcpy(s, h);
 				if (debug_mode) Msg("Move_stop: Sprite %d, dir %d, num %d", nlist[0], nlist[1], nlist[2]);
 				return 2;
 
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2425,7 +2425,7 @@ pass:
 				}
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2442,7 +2442,7 @@ pass:
 				Msg(slist[0]);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2463,7 +2463,7 @@ pass:
 				make_function(slist[0], slist[1]);
 				//Msg(slist[0]);
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2477,7 +2477,7 @@ pass:
 				//Msg(slist[0]);
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2494,7 +2494,7 @@ pass:
 			if (strchr(h, '=') != NULL) {
 				strip_beginning_spaces(h);
 				//Msg("Found =...continuing equation");
-				strcpy(s, h);
+				dink_strcpy(s, h);
 				return 4;
 			}
 
@@ -2520,7 +2520,7 @@ pass:
 
 			} else Msg("Failed getting parms for Busy()");
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2545,7 +2545,7 @@ pass:
 				}
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2567,7 +2567,7 @@ pass:
 
 			} else Msg("Failed getting parms for inside_box");
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2579,7 +2579,7 @@ pass:
 				returnint = RANDOM(nlist[1], nlist[0]);
 			} else Msg("Failed getting parms for Random()");
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2592,7 +2592,7 @@ pass:
 				Msg("Initted font %s", slist[0]);
 			} else Msg("Failed getting parms for Initfont()");
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2600,14 +2600,14 @@ pass:
 		if (compare(ev[1], "get_version")) {
 			h = &h[strlen(ev[1])];
 			returnint = dversion;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
 		if (compare(ev[1], "get_burn")) {
 			h = &h[strlen(ev[1])];
 			returnint = burn_revision;
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2619,7 +2619,7 @@ pass:
 				returnint = mode;
 			} else Msg("Failed to set mode");
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -2638,7 +2638,7 @@ pass:
 				}
 			}
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -3839,7 +3839,7 @@ pass:
 			}
 
 			//DO STUFF HERE!
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			//g("continuing to run line %s..", h);
 
 			return 5;
@@ -3853,7 +3853,7 @@ pass:
 			h = &h[1];
 			strip_beginning_spaces(h);
 			var_equals(ev[1], ev[3], '=', script, h);
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -3863,7 +3863,7 @@ pass:
 			h = &h[2];
 			strip_beginning_spaces(h);
 			var_equals(ev[1], ev[3], '+', script, h);
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -3873,7 +3873,7 @@ pass:
 			h = &h[2];
 			strip_beginning_spaces(h);
 			var_equals(ev[1], ev[3], '*', script, h);
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -3887,7 +3887,7 @@ pass:
 
 			var_equals(ev[1], ev[3], '-', script, h);
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -3900,7 +3900,7 @@ pass:
 
 			var_equals(ev[1], ev[3], '/', script, h);
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -3912,7 +3912,7 @@ pass:
 
 			var_equals(ev[1], ev[3], '*', script, h);
 
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 		if (compare(ev[1], "external")) {
@@ -3944,7 +3944,7 @@ pass:
 					kill_script(myscript1);
 				}
 			}
-			strcpy(s, h);
+			dink_strcpy(s, h);
 			return 0;
 		}
 
@@ -4035,11 +4035,11 @@ pass:
 	}
 
 bad:
-	strcpy(s, h);
+	dink_strcpy(s, h);
 	return 0;
 
 good:
-	strcpy(s, h);
+	dink_strcpy(s, h);
 	//s = h
 	//Msg("ok, continuing with running %s..",s);
 	return 1;
@@ -4233,7 +4233,7 @@ bool read_next_line(int script, char *line) {
 	}
 	*/
 
-	strcpy(line, "");
+	dink_strcpy(line, "");
 
 	for (int ii = rinfo[script]->current; (ii < rinfo[script]->end); ii++) {
 
