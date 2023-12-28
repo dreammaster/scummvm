@@ -19,17 +19,26 @@
  *
  */
 
-#ifndef WASTELAND_VIEWS_H
-#define WASTELAND_VIEWS_H
-
-#include "wasteland/view1.h"
+#include "wasteland/fod/fod.h"
+#include "wasteland/fod/views/views.h"
 
 namespace Wasteland {
+namespace FOD {
 
-struct Views {
-	View1 _view1;
-};
+FountainOfDreamsEngine *g_engine;
 
+FountainOfDreamsEngine::FountainOfDreamsEngine(OSystem *syst, const ADGameDescription *gameDesc) :
+		Wasteland::Engine(syst, gameDesc) {
+	g_engine = this;
+}
+
+FountainOfDreamsEngine::~FountainOfDreamsEngine() {
+	g_engine = nullptr;
+}
+
+Wasteland::Views *FountainOfDreamsEngine::createViews() {
+	return new Views::Views();
+}
+
+} // namespace FOD
 } // namespace Wasteland
-
-#endif

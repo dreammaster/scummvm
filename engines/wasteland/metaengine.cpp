@@ -23,7 +23,7 @@
 
 #include "wasteland/metaengine.h"
 #include "wasteland/detection.h"
-#include "wasteland/wasteland.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 
@@ -53,7 +53,7 @@ const ADExtraGuiOptionsMap *WastelandMetaEngine::getAdvancedExtraGuiOptions() co
 }
 
 Common::Error WastelandMetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const {
-	*engine = new Wasteland::WastelandEngine(syst, desc);
+	*engine = new Wasteland::FOD::FountainOfDreamsEngine(syst, desc);
 	return Common::kNoError;
 }
 

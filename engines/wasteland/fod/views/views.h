@@ -19,28 +19,21 @@
  *
  */
 
-#ifndef WASTELAND_VIEW1_H
-#define WASTELAND_VIEW1_H
+#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
+#define WASTELAND_FOD_VIEWS_VIEWS_H
 
-#include "wasteland/events.h"
+#include "wasteland/fod/views/title.h"
 
 namespace Wasteland {
+namespace FOD {
+namespace Views {
 
-class View1 : public UIElement {
-private:
-	byte _pal[256 * 3] = { 0 };
-	int _offset = 0;
-
-public:
-	View1() : UIElement("View1") {}
-	virtual ~View1() {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-	void draw() override;
-	bool tick() override;
+struct Views : public Wasteland::Views {
+	Title _title;
 };
 
+} // namespace Views
+} // namespace FOD
 } // namespace Wasteland
 
 #endif

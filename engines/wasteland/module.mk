@@ -1,12 +1,13 @@
 MODULE := engines/wasteland
 
 MODULE_OBJS = \
-	wasteland.o \
 	console.o \
+	engine.o \
 	events.o \
 	messages.o \
 	metaengine.o \
-	view1.o
+	fod/fod.o \
+	fod/views/title.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_WASTELAND), DYNAMIC_PLUGIN)

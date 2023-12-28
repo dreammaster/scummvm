@@ -19,7 +19,7 @@
  *
  */
 
-#include "wasteland/wasteland.h"
+#include "wasteland/engine.h"
 #include "wasteland/detection.h"
 #include "wasteland/console.h"
 #include "common/scummsys.h"
@@ -32,25 +32,25 @@
 
 namespace Wasteland {
 
-WastelandEngine *g_engine;
+Engine *g_engine;
 
-WastelandEngine::WastelandEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
+Engine::Engine(OSystem *syst, const ADGameDescription *gameDesc) : ::Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Wasteland") {
 	g_engine = this;
 }
 
-WastelandEngine::~WastelandEngine() {
+Engine::~Engine() {
 }
 
-uint32 WastelandEngine::getFeatures() const {
+uint32 Engine::getFeatures() const {
 	return _gameDescription->flags;
 }
 
-Common::String WastelandEngine::getGameId() const {
+Common::String Engine::getGameId() const {
 	return _gameDescription->gameId;
 }
 
-Common::Error WastelandEngine::run() {
+Common::Error Engine::run() {
 	// Initialize 320x200 paletted graphics mode
 	initGraphics(320, 200);
 
@@ -62,7 +62,7 @@ Common::Error WastelandEngine::run() {
 	return Common::kNoError;
 }
 
-Common::Error WastelandEngine::syncGame(Common::Serializer &s) {
+Common::Error Engine::syncGame(Common::Serializer &s) {
 	// The Serializer has methods isLoading() and isSaving()
 	// if you need to specific steps; for example setting
 	// an array size after reading it's length, whereas
