@@ -21,23 +21,25 @@
 
 #include "common/system.h"
 #include "graphics/paletteman.h"
-#include "wasteland/view1.h"
+#include "wasteland/fod/views/title.h"
 
 namespace Wasteland {
+namespace FOD {
+namespace Views {
 
-bool View1::msgFocus(const FocusMessage &msg) {
+bool Title::msgFocus(const FocusMessage &msg) {
 	Common::fill(&_pal[0], &_pal[256 * 3], 0);
 	_offset = 128;
 	return true;
 }
 
-bool View1::msgKeypress(const KeypressMessage &msg) {
+bool Title::msgKeypress(const KeypressMessage &msg) {
 	// Any keypress to close the view
 	close();
 	return true;
 }
 
-void View1::draw() {
+void Title::draw() {
 	// Draw a bunch of squares on screen
 	Graphics::ManagedSurface s = getSurface();
 
@@ -45,7 +47,7 @@ void View1::draw() {
 		s.frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
 }
 
-bool View1::tick() {
+bool Title::tick() {
 	// Cycle the palette
 	++_offset;
 	for (int i = 0; i < 256; ++i)
@@ -61,4 +63,6 @@ bool View1::tick() {
 	return true;
 }
 
+} // namespace Views
+} // namespace FOD
 } // namespace Wasteland

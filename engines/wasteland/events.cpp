@@ -22,8 +22,7 @@
 #include "common/config-manager.h"
 #include "graphics/screen.h"
 #include "wasteland/events.h"
-#include "wasteland/wasteland.h"
-#include "wasteland/views.h"
+#include "wasteland/engine.h"
 
 namespace Wasteland {
 
@@ -40,14 +39,16 @@ Events::~Events() {
 void Events::runGame() {
 	uint currTime, nextFrameTime = 0;
 	_screen = new Graphics::Screen();
-	Views views;	// Loads all views in the structure
+
+	// Loads all views in the structure
+	Views *views = createViews();
 
 	// Run the game
 	int saveSlot = ConfMan.getInt("save_slot");
 	if (saveSlot != -1)
 		g_engine->loadGameState(saveSlot);
 
-	addView("View1");
+	addView("Title");
 
 	Common::Event e;
 	while (!_views.empty() && !shouldQuit()) {
@@ -73,6 +74,7 @@ void Events::runGame() {
 		}
 	}
 
+	delete views;
 	delete _screen;
 }
 

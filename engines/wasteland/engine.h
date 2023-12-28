@@ -41,7 +41,7 @@ namespace Wasteland {
 
 struct WastelandGameDescription;
 
-class WastelandEngine : public Engine, public Events {
+class Engine : public ::Engine, public Events {
 private:
 	const ADGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
@@ -53,12 +53,12 @@ protected:
 	 * Returns true if the game should quit
 	 */
 	bool shouldQuit() const override {
-		return Engine::shouldQuit();
+		return ::Engine::shouldQuit();
 	}
 
 public:
-	WastelandEngine(OSystem *syst, const ADGameDescription *gameDesc);
-	~WastelandEngine() override;
+	Engine(OSystem *syst, const ADGameDescription *gameDesc);
+	~Engine() override;
 
 	uint32 getFeatures() const;
 
@@ -104,7 +104,7 @@ public:
 	}
 };
 
-extern WastelandEngine *g_engine;
+extern Engine *g_engine;
 #define SHOULD_QUIT ::Wasteland::g_engine->shouldQuit()
 
 } // End of namespace Wasteland
