@@ -30,6 +30,7 @@
 #include "common/random.h"
 #include "common/serializer.h"
 #include "common/util.h"
+#include "graphics/font.h"
 #include "engines/engine.h"
 #include "engines/savestate.h"
 #include "graphics/screen.h"
@@ -55,6 +56,9 @@ protected:
 	bool shouldQuit() const override {
 		return ::Engine::shouldQuit();
 	}
+
+public:
+	Graphics::Font *_font = nullptr;
 
 public:
 	Engine(OSystem *syst, const ADGameDescription *gameDesc);

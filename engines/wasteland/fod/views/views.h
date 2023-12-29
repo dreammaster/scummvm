@@ -28,7 +28,7 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-struct Views : public Wasteland::Views {
+struct Views {
 	Title _title;
 };
 

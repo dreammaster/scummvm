@@ -59,9 +59,6 @@ public:
 	int16 height() const { return _bounds.height(); }
 };
 
-struct Views {
-};
-
 /**
  * User interface element
  */
@@ -260,9 +257,9 @@ protected:
 	void processEvent(Common::Event &ev);
 
 	/**
-	 * Returns the viewset for the game
+	 * Performs game specific setup
 	 */
-	virtual Views *createViews() = 0;
+	virtual void setup() = 0;
 
 	/**
 	 * Returns true if the game should quit

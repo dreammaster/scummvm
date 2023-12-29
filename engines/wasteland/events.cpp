@@ -40,15 +40,13 @@ void Events::runGame() {
 	uint currTime, nextFrameTime = 0;
 	_screen = new Graphics::Screen();
 
-	// Loads all views in the structure
-	Views *views = createViews();
+	// Performs game specific setup, including the view list
+	setup();
 
 	// Run the game
 	int saveSlot = ConfMan.getInt("save_slot");
 	if (saveSlot != -1)
-		g_engine->loadGameState(saveSlot);
-
-	addView("Title");
+		(void)g_engine->loadGameState(saveSlot);
 
 	Common::Event e;
 	while (!_views.empty() && !shouldQuit()) {
@@ -74,7 +72,6 @@ void Events::runGame() {
 		}
 	}
 
-	delete views;
 	delete _screen;
 }
 
