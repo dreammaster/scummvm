@@ -34,10 +34,12 @@ FountainOfDreamsEngine::FountainOfDreamsEngine(OSystem *syst, const ADGameDescri
 
 FountainOfDreamsEngine::~FountainOfDreamsEngine() {
 	g_engine = nullptr;
+	delete _views;
 }
 
-Wasteland::Views *FountainOfDreamsEngine::createViews() {
-	return new Views::Views();
+void FountainOfDreamsEngine::setup() {
+	_views = new Views::Views();
+	addView("Title");
 }
 
 } // namespace FOD

@@ -23,13 +23,17 @@
 #define WASTELAND_FOD_FOD_H
 
 #include "wasteland/engine.h"
+#include "wasteland/fod/views/views.h"
 
 namespace Wasteland {
 namespace FOD {
 
 class FountainOfDreamsEngine : public Wasteland::Engine {
+private:
+	FOD::Views::Views *_views = nullptr;
+
 protected:
-	Wasteland::Views *createViews() override;
+	void setup() override;
 
 public:
 	FountainOfDreamsEngine(OSystem *syst, const ADGameDescription *gameDesc);
