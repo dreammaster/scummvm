@@ -19,35 +19,39 @@
  *
  */
 
-#include "wasteland/fod/fod.h"
-#include "wasteland/fod/views/views.h"
+#include "common/file.h"
 #include "wasteland/gfx/bitmap_font.h"
 
 namespace Wasteland {
-namespace FOD {
+namespace Gfx {
 
-FountainOfDreamsEngine *g_engine;
+bool BitmapFont::load(const Common::Path &filename) {
+	Common::File f;
+	if (!f.open(filename))
+		return false;
 
-FountainOfDreamsEngine::FountainOfDreamsEngine(OSystem *syst, const ADGameDescription *gameDesc) :
-		Wasteland::Engine(syst, gameDesc) {
-	g_engine = this;
+	// Get the size of the font
+	_count = f.readUint16LE();
+	_data.resize(_count * 23);
+	f.read(&_data[0], _count * 32);
 }
 
-FountainOfDreamsEngine::~FountainOfDreamsEngine() {
-	g_engine = nullptr;
-	delete _views;
-	delete _font;
+void BitmapFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+	const byte *src = &_data[chr * 32];
+	byte v = 0;
+
+	for (int yCtr = 0; yCtr < _size.y; ++yCtr) {
+		byte *dstP = (byte *)dst->getBasePtr(x, y + yCtr);
+
+		for (int xCtr = 0; xCtr < _size.x; ++xCtr, ++dstP, v >>= 1) {
+			if ((xCtr % 8) == 0)
+				v = *src++;
+
+			if (v & 1)
+				*dstP = color;
+		}
+	}
 }
 
-void FountainOfDreamsEngine::setup() {
-	_views = new Views::Views();
-	addView("Title");
-
-	auto font = new Wasteland::Gfx::BitmapFont();
-	if (!font->load("FONT"))
-		error("Could not load FONT");
-	_font = font;
-}
-
-} // namespace FOD
+} // namespace Gfx
 } // namespace Wasteland
