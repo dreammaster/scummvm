@@ -22,6 +22,7 @@
 #include "common/system.h"
 #include "graphics/paletteman.h"
 #include "wasteland/fod/views/title.h"
+#include "wasteland/engine.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -45,7 +46,12 @@ void Title::draw() {
 
 	for (int i = 0; i < 100; ++i)
 		s.frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
+
+	// Test font drawing
+	g_engine->_font->drawString(&s, "This is a test", 50, 50,
+		200, 0xff);
 }
+
 
 bool Title::tick() {
 	// Cycle the palette
