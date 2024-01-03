@@ -22,6 +22,7 @@
 #ifndef WASTELAND_FOD_VIEWS_VIEWS_H
 #define WASTELAND_FOD_VIEWS_VIEWS_H
 
+#include "wasteland/fod/views/main_menu.h"
 #include "wasteland/fod/views/title.h"
 
 namespace Wasteland {
@@ -29,6 +30,7 @@ namespace FOD {
 namespace Views {
 
 struct Views {
+	MainMenu _mainMenu;
 	Title _title;
 };
 

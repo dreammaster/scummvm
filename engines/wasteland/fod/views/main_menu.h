@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_TITLE_H
-#define WASTELAND_FOD_VIEWS_TITLE_H
+#ifndef WASTELAND_FOD_VIEWS_MAIN_MENU_H
+#define WASTELAND_FOD_VIEWS_MAIN_MENU_H
 
 #include "wasteland/events.h"
 
@@ -28,13 +28,15 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-class Title : public UIElement {
+class MainMenu : public UIElement {
+private:
+	Common::String _errorMessage;
+
 public:
-	Title() : UIElement("Title") {}
-	virtual ~Title() {}
+	MainMenu() : UIElement("MainMenu") {}
+	virtual ~MainMenu() {}
 
 	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
 	void draw() override;
 };
 

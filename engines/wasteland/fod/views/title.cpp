@@ -29,8 +29,12 @@ namespace FOD {
 namespace Views {
 
 bool Title::msgKeypress(const KeypressMessage &msg) {
-	// Any keypress to close the view
-	close();
+	replaceView("MainMenu");
+	return true;
+}
+
+bool Title::msgMouseDown(const MouseDownMessage &msg) {
+	replaceView("MainMenu");
 	return true;
 }
 

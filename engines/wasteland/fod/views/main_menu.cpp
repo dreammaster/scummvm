@@ -19,27 +19,29 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_TITLE_H
-#define WASTELAND_FOD_VIEWS_TITLE_H
-
-#include "wasteland/events.h"
+#include "common/system.h"
+#include "graphics/palette.h"
+#include "wasteland/fod/views/main_menu.h"
+#include "wasteland/engine.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-class Title : public UIElement {
-public:
-	Title() : UIElement("Title") {}
-	virtual ~Title() {}
+bool MainMenu::msgKeypress(const KeypressMessage &msg) {
+	// Any keypress to close the view
+	close();
+	return true;
+}
 
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	void draw() override;
-};
+void MainMenu::draw() {
+	Surface s = getSurface();
+	s.clear();
+
+	// TODO: Draw frame
+
+}
 
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland
-
-#endif
