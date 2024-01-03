@@ -19,9 +19,10 @@
  *
  */
 
+#include "wasteland/gfx/wasteland_font.h"
+#include "wasteland/gfx/surface.h"
 #include "wasteland/fod/fod.h"
 #include "wasteland/fod/views/views.h"
-#include "wasteland/gfx/bitmap_font.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -43,7 +44,8 @@ void FountainOfDreamsEngine::setup() {
 	_views = new Views::Views();
 	addView("Title");
 
-	auto font = new Wasteland::Gfx::BitmapFont();
+	Gfx::Surface::setupPalette();
+	auto font = new Wasteland::Gfx::WastelandFont();
 	if (!font->load("FONT"))
 		error("Could not load FONT");
 	_font = font;
