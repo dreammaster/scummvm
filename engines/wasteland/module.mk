@@ -10,6 +10,7 @@ MODULE_OBJS = \
 	gfx/surface.o \
 	gfx/wasteland_font.o \
 	fod/fod.o \
+	fod/views/main_menu.o \
 	fod/views/title.o
 
 # This module can be built as a plugin
