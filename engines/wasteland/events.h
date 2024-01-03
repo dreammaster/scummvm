@@ -26,6 +26,7 @@
 #include "common/stack.h"
 #include "graphics/screen.h"
 #include "wasteland/messages.h"
+#include "wasteland/gfx/surface.h"
 
 namespace Wasteland {
 
@@ -33,6 +34,7 @@ namespace Wasteland {
 #define FRAME_DELAY (1000 / FRAME_RATE)
 
 class Events;
+using Wasteland::Gfx::Surface;
 
 /**
  * Implements a thunk layer around an element's bounds,
@@ -182,7 +184,7 @@ public:
 	/**
 	 * Returns a surface for drawing the element
 	 */
-	Graphics::ManagedSurface getSurface() const;
+	Surface getSurface() const;
 
 	/**
 	 * Clear the surface

@@ -39,8 +39,8 @@ public:
 
 public:
 	Surface() : Graphics::ManagedSurface() {}
-
-
+	Surface(ManagedSurface &surf, const Common::Rect &bounds) :
+		Graphics::ManagedSurface(surf, bounds) {}
 };
 
 } // namespace Gfx
