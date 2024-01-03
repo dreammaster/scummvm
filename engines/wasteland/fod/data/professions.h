@@ -19,32 +19,16 @@
  *
  */
 
-#ifndef WASTELAND_FOD_FOD_H
-#define WASTELAND_FOD_FOD_H
+#ifndef WASTELAND_FOD_DATA_PROFESSIONS_H
+#define WASTELAND_FOD_DATA_PROFESSIONS_H
 
-#include "wasteland/engine.h"
-#include "wasteland/fod/views/views.h"
-#include "wasteland/fod/data/party.h"
-#include "wasteland/fod/data/professions.h"
+#include "common/serializer.h"
 
 namespace Wasteland {
 namespace FOD {
+namespace Data {
 
-class FountainOfDreamsEngine : public Wasteland::Engine {
-private:
-	FOD::Views::Views *_views = nullptr;
-	Data::Disk1 _disk1;
-
-protected:
-	void setup() override;
-
-public:
-	FountainOfDreamsEngine(OSystem *syst, const ADGameDescription *gameDesc);
-	~FountainOfDreamsEngine() override;
-};
-
-extern FountainOfDreamsEngine *g_engine;
-
+} // namespace Data
 } // namespace FOD
 } // namespace Wasteland
 
