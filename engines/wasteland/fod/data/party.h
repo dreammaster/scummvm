@@ -39,12 +39,12 @@ enum Sex {
 };
 
 struct MemberArray1Entry {
-	byte _field0;
-	byte _field1;
-	byte _field2;
-	byte _field3;
-	byte _field4;
-	byte _field5;
+	byte _field0 = 0;
+	byte _field1 = 0;
+	byte _field2 = 0;
+	byte _field3 = 0;
+	byte _field4 = 0;
+	byte _field5 = 0;
 
 	void synchronize(Common::Serializer &s);
 };
@@ -86,6 +86,8 @@ struct PartyMember {
 	uint32 _field148;
 
 	void synchronize(Common::Serializer &s);
+
+	void reset();
 };
 
 class Roster {
@@ -130,17 +132,18 @@ struct Disk1 {
 	uint16 _field38;
 	Roster _roster;
 	byte _unknown4[250];
-	byte _field7B0;
-	byte _unknown5[5];
+	byte _field7B0[6];
 	uint16 _field7B6;
-	byte _unknown6[1800];
+	byte _unknown5[1800];
 
 	void synchronize(Common::Serializer &s);
 
 	/**
 	 * Loads the data for disk 1
 	 */
-	bool load();
+	bool load(bool &hasParty);
+
+	void resetRoster();
 };
 
 } // namespace Data
