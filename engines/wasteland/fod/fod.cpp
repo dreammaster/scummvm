@@ -50,7 +50,7 @@ void FountainOfDreamsEngine::setup() {
 		error("Could not load FONT");
 	_font = font;
 
-	if (!_disk1.load())
+	if (!_disk1.load(_hasParty))
 		error("Could not load DISK1");
 }
 

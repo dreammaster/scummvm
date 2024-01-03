@@ -83,6 +83,39 @@ void PartyMember::synchronize(Common::Serializer &s) {
 	s.syncAsUint32LE(_field148);
 }
 
+void PartyMember::reset() {
+	_name.clear();
+	_field52 = 0;
+
+	for (int i = 0; i < 32; ++i)
+		_array1[i] = MemberArray1Entry();
+	_array1[0]._field0 = 2;
+	_array1[0]._field2 = 9;
+	_array1[1]._field0 = 12;
+	_array1[2]._field0 = 12;
+	_array1[3]._field0 = 32;
+	_array1[4]._field0 = 41;
+	_array1[5]._field0 = 55;
+
+	_field4E = 1;
+	_field5E = 1500;
+	_field60 = 0;
+	_field4A = 0xff;
+
+	Common::fill(&_array2[0], &_array2[3], 0xff);
+
+	_field5C = 0;
+	_field5A = 0;
+	_field4F = 0;
+	_sex = SEX_MALE;
+	_field53 = 0;
+	_field54 = 0;
+	_field55 = 0;
+	_field56 = 0;
+	_field57 = 0;
+	_field49 = 0;
+}
+
 void Roster::synchronize(Common::Serializer &s) {
 	for (int i = 0; i < 5; ++i)
 		_party[i].synchronize(s);
@@ -115,13 +148,12 @@ void Disk1::synchronize(Common::Serializer &s) {
 	_roster.synchronize(s);
 
 	s.syncBytes(_unknown4, 250);
-	s.syncAsByte(_field7B0);
-	s.syncBytes(_unknown5, 5);
+	s.syncBytes(_field7B0, 6);
 	s.syncAsUint16LE(_field7B6);
-	s.syncBytes(_unknown6, 1800);
+	s.syncBytes(_unknown5, 1800);
 }
 
-bool Disk1::load() {
+bool Disk1::load(bool &hasParty) {
 	Common::File f;
 
 	if (!f.open("DISK1"))
@@ -129,7 +161,23 @@ bool Disk1::load() {
 
 	Common::Serializer s(&f, nullptr);
 	synchronize(s);
+
+	hasParty = _field2 || _field0;
+
+	if (!hasParty)
+		resetRoster();
+
 	return true;
+}
+
+void Disk1::resetRoster() {
+	for (int memberNum = 0; memberNum < ROSTER_COUNT; ++memberNum) {
+		PartyMember &member = _roster[memberNum];
+		_partyIndexes[memberNum] = memberNum;
+		member.reset();
+
+		_field7B0[memberNum] = 0;
+	}
 }
 
 } // namespace Data

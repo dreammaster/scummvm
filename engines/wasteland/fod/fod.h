@@ -34,6 +34,7 @@ class FountainOfDreamsEngine : public Wasteland::Engine {
 private:
 	FOD::Views::Views *_views = nullptr;
 	Data::Disk1 _disk1;
+	bool _hasParty = false;
 
 protected:
 	void setup() override;
