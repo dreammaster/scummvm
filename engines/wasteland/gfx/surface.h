@@ -27,6 +27,8 @@
 namespace Wasteland {
 namespace Gfx {
 
+typedef Common::Rect Window;
+
 /**
  * Implements the surface class views use when they call getSurface
  */

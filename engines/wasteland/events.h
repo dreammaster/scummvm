@@ -187,6 +187,13 @@ public:
 	Surface getSurface() const;
 
 	/**
+	 * Returns a surface for drawing the element, using a passed window
+	 * to restrict the returned drawing area.
+	 * @remarks		The window bounds are in text co-ordinates
+	 */
+	Surface getSurface(const Gfx::Window &win) const;
+
+	/**
 	 * Clear the surface
 	 */
 	virtual void clearSurface();
