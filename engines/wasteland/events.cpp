@@ -313,8 +313,8 @@ void UIElement::addView() {
 	g_events->addView(this);
 }
 
-Graphics::ManagedSurface UIElement::getSurface() const {
-	return Graphics::ManagedSurface(*g_events->getScreen(), _bounds);
+Surface UIElement::getSurface() const {
+	return Surface(*g_events->getScreen(), _bounds);
 }
 
 int UIElement::getRandomNumber(int minNumber, int maxNumber) {

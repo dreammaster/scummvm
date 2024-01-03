@@ -36,7 +36,7 @@ bool Title::msgKeypress(const KeypressMessage &msg) {
 
 void Title::draw() {
 	// Draw a bunch of squares on screen
-	Graphics::ManagedSurface s = getSurface();
+	Surface s = getSurface();
 	s.fillRect(Common::Rect(0, 0, 320, 200), 0xff);
 	for (int i = 0; i < 16; ++i)
 		s.fillRect(Common::Rect(i * 10, 190, i * 10 + 10, 200), i);
