@@ -49,6 +49,9 @@ void FountainOfDreamsEngine::setup() {
 	if (!font->load("FONT"))
 		error("Could not load FONT");
 	_font = font;
+
+	if (!_disk1.load())
+		error("Could not load DISK1");
 }
 
 } // namespace FOD
