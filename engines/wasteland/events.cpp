@@ -23,6 +23,7 @@
 #include "graphics/screen.h"
 #include "wasteland/events.h"
 #include "wasteland/engine.h"
+#include "wasteland/gfx/wasteland_font.h"
 
 namespace Wasteland {
 
@@ -315,6 +316,14 @@ void UIElement::addView() {
 
 Surface UIElement::getSurface() const {
 	return Surface(*g_events->getScreen(), _bounds);
+}
+
+Surface UIElement::getSurface(const Gfx::Window &win) const {
+	Common::Rect r(_bounds.left + win.left * FONT_W, _bounds.top + win.top * FONT_H,
+					_bounds.left + win.right * FONT_W, _bounds.top + win.bottom * FONT_H);
+	r.clip(_bounds);
+
+	return Surface(*g_events->getScreen(), r);
 }
 
 int UIElement::getRandomNumber(int minNumber, int maxNumber) {

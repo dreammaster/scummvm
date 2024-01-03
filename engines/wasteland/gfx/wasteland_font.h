@@ -30,6 +30,9 @@
 namespace Wasteland {
 namespace Gfx {
 
+#define FONT_W 8
+#define FONT_H 8
+
 /**
  * Implements a font stored as a grid on a passed surface
  */
@@ -50,17 +53,17 @@ public:
 	/**
 	 * Get the font height
 	 */
-	int getFontHeight() const override { return 8; }
+	int getFontHeight() const override { return FONT_H; }
 
 	/**
 	 * Get the maximum character width
 	 */
-	int getMaxCharWidth() const override { return 8; }
+	int getMaxCharWidth() const override { return FONT_W; }
 
 	/**
 	 * Get the width of the given character
 	 */
-	int getCharWidth(uint32 chr) const override { return 8; }
+	int getCharWidth(uint32 chr) const override { return FONT_W; }
 
 	/**
 	 * Draw a character
