@@ -28,12 +28,6 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-bool Title::msgFocus(const FocusMessage &msg) {
-	Common::fill(&_pal[0], &_pal[256 * 3], 0);
-	_offset = 128;
-	return true;
-}
-
 bool Title::msgKeypress(const KeypressMessage &msg) {
 	// Any keypress to close the view
 	close();
@@ -43,30 +37,13 @@ bool Title::msgKeypress(const KeypressMessage &msg) {
 void Title::draw() {
 	// Draw a bunch of squares on screen
 	Graphics::ManagedSurface s = getSurface();
-
-	for (int i = 0; i < 100; ++i)
-		s.frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
+	s.fillRect(Common::Rect(0, 0, 320, 200), 0xff);
+	for (int i = 0; i < 16; ++i)
+		s.fillRect(Common::Rect(i * 10, 190, i * 10 + 10, 200), i);
 
 	// Test font drawing
 	g_engine->_font->drawString(&s, "This is a test", 50, 50,
 		200, 0xff);
-}
-
-
-bool Title::tick() {
-	// Cycle the palette
-	++_offset;
-	for (int i = 0; i < 256; ++i)
-		_pal[i * 3 + 1] = (i + _offset) % 256;
-	g_system->getPaletteManager()->setPalette(_pal, 0, 256);
-
-	// Below is redundant since we're only cycling the palette, but it demonstrates
-	// how to trigger the view to do further draws after the first time, since views
-	// don't automatically keep redrawing unless you tell it to
-	if ((_offset % 256) == 0)
-		redraw();
-
-	return true;
 }
 
 } // namespace Views

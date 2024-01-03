@@ -6,7 +6,8 @@ MODULE_OBJS = \
 	events.o \
 	messages.o \
 	metaengine.o \
-	gfx/bitmap_font.o \
+	gfx/surface.o \
+	gfx/wasteland_font.o \
 	fod/fod.o \
 	fod/views/title.o
 

@@ -19,54 +19,28 @@
  *
  */
 
-#ifndef WASTELAND_GFX_BITMAP_FONT_H
-#define WASTELAND_GFX_BITMAP_FONT_H
+#ifndef WASTELAND_GFX_SURFACE_H
+#define WASTELAND_GFX_SURFACE_H
 
-#include "common/array.h"
-#include "common/rect.h"
-#include "graphics/font.h"
 #include "graphics/managed_surface.h"
 
 namespace Wasteland {
 namespace Gfx {
 
 /**
- * Implements a font stored as a grid on a passed surface
+ * Implements the surface class views use when they call getSurface
  */
-class BitmapFont : public Graphics::Font {
-private:
-	size_t _count;
-	Common::Array<byte> _data;
-	const size_t _startingChar = 0;
-	const Common::Point _size;
+class Surface : public Graphics::ManagedSurface {
+public:
+	/**
+	 * Sets the EGA palette
+	 */
+	static void setupPalette();
 
 public:
-	BitmapFont() : _size(16, 8) {}
+	Surface() : Graphics::ManagedSurface() {}
 
-	/**
-	 * Loads the font from the specified filer
-	 */
-	bool load(const Common::Path &filename);
 
-	/**
-	 * Get the font height
-	 */
-	int getFontHeight() const override { return _size.y; }
-
-	/**
-	 * Get the maximum character width
-	 */
-	int getMaxCharWidth() const override { return _size.x; }
-
-	/**
-	 * Get the width of the given character
-	 */
-	int getCharWidth(uint32 chr) const override { return _size.x; }
-
-	/**
-	 * Draw a character
-	 */
-	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
 };
 
 } // namespace Gfx

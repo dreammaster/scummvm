@@ -20,35 +20,42 @@
  */
 
 #include "common/file.h"
-#include "wasteland/gfx/bitmap_font.h"
+#include "wasteland/gfx/wasteland_font.h"
 
 namespace Wasteland {
 namespace Gfx {
 
-bool BitmapFont::load(const Common::Path &filename) {
+bool WastelandFont::load(const Common::Path &filename) {
 	Common::File f;
 	if (!f.open(filename))
 		return false;
 
 	// Get the size of the font
 	_count = f.readUint16LE();
-	_data.resize(_count * 23);
-	f.read(&_data[0], _count * 32);
+	_data = new byte[_count * 32];
+	f.read(_data, _count * 32);
+	return true;
 }
 
-void BitmapFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+WastelandFont::~WastelandFont() {
+	delete[] _data;
+}
+
+void WastelandFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+	assert(chr < _count);
+	assert(x >= 0 && y >= 0 && x < (dst->w - 8) && y < (dst->h - 8));
 	const byte *src = &_data[chr * 32];
-	byte v = 0;
 
-	for (int yCtr = 0; yCtr < _size.y; ++yCtr) {
-		byte *dstP = (byte *)dst->getBasePtr(x, y + yCtr);
+	for (int yCtr = 0; yCtr < 8; ++yCtr) {
+		byte *dest = (byte *)dst->getBasePtr(x, y + yCtr);
 
-		for (int xCtr = 0; xCtr < _size.x; ++xCtr, ++dstP, v >>= 1) {
-			if ((xCtr % 8) == 0)
-				v = *src++;
+		// The 8 pixels of the font character are stored in 4 nibbles
+		uint32 srcVal = READ_LE_UINT32(src);
+		src += 4;
 
-			if (v & 1)
-				*dstP = color;
+		for (int xCtr = 0; xCtr < 4; ++xCtr, srcVal >>= 8) {
+			*dest++ = (srcVal >> 4) & 0xf;
+			*dest++ = srcVal & 0xf;
 		}
 	}
 }
