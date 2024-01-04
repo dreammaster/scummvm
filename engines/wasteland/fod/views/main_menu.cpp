@@ -22,7 +22,7 @@
 #include "common/system.h"
 #include "graphics/palette.h"
 #include "wasteland/fod/views/main_menu.h"
-#include "wasteland/engine.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -80,6 +80,18 @@ void MainMenu::removeMember() {
 }
 
 void MainMenu::playGame() {
+	if (g_engine->_disk1._partyCount == 0) {
+		Surface main = getSurface(Gfx::Window(0, 14, 39, 19));
+		main.clear();
+		main.writeCenteredString("It's tough out there!", 1);
+		main.writeCenteredString("You should take somebody with you.", 3);
+
+		delaySeconds(3);
+
+	} else {
+		// Start the game
+		replaceView("Game");
+	}
 }
 
 } // namespace Views
