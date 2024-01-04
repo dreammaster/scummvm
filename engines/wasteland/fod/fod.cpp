@@ -52,6 +52,8 @@ void FountainOfDreamsEngine::setup() {
 
 	if (!_disk1.load(_hasParty))
 		error("Could not load DISK1");
+	if (!_archetypes.load())
+		error("Could not load ARCHTYPE");
 }
 
 } // namespace FOD

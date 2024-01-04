@@ -25,7 +25,7 @@
 #include "wasteland/engine.h"
 #include "wasteland/fod/views/views.h"
 #include "wasteland/fod/data/party.h"
-#include "wasteland/fod/data/professions.h"
+#include "wasteland/fod/data/archetypes.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -35,6 +35,7 @@ private:
 	FOD::Views::Views *_views = nullptr;
 	Data::Disk1 _disk1;
 	bool _hasParty = false;
+	Data::Archetypes _archetypes;
 
 protected:
 	void setup() override;
