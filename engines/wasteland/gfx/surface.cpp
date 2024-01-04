@@ -76,9 +76,8 @@ void Surface::setupPalette() {
 }
 
 void Surface::writeString(const Common::String &str) {
-	g_engine->_font->drawString(this, str, _textX * FONT_W,
-		_textY * FONT_H, this->w - (_textX * FONT_W),
-		_inverseColor ? -1 : 1);
+	g_engine->_font->drawString(this, str, _textX * FONT_W, _textY * FONT_H,
+		this->w - (_textX * FONT_W), _inverseColor ? -1 : 1);
 	_textX += str.size();
 }
 
@@ -94,8 +93,7 @@ void Surface::writeCenteredString(const Common::String &str, int y) {
 }
 
 void Surface::writeChar(unsigned char c) {
-	g_engine->_font->drawChar(this, c, _textX * FONT_W, _textY * FONT_H,
-		_inverseColor ? -1 : 1);
+	g_engine->_font->drawChar(this, c, _textX * FONT_W, _textY * FONT_H, _inverseColor ? -1 : 1);
 }
 
 void Surface::drawBorders() {
