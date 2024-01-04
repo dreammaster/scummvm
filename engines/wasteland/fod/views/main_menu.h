@@ -22,15 +22,15 @@
 #ifndef WASTELAND_FOD_VIEWS_MAIN_MENU_H
 #define WASTELAND_FOD_VIEWS_MAIN_MENU_H
 
-#include "wasteland/events.h"
+#include "wasteland/fod/views/menu_view.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-class MainMenu : public UIElement {
+class MainMenu : public MenuView {
 public:
-	MainMenu() : UIElement("MainMenu") {}
+	MainMenu() : MenuView("MainMenu") {}
 	virtual ~MainMenu() {}
 
 	bool msgKeypress(const KeypressMessage &msg) override;

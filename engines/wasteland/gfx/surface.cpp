@@ -25,7 +25,6 @@
 #include "wasteland/gfx/surface.h"
 #include "wasteland/engine.h"
 #include "wasteland/gfx/wasteland_font.h"
-#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace Gfx {
@@ -96,18 +95,9 @@ void Surface::writeChar(unsigned char c) {
 	g_engine->_font->drawChar(this, c, _textX * FONT_W, _textY * FONT_H, _inverseColor ? -1 : 1);
 }
 
-void Surface::drawBorders() {
-	assert(g_engine->getGameType() == GAMETYPE_FOD);
-	const byte *borders = FOD::g_engine->_pics._borders;
-	int savedX = _textX, savedY = _textY;
-
-	for (_textY = 0; _textY < TEXT_H; ++_textY) {
-		for (_textX = 0; _textX < TEXT_W; ++_textX)
-			writeChar(*borders++);
-	}
-
-	_textX = savedX;
-	_textY = savedY;
+void Surface::setTextPos(int x, int y) {
+	_textX = x;
+	_textY = y;
 }
 
 } // namespace Gfx
