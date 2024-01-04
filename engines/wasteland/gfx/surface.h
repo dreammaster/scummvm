@@ -33,6 +33,10 @@ typedef Common::Rect Window;
  * Implements the surface class views use when they call getSurface
  */
 class Surface : public Graphics::ManagedSurface {
+private:
+	bool _inverseColor = false;
+	int _textX = 0, _textY = 0;
+
 public:
 	/**
 	 * Sets the EGA palette
@@ -43,6 +47,12 @@ public:
 	Surface() : Graphics::ManagedSurface() {}
 	Surface(ManagedSurface &surf, const Common::Rect &bounds) :
 		Graphics::ManagedSurface(surf, bounds) {}
+
+	void setInverseColor(bool isInverse) { _inverseColor = isInverse; }
+	void writeString(const Common::String &str);
+	void writeString(const Common::String &str, int x, int y);
+	void writeCenteredString(const Common::String &str, int y);
+	void writeChar(unsigned char c);
 };
 
 } // namespace Gfx

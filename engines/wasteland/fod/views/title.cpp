@@ -46,8 +46,7 @@ void Title::draw() {
 		s.fillRect(Common::Rect(i * 10, 190, i * 10 + 10, 200), i);
 
 	// Test font drawing
-	g_engine->_font->drawString(&s, "This is a test", 50, 50,
-		200, 0xff);
+	s.writeString("This is a test", 5, 5);
 }
 
 } // namespace Views

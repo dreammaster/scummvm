@@ -23,6 +23,8 @@
 #include "graphics/palette.h"
 #include "graphics/paletteman.h"
 #include "wasteland/gfx/surface.h"
+#include "wasteland/engine.h"
+#include "wasteland/gfx/wasteland_font.h"
 
 namespace Wasteland {
 namespace Gfx {
@@ -70,6 +72,30 @@ void Surface::setupPalette() {
 			g_system->getPaletteManager()->setPalette(pal, blockCtr * 16 + i, 1);
 	}
 	*/
+}
+
+void Surface::writeString(const Common::String &str) {
+	g_engine->_font->drawString(this, str, _textX * FONT_W,
+		_textY * FONT_H, this->w - (_textX * FONT_W),
+		_inverseColor ? -1 : 1);
+	_textX += str.size();
+}
+
+void Surface::writeString(const Common::String &str, int x, int y) {
+	_textX = x;
+	_textY = y;
+	writeString(str);
+}
+
+void Surface::writeCenteredString(const Common::String &str, int y) {
+	int x = ((this->w / FONT_W) - str.size()) / 2;
+	writeString(str, x, y);
+}
+
+void Surface::writeChar(unsigned char c) {
+	g_engine->_font->drawChar(this, c, _textX * FONT_W, _textY * FONT_H,
+		_inverseColor ? -1 : 1);
+	++_textX;
 }
 
 } // namespace Gfx
