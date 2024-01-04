@@ -19,38 +19,28 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_MAIN_MENU_H
-#define WASTELAND_FOD_VIEWS_MAIN_MENU_H
+#ifndef WASTELAND_GFX_CLICKABLE_TEXT_H
+#define WASTELAND_GFX_CLICKABLE_TEXT_H
 
-#include "wasteland/fod/views/menu_view.h"
-#include "wasteland/gfx/clickable_text.h"
+#include "wasteland/events.h"
 
 namespace Wasteland {
-namespace FOD {
-namespace Views {
+namespace Gfx {
 
-class MainMenu : public MenuView {
+class ClickableText : public UIElement {
 private:
-	Gfx::ClickableText _addMember;
-	Gfx::ClickableText _editMember;
-	Gfx::ClickableText _removeMember;
-	Gfx::ClickableText _playGame;
-
-	void addMember();
-	void editMember();
-	void removeMember();
-	void playGame();
+	Common::String _text;
+	Common::KeyCode _keycode;
 
 public:
-	MainMenu();
-	virtual ~MainMenu() {}
+	ClickableText(const Common::String &name, UIElement *uiParent, int x, int y,
+		const Common::String &text, Common::KeyCode keycode);
 
-	bool msgKeypress(const KeypressMessage &msg) override;
 	void draw() override;
+	bool msgMouseDown(const MouseDownMessage &msg) override;
 };
 
-} // namespace Views
-} // namespace FOD
+} // namespace Gfx
 } // namespace Wasteland
 
 #endif
