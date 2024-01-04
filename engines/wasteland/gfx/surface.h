@@ -56,8 +56,7 @@ public:
 	void writeString(const Common::String &str, int x, int y);
 	void writeCenteredString(const Common::String &str, int y);
 	void writeChar(unsigned char c);
-
-	void drawBorders();
+	void setTextPos(int x, int y);
 };
 
 } // namespace Gfx

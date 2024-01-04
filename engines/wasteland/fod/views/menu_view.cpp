@@ -21,29 +21,29 @@
 
 #include "common/system.h"
 #include "graphics/palette.h"
-#include "wasteland/fod/views/main_menu.h"
-#include "wasteland/engine.h"
+#include "wasteland/fod/views/menu_view.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-bool MainMenu::msgKeypress(const KeypressMessage &msg) {
-	// Any keypress to close the view
-	close();
-	return true;
+void MenuView::draw() {
+	Surface s = getSurface();
+	s.clear();
+	drawBorders();
 }
 
-void MainMenu::draw() {
-	MenuView::draw();
+void MenuView::drawBorders() {
+	Surface s = getSurface();
+	const byte *borders = g_engine->_pics._borders;
 
-	Surface portrait = getSurface(Gfx::Window(1, 0, 12, 11));
-	portrait.writeCenteredString("Welcome", 11);
-
-	Surface main = getSurface(Gfx::Window(0, 14, 39, 19));
-	main.writeCenteredString("Choose a function:", 1);
-	main.writeString("A)dd member      R)emove member", 5, 3);
-	main.writeString("E)dit member     P)lay the game", 5, 4);
+	for (int y = 0; y < TEXT_H; ++y) {
+		for (int x = 0; x < TEXT_W; ++x) {
+			s.setTextPos(x, y);
+			s.writeChar(*borders++);
+		}
+	}
 }
 
 } // namespace Views

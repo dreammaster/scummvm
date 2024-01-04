@@ -19,33 +19,28 @@
  *
  */
 
-#include "common/system.h"
-#include "graphics/palette.h"
-#include "wasteland/fod/views/main_menu.h"
-#include "wasteland/engine.h"
+#ifndef WASTELAND_FOD_VIEWS_MENU_VIEW_H
+#define WASTELAND_FOD_VIEWS_MENU_VIEW_H
+
+#include "wasteland/events.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-bool MainMenu::msgKeypress(const KeypressMessage &msg) {
-	// Any keypress to close the view
-	close();
-	return true;
-}
+class MenuView : public UIElement {
+private:
+	void drawBorders();
 
-void MainMenu::draw() {
-	MenuView::draw();
+public:
+	MenuView(const Common::String &name) : UIElement(name) {}
+	virtual ~MenuView() {}
 
-	Surface portrait = getSurface(Gfx::Window(1, 0, 12, 11));
-	portrait.writeCenteredString("Welcome", 11);
-
-	Surface main = getSurface(Gfx::Window(0, 14, 39, 19));
-	main.writeCenteredString("Choose a function:", 1);
-	main.writeString("A)dd member      R)emove member", 5, 3);
-	main.writeString("E)dit member     P)lay the game", 5, 4);
-}
+	void draw() override;
+};
 
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland
+
+#endif
