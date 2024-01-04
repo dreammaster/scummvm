@@ -19,36 +19,25 @@
  *
  */
 
-#ifndef WASTELAND_FOD_FOD_H
-#define WASTELAND_FOD_FOD_H
+#ifndef WASTELAND_FOD_DATA_PICS_H
+#define WASTELAND_FOD_DATA_PICS_H
 
 #include "wasteland/engine.h"
 #include "wasteland/fod/views/views.h"
-#include "wasteland/fod/data/party.h"
-#include "wasteland/fod/data/archetypes.h"
-#include "wasteland/fod/data/pics.h"
 
 namespace Wasteland {
 namespace FOD {
+namespace Data {
 
-class FountainOfDreamsEngine : public Wasteland::Engine {
-private:
-	FOD::Views::Views *_views = nullptr;
-	Data::Disk1 _disk1;
-	bool _hasParty = false;
-	Data::Archetypes _archetypes;
-	Data::Pics _pics;
+struct Pics {
+	byte *_borders = nullptr;
 
-protected:
-	void setup() override;
+	~Pics();
 
-public:
-	FountainOfDreamsEngine(OSystem *syst, const ADGameDescription *gameDesc);
-	~FountainOfDreamsEngine() override;
+	bool load();
 };
 
-extern FountainOfDreamsEngine *g_engine;
-
+} // namespace Data
 } // namespace FOD
 } // namespace Wasteland
 

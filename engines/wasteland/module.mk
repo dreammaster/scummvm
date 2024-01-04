@@ -12,6 +12,7 @@ MODULE_OBJS = \
 	fod/fod.o \
 	fod/data/archetypes.o \
 	fod/data/party.o \
+	fod/data/pics.o \
 	fod/views/main_menu.o \
 	fod/views/title.o
 

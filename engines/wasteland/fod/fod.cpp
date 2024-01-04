@@ -54,6 +54,8 @@ void FountainOfDreamsEngine::setup() {
 		error("Could not load DISK1");
 	if (!_archetypes.load())
 		error("Could not load ARCHTYPE");
+	if (!_pics.load())
+		error("Could not load display images");
 }
 
 } // namespace FOD
