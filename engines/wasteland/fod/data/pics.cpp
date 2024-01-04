@@ -41,6 +41,9 @@ bool Pics::load() {
 	borders.read(_borders, TEXT_W * TEXT_H);
 	borders.close();
 
+//	if (!_welcome.load("GANI", 70, 70))
+//		return false;
+
 	return true;
 }
 
