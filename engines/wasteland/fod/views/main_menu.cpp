@@ -28,9 +28,32 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
+MainMenu::MainMenu() : MenuView("MainMenu"),
+	_addMember("AddMember", this, 5, 17, "A)dd member", Common::KEYCODE_a),
+	_editMember("EditMember", this, 5, 18, "E)dit member", Common::KEYCODE_e),
+	_removeMember("RemoveMember", this, 22, 17, "R)emove member", Common::KEYCODE_r),
+	_playGame("PlayGame", this, 22, 18, "P)lay the game", Common::KEYCODE_p) {
+}
+
 bool MainMenu::msgKeypress(const KeypressMessage &msg) {
-	// Any keypress to close the view
-	close();
+	switch (msg.keycode) {
+	case Common::KEYCODE_a:
+		addMember();
+		break;
+	case Common::KEYCODE_e:
+		editMember();
+		break;
+	case Common::KEYCODE_r:
+		removeMember();
+		break;
+	case Common::KEYCODE_p:
+		playGame();
+		break;
+	default:
+		break;
+	}
+
+
 	return true;
 }
 
@@ -42,8 +65,21 @@ void MainMenu::draw() {
 
 	Surface main = getSurface(Gfx::Window(0, 14, 39, 19));
 	main.writeCenteredString("Choose a function:", 1);
-	main.writeString("A)dd member      R)emove member", 5, 3);
-	main.writeString("E)dit member     P)lay the game", 5, 4);
+
+	UIElement::draw();
+}
+
+void MainMenu::addMember() {
+
+}
+
+void MainMenu::editMember() {
+}
+
+void MainMenu::removeMember() {
+}
+
+void MainMenu::playGame() {
 }
 
 } // namespace Views

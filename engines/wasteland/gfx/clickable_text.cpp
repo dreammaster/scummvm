@@ -19,38 +19,33 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_MAIN_MENU_H
-#define WASTELAND_FOD_VIEWS_MAIN_MENU_H
-
-#include "wasteland/fod/views/menu_view.h"
 #include "wasteland/gfx/clickable_text.h"
+#include "wasteland/gfx/wasteland_font.h"
 
 namespace Wasteland {
-namespace FOD {
-namespace Views {
+namespace Gfx {
 
-class MainMenu : public MenuView {
-private:
-	Gfx::ClickableText _addMember;
-	Gfx::ClickableText _editMember;
-	Gfx::ClickableText _removeMember;
-	Gfx::ClickableText _playGame;
+ClickableText::ClickableText(const Common::String &name, UIElement *owner, int x, int y,
+		const Common::String &text, Common::KeyCode keycode) : UIElement(name, owner),
+		_text(text), _keycode(keycode) {
+	setBounds(Common::Rect(x * FONT_W, y * FONT_H, (x + text.size()) * FONT_W, (y + 1) * FONT_H));
+}
 
-	void addMember();
-	void editMember();
-	void removeMember();
-	void playGame();
 
-public:
-	MainMenu();
-	virtual ~MainMenu() {}
+void ClickableText::draw() {
+	Surface s = getSurface();
+	s.writeString(_text);
+}
 
-	bool msgKeypress(const KeypressMessage &msg) override;
-	void draw() override;
-};
+bool ClickableText::msgMouseDown(const MouseDownMessage& msg) {
+	if (_bounds.contains(msg._pos)) {
+		Common::KeyState keyState(_keycode);
+		_parent->send(KeypressMessage(keyState));
+		return true;
+	}
 
-} // namespace Views
-} // namespace FOD
+	return false;
+}
+
+} // namespace Gfx
 } // namespace Wasteland
-
-#endif

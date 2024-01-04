@@ -59,6 +59,7 @@ public:
 	size_t borderSize() const { return _borderSize; }
 	int16 width() const { return _bounds.width(); }
 	int16 height() const { return _bounds.height(); }
+	bool contains(const Common::Point &pt) const { return _innerBounds.contains(pt); }
 };
 
 /**
