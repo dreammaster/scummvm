@@ -20,6 +20,7 @@
  */
 
 #include "common/file.h"
+#include "common/memstream.h"
 #include "wasteland/gfx/image_decoder.h"
 
 namespace Wasteland {
@@ -29,18 +30,44 @@ namespace Gfx {
 
 bool ImageDecoder::load(const Common::Path &name, uint16 w, uint16 h) {
 	Common::File f;
+	Common::MemoryWriteStreamDynamic tmp(DisposeAfterUse::YES);
 
 	if (!f.open(name))
 		return false;
 
-	loadStream(f, w, h);
+	// Decompress the stream
+	loadStream(f, tmp);
+	assert((tmp.size() * 2) == (w * h));
+
+	// Create the surface and copy the data in
+	_surface.create(w, h);
+	Common::MemoryReadStream tmp2(tmp.getData(), tmp.size());
+	copyPixelsToSurface(tmp2);
+
 	return true;
 }
 
-#define OUTPUT_PIXEL(VAL) *dest++ = VAL >> 4; *dest++ = VAL & 0xF
+bool ImageDecoder::loadWelcome(const Common::Path &name) {
+	Common::File f;
+	Common::MemoryWriteStreamDynamic tmp(DisposeAfterUse::YES);
 
-void ImageDecoder::loadStream(Common::SeekableReadStream &stream, uint16 w, uint16 h) {
-	int size = stream.readUint32LE();
+	if (!f.open(name))
+		return false;
+
+	// Decompress the stream
+	loadStream(f, tmp);
+	assert(tmp.size() == 4236);
+
+	// Create the surface and copy the data in
+	_surface.create(96, 88);
+	Common::MemoryReadStream tmp2(tmp.getData() + 9, tmp.size() - 9);
+	copyPixelsToSurface(tmp2);
+
+	return true;
+}
+
+void ImageDecoder::loadStream(Common::ReadStream &src, Common::WriteStream &dest) {
+	int size = src.readUint32LE();
 	int bufferOffset = 0xfee;
 	int bitCtr = 1;
 	byte srcByte = 0, val = 0;
@@ -48,18 +75,13 @@ void ImageDecoder::loadStream(Common::SeekableReadStream &stream, uint16 w, uint
 	byte buffer[IMAGE_BUFFER_COUNT];
 	bool bit = false;
 
-	assert((size * 2) <= (w * h));
-	_decompressedSize = size;
-	_surface.create(w, h);
-	byte *dest = (byte *)_surface.getPixels();
-
 	Common::fill(&buffer[0], &buffer[IMAGE_BUFFER_COUNT], 0x20);
 
 	for (;;) {
 		// A single byte will use it's 8 bits to indicate where the following
 		// 8 'entries' are individual bytes to copy, or a sequence from the buffer
 		if (--bitCtr == 0) {
-			srcByte = stream.readByte();
+			srcByte = src.readByte();
 			bitCtr = 8;
 		}
 
@@ -67,8 +89,8 @@ void ImageDecoder::loadStream(Common::SeekableReadStream &stream, uint16 w, uint
 		srcByte >>= 1;
 		if (bit) {
 			// Output single byte
-			val = stream.readByte();
-			OUTPUT_PIXEL(val);
+			val = src.readByte();
+			dest.writeByte(val);
 
 			if (--size == 0)
 				return;
@@ -76,8 +98,8 @@ void ImageDecoder::loadStream(Common::SeekableReadStream &stream, uint16 w, uint
 			bufferOffset = (bufferOffset + 1) & 0xfff;
 		} else {
 			// Sequence from buffer
-			seq1 = stream.readByte();
-			seq2 = stream.readByte();
+			seq1 = src.readByte();
+			seq2 = src.readByte();
 			srcCount = (seq2 & 0xf) + 3;
 			seq2 >>= 4;
 			srcOffset = (seq2 << 8) | seq1;
@@ -85,13 +107,27 @@ void ImageDecoder::loadStream(Common::SeekableReadStream &stream, uint16 w, uint
 			while (srcCount-- > 0) {
 				val = buffer[srcOffset];
 				srcOffset = (srcOffset + 1) & 0xfff;
-				OUTPUT_PIXEL(val);
+				dest.writeByte(val);
 
 				if (--size == 0)
 					return;
 				buffer[bufferOffset] = val;
 				bufferOffset = (bufferOffset + 1) & 0xfff;
 			}
+		}
+	}
+}
+
+void ImageDecoder::copyPixelsToSurface(Common::SeekableReadStream &src) {
+	assert(!_surface.empty());
+
+	for (int y = 0; y < _surface.h; ++y) {
+		byte *dest = (byte *)_surface.getBasePtr(0, y);
+
+		for (int x = 0; x < _surface.w / 2; ++x) {
+			byte v = src.readByte();
+			*dest++ = v >> 4;
+			*dest++ = v & 0xf;
 		}
 	}
 }

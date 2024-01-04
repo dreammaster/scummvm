@@ -34,12 +34,34 @@ namespace Gfx {
 class ImageDecoder {
 private:
 	Graphics::ManagedSurface _surface;
-	size_t _decompressedSize = 0;
+
+	/**
+	 * Handles raw decompression of the s
+	 */
+	static void loadStream(Common::ReadStream &src, Common::WriteStream &dest);
+
+	/**
+	 * Copies a decompressed stream to the surface
+	 */
+	void copyPixelsToSurface(Common::SeekableReadStream &src);
 
 public:
-	void loadStream(Common::SeekableReadStream &stream, uint16 w, uint16 h);
+	/**
+	 * Loads an image into the internal _surface
+	*/
 	bool load(const Common::Path &name, uint16 w, uint16 h);
 
+	/**
+	 * Special variation for loading the Fountain of Dreams Welcome image.
+	 * It seems to maybe be a primitive collection format, with the first
+	 * byte being an image count (1 for welcome), and the next two bytes
+	 * being an offset to just after the first image, which starts at offset 9
+	 */
+	bool loadWelcome(const Common::Path &name);
+
+	/**
+	 * Returns the surface of the decoded image
+	 */
 	const Graphics::ManagedSurface *getSurface() const { return &_surface; }
 };
 

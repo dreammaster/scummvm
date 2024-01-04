@@ -32,6 +32,12 @@ class MenuView : public UIElement {
 private:
 	void drawBorders();
 
+protected:
+	/**
+	 * Writes the text under the portrait image
+	*/
+	void writePortraitText(const Common::String &str);
+
 public:
 	MenuView(const Common::String &name) : UIElement(name) {}
 	virtual ~MenuView() {}

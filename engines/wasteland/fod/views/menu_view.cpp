@@ -50,6 +50,11 @@ void MenuView::drawBorders() {
 	}
 }
 
+void MenuView::writePortraitText(const Common::String &str) {
+	Surface portrait = getSurface(Gfx::Window(1, 1, 12, 12));
+	portrait.writeCenteredString(str, 11);
+}
+
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland

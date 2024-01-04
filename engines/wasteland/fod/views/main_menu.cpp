@@ -54,15 +54,12 @@ bool MainMenu::msgKeypress(const KeypressMessage &msg) {
 		break;
 	}
 
-
 	return true;
 }
 
 void MainMenu::draw() {
 	MenuView::draw();
-
-	Surface portrait = getSurface(Gfx::Window(1, 0, 12, 11));
-	portrait.writeCenteredString("Welcome", 11);
+	writePortraitText("Welcome");
 
 	Surface main = getSurface(_mainArea);
 	main.writeCenteredString("Choose a function:", 1);
