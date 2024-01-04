@@ -20,12 +20,24 @@
  */
 
 #include "common/config-manager.h"
+#include "graphics/cursorman.h"
 #include "graphics/screen.h"
 #include "wasteland/events.h"
 #include "wasteland/engine.h"
 #include "wasteland/gfx/wasteland_font.h"
 
 namespace Wasteland {
+
+static const byte CURSOR_ARROW_DATA[8 * 8] = {
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00
+};
 
 Events *g_events;
 
@@ -43,6 +55,10 @@ void Events::runGame() {
 
 	// Performs game specific setup, including the view list
 	setup();
+
+	// Set the mouse cursor
+	CursorMan.replaceCursor(CURSOR_ARROW_DATA, 8, 8, 0, 0, 0);
+	CursorMan.showMouse(true);
 
 	// Run the game
 	int saveSlot = ConfMan.getInt("save_slot");
@@ -76,9 +92,20 @@ void Events::runGame() {
 	delete _screen;
 }
 
+#define SHOW_CURSOR           \
+	if (!_cursorVisible) {    \
+		CursorMan.showMouse(true); \
+		_cursorVisible = true; \
+	}
+
 void Events::processEvent(Common::Event &ev) {
 	switch (ev.type) {
 	case Common::EVENT_KEYDOWN:
+		if (_cursorVisible) {
+			CursorMan.showMouse(false);
+			_cursorVisible = false;
+		}
+
 		if (ev.kbd.keycode < Common::KEYCODE_NUMLOCK)
 			msgKeypress(KeypressMessage(ev.kbd));
 		break;
@@ -87,13 +114,16 @@ void Events::processEvent(Common::Event &ev) {
 		break;
 	case Common::EVENT_LBUTTONDOWN:
 	case Common::EVENT_RBUTTONDOWN:
-		//case Common::EVENT_MBUTTONDOWN:
+		SHOW_CURSOR
 		msgMouseDown(MouseDownMessage(ev.type, ev.mouse));
 		break;
 	case Common::EVENT_LBUTTONUP:
 	case Common::EVENT_RBUTTONUP:
-		//case Common::EVENT_MBUTTONUP:
+		SHOW_CURSOR
 		msgMouseUp(MouseUpMessage(ev.type, ev.mouse));
+		break;
+	case Common::EVENT_MOUSEMOVE:
+		SHOW_CURSOR
 		break;
 	default:
 		break;

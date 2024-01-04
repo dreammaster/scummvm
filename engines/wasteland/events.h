@@ -75,6 +75,7 @@ protected:
 	Bounds _bounds;
 	bool _needsRedraw = true;
 	Common::String _name;
+
 protected:
 	/**
 	 * Set a delay countdown in seconds, after which timeout() is called
@@ -259,6 +260,8 @@ class Events : public UIElement {
 private:
 	Graphics::Screen *_screen = nullptr;
 	Common::Stack<UIElement *> _views;
+	bool _cursorVisible = true;
+
 protected:
 	/**
 	 * Process an event
