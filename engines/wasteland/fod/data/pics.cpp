@@ -37,8 +37,8 @@ bool Pics::load() {
 
 	// Load data for drawing on-screen borders
 	borders.seek(5000);
-	_borders = new byte[40 * 25];
-	borders.read(_borders, 40 * 25);
+	_borders = new byte[TEXT_W * TEXT_H];
+	borders.read(_borders, TEXT_W * TEXT_H);
 	borders.close();
 
 	return true;

@@ -44,7 +44,7 @@ struct WastelandGameDescription;
 
 class Engine : public ::Engine, public Events {
 private:
-	const ADGameDescription *_gameDescription;
+	const WastelandGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
 protected:
 	// Engine APIs
@@ -61,7 +61,7 @@ public:
 	Graphics::Font *_font = nullptr;
 
 public:
-	Engine(OSystem *syst, const ADGameDescription *gameDesc);
+	Engine(OSystem *syst, const WastelandGameDescription *gameDesc);
 	~Engine() override;
 
 	uint32 getFeatures() const;
@@ -70,6 +70,11 @@ public:
 	 * Returns the game Id
 	 */
 	Common::String getGameId() const;
+
+	/**
+	 * Return the game type
+	 */
+	GameType getGameType() const;
 
 	/**
 	 * Gets a random number

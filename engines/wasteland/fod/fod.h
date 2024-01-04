@@ -34,16 +34,18 @@ namespace FOD {
 class FountainOfDreamsEngine : public Wasteland::Engine {
 private:
 	FOD::Views::Views *_views = nullptr;
-	Data::Disk1 _disk1;
-	bool _hasParty = false;
-	Data::Archetypes _archetypes;
-	Data::Pics _pics;
 
 protected:
 	void setup() override;
 
 public:
-	FountainOfDreamsEngine(OSystem *syst, const ADGameDescription *gameDesc);
+	Data::Disk1 _disk1;
+	bool _hasParty = false;
+	Data::Archetypes _archetypes;
+	Data::Pics _pics;
+
+public:
+	FountainOfDreamsEngine(OSystem *syst, const WastelandGameDescription *gameDesc);
 	~FountainOfDreamsEngine() override;
 };
 
