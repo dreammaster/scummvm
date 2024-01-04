@@ -31,6 +31,7 @@ namespace Views {
 
 class MainMenu : public MenuView {
 private:
+	Gfx::Window _mainArea;
 	Gfx::ClickableText _addMember;
 	Gfx::ClickableText _editMember;
 	Gfx::ClickableText _removeMember;

@@ -29,6 +29,7 @@ namespace FOD {
 namespace Views {
 
 MainMenu::MainMenu() : MenuView("MainMenu"),
+	_mainArea(0, 14, 39, 19),
 	_addMember("AddMember", this, 5, 17, "A)dd member", Common::KEYCODE_a),
 	_editMember("EditMember", this, 5, 18, "E)dit member", Common::KEYCODE_e),
 	_removeMember("RemoveMember", this, 22, 17, "R)emove member", Common::KEYCODE_r),
@@ -63,25 +64,54 @@ void MainMenu::draw() {
 	Surface portrait = getSurface(Gfx::Window(1, 0, 12, 11));
 	portrait.writeCenteredString("Welcome", 11);
 
-	Surface main = getSurface(Gfx::Window(0, 14, 39, 19));
+	Surface main = getSurface(_mainArea);
 	main.writeCenteredString("Choose a function:", 1);
 
 	UIElement::draw();
 }
 
 void MainMenu::addMember() {
+	if (g_engine->_disk1._partyCount < 3) {
+		addView("AddMember");
 
+	} else {
+		Surface main = getSurface(_mainArea);
+		main.clear();
+		main.writeCenteredString("The member roster is full!", 2);
+
+		delaySeconds(3);
+	}
 }
 
 void MainMenu::editMember() {
+	if (g_engine->_disk1._partyCount == 0) {
+		Surface main = getSurface(_mainArea);
+		main.clear();
+		main.writeCenteredString("There's no one to edit!", 2);
+
+		delaySeconds(3);
+
+	} else {
+		addView("EditMember");
+	}
 }
 
 void MainMenu::removeMember() {
+	if (g_engine->_disk1._partyCount == 0) {
+		Surface main = getSurface(_mainArea);
+		main.clear();
+		main.writeCenteredString("There's no one to remove!", 2);
+
+		delaySeconds(3);
+
+	} else {
+		addView("RemoveMember");
+	}
 }
 
 void MainMenu::playGame() {
 	if (g_engine->_disk1._partyCount == 0) {
-		Surface main = getSurface(Gfx::Window(0, 14, 39, 19));
+		Surface main = getSurface(_mainArea);
 		main.clear();
 		main.writeCenteredString("It's tough out there!", 1);
 		main.writeCenteredString("You should take somebody with you.", 3);
