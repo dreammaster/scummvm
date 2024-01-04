@@ -19,14 +19,81 @@
  *
  */
 
-#include "wasteland/gfx/image_decoder.h"2
+#include "common/file.h"
+#include "wasteland/gfx/image_decoder.h"
 
 namespace Wasteland {
 namespace Gfx {
 
-bool ImageDecoder::loadStream(Common::SeekableReadStream &stream) {
-	// TODO
+#define IMAGE_BUFFER_COUNT 0x1000
+
+bool ImageDecoder::load(const Common::Path &name, uint16 w, uint16 h) {
+	Common::File f;
+
+	if (!f.open(name))
+		return false;
+
+	loadStream(f, w, h);
 	return true;
+}
+
+#define OUTPUT_PIXEL(VAL) *dest++ = VAL >> 4; *dest++ = VAL & 0xF
+
+void ImageDecoder::loadStream(Common::SeekableReadStream &stream, uint16 w, uint16 h) {
+	int size = stream.readUint32LE();
+	int bufferOffset = 0xfee;
+	int bitCtr = 1;
+	byte srcByte = 0, val = 0;
+	int seq1 = 0, seq2 = 0, srcOffset = 0, srcCount = 0;
+	byte buffer[IMAGE_BUFFER_COUNT];
+	bool bit = false;
+
+	assert((size * 2) == (w * h));
+	_decompressedSize = size;
+	_surface.create(w, h);
+	byte *dest = (byte *)_surface.getPixels();
+
+	Common::fill(&buffer[0], &buffer[IMAGE_BUFFER_COUNT], 0x20);
+
+	for (;;) {
+		// A single byte will use it's 8 bits to indicate where the following
+		// 8 'entries' are individual bytes to copy, or a sequence from the buffer
+		if (--bitCtr == 0) {
+			srcByte = stream.readByte();
+			bitCtr = 8;
+		}
+
+		bit = (srcByte & 1) != 0;
+		srcByte >>= 1;
+		if (bit) {
+			// Output single byte
+			val = stream.readByte();
+			OUTPUT_PIXEL(val);
+
+			if (--size == 0)
+				return;
+			buffer[bufferOffset] = val;
+			bufferOffset = (bufferOffset + 1) & 0xfff;
+		} else {
+			// Sequence from buffer
+			seq1 = stream.readByte();
+			seq2 = stream.readByte();
+			srcCount = (seq2 & 0xf) + 3;
+			seq2 >>= 4;
+			srcOffset = (seq2 << 8) | seq1;
+
+			while (srcCount-- > 0) {
+				val = buffer[srcOffset];
+				srcOffset = (srcOffset + 1) & 0xfff;
+				OUTPUT_PIXEL(val);
+
+				if (--size == 0)
+					return;
+				buffer[bufferOffset] = val;
+				bufferOffset = (bufferOffset + 1) & 0xfff;
+			}
+		}
+	}
 }
 
 } // namespace Gfx

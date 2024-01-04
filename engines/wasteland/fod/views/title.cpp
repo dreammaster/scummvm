@@ -23,6 +23,7 @@
 #include "graphics/paletteman.h"
 #include "wasteland/fod/views/title.h"
 #include "wasteland/engine.h"
+#include "wasteland/gfx/image_decoder.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -39,6 +40,15 @@ bool Title::msgMouseDown(const MouseDownMessage &msg) {
 }
 
 void Title::draw() {
+	Surface s = getSurface();
+	Gfx::ImageDecoder decoder;
+
+	if (!decoder.load("TPICT", 320, 200))
+		error("Could not load TPICT");
+
+	s.blitFrom(*decoder.getSurface());
+
+#if 0
 	// Draw a bunch of squares on screen
 	Surface s = getSurface();
 	s.fillRect(Common::Rect(0, 0, 320, 200), 0xff);
@@ -47,6 +57,7 @@ void Title::draw() {
 
 	// Test font drawing
 	s.writeString("This is a test", 5, 5);
+	#endif
 }
 
 } // namespace Views

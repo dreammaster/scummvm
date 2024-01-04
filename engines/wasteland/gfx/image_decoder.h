@@ -22,7 +22,8 @@
 #ifndef WASTELAND_GFX_IMAGE_DECODER_H
 #define WASTELAND_GFX_IMAGE_DECODER_H
 
-#include "image/image_decoder.h"
+#include "graphics/managed_surface.h"
+#include "common/stream.h"
 
 namespace Wasteland {
 namespace Gfx {
@@ -30,15 +31,16 @@ namespace Gfx {
 /**
  * Implements an image decoder for Wasteland image files
  */
-class ImageDecoder : public Image::ImageDecoder {
+class ImageDecoder {
 private:
-	Graphics::Surface *_surface = nullptr;
+	Graphics::ManagedSurface _surface;
+	size_t _decompressedSize = 0;
 
 public:
-	ImageDecoder() : Image::ImageDecoder() {}
-	~ImageDecoder() override {}
+	void loadStream(Common::SeekableReadStream &stream, uint16 w, uint16 h);
+	bool load(const Common::Path &name, uint16 w, uint16 h);
 
-	bool loadStream(Common::SeekableReadStream &stream) override;
+	const Graphics::ManagedSurface *getSurface() const { return &_surface; }
 };
 
 } // namespace Gfx
