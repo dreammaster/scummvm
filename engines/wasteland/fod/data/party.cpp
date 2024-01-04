@@ -164,8 +164,25 @@ bool Disk1::load(bool &hasParty) {
 
 	hasParty = _field2 || _field0;
 
-	if (!hasParty)
+	if (!hasParty) {
 		resetRoster();
+
+		_fieldE = 100;
+		_field10 = 0;
+		_field8 = 9;
+		_field9 = 0;
+		_field37 = 1;
+		_field7 = 0;
+		_field38 = 0;
+		_fieldA = 10;
+		_fieldC = 6;
+		_field30 = 0;
+		_field12 = 28;
+		_field1C = 10;
+		_field26 = 6;
+		_field7B6 = 0;
+		_partyCount = 0;
+	}
 
 	return true;
 }
