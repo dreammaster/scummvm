@@ -43,7 +43,7 @@ WastelandFont::~WastelandFont() {
 
 void WastelandFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
 	assert(chr < _count);
-	assert(x >= 0 && y >= 0 && x < (dst->w - 8) && y < (dst->h - 8));
+	assert(x >= 0 && y >= 0 && x <= (dst->w - 8) && y <= (dst->h - 8));
 	const byte *src = &_data[chr * 32];
 
 	for (int yCtr = 0; yCtr < 8; ++yCtr) {
@@ -52,6 +52,9 @@ void WastelandFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, u
 		// The 8 pixels of the font character are stored in 4 nibbles
 		uint32 srcVal = READ_LE_UINT32(src);
 		src += 4;
+		if (color == -1)
+			// Drawing inverse colors
+			srcVal ^= 0xffffffff;
 
 		for (int xCtr = 0; xCtr < 4; ++xCtr, srcVal >>= 8) {
 			*dest++ = (srcVal >> 4) & 0xf;

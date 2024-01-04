@@ -53,7 +53,8 @@ const ADExtraGuiOptionsMap *WastelandMetaEngine::getAdvancedExtraGuiOptions() co
 }
 
 Common::Error WastelandMetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const {
-	*engine = new Wasteland::FOD::FountainOfDreamsEngine(syst, desc);
+	*engine = new Wasteland::FOD::FountainOfDreamsEngine(syst,
+		(const Wasteland::WastelandGameDescription *)desc);
 	return Common::kNoError;
 }
 

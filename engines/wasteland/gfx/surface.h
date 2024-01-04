@@ -27,6 +27,9 @@
 namespace Wasteland {
 namespace Gfx {
 
+#define TEXT_W 40
+#define TEXT_H 25
+
 typedef Common::Rect Window;
 
 /**
@@ -53,6 +56,8 @@ public:
 	void writeString(const Common::String &str, int x, int y);
 	void writeCenteredString(const Common::String &str, int y);
 	void writeChar(unsigned char c);
+
+	void drawBorders();
 };
 
 } // namespace Gfx

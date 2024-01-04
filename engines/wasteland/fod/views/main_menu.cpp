@@ -37,6 +37,7 @@ bool MainMenu::msgKeypress(const KeypressMessage &msg) {
 void MainMenu::draw() {
 	Surface s = getSurface();
 	s.clear();
+	s.drawBorders();
 
 	// TODO: Draw frame
 

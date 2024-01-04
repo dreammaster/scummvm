@@ -34,7 +34,7 @@ namespace Wasteland {
 
 Engine *g_engine;
 
-Engine::Engine(OSystem *syst, const ADGameDescription *gameDesc) : ::Engine(syst),
+Engine::Engine(OSystem *syst, const WastelandGameDescription *gameDesc) : ::Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Wasteland") {
 	g_engine = this;
 }
@@ -43,11 +43,15 @@ Engine::~Engine() {
 }
 
 uint32 Engine::getFeatures() const {
-	return _gameDescription->flags;
+	return _gameDescription->desc.flags;
 }
 
 Common::String Engine::getGameId() const {
-	return _gameDescription->gameId;
+	return _gameDescription->desc.gameId;
+}
+
+GameType Engine::getGameType() const {
+	return (GameType)_gameDescription->gameType;
 }
 
 Common::Error Engine::run() {
