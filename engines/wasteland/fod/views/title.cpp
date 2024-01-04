@@ -43,8 +43,9 @@ void Title::draw() {
 	Surface s = getSurface();
 	Gfx::ImageDecoder decoder;
 
-	if (!decoder.load("TPICT", 320, 200))
-		error("Could not load TPICT");
+	decoder.load("GANI", 96, 96);
+		//	if (!decoder.load("TPICT", 320, 200))
+//		error("Could not load TPICT");
 
 	s.blitFrom(*decoder.getSurface());
 

@@ -48,7 +48,7 @@ void ImageDecoder::loadStream(Common::SeekableReadStream &stream, uint16 w, uint
 	byte buffer[IMAGE_BUFFER_COUNT];
 	bool bit = false;
 
-	assert((size * 2) == (w * h));
+	assert((size * 2) <= (w * h));
 	_decompressedSize = size;
 	_surface.create(w, h);
 	byte *dest = (byte *)_surface.getPixels();

@@ -32,6 +32,10 @@ void MenuView::draw() {
 	Surface s = getSurface();
 	s.clear();
 	drawBorders();
+
+	// Draw the welcome portrait
+	Surface portrait = getSurface(Gfx::Window(1, 1, 12, 11));
+	portrait.blitFrom(*g_engine->_pics._welcome.getSurface());
 }
 
 void MenuView::drawBorders() {

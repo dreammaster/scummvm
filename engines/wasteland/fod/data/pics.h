@@ -24,6 +24,7 @@
 
 #include "wasteland/engine.h"
 #include "wasteland/fod/views/views.h"
+#include "wasteland/gfx/image_decoder.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -31,7 +32,7 @@ namespace Data {
 
 struct Pics {
 	byte *_borders = nullptr;
-
+	Gfx::ImageDecoder _welcome;
 	~Pics();
 
 	bool load();
