@@ -19,14 +19,33 @@
  *
  */
 
-#ifndef WASTELAND_FOD_DATA_PROFESSIONS_H
-#define WASTELAND_FOD_DATA_PROFESSIONS_H
+#ifndef WASTELAND_FOD_DATA_ARCHETYPES_H
+#define WASTELAND_FOD_DATA_ARCHETYPES_H
 
-#include "common/serializer.h"
+#include "common/stream.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Data {
+
+#define PROFESSIONS_COUNT 5
+
+struct Profession {
+	Common::String _name;
+	byte _attributes[7];
+	byte _field33;
+	byte _activeSkills[16];
+	byte _passiveSkills[16];
+	byte _field7B;
+
+	void load(Common::SeekableReadStream &src);
+};
+
+struct Archetypes {
+	Profession _professions[PROFESSIONS_COUNT];
+
+	bool load();
+};
 
 } // namespace Data
 } // namespace FOD
