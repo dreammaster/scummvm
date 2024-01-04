@@ -29,9 +29,6 @@ namespace FOD {
 namespace Views {
 
 class MainMenu : public UIElement {
-private:
-	Common::String _errorMessage;
-
 public:
 	MainMenu() : UIElement("MainMenu") {}
 	virtual ~MainMenu() {}

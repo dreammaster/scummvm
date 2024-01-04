@@ -39,8 +39,13 @@ void MainMenu::draw() {
 	s.clear();
 	s.drawBorders();
 
-	// TODO: Draw frame
+	Surface portrait = getSurface(Gfx::Window(1, 0, 12, 11));
+	portrait.writeCenteredString("Welcome", 11);
 
+	Surface main = getSurface(Gfx::Window(0, 14, 39, 19));
+	main.writeCenteredString("Choose a function:", 1);
+	main.writeString("A)dd member      R)emove member", 5, 3);
+	main.writeString("E)dit member     P)lay the game", 5, 4);
 }
 
 } // namespace Views
