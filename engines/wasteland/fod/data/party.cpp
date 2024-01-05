@@ -19,8 +19,9 @@
  *
  */
 
-#include "wasteland/fod/data/party.h"
 #include "common/file.h"
+#include "wasteland/fod/data/party.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -49,7 +50,7 @@ void PartyMember::synchronize(Common::Serializer &s) {
 
 	s.syncBytes(_attributes, ATTRIBUTES_COUNT);
 	s.syncAsUint32LE(_unknown1);
-	s.syncAsByte(_field23);
+	s.syncAsByte(_attributesRemaining);
 	s.syncBytes(_activeSkills, SKILLS_COUNT);
 	s.syncBytes(_passiveSkills, SKILLS_COUNT);
 	s.syncAsUint16LE(_con);
@@ -114,6 +115,10 @@ void PartyMember::reset() {
 	_field56 = 0;
 	_field57 = 0;
 	_field49 = 0;
+}
+
+const Profession &PartyMember::getProfession() const {
+	return g_engine->_archetypes._professions[_profession];
 }
 
 void Roster::synchronize(Common::Serializer &s) {

@@ -24,6 +24,7 @@
 
 #include "wasteland/engine.h"
 #include "wasteland/fod/views/views.h"
+#include "wasteland/fod/data/archetypes.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -54,7 +55,7 @@ struct PartyMember {
 	Common::String _name;
 	byte _attributes[ATTRIBUTES_COUNT];
 	uint32 _unknown1;
-	byte _field23;
+	byte _attributesRemaining;
 	byte _activeSkills[SKILLS_COUNT];
 	byte _passiveSkills[SKILLS_COUNT];
 	uint16 _con;
@@ -89,6 +90,8 @@ struct PartyMember {
 	void synchronize(Common::Serializer &s);
 
 	void reset();
+
+	const Profession &getProfession() const;
 };
 
 class Roster {

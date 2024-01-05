@@ -34,7 +34,7 @@ void Profession::load(Common::SeekableReadStream &src) {
 	buf[15] = '\0';
 	_name = Common::String((const char *)buf);
 	Common::copy(&buf[0x14], &buf[0x1b], _attributes);
-	_field33 = buf[0x33];
+	_attributePoints = buf[0x33];
 	Common::copy(&buf[0x38], &buf[0x48], _activeSkills);
 	Common::copy(&buf[0x48], &buf[0x58], _passiveSkills);
 	_unkMin = READ_LE_UINT16(buf + 0x70);

@@ -19,39 +19,8 @@
  *
  */
 
-#ifndef WASTELAND_GFX_CLICKABLE_TEXT_H
-#define WASTELAND_GFX_CLICKABLE_TEXT_H
-
-#include "wasteland/events.h"
+#include "wasteland/core/array.h"
 
 namespace Wasteland {
-namespace Gfx {
 
-class ClickableText : public UIElement {
-private:
-	Common::String _text;
-	bool _inverseColor = false;
-	Common::KeyCode _keycode;
-	Common::String _message;
-	int _tag = 0;
-
-public:
-	ClickableText(const Common::String &name, UIElement *owner, int x, int y,
-		const Common::String &text, Common::KeyCode keycode);
-	ClickableText(const Common::String &name, UIElement *owner, int x, int y,
-				  const Common::String &text, const Common::String &message, int tag = 0);
-
-	void draw() override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-
-	void setInverseColor(bool isInverse) {
-		_inverseColor = isInverse;
-		redraw();
-	}
-	void setText(const Common::String &text);
-};
-
-} // namespace Gfx
 } // namespace Wasteland
-
-#endif

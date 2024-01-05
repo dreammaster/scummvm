@@ -26,6 +26,27 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
+struct AttributePrefix {
+	int _x;
+	int _y;
+	const char *_text;
+};
+
+static const AttributePrefix ATTRIBUTE_PREFIXES[8] = {
+	{21, 2, "ST:"},
+	{21, 3, "IQ:"},
+	{21, 4, "DX:"},
+	{21, 5, "WP:"},
+	{30, 2, "AP:"},
+	{30, 3, "CH:"},
+	{30, 4, "LK:"},
+	{29, 5, "Sex:"}
+};
+
+// Yes, the original did in fact have an 'Other' sex option, though character
+// creation didn't allow you to see it
+static const char *SEX_NAMES[3] = {"Other", "Male", "Female"};
+
 EditMember::EditMember() : MenuView("EditMember"),
 	_mainArea(0, 14, 39, 19),
 	_profession11("Profession11", nullptr, 4, 17, "1)Survivalist", Common::KEYCODE_1),
@@ -38,6 +59,14 @@ EditMember::EditMember() : MenuView("EditMember"),
 	_profession23("Profession23", nullptr, 0, 17, "3)Medic", Common::KEYCODE_3),
 	_profession24("Profession24", nullptr, 0, 18, "4)Hood", Common::KEYCODE_4),
 	_profession25("Profession25", nullptr, 0, 19, "5)Mechanic", Common::KEYCODE_5),
+	_attr0("Attr0", nullptr, ATTRIBUTE_PREFIXES[0]._x + 3, 14 + ATTRIBUTE_PREFIXES[0]._y, "", "ATTR_CLICK", 0),
+	_attr1("Attr1", nullptr, ATTRIBUTE_PREFIXES[1]._x + 3, 14 + ATTRIBUTE_PREFIXES[1]._y, "", "ATTR_CLICK", 1),
+	_attr2("Attr2", nullptr, ATTRIBUTE_PREFIXES[2]._x + 3, 14 + ATTRIBUTE_PREFIXES[2]._y, "", "ATTR_CLICK", 2),
+	_attr3("Attr3", nullptr, ATTRIBUTE_PREFIXES[3]._x + 3, 14 + ATTRIBUTE_PREFIXES[3]._y, "", "ATTR_CLICK", 3),
+	_attr4("Attr4", nullptr, ATTRIBUTE_PREFIXES[4]._x + 3, 14 + ATTRIBUTE_PREFIXES[4]._y, "", "ATTR_CLICK", 4),
+	_attr5("Attr5", nullptr, ATTRIBUTE_PREFIXES[5]._x + 3, 14 + ATTRIBUTE_PREFIXES[5]._y, "", "ATTR_CLICK", 5),
+	_attr6("Attr6", nullptr, ATTRIBUTE_PREFIXES[6]._x + 3, 14 + ATTRIBUTE_PREFIXES[6]._y, "", "ATTR_CLICK", 6),
+	_attr7("Attr7", nullptr, ATTRIBUTE_PREFIXES[7]._x + 5, 14 + ATTRIBUTE_PREFIXES[7]._y, "", "ATTR_CLICK", 7),
 	_nameEntry("NameEntry", nullptr, 4, 22, 12) {
 
 	_professions1[0] = &_profession11;
@@ -50,6 +79,15 @@ EditMember::EditMember() : MenuView("EditMember"),
 	_professions2[2] = &_profession23;
 	_professions2[3] = &_profession24;
 	_professions2[4] = &_profession25;
+
+	_attributes[0] = &_attr0;
+	_attributes[1] = &_attr1;
+	_attributes[2] = &_attr2;
+	_attributes[3] = &_attr3;
+	_attributes[4] = &_attr4;
+	_attributes[5] = &_attr5;
+	_attributes[6] = &_attr6;
+	_attributes[7] = &_attr7;
 }
 
 bool EditMember::msgGame(const GameMessage& msg) {
@@ -59,6 +97,12 @@ bool EditMember::msgGame(const GameMessage& msg) {
 
 	} else if (msg._name == "EDIT_MEMBER") {
 		editMember(msg._value);
+		return true;
+
+	} else if (msg._name == "ATTR_CLICK") {
+		_selectedAttribute = msg._value;
+		changeAttribute(_selectedAttribute, msg._stringValue == "LEFT" ? -1 : 1);
+		redraw();
 		return true;
 	}
 
@@ -85,6 +129,9 @@ void EditMember::setMode(Mode mode) {
 
 		for (int i = 0; i < 5; ++i)
 			_professions2[i]->setParent(this);
+
+		for (int i = 0; i < 8; ++i)
+			_attributes[i]->setParent(this);
 		break;
 	}
 }
@@ -115,6 +162,7 @@ void EditMember::draw() {
 	case EDIT_STATS:
 		writePortraitText(g_engine->_archetypes._professions[_profession]._name);
 		writeSkills();
+		writeAttributes();
 		break;
 
 	default:
@@ -135,6 +183,7 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 
 			setMode(EDIT_STATS);
 			redraw();
+			return true;
 		}
 		break;
 
@@ -148,6 +197,37 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 			}
 			return true;
 
+		case Common::KEYCODE_1:
+		case Common::KEYCODE_2:
+		case Common::KEYCODE_3:
+		case Common::KEYCODE_4:
+		case Common::KEYCODE_5:
+			// Switch to another profession
+			_profession = msg.keycode - Common::KEYCODE_F1;
+			createNewMember();
+			redraw();
+			return true;
+
+		case Common::KEYCODE_UP:
+			_selectedAttribute = (_selectedAttribute == 0) ? 7 : _selectedAttribute - 1;
+			redraw();
+			return true;
+
+		case Common::KEYCODE_DOWN:
+			_selectedAttribute = (_selectedAttribute + 1) % 8;
+			redraw();
+			break;
+
+		case Common::KEYCODE_LEFT:
+			changeAttribute(_selectedAttribute, -1);
+			redraw();
+			break;
+
+		case Common::KEYCODE_RIGHT:
+			changeAttribute(_selectedAttribute, 1);
+			redraw();
+			break;
+
 		default:
 			break;
 		}
@@ -157,20 +237,18 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 		break;
 	}
 
-	return true;
+	return false;
 }
 
 void EditMember::createNewMember() {
 	Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
 	Data::Profession &prof = g_engine->_archetypes._professions[_profession];
 
-	// TODO: Origiinal uses loop to clear 12 bytes. Is attributes that large,
-	// or is it just using a hack to clear the following fields
-	member._unknown1 = member._field23 = 0;
+	member._unknown1 = 0;
 
 	// Copy over the base attributes and skills for the profession
 	Common::copy(prof._attributes, prof._attributes + ATTRIBUTES_COUNT, member._attributes);
-	member._field23 = prof._field33;
+	member._attributesRemaining = prof._attributePoints;
 	Common::copy(prof._activeSkills, prof._activeSkills + SKILLS_COUNT, member._activeSkills);
 	Common::copy(prof._passiveSkills, prof._passiveSkills + SKILLS_COUNT, member._passiveSkills);
 	Common::fill(member._activeSkills2, member._activeSkills2 + SKILLS_COUNT, 0);
@@ -218,6 +296,54 @@ void EditMember::writeSkills() {
 			++passiveCount;
 		}
 	}
+}
+
+void EditMember::writeAttributes() {
+	Surface s = getSurface(Gfx::Window(0, 14, 39, 19));
+	const Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
+
+	s.writeString(Common::String::format("Attribute Pts: <-%d->",
+		member._attributesRemaining).c_str(), 19, 0);
+
+	// Write out the attribute headers. Note that we don't need to write the values,
+	// since we represent them as clickable text child components
+	for (int i = 0; i < 8; ++i) {
+		const AttributePrefix &pr = ATTRIBUTE_PREFIXES[i];
+		s.writeString(pr._text, pr._x, pr._y);
+	}
+
+	// Update the text of the attributes, in preparation for when they're later drawn
+	for (int i = 0; i < 7; ++i) {
+		_attributes[i]->setText(Common::String::format("%d", member._attributes[i]));
+		_attributes[i]->setInverseColor(i == _selectedAttribute);
+	}
+
+	_attr7.setText(SEX_NAMES[member._sex]);
+	_attr7.setInverseColor(_selectedAttribute == 7);
+}
+
+void EditMember::changeAttribute(int attrNum, int delta) {
+	Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
+	const Data::Profession &prof = member.getProfession();
+
+	if (attrNum == 7) {
+		// Cycle through available sexes. As an enhancement for ScummVM,
+		// I've enabled the selection of the originally suppressed 'Other' sex
+		member._sex = (member._sex == Data::SEX_OTHER && delta == -1) ? Data::SEX_FEMALE :
+			(member._sex + delta) % 3;
+
+	} else if (delta < 0 && member._attributes[attrNum] > prof._attributes[attrNum]) {
+		// Only allow decreasing attributes above the minimum for profession
+		delta = -delta;
+		member._attributes[attrNum] -= delta;
+		member._attributesRemaining += delta;
+
+	} else if (delta > 0 && member._attributes[attrNum] < 20) {
+		member._attributes[attrNum] += delta;
+		member._attributesRemaining -= delta;			
+	}
+
+	redraw();
 }
 
 } // namespace Views
