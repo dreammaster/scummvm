@@ -210,7 +210,26 @@ void EditMember::writeSkills() {
 	skillsArea.writeCenteredString("Skills", 0);
 	skillsArea.writeCenteredString("Active      Passive", 1);
 
+	int skillLevel, activeCount = 0, passiveCount = 0;
 
+	// List active skills
+	for (int skillNum = 0; skillNum < SKILLS_COUNT; ++skillNum) {
+		skillLevel = prof._activeSkills[skillNum];
+		if (skillLevel) {
+			skillsArea.writeString(Common::String::format("%1d %-10.10s",
+				skillLevel, g_engine->_hds._activeSkillNames[skillNum].c_str()),
+				0, activeCount + 3);
+			++activeCount;
+		}
+
+		skillLevel = prof._passiveSkills[skillNum];
+		if (skillLevel) {
+			skillsArea.writeString(Common::String::format("%1d %-10.10s",
+				skillLevel, g_engine->_hds._passiveSkillNames[skillNum].c_str()),
+				13, passiveCount + 3);
+			++passiveCount;
+		}
+	}
 }
 
 } // namespace Views

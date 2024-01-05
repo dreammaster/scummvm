@@ -24,6 +24,7 @@
 
 #include "wasteland/engine.h"
 #include "wasteland/fod/views/views.h"
+#include "wasteland/fod/data/hds.h"
 #include "wasteland/fod/data/party.h"
 #include "wasteland/fod/data/archetypes.h"
 #include "wasteland/fod/data/pics.h"
@@ -39,9 +40,9 @@ protected:
 	void setup() override;
 
 public:
-	Data::Disk1 _disk1;
-	bool _hasParty = false;
 	Data::Archetypes _archetypes;
+	Data::Disk1 _disk1;
+	Data::HDS _hds;
 	Data::Pics _pics;
 
 public:
