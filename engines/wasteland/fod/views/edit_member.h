@@ -32,11 +32,26 @@ namespace Views {
 class EditMember : public MenuView {
 	enum Mode { SELECT_PROFESSION, EDIT_STATS};
 private:
+	Gfx::ClickableText _profession11;
+	Gfx::ClickableText _profession12;
+	Gfx::ClickableText _profession13;
+	Gfx::ClickableText _profession14;
+	Gfx::ClickableText _profession15;
+	Gfx::ClickableText *_professions1[5];
+	Gfx::ClickableText _profession21;
+	Gfx::ClickableText _profession22;
+	Gfx::ClickableText _profession23;
+	Gfx::ClickableText _profession24;
+	Gfx::ClickableText _profession25;
+	Gfx::ClickableText *_professions2[5];
+
 	Mode _mode = SELECT_PROFESSION;
 	Gfx::Window _mainArea;
 	int _rosterNum = -1;
+	int _profession = 0;
 
 	void addMember();
+	void createNewMember();
 	void editMember(int rosterNum);
 
 public:
@@ -44,6 +59,7 @@ public:
 	virtual ~EditMember() {}
 
 	bool msgGame(const GameMessage &msg) override;
+	bool msgMouseDown(const MouseDownMessage &msg) override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 	void draw() override;
 };
