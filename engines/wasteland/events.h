@@ -25,6 +25,7 @@
 #include "common/array.h"
 #include "common/stack.h"
 #include "graphics/screen.h"
+#include "wasteland/core/array.h"
 #include "wasteland/messages.h"
 #include "wasteland/gfx/surface.h"
 
@@ -71,7 +72,7 @@ private:
 	int _timeoutCtr = 0;
 protected:
 	UIElement *_parent;
-	Common::Array<UIElement *> _children;
+	Array<UIElement *> _children;
 	Common::Rect _innerBounds;
 	Bounds _bounds;
 	bool _needsRedraw = true;
@@ -122,6 +123,11 @@ public:
 	UIElement(const Common::String &name, UIElement *uiParent);
 	UIElement(const Common::String &name);
 	virtual ~UIElement() {}
+
+	/**
+	 * Changes the parent of an element
+	 */
+	void setParent(UIElement *newParent);
 
 	/**
 	 * Returns true if the elements needs to be redrawn

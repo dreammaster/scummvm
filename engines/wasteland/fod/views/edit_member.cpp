@@ -38,8 +38,8 @@ EditMember::EditMember() : MenuView("EditMember"),
 	_profession23("Profession23", nullptr, 0, 17, "3)Medic", Common::KEYCODE_3),
 	_profession24("Profession24", nullptr, 0, 18, "4)Hood", Common::KEYCODE_4),
 	_profession25("Profession25", nullptr, 0, 19, "5)Mechanic", Common::KEYCODE_5),
-	_f1("F1", nullptr, 0, 22, "F1>", Common::KEYCODE_F1),
-	_f2("F2", nullptr, 0, 23, "F2>", Common::KEYCODE_F2),
+	_f1("F1", nullptr, 1, 22, "F1>", Common::KEYCODE_F1),
+	_f2("F2", nullptr, 1, 23, "F2>", Common::KEYCODE_F2),
 	_nameEntry("NameEntry", nullptr, 4, 22, 12) {
 
 	_professions1[0] = &_profession11;
@@ -70,9 +70,34 @@ bool EditMember::msgGame(const GameMessage& msg) {
 	return false;
 }
 
+void EditMember::setMode(Mode mode) {
+	_mode = mode;
+
+	for (int i = _children.size() - 1; i >= 0; --i)
+		_children[i]->setParent(nullptr);
+	assert(_children.empty());
+
+	switch (mode) {
+	case SELECT_PROFESSION:
+		for (int i = 0; i < 5; ++i)
+			_professions1[i]->setParent(this);
+		break;
+
+	case EDIT_STATS:
+		// Add the F1 and optionally F2 character selectors
+		_f1.setParent(this);
+		if (g_engine->_disk1._partyCount > 1)
+			_f2.setParent(this);
+
+		for (int i = 0; i < 5; ++i)
+			_professions2[i]->setParent(this);
+		break;
+	}
+}
+
 void EditMember::addMember() {
 	_rosterNum = g_engine->_disk1._partyCount;
-	_mode = SELECT_PROFESSION;
+	setMode(SELECT_PROFESSION);
 	addView("EditMember");
 }
 
@@ -91,8 +116,8 @@ void EditMember::draw() {
 		Surface main = getSurface(_mainArea);
 		main.writeCenteredString("Choose a Profession:", 1);
 
-		for (int i = 0; i < 5; ++i)
-			_professions1[i]->draw();
+//		for (int i = 0; i < 5; ++i)
+//			_professions1[i]->draw();
 		break;
 	}
 
@@ -100,8 +125,8 @@ void EditMember::draw() {
 		writePortraitText(g_engine->_archetypes._professions[_profession]._name);
 		writeSkills();
 
-		for (int i = 0; i < 5; ++i)
-			_professions2[i]->draw();
+//		for (int i = 0; i < 5; ++i)
+//			_professions2[i]->draw();
 
 		_nameEntry.draw();
 		break;
@@ -122,7 +147,7 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 			Data::PartyMember &member = g_engine->_disk1._roster[_rosterNum];
 			member._name = "Ojnab Bob";
 
-			_mode = EDIT_STATS;
+			setMode(EDIT_STATS);
 			redraw();
 		}
 		break;
@@ -138,7 +163,8 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 			return true;
 
 		default:
-			return _nameEntry.msgKeypress(msg);
+			break;
+			//return _nameEntry.msgKeypress(msg);
 		}
 		break;
 
@@ -150,6 +176,7 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 }
 
 bool EditMember::msgMouseDown(const MouseDownMessage& msg) {
+	/*
 	switch (_mode) {
 	case SELECT_PROFESSION:
 		for (int i = 0; i < 5; ++i) {
@@ -168,7 +195,7 @@ bool EditMember::msgMouseDown(const MouseDownMessage& msg) {
 	default:
 		break;
 	}
-
+	*/
 	return false;
 }
 

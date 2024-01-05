@@ -253,6 +253,15 @@ UIElement::UIElement(const Common::String &name, UIElement *uiParent) :
 		_parent->_children.push_back(this);
 }
 
+void UIElement::setParent(UIElement *newParent) {
+	if (_parent)
+		_parent->_children.remove(this);
+
+	_parent = newParent;
+	if (_parent)
+		_parent->_children.push_back(this);
+}
+
 void UIElement::redraw() {
 	_needsRedraw = true;
 
@@ -293,9 +302,6 @@ void UIElement::clearSurface() {
 }
 
 void UIElement::draw() {
-	for (size_t i = 0; i < _children.size(); ++i) {
-		_children[i]->draw();
-	}
 }
 
 bool UIElement::tick() {
