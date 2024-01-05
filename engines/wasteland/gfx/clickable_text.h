@@ -31,6 +31,7 @@ class ClickableText : public UIElement {
 private:
 	Common::String _text;
 	Common::KeyCode _keycode;
+	bool _inverseColor = false;
 
 public:
 	ClickableText(const Common::String &name, UIElement *uiParent, int x, int y,
@@ -38,6 +39,11 @@ public:
 
 	void draw() override;
 	bool msgMouseDown(const MouseDownMessage &msg) override;
+
+	void setInverseColor(bool isInverse) {
+		_inverseColor = isInverse;
+		redraw();
+	}
 };
 
 } // namespace Gfx

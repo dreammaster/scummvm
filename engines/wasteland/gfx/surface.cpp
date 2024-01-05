@@ -93,6 +93,7 @@ void Surface::writeCenteredString(const Common::String &str, int y) {
 
 void Surface::writeChar(unsigned char c) {
 	g_engine->_font->drawChar(this, c, _textX * FONT_W, _textY * FONT_H, _inverseColor ? -1 : 1);
+	++_textX;
 }
 
 void Surface::setTextPos(int x, int y) {

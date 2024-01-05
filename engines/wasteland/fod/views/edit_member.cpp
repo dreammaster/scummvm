@@ -37,8 +37,11 @@ EditMember::EditMember() : MenuView("EditMember"),
 	_profession22("Profession22", nullptr, 0, 16, "2)Vigilante", Common::KEYCODE_2),
 	_profession23("Profession23", nullptr, 0, 17, "3)Medic", Common::KEYCODE_3),
 	_profession24("Profession24", nullptr, 0, 18, "4)Hood", Common::KEYCODE_4),
-	_profession25("Profession25", nullptr, 0, 19, "5)Mechanic", Common::KEYCODE_5)
-{
+	_profession25("Profession25", nullptr, 0, 19, "5)Mechanic", Common::KEYCODE_5),
+	_f1("F1", nullptr, 0, 22, "F1>", Common::KEYCODE_F1),
+	_f2("F2", nullptr, 0, 23, "F2>", Common::KEYCODE_F2),
+	_nameEntry("NameEntry", nullptr, 4, 22, 12) {
+
 	_professions1[0] = &_profession11;
 	_professions1[1] = &_profession12;
 	_professions1[2] = &_profession13;
@@ -49,6 +52,9 @@ EditMember::EditMember() : MenuView("EditMember"),
 	_professions2[2] = &_profession23;
 	_professions2[3] = &_profession24;
 	_professions2[4] = &_profession25;
+
+	_f1.setInverseColor(true);
+	_f2.setInverseColor(true);
 }
 
 bool EditMember::msgGame(const GameMessage& msg) {
@@ -92,9 +98,12 @@ void EditMember::draw() {
 
 	case EDIT_STATS:
 		writePortraitText(g_engine->_archetypes._professions[_profession]._name);
+		writeSkills();
 
 		for (int i = 0; i < 5; ++i)
 			_professions2[i]->draw();
+
+		_nameEntry.draw();
 		break;
 
 	default:
@@ -107,6 +116,7 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 	case SELECT_PROFESSION:
 		if (msg.keycode >= Common::KEYCODE_1 && msg.keycode <= Common::KEYCODE_5) {
 			_profession = msg.keycode - Common::KEYCODE_1;
+			g_engine->_disk1._partyCount++;
 
 			createNewMember();
 			Data::PartyMember &member = g_engine->_disk1._roster[_rosterNum];
@@ -114,6 +124,21 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 
 			_mode = EDIT_STATS;
 			redraw();
+		}
+		break;
+
+	case EDIT_STATS:
+		switch (msg.keycode) {
+		case Common::KEYCODE_F1:
+		case Common::KEYCODE_F2:
+			if (msg.keycode == Common::KEYCODE_F1 || g_engine->_disk1._partyCount == 2) {
+				_rosterNum = msg.keycode - Common::KEYCODE_F1;
+				redraw();
+			}
+			return true;
+
+		default:
+			return _nameEntry.msgKeypress(msg);
 		}
 		break;
 
@@ -167,6 +192,25 @@ void EditMember::createNewMember() {
 	member._profession = _profession;
 	member._field51 = prof._field7B;
 	member._sex = Data::SEX_MALE;
+}
+
+void EditMember::setupMemberCon() {
+	Data::PartyMember &member = g_engine->_disk1._roster[_rosterNum];
+	Data::Profession &prof = g_engine->_archetypes._professions[_profession];
+
+	member._con = member._conTemp = member._conBase =
+		g_engine->getRandomNumber(prof._unkMin, prof._unkMax);
+}
+
+void EditMember::writeSkills() {
+	Data::PartyMember &member = g_engine->_disk1._roster[_rosterNum];
+	Data::Profession &prof = g_engine->_archetypes._professions[member._profession];
+
+	Surface skillsArea = getSurface(Gfx::Window(14, 1, 38, 12));
+	skillsArea.writeCenteredString("Skills", 0);
+	skillsArea.writeCenteredString("Active      Passive", 1);
+
+
 }
 
 } // namespace Views
