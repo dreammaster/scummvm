@@ -13,6 +13,7 @@ MODULE_OBJS = \
 	gfx/wasteland_font.o \
 	fod/fod.o \
 	fod/data/archetypes.o \
+	fod/data/hds.o \
 	fod/data/party.o \
 	fod/data/pics.o \
 	fod/views/edit_member.o \

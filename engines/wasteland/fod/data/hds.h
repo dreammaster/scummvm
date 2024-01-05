@@ -19,47 +19,27 @@
  *
  */
 
-#include "wasteland/gfx/wasteland_font.h"
-#include "wasteland/gfx/surface.h"
-#include "wasteland/fod/fod.h"
-#include "wasteland/fod/views/views.h"
+#ifndef WASTELAND_FOD_DATA_HDS_H
+#define WASTELAND_FOD_DATA_HDS_H
+
+#include "common/path.h"
+#include "common/stream.h"
+#include "common/str-array.h"
 
 namespace Wasteland {
 namespace FOD {
+namespace Data {
 
-FountainOfDreamsEngine *g_engine;
+struct HDS {
+	byte _attributes[0x126];
+	Common::StringArray _activeSkillNames;
+	Common::StringArray _passiveSkillNames;
 
-FountainOfDreamsEngine::FountainOfDreamsEngine(OSystem *syst, const WastelandGameDescription *gameDesc) :
-		Wasteland::Engine(syst, gameDesc) {
-	g_engine = this;
-}
+	bool load();
+};
 
-FountainOfDreamsEngine::~FountainOfDreamsEngine() {
-	g_engine = nullptr;
-	delete _views;
-	delete _font;
-}
-
-void FountainOfDreamsEngine::setup() {
-	_views = new Views::Views();
-	addView("Title");
-
-	Gfx::Surface::setupPalette();
-	auto font = new Wasteland::Gfx::WastelandFont();
-	if (!font->load("FONT"))
-		error("Could not load FONT");
-	_font = font;
-
-	bool hasParty = false;
-	if (!_disk1.load(hasParty))
-		error("Could not load DISK1");
-	if (!_archetypes.load())
-		error("Could not load ARCHTYPE");
-	if (!_hds.load())
-		error("Could not load HDSPCT");
-	if (!_pics.load())
-		error("Could not load display images");
-}
-
+} // namespace Data
 } // namespace FOD
 } // namespace Wasteland
+
+#endif // WASTELAND_H
