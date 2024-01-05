@@ -46,6 +46,7 @@ public:
 	MainMenu();
 	virtual ~MainMenu() {}
 
+	bool msgFocus(const FocusMessage &msg) override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 	void draw() override;
 };

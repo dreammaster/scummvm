@@ -131,7 +131,7 @@ struct Disk1 {
 	byte _partyIndexes[ROSTER_COUNT];
 	byte _field37;
 	uint16 _field38;
-	Roster _roster;
+	Roster _party;
 	byte _unknown4[250];
 	byte _field7B0[6];
 	uint16 _field7B6;

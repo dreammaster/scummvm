@@ -45,13 +45,10 @@ private:
 	Gfx::ClickableText _profession24;
 	Gfx::ClickableText _profession25;
 	Gfx::ClickableText *_professions2[5];
-	Gfx::ClickableText _f1;
-	Gfx::ClickableText _f2;
 	Gfx::TextEntry _nameEntry;
 
 	Mode _mode = SELECT_PROFESSION;
 	Gfx::Window _mainArea;
-	int _rosterNum = -1;
 	int _profession = 0;
 
 	void setMode(Mode mode);
@@ -66,7 +63,6 @@ public:
 	virtual ~EditMember() {}
 
 	bool msgGame(const GameMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 	void draw() override;
 };
