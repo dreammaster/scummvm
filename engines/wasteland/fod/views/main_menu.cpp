@@ -34,6 +34,14 @@ MainMenu::MainMenu() : MenuView("MainMenu"),
 	_playGame("PlayGame", this, 22, 18, "P)lay the game", Common::KEYCODE_p) {
 }
 
+bool MainMenu::msgFocus(const FocusMessage& msg) {
+	if (g_engine->_disk1._partyCount > 0)
+		_selectedPartyMember = 0;
+
+	showParty();
+	return true;
+}
+
 bool MainMenu::msgKeypress(const KeypressMessage &msg) {
 	switch (msg.keycode) {
 	case Common::KEYCODE_a:
@@ -87,8 +95,7 @@ void MainMenu::editMember() {
 		delaySeconds(3);
 
 	} else {
-		int rosterNum = 0; // TODO: Select roster member
-		send("EditMember", GameMessage("EDIT_MEMBER", rosterNum));
+		send("EditMember", GameMessage("EDIT_MEMBER", _selectedPartyMember));
 	}
 }
 
@@ -101,7 +108,7 @@ void MainMenu::removeMember() {
 		delaySeconds(3);
 
 	} else {
-		addView("RemoveMember");
+		send("RemoveMember", GameMessage("REMOVE_MEMBER", _selectedPartyMember));
 	}
 }
 

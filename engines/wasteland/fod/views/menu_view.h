@@ -23,6 +23,7 @@
 #define WASTELAND_FOD_VIEWS_MENU_VIEW_H
 
 #include "wasteland/events.h"
+#include "wasteland/gfx/clickable_text.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -30,16 +31,31 @@ namespace Views {
 
 class MenuView : public UIElement {
 private:
+	Gfx::ClickableText _f1;
+	Gfx::ClickableText _f2;
+
 	void drawBorders();
 
 protected:
+	int _selectedPartyMember = -1;
+
 	/**
 	 * Writes the text under the portrait image
-	*/
+	 */
 	void writePortraitText(const Common::String &str);
 
+	/**
+	 * Enables the display of the party at the bottom of the screen
+	 */
+	void showParty();
+
+	/**
+	 * Removes the display of the party at the bottom of the screen
+	 */
+	void hideParty();
+
 public:
-	MenuView(const Common::String &name) : UIElement(name) {}
+	MenuView(const Common::String &name);
 	virtual ~MenuView() {}
 
 	void draw() override;

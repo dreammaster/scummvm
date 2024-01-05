@@ -38,8 +38,6 @@ EditMember::EditMember() : MenuView("EditMember"),
 	_profession23("Profession23", nullptr, 0, 17, "3)Medic", Common::KEYCODE_3),
 	_profession24("Profession24", nullptr, 0, 18, "4)Hood", Common::KEYCODE_4),
 	_profession25("Profession25", nullptr, 0, 19, "5)Mechanic", Common::KEYCODE_5),
-	_f1("F1", nullptr, 1, 22, "F1>", Common::KEYCODE_F1),
-	_f2("F2", nullptr, 1, 23, "F2>", Common::KEYCODE_F2),
 	_nameEntry("NameEntry", nullptr, 4, 22, 12) {
 
 	_professions1[0] = &_profession11;
@@ -52,9 +50,6 @@ EditMember::EditMember() : MenuView("EditMember"),
 	_professions2[2] = &_profession23;
 	_professions2[3] = &_profession24;
 	_professions2[4] = &_profession25;
-
-	_f1.setInverseColor(true);
-	_f2.setInverseColor(true);
 }
 
 bool EditMember::msgGame(const GameMessage& msg) {
@@ -79,15 +74,14 @@ void EditMember::setMode(Mode mode) {
 
 	switch (mode) {
 	case SELECT_PROFESSION:
+		hideParty();
+
 		for (int i = 0; i < 5; ++i)
 			_professions1[i]->setParent(this);
 		break;
 
 	case EDIT_STATS:
-		// Add the F1 and optionally F2 character selectors
-		_f1.setParent(this);
-		if (g_engine->_disk1._partyCount > 1)
-			_f2.setParent(this);
+		showParty();
 
 		for (int i = 0; i < 5; ++i)
 			_professions2[i]->setParent(this);
@@ -96,13 +90,13 @@ void EditMember::setMode(Mode mode) {
 }
 
 void EditMember::addMember() {
-	_rosterNum = g_engine->_disk1._partyCount;
+	_selectedPartyMember = g_engine->_disk1._partyCount;
 	setMode(SELECT_PROFESSION);
 	addView("EditMember");
 }
 
 void EditMember::editMember(int rosterNum) {
-	_rosterNum = rosterNum;
+	_selectedPartyMember = rosterNum;
 	addView("EditMember");
 }
 
@@ -115,20 +109,12 @@ void EditMember::draw() {
 
 		Surface main = getSurface(_mainArea);
 		main.writeCenteredString("Choose a Profession:", 1);
-
-//		for (int i = 0; i < 5; ++i)
-//			_professions1[i]->draw();
 		break;
 	}
 
 	case EDIT_STATS:
 		writePortraitText(g_engine->_archetypes._professions[_profession]._name);
 		writeSkills();
-
-//		for (int i = 0; i < 5; ++i)
-//			_professions2[i]->draw();
-
-		_nameEntry.draw();
 		break;
 
 	default:
@@ -144,7 +130,7 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 			g_engine->_disk1._partyCount++;
 
 			createNewMember();
-			Data::PartyMember &member = g_engine->_disk1._roster[_rosterNum];
+			Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
 			member._name = "Ojnab Bob";
 
 			setMode(EDIT_STATS);
@@ -157,14 +143,13 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 		case Common::KEYCODE_F1:
 		case Common::KEYCODE_F2:
 			if (msg.keycode == Common::KEYCODE_F1 || g_engine->_disk1._partyCount == 2) {
-				_rosterNum = msg.keycode - Common::KEYCODE_F1;
+				_selectedPartyMember = msg.keycode - Common::KEYCODE_F1;
 				redraw();
 			}
 			return true;
 
 		default:
 			break;
-			//return _nameEntry.msgKeypress(msg);
 		}
 		break;
 
@@ -175,32 +160,8 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 	return true;
 }
 
-bool EditMember::msgMouseDown(const MouseDownMessage& msg) {
-	/*
-	switch (_mode) {
-	case SELECT_PROFESSION:
-		for (int i = 0; i < 5; ++i) {
-			if (_professions1[i]->msgMouseDown(msg))
-				return true;
-		}
-		break;
-
-	case EDIT_STATS:
-		for (int i = 0; i < 5; ++i) {
-			if (_professions2[i]->msgMouseDown(msg))
-				return true;
-		}
-		break;
-
-	default:
-		break;
-	}
-	*/
-	return false;
-}
-
 void EditMember::createNewMember() {
-	Data::PartyMember &member = g_engine->_disk1._roster[_rosterNum];
+	Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
 	Data::Profession &prof = g_engine->_archetypes._professions[_profession];
 
 	// TODO: Origiinal uses loop to clear 12 bytes. Is attributes that large,
@@ -222,7 +183,7 @@ void EditMember::createNewMember() {
 }
 
 void EditMember::setupMemberCon() {
-	Data::PartyMember &member = g_engine->_disk1._roster[_rosterNum];
+	Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
 	Data::Profession &prof = g_engine->_archetypes._professions[_profession];
 
 	member._con = member._conTemp = member._conBase =
@@ -230,7 +191,7 @@ void EditMember::setupMemberCon() {
 }
 
 void EditMember::writeSkills() {
-	Data::PartyMember &member = g_engine->_disk1._roster[_rosterNum];
+	Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
 	Data::Profession &prof = g_engine->_archetypes._professions[member._profession];
 
 	Surface skillsArea = getSurface(Gfx::Window(14, 1, 38, 12));

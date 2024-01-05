@@ -145,7 +145,7 @@ void Disk1::synchronize(Common::Serializer &s) {
 	s.syncBytes(_partyIndexes, ROSTER_COUNT);
 	s.syncAsByte(_field37);
 	s.syncAsUint16LE(_field38);
-	_roster.synchronize(s);
+	_party.synchronize(s);
 
 	s.syncBytes(_unknown4, 250);
 	s.syncBytes(_field7B0, 6);
@@ -189,7 +189,7 @@ bool Disk1::load(bool &hasParty) {
 
 void Disk1::resetRoster() {
 	for (int memberNum = 0; memberNum < ROSTER_COUNT; ++memberNum) {
-		PartyMember &member = _roster[memberNum];
+		PartyMember &member = _party[memberNum];
 		_partyIndexes[memberNum] = memberNum;
 		member.reset();
 

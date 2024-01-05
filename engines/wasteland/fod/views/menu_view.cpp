@@ -28,6 +28,11 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
+MenuView::MenuView(const Common::String& name) : UIElement(name),
+	_f1("F1", nullptr, 1, 22, "F1>", Common::KEYCODE_F1),
+	_f2("F2", nullptr, 1, 23, "F2>", Common::KEYCODE_F2) {
+}
+
 void MenuView::draw() {
 	UIElement::draw();
 
@@ -38,6 +43,23 @@ void MenuView::draw() {
 	// Draw the welcome portrait
 	Surface portrait = getSurface(Gfx::Window(1, 1, 12, 11));
 	portrait.blitFrom(*g_engine->_pics._welcome.getSurface());
+
+	// If the party display is enabled, show it
+	if (_children.contains(&_f1)) {
+		Surface partyArea = getSurface(Gfx::Window(1, 21, 38, 23));
+
+		for (uint i = 0; i < g_engine->_disk1._partyCount; ++i) {
+			const Data::PartyMember &member = g_engine->_disk1._party[i];
+			partyArea.writeString(Common::String::format("%-16.16s - %-16.16s",
+				member._name.c_str(),
+				g_engine->_archetypes._professions[member._profession]._name.c_str()),
+				3, i + 1);
+		}
+
+		// Set the currently active party member as highlighted
+		_f1.setInverseColor(_selectedPartyMember == 0);
+		_f2.setInverseColor(_selectedPartyMember == 1);
+	}
 }
 
 void MenuView::drawBorders() {
@@ -56,6 +78,18 @@ void MenuView::drawBorders() {
 void MenuView::writePortraitText(const Common::String &str) {
 	Surface portrait = getSurface(Gfx::Window(1, 1, 12, 12));
 	portrait.writeCenteredString(str, 11);
+}
+
+void MenuView::showParty() {
+	_f1.setParent((g_engine->_disk1._partyCount > 0) ? this : nullptr);
+	_f2.setParent((g_engine->_disk1._partyCount > 1) ? this : nullptr);
+
+	redraw();
+}
+
+void MenuView::hideParty() {
+	_f1.setParent(nullptr);
+	_f2.setParent(nullptr);
 }
 
 } // namespace Views
