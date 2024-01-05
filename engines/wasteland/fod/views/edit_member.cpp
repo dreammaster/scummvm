@@ -101,7 +101,7 @@ bool EditMember::msgGame(const GameMessage& msg) {
 
 	} else if (msg._name == "ATTR_CLICK") {
 		_selectedAttribute = msg._value;
-		changeAttribute(_selectedAttribute, msg._stringValue == "LEFT" ? -1 : 1);
+		changeAttribute(_selectedAttribute, msg._stringValue == "LEFT" ? 1 : -1);
 		redraw();
 		return true;
 	}
@@ -160,7 +160,7 @@ void EditMember::draw() {
 	}
 
 	case EDIT_STATS:
-		writePortraitText(g_engine->_archetypes._professions[_profession]._name);
+		writePortraitText(g_engine->_disk1._party[_selectedPartyMember].getProfession()._name);
 		writeSkills();
 		writeAttributes();
 		break;
@@ -171,13 +171,17 @@ void EditMember::draw() {
 }
 
 bool EditMember::msgKeypress(const KeypressMessage &msg) {
+	if (msg.keycode == Common::KEYCODE_ESCAPE) {
+		close();
+		return true;
+	}
+
 	switch (_mode) {
 	case SELECT_PROFESSION:
 		if (msg.keycode >= Common::KEYCODE_1 && msg.keycode <= Common::KEYCODE_5) {
-			_profession = msg.keycode - Common::KEYCODE_1;
 			g_engine->_disk1._partyCount++;
 
-			createNewMember();
+			createNewMember(msg.keycode - Common::KEYCODE_1);
 			Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
 			member._name = "Ojnab Bob";
 
@@ -203,8 +207,7 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 		case Common::KEYCODE_4:
 		case Common::KEYCODE_5:
 			// Switch to another profession
-			_profession = msg.keycode - Common::KEYCODE_F1;
-			createNewMember();
+			createNewMember(msg.keycode - Common::KEYCODE_1);
 			redraw();
 			return true;
 
@@ -240,9 +243,10 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 	return false;
 }
 
-void EditMember::createNewMember() {
+void EditMember::createNewMember(int profession) {
 	Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
-	Data::Profession &prof = g_engine->_archetypes._professions[_profession];
+	member._profession = profession;
+	const Data::Profession &prof = member.getProfession();
 
 	member._unknown1 = 0;
 
@@ -255,14 +259,13 @@ void EditMember::createNewMember() {
 	Common::fill(member._passiveSkills2, member._passiveSkills2 + SKILLS_COUNT, 0);
 
 	member._field58 = 0;
-	member._profession = _profession;
 	member._field51 = prof._field7B;
 	member._sex = Data::SEX_MALE;
 }
 
 void EditMember::setupMemberCon() {
 	Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
-	Data::Profession &prof = g_engine->_archetypes._professions[_profession];
+	const Data::Profession &prof = member.getProfession();
 
 	member._con = member._conTemp = member._conBase =
 		g_engine->getRandomNumber(prof._unkMin, prof._unkMax);
