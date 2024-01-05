@@ -27,7 +27,28 @@ namespace FOD {
 namespace Views {
 
 EditMember::EditMember() : MenuView("EditMember"),
-	_mainArea(0, 14, 39, 19) {
+	_mainArea(0, 14, 39, 19),
+	_profession11("Profession11", nullptr, 4, 17, "1)Survivalist", Common::KEYCODE_1),
+	_profession12("Profession12", nullptr, 4, 18, "2)Vigilante", Common::KEYCODE_2),
+	_profession13("Profession13", nullptr, 4, 19, "3)Medic", Common::KEYCODE_3),
+	_profession14("Profession14", nullptr, 23, 17, "4)Hood", Common::KEYCODE_4),
+	_profession15("Profession15", nullptr, 23, 18, "5)Mechanic", Common::KEYCODE_5),
+	_profession21("Profession21", nullptr, 0, 15, "1)Survivalist", Common::KEYCODE_1),
+	_profession22("Profession22", nullptr, 0, 16, "2)Vigilante", Common::KEYCODE_2),
+	_profession23("Profession23", nullptr, 0, 17, "3)Medic", Common::KEYCODE_3),
+	_profession24("Profession24", nullptr, 0, 18, "4)Hood", Common::KEYCODE_4),
+	_profession25("Profession25", nullptr, 0, 19, "5)Mechanic", Common::KEYCODE_5)
+{
+	_professions1[0] = &_profession11;
+	_professions1[1] = &_profession12;
+	_professions1[2] = &_profession13;
+	_professions1[3] = &_profession14;
+	_professions1[4] = &_profession15;
+	_professions2[0] = &_profession21;
+	_professions2[1] = &_profession22;
+	_professions2[2] = &_profession23;
+	_professions2[3] = &_profession24;
+	_professions2[4] = &_profession25;
 }
 
 bool EditMember::msgGame(const GameMessage& msg) {
@@ -44,6 +65,8 @@ bool EditMember::msgGame(const GameMessage& msg) {
 }
 
 void EditMember::addMember() {
+	_rosterNum = g_engine->_disk1._partyCount;
+	_mode = SELECT_PROFESSION;
 	addView("EditMember");
 }
 
@@ -52,19 +75,76 @@ void EditMember::editMember(int rosterNum) {
 	addView("EditMember");
 }
 
+void EditMember::draw() {
+	MenuView::draw();
+
+	switch (_mode) {
+	case SELECT_PROFESSION: {
+		writePortraitText("Welcome");
+
+		Surface main = getSurface(_mainArea);
+		main.writeCenteredString("Choose a Profession:", 1);
+
+		for (int i = 0; i < 5; ++i)
+			_professions1[i]->draw();
+		break;
+	}
+
+	case EDIT_STATS:
+		writePortraitText(g_engine->_archetypes._professions[_profession]._name);
+
+		for (int i = 0; i < 5; ++i)
+			_professions2[i]->draw();
+		break;
+
+	default:
+		break;
+	}
+}
+
 bool EditMember::msgKeypress(const KeypressMessage &msg) {
-	
+	switch (_mode) {
+	case SELECT_PROFESSION:
+		if (msg.keycode >= Common::KEYCODE_1 && msg.keycode <= Common::KEYCODE_5) {
+			_profession = msg.keycode - Common::KEYCODE_1;
+			createNewMember();
+			_mode = EDIT_STATS;
+			redraw();
+		}
+		break;
+
+	default:
+		break;
+	}
+
 	return true;
 }
 
-void EditMember::draw() {
-	MenuView::draw();
-	writePortraitText("Yo");
+bool EditMember::msgMouseDown(const MouseDownMessage& msg) {
+	switch (_mode) {
+	case SELECT_PROFESSION:
+		for (int i = 0; i < 5; ++i) {
+			if (_professions1[i]->msgMouseDown(msg))
+				return true;
+		}
+		break;
 
-	Surface main = getSurface(_mainArea);
-//	main.writeCenteredString("Choose a function:", 1);
+	case EDIT_STATS:
+		for (int i = 0; i < 5; ++i) {
+			if (_professions2[i]->msgMouseDown(msg))
+				return true;
+		}
+		break;
 
-//	UIElement::draw();
+	default:
+		break;
+	}
+
+	return false;
+}
+
+void EditMember::createNewMember() {
+	// TODO
 }
 
 } // namespace Views
