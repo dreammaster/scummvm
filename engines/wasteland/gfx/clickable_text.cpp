@@ -34,6 +34,7 @@ ClickableText::ClickableText(const Common::String &name, UIElement *owner, int x
 
 void ClickableText::draw() {
 	Surface s = getSurface();
+	s.setInverseColor(_inverseColor);
 	s.writeString(_text);
 }
 

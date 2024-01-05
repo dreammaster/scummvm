@@ -29,6 +29,8 @@ namespace FOD {
 namespace Views {
 
 void MenuView::draw() {
+	UIElement::draw();
+
 	Surface s = getSurface();
 	s.clear();
 	drawBorders();

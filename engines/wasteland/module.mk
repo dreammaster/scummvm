@@ -6,6 +6,7 @@ MODULE_OBJS = \
 	events.o \
 	messages.o \
 	metaengine.o \
+	core/array.o \
 	gfx/clickable_text.o \
 	gfx/image_decoder.o \
 	gfx/surface.o \

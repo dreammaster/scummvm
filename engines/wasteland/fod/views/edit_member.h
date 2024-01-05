@@ -54,6 +54,7 @@ private:
 	int _rosterNum = -1;
 	int _profession = 0;
 
+	void setMode(Mode mode);
 	void addMember();
 	void createNewMember();
 	void editMember(int rosterNum);
