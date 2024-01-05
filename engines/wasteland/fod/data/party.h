@@ -31,6 +31,7 @@ namespace Data {
 
 #define ROSTER_COUNT 5
 #define ATTRIBUTES_COUNT 7
+#define SKILLS_COUNT 16
 
 enum Sex {
 	SEX_OTHER = 0,
@@ -54,8 +55,8 @@ struct PartyMember {
 	byte _attributes[ATTRIBUTES_COUNT];
 	uint32 _unknown1;
 	byte _field23;
-	byte _array5[16];
-	byte _array6[16];
+	byte _activeSkills[SKILLS_COUNT];
+	byte _passiveSkills[SKILLS_COUNT];
 	uint16 _con;
 	uint16 _conBase;
 	byte _profession;
@@ -80,8 +81,8 @@ struct PartyMember {
 	uint16 _field60;
 	MemberArray1Entry _array1[32];
 	uint16 _conTemp;
-	byte _array3[16];
-	byte _array4[16];
+	byte _activeSkills2[SKILLS_COUNT];
+	byte _passiveSkills2[SKILLS_COUNT];
 	uint32 _field144;
 	uint32 _field148;
 
