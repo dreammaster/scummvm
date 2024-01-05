@@ -107,7 +107,11 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 	case SELECT_PROFESSION:
 		if (msg.keycode >= Common::KEYCODE_1 && msg.keycode <= Common::KEYCODE_5) {
 			_profession = msg.keycode - Common::KEYCODE_1;
+
 			createNewMember();
+			Data::PartyMember &member = g_engine->_disk1._roster[_rosterNum];
+			member._name = "Ojnab Bob";
+
 			_mode = EDIT_STATS;
 			redraw();
 		}
@@ -144,7 +148,25 @@ bool EditMember::msgMouseDown(const MouseDownMessage& msg) {
 }
 
 void EditMember::createNewMember() {
-	// TODO
+	Data::PartyMember &member = g_engine->_disk1._roster[_rosterNum];
+	Data::Profession &prof = g_engine->_archetypes._professions[_profession];
+
+	// TODO: Origiinal uses loop to clear 12 bytes. Is attributes that large,
+	// or is it just using a hack to clear the following fields
+	member._unknown1 = member._field23 = 0;
+
+	// Copy over the base attributes and skills for the profession
+	Common::copy(prof._attributes, prof._attributes + ATTRIBUTES_COUNT, member._attributes);
+	member._field23 = prof._field33;
+	Common::copy(prof._activeSkills, prof._activeSkills + SKILLS_COUNT, member._activeSkills);
+	Common::copy(prof._passiveSkills, prof._passiveSkills + SKILLS_COUNT, member._passiveSkills);
+	Common::fill(member._activeSkills2, member._activeSkills2 + SKILLS_COUNT, 0);
+	Common::fill(member._passiveSkills2, member._passiveSkills2 + SKILLS_COUNT, 0);
+
+	member._field58 = 0;
+	member._profession = _profession;
+	member._field51 = prof._field7B;
+	member._sex = Data::SEX_MALE;
 }
 
 } // namespace Views

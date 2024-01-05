@@ -50,8 +50,8 @@ void PartyMember::synchronize(Common::Serializer &s) {
 	s.syncBytes(_attributes, ATTRIBUTES_COUNT);
 	s.syncAsUint32LE(_unknown1);
 	s.syncAsByte(_field23);
-	s.syncBytes(_array5, 16);
-	s.syncBytes(_array6, 16);
+	s.syncBytes(_activeSkills, SKILLS_COUNT);
+	s.syncBytes(_passiveSkills, SKILLS_COUNT);
 	s.syncAsUint16LE(_con);
 	s.syncAsUint16LE(_conBase);
 	s.syncAsByte(_profession);
@@ -77,8 +77,8 @@ void PartyMember::synchronize(Common::Serializer &s) {
 	for (int i = 0; i < 32; ++i)
 		_array1[i].synchronize(s);
 	s.syncAsUint16LE(_conTemp);
-	s.syncBytes(_array3, 16);
-	s.syncBytes(_array4, 16);
+	s.syncBytes(_activeSkills2, SKILLS_COUNT);
+	s.syncBytes(_passiveSkills2, SKILLS_COUNT);
 	s.syncAsUint32LE(_field144);
 	s.syncAsUint32LE(_field148);
 }
