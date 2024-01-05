@@ -31,6 +31,17 @@ ClickableText::ClickableText(const Common::String &name, UIElement *owner, int x
 	setBounds(Common::Rect(x * FONT_W, y * FONT_H, (x + text.size()) * FONT_W, (y + 1) * FONT_H));
 }
 
+ClickableText::ClickableText(const Common::String &name, UIElement *owner, int x, int y,
+		const Common::String &text, const Common::String &message, int tag) : UIElement(name, owner),
+		_text(text), _keycode(Common::KEYCODE_INVALID), _message(message), _tag(tag) {
+	setBounds(Common::Rect(x * FONT_W, y * FONT_H, (x + text.size()) * FONT_W, (y + 1) * FONT_H));
+}
+
+void ClickableText::setText(const Common::String &text) {
+	_text = text;
+	setBounds(Common::Rect(_bounds.left, _bounds.top, _bounds.left + text.size() * FONT_W, _bounds.bottom));
+	redraw();
+}
 
 void ClickableText::draw() {
 	Surface s = getSurface();
@@ -38,14 +49,20 @@ void ClickableText::draw() {
 	s.writeString(_text);
 }
 
-bool ClickableText::msgMouseDown(const MouseDownMessage& msg) {
-	if (_bounds.contains(msg._pos)) {
+bool ClickableText::msgMouseDown(const MouseDownMessage &msg) {
+	if (!_bounds.contains(msg._pos))
+		return false;
+
+	if (_keycode != Common::KEYCODE_INVALID) {
 		Common::KeyState keyState(_keycode);
 		_parent->send(KeypressMessage(keyState));
-		return true;
+
+	} else {
+		const char *strParam = (msg._button == MouseDownMessage::MB_LEFT) ? "LEFT" : "RIGHT";
+		_parent->send(GameMessage(_message, strParam, _tag));
 	}
 
-	return false;
+	return true;
 }
 
 } // namespace Gfx

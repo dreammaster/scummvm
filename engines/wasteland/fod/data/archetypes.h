@@ -33,7 +33,7 @@ namespace Data {
 struct Profession {
 	Common::String _name;
 	byte _attributes[7];
-	byte _field33;
+	byte _attributePoints;
 	byte _activeSkills[16];
 	byte _passiveSkills[16];
 	uint16 _unkMin, _unkMax;

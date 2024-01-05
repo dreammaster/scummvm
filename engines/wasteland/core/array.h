@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,39 +20,39 @@
  *
  */
 
-#ifndef WASTELAND_GFX_CLICKABLE_TEXT_H
-#define WASTELAND_GFX_CLICKABLE_TEXT_H
+#ifndef WASTELAND_ARRAY_H
+#define WASTELAND_ARRAY_H
 
-#include "wasteland/events.h"
+#include "common/array.h"
 
 namespace Wasteland {
-namespace Gfx {
 
-class ClickableText : public UIElement {
-private:
-	Common::String _text;
-	bool _inverseColor = false;
-	Common::KeyCode _keycode;
-	Common::String _message;
-	int _tag = 0;
-
+template<class T>
+class Array : public Common::Array<T> {
 public:
-	ClickableText(const Common::String &name, UIElement *owner, int x, int y,
-		const Common::String &text, Common::KeyCode keycode);
-	ClickableText(const Common::String &name, UIElement *owner, int x, int y,
-				  const Common::String &text, const Common::String &message, int tag = 0);
+	Array<T>() : Common::Array<T>() {}
 
-	void draw() override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
+	int indexOf(T elem) const {
+		for (uint i = 0; i < this->size(); ++i) {
+			if (this->operator[](i) == elem)
+				return i;
+		}
 
-	void setInverseColor(bool isInverse) {
-		_inverseColor = isInverse;
-		redraw();
+		return -1;
 	}
-	void setText(const Common::String &text);
+
+	void remove(T elem) {
+		int index = this->indexOf(elem);
+		if (index != -1)
+			this->remove_at(index);
+	}
+
+	bool contains(T elem) const {
+		int index = this->indexOf(elem);
+		return index != -1;		
+	}
 };
 
-} // namespace Gfx
 } // namespace Wasteland
 
 #endif

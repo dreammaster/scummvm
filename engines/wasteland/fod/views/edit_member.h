@@ -45,11 +45,21 @@ private:
 	Gfx::ClickableText _profession24;
 	Gfx::ClickableText _profession25;
 	Gfx::ClickableText *_professions2[5];
+	Gfx::ClickableText _attr0;
+	Gfx::ClickableText _attr1;
+	Gfx::ClickableText _attr2;
+	Gfx::ClickableText _attr3;
+	Gfx::ClickableText _attr4;
+	Gfx::ClickableText _attr5;
+	Gfx::ClickableText _attr6;
+	Gfx::ClickableText _attr7;
+	Gfx::ClickableText *_attributes[8];
 	Gfx::TextEntry _nameEntry;
 
 	Mode _mode = SELECT_PROFESSION;
 	Gfx::Window _mainArea;
 	int _profession = 0;
+	int _selectedAttribute = 0;
 
 	void setMode(Mode mode);
 	void addMember();
@@ -57,6 +67,8 @@ private:
 	void editMember(int rosterNum);
 	void setupMemberCon();
 	void writeSkills();
+	void writeAttributes();
+	void changeAttribute(int attrNum, int delta);
 
 public:
 	EditMember();
