@@ -58,12 +58,11 @@ private:
 
 	Mode _mode = SELECT_PROFESSION;
 	Gfx::Window _mainArea;
-	int _profession = 0;
 	int _selectedAttribute = 0;
 
 	void setMode(Mode mode);
 	void addMember();
-	void createNewMember();
+	void createNewMember(int profession);
 	void editMember(int rosterNum);
 	void setupMemberCon();
 	void writeSkills();
