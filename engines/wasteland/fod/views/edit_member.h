@@ -24,6 +24,7 @@
 
 #include "wasteland/fod/views/menu_view.h"
 #include "wasteland/gfx/clickable_text.h"
+#include "wasteland/gfx/text_entry.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -44,6 +45,9 @@ private:
 	Gfx::ClickableText _profession24;
 	Gfx::ClickableText _profession25;
 	Gfx::ClickableText *_professions2[5];
+	Gfx::ClickableText _f1;
+	Gfx::ClickableText _f2;
+	Gfx::TextEntry _nameEntry;
 
 	Mode _mode = SELECT_PROFESSION;
 	Gfx::Window _mainArea;
@@ -53,6 +57,8 @@ private:
 	void addMember();
 	void createNewMember();
 	void editMember(int rosterNum);
+	void setupMemberCon();
+	void writeSkills();
 
 public:
 	EditMember();

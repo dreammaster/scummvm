@@ -82,6 +82,9 @@ public:
 	uint32 getRandomNumber(uint maxNum) {
 		return _randomSource.getRandomNumber(maxNum);
 	}
+	uint32 getRandomNumber(uint minVal, uint maxVal) {
+		return _randomSource.getRandomNumberRng(minVal, maxVal);
+	}
 
 	bool hasFeature(EngineFeature f) const override {
 		return

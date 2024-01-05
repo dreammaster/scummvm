@@ -19,43 +19,31 @@
  *
  */
 
-#include "common/system.h"
-#include "graphics/palette.h"
-#include "wasteland/fod/views/menu_view.h"
-#include "wasteland/fod/fod.h"
+#ifndef WASTELAND_GFX_TEXT_ENTRY_H
+#define WASTELAND_GFX_TEXT_ENTRY_H
+
+#include "wasteland/events.h"
 
 namespace Wasteland {
-namespace FOD {
-namespace Views {
+namespace Gfx {
 
-void MenuView::draw() {
-	Surface s = getSurface();
-	s.clear();
-	drawBorders();
+class TextEntry : public UIElement {
+private:
+	Common::String _text;
+	size_t _maxLength;
+	bool _caretVisible = false;
+	int _caretCtr = 0;
 
-	// Draw the welcome portrait
-	Surface portrait = getSurface(Gfx::Window(1, 1, 12, 11));
-	portrait.blitFrom(*g_engine->_pics._welcome.getSurface());
-}
+public:
+	TextEntry(const Common::String &name, UIElement *uiParent, int x, int y,
+		size_t maxLength);
 
-void MenuView::drawBorders() {
-	Surface s = getSurface();
-	const byte *borders = g_engine->_pics._borders;
+	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	bool tick() override;
+};
 
-	for (int y = 0; y < TEXT_H; ++y) {
-		s.setTextPos(0, y);
-
-		for (int x = 0; x < TEXT_W; ++x) {
-			s.writeChar(*borders++);
-		}
-	}
-}
-
-void MenuView::writePortraitText(const Common::String &str) {
-	Surface portrait = getSurface(Gfx::Window(1, 1, 12, 12));
-	portrait.writeCenteredString(str, 11);
-}
-
-} // namespace Views
-} // namespace FOD
+} // namespace Gfx
 } // namespace Wasteland
+
+#endif
