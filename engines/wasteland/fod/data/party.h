@@ -57,7 +57,7 @@ struct PartyMember {
 	byte _array5[16];
 	byte _array6[16];
 	uint16 _con;
-	uint16 _field46;
+	uint16 _conBase;
 	byte _profession;
 	byte _field49;
 	byte _field4A;
@@ -79,7 +79,7 @@ struct PartyMember {
 	uint16 _field5E;
 	uint16 _field60;
 	MemberArray1Entry _array1[32];
-	uint16 _field122;
+	uint16 _conTemp;
 	byte _array3[16];
 	byte _array4[16];
 	uint32 _field144;

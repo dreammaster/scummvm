@@ -19,8 +19,6 @@
  *
  */
 
-#include "common/system.h"
-#include "graphics/palette.h"
 #include "wasteland/fod/views/main_menu.h"
 #include "wasteland/fod/fod.h"
 
@@ -69,7 +67,7 @@ void MainMenu::draw() {
 
 void MainMenu::addMember() {
 	if (g_engine->_disk1._partyCount < 3) {
-		addView("AddMember");
+		send("EditMember", GameMessage("ADD_MEMBER"));
 
 	} else {
 		Surface main = getSurface(_mainArea);
@@ -89,7 +87,8 @@ void MainMenu::editMember() {
 		delaySeconds(3);
 
 	} else {
-		addView("EditMember");
+		int rosterNum = 0; // TODO: Select roster member
+		send("EditMember", GameMessage("EDIT_MEMBER", rosterNum));
 	}
 }
 

@@ -24,12 +24,14 @@
 
 #include "wasteland/fod/views/main_menu.h"
 #include "wasteland/fod/views/title.h"
+#include "wasteland/fod/views/edit_member.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
 struct Views {
+	EditMember _editMember;
 	MainMenu _mainMenu;
 	Title _title;
 };

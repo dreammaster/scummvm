@@ -19,45 +19,54 @@
  *
  */
 
-#include "common/algorithm.h"
-#include "common/file.h"
-#include "wasteland/fod/data/archetypes.h"
+#include "wasteland/fod/views/edit_member.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
-namespace Data {
+namespace Views {
 
-void Profession::load(Common::SeekableReadStream &src) {
-	byte buf[128];
-	src.read(buf, 128);
-
-	buf[15] = '\0';
-	_name = Common::String((const char *)buf);
-	Common::copy(&buf[0x14], &buf[0x1b], _attributes);
-	_field33 = buf[0x33];
-	Common::copy(&buf[0x38], &buf[0x48], _activeSkills);
-	Common::copy(&buf[0x48], &buf[0x58], _passiveSkills);
-	_unkMin = READ_LE_UINT16(buf + 0x70);
-	_unkMin = READ_LE_UINT16(buf + 0x72);
-	_field7B = buf[0x7b];
+EditMember::EditMember() : MenuView("EditMember"),
+	_mainArea(0, 14, 39, 19) {
 }
 
-bool Archetypes::load() {
-	Common::File f;
+bool EditMember::msgGame(const GameMessage& msg) {
+	if (msg._name == "ADD_MEMBER") {
+		addMember();
+		return true;
 
-	if (!f.open("ARCHTYPE"))
-		return false;
+	} else if (msg._name == "EDIT_MEMBER") {
+		editMember(msg._value);
+		return true;
+	}
 
-	// Read in the professions
-	f.skip(4);
-	f.seek(f.readUint16LE());
+	return false;
+}
 
-	for (int i = 0; i < PROFESSIONS_COUNT; ++i)
-		_professions[i].load(f);
+void EditMember::addMember() {
+	addView("EditMember");
+}
 
+void EditMember::editMember(int rosterNum) {
+	_rosterNum = rosterNum;
+	addView("EditMember");
+}
+
+bool EditMember::msgKeypress(const KeypressMessage &msg) {
+	
 	return true;
 }
 
-} // namespace Data
+void EditMember::draw() {
+	MenuView::draw();
+	writePortraitText("Yo");
+
+	Surface main = getSurface(_mainArea);
+//	main.writeCenteredString("Choose a function:", 1);
+
+//	UIElement::draw();
+}
+
+} // namespace Views
 } // namespace FOD
 } // namespace Wasteland

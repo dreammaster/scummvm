@@ -19,45 +19,37 @@
  *
  */
 
-#include "common/algorithm.h"
-#include "common/file.h"
-#include "wasteland/fod/data/archetypes.h"
+#ifndef WASTELAND_FOD_VIEWS_EDIT_MEMBER_H
+#define WASTELAND_FOD_VIEWS_EDIT_MEMBER_H
+
+#include "wasteland/fod/views/menu_view.h"
+#include "wasteland/gfx/clickable_text.h"
 
 namespace Wasteland {
 namespace FOD {
-namespace Data {
+namespace Views {
 
-void Profession::load(Common::SeekableReadStream &src) {
-	byte buf[128];
-	src.read(buf, 128);
+class EditMember : public MenuView {
+	enum Mode { SELECT_PROFESSION, EDIT_STATS};
+private:
+	Mode _mode = SELECT_PROFESSION;
+	Gfx::Window _mainArea;
+	int _rosterNum = -1;
 
-	buf[15] = '\0';
-	_name = Common::String((const char *)buf);
-	Common::copy(&buf[0x14], &buf[0x1b], _attributes);
-	_field33 = buf[0x33];
-	Common::copy(&buf[0x38], &buf[0x48], _activeSkills);
-	Common::copy(&buf[0x48], &buf[0x58], _passiveSkills);
-	_unkMin = READ_LE_UINT16(buf + 0x70);
-	_unkMin = READ_LE_UINT16(buf + 0x72);
-	_field7B = buf[0x7b];
-}
+	void addMember();
+	void editMember(int rosterNum);
 
-bool Archetypes::load() {
-	Common::File f;
+public:
+	EditMember();
+	virtual ~EditMember() {}
 
-	if (!f.open("ARCHTYPE"))
-		return false;
+	bool msgGame(const GameMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	void draw() override;
+};
 
-	// Read in the professions
-	f.skip(4);
-	f.seek(f.readUint16LE());
-
-	for (int i = 0; i < PROFESSIONS_COUNT; ++i)
-		_professions[i].load(f);
-
-	return true;
-}
-
-} // namespace Data
+} // namespace Views
 } // namespace FOD
 } // namespace Wasteland
+
+#endif
