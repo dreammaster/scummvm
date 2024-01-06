@@ -19,23 +19,26 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
-#define WASTELAND_FOD_VIEWS_VIEWS_H
+#ifndef WASTELAND_FOD_VIEWS_REMOVE_MEMBER_H
+#define WASTELAND_FOD_VIEWS_REMOVE_MEMBER_H
 
-#include "wasteland/fod/views/main_menu.h"
-#include "wasteland/fod/views/title.h"
-#include "wasteland/fod/views/edit_member.h"
-#include "wasteland/fod/views/remove_member.h"
+#include "wasteland/events.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-struct Views {
-	EditMember _editMember;
-	MainMenu _mainMenu;
-	RemoveMember _removeMember;
-	Title _title;
+class RemoveMember : public UIElement {
+private:
+	int _selectedPartyMember = -1;
+
+public:
+	RemoveMember();
+	virtual ~RemoveMember() {}
+
+	bool msgGame(const GameMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	void draw() override;
 };
 
 } // namespace Views

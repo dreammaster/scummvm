@@ -28,10 +28,10 @@ namespace Views {
 
 MainMenu::MainMenu() : MenuView("MainMenu"),
 	_mainArea(0, 14, 39, 19),
-	_addMember("AddMember", this, 5, 17, "A)dd member", Common::KEYCODE_a),
-	_editMember("EditMember", this, 5, 18, "E)dit member", Common::KEYCODE_e),
-	_removeMember("RemoveMember", this, 22, 17, "R)emove member", Common::KEYCODE_r),
-	_playGame("PlayGame", this, 22, 18, "P)lay the game", Common::KEYCODE_p) {
+	_addMember("AddMemberItem", this, 5, 17, "A)dd member", Common::KEYCODE_a),
+	_editMember("EditMemberItem", this, 5, 18, "E)dit member", Common::KEYCODE_e),
+	_removeMember("RemoveMemberItem", this, 22, 17, "R)emove member", Common::KEYCODE_r),
+	_playGame("PlayGameItem", this, 22, 18, "P)lay the game", Common::KEYCODE_p) {
 }
 
 bool MainMenu::msgFocus(const FocusMessage &msg) {
@@ -124,6 +124,7 @@ void MainMenu::removeMember() {
 
 	} else {
 		send("RemoveMember", GameMessage("REMOVE_MEMBER", _selectedPartyMember));
+		_selectedPartyMember = -1;
 	}
 }
 

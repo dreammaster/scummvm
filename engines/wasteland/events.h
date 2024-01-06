@@ -183,6 +183,11 @@ public:
 	}
 
 	/**
+	 * Sets the element's window (using text-based co-ordinates)
+	 */
+	void setBounds(const Gfx::Window &win);
+
+	/**
 	 * Gets the element's bounds
 	 */
 	Common::Rect getBounds() const {
