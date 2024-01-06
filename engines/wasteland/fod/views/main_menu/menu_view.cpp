@@ -21,7 +21,7 @@
 
 #include "common/system.h"
 #include "graphics/palette.h"
-#include "wasteland/fod/views/menu_view.h"
+#include "wasteland/fod/views/main_menu/menu_view.h"
 #include "wasteland/fod/fod.h"
 
 namespace Wasteland {

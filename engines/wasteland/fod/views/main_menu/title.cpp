@@ -21,7 +21,7 @@
 
 #include "common/system.h"
 #include "graphics/paletteman.h"
-#include "wasteland/fod/views/title.h"
+#include "wasteland/fod/views/main_menu/title.h"
 #include "wasteland/fod/fod.h"
 #include "wasteland/gfx/image_decoder.h"
 
