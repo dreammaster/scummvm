@@ -31,11 +31,10 @@ ClickableText::ClickableText(const Common::String &name, UIElement *owner, int x
 	setBounds(Common::Rect(x * FONT_W, y * FONT_H, (x + text.size()) * FONT_W, (y + 1) * FONT_H));
 }
 
-ClickableText::ClickableText(const Common::String &name, UIElement *owner, int x, int y,
-		const Common::Point &offset, const Common::String &text, Common::KeyCode keycode) : UIElement(name, owner),
+ClickableText::ClickableText(const Common::String &name, UIElement *owner, const Position &pos, const Common::String &text, Common::KeyCode keycode) : UIElement(name, owner),
 		_text(text), _keycode(keycode) {
-	Common::Rect r(x * FONT_W, y * FONT_H, (x + text.size()) * FONT_W, (y + 1) * FONT_H);
-	r.translate(offset.x, offset.y);
+	Common::Rect r(pos.x * FONT_W, pos.y * FONT_H, (pos.x + text.size()) * FONT_W, (pos.y + 1) * FONT_H);
+	r.translate(pos._xOffset, pos._yOffset);
 	setBounds(r);
 }
 
@@ -45,11 +44,11 @@ ClickableText::ClickableText(const Common::String &name, UIElement *owner, int x
 	setBounds(Common::Rect(x * FONT_W, y * FONT_H, (x + text.size()) * FONT_W, (y + 1) * FONT_H));
 }
 
-ClickableText::ClickableText(const Common::String &name, UIElement *owner, int x, int y,
-		const Common::Point &offset, const Common::String &text, const Common::String &message, int tag) : UIElement(name, owner),
+ClickableText::ClickableText(const Common::String &name, UIElement *owner, const Position &pos,
+		const Common::String &text, const Common::String &message, int tag) : UIElement(name, owner),
 		_text(text), _keycode(Common::KEYCODE_INVALID), _message(message), _tag(tag) {
-	Common::Rect r(x * FONT_W, y * FONT_H, (x + text.size()) * FONT_W, (y + 1) * FONT_H);
-	r.translate(offset.x, offset.y);
+	Common::Rect r(pos.x * FONT_W, pos.y * FONT_H, (pos.x + text.size()) * FONT_W, (pos.y + 1) * FONT_H);
+	r.translate(pos._xOffset, pos._yOffset);
 	setBounds(r);
 }
 

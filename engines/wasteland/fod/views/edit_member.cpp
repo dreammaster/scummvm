@@ -67,7 +67,7 @@ EditMember::EditMember() : MenuView("EditMember"),
 	_attr5("Attr5", nullptr, ATTRIBUTE_PREFIXES[5]._x + 3, 14 + ATTRIBUTE_PREFIXES[5]._y, "", "ATTR_CLICK", 5),
 	_attr6("Attr6", nullptr, ATTRIBUTE_PREFIXES[6]._x + 3, 14 + ATTRIBUTE_PREFIXES[6]._y, "", "ATTR_CLICK", 6),
 	_attr7("Attr7", nullptr, ATTRIBUTE_PREFIXES[7]._x + 5, 14 + ATTRIBUTE_PREFIXES[7]._y, "", "ATTR_CLICK", 7),
-	_nameEntry("NameEntry", nullptr, 4, 22, 12) {
+	_nameEntry("NameEntry", nullptr, Gfx::Position(4, 21, 0, 4), 12) {
 
 	_professions1[0] = &_profession11;
 	_professions1[1] = &_profession12;
@@ -104,6 +104,12 @@ bool EditMember::msgGame(const GameMessage& msg) {
 		changeAttribute(_selectedAttribute, msg._stringValue == "LEFT" ? 1 : -1);
 		redraw();
 		return true;
+
+	} else if (msg._name == "TEXT_CHANGED") {
+		Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
+		member._name = msg._stringValue;
+		redraw();
+		return true;
 	}
 
 	return false;
@@ -126,6 +132,7 @@ void EditMember::setMode(Mode mode) {
 
 	case EDIT_STATS:
 		showParty();
+		_nameEntry.setParent(this);
 
 		for (int i = 0; i < 5; ++i)
 			_professions2[i]->setParent(this);
@@ -159,11 +166,16 @@ void EditMember::draw() {
 		break;
 	}
 
-	case EDIT_STATS:
-		writePortraitText(g_engine->_disk1._party[_selectedPartyMember].getProfession()._name);
+	case EDIT_STATS: {
+		const Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
+		_nameEntry.setText(member._name);
+		_nameEntry.setPosition(Gfx::Position(4, 21 + _selectedPartyMember, 0, 4));
+
+		writePortraitText(member.getProfession()._name);
 		writeSkills();
 		writeAttributes();
 		break;
+	}
 
 	default:
 		break;
@@ -243,7 +255,7 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 		break;
 	}
 
-	return false;
+	return MenuView::msgKeypress(msg);
 }
 
 void EditMember::createNewMember(int profession) {
@@ -344,7 +356,7 @@ void EditMember::changeAttribute(int attrNum, int delta) {
 		member._attributes[attrNum] -= delta;
 		member._attributesRemaining += delta;
 
-	} else if (delta > 0 && member._attributes[attrNum] < 20) {
+	} else if (delta > 0 && member._attributesRemaining > 0 && member._attributes[attrNum] < 20) {
 		member._attributes[attrNum] += delta;
 		member._attributesRemaining -= delta;			
 	}

@@ -25,31 +25,43 @@
 namespace Wasteland {
 namespace Gfx {
 
-TextEntry::TextEntry(const Common::String &name, UIElement *uiParent, int x, int y,
-					 size_t maxLength) : UIElement(name, uiParent), _maxLength(maxLength) {
+TextEntry::TextEntry(const Common::String &name, UIElement *uiParent, int x, int y, size_t maxLength) :
+		UIElement(name, uiParent), _maxLength(maxLength) {
 	setBounds(Common::Rect(x * FONT_W, y * FONT_H, (x + maxLength + 1) * FONT_W, (y + 1) * FONT_H));
+}
+
+TextEntry::TextEntry(const Common::String &name, UIElement *uiParent, const Position &pos, size_t maxLength) :
+		UIElement(name, uiParent), _maxLength(maxLength) {
+	Common::Rect r(pos.x * FONT_W, pos.y * FONT_H, (pos.x + maxLength + 1) * FONT_W, (pos.y + 1) * FONT_H);
+	r.translate(pos._xOffset, pos._yOffset);
+	setBounds(r);
 }
 
 void TextEntry::draw() {
 	Surface s = getSurface();
+	s.clear();
 	s.writeString(_text);
-	if (_caretVisible)
-		s.writeChar('_');
+	s.writeChar(_caretVisible ? '\x1b' : ' ');
 }
 
 bool TextEntry::msgKeypress(const KeypressMessage &msg) {
+	bool changed = false;
+
 	if (msg.ascii >= ' ' && msg.ascii <= 127 && _text.size() < _maxLength) {
 		_text += msg.ascii;
-		redraw();
-		return true;
+		changed = true;
 
 	} else if (msg.keycode == Common::KEYCODE_BACKSPACE && !_text.empty()) {
 		_text.deleteLastChar();
-		redraw();
-		return true;
+		changed = true;
 
 	} else if (msg.keycode == Common::KEYCODE_RETURN) {
 		_parent->send(GameMessage("TEXT", _text));
+		return true;
+	}
+
+	if (changed) {
+		_parent->send(GameMessage("TEXT_CHANGED", _text));
 		return true;
 	}
 
@@ -57,13 +69,24 @@ bool TextEntry::msgKeypress(const KeypressMessage &msg) {
 }
 
 bool TextEntry::tick() {
-	if (++_caretCtr >= 10) {
+	if (++_caretCtr >= 5) {
 		_caretCtr = 0;
 		_caretVisible = !_caretVisible;
 		redraw();
 	}
 
 	return false;
+}
+
+void TextEntry::setText(const Common::String &text) {
+	_text = text;
+	redraw();
+}
+
+void TextEntry::setPosition(const Position &pos) {
+	Common::Rect r(pos.x * FONT_W, pos.y * FONT_H, (pos.x + _maxLength + 1) * FONT_W, (pos.y + 1) * FONT_H);
+	r.translate(pos._xOffset, pos._yOffset);
+	setBounds(r);
 }
 
 } // namespace Gfx

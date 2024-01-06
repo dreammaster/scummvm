@@ -37,10 +37,15 @@ private:
 public:
 	TextEntry(const Common::String &name, UIElement *uiParent, int x, int y,
 		size_t maxLength);
+	TextEntry(const Common::String &name, UIElement *uiParent, const Position &pos,
+		size_t maxLength);
 
 	void draw() override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 	bool tick() override;
+
+	void setText(const Common::String &text);
+	void setPosition(const Position &pos);
 };
 
 } // namespace Gfx
