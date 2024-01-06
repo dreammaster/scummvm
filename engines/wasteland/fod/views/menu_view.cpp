@@ -29,9 +29,9 @@ namespace FOD {
 namespace Views {
 
 MenuView::MenuView(const Common::String &name) : UIElement(name),
-	_f1("F1", nullptr, 1, 21, Common::Point(0, 4), "F1>", Common::KEYCODE_F1),
-	_f2("F2", nullptr, 1, 22, Common::Point(0, 4), "F2>", Common::KEYCODE_F2),
-	_f3("F3", nullptr, 1, 23, Common::Point(0, 4), "F3>", Common::KEYCODE_F3) {
+	_f1("F1", nullptr, Gfx::Position(1, 21, 0, 4), "F1>", Common::KEYCODE_F1),
+	_f2("F2", nullptr, Gfx::Position(1, 22, 0, 4), "F2>", Common::KEYCODE_F2),
+	_f3("F3", nullptr, Gfx::Position(1, 23, 0, 4), "F3>", Common::KEYCODE_F3) {
 }
 
 void MenuView::draw() {
