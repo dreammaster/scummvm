@@ -28,9 +28,10 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-MenuView::MenuView(const Common::String& name) : UIElement(name),
-	_f1("F1", nullptr, 1, 22, "F1>", Common::KEYCODE_F1),
-	_f2("F2", nullptr, 1, 23, "F2>", Common::KEYCODE_F2) {
+MenuView::MenuView(const Common::String &name) : UIElement(name),
+	_f1("F1", nullptr, 1, 21, Common::Point(0, 4), "F1>", Common::KEYCODE_F1),
+	_f2("F2", nullptr, 1, 22, Common::Point(0, 4), "F2>", Common::KEYCODE_F2),
+	_f3("F3", nullptr, 1, 23, Common::Point(0, 4), "F3>", Common::KEYCODE_F3) {
 }
 
 void MenuView::draw() {
@@ -46,7 +47,7 @@ void MenuView::draw() {
 
 	// If the party display is enabled, show it
 	if (_children.contains(&_f1)) {
-		Surface partyArea = getSurface(Gfx::Window(1, 21, 38, 23));
+		Surface partyArea = getSurface(Gfx::Window(1, 20, 38, 23, 0, 4));
 
 		for (uint i = 0; i < g_engine->_disk1._partyCount; ++i) {
 			const Data::PartyMember &member = g_engine->_disk1._party[i];
@@ -59,6 +60,7 @@ void MenuView::draw() {
 		// Set the currently active party member as highlighted
 		_f1.setInverseColor(_selectedPartyMember == 0);
 		_f2.setInverseColor(_selectedPartyMember == 1);
+		_f3.setInverseColor(_selectedPartyMember == 2);
 	}
 }
 
@@ -83,6 +85,7 @@ void MenuView::writePortraitText(const Common::String &str) {
 void MenuView::showParty() {
 	_f1.setParent((g_engine->_disk1._partyCount > 0) ? this : nullptr);
 	_f2.setParent((g_engine->_disk1._partyCount > 1) ? this : nullptr);
+	_f3.setParent((g_engine->_disk1._partyCount > 2) ? this : nullptr);
 
 	redraw();
 }
@@ -90,6 +93,7 @@ void MenuView::showParty() {
 void MenuView::hideParty() {
 	_f1.setParent(nullptr);
 	_f2.setParent(nullptr);
+	_f3.setParent(nullptr);
 }
 
 } // namespace Views

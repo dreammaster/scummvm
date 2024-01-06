@@ -357,6 +357,7 @@ Surface UIElement::getSurface() const {
 Surface UIElement::getSurface(const Gfx::Window &win) const {
 	Common::Rect r(_bounds.left + win.left * FONT_W, _bounds.top + win.top * FONT_H,
 					_bounds.left + (win.right + 1) * FONT_W, _bounds.top + (win.bottom + 1) * FONT_H);
+	r.translate(win._xOffset, win._yOffset);
 	r.clip(_bounds);
 
 	return Surface(*g_events->getScreen(), r);
