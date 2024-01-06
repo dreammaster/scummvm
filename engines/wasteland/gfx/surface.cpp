@@ -75,9 +75,19 @@ void Surface::setupPalette() {
 }
 
 void Surface::writeString(const Common::String &str) {
-	g_engine->_font->drawString(this, str, _textX * FONT_W, _textY * FONT_H,
-		this->w - (_textX * FONT_W), _inverseColor ? -1 : 1);
-	_textX += str.size();
+	StringArray lines;
+	lines.split(str, '\n');
+
+	for (uint lineNum = 0; lineNum < lines.size(); ++lineNum) {
+		if (lineNum > 0) {
+			_textX = 0;
+			++_textY;
+		}
+
+		g_engine->_font->drawString(this, lines[lineNum], _textX * FONT_W, _textY * FONT_H,
+			this->w - (_textX * FONT_W), _inverseColor ? -1 : 1);
+		_textX += lines[lineNum].size();
+	}
 }
 
 void Surface::writeString(const Common::String &str, int x, int y) {

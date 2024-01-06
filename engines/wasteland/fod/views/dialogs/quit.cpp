@@ -28,6 +28,10 @@ namespace Dialogs {
 
 void Quit::draw() {
 	Dialog::draw();
+
+	Surface s = getSurface();
+	s.writeString("Your choice ?\n\n\n1. Quit (without saving)\n3. Quit (save game)\n"
+		"5. Just save!\n\nN)evermind");
 }
 
 } // namespace Dialogs

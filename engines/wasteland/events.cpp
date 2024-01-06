@@ -224,6 +224,7 @@ Bounds::Bounds(Common::Rect &innerBounds) :
 		_innerBounds(innerBounds),
 		left(_bounds.left), top(_bounds.top),
 		right(_bounds.right), bottom(_bounds.bottom) {
+	_innerBounds = _bounds;
 }
 
 Bounds &Bounds::operator=(const Common::Rect &r) {
@@ -357,14 +358,14 @@ void UIElement::setBounds(const Gfx::Window &win) {
 };
 
 Surface UIElement::getSurface() const {
-	return Surface(*g_events->getScreen(), _bounds);
+	return Surface(*g_events->getScreen(), _innerBounds);
 }
 
 Surface UIElement::getSurface(const Gfx::Window &win) const {
-	Common::Rect r(_bounds.left + win.left * FONT_W, _bounds.top + win.top * FONT_H,
-					_bounds.left + (win.right + 1) * FONT_W, _bounds.top + (win.bottom + 1) * FONT_H);
+	Common::Rect r(_innerBounds.left + win.left * FONT_W, _innerBounds.top + win.top * FONT_H,
+					_innerBounds.left + (win.right + 1) * FONT_W, _innerBounds.top + (win.bottom + 1) * FONT_H);
 	r.translate(win._xOffset, win._yOffset);
-	r.clip(_bounds);
+	r.clip(_innerBounds);
 
 	return Surface(*g_events->getScreen(), r);
 }
