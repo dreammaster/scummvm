@@ -39,7 +39,11 @@ public:
 	ClickableText(const Common::String &name, UIElement *owner, int x, int y,
 		const Common::String &text, Common::KeyCode keycode);
 	ClickableText(const Common::String &name, UIElement *owner, int x, int y,
+				  const Common::Point &offset, const Common::String &text, Common::KeyCode keycode);
+	ClickableText(const Common::String &name, UIElement *owner, int x, int y,
 				  const Common::String &text, const Common::String &message, int tag = 0);
+	ClickableText(const Common::String &name, UIElement *owner, int x, int y,
+				  const Common::Point &offset, const Common::String &text, const Common::String &message, int tag = 0);
 
 	void draw() override;
 	bool msgMouseDown(const MouseDownMessage &msg) override;

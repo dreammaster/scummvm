@@ -22,6 +22,7 @@
 #ifndef WASTELAND_GFX_SURFACE_H
 #define WASTELAND_GFX_SURFACE_H
 
+#include "common/rect.h"
 #include "graphics/managed_surface.h"
 
 namespace Wasteland {
@@ -30,7 +31,16 @@ namespace Gfx {
 #define TEXT_W 40
 #define TEXT_H 25
 
-typedef Common::Rect Window;
+struct Window : public Common::Rect {
+	int _xOffset;
+	int _yOffset;
+
+	Window() : Common::Rect(), _xOffset(0), _yOffset(0) {}
+	Window(int x1, int y1, int x2, int y2, int xOffset = 0, int yOffset = 0) :
+		Common::Rect(x1, y1, x2, y2), _xOffset(xOffset), _yOffset(yOffset) {}
+	Window(const Common::Rect &r, int xOffset = 0, int yOffset = 0) :
+		Common::Rect(r), _xOffset(xOffset), _yOffset(yOffset) {}	
+};
 
 /**
  * Implements the surface class views use when they call getSurface

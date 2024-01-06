@@ -34,8 +34,10 @@ MainMenu::MainMenu() : MenuView("MainMenu"),
 	_playGame("PlayGame", this, 22, 18, "P)lay the game", Common::KEYCODE_p) {
 }
 
-bool MainMenu::msgFocus(const FocusMessage& msg) {
-	if (g_engine->_disk1._partyCount > 0)
+bool MainMenu::msgFocus(const FocusMessage &msg) {
+	if (g_engine->_disk1._partyCount == 0)
+		_selectedPartyMember = -1;
+	else if (_selectedPartyMember == -1 || _selectedPartyMember >= g_engine->_disk1._partyCount)
 		_selectedPartyMember = 0;
 
 	showParty();
@@ -43,6 +45,8 @@ bool MainMenu::msgFocus(const FocusMessage& msg) {
 }
 
 bool MainMenu::msgKeypress(const KeypressMessage &msg) {
+	int partyNum;
+
 	switch (msg.keycode) {
 	case Common::KEYCODE_a:
 		addMember();
@@ -56,6 +60,17 @@ bool MainMenu::msgKeypress(const KeypressMessage &msg) {
 	case Common::KEYCODE_p:
 		playGame();
 		break;
+
+	case Common::KEYCODE_F1:
+	case Common::KEYCODE_F2:
+	case Common::KEYCODE_F3:
+		partyNum = msg.keycode - Common::KEYCODE_F1;
+		if (partyNum < g_engine->_disk1._partyCount) {
+			_selectedPartyMember = partyNum;
+			editMember();
+		}
+		break;
+
 	default:
 		break;
 	}

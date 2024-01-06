@@ -195,11 +195,14 @@ bool EditMember::msgKeypress(const KeypressMessage &msg) {
 		switch (msg.keycode) {
 		case Common::KEYCODE_F1:
 		case Common::KEYCODE_F2:
-			if (msg.keycode == Common::KEYCODE_F1 || g_engine->_disk1._partyCount == 2) {
-				_selectedPartyMember = msg.keycode - Common::KEYCODE_F1;
+		case Common::KEYCODE_F3: {
+			int partyNum = msg.keycode - Common::KEYCODE_F1;
+			if (partyNum < g_engine->_disk1._partyCount) {
+				_selectedPartyMember = partyNum;
 				redraw();
 			}
 			return true;
+		}
 
 		case Common::KEYCODE_1:
 		case Common::KEYCODE_2:

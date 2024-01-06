@@ -33,6 +33,7 @@ class MenuView : public UIElement {
 private:
 	Gfx::ClickableText _f1;
 	Gfx::ClickableText _f2;
+	Gfx::ClickableText _f3;
 
 	void drawBorders();
 
