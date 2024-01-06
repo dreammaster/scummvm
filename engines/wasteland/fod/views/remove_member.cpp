@@ -19,27 +19,48 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
-#define WASTELAND_FOD_VIEWS_VIEWS_H
-
-#include "wasteland/fod/views/main_menu.h"
-#include "wasteland/fod/views/title.h"
-#include "wasteland/fod/views/edit_member.h"
 #include "wasteland/fod/views/remove_member.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-struct Views {
-	EditMember _editMember;
-	MainMenu _mainMenu;
-	RemoveMember _removeMember;
-	Title _title;
-};
+RemoveMember::RemoveMember() : UIElement("RemoveMember") {
+	setBounds(Gfx::Window(0, 14, 39, 19));
+}
+
+bool RemoveMember::msgGame(const GameMessage &msg) {
+	if (msg._name == "REMOVE_MEMBER") {
+		_selectedPartyMember = msg._value;
+		addView();
+		return true;
+	}
+
+	return false;
+}
+
+bool RemoveMember::msgKeypress(const KeypressMessage &msg) {
+	if (msg.keycode == Common::KEYCODE_y) {
+		for (int i = _selectedPartyMember; i < (g_engine->_disk1._partyCount - 1); ++i)
+			g_engine->_disk1._party[i] = g_engine->_disk1._party[i + 1];
+
+		--g_engine->_disk1._partyCount;
+	}
+
+	close();
+	return true;
+}
+
+
+void RemoveMember::draw() {
+	Surface s = getSurface();
+	s.clear();
+
+	s.writeCenteredString("Really remove this member?", 1);
+	s.writeCenteredString("Y)es N)o", 3);
+}
 
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland
-
-#endif

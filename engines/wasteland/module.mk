@@ -20,6 +20,7 @@ MODULE_OBJS = \
 	fod/views/edit_member.o \
 	fod/views/main_menu.o \
 	fod/views/menu_view.o \
+	fod/views/remove_member.o \
 	fod/views/title.o
 
 # This module can be built as a plugin

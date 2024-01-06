@@ -350,6 +350,12 @@ void UIElement::addView() {
 	g_events->addView(this);
 }
 
+void UIElement::setBounds(const Gfx::Window &win) {
+	Common::Rect r(win.left * FONT_W, win.top * FONT_H, (win.right + 1) * FONT_W, (win.bottom + 1) * FONT_H);
+	r.translate(win._xOffset, win._yOffset);
+	setBounds(r);
+};
+
 Surface UIElement::getSurface() const {
 	return Surface(*g_events->getScreen(), _bounds);
 }
