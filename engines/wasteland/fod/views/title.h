@@ -35,7 +35,9 @@ public:
 
 	bool msgKeypress(const KeypressMessage &msg) override;
 	bool msgMouseDown(const MouseDownMessage &msg) override;
+	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
+	void timeout() override;
 };
 
 } // namespace Views

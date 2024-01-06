@@ -138,8 +138,8 @@ void MainMenu::playGame() {
 		delaySeconds(3);
 
 	} else {
-		// Start the game
-		replaceView("Game");
+		// Switch to the title screen, which will show briefly and then start the game
+		replaceView("Title");
 	}
 }
 

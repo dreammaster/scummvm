@@ -22,7 +22,7 @@
 #include "common/system.h"
 #include "graphics/paletteman.h"
 #include "wasteland/fod/views/title.h"
-#include "wasteland/engine.h"
+#include "wasteland/fod/fod.h"
 #include "wasteland/gfx/image_decoder.h"
 
 namespace Wasteland {
@@ -30,12 +30,12 @@ namespace FOD {
 namespace Views {
 
 bool Title::msgKeypress(const KeypressMessage &msg) {
-	replaceView("MainMenu");
+	timeout();
 	return true;
 }
 
 bool Title::msgMouseDown(const MouseDownMessage &msg) {
-	replaceView("MainMenu");
+	timeout();
 	return true;
 }
 
@@ -58,6 +58,15 @@ void Title::draw() {
 	// Test font drawing
 	s.writeString("This is a test", 5, 5);
 	#endif
+}
+
+bool Title::msgFocus(const FocusMessage &msg) {
+	delaySeconds(1);
+	return true;
+}
+
+void Title::timeout() {
+	replaceView(g_engine->_disk1._partyCount > 0 ? "Game" : "MainMenu");
 }
 
 } // namespace Views
