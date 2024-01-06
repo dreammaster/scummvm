@@ -30,13 +30,16 @@ namespace Dialogs {
 Dialog::Dialog(const Common::String &name, int w, int h) : UIElement(name) {
 	setBounds(Common::Rect(160 - (w * FONT_W / 2), 100 - (h * FONT_H / 2),
 		160 + (w * FONT_W / 2), 100 + (h * FONT_H / 2)));
+	_bounds.setBorderSize(FONT_W);
 }
 
 Dialog::Dialog(const Common::String &name, const Gfx::Window &win) : UIElement(name) {
-	setBounds(win);
+	setBounds(Gfx::Window(win.left - 1, win.top - 1, win.right + 1, win.bottom + 1,
+		win._xOffset, win._yOffset));
 }
 
 void Dialog::draw() {
+	_bounds.setBorderSize(0);		// We want to draw in the borders area
 	Surface s = getSurface();
 	s.clear();
 
@@ -74,6 +77,8 @@ void Dialog::draw() {
 	s.setTextPos(0, _bounds.height() / FONT_H - 2);
 	s.writeChar(0x82);
 	s.setTextPos(r, _bounds.height() / FONT_H - 2);
+
+	_bounds.setBorderSize(FONT_W);
 }
 
 } // namespace Dialogs

@@ -24,6 +24,7 @@
 #define WASTELAND_ARRAY_H
 
 #include "common/array.h"
+#include "common/str.h"
 
 namespace Wasteland {
 
@@ -51,6 +52,14 @@ public:
 		int index = this->indexOf(elem);
 		return index != -1;		
 	}
+};
+
+class StringArray : public Array<Common::String> {
+public:
+	/**
+	 * Splits a passed string based on a separator character
+	 */
+	void split(const Common::String &src, char separator);
 };
 
 } // namespace Wasteland

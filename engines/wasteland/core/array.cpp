@@ -23,4 +23,17 @@
 
 namespace Wasteland {
 
+void StringArray::split(const Common::String &src, char separator) {
+	clear();
+
+	Common::String str = src;
+	size_t idx;
+	while ((idx = str.findFirstOf(separator)) != Common::String::npos) {
+		push_back(Common::String(str.c_str(), idx));
+		str = Common::String(str.c_str() + idx + 1);
+	}
+
+	push_back(str);
+}
+
 } // namespace Wasteland
