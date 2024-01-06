@@ -22,20 +22,18 @@
 #ifndef WASTELAND_FOD_VIEWS_MENU_VIEW_H
 #define WASTELAND_FOD_VIEWS_MENU_VIEW_H
 
-#include "wasteland/events.h"
+#include "wasteland/fod/views/core/base_view.h"
 #include "wasteland/gfx/clickable_text.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-class MenuView : public UIElement {
+class MenuView : public BaseView {
 private:
 	Gfx::ClickableText _f1;
 	Gfx::ClickableText _f2;
 	Gfx::ClickableText _f3;
-
-	void drawBorders();
 
 protected:
 	int _selectedPartyMember = -1;

@@ -22,13 +22,13 @@
 #ifndef WASTELAND_FOD_VIEWS_GAME_GAME_H
 #define WASTELAND_FOD_VIEWS_GAME_GAME_H
 
-#include "wasteland/events.h"
+#include "wasteland/fod/views/core/base_view.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-class Game : public UIElement {
+class Game : public BaseView {
 public:
 	Game();
 	virtual ~Game() {}

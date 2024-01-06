@@ -25,12 +25,11 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-Game::Game() : UIElement("Game") {
+Game::Game() : BaseView("Game") {
 }
 
 void Game::draw() {
-	Surface s = getSurface();
-	s.clear();
+	drawBorders(0);
 }
 
 bool Game::msgKeypress(const KeypressMessage& msg) {

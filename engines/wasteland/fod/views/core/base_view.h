@@ -19,28 +19,30 @@
  *
  */
 
-#include "wasteland/fod/data/pics.h"
-#include "common/file.h"
+#ifndef WASTELAND_FOD_VIEWS_CORE_BASE_VIEW_H
+#define WASTELAND_FOD_VIEWS_CORE_BASE_VIEW_H
+
+#include "wasteland/events.h"
 
 namespace Wasteland {
 namespace FOD {
-namespace Data {
+namespace Views {
 
-bool Pics::load() {
-	Common::File borders;
-	if (!borders.open("BORDERS"))
-		return false;
+class BaseView : public UIElement {
+protected:
+	/**
+	 * Draws a border around the edges of the screen
+	 * @param bordersNum	Border style to draw (0 to 5)
+	 */
+	void drawBorders(int bordersNum);
 
-	// Load data for drawing on-screen borders
-	borders.read(_borders, 6 * TEXT_W * TEXT_H);
-	borders.close();
+public:
+	BaseView(const Common::String &name);
+	virtual ~BaseView() {}
+};
 
-	if (!_welcome.loadWelcome("GANI"))
-		return false;
-
-	return true;
-}
-
-} // namespace Data
+} // namespace Views
 } // namespace FOD
 } // namespace Wasteland
+
+#endif
