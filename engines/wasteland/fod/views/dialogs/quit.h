@@ -19,31 +19,25 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
-#define WASTELAND_FOD_VIEWS_VIEWS_H
+#ifndef WASTELAND_FOD_VIEWS_DIALOGS_QUIT_H
+#define WASTELAND_FOD_VIEWS_DIALOGS_QUIT_H
 
-#include "wasteland/fod/views/main_menu/main_menu.h"
-#include "wasteland/fod/views/main_menu/title.h"
-#include "wasteland/fod/views/main_menu/edit_member.h"
-#include "wasteland/fod/views/main_menu/remove_member.h"
-#include "wasteland/fod/views/game/game.h"
-#include "wasteland/fod/views/dialogs/quit.h"
+#include "wasteland/fod/views/dialogs/dialog.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
+namespace Dialogs {
 
-struct Views {
-	EditMember _editMember;
-	MainMenu _mainMenu;
-	RemoveMember _removeMember;
-	Title _title;
+class Quit : public Dialog {
+public:
+	Quit() : Dialog("QuitDialog", Gfx::Window(8, 6, 31, 17)) {}
+	virtual ~Quit() {}
 
-	Game _game;
-
-	Dialogs::Quit _quit;
+	void draw() override;
 };
 
+} // namespace Dialogs
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland
