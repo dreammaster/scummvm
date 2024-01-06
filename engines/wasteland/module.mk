@@ -17,11 +17,11 @@ MODULE_OBJS = \
 	fod/data/hds.o \
 	fod/data/party.o \
 	fod/data/pics.o \
-	fod/views/edit_member.o \
-	fod/views/main_menu.o \
-	fod/views/menu_view.o \
-	fod/views/remove_member.o \
-	fod/views/title.o
+	fod/views/main_menu/main_menu/edit_member.o \
+	fod/views/main_menu/main_menu/main_menu.o \
+	fod/views/main_menu/main_menu/menu_view.o \
+	fod/views/main_menu/main_menu/remove_member.o \
+	fod/views/main_menu/main_menu/title.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_WASTELAND), DYNAMIC_PLUGIN)

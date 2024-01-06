@@ -23,7 +23,6 @@
 #define WASTELAND_FOD_DATA_PARTY_H
 
 #include "wasteland/engine.h"
-#include "wasteland/fod/views/views.h"
 #include "wasteland/fod/data/archetypes.h"
 
 namespace Wasteland {

@@ -22,7 +22,7 @@
 #ifndef WASTELAND_FOD_VIEWS_EDIT_MEMBER_H
 #define WASTELAND_FOD_VIEWS_EDIT_MEMBER_H
 
-#include "wasteland/fod/views/menu_view.h"
+#include "wasteland/fod/views/main_menu/menu_view.h"
 #include "wasteland/gfx/clickable_text.h"
 #include "wasteland/gfx/text_entry.h"
 

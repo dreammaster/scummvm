@@ -19,7 +19,7 @@
  *
  */
 
-#include "wasteland/fod/views/main_menu.h"
+#include "wasteland/fod/views/main_menu/main_menu.h"
 #include "wasteland/fod/fod.h"
 
 namespace Wasteland {

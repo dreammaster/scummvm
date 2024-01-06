@@ -22,10 +22,10 @@
 #ifndef WASTELAND_FOD_VIEWS_VIEWS_H
 #define WASTELAND_FOD_VIEWS_VIEWS_H
 
-#include "wasteland/fod/views/main_menu.h"
-#include "wasteland/fod/views/title.h"
-#include "wasteland/fod/views/edit_member.h"
-#include "wasteland/fod/views/remove_member.h"
+#include "wasteland/fod/views/main_menu/main_menu.h"
+#include "wasteland/fod/views/main_menu/title.h"
+#include "wasteland/fod/views/main_menu/edit_member.h"
+#include "wasteland/fod/views/main_menu/remove_member.h"
 
 namespace Wasteland {
 namespace FOD {

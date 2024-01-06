@@ -22,7 +22,6 @@
 #include "wasteland/gfx/wasteland_font.h"
 #include "wasteland/gfx/surface.h"
 #include "wasteland/fod/fod.h"
-#include "wasteland/fod/views/views.h"
 
 namespace Wasteland {
 namespace FOD {

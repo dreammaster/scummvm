@@ -19,7 +19,7 @@
  *
  */
 
-#include "wasteland/fod/views/edit_member.h"
+#include "wasteland/fod/views/main_menu/edit_member.h"
 #include "wasteland/fod/fod.h"
 
 namespace Wasteland {

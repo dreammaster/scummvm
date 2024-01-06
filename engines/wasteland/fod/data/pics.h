@@ -23,7 +23,6 @@
 #define WASTELAND_FOD_DATA_PICS_H
 
 #include "wasteland/engine.h"
-#include "wasteland/fod/views/views.h"
 #include "wasteland/gfx/image_decoder.h"
 
 namespace Wasteland {

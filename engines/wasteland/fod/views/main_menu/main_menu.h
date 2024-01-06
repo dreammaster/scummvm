@@ -19,48 +19,40 @@
  *
  */
 
-#include "wasteland/fod/views/remove_member.h"
-#include "wasteland/fod/fod.h"
+#ifndef WASTELAND_FOD_VIEWS_MAIN_MENU_H
+#define WASTELAND_FOD_VIEWS_MAIN_MENU_H
+
+#include "wasteland/fod/views/main_menu/menu_view.h"
+#include "wasteland/gfx/clickable_text.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-RemoveMember::RemoveMember() : UIElement("RemoveMember") {
-	setBounds(Gfx::Window(0, 14, 39, 19));
-}
+class MainMenu : public MenuView {
+private:
+	Gfx::Window _mainArea;
+	Gfx::ClickableText _addMember;
+	Gfx::ClickableText _editMember;
+	Gfx::ClickableText _removeMember;
+	Gfx::ClickableText _playGame;
 
-bool RemoveMember::msgGame(const GameMessage &msg) {
-	if (msg._name == "REMOVE_MEMBER") {
-		_selectedPartyMember = msg._value;
-		addView();
-		return true;
-	}
+	void addMember();
+	void editMember();
+	void removeMember();
+	void playGame();
 
-	return false;
-}
+public:
+	MainMenu();
+	virtual ~MainMenu() {}
 
-bool RemoveMember::msgKeypress(const KeypressMessage &msg) {
-	if (msg.keycode == Common::KEYCODE_y) {
-		for (int i = _selectedPartyMember; i < (g_engine->_disk1._partyCount - 1); ++i)
-			g_engine->_disk1._party[i] = g_engine->_disk1._party[i + 1];
-
-		--g_engine->_disk1._partyCount;
-	}
-
-	close();
-	return true;
-}
-
-
-void RemoveMember::draw() {
-	Surface s = getSurface();
-	s.clear();
-
-	s.writeCenteredString("Really remove this member?", 1);
-	s.writeCenteredString("Y)es N)o", 3);
-}
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	void draw() override;
+};
 
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland
+
+#endif
