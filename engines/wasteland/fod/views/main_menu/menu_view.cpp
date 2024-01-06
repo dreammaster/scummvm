@@ -28,18 +28,18 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-MenuView::MenuView(const Common::String &name) : UIElement(name),
+MenuView::MenuView(const Common::String &name) : BaseView(name),
 	_f1("F1", nullptr, Gfx::Position(1, 21, 0, 4), "F1>", Common::KEYCODE_F1),
 	_f2("F2", nullptr, Gfx::Position(1, 22, 0, 4), "F2>", Common::KEYCODE_F2),
 	_f3("F3", nullptr, Gfx::Position(1, 23, 0, 4), "F3>", Common::KEYCODE_F3) {
 }
 
 void MenuView::draw() {
-	UIElement::draw();
+	BaseView::draw();
 
 	Surface s = getSurface();
 	s.clear();
-	drawBorders();
+	drawBorders(5);
 
 	// Draw the welcome portrait
 	Surface portrait = getSurface(Gfx::Window(1, 1, 12, 11));
@@ -61,19 +61,6 @@ void MenuView::draw() {
 		_f1.setInverseColor(_selectedPartyMember == 0);
 		_f2.setInverseColor(_selectedPartyMember == 1);
 		_f3.setInverseColor(_selectedPartyMember == 2);
-	}
-}
-
-void MenuView::drawBorders() {
-	Surface s = getSurface();
-	const byte *borders = g_engine->_pics._borders;
-
-	for (int y = 0; y < TEXT_H; ++y) {
-		s.setTextPos(0, y);
-
-		for (int x = 0; x < TEXT_W; ++x) {
-			s.writeChar(*borders++);
-		}
 	}
 }
 

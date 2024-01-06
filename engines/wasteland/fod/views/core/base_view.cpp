@@ -19,28 +19,29 @@
  *
  */
 
-#include "wasteland/fod/data/pics.h"
-#include "common/file.h"
+#include "wasteland/fod/views/core/base_view.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
-namespace Data {
+namespace Views {
 
-bool Pics::load() {
-	Common::File borders;
-	if (!borders.open("BORDERS"))
-		return false;
-
-	// Load data for drawing on-screen borders
-	borders.read(_borders, 6 * TEXT_W * TEXT_H);
-	borders.close();
-
-	if (!_welcome.loadWelcome("GANI"))
-		return false;
-
-	return true;
+BaseView::BaseView(const Common::String &name) : UIElement(name) {
 }
 
-} // namespace Data
+void BaseView::drawBorders(int bordersNum) {
+	Surface s = getSurface();
+	const byte *borders = &g_engine->_pics._borders[bordersNum][0];
+
+	for (int y = 0; y < TEXT_H; ++y) {
+		s.setTextPos(0, y);
+
+		for (int x = 0; x < TEXT_W; ++x) {
+			s.writeChar(*borders++);
+		}
+	}
+}
+
+} // namespace Views
 } // namespace FOD
 } // namespace Wasteland

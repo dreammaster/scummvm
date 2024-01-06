@@ -30,9 +30,8 @@ namespace FOD {
 namespace Data {
 
 struct Pics {
-	byte *_borders = nullptr;
+	byte _borders[6][TEXT_W * TEXT_H];
 	Gfx::ImageDecoder _welcome;
-	~Pics();
 
 	bool load();
 };

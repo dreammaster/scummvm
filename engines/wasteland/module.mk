@@ -17,6 +17,7 @@ MODULE_OBJS = \
 	fod/data/hds.o \
 	fod/data/party.o \
 	fod/data/pics.o \
+	fod/views/core/base_view.o \
 	fod/views/dialogs/dialog.o \
 	fod/views/dialogs/quit.o \
 	fod/views/game/game.o \
