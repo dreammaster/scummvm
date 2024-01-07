@@ -63,7 +63,7 @@ struct PartyMember {
 	byte _field49;
 	byte _field4A;
 	byte _array2[3];
-	byte _field4E;
+	byte _rank;
 	byte _field4F;
 	byte _sex;
 	byte _field51;
@@ -73,7 +73,7 @@ struct PartyMember {
 	byte _field55;
 	byte _field56;
 	byte _field57;
-	byte _highlighted;
+	byte _afflicted;
 	byte _field59;
 	uint16 _field5A;
 	uint16 _field5C;
@@ -91,6 +91,7 @@ struct PartyMember {
 	void reset();
 
 	const Profession &getProfession() const;
+	int getCon() const;
 };
 
 class Party {

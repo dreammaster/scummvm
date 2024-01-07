@@ -59,7 +59,7 @@ void PartyMember::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_field49);
 	s.syncAsByte(_field4A);
 	s.syncBytes(_array2, 3);
-	s.syncAsByte(_field4E);
+	s.syncAsByte(_rank);
 	s.syncAsByte(_field4F);
 	s.syncAsByte(_sex);
 	s.syncAsByte(_field51);
@@ -69,7 +69,7 @@ void PartyMember::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_field55);
 	s.syncAsByte(_field56);
 	s.syncAsByte(_field57);
-	s.syncAsByte(_highlighted);
+	s.syncAsByte(_afflicted);
 	s.syncAsByte(_field59);
 	s.syncAsUint16LE(_field5A);
 	s.syncAsUint16LE(_field5C);
@@ -98,7 +98,7 @@ void PartyMember::reset() {
 	_array1[4]._field0 = 41;
 	_array1[5]._field0 = 55;
 
-	_field4E = 1;
+	_rank = 1;
 	_field5E = 1500;
 	_field60 = 0;
 	_field4A = 0xff;
@@ -117,13 +117,22 @@ void PartyMember::reset() {
 	_field49 = 0;
 }
 
+void Party::synchronize(Common::Serializer &s) {
+	for (int i = 0; i < 5; ++i)
+		_party[i].synchronize(s);
+}
+
 const Profession &PartyMember::getProfession() const {
 	return g_engine->_archetypes._professions[_profession];
 }
 
-void Party::synchronize(Common::Serializer &s) {
-	for (int i = 0; i < 5; ++i)
-		_party[i].synchronize(s);
+int PartyMember::getCon() const {
+	if (_con >= 1)
+		return _con;
+	else if (_con > -60)
+		return ABS(_con) / 15 + 1;
+	else
+		return 5;
 }
 
 } // namespace Data

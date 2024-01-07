@@ -273,7 +273,7 @@ void EditMember::createNewMember(int profession) {
 	Common::fill(member._activeSkills2, member._activeSkills2 + SKILLS_COUNT, 0);
 	Common::fill(member._passiveSkills2, member._passiveSkills2 + SKILLS_COUNT, 0);
 
-	member._highlighted = 0;
+	member._afflicted = 0;
 	member._field51 = prof._field7B;
 	member._sex = Data::SEX_MALE;
 }

@@ -87,7 +87,7 @@ void Game::writeParty() {
 		win.translate(7 * partyNum, 0);
 		Surface s = getSurface(win);
 
-		if (member._highlighted) {
+		if (member._afflicted) {
 			s.clear(15);
 			s.setInverseColor(true);
 		}

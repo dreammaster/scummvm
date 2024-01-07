@@ -23,6 +23,7 @@
 #define WASTELAND_FOD_VIEWS_DIALOGS_CHARACTER_INFO_H
 
 #include "wasteland/fod/views/core/base_view.h"
+#include "wasteland/fod/data/party.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -31,9 +32,10 @@ namespace Dialogs {
 
 class CharacterInfo : public BaseView {
 private:
-	int _partyNum = -1;
+	Data::PartyMember *_member = nullptr;
 
 	void writeStats();
+	void writeName(bool highlight);
 
 public:
 	CharacterInfo() : BaseView("CharacterInfo") {}
