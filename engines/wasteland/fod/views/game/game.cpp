@@ -43,6 +43,7 @@ bool Game::msgFocus(const FocusMessage &msg) {
 void Game::draw() {
 	drawBorders(0);
 
+	writeParty();
 	writeTime();
 	writeInfo();
 }
@@ -76,6 +77,20 @@ bool Game::msgKeypress(const KeypressMessage &msg) {
 void Game::setMode(Mode newMode) {
 	_mode = newMode;
 	_infoText.clear();
+}
+
+void Game::writeParty() {
+	for (uint partyNum = 0; partyNum < g_engine->_disk1._partyCount; ++partyNum) {
+		const Data::PartyMember &member = g_engine->_disk1._party[partyNum];
+
+		Gfx::Window win(1, 1, 6, 1);
+		win.translate(7 * partyNum, 0);
+		Surface s = getSurface(win);
+
+		Common::String tmp = (member._name.size() <= 6) ? member._name :
+			Common::String(member._name.c_str(), 6);
+		s.writeCenteredString(tmp, 0);
+	}
 }
 
 void Game::writeTime() {

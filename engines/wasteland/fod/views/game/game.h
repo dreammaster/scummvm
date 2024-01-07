@@ -35,6 +35,7 @@ private:
 	Common::String _infoText;
 
 	void setMode(Mode newMode);
+	void writeParty();
 	void writeTime();
 	void writeInfo();
 
