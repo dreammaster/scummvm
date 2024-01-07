@@ -29,10 +29,17 @@ namespace FOD {
 namespace Views {
 
 class Game : public BaseView {
+private:
+	Common::String _infoText;
+
+	void writeTime();
+	void writeInfo();
+
 public:
 	Game();
 	virtual ~Game() {}
 
+	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 };
