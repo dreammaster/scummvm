@@ -23,14 +23,14 @@ namespace Wasteland {
 
 const PlainGameDescriptor wastelandGames[] = {
 	{ "wasteland", "Wasteland" },
-	{ "fod", "Fountain of Dreams" },
+	{ "fountainofdreams", "Fountain of Dreams" },
 	{ 0, 0 }
 };
 
 const WastelandGameDescription gameDescriptions[] = {
 	{
 		{
-			"fod",
+			"fountainofdreams",
 			nullptr,
 			AD_ENTRY1s("dmap", "f267ac8b1916373a8437f4c6cfe73c7a", 138956),
 			Common::EN_ANY,
