@@ -195,6 +195,11 @@ public:
 	}
 
 	/**
+	 * Return the view's name
+	 */
+	Common::String getName() const { return _name; }
+
+	/**
 	 * Returns a surface for drawing the element
 	 */
 	Surface getSurface() const;

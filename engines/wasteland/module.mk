@@ -20,6 +20,7 @@ MODULE_OBJS = \
 	fod/data/pics.o \
 	fod/views/core/base_view.o \
 	fod/views/dialogs/dialog.o \
+	fod/views/dialogs/character_info.o \
 	fod/views/dialogs/quit.o \
 	fod/views/game/game.o \
 	fod/views/main_menu/edit_member.o \
