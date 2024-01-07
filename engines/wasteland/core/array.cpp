@@ -36,4 +36,32 @@ void StringArray::split(const Common::String &src, char separator) {
 	push_back(str);
 }
 
+void StringArray::split(const Common::String &src, char separator, size_t maxLen) {
+	Common::String str = src;
+	size_t newLine, lineEnd;
+	clear();
+
+	while (!str.empty()) {
+		// Find end of the current line
+		newLine = str.findFirstOf('\n');
+		lineEnd = (newLine == Common::String::npos) ? str.size() : newLine;
+
+		if (lineEnd > maxLen) {
+			// Move backwards from line end to find point to split line at
+			while (lineEnd > 0 && !(lineEnd <= maxLen && Common::isSpace(str[lineEnd])))
+				--lineEnd;
+			assert(lineEnd > 0);
+		}
+
+		push_back(Common::String(str.c_str(), str.c_str() + lineEnd));
+
+		if (lineEnd == str.size())
+			// Nothing left in string
+			str.clear();
+		else
+			// Remove already processed line
+			str = Common::String(str.c_str() + lineEnd + 1);
+	}
+}
+
 } // namespace Wasteland

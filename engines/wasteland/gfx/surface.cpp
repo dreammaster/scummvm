@@ -76,7 +76,7 @@ void Surface::setupPalette() {
 
 void Surface::writeString(const Common::String &str) {
 	StringArray lines;
-	lines.split(str, '\n');
+	lines.split(str, '\n', this->w / FONT_W);
 
 	for (uint lineNum = 0; lineNum < lines.size(); ++lineNum) {
 		if (lineNum > 0) {
