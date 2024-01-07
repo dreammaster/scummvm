@@ -20,6 +20,7 @@
  */
 
 #include "wasteland/fod/views/dialogs/character_info.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -28,7 +29,9 @@ namespace Dialogs {
 
 bool CharacterInfo::msgGame(const GameMessage& msg) {
 	if (msg._name == "INFO") {
-		_partyNum = msg._value;
+		assert(msg._value >= 0 && msg._value < g_engine->_disk1._partyCount);
+		_member = &g_engine->_disk1._party[msg._value];
+
 		addView();
 		return true;
 	}
@@ -43,8 +46,22 @@ void CharacterInfo::draw() {
 }
 
 void CharacterInfo::writeStats() {
+	bool highlight = false; // TODO: Logic for flag
+	Surface s = getSurface(Gfx::Window(1, 1, 23, 13));
+
+	s.setInverseColor(highlight);
+	s.writeCenteredString(_member->_name, 0);
+	s.setInverseColor(false);
+
+	s.writeString(Common::String::format("Rank: %u", _member->_rank), 0, 1);
+	s.writeString(Common::String::format("Cond: %s",
+		_member->_afflicted ? "Afflicted" : "Unafflicted"), 0, 2);
+
+	if (_member->_afflicted)
+		s.writeString("(V)iew", 16, 2);
 
 }
+
 
 bool CharacterInfo::msgKeypress(const KeypressMessage &msg) {
 	close();
