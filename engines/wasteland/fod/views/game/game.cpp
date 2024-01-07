@@ -87,6 +87,11 @@ void Game::writeParty() {
 		win.translate(7 * partyNum, 0);
 		Surface s = getSurface(win);
 
+		if (member._highlighted) {
+			s.clear(15);
+			s.setInverseColor(true);
+		}
+
 		Common::String tmp = (member._name.size() <= 6) ? member._name :
 			Common::String(member._name.c_str(), 6);
 		s.writeCenteredString(tmp, 0);

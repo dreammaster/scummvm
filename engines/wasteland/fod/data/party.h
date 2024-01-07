@@ -73,7 +73,7 @@ struct PartyMember {
 	byte _field55;
 	byte _field56;
 	byte _field57;
-	byte _field58;
+	byte _highlighted;
 	byte _field59;
 	uint16 _field5A;
 	uint16 _field5C;

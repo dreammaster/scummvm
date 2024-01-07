@@ -69,7 +69,7 @@ void PartyMember::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_field55);
 	s.syncAsByte(_field56);
 	s.syncAsByte(_field57);
-	s.syncAsByte(_field58);
+	s.syncAsByte(_highlighted);
 	s.syncAsByte(_field59);
 	s.syncAsUint16LE(_field5A);
 	s.syncAsUint16LE(_field5C);
