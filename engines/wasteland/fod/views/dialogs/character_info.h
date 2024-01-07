@@ -19,33 +19,32 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
-#define WASTELAND_FOD_VIEWS_VIEWS_H
+#ifndef WASTELAND_FOD_VIEWS_DIALOGS_CHARACTER_INFO_H
+#define WASTELAND_FOD_VIEWS_DIALOGS_CHARACTER_INFO_H
 
-#include "wasteland/fod/views/main_menu/main_menu.h"
-#include "wasteland/fod/views/main_menu/title.h"
-#include "wasteland/fod/views/main_menu/edit_member.h"
-#include "wasteland/fod/views/main_menu/remove_member.h"
-#include "wasteland/fod/views/game/game.h"
-#include "wasteland/fod/views/dialogs/character_info.h"
-#include "wasteland/fod/views/dialogs/quit.h"
+#include "wasteland/fod/views/core/base_view.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
+namespace Dialogs {
 
-struct Views {
-	EditMember _editMember;
-	MainMenu _mainMenu;
-	RemoveMember _removeMember;
-	Title _title;
+class CharacterInfo : public BaseView {
+private:
+	int _partyNum = -1;
 
-	Game _game;
+	void writeStats();
 
-	Dialogs::CharacterInfo _characterInfo;
-	Dialogs::Quit _quit;
+public:
+	CharacterInfo() : BaseView("CharacterInfo") {}
+	virtual ~CharacterInfo() {}
+
+	bool msgGame(const GameMessage &msg) override;
+	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
+} // namespace Dialogs
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland

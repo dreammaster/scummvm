@@ -29,9 +29,12 @@ namespace FOD {
 namespace Views {
 
 class Game : public BaseView {
+	enum Mode { MODE_NORMAL };
 private:
+	Mode _mode;
 	Common::String _infoText;
 
+	void setMode(Mode newMode);
 	void writeTime();
 	void writeInfo();
 

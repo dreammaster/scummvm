@@ -19,35 +19,39 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
-#define WASTELAND_FOD_VIEWS_VIEWS_H
-
-#include "wasteland/fod/views/main_menu/main_menu.h"
-#include "wasteland/fod/views/main_menu/title.h"
-#include "wasteland/fod/views/main_menu/edit_member.h"
-#include "wasteland/fod/views/main_menu/remove_member.h"
-#include "wasteland/fod/views/game/game.h"
 #include "wasteland/fod/views/dialogs/character_info.h"
-#include "wasteland/fod/views/dialogs/quit.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
+namespace Dialogs {
 
-struct Views {
-	EditMember _editMember;
-	MainMenu _mainMenu;
-	RemoveMember _removeMember;
-	Title _title;
+bool CharacterInfo::msgGame(const GameMessage& msg) {
+	if (msg._name == "INFO") {
+		_partyNum = msg._value;
+		addView();
+		return true;
+	}
 
-	Game _game;
+	return false;
+}
 
-	Dialogs::CharacterInfo _characterInfo;
-	Dialogs::Quit _quit;
-};
+void CharacterInfo::draw() {
+	drawBorders(1);
 
+	writeStats();
+}
+
+void CharacterInfo::writeStats() {
+
+}
+
+bool CharacterInfo::msgKeypress(const KeypressMessage &msg) {
+	close();
+	return true;
+}
+
+} // namespace Dialogs
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland
-
-#endif

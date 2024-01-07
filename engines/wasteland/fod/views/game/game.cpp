@@ -32,7 +32,11 @@ Game::Game() : BaseView("Game") {
 }
 
 bool Game::msgFocus(const FocusMessage &msg) {
-	_infoText = "Welcome to the beautiful island of Florida!\n";
+	setMode(MODE_NORMAL);
+
+	if (msg._priorView->getName() == "Title")
+		_infoText = "Welcome to the beautiful island of Florida!\n";
+
 	return true;
 }
 
@@ -43,9 +47,35 @@ void Game::draw() {
 	writeInfo();
 }
 
-bool Game::msgKeypress(const KeypressMessage& msg) {
-	addView("QuitDialog");
+bool Game::msgKeypress(const KeypressMessage &msg) {
+	assert(_mode == MODE_NORMAL);
+
+	switch (msg.keycode) {
+	case Common::KEYCODE_F1:
+	case Common::KEYCODE_F2:
+	case Common::KEYCODE_F3:
+	case Common::KEYCODE_F4:
+	case Common::KEYCODE_F5: {
+		int partyNum = msg.keycode - Common::KEYCODE_F1;
+		if (partyNum < g_engine->_disk1._partyCount)
+			send("CharacterInfo", GameMessage("INFO", partyNum));
+		break;
+	}
+
+	case Common::KEYCODE_q:
+		addView("QuitDialog");
+		break;
+
+	default:
+		break;
+	}
+
 	return true;
+}
+
+void Game::setMode(Mode newMode) {
+	_mode = newMode;
+	_infoText.clear();
 }
 
 void Game::writeTime() {
