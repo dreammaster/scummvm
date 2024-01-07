@@ -19,39 +19,55 @@
  *
  */
 
-#ifndef WASTELAND_FOD_FOD_H
-#define WASTELAND_FOD_FOD_H
+#ifndef WASTELAND_FOD_DATA_DISK1_H
+#define WASTELAND_FOD_DATA_DISK1_H
 
-#include "wasteland/engine.h"
-#include "wasteland/fod/views/views.h"
-#include "wasteland/fod/data/hds.h"
-#include "wasteland/fod/data/disk1.h"
-#include "wasteland/fod/data/archetypes.h"
-#include "wasteland/fod/data/pics.h"
+#include "wasteland/fod/data/party.h"
 
 namespace Wasteland {
 namespace FOD {
+namespace Data {
 
-class FountainOfDreamsEngine : public Wasteland::Engine {
-private:
-	FOD::Views::Views *_views = nullptr;
+struct Disk1 {
+	uint16 _field0;
+	uint16 _field2;
+	uint16 _field4;
+	byte _gfxMode = 3;
+	byte _field7;
+	byte _timeHours;
+	byte _timeMinutes;
+	uint16 _fieldA;
+	uint16 _fieldC;
+	uint16 _fieldE;
+	uint16 _field10;
+	byte _field12;
+	byte _unknown1[9];
+	byte _field1C;
+	byte _unknown2[9];
+	byte _field26;
+	byte _unknown3[9];
+	byte _field30;
+	byte _partyCount;
+	byte _partyIndexes[PARTY_COUNT];
+	byte _timeWeekday;
+	uint16 _field38;
+	Party _party;
+	byte _unknown4[250];
+	byte _field7B0[6];
+	uint16 _field7B6;
+	byte _unknown5[1800];
 
-protected:
-	void setup() override;
+	void synchronize(Common::Serializer &s);
 
-public:
-	Data::Archetypes _archetypes;
-	Data::Disk1 _disk1;
-	Data::HDS _hds;
-	Data::Pics _pics;
+	/**
+	 * Loads the data for disk 1
+	 */
+	bool load(bool &hasParty);
 
-public:
-	FountainOfDreamsEngine(OSystem *syst, const WastelandGameDescription *gameDesc);
-	~FountainOfDreamsEngine() override;
+	void resetRoster();
 };
 
-extern FountainOfDreamsEngine *g_engine;
-
+} // namespace Data
 } // namespace FOD
 } // namespace Wasteland
 
