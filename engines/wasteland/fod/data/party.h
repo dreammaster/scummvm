@@ -116,8 +116,8 @@ struct Disk1 {
 	uint16 _field4;
 	byte _gfxMode = 3;
 	byte _field7;
-	byte _field8;
-	byte _field9;
+	byte _timeHours;
+	byte _timeMinutes;
 	uint16 _fieldA;
 	uint16 _fieldC;
 	uint16 _fieldE;
@@ -131,7 +131,7 @@ struct Disk1 {
 	byte _field30;
 	byte _partyCount;
 	byte _partyIndexes[ROSTER_COUNT];
-	byte _field37;
+	byte _timeWeekday;
 	uint16 _field38;
 	Roster _party;
 	byte _unknown4[250];

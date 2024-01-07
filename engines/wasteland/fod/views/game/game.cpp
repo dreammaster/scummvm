@@ -20,21 +20,43 @@
  */
 
 #include "wasteland/fod/views/game/game.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
+static const char *WEEKDAYS[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+
 Game::Game() : BaseView("Game") {
+}
+
+bool Game::msgFocus(const FocusMessage &msg) {
+	_infoText = "Welcome to the beautiful island of Florida!\n";
+	return true;
 }
 
 void Game::draw() {
 	drawBorders(0);
+
+	writeTime();
+	writeInfo();
 }
 
 bool Game::msgKeypress(const KeypressMessage& msg) {
 	addView("QuitDialog");
 	return true;
+}
+
+void Game::writeTime() {
+	Surface s = getSurface(Gfx::Window(1, 22, 5, 23));
+	s.writeString(WEEKDAYS[g_engine->_disk1._timeWeekday], 1, 0);
+	s.writeString(Common::String::format("%2.2d:%.2d", g_engine->_disk1._timeHours, g_engine->_disk1._timeMinutes),
+		0, 1);
+}
+
+void Game::writeInfo() {
+
 }
 
 } // namespace Views

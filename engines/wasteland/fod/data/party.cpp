@@ -132,8 +132,8 @@ void Disk1::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_field4);
 	s.syncAsByte(_gfxMode);
 	s.syncAsByte(_field7);
-	s.syncAsByte(_field8);
-	s.syncAsByte(_field9);
+	s.syncAsByte(_timeHours);
+	s.syncAsByte(_timeMinutes);
 	s.syncAsUint16LE(_fieldA);
 	s.syncAsUint16LE(_fieldC);
 	s.syncAsUint16LE(_fieldE);
@@ -148,7 +148,7 @@ void Disk1::synchronize(Common::Serializer &s) {
 
 	s.syncAsByte(_partyCount);
 	s.syncBytes(_partyIndexes, ROSTER_COUNT);
-	s.syncAsByte(_field37);
+	s.syncAsByte(_timeWeekday);
 	s.syncAsUint16LE(_field38);
 	_party.synchronize(s);
 
@@ -174,9 +174,9 @@ bool Disk1::load(bool &hasParty) {
 
 		_fieldE = 100;
 		_field10 = 0;
-		_field8 = 9;
-		_field9 = 0;
-		_field37 = 1;
+		_timeHours = 9;
+		_timeMinutes = 0;
+		_timeWeekday = 1;
 		_field7 = 0;
 		_field38 = 0;
 		_fieldA = 10;
