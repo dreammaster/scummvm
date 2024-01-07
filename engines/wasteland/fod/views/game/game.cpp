@@ -56,7 +56,8 @@ void Game::writeTime() {
 }
 
 void Game::writeInfo() {
-
+	Surface s = getSurface(Gfx::Window(7, 22, 39, 24));
+	s.writeString(_infoText);
 }
 
 } // namespace Views

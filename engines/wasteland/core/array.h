@@ -60,6 +60,7 @@ public:
 	 * Splits a passed string based on a separator character
 	 */
 	void split(const Common::String &src, char separator);
+	void split(const Common::String &src, char separator, size_t maxLen);
 };
 
 } // namespace Wasteland
