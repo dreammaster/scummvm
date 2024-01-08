@@ -20,6 +20,7 @@
  */
 
 #include "wasteland/fod/views/dialogs/character_info.h"
+#include "wasteland/fod/data/strings.h"
 #include "wasteland/fod/fod.h"
 
 namespace Wasteland {
@@ -46,10 +47,9 @@ void CharacterInfo::draw() {
 }
 
 void CharacterInfo::writeStats() {
-	bool highlight = false; // TODO: Logic for flag
 	Surface s = getSurface(Gfx::Window(1, 1, 23, 13));
 
-	s.setInverseColor(highlight);
+	s.setInverseColor(_member->_afflicted);
 	s.writeCenteredString(_member->_name, 0);
 	s.setInverseColor(false);
 
@@ -60,6 +60,14 @@ void CharacterInfo::writeStats() {
 	if (_member->_afflicted)
 		s.writeString("(V)iew", 16, 2);
 
+	auto status = _member->getStatus();
+	if (status == Data::STATUS_OK) {
+		s.writeString(Common::String::format(" Con: %3u  MaxCon:  %3u",
+			_member->_con, _member->_conBase), 0, 3);
+	} else {
+		s.writeString(Common::String::format(" Con: %3s  MaxCon:  %3u",
+			Data::STATUSES[status], _member->_conBase), 0, 3);
+	}
 }
 
 

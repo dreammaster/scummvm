@@ -37,6 +37,7 @@ struct Profession {
 	byte _activeSkills[16];
 	byte _passiveSkills[16];
 	uint16 _unkMin, _unkMax;
+	byte _ac;
 	byte _field7B;
 
 	void load(Common::SeekableReadStream &src);

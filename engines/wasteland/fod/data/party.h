@@ -39,6 +39,15 @@ enum Sex {
 	SEX_FEMALE = 2
 };
 
+enum MemberStatus {
+	STATUS_OK = 0,
+	STATUS_UNCONSCIOUS = 1,
+	STATUS_SERIOUS = 2,
+	STATUS_CRITICAL = 3,
+	STATUS_COMATOSE = 4,
+	STATUS_DEAD = 5
+};
+
 struct MemberArray1Entry {
 	byte _field0 = 0;
 	byte _field1 = 0;
@@ -61,7 +70,7 @@ struct PartyMember {
 	uint16 _conBase;
 	byte _profession;
 	byte _field49;
-	byte _field4A;
+	byte _equippedWeapon;
 	byte _array2[3];
 	byte _rank;
 	byte _field4F;
@@ -91,7 +100,8 @@ struct PartyMember {
 	void reset();
 
 	const Profession &getProfession() const;
-	int getCon() const;
+	MemberStatus getStatus() const;
+	int getArmorClass() const;
 };
 
 class Party {

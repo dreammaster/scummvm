@@ -19,45 +19,13 @@
  *
  */
 
-#include "common/algorithm.h"
-#include "common/file.h"
-#include "wasteland/fod/data/archetypes.h"
+#include "wasteland/fod/data/strings.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-void Profession::load(Common::SeekableReadStream &src) {
-	byte buf[128];
-	src.read(buf, 128);
-
-	buf[15] = '\0';
-	_name = Common::String((const char *)buf);
-	Common::copy(&buf[0x14], &buf[0x1b], _attributes);
-	_attributePoints = buf[0x33];
-	Common::copy(&buf[0x38], &buf[0x48], _activeSkills);
-	Common::copy(&buf[0x48], &buf[0x58], _passiveSkills);
-	_unkMin = READ_LE_UINT16(buf + 0x70);
-	_unkMin = READ_LE_UINT16(buf + 0x72);
-	_ac = buf[0x7a];
-	_field7B = buf[0x7b];
-}
-
-bool Archetypes::load() {
-	Common::File f;
-
-	if (!f.open("ARCHTYPE"))
-		return false;
-
-	// Read in the professions
-	f.skip(4);
-	f.seek(f.readUint16LE());
-
-	for (int i = 0; i < PROFESSIONS_COUNT; ++i)
-		_professions[i].load(f);
-
-	return true;
-}
+const char *const STATUSES[6] = { "OK ", "UNC", "SER", "CRT", "COM", "DED" };
 
 } // namespace Data
 } // namespace FOD

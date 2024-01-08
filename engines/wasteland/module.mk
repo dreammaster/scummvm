@@ -15,9 +15,12 @@ MODULE_OBJS = \
 	fod/fod.o \
 	fod/data/archetypes.o \
 	fod/data/disk1.o \
+	fod/data/globals.o \
 	fod/data/hds.o \
 	fod/data/party.o \
 	fod/data/pics.o \
+	fod/data/strings.o \
+	fod/data/weapons.o \
 	fod/views/core/base_view.o \
 	fod/views/dialogs/dialog.o \
 	fod/views/dialogs/character_info.o \
