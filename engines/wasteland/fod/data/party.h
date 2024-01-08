@@ -49,7 +49,7 @@ enum MemberStatus {
 };
 
 struct MemberArray1Entry {
-	byte _field0 = 0;
+	byte _id = 0;
 	byte _field1 = 0;
 	byte _field2 = 0;
 	byte _field3 = 0;

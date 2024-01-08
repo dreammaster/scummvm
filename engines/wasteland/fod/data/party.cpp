@@ -28,7 +28,7 @@ namespace FOD {
 namespace Data {
 
 void MemberArray1Entry::synchronize(Common::Serializer &s) {
-	s.syncAsByte(_field0);
+	s.syncAsByte(_id);
 	s.syncAsByte(_field1);
 	s.syncAsByte(_field2);
 	s.syncAsByte(_field3);
@@ -90,13 +90,13 @@ void PartyMember::reset() {
 
 	for (int i = 0; i < 32; ++i)
 		_array1[i] = MemberArray1Entry();
-	_array1[0]._field0 = 2;
+	_array1[0]._id = 2;
 	_array1[0]._field2 = 9;
-	_array1[1]._field0 = 12;
-	_array1[2]._field0 = 12;
-	_array1[3]._field0 = 32;
-	_array1[4]._field0 = 41;
-	_array1[5]._field0 = 55;
+	_array1[1]._id = 12;
+	_array1[2]._id = 12;
+	_array1[3]._id = 32;
+	_array1[4]._id = 41;
+	_array1[5]._id = 55;
 
 	_rank = 1;
 	_field5E = 1500;
@@ -138,9 +138,14 @@ MemberStatus PartyMember::getStatus() const {
 int PartyMember::getArmorClass() const {
 	int total = 0;
 
-	// TODO: Calculation loop
 	for (int i = 0; i < 3; ++i) {
+		int index = _array2[i];
 
+		if (index != 0xff) {
+			int itemIndex = _array1[index]._id;
+			const GlobalItem &gi = g_engine->_globals._items[itemIndex];
+			total += gi._ac;
+		}
 	}
 
 	return total ? total : getProfession()._ac;

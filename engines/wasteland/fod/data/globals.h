@@ -35,7 +35,7 @@ struct GlobalItem {
 	Common::String _name;
 	uint16 _field12;
 	byte _field14;
-	byte _weaponOffset;
+	byte _ac;
 	byte _field16;
 	byte _field17;
 
