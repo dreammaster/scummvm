@@ -57,7 +57,7 @@ void PartyMember::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_conBase);
 	s.syncAsByte(_profession);
 	s.syncAsByte(_field49);
-	s.syncAsByte(_field4A);
+	s.syncAsByte(_equippedWeapon);
 	s.syncBytes(_array2, 3);
 	s.syncAsByte(_rank);
 	s.syncAsByte(_field4F);
@@ -101,7 +101,7 @@ void PartyMember::reset() {
 	_rank = 1;
 	_field5E = 1500;
 	_field60 = 0;
-	_field4A = 0xff;
+	_equippedWeapon = 0xff;
 
 	Common::fill(&_array2[0], &_array2[3], 0xff);
 
@@ -126,13 +126,24 @@ const Profession &PartyMember::getProfession() const {
 	return g_engine->_archetypes._professions[_profession];
 }
 
-int PartyMember::getCon() const {
+MemberStatus PartyMember::getStatus() const {
 	if (_con >= 1)
-		return _con;
+		return STATUS_OK;
 	else if (_con > -60)
-		return ABS(_con) / 15 + 1;
+		return (MemberStatus)(ABS(_con) / 15 + 1);
 	else
-		return 5;
+		return STATUS_DEAD;
+}
+
+int PartyMember::getArmorClass() const {
+	int total = 0;
+
+	// TODO: Calculation loop
+	for (int i = 0; i < 3; ++i) {
+
+	}
+
+	return total ? total : getProfession()._ac;
 }
 
 } // namespace Data

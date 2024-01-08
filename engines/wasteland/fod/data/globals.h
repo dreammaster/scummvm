@@ -19,46 +19,43 @@
  *
  */
 
-#include "common/algorithm.h"
-#include "common/file.h"
-#include "wasteland/fod/data/archetypes.h"
+#ifndef WASTELAND_FOD_DATA_GLOBALS_H
+#define WASTELAND_FOD_DATA_GLOBALS_H
+
+#include "common/str.h"
+#include "common/stream.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-void Profession::load(Common::SeekableReadStream &src) {
-	byte buf[128];
-	src.read(buf, 128);
+#define GLOBALS_ITEMS_COUNT 118
 
-	buf[15] = '\0';
-	_name = Common::String((const char *)buf);
-	Common::copy(&buf[0x14], &buf[0x1b], _attributes);
-	_attributePoints = buf[0x33];
-	Common::copy(&buf[0x38], &buf[0x48], _activeSkills);
-	Common::copy(&buf[0x48], &buf[0x58], _passiveSkills);
-	_unkMin = READ_LE_UINT16(buf + 0x70);
-	_unkMin = READ_LE_UINT16(buf + 0x72);
-	_ac = buf[0x7a];
-	_field7B = buf[0x7b];
-}
+struct GlobalItem {
+	Common::String _name;
+	uint16 _field12;
+	byte _field14;
+	byte _weaponOffset;
+	byte _field16;
+	byte _field17;
 
-bool Archetypes::load() {
-	Common::File f;
+	void load(Common::SeekableReadStream &src);
+};
 
-	if (!f.open("ARCHTYPE"))
-		return false;
+struct Globals {
+	byte _field0;
+	byte _field1;
+	uint16 _field2;
+	uint16 _field4;
+	uint16 _field6;
 
-	// Read in the professions
-	f.skip(4);
-	f.seek(f.readUint16LE());
+	GlobalItem _items[118];
 
-	for (int i = 0; i < PROFESSIONS_COUNT; ++i)
-		_professions[i].load(f);
-
-	return true;
-}
+	bool load();
+};
 
 } // namespace Data
 } // namespace FOD
 } // namespace Wasteland
+
+#endif // WASTELAND_H

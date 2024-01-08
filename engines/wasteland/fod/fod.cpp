@@ -58,6 +58,10 @@ void FountainOfDreamsEngine::setup() {
 		error("Could not load HDSPCT");
 	if (!_pics.load())
 		error("Could not load display images");
+	if (!_globals.load())
+		error("Could not load GLOBALS");
+	if (!_weapons.load())
+		error("Could not load WEAPONS");
 }
 
 } // namespace FOD
