@@ -28,6 +28,22 @@ namespace FOD {
 namespace Views {
 namespace Dialogs {
 
+struct AttributeItem {
+	byte _x;
+	byte _y;
+	const char *_name;
+};
+
+static const AttributeItem ATTRIBUTES[7] = {
+	{  1,  9, "ST:" },
+	{ 17,  9, "IQ:" },
+	{  1, 10, "DX:" },
+	{  9, 10, "WP:" },
+	{ 17, 10, "AP:" },
+	{  1, 11, "CH:" },
+	{ 17, 11, "LK:" }
+};
+
 bool CharacterInfo::msgGame(const GameMessage& msg) {
 	if (msg._name == "INFO") {
 		assert(msg._value >= 0 && msg._value < g_engine->_disk1._partyCount);
@@ -67,6 +83,20 @@ void CharacterInfo::writeStats() {
 	} else {
 		s.writeString(Common::String::format(" Con: %3s  MaxCon:  %3u",
 			Data::STATUSES[status], _member->_conBase), 0, 3);
+	}
+
+	s.writeString(Common::String::format("  AC: %3u", _member->getArmorClass()), 0, 4);
+
+	Common::String weapon = (_member->_equippedWeapon == 0xff) ? "Hands" :
+		g_engine->_globals._items[_member->_array1[_member->_equippedWeapon]._id]._name;
+	s.writeString(Common::String::format("Weap: %-.17s", weapon.c_str()), 0, 5);
+
+	s.writeString("Attributes", 6, 7);
+	for (int i = 0; i < 7; ++i) {
+		const AttributeItem &ai = ATTRIBUTES[i];
+		s.writeString(Common::String::format("%3s%2u",
+			ai._name, _member->_attributes[i]),
+			ai._x, ai._y);
 	}
 }
 

@@ -52,7 +52,7 @@ void GlobalItem::load(Common::SeekableReadStream &src) {
 
 	_field12 = src.readUint16LE();
 	_field14 = src.readByte();
-	_weaponOffset = src.readByte();
+	_ac = src.readByte();
 	_field16 = src.readByte();
 	_field17 = src.readByte();
 }
