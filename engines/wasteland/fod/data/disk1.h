@@ -38,8 +38,7 @@ struct Disk1 {
 	byte _timeMinutes;
 	uint16 _fieldA;
 	uint16 _fieldC;
-	uint16 _fieldE;
-	uint16 _field10;
+	uint32 _cash;
 	byte _field12;
 	byte _unknown1[9];
 	byte _field1C;
