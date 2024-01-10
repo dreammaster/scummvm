@@ -19,35 +19,31 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
-#define WASTELAND_FOD_VIEWS_VIEWS_H
+#ifndef WASTELAND_FOD_VIEWS_DIALOGS_ALL_CHARACTER_INFO_H
+#define WASTELAND_FOD_VIEWS_DIALOGS_ALL_CHARACTER_INFO_H
 
-#include "wasteland/fod/views/main_menu/main_menu.h"
-#include "wasteland/fod/views/main_menu/title.h"
-#include "wasteland/fod/views/main_menu/edit_member.h"
-#include "wasteland/fod/views/main_menu/remove_member.h"
-#include "wasteland/fod/views/game/game.h"
-#include "wasteland/fod/views/dialogs/all_character_info.h"
-#include "wasteland/fod/views/dialogs/character_info.h"
-#include "wasteland/fod/views/dialogs/quit.h"
+#include "wasteland/fod/views/core/base_view.h"
+#include "wasteland/fod/data/party.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
+namespace Dialogs {
 
-struct Views {
-	EditMember _editMember;
-	MainMenu _mainMenu;
-	RemoveMember _removeMember;
-	Title _title;
+class AllCharacterInfo : public BaseView {
+private:
+	void writeMember(int partyNum);
+	void writeOptions();
 
-	Game _game;
+public:
+	AllCharacterInfo() : BaseView("AllCharacterInfo") {}
+	virtual ~AllCharacterInfo() {}
 
-	Dialogs::AllCharacterInfo _allCharacterInfo;
-	Dialogs::CharacterInfo _characterInfo;
-	Dialogs::Quit _quit;
+	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
+} // namespace Dialogs
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland

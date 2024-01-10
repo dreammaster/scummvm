@@ -30,7 +30,7 @@ namespace Data {
 void MemberArray1Entry::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_id);
 	s.syncAsByte(_field1);
-	s.syncAsByte(_field2);
+	s.syncAsByte(_ammo);
 	s.syncAsByte(_field3);
 	s.syncAsByte(_field4);
 	s.syncAsByte(_field5);
@@ -91,7 +91,7 @@ void PartyMember::reset() {
 	for (int i = 0; i < 32; ++i)
 		_array1[i] = MemberArray1Entry();
 	_array1[0]._id = 2;
-	_array1[0]._field2 = 9;
+	_array1[0]._ammo = 9;
 	_array1[1]._id = 12;
 	_array1[2]._id = 12;
 	_array1[3]._id = 32;

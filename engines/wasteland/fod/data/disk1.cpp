@@ -37,8 +37,7 @@ void Disk1::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_timeMinutes);
 	s.syncAsUint16LE(_fieldA);
 	s.syncAsUint16LE(_fieldC);
-	s.syncAsUint16LE(_fieldE);
-	s.syncAsUint16LE(_field10);
+	s.syncAsUint32LE(_cash);
 	s.syncAsByte(_field12);
 	s.syncBytes(_unknown1, 9);
 	s.syncAsByte(_field1C);
@@ -73,8 +72,7 @@ bool Disk1::load(bool &hasParty) {
 	if (!hasParty) {
 		resetRoster();
 
-		_fieldE = 100;
-		_field10 = 0;
+		_cash = 100;
 		_timeHours = 9;
 		_timeMinutes = 0;
 		_timeWeekday = 1;

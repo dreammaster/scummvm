@@ -51,7 +51,7 @@ enum MemberStatus {
 struct MemberArray1Entry {
 	byte _id = 0;
 	byte _field1 = 0;
-	byte _field2 = 0;
+	byte _ammo = 0;
 	byte _field3 = 0;
 	byte _field4 = 0;
 	byte _field5 = 0;

@@ -52,6 +52,10 @@ bool Game::msgKeypress(const KeypressMessage &msg) {
 	assert(_mode == MODE_NORMAL);
 
 	switch (msg.keycode) {
+	case Common::KEYCODE_a:
+		addView("AllCharacterInfo");
+		break;
+
 	case Common::KEYCODE_F1:
 	case Common::KEYCODE_F2:
 	case Common::KEYCODE_F3:
