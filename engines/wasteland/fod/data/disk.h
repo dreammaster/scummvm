@@ -19,51 +19,28 @@
  *
  */
 
-#ifndef WASTELAND_FOD_DATA_DISK1_H
-#define WASTELAND_FOD_DATA_DISK1_H
+#ifndef WASTELAND_FOD_DATA_DISK_H
+#define WASTELAND_FOD_DATA_DISK_H
 
-#include "wasteland/fod/data/party.h"
+#include "common/file.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-struct Disk1 {
-	uint16 _field0;
-	uint16 _field2;
-	uint16 _field4;
-	byte _gfxMode = 3;
-	byte _field7;
-	byte _timeHours;
-	byte _timeMinutes;
-	uint16 _fieldA;
-	uint16 _fieldC;
-	uint32 _cash;
-	byte _field12;
-	byte _unknown1[9];
-	byte _field1C;
-	byte _unknown2[9];
-	byte _field26;
-	byte _unknown3[9];
-	byte _field30;
-	byte _partyCount;
-	byte _partyIndexes[PARTY_COUNT];
-	byte _timeWeekday;
-	uint16 _field38;
-	Party _party;
-	byte _unknown4[250];
-	byte _field7B0[6];
-	uint16 _field7B6;
-	byte _unknown5[1800];
+class Disk {
+	struct DiskEntry {
+		const char *_disk;
+		const char *_map;
+		const char *_scr;
+		const char *_ani;
+	};
+private:
+	static const DiskEntry _entries[4];
 
-	void synchronize(Common::Serializer &s);
+public:
+	int _currentDiskNum = 0;
 
-	/**
-	 * Loads the data for disk 1
-	 */
-	bool load(bool &hasParty);
-
-	void resetRoster();
 };
 
 } // namespace Data

@@ -38,4 +38,4 @@ struct Weapons {
 } // namespace FOD
 } // namespace Wasteland
 
-#endif // WASTELAND_H
+#endif
