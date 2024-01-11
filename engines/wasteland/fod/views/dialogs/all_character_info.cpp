@@ -104,7 +104,7 @@ bool AllCharacterInfo::msgMouseDown(const MouseDownMessage &msg) {
 		return true;
 
 	for (uint partyNum = 0; partyNum < g_engine->_disk1._partyCount; ++partyNum) {
-		Common::Rect r(0, (1 + partyNum * 4) * 8, 320, (3 + partyNum * 4) * 8);
+		const Common::Rect r(0, (1 + partyNum * 4) * 8, 320, (3 + partyNum * 4) * 8);
 		if (r.contains(msg._pos)) {
 			// Click in party member area
 			close();
