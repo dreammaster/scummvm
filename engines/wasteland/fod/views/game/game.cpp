@@ -78,6 +78,26 @@ bool Game::msgKeypress(const KeypressMessage &msg) {
 	return true;
 }
 
+bool Game::msgMouseDown(const MouseDownMessage &msg) {
+	if (BaseView::msgMouseDown(msg))
+		return true;
+
+	for (uint partyNum = 0; partyNum < g_engine->_disk1._partyCount; ++partyNum) {
+		const Common::Rect r(4 + partyNum * 28, 0, 52 + partyNum * 56, 24);
+		if (r.contains(msg._pos)) {
+			send("CharacterInfo", GameMessage("INFO", partyNum));
+			return true;
+		}
+	}
+
+	if (Common::Rect(280, 0, 320, 24).contains(msg._pos)) {
+		addView("AllCharacterInfo");
+		return true;
+	}
+
+	return false;
+}
+
 void Game::setMode(Mode newMode) {
 	_mode = newMode;
 	_infoText.clear();
