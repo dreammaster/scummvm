@@ -59,4 +59,4 @@ extern FountainOfDreamsEngine *g_engine;
 } // namespace FOD
 } // namespace Wasteland
 
-#endif // WASTELAND_H
+#endif

@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef WASTELAND_H
-#define WASTELAND_H
+#ifndef WASTELAND_ENGINE_H
+#define WASTELAND_ENGINE_H
 
 #include "common/scummsys.h"
 #include "common/system.h"
@@ -121,4 +121,4 @@ extern Engine *g_engine;
 
 } // End of namespace Wasteland
 
-#endif // WASTELAND_H
+#endif
