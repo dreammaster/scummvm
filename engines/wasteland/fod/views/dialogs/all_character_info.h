@@ -24,6 +24,7 @@
 
 #include "wasteland/fod/views/core/base_view.h"
 #include "wasteland/fod/data/party.h"
+#include "wasteland/gfx/clickable_text.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -31,16 +32,19 @@ namespace Views {
 namespace Dialogs {
 
 class AllCharacterInfo : public BaseView {
+	Gfx::ClickableText _reorder;
+	Gfx::ClickableText _banish;
+	Gfx::ClickableText _exit;
 private:
 	void writeMember(int partyNum);
-	void writeOptions();
 
 public:
-	AllCharacterInfo() : BaseView("AllCharacterInfo") {}
+	AllCharacterInfo();
 	virtual ~AllCharacterInfo() {}
 
 	void draw() override;
 	bool msgKeypress(const KeypressMessage &msg) override;
+	bool msgMouseDown(const MouseDownMessage &msg) override;
 };
 
 } // namespace Dialogs
