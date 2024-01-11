@@ -30,6 +30,7 @@ namespace Data {
 
 class Disk {
 	struct DiskEntry {
+		const char *_name;
 		const char *_disk;
 		const char *_map;
 		const char *_scr;

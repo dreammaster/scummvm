@@ -39,13 +39,8 @@ struct Disk1 {
 	uint16 _fieldA;
 	uint16 _fieldC;
 	uint32 _cash;
-	byte _field12;
-	byte _unknown1[9];
-	byte _field1C;
-	byte _unknown2[9];
-	byte _field26;
-	byte _unknown3[9];
-	byte _field30;
+	byte _maps[30];
+	byte _mapIndex;
 	byte _partyCount;
 	byte _partyIndexes[PARTY_COUNT];
 	byte _timeWeekday;

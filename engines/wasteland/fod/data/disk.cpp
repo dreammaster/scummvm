@@ -27,10 +27,10 @@ namespace FOD {
 namespace Data {
 
 const Disk::DiskEntry Disk::_entries[4] = {
-	{ "Disk 1", "KMAP", "KSCR", "KANI" },
-	{ "Disk 2", "KMAP", "KSCR", "KANI" },
-	{ "Disk 3", "FMAP", "FSCR", "FANI" },
-	{ "Disk 4", "DMAP", "DSCR", "DANI" }
+	{ "Disk 1", "disk1", "kmap", "kscr", "kani" },
+	{ "Disk 2", "disk2", "kmap", "kscr", "kani" },
+	{ "Disk 3", "disk3", "fmap", "fscr", "fani" },
+	{ "Disk 4", "disk4", "dmap", "dscr", "dani" }
 };
 
 } // namespace Data
