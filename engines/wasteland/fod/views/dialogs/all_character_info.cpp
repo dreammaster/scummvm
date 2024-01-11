@@ -28,13 +28,20 @@ namespace FOD {
 namespace Views {
 namespace Dialogs {
 
+AllCharacterInfo::AllCharacterInfo() : BaseView("AllCharacterInfo"),
+	_reorder("ReorderItem", this, 19, 22, "(R)eorder roster", Common::KEYCODE_r),
+	_banish("BanishItem", this, 19, 23, "(B)anish", Common::KEYCODE_b),
+	_exit("ExitItem", this, 30, 23, "(L)eave", Common::KEYCODE_l) {
+}
+
 void AllCharacterInfo::draw() {
 	drawBorders(2);
 
 	for (uint partyNum = 0; partyNum < g_engine->_disk1._partyCount; ++partyNum)
 		writeMember(partyNum);
 
-	writeOptions();
+	Surface s = getSurface(Gfx::Window(1, 21, 38, 23));
+	s.writeString(Common::String::format("Cash: $%lu", g_engine->_disk1._cash), 22, 0);
 }
 
 void AllCharacterInfo::writeMember(int partyNum) {
@@ -65,16 +72,48 @@ void AllCharacterInfo::writeMember(int partyNum) {
 		0, 2);	
 }
 
-void AllCharacterInfo::writeOptions() {
-	Surface s = getSurface(Gfx::Window(1, 21, 38, 23));
-	s.writeString(Common::String::format("Cash: $%lu", g_engine->_disk1._cash), 22, 0);
-	s.writeString("(R)eorder roster", 19, 1);
-	s.writeString("(B)anish   (L)eave", 19, 2);
+bool AllCharacterInfo::msgKeypress(const KeypressMessage &msg) {
+	switch (msg.keycode) {
+	case Common::KEYCODE_l:
+	case Common::KEYCODE_ESCAPE:
+		close();
+		break;
+
+	case Common::KEYCODE_F1:
+	case Common::KEYCODE_F2:
+	case Common::KEYCODE_F3:
+	case Common::KEYCODE_F4:
+	case Common::KEYCODE_F5: {
+		int partyNum = msg.keycode - Common::KEYCODE_F1;
+		if (partyNum < g_engine->_disk1._partyCount) {
+			close();
+			send("CharacterInfo", GameMessage("INFO", partyNum));
+		}
+		break;
+	}
+
+	default:
+		break;
+	}
+
+	return true;
 }
 
-bool AllCharacterInfo::msgKeypress(const KeypressMessage &msg) {
-	close();
-	return true;
+bool AllCharacterInfo::msgMouseDown(const MouseDownMessage &msg) {
+	if (BaseView::msgMouseDown(msg))
+		return true;
+
+	for (uint partyNum = 0; partyNum < g_engine->_disk1._partyCount; ++partyNum) {
+		Common::Rect r(0, (1 + partyNum * 4) * 8, 320, (3 + partyNum * 4) * 8);
+		if (r.contains(msg._pos)) {
+			// Click in party member area
+			close();
+			send("CharacterInfo", GameMessage("INFO", partyNum));
+			return true;
+		}
+	}
+
+	return false;
 }
 
 } // namespace Dialogs
