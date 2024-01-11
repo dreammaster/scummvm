@@ -38,13 +38,8 @@ void Disk1::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_fieldA);
 	s.syncAsUint16LE(_fieldC);
 	s.syncAsUint32LE(_cash);
-	s.syncAsByte(_field12);
-	s.syncBytes(_unknown1, 9);
-	s.syncAsByte(_field1C);
-	s.syncBytes(_unknown2, 9);
-	s.syncAsByte(_field26);
-	s.syncBytes(_unknown3, 9);
-	s.syncAsByte(_field30);
+	s.syncBytes(_maps, 30);
+	s.syncAsByte(_mapIndex);
 
 	s.syncAsByte(_partyCount);
 	s.syncBytes(_partyIndexes, PARTY_COUNT);
@@ -72,6 +67,7 @@ bool Disk1::load(bool &hasParty) {
 	if (!hasParty) {
 		resetRoster();
 
+		// Reset game state to beginning
 		_cash = 100;
 		_timeHours = 9;
 		_timeMinutes = 0;
@@ -80,10 +76,10 @@ bool Disk1::load(bool &hasParty) {
 		_field38 = 0;
 		_fieldA = 10;
 		_fieldC = 6;
-		_field30 = 0;
-		_field12 = 28;
-		_field1C = 10;
-		_field26 = 6;
+		_mapIndex = 0;
+		_maps[0] = 28;
+		_maps[10] = 10;
+		_maps[20] = 6;
 		_field7B6 = 0;
 		_partyCount = 0;
 	}
