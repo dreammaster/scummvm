@@ -37,6 +37,9 @@ bool Game::msgFocus(const FocusMessage &msg) {
 	if (msg._priorView->getName() == "Title")
 		_infoText = "Welcome to the beautiful island of Florida!\n";
 
+	int mapNum = g_engine->_disk1._maps[g_engine->_disk1._mapIndex];
+	g_engine->_disk.loadMap(mapNum);
+
 	return true;
 }
 

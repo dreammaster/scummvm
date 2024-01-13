@@ -23,10 +23,14 @@
 #define WASTELAND_FOD_DATA_DISK_H
 
 #include "common/file.h"
+#include "wasteland/fod/data/map.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Data {
+
+#define MAP_CONTENTS_COUNT 28
+#define ANI_CONTENTS_COUNT 53
 
 class Disk {
 	struct DiskEntry {
@@ -36,12 +40,30 @@ class Disk {
 		const char *_scr;
 		const char *_ani;
 	};
+	struct FileEntry {
+		size_t _offset;
+		size_t _size;
+	};
 private:
-	static const DiskEntry _entries[4];
+	static const byte MAP_DISKS[29];
+	static const DiskEntry DISKS[4];
+
+	const DiskEntry *_currentDisk = nullptr;
+	int _currentDiskNum = 0;
+	int _currentMapNum = 0;
+	FileEntry _mapContents[MAP_CONTENTS_COUNT];
+	FileEntry _scrContents[MAP_CONTENTS_COUNT];
+	FileEntry _aniContents[ANI_CONTENTS_COUNT];
+	Map _map;
+
+	void saveMap();
+	void loadFileContents(const Common::Path &path, FileEntry *table, size_t count);
 
 public:
-	int _currentDiskNum = 0;
-
+	/**
+	 * Load a specified map
+	 */
+	void loadMap(int mapNum);
 };
 
 } // namespace Data
