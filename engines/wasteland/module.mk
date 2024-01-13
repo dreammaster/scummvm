@@ -18,6 +18,7 @@ MODULE_OBJS = \
 	fod/data/disk1.o \
 	fod/data/globals.o \
 	fod/data/hds.o \
+	fod/data/map.o \
 	fod/data/party.o \
 	fod/data/pics.o \
 	fod/data/strings.o \
