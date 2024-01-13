@@ -53,8 +53,6 @@ void Disk::loadMap(int mapNum) {
 		loadFileContents(_currentDisk->_map, _mapContents, MAP_CONTENTS_COUNT);
 		loadFileContents(_currentDisk->_scr, _scrContents, MAP_CONTENTS_COUNT);
 		loadFileContents(_currentDisk->_ani, _aniContents, ANI_CONTENTS_COUNT);
-
-
 	}
 }
 
