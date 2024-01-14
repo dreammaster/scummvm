@@ -22,6 +22,7 @@ MODULE_OBJS = \
 	fod/data/map.o \
 	fod/data/party.o \
 	fod/data/pics.o \
+	fod/data/scripts.o \
 	fod/data/strings.o \
 	fod/data/weapons.o \
 	fod/views/core/base_view.o \
