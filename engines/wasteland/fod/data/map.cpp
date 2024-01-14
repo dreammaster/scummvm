@@ -28,7 +28,8 @@ namespace Data {
 
 void Map::MapTile::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_id);
-	s.syncAsUint16LE(_field2);
+	s.syncAsByte(_field2);
+	s.syncAsByte(_field3);
 	s.syncAsUint16LE(_field4);
 	s.syncAsUint16LE(_field6);
 }

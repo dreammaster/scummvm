@@ -67,6 +67,8 @@ public:
 	 * Load a specified map
 	 */
 	void loadMap(int mapNum);
+
+	void processMap();
 };
 
 } // namespace Data

@@ -30,14 +30,14 @@ namespace Data {
 
 struct Disk1Table {
 	struct Entry {
-		uint16 _field0 = 0;
-		byte _field2 = 0;
-		byte _field3 = 0;
-		byte _field4 = 0;
-		byte _field5 = 0;
-		uint16 _field6 = 0;
-		byte _field8 = 0;
-		byte _field9 = 0;
+		byte _mapNum = 0;
+		byte _x = 0;
+		byte _y = 0;
+		byte _flags = 0;
+		uint16 _field4 = 0;
+		byte _field6 = 0;
+		byte _field7 = 0;
+		uint16 _field8 = 0;
 		uint16 _fieldA = 0;
 
 		void load(Common::Serializer &s);
