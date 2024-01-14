@@ -54,12 +54,15 @@ private:
 	FileEntry _mapContents[MAP_CONTENTS_COUNT];
 	FileEntry _scrContents[MAP_CONTENTS_COUNT];
 	FileEntry _aniContents[ANI_CONTENTS_COUNT];
-	Map _map;
 
 	void saveMap();
 	void loadFileContents(const Common::Path &path, FileEntry *table, size_t count);
+	Common::SeekableReadStream *getFile(const Common::Path &path, const FileEntry *table,
+		int index);
 
 public:
+	Map _map;
+
 	/**
 	 * Load a specified map
 	 */

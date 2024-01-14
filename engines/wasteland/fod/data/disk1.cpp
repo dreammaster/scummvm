@@ -27,6 +27,25 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
+void Disk1Table::load(Common::Serializer &s) {
+	s.syncAsUint16LE(_count);
+
+	for (int i = 0; i < 150; ++i)
+		_entries[i].load(s);
+}
+
+void Disk1Table::Entry::load(Common::Serializer &s) {
+	s.syncAsUint16LE(_field0);
+	s.syncAsByte(_field2);
+	s.syncAsByte(_field3);
+	s.syncAsByte(_field4);
+	s.syncAsByte(_field5);
+	s.syncAsUint16LE(_field6);
+	s.syncAsByte(_field8);
+	s.syncAsByte(_field9);
+	s.syncAsUint16LE(_fieldA);
+}
+
 void Disk1::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_field0);
 	s.syncAsUint16LE(_field2);
@@ -48,9 +67,8 @@ void Disk1::synchronize(Common::Serializer &s) {
 	_party.synchronize(s);
 
 	s.syncBytes(_unknown4, 250);
-	s.syncBytes(_field7B0, 6);
-	s.syncAsUint16LE(_field7B6);
-	s.syncBytes(_unknown5, 1800);
+	s.syncBytes(_unknown5, 6);
+	_table.load(s);
 }
 
 bool Disk1::load(bool &hasParty) {
@@ -80,7 +98,7 @@ bool Disk1::load(bool &hasParty) {
 		_maps[0] = 28;
 		_maps[10] = 10;
 		_maps[20] = 6;
-		_field7B6 = 0;
+		_table._count = 0;
 		_partyCount = 0;
 	}
 
@@ -93,7 +111,7 @@ void Disk1::resetRoster() {
 		_partyIndexes[memberNum] = memberNum;
 		member.reset();
 
-		_field7B0[memberNum] = 0;
+		_unknown5[memberNum] = 0;
 	}
 }
 
