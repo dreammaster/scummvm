@@ -28,6 +28,27 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
+struct Disk1Table {
+	struct Entry {
+		uint16 _field0 = 0;
+		byte _field2 = 0;
+		byte _field3 = 0;
+		byte _field4 = 0;
+		byte _field5 = 0;
+		uint16 _field6 = 0;
+		byte _field8 = 0;
+		byte _field9 = 0;
+		uint16 _fieldA = 0;
+
+		void load(Common::Serializer &s);
+	};
+
+	uint16 _count;
+	Entry _entries[150];
+
+	void load(Common::Serializer &s);
+};
+
 struct Disk1 {
 	uint16 _field0;
 	uint16 _field2;
@@ -47,9 +68,8 @@ struct Disk1 {
 	uint16 _field38;
 	Party _party;
 	byte _unknown4[250];
-	byte _field7B0[6];
-	uint16 _field7B6;
-	byte _unknown5[1800];
+	byte _unknown5[6];
+	Disk1Table _table;
 
 	void synchronize(Common::Serializer &s);
 

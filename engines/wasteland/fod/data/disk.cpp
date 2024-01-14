@@ -39,7 +39,8 @@ const Disk::DiskEntry Disk::DISKS[4] = {
 };
 
 void Disk::loadMap(int mapNum) {
-	if (mapNum != _currentMapNum)
+	Common::SeekableReadStream *src;
+	if (mapNum == _currentMapNum)
 		return;
 
 	saveMap();
@@ -54,6 +55,12 @@ void Disk::loadMap(int mapNum) {
 		loadFileContents(_currentDisk->_scr, _scrContents, MAP_CONTENTS_COUNT);
 		loadFileContents(_currentDisk->_ani, _aniContents, ANI_CONTENTS_COUNT);
 	}
+
+	// Load the map
+	src = getFile(_currentDisk->_map, _mapContents, mapNum - 1);
+	Common::Serializer sMap(src, nullptr);
+	_map.synchronize(sMap);
+
 }
 
 void Disk::loadFileContents(const Common::Path &path, Disk::FileEntry *table, size_t count) {
@@ -62,12 +69,26 @@ void Disk::loadFileContents(const Common::Path &path, Disk::FileEntry *table, si
 		error("Could not open %s", path.baseName().c_str());
 
 	for (uint i = 0; i < count; ++i) {
-		table[i]._offset = (size_t)f.readUint16LE() * 4;
+		table[i]._offset = (size_t)f.readUint16LE() * 16;
 		table[i]._size = f.readUint16LE();
 	}
 
-	f.close();
+ 	f.close();
 }
+
+Common::SeekableReadStream *Disk::getFile(const Common::Path &path,
+		const FileEntry *table, int index) {
+	Common::File f;
+	if (!f.open(path))
+		error("Error opening file");
+
+	f.seek(table[index]._offset);
+	Common::SeekableReadStream *result = f.readStream(table[index]._size);
+	f.close();
+
+	return result;
+}
+
 
 void Disk::saveMap() {
 	if (_currentMapNum && (_map._flags & 0x8000)) {

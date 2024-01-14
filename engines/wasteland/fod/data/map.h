@@ -22,7 +22,7 @@
 #ifndef WASTELAND_FOD_DATA_MAP_H
 #define WASTELAND_FOD_DATA_MAP_H
 
-#include "common/file.h"
+#include "common/serializer.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -31,7 +31,33 @@ namespace Data {
 enum MapFlag { MAPFLAG_8000 = 0x8000 };
 
 struct Map {
+	struct MapTile {
+		uint16 _id = 0;
+		uint16 _field2 = 0;
+		uint16 _field4 = 0;
+		uint16 _field6 = 0;
+
+		void synchronize(Common::Serializer &s);
+	};
+
+	uint16 _width = 0;
+	uint16 _height = 0;
 	uint16 _flags = 0;
+	byte _unknown[1022];
+
+	uint16 _offset1 = 0;
+	uint16 _offset2 = 0;
+	uint16 _offset3 = 0;
+	uint16 _offset4 = 0;
+	uint16 _offset5 = 0;
+	uint16 _field40e = 0;
+	uint16 _field410 = 0;
+	uint16 _field412 = 0;
+	Common::Array<MapTile> _tiles;
+
+	const MapTile *_mapTileTopLeft = nullptr;
+
+	void synchronize(Common::Serializer &s);
 };
 
 } // namespace Data

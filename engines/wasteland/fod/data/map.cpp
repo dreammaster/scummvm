@@ -26,6 +26,34 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
+void Map::MapTile::synchronize(Common::Serializer &s) {
+	s.syncAsUint16LE(_id);
+	s.syncAsUint16LE(_field2);
+	s.syncAsUint16LE(_field4);
+	s.syncAsUint16LE(_field6);
+}
+
+void Map::synchronize(Common::Serializer &s) {
+	s.syncAsUint16LE(_width);
+	s.syncAsUint16LE(_height);
+	s.syncAsUint16LE(_flags);
+	s.syncBytes(_unknown, 1022);
+
+	s.syncAsUint16LE(_offset1);
+	s.syncAsUint16LE(_offset2);
+	s.syncAsUint16LE(_offset3);
+	s.syncAsUint16LE(_offset4);
+	s.syncAsUint16LE(_offset5);
+	s.syncAsUint16LE(_field40e);
+	s.syncAsUint16LE(_field410);
+	s.syncAsUint16LE(_field412);
+
+	if (s.isLoading()) {
+		_tiles.resize(_width * _height);
+		for (uint i = 0; i < _tiles.size(); ++i)
+			_tiles[i].synchronize(s);
+	}
+}
 
 } // namespace Data
 } // namespace FOD
