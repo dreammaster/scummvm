@@ -38,6 +38,7 @@ private:
 	void writeParty();
 	void writeTime();
 	void writeInfo();
+	void drawMap();
 
 public:
 	Game();

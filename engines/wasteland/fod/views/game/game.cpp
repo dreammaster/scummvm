@@ -50,6 +50,7 @@ void Game::draw() {
 	writeParty();
 	writeTime();
 	writeInfo();
+	drawMap();
 }
 
 bool Game::msgKeypress(const KeypressMessage &msg) {
@@ -136,6 +137,42 @@ void Game::writeTime() {
 void Game::writeInfo() {
 	Surface s = getSurface(Gfx::Window(7, 22, 39, 24));
 	s.writeString(_infoText);
+}
+
+void Game::drawMap() {
+	Surface s = getSurface(Gfx::Window(1, 3, 39, 21));
+	Data::Map &map = g_engine->_disk._map;
+	int defaultTile = map._flags & ~Data::MAPFLAG_8000;
+	int mapOffsetX = g_engine->_disk1._mapPosX - 9;
+	int mapOffsetY = g_engine->_disk1._mapPosY - 4;
+	int tileId;
+
+	for (int mapY = 0; mapY < 9; ++mapY) {
+		int mapCurrentY = mapOffsetY + mapY;
+
+		for (int mapX = 0; mapX < 19; ++mapX) {
+ 			int mapCurrentX = mapOffsetX + mapX;
+
+			if (mapCurrentX >= map._width || mapCurrentY >= map._height ||
+					mapCurrentX < 0 || mapCurrentY < 0) {
+				tileId = defaultTile;
+			} else {
+				const Data::Map::MapTile &tile = map._tiles[mapCurrentY * map._width + mapCurrentX];
+
+				tileId = tile._id;
+				if (tile._flags & 0x40) {
+					tileId = (tileId & 0x7ff) | 0x1800;
+				} else if (tile._flags & 0x80) {
+					tileId = (tileId & 0x7ff) | 0x1000;
+				}
+			}
+
+			g_engine->_tiles.drawTile(&s, tileId, mapX * TILE_W, mapY * TILE_H);
+		}
+	}
+
+	map._mapState &= 0x7ff;
+	map._mapState |= 0x800;
 }
 
 } // namespace Views

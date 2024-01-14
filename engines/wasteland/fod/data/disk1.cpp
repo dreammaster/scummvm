@@ -54,8 +54,8 @@ void Disk1::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_field7);
 	s.syncAsByte(_timeHours);
 	s.syncAsByte(_timeMinutes);
-	s.syncAsUint16LE(_fieldA);
-	s.syncAsUint16LE(_fieldC);
+	s.syncAsUint16LE(_mapPosX);
+	s.syncAsUint16LE(_mapPosY);
 	s.syncAsUint32LE(_cash);
 	s.syncBytes(_maps, 30);
 	s.syncAsByte(_mapIndex);
@@ -92,8 +92,8 @@ bool Disk1::load(bool &hasParty) {
 		_timeWeekday = 1;
 		_field7 = 0;
 		_field38 = 0;
-		_fieldA = 10;
-		_fieldC = 6;
+		_mapPosX = 10;
+		_mapPosY = 6;
 		_mapIndex = 0;
 		_maps[0] = 28;
 		_maps[10] = 10;

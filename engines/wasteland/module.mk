@@ -11,6 +11,7 @@ MODULE_OBJS = \
 	gfx/image_decoder.o \
 	gfx/surface.o \
 	gfx/text_entry.o \
+	gfx/tiles.o \
 	gfx/wasteland_font.o \
 	fod/fod.o \
 	fod/data/archetypes.o \

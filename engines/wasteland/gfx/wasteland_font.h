@@ -46,7 +46,7 @@ public:
 	~WastelandFont();
 
 	/**
-	 * Loads the font from the specified filer
+	 * Loads the font from the specified file
 	 */
 	bool load(const Common::Path &filename);
 

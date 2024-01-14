@@ -57,8 +57,8 @@ struct Disk1 {
 	byte _field7;
 	byte _timeHours;
 	byte _timeMinutes;
-	uint16 _fieldA;
-	uint16 _fieldC;
+	uint16 _mapPosX;
+	uint16 _mapPosY;
 	uint32 _cash;
 	byte _maps[30];
 	byte _mapIndex;

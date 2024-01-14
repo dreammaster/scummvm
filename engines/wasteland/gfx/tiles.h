@@ -19,43 +19,43 @@
  *
  */
 
-#include "common/file.h"
-#include "wasteland/fod/data/map.h"
+#ifndef WASTELAND_GFX_TILES_H
+#define WASTELAND_GFX_TILES_H
+
+#include "common/array.h"
+#include "graphics/managed_surface.h"
+#include "wasteland/gfx/surface.h"
 
 namespace Wasteland {
-namespace FOD {
-namespace Data {
+namespace Gfx {
 
-void Map::MapTile::synchronize(Common::Serializer &s) {
-	s.syncAsUint16LE(_id);
-	s.syncAsByte(_flags);
-	s.syncAsByte(_field3);
-	s.syncAsUint16LE(_field4);
-	s.syncAsUint16LE(_field6);
-}
+#define TILE_W 16
+#define TILE_H 16
 
-void Map::synchronize(Common::Serializer &s) {
-	s.syncAsUint16LE(_width);
-	s.syncAsUint16LE(_height);
-	s.syncAsUint16LE(_flags);
-	s.syncBytes(_unknown, 1022);
+/**
+ * Manages a tileset
+ */
+class Tiles {
+private:
+	size_t _count;
+	byte *_data = nullptr;
 
-	s.syncAsUint16LE(_offset1);
-	s.syncAsUint16LE(_offset2);
-	s.syncAsUint16LE(_offset3);
-	s.syncAsUint16LE(_offset4);
-	s.syncAsUint16LE(_offset5);
-	s.syncAsUint16LE(_field40e);
-	s.syncAsUint16LE(_field410);
-	s.syncAsUint16LE(_field412);
+public:
+	Tiles() {}
+	~Tiles();
 
-	if (s.isLoading()) {
-		_tiles.resize(_width * _height);
-		for (uint i = 0; i < _tiles.size(); ++i)
-			_tiles[i].synchronize(s);
-	}
-}
+	/**
+	 * Loads the tile set from the specified file
+	 */
+	bool load(const Common::Path &filename);
 
-} // namespace Data
-} // namespace FOD
+	/**
+	 * Draw a tile
+	 */
+	void drawTile(Surface *dst, uint tileId, int x, int y) const;
+};
+
+} // namespace Gfx
 } // namespace Wasteland
+
+#endif
