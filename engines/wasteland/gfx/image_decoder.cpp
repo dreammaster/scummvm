@@ -66,6 +66,25 @@ bool ImageDecoder::loadWelcome(const Common::Path &name) {
 	return true;
 }
 
+bool ImageDecoder::loadTiles(const Common::Path &name) {
+	Common::File f;
+	Common::MemoryWriteStreamDynamic tmp(DisposeAfterUse::YES);
+
+	if (!f.open(name))
+		return false;
+
+	// Decompress the stream
+	loadStream(f, tmp);
+	assert((tmp.size() % 128) == 0);
+
+	// Create the surface and copy the data in
+	_surface.create(16, (tmp.size() / 128) * 16);
+	Common::MemoryReadStream tmp2(tmp.getData(), tmp.size());
+	copyPixelsToSurface(tmp2);
+
+	return true;
+}
+
 void ImageDecoder::loadStream(Common::ReadStream &src, Common::WriteStream &dest) {
 	int size = src.readUint32LE();
 	int bufferOffset = 0xfee;

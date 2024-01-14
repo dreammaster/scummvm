@@ -60,6 +60,12 @@ public:
 	bool loadWelcome(const Common::Path &name);
 
 	/**
+	 * Special variation for loading a tileset.
+	 * The tiles are loaded onto a long vertical surface
+	 */
+	bool loadTiles(const Common::Path &name);
+
+	/**
 	 * Returns the surface of the decoded image
 	 */
 	const Graphics::ManagedSurface *getSurface() const { return &_surface; }

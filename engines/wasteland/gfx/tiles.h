@@ -25,6 +25,7 @@
 #include "common/array.h"
 #include "graphics/managed_surface.h"
 #include "wasteland/gfx/surface.h"
+#include "wasteland/gfx/image_decoder.h"
 
 namespace Wasteland {
 namespace Gfx {
@@ -37,13 +38,9 @@ namespace Gfx {
  */
 class Tiles {
 private:
-	size_t _count;
-	byte *_data = nullptr;
+	ImageDecoder _decoder;
 
 public:
-	Tiles() {}
-	~Tiles();
-
 	/**
 	 * Loads the tile set from the specified file
 	 */

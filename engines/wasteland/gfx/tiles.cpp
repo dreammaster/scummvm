@@ -28,39 +28,16 @@ namespace Gfx {
 #define TILE_SIZE (TILE_W / 2 * TILE_H)
 
 bool Tiles::load(const Common::Path &filename) {
-	Common::File f;
-	if (!f.open(filename))
-		return false;
-
-	// Get the size of the font
-	_count = f.readUint16LE();
-	_data = new byte[_count * TILE_SIZE];
-	f.read(_data, _count * TILE_SIZE);
-	return true;
-}
-
-Tiles::~Tiles() {
-	delete[] _data;
+	return _decoder.loadTiles(filename);
 }
 
 void Tiles::drawTile(Surface *dst, uint tileId, int x, int y) const {
 	assert(x >= 0 && y >= 0 && x <= (dst->w - TILE_W) && y <= (dst->h - TILE_H));
-	const byte *src = &_data[tileId * TILE_SIZE];
 
-	for (int yCtr = 0; yCtr < TILE_H; ++yCtr) {
-		byte *dest = (byte *)dst->getBasePtr(x, y + yCtr);
+	const Graphics::ManagedSurface *src = _decoder.getSurface();
+	Common::Rect r(0, tileId * 16, 16, (tileId + 1) * 16);
 
-		// The 16 pixels are stored in two pixels per byte
-		uint64 srcVal = READ_LE_UINT64(src);
-		src += 8;
-
-		for (int xCtr = 0; xCtr < (TILE_W / 2); ++xCtr, srcVal >>= 8) {
-			*dest++ = (srcVal >> 4) & 0xf;
-			*dest++ = srcVal & 0xf;
-		}
-	}
-
-	dst->addDirtyRect(Common::Rect(x, y, x + TILE_W, y + TILE_H));
+	dst->blitFrom(*src, r, Common::Point(x, y));
 }
 
 } // namespace Gfx
