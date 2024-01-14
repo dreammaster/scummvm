@@ -84,7 +84,7 @@ void Disk::processMap() {
 			if (entry._flags & 0x40) {
 				tile._field3 = entry._field7;
 				tile._field4 = entry._field8;
-				tile._field2 = (tile._field2 & 0x80) | entry._field6;
+				tile._flags = (tile._flags & 0x80) | entry._field6;
 			}
 
 			if (entry._flags & 0x20)

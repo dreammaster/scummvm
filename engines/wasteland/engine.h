@@ -37,6 +37,7 @@
 
 #include "wasteland/detection.h"
 #include "wasteland/events.h"
+#include "wasteland/gfx/tiles.h"
 
 namespace Wasteland {
 
@@ -59,6 +60,7 @@ protected:
 
 public:
 	Graphics::Font *_font = nullptr;
+	Gfx::Tiles _tiles;
 
 public:
 	Engine(OSystem *syst, const WastelandGameDescription *gameDesc);

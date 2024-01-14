@@ -49,6 +49,9 @@ void FountainOfDreamsEngine::setup() {
 		error("Could not load FONT");
 	_font = font;
 
+	if (!_tiles.load("TILES"))
+		error("Could not load TILES");
+
 	bool hasParty = false;
 	if (!_disk1.load(hasParty))
 		error("Could not load DISK1");

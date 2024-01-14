@@ -33,7 +33,7 @@ enum MapFlag { MAPFLAG_8000 = 0x8000 };
 struct Map {
 	struct MapTile {
 		uint16 _id = 0;
-		byte _field2 = 0;
+		byte _flags = 0;
 		byte _field3 = 0;
 		uint16 _field4 = 0;
 		uint16 _field6 = 0;
@@ -54,7 +54,9 @@ struct Map {
 	uint16 _field40e = 0;
 	uint16 _field410 = 0;
 	uint16 _field412 = 0;
+
 	Common::Array<MapTile> _tiles;
+	uint16 _mapState = 0;
 
 	const MapTile *_mapTileTopLeft = nullptr;
 
