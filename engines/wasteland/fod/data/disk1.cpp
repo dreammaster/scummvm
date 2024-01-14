@@ -35,14 +35,14 @@ void Disk1Table::load(Common::Serializer &s) {
 }
 
 void Disk1Table::Entry::load(Common::Serializer &s) {
-	s.syncAsUint16LE(_field0);
-	s.syncAsByte(_field2);
-	s.syncAsByte(_field3);
-	s.syncAsByte(_field4);
-	s.syncAsByte(_field5);
-	s.syncAsUint16LE(_field6);
-	s.syncAsByte(_field8);
-	s.syncAsByte(_field9);
+	s.syncAsByte(_mapNum);
+	s.syncAsByte(_x);
+	s.syncAsByte(_y);
+	s.syncAsByte(_flags);
+	s.syncAsUint16LE(_field4);
+	s.syncAsByte(_field6);
+	s.syncAsByte(_field7);
+	s.syncAsUint16LE(_field8);
 	s.syncAsUint16LE(_fieldA);
 }
 

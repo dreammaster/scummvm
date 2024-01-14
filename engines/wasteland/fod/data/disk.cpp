@@ -21,6 +21,7 @@
 
 #include "common/file.h"
 #include "wasteland/fod/data/disk.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -61,6 +62,45 @@ void Disk::loadMap(int mapNum) {
 	Common::Serializer sMap(src, nullptr);
 	_map.synchronize(sMap);
 
+	processMap();
+}
+
+void Disk::processMap() {
+	Disk1Table &table = g_engine->_disk1._table;
+	int newCount = 0;
+
+	for (uint tableCtr = 0; tableCtr < table._count; ++tableCtr) {
+		int entryIndex = tableCtr - newCount;
+		const Disk1Table::Entry &entry = table._entries[entryIndex];
+
+		if (entry._mapNum == _currentMapNum) {
+			Map::MapTile &tile = _map._tiles[entry._y * _map._width + entry._x];
+
+			if (entry._flags & 0x80)
+				tile._id = (tile._id & 0xf800) | entry._field4;
+
+			if (entry._flags & 0x40) {
+				tile._field3 = entry._field7;
+				tile._field4 = entry._field8;
+				tile._field2 = (tile._field2 & 0x80) | entry._field6;
+			}
+
+			if (entry._flags & 0x20)
+				tile._field6 = entry._fieldA;
+
+			++newCount;
+
+			if ((table._count - 1) != entryIndex) {
+				for (int idx = entryIndex; idx <= (table._count - newCount); ++idx)
+					table._entries[idx] = table._entries[idx + 1];
+			}
+		}
+	}
+
+	if (newCount > 0) {
+		table._count = newCount;
+		_map._flags |= MAPFLAG_8000;
+	}
 }
 
 void Disk::loadFileContents(const Common::Path &path, Disk::FileEntry *table, size_t count) {
