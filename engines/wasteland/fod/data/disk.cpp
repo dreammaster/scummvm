@@ -61,8 +61,10 @@ void Disk::loadMap(int mapNum) {
 	src = getFile(_currentDisk->_map, _mapContents, mapNum - 1);
 	Common::Serializer sMap(src, nullptr);
 	_map.synchronize(sMap);
+	delete src;
 
 	processMap();
+	loadScripts();
 }
 
 void Disk::processMap() {
@@ -101,6 +103,12 @@ void Disk::processMap() {
 		table._count = newCount;
 		_map._flags |= MAPFLAG_8000;
 	}
+}
+
+void Disk::loadScripts() {
+	Common::fill(_scriptsArray, _scriptsArray + 3, -1);
+
+	// TODO: Scripts loading
 }
 
 void Disk::loadFileContents(const Common::Path &path, Disk::FileEntry *table, size_t count) {

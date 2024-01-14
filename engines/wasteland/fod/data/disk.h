@@ -54,6 +54,8 @@ private:
 	FileEntry _mapContents[MAP_CONTENTS_COUNT];
 	FileEntry _scrContents[MAP_CONTENTS_COUNT];
 	FileEntry _aniContents[ANI_CONTENTS_COUNT];
+	int _scriptsArray[3];
+	int _scriptsCtr;
 
 	void saveMap();
 	void loadFileContents(const Common::Path &path, FileEntry *table, size_t count);
@@ -69,6 +71,8 @@ public:
 	void loadMap(int mapNum);
 
 	void processMap();
+
+	void loadScripts();
 };
 
 } // namespace Data
