@@ -83,7 +83,7 @@ bool Disk1::load(bool &hasParty) {
 	hasParty = _field2 || _field0;
 
 	if (!hasParty) {
-		resetRoster();
+		resetParty();
 
 		// Reset game state to beginning
 		_cash = 100;
@@ -105,7 +105,7 @@ bool Disk1::load(bool &hasParty) {
 	return true;
 }
 
-void Disk1::resetRoster() {
+void Disk1::resetParty() {
 	for (int memberNum = 0; memberNum < PARTY_COUNT; ++memberNum) {
 		PartyMember &member = _party[memberNum];
 		_partyIndexes[memberNum] = memberNum;
@@ -113,6 +113,15 @@ void Disk1::resetRoster() {
 
 		_unknown5[memberNum] = 0;
 	}
+}
+
+bool Disk1::isPartyAlive() const {
+	for (uint i = 0; i < _partyCount; ++i) {
+		if (_party[i]._con > 0 && _party[i]._field57)
+			return true;
+	}
+
+	return false;
 }
 
 } // namespace Data
