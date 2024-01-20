@@ -21,6 +21,7 @@
 
 #include "common/file.h"
 #include "wasteland/fod/logic/game.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -57,7 +58,9 @@ void Game::setPartyIcon(Direction dir) {
 }
 
 void Game::move(Direction dir, bool flag) {
-
+	static const int8 DELTAS[4][2] = { { 0, -1 }, { 0, 1 }, { 1, 0 }, { -1, 0 } };
+	g_engine->_disk1._mapPosX += DELTAS[dir - 1][0];
+	g_engine->_disk1._mapPosY += DELTAS[dir - 1][1];
 }
 
 } // namespace Logic
