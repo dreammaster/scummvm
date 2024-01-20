@@ -48,7 +48,7 @@ protected:
 	/**
 	 * Show a message after attempting to leave the edge of a map
 	 */
-	void showEdgeMessage() override;
+	void showMoveMessage(int msgNum) override;
 
 public:
 	Game();

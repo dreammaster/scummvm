@@ -42,6 +42,7 @@ protected:
 	uint16 _personIcons[21];
 	int _personIconsSection = 0;
 	Direction _currentDir = DIR_NONE;
+	Common::Point _newMapPos;
 
 	/**
 	 * Sets the slot for the party in the person icons array
@@ -55,9 +56,9 @@ protected:
 	void move(Direction dir, bool flag);
 
 	/**
-	 * Show a message after attempting to leave the edge of a map
+	 * Show a movement message
 	 */
-	virtual void showEdgeMessage() = 0;
+	virtual void showMoveMessage(int msgNum) = 0;
 
 public:
 	Game();

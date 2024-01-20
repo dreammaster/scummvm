@@ -241,9 +241,12 @@ void Game::move(Logic::Direction dir) {
 	redraw();
 }
 
-void Game::showEdgeMessage() {
+void Game::showMoveMessage(int msgNum) {
 	_infoText.clear();
-	int msgNum = g_engine->_disk._map._edgeMessage;
+
+	if (msgNum == -1)
+		// Hiccup
+		msgNum = 4;
 
 	if (msgNum)
 		_infoText = EDGE_MESSAGES[msgNum - 1];
