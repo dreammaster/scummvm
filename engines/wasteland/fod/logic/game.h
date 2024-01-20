@@ -33,6 +33,10 @@ enum Direction {
 	DIR_NONE = 5
 };
 
+enum PersonId {
+	PERSON_PARTY = 1, PERSON_2 = 2, PERSON_4 = 4
+};
+
 class Game {
 protected:
 	uint16 _personIcons[21];

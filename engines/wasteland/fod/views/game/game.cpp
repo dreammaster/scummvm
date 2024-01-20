@@ -32,6 +32,10 @@ namespace Views {
 #define MAP_TILES_X 19
 #define MAP_TILES_Y 9
 
+#define MAP_FG_SHIFT 11
+#define MAP_BG_MASK 0x7ff
+#define MAP_TILE(BG, FG) ((BG & MAP_BG_MASK) | (FG << MAP_FG_SHIFT))
+
 static const char *WEEKDAYS[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 Game::Game() : BaseView("Game") {
@@ -190,9 +194,9 @@ void Game::drawMap() {
 
 				tileId = tile._id;
 				if (tile._flags & 0x40) {
-					tileId = (tileId & 0x7ff) | 0x1800;
+					tileId = MAP_TILE(tileId, Logic::PERSON_4);
 				} else if (tile._flags & 0x80) {
-					tileId = (tileId & 0x7ff) | 0x1000;
+					tileId = MAP_TILE(tileId, Logic::PERSON_2);
 				}
 			}
 
@@ -204,18 +208,18 @@ void Game::drawMap() {
 	}
 
 	// Draw the party's icon at the center of the screen
-	partyTile = (partyTile & 0x7ff) | 0x800;
+	partyTile = MAP_TILE(partyTile, Logic::PERSON_PARTY);
 	drawTileAt(s, MAP_CENTER_X, MAP_CENTER_Y, partyTile);
 }
 
 void Game::drawTileAt(Surface &s, int mapX, int mapY, int tileId) {
-	int index = tileId & 0x7ff;
+	int index = tileId & MAP_BG_MASK;
 	g_engine->_tiles.drawTile(&s, index, mapX * TILE_W, mapY * TILE_H, false);
 
-	if (tileId & 0xf800) {
+	if (tileId >> MAP_FG_SHIFT) {
 		// Drawing party icon. The paragraph represents the icon offset * 16.
 		// And since each icon is 128 bytes, the index can be calculated
-		int iconParagraph = _personIcons[((tileId & 0xf800) >> 8) >> 3];
+		int iconParagraph = _personIcons[tileId >> MAP_FG_SHIFT];
 		assert((iconParagraph % (128 / 16)) == 0);
 		index = iconParagraph / (128 / 16);
 
