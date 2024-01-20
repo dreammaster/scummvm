@@ -44,6 +44,7 @@ public:
 
 	void draw() override;
 	bool msgKeypress(const KeypressMessage &msg) override;
+	bool msgAction(const ActionMessage &msg);
 	bool msgMouseDown(const MouseDownMessage &msg) override;
 };
 

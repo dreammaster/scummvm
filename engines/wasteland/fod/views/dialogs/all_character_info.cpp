@@ -22,6 +22,7 @@
 #include "wasteland/fod/views/dialogs/all_character_info.h"
 #include "wasteland/fod/data/strings.h"
 #include "wasteland/fod/fod.h"
+#include "wasteland/keymapping.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -75,28 +76,40 @@ void AllCharacterInfo::writeMember(int partyNum) {
 bool AllCharacterInfo::msgKeypress(const KeypressMessage &msg) {
 	switch (msg.keycode) {
 	case Common::KEYCODE_l:
-	case Common::KEYCODE_ESCAPE:
 		close();
 		break;
-
-	case Common::KEYCODE_F1:
-	case Common::KEYCODE_F2:
-	case Common::KEYCODE_F3:
-	case Common::KEYCODE_F4:
-	case Common::KEYCODE_F5: {
-		int partyNum = msg.keycode - Common::KEYCODE_F1;
-		if (partyNum < g_engine->_disk1._partyCount) {
-			close();
-			send("CharacterInfo", GameMessage("INFO", partyNum));
-		}
-		break;
-	}
 
 	default:
 		break;
 	}
 
 	return true;
+}
+
+bool AllCharacterInfo::msgAction(const ActionMessage &msg) {
+	switch (msg._action) {
+	case KEYBIND_ESCAPE:
+		close();
+		return true;
+
+	case KEYBIND_VIEW_PARTY1:
+	case KEYBIND_VIEW_PARTY2:
+	case KEYBIND_VIEW_PARTY3:
+	case KEYBIND_VIEW_PARTY4:
+	case KEYBIND_VIEW_PARTY5: {
+		int partyNum = msg._action - KEYBIND_VIEW_PARTY1;
+		if (partyNum < g_engine->_disk1._partyCount) {
+			close();
+			send("CharacterInfo", GameMessage("INFO", partyNum));
+		}
+		return true;
+	}
+
+	default:
+		break;
+	}
+
+	return false;
 }
 
 bool AllCharacterInfo::msgMouseDown(const MouseDownMessage &msg) {

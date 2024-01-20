@@ -22,6 +22,7 @@
 #include "wasteland/fod/views/dialogs/character_info.h"
 #include "wasteland/fod/data/strings.h"
 #include "wasteland/fod/fod.h"
+#include "wasteland/keymapping.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -100,10 +101,18 @@ void CharacterInfo::writeStats() {
 	}
 }
 
-
 bool CharacterInfo::msgKeypress(const KeypressMessage &msg) {
 	close();
 	return true;
+}
+
+bool CharacterInfo::msgAction(const ActionMessage &msg) {
+	if (msg._action == KEYBIND_ESCAPE) {
+		close();
+		return true;
+	}
+
+	return false;
 }
 
 } // namespace Dialogs
