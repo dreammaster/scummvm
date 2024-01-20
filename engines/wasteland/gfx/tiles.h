@@ -49,7 +49,7 @@ public:
 	/**
 	 * Draw a tile
 	 */
-	void drawTile(Surface *dst, uint tileId, int x, int y) const;
+	void drawTile(Surface *dst, uint tileId, int x, int y, bool transparent) const;
 };
 
 } // namespace Gfx
