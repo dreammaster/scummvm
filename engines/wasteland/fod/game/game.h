@@ -19,40 +19,29 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_GAME_GAME_H
-#define WASTELAND_FOD_VIEWS_GAME_GAME_H
+#ifndef WASTELAND_FOD_DATA_GAME_H
+#define WASTELAND_FOD_DATA_GAME_H
 
-#include "wasteland/fod/views/core/base_view.h"
-#include "wasteland/fod/game/game.h"
+#include "common/serializer.h"
 
 namespace Wasteland {
 namespace FOD {
-namespace Views {
+namespace Game {
 
-class Game : public BaseView, public FOD::Game::Game {
-	enum Mode { MODE_NORMAL };
-private:
-	Mode _mode;
-	Common::String _infoText;
-
-	void setMode(Mode newMode);
-	void writeParty();
-	void writeTime();
-	void writeInfo();
-	void drawMap();
-
-public:
-	Game();
-	virtual ~Game() {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgAction(const ActionMessage &msg) override;
+enum Direction {
+	DIR_NORTH = 1, DIR_SOUTH = 2, DIR_EAST = 3, DIR_WEST = 4,
+	DIR_NONE = 5
 };
 
-} // namespace Views
+class Game {
+protected:
+	void move(Direction dir, bool flag);
+
+public:
+	virtual ~Game() {}
+};
+
+} // namespace Game
 } // namespace FOD
 } // namespace Wasteland
 
