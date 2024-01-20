@@ -22,6 +22,7 @@
 #ifndef WASTELAND_FOD_LOGIC_GAME_H
 #define WASTELAND_FOD_LOGIC_GAME_H
 
+#include "common/rect.h"
 #include "common/serializer.h"
 
 namespace Wasteland {
@@ -42,7 +43,7 @@ protected:
 	uint16 _personIcons[21];
 	int _personIconsSection = 0;
 	Direction _currentDir = DIR_NONE;
-	Common::Point _newMapPos;
+	Common::Point _oldMapPos;
 
 	/**
 	 * Sets the slot for the party in the person icons array
@@ -54,6 +55,10 @@ protected:
 	 * Move the party in the specified direction
 	 */
 	void move(Direction dir, bool flag);
+
+	void nothing(bool flag);
+
+	void moved(int mapX, int mapY);
 
 	/**
 	 * Show a movement message

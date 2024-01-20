@@ -41,6 +41,8 @@ struct Map {
 		void synchronize(Common::Serializer &s);
 	};
 
+	uint16 _mapNum = 0;
+
 	uint16 _width = 0;
 	uint16 _height = 0;
 	uint16 _flags = 0;
