@@ -78,7 +78,13 @@ struct Disk1 {
 	 */
 	bool load(bool &hasParty);
 
-	void resetRoster();
+	void resetParty();
+
+	/**
+	 * Returns true if someone in the party is alive
+	 */
+	bool isPartyAlive() const;
+
 };
 
 } // namespace Data

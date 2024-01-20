@@ -54,6 +54,11 @@ protected:
 	 */
 	void move(Direction dir, bool flag);
 
+	/**
+	 * Show a message after attempting to leave the edge of a map
+	 */
+	virtual void showEdgeMessage() = 0;
+
 public:
 	Game();
 	virtual ~Game() {}

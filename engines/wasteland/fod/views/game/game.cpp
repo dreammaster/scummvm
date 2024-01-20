@@ -38,6 +38,13 @@ namespace Views {
 
 static const char *WEEKDAYS[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
+static const char *const EDGE_MESSAGES[4] = {
+	"\nYou see miles of impassable ocean and you decide to turn back.\n",
+	"\nThere are roads around here somewhere!\n",
+	"\nTry using the road, friend.\n",
+	"\n            hic!\n"
+};
+
 Game::Game() : BaseView("Game") {
 }
 
@@ -232,6 +239,14 @@ void Game::move(Logic::Direction dir) {
 	Logic::Game::move(dir, false);
 
 	redraw();
+}
+
+void Game::showEdgeMessage() {
+	_infoText.clear();
+	int msgNum = g_engine->_disk._map._edgeMessage;
+
+	if (msgNum)
+		_infoText = EDGE_MESSAGES[msgNum - 1];
 }
 
 } // namespace Views

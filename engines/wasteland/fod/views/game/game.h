@@ -45,6 +45,11 @@ private:
 protected:
 	void move(Logic::Direction dir);
 
+	/**
+	 * Show a message after attempting to leave the edge of a map
+	 */
+	void showEdgeMessage() override;
+
 public:
 	Game();
 	virtual ~Game() {}
