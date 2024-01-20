@@ -19,17 +19,44 @@
  *
  */
 
-#include "common/file.h"
-#include "wasteland/fod/game/game.h"
+#ifndef WASTELAND_FOD_LOGIC_GAME_H
+#define WASTELAND_FOD_LOGIC_GAME_H
+
+#include "common/serializer.h"
 
 namespace Wasteland {
 namespace FOD {
-namespace Game {
+namespace Logic {
 
-void Game::move(Direction dir, bool flag) {
+enum Direction {
+	DIR_NORTH = 1, DIR_SOUTH = 2, DIR_EAST = 3, DIR_WEST = 4,
+	DIR_NONE = 5
+};
 
-}
+class Game {
+protected:
+	uint16 _personIcons[21];
+	int _personIconsSection = 0;
+	Direction _currentDir = DIR_NONE;
 
-} // namespace Game
+	/**
+	 * Sets the slot for the party in the person icons array
+	 * based on the new direction the party is facing
+	 */
+	void setPartyIcon(Direction dir);
+
+	/**
+	 * Move the party in the specified direction
+	 */
+	void move(Direction dir, bool flag);
+
+public:
+	Game();
+	virtual ~Game() {}
+};
+
+} // namespace Logic
 } // namespace FOD
 } // namespace Wasteland
+
+#endif

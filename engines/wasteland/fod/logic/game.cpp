@@ -19,30 +19,47 @@
  *
  */
 
-#ifndef WASTELAND_FOD_DATA_GAME_H
-#define WASTELAND_FOD_DATA_GAME_H
-
-#include "common/serializer.h"
+#include "common/file.h"
+#include "wasteland/fod/logic/game.h"
 
 namespace Wasteland {
 namespace FOD {
-namespace Game {
+namespace Logic {
 
-enum Direction {
-	DIR_NORTH = 1, DIR_SOUTH = 2, DIR_EAST = 3, DIR_WEST = 4,
-	DIR_NONE = 5
+/**
+ * Table of offsets into tile data for the party facing in
+ * different directions
+ */
+static const uint16 PARTY_ICONS_TABLE[2][4] = {
+	{ 0x1E70, 0x1E68, 0x1E78, 0x1E80 },
+	{ 0x1E90, 0x1E88, 0x1E98, 0x1EA0 }
 };
 
-class Game {
-protected:
-	void move(Direction dir, bool flag);
-
-public:
-	virtual ~Game() {}
+/**
+ * Table of offsets into tile data for different characters
+ */
+static const uint16 PERSON_ICONS[21] = {
+	0x0000, 0x1E68, 0x1E60, 0x1F38, 0x1E48, 0x1E50,
+	0x1E58, 0x1EC8, 0x1ED0, 0x1ED8, 0x1EE0, 0x1EE8,
+	0x1EF0, 0x1EF8, 0x1F00, 0x1F08, 0x1F10, 0x1F18,
+	0x1F20, 0x1F28, 0x1F30
 };
 
-} // namespace Game
+Game::Game() {
+	Common::copy(PERSON_ICONS, PERSON_ICONS + 21, _personIcons);
+}
+
+void Game::setPartyIcon(Direction dir) {
+	if (dir != DIR_NONE) {
+		_currentDir = dir;
+		_personIcons[1] = PARTY_ICONS_TABLE[_personIconsSection][dir - 1];
+	}
+}
+
+void Game::move(Direction dir, bool flag) {
+
+}
+
+} // namespace Logic
 } // namespace FOD
 } // namespace Wasteland
-
-#endif

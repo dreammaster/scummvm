@@ -27,7 +27,7 @@ MODULE_OBJS = \
 	fod/data/scripts.o \
 	fod/data/strings.o \
 	fod/data/weapons.o \
-	fod/game/game.o \
+	fod/logic/game.o \
 	fod/views/core/base_view.o \
 	fod/views/dialogs/dialog.o \
 	fod/views/dialogs/all_character_info.o \
