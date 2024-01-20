@@ -29,6 +29,8 @@ namespace Views {
 
 #define MAP_CENTER_X 9
 #define MAP_CENTER_Y 4
+#define MAP_TILES_X 19
+#define MAP_TILES_Y 9
 
 static const char *WEEKDAYS[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
@@ -174,10 +176,10 @@ void Game::drawMap() {
 	int mapOffsetY = g_engine->_disk1._mapPosY - 4;
 	int tileId, partyTile = 0;
 
-	for (int mapY = 0; mapY < 9; ++mapY) {
+	for (int mapY = 0; mapY < MAP_TILES_Y; ++mapY) {
 		int mapCurrentY = mapOffsetY + mapY;
 
-		for (int mapX = 0; mapX < 19; ++mapX) {
+		for (int mapX = 0; mapX < MAP_TILES_X; ++mapX) {
  			int mapCurrentX = mapOffsetX + mapX;
 
 			if (mapCurrentX >= map._width || mapCurrentY >= map._height ||
