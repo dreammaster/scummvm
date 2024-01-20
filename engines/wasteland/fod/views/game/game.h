@@ -34,6 +34,7 @@ class Game : public BaseView, public FOD::Logic::Game {
 private:
 	Mode _mode;
 	Common::String _infoText;
+	uint16 _partyIcon = 0;
 
 	void setMode(Mode newMode);
 	void writeParty();

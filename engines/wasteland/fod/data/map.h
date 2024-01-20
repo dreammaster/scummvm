@@ -56,7 +56,6 @@ struct Map {
 	uint16 _field412 = 0;
 
 	Common::Array<MapTile> _tiles;
-	uint16 _mapState = 0;
 
 	const MapTile *_mapTileTopLeft = nullptr;
 

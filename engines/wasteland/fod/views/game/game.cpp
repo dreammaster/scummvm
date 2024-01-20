@@ -195,8 +195,11 @@ void Game::drawMap() {
 		}
 	}
 
-	map._mapState &= 0x7ff;
-	map._mapState |= 0x800;
+	_partyIcon &= 0x7ff;
+	_partyIcon |= 0x800;
+
+	// Draw the party's icon at the center of the screen
+	drawTileAt(s, 9, 4, _partyIcon | 0x800);
 }
 
 void Game::drawTileAt(Surface &s, int mapX, int mapY, int tileId) {
