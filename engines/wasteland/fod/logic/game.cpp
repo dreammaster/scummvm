@@ -58,19 +58,29 @@ void Game::setPartyIcon(Direction dir) {
 }
 
 void Game::move(Direction dir, bool flag) {
-	static const int8 DELTAS[4][2] = { { 0, -1 }, { 0, 1 }, { 1, 0 }, { -1, 0 } };
-	int newX = g_engine->_disk1._mapPosX + DELTAS[dir - 1][0];
-	int newY = g_engine->_disk1._mapPosY + DELTAS[dir - 1][1];
+	static const int8 DELTAS[5][2] = { { 0, 0 }, { 0, -1 }, { 0, 1 }, { 1, 0 }, { -1, 0 } };
 	const auto &map = g_engine->_disk._map;
 
+	// Weird decision in the original, but there was a minor random
+	// chance of hiccuping, and moving in a random direction
 	if (!flag && g_engine->_disk1.isPartyAlive()) {
-
+		if (g_engine->getRandomNumber(1, 100) < 10) {
+			dir = (Direction)g_engine->getRandomNumber(4);
+			showMoveMessage(-1);
+		}
 	}
 
+	// Figure out new position
+	int newX = g_engine->_disk1._mapPosX + DELTAS[dir][0];
+	int newY = g_engine->_disk1._mapPosY + DELTAS[dir][1];
+
+	// Set the party icon to show facing in the movement direction
 	setPartyIcon(dir);
 
 	if (newX < 0 || newY < 0 || newX >= map._width || newY >= map._height) {
-		showEdgeMessage();
+		// Show optional message for trying to leave edge of map
+		int msgNum = g_engine->_disk._map._edgeMessage;
+		showMoveMessage(msgNum);
 
 	} else {
 
