@@ -23,13 +23,13 @@
 #define WASTELAND_FOD_VIEWS_GAME_GAME_H
 
 #include "wasteland/fod/views/core/base_view.h"
-#include "wasteland/fod/game/game.h"
+#include "wasteland/fod/logic/game.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-class Game : public BaseView, public FOD::Game::Game {
+class Game : public BaseView, public FOD::Logic::Game {
 	enum Mode { MODE_NORMAL };
 private:
 	Mode _mode;
@@ -40,6 +40,10 @@ private:
 	void writeTime();
 	void writeInfo();
 	void drawMap();
+	void drawTileAt(Surface &s, int mapX, int mapY, int tileId);
+
+protected:
+	void move(Logic::Direction dir);
 
 public:
 	Game();

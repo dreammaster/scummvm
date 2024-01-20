@@ -107,6 +107,19 @@ bool Game::msgAction(const ActionMessage &msg) {
 		addView("AllCharacterInfo");
 		return true;
 
+	case KEYBIND_NORTH:
+		move(Logic::DIR_NORTH);
+		break;
+	case KEYBIND_SOUTH:
+		move(Logic::DIR_SOUTH);
+		break;
+	case KEYBIND_EAST:
+		move(Logic::DIR_EAST);
+		break;
+	case KEYBIND_WEST:
+		move(Logic::DIR_WEST);
+		break;
+
 	default:
 		break;
 	}
@@ -178,12 +191,34 @@ void Game::drawMap() {
 				}
 			}
 
-			g_engine->_tiles.drawTile(&s, tileId, mapX * TILE_W, mapY * TILE_H);
+			drawTileAt(s, mapX, mapY, tileId);
 		}
 	}
 
 	map._mapState &= 0x7ff;
 	map._mapState |= 0x800;
+}
+
+void Game::drawTileAt(Surface &s, int mapX, int mapY, int tileId) {
+	int index = tileId & 0x7ff;
+	g_engine->_tiles.drawTile(&s, index, mapX * TILE_W, mapY * TILE_H);
+
+	if (tileId & 0xf800) {
+		// Drawing party icon. The paragraph represents the icon offset * 16.
+		// And since each icon is 128 bytes, the index can be calculated
+		int iconParagraph = _personIcons[((tileId & 0xf800) >> 8) >> 3];
+		assert((iconParagraph % (128 / 16)) == 0);
+		index = iconParagraph / (128 / 16);
+
+		g_engine->_tiles.drawTile(&s, index, mapX * TILE_W, mapY * TILE_H);
+	}
+}
+
+void Game::move(Logic::Direction dir) {
+	_infoText.clear();
+	Logic::Game::move(dir, false);
+
+	redraw();
 }
 
 } // namespace Views
