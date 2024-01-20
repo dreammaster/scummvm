@@ -23,6 +23,7 @@
 
 #include "wasteland/metaengine.h"
 #include "wasteland/detection.h"
+#include "wasteland/keymapping.h"
 #include "wasteland/fod/fod.h"
 
 namespace Wasteland {
@@ -61,6 +62,10 @@ Common::Error WastelandMetaEngine::createInstance(OSystem *syst, Engine **engine
 bool WastelandMetaEngine::hasFeature(MetaEngineFeature f) const {
 	return checkExtendedSaves(f) ||
 		(f == kSupportsLoadingDuringStartup);
+}
+
+Common::KeymapArray WastelandMetaEngine::initKeymaps(const char *target) const {
+	return Wasteland::Keymapping::initKeymaps();
 }
 
 #if PLUGIN_ENABLED_DYNAMIC(WASTELAND)

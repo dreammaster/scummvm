@@ -19,41 +19,17 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_GAME_GAME_H
-#define WASTELAND_FOD_VIEWS_GAME_GAME_H
-
-#include "wasteland/fod/views/core/base_view.h"
+#include "common/file.h"
 #include "wasteland/fod/game/game.h"
 
 namespace Wasteland {
 namespace FOD {
-namespace Views {
+namespace Game {
 
-class Game : public BaseView, public FOD::Game::Game {
-	enum Mode { MODE_NORMAL };
-private:
-	Mode _mode;
-	Common::String _infoText;
+void Game::move(Direction dir, bool flag) {
 
-	void setMode(Mode newMode);
-	void writeParty();
-	void writeTime();
-	void writeInfo();
-	void drawMap();
+}
 
-public:
-	Game();
-	virtual ~Game() {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgAction(const ActionMessage &msg) override;
-};
-
-} // namespace Views
+} // namespace Game
 } // namespace FOD
 } // namespace Wasteland
-
-#endif

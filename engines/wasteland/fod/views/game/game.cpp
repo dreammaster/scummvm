@@ -21,6 +21,7 @@
 
 #include "wasteland/fod/views/game/game.h"
 #include "wasteland/fod/fod.h"
+#include "wasteland/keymapping.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -33,6 +34,7 @@ Game::Game() : BaseView("Game") {
 
 bool Game::msgFocus(const FocusMessage &msg) {
 	setMode(MODE_NORMAL);
+	Keymapping::setKeybindingMode(KBMODE_NORMAL);
 
 	if (msg._priorView->getName() == "Title")
 		_infoText = "Welcome to the beautiful island of Florida!\n";
@@ -57,21 +59,6 @@ bool Game::msgKeypress(const KeypressMessage &msg) {
 	assert(_mode == MODE_NORMAL);
 
 	switch (msg.keycode) {
-	case Common::KEYCODE_a:
-		addView("AllCharacterInfo");
-		break;
-
-	case Common::KEYCODE_F1:
-	case Common::KEYCODE_F2:
-	case Common::KEYCODE_F3:
-	case Common::KEYCODE_F4:
-	case Common::KEYCODE_F5: {
-		int partyNum = msg.keycode - Common::KEYCODE_F1;
-		if (partyNum < g_engine->_disk1._partyCount)
-			send("CharacterInfo", GameMessage("INFO", partyNum));
-		break;
-	}
-
 	case Common::KEYCODE_q:
 		addView("QuitDialog");
 		break;
@@ -98,6 +85,30 @@ bool Game::msgMouseDown(const MouseDownMessage &msg) {
 	if (Common::Rect(280, 0, 320, 24).contains(msg._pos)) {
 		addView("AllCharacterInfo");
 		return true;
+	}
+
+	return false;
+}
+
+bool Game::msgAction(const ActionMessage &msg) {
+	switch (msg._action) {
+	case KEYBIND_VIEW_PARTY1:
+	case KEYBIND_VIEW_PARTY2:
+	case KEYBIND_VIEW_PARTY3:
+	case KEYBIND_VIEW_PARTY4:
+	case KEYBIND_VIEW_PARTY5: {
+		int partyNum = msg._action - KEYBIND_VIEW_PARTY1;
+		if (partyNum < g_engine->_disk1._partyCount)
+			send("CharacterInfo", GameMessage("INFO", partyNum));
+		return true;
+	}
+
+	case KEYBIND_VIEW_PARTY_ALL:
+		addView("AllCharacterInfo");
+		return true;
+
+	default:
+		break;
 	}
 
 	return false;

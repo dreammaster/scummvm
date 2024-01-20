@@ -22,6 +22,7 @@
 #ifndef WASTELAND_METAENGINE_H
 #define WASTELAND_METAENGINE_H
 
+#include "common/system.h"
 #include "engines/advancedDetector.h"
 
 class WastelandMetaEngine : public AdvancedMetaEngine<ADGameDescription> {
@@ -38,6 +39,8 @@ public:
 	bool hasFeature(MetaEngineFeature f) const override;
 
 	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
+
+	Common::KeymapArray initKeymaps(const char *target) const override;
 };
 
 #endif // WASTELAND_METAENGINE_H
