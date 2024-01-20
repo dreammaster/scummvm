@@ -31,13 +31,16 @@ bool Tiles::load(const Common::Path &filename) {
 	return _decoder.loadTiles(filename);
 }
 
-void Tiles::drawTile(Surface *dst, uint tileId, int x, int y) const {
+void Tiles::drawTile(Surface *dst, uint tileId, int x, int y, bool transparent) const {
 	assert(x >= 0 && y >= 0 && x <= (dst->w - TILE_W) && y <= (dst->h - TILE_H));
 
 	const Graphics::ManagedSurface *src = _decoder.getSurface();
 	Common::Rect r(0, tileId * 16, 16, (tileId + 1) * 16);
 
-	dst->blitFrom(*src, r, Common::Point(x, y));
+	if (transparent)
+		dst->transBlitFrom(*src, r, Common::Point(x, y), 0);
+	else
+		dst->blitFrom(*src, r, Common::Point(x, y));
 }
 
 } // namespace Gfx

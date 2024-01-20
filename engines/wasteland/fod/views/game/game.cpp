@@ -27,6 +27,9 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
+#define MAP_CENTER_X 9
+#define MAP_CENTER_Y 4
+
 static const char *WEEKDAYS[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 Game::Game() : BaseView("Game") {
@@ -169,7 +172,7 @@ void Game::drawMap() {
 	int defaultTile = map._flags & ~Data::MAPFLAG_8000;
 	int mapOffsetX = g_engine->_disk1._mapPosX - 9;
 	int mapOffsetY = g_engine->_disk1._mapPosY - 4;
-	int tileId;
+	int tileId, partyTile = 0;
 
 	for (int mapY = 0; mapY < 9; ++mapY) {
 		int mapCurrentY = mapOffsetY + mapY;
@@ -192,19 +195,20 @@ void Game::drawMap() {
 			}
 
 			drawTileAt(s, mapX, mapY, tileId);
+
+			if (mapX == MAP_CENTER_X && mapY == MAP_CENTER_Y)
+				partyTile = tileId;
 		}
 	}
 
-	_partyIcon &= 0x7ff;
-	_partyIcon |= 0x800;
-
 	// Draw the party's icon at the center of the screen
-	drawTileAt(s, 9, 4, _partyIcon | 0x800);
+	partyTile = (partyTile & 0x7ff) | 0x800;
+	drawTileAt(s, MAP_CENTER_X, MAP_CENTER_Y, partyTile);
 }
 
 void Game::drawTileAt(Surface &s, int mapX, int mapY, int tileId) {
 	int index = tileId & 0x7ff;
-	g_engine->_tiles.drawTile(&s, index, mapX * TILE_W, mapY * TILE_H);
+	g_engine->_tiles.drawTile(&s, index, mapX * TILE_W, mapY * TILE_H, false);
 
 	if (tileId & 0xf800) {
 		// Drawing party icon. The paragraph represents the icon offset * 16.
@@ -213,7 +217,7 @@ void Game::drawTileAt(Surface &s, int mapX, int mapY, int tileId) {
 		assert((iconParagraph % (128 / 16)) == 0);
 		index = iconParagraph / (128 / 16);
 
-		g_engine->_tiles.drawTile(&s, index, mapX * TILE_W, mapY * TILE_H);
+		g_engine->_tiles.drawTile(&s, index, mapX * TILE_W, mapY * TILE_H, true);
 	}
 }
 
