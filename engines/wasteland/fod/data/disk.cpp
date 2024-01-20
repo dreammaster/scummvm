@@ -41,11 +41,11 @@ const Disk::DiskEntry Disk::DISKS[4] = {
 
 void Disk::loadMap(int mapNum) {
 	Common::SeekableReadStream *src;
-	if (mapNum == _currentMapNum)
+	if (mapNum == _map._mapNum)
 		return;
 
 	saveMap();
-	_currentMapNum = mapNum;
+	_map._mapNum = mapNum;
 
 	int diskNum = MAP_DISKS[mapNum];
 	if (diskNum != _currentDiskNum) {
@@ -75,7 +75,7 @@ void Disk::processMap() {
 		int entryIndex = tableCtr - newCount;
 		const Disk1Table::Entry &entry = table._entries[entryIndex];
 
-		if (entry._mapNum == _currentMapNum) {
+		if (entry._mapNum == _map._mapNum) {
 			Map::MapTile &tile = _map._tiles[entry._y * _map._width + entry._x];
 
 			if (entry._flags & 0x80)
@@ -139,7 +139,7 @@ Common::SeekableReadStream *Disk::getFile(const Common::Path &path,
 
 
 void Disk::saveMap() {
-	if (_currentMapNum && (_map._flags & 0x8000)) {
+	if (_map._mapNum && (_map._flags & 0x8000)) {
 		_map._flags &= ~MAPFLAG_8000;
 		// TODO: Save changed map
 	}

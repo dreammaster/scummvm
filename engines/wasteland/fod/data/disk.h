@@ -50,7 +50,6 @@ private:
 
 	const DiskEntry *_currentDisk = nullptr;
 	int _currentDiskNum = 0;
-	int _currentMapNum = 0;
 	FileEntry _mapContents[MAP_CONTENTS_COUNT];
 	FileEntry _scrContents[MAP_CONTENTS_COUNT];
 	FileEntry _aniContents[ANI_CONTENTS_COUNT];
