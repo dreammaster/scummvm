@@ -41,6 +41,9 @@ const Disk::DiskEntry Disk::DISKS[4] = {
 	{ "Disk 4", "disk4", "dmap", "dscr", "dani" }
 };
 
+Disk::Disk(uint16 &mapX, uint16 &mapY) : _map(mapX, mapY) {
+}
+
 void Disk::loadMap(int mapNum) {
 	Common::SeekableReadStream *src;
 	if (mapNum == _map._mapNum)

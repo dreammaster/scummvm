@@ -65,6 +65,8 @@ private:
 
 public:
 	uint16 _mapNum = 0;
+	uint16 &_mapPosX;
+	uint16 &_mapPosY;
 
 	uint16 _width = 0;
 	uint16 _height = 0;
@@ -92,6 +94,8 @@ public:
 	Common::Array<MapEntry4> _array4;
 
 	const MapTile *_mapTileTopLeft = nullptr;
+
+	Map(uint16 &mapX, uint16 &mapY);
 
 	void load(Common::SeekableReadStream &src);
 };

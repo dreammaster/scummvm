@@ -92,6 +92,9 @@ void Map::synchronizeCore(Common::Serializer &s) {
 		_tiles[i].synchronize(s);
 }
 
+Map::Map(uint16 &mapX, uint16 &mapY) : _mapPosX(mapX), _mapPosY(mapY) {
+}
+
 void Map::load(Common::SeekableReadStream &src) {
 	// Get the core data and tiles
 	Common::Serializer s(&src, nullptr);

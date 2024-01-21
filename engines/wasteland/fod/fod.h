@@ -38,6 +38,7 @@ namespace FOD {
 class FountainOfDreamsEngine : public Wasteland::Engine {
 private:
 	FOD::Views::Views *_views = nullptr;
+	uint16 _mapX = 0, _mapY = 0;
 
 protected:
 	void setup() override;

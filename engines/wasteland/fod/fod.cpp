@@ -29,7 +29,7 @@ namespace FOD {
 FountainOfDreamsEngine *g_engine;
 
 FountainOfDreamsEngine::FountainOfDreamsEngine(OSystem *syst, const WastelandGameDescription *gameDesc) :
-		Wasteland::Engine(syst, gameDesc) {
+		Wasteland::Engine(syst, gameDesc), _disk1(_mapX, _mapY), _disk(_mapX, _mapY) {
 	g_engine = this;
 }
 
