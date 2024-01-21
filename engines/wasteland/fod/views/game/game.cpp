@@ -27,15 +27,6 @@ namespace Wasteland {
 namespace FOD {
 namespace Views {
 
-#define MAP_CENTER_X 9
-#define MAP_CENTER_Y 4
-#define MAP_TILES_X 19
-#define MAP_TILES_Y 9
-
-#define MAP_FG_SHIFT 11
-#define MAP_BG_MASK 0x7ff
-#define MAP_TILE(BG, FG) ((BG & MAP_BG_MASK) | (FG << MAP_FG_SHIFT))
-
 static const char *WEEKDAYS[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 static const char *const EDGE_MESSAGES[4] = {
@@ -56,8 +47,8 @@ bool Game::msgFocus(const FocusMessage &msg) {
 		_infoText = "Welcome to the beautiful island of Florida!\n";
 
 	int mapNum = g_engine->_disk1._maps[g_engine->_disk1._mapIndex];
-
 	g_engine->_disk.loadMap(mapNum);
+	g_engine->_disk._map.updateMap();
 
 	return true;
 }

@@ -45,6 +45,8 @@ void Map::MapPerson::synchronize(Common::Serializer &s) {
 		_field50 = buf[0x50];
 		_mapX = buf[0x5b];
 		_mapY = buf[0x5c];
+		_field5f = buf[0x5f];
+		_field65 = buf[0x65];
 		_talkId = READ_LE_UINT16(&buf[0x66]);
 	}
 }
@@ -115,6 +117,34 @@ void Map::load(Common::SeekableReadStream &src) {
 
 	for (uint i = 0; i < _count4; ++i)
 		_array4[i].synchronize(s);
+}
+
+void Map::updateMap() {
+	for (uint i = 0; i < _peopleCount; ++i) {
+		const auto &person = _people[i];
+		updateTile(person._field5f, person._mapX, person._mapY, person._field65);
+	}
+
+	for (uint i = 0; i < _count4; ++i) {
+		const auto &entry = _array4[i];
+		if (entry._flags & 0xf)
+			updateTile(entry._field5, entry._mapX, entry._mapY, entry._fieldC);
+	}
+}
+
+void Map::updateTile(int diff, int mapX, int mapY, int charNum) {
+	MapTile &tile = _tiles[mapY * _width + mapX];
+	tile._id &= MAP_BG_MASK;
+
+	if (isCloseTo(diff, mapX, mapY))
+		tile._id = MAP_TILE(tile._id, charNum);
+}
+
+bool Map::isCloseTo(int diff, int mapX, int mapY) const {
+	int x1 = _mapPosX - diff, x2 = _mapPosX + diff;
+	int y1 = _mapPosY - diff, y2 = _mapPosY + diff;
+
+	return mapX >= x1 && mapY <= x2 && mapY >= y1 && mapY <= y2;
 }
 
 } // namespace Data

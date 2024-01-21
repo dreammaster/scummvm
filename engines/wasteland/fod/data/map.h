@@ -30,6 +30,15 @@ namespace Data {
 
 enum MapFlag { MAPFLAG_8000 = 0x8000 };
 
+#define MAP_CENTER_X 9
+#define MAP_CENTER_Y 4
+#define MAP_TILES_X 19
+#define MAP_TILES_Y 9
+
+#define MAP_FG_SHIFT 11
+#define MAP_BG_MASK 0x7ff
+#define MAP_TILE(BG, FG) ((BG & MAP_BG_MASK) | (FG << MAP_FG_SHIFT))
+
 struct Map {
 	struct MapTile {
 		uint16 _id = 0;
@@ -45,6 +54,8 @@ struct Map {
 		byte _field50 = 0;
 		byte _mapX = 0;
 		byte _mapY = 0;
+		byte _field5f = 0;
+		byte _field65 = 0;
 		uint16 _talkId = 0;
 
 		void synchronize(Common::Serializer &s);
@@ -62,6 +73,10 @@ struct Map {
 
 private:
 	void synchronizeCore(Common::Serializer &s);
+
+	void updateTile(int diff, int mapX, int mapY, int charNum);
+
+	bool isCloseTo(int diff, int mapX, int mapY) const;
 
 public:
 	uint16 _mapNum = 0;
@@ -98,6 +113,8 @@ public:
 	Map(uint16 &mapX, uint16 &mapY);
 
 	void load(Common::SeekableReadStream &src);
+
+	void updateMap();
 };
 
 } // namespace Data
