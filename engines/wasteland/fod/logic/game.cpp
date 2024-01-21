@@ -102,20 +102,66 @@ void Game::move(Direction dir, bool flag) {
 			}
 
 			if (personNum < map._people.size()) {
+				// Moving onto a person, to trigger conversation
 				auto &person = map._people[personNum];
 				person._field50 &= ~0x80;
+				doMapAction(&person._talkId, 6, personNum);
+				nothing(flag);
 
+			} else {
+				if (canMove(newX, newY))
+					moveTo(newX, newY);
+
+				// TODO: method calls
+				doMapAction(&map._tiles[0]._field6, 0, 0);
+
+				if (!flag)
+					checkForTrouble();
+
+				moved(disk1._mapPosX, disk1._mapPosY);
 			}
 
 		} else {
 			nothing(flag);
 			moved(disk1._mapPosX, disk1._mapPosY);
 		}
-
-		// TODO:
-		disk1._mapPosX = newX;
-		disk1._mapPosY = newY;
 	}
+}
+
+bool Game::canMove(int newX, int newY) const {
+	const auto &map = g_engine->_disk._map;
+
+	if (newX < 0 || newY < 0 || newX >= map._width || newY >= map._height)
+		return false;
+
+	const auto &tile = map._tiles[newY * map._width + newX];
+	if (!(tile._flags & 1))
+		return false;
+
+	// Check if there's any person on the cell
+	for (uint i = 0; i < map._peopleCount; ++i) {
+		const auto &person = map._people[i];
+		if (person._mapX == newX && person._mapY == newY)
+			return false;
+	}
+
+	// Scan for any other obstruction
+	for (uint i = 0; i < map._count4; ++i) {
+		const auto &entry = map._array4[i];
+		if ((entry._flags & 0xf) && entry._mapX == newX && entry._mapY == newY)
+			return false;
+	}
+
+	return true;
+}
+
+void Game::moveTo(int newX, int newY) {
+	auto &disk1 = g_engine->_disk1;
+	disk1._mapPosX = newX;
+	disk1._mapPosY = newY;
+
+	_gameVal1 = 0;
+	_gameVal2 = 0;
 }
 
 void Game::nothing(bool flag) {
@@ -126,7 +172,11 @@ void Game::moved(int mapX, int mapY) {
 
 }
 
-void Game::doMapAction(int val6, const byte *mapTiles, int val1, int val0) {
+void Game::doMapAction(const uint16 *idPtr, int arg1, int arg2) {
+
+}
+
+void Game::checkForTrouble() {
 
 }
 

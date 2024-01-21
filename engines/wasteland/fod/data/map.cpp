@@ -39,13 +39,29 @@ void Map::MapPerson::synchronize(Common::Serializer &s) {
 	s.syncBytes(buf, 0x68);
 
 	if (s.isLoading()) {
+		buf[14] = '\0';
+		_name = Common::String((const char *)buf);
+
 		_field50 = buf[0x50];
 		_mapX = buf[0x5b];
 		_mapY = buf[0x5c];
-		_talkOffset = READ_LE_UINT16(&buf[0x66]);
+		_talkId = READ_LE_UINT16(&buf[0x66]);
 	}
 }
 
+void Map::MapEntry4::synchronize(Common::Serializer &s) {
+	byte buf[0x66];
+	s.syncBytes(buf, 0x66);
+
+	if (s.isLoading()) {
+		_field1 = buf[1];
+		_mapX = buf[2];
+		_mapY = buf[3];
+		_field5 = buf[5];
+		_flags = buf[9];
+		_fieldC = buf[12];
+	}
+}
 
 void Map::synchronizeCore(Common::Serializer &s) {
 	s.syncAsUint16LE(_width);
@@ -88,6 +104,14 @@ void Map::load(Common::SeekableReadStream &src) {
 
 	for (uint i = 0; i < _peopleCount; ++i)
 		_people[i].synchronize(s);
+
+	// Load array 4
+	_array4.clear();
+	_array4.resize(_count4);
+	src.seek(_offset4);
+
+	for (uint i = 0; i < _count4; ++i)
+		_array4[i].synchronize(s);
 }
 
 } // namespace Data
