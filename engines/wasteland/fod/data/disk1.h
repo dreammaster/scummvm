@@ -57,8 +57,8 @@ struct Disk1 {
 	byte _field7;
 	byte _timeHours;
 	byte _timeMinutes;
-	uint16 _mapPosX;
-	uint16 _mapPosY;
+	uint16 &_mapPosX;
+	uint16 &_mapPosY;
 	uint32 _cash;
 	byte _maps[30];
 	byte _mapIndex;
@@ -70,6 +70,8 @@ struct Disk1 {
 	byte _unknown4[250];
 	byte _unknown5[6];
 	Disk1Table _table;
+
+	Disk1(uint16 &mapX, uint16 &mapY) : _mapPosX(mapX), _mapPosY(mapY) {}
 
 	void synchronize(Common::Serializer &s);
 
