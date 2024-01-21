@@ -43,8 +43,8 @@ void Map::MapPerson::synchronize(Common::Serializer &s) {
 		_name = Common::String((const char *)buf);
 
 		_field50 = buf[0x50];
-		_mapX = buf[0x5b];
-		_mapY = buf[0x5c];
+		_mapX = (int8)buf[0x5b];
+		_mapY = (int8)buf[0x5c];
 		_field5f = buf[0x5f];
 		_field65 = buf[0x65];
 		_talkId = READ_LE_UINT16(&buf[0x66]);
@@ -57,8 +57,8 @@ void Map::MapEntry4::synchronize(Common::Serializer &s) {
 
 	if (s.isLoading()) {
 		_field1 = buf[1];
-		_mapX = buf[2];
-		_mapY = buf[3];
+		_mapX = (int8)buf[2];
+		_mapY = (int8)buf[3];
 		_field5 = buf[5];
 		_flags = buf[9];
 		_fieldC = buf[12];
@@ -133,11 +133,13 @@ void Map::updateMap() {
 }
 
 void Map::updateTile(int diff, int mapX, int mapY, int charNum) {
-	MapTile &tile = _tiles[mapY * _width + mapX];
-	tile._id &= MAP_BG_MASK;
+	if (mapX >= 0 && mapY >= 0 && mapX < _width && mapY < _height) {
+		MapTile &tile = _tiles[mapY * _width + mapX];
+		tile._id &= MAP_BG_MASK;
 
-	if (isCloseTo(diff, mapX, mapY))
-		tile._id = MAP_TILE(tile._id, charNum);
+		if (isCloseTo(diff, mapX, mapY))
+			tile._id = MAP_TILE(tile._id, charNum);
+	}
 }
 
 bool Map::isCloseTo(int diff, int mapX, int mapY) const {
