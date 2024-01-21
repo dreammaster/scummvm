@@ -61,8 +61,7 @@ void Disk::loadMap(int mapNum) {
 
 	// Load the map
 	src = getFile(_currentDisk->_map, _mapContents, mapNum - 1);
-	Common::Serializer sMap(src, nullptr);
-	_map.synchronize(sMap);
+	_map.load(*src);
 	delete src;
 
 	processMap();
