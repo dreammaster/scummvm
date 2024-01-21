@@ -46,9 +46,14 @@ struct Map {
 	uint16 _width = 0;
 	uint16 _height = 0;
 	uint16 _flags = 0;
+	uint16 _field6 = 0;
+	byte _field8 = 0;
+	byte _count2 = 0;
+	byte _fieldA = 0;
+	byte _count4 = 0;
 	byte _fieldC = 0;
 	byte _edgeMessage = 0;
-	byte _unknown[1020];
+	byte _unknown[1014];
 
 	uint16 _offset1 = 0;
 	uint16 _offset2 = 0;

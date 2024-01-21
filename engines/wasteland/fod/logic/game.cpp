@@ -86,10 +86,13 @@ void Game::move(Direction dir, bool flag) {
 
 	} else {
 		int currMapNum = map._mapNum;
-		_oldMapPos = Common::Point(disk1._mapPosX, disk1._mapPosY);
+		const Common::Point oldPos(disk1._mapPosX, disk1._mapPosY);
+		_oldMapPos = oldPos;
 
-		// Only do further movement if the map hasn't changed
-		if (map._mapNum == currMapNum) {
+		// Only do further movement if the map/position hasn't changed,
+		// considering we haven't applied our own move change yet
+		if (map._mapNum == currMapNum && disk1._mapPosX == oldPos.x &&
+				disk1._mapPosY == oldPos.y) {
 
 		} else {
 			nothing(flag);
@@ -107,6 +110,10 @@ void Game::nothing(bool flag) {
 }
 
 void Game::moved(int mapX, int mapY) {
+
+}
+
+void Game::doMapAction(int val6, const byte *mapTiles, int val1, int val0) {
 
 }
 
