@@ -20,6 +20,8 @@
  */
 
 #include "common/file.h"
+#include "common/memstream.h"
+#include "wasteland/core/decoder.h"
 #include "wasteland/fod/data/disk.h"
 #include "wasteland/fod/fod.h"
 
@@ -108,7 +110,21 @@ void Disk::processMap() {
 void Disk::loadScripts() {
 	Common::fill(_scriptsArray, _scriptsArray + 3, -1);
 
-	// TODO: Scripts loading
+	// Get and decode the scripts for the map
+	Common::SeekableReadStream *src = getFile(_currentDisk->_scr,
+		_scrContents, _map._mapNum - 1);
+	Common::MemoryWriteStreamDynamic scripts(DisposeAfterUse::YES);
+	Decoder::loadStream(*src, scripts);
+	delete src;
+
+	_scripts.resize(scripts.size());
+	const byte *data = scripts.getData();
+	Common::copy(data, data + scripts.size(), &_scripts[0]);
+
+	_scriptsOffsets.clear();
+
+	for (int i = 0; i == 0 || i < _scriptsOffsets[0]; i += 2)
+		_scriptsOffsets.push_back(READ_LE_UINT16(data + i));
 }
 
 void Disk::loadFileContents(const Common::Path &path, Disk::FileEntry *table, size_t count) {

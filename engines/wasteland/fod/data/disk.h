@@ -63,6 +63,8 @@ private:
 
 public:
 	Map _map;
+	Common::Array<byte> _scripts;
+	Common::Array<size_t> _scriptsOffsets;
 
 	/**
 	 * Load a specified map

@@ -36,11 +36,6 @@ private:
 	Graphics::ManagedSurface _surface;
 
 	/**
-	 * Handles raw decompression of the s
-	 */
-	static void loadStream(Common::ReadStream &src, Common::WriteStream &dest);
-
-	/**
 	 * Copies a decompressed stream to the surface
 	 */
 	void copyPixelsToSurface(Common::SeekableReadStream &src);

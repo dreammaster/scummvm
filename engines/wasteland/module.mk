@@ -8,6 +8,7 @@ MODULE_OBJS = \
 	messages.o \
 	metaengine.o \
 	core/array.o \
+	core/decoder.o \
 	gfx/clickable_text.o \
 	gfx/image_decoder.o \
 	gfx/surface.o \
