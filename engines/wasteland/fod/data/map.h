@@ -41,16 +41,23 @@ struct Map {
 		void synchronize(Common::Serializer &s);
 	};
 	struct MapPerson {
+		Common::String _name;
 		byte _field50 = 0;
 		byte _mapX = 0;
 		byte _mapY = 0;
-		uint16 _talkOffset = 0;
+		uint16 _talkId = 0;
 
 		void synchronize(Common::Serializer &s);
+	};
+	struct MapEntry4 {
+		byte _field1;
+		byte _mapX;
+		byte _mapY;
+		byte _field5;
+		byte _flags;
+		byte _fieldC;
 
-		static size_t size() {
-			return 0x68;
-		}
+		void synchronize(Common::Serializer &s);
 	};
 
 private:
@@ -82,6 +89,7 @@ public:
 
 	Common::Array<MapTile> _tiles;
 	Common::Array<MapPerson> _people;
+	Common::Array<MapEntry4> _array4;
 
 	const MapTile *_mapTileTopLeft = nullptr;
 
