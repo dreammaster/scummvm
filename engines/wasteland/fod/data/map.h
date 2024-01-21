@@ -52,8 +52,8 @@ struct Map {
 	struct MapPerson {
 		Common::String _name;
 		byte _field50 = 0;
-		byte _mapX = 0;
-		byte _mapY = 0;
+		int8 _mapX = 0;
+		int8 _mapY = 0;
 		byte _field5f = 0;
 		byte _field65 = 0;
 		uint16 _talkId = 0;
@@ -62,8 +62,8 @@ struct Map {
 	};
 	struct MapEntry4 {
 		byte _field1;
-		byte _mapX;
-		byte _mapY;
+		int8 _mapX;
+		int8 _mapY;
 		byte _field5;
 		byte _flags;
 		byte _fieldC;
