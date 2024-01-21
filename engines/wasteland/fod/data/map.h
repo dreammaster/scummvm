@@ -40,7 +40,23 @@ struct Map {
 
 		void synchronize(Common::Serializer &s);
 	};
+	struct MapPerson {
+		byte _field50 = 0;
+		byte _mapX = 0;
+		byte _mapY = 0;
+		uint16 _talkOffset = 0;
 
+		void synchronize(Common::Serializer &s);
+
+		static size_t size() {
+			return 0x68;
+		}
+	};
+
+private:
+	void synchronizeCore(Common::Serializer &s);
+
+public:
 	uint16 _mapNum = 0;
 
 	uint16 _width = 0;
@@ -48,7 +64,7 @@ struct Map {
 	uint16 _flags = 0;
 	uint16 _field6 = 0;
 	byte _field8 = 0;
-	byte _count2 = 0;
+	byte _peopleCount = 0;
 	byte _fieldA = 0;
 	byte _count4 = 0;
 	byte _fieldC = 0;
@@ -56,7 +72,7 @@ struct Map {
 	byte _unknown[1014];
 
 	uint16 _offset1 = 0;
-	uint16 _offset2 = 0;
+	uint16 _offsetPeople = 0;
 	uint16 _offset3 = 0;
 	uint16 _offset4 = 0;
 	uint16 _offset5 = 0;
@@ -65,10 +81,11 @@ struct Map {
 	uint16 _field412 = 0;
 
 	Common::Array<MapTile> _tiles;
+	Common::Array<MapPerson> _people;
 
 	const MapTile *_mapTileTopLeft = nullptr;
 
-	void synchronize(Common::Serializer &s);
+	void load(Common::SeekableReadStream &src);
 };
 
 } // namespace Data

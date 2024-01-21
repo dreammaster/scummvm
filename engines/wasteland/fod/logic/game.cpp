@@ -60,7 +60,7 @@ void Game::setPartyIcon(Direction dir) {
 void Game::move(Direction dir, bool flag) {
 	static const int8 DELTAS[5][2] = { { 0, 0 }, { 0, -1 }, { 0, 1 }, { 1, 0 }, { -1, 0 } };
 	Data::Disk1 &disk1 = g_engine->_disk1;
-	const auto &map = g_engine->_disk._map;
+	auto &map = g_engine->_disk._map;
 
 	// Weird decision in the original, but there was a minor random
 	// chance of hiccuping, and moving in a random direction
@@ -93,6 +93,19 @@ void Game::move(Direction dir, bool flag) {
 		// considering we haven't applied our own move change yet
 		if (map._mapNum == currMapNum && disk1._mapPosX == oldPos.x &&
 				disk1._mapPosY == oldPos.y) {
+			// Scan for people at the new position
+			uint personNum = 0;
+			for (personNum = 0; personNum < map._people.size(); ++personNum) {
+				const auto &person = map._people[personNum];
+				if (person._mapX == newX && person._mapY == newY)
+					break;
+			}
+
+			if (personNum < map._people.size()) {
+				auto &person = map._people[personNum];
+				person._field50 &= ~0x80;
+
+			}
 
 		} else {
 			nothing(flag);
