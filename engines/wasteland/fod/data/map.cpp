@@ -38,7 +38,14 @@ void Map::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_width);
 	s.syncAsUint16LE(_height);
 	s.syncAsUint16LE(_flags);
-	s.syncBytes(_unknown, 1022);
+	s.syncAsUint16LE(_field6);
+	s.syncAsByte(_field8);
+	s.syncAsByte(_count2);
+	s.syncAsByte(_fieldA);
+	s.syncAsByte(_count4);
+	s.syncAsByte(_fieldC);
+	s.syncAsByte(_edgeMessage);
+	s.syncBytes(_unknown, 1014);
 
 	s.syncAsUint16LE(_offset1);
 	s.syncAsUint16LE(_offset2);

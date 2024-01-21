@@ -60,6 +60,8 @@ protected:
 
 	void moved(int mapX, int mapY);
 
+	void doMapAction(int val6, const byte *tiles, int val1, int val0);
+
 	/**
 	 * Show a movement message
 	 */
