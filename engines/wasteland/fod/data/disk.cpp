@@ -80,7 +80,7 @@ void Disk::processMap() {
 		const Disk1Table::Entry &entry = table._entries[entryIndex];
 
 		if (entry._mapNum == _map._mapNum) {
-			Map::MapTile &tile = _map._tiles[entry._y * _map._width + entry._x];
+			Map::MapTile &tile = _map._tiles[entry._x][entry._y];
 
 			if (entry._flags & 0x80)
 				tile._id = (tile._id & 0xf800) | entry._field4;

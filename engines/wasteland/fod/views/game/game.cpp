@@ -188,7 +188,7 @@ void Game::drawMap() {
 					mapCurrentX < 0 || mapCurrentY < 0) {
 				tileId = defaultTile;
 			} else {
-				const Data::Map::MapTile &tile = map._tiles[mapCurrentY * map._width + mapCurrentX];
+				const Data::Map::MapTile &tile = map._tiles[mapCurrentX][mapCurrentY];
 
 				tileId = tile._id;
 				if (tile._flags & 0x40) {
