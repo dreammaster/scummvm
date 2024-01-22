@@ -68,10 +68,13 @@ bool MapAction::mapActionInner(const uint16 *idPtr, int action, int partyNum, in
 	if (action == 4)
 		local1 = arg4;
 
-	scriptP += 4;
-	scriptCurrP = scriptP;
-
 	for (;;) {
+		scriptCurrP = scriptP + 4;
+
+		for (;;) {
+
+		}
+
 		error("TODO: main loop");
 	}
 }

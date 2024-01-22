@@ -45,7 +45,7 @@ struct Map {
 		byte _flags = 0;
 		byte _field3 = 0;
 		uint16 _field4 = 0;
-		uint16 _field6 = 0;
+		uint16 _actionId = 0;
 
 		void synchronize(Common::Serializer &s);
 	};

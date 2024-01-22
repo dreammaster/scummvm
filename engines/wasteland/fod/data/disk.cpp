@@ -92,7 +92,7 @@ void Disk::processMap() {
 			}
 
 			if (entry._flags & 0x20)
-				tile._field6 = entry._fieldA;
+				tile._actionId = entry._fieldA;
 
 			++newCount;
 
