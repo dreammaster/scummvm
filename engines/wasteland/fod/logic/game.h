@@ -24,6 +24,7 @@
 
 #include "common/rect.h"
 #include "common/serializer.h"
+#include "wasteland/fod/logic/map_action.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -38,7 +39,7 @@ enum PersonId {
 	PERSON_PARTY = 1, PERSON_2 = 2, PERSON_4 = 4
 };
 
-class Game {
+class Game : public MapAction {
 private:
 	bool canMove(int newX, int newY) const;
 	void moveTo(int newX, int newY);
@@ -66,8 +67,6 @@ protected:
 	void nothing(bool flag);
 
 	void moved(int mapX, int mapY);
-
-	void doMapAction(const uint16 *idPtr, int arg1, int arg2);
 
 	/**
 	 * Show a movement message

@@ -19,50 +19,34 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_GAME_GAME_H
-#define WASTELAND_FOD_VIEWS_GAME_GAME_H
+#ifndef WASTELAND_FOD_LOGIC_ACTION_H
+#define WASTELAND_FOD_LOGIC_ACTION_H
 
-#include "wasteland/fod/views/core/base_view.h"
-#include "wasteland/fod/logic/game.h"
-#include "wasteland/fod/logic/map_action.h"
+#include "wasteland/fod/data/party.h"
 
 namespace Wasteland {
 namespace FOD {
-namespace Views {
+namespace Logic {
 
-class Game : public BaseView, public FOD::Logic::Game {
-	enum Mode { MODE_NORMAL };
+class MapAction {
 private:
-	Mode _mode;
-	Common::String _infoText;
+	const uint16 *_idPtr = nullptr;
+	int _actionNum = 0;
+	int _charNum = 0;
+	int _partyNum = 0;
+	bool _redrawFlag = false;
+	int _val2 = 0;
+	Data::PartyMember *_partyMember = nullptr;
 
-	void setMode(Mode newMode);
-	void writeParty();
-	void writeTime();
-	void writeInfo();
-	void drawMap();
-	void drawTileAt(Surface &s, int mapX, int mapY, int tileId);
+	bool mapActionInner(const uint16 *idPtr, int action, int partyNum, int charNum, int arg4);
+	void mapActionDone();
+	void setPartyMember(int partyNum);
 
 protected:
-	void move(Logic::Direction dir);
-
-	/**
-	 * Show a message after attempting to leave the edge of a map
-	 */
-	void showMoveMessage(int msgNum) override;
-
-public:
-	Game();
-	virtual ~Game() {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgAction(const ActionMessage &msg) override;
+	void doMapAction(const uint16 *idPtr, int action, int arg2);
 };
 
-} // namespace Views
+} // namespace Logic
 } // namespace FOD
 } // namespace Wasteland
 

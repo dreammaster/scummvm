@@ -46,6 +46,11 @@ void Disk1Table::Entry::load(Common::Serializer &s) {
 	s.syncAsUint16LE(_fieldA);
 }
 
+Disk1::Disk1(uint16 &mapX, uint16 &mapY) : _mapPosX(mapX), _mapPosY(mapY),
+		_party(_partyCount) {
+}
+
+
 void Disk1::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_field0);
 	s.syncAsUint16LE(_field2);

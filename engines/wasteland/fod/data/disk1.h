@@ -71,7 +71,7 @@ struct Disk1 {
 	byte _unknown5[6];
 	Disk1Table _table;
 
-	Disk1(uint16 &mapX, uint16 &mapY) : _mapPosX(mapX), _mapPosY(mapY) {}
+	Disk1(uint16 &mapX, uint16 &mapY);
 
 	void synchronize(Common::Serializer &s);
 
