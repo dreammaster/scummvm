@@ -43,6 +43,7 @@ void Map::MapPerson::synchronize(Common::Serializer &s) {
 		_name = Common::String((const char *)buf);
 
 		_field1a = buf[0x1a];
+		_id = buf[0x49];
 		_field50 = buf[0x50];
 		_mapX = (int8)buf[0x5b];
 		_mapY = (int8)buf[0x5c];
@@ -138,6 +139,18 @@ void Map::updateMap() {
 		if (entry._flags & 0xf)
 			updateTile(entry._field5, entry._mapX, entry._mapY, entry._fieldC);
 	}
+}
+
+Map::MapPerson *Map::findPersonById(byte id, int *partyNum) {
+	for (uint i = 0; i < _people.size(); ++i) {
+		MapPerson &person = _people[i];
+		if (person._id == id) {
+			*partyNum = i;
+			return &person;
+		}
+	}
+
+	return nullptr;
 }
 
 void Map::updateTile(int diff, int mapX, int mapY, int charNum) {
