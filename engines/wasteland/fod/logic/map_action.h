@@ -46,6 +46,7 @@ private:
 	void readParams(const byte *&scriptP, int *dest, int action);
 
 private:
+	void opcodeNOP(int params[]) {}
 	void opcode00(int params[]);
 	void opcode01(int params[]);
 	void opcode02(int params[]);
@@ -76,10 +77,8 @@ private:
 	void opcode27(int params[]);
 	void opcode28(int params[]);
 	void opcode29(int params[]);
-	void opcode30(int params[]);
 	void opcode31(int params[]);
 	void opcode32(int params[]);
-	void opcode33(int params[]);
 	void opcode34(int params[]);
 	void opcode35(int params[]);
 	void opcode36(int params[]);
@@ -87,7 +86,6 @@ private:
 	void opcode38(int params[]);
 	void opcode39(int params[]);
 	void opcode40(int params[]);
-	void opcode41(int params[]);
 	void opcode42(int params[]);
 	void opcode43(int params[]);
 	void opcode44(int params[]);
@@ -97,7 +95,6 @@ private:
 	void opcode48(int params[]);
 	void opcode49(int params[]);
 	void opcode50(int params[]);
-	void opcode51(int params[]);
 	void opcode52(int params[]);
 	void opcode53(int params[]);
 	void opcode54(int params[]);
@@ -116,12 +113,9 @@ private:
 	void opcode67(int params[]);
 	void opcode68(int params[]);
 	void opcode69(int params[]);
-	void opcode70(int params[]);
-	void opcode71(int params[]);
 	void opcode72(int params[]);
 	void opcode73(int params[]);
 	void opcode74(int params[]);
-	void opcode75(int params[]);
 
 protected:
 	void doMapAction(const uint16 *idPtr, int action, int arg2);
