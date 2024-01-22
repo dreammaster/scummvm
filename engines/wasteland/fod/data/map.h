@@ -51,10 +51,14 @@ struct Map {
 	};
 	struct MapPerson {
 		Common::String _name;
+		byte _field1a = 0;
 		byte _field50 = 0;
 		int8 _mapX = 0;
 		int8 _mapY = 0;
 		byte _field5f = 0;
+		byte _oldX = 0;
+		byte _oldY = 0;
+		byte _field63 = 0;
 		byte _field65 = 0;
 		uint16 _talkId = 0;
 

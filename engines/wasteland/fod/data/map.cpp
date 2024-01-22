@@ -42,10 +42,14 @@ void Map::MapPerson::synchronize(Common::Serializer &s) {
 		buf[14] = '\0';
 		_name = Common::String((const char *)buf);
 
+		_field1a = buf[0x1a];
 		_field50 = buf[0x50];
 		_mapX = (int8)buf[0x5b];
 		_mapY = (int8)buf[0x5c];
 		_field5f = buf[0x5f];
+		_oldX = (int8)buf[0x60];
+		_oldY = (int8)buf[0x61];
+		_field63 = buf[0x63];
 		_field65 = buf[0x65];
 		_talkId = READ_LE_UINT16(&buf[0x66]);
 	}

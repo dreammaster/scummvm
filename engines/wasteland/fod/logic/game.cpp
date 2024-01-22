@@ -172,10 +172,6 @@ void Game::moved(int mapX, int mapY) {
 
 }
 
-void Game::doMapAction(const uint16 *idPtr, int arg1, int arg2) {
-
-}
-
 void Game::checkForTrouble() {
 
 }

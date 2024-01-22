@@ -109,6 +109,12 @@ private:
 	PartyMember _party[5];
 
 public:
+	byte &_count;
+
+public:
+	Party(byte &count) : _count(count) {
+	}
+
 	PartyMember &operator[](uint idx) {
 		assert(idx < 5);
 		return _party[idx];
@@ -119,6 +125,8 @@ public:
 	}
 
 	void synchronize(Common::Serializer &s);
+
+	int getMemberByStatus(int status) const;
 };
 
 } // namespace Data

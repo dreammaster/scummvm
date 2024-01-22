@@ -122,6 +122,16 @@ void Party::synchronize(Common::Serializer &s) {
 		_party[i].synchronize(s);
 }
 
+int Party::getMemberByStatus(int status) const {
+	for (uint i = 0; i < _count; ++i) {
+		if (_party[i].getStatus() < status)
+			return i;
+	}
+
+	return _count;
+}
+
+
 const Profession &PartyMember::getProfession() const {
 	return g_engine->_archetypes._professions[_profession];
 }
