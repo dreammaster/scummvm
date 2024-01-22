@@ -31,7 +31,7 @@ void Map::MapTile::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_flags);
 	s.syncAsByte(_field3);
 	s.syncAsUint16LE(_field4);
-	s.syncAsUint16LE(_field6);
+	s.syncAsUint16LE(_actionId);
 }
 
 void Map::MapPerson::synchronize(Common::Serializer &s) {
