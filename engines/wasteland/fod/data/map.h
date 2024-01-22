@@ -57,6 +57,7 @@ struct Map {
 		byte _field50 = 0;
 		int8 _mapX = 0;
 		int8 _mapY = 0;
+		byte _id = 0;
 		byte _field5f = 0;
 		byte _oldX = 0;
 		byte _oldY = 0;
@@ -121,6 +122,8 @@ public:
 	void load(Common::SeekableReadStream &src);
 
 	void updateMap();
+
+	MapPerson *findPersonById(byte id, int *partyNum);
 };
 
 } // namespace Data
