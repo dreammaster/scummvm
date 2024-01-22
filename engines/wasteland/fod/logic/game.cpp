@@ -89,7 +89,7 @@ void Game::move(Direction dir, bool flag) {
 		const Common::Point oldPos(disk1._mapPosX, disk1._mapPosY);
 		_oldMapPos = oldPos;
 
-		doMapAction(&map._tiles[0]._actionId, 1, 0);
+		doMapAction(&map._tiles[newX][newY]._actionId, 1, 0);
 
 		// Only do further movement if the map/position hasn't changed,
 		// considering we haven't applied our own move change yet
@@ -115,7 +115,7 @@ void Game::move(Direction dir, bool flag) {
 					moveTo(newX, newY);
 
 				// TODO: method calls
-				doMapAction(&map._tiles[0]._actionId, 0, 0);
+				doMapAction(&map._tiles[newX][newY]._actionId, 0, 0);
 
 				if (!flag)
 					checkForTrouble();
@@ -136,7 +136,7 @@ bool Game::canMove(int newX, int newY) const {
 	if (newX < 0 || newY < 0 || newX >= map._width || newY >= map._height)
 		return false;
 
-	const auto &tile = map._tiles[newY * map._width + newX];
+	const auto &tile = map._tiles[newX][newY];
 	if (!(tile._flags & 1))
 		return false;
 

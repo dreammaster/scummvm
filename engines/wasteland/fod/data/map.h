@@ -49,6 +49,8 @@ struct Map {
 
 		void synchronize(Common::Serializer &s);
 	};
+	typedef Common::Array<MapTile> MapTileColumn;
+
 	struct MapPerson {
 		Common::String _name;
 		byte _field1a = 0;
@@ -108,7 +110,7 @@ public:
 	uint16 _field410 = 0;
 	uint16 _field412 = 0;
 
-	Common::Array<MapTile> _tiles;
+	Common::Array<MapTileColumn> _tiles;
 	Common::Array<MapPerson> _people;
 	Common::Array<MapEntry4> _array4;
 

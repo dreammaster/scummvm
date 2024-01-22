@@ -91,11 +91,15 @@ void Map::synchronizeCore(Common::Serializer &s) {
 	s.syncAsUint16LE(_field410);
 	s.syncAsUint16LE(_field412);
 
-	if (s.isLoading())
-		_tiles.resize(_width * _height);
+	if (s.isLoading()) {
+		_tiles.resize(_width);
+		for (uint x = 0; x < _width; ++x)
+			_tiles[x].resize(_height);
+	}
 
-	for (uint i = 0; i < _tiles.size(); ++i)
-		_tiles[i].synchronize(s);
+	for (uint y = 0; y < _height; ++y)
+		for (uint x = 0; x < _width; ++x)
+			_tiles[x][y].synchronize(s);
 }
 
 Map::Map(uint16 &mapX, uint16 &mapY) : _mapPosX(mapX), _mapPosY(mapY) {
@@ -138,7 +142,7 @@ void Map::updateMap() {
 
 void Map::updateTile(int diff, int mapX, int mapY, int charNum) {
 	if (mapX >= 0 && mapY >= 0 && mapX < _width && mapY < _height) {
-		MapTile &tile = _tiles[mapY * _width + mapX];
+		MapTile &tile = _tiles[mapX][mapY];
 		tile._id &= MAP_BG_MASK;
 
 		if (isCloseTo(diff, mapX, mapY))
