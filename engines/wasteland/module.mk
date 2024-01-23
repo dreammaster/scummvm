@@ -35,6 +35,7 @@ MODULE_OBJS = \
 	fod/views/dialogs/all_character_info.o \
 	fod/views/dialogs/character_info.o \
 	fod/views/dialogs/quit.o \
+	fod/views/dialogs/yes_no.o \
 	fod/views/game/game.o \
 	fod/views/main_menu/edit_member.o \
 	fod/views/main_menu/main_menu.o \

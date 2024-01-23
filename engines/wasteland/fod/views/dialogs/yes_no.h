@@ -19,37 +19,41 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
-#define WASTELAND_FOD_VIEWS_VIEWS_H
+#ifndef WASTELAND_FOD_VIEWS_DIALOGS_YES_NO_H
+#define WASTELAND_FOD_VIEWS_DIALOGS_YES_NO_H
 
-#include "wasteland/fod/views/main_menu/main_menu.h"
-#include "wasteland/fod/views/main_menu/title.h"
-#include "wasteland/fod/views/main_menu/edit_member.h"
-#include "wasteland/fod/views/main_menu/remove_member.h"
-#include "wasteland/fod/views/game/game.h"
-#include "wasteland/fod/views/dialogs/all_character_info.h"
-#include "wasteland/fod/views/dialogs/character_info.h"
-#include "wasteland/fod/views/dialogs/quit.h"
-#include "wasteland/fod/views/dialogs/yes_no.h"
+#include "wasteland/fod/views/dialogs/dialog.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
+namespace Dialogs {
 
-struct Views {
-	EditMember _editMember;
-	MainMenu _mainMenu;
-	RemoveMember _removeMember;
-	Title _title;
+typedef void (*YesNoCallback)(bool response);
 
-	Game _game;
+class YesNo : public Dialog {
+private:
+	Common::String _message;
+	YesNoCallback _callback = nullptr;
 
-	Dialogs::AllCharacterInfo _allCharacterInfo;
-	Dialogs::CharacterInfo _characterInfo;
-	Dialogs::Quit _quit;
-	Dialogs::YesNo _yesNo;
+	/**
+	 * Passed the yes/no selection
+	 */
+	void response(bool isYes);
+
+public:
+	static void show(const Common::String &message, YesNoCallback callback);
+
+public:
+	YesNo() : Dialog("YesNo", Gfx::Window(8, 6, 31, 17)) {}
+	virtual ~YesNo() {}
+
+	void draw() override;
+	bool msgAction(const ActionMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
+} // namespace Dialogs
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland
