@@ -19,39 +19,60 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
-#define WASTELAND_FOD_VIEWS_VIEWS_H
-
-#include "wasteland/fod/views/main_menu/main_menu.h"
-#include "wasteland/fod/views/main_menu/title.h"
-#include "wasteland/fod/views/main_menu/edit_member.h"
-#include "wasteland/fod/views/main_menu/remove_member.h"
-#include "wasteland/fod/views/game/game.h"
-#include "wasteland/fod/views/dialogs/all_character_info.h"
-#include "wasteland/fod/views/dialogs/character_info.h"
-#include "wasteland/fod/views/dialogs/quit.h"
 #include "wasteland/fod/views/dialogs/yes_no.h"
+#include "wasteland/fod/fod.h"
+#include "wasteland/keymapping.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
+namespace Dialogs {
 
-struct Views {
-	EditMember _editMember;
-	MainMenu _mainMenu;
-	RemoveMember _removeMember;
-	Title _title;
+void YesNo::show(const Common::String &message, YesNoCallback callback) {
+	YesNo *view = static_cast<YesNo *>(g_engine->findView("YesNo"));
+	view->_message = message;
+	view->_callback = callback;
+	view->addView();
+}
 
-	Game _game;
+void YesNo::draw() {
+	Dialog::draw();
 
-	Dialogs::AllCharacterInfo _allCharacterInfo;
-	Dialogs::CharacterInfo _characterInfo;
-	Dialogs::Quit _quit;
-	Dialogs::YesNo _yesNo;
-};
+	Surface s = getSurface();
+	s.writeString(Common::String::format("%s\n\n%s",
+		_message.c_str(),
+		"Y)es  N)o"));
+}
 
+bool YesNo::msgAction(const ActionMessage &msg) {
+	if (msg._action == KEYBIND_SELECT) {
+		response(true);
+		return true;
+	} else if (msg._action == KEYBIND_ESCAPE) {
+		response(false);
+		return true;
+	}
+
+	return false;
+}
+
+bool YesNo::msgKeypress(const KeypressMessage &msg) {
+	if (msg.keycode == Common::KEYCODE_y) {
+		response(true);
+		return true;
+	} else if (msg.keycode == Common::KEYCODE_n) {
+		response(false);
+		return true;
+	}
+
+	return false;
+}
+
+void YesNo::response(bool isYes) {
+	close(); 
+}
+
+} // namespace Dialogs
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland
-
-#endif

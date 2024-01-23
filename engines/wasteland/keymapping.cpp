@@ -60,6 +60,7 @@ static const KeybindingRecord PARTY_KEYS[] = {
 };
 
 static const KeybindingRecord NORMAL_KEYS[] = {
+	{ KEYBIND_ESCAPE, "ESCAPE", _s("Escape"), "ESCAPE", nullptr },
 	{ KEYBIND_SELECT, "SELECT", _s("Select"), "RETURN", nullptr },
 
 	{ KEYBIND_NORTH, "NORTH", _s("Move North"), "UP", nullptr },
