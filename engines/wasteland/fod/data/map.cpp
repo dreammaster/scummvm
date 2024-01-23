@@ -34,6 +34,10 @@ void Map::MapTile::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_actionId);
 }
 
+void Map::MapTile::updateForeground(int fg) {
+	_id = MAP_TILE(_id & MAP_BG_MASK, fg);
+}
+
 void Map::MapPerson::synchronize(Common::Serializer &s) {
 	byte buf[0x68];
 	s.syncBytes(buf, 0x68);
@@ -47,11 +51,11 @@ void Map::MapPerson::synchronize(Common::Serializer &s) {
 		_field50 = buf[0x50];
 		_mapX = (int8)buf[0x5b];
 		_mapY = (int8)buf[0x5c];
-		_field5f = buf[0x5f];
+		_diff = buf[0x5f];
 		_oldX = (int8)buf[0x60];
 		_oldY = (int8)buf[0x61];
 		_field63 = buf[0x63];
-		_field65 = buf[0x65];
+		_charNum = buf[0x65];
 		_talkId = READ_LE_UINT16(&buf[0x66]);
 	}
 }
@@ -131,7 +135,7 @@ void Map::load(Common::SeekableReadStream &src) {
 void Map::updateMap() {
 	for (uint i = 0; i < _peopleCount; ++i) {
 		const auto &person = _people[i];
-		updateTile(person._field5f, person._mapX, person._mapY, person._field65);
+		updateTile(person._diff, person._mapX, person._mapY, person._charNum);
 	}
 
 	for (uint i = 0; i < _count4; ++i) {
@@ -141,11 +145,11 @@ void Map::updateMap() {
 	}
 }
 
-Map::MapPerson *Map::findPersonById(byte id, int *partyNum) {
+Map::MapPerson *Map::findPersonById(byte id, int *charNum) {
 	for (uint i = 0; i < _people.size(); ++i) {
 		MapPerson &person = _people[i];
 		if (person._id == id) {
-			*partyNum = i;
+			*charNum = i;
 			return &person;
 		}
 	}
@@ -168,6 +172,11 @@ bool Map::isCloseTo(int diff, int mapX, int mapY) const {
 	int y1 = _mapPosY - diff, y2 = _mapPosY + diff;
 
 	return mapX >= x1 && mapY <= x2 && mapY >= y1 && mapY <= y2;
+}
+
+void Map::updateTileForeground(int mapX, int mapY, int fg) {
+	if (mapX >= 0 && mapX < _width && mapY >= 0 && mapY < _height)
+		_tiles[mapX][mapY].updateForeground(fg);
 }
 
 } // namespace Data
