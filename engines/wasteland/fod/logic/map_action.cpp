@@ -140,7 +140,7 @@ void MapAction::doMapAction(const uint16 *idPtr, int action, int charNum) {
 		mapActionInner(_idPtr, _actionNum, _partyNum, _charNum, 0);
 
 		if (_redrawFlag && !_actionNum)
-			g_engine->findView("Game")->draw();
+			g_engine->findView("Game")->redraw();
 	}
 }
 
@@ -175,32 +175,24 @@ bool MapAction::mapActionInner(const uint16 *idPtr, int action, int partyNum, in
 		local1 = arg4;
 
 	scriptCurrP = scriptP + 4;
-	for (;;) {
-		for (;;) {
-			if (_breakFlag) {
-				_val2 = 0;
-				return true;
-			}
+	const byte *ptrNext = scriptP + READ_LE_UINT16(scriptP + 2);
 
-			const byte *ptrNext = scriptP + READ_LE_UINT16(scriptP + 2);
-			if (scriptCurrP > ptrNext) {
-				_val2 = 0;
-				return true;
-			}
+	while (!_breakFlag && scriptCurrP <= ptrNext) {
+		OpcodeParams params = readParams(scriptCurrP, action);
+		if (params._action != action)
+			continue;
 
-			OpcodeParams params = readParams(scriptCurrP, action);
-			if (params._action != action)
-				continue;
-
-			int opcode = params._opcode;
-			if (opcode > 75) {
-				warning("Out of range opcode");
-				continue;
-			}
-
-			(this->*OPCODE_FUNCTIONS[opcode])(params);
+		int opcode = params._opcode;
+		if (opcode > 75) {
+			warning("Out of range opcode");
+			continue;
 		}
+
+		(this->*OPCODE_FUNCTIONS[opcode])(params);
 	}
+
+	_val2 = 0;
+	return true;
 }
 
 void MapAction::mapActionDone() {
@@ -269,7 +261,9 @@ void MapAction::opcode10(const OpcodeParams &params) { error("Unimplemented opco
 
 void MapAction::opcode11(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode12(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void MapAction::opcode12(const OpcodeParams &params) {
+	error("Unimplemented opcode");
+}
 
 void MapAction::opcode13(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
@@ -360,8 +354,8 @@ void MapAction::opcode52_movePerson(const OpcodeParams &params) {
 		person->_oldX = -1;
 		map.flagMap();
 
-		if (params[4] == 1 || params._opcode == 75) {
-			if (params[4] == 1)
+		if (params[3] == 1 || params._opcode == 75) {
+			if (params[3] == 1)
 				person->_field50 |= 0x80;
 
 			_idPtr = &person->_talkId;
