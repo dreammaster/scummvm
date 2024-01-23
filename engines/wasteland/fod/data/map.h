@@ -48,6 +48,8 @@ struct Map {
 		uint16 _actionId = 0;
 
 		void synchronize(Common::Serializer &s);
+
+		void updateForeground(int fg);
 	};
 	typedef Common::Array<MapTile> MapTileColumn;
 
@@ -58,11 +60,11 @@ struct Map {
 		int8 _mapX = 0;
 		int8 _mapY = 0;
 		byte _id = 0;
-		byte _field5f = 0;
-		byte _oldX = 0;
-		byte _oldY = 0;
+		byte _diff = 0;
+		int8 _oldX = 0;
+		int8 _oldY = 0;
 		byte _field63 = 0;
-		byte _field65 = 0;
+		byte _charNum = 0;
 		uint16 _talkId = 0;
 
 		void synchronize(Common::Serializer &s);
@@ -80,8 +82,6 @@ struct Map {
 
 private:
 	void synchronizeCore(Common::Serializer &s);
-
-	void updateTile(int diff, int mapX, int mapY, int charNum);
 
 	bool isCloseTo(int diff, int mapX, int mapY) const;
 
@@ -120,10 +120,15 @@ public:
 	Map(uint16 &mapX, uint16 &mapY);
 
 	void load(Common::SeekableReadStream &src);
-
 	void updateMap();
 
-	MapPerson *findPersonById(byte id, int *partyNum);
+	void flagMap() {
+		_flags |= MAPFLAG_8000;
+	}
+
+	MapPerson *findPersonById(byte id, int *charNum);
+	void updateTile(int diff, int mapX, int mapY, int charNum);
+	void updateTileForeground(int mapX, int mapY, int fg);
 };
 
 } // namespace Data

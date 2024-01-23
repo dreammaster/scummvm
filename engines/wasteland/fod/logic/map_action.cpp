@@ -21,6 +21,7 @@
 
 #include "wasteland/fod/logic/map_action.h"
 #include "wasteland/fod/fod.h"
+#include "wasteland/fod/data/map.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -101,7 +102,7 @@ const MapAction::OpcodeFunction MapAction::OPCODE_FUNCTIONS[76] = {
 	&MapAction::opcode50,
 
 	&MapAction::opcodeNOP,
-	&MapAction::opcode52,
+	&MapAction::opcode52_movePerson,
 	&MapAction::opcode53,
 	&MapAction::opcode54,
 	&MapAction::opcode55,
@@ -118,7 +119,7 @@ const MapAction::OpcodeFunction MapAction::OPCODE_FUNCTIONS[76] = {
 	&MapAction::opcode65,
 	&MapAction::opcode66,
 	&MapAction::opcode67,
-	&MapAction::opcode68,
+	&MapAction::opcode68_End,
 	&MapAction::opcode69,
 	&MapAction::opcode17,
 
@@ -126,7 +127,7 @@ const MapAction::OpcodeFunction MapAction::OPCODE_FUNCTIONS[76] = {
 	&MapAction::opcode72,
 	&MapAction::opcode73,
 	&MapAction::opcode74,
-	&MapAction::opcode52
+	&MapAction::opcode52_movePerson
 };
 
 void MapAction::doMapAction(const uint16 *idPtr, int action, int charNum) {
@@ -147,6 +148,7 @@ bool MapAction::mapActionInner(const uint16 *idPtr, int action, int partyNum, in
 	const auto &disk = g_engine->_disk;
 	uint16 id = *idPtr;
 	_actionNum = -1;
+	_newPartyNum = partyNum;
 
 	if (id == 0xffff)
 		return false;
@@ -163,11 +165,10 @@ bool MapAction::mapActionInner(const uint16 *idPtr, int action, int partyNum, in
 	if (!_redrawFlag && action == 6)
 		error("TODO: action 6");
 	if (_redrawFlag)
-		partyNum = g_engine->_disk1._party.getMemberByStatus(1);
+		_newPartyNum = g_engine->_disk1._party.getMemberByStatus(1);
 
-	int local1 = 0, local2 = 0, local3 = 0;
-	int params[8];
-	bool breakFlag = false;
+	int local1 = 0;		//, local2 = 0, local3 = 0;
+	_breakFlag = false;
 	const byte *scriptCurrP;
 
 	if (action == 4)
@@ -176,7 +177,7 @@ bool MapAction::mapActionInner(const uint16 *idPtr, int action, int partyNum, in
 	scriptCurrP = scriptP + 4;
 	for (;;) {
 		for (;;) {
-			if (breakFlag) {
+			if (_breakFlag) {
 				_val2 = 0;
 				return true;
 			}
@@ -187,18 +188,17 @@ bool MapAction::mapActionInner(const uint16 *idPtr, int action, int partyNum, in
 				return true;
 			}
 
-			readParams(scriptCurrP, params, action);
-			if (params[0] != action)
+			OpcodeParams params = readParams(scriptCurrP, action);
+			if (params._action != action)
 				continue;
 
-			int opcode = params[1];
+			int opcode = params._opcode;
 			if (opcode > 75) {
 				warning("Out of range opcode");
 				continue;
 			}
 
 			(this->*OPCODE_FUNCTIONS[opcode])(params);
-			error("TODO: main loop");
 		}
 	}
 }
@@ -211,14 +211,16 @@ void MapAction::setPartyMember(int partyNum) {
 	_partyMember = &g_engine->_disk1._party[partyNum];
 }
 
-void MapAction::readParams(const byte *&scriptP, int *dest, int action) {
+MapAction::OpcodeParams MapAction::readParams(const byte *&scriptP, int action) {
+	OpcodeParams result;
 	int nextVal = *scriptP++;
-	*dest++ = nextVal & 0xf;
+	result._action = nextVal & 0xf;
 	int paramsType = nextVal >> 4;
 
 	if (!action) {
-		*dest++ = *scriptP++;
+		result._opcode = *scriptP++;
 
+		int *dest = result._params;
 		// Iterate through loading parameters
 		for (const byte *paramP = PARAMS[paramsType]; *paramP; ++paramP) {
 			if (*paramP == BYTE) {
@@ -239,147 +241,179 @@ void MapAction::readParams(const byte *&scriptP, int *dest, int action) {
 		int offset = ARRAY[*scriptP] + 1;
 		scriptP += offset;	
 	}
+
+	return result;
 }
 
-void MapAction::opcode00(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode00(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode01(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode01(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode02(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode02(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode03(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode03(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode04(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode04(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode05(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode05(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode06(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode06(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode07(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode07(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode08(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode08(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode09(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode09(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode10(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode10(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode11(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode11(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode12(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode12(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode13(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode13(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode14(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode14(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode15(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode15(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode16(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode16(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode17(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode17(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode18(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode18(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode19(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode19(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode20(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode20(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode21(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode21(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode22(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode22(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode23(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode23(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode24(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode24(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode25(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode25(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode26(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode26(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode27(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode27(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode28(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode28(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode29(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode29(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode31(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode31(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode32(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode32(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode34(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode34(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode35(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode35(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode36(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode36(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode37(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode37(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode38(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode38(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode39(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode39(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode40(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode40(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode42(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode42(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode43(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode43(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode44(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode44(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode45(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode45(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode46(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode46(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode47(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode47(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode48(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode48(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode49(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode49(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode50(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode50(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode52(int params[]) {
-	error("Unimplemented opcode");
+void MapAction::opcode52_movePerson(const OpcodeParams &params) {
+	int charNum;
+	Data::Map &map = g_engine->_disk._map;
+	Data::Map::MapPerson *person = map.findPersonById(params._params[0], &charNum);
+
+	if (person && !(g_engine->_disk1._unknown4[person->_id] & 2)) {
+		if (params._opcode == 52) {
+			// Remove character from old position
+			map.updateTileForeground(person->_mapX, person->_mapY, 0);
+
+			// Move them to new position
+			person->_mapX = params[1];
+			person->_mapY = params[2];
+			map.updateTile(person->_diff, person->_mapX, person->_mapY, person->_charNum);
+		}
+
+		person->_oldX = -1;
+		map.flagMap();
+
+		if (params[4] == 1 || params._opcode == 75) {
+			if (params[4] == 1)
+				person->_field50 |= 0x80;
+
+			_idPtr = &person->_talkId;
+			_actionNum = 6;
+			_partyNum = _newPartyNum;
+			_redrawFlag = false;
+			_breakFlag = true;
+		}
+	}
 }
 
-void MapAction::opcode53(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode53(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode54(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode54(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode55(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode55(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode56(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode56(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode57(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode57(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode58(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode58(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode59(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode59(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode60(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode60(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode61(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode61(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode62(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode62(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode63(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode63(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode64(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode64(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode65(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode65(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode66(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode66(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode67(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode67(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode68(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode68_End(const OpcodeParams &params) {
+	_breakFlag = true;
+}
 
-void MapAction::opcode69(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode69(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode72(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode72(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode73(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode73(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void MapAction::opcode74(int params[]) { error("Unimplemented opcode"); }
+void MapAction::opcode74(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
 } // namespace Logic
 } // namespace FOD
