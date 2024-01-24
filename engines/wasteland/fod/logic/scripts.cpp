@@ -132,33 +132,58 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 
 void Scripts::execute(const uint16 *idPtr, int action, int charNum, ScriptDoneCallback doneCallback) {
 	assert(doneCallback);
+	assert(_state == kScriptIdle);
+
+	_state = kScriptRunning;
 	_idPtr = idPtr;
 	_actionNum = action;
 	_charNum = charNum;
 	_partyNum = 0;
 
-	while (_actionNum != -1 && _actionNum != 8) {
-		mapActionInner(_idPtr, _actionNum, _partyNum, _charNum, 0);
-
-		if (_redrawFlag && !_actionNum)
-			g_engine->findView("Game")->redraw();
-	}
-
-	doneCallback();
+	executeLoop();
 }
 
-bool Scripts::mapActionInner(const uint16 *idPtr, int action, int partyNum, int charNum, int arg4) {
+void Scripts::resume(const ScriptResumeParams &params) {
+	assert(_state == kScriptPaused);
+	_resumeParams = params;
+
+	executeLoop();
+}
+
+void Scripts::executeLoop() {
+	while (_actionNum != -1 && _actionNum != 8) {
+		executeScript();
+
+		// if (_redrawFlag && !_actionNum) g_engine->findView("Game")->redraw();
+	}
+
+	if (_state == kScriptBreak)
+		_doneCallback();
+}
+
+bool Scripts::executeScript() {
 	const auto &disk = g_engine->_disk;
-	uint16 id = *idPtr;
+	uint16 id = *_idPtr;
+//	int charNum = _charNum;
+	int partyNum = _partyNum;
+	int action = _actionNum;
+//	int arg4 = 0;
+	uint flags;
+
+	if (_state == kScriptPaused)
+		goto resumeScript;
+
 	_actionNum = -1;
 	_newPartyNum = partyNum;
+	//int local1 = 0, local2 = 0, local3 = 0;
+//	if (action == 4) local1 = arg4;
 
 	if (id == 0xffff)
 		return false;
 
 	// Check whether the script handles the particular action
-	const byte *scriptP = &disk._scripts[disk._scriptsOffsets[id]];
-	uint flags = READ_LE_UINT16(scriptP);
+	_scriptP = &disk._scripts[disk._scriptsOffsets[id]];
+	flags = READ_LE_UINT16(_scriptP);
 	if (!(flags & (1 << action)))
 		return false;
 
@@ -170,35 +195,33 @@ bool Scripts::mapActionInner(const uint16 *idPtr, int action, int partyNum, int 
 	if (_redrawFlag)
 		_newPartyNum = g_engine->_disk1._party.getMemberByStatus(1);
 
-	int local1 = 0;		//, local2 = 0, local3 = 0;
-	_breakFlag = false;
-	const byte *scriptCurrP;
+	_scriptCurrP = _scriptP + 4;
+	_scriptNextP = _scriptP + READ_LE_UINT16(_scriptP + 2);
 
-	if (action == 4)
-		local1 = arg4;
+resumeScript:
+	while (_state != kScriptBreak && _scriptCurrP <= _scriptNextP) {
+		if (_state == kScriptPaused) {
+			_params._isResuming = true;
+		} else {
+			_params = readParams(_scriptCurrP, action);
+			if (_params._action != action)
+				continue;
+		}
 
-	scriptCurrP = scriptP + 4;
-	const byte *ptrNext = scriptP + READ_LE_UINT16(scriptP + 2);
-
-	while (!_breakFlag && scriptCurrP <= ptrNext) {
-		OpcodeParams params = readParams(scriptCurrP, action);
-		if (params._action != action)
-			continue;
-
-		int opcode = params._opcode;
+		int opcode = _params._opcode;
 		if (opcode > 75) {
 			warning("Out of range opcode");
 			continue;
 		}
 
-		(this->*OPCODE_FUNCTIONS[opcode])(params);
+		(this->*OPCODE_FUNCTIONS[opcode])(_params);
 	}
 
 	_val2 = 0;
 	return true;
 }
 
-void Scripts::mapActionDone() {
+void Scripts::scriptDone() {
 
 }
 
@@ -265,6 +288,29 @@ void Scripts::opcode10(const OpcodeParams &params) { error("Unimplemented opcode
 void Scripts::opcode11(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
 void Scripts::opcode12(const OpcodeParams &params) {
+	const auto &disk1 = g_engine->_disk1;
+	int isYes = true;
+
+	if (params._isResuming) {
+		isYes = _resumeParams._intValue != 0;
+	} else if (!params[3]) {
+		_state = kScriptPaused;
+		Views::Dialogs::YesNo::show("Enter new location?", [](bool response) {
+			g_engine->_scripts.resume(ScriptResumeParams(response ? 1 : 0));
+		});
+		return;
+	}
+
+	if (isYes) {
+		switch (params[2]) {
+		case 0:
+			if (disk1._mapIndex) {
+				// TODO
+			}
+			break;
+		}
+	}
+
 	error("Unimplemented opcode");
 }
 
@@ -365,7 +411,8 @@ void Scripts::opcode52_movePerson(const OpcodeParams &params) {
 			_actionNum = 6;
 			_partyNum = _newPartyNum;
 			_redrawFlag = false;
-			_breakFlag = true;
+
+			_state = kScriptBreak;
 		}
 	}
 }
@@ -401,7 +448,7 @@ void Scripts::opcode66(const OpcodeParams &params) { error("Unimplemented opcode
 void Scripts::opcode67(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
 void Scripts::opcode68_End(const OpcodeParams &params) {
-	_breakFlag = true;
+	_state = kScriptBreak;
 }
 
 void Scripts::opcode69(const OpcodeParams &params) { error("Unimplemented opcode"); }
