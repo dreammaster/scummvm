@@ -46,6 +46,9 @@ static const uint16 PERSON_ICONS[21] = {
 	0x1F20, 0x1F28, 0x1F30
 };
 
+Game *Game::_owner;
+bool Game::_flag;
+
 Game::Game() {
 	Common::copy(PERSON_ICONS, PERSON_ICONS + 21, _personIcons);
 }
@@ -85,49 +88,64 @@ void Game::move(Direction dir, bool flag) {
 		nothing(false);
 
 	} else {
-		int currMapNum = map._mapNum;
-		const Common::Point oldPos(disk1._mapPosX, disk1._mapPosY);
-		_oldMapPos = oldPos;
+		_currMapNum = map._mapNum;
+		_oldMapPos = Common::Point(disk1._mapPosX, disk1._mapPosY);
+		_newMapPos = Common::Point(newX, newY);
+		_owner = this;
+		_flag = flag;
 
-		doMapAction(&map._tiles[newX][newY]._actionId, 1, 0);
+		g_engine->_scripts.execute(&map._tiles[newX][newY]._actionId, 1, 0,
+			[]() { _owner->move2(); });		
+	}
+}
 
-		// Only do further movement if the map/position hasn't changed,
-		// considering we haven't applied our own move change yet
-		if (map._mapNum == currMapNum && disk1._mapPosX == oldPos.x &&
-				disk1._mapPosY == oldPos.y) {
-			// Scan for people at the new position
-			uint personNum = 0;
-			for (personNum = 0; personNum < map._people.size(); ++personNum) {
-				const auto &person = map._people[personNum];
-				if (person._mapX == newX && person._mapY == newY)
-					break;
-			}
+void Game::move2() {
+	auto &map = g_engine->_disk._map;
+	Data::Disk1 &disk1 = g_engine->_disk1;
 
-			if (personNum < map._people.size()) {
-				// Moving onto a person, to trigger conversation
-				auto &person = map._people[personNum];
-				person._field50 &= ~0x80;
-				doMapAction(&person._talkId, 6, personNum);
-				nothing(flag);
+	// Only do further movement if the map/position hasn't changed,
+	// considering we haven't applied our own move change yet
+	if (map._mapNum == _currMapNum && disk1._mapPosX == _oldMapPos.x &&
+		disk1._mapPosY == _oldMapPos.y) {
+		// Scan for people at the new position
+		uint personNum = 0;
+		for (personNum = 0; personNum < map._people.size(); ++personNum) {
+			const auto &person = map._people[personNum];
+			if (person._mapX == _newMapPos.x && person._mapY == _newMapPos.y)
+				break;
+		}
 
-			} else {
-				if (canMove(newX, newY))
-					moveTo(newX, newY);
-
-				// TODO: method calls
-				doMapAction(&map._tiles[newX][newY]._actionId, 0, 0);
-
-				if (!flag)
-					checkForTrouble();
-
-				moved(disk1._mapPosX, disk1._mapPosY);
-			}
+		if (personNum < map._people.size()) {
+			// Moving onto a person, to trigger conversation
+			auto &person = map._people[personNum];
+			person._field50 &= ~0x80;
+			g_engine->_scripts.execute(&person._talkId, 6, personNum,
+				[]() {
+					_owner->nothing(_owner->_flag);
+				});
 
 		} else {
-			nothing(flag);
-			moved(disk1._mapPosX, disk1._mapPosY);
+			if (canMove(_newMapPos.x, _newMapPos.y))
+				moveTo(_newMapPos.x, _newMapPos.y);
+
+			// TODO: method calls
+			g_engine->_scripts.execute(&map._tiles[_newMapPos.x][_newMapPos.y]._actionId, 0, 0,
+				[]() { _owner->move3(); });
 		}
+
+	} else {
+		nothing(_flag);
+		moved(disk1._mapPosX, disk1._mapPosY);
 	}
+}
+
+void Game::move3() {
+	Data::Disk1 &disk1 = g_engine->_disk1;
+
+	if (!_flag)
+		checkForTrouble();
+
+	moved(disk1._mapPosX, disk1._mapPosY);
 }
 
 bool Game::canMove(int newX, int newY) const {

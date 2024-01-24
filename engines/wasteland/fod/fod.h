@@ -31,6 +31,7 @@
 #include "wasteland/fod/data/pics.h"
 #include "wasteland/fod/data/globals.h"
 #include "wasteland/fod/data/weapons.h"
+#include "wasteland/fod/logic/scripts.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -51,6 +52,7 @@ public:
 	Data::Pics _pics;
 	Data::Globals _globals;
 	Data::Weapons _weapons;
+	Logic::Scripts _scripts;
 
 public:
 	FountainOfDreamsEngine(OSystem *syst, const WastelandGameDescription *gameDesc);
