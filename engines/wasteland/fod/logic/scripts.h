@@ -30,11 +30,34 @@ namespace Logic {
 
 typedef void (*ScriptDoneCallback)();
 
+/**
+ * Current script execution state
+ */
+enum ScriptState {
+	kScriptIdle = 0, kScriptBreak = 0, kScriptRunning = 1, kScriptPaused = 2
+};
+
+/**
+ * Container for values that can be passed into the script when resuming.
+ * In the original, a script could show a view mid-execution, such as
+ * prompting the user for Y/N when exiting a map. Now in ScummVM, the
+ * script can pause itself to show the Y/N view, which then calls a
+ * callback when a key is pressed, which in turn passes the Y/N selection
+ * back into the script to resume execution with.
+ */
+struct ScriptResumeParams {
+	int _intValue = 0;
+
+	ScriptResumeParams() {}
+	ScriptResumeParams(int value) : _intValue(value) {}
+};
+
 class Scripts {
 	struct OpcodeParams {
 		byte _action = 0;
 		byte _opcode = 0;
 		int _params[5];
+		bool _isResuming = false;
 
 		const int &operator[](uint i) const {
 			return _params[i];
@@ -43,6 +66,8 @@ class Scripts {
 	typedef void(Scripts:: *OpcodeFunction)(const OpcodeParams &params);
 private:
 	static const OpcodeFunction OPCODE_FUNCTIONS[76];
+	ScriptResumeParams _resumeParams;
+	ScriptState _state = kScriptIdle;
 	ScriptDoneCallback _doneCallback;
 	const uint16 *_idPtr = nullptr;
 	int _actionNum = 0;
@@ -52,16 +77,22 @@ private:
 	bool _redrawFlag = false;
 	int _val2 = 0;
 	Data::PartyMember *_partyMember = nullptr;
-	bool _breakFlag = false;
+	const byte *_scriptP = nullptr;
+	const byte *_scriptCurrP = nullptr;
+	const byte *_scriptNextP = nullptr;
+	OpcodeParams _params;
 
-	bool mapActionInner(const uint16 *idPtr, int action, int partyNum, int charNum, int arg4);
-	void mapActionDone();
+	void executeLoop();
+	bool executeScript();
+	void scriptDone();
 	void setPartyMember(int partyNum);
 	OpcodeParams readParams(const byte *&scriptP, int action);
 
 public:
 	void execute(const uint16 *idPtr, int action, int arg2,
 		ScriptDoneCallback doneCallback);
+
+	void resume(const ScriptResumeParams &params);
 
 private:
 	void opcodeNOP(const OpcodeParams &) {}
