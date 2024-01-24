@@ -227,9 +227,9 @@ void Game::drawTileAt(Surface &s, int mapX, int mapY, int tileId) {
 
 void Game::move(Logic::Direction dir) {
 	_infoText.clear();
-	Logic::Game::move(dir, false);
-
 	redraw();
+
+	Logic::Game::move(dir, false);
 }
 
 void Game::showMoveMessage(int msgNum) {

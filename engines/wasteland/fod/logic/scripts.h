@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef WASTELAND_FOD_LOGIC_ACTION_H
-#define WASTELAND_FOD_LOGIC_ACTION_H
+#ifndef WASTELAND_FOD_LOGIC_SCRIPTS_H
+#define WASTELAND_FOD_LOGIC_SCRIPTS_H
 
 #include "wasteland/fod/data/party.h"
 
@@ -28,7 +28,9 @@ namespace Wasteland {
 namespace FOD {
 namespace Logic {
 
-class MapAction {
+typedef void (*ScriptDoneCallback)();
+
+class Scripts {
 	struct OpcodeParams {
 		byte _action = 0;
 		byte _opcode = 0;
@@ -38,9 +40,10 @@ class MapAction {
 			return _params[i];
 		}
 	};
-	typedef void(MapAction:: *OpcodeFunction)(const OpcodeParams &params);
+	typedef void(Scripts:: *OpcodeFunction)(const OpcodeParams &params);
 private:
 	static const OpcodeFunction OPCODE_FUNCTIONS[76];
+	ScriptDoneCallback _doneCallback;
 	const uint16 *_idPtr = nullptr;
 	int _actionNum = 0;
 	int _charNum = 0;
@@ -55,6 +58,10 @@ private:
 	void mapActionDone();
 	void setPartyMember(int partyNum);
 	OpcodeParams readParams(const byte *&scriptP, int action);
+
+public:
+	void execute(const uint16 *idPtr, int action, int arg2,
+		ScriptDoneCallback doneCallback);
 
 private:
 	void opcodeNOP(const OpcodeParams &) {}
@@ -127,9 +134,6 @@ private:
 	void opcode72(const OpcodeParams &);
 	void opcode73(const OpcodeParams &);
 	void opcode74(const OpcodeParams &);
-
-protected:
-	void doMapAction(const uint16 *idPtr, int action, int arg2);
 };
 
 } // namespace Logic

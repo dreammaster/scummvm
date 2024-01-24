@@ -24,7 +24,7 @@
 
 #include "common/rect.h"
 #include "common/serializer.h"
-#include "wasteland/fod/logic/map_action.h"
+#include "wasteland/fod/logic/scripts.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -39,7 +39,7 @@ enum PersonId {
 	PERSON_PARTY = 1, PERSON_2 = 2, PERSON_4 = 4
 };
 
-class Game : public MapAction {
+class Game {
 private:
 	bool canMove(int newX, int newY) const;
 	void moveTo(int newX, int newY);
@@ -49,7 +49,8 @@ protected:
 	uint16 _personIcons[21];
 	int _personIconsSection = 0;
 	Direction _currentDir = DIR_NONE;
-	Common::Point _oldMapPos;
+	Common::Point _oldMapPos, _newMapPos;
+	int _currMapNum = 0;
 	int _gameVal1 = 0;
 	int _gameVal2 = 0;
 
@@ -63,6 +64,10 @@ protected:
 	 * Move the party in the specified direction
 	 */
 	void move(Direction dir, bool flag);
+	void move2();
+	void move3();
+	static Game *_owner;
+	static bool _flag;
 
 	void nothing(bool flag);
 

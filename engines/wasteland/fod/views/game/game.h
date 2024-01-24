@@ -24,7 +24,6 @@
 
 #include "wasteland/fod/views/core/base_view.h"
 #include "wasteland/fod/logic/game.h"
-#include "wasteland/fod/logic/map_action.h"
 
 namespace Wasteland {
 namespace FOD {
