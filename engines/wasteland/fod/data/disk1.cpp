@@ -52,8 +52,7 @@ Disk1::Disk1(uint16 &mapX, uint16 &mapY) : _mapPosX(mapX), _mapPosY(mapY),
 
 
 void Disk1::synchronize(Common::Serializer &s) {
-	s.syncAsUint16LE(_field0);
-	s.syncAsUint16LE(_field2);
+	s.syncAsUint32LE(_saveCtr);
 	s.syncAsUint16LE(_field4);
 	s.syncAsByte(_gfxMode);
 	s.syncAsByte(_field7);
@@ -62,7 +61,9 @@ void Disk1::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_mapPosX);
 	s.syncAsUint16LE(_mapPosY);
 	s.syncAsUint32LE(_cash);
-	s.syncBytes(_maps, 30);
+	s.syncBytes(_maps, 10);
+	s.syncBytes(_mapsX, 10);
+	s.syncBytes(_mapsY, 10);
 	s.syncAsByte(_mapIndex);
 
 	s.syncAsByte(_partyCount);
@@ -85,7 +86,7 @@ bool Disk1::load(bool &hasParty) {
 	Common::Serializer s(&f, nullptr);
 	synchronize(s);
 
-	hasParty = _field2 || _field0;
+	hasParty = _saveCtr != 0;
 
 	if (!hasParty) {
 		resetParty();
@@ -127,6 +128,18 @@ bool Disk1::isPartyAlive() const {
 	}
 
 	return false;
+}
+
+void Disk1::save() {
+	// TODO
+}
+
+void Disk1::moveTo(int newX, int newY) {
+	_mapPosX = newX;
+	_mapPosY = newY;
+
+	_mapVal1 = 0;
+	_mapVal2 = 0;
 }
 
 } // namespace Data

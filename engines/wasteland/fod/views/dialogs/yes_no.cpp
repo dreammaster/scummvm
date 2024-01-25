@@ -28,8 +28,7 @@ namespace FOD {
 namespace Views {
 namespace Dialogs {
 
-void YesNo::show(const Common::String &message, YesNoCallback callback) {
-	YesNo *view = static_cast<YesNo *>(g_engine->findView("YesNo"));
+void YesNo::show(YesNo *view, const Common::String &message, YesNoCallback callback) {
 	view->_message = message;
 	view->_callback = callback;
 	view->addView();
@@ -69,7 +68,18 @@ bool YesNo::msgKeypress(const KeypressMessage &msg) {
 }
 
 void YesNo::response(bool isYes) {
-	close(); 
+	close();
+	_callback(isYes);
+}
+
+void LeaveMap::show() {
+	LeaveMap *view = static_cast<LeaveMap *>(g_engine->findView("LeaveMap"));
+
+	YesNo::show(view, "Enter new location?",
+		[](bool response) {
+			g_engine->_scripts.resume(Logic::ScriptResumeParams(response ? 1 : 0));
+		}
+	);
 }
 
 } // namespace Dialogs

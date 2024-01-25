@@ -47,7 +47,7 @@ struct Views {
 	Dialogs::AllCharacterInfo _allCharacterInfo;
 	Dialogs::CharacterInfo _characterInfo;
 	Dialogs::Quit _quit;
-	Dialogs::YesNo _yesNo;
+	Dialogs::LeaveMap _leaveMap;
 };
 
 } // namespace Views

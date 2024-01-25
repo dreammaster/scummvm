@@ -50,8 +50,7 @@ struct Disk1Table {
 };
 
 struct Disk1 {
-	uint16 _field0;
-	uint16 _field2;
+	uint32 _saveCtr;
 	uint16 _field4;
 	byte _gfxMode = 3;
 	byte _field7;
@@ -60,7 +59,9 @@ struct Disk1 {
 	uint16 &_mapPosX;
 	uint16 &_mapPosY;
 	uint32 _cash;
-	byte _maps[30];
+	byte _maps[10];
+	byte _mapsX[10];
+	byte _mapsY[10];
 	byte _mapIndex;
 	byte _partyCount;
 	byte _partyIndexes[PARTY_COUNT];
@@ -70,6 +71,9 @@ struct Disk1 {
 	byte _unknown4[250];
 	byte _unknown5[6];
 	Disk1Table _table;
+
+	int _mapVal1 = 0;
+	int _mapVal2 = 0;
 
 	Disk1(uint16 &mapX, uint16 &mapY);
 
@@ -87,6 +91,9 @@ struct Disk1 {
 	 */
 	bool isPartyAlive() const;
 
+	void save();
+
+	void moveTo(int newX, int newY);
 };
 
 } // namespace Data
