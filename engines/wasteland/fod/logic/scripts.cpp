@@ -334,7 +334,7 @@ void Scripts::opcode12(const OpcodeParams &params) {
 			disk1._mapsX[disk1._mapIndex] = disk1._mapPosX;
 			disk1._mapsY[disk1._mapIndex] = disk1._mapPosY;
 
-			mapId = params[2];
+			mapId = params[2] - 1;
 			mapFlag = false;
 			for (mapIndex = 0; mapIndex <= disk1._mapIndex && !mapFlag; ++mapIndex) {
 				mapFlag = disk1._maps[mapIndex] == mapId;
@@ -354,6 +354,7 @@ void Scripts::opcode12(const OpcodeParams &params) {
 		}
 	}
 
+	_val2 = 0;
 	_scriptResult = true;
 	_state = kScriptBreak;
 }
