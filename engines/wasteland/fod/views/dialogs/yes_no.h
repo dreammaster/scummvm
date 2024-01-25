@@ -42,15 +42,24 @@ private:
 	void response(bool isYes);
 
 public:
-	static void show(const Common::String &message, YesNoCallback callback);
+	static void show(YesNo *view, const Common::String &message, YesNoCallback callback);
 
 public:
 	YesNo() : Dialog("YesNo", Gfx::Window(8, 6, 31, 17)) {}
+	YesNo(const Common::String &name) : Dialog(name, Gfx::Window(8, 6, 31, 17)) {}
 	virtual ~YesNo() {}
 
 	void draw() override;
 	bool msgAction(const ActionMessage &msg) override;
 	bool msgKeypress(const KeypressMessage &msg) override;
+};
+
+class LeaveMap : public YesNo {
+public:
+	LeaveMap() : YesNo("LeaveMap") {}
+	virtual ~LeaveMap() {}
+
+	static void show();
 };
 
 } // namespace Dialogs

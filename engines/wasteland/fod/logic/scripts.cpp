@@ -131,14 +131,14 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 };
 
 void Scripts::execute(const uint16 *idPtr, int action, int charNum, ScriptDoneCallback doneCallback) {
-	assert(doneCallback);
+	assert(idPtr && doneCallback);
 	assert(_state == kScriptIdle);
 
-	_state = kScriptRunning;
 	_idPtr = idPtr;
 	_actionNum = action;
 	_charNum = charNum;
 	_partyNum = 0;
+	_doneCallback = doneCallback;
 
 	executeLoop();
 }
@@ -151,7 +151,10 @@ void Scripts::resume(const ScriptResumeParams &params) {
 }
 
 void Scripts::executeLoop() {
-	while (_actionNum != -1 && _actionNum != 8) {
+	bool firstTime = _state == kScriptPaused;
+
+	while (firstTime || (_actionNum != -1 && _actionNum != 8)) {
+		firstTime = false;
 		executeScript();
 
 		// if (_redrawFlag && !_actionNum) g_engine->findView("Game")->redraw();
@@ -188,6 +191,7 @@ bool Scripts::executeScript() {
 		return false;
 
 	_val2 = 1;
+	_scriptResult = false;
 	setPartyMember(partyNum);
 
 	if (!_redrawFlag && action == 6)
@@ -197,11 +201,18 @@ bool Scripts::executeScript() {
 
 	_scriptCurrP = _scriptP + 4;
 	_scriptNextP = _scriptP + READ_LE_UINT16(_scriptP + 2);
+	_state = kScriptRunning;
+
+	do {
+		if (_state == kScriptBreak || _scriptCurrP >= _scriptNextP) {
+			_val2 = 0;
+			break;
+		}
 
 resumeScript:
-	while (_state != kScriptBreak && _scriptCurrP <= _scriptNextP) {
 		if (_state == kScriptPaused) {
 			_params._isResuming = true;
+			_state = kScriptRunning;
 		} else {
 			_params = readParams(_scriptCurrP, action);
 			if (_params._action != action)
@@ -215,10 +226,9 @@ resumeScript:
 		}
 
 		(this->*OPCODE_FUNCTIONS[opcode])(_params);
-	}
+	} while (_state == kScriptRunning);
 
-	_val2 = 0;
-	return true;
+	return _scriptResult;
 }
 
 void Scripts::scriptDone() {
@@ -288,16 +298,18 @@ void Scripts::opcode10(const OpcodeParams &params) { error("Unimplemented opcode
 void Scripts::opcode11(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
 void Scripts::opcode12(const OpcodeParams &params) {
-	const auto &disk1 = g_engine->_disk1;
+	auto &disk1 = g_engine->_disk1;
+	auto &disk = g_engine->_disk;
 	int isYes = true;
+	int mapId;
+	bool mapFlag = false;
+	int mapIndex;
 
 	if (params._isResuming) {
 		isYes = _resumeParams._intValue != 0;
 	} else if (!params[3]) {
 		_state = kScriptPaused;
-		Views::Dialogs::YesNo::show("Enter new location?", [](bool response) {
-			g_engine->_scripts.resume(ScriptResumeParams(response ? 1 : 0));
-		});
+		Views::Dialogs::LeaveMap::show();
 		return;
 	}
 
@@ -305,13 +317,45 @@ void Scripts::opcode12(const OpcodeParams &params) {
 		switch (params[2]) {
 		case 0:
 			if (disk1._mapIndex) {
-				// TODO
+				disk1.save();
+
+				disk1._mapIndex--;
+				disk.loadMap(disk1._maps[disk1._mapIndex]);
+				disk1.moveTo(disk1._mapsX[disk1._mapIndex], disk1._mapsY[disk1._mapIndex]);
 			}
+			break;
+
+		case 1:
+			disk1.moveTo(params[0], params[1]);
+			break;
+
+		default:
+			disk1.save();
+			disk1._mapsX[disk1._mapIndex] = disk1._mapPosX;
+			disk1._mapsY[disk1._mapIndex] = disk1._mapPosY;
+
+			mapId = params[2];
+			mapFlag = false;
+			for (mapIndex = 0; mapIndex <= disk1._mapIndex && !mapFlag; ++mapIndex) {
+				mapFlag = disk1._maps[mapIndex] == mapId;
+			}
+
+			if (mapFlag) {
+				disk1._mapIndex = mapIndex;
+			} else {
+				disk1._maps[++disk1._mapIndex] = mapId;
+			}
+
+			disk1._mapsX[disk1._mapIndex] = params[0];
+			disk1._mapsY[disk1._mapIndex] = params[1];
+			disk.loadMap(mapId);
+			disk1.moveTo(disk1._mapsX[disk1._mapIndex], disk1._mapsY[disk1._mapIndex]);
 			break;
 		}
 	}
 
-	error("Unimplemented opcode");
+	_scriptResult = true;
+	_state = kScriptBreak;
 }
 
 void Scripts::opcode13(const OpcodeParams &params) { error("Unimplemented opcode"); }

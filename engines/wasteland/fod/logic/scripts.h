@@ -68,7 +68,7 @@ private:
 	static const OpcodeFunction OPCODE_FUNCTIONS[76];
 	ScriptResumeParams _resumeParams;
 	ScriptState _state = kScriptIdle;
-	ScriptDoneCallback _doneCallback;
+	ScriptDoneCallback _doneCallback = nullptr;
 	const uint16 *_idPtr = nullptr;
 	int _actionNum = 0;
 	int _charNum = 0;
@@ -76,6 +76,7 @@ private:
 	int _newPartyNum = 0;
 	bool _redrawFlag = false;
 	int _val2 = 0;
+	bool _scriptResult = false;
 	Data::PartyMember *_partyMember = nullptr;
 	const byte *_scriptP = nullptr;
 	const byte *_scriptCurrP = nullptr;

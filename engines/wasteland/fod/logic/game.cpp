@@ -126,7 +126,7 @@ void Game::move2() {
 
 		} else {
 			if (canMove(_newMapPos.x, _newMapPos.y))
-				moveTo(_newMapPos.x, _newMapPos.y);
+				disk1.moveTo(_newMapPos.x, _newMapPos.y);
 
 			// TODO: method calls
 			g_engine->_scripts.execute(&map._tiles[_newMapPos.x][_newMapPos.y]._actionId, 0, 0,
@@ -173,15 +173,6 @@ bool Game::canMove(int newX, int newY) const {
 	}
 
 	return true;
-}
-
-void Game::moveTo(int newX, int newY) {
-	auto &disk1 = g_engine->_disk1;
-	disk1._mapPosX = newX;
-	disk1._mapPosY = newY;
-
-	_gameVal1 = 0;
-	_gameVal2 = 0;
 }
 
 void Game::nothing(bool flag) {

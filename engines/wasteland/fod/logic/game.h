@@ -42,7 +42,6 @@ enum PersonId {
 class Game {
 private:
 	bool canMove(int newX, int newY) const;
-	void moveTo(int newX, int newY);
 	void checkForTrouble();
 
 protected:
@@ -51,8 +50,6 @@ protected:
 	Direction _currentDir = DIR_NONE;
 	Common::Point _oldMapPos, _newMapPos;
 	int _currMapNum = 0;
-	int _gameVal1 = 0;
-	int _gameVal2 = 0;
 
 	/**
 	 * Sets the slot for the party in the person icons array
