@@ -37,6 +37,18 @@ enum ScriptState {
 	kScriptIdle = 0, kScriptBreak = 0, kScriptRunning = 1, kScriptPaused = 2
 };
 
+enum Opcode {
+	kOpcodeMoveParty = 12,
+	kOpcodeNOP1 = 33,
+	kOpcodeNOP2 = 51,
+	kOpcodeMovePerson = 52,
+	kOpcode_End = 68,
+
+	kOpcodeMovePerson2 = 75,
+	kOpcodeLast = 75
+};
+
+
 /**
  * Container for values that can be passed into the script when resuming.
  * In the original, a script could show a view mid-execution, such as
@@ -55,8 +67,9 @@ struct ScriptResumeParams {
 class Scripts {
 	struct OpcodeParams {
 		byte _action = 0;
-		byte _opcode = 0;
+		Opcode _opcode = (Opcode)0;
 		int _params[5];
+		int _paramCount = 0;
 		bool _isResuming = false;
 
 		const int &operator[](uint i) const {
@@ -88,6 +101,7 @@ private:
 	void scriptDone();
 	void setPartyMember(int partyNum);
 	OpcodeParams readParams(const byte *&scriptP, int action);
+	void dumpOpcode();
 
 public:
 	void execute(const uint16 *idPtr, int action, int arg2,
@@ -109,7 +123,7 @@ private:
 	void opcode09(const OpcodeParams &);
 	void opcode10(const OpcodeParams &);
 	void opcode11(const OpcodeParams &);
-	void opcode12(const OpcodeParams &);
+	void opcode12_MoveParty(const OpcodeParams &);
 	void opcode13(const OpcodeParams &);
 	void opcode14(const OpcodeParams &);
 	void opcode15(const OpcodeParams &);
@@ -145,7 +159,7 @@ private:
 	void opcode48(const OpcodeParams &);
 	void opcode49(const OpcodeParams &);
 	void opcode50(const OpcodeParams &);
-	void opcode52_movePerson(const OpcodeParams &);
+	void opcode52_MovePerson(const OpcodeParams &);
 	void opcode53(const OpcodeParams &);
 	void opcode54(const OpcodeParams &);
 	void opcode55(const OpcodeParams &);

@@ -44,6 +44,32 @@ static const byte *const PARAMS[11] = {
 	PARAMS7, PARAMS8, PARAMS9, PARAMS10, PARAMS11
 };
 
+const char *const OPCODE_NAMES[76] = {
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+
+	nullptr, nullptr, "MoveParty", nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+
+	nullptr, nullptr, nullptr, "NOP1", nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+
+	nullptr, "NOP2", "MovePerson", nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+
+	nullptr, nullptr, nullptr, nullptr, nullptr,
+	"MovePerson2"
+};
+
 const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode00,
 	&Scripts::opcode01,
@@ -58,7 +84,7 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 
 	&Scripts::opcode10,
 	&Scripts::opcode11,
-	&Scripts::opcode12,
+	&Scripts::opcode12_MoveParty,
 	&Scripts::opcode13,
 	&Scripts::opcode14,
 	&Scripts::opcode15,
@@ -77,8 +103,8 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode27,
 	&Scripts::opcode28,
 	&Scripts::opcode29,
-	&Scripts::opcode28,
 
+	&Scripts::opcode28,
 	&Scripts::opcode31,
 	&Scripts::opcode32,
 	&Scripts::opcodeNOP,
@@ -88,8 +114,8 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode37,
 	&Scripts::opcode38,
 	&Scripts::opcode39,
-	&Scripts::opcode40,
 
+	&Scripts::opcode40,
 	&Scripts::opcode00,
 	&Scripts::opcode42,
 	&Scripts::opcode43,
@@ -99,10 +125,10 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode47,
 	&Scripts::opcode48,
 	&Scripts::opcode49,
-	&Scripts::opcode50,
 
+	&Scripts::opcode50,
 	&Scripts::opcodeNOP,
-	&Scripts::opcode52_movePerson,
+	&Scripts::opcode52_MovePerson,
 	&Scripts::opcode53,
 	&Scripts::opcode54,
 	&Scripts::opcode55,
@@ -110,8 +136,8 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode57,
 	&Scripts::opcode58,
 	&Scripts::opcode59,
-	&Scripts::opcode60,
 
+	&Scripts::opcode60,
 	&Scripts::opcode61,
 	&Scripts::opcode62,
 	&Scripts::opcode63,
@@ -121,13 +147,13 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode67,
 	&Scripts::opcode68_End,
 	&Scripts::opcode69,
-	&Scripts::opcode17,
 
+	&Scripts::opcode17,
 	&Scripts::opcode00,
 	&Scripts::opcode72,
 	&Scripts::opcode73,
 	&Scripts::opcode74,
-	&Scripts::opcode52_movePerson
+	&Scripts::opcode52_MovePerson
 };
 
 void Scripts::execute(const uint16 *idPtr, int action, int charNum, ScriptDoneCallback doneCallback) {
@@ -220,10 +246,13 @@ resumeScript:
 		}
 
 		int opcode = _params._opcode;
-		if (opcode > 75) {
+		if (opcode > kOpcodeLast) {
 			warning("Out of range opcode");
 			continue;
 		}
+
+		if (gDebugLevel > 0 && !_params._isResuming)
+			dumpOpcode();
 
 		(this->*OPCODE_FUNCTIONS[opcode])(_params);
 	} while (_state == kScriptRunning);
@@ -246,11 +275,13 @@ Scripts::OpcodeParams Scripts::readParams(const byte *&scriptP, int action) {
 	int paramsType = nextVal >> 4;
 
 	if (!action) {
-		result._opcode = *scriptP++;
+		result._opcode = (Opcode)*scriptP++;
+		result._paramCount = 0;
 
 		int *dest = result._params;
 		// Iterate through loading parameters
 		for (const byte *paramP = PARAMS[paramsType]; *paramP; ++paramP) {
+			result._paramCount++;
 			if (*paramP == BYTE) {
 				*dest++ = *scriptP++;
 			} else {
@@ -271,6 +302,19 @@ Scripts::OpcodeParams Scripts::readParams(const byte *&scriptP, int action) {
 	}
 
 	return result;
+}
+
+void Scripts::dumpOpcode() {
+	Common::String line = Common::String::format("%s(", OPCODE_NAMES[_params._opcode]);
+
+	for (int i = 0; i < _params._paramCount; ++i) {
+		if (i > 0)
+			line += ", ";
+		line += Common::String::format("%d", _params[i]);
+	}
+	line += ")";
+
+	debugC(kDebugScript, "%s", line.c_str());
 }
 
 void Scripts::opcode00(const OpcodeParams &params) { error("Unimplemented opcode"); }
@@ -297,7 +341,7 @@ void Scripts::opcode10(const OpcodeParams &params) { error("Unimplemented opcode
 
 void Scripts::opcode11(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void Scripts::opcode12(const OpcodeParams &params) {
+void Scripts::opcode12_MoveParty(const OpcodeParams &params) {
 	auto &disk1 = g_engine->_disk1;
 	auto &disk = g_engine->_disk;
 	int isYes = true;
@@ -429,13 +473,13 @@ void Scripts::opcode49(const OpcodeParams &params) { error("Unimplemented opcode
 
 void Scripts::opcode50(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void Scripts::opcode52_movePerson(const OpcodeParams &params) {
+void Scripts::opcode52_MovePerson(const OpcodeParams &params) {
 	int charNum;
 	Data::Map &map = g_engine->_disk._map;
 	Data::Map::MapPerson *person = map.findPersonById(params._params[0], &charNum);
 
 	if (person && !(g_engine->_disk1._unknown4[person->_id] & 2)) {
-		if (params._opcode == 52) {
+		if (params._opcode == kOpcodeMovePerson) {
 			// Remove character from old position
 			map.updateTileForeground(person->_mapX, person->_mapY, 0);
 
@@ -448,7 +492,7 @@ void Scripts::opcode52_movePerson(const OpcodeParams &params) {
 		person->_oldX = -1;
 		map.flagMap();
 
-		if (params[3] == 1 || params._opcode == 75) {
+		if (params[3] == 1 || params._opcode == kOpcodeMovePerson2) {
 			if (params[3] == 1)
 				person->_field50 |= 0x80;
 
