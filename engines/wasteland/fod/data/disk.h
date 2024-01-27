@@ -72,7 +72,7 @@ public:
 	 */
 	void loadMap(int mapNum);
 
-	void processMap();
+	void applyMapOverrides();
 
 	void loadScripts();
 };

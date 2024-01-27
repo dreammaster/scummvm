@@ -67,44 +67,44 @@ void Disk::loadMap(int mapNum) {
 	_map.load(*src);
 	delete src;
 
-	processMap();
+	applyMapOverrides();
 	loadScripts();
 }
 
-void Disk::processMap() {
-	Disk1Table &table = g_engine->_disk1._table;
+void Disk::applyMapOverrides() {
+	TileOverrides &overrides = g_engine->_disk1._tileOverrides;
 	int newCount = 0;
 
-	for (uint tableCtr = 0; tableCtr < table._count; ++tableCtr) {
+	for (uint tableCtr = 0; tableCtr < overrides.size(); ++tableCtr) {
 		int entryIndex = tableCtr - newCount;
-		const Disk1Table::Entry &entry = table._entries[entryIndex];
+		const TileOverride &entry = overrides[entryIndex];
 
 		if (entry._mapNum == _map._mapNum) {
 			Map::MapTile &tile = _map._tiles[entry._x][entry._y];
 
 			if (entry._flags & 0x80)
-				tile._id = (tile._id & 0xf800) | entry._field4;
+				tile._id = (tile._id & 0xf800) | entry._tile._id;
 
 			if (entry._flags & 0x40) {
-				tile._field3 = entry._field7;
-				tile._field4 = entry._field8;
-				tile._flags = (tile._flags & 0x80) | entry._field6;
+				tile._field3 = entry._tile._field3;
+				tile._field4 = entry._tile._field4;
+				tile._flags = (tile._flags & 0x80) | entry._tile._flags;
 			}
 
 			if (entry._flags & 0x20)
-				tile._actionId = entry._fieldA;
+				tile._actionId = entry._tile._actionId;
 
 			++newCount;
 
-			if ((table._count - 1) != entryIndex) {
-				for (int idx = entryIndex; idx <= (table._count - newCount); ++idx)
-					table._entries[idx] = table._entries[idx + 1];
+			if (((int)overrides.size() - 1) != entryIndex) {
+				for (int idx = entryIndex; idx <= ((int)overrides.size() - newCount); ++idx)
+					overrides[idx] = overrides[idx + 1];
 			}
 		}
 	}
 
 	if (newCount > 0) {
-		table._count = newCount;
+		overrides.resize(newCount);
 		_map._flags |= MAPFLAG_8000;
 	}
 }

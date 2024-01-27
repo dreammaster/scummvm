@@ -151,7 +151,7 @@ private:
 	void opcode25();
 	void opcode26();
 	void opcode27();
-	void opcode28();
+	void opcode28_setTileOverride();
 	void opcode31_Sound();
 	void opcode32();
 	void opcode34();
