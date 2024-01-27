@@ -467,8 +467,9 @@ void Scripts::opcode26() { error("Unimplemented opcode"); }
 void Scripts::opcode27() { error("Unimplemented opcode"); }
 
 void Scripts::opcode28() {
-	//int param5 = (_params._opcode == 28) ? 0 : _params[4];
-
+	int val = (_params._opcode != kOpcode29) ? 0 : _params[4];
+	g_engine->_disk1.tableAdd(_params._opcode, _params[2], _params[0],
+		_params[1], _params[3], val);
 
 	error("Unimplemented opcode");
 }
