@@ -145,7 +145,7 @@ void Party::healOrDamageParty() {
 }
 
 void Party::damageParty(int, int min, int max, const char *message) {
-	// TODO
+	error("TODO: damageParty");
 }
 
 int Party::damageMember(int partyNum, int min, int max) {

@@ -103,7 +103,7 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode26,
 	&Scripts::opcode27,
 	&Scripts::opcode28,
-	&Scripts::opcode29,
+	&Scripts::opcode28,
 
 	&Scripts::opcode28,
 	&Scripts::opcode31_Sound,
@@ -256,7 +256,7 @@ resumeScript:
 		if (gDebugLevel > 0 && !_params._isResuming)
 			dumpOpcode();
 
-		(this->*OPCODE_FUNCTIONS[opcode])(_params);
+		(this->*OPCODE_FUNCTIONS[opcode])();
 	} while (_state == kScriptRunning);
 
 	return _scriptResult;
@@ -332,7 +332,7 @@ const char *Scripts::getMessage(int msgNum) {
 	return msg;
 }
 
-void Scripts::opcode00_healOrDamageParty(const OpcodeParams &params) {
+void Scripts::opcode00_healOrDamageParty() {
 	auto &disk1 = g_engine->_disk1;
 	auto &party = disk1._party;
 	party._ignoreMemberAC = _params._opcode == kOpcodeDamagePartyIgnoreAC;
@@ -349,29 +349,29 @@ void Scripts::opcode00_healOrDamageParty(const OpcodeParams &params) {
 	party.healOrDamageParty();
 }
 
-void Scripts::opcode01(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode01() { error("Unimplemented opcode"); }
 
-void Scripts::opcode02(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode02() { error("Unimplemented opcode"); }
 
-void Scripts::opcode03(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode03() { error("Unimplemented opcode"); }
 
-void Scripts::opcode04(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode04() { error("Unimplemented opcode"); }
 
-void Scripts::opcode05(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode05() { error("Unimplemented opcode"); }
 
-void Scripts::opcode06(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode06() { error("Unimplemented opcode"); }
 
-void Scripts::opcode07(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode07() { error("Unimplemented opcode"); }
 
-void Scripts::opcode08(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode08() { error("Unimplemented opcode"); }
 
-void Scripts::opcode09(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode09() { error("Unimplemented opcode"); }
 
-void Scripts::opcode10(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode10() { error("Unimplemented opcode"); }
 
-void Scripts::opcode11(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode11() { error("Unimplemented opcode"); }
 
-void Scripts::opcode12_MoveParty(const OpcodeParams &params) {
+void Scripts::opcode12_MoveParty() {
 	auto &disk1 = g_engine->_disk1;
 	auto &disk = g_engine->_disk;
 	int isYes = true;
@@ -379,16 +379,16 @@ void Scripts::opcode12_MoveParty(const OpcodeParams &params) {
 	bool mapFlag = false;
 	int mapIndex;
 
-	if (params._isResuming) {
+	if (_params._isResuming) {
 		isYes = _resumeParams._intValue != 0;
-	} else if (!params[3]) {
+	} else if (!_params[3]) {
 		_state = kScriptPaused;
 		Views::Dialogs::LeaveMap::show();
 		return;
 	}
 
 	if (isYes) {
-		switch (params[2]) {
+		switch (_params[2]) {
 		case 0:
 			if (disk1._mapIndex) {
 				disk1.save();
@@ -400,7 +400,7 @@ void Scripts::opcode12_MoveParty(const OpcodeParams &params) {
 			break;
 
 		case 1:
-			disk1.moveTo(params[0], params[1]);
+			disk1.moveTo(_params[0], _params[1]);
 			break;
 
 		default:
@@ -408,7 +408,7 @@ void Scripts::opcode12_MoveParty(const OpcodeParams &params) {
 			disk1._mapsX[disk1._mapIndex] = disk1._mapPosX;
 			disk1._mapsY[disk1._mapIndex] = disk1._mapPosY;
 
-			mapId = params[2] - 1;
+			mapId = _params[2] - 1;
 			mapFlag = false;
 			for (mapIndex = 0; mapIndex <= disk1._mapIndex && !mapFlag; ++mapIndex) {
 				mapFlag = disk1._maps[mapIndex] == mapId;
@@ -420,8 +420,8 @@ void Scripts::opcode12_MoveParty(const OpcodeParams &params) {
 				disk1._maps[++disk1._mapIndex] = mapId;
 			}
 
-			disk1._mapsX[disk1._mapIndex] = params[0];
-			disk1._mapsY[disk1._mapIndex] = params[1];
+			disk1._mapsX[disk1._mapIndex] = _params[0];
+			disk1._mapsY[disk1._mapIndex] = _params[1];
 			disk.loadMap(mapId);
 			disk1.moveTo(disk1._mapsX[disk1._mapIndex], disk1._mapsY[disk1._mapIndex]);
 			break;
@@ -433,107 +433,105 @@ void Scripts::opcode12_MoveParty(const OpcodeParams &params) {
 	_state = kScriptBreak;
 }
 
-void Scripts::opcode13(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode13() { error("Unimplemented opcode"); }
 
-void Scripts::opcode14(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode14() { error("Unimplemented opcode"); }
 
-void Scripts::opcode15(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode15() { error("Unimplemented opcode"); }
 
-void Scripts::opcode16(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode16() { error("Unimplemented opcode"); }
 
-void Scripts::opcode17(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode17() { error("Unimplemented opcode"); }
 
-void Scripts::opcode18(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode18() { error("Unimplemented opcode"); }
 
-void Scripts::opcode19(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode19() { error("Unimplemented opcode"); }
 
-void Scripts::opcode20(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode20() { error("Unimplemented opcode"); }
 
-void Scripts::opcode21(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode21() { error("Unimplemented opcode"); }
 
-void Scripts::opcode22(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode22() { error("Unimplemented opcode"); }
 
-void Scripts::opcode23_Message(const OpcodeParams &params) {
+void Scripts::opcode23_Message() {
 	const char *msg = getMessage(_params[0]);
 	g_engine->send("Game", GameMessage("INFO", msg));
 }
 
-void Scripts::opcode24(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode24() { error("Unimplemented opcode"); }
 
-void Scripts::opcode25(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode25() { error("Unimplemented opcode"); }
 
-void Scripts::opcode26(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode26() { error("Unimplemented opcode"); }
 
-void Scripts::opcode27(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode27() { error("Unimplemented opcode"); }
 
-void Scripts::opcode28(const OpcodeParams &params) {
+void Scripts::opcode28() {
 	//int param5 = (_params._opcode == 28) ? 0 : _params[4];
 
 
 	error("Unimplemented opcode");
 }
 
-void Scripts::opcode29(const OpcodeParams &params) { error("Unimplemented opcode"); }
-
-void Scripts::opcode31_Sound(const OpcodeParams &params) {
-	Sound::playSound(params[0]);
+void Scripts::opcode31_Sound() {
+	Sound::playSound(_params[0]);
 }
 
-void Scripts::opcode32(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode32() { error("Unimplemented opcode"); }
 
-void Scripts::opcode34(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode34() { error("Unimplemented opcode"); }
 
-void Scripts::opcode35(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode35() { error("Unimplemented opcode"); }
 
-void Scripts::opcode36(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode36() { error("Unimplemented opcode"); }
 
-void Scripts::opcode37(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode37() { error("Unimplemented opcode"); }
 
-void Scripts::opcode38(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode38() { error("Unimplemented opcode"); }
 
-void Scripts::opcode39(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode39() { error("Unimplemented opcode"); }
 
-void Scripts::opcode40(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode40() { error("Unimplemented opcode"); }
 
-void Scripts::opcode42(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode42() { error("Unimplemented opcode"); }
 
-void Scripts::opcode43(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode43() { error("Unimplemented opcode"); }
 
-void Scripts::opcode44(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode44() { error("Unimplemented opcode"); }
 
-void Scripts::opcode45(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode45() { error("Unimplemented opcode"); }
 
-void Scripts::opcode46(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode46() { error("Unimplemented opcode"); }
 
-void Scripts::opcode47(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode47() { error("Unimplemented opcode"); }
 
-void Scripts::opcode48(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode48() { error("Unimplemented opcode"); }
 
-void Scripts::opcode49(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode49() { error("Unimplemented opcode"); }
 
-void Scripts::opcode50(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode50() { error("Unimplemented opcode"); }
 
-void Scripts::opcode52_MovePerson(const OpcodeParams &params) {
+void Scripts::opcode52_MovePerson() {
 	int charNum;
 	Data::Map &map = g_engine->_disk._map;
-	Data::Map::MapPerson *person = map.findPersonById(params._params[0], &charNum);
+	Data::Map::MapPerson *person = map.findPersonById(_params._params[0], &charNum);
 
 	if (person && !(g_engine->_disk1._partyFlags[person->_id] & 2)) {
-		if (params._opcode == kOpcodeMovePerson) {
+		if (_params._opcode == kOpcodeMovePerson) {
 			// Remove character from old position
 			map.updateTileForeground(person->_mapX, person->_mapY, 0);
 
 			// Move them to new position
-			person->_mapX = params[1];
-			person->_mapY = params[2];
+			person->_mapX = _params[1];
+			person->_mapY = _params[2];
 			map.updateTile(person->_diff, person->_mapX, person->_mapY, person->_charNum);
 		}
 
 		person->_oldX = -1;
 		map.flagMap();
 
-		if (params[3] == 1 || params._opcode == kOpcodeMovePerson2) {
-			if (params[3] == 1)
+		if (_params[3] == 1 || _params._opcode == kOpcodeMovePerson2) {
+			if (_params[3] == 1)
 				person->_field50 |= 0x80;
 
 			_idPtr = &person->_talkId;
@@ -546,47 +544,47 @@ void Scripts::opcode52_MovePerson(const OpcodeParams &params) {
 	}
 }
 
-void Scripts::opcode53(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode53() { error("Unimplemented opcode"); }
 
-void Scripts::opcode54(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode54() { error("Unimplemented opcode"); }
 
-void Scripts::opcode55(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode55() { error("Unimplemented opcode"); }
 
-void Scripts::opcode56(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode56() { error("Unimplemented opcode"); }
 
-void Scripts::opcode57(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode57() { error("Unimplemented opcode"); }
 
-void Scripts::opcode58(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode58() { error("Unimplemented opcode"); }
 
-void Scripts::opcode59(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode59() { error("Unimplemented opcode"); }
 
-void Scripts::opcode60(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode60() { error("Unimplemented opcode"); }
 
-void Scripts::opcode61(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode61() { error("Unimplemented opcode"); }
 
-void Scripts::opcode62(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode62() { error("Unimplemented opcode"); }
 
-void Scripts::opcode63(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode63() { error("Unimplemented opcode"); }
 
-void Scripts::opcode64(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode64() { error("Unimplemented opcode"); }
 
-void Scripts::opcode65(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode65() { error("Unimplemented opcode"); }
 
-void Scripts::opcode66(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode66() { error("Unimplemented opcode"); }
 
-void Scripts::opcode67(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode67() { error("Unimplemented opcode"); }
 
-void Scripts::opcode68_End(const OpcodeParams &params) {
+void Scripts::opcode68_End() {
 	_state = kScriptBreak;
 }
 
-void Scripts::opcode69(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode69() { error("Unimplemented opcode"); }
 
-void Scripts::opcode72(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode72() { error("Unimplemented opcode"); }
 
-void Scripts::opcode73(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode73() { error("Unimplemented opcode"); }
 
-void Scripts::opcode74(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode74() { error("Unimplemented opcode"); }
 
 } // namespace Logic
 } // namespace FOD
