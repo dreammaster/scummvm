@@ -21,6 +21,7 @@
 
 #include "wasteland/fod/logic/scripts.h"
 #include "wasteland/fod/fod.h"
+#include "wasteland/fod/sound.h"
 #include "wasteland/fod/data/map.h"
 
 namespace Wasteland {
@@ -51,10 +52,10 @@ const char *const OPCODE_NAMES[76] = {
 	nullptr, nullptr, "MoveParty", nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 
-	nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, "Message", nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 
-	nullptr, nullptr, nullptr, "NOP1", nullptr,
+	nullptr, "Sound", nullptr, "NOP1", nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 
 	nullptr, nullptr, nullptr, nullptr, nullptr,
@@ -96,7 +97,7 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode20,
 	&Scripts::opcode21,
 	&Scripts::opcode22,
-	&Scripts::opcode23,
+	&Scripts::opcode23_Message,
 	&Scripts::opcode24,
 	&Scripts::opcode25,
 	&Scripts::opcode26,
@@ -105,7 +106,7 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode29,
 
 	&Scripts::opcode28,
-	&Scripts::opcode31,
+	&Scripts::opcode31_Sound,
 	&Scripts::opcode32,
 	&Scripts::opcodeNOP,
 	&Scripts::opcode34,
@@ -231,6 +232,7 @@ bool Scripts::executeScript() {
 
 	do {
 		if (_state == kScriptBreak || _scriptCurrP >= _scriptNextP) {
+			_state = kScriptBreak;
 			_val2 = 0;
 			break;
 		}
@@ -307,12 +309,21 @@ Scripts::OpcodeParams Scripts::readParams(const byte *&scriptP, int action) {
 void Scripts::dumpOpcode() {
 	Common::String line = Common::String::format("%s(", OPCODE_NAMES[_params._opcode]);
 
-	for (int i = 0; i < _params._paramCount; ++i) {
-		if (i > 0)
-			line += ", ";
-		line += Common::String::format("%d", _params[i]);
+	if (_params._opcode == kOpcodeMessage) {
+		uint msgOffset = READ_LE_UINT16(_scriptP + 2);
+		const char *msg = (const char *)&_scriptP[msgOffset];
+		for (int i = 0; i < _params[0]; ++i)
+			msg += strlen(msg) + 1;
+
+		line += Common::String::format("%s)", msg);
+	} else {
+		for (int i = 0; i < _params._paramCount; ++i) {
+			if (i > 0)
+				line += ", ";
+			line += Common::String::format("%d", _params[i]);
+		}
+		line += ")";
 	}
-	line += ")";
 
 	debugC(kDebugScript, "%s", line.c_str());
 }
@@ -423,7 +434,14 @@ void Scripts::opcode21(const OpcodeParams &params) { error("Unimplemented opcode
 
 void Scripts::opcode22(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void Scripts::opcode23(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode23_Message(const OpcodeParams &params) {
+	uint msgOffset = READ_LE_UINT16(_scriptP + 2);
+	const char *msg = (const char *)&_scriptP[msgOffset];
+	for (int i = 0; i < _params[0]; ++i)
+		msg += strlen(msg) + 1;
+
+	g_engine->send("Game", GameMessage("INFO", msg));
+}
 
 void Scripts::opcode24(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
@@ -437,7 +455,9 @@ void Scripts::opcode28(const OpcodeParams &params) { error("Unimplemented opcode
 
 void Scripts::opcode29(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void Scripts::opcode31(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode31_Sound(const OpcodeParams &params) {
+	Sound::playSound(params[0]);
+}
 
 void Scripts::opcode32(const OpcodeParams &params) { error("Unimplemented opcode"); }
 

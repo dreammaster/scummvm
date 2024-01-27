@@ -39,6 +39,8 @@ enum ScriptState {
 
 enum Opcode {
 	kOpcodeMoveParty = 12,
+	kOpcodeMessage = 23,
+	kOpcodeSound = 31,
 	kOpcodeNOP1 = 33,
 	kOpcodeNOP2 = 51,
 	kOpcodeMovePerson = 52,
@@ -134,14 +136,14 @@ private:
 	void opcode20(const OpcodeParams &);
 	void opcode21(const OpcodeParams &);
 	void opcode22(const OpcodeParams &);
-	void opcode23(const OpcodeParams &);
+	void opcode23_Message(const OpcodeParams &);
 	void opcode24(const OpcodeParams &);
 	void opcode25(const OpcodeParams &);
 	void opcode26(const OpcodeParams &);
 	void opcode27(const OpcodeParams &);
 	void opcode28(const OpcodeParams &);
 	void opcode29(const OpcodeParams &);
-	void opcode31(const OpcodeParams &);
+	void opcode31_Sound(const OpcodeParams &);
 	void opcode32(const OpcodeParams &);
 	void opcode34(const OpcodeParams &);
 	void opcode35(const OpcodeParams &);

@@ -16,6 +16,7 @@ MODULE_OBJS = \
 	gfx/tiles.o \
 	gfx/wasteland_font.o \
 	fod/fod.o \
+	fod/sound.o \
 	fod/data/archetypes.o \
 	fod/data/archive.o \
 	fod/data/disk.o \

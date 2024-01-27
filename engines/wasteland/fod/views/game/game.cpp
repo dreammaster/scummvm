@@ -134,6 +134,15 @@ bool Game::msgAction(const ActionMessage &msg) {
 	return false;
 }
 
+bool Game::msgGame(const GameMessage &msg) {
+	if (msg._name == "INFO") {
+		_infoText = msg._stringValue;
+		return true;
+	}
+
+	return false;
+}
+
 void Game::setMode(Mode newMode) {
 	_mode = newMode;
 	_infoText.clear();
