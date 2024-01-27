@@ -38,15 +38,18 @@ enum ScriptState {
 };
 
 enum Opcode {
+	kOpcodeHealParty = 0,
 	kOpcodeMoveParty = 12,
 	kOpcodeMessage = 23,
 	kOpcodeSound = 31,
 	kOpcodeNOP1 = 33,
+	kOpcodeDamageParty = 41,
 	kOpcodeNOP2 = 51,
 	kOpcodeMovePerson = 52,
 	kOpcode_End = 68,
-
+	kOpcodeDamagePartyIgnoreAC = 71,
 	kOpcodeMovePerson2 = 75,
+
 	kOpcodeLast = 75
 };
 
@@ -104,6 +107,7 @@ private:
 	void setPartyMember(int partyNum);
 	OpcodeParams readParams(const byte *&scriptP, int action);
 	void dumpOpcode();
+	const char *getMessage(int msgNum);
 
 public:
 	void execute(const uint16 *idPtr, int action, int arg2,
@@ -113,7 +117,7 @@ public:
 
 private:
 	void opcodeNOP(const OpcodeParams &) {}
-	void opcode00(const OpcodeParams &);
+	void opcode00_healOrDamageParty(const OpcodeParams &);
 	void opcode01(const OpcodeParams &);
 	void opcode02(const OpcodeParams &);
 	void opcode03(const OpcodeParams &);

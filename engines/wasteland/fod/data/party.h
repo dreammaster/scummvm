@@ -32,6 +32,7 @@ namespace Data {
 #define PARTY_COUNT 5
 #define ATTRIBUTES_COUNT 7
 #define SKILLS_COUNT 16
+#define AFFLICTED_80 0x80
 
 enum Sex {
 	SEX_OTHER = 0,
@@ -112,6 +113,9 @@ private:
 public:
 	byte &_count;
 	bool _ignoreMemberAC = false;
+	int _conMin = 0;
+	int _conMax = 0;
+	bool _conDamaging = false;
 
 public:
 	Party(byte &count) : _count(count) {
@@ -130,7 +134,10 @@ public:
 
 	int getMemberByStatus(int status) const;
 
-	int damage(int partyNum, int min, int max);
+	void healOrDamageParty();
+	void damageParty(int, int min, int max, const char *message);
+	int damageMember(int partyNum, int min, int max);
+	int healMember(int partyNum, int min, int max);
 };
 
 } // namespace Data

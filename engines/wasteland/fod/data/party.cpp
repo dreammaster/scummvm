@@ -131,7 +131,24 @@ int Party::getMemberByStatus(int status) const {
 	return _count;
 }
 
-int Party::damage(int partyNum, int min, int max) {
+void Party::healOrDamageParty() {
+	if (_conDamaging) {
+		damageParty(0, _conMin, _conMax, g_engine->_moveMessage);
+
+	} else {
+		for (uint partyNum = 0; partyNum < _count; ++partyNum) {
+			auto &member = _party[partyNum];
+			if (!(member._afflicted & ~AFFLICTED_80))
+				healMember(partyNum, _conMin, _conMax);
+		}
+	}
+}
+
+void Party::damageParty(int, int min, int max, const char *message) {
+	// TODO
+}
+
+int Party::damageMember(int partyNum, int min, int max) {
 	PartyMember &member = _party[partyNum];
 	int amount = g_engine->getRandomNumber(min, max);
 	int ac = _ignoreMemberAC ? 0 : member.getArmorClass();
@@ -150,6 +167,13 @@ int Party::damage(int partyNum, int min, int max) {
 	}
 }
 
+int Party::healMember(int partyNum, int min, int max) {
+	PartyMember &member = _party[partyNum];
+	int amount = g_engine->getRandomNumber(min, max);
+
+	member._con = MIN((int)member._conBase, (int)member._con + amount);
+	return member._con;
+}
 
 const Profession &PartyMember::getProfession() const {
 	return g_engine->_archetypes._professions[_profession];
