@@ -50,6 +50,8 @@ struct Map {
 		void synchronize(Common::Serializer &s);
 
 		void updateForeground(int fg);
+		void proc1(int arg1, int arg2);
+		void proc2(int opcode, int val, int val2);
 	};
 	typedef Common::Array<MapTile> MapTileColumn;
 

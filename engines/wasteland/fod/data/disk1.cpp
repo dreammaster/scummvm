@@ -20,6 +20,7 @@
  */
 
 #include "common/file.h"
+#include "wasteland/fod/data/scripts.h"
 #include "wasteland/fod/data/disk1.h"
 #include "wasteland/fod/fod.h"
 
@@ -32,6 +33,44 @@ void Disk1Table::load(Common::Serializer &s) {
 
 	for (int i = 0; i < 150; ++i)
 		_entries[i].load(s);
+}
+
+int Disk1Table::indexOf(int mapNum, int mapX, int mapY) {
+	for (int i = 0; i < _count; ++i) {
+		const auto &item = _entries[i];
+		if (item._mapNum == mapNum && item._x == mapX && item._y == mapY)
+			return i;
+	}
+
+	return -1;
+}
+
+bool Disk1Table::contains(int mapNum, int mapX, int mapY) {
+	return indexOf(mapNum, mapX, mapY) != -1;
+}
+
+Disk1Table::Entry *Disk1Table::add(int mapNum, int mapX, int mapY) {
+	// Make sure the table hasn't run out
+	if (_count >= DISK1_TABLE_SIZE)
+		error("Flushing Needed!!");
+
+	// Ensure there aren't duplicates
+	int idx = indexOf(mapNum, mapX, mapY);
+	if (idx != -1)
+		return &_entries[idx];
+
+	// Add the new entry
+	Disk1Table::Entry &entry = _entries[_count++];
+	entry._mapNum = mapNum;
+	entry._x = mapX;
+	entry._y = mapY;
+	entry._flags = 0;
+	entry._field6 = 0;
+	entry._field4 = 0;
+	entry._field7 = 0;
+	entry._field8 = 0;
+
+	return &entry;
 }
 
 void Disk1Table::Entry::load(Common::Serializer &s) {
@@ -102,9 +141,10 @@ bool Disk1::load(bool &hasParty) {
 		_mapPosY = 6;
 		_mapIndex = 0;
 		_maps[0] = 28;
-		_maps[10] = 10;
-		_maps[20] = 6;
-		_table._count = 0;
+		_mapsX[0] = 10;
+		_mapsY[0] = 6;
+
+		_table.clear();
 		_partyCount = 0;
 	}
 
@@ -140,6 +180,30 @@ void Disk1::moveTo(int newX, int newY) {
 
 	g_engine->_moveMessage = nullptr;
 	g_engine->_mapVal2 = 0;
+}
+
+void Disk1::tableAdd(int opcode, int mapNum, int mapX, int mapY, int arg5, int arg6) {
+	Map::MapTile &mapTile = g_engine->_disk._map._tiles[mapX][mapY];
+
+	if (_maps[_mapIndex] == mapNum) {
+		mapTile.proc2(opcode, arg5, arg6);
+
+	} else {
+		// Add the entry
+		Disk1Table::Entry *entry = _table.add(mapNum, mapX, mapY);
+	
+		switch (opcode) {
+		case Logic::kOpcode28:
+			entry->_flags |= 0x80;
+			entry->_field4 = arg5 & 7;
+			break;
+
+		case Logic::kOpcode29:
+			entry->_flags |= 0x40;
+			break;
+		}
+	}
+	// TODO: Finish
 }
 
 } // namespace Data

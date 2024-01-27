@@ -21,6 +21,7 @@
 
 #include "common/file.h"
 #include "wasteland/fod/data/map.h"
+#include "wasteland/fod/logic/scripts.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -36,6 +37,39 @@ void Map::MapTile::synchronize(Common::Serializer &s) {
 
 void Map::MapTile::updateForeground(int fg) {
 	_id = MAP_TILE(_id & MAP_BG_MASK, fg);
+}
+
+void Map::MapTile::proc1(int arg1, int arg2) {
+	_field3 = arg1 & 0x7f;
+	_flags = (_flags & ~1) | (arg1 >> 7);
+	_field4 = arg2 & 0x7f;
+	_flags = (_flags & ~2) | ((arg2 & 0x8000) > 14);
+}
+
+void Map::MapTile::proc2(int opcode, int val, int val2) {
+	int bg;
+
+	switch (opcode) {
+	case Logic::kOpcode26:
+	case Logic::kOpcode29:
+		proc1(val, val2);
+		break;
+
+	case Logic::kOpcode25:
+	case Logic::kOpcode28:
+		bg = _id & MAP_BG_MASK;
+		if (bg != val)
+			_id = (_id & ~MAP_BG_MASK) | val;
+		break;
+
+	case Logic::kOpcode27:
+	case Logic::kOpcode30:
+		_actionId = val;
+		break;
+
+	default:
+		break;
+	}
 }
 
 void Map::MapPerson::synchronize(Common::Serializer &s) {

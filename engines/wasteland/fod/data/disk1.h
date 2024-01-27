@@ -28,6 +28,8 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
+#define DISK1_TABLE_SIZE 150
+
 enum PartyFlag {
 	PARTYFLAG_DEAD = 2
 };
@@ -48,9 +50,13 @@ struct Disk1Table {
 	};
 
 	uint16 _count;
-	Entry _entries[150];
+	Entry _entries[DISK1_TABLE_SIZE];
 
+	void clear() { _count = 0; }
 	void load(Common::Serializer &s);
+	int indexOf(int mapNum, int mapX, int mapY);
+	bool contains(int mapNum, int mapX, int mapY);
+	Entry *add(int mapNum, int mapX, int mapY);
 };
 
 struct Disk1 {
@@ -95,6 +101,8 @@ struct Disk1 {
 	void save();
 
 	void moveTo(int newX, int newY);
+
+	void tableAdd(int opcode, int mapNum, int mapX, int mapY, int arg5, int arg6);
 };
 
 } // namespace Data
