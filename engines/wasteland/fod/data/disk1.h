@@ -23,40 +23,35 @@
 #define WASTELAND_FOD_DATA_DISK1_H
 
 #include "wasteland/fod/data/party.h"
+#include "wasteland/fod/data/map.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-#define DISK1_TABLE_SIZE 150
+#define TILE_OVERRIDES_COUNT 150
 
 enum PartyFlag {
 	PARTYFLAG_DEAD = 2
 };
 
-struct Disk1Table {
-	struct Entry {
-		byte _mapNum = 0;
-		byte _x = 0;
-		byte _y = 0;
-		byte _flags = 0;
-		uint16 _field4 = 0;
-		byte _field6 = 0;
-		byte _field7 = 0;
-		uint16 _field8 = 0;
-		uint16 _fieldA = 0;
+struct TileOverride {
+	byte _mapNum = 0;
+	byte _x = 0;
+	byte _y = 0;
+	byte _flags = 0;
+	Map::MapTile _tile;
 
-		void load(Common::Serializer &s);
-	};
-
-	uint16 _count;
-	Entry _entries[DISK1_TABLE_SIZE];
-
-	void clear() { _count = 0; }
 	void load(Common::Serializer &s);
-	int indexOf(int mapNum, int mapX, int mapY);
-	bool contains(int mapNum, int mapX, int mapY);
-	Entry *add(int mapNum, int mapX, int mapY);
+};
+
+class TileOverrides : public Common::Array<TileOverride> {
+public:
+	void load(Common::Serializer &s);
+
+	int indexOf(int mapNum, int mapX, int mapY) const;
+	bool contains(int mapNum, int mapX, int mapY) const;
+	TileOverride *add(int mapNum, int mapX, int mapY);
 };
 
 struct Disk1 {
@@ -80,7 +75,7 @@ struct Disk1 {
 	Party _party;
 	byte _partyFlags[250];
 	byte _unknown5[6];
-	Disk1Table _table;
+	TileOverrides _tileOverrides;
 
 	Disk1(uint16 &mapX, uint16 &mapY);
 
@@ -102,7 +97,7 @@ struct Disk1 {
 
 	void moveTo(int newX, int newY);
 
-	void tableAdd(int opcode, int mapNum, int mapX, int mapY, int arg5, int arg6);
+	void setTileOverride(int opcode, int mapNum, int mapX, int mapY, int value, int arg6);
 };
 
 } // namespace Data

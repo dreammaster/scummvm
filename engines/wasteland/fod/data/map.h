@@ -49,6 +49,9 @@ struct Map {
 
 		void synchronize(Common::Serializer &s);
 
+		void clear() {
+			_id = _flags = _field3 = _field4 = _actionId = 0;
+		}
 		void updateForeground(int fg);
 		void proc1(int arg1, int arg2);
 		void proc2(int opcode, int val, int val2);

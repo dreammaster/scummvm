@@ -28,16 +28,27 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-void Disk1Table::load(Common::Serializer &s) {
-	s.syncAsUint16LE(_count);
+void TileOverrides::load(Common::Serializer &s) {
+	uint count = size();
+	s.syncAsUint16LE(count);
 
-	for (int i = 0; i < 150; ++i)
-		_entries[i].load(s);
+	if (s.isLoading()) {
+		clear();
+		resize(count);
+	}
+
+	TileOverride dummy;
+	for (uint i = 0; i < TILE_OVERRIDES_COUNT; ++i) {
+		if (i < count)
+			(*this)[i].load(s);
+		else
+			dummy.load(s);
+	}
 }
 
-int Disk1Table::indexOf(int mapNum, int mapX, int mapY) {
-	for (int i = 0; i < _count; ++i) {
-		const auto &item = _entries[i];
+int TileOverrides::indexOf(int mapNum, int mapX, int mapY) const {
+	for (uint i = 0; i < size(); ++i) {
+		const auto &item = (*this)[i];
 		if (item._mapNum == mapNum && item._x == mapX && item._y == mapY)
 			return i;
 	}
@@ -45,44 +56,37 @@ int Disk1Table::indexOf(int mapNum, int mapX, int mapY) {
 	return -1;
 }
 
-bool Disk1Table::contains(int mapNum, int mapX, int mapY) {
+bool TileOverrides::contains(int mapNum, int mapX, int mapY) const {
 	return indexOf(mapNum, mapX, mapY) != -1;
 }
 
-Disk1Table::Entry *Disk1Table::add(int mapNum, int mapX, int mapY) {
+TileOverride *TileOverrides::add(int mapNum, int mapX, int mapY) {
 	// Make sure the table hasn't run out
-	if (_count >= DISK1_TABLE_SIZE)
+	if (size() >= TILE_OVERRIDES_COUNT)
 		error("Flushing Needed!!");
 
 	// Ensure there aren't duplicates
 	int idx = indexOf(mapNum, mapX, mapY);
 	if (idx != -1)
-		return &_entries[idx];
+		return &(*this)[idx];
 
 	// Add the new entry
-	Disk1Table::Entry &entry = _entries[_count++];
+	TileOverride entry;
 	entry._mapNum = mapNum;
 	entry._x = mapX;
 	entry._y = mapY;
 	entry._flags = 0;
-	entry._field6 = 0;
-	entry._field4 = 0;
-	entry._field7 = 0;
-	entry._field8 = 0;
+	push_back(entry);
 
-	return &entry;
+	return &back();
 }
 
-void Disk1Table::Entry::load(Common::Serializer &s) {
+void TileOverride::load(Common::Serializer &s) {
 	s.syncAsByte(_mapNum);
 	s.syncAsByte(_x);
 	s.syncAsByte(_y);
 	s.syncAsByte(_flags);
-	s.syncAsUint16LE(_field4);
-	s.syncAsByte(_field6);
-	s.syncAsByte(_field7);
-	s.syncAsUint16LE(_field8);
-	s.syncAsUint16LE(_fieldA);
+	_tile.synchronize(s);
 }
 
 Disk1::Disk1(uint16 &mapX, uint16 &mapY) : _mapPosX(mapX), _mapPosY(mapY),
@@ -113,7 +117,7 @@ void Disk1::synchronize(Common::Serializer &s) {
 
 	s.syncBytes(_partyFlags, 250);
 	s.syncBytes(_unknown5, 6);
-	_table.load(s);
+	_tileOverrides.load(s);
 }
 
 bool Disk1::load(bool &hasParty) {
@@ -144,7 +148,7 @@ bool Disk1::load(bool &hasParty) {
 		_mapsX[0] = 10;
 		_mapsY[0] = 6;
 
-		_table.clear();
+		_tileOverrides.clear();
 		_partyCount = 0;
 	}
 
@@ -182,24 +186,33 @@ void Disk1::moveTo(int newX, int newY) {
 	g_engine->_mapVal2 = 0;
 }
 
-void Disk1::tableAdd(int opcode, int mapNum, int mapX, int mapY, int arg5, int arg6) {
+void Disk1::setTileOverride(int opcode, int mapNum, int mapX, int mapY, int value, int arg6) {
 	Map::MapTile &mapTile = g_engine->_disk._map._tiles[mapX][mapY];
 
 	if (_maps[_mapIndex] == mapNum) {
-		mapTile.proc2(opcode, arg5, arg6);
+		mapTile.proc2(opcode, value, arg6);
 
 	} else {
-		// Add the entry
-		Disk1Table::Entry *entry = _table.add(mapNum, mapX, mapY);
+		// Add the entry, or get an existing override
+		TileOverride *entry = _tileOverrides.add(mapNum, mapX, mapY);
 	
 		switch (opcode) {
 		case Logic::kOpcode28:
 			entry->_flags |= 0x80;
-			entry->_field4 = arg5 & 7;
+			entry->_tile._id = value & 7;
 			break;
 
 		case Logic::kOpcode29:
 			entry->_flags |= 0x40;
+			entry->_tile.proc1(value, arg6);
+			break;
+
+		case Logic::kOpcode30:
+			entry->_flags |= 0x20;
+			entry->_tile._actionId = value;
+			break;
+
+		default:
 			break;
 		}
 	}

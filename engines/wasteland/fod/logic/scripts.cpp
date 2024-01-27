@@ -53,9 +53,9 @@ const char *const OPCODE_NAMES[76] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 
 	nullptr, nullptr, nullptr, "Message", nullptr,
-	nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, "OverrideTile1", "OverrideTile2",
 
-	nullptr, "Sound", nullptr, "NOP1", nullptr,
+	"OverrideTile3", "Sound", nullptr, "NOP1", nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 
 	nullptr, "DamageParty", nullptr, nullptr, nullptr,
@@ -102,10 +102,10 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode25,
 	&Scripts::opcode26,
 	&Scripts::opcode27,
-	&Scripts::opcode28,
-	&Scripts::opcode28,
+	&Scripts::opcode28_setTileOverride,
+	&Scripts::opcode28_setTileOverride,
 
-	&Scripts::opcode28,
+	&Scripts::opcode28_setTileOverride,
 	&Scripts::opcode31_Sound,
 	&Scripts::opcode32,
 	&Scripts::opcodeNOP,
@@ -466,12 +466,10 @@ void Scripts::opcode26() { error("Unimplemented opcode"); }
 
 void Scripts::opcode27() { error("Unimplemented opcode"); }
 
-void Scripts::opcode28() {
+void Scripts::opcode28_setTileOverride() {
 	int val = (_params._opcode != kOpcode29) ? 0 : _params[4];
-	g_engine->_disk1.tableAdd(_params._opcode, _params[2], _params[0],
+	g_engine->_disk1.setTileOverride(_params._opcode, _params[2], _params[0],
 		_params[1], _params[3], val);
-
-	error("Unimplemented opcode");
 }
 
 void Scripts::opcode31_Sound() {
