@@ -54,6 +54,10 @@ public:
 	Data::Weapons _weapons;
 	Logic::Scripts _scripts;
 
+	const char *_moveMessage = nullptr;
+	int _moveVal3 = 0;
+	int _mapVal2 = 0;
+
 public:
 	FountainOfDreamsEngine(OSystem *syst, const WastelandGameDescription *gameDesc);
 	~FountainOfDreamsEngine() override;

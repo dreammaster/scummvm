@@ -138,8 +138,8 @@ void Disk1::moveTo(int newX, int newY) {
 	_mapPosX = newX;
 	_mapPosY = newY;
 
-	_mapVal1 = 0;
-	_mapVal2 = 0;
+	g_engine->_moveMessage = nullptr;
+	g_engine->_mapVal2 = 0;
 }
 
 } // namespace Data

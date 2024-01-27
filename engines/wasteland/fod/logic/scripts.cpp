@@ -46,7 +46,7 @@ static const byte *const PARAMS[11] = {
 };
 
 const char *const OPCODE_NAMES[76] = {
-	nullptr, nullptr, nullptr, nullptr, nullptr,
+	"HealParty", nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 
 	nullptr, nullptr, "MoveParty", nullptr, nullptr,
@@ -58,7 +58,7 @@ const char *const OPCODE_NAMES[76] = {
 	nullptr, "Sound", nullptr, "NOP1", nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 
-	nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, "DamageParty", nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 
 	nullptr, "NOP2", "MovePerson", nullptr, nullptr,
@@ -67,12 +67,12 @@ const char *const OPCODE_NAMES[76] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 
-	nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, "DamagePartyIgnoreAC", nullptr, nullptr, nullptr,
 	"MovePerson2"
 };
 
 const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
-	&Scripts::opcode00,
+	&Scripts::opcode00_healOrDamageParty,
 	&Scripts::opcode01,
 	&Scripts::opcode02,
 	&Scripts::opcode03,
@@ -117,7 +117,7 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode39,
 
 	&Scripts::opcode40,
-	&Scripts::opcode00,
+	&Scripts::opcode00_healOrDamageParty,
 	&Scripts::opcode42,
 	&Scripts::opcode43,
 	&Scripts::opcode44,
@@ -150,7 +150,7 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode69,
 
 	&Scripts::opcode17,
-	&Scripts::opcode00,
+	&Scripts::opcode00_healOrDamageParty,
 	&Scripts::opcode72,
 	&Scripts::opcode73,
 	&Scripts::opcode74,
@@ -310,12 +310,7 @@ void Scripts::dumpOpcode() {
 	Common::String line = Common::String::format("%s(", OPCODE_NAMES[_params._opcode]);
 
 	if (_params._opcode == kOpcodeMessage) {
-		uint msgOffset = READ_LE_UINT16(_scriptP + 2);
-		const char *msg = (const char *)&_scriptP[msgOffset];
-		for (int i = 0; i < _params[0]; ++i)
-			msg += strlen(msg) + 1;
-
-		line += Common::String::format("%s)", msg);
+		line += Common::String::format("%s)", getMessage(_params[0]));
 	} else {
 		for (int i = 0; i < _params._paramCount; ++i) {
 			if (i > 0)
@@ -328,12 +323,30 @@ void Scripts::dumpOpcode() {
 	debugC(kDebugScript, "%s", line.c_str());
 }
 
-void Scripts::opcode00(const OpcodeParams &params) {
-	//int val = (_params._opcode == 71) ? 1 : 0;
+const char *Scripts::getMessage(int msgNum) {
+	uint msgOffset = READ_LE_UINT16(_scriptP + 2);
+	const char *msg = (const char *)&_scriptP[msgOffset];
+	for (int i = 0; i < msgNum; ++i)
+		msg += strlen(msg) + 1;
 
-	// TODO
+	return msg;
+}
 
-	error("Unimplemented opcode");
+void Scripts::opcode00_healOrDamageParty(const OpcodeParams &params) {
+	auto &disk1 = g_engine->_disk1;
+	auto &party = disk1._party;
+	party._ignoreMemberAC = _params._opcode == kOpcodeDamagePartyIgnoreAC;
+
+	g_engine->_moveMessage = getMessage(_params[0]);
+	if (!*g_engine->_moveMessage)
+		g_engine->_moveMessage = nullptr;
+
+	party._conDamaging = _params._opcode != kOpcodeHealParty;
+	party._conMin = _params[1];
+	party._conMax = _params[2];
+	g_engine->_moveVal3 = _params[3];
+
+	party.healOrDamageParty();
 }
 
 void Scripts::opcode01(const OpcodeParams &params) { error("Unimplemented opcode"); }
@@ -441,11 +454,7 @@ void Scripts::opcode21(const OpcodeParams &params) { error("Unimplemented opcode
 void Scripts::opcode22(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
 void Scripts::opcode23_Message(const OpcodeParams &params) {
-	uint msgOffset = READ_LE_UINT16(_scriptP + 2);
-	const char *msg = (const char *)&_scriptP[msgOffset];
-	for (int i = 0; i < _params[0]; ++i)
-		msg += strlen(msg) + 1;
-
+	const char *msg = getMessage(_params[0]);
 	g_engine->send("Game", GameMessage("INFO", msg));
 }
 
