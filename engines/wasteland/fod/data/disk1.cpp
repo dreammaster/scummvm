@@ -72,7 +72,7 @@ void Disk1::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_field38);
 	_party.synchronize(s);
 
-	s.syncBytes(_unknown4, 250);
+	s.syncBytes(_partyFlags, 250);
 	s.syncBytes(_unknown5, 6);
 	_table.load(s);
 }

@@ -102,6 +102,7 @@ struct PartyMember {
 	const Profession &getProfession() const;
 	MemberStatus getStatus() const;
 	int getArmorClass() const;
+	void updateCon(int amount);
 };
 
 class Party {
@@ -110,6 +111,7 @@ private:
 
 public:
 	byte &_count;
+	bool _ignoreMemberAC = false;
 
 public:
 	Party(byte &count) : _count(count) {
@@ -127,6 +129,8 @@ public:
 	void synchronize(Common::Serializer &s);
 
 	int getMemberByStatus(int status) const;
+
+	int damage(int partyNum, int min, int max);
 };
 
 } // namespace Data

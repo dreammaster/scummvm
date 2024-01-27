@@ -28,6 +28,10 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
+enum PartyFlag {
+	PARTYFLAG_DEAD = 2
+};
+
 struct Disk1Table {
 	struct Entry {
 		byte _mapNum = 0;
@@ -68,7 +72,7 @@ struct Disk1 {
 	byte _timeWeekday;
 	uint16 _field38;
 	Party _party;
-	byte _unknown4[250];
+	byte _partyFlags[250];
 	byte _unknown5[6];
 	Disk1Table _table;
 

@@ -328,7 +328,13 @@ void Scripts::dumpOpcode() {
 	debugC(kDebugScript, "%s", line.c_str());
 }
 
-void Scripts::opcode00(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode00(const OpcodeParams &params) {
+	//int val = (_params._opcode == 71) ? 1 : 0;
+
+	// TODO
+
+	error("Unimplemented opcode");
+}
 
 void Scripts::opcode01(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
@@ -451,7 +457,12 @@ void Scripts::opcode26(const OpcodeParams &params) { error("Unimplemented opcode
 
 void Scripts::opcode27(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
-void Scripts::opcode28(const OpcodeParams &params) { error("Unimplemented opcode"); }
+void Scripts::opcode28(const OpcodeParams &params) {
+	//int param5 = (_params._opcode == 28) ? 0 : _params[4];
+
+
+	error("Unimplemented opcode");
+}
 
 void Scripts::opcode29(const OpcodeParams &params) { error("Unimplemented opcode"); }
 
@@ -498,7 +509,7 @@ void Scripts::opcode52_MovePerson(const OpcodeParams &params) {
 	Data::Map &map = g_engine->_disk._map;
 	Data::Map::MapPerson *person = map.findPersonById(params._params[0], &charNum);
 
-	if (person && !(g_engine->_disk1._unknown4[person->_id] & 2)) {
+	if (person && !(g_engine->_disk1._partyFlags[person->_id] & 2)) {
 		if (params._opcode == kOpcodeMovePerson) {
 			// Remove character from old position
 			map.updateTileForeground(person->_mapX, person->_mapY, 0);
