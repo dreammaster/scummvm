@@ -131,6 +131,25 @@ int Party::getMemberByStatus(int status) const {
 	return _count;
 }
 
+int Party::damage(int partyNum, int min, int max) {
+	PartyMember &member = _party[partyNum];
+	int amount = g_engine->getRandomNumber(min, max);
+	int ac = _ignoreMemberAC ? 0 : member.getArmorClass();
+
+	if (ac) {
+		ac = g_engine->getRandomNumber(g_engine->_globals._field0 * ac,
+			g_engine->_globals._field1 * ac);
+	}
+
+	if (amount > ac) {
+		amount -= ac;
+		member.updateCon(amount);
+		return amount;
+	} else {
+		return 0;
+	}
+}
+
 
 const Profession &PartyMember::getProfession() const {
 	return g_engine->_archetypes._professions[_profession];
@@ -159,6 +178,27 @@ int PartyMember::getArmorClass() const {
 	}
 
 	return total ? total : getProfession()._ac;
+}
+
+void PartyMember::updateCon(int amount) {
+	auto &disk1 = g_engine->_disk1;
+
+	if (amount > 0) {
+		if (_con > 0) {
+			int con = _con - amount;
+
+			if (con < 1) {
+				int threshold = 100 * _con / _conBase;
+				_conTemp = (threshold > 50) ? (_conBase / 4) + 1 : _con;					
+			}
+		}
+
+		if (!(disk1._partyFlags[_field49] & PARTYFLAG_DEAD))
+			_con -= amount;
+
+		if (_con <= -60)
+			disk1._partyFlags[_field49] |= PARTYFLAG_DEAD;
+	}
 }
 
 } // namespace Data
