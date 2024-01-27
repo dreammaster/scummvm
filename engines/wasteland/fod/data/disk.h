@@ -64,7 +64,6 @@ private:
 public:
 	Map _map;
 	Common::Array<byte> _scripts;
-	Common::Array<size_t> _scriptsOffsets;
 
 	Disk(uint16 &mapX, uint16 &mapY);
 

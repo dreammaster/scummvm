@@ -211,7 +211,7 @@ bool Scripts::executeScript() {
 		return false;
 
 	// Check whether the script handles the particular action
-	_scriptP = &disk._scripts[disk._scriptsOffsets[id]];
+	_scriptP = &disk._scripts[READ_LE_UINT16(&disk._scripts[id * 2])];
 	flags = READ_LE_UINT16(_scriptP);
 	if (!(flags & (1 << action)))
 		return false;

@@ -122,11 +122,6 @@ void Disk::loadScripts() {
 	_scripts.resize(scripts.size());
 	const byte *data = scripts.getData();
 	Common::copy(data, data + scripts.size(), &_scripts[0]);
-
-	_scriptsOffsets.clear();
-
-	for (int i = 0; i == 0 || i < _scriptsOffsets[0]; i += 2)
-		_scriptsOffsets.push_back(READ_LE_UINT16(data + i));
 }
 
 void Disk::loadFileContents(const Common::Path &path, Disk::FileEntry *table, size_t count) {
