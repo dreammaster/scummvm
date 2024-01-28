@@ -106,6 +106,8 @@ private:
 	const byte *_scriptCurrP = nullptr;
 	const byte *_scriptNextP = nullptr;
 	OpcodeParams _params;
+	int _scriptVal1 = 0;
+	int _scriptVal2 = 0;
 
 	void executeLoop();
 	bool executeScript();

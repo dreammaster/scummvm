@@ -307,7 +307,9 @@ Scripts::OpcodeParams Scripts::readParams(const byte *&scriptP, int action) {
 }
 
 void Scripts::dumpOpcode() {
-	Common::String line = Common::String::format("%s(", OPCODE_NAMES[_params._opcode]);
+	Common::String line = OPCODE_NAMES[_params._opcode] ?
+		Common::String::format("%s(", OPCODE_NAMES[_params._opcode]) :
+		Common::String::format("%d(", _params._opcode);
 
 	if (_params._opcode == kOpcodeMessage) {
 		line += Common::String::format("%s)", getMessage(_params[0]));
@@ -353,7 +355,10 @@ void Scripts::opcode01() { error("Unimplemented opcode"); }
 
 void Scripts::opcode02() { error("Unimplemented opcode"); }
 
-void Scripts::opcode03() { error("Unimplemented opcode"); }
+void Scripts::opcode03() {
+	_scriptVal1 = _params[0];
+	_scriptVal2 = 0;
+}
 
 void Scripts::opcode04() { error("Unimplemented opcode"); }
 
@@ -460,11 +465,19 @@ void Scripts::opcode23_Message() {
 
 void Scripts::opcode24() { error("Unimplemented opcode"); }
 
-void Scripts::opcode25() { error("Unimplemented opcode"); }
+void Scripts::opcode25() {
+	g_engine->_disk._map._tiles[0][0].proc2(kOpcode25, _params[0], 0);
 
-void Scripts::opcode26() { error("Unimplemented opcode"); }
+	error("Unimplemented opcode");
+}
 
-void Scripts::opcode27() { error("Unimplemented opcode"); }
+void Scripts::opcode26() {
+	g_engine->_disk._map._tiles[0][0].proc2(kOpcode26, _params[0], _params[1]);
+}
+
+void Scripts::opcode27() {
+	g_engine->_disk._map._tiles[0][0].proc2(kOpcode27, _params[0], 0);
+}
 
 void Scripts::opcode28_setTileOverride() {
 	int val = (_params._opcode != kOpcode29) ? 0 : _params[4];
@@ -476,7 +489,10 @@ void Scripts::opcode31_Sound() {
 	Sound::playSound(_params[0]);
 }
 
-void Scripts::opcode32() { error("Unimplemented opcode"); }
+void Scripts::opcode32() {
+	_scriptVal1 = g_engine->getRandomNumber(_params[0], _params[1]);
+	_scriptVal2 = 0;
+}
 
 void Scripts::opcode34() { error("Unimplemented opcode"); }
 
@@ -494,13 +510,32 @@ void Scripts::opcode40() { error("Unimplemented opcode"); }
 
 void Scripts::opcode42() { error("Unimplemented opcode"); }
 
-void Scripts::opcode43() { error("Unimplemented opcode"); }
+void Scripts::opcode43() {
+	const auto &party = g_engine->_disk1._party;
+	bool flag = g_engine->_disk1._partyFlags[_params[0]] & Data::PARTYFLAG_1;
+
+	if (flag) {
+		int idx;
+		for (idx = 0; idx < party._count && _params[0] != party[idx]._field49; ++idx) {
+		}
+		assert(idx < party._count);
+
+		const auto &member = party[idx];
+		flag = member._con > 0;
+	}
+
+	error("Unimplemented opcode");
+}
 
 void Scripts::opcode44() { error("Unimplemented opcode"); }
 
 void Scripts::opcode45() { error("Unimplemented opcode"); }
 
-void Scripts::opcode46() { error("Unimplemented opcode"); }
+void Scripts::opcode46() {
+	const auto &disk1 = g_engine->_disk1;
+	_scriptVal1 = disk1._timeHours * 100 + disk1._timeMinutes;
+	_scriptVal2 = 0;
+}
 
 void Scripts::opcode47() { error("Unimplemented opcode"); }
 
@@ -557,7 +592,10 @@ void Scripts::opcode58() { error("Unimplemented opcode"); }
 
 void Scripts::opcode59() { error("Unimplemented opcode"); }
 
-void Scripts::opcode60() { error("Unimplemented opcode"); }
+void Scripts::opcode60() {
+	_scriptVal1 = g_engine->_disk1._timeWeekday;
+	_scriptVal2 = 0;
+}
 
 void Scripts::opcode61() { error("Unimplemented opcode"); }
 

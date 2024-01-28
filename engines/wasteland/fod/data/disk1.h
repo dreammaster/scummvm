@@ -32,7 +32,8 @@ namespace Data {
 #define TILE_OVERRIDES_COUNT 150
 
 enum PartyFlag {
-	PARTYFLAG_DEAD = 2
+	PARTYFLAG_DEAD = 2,
+	PARTYFLAG_1 = 1
 };
 
 struct TileOverride {
