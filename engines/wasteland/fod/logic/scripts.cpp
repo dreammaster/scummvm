@@ -23,6 +23,7 @@
 #include "wasteland/fod/fod.h"
 #include "wasteland/fod/sound.h"
 #include "wasteland/fod/data/map.h"
+#include "wasteland/core/algorithms.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -62,7 +63,7 @@ const char *const OPCODE_NAMES[76] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 
 	nullptr, "NOP2", "MovePerson", nullptr, nullptr,
-	nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, "MessageDialog", nullptr, nullptr,
 
 	nullptr, nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr,
@@ -134,7 +135,7 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode54,
 	&Scripts::opcode55,
 	&Scripts::opcode56,
-	&Scripts::opcode57,
+	&Scripts::opcode57_messageDialog,
 	&Scripts::opcode58,
 	&Scripts::opcode59,
 
@@ -203,8 +204,10 @@ bool Scripts::executeScript() {
 	if (_state == kScriptPaused)
 		goto resumeScript;
 
+	_scriptVal1 = _scriptVal2 = _scriptVal3 = 0;
 	_actionNum = -1;
 	_newPartyNum = partyNum;
+
 	//int local1 = 0, local2 = 0, local3 = 0;
 //	if (action == 4) local1 = arg4;
 
@@ -450,7 +453,27 @@ void Scripts::opcode17() { error("Unimplemented opcode"); }
 
 void Scripts::opcode18() { error("Unimplemented opcode"); }
 
-void Scripts::opcode19() { error("Unimplemented opcode"); }
+void Scripts::opcode19() {
+	int mapId;
+	int zero = 0;
+
+	if (_params[0] < 12) {
+		mapId = (_params[0] < 6) ? _params[2] : _scriptVal3;
+
+		switch (_params[0] % 6) {
+		case 0:
+
+		default:
+			break;
+		}
+	} else if (_params[0] >= 15) {
+
+	} else {
+
+	}
+
+	error("Unimplemented opcode");
+}
 
 void Scripts::opcode20() { error("Unimplemented opcode"); }
 
@@ -586,7 +609,12 @@ void Scripts::opcode55() { error("Unimplemented opcode"); }
 
 void Scripts::opcode56() { error("Unimplemented opcode"); }
 
-void Scripts::opcode57() { error("Unimplemented opcode"); }
+void Scripts::opcode57_messageDialog() {
+	_state = kScriptPaused;
+
+	const char *msg = getMessage(_params[0]);
+	g_engine->send("MessageDialog", GameMessage("SHOW", msg));
+}
 
 void Scripts::opcode58() { error("Unimplemented opcode"); }
 

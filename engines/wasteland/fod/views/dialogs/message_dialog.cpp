@@ -19,41 +19,44 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
-#define WASTELAND_FOD_VIEWS_VIEWS_H
-
-#include "wasteland/fod/views/main_menu/main_menu.h"
-#include "wasteland/fod/views/main_menu/title.h"
-#include "wasteland/fod/views/main_menu/edit_member.h"
-#include "wasteland/fod/views/main_menu/remove_member.h"
-#include "wasteland/fod/views/game/game.h"
-#include "wasteland/fod/views/dialogs/all_character_info.h"
-#include "wasteland/fod/views/dialogs/character_info.h"
 #include "wasteland/fod/views/dialogs/message_dialog.h"
-#include "wasteland/fod/views/dialogs/quit.h"
-#include "wasteland/fod/views/dialogs/yes_no.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
+namespace Dialogs {
 
-struct Views {
-	EditMember _editMember;
-	MainMenu _mainMenu;
-	RemoveMember _removeMember;
-	Title _title;
+bool MessageDialog::msgGame(const GameMessage &msg) {
+	if (msg._name == "SHOW") {
+		_message = msg._stringValue;
+		addView();
+		return true;
+	}
 
-	Game _game;
+	return false;
+}
 
-	Dialogs::AllCharacterInfo _allCharacterInfo;
-	Dialogs::CharacterInfo _characterInfo;
-	Dialogs::MessageDialog _messageDialog;
-	Dialogs::Quit _quit;
-	Dialogs::LeaveMap _leaveMap;
-};
+void MessageDialog::draw() {
+	Dialog::draw();
 
+	Surface s = getSurface();
+	s.writeString(_message);
+}
+
+bool MessageDialog::msgKeypress(const KeypressMessage &msg) {
+	close();
+	g_engine->_scripts.resume(Logic::ScriptResumeParams());
+	return true;
+}
+
+bool MessageDialog::msgAction(const ActionMessage &msg) {
+	close();
+	g_engine->_scripts.resume(Logic::ScriptResumeParams());
+	return true;
+}
+
+} // namespace Dialogs
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland
-
-#endif
