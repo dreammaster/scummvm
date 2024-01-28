@@ -27,13 +27,26 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-void MemberArray1Entry::synchronize(Common::Serializer &s) {
+void InventoryItem::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_id);
 	s.syncAsByte(_field1);
 	s.syncAsByte(_ammo);
 	s.syncAsByte(_field3);
 	s.syncAsByte(_field4);
 	s.syncAsByte(_field5);
+}
+
+void InventoryItem::updateItem(int itemId) {
+	_id = itemId;
+	_field1 = 0;
+	_ammo = 0;
+	_field3 = 0;
+
+	const auto &item = g_engine->_globals._items[itemId];
+	if (item._flags & GIFLAG_1) {
+		const auto &weapon = g_engine->_weapons[item._weaponIndex];
+		error("TODO: Figure out updateItem");
+	}
 }
 
 void PartyMember::synchronize(Common::Serializer &s) {
@@ -63,7 +76,7 @@ void PartyMember::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_field4F);
 	s.syncAsByte(_sex);
 	s.syncAsByte(_field51);
-	s.syncAsByte(_field52);
+	s.syncAsByte(_inventoryCount);
 	s.syncAsByte(_field53);
 	s.syncAsByte(_field54);
 	s.syncAsByte(_field55);
@@ -75,8 +88,8 @@ void PartyMember::synchronize(Common::Serializer &s) {
 	s.syncAsUint16LE(_field5C);
 	s.syncAsUint16LE(_field5E);
 	s.syncAsUint16LE(_field60);
-	for (int i = 0; i < 32; ++i)
-		_array1[i].synchronize(s);
+	for (int i = 0; i < INVENTORY_COUNT; ++i)
+		_inventory[i].synchronize(s);
 	s.syncAsUint16LE(_conTemp);
 	s.syncBytes(_activeSkills2, SKILLS_COUNT);
 	s.syncBytes(_passiveSkills2, SKILLS_COUNT);
@@ -86,17 +99,17 @@ void PartyMember::synchronize(Common::Serializer &s) {
 
 void PartyMember::reset() {
 	_name.clear();
-	_field52 = 0;
+	_inventoryCount = 0;
 
-	for (int i = 0; i < 32; ++i)
-		_array1[i] = MemberArray1Entry();
-	_array1[0]._id = 2;
-	_array1[0]._ammo = 9;
-	_array1[1]._id = 12;
-	_array1[2]._id = 12;
-	_array1[3]._id = 32;
-	_array1[4]._id = 41;
-	_array1[5]._id = 55;
+	for (int i = 0; i < INVENTORY_COUNT; ++i)
+		_inventory[i] = InventoryItem();
+	_inventory[0]._id = 2;
+	_inventory[0]._ammo = 9;
+	_inventory[1]._id = 12;
+	_inventory[2]._id = 12;
+	_inventory[3]._id = 32;
+	_inventory[4]._id = 41;
+	_inventory[5]._id = 55;
 
 	_rank = 1;
 	_field5E = 1500;
@@ -195,7 +208,7 @@ int PartyMember::getArmorClass() const {
 		int index = _array2[i];
 
 		if (index != 0xff) {
-			int itemIndex = _array1[index]._id;
+			int itemIndex = _inventory[index]._id;
 			const GlobalItem &gi = g_engine->_globals._items[itemIndex];
 			total += gi._ac;
 		}

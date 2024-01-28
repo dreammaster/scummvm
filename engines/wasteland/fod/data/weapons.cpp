@@ -31,7 +31,20 @@ bool Weapons::load() {
 	if (!f.open("WEAPONS"))
 		return false;
 
-	// TODO
+	clear();
+	resize(f.readUint16LE());
+
+	for (uint i = 0; i < size(); ++i) {
+		char buf[0x3c];
+		f.read(buf, 0x3c);
+
+		Weapon &w = (*this)[i];
+		buf[15] = '\0';
+		w._name = Common::String((const char *)buf);
+		w._flags = buf[0x18];
+		w._field38 = READ_LE_UINT16(buf + 0x38);
+		w._field3a = READ_LE_UINT16(buf + 0x3a);
+	}
 
 	return true;
 }

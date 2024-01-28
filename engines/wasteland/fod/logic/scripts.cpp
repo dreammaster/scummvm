@@ -455,7 +455,7 @@ void Scripts::opcode18() { error("Unimplemented opcode"); }
 
 void Scripts::opcode19() {
 	int mapId;
-	int zero = 0;
+	//int zero = 0;
 
 	if (_params[0] < 12) {
 		mapId = (_params[0] < 6) ? _params[2] : _scriptVal3;
@@ -607,7 +607,25 @@ void Scripts::opcode54() { error("Unimplemented opcode"); }
 
 void Scripts::opcode55() { error("Unimplemented opcode"); }
 
-void Scripts::opcode56() { error("Unimplemented opcode"); }
+void Scripts::opcode56() {
+	int partyNum = NONZERO(_params[0], _newPartyNum);
+
+	if (g_engine->_globals[_params[1]].proc1()) {
+		g_engine->_globals[_params[1]].proc2();
+
+	} else {
+		auto &member = g_engine->_disk1._party[partyNum];
+
+		if (member._inventoryCount < INVENTORY_COUNT) {
+			auto &invItem = member._inventory[member._inventoryCount];
+			invItem._id = _params[1];
+			invItem.updateItem(_params[1]);
+			member._inventoryCount++;
+		}
+	}
+
+	error("Unimplemented opcode");
+}
 
 void Scripts::opcode57_messageDialog() {
 	_state = kScriptPaused;

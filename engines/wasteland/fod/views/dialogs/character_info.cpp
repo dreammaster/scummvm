@@ -89,7 +89,7 @@ void CharacterInfo::writeStats() {
 	s.writeString(Common::String::format("  AC: %3u", _member->getArmorClass()), 0, 4);
 
 	Common::String weapon = (_member->_equippedWeapon == 0xff) ? "Hands" :
-		g_engine->_globals._items[_member->_array1[_member->_equippedWeapon]._id]._name;
+		g_engine->_globals._items[_member->_inventory[_member->_equippedWeapon]._id]._name;
 	s.writeString(Common::String::format("Weap: %-.17s", weapon.c_str()), 0, 5);
 
 	s.writeString("Attributes", 6, 7);

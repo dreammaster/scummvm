@@ -68,8 +68,8 @@ void AllCharacterInfo::writeMember(int partyNum) {
 
 	s.writeString(Common::String::format("Weapon: %-19.19s   Ammo: %2d",
 		member._equippedWeapon == 0xff ? "Hands" :
-			g_engine->_globals._items[member._array1[member._equippedWeapon]._id]._name.c_str(),
-		member._equippedWeapon == 0xff ? 0 : member._array1[member._equippedWeapon]._ammo),
+			g_engine->_globals._items[member._inventory[member._equippedWeapon]._id]._name.c_str(),
+		member._equippedWeapon == 0xff ? 0 : member._inventory[member._equippedWeapon]._ammo),
 		0, 2);	
 }
 

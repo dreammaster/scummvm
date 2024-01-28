@@ -52,8 +52,8 @@ void GlobalItem::load(Common::SeekableReadStream &src) {
 	_name = Common::String(buf);
 
 	_field12 = src.readUint16LE();
-	_field14 = src.readByte();
-	_ac = src.readByte();
+	_flags = src.readByte();
+	_weaponIndex = src.readByte();
 	_field16 = src.readByte();
 	_bitShift = src.readByte();
 }
