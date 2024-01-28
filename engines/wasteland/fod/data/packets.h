@@ -19,16 +19,22 @@
  *
  */
 
-#include "wasteland/fod/data/scripts.h"
+#ifndef WASTELAND_FOD_DATA_PACKETS_H
+#define WASTELAND_FOD_DATA_PACKETS_H
+
+#include "common/serializer.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-void Scripts::synchronize(Common::SeekableReadStream &src) {
+struct Packets {
 
-}
+	void synchronize(Common::SeekableReadStream &src);
+};
 
 } // namespace Data
 } // namespace FOD
 } // namespace Wasteland
+
+#endif

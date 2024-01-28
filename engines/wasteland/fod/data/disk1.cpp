@@ -20,7 +20,6 @@
  */
 
 #include "common/file.h"
-#include "wasteland/fod/data/scripts.h"
 #include "wasteland/fod/data/disk1.h"
 #include "wasteland/fod/fod.h"
 
