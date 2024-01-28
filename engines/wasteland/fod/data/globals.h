@@ -31,18 +31,28 @@ namespace Data {
 
 #define GLOBALS_ITEMS_COUNT 118
 
+enum {
+	GIFLAG_1 = 1,
+	GIFLAG_4 = 4,
+	GIFLAG_8 = 8,
+	GIFLAG_16 = 16
+};
+
 struct GlobalItem {
 	Common::String _name;
 	uint16 _field12;
-	byte _field14;
-	byte _ac;
+	byte _flags;
+	byte _weaponIndex;
 	byte _field16;
 	byte _bitShift;
+
+	byte &_ac = _weaponIndex;
 
 	void load(Common::SeekableReadStream &src);
 
 	bool proc1() const {
-		return (_field14 & 28) == 28;
+		return (_flags & (GIFLAG_4 | GIFLAG_8 | GIFLAG_16)) ==
+			(GIFLAG_4 | GIFLAG_8 | GIFLAG_16);
 	}
 	void proc2();
 };

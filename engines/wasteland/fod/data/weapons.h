@@ -30,7 +30,15 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-struct Weapons {
+struct Weapon {
+	Common::String _name;
+	byte _flags = 0;
+	int _field38 = 0;
+	int _field3a = 0;
+};
+
+class Weapons : public Common::Array<Weapon> {
+public:
 	bool load();
 };
 

@@ -33,6 +33,7 @@ namespace Data {
 #define ATTRIBUTES_COUNT 7
 #define SKILLS_COUNT 16
 #define AFFLICTED_80 0x80
+#define INVENTORY_COUNT 32
 
 enum Sex {
 	SEX_OTHER = 0,
@@ -49,7 +50,7 @@ enum MemberStatus {
 	STATUS_DEAD = 5
 };
 
-struct MemberArray1Entry {
+struct InventoryItem {
 	byte _id = 0;
 	byte _field1 = 0;
 	byte _ammo = 0;
@@ -58,6 +59,8 @@ struct MemberArray1Entry {
 	byte _field5 = 0;
 
 	void synchronize(Common::Serializer &s);
+
+	void updateItem(int itemId);
 };
 
 struct PartyMember {
@@ -77,7 +80,7 @@ struct PartyMember {
 	byte _field4F;
 	byte _sex;
 	byte _field51;
-	byte _field52;
+	byte _inventoryCount;
 	byte _field53;
 	byte _field54;
 	byte _field55;
@@ -89,7 +92,7 @@ struct PartyMember {
 	uint16 _field5C;
 	uint16 _field5E;
 	uint16 _field60;
-	MemberArray1Entry _array1[32];
+	InventoryItem _inventory[INVENTORY_COUNT];
 	uint16 _conTemp;
 	byte _activeSkills2[SKILLS_COUNT];
 	byte _passiveSkills2[SKILLS_COUNT];
