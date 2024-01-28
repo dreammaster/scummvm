@@ -52,6 +52,7 @@ enum Opcode {
 	kOpcodeDamageParty = 41,
 	kOpcodeNOP2 = 51,
 	kOpcodeMovePerson = 52,
+	kOpcodeMessageDialog = 57,
 	kOpcode_End = 68,
 	kOpcodeDamagePartyIgnoreAC = 71,
 	kOpcodeMovePerson2 = 75,
@@ -108,6 +109,7 @@ private:
 	OpcodeParams _params;
 	int _scriptVal1 = 0;
 	int _scriptVal2 = 0;
+	int _scriptVal3 = 0;
 
 	void executeLoop();
 	bool executeScript();
@@ -177,7 +179,7 @@ private:
 	void opcode54();
 	void opcode55();
 	void opcode56();
-	void opcode57();
+	void opcode57_messageDialog();
 	void opcode58();
 	void opcode59();
 	void opcode60();

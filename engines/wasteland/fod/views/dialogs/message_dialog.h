@@ -19,39 +19,31 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_VIEWS_H
-#define WASTELAND_FOD_VIEWS_VIEWS_H
+#ifndef WASTELAND_FOD_VIEWS_MESSAGE_DIALOG_H
+#define WASTELAND_FOD_VIEWS_MESSAGE_DIALOG_H
 
-#include "wasteland/fod/views/main_menu/main_menu.h"
-#include "wasteland/fod/views/main_menu/title.h"
-#include "wasteland/fod/views/main_menu/edit_member.h"
-#include "wasteland/fod/views/main_menu/remove_member.h"
-#include "wasteland/fod/views/game/game.h"
-#include "wasteland/fod/views/dialogs/all_character_info.h"
-#include "wasteland/fod/views/dialogs/character_info.h"
-#include "wasteland/fod/views/dialogs/message_dialog.h"
-#include "wasteland/fod/views/dialogs/quit.h"
-#include "wasteland/fod/views/dialogs/yes_no.h"
+#include "wasteland/fod/views/dialogs/dialog.h"
 
 namespace Wasteland {
 namespace FOD {
 namespace Views {
+namespace Dialogs {
 
-struct Views {
-	EditMember _editMember;
-	MainMenu _mainMenu;
-	RemoveMember _removeMember;
-	Title _title;
+class MessageDialog : public Dialog {
+private:
+	Common::String _message;
 
-	Game _game;
+public:
+	MessageDialog() : Dialog("MessageDialog", Gfx::Window(8, 6, 31, 17)) {}
+	virtual ~MessageDialog() {}
 
-	Dialogs::AllCharacterInfo _allCharacterInfo;
-	Dialogs::CharacterInfo _characterInfo;
-	Dialogs::MessageDialog _messageDialog;
-	Dialogs::Quit _quit;
-	Dialogs::LeaveMap _leaveMap;
+	bool msgGame(const GameMessage &msg) override;
+	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	bool msgAction(const ActionMessage &msg) override;
 };
 
+} // namespace Dialogs
 } // namespace Views
 } // namespace FOD
 } // namespace Wasteland
