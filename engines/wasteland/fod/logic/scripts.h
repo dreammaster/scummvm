@@ -53,6 +53,7 @@ enum Opcode {
 	kOpcodeNOP2 = 51,
 	kOpcodeMovePerson = 52,
 	kOpcodeMessageDialog = 57,
+	kOpcodeSetAffliction = 64,
 	kOpcode_End = 68,
 	kOpcodeDamagePartyIgnoreAC = 71,
 	kOpcodeMovePerson2 = 75,
@@ -186,7 +187,7 @@ private:
 	void opcode61();
 	void opcode62();
 	void opcode63();
-	void opcode64();
+	void opcode64_setAffliction();
 	void opcode65();
 	void opcode66();
 	void opcode67();

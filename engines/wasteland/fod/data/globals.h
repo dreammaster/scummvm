@@ -37,9 +37,14 @@ struct GlobalItem {
 	byte _field14;
 	byte _ac;
 	byte _field16;
-	byte _field17;
+	byte _bitShift;
 
 	void load(Common::SeekableReadStream &src);
+
+	bool proc1() const {
+		return (_field14 & 28) == 28;
+	}
+	void proc2();
 };
 
 struct Globals {
@@ -52,6 +57,10 @@ struct Globals {
 	GlobalItem _items[118];
 
 	bool load();
+
+	GlobalItem &operator[](uint idx) {
+		return _items[idx];
+	}
 };
 
 } // namespace Data

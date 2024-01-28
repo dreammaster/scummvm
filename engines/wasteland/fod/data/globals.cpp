@@ -21,6 +21,7 @@
 
 #include "common/file.h"
 #include "wasteland/fod/data/globals.h"
+#include "wasteland/fod/fod.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -54,7 +55,11 @@ void GlobalItem::load(Common::SeekableReadStream &src) {
 	_field14 = src.readByte();
 	_ac = src.readByte();
 	_field16 = src.readByte();
-	_field17 = src.readByte();
+	_bitShift = src.readByte();
+}
+
+void GlobalItem::proc2() {
+	g_engine->_disk1._field7 |= 1 << _bitShift;
 }
 
 } // namespace Data
