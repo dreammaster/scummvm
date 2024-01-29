@@ -111,6 +111,9 @@ private:
 	int _scriptVal1 = 0;
 	int _scriptVal2 = 0;
 	int _scriptVal3 = 0;
+	int _local1 = 0;
+	int _local2 = 0;
+	int _local3 = 0;
 
 	void executeLoop();
 	bool executeScript();
