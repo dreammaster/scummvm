@@ -94,7 +94,11 @@ void Game::move(Direction dir, bool flag) {
 		_owner = this;
 		_flag = flag;
 
-		g_engine->_scripts.execute(&map._tiles[newX][newY]._actionId, 1, 0,
+		auto &scripts = g_engine->_scripts;
+		scripts._moveFlag1 = true;
+		scripts._moveFlag2 = false;
+
+		scripts.execute(&map._tiles[newX][newY]._actionId, 1, 0,
 			[]() { _owner->move2(); });		
 	}
 }

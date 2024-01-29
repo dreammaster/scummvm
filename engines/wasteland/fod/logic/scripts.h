@@ -121,6 +121,10 @@ private:
 	const char *getMessage(int msgNum);
 
 public:
+	bool _moveFlag1 = false;
+	bool _moveFlag2 = false;
+
+public:
 	void execute(const uint16 *idPtr, int action, int arg2,
 		ScriptDoneCallback doneCallback);
 
@@ -187,8 +191,8 @@ private:
 	void opcode61();
 	void opcode62();
 	void opcode63();
-	void opcode64_setAffliction();
-	void opcode65();
+	void opcode64_setAffliction1();
+	void opcode65_setAffliction2();
 	void opcode66();
 	void opcode67();
 	void opcode68_End();
