@@ -65,8 +65,8 @@ const char *const OPCODE_NAMES[76] = {
 	nullptr, "NOP2", "MovePerson", nullptr, nullptr,
 	nullptr, nullptr, "MessageDialog", nullptr, nullptr,
 
-	nullptr, nullptr, nullptr, nullptr, "SetAffliction",
-	nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, "SetAffliction1",
+	"SetAffliction2", nullptr, nullptr, nullptr, nullptr,
 
 	nullptr, "DamagePartyIgnoreAC", nullptr, nullptr, nullptr,
 	"MovePerson2"
@@ -143,8 +143,8 @@ const Scripts::OpcodeFunction Scripts::OPCODE_FUNCTIONS[76] = {
 	&Scripts::opcode61,
 	&Scripts::opcode62,
 	&Scripts::opcode63,
-	&Scripts::opcode64_setAffliction,
-	&Scripts::opcode65,
+	&Scripts::opcode64_setAffliction1,
+	&Scripts::opcode65_setAffliction2,
 	&Scripts::opcode66,
 	&Scripts::opcode67,
 	&Scripts::opcode68_End,
@@ -525,7 +525,9 @@ void Scripts::opcode36() { error("Unimplemented opcode"); }
 
 void Scripts::opcode37() { error("Unimplemented opcode"); }
 
-void Scripts::opcode38() { error("Unimplemented opcode"); }
+void Scripts::opcode38() {
+	_moveFlag1 = false;
+}
 
 void Scripts::opcode39() { error("Unimplemented opcode"); }
 
@@ -649,13 +651,17 @@ void Scripts::opcode62() { error("Unimplemented opcode"); }
 
 void Scripts::opcode63() { error("Unimplemented opcode"); }
 
-void Scripts::opcode64_setAffliction() {
+void Scripts::opcode64_setAffliction1() {
 	int partyNum = NONZERO(_params[0], _newPartyNum);
 	auto &member = g_engine->_disk1._party[partyNum];
 	member._afflicted |= 1 << _params[1];
 }
 
-void Scripts::opcode65() { error("Unimplemented opcode"); }
+void Scripts::opcode65_setAffliction2() {
+	int partyNum = NONZERO(_params[0], _newPartyNum);
+	auto &member = g_engine->_disk1._party[partyNum];
+	member._afflicted &= 1 << _params[1];
+}
 
 void Scripts::opcode66() { error("Unimplemented opcode"); }
 
