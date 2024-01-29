@@ -198,7 +198,7 @@ bool Scripts::executeScript() {
 //	int charNum = _charNum;
 	int partyNum = _partyNum;
 	int action = _actionNum;
-//	int arg4 = 0;
+	int arg4 = 0;
 	uint flags;
 
 	if (_state == kScriptPaused)
@@ -208,8 +208,9 @@ bool Scripts::executeScript() {
 	_actionNum = -1;
 	_newPartyNum = partyNum;
 
-	//int local1 = 0, local2 = 0, local3 = 0;
-//	if (action == 4) local1 = arg4;
+	_local1 = _local2 = _local3 = 0;
+	if (action == 4)
+		_local1 = arg4;
 
 	if (id == 0xffff)
 		return false;
