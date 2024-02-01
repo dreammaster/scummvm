@@ -51,7 +51,7 @@ int m1x, m1y;
 int m2x, m2y;
 int m3x, m3y;
 int playx = 620;
-bool windowed = false;
+bool windowed = true;
 int playl = 20;
 HINSTANCE MyhInstance = nullptr;
 bool mouse1 = false;
@@ -143,7 +143,7 @@ char save_game_info[200] = "Level &level";
 //redink1 added this prototype to fix this save info declaration error thing
 void decipher_string(char line[200], int script);
 //redink1 and invertigo tags for windowed/high color mode
-bool truecolor = false;
+bool truecolor = true;
 bool dinkpal = false;
 //redink1 int for truecolor transition
 int iTrueColorFadeTime = 0;

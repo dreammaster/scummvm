@@ -55,6 +55,13 @@ public:
 	operator Common::Rect() {
 		return Common::Rect(left, top, right, bottom);
 	}
+
+	int width() const {
+		return right - left;
+	}
+	int height() const {
+		return bottom - top;
+	}
 };
 
 typedef Common::Point POINT;

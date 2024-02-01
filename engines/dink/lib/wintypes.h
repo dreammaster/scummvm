@@ -62,7 +62,14 @@ inline int mciSendString(const char *lpstrCommand,
 	const char *lpstrReturnString, uint uReturnLength, HWND hwndCallback) {
 	return 0;
 }
-inline bool GetClientRect(HWND hWnd, LPRECT lpRect) { return false; }
+
+inline bool GetClientRect(HWND hWnd, LPRECT lpRect) {
+	lpRect->left = lpRect->top = 0;
+	lpRect->right = 640;
+	lpRect->bottom = 480;
+	return true;
+}
+
 inline void CloseHandle(HANDLE) {}
 inline void FillMemory(void *p, size_t size, byte v) {
 	memset((byte *)p, v, size);

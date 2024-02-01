@@ -5231,7 +5231,7 @@ bool doInit() {
 	rcRect.right = currX;
 	rcRect.bottom = currY;
 
-	// Draw version #
+	// Copy background to back buffer
 	ddrval = lpDDSBack->BltFast(0, 0, lpDDSTwo, &rcRect,
 		DDBLTFAST_NOCOLORKEY);
 

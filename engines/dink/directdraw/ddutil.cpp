@@ -35,7 +35,8 @@ static const Graphics::Surface *loadImage(Image::ImageDecoder &decoder,
 }
 
 IDirectDrawSurface *DDLoadBitmap(IDirectDraw * pdd, LPCSTR szBitmap, int dx, int dy) {
-	IDirectDrawSurface *surf = new IDirectDrawSurface();
+	Graphics::PixelFormat format;
+	IDirectDrawSurface *surf = new IDirectDrawSurface(0, 0, format);
 	assert(dx == 0 && dy == 0);
 
 	if (DDReLoadBitmap(surf, szBitmap) == DD_OK) {
@@ -94,7 +95,7 @@ IDirectDrawPalette *DDLoadPalette(IDirectDraw *pdd, LPCSTR szBitmap) {
 	IDirectDrawPalette *pal = new IDirectDrawPalette();
 	PALETTEENTRY *ape = pal->_palette;
 
-	for (int i = 0; i < PALETTE_SIZE; i++) {
+	for (int i = 0; i < PALETTE_COUNT; i++) {
 		ape[i].peRed = (byte)(((i >> 5) & 0x07) * 255 / 7);
 		ape[i].peGreen = (byte)(((i >> 2) & 0x07) * 255 / 7);
 		ape[i].peBlue = (byte)(((i >> 0) & 0x03) * 255 / 3);
@@ -113,6 +114,10 @@ IDirectDrawPalette *DDLoadPalette(IDirectDraw *pdd, LPCSTR szBitmap) {
 			destP->peBlue = srcP[2];
 		}
 	}
+
+	// Indexes 0 and 255 are reserved for black and white respectively
+	ape[0].peRed = ape[0].peGreen = ape[0].peBlue = 0;
+	ape[255].peRed = ape[255].peGreen = ape[255].peBlue = 255;
 
 	return pal;
 }
@@ -174,8 +179,9 @@ IDirectDrawSurface *DDTileLoad(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy
 	if (!f.open(szBitmap) || !decoder.loadStream(f))
 		return nullptr;
 
-	IDirectDrawSurface *surf = new IDirectDrawSurface();
-	surf->copyFrom(decoder.getSurface());
+	const Graphics::Surface *s = decoder.getSurface();
+	IDirectDrawSurface *surf = new IDirectDrawSurface(s->w, s->h, s->format);
+	surf->copyFrom(*s);
 
 	if (decoder.hasPalette())
 		surf->setPalette(decoder.getPalette(), 0, decoder.getPaletteColorCount());

@@ -152,6 +152,7 @@ private:
 	void setScreenPalette();
 public:
 	IDirectDrawSurface();
+	IDirectDrawSurface(int w, int h, const Graphics::PixelFormat &pformat);
 
 	HRESULT Lock(const LPRECT rect, LPDDSURFACEDESC desc, uint32 flags, HANDLE handle);
 	HRESULT Unlock(const LPRECT rect);

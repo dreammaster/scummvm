@@ -25,6 +25,8 @@
 #include "common/algorithm.h"
 #include "graphics/palette.h"
 
+#include "common/events.h"
+
 namespace Dink {
 
 HRESULT IDirectDraw::CreateSurface(LPDDSURFACEDESC ddsd, LPDIRECTDRAWSURFACE *surf, IUnknown *) {
@@ -53,6 +55,11 @@ IDirectDrawSurface::IDirectDrawSurface() {
 		g_system->getScreenFormat());
 }
 
+IDirectDrawSurface::IDirectDrawSurface(int w, int h, const Graphics::PixelFormat &pformat) {
+	if (w != 0 && h != 0)
+		create(w, h, pformat);
+}
+
 HRESULT IDirectDrawSurface::Lock(const LPRECT rect, LPDDSURFACEDESC desc, uint32 flags, HANDLE handle) {
 	return DD_OK;
 }
@@ -70,19 +77,52 @@ HRESULT IDirectDrawSurface::Restore() {
 
 HRESULT IDirectDrawSurface::BltFast(int16 x, int16 y,
 		const IDirectDrawSurface *src, LPRECT rect, uint32 flags) {
-	rawBlitFrom(*src, *rect, Common::Point(x, y));
+	assert(flags == DDBLTFAST_NOCOLORKEY);
+	byte r, g, b;
 
-	if (src->hasPalette()) {
-		byte pal[PALETTE_SIZE];
-		src->grabPalette(pal, 0, PALETTE_COUNT);
-		setPalette(pal, 0, PALETTE_COUNT);
+	assert(src->format.bytesPerPixel == 1);
+	byte srcPal[PALETTE_SIZE];
+	src->grabPalette(srcPal, 0, PALETTE_COUNT);
+
+	addDirtyRect(Common::Rect(x, y, x + rect->width(), y + rect->height()));
+
+	for (int yp = rect->top; yp < rect->bottom; ++yp, ++y) {
+		const byte *srcP = (const byte *)src->getBasePtr(rect->left, yp);
+		byte *dest8 = (byte *)getBasePtr(x, y);
+		uint32 *dest32 = (uint32 *)getBasePtr(x, y);
+
+		for (int xp = 0; xp < rect->width(); ++xp, ++srcP) {
+			r = srcPal[*srcP * 3];
+			g = srcPal[*srcP * 3 + 1];
+			b = srcPal[*srcP * 3 + 2];
+			uint32 destPixel = format.RGBToColor(r, g, b);
+
+			if (format.bytesPerPixel == 1)
+				*dest8++ = destPixel;
+			else
+				*dest32++ = destPixel;
+		}
 	}
 
 	return DD_OK;
 }
 
 HRESULT IDirectDrawSurface::Blt(const LPRECT dstRect, const IDirectDrawSurface *src,
-	const LPRECT srcRect, uint32 flags, LPDDBLTFX lpDDBltFx) {
+		const LPRECT srcRect, uint32 flags, LPDDBLTFX lpDDBltFx) {
+	assert(srcRect->width() == dstRect->width() && srcRect->height() == dstRect->height());
+
+	if (format.bytesPerPixel != 1 && src->format.bytesPerPixel != 1) {
+		rawBlitFrom(*src, *srcRect, Common::Point(dstRect->left, dstRect->top));
+	} else {
+		BltFast(dstRect->left, dstRect->top, src, srcRect, 0);
+	}
+
+	if (flags & DDBLT_WAIT) {
+		assert(g_system->getScreenFormat() == this->format);
+		g_system->copyRectToScreen(getPixels(), this->pitch, 0, 0, this->w, this->h);
+		g_system->updateScreen();
+	}
+
 	return DD_OK;
 }
 
@@ -93,7 +133,7 @@ HRESULT IDirectDrawSurface::Flip(IDirectDrawSurface *, uint32 flags) {
 		lpDDSPrimary->setScreenPalette();
 
 	g_system->copyRectToScreen(lpDDSPrimary->getPixels(),
-		lpDDSPrimary->w, 0, 0, lpDDSPrimary->w, lpDDSPrimary->h);
+		lpDDSPrimary->pitch, 0, 0, lpDDSPrimary->w, lpDDSPrimary->h);
 	g_system->updateScreen();
 
 	return DD_OK;
