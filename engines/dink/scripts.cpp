@@ -4080,6 +4080,8 @@ void run_script(int script) {
 			if (compare(line, "\n"))
 				break;
 
+			debugC(1, kDebugScript, "%s", line);
+
 			result = process_line(script, line, false);
 			if (result == 3) {
 redo:
