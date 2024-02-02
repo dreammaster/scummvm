@@ -167,7 +167,7 @@ DWORD DDColorMatch(IDirectDrawSurface *pdds, COLORREF rgb) {
 #endif
 }
 
-HRESULT DDSetColorKey(IDirectDrawSurface * pdds, COLORREF rgb) {
+HRESULT DDSetColorKey(IDirectDrawSurface *pdds, COLORREF rgb) {
 	pdds->setTransparentColor(rgb);
 	return DD_OK;
 }

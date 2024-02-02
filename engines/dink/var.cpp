@@ -24,6 +24,7 @@
 #include "image/bmp.h"
 #include "dink/dink.h"
 #include "dink/events.h"
+#include "dink/fast_file.h"
 #include "dink/file.h"
 #include "dink/graphics.h"
 #include "dink/music.h"
@@ -611,34 +612,31 @@ LPDIRECTDRAWSURFACE DDCreateSurface(uint32 width, uint32 height,
 //redink1 and Invertigo fix for windowed/true color mode
 void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffset,
                      RECT hardbox, bool notanim, bool black, bool leftalign, bool samedir) {
-#ifdef TODO
 	int work;
+	Common::File f;
+	DDSURFACEDESC ddsd;
+	DDCOLORKEY ddck;
 
-	HFASTFILE                  pfile;
+#if 0
+	HFASTFILE pfile;
 	BITMAPFILEHEADER UNALIGNED *pbf;
 	BITMAPINFOHEADER UNALIGNED *pbi;
-	DDSURFACEDESC       ddsd;
 	HBITMAP             hbm;
 	BITMAP              bm;
-
-	DDCOLORKEY          ddck;
-
+	bool trans = false;
+#endif
 
 	int x, y, dib_pitch;
-	BYTE *src, *dst;
+	const byte *src;
+	byte *dst;
 	uint32 ddst;
 	char fname[20];
-	LPTSTR dump;
-
-	//IDirectDrawSurface *pdds;
 
 	int sprite = 71;
-	bool                       trans = false;
 	bool reload = false;
 
-	PALETTEENTRY    holdpal[256];
-	char crap[200], hold[5];
-
+	PALETTEENTRY holdpal[256];
+	char crap[200];// , hold[5];
 	int save_cur = cur_sprite;
 
 	if (index[nummy].last != 0) {
@@ -651,7 +649,8 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
 	index[nummy].s = cur_sprite - 1;
 
-	if (no_running_main) draw_wait();
+	if (no_running_main)
+		draw_wait();
 
 	char crap2[200];
 	dink_strcpy(crap2, org);
@@ -668,90 +667,60 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 		dink_sprintf(crap, "..\\dink\\%s\\dir.ff", crap2);
 
 
-	if (!FastFileInit((LPSTR)crap, 5)) {
-		Msg("Could not load dir.ff art file %s err=%08lX", crap, GetLastError());
+	if (!FastFileInit(crap, 5)) {
+		Msg("Could not load dir.ff art file %s", crap);
 
 		cur_sprite = save_cur;
 		return;
-
 	}
 
-
-
-	/*      if (!windowed)
-	{
+	/* if (!windowed) {
 	lpDDPal->GetEntries(0,0,256,holdpal);
 	lpDDPal->SetEntries(0,0,256,real_pal);
 	}
 	*/
 
-
 	for (int oo = 1; oo <= 51; oo++) {
+		Image::BitmapDecoder decoder;
 
-
-		//load sprite
-		char dumb[100];
+		// Load sprite
+//		char dumb[100];
 		sprite = cur_sprite;
 		//if (reload) Msg("Ok, programming sprite %d", sprite);
 		if (oo < 10) dink_strcpy(crap2, "0");
 		else dink_strcpy(crap2, "");
-		wdink_sprintf(crap, "%s%s%d.bmp", fname, crap2, oo);
+		dink_sprintf(crap, "%s%s%d.bmp", fname, crap2, oo);
 
-		pfile = FastFileOpen((LPSTR) crap);
-
-
-		if (pfile == NULL) {
-			FastFileClose(pfile);
-			//  FastFileFini();
+		if (!f.open(crap) || !decoder.loadStream(f)) {
 			if (oo == 1)
 				Msg("Sprite_load_pak error:  Couldn't load %s.", crap);
 
 			index[nummy].last = (oo - 1);
 			//     initFail(hWndMain, crap);
 			setup_anim(nummy, nummy, speed);
-			//              if (!windowed)  lpDDPal->SetEntries(0,0,256,holdpal);
+			//     if (!windowed)  lpDDPal->SetEntries(0,0,256,holdpal);
 
 			//if (reload) Msg("Ok, tacking %d back on.", save_cur);
 			cur_sprite = save_cur;
 			return;
 
-
 		} else {
+			// Got image
+			const Graphics::Surface *surf = decoder.getSurface();
+			const byte *palzor = decoder.getPalette();
+			const int paletteCount = decoder.getPaletteColorCount();
 
-			//got file
-
-			pbf = (BITMAPFILEHEADER *)FastFileLock(pfile, 0, 0);
-			pbi = (BITMAPINFOHEADER *)(pbf + 1);
-
-			if (pbf->bfType != 0x4d42 ||
-			        pbi->biSize != sizeof(BITMAPINFOHEADER)) {
-				Msg("Failed to load");
-				Msg(crap);
-				cur_sprite = save_cur;
-				FastFileClose(pfile);
-				//  FastFileFini();
-
-
-				return;
-
-			}
-
-			//redink1 modified this to work with every color depth
-			//Ok, what we do here is take each color, shift it right to get rid of any
-			//lower-order bits that we don't use, then shift it left to go to the correct
-			//position.  Should work fine with 16-24-32 bit color depth.
 #define _RGBXBIT(r, g, b) ( (r >> (8 - wRBits) << wRPos) | (g >> (8 - wGBits) << wGPos) | (b >> (8 - wBBits) << wBPos) )
 			PALETTEENTRY ape[256];
-			uint32 dwBlack;
-			uint32 dwNearBlack;
-			uint32 dwWhite;
-			uint32 dwNearWhite;
+			uint32 dwBlack = 0;
+			uint32 dwNearBlack = 0;
+			uint32 dwWhite = 0;
+			uint32 dwNearWhite = 0;
 
 			if (truecolor) {
 				if (dinkpal) {
 					memcpy(ape, real_pal, sizeof(PALETTEENTRY) * 256);
 				} else {
-					byte *palzor = (byte *)pbf + 54;
 					for (int pcount = 0; pcount < 256; pcount++) {
 						ape[pcount].peRed = palzor[pcount * 4 + 2];
 						ape[pcount].peGreen = palzor[pcount * 4 + 1];
@@ -764,15 +733,11 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 				dwNearWhite = _RGBXBIT(ape[30].peRed,  ape[30].peGreen,  ape[30].peBlue);
 			}
 
-			byte *pic;
-
-			pic = (byte *)pbf + 1078;
-
 			//Msg("Pic's size is now %d.",sizeof(pic));
 
 			//redink1 THIS DOESN'T DO ANYTHING!!!! ARGHAGHARHA!
-			/*bm.bmWidth = pbi->biWidth;
-			bm.bmHeight = pbi->biHeight;
+			/*bm.bmWidth = surf->w;
+			bm.bmHeight = surf->h;
 			bm.bmWidthBytes = 32;
 			bm.bmPlanes = pbi->biPlanes;
 			bm.bmBitsPixel = pbi->biBitCount;
@@ -785,34 +750,31 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 			ddsd.dwSize = sizeof(ddsd);
 			ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
 			ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
-			ddsd.dwWidth = pbi->biWidth;
-			ddsd.dwHeight = pbi->biHeight; // + 1; //redink1 fixed crashing in 16-bit mode... would overflow by a byte or two by writing dwords, really weird bug. Eh, actually moved solution to everywhere we update a uint32, include any trailing bits that were there before.  Saves memory.
+			ddsd.dwWidth = surf->w;
+			ddsd.dwHeight = surf->h;
 
-			if (picInfo[sprite].k != NULL) picInfo[sprite].k->Release();
+			if (picInfo[sprite].k != NULL)
+				picInfo[sprite].k->Release();
 
 			if (lpDD->CreateSurface(&ddsd, &picInfo[sprite].k, NULL) != DD_OK) {
 				Msg("Failed to create pdd surface description");
-
-
 			} else {
-
-
 				ddsd.dwSize = sizeof(ddsd);
 				ddrval = IDirectDrawSurface_Lock(
-				             picInfo[sprite].k, NULL, &ddsd, DDLOCK_WAIT, NULL);
+					picInfo[sprite].k, NULL, &ddsd, DDLOCK_WAIT, NULL);
 
 				if (ddrval == DD_OK) {
-					dib_pitch = (pbi->biWidth + 3) & ~3;
-					src = (BYTE *)pic + dib_pitch * (pbi->biHeight - 1);
+					dib_pitch = (surf->w + 3) & ~3;
+					src = (const byte *)surf->getBasePtr(0, surf->h - 1);
 					dst = (BYTE *)ddsd.lpSurface;
 					ddst = (uint32)ddsd.lpSurface;
-					int bytesPerPixel = ddsd.ddpfPixelFormat.dwRGBBitCount >> 3; //Divide by 8, basically
+					int bytesPerPixel = surf->format.bytesPerPixel;
+
 					uint32 dwPixel;
 					if (leftalign) {
 						//Msg("left aligning..");
-
-						for (y = 0; y < (int)pbi->biHeight; y++) {
-							for (x = 0; x < (int)pbi->biWidth; x++) {
+						for (y = 0; y < (int)surf->h; y++) {
+							for (x = 0; x < (int)surf->w; x++) {
 								if (truecolor) {
 									dwPixel = _RGBXBIT(ape[src[x]].peRed, ape[src[x]].peGreen, ape[src[x]].peBlue);
 									if (dwPixel == dwBlack) {
@@ -821,7 +783,8 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 									} else if (dwPixel == dwWhite) {
 										dwPixel = dwNearWhite;
 									}
-									//Make sure to or it with the rest of the uint32 present, just in case it overflows the buffer
+
+									// Make sure to or it with the rest of the uint32 present, just in case it overflows the buffer
 									*((uint32 *)ddst) = dwPixel | *((uint32 *)ddst) & ~dwWhite;
 
 									ddst += bytesPerPixel;
@@ -838,18 +801,14 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 							}
 
 							//redink1 switched to 'better' version
-							((uint32)ddst) += ddsd.lPitch - ((int)pbi->biWidth) * bytesPerPixel; //ddst += ddsd.lPitch / 4;
+							ddst += ddsd.lPitch - ((int)surf->w) * bytesPerPixel; //ddst += ddsd.lPitch / 4;
 							dst += ddsd.lPitch;
 							src -= dib_pitch;
 						}
-
-
 					} else
-
 						if (black) {
-
-							for (y = 0; y < (int)pbi->biHeight; y++) {
-								for (x = 0; x < (int)pbi->biWidth; x++) {
+							for (y = 0; y < (int)surf->h; y++) {
+								for (x = 0; x < (int)surf->w; x++) {
 									if (truecolor) {
 										dwPixel = _RGBXBIT(ape[src[x]].peRed, ape[src[x]].peGreen, ape[src[x]].peBlue);
 										if (dwPixel == dwWhite) {
@@ -889,7 +848,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
 
 								//redink1 switched to 'better' version
-								((uint32)ddst) += ddsd.lPitch - ((int)pbi->biWidth) * bytesPerPixel; //
+								ddst += ddsd.lPitch - ((int)surf->w) * bytesPerPixel;
 								dst += ddsd.lPitch;
 								src -= dib_pitch;
 							}
@@ -897,8 +856,8 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 						} else {
 
 							//doing white
-							for (y = 0; y < (int)pbi->biHeight; y++) {
-								for (x = 0; x < (int)pbi->biWidth; x++) {
+							for (y = 0; y < (int)surf->h; y++) {
+								for (x = 0; x < (int)surf->w; x++) {
 									if (truecolor) {
 										dwPixel = _RGBXBIT(ape[src[x]].peRed, ape[src[x]].peGreen, ape[src[x]].peBlue);
 										if (dwPixel == dwBlack) {
@@ -935,7 +894,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 								}
 
 								//redink1 switched to 'better' version
-								((uint32)ddst) += ddsd.lPitch - ((int)pbi->biWidth) * bytesPerPixel; //ddst += ddsd.lPitch / 4;
+								ddst += ddsd.lPitch - ((int)surf->w) * bytesPerPixel; //ddst += ddsd.lPitch / 4;
 								dst += ddsd.lPitch;
 								src -= dib_pitch;
 							}
@@ -1019,46 +978,30 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
 					}
 
-					if (black)
-
-					{
+					if (black) {
 						ddck.dwColorSpaceLowValue  = DDColorMatch(picInfo[cur_sprite].k, RGB(255, 255, 255));
 
 						ddck.dwColorSpaceHighValue = ddck.dwColorSpaceLowValue;
 						picInfo[cur_sprite].k->SetColorKey(DDCKEY_SRCBLT, &ddck);
 
-					}
-
-					else
-
-					{
+					} else {
 						ddck.dwColorSpaceLowValue  = DDColorMatch(picInfo[cur_sprite].k, RGB(0, 0, 0));
 						ddck.dwColorSpaceHighValue = ddck.dwColorSpaceLowValue;
 						picInfo[cur_sprite].k->SetColorKey(DDCKEY_SRCBLT, &ddck);
 
 					}
+
 					cur_sprite++;
 					if (!reload)
 						save_cur++;
-					FastFileClose(pfile);
+
+					//FastFileClose(pfile);
 				}
-
 			}
-
-
 		}
-
 	}
 
-
 	//  FastFileFini();
-
-
-	return;
-
-#else
-	error("TODO");
-#endif
 }
 
 

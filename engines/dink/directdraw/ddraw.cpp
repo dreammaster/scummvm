@@ -175,4 +175,8 @@ HRESULT IDirectDrawSurface::SetPalette(LPDIRECTDRAWPALETTE pal) {
 	return DD_OK;
 }
 
+HRESULT IDirectDrawSurface::SetColorKey(uint32 flags, LPDDCOLORKEY rgb) {
+	return DD_OK;
+}
+
 } // namespace Dink

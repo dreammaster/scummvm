@@ -27,6 +27,7 @@
 #include "common/rect.h"
 #include "graphics/managed_surface.h"
 #include "graphics/screen.h"
+#include "dink/graphics.h"
 #include "dink/lib/wintypes.h"
 #include "dink/lib/rect.h"
 
@@ -78,6 +79,7 @@ namespace Dink {
 
 // Lock modes
 #define DDLOCK_DONOTWAIT                        0x00004000L
+#define DDLOCK_WAIT                             0x00000001L
 
 // Flip flags
 #define DDFLIP_WAIT                          0x00000001L
@@ -85,6 +87,7 @@ namespace Dink {
 #define DDFLIP_ODD                           0x00000004L
 #define DDFLIP_NOVSYNC                       0x00000008L
 
+#define IDirectDrawSurface_Lock(p,a,b,c,d)              (p)->Lock(a,b,c,d)
 
 enum BlankFlag {
 	DDWAITVB_BLOCKBEGIN,
@@ -99,8 +102,17 @@ enum BlankFlag {
 #define DDSD_HEIGHT             0x00000002l
 #define DDSD_WIDTH              0x00000004l
 #define DDSCAPS_OFFSCREENPLAIN  0x00000040l
+#define DDSCAPS_SYSTEMMEMORY    0x00000800l
 
-#define IDirectDraw_CreateSurface(p, a, b, c)       (p)->CreateSurface(a, b, c)
+// color key flags
+#define DDCKEY_COLORSPACE       0x00000001l
+#define DDCKEY_DESTBLT          0x00000002l
+#define DDCKEY_DESTOVERLAY      0x00000004l
+#define DDCKEY_SRCBLT           0x00000008l
+
+
+#define IDirectDraw_CreateSurface(p, a, b, c) (p)->CreateSurface(a, b, c)
+#define IDirectDrawSurface_Unlock(p,b)        (p)->Unlock(b)
 
 #include "common/pack-start.h"	// START STRUCT PACKING
 struct PALETTEENTRY {
@@ -147,6 +159,14 @@ struct DDBLTFX {
 };
 typedef DDBLTFX *LPDDBLTFX;
 
+struct  DDCOLORKEY {
+	DWORD dwColorSpaceLowValue;		// low boundary of color space that is to
+									// be treated as Color Key, inclusive
+	DWORD dwColorSpaceHighValue;	// high boundary of color space that is
+									// to be treated as Color Key, inclusive
+};
+typedef DDCOLORKEY *LPDDCOLORKEY;
+
 struct IDirectDrawSurface : public Graphics::ManagedSurface {
 private:
 	void setScreenPalette();
@@ -167,6 +187,7 @@ public:
 	HRESULT ReleaseDC(HDC &hdc);
 	HRESULT IsLost() const;
 	HRESULT SetPalette(LPDIRECTDRAWPALETTE pal);
+	HRESULT SetColorKey(uint32 flags, LPDDCOLORKEY rgb);
 };
 typedef IDirectDrawSurface *LPDIRECTDRAWSURFACE;
 
