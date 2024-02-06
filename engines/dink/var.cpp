@@ -629,7 +629,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 	int x, y, dib_pitch;
 	const byte *src;
 	byte *dst;
-	uint32 ddst;
+	byte *ddst;
 	char fname[20];
 
 	int sprite = 71;
@@ -767,7 +767,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 					dib_pitch = (surf->w + 3) & ~3;
 					src = (const byte *)surf->getBasePtr(0, surf->h - 1);
 					dst = (BYTE *)ddsd.lpSurface;
-					ddst = (uint32)ddsd.lpSurface;
+					ddst = (byte *)ddsd.lpSurface;
 					int bytesPerPixel = surf->format.bytesPerPixel;
 
 					uint32 dwPixel;
@@ -801,7 +801,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 							}
 
 							//redink1 switched to 'better' version
-							ddst += ddsd.lPitch - ((int)surf->w) * bytesPerPixel; //ddst += ddsd.lPitch / 4;
+							ddst += ddsd.lPitch - surf->w * bytesPerPixel; //ddst += ddsd.lPitch / 4;
 							dst += ddsd.lPitch;
 							src -= dib_pitch;
 						}
@@ -848,7 +848,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 
 
 								//redink1 switched to 'better' version
-								ddst += ddsd.lPitch - ((int)surf->w) * bytesPerPixel;
+								ddst += ddsd.lPitch - surf->w * bytesPerPixel;
 								dst += ddsd.lPitch;
 								src -= dib_pitch;
 							}
@@ -894,7 +894,7 @@ void load_sprite_pak(char org[100], int nummy, int speed, int xoffset, int yoffs
 								}
 
 								//redink1 switched to 'better' version
-								ddst += ddsd.lPitch - ((int)surf->w) * bytesPerPixel; //ddst += ddsd.lPitch / 4;
+								ddst += ddsd.lPitch - surf->w * bytesPerPixel; //ddst += ddsd.lPitch / 4;
 								dst += ddsd.lPitch;
 								src -= dib_pitch;
 							}
