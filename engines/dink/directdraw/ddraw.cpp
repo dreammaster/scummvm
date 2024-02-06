@@ -129,7 +129,7 @@ HRESULT IDirectDrawSurface::Blt(const LPRECT dstRect, const IDirectDrawSurface *
 HRESULT IDirectDrawSurface::Flip(IDirectDrawSurface *, uint32 flags) {
 	SWAP(lpDDSPrimary, lpDDSBack);
 
-	if (lpDDSPrimary->hasPalette())
+	if (lpDDSPrimary->hasPalette() && lpDDSPrimary->format.bytesPerPixel == 1)
 		lpDDSPrimary->setScreenPalette();
 
 	g_system->copyRectToScreen(lpDDSPrimary->getPixels(),

@@ -51,7 +51,7 @@ int m1x, m1y;
 int m2x, m2y;
 int m3x, m3y;
 int playx = 620;
-bool windowed = true;
+bool windowed = false;
 int playl = 20;
 HINSTANCE MyhInstance = nullptr;
 bool mouse1 = false;
