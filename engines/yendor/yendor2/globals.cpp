@@ -23,6 +23,7 @@
 #include "graphics/fonts/ttf.h"
 #include "yendor/utils/engine_data.h"
 #include "yendor/yendor2/globals.h"
+#include "yendor/yendor2/yendor2.h"
 
 namespace Yendor {
 namespace Yendor2 {
@@ -56,6 +57,14 @@ bool Globals::load() {
 	Font::_fgColor = 0;
 	Font::_bgColor = 0;
 
+	if (!_picturesVga.open())
+		error("Could not open pictures.vga");
+	if (!_worldDat.open())
+		error("Could not open world.dat");
+	if (!_curGame.create())
+		error("Could not create curgame");
+
+	
 	return true;
 }
 

@@ -20,7 +20,7 @@
  */
 
 #include "common/file.h"
-#include "common/savefile.h"
+#include "common/memstream.h"
 #include "yendor/utils/file_entry.h"
 #include "yendor/yendor.h"
 
@@ -34,7 +34,7 @@ void FileEntry::close() {
 }
 
 bool FileEntry::create() {
-	_stream = g_system->getSavefileManager()->openForSaving(_filename);
+	_stream = new Common::MemoryReadWriteStream(DisposeAfterUse::YES);
 	if (_stream) {
 		g_engine->_errorCode = 0;
 		return true;
@@ -47,7 +47,6 @@ bool FileEntry::open() {
 	Common::File *f = new Common::File();
 
 	if (f->open(Common::Path(_filename))) {
-		_stream = f;
 		g_engine->_errorCode = 0;
 		return true;
 	} else {
