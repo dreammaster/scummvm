@@ -23,7 +23,7 @@
 #include "graphics/screen.h"
 #include "yendor/events.h"
 #include "yendor/yendor.h"
-#include "yendor/views.h"
+#include "yendor/yendor2/views/views.h"
 
 namespace Yendor {
 
@@ -40,7 +40,7 @@ Events::~Events() {
 void Events::runGame() {
 	uint currTime, nextFrameTime = 0;
 	_screen = new Graphics::Screen();
-	Views views;	// Loads all views in the structure
+	Yendor2::Views views;	// Loads all views in the structure
 
 	// Run the game
 	int saveSlot = ConfMan.getInt("save_slot");

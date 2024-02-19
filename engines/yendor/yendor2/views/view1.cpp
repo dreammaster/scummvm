@@ -21,9 +21,10 @@
 
 #include "common/system.h"
 #include "graphics/palette.h"
-#include "yendor/view1.h"
+#include "yendor/yendor2/views/view1.h"
 
 namespace Yendor {
+namespace Yendor2 {
 
 bool View1::msgFocus(const FocusMessage &msg) {
 	Common::fill(&_pal[0], &_pal[256 * 3], 0);
@@ -61,4 +62,5 @@ bool View1::tick() {
 	return true;
 }
 
+} // namespace Yendor2
 } // namespace Yendor

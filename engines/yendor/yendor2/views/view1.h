@@ -25,10 +25,11 @@
 #include "yendor/events.h"
 
 namespace Yendor {
+namespace Yendor2 {
 
 class View1 : public UIElement {
 private:
-	byte _pal[256 * 3] = { 0 };
+	byte _pal[256 * 3] = {0};
 	int _offset = 0;
 
 public:
@@ -41,6 +42,7 @@ public:
 	bool tick() override;
 };
 
+} // namespace Yendor2
 } // namespace Yendor
 
 #endif

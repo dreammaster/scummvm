@@ -22,14 +22,16 @@
 #ifndef YENDOR_VIEWS_H
 #define YENDOR_VIEWS_H
 
-#include "yendor/view1.h"
+#include "yendor/yendor2/views/view1.h"
 
 namespace Yendor {
+namespace Yendor2 {
 
 struct Views {
 	View1 _view1;
 };
 
+} // namespace Yendor2
 } // namespace Yendor
 
 #endif

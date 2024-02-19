@@ -6,7 +6,7 @@ MODULE_OBJS = \
 	events.o \
 	messages.o \
 	metaengine.o \
-	view1.o
+	yendor2/views/view1.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_YENDOR), DYNAMIC_PLUGIN)
