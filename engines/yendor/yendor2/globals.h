@@ -30,7 +30,7 @@
 namespace Yendor {
 namespace Yendor2 {
 
-class Globals : public GlobalsBase {
+class Globals {
 public:
 	Font _fonts[4];
 	FileEntry _curGame;
@@ -38,14 +38,14 @@ public:
 	FileEntry _savegameX;
 	FileEntry _worldDat;
 
+	const int _blockSize1 = 26472;
+	const int _blockSize2 = 18844;
+
 public:
 	Globals();
 	virtual ~Globals();
 
-	/**
-	 * Loads global data
-	 */
-	bool load() override;
+	bool load();
 
 	/**
 	 * Saves global data to/from savegames

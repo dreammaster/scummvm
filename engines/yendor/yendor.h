@@ -57,7 +57,6 @@ protected:
 	}
 
 public:
-	GlobalsBase *_globals;
 	int _errorCode = 0;
 
 public:

@@ -23,11 +23,15 @@
 #define YENDOR_YENDOR2_H
 
 #include "yendor/yendor.h"
+#include "yendor/yendor2/globals.h"
 
 namespace Yendor {
 namespace Yendor2 {
 
 class Yendor2Engine : public YendorEngine {
+private:
+	Globals _globals;
+
 protected:
 	// Engine APIs
 	Common::Error run() override;

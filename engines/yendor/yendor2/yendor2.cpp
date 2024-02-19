@@ -21,6 +21,7 @@
 
 #include "yendor/yendor2/yendor2.h"
 #include "yendor/yendor2/globals.h"
+#include "yendor/utils/engine_data.h"
 
 namespace Yendor {
 namespace Yendor2 {
@@ -33,12 +34,17 @@ Yendor2Engine::Yendor2Engine(OSystem *syst, const ADGameDescription *gameDesc) :
 
 Yendor2Engine::~Yendor2Engine() {
 	g_engine = nullptr;
-
-	delete _globals;
 }
 
 Common::Error Yendor2Engine::run() {
-	_globals = new Yendor2::Globals();
+	Common::U32String errMsg;
+	if (!load_engine_data("yendor2", 1, 0, errMsg)) {
+		GUIErrorMessage(errMsg);
+		return Common::kNoError;
+	}
+
+	if (!_globals.load())
+		return Common::kNoError;
 
 	return YendorEngine::run();
 }
