@@ -34,6 +34,10 @@ namespace Yendor {
 
 class Events;
 
+struct GlobalsBase {
+	virtual bool load() = 0;
+};
+
 /**
  * Implements a thunk layer around an element's bounds,
  * allowing access to it as if it were a simple Common::Rect,

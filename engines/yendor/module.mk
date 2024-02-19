@@ -6,6 +6,13 @@ MODULE_OBJS = \
 	events.o \
 	messages.o \
 	metaengine.o \
+	gfx/font.o \
+	utils/engine_data.o \
+	utils/file_entry.o \
+	utils/strings.o \
+	yendor2/globals.o \
+	yendor2/metaengine.o \
+	yendor2/yendor2.o \
 	yendor2/views/view1.o
 
 # This module can be built as a plugin

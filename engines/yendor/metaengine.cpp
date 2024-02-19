@@ -23,7 +23,7 @@
 
 #include "yendor/metaengine.h"
 #include "yendor/detection.h"
-#include "yendor/yendor.h"
+#include "yendor/yendor2/yendor2.h"
 
 namespace Yendor {
 
@@ -53,7 +53,7 @@ const ADExtraGuiOptionsMap *YendorMetaEngine::getAdvancedExtraGuiOptions() const
 }
 
 Common::Error YendorMetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const {
-	*engine = new Yendor::YendorEngine(syst, desc);
+	*engine = new Yendor::Yendor2::Yendor2Engine(syst, desc);
 	return Common::kNoError;
 }
 
