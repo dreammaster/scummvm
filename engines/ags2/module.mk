@@ -2,8 +2,11 @@ MODULE := engines/ags2
 
 MODULE_OBJS = \
 	ags2.o \
+	ac.o \
 	console.o \
-	metaengine.o
+	metaengine.o \
+	routefnd.o \
+	vars.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AGS2), DYNAMIC_PLUGIN)
