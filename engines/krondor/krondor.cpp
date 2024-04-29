@@ -19,16 +19,11 @@
  *
  */
 
-#include "krondor/krondor.h"
-#include "krondor/detection.h"
-#include "krondor/console.h"
-#include "common/scummsys.h"
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
-#include "common/events.h"
-#include "common/system.h"
+#include "common/translation.h"
 #include "engines/util.h"
-#include "graphics/paletteman.h"
+#include "krondor/krondor.h"
+#include "krondor/console.h"
+#include "krondor/files/resource_archive.h"
 
 namespace Krondor {
 
@@ -56,6 +51,11 @@ Common::Error KrondorEngine::run() {
 
 	// Set the engine's debugger console
 	setDebugger(new Console());
+
+	if (!ResourceArchive::initialize()) {
+		GUIErrorMessage(_("Could not load resources"));
+		return Common::kNoError;
+	}
 
 	runGame();
 

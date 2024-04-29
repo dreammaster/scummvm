@@ -7,7 +7,8 @@ MODULE_OBJS = \
 	messages.o \
 	metaengine.o \
 	view.o \
-	view1.o
+	view1.o \
+	files/resource_archive.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_KRONDOR), DYNAMIC_PLUGIN)
