@@ -19,28 +19,35 @@
  *
  */
 
-#ifndef KRONDOR_VIEW1_H
-#define KRONDOR_VIEW1_H
-
-#include "krondor/view.h"
+#include "common/system.h"
+#include "krondor/views/dialogs/preferences.h"
 
 namespace Krondor {
+namespace Views {
+namespace Dialogs {
 
-class View1 : public View {
-private:
-	byte _pal[256 * 3] = { 0 };
-	int _offset = 0;
+bool Preferences::msgFocus(const FocusMessage &msg) {
+	return true;
+}
 
-public:
-	View1() : View("View1") {}
-	virtual ~View1() {}
+bool Preferences::msgKeypress(const KeypressMessage &msg) {
+	// Any keypress to close the view
+	close();
+	return true;
+}
 
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-	void draw() override;
-	bool tick() override;
-};
+void Preferences::draw() {
+	// Draw a bunch of squares on screen
+	Graphics::ManagedSurface s = getSurface();
 
+	for (int i = 0; i < 100; ++i)
+		s.frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
+}
+
+bool Preferences::tick() {
+	return true;
+}
+
+} // namespace Dialogs
+} // namespace Views
 } // namespace Krondor
-
-#endif

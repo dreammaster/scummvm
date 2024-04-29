@@ -23,7 +23,7 @@
 #include "graphics/screen.h"
 #include "krondor/events.h"
 #include "krondor/krondor.h"
-#include "krondor/views.h"
+#include "krondor/views/views.h"
 
 namespace Krondor {
 
@@ -40,7 +40,7 @@ Events::~Events() {
 void Events::runGame() {
 	uint currTime, nextFrameTime = 0;
 	_screen = new Graphics::Screen();
-	Views views;	// Loads all views in the structure
+	Views::Views views;	// Loads all views in the structure
 
 	// Run the game
 	int saveSlot = ConfMan.getInt("save_slot");

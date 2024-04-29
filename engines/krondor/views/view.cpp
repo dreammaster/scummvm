@@ -19,7 +19,7 @@
  *
  */
 
-#include "krondor/view.h"
+#include "krondor/views/view.h"
 
 namespace Krondor {
 

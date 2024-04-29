@@ -19,15 +19,26 @@
  *
  */
 
-#ifndef KRONDOR_VIEWS_H
-#define KRONDOR_VIEWS_H
+#ifndef KRONDOR_VIEW1_H
+#define KRONDOR_VIEW1_H
 
-#include "krondor/view1.h"
+#include "krondor/views/view.h"
 
 namespace Krondor {
 
-struct Views {
-	View1 _view1;
+class View1 : public View {
+private:
+	byte _pal[256 * 3] = { 0 };
+	int _offset = 0;
+
+public:
+	View1() : View("View1") {}
+	virtual ~View1() {}
+
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	void draw() override;
+	bool tick() override;
 };
 
 } // namespace Krondor
