@@ -7,6 +7,9 @@ MODULE_OBJS = \
 	messages.o \
 	metaengine.o \
 	files/resource_archive.o \
+	res/rect.o \
+	res/request_resource.o \
+	res/resource.o \
 	views/view.o \
 	views/view1.o \
 	views/dialogs/preferences.o

@@ -24,6 +24,8 @@
 
 #include "common/archive.h"
 #include "common/hashmap.h"
+#include "common/rect.h"
+#include "common/serializer.h"
 #include "common/stream.h"
 
 namespace Krondor {
