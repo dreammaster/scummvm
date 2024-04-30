@@ -30,6 +30,7 @@ namespace Views {
 
 struct Views {
 	View1 _view1;
+	Dialogs::Preferences _preferences;
 };
 
 } // namespace Views

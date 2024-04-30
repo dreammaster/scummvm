@@ -19,45 +19,28 @@
  *
  */
 
-#ifndef KRONDOR_RES_REQUEST_RESOURCE_H
-#define KRONDOR_RES_REQUEST_RESOURCE_H
-
-#include "common/array.h"
-#include "krondor/res/resource.h"
-#include "krondor/res/rect.h"
+#include "krondor/res/palette_resource.h"
 
 namespace Krondor {
 
-struct RequestData {
-	uint _widget = 0;
-	int _action = 0;
-	bool _visible = 0;
-	int _xpos = 0;
-	int _ypos = 0;
-	int _width = 0;
-	int _height = 0;
-	int _teleport = 0;
-	int _image = 0;
-	int _group = 0;
-	Common::String _label;
-};
+void PaletteResource::clear() {
+	_palette.clear();
+}
 
-class RequestResource : public Resource {
-public:
-	bool _popup = false;
-	Rect _rect;
-	int _xoff = 0;
-	int _yoff = 0;
-	Common::Array<RequestData> _data;
+void PaletteResource::read(Common::SeekableReadStream *src) {
+	Common::SeekableReadStream *tag = getTag(TAG_VGA);
+	assert(tag);
 
-public:
-	RequestResource() : Resource() {}
-	~RequestResource() override {}
+	// Load and convert the palette bytes
+	Common::Array<byte> data(tag->size());
+	tag->read(&data[0], tag->size());
+	delete tag;
 
-	void clear() override;
-	void read(Common::SeekableReadStream *src) override;
-};
+	for (uint i = 0; i < data.size(); ++i)
+		data[i] = data[i] << 2;
+
+	// Set the palette contents
+	_palette = Graphics::Palette(&data[0], data.size() / 3);	 
+}
 
 } // namespace Krondor
-
-#endif

@@ -23,6 +23,10 @@
 
 namespace Krondor {
 
+void Rect::clear() {
+	left = top = right = bottom = 0;
+}
+
 void Rect::synchronize(Common::Serializer &s) {
 	s.syncAsSint16LE(left);
 	s.syncAsSint16LE(top);
@@ -36,6 +40,16 @@ void Rect::synchronize(Common::Serializer &s) {
 		setWidth(w);
 		setHeight(h);
 	}
+}
+
+void Rect::read(Common::SeekableReadStream *src) {
+	Common::Serializer s(src, nullptr);
+	synchronize(s);
+}
+
+void Rect::write(Common::WriteStream *dest) {
+	Common::Serializer s(nullptr, dest);
+	synchronize(s);
 }
 
 } // namespace Krondor

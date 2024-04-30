@@ -26,22 +26,73 @@
 
 namespace Krondor {
 
-Resource::Resource(const Common::Path &path) {
+void Resource::load(const Common::String &path) {
 	Common::File f;
-	if (!f.open(path))
-		error("Opening file - %s", path.toString().c_str());
+	if (!f.open(Common::Path(path)))
+		error("Opening file - %s", path.c_str());
 
-	load(&f);
+	readIndex(&f);
+	read(&f);
 }
 
-void Resource::load(Common::SeekableReadStream *src) {
-	Common::Serializer s(src, nullptr);
-	synchronize(s);
+void TaggedResource::readIndex(Common::SeekableReadStream *src) {
+	if (!_file)
+		_file = src;
+
+	for (;;) {
+		uint32 label = src->readUint32LE();
+		if (src->eos())
+			break;
+
+		switch (label) {
+		case TAG_ADS:
+		case TAG_APP:
+		case TAG_BIN:
+		case TAG_BMP:
+		case TAG_DAT:
+		case TAG_FNT:
+		case TAG_GID:
+		case TAG_INF:
+		case TAG_MAP:
+		case TAG_PAG:
+		case TAG_PAL:
+		case TAG_RES:
+		case TAG_SCR:
+		case TAG_SND:
+		case TAG_TAG:
+		case TAG_TT3:
+		case TAG_TTI:
+		case TAG_VER:
+		case TAG_VGA: {
+			uint size = src->readUint32LE();
+			_tags[label] = TagEntry(src->pos(), size & 0x7fffffff);
+
+			if (size & 0x80000000) {
+				// Sub-container
+				SubStream sub(src, src->pos(), size & 0x7fffffff);
+				readIndex(&sub);
+
+			} else {
+				// Move to next entry
+				src->skip(size);
+			}
+			break;
+		}
+
+		default:
+			error("Unknown tag encountered - %x", label);
+			break;
+		}
+	}
 }
 
-void Resource::save(Common::WriteStream *dest) {
-	Common::Serializer s(nullptr, dest);
-	synchronize(s);
+Common::SeekableReadStream *TaggedResource::getTag(uint32 tag) {
+	if (_tags.contains(tag)) {
+		_file->seek(_tags[tag]._offset);
+		return _file->readStream(_tags[tag]._size);
+	}
+
+	return nullptr;
 }
 
 } // namespace Krondor

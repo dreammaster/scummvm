@@ -21,12 +21,21 @@
 
 #include "common/system.h"
 #include "krondor/views/dialogs/preferences.h"
+#include "krondor/res/request_resource.h"
+#include "krondor/res/palette_resource.h"
 
 namespace Krondor {
 namespace Views {
 namespace Dialogs {
 
 bool Preferences::msgFocus(const FocusMessage &msg) {
+	// Dummy stuff
+	RequestResource req;
+	PaletteResource pal;
+
+	req.load("req_pref.dat");
+	pal.load("options.pal");
+
 	return true;
 }
 

@@ -29,18 +29,11 @@ namespace Krondor {
 
 class Rect : public Common::Rect, public Resource {
 public:
-	void clear() override {
-		left = top = right = bottom = 0;
-	}
-	void synchronize(Common::Serializer &s) override;
-	void load(Common::SeekableReadStream *src) {
-		Common::Serializer s(src, nullptr);
-		synchronize(s);
-	}
-	void save(Common::WriteStream *dest) {
-		Common::Serializer s(nullptr, dest);
-		synchronize(s);
-	}
+	void clear() override;
+	void read(Common::SeekableReadStream *src) override;
+
+	void write(Common::WriteStream *dest);
+	void synchronize(Common::Serializer &s);
 };
 
 } // namespace Krondor

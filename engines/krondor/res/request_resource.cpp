@@ -30,13 +30,13 @@ void RequestResource::clear() {
 	_data.clear();
 }
 
-void RequestResource::load(Common::SeekableReadStream *src) {
+void RequestResource::read(Common::SeekableReadStream *src) {
 	clear();
 
 	src->skip(2);
 	_popup = src->readSint16LE() != 0;
 	src->skip(2);
-	_rect.load(src);
+	_rect.read(src);
 
 	src->skip(2);
 	_xoff = src->readSint16LE();
@@ -56,7 +56,7 @@ void RequestResource::load(Common::SeekableReadStream *src) {
 
 		rd._widget = src->readUint16LE();
 		rd._action = src->readSint16LE();
-		rd._visible = (src->readByte() > 0);
+		rd._visible = (src->readByte() != 0);
 		src->skip(2);
 		src->skip(2);
 		src->skip(2);

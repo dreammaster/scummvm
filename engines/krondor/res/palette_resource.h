@@ -19,43 +19,27 @@
  *
  */
 
-#ifndef KRONDOR_RES_REQUEST_RESOURCE_H
-#define KRONDOR_RES_REQUEST_RESOURCE_H
+#ifndef KRONDOR_RES_PALETTE_RESOURCE_H
+#define KRONDOR_RES_PALETTE_RESOURCE_H
 
-#include "common/array.h"
+#include "common/memstream.h"
+#include "graphics/palette.h"
 #include "krondor/res/resource.h"
-#include "krondor/res/rect.h"
 
 namespace Krondor {
 
-struct RequestData {
-	uint _widget = 0;
-	int _action = 0;
-	bool _visible = 0;
-	int _xpos = 0;
-	int _ypos = 0;
-	int _width = 0;
-	int _height = 0;
-	int _teleport = 0;
-	int _image = 0;
-	int _group = 0;
-	Common::String _label;
-};
-
-class RequestResource : public Resource {
-public:
-	bool _popup = false;
-	Rect _rect;
-	int _xoff = 0;
-	int _yoff = 0;
-	Common::Array<RequestData> _data;
+class PaletteResource : public TaggedResource {
+protected:
+	void read(Common::SeekableReadStream *src) override;
 
 public:
-	RequestResource() : Resource() {}
-	~RequestResource() override {}
+	Graphics::Palette _palette;
+
+public:
+	PaletteResource() : TaggedResource(), _palette(nullptr, 0) {}
+	~PaletteResource() override {}
 
 	void clear() override;
-	void read(Common::SeekableReadStream *src) override;
 };
 
 } // namespace Krondor

@@ -8,6 +8,7 @@ MODULE_OBJS = \
 	metaengine.o \
 	files/resource_archive.o \
 	res/rect.o \
+	res/palette_resource.o \
 	res/request_resource.o \
 	res/resource.o \
 	views/view.o \
