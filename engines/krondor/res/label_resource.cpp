@@ -19,47 +19,39 @@
  *
  */
 
-#include "common/system.h"
-#include "krondor/views/dialogs/preferences.h"
 #include "krondor/res/label_resource.h"
-#include "krondor/res/request_resource.h"
-#include "krondor/res/palette_resource.h"
 
 namespace Krondor {
-namespace Views {
-namespace Dialogs {
 
-bool Preferences::msgFocus(const FocusMessage &msg) {
-	// Dummy stuff
-	RequestResource req;
-	PaletteResource pal;
-	LabelResource lbl;
-
-	req.load("req_pref.dat");
-	pal.load("options.pal");
-	lbl.load("lbl_pref.dat");
-
-	return true;
+void LabelResource::clear() {
+	_data.clear();
 }
 
-bool Preferences::msgKeypress(const KeypressMessage &msg) {
-	// Any keypress to close the view
-	close();
-	return true;
+void LabelResource::read(Common::SeekableReadStream *src) {
+	clear();
+
+	_data.resize(src->readUint16LE());
+	Common::Array<int> offsets(_data.size());
+
+	for (uint i = 0; i < _data.size(); ++i) {
+		LabelData &lbl = _data[i];
+        offsets[i] = src->readSint16LE();
+        lbl._xpos = src->readSint16LE();
+        lbl._ypos = src->readSint16LE();
+        lbl._type = src->readSint16LE();
+        lbl._color = src->readSByte();
+        lbl._shadow = src->readSByte();
+    }
+
+	src->skip(2);
+    uint start = src->pos();
+
+	for (uint i = 0; i < _data.size(); i++) {
+        if (offsets[i] >= 0) {
+            src->seek(start + offsets[i]);
+            _data[i]._label = src->readString();
+        }
+    }
 }
 
-void Preferences::draw() {
-	// Draw a bunch of squares on screen
-	Graphics::ManagedSurface s = getSurface();
-
-	for (int i = 0; i < 100; ++i)
-		s.frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
-}
-
-bool Preferences::tick() {
-	return true;
-}
-
-} // namespace Dialogs
-} // namespace Views
 } // namespace Krondor

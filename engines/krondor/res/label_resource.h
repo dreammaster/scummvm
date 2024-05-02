@@ -19,47 +19,36 @@
  *
  */
 
-#include "common/system.h"
-#include "krondor/views/dialogs/preferences.h"
-#include "krondor/res/label_resource.h"
-#include "krondor/res/request_resource.h"
-#include "krondor/res/palette_resource.h"
+#ifndef KRONDOR_RES_LABEL_RESOURCE_H
+#define KRONDOR_RES_LABEL_RESOURCE_H
+
+#include "krondor/res/resource.h"
 
 namespace Krondor {
-namespace Views {
-namespace Dialogs {
 
-bool Preferences::msgFocus(const FocusMessage &msg) {
-	// Dummy stuff
-	RequestResource req;
-	PaletteResource pal;
-	LabelResource lbl;
+struct LabelData {
+	int _xpos;
+	int _ypos;
+	int _type;
+	int _color;
+	int _shadow;
+	Common::String _label;
 
-	req.load("req_pref.dat");
-	pal.load("options.pal");
-	lbl.load("lbl_pref.dat");
+	void read(Common::SeekableReadStream *src);
+};
 
-	return true;
-}
+class LabelResource : public Resource {
+public:
+	Common::Array<LabelData> _data;
 
-bool Preferences::msgKeypress(const KeypressMessage &msg) {
-	// Any keypress to close the view
-	close();
-	return true;
-}
+public:
+	LabelResource() : Resource() {}
+	~LabelResource() override {}
 
-void Preferences::draw() {
-	// Draw a bunch of squares on screen
-	Graphics::ManagedSurface s = getSurface();
+	void clear() override;
+	void read(Common::SeekableReadStream *src) override;
+};
 
-	for (int i = 0; i < 100; ++i)
-		s.frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
-}
-
-bool Preferences::tick() {
-	return true;
-}
-
-} // namespace Dialogs
-} // namespace Views
 } // namespace Krondor
+
+#endif
