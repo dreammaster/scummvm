@@ -27,7 +27,23 @@
 
 namespace Krondor {
 
+static const unsigned int MAX_FONT_HEIGHT = 16;
+
+typedef uint16 GlyphData[MAX_FONT_HEIGHT];
+
+struct FontGlyph {
+	uint _width = 0;
+	GlyphData _data;
+};
+
 class FontResource : public TaggedResource, public Graphics::Font {
+private:
+	int _fontHeight = 0;
+	char _firstChar = '\0';
+	byte _numChars = 0;
+	byte _maxCharWidth = 0;
+	Common::Array<FontGlyph> _glyphs;
+
 public:
 	FontResource() : TaggedResource(), Graphics::Font() {}
 	FontResource(const Common::String &name) : TaggedResource(), Graphics::Font() {
@@ -39,7 +55,8 @@ public:
 	void load(const Common::String &name);
 
 	int getFontHeight() const override;
-	int getCharWidth(uint32 chr) const;
+	int getCharWidth(uint32 chr) const override;
+	int getMaxCharWidth() const override;
 	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
 
 };

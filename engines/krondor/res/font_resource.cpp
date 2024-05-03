@@ -19,11 +19,17 @@
  *
  */
 
+#include "graphics/surface.h"
 #include "krondor/res/font_resource.h"
 
 namespace Krondor {
 
 void FontResource::clear() {
+	_fontHeight = 0;
+	_firstChar = '\0';
+	_numChars = 0;
+	_maxCharWidth = 0;
+	_glyphs.clear();
 }
 
 void FontResource::load(const Common::String &name) {
@@ -31,19 +37,70 @@ void FontResource::load(const Common::String &name) {
 	File f(name);
 	loadIndex(&f);
 
+	Common::SeekableReadStream *font = getTag(&f, TAG_FNT);
+
+	f.skip(2);
+	_fontHeight = f.readUint16LE() & 0xff;
+	_firstChar = (char)f.readByte();
+	_numChars = f.readByte();
+	f.skip(2);
+
+	if (f.readByte() != 0x01)
+		error("Unsupported font compression");
+
+	Common::SeekableReadStream *glyphs = f.decompressRLE();
+	Common::Array<int> glyphOffset(_numChars);
+	_glyphs.resize(_numChars);
+
+	for (uint i = 0; i < _numChars; i++)
+		glyphOffset[i] = glyphs->readUint16LE();
+
+	uint glyphDataStart = glyphs->pos();
+	for (uint i = 0; i < _numChars; i++) {
+		FontGlyph &glyph = _glyphs[i];
+
+		glyphs->seek(glyphDataStart + i);
+		glyph._width = glyphs->readByte();
+		_maxCharWidth = MAX<byte>(_maxCharWidth, glyph._width);
+
+		glyphs->seek(glyphDataStart + _numChars + glyphOffset[i]);
+
+		for (uint j = 0; j < _fontHeight; j++) {
+			glyph._data[j] = (uint16)glyphs->readByte() << 8;
+			if (glyph._width > 8) {
+				glyph._data[j] += (uint16)glyphs->readByte();
+			}
+		}
+	}
 }
 
 int FontResource::getFontHeight() const {
-	return 0;
+	return _fontHeight;
 }
 
 int FontResource::getCharWidth(uint32 chr) const {
-	return 8;
+	assert(chr >= _firstChar && chr < (_firstChar + _numChars));
+	return _glyphs[chr - _firstChar]._width;
 }
 
+int FontResource::getMaxCharWidth() const {
+	return _maxCharWidth;
+}
 
 void FontResource::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
-}
+	assert(chr >= _firstChar && chr < (_firstChar + _numChars));
+	const FontGlyph &glyph = _glyphs[chr - _firstChar];
+	uint16 pixels;
 
+	for (int yp = 0; yp < _fontHeight; ++yp, ++y) {
+		byte *destP = (byte *)dst->getBasePtr(x, y);
+		pixels = glyph._data[yp];
+
+		for (int xp = 0; xp < glyph._width; ++xp, ++destP, pixels <<= 1) {
+			if (pixels & 0x8000)
+				*destP = color;
+		}
+	}
+}
 
 } // namespace Krondor

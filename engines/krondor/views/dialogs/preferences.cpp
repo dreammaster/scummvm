@@ -32,6 +32,7 @@ bool Preferences::msgFocus(const FocusMessage &msg) {
 	RequestResource req("req_pref.dat");
 	PaletteResource pal("options.pal");
 	LabelResource lbl("lbl_pref.dat");
+	FontResource fnt("game.fnt");
 
 	return true;
 }

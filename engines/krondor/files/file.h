@@ -40,6 +40,11 @@ public:
 	void open(const Common::String &path) {
 		open(Common::Path(path));
 	}
+
+	/**
+	 * Do a RLE decompression of a stream
+	 */
+	Common::SeekableReadStream *decompressRLE();
 };
 
 } // namespace Krondor
