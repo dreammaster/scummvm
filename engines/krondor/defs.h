@@ -19,50 +19,13 @@
  *
  */
 
-#ifndef KRONDOR_FILES_FILE_H
-#define KRONDOR_FILES_FILE_H
-
-#include "common/file.h"
-#include "krondor/files/decompress.h"
+#ifndef KRONDOR_DEFS_H
+#define KRONDOR_DEFS_H
 
 namespace Krondor {
 
-class File : public Common::File {
-public:
-	File() : Common::File() {}
-	File(const Common::Path &name) : Common::File() {
-		open(name);
-	}
-	File(const Common::String &name) : Common::File() {
-		(void)open(name);
-	}
-
-	bool open(const Common::Path &path) override;
-	void open(const Common::String &path) {
-		open(Common::Path(path));
-	}
-
-	/**
-	 * Do a RLE decompression of a stream
-	 */
-	Common::SeekableReadStream *decompressRLE() {
-		return DecompressRLE(this).decompress();
-	}
-
-	/**
-	 * Do a LZW decompression of a stream
-	 */
-	Common::SeekableReadStream *decompressLZW() {
-		return DecompressLZW(this).decompress();
-	}
-
-	/**
-	 * Do a LZSS decompression of a stream
-	 */
-	Common::SeekableReadStream *decompressLZSS() {
-		return DecompressLZSS(this).decompress();
-	}
-};
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 200
 
 } // namespace Krondor
 

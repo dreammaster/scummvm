@@ -38,10 +38,10 @@ struct FontGlyph {
 
 class FontResource : public TaggedResource, public Graphics::Font {
 private:
-	int _fontHeight = 0;
-	char _firstChar = '\0';
-	byte _numChars = 0;
-	byte _maxCharWidth = 0;
+	uint _fontHeight = 0;
+	uint _firstChar = '\0';
+	uint _numChars = 0;
+	uint _maxCharWidth = 0;
 	Common::Array<FontGlyph> _glyphs;
 
 public:

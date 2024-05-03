@@ -32,27 +32,4 @@ bool File::open(const Common::Path &path) {
 	return true;
 }
 
-Common::SeekableReadStream *File::decompressRLE() {
-	uint size = readUint32LE();
-	Common::SeekableReadStream *src = readStream(size);
-	Common::MemoryWriteStreamDynamic buf(DisposeAfterUse::NO);
-	uint control, val, i;
-
-	while (!src->eos()) {
-		control = src->readByte();
-		if (control & 0x80) {
-			// Repeat following byte number of times
-			val = src->readByte();
-			for (i = 0; i < (control & 0x7f); ++i)
-				buf.writeByte(val);
-		} else {
-			// Copy a range of bytes
-			for (i = 0; i < control; ++i)
-				buf.writeByte(src->readByte());
-		}
-	}
-
-	return new Common::MemoryReadStream(buf.getData(), buf.size(), DisposeAfterUse::YES);
-}
-
 } // namespace Krondor

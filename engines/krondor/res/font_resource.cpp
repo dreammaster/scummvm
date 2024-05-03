@@ -39,16 +39,16 @@ void FontResource::load(const Common::String &name) {
 
 	Common::SeekableReadStream *font = getTag(&f, TAG_FNT);
 
-	f.skip(2);
-	_fontHeight = f.readUint16LE() & 0xff;
-	_firstChar = (char)f.readByte();
-	_numChars = f.readByte();
-	f.skip(2);
+	font->skip(2);
+	_fontHeight = font->readUint16LE() & 0xff;
+	_firstChar = (char)font->readByte();
+	_numChars = font->readByte();
+	font->skip(2);
 
-	if (f.readByte() != 0x01)
+	if (font->readByte() != 0x01)
 		error("Unsupported font compression");
 
-	Common::SeekableReadStream *glyphs = f.decompressRLE();
+	Common::SeekableReadStream *glyphs = DecompressRLE(font).decompress();
 	Common::Array<int> glyphOffset(_numChars);
 	_glyphs.resize(_numChars);
 
@@ -92,11 +92,11 @@ void FontResource::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, ui
 	const FontGlyph &glyph = _glyphs[chr - _firstChar];
 	uint16 pixels;
 
-	for (int yp = 0; yp < _fontHeight; ++yp, ++y) {
+	for (uint yp = 0; yp < _fontHeight; ++yp, ++y) {
 		byte *destP = (byte *)dst->getBasePtr(x, y);
 		pixels = glyph._data[yp];
 
-		for (int xp = 0; xp < glyph._width; ++xp, ++destP, pixels <<= 1) {
+		for (uint xp = 0; xp < glyph._width; ++xp, ++destP, pixels <<= 1) {
 			if (pixels & 0x8000)
 				*destP = color;
 		}

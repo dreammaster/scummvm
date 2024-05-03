@@ -19,49 +19,50 @@
  *
  */
 
-#ifndef KRONDOR_FILES_FILE_H
-#define KRONDOR_FILES_FILE_H
+#ifndef KRONDOR_FILES_DECOMPRESS_H
+#define KRONDOR_FILES_DECOMPRESS_H
 
 #include "common/file.h"
-#include "krondor/files/decompress.h"
 
 namespace Krondor {
 
-class File : public Common::File {
+class DecompressRLE {
+private:
+	Common::SeekableReadStream *_src;
+
 public:
-	File() : Common::File() {}
-	File(const Common::Path &name) : Common::File() {
-		open(name);
-	}
-	File(const Common::String &name) : Common::File() {
-		(void)open(name);
-	}
+	DecompressRLE(Common::SeekableReadStream *src);
 
-	bool open(const Common::Path &path) override;
-	void open(const Common::String &path) {
-		open(Common::Path(path));
-	}
+	Common::SeekableReadStream *decompress();
+};
 
-	/**
-	 * Do a RLE decompression of a stream
-	 */
-	Common::SeekableReadStream *decompressRLE() {
-		return DecompressRLE(this).decompress();
-	}
+class DecompressLZSS {
+private:
+	Common::Array<byte> _srcData;
 
-	/**
-	 * Do a LZW decompression of a stream
-	 */
-	Common::SeekableReadStream *decompressLZW() {
-		return DecompressLZW(this).decompress();
-	}
+public:
+	DecompressLZSS(Common::SeekableReadStream *src);
 
-	/**
-	 * Do a LZSS decompression of a stream
-	 */
-	Common::SeekableReadStream *decompressLZSS() {
-		return DecompressLZSS(this).decompress();
-	}
+	Common::SeekableReadStream *decompress();
+};
+
+class DecompressLZW {
+	struct CodeTableEntry {
+		uint16 _prefix;
+		uint8 _append;
+	};
+private:
+	Common::SeekableReadStream *_src;
+	int _nextBit = 8;
+	byte _currentByte = 0;
+
+	uint getBits(uint numBits);
+	void skipBits();
+
+public:
+	DecompressLZW(Common::SeekableReadStream *src);
+
+	Common::SeekableReadStream *decompress();
 };
 
 } // namespace Krondor
