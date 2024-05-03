@@ -29,17 +29,19 @@
 namespace Krondor {
 
 class PaletteResource : public TaggedResource {
-protected:
-	void read(Common::SeekableReadStream *src) override;
-
 public:
 	Graphics::Palette _palette;
 
 public:
 	PaletteResource() : TaggedResource(), _palette(nullptr, 0) {}
+	PaletteResource(const Common::String &name) : TaggedResource(),
+			_palette(nullptr, 0) {
+		load(name);
+	}
 	~PaletteResource() override {}
 
-	void clear() override;
+	void clear();
+	void load(const Common::String &name);
 };
 
 } // namespace Krondor

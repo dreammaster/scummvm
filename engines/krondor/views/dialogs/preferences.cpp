@@ -29,13 +29,9 @@ namespace Dialogs {
 
 bool Preferences::msgFocus(const FocusMessage &msg) {
 	// Dummy stuff
-	RequestResource req;
-	PaletteResource pal;
-	LabelResource lbl;
-
-	req.load("req_pref.dat");
-	pal.load("options.pal");
-	lbl.load("lbl_pref.dat");
+	RequestResource req("req_pref.dat");
+	PaletteResource pal("options.pal");
+	LabelResource lbl("lbl_pref.dat");
 
 	return true;
 }

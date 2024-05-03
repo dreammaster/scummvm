@@ -43,10 +43,13 @@ public:
 
 public:
 	LabelResource() : Resource() {}
+	LabelResource(const Common::String &name) : Resource() {
+		load(name);
+	}
 	~LabelResource() override {}
 
-	void clear() override;
-	void read(Common::SeekableReadStream *src) override;
+	void clear();
+	void load(const Common::String &name);
 };
 
 } // namespace Krondor

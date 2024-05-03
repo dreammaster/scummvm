@@ -29,9 +29,8 @@ namespace Krondor {
 
 class Rect : public Common::Rect, public Resource {
 public:
-	void clear() override;
-	void read(Common::SeekableReadStream *src) override;
-
+	void clear();
+	void read(Common::SeekableReadStream *src);
 	void write(Common::WriteStream *dest);
 	void synchronize(Common::Serializer &s);
 };

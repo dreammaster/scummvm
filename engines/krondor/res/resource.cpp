@@ -26,19 +26,7 @@
 
 namespace Krondor {
 
-void Resource::load(const Common::String &path) {
-	Common::File f;
-	if (!f.open(Common::Path(path)))
-		error("Opening file - %s", path.c_str());
-
-	readIndex(&f);
-	read(&f);
-}
-
-void TaggedResource::readIndex(Common::SeekableReadStream *src) {
-	if (!_file)
-		_file = src;
-
+void TaggedResource::loadIndex(Common::SeekableReadStream *src) {
 	for (;;) {
 		uint32 label = src->readUint32LE();
 		if (src->eos())
@@ -70,7 +58,7 @@ void TaggedResource::readIndex(Common::SeekableReadStream *src) {
 			if (size & 0x80000000) {
 				// Sub-container
 				SubStream sub(src, src->pos(), size & 0x7fffffff);
-				readIndex(&sub);
+				loadIndex(&sub);
 
 			} else {
 				// Move to next entry
@@ -86,10 +74,10 @@ void TaggedResource::readIndex(Common::SeekableReadStream *src) {
 	}
 }
 
-Common::SeekableReadStream *TaggedResource::getTag(uint32 tag) {
+Common::SeekableReadStream *TaggedResource::getTag(Common::SeekableReadStream *src, uint32 tag) {
 	if (_tags.contains(tag)) {
-		_file->seek(_tags[tag]._offset);
-		return _file->readStream(_tags[tag]._size);
+		src->seek(_tags[tag]._offset);
+		return src->readStream(_tags[tag]._size);
 	}
 
 	return nullptr;

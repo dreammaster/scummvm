@@ -30,23 +30,24 @@ void RequestResource::clear() {
 	_data.clear();
 }
 
-void RequestResource::read(Common::SeekableReadStream *src) {
+void RequestResource::load(const Common::String &name) {
 	clear();
+	File f(name);
 
-	src->skip(2);
-	_popup = src->readSint16LE() != 0;
-	src->skip(2);
-	_rect.read(src);
+	f.skip(2);
+	_popup = f.readSint16LE() != 0;
+	f.skip(2);
+	_rect.read(&f);
 
-	src->skip(2);
-	_xoff = src->readSint16LE();
-	_yoff = src->readSint16LE();
-	src->skip(2);
-	src->skip(2);
-	src->skip(2);
-	src->skip(2);
+	f.skip(2);
+	_xoff = f.readSint16LE();
+	_yoff = f.readSint16LE();
+	f.skip(2);
+	f.skip(2);
+	f.skip(2);
+	f.skip(2);
 
-	uint numRecords = src->readUint16LE();
+	uint numRecords = f.readUint16LE();
 	Common::Array<int> offsets;
 	offsets.resize(numRecords);
 	_data.resize(numRecords);
@@ -54,33 +55,33 @@ void RequestResource::read(Common::SeekableReadStream *src) {
 	for (uint i = 0; i < numRecords; i++) {
 		RequestData &rd = _data[i];
 
-		rd._widget = src->readUint16LE();
-		rd._action = src->readSint16LE();
-		rd._visible = (src->readByte() != 0);
-		src->skip(2);
-		src->skip(2);
-		src->skip(2);
-		rd._xpos = src->readSint16LE();
-		rd._ypos = src->readSint16LE();
-		rd._width = src->readUint16LE();
-		rd._height = src->readUint16LE();
-		src->skip(2);
-		offsets[i] = src->readSint16LE();
-		rd._teleport = src->readSint16LE();
-		rd._image = src->readUint16LE();
+		rd._widget = f.readUint16LE();
+		rd._action = f.readSint16LE();
+		rd._visible = (f.readByte() != 0);
+		f.skip(2);
+		f.skip(2);
+		f.skip(2);
+		rd._xpos = f.readSint16LE();
+		rd._ypos = f.readSint16LE();
+		rd._width = f.readUint16LE();
+		rd._height = f.readUint16LE();
+		f.skip(2);
+		offsets[i] = f.readSint16LE();
+		rd._teleport = f.readSint16LE();
+		rd._image = f.readUint16LE();
 		rd._image = (rd._image >> 1) + (rd._image & 1);
-		src->skip(2);
-		rd._group = src->readUint16LE();
-		src->skip(2);
+		f.skip(2);
+		rd._group = f.readUint16LE();
+		f.skip(2);
 	}
 
-	src->skip(2);
-	uint start = src->pos();
+	f.skip(2);
+	uint start = f.pos();
 
 	for (uint i = 0; i < numRecords; i++) {
 		if (offsets[i] >= 0) {
-			src->seek(start + offsets[i]);
-			_data[i]._label = src->readString();
+			f.seek(start + offsets[i]);
+			_data[i]._label = f.readString();
 		}
 	}
 }

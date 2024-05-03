@@ -24,6 +24,7 @@
 
 #include "common/hashmap.h"
 #include "common/serializer.h"
+#include "krondor/files/file.h"
 
 namespace Krondor {
 
@@ -51,16 +52,9 @@ enum {
 
 
 class Resource {
-protected:
-	virtual void readIndex(Common::SeekableReadStream *src) {}
-	virtual void read(Common::SeekableReadStream *src) = 0;
-
 public:
 	Resource() {}
 	virtual ~Resource() {}
-	void load(const Common::String &name);
-
-	virtual void clear() {}
 };
 
 class TaggedResource : public Resource {
@@ -99,16 +93,15 @@ class TaggedResource : public Resource {
 		TagEntry(uint offset, uint size) : _offset(offset), _size(size) {}
 	};
 private:
-	Common::SeekableReadStream *_file = nullptr;
 	Common::HashMap<uint32, TagEntry> _tags;
 
 protected:
 	/**
 	 * Returns a sub-stream for the tag we're interested in
 	 */
-	Common::SeekableReadStream *getTag(uint32 tag);
+	Common::SeekableReadStream *getTag(Common::SeekableReadStream *src, uint32 tag);
 
-	void readIndex(Common::SeekableReadStream *src) override;
+	void loadIndex(Common::SeekableReadStream *src);
 
 public:
 	TaggedResource() : Resource() {}

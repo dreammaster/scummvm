@@ -23,10 +23,13 @@
 
 namespace Krondor {
 
-//void FontResource::clear() {}
+void FontResource::clear() {
+}
 
-void FontResource::read(Common::SeekableReadStream *src) {
+void FontResource::load(const Common::String &name) {
 	clear();
+	File f(name);
+	loadIndex(&f);
 
 }
 

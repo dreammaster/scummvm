@@ -30,9 +30,13 @@ namespace Krondor {
 class FontResource : public TaggedResource, public Graphics::Font {
 public:
 	FontResource() : TaggedResource(), Graphics::Font() {}
+	FontResource(const Common::String &name) : TaggedResource(), Graphics::Font() {
+		load(name);
+	}
 	~FontResource() override {}
 
-	void read(Common::SeekableReadStream *src) override;
+	void clear();
+	void load(const Common::String &name);
 
 	int getFontHeight() const override;
 	int getCharWidth(uint32 chr) const;

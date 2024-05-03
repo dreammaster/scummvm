@@ -27,8 +27,12 @@ void PaletteResource::clear() {
 	_palette.clear();
 }
 
-void PaletteResource::read(Common::SeekableReadStream *src) {
-	Common::SeekableReadStream *tag = getTag(TAG_VGA);
+void PaletteResource::load(const Common::String &name) {
+	clear();
+	File f(name);
+	loadIndex(&f);
+
+	Common::SeekableReadStream *tag = getTag(&f, TAG_VGA);
 	assert(tag);
 
 	// Load and convert the palette bytes

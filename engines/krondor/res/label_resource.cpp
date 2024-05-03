@@ -27,29 +27,30 @@ void LabelResource::clear() {
 	_data.clear();
 }
 
-void LabelResource::read(Common::SeekableReadStream *src) {
+void LabelResource::load(const Common::String &name) {
 	clear();
+	File f(name);
 
-	_data.resize(src->readUint16LE());
+	_data.resize(f.readUint16LE());
 	Common::Array<int> offsets(_data.size());
 
 	for (uint i = 0; i < _data.size(); ++i) {
 		LabelData &lbl = _data[i];
-        offsets[i] = src->readSint16LE();
-        lbl._xpos = src->readSint16LE();
-        lbl._ypos = src->readSint16LE();
-        lbl._type = src->readSint16LE();
-        lbl._color = src->readSByte();
-        lbl._shadow = src->readSByte();
+        offsets[i] = f.readSint16LE();
+        lbl._xpos = f.readSint16LE();
+        lbl._ypos = f.readSint16LE();
+        lbl._type = f.readSint16LE();
+        lbl._color = f.readSByte();
+        lbl._shadow = f.readSByte();
     }
 
-	src->skip(2);
-    uint start = src->pos();
+	f.skip(2);
+    uint start = f.pos();
 
 	for (uint i = 0; i < _data.size(); i++) {
         if (offsets[i] >= 0) {
-            src->seek(start + offsets[i]);
-            _data[i]._label = src->readString();
+            f.seek(start + offsets[i]);
+            _data[i]._label = f.readString();
         }
     }
 }
