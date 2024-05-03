@@ -27,6 +27,12 @@
 
 namespace Krondor {
 
+enum CompressionType {
+	COMPRESSION_LZW = 0,
+	COMPRESSION_LZSS = 1,
+	COMPRESSION_RLE = 2
+};
+
 class File : public Common::File {
 public:
 	File() : Common::File() {}
@@ -62,6 +68,8 @@ public:
 	Common::SeekableReadStream *decompressLZSS() {
 		return DecompressLZSS(this).decompress();
 	}
+
+	Common::SeekableReadStream *decompress(CompressionType compression);
 };
 
 } // namespace Krondor

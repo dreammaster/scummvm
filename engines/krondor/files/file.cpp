@@ -32,4 +32,19 @@ bool File::open(const Common::Path &path) {
 	return true;
 }
 
+Common::SeekableReadStream *File::decompress(CompressionType compression) {
+	switch (compression) {
+	case COMPRESSION_LZW:
+		if (readByte() != 2)
+			error("Invalid lzw");
+		return decompressLZW();
+
+	case COMPRESSION_LZSS:
+		return decompressLZSS();
+
+	case COMPRESSION_RLE:
+		return decompressRLE();
+	}
+}
+
 } // namespace Krondor

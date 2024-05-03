@@ -30,8 +30,16 @@
 namespace Krondor {
 
 class ImageResource : public Resource {
+	enum ImageFlag {
+		FLAG_XYSWAPPED = 0x20,
+		FLAG_UNKNOWN = 0x40,
+		FLAG_COMPRESSED = 0x80
+	};
 public:
 	Common::Array<Graphics::ManagedSurface> _images;
+
+	void loadImage(Graphics::ManagedSurface &surface, uint flags,
+		Common::SeekableReadStream *src);
 
 public:
 	ImageResource() : Resource() {}
