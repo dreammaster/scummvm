@@ -49,6 +49,7 @@ enum {
 	TAG_VGA = 0x3a414756
 };
 
+
 class Resource {
 protected:
 	virtual void readIndex(Common::SeekableReadStream *src) {}

@@ -19,45 +19,27 @@
  *
  */
 
-#include "common/system.h"
-#include "krondor/views/dialogs/preferences.h"
-#include "krondor/res/resources.h"
+#ifndef KRONDOR_RES_FONT_RESOURCE_H
+#define KRONDOR_RES_FONT_RESOURCE_H
+
+#include "graphics/font.h"
+#include "krondor/res/resource.h"
 
 namespace Krondor {
-namespace Views {
-namespace Dialogs {
 
-bool Preferences::msgFocus(const FocusMessage &msg) {
-	// Dummy stuff
-	RequestResource req;
-	PaletteResource pal;
-	LabelResource lbl;
+class FontResource : public TaggedResource, public Graphics::Font {
+public:
+	FontResource() : TaggedResource(), Graphics::Font() {}
+	~FontResource() override {}
 
-	req.load("req_pref.dat");
-	pal.load("options.pal");
-	lbl.load("lbl_pref.dat");
+	void read(Common::SeekableReadStream *src) override;
 
-	return true;
-}
+	int getFontHeight() const override;
+	int getCharWidth(uint32 chr) const;
+	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
 
-bool Preferences::msgKeypress(const KeypressMessage &msg) {
-	// Any keypress to close the view
-	close();
-	return true;
-}
+};
 
-void Preferences::draw() {
-	// Draw a bunch of squares on screen
-	Graphics::ManagedSurface s = getSurface();
-
-	for (int i = 0; i < 100; ++i)
-		s.frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
-}
-
-bool Preferences::tick() {
-	return true;
-}
-
-} // namespace Dialogs
-} // namespace Views
 } // namespace Krondor
+
+#endif

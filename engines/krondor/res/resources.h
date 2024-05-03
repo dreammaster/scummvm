@@ -19,45 +19,12 @@
  *
  */
 
-#include "common/system.h"
-#include "krondor/views/dialogs/preferences.h"
-#include "krondor/res/resources.h"
+#ifndef KRONDOR_RES_RESOURCES_H
+#define KRONDOR_RES_RESOURCES_H
 
-namespace Krondor {
-namespace Views {
-namespace Dialogs {
+#include "krondor/res/font_resource.h"
+#include "krondor/res/label_resource.h"
+#include "krondor/res/request_resource.h"
+#include "krondor/res/palette_resource.h"
 
-bool Preferences::msgFocus(const FocusMessage &msg) {
-	// Dummy stuff
-	RequestResource req;
-	PaletteResource pal;
-	LabelResource lbl;
-
-	req.load("req_pref.dat");
-	pal.load("options.pal");
-	lbl.load("lbl_pref.dat");
-
-	return true;
-}
-
-bool Preferences::msgKeypress(const KeypressMessage &msg) {
-	// Any keypress to close the view
-	close();
-	return true;
-}
-
-void Preferences::draw() {
-	// Draw a bunch of squares on screen
-	Graphics::ManagedSurface s = getSurface();
-
-	for (int i = 0; i < 100; ++i)
-		s.frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
-}
-
-bool Preferences::tick() {
-	return true;
-}
-
-} // namespace Dialogs
-} // namespace Views
-} // namespace Krondor
+#endif
