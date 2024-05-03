@@ -9,11 +9,13 @@ MODULE_OBJS = \
 	files/file.o \
 	files/resource_archive.o \
 	res/rect.o \
+	res/resource.o \
 	res/font_resource.o \
+	res/image_resource.o \
 	res/label_resource.o \
 	res/palette_resource.o \
 	res/request_resource.o \
-	res/resource.o \
+	res/screen_resource.o \
 	views/view.o \
 	views/view1.o \
 	views/dialogs/preferences.o

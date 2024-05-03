@@ -19,14 +19,19 @@
  *
  */
 
-#ifndef KRONDOR_RES_RESOURCES_H
-#define KRONDOR_RES_RESOURCES_H
-
-#include "krondor/res/font_resource.h"
-#include "krondor/res/image_resource.h"
-#include "krondor/res/label_resource.h"
-#include "krondor/res/palette_resource.h"
-#include "krondor/res/request_resource.h"
 #include "krondor/res/screen_resource.h"
 
-#endif
+namespace Krondor {
+
+void ScreenResource::clear() {
+	_image.clear();
+}
+
+void ScreenResource::load(const Common::String &name) {
+	clear();
+	File f(name);
+
+	// TODO
+}
+
+} // namespace Krondor

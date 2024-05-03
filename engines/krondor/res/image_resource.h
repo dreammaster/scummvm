@@ -19,14 +19,31 @@
  *
  */
 
-#ifndef KRONDOR_RES_RESOURCES_H
-#define KRONDOR_RES_RESOURCES_H
+#ifndef KRONDOR_RES_IMAGE_RESOURCE_H
+#define KRONDOR_RES_IMAGE_RESOURCE_H
 
-#include "krondor/res/font_resource.h"
-#include "krondor/res/image_resource.h"
-#include "krondor/res/label_resource.h"
-#include "krondor/res/palette_resource.h"
-#include "krondor/res/request_resource.h"
-#include "krondor/res/screen_resource.h"
+#include "common/array.h"
+#include "graphics/managed_surface.h"
+#include "krondor/res/resource.h"
+#include "krondor/res/rect.h"
+
+namespace Krondor {
+
+class ImageResource : public Resource {
+public:
+	Common::Array<Graphics::ManagedSurface> _images;
+
+public:
+	ImageResource() : Resource() {}
+	ImageResource(const Common::String &name) : Resource() {
+		load(name);
+	}
+	~ImageResource() override {}
+
+	void clear();
+	void load(const Common::String &name);
+};
+
+} // namespace Krondor
 
 #endif
