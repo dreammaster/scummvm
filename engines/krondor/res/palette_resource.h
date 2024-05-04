@@ -28,14 +28,11 @@
 
 namespace Krondor {
 
-class PaletteResource : public TaggedResource {
+class PaletteResource : public TaggedResource, public Graphics::Palette {
 public:
-	Graphics::Palette _palette;
-
-public:
-	PaletteResource() : TaggedResource(), _palette(nullptr, 0) {}
+	PaletteResource() : TaggedResource(), Graphics::Palette(nullptr, 0) {}
 	PaletteResource(const Common::String &name) : TaggedResource(),
-			_palette(nullptr, 0) {
+			Graphics::Palette(nullptr, 0) {
 		load(name);
 	}
 	~PaletteResource() override {}

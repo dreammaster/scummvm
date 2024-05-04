@@ -28,15 +28,15 @@ namespace Krondor {
 #define CODE_TABLE_SIZE 4096
 
 DecompressRLE::DecompressRLE(Common::SeekableReadStream *src) {
-	uint32 size = src->readUint32LE();
-	_src = src->readStream(size);
+	_decompressedSize = src->readUint32LE();
+	_src = src;
 }
 
 Common::SeekableReadStream *DecompressRLE::decompress() {
 	Common::MemoryWriteStreamDynamic buf(DisposeAfterUse::NO);
 	uint control, val, i;
 
-	while (!_src->eos()) {
+	while (!_src->eos() && buf.size() < _decompressedSize) {
 		control = _src->readByte();
 		if (control & 0x80) {
 			// Repeat following byte number of times
@@ -55,32 +55,30 @@ Common::SeekableReadStream *DecompressRLE::decompress() {
 
 
 DecompressLZSS::DecompressLZSS(Common::SeekableReadStream *src) {
-	uint32 size = src->readUint32LE();
-	_srcData.resize(size);
-	src->read(&_srcData[0], size);
+	_decompressedSize = src->readUint32LE();
 }
 
 Common::SeekableReadStream *DecompressLZSS::decompress() {
 	uint8 code = 0, mask = 0;
-	Common::MemoryReadStream src(&_srcData[0], _srcData.size());
+	//Common::MemoryReadStream src(&_srcData[0], _srcData.size());
 	Common::MemoryWriteStreamDynamic buf(DisposeAfterUse::NO);
 
-	while (!src.eos()) {
+	while (!_src->eos() && buf.size() < _decompressedSize) {
 		if (!mask) {
-			code = src.readByte();
+			code = _src->readByte();
 			mask = 0x01;
 		}
 
 		if (code & mask) {
-			buf.writeByte(src.readByte());
+			buf.writeByte(_src->readByte());
 
 		} else {
-			uint off = src.readUint16LE();
-			uint len = src.readByte() + 5;
+			uint off = _src->readUint16LE();
+			uint len = _src->readByte() + 5;
 
 			buf.seek(off);
 			for (uint i = 0; i < len; ++i)
-				buf.writeByte(_srcData[off + i]);
+				buf.writeByte(*(buf.getData() + off + i));
 		}
 
 		mask <<= 1;
@@ -91,8 +89,8 @@ Common::SeekableReadStream *DecompressLZSS::decompress() {
 
 
 DecompressLZW::DecompressLZW(Common::SeekableReadStream *src) {
-	uint32 size = src->readUint32LE();
-	_src = src->readStream(size);
+	_src = src;
+	_decompressedSize = src->readUint32LE();
 }
 
 Common::SeekableReadStream *DecompressLZW::decompress() {
@@ -111,7 +109,7 @@ Common::SeekableReadStream *DecompressLZW::decompress() {
 	Common::MemoryWriteStreamDynamic buf(DisposeAfterUse::NO);
 	buf.writeByte(oldcode);
 
-	while (_src->eos()) {
+	while (!_src->eos() && buf.size() < _decompressedSize) {
 		uint newcode = getBits(n_bits);
 		bitpos += n_bits;
 		if (newcode == 256) {
@@ -122,13 +120,12 @@ Common::SeekableReadStream *DecompressLZW::decompress() {
 			bitpos = 0;
 		} else {
 			uint code = newcode;
-			if (code >= free_entry)
-			{
+			if (code >= free_entry) {
 				*stackptr++ = lastbyte;
 				code = oldcode;
 			}
-			while (code >= 256)
-			{
+			while (code >= 256) {
+				assert(code < CODE_TABLE_SIZE);
 				*stackptr++ = codetable[code]._append;
 				code = codetable[code]._prefix;
 			}

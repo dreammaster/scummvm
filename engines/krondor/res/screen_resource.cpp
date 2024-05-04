@@ -25,21 +25,23 @@
 namespace Krondor {
 
 void ScreenResource::clear() {
-	_image.clear();
+	Graphics::ManagedSurface::clear();
 }
 
 void ScreenResource::load(const Common::String &name) {
 	clear();
 	File f(name);
 
-	if (f.readUint16LE() != 0x27b6 || f.readByte() == 2)
+	if (f.readUint16LE() != 0x27b6)
+		f.seek(-2, SEEK_CUR);
+	if (f.readByte() != 2)
 		error("Screen data corruption");
 
 	Common::SeekableReadStream *pixels = f.decompressLZW();
 	assert(pixels && pixels->size() == (SCREEN_WIDTH * SCREEN_HEIGHT));
 
-	_image.create(SCREEN_WIDTH, SCREEN_HEIGHT, Graphics::PixelFormat::createFormatCLUT8());
-	pixels->read((byte *)_image.getPixels(), pixels->size());
+	create(SCREEN_WIDTH, SCREEN_HEIGHT, Graphics::PixelFormat::createFormatCLUT8());
+	pixels->read((byte *)getPixels(), pixels->size());
 
 	delete pixels;
 }

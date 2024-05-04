@@ -20,6 +20,7 @@
  */
 
 #include "common/system.h"
+#include "graphics/paletteman.h"
 #include "krondor/views/dialogs/preferences.h"
 #include "krondor/res/resources.h"
 
@@ -28,12 +29,6 @@ namespace Views {
 namespace Dialogs {
 
 bool Preferences::msgFocus(const FocusMessage &msg) {
-	// Dummy stuff
-	RequestResource req("req_pref.dat");
-	PaletteResource pal("options.pal");
-	LabelResource lbl("lbl_pref.dat");
-	FontResource fnt("game.fnt");
-
 	return true;
 }
 
@@ -47,8 +42,15 @@ void Preferences::draw() {
 	// Draw a bunch of squares on screen
 	Graphics::ManagedSurface s = getSurface();
 
-	for (int i = 0; i < 100; ++i)
-		s.frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
+	// Dummy stuff
+	RequestResource req("req_pref.dat");
+	PaletteResource pal("options.pal");
+	LabelResource lbl("lbl_pref.dat");
+	FontResource fnt("game.fnt");
+	ScreenResource screen("options2.scx");
+
+	g_system->getPaletteManager()->setPalette(pal.data(), 0, pal.size());
+	s.blitFrom(screen);
 }
 
 bool Preferences::tick() {

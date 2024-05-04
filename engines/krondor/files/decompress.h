@@ -28,7 +28,8 @@ namespace Krondor {
 
 class DecompressRLE {
 private:
-	Common::SeekableReadStream *_src;
+	Common::SeekableReadStream *_src = nullptr;
+	size_t _decompressedSize = 0;
 
 public:
 	DecompressRLE(Common::SeekableReadStream *src);
@@ -38,7 +39,8 @@ public:
 
 class DecompressLZSS {
 private:
-	Common::Array<byte> _srcData;
+	Common::SeekableReadStream *_src = nullptr;
+	size_t _decompressedSize = 0;
 
 public:
 	DecompressLZSS(Common::SeekableReadStream *src);
@@ -53,7 +55,8 @@ class DecompressLZW {
 	};
 private:
 	Common::SeekableReadStream *_src;
-	int _nextBit = 8;
+	size_t _decompressedSize = 0;
+	int _nextBit = 0;
 	byte _currentByte = 0;
 
 	uint getBits(uint numBits);

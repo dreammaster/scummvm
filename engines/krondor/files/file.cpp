@@ -42,7 +42,7 @@ Common::SeekableReadStream *File::decompress(CompressionType compression) {
 	case COMPRESSION_LZSS:
 		return decompressLZSS();
 
-	case COMPRESSION_RLE:
+	default:
 		return decompressRLE();
 	}
 }

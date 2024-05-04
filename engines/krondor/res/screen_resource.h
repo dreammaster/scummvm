@@ -27,10 +27,7 @@
 
 namespace Krondor {
 
-class ScreenResource : public Resource {
-public:
-	Graphics::ManagedSurface _image;
-
+class ScreenResource : public Resource, public Graphics::ManagedSurface {
 public:
 	ScreenResource() : Resource() {}
 	ScreenResource(const Common::String &name) : Resource() {

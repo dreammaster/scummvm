@@ -24,7 +24,7 @@
 namespace Krondor {
 
 void PaletteResource::clear() {
-	_palette.clear();
+	Graphics::Palette::clear();
 }
 
 void PaletteResource::load(const Common::String &name) {
@@ -44,7 +44,7 @@ void PaletteResource::load(const Common::String &name) {
 		data[i] = data[i] << 2;
 
 	// Set the palette contents
-	_palette = Graphics::Palette(&data[0], data.size() / 3);	 
+	*static_cast<Graphics::Palette *>(this) = Graphics::Palette(&data[0], data.size() / 3);
 }
 
 } // namespace Krondor
