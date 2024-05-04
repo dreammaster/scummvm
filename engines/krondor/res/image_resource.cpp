@@ -41,7 +41,7 @@ void ImageResource::load(const Common::String &name) {
 	_images.resize(numImages);
 
 	f.skip(2);
-	/*uint size =*/ f.readUint32LE();
+	int size = f.readUint32LE();
 
 	for (uint i = 0; i < numImages; i++) {
 		imageSize[i] = (uint)f.readUint16LE();
@@ -52,7 +52,7 @@ void ImageResource::load(const Common::String &name) {
 		_images[i].create(width, height);
 	}
 
-	Common::SeekableReadStream *decompressed = f.decompress(compression);
+	Common::SeekableReadStream *decompressed = f.decompress(compression, size);
 
 	for (uint i = 0; i < numImages; i++) {
 		Common::SeekableReadStream *frameSrc = decompressed->readStream(imageSize[i]);

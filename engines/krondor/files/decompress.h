@@ -32,7 +32,7 @@ private:
 	size_t _decompressedSize = 0;
 
 public:
-	DecompressRLE(Common::SeekableReadStream *src);
+	DecompressRLE(Common::SeekableReadStream *src, int destSize = -1);
 
 	Common::SeekableReadStream *decompress();
 };
@@ -43,15 +43,15 @@ private:
 	size_t _decompressedSize = 0;
 
 public:
-	DecompressLZSS(Common::SeekableReadStream *src);
+	DecompressLZSS(Common::SeekableReadStream *src, int destSize = -1);
 
 	Common::SeekableReadStream *decompress();
 };
 
 class DecompressLZW {
 	struct CodeTableEntry {
-		uint16 _prefix;
-		uint8 _append;
+		uint16 _prefix = 0;
+		uint8 _append = 0;
 	};
 private:
 	Common::SeekableReadStream *_src;
@@ -63,7 +63,7 @@ private:
 	void skipBits();
 
 public:
-	DecompressLZW(Common::SeekableReadStream *src);
+	DecompressLZW(Common::SeekableReadStream *src, int destSize = -1);
 
 	Common::SeekableReadStream *decompress();
 };

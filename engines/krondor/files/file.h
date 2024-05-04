@@ -51,25 +51,26 @@ public:
 	/**
 	 * Do a RLE decompression of a stream
 	 */
-	Common::SeekableReadStream *decompressRLE() {
-		return DecompressRLE(this).decompress();
+	Common::SeekableReadStream *decompressRLE(int destSize = -1) {
+		return DecompressRLE(this, destSize).decompress();
 	}
 
 	/**
 	 * Do a LZW decompression of a stream
 	 */
-	Common::SeekableReadStream *decompressLZW() {
-		return DecompressLZW(this).decompress();
+	Common::SeekableReadStream *decompressLZW(int destSize = -1) {
+		return DecompressLZW(this, destSize).decompress();
 	}
 
 	/**
 	 * Do a LZSS decompression of a stream
 	 */
-	Common::SeekableReadStream *decompressLZSS() {
-		return DecompressLZSS(this).decompress();
+	Common::SeekableReadStream *decompressLZSS(int destSize = -1) {
+		return DecompressLZSS(this, destSize).decompress();
 	}
 
-	Common::SeekableReadStream *decompress(CompressionType compression);
+	Common::SeekableReadStream *decompress(
+		CompressionType compression, int destSize = -1);
 };
 
 } // namespace Krondor

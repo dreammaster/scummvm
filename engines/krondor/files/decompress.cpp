@@ -27,9 +27,9 @@ namespace Krondor {
 
 #define CODE_TABLE_SIZE 4096
 
-DecompressRLE::DecompressRLE(Common::SeekableReadStream *src) {
-	_decompressedSize = src->readUint32LE();
+DecompressRLE::DecompressRLE(Common::SeekableReadStream *src, int destSize) {
 	_src = src;
+	_decompressedSize = (destSize != -1) ? destSize : src->readUint32LE();
 }
 
 Common::SeekableReadStream *DecompressRLE::decompress() {
@@ -54,8 +54,9 @@ Common::SeekableReadStream *DecompressRLE::decompress() {
 }
 
 
-DecompressLZSS::DecompressLZSS(Common::SeekableReadStream *src) {
-	_decompressedSize = src->readUint32LE();
+DecompressLZSS::DecompressLZSS(Common::SeekableReadStream *src, int destSize) {
+	_src = src;
+	_decompressedSize = (destSize != -1) ? destSize : src->readUint32LE();
 }
 
 Common::SeekableReadStream *DecompressLZSS::decompress() {
@@ -88,72 +89,70 @@ Common::SeekableReadStream *DecompressLZSS::decompress() {
 }
 
 
-DecompressLZW::DecompressLZW(Common::SeekableReadStream *src) {
+DecompressLZW::DecompressLZW(Common::SeekableReadStream *src, int destSize) {
 	_src = src;
-	_decompressedSize = src->readUint32LE();
+	_decompressedSize = (destSize != -1) ? destSize :
+		src->readUint32LE();
 }
 
 Common::SeekableReadStream *DecompressLZW::decompress() {
-	CodeTableEntry *codetable = new CodeTableEntry[CODE_TABLE_SIZE];
-	uint8 *decodestack = new uint8[CODE_TABLE_SIZE];
-	uint8 *stackptr = decodestack;
+	Common::Array<CodeTableEntry> codeTable(CODE_TABLE_SIZE);
+	Common::Array<uint8> decodeStack(CODE_TABLE_SIZE);
+	uint8 *stackPtr = &decodeStack[0];
 	uint n_bits = 9;
-	uint free_entry = 257;
-	uint oldcode = getBits(n_bits);
-	uint lastbyte = oldcode;
-	uint bitpos = 0;
+	uint freeEntry = 257;
+	uint bitPos = 0;
 
 	_nextBit = 0;
 	_currentByte = _src->readByte();
+	uint oldcode = getBits(n_bits);
+	uint lastbyte = oldcode;
 
 	Common::MemoryWriteStreamDynamic buf(DisposeAfterUse::NO);
 	buf.writeByte(oldcode);
 
 	while (!_src->eos() && buf.size() < _decompressedSize) {
 		uint newcode = getBits(n_bits);
-		bitpos += n_bits;
+		bitPos += n_bits;
 		if (newcode == 256) {
 			skipBits();
-			_src->skip((((bitpos - 1) + ((n_bits << 3) - (bitpos - 1 + (n_bits << 3)) % (n_bits << 3))) - bitpos) >> 3);
+			_src->skip((((bitPos - 1) + ((n_bits << 3) - (bitPos - 1 + (n_bits << 3)) % (n_bits << 3))) - bitPos) >> 3);
 			n_bits = 9;
-			free_entry = 256;
-			bitpos = 0;
+			freeEntry = 256;
+			bitPos = 0;
 		} else {
 			uint code = newcode;
-			if (code >= free_entry) {
-				*stackptr++ = lastbyte;
+			if (code >= freeEntry) {
+				*stackPtr++ = lastbyte;
 				code = oldcode;
 			}
 			while (code >= 256) {
 				assert(code < CODE_TABLE_SIZE);
-				*stackptr++ = codetable[code]._append;
-				code = codetable[code]._prefix;
+				*stackPtr++ = codeTable[code]._append;
+				code = codeTable[code]._prefix;
 			}
 
-			*stackptr++ = code;
+			*stackPtr++ = code;
 			lastbyte = code;
 
-			while (stackptr > decodestack) {
-				buf.writeByte(*--stackptr);
+			while (stackPtr > &decodeStack[0]) {
+				buf.writeByte(*--stackPtr);
 			}
 
-			if (free_entry < CODE_TABLE_SIZE) {
-				codetable[free_entry]._prefix = oldcode;
-				codetable[free_entry]._append = lastbyte;
-				free_entry++;
+			if (freeEntry < CODE_TABLE_SIZE) {
+				codeTable[freeEntry]._prefix = oldcode;
+				codeTable[freeEntry]._append = lastbyte;
+				freeEntry++;
 
-				if ((free_entry >= (unsigned int)(1 << n_bits)) && (n_bits < 12)) {
+				if ((freeEntry >= (unsigned int)(1 << n_bits)) && (n_bits < 12)) {
 					n_bits++;
-					bitpos = 0;
+					bitPos = 0;
 				}
 			}
 
 			oldcode = newcode;
 		}
 	}
-
-	delete[] decodestack;
-	delete[] codetable;
 
 	return new Common::MemoryReadStream(buf.getData(), buf.size(), DisposeAfterUse::YES);
 }
