@@ -116,7 +116,11 @@ Common::SeekableReadStream *DecompressLZW::decompress() {
 		bitPos += n_bits;
 		if (newcode == 256) {
 			skipBits();
-			_src->skip((((bitPos - 1) + ((n_bits << 3) - (bitPos - 1 + (n_bits << 3)) % (n_bits << 3))) - bitPos) >> 3);
+
+			int bytesToSkip = (((bitPos - 1) + ((n_bits << 3) - (bitPos - 1 + (n_bits << 3)) % (n_bits << 3))) - bitPos) >> 3;
+			_src->skip(bytesToSkip - 1);
+			_currentByte = _src->readByte();
+
 			n_bits = 9;
 			freeEntry = 256;
 			bitPos = 0;
