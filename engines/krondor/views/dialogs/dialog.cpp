@@ -35,6 +35,7 @@ bool Dialog::msgFocus(const FocusMessage &msg) {
 	_font.load(_fontName);
 	_label.load(_labelName);
 
+
 	return true;
 }
 
@@ -45,6 +46,11 @@ bool Dialog::msgUnfocus(const UnfocusMessage &msg) {
 	_normal.clear();
 	_font.clear();
 	_label.clear();
+
+	// Remove added children controls
+	for (auto *child : _children)
+		delete child;
+	_children.clear();
 
 	return true;
 }
