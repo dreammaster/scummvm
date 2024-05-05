@@ -9,6 +9,8 @@ MODULE_OBJS = \
 	files/decompress.o \
 	files/file.o \
 	files/resource_archive.o \
+	gfx/widgets/select.o \
+	gfx/widgets/text_button.o \
 	res/rect.o \
 	res/resource.o \
 	res/font_resource.o \
@@ -19,6 +21,7 @@ MODULE_OBJS = \
 	res/screen_resource.o \
 	views/view.o \
 	views/view1.o \
+	views/dialogs/dialog.o \
 	views/dialogs/preferences.o
 
 # This module can be built as a plugin

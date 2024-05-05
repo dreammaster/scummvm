@@ -21,12 +21,40 @@
 
 #include "common/system.h"
 #include "graphics/paletteman.h"
-#include "krondor/views/dialogs/preferences.h"
-#include "krondor/res/resources.h"
+#include "krondor/views/dialogs/dialog.h"
 
 namespace Krondor {
 namespace Views {
 namespace Dialogs {
+
+bool Dialog::msgFocus(const FocusMessage &msg) {
+	_request.load(_requestName);
+	_palette.load(_paletteName);
+	_screen.load(_screenName);
+	_normal.load(_normalName);
+	_font.load(_fontName);
+	_label.load(_labelName);
+
+	return true;
+}
+
+bool Dialog::msgUnfocus(const UnfocusMessage &msg) {
+	_request.clear();
+	_palette.clear();
+	_screen.clear();
+	_normal.clear();
+	_font.clear();
+	_label.clear();
+
+	return true;
+}
+
+void Dialog::draw() {
+	Graphics::ManagedSurface s = getSurface();
+
+	g_system->getPaletteManager()->setPalette(_palette.data(), 0, _palette.size());
+	s.blitFrom(_screen);
+}
 
 } // namespace Dialogs
 } // namespace Views

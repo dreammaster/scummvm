@@ -22,23 +22,19 @@
 #ifndef KRONDOR_VIEWS_DIALOGS_PREFERENCES_H
 #define KRONDOR_VIEWS_DIALOGS_PREFERENCES_H
 
-#include "krondor/events.h"
+#include "krondor/views/dialogs/dialog.h"
 
 namespace Krondor {
 namespace Views {
 namespace Dialogs {
 
-class Preferences : public UIElement {
+class Preferences : public Dialog {
 public:
-	Preferences() : UIElement("Preferences") {
+	Preferences() : Dialog("Preferences", "req_pref.dat", "options.pal",
+		"options2.scx", "bicons1.bmx", "game.fnt", "lbl_pref.dat") {
 	}
 	virtual ~Preferences() {
 	}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-	void draw() override;
-	bool tick() override;
 };
 
 } // namespace Dialogs

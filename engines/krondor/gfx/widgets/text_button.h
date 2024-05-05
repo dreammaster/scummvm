@@ -19,15 +19,22 @@
  *
  */
 
-#include "common/system.h"
-#include "graphics/paletteman.h"
-#include "krondor/views/dialogs/preferences.h"
-#include "krondor/res/resources.h"
+#ifndef KRONDOR_GFX_WIDGETS_TEXT_BUTTON_H
+#define KRONDOR_GFX_WIDGETS_TEXT_BUTTON_H
+
+#include "krondor/events.h"
 
 namespace Krondor {
-namespace Views {
-namespace Dialogs {
 
-} // namespace Dialogs
-} // namespace Views
+class TextButton : public UIElement {
+public:
+	TextButton() : UIElement("TextButton") {}
+	virtual ~TextButton() {}
+
+	bool msgKeypress(const KeypressMessage &msg) override;
+	void draw() override;
+};
+
 } // namespace Krondor
+
+#endif

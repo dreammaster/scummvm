@@ -19,15 +19,16 @@
  *
  */
 
-#include "common/system.h"
-#include "graphics/paletteman.h"
-#include "krondor/views/dialogs/preferences.h"
-#include "krondor/res/resources.h"
+#include "krondor/gfx/widgets/select.h"
 
 namespace Krondor {
-namespace Views {
-namespace Dialogs {
 
-} // namespace Dialogs
-} // namespace Views
+bool Select::msgKeypress(const KeypressMessage &msg) {
+	return false;
+}
+
+void Select::draw() {
+	// TODO
+}
+
 } // namespace Krondor
