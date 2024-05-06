@@ -19,10 +19,7 @@
  *
  */
 
-#include "common/system.h"
-#include "graphics/paletteman.h"
 #include "krondor/views/dialogs/preferences.h"
-#include "krondor/res/resources.h"
 
 namespace Krondor {
 namespace Views {

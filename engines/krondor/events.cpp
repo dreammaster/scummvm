@@ -28,9 +28,11 @@
 namespace Krondor {
 
 Events *g_events;
+Graphics::Font *UIElement::_currentFont;
 
 Events::Events() : UIElement("Root", nullptr) {
 	g_events = this;
+	UIElement::setFont(nullptr);
 }
 
 Events::~Events() {
@@ -317,8 +319,8 @@ void UIElement::addView() {
 	g_events->addView(this);
 }
 
-Graphics::ManagedSurface UIElement::getSurface() const {
-	return Graphics::ManagedSurface(*g_events->getScreen(), _bounds);
+GfxSurface UIElement::getSurface() const {
+	return GfxSurface(*g_events->getScreen(), _bounds);
 }
 
 int UIElement::getRandomNumber(int minNumber, int maxNumber) {

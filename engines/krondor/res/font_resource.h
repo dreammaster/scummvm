@@ -59,6 +59,7 @@ public:
 	int getMaxCharWidth() const override;
 	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
 
+	void setActive();
 };
 
 } // namespace Krondor

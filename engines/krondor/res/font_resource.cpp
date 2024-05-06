@@ -20,6 +20,7 @@
  */
 
 #include "graphics/surface.h"
+#include "krondor/events.h"
 #include "krondor/res/font_resource.h"
 
 namespace Krondor {
@@ -101,6 +102,10 @@ void FontResource::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, ui
 				*destP = color;
 		}
 	}
+}
+
+void FontResource::setActive() {
+	UIElement::setFont(this);
 }
 
 } // namespace Krondor

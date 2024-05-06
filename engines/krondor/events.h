@@ -24,8 +24,10 @@
 
 #include "common/array.h"
 #include "common/stack.h"
+#include "graphics/font.h"
 #include "graphics/screen.h"
 #include "krondor/messages.h"
+#include "krondor/gfx/gfx_surface.h"
 
 namespace Krondor {
 
@@ -33,6 +35,7 @@ namespace Krondor {
 #define FRAME_DELAY (1000 / FRAME_RATE)
 
 class Events;
+using Gfx::GfxSurface;
 
 /**
  * Implements a thunk layer around an element's bounds,
@@ -66,6 +69,8 @@ class UIElement {
 	friend class Events;
 private:
 	int _timeoutCtr = 0;
+	static Graphics::Font *_currentFont;
+
 protected:
 	UIElement *_parent;
 	Common::Array<UIElement *> _children;
@@ -114,6 +119,15 @@ private:
 	 * Finds a view globally
 	 */
 	static UIElement *findViewGlobally(const Common::String &name);
+
+public:
+	static Graphics::Font *getFont() {
+		return _currentFont;
+	}
+	static void setFont(Graphics::Font *font) {
+		_currentFont = font;
+	}
+
 public:
 	UIElement(const Common::String &name, UIElement *uiParent);
 	UIElement(const Common::String &name);
@@ -182,7 +196,7 @@ public:
 	/**
 	 * Returns a surface for drawing the element
 	 */
-	Graphics::ManagedSurface getSurface() const;
+	GfxSurface getSurface() const;
 
 	/**
 	 * Clear the surface

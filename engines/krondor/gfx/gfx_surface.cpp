@@ -19,51 +19,23 @@
  *
  */
 
-#include "common/system.h"
-#include "graphics/paletteman.h"
-#include "krondor/views/dialogs/dialog.h"
+#include "krondor/gfx/gfx_surface.h"
+#include "krondor/events.h"
 
 namespace Krondor {
-namespace Views {
-namespace Dialogs {
+namespace Gfx {
 
-bool Dialog::msgFocus(const FocusMessage &msg) {
-	_request.load(_requestName);
-	_palette.load(_paletteName);
-	_screen.load(_screenName);
-	_normal.load(_normalName);
-	_font.load(_fontName);
-	_label.load(_labelName);
-
-	_palette.setActive();
-	_font.setActive();
-
-	return true;
+void GfxSurface::writeChar(char c) {
+	writeString(Common::String::format("%c", c));
 }
 
-bool Dialog::msgUnfocus(const UnfocusMessage &msg) {
-	_request.clear();
-	_palette.clear();
-	_screen.clear();
-	_normal.clear();
-	_font.clear();
-	_label.clear();
+void GfxSurface::writeString(const Common::String &str) {
+	Graphics::Font *font = UIElement::getFont();
+	int strWidth = font->getStringWidth(str);
+	font->drawString(this, str, _textX, _textY, strWidth, _textColor);
 
-	// Remove added children controls
-	for (auto *child : _children)
-		delete child;
-	_children.clear();
-
-	return true;
+	_textX += strWidth;
 }
 
-void Dialog::draw() {
-	GfxSurface s = getSurface();
-	s.blitFrom(_screen);
-
-	s.writeString(Common::Point(50, 50), "Testing testing");
-}
-
-} // namespace Dialogs
-} // namespace Views
+} // namespace Gfx
 } // namespace Krondor

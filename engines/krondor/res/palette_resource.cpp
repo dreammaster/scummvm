@@ -19,6 +19,8 @@
  *
  */
 
+#include "common/system.h"
+#include "graphics/paletteman.h"
 #include "krondor/res/palette_resource.h"
 
 namespace Krondor {
@@ -46,5 +48,10 @@ void PaletteResource::load(const Common::String &name) {
 	// Set the palette contents
 	*static_cast<Graphics::Palette *>(this) = Graphics::Palette(&data[0], data.size() / 3);
 }
+
+void PaletteResource::setActive() {
+	g_system->getPaletteManager()->setPalette(data(), 0, size());
+}
+
 
 } // namespace Krondor

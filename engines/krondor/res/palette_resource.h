@@ -39,6 +39,8 @@ public:
 
 	void clear();
 	void load(const Common::String &name);
+
+	void setActive();
 };
 
 } // namespace Krondor
