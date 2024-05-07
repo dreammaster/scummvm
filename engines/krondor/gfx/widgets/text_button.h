@@ -22,19 +22,23 @@
 #ifndef KRONDOR_GFX_WIDGETS_TEXT_BUTTON_H
 #define KRONDOR_GFX_WIDGETS_TEXT_BUTTON_H
 
-#include "krondor/events.h"
+#include "krondor/gfx/widgets/widget.h"
 
 namespace Krondor {
+namespace Gfx {
+namespace Widgets {
 
-class TextButton : public UIElement {
+class TextButton : public Widget {
 public:
-	TextButton() : UIElement("TextButton") {}
+	TextButton(const RequestData *reqData) : Widget("TextButton", reqData) {}
 	virtual ~TextButton() {}
 
 	bool msgKeypress(const KeypressMessage &msg) override;
 	void draw() override;
 };
 
+} // namespace Widgets
+} // namespace Gfx
 } // namespace Krondor
 
 #endif

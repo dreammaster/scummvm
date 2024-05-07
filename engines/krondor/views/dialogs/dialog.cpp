@@ -22,6 +22,8 @@
 #include "common/system.h"
 #include "graphics/paletteman.h"
 #include "krondor/views/dialogs/dialog.h"
+#include "krondor/gfx/widgets/text_button.h"
+#include "krondor/gfx/widgets/select.h"
 
 namespace Krondor {
 namespace Views {
@@ -62,6 +64,17 @@ void Dialog::draw() {
 	s.blitFrom(_screen);
 
 	s.writeString(Common::Point(50, 50), "Testing testing");
+}
+
+Gfx::Widgets::Widget *Dialog::createWidget(const RequestData *reqData) {
+	switch (reqData->_widget) {
+	case REQ_TEXTBUTTON:
+		return new Gfx::Widgets::TextButton(reqData);
+	case REQ_SELECT:
+		return new Gfx::Widgets::Select(reqData);
+	default:
+		error("Invalid widget type - %d", reqData->_widget);
+	}
 }
 
 } // namespace Dialogs

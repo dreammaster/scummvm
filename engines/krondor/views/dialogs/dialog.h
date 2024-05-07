@@ -24,6 +24,7 @@
 
 #include "krondor/events.h"
 #include "krondor/res/resources.h"
+#include "krondor/gfx/widgets/widget.h"
 
 namespace Krondor {
 namespace Views {
@@ -37,12 +38,20 @@ private:
 	Common::String _normalName;
 	Common::String _fontName;
 	Common::String _labelName;
+
+protected:
 	RequestResource _request;
 	PaletteResource _palette;
 	ScreenResource _screen;
 	ImageResource _normal;
 	FontResource _font;
 	LabelResource _label;
+
+protected:
+	/**
+	 * Creates a widget based on a request data entry
+	 */
+	virtual Gfx::Widgets::Widget *createWidget(const RequestData *reqData);
 
 public:
 	Dialog(const Common::String &name,

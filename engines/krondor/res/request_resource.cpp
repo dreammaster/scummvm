@@ -25,8 +25,7 @@ namespace Krondor {
 
 void RequestResource::clear() {
 	_popup = false;
-	_rect.clear();
-	_xoff = _yoff = 0;
+	_bounds.clear();
 	_data.clear();
 }
 
@@ -37,7 +36,7 @@ void RequestResource::load(const Common::String &name) {
 	f.skip(2);
 	_popup = f.readSint16LE() != 0;
 	f.skip(2);
-	_rect.read(&f);
+	_bounds.read(&f);
 
 	f.skip(2);
 	_xoff = f.readSint16LE();
@@ -61,10 +60,7 @@ void RequestResource::load(const Common::String &name) {
 		f.skip(2);
 		f.skip(2);
 		f.skip(2);
-		rd._xpos = f.readSint16LE();
-		rd._ypos = f.readSint16LE();
-		rd._width = f.readUint16LE();
-		rd._height = f.readUint16LE();
+		rd._bounds.read(&f);
 		f.skip(2);
 		offsets[i] = f.readSint16LE();
 		rd._teleport = f.readSint16LE();

@@ -19,23 +19,23 @@
  *
  */
 
-#ifndef KRONDOR_GFX_WIDGETS_SELECT_H
-#define KRONDOR_GFX_WIDGETS_SELECT_H
+#ifndef KRONDOR_GFX_WIDGETS_WIDGET_H
+#define KRONDOR_GFX_WIDGETS_WIDGET_H
 
-#include "krondor/gfx/widgets/widget.h"
+#include "krondor/events.h"
+#include "krondor/res/request_resource.h"
 
 namespace Krondor {
 namespace Gfx {
 namespace Widgets {
 
-class Select : public Widget {
-public:
-	Select(const RequestData *reqData) : Widget("Select", reqData) {
-	}
-	virtual ~Select() {}
+class Widget : public UIElement {
+protected:
+	const RequestData *_requestData;
 
-	bool msgKeypress(const KeypressMessage &msg) override;
-	void draw() override;
+public:
+	Widget(const Common::String &name, const RequestData *reqData);
+	virtual ~Widget() {}
 };
 
 } // namespace Widgets

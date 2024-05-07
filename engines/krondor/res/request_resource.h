@@ -28,14 +28,18 @@
 
 namespace Krondor {
 
+enum RequestType {
+	REQ_USERDEFINED = 0,
+	REQ_IMAGEBUTTON = 3,
+	REQ_SELECT = 4,
+	REQ_TEXTBUTTON = 6
+};
+
 struct RequestData {
 	uint _widget = 0;
 	int _action = 0;
 	bool _visible = 0;
-	int _xpos = 0;
-	int _ypos = 0;
-	int _width = 0;
-	int _height = 0;
+	Rect _bounds;
 	int _teleport = 0;
 	int _image = 0;
 	int _group = 0;
@@ -45,7 +49,7 @@ struct RequestData {
 class RequestResource : public Resource {
 public:
 	bool _popup = false;
-	Rect _rect;
+	Rect _bounds;
 	int _xoff = 0;
 	int _yoff = 0;
 	Common::Array<RequestData> _data;

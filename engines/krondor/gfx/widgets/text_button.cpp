@@ -22,6 +22,8 @@
 #include "krondor/gfx/widgets/text_button.h"
 
 namespace Krondor {
+namespace Gfx {
+namespace Widgets {
 
 bool TextButton::msgKeypress(const KeypressMessage &msg) {
 	return false;
@@ -31,4 +33,6 @@ void TextButton::draw() {
 	// TODO
 }
 
+} // namespace Widgets
+} // namespace Gfx
 } // namespace Krondor

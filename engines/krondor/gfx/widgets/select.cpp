@@ -22,6 +22,8 @@
 #include "krondor/gfx/widgets/select.h"
 
 namespace Krondor {
+namespace Gfx {
+namespace Widgets {
 
 bool Select::msgKeypress(const KeypressMessage &msg) {
 	return false;
@@ -31,4 +33,6 @@ void Select::draw() {
 	// TODO
 }
 
+} // namespace Widgets
+} // namespace Gfx
 } // namespace Krondor

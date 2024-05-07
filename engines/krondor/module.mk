@@ -10,6 +10,7 @@ MODULE_OBJS = \
 	files/file.o \
 	files/resource_archive.o \
 	gfx/gfx_surface.o \
+	gfx/widgets/widget.o \
 	gfx/widgets/select.o \
 	gfx/widgets/text_button.o \
 	res/rect.o \
