@@ -77,6 +77,7 @@ protected:
 	Common::Rect _innerBounds;
 	Bounds _bounds;
 	bool _needsRedraw = true;
+	bool _visible = true;
 	Common::String _name;
 protected:
 	/**
@@ -160,6 +161,18 @@ public:
 	bool isFocused() const;
 
 	/**
+	 * Sets whether the element is visible
+	 */
+	void setVisible(bool visible);
+
+	/**
+	 * Gets the visibility of the element
+	 */
+	bool isVisible() const {
+		return _visible;
+	}
+
+	/**
 	 * Sets the focus to a new view
 	 */
 	void replaceView(UIElement *ui, bool replaceAllViews = false);
@@ -232,7 +245,7 @@ public:
 		virtual bool msg##NAME(const NAME##Message &e) { \
 			for (Common::Array<UIElement *>::iterator it = _children.begin(); \
 					it != _children.end(); ++it) { \
-				if ((*it)->msg##NAME(e)) return true; \
+				if ((*it)->isVisible() && (*it)->msg##NAME(e)) return true; \
 			} \
 			return false; \
 		} \
