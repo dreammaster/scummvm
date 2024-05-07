@@ -25,10 +25,6 @@ namespace Krondor {
 namespace Gfx {
 namespace Widgets {
 
-bool TextButton::msgKeypress(const KeypressMessage &msg) {
-	return false;
-}
-
 void TextButton::draw() {
 	// TODO
 }

@@ -19,21 +19,51 @@
  *
  */
 
-#ifndef KRONDOR_GFX_WIDGETS_TEXT_BUTTON_H
-#define KRONDOR_GFX_WIDGETS_TEXT_BUTTON_H
+#ifndef KRONDOR_GFX_WIDGETS_TEXT_H
+#define KRONDOR_GFX_WIDGETS_TEXT_H
 
-#include "krondor/gfx/widgets/button.h"
+#include "krondor/gfx/widgets/widget.h"
 
 namespace Krondor {
 namespace Gfx {
 namespace Widgets {
 
-class TextButton : public Button {
+enum HorizontalAlignment {
+	HA_LEFT,
+	HA_CENTER,
+	HA_RIGHT
+};
+
+enum VerticalAlignment {
+	VA_TOP,
+	VA_CENTER,
+	VA_BOTTOM
+};
+
+class Text : public UIElement {
+private:
+	Common::String _text;
+	int _textWidth = 0;
+	int _textHeight = 0;
+	int _color = 0;
+	int _shadow = 0;
+	int _shadowXoff = 0;
+	int _shadowYoff = 0;
+	HorizontalAlignment _horAlign = HA_CENTER;
+	VerticalAlignment _vertAlign = VA_CENTER;
+
 public:
-	TextButton(const RequestData *reqData) : Button(reqData) {}
-	virtual ~TextButton() {}
+	Text();
+	Text(const Common::Rect &r, const char *text = nullptr);
+	Text(int x, int y, const Common::String &text);
+	virtual ~Text() {}
 
 	void draw() override;
+
+	void setColor(const int c);
+	void setText(const Common::String &s);
+	void setShadow(const int s, const int xoff, const int yoff);
+	void setAlignment(const HorizontalAlignment ha, const VerticalAlignment va);
 };
 
 } // namespace Widgets

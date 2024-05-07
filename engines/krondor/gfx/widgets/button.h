@@ -19,21 +19,35 @@
  *
  */
 
-#ifndef KRONDOR_GFX_WIDGETS_TEXT_BUTTON_H
-#define KRONDOR_GFX_WIDGETS_TEXT_BUTTON_H
+#ifndef KRONDOR_GFX_WIDGETS_BUTTON_H
+#define KRONDOR_GFX_WIDGETS_BUTTON_H
 
-#include "krondor/gfx/widgets/button.h"
+#include "krondor/gfx/widgets/widget.h"
 
 namespace Krondor {
 namespace Gfx {
 namespace Widgets {
 
-class TextButton : public Button {
-public:
-	TextButton(const RequestData *reqData) : Button(reqData) {}
-	virtual ~TextButton() {}
+class Button : public Widget {
+private:
+	bool _pressed = false;
+	bool _enabled = true;
 
-	void draw() override;
+public:
+	Button(const RequestData *reqData) : Widget("Button", reqData) {}
+	virtual ~Button() {}
+
+	void setEnabled(bool toggle);
+	bool isEnabled() const {
+		return _enabled;
+	}
+	void setPressed(bool toggle);
+	bool isPressed() const {
+		return _pressed;
+	}
+	void reset() {
+		setPressed(false);
+	}
 };
 
 } // namespace Widgets
