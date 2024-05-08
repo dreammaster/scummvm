@@ -33,9 +33,12 @@ Text::Text(const Common::Rect &r, const char *text) : UIElement("Text") {
 	if (text)
 		setText(text);
 }
-//Common::Rect r(x, y, x + _textWidth, y + _textHeight);
-//setBounds(r);
 
+Text::Text(int x, int y, const Common::String &text) : UIElement("Text") {
+	setText(text);
+	Common::Rect r(x, y, x + _textWidth, y + _textHeight);
+	setBounds(r);
+}
 
 void Text::setText(const Common::String &s) {
 	_text = s;
@@ -96,10 +99,8 @@ void Text::draw() {
 		w = 0;
 
 		while ((i < (int)_text.size()) && (w + font->getCharWidth(_text[i]) < (int)_bounds.width())) {
-			font->drawChar(&s, _text[i],
-				_bounds.left + xoff + _shadowXoff + w,
-				_bounds.top + yoff + _shadowYoff,
-				_shadow);
+			font->drawChar(&s, _text[i], xoff + _shadowXoff + w,
+				yoff + _shadowYoff, _shadow);
 
 			w += font->getCharWidth(_text[i]);
 			i++;
@@ -109,10 +110,7 @@ void Text::draw() {
 	i = 0;
 	w = 0;
 	while ((i < (int)_text.size()) && (w + font->getCharWidth(_text[i]) < (int)_bounds.width())) {
-		font->drawChar(&s, _text[i],
-			_bounds.left + xoff + w,
-			_bounds.top + yoff,
-			_color);
+		font->drawChar(&s, _text[i], xoff + w, yoff, _color);
 		w += font->getCharWidth(_text[i]);
 		i++;
 	}

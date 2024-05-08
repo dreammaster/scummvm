@@ -348,4 +348,18 @@ void UIElement::timeout() {
 	redraw();
 }
 
+void UIElement::setBounds(const Common::Rect &r) {
+	int deltaX = r.left - _bounds.left;
+	int deltaY = r.top - _bounds.top;
+	_bounds = r;
+
+	// Shift all embedded children by the same delta
+	for (auto *child : _children) {
+		Common::Rect childBounds = child->getBounds();
+		childBounds.translate(deltaX, deltaY);
+		child->setBounds(childBounds);
+	}
+}
+
+
 } // namespace Krondor

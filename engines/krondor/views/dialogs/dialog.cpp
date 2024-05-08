@@ -40,6 +40,10 @@ bool Dialog::msgFocus(const FocusMessage &msg) {
 	_palette.setActive();
 	_font.setActive();
 
+	// Create all the request based controls
+	for (const auto &req : _request._data)
+		_children.push_back(createWidget(&req));
+
 	return true;
 }
 
@@ -62,8 +66,6 @@ bool Dialog::msgUnfocus(const UnfocusMessage &msg) {
 void Dialog::draw() {
 	GfxSurface s = getSurface();
 	s.blitFrom(_screen);
-
-	s.writeString(Common::Point(50, 50), "Testing testing");
 }
 
 Gfx::Widgets::Widget *Dialog::createWidget(const RequestData *reqData) {

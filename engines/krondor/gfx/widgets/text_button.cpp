@@ -25,8 +25,49 @@ namespace Krondor {
 namespace Gfx {
 namespace Widgets {
 
+TextButton::TextButton(const RequestData *reqData) : Button(reqData),
+		_label(Common::Rect(
+			reqData->_bounds.left + 2, reqData->_bounds.top + 2,
+			reqData->_bounds.right - 4, reqData->_bounds.bottom - 4),
+			reqData->_label.c_str()) {
+	_children.push_back(&_label);
+}
+
+TextButton::~TextButton() {
+	_children.clear();
+}
+
 void TextButton::draw() {
-	// TODO
+	GfxSurface s = getSurface();
+
+	if (isPressed()) {
+		s.clear(BUTTON_COLOR_PRESSED);
+		s.vLine(0, 0, _bounds.height() - 1, LIGHT_COLOR);
+		s.hLine(1, 0, _bounds.width() - 1, SHADOW_COLOR);
+		s.vLine(_bounds.width() - 1, 1, _bounds.height() - 2, SHADOW_COLOR);
+		s.hLine(1, _bounds.height() - 1, _bounds.width() - 1, LIGHT_COLOR);
+	} else {
+		s.clear(BUTTON_COLOR_NORMAL);
+		s.vLine(0, 0, _bounds.height() - 1, SHADOW_COLOR);
+		s.hLine(1, 0, _bounds.width() - 1, LIGHT_COLOR);
+		s.vLine(_bounds.width() - 1, 1, _bounds.height() - 2, LIGHT_COLOR);
+		s.hLine(1, _bounds.height() - 1, _bounds.width() - 1, SHADOW_COLOR);
+	}
+
+	// Update the state of the button's label. We don't need to manually draw it..
+	// it'll be drawn automatically 
+	if (isEnabled()) {
+		if (isPressed()) {
+			_label.setColor(TEXT_COLOR_PRESSED);
+			_label.setShadow(SHADOW_COLOR, 0, 1);
+		} else {
+			_label.setColor(TEXT_COLOR_NORMAL);
+			_label.setShadow(SHADOW_COLOR, 0, 1);
+		}
+	} else {
+		_label.setColor(TEXT_COLOR_DISABLED);
+		_label.setShadow(NO_SHADOW, 0, 0);
+	}
 }
 
 } // namespace Widgets

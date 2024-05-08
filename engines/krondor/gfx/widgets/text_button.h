@@ -23,15 +23,19 @@
 #define KRONDOR_GFX_WIDGETS_TEXT_BUTTON_H
 
 #include "krondor/gfx/widgets/button.h"
+#include "krondor/gfx/widgets/text.h"
 
 namespace Krondor {
 namespace Gfx {
 namespace Widgets {
 
 class TextButton : public Button {
+private:
+	Text _label;
+
 public:
-	TextButton(const RequestData *reqData) : Button(reqData) {}
-	virtual ~TextButton() {}
+	TextButton(const RequestData *reqData);
+	virtual ~TextButton();
 
 	void draw() override;
 };
