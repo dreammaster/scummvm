@@ -20,6 +20,7 @@
  */
 
 #include "krondor/gfx/widgets/text_button.h"
+#include "krondor/messages.h"
 
 namespace Krondor {
 namespace Gfx {
@@ -68,6 +69,25 @@ void TextButton::draw() {
 		_label.setColor(TEXT_COLOR_DISABLED);
 		_label.setShadow(NO_SHADOW, 0, 0);
 	}
+}
+
+bool TextButton::msgMouseDown(const MouseDownMessage &msg) {
+	if (msg._button == MouseMessage::MB_LEFT) {
+		setPressed(true);
+		//GenerateActionEvent(GetAction());
+		return true;
+	}
+
+	return false;
+}
+
+bool TextButton::msgMouseUp(const MouseUpMessage &msg) {
+	if (msg._button == MouseMessage::MB_LEFT) {
+		setPressed(false);
+		return true;
+	}
+
+	return false;
 }
 
 } // namespace Widgets

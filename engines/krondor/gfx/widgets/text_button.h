@@ -38,6 +38,8 @@ public:
 	virtual ~TextButton();
 
 	void draw() override;
+	bool msgMouseDown(const MouseDownMessage &msg) override;
+	bool msgMouseUp(const MouseUpMessage &msg) override;
 };
 
 } // namespace Widgets
