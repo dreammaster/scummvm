@@ -10,6 +10,7 @@ MODULE_OBJS = \
 	files/file.o \
 	files/resource_archive.o \
 	gfx/gfx_surface.o \
+	gfx/mouse_cursor.o \
 	gfx/widgets/widget.o \
 	gfx/widgets/button.o \
 	gfx/widgets/select.o \

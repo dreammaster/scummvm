@@ -44,6 +44,8 @@ void Events::runGame() {
 	_screen = new Graphics::Screen();
 	Views::Views views;	// Loads all views in the structure
 
+	_mouseCursors.load();
+
 	// Run the game
 	int saveSlot = ConfMan.getInt("save_slot");
 	if (saveSlot != -1)

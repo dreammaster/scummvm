@@ -28,6 +28,7 @@
 #include "graphics/screen.h"
 #include "krondor/messages.h"
 #include "krondor/gfx/gfx_surface.h"
+#include "krondor/gfx/mouse_cursor.h"
 
 namespace Krondor {
 
@@ -305,6 +306,10 @@ protected:
 	MESSAGE(MouseUp);
 	MESSAGE(MouseMove);
 	#undef MESSAGE
+
+public:
+	Gfx::MouseCursors _mouseCursors;
+
 public:
 	Events();
 	virtual ~Events();
