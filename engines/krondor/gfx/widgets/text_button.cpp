@@ -78,7 +78,7 @@ bool TextButton::msgMouseDown(const MouseDownMessage &msg) {
 		return true;
 	}
 
-	return false;
+	return Button::msgMouseDown(msg);
 }
 
 bool TextButton::msgMouseUp(const MouseUpMessage &msg) {
@@ -87,7 +87,14 @@ bool TextButton::msgMouseUp(const MouseUpMessage &msg) {
 		return true;
 	}
 
-	return false;
+	return Button::msgMouseUp(msg);
+}
+
+bool TextButton::msgUnfocus(const UnfocusMessage &msg) {
+	if (isPressed())
+		setPressed(false);
+
+	return Button::msgUnfocus(msg);
 }
 
 } // namespace Widgets

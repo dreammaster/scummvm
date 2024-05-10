@@ -25,6 +25,7 @@
 #include "krondor/events.h"
 
 namespace Krondor {
+namespace Views {
 
 /**
  * Base view class for screens and dialogs that appear on-screen.
@@ -68,6 +69,7 @@ public:
 	bool msgMouseUp(const MouseUpMessage &msg) override;
 };
 
+} // namespace Views
 } // namespace Krondor
 
 #endif

@@ -22,7 +22,7 @@
 #ifndef KRONDOR_VIEWS_DIALOGS_DIALOG_H
 #define KRONDOR_VIEWS_DIALOGS_DIALOG_H
 
-#include "krondor/events.h"
+#include "krondor/views/view.h"
 #include "krondor/res/resources.h"
 #include "krondor/gfx/widgets/widget.h"
 
@@ -30,7 +30,7 @@ namespace Krondor {
 namespace Views {
 namespace Dialogs {
 
-class Dialog : public UIElement {
+class Dialog : public View {
 private:
 	Common::String _requestName;
 	Common::String _paletteName;
@@ -58,9 +58,9 @@ public:
 		const Common::String &requestName, const Common::String &paletteName,
 		const Common::String &screenName, const Common::String &normalName,
 		const Common::String &fontName, const Common::String &labelName) :
-		UIElement(name), _requestName(requestName), _paletteName(paletteName),
-		_screenName(screenName), _normalName(normalName),
-		_fontName(fontName), _labelName(labelName) {
+			View(name), _requestName(requestName), _paletteName(paletteName),
+			_screenName(screenName), _normalName(normalName),
+			_fontName(fontName), _labelName(labelName) {
 	}
 	virtual ~Dialog() {
 	}

@@ -25,7 +25,6 @@ MODULE_OBJS = \
 	res/request_resource.o \
 	res/screen_resource.o \
 	views/view.o \
-	views/view1.o \
 	views/dialogs/dialog.o \
 	views/dialogs/preferences.o
 

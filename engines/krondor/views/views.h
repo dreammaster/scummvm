@@ -22,14 +22,12 @@
 #ifndef KRONDOR_VIEWS_H
 #define KRONDOR_VIEWS_H
 
-#include "krondor/views/view1.h"
 #include "krondor/views/dialogs/preferences.h"
 
 namespace Krondor {
 namespace Views {
 
 struct Views {
-	View1 _view1;
 	Dialogs::Preferences _preferences;
 };
 
