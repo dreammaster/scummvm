@@ -25,12 +25,18 @@ namespace Krondor {
 namespace Gfx {
 namespace Widgets {
 
-bool Select::msgKeypress(const KeypressMessage &msg) {
-	return false;
+void Select::setImage(Graphics::ManagedSurface *normal, Graphics::ManagedSurface *selected) {
+	assert(normal && selected);
+	_normal = normal;
+	_selected = selected;
 }
 
 void Select::draw() {
-	// TODO
+	bool isSelected = false; // TODO
+	Graphics::ManagedSurface *surf = isSelected ? _selected : _normal;
+
+	GfxSurface s = getSurface();
+	s.blitFrom(*surf);
 }
 
 } // namespace Widgets

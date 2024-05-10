@@ -24,6 +24,7 @@
 #include "krondor/views/dialogs/dialog.h"
 #include "krondor/gfx/widgets/text_button.h"
 #include "krondor/gfx/widgets/select.h"
+#include "krondor/gfx/widgets/text.h"
 
 namespace Krondor {
 namespace Views {
@@ -43,6 +44,10 @@ bool Dialog::msgFocus(const FocusMessage &msg) {
 	// Create all the request based controls
 	for (const auto &req : _request._data)
 		_children.push_back(createWidget(&req));
+
+	// Create elements for all the labels
+	for (const auto &lbl : _label._data)
+		_children.push_back(createWidget(&lbl));
 
 	return true;
 }
@@ -72,11 +77,47 @@ Gfx::Widgets::Widget *Dialog::createWidget(const RequestData *reqData) {
 	switch (reqData->_widget) {
 	case REQ_TEXTBUTTON:
 		return new Gfx::Widgets::TextButton(reqData);
-	case REQ_SELECT:
-		return new Gfx::Widgets::Select(reqData);
+	case REQ_SELECT: {
+		auto *widget = new Gfx::Widgets::Select(reqData);
+		widget->setImage(_normal.getImage(reqData->_image + 1),
+			_normal.getImage(reqData->_image));
+		return widget;
+	}
 	default:
 		error("Invalid widget type - %d", reqData->_widget);
 	}
+}
+
+Gfx::Widgets::Text *Dialog::createWidget(const LabelData *lblData) {
+	uint width = 1;
+	Graphics::Font *font = getFont();
+	uint strWidth = font->getStringWidth(lblData->_label);
+
+	switch (lblData->_type) {
+	case LBL_STANDARD:
+		width = strWidth + 1;
+		break;
+	case LBL_TITLE:
+		width = this->_bounds.width();
+		break;
+	default:
+		break;
+	}
+
+	Gfx::Widgets::Text *label = new Gfx::Widgets::Text(
+		Common::Rect(lblData->_xpos, lblData->_ypos,
+			lblData->_xpos + width,
+			lblData->_ypos + font->getFontHeight() + 1),
+		lblData->_label.c_str());
+	label->setColor(lblData->_color);
+
+	if (lblData->_type == LBL_TITLE) {
+		label->setShadow(lblData->_shadow, 0, 1);
+		label->setAlignment(Gfx::Widgets::HA_CENTER,
+			Gfx::Widgets::VA_TOP);
+	}
+
+	return label;
 }
 
 } // namespace Dialogs

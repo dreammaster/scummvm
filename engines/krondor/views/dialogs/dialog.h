@@ -25,6 +25,7 @@
 #include "krondor/views/view.h"
 #include "krondor/res/resources.h"
 #include "krondor/gfx/widgets/widget.h"
+#include "krondor/gfx/widgets/text.h"
 
 namespace Krondor {
 namespace Views {
@@ -52,6 +53,7 @@ protected:
 	 * Creates a widget based on a request data entry
 	 */
 	virtual Gfx::Widgets::Widget *createWidget(const RequestData *reqData);
+	Gfx::Widgets::Text *createWidget(const LabelData *lblData);
 
 public:
 	Dialog(const Common::String &name,

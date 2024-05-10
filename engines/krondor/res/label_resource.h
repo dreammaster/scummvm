@@ -26,6 +26,9 @@
 
 namespace Krondor {
 
+static const int LBL_STANDARD = 0;
+static const int LBL_TITLE = 3;
+
 struct LabelData {
 	int _xpos;
 	int _ypos;

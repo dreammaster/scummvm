@@ -50,6 +50,9 @@ public:
 
 	void clear();
 	void load(const Common::String &name);
+	Graphics::ManagedSurface *getImage(uint idx) {
+		return &_images[idx];
+	}
 };
 
 } // namespace Krondor

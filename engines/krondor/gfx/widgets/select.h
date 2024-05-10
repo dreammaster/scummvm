@@ -29,13 +29,17 @@ namespace Gfx {
 namespace Widgets {
 
 class Select : public Widget {
+private:
+	Graphics::ManagedSurface *_normal = nullptr;
+	Graphics::ManagedSurface *_selected = nullptr;
+
 public:
-	Select(const RequestData *reqData) : Widget("Select", reqData) {
-	}
+	Select(const RequestData *reqData) : Widget("Select", reqData) {}
 	virtual ~Select() {}
 
-	bool msgKeypress(const KeypressMessage &msg) override;
 	void draw() override;
+
+	void setImage(Graphics::ManagedSurface *normal, Graphics::ManagedSurface *selected);
 };
 
 } // namespace Widgets
