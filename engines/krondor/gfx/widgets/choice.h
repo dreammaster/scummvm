@@ -19,26 +19,31 @@
  *
  */
 
-#include "krondor/gfx/widgets/select.h"
+#ifndef KRONDOR_GFX_WIDGETS_CHOICE_H
+#define KRONDOR_GFX_WIDGETS_CHOICE_H
+
+#include "krondor/gfx/widgets/widget.h"
 
 namespace Krondor {
 namespace Gfx {
 namespace Widgets {
 
-void Select::setImage(Graphics::ManagedSurface *normal, Graphics::ManagedSurface *selected) {
-	assert(normal && selected);
-	_normal = normal;
-	_selected = selected;
-}
+class Choice : public Widget {
+private:
+	Graphics::ManagedSurface *_normal = nullptr;
+	Graphics::ManagedSurface *_selected = nullptr;
 
-void Select::draw() {
-	bool isSelected = false; // TODO
-	Graphics::ManagedSurface *surf = isSelected ? _selected : _normal;
+public:
+	Choice(const RequestData *reqData) : Widget("Select", reqData) {}
+	virtual ~Choice() {}
 
-	GfxSurface s = getSurface();
-	s.blitFrom(*surf);
-}
+	void draw() override;
+
+	void setImage(Graphics::ManagedSurface *normal, Graphics::ManagedSurface *selected);
+};
 
 } // namespace Widgets
 } // namespace Gfx
 } // namespace Krondor
+
+#endif

@@ -13,7 +13,7 @@ MODULE_OBJS = \
 	gfx/mouse_cursor.o \
 	gfx/widgets/widget.o \
 	gfx/widgets/button.o \
-	gfx/widgets/select.o \
+	gfx/widgets/choice.o \
 	gfx/widgets/text.o \
 	gfx/widgets/text_button.o \
 	res/rect.o \

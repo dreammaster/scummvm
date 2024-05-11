@@ -22,8 +22,8 @@
 #include "common/system.h"
 #include "graphics/paletteman.h"
 #include "krondor/views/dialogs/dialog.h"
+#include "krondor/gfx/widgets/choice.h"
 #include "krondor/gfx/widgets/text_button.h"
-#include "krondor/gfx/widgets/select.h"
 #include "krondor/gfx/widgets/text.h"
 
 namespace Krondor {
@@ -77,8 +77,8 @@ Gfx::Widgets::Widget *Dialog::createWidget(const RequestData *reqData) {
 	switch (reqData->_widget) {
 	case REQ_TEXTBUTTON:
 		return new Gfx::Widgets::TextButton(reqData);
-	case REQ_SELECT: {
-		auto *widget = new Gfx::Widgets::Select(reqData);
+	case REQ_CHOICE: {
+		auto *widget = new Gfx::Widgets::Choice(reqData);
 		widget->setImage(_normal.getImage(reqData->_image + 1),
 			_normal.getImage(reqData->_image));
 		return widget;

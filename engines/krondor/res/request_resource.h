@@ -31,7 +31,7 @@ namespace Krondor {
 enum RequestType {
 	REQ_USERDEFINED = 0,
 	REQ_IMAGEBUTTON = 3,
-	REQ_SELECT = 4,
+	REQ_CHOICE = 4,
 	REQ_TEXTBUTTON = 6
 };
 
