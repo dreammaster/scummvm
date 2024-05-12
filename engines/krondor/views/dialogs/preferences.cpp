@@ -71,10 +71,14 @@ bool Preferences::msgAction(const ActionMessage &msg) {
 	switch (msg._action) {
 	case PREF_OK:
 		// Copy over prefs and close dialog
+		g_vars->_prefs = g_vars->_tempPrefs;
+		g_vars->_prefs.apply();
+		replaceView("MainMenu");
 		break;
 
 	case PREF_CANCEL:
 		// Close dialog
+		replaceView("MainMenu");
 		break;
 
 	case PREF_DEFAULTS:
@@ -111,7 +115,7 @@ void Preferences::loadSelections() {
 		PREF_STEP_MEDIUM, STS_MEDIUM,
 		PREF_STEP_LARGE, STS_LARGE
 	);
-	_stepSize.load(this, (int)prefs.getTurnSize(),
+	_turnSize.load(this, (int)prefs.getTurnSize(),
 		[](int newValue) { g_vars->_tempPrefs.setTurnSize((StepTurnSize)newValue); },
 		PREF_TURN_SMALL, STS_SMALL,
 		PREF_TURN_MEDIUM, STS_MEDIUM,
@@ -141,6 +145,8 @@ void Preferences::loadSelections() {
 		[](bool newValue) { g_vars->_tempPrefs.setCdMusic(newValue); });
 	_introduction.load(this, PREF_INTRODUCTION, prefs.getIntroduction(),
 		[](bool newValue) { g_vars->_tempPrefs.setIntroduction(newValue); });
+
+	redraw();
 }
 
 

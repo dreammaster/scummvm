@@ -36,11 +36,14 @@ void Choice::draw() {
 
 	} else if (_requestData->_widget == REQ_IMAGEBUTTON ||
 			(_requestData->_widget == REQ_CHOICE && _requestData->_alt2)) {
-		if (_selected)
+		if (_focused)
 			++index;
 	} else {
-		index += _selected ? 3 : 2;
+		index += _focused ? 3 : 2;
 	}
+
+	if (_selected)
+		index -= 2;
 
 	const Graphics::ManagedSurface *surf = g_vars->getIcon(index);
 

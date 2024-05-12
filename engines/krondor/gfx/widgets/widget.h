@@ -48,6 +48,7 @@ static const int INVENTORY_OFFSET = 1024;
 class Widget : public UIElement {
 protected:
 	const RequestData *_requestData;
+	bool _focused = false;
 
 public:
 	Widget(const Common::String &name, const RequestData *reqData);
