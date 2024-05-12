@@ -19,17 +19,26 @@
  *
  */
 
-#include "krondor/views/dialogs/preferences.h"
+#include "krondor/vars.h"
 
 namespace Krondor {
-namespace Views {
-namespace Dialogs {
 
-Preferences::Preferences() : Dialog("Preferences",
-	"req_pref.dat", "options.pal", "options2.scx",
-	"game.fnt", "lbl_pref.dat") {
+Vars *g_vars;
+
+Vars::Vars() : _icons1("bicons1.bmx"), _icons2("bicons2.bmx") {
+	g_vars = this;
 }
 
-} // namespace Dialogs
-} // namespace Views
+Vars::~Vars() {
+	g_vars = nullptr;
+}
+
+const Graphics::ManagedSurface *Vars::getIcon(uint index) const {
+	if (index > 50)
+		++index;
+
+	const ImageResource *res = (index & 1) ? &_icons2 : &_icons1;
+	return &res->_images[index / 2];
+}
+
 } // namespace Krondor

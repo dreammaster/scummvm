@@ -65,7 +65,6 @@ void RequestResource::load(const Common::String &name) {
 		offsets[i] = f.readSint16LE();
 		rd._teleport = f.readSint16LE();
 		rd._image = f.readUint16LE();
-		rd._image = (rd._image >> 1) + (rd._image & 1);
 		f.skip(2);
 		rd._group = f.readUint16LE();
 		f.skip(2);

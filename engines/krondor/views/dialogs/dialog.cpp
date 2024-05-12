@@ -25,40 +25,39 @@
 #include "krondor/gfx/widgets/choice.h"
 #include "krondor/gfx/widgets/text_button.h"
 #include "krondor/gfx/widgets/text.h"
+#include "krondor/vars.h"
 
 namespace Krondor {
 namespace Views {
 namespace Dialogs {
 
 bool Dialog::msgFocus(const FocusMessage &msg) {
-	_request.load(_requestName);
+	_requests.load(_requestName);
 	_palette.load(_paletteName);
 	_screen.load(_screenName);
-	_normal.load(_normalName);
 	_font.load(_fontName);
-	_label.load(_labelName);
+	_labels.load(_labelName);
 
 	_palette.setActive();
 	_font.setActive();
 
 	// Create all the request based controls
-	for (const auto &req : _request._data)
+	for (const auto &req : _requests._data)
 		_children.push_back(createWidget(&req));
 
 	// Create elements for all the labels
-	for (const auto &lbl : _label._data)
+	for (const auto &lbl : _labels._data)
 		_children.push_back(createWidget(&lbl));
 
 	return true;
 }
 
 bool Dialog::msgUnfocus(const UnfocusMessage &msg) {
-	_request.clear();
+	_requests.clear();
 	_palette.clear();
 	_screen.clear();
-	_normal.clear();
 	_font.clear();
-	_label.clear();
+	_labels.clear();
 
 	// Remove added children controls
 	for (auto *child : _children)
@@ -79,8 +78,10 @@ Gfx::Widgets::Widget *Dialog::createWidget(const RequestData *reqData) {
 		return new Gfx::Widgets::TextButton(reqData);
 	case REQ_CHOICE: {
 		auto *widget = new Gfx::Widgets::Choice(reqData);
-		widget->setImage(_normal.getImage(reqData->_image + 1),
-			_normal.getImage(reqData->_image));
+		widget->setImage(
+			g_vars->getIcon(reqData->_image + 1),
+			g_vars->getIcon(reqData->_image)
+		);
 		return widget;
 	}
 	default:

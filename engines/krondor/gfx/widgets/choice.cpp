@@ -25,7 +25,8 @@ namespace Krondor {
 namespace Gfx {
 namespace Widgets {
 
-void Choice::setImage(Graphics::ManagedSurface *normal, Graphics::ManagedSurface *selected) {
+void Choice::setImage(const Graphics::ManagedSurface *normal,
+		const Graphics::ManagedSurface *selected) {
 	assert(normal && selected);
 	_normal = normal;
 	_selected = selected;
@@ -33,7 +34,7 @@ void Choice::setImage(Graphics::ManagedSurface *normal, Graphics::ManagedSurface
 
 void Choice::draw() {
 	bool isSelected = false; // TODO
-	Graphics::ManagedSurface *surf = isSelected ? _selected : _normal;
+	const Graphics::ManagedSurface *surf = isSelected ? _selected : _normal;
 
 	GfxSurface s = getSurface();
 	s.blitFrom(*surf);

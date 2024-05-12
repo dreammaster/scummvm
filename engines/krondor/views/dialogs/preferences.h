@@ -30,11 +30,8 @@ namespace Dialogs {
 
 class Preferences : public Dialog {
 public:
-	Preferences() : Dialog("Preferences", "req_pref.dat", "options.pal",
-		"options2.scx", "bicons1.bmx", "game.fnt", "lbl_pref.dat") {
-	}
-	virtual ~Preferences() {
-	}
+	Preferences();
+	~Preferences() override {}
 };
 
 } // namespace Dialogs

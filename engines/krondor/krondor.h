@@ -36,6 +36,7 @@
 
 #include "krondor/detection.h"
 #include "krondor/events.h"
+#include "krondor/vars.h"
 
 namespace Krondor {
 
@@ -45,6 +46,7 @@ class KrondorEngine : public Engine, public Events {
 private:
 	const ADGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
+
 protected:
 	// Engine APIs
 	Common::Error run() override;

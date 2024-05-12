@@ -57,8 +57,11 @@ Common::Error KrondorEngine::run() {
 		return Common::kNoError;
 	}
 
+	Vars *vars = new Vars();
+
 	runGame();
 
+	delete vars;
 	return Common::kNoError;
 }
 

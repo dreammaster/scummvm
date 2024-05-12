@@ -19,17 +19,30 @@
  *
  */
 
-#include "krondor/views/dialogs/preferences.h"
+#ifndef KRONDOR_VARS_H
+#define KRONDOR_VARS_H
+
+#include "krondor/res/image_resource.h"
 
 namespace Krondor {
-namespace Views {
-namespace Dialogs {
 
-Preferences::Preferences() : Dialog("Preferences",
-	"req_pref.dat", "options.pal", "options2.scx",
-	"game.fnt", "lbl_pref.dat") {
-}
+struct Vars {
+public:
+	ImageResource _icons1, _icons2;
 
-} // namespace Dialogs
-} // namespace Views
+public:
+	Vars();
+	~Vars();
+
+	/**
+	 * Get an icon
+	 */
+	const Graphics::ManagedSurface *getIcon(uint index) const;
+};
+
+extern Vars *g_vars;
+#define _G(FIELD) g_vars->_##FIELD
+
 } // namespace Krondor
+
+#endif

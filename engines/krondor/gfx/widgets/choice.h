@@ -30,8 +30,8 @@ namespace Widgets {
 
 class Choice : public Widget {
 private:
-	Graphics::ManagedSurface *_normal = nullptr;
-	Graphics::ManagedSurface *_selected = nullptr;
+	const Graphics::ManagedSurface *_normal = nullptr;
+	const Graphics::ManagedSurface *_selected = nullptr;
 
 public:
 	Choice(const RequestData *reqData) : Widget("Select", reqData) {}
@@ -39,7 +39,8 @@ public:
 
 	void draw() override;
 
-	void setImage(Graphics::ManagedSurface *normal, Graphics::ManagedSurface *selected);
+	void setImage(const Graphics::ManagedSurface *normal,
+		const Graphics::ManagedSurface *selected);
 };
 
 } // namespace Widgets

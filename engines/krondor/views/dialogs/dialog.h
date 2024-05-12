@@ -36,17 +36,15 @@ private:
 	Common::String _requestName;
 	Common::String _paletteName;
 	Common::String _screenName;
-	Common::String _normalName;
 	Common::String _fontName;
 	Common::String _labelName;
 
 protected:
-	RequestResource _request;
+	RequestResource _requests;
 	PaletteResource _palette;
 	ScreenResource _screen;
-	ImageResource _normal;
 	FontResource _font;
-	LabelResource _label;
+	LabelResource _labels;
 
 protected:
 	/**
@@ -58,11 +56,11 @@ protected:
 public:
 	Dialog(const Common::String &name,
 		const Common::String &requestName, const Common::String &paletteName,
-		const Common::String &screenName, const Common::String &normalName,
-		const Common::String &fontName, const Common::String &labelName) :
+		const Common::String &screenName, const Common::String &fontName,
+		const Common::String &labelName) :
 			View(name), _requestName(requestName), _paletteName(paletteName),
-			_screenName(screenName), _normalName(normalName),
-			_fontName(fontName), _labelName(labelName) {
+			_screenName(screenName), _fontName(fontName),
+			_labelName(labelName) {
 	}
 	virtual ~Dialog() {
 	}
