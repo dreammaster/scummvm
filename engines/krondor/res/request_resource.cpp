@@ -58,8 +58,8 @@ void RequestResource::load(const Common::String &name) {
 		rd._action = f.readSint16LE();
 		rd._visible = (f.readByte() != 0);
 		f.skip(2);
-		f.skip(2);
-		f.skip(2);
+		rd._alt = f.readUint16LE();
+		rd._alt2 = f.readUint16LE();
 		rd._bounds.read(&f);
 		f.skip(2);
 		offsets[i] = f.readSint16LE();

@@ -25,7 +25,6 @@
 #include "krondor/gfx/widgets/choice.h"
 #include "krondor/gfx/widgets/text_button.h"
 #include "krondor/gfx/widgets/text.h"
-#include "krondor/vars.h"
 
 namespace Krondor {
 namespace Views {
@@ -76,14 +75,9 @@ Gfx::Widgets::Widget *Dialog::createWidget(const RequestData *reqData) {
 	switch (reqData->_widget) {
 	case REQ_TEXTBUTTON:
 		return new Gfx::Widgets::TextButton(reqData);
-	case REQ_CHOICE: {
-		auto *widget = new Gfx::Widgets::Choice(reqData);
-		widget->setImage(
-			g_vars->getIcon(reqData->_image + 1),
-			g_vars->getIcon(reqData->_image)
-		);
-		return widget;
-	}
+	case REQ_IMAGEBUTTON:
+	case REQ_CHOICE:
+		return new Gfx::Widgets::Choice(reqData);
 	default:
 		error("Invalid widget type - %d", reqData->_widget);
 	}

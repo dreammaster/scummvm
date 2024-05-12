@@ -20,22 +20,30 @@
  */
 
 #include "krondor/gfx/widgets/choice.h"
+#include "krondor/vars.h"
 
 namespace Krondor {
 namespace Gfx {
 namespace Widgets {
 
-void Choice::setImage(const Graphics::ManagedSurface *normal,
-		const Graphics::ManagedSurface *selected) {
-	assert(normal && selected);
-	_normal = normal;
-	_selected = selected;
-}
-
 void Choice::draw() {
-	bool isSelected = false; // TODO
-	const Graphics::ManagedSurface *surf = isSelected ? _selected : _normal;
+	// Get the icon to use
+	int index = _requestData->_image;
 
+	if (_requestData->_alt) {
+		index = 50;
+
+	} else if (_requestData->_widget == REQ_IMAGEBUTTON ||
+			(_requestData->_widget == REQ_CHOICE && _requestData->_alt2)) {
+		if (_selected)
+			++index;
+	} else {
+		index += _selected ? 3 : 2;
+	}
+
+	const Graphics::ManagedSurface *surf = g_vars->getIcon(index);
+
+	// Draw the icon
 	GfxSurface s = getSurface();
 	s.blitFrom(*surf);
 }

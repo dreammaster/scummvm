@@ -36,9 +36,11 @@ enum RequestType {
 };
 
 struct RequestData {
-	uint _widget = 0;
+	uint16 _widget = 0;
 	int _action = 0;
 	bool _visible = 0;
+	uint16 _alt = 0;
+	uint16 _alt2 = 0;
 	Rect _bounds;
 	int _teleport = 0;
 	int _image = 0;
