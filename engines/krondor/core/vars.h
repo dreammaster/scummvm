@@ -19,15 +19,17 @@
  *
  */
 
-#ifndef KRONDOR_VARS_H
-#define KRONDOR_VARS_H
+#ifndef KRONDOR_CORE_VARS_H
+#define KRONDOR_CORE_VARS_H
 
 #include "krondor/res/image_resource.h"
+#include "krondor/core/preferences.h"
 
 namespace Krondor {
 
 struct Vars {
 public:
+	Preferences _prefs;
 	ImageResource _icons1, _icons2;
 
 public:

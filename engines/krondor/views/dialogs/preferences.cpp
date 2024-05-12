@@ -25,6 +25,35 @@ namespace Krondor {
 namespace Views {
 namespace Dialogs {
 
+enum {
+	PREF_CANCEL = 46,
+	PREF_DEFAULTS = 32,
+	PREF_OK = 24,
+
+	PREF_STEP_SMALL = 192,
+	PREF_STEP_MEDIUM = 193,
+	PREF_STEP_LARGE = 194,
+
+	PREF_TURN_SMALL = 195,
+	PREF_TURN_MEDIUM = 196,
+	PREF_TURN_LARGE = 197,
+
+	PREF_DETAIL_MIN = 198,
+	PREF_DETAIL_LOW = 199,
+	PREF_DETAIL_HIGH = 200,
+	PREF_DETAIL_MAX = 201,
+
+	PREF_TEXT_WAIT = 202,
+	PREF_TEXT_MEDIUM = 203,
+	PREF_TEXT_FAST = 204,
+
+	PREF_SOUND = 205,
+	PREF_MUSIC = 206,
+	PREF_COMBAT_MUSIC = 207,
+	PREF_INTRODUCTION = 208,
+	PREF_CD_MUSIC = 209
+};
+
 Preferences::Preferences() : Dialog("Preferences",
 	"req_pref.dat", "options.pal", "options2.scx",
 	"game.fnt", "lbl_pref.dat") {

@@ -20,8 +20,9 @@
  */
 
 #include "krondor/gfx/widgets/choice.h"
-#include "krondor/vars.h"
+#include "krondor/core/vars.h"
 #include "krondor/krondor.h"
+
 namespace Krondor {
 namespace Gfx {
 namespace Widgets {

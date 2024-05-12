@@ -36,7 +36,7 @@
 
 #include "krondor/detection.h"
 #include "krondor/events.h"
-#include "krondor/vars.h"
+#include "krondor/core/vars.h"
 
 namespace Krondor {
 
