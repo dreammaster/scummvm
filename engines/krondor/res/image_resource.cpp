@@ -52,7 +52,8 @@ void ImageResource::load(const Common::String &name) {
 		_images[i].create(width, height);
 	}
 
-	Common::SeekableReadStream *decompressed = f.decompress(compression, size);
+	Common::SeekableReadStream *decompressed = f.decompress(compression);
+	assert(decompressed->size() == size);
 
 	for (uint i = 0; i < numImages; i++) {
 		Common::SeekableReadStream *frameSrc = decompressed->readStream(imageSize[i]);
@@ -66,7 +67,7 @@ void ImageResource::load(const Common::String &name) {
 void ImageResource::loadImage(Graphics::ManagedSurface &surface,
 		uint flags, Common::SeekableReadStream *src) {
 	if (flags & FLAG_COMPRESSED)
-		src = DecompressRLE(src).decompress();
+		src = DecompressRLE(src, surface.w * surface.h).decompress();
 
 	if (flags & FLAG_XYSWAPPED) {
 		// For x/y swapped, requires doing it by column and then by row

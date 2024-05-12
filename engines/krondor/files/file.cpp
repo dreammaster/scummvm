@@ -33,7 +33,7 @@ bool File::open(const Common::Path &path) {
 }
 
 Common::SeekableReadStream *File::decompress(
-		CompressionType compression, int destSize) {
+		CompressionType compression) {
 	switch (compression) {
 	case COMPRESSION_LZW:
 		if (readByte() != 2)
