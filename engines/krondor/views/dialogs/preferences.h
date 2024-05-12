@@ -23,15 +23,68 @@
 #define KRONDOR_VIEWS_DIALOGS_PREFERENCES_H
 
 #include "krondor/views/dialogs/dialog.h"
+#include "krondor/gfx/widgets/choice.h"
 
 namespace Krondor {
 namespace Views {
 namespace Dialogs {
 
 class Preferences : public Dialog {
+	typedef void (*RadioCallback)(int value);
+	typedef void (*CheckboxCallback)(bool value);
+
+	struct RadioButton {
+		Gfx::Widgets::Choice *_element = nullptr;
+		int _value = 0;
+		RadioButton() {}
+		RadioButton(Gfx::Widgets::Choice *element, int value) :
+			_element(element), _value(value) {}
+	};
+
+	class RadioButtons {
+	private:
+		Common::Array<RadioButton> _items;
+		RadioCallback _callback = nullptr;
+	public:
+		void load(Preferences *owner, int value, RadioCallback callback,
+			int action1, int value1,
+			int action2, int value2,
+			int action3, int value3,
+			int action4 = -1, int value4 = -1);
+
+		void action(int action);
+	};
+	class Checkbox {
+	private:
+		Gfx::Widgets::Choice *_element = nullptr;
+		CheckboxCallback _callback = nullptr;
+	public:
+		void load(Preferences *owner, int action, bool value,
+			CheckboxCallback callback);
+
+		void action(int action);
+	};
+
+private:
+	RadioButtons _stepSize;
+	RadioButtons _turnSize;
+	RadioButtons _textSpeed;
+	RadioButtons _detail;
+	Checkbox _sound;
+	Checkbox _music;
+	Checkbox _combatMusic;
+	Checkbox _cdMusic;
+	Checkbox _introduction;
+
+private:
+	void loadSelections();
+
 public:
 	Preferences();
 	~Preferences() override {}
+
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgAction(const ActionMessage &msg) override;
 };
 
 } // namespace Dialogs

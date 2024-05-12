@@ -35,8 +35,11 @@ private:
 public:
 	Choice(const RequestData *reqData) : Widget("Select", reqData) {}
 	virtual ~Choice() {}
+	bool getSelected() const { return _selected; }
+	void setSelected(bool value) { _selected = value; }
 
 	void draw() override;
+	bool msgMouseDown(const MouseDownMessage &msg) override;
 };
 
 } // namespace Widgets

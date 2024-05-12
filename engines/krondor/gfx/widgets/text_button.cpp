@@ -74,7 +74,6 @@ void TextButton::draw() {
 bool TextButton::msgMouseDown(const MouseDownMessage &msg) {
 	if (msg._button == MouseMessage::MB_LEFT) {
 		setPressed(true);
-		//GenerateActionEvent(GetAction());
 		return true;
 	}
 
@@ -83,7 +82,14 @@ bool TextButton::msgMouseDown(const MouseDownMessage &msg) {
 
 bool TextButton::msgMouseUp(const MouseUpMessage &msg) {
 	if (msg._button == MouseMessage::MB_LEFT) {
+		bool pressed = isPressed();
 		setPressed(false);
+
+		if (pressed)
+			// Send an Action message to the owning dialog
+			// for which request action has been selected
+			g_events->send(ActionMessage(_requestData->_action));
+
 		return true;
 	}
 

@@ -45,7 +45,7 @@ enum LevelOfDetail {
 	LOD_MAX
 };
 
-class Preferences {
+class Prefs {
 private:
 	StepTurnSize _stepSize = STS_LARGE;
 	StepTurnSize _turnSize = STS_MEDIUM;
@@ -58,8 +58,11 @@ private:
 	bool _introduction = true;
 
 public:
-	Preferences() { setDefaults(); }
+	Prefs() { setDefaults(); }
+	
 	void setDefaults();
+	void apply();
+
 	StepTurnSize getStepSize() const { return _stepSize; }
 	void setStepSize(const StepTurnSize sz);
 	StepTurnSize getTurnSize() const { return _turnSize; }

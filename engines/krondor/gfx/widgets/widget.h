@@ -52,6 +52,9 @@ protected:
 public:
 	Widget(const Common::String &name, const RequestData *reqData);
 	virtual ~Widget() {}
+	const RequestData *getData() const {
+		return _requestData;
+	}
 };
 
 } // namespace Widgets

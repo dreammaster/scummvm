@@ -19,15 +19,15 @@
  *
  */
 
-#include "krondor/core/preferences.h"
+#include "krondor/core/prefs.h"
 
 namespace Krondor {
 
-void Preferences::setDefaults() {
-	_stepSize = STS_SMALL;
-	_turnSize = STS_SMALL;
+void Prefs::setDefaults() {
+	_stepSize = STS_LARGE;
+	_turnSize = STS_MEDIUM;
 	_textSpeed = TS_WAIT;
-	_detail = LOD_MAX;
+	_detail = LOD_HIGH;
 	_sound = true;
 	_music = true;
 	_combatMusic = true;
@@ -35,55 +35,59 @@ void Preferences::setDefaults() {
 	_introduction = true;
 }
 
-void Preferences::setStepSize(const StepTurnSize sz) {
+void Prefs::apply() {
+	// TODO
+}
+
+void Prefs::setStepSize(const StepTurnSize sz) {
 	_stepSize = sz;
 }
 
-void Preferences::setTurnSize(const StepTurnSize sz) {
+void Prefs::setTurnSize(const StepTurnSize sz) {
 	_turnSize = sz;
 }
 
-void Preferences::setTextSpeed(const TextSpeed ts) {
+void Prefs::setTextSpeed(const TextSpeed ts) {
 	_textSpeed = ts;
 }
 
-void Preferences::setDetail(const LevelOfDetail lod) {
+void Prefs::setDetail(const LevelOfDetail lod) {
 	_detail = lod;
 }
 
-bool Preferences::getSound() const {
+bool Prefs::getSound() const {
 	return _sound;
 }
 
-void Preferences::setSound(bool toggle) {
+void Prefs::setSound(bool toggle) {
 	_sound = toggle;
 }
 
-bool Preferences::getMusic() const {
+bool Prefs::getMusic() const {
 	return _music;
 }
 
-void Preferences::setMusic(bool toggle) {
+void Prefs::setMusic(bool toggle) {
 	_music = toggle;
 }
 
-bool Preferences::getCombatMusic() const {
+bool Prefs::getCombatMusic() const {
 	return _combatMusic;
 }
 
-void Preferences::setCombatMusic(bool toggle) {
+void Prefs::setCombatMusic(bool toggle) {
 	_combatMusic = toggle;
 }
 
-bool Preferences::getCdMusic() const {
+bool Prefs::getCdMusic() const {
 	return _cdMusic;
 }
 
-void Preferences::setCdMusic(bool toggle) {
+void Prefs::setCdMusic(bool toggle) {
 	_cdMusic = toggle;
 }
 
-void Preferences::setIntroduction(bool toggle) {
+void Prefs::setIntroduction(bool toggle) {
 	_introduction = toggle;
 }
 

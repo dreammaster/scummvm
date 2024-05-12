@@ -49,6 +49,17 @@ void Choice::draw() {
 	s.transBlitFrom(*surf, 0);
 }
 
+bool Choice::msgMouseDown(const MouseDownMessage &msg) {
+	if (msg._button == MouseDownMessage::MB_LEFT) {
+		// Send an Action message to the owning dialog
+		// for which request action has been selected
+		g_events->send(ActionMessage(_requestData->_action));
+		return true;
+	}
+
+	return Widget::msgMouseDown(msg);
+}
+
 } // namespace Widgets
 } // namespace Gfx
 } // namespace Krondor
