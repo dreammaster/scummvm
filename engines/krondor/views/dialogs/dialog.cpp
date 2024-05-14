@@ -31,6 +31,8 @@ namespace Views {
 namespace Dialogs {
 
 bool Dialog::msgFocus(const FocusMessage &msg) {
+	View::msgFocus(msg);
+
 	_requests.load(_requestName);
 	_palette.load(_paletteName);
 	_screen.load(_screenName);
@@ -53,6 +55,8 @@ bool Dialog::msgFocus(const FocusMessage &msg) {
 }
 
 bool Dialog::msgUnfocus(const UnfocusMessage &msg) {
+	View::msgUnfocus(msg);
+
 	_requests.clear();
 	_palette.clear();
 	_screen.clear();
