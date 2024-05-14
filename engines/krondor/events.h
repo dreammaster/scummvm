@@ -174,6 +174,13 @@ public:
 	}
 
 	/**
+	 * Get the element's name
+	 */
+	const Common::String &getName() const {
+		return _name;
+	}
+
+	/**
 	 * Sets the focus to a new view
 	 */
 	void replaceView(UIElement *ui, bool replaceAllViews = false);

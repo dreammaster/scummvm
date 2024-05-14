@@ -35,7 +35,8 @@ bool Dialog::msgFocus(const FocusMessage &msg) {
 	_palette.load(_paletteName);
 	_screen.load(_screenName);
 	_font.load(_fontName);
-	_labels.load(_labelName);
+	if (!_labelName.empty())
+		_labels.load(_labelName);
 
 	_palette.setActive();
 	_font.setActive();

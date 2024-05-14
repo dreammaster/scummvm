@@ -73,12 +73,12 @@ bool Preferences::msgAction(const ActionMessage &msg) {
 		// Copy over prefs and close dialog
 		g_vars->_prefs = g_vars->_tempPrefs;
 		g_vars->_prefs.apply();
-		replaceView("MainMenu");
+		replaceView("Options");
 		break;
 
 	case PREF_CANCEL:
 		// Close dialog
-		replaceView("MainMenu");
+		replaceView("Options");
 		break;
 
 	case PREF_DEFAULTS:

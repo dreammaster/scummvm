@@ -19,20 +19,25 @@
  *
  */
 
-#ifndef KRONDOR_VIEWS_H
-#define KRONDOR_VIEWS_H
+#ifndef KRONDOR_VIEWS_DIALOGS_OPTIONS_H
+#define KRONDOR_VIEWS_DIALOGS_OPTIONS_H
 
-#include "krondor/views/dialogs/options.h"
-#include "krondor/views/dialogs/preferences.h"
+#include "krondor/views/dialogs/dialog.h"
 
 namespace Krondor {
 namespace Views {
+namespace Dialogs {
 
-struct Views {
-	Dialogs::Options _options;
-	Dialogs::Preferences _preferences;
+class Options : public Dialog {
+public:
+	Options();
+	~Options() override {}
+
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgAction(const ActionMessage &msg) override;
 };
 
+} // namespace Dialogs
 } // namespace Views
 } // namespace Krondor
 

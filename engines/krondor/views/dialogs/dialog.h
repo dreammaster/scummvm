@@ -32,14 +32,13 @@ namespace Views {
 namespace Dialogs {
 
 class Dialog : public View {
-private:
+protected:
 	Common::String _requestName;
 	Common::String _paletteName;
 	Common::String _screenName;
 	Common::String _fontName;
 	Common::String _labelName;
 
-protected:
 	RequestResource _requests;
 	PaletteResource _palette;
 	ScreenResource _screen;
@@ -61,6 +60,12 @@ public:
 			View(name), _requestName(requestName), _paletteName(paletteName),
 			_screenName(screenName), _fontName(fontName),
 			_labelName(labelName) {
+	}
+	Dialog(const Common::String &name,
+		const Common::String &requestName, const Common::String &paletteName,
+		const Common::String &screenName, const Common::String &fontName) :
+			View(name), _requestName(requestName), _paletteName(paletteName),
+			_screenName(screenName), _fontName(fontName) {
 	}
 	virtual ~Dialog() {
 	}

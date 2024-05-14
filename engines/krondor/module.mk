@@ -28,6 +28,7 @@ MODULE_OBJS = \
 	res/screen_resource.o \
 	views/view.o \
 	views/dialogs/dialog.o \
+	views/dialogs/options.o \
 	views/dialogs/preferences.o
 
 # This module can be built as a plugin
