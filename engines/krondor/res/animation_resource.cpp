@@ -31,9 +31,9 @@ void AnimationResource::clear() {
 	_script = nullptr;
 }
 
-void AnimationResource::load(const Common::String &name) {
+void AnimationResource::load(const Common::String &resName) {
 	clear();
-	File f(name);
+	File f(resName);
 	loadIndex(&f);
 
 	Common::SeekableReadStream *verbuf = getTag(&f, TAG_VER);

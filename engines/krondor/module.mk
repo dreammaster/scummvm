@@ -30,6 +30,7 @@ MODULE_OBJS = \
 	res/palette_resource.o \
 	res/request_resource.o \
 	res/screen_resource.o \
+	res/sound_resource.o \
 	views/view.o \
 	views/movie.o \
 	views/dialogs/dialog.o \

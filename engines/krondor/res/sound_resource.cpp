@@ -19,28 +19,22 @@
  *
  */
 
-#include "krondor/gfx/movie_decoder.h"
+#include "krondor/res/sound_resource.h"
 
 namespace Krondor {
-namespace Gfx {
 
-bool MovieDecoder::loadFile(const Common::Path &filename) {
-	_anim.load(filename.toString());
-	_ttm.load(_anim.getAnimationData(1)._resource);
-	loadMovie(&_ttm.getMovieTags());
-
-	return true;
+void SoundResource::clear() {
 }
 
-bool MovieDecoder::loadStream(Common::SeekableReadStream *stream) {
-	// Loading from streams not supported
-	return false;
+void SoundResource::load(const Common::String &name) {
+	clear();
+	File f(name);
+	loadIndex(&f);
+
+//	Common::SeekableReadStream *font = getTag(&f, TAG_FNT);
+
+
+//	delete font;
 }
 
-void MovieDecoder::loadMovie(const Common::Array<MovieTag *> *movie) {
-	// TODO
-}
-
-
-} // namespace Gfx
 } // namespace Krondor

@@ -19,28 +19,33 @@
  *
  */
 
-#include "krondor/gfx/movie_decoder.h"
+#ifndef KRONDOR_RES_SOUND_RESOURCE_H
+#define KRONDOR_RES_SOUND_RESOURCE_H
+
+#include "common/hashmap.h"
+#include "krondor/res/resource.h"
 
 namespace Krondor {
-namespace Gfx {
 
-bool MovieDecoder::loadFile(const Common::Path &filename) {
-	_anim.load(filename.toString());
-	_ttm.load(_anim.getAnimationData(1)._resource);
-	loadMovie(&_ttm.getMovieTags());
+struct SoundData {
+};
 
-	return true;
-}
+class SoundResource : public TaggedResource {
+private:
+	Common::HashMap<uint, SoundData> soundMap;
+	static SoundResource *_instance;
 
-bool MovieDecoder::loadStream(Common::SeekableReadStream *stream) {
-	// Loading from streams not supported
-	return false;
-}
+public:
+	SoundResource() : TaggedResource() {}
+	SoundResource(const Common::String &name) : TaggedResource() {
+		load(name);
+	}
+	~SoundResource() override {}
 
-void MovieDecoder::loadMovie(const Common::Array<MovieTag *> *movie) {
-	// TODO
-}
+	void clear();
+	void load(const Common::String &name);
+};
 
-
-} // namespace Gfx
 } // namespace Krondor
+
+#endif

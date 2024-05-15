@@ -49,6 +49,9 @@ public:
 	const Common::String &getVersion() const {
 		return _version;
 	}
+	const AnimationData &getAnimationData(uint id) const {
+		return _animationMap[id];
+	}
 
 	void clear();
 	void load(const Common::String &name);
