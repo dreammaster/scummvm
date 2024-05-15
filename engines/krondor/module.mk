@@ -13,6 +13,7 @@ MODULE_OBJS = \
 	files/resource_archive.o \
 	gfx/gfx_surface.o \
 	gfx/mouse_cursor.o \
+	gfx/movie_decoder.o \
 	gfx/widgets/widget.o \
 	gfx/widgets/button.o \
 	gfx/widgets/choice.o \
@@ -20,6 +21,8 @@ MODULE_OBJS = \
 	gfx/widgets/text_button.o \
 	res/rect.o \
 	res/resource.o \
+	res/resource_tag.o \
+	res/animation_resource.o \
 	res/font_resource.o \
 	res/image_resource.o \
 	res/label_resource.o \
@@ -27,6 +30,7 @@ MODULE_OBJS = \
 	res/request_resource.o \
 	res/screen_resource.o \
 	views/view.o \
+	views/movie.o \
 	views/dialogs/dialog.o \
 	views/dialogs/options.o \
 	views/dialogs/preferences.o

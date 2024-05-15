@@ -73,6 +73,8 @@ void FontResource::load(const Common::String &name) {
 			}
 		}
 	}
+
+	delete font;
 }
 
 int FontResource::getFontHeight() const {
