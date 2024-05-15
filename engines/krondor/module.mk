@@ -26,6 +26,7 @@ MODULE_OBJS = \
 	res/font_resource.o \
 	res/image_resource.o \
 	res/label_resource.o \
+	res/movie_resource.o \
 	res/palette_resource.o \
 	res/request_resource.o \
 	res/screen_resource.o \
