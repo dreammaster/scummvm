@@ -25,7 +25,8 @@ namespace Krondor {
 
 Vars *g_vars;
 
-Vars::Vars() : _icons1("bicons1.bmx"), _icons2("bicons2.bmx") {
+Vars::Vars() : _icons1("bicons1.bmx"), _icons2("bicons2.bmx"),
+		_frpSx("frp.sx") {
 	g_vars = this;
 }
 

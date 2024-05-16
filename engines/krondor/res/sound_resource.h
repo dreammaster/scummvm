@@ -22,18 +22,23 @@
 #ifndef KRONDOR_RES_SOUND_RESOURCE_H
 #define KRONDOR_RES_SOUND_RESOURCE_H
 
-#include "common/hashmap.h"
+#include "audio/audiostream.h"
+#include "common/array.h"
 #include "krondor/res/resource.h"
 
 namespace Krondor {
 
 struct SoundData {
+	~SoundData();
+
+	Common::String _name;
+	uint _type = 0;
+	Common::Array<Audio::SeekableAudioStream *> _sounds;
 };
 
 class SoundResource : public TaggedResource {
 private:
-	Common::HashMap<uint, SoundData> soundMap;
-	static SoundResource *_instance;
+	Common::HashMap<uint, SoundData> _soundMap;
 
 public:
 	SoundResource() : TaggedResource() {}
@@ -44,6 +49,9 @@ public:
 
 	void clear();
 	void load(const Common::String &name);
+	SoundData &getSoundData(uint id) {
+		return _soundMap[id];
+	}
 };
 
 } // namespace Krondor

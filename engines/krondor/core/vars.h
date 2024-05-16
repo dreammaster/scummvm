@@ -23,6 +23,7 @@
 #define KRONDOR_CORE_VARS_H
 
 #include "krondor/res/image_resource.h"
+#include "krondor/res/sound_resource.h"
 #include "krondor/core/prefs.h"
 
 namespace Krondor {
@@ -32,6 +33,7 @@ public:
 	Prefs _prefs;
 	Prefs _tempPrefs;
 	ImageResource _icons1, _icons2;
+	SoundResource _frpSx;
 
 public:
 	Vars();
