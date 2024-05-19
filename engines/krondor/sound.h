@@ -23,6 +23,8 @@
 #define KRONDOR_SOUND_H
 
 #include "audio/midiplayer.h"
+#include "audio/mixer.h"
+#include "common/multimap.h"
 #include "krondor/sound.h"
 
 namespace Krondor {
@@ -33,6 +35,13 @@ enum SoundFormat {
 	SF_UNKNOWN
 };
 
+struct MidiEvent {
+	uint delta;
+	uint size;
+	byte data[8];
+};
+
+
 class Sound {
 private:
 	uint _type;
@@ -40,6 +49,17 @@ private:
 	SoundFormat _format = SF_UNKNOWN;
 	byte *_data = nullptr;
 	size_t _size = 0;
+	Audio::SoundHandle _soundHandle;
+
+	/**
+	 * I'm not sure if MIDI format the data is in is standard or not,
+	 * but luckily xBak had code to load the MIDI commands, and then
+	 * another method to create an SMF file. This is used to create
+	 * something that ScummVM's MIDI parser can handle.
+	 */
+	void parseMidi(Common::SeekableReadStream *src);
+	void generateMidi(Common::MultiMap<uint, MidiEvent> &midiEvents);
+	void putVariableLength(Common::WriteStream *dest, uint n);
 
 public:
 	Sound(uint type) : _type(type) {}
@@ -59,6 +79,7 @@ public:
 	}
 
 	void load(Common::SeekableReadStream *src);
+	void play();
 };
 
 } // namespace Krondor

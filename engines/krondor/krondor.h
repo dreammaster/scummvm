@@ -107,6 +107,10 @@ public:
 		return syncGame(s);
 	}
 
+	MusicPlayer *getMidi() const {
+		return _midi;
+	}
+
 	/**
 	 * Pause all internal timers.
 	 */

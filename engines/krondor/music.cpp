@@ -48,7 +48,7 @@ void MusicPlayer::play(Sound *sound) {
 
 	MidiParser *parser = nullptr;
 	bool loaded = false;
-	parser = MidiParser::createParser_XMIDI();
+	parser = MidiParser::createParser_SMF();
 	loaded = parser->loadMusic(sound->getData(), sound->getSize());
 
 	if (loaded) {

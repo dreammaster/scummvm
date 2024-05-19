@@ -56,7 +56,8 @@ void SoundResource::load(const Common::String &resName) {
 		if (id != f.readUint16LE())
 			error("Data corruption in sound resource");
 
-		SoundData data;
+		_soundMap[id] = SoundData();
+		SoundData &data = _soundMap[id];
 		data._name = name;
 		data._type = f.readByte();
 		f.skip(2);
@@ -65,7 +66,7 @@ void SoundResource::load(const Common::String &resName) {
 		f.skip(2);
 		Common::SeekableReadStream *soundBuff = f.readStream(sndSize);
 
-		f.skip(-(int)soundBuff->size());
+		f.seek(-(int)soundBuff->size(), SEEK_CUR);
 		int code = f.readByte();
 
 		while (code != 0xff) {
@@ -79,6 +80,7 @@ void SoundResource::load(const Common::String &resName) {
 				offsetVec.push_back(f.readUint16LE());
 				sizeVec.push_back(f.readUint16LE());
 				code = f.readByte();
+				assert(offsetVec.size() < 256);
 			}
 
 			for (uint j = 0; j < offsetVec.size(); j++) {
@@ -91,9 +93,9 @@ void SoundResource::load(const Common::String &resName) {
 
 			data._sounds.push_back(sound);
 			code = f.readByte();
+			assert(data._sounds.size() < 256);
 		}
 
-		_soundMap[id] = data;
 		delete soundBuff;
 	}
 
