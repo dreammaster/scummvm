@@ -36,6 +36,7 @@
 
 #include "krondor/detection.h"
 #include "krondor/events.h"
+#include "krondor/music.h"
 #include "krondor/core/vars.h"
 
 namespace Krondor {
@@ -46,6 +47,7 @@ class KrondorEngine : public Engine, public Events {
 private:
 	const ADGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
+	MusicPlayer *_midi = nullptr;
 
 protected:
 	// Engine APIs
@@ -104,6 +106,11 @@ public:
 		Common::Serializer s(stream, nullptr);
 		return syncGame(s);
 	}
+
+	/**
+	 * Pause all internal timers.
+	 */
+	void pauseEngineIntern(bool pause) override;
 };
 
 extern KrondorEngine *g_engine;

@@ -28,76 +28,77 @@ void SoundResource::clear() {
 	_soundMap.clear();
 }
 
-void SoundResource::load(const Common::String &name) {
+void SoundResource::load(const Common::String &resName) {
 	clear();
-	File f(name);
+	File f(resName);
 	loadIndex(&f);
 
-	Common::SeekableReadStream *infbuf = getTag(&f, TAG_INF);
-	Common::SeekableReadStream *tagbuf = getTag(&f, TAG_TAG);
-	if (!infbuf || !tagbuf)
+	Common::SeekableReadStream *infBuff = getTag(&f, TAG_INF);
+	Common::SeekableReadStream *tagBuff = getTag(&f, TAG_TAG);
+	if (!infBuff || !tagBuff)
 		error("Data corruption in sound resource");
 
-	infbuf->skip(2);
-	uint n = infbuf->readUint16LE();
-	infbuf->skip(1);
+	infBuff->skip(2);
+	uint n = infBuff->readUint16LE();
+	infBuff->skip(1);
 	ResourceTag tags;
-	tags.load(tagbuf);
+	tags.load(tagBuff);
 
 	for (uint i = 0; i < n; i++) {
-		uint id = infbuf->readUint16LE();
-		uint offset = infbuf->readUint32LE();
+		uint id = infBuff->readUint16LE();
+		uint offset = infBuff->readUint32LE();
 		Common::String name;
 
-		if (tags.find(id, name)) {
-			f.seek(offset + 8);
-			if (id != f.readUint16LE())
-				error("Data corruption in sound resource");
+		if (!tags.find(id, name))
+			error("Tag not found - %d", id);
 
-			SoundData data;
-			data._name = name;
-			data._type = f.readByte();
-			f.skip(2);
+		f.seek(offset + 8);
+		if (id != f.readUint16LE())
+			error("Data corruption in sound resource");
 
-			uint sndSize = f.readUint32LE() - 2;
-			f.skip(2);
-			Common::SeekableReadStream *sndbuf = f.readStream(sndSize);
+		SoundData data;
+		data._name = name;
+		data._type = f.readByte();
+		f.skip(2);
 
-			f.skip(-(int)sndbuf->size());
-			int code = f.readByte();
+		uint sndSize = f.readUint32LE() - 2;
+		f.skip(2);
+		Common::SeekableReadStream *soundBuff = f.readStream(sndSize);
+
+		f.skip(-(int)soundBuff->size());
+		int code = f.readByte();
+
+		while (code != 0xff) {
+			Sound *sound = new Sound(code);
+			Common::Array<uint> offsetVec;
+			Common::Array<uint> sizeVec;
+			code = f.readByte();
+
 			while (code != 0xff) {
-				Sound *sound = new Sound(code);
-				Common::Array<uint> offsetVec;
-				Common::Array<uint> sizeVec;
-				code = f.readUint8();
-				while (code != 0xff)
-				{
-					f.skip(1);
-					offsetVec.push_back(f.readUint16LE());
-					sizeVec.push_back(f.readUint16LE());
-					code = f.readUint8();
-				}
-				for (uint j = 0; j < offsetVec.size(); j++)
-				{
-					sndbuf->Seek(offsetVec[j]);
-					FileBuffer *samplebuf = new FileBuffer(sizeVec[j]);
-					samplebuf->Fill(sndbuf);
-					sound->AddVoice(samplebuf);
-					delete samplebuf;
-				}
-				sound->GenerateBuffer();
-				data.sounds.push_back(sound);
-				code = f.readUint8();
+				f.skip(1);
+				offsetVec.push_back(f.readUint16LE());
+				sizeVec.push_back(f.readUint16LE());
+				code = f.readByte();
 			}
-			soundMap.insert(std::pair<uint, SoundData>(id, data));
-			delete sndbuf;
-		} else
-		{
-			throw DataCorruption(__FILE__, __LINE__);
+
+			for (uint j = 0; j < offsetVec.size(); j++) {
+				soundBuff->seek(offsetVec[j]);
+				Common::SeekableReadStream *sampleBuff =
+					soundBuff->readStream(sizeVec[j]);
+				sound->load(sampleBuff);
+				delete sampleBuff;
+			}
+
+			data._sounds.push_back(sound);
+			code = f.readByte();
 		}
+
+		_soundMap[id] = data;
+		delete soundBuff;
 	}
 
-//	delete font;
+	delete infBuff;
+	delete tagBuff;
 }
 
 

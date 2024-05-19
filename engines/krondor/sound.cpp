@@ -19,42 +19,29 @@
  *
  */
 
-#ifndef KRONDOR_RES_SOUND_RESOURCE_H
-#define KRONDOR_RES_SOUND_RESOURCE_H
-
-#include "audio/audiostream.h"
-#include "common/array.h"
-#include "krondor/res/resource.h"
+#include "common/memstream.h"
 #include "krondor/sound.h"
 
 namespace Krondor {
 
-struct SoundData {
-	~SoundData();
+Sound::~Sound() {
+	delete[] _data;
+}
 
-	Common::String _name;
-	uint _type = 0;
-	Common::Array<Sound *> _sounds;
-};
+void Sound::load(Common::SeekableReadStream *src) {
+	assert(!_data);
+	byte code = src->readByte();
+	_channel = code & 0x0f;
 
-class SoundResource : public TaggedResource {
-private:
-	Common::HashMap<uint, SoundData> _soundMap;
-
-public:
-	SoundResource() : TaggedResource() {}
-	SoundResource(const Common::String &name) : TaggedResource() {
-		load(name);
+	if (code == 0xfe) {
+		_format = SF_WAVE;
+	} else {
+		_format = SF_MIDI;
 	}
-	~SoundResource() override {}
 
-	void clear();
-	void load(const Common::String &name);
-	SoundData &getSoundData(uint id) {
-		return _soundMap[id];
-	}
-};
+	_size = src->size();
+	byte *data = new byte[_size];
+	src->read(data, _size);
+}
 
 } // namespace Krondor
-
-#endif

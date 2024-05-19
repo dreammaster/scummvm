@@ -6,6 +6,8 @@ MODULE_OBJS = \
 	events.o \
 	messages.o \
 	metaengine.o \
+	music.o \
+	sound.o \
 	core/prefs.o \
 	core/vars.o \
 	files/decompress.o \

@@ -19,40 +19,46 @@
  *
  */
 
-#ifndef KRONDOR_RES_SOUND_RESOURCE_H
-#define KRONDOR_RES_SOUND_RESOURCE_H
+#ifndef KRONDOR_SOUND_H
+#define KRONDOR_SOUND_H
 
-#include "audio/audiostream.h"
-#include "common/array.h"
-#include "krondor/res/resource.h"
+#include "audio/midiplayer.h"
 #include "krondor/sound.h"
 
 namespace Krondor {
 
-struct SoundData {
-	~SoundData();
-
-	Common::String _name;
-	uint _type = 0;
-	Common::Array<Sound *> _sounds;
+enum SoundFormat {
+	SF_MIDI,
+	SF_WAVE,
+	SF_UNKNOWN
 };
 
-class SoundResource : public TaggedResource {
+class Sound {
 private:
-	Common::HashMap<uint, SoundData> _soundMap;
+	uint _type;
+	uint _channel = 255;
+	SoundFormat _format = SF_UNKNOWN;
+	byte *_data = nullptr;
+	size_t _size = 0;
 
 public:
-	SoundResource() : TaggedResource() {}
-	SoundResource(const Common::String &name) : TaggedResource() {
-		load(name);
-	}
-	~SoundResource() override {}
+	Sound(uint type) : _type(type) {}
+	virtual ~Sound();
 
-	void clear();
-	void load(const Common::String &name);
-	SoundData &getSoundData(uint id) {
-		return _soundMap[id];
+	uint getType() const {
+		return _type;
 	}
+	SoundFormat GetFormat() const {
+		return _format;
+	}
+	byte *getData() const {
+		return _data;
+	}
+	size_t getSize() const {
+		return _size;
+	}
+
+	void load(Common::SeekableReadStream *src);
 };
 
 } // namespace Krondor

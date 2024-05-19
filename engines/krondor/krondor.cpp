@@ -35,6 +35,7 @@ KrondorEngine::KrondorEngine(OSystem *syst, const ADGameDescription *gameDesc) :
 }
 
 KrondorEngine::~KrondorEngine() {
+	delete _midi;
 }
 
 uint32 KrondorEngine::getFeatures() const {
@@ -57,6 +58,8 @@ Common::Error KrondorEngine::run() {
 		return Common::kNoError;
 	}
 
+	_midi = new MusicPlayer();
+
 	Vars *vars = new Vars();
 
 	runGame();
@@ -74,6 +77,15 @@ Common::Error KrondorEngine::syncGame(Common::Serializer &s) {
 	s.syncAsUint32LE(dummy);
 
 	return Common::kNoError;
+}
+
+void KrondorEngine::pauseEngineIntern(bool pause) {
+	Engine::pauseEngineIntern(pause);
+	if (pause) {
+		_midi->pause();
+	} else {
+		_midi->resume();
+	}
 }
 
 } // End of namespace Krondor
