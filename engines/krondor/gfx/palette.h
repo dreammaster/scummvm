@@ -19,29 +19,25 @@
  *
  */
 
-#ifndef KRONDOR_RES_PALETTE_RESOURCE_H
-#define KRONDOR_RES_PALETTE_RESOURCE_H
+#ifndef KRONDOR_GFX_PALETTE_H
+#define KRONDOR_GFX_PALETTE_H
 
-#include "common/memstream.h"
-#include "krondor/gfx/palette.h"
-#include "krondor/res/resource.h"
+#include "graphics/palette.h"
 
 namespace Krondor {
+namespace Gfx {
 
-class PaletteResource : public TaggedResource, public Gfx::Palette {
+class Palette : public Graphics::Palette {
 public:
-	PaletteResource() : TaggedResource(), Gfx::Palette(nullptr, 0) {}
-	PaletteResource(const Common::String &name) : TaggedResource(),
-			Gfx::Palette(nullptr, 0) {
-		load(name);
-	}
-	~PaletteResource() override {}
+	Palette(uint size) : Graphics::Palette(size) {}
+	Palette(const byte *data, uint size) : Graphics::Palette(data, size) {}
+	Palette(const Palette &p) : Graphics::Palette(p) {}
 
-	void load(const Common::String &name);
-
-	void clear();
+	void setActive();
+	void getActive();
 };
 
+} // namespace Gfx
 } // namespace Krondor
 
 #endif

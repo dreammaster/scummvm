@@ -16,6 +16,7 @@ MODULE_OBJS = \
 	gfx/gfx_surface.o \
 	gfx/mouse_cursor.o \
 	gfx/movie_decoder.o \
+	gfx/palette.o \
 	gfx/widgets/widget.o \
 	gfx/widgets/button.o \
 	gfx/widgets/choice.o \
