@@ -28,6 +28,9 @@
 
 namespace Krondor {
 
+constexpr int SCREEN_WIDTH = 320;
+constexpr int SCREEN_HEIGHT = 200;
+
 struct Vars {
 public:
 	Prefs _prefs;

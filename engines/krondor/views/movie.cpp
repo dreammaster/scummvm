@@ -24,6 +24,33 @@
 namespace Krondor {
 namespace Views {
 
+void Movie::play(const Common::String &name, bool repeat) {
+	if (!_decoder.loadFile(Common::Path(name)))
+		error("Could not load - %s", name.c_str());
+	_decoder.setRepeat(repeat);
+
+	g_events->replaceView("Movie");
+}
+
+bool Movie::msgFocus(const FocusMessage &msg) {
+	View::msgFocus(msg);
+
+	_decoder.start();
+	tick();
+	return true;
+}
+
+bool Movie::tick() {
+	if (_decoder.needsUpdate())
+		redraw();
+	return true;
+}
+
+void Movie::draw() {
+	GfxSurface s = getSurface();
+	const Graphics::ManagedSurface *src = _decoder.decodeNextFrame();
+	s.blitFrom(*src);
+}
 
 } // namespace Views
 } // namespace Krondor

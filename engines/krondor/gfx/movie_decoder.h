@@ -36,14 +36,16 @@ namespace Gfx {
 static const uint MAX_IMAGE_SLOTS = 4;
 static const uint MAX_PALETTE_SLOTS = 4;
 
-class MovieDecoder : public Video::VideoDecoder {
+class MovieDecoder {
 private:
 	AnimationResource _anim;
 	MovieResource _ttm;
 	bool _repeat = false;
 
-private:
-	Common::Array<MovieTag *> *tagVec = nullptr;
+	Graphics::ManagedSurface _surface;
+	const Common::Array<MovieTag *> *tagVec = nullptr;
+	uint32 _nextFrameTime = 0;
+
 	ScreenResource *screenSlot = nullptr;
 	SoundResource *soundSlot = nullptr;
 	ImageResource *imageSlot[MAX_IMAGE_SLOTS];
@@ -56,20 +58,24 @@ private:
 	uint currImage = 0;
 	uint currPalette = 0;
 	uint currTag = 0;
-	uint currDelay = 0;
 	uint currSound = 0;
 	Common::HashMap<uint, int> soundMap;
 	bool paletteActivated = false;
-	bool playing = false;
+	bool _playing = false;
 	bool looped = false;
-	bool delayed = false;
 
 	void loadMovie(const Common::Array<MovieTag *> *movie);
 	//void playTag(MediaToolkit *media);
 
+	void clear();
+	void setDelay(uint time);
+
 public:
-	bool loadFile(const Common::Path &filename) override;
-	bool loadStream(Common::SeekableReadStream *stream) override;
+	~MovieDecoder() {
+		clear();
+	}
+
+	bool loadFile(const Common::Path &filename);
 
 	bool isRepeat() const {
 		return _repeat;
@@ -77,6 +83,12 @@ public:
 	void setRepeat(bool repeat) {
 		_repeat = repeat;
 	}
+
+	void start();
+	void stop();
+	bool needsUpdate();
+
+	const Graphics::ManagedSurface *decodeNextFrame();
 };
 
 } // namespace Gfx

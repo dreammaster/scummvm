@@ -35,8 +35,11 @@ private:
 public:
 	Movie() : View("Movie") {}
 
+	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
 	bool tick() override;
+
+	void play(const Common::String &name, bool repeat);
 };
 
 } // namespace Views
