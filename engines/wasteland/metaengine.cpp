@@ -24,6 +24,7 @@
 #include "wasteland/metaengine.h"
 #include "wasteland/detection.h"
 #include "wasteland/keymapping.h"
+#include "wasteland/wasteland1/wasteland1.h"
 #include "wasteland/fod/fod.h"
 
 namespace Wasteland {
@@ -54,8 +55,21 @@ const ADExtraGuiOptionsMap *WastelandMetaEngine::getAdvancedExtraGuiOptions() co
 }
 
 Common::Error WastelandMetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const {
-	*engine = new Wasteland::FOD::FountainOfDreamsEngine(syst,
-		(const Wasteland::WastelandGameDescription *)desc);
+	const auto *gd = (Wasteland::WastelandGameDescription *)desc;
+
+	switch (gd->gameType) {
+	case Wasteland::GAMETYPE_WASTELAND:
+		*engine = new Wasteland::Wasteland1::Wasteland1Engine(syst, gd);
+		break;
+	case Wasteland::GAMETYPE_FOD:
+		*engine = new Wasteland::FOD::FountainOfDreamsEngine(syst, gd);
+		break;
+
+	default:
+		error("Unknown game");
+		break;
+	}
+
 	return Common::kNoError;
 }
 
