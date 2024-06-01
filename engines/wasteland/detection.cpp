@@ -40,6 +40,7 @@ const DebugChannelDef WastelandMetaEngineDetection::debugFlagList[] = {
 
 WastelandMetaEngineDetection::WastelandMetaEngineDetection() : AdvancedMetaEngineDetection(
 	Wasteland::gameDescriptions, Wasteland::wastelandGames) {
+	_flags = kADFlagMatchFullPaths;
 }
 
 REGISTER_PLUGIN_STATIC(WASTELAND_DETECTION, PLUGIN_TYPE_ENGINE_DETECTION, WastelandMetaEngineDetection);
