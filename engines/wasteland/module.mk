@@ -9,6 +9,7 @@ MODULE_OBJS = \
 	metaengine.o \
 	core/array.o \
 	core/decoder.o \
+	core/file.o \
 	gfx/clickable_text.o \
 	gfx/image_decoder.o \
 	gfx/surface.o \

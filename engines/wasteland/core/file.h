@@ -19,35 +19,27 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
-#define WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
+#ifndef MM_WASTELAND_CORE_FILE_H
+#define MM_WASTELAND_CORE_FILE_H
 
-#include "graphics/managed_surface.h"
-#include "wasteland/events.h"
+#include "common/file.h"
 
 namespace Wasteland {
-namespace Wasteland1 {
-namespace Views {
-namespace Dialogs {
 
-class Title : public UIElement {
-private:
-	Graphics::ManagedSurface _surface;
-
+/**
+ * Derived file class
+ */
+class File : public Common::File {
 public:
-	Title() : UIElement("Title") {}
-	virtual ~Title() {}
+	File() : Common::File() {}
+	File(const Common::Path &filename);
 
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	void timeout() override;
+	/**
+	 * Opens the given file, throwing an error if it can't be opened
+	 */
+	bool open(const Common::Path &filename) override;
 };
 
-} // namespace Dialogs
-} // namespace Views
-} // namespace Wasteland1
 } // namespace Wasteland
 
 #endif
