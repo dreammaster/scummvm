@@ -35,20 +35,6 @@ void Surface::setupPalette() {
 
 	uint32 white = 0xffffffff;
 	g_system->getPaletteManager()->setPalette((const byte *)&white, 255, 1);
-	return;
-	/*
-	// The game sets blocks of 16 palette entries to the same color
-	byte pal[3];
-
-	for (int blockCtr = 0; blockCtr < 16; ++blockCtr) {
-		const byte *src = &MASTER_PALETTE[0][blockCtr];
-		for (int i = 0; i < 3; ++i, ++src)
-			pal[i] = VGA_COLOR_TRANS(*src);
-
-		for (int i = 0; i < 16; ++i)
-			g_system->getPaletteManager()->setPalette(pal, blockCtr * 16 + i, 1);
-	}
-	*/
 }
 
 void Surface::writeString(const Common::String &str) {

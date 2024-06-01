@@ -21,14 +21,16 @@
 
 #include "common/system.h"
 #include "graphics/palette.h"
-#include "wasteland/Wasteland1/views/dialogs/title.h"
-#include "wasteland/Wasteland1/Wasteland1.h"
-#include "wasteland/gfx/image_decoder.h"
+#include "wasteland/wasteland1/views/dialogs/title.h"
+#include "wasteland/core/file.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
 namespace Dialogs {
+
+#define TITLE_W 288
+#define TITLE_H 128
 
 bool Title::msgKeypress(const KeypressMessage &msg) {
 	timeout();
@@ -42,16 +44,32 @@ bool Title::msgMouseDown(const MouseDownMessage &msg) {
 
 void Title::draw() {
 	Surface s = getSurface();
-	Gfx::ImageDecoder decoder;
-
-	if (!decoder.load("TPICT", 320, 200))
-		error("Could not load TPICT");
-
-	s.blitFrom(*decoder.getSurface());
+	s.blitFrom(_surface);
 }
 
 bool Title::msgFocus(const FocusMessage &msg) {
-	delaySeconds(1);
+	// Read title in
+	File f("title.pic");
+	byte tmp[TITLE_W / 2 * TITLE_H];
+	f.read(tmp, TITLE_W / 2 * TITLE_H);
+
+	// Do a vertical xor decoding
+	byte *s1 = tmp;
+	byte *s2 = tmp + TITLE_W / 2;
+	for (int i = 0; i < (TITLE_W / 2 * (TITLE_H - 1)); ++i, ++s1, ++s2)
+		*s2 ^= *s1;
+
+	// Load into surface
+	_surface.create(TITLE_W, TITLE_H);
+
+	const byte *pSrc = tmp;
+	byte *pDest = (byte *)_surface.getPixels();
+	for (int i = 0; i < (TITLE_W / 2 * (TITLE_H - 1)); ++i, ++pSrc) {
+		*pDest++ = *pSrc & 0xf;
+		*pDest++ = *pSrc >> 4;
+	}
+
+	//delaySeconds(1);
 	return true;
 }
 
