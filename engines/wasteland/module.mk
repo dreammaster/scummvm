@@ -15,6 +15,8 @@ MODULE_OBJS = \
 	gfx/text_entry.o \
 	gfx/tiles.o \
 	gfx/wasteland_font.o \
+	wasteland1/wasteland1.o \
+	wasteland1/views/dialogs/title.o \
 	fod/fod.o \
 	fod/sound.o \
 	fod/data/archetypes.o \
