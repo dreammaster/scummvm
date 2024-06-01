@@ -28,6 +28,34 @@ const PlainGameDescriptor wastelandGames[] = {
 };
 
 const WastelandGameDescription gameDescriptions[] = {
+	// Wasteland 1
+	{
+		{
+			"wasteland",
+			nullptr,
+			AD_ENTRY1s("game1", "f4398aa2c7aeeb1c63466c08bd49b50f", 159429),
+			Common::EN_ANY,
+			Common::kPlatformDOS,
+			ADGF_UNSTABLE,
+			GUIO1(GUIO_NONE)
+		},
+		GAMETYPE_WASTELAND
+	},
+
+	// GOG Wasteleand 1 Classic
+	{
+		{
+			"wasteland",
+			nullptr,
+			AD_ENTRY1s("rom/data/game1", "4cfb4e6ffacccc865990019c32108bfe", 159429),
+			Common::EN_ANY,
+			Common::kPlatformDOS,
+			ADGF_UNSTABLE,
+			GUIO1(GUIO_NONE)
+		},
+		GAMETYPE_WASTELAND
+	},
+
 	{
 		{
 			"fountainofdreams",
