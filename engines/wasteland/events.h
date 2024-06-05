@@ -266,6 +266,12 @@ public:
 	#undef MESSAGE
 };
 
+struct Cursor {
+	Graphics::ManagedSurface _image;
+	Graphics::ManagedSurface _mask;
+};
+typedef Common::Array<Cursor> CursorArray;
+
 /**
  * Main events and view manager. This is kept separate from the engine
  * class because the engine may add a lot of globals and bring in other
@@ -278,6 +284,10 @@ private:
 	Graphics::Screen *_screen = nullptr;
 	Common::Stack<UIElement *> _views;
 	bool _cursorVisible = true;
+	int _cursorNum = -1;
+
+protected:
+	CursorArray _cursors;
 
 protected:
 	/**
@@ -415,6 +425,11 @@ public:
 	void close() override {
 		focusedView()->close();
 	}
+
+	/**
+	 * Set the cursor
+	 */
+	void setCursor(int cursorNum);
 };
 
 extern Events *g_events;
