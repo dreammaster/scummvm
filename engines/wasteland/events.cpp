@@ -57,7 +57,7 @@ void Events::runGame() {
 	setup();
 
 	// Set the mouse cursor
-	CursorMan.replaceCursor(CURSOR_ARROW_DATA, 8, 8, 0, 0, 0);
+	//CursorMan.replaceCursor(CURSOR_ARROW_DATA, 8, 8, 0, 0, 0);
 	CursorMan.showMouse(true);
 
 	// Run the game
@@ -215,6 +215,16 @@ void Events::addKeypress(const Common::KeyCode kc) {
 		ks.ascii = kc;
 
 	focusedView()->msgKeypress(KeypressMessage(ks));
+}
+
+void Events::setCursor(int cursorNum) {
+	_cursorNum = cursorNum;
+	const Cursor &curs = _cursors[cursorNum];
+
+	g_system->setMouseCursor(curs._image.getPixels(),
+		curs._image.w, curs._image.h, 0, 0, (uint)-1, false, nullptr,
+		(const byte *)curs._mask.getPixels()
+	);
 }
 
 /*------------------------------------------------------------------------*/

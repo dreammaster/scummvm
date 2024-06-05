@@ -19,44 +19,24 @@
  *
  */
 
-#include "wasteland/gfx/wasteland_font.h"
-#include "wasteland/gfx/surface.h"
+#ifndef WASTELAND_WASTELAND1_GFX_CURSORS_H
+#define WASTELAND_WASTELAND1_GFX_CURSORS_H
+
+#include "wasteland/engine.h"
+#include "wasteland/wasteland1/views/views.h"
 #include "wasteland/wasteland1/wasteland1.h"
-#include "wasteland/wasteland1/gfx/cursors.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
+namespace W1Gfx {
 
-Wasteland1Engine *g_engine;
+class Cursors {
+public:
+	static void load(CursorArray &cursors);
+};
 
-Wasteland1Engine::Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc) :
-		Wasteland::Engine(syst, gameDesc) {
-	g_engine = this;
-}
-
-Wasteland1Engine::~Wasteland1Engine() {
-	g_engine = nullptr;
-	delete _views;
-	delete _font;
-}
-
-void Wasteland1Engine::initializePath(const Common::FSNode &gamePath) {
-	Engine::initializePath(gamePath);
-	SearchMan.addDirectory("data", gamePath.getChild("rom").getChild("data"), 0, 3);
-}
-
-void Wasteland1Engine::setup() {
-	_views = new Views::Views();
-	addView("Title");
-
-	Gfx::Surface::setupPalette();
-	auto font = new Wasteland::Gfx::WastelandFont();
-	if (!font->load("colorf.fnt"))
-		error("Could not load FONT");
-
-	W1Gfx::Cursors::load(_cursors);
-	setCursor(0);
-}
-
+} // namespace W1Gfx
 } // namespace Wasteland1
 } // namespace Wasteland
+
+#endif
