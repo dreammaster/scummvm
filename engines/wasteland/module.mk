@@ -33,6 +33,7 @@ MODULE_OBJS = \
 	fod/data/pics.o \
 	fod/data/strings.o \
 	fod/data/weapons.o \
+	fod/gfx/cursors.o \
 	fod/logic/game.o \
 	fod/logic/scripts.o \
 	fod/views/core/base_view.o \

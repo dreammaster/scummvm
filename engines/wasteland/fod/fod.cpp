@@ -22,6 +22,7 @@
 #include "wasteland/gfx/wasteland_font.h"
 #include "wasteland/gfx/surface.h"
 #include "wasteland/fod/fod.h"
+#include "wasteland/fod/gfx/cursors.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -65,6 +66,9 @@ void FountainOfDreamsEngine::setup() {
 		error("Could not load GLOBALS");
 	if (!_weapons.load())
 		error("Could not load WEAPONS");
+
+	FGfx::Cursors::load(_cursors);
+	setCursor(0);
 }
 
 } // namespace FOD
