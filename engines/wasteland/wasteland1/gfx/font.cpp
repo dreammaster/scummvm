@@ -19,44 +19,49 @@
  *
  */
 
-#include "wasteland/gfx/surface.h"
-#include "wasteland/wasteland1/wasteland1.h"
-#include "wasteland/wasteland1/gfx/cursors.h"
+#include "wasteland/core/file.h"
 #include "wasteland/wasteland1/gfx/font.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
+namespace W1Gfx {
 
-Wasteland1Engine *g_engine;
+#define FIRST_CHAR 16
 
-Wasteland1Engine::Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc) :
-		Wasteland::Engine(syst, gameDesc) {
-	g_engine = this;
+void Font::load() {
+	File f("colorf.fnt");
+	_chars.resize(172);
+
+	int i;
+	int b;
+	int y;
+	int bit, pixel;
+
+	for (i = 0; i < 172; ++i) {
+		Graphics::ManagedSurface &s = _chars[i];
+		s.create(FONT_W, FONT_H);
+
+		for (bit = 0; bit < 4; bit++) {
+			for (y = 0; y < 8; y++) {
+				b = f.readByte();
+
+				for (pixel = 0; pixel < 8; pixel++) {
+					s.setPixel(pixel, y, s.getPixel(pixel, y)
+						| (((b >> (7 - pixel)) & 1) << bit));
+				}
+			}
+		}
+	}
 }
 
-Wasteland1Engine::~Wasteland1Engine() {
-	g_engine = nullptr;
-	delete _views;
-	delete _font;
+void Font::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+	assert(chr >= 0 && chr < _chars.size());
+	const Graphics::ManagedSurface &charImage = _chars[chr];
+
+	Graphics::ManagedSurface dest(dst, DisposeAfterUse::NO);
+	dest.blitFrom(charImage, Common::Point(x, y));
 }
 
-void Wasteland1Engine::initializePath(const Common::FSNode &gamePath) {
-	Engine::initializePath(gamePath);
-	SearchMan.addDirectory("data", gamePath.getChild("rom").getChild("data"), 0, 3);
-}
-
-void Wasteland1Engine::setup() {
-	_views = new Views::Views();
-	addView("Title");
-
-	Gfx::Surface::setupPalette();
-	auto font = new W1Gfx::Font();
-	font->load();
-	_font = font;
-
-	W1Gfx::Cursors::load(_cursors);
-	setCursor(0);
-}
-
+} // namespace W1Gfx
 } // namespace Wasteland1
 } // namespace Wasteland

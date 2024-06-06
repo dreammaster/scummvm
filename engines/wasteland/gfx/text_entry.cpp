@@ -20,7 +20,6 @@
  */
 
 #include "wasteland/gfx/text_entry.h"
-#include "wasteland/gfx/wasteland_font.h"
 
 namespace Wasteland {
 namespace Gfx {

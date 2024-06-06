@@ -30,6 +30,8 @@ namespace Gfx {
 
 #define TEXT_W 40
 #define TEXT_H 25
+#define FONT_W 8
+#define FONT_H 8
 
 struct Window : public Common::Rect {
 	int _xOffset = 0;

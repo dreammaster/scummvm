@@ -20,7 +20,6 @@
  */
 
 #include "wasteland/gfx/clickable_text.h"
-#include "wasteland/gfx/wasteland_font.h"
 
 namespace Wasteland {
 namespace Gfx {

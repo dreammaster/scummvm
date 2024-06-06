@@ -18,6 +18,7 @@ MODULE_OBJS = \
 	gfx/wasteland_font.o \
 	wasteland1/wasteland1.o \
 	wasteland1/gfx/cursors.o \
+	wasteland1/gfx/font.o \
 	wasteland1/views/dialogs/title.o \
 	fod/fod.o \
 	fod/sound.o \
@@ -34,6 +35,7 @@ MODULE_OBJS = \
 	fod/data/strings.o \
 	fod/data/weapons.o \
 	fod/gfx/cursors.o \
+	fod/gfx/font.o \
 	fod/logic/game.o \
 	fod/logic/scripts.o \
 	fod/views/core/base_view.o \
