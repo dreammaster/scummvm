@@ -20,7 +20,6 @@
  */
 
 #include "wasteland/fod/views/dialogs/dialog.h"
-#include "wasteland/gfx/wasteland_font.h"
 
 namespace Wasteland {
 namespace FOD {

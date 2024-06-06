@@ -45,6 +45,15 @@ bool Title::msgMouseDown(const MouseDownMessage &msg) {
 void Title::draw() {
 	Surface s = getSurface();
 	s.blitFrom(_surface);
+
+	for (int y = 0; y < 172 / 16; ++y) {
+		for (int x = 0; x < 16; ++x) {
+			s.setTextPos(x, y);
+			s.writeChar((char)(y * 16 + x));
+		}
+	}
+
+	s.markAllDirty();
 }
 
 bool Title::msgFocus(const FocusMessage &msg) {

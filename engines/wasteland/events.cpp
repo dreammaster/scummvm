@@ -24,7 +24,6 @@
 #include "graphics/screen.h"
 #include "wasteland/events.h"
 #include "wasteland/engine.h"
-#include "wasteland/gfx/wasteland_font.h"
 
 namespace Wasteland {
 

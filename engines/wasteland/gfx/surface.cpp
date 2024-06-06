@@ -24,7 +24,6 @@
 #include "graphics/paletteman.h"
 #include "wasteland/gfx/surface.h"
 #include "wasteland/engine.h"
-#include "wasteland/gfx/wasteland_font.h"
 
 namespace Wasteland {
 namespace Gfx {

@@ -20,12 +20,13 @@
  */
 
 #include "common/file.h"
-#include "wasteland/gfx/wasteland_font.h"
+#include "wasteland/fod/gfx/font.h"
 
 namespace Wasteland {
-namespace Gfx {
+namespace FOD {
+namespace FGfx {
 
-bool WastelandFont::load(const Common::Path &filename) {
+bool Font::load(const Common::Path &filename) {
 	Common::File f;
 	if (!f.open(filename))
 		return false;
@@ -37,11 +38,11 @@ bool WastelandFont::load(const Common::Path &filename) {
 	return true;
 }
 
-WastelandFont::~WastelandFont() {
+Font::~Font() {
 	delete[] _data;
 }
 
-void WastelandFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+void Font::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
 	assert(chr < _count);
 	assert(x >= 0 && y >= 0 && x <= (dst->w - 8) && y <= (dst->h - 8));
 	const byte *src = &_data[chr * 32];
@@ -63,5 +64,6 @@ void WastelandFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, u
 	}
 }
 
-} // namespace Gfx
+} // namespace FGfx
+} // namespace FOD
 } // namespace Wasteland

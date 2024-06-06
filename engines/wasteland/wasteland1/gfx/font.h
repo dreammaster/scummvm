@@ -19,51 +19,55 @@
  *
  */
 
-#ifndef WASTELAND_GFX_WASTELAND_FONT_H
-#define WASTELAND_GFX_WASTELAND_FONT_H
+#ifndef WASTELAND_WASTELAND1_GFX_FONT_H
+#define WASTELAND_WASTELAND1_GFX_FONT_H
 
 #include "common/array.h"
 #include "common/rect.h"
 #include "graphics/font.h"
 #include "graphics/managed_surface.h"
+#include "wasteland/gfx/surface.h"
 
 namespace Wasteland {
-namespace Gfx {
-
-#define FONT_W 8
-#define FONT_H 8
+namespace Wasteland1 {
+namespace W1Gfx {
 
 /**
  * Implements a font stored as a grid on a passed surface
  */
-class WastelandFont : public Graphics::Font {
+class Font : public Graphics::Font {
 private:
-	size_t _count;
-	byte *_data = nullptr;
+	Common::Array<Graphics::ManagedSurface> _chars;
 
 public:
-	WastelandFont() : Graphics::Font() {}
-	~WastelandFont();
+	Font() : Graphics::Font() {}
+	~Font() override {}
 
 	/**
 	 * Loads the font from the specified file
 	 */
-	bool load(const Common::Path &filename);
+	void load();
 
 	/**
 	 * Get the font height
 	 */
-	int getFontHeight() const override { return FONT_H; }
+	int getFontHeight() const override {
+		return FONT_H;
+	}
 
 	/**
 	 * Get the maximum character width
 	 */
-	int getMaxCharWidth() const override { return FONT_W; }
+	int getMaxCharWidth() const override {
+		return FONT_W;
+	}
 
 	/**
 	 * Get the width of the given character
 	 */
-	int getCharWidth(uint32 chr) const override { return FONT_W; }
+	int getCharWidth(uint32 chr) const override {
+		return FONT_W;
+	}
 
 	/**
 	 * Draw a character
@@ -71,7 +75,8 @@ public:
 	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
 };
 
-} // namespace Gfx
+} // namespace W1Gfx
+} // namespace Wasteland1
 } // namespace Wasteland
 
 #endif
