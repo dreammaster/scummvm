@@ -33,15 +33,17 @@ namespace Wasteland1 {
 namespace W1Gfx {
 
 /**
- * Implements a font stored as a grid on a passed surface
+ * Implements the special font in colorf.fnt. This contains special
+ * glyphs like the different edge pieces of dialogs, and subsets of
+ * the alphabet used for dialog titles and button contents
  */
-class Font : public Graphics::Font {
+class ColorFont : public Graphics::Font {
 private:
 	Common::Array<Graphics::ManagedSurface> _chars;
 
 public:
-	Font() : Graphics::Font() {}
-	~Font() override {}
+	ColorFont() : Graphics::Font() {}
+	~ColorFont() override {}
 
 	/**
 	 * Loads the font from the specified file

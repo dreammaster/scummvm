@@ -20,15 +20,13 @@
  */
 
 #include "wasteland/core/file.h"
-#include "wasteland/wasteland1/gfx/font.h"
+#include "wasteland/wasteland1/gfx/color_font.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace W1Gfx {
 
-#define FIRST_CHAR 16
-
-void Font::load() {
+void ColorFont::load() {
 	File f("colorf.fnt");
 	_chars.resize(172);
 
@@ -54,7 +52,7 @@ void Font::load() {
 	}
 }
 
-void Font::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+void ColorFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
 	assert(chr >= 0 && chr < _chars.size());
 	const Graphics::ManagedSurface &charImage = _chars[chr];
 
