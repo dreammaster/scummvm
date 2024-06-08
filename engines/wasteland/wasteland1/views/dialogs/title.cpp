@@ -60,18 +60,16 @@ void Title::draw() {
 		s.writeChar(WASTELAND[i] + 1);
 	}
 
-	/*
-	for (int y = 0; y < 172 / 16; ++y) {
-		for (int x = 0; x < 16; ++x) {
-			s.setTextPos(x, y);
-			s.writeChar((char)(y * 16 + x));
-		}
-	}
-*/
-	s.markAllDirty();
+	const char *START = "START";
+	for (int i = 0; i < 5; ++i)
+		s.writeChar(START[i] - 'A' + 24, 18 + i, 24);
+
+	// TODO: Write intro text
 }
 
 bool Title::msgFocus(const FocusMessage &msg) {
+	Dialog::msgFocus(msg);
+
 	// Read title in
 	File f("title.pic");
 	byte tmp[TITLE_W / 2 * TITLE_H];
@@ -94,6 +92,12 @@ bool Title::msgFocus(const FocusMessage &msg) {
 	}
 
 	//delaySeconds(1);
+	return true;
+}
+
+bool Title::msgUnfocus(const UnfocusMessage &msg) {
+	Dialog::msgUnfocus(msg);
+	_surface.clear();
 	return true;
 }
 

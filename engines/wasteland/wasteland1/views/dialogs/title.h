@@ -41,6 +41,7 @@ public:
 	bool msgKeypress(const KeypressMessage &msg) override;
 	bool msgMouseDown(const MouseDownMessage &msg) override;
 	bool msgFocus(const FocusMessage &msg) override;
+	bool msgUnfocus(const UnfocusMessage &msg) override;
 	void draw() override;
 	void timeout() override;
 };
