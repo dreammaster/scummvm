@@ -89,8 +89,8 @@ bool Title::msgFocus(const FocusMessage &msg) {
 	const byte *pSrc = tmp;
 	byte *pDest = (byte *)_surface.getPixels();
 	for (int i = 0; i < (TITLE_W / 2 * (TITLE_H - 1)); ++i, ++pSrc) {
-		*pDest++ = *pSrc & 0xf;
 		*pDest++ = *pSrc >> 4;
+		*pDest++ = *pSrc & 0xf;
 	}
 
 	//delaySeconds(1);
