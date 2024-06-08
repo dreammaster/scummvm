@@ -44,7 +44,7 @@ void InventoryItem::updateItem(int itemId) {
 
 	const auto &item = g_engine->_globals._items[itemId];
 	if (item._flags & GIFLAG_1) {
-		const auto &weapon = g_engine->_weapons[item._weaponIndex];
+		//const auto &weapon = g_engine->_weapons[item._weaponIndex];
 		error("TODO: Figure out updateItem");
 	}
 }

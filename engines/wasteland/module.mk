@@ -19,6 +19,7 @@ MODULE_OBJS = \
 	wasteland1/wasteland1.o \
 	wasteland1/gfx/cursors.o \
 	wasteland1/gfx/color_font.o \
+	wasteland1/views/dialogs/dialog.o \
 	wasteland1/views/dialogs/title.o \
 	fod/fod.o \
 	fod/sound.o \

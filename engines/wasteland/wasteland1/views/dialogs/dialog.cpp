@@ -19,10 +19,6 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
-#define WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
-
-#include "graphics/managed_surface.h"
 #include "wasteland/wasteland1/views/dialogs/dialog.h"
 
 namespace Wasteland {
@@ -30,24 +26,26 @@ namespace Wasteland1 {
 namespace Views {
 namespace Dialogs {
 
-class Title : public Dialog {
-private:
-	Graphics::ManagedSurface _surface;
+void Dialog::drawFrame(const Common::Rect &r) {
+	Surface s = getSurface();
 
-public:
-	Title() : Dialog("Title") {}
-	virtual ~Title() {}
+	s.writeChar(14, r.left, r.top);
+	for (int x = r.left + 1; x < r.right; ++x)
+		s.writeChar(18);
+	s.writeChar(15);
 
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	void timeout() override;
-};
+	for (int y = r.top + 1; y < r.bottom; ++y) {
+		s.writeChar(13, r.left, y);
+		s.writeChar(19, r.right, y);
+	}
+
+	s.writeChar(16, r.left, r.bottom);
+	for (int x = r.left + 1; x < r.right; ++x)
+		s.writeChar(18);
+	s.writeChar(17);
+}
 
 } // namespace Dialogs
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif

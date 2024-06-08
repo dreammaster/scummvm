@@ -19,30 +19,27 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
-#define WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_DIALOGS_DIALOG_H
+#define WASTELAND_WASTELAND1_VIEWS_DIALOGS_DIALOG_H
 
 #include "graphics/managed_surface.h"
-#include "wasteland/wasteland1/views/dialogs/dialog.h"
+#include "wasteland/events.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
 namespace Dialogs {
 
-class Title : public Dialog {
-private:
-	Graphics::ManagedSurface _surface;
+class Dialog : public UIElement {
+protected:
+	/**
+	 * Draw a frame within the dialog
+	 */
+	void drawFrame(const Common::Rect &r);
 
 public:
-	Title() : Dialog("Title") {}
-	virtual ~Title() {}
-
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	void timeout() override;
+	Dialog(const Common::String &name) : UIElement(name) {}
+	virtual ~Dialog() {}
 };
 
 } // namespace Dialogs

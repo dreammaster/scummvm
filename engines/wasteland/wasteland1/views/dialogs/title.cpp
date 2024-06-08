@@ -44,15 +44,30 @@ bool Title::msgMouseDown(const MouseDownMessage &msg) {
 
 void Title::draw() {
 	Surface s = getSurface();
-	s.blitFrom(_surface);
+	s.blitFrom(_surface, Common::Point(8, 8));
 
+	drawFrame(Common::Rect(0, 0, 37, 17));
+	drawFrame(Common::Rect(0, 17, 39, 24));
+	s.writeChar(94, 0, 17);
+	s.writeChar(95, 37, 17);
+
+	const unsigned char WASTELAND[17] = {
+		0x62, 0x64, 0x66, 0x68, 0x6a, 0x6c, 0x64, 0x6e, 0x70,
+		0x74, 0x72, 0x82, 0x82, 0x82, 0x82, 0x7c, 0x7a
+	};
+	for (int i = 0; i < 17; ++i) {
+		s.writeChar(WASTELAND[i], 38, i);
+		s.writeChar(WASTELAND[i] + 1);
+	}
+
+	/*
 	for (int y = 0; y < 172 / 16; ++y) {
 		for (int x = 0; x < 16; ++x) {
 			s.setTextPos(x, y);
 			s.writeChar((char)(y * 16 + x));
 		}
 	}
-
+*/
 	s.markAllDirty();
 }
 

@@ -68,6 +68,11 @@ void Surface::writeChar(unsigned char c) {
 	++_textX;
 }
 
+void Surface::writeChar(unsigned char c, int x, int y) {
+	setTextPos(x, y);
+	writeChar(c);
+}
+
 void Surface::setTextPos(int x, int y) {
 	_textX = x;
 	_textY = y;
