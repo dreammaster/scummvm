@@ -22,7 +22,7 @@
 #include "wasteland/gfx/surface.h"
 #include "wasteland/wasteland1/wasteland1.h"
 #include "wasteland/wasteland1/gfx/cursors.h"
-#include "wasteland/wasteland1/gfx/font.h"
+#include "wasteland/wasteland1/gfx/color_font.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -50,7 +50,7 @@ void Wasteland1Engine::setup() {
 	addView("Title");
 
 	Gfx::Surface::setupPalette();
-	auto font = new W1Gfx::Font();
+	auto font = new W1Gfx::ColorFont();
 	font->load();
 	_font = font;
 
