@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_GFX_COLOR_FONT_H
-#define WASTELAND_WASTELAND1_GFX_COLOR_FONT_H
+#ifndef WASTELAND_WASTELAND1_GFX_MONO_FONT_H
+#define WASTELAND_WASTELAND1_GFX_MONO_FONT_H
 
 #include "common/array.h"
 #include "common/rect.h"
@@ -33,17 +33,15 @@ namespace Wasteland1 {
 namespace W1Gfx {
 
 /**
- * Implements the special font in colorf.fnt. This contains special
- * glyphs like the different edge pieces of dialogs, and subsets of
- * the alphabet used for dialog titles and button contents
+ * Implements a plain fixed width font
  */
-class ColorFont : public Graphics::Font {
+class MonoFont : public Graphics::Font {
 private:
-	Common::Array<Graphics::ManagedSurface> _chars;
+	Common::Array<byte> _data;
 
 public:
-	ColorFont() : Graphics::Font() {}
-	~ColorFont() override {}
+	MonoFont() : Graphics::Font() {}
+	~MonoFont() override {}
 
 	/**
 	 * Loads the font from the specified file

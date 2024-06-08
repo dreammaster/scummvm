@@ -23,6 +23,7 @@
 #define WASTELAND_GFX_SURFACE_H
 
 #include "common/rect.h"
+#include "graphics/font.h"
 #include "graphics/managed_surface.h"
 
 namespace Wasteland {
@@ -61,6 +62,7 @@ class Surface : public Graphics::ManagedSurface {
 private:
 	bool _inverseColor = false;
 	int _textX = 0, _textY = 0;
+	Graphics::Font *_currentFont;
 
 public:
 	/**
@@ -69,10 +71,10 @@ public:
 	static void setupPalette();
 
 public:
-	Surface() : Graphics::ManagedSurface() {}
-	Surface(ManagedSurface &surf, const Common::Rect &bounds) :
-		Graphics::ManagedSurface(surf, bounds) {}
+	Surface();
+	Surface(ManagedSurface &surf, const Common::Rect &bounds);
 
+	void setFont(int fontNum);
 	void setInverseColor(bool isInverse) { _inverseColor = isInverse; }
 	void writeString(const Common::String &str);
 	void writeString(const Common::String &str, int x, int y);

@@ -37,7 +37,6 @@ FountainOfDreamsEngine::FountainOfDreamsEngine(OSystem *syst, const WastelandGam
 FountainOfDreamsEngine::~FountainOfDreamsEngine() {
 	g_engine = nullptr;
 	delete _views;
-	delete _font;
 }
 
 void FountainOfDreamsEngine::setup() {
@@ -48,7 +47,7 @@ void FountainOfDreamsEngine::setup() {
 	auto font = new FGfx::Font();
 	if (!font->load("FONT"))
 		error("Could not load FONT");
-	_font = font;
+	_fonts.push_back(font);
 
 	if (!_tiles.load("TILES"))
 		error("Could not load TILES");

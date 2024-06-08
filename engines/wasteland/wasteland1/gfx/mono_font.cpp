@@ -19,34 +19,41 @@
  *
  */
 
-#include "wasteland/wasteland1/views/dialogs/dialog.h"
+#include "wasteland/core/file.h"
+#include "wasteland/wasteland1/gfx/mono_font.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace Views {
-namespace Dialogs {
+namespace W1Gfx {
 
-void Dialog::drawFrame(const Common::Rect &r) {
-	Surface s = getSurface();
-	s.setFont(1);
+#define FIRST_CHAR 32
+#define CHAR_COUNT 128
 
-	s.writeChar(14, r.left, r.top);
-	for (int x = r.left + 1; x < r.right; ++x)
-		s.writeChar(18);
-	s.writeChar(15);
+void MonoFont::load() {
+	File f("mono.fnt");
+	assert(f.size() == (CHAR_COUNT * 8));
 
-	for (int y = r.top + 1; y < r.bottom; ++y) {
-		s.writeChar(13, r.left, y);
-		s.writeChar(19, r.right, y);
-	}
-
-	s.writeChar(16, r.left, r.bottom);
-	for (int x = r.left + 1; x < r.right; ++x)
-		s.writeChar(18);
-	s.writeChar(17);
+	_data.resize((CHAR_COUNT * 8));
+	f.read(&_data[0], (CHAR_COUNT * 8));
 }
 
-} // namespace Dialogs
-} // namespace Views
+void MonoFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+	assert(chr >= FIRST_CHAR && chr < (FIRST_CHAR + CHAR_COUNT));
+	const byte *src = &_data[(chr - FIRST_CHAR) * 8];
+	byte *dest;
+	byte bits;
+
+	for (int yc = 0; yc < FONT_H; ++yc, ++y, ++src) {
+		bits = *src;
+		dest = (byte *)dst->getBasePtr(x, y);
+
+		for (int xc = 0; xc < FONT_W; ++xc, ++dest, bits <<= 1) {
+			if (bits & 0x80)
+				*dest = color;
+		}
+	}
+}
+
+} // namespace W1Gfx
 } // namespace Wasteland1
 } // namespace Wasteland

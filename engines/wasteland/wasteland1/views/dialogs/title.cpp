@@ -46,6 +46,7 @@ void Title::draw() {
 	Surface s = getSurface();
 	s.blitFrom(_surface, Common::Point(8, 8));
 
+	s.setFont(1);
 	drawFrame(Common::Rect(0, 0, 37, 17));
 	drawFrame(Common::Rect(0, 17, 39, 24));
 	s.writeChar(94, 0, 17);
@@ -65,6 +66,8 @@ void Title::draw() {
 		s.writeChar(START[i] - 'A' + 24, 18 + i, 24);
 
 	// TODO: Write intro text
+	s.setFont(0);
+	s.writeString("TESTING 012345", 3, 22);
 }
 
 bool Title::msgFocus(const FocusMessage &msg) {
@@ -72,7 +75,7 @@ bool Title::msgFocus(const FocusMessage &msg) {
 
 	// Read title in
 	File f("title.pic");
-	byte tmp[TITLE_W / 2 * TITLE_H];
+	byte *tmp = new byte[TITLE_W / 2 * TITLE_H];
 	f.read(tmp, TITLE_W / 2 * TITLE_H);
 
 	// Do a vertical xor decoding
@@ -92,6 +95,7 @@ bool Title::msgFocus(const FocusMessage &msg) {
 	}
 
 	//delaySeconds(1);
+	delete[] tmp;
 	return true;
 }
 

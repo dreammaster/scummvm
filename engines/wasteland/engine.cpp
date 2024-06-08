@@ -40,6 +40,8 @@ Engine::Engine(OSystem *syst, const WastelandGameDescription *gameDesc) : ::Engi
 }
 
 Engine::~Engine() {
+	for (auto *font : _fonts)
+		delete font;
 }
 
 uint32 Engine::getFeatures() const {
