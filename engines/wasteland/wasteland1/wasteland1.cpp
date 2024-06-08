@@ -19,10 +19,12 @@
  *
  */
 
+#include "common/engine_data.h"
 #include "wasteland/gfx/surface.h"
 #include "wasteland/wasteland1/wasteland1.h"
 #include "wasteland/wasteland1/gfx/cursors.h"
 #include "wasteland/wasteland1/gfx/color_font.h"
+#include "wasteland/wasteland1/gfx/mono_font.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -37,7 +39,6 @@ Wasteland1Engine::Wasteland1Engine(OSystem *syst, const WastelandGameDescription
 Wasteland1Engine::~Wasteland1Engine() {
 	g_engine = nullptr;
 	delete _views;
-	delete _font;
 }
 
 void Wasteland1Engine::initializePath(const Common::FSNode &gamePath) {
@@ -46,13 +47,25 @@ void Wasteland1Engine::initializePath(const Common::FSNode &gamePath) {
 }
 
 void Wasteland1Engine::setup() {
+	// Initialise engine data for the game
+	Common::U32String errMsg;
+	if (!Common::load_engine_data("wasteland.dat", "wasteland1", 1, 0, errMsg)) {
+		Common::String msg(errMsg);
+		error("%s", msg.c_str());
+	}
+
+	// Setup game views
 	_views = new Views::Views();
 	addView("Title");
 
 	Gfx::Surface::setupPalette();
-	auto font = new W1Gfx::ColorFont();
-	font->load();
-	_font = font;
+
+	auto monoFont = new W1Gfx::MonoFont();
+	monoFont->load();
+	_fonts.push_back(monoFont);
+	auto colorFont = new W1Gfx::ColorFont();
+	colorFont->load();
+	_fonts.push_back(colorFont);
 
 	W1Gfx::Cursors::load(_cursors);
 	setCursor(0);

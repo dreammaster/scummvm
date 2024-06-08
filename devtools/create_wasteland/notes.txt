@@ -1,0 +1,3 @@
+Wasteland 1 notes:
+------------------
+mono.fnt is just the raw data for the mono font copied and pasted as binary from the disassembly of the game.

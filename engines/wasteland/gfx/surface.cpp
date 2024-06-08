@@ -28,12 +28,27 @@
 namespace Wasteland {
 namespace Gfx {
 
+#define FONT_COLOR 15
+
+Surface::Surface() : Graphics::ManagedSurface() {
+	_currentFont = g_engine->_fonts[0];
+}
+
+Surface::Surface(ManagedSurface &surf, const Common::Rect &bounds) :
+		Graphics::ManagedSurface(surf, bounds) {
+	_currentFont = g_engine->_fonts[0];
+}
+
 void Surface::setupPalette() {
 	Graphics::Palette ega = Graphics::Palette::createEGAPalette();
 	g_system->getPaletteManager()->setPalette(ega);
 
 	uint32 white = 0xffffffff;
 	g_system->getPaletteManager()->setPalette((const byte *)&white, 255, 1);
+}
+
+void Surface::setFont(int fontNum) {
+	_currentFont = g_engine->_fonts[fontNum];
 }
 
 void Surface::writeString(const Common::String &str) {
@@ -46,8 +61,8 @@ void Surface::writeString(const Common::String &str) {
 			++_textY;
 		}
 
-		g_engine->_font->drawString(this, lines[lineNum], _textX * FONT_W, _textY * FONT_H,
-			this->w - (_textX * FONT_W), _inverseColor ? -1 : 1);
+		_currentFont->drawString(this, lines[lineNum], _textX * FONT_W, _textY * FONT_H,
+			this->w - (_textX * FONT_W), _inverseColor ? -FONT_COLOR : FONT_COLOR);
 		_textX += lines[lineNum].size();
 	}
 }
@@ -64,7 +79,8 @@ void Surface::writeCenteredString(const Common::String &str, int y) {
 }
 
 void Surface::writeChar(unsigned char c) {
-	g_engine->_font->drawChar(this, c, _textX * FONT_W, _textY * FONT_H, _inverseColor ? -1 : 1);
+	_currentFont->drawChar(this, c, _textX * FONT_W, _textY * FONT_H,
+		_inverseColor ? -FONT_COLOR : FONT_COLOR);
 	++_textX;
 }
 

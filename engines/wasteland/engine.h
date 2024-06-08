@@ -59,7 +59,7 @@ protected:
 	}
 
 public:
-	Graphics::Font *_font = nullptr;
+	Common::Array<Graphics::Font *> _fonts;
 	Gfx::Tiles _tiles;
 
 public:
