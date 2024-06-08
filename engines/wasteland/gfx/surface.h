@@ -78,6 +78,7 @@ public:
 	void writeString(const Common::String &str, int x, int y);
 	void writeCenteredString(const Common::String &str, int y);
 	void writeChar(unsigned char c);
+	void writeChar(unsigned char c, int x, int y);
 	void setTextPos(int x, int y);
 };
 
