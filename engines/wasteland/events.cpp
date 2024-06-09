@@ -101,16 +101,14 @@ void Events::processEvent(Common::Event &ev) {
 		break;
 	case Common::EVENT_LBUTTONDOWN:
 	case Common::EVENT_RBUTTONDOWN:
-		SHOW_CURSOR
 		msgMouseDown(MouseDownMessage(ev.type, ev.mouse));
 		break;
 	case Common::EVENT_LBUTTONUP:
 	case Common::EVENT_RBUTTONUP:
-		SHOW_CURSOR
 		msgMouseUp(MouseUpMessage(ev.type, ev.mouse));
 		break;
 	case Common::EVENT_MOUSEMOVE:
-		SHOW_CURSOR
+		msgMouseMove(MouseMoveMessage(ev.type, ev.mouse));
 		break;
 	default:
 		break;

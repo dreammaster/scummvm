@@ -250,9 +250,25 @@ public:
 			return view->msg##NAME(msg); \
 		} \
 		bool send(const NAME##Message &msg) { \
-			return send("Root", msg); \
-		} \
+			return msg##NAME(msg); \
+		}
 
+	#define VIEW_MESSAGE(NAME) \
+	protected: \
+		virtual bool msg##NAME(const NAME##Message &e) { \
+			return false; \
+		} \
+	public: \
+		bool send(const Common::String &viewName, const NAME##Message &msg) { \
+			UIElement *view = UIElement::findViewGlobally(viewName); \
+			assert(view); \
+			return view->msg##NAME(msg); \
+		} \
+		bool send(const NAME##Message &msg) { \
+			return msg##NAME(msg); \
+		}
+
+	VIEW_MESSAGE(MouseMove);
 	MESSAGE(Focus);
 	MESSAGE(Unfocus);
 	MESSAGE(MouseEnter);
@@ -319,7 +335,8 @@ protected:
 	MESSAGE(MouseLeave);
 	MESSAGE(Keypress);
 	MESSAGE(MouseDown);
-	MESSAGE(MouseUp);
+	MESSAGE(MouseUp)
+	MESSAGE(MouseMove);
 	#undef MESSAGE
 public:
 	Events();
