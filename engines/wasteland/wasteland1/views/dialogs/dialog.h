@@ -23,14 +23,14 @@
 #define WASTELAND_WASTELAND1_VIEWS_DIALOGS_DIALOG_H
 
 #include "graphics/managed_surface.h"
-#include "wasteland/events.h"
+#include "wasteland/wasteland1/views/view.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
 namespace Dialogs {
 
-class Dialog : public UIElement {
+class Dialog : public View {
 protected:
 	/**
 	 * Draw a frame within the dialog
@@ -38,7 +38,7 @@ protected:
 	void drawFrame(const Common::Rect &r);
 
 public:
-	Dialog(const Common::String &name) : UIElement(name) {}
+	Dialog(const Common::String &name) : View(name) {}
 	virtual ~Dialog() {}
 };
 

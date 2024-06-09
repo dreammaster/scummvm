@@ -27,13 +27,13 @@ namespace W1Gfx {
 
 bool Button::msgFocus(const FocusMessage &msg) {
 	_focused = true;
-	redraw();
+	draw();
 	return true;
 }
 
 bool Button::msgUnfocus(const UnfocusMessage &msg) {
 	_focused = false;
-	redraw();
+	draw();
 	return true;
 }
 
