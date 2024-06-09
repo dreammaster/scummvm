@@ -19,38 +19,38 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
-#define WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
-
-#include "graphics/managed_surface.h"
-#include "wasteland/wasteland1/views/dialogs/dialog.h"
 #include "wasteland/wasteland1/gfx/button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace Views {
-namespace Dialogs {
+namespace W1Gfx {
 
-class Title : public Dialog {
-private:
-	Graphics::ManagedSurface _surface;
-	W1Gfx::Button _start;
+bool Button::msgFocus(const FocusMessage &msg) {
+	_focused = true;
+	redraw();
+	return true;
+}
 
-public:
-	Title();
-	virtual ~Title() {}
+bool Button::msgUnfocus(const UnfocusMessage &msg) {
+	_focused = false;
+	redraw();
+	return true;
+}
 
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	void draw() override;
-	void timeout() override;
-};
+void Button::draw() {
+	Surface s = getSurface();
+	s.setFont(1);
+	int firstChar = _focused ? 52 : 24;
 
-} // namespace Dialogs
-} // namespace Views
+	for (uint x = 0; x < _text.size(); ++x)
+		s.writeChar(toupper(_text[x]) - 'A' + firstChar);
+}
+
+bool Button::msgMouseUp(const MouseUpMessage &msg) {
+	warning("TODO: Handle messages");
+	return true;
+}
+
+} // namespace W1Gfx
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif

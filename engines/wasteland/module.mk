@@ -17,6 +17,7 @@ MODULE_OBJS = \
 	gfx/tiles.o \
 	gfx/wasteland_font.o \
 	wasteland1/wasteland1.o \
+	wasteland1/gfx/button.o \
 	wasteland1/gfx/cursors.o \
 	wasteland1/gfx/color_font.o \
 	wasteland1/gfx/mono_font.o \

@@ -32,6 +32,9 @@ namespace Dialogs {
 #define TITLE_W 288
 #define TITLE_H 128
 
+Title::Title() : Dialog("Title"), _start(this, "Start", "START", 18, 24) {
+}
+
 bool Title::msgKeypress(const KeypressMessage &msg) {
 	timeout();
 	return true;
@@ -60,10 +63,6 @@ void Title::draw() {
 		s.writeChar(WASTELAND[i], 38, i);
 		s.writeChar(WASTELAND[i] + 1);
 	}
-
-	const char *START = "START";
-	for (int i = 0; i < 5; ++i)
-		s.writeChar(START[i] - 'A' + 24, 18 + i, 24);
 
 	// TODO: Write intro text
 	s.setFont(0);

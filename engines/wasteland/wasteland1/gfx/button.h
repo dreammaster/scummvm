@@ -19,37 +19,36 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
-#define WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
+#ifndef WASTELAND_WASTELAND1_GFX_BUTTON_H
+#define WASTELAND_WASTELAND1_GFX_BUTTON_H
 
-#include "graphics/managed_surface.h"
-#include "wasteland/wasteland1/views/dialogs/dialog.h"
-#include "wasteland/wasteland1/gfx/button.h"
+#include "wasteland/events.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace Views {
-namespace Dialogs {
+namespace W1Gfx {
 
-class Title : public Dialog {
+class Button : public UIElement {
 private:
-	Graphics::ManagedSurface _surface;
-	W1Gfx::Button _start;
+	Common::String _text;
+	bool _focused = false;
 
 public:
-	Title();
-	virtual ~Title() {}
+	Button(UIElement *parent, const Common::String &name, const Common::String &text) :
+		UIElement(name, parent), _text(text) {}
+	Button(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y) :
+			UIElement(name, parent), _text(text) {
+		setBounds(Gfx::Window(x, y, x + _text.size(), y));
+	}
+	~Button() override {}
 
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
 	bool msgFocus(const FocusMessage &msg) override;
 	bool msgUnfocus(const UnfocusMessage &msg) override;
 	void draw() override;
-	void timeout() override;
+	bool msgMouseUp(const MouseUpMessage &msg) override;
 };
 
-} // namespace Dialogs
-} // namespace Views
+} // namespace W1Gfx
 } // namespace Wasteland1
 } // namespace Wasteland
 
