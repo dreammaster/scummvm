@@ -207,8 +207,8 @@ void Events::setCursor(int cursorNum) {
 	const Cursor &curs = _cursors[cursorNum];
 
 	g_system->setMouseCursor(curs._image.getPixels(),
-		curs._image.w, curs._image.h, 0, 0, (uint)-1, false, nullptr,
-		(const byte *)curs._mask.getPixels()
+		curs._image.w, curs._image.h, curs._hotspotX, curs._hotspotY,
+		(uint)-1, false, nullptr, (const byte *)curs._mask.getPixels()
 	);
 }
 

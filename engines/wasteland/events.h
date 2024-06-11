@@ -285,6 +285,8 @@ public:
 struct Cursor {
 	Graphics::ManagedSurface _image;
 	Graphics::ManagedSurface _mask;
+	int _hotspotX = 0;
+	int _hotspotY = 0;
 };
 typedef Common::Array<Cursor> CursorArray;
 

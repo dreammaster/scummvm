@@ -45,7 +45,7 @@ public:
 	bool msgFocus(const FocusMessage &msg) override;
 	bool msgUnfocus(const UnfocusMessage &msg) override;
 	void draw() override;
-	bool msgMouseUp(const MouseUpMessage &msg) override;
+	bool msgMouseDown(const MouseDownMessage &msg) override;
 };
 
 } // namespace W1Gfx

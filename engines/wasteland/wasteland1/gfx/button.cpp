@@ -27,12 +27,16 @@ namespace W1Gfx {
 
 bool Button::msgFocus(const FocusMessage &msg) {
 	_focused = true;
+	g_events->setCursor(1);
+
 	draw();
 	return true;
 }
 
 bool Button::msgUnfocus(const UnfocusMessage &msg) {
 	_focused = false;
+	g_events->setCursor(0);
+
 	draw();
 	return true;
 }
@@ -46,8 +50,8 @@ void Button::draw() {
 		s.writeChar(toupper(_text[x]) - 'A' + firstChar);
 }
 
-bool Button::msgMouseUp(const MouseUpMessage &msg) {
-	warning("TODO: Handle messages");
+bool Button::msgMouseDown(const MouseDownMessage &msg) {
+	_parent->send(GameMessage(_name));
 	return true;
 }
 
