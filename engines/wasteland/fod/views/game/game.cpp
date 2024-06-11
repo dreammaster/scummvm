@@ -152,7 +152,7 @@ void Game::writeParty() {
 	for (uint partyNum = 0; partyNum < g_engine->_disk1._partyCount; ++partyNum) {
 		const Data::PartyMember &member = g_engine->_disk1._party[partyNum];
 
-		Gfx::Window win(1, 1, 6, 1);
+		 Window win(1, 1, 6, 1);
 		win.translate(7 * partyNum, 0);
 		Surface s = getSurface(win);
 
@@ -168,19 +168,19 @@ void Game::writeParty() {
 }
 
 void Game::writeTime() {
-	Surface s = getSurface(Gfx::Window(1, 22, 5, 23));
+	Surface s = getSurface( Window(1, 22, 5, 23));
 	s.writeString(WEEKDAYS[g_engine->_disk1._timeWeekday], 1, 0);
 	s.writeString(Common::String::format("%2.2d:%.2d", g_engine->_disk1._timeHours, g_engine->_disk1._timeMinutes),
 		0, 1);
 }
 
 void Game::writeInfo() {
-	Surface s = getSurface(Gfx::Window(7, 22, 39, 24));
+	Surface s = getSurface( Window(7, 22, 39, 24));
 	s.writeString(_infoText);
 }
 
 void Game::drawMap() {
-	Surface s = getSurface(Gfx::Window(1, 3, 39, 21));
+	Surface s = getSurface( Window(1, 3, 39, 21));
 	Data::Map &map = g_engine->_disk._map;
 	int defaultTile = map._flags & ~Data::MAPFLAG_8000;
 	int mapOffsetX = g_engine->_disk1._mapPosX - 9;

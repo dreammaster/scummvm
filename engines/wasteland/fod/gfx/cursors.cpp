@@ -24,7 +24,7 @@
 
 namespace Wasteland {
 namespace FOD {
-namespace FGfx {
+namespace Gfx {
 
 #define CURSOR_W 8
 #define CURSOR_H 8
@@ -56,6 +56,6 @@ void Cursors::load(CursorArray &cursors) {
 	}
 }
 
-} // namespace FGfx
+} // namespace Gfx
 } // namespace FOD
 } // namespace Wasteland

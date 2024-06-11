@@ -67,7 +67,7 @@ EditMember::EditMember() : MenuView("EditMember"),
 	_attr5("Attr5", nullptr, ATTRIBUTE_PREFIXES[5]._x + 3, 14 + ATTRIBUTE_PREFIXES[5]._y, "", "ATTR_CLICK", 5),
 	_attr6("Attr6", nullptr, ATTRIBUTE_PREFIXES[6]._x + 3, 14 + ATTRIBUTE_PREFIXES[6]._y, "", "ATTR_CLICK", 6),
 	_attr7("Attr7", nullptr, ATTRIBUTE_PREFIXES[7]._x + 5, 14 + ATTRIBUTE_PREFIXES[7]._y, "", "ATTR_CLICK", 7),
-	_nameEntry("NameEntry", nullptr, Gfx::Position(4, 21, 0, 4), 12) {
+	_nameEntry("NameEntry", nullptr, Position(4, 21, 0, 4), 12) {
 
 	_professions1[0] = &_profession11;
 	_professions1[1] = &_profession12;
@@ -169,7 +169,7 @@ void EditMember::draw() {
 	case EDIT_STATS: {
 		const Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
 		_nameEntry.setText(member._name);
-		_nameEntry.setPosition(Gfx::Position(4, 21 + _selectedPartyMember, 0, 4));
+		_nameEntry.setPosition(Position(4, 21 + _selectedPartyMember, 0, 4));
 
 		writePortraitText(member.getProfession()._name);
 		writeSkills();
@@ -290,7 +290,7 @@ void EditMember::writeSkills() {
 	Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
 	Data::Profession &prof = g_engine->_archetypes._professions[member._profession];
 
-	Surface skillsArea = getSurface(Gfx::Window(14, 1, 38, 12));
+	Surface skillsArea = getSurface( Window(14, 1, 38, 12));
 	skillsArea.writeCenteredString("Skills", 0);
 	skillsArea.writeCenteredString("Active      Passive", 1);
 
@@ -317,7 +317,7 @@ void EditMember::writeSkills() {
 }
 
 void EditMember::writeAttributes() {
-	Surface s = getSurface(Gfx::Window(0, 14, 39, 19));
+	Surface s = getSurface( Window(0, 14, 39, 19));
 	const Data::PartyMember &member = g_engine->_disk1._party[_selectedPartyMember];
 
 	s.writeString(Common::String::format("Attribute Pts: <-%d->",

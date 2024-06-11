@@ -56,18 +56,18 @@ void Wasteland1Engine::setup() {
 
 	// Setup game views
 	_views = new Views::Views();
-	addView("Title");
+	addView("Roster");
 
-	Gfx::Surface::setupPalette();
+	Surface::setupPalette();
 
-	auto monoFont = new W1Gfx::MonoFont();
+	auto monoFont = new Gfx::MonoFont();
 	monoFont->load();
 	_fonts.push_back(monoFont);
-	auto colorFont = new W1Gfx::ColorFont();
+	auto colorFont = new Gfx::ColorFont();
 	colorFont->load();
 	_fonts.push_back(colorFont);
 
-	W1Gfx::Cursors::load(_cursors);
+	Gfx::Cursors::load(_cursors);
 	setCursor(0);
 }
 

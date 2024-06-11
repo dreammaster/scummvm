@@ -28,14 +28,14 @@
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace W1Gfx {
+namespace Gfx {
 
 class Cursors {
 public:
 	static void load(CursorArray &cursors);
 };
 
-} // namespace W1Gfx
+} // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland
 

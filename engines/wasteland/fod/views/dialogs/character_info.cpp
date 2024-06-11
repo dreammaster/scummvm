@@ -64,7 +64,7 @@ void CharacterInfo::draw() {
 }
 
 void CharacterInfo::writeStats() {
-	Surface s = getSurface(Gfx::Window(1, 1, 23, 13));
+	Surface s = getSurface( Window(1, 1, 23, 13));
 
 	s.setInverseColor(_member->_afflicted);
 	s.writeCenteredString(_member->_name, 0);

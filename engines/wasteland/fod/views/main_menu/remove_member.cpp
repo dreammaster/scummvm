@@ -27,7 +27,7 @@ namespace FOD {
 namespace Views {
 
 RemoveMember::RemoveMember() : UIElement("RemoveMember") {
-	setBounds(Gfx::Window(0, 14, 39, 19));
+	setBounds( Window(0, 14, 39, 19));
 }
 
 bool RemoveMember::msgGame(const GameMessage &msg) {

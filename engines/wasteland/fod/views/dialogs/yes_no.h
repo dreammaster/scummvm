@@ -45,8 +45,8 @@ public:
 	static void show(YesNo *view, const Common::String &message, YesNoCallback callback);
 
 public:
-	YesNo() : Dialog("YesNo", Gfx::Window(8, 6, 31, 17)) {}
-	YesNo(const Common::String &name) : Dialog(name, Gfx::Window(8, 6, 31, 17)) {}
+	YesNo() : Dialog("YesNo", Window(8, 6, 31, 17)) {}
+	YesNo(const Common::String &name) : Dialog(name, Window(8, 6, 31, 17)) {}
 	virtual ~YesNo() {}
 
 	void draw() override;

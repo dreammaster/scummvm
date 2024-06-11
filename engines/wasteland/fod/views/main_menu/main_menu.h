@@ -31,11 +31,11 @@ namespace Views {
 
 class MainMenu : public MenuView {
 private:
-	Gfx::Window _mainArea;
-	Gfx::ClickableText _addMember;
-	Gfx::ClickableText _editMember;
-	Gfx::ClickableText _removeMember;
-	Gfx::ClickableText _playGame;
+	Shared::Gfx::Window _mainArea;
+	Shared::Gfx::ClickableText _addMember;
+	Shared::Gfx::ClickableText _editMember;
+	Shared::Gfx::ClickableText _removeMember;
+	Shared::Gfx::ClickableText _playGame;
 
 	void addMember();
 	void editMember();

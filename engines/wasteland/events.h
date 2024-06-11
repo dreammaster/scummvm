@@ -35,7 +35,9 @@ namespace Wasteland {
 #define FRAME_DELAY (1000 / FRAME_RATE)
 
 class Events;
-using Wasteland::Gfx::Surface;
+using Shared::Gfx::Surface;
+using Shared::Gfx::Window;
+using Shared::Gfx::Position;
 
 /**
  * Implements a thunk layer around an element's bounds,
@@ -185,7 +187,7 @@ public:
 	/**
 	 * Sets the element's window (using text-based co-ordinates)
 	 */
-	void setBounds(const Gfx::Window &win);
+	void setBounds(const Window &win);
 
 	/**
 	 * Gets the element's bounds
@@ -209,7 +211,7 @@ public:
 	 * to restrict the returned drawing area.
 	 * @remarks		The window bounds are in text co-ordinates
 	 */
-	Surface getSurface(const Gfx::Window &win) const;
+	Surface getSurface(const Window &win) const;
 
 	/**
 	 * Clear the surface

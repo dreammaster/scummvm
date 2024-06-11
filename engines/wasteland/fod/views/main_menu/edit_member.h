@@ -33,31 +33,31 @@ namespace Views {
 class EditMember : public MenuView {
 	enum Mode { SELECT_PROFESSION, EDIT_STATS};
 private:
-	Gfx::ClickableText _profession11;
-	Gfx::ClickableText _profession12;
-	Gfx::ClickableText _profession13;
-	Gfx::ClickableText _profession14;
-	Gfx::ClickableText _profession15;
-	Gfx::ClickableText *_professions1[5];
-	Gfx::ClickableText _profession21;
-	Gfx::ClickableText _profession22;
-	Gfx::ClickableText _profession23;
-	Gfx::ClickableText _profession24;
-	Gfx::ClickableText _profession25;
-	Gfx::ClickableText *_professions2[5];
-	Gfx::ClickableText _attr0;
-	Gfx::ClickableText _attr1;
-	Gfx::ClickableText _attr2;
-	Gfx::ClickableText _attr3;
-	Gfx::ClickableText _attr4;
-	Gfx::ClickableText _attr5;
-	Gfx::ClickableText _attr6;
-	Gfx::ClickableText _attr7;
-	Gfx::ClickableText *_attributes[8];
-	Gfx::TextEntry _nameEntry;
+	Shared::Gfx::ClickableText _profession11;
+	Shared::Gfx::ClickableText _profession12;
+	Shared::Gfx::ClickableText _profession13;
+	Shared::Gfx::ClickableText _profession14;
+	Shared::Gfx::ClickableText _profession15;
+	Shared::Gfx::ClickableText *_professions1[5];
+	Shared::Gfx::ClickableText _profession21;
+	Shared::Gfx::ClickableText _profession22;
+	Shared::Gfx::ClickableText _profession23;
+	Shared::Gfx::ClickableText _profession24;
+	Shared::Gfx::ClickableText _profession25;
+	Shared::Gfx::ClickableText *_professions2[5];
+	Shared::Gfx::ClickableText _attr0;
+	Shared::Gfx::ClickableText _attr1;
+	Shared::Gfx::ClickableText _attr2;
+	Shared::Gfx::ClickableText _attr3;
+	Shared::Gfx::ClickableText _attr4;
+	Shared::Gfx::ClickableText _attr5;
+	Shared::Gfx::ClickableText _attr6;
+	Shared::Gfx::ClickableText _attr7;
+	Shared::Gfx::ClickableText *_attributes[8];
+	Shared::Gfx::TextEntry _nameEntry;
 
 	Mode _mode = SELECT_PROFESSION;
-	Gfx::Window _mainArea;
+	Window _mainArea;
 	int _selectedAttribute = 0;
 
 	void setMode(Mode mode);

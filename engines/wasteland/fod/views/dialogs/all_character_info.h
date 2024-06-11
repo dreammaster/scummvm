@@ -32,9 +32,9 @@ namespace Views {
 namespace Dialogs {
 
 class AllCharacterInfo : public BaseView {
-	Gfx::ClickableText _reorder;
-	Gfx::ClickableText _banish;
-	Gfx::ClickableText _exit;
+	Shared::Gfx::ClickableText _reorder;
+	Shared::Gfx::ClickableText _banish;
+	Shared::Gfx::ClickableText _exit;
 private:
 	void writeMember(int partyNum);
 

@@ -22,15 +22,16 @@
 #include "wasteland/gfx/text_entry.h"
 
 namespace Wasteland {
+namespace Shared {
 namespace Gfx {
 
 TextEntry::TextEntry(const Common::String &name, UIElement *uiParent, int x, int y, size_t maxLength) :
-		UIElement(name, uiParent), _maxLength(maxLength) {
+	UIElement(name, uiParent), _maxLength(maxLength) {
 	setBounds(Common::Rect(x * FONT_W, y * FONT_H, (x + maxLength + 1) * FONT_W, (y + 1) * FONT_H));
 }
 
 TextEntry::TextEntry(const Common::String &name, UIElement *uiParent, const Position &pos, size_t maxLength) :
-		UIElement(name, uiParent), _maxLength(maxLength) {
+	UIElement(name, uiParent), _maxLength(maxLength) {
 	Common::Rect r(pos.x * FONT_W, pos.y * FONT_H, (pos.x + maxLength + 1) * FONT_W, (pos.y + 1) * FONT_H);
 	r.translate(pos._xOffset, pos._yOffset);
 	setBounds(r);
@@ -89,4 +90,5 @@ void TextEntry::setPosition(const Position &pos) {
 }
 
 } // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland

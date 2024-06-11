@@ -60,7 +60,7 @@ protected:
 
 public:
 	Common::Array<Graphics::Font *> _fonts;
-	Gfx::Tiles _tiles;
+	Shared::Gfx::Tiles _tiles;
 
 public:
 	Engine(OSystem *syst, const WastelandGameDescription *gameDesc);

@@ -31,7 +31,7 @@ namespace Data {
 
 struct Pics {
 	byte _borders[6][TEXT_W * TEXT_H];
-	Gfx::ImageDecoder _welcome;
+	Shared::Gfx::ImageDecoder _welcome;
 
 	bool load();
 };

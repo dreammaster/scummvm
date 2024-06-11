@@ -29,14 +29,14 @@
 
 namespace Wasteland {
 namespace FOD {
-namespace FGfx {
+namespace Gfx {
 
 class Cursors {
 public:
 	static void load(CursorArray &cursors);
 };
 
-} // namespace FGfx
+} // namespace Gfx
 } // namespace FOD
 } // namespace Wasteland
 

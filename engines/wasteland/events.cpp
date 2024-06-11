@@ -346,7 +346,7 @@ void UIElement::addView() {
 	g_events->addView(this);
 }
 
-void UIElement::setBounds(const Gfx::Window &win) {
+void UIElement::setBounds(const Window &win) {
 	Common::Rect r(win.left * FONT_W, win.top * FONT_H, (win.right + 1) * FONT_W, (win.bottom + 1) * FONT_H);
 	r.translate(win._xOffset, win._yOffset);
 	setBounds(r);
@@ -356,7 +356,7 @@ Surface UIElement::getSurface() const {
 	return Surface(*g_events->getScreen(), _innerBounds);
 }
 
-Surface UIElement::getSurface(const Gfx::Window &win) const {
+Surface UIElement::getSurface(const Window &win) const {
 	Common::Rect r(_innerBounds.left + win.left * FONT_W, _innerBounds.top + win.top * FONT_H,
 					_innerBounds.left + (win.right + 1) * FONT_W, _innerBounds.top + (win.bottom + 1) * FONT_H);
 	r.translate(win._xOffset, win._yOffset);

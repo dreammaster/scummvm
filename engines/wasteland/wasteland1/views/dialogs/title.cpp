@@ -50,6 +50,7 @@ bool Title::msgGame(const GameMessage &msg) {
 
 void Title::draw() {
 	Surface s = getSurface();
+	s.clear();
 	s.blitFrom(_surface, Common::Point(8, 8));
 
 	s.setFont(1);

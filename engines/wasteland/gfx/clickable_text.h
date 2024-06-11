@@ -25,6 +25,7 @@
 #include "wasteland/events.h"
 
 namespace Wasteland {
+namespace Shared {
 namespace Gfx {
 
 class ClickableText : public UIElement {
@@ -40,7 +41,7 @@ public:
 		const Common::String &text, Common::KeyCode keycode);
 	ClickableText(const Common::String &name, UIElement *owner, const Position &pos, const Common::String &text, Common::KeyCode keycode);
 	ClickableText(const Common::String &name, UIElement *owner, int x, int y,
-				  const Common::String &text, const Common::String &message, int tag = 0);
+		const Common::String &text, const Common::String &message, int tag = 0);
 	ClickableText(const Common::String &name, UIElement *owner, const Position &pos, const Common::String &text, const Common::String &message, int tag = 0);
 
 	void draw() override;
@@ -54,6 +55,7 @@ public:
 };
 
 } // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland
 
 #endif

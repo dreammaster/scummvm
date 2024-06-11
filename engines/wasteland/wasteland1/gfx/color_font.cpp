@@ -24,7 +24,7 @@
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace W1Gfx {
+namespace Gfx {
 
 void ColorFont::load() {
 	File f("colorf.fnt");
@@ -60,6 +60,6 @@ void ColorFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint3
 	dest.blitFrom(charImage, Common::Point(x, y));
 }
 
-} // namespace W1Gfx
+} // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland

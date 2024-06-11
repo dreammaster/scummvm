@@ -23,6 +23,7 @@ MODULE_OBJS = \
 	wasteland1/gfx/mono_font.o \
 	wasteland1/views/view.o \
 	wasteland1/views/dialogs/dialog.o \
+	wasteland1/views/dialogs/roster.o \
 	wasteland1/views/dialogs/title.o \
 	fod/fod.o \
 	fod/sound.o \

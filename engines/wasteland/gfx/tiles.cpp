@@ -23,6 +23,7 @@
 #include "wasteland/gfx/tiles.h"
 
 namespace Wasteland {
+namespace Shared {
 namespace Gfx {
 
 #define TILE_SIZE (TILE_W / 2 * TILE_H)
@@ -44,4 +45,5 @@ void Tiles::drawTile(Surface *dst, uint tileId, int x, int y, bool transparent) 
 }
 
 } // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland
