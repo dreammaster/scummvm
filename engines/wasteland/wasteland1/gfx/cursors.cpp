@@ -43,6 +43,8 @@ void Cursors::load(CursorArray &cursors) {
 		Cursor &curs = cursors[cursorNum];
 		curs._image.create(CURSOR_W, CURSOR_H);
 		curs._mask.create(CURSOR_W, CURSOR_H);
+		curs._hotspotX = CURSOR_W / 2;
+		curs._hotspotY = 4;
 
 		for (bit = 0; bit < 4; bit++) {
 			for (y = 0; y < CURSOR_H; y++) {

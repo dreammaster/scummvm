@@ -41,7 +41,7 @@ public:
 	virtual ~Title() {}
 
 	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
+	bool msgGame(const GameMessage &msg) override;
 	bool msgFocus(const FocusMessage &msg) override;
 	bool msgUnfocus(const UnfocusMessage &msg) override;
 	void draw() override;

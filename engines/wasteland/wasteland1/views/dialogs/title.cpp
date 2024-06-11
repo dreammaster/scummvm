@@ -36,12 +36,14 @@ Title::Title() : Dialog("Title"), _start(this, "Start", "START", 18, 24) {
 }
 
 bool Title::msgKeypress(const KeypressMessage &msg) {
-	timeout();
+	if (msg.keycode == Common::KEYCODE_RETURN)
+		replaceView("Roster");
 	return true;
 }
 
-bool Title::msgMouseDown(const MouseDownMessage &msg) {
-	timeout();
+bool Title::msgGame(const GameMessage &msg) {
+	if (msg._name == "Start")
+		replaceView("Roster");
 	return true;
 }
 
