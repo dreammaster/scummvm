@@ -34,7 +34,7 @@ namespace Dialogs {
 class Title : public Dialog {
 private:
 	Graphics::ManagedSurface _surface;
-	W1Gfx::Button _start;
+	Gfx::Button _start;
 
 public:
 	Title();

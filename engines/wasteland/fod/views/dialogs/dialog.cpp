@@ -32,8 +32,8 @@ Dialog::Dialog(const Common::String &name, int w, int h) : UIElement(name) {
 	_bounds.setBorderSize(FONT_W);
 }
 
-Dialog::Dialog(const Common::String &name, const Gfx::Window &win) : UIElement(name) {
-	setBounds(Gfx::Window(win.left - 1, win.top - 1, win.right + 1, win.bottom + 1,
+Dialog::Dialog(const Common::String &name, const Window &win) : UIElement(name) {
+	setBounds( Window(win.left - 1, win.top - 1, win.right + 1, win.bottom + 1,
 		win._xOffset, win._yOffset));
 }
 

@@ -34,7 +34,7 @@ private:
 	Common::String _message;
 
 public:
-	MessageDialog() : Dialog("MessageDialog", Gfx::Window(8, 6, 31, 17)) {}
+	MessageDialog() : Dialog("MessageDialog", Window(8, 6, 31, 17)) {}
 	virtual ~MessageDialog() {}
 
 	bool msgGame(const GameMessage &msg) override;

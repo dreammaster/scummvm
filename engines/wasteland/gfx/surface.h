@@ -27,6 +27,7 @@
 #include "graphics/managed_surface.h"
 
 namespace Wasteland {
+namespace Shared {
 namespace Gfx {
 
 #define TEXT_W 40
@@ -38,21 +39,27 @@ struct Window : public Common::Rect {
 	int _xOffset = 0;
 	int _yOffset = 0;
 
-	Window() : Common::Rect() {}
+	Window() : Common::Rect() {
+	}
 	Window(int x1, int y1, int x2, int y2, int xOffset = 0, int yOffset = 0) :
-		Common::Rect(x1, y1, x2, y2), _xOffset(xOffset), _yOffset(yOffset) {}
+		Common::Rect(x1, y1, x2, y2), _xOffset(xOffset), _yOffset(yOffset) {
+	}
 	Window(const Common::Rect &r, int xOffset = 0, int yOffset = 0) :
-		Common::Rect(r), _xOffset(xOffset), _yOffset(yOffset) {}	
+		Common::Rect(r), _xOffset(xOffset), _yOffset(yOffset) {
+	}
 };
 
 struct Position : public Common::Point {
 	int _xOffset = 0;
 	int _yOffset = 0;
 
-	Position() : Common::Point() {}
-	Position(int x, int y) : Common::Point(x, y) {}
+	Position() : Common::Point() {
+	}
+	Position(int x, int y) : Common::Point(x, y) {
+	}
 	Position(int x, int y, int xOffset, int yOffset) : Common::Point(x, y),
-		_xOffset(xOffset), _yOffset(yOffset) {}
+		_xOffset(xOffset), _yOffset(yOffset) {
+	}
 };
 
 /**
@@ -75,7 +82,9 @@ public:
 	Surface(ManagedSurface &surf, const Common::Rect &bounds);
 
 	void setFont(int fontNum);
-	void setInverseColor(bool isInverse) { _inverseColor = isInverse; }
+	void setInverseColor(bool isInverse) {
+		_inverseColor = isInverse;
+	}
 	void writeString(const Common::String &str);
 	void writeString(const Common::String &str, int x, int y);
 	void writeCenteredString(const Common::String &str, int y);
@@ -85,6 +94,7 @@ public:
 };
 
 } // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland
 
 #endif

@@ -28,6 +28,7 @@
 #include "wasteland/gfx/image_decoder.h"
 
 namespace Wasteland {
+namespace Shared {
 namespace Gfx {
 
 #define TILE_W 16
@@ -53,6 +54,7 @@ public:
 };
 
 } // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland
 
 #endif

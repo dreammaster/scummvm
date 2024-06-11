@@ -32,7 +32,7 @@ namespace Dialogs {
 class Dialog : public UIElement {
 public:
 	Dialog(const Common::String &name, int w, int h);
-	Dialog(const Common::String &name, const Gfx::Window &win);
+	Dialog(const Common::String &name, const Window &win);
 	virtual ~Dialog() {}
 
 	void draw() override;

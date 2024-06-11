@@ -22,30 +22,31 @@
 #include "wasteland/gfx/clickable_text.h"
 
 namespace Wasteland {
+namespace Shared {
 namespace Gfx {
 
 ClickableText::ClickableText(const Common::String &name, UIElement *owner, int x, int y,
-		const Common::String &text, Common::KeyCode keycode) : UIElement(name, owner),
-		_text(text), _keycode(keycode) {
+	const Common::String &text, Common::KeyCode keycode) : UIElement(name, owner),
+	_text(text), _keycode(keycode) {
 	setBounds(Common::Rect(x * FONT_W, y * FONT_H, (x + text.size()) * FONT_W, (y + 1) * FONT_H));
 }
 
 ClickableText::ClickableText(const Common::String &name, UIElement *owner, const Position &pos, const Common::String &text, Common::KeyCode keycode) : UIElement(name, owner),
-		_text(text), _keycode(keycode) {
+_text(text), _keycode(keycode) {
 	Common::Rect r(pos.x * FONT_W, pos.y * FONT_H, (pos.x + text.size()) * FONT_W, (pos.y + 1) * FONT_H);
 	r.translate(pos._xOffset, pos._yOffset);
 	setBounds(r);
 }
 
 ClickableText::ClickableText(const Common::String &name, UIElement *owner, int x, int y,
-		const Common::String &text, const Common::String &message, int tag) : UIElement(name, owner),
-		_text(text), _keycode(Common::KEYCODE_INVALID), _message(message), _tag(tag) {
+	const Common::String &text, const Common::String &message, int tag) : UIElement(name, owner),
+	_text(text), _keycode(Common::KEYCODE_INVALID), _message(message), _tag(tag) {
 	setBounds(Common::Rect(x * FONT_W, y * FONT_H, (x + text.size()) * FONT_W, (y + 1) * FONT_H));
 }
 
 ClickableText::ClickableText(const Common::String &name, UIElement *owner, const Position &pos,
-		const Common::String &text, const Common::String &message, int tag) : UIElement(name, owner),
-		_text(text), _keycode(Common::KEYCODE_INVALID), _message(message), _tag(tag) {
+	const Common::String &text, const Common::String &message, int tag) : UIElement(name, owner),
+	_text(text), _keycode(Common::KEYCODE_INVALID), _message(message), _tag(tag) {
 	Common::Rect r(pos.x * FONT_W, pos.y * FONT_H, (pos.x + text.size()) * FONT_W, (pos.y + 1) * FONT_H);
 	r.translate(pos._xOffset, pos._yOffset);
 	setBounds(r);
@@ -80,4 +81,5 @@ bool ClickableText::msgMouseDown(const MouseDownMessage &msg) {
 }
 
 } // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland

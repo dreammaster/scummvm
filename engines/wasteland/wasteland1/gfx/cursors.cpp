@@ -24,7 +24,7 @@
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace W1Gfx {
+namespace Gfx {
 
 #define CURSOR_W 16
 #define CURSOR_H 16
@@ -74,6 +74,6 @@ void Cursors::load(CursorArray &cursors) {
 	}
 }
 
-} // namespace W1Gfx
+} // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland

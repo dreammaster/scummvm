@@ -25,6 +25,7 @@
 #include "wasteland/events.h"
 
 namespace Wasteland {
+namespace Shared {
 namespace Gfx {
 
 class TextEntry : public UIElement {
@@ -49,6 +50,7 @@ public:
 };
 
 } // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland
 
 #endif

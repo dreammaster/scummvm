@@ -30,7 +30,7 @@
 
 namespace Wasteland {
 namespace FOD {
-namespace FGfx {
+namespace Gfx {
 
 /**
  * Implements a font stored as a grid on a passed surface
@@ -77,7 +77,7 @@ public:
 	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
 };
 
-} // namespace FGfx
+} // namespace Gfx
 } // namespace FOD
 } // namespace Wasteland
 

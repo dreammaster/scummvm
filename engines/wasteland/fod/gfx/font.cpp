@@ -24,7 +24,7 @@
 
 namespace Wasteland {
 namespace FOD {
-namespace FGfx {
+namespace Gfx {
 
 bool Font::load(const Common::Path &filename) {
 	Common::File f;
@@ -64,6 +64,6 @@ void Font::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 col
 	}
 }
 
-} // namespace FGfx
+} // namespace Gfx
 } // namespace FOD
 } // namespace Wasteland

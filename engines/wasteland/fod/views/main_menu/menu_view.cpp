@@ -29,9 +29,9 @@ namespace FOD {
 namespace Views {
 
 MenuView::MenuView(const Common::String &name) : BaseView(name),
-	_f1("F1", nullptr, Gfx::Position(1, 21, 0, 4), "F1>", Common::KEYCODE_F1),
-	_f2("F2", nullptr, Gfx::Position(1, 22, 0, 4), "F2>", Common::KEYCODE_F2),
-	_f3("F3", nullptr, Gfx::Position(1, 23, 0, 4), "F3>", Common::KEYCODE_F3) {
+	_f1("F1", nullptr, Position(1, 21, 0, 4), "F1>", Common::KEYCODE_F1),
+	_f2("F2", nullptr, Position(1, 22, 0, 4), "F2>", Common::KEYCODE_F2),
+	_f3("F3", nullptr, Position(1, 23, 0, 4), "F3>", Common::KEYCODE_F3) {
 }
 
 void MenuView::draw() {
@@ -42,12 +42,12 @@ void MenuView::draw() {
 	drawBorders(5);
 
 	// Draw the welcome portrait
-	Surface portrait = getSurface(Gfx::Window(1, 1, 12, 11));
+	Surface portrait = getSurface( Window(1, 1, 12, 11));
 	portrait.blitFrom(*g_engine->_pics._welcome.getSurface());
 
 	// If the party display is enabled, show it
 	if (_children.contains(&_f1)) {
-		Surface partyArea = getSurface(Gfx::Window(1, 20, 38, 23, 0, 4));
+		Surface partyArea = getSurface( Window(1, 20, 38, 23, 0, 4));
 
 		for (uint i = 0; i < g_engine->_disk1._partyCount; ++i) {
 			const Data::PartyMember &member = g_engine->_disk1._party[i];
@@ -65,7 +65,7 @@ void MenuView::draw() {
 }
 
 void MenuView::writePortraitText(const Common::String &str) {
-	Surface portrait = getSurface(Gfx::Window(1, 1, 12, 12));
+	Surface portrait = getSurface( Window(1, 1, 12, 12));
 	portrait.writeCenteredString(str, 11);
 }
 

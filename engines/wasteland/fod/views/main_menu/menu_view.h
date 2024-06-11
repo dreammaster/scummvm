@@ -31,9 +31,9 @@ namespace Views {
 
 class MenuView : public BaseView {
 private:
-	Gfx::ClickableText _f1;
-	Gfx::ClickableText _f2;
-	Gfx::ClickableText _f3;
+	Shared::Gfx::ClickableText _f1;
+	Shared::Gfx::ClickableText _f2;
+	Shared::Gfx::ClickableText _f3;
 
 protected:
 	int _selectedPartyMember = -1;

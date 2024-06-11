@@ -26,7 +26,7 @@
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace W1Gfx {
+namespace Gfx {
 
 class Button : public UIElement {
 private:
@@ -38,7 +38,7 @@ public:
 		UIElement(name, parent), _text(text) {}
 	Button(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y) :
 			UIElement(name, parent), _text(text) {
-		setBounds(Gfx::Window(x, y, x + _text.size(), y));
+		setBounds( Window(x, y, x + _text.size(), y));
 	}
 	~Button() override {}
 
@@ -48,7 +48,7 @@ public:
 	bool msgMouseDown(const MouseDownMessage &msg) override;
 };
 
-} // namespace W1Gfx
+} // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland
 

@@ -26,6 +26,7 @@
 #include "common/stream.h"
 
 namespace Wasteland {
+namespace Shared {
 namespace Gfx {
 
 /**
@@ -67,6 +68,7 @@ public:
 };
 
 } // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland
 
 #endif

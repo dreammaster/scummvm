@@ -19,27 +19,36 @@
  *
  */
 
-#ifndef WASTELAND_FOD_VIEWS_DIALOGS_QUIT_H
-#define WASTELAND_FOD_VIEWS_DIALOGS_QUIT_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_DIALOGS_ROSTER_H
+#define WASTELAND_WASTELAND1_VIEWS_DIALOGS_ROSTER_H
 
-#include "wasteland/fod/views/dialogs/dialog.h"
+#include "graphics/managed_surface.h"
+#include "wasteland/wasteland1/views/dialogs/dialog.h"
+#include "wasteland/wasteland1/gfx/button.h"
 
 namespace Wasteland {
-namespace FOD {
+namespace Wasteland1 {
 namespace Views {
 namespace Dialogs {
 
-class Quit : public Dialog {
+class Roster : public Dialog {
+private:
+	Gfx::Button _create;
+	Gfx::Button _delete;
+	Gfx::Button _play;
 public:
-	Quit() : Dialog("QuitDialog", Window(8, 6, 31, 17)) {}
-	virtual ~Quit() {}
+	Roster();
+	virtual ~Roster() {}
 
+	bool msgGame(const GameMessage &msg) override;
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgUnfocus(const UnfocusMessage &msg) override;
 	void draw() override;
 };
 
 } // namespace Dialogs
 } // namespace Views
-} // namespace FOD
+} // namespace Wasteland1
 } // namespace Wasteland
 
 #endif

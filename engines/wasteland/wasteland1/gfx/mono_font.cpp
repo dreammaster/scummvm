@@ -24,7 +24,7 @@
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace W1Gfx {
+namespace Gfx {
 
 #define FIRST_CHAR 32
 #define CHAR_COUNT 128
@@ -54,6 +54,6 @@ void MonoFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32
 	}
 }
 
-} // namespace W1Gfx
+} // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland

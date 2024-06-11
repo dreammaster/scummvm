@@ -43,8 +43,8 @@ void FountainOfDreamsEngine::setup() {
 	_views = new Views::Views();
 	addView("Title");
 
-	Gfx::Surface::setupPalette();
-	auto font = new FGfx::Font();
+	Surface::setupPalette();
+	auto font = new Gfx::Font();
 	if (!font->load("FONT"))
 		error("Could not load FONT");
 	_fonts.push_back(font);
@@ -66,7 +66,7 @@ void FountainOfDreamsEngine::setup() {
 	if (!_weapons.load())
 		error("Could not load WEAPONS");
 
-	FGfx::Cursors::load(_cursors);
+	Gfx::Cursors::load(_cursors);
 	setCursor(0);
 }
 

@@ -26,6 +26,7 @@
 #include "wasteland/engine.h"
 
 namespace Wasteland {
+namespace Shared {
 namespace Gfx {
 
 #define FONT_COLOR 15
@@ -35,7 +36,7 @@ Surface::Surface() : Graphics::ManagedSurface() {
 }
 
 Surface::Surface(ManagedSurface &surf, const Common::Rect &bounds) :
-		Graphics::ManagedSurface(surf, bounds) {
+	Graphics::ManagedSurface(surf, bounds) {
 	_currentFont = g_engine->_fonts[0];
 }
 
@@ -95,4 +96,5 @@ void Surface::setTextPos(int x, int y) {
 }
 
 } // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland

@@ -22,6 +22,7 @@
 #ifndef WASTELAND_WASTELAND1_VIEWS_VIEWS_H
 #define WASTELAND_WASTELAND1_VIEWS_VIEWS_H
 
+#include "wasteland/wasteland1/views/dialogs/roster.h"
 #include "wasteland/wasteland1/views/dialogs/title.h"
 
 namespace Wasteland {
@@ -29,6 +30,7 @@ namespace Wasteland1 {
 namespace Views {
 
 struct Views {
+	Dialogs::Roster _roster;
 	Dialogs::Title _title;
 };
 

@@ -25,6 +25,7 @@
 #include "wasteland/gfx/image_decoder.h"
 
 namespace Wasteland {
+namespace Shared {
 namespace Gfx {
 
 bool ImageDecoder::load(const Common::Path &name, uint16 w, uint16 h) {
@@ -99,4 +100,5 @@ void ImageDecoder::copyPixelsToSurface(Common::SeekableReadStream &src) {
 }
 
 } // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland

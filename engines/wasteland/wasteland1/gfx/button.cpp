@@ -23,7 +23,7 @@
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace W1Gfx {
+namespace Gfx {
 
 bool Button::msgFocus(const FocusMessage &msg) {
 	_focused = true;
@@ -55,6 +55,6 @@ bool Button::msgMouseDown(const MouseDownMessage &msg) {
 	return true;
 }
 
-} // namespace W1Gfx
+} // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland

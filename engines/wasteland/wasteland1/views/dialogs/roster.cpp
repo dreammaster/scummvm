@@ -19,56 +19,46 @@
  *
  */
 
-#include "common/system.h"
-#include "graphics/paletteman.h"
-#include "wasteland/fod/views/main_menu/title.h"
-#include "wasteland/fod/fod.h"
-#include "wasteland/gfx/image_decoder.h"
+#include "wasteland/wasteland1/views/dialogs/roster.h"
 
 namespace Wasteland {
-namespace FOD {
+namespace Wasteland1 {
 namespace Views {
+namespace Dialogs {
 
-bool Title::msgKeypress(const KeypressMessage &msg) {
-	timeout();
-	return true;
+Roster::Roster() : Dialog("Roster"),
+		_create(this, "Create", "CREATE", 11, 24),
+		_delete(this, "Delete", "DELETE", 17, 24),
+		_play(this, "Play", "PLAY", 23, 24) {
 }
 
-bool Title::msgMouseDown(const MouseDownMessage &msg) {
-	timeout();
-	return true;
-}
-
-void Title::draw() {
+void Roster::draw() {
 	Surface s = getSurface();
-	Shared::Gfx::ImageDecoder decoder;
+	s.clear();
 
-	if (!decoder.load("TPICT", 320, 200))
-		error("Could not load TPICT");
-
-	s.blitFrom(*decoder.getSurface());
-
-#if 0
-	// Draw a bunch of squares on screen
-	Surface s = getSurface();
-	s.fillRect(Common::Rect(0, 0, 320, 200), 0xff);
-	for (int i = 0; i < 16; ++i)
-		s.fillRect(Common::Rect(i * 10, 190, i * 10 + 10, 200), i);
-
-	// Test font drawing
-	s.writeString("This is a test", 5, 5);
-	#endif
+	drawFrame(Common::Rect(0, 0, 39, 24));
+	drawFrame(Common::Rect(0, 0, 39, 23));
+	drawFrame(Common::Rect(0, 0, 13, 11));
+	drawFrame(Common::Rect(14, 0, 39, 11));
 }
 
-bool Title::msgFocus(const FocusMessage &msg) {
-	delaySeconds(1);
+bool Roster::msgFocus(const FocusMessage &msg) {
+	Dialog::msgFocus(msg);
 	return true;
 }
 
-void Title::timeout() {
-	replaceView(g_engine->_disk1._partyCount > 0 ? "Game" : "MainMenu");
+bool Roster::msgUnfocus(const UnfocusMessage &msg) {
+	Dialog::msgUnfocus(msg);
+	return true;
 }
 
+bool Roster::msgGame(const GameMessage &msg) {
+
+	return true;
+}
+
+
+} // namespace Dialogs
 } // namespace Views
-} // namespace FOD
+} // namespace Wasteland1
 } // namespace Wasteland

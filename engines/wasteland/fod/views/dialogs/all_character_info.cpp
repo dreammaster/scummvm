@@ -41,13 +41,13 @@ void AllCharacterInfo::draw() {
 	for (uint partyNum = 0; partyNum < g_engine->_disk1._partyCount; ++partyNum)
 		writeMember(partyNum);
 
-	Surface s = getSurface(Gfx::Window(1, 21, 38, 23));
+	Surface s = getSurface(Window(1, 21, 38, 23));
 	s.writeString(Common::String::format("Cash: $%lu", g_engine->_disk1._cash), 22, 0);
 }
 
 void AllCharacterInfo::writeMember(int partyNum) {
 	const Data::PartyMember &member = g_engine->_disk1._party[partyNum];
-	Surface s = getSurface(Gfx::Window(1, 1 + partyNum * 4, 38, 3 + partyNum * 4));
+	Surface s = getSurface(Window(1, 1 + partyNum * 4, 38, 3 + partyNum * 4));
 	int ac = member.getArmorClass();
 
 	s.writeString(Common::String::format("F%1d>%-19.19s",
