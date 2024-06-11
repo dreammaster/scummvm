@@ -23,6 +23,7 @@
 #include "graphics/palette.h"
 #include "wasteland/wasteland1/views/dialogs/title.h"
 #include "wasteland/core/file.h"
+#include "wasteland/keymapping.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -35,8 +36,8 @@ namespace Dialogs {
 Title::Title() : Dialog("Title"), _start(this, "Start", "START", 18, 24) {
 }
 
-bool Title::msgKeypress(const KeypressMessage &msg) {
-	if (msg.keycode == Common::KEYCODE_RETURN)
+bool Title::msgAction(const ActionMessage &msg) {
+	if (msg._action == KEYBIND_SELECT)
 		replaceView("Roster");
 	return true;
 }
