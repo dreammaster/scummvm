@@ -25,6 +25,16 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Gfx {
 
+Button::Button(UIElement *parent, const Common::String &name, const Common::String &text) :
+	UIElement(name, parent), _text(text) {
+}
+
+Button::Button(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y) :
+	UIElement(name, parent), _text(text) {
+	setBounds(Window(x - 1, y, x + _text.size(), y));
+	_bounds.setBorderSize(FONT_W, 0, FONT_W, 0);
+}
+
 bool Button::msgFocus(const FocusMessage &msg) {
 	_focused = true;
 	g_events->setCursor(1);
@@ -42,12 +52,20 @@ bool Button::msgUnfocus(const UnfocusMessage &msg) {
 }
 
 void Button::draw() {
-	Surface s = getSurface();
+	Surface s = getSurface(_bounds);
+
 	s.setFont(1);
 	int firstChar = _focused ? 52 : 24;
 
+	Button *btnLeft = leftSideButton();
+	Button *btnRight = rightSideButton();
+
+	s.writeChar(btnLeft ? (btnLeft->isFocused() ? 52 : 24) - 'A' + 'Z' : 23);
+
 	for (uint x = 0; x < _text.size(); ++x)
 		s.writeChar(toupper(_text[x]) - 'A' + firstChar);
+
+	s.writeChar(btnRight ? firstChar - 'A' + 'Z' : firstChar - 'A' + 'Q');
 }
 
 bool Button::msgMouseDown(const MouseDownMessage &msg) {
@@ -55,6 +73,27 @@ bool Button::msgMouseDown(const MouseDownMessage &msg) {
 	return true;
 }
 
+Button *Button::leftSideButton() const {
+	for (auto *child : _parent->getChildren()) {
+		Button *btn = dynamic_cast<Button *>(child);
+		if (btn && btn->_bounds.top == _bounds.top &&
+				btn->_bounds.right == (_bounds.left + FONT_W))
+			return btn;
+	}
+
+	return nullptr;
+}
+
+Button *Button::rightSideButton() const {
+	for (auto *child : _parent->getChildren()) {
+		Button *btn = dynamic_cast<Button *>(child);
+		if (btn && btn->_bounds.top == _bounds.top &&
+			btn->_bounds.left == (_bounds.right - FONT_W))
+			return btn;
+	}
+
+	return nullptr;
+}
 } // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland

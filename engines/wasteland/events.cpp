@@ -235,6 +235,11 @@ void Bounds::setBorderSize(size_t borderSize) {
 	_innerBounds.grow(-_borderSize);
 }
 
+void Bounds::setBorderSize(int leftPad, int topPad, int rightPad, int bottomPad) {
+	_borderSize = 0;	// No standard border size
+	_innerBounds = Common::Rect(left + leftPad, top + topPad, right - rightPad, bottom - bottomPad);
+}
+
 /*------------------------------------------------------------------------*/
 
 UIElement::UIElement(const Common::String &name) :
@@ -354,6 +359,10 @@ void UIElement::setBounds(const Window &win) {
 
 Surface UIElement::getSurface() const {
 	return Surface(*g_events->getScreen(), _innerBounds);
+}
+
+Surface UIElement::getSurface(const Common::Rect &r) const {
+	return Surface(*g_events->getScreen(), r);
 }
 
 Surface UIElement::getSurface(const Window &win) const {

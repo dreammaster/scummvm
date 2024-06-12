@@ -33,13 +33,16 @@ private:
 	Common::String _text;
 	bool _focused = false;
 
+	/**
+	 * Returns any button immediately to the left/right of the current button.
+	 * Used for drawing the correct left edge between successive buttons
+	 */
+	Button *leftSideButton() const;
+	Button *rightSideButton() const;
+
 public:
-	Button(UIElement *parent, const Common::String &name, const Common::String &text) :
-		UIElement(name, parent), _text(text) {}
-	Button(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y) :
-			UIElement(name, parent), _text(text) {
-		setBounds( Window(x, y, x + _text.size(), y));
-	}
+	Button(UIElement *parent, const Common::String &name, const Common::String &text);
+	Button(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y);
 	~Button() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;

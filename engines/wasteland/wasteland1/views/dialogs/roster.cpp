@@ -28,8 +28,8 @@ namespace Dialogs {
 
 Roster::Roster() : Dialog("Roster"),
 		_create(this, "Create", "CREATE", 11, 24),
-		_delete(this, "Delete", "DELETE", 17, 24),
-		_play(this, "Play", "PLAY", 23, 24) {
+		_delete(this, "Delete", "DELETE", 18, 24),
+		_play(this, "Play", "PLAY", 25, 24) {
 }
 
 void Roster::draw() {
