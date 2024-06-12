@@ -59,6 +59,7 @@ public:
 	operator const Common::Rect &() const { return _bounds; }
 	Bounds &operator=(const Common::Rect &r);
 	void setBorderSize(size_t borderSize);
+	void setBorderSize(int leftPad, int topPad, int rightPad, int bottomPad);
 	size_t borderSize() const { return _borderSize; }
 	int16 width() const { return _bounds.width(); }
 	int16 height() const { return _bounds.height(); }
@@ -202,9 +203,19 @@ public:
 	Common::String getName() const { return _name; }
 
 	/**
+	 * Return the child elements
+	 */
+	Array<UIElement *> getChildren() { return _children; }
+
+	/**
 	 * Returns a surface for drawing the element
 	 */
 	Surface getSurface() const;
+
+	/**
+	 * Returns a surface for drawing the element
+	 */
+	Surface getSurface(const Common::Rect &r) const;
 
 	/**
 	 * Returns a surface for drawing the element, using a passed window
