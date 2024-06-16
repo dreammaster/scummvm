@@ -19,36 +19,48 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_WASTELAND1_H
-#define WASTELAND_WASTELAND1_WASTELAND1_H
-
-#include "wasteland/engine.h"
-#include "wasteland/wasteland1/views/views.h"
-#include "wasteland/wasteland1/files/game_archive.h"
+#include "common/memstream.h"
+#include "wasteland/wasteland1/files/rotating_xor_input_stream.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 
-class Wasteland1Engine : public Wasteland::Engine {
-private:
-	Wasteland1::Views::Views *_views = nullptr;
-	uint16 _mapX = 0, _mapY = 0;
+void RotatingXorInputStream::init(Common::SeekableReadStream *src) {
+	int e1, e2;
 
-protected:
-	void setup() override;
+	// Get encryption byte and checksum end marker
+	e1 = src->readByte();
+	e2 = src->readByte();
+	_enc = e1 ^ e2;
+	_endChecksum = e1 | (e2 << 8);
 
-public:
-	GameArchive *_gameArchive = nullptr;
+	// Initialize checksum
+	_checksum = 0;
+}
 
-public:
-	Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc);
-	~Wasteland1Engine() override;
-	void initializePath(const Common::FSNode &gamePath) override;
-};
+void RotatingXorInputStream::decode(Common::SeekableReadStream *src) {
+	Common::MemoryWriteStreamDynamic buf(DisposeAfterUse::NO);
 
-extern Wasteland1Engine *g_engine;
+	while (!src->eos()) {
+		int crypted;
+		int b;
+
+		// Read crypted byte
+		crypted = src->readByte();
+
+		// Decrypt the byte
+		b = crypted ^ _enc;
+		buf.writeByte(b);
+
+		// Update checksum
+		_checksum = (_checksum - b) & 0xffff;
+
+		// Updated encryption byte
+		_enc = (_enc + 0x1f) % 0x100;
+	}
+
+	_stream = new Common::MemoryReadStream(buf.getData(), buf.size());
+}
 
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif
