@@ -69,6 +69,9 @@ void Wasteland1Engine::setup() {
 
 	Gfx::Cursors::load(_cursors);
 	setCursor(0);
+
+	_gameArchive = new GameArchive();
+	SearchMan.add("Game", _gameArchive);
 }
 
 } // namespace Wasteland1

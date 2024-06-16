@@ -19,34 +19,39 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_WASTELAND1_H
-#define WASTELAND_WASTELAND1_WASTELAND1_H
+#ifndef WASTELAND_WASTELAND1_FILES_ROTATING_XOR_STREAM_H
+#define WASTELAND_WASTELAND1_FILES_ROTATING_XOR_STREAM_H
 
-#include "wasteland/engine.h"
-#include "wasteland/wasteland1/views/views.h"
-#include "wasteland/wasteland1/files/game_archive.h"
+#include "common/stream.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 
-class Wasteland1Engine : public Wasteland::Engine {
+class RotatingXorInputStream {
 private:
-	Wasteland1::Views::Views *_views = nullptr;
-	uint16 _mapX = 0, _mapY = 0;
+	Common::SeekableReadStream *_stream = nullptr;
+	int _enc = 0;
+	int _endChecksum = 0;
+	int _checksum = 0;
 
-protected:
-	void setup() override;
+	void init(Common::SeekableReadStream *src);
+	void decode(Common::SeekableReadStream *src);
 
 public:
-	GameArchive *_gameArchive = nullptr;
+	RotatingXorInputStream(Common::SeekableReadStream *src) {
+		init(src);
+		decode(src);
+	}
+	~RotatingXorInputStream() {
+		delete _stream;
+	}
 
-public:
-	Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc);
-	~Wasteland1Engine() override;
-	void initializePath(const Common::FSNode &gamePath) override;
+	Common::SeekableReadStream *get() {
+		auto *result = _stream;
+		_stream = nullptr;
+		return result;
+	}
 };
-
-extern Wasteland1Engine *g_engine;
 
 } // namespace Wasteland1
 } // namespace Wasteland
