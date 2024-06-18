@@ -16,6 +16,9 @@ MODULE_OBJS = \
 	gfx/text_entry.o \
 	gfx/tiles.o \
 	gfx/wasteland_font.o \
+	wasteland1/core/array1.o \
+	wasteland1/data/parties.o \
+	wasteland1/data/party_member.o \
 	wasteland1/wasteland1.o \
 	wasteland1/files/game_archive.o \
 	wasteland1/files/rotating_xor_input_stream.o \

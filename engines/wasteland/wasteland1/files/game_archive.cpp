@@ -92,6 +92,10 @@ void GameArchive::load(int gameNum) {
 	// Iterate over the blocks to get the types
 	_savegameIndex = _shopsIndex = -1;
 	for (uint i = 0; i < _blocks.size(); ++i) {
+		warning("%x", _blocks[i]._offset);
+		if (_blocks[i]._offset == 0x253c5)
+			warning("SAVES");
+
 		switch (getBlockType(_blocks[i], &f)) {
 		case TYPE_SAVEGAME:
 			_savegameIndex = i;
@@ -103,7 +107,6 @@ void GameArchive::load(int gameNum) {
 			break;
 		}
 	}
-	assert(_savegameIndex != -1 && _shopsIndex != -1);
 }
 
 bool GameArchive::hasFile(const Common::Path &path) const {
@@ -187,11 +190,11 @@ GameArchive::BlockType GameArchive::getBlockType(const GameArchive::GameMsqBlock
 }
 
 bool GameArchive::isSaveGame(const byte bytes[]) {
-	bool seen[8];
+	bool seen[6];
 	byte b;
-	Common::fill(seen, seen + 8, false);
+	Common::fill(seen, seen + 6, false);
 
-	for (int i = 1; i < 8; i++) {
+	for (int i = 1; i < 6; i++) {
 		b = bytes[i];
 		if (b > 7)
 			return false;
