@@ -19,43 +19,39 @@
  *
  */
 
-#include "wasteland/wasteland1/data/parties.h"
+#include "common/algorithm.h"
+#include "wasteland/core/serializer.h"
 
 namespace Wasteland {
-namespace Wasteland1 {
-namespace Data {
 
-Party::Party() {
-	_members.resize(7);
+void Serializer::syncAsInt3(int &val) {
+	byte tmp[3];
+
+	if (isLoading()) {
+		syncBytes(tmp, 3);
+		val = (int)tmp[0] | ((int)tmp[1] << 8) | ((int)tmp[2] << 16);
+	} else {
+		tmp[0] = val & 0xff;
+		tmp[1] = (val >> 8) & 0xff;
+		tmp[2] = (val >> 16) & 0xff;
+		syncBytes(tmp, 3);
+	}
 }
 
-void Party::synchronize(Serializer &s) {
-	s.skip(1);
-	for (int i = 0; i < 7; ++i)
-		s.syncAsByte(_members[i]);
+void Serializer::syncAsString(Common::String &str, size_t size) {
+	char *tmp = new char[size];
 
-	s.syncAsSByte(_x);
-	s.syncAsSByte(_y);
-	s.syncAsSByte(_map);
-	s.syncAsSByte(_prevX);
-	s.syncAsSByte(_prevY);
-	s.syncAsSByte(_prevMap);
+	if (isLoading()) {
+		syncBytes((byte *)tmp, size);
+		tmp[size - 1] = '\0';
+		str = Common::String(tmp);
+	} else {
+		Common::fill(tmp, tmp + size, 0);
+		Common::strcpy_s(tmp, size, str.c_str());
+		syncBytes((byte *)tmp, 14);
+	}
+
+	delete[] tmp;
 }
 
-Parties::Parties() {
-	_parties.resize(4);
-	_roster.resize(8);
-}
-
-void Parties::synchronize(Serializer &s) {
-	for (int i = 0; i < 4; ++i)
-		_parties[i].synchronize(s);
-	s.skip(0xc8);	// TODO: Figure out if remainder of 256 bytes is needed
-
-	for (int i = 0; i < 8; ++i)
-		_roster[i].synchronize(s);
-}
-
-} // namespace Data
-} // namespace Wasteland1
 } // namespace Wasteland

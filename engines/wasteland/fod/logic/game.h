@@ -23,7 +23,7 @@
 #define WASTELAND_FOD_LOGIC_GAME_H
 
 #include "common/rect.h"
-#include "common/serializer.h"
+#include "wasteland/core/serializer.h"
 #include "wasteland/fod/logic/scripts.h"
 
 namespace Wasteland {

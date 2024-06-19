@@ -27,7 +27,7 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-void InventoryItem::synchronize(Common::Serializer &s) {
+void InventoryItem::synchronize(Serializer &s) {
 	s.syncAsByte(_id);
 	s.syncAsByte(_field1);
 	s.syncAsByte(_ammo);
@@ -49,7 +49,7 @@ void InventoryItem::updateItem(int itemId) {
 	}
 }
 
-void PartyMember::synchronize(Common::Serializer &s) {
+void PartyMember::synchronize(Serializer &s) {
 	char nameBuff[24];
 	if (s.isSaving()) {
 		Common::fill(nameBuff, nameBuff + 24, 0);
@@ -130,7 +130,7 @@ void PartyMember::reset() {
 	_field49 = 0;
 }
 
-void Party::synchronize(Common::Serializer &s) {
+void Party::synchronize(Serializer &s) {
 	for (int i = 0; i < 5; ++i)
 		_party[i].synchronize(s);
 }

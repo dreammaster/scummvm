@@ -58,7 +58,7 @@ struct InventoryItem {
 	byte _field4 = 0;
 	byte _field5 = 0;
 
-	void synchronize(Common::Serializer &s);
+	void synchronize(Serializer &s);
 
 	void updateItem(int itemId);
 };
@@ -99,7 +99,7 @@ struct PartyMember {
 	uint32 _field144;
 	uint32 _field148;
 
-	void synchronize(Common::Serializer &s);
+	void synchronize(Serializer &s);
 
 	void reset();
 
@@ -133,7 +133,7 @@ public:
 		return _party[idx];
 	}
 
-	void synchronize(Common::Serializer &s);
+	void synchronize(Serializer &s);
 
 	int getMemberByStatus(int status) const;
 

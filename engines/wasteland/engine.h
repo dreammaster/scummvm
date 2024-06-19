@@ -28,7 +28,7 @@
 #include "common/fs.h"
 #include "common/hash-str.h"
 #include "common/random.h"
-#include "common/serializer.h"
+#include "wasteland/core/serializer.h"
 #include "common/util.h"
 #include "graphics/font.h"
 #include "engines/engine.h"
@@ -106,14 +106,14 @@ public:
 	 * Uses a serializer to allow implementing savegame
 	 * loading and saving using a single method
 	 */
-	Common::Error syncGame(Common::Serializer &s);
+	Common::Error syncGame(Serializer &s);
 
 	Common::Error saveGameStream(Common::WriteStream *stream, bool isAutosave = false) override {
-		Common::Serializer s(nullptr, stream);
+		Serializer s(stream);
 		return syncGame(s);
 	}
 	Common::Error loadGameStream(Common::SeekableReadStream *stream) override {
-		Common::Serializer s(stream, nullptr);
+		Serializer s(stream);
 		return syncGame(s);
 	}
 };

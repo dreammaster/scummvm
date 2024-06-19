@@ -22,7 +22,7 @@
 #ifndef WASTELAND_FOD_DATA_PACKETS_H
 #define WASTELAND_FOD_DATA_PACKETS_H
 
-#include "common/serializer.h"
+#include "wasteland/core/serializer.h"
 
 namespace Wasteland {
 namespace FOD {

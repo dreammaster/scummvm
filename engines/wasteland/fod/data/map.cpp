@@ -27,7 +27,7 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-void Map::MapTile::synchronize(Common::Serializer &s) {
+void Map::MapTile::synchronize(Serializer &s) {
 	s.syncAsUint16LE(_id);
 	s.syncAsByte(_flags);
 	s.syncAsByte(_field3);
@@ -72,7 +72,7 @@ void Map::MapTile::proc2(int opcode, int val, int val2) {
 	}
 }
 
-void Map::MapPerson::synchronize(Common::Serializer &s) {
+void Map::MapPerson::synchronize(Serializer &s) {
 	byte buf[0x68];
 	s.syncBytes(buf, 0x68);
 
@@ -94,7 +94,7 @@ void Map::MapPerson::synchronize(Common::Serializer &s) {
 	}
 }
 
-void Map::MapEntry4::synchronize(Common::Serializer &s) {
+void Map::MapEntry4::synchronize(Serializer &s) {
 	byte buf[0x66];
 	s.syncBytes(buf, 0x66);
 
@@ -108,7 +108,7 @@ void Map::MapEntry4::synchronize(Common::Serializer &s) {
 	}
 }
 
-void Map::synchronizeCore(Common::Serializer &s) {
+void Map::synchronizeCore(Serializer &s) {
 	s.syncAsUint16LE(_width);
 	s.syncAsUint16LE(_height);
 	s.syncAsUint16LE(_flags);
@@ -146,7 +146,7 @@ Map::Map(uint16 &mapX, uint16 &mapY) : _mapPosX(mapX), _mapPosY(mapY) {
 
 void Map::load(Common::SeekableReadStream &src) {
 	// Get the core data and tiles
-	Common::Serializer s(&src, nullptr);
+	Serializer s(&src);
 	synchronizeCore(s);
 
 	// Load the specials

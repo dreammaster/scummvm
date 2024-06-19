@@ -27,7 +27,7 @@ namespace Wasteland {
 namespace FOD {
 namespace Data {
 
-void TileOverrides::load(Common::Serializer &s) {
+void TileOverrides::load(Serializer &s) {
 	uint count = size();
 	s.syncAsUint16LE(count);
 
@@ -80,7 +80,7 @@ TileOverride *TileOverrides::add(int mapNum, int mapX, int mapY) {
 	return &back();
 }
 
-void TileOverride::load(Common::Serializer &s) {
+void TileOverride::load(Serializer &s) {
 	s.syncAsByte(_mapNum);
 	s.syncAsByte(_x);
 	s.syncAsByte(_y);
@@ -93,7 +93,7 @@ Disk1::Disk1(uint16 &mapX, uint16 &mapY) : _mapPosX(mapX), _mapPosY(mapY),
 }
 
 
-void Disk1::synchronize(Common::Serializer &s) {
+void Disk1::synchronize(Serializer &s) {
 	s.syncAsUint32LE(_saveCtr);
 	s.syncAsUint16LE(_field4);
 	s.syncAsByte(_gfxMode);
@@ -125,7 +125,7 @@ bool Disk1::load(bool &hasParty) {
 	if (!f.open("DISK1"))
 		return false;
 
-	Common::Serializer s(&f, nullptr);
+	Serializer s(&f);
 	synchronize(s);
 
 	hasParty = _saveCtr != 0;
