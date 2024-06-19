@@ -68,7 +68,7 @@ Common::Error Engine::run() {
 	return Common::kNoError;
 }
 
-Common::Error Engine::syncGame(Common::Serializer &s) {
+Common::Error Engine::syncGame(Serializer &s) {
 	// The Serializer has methods isLoading() and isSaving()
 	// if you need to specific steps; for example setting
 	// an array size after reading it's length, whereas

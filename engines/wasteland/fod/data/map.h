@@ -22,7 +22,7 @@
 #ifndef WASTELAND_FOD_DATA_MAP_H
 #define WASTELAND_FOD_DATA_MAP_H
 
-#include "common/serializer.h"
+#include "wasteland/core/serializer.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -47,7 +47,7 @@ struct Map {
 		uint16 _field4 = 0;
 		uint16 _actionId = 0;
 
-		void synchronize(Common::Serializer &s);
+		void synchronize(Serializer &s);
 
 		void clear() {
 			_id = _flags = _field3 = _field4 = _actionId = 0;
@@ -72,7 +72,7 @@ struct Map {
 		byte _charNum = 0;
 		uint16 _talkId = 0;
 
-		void synchronize(Common::Serializer &s);
+		void synchronize(Serializer &s);
 	};
 	struct MapEntry4 {
 		byte _field1;
@@ -82,11 +82,11 @@ struct Map {
 		byte _flags;
 		byte _fieldC;
 
-		void synchronize(Common::Serializer &s);
+		void synchronize(Serializer &s);
 	};
 
 private:
-	void synchronizeCore(Common::Serializer &s);
+	void synchronizeCore(Serializer &s);
 
 	bool isCloseTo(int diff, int mapX, int mapY) const;
 

@@ -23,7 +23,7 @@
 #define WASTELAND_WASTELAND1_DATA_PARTIES_H
 
 #include "common/array.h"
-#include "common/serializer.h"
+#include "wasteland/core/serializer.h"
 #include "wasteland/wasteland1/core/array1.h"
 #include "wasteland/wasteland1/data/party_member.h"
 
@@ -41,7 +41,7 @@ struct Party {
 	int _prevMap = 0;
 
 	Party();
-	void synchronize(Common::Serializer &s);
+	void synchronize(Serializer &s);
 };
 
 struct Parties {
@@ -49,7 +49,7 @@ struct Parties {
 	Array1<PartyMember> _roster;
 
 	Parties();
-	void synchronize(Common::Serializer &s);
+	void synchronize(Serializer &s);
 };
 
 } // namespace Data

@@ -19,43 +19,31 @@
  *
  */
 
-#include "wasteland/wasteland1/data/parties.h"
+#ifndef WASTELAND_WASTELAND1_DATA_SKILLS_H
+#define WASTELAND_WASTELAND1_DATA_SKILLS_H
+
+#include "wasteland/core/serializer.h"
+#include "wasteland/wasteland1/core/array1.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Data {
 
-Party::Party() {
-	_members.resize(7);
-}
+struct Skill {
+	int8 _id = 0;
+	int8 _level = 0;
 
-void Party::synchronize(Serializer &s) {
-	s.skip(1);
-	for (int i = 0; i < 7; ++i)
-		s.syncAsByte(_members[i]);
+	Skill() {}
+	void synchronize(Serializer &s);
+};
 
-	s.syncAsSByte(_x);
-	s.syncAsSByte(_y);
-	s.syncAsSByte(_map);
-	s.syncAsSByte(_prevX);
-	s.syncAsSByte(_prevY);
-	s.syncAsSByte(_prevMap);
-}
-
-Parties::Parties() {
-	_parties.resize(4);
-	_roster.resize(8);
-}
-
-void Parties::synchronize(Serializer &s) {
-	for (int i = 0; i < 4; ++i)
-		_parties[i].synchronize(s);
-	s.skip(0xc8);	// TODO: Figure out if remainder of 256 bytes is needed
-
-	for (int i = 0; i < 8; ++i)
-		_roster[i].synchronize(s);
-}
+struct Skills : public Array1<Skill> {
+	Skills();
+	void synchronize(Serializer &s);
+};
 
 } // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland
+
+#endif

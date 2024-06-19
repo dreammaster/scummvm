@@ -22,16 +22,50 @@
 #ifndef WASTELAND_WASTELAND1_DATA_PARTY_MEMBER_H
 #define WASTELAND_WASTELAND1_DATA_PARTY_MEMBER_H
 
-#include "common/serializer.h"
+#include "wasteland/core/serializer.h"
+#include "wasteland/wasteland1/data/items.h"
+#include "wasteland/wasteland1/data/skills.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Data {
 
 struct PartyMember {
+	Common::String _name;
+	int _strength = 0;
+	int _iq = 0;
+	int _luck = 0;
+	int _speed = 0;
+	int _agility = 0;
+	int _dexterity = 0;
+	int _charisma = 0;
+	int _money = 0;
+	int _gender = 0;
+	int _nationality = 0;
+	int _ac = 0;
+	int _maxCon = 0;
+	int _con = 0;
+	int _weapon = 0;
+	int _skillPoints = 0;
+	int _experience = 0;
+	int _level = 0;
+	int _armor = 0;
+	int _lastCon = 0;
+	int _afflictions = 0;
+	bool _npc = false;
+	int _unknown2A = 0;
+	int _itemRefuse = 0;
+	int _skillRefuse = 0;
+	int _attribRefuse = 0;
+	int _tradeRefuse = 0;
+	int _unknown2F = 0;
+	int _joinString = 0;
+	int _willingness = 0;
+	Common::String _rank;
+	Skills _skills;
+	Items _items;
 
-
-	void synchronize(Common::Serializer &s);
+	void synchronize(Serializer &s);
 };
 
 } // namespace Data

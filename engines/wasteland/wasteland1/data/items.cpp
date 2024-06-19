@@ -19,41 +19,24 @@
  *
  */
 
-#include "wasteland/wasteland1/data/parties.h"
+#include "wasteland/wasteland1/data/items.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Data {
 
-Party::Party() {
-	_members.resize(7);
+Items::Items() {
+	resize(30);
 }
 
-void Party::synchronize(Serializer &s) {
-	s.skip(1);
-	for (int i = 0; i < 7; ++i)
-		s.syncAsByte(_members[i]);
-
-	s.syncAsSByte(_x);
-	s.syncAsSByte(_y);
-	s.syncAsSByte(_map);
-	s.syncAsSByte(_prevX);
-	s.syncAsSByte(_prevY);
-	s.syncAsSByte(_prevMap);
+void Items::synchronize(Serializer &s) {
+	for (uint i = 1; i <= size(); ++i)
+		(*this)[i].synchronize(s);
 }
 
-Parties::Parties() {
-	_parties.resize(4);
-	_roster.resize(8);
-}
-
-void Parties::synchronize(Serializer &s) {
-	for (int i = 0; i < 4; ++i)
-		_parties[i].synchronize(s);
-	s.skip(0xc8);	// TODO: Figure out if remainder of 256 bytes is needed
-
-	for (int i = 0; i < 8; ++i)
-		_roster[i].synchronize(s);
+void Item::synchronize(Serializer &s) {
+	s.syncAsByte(_id);
+	s.syncAsByte(_load);
 }
 
 } // namespace Data

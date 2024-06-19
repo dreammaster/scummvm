@@ -43,12 +43,12 @@ struct TileOverride {
 	byte _flags = 0;
 	Map::MapTile _tile;
 
-	void load(Common::Serializer &s);
+	void load(Serializer &s);
 };
 
 class TileOverrides : public Common::Array<TileOverride> {
 public:
-	void load(Common::Serializer &s);
+	void load(Serializer &s);
 
 	int indexOf(int mapNum, int mapX, int mapY) const;
 	bool contains(int mapNum, int mapX, int mapY) const;
@@ -80,7 +80,7 @@ struct Disk1 {
 
 	Disk1(uint16 &mapX, uint16 &mapY);
 
-	void synchronize(Common::Serializer &s);
+	void synchronize(Serializer &s);
 
 	/**
 	 * Loads the data for disk 1

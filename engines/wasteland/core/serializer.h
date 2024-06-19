@@ -19,43 +19,32 @@
  *
  */
 
-#include "wasteland/wasteland1/data/parties.h"
+#ifndef MM_WASTELAND_CORE_SERIALIZER_H
+#define MM_WASTELAND_CORE_SERIALIZER_H
+
+#include "common/serializer.h"
 
 namespace Wasteland {
-namespace Wasteland1 {
-namespace Data {
 
-Party::Party() {
-	_members.resize(7);
-}
+/**
+ * Derived serializer class
+ */
+class Serializer : public Common::Serializer {
+public:
+	Serializer(Common::SeekableReadStream *in) : Common::Serializer(in, nullptr) {}
+	Serializer(Common::WriteStream *out) : Common::Serializer(nullptr, out) {}
 
-void Party::synchronize(Serializer &s) {
-	s.skip(1);
-	for (int i = 0; i < 7; ++i)
-		s.syncAsByte(_members[i]);
+	/**
+	 * Serializes a 3 byte integer to or from the serializer
+	 */
+	void syncAsInt3(int &val);
 
-	s.syncAsSByte(_x);
-	s.syncAsSByte(_y);
-	s.syncAsSByte(_map);
-	s.syncAsSByte(_prevX);
-	s.syncAsSByte(_prevY);
-	s.syncAsSByte(_prevMap);
-}
+	/**
+	 * Serializes a string using a fixed size
+	 */
+	void syncAsString(Common::String &str, size_t size);
+};
 
-Parties::Parties() {
-	_parties.resize(4);
-	_roster.resize(8);
-}
-
-void Parties::synchronize(Serializer &s) {
-	for (int i = 0; i < 4; ++i)
-		_parties[i].synchronize(s);
-	s.skip(0xc8);	// TODO: Figure out if remainder of 256 bytes is needed
-
-	for (int i = 0; i < 8; ++i)
-		_roster[i].synchronize(s);
-}
-
-} // namespace Data
-} // namespace Wasteland1
 } // namespace Wasteland
+
+#endif
