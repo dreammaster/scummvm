@@ -22,7 +22,6 @@
 #ifndef WASTELAND_WASTELAND1_DATA_PARTIES_H
 #define WASTELAND_WASTELAND1_DATA_PARTIES_H
 
-#include "common/array.h"
 #include "wasteland/core/serializer.h"
 #include "wasteland/wasteland1/core/array1.h"
 #include "wasteland/wasteland1/data/party_member.h"
@@ -45,11 +44,16 @@ struct Party {
 };
 
 struct Parties {
-	Common::Array<Party> _parties;
+	Array1<Party> _parties;
 	Array1<PartyMember> _roster;
 
 	Parties();
 	void synchronize(Serializer &s);
+
+	/**
+	 * Loads the parties from the original files
+	 */
+	void load();
 };
 
 } // namespace Data

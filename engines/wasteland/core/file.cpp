@@ -27,6 +27,10 @@ File::File(const Common::Path &filename) {
 	File::open(filename);
 }
 
+File::File(const char *filename) {
+	File::open(Common::Path(filename));
+}
+
 bool File::open(const Common::Path &filename) {
 	if (!Common::File::open(filename))
 		error("Could not open file - %s", filename.toString(Common::Path::kNativeSeparator).c_str());

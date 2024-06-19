@@ -33,6 +33,7 @@ class File : public Common::File {
 public:
 	File() : Common::File() {}
 	File(const Common::Path &filename);
+	File(const char *filename);
 
 	/**
 	 * Opens the given file, throwing an error if it can't be opened
