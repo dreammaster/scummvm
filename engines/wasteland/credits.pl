@@ -1,3 +1,4 @@
 begin_section("Wasteland");
-	add_person("Name 1", "Handle 1", "");
+	add_person("Paul Gilbert", "DreamMaster", "");
+	add_person("Klaus Reimer", "K", "Wasteland Suite");
 end_section();
