@@ -37,7 +37,7 @@ struct Item {
 	void synchronize(Serializer &s);
 };
 
-struct Items : public Common::Array<Item> {
+struct Items : public Array1<Item> {
 	Items();
 	void synchronize(Serializer &s);
 };

@@ -92,10 +92,6 @@ void GameArchive::load(int gameNum) {
 	// Iterate over the blocks to get the types
 	_savegameIndex = _shopsIndex = -1;
 	for (uint i = 0; i < _blocks.size(); ++i) {
-		warning("%x", _blocks[i]._offset);
-		if (_blocks[i]._offset == 0x253c5)
-			warning("SAVES");
-
 		switch (getBlockType(_blocks[i], &f)) {
 		case TYPE_SAVEGAME:
 			_savegameIndex = i;

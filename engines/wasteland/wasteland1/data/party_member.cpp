@@ -63,6 +63,7 @@ void PartyMember::synchronize(Serializer &s) {
 
 	// Serialize skills and items
 	_skills.synchronize(s);
+	s.skip(1);
 	_items.synchronize(s);
 
 	s.skip(7);

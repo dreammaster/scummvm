@@ -20,6 +20,7 @@
  */
 
 #include "wasteland/wasteland1/data/parties.h"
+#include "wasteland/core/file.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -31,7 +32,7 @@ Party::Party() {
 
 void Party::synchronize(Serializer &s) {
 	s.skip(1);
-	for (int i = 0; i < 7; ++i)
+	for (int i = 1; i <= 7; ++i)
 		s.syncAsByte(_members[i]);
 
 	s.syncAsSByte(_x);
@@ -44,16 +45,22 @@ void Party::synchronize(Serializer &s) {
 
 Parties::Parties() {
 	_parties.resize(4);
-	_roster.resize(8);
+	_roster.resize(7);
 }
 
 void Parties::synchronize(Serializer &s) {
-	for (int i = 0; i < 4; ++i)
+	for (uint i = 1; i <= _parties.size(); ++i)
 		_parties[i].synchronize(s);
 	s.skip(0xc8);	// TODO: Figure out if remainder of 256 bytes is needed
 
-	for (int i = 0; i < 8; ++i)
+	for (uint i = 1; i <= _roster.size(); ++i)
 		_roster[i].synchronize(s);
+}
+
+void Parties::load() {
+	File f("savegame");	// Loads savegame block from game1
+	Serializer s(&f);
+	synchronize(s);
 }
 
 } // namespace Data

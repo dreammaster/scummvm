@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/config-manager.h"
 #include "common/engine_data.h"
 #include "wasteland/gfx/surface.h"
 #include "wasteland/wasteland1/wasteland1.h"
@@ -72,6 +73,13 @@ void Wasteland1Engine::setup() {
 
 	_gameArchive = new GameArchive();
 	SearchMan.add("Game", _gameArchive);
+
+	// Load save data
+	int saveSlot = ConfMan.getInt("save_slot");
+	_parties.load();
+	if (saveSlot != -1)
+		(void)loadGameState(saveSlot);
+
 }
 
 } // namespace Wasteland1
