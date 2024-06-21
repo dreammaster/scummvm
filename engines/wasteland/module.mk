@@ -19,16 +19,21 @@ MODULE_OBJS = \
 	gfx/wasteland_font.o \
 	wasteland1/core/array1.o \
 	wasteland1/data/items.o \
+	wasteland1/data/msq_header.o \
 	wasteland1/data/parties.o \
 	wasteland1/data/party_member.o \
 	wasteland1/data/skills.o \
 	wasteland1/wasteland1.o \
 	wasteland1/files/game_archive.o \
+	wasteland1/files/huffman_input_stream.o \
+	wasteland1/files/huffman_node.o \
+	wasteland1/files/huffman_tree.o \
 	wasteland1/files/rotating_xor_input_stream.o \
 	wasteland1/gfx/button.o \
 	wasteland1/gfx/cursors.o \
 	wasteland1/gfx/color_font.o \
 	wasteland1/gfx/mono_font.o \
+	wasteland1/gfx/pics.o \
 	wasteland1/views/view.o \
 	wasteland1/views/dialogs/dialog.o \
 	wasteland1/views/dialogs/roster.o \
