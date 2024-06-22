@@ -72,13 +72,13 @@ const Common::Array<bool> &HuffmanNode::getFullKey() {
 	return _fullKey;
 }
 
-int HuffmanNode::compareTo(const HuffmanNode &rhs) const {
-	if (_probability < rhs._probability) {
+int HuffmanNode::compareNodes(const HuffmanNode *a, const HuffmanNode *b) {
+	if (a->_probability < b->_probability) {
 		return 1;
-	} else if (_probability > rhs._probability) {
+	} else if (a->_probability > b->_probability) {
 		return -1;
 	} else {
-		return _id == rhs._id;
+		return a->_id - b->_id;
 	}
 }
 

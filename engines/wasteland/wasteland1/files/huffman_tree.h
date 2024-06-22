@@ -22,14 +22,64 @@
 #ifndef WASTELAND_WASTELAND1_FILES_HUFFMAN_INPUT_STREAM_H
 #define WASTELAND_WASTELAND1_FILES_HUFFMAN_INPUT_STREAM_H
 
+#include "common/hashmap.h"
 #include "common/stream.h"
+#include "wasteland/wasteland1/files/huffman_node.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
+namespace Huffman {
 
-class HuffmanInputStream {
+class HuffmanTree {
+private:
+	HuffmanNode *_rootNode = nullptr;
+	Common::HashMap<int, HuffmanNode *> _index;
+
+	HuffmanTree() {}
+
+	/**
+	 * Creates the root node of the Huffman Tree.
+	 *
+	 * @param stream	The input stream to build the root node for.
+	 */
+	void createTree(Common::SeekableReadStream *stream);
+
+public:
+	~HuffmanTree();
+
+	static HuffmanTree *create(Common::SeekableReadStream *src);
+
+	/**
+	 * Creates a Huffman tree from a byte array.
+	 * @param bytes The bytes to build the Huffman tree for
+	 * @return The Huffman tree
+	 */
+	static HuffmanTree *create(const Common::Array<byte> &bytes);
+
+
+	/**
+	 * Returns the root node of the Huffman tree.
+	 *
+	 * @return The root node
+	 */
+	HuffmanNode *getRootNode() const {
+		return _rootNode;
+	}
+
+
+	/**
+	 * Returns the Huffman node for the given payload.
+	 *
+	 * @param payload	The payload
+	 * @return The Huffman node
+	 */
+	HuffmanNode *getNode(int payload) const {
+		return _index[payload];
+	}
+
 };
 
+} // namespace Huffman
 } // namespace Wasteland1
 } // namespace Wasteland
 
