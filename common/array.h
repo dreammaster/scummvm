@@ -267,7 +267,17 @@ public:
 		return tmp;
 	}
 
-	// TODO: insert, remove, ...
+	/**
+	 * Remove a given element
+	 */
+	void remove(const T &element) {
+		for (uint i = 0; i < this->size(); ++i) {
+			if (this->operator[](i) == element) {
+				this->remove_at(i);
+				break;
+			}
+		}
+	}
 
 	/** Return a reference to the element at the given position in the array. */
 	T &operator[](size_type idx) {
