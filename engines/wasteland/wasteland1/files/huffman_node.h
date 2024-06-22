@@ -23,7 +23,6 @@
 #define WASTELAND_WASTELAND1_FILES_HUFFMAN_NODE_H
 
 #include "common/array.h"
-#include "common/stream.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -73,8 +72,7 @@ public:
 	 */
 	const Common::Array<bool> &getFullKey();
 
-	int compareTo(const HuffmanNode &rhs) const;
-	
+	static int compareNodes(const HuffmanNode *a, const HuffmanNode *b);
 };
 
 } // namespace Huffman
