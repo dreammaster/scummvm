@@ -19,20 +19,26 @@
  *
  */
 
+#include "wasteland/events.h"
 #include "wasteland/console.h"
 
 namespace Wasteland {
 
 Console::Console() : GUI::Debugger() {
-	registerCmd("test",   WRAP_METHOD(Console, Cmd_test));
+	registerCmd("view",   WRAP_METHOD(Console, cmdView));
 }
 
 Console::~Console() {
 }
 
-bool Console::Cmd_test(int argc, const char **argv) {
-	debugPrintf("Test\n");
-	return true;
+bool Console::cmdView(int argc, const char **argv) {
+	if (argc == 2) {
+		g_events->replaceView(argv[1]);
+		return false;
+	} else {
+		debugPrintf("view <name>\n");
+		return true;
+	}
 }
 
 } // End of namespace Wasteland

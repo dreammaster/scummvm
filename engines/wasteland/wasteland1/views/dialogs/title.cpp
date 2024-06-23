@@ -23,6 +23,7 @@
 #include "graphics/palette.h"
 #include "wasteland/wasteland1/views/dialogs/title.h"
 #include "wasteland/core/file.h"
+#include "wasteland/wasteland1/files/vertical_xor_stream.h"
 #include "wasteland/keymapping.h"
 
 namespace Wasteland {
@@ -78,27 +79,18 @@ bool Title::msgFocus(const FocusMessage &msg) {
 
 	// Read title in
 	File f("title.pic");
-	byte *tmp = new byte[TITLE_W / 2 * TITLE_H];
-	f.read(tmp, TITLE_W / 2 * TITLE_H);
-
-	// Do a vertical xor decoding
-	byte *s1 = tmp;
-	byte *s2 = tmp + TITLE_W / 2;
-	for (int i = 0; i < (TITLE_W / 2 * (TITLE_H - 1)); ++i, ++s1, ++s2)
-		*s2 ^= *s1;
+	VerticalXorStream xorStream(&f, TITLE_W, DisposeAfterUse::NO);
 
 	// Load into surface
 	_surface.create(TITLE_W, TITLE_H);
 
-	const byte *pSrc = tmp;
 	byte *pDest = (byte *)_surface.getPixels();
-	for (int i = 0; i < (TITLE_W / 2 * (TITLE_H - 1)); ++i, ++pSrc) {
-		*pDest++ = *pSrc >> 4;
-		*pDest++ = *pSrc & 0xf;
+	for (int i = 0; i < (TITLE_W / 2 * (TITLE_H - 1)); ++i) {
+		byte b = xorStream.readByte();
+		*pDest++ = b >> 4;
+		*pDest++ = b & 0xf;
 	}
 
-	//delaySeconds(1);
-	delete[] tmp;
 	return true;
 }
 
