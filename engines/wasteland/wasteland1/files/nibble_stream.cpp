@@ -20,24 +20,22 @@
  */
 
 #include "common/memstream.h"
-#include "wasteland/wasteland1/files/vertical_xor_stream.h"
+#include "wasteland/wasteland1/files/nibble_stream.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 
-VerticalXorStream::VerticalXorStream(Common::SeekableReadStream *stream,
-		int width, DisposeAfterUse::Flag disposeAfterUse) :
-		_stream(stream), _disposeAfterUse(disposeAfterUse),
-		_width(width / 2) {
-	_lastLine.resize(width);
+NibbleStream::NibbleStream(Common::SeekableReadStream *stream,
+		DisposeAfterUse::Flag disposeAfterUse) :
+		_stream(stream), _disposeAfterUse(disposeAfterUse) {
 }
 
-VerticalXorStream::~VerticalXorStream() {
+NibbleStream::~NibbleStream() {
 	if (_disposeAfterUse == DisposeAfterUse::YES)
 		delete _stream;
 }
 
-uint32 VerticalXorStream::read(void *dataPtr, uint32 dataSize) {
+uint32 NibbleStream::read(void *dataPtr, uint32 dataSize) {
 	assert((dataSize % 2) == 0);
 	Common::Array<byte> buf;
 	buf.resize(dataSize / 2);
@@ -45,28 +43,12 @@ uint32 VerticalXorStream::read(void *dataPtr, uint32 dataSize) {
 	int bytesRead = _stream->read(&buf[0], dataSize / 2);
 
 	// Iterate through the bytes
+	const byte *src = &buf[0];
 	byte *dest = (byte *)dataPtr;
-	for (int i = 0; i < bytesRead; ++i) {
-		byte b = buf[i];
 
-		// Decode the byte it it's not in the first (unencoded) row
-		if (_y > 0) {
-			b = b ^ _lastLine[_x];
-		}
-
-		// Remember the decoded byte for the next row
-		_lastLine[_x] = b;
-
-		// Move on the cursor
-		if (_x < _width - 1) {
-			_x++;
-		} else {
-			_y++;
-			_x = 0;
-		}
-
-		*dest++ = b >> 4;
-		*dest++ = b & 0xf;
+	for (int i = 0; i < bytesRead; ++i, ++src) {
+		*dest++ = *src >> 4;
+		*dest++ = *src & 0xf;
 	}
 
 	return bytesRead * 2;

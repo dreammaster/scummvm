@@ -19,35 +19,42 @@
  *
  */
 
-#include "wasteland/wasteland1/gfx/pic.h"
-#include "wasteland/wasteland1/files/nibble_stream.h"
-#include "wasteland/wasteland1/files/vertical_xor_stream.h"
+#ifndef WASTELAND_WASTELAND1_FILES_NIBBLE_STREAM_H
+#define WASTELAND_WASTELAND1_FILES_NIBBLE_STREAM_H
+
+#include "common/array.h"
+#include "common/stream.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace Gfx {
 
-Pic *Pic::read(Common::SeekableReadStream *stream,
-		int w, int h, bool encoded) {
-	Common::SeekableReadStream *xorStream;
-	Pic *pic;
+class NibbleStream : public Common::SeekableReadStream {
+private:
+	Common::SeekableReadStream *_stream = nullptr;
+	DisposeAfterUse::Flag _disposeAfterUse;
 
-	// Create the pic object
-	pic = new Pic(w, h);
+public:
+	NibbleStream(Common::SeekableReadStream *stream,
+		DisposeAfterUse::Flag disposeAfterUse);
+	~NibbleStream();
 
-	// Set up decoder stream
-	if (encoded)
-		xorStream = new VerticalXorStream(stream, w, DisposeAfterUse::NO);
-	else
-		xorStream = new NibbleStream(stream, DisposeAfterUse::NO);
+	bool eos() const override {
+		return _stream->eos();
+	}
+	int64 pos() const override {
+		return _stream->pos();
+	}
+	int64 size() const override {
+		return _stream->size();
+	}
+	bool seek(int64 offset, int whence = SEEK_SET) override {
+		return _stream->seek(offset, whence);
+	}
 
-	// Read the pixels
-	xorStream->read(pic->getPixels(), w * h);
+	uint32 read(void *dataPtr, uint32 dataSize) override;
+};
 
-	delete xorStream;
-	return pic;
-}
-
-} // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland
+
+#endif
