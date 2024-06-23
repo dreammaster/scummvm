@@ -77,19 +77,14 @@ void Title::draw() {
 bool Title::msgFocus(const FocusMessage &msg) {
 	Dialog::msgFocus(msg);
 
-	// Read title in
+	// Open title pic file for access
 	File f("title.pic");
 	VerticalXorStream xorStream(&f, TITLE_W, DisposeAfterUse::NO);
 
 	// Load into surface
 	_surface.create(TITLE_W, TITLE_H);
-
 	byte *pDest = (byte *)_surface.getPixels();
-	for (int i = 0; i < (TITLE_W / 2 * (TITLE_H - 1)); ++i) {
-		byte b = xorStream.readByte();
-		*pDest++ = b >> 4;
-		*pDest++ = b & 0xf;
-	}
+	xorStream.read(pDest, TITLE_W * TITLE_H);
 
 	return true;
 }

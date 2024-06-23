@@ -33,17 +33,21 @@ VerticalXorStream::VerticalXorStream(Common::SeekableReadStream *stream,
 }
 
 VerticalXorStream::~VerticalXorStream() {
-	if (_disposeAfterUse)
+	if (_disposeAfterUse == DisposeAfterUse::YES)
 		delete _stream;
 }
 
 uint32 VerticalXorStream::read(void *dataPtr, uint32 dataSize) {
-	byte *buf = (byte *)dataPtr;
-	int bytesRead = _stream->read(dataPtr, dataSize);
+	assert((dataSize % 2) == 0);
+	Common::Array<byte> buf;
+	buf.resize(dataSize);
+
+	int bytesRead = _stream->read(&buf[0], dataSize);
 
 	// Iterate through the bytes
-	for (int i = 0; i < bytesRead; ++i, ++buf) {
-		byte &b = *buf;
+	byte *dest = (byte *)dataPtr;
+	for (int i = 0; i < bytesRead; ++i) {
+		byte b = buf[i];
 
 		// Decode the byte it it's not in the first (unencoded) row
 		if (_y > 0) {
@@ -60,9 +64,12 @@ uint32 VerticalXorStream::read(void *dataPtr, uint32 dataSize) {
 			_y++;
 			_x = 0;
 		}
+
+		*dest++ = b >> 4;
+		*dest++ = b & 0xf;
 	}
 
-	return bytesRead;
+	return bytesRead * 2;
 }
 
 } // namespace Wasteland1
