@@ -38,6 +38,9 @@ MODULE_OBJS = \
 	wasteland1/gfx/mono_font.o \
 	wasteland1/gfx/pic.o \
 	wasteland1/gfx/pics.o \
+	wasteland1/gfx/pics_animation.o \
+	wasteland1/gfx/pics_animation_frame_set.o \
+	wasteland1/gfx/raw_animation_frame.o \
 	wasteland1/views/view.o \
 	wasteland1/views/dialogs/dialog.o \
 	wasteland1/views/dialogs/roster.o \
