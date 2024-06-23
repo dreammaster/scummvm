@@ -19,25 +19,14 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_GFX_PICS_H
-#define WASTELAND_WASTELAND1_GFX_PICS_H
-
-#include "common/array.h"
-#include "common/stream.h"
-#include "wasteland/wasteland1/gfx/pics_animation.h"
+#include "wasteland/wasteland1/gfx/raw_animation_frame.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Gfx {
 
-class PicsDecoder : public Common::Array<PicsAnimation> {
-public:
-	void load(const char *filename);
-	void load(Common::SeekableReadStream *src);
-};
+
 
 } // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif
