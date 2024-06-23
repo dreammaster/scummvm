@@ -19,11 +19,46 @@
  *
  */
 
-#include "wasteland/wasteland1/files/huffman_input_stream.h"
+#ifndef WASTELAND_WASTELAND1_FILES_VERTICAL_XOR_STREAM_H
+#define WASTELAND_WASTELAND1_FILES_VERTICAL_XOR_STREAM_H
+
+#include "common/array.h"
+#include "common/stream.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 
+class VerticalXorStream : public Common::SeekableReadStream {
+private:
+	Common::SeekableReadStream *_stream = nullptr;
+	DisposeAfterUse::Flag _disposeAfterUse;
+	Common::Array<byte> _lastLine;
+	int _width;
+	int _x = 0;
+	int _y = 0;
+
+public:
+	VerticalXorStream(Common::SeekableReadStream *stream, int width,
+		DisposeAfterUse::Flag disposeAfterUse);
+	~VerticalXorStream();
+
+	bool eos() const override {
+		return _stream->eos();
+	}
+	int64 pos() const override {
+		return _stream->pos();
+	}
+	int64 size() const override {
+		return _stream->size();
+	}
+	bool seek(int64 offset, int whence = SEEK_SET) override {
+		return _stream->seek(offset, whence);
+	}
+
+	uint32 read(void *dataPtr, uint32 dataSize) override;
+};
 
 } // namespace Wasteland1
 } // namespace Wasteland
+
+#endif

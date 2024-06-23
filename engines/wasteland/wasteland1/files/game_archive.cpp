@@ -21,7 +21,7 @@
 
 #include "common/hashmap.h"
 #include "wasteland/wasteland1/files/game_archive.h"
-#include "wasteland/wasteland1/files/rotating_xor_input_stream.h"
+#include "wasteland/wasteland1/files/rotating_xor_stream.h"
 #include "wasteland/core/file.h"
 
 namespace Wasteland {
@@ -150,7 +150,7 @@ Common::SeekableReadStream *GameArchive::createReadStreamForMember(const Common:
 	f.seek(_blocks[blockIndex]._offset + 4);
 
 	auto *blockStream = f.readStream(_blocks[blockIndex]._size - 4);
-	RotatingXorInputStream xorStream(blockStream);
+	RotatingXorStream xorStream(blockStream);
 	delete blockStream;
 
 	return xorStream.get();
@@ -167,7 +167,7 @@ GameArchive::BlockType GameArchive::getBlockType(const GameArchive::GameMsqBlock
 
 	// Read the first 9 decrypted bytes
 	Common::SeekableReadStream *blockStream = src->readStream(9);
-	RotatingXorInputStream xorStream(blockStream);
+	RotatingXorStream xorStream(blockStream);
 	delete blockStream;
 
 	Common::SeekableReadStream *decodedStream = xorStream.get();
