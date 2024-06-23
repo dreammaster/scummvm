@@ -19,17 +19,33 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_FILES_HUFFMAN_INPUT_STREAM_H
-#define WASTELAND_WASTELAND1_FILES_HUFFMAN_INPUT_STREAM_H
+#ifndef WASTELAND_WASTELAND1_GFX_PIC_H
+#define WASTELAND_WASTELAND1_GFX_PIC_H
 
+#include "graphics/managed_surface.h"
 #include "common/stream.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
+namespace Gfx {
 
-class HuffmanInputStream {
+class Pic : public Graphics::ManagedSurface {
+public:
+	Pic(int w, int h) : Graphics::ManagedSurface(w, h) {}
+
+	/**
+	 * Loads a xor-encoded picture from a stream.
+	 *
+	 * @param stream	The input stream
+	 * @param width		The width of the picture to read in pixel
+	 * @param height	The height of the picture to read in pixel
+	 * @return			The picture
+	 */
+	static Pic *read(Common::SeekableReadStream *stream,
+		int w, int h, bool encoded = true);
 };
 
+} // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland
 

@@ -27,7 +27,7 @@
 namespace Wasteland {
 namespace Wasteland1 {
 
-class RotatingXorInputStream {
+class RotatingXorStream {
 private:
 	Common::SeekableReadStream *_stream = nullptr;
 	int _enc = 0;
@@ -38,11 +38,11 @@ private:
 	void decode(Common::SeekableReadStream *src);
 
 public:
-	RotatingXorInputStream(Common::SeekableReadStream *src) {
+	RotatingXorStream(Common::SeekableReadStream *src) {
 		init(src);
 		decode(src);
 	}
-	~RotatingXorInputStream() {
+	~RotatingXorStream() {
 		delete _stream;
 	}
 

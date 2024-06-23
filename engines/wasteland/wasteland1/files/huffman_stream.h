@@ -19,48 +19,31 @@
  *
  */
 
-#include "common/memstream.h"
-#include "wasteland/wasteland1/files/rotating_xor_input_stream.h"
+#ifndef WASTELAND_WASTELAND1_FILES_HUFFMAN_STREAM_H
+#define WASTELAND_WASTELAND1_FILES_HUFFMAN_STREAM_H
+
+#include "wasteland/wasteland1/files/bit_stream.h"
+#include "wasteland/wasteland1/files/huffman_tree.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 
-void RotatingXorInputStream::init(Common::SeekableReadStream *src) {
-	int e1, e2;
+class HuffmanStream {
+private:
+	Huffman::HuffmanTree *_tree;
+	BitStream *_bitStream;
 
-	// Get encryption byte and checksum end marker
-	e1 = src->readByte();
-	e2 = src->readByte();
-	_enc = e1 ^ e2;
-	_endChecksum = e1 | (e2 << 8);
-
-	// Initialize checksum
-	_checksum = 0;
-}
-
-void RotatingXorInputStream::decode(Common::SeekableReadStream *src) {
-	Common::MemoryWriteStreamDynamic buf(DisposeAfterUse::NO);
-
-	while (!src->eos()) {
-		int crypted;
-		int b;
-
-		// Read crypted byte
-		crypted = src->readByte();
-
-		// Decrypt the byte
-		b = crypted ^ _enc;
-		buf.writeByte(b);
-
-		// Update checksum
-		_checksum = (_checksum - b) & 0xffff;
-
-		// Updated encryption byte
-		_enc = (_enc + 0x1f) % 0x100;
+	HuffmanStream(Huffman::HuffmanTree *tree, BitStream *stream) :
+		_tree(tree), _bitStream(stream) {}
+	~HuffmanStream() {
+		delete _tree;
+		delete _bitStream;
 	}
 
-	_stream = new Common::MemoryReadStream(buf.getData(), buf.size());
-}
+	int read();
+};
 
 } // namespace Wasteland1
 } // namespace Wasteland
+
+#endif
