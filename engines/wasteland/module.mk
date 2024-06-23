@@ -29,6 +29,7 @@ MODULE_OBJS = \
 	wasteland1/files/huffman_stream.o \
 	wasteland1/files/huffman_node.o \
 	wasteland1/files/huffman_tree.o \
+	wasteland1/files/nibble_stream.o \
 	wasteland1/files/rotating_xor_stream.o \
 	wasteland1/files/vertical_xor_stream.o \
 	wasteland1/gfx/button.o \
