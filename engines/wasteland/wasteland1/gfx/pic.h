@@ -43,6 +43,11 @@ public:
 	 */
 	static Pic *read(Common::SeekableReadStream *stream,
 		int w, int h, bool encoded = true);
+
+	/**
+	 * Creates a copy of a picture
+	 */
+	Pic *clone() const;
 };
 
 } // namespace Gfx

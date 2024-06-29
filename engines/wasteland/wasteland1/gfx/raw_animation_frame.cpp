@@ -25,6 +25,31 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Gfx {
 
+RawAnimationFrame::~RawAnimationFrame() {
+	for (auto *part : *_parts)
+		delete part;
+	delete _parts;
+}
+
+
+void RawAnimationFrame::apply(Pic *image) {
+	for (RawAnimationFramePart *part : *_parts)
+		part->apply(image);
+}
+
+RawAnimationFrame *RawAnimationFrame::read(Common::SeekableReadStream *stream) {
+	Common::Array<RawAnimationFramePart *> *parts;
+	RawAnimationFramePart *part;
+	int size;
+
+	parts = new Common::Array<RawAnimationFramePart *>();
+	size = 0;
+	while ((part = RawAnimationFramePart::read(stream)) != nullptr) {
+		size += part->getSize();
+		parts->push_back(part);
+	}
+	return new RawAnimationFrame(parts, size + 2);
+}
 
 
 } // namespace Gfx

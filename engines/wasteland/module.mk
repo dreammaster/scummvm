@@ -41,6 +41,7 @@ MODULE_OBJS = \
 	wasteland1/gfx/pics_animation.o \
 	wasteland1/gfx/pics_animation_frame_set.o \
 	wasteland1/gfx/raw_animation_frame.o \
+	wasteland1/gfx/raw_animation_frame_part.o \
 	wasteland1/views/view.o \
 	wasteland1/views/dialogs/dialog.o \
 	wasteland1/views/dialogs/roster.o \

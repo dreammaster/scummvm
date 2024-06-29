@@ -22,11 +22,61 @@
 #ifndef WASTELAND_WASTELAND1_GFX_RAW_ANIMATION_FRAME_H
 #define WASTELAND_WASTELAND1_GFX_RAW_ANIMATION_FRAME_H
 
+#include "common/list.h"
+#include "wasteland/wasteland1/gfx/pic.h"
+#include "wasteland/wasteland1/gfx/raw_animation_frame_part.h"
+
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Gfx {
 
+/**
+ * A raw animation frame represents the raw frame found in the wasteland
+ * animation data block. It consists of multiple raw animation frame parts.
+ */
+struct RawAnimationFrame {
+private:
+	// The raw animation frame parts
+	Common::Array<RawAnimationFramePart *> *_parts;
 
+	// The size of the animation frame
+	int _size;
+
+public:
+	/**
+	 * Constructor
+	 * @param parts		The animation frame parts
+	 * @param size		The size of the animation frame
+	 */
+	RawAnimationFrame(Common::Array<RawAnimationFramePart *> *parts, int size) :
+		_parts(parts), _size(size) {
+	}
+	~RawAnimationFrame();
+
+	/**
+	 * Applies this animation frame to a image
+	 * @param image		The image to update
+	 */
+	void apply(Pic *image);
+
+	/**
+	 * Reads the next raw animation frame from the input stream.
+	 *
+	 * @param stream	The input stream
+	 * @return The raw animation frame
+	 */
+	static RawAnimationFrame *read(Common::SeekableReadStream *stream);
+
+	/**
+	 * Returns the size.
+	 *
+	 * @return The size
+	 */
+
+	int getSize() const {
+		return _size;
+	}
+};
 
 } // namespace Gfx
 } // namespace Wasteland1
