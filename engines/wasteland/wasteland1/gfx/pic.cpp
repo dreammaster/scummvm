@@ -48,6 +48,13 @@ Pic *Pic::read(Common::SeekableReadStream *stream,
 	return pic;
 }
 
+Pic *Pic::clone() const {
+	Pic *copy = new Pic(w, h);
+	copy->blitFrom(*this);
+
+	return copy;
+}
+
 } // namespace Gfx
 } // namespace Wasteland1
 } // namespace Wasteland
