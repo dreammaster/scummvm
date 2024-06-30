@@ -20,9 +20,10 @@
  */
 
 #include "common/algorithm.h"
-#include "wasteland/core/decoder.h"
+#include "wasteland/fod/core/decoder.h"
 
 namespace Wasteland {
+namespace FOD {
 
 #define DECODER_BUFFER_COUNT 0x1000
 
@@ -78,4 +79,5 @@ void Decoder::loadStream(Common::ReadStream &src, Common::WriteStream &dest) {
 	}
 }
 
+} // namespace FOD
 } // namespace Wasteland

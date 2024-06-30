@@ -95,6 +95,10 @@ public:
 
 } // namespace Gfx
 } // namespace Shared
+
+using Shared::Gfx::Window;
+using Shared::Gfx::Surface;
+
 } // namespace Wasteland
 
 #endif

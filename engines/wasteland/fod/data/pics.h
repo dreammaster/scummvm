@@ -23,7 +23,7 @@
 #define WASTELAND_FOD_DATA_PICS_H
 
 #include "wasteland/engine.h"
-#include "wasteland/gfx/image_decoder.h"
+#include "wasteland/fod/gfx/image_decoder.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -31,7 +31,7 @@ namespace Data {
 
 struct Pics {
 	byte _borders[6][TEXT_W * TEXT_H];
-	Shared::Gfx::ImageDecoder _welcome;
+	Gfx::ImageDecoder _welcome;
 
 	bool load();
 };

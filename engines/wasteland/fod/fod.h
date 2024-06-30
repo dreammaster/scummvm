@@ -32,6 +32,7 @@
 #include "wasteland/fod/data/globals.h"
 #include "wasteland/fod/data/weapons.h"
 #include "wasteland/fod/logic/scripts.h"
+#include "wasteland/fod/gfx/tiles.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -52,6 +53,7 @@ public:
 	Data::Pics _pics;
 	Data::Globals _globals;
 	Data::Weapons _weapons;
+	Gfx::Tiles _tiles;
 	Logic::Scripts _scripts;
 
 	const char *_moveMessage = nullptr;

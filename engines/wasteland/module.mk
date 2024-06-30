@@ -8,14 +8,11 @@ MODULE_OBJS = \
 	messages.o \
 	metaengine.o \
 	core/array.o \
-	core/decoder.o \
 	core/file.o \
 	core/serializer.o \
 	gfx/clickable_text.o \
-	gfx/image_decoder.o \
 	gfx/surface.o \
 	gfx/text_entry.o \
-	gfx/tiles.o \
 	gfx/wasteland_font.o \
 	wasteland1/core/array1.o \
 	wasteland1/data/items.o \
@@ -48,6 +45,7 @@ MODULE_OBJS = \
 	wasteland1/views/dialogs/title.o \
 	fod/fod.o \
 	fod/sound.o \
+	fod/core/decoder.o \
 	fod/data/archetypes.o \
 	fod/data/archive.o \
 	fod/data/disk.o \
@@ -61,7 +59,9 @@ MODULE_OBJS = \
 	fod/data/strings.o \
 	fod/data/weapons.o \
 	fod/gfx/cursors.o \
+	fod/gfx/image_decoder.o \
 	fod/gfx/font.o \
+	fod/gfx/tiles.o \
 	fod/logic/game.o \
 	fod/logic/scripts.o \
 	fod/views/core/base_view.o \

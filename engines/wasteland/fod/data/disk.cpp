@@ -21,7 +21,7 @@
 
 #include "common/file.h"
 #include "common/memstream.h"
-#include "wasteland/core/decoder.h"
+#include "wasteland/fod/core/decoder.h"
 #include "wasteland/fod/data/disk.h"
 #include "wasteland/fod/fod.h"
 
