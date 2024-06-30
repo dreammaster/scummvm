@@ -80,6 +80,7 @@ void Wasteland1Engine::setup() {
 	if (saveSlot != -1)
 		(void)loadGameState(saveSlot);
 
+	_pics.load("allpics1");
 }
 
 } // namespace Wasteland1

@@ -20,12 +20,62 @@
  */
 
 #include "wasteland/wasteland1/gfx/pics_animation.h"
+#include "wasteland/wasteland1/data/msq_header.h"
 #include "wasteland/core/file.h"
+#include "wasteland/wasteland1/files/huffman_stream.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Gfx {
 
+bool PicsAnimation::read(Common::SeekableReadStream *src, int width) {
+#ifdef TODO
+	Data::MsqHeader header;
+	int height;
+	HuffmanStream huffmanStream;
+	Pic baseFrame;
+
+	// Read the next MSQ header and validate it
+	header = MsqHeader.read(stream);
+	if (header == null)
+	{
+		// No more animations, abort.
+		return null;
+	}
+	if (header.getType() != MsqType.Compressed)
+	{
+		throw new IOException(
+			"Expected base frame block of PICS stream to be compressed");
+	}
+
+	// Calculate the height
+	height = header.getSize() * 2 / width;
+
+	// Read the base frame
+	huffmanStream = new HuffmanInputStream(stream);
+	baseFrame = Pic.read(huffmanStream, width, height);
+
+	// Read the second MSQ header (The animation frames) and validate it
+	header = MsqHeader.read(stream);
+	if (header == null)
+	{
+		throw new EOFException(
+			"Unexpected end of stream while reading PICS animation block");
+	}
+	if (header.getType() != MsqType.Compressed)
+	{
+		throw new IOException(
+			"Expected animation block of PICS stream to be compressed");
+	}
+
+	// Start a huffman input stream
+	huffmanStream = new HuffmanInputStream(stream);
+
+	return new PicsAnimation(baseFrame, readAnimationData(huffmanStream,
+		baseFrame));
+#endif
+	return false;
+}
 
 } // namespace Gfx
 } // namespace Wasteland1

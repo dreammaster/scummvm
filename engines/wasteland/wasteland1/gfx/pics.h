@@ -31,6 +31,9 @@ namespace Wasteland1 {
 namespace Gfx {
 
 class PicsDecoder : public Common::Array<PicsAnimation> {
+private:
+	Common::Array<PicsAnimation> _animations;
+
 public:
 	void load(const char *filename);
 	void load(Common::SeekableReadStream *src);

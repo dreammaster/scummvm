@@ -26,6 +26,7 @@
 #include "wasteland/wasteland1/views/views.h"
 #include "wasteland/wasteland1/files/game_archive.h"
 #include "wasteland/wasteland1/data/parties.h"
+#include "wasteland/wasteland1/gfx/pics.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -41,6 +42,7 @@ protected:
 public:
 	GameArchive *_gameArchive = nullptr;
 	Data::Parties _parties;
+	Gfx::PicsDecoder _pics;
 
 public:
 	Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc);
