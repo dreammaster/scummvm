@@ -30,7 +30,15 @@ namespace Wasteland1 {
 namespace Gfx {
 
 class PicsAnimation {
-
+public:
+	/**
+	 * Read in an animation
+	 * @param src		Source stream
+	 * @param width		Picture width
+	 * @return True if an animation could be read,
+	 * or false if the end of the file has been reached.
+	*/
+	bool read(Common::SeekableReadStream *src, int width = 96);
 };
 
 } // namespace Gfx
