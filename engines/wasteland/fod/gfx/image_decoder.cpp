@@ -21,11 +21,11 @@
 
 #include "common/file.h"
 #include "common/memstream.h"
-#include "wasteland/core/decoder.h"
-#include "wasteland/gfx/image_decoder.h"
+#include "wasteland/fod/core/decoder.h"
+#include "wasteland/fod/gfx/image_decoder.h"
 
 namespace Wasteland {
-namespace Shared {
+namespace FOD {
 namespace Gfx {
 
 bool ImageDecoder::load(const Common::Path &name, uint16 w, uint16 h) {
@@ -100,5 +100,5 @@ void ImageDecoder::copyPixelsToSurface(Common::SeekableReadStream &src) {
 }
 
 } // namespace Gfx
-} // namespace Shared
+} // namespace FOD
 } // namespace Wasteland

@@ -26,9 +26,10 @@
 #include "common/stream.h"
 
 namespace Wasteland {
+namespace FOD {
 
 /**
- * Implements a decoder for Wasteland encoded data
+ * Implements a decoder for FOD encoded data
  */
 class Decoder {
 public:
@@ -38,6 +39,7 @@ public:
 	static void loadStream(Common::ReadStream &src, Common::WriteStream &dest);
 };
 
+} // namespace FOD
 } // namespace Wasteland
 
 #endif

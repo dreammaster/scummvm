@@ -19,31 +19,42 @@
  *
  */
 
-#include "common/file.h"
-#include "wasteland/gfx/tiles.h"
+#ifndef WASTELAND_FOD_GFX_TILES_H
+#define WASTELAND_FOD_GFX_TILES_H
+
+#include "common/array.h"
+#include "graphics/managed_surface.h"
+#include "wasteland/gfx/surface.h"
+#include "wasteland/fod/gfx/image_decoder.h"
 
 namespace Wasteland {
-namespace Shared {
+namespace FOD {
 namespace Gfx {
 
-#define TILE_SIZE (TILE_W / 2 * TILE_H)
+#define TILE_W 16
+#define TILE_H 16
 
-bool Tiles::load(const Common::Path &filename) {
-	return _decoder.loadTiles(filename);
-}
+/**
+ * Manages a tileset
+ */
+class Tiles {
+private:
+	ImageDecoder _decoder;
 
-void Tiles::drawTile(Surface *dst, uint tileId, int x, int y, bool transparent) const {
-	assert(x >= 0 && y >= 0 && x <= (dst->w - TILE_W) && y <= (dst->h - TILE_H));
+public:
+	/**
+	 * Loads the tile set from the specified file
+	 */
+	bool load(const Common::Path &filename);
 
-	const Graphics::ManagedSurface *src = _decoder.getSurface();
-	Common::Rect r(0, tileId * 16, 16, (tileId + 1) * 16);
-
-	if (transparent)
-		dst->transBlitFrom(*src, r, Common::Point(x, y), 0);
-	else
-		dst->blitFrom(*src, r, Common::Point(x, y));
-}
+	/**
+	 * Draw a tile
+	 */
+	void drawTile(Surface *dst, uint tileId, int x, int y, bool transparent) const;
+};
 
 } // namespace Gfx
-} // namespace Shared
+} // namespace FOD
 } // namespace Wasteland
+
+#endif

@@ -21,9 +21,9 @@
 
 #include "common/system.h"
 #include "graphics/paletteman.h"
+#include "wasteland/fod/gfx/image_decoder.h"
 #include "wasteland/fod/views/main_menu/title.h"
 #include "wasteland/fod/fod.h"
-#include "wasteland/gfx/image_decoder.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -41,7 +41,7 @@ bool Title::msgMouseDown(const MouseDownMessage &msg) {
 
 void Title::draw() {
 	Surface s = getSurface();
-	Shared::Gfx::ImageDecoder decoder;
+	Gfx::ImageDecoder decoder;
 
 	if (!decoder.load("TPICT", 320, 200))
 		error("Could not load TPICT");

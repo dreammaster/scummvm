@@ -23,10 +23,11 @@
 #define WASTELAND_GFX_IMAGE_DECODER_H
 
 #include "graphics/managed_surface.h"
+#include "common/path.h"
 #include "common/stream.h"
 
 namespace Wasteland {
-namespace Shared {
+namespace FOD {
 namespace Gfx {
 
 /**
@@ -68,7 +69,7 @@ public:
 };
 
 } // namespace Gfx
-} // namespace Shared
+} // namespace FOD
 } // namespace Wasteland
 
 #endif

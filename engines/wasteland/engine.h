@@ -28,16 +28,15 @@
 #include "common/fs.h"
 #include "common/hash-str.h"
 #include "common/random.h"
-#include "wasteland/core/serializer.h"
 #include "common/util.h"
 #include "graphics/font.h"
 #include "engines/engine.h"
 #include "engines/savestate.h"
 #include "graphics/screen.h"
 
+#include "wasteland/core/serializer.h"
 #include "wasteland/detection.h"
 #include "wasteland/events.h"
-#include "wasteland/gfx/tiles.h"
 
 namespace Wasteland {
 
@@ -60,7 +59,6 @@ protected:
 
 public:
 	Common::Array<Graphics::Font *> _fonts;
-	Shared::Gfx::Tiles _tiles;
 
 public:
 	Engine(OSystem *syst, const WastelandGameDescription *gameDesc);
