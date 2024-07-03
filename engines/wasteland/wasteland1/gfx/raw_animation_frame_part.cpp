@@ -54,7 +54,7 @@ void RawAnimationFramePart::apply(Pic *image) {
 }
 
 RawAnimationFramePart *RawAnimationFramePart::read(
-		Common::SeekableReadStream *stream) {
+		Common::ReadStream *stream) {
 	int address;
 	int bytes;
 	int h, l;

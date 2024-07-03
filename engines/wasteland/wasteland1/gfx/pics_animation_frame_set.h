@@ -23,6 +23,7 @@
 #define WASTELAND_WASTELAND1_GFX_PICS_ANIMATION_FRAME_SET_H
 
 #include "common/array.h"
+#include "common/hash-str.h"
 #include "common/list.h"
 #include "wasteland/wasteland1/gfx/pic.h"
 #include "wasteland/wasteland1/gfx/raw_animation_frame.h"

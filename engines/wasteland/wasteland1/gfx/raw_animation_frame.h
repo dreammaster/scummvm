@@ -37,12 +37,17 @@ namespace Gfx {
 struct RawAnimationFrame {
 private:
 	// The raw animation frame parts
-	Common::Array<RawAnimationFramePart *> *_parts;
+	Common::Array<RawAnimationFramePart *> *_parts = nullptr;
 
 	// The size of the animation frame
-	int _size;
+	int _size = 0;
 
 public:
+	/**
+	 * Constructor
+	 */
+	RawAnimationFrame() {}
+
 	/**
 	 * Constructor
 	 * @param parts		The animation frame parts
@@ -65,7 +70,7 @@ public:
 	 * @param stream	The input stream
 	 * @return The raw animation frame
 	 */
-	static RawAnimationFrame *read(Common::SeekableReadStream *stream);
+	static RawAnimationFrame *read(Common::ReadStream *stream);
 
 	/**
 	 * Returns the size.
