@@ -27,7 +27,7 @@
 namespace Wasteland {
 namespace Wasteland1 {
 
-class BitStream {
+class BitStream : public Common::ReadStream {
 private:
 	Common::ReadStream *_src;
 	DisposeAfterUse::Flag _disposeAfterUse;
@@ -36,16 +36,21 @@ private:
 
 public:
 	BitStream(Common::ReadStream *src,
-		DisposeAfterUse::Flag disposeAfterUse = DisposeAfterUse::YES);
+		DisposeAfterUse::Flag disposeAfterUse = DisposeAfterUse::NO);
 	~BitStream() {
 		close();
 	}
 
 	void close();
 	bool hasNextBit() const {
-		return _bitNum == 8 && _src->eos();
+		return _bitNum == 8 && !_src->eos();
 	}
 	int readBit();
+
+	bool eos() const override {
+		return _src->eos();
+	}
+	uint32 read(void *dataPtr, uint32 dataSize) override;
 };
 
 } // namespace Wasteland1

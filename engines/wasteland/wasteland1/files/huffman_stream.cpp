@@ -20,29 +20,44 @@
  */
 
 #include "wasteland/wasteland1/files/huffman_stream.h"
+#include "wasteland/wasteland1/files/huffman_tree.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 
-int HuffmanStream::read() {
+HuffmanStream::HuffmanStream(Common::ReadStream *src) : BitStream(src) {
+	_tree = Huffman::HuffmanTree::create(this);
+}
+
+HuffmanStream::~HuffmanStream() {
+	delete _tree;
+}
+
+uint32 HuffmanStream::read(void *dataPtr, uint32 dataSize) {
+	byte *dest = (byte *)dataPtr;
 	byte bit;
 	Huffman::HuffmanNode *node;
 	int payload;
 
-	node = _tree->getRootNode();
-	while ((payload = node->getPayload()) == -1) {
-		bit = _bitStream->readBit();
-		if (bit == -1)
-			error("Unexpected end of stream while reading Huffman data");
+	for (uint i = 0; i < dataSize; ++i, ++dest) {
+		node = _tree->getRootNode();
 
-		if (bit == 0) {
-			node = node->getLeft();
-		} else {
-			node = node->getRight();
+		while ((payload = node->getPayload()) == -1) {
+			bit = readBit();
+			if (bit == -1)
+				error("Unexpected end of stream while reading Huffman data");
+
+			if (bit == 0) {
+				node = node->getLeft();
+			} else {
+				node = node->getRight();
+			}
 		}
+
+		*dest = payload;
 	}
 
-	return payload;
+	return dataSize;
 }
 
 } // namespace Wasteland1

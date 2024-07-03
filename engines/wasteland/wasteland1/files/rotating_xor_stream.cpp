@@ -25,7 +25,7 @@
 namespace Wasteland {
 namespace Wasteland1 {
 
-void RotatingXorStream::init(Common::SeekableReadStream *src) {
+void RotatingXorStream::init(Common::ReadStream *src) {
 	int e1, e2;
 
 	// Get encryption byte and checksum end marker
@@ -38,7 +38,7 @@ void RotatingXorStream::init(Common::SeekableReadStream *src) {
 	_checksum = 0;
 }
 
-void RotatingXorStream::decode(Common::SeekableReadStream *src) {
+void RotatingXorStream::decode(Common::ReadStream *src) {
 	Common::MemoryWriteStreamDynamic buf(DisposeAfterUse::NO);
 
 	while (!src->eos()) {

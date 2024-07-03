@@ -25,7 +25,7 @@
 namespace Wasteland {
 namespace Wasteland1 {
 
-NibbleStream::NibbleStream(Common::SeekableReadStream *stream,
+NibbleStream::NibbleStream(Common::ReadStream *stream,
 		DisposeAfterUse::Flag disposeAfterUse) :
 		_stream(stream), _disposeAfterUse(disposeAfterUse) {
 }

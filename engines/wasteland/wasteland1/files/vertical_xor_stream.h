@@ -28,9 +28,9 @@
 namespace Wasteland {
 namespace Wasteland1 {
 
-class VerticalXorStream : public Common::SeekableReadStream {
+class VerticalXorStream : public Common::ReadStream {
 private:
-	Common::SeekableReadStream *_stream = nullptr;
+	Common::ReadStream *_stream = nullptr;
 	DisposeAfterUse::Flag _disposeAfterUse;
 	Common::Array<byte> _lastLine;
 	int _width;
@@ -38,21 +38,12 @@ private:
 	int _y = 0;
 
 public:
-	VerticalXorStream(Common::SeekableReadStream *stream, int width,
+	VerticalXorStream(Common::ReadStream *stream, int width,
 		DisposeAfterUse::Flag disposeAfterUse);
 	~VerticalXorStream();
 
 	bool eos() const override {
 		return _stream->eos();
-	}
-	int64 pos() const override {
-		return _stream->pos();
-	}
-	int64 size() const override {
-		return _stream->size();
-	}
-	bool seek(int64 offset, int whence = SEEK_SET) override {
-		return _stream->seek(offset, whence);
 	}
 
 	uint32 read(void *dataPtr, uint32 dataSize) override;

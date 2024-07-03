@@ -28,19 +28,15 @@
 namespace Wasteland {
 namespace Wasteland1 {
 
-class HuffmanStream {
+class HuffmanStream : public BitStream {
 private:
 	Huffman::HuffmanTree *_tree;
-	BitStream *_bitStream;
 
-	HuffmanStream(Huffman::HuffmanTree *tree, BitStream *stream) :
-		_tree(tree), _bitStream(stream) {}
-	~HuffmanStream() {
-		delete _tree;
-		delete _bitStream;
-	}
+public:
+	HuffmanStream(Common::ReadStream *src);
+	~HuffmanStream();
 
-	int read();
+	uint32 read(void *dataPtr, uint32 dataSize) override;
 };
 
 } // namespace Wasteland1

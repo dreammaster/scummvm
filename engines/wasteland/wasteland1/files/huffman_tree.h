@@ -25,6 +25,7 @@
 #include "common/hashmap.h"
 #include "common/stream.h"
 #include "wasteland/wasteland1/files/huffman_node.h"
+#include "wasteland/wasteland1/files/bit_stream.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -42,12 +43,12 @@ private:
 	 *
 	 * @param stream	The input stream to build the root node for.
 	 */
-	void createTree(Common::SeekableReadStream *stream);
+	void createTree(BitStream *stream);
 
 public:
 	~HuffmanTree();
 
-	static HuffmanTree *create(Common::SeekableReadStream *src);
+	static HuffmanTree *create(Common::ReadStream *src);
 
 	/**
 	 * Creates a Huffman tree from a byte array.
