@@ -24,13 +24,27 @@
 
 #include "common/array.h"
 #include "common/stream.h"
+#include "wasteland/wasteland1/gfx/pic.h"
+#include "wasteland/wasteland1/files/bit_stream.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Gfx {
 
 class PicsAnimation {
+private:
+	Gfx::Pic *_baseFrame = nullptr;
+
+	/**
+	 * Reads the animation data from the stream.
+	 *
+	 * @param src	The input stream
+	 */
+	void readAnimationData(BitStream *src);
+
 public:
+	~PicsAnimation();
+
 	/**
 	 * Read in an animation
 	 * @param src		Source stream

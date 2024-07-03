@@ -41,7 +41,7 @@ public:
 	 * @param height	The height of the picture to read in pixel
 	 * @return			The picture
 	 */
-	static Pic *read(Common::SeekableReadStream *stream,
+	static Pic *read(Common::ReadStream *stream,
 		int w, int h, bool encoded = true);
 
 	/**

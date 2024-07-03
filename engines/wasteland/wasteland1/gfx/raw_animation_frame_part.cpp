@@ -94,7 +94,7 @@ bool RawAnimationFramePart::isMergable(const RawAnimationFramePart &other) const
 	if (size > 16)
 		return false;
 
-	if ((size + 2) >= (other._diff.size() + _diff.size() + 4))
+	if ((size + 2) >= (int)(other._diff.size() + _diff.size() + 4))
 		return false;
 
 	return true;

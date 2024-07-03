@@ -25,7 +25,7 @@
 namespace Wasteland {
 namespace Wasteland1 {
 
-VerticalXorStream::VerticalXorStream(Common::SeekableReadStream *stream,
+VerticalXorStream::VerticalXorStream(Common::ReadStream *stream,
 		int width, DisposeAfterUse::Flag disposeAfterUse) :
 		_stream(stream), _disposeAfterUse(disposeAfterUse),
 		_width(width / 2) {

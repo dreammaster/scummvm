@@ -28,27 +28,18 @@
 namespace Wasteland {
 namespace Wasteland1 {
 
-class NibbleStream : public Common::SeekableReadStream {
+class NibbleStream : public Common::ReadStream {
 private:
-	Common::SeekableReadStream *_stream = nullptr;
+	Common::ReadStream *_stream = nullptr;
 	DisposeAfterUse::Flag _disposeAfterUse;
 
 public:
-	NibbleStream(Common::SeekableReadStream *stream,
-		DisposeAfterUse::Flag disposeAfterUse);
+	NibbleStream(Common::ReadStream *stream,
+		DisposeAfterUse::Flag disposeAfterUse = DisposeAfterUse::NO);
 	~NibbleStream();
 
 	bool eos() const override {
 		return _stream->eos();
-	}
-	int64 pos() const override {
-		return _stream->pos();
-	}
-	int64 size() const override {
-		return _stream->size();
-	}
-	bool seek(int64 offset, int whence = SEEK_SET) override {
-		return _stream->seek(offset, whence);
 	}
 
 	uint32 read(void *dataPtr, uint32 dataSize) override;

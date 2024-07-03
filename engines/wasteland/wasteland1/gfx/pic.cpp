@@ -27,9 +27,9 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Gfx {
 
-Pic *Pic::read(Common::SeekableReadStream *stream,
+Pic *Pic::read(Common::ReadStream *stream,
 		int w, int h, bool encoded) {
-	Common::SeekableReadStream *xorStream;
+	Common::ReadStream *xorStream;
 	Pic *pic;
 
 	// Create the pic object

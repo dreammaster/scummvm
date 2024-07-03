@@ -34,14 +34,12 @@ void PicsDecoder::load(const char *filename) {
 void PicsDecoder::load(Common::SeekableReadStream *src) {
 	// Reset animations array
 	_animations.clear();
-	_animations.reserve(256);
 
 	// Read in animations until end is signalled
-	do {
+	while (!src->eos()) {
 		_animations.push_back(PicsAnimation());
-	} while (_animations.back().read(src, 96));
-
-	_animations.pop_back();
+		_animations.back().read(src, 96);
+	}
 }
 
 } // namespace Gfx

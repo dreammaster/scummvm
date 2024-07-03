@@ -34,11 +34,11 @@ private:
 	int _endChecksum = 0;
 	int _checksum = 0;
 
-	void init(Common::SeekableReadStream *src);
-	void decode(Common::SeekableReadStream *src);
+	void init(Common::ReadStream *src);
+	void decode(Common::ReadStream *src);
 
 public:
-	RotatingXorStream(Common::SeekableReadStream *src) {
+	RotatingXorStream(Common::ReadStream *src) {
 		init(src);
 		decode(src);
 	}

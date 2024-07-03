@@ -27,9 +27,17 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Huffman {
 
-HuffmanTree *HuffmanTree::create(Common::SeekableReadStream *src) {
+HuffmanTree *HuffmanTree::create(Common::ReadStream *src) {
 	HuffmanTree *tree = new HuffmanTree();
-	tree->createTree(src);
+	BitStream *bitStream = dynamic_cast<BitStream *>(src);
+
+	if (bitStream) {
+		tree->createTree(bitStream);
+	} else {
+		BitStream streamWrapper(src);
+		tree->createTree(&streamWrapper);
+	}
+
 	return tree;
 }
 
@@ -43,7 +51,7 @@ HuffmanTree *HuffmanTree::create(const Common::Array<byte> &bytes) {
 	return create(&stream);
 }
 
-void HuffmanTree::createTree(Common::SeekableReadStream *stream) {
+void HuffmanTree::createTree(BitStream *stream) {
 	int *counter;
 	int b;
 	HuffmanNode *node, *left, *right;

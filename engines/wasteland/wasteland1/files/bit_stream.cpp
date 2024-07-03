@@ -52,5 +52,11 @@ int BitStream::readBit() {
 	return result;
 }
 
+uint32 BitStream::read(void *dataPtr, uint32 dataSize) {
+	_bitNum = 8;	// Invalid current byte
+
+	return _src->read(dataPtr, dataSize);
+}
+
 } // namespace Wasteland1
 } // namespace Wasteland
