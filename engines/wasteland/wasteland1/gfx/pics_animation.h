@@ -24,8 +24,9 @@
 
 #include "common/array.h"
 #include "common/stream.h"
-#include "wasteland/wasteland1/gfx/pic.h"
 #include "wasteland/wasteland1/files/bit_stream.h"
+#include "wasteland/wasteland1/gfx/pic.h"
+#include "wasteland/wasteland1/gfx/pics_animation_frame_set.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -34,6 +35,7 @@ namespace Gfx {
 class PicsAnimation {
 private:
 	Gfx::Pic *_baseFrame = nullptr;
+	Common::List<PicsAnimationFrameSet> _frameSets;
 
 	/**
 	 * Reads the animation data from the stream.

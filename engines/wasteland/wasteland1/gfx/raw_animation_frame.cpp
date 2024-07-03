@@ -37,7 +37,7 @@ void RawAnimationFrame::apply(Pic *image) {
 		part->apply(image);
 }
 
-RawAnimationFrame *RawAnimationFrame::read(Common::SeekableReadStream *stream) {
+RawAnimationFrame *RawAnimationFrame::read(Common::ReadStream *stream) {
 	Common::Array<RawAnimationFramePart *> *parts;
 	RawAnimationFramePart *part;
 	int size;

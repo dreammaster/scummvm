@@ -66,7 +66,7 @@ public:
 	 * @param stream	The input stream
 	 * @return The next animation frame part or null if end of frame reached
 	 */
-	static RawAnimationFramePart *read(Common::SeekableReadStream *stream);
+	static RawAnimationFramePart *read(Common::ReadStream *stream);
 
 	/**
 	 * Returns the size.
