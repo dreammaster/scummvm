@@ -26,7 +26,7 @@ namespace Wasteland {
 namespace Wasteland1 {
 
 HuffmanStream::HuffmanStream(Common::ReadStream *src) : BitStream(src) {
-	_tree = Huffman::HuffmanTree::create(this);
+	_tree = Huffman::HuffmanTree::load(src);
 }
 
 HuffmanStream::~HuffmanStream() {

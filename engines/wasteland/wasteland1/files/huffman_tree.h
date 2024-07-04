@@ -43,12 +43,20 @@ private:
 	 *
 	 * @param stream	The input stream to build the root node for.
 	 */
-	void createTree(BitStream *stream);
+	void loadTree(BitStream *stream);
+
+	/**
+	 Builds a Huffman node and returns it.
+     *
+     * @param stream	The bit stream to read data from
+     * @return The Huffman node
+     */
+	HuffmanNode *loadNode(BitStream *stream);
 
 public:
 	~HuffmanTree();
 
-	static HuffmanTree *create(Common::ReadStream *src);
+	static HuffmanTree *load(Common::ReadStream *src);
 
 	/**
 	 * Creates a Huffman tree from a byte array.
