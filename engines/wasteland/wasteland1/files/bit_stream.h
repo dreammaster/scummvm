@@ -43,7 +43,7 @@ public:
 
 	void close();
 	bool hasNextBit() const {
-		return _bitNum == 8 && !_src->eos();
+		return _bitNum != 8 || !_src->eos();
 	}
 	int readBit();
 

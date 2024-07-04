@@ -48,16 +48,18 @@ bool PicsAnimation::read(Common::SeekableReadStream *src, int width) {
 	height = header._size * 2 / width;
 
 	// Read the base frame
-	HuffmanStream huffmanStream(src);
-	_baseFrame = Pic::read(&huffmanStream, width, height);
+	HuffmanStream huffmanStream1(src);
+	_baseFrame = Pic::read(&huffmanStream1, width, height);
 
 	// Read the second MSQ header (The animation frames) and validate it
 	header.synchronize(src);
 	if (header._type != Data::MsqType::Compressed)
 		error("Expected animation block of PICS stream to be compressed");
 
-	// Start a Huffman input stream
-	readAnimationData(&huffmanStream);
+	// Read in the animation frames data
+	HuffmanStream huffmanStream2(src);
+	readAnimationData(&huffmanStream2);
+
 	return true;
 }
 

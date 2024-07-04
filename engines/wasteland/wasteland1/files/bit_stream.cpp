@@ -38,24 +38,33 @@ void BitStream::close() {
 
 int BitStream::readBit() {
 	if (_bitNum == 8) {
-		if (hasNextBit())
+		if (!hasNextBit())
 			return -1;
 
 		_currentByte = _src->readByte();
 		_bitNum = 0;
 	}
 
-	int result = _currentByte & 1;
-	_currentByte >>= 1;
+	int result = (_currentByte & 0x80) ? 1 : 0;
+	_currentByte <<= 1;
 	++_bitNum;
 
 	return result;
 }
 
 uint32 BitStream::read(void *dataPtr, uint32 dataSize) {
-	_bitNum = 8;	// Invalid current byte
+	if (_bitNum == 8)
+		// Already on a byte boundary, so reading is easy
+		return _src->read(dataPtr, dataSize);
 
-	return _src->read(dataPtr, dataSize);
+	byte *dest = (byte *)dataPtr;
+	for (uint byteNum = 0; byteNum < dataSize; ++byteNum) {
+		*dest = 0;
+		for (int bitNum = 0; bitNum < 8; ++bitNum)
+			*dest = (*dest << 1) | readBit();
+	}
+
+	return dataSize;
 }
 
 } // namespace Wasteland1
