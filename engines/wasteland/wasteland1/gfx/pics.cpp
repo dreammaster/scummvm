@@ -34,9 +34,10 @@ void PicsDecoder::load(const char *filename) {
 void PicsDecoder::load(Common::SeekableReadStream *src) {
 	// Reset animations array
 	_animations.clear();
+	_animations.reserve(256);
 
 	// Read in animations until end is signalled
-	while (!src->eos()) {
+	while (src->pos() < src->size()) {
 		_animations.push_back(PicsAnimation());
 		_animations.back().read(src, 96);
 	}
