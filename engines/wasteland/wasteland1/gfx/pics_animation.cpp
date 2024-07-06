@@ -65,12 +65,12 @@ bool PicsAnimation::read(Common::SeekableReadStream *src, int width) {
 }
 
 void PicsAnimation::readAnimationData(BitStream *src) {
-	PicsAnimationFrameSet *frameSet;
+	PicsAnimationFrameSet *frameSet = nullptr;
 	Common::Array<RawAnimationFrame> rawFrames;
 	int dataSize;
 	int pos;
 	Common::Array<byte> instructions;
-	Pic *workingFrame;
+	Pic *workingFrame = nullptr;
 	uint headerSize;
 	int delay;
 	int frameNo;
@@ -97,22 +97,23 @@ void PicsAnimation::readAnimationData(BitStream *src) {
 	}
 
 	// Cycle through the animation instructions and build the frame sets
-	_frameSets.push_back(PicsAnimationFrameSet());
-	frameSet = &_frameSets.back();
-	workingFrame = _baseFrame->clone();
-
 	while (!byteStream.eos()) {
 		delay = byteStream.readByte();
 
 		if (delay == 255) {
-			_frameSets.push_back(PicsAnimationFrameSet());
-			frameSet = &_frameSets.back();
-
-			workingFrame = _baseFrame->clone();
+			// End of frames for current frame set
+			frameSet = nullptr;
 			continue;
 		}
 
 		frameNo = byteStream.readByte();
+
+		if (!frameSet) {
+			_frameSets.push_back(PicsAnimationFrameSet());
+			frameSet = &_frameSets.back();
+
+			workingFrame = _baseFrame->clone();
+		}
 
 		frameSet->addFrame(delay, frameNo, _baseFrame, workingFrame,
 			rawFrames);
