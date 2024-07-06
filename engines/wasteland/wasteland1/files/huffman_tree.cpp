@@ -56,7 +56,6 @@ HuffmanNode *HuffmanTree::loadNode(BitStream *stream) {
 
 	if (stream->readBit() == 0) {
 		HuffmanNode *left, *right;
-
 		left = loadNode(stream);
 		stream->readBit();
 		right = loadNode(stream);

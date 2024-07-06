@@ -25,8 +25,9 @@
 namespace Wasteland {
 namespace Wasteland1 {
 
-HuffmanStream::HuffmanStream(Common::ReadStream *src) : BitStream(src) {
-	_tree = Huffman::HuffmanTree::load(src);
+HuffmanStream::HuffmanStream(Common::ReadStream *src) :
+		BitStream(src) {
+	_tree = Huffman::HuffmanTree::load(this);
 }
 
 HuffmanStream::~HuffmanStream() {
@@ -34,6 +35,9 @@ HuffmanStream::~HuffmanStream() {
 }
 
 uint32 HuffmanStream::read(void *dataPtr, uint32 dataSize) {
+	if (!_tree)
+		return BitStream::read(dataPtr, dataSize);
+
 	byte *dest = (byte *)dataPtr;
 	byte bit;
 	Huffman::HuffmanNode *node;
@@ -44,6 +48,7 @@ uint32 HuffmanStream::read(void *dataPtr, uint32 dataSize) {
 
 		while ((payload = node->getPayload()) == -1) {
 			bit = readBit();
+
 			if (bit == -1)
 				error("Unexpected end of stream while reading Huffman data");
 

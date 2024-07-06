@@ -46,6 +46,7 @@ bool PicsAnimation::read(Common::SeekableReadStream *src, int width) {
 
 	// Calculate the height
 	height = header._size * 2 / width;
+	assert((header._size * 2) % width == 0);
 
 	// Read the base frame
 	HuffmanStream huffmanStream1(src);
@@ -116,9 +117,6 @@ void PicsAnimation::readAnimationData(BitStream *src) {
 		frameSet->addFrame(delay, frameNo, _baseFrame, workingFrame,
 			rawFrames);
 	}
-
-	// Remove redundant entry added at end
-	_frameSets.erase(_frameSets.end());
 }
 
 } // namespace Gfx
