@@ -53,14 +53,10 @@ void RawAnimationFramePart::apply(Pic *image) {
 	}
 }
 
-RawAnimationFramePart *RawAnimationFramePart::read(
-		Common::ReadStream *stream) {
+bool RawAnimationFramePart::read(Common::ReadStream *stream) {
 	int address;
 	int bytes;
 	int h, l;
-	int offset;
-	int size;
-	Common::Array<int> diff;
 
 	// Read address from stream-> Abort if hit the end of the frame part
 	l = stream->readByte();
@@ -68,23 +64,23 @@ RawAnimationFramePart *RawAnimationFramePart::read(
 
 	address = l | (h << 8);
 	if (address == 0xffff) {
-		return nullptr;
+		return false;
 	}
 
 	// Extract number of diff bytes from address
 	bytes = ((address >> 12) & 0xf) + 1;
 	address = address & 0xfff;
 
-	size = 2;
-	offset = address;
-	diff.resize(bytes);
+	_size = 2;
+	_offset = address;
+	_diff.resize(bytes);
 
 	for (int i = 0; i < bytes; i++) {
-		diff[i] = stream->readByte();
-		size++;
+		_diff[i] = stream->readByte();
+		_size++;
 	}
 
-	return new RawAnimationFramePart(offset, diff, size);
+	return true;
 }
 
 bool RawAnimationFramePart::isMergable(const RawAnimationFramePart &other) const {

@@ -59,14 +59,10 @@ public:
 	void apply(Pic *image);
 
 	/**
-	 * Parses the next animation frame part from the specified input stream. If
-	 * the end of the animation frame has been reached then this method returns
-	 * null
-	 *
+	 * Parses the next animation frame part from the specified input stream.
 	 * @param stream	The input stream
-	 * @return The next animation frame part or null if end of frame reached
 	 */
-	static RawAnimationFramePart *read(Common::ReadStream *stream);
+	bool read(Common::ReadStream *stream);
 
 	/**
 	 * Returns the size.

@@ -37,7 +37,7 @@ namespace Gfx {
 struct RawAnimationFrame {
 private:
 	// The raw animation frame parts
-	Common::Array<RawAnimationFramePart *> *_parts = nullptr;
+	Common::Array<RawAnimationFramePart> *_parts = nullptr;
 
 	// The size of the animation frame
 	int _size = 0;
@@ -53,7 +53,7 @@ public:
 	 * @param parts		The animation frame parts
 	 * @param size		The size of the animation frame
 	 */
-	RawAnimationFrame(Common::Array<RawAnimationFramePart *> *parts, int size) :
+	RawAnimationFrame(Common::Array<RawAnimationFramePart> *parts, int size) :
 		_parts(parts), _size(size) {
 	}
 	~RawAnimationFrame();
