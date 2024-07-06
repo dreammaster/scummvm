@@ -68,9 +68,8 @@ public:
 	 * Reads the next raw animation frame from the input stream.
 	 *
 	 * @param stream	The input stream
-	 * @return The raw animation frame
 	 */
-	static RawAnimationFrame *read(Common::ReadStream *stream);
+	void read(Common::ReadStream *stream);
 
 	/**
 	 * Returns the size.

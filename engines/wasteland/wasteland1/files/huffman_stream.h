@@ -30,7 +30,7 @@ namespace Wasteland1 {
 
 class HuffmanStream : public BitStream {
 private:
-	Huffman::HuffmanTree *_tree;
+	Huffman::HuffmanTree *_tree = nullptr;
 
 public:
 	HuffmanStream(Common::ReadStream *src);
