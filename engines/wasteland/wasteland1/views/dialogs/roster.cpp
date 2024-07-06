@@ -20,6 +20,8 @@
  */
 
 #include "wasteland/wasteland1/views/dialogs/roster.h"
+#include "wasteland/wasteland1/gfx/pics.h"
+#include "wasteland/wasteland1/wasteland1.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -40,6 +42,14 @@ void Roster::draw() {
 	drawFrame(Common::Rect(0, 0, 39, 23));
 	drawFrame(Common::Rect(0, 0, 13, 11));
 	drawFrame(Common::Rect(14, 0, 39, 11));
+
+	Gfx::PicsDecoder &pics = g_engine->_pics;
+	const Gfx::PicsAnimation &anim = pics.getAnimation(0);
+	const auto &frameSets = anim.getFrameSets();
+	const auto &frameSet = *frameSets.begin();
+	const auto &frames = frameSet.getFrames();
+
+	s.blitFrom(*frames[0], Common::Point(10, 10));
 }
 
 bool Roster::msgFocus(const FocusMessage &msg) {

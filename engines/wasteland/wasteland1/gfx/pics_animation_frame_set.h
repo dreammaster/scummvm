@@ -154,6 +154,10 @@ public:
 	const Common::Array<PicsAnimationInstruction> &getInstructions() {
 		return _instructions;
 	}
+
+	const Common::Array<Pic *> &getFrames() const {
+		return _frames;
+	}
 };
 
 } // namespace Gfx

@@ -55,6 +55,13 @@ public:
 	 * or false if the end of the file has been reached.
 	*/
 	bool read(Common::SeekableReadStream *src, int width = 96);
+
+	/**
+	 * Return the frame sets for the animation
+	 */
+	const Common::List<PicsAnimationFrameSet> &getFrameSets() const {
+		return _frameSets;
+	}
 };
 
 } // namespace Gfx
