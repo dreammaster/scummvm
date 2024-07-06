@@ -40,16 +40,16 @@ void Roster::draw() {
 
 	drawFrame(Common::Rect(0, 0, 39, 24));
 	drawFrame(Common::Rect(0, 0, 39, 23));
-	drawFrame(Common::Rect(0, 0, 13, 11));
-	drawFrame(Common::Rect(14, 0, 39, 11));
+	drawFrame(Common::Rect(0, 0, 13, 13));
+	drawFrame(Common::Rect(14, 0, 39, 13));
 
 	Gfx::PicsDecoder &pics = g_engine->_pics;
-	const Gfx::PicsAnimation &anim = pics.getAnimation(0);
+	const Gfx::PicsAnimation &anim = pics.getAnimation(3);
 	const auto &frameSets = anim.getFrameSets();
 	const auto &frameSet = *frameSets.begin();
 	const auto &frames = frameSet.getFrames();
 
-	s.blitFrom(*frames[0], Common::Point(10, 10));
+	s.blitFrom(*frames[0], Common::Point(8, 8));
 }
 
 bool Roster::msgFocus(const FocusMessage &msg) {
