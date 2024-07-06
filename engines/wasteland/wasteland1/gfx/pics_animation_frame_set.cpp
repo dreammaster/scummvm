@@ -77,7 +77,7 @@ Common::HashMap<Common::String, RawAnimationFrame *> *PicsAnimationFrameSet::get
 RawAnimationFrame *PicsAnimationFrameSet::getRawFrame(int currentFrame, int nextFrame,
 		Pic *baseFrame) {
 	Pic *current, *next;
-	Common::Array<RawAnimationFramePart *> *parts;
+	Common::Array<RawAnimationFramePart> *parts;
 
 	current = currentFrame == 0 ? baseFrame : _frames[currentFrame - 1];
 	next = nextFrame == 0 ? baseFrame : _frames[nextFrame - 1];
@@ -87,16 +87,16 @@ RawAnimationFrame *PicsAnimationFrameSet::getRawFrame(int currentFrame, int next
 	return new RawAnimationFrame(parts, 0);
 }
 
-Common::Array<RawAnimationFramePart *> *PicsAnimationFrameSet::getDiff(Pic *frame1, Pic *frame2) {
+Common::Array<RawAnimationFramePart> *PicsAnimationFrameSet::getDiff(Pic *frame1, Pic *frame2) {
 	int x, y;
 	int w, h;
-	Common::Array<RawAnimationFramePart *> *diff;
+	Common::Array<RawAnimationFramePart> *diff;
 	RawAnimationFramePart *last, *current;
 	int xorVal;
 
 	w = frame1->w;
 	h = frame1->h;
-	diff = new Common::Array<RawAnimationFramePart *>();
+	diff = new Common::Array<RawAnimationFramePart>();
 	last = nullptr;
 
 	for (y = 0; y < h; y++) {
@@ -112,7 +112,7 @@ Common::Array<RawAnimationFramePart *> *PicsAnimationFrameSet::getDiff(Pic *fram
 				if (last != nullptr && last->isMergable(*current)) {
 					last->merge(*current);
 				} else {
-					diff->push_back(current);
+					diff->push_back(*current);
 					last = current;
 				}
 			}

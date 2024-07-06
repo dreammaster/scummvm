@@ -82,13 +82,11 @@ private:
 	 * dimensional array. The first index is the y coordinate and the second is
 	 * the x co-ordinate. Each array entry holds the byte for two pixels.
 	 *
-	 * @param frame1
-	 *            The first frame to compare
-	 * @param frame2
-	 *            The second frame to compare
+	 * @param frame1	The first frame to compare
+	 * @param frame2	The second frame to compare
 	 * @return The diff
 	 */
-	Common::Array<RawAnimationFramePart *> *getDiff(Pic *frame1, Pic *frame2);
+	Common::Array<RawAnimationFramePart> *getDiff(Pic *frame1, Pic *frame2);
 
 	/**
 	 * Checks if the specified frame already exists and returns the frame index.

@@ -26,28 +26,27 @@ namespace Wasteland1 {
 namespace Gfx {
 
 RawAnimationFrame::~RawAnimationFrame() {
-	if (_parts) {
-		for (auto *part : *_parts)
-			delete part;
-		delete _parts;
-	}
+	delete _parts;
 }
 
 void RawAnimationFrame::apply(Pic *image) {
 	assert(_parts);
-	for (RawAnimationFramePart *part : *_parts)
-		part->apply(image);
+	for (RawAnimationFramePart &part : *_parts)
+		part.apply(image);
 }
 
 void RawAnimationFrame::read(Common::ReadStream *stream) {
-	RawAnimationFramePart *part;
 	_size = 2;
 
 	assert(!_parts);
-	_parts = new Common::Array<RawAnimationFramePart *>();
+	_parts = new Common::Array<RawAnimationFramePart>();
 
-	while ((part = RawAnimationFramePart::read(stream)) != nullptr) {
-		_size += part->getSize();
+	for (;;) {
+		RawAnimationFramePart part;
+		if (!part.read(stream))
+			break;
+
+		_size += part.getSize();
 		_parts->push_back(part);
 	}
 }
