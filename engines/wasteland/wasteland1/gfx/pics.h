@@ -37,6 +37,13 @@ private:
 public:
 	void load(const char *filename);
 	void load(Common::SeekableReadStream *src);
+
+	size_t size() const {
+		return _animations.size();
+	}
+	const PicsAnimation &getAnimation(uint idx) const {
+		return _animations[idx];
+	}
 };
 
 } // namespace Gfx
