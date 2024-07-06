@@ -86,7 +86,7 @@ private:
 	 * @param frame2	The second frame to compare
 	 * @return The diff
 	 */
-	Common::Array<RawAnimationFramePart> *getDiff(Pic *frame1, Pic *frame2);
+	Common::Array<RawAnimationFramePart> getDiff(Pic *frame1, Pic *frame2);
 
 	/**
 	 * Checks if the specified frame already exists and returns the frame index.
