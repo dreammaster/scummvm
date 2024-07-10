@@ -55,10 +55,6 @@ void Wasteland1Engine::setup() {
 		error("%s", msg.c_str());
 	}
 
-	// Setup game views
-	_views = new Views::Views();
-	addView("Roster");
-
 	Surface::setupPalette();
 
 	auto monoFont = new Gfx::MonoFont();
@@ -81,6 +77,10 @@ void Wasteland1Engine::setup() {
 		(void)loadGameState(saveSlot);
 
 	_pics.load("allpics1");
+
+	// Setup game views
+	_views = new Views::Views();
+	addView("Roster");
 }
 
 } // namespace Wasteland1

@@ -41,7 +41,7 @@ public:
 	size_t size() const {
 		return _animations.size();
 	}
-	const PicsAnimation &getAnimation(uint idx) const {
+	PicsAnimation &getAnimation(uint idx) {
 		return _animations[idx];
 	}
 };

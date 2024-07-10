@@ -64,6 +64,8 @@ class PicsAnimationFrameSet {
 private:
 	Common::Array<Pic *> _frames;
 	Common::Array<PicsAnimationInstruction> _instructions;
+	int _instructionIndex = -1;
+	uint32 _nextFrameTime = 0;
 
 	/**
 	 * Calculated and returns a raw animation frame.
@@ -158,6 +160,16 @@ public:
 	const Common::Array<Pic *> &getFrames() const {
 		return _frames;
 	}
+
+	void start();
+	void stop();
+
+	bool isPlaying() const {
+		return _instructionIndex != -1;
+	}
+
+	bool needsUpdate() const;
+	const Graphics::Surface *getSurface();
 };
 
 } // namespace Gfx

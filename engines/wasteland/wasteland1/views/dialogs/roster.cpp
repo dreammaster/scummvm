@@ -43,22 +43,34 @@ void Roster::draw() {
 	drawFrame(Common::Rect(0, 0, 13, 13));
 	drawFrame(Common::Rect(14, 0, 39, 13));
 
-	Gfx::PicsDecoder &pics = g_engine->_pics;
-	const Gfx::PicsAnimation &anim = pics.getAnimation(3);
-	const auto &frameSets = anim.getFrameSets();
-	const auto &frameSet = *frameSets.begin();
-	const auto &frames = frameSet.getFrames();
-
-	s.blitFrom(*frames[0], Common::Point(8, 8));
+	const Graphics::Surface *frame = _anim->getSurface();
+	s.blitFrom(*frame, Common::Point(8, 8));
 }
 
 bool Roster::msgFocus(const FocusMessage &msg) {
 	Dialog::msgFocus(msg);
+
+	Gfx::PicsDecoder &pics = g_engine->_pics;
+	Gfx::PicsAnimation &anim = pics.getAnimation(3);
+	auto &frameSets = anim.getFrameSets();
+	auto &frameSet = *frameSets.begin();
+	_anim = &frameSet;
+	_anim->start();
+
 	return true;
 }
 
 bool Roster::msgUnfocus(const UnfocusMessage &msg) {
 	Dialog::msgUnfocus(msg);
+
+	_anim->stop();
+	return true;
+}
+
+bool Roster::tick() {
+	if (_anim->needsUpdate())
+		draw();
+
 	return true;
 }
 
@@ -66,7 +78,6 @@ bool Roster::msgGame(const GameMessage &msg) {
 
 	return true;
 }
-
 
 } // namespace Dialogs
 } // namespace Views
