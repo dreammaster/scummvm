@@ -17,8 +17,9 @@ MODULE_OBJS = \
 	wasteland1/core/array1.o \
 	wasteland1/data/items.o \
 	wasteland1/data/msq_header.o \
-	wasteland1/data/parties.o \
+	wasteland1/data/party.o \
 	wasteland1/data/party_member.o \
+	wasteland1/data/saved.o \
 	wasteland1/data/skills.o \
 	wasteland1/wasteland1.o \
 	wasteland1/files/bit_stream.o \

@@ -19,45 +19,38 @@
  *
  */
 
-#include "wasteland/wasteland1/data/parties.h"
+#include "wasteland/wasteland1/data/saved.h"
 #include "wasteland/core/file.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Data {
 
-Party::Party() {
-	_members.resize(7);
-}
-
-void Party::synchronize(Serializer &s) {
-	s.skip(1);
-	for (int i = 1; i <= 7; ++i)
-		s.syncAsByte(_members[i]);
-
-	s.syncAsSByte(_x);
-	s.syncAsSByte(_y);
-	s.syncAsSByte(_map);
-	s.syncAsSByte(_prevX);
-	s.syncAsSByte(_prevY);
-	s.syncAsSByte(_prevMap);
-}
-
-Parties::Parties() {
+Saved::Saved() {
 	_parties.resize(4);
 	_roster.resize(7);
 }
 
-void Parties::synchronize(Serializer &s) {
+void Saved::synchronize(Serializer &s) {
 	for (uint i = 1; i <= _parties.size(); ++i)
 		_parties[i].synchronize(s);
-	s.skip(0xc8);	// TODO: Figure out if remainder of 256 bytes is needed
+
+	s.skip(0x98);	// TODO: Figure out unknown bytes
+
+	char locName[13];
+	Common::strcpy_s(locName, _saveLocationName.c_str());
+	s.syncBytes((byte *)locName, 12);
+	locName[12] = '\0';
+	if (s.isLoading())
+		_saveLocationName = Common::String(locName);
+
+	s.skip(0x24);	// TODO: Figure out unknown bytes
 
 	for (uint i = 1; i <= _roster.size(); ++i)
 		_roster[i].synchronize(s);
 }
 
-void Parties::load() {
+void Saved::load() {
 	File f("savegame");	// Loads savegame block from game1
 	Serializer s(&f);
 	synchronize(s);

@@ -45,6 +45,7 @@ void Roster::draw() {
 
 	const Graphics::Surface *frame = _anim->getSurface();
 	s.blitFrom(*frame, Common::Point(8, 8));
+	s.writeString(g_engine->_saved._saveLocationName, 1, 12);
 }
 
 bool Roster::msgFocus(const FocusMessage &msg) {

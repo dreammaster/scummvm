@@ -19,45 +19,30 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_DATA_PARTIES_H
-#define WASTELAND_WASTELAND1_DATA_PARTIES_H
-
-#include "wasteland/core/serializer.h"
-#include "wasteland/wasteland1/core/array1.h"
-#include "wasteland/wasteland1/data/party_member.h"
+#include "wasteland/wasteland1/data/party.h"
+#include "wasteland/core/file.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Data {
 
-struct Party {
-	Array1<int> _members;
-	int _x = 0;
-	int _y = 0;
-	int _map = 0;
-	int _prevX = 0;
-	int _prevY = 0;
-	int _prevMap = 0;
+Party::Party() {
+	_members.resize(7);
+}
 
-	Party();
-	void synchronize(Serializer &s);
-};
+void Party::synchronize(Serializer &s) {
+	s.skip(1);
+	for (int i = 1; i <= 7; ++i)
+		s.syncAsByte(_members[i]);
 
-struct Parties {
-	Array1<Party> _parties;
-	Array1<PartyMember> _roster;
-
-	Parties();
-	void synchronize(Serializer &s);
-
-	/**
-	 * Loads the parties from the original files
-	 */
-	void load();
-};
+	s.syncAsSByte(_x);
+	s.syncAsSByte(_y);
+	s.syncAsSByte(_map);
+	s.syncAsSByte(_prevX);
+	s.syncAsSByte(_prevY);
+	s.syncAsSByte(_prevMap);
+}
 
 } // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif
