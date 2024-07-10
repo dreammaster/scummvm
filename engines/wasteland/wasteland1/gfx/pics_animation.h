@@ -59,7 +59,7 @@ public:
 	/**
 	 * Return the frame sets for the animation
 	 */
-	const Common::List<PicsAnimationFrameSet> &getFrameSets() const {
+	Common::List<PicsAnimationFrameSet> &getFrameSets() {
 		return _frameSets;
 	}
 };

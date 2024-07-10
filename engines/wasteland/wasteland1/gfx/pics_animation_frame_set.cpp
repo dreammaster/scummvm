@@ -19,8 +19,10 @@
  *
  */
 
+#include "common/system.h"
 #include "common/hash-str.h"
 #include "wasteland/wasteland1/gfx/pics_animation_frame_set.h"
+#include "wasteland/events.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -140,6 +142,38 @@ int PicsAnimationFrameSet::getFrameIndex(Pic *workingFrame, Pic *baseFrame) {
 	}
 
 	return -1;
+}
+
+void PicsAnimationFrameSet::start() {
+	_instructionIndex = 0;
+	_nextFrameTime = 0;
+}
+
+void PicsAnimationFrameSet::stop() {
+	_instructionIndex = -1;
+}
+
+bool PicsAnimationFrameSet::needsUpdate() const {
+	if (!isPlaying())
+		return false;
+
+	uint32 currTime = g_system->getMillis();
+	return currTime >= _nextFrameTime;
+}
+
+const Graphics::Surface *PicsAnimationFrameSet::getSurface() {
+	// Get the next frame to return
+	const PicsAnimationInstruction &ins = _instructions[_instructionIndex];
+	const Graphics::Surface &frame = *_frames[ins.getFrame() - 1];
+
+	// Move to next instruction entry for next time
+	if (++_instructionIndex >= (int)_instructions.size())
+		_instructionIndex = 0;
+
+	// Set when the next frame will be displayed
+	_nextFrameTime = g_system->getMillis() + ins.getDelay() * FRAME_DELAY;
+
+	return &frame;
 }
 
 } // namespace Gfx
