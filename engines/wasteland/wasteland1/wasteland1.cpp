@@ -72,7 +72,7 @@ void Wasteland1Engine::setup() {
 
 	// Load save data
 	int saveSlot = ConfMan.getInt("save_slot");
-	_parties.load();
+	_saved.load();
 	if (saveSlot != -1)
 		(void)loadGameState(saveSlot);
 

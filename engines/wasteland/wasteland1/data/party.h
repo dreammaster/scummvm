@@ -19,39 +19,31 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_WASTELAND1_H
-#define WASTELAND_WASTELAND1_WASTELAND1_H
+#ifndef WASTELAND_WASTELAND1_DATA_PARTY_H
+#define WASTELAND_WASTELAND1_DATA_PARTY_H
 
-#include "wasteland/engine.h"
-#include "wasteland/wasteland1/views/views.h"
-#include "wasteland/wasteland1/files/game_archive.h"
-#include "wasteland/wasteland1/data/saved.h"
-#include "wasteland/wasteland1/gfx/pics.h"
+#include "wasteland/core/serializer.h"
+#include "wasteland/wasteland1/core/array1.h"
+#include "wasteland/wasteland1/data/party_member.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
+namespace Data {
 
-class Wasteland1Engine : public Wasteland::Engine {
-private:
-	Wasteland1::Views::Views *_views = nullptr;
-	uint16 _mapX = 0, _mapY = 0;
+struct Party {
+	Array1<int> _members;
+	int _x = 0;
+	int _y = 0;
+	int _map = 0;
+	int _prevX = 0;
+	int _prevY = 0;
+	int _prevMap = 0;
 
-protected:
-	void setup() override;
-
-public:
-	GameArchive *_gameArchive = nullptr;
-	Data::Saved _saved;
-	Gfx::PicsDecoder _pics;
-
-public:
-	Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc);
-	~Wasteland1Engine() override;
-	void initializePath(const Common::FSNode &gamePath) override;
+	Party();
+	void synchronize(Serializer &s);
 };
 
-extern Wasteland1Engine *g_engine;
-
+} // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland
 

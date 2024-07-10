@@ -19,7 +19,7 @@
  *
  */
 
-#include "wasteland/wasteland1/data/parties.h"
+#include "wasteland/wasteland1/core/array1.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
