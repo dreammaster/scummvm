@@ -19,41 +19,56 @@
  *
  */
 
-#include "wasteland/wasteland1/views/dialogs/roster.h"
+#include "wasteland/wasteland1/views/gfx/animation.h"
 #include "wasteland/wasteland1/gfx/pics.h"
 #include "wasteland/wasteland1/wasteland1.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
-namespace Dialogs {
 
-Roster::Roster() : Dialog("Roster"),
-		_create(this, "Create", "CREATE", 11, 24),
-		_delete(this, "Delete", "DELETE", 18, 24),
-		_play(this, "Play", "PLAY", 25, 24),
-		_animation("Animation", this, 3, 0) {
+bool Animation::msgFocus(const FocusMessage &msg) {
+	// Get a reference to the specified animation
+	Gfx::PicsDecoder &pics = g_engine->_pics;
+	Gfx::PicsAnimation &anim = pics.getAnimation(_animIndex);
+	auto &frameSets = anim.getFrameSets();
+
+	Common::List<Gfx::PicsAnimationFrameSet>::iterator it = frameSets.begin();
+	for (int i = 0; i < _animSubIndex; ++i)
+		++it;
+
+	auto &frameSet = *it;
+	_anim = &frameSet;
+
+	// Set the animation control area
+	setBounds(Common::Rect(_topLeft.x, _topLeft.y,
+		_topLeft.x + _anim->width(),
+		_topLeft.y + _anim->height()));
+
+	// Start the animation
+	_anim->start();
+	return UIElement::msgFocus(msg);
 }
 
-void Roster::draw() {
+bool Animation::msgUnfocus(const UnfocusMessage &msg) {
+	_anim->stop();
+	return UIElement::msgUnfocus(msg);
+}
+
+void Animation::draw() {
 	Surface s = getSurface();
-	s.clear();
 
-	drawFrame(Common::Rect(0, 0, 39, 24));
-	drawFrame(Common::Rect(0, 0, 39, 23));
-	drawFrame(Common::Rect(0, 0, 13, 13));
-	drawFrame(Common::Rect(14, 0, 39, 13));
-
-	// Draw the location name below the animation
-	s.writeString(g_engine->_saved._saveLocationName, 1, 12);
+	const Graphics::Surface *frame = _anim->getSurface();
+	s.blitFrom(*frame);
 }
 
-bool Roster::msgGame(const GameMessage &msg) {
+bool Animation::tick() {
+	if (_anim->isPlaying() && _anim->needsUpdate())
+		draw();
 
 	return true;
 }
 
-} // namespace Dialogs
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland

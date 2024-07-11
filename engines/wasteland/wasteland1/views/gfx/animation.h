@@ -19,39 +19,42 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_GFX_BUTTON_H
-#define WASTELAND_WASTELAND1_GFX_BUTTON_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_GFX_ANIMATION_H
+#define WASTELAND_WASTELAND1_VIEWS_GFX_ANIMATION_H
 
+#include "wasteland/wasteland1/gfx/pics_animation_frame_set.h"
 #include "wasteland/events.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace Gfx {
+namespace Views {
 
-class Button : public UIElement {
+/**
+ * Animation view class
+ */
+class Animation : public UIElement {
 private:
-	Common::String _text;
-	bool _focused = false;
-
-	/**
-	 * Returns any button immediately to the left/right of the current button.
-	 * Used for drawing the correct left edge between successive buttons
-	 */
-	Button *leftSideButton() const;
-	Button *rightSideButton() const;
+	int _animIndex;
+	int _animSubIndex;
+	Gfx::PicsAnimationFrameSet *_anim = nullptr;
+	Common::Point _topLeft;
 
 public:
-	Button(UIElement *parent, const Common::String &name, const Common::String &text);
-	Button(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y);
-	~Button() override {}
+	Animation(const Common::String &name, UIElement *uiParent,
+			int animIndex, int animSubIndex, int x = 8, int y = 8) :
+		UIElement(name, uiParent),
+		_animIndex(animIndex), _animSubIndex(animSubIndex),
+		_topLeft(x, y) {
+	}
+	virtual ~Animation() {}
 
 	bool msgFocus(const FocusMessage &msg) override;
 	bool msgUnfocus(const UnfocusMessage &msg) override;
 	void draw() override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
+	bool tick() override;
 };
 
-} // namespace Gfx
+} // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
 

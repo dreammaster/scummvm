@@ -149,6 +149,14 @@ public:
 		return _frames;
 	}
 
+	int width() const {
+		return _frames[0]->w;
+	}
+
+	int height() const {
+		return _frames[0]->h;
+	}
+
 	/**
 	 * Returns the instructions.
 	 * @return The instructions
