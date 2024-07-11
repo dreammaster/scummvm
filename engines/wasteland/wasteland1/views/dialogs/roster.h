@@ -24,8 +24,8 @@
 
 #include "graphics/managed_surface.h"
 #include "wasteland/wasteland1/views/dialogs/dialog.h"
-#include "wasteland/wasteland1/gfx/button.h"
-#include "wasteland/wasteland1/gfx/pics_animation_frame_set.h"
+#include "wasteland/wasteland1/views/gfx/animation.h"
+#include "wasteland/wasteland1/views/gfx/button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -34,20 +34,17 @@ namespace Dialogs {
 
 class Roster : public Dialog {
 private:
-	Gfx::Button _create;
-	Gfx::Button _delete;
-	Gfx::Button _play;
-	Gfx::PicsAnimationFrameSet *_anim = nullptr;
+	Button _create;
+	Button _delete;
+	Button _play;
+	Animation _animation;
 
 public:
 	Roster();
 	virtual ~Roster() {}
 
 	bool msgGame(const GameMessage &msg) override;
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
 	void draw() override;
-	bool tick() override;
 };
 
 } // namespace Dialogs

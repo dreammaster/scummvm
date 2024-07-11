@@ -30,7 +30,6 @@ MODULE_OBJS = \
 	wasteland1/files/nibble_stream.o \
 	wasteland1/files/rotating_xor_stream.o \
 	wasteland1/files/vertical_xor_stream.o \
-	wasteland1/gfx/button.o \
 	wasteland1/gfx/cursors.o \
 	wasteland1/gfx/color_font.o \
 	wasteland1/gfx/mono_font.o \
@@ -41,6 +40,8 @@ MODULE_OBJS = \
 	wasteland1/gfx/raw_animation_frame.o \
 	wasteland1/gfx/raw_animation_frame_part.o \
 	wasteland1/views/view.o \
+	wasteland1/views/gfx/animation.o \
+	wasteland1/views/gfx/button.o \
 	wasteland1/views/dialogs/dialog.o \
 	wasteland1/views/dialogs/roster.o \
 	wasteland1/views/dialogs/title.o \

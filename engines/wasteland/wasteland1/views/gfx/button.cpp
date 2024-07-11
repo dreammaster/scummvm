@@ -19,11 +19,11 @@
  *
  */
 
-#include "wasteland/wasteland1/gfx/button.h"
+#include "wasteland/wasteland1/views/gfx/button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
-namespace Gfx {
+namespace Views {
 
 Button::Button(UIElement *parent, const Common::String &name, const Common::String &text) :
 	UIElement(name, parent), _text(text) {
@@ -35,7 +35,7 @@ Button::Button(UIElement *parent, const Common::String &name, const Common::Stri
 	_bounds.setBorderSize(FONT_W, 0, FONT_W, 0);
 }
 
-bool Button::msgFocus(const FocusMessage &msg) {
+bool Button::msgMouseEnter(const MouseEnterMessage &msg) {
 	_focused = true;
 	g_events->setCursor(1);
 
@@ -43,7 +43,7 @@ bool Button::msgFocus(const FocusMessage &msg) {
 	return true;
 }
 
-bool Button::msgUnfocus(const UnfocusMessage &msg) {
+bool Button::msgMouseLeave(const MouseLeaveMessage &msg) {
 	_focused = false;
 	g_events->setCursor(0);
 
@@ -94,6 +94,6 @@ Button *Button::rightSideButton() const {
 
 	return nullptr;
 }
-} // namespace Gfx
+} // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
