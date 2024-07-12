@@ -28,7 +28,7 @@ namespace Views {
 void View::checkFocusedControl(const Common::Point &mousePos) {
 	if (_focusedElement) {
 		if (!_focusedElement->getBounds().contains(mousePos)) {
-			_focusedElement->send(UnfocusMessage());
+			_focusedElement->send(MouseLeaveMessage());
 			_focusedElement = nullptr;
 		}
 
@@ -36,7 +36,7 @@ void View::checkFocusedControl(const Common::Point &mousePos) {
 		for (UIElement *child : _children) {
 			if (child->getBounds().contains(mousePos)) {
 				_focusedElement = child;
-				child->send(FocusMessage());
+				child->send(MouseEnterMessage());
 				break;
 			}
 		}
@@ -60,7 +60,7 @@ bool View::msgFocus(const FocusMessage &msg) {
 
 bool View::msgUnfocus(const UnfocusMessage &msg) {
 	if (_focusedElement)
-		_focusedElement->send(UnfocusMessage());
+		_focusedElement->send(MouseLeaveMessage());
 
 	return UIElement::msgUnfocus(msg);
 }
