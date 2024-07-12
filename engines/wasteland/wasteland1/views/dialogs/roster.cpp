@@ -36,6 +36,8 @@ Roster::Roster() : Dialog("Roster"),
 }
 
 void Roster::draw() {
+	const int WIDTHS[7] = { 3, 11, 2, 3, 3, 3, 6 };
+
 	Surface s = getSurface();
 	s.clear();
 
@@ -46,6 +48,17 @@ void Roster::draw() {
 
 	// Draw the location name below the animation
 	s.writeString(g_engine->_saved._saveLocationName, 1, 12);
+
+	// Write out header row buttons
+	s.setFont(1);
+	int x = 1;
+	for (int btnNum = 0; btnNum < 7; x += WIDTHS[btnNum] + 1, ++btnNum) {
+		s.setTextPos(x, 14);
+		s.writeChar(10);
+		for (int i = 1; i < (WIDTHS[btnNum] - 1); ++i)
+			s.writeChar(18);
+		s.writeChar(11);
+	}
 }
 
 bool Roster::msgGame(const GameMessage &msg) {
