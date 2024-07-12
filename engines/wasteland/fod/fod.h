@@ -44,6 +44,7 @@ private:
 
 protected:
 	void setup() override;
+	GUI::Debugger *getConsole() override;
 
 public:
 	Data::Archetypes _archetypes;

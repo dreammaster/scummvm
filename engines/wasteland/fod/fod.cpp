@@ -23,6 +23,7 @@
 #include "wasteland/fod/fod.h"
 #include "wasteland/fod/gfx/cursors.h"
 #include "wasteland/fod/gfx/font.h"
+#include "wasteland/fod/console.h"
 
 namespace Wasteland {
 namespace FOD {
@@ -68,6 +69,10 @@ void FountainOfDreamsEngine::setup() {
 
 	Gfx::Cursors::load(_cursors);
 	setCursor(0);
+}
+
+GUI::Debugger *FountainOfDreamsEngine::getConsole() {
+	return new Console();
 }
 
 } // namespace FOD

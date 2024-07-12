@@ -19,41 +19,28 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_WASTELAND1_H
-#define WASTELAND_WASTELAND1_WASTELAND1_H
-
-#include "wasteland/engine.h"
-#include "wasteland/wasteland1/views/views.h"
-#include "wasteland/wasteland1/files/game_archive.h"
-#include "wasteland/wasteland1/data/saved.h"
-#include "wasteland/wasteland1/gfx/pics.h"
+#include "wasteland/wasteland1/console.h"
+#include "wasteland/wasteland1/wasteland1.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 
-class Wasteland1Engine : public Wasteland::Engine {
-private:
-	Wasteland1::Views::Views *_views = nullptr;
-	uint16 _mapX = 0, _mapY = 0;
+Console::Console() : Wasteland::Console() {
+	registerCmd("font", WRAP_METHOD(Console, cmdFont));
+}
 
-protected:
-	void setup() override;
-	GUI::Debugger *getConsole() override;
+bool Console::cmdFont(int argc, const char **argv) {
+	auto *font = g_engine->_fonts[1];
+	Graphics::Screen *screen = g_engine->getScreen();
 
-public:
-	GameArchive *_gameArchive = nullptr;
-	Data::Saved _saved;
-	Gfx::PicsDecoder _pics;
+	screen->clear();
+	for (uint i = 0; i < 172; ++i) {
+		font->drawChar(screen, i, (i % 16) * 16, (i / 16) * 16, 255);
+	}
 
-public:
-	Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc);
-	~Wasteland1Engine() override;
-	void initializePath(const Common::FSNode &gamePath) override;
-};
-
-extern Wasteland1Engine *g_engine;
+	screen->update();
+	return false;
+}
 
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif
