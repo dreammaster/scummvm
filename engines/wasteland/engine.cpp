@@ -61,7 +61,7 @@ Common::Error Engine::run() {
 	initGraphics(320, 200);
 
 	// Set the engine's debugger console
-	setDebugger(new Console());
+	setDebugger(getConsole());
 
 	runGame();
 

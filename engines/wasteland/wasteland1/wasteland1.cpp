@@ -26,6 +26,7 @@
 #include "wasteland/wasteland1/gfx/cursors.h"
 #include "wasteland/wasteland1/gfx/color_font.h"
 #include "wasteland/wasteland1/gfx/mono_font.h"
+#include "wasteland/wasteland1/console.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -81,6 +82,10 @@ void Wasteland1Engine::setup() {
 	// Setup game views
 	_views = new Views::Views();
 	addView("Roster");
+}
+
+GUI::Debugger *Wasteland1Engine::getConsole() {
+	return new Console();
 }
 
 } // namespace Wasteland1

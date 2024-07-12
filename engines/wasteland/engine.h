@@ -49,6 +49,7 @@ private:
 protected:
 	// Engine APIs
 	Common::Error run() override;
+	virtual GUI::Debugger *getConsole() = 0;
 
 	/**
 	 * Returns true if the game should quit

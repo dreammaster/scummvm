@@ -14,6 +14,8 @@ MODULE_OBJS = \
 	gfx/surface.o \
 	gfx/text_entry.o \
 	gfx/wasteland_font.o \
+	wasteland1/wasteland1.o \
+	wasteland1/console.o \
 	wasteland1/core/array1.o \
 	wasteland1/data/items.o \
 	wasteland1/data/msq_header.o \
@@ -21,7 +23,6 @@ MODULE_OBJS = \
 	wasteland1/data/party_member.o \
 	wasteland1/data/saved.o \
 	wasteland1/data/skills.o \
-	wasteland1/wasteland1.o \
 	wasteland1/files/bit_stream.o \
 	wasteland1/files/game_archive.o \
 	wasteland1/files/huffman_stream.o \
@@ -46,6 +47,7 @@ MODULE_OBJS = \
 	wasteland1/views/dialogs/roster.o \
 	wasteland1/views/dialogs/title.o \
 	fod/fod.o \
+	fod/console.o \
 	fod/sound.o \
 	fod/core/decoder.o \
 	fod/data/archetypes.o \
