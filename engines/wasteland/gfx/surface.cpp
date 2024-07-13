@@ -74,6 +74,13 @@ void Surface::writeString(const Common::String &str, int x, int y) {
 	writeString(str);
 }
 
+void Surface::writeString(const unsigned char *str, int x, int y) {
+	_textX = x;
+	_textY = y;
+	Common::String s((const char *)str);
+	writeString(s);
+}
+
 void Surface::writeCenteredString(const Common::String &str, int y) {
 	int x = ((this->w / FONT_W) - str.size()) / 2;
 	writeString(str, x, y);
