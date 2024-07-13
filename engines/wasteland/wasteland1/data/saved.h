@@ -32,12 +32,36 @@ namespace Wasteland1 {
 namespace Data {
 
 /**
+ * Sub-section of the saved data. In the original,
+ * this gets separately copied
+ */
+struct Saved2 {
+	byte _field0 = 0;
+	byte _field1 = 0;
+	byte _field2 = 0;
+	byte _field3 = 0;
+	byte _field4 = 0;
+	byte _field5 = 0;
+	byte _activePartyGroup = 0;
+	byte _field7 = 0;
+	byte _field8 = 0;
+	byte _totalPartyGroups = 0;
+	byte _fieldA = 0;
+	byte _fieldB = 0;
+	byte _fieldC = 0;
+	byte _fieldD = 0;
+
+	void synchronize(Serializer &s);
+};
+
+/**
  * Returns party, roster, and other saved data
  */
 struct Saved {
 	Array1<Party> _parties;
 	Array1<PartyMember> _roster;
 	Common::String _saveLocationName;
+	Saved2 _saved2;
 
 	Saved();
 	void synchronize(Serializer &s);

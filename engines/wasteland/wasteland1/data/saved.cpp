@@ -35,7 +35,9 @@ void Saved::synchronize(Serializer &s) {
 	for (uint i = 1; i <= _parties.size(); ++i)
 		_parties[i].synchronize(s);
 
-	s.skip(0x98);	// TODO: Figure out unknown bytes
+	s.skip(64);		// TODO: Figure out unknown bytes
+	_saved2.synchronize(s);
+	s.skip(74);		// TODO: Figure out unknown bytes
 
 	char locName[13];
 	Common::strcpy_s(locName, _saveLocationName.c_str());
@@ -54,6 +56,24 @@ void Saved::load() {
 	File f("savegame");	// Loads savegame block from game1
 	Serializer s(&f);
 	synchronize(s);
+}
+
+
+void Saved2::synchronize(Serializer &s) {
+	s.syncAsByte(_field0);
+	s.syncAsByte(_field1);
+	s.syncAsByte(_field2);
+	s.syncAsByte(_field3);
+	s.syncAsByte(_field4);
+	s.syncAsByte(_field5);
+	s.syncAsByte(_activePartyGroup);
+	s.syncAsByte(_field7);
+	s.syncAsByte(_field8);
+	s.syncAsByte(_totalPartyGroups);
+	s.syncAsByte(_fieldA);
+	s.syncAsByte(_fieldB);
+	s.syncAsByte(_fieldC);
+	s.syncAsByte(_fieldD);
 }
 
 } // namespace Data
