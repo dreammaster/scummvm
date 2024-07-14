@@ -19,10 +19,41 @@
  *
  */
 
-#include "wasteland/wasteland1/core/array1.h"
+#ifndef WASTELAND_WASTELAND1_CORE_TEXT_DECODER_H
+#define WASTELAND_WASTELAND1_CORE_TEXT_DECODER_H
+
+#include "common/str-array.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 
+/**
+ * Text data in Wasteland 1 is encoded using a lookup
+ * table of characters, and 5 bit sequences giving indexes.
+ * It currently suffers from a problem that I don't know when
+ * the data for the final page ends, so I'm only using it
+ * internally and manually stopping it at the right time to
+ * get the text for the last page, and then copying and
+ * pasting the decoded text directly into the source code.
+ */
+class TextDecoder {
+private:
+	Common::Array<Common::StringArray> _text;
+	const byte *_lookup;
+	const byte *_textPtr;
+	byte _capitalize = 0;
+	int _ctr = -1;
+	byte _mask = 0;
+
+	Common::String getString();
+	int getIndex();
+	char getChar();
+
+public:
+	TextDecoder(const byte *data);
+};
+
 } // namespace Wasteland1
 } // namespace Wasteland
+
+#endif
