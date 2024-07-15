@@ -37,11 +37,14 @@ TextView::TextView(const Common::String &name, UIElement *uiParent,
 
 void TextView::draw() {
 	Surface s = getSurface();
+	s.clear();
 	s.setFont(0);
 
 	for (uint y = 0; y < size(); ++y) {
-		if (y < (int)_text.size())
-			s.writeString(_text[y], 0, y);
+		int lineNum = _text.size() - size() + y;
+
+		if (lineNum >= 0)
+			s.writeString(_text[lineNum], 0, y);
 	}
 }
 
@@ -60,27 +63,39 @@ void TextView::print(const char *fmt, ...) {
 }
 
 void TextView::print(const Common::String &str) {
-	uint32 p;
-	Common::String text = str;
+	if (str.empty())
+		return;
+	if (_text.empty())
+		_text.push_back("");
 
-	while (!text.empty()) {
-		// Get the next line
+	// Add in the text. Each time a newline is encountered,
+	// add in a new row
+	Common::String temp = str;
+	uint32 p;
+	while (!temp.empty()) {
 		Common::String line;
-		p = text.findFirstOf('\r');
+		p = temp.findFirstOf('\r');
 
 		if (p != Common::String::npos) {
-			line = Common::String(text.c_str(), text.c_str() + p);
-			text = Common::String(text.c_str() + p + 1);
+			// Get the line
+			line = Common::String(temp.c_str(), p);
+			temp = Common::String(temp.c_str() + p + 1);
 		} else {
-			line = text;
-			text.clear();
+			line = temp;
+			temp.clear();
 		}
 
-		// Add it to the saved lines
-		if (_text.size() == size())
-			_text.remove_at(0);
-		_text.push_back(line);
+		_text.back() += line;
+
+		if (p != Common::String::npos) {
+			// Move to next line
+			if (_text.size() == size())
+				_text.remove_at(0);
+			_text.push_back("");
+		}
 	}
+
+	redraw();
 }
 
 } // namespace Gfx
