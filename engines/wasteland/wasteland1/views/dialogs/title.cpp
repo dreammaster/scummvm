@@ -47,15 +47,15 @@ static const char *const TEXT[] = {
 	"\rPlace : EARTH\r",
 	"Year  : 1998\r",
 	"Status: DEFCON 1\r\r",
-	"\r Computer defense initiative activated.\r",
-	"\r Diplomatic solutions to the world's\r",
-	" problems fail and war erupts as some\r",
-	" madmen press ahead with their insane\r dreams.\r",
-	"Current condition:\r",
-	"High concentrations of radiation\r",
-	"produce random storms and mutations.\r",
-	"Somehow life continues in the\r",
-	"Wasteland!\r"
+	" Diplomatic solutions to the world's\r"
+		" problems fail and war erupts as some\r"
+		" madmen press ahead with their insane\r"
+		" dreams.\r",
+	" Current condition:\r"
+		" High concentrations of radiation\r"
+		" produce random storms and mutations.\r"
+		" Somehow life continues in the\r"
+		" Wasteland!\r"
 };
 
 
@@ -126,13 +126,41 @@ void Title::timeout() {
 }
 
 void Title::setText() {
-	switch (_textNum++) {
+	int textNum = _textNum++;
+	Common::String s;
+
+	switch (textNum) {
 	case 0:
-		_textView.print(TEXT[0]);
+	case 1:
+	case 2:
+		_textView.clear();
+		_textView.print(TEXT[textNum]);
 		delaySeconds(3);
 		break;
 
+	case 3:
+	case 4:
+	case 5:
+		if (textNum == 3)
+			_textView.clear();
+		_textView.print(TEXT[textNum]);
+		if (textNum == 5)
+			delaySeconds(3);
+		else
+			delayFrames(10);
+		break;
+
+	case 6:
+		_textView.clear();
+		_textView.print(TEXT[6]);
+		delaySeconds(5);
+		break;
+
 	default:
+		_textNum = 0;
+		_textView.clear();
+		_textView.print(TEXT[7]);
+		delaySeconds(10);
 		break;
 	}
 }
