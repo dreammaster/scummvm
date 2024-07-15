@@ -13,6 +13,7 @@ MODULE_OBJS = \
 	gfx/clickable_text.o \
 	gfx/surface.o \
 	gfx/text_entry.o \
+	gfx/text_view.o \
 	gfx/wasteland_font.o \
 	wasteland1/wasteland1.o \
 	wasteland1/console.o \
