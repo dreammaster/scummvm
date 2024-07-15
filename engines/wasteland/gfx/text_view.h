@@ -19,43 +19,45 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
-#define WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
+#ifndef WASTELAND_GFX_TEXT_VIEW_H
+#define WASTELAND_GFX_TEXT_VIEW_H
 
-#include "graphics/managed_surface.h"
-#include "wasteland/gfx/text_view.h"
-#include "wasteland/wasteland1/views/dialogs/dialog.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "common/str-array.h"
+#include "wasteland/events.h"
 
 namespace Wasteland {
-namespace Wasteland1 {
-namespace Views {
-namespace Dialogs {
+namespace Shared {
+namespace Gfx {
 
-class Title : public Dialog {
+class TextView : public UIElement {
 private:
-	Graphics::ManagedSurface _surface;
-	Shared::Gfx::TextView _textView;
-	Button _start;
-	int _textNum = 0;
+	Common::StringArray _text;
 
-	void setText();
-
+	/**
+	 * Returns the number of rows that the view contains
+	 */
+	uint size() const {
+		return _bounds.height() / FONT_H;
+	}
 public:
-	Title();
-	virtual ~Title() {}
+	TextView(const Common::String &name, UIElement *uiParent);
+	TextView(const Common::String &name, UIElement *uiParent,
+		const Common::Rect &r);
 
-	bool msgAction(const ActionMessage &msg) override;
-	bool msgGame(const GameMessage &msg) override;
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
+	void setBounds(const Common::Rect &r) override {
+		UIElement::setBounds(r);
+		clear();
+	}
+
 	void draw() override;
-	void timeout() override;
+
+	void clear();
+	void print(const char *fmt, ...);
+	void print(const Common::String &str);
 };
 
-} // namespace Dialogs
-} // namespace Views
-} // namespace Wasteland1
+} // namespace Gfx
+} // namespace Shared
 } // namespace Wasteland
 
 #endif
