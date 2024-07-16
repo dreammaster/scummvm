@@ -25,6 +25,7 @@ MODULE_OBJS = \
 	wasteland1/data/party_member.o \
 	wasteland1/data/saved.o \
 	wasteland1/data/skills.o \
+	wasteland1/data/text.o \
 	wasteland1/files/bit_stream.o \
 	wasteland1/files/game_archive.o \
 	wasteland1/files/huffman_stream.o \

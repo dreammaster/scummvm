@@ -29,15 +29,19 @@ namespace Wasteland1 {
 TextDecoder::TextDecoder(const byte *data) : _lookup(data) {
 	int count = READ_LE_UINT16(_lookup + 60) / 2;
 	const byte *nextPtr = nullptr;
+	int offset;
 
 	for (int i = 0; i < count; ++i) {
-		_textPtr = data + 60 + READ_LE_UINT16(data + 60 + i * 2);
-		nextPtr = data + 60 + ((i == (count - 1)) ? 999 :
+		if (i >= 42) break;
+
+		offset = READ_LE_UINT16(data + 60 + i * 2);
+		_textPtr = data + 60 + offset;
+		nextPtr = data + 60 + ((i == (count - 1)) ?
+			offset + 100 :
 			READ_LE_UINT16(data + 60 + (i + 1) * 2));
 		_ctr = -1;
 		_mask = 0;
 
-		_text.push_back(Common::StringArray());
 		while (_textPtr < (nextPtr - 1)) {
 			Common::String s = getString();
 
@@ -45,15 +49,19 @@ TextDecoder::TextDecoder(const byte *data) : _lookup(data) {
 			for (uint idx = 0; idx < s.size(); ++idx) {
 				if (s[idx] == '\r')
 					debugN("\\r");
+				else if (s[idx] == '\n')
+					debugN("\\n");
+				else if (s[idx] == '\v')
+					debugN("\\v");
+				else if (s[idx] < 32)
+					debugN("\\x%x\"\"", (int)s[idx]);
 				else
 					debugN("%c", s[idx]);
 			}
-			debugN("\"\n");
+			debug("\",");
 
-			_text.back().push_back(s);
+			push_back(s);
 		}
-
-		debug("----");
 	}
 }
 
