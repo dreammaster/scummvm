@@ -19,39 +19,19 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_CORE_TEXT_DECODER_H
-#define WASTELAND_WASTELAND1_CORE_TEXT_DECODER_H
+#ifndef WASTELAND_WASTELAND1_DATA_TEXT_H
+#define WASTELAND_WASTELAND1_DATA_TEXT_H
 
-#include "common/str-array.h"
+#include "wasteland/core/serializer.h"
+#include "wasteland/wasteland1/core/array1.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
+namespace Data {
 
-/**
- * Text data in Wasteland 1 is encoded using a lookup
- * table of characters, and 5 bit sequences giving indexes.
- * It currently suffers from a problem that I don't know when
- * the data for the final page ends, so I'm only using it
- * internally and manually stopping it at the right time to
- * get the text for the last page, and then copying and
- * pasting the decoded text directly into the source code.
- */
-class TextDecoder : public Common::StringArray {
-private:
-	const byte *_lookup;
-	const byte *_textPtr;
-	byte _capitalize = 0;
-	int _ctr = -1;
-	byte _mask = 0;
+extern const char *const TEXT_STRINGS[];
 
-	Common::String getString();
-	int getIndex();
-	char getChar();
-
-public:
-	TextDecoder(const byte *data);
-};
-
+} // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland
 
