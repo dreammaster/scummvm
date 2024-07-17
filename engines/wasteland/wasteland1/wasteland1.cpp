@@ -81,7 +81,7 @@ void Wasteland1Engine::setup() {
 
 	// Setup game views
 	_views = new Views::Views();
-	addView("Title");
+	addView("Roster");
 }
 
 GUI::Debugger *Wasteland1Engine::getConsole() {

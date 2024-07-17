@@ -32,7 +32,7 @@ Saved::Saved() {
 }
 
 void Saved::synchronize(Serializer &s) {
-	for (uint i = 1; i <= _parties.size(); ++i)
+	for (uint i = 0; i < _parties.size(); ++i)
 		_parties[i].synchronize(s);
 
 	s.skip(64);		// TODO: Figure out unknown bytes
@@ -65,7 +65,7 @@ void Saved2::synchronize(Serializer &s) {
 	s.syncAsByte(_field2);
 	s.syncAsByte(_field3);
 	s.syncAsByte(_field4);
-	s.syncAsByte(_field5);
+	s.syncAsByte(_membersInGroup);
 	s.syncAsByte(_activePartyGroup);
 	s.syncAsByte(_field7);
 	s.syncAsByte(_field8);
@@ -74,6 +74,11 @@ void Saved2::synchronize(Serializer &s) {
 	s.syncAsByte(_fieldB);
 	s.syncAsByte(_fieldC);
 	s.syncAsByte(_fieldD);
+}
+
+void Saved::setCurrentCharacter(int partyNum) {
+	auto &party = _parties[_saved2._activePartyGroup];
+	_currentCharacter = &_roster[party._members[partyNum]];
 }
 
 } // namespace Data

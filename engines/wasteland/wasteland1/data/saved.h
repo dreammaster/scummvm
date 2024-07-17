@@ -41,7 +41,7 @@ struct Saved2 {
 	byte _field2 = 0;
 	byte _field3 = 0;
 	byte _field4 = 0;
-	byte _field5 = 0;
+	byte _membersInGroup = 0;
 	byte _activePartyGroup = 0;
 	byte _field7 = 0;
 	byte _field8 = 0;
@@ -58,10 +58,11 @@ struct Saved2 {
  * Returns party, roster, and other saved data
  */
 struct Saved {
-	Array1<Party> _parties;
+	Common::Array<Party> _parties;
 	Array1<PartyMember> _roster;
 	Common::String _saveLocationName;
 	Saved2 _saved2;
+	PartyMember *_currentCharacter = nullptr;
 
 	Saved();
 	void synchronize(Serializer &s);
@@ -70,6 +71,11 @@ struct Saved {
 	 * Loads the data from the original files
 	 */
 	void load();
+
+	/**
+	 * Sets the currently active/in-use character
+	 */
+	void setCurrentCharacter(int partyNum);
 };
 
 } // namespace Data
