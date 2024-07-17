@@ -38,12 +38,15 @@ private:
 	Button _delete;
 	Button _play;
 	Animation _animation;
+	int _selectedMember = -1;
+
+	void writeParty();
+	void writePartyMember(int partyNum);
 
 public:
 	Roster();
 	virtual ~Roster() {}
 
-	bool msgGame(const GameMessage &msg) override;
 	void draw() override;
 };
 

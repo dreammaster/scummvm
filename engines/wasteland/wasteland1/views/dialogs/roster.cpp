@@ -29,10 +29,10 @@ namespace Views {
 namespace Dialogs {
 
 Roster::Roster() : Dialog("Roster"),
-		_create(this, "Create", "CREATE", 11, 24),
-		_delete(this, "Delete", "DELETE", 18, 24),
-		_play(this, "Play", "PLAY", 25, 24),
-		_animation("Animation", this, 3, 0) {
+_create(this, "Create", "CREATE", 11, 24),
+_delete(this, "Delete", "DELETE", 18, 24),
+_play(this, "Play", "PLAY", 25, 24),
+_animation("Animation", this, 3, 0) {
 }
 
 void Roster::draw() {
@@ -75,11 +75,34 @@ void Roster::draw() {
 
 	s.writeString(HEADER_ROW1, 0, 14);
 	s.writeString(HEADER_ROW2, 0, 15);
+	writeParty();
 }
 
-bool Roster::msgGame(const GameMessage &msg) {
+void Roster::writeParty() {
+	const auto &saved = g_engine->_saved;
+	const auto &saved2 = saved._saved2;
 
-	return true;
+	for (int i = 1; i <= saved2._membersInGroup; ++i) {
+		writePartyMember(i);
+	}
+}
+
+void Roster::writePartyMember(int partyNum) {
+	Surface s = getSurface();
+	s.setInverseColor(partyNum == _selectedMember);
+	s.writeChar('0' + partyNum, 1, 15 + partyNum);
+	s.writeChar('>');
+	s.setInverseColor(false);
+
+	auto &saved = g_engine->_saved;
+	saved.setCurrentCharacter(partyNum);
+	const auto &member = *saved._currentCharacter;
+
+	s.writeString(member._name);
+	s.setTextPos(17, 15 + partyNum);
+	s.writeString(Common::String::format("%2d", member._ac));
+
+	// TODO
 }
 
 } // namespace Dialogs
