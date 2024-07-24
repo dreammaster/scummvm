@@ -63,7 +63,7 @@ struct PartyMember {
 	int _willingness = 0;
 	Common::String _rank;
 	Skills _skills;
-	Items _items;
+	InventoryItems _items;
 
 	void synchronize(Serializer &s);
 };

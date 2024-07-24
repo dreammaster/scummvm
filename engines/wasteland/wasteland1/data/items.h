@@ -29,16 +29,16 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Data {
 
-struct Item {
+struct InventoryItem {
 	int8 _id = 0;
-	int8 _load = 0;
+	int8 _quantity = 0;
 
-	Item() {}
+	InventoryItem() {}
 	void synchronize(Serializer &s);
 };
 
-struct Items : public Array1<Item> {
-	Items();
+struct InventoryItems : public Array1<InventoryItem> {
+	InventoryItems();
 	void synchronize(Serializer &s);
 };
 
