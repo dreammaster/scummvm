@@ -25,20 +25,32 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Data {
 
-Items::Items() {
+InventoryItems::InventoryItems() {
 	resize(30);
 }
 
-void Items::synchronize(Serializer &s) {
+void InventoryItems::synchronize(Serializer &s) {
 	for (uint i = 1; i <= size(); ++i)
 		(*this)[i].synchronize(s);
 }
 
-void Item::synchronize(Serializer &s) {
+void InventoryItem::synchronize(Serializer &s) {
 	s.syncAsByte(_id);
-	s.syncAsByte(_load);
+	s.syncAsByte(_quantity);
 }
+/*
+static const int8 AMMUNITION_ITEMS[] = {
+	 13, 10, 11, 12, 2, 3, 4, 5,  6, 7, 8, 9, -1
+};
+bool InventoryItem::hasNoAmmunition() const {
+	for (const int8 *ptr = AMMUNITION_ITEMS; *ptr >= 0; ++ptr) {
+		if (*ptr == _id)
+			return false;
+	}
 
+	return true;
+}
+*/
 } // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland

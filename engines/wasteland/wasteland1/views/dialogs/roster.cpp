@@ -102,6 +102,16 @@ void Roster::writePartyMember(int partyNum) {
 	s.setTextPos(17, 15 + partyNum);
 	s.writeString(Common::String::format("%2d", member._ac));
 
+	int weapon = member._weapon;
+	int ammunition = 0;
+
+	if (weapon) {
+		auto &invItem = member._items[weapon];
+		if (!invItem.hasNoAmmunition() && invItem._quantity)
+			ammunition = invItem._quantity & 63;
+	}
+	s.writeString(Common::String::format("%4d", ammunition));
+
 	// TODO
 }
 
