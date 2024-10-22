@@ -147,7 +147,7 @@ private:
 	uint32 _playTime;
 	Point _mousePos;
 	uint _specialButtons;
-	uint8  _buttonsDown;
+	byte  _buttonsDown;
 
 	/**
 	 * Check whether it's time to display the next screen frame

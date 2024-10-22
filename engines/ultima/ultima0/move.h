@@ -19,15 +19,14 @@
  *
  */
 
-#include "ultima/ultima0/game.h"
+#include "ultima/ultima0/struct.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-EMPTY_MESSAGE_MAP(Ultima0Game, Shared::Game);
+extern void MOVEEnterExit(WORLDMAP *, PLAYER *, DUNGEONMAP *);
+extern void MOVEMove(int, WORLDMAP *, PLAYER *, DUNGEONMAP *, int, int);
+extern void MOVERotLeft(COORD *);
 
-Ultima0Game::Ultima0Game() : Shared::Game() {
-}
-
-} // End of namespace Ultima0
-} // End of namespace Ultima
+} // namespace Ultima0
+} // namespace Ultima

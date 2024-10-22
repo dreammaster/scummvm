@@ -11,6 +11,28 @@ MODULE_OBJS := \
 	shared/engine/events.o \
 	shared/std/string.o
 
+ifdef ENABLE_AKALABETH
+MODULE_OBJS += \
+	ultima0/akalabeth.o \
+	ultima0/attack.o \
+	ultima0/british.o \
+	ultima0/ddraw.o \
+	ultima0/dead.o \
+	ultima0/draw.o \
+	ultima0/draw2.o \
+	ultima0/draw3.o \
+	ultima0/dungeon.o \
+	ultima0/globals.o \
+	ultima0/hardware.o \
+	ultima0/main.o \
+	ultima0/monst.o \
+	ultima0/move.o \
+	ultima0/player.o \
+	ultima0/sdw.o \
+	ultima0/town.o \
+	ultima0/world.o
+endif
+
 ifdef ENABLE_ULTIMA1
 MODULE_OBJS += \
 	shared/actions/action.o \

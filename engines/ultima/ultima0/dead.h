@@ -19,24 +19,13 @@
  *
  */
 
-#ifndef ULTIMA_ULTIMA0_GAME_H
-#define ULTIMA_ULTIMA0_GAME_H
-
-#include "ultima/shared/early/game.h"
+#include "ultima/ultima0/struct.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-class Ultima0Game : public Shared::Game {
-	DECLARE_MESSAGE_MAP;
-public:
-	CLASSDEF;
-	Ultima0Game();
-	~Ultima0Game() override {}
+extern void DEADCode(PLAYER *);
+extern int  DEADGetYesNo(void);
 
-};
-
-} // End of namespace Ultima0
-} // End of namespace Ultima
-
-#endif
+} // namespace Ultima0
+} // namespace Ultima

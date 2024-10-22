@@ -19,8 +19,14 @@
  *
  */
 
-#include "ultima/ultima0/core/resources.h"
+#include "ultima/ultima0/struct.h"
 
 namespace Ultima {
+namespace Ultima0 {
 
-} // End of namespace Ultima
+extern int  MAINSuper();
+extern void MAINSetup();
+extern void MAINStart();
+
+} // namespace Ultima0
+} // namespace Ultima

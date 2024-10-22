@@ -19,19 +19,16 @@
  *
  */
 
-#ifndef ULTIMA_ULTIMA0_RESOURCES_H
-#define ULTIMA_ULTIMA0_RESOURCES_H
-
-#include "ultima/shared/engine/resources.h"
+#include "ultima/ultima0/struct.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-class Resources : public Shared::LocalResourceFile {
+extern void DRAWTile(RECT *, int);
+extern void DRAWSetRect(RECT *, int, int, int, int);
+extern void DRAWMonster(int, int, int, double);
+extern void DRAWDungeon(RECT *, RECT *, int, int, int, int, int);
+extern void DRAWText(const char *, ...);
 
-};
-
-} // End of namespace Ultima0
-} // End of namespace Ultima
-
-#endif
+} // namespace Ultima0
+} // namespace Ultima

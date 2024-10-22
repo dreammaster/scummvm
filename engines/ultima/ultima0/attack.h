@@ -19,8 +19,12 @@
  *
  */
 
-#include "ultima/shared/engine/resources.h"
+#include "ultima/ultima0/struct.h"
 
 namespace Ultima {
+namespace Ultima0 {
 
-} // End of namespace Ultima
+extern void ATTACKMonster(PLAYER *, DUNGEONMAP *);
+
+} // namespace Ultima0
+} // namespace Ultima

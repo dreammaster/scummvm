@@ -104,6 +104,13 @@ public:
 	}
 
 	/**
+	 * Sets the random number seed
+	 */
+	void setRandomSeed(uint seed) {
+		_randomSource.setSeed(seed);
+	}
+
+	/**
 	 * Returns a file system node for the game directory
 	 */
 	Common::FSNode getGameDirectory() const;
