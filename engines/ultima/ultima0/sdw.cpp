@@ -20,6 +20,7 @@
  */
 
 #include "common/system.h"
+#include "common/events.h"
 #include "common/textconsole.h"
 #include "ultima/ultima0/sdw.h"
 
@@ -37,9 +38,7 @@ static AudioObject *SoundList[MAXSOUND];     // Audio objects in use.
 
 static uint32 _GetPixel(SDL_Surface *Surface, int x, int y);
 
-static void SoundInitialise();
-static void SoundTerminate();
-static void SoundCallBack(void *Data,byte *Stream,int Length);
+//static void SoundCallBack(void *Data,byte *Stream,int Length);
 
 //	**************************************************************************************************************************
 //
@@ -802,11 +801,13 @@ void Timer::WaitTimer()					// Wait for the timer to time out
 //
 //	**************************************************************************************************************************
 
+#ifdef TODO
 static int _Process(int Pos)					// Converts an analogue position to a digital directional value
 {
 	if (abs(Pos) < 1024) return 0;
 	return (Pos < 0) ? -1 : 1;
 }
+#endif
 
 int SDLWrapper::ReadStick(int &A,int &B,int &dx,int &dy)
 {
@@ -846,28 +847,29 @@ int SDLWrapper::ReadStick(int &A,int &B,int &dx,int &dy)
 //
 //	**************************************************************************************************************************
 
-int SDLWrapper::ExitKey()
-{
-    SDL_Event e;
+int SDLWrapper::ExitKey() {
+	int key;
 
-    byte *Key;
-	while (SDL_PollEvent(&e)) {}				// Process the event queue
-    Key = SDL_GetKeyState(nullptr);
-    return (Key[SDLK_ESCAPE] != 0);
+	do {
+		key = GetKey();
+	} while (key != Common::KEYCODE_ESCAPE && key != -1);
+
+	return key;
 }
 
-int SDLWrapper::GetKey()
-{
-	SDL_Event e;
-	int Key = -1;
-	
-	while (Key < 0)
-	{
-		while (SDL_PollEvent(&e))
-			if (e.type == SDL_KEYDOWN)
-				Key = e.key.keysym.sym;
+int SDLWrapper::GetKey() {
+	Common::Event e;
+
+	while (!g_engine->shouldQuit()) {
+		while (g_system->getEventManager()->pollEvent(e)) {
+			if (e.type == Common::EVENT_KEYDOWN)
+				return e.kbd.keycode;
+		}
+
+		g_system->delayMillis(10);
 	}
-	return Key;
+
+	return -1;
 }
 
 //	**************************************************************************************************************************
@@ -876,8 +878,9 @@ int SDLWrapper::GetKey()
 //
 //	**************************************************************************************************************************
 
-int SDLWrapper::MouseClick(int &x,int &y)
-{
+int SDLWrapper::MouseClick(int &x,int &y) {
+	return false;
+#if 0
 	int n;
 	SDL_Event e;
 	SDL_ShowCursor(SDL_ENABLE);					// Bring the cursor back
@@ -892,6 +895,7 @@ int SDLWrapper::MouseClick(int &x,int &y)
 	SDL_ShowCursor(SDL_DISABLE);				// Hide mouse cursor
 	n = n & SDL_BUTTON(1);						// Return true if left pressed, false otherwise
 	return n;
+#endif
 }
 
 //	**************************************************************************************************************************
@@ -902,6 +906,7 @@ int SDLWrapper::MouseClick(int &x,int &y)
 
 void AudioObject::CopyStream(void *Stream,int Reqd)
 {
+#ifdef TODO
     int Qty = Reqd;                             // Bytes to copy
     if (SoundOn == 0) return;
     if (Qty > Length-Position)                  // Can't use more than are available
@@ -919,6 +924,7 @@ void AudioObject::CopyStream(void *Stream,int Reqd)
                                     SDL_MIX_MAXVOLUME);
         Position = Position + Qty;
     }
+#endif
 }
 
 //	**************************************************************************************************************************
@@ -953,6 +959,7 @@ void AudioObject::Detach()
 
 void AudioWave::Load(char *File)
 {
+#ifdef TODO
     SDL_AudioSpec Wave;
     byte *WaveData;
     uint32 Size;
@@ -980,6 +987,7 @@ void AudioWave::Load(char *File)
     Length = Cvt.len_cvt;
     Position = 0;
     SDL_UnlockAudio();
+#endif
 }
 
 //	**************************************************************************************************************************
@@ -990,6 +998,7 @@ void AudioWave::Load(char *File)
 
 void AudioBeep::CreateBeep(int sPitch,int sLength)
 {
+#ifdef TODO
     int Size = AudioFmt.freq * sLength / 1000;
     SDWASSERT(AudioFmt.format = AUDIO_S16);     // We must be using 16 bit signed here ?
     Uint16 *Wave = (Uint16 *)malloc(Size*2);    // Allocate a buffer for it
@@ -999,15 +1008,18 @@ void AudioBeep::CreateBeep(int sPitch,int sLength)
     Length = Size*2;
     Position = 0;
     SDL_UnlockAudio();
+#endif
 }
 
 void AudioObject::Write(int Pos,int Dat)
 {
+#ifdef TODO
     if (Pos >= 0 && Pos < Length/2)
     {
         Uint16 *Wave = (Uint16 *)Data;
         Wave[Pos] = Dat;
     }
+#endif
 }
 
 //	**************************************************************************************************************************
@@ -1016,9 +1028,10 @@ void AudioObject::Write(int Pos,int Dat)
 //
 //	**************************************************************************************************************************
 
-void AudioBeep::CreateWave(void *Data,int Size,int sPitch)
+void AudioBeep::CreateWave(void *data,int Size,int sPitch)
 {
-    Uint16 *Wave = (Uint16 *)Data;
+#ifdef TODO
+    Uint16 *Wave = (Uint16 *)data;
     int PCount = 0;
     int PValue = 32700;
     int PMax = 0;
@@ -1031,6 +1044,7 @@ void AudioBeep::CreateWave(void *Data,int Size,int sPitch)
             PCount = 0;PValue = -PValue;
         }
     }
+#endif
 }
 
 
@@ -1040,7 +1054,7 @@ void AudioBeep::CreateWave(void *Data,int Size,int sPitch)
 //
 //	**************************************************************************************************************************
 
-
+#ifdef TODO
 static void SoundCallBack(void *Data,byte *Stream,int Length)
 {
     Data = Data;                                // Stops nagging :)
@@ -1050,38 +1064,7 @@ static void SoundCallBack(void *Data,byte *Stream,int Length)
                     SoundList[i]->CopyStream(Stream,Length);
     }
 }
-
-//	**************************************************************************************************************************
-//
-//							                Initialise Sound System
-//
-//	**************************************************************************************************************************
-
-static void SoundInitialise()
-{
-    for (int i = 0;i < MAXSOUND;i++)            // Erase all sound objects
-                            SoundList[i] = nullptr;
-    AudioFmt.freq = 22050;                      // Frequency of reproduction
-    AudioFmt.format = AUDIO_S16;                // 16 bit sound
-    AudioFmt.channels = 1;                      // No of channels
-    AudioFmt.samples = 1024;                    // Sample length
-    AudioFmt.callback = SoundCallBack;       // Callback function
-    AudioFmt.userdata = nullptr;                   // Don't use this :)
-    if (SDL_OpenAudio(&AudioFmt,nullptr) < 0)      // Open the audio devices
-                                    SDWERROR(); // ... or not.
-    SDL_PauseAudio(0);                          // Turn the audio system on.
-}
-
-//	**************************************************************************************************************************
-//
-//							                Terminate sound systems
-//
-//	**************************************************************************************************************************
-
-static void SoundTerminate()
-{
-        SDL_CloseAudio();                       // Close the audio devices
-}
+#endif
 
 } // namespace Ultima0
 } // namespace Ultima

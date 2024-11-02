@@ -246,7 +246,7 @@ public:
 		CreateBeep(p, l);
 	}
 protected:
-	void CreateWave(void *Data, int Size, int sPitch);
+	void CreateWave(void *data, int Size, int sPitch);
 	void CreateBeep(int sPitch, int sLength);
 };
 

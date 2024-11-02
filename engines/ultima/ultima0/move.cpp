@@ -40,7 +40,7 @@ namespace Ultima0 {
 
 void MOVEMove(int c,WORLDMAP *w,PLAYER *p,DUNGEONMAP *d,int xi,int yi)
 {
-	int z,x1,y1,Moved;
+	int z,x1,y1,Moved = 0;
 	const char *s1, *s2;
 	double n;
 	COORD New;
