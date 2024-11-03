@@ -46,8 +46,8 @@ namespace Ultima0 {
 #define C_WHITE 	RGB(1,1,1)
 #define C_CYAN		RGB(0,1,1)
 
-#define RND()			g_ultima->rnd()
-#define RANDOM()		g_ultima->getRandomNumber(0xffff)
+#define RND()			g_engine->rnd()
+#define RANDOM()		g_engine->getRandomNumber(0xffff)
 
 #define	WT_SPACE		(0)					/* World Tiles */
 #define WT_MOUNTAIN		(1)

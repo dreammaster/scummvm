@@ -22,7 +22,7 @@
 #include "common/system.h"
 #include "common/events.h"
 #include "common/textconsole.h"
-#include "ultima/ultima0/sdw.h"
+#include "ultima/ultima0/game/sdw.h"
 
 namespace Ultima {
 namespace Ultima0 {
@@ -679,8 +679,8 @@ static uint32 _GetPixel(SDL_Surface *Surface, int x, int y) {
 //	**************************************************************************************************************************
 
 void Surface::Flip() {
-	g_ultima->_screen->blitFrom(*Display);
-	g_ultima->_screen->update();
+	g_engine->_screen->blitFrom(*Display);
+	g_engine->_screen->update();
 }
 
 //	**************************************************************************************************************************
@@ -751,11 +751,11 @@ void Surface::VerticalMirror(int x1,int y1,int x2,int y2)
 //	**************************************************************************************************************************
 
 int SDLWrapper::GameClock() {
-	return (int)g_ultima->getTicks() * GameSpeed/100;
+	return (int)g_engine->getTicks() * GameSpeed/100;
 }
 
 int SDLWrapper::SystemClock() {
-	return (int)g_ultima->getTicks();
+	return (int)g_engine->getTicks();
 }
 
 //	**************************************************************************************************************************

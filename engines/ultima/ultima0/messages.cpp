@@ -19,34 +19,26 @@
  *
  */
 
-#include "common/system.h"
-#include "engines/util.h"
-#include "ultima/ultima0/akalabeth.h"
-#include "ultima/ultima0/console.h"
-#include "ultima/ultima0/game/sdw.h"
+#include "ultima/ultima0/messages.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-AkalabethEngine::AkalabethEngine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc) :
-		Shared::UltimaEngine(syst, gameDesc), Events() {
-	g_engine = this;
-}
-
-Common::Error AkalabethEngine::run() {
-	initGraphics(DEFAULT_SCX, DEFAULT_SCY);
-	_screen = new Graphics::Screen();
-
-	// Set the engine's debugger console
-	setDebugger(new Console());
-
-	runGame();
-
-	return Common::kNoError;
-}
-
-uint32 AkalabethEngine::getTicks() const {
-	return g_system->getMillis();
+MouseMessage::MouseMessage(Common::EventType type,
+	const Common::Point &pos) : Message(), _pos(pos) {
+	switch (type) {
+	case Common::EVENT_RBUTTONDOWN:
+	case Common::EVENT_RBUTTONUP:
+		_button = MB_RIGHT;
+		break;
+	case Common::EVENT_MBUTTONDOWN:
+	case Common::EVENT_MBUTTONUP:
+		_button = MB_MIDDLE;
+		break;
+	default:
+		_button = MB_LEFT;
+		break;
+	}
 }
 
 } // namespace Ultima0

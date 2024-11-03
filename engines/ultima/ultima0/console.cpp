@@ -19,34 +19,21 @@
  *
  */
 
-#include "common/system.h"
-#include "engines/util.h"
-#include "ultima/ultima0/akalabeth.h"
 #include "ultima/ultima0/console.h"
-#include "ultima/ultima0/game/sdw.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-AkalabethEngine::AkalabethEngine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc) :
-		Shared::UltimaEngine(syst, gameDesc), Events() {
-	g_engine = this;
+Console::Console() : GUI::Debugger() {
+	registerCmd("test", WRAP_METHOD(Console, Cmd_test));
 }
 
-Common::Error AkalabethEngine::run() {
-	initGraphics(DEFAULT_SCX, DEFAULT_SCY);
-	_screen = new Graphics::Screen();
-
-	// Set the engine's debugger console
-	setDebugger(new Console());
-
-	runGame();
-
-	return Common::kNoError;
+Console::~Console() {
 }
 
-uint32 AkalabethEngine::getTicks() const {
-	return g_system->getMillis();
+bool Console::Cmd_test(int argc, const char **argv) {
+	debugPrintf("Test\n");
+	return true;
 }
 
 } // namespace Ultima0

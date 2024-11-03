@@ -26,26 +26,14 @@
 #include "ultima/shared/engine/ultima.h"
 #include "ultima/ultima0/defines.h"
 #include "ultima/ultima0/struct.h"
-#include "ultima/ultima0/attack.h"
-#include "ultima/ultima0/british.h"
-#include "ultima/ultima0/ddraw.h"
-#include "ultima/ultima0/dead.h"
-#include "ultima/ultima0/draw.h"
-#include "ultima/ultima0/dungeon.h"
-#include "ultima/ultima0/globals.h"
-#include "ultima/ultima0/hardware.h"
-#include "ultima/ultima0/main.h"
-#include "ultima/ultima0/monst.h"
-#include "ultima/ultima0/move.h"
-#include "ultima/ultima0/player.h"
-#include "ultima/ultima0/sdw.h"
-#include "ultima/ultima0/town.h"
-#include "ultima/ultima0/world.h"
+#include "ultima/ultima0/events.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-class AkalabethEngine : public Shared::UltimaEngine {
+class AkalabethEngine : public Shared::UltimaEngine, public Events {
+private:
+	const ADGameDescription *_gameDescription;
 protected:
 	// Engine APIs
 	Common::Error run() override;
@@ -62,6 +50,9 @@ public:
 	/**
 	 * Get a random number
 	 */
+	int getRandomNumber(int maxVal) {
+		return Shared::UltimaEngine::getRandomNumber(maxVal);
+	}
 	double rnd() {
 		return (double)getRandomNumber(0xffff) / 1.0;
 	}
@@ -70,9 +61,18 @@ public:
 	 * Get the ellapsed time in milliseconds
 	 */
 	uint32 getTicks() const;
+
+
+	/**
+	 * Returns true if the game should quit
+	 */
+	bool shouldQuit() const override {
+		return Shared::UltimaEngine::shouldQuit();
+	}
 };
 
-extern AkalabethEngine *g_ultima;
+extern AkalabethEngine *g_engine;
+#define SHOULD_QUIT ::Ultima::Ultima0::g_engine->shouldQuit()
 
 } // namespace Ultima0
 } // namespace Ultima

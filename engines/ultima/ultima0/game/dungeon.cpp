@@ -20,6 +20,8 @@
  */
 
 #include "ultima/ultima0/akalabeth.h"
+#include "ultima/ultima0/game/main.h"
+#include "ultima/ultima0/game/globals.h"
 
 namespace Ultima {
 namespace Ultima0 {
@@ -45,7 +47,7 @@ void DUNGEONCreate(PLAYER *p,DUNGEONMAP *d) {
 	int i,n,x,y,Size;
 
 	// Seed the random number
-	g_ultima->setRandomSeed(p->LuckyNumber - p->World.x*40 -
+	g_engine->setRandomSeed(p->LuckyNumber - p->World.x*40 -
 		p->World.y * 1000 - p->Level);
 
 	Size=MAINSuper()?DUNGEON_MAP_SIZE-1:10;	/* Calculate map size */

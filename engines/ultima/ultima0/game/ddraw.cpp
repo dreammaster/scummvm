@@ -20,6 +20,9 @@
  */
 
 #include "ultima/ultima0/akalabeth.h"
+#include "ultima/ultima0/game/draw.h"
+#include "ultima/ultima0/game/ddraw.h"
+#include "ultima/ultima0/game/move.h"
 
 namespace Ultima {
 namespace Ultima0 {
@@ -58,7 +61,9 @@ void DDRAWDraw(PLAYER *p,DUNGEONMAP *d)
 		Next.x = Pos.x + p->DungDir.x;		/* Next position */
 		Next.y = Pos.y + p->DungDir.y;
 
-		Dir = p->DungDir;MOVERotLeft(&Dir);	/* To the left */
+		Dir = p->DungDir;
+		MOVERotLeft(&Dir);	/* To the left */
+
 		Left = d->Map[Pos.x+Dir.x][Pos.y+Dir.y];
 		MOVERotLeft(&Dir);MOVERotLeft(&Dir);/* To the right */
 		Right = d->Map[Pos.x+Dir.x][Pos.y+Dir.y];

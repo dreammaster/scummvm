@@ -19,35 +19,32 @@
  *
  */
 
-#include "common/system.h"
-#include "engines/util.h"
-#include "ultima/ultima0/akalabeth.h"
-#include "ultima/ultima0/console.h"
-#include "ultima/ultima0/game/sdw.h"
+#ifndef ULTIMA0_ULTIMA0_VIEWS_MAIN_H
+#define ULTIMA0_ULTIMA0_VIEWS_MAIN_H
+
+#include "ultima/ultima0/views/view.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-AkalabethEngine::AkalabethEngine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc) :
-		Shared::UltimaEngine(syst, gameDesc), Events() {
-	g_engine = this;
-}
+class Main : public View {
+private:
+	byte _pal[256 * 3] = { 0 };
+	int _offset = 0;
 
-Common::Error AkalabethEngine::run() {
-	initGraphics(DEFAULT_SCX, DEFAULT_SCY);
-	_screen = new Graphics::Screen();
+public:
+	Main() : View("Main") {
+	}
+	virtual ~Main() {
+	}
 
-	// Set the engine's debugger console
-	setDebugger(new Console());
-
-	runGame();
-
-	return Common::kNoError;
-}
-
-uint32 AkalabethEngine::getTicks() const {
-	return g_system->getMillis();
-}
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	void draw() override;
+	bool tick() override;
+};
 
 } // namespace Ultima0
 } // namespace Ultima
+
+#endif

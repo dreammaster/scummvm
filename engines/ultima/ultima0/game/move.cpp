@@ -20,6 +20,15 @@
  */
 
 #include "ultima/ultima0/akalabeth.h"
+#include "ultima/ultima0/game/move.h"
+#include "ultima/ultima0/game/draw.h"
+#include "ultima/ultima0/game/ddraw.h"
+#include "ultima/ultima0/game/dungeon.h"
+#include "ultima/ultima0/game/town.h"
+#include "ultima/ultima0/game/world.h"
+#include "ultima/ultima0/game/globals.h"
+#include "ultima/ultima0/game/monst.h"
+#include "ultima/ultima0/game/british.h"
 
 namespace Ultima {
 namespace Ultima0 {

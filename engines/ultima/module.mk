@@ -14,23 +14,28 @@ MODULE_OBJS := \
 ifdef ENABLE_AKALABETH
 MODULE_OBJS += \
 	ultima0/akalabeth.o \
-	ultima0/attack.o \
-	ultima0/british.o \
-	ultima0/ddraw.o \
-	ultima0/dead.o \
-	ultima0/draw.o \
-	ultima0/draw2.o \
-	ultima0/draw3.o \
-	ultima0/dungeon.o \
-	ultima0/globals.o \
-	ultima0/hardware.o \
-	ultima0/main.o \
-	ultima0/monst.o \
-	ultima0/move.o \
-	ultima0/player.o \
-	ultima0/sdw.o \
-	ultima0/town.o \
-	ultima0/world.o
+	ultima0/console.o \
+	ultima0/events.o \
+	ultima0/messages.o \
+	ultima0/views/view.o \
+	ultima0/views/main.o \
+	ultima0/game/attack.o \
+	ultima0/game/british.o \
+	ultima0/game/ddraw.o \
+	ultima0/game/dead.o \
+	ultima0/game/draw.o \
+	ultima0/game/draw2.o \
+	ultima0/game/draw3.o \
+	ultima0/game/dungeon.o \
+	ultima0/game/globals.o \
+	ultima0/game/hardware.o \
+	ultima0/game/main.o \
+	ultima0/game/monst.o \
+	ultima0/game/move.o \
+	ultima0/game/player.o \
+	ultima0/game/sdw.o \
+	ultima0/game/town.o \
+	ultima0/game/world.o
 endif
 
 ifdef ENABLE_ULTIMA1

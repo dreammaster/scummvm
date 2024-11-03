@@ -19,7 +19,7 @@
  *
  */
 
-#include "ultima/ultima0/sdw.h"
+#include "ultima/ultima0/game/sdw.h"
 
 namespace Ultima {
 namespace Ultima0 {

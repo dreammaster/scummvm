@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,35 +20,23 @@
  *
  */
 
-#include "common/system.h"
-#include "engines/util.h"
-#include "ultima/ultima0/akalabeth.h"
-#include "ultima/ultima0/console.h"
-#include "ultima/ultima0/game/sdw.h"
+#ifndef ULTIMA_ULTIMA0_CONSOLE_H
+#define ULTIMA_ULTIMA0_CONSOLE_H
+
+#include "gui/debugger.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-AkalabethEngine::AkalabethEngine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc) :
-		Shared::UltimaEngine(syst, gameDesc), Events() {
-	g_engine = this;
-}
-
-Common::Error AkalabethEngine::run() {
-	initGraphics(DEFAULT_SCX, DEFAULT_SCY);
-	_screen = new Graphics::Screen();
-
-	// Set the engine's debugger console
-	setDebugger(new Console());
-
-	runGame();
-
-	return Common::kNoError;
-}
-
-uint32 AkalabethEngine::getTicks() const {
-	return g_system->getMillis();
-}
+class Console : public GUI::Debugger {
+private:
+	bool Cmd_test(int argc, const char **argv);
+public:
+	Console();
+	~Console() override;
+};
 
 } // namespace Ultima0
 } // namespace Ultima
+
+#endif

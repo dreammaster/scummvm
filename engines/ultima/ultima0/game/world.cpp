@@ -20,6 +20,8 @@
  */
 
 #include "ultima/ultima0/akalabeth.h"
+#include "ultima/ultima0/game/draw.h"
+#include "ultima/ultima0/game/main.h"
 
 namespace Ultima {
 namespace Ultima0 {
@@ -41,7 +43,7 @@ namespace Ultima0 {
 void WORLDCreate(PLAYER *p,WORLDMAP *w) {
 	int c,x,y,Size;
 
-	g_ultima->setRandomSeed(p->LuckyNumber);					/* Seed the random number */
+	g_engine->setRandomSeed(p->LuckyNumber);					/* Seed the random number */
 	Size = MAINSuper()?WORLD_MAP_SIZE-1:20;	/* Calculate map size */
 	w->MapSize = Size;						/* Save the map size */
 	for (x = 0;x <= Size;x++)				/* Draw the boundaries */

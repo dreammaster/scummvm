@@ -20,33 +20,46 @@
  */
 
 #include "common/system.h"
-#include "engines/util.h"
-#include "ultima/ultima0/akalabeth.h"
-#include "ultima/ultima0/console.h"
-#include "ultima/ultima0/game/sdw.h"
+#include "graphics/paletteman.h"
+#include "ultima/ultima0/views/main.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-AkalabethEngine::AkalabethEngine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc) :
-		Shared::UltimaEngine(syst, gameDesc), Events() {
-	g_engine = this;
+bool Main::msgFocus(const FocusMessage &msg) {
+	Common::fill(&_pal[0], &_pal[256 * 3], 0);
+	_offset = 128;
+	return true;
 }
 
-Common::Error AkalabethEngine::run() {
-	initGraphics(DEFAULT_SCX, DEFAULT_SCY);
-	_screen = new Graphics::Screen();
-
-	// Set the engine's debugger console
-	setDebugger(new Console());
-
-	runGame();
-
-	return Common::kNoError;
+bool Main::msgKeypress(const KeypressMessage &msg) {
+	// Any keypress to close the view
+	close();
+	return true;
 }
 
-uint32 AkalabethEngine::getTicks() const {
-	return g_system->getMillis();
+void Main::draw() {
+	// Draw a bunch of squares on screen
+	Graphics::ManagedSurface s = getSurface();
+
+	for (int i = 0; i < 100; ++i)
+		s.frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
+}
+
+bool Main::tick() {
+	// Cycle the palette
+	++_offset;
+	for (int i = 0; i < 256; ++i)
+		_pal[i * 3 + 1] = (i + _offset) % 256;
+	g_system->getPaletteManager()->setPalette(_pal, 0, 256);
+
+	// Below is redundant since we're only cycling the palette, but it demonstrates
+	// how to trigger the view to do further draws after the first time, since views
+	// don't automatically keep redrawing unless you tell it to
+	if ((_offset % 256) == 0)
+		redraw();
+
+	return true;
 }
 
 } // namespace Ultima0
