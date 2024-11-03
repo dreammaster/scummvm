@@ -19,7 +19,7 @@
  *
  */
 
-#include "ultima/ultima0/struct.h"
+#include "ultima/ultima0/data/struct.h"
 
 namespace Ultima {
 namespace Ultima0 {

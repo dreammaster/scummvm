@@ -19,17 +19,22 @@
  *
  */
 
-#include "ultima/ultima0/data/struct.h"
+#include "common/algorithm.h"
+#include "ultima/ultima0/data/player.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-extern const char *GLOObjName(int);
-extern const char *GLOAttribName(int);
-extern const char *GLOClassName(char);
-extern const char *GLOMonsterName(int);
-extern int GLOMonsterLevel(int);
-extern void GLOGetInfo(int n, int *, int *, int *);
+PLAYER::PLAYER() {
+	Common::fill(Name, Name + MAX_NAME + 2, '\0');
+	Common::fill(Attr, Attr + MAX_ATTR, 0);
+	Common::fill(Object, Object + MAX_OBJ, 0.0);
+}
+
+void PLAYER::setIsEnhanced(bool isEnh) {
+	Attributes = isEnh ? MAX_ATTR : 6;
+	Objects = isEnh ? MAX_OBJ : 6;
+}
 
 } // namespace Ultima0
 } // namespace Ultima

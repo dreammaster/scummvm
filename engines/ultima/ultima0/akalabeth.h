@@ -24,8 +24,8 @@
 
 #include "graphics/screen.h"
 #include "ultima/shared/engine/ultima.h"
-#include "ultima/ultima0/defines.h"
-#include "ultima/ultima0/struct.h"
+#include "ultima/ultima0/data/defines.h"
+#include "ultima/ultima0/data/struct.h"
 #include "ultima/ultima0/events.h"
 
 namespace Ultima {
@@ -40,6 +40,7 @@ protected:
 
 public:
 	Graphics::Screen *_screen = nullptr;
+	PLAYER _player;
 
 public:
 	AkalabethEngine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);

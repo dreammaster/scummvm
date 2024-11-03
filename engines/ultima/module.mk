@@ -19,6 +19,7 @@ MODULE_OBJS += \
 	ultima0/messages.o \
 	ultima0/views/view.o \
 	ultima0/views/main.o \
+	ultima0/data/player.o \
 	ultima0/game/attack.o \
 	ultima0/game/british.o \
 	ultima0/game/ddraw.o \

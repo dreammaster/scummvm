@@ -19,12 +19,11 @@
  *
  */
 
-#include "ultima/ultima0/struct.h"
+#include "ultima/ultima0/data/struct.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-extern void PLAYERInit(PLAYER *);
 extern void PLAYERDebug(PLAYER *);
 extern void PLAYERDemo(PLAYER *);
 extern void PLAYERCharacter(PLAYER *);

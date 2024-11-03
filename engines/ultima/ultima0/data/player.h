@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,17 +20,42 @@
  *
  */
 
-#include "ultima/ultima0/data/struct.h"
+#ifndef ULTIMA_ULTIMA0_DATA_PLAYER_H
+#define ULTIMA_ULTIMA0_DATA_PLAYER_H
+
+#include "common/rect.h"
+#include "ultima/ultima0/data/defines.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-extern const char *GLOObjName(int);
-extern const char *GLOAttribName(int);
-extern const char *GLOClassName(char);
-extern const char *GLOMonsterName(int);
-extern int GLOMonsterLevel(int);
-extern void GLOGetInfo(int n, int *, int *, int *);
+struct COORD {
+	int x = 0, y = 0;
+};
+
+struct PLAYER {
+	char  Name[MAX_NAME + 1];	// Player Name
+	COORD World;				// World map position
+	COORD Dungeon;				// Dungeon map position
+	COORD DungDir;				// Dungeon direction facing
+	char  Class = '?';			// Player class (F or M)
+	int   HPGain = 0;			// HPs gained in dungeon
+	int	  Level = 0;			// Dungeon level, 0 = world map
+	int	  Skill = 0;			// Skill level
+	int	  Task = 0;				// Task set (-1 = none)
+	int	  TaskCompleted = 0;	// Task completed
+	int	  LuckyNumber = 42;		// Value used for seeding
+	int	  Attributes = 6;		// Number of attributes
+	int	  Objects = 6;			// Number of objects
+	int   Attr[MAX_ATTR];		// Attribute values
+	double Object[MAX_OBJ];		// Object counts
+
+	PLAYER();
+
+	void setIsEnhanced(bool isEnh);
+};
 
 } // namespace Ultima0
 } // namespace Ultima
+
+#endif

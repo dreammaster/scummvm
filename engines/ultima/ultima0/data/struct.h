@@ -22,15 +22,11 @@
 #ifndef ULTIMA_ULTIMA0_STRUCT_H
 #define ULTIMA_ULTIMA0_STRUCT_H
 
-#include "ultima/ultima0/defines.h"
-#include "common/scummsys.h"
+#include "ultima/ultima0/data/defines.h"
+#include "ultima/ultima0/data/player.h"
 
 namespace Ultima {
 namespace Ultima0 {
-
-struct COORD {
-	int x, y;
-};
 
 struct RECT {
 	int left, top, right, bottom;		// Rectangle coords
@@ -53,24 +49,6 @@ struct DUNGEONMAP {
 	byte Map[DUNGEON_MAP_SIZE][DUNGEON_MAP_SIZE];	// Map information
 	int	MonstCount;							// Number of Monsters
 	MONSTER Monster[MAX_MONSTERS];			// Monster records
-};
-
-struct PLAYER {
-	char  Name[MAX_NAME+1];					// Player Name
-	COORD World;							// World map position
-	COORD Dungeon;							// Dungeon map position
-	COORD DungDir;							// Dungeon direction facing
-	char  Class;							// Player class (F or M)
-	int   HPGain;							// HPs gained in dungeon
-	int	  Level;							// Dungeon level, 0 = world map
-	int	  Skill;							// Skill level
-	int	  Task;								// Task set (-1 = none)
-	int	  TaskCompleted;					// Task completed
-	int	  LuckyNumber;						// Value used for seeding
-	int	  Attributes;						// Number of attributes
-	int	  Objects;							// Number of objects
-	int   Attr[MAX_ATTR];					// Attribute values
-	double Object[MAX_OBJ];					// Object counts
 };
 
 } // namespace Ultima0

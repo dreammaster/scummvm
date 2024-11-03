@@ -94,9 +94,7 @@ void MAINStart(void)
 /*																		*/
 /************************************************************************/
 
-void MAINSetup(void)
-{
-	PLAYERInit(&Player);					/* Initialise the player */
+void MAINSetup(void) {
 	PLAYERCharacter(&Player);				/* Character information */
 //	PLAYERDebug(&Player);
 	WORLDCreate(&Player,&World);			/* Create the over world */

@@ -38,6 +38,7 @@ AkalabethEngine::AkalabethEngine(OSystem *syst, const Ultima::UltimaGameDescript
 Common::Error AkalabethEngine::run() {
 	initGraphics(DEFAULT_SCX, DEFAULT_SCY);
 	_screen = new Graphics::Screen();
+	_player.setIsEnhanced(true);
 
 	// Set the engine's debugger console
 	setDebugger(new Console());

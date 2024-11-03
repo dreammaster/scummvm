@@ -29,42 +29,6 @@
 namespace Ultima {
 namespace Ultima0 {
 
-/************************************************************************/
-/************************************************************************/
-/*																		*/
-/*							Manage Player Structures					*/
-/*																		*/
-/************************************************************************/
-/************************************************************************/
-
-/************************************************************************/
-/*																		*/
-/*					Initialise the player character						*/
-/*																		*/
-/************************************************************************/
-
-void PLAYERInit(PLAYER *p)
-{
-	int i;
-	memset(p,0xFF,sizeof(PLAYER));			/* Fill with character $FF */
-	p->Name[0] = '\0';
-	p->World.x = p->World.y = 0;
-	p->Dungeon.x = p->Dungeon.y = 0;
-	p->DungDir.x = p->DungDir.y = 0;
-	p->Class = '?';
-	p->Level = 0;p->Skill = 0;
-	p->Task = 0;p->TaskCompleted = 0;
-	p->HPGain = 0;
-	p->LuckyNumber = RANDOM();				/* We do the lucky number ! */
-	p->Attributes = p->Objects = 6;			/* Aklabeth standards */
-	if (MAINSuper())         				/* Super Aklabeth : more */
-		{
-		p->Attributes = MAX_ATTR;
-		p->Objects = MAX_OBJ;
-		}
-	for (i = 0;i < p->Attributes;i++) p->Attr[i] = 0;
-	for (i = 0;i < p->Objects;i++) p->Object[i] = 0.0;
-}
 
 /************************************************************************/
 /*																		*/

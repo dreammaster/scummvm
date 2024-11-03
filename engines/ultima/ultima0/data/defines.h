@@ -22,6 +22,8 @@
 #ifndef ULTIMA_ULTIMA0_DEFINES_H
 #define ULTIMA_ULTIMA0_DEFINES_H
 
+#include "common/scummsys.h"
+
 namespace Ultima {
 namespace Ultima0 {
 
