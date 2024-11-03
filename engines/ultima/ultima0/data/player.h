@@ -52,7 +52,20 @@ struct PLAYER {
 
 	PLAYER();
 
+	/**
+	 * Sets enhanced mode, which allows for a larger inventory
+	 */
 	void setIsEnhanced(bool isEnh);
+
+	/**
+	 * Sets up a demo character
+	 */
+	void setDemo();
+
+	/**
+	 * Sets up a debug character
+	 */
+	void setDebug();
 };
 
 } // namespace Ultima0

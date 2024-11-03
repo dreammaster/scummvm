@@ -24,8 +24,6 @@
 namespace Ultima {
 namespace Ultima0 {
 
-extern void PLAYERDebug(PLAYER *);
-extern void PLAYERDemo(PLAYER *);
 extern void PLAYERCharacter(PLAYER *);
 extern void PLAYERInv(PLAYER *);
 

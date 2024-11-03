@@ -20,6 +20,7 @@
  */
 
 #include "common/algorithm.h"
+#include "common/str.h"
 #include "ultima/ultima0/data/player.h"
 
 namespace Ultima {
@@ -34,6 +35,32 @@ PLAYER::PLAYER() {
 void PLAYER::setIsEnhanced(bool isEnh) {
 	Attributes = isEnh ? MAX_ATTR : 6;
 	Objects = isEnh ? MAX_OBJ : 6;
+}
+
+void PLAYER::setDemo() {
+	int i;
+	Common::strcpy_s(Name, "Demo");		// Characters Name
+	Class = 'F';						// Fighter
+	LuckyNumber = 42;					// Always the same.....
+	Skill = 1;							// Skill level 1
+	Common::fill(Attr, Attr + Attributes, 15);	// High attributes
+	Attr[AT_HP] = 18;
+	Attr[AT_GOLD] = 99;
+	for (i = 0; i < Objects; i++)		// Lots of nice objects
+		Object[i] = (i == OB_FOOD || i == OB_BOW) ? 999 : 4.0;
+}
+
+void PLAYER::setDebug() {
+	int i;
+	Common::strcpy_s(Name, "Debuggo");	// Characters Name
+	Class = 'F';						// Fighter
+	LuckyNumber = 42;					// Always the same.....
+	Skill = 1;							// Skill level 1
+	Common::fill(Attr, Attr + Attributes, 99);	// High attributes
+	Attr[AT_HP] = 999;
+	Attr[AT_GOLD] = 9999;
+	for (i = 0; i < Objects; i++)		// Lots of nice objects
+		Object[i] = (i == OB_FOOD || i == OB_BOW) ? 9999.9 : 99.0;
 }
 
 } // namespace Ultima0
