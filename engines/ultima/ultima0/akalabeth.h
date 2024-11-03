@@ -58,16 +58,22 @@ public:
 	}
 
 	/**
-	 * Get the ellapsed time in milliseconds
+	 * Get the elapsed time in milliseconds
 	 */
 	uint32 getTicks() const;
-
 
 	/**
 	 * Returns true if the game should quit
 	 */
 	bool shouldQuit() const override {
 		return Shared::UltimaEngine::shouldQuit();
+	}
+
+	bool canLoadGameStateCurrently(bool isAutosave) override {
+		return false;
+	}
+	bool canSaveGameStateCurrently(bool isAutosave) override {
+		return false;
 	}
 };
 

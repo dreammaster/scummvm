@@ -28,6 +28,8 @@
 namespace Ultima {
 namespace Ultima0 {
 
+AkalabethEngine *g_engine;
+
 AkalabethEngine::AkalabethEngine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc) :
 		Shared::UltimaEngine(syst, gameDesc), Events() {
 	g_engine = this;

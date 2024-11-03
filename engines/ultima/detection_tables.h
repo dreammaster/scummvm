@@ -21,6 +21,7 @@
 
 namespace Ultima {
 
+#define GUI_OPTIONS_AKALABETH	GUIO0()
 #define GUI_OPTIONS_ULTIMA1	GUIO0()
 #define GUI_OPTIONS_ULTIMA4	GUIO1(GUIO_NOSPEECH)
 #define GUI_OPTIONS_ULTIMA6	GUIO0()
@@ -46,6 +47,23 @@ namespace Ultima {
 #define ENTRY_ULTIMA6_NORMAL_UNSTABLE(FILENAME, MD5, FILESIZE, LANG, PLATFORM) {{"ultima6", 0, AD_ENTRY1s(FILENAME, MD5, FILESIZE), LANG, PLATFORM, ADGF_UNSTABLE, GUI_OPTIONS_ULTIMA6}, GAME_ULTIMA6, 0}
 
 static const UltimaGameDescription GAME_DESCRIPTIONS[] = {
+#ifdef ENABLE_AKALABETH
+	// Akalabeth - World of Doom
+	{
+		{
+			"akalabeth",
+			0,
+			AD_ENTRY1s("aklabeth.bas", "1baf1244abac0470769178684032e09a", 38929),
+			Common::EN_ANY,
+			Common::kPlatformDOS,
+			ADGF_UNSTABLE,
+			GUI_OPTIONS_AKALABETH
+		},
+		GAME_AKALABETH,
+		0
+	},
+#endif
+
 #ifdef ENABLE_ULTIMA1
 	{
 		// Ultima I - The First Age of Darkness
