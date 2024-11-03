@@ -28,68 +28,49 @@
 namespace Ultima {
 namespace Ultima0 {
 
-/************************************************************************/
-/************************************************************************/
-/*																		*/
-/*							Data Structures								*/
-/*																		*/
-/************************************************************************/
-/************************************************************************/
-
 struct COORD {
 	int x, y;
 };
 
-/************************************************************************/
-
 struct RECT {
-	int left,top,right,bottom;				/* Rectangle coords */
+	int left, top, right, bottom;		// Rectangle coords
 };
-
-/************************************************************************/
 
 struct WORLDMAP {
-	int MapSize;							/* Size of map */
-	unsigned char Map[WORLD_MAP_SIZE]		/* Map information */
-							[WORLD_MAP_SIZE];
+	int MapSize;								// Size of map
+	byte Map[WORLD_MAP_SIZE][WORLD_MAP_SIZE];	// Info
 };
-
-/************************************************************************/
 
 struct MONSTER {
-	COORD Loc;								/* Position */
-	int	  Type;								/* Monster type */
-	int	  Strength;							/* Strength */
-	int	  Alive;							/* Alive flag */
+	COORD Loc;							// Position
+	int	  Type;							// Monster type
+	int	  Strength;						// Strength
+	int	  Alive;						// Alive flag
 };
-
-/************************************************************************/
 
 struct DUNGEONMAP {
-	int MapSize;							/* Size of Map */
-	byte Map[DUNGEON_MAP_SIZE][DUNGEON_MAP_SIZE];	/* Map information */
-	int	MonstCount;							/* Number of Monsters */
-	MONSTER Monster[MAX_MONSTERS];			/* Monster records */
+	int MapSize;							// Size of Map
+	byte Map[DUNGEON_MAP_SIZE][DUNGEON_MAP_SIZE];	// Map information
+	int	MonstCount;							// Number of Monsters
+	MONSTER Monster[MAX_MONSTERS];			// Monster records
 };
 
-/************************************************************************/
-
 struct PLAYER {
-	char  Name[MAX_NAME+1];					/* Player Name */
-	COORD World;							/* World map position */
-	COORD Dungeon;							/* Dungeon map position */
-	COORD DungDir;							/* Dungeon direction facing */
-	char  Class;							/* Player class (F or M) */
-	int   HPGain;							/* HPs gained in dungeon */
-	int	  Level;							/* Dungeon level, 0 = world map */
-	int	  Skill;							/* Skill level */
-	int	  Task;								/* Task set (-1 = none) */
-	int	  TaskCompleted;					/* Task completed */
-	int	  LuckyNumber;						/* Value used for seeding */
-	int	  Attributes;						/* Number of attributes */
-	int	  Objects;							/* Number of objects */
-	int   Attr[MAX_ATTR];					/* Attribute values */
-	double Object[MAX_OBJ];					/* Object counts */
+	char  Name[MAX_NAME+1];					// Player Name
+	COORD World;							// World map position
+	COORD Dungeon;							// Dungeon map position
+	COORD DungDir;							// Dungeon direction facing
+	char  Class;							// Player class (F or M)
+	int   HPGain;							// HPs gained in dungeon
+	int	  Level;							// Dungeon level, 0 = world map
+	int	  Skill;							// Skill level
+	int	  Task;								// Task set (-1 = none)
+	int	  TaskCompleted;					// Task completed
+	int	  LuckyNumber;						// Value used for seeding
+	int	  Attributes;						// Number of attributes
+	int	  Objects;							// Number of objects
+	int   Attr[MAX_ATTR];					// Attribute values
+	double Object[MAX_OBJ];					// Object counts
 };
 
 } // namespace Ultima0
