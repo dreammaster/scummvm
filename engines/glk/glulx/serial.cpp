@@ -19,39 +19,87 @@
  *
  */
 
+/* Glulxe code for saving and restoring the VM state.
+ */
+
+#include "glk/glk.h"
+#include "glk/glulx/glulxe.h"
 #include "glk/glulx/glulx.h"
 
 namespace Glk {
 namespace Glulx {
 
-#define IFFID(c1, c2, c3, c4) MKTAG(c1, c2, c3, c4)
+#define IFFID(c1, c2, c3, c4)  \
+  ( (((glui32)c1) << 24)    \
+  | (((glui32)c2) << 16)    \
+  | (((glui32)c3) << 8)     \
+  | (((glui32)c4)) )
 
-bool Glulx::init_serial() {
+/* This can be adjusted before startup by platform-specific startup
+   code -- that is, preference code. */
+int max_undo_level = 8;
+
+static int undo_chain_size = 0;
+static int undo_chain_num = 0;
+static unsigned char **undo_chain = NULL;
+
+#ifdef SERIALIZE_CACHE_RAM
+/* This will contain a copy of RAM (ramstate to endmem) as it exists
+   in the game file. */
+static unsigned char *ramcache = NULL;
+#endif /* SERIALIZE_CACHE_RAM */
+
+static glui32 write_memstate(dest_t *dest);
+static glui32 write_heapstate(dest_t *dest, int portable);
+static glui32 write_stackstate(dest_t *dest, int portable);
+static glui32 read_memstate(dest_t *dest, glui32 chunklen);
+static glui32 read_heapstate(dest_t *dest, glui32 chunklen, int portable,
+  glui32 *sumlen, glui32 **summary);
+static glui32 read_stackstate(dest_t *dest, glui32 chunklen, int portable);
+static glui32 write_heapstate_sub(glui32 sumlen, glui32 *sumarray,
+  dest_t *dest, int portable);
+static int sort_heap_summary(const void *p1, const void *p2);
+static int write_long(dest_t *dest, glui32 val);
+static int read_long(dest_t *dest, glui32 *val);
+static int write_byte(dest_t *dest, unsigned char val);
+static int read_byte(dest_t *dest, unsigned char *val);
+static int reposition_write(dest_t *dest, glui32 pos);
+
+/* init_serial():
+   Set up the undo chain and anything else that needs to be set up.
+*/
+int init_serial() {
 	undo_chain_num = 0;
-	undo_chain_size = max_undo_level;
-	undo_chain = (unsigned char **)glulx_malloc(sizeof(unsigned char *) * undo_chain_size);
-	if (!undo_chain)
-		return false;
+	undo_chain_size = 0;
+	undo_chain = NULL;
+	if (max_undo_level > 0) {
+		undo_chain_size = max_undo_level;
+		undo_chain = (unsigned char **)glulx_malloc(sizeof(unsigned char *) * undo_chain_size);
+		if (!undo_chain)
+			return FALSE;
+	}
 
 #ifdef SERIALIZE_CACHE_RAM
 	{
-		uint len = (endmem - ramstart);
-		uint res;
+		glui32 len = (endmem - ramstart);
+		glui32 res;
 		ramcache = (unsigned char *)glulx_malloc(sizeof(unsigned char *) * len);
 		if (!ramcache)
-			return false;
-
-		_gameFile.seek(gamefile_start + ramstart);
-		res = _gameFile.read(ramcache, len);
+			return FALSE;
+		glk_stream_set_position(gamefile, gamefile_start + ramstart, seekmode_Start);
+		res = glk_get_buffer_stream(gamefile, (char *)ramcache, len);
 		if (res != len)
-			return false;
+			return FALSE;
 	}
 #endif /* SERIALIZE_CACHE_RAM */
 
-	return true;
+	return TRUE;
 }
 
-void Glulx::final_serial() {
+/* final_serial():
+   Clean up memory when the VM shuts down.
+*/
+void final_serial() {
 	if (undo_chain) {
 		int ix;
 		for (ix = 0; ix < undo_chain_num; ix++) {
@@ -59,23 +107,26 @@ void Glulx::final_serial() {
 		}
 		glulx_free(undo_chain);
 	}
-	undo_chain = nullptr;
+	undo_chain = NULL;
 	undo_chain_size = 0;
 	undo_chain_num = 0;
 
 #ifdef SERIALIZE_CACHE_RAM
 	if (ramcache) {
 		glulx_free(ramcache);
-		ramcache = nullptr;
+		ramcache = NULL;
 	}
 #endif /* SERIALIZE_CACHE_RAM */
 }
 
-uint Glulx::perform_saveundo() {
+/* perform_saveundo():
+   Add a state pointer to the undo chain. This returns 0 on success,
+   1 on failure.
+*/
+glui32 perform_saveundo() {
 	dest_t dest;
-	uint res;
-	uint memstart = 0, memlen = 0, heapstart = 0, heaplen = 0;
-	uint stackstart = 0, stacklen = 0;
+	glui32 res;
+	glui32 memstart = 0, memlen = 0, heapstart = 0, heaplen = 0, stackstart = 0, stacklen = 0;
 
 	/* The format for undo-saves is simpler than for saves on disk. We
 	   just have a memory chunk, a heap chunk, and a stack chunk, in
@@ -86,38 +137,42 @@ uint Glulx::perform_saveundo() {
 	if (undo_chain_size == 0)
 		return 1;
 
-	dest._isMem = true;
+	dest.ismem = TRUE;
+	dest.size = 0;
+	dest.pos = 0;
+	dest.ptr = NULL;
+	dest.str = NULL;
 
 	res = 0;
 	if (res == 0) {
 		res = write_long(&dest, 0); /* space for chunk length */
 	}
 	if (res == 0) {
-		memstart = dest._pos;
+		memstart = dest.pos;
 		res = write_memstate(&dest);
-		memlen = dest._pos - memstart;
+		memlen = dest.pos - memstart;
 	}
 	if (res == 0) {
 		res = write_long(&dest, 0); /* space for chunk length */
 	}
 	if (res == 0) {
-		heapstart = dest._pos;
-		res = write_heapstate(&dest, false);
-		heaplen = dest._pos - heapstart;
+		heapstart = dest.pos;
+		res = write_heapstate(&dest, FALSE);
+		heaplen = dest.pos - heapstart;
 	}
 	if (res == 0) {
 		res = write_long(&dest, 0); /* space for chunk length */
 	}
 	if (res == 0) {
-		stackstart = dest._pos;
-		res = write_stackstate(&dest, false);
-		stacklen = dest._pos - stackstart;
+		stackstart = dest.pos;
+		res = write_stackstate(&dest, FALSE);
+		stacklen = dest.pos - stackstart;
 	}
 
 	if (res == 0) {
 		/* Trim it down to the perfect size. */
-		dest._ptr = (byte *)glulx_realloc(dest._ptr, dest._pos);
-		if (!dest._ptr)
+		dest.ptr = glulx_realloc(dest.ptr, dest.pos);
+		if (!dest.ptr)
 			res = 1;
 	}
 	if (res == 0) {
@@ -143,34 +198,40 @@ uint Glulx::perform_saveundo() {
 		/* It worked. */
 		if (undo_chain_num >= undo_chain_size) {
 			glulx_free(undo_chain[undo_chain_num - 1]);
-			undo_chain[undo_chain_num - 1] = nullptr;
+			undo_chain[undo_chain_num - 1] = NULL;
 		}
 		if (undo_chain_size > 1)
 			memmove(undo_chain + 1, undo_chain,
-			        (undo_chain_size - 1) * sizeof(unsigned char *));
-		undo_chain[0] = dest._ptr;
+				(undo_chain_size - 1) * sizeof(unsigned char *));
+		undo_chain[0] = dest.ptr;
 		if (undo_chain_num < undo_chain_size)
 			undo_chain_num += 1;
-		dest._ptr = nullptr;
+		dest.ptr = NULL;
 	} else {
 		/* It didn't work. */
-		if (dest._ptr) {
-			glulx_free(dest._ptr);
-			dest._ptr = nullptr;
+		if (dest.ptr) {
+			glulx_free(dest.ptr);
+			dest.ptr = NULL;
 		}
 	}
 
 	return res;
 }
 
-uint Glulx::perform_restoreundo() {
+/* perform_restoreundo():
+   Pull a state pointer from the undo chain. This returns 0 on success,
+   1 on failure. Note that if it succeeds, the frameptr, localsbase,
+   and valstackbase registers are invalid; they must be rebuilt from
+   the stack.
+*/
+glui32 perform_restoreundo() {
 	dest_t dest;
-	uint res, val = 0;
-	uint heapsumlen = 0;
-	uint *heapsumarr = nullptr;
+	glui32 res, val;
+	glui32 heapsumlen = 0;
+	glui32 *heapsumarr = NULL;
 
 	/* If profiling is enabled and active then fail. */
-#ifdef VM_PROFILING
+#if VM_PROFILING
 	if (profile_profiling_active())
 		return 1;
 #endif /* VM_PROFILING */
@@ -178,9 +239,13 @@ uint Glulx::perform_restoreundo() {
 	if (undo_chain_size == 0 || undo_chain_num == 0)
 		return 1;
 
-	dest._isMem = true;
-	dest._ptr = undo_chain[0];
+	dest.ismem = TRUE;
+	dest.size = 0;
+	dest.pos = 0;
+	dest.ptr = undo_chain[0];
+	dest.str = NULL;
 
+	val = 0;
 	res = 0;
 	if (res == 0) {
 		res = read_long(&dest, &val);
@@ -192,13 +257,13 @@ uint Glulx::perform_restoreundo() {
 		res = read_long(&dest, &val);
 	}
 	if (res == 0) {
-		res = read_heapstate(&dest, val, false, &heapsumlen, &heapsumarr);
+		res = read_heapstate(&dest, val, FALSE, &heapsumlen, &heapsumarr);
 	}
 	if (res == 0) {
 		res = read_long(&dest, &val);
 	}
 	if (res == 0) {
-		res = read_stackstate(&dest, val, false);
+		res = read_stackstate(&dest, val, FALSE);
 	}
 	/* ### really, many of the failure modes of those calls ought to
 	   cause fatal errors. The stack or main memory may be damaged now. */
@@ -212,194 +277,377 @@ uint Glulx::perform_restoreundo() {
 		/* It worked. */
 		if (undo_chain_size > 1)
 			memmove(undo_chain, undo_chain + 1,
-			        (undo_chain_size - 1) * sizeof(unsigned char *));
+				(undo_chain_size - 1) * sizeof(unsigned char *));
 		undo_chain_num -= 1;
-		glulx_free(dest._ptr);
-		dest._ptr = nullptr;
+		glulx_free(dest.ptr);
+		dest.ptr = NULL;
 	} else {
 		/* It didn't work. */
-		dest._ptr = nullptr;
+		dest.ptr = NULL;
 	}
+
+	if (heapsumarr)
+		glulx_free(heapsumarr);
 
 	return res;
 }
 
-Common::Error Glulx::readSaveData(Common::SeekableReadStream *rs) {
-	Common::ErrorCode errCode = Common::kNoError;
-	QuetzalReader r;
-	if (r.open(rs))
-		// Load in the savegame chunks
-		errCode = loadGameChunks(r).getCode();
-
-	return errCode;
+/* has_undo():
+   Return 0 if an undo state is available, 1 if not.
+*/
+glui32 has_undo() {
+	if (undo_chain_size == 0 || undo_chain_num == 0)
+		return 1;
+	return 0;
 }
 
-Common::Error Glulx::writeGameData(Common::WriteStream *ws) {
-	QuetzalWriter w;
-	Common::ErrorCode errCode = saveGameChunks(w).getCode();
+/* discard_undo():
+   Drop the most recent undo state, if there are any.
+*/
+void discard_undo() {
+	if (undo_chain_size == 0 || undo_chain_num == 0)
+		return;
 
-	if (errCode == Common::kNoError) {
-		w.save(ws, _savegameDescription);
+	unsigned char *destptr = undo_chain[0];
+
+	if (undo_chain_size > 1)
+		memmove(undo_chain, undo_chain + 1,
+			(undo_chain_size - 1) * sizeof(unsigned char *));
+	undo_chain_num -= 1;
+	glulx_free(destptr);
+}
+
+/* perform_save():
+   Write the state to the output stream. This returns 0 on success,
+   1 on failure.
+*/
+glui32 perform_save(strid_t str) {
+	dest_t dest;
+	int ix;
+	glui32 res, lx, val;
+	glui32 memstart = 0, memlen = 0, stackstart = 0, stacklen = 0, heapstart = 0, heaplen = 0;
+	glui32 filestart = 0, filelen = 0;
+
+	stream_get_iosys(&val, &lx);
+	if (val != 2) {
+		/* Not using the Glk I/O system, so bail. This function only
+		   knows how to write to a Glk stream. */
+		fatal_error("Streams are only available in Glk I/O system.");
 	}
 
-	return errCode;
+	if (str == 0)
+		return 1;
+
+	dest.ismem = FALSE;
+	dest.size = 0;
+	dest.pos = 0;
+	dest.ptr = NULL;
+	dest.str = str;
+
+	res = 0;
+
+	/* Quetzal header. */
+	if (res == 0) {
+		res = write_long(&dest, IFFID('F', 'O', 'R', 'M'));
+	}
+	if (res == 0) {
+		res = write_long(&dest, 0); /* space for file length */
+		filestart = dest.pos;
+	}
+
+	if (res == 0) {
+		res = write_long(&dest, IFFID('I', 'F', 'Z', 'S')); /* ### ? */
+	}
+
+	/* Header chunk. This is the first 128 bytes of memory. */
+	if (res == 0) {
+		res = write_long(&dest, IFFID('I', 'F', 'h', 'd'));
+	}
+	if (res == 0) {
+		res = write_long(&dest, 128);
+	}
+	for (ix = 0; res == 0 && ix < 128; ix++) {
+		res = write_byte(&dest, Mem1(ix));
+	}
+	/* Always even, so no padding necessary. */
+
+	/* Memory chunk. */
+	if (res == 0) {
+		res = write_long(&dest, IFFID('C', 'M', 'e', 'm'));
+	}
+	if (res == 0) {
+		res = write_long(&dest, 0); /* space for chunk length */
+	}
+	if (res == 0) {
+		memstart = dest.pos;
+		res = write_memstate(&dest);
+		memlen = dest.pos - memstart;
+	}
+	if (res == 0 && (memlen & 1) != 0) {
+		res = write_byte(&dest, 0);
+	}
+
+	/* Heap chunk. */
+	if (res == 0) {
+		res = write_long(&dest, IFFID('M', 'A', 'l', 'l'));
+	}
+	if (res == 0) {
+		res = write_long(&dest, 0); /* space for chunk length */
+	}
+	if (res == 0) {
+		heapstart = dest.pos;
+		res = write_heapstate(&dest, TRUE);
+		heaplen = dest.pos - heapstart;
+	}
+	/* Always even, so no padding necessary. */
+
+	/* Stack chunk. */
+	if (res == 0) {
+		res = write_long(&dest, IFFID('S', 't', 'k', 's'));
+	}
+	if (res == 0) {
+		res = write_long(&dest, 0); /* space for chunk length */
+	}
+	if (res == 0) {
+		stackstart = dest.pos;
+		res = write_stackstate(&dest, TRUE);
+		stacklen = dest.pos - stackstart;
+	}
+	if (res == 0 && (stacklen & 1) != 0) {
+		res = write_byte(&dest, 0);
+	}
+
+	filelen = dest.pos - filestart;
+
+	/* Okay, fill in all the lengths. */
+	if (res == 0) {
+		res = reposition_write(&dest, memstart - 4);
+	}
+	if (res == 0) {
+		res = write_long(&dest, memlen);
+	}
+	if (res == 0) {
+		res = reposition_write(&dest, heapstart - 4);
+	}
+	if (res == 0) {
+		res = write_long(&dest, heaplen);
+	}
+	if (res == 0) {
+		res = reposition_write(&dest, stackstart - 4);
+	}
+	if (res == 0) {
+		res = write_long(&dest, stacklen);
+	}
+	if (res == 0) {
+		res = reposition_write(&dest, filestart - 4);
+	}
+	if (res == 0) {
+		res = write_long(&dest, filelen);
+	}
+
+	/* All done. */
+
+	return res;
 }
 
-Common::Error Glulx::loadGameChunks(QuetzalReader &quetzal) {
-	uint res = 0;
-	uint heapsumlen = 0;
-	uint *heapsumarr = nullptr;
+/* perform_restore():
+   Pull a state pointer from a stream. This returns 0 on success,
+   1 on failure. Note that if it succeeds, the frameptr, localsbase,
+   and valstackbase registers are invalid; they must be rebuilt from
+   the stack.
+ 
+   If fromshell is true, the restore is being invoked by the library
+   shell (an autorestore of some kind). This currently happens only in
+   iosglk and remglk.
+*/
+glui32 perform_restore(strid_t str, int fromshell) {
+	dest_t dest;
+	int ix;
+	glui32 lx, res, val;
+	glui32 filestart = 0, filelen = 0;
+	glui32 heapsumlen = 0;
+	glui32 *heapsumarr = NULL;
 
-	for (QuetzalReader::Iterator it = quetzal.begin();
-			it != quetzal.end() && !res; ++it) {
-		Common::SeekableReadStream *rs = it.getStream();
-		dest_t dest;
-		dest._src = rs;
+	/* If profiling is enabled and active then fail. */
+#if VM_PROFILING
+	if (profile_profiling_active())
+		return 1;
+#endif /* VM_PROFILING */
 
-		switch ((*it)._id) {
-		case ID_IFhd:
-			for (int ix = 0; ix < 128 && !res; ix++) {
-				byte v = rs->readByte();
-				if (Mem1(ix) != v)
-					// ### non-matching header
-					res = 1;
+	stream_get_iosys(&val, &lx);
+	if (val != 2 && !fromshell) {
+		/* Not using the Glk I/O system, so bail. This function only
+		   knows how to read from a Glk stream. (But in the autorestore
+		   case, iosys hasn't been set yet, so ignore this test.) */
+		fatal_error("Streams are only available in Glk I/O system.");
+	}
+
+	if (str == 0)
+		return 1;
+
+	dest.ismem = FALSE;
+	dest.size = 0;
+	dest.pos = 0;
+	dest.ptr = NULL;
+	dest.str = str;
+
+	res = 0;
+
+	/* ### the format errors checked below should send error messages to
+	   the current stream. */
+
+	if (res == 0) {
+		res = read_long(&dest, &val);
+	}
+	if (res == 0 && val != IFFID('F', 'O', 'R', 'M')) {
+		/* ### bad header */
+		return 1;
+	}
+	if (res == 0) {
+		res = read_long(&dest, &filelen);
+	}
+	filestart = dest.pos;
+
+	if (res == 0) {
+		res = read_long(&dest, &val);
+	}
+	if (res == 0 && val != IFFID('I', 'F', 'Z', 'S')) { /* ### ? */
+		/* ### bad header */
+		return 1;
+	}
+
+	while (res == 0 && dest.pos < filestart + filelen) {
+		/* Read a chunk and deal with it. */
+		glui32 chunktype = 0, chunkstart = 0, chunklen = 0;
+		unsigned char dummy;
+
+		if (res == 0) {
+			res = read_long(&dest, &chunktype);
+		}
+		if (res == 0) {
+			res = read_long(&dest, &chunklen);
+		}
+		chunkstart = dest.pos;
+
+		if (chunktype == IFFID('I', 'F', 'h', 'd')) {
+			for (ix = 0; res == 0 && ix < 128; ix++) {
+				res = read_byte(&dest, &dummy);
+				if (res == 0 && Mem1(ix) != dummy) {
+					/* ### non-matching header */
+					return 1;
+				}
 			}
-			break;
-
-		case ID_CMem:
-			res = read_memstate(&dest, rs->size());
-			break;
-
-		case MKTAG('M', 'A', 'l', 'l'):
-			res = read_heapstate(&dest, rs->size(), true, &heapsumlen, &heapsumarr);
-			break;
-
-		case ID_Stks:
-			res = read_stackstate(&dest, rs->size(), true);
-			break;
-
-		default:
-			break;
+		} else if (chunktype == IFFID('C', 'M', 'e', 'm')) {
+			res = read_memstate(&dest, chunklen);
+		} else if (chunktype == IFFID('M', 'A', 'l', 'l')) {
+			res = read_heapstate(&dest, chunklen, TRUE, &heapsumlen, &heapsumarr);
+		} else if (chunktype == IFFID('S', 't', 'k', 's')) {
+			res = read_stackstate(&dest, chunklen, TRUE);
+		} else {
+			/* Unknown chunk type. Skip it. */
+			for (lx = 0; res == 0 && lx < chunklen; lx++) {
+				res = read_byte(&dest, &dummy);
+			}
 		}
 
-		delete rs;
+		if (chunkstart + chunklen != dest.pos) {
+			/* ### funny chunk length */
+			return 1;
+		}
+
+		if ((chunklen & 1) != 0) {
+			if (res == 0) {
+				res = read_byte(&dest, &dummy);
+			}
+		}
 	}
 
-	if (!res) {
+	if (res == 0) {
 		if (heapsumarr) {
 			/* The summary might have come from any interpreter, so it could
 			   be out of order. We'll sort it. */
-			glulx_sort(heapsumarr + 2, (heapsumlen - 2) / 2, 2 * sizeof(uint), &sort_heap_summary);
+			glulx_sort(heapsumarr + 2, (heapsumlen - 2) / 2, 2 * sizeof(glui32),
+				&sort_heap_summary);
 			res = heap_apply_summary(heapsumlen, heapsumarr);
 		}
 	}
 
-	return res ? Common::kReadingFailed : Common::kNoError;
+	if (heapsumarr)
+		glulx_free(heapsumarr);
+
+	if (res)
+		return 1;
+
+	return 0;
 }
 
-Common::Error Glulx::saveGameChunks(QuetzalWriter &quetzal) {
-	uint res = 0;
-
-	// IFHd
-	if (!res) {
-		Common::WriteStream &ws = quetzal.add(ID_IFhd);
-		for (int ix = 0; res == 0 && ix < 128; ix++)
-			ws.writeByte(Mem1(ix));
-	}
-
-	// CMem
-	if (!res) {
-		Common::WriteStream &ws = quetzal.add(ID_CMem);
-		dest_t dest;
-		dest._dest = &ws;
-		res = write_memstate(&dest);
-	}
-
-	// MAll
-	if (!res) {
-		Common::WriteStream &ws = quetzal.add(MKTAG('M', 'A', 'l', 'l'));
-		dest_t dest;
-		dest._dest = &ws;
-		res = write_heapstate(&dest, true);
-	}
-
-	// Stks
-	if (!res) {
-		Common::WriteStream &ws = quetzal.add(ID_Stks);
-		dest_t dest;
-		dest._dest = &ws;
-		res = write_stackstate(&dest, true);
-	}
-
-	// All done
-	return res ? Common::kUnknownError : Common::kNoError;
-}
-
-int Glulx::reposition_write(dest_t *dest, uint pos) {
-	if (dest->_isMem) {
-		dest->_pos = pos;
+static int reposition_write(dest_t *dest, glui32 pos) {
+	if (dest->ismem) {
+		dest->pos = pos;
 	} else {
-		error("Seeking a WriteStream isn't allowed");
+		glk_stream_set_position(dest->str, pos, seekmode_Start);
+		dest->pos = pos;
 	}
 
 	return 0;
 }
 
-int Glulx::write_buffer(dest_t *dest, const byte *ptr, uint len) {
-	if (dest->_isMem) {
-		if (dest->_pos + len > dest->_size) {
-			dest->_size = dest->_pos + len + 1024;
-			if (!dest->_ptr) {
-				dest->_ptr = (byte *)glulx_malloc(dest->_size);
+static int write_buffer(dest_t *dest, unsigned char *ptr, glui32 len) {
+	if (dest->ismem) {
+		if (dest->pos + len > dest->size) {
+			dest->size = dest->pos + len + 1024;
+			if (!dest->ptr) {
+				dest->ptr = (unsigned char *)glulx_malloc(dest->size);
 			} else {
-				dest->_ptr = (byte *)glulx_realloc(dest->_ptr, dest->_size);
+				dest->ptr = glulx_realloc(dest->ptr, dest->size);
 			}
-			if (!dest->_ptr)
+			if (!dest->ptr)
 				return 1;
 		}
-		memcpy(dest->_ptr + dest->_pos, ptr, len);
+		memcpy(dest->ptr + dest->pos, ptr, len);
 	} else {
-		dest->_dest->write(ptr, len);
+		glk_put_buffer_stream(dest->str, (char *)ptr, len);
 	}
 
-	dest->_pos += len;
+	dest->pos += len;
 
 	return 0;
 }
 
-int Glulx::read_buffer(dest_t *dest, byte *ptr, uint len) {
-	uint newlen;
+static int read_buffer(dest_t *dest, unsigned char *ptr, glui32 len) {
+	glui32 newlen;
 
-	if (dest->_isMem) {
-		memcpy(ptr, dest->_ptr + dest->_pos, len);
+	if (dest->ismem) {
+		memcpy(ptr, dest->ptr + dest->pos, len);
 	} else {
-		newlen = dest->_src->read(ptr, len);
+		newlen = glk_get_buffer_stream(dest->str, (char *)ptr, len);
 		if (newlen != len)
 			return 1;
 	}
 
-	dest->_pos += len;
+	dest->pos += len;
 
 	return 0;
 }
 
-int Glulx::write_long(dest_t *dest, uint val) {
+static int write_long(dest_t *dest, glui32 val) {
 	unsigned char buf[4];
 	Write4(buf, val);
 	return write_buffer(dest, buf, 4);
 }
 
-int Glulx::write_short(dest_t *dest, uint16 val) {
-	unsigned char buf[2];
-	Write2(buf, val);
-	return write_buffer(dest, buf, 2);
+static int write_short(dest_t *dest, glui16 val)
+{
+  unsigned char buf[2];
+  Write2(buf, val);
+  return write_buffer(dest, buf, 2);
 }
 
-int Glulx::write_byte(dest_t *dest, byte val) {
+static int write_byte(dest_t *dest, unsigned char val) {
 	return write_buffer(dest, &val, 1);
 }
 
-int Glulx::read_long(dest_t *dest, uint *val) {
+static int read_long(dest_t *dest, glui32 *val) {
 	unsigned char buf[4];
 	int res = read_buffer(dest, buf, 4);
 	if (res)
@@ -408,7 +656,7 @@ int Glulx::read_long(dest_t *dest, uint *val) {
 	return 0;
 }
 
-int Glulx::read_short(dest_t *dest, uint16 *val) {
+static int read_short(dest_t *dest, glui16 *val) {
 	unsigned char buf[2];
 	int res = read_buffer(dest, buf, 2);
 	if (res)
@@ -417,17 +665,17 @@ int Glulx::read_short(dest_t *dest, uint16 *val) {
 	return 0;
 }
 
-int Glulx::read_byte(dest_t *dest, byte *val) {
+static int read_byte(dest_t *dest, unsigned char *val) {
 	return read_buffer(dest, val, 1);
 }
 
-uint Glulx::write_memstate(dest_t *dest) {
-	uint res, pos;
+static glui32 write_memstate(dest_t *dest) {
+	glui32 res, pos;
 	int val;
 	int runlen;
 	unsigned char ch;
 #ifdef SERIALIZE_CACHE_RAM
-	uint cachepos;
+	glui32 cachepos;
 #endif /* SERIALIZE_CACHE_RAM */
 
 	res = write_long(dest, endmem);
@@ -439,7 +687,7 @@ uint Glulx::write_memstate(dest_t *dest) {
 #ifdef SERIALIZE_CACHE_RAM
 	cachepos = 0;
 #else /* SERIALIZE_CACHE_RAM */
-	_gameFile.seek(gamefile_start + ramstart);
+	glk_stream_set_position(gamefile, gamefile_start + ramstart, seekmode_Start);
 #endif /* SERIALIZE_CACHE_RAM */
 
 	for (pos = ramstart; pos < endmem; pos++) {
@@ -484,15 +732,15 @@ uint Glulx::write_memstate(dest_t *dest) {
 	return 0;
 }
 
-uint Glulx::read_memstate(dest_t *dest, uint chunklen) {
-	uint chunkend = dest->_pos + chunklen;
-	uint newlen;
-	uint res, pos;
+static glui32 read_memstate(dest_t *dest, glui32 chunklen) {
+	glui32 chunkend = dest->pos + chunklen;
+	glui32 newlen;
+	glui32 res, pos;
 	int val;
 	int runlen;
 	unsigned char ch, ch2;
 #ifdef SERIALIZE_CACHE_RAM
-	uint cachepos;
+	glui32 cachepos;
 #endif /* SERIALIZE_CACHE_RAM */
 
 	heap_clear();
@@ -501,7 +749,7 @@ uint Glulx::read_memstate(dest_t *dest, uint chunklen) {
 	if (res)
 		return res;
 
-	res = change_memsize(newlen, false);
+	res = change_memsize(newlen, FALSE);
 	if (res)
 		return res;
 
@@ -510,7 +758,7 @@ uint Glulx::read_memstate(dest_t *dest, uint chunklen) {
 #ifdef SERIALIZE_CACHE_RAM
 	cachepos = 0;
 #else /* SERIALIZE_CACHE_RAM */
-	_gameFile.seek(gamefile_start + ramstart);
+	glk_stream_set_position(gamefile, gamefile_start + ramstart, seekmode_Start);
 #endif /* SERIALIZE_CACHE_RAM */
 
 	for (pos = ramstart; pos < endmem; pos++) {
@@ -519,9 +767,9 @@ uint Glulx::read_memstate(dest_t *dest, uint chunklen) {
 			val = ramcache[cachepos];
 			cachepos++;
 #else /* SERIALIZE_CACHE_RAM */
-			if (_gameFile.pos() >= _gameFile.size()) {
+			val = glk_get_char_stream(gamefile);
+			if (val == -1) {
 				fatal_error("The game file ended unexpectedly while restoring.");
-				val = _gameFile.readByte();
 			}
 #endif /* SERIALIZE_CACHE_RAM */
 			ch = (unsigned char)val;
@@ -529,7 +777,7 @@ uint Glulx::read_memstate(dest_t *dest, uint chunklen) {
 			ch = 0;
 		}
 
-		if (dest->_pos >= chunkend) {
+		if (dest->pos >= chunkend) {
 			/* we're into the final, unstored run. */
 		} else if (runlen) {
 			runlen--;
@@ -541,7 +789,7 @@ uint Glulx::read_memstate(dest_t *dest, uint chunklen) {
 				res = read_byte(dest, &ch2);
 				if (res)
 					return res;
-				runlen = (uint)ch2;
+				runlen = (glui32)ch2;
 			} else {
 				ch ^= ch2;
 			}
@@ -556,10 +804,10 @@ uint Glulx::read_memstate(dest_t *dest, uint chunklen) {
 	return 0;
 }
 
-uint Glulx::write_heapstate(dest_t *dest, int portable) {
-	uint res;
-	uint sumlen;
-	uint *sumarray;
+static glui32 write_heapstate(dest_t *dest, int portable) {
+	glui32 res;
+	glui32 sumlen;
+	glui32 *sumarray;
 
 	res = heap_get_summary(&sumlen, &sumarray);
 	if (res)
@@ -574,13 +822,14 @@ uint Glulx::write_heapstate(dest_t *dest, int portable) {
 	return res;
 }
 
-uint Glulx::write_heapstate_sub(uint sumlen, uint *sumarray, dest_t *dest, int portable)  {
-	uint res, lx;
+static glui32 write_heapstate_sub(glui32 sumlen, glui32 *sumarray,
+	dest_t *dest, int portable) {
+	glui32 res, lx;
 
 	/* If we're storing for the purpose of undo, we don't need to do any
 	   byte-swapping, because the result will only be used by this session. */
 	if (!portable) {
-		res = write_buffer(dest, (const byte *)sumarray, sumlen * sizeof(uint));
+		res = write_buffer(dest, (unsigned char *)sumarray, sumlen * sizeof(glui32));
 		if (res)
 			return res;
 		return 0;
@@ -595,9 +844,9 @@ uint Glulx::write_heapstate_sub(uint sumlen, uint *sumarray, dest_t *dest, int p
 	return 0;
 }
 
-int Glulx::sort_heap_summary(const void *p1, const void *p2) {
-	uint v1 = *(const uint *)p1;
-	uint v2 = *(const uint *)p2;
+static int sort_heap_summary(const void *p1, const void *p2) {
+	glui32 v1 = *(const glui32 *)p1;
+	glui32 v2 = *(const glui32 *)p2;
 
 	if (v1 < v2)
 		return -1;
@@ -606,24 +855,25 @@ int Glulx::sort_heap_summary(const void *p1, const void *p2) {
 	return 0;
 }
 
-uint Glulx::read_heapstate(dest_t *dest, uint chunklen, int portable, uint *sumlen, uint **summary) {
-	uint res, count, lx;
-	uint *arr;
+static glui32 read_heapstate(dest_t *dest, glui32 chunklen, int portable,
+	glui32 *sumlen, glui32 **summary) {
+	glui32 res, count, lx;
+	glui32 *arr;
 
 	*sumlen = 0;
-	*summary = nullptr;
+	*summary = NULL;
 
 	if (chunklen == 0)
 		return 0; /* no heap */
 
 	if (!portable) {
-		count = chunklen / sizeof(uint);
+		count = chunklen / sizeof(glui32);
 
-		arr = (uint *)glulx_malloc(chunklen);
+		arr = (glui32 *)glulx_malloc(chunklen);
 		if (!arr)
 			return 1;
 
-		res = read_buffer(dest, (byte *)arr, chunklen);
+		res = read_buffer(dest, (unsigned char *)arr, chunklen);
 		if (res)
 			return res;
 
@@ -635,7 +885,7 @@ uint Glulx::read_heapstate(dest_t *dest, uint chunklen, int portable, uint *suml
 
 	count = chunklen / 4;
 
-	arr = (uint *)glulx_malloc(count * sizeof(uint));
+	arr = (glui32 *)glulx_malloc(count * sizeof(glui32));
 	if (!arr)
 		return 1;
 
@@ -651,10 +901,10 @@ uint Glulx::read_heapstate(dest_t *dest, uint chunklen, int portable, uint *suml
 	return 0;
 }
 
-uint Glulx::write_stackstate(dest_t *dest, int portable) {
-	uint res;
-	uint lx;
-	uint lastframe;
+static glui32 write_stackstate(dest_t *dest, int portable) {
+	glui32 res;
+	glui32 lx;
+	glui32 lastframe;
 
 	/* If we're storing for the purpose of undo, we don't need to do any
 	   byte-swapping, because the result will only be used by this session. */
@@ -671,11 +921,11 @@ uint Glulx::write_stackstate(dest_t *dest, int portable) {
 	   (This includes the last frame, because the save opcode pushes on
 	   a call stub before it calls perform_save().) */
 
-	lastframe = (uint)(-1);
+	lastframe = (glui32)(-1);
 	while (1) {
-		uint frameend, frm, frm2, frm3;
+		glui32 frameend, frm, frm2, frm3;
 		unsigned char loctype, loccount;
-		uint numlocals, frlen, locpos;
+		glui32 numlocals, frlen, locpos;
 
 		/* Find the next stack frame (after the one in lastframe). Sadly,
 		   this requires searching the stack from the top down. We have to
@@ -684,8 +934,9 @@ uint Glulx::write_stackstate(dest_t *dest, int portable) {
 		   If it becomes a practical problem, we can build a stack-frame
 		   array, which requires dynamic allocation. */
 		for (frm = stackptr, frameend = stackptr;
-		        frm != 0 && (frm2 = Stk4(frm - 4)) != lastframe;
-		        frameend = frm, frm = frm2) { };
+			frm != 0 && (frm2 = Stk4(frm - 4)) != lastframe;
+			frameend = frm, frm = frm2) {
+		};
 
 		/* Write out the frame. */
 		frm2 = frm;
@@ -809,9 +1060,9 @@ uint Glulx::write_stackstate(dest_t *dest, int portable) {
 	return 0;
 }
 
-uint Glulx::read_stackstate(dest_t *dest, uint chunklen, int portable) {
-	uint res;
-	uint frameend, frm, frm2, frm3, locpos, frlen, numlocals;
+static glui32 read_stackstate(dest_t *dest, glui32 chunklen, int portable) {
+	glui32 res;
+	glui32 frameend, frm, frm2, frm3, locpos, frlen, numlocals;
 
 	if (chunklen > stacksize)
 		return 1;
@@ -885,7 +1136,7 @@ uint Glulx::read_stackstate(dest_t *dest, uint chunklen, int portable) {
 
 			case 2:
 				do {
-					uint16 loc = Read2(stack + frm2);
+					glui16 loc = Read2(stack + frm2);
 					StkW2(frm2, loc);
 					frm2 += 2;
 					loccount--;
@@ -894,7 +1145,7 @@ uint Glulx::read_stackstate(dest_t *dest, uint chunklen, int portable) {
 
 			case 4:
 				do {
-					uint loc = Read4(stack + frm2);
+					glui32 loc = Read4(stack + frm2);
 					StkW4(frm2, loc);
 					frm2 += 4;
 					loccount--;
@@ -929,7 +1180,7 @@ uint Glulx::read_stackstate(dest_t *dest, uint chunklen, int portable) {
 		/* Now, the values pushed on the stack after the call frame itself.
 		   This includes the stub. */
 		while (frm2 < frameend) {
-			uint loc = Read4(stack + frm2);
+			glui32 loc = Read4(stack + frm2);
 			StkW4(frm2, loc);
 			frm2 += 4;
 		}
@@ -940,22 +1191,23 @@ uint Glulx::read_stackstate(dest_t *dest, uint chunklen, int portable) {
 	return 0;
 }
 
-uint Glulx::perform_verify() {
-	uint len, chksum = 0, newlen;
+glui32 perform_verify() {
+	glui32 len, checksumTotal, newlen;
 	unsigned char buf[4];
-	uint val, newsum, ix;
+	glui32 val, newsum, ix;
 
 	len = gamefile_len;
+	checksumTotal = 0;
 
 	if (len < 256 || (len & 0xFF) != 0)
 		return 1;
 
-	_gameFile.seek(gamefile_start);
+	glk_stream_set_position(gamefile, gamefile_start, seekmode_Start);
 	newsum = 0;
 
 	/* Read the header */
 	for (ix = 0; ix < 9; ix++) {
-		newlen = _gameFile.read(buf, 4);
+		newlen = glk_get_buffer_stream(gamefile, (char *)buf, 4);
 		if (newlen != 4)
 			return 1;
 		val = Read4(buf);
@@ -964,25 +1216,25 @@ uint Glulx::perform_verify() {
 				return 1;
 		}
 		if (ix == 8)
-			chksum = val;
+			checksumTotal = val;
 		else
 			newsum += val;
 	}
 
 	/* Read everything else */
 	for (; ix < len / 4; ix++) {
-		newlen = _gameFile.read(buf, 4);
+		newlen = glk_get_buffer_stream(gamefile, (char *)buf, 4);
 		if (newlen != 4)
 			return 1;
 		val = Read4(buf);
 		newsum += val;
 	}
 
-	if (newsum != chksum)
+	if (newsum != checksumTotal)
 		return 1;
 
 	return 0;
 }
 
-} // End of namespace Glulx
-} // End of namespace Glk
+} // namespace Glulx
+} // namespace Glk

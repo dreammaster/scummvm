@@ -19,19 +19,24 @@
  *
  */
 
-#include "glk/glulx/glulx.h"
+/* Glulxe code for gestalt selectors
+ */
+
+#include "glk/glk.h"
+#include "glk/glulx/glulxe.h"
+#include "glk/glulx/gestalt.h"
 
 namespace Glk {
 namespace Glulx {
 
-uint Glulx::do_gestalt(uint val, uint val2) {
+glui32 do_gestalt(glui32 val, glui32 val2) {
 	switch (val) {
 
 	case gestulx_GlulxVersion:
-		return 0x00030102; /* Glulx spec version 3.1.2 */
+		return 0x00030103; /* Glulx spec version 3.1.3 */
 
 	case gestulx_TerpVersion:
-		return 0x00000504; /* Glulx version 0.5.4 */
+		return 0x00000601; /* Glulxe version 0.6.1 */
 
 	case gestulx_ResizeMem:
 #ifdef FIXED_MEMSIZE
@@ -41,7 +46,9 @@ uint Glulx::do_gestalt(uint val, uint val2) {
 #endif /* FIXED_MEMSIZE */
 
 	case gestulx_Undo:
-		return 1; /* We can handle saveundo and restoreundo. */
+		if (max_undo_level > 0)
+			return 1; /* We can handle saveundo and restoreundo. */
+		return 0; /* Got "--undo 0", so nope. */
 
 	case gestulx_IOSystem:
 		switch (val2) {
@@ -86,6 +93,20 @@ uint Glulx::do_gestalt(uint val, uint val2) {
 		return 0; /* The floating-point opcodes are not compiled in. */
 #endif /* FLOAT_SUPPORT */
 
+	case gestulx_ExtUndo:
+		return 1; /* We can handle hasundo and discardundo. */
+
+	case gestulx_Double:
+#ifdef FLOAT_SUPPORT
+#ifdef DOUBLE_SUPPORT   /* Inside FLOAT_SUPPORT! */
+		return 1; /* We can do double-precision operations. */
+#else /* DOUBLE_SUPPORT */
+		return 0; /* The double-precision opcodes are not compiled in. */
+#endif /* DOUBLE_SUPPORT */
+#else /* FLOAT_SUPPORT */
+		return 0; /* Neither float nor double opcodes are compiled in. */
+#endif /* FLOAT_SUPPORT */
+
 #ifdef GLULX_EXTEND_GESTALT
 		GLULX_EXTEND_GESTALT
 #endif /* GLULX_EXTEND_GESTALT */
@@ -96,5 +117,5 @@ uint Glulx::do_gestalt(uint val, uint val2) {
 	}
 }
 
-} // End of namespace Glulx
-} // End of namespace Glk
+} // namespace Glulx
+} // namespace Glk

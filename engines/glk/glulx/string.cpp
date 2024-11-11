@@ -19,23 +19,58 @@
  *
  */
 
-#include "glk/glulx/glulx.h"
+/* Glulxe string and text functions.
+ */
+
+#include "glk/glk.h"
+#include "glk/glulx/glulxe.h"
+#include "glk/glulx/glulx_types.h"
 
 namespace Glk {
 namespace Glulx {
 
-void Glulx::stream_get_iosys(uint *mode, uint *rock) {
+static glui32 iosys_mode;
+static glui32 iosys_rock;
+/* These constants are defined in the Glulx spec. */
+#define iosys_None (0)
+#define iosys_Filter (1)
+#define iosys_Glk (2)
+
+#define CACHEBITS (4)
+#define CACHESIZE (1<<CACHEBITS) 
+#define CACHEMASK (15)
+
+/* The current string-decoding tables, broken out into a fast and
+   easy-to-use form. */
+static int tablecache_valid = FALSE;
+static cacheblock_t tablecache;
+
+static void stream_setup_unichar(void);
+
+static void nopio_char_han(unsigned char ch);
+static void filio_char_han(unsigned char ch);
+static void nopio_unichar_han(glui32 ch);
+static void filio_unichar_han(glui32 ch);
+static void glkio_unichar_nouni_han(glui32 val);
+static void (*glkio_unichar_han_ptr)(glui32 val) = NULL;
+
+static void dropcache(cacheblock_t *cablist);
+static void buildcache(cacheblock_t *cablist, glui32 nodeaddr, int depth,
+	int mask, int recdepth);
+//static void dumpcache(cacheblock_t *cablist, int count, int indent);
+
+void stream_get_iosys(glui32 *mode, glui32 *rock) {
 	*mode = iosys_mode;
 	*rock = iosys_rock;
 }
 
-void Glulx::stream_setup_unichar() {
+static void stream_setup_unichar() {
 #ifdef GLK_MODULE_UNICODE
 
 	if (glk_gestalt(gestalt_Unicode, 0))
-		glkio_unichar_han_ptr = &Glulx::glk_put_char_uni;
+		glkio_unichar_han_ptr = glk_put_char_uni;
 	else
-		glkio_unichar_han_ptr = &Glulx::glkio_unichar_nouni_han;
+		glkio_unichar_han_ptr = glkio_unichar_nouni_han;
 
 #else /* GLK_MODULE_UNICODE */
 
@@ -44,25 +79,26 @@ void Glulx::stream_setup_unichar() {
 #endif /* GLK_MODULE_UNICODE */
 }
 
-void Glulx::stream_set_iosys(uint mode, uint rock) {
+void stream_set_iosys(glui32 mode, glui32 rock) {
 	switch (mode) {
 	default:
 		mode = 0;
-		// fall through
+		// Fall through to next case (no-op I/O).
+
 	case iosys_None:
 		rock = 0;
-		stream_char_handler = &Glulx::nopio_char_han;
-		stream_unichar_handler = &Glulx::nopio_unichar_han;
+		stream_char_handler = nopio_char_han;
+		stream_unichar_handler = nopio_unichar_han;
 		break;
 	case iosys_Filter:
-		stream_char_handler = &Glulx::filio_char_han;
-		stream_unichar_handler = &Glulx::filio_unichar_han;
+		stream_char_handler = filio_char_han;
+		stream_unichar_handler = filio_unichar_han;
 		break;
 	case iosys_Glk:
 		if (!glkio_unichar_han_ptr)
 			stream_setup_unichar();
 		rock = 0;
-		stream_char_handler = &Glulx::glk_put_char;
+		stream_char_handler = glk_put_char;
 		stream_unichar_handler = glkio_unichar_han_ptr;
 		break;
 	}
@@ -71,43 +107,45 @@ void Glulx::stream_set_iosys(uint mode, uint rock) {
 	iosys_rock = rock;
 }
 
-void Glulx::nopio_char_han(unsigned char ch) {
+static void nopio_char_han(unsigned char ch) {
 }
 
-void Glulx::nopio_unichar_han(uint32 ch) {
+static void nopio_unichar_han(glui32 ch) {
 }
 
-void Glulx::filio_char_han(unsigned char ch) {
-	uint val = ch;
+static void filio_char_han(unsigned char ch) {
+	glui32 val = ch;
 	push_callstub(0, 0);
 	enter_function(iosys_rock, 1, &val);
 }
 
-void Glulx::filio_unichar_han(uint32 val) {
-	uint v = val;
+static void filio_unichar_han(glui32 val) {
 	push_callstub(0, 0);
-	enter_function(iosys_rock, 1, &v);
+	enter_function(iosys_rock, 1, &val);
 }
 
-void Glulx::glkio_unichar_nouni_han(uint32 val) {
+static void glkio_unichar_nouni_han(glui32 val) {
 	/* Only used if the Glk library has no Unicode functions */
 	if (val > 0xFF)
 		val = '?';
 	glk_put_char(val);
 }
 
-void Glulx::stream_num(int val, int inmiddle, int charnum) {
+/* stream_num():
+   Write a signed integer to the current output stream.
+*/
+void stream_num(glsi32 val, int inmiddle, int charnum) {
 	int ix = 0;
 	int res, jx;
 	char buf[16];
-	uint ival;
+	glui32 ival;
 
 	if (val == 0) {
 		buf[ix] = '0';
 		ix++;
 	} else {
 		if (val < 0)
-			ival = -val;
+			ival = -(int32)val;
 		else
 			ival = val;
 
@@ -136,7 +174,7 @@ void Glulx::stream_num(int val, int inmiddle, int charnum) {
 	case iosys_Filter:
 		if (!inmiddle) {
 			push_callstub(0x11, 0);
-			inmiddle = true;
+			inmiddle = TRUE;
 		}
 		if (charnum < ix) {
 			ival = buf[(ix - 1) - charnum] & 0xFF;
@@ -159,12 +197,18 @@ void Glulx::stream_num(int val, int inmiddle, int charnum) {
 	}
 }
 
-void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
+/* stream_string():
+   Write a Glulx string object to the current output stream.
+   inmiddle is zero if we are beginning a new string, or
+   nonzero if restarting one (E0/E1/E2, as appropriate for
+   the string type).
+*/
+void stream_string(glui32 addr, int inmiddle, int bitnum) {
 	int ch;
 	int type;
-	int alldone = false;
+	int alldone = FALSE;
 	int substring = (inmiddle != 0);
-	uint ival;
+	glui32 ival;
 
 	if (!addr)
 		fatal_error("Called stream_string with null address.");
@@ -186,7 +230,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 			if (tablecache_valid) {
 				int bits, numbits;
 				int readahead;
-				uint tmpaddr;
+				glui32 tmpaddr;
 				cacheblock_t *cablist;
 				int done = 0;
 
@@ -195,7 +239,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 				if (bitnum)
 					bits >>= bitnum;
 				numbits = (8 - bitnum);
-				readahead = false;
+				readahead = FALSE;
 
 				if (tablecache.type != 0) {
 					/* This is a bit of a cheat. If the top-level block is not
@@ -214,7 +258,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 						int newbyte = Mem1(addr + 1);
 						bits |= (newbyte << numbits);
 						numbits += 8;
-						readahead = true;
+						readahead = TRUE;
 					}
 
 					cab = &(cablist[bits & CACHEMASK]);
@@ -225,7 +269,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 						addr += 1;
 						bitnum -= 8;
 						if (readahead) {
-							readahead = false;
+							readahead = FALSE;
 						} else {
 							int newbyte = Mem1(addr);
 							bits |= (newbyte << numbits);
@@ -249,7 +293,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 							ival = cab->u.ch & 0xFF;
 							if (!substring) {
 								push_callstub(0x11, 0);
-								substring = true;
+								substring = TRUE;
 							}
 							pc = addr;
 							push_callstub(0x10, bitnum);
@@ -261,13 +305,13 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 					case 0x04: /* single Unicode character */
 						switch (iosys_mode) {
 						case iosys_Glk:
-							(this->*glkio_unichar_han_ptr)(cab->u.uch);
+							glkio_unichar_han_ptr(cab->u.uch);
 							break;
 						case iosys_Filter:
 							ival = cab->u.uch;
 							if (!substring) {
 								push_callstub(0x11, 0);
-								substring = true;
+								substring = TRUE;
 							}
 							pc = addr;
 							push_callstub(0x10, bitnum);
@@ -286,7 +330,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 						case iosys_Filter:
 							if (!substring) {
 								push_callstub(0x11, 0);
-								substring = true;
+								substring = TRUE;
 							}
 							pc = addr;
 							push_callstub(0x10, bitnum);
@@ -303,13 +347,13 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 						switch (iosys_mode) {
 						case iosys_Glk:
 							for (tmpaddr = cab->u.addr; (ival = Mem4(tmpaddr)) != 0; tmpaddr += 4)
-								(this->*glkio_unichar_han_ptr)(ival);
+								glkio_unichar_han_ptr(ival);
 							cablist = tablecache.u.branches;
 							break;
 						case iosys_Filter:
 							if (!substring) {
 								push_callstub(0x11, 0);
-								substring = true;
+								substring = TRUE;
 							}
 							pc = addr;
 							push_callstub(0x10, bitnum);
@@ -325,8 +369,9 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 					case 0x08:
 					case 0x09:
 					case 0x0A:
-					case 0x0B: {
-						uint oaddr;
+					case 0x0B:
+					{
+						glui32 oaddr;
 						int otype;
 						oaddr = cab->u.addr;
 						if (cab->type >= 0x09)
@@ -336,7 +381,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 						otype = Mem1(oaddr);
 						if (!substring) {
 							push_callstub(0x11, 0);
-							substring = true;
+							substring = TRUE;
 						}
 						if (otype >= 0xE0 && otype <= 0xFF) {
 							pc = addr;
@@ -345,14 +390,14 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 							addr = oaddr;
 							done = 2;
 						} else if (otype >= 0xC0 && otype <= 0xDF) {
-							uint argc;
-							uint *argv;
+							glui32 argc;
+							glui32 *argv;
 							if (cab->type == 0x0A || cab->type == 0x0B) {
 								argc = Mem4(cab->u.addr + 4);
 								argv = pop_arguments(argc, cab->u.addr + 8);
 							} else {
 								argc = 0;
-								argv = nullptr;
+								argv = NULL;
 							}
 							pc = addr;
 							push_callstub(0x10, bitnum);
@@ -372,34 +417,34 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 					continue; /* restart the top-level loop */
 				}
 			} else { /* tablecache not valid */
-				uint node;
-				int byte1;
+				glui32 node;
+				int byte;
 				int nodetype;
 				int done = 0;
 
 				if (!stringtable)
 					fatal_error("Attempted to print a compressed string with no table set.");
 				/* bitnum is already set right */
-				byte1 = Mem1(addr);
+				byte = Mem1(addr);
 				if (bitnum)
-					byte1 >>= bitnum;
+					byte >>= bitnum;
 				node = Mem4(stringtable + 8);
 				while (!done) {
 					nodetype = Mem1(node);
 					node++;
 					switch (nodetype) {
 					case 0x00: /* non-leaf node */
-						if (byte1 & 1)
+						if (byte & 1)
 							node = Mem4(node + 4);
 						else
 							node = Mem4(node + 0);
 						if (bitnum == 7) {
 							bitnum = 0;
 							addr++;
-							byte1 = Mem1(addr);
+							byte = Mem1(addr);
 						} else {
 							bitnum++;
-							byte1 >>= 1;
+							byte >>= 1;
 						}
 						break;
 					case 0x01: /* string terminator */
@@ -415,7 +460,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 							ival = ch & 0xFF;
 							if (!substring) {
 								push_callstub(0x11, 0);
-								substring = true;
+								substring = TRUE;
 							}
 							pc = addr;
 							push_callstub(0x10, bitnum);
@@ -428,12 +473,12 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 						ival = Mem4(node);
 						switch (iosys_mode) {
 						case iosys_Glk:
-							(this->*glkio_unichar_han_ptr)(ival);
+							glkio_unichar_han_ptr(ival);
 							break;
 						case iosys_Filter:
 							if (!substring) {
 								push_callstub(0x11, 0);
-								substring = true;
+								substring = TRUE;
 							}
 							pc = addr;
 							push_callstub(0x10, bitnum);
@@ -452,7 +497,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 						case iosys_Filter:
 							if (!substring) {
 								push_callstub(0x11, 0);
-								substring = true;
+								substring = TRUE;
 							}
 							pc = addr;
 							push_callstub(0x10, bitnum);
@@ -469,13 +514,13 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 						switch (iosys_mode) {
 						case iosys_Glk:
 							for (; (ival = Mem4(node)) != 0; node += 4)
-								(this->*glkio_unichar_han_ptr)(ival);
+								glkio_unichar_han_ptr(ival);
 							node = Mem4(stringtable + 8);
 							break;
 						case iosys_Filter:
 							if (!substring) {
 								push_callstub(0x11, 0);
-								substring = true;
+								substring = TRUE;
 							}
 							pc = addr;
 							push_callstub(0x10, bitnum);
@@ -491,8 +536,9 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 					case 0x08:
 					case 0x09:
 					case 0x0A:
-					case 0x0B: {
-						uint oaddr;
+					case 0x0B:
+					{
+						glui32 oaddr;
 						int otype;
 						oaddr = Mem4(node);
 						if (nodetype == 0x09 || nodetype == 0x0B)
@@ -500,7 +546,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 						otype = Mem1(oaddr);
 						if (!substring) {
 							push_callstub(0x11, 0);
-							substring = true;
+							substring = TRUE;
 						}
 						if (otype >= 0xE0 && otype <= 0xFF) {
 							pc = addr;
@@ -509,14 +555,14 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 							addr = oaddr;
 							done = 2;
 						} else if (otype >= 0xC0 && otype <= 0xDF) {
-							uint argc;
-							uint *argv;
+							glui32 argc;
+							glui32 *argv;
 							if (nodetype == 0x0A || nodetype == 0x0B) {
 								argc = Mem4(node + 4);
 								argv = pop_arguments(argc, node + 8);
 							} else {
 								argc = 0;
-								argv = nullptr;
+								argv = NULL;
 							}
 							pc = addr;
 							push_callstub(0x10, bitnum);
@@ -550,7 +596,7 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 			case iosys_Filter:
 				if (!substring) {
 					push_callstub(0x11, 0);
-					substring = true;
+					substring = TRUE;
 				}
 				ch = Mem1(addr);
 				addr++;
@@ -571,13 +617,13 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 					addr += 4;
 					if (ival == 0)
 						break;
-					(this->*glkio_unichar_han_ptr)(ival);
+					glkio_unichar_han_ptr(ival);
 				}
 				break;
 			case iosys_Filter:
 				if (!substring) {
 					push_callstub(0x11, 0);
-					substring = true;
+					substring = TRUE;
 				}
 				ival = Mem4(addr);
 				addr += 4;
@@ -597,12 +643,12 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 
 		if (!substring) {
 			/* Just get straight out. */
-			alldone = true;
+			alldone = TRUE;
 		} else {
 			/* Pop a stub and see what's to be done. */
 			addr = pop_callstub_string(&bitnum);
 			if (addr == 0) {
-				alldone = true;
+				alldone = TRUE;
 			} else {
 				inmiddle = 0xE1;
 			}
@@ -610,11 +656,17 @@ void Glulx::stream_string(uint addr, int inmiddle, int bitnum) {
 	}
 }
 
-uint Glulx::stream_get_table() {
+/* stream_get_table():
+   Get the current table address.
+*/
+glui32 stream_get_table() {
 	return stringtable;
 }
 
-void Glulx::stream_set_table(uint addr) {
+/* stream_set_table():
+   Set the current table address, and rebuild decoding cache.
+*/
+void stream_set_table(glui32 addr) {
 	if (stringtable == addr)
 		return;
 
@@ -622,36 +674,42 @@ void Glulx::stream_set_table(uint addr) {
 	if (tablecache_valid) {
 		if (tablecache.type == 0)
 			dropcache(tablecache.u.branches);
-		tablecache.u.branches = nullptr;
-		tablecache_valid = false;
+		tablecache.u.branches = NULL;
+		tablecache_valid = FALSE;
 	}
 
 	stringtable = addr;
 
 	if (stringtable) {
 		/* Build cache. We can only do this if the table is entirely in ROM. */
-		uint tablelen = Mem4(stringtable);
-		uint rootaddr = Mem4(stringtable + 8);
+		glui32 tablelen = Mem4(stringtable);
+		glui32 rootaddr = Mem4(stringtable + 8);
 		int cache_stringtable = (stringtable + tablelen <= ramstart);
-		/* cache_stringtable = true; ...for testing only */
-		/* cache_stringtable = false; ...for testing only */
+		/* cache_stringtable = TRUE; ...for testing only */
+		/* cache_stringtable = FALSE; ...for testing only */
 		if (cache_stringtable) {
-			buildcache(&tablecache, rootaddr, CACHEBITS, 0);
+			buildcache(&tablecache, rootaddr, CACHEBITS, 0, 0);
 			/* dumpcache(&tablecache, 1, 0); */
-			tablecache_valid = true;
+			tablecache_valid = TRUE;
 		}
 	}
 }
 
-void Glulx::buildcache(cacheblock_t *cablist, uint nodeaddr, int depth, int mask) {
+static void buildcache(cacheblock_t *cablist, glui32 nodeaddr, int depth,
+	int mask, int recdepth) {
 	int ix, type;
+
+	/* This gets up to 24 in large games, so I think 48 is a generous
+	   maximum. If it's not, we might need a command-line parameter. */
+	if (recdepth >= 48)
+		fatal_error("Apparent infinite recursion in buildcache");
 
 	type = Mem1(nodeaddr);
 
 	if (type == 0 && depth == CACHEBITS) {
 		cacheblock_t *list, *cab;
 		list = (cacheblock_t *)glulx_malloc(sizeof(cacheblock_t) * CACHESIZE);
-		buildcache(list, nodeaddr, 0, 0);
+		buildcache(list, nodeaddr, 0, 0, recdepth + 1);
 		cab = &(cablist[mask]);
 		cab->type = 0;
 		cab->depth = CACHEBITS;
@@ -660,10 +718,10 @@ void Glulx::buildcache(cacheblock_t *cablist, uint nodeaddr, int depth, int mask
 	}
 
 	if (type == 0) {
-		uint leftaddr  = Mem4(nodeaddr + 1);
-		uint rightaddr = Mem4(nodeaddr + 5);
-		buildcache(cablist, leftaddr, depth + 1, mask);
-		buildcache(cablist, rightaddr, depth + 1, (mask | (1 << depth)));
+		glui32 leftaddr = Mem4(nodeaddr + 1);
+		glui32 rightaddr = Mem4(nodeaddr + 5);
+		buildcache(cablist, leftaddr, depth + 1, mask, recdepth + 1);
+		buildcache(cablist, rightaddr, depth + 1, (mask | (1 << depth)), recdepth + 1);
 		return;
 	}
 
@@ -696,7 +754,7 @@ void Glulx::buildcache(cacheblock_t *cablist, uint nodeaddr, int depth, int mask
 
 #if 0
 #include <stdio.h>
-void Glulx::dumpcache(cacheblock_t *cablist, int count, int indent) {
+static void dumpcache(cacheblock_t *cablist, int count, int indent) {
 	int ix, jx;
 
 	for (ix = 0; ix < count; ix++) {
@@ -727,28 +785,34 @@ void Glulx::dumpcache(cacheblock_t *cablist, int count, int indent) {
 }
 #endif /* 0 */
 
-void Glulx::dropcache(cacheblock_t *cablist) {
+static void dropcache(cacheblock_t *cablist) {
 	int ix;
 	for (ix = 0; ix < CACHESIZE; ix++) {
 		cacheblock_t *cab = &(cablist[ix]);
 		if (cab->type == 0) {
 			dropcache(cab->u.branches);
-			cab->u.branches = nullptr;
+			cab->u.branches = NULL;
 		}
 	}
 	glulx_free(cablist);
 }
 
-char *Glulx::make_temp_string(uint addr) {
+/* This misbehaves if a Glk function has more than one S argument. */
+
+#define STATIC_TEMP_BUFSIZE (127)
+static char temp_buf[STATIC_TEMP_BUFSIZE + 1];
+
+char *make_temp_string(glui32 addr) {
 	int ix, len;
-	uint addr2;
+	glui32 addr2;
 	char *res;
 
 	if (Mem1(addr) != 0xE0)
 		fatal_error("String argument to a Glk call must be unencoded.");
 	addr++;
 
-	for (addr2 = addr; Mem1(addr2); addr2++) { };
+	for (addr2 = addr; Mem1(addr2); addr2++) {
+	};
 	len = (addr2 - addr);
 	if (len < STATIC_TEMP_BUFSIZE) {
 		res = temp_buf;
@@ -766,21 +830,22 @@ char *Glulx::make_temp_string(uint addr) {
 	return res;
 }
 
-uint32 *Glulx::make_temp_ustring(uint addr) {
+glui32 *make_temp_ustring(glui32 addr) {
 	int ix, len;
-	uint addr2;
-	uint32 *res;
+	glui32 addr2;
+	glui32 *res;
 
 	if (Mem1(addr) != 0xE2)
 		fatal_error("Ustring argument to a Glk call must be unencoded.");
 	addr += 4;
 
-	for (addr2 = addr; Mem4(addr2); addr2 += 4) { };
+	for (addr2 = addr; Mem4(addr2); addr2 += 4) {
+	};
 	len = (addr2 - addr) / 4;
 	if ((len + 1) * 4 < STATIC_TEMP_BUFSIZE) {
-		res = (uint32 *)temp_buf;
+		res = (glui32 *)temp_buf;
 	} else {
-		res = (uint32 *)glulx_malloc((len + 1) * 4);
+		res = (glui32 *)glulx_malloc((len + 1) * 4);
 		if (!res)
 			fatal_error("Unable to allocate space for ustring argument to Glk call.");
 	}
@@ -793,15 +858,15 @@ uint32 *Glulx::make_temp_ustring(uint addr) {
 	return res;
 }
 
-void Glulx::free_temp_string(char *str) {
+void free_temp_string(char *str) {
 	if (str && str != temp_buf)
 		glulx_free(str);
 }
 
-void Glulx::free_temp_ustring(uint32 *str) {
-	if (str && str != (uint32 *)temp_buf)
+void free_temp_ustring(glui32 *str) {
+	if (str && str != (glui32 *)temp_buf)
 		glulx_free(str);
 }
 
-} // End of namespace Glulx
-} // End of namespace Glk
+} // namespace Glulx
+} // namespace Glk

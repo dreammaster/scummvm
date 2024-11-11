@@ -19,76 +19,104 @@
  *
  */
 
-#include "glk/glulx/glulx.h"
+/* Glulxe code for accelerated functions
+ */
+
+#include "glk/glk.h"
+#include "glk/glulx/glulxe.h"
+#include "glk/glulx/glulx_types.h"
 
 namespace Glk {
 namespace Glulx {
 
-/**
- * Git passes along function arguments in reverse order. To make our lives more interesting
- */
+/* Git passes along function arguments in reverse order. To make our lives
+   more interesting. */
 #ifdef ARGS_REVERSED
 #define ARG(argv, argc, ix) (argv[(argc-1)-ix])
 #else
 #define ARG(argv, argc, ix) (argv[ix])
 #endif
 
-/**
- * Any function can be called with any number of arguments. This macro lets us snarf a given argument,
- * or zero if it wasn't supplied.
- */
+   /* Any function can be called with any number of arguments. This macro
+	  lets us snarf a given argument, or zero if it wasn't supplied. */
 #define ARG_IF_GIVEN(argv, argc, ix)  ((argc > ix) ? (ARG(argv, argc, ix)) : 0)
 
-acceleration_func Glulx::accel_find_func(uint index) {
-	switch (index) {
-	case 0:
-		return nullptr;     // 0 always means no acceleration
-	case 1:
-		return &Glulx::func_1_z__region;
-	case 2:
-		return &Glulx::func_2_cp__tab;
-	case 3:
-		return &Glulx::func_3_ra__pr;
-	case 4:
-		return &Glulx::func_4_rl__pr;
-	case 5:
-		return &Glulx::func_5_oc__cl;
-	case 6:
-		return &Glulx::func_6_rv__pr;
-	case 7:
-		return &Glulx::func_7_op__pr;
-	case 8:
-		return &Glulx::func_8_cp__tab;
-	case 9:
-		return &Glulx::func_9_ra__pr;
-	case 10:
-		return &Glulx::func_10_rl__pr;
-	case 11:
-		return &Glulx::func_11_oc__cl;
-	case 12:
-		return &Glulx::func_12_rv__pr;
-	case 13:
-		return &Glulx::func_13_op__pr;
-	}
-	return nullptr;
+static void accel_error(const char *msg);
+static glui32 func_1_z__region(glui32 argc, glui32 *argv);
+static glui32 func_2_cp__tab(glui32 argc, glui32 *argv);
+static glui32 func_3_ra__pr(glui32 argc, glui32 *argv);
+static glui32 func_4_rl__pr(glui32 argc, glui32 *argv);
+static glui32 func_5_oc__cl(glui32 argc, glui32 *argv);
+static glui32 func_6_rv__pr(glui32 argc, glui32 *argv);
+static glui32 func_7_op__pr(glui32 argc, glui32 *argv);
+static glui32 func_8_cp__tab(glui32 argc, glui32 *argv);
+static glui32 func_9_ra__pr(glui32 argc, glui32 *argv);
+static glui32 func_10_rl__pr(glui32 argc, glui32 *argv);
+static glui32 func_11_oc__cl(glui32 argc, glui32 *argv);
+static glui32 func_12_rv__pr(glui32 argc, glui32 *argv);
+static glui32 func_13_op__pr(glui32 argc, glui32 *argv);
+
+static int obj_in_class(glui32 obj);
+static glui32 get_prop(glui32 obj, glui32 id);
+static glui32 get_prop_new(glui32 obj, glui32 id);
+
+/* Parameters, set by @accelparam. */
+static glui32 classes_table = 0;     /* class object array */
+static glui32 indiv_prop_start = 0;  /* first individual prop ID */
+static glui32 class_metaclass = 0;   /* "Class" class object */
+static glui32 object_metaclass = 0;  /* "Object" class object */
+static glui32 routine_metaclass = 0; /* "Routine" class object */
+static glui32 string_metaclass = 0;  /* "String" class object */
+static glui32 self = 0;              /* address of global "self" */
+static glui32 num_attr_bytes = 0;    /* number of attributes / 8 */
+static glui32 cpv__start = 0;        /* array of common prop defaults */
+
+#define ACCEL_HASH_SIZE (511)
+
+static accelentry_t **accelentries = NULL;
+
+void init_accel() {
+	accelentries = NULL;
 }
 
-acceleration_func Glulx::accel_get_func(uint addr) {
+acceleration_func accel_find_func(glui32 index) {
+	switch (index) {
+	case 0: return NULL; /* 0 always means no acceleration */
+	case 1: return func_1_z__region;
+	case 2: return func_2_cp__tab;
+	case 3: return func_3_ra__pr;
+	case 4: return func_4_rl__pr;
+	case 5: return func_5_oc__cl;
+	case 6: return func_6_rv__pr;
+	case 7: return func_7_op__pr;
+	case 8: return func_8_cp__tab;
+	case 9: return func_9_ra__pr;
+	case 10: return func_10_rl__pr;
+	case 11: return func_11_oc__cl;
+	case 12: return func_12_rv__pr;
+	case 13: return func_13_op__pr;
+	}
+	return NULL;
+}
+
+acceleration_func accel_get_func(glui32 addr) {
 	int bucknum;
 	accelentry_t *ptr;
 
 	if (!accelentries)
-		return nullptr;
+		return NULL;
 
 	bucknum = (addr % ACCEL_HASH_SIZE);
 	for (ptr = accelentries[bucknum]; ptr; ptr = ptr->next) {
 		if (ptr->addr == addr)
 			return ptr->func;
 	}
-	return nullptr;
+	return NULL;
 }
 
-void Glulx::accel_iterate_funcs(void (*func)(uint index, uint addr)) {
+/* Iterate the entire acceleration table, calling the callback for
+   each (non-NULL) entry. This is used only for autosave. */
+void accel_iterate_funcs(void (*func)(glui32 index, glui32 addr)) {
 	int bucknum;
 	accelentry_t *ptr;
 
@@ -104,11 +132,11 @@ void Glulx::accel_iterate_funcs(void (*func)(uint index, uint addr)) {
 	}
 }
 
-void Glulx::accel_set_func(uint index, uint addr) {
+void accel_set_func(glui32 index, glui32 addr) {
 	int bucknum;
 	accelentry_t *ptr;
 	int functype;
-	acceleration_func new_func = nullptr;
+	acceleration_func new_func = NULL;
 
 	/* Check the Glulx type identifier byte. */
 	functype = Mem1(addr);
@@ -118,15 +146,15 @@ void Glulx::accel_set_func(uint index, uint addr) {
 
 	if (!accelentries) {
 		accelentries = (accelentry_t **)glulx_malloc(ACCEL_HASH_SIZE
-		               * sizeof(accelentry_t *));
+			* sizeof(accelentry_t *));
 		if (!accelentries)
 			fatal_error("Cannot malloc acceleration table.");
 		for (bucknum = 0; bucknum < ACCEL_HASH_SIZE; bucknum++)
-			accelentries[bucknum] = nullptr;
+			accelentries[bucknum] = NULL;
 	}
 
 	new_func = accel_find_func(index);
-	/* Might be nullptr, if the index is zero or not recognized. */
+	/* Might be NULL, if the index is zero or not recognized. */
 
 	bucknum = (addr % ACCEL_HASH_SIZE);
 	for (ptr = accelentries[bucknum]; ptr; ptr = ptr->next) {
@@ -142,7 +170,7 @@ void Glulx::accel_set_func(uint index, uint addr) {
 			fatal_error("Cannot malloc acceleration entry.");
 		ptr->addr = addr;
 		ptr->index = 0;
-		ptr->func = nullptr;
+		ptr->func = NULL;
 		ptr->next = accelentries[bucknum];
 		accelentries[bucknum] = ptr;
 	}
@@ -151,82 +179,65 @@ void Glulx::accel_set_func(uint index, uint addr) {
 	ptr->func = new_func;
 }
 
-void Glulx::accel_set_param(uint index, uint val) {
+void accel_set_param(glui32 index, glui32 val) {
 	switch (index) {
-	case 0:
-		classes_table = val;
-		break;
-	case 1:
-		indiv_prop_start = val;
-		break;
-	case 2:
-		class_metaclass = val;
-		break;
-	case 3:
-		object_metaclass = val;
-		break;
-	case 4:
-		routine_metaclass = val;
-		break;
-	case 5:
-		string_metaclass = val;
-		break;
-	case 6:
-		self = val;
-		break;
-	case 7:
-		num_attr_bytes = val;
-		break;
-	case 8:
-		cpv__start = val;
-		break;
+	case 0: classes_table = val; break;
+	case 1: indiv_prop_start = val; break;
+	case 2: class_metaclass = val; break;
+	case 3: object_metaclass = val; break;
+	case 4: routine_metaclass = val; break;
+	case 5: string_metaclass = val; break;
+	case 6: self = val; break;
+	case 7: num_attr_bytes = val; break;
+	case 8: cpv__start = val; break;
 	}
 }
 
-uint Glulx::accel_get_param_count() const {
+/* This is used only for autosave. */
+glui32 accel_get_param_count() {
 	return 9;
 }
 
-uint Glulx::accel_get_param(uint index) const {
+/* This is used only for autosave. */
+glui32 accel_get_param(glui32 index) {
 	switch (index) {
-	case 0:
-		return classes_table;
-	case 1:
-		return indiv_prop_start;
-	case 2:
-		return class_metaclass;
-	case 3:
-		return object_metaclass;
-	case 4:
-		return routine_metaclass;
-	case 5:
-		return string_metaclass;
-	case 6:
-		return self;
-	case 7:
-		return num_attr_bytes;
-	case 8:
-		return cpv__start;
-	default:
-		return 0;
+	case 0: return classes_table;
+	case 1: return indiv_prop_start;
+	case 2: return class_metaclass;
+	case 3: return object_metaclass;
+	case 4: return routine_metaclass;
+	case 5: return string_metaclass;
+	case 6: return self;
+	case 7: return num_attr_bytes;
+	case 8: return cpv__start;
+	default: return 0;
 	}
 }
 
-void Glulx::accel_error(const char *msg) {
-	glk_put_char('\n');
-	glk_put_string(msg);
-	glk_put_char('\n');
+static void accel_error(const char *msg) {
+	glui32 mode, rock;
+	stream_get_iosys(&mode, &rock);
+	if (mode == 2) { /* iosys_Glk */
+		glk_put_char('\n');
+		glk_put_string(msg);
+		glk_put_char('\n');
+	}
+	/* If we're in iosys_Filter, there's no way to validly call the filter
+	   function, and the Glk printing path might throw a fatal error.
+	   Just give up. */
 }
 
-int Glulx::obj_in_class(uint obj) {
-	// This checks whether obj is contained in Class, not whether it is a member of Class
+static int obj_in_class(glui32 obj) {
+	/* This checks whether obj is contained in Class, not whether
+	   it is a member of Class. */
 	return (Mem4(obj + 13 + num_attr_bytes) == class_metaclass);
 }
 
-uint Glulx::get_prop(uint obj, uint id) {
-	uint cla = 0;
-	uint prop;
-	uint call_argv[2];
+/* Look up a property entry. */
+static glui32 get_prop(glui32 obj, glui32 id) {
+	glui32 cla = 0;
+	glui32 prop;
+	glui32 call_argv[2];
 
 	if (id & 0xFFFF0000) {
 		cla = Mem4(classes_table + ((id & 0xFFFF) * 4));
@@ -257,10 +268,14 @@ uint Glulx::get_prop(uint obj, uint id) {
 	return prop;
 }
 
-uint Glulx::get_prop_new(uint obj, uint id) {
-	uint cla = 0;
-	uint prop;
-	uint call_argv[2];
+/* Look up a property entry. This is part of the newer set of accel
+   functions (8 through 13), which support increasing NUM_ATTR_BYTES.
+   It is identical to get_prop() except that it calls the new versions
+   of func_5 and func_2. */
+static glui32 get_prop_new(glui32 obj, glui32 id) {
+	glui32 cla = 0;
+	glui32 prop;
+	glui32 call_argv[2];
 
 	if (id & 0xFFFF0000) {
 		cla = Mem4(classes_table + ((id & 0xFFFF) * 4));
@@ -291,9 +306,9 @@ uint Glulx::get_prop_new(uint obj, uint id) {
 	return prop;
 }
 
-uint Glulx::func_1_z__region(uint argc, uint *argv) {
-	uint addr;
-	uint tb;
+static glui32 func_1_z__region(glui32 argc, glui32 *argv) {
+	glui32 addr;
+	glui32 tb;
 
 	if (argc < 1)
 		return 0;
@@ -317,10 +332,15 @@ uint Glulx::func_1_z__region(uint argc, uint *argv) {
 	return 0;
 }
 
-uint Glulx::func_2_cp__tab(uint argc, uint *argv) {
-	uint obj;
-	uint id;
-	uint otab, max;
+/* The old set of accel functions (2 through 7) are deprecated; they
+   behave badly if the Inform 6 NUM_ATTR_BYTES option (parameter 7) is
+   changed from its default value (7). They will not be removed, but
+   new games should use functions 8 through 13 instead. */
+
+static glui32 func_2_cp__tab(glui32 argc, glui32 *argv) {
+	glui32 obj;
+	glui32 id;
+	glui32 otab, max;
 
 	obj = ARG_IF_GIVEN(argv, argc, 0);
 	id = ARG_IF_GIVEN(argv, argc, 1);
@@ -340,10 +360,10 @@ uint Glulx::func_2_cp__tab(uint argc, uint *argv) {
 	return binary_search(id, 2, otab, 10, max, 0, 0);
 }
 
-uint Glulx::func_3_ra__pr(uint argc, uint *argv) {
-	uint obj;
-	uint id;
-	uint prop;
+static glui32 func_3_ra__pr(glui32 argc, glui32 *argv) {
+	glui32 obj;
+	glui32 id;
+	glui32 prop;
 
 	obj = ARG_IF_GIVEN(argv, argc, 0);
 	id = ARG_IF_GIVEN(argv, argc, 1);
@@ -355,10 +375,10 @@ uint Glulx::func_3_ra__pr(uint argc, uint *argv) {
 	return Mem4(prop + 4);
 }
 
-uint Glulx::func_4_rl__pr(uint argc, uint *argv) {
-	uint obj;
-	uint id;
-	uint prop;
+static glui32 func_4_rl__pr(glui32 argc, glui32 *argv) {
+	glui32 obj;
+	glui32 id;
+	glui32 prop;
 
 	obj = ARG_IF_GIVEN(argv, argc, 0);
 	id = ARG_IF_GIVEN(argv, argc, 1);
@@ -370,10 +390,10 @@ uint Glulx::func_4_rl__pr(uint argc, uint *argv) {
 	return 4 * Mem2(prop + 2);
 }
 
-uint Glulx::func_5_oc__cl(uint argc, uint *argv) {
-	uint obj;
-	uint cla;
-	uint zr, prop, inlist, inlistlen, jx;
+static glui32 func_5_oc__cl(glui32 argc, glui32 *argv) {
+	glui32 obj;
+	glui32 cla;
+	glui32 zr, prop, inlist, inlistlen, jx;
 
 	obj = ARG_IF_GIVEN(argv, argc, 0);
 	cla = ARG_IF_GIVEN(argv, argc, 1);
@@ -436,9 +456,9 @@ uint Glulx::func_5_oc__cl(uint argc, uint *argv) {
 	return 0;
 }
 
-uint Glulx::func_6_rv__pr(uint argc, uint *argv) {
-	uint id;
-	uint addr;
+static glui32 func_6_rv__pr(glui32 argc, glui32 *argv) {
+	glui32 id;
+	glui32 addr;
 
 	id = ARG_IF_GIVEN(argv, argc, 1);
 
@@ -455,10 +475,10 @@ uint Glulx::func_6_rv__pr(uint argc, uint *argv) {
 	return Mem4(addr);
 }
 
-uint Glulx::func_7_op__pr(uint argc, uint *argv) {
-	uint obj;
-	uint id;
-	uint zr;
+static glui32 func_7_op__pr(glui32 argc, glui32 *argv) {
+	glui32 obj;
+	glui32 id;
+	glui32 zr;
 
 	obj = ARG_IF_GIVEN(argv, argc, 0);
 	id = ARG_IF_GIVEN(argv, argc, 1);
@@ -488,10 +508,13 @@ uint Glulx::func_7_op__pr(uint argc, uint *argv) {
 	return ((func_3_ra__pr(argc, argv)) ? 1 : 0);
 }
 
-uint Glulx::func_8_cp__tab(uint argc, uint *argv) {
-	uint obj;
-	uint id;
-	uint otab, max;
+/* Here are the newer functions, which support changing NUM_ATTR_BYTES.
+   These call get_prop_new() instead of get_prop(). */
+
+static glui32 func_8_cp__tab(glui32 argc, glui32 *argv) {
+	glui32 obj;
+	glui32 id;
+	glui32 otab, max;
 
 	obj = ARG_IF_GIVEN(argv, argc, 0);
 	id = ARG_IF_GIVEN(argv, argc, 1);
@@ -511,10 +534,10 @@ uint Glulx::func_8_cp__tab(uint argc, uint *argv) {
 	return binary_search(id, 2, otab, 10, max, 0, 0);
 }
 
-uint Glulx::func_9_ra__pr(uint argc, uint *argv) {
-	uint obj;
-	uint id;
-	uint prop;
+static glui32 func_9_ra__pr(glui32 argc, glui32 *argv) {
+	glui32 obj;
+	glui32 id;
+	glui32 prop;
 
 	obj = ARG_IF_GIVEN(argv, argc, 0);
 	id = ARG_IF_GIVEN(argv, argc, 1);
@@ -526,10 +549,10 @@ uint Glulx::func_9_ra__pr(uint argc, uint *argv) {
 	return Mem4(prop + 4);
 }
 
-uint Glulx::func_10_rl__pr(uint argc, uint *argv) {
-	uint obj;
-	uint id;
-	uint prop;
+static glui32 func_10_rl__pr(glui32 argc, glui32 *argv) {
+	glui32 obj;
+	glui32 id;
+	glui32 prop;
 
 	obj = ARG_IF_GIVEN(argv, argc, 0);
 	id = ARG_IF_GIVEN(argv, argc, 1);
@@ -541,10 +564,10 @@ uint Glulx::func_10_rl__pr(uint argc, uint *argv) {
 	return 4 * Mem2(prop + 2);
 }
 
-uint Glulx::func_11_oc__cl(uint argc, uint *argv) {
-	uint obj;
-	uint cla;
-	uint zr, prop, inlist, inlistlen, jx;
+static glui32 func_11_oc__cl(glui32 argc, glui32 *argv) {
+	glui32 obj;
+	glui32 cla;
+	glui32 zr, prop, inlist, inlistlen, jx;
 
 	obj = ARG_IF_GIVEN(argv, argc, 0);
 	cla = ARG_IF_GIVEN(argv, argc, 1);
@@ -607,9 +630,9 @@ uint Glulx::func_11_oc__cl(uint argc, uint *argv) {
 	return 0;
 }
 
-uint Glulx::func_12_rv__pr(uint argc, uint *argv) {
-	uint id;
-	uint addr;
+static glui32 func_12_rv__pr(glui32 argc, glui32 *argv) {
+	glui32 id;
+	glui32 addr;
 
 	id = ARG_IF_GIVEN(argv, argc, 1);
 
@@ -626,10 +649,10 @@ uint Glulx::func_12_rv__pr(uint argc, uint *argv) {
 	return Mem4(addr);
 }
 
-uint Glulx::func_13_op__pr(uint argc, uint *argv) {
-	uint obj;
-	uint id;
-	uint zr;
+static glui32 func_13_op__pr(glui32 argc, glui32 *argv) {
+	glui32 obj;
+	glui32 id;
+	glui32 zr;
 
 	obj = ARG_IF_GIVEN(argv, argc, 0);
 	id = ARG_IF_GIVEN(argv, argc, 1);
@@ -659,5 +682,5 @@ uint Glulx::func_13_op__pr(uint argc, uint *argv) {
 	return ((func_9_ra__pr(argc, argv)) ? 1 : 0);
 }
 
-} // End of namespace Glulx
-} // End of namespace Glk
+} // namespace Glulx
+} // namespace Glk

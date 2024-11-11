@@ -19,56 +19,91 @@
  *
  */
 
-#include "glk/glulx/glulx.h"
+/* operand.c: Glulxe code for instruction operands, reading and writing.
+    Designed by Andrew Plotkin <erkyrath@eblong.com>
+    http://eblong.com/zarf/glulx/index.html
+*/
+
+#include "glk/glk.h"
+#include "glk/glulx/glulxe.h"
+#include "glk/glulx/opcodes.h"
 
 namespace Glk {
 namespace Glulx {
 
-/**
- * The actual immutable structures which lookup_operandlist() returns.
- */
-static const operandlist_t list_none = { 0, 4, nullptr };
+/* ### We could save a few cycles per operand by generating a function for
+   each operandlist type. */
 
-static const int array_S[1] = { modeform_Store };
-static const operandlist_t list_S = { 1, 4, &array_S[0] };
-static const int array_LS[2] = { modeform_Load, modeform_Store };
-static const operandlist_t list_LS = { 2, 4, &array_LS[0] };
-static const int array_LLS[3] = { modeform_Load, modeform_Load, modeform_Store };
-static const operandlist_t list_LLS = { 3, 4, &array_LLS[0] };
-static const int array_LLLS[4] = { modeform_Load, modeform_Load, modeform_Load, modeform_Store };
-static const operandlist_t list_LLLS = { 4, 4, &array_LLLS[0] };
-static const int array_LLLLS[5] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Store };
-static const operandlist_t list_LLLLS = { 5, 4, &array_LLLLS[0] };
-/* static const int array_LLLLLS[6] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Store };
-static const operandlist_t list_LLLLLS = { 6, 4, &array_LLLLLS }; */ /* not currently used */
-static const int array_LLLLLLS[7] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Store };
-static const operandlist_t list_LLLLLLS = { 7, 4, &array_LLLLLLS[0] };
-static const int array_LLLLLLLS[8] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Store };
-static const operandlist_t list_LLLLLLLS = { 8, 4, &array_LLLLLLLS[0] };
+   /* fast_operandlist[]:
+	  This is a handy array in which to look up operandlists quickly.
+	  It stores the operandlists for the first 128 opcodes, which are
+	  the ones used most frequently.
+   */
+const operandlist_t *fast_operandlist[0x80];
 
-static const int array_L[1] = { modeform_Load };
-static const operandlist_t list_L = { 1, 4, &array_L[0] };
-static const int array_LL[2] = { modeform_Load, modeform_Load };
-static const operandlist_t list_LL = { 2, 4, &array_LL[0] };
-static const int array_LLL[3] = { modeform_Load, modeform_Load, modeform_Load };
-static const operandlist_t list_LLL = { 3, 4, &array_LLL[0] };
-static const operandlist_t list_2LS = { 2, 2, &array_LS[0] };
-static const operandlist_t list_1LS = { 2, 1, &array_LS[0] };
-static const int array_LLLL[4] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load };
-static const operandlist_t list_LLLL = { 4, 4, &array_LLLL[0] };
-static const int array_SL[2] = { modeform_Store, modeform_Load };
-static const operandlist_t list_SL = { 2, 4, &array_SL[0] };
-static const int array_SS[2] = { modeform_Store, modeform_Store };
-static const operandlist_t list_SS = { 2, 4, &array_SS[0] };
-static const int array_LLSS[4] = { modeform_Load, modeform_Load, modeform_Store, modeform_Store };
-static const operandlist_t list_LLSS = { 4, 4, &array_LLSS[0] };
+/* The actual immutable structures which lookup_operandlist()
+   returns. */
+static operandlist_t list_none = { 0, 4, NULL };
 
-void Glulx::init_operands() {
-	for (int ix = 0; ix < 0x80; ix++)
+static int array_S[1] = { modeform_Store };
+static operandlist_t list_S = { 1, 4, array_S };
+static int array_LS[2] = { modeform_Load, modeform_Store };
+static operandlist_t list_LS = { 2, 4, array_LS };
+static int array_LLS[3] = { modeform_Load, modeform_Load, modeform_Store };
+static operandlist_t list_LLS = { 3, 4, array_LLS };
+static int array_LLLS[4] = { modeform_Load, modeform_Load, modeform_Load, modeform_Store };
+static operandlist_t list_LLLS = { 4, 4, array_LLLS };
+static int array_LLLLS[5] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Store };
+static operandlist_t list_LLLLS = { 5, 4, array_LLLLS };
+/* static int array_LLLLLS[6] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Store };
+static operandlist_t list_LLLLLS = { 6, 4, array_LLLLLS }; */ /* not currently used */
+static int array_LLLLLLS[7] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Store };
+static operandlist_t list_LLLLLLS = { 7, 4, array_LLLLLLS };
+static int array_LLLLLLLS[8] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Store };
+static operandlist_t list_LLLLLLLS = { 8, 4, array_LLLLLLLS };
+
+static int array_L[1] = { modeform_Load };
+static operandlist_t list_L = { 1, 4, array_L };
+static int array_LL[2] = { modeform_Load, modeform_Load };
+static operandlist_t list_LL = { 2, 4, array_LL };
+static int array_LLL[3] = { modeform_Load, modeform_Load, modeform_Load };
+static operandlist_t list_LLL = { 3, 4, array_LLL };
+static operandlist_t list_2LS = { 2, 2, array_LS };
+static operandlist_t list_1LS = { 2, 1, array_LS };
+static int array_LLLL[4] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load };
+static operandlist_t list_LLLL = { 4, 4, array_LLLL };
+static int array_LLLLL[5] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load };
+static operandlist_t list_LLLLL = { 5, 4, array_LLLLL };
+//static int array_LLLLLL[6] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load };
+//static operandlist_t list_LLLLLL = { 6, 4, array_LLLLLL };
+static int array_LLLLLLL[7] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Load };
+static operandlist_t list_LLLLLLL = { 7, 4, array_LLLLLLL };
+static int array_SL[2] = { modeform_Store, modeform_Load };
+static operandlist_t list_SL = { 2, 4, array_SL };
+static int array_SS[2] = { modeform_Store, modeform_Store };
+static operandlist_t list_SS = { 2, 4, array_SS };
+static int array_LSS[3] = { modeform_Load, modeform_Store, modeform_Store };
+static operandlist_t list_LSS = { 3, 4, array_LSS };
+static int array_LLSS[4] = { modeform_Load, modeform_Load, modeform_Store, modeform_Store };
+static operandlist_t list_LLSS = { 4, 4, array_LLSS };
+static int array_LLLLSS[6] = { modeform_Load, modeform_Load, modeform_Load, modeform_Load, modeform_Store, modeform_Store };
+static operandlist_t list_LLLLSS = { 6, 4, array_LLLLSS };
+
+/* init_operands():
+   Set up the fast-lookup array of operandlists. This is called just
+   once, when the terp starts up.
+*/
+void init_operands() {
+	int ix;
+	for (ix = 0; ix < 0x80; ix++)
 		fast_operandlist[ix] = lookup_operandlist(ix);
 }
 
-const operandlist_t *Glulx::lookup_operandlist(uint opcode) {
+/* lookup_operandlist():
+   Return the operandlist for a given opcode. For opcodes in the range
+   00..7F, it's faster to use the array fast_operandlist[].
+*/
+const operandlist_t *lookup_operandlist(glui32 opcode) {
 	switch (opcode) {
 	case op_nop:
 		return &list_none;
@@ -179,7 +214,10 @@ const operandlist_t *Glulx::lookup_operandlist(uint opcode) {
 		return &list_LS;
 	case op_saveundo:
 	case op_restoreundo:
+	case op_hasundo:
 		return &list_S;
+	case op_discardundo:
+		return &list_none;
 	case op_protect:
 		return &list_LL;
 
@@ -270,29 +308,84 @@ const operandlist_t *Glulx::lookup_operandlist(uint opcode) {
 
 #endif /* FLOAT_SUPPORT */
 
+#ifdef DOUBLE_SUPPORT
+
+	case op_numtod:
+	case op_ftod:
+		return &list_LSS;
+	case op_dtonumz:
+	case op_dtonumn:
+	case op_dtof:
+		return &list_LLS;
+	case op_dceil:
+	case op_dfloor:
+	case op_dsqrt:
+	case op_dexp:
+	case op_dlog:
+		return &list_LLSS;
+	case op_dadd:
+	case op_dsub:
+	case op_dmul:
+	case op_ddiv:
+	case op_dpow:
+	case op_datan2:
+		return &list_LLLLSS;
+	case op_dmodr:
+	case op_dmodq:
+		return &list_LLLLSS;
+	case op_dsin:
+	case op_dcos:
+	case op_dtan:
+	case op_dasin:
+	case op_dacos:
+	case op_datan:
+		return &list_LLSS;
+	case op_jdeq:
+	case op_jdne:
+		return &list_LLLLLLL;
+	case op_jdlt:
+	case op_jdle:
+	case op_jdgt:
+	case op_jdge:
+		return &list_LLLLL;
+	case op_jdisnan:
+	case op_jdisinf:
+		return &list_LLL;
+
+#endif /* DOUBLE_SUPPORT */
+
 #ifdef GLULX_EXTEND_OPERANDS
 		GLULX_EXTEND_OPERANDS
 #endif /* GLULX_EXTEND_OPERANDS */
 
 	default:
-		return nullptr;
+		return NULL;
 	}
 }
 
-void Glulx::parse_operands(oparg_t *args, const operandlist_t *oplist) {
+/* parse_operands():
+   Read the list of operands of an instruction, and put the values
+   in args. This assumes that the PC is at the beginning of the
+   operand mode list (right after an opcode number.) Upon return,
+   the PC will be at the beginning of the next instruction.
+
+   This also assumes that args points at an allocated array of
+   MAX_OPERANDS oparg_t structures.
+*/
+void parse_operands(oparg_t *args, const operandlist_t *oplist) {
 	int ix;
 	oparg_t *curarg;
 	int numops = oplist->num_ops;
 	int argsize = oplist->arg_size;
-	uint modeaddr = pc;
+	glui32 modeaddr = pc;
 	int modeval = 0;
 
 	pc += (numops + 1) / 2;
 
 	for (ix = 0, curarg = args; ix < numops; ix++, curarg++) {
 		int mode;
-		uint value;
-		uint addr;
+		glui32 value;
+		glui32 addr;
 
 		curarg->desttype = 0;
 
@@ -322,16 +415,16 @@ void Glulx::parse_operands(oparg_t *args, const operandlist_t *oplist) {
 
 			case 1: /* one-byte constant */
 				/* Sign-extend from 8 bits to 32 */
-				value = (int)(signed char)(Mem1(pc));
+				value = (glsi32)(signed char)(Mem1(pc));
 				pc++;
 				break;
 
 			case 2: /* two-byte constant */
 				/* Sign-extend the first byte from 8 bits to 32; the subsequent
 				   byte must not be sign-extended. */
-				value = (int)(signed char)(Mem1(pc));
+				value = (glsi32)(signed char)(Mem1(pc));
 				pc++;
-				value = (value << 8) | (uint)(Mem1(pc));
+				value = (value << 8) | (glui32)(Mem1(pc));
 				pc++;
 				break;
 
@@ -348,13 +441,13 @@ void Glulx::parse_operands(oparg_t *args, const operandlist_t *oplist) {
 				goto MainMemAddr;
 
 			case 14: /* main memory RAM, two-byte address */
-				addr = (uint)Mem2(pc);
+				addr = (glui32)Mem2(pc);
 				addr += ramstart;
 				pc += 2;
 				goto MainMemAddr;
 
 			case 13: /* main memory RAM, one-byte address */
-				addr = (uint)(Mem1(pc));
+				addr = (glui32)(Mem1(pc));
 				addr += ramstart;
 				pc++;
 				goto MainMemAddr;
@@ -365,12 +458,12 @@ void Glulx::parse_operands(oparg_t *args, const operandlist_t *oplist) {
 				goto MainMemAddr;
 
 			case 6: /* main memory, two-byte address */
-				addr = (uint)Mem2(pc);
+				addr = (glui32)Mem2(pc);
 				pc += 2;
 				goto MainMemAddr;
 
 			case 5: /* main memory, one-byte address */
-				addr = (uint)(Mem1(pc));
+				addr = (glui32)(Mem1(pc));
 				pc++;
 				/* fall through */
 
@@ -391,12 +484,12 @@ MainMemAddr:
 				goto LocalsAddr;
 
 			case 10: /* locals, two-byte address */
-				addr = (uint)Mem2(pc);
+				addr = (glui32)Mem2(pc);
 				pc += 2;
 				goto LocalsAddr;
 
 			case 9: /* locals, one-byte address */
-				addr = (uint)(Mem1(pc));
+				addr = (glui32)(Mem1(pc));
 				pc++;
 				/* fall through */
 
@@ -423,7 +516,7 @@ LocalsAddr:
 
 			curarg->value = value;
 
-		} else { /* modeform_Store */
+		} else {  /* modeform_Store */
 			switch (mode) {
 
 			case 0: /* discard value */
@@ -443,13 +536,13 @@ LocalsAddr:
 				goto WrMainMemAddr;
 
 			case 14: /* main memory RAM, two-byte address */
-				addr = (uint)Mem2(pc);
+				addr = (glui32)Mem2(pc);
 				addr += ramstart;
 				pc += 2;
 				goto WrMainMemAddr;
 
 			case 13: /* main memory RAM, one-byte address */
-				addr = (uint)(Mem1(pc));
+				addr = (glui32)(Mem1(pc));
 				addr += ramstart;
 				pc++;
 				goto WrMainMemAddr;
@@ -460,12 +553,12 @@ LocalsAddr:
 				goto WrMainMemAddr;
 
 			case 6: /* main memory, two-byte address */
-				addr = (uint)Mem2(pc);
+				addr = (glui32)Mem2(pc);
 				pc += 2;
 				goto WrMainMemAddr;
 
 			case 5: /* main memory, one-byte address */
-				addr = (uint)(Mem1(pc));
+				addr = (glui32)(Mem1(pc));
 				pc++;
 				/* fall through */
 
@@ -481,12 +574,12 @@ WrMainMemAddr:
 				goto WrLocalsAddr;
 
 			case 10: /* locals, two-byte address */
-				addr = (uint)Mem2(pc);
+				addr = (glui32)Mem2(pc);
 				pc += 2;
 				goto WrLocalsAddr;
 
 			case 9: /* locals, one-byte address */
-				addr = (uint)(Mem1(pc));
+				addr = (glui32)(Mem1(pc));
 				pc++;
 				/* fall through */
 
@@ -507,7 +600,6 @@ WrLocalsAddr:
 			case 2:
 			case 3:
 				fatal_error("Constant addressing mode in store operand.");
-				break;
 
 			default:
 				fatal_error("Unknown addressing mode in store operand.");
@@ -516,7 +608,12 @@ WrLocalsAddr:
 	}
 }
 
-void Glulx::store_operand(uint desttype, uint destaddr, uint storeval) {
+/* store_operand():
+   Store a result value, according to the desttype and destaddress given.
+   This is usually used to store the result of an opcode, but it's also
+   used by any code that pulls a call-stub off the stack.
+*/
+void store_operand(glui32 desttype, glui32 destaddr, glui32 storeval) {
 	switch (desttype) {
 
 	case 0: /* do nothing; discard the value. */
@@ -545,7 +642,7 @@ void Glulx::store_operand(uint desttype, uint destaddr, uint storeval) {
 	}
 }
 
-void Glulx::store_operand_s(uint desttype, uint destaddr, uint storeval) {
+void store_operand_s(glui32 desttype, glui32 destaddr, glui32 storeval) {
 	storeval &= 0xFFFF;
 
 	switch (desttype) {
@@ -576,7 +673,7 @@ void Glulx::store_operand_s(uint desttype, uint destaddr, uint storeval) {
 	}
 }
 
-void Glulx::store_operand_b(uint desttype, uint destaddr, uint storeval) {
+void store_operand_b(glui32 desttype, glui32 destaddr, glui32 storeval) {
 	storeval &= 0xFF;
 
 	switch (desttype) {
@@ -607,5 +704,5 @@ void Glulx::store_operand_b(uint desttype, uint destaddr, uint storeval) {
 	}
 }
 
-} // End of namespace Glulx
-} // End of namespace Glk
+} // namespace Glulx
+} // namespace Glk

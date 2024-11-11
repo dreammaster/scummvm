@@ -19,24 +19,67 @@
  *
  */
 
-#include "glk/glulx/glulx.h"
+/* Glulxe code related to the VM overall. Also miscellaneous stuff.
+ */
+
+#include "glk/glk.h"
+#include "glk/glulx/glulxe.h"
 
 namespace Glk {
 namespace Glulx {
 
-void Glulx::setup_vm() {
-	byte buf[4 * 7];
+/* The memory blocks which contain VM main memory and the stack. */
+unsigned char *memmap = NULL;
+unsigned char *stack = NULL;
 
-	pc = 0;           // Clear this, so that error messages are cleaner.
+/* Various memory addresses which are useful. These are loaded in from
+   the game file header. */
+glui32 ramstart;
+glui32 endgamefile;
+glui32 origendmem;
+glui32 stacksize;
+glui32 startfuncaddr;
+glui32 origstringtable;
+glui32 checksum;
+
+/* The VM registers. */
+glui32 stackptr;
+glui32 frameptr;
+glui32 pc;
+glui32 stringtable;
+glui32 valstackbase;
+glui32 localsbase;
+glui32 endmem;
+glui32 protectstart, protectend;
+
+/* This is not needed for VM operation, but it may be needed for
+   autosave/autorestore. */
+glui32 prevpc;
+
+void (*stream_char_handler)(unsigned char ch);
+void (*stream_unichar_handler)(glui32 ch);
+
+/* setup_vm():
+   Read in the game file and build the machine, allocating all the memory
+   necessary.
+*/
+void setup_vm() {
+	unsigned char buf[4 * 7];
+	int res;
+
+	pc = 0; /* Clear this, so that error messages are cleaner. */
 	prevpc = 0;
 
-	// Read in all the size constants from the game file header
-	stream_char_handler = nullptr;
-	stream_unichar_handler = nullptr;
+	/* Read in all the size constants from the game file header. */
 
-	_gameFile.seek(gamefile_start + 8);
-	if (_gameFile.read(buf, 4 * 7) != (4 * 7))
+	stream_char_handler = NULL;
+	stream_unichar_handler = NULL;
+
+	glk_stream_set_position(gamefile, gamefile_start + 8, seekmode_Start);
+	res = glk_get_buffer_stream(gamefile, (char *)buf, 4 * 7);
+	if (res != 4 * 7) {
 		fatal_error("The game file header is too short.");
+	}
 
 	ramstart = Read4(buf + 0);
 	endgamefile = Read4(buf + 4);
@@ -46,27 +89,28 @@ void Glulx::setup_vm() {
 	origstringtable = Read4(buf + 20);
 	checksum = Read4(buf + 24);
 
-	// Set the protection range to (0, 0), meaning "off".
+	/* Set the protection range to (0, 0), meaning "off". */
 	protectstart = 0;
 	protectend = 0;
 
-	// Do a few sanity checks.
+	/* Do a few sanity checks. */
+
 	if ((ramstart & 0xFF)
-	        || (endgamefile & 0xFF)
-	        || (origendmem & 0xFF)
-	        || (stacksize & 0xFF)) {
+		|| (endgamefile & 0xFF)
+		|| (origendmem & 0xFF)
+		|| (stacksize & 0xFF)) {
 		nonfatal_warning("One of the segment boundaries in the header is not "
-		                 "256-byte aligned.");
+			"256-byte aligned.");
 	}
 
 	if (endgamefile != gamefile_len) {
 		nonfatal_warning("The gamefile length does not match the header "
-		                 "endgamefile length.");
+			"endgamefile length.");
 	}
 
 	if (ramstart < 0x100 || endgamefile < ramstart || origendmem < endgamefile) {
 		fatal_error("The segment boundaries in the header are in an impossible "
-		            "order.");
+			"order.");
 	}
 	if (stacksize < 0x100) {
 		fatal_error("The stack size in the header is too small.");
@@ -75,51 +119,59 @@ void Glulx::setup_vm() {
 	/* Allocate main memory and the stack. This is where memory allocation
 	   errors are most likely to occur. */
 	endmem = origendmem;
-	memmap = (byte *)glulx_malloc(origendmem);
+	memmap = (unsigned char *)glulx_malloc(origendmem);
 	if (!memmap) {
 		fatal_error("Unable to allocate Glulx memory space.");
 	}
-	stack = (byte *)glulx_malloc(stacksize);
+	stack = (unsigned char *)glulx_malloc(stacksize);
 	if (!stack) {
 		glulx_free(memmap);
-		memmap = nullptr;
+		memmap = NULL;
 		fatal_error("Unable to allocate Glulx stack space.");
 	}
 	stringtable = 0;
 
-	// Initialize various other things in the terp.
+	/* Initialize various other things in the terp. */
 	init_operands();
+	init_accel();
 	init_serial();
 
-	// Set up the initial machine state.
+	/* Set up the initial machine state. */
 	vm_restart();
 
 	/* If the debugger is compiled in, check that the debug data matches
 	   the game. (This only prints warnings for mismatch.) */
 	debugger_check_story_file();
-
 	/* Also, set up any start-time debugger state. This may do a block-
 	   and-debug, if the user has requested that. */
 	debugger_setup_start_state();
 }
 
-void Glulx::finalize_vm() {
+/* finalize_vm():
+   Deallocate all the memory and shut down the machine.
+*/
+void finalize_vm() {
 	stream_set_table(0);
 
 	if (memmap) {
 		glulx_free(memmap);
-		memmap = nullptr;
+		memmap = NULL;
 	}
 	if (stack) {
 		glulx_free(stack);
-		stack = nullptr;
+		stack = NULL;
 	}
 
 	final_serial();
 }
 
-void Glulx::vm_restart() {
-	uint lx;
+/* vm_restart():
+   Put the VM into a state where it's ready to begin executing the
+   game. This is called both at startup time, and when the machine
+   performs a "restart" opcode.
+*/
+void vm_restart() {
+	glui32 lx;
 	int res;
 	int bufpos;
 	char buf[0x100];
@@ -128,18 +180,18 @@ void Glulx::vm_restart() {
 	heap_clear();
 
 	/* Reset memory to the original size. */
-	lx = change_memsize(origendmem, false);
+	lx = change_memsize(origendmem, FALSE);
 	if (lx)
 		fatal_error("Memory could not be reset to its original size.");
 
 	/* Load in all of main memory. We do this in 256-byte chunks, because
 	   why rely on OS stream buffering? */
-	_gameFile.seek(gamefile_start);
+	glk_stream_set_position(gamefile, gamefile_start, seekmode_Start);
 	bufpos = 0x100;
 
 	for (lx = 0; lx < endgamefile; lx++) {
 		if (bufpos >= 0x100) {
-			int count = _gameFile.read(buf, 0x100);
+			int count = glk_get_buffer_stream(gamefile, buf, 0x100);
 			if (count != 0x100) {
 				fatal_error("The game file ended unexpectedly.");
 			}
@@ -168,13 +220,20 @@ void Glulx::vm_restart() {
 	/* Note that we do not reset the protection range. */
 
 	/* Push the first function call. (No arguments.) */
-	enter_function(startfuncaddr, 0, nullptr);
+	enter_function(startfuncaddr, 0, NULL);
 
 	/* We're now ready to execute. */
 }
 
-uint Glulx::change_memsize(uint newlen, bool internal) {
-	uint lx;
+/* change_memsize():
+   Change the size of the memory map. This may not be available at
+   all; #define FIXED_MEMSIZE if you want the interpreter to
+   unconditionally refuse. The internal flag should be true only when
+   the heap-allocation system is calling.
+   Returns 0 for success; otherwise, the operation failed.
+*/
+glui32 change_memsize(glui32 newlen, int internal) {
+	long lx;
 	unsigned char *newmemmap;
 
 	if (newlen == endmem)
@@ -201,7 +260,7 @@ uint Glulx::change_memsize(uint newlen, bool internal) {
 	memmap = newmemmap;
 
 	if (newlen > endmem) {
-		for (lx = endmem; lx < newlen; lx++) {
+		for (lx = endmem; lx < (long)newlen; lx++) {
 			memmap[lx] = 0;
 		}
 	}
@@ -213,18 +272,28 @@ uint Glulx::change_memsize(uint newlen, bool internal) {
 #endif /* FIXED_MEMSIZE */
 }
 
-uint *Glulx::pop_arguments(uint count, uint addr) {
-	uint ix;
-	uint argptr;
-	uint *array;
+/* pop_arguments():
+   If addr is 0, pop N arguments off the stack, and put them in an array.
+   If non-0, take N arguments from that main memory address instead.
+   This has to dynamically allocate if there are more than 32 arguments,
+   but that shouldn't be a problem.
+*/
+glui32 *pop_arguments(glui32 count, glui32 addr) {
+	int ix;
+	glui32 argptr;
+	glui32 *array;
+
+	/* This shouldn't happen. */
+	if (count & 0x80000000)
+		fatal_error("Argument count is negative");
 
 #define MAXARGS (32)
-	static uint statarray[MAXARGS];
-	static uint *dynarray = nullptr;
-	static uint dynarray_size = 0;
+	static glui32 statarray[MAXARGS];
+	static glui32 *dynarray = NULL;
+	static glui32 dynarray_size = 0;
 
 	if (count == 0)
-		return nullptr;
+		return NULL;
 
 	if (count <= MAXARGS) {
 		/* Store in the static array. */
@@ -232,7 +301,7 @@ uint *Glulx::pop_arguments(uint count, uint addr) {
 	} else {
 		if (!dynarray) {
 			dynarray_size = count + 8;
-			dynarray = (uint *)glulx_malloc(sizeof(uint) * dynarray_size);
+			dynarray = (glui32 *)glulx_malloc(sizeof(glui32) * dynarray_size);
 			if (!dynarray)
 				fatal_error("Unable to allocate function arguments.");
 			array = dynarray;
@@ -242,7 +311,7 @@ uint *Glulx::pop_arguments(uint count, uint addr) {
 				array = dynarray;
 			} else {
 				dynarray_size = count + 8;
-				dynarray = (uint *)glulx_realloc(dynarray, sizeof(uint) * dynarray_size);
+				dynarray = glulx_realloc(dynarray, sizeof(glui32) * dynarray_size);
 				if (!dynarray)
 					fatal_error("Unable to reallocate function arguments.");
 				array = dynarray;
@@ -254,12 +323,12 @@ uint *Glulx::pop_arguments(uint count, uint addr) {
 		if (stackptr < valstackbase + 4 * count)
 			fatal_error("Stack underflow in arguments.");
 		stackptr -= 4 * count;
-		for (ix = 0; ix < count; ix++) {
+		for (ix = 0; ix < (int)count; ix++) {
 			argptr = stackptr + 4 * ((count - 1) - ix);
 			array[ix] = Stk4(argptr);
 		}
 	} else {
-		for (ix = 0; ix < count; ix++) {
+		for (ix = 0; ix < (int)count; ix++) {
 			array[ix] = Mem4(addr);
 			addr += 4;
 		}
@@ -268,7 +337,12 @@ uint *Glulx::pop_arguments(uint count, uint addr) {
 	return array;
 }
 
-void Glulx::verify_address(uint addr, uint count) {
+/* verify_address():
+   Make sure that count bytes beginning with addr all fall within the
+   current memory map. This is called at every memory (read) access if
+   VERIFY_MEMORY_ACCESS is defined in the header file.
+*/
+void verify_address(glui32 addr, glui32 count) {
 	if (addr >= endmem)
 		fatal_error_i("Memory access out of range", addr);
 	if (count > 1) {
@@ -278,7 +352,12 @@ void Glulx::verify_address(uint addr, uint count) {
 	}
 }
 
-void Glulx::verify_address_write(uint addr, uint count) {
+/* verify_address_write():
+   Make sure that count bytes beginning with addr all fall within RAM.
+   This is called at every memory write if VERIFY_MEMORY_ACCESS is
+   defined in the header file.
+*/
+void verify_address_write(glui32 addr, glui32 count) {
 	if (addr < ramstart)
 		fatal_error_i("Memory write to read-only address", addr);
 	if (addr >= endmem)
@@ -290,8 +369,39 @@ void Glulx::verify_address_write(uint addr, uint count) {
 	}
 }
 
-void Glulx::verify_array_addresses(uint addr, uint count, uint size) {
-	uint bytecount;
+/* verify_address_stack():
+   Make sure that count bytes beginning with stackpos all fall
+   within the stack. This is called at every stack access if
+   VERIFY_MEMORY_ACCESS is defined in the header file.
+*/
+void verify_address_stack(glui32 stackpos, glui32 count) {
+	if (stackpos >= stacksize || stackpos + count > stacksize)
+		fatal_error_i("Stack access out of range", stackpos);
+
+	switch (count) {
+	case 1:
+		break;
+	case 2:
+		if (stackpos & 1)
+			fatal_error_i("Unaligned stack access (2)", stackpos);
+		break;
+	case 4:
+		if (stackpos & 3)
+			fatal_error_i("Unaligned stack access (4)", stackpos);
+		break;
+	default:
+		fatal_error_i("Invalid stack access size", count);
+	}
+}
+
+/* verify_array_addresses():
+   Make sure that an array of count elements (size bytes each),
+   starting at addr, does not fall outside the memory map. This goes
+   to some trouble that verify_address() does not, because we need
+   to be wary of lengths near -- or beyond -- 0x7FFFFFFF.
+*/
+void verify_array_addresses(glui32 addr, glui32 count, glui32 size) {
+	glui32 bytecount;
 	if (addr >= endmem)
 		fatal_error_i("Memory access out of range", addr);
 
@@ -312,5 +422,5 @@ void Glulx::verify_array_addresses(uint addr, uint count, uint size) {
 		fatal_error_i("Memory access too long", addr);
 }
 
-} // End of namespace Glulx
-} // End of namespace Glk
+} // namespace Glulx
+} // namespace Glk

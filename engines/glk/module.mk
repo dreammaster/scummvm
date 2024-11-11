@@ -9,6 +9,7 @@ MODULE_OBJS := \
 	glk.o \
 	glk_api.o \
 	glk_dispa.o \
+	glk_proxy.o \
 	metaengine.o \
 	pc_speaker.o \
 	picture.o \
@@ -182,7 +183,7 @@ MODULE_OBJS := \
 	glulx/float.o \
 	glulx/funcs.o \
 	glulx/gestalt.o \
-	glulx/glkop.o \
+	glulx/glk_op.o \
 	glulx/glulx.o \
 	glulx/heap.o \
 	glulx/operand.o \

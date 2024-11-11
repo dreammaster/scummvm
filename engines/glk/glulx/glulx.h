@@ -19,7 +19,7 @@
  *
  */
 
-/* Based on Glulx intrepreter version 0.5.4 */
+/* Based on Glulx intrepreter version 0.6.1 */
 
 #ifndef GLK_GLULXE
 #define GLK_GLULXE
@@ -28,6 +28,7 @@
 #include "common/random.h"
 #include "glk/glk_api.h"
 #include "glk/glulx/glulx_types.h"
+#include "glk/glulx/glulxe.h"
 
 namespace Glk {
 namespace Glulx {
@@ -713,15 +714,6 @@ public:
 	 * @{
 	 */
 
-	inline void *glulx_malloc(uint len) {
-		return malloc(len);
-	}
-	inline void *glulx_realloc(void *ptr, uint len) {
-		return realloc(ptr, len);
-	}
-	inline void glulx_free(void *ptr) {
-		free(ptr);
-	}
 	inline void glulx_setrandom(uint32 seed) {
 		_random.setSeed(seed);
 	}
@@ -995,12 +987,16 @@ public:
 
 extern Glulx *g_vm;
 
-#define fatal_error(s)  (fatal_error_handler((s), nullptr, false, 0))
-#define fatal_error_2(s1, s2)  (fatal_error_handler((s1), (s2), false, 0))
-#define fatal_error_i(s, v)  (fatal_error_handler((s), nullptr, true, (v)))
-#define nonfatal_warning(s) (nonfatal_warning_handler((s), nullptr, false, 0))
-#define nonfatal_warning_2(s1, s2) (nonfatal_warning_handler((s1), (s2), false, 0))
-#define nonfatal_warning_i(s, v) (nonfatal_warning_handler((s), nullptr, true, (v)))
+inline void glulx_setrandom(uint32 seed) {
+	g_vm->glulx_setrandom(seed);
+}
+inline uint glulx_random() {
+	return g_vm->glulx_random();
+}
+inline void glulx_sort(void *addr, int count, int size, int(*comparefunc)(const void *p1, const void *p2)) {
+	g_vm->glulx_sort(addr, count, size, comparefunc);
+}
+
 
 } // End of namespace Glulx
 } // End of namespace Glk

@@ -19,30 +19,40 @@
  *
  */
 
-#include "glk/glulx/glulx.h"
+/* Glulxe function-handling functions.
+ */
+
+#include "glk/glk.h"
+#include "glk/glulx/glulxe.h"
 
 namespace Glk {
 namespace Glulx {
 
-void Glulx::enter_function(uint funcaddr, uint argc, uint *argv) {
-	uint ix, jx;
-	acceleration_func accelFunc;
+/* enter_function():
+   This writes a new call frame onto the stack, at stackptr. It leaves
+   frameptr pointing to the frame (ie, the original stackptr value.)
+   argc and argv are an array of arguments. Note that if argc is zero,
+   argv may be NULL.
+*/
+void enter_function(glui32 funcaddr, glui32 argc, glui32 *argv) {
+	int ix, jx;
+	acceleration_func accelfunc;
 	int locallen;
 	int functype;
-	uint modeaddr, opaddr, val;
+	glui32 modeaddr, opaddr, val;
 	int loctype, locnum;
-	uint addr = funcaddr;
+	glui32 addr = funcaddr;
 
-	accelFunc = accel_get_func(addr);
-	if (accelFunc) {
-		profile_in(addr, stackptr, true);
-		val = (this->*accelFunc)(argc, argv);
+	accelfunc = accel_get_func(addr);
+	if (accelfunc) {
+		profile_in(addr, stackptr, TRUE);
+		val = accelfunc(argc, argv);
 		profile_out(stackptr);
 		pop_callstub(val);
 		return;
 	}
 
-	profile_in(addr, stackptr, false);
+	profile_in(addr, stackptr, FALSE);
 
 	/* Check the Glulx type identifier byte. */
 	functype = Mem1(addr);
@@ -128,7 +138,7 @@ void Glulx::enter_function(uint funcaddr, uint argc, uint *argv) {
 	pc = addr;
 
 	/* Zero out all the locals. */
-	for (jx = 0; jx < (uint)locallen; jx++)
+	for (jx = 0; jx < locallen; jx++)
 		StkW1(localsbase + jx, 0);
 
 	if (functype == 0xC0) {
@@ -136,7 +146,7 @@ void Glulx::enter_function(uint funcaddr, uint argc, uint *argv) {
 		   been zeroed. */
 		if (stackptr + 4 * (argc + 1) >= stacksize)
 			fatal_error("Stack overflow in function arguments.");
-		for (ix = 0; ix < argc; ix++) {
+		for (ix = 0; ix < (int)argc; ix++) {
 			val = argv[(argc - 1) - ix];
 			StkW4(stackptr, val);
 			stackptr += 4;
@@ -151,7 +161,7 @@ void Glulx::enter_function(uint funcaddr, uint argc, uint *argv) {
 		modeaddr = frameptr + 8;
 		opaddr = localsbase;
 		ix = 0;
-		while (ix < argc) {
+		while (ix < (int)argc) {
 			loctype = Stk1(modeaddr);
 			modeaddr++;
 			locnum = Stk1(modeaddr);
@@ -161,7 +171,7 @@ void Glulx::enter_function(uint funcaddr, uint argc, uint *argv) {
 			if (loctype == 4) {
 				while (opaddr & 3)
 					opaddr++;
-				while (ix < argc && locnum) {
+				while (ix < (int)argc && locnum) {
 					val = argv[ix];
 					StkW4(opaddr, val);
 					opaddr += 4;
@@ -171,7 +181,7 @@ void Glulx::enter_function(uint funcaddr, uint argc, uint *argv) {
 			} else if (loctype == 2) {
 				while (opaddr & 1)
 					opaddr++;
-				while (ix < argc && locnum) {
+				while (ix < (int)argc && locnum) {
 					val = argv[ix] & 0xFFFF;
 					StkW2(opaddr, val);
 					opaddr += 2;
@@ -179,7 +189,7 @@ void Glulx::enter_function(uint funcaddr, uint argc, uint *argv) {
 					locnum--;
 				}
 			} else if (loctype == 1) {
-				while (ix < argc && locnum) {
+				while (ix < (int)argc && locnum) {
 					val = argv[ix] & 0xFF;
 					StkW1(opaddr, val);
 					opaddr += 1;
@@ -195,12 +205,19 @@ void Glulx::enter_function(uint funcaddr, uint argc, uint *argv) {
 	debugger_check_func_breakpoint(funcaddr);
 }
 
-void Glulx::leave_function() {
+/* leave_function():
+   Pop the current call frame off the stack. This is very simple.
+*/
+void leave_function() {
 	profile_out(stackptr);
 	stackptr = frameptr;
 }
 
-void Glulx::push_callstub(uint desttype, uint destaddr) {
+/* push_callstub():
+   Push the magic four values on the stack: result destination,
+   PC, and frameptr.
+*/
+void push_callstub(glui32 desttype, glui32 destaddr) {
 	if (stackptr + 16 > stacksize)
 		fatal_error("Stack overflow in callstub.");
 	StkW4(stackptr + 0, desttype);
@@ -210,9 +227,14 @@ void Glulx::push_callstub(uint desttype, uint destaddr) {
 	stackptr += 16;
 }
 
-void Glulx::pop_callstub(uint returnvalue) {
-	uint desttype, destaddr;
-	uint newpc, newframeptr;
+/* pop_callstub():
+   Remove the magic four values from the stack, and use them. The
+   returnvalue, whatever it is, is put at the result destination;
+   the PC and frameptr registers are set.
+*/
+void pop_callstub(glui32 returnvalue) {
+	glui32 desttype, destaddr;
+	glui32 newpc, newframeptr;
 
 	if (stackptr < 16)
 		fatal_error("Stack underflow in callstub.");
@@ -245,7 +267,7 @@ void Glulx::pop_callstub(uint returnvalue) {
 	case 0x12:
 		/* This call stub was pushed during a number-printing operation.
 		   Restart that. (Return value discarded.) */
-		stream_num(pc, true, destaddr);
+		stream_num(pc, TRUE, destaddr);
 		break;
 
 	case 0x13:
@@ -269,8 +291,13 @@ void Glulx::pop_callstub(uint returnvalue) {
 	}
 }
 
-uint Glulx::pop_callstub_string(int *bitnum) {
-	uint desttype, destaddr, newpc;
+/* pop_callstub_string():
+   Remove the magic four values, but interpret them as a string restart
+   state. Returns zero if it's a termination stub, or returns the
+   restart address. The bitnum is extra.
+*/
+glui32 pop_callstub_string(int *bitnum) {
+	glui32 desttype, destaddr, newpc;
 
 	if (stackptr < 16)
 		fatal_error("Stack underflow in callstub.");
@@ -294,5 +321,5 @@ uint Glulx::pop_callstub_string(int *bitnum) {
 	return 0;
 }
 
-} // End of namespace Glulx
-} // End of namespace Glk
+} // namespace Glulx
+} // namespace Glk

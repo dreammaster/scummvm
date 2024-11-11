@@ -321,6 +321,8 @@ public:
 	gidispatch_rock_t gidispatch_get_objrock(void *obj, uint objclass);
 };
 
+extern GlkAPI *g_api;
+
 } // End of namespace Glk
 
 #endif
