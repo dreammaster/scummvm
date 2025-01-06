@@ -27,6 +27,7 @@
 #define AESOP_EVENT_H
 
 #include "aesop/defs.h"
+#include "aesop/shared.h"
 
 namespace Aesop {
 
@@ -64,9 +65,9 @@ extern LONG current_event_type;
 //
 
 void init_notify_list();
-void add_notify_request(LONG client, ULONG message, ULONG event, LONG
+void add_notify_request(LONG client, LONG message, ULONG event, LONG
 	parameter);
-void delete_notify_request(LONG client, ULONG message, ULONG event,
+void delete_notify_request(LONG client, LONG message, ULONG event,
 	LONG parameter);
 void cancel_entity_requests(LONG client);
 void init_event_queue();

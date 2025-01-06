@@ -39,9 +39,10 @@ namespace Aesop {
 extern Common::Stream *open(const char *filename, int flags);
 extern void close(Common::Stream *&file);
 extern size_t read(Common::Stream *file, void *buffer, size_t size);
-extern size_t write(Common::Stream *file, void *buffer, size_t size);
+extern size_t write(Common::Stream *file, const void *buffer, size_t size);
 extern int32 lseek(Common::Stream *file, off_t offset, int whence);
 extern int32 tell(Common::Stream *file);
+extern void fprintStr(Common::Stream *file, const char *msg, ...);
 
 } // namespace Aesop
 
