@@ -58,7 +58,7 @@ size_t read(Common::Stream *file, void *buffer, size_t size) {
 	return rs ? rs->read(buffer, size) : 0;
 }
 
-size_t write(Common::Stream *file, void *buffer, size_t size) {
+size_t write(Common::Stream *file, const void *buffer, size_t size) {
 	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(file);
 	assert(ws);
 	return ws->write(buffer, size);
@@ -86,6 +86,15 @@ int32 tell(Common::Stream *file) {
 		return rs->pos();
 
 	return 0;
+}
+
+void fprintStr(Common::Stream *file, const char *msg, ...) {
+	va_list argptr;
+	va_start(argptr, msg);
+	Common::String str = Common::String::vformat(msg, argptr);
+	va_end(argptr);
+
+	write(file, str.c_str(), str.size() + 1);
 }
 
 } // namespace Aesop

@@ -3,6 +3,7 @@ MODULE := engines/aesop
 MODULE_OBJS = \
 	aesop.o \
 	console.o \
+	event.o \
 	files.o \
 	metaengine.o \
 	rtobject.o \
