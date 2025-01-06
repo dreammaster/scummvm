@@ -28,4 +28,6 @@ size_t heap_size;
 RTR_class *RTR;
 HRES HROED;
 
+ULONG check_on;
+
 } // namespace Aesop

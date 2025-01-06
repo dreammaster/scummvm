@@ -27,6 +27,7 @@
 #define AESOP_RTOBJECT_H
 
 #include "aesop/defs.h"
+#include "aesop/shared.h"
 
 namespace Aesop {
 
