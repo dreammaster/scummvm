@@ -5,6 +5,7 @@ MODULE_OBJS = \
 	console.o \
 	files.o \
 	metaengine.o \
+	rtres.o \
 	rtsystem.o \
 	vars.o
 
