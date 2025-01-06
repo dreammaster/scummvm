@@ -33,6 +33,8 @@ extern size_t heap_size;
 extern RTR_class *RTR;
 extern HRES HROED;
 
+extern ULONG check_on;
+
 } // namespace Aesop
 
 #endif

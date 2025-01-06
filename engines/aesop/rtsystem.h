@@ -77,7 +77,7 @@ WORD TF_destroy(TF_class *TF);
 WORD TF_wchar(TF_class *TF, BYTE ch);
 BYTE TF_rchar(TF_class *TF);
 WORD TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen);
-WORD TF_writeln(TF_class *TF, BYTE *buffer);
+WORD TF_writeln(TF_class *TF, const BYTE *buffer);
 
 //
 // Binary file management

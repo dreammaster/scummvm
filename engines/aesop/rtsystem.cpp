@@ -361,7 +361,7 @@ WORD TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen) {
 //
 /***************************************************/
 
-WORD TF_writeln(TF_class *TF, BYTE *buffer) {
+WORD TF_writeln(TF_class *TF, const BYTE *buffer) {
 	WORD b, c;
 
 	b = 0;
