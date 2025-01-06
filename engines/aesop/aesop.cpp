@@ -19,10 +19,6 @@
  *
  */
 
-#include "aesop/aesop.h"
-#include "graphics/framelimiter.h"
-#include "aesop/detection.h"
-#include "aesop/console.h"
 #include "common/scummsys.h"
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
@@ -31,9 +27,45 @@
 #include "engines/util.h"
 #include "graphics/paletteman.h"
 
+#include "aesop/aesop.h"
+#include "aesop/detection.h"
+#include "aesop/console.h"
+
+#include "aesop/defs.h"
+#include "aesop/ail_sound.h"
+#include "aesop/shared.h"
+#include "aesop/rtmsg.h"
+#include "aesop/rtres.h"
+#include "aesop/rtsystem.h"
+#include "aesop/rt.h"
+#include "aesop/rtlink.h"
+#include "aesop/rtobject.h"
+#include "aesop/rtcode.h"
+#include "aesop/event.h"
+#include "aesop/vars.h"
+
 namespace Aesop {
 
 AesopEngine *g_engine;
+
+// Amount of memory to reserve for scaling buffer (64K) + PAGE2 (64K) + misc. (22K)
+#define  WINDOW_SIZE    150000   
+
+// Amount of memory to reserve for DLL loading/linking (100K)
+#define DLL_HEADROOM    100000
+
+// Amount of memory to reserve for miscellaneous malloc() calls (32K)
+#define MALLOC_HEADROOM 32768
+
+// Amount of memory to reserve for AESOP interpreter stack (16K)
+#define STK_SIZE        16384
+
+// Minimum AESOP resource cache size permissible (600K)
+#define MIN_RES_SIZE    600000
+
+// Maximum useful AESOP resource cache size (800K)
+#define MAX_RES_SIZE    800000
+
 
 AesopEngine::AesopEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Aesop") {
@@ -60,37 +92,70 @@ Common::Error AesopEngine::run() {
 	// Set the engine's debugger console
 	setDebugger(new Console());
 
-	// If a savegame was selected from the launcher, load it
-	int saveSlot = ConfMan.getInt("save_slot");
-	if (saveSlot != -1)
-		(void)loadGameState(saveSlot);
+	BYTE RES_name[256];
+	BYTE code_name[256];
+	ULONG i;
+	ULONG code;
+	LONG rtn;
 
-	// Draw a series of boxes on screen as a sample
-	for (int i = 0; i < 100; ++i)
-		_screen->frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
-	_screen->update();
+	pathname = "scummvm.exe";
 
-	// Simple event handling loop
-	byte pal[256 * 3] = { 0 };
-	Common::Event e;
-	int offset = 0;
+	//setbuf(stdout, NULL);
 
-	Graphics::FrameLimiter limiter(g_system, 60);
-	while (!shouldQuit()) {
-		while (g_system->getEventManager()->pollEvent(e)) {
-		}
+	ENABLED = 1;
 
-		// Cycle through a simple palette
-		++offset;
-		for (int i = 0; i < 256; ++i)
-			pal[i * 3 + 1] = (i + offset) % 256;
-		g_system->getPaletteManager()->setPalette(pal, 0, 256);
-		// Delay for a bit. All events loops should have a delay
-		// to prevent the system being unduly loaded
-		limiter.delayBeforeSwap();
-		_screen->update();
-		limiter.startFrame();
+	AIL_startup();
+	mem_init();
+
+	Common::strcpy_s(RES_name, "eye.res");
+	Common::strcpy_s(code_name, "start");
+
+	heap_size = mem_avail() -
+		WINDOW_SIZE -
+		DLL_HEADROOM -
+		MALLOC_HEADROOM -
+		STK_SIZE;
+	assert(heap_size >= MIN_RES_SIZE);
+
+	if (heap_size > MAX_RES_SIZE)
+		heap_size = MAX_RES_SIZE;
+
+	RTR = RTR_construct(mem_alloc(heap_size), heap_size, MAX_OBJ_TYPES, RES_name);
+
+	if (RTR == NULL)
+		error(MSG_RIF, RES_name);
+
+	init_object_list();
+	init_notify_list();
+	init_event_queue();
+
+	RT_init(RTR, STK_SIZE, objlist);
+
+	HROED = RTR_get_resource_handle(RTR, ROED, DA_TEMPORARY | DA_EVANESCENT);
+	RTR_lock(RTR, HROED);
+	code = ascnum(RTD_lookup(HROED, code_name));
+	RTR_unlock(HROED);
+
+	if (code == (ULONG)-1L)
+		error(MSG_SPNF);
+
+	rtn = create_program(1, bootstrap, (ULONG)code);
+	rtn = destroy_object(1, rtn);
+
+	for (i = 0; i < RTR->nentries; i++) {
+		ULONG f;
+
+		f = RTR->dir[i].flags;
+
+		if ((f & DA_FREE) && (f & DA_DISCARDED) && (!RTR->dir[i].seg))
+			break;
 	}
+
+	RTR_destroy(RTR, RTR_FREEBASE);
+	RT_shutdown();
+
+	mem_shutdown();
+	AIL_shutdown(MSG_AIL);
 
 	return Common::kNoError;
 }

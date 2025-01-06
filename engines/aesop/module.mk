@@ -3,7 +3,8 @@ MODULE := engines/aesop
 MODULE_OBJS = \
 	aesop.o \
 	console.o \
-	metaengine.o
+	metaengine.o \
+	vars.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AESOP), DYNAMIC_PLUGIN)
