@@ -103,7 +103,7 @@ void GIL2VFX_pixel_fade(LONG src_wnd, LONG dest_wnd, LONG intervals);
 void GIL2VFX_select_text_window(TEXTWINDOW *tw);
 LONG GIL2VFX_char_width(LONG ch);
 void GIL2VFX_home();
-void GIL2VFX_remap_font_color(LONG current, LONG new);
+void GIL2VFX_remap_font_color(LONG current, LONG newColor);
 LONG GIL2VFX_test_overlap(LONG wnd, LONG x1, LONG y1, UBYTE *shapes, LONG shape_num);
 void GIL2VFX_print(LONG operation, const char *format, ...);
 void GIL2VFX_scroll_window(LONG wnd, LONG dx, LONG dy, LONG flags, LONG background);

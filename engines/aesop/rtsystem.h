@@ -26,6 +26,7 @@
 #ifndef AESOP_RTSYSTEM_H
 #define AESOP_RTSYSTEM_H
 
+#include "common/stream.h"
 #include "aesop/defs.h"
 
 namespace Aesop {
@@ -36,7 +37,7 @@ typedef struct {
 	HRES hbuf;
 	BYTE *buffer;
 	WORD p;
-	WORD file;
+	Common::Stream *file;
 	WORD mode;
 	LONG len;
 	LONG pos;
@@ -105,7 +106,7 @@ ULONG mem_headroom();
 
 LONG ascnum(BYTE *string);
 void opcode_fault(void *PC, void *stk);
-void abend(BYTE *msg, ...);
+void abend(const char *msg, ...);
 void curpos(WORD *x, WORD *y);
 void locate(WORD x, WORD y);
 

@@ -27,6 +27,7 @@
 #define AESOP_DEFS_H
 
 #include "common/scummsys.h"
+#include "graphics/font.h"
 
 namespace Aesop {
 
@@ -34,11 +35,13 @@ typedef uint16 UWORD;
 typedef byte UBYTE;
 typedef uint32 ULONG;
 typedef int16 WORD;
-typedef int8 BYTE;
+typedef char BYTE;
 typedef int32 LONG;
 
 typedef ULONG HRES;           // run-time resource handle
 typedef UWORD HSTR;           // run-time len-prefixed string descriptor
+
+typedef Graphics::Font FONT;
 
 #define MSG_CREATE  0         // predefined message tokens (sent by system)
 #define MSG_DESTROY 1

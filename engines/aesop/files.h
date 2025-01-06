@@ -19,31 +19,28 @@
  *
  */
 
-//
-//  Run-time graphics subs
-//
+#ifndef AESOP_VARS_H
+#define AESOP_VARS_H
 
-#ifndef AESOP_GRAPHICS_H
-#define AESOP_GRAPHICS_H
-
-#include "aesop/defs.h"
+#include "common/stream.h"
 
 namespace Aesop {
 
-extern UBYTE *fade_tables[5][16];
-extern UWORD first_color[5];
-extern UWORD in_GIL;
+#define O_RDONLY 1
+#define O_BINARY 2
+#define O_CREAT 4
+#define O_RDWR 8
+#define O_TRUNC 16
+#define O_APPEND 32
 
-//#define MODE_X 1                 // 1 for VGA mode X, 0 for MCGA mode 13h
+#define ATF_WRITE 1
+#define ATF_READ 2
 
-#define NTW 32                   // # of text windows available
-
-void dprint(LONG argcnt, BYTE *format, ...);
-void sprint(LONG argcnt, ULONG wndnum, BYTE *format, ...);
-void text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG newColor);
-void release_owned_windows(LONG owner);
+extern Common::Stream *open(const char *filename, int flags);
+extern void close(Common::Stream *&file);
+extern size_t read(Common::Stream *file, void *buffer, size_t size);
+extern size_t write(Common::Stream *file, void *buffer, size_t size);
 
 } // namespace Aesop
 
 #endif
-

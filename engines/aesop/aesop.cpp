@@ -100,8 +100,6 @@ Common::Error AesopEngine::run() {
 
 	pathname = "scummvm.exe";
 
-	//setbuf(stdout, NULL);
-
 	ENABLED = 1;
 
 	AIL_startup();

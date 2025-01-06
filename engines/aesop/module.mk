@@ -3,7 +3,9 @@ MODULE := engines/aesop
 MODULE_OBJS = \
 	aesop.o \
 	console.o \
+	files.o \
 	metaengine.o \
+	rtsystem.o \
 	vars.o
 
 # This module can be built as a plugin
