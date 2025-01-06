@@ -26,6 +26,7 @@
 #ifndef AESOP_RTRES_H
 #define AESOP_RTRES_H
 
+#include "common/stream.h"
 #include "aesop/defs.h"
 
 namespace Aesop {
@@ -103,7 +104,7 @@ typedef struct {
 	HD_entry *dir;             // public
 	UWORD nentries;            // public
 
-	WORD file;
+	Common::Stream *file;
 	RF_file_hdr RFH;
 	RF_entry_hdr REH;
 	OD_block OD;

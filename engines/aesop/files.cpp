@@ -64,4 +64,28 @@ size_t write(Common::Stream *file, void *buffer, size_t size) {
 	return ws->write(buffer, size);
 }
 
+int32 lseek(Common::Stream *file, off_t offset, int whence) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(file);
+	Common::SeekableWriteStream *ws = dynamic_cast<Common::SeekableWriteStream *>(file);
+
+	if (ws)
+		return ws->seek(offset, whence);
+	if (rs)
+		return rs->seek(offset, whence);
+
+	return 0;
+}
+
+int32 tell(Common::Stream *file) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(file);
+	Common::SeekableWriteStream *ws = dynamic_cast<Common::SeekableWriteStream *>(file);
+
+	if (ws)
+		return ws->pos();
+	if (rs)
+		return rs->pos();
+
+	return 0;
+}
+
 } // namespace Aesop
