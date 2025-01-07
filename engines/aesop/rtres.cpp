@@ -25,7 +25,7 @@
 #include "aesop/rt.h"
 #include "aesop/interface.h"
 #include "aesop/graphics.h"   // for dprint()
-#include "aesop/modsnd32.h"
+#include "aesop/system/ail32.h"
 #include "aesop/files.h"
 
 namespace Aesop {

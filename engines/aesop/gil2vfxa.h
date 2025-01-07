@@ -22,7 +22,7 @@
 #ifndef AESOP_GIL2VFXA_H
 #define AESOP_GIL2VFXA_H
 
-#include "aesop/vfx.h"
+#include "aesop/system/vfx.h"
 
 namespace Aesop {
 
