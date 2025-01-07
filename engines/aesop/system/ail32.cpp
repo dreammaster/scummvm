@@ -29,7 +29,7 @@ HDRIVER AIL_register_driver(void *driver_base_addr) {
 	return (HDRIVER)0;
 }
 
-void AIL_shutdown_driver(HDRIVER hXMI, int) {
+void AIL_shutdown_driver(HDRIVER hXMI, const char *) {
 }
 
 void AIL_release_driver_handle(HDRIVER hXMI) {
@@ -65,7 +65,7 @@ bool PhysicalState(int channel) {
 	return false;
 }
 
-void SetChannel(WORD blk, UWORD offset, UWORD size, int channel, int one) {
+void SetChannel(WORD blk, UWORD offset, UWORD size, WORD channel, WORD one) {
 }
 
 void SetActive(WORD channel1, WORD channel2) {
