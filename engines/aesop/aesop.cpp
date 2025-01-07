@@ -43,6 +43,7 @@
 #include "aesop/rtcode.h"
 #include "aesop/event.h"
 #include "aesop/vars.h"
+#include "aesop/system/vfx.h"
 
 namespace Aesop {
 
@@ -87,6 +88,8 @@ Common::String AesopEngine::getGameId() const {
 Common::Error AesopEngine::run() {
 	// Initialize 320x200 paletted graphics mode
 	initGraphics(320, 200);
+	VFX->scrn_width = 320;
+	VFX->scrn_height = 200;
 	_screen = new Graphics::Screen();
 
 	// Set the engine's debugger console

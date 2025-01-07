@@ -27,7 +27,7 @@
 #define AESOP_MOUSE_H
 
 #include "aesop/defs.h"
-#include "aesop/vfx.h"
+#include "aesop/system/vfx.h"
 
 namespace Aesop {
 
@@ -38,11 +38,11 @@ extern void mouse_show();
 extern void mouse_hide();
 extern void mouse_set_pointer(void *table, LONG shape, LONG uhot_x, LONG uhot_y);
 
-extern void mouse_register_mouse_event_callback(void cdecl(*fn)
+extern void mouse_register_mouse_event_callback(void(*fn)
 	(LONG x, LONG y));
-extern void mouse_register_button_event_callback(void cdecl(*fn)
+extern void mouse_register_button_event_callback(void(*fn)
 	(LONG left, LONG right, LONG center));
-extern void mouse_register_watchdog_callback(LONG cdecl(*fn)
+extern void mouse_register_watchdog_callback(LONG(*fn)
 	(RECT *area));
 
 extern void mouse_lock();

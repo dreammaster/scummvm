@@ -5,11 +5,14 @@ MODULE_OBJS = \
 	console.o \
 	event.o \
 	files.o \
+	interface.o \
 	metaengine.o \
 	rtobject.o \
 	rtres.o \
 	rtsystem.o \
-	vars.o
+	vars.o \
+	system/timers.o \
+	system/vfx.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AESOP), DYNAMIC_PLUGIN)

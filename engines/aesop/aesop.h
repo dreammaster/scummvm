@@ -33,14 +33,14 @@
 #include "engines/engine.h"
 #include "engines/savestate.h"
 #include "graphics/screen.h"
-
 #include "aesop/detection.h"
+#include "aesop/system/timers.h"
 
 namespace Aesop {
 
 struct AesopGameDescription;
 
-class AesopEngine : public Engine {
+class AesopEngine : public Engine, public Timers {
 private:
 	const ADGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
