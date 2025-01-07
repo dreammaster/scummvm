@@ -94,13 +94,13 @@ typedef struct OD_block {
 } OD_block;
 
 // name directory entry
-typedef struct {
+struct ND_entry {
 	ULONG OE;                     // public
 	HRES thunk;                   // public
 	HRES handle;                  // public
-} ND_entry;
+};
 
-typedef struct {
+struct RTR_class {
 	HD_entry *dir;             // public
 	UWORD nentries;            // public
 
@@ -118,7 +118,7 @@ typedef struct {
 
 	HRES name_dir;
 	WORD nd_entries;
-} RTR_class;
+};
 
 //
 // RTR_addr macro returns current address of resource cache entry

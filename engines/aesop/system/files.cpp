@@ -22,7 +22,7 @@
 #include "common/file.h"
 #include "common/savefile.h"
 #include "common/system.h"
-#include "aesop/files.h"
+#include "aesop/system/files.h"
 
 namespace Aesop {
 

@@ -40,9 +40,6 @@ typedef int32 LONG;
 
 typedef ULONG HRES;           // run-time resource handle
 typedef UWORD HSTR;           // run-time len-prefixed string descriptor
-typedef Common::Rect RECT;
-
-typedef Graphics::Font FONT;
 
 #define MSG_CREATE  0         // predefined message tokens (sent by system)
 #define MSG_DESTROY 1
@@ -92,6 +89,13 @@ typedef struct {
 	UWORD RGB;
 	UWORD fade[11];
 } PAL_HDR;                      // Palette resource header
+
+struct RECT {
+	int x0 = 0;
+	int y0 = 0;
+	int x1 = 0;
+	int y1 = 0;
+};
 
 } // namespace Aesop
 

@@ -100,6 +100,7 @@ BYTE *str_alloc(BYTE *string);
 void mem_free(void *ptr);
 ULONG mem_headroom();
 
+
 //
 // Misc. routines
 //

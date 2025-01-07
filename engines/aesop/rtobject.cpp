@@ -20,7 +20,6 @@
  */
 
 #include "aesop/rtobject.h"
-#include "aesop/files.h"
 #include "aesop/shared.h"
 #include "aesop/rtres.h"
 #include "aesop/rtlink.h"
@@ -32,6 +31,7 @@
 #include "aesop/event.h"
 #include "aesop/graphics.h"
 #include "aesop/vars.h"
+#include "aesop/system/files.h"
 
 namespace Aesop {
 
@@ -355,7 +355,7 @@ LONG readln(TF_class *TF, BYTE *buffer, LONG maxlen)
 
 CDESC *read_context_descriptor(TF_class *TF) {
 	static CDESC c;
-	HRES HROED;
+	HRES hroed;
 	BYTE *num;
 	BYTE *cName;
 	BYTE *def;
@@ -378,17 +378,17 @@ CDESC *read_context_descriptor(TF_class *TF) {
 	cName++;
 	cName[strlen(cName) - 1] = 0;
 
-	HROED = RTR_get_resource_handle(RTR, ROED, DA_TEMPORARY | DA_EVANESCENT);
-	RTR_lock(RTR, HROED);
+	hroed = RTR_get_resource_handle(RTR, ROED, DA_TEMPORARY | DA_EVANESCENT);
+	RTR_lock(RTR, hroed);
 
-	def = RTD_lookup(HROED, cName);
+	def = RTD_lookup(hroed, cName);
 
 	if (def == NULL)
 		abend(MSG_OMCR, cName, c.slot);
 
 	c.name = ascnum(def);
 
-	RTR_unlock(HROED);
+	RTR_unlock(hroed);
 
 	return &c;
 }

@@ -21,7 +21,7 @@
 
 #include "aesop/event.h"
 #include "aesop/shared.h"
-#include "aesop/files.h"
+#include "aesop/system/files.h"
 #include "aesop/rtres.h"
 #include "aesop/interface.h"
 #include "aesop/rt.h"

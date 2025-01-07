@@ -25,9 +25,6 @@
 #include "common/file.h"
 #include "common/savefile.h"
 #include "common/system.h"
-//#include "aesop/vfx.h"
-//#include "aesop/ail32.h"
-#include "aesop/files.h"
 #include "aesop/gil2vfx.h"
 #include "aesop/defs.h"
 #include "aesop/ail_sound.h"
@@ -40,6 +37,9 @@
 #include "aesop/event.h"
 #include "aesop/sound.h"
 #include "aesop/graphics.h"
+#include "aesop/system/ail32.h"
+#include "aesop/system/files.h"
+#include "aesop/system/vfx.h"
 
 namespace Aesop {
 
