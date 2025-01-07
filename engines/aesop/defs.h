@@ -26,7 +26,7 @@
 #ifndef AESOP_DEFS_H
 #define AESOP_DEFS_H
 
-#include "common/scummsys.h"
+#include "common/rect.h"
 #include "graphics/font.h"
 
 namespace Aesop {
@@ -40,6 +40,7 @@ typedef int32 LONG;
 
 typedef ULONG HRES;           // run-time resource handle
 typedef UWORD HSTR;           // run-time len-prefixed string descriptor
+typedef Common::Rect RECT;
 
 typedef Graphics::Font FONT;
 
