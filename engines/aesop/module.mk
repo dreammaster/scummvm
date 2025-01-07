@@ -7,6 +7,7 @@ MODULE_OBJS = \
 	files.o \
 	interface.o \
 	metaengine.o \
+	rtlink.o \
 	rtobject.o \
 	rtres.o \
 	rtsystem.o \
