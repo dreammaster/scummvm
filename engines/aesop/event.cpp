@@ -27,7 +27,7 @@
 #include "aesop/rt.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
-#include "aesop/modsnd32.h"
+#include "aesop/system/ail32.h"
 
 namespace Aesop {
 

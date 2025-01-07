@@ -12,7 +12,9 @@ MODULE_OBJS = \
 	rtobject.o \
 	rtres.o \
 	rtsystem.o \
+	sound.o \
 	vars.o \
+	system/ail32.o \
 	system/timers.o \
 	system/vfx.o
 

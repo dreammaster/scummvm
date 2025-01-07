@@ -76,6 +76,18 @@ int32 lseek(Common::Stream *file, off_t offset, int whence) {
 	return 0;
 }
 
+size_t fsize(Common::Stream *file) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(file);
+	Common::SeekableWriteStream *ws = dynamic_cast<Common::SeekableWriteStream *>(file);
+
+	if (ws)
+		return ws->size();
+	if (rs)
+		return rs->size();
+
+	return 0;
+}
+
 int32 tell(Common::Stream *file) {
 	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(file);
 	Common::SeekableWriteStream *ws = dynamic_cast<Common::SeekableWriteStream *>(file);
@@ -95,6 +107,20 @@ void fprintStr(Common::Stream *file, const char *msg, ...) {
 	va_end(argptr);
 
 	write(file, str.c_str(), str.size() + 1);
+}
+
+void *FILE_read(const char *filename, void *dest) {
+	Common::Stream *file = open(filename, ATF_READ);
+	if (!file)
+		return nullptr;
+
+	size_t size = fsize(file);
+	if (!dest)
+		dest = malloc(size);
+
+	read(file, dest, size);
+
+	return dest;
 }
 
 } // namespace Aesop

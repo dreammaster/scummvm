@@ -36,6 +36,8 @@ typedef void *PANE;
 
 extern VFX_DESC *VFX;
 
+inline void VFX_wait_vblank_leading() {}
+
 } // namespace Aesop
 
 #endif
