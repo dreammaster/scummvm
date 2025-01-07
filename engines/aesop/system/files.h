@@ -19,42 +19,33 @@
  *
  */
 
-#ifndef AESOP_SYSTEM_TIMERS_H
-#define AESOP_SYSTEM_TIMERS_H
+#ifndef AESOP_SYSTEM_FILES_H
+#define AESOP_SYSTEM_FILES_H
 
-#include "common/list.h"
+#include "common/stream.h"
 
 namespace Aesop {
 
-typedef void (*TimerCallback)();
+#define O_RDONLY 1
+#define O_BINARY 2
+#define O_CREAT 4
+#define O_RDWR 8
+#define O_TRUNC 16
+#define O_APPEND 32
 
-struct Timer {
-	int _frequency = 0;
-	uint32 _nextTimeout = 0;
-	TimerCallback _callback = nullptr;
-	bool _active = false;
+#define ATF_WRITE 1
+#define ATF_READ 2
 
-	Timer();
-	Timer(TimerCallback callback, int frequency = 0) :
-		_frequency(frequency), _callback(callback) {}
-};
+extern Common::Stream *open(const char *filename, int flags);
+extern void close(Common::Stream *&file);
+extern size_t read(Common::Stream *file, void *buffer, size_t size);
+extern size_t write(Common::Stream *file, const void *buffer, size_t size);
+extern int32 lseek(Common::Stream *file, off_t offset, int whence);
+extern size_t fsize(Common::Stream *file);
+extern int32 tell(Common::Stream *file);
+extern void fprintStr(Common::Stream *file, const char *msg, ...);
 
-struct Timers : Common::List<Timer> {
-public:
-	Timers();
-	~Timers();
-
-	void poll();
-};
-
-typedef Common::List<Timer>::iterator TimerIterator;
-typedef TimerIterator HTIMER;
-
-extern HTIMER AIL_register_timer(TimerCallback callback);
-extern void AIL_release_timer_handle(HTIMER timer);
-extern void AIL_set_timer_frequency(HTIMER timer, int freq);
-extern void AIL_start_timer(HTIMER timer);
-extern void AIL_stop_timer(HTIMER timer);
+extern void *FILE_read(const char *filename, void *dest);
 
 } // namespace Aesop
 

@@ -20,9 +20,6 @@
  */
 
 #include "common/textconsole.h"
-#include "aesop/system/vfx.h"
-#include "aesop/files.h"
-#include "aesop/mouse.h"
 #include "aesop/gil2vfx.h"
 #include "aesop/gil2vfxa.h"
 #include "aesop/defs.h"
@@ -35,7 +32,10 @@
 #include "aesop/sound.h"
 #include "aesop/graphics.h"
 #include "aesop/system/ail32.h"
-//#include "dll.h"
+#include "aesop/system/files.h"
+#include "aesop/system/mouse.h"
+#include "aesop/system/vfx.h"
+ //#include "dll.h"
 
 namespace Aesop {
 

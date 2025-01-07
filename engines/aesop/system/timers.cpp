@@ -66,4 +66,8 @@ void AIL_start_timer(HTIMER timer) {
 	timer->_active = true;
 }
 
+void AIL_stop_timer(HTIMER timer) {
+	timer->_active = false;
+}
+
 } // namespace Aesop

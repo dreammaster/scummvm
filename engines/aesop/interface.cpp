@@ -29,7 +29,7 @@
 #include "aesop/rt.h"
 #include "aesop/gil2vfx.h"
 #include "aesop/interface.h"
-#include "aesop/mouse.h"
+#include "aesop/system/mouse.h"
 #include "aesop/event.h"
 #include "aesop/graphics.h"
 #include "aesop/system/timers.h"

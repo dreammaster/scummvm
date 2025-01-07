@@ -4,8 +4,8 @@ MODULE_OBJS = \
 	aesop.o \
 	console.o \
 	event.o \
-	files.o \
 	interface.o \
+	gil2vfx.o \
 	metaengine.o \
 	rt.o \
 	rtlink.o \
@@ -15,6 +15,9 @@ MODULE_OBJS = \
 	sound.o \
 	vars.o \
 	system/ail32.o \
+	system/events.o \
+	system/files.o \
+	system/mouse.o \
 	system/timers.o \
 	system/vfx.o
 

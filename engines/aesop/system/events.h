@@ -19,42 +19,18 @@
  *
  */
 
-#ifndef AESOP_SYSTEM_TIMERS_H
-#define AESOP_SYSTEM_TIMERS_H
+//
+// C type definitions & mouse API prototypes
+//
 
-#include "common/list.h"
+#ifndef AESOP_SYSTEM_EVENTS_H
+#define AESOP_SYSTEM_EVENTS_H
+
+#include "aesop/defs.h"
 
 namespace Aesop {
 
-typedef void (*TimerCallback)();
 
-struct Timer {
-	int _frequency = 0;
-	uint32 _nextTimeout = 0;
-	TimerCallback _callback = nullptr;
-	bool _active = false;
-
-	Timer();
-	Timer(TimerCallback callback, int frequency = 0) :
-		_frequency(frequency), _callback(callback) {}
-};
-
-struct Timers : Common::List<Timer> {
-public:
-	Timers();
-	~Timers();
-
-	void poll();
-};
-
-typedef Common::List<Timer>::iterator TimerIterator;
-typedef TimerIterator HTIMER;
-
-extern HTIMER AIL_register_timer(TimerCallback callback);
-extern void AIL_release_timer_handle(HTIMER timer);
-extern void AIL_set_timer_frequency(HTIMER timer, int freq);
-extern void AIL_start_timer(HTIMER timer);
-extern void AIL_stop_timer(HTIMER timer);
 
 } // namespace Aesop
 

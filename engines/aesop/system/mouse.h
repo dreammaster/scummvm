@@ -23,8 +23,8 @@
 // C type definitions & mouse API prototypes
 //
 
-#ifndef AESOP_MOUSE_H
-#define AESOP_MOUSE_H
+#ifndef AESOP_SYSTEM_MOUSE_H
+#define AESOP_SYSTEM_MOUSE_H
 
 #include "aesop/defs.h"
 #include "aesop/system/vfx.h"

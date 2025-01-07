@@ -23,6 +23,7 @@
 #define AESOP_GIL2VFX_H
 
 #include "aesop/defs.h"
+#include "aesop/system/vfx.h"
 
 namespace Aesop {
 
@@ -43,17 +44,17 @@ namespace Aesop {
 #define Y_MIRROR 2
 #define XY_MIRROR 3
 
-typedef struct {
+struct TEXTWINDOW {
 	LONG window;
 	LONG htab, vtab;
 	FONT *font;
 	LONG delay;
-	LONG(*continueFunction)();
+	LONG(*continueFunction)(LONG htab);
 	char *txtbuf;
 	char *txtpnt;
 	LONG justify;
 	UBYTE lookaside[256];
-} TEXTWINDOW;
+};
 
 LONG GIL2VFX_char_width(LONG ch);
 void GIL2VFX_print(LONG operation, const char *format, ...);

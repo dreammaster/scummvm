@@ -19,34 +19,10 @@
  *
  */
 
-#ifndef AESOP_VARS_H
-#define AESOP_VARS_H
-
-#include "common/stream.h"
+#include "aesop/system/events.h"
 
 namespace Aesop {
 
-#define O_RDONLY 1
-#define O_BINARY 2
-#define O_CREAT 4
-#define O_RDWR 8
-#define O_TRUNC 16
-#define O_APPEND 32
 
-#define ATF_WRITE 1
-#define ATF_READ 2
-
-extern Common::Stream *open(const char *filename, int flags);
-extern void close(Common::Stream *&file);
-extern size_t read(Common::Stream *file, void *buffer, size_t size);
-extern size_t write(Common::Stream *file, const void *buffer, size_t size);
-extern int32 lseek(Common::Stream *file, off_t offset, int whence);
-extern size_t fsize(Common::Stream *file);
-extern int32 tell(Common::Stream *file);
-extern void fprintStr(Common::Stream *file, const char *msg, ...);
-
-extern void *FILE_read(const char *filename, void *dest);
 
 } // namespace Aesop
-
-#endif
