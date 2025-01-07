@@ -30,10 +30,10 @@
 namespace Aesop {
 
 // fundamental stack value structure
-typedef struct {
+struct STKVAL {
 	ULONG val;
 	UWORD type;
-} STKVAL;
+};
 
 enum {
 	TYP_CRES,                  // data type: code resource address
@@ -68,7 +68,7 @@ BYTE *RTD_lookup(HRES dictionary, const char *key);
 
 // Runtime interpreter calls
 
-void RT_init(RTR_class *RTR, ULONG stack_size, HRES *objlist);
+void RT_init(RTR_class *rtr, ULONG stack_size, HRES *rtObjList);
 void RT_shutdown();
 void RT_arguments(void *base, ULONG size);
 LONG RT_execute(ULONG index, ULONG msg_num, ULONG vector);
