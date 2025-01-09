@@ -4,6 +4,7 @@ MODULE_OBJS = \
 	aesop.o \
 	console.o \
 	event.o \
+	eye.o \
 	interface.o \
 	gil2vfx.o \
 	gil2vfxa.o \
