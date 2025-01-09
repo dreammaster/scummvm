@@ -130,9 +130,9 @@ LONG get_text_y(LONG argcnt, ULONG wndnum);
 void home(LONG argcnt, ULONG wndnum);
 
 void print(LONG argcnt, ULONG wndnum, ULONG format, ...);
-void sprint(LONG argcnt, ULONG wndnum, BYTE *format, ...);
-void dprint(LONG argcnt, BYTE *format, ...);
-void aprint(LONG argcnt, BYTE *format, ...);
+void sprint(LONG argcnt, ULONG wndnum, const char *format, ...);
+void dprint(LONG argcnt, const char *format, ...);
+void aprint(LONG argcnt, const char *format, ...);
 void crout(LONG argcnt, ULONG wndnum);
 ULONG char_width(LONG argcnt, ULONG wndnum, ULONG ch);
 ULONG font_height(LONG argcnt, ULONG wndnum);
