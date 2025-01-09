@@ -6,6 +6,7 @@ MODULE_OBJS = \
 	event.o \
 	interface.o \
 	gil2vfx.o \
+	gil2vfxa.o \
 	graphics.o \
 	metaengine.o \
 	rt.o \
