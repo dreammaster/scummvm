@@ -43,7 +43,7 @@
 
 namespace Aesop {
 
-void breakpoint();
+static void breakpoint() {}
 
 ULONG headroom;
 ULONG checksum;
