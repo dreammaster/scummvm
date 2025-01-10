@@ -35,6 +35,10 @@ struct InventoryItem {
 
 	InventoryItem() {}
 	void synchronize(Serializer &s);
+
+	bool hasNoAmmunition() const {
+		return _quantity == 0;
+	}
 };
 
 struct InventoryItems : public Array1<InventoryItem> {
