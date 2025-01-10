@@ -26,11 +26,23 @@
 #ifndef AESOP_SYSTEM_EVENTS_H
 #define AESOP_SYSTEM_EVENTS_H
 
+#include "common/events.h"
+#include "common/queue.h"
 #include "aesop/defs.h"
 
 namespace Aesop {
 
+class Events {
+	Common::Queue<Common::Event> _keys;
+public:
+	void pollEvents();
 
+	int kbhit() const {
+		return _keys.empty() ? 0 : 1;
+	}
+};
+
+extern int kbhit();
 
 } // namespace Aesop
 

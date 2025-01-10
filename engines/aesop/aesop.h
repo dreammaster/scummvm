@@ -34,6 +34,7 @@
 #include "engines/savestate.h"
 #include "graphics/screen.h"
 #include "aesop/detection.h"
+#include "aesop/system/events.h"
 #include "aesop/system/timers.h"
 
 namespace Aesop {
@@ -49,6 +50,8 @@ protected:
 	Common::Error run() override;
 public:
 	Graphics::Screen *_screen = nullptr;
+	Events _events;
+
 public:
 	AesopEngine(OSystem *syst, const ADGameDescription *gameDesc);
 	~AesopEngine() override;

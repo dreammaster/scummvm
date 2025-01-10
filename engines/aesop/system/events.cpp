@@ -19,10 +19,23 @@
  *
  */
 
+#include "common/events.h"
+#include "common/system.h"
 #include "aesop/system/events.h"
+#include "aesop/aesop.h"
 
 namespace Aesop {
 
+void Events::pollEvents() {
+	Common::Event event;
+	while (!g_engine->shouldQuit() && g_system->getEventManager()->pollEvent(event)) {
+		if (event.type == Common::EVENT_KEYDOWN)
+			_keys.push(event);
+	}
+}
 
+int kbhit() {
+	return g_engine->_events.kbhit();
+}
 
 } // namespace Aesop
