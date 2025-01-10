@@ -21,7 +21,7 @@
 
 #include "common/system.h"
 #include "graphics/palette.h"
-#include "wasteland/wasteland1/views/dialogs/title.h"
+#include "wasteland/wasteland1/views/title/title.h"
 #include "wasteland/core/file.h"
 #include "wasteland/wasteland1/files/vertical_xor_stream.h"
 #include "wasteland/keymapping.h"
@@ -30,7 +30,7 @@
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
-namespace Dialogs {
+namespace Title {
 
 #define TITLE_W 288
 #define TITLE_H 128
@@ -165,7 +165,7 @@ void Title::setText() {
 	}
 }
 
-} // namespace Dialogs
+} // namespace Title
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
