@@ -11,6 +11,7 @@ MODULE_OBJS = \
 	graphics.o \
 	metaengine.o \
 	rt.o \
+	rtcode.o \
 	rtlink.o \
 	rtobject.o \
 	rtres.o \
