@@ -19,43 +19,22 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
-#define WASTELAND_WASTELAND1_VIEWS_DIALOGS_TITLE_H
-
-#include "graphics/managed_surface.h"
-#include "wasteland/gfx/text_view.h"
-#include "wasteland/wasteland1/views/dialogs/dialog.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "wasteland/wasteland1/views/title/roster_pane.h"
+#include "wasteland/wasteland1/views/title/roster.h"
+#include "wasteland/events.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
-namespace Dialogs {
+namespace Title {
 
-class Title : public Dialog {
-private:
-	Graphics::ManagedSurface _surface;
-	Shared::Gfx::TextView _textView;
-	Button _start;
-	int _textNum = 0;
+void RosterPane::draw() {
+	// Keeps the location animating when showing a sub-pane
+	Roster *locationAnim = dynamic_cast<Roster *>(g_events->findView("Animation"));
+	locationAnim->draw();
+}
 
-	void setText();
-
-public:
-	Title();
-	virtual ~Title() {}
-
-	bool msgAction(const ActionMessage &msg) override;
-	bool msgGame(const GameMessage &msg) override;
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	void draw() override;
-	void timeout() override;
-};
-
-} // namespace Dialogs
+} // namespace Title
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif

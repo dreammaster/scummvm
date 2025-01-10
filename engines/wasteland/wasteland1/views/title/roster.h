@@ -19,21 +19,38 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_VIEWS_H
-#define WASTELAND_WASTELAND1_VIEWS_VIEWS_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_TITLE_ROSTER_H
+#define WASTELAND_WASTELAND1_VIEWS_TITLE_ROSTER_H
 
-#include "wasteland/wasteland1/views/title/roster.h"
-#include "wasteland/wasteland1/views/title/title.h"
+#include "graphics/managed_surface.h"
+#include "wasteland/wasteland1/views/dialogs/dialog.h"
+#include "wasteland/wasteland1/views/gfx/animation.h"
+#include "wasteland/wasteland1/views/gfx/button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
+namespace Title {
 
-struct Views {
-	Title::Title _title;
-	Title::Roster _roster;
+class Roster : public Dialogs::Dialog {
+private:
+	Button _create;
+	Button _delete;
+	Button _play;
+	Animation _animation;
+	int _selectedMember = -1;
+
+	void writeParty();
+	void writePartyMember(int partyNum);
+
+public:
+	Roster();
+	virtual ~Roster() {}
+
+	void draw() override;
 };
 
+} // namespace Title
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland

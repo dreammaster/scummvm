@@ -19,21 +19,41 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_VIEWS_H
-#define WASTELAND_WASTELAND1_VIEWS_VIEWS_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_TITLE_TITLE_H
+#define WASTELAND_WASTELAND1_VIEWS_TITLE_TITLE_H
 
-#include "wasteland/wasteland1/views/title/roster.h"
-#include "wasteland/wasteland1/views/title/title.h"
+#include "graphics/managed_surface.h"
+#include "wasteland/gfx/text_view.h"
+#include "wasteland/wasteland1/views/dialogs/dialog.h"
+#include "wasteland/wasteland1/views/gfx/button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
+namespace Title {
 
-struct Views {
-	Title::Title _title;
-	Title::Roster _roster;
+class Title : public Dialogs::Dialog {
+private:
+	Graphics::ManagedSurface _surface;
+	Shared::Gfx::TextView _textView;
+	Button _start;
+	int _textNum = 0;
+
+	void setText();
+
+public:
+	Title();
+	virtual ~Title() {}
+
+	bool msgAction(const ActionMessage &msg) override;
+	bool msgGame(const GameMessage &msg) override;
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgUnfocus(const UnfocusMessage &msg) override;
+	void draw() override;
+	void timeout() override;
 };
 
+} // namespace Title
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland

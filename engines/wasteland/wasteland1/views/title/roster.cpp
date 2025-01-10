@@ -19,14 +19,14 @@
  *
  */
 
-#include "wasteland/wasteland1/views/dialogs/roster.h"
+#include "wasteland/wasteland1/views/title/roster.h"
 #include "wasteland/wasteland1/gfx/pics.h"
 #include "wasteland/wasteland1/wasteland1.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
-namespace Dialogs {
+namespace Title {
 
 Roster::Roster() : Dialog("Roster"),
 _create(this, "Create", "CREATE", 11, 24),
@@ -115,7 +115,7 @@ void Roster::writePartyMember(int partyNum) {
 	// TODO
 }
 
-} // namespace Dialogs
+} // namespace Title
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
