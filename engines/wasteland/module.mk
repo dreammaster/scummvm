@@ -46,7 +46,9 @@ MODULE_OBJS = \
 	wasteland1/views/view.o \
 	wasteland1/views/gfx/animation.o \
 	wasteland1/views/gfx/button.o \
+	wasteland1/views/gfx/clickable_text.o \
 	wasteland1/views/dialogs/dialog.o \
+	wasteland1/views/title/party_member.o \
 	wasteland1/views/title/title.o \
 	wasteland1/views/title/roster.o \
 	wasteland1/views/title/roster_pane.o \
