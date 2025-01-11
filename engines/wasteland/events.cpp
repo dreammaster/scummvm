@@ -203,13 +203,15 @@ void Events::addKeypress(const Common::KeyCode kc) {
 }
 
 void Events::setCursor(int cursorNum) {
-	_cursorNum = cursorNum;
-	const Cursor &curs = _cursors[cursorNum];
+	if (cursorNum != _cursorNum) {
+		_cursorNum = cursorNum;
+		const Cursor &curs = _cursors[cursorNum];
 
-	g_system->setMouseCursor(curs._image.getPixels(),
-		curs._image.w, curs._image.h, curs._hotspotX, curs._hotspotY,
-		(uint)-1, false, nullptr, (const byte *)curs._mask.getPixels()
-	);
+		g_system->setMouseCursor(curs._image.getPixels(),
+			curs._image.w, curs._image.h, curs._hotspotX, curs._hotspotY,
+			(uint)-1, false, nullptr, (const byte *)curs._mask.getPixels()
+		);
+	}
 }
 
 /*------------------------------------------------------------------------*/

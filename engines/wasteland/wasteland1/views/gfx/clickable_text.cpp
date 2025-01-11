@@ -19,46 +19,42 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_TITLE_ROSTER_H
-#define WASTELAND_WASTELAND1_VIEWS_TITLE_ROSTER_H
-
-#include "graphics/managed_surface.h"
-#include "wasteland/wasteland1/views/dialogs/dialog.h"
-#include "wasteland/wasteland1/views/gfx/animation.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
-#include "wasteland/wasteland1/views/title/party_member.h"
+#include "wasteland/wasteland1/views/gfx/clickable_text.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
-namespace Title {
 
-class Roster : public Dialogs::Dialog {
-private:
-	Button _create;
-	Button _delete;
-	Button _play;
-	PartyMember _roster1;
-	PartyMember _roster2;
-	PartyMember _roster3;
-	PartyMember _roster4;
-	PartyMember _roster5;
-	PartyMember _roster6;
-	PartyMember *_roster[7] = {};
-	Animation _animation;
-	int _selectedMember = -1;
+ClickableText::ClickableText(UIElement *parent, const Common::String &name) :
+	UIElement(name, parent) {
+}
 
-public:
-	Roster();
-	virtual ~Roster() {}
+bool ClickableText::msgMouseEnter(const MouseEnterMessage &msg) {
+	if (isValid())
+		g_events->setCursor(1);
 
-	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
-};
+	return true;
+}
 
-} // namespace Title
+bool ClickableText::msgMouseLeave(const MouseLeaveMessage &msg) {
+	g_events->setCursor(0);
+
+	return true;
+}
+
+void ClickableText::draw() {
+	Surface s = getSurface(_bounds);
+
+	s.writeString(_text);
+}
+
+bool ClickableText::msgMouseDown(const MouseDownMessage &msg) {
+	if (isValid())
+		_parent->send(GameMessage(_name));
+
+	return true;
+}
+
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif

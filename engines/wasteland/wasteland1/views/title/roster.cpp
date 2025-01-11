@@ -29,10 +29,25 @@ namespace Views {
 namespace Title {
 
 Roster::Roster() : Dialog("Roster"),
-_create(this, "Create", "CREATE", 11, 24),
-_delete(this, "Delete", "DELETE", 18, 24),
-_play(this, "Play", "PLAY", 25, 24),
-_animation("Animation", this, 3, 0) {
+		_create(this, "Create", "CREATE", 11, 24),
+		_delete(this, "Delete", "DELETE", 18, 24),
+		_play(this, "Play", "PLAY", 25, 24),
+		_animation("Animation", this, 3, 0),
+		_roster1(this, 1),
+		_roster2(this, 2),
+		_roster3(this, 3),
+		_roster4(this, 4),
+		_roster5(this, 5),
+		_roster6(this, 6) {
+	_roster[1] = &_roster1;
+	_roster[2] = &_roster2;
+	_roster[3] = &_roster3;
+	_roster[4] = &_roster4;
+	_roster[5] = &_roster5;
+	_roster[6] = &_roster6;
+
+	for (int i = 1; i <= 6; ++i)
+		_children.push_back(_roster[i]);
 }
 
 void Roster::draw() {
@@ -75,44 +90,19 @@ void Roster::draw() {
 
 	s.writeString(HEADER_ROW1, 0, 14);
 	s.writeString(HEADER_ROW2, 0, 15);
-	writeParty();
+
+	Dialog::draw();
 }
 
-void Roster::writeParty() {
-	const auto &saved = g_engine->_saved;
-	const auto &saved2 = saved._saved2;
-
-	for (int i = 1; i <= saved2._membersInGroup; ++i) {
-		writePartyMember(i);
+bool Roster::msgGame(const GameMessage &msg) {
+	if (msg._name == "SELECT_MEMBER") {
+		// Select new member
+		for (int i = 1; i <= 6; ++i)
+			_roster[i]->setSelected(i == msg._value);
+		return true;
 	}
-}
 
-void Roster::writePartyMember(int partyNum) {
-	Surface s = getSurface();
-	s.setInverseColor(partyNum == _selectedMember);
-	s.writeChar('0' + partyNum, 1, 15 + partyNum);
-	s.writeChar('>');
-	s.setInverseColor(false);
-
-	auto &saved = g_engine->_saved;
-	saved.setCurrentCharacter(partyNum);
-	const auto &member = *saved._currentCharacter;
-
-	s.writeString(member._name);
-	s.setTextPos(17, 15 + partyNum);
-	s.writeString(Common::String::format("%2d", member._ac));
-
-	int weapon = member._weapon;
-	int ammunition = 0;
-
-	if (weapon) {
-		auto &invItem = member._items[weapon];
-		if (!invItem.hasNoAmmunition() && invItem._quantity)
-			ammunition = invItem._quantity & 63;
-	}
-	s.writeString(Common::String::format("%4d", ammunition));
-
-	// TODO
+	return false;
 }
 
 } // namespace Title
