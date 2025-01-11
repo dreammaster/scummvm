@@ -43,13 +43,17 @@ void MonoFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32
 	byte *dest;
 	byte bits;
 
+	bool isReverse = ((int32)color) < 0;
+	byte col = (byte)ABS((int32)color);
+
 	for (int yc = 0; yc < FONT_H; ++yc, ++y, ++src) {
 		bits = *src;
 		dest = (byte *)dst->getBasePtr(x, y);
 
 		for (int xc = 0; xc < FONT_W; ++xc, ++dest, bits <<= 1) {
-			if (bits & 0x80)
-				*dest = color;
+			if (((bits & 0x80) && !isReverse) ||
+					(!(bits & 0x80) && isReverse))
+				*dest = col;
 		}
 	}
 }
