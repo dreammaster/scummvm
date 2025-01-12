@@ -21,6 +21,7 @@
 
 #include "wasteland/wasteland1/views/title/party_member.h"
 #include "wasteland/wasteland1/wasteland1.h"
+#include "wasteland/wasteland1/data/text.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -35,6 +36,10 @@ PartyMember::PartyMember(UIElement *parent, uint memberIndex) :
 }
 
 void PartyMember::draw() {
+	static const byte CONDITION_CHARS[] = {
+		0x85, 0x9A, 0x9B, 0x9C, 0x9D, 0x84
+	};
+
 	Surface s = getSurface();
 	s.clear();
 
@@ -64,6 +69,32 @@ void PartyMember::draw() {
 	}
 	s.writeString(Common::String::format("%4d", ammunition));
 
+	// Write the max constitution. If the member is afflicted,
+	// show it in inverse colors
+	s.setTextPos(23, 0);
+	if (member._afflictions)
+		s.setInverseColor(true);
+	s.writeString(Common::String::format("%3d", member._maxCon));
+	s.setInverseColor(false);
+
+	// Write the current constitution
+	s.setTextPos(27, 0);
+	if (member._con < 0) {
+		s.writeChar(CONDITION_CHARS[member.getConditionIndex()]);
+	} else if (member._con == 0) {
+		s.writeChar(CONDITION_CHARS[5]);
+	} else {
+		s.writeString(Common::String::format("%3d", member._con));
+	}
+
+	// Write out the weapon
+	s.setTextPos(31, 0);
+	if (weapon) {
+		auto &invItem = member._items[weapon];
+		s.setInverseColor(invItem._quantity < 0);	// reverse if broken
+		s.writeString(Data::TEXT_STRINGS[36 + invItem._id]);
+		s.setInverseColor(false);
+	}
 }
 
 bool PartyMember::msgMouseDown(const MouseDownMessage &msg) {

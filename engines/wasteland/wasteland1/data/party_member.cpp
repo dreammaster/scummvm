@@ -69,6 +69,22 @@ void PartyMember::synchronize(Serializer &s) {
 	s.skip(7);
 }
 
+int PartyMember::getConditionIndex() const {
+	static const int8 CONDITION_THRESHOLDS[] = {
+		-1, -11, -20, -30, -40
+	};
+
+	if (!_con)
+		return 0;
+
+	for (int idx = 4; idx >= 0; --idx) {
+		if (_con <= CONDITION_THRESHOLDS[idx])
+			return idx;
+	}
+
+	return -1;
+}
+
 } // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland
