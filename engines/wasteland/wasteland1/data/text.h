@@ -31,6 +31,12 @@ namespace Data {
 
 extern const char *const TEXT_STRINGS[];
 
+/**
+ * In some cases, item names are encoded with three \n characters,
+ * indicating the suffixes to use for singular vs plural amounts.
+ */
+extern Common::String getText(uint index, bool isPlural = false);
+
 } // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland

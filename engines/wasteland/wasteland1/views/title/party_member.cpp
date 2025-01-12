@@ -92,7 +92,7 @@ void PartyMember::draw() {
 	if (weapon) {
 		auto &invItem = member._items[weapon];
 		s.setInverseColor(invItem._quantity < 0);	// reverse if broken
-		s.writeString(Data::TEXT_STRINGS[36 + invItem._id]);
+		s.writeString(Data::getText(36 + invItem._id));
 		s.setInverseColor(false);
 	}
 }
