@@ -66,6 +66,8 @@ struct PartyMember {
 	InventoryItems _items;
 
 	void synchronize(Serializer &s);
+
+	int getConditionIndex() const;
 };
 
 } // namespace Data
