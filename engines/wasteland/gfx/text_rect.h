@@ -19,25 +19,32 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_VIEWS_H
-#define WASTELAND_WASTELAND1_VIEWS_VIEWS_H
+#ifndef WASTELAND_WASTELAND1_DATA_TEXT_RECT_H
+#define WASTELAND_WASTELAND1_DATA_TEXT_RECT_H
 
-#include "wasteland/wasteland1/views/title/roster.h"
-#include "wasteland/wasteland1/views/title/title.h"
-#include "wasteland/wasteland1/views/title/summary_pane.h"
+#include "common/rect.h"
+#include "wasteland/gfx/surface.h"
 
 namespace Wasteland {
-namespace Wasteland1 {
-namespace Views {
+namespace Gfx {
 
-struct Views {
-	Title::Title _title;
-	Title::Roster _roster;
-	Title::SummaryPane _summaryPane;
+struct TextRect : public Common::Rect {
+	TextRect() : Common::Rect() {}
+	TextRect(int16 w, int16 h) : Common::Rect(w *TEXT_W, h *TEXT_H) {}
+	TextRect(int16 x1, int16 y1, int16 x2, int16 y2) :
+		Common::Rect(x1 *TEXT_W, y1 *TEXT_H, x2 *TEXT_W, y2 *TEXT_H) {}
 };
 
-} // namespace Views
-} // namespace Wasteland1
+struct TextPoint : public Common::Point {
+	TextPoint() : Common::Point() {}
+	TextPoint(int16 x, int16 y) : Common::Point(x *TEXT_W, y *TEXT_H) {}
+};
+
+} // namespace Gfx
+
+using Gfx::TextRect;
+using Gfx::TextPoint;
+
 } // namespace Wasteland
 
 #endif

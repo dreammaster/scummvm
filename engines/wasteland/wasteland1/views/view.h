@@ -23,6 +23,7 @@
 #define WASTELAND_WASTELAND1_VIEWS_VIEW_H
 
 #include "wasteland/events.h"
+#include "wasteland/gfx/text_rect.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
