@@ -194,6 +194,30 @@ const char *const TEXT_STRINGS[] = {
 	". (RETURN)\x3"
 };
 
+Common::String getText(uint index, bool isPlural) {
+	const char *TEXT = TEXT_STRINGS[index];
+	const char *n1 = strchr(TEXT, '\n'), *n2;
+
+	if (!n1)
+		return TEXT;
+
+	Common::String result(TEXT, n1);
+
+	if (isPlural) {
+		// Get the text between the second and third \n for plural
+		n1 = strchr(n1 + 1, '\n');
+		if (!n1)
+			return result;
+	}
+
+	n2 = strchr(n1 + 1, '\n');
+	if (!n2)
+		return result;
+
+	result += Common::String(n1 + 1, n2);
+	return result;
+}
+
 } // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland
