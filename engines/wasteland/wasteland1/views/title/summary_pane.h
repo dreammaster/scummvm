@@ -19,23 +19,26 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_VIEWS_H
-#define WASTELAND_WASTELAND1_VIEWS_VIEWS_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_TITLE_SUMMARY_PANE_H
+#define WASTELAND_WASTELAND1_VIEWS_TITLE_SUMMARY_PANE_H
 
-#include "wasteland/wasteland1/views/title/roster.h"
-#include "wasteland/wasteland1/views/title/title.h"
-#include "wasteland/wasteland1/views/title/summary_pane.h"
+#include "wasteland/wasteland1/views/title/member_pane.h"
+#include "wasteland/wasteland1/views/gfx/button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
+namespace Title {
 
-struct Views {
-	Title::Title _title;
-	Title::Roster _roster;
-	Title::SummaryPane _summaryPane;
+class SummaryPane : public MemberPane {
+public:
+	SummaryPane() : MemberPane("MemberSummary") {}
+	virtual ~SummaryPane() {}
+
+	void draw() override;
 };
 
+} // namespace Title
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland

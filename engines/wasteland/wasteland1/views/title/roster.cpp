@@ -32,7 +32,7 @@ Roster::Roster() : Dialog("Roster"),
 		_create(this, "Create", "CREATE", 11, 24),
 		_delete(this, "Delete", "DELETE", 18, 24),
 		_play(this, "Play", "PLAY", 25, 24),
-		_animation("Animation", this, 3, 0),
+		_animation("RosterAnimation", this, 3, 0),
 		_roster1(this, 1),
 		_roster2(this, 2),
 		_roster3(this, 3),
@@ -99,6 +99,9 @@ bool Roster::msgGame(const GameMessage &msg) {
 		// Select new member
 		for (int i = 1; i <= 6; ++i)
 			_roster[i]->setSelected(i == msg._value);
+
+		draw();
+		addView("MemberSummary");		// Show member summary
 		return true;
 	}
 
