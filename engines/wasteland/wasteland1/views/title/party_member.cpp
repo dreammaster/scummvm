@@ -35,11 +35,9 @@ PartyMember::PartyMember(UIElement *parent, uint memberIndex) :
 		320 - FONT_W, (16 + _memberIndex) * FONT_H));
 }
 
-void PartyMember::setSelected(bool val, bool shouldRedraw) {
+void PartyMember::setSelected(bool val) {
 	_selected = val;
-
-	if (shouldRedraw)
-		draw();
+	redraw();
 }
 
 void PartyMember::draw() {

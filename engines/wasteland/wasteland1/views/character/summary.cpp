@@ -69,7 +69,7 @@ void Summary::draw() {
 }
 
 bool Summary::msgGame(const GameMessage &msg) {
-	if (msg._name == "Esc") {
+	if (msg._name == "Escape") {
 		close();
 		return true;
 	}
