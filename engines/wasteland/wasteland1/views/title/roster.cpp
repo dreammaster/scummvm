@@ -100,7 +100,10 @@ bool Roster::msgGame(const GameMessage &msg) {
 		for (int i = 1; i <= 6; ++i)
 			_roster[i]->setSelected(i == msg._value);
 
-		addView("CharacterSummary");		// Show character summary
+		// Show character summary
+		auto &saved = g_engine->_saved;
+		saved.setCurrentCharacter(msg._value);
+		addView("CharacterSummary");
 		return true;
 	}
 

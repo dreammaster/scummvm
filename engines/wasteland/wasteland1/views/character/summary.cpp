@@ -20,6 +20,8 @@
  */
 
 #include "wasteland/wasteland1/views/character/summary.h"
+#include "wasteland/wasteland1/wasteland1.h"
+#include "wasteland/wasteland1/data/text.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -30,7 +32,33 @@ void Summary::draw() {
 	Pane::draw();
 
 	Surface s = getSurface();
-	s.writeString("Wibbly");
+	const auto &c = *g_engine->_saved._currentCharacter;
+	s.writeString("NAME: ");
+	s.writeString(c._name);
+
+	s.setTextPos(0, 2);
+	s.writeString(Common::String::format("ST =%3d IQ =%3d LK =%3d",
+		c._strength, c._iq, c._luck));
+	s.setTextPos(0, 3);
+	s.writeString(Common::String::format("SP =%3d AGL=%3d DEX=%3d",
+		c._speed, c._agility, c._dexterity));
+	s.setTextPos(0, 4);
+	s.writeString(Common::String::format("CHR=%3d SKP=%3d",
+		c._charisma, c._skillPoints));
+
+	s.setTextPos(0, 5);
+	s.writeString("RANK: ");
+	s.writeString(c._rank);
+	s.setTextPos(0, 6);
+	s.writeString(Common::String::format("MAXCON=%d", c._maxCon));
+	s.setTextPos(0, 7);
+	s.writeString(Common::String::format("$=%d", c._money));
+	s.setTextPos(0, 8);
+	s.writeString("SEX: ");
+	s.writeString(Data::TEXT_STRINGS[160 + c._gender]);
+	s.setTextPos(0, 9);
+	s.writeString("NATIONALITY: ");
+	s.writeString(Data::TEXT_STRINGS[143 + c._nationality]);
 }
 
 } // namespace Character
