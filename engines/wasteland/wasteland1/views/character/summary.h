@@ -31,11 +31,18 @@ namespace Views {
 namespace Character {
 
 class Summary : public Gfx::Pane {
+private:
+	Button _esc;
+	Button _next;
+	Button _pool;
+	Button _divide;
+
 public:
-	Summary() : Pane("CharacterSummary") {}
+	Summary();
 	virtual ~Summary() {}
 
 	void draw() override;
+	bool msgGame(const GameMessage &msg) override;
 };
 
 } // namespace Title

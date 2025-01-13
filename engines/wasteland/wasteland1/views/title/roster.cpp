@@ -94,6 +94,12 @@ void Roster::draw() {
 	Dialog::draw();
 }
 
+bool Roster::msgFocus(const FocusMessage &msg) {
+	for (int i = 1; i <= 6; ++i)
+		_roster[i]->setSelected(false, false);
+	return Dialogs::Dialog::msgFocus(msg);
+}
+
 bool Roster::msgGame(const GameMessage &msg) {
 	if (msg._name == "SELECT_MEMBER") {
 		// Select new member

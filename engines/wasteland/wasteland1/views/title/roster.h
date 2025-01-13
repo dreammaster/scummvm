@@ -53,6 +53,7 @@ public:
 	virtual ~Roster() {}
 
 	void draw() override;
+	bool msgFocus(const FocusMessage &msg) override;
 	bool msgGame(const GameMessage &msg) override;
 };
 

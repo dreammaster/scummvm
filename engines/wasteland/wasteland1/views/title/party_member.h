@@ -50,11 +50,7 @@ public:
 	bool msgMouseDown(const MouseDownMessage &msg) override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 
-	void setSelected(bool val) {
-		_selected = val;
-		draw();
-	}
-
+	void setSelected(bool val, bool shouldRedraw = true);
 };
 
 } // namespace Title

@@ -28,6 +28,13 @@ namespace Wasteland1 {
 namespace Views {
 namespace Character {
 
+Summary::Summary() : Pane("CharacterSummary"),
+		_esc(this, "Escape", "ESC", 18, 0),
+		_next(this, "Next", "NEXT", 32, 0),
+		_pool(this, "Pool", "POOL", 18, 13),
+		_divide(this, "Divide", "DIVIDE", 32, 13) {
+}
+
 void Summary::draw() {
 	Pane::draw();
 
@@ -60,6 +67,16 @@ void Summary::draw() {
 	s.writeString("NATIONALITY: ");
 	s.writeString(Data::TEXT_STRINGS[143 + c._nationality]);
 }
+
+bool Summary::msgGame(const GameMessage &msg) {
+	if (msg._name == "Esc") {
+		close();
+		return true;
+	}
+
+	return Pane::msgGame(msg);
+}
+
 
 } // namespace Character
 } // namespace Views
