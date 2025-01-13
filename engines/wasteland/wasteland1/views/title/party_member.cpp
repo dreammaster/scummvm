@@ -35,6 +35,13 @@ PartyMember::PartyMember(UIElement *parent, uint memberIndex) :
 		320 - FONT_W, (16 + _memberIndex) * FONT_H));
 }
 
+void PartyMember::setSelected(bool val, bool shouldRedraw) {
+	_selected = val;
+
+	if (shouldRedraw)
+		draw();
+}
+
 void PartyMember::draw() {
 	static const byte CONDITION_CHARS[] = {
 		0x85, 0x9A, 0x9B, 0x9C, 0x9D, 0x84
