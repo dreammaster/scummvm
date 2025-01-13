@@ -39,7 +39,16 @@ struct FocusMessage : public Message {
 		_priorView(priorView) {}
 };
 
-struct UnfocusMessage : public Message {};
+struct UnfocusMessage : public Message {
+public:
+	// Lets a view determine whether it is being completely closed,
+	// versus obscured by a window opening on top of it
+	bool _isClosing = true;
+
+	UnfocusMessage() {}
+	UnfocusMessage(bool isClosing) : _isClosing(isClosing) {}
+};
+
 struct MouseEnterMessage : public Message {};
 struct MouseLeaveMessage : public Message {};
 

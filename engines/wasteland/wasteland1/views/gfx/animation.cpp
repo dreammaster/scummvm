@@ -27,13 +27,17 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
 
+using Wasteland1::Gfx::PicsDecoder;
+using Wasteland1::Gfx::PicsAnimation;
+using Wasteland1::Gfx::PicsAnimationFrameSet;
+
 bool Animation::msgFocus(const FocusMessage &msg) {
 	// Get a reference to the specified animation
-	Gfx::PicsDecoder &pics = g_engine->_pics;
-	Gfx::PicsAnimation &anim = pics.getAnimation(_animIndex);
+	PicsDecoder &pics = g_engine->_pics;
+	PicsAnimation &anim = pics.getAnimation(_animIndex);
 	auto &frameSets = anim.getFrameSets();
 
-	Common::List<Gfx::PicsAnimationFrameSet>::iterator it = frameSets.begin();
+	Common::List<PicsAnimationFrameSet>::iterator it = frameSets.begin();
 	for (int i = 0; i < _animSubIndex; ++i)
 		++it;
 
@@ -51,7 +55,8 @@ bool Animation::msgFocus(const FocusMessage &msg) {
 }
 
 bool Animation::msgUnfocus(const UnfocusMessage &msg) {
-	_anim->stop();
+	if (msg._isClosing)
+		_anim->stop();
 	return UIElement::msgUnfocus(msg);
 }
 
@@ -63,6 +68,13 @@ void Animation::draw() {
 }
 
 bool Animation::tick() {
+	if (_anim->isPlaying() && _anim->needsUpdate())
+		draw();
+
+	return true;
+}
+
+bool Animation::backgroundTick() {
 	if (_anim->isPlaying() && _anim->needsUpdate())
 		draw();
 

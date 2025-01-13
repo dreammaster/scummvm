@@ -19,28 +19,21 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_TITLE_ROSTER_PANE_H
-#define WASTELAND_WASTELAND1_VIEWS_TITLE_ROSTER_PANE_H
-
-#include "graphics/managed_surface.h"
-#include "wasteland/wasteland1/views/dialogs/dialog.h"
+#include "wasteland/wasteland1/views/character/summary.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
-namespace Title {
+namespace Character {
 
-class RosterPane : public Dialogs::Dialog {
-public:
-	RosterPane();
-	virtual ~RosterPane() {}
+void Summary::draw() {
+	Pane::draw();
 
-	void draw() override;
-};
+	Surface s = getSurface();
+	s.writeString("Wibbly");
+}
 
-} // namespace Dialogs
+} // namespace Character
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif

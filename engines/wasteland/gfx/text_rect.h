@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_DATA_TEXT_RECT_H
-#define WASTELAND_WASTELAND1_DATA_TEXT_RECT_H
+#ifndef WASTELAND_WASTELAND1_DATA_FONT_RECT_H
+#define WASTELAND_WASTELAND1_DATA_FONT_RECT_H
 
 #include "common/rect.h"
 #include "wasteland/gfx/surface.h"
@@ -30,14 +30,14 @@ namespace Gfx {
 
 struct TextRect : public Common::Rect {
 	TextRect() : Common::Rect() {}
-	TextRect(int16 w, int16 h) : Common::Rect(w *TEXT_W, h *TEXT_H) {}
+	TextRect(int16 w, int16 h) : Common::Rect(w * FONT_W, h * FONT_H) {}
 	TextRect(int16 x1, int16 y1, int16 x2, int16 y2) :
-		Common::Rect(x1 *TEXT_W, y1 *TEXT_H, x2 *TEXT_W, y2 *TEXT_H) {}
+		Common::Rect(x1 * FONT_W, y1 * FONT_H, x2 * FONT_W, y2 * FONT_H) {}
 };
 
 struct TextPoint : public Common::Point {
 	TextPoint() : Common::Point() {}
-	TextPoint(int16 x, int16 y) : Common::Point(x *TEXT_W, y *TEXT_H) {}
+	TextPoint(int16 x, int16 y) : Common::Point(x * FONT_W, y * FONT_H) {}
 };
 
 } // namespace Gfx

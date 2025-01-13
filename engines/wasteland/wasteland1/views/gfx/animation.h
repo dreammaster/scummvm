@@ -36,7 +36,7 @@ class Animation : public UIElement {
 private:
 	int _animIndex;
 	int _animSubIndex;
-	Gfx::PicsAnimationFrameSet *_anim = nullptr;
+	Wasteland1::Gfx::PicsAnimationFrameSet *_anim = nullptr;
 	Common::Point _topLeft;
 
 public:
@@ -52,6 +52,7 @@ public:
 	bool msgUnfocus(const UnfocusMessage &msg) override;
 	void draw() override;
 	bool tick() override;
+	bool backgroundTick() override;
 };
 
 } // namespace Views

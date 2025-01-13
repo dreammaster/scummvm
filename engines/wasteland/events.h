@@ -235,9 +235,16 @@ public:
 	virtual void draw();
 
 	/**
-	 * Called for game frame ticks
+	 * Called for game frame ticks for the active view and it's elements
 	 */
 	virtual bool tick();
+
+	/**
+	 * Called for game frame ticks to views that are in the background.
+	 * Used for specialized redrawing, like keeping the location aimating
+	 * in the title screen roster whilst another view is open on top.
+	 */
+	virtual bool backgroundTick();
 
 	/**
 	 * Find a view by name
@@ -448,7 +455,13 @@ public:
 	 * Called once every game frame
 	 */
 	bool tick() override {
+		(void)backgroundTick();
 		return !_views.empty() ? focusedView()->tick() : false;
+	}
+	bool backgroundTick() override {
+		for (int i = 0; i < (int)_views.size() - 1; ++i)
+			_views[i]->backgroundTick();
+		return true;
 	}
 
 	/**

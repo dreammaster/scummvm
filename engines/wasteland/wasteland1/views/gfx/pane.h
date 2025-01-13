@@ -19,26 +19,26 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_TITLE_SUMMARY_PANE_H
-#define WASTELAND_WASTELAND1_VIEWS_TITLE_SUMMARY_PANE_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_GFX_PANE_H
+#define WASTELAND_WASTELAND1_VIEWS_GFX_PANE_H
 
-#include "wasteland/wasteland1/views/title/member_pane.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "graphics/managed_surface.h"
+#include "wasteland/wasteland1/views/dialogs/dialog.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
-namespace Title {
+namespace Gfx {
 
-class SummaryPane : public MemberPane {
+class Pane : public Dialogs::Dialog {
 public:
-	SummaryPane() : MemberPane("MemberSummary") {}
-	virtual ~SummaryPane() {}
+	Pane(const Common::String &name);
+	virtual ~Pane() {}
 
 	void draw() override;
 };
 
-} // namespace Title
+} // namespace Gfx
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland

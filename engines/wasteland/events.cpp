@@ -141,7 +141,7 @@ void Events::addView(UIElement *ui) {
 	UIElement *priorView = focusedView();
 
 	if (!_views.empty())
-		priorView->msgUnfocus(UnfocusMessage());
+		priorView->msgUnfocus(UnfocusMessage(false));
 
 	_views.push(ui);
 	ui->redraw();
@@ -318,6 +318,13 @@ bool UIElement::tick() {
 	}
 
 	return false;
+}
+
+bool UIElement::backgroundTick() {
+	for (size_t i = 0; i < _children.size(); ++i)
+		(void)_children[i]->backgroundTick();
+
+	return true;
 }
 
 UIElement *UIElement::findView(const Common::String &name) {
