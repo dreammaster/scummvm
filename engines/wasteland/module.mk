@@ -44,15 +44,15 @@ MODULE_OBJS = \
 	wasteland1/gfx/raw_animation_frame.o \
 	wasteland1/gfx/raw_animation_frame_part.o \
 	wasteland1/views/view.o \
+	wasteland1/views/character/summary.o \
 	wasteland1/views/gfx/animation.o \
 	wasteland1/views/gfx/button.o \
 	wasteland1/views/gfx/clickable_text.o \
+	wasteland1/views/gfx/pane.o \
 	wasteland1/views/dialogs/dialog.o \
 	wasteland1/views/title/party_member.o \
 	wasteland1/views/title/title.o \
 	wasteland1/views/title/roster.o \
-	wasteland1/views/title/roster_pane.o \
-	wasteland1/views/title/summary_pane.o \
 	fod/fod.o \
 	fod/console.o \
 	fod/sound.o \

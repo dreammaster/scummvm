@@ -24,7 +24,7 @@
 
 #include "wasteland/wasteland1/views/title/roster.h"
 #include "wasteland/wasteland1/views/title/title.h"
-#include "wasteland/wasteland1/views/title/summary_pane.h"
+#include "wasteland/wasteland1/views/character/summary.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -33,7 +33,7 @@ namespace Views {
 struct Views {
 	Title::Title _title;
 	Title::Roster _roster;
-	Title::SummaryPane _summaryPane;
+	Character::Summary _characterSummary;
 };
 
 } // namespace Views

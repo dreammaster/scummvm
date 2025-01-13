@@ -100,8 +100,7 @@ bool Roster::msgGame(const GameMessage &msg) {
 		for (int i = 1; i <= 6; ++i)
 			_roster[i]->setSelected(i == msg._value);
 
-		draw();
-		addView("MemberSummary");		// Show member summary
+		addView("CharacterSummary");		// Show character summary
 		return true;
 	}
 

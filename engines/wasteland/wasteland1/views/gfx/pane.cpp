@@ -19,22 +19,25 @@
  *
  */
 
-#include "wasteland/wasteland1/views/title/roster_pane.h"
+#include "wasteland/wasteland1/views/gfx/pane.h"
 #include "wasteland/wasteland1/views/title/roster.h"
 #include "wasteland/events.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
-namespace Title {
+namespace Gfx {
 
-void RosterPane::draw() {
-	// Keeps the location animating when showing a sub-pane
-	Roster *locationAnim = dynamic_cast<Roster *>(g_events->findView("Animation"));
-	locationAnim->draw();
+Pane::Pane(const Common::String &name) : Dialogs::Dialog(name) {
+	setBounds(TextRect(14, 0, TEXT_W, 14));
+	_bounds.setBorderSize(FONT_W);
 }
 
-} // namespace Title
+void Pane::draw() {
+	Dialogs::Dialog::draw();
+}
+
+} // namespace Gfx
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland

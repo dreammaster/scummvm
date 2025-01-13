@@ -52,7 +52,7 @@ public:
 
 	void setSelected(bool val) {
 		_selected = val;
-		redraw();
+		draw();
 	}
 
 };

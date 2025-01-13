@@ -19,21 +19,28 @@
  *
  */
 
-#include "wasteland/wasteland1/views/title/summary_pane.h"
+#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
+#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
+
+#include "wasteland/wasteland1/views/gfx/pane.h"
+#include "wasteland/wasteland1/views/gfx/button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
-namespace Title {
+namespace Character {
 
-void SummaryPane::draw() {
-	MemberPane::draw();
+class Summary : public Gfx::Pane {
+public:
+	Summary() : Pane("CharacterSummary") {}
+	virtual ~Summary() {}
 
-	Surface s = getSurface();
-	s.writeString("Wibbly");
-}
+	void draw() override;
+};
 
 } // namespace Title
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
+
+#endif
