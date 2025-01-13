@@ -96,15 +96,17 @@ void Roster::draw() {
 
 bool Roster::msgFocus(const FocusMessage &msg) {
 	for (int i = 1; i <= 6; ++i)
-		_roster[i]->setSelected(false, false);
+		_roster[i]->setSelected(false);
 	return Dialogs::Dialog::msgFocus(msg);
 }
 
 bool Roster::msgGame(const GameMessage &msg) {
 	if (msg._name == "SELECT_MEMBER") {
 		// Select new member
-		for (int i = 1; i <= 6; ++i)
+		for (int i = 1; i <= 6; ++i) {
 			_roster[i]->setSelected(i == msg._value);
+			_roster[i]->draw();
+		}
 
 		// Show character summary
 		auto &saved = g_engine->_saved;
