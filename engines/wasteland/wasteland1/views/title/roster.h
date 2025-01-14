@@ -44,7 +44,8 @@ private:
 	PartyMember _roster4;
 	PartyMember _roster5;
 	PartyMember _roster6;
-	PartyMember *_roster[7] = {};
+	PartyMember _roster7;
+	PartyMember *_roster[8] = {};
 	Animation _animation;
 	int _selectedMember = -1;
 

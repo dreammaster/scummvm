@@ -23,6 +23,7 @@
 #define WASTELAND_WASTELAND1_VIEWS_GFX_BUTTON_H
 
 #include "wasteland/events.h"
+#include "wasteland/keymapping.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -32,6 +33,8 @@ class Button : public UIElement {
 private:
 	Common::String _text;
 	bool _focused = false;
+	Common::KeyCode _keycode = Common::KEYCODE_INVALID;
+	KeybindingAction _action = KEYBIND_NONE;
 
 	/**
 	 * Returns any button immediately to the left/right of the current button.
@@ -41,14 +44,22 @@ private:
 	Button *rightSideButton() const;
 
 public:
-	Button(UIElement *parent, const Common::String &name, const Common::String &text);
-	Button(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y);
+	Button(UIElement *parent, const Common::String &name, const Common::String &text,
+		Common::KeyCode keycode = Common::KEYCODE_INVALID);
+	Button(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y,
+		Common::KeyCode keycode = Common::KEYCODE_INVALID);
+	Button(UIElement *parent, const Common::String &name, const Common::String &text,
+		KeybindingAction action);
+	Button(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y,
+		KeybindingAction action);
 	~Button() override {}
 
+	void draw() override;
 	bool msgMouseEnter(const MouseEnterMessage &msg) override;
 	bool msgMouseLeave(const MouseLeaveMessage &msg) override;
-	void draw() override;
 	bool msgMouseDown(const MouseDownMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	bool msgAction(const ActionMessage &msg) override;
 };
 
 } // namespace Views
