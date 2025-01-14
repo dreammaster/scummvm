@@ -29,24 +29,26 @@ namespace Views {
 namespace Title {
 
 Roster::Roster() : Dialog("Roster"),
-		_create(this, "Create", "CREATE", 11, 24),
-		_delete(this, "Delete", "DELETE", 18, 24),
-		_play(this, "Play", "PLAY", 25, 24),
+		_create(this, "Create", "CREATE", 11, 24, Common::KEYCODE_c),
+		_delete(this, "Delete", "DELETE", 18, 24, Common::KEYCODE_d),
+		_play(this, "Play", "PLAY", 25, 24, Common::KEYCODE_p),
 		_animation("RosterAnimation", this, 3, 0),
 		_roster1(this, 1),
 		_roster2(this, 2),
 		_roster3(this, 3),
 		_roster4(this, 4),
 		_roster5(this, 5),
-		_roster6(this, 6) {
+		_roster6(this, 6),
+		_roster7(this, 7) {
 	_roster[1] = &_roster1;
 	_roster[2] = &_roster2;
 	_roster[3] = &_roster3;
 	_roster[4] = &_roster4;
 	_roster[5] = &_roster5;
 	_roster[6] = &_roster6;
+	_roster[7] = &_roster7;
 
-	for (int i = 1; i <= 6; ++i)
+	for (int i = 1; i <= 7; ++i)
 		_children.push_back(_roster[i]);
 }
 
@@ -103,7 +105,7 @@ bool Roster::msgFocus(const FocusMessage &msg) {
 bool Roster::msgGame(const GameMessage &msg) {
 	if (msg._name == "SELECT_MEMBER") {
 		// Select new member
-		for (int i = 1; i <= 6; ++i) {
+		for (int i = 1; i <= 7; ++i) {
 			_roster[i]->setSelected(i == msg._value);
 			_roster[i]->draw();
 		}

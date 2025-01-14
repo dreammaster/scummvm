@@ -29,10 +29,10 @@ namespace Views {
 namespace Character {
 
 Summary::Summary() : Pane("CharacterSummary"),
-		_esc(this, "Escape", "ESC", 18, 0),
-		_next(this, "Next", "NEXT", 32, 0),
-		_pool(this, "Pool", "POOL", 18, 13),
-		_divide(this, "Divide", "DIVIDE", 32, 13) {
+		_esc(this, "Escape", "ESC", 18, 0, KEYBIND_ESCAPE),
+		_next(this, "Next", "NEXT", 32, 0, Common::KEYCODE_n),
+		_pool(this, "Pool", "POOL", 18, 13, Common::KEYCODE_p),
+		_divide(this, "Divide", "DIVIDE", 32, 13, Common::KEYCODE_d) {
 }
 
 void Summary::draw() {

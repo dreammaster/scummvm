@@ -25,12 +25,26 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
 
-Button::Button(UIElement *parent, const Common::String &name, const Common::String &text) :
-	UIElement(name, parent), _text(text) {
+Button::Button(UIElement *parent, const Common::String &name, const Common::String &text,
+		Common::KeyCode keycode) : UIElement(name, parent),
+		_text(text), _keycode(keycode) {
 }
 
-Button::Button(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y) :
-	UIElement(name, parent), _text(text) {
+Button::Button(UIElement *parent, const Common::String &name, const Common::String &text,
+		int x, int y, Common::KeyCode keycode) : UIElement(name, parent),
+		_text(text), _keycode(keycode) {
+	setBounds(Window(x - 1, y, x + _text.size(), y));
+	_bounds.setBorderSize(FONT_W, 0, FONT_W, 0);
+}
+
+Button::Button(UIElement *parent, const Common::String &name, const Common::String &text,
+		KeybindingAction action) : UIElement(name, parent),
+		_text(text), _action(action) {
+}
+
+Button::Button(UIElement *parent, const Common::String &name, const Common::String &text,
+		int x, int y, KeybindingAction action) : UIElement(name, parent),
+		_text(text), _action(action) {
 	setBounds(Window(x - 1, y, x + _text.size(), y));
 	_bounds.setBorderSize(FONT_W, 0, FONT_W, 0);
 }
@@ -55,12 +69,12 @@ void Button::draw() {
 	Surface s = getSurface(_bounds);
 
 	s.setFont(1);
-	int firstChar = _focused ? 52 : 24;
+	int firstChar = _focused ? 24 : 52;
 
 	Button *btnLeft = leftSideButton();
 	Button *btnRight = rightSideButton();
 
-	s.writeChar(btnLeft ? (btnLeft->isFocused() ? 52 : 24) - 'A' + 'Z' : 23);
+	s.writeChar(btnLeft ? (btnLeft->isFocused() ? 24 : 52) - 'A' + 'Z' : 23);
 
 	for (uint x = 0; x < _text.size(); ++x)
 		s.writeChar(toupper(_text[x]) - 'A' + firstChar);
@@ -94,6 +108,25 @@ Button *Button::rightSideButton() const {
 
 	return nullptr;
 }
+
+bool Button::msgKeypress(const KeypressMessage &msg) {
+	if (_keycode != Common::KEYCODE_INVALID && msg.keycode == _keycode) {
+		_parent->send(GameMessage(_name));
+		return true;
+	}
+
+	return false;
+}
+
+bool Button::msgAction(const ActionMessage &msg) {
+	if (_action != KEYBIND_NONE && msg._action == _action) {
+		_parent->send(GameMessage(_name));
+		return true;
+	}
+
+	return false;
+}
+
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
