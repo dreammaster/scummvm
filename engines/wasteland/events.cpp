@@ -79,13 +79,13 @@ void Events::runGame() {
 	delete _screen;
 }
 
-#define SHOW_CURSOR           \
-	if (!_cursorVisible) {    \
-		CursorMan.showMouse(true); \
-		_cursorVisible = true; \
+void Events::processEvent(Common::Event &ev) {
+	if (!_cursorVisible && (ev.type == Common::EVENT_MOUSEMOVE ||
+		ev.type == Common::EVENT_LBUTTONDOWN)) {
+		CursorMan.showMouse(true);
+		_cursorVisible = true;
 	}
 
-void Events::processEvent(Common::Event &ev) {
 	switch (ev.type) {
 	case Common::EVENT_KEYDOWN:
 		if (_cursorVisible) {
