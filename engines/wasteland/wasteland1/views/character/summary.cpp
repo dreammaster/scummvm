@@ -69,8 +69,28 @@ void Summary::draw() {
 }
 
 bool Summary::msgGame(const GameMessage &msg) {
-	if (msg._name == "Escape") {
-		close();
+	if (msg._name == "Divide" || msg._name == "Pool") {
+		uint total = 0;
+		for (uint i = 1; i <= g_engine->_party.size(); ++i)
+			total += g_engine->_party[i]->_money;
+
+		if (msg._name == "Pool") {
+			for (uint i = 1; i <= g_engine->_party.size(); ++i)
+				g_engine->_party[i]->_money = 0;
+			g_engine->_currentChar->_money = total;
+		} else {
+			uint perTotal = total / g_engine->_party.size();
+			for (uint i = 1; i <= g_engine->_party.size(); ++i) {
+				g_engine->_party[i]->_money = (i == g_engine->_party.size()) ?
+					total : perTotal;
+				total -= perTotal;
+			}
+		}
+
+		redraw();
+		return true;
+	} else if (msg._name == "Next") {
+		replaceView("CharacterInventory");
 		return true;
 	}
 

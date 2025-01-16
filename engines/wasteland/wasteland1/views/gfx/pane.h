@@ -36,6 +36,7 @@ public:
 	virtual ~Pane() {}
 
 	void draw() override;
+	bool msgGame(const GameMessage &msg) override;
 };
 
 } // namespace Gfx

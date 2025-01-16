@@ -97,7 +97,7 @@ void Roster::draw() {
 }
 
 bool Roster::msgFocus(const FocusMessage &msg) {
-	for (int i = 1; i <= 6; ++i)
+	for (int i = 1; i <= 7; ++i)
 		_roster[i]->setSelected(false);
 	return Dialogs::Dialog::msgFocus(msg);
 }
