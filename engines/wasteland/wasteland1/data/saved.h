@@ -78,6 +78,16 @@ struct Saved {
 	void setCurrentCharacter(int partyNum);
 };
 
+struct CurrentParty {
+private:
+	Saved &_saved;
+public:
+	CurrentParty(Saved &saved) : _saved(saved) {}
+
+	size_t size() const;
+	PartyMember *operator[](uint memberNum);
+};
+
 } // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland

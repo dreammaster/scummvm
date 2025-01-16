@@ -44,6 +44,8 @@ public:
 	GameArchive *_gameArchive = nullptr;
 	Data::Saved _saved;
 	Gfx::PicsDecoder _pics;
+	Data::CurrentParty _party;
+	Data::PartyMember *&_currentChar;
 
 public:
 	Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc);

@@ -35,6 +35,18 @@ Pane::Pane(const Common::String &name) : Dialogs::Dialog(name) {
 
 void Pane::draw() {
 	Dialogs::Dialog::draw();
+
+	Surface s = getSurface();
+	s.clear();
+}
+
+bool Pane::msgGame(const GameMessage &msg) {
+	if (msg._name == "Escape") {
+		close();
+		return true;
+	}
+
+	return Pane::msgGame(msg);
 }
 
 } // namespace Gfx

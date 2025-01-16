@@ -34,7 +34,8 @@ namespace Wasteland1 {
 Wasteland1Engine *g_engine;
 
 Wasteland1Engine::Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc) :
-		Wasteland::Engine(syst, gameDesc) {
+		Wasteland::Engine(syst, gameDesc),
+		_party(_saved), _currentChar(_saved._currentCharacter) {
 	g_engine = this;
 }
 

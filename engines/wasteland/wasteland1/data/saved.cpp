@@ -21,6 +21,7 @@
 
 #include "wasteland/wasteland1/data/saved.h"
 #include "wasteland/core/file.h"
+#include "wasteland/wasteland1/wasteland1.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -79,6 +80,16 @@ void Saved2::synchronize(Serializer &s) {
 void Saved::setCurrentCharacter(int partyNum) {
 	auto &party = _parties[_saved2._activePartyGroup];
 	_currentCharacter = &_roster[party._members[partyNum]];
+}
+
+
+size_t CurrentParty::size() const {
+	return _saved._saved2._membersInGroup;
+}
+
+PartyMember *CurrentParty::operator[](uint memberNum) {
+	auto &party = _saved._parties[_saved._saved2._activePartyGroup];
+	return &_saved._roster[party._members[memberNum]];
 }
 
 } // namespace Data
