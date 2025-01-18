@@ -19,27 +19,20 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
-#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_INVENTORY_H
+#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_INVENTORY_H
 
-#include "wasteland/wasteland1/views/gfx/pane.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "wasteland/wasteland1/views/character/reorder_pane.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
 namespace Character {
 
-class Summary : public Gfx::Pane {
-private:
-	Button _esc;
-	Button _next;
-	Button _pool;
-	Button _divide;
-
+class Inventory : public ReorderPane {
 public:
-	Summary();
-	virtual ~Summary() {}
+	Inventory();
+	virtual ~Inventory() {}
 
 	void draw() override;
 	bool msgGame(const GameMessage &msg) override;

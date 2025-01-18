@@ -19,35 +19,55 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
-#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
-
-#include "wasteland/wasteland1/views/gfx/pane.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "wasteland/wasteland1/views/character/reorder_pane.h"
+#include "wasteland/wasteland1/wasteland1.h"
+#include "wasteland/wasteland1/data/text.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
 namespace Character {
 
-class Summary : public Gfx::Pane {
-private:
-	Button _esc;
-	Button _next;
-	Button _pool;
-	Button _divide;
+ReorderPane::ReorderPane(const Common::String &name) : Gfx::PagedPane(name),
+_esc(this, "Escape", "ESC", 18, 0, KEYBIND_ESCAPE),
+_reorder(this, "Reorder", "REORDER", 23, 0, Common::KEYCODE_r),
+_next(this, "Next", "NEXT", 32, 0, Common::KEYCODE_SPACE) {
+}
 
-public:
-	Summary();
-	virtual ~Summary() {}
+void ReorderPane::draw() {
+	PagedPane::draw();
 
-	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
-};
+	Surface s = getSurface();
+	s.writeString("ITEM", 4, 0);
+}
+
+bool ReorderPane::msgFocus(const FocusMessage &msg) {
+	resetLines();
+	return true;
+}
+
+bool ReorderPane::msgGame(const GameMessage &msg) {
+	if (msg._name == "Reorder") {
+		// TODO
+		return true;
+	}
+
+	return PagedPane::msgGame(msg);
+}
+
+void ReorderPane::clearLines() {
+	_lines.clear();
+	clearText();
+}
+
+void ReorderPane::addLine(const Common::String &str) {
+	_lines.push_back(str);
+	addText(Common::String::format("%d> %s",
+		((_lines.size() - 1) % PAGED_LINES) + 1,
+		str.c_str()));
+}
 
 } // namespace Character
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif

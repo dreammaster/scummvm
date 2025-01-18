@@ -36,8 +36,13 @@ Pane::Pane(const Common::String &name) : Dialogs::Dialog(name) {
 void Pane::draw() {
 	Dialogs::Dialog::draw();
 
+	// Draw the outer frame
+	_bounds.setBorderSize(0);
 	Surface s = getSurface();
 	s.clear();
+	drawFrame(Common::Rect(0, 0, 25, 13));
+
+	_bounds.setBorderSize(FONT_W);
 }
 
 bool Pane::msgGame(const GameMessage &msg) {
@@ -46,7 +51,7 @@ bool Pane::msgGame(const GameMessage &msg) {
 		return true;
 	}
 
-	return Pane::msgGame(msg);
+	return Dialogs::Dialog::msgGame(msg);
 }
 
 } // namespace Gfx

@@ -19,10 +19,10 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
-#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_REORDER_PANE_H
+#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_REORDER_PANE_H
 
-#include "wasteland/wasteland1/views/gfx/pane.h"
+#include "wasteland/wasteland1/views/gfx/paged_pane.h"
 #include "wasteland/wasteland1/views/gfx/button.h"
 
 namespace Wasteland {
@@ -30,18 +30,24 @@ namespace Wasteland1 {
 namespace Views {
 namespace Character {
 
-class Summary : public Gfx::Pane {
+class ReorderPane : public Gfx::PagedPane {
 private:
 	Button _esc;
+	Button _reorder;
 	Button _next;
-	Button _pool;
-	Button _divide;
+	Common::StringArray _lines;
+
+protected:
+	void clearLines();
+	void addLine(const Common::String &str);
+	virtual void resetLines() {}
 
 public:
-	Summary();
-	virtual ~Summary() {}
+	ReorderPane(const Common::String &name);
+	virtual ~ReorderPane() {}
 
 	void draw() override;
+	bool msgFocus(const FocusMessage &msg) override;
 	bool msgGame(const GameMessage &msg) override;
 };
 
