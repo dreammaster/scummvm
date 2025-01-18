@@ -19,33 +19,41 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
-#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_PAGED_PANE_H
+#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_PAGED_PANE_H
 
+#include "common/str-array.h"
 #include "wasteland/wasteland1/views/gfx/pane.h"
 #include "wasteland/wasteland1/views/gfx/button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
-namespace Character {
+namespace Gfx {
 
-class Summary : public Gfx::Pane {
+#define PAGED_Y_START 2
+#define PAGED_LINES 9
+
+class PagedPane : public Pane {
 private:
-	Button _esc;
-	Button _next;
-	Button _pool;
-	Button _divide;
+	Button _upArrow;
+	Button _downArrow;
+	Common::StringArray _text;
+	int _pageNum = 0;
+
+protected:
+	void clearText();
+	void addText(const Common::String &str);
 
 public:
-	Summary();
-	virtual ~Summary() {}
+	PagedPane(const Common::String &name);
+	virtual ~PagedPane() {}
 
 	void draw() override;
 	bool msgGame(const GameMessage &msg) override;
 };
 
-} // namespace Character
+} // namespace Gfx
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland

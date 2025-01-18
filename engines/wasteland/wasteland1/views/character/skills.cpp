@@ -19,35 +19,46 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
-#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
-
-#include "wasteland/wasteland1/views/gfx/pane.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "wasteland/wasteland1/views/character/skills.h"
+#include "wasteland/wasteland1/wasteland1.h"
+#include "wasteland/wasteland1/data/text.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
 namespace Character {
 
-class Summary : public Gfx::Pane {
-private:
-	Button _esc;
-	Button _next;
-	Button _pool;
-	Button _divide;
+Skills::Skills() : ReorderPane("CharacterSkills") {
+}
 
-public:
-	Summary();
-	virtual ~Summary() {}
+void Skills::resetLines() {
+	const Data::Skills &skills = g_engine->_currentChar->_skills;
 
-	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
-};
+	for (uint i = 1; i <= skills.size(); ++i)
+		addLine(Common::String::format("%3d %s", skills[i]._level,
+			Data::TEXT_STRINGS[skills[i]._id]));
+}
+
+void Skills::draw() {
+	ReorderPane::draw();
+
+	Surface s = getSurface();
+	s.writeString("LVL   SKILL", 3, 0);
+}
+
+bool Skills::msgGame(const GameMessage &msg) {
+	if (ReorderPane::msgGame(msg))
+		return true;
+
+	if (msg._name == "Next") {
+		close();
+		return true;
+	}
+
+	return false;
+}
 
 } // namespace Character
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif

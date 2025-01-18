@@ -136,8 +136,6 @@ Common::KeymapArray Keymapping::initKeymaps(KeybindingMode mode) {
 			act->addDefaultInputMapping(r->_key);
 			if (r->_joy)
 				act->addDefaultInputMapping(r->_joy);
-			if (r->_action == KEYBIND_SELECT)
-				act->addDefaultInputMapping("SPACE");
 
 			if (r->_action == KEYBIND_NORTH || r->_action == KEYBIND_SOUTH ||
 				r->_action == KEYBIND_EAST || r->_action == KEYBIND_WEST)

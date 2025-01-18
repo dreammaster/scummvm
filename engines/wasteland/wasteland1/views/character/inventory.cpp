@@ -19,7 +19,7 @@
  *
  */
 
-#include "wasteland/wasteland1/views/character/summary.h"
+#include "wasteland/wasteland1/views/character/inventory.h"
 #include "wasteland/wasteland1/wasteland1.h"
 #include "wasteland/wasteland1/data/text.h"
 
@@ -28,47 +28,20 @@ namespace Wasteland1 {
 namespace Views {
 namespace Character {
 
-Summary::Summary() : Pane("CharacterSummary"),
-		_esc(this, "Escape", "ESC", 18, 0, KEYBIND_ESCAPE),
-		_next(this, "Next", "NEXT", 32, 0, Common::KEYCODE_SPACE),
-		_pool(this, "Pool", "POOL", 18, 13, Common::KEYCODE_p),
-		_divide(this, "Divide", "DIVIDE", 32, 13, Common::KEYCODE_d) {
+Inventory::Inventory() : ReorderPane("CharacterInventory") {
 }
 
-void Summary::draw() {
+void Inventory::draw() {
 	Pane::draw();
 
 	Surface s = getSurface();
-	const auto &c = *g_engine->_saved._currentCharacter;
-	s.writeString("NAME: ");
-	s.writeString(c._name);
-
-	s.setTextPos(0, 2);
-	s.writeString(Common::String::format("ST =%3d IQ =%3d LK =%3d",
-		c._strength, c._iq, c._luck));
-	s.setTextPos(0, 3);
-	s.writeString(Common::String::format("SP =%3d AGL=%3d DEX=%3d",
-		c._speed, c._agility, c._dexterity));
-	s.setTextPos(0, 4);
-	s.writeString(Common::String::format("CHR=%3d SKP=%3d",
-		c._charisma, c._skillPoints));
-
-	s.setTextPos(0, 5);
-	s.writeString("RANK: ");
-	s.writeString(c._rank);
-	s.setTextPos(0, 6);
-	s.writeString(Common::String::format("MAXCON=%d", c._maxCon));
-	s.setTextPos(0, 7);
-	s.writeString(Common::String::format("$=%d", c._money));
-	s.setTextPos(0, 8);
-	s.writeString("SEX: ");
-	s.writeString(Data::TEXT_STRINGS[160 + c._gender]);
-	s.setTextPos(0, 9);
-	s.writeString("NATIONALITY: ");
-	s.writeString(Data::TEXT_STRINGS[143 + c._nationality]);
+	s.writeString("ITEM", 4, 0);
 }
 
-bool Summary::msgGame(const GameMessage &msg) {
+bool Inventory::msgGame(const GameMessage &msg) {
+	if (ReorderPane::msgGame(msg))
+		return true;
+
 	if (msg._name == "Divide" || msg._name == "Pool") {
 		uint total = 0;
 		for (uint i = 1; i <= g_engine->_party.size(); ++i)
@@ -90,11 +63,11 @@ bool Summary::msgGame(const GameMessage &msg) {
 		redraw();
 		return true;
 	} else if (msg._name == "Next") {
-		replaceView("CharacterInventory");
+		replaceView("CharacterSkills");
 		return true;
 	}
 
-	return Pane::msgGame(msg);
+	return false;
 }
 
 
