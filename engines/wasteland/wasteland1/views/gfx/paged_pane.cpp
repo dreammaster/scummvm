@@ -27,8 +27,8 @@ namespace Views {
 namespace Gfx {
 
 PagedPane::PagedPane(const Common::String &name) : Gfx::Pane(name),
-		_upArrow(this, "Up", "U", 39, 3, Common::KEYCODE_UP),
-		_downArrow(this, "Up", "U", 39, 6, Common::KEYCODE_UP) {	
+		_upArrow(this, "Up", true, 39, 3, Common::KEYCODE_UP),
+		_downArrow(this, "Down", false, 39, 6, Common::KEYCODE_DOWN) {	
 }
 
 void PagedPane::draw() {

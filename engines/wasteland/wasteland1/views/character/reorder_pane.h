@@ -23,7 +23,7 @@
 #define WASTELAND_WASTELAND1_VIEWS_CHARACTER_REORDER_PANE_H
 
 #include "wasteland/wasteland1/views/gfx/paged_pane.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "wasteland/wasteland1/views/gfx/text_button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -32,9 +32,9 @@ namespace Character {
 
 class ReorderPane : public Gfx::PagedPane {
 private:
-	Button _esc;
-	Button _reorder;
-	Button _next;
+	Gfx::TextButton _esc;
+	Gfx::TextButton _reorder;
+	Gfx::TextButton _next;
 	Common::StringArray _lines;
 
 protected:

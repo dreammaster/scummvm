@@ -19,10 +19,10 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_GFX_BUTTON_H
-#define WASTELAND_WASTELAND1_VIEWS_GFX_BUTTON_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_GFX_UP_DOWN_BUTTON_H
+#define WASTELAND_WASTELAND1_VIEWS_GFX_UP_DOWN_BUTTON_H
 
-#include "wasteland/events.h"
+#include "wasteland/wasteland1/views/gfx/button.h"
 #include "wasteland/keymapping.h"
 
 namespace Wasteland {
@@ -30,28 +30,23 @@ namespace Wasteland1 {
 namespace Views {
 namespace Gfx {
 
-class Button : public UIElement {
+class UpDownButton : public Button {
 private:
-	Common::KeyCode _keycode = Common::KEYCODE_INVALID;
-	KeybindingAction _action = KEYBIND_NONE;
-
-protected:
-	bool _focused = false;
+	bool _isUp = false;
 
 public:
-	Button(UIElement *parent, const Common::String &name,
+	UpDownButton(UIElement *parent, const Common::String &name, bool isUp,
 		Common::KeyCode keycode = Common::KEYCODE_INVALID);
-	Button(UIElement *parent, const Common::String &name,
+	UpDownButton(UIElement *parent, const Common::String &name, bool isUp, int x, int y,
+		Common::KeyCode keycode = Common::KEYCODE_INVALID);
+	UpDownButton(UIElement *parent, const Common::String &name, bool isUp,
 		KeybindingAction action);
-	~Button() override {
+	UpDownButton(UIElement *parent, const Common::String &name, bool isUp, int x, int y,
+		KeybindingAction action);
+	~UpDownButton() override {
 	}
 
-	void draw() override = 0;
-	bool msgMouseEnter(const MouseEnterMessage &msg) override;
-	bool msgMouseLeave(const MouseLeaveMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgAction(const ActionMessage &msg) override;
+	void draw() override;
 };
 
 } // namespace Gfx

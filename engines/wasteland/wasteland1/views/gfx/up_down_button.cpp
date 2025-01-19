@@ -19,44 +19,45 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_GFX_BUTTON_H
-#define WASTELAND_WASTELAND1_VIEWS_GFX_BUTTON_H
-
-#include "wasteland/events.h"
-#include "wasteland/keymapping.h"
+#include "wasteland/wasteland1/views/gfx/up_down_button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
 namespace Gfx {
 
-class Button : public UIElement {
-private:
-	Common::KeyCode _keycode = Common::KEYCODE_INVALID;
-	KeybindingAction _action = KEYBIND_NONE;
+UpDownButton::UpDownButton(UIElement *parent, const Common::String &name, bool isUp,
+	Common::KeyCode keycode) : Button(parent, name, keycode), _isUp(isUp) {
+}
 
-protected:
-	bool _focused = false;
+UpDownButton::UpDownButton(UIElement *parent, const Common::String &name, bool isUp,
+	int x, int y, Common::KeyCode keycode) : Button(parent, name, keycode),
+		_isUp(isUp) {
+	setBounds(Window(x, y, x + 1, y));
+}
 
-public:
-	Button(UIElement *parent, const Common::String &name,
-		Common::KeyCode keycode = Common::KEYCODE_INVALID);
-	Button(UIElement *parent, const Common::String &name,
-		KeybindingAction action);
-	~Button() override {
-	}
+UpDownButton::UpDownButton(UIElement *parent, const Common::String &name, bool isUp,
+	KeybindingAction action) : Button(parent, name, action),
+	_isUp(isUp) {
+}
 
-	void draw() override = 0;
-	bool msgMouseEnter(const MouseEnterMessage &msg) override;
-	bool msgMouseLeave(const MouseLeaveMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgAction(const ActionMessage &msg) override;
-};
+UpDownButton::UpDownButton(UIElement *parent, const Common::String &name, bool isUp,
+		int x, int y, KeybindingAction action) : Button(parent, name, action),
+		_isUp(isUp) {
+	setBounds(Window(x, y, x + 1, y));
+	_bounds.setBorderSize(FONT_W, 0, FONT_W, 0);
+}
+
+void UpDownButton::draw() {
+	Surface s = getSurface(_bounds);
+
+	s.setFont(1);
+	int firstChar = _focused ? 24 : 52;
+
+	s.writeChar(_isUp ? 'U' : 'D');
+}
 
 } // namespace Gfx
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
-
-#endif

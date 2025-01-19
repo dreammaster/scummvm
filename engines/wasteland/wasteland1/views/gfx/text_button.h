@@ -19,10 +19,10 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_GFX_BUTTON_H
-#define WASTELAND_WASTELAND1_VIEWS_GFX_BUTTON_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_GFX_TEXT_BUTTON_H
+#define WASTELAND_WASTELAND1_VIEWS_GFX_TEXT_BUTTON_H
 
-#include "wasteland/events.h"
+#include "wasteland/wasteland1/views/gfx/button.h"
 #include "wasteland/keymapping.h"
 
 namespace Wasteland {
@@ -30,28 +30,30 @@ namespace Wasteland1 {
 namespace Views {
 namespace Gfx {
 
-class Button : public UIElement {
+class TextButton : public Button {
 private:
-	Common::KeyCode _keycode = Common::KEYCODE_INVALID;
-	KeybindingAction _action = KEYBIND_NONE;
+	Common::String _text;
 
-protected:
-	bool _focused = false;
+	/**
+	 * Returns any button immediately to the left/right of the current button.
+	 * Used for drawing the correct left edge between successive buttons
+	 */
+	TextButton *leftSideButton() const;
+	TextButton *rightSideButton() const;
 
 public:
-	Button(UIElement *parent, const Common::String &name,
+	TextButton(UIElement *parent, const Common::String &name, const Common::String &text,
 		Common::KeyCode keycode = Common::KEYCODE_INVALID);
-	Button(UIElement *parent, const Common::String &name,
+	TextButton(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y,
+		Common::KeyCode keycode = Common::KEYCODE_INVALID);
+	TextButton(UIElement *parent, const Common::String &name, const Common::String &text,
 		KeybindingAction action);
-	~Button() override {
+	TextButton(UIElement *parent, const Common::String &name, const Common::String &text, int x, int y,
+		KeybindingAction action);
+	~TextButton() override {
 	}
 
-	void draw() override = 0;
-	bool msgMouseEnter(const MouseEnterMessage &msg) override;
-	bool msgMouseLeave(const MouseLeaveMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-	bool msgAction(const ActionMessage &msg) override;
+	void draw() override;
 };
 
 } // namespace Gfx
