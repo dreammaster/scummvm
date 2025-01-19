@@ -22,6 +22,8 @@
 #ifndef WASTELAND_WASTELAND1_VIEWS_GFX_BUTTON_H
 #define WASTELAND_WASTELAND1_VIEWS_GFX_BUTTON_H
 
+#include "common/array.h"
+#include "common/events.h"
 #include "wasteland/events.h"
 #include "wasteland/keymapping.h"
 
@@ -32,7 +34,7 @@ namespace Gfx {
 
 class Button : public UIElement {
 private:
-	Common::KeyCode _keycode = Common::KEYCODE_INVALID;
+	Common::Array<Common::KeyCode> _keycodes;
 	KeybindingAction _action = KEYBIND_NONE;
 
 protected:
@@ -52,6 +54,8 @@ public:
 	bool msgMouseDown(const MouseDownMessage &msg) override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 	bool msgAction(const ActionMessage &msg) override;
+
+	void addKeycode(Common::KeyCode keycode);
 };
 
 } // namespace Gfx
