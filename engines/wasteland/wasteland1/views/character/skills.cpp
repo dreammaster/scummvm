@@ -34,9 +34,13 @@ Skills::Skills() : ReorderPane("CharacterSkills") {
 void Skills::resetLines() {
 	const Data::Skills &skills = g_engine->_currentChar->_skills;
 
-	for (uint i = 1; i <= skills.size(); ++i)
+	for (uint i = 1; i <= skills.size(); ++i) {
+		if (!skills[i]._level)
+			break;
+
 		addLine(Common::String::format("%3d %s", skills[i]._level,
 			Data::TEXT_STRINGS[skills[i]._id]));
+	}
 }
 
 void Skills::draw() {
