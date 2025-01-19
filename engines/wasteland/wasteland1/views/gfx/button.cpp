@@ -27,8 +27,8 @@ namespace Views {
 namespace Gfx {
 
 Button::Button(UIElement *parent, const Common::String &name,
-		Common::KeyCode keycode) : UIElement(name, parent),
-		_keycode(keycode) {
+		Common::KeyCode keycode) : UIElement(name, parent) {
+	_keycodes.push_back(keycode);
 }
 
 Button::Button(UIElement *parent, const Common::String &name,
@@ -58,9 +58,11 @@ bool Button::msgMouseDown(const MouseDownMessage &msg) {
 }
 
 bool Button::msgKeypress(const KeypressMessage &msg) {
-	if (_keycode != Common::KEYCODE_INVALID && msg.keycode == _keycode) {
-		_parent->send(GameMessage(_name));
-		return true;
+	for (uint i = 0; i < _keycodes.size(); ++i) {
+		if (_keycodes[i] == msg.keycode) {
+			_parent->send(GameMessage(_name));
+			return true;
+		}
 	}
 
 	return false;
@@ -73,6 +75,10 @@ bool Button::msgAction(const ActionMessage &msg) {
 	}
 
 	return false;
+}
+
+void Button::addKeycode(Common::KeyCode keycode) {
+	_keycodes.push_back(keycode);
 }
 
 } // namespace Gfx

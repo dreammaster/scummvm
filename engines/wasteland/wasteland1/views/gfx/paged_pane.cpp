@@ -29,6 +29,9 @@ namespace Gfx {
 PagedPane::PagedPane(const Common::String &name) : Gfx::Pane(name),
 		_upArrow(this, "Up", true, 39, 3, Common::KEYCODE_UP),
 		_downArrow(this, "Down", false, 39, 6, Common::KEYCODE_DOWN) {	
+	// Wasteland also allowed for I/K to be used instead of up/down arrows
+	_upArrow.addKeycode(Common::KEYCODE_i);
+	_downArrow.addKeycode(Common::KEYCODE_k);
 }
 
 void PagedPane::draw() {
