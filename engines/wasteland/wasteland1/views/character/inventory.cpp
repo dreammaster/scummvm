@@ -31,8 +31,20 @@ namespace Character {
 Inventory::Inventory() : ReorderPane("CharacterInventory") {
 }
 
+void Inventory::resetLines() {
+	const Data::InventoryItems &items = g_engine->_currentChar->_items;
+
+	for (uint i = 1; i <= items.size(); ++i) {
+		auto &item = items[i];
+		if (!item._id)
+			break;
+
+		addLine(Data::getText(item._id + 36));
+	}
+}
+
 void Inventory::draw() {
-	Pane::draw();
+	ReorderPane::draw();
 
 	Surface s = getSurface();
 	s.writeString("ITEM", 4, 0);
