@@ -24,7 +24,7 @@
 
 #include "common/str-array.h"
 #include "wasteland/wasteland1/views/gfx/pane.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "wasteland/wasteland1/views/gfx/up_down_button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -36,8 +36,8 @@ namespace Gfx {
 
 class PagedPane : public Pane {
 private:
-	Button _upArrow;
-	Button _downArrow;
+	Gfx::UpDownButton _upArrow;
+	Gfx::UpDownButton _downArrow;
 	Common::StringArray _text;
 	int _pageNum = 0;
 

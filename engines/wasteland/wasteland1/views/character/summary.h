@@ -23,7 +23,7 @@
 #define WASTELAND_WASTELAND1_VIEWS_CHARACTER_SUMMARY_H
 
 #include "wasteland/wasteland1/views/gfx/pane.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "wasteland/wasteland1/views/gfx/text_button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -32,10 +32,10 @@ namespace Character {
 
 class Summary : public Gfx::Pane {
 private:
-	Button _esc;
-	Button _next;
-	Button _pool;
-	Button _divide;
+	Gfx::TextButton _esc;
+	Gfx::TextButton _next;
+	Gfx::TextButton _pool;
+	Gfx::TextButton _divide;
 
 public:
 	Summary();

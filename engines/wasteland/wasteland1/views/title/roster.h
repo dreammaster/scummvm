@@ -25,7 +25,7 @@
 #include "graphics/managed_surface.h"
 #include "wasteland/wasteland1/views/dialogs/dialog.h"
 #include "wasteland/wasteland1/views/gfx/animation.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "wasteland/wasteland1/views/gfx/text_button.h"
 #include "wasteland/wasteland1/views/title/party_member.h"
 
 namespace Wasteland {
@@ -35,9 +35,9 @@ namespace Title {
 
 class Roster : public Dialogs::Dialog {
 private:
-	Button _create;
-	Button _delete;
-	Button _play;
+	Gfx::TextButton _create;
+	Gfx::TextButton _delete;
+	Gfx::TextButton _play;
 	PartyMember _roster1;
 	PartyMember _roster2;
 	PartyMember _roster3;

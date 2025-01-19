@@ -25,7 +25,7 @@
 #include "graphics/managed_surface.h"
 #include "wasteland/gfx/text_view.h"
 #include "wasteland/wasteland1/views/dialogs/dialog.h"
-#include "wasteland/wasteland1/views/gfx/button.h"
+#include "wasteland/wasteland1/views/gfx/text_button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -36,7 +36,7 @@ class Title : public Dialogs::Dialog {
 private:
 	Graphics::ManagedSurface _surface;
 	Shared::Gfx::TextView _textView;
-	Button _start;
+	Gfx::TextButton _start;
 	int _textNum = 0;
 
 	void setText();

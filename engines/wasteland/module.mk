@@ -53,6 +53,8 @@ MODULE_OBJS = \
 	wasteland1/views/gfx/clickable_text.o \
 	wasteland1/views/gfx/paged_pane.o \
 	wasteland1/views/gfx/pane.o \
+	wasteland1/views/gfx/text_button.o \
+	wasteland1/views/gfx/up_down_button.o \
 	wasteland1/views/dialogs/dialog.o \
 	wasteland1/views/title/party_member.o \
 	wasteland1/views/title/title.o \
