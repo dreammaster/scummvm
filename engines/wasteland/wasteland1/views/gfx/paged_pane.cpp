@@ -45,7 +45,7 @@ void PagedPane::draw() {
 	// If there's more than one page, also draw "MORE" indicator
 	if (_text.size() > PAGED_LINES) {
 		s.setInverseColor(true);
-		s.writeString("MORE", 0, PAGED_Y_START + PAGED_LINES);
+		s.writeString("MORE\x5e", 0, PAGED_Y_START + PAGED_LINES);
 	}
 }
 

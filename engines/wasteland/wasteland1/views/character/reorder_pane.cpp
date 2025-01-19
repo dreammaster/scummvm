@@ -37,8 +37,8 @@ _next(this, "Next", "NEXT", 32, 0, Common::KEYCODE_SPACE) {
 void ReorderPane::draw() {
 	PagedPane::draw();
 
-	Surface s = getSurface();
-	s.writeString("ITEM", 4, 0);
+	// TODO: Handle reordering mode
+//	Surface s = getSurface();
 }
 
 bool ReorderPane::msgFocus(const FocusMessage &msg) {
