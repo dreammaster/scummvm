@@ -32,6 +32,18 @@ PagedPane::PagedPane(const Common::String &name) : Gfx::Pane(name),
 	// Wasteland also allowed for I/K to be used instead of up/down arrows
 	_upArrow.addKeycode(Common::KEYCODE_i);
 	_downArrow.addKeycode(Common::KEYCODE_k);
+
+	for (int i = 0; i < PAGED_LINES; ++i) {
+		_clickableText[i] = new Gfx::ClickableText(this,
+			Common::String::format("Line%d", i));
+		_clickableText[i]->setBounds(TextRect(15, i + PAGED_Y_START,
+			39, i + PAGED_Y_START));
+	}
+}
+
+PagedPane::~PagedPane() {
+	for (int i = 0; i < PAGED_LINES; ++i)
+		delete _clickableText[i];
 }
 
 void PagedPane::draw() {
@@ -41,8 +53,14 @@ void PagedPane::draw() {
 	Surface s = getSurface();
 
 	uint index = _pageNum * PAGED_LINES;
-	for (int y = 0; y < PAGED_LINES && index < _text.size(); ++y, ++index) {
-		s.writeString(_text[index], 0, y + PAGED_Y_START);
+	for (int y = 0; y < PAGED_LINES; ++y, ++index) {
+		if (index < _text.size()) {
+			_clickableText[y]->setEnabled(_clickable);
+			_clickableText[y]->setText(_text[index]);
+		} else {
+			_clickableText[y]->setEnabled(false);
+			_clickableText[y]->setText("");
+		}
 	}
 
 	// If there's more than one page, also draw "MORE" indicator
@@ -81,6 +99,11 @@ void PagedPane::clearText() {
 
 void PagedPane::addText(const Common::String &str) {
 	_text.push_back(str);
+}
+
+void PagedPane::setClickable(bool clickable) {
+	_clickable = clickable;
+	redraw();
 }
 
 } // namespace Gfx

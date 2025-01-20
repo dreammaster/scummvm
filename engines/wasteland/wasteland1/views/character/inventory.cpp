@@ -33,6 +33,7 @@ Inventory::Inventory() : ReorderPane("CharacterInventory") {
 
 void Inventory::resetLines() {
 	const Data::InventoryItems &items = g_engine->_currentChar->_items;
+	setClickable(true);
 
 	for (uint i = 1; i <= items.size(); ++i) {
 		auto &item = items[i];

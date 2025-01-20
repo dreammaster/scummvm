@@ -33,6 +33,7 @@ Skills::Skills() : ReorderPane("CharacterSkills") {
 
 void Skills::resetLines() {
 	const Data::Skills &skills = g_engine->_currentChar->_skills;
+	setClickable(false);
 
 	for (uint i = 1; i <= skills.size(); ++i) {
 		if (!skills[i]._level)

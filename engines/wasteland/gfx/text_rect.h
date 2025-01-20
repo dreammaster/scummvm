@@ -32,7 +32,7 @@ struct TextRect : public Common::Rect {
 	TextRect() : Common::Rect() {}
 	TextRect(int16 w, int16 h) : Common::Rect(w * FONT_W, h * FONT_H) {}
 	TextRect(int16 x1, int16 y1, int16 x2, int16 y2) :
-		Common::Rect(x1 * FONT_W, y1 * FONT_H, x2 * FONT_W, y2 * FONT_H) {}
+		Common::Rect(x1 * FONT_W, y1 * FONT_H, (x2 + 1) * FONT_W, (y2 + 1) * FONT_H) {}
 };
 
 struct TextPoint : public Common::Point {
