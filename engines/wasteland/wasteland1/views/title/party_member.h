@@ -32,7 +32,7 @@ namespace Title {
 /**
  * Implements a party member line in the title roster list
  */
-class PartyMember : public ClickableText {
+class PartyMember : public Gfx::ClickableText {
 private:
 	Common::String _text;
 	uint _memberIndex;

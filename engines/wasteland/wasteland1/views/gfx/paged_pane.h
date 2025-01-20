@@ -23,6 +23,7 @@
 #define WASTELAND_WASTELAND1_VIEWS_CHARACTER_PAGED_PANE_H
 
 #include "common/str-array.h"
+#include "wasteland/wasteland1/views/gfx/clickable_text.h"
 #include "wasteland/wasteland1/views/gfx/pane.h"
 #include "wasteland/wasteland1/views/gfx/up_down_button.h"
 
@@ -38,8 +39,10 @@ class PagedPane : public Pane {
 private:
 	Gfx::UpDownButton _upArrow;
 	Gfx::UpDownButton _downArrow;
+	Gfx::ClickableText *_clickableText[PAGED_LINES];
 	Common::StringArray _text;
 	int _pageNum = 0;
+	bool _clickable = true;
 
 protected:
 	void clearText();
@@ -47,10 +50,15 @@ protected:
 
 public:
 	PagedPane(const Common::String &name);
-	virtual ~PagedPane() {}
+	virtual ~PagedPane();
 
 	void draw() override;
 	bool msgGame(const GameMessage &msg) override;
+
+	bool isClickable() const {
+		return _clickable;
+	}
+	void setClickable(bool clickable);
 };
 
 } // namespace Gfx

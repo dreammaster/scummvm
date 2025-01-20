@@ -24,19 +24,21 @@
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
+namespace Gfx {
 
 ClickableText::ClickableText(UIElement *parent, const Common::String &name) :
 	UIElement(name, parent) {
 }
 
 bool ClickableText::msgMouseEnter(const MouseEnterMessage &msg) {
-	if (isValid())
+	if (isValid() && isEnabled())
 		g_events->setCursor(1);
 
 	return true;
 }
 
 bool ClickableText::msgMouseLeave(const MouseLeaveMessage &msg) {
+	if (isEnabled())
 	g_events->setCursor(0);
 
 	return true;
@@ -49,12 +51,13 @@ void ClickableText::draw() {
 }
 
 bool ClickableText::msgMouseDown(const MouseDownMessage &msg) {
-	if (isValid())
+	if (isValid() && isEnabled())
 		_parent->send(GameMessage(_name));
 
 	return true;
 }
 
+} // namespace Gfx
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland

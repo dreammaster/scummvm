@@ -27,10 +27,12 @@
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
+namespace Gfx {
 
 class ClickableText : public UIElement {
 private:
 	Common::String _text;
+	bool _enabled = true;
 
 protected:
 	virtual bool isValid() const {
@@ -39,7 +41,8 @@ protected:
 
 public:
 	ClickableText(UIElement *parent, const Common::String &name);
-	~ClickableText() override {}
+	~ClickableText() override {
+	}
 
 	bool msgMouseEnter(const MouseEnterMessage &msg) override;
 	bool msgMouseLeave(const MouseLeaveMessage &msg) override;
@@ -50,8 +53,16 @@ public:
 		_text = text;
 		redraw();
 	}
+
+	bool isEnabled() const {
+		return _enabled;
+	}
+	void setEnabled(bool enabled) {
+		_enabled = enabled;
+	}
 };
 
+} // namespace Gfx
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
