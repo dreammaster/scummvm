@@ -39,6 +39,10 @@ public:
 		assert(idx >= 1 && idx <= this->size());
 		return Common::Array<T>::operator[](idx - 1);
 	}
+
+	void remove_at(size_t idx) {
+		Common::Array<T>::remove_at(idx - 1);
+	}
 };
 
 } // namespace Wasteland1

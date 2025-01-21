@@ -34,6 +34,7 @@ Inventory::Inventory() : ReorderPane("CharacterInventory") {
 void Inventory::resetLines() {
 	const Data::InventoryItems &items = g_engine->_currentChar->_items;
 	setClickable(true);
+	clearLines();
 
 	for (uint i = 1; i <= items.size(); ++i) {
 		auto &item = items[i];
@@ -42,6 +43,21 @@ void Inventory::resetLines() {
 
 		addLine(Data::getText(item._id + 36));
 	}
+}
+
+void Inventory::reordered() {
+	Data::InventoryItems &items = g_engine->_currentChar->_items;
+	Data::InventoryItems temp;
+
+	// Copy over items in new order
+	for (uint i = 1; i <= _newOrder.size(); ++i)
+		temp[i] = items[_newOrder[i]];
+
+	// Overwrite with newly ordered list
+	items = temp;
+
+	resetLines();
+	redraw();
 }
 
 void Inventory::draw() {
@@ -78,6 +94,10 @@ bool Inventory::msgGame(const GameMessage &msg) {
 	} else if (msg._name == "Next") {
 		replaceView("CharacterSkills");
 		return true;
+
+	} else if (msg._name == "Line") {
+		// TODO: select item action
+		warning("TODO: select item action");
 	}
 
 	return false;

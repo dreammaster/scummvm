@@ -53,6 +53,7 @@ public:
 	virtual ~PagedPane();
 
 	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 	bool msgGame(const GameMessage &msg) override;
 
 	bool isClickable() const {

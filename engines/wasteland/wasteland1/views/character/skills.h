@@ -32,6 +32,8 @@ namespace Character {
 class Skills : public ReorderPane {
 protected:
 	void resetLines() override;
+	void reordered() override;
+
 public:
 	Skills();
 	virtual ~Skills() {}

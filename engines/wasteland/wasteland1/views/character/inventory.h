@@ -32,6 +32,7 @@ namespace Character {
 class Inventory : public ReorderPane {
 protected:
 	void resetLines() override;
+	void reordered() override;
 
 public:
 	Inventory();
