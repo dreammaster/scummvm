@@ -50,10 +50,9 @@ bool ReorderPane::msgFocus(const FocusMessage &msg) {
 
 bool ReorderPane::msgGame(const GameMessage &msg) {
 	if (msg._name == "Reorder") {
-		_reordering = true;
+		setReordering(true);
 		_newOrder.clear();
 		setClickable(true);
-		redraw();
 
 		return true;
 	} else if (msg._name == "Line" && _reordering) {
@@ -63,9 +62,8 @@ bool ReorderPane::msgGame(const GameMessage &msg) {
 
 		if (_lines.size() == 0) {
 			// Finished reordering
-			_reordering = false;
+			setReordering(false);
 			reordered();
-			redraw();
 
 		} else {
 			// Reset display list to remaining lines
@@ -91,6 +89,22 @@ void ReorderPane::addLine(const Common::String &str) {
 	addText(Common::String::format("%d> %s",
 		((_lines.size() - 1) % PAGED_LINES) + 1,
 		str.c_str()));
+}
+
+void ReorderPane::setReordering(bool flag) {
+	_reordering = flag;
+
+	if (flag) {
+		_children.remove(&_esc);
+		_children.remove(&_reorder);
+		_children.remove(&_next);
+	} else {
+		_children.push_back(&_esc);
+		_children.push_back(&_reorder);
+		_children.push_back(&_next);
+	}
+
+	redraw();
 }
 
 } // namespace Character
