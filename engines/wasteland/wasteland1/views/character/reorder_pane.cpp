@@ -37,8 +37,10 @@ _next(this, "Next", "NEXT", 32, 0, Common::KEYCODE_SPACE) {
 void ReorderPane::draw() {
 	PagedPane::draw();
 
-	// TODO: Handle reordering mode
-//	Surface s = getSurface();
+	if (_reordering) {
+		Surface s = getSurface();
+		s.writeString("REORDER", 1, 1);
+	}
 }
 
 bool ReorderPane::msgFocus(const FocusMessage &msg) {
@@ -48,8 +50,32 @@ bool ReorderPane::msgFocus(const FocusMessage &msg) {
 
 bool ReorderPane::msgGame(const GameMessage &msg) {
 	if (msg._name == "Reorder") {
-		// TODO
+		_reordering = true;
+		_newOrder.clear();
+		setClickable(true);
+		redraw();
+
 		return true;
+	} else if (msg._name == "Line" && _reordering) {
+		// Add selected entry to new ordering list
+		_newOrder.push_back(_lines[msg._value]._index);
+		_lines.remove_at(msg._value);
+
+		if (_lines.size() == 0) {
+			// Finished reordering
+			_reordering = false;
+			reordered();
+			redraw();
+
+		} else {
+			// Reset display list to remaining lines
+			clearText();
+			for (uint i = 1; i <= _lines.size(); ++i)
+				addText(Common::String::format("%d> %s",
+					((i - 1) % PAGED_LINES) + 1, _lines[i].c_str()));
+
+			redraw();
+		}
 	}
 
 	return PagedPane::msgGame(msg);
@@ -61,7 +87,7 @@ void ReorderPane::clearLines() {
 }
 
 void ReorderPane::addLine(const Common::String &str) {
-	_lines.push_back(str);
+	_lines.push_back(Entry(str, _lines.size() + 1));
 	addText(Common::String::format("%d> %s",
 		((_lines.size() - 1) % PAGED_LINES) + 1,
 		str.c_str()));

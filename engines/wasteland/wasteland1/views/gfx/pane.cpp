@@ -29,7 +29,7 @@ namespace Views {
 namespace Gfx {
 
 Pane::Pane(const Common::String &name) : Dialogs::Dialog(name) {
-	setBounds(TextRect(14, 0, TEXT_W, 14));
+	setBounds(TextRect(14, 0, TEXT_W, 13));
 	_bounds.setBorderSize(FONT_W);
 }
 

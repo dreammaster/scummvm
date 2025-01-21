@@ -22,6 +22,8 @@
 #ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_REORDER_PANE_H
 #define WASTELAND_WASTELAND1_VIEWS_CHARACTER_REORDER_PANE_H
 
+#include "common/array.h"
+#include "wasteland/wasteland1/core/array1.h"
 #include "wasteland/wasteland1/views/gfx/paged_pane.h"
 #include "wasteland/wasteland1/views/gfx/text_button.h"
 
@@ -31,11 +33,23 @@ namespace Views {
 namespace Character {
 
 class ReorderPane : public Gfx::PagedPane {
+	struct Entry : public Common::String {
+		int _index = 0;
+		Entry() : Common::String() {}
+		Entry(const Common::String &str, int index) :
+			Common::String(str), _index(index) {}
+	};
 private:
 	Gfx::TextButton _esc;
 	Gfx::TextButton _reorder;
 	Gfx::TextButton _next;
-	Common::StringArray _lines;
+	Array1<Entry> _lines;
+	bool _reordering = false;
+
+protected:
+	Array1<int> _newOrder;
+
+	virtual void reordered() = 0;
 
 protected:
 	void clearLines();

@@ -35,9 +35,9 @@ PagedPane::PagedPane(const Common::String &name) : Gfx::Pane(name),
 
 	for (int i = 0; i < PAGED_LINES; ++i) {
 		_clickableText[i] = new Gfx::ClickableText(this,
-			Common::String::format("Line%d", i));
-		_clickableText[i]->setBounds(TextRect(15, i + PAGED_Y_START,
-			39, i + PAGED_Y_START));
+			Common::String::format("Line%d", i + 1));
+		_clickableText[i]->setBounds(TextRect(15, 1 + i + PAGED_Y_START,
+			39, 1 + i + PAGED_Y_START));
 	}
 }
 
@@ -70,6 +70,17 @@ void PagedPane::draw() {
 	}
 }
 
+bool PagedPane::msgKeypress(const KeypressMessage &msg) {
+	if (msg.keycode >= Common::KEYCODE_1 &&
+			msg.keycode <= Common::KEYCODE_9) {
+		send(GameMessage("Line", msg.keycode - Common::KEYCODE_0 +
+			(_pageNum * PAGED_LINES)));
+		return true;
+	}
+
+	return Pane::msgKeypress(msg);
+}
+
 bool PagedPane::msgGame(const GameMessage &msg) {
 	if (msg._name == "Up") {
 		if (_pageNum > 0)
@@ -84,6 +95,12 @@ bool PagedPane::msgGame(const GameMessage &msg) {
 			++_pageNum;
 
 		redraw();
+		return true;
+
+	} else if (msg._name.hasPrefix("Line") && Common::isDigit(msg._name.lastChar())) {
+		// Get out the line number and re-generate the message
+		send(GameMessage("Line", msg._name.lastChar() - '0' +
+			(_pageNum * PAGED_LINES)));
 		return true;
 
 	} else {
