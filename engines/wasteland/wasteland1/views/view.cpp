@@ -28,7 +28,8 @@ namespace Views {
 void View::checkFocusedControl(const Common::Point &mousePos) {
 	if (_focusedElement) {
 		if (!_focusedElement->getBounds().contains(mousePos)) {
-			_focusedElement->send(MouseLeaveMessage());
+			if (_children.contains(_focusedElement))
+				_focusedElement->send(MouseLeaveMessage());
 			_focusedElement = nullptr;
 		}
 

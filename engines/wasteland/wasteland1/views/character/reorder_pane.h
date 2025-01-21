@@ -46,6 +46,8 @@ private:
 	Array1<Entry> _lines;
 	bool _reordering = false;
 
+	void setReordering(bool flag);
+
 protected:
 	Array1<int> _newOrder;
 
