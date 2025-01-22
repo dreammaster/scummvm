@@ -90,7 +90,8 @@ bool Summary::msgGame(const GameMessage &msg) {
 		redraw();
 		return true;
 	} else if (msg._name == "Next") {
-		replaceView("CharacterInventory");
+		replaceView(g_engine->_currentChar->_items.empty() ?
+			"CharacterSummary" : "CharacterInventory");
 		return true;
 	}
 
