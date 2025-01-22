@@ -96,8 +96,8 @@ bool Inventory::msgGame(const GameMessage &msg) {
 		return true;
 
 	} else if (msg._name == "Line") {
-		// TODO: select item action
-		warning("TODO: select item action");
+		send("UseItem", GameMessage("UseItem", msg._value));
+		return true;
 	}
 
 	return false;
