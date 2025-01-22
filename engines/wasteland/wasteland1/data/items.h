@@ -49,6 +49,10 @@ struct InventoryItems : public Array1<InventoryItem> {
 		Array1<InventoryItem>::remove_at(idx);
 		push_back(InventoryItem());
 	}
+
+	bool empty() const {
+		return !Array1<InventoryItem>::empty() || front()._id == 0;
+	}
 };
 
 } // namespace Data
