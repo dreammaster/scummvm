@@ -44,6 +44,11 @@ struct InventoryItem {
 struct InventoryItems : public Array1<InventoryItem> {
 	InventoryItems();
 	void synchronize(Serializer &s);
+
+	void remove_at(uint idx) {
+		Array1<InventoryItem>::remove_at(idx);
+		push_back(InventoryItem());
+	}
 };
 
 } // namespace Data

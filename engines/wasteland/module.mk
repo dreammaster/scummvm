@@ -48,6 +48,7 @@ MODULE_OBJS = \
 	wasteland1/views/character/reorder_pane.o \
 	wasteland1/views/character/skills.o \
 	wasteland1/views/character/summary.o \
+	wasteland1/views/character/use_item.o \
 	wasteland1/views/gfx/animation.o \
 	wasteland1/views/gfx/button.o \
 	wasteland1/views/gfx/clickable_text.o \

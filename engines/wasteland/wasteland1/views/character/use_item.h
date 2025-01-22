@@ -19,29 +19,41 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_VIEWS_H
-#define WASTELAND_WASTELAND1_VIEWS_VIEWS_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_USE_ITEM_H
+#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_USE_ITEM_H
 
-#include "wasteland/wasteland1/views/title/roster.h"
-#include "wasteland/wasteland1/views/title/title.h"
-#include "wasteland/wasteland1/views/character/inventory.h"
-#include "wasteland/wasteland1/views/character/skills.h"
-#include "wasteland/wasteland1/views/character/summary.h"
-#include "wasteland/wasteland1/views/character/use_item.h"
+#include "wasteland/wasteland1/views/gfx/pane.h"
+#include "wasteland/wasteland1/views/gfx/text_button.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
+namespace Character {
 
-struct Views {
-	Title::Title _title;
-	Title::Roster _roster;
-	Character::Inventory _characterInventory;
-	Character::Skills _characterSkills;
-	Character::Summary _characterSummary;
-	Character::UseItem _characterUseItem;
+class UseItem : public Gfx::Pane {
+	enum Mode {
+		INITIAL, RELOAD, NO_TRADE, TRADE
+	};
+private:
+	Gfx::TextButton _esc;
+	Gfx::TextButton _enter;
+	int _selectedItem = 0;
+	Mode _mode = INITIAL;
+
+	void drop();
+	void trade();
+	void equip();
+
+public:
+	UseItem();
+	virtual ~UseItem() {}
+
+	void draw() override;
+	bool msgGame(const GameMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
+} // namespace Character
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
