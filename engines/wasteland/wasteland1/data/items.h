@@ -55,6 +55,27 @@ struct InventoryItems : public Array1<InventoryItem> {
 	}
 };
 
+struct ItemDetails {
+	byte _field0 = 0;
+	byte _field1 = 0;
+	byte _field2 = 0;
+	byte _field3 = 0;
+	byte _field4 = 0;
+	byte _field5 = 0;
+	byte _field6 = 0;
+	byte _field7 = 0;
+
+	void load(Common::SeekableReadStream *src);
+};
+
+struct ItemDetailsArray : public Common::Array<ItemDetails> {
+private:
+	int _itemsSection = -1;
+
+public:
+	void load(int section = 0);
+};
+
 } // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland

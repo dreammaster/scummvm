@@ -34,8 +34,7 @@ namespace Wasteland1 {
 Wasteland1Engine *g_engine;
 
 Wasteland1Engine::Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc) :
-		Wasteland::Engine(syst, gameDesc),
-		_party(_saved), _currentChar(_saved._currentCharacter) {
+		Wasteland::Engine(syst, gameDesc) {
 	g_engine = this;
 }
 
@@ -71,6 +70,9 @@ void Wasteland1Engine::setup() {
 
 	_gameArchive = new GameArchive();
 	SearchMan.add("Game", _gameArchive);
+
+	// Load other variables
+	Vars::load();
 
 	// Load save data
 	int saveSlot = ConfMan.getInt("save_slot");

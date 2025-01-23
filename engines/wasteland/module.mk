@@ -17,6 +17,7 @@ MODULE_OBJS = \
 	gfx/wasteland_font.o \
 	wasteland1/wasteland1.o \
 	wasteland1/console.o \
+	wasteland1/vars.o \
 	wasteland1/core/array1.o \
 	wasteland1/core/text_decoder.o \
 	wasteland1/data/items.o \
