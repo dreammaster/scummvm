@@ -91,13 +91,12 @@ bool Summary::msgGame(const GameMessage &msg) {
 		return true;
 	} else if (msg._name == "Next") {
 		replaceView(g_engine->_currentChar->_items.empty() ?
-			"CharacterSummary" : "CharacterInventory");
+			"CharacterSkills" : "CharacterInventory");
 		return true;
 	}
 
 	return Pane::msgGame(msg);
 }
-
 
 } // namespace Character
 } // namespace Views

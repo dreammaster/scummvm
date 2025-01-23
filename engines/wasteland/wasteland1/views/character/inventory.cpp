@@ -96,7 +96,7 @@ bool Inventory::msgGame(const GameMessage &msg) {
 		return true;
 
 	} else if (msg._name == "Line") {
-		send("UseItem", GameMessage("UseItem", msg._value));
+		send("CharacterUseItem", GameMessage("UseItem", msg._value));
 		return true;
 	}
 

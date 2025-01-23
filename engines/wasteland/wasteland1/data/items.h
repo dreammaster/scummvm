@@ -29,16 +29,41 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Data {
 
+struct ItemDetails {
+	byte _field0 = 0;
+	byte _field1 = 0;
+	byte _field2 = 0;
+	byte _field3 = 0;
+	byte _field4 = 0;
+	byte _field5 = 0;
+	byte _field6 = 0;
+	byte _ammunitionId = 0;		// Ammunition item takes
+
+	void load(Common::SeekableReadStream *src);
+};
+
+struct ItemDetailsArray : public Common::Array<ItemDetails> {
+private:
+	int _itemsSection = -1;
+
+public:
+	void load(int section = 0);
+};
+
+
 struct InventoryItem {
 	int8 _id = 0;
 	int8 _quantity = 0;
 
-	InventoryItem() {}
+	InventoryItem() {
+	}
 	void synchronize(Serializer &s);
 
 	bool hasNoAmmunition() const {
 		return _quantity == 0;
 	}
+
+	const ItemDetails *getItemDetails() const;
 };
 
 struct InventoryItems : public Array1<InventoryItem> {
@@ -51,29 +76,8 @@ struct InventoryItems : public Array1<InventoryItem> {
 	}
 
 	bool empty() const {
-		return !Array1<InventoryItem>::empty() || front()._id == 0;
+		return Array1<InventoryItem>::empty() || front()._id == 0;
 	}
-};
-
-struct ItemDetails {
-	byte _field0 = 0;
-	byte _field1 = 0;
-	byte _field2 = 0;
-	byte _field3 = 0;
-	byte _field4 = 0;
-	byte _field5 = 0;
-	byte _field6 = 0;
-	byte _field7 = 0;
-
-	void load(Common::SeekableReadStream *src);
-};
-
-struct ItemDetailsArray : public Common::Array<ItemDetails> {
-private:
-	int _itemsSection = -1;
-
-public:
-	void load(int section = 0);
 };
 
 } // namespace Data

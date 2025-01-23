@@ -21,6 +21,7 @@
 
 #include "wasteland/wasteland1/data/items.h"
 #include "wasteland/core/file.h"
+#include "wasteland/wasteland1/vars.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -39,6 +40,11 @@ void InventoryItem::synchronize(Serializer &s) {
 	s.syncAsByte(_id);
 	s.syncAsByte(_quantity);
 }
+
+const ItemDetails *InventoryItem::getItemDetails() const {
+	return &g_vars->_itemDetails[_id + 1];
+}
+
 /*
 static const int8 AMMUNITION_ITEMS[] = {
 	 13, 10, 11, 12, 2, 3, 4, 5,  6, 7, 8, 9, -1
@@ -61,7 +67,7 @@ void ItemDetails::load(Common::SeekableReadStream *src) {
 	_field4 = src->readByte();
 	_field5 = src->readByte();
 	_field6 = src->readByte();
-	_field7 = src->readByte();
+	_ammunitionId = src->readByte();
 }
 
 void ItemDetailsArray::load(int section) {
