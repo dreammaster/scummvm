@@ -43,10 +43,12 @@ void UseItem::draw() {
 		s.writeString("Drop", 0, 2);
 		s.writeString("Trade", 0, 3);
 		s.writeString("Equip/unequip", 0, 4);
+		if (_canReload)
+			s.writeString("Reload", 0, 5);
 	}
 
 	if (_mode == NO_TRADE)
-		s.writeString("No one to trade with.", 0, 6);
+		s.writeString("No one to trade with.", 0, _canReload ? 7 : 6);
 
 	if (_mode == TRADE)
 		s.writeString("Who wants it?");
@@ -54,13 +56,22 @@ void UseItem::draw() {
 
 bool UseItem::msgGame(const GameMessage &msg) {
 	if (msg._name == "UseItem") {
-		_selectedItem = msg._value;
-		_mode = INITIAL;
-		addView();
+		show(msg._value);
 		return true;
 	}
 
 	return Pane::msgGame(msg);
+}
+
+void UseItem::show(int selectedItem) {
+	_selectedItem = selectedItem;
+	_mode = INITIAL;
+
+	const Data::InventoryItem &item = g_engine->_currentChar->_items[selectedItem];
+	const Data::ItemDetails &weapon = *g_engine->_currentChar->getEquippedWeaponDetails();
+	_canReload = weapon._ammunitionId == item._id;
+
+	addView();
 }
 
 bool UseItem::msgKeypress(const KeypressMessage &msg) {

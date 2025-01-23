@@ -68,6 +68,8 @@ struct PartyMember {
 	void synchronize(Serializer &s);
 
 	int getConditionIndex() const;
+
+	const ItemDetails *getEquippedWeaponDetails() const;
 };
 
 } // namespace Data

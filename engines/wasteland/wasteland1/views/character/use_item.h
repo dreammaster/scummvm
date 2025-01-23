@@ -32,14 +32,16 @@ namespace Character {
 
 class UseItem : public Gfx::Pane {
 	enum Mode {
-		INITIAL, RELOAD, NO_TRADE, TRADE
+		INITIAL, NO_TRADE, TRADE
 	};
 private:
 	Gfx::TextButton _esc;
 	Gfx::TextButton _enter;
 	int _selectedItem = 0;
 	Mode _mode = INITIAL;
+	bool _canReload = false;
 
+	void show(int selectedItem);
 	void drop();
 	void trade();
 	void equip();

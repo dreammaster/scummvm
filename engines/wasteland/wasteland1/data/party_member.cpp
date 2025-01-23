@@ -21,6 +21,7 @@
 
 #include "common/hashmap.h"
 #include "wasteland/wasteland1/data/party_member.h"
+#include "wasteland/wasteland1/vars.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -83,6 +84,11 @@ int PartyMember::getConditionIndex() const {
 	}
 
 	return -1;
+}
+
+const ItemDetails *PartyMember::getEquippedWeaponDetails() const {
+	return !_weapon ? &g_vars->_itemDetails[0] :
+		_items[_weapon].getItemDetails();
 }
 
 } // namespace Data
