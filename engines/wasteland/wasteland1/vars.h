@@ -19,34 +19,30 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_WASTELAND1_H
-#define WASTELAND_WASTELAND1_WASTELAND1_H
+#ifndef WASTELAND_WASTELAND1_VARS_H
+#define WASTELAND_WASTELAND1_VARS_H
 
-#include "wasteland/engine.h"
-#include "wasteland/wasteland1/vars.h"
-#include "wasteland/wasteland1/views/views.h"
-#include "wasteland/wasteland1/files/game_archive.h"
+#include "wasteland/wasteland1/data/saved.h"
+#include "wasteland/wasteland1/gfx/pics.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 
-class Wasteland1Engine : public Wasteland::Engine, public Vars {
-private:
-	Wasteland1::Views::Views *_views = nullptr;
-	uint16 _mapX = 0, _mapY = 0;
-	GameArchive *_gameArchive = nullptr;
-
-protected:
-	void setup() override;
-	GUI::Debugger *getConsole() override;
+struct Vars {
+public:
+	Data::Saved _saved;
+	Gfx::PicsDecoder _pics;
+	Data::CurrentParty _party;
+	Data::PartyMember *&_currentChar;
+	Data::ItemDetailsArray _itemDetails;
 
 public:
-	Wasteland1Engine(OSystem *syst, const WastelandGameDescription *gameDesc);
-	~Wasteland1Engine() override;
-	void initializePath(const Common::FSNode &gamePath) override;
+	Vars();
+	~Vars();
+	void load();
 };
 
-extern Wasteland1Engine *g_engine;
+extern Vars *g_vars;
 
 } // namespace Wasteland1
 } // namespace Wasteland

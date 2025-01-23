@@ -110,11 +110,18 @@ bool GameArchive::hasFile(const Common::Path &path) const {
 	if (name.equalsIgnoreCase("savegame") || name.equalsIgnoreCase("shops"))
 		return true;
 
-	if (!name.hasPrefixIgnoreCase("map"))
-		return false;
+	if (name.hasPrefixIgnoreCase("map")) {
+		int mapNum = atoi(name.c_str() + 3);
+		return getBlockIndex(mapNum) != -1;
 
-	int mapNum = atoi(name.c_str() + 3);
-	return getMapIndex(mapNum) != -1;
+	}
+
+	if (name.hasPrefixIgnoreCase("game-")) {
+		int blockNum = atoi(name.c_str() + 5);
+		return getBlockIndex(blockNum) != -1;
+	}
+
+	return false;
 }
 
 int GameArchive::listMembers(Common::ArchiveMemberList &list) const {
@@ -137,7 +144,9 @@ Common::SeekableReadStream *GameArchive::createReadStreamForMember(const Common:
 	} else if (name.equalsIgnoreCase("shops")) {
 		blockIndex = _shopsIndex;
 	} else if (name.hasPrefixIgnoreCase("map")) {
-		blockIndex = getMapIndex(atoi(name.c_str() + 3));
+		blockIndex = getBlockIndex(atoi(name.c_str() + 3));
+	} else if (name.hasPrefixIgnoreCase("game-")) {
+		blockIndex = getBlockIndex(atoi(name.c_str() + 5));
 	} else {
 		blockIndex = -1;
 	}
@@ -207,7 +216,7 @@ bool GameArchive::isShopItems(const byte bytes[]) {
 	return bytes[0] == 0x60 && bytes[1] == 0x60 && bytes[2] == 0x60;
 }
 
-int GameArchive::getMapIndex(int mapNum) const {
+int GameArchive::getBlockIndex(int mapNum) const {
 	if (mapNum >= 0 && mapNum < (int)_blocks.size())
 		return mapNum;
 

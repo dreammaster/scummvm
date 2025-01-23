@@ -20,6 +20,7 @@
  */
 
 #include "wasteland/wasteland1/data/items.h"
+#include "wasteland/core/file.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -51,6 +52,38 @@ bool InventoryItem::hasNoAmmunition() const {
 	return true;
 }
 */
+
+void ItemDetails::load(Common::SeekableReadStream *src) {
+	_field0 = src->readByte();
+	_field1 = src->readByte();
+	_field2 = src->readByte();
+	_field3 = src->readByte();
+	_field4 = src->readByte();
+	_field5 = src->readByte();
+	_field6 = src->readByte();
+	_field7 = src->readByte();
+}
+
+void ItemDetailsArray::load(int section) {
+	if (section != _itemsSection) {
+		_itemsSection = section;
+
+		size_t offset = (section == 4) ? 0x28bc7 : 0x253c5;
+		offset += 4614;
+		if (section != 4) {
+			static const uint16 OFFSETS[4] = { 0, 766, 1532, 2298 };
+			offset += OFFSETS[section];
+		}
+
+		File f(Common::String::format("game-%d", offset).c_str());
+
+		clear();
+		resize(95);
+		for (int i = 0; i < 95; ++i)
+			(*this)[i].load(&f);
+	}
+}
+
 } // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland

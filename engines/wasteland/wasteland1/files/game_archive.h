@@ -79,7 +79,7 @@ private:
 	/**
 	 * Gets the index of a map block
 	 */
-	int getMapIndex(int mapNum) const;
+	int getBlockIndex(int mapNum) const;
 
 public:
 	GameArchive() {
