@@ -32,7 +32,7 @@ namespace Character {
 
 class UseItem : public Gfx::Pane {
 	enum Mode {
-		INITIAL, NO_TRADE, TRADE
+		INITIAL, NO_TRADE, TRADE, JAMMED
 	};
 private:
 	Gfx::TextButton _esc;
@@ -44,7 +44,9 @@ private:
 	void show(int selectedItem);
 	void drop();
 	void trade();
+	void trade(int destCharNum);
 	void equip();
+	void reload();
 
 public:
 	UseItem();
@@ -53,6 +55,7 @@ public:
 	void draw() override;
 	bool msgGame(const GameMessage &msg) override;
 	bool msgKeypress(const KeypressMessage &msg) override;
+	bool msgUnfocus(const UnfocusMessage &msg) override;
 };
 
 } // namespace Character

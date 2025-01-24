@@ -64,7 +64,7 @@ void ItemDetails::load(Common::SeekableReadStream *src) {
 	_field1 = src->readByte();
 	_field2 = src->readByte();
 	_field3 = src->readByte();
-	_field4 = src->readByte();
+	_clipSize = src->readByte();
 	_field5 = src->readByte();
 	_field6 = src->readByte();
 	_ammunitionId = src->readByte();

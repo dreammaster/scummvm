@@ -34,7 +34,7 @@ struct ItemDetails {
 	byte _field1 = 0;
 	byte _field2 = 0;
 	byte _field3 = 0;
-	byte _field4 = 0;
+	byte _clipSize = 0;			// Ammunition clip size
 	byte _field5 = 0;
 	byte _field6 = 0;
 	byte _ammunitionId = 0;		// Ammunition item takes
@@ -52,8 +52,8 @@ public:
 
 
 struct InventoryItem {
-	int8 _id = 0;
-	int8 _quantity = 0;
+	byte _id = 0;
+	byte _quantity = 0;
 
 	InventoryItem() {
 	}
@@ -61,6 +61,9 @@ struct InventoryItem {
 
 	bool hasNoAmmunition() const {
 		return _quantity == 0;
+	}
+	bool isJammed() const {
+		return (int8)_quantity < 0;
 	}
 
 	const ItemDetails *getItemDetails() const;
