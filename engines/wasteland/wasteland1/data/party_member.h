@@ -69,6 +69,7 @@ struct PartyMember {
 
 	int getConditionIndex() const;
 
+	InventoryItem *getEquippedWeapon();
 	const ItemDetails *getEquippedWeaponDetails() const;
 };
 

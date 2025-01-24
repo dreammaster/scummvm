@@ -86,6 +86,10 @@ int PartyMember::getConditionIndex() const {
 	return -1;
 }
 
+InventoryItem *PartyMember::getEquippedWeapon() {
+	return _weapon ? &_items[_weapon] : nullptr;
+}
+
 const ItemDetails *PartyMember::getEquippedWeaponDetails() const {
 	return !_weapon ? &g_vars->_itemDetails[0] :
 		_items[_weapon].getItemDetails();
