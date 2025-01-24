@@ -62,10 +62,10 @@ void Summary::draw() {
 	s.writeString(Common::String::format("$=%d", c._money));
 	s.setTextPos(0, 8);
 	s.writeString("SEX: ");
-	s.writeString(Data::TEXT_STRINGS[160 + c._gender]);
+	s.writeString(Data::SEX[c._gender]);
 	s.setTextPos(0, 9);
 	s.writeString("NATIONALITY: ");
-	s.writeString(Data::TEXT_STRINGS[143 + c._nationality]);
+	s.writeString(Data::NATIONALITIES[c._nationality]);
 }
 
 bool Summary::msgGame(const GameMessage &msg) {

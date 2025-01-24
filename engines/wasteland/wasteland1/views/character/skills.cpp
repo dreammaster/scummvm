@@ -41,7 +41,7 @@ void Skills::resetLines() {
 			break;
 
 		addLine(Common::String::format("%3d %s", skills[i]._level,
-			Data::TEXT_STRINGS[skills[i]._id]));
+			Data::SKILL_NAMES[skills[i]._id]));
 	}
 }
 

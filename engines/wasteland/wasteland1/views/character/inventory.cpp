@@ -41,7 +41,7 @@ void Inventory::resetLines() {
 		if (!item._id)
 			break;
 
-		addLine(Data::getText(item._id + 36));
+		addLine(Data::getItemText(item._id));
 	}
 }
 
