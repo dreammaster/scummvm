@@ -29,13 +29,16 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Data {
 
-extern const char *const TEXT_STRINGS[];
+extern const char *const SKILL_NAMES[];
+extern const char *const ITEM_NAMES[];
+extern const char *const NATIONALITIES[];
+extern const char *const SEX[];
 
 /**
  * In some cases, item names are encoded with three \n characters,
  * indicating the suffixes to use for singular vs plural amounts.
  */
-extern Common::String getText(uint index, bool isPlural = false);
+extern Common::String getItemText(uint index, bool isPlural = false);
 
 } // namespace Data
 } // namespace Wasteland1
