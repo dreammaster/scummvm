@@ -20,6 +20,7 @@
  */
 
 #include "wasteland/wasteland1/views/gfx/up_down_button.h"
+#include "wasteland/gfx/text_rect.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -33,7 +34,7 @@ UpDownButton::UpDownButton(UIElement *parent, const Common::String &name, bool i
 UpDownButton::UpDownButton(UIElement *parent, const Common::String &name, bool isUp,
 	int x, int y, Common::KeyCode keycode) : Button(parent, name, keycode),
 		_isUp(isUp) {
-	setBounds(Window(x, y, x + 1, y));
+	setBounds(TextRect(x, y, x, y + 1));
 }
 
 UpDownButton::UpDownButton(UIElement *parent, const Common::String &name, bool isUp,
@@ -52,9 +53,15 @@ void UpDownButton::draw() {
 	Surface s = getSurface(_bounds);
 
 	s.setFont(1);
-	int firstChar = _focused ? 24 : 52;
+	unsigned char firstChar = _focused ? 30 : 58;
 
-	s.writeChar(_isUp ? 'U' : 'D');
+	if (_isUp) {
+		s.writeChar(firstChar + 0, 0, 0);
+		s.writeChar(firstChar + 1, 0, 1);
+	} else {
+		s.writeChar(firstChar + 3, 0, 0);
+		s.writeChar(firstChar + 4, 0, 1);
+	}
 }
 
 } // namespace Gfx
