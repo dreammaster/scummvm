@@ -169,7 +169,28 @@ void UseItem::trade(int destCharNum) {
 }
 
 void UseItem::equip() {
+	Data::PartyMember &c = *g_engine->_currentChar;
 
+	if (_selectedItem == c._weapon) {
+		// Unequipping weapon
+		c._weapon = 0;
+	} else if (_selectedItem == c._armor) {
+		c._armor = 0;
+		c._ac = 0;
+	} else {
+		Data::InventoryItem &item = c._items[_selectedItem];
+		const Data::ItemDetails &details = *item.getItemDetails();
+
+		// It's either an armor, or everything else is a weapon
+		if (details.isArmor()) {
+			c._ac = details._armorClass;
+			c._armor = _selectedItem;
+		} else {
+			c._weapon = _selectedItem;
+		}
+	}
+
+	close();
 }
 
 void UseItem::reload() {
