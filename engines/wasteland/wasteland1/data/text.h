@@ -40,6 +40,9 @@ extern const char *const SEX[];
  */
 extern Common::String getItemText(uint index, bool isPlural = false);
 
+// TODO: Remove me
+extern const char *const ORIG_TEXT_STRINGS[168];
+
 } // namespace Data
 } // namespace Wasteland1
 } // namespace Wasteland

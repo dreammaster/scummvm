@@ -180,7 +180,7 @@ const char *const SEX[] = {
 // In ScummVM, I've changed to individual lists of skills, items,
 // etc. and individual views have their own text. Eventually this
 // array should be completely removed.
-const char *const ORIG_TEXT_STRINGS[] = {
+const char *const ORIG_TEXT_STRINGS[168] = {
 	"",
 	"Brawling",
 	"Climb",
