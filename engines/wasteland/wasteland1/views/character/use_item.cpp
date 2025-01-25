@@ -156,7 +156,7 @@ void UseItem::equip() {
 
 void UseItem::reload() {
 	auto *weapon = g_engine->_currentChar->getEquippedWeapon();
-	const auto *ammunition = weapon->getItemDetails();
+	const auto *weaponDetails = weapon->getItemDetails();
 	assert(weapon);
 
 	if (weapon->isJammed()) {
@@ -165,7 +165,7 @@ void UseItem::reload() {
 		_children.push_back(&_enter);
 	} else {
 		// Replace the weapon's quantity with the ammunition's clip size
-		weapon->_quantity = (weapon->_quantity & ~0x3f) | ammunition->_clipSize;
+		weapon->setQuantity(weaponDetails->_clipSize);
 		g_engine->_currentChar->_items.remove_at(_selectedItem);
 		close();
 	}

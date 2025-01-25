@@ -29,6 +29,12 @@ namespace Wasteland {
 namespace Wasteland1 {
 namespace Data {
 
+enum ItemFlag {
+	ITEM_JAMMED = 0x80,
+	ITEM_40 = 0x40,
+	ITEM_FLAGS = ITEM_JAMMED || ITEM_40
+};
+
 struct ItemDetails {
 	byte _field0 = 0;
 	byte _field1 = 0;
@@ -63,7 +69,11 @@ struct InventoryItem {
 		return _quantity == 0;
 	}
 	bool isJammed() const {
-		return (int8)_quantity < 0;
+		return (_quantity & ITEM_JAMMED) != 0;
+	}
+	void setQuantity(uint qty) {
+		assert(qty < 64);
+		_quantity = (_quantity & ITEM_FLAGS) | qty;
 	}
 
 	const ItemDetails *getItemDetails() const;
