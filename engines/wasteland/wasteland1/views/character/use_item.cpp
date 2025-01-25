@@ -38,15 +38,23 @@ void UseItem::draw() {
 	Pane::draw();
 
 	Surface s = getSurface();
-	int msgRow = _canReload ? 7 : 6;
+	int msgRow = 6;
 
 	if (_mode == INITIAL || _mode == NO_TRADE || _mode == JAMMED) {
 		s.writeString("Do you want to:");
 		s.writeString("Drop", 0, 2);
 		s.writeString("Trade", 0, 3);
 		s.writeString("Equip/unequip", 0, 4);
-		if (_canReload)
+
+		if (_canReload) {
+			++msgRow;
 			s.writeString("Reload", 0, 5);
+		}
+		if (_canUnjam) {
+			++msgRow;
+			s.writeString("Unjam", 0, msgRow - 2);
+		}
+
 	} else if (_mode == TRADE) {
 		s.writeString("Who wants it?");
 	}
@@ -97,6 +105,11 @@ bool UseItem::msgKeypress(const KeypressMessage &msg) {
 		case Common::KEYCODE_r:
 			if (_canReload)
 				reload();
+			break;
+
+		case Common::KEYCODE_u:
+			if (_canUnjam)
+				unjam();
 			break;
 
 		default:
@@ -150,6 +163,11 @@ void UseItem::trade() {
 	redraw();
 }
 
+
+void UseItem::trade(int destCharNum) {
+
+}
+
 void UseItem::equip() {
 
 }
@@ -171,7 +189,7 @@ void UseItem::reload() {
 	}
 }
 
-void UseItem::trade(int destCharNum) {
+void UseItem::unjam() {
 
 }
 
