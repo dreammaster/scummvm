@@ -35,17 +35,28 @@ enum ItemFlag {
 	ITEM_FLAGS = ITEM_JAMMED || ITEM_40
 };
 
+enum ItemType {
+	ITEMTYPE_ARMOR = 15
+};
+
 struct ItemDetails {
 	byte _field0 = 0;
 	byte _field1 = 0;
 	byte _field2 = 0;
-	byte _field3 = 0;
+	byte _flags = 0;
 	byte _clipSize = 0;			// Ammunition clip size
 	byte _field5 = 0;
-	byte _field6 = 0;
+	byte _armorClass = 0;
 	byte _ammunitionId = 0;		// Ammunition item takes
 
 	void load(Common::SeekableReadStream *src);
+
+	byte getItemType() const {
+		return _flags >> 3;
+	}
+	bool isArmor() const {
+		return getItemType() == ITEMTYPE_ARMOR;
+	}
 };
 
 struct ItemDetailsArray : public Common::Array<ItemDetails> {
