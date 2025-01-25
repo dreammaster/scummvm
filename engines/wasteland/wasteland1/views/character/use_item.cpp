@@ -156,8 +156,7 @@ void UseItem::equip() {
 
 void UseItem::reload() {
 	auto *weapon = g_engine->_currentChar->getEquippedWeapon();
-	const Data::InventoryItem &item = g_engine->_currentChar->_items[_selectedItem];
-	const auto *ammunition = item.getItemDetails();
+	const auto *ammunition = weapon->getItemDetails();
 	assert(weapon);
 
 	if (weapon->isJammed()) {
