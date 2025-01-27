@@ -45,6 +45,8 @@ MODULE_OBJS = \
 	wasteland1/gfx/raw_animation_frame.o \
 	wasteland1/gfx/raw_animation_frame_part.o \
 	wasteland1/views/view.o \
+	wasteland1/views/character/create.o \
+	wasteland1/views/character/delete.o \
 	wasteland1/views/character/inventory.o \
 	wasteland1/views/character/reorder_pane.o \
 	wasteland1/views/character/skills.o \

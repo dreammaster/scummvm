@@ -19,33 +19,31 @@
  *
  */
 
-#ifndef WASTELAND_WASTELAND1_VIEWS_VIEWS_H
-#define WASTELAND_WASTELAND1_VIEWS_VIEWS_H
+#ifndef WASTELAND_WASTELAND1_VIEWS_CHARACTER_DELETE_H
+#define WASTELAND_WASTELAND1_VIEWS_CHARACTER_DELETE_H
 
-#include "wasteland/wasteland1/views/title/roster.h"
-#include "wasteland/wasteland1/views/title/title.h"
-#include "wasteland/wasteland1/views/character/create.h"
-#include "wasteland/wasteland1/views/character/delete.h"
-#include "wasteland/wasteland1/views/character/inventory.h"
-#include "wasteland/wasteland1/views/character/skills.h"
-#include "wasteland/wasteland1/views/character/summary.h"
-#include "wasteland/wasteland1/views/character/use_item.h"
+#include "wasteland/wasteland1/views/gfx/pane.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
 namespace Views {
+namespace Character {
 
-struct Views {
-	Title::Title _title;
-	Title::Roster _roster;
-	Character::Create _characterCreate;
-	Character::Delete _characterDelete;
-	Character::Inventory _characterInventory;
-	Character::Skills _characterSkills;
-	Character::Summary _characterSummary;
-	Character::UseItem _characterUseItem;
+class Delete : public Gfx::Pane {
+	int _selectedCharacter = 0;
+
+	void deleteCharacter();
+
+public:
+	Delete();
+	virtual ~Delete() {}
+
+	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	bool msgGame(const GameMessage &msg) override;
 };
 
+} // namespace Character
 } // namespace Views
 } // namespace Wasteland1
 } // namespace Wasteland
