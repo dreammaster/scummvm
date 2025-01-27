@@ -61,9 +61,12 @@ void UseItem::draw() {
 
 	if (_mode == NO_TRADE)
 		s.writeString("No one to trade with.", 0, msgRow);
-	if (_mode == JAMMED) {
+	else if (_mode == JAMMED)
 		s.writeString("Your weapon is jammed.", 0, msgRow);
-	}
+	else if (_mode == UNJAM_FAIL)
+		s.writeString("can't unjam the weapon.", 0, msgRow);
+	else if (_mode == UNJAM_SUCCESS)
+		s.writeString("Unjammed the weapon.", 0, msgRow);
 }
 
 bool UseItem::msgGame(const GameMessage &msg) {
@@ -82,8 +85,14 @@ void UseItem::show(int selectedItem) {
 	const Data::InventoryItem &item = g_engine->_currentChar->_items[selectedItem];
 	const Data::ItemDetails &weapon = *g_engine->_currentChar->getEquippedWeaponDetails();
 	_canReload = weapon._ammunitionId == item._id;
+	_canUnjam = item.isJammed();
 
 	addView();
+}
+
+void UseItem::showEnter() {
+	_children.remove(&_esc);
+	_children.push_back(&_enter);
 }
 
 bool UseItem::msgKeypress(const KeypressMessage &msg) {
@@ -196,12 +205,10 @@ void UseItem::equip() {
 void UseItem::reload() {
 	auto *weapon = g_engine->_currentChar->getEquippedWeapon();
 	const auto *weaponDetails = weapon->getItemDetails();
-	assert(weapon);
 
 	if (weapon->isJammed()) {
 		_mode = JAMMED;
-		_children.remove(&_esc);
-		_children.push_back(&_enter);
+		showEnter();
 	} else {
 		// Replace the weapon's quantity with the ammunition's clip size
 		weapon->setQuantity(weaponDetails->_clipSize);
@@ -211,7 +218,17 @@ void UseItem::reload() {
 }
 
 void UseItem::unjam() {
+	auto *weapon = g_engine->_currentChar->getEquippedWeapon();
+	int val = weapon->_quantity & 0x3f;
 
+	if (!weapon->isJammed() || val < 6) {
+		_mode = UNJAM_FAIL;
+	} else {
+		_mode = UNJAM_SUCCESS;
+		weapon->_quantity = 0;
+	}
+
+	showEnter();
 }
 
 } // namespace Character
