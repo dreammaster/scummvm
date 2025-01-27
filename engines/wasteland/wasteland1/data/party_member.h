@@ -68,6 +68,9 @@ struct PartyMember {
 	void synchronize(Serializer &s);
 
 	int getConditionIndex() const;
+	bool isUnconscious() const {
+		return _con <= 0;
+	}
 
 	InventoryItem *getEquippedWeapon();
 	const ItemDetails *getEquippedWeaponDetails() const;

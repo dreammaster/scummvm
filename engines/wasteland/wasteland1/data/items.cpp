@@ -36,6 +36,32 @@ void InventoryItems::synchronize(Serializer &s) {
 		(*this)[i].synchronize(s);
 }
 
+void InventoryItems::remove_at(uint idx) {
+	Array1<InventoryItem>::remove_at(idx);
+	push_back(InventoryItem());
+}
+
+void InventoryItems::add(byte id, byte qty) {
+	assert(!full());
+
+	for (uint i = 0; i < 30; ++i) {
+		if (!(*this)[i]._id) {
+			(*this)[i]._id = id;
+			(*this)[i]._quantity = qty;
+			break;
+		}
+	}
+}
+
+bool InventoryItems::empty() const {
+	return front()._id == 0;
+}
+
+bool InventoryItems::full() const {
+	return back()._id != 0;
+}
+
+
 void InventoryItem::synchronize(Serializer &s) {
 	s.syncAsByte(_id);
 	s.syncAsByte(_quantity);
