@@ -76,6 +76,7 @@ struct InventoryItem {
 	}
 	void synchronize(Serializer &s);
 
+	Common::String getName() const;
 	bool hasNoAmmunition() const {
 		return _quantity == 0;
 	}

@@ -96,8 +96,10 @@ void PartyMember::draw() {
 	s.setTextPos(31, 0);
 	if (weapon) {
 		auto &invItem = member._items[weapon];
-		s.setInverseColor(invItem._quantity < 0);	// reverse if broken
-		s.writeString(Data::getItemText(invItem._id));
+		Common::String weaponName = Data::getItemText(invItem._id);
+
+		s.setInverseColor(invItem.isJammed());
+		s.writeString(weaponName);
 		s.setInverseColor(false);
 	}
 }

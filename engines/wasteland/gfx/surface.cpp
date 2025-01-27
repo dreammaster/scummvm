@@ -62,8 +62,24 @@ void Surface::writeString(const Common::String &str) {
 			++_textY;
 		}
 
-		_currentFont->drawString(this, lines[lineNum], _textX * FONT_W, _textY * FONT_H,
-			this->w - (_textX * FONT_W), _inverseColor ? -FONT_COLOR : FONT_COLOR);
+		// Iterate over the characters
+		int x = _textX * FONT_W;
+		int y = _textY * FONT_H;
+		const Common::String &line = lines[lineNum];
+
+		for (uint i = 0; i < line.size(); ++i) {
+			unsigned char c = line[i];
+
+			if (c == 1) {
+				// Toggle inverse color
+				setInverseColor(!_inverseColor);
+			} else if (x < this->w) {
+				_currentFont->drawChar(this, c, x, y,
+					_inverseColor ? -FONT_COLOR : FONT_COLOR);
+				x += FONT_W;
+			}
+		}
+
 		_textX += lines[lineNum].size();
 	}
 }
