@@ -43,6 +43,7 @@ private:
 	bool _canUnjam = false;
 
 	void show(int selectedItem);
+	void showEnter();
 	void drop();
 	void trade();
 	void trade(int destCharNum);

@@ -82,11 +82,8 @@ struct InventoryItem {
 	bool isJammed() const {
 		return (_quantity & ITEM_JAMMED) != 0;
 	}
-	void setQuantity(uint qty) {
-		assert(qty < 64);
-		_quantity = (_quantity & ITEM_FLAGS) | qty;
-	}
-
+	bool canUnjam() const;
+	void setQuantity(uint qty);
 	const ItemDetails *getItemDetails() const;
 };
 

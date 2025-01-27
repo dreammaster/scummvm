@@ -41,6 +41,16 @@ void InventoryItem::synchronize(Serializer &s) {
 	s.syncAsByte(_quantity);
 }
 
+bool InventoryItem::canUnjam() const {
+	warning("TODO: canUnjam checks");
+	return true;
+}
+
+void InventoryItem::setQuantity(uint qty) {
+	assert(qty < 64);
+	_quantity = (_quantity & ITEM_FLAGS) | qty;
+}
+
 const ItemDetails *InventoryItem::getItemDetails() const {
 	return &g_vars->_itemDetails[_id + 1];
 }
