@@ -115,6 +115,12 @@ bool Roster::msgGame(const GameMessage &msg) {
 		saved.setCurrentCharacter(msg._value);
 		addView("CharacterSummary");
 		return true;
+	} else if (msg._name == "Create") {
+		send("CharacterCreate", GameMessage("CreateCharacter"));
+		return true;
+	} else if (msg._name == "Delete") {
+		send("CharacterDelete", GameMessage("DeleteCharacter"));
+		return true;
 	}
 
 	return false;
