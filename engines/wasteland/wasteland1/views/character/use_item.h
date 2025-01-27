@@ -32,7 +32,8 @@ namespace Character {
 
 class UseItem : public Gfx::Pane {
 	enum Mode {
-		INITIAL, NO_TRADE, TRADE, JAMMED, UNJAM_FAIL, UNJAM_SUCCESS
+		INITIAL, TRADE, TRADE_NONE, TRADE_REFUSE, TRADE_FULL,
+		JAMMED, UNJAM_FAIL, UNJAM_SUCCESS
 	};
 private:
 	Gfx::TextButton _esc;

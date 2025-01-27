@@ -91,14 +91,11 @@ struct InventoryItems : public Array1<InventoryItem> {
 	InventoryItems();
 	void synchronize(Serializer &s);
 
-	void remove_at(uint idx) {
-		Array1<InventoryItem>::remove_at(idx);
-		push_back(InventoryItem());
-	}
+	void remove_at(uint idx);
+	bool empty() const;
+	bool full() const;
 
-	bool empty() const {
-		return Array1<InventoryItem>::empty() || front()._id == 0;
-	}
+	void add(byte id, byte qty);
 };
 
 } // namespace Data

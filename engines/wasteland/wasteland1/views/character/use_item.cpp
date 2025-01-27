@@ -40,7 +40,9 @@ void UseItem::draw() {
 	Surface s = getSurface();
 	int msgRow = 6;
 
-	if (_mode == INITIAL || _mode == NO_TRADE || _mode == JAMMED) {
+	if (_mode == TRADE) {
+		s.writeString("Who wants it?");
+	} else {
 		s.writeString("Do you want to:");
 		s.writeString("Drop", 0, 2);
 		s.writeString("Trade", 0, 3);
@@ -55,18 +57,35 @@ void UseItem::draw() {
 			s.writeString("Unjam", 0, msgRow - 2);
 		}
 
-	} else if (_mode == TRADE) {
-		s.writeString("Who wants it?");
+		// All other modes than the initial options display are
+		// just outcome messages of actions, and need to hide
+		// the Esc button and show the Enter button instead
+		if (_mode != INITIAL)
+			showEnter();
 	}
 
-	if (_mode == NO_TRADE)
+	switch (_mode) {
+	case TRADE_NONE:
 		s.writeString("No one to trade with.", 0, msgRow);
-	else if (_mode == JAMMED)
+		break;
+	case TRADE_FULL:
+		s.writeString("Can't carry any more.", 0, msgRow);
+		break;
+	case TRADE_REFUSE:
+		s.writeString("Doesn't want to trade.", 0, msgRow);
+		break;
+	case JAMMED:
 		s.writeString("Your weapon is jammed.", 0, msgRow);
-	else if (_mode == UNJAM_FAIL)
+		break;
+	case UNJAM_FAIL:
 		s.writeString("can't unjam the weapon.", 0, msgRow);
-	else if (_mode == UNJAM_SUCCESS)
+		break;
+	case UNJAM_SUCCESS:
 		s.writeString("Unjammed the weapon.", 0, msgRow);
+		break;
+	default:
+		break;
+	}
 }
 
 bool UseItem::msgGame(const GameMessage &msg) {
@@ -164,7 +183,11 @@ void UseItem::drop() {
 
 void UseItem::trade() {
 	if (g_engine->_party.size() == 1) {
-		_mode = NO_TRADE;
+		_mode = TRADE_NONE;
+	} else if (g_engine->_party.size() == 2) {
+		// There's only one other person to trade with,
+		// so use them automatically
+		trade(g_engine->_currentChar == g_engine->_party[1] ? 2 : 1);
 	} else {
 		_mode = TRADE;
 	}
@@ -172,9 +195,38 @@ void UseItem::trade() {
 	redraw();
 }
 
-
 void UseItem::trade(int destCharNum) {
+	Data::PartyMember *srcChar = g_engine->_currentChar;
+	Data::PartyMember *destChar = g_engine->_party[destCharNum];
+	Data::InventoryItem &item = srcChar->_items[_selectedItem];
 
+	if (destChar->_npc && !destChar->isUnconscious()) {
+		if (g_events->getRandomNumber(srcChar->_charisma) <
+				destChar->_tradeRefuse) {
+			_mode = TRADE_REFUSE;
+			redraw();
+			return;
+		}
+	}
+
+	if (destChar->_items.full()) {
+		_mode = TRADE_FULL;
+		redraw();
+	} else {
+		// Add to dest character
+		destChar->_items.add(item._id, item._quantity);
+
+		// Remove item from source. If weapon or armor,
+		// also take care of properly unequipping them
+		if (_selectedItem == srcChar->_weapon) {
+			srcChar->_weapon = 0;
+		} else if (_selectedItem == srcChar->_armor) {
+			srcChar->_armor = 0;
+			srcChar->_ac = 0;
+		}
+
+		close();
+	}
 }
 
 void UseItem::equip() {
@@ -208,7 +260,6 @@ void UseItem::reload() {
 
 	if (weapon->isJammed()) {
 		_mode = JAMMED;
-		showEnter();
 	} else {
 		// Replace the weapon's quantity with the ammunition's clip size
 		weapon->setQuantity(weaponDetails->_clipSize);
