@@ -22,6 +22,7 @@
 #include "wasteland/wasteland1/data/items.h"
 #include "wasteland/core/file.h"
 #include "wasteland/wasteland1/vars.h"
+#include "wasteland/wasteland1/data/text.h"
 
 namespace Wasteland {
 namespace Wasteland1 {
@@ -65,6 +66,10 @@ bool InventoryItems::full() const {
 void InventoryItem::synchronize(Serializer &s) {
 	s.syncAsByte(_id);
 	s.syncAsByte(_quantity);
+}
+
+Common::String InventoryItem::getName() const {
+	return Data::getItemText(_id);
 }
 
 bool InventoryItem::canUnjam() const {

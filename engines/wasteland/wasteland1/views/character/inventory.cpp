@@ -32,16 +32,23 @@ Inventory::Inventory() : ReorderPane("CharacterInventory") {
 }
 
 void Inventory::resetLines() {
-	const Data::InventoryItems &items = g_engine->_currentChar->_items;
+	const Data::PartyMember &c = *g_engine->_currentChar;
+	const Data::InventoryItems &items = c._items;
 	setClickable(true);
 	clearLines();
 
-	for (uint i = 1; i <= items.size(); ++i) {
+	for (int i = 1; i <= (int)items.size(); ++i) {
 		auto &item = items[i];
 		if (!item._id)
 			break;
 
-		addLine(Data::getItemText(item._id));
+		Common::String line = Data::getItemText(item._id);
+
+		if (i == c._weapon || i == c._armor)
+			// Show equipped weapon/armor in reverse color
+			line = Common::String::format("\x01%s\x01", line.c_str());
+
+		addLine(line);
 	}
 }
 
