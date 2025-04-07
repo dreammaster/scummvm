@@ -19,15 +19,14 @@
  *
  */
 
-#include "ultima/ultima4/metaengine.h"
-#include "ultima/ultima4/core/debugger.h"
-#include "ultima/ultima4/ultima4.h"
+#include "ultima/ultima3/metaengine.h"
+#include "ultima/ultima3/ultima3.h"
 #include "common/translation.h"
 #include "backends/keymapper/action.h"
 #include "backends/keymapper/standard-actions.h"
 
 namespace Ultima {
-namespace Ultima4 {
+namespace Ultima3 {
 
 struct KeybindingRecord {
 	KeybindingAction _action;
@@ -157,25 +156,25 @@ struct KeysRecord {
 };
 
 static const KeysRecord NORMAL_RECORDS[] = {
-	{ "ultima4", "Ultima IV", NORMAL_KEYS },
-	{ "ultima4_config", "Ultima IV - Configuration", CONFIG_KEYS },
-	{ "ultima4_party", "Ultima IV - Party", PARTY_KEYS },
-	{ "ultima4_cheats", "Ultima IV - Cheats", CHEAT_KEYS },
+	{ "Ultima3", "Ultima IV", NORMAL_KEYS },
+	{ "Ultima3_config", "Ultima IV - Configuration", CONFIG_KEYS },
+	{ "Ultima3_party", "Ultima IV - Party", PARTY_KEYS },
+	{ "Ultima3_cheats", "Ultima IV - Cheats", CHEAT_KEYS },
 	{ nullptr, nullptr, nullptr }
 };
 
 static const KeysRecord INPUT_RECORDS[] = {
-	{ "ultima4", "Ultima IV", INPUT_KEYS },
+	{ "Ultima3", "Ultima IV", INPUT_KEYS },
 	{ nullptr, nullptr, nullptr }
 };
 
 static const KeysRecord DIRECTION_RECORDS[] = {
-	{ "ultima4", "Ultima IV", DIRECTION_KEYS },
+	{ "Ultima3", "Ultima IV", DIRECTION_KEYS },
 	{ nullptr, nullptr, nullptr }
 };
 
 static const KeysRecord MENU_RECORDS[] = {
-	{ "ultima4", "Ultima IV", MENU_KEYS },
+	{ "Ultima3", "Ultima IV", MENU_KEYS },
 	{ nullptr, nullptr, nullptr }
 };
 
@@ -246,8 +245,11 @@ void MetaEngine::setKeybindingMode(KeybindingMode mode) {
 
 void MetaEngine::executeAction(KeybindingAction keyAction) {
 	Common::String methodName = getMethod(keyAction);
+	warning("KEYBIND: %s", methodName.c_str());
+#ifdef TODO
 	if (!methodName.empty())
 		g_debugger->executeCommand(methodName);
+#endif
 }
 
 Common::String MetaEngine::getMethod(KeybindingAction keyAction) {
@@ -261,5 +263,5 @@ Common::String MetaEngine::getMethod(KeybindingAction keyAction) {
 	return Common::String();
 }
 
-} // End of namespace Ultima4
-} // End of namespace Ultima
+} // namespace Ultima3
+} // namespace Ultima

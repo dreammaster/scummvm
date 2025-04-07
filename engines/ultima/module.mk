@@ -138,6 +138,12 @@ MODULE_OBJS += \
 	ultima1/game.o
 endif
 
+ifdef ENABLE_ULTIMA3
+MODULE_OBJS += \
+	ultima3/ultima3.o \
+	ultima3/meta_engine.o
+endif
+
 ifdef ENABLE_ULTIMA4
 MODULE_OBJS += \
 	ultima4/controllers/alpha_action_controller.o \
