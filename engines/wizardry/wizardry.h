@@ -36,6 +36,7 @@
 
 #include "wizardry/detection.h"
 #include "wizardry/events.h"
+#include "wizardry/data/globals.h"
 
 namespace Wizardry {
 
@@ -45,6 +46,8 @@ class WizardryEngine : public Engine, public Events {
 private:
 	const ADGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
+	Globals _globals;
+
 protected:
 	// Engine APIs
 	Common::Error run() override;

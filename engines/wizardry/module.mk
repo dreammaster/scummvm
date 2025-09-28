@@ -6,6 +6,7 @@ MODULE_OBJS = \
 	events.o \
 	messages.o \
 	metaengine.o \
+	data/globals.o \
 	view.o \
 	view1.o
 
