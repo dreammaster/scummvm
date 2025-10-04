@@ -191,6 +191,23 @@ long FileLength(const char *filename) {
 	return result;
 }
 
+HWND CreateWindow(const char *lpClassName, const char *lpWindowName, uint32 dwStyle,
+		int x, int y, int nWidth, int nHeight, HWND hWndParent,
+		HMENU hMenu, HINSTANCE hInstance, void *lpParam) {
+	CWnd *pWnd = new CWnd();
+	return pWnd->m_hWnd;
+}
+
+void ShowWindow(HWND hWnd, int nCmdShow) {
+	CWnd *wnd = CWnd::FromHandle(hWnd);
+	wnd->ShowWindow(nCmdShow);
+}
+
+void UpdateWindow(HWND hWnd) {
+	CWnd *wnd = CWnd::FromHandle(hWnd);
+	wnd->UpdateWindow();
+}
+
 bool PeekMessage(LPMSG lpMsg, HWND hWnd,
                  unsigned int wMsgFilterMin, unsigned int wMsgFilterMax,
                  unsigned int wRemoveMsg) {
