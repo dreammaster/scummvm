@@ -19,19 +19,27 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#include "common/textconsole.h"
+#include "common/mfc/afxwin.h"
 
-#include "common/mfc/mfc.h"
-
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
+
+CObject *CRuntimeClass::CreateObject() const {
+	return m_pfnCreateObject();
+}
+
+bool CRuntimeClass::IsDerivedFrom(const CRuntimeClass *pBaseClass) const {
+	assert(pBaseClass != nullptr);
+
+	for (const CRuntimeClass *rtClass = this;
+			rtClass; rtClass = rtClass->m_pBaseClass) {
+		if (rtClass == pBaseClass)
+			return true;
+	}
+
+	return false;
+}
+
 } // namespace MFC
-
-} // namespace Bagel
-
-#endif
+} // namespace Common

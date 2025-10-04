@@ -22,8 +22,8 @@
 #ifndef HODJNPODJ_HNPLIBS_MAINMENU_H
 #define HODJNPODJ_HNPLIBS_MAINMENU_H
 
-#include "bagel/mfc/afxwin.h"
-#include "bagel/mfc/afxext.h"
+#include "common/mfc/afxwin.h"
+#include "common/mfc/afxext.h"
 #include "bagel/hodjnpodj/hnplibs/button.h"
 #include "bagel/hodjnpodj/hnplibs/dibdoc.h"
 #include "bagel/hodjnpodj/hnplibs/cbofdlg.h"

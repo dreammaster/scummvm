@@ -19,19 +19,25 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#include "common/textconsole.h"
+#include "common/mfc/afxwin.h"
 
-#include "common/mfc/mfc.h"
-
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
+
+IMPLEMENT_DYNAMIC(CPaintDC, CDC)
+
+CPaintDC::CPaintDC(CWnd *pWnd) {
+	m_hWnd = pWnd->m_hWnd;
+
+	if (!Attach(MFC::BeginPaint(m_hWnd, &m_ps)))
+		error("Could not attach to window");
+}
+
+CPaintDC::~CPaintDC() {
+	MFC::EndPaint(m_hWnd, &m_ps);
+	Detach();
+}
+
 } // namespace MFC
-
-} // namespace Bagel
-
-#endif
+} // namespace Common

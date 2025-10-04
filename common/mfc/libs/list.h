@@ -19,19 +19,29 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#ifndef COMMON_MFC_LIBS_LIST_H
+#define COMMON_MFC_LIBS_LIST_H
 
-#include "common/mfc/mfc.h"
+#include "common/list.h"
 
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
-} // namespace MFC
+namespace Libs {
 
-} // namespace Bagel
+template<class T>
+class List : public Common::List<T> {
+public:
+	bool contains(const T &tmp) const {
+		for (auto it = this->begin(); it != this->end(); ++it) {
+			if (*it == tmp)
+				return true;
+		}
+		return false;
+	}
+};
+
+} // namespace Libs
+} // namespace MFC
+} // namespace Common
 
 #endif

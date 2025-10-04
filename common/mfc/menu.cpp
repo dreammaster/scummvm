@@ -19,19 +19,42 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#include "common/textconsole.h"
+#include "common/mfc/afxwin.h"
 
-#include "common/mfc/mfc.h"
-
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
+
+CMenu::CMenu() {
+}
+
+bool CMenu::CreateMenu() {
+	error("TODO: CMenu::CreateMenu");
+}
+bool CMenu::CreatePopupMenu() {
+	error("TODO: CMenu::CreatePopupMenu");
+}
+bool CMenu::LoadMenu(const char *lpszResourceName) {
+	error("TODO: CMenu::LoadMenu");
+}
+bool CMenu::LoadMenu(unsigned int nIDResource) {
+	error("TODO: CMenu::LoadMenu");
+}
+bool CMenu::LoadMenuIndirect(const void *lpMenuTemplate) {
+	error("TODO: CMenu::LoadMenuIndirect");
+}
+bool CMenu::DestroyMenu() {
+	error("TODO: CMenu::DestroyMenu");
+}
+
+CMenu *CMenu::FromHandle(HMENU hMenu) {
+	error("TODO: CMenu::FromHandle");
+}
+
+unsigned int CMenu::CheckMenuItem(unsigned int nIDCheckItem, unsigned int nCheck) {
+	error("TODO: CMenu::CheckMenuItem");
+}
+
+
 } // namespace MFC
-
-} // namespace Bagel
-
-#endif
+} // namespace Common

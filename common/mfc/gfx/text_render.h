@@ -19,19 +19,37 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#ifndef COMMON_MFC_GFX_TEXT_RENDER_H
+#define COMMON_MFC_GFX_TEXT_RENDER_H
 
-#include "common/mfc/mfc.h"
+#include "common/str-array.h"
+#include "graphics/font.h"
+#include "common/mfc/gfx/surface.h"
+#include "common/mfc/minwindef.h"
+#include "common/mfc/atltypes.h"
+#include "common/mfc/wingdi.h"
 
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
-} // namespace MFC
+namespace Gfx {
 
-} // namespace Bagel
+class TextRender {
+protected:
+	CSize renderText(const Common::String &str,
+		Gfx::Surface *dest, Graphics::Font *font,
+		uint textCol, LPCRECT lpRect, unsigned int nFormat,
+		const Common::Array<int> &tabStops,
+		int nTabOrigin, uint bkColor, int bkMode,
+		uint textColor, uint textAlign);
+
+	void wordWrapText(Graphics::Font *font, const Common::String &str,
+		const Common::Array<int> tabStops,
+		int maxWidth, Common::StringArray &lines);
+	int getStringWidth(Graphics::Font *font, const Common::String &str);
+};
+
+} // namespace Gfx
+} // namespace MFC
+} // namespace Common
 
 #endif

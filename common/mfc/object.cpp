@@ -19,19 +19,31 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
-
 #include "common/mfc/mfc.h"
 
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
+
+const CRuntimeClass CObject::classCObject = {
+	"CObject", sizeof(CObject), 0xFFFF,	// class name, size, schema
+	nullptr,							// (null if DECLARE_DYNAMIC only)
+	nullptr								// pointer to base class's CRuntimeClass
+};
+
+CObject::CObject() {
+}
+
+CObject::~CObject() {
+}
+
+const CRuntimeClass *CObject::GetRuntimeClass() const {
+	return &CObject::classCObject;
+}
+
+bool CObject::IsKindOf(const CRuntimeClass *pClass) const {
+	const CRuntimeClass *pClassThis = GetRuntimeClass();
+	return pClassThis->IsDerivedFrom(pClass);
+}
+
 } // namespace MFC
-
-} // namespace Bagel
-
-#endif
+} // namespace Common

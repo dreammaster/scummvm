@@ -19,19 +19,29 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#ifndef COMMON_MFC_GFX_BLITTER_H
+#define COMMON_MFC_GFX_BLITTER_H
 
-#include "common/mfc/mfc.h"
+#include "common/mfc/gfx/surface.h"
 
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
-} // namespace MFC
+namespace Gfx {
 
-} // namespace Bagel
+extern void blit(Gfx::Surface *src, Gfx::Surface *dest,
+	const Common::Rect &srcRect, const Common::Point &destPos,
+	uint bgColor, int mode);
+
+extern void stretchBlit(Gfx::Surface *src, Gfx::Surface *dest,
+	const Common::Rect &srcRect,
+	const Common::Rect &destRect,
+	uint bgColor, int mode);
+
+extern void frameRect(Gfx::Surface *dest,
+	const Common::Rect &r, byte color, int drawMode);
+
+} // namespace Gfx
+} // namespace MFC
+} // namespace Common
 
 #endif

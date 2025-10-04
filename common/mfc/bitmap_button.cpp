@@ -19,19 +19,19 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#include "common/textconsole.h"
+#include "common/mfc/afxext.h"
 
-#include "common/mfc/mfc.h"
-
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
+
+IMPLEMENT_DYNAMIC(CBitmapButton, CButton)
+BEGIN_MESSAGE_MAP(CBitmapButton, CButton)
+END_MESSAGE_MAP()
+
+void CBitmapButton::SizeToContent() {
+	error("TODO: CBitmapButton::SizeToContent");
+}
+
 } // namespace MFC
-
-} // namespace Bagel
-
-#endif
+} // namespace Common

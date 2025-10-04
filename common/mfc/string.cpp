@@ -19,19 +19,22 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#include "common/textconsole.h"
+#include "common/mfc/afxstr.h"
+#include "common/mfc/global_functions.h"
 
-#include "common/mfc/mfc.h"
-
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
+
+bool CString::LoadString(unsigned int nID) {
+	char szTemp[256];
+	int nLen = MFC::LoadString(AfxGetInstanceHandle(), nID, szTemp, sizeof(szTemp));
+	if (nLen == 0)
+		return false;
+
+	*this = szTemp;
+	return true;
+}
+
 } // namespace MFC
-
-} // namespace Bagel
-
-#endif
+} // namespace Common

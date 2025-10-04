@@ -19,19 +19,21 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#include "common/textconsole.h"
+#include "common/mfc/afxwin.h"
 
-#include "common/mfc/mfc.h"
-
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
+
+CPen::CPen(int nPenStyle, int nWidth, COLORREF crColor) {
+	CreatePen(nPenStyle, nWidth, crColor);
+}
+
+bool CPen::CreatePen(int nPenStyle, int nWidth, COLORREF crColor) {
+	m_hObject = new Impl(nPenStyle, nWidth, crColor);
+	AfxHookObject();
+	return true;
+}
+
 } // namespace MFC
-
-} // namespace Bagel
-
-#endif
+} // namespace Common

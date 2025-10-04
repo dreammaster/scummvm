@@ -19,19 +19,33 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#ifndef COMMON_MFC_GFX_PALETTE_MAP_H
+#define COMMON_MFC_GFX_PALETTE_MAP_H
 
-#include "common/mfc/mfc.h"
+#include "graphics/palette.h"
 
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
-} // namespace MFC
+namespace Gfx {
 
-} // namespace Bagel
+/**
+ * Simple wrapper over Graphics::PaletteLookup
+ */
+class PaletteMap {
+private:
+	uint32 *_map;
+	size_t _srcPalCount;
+
+public:
+	PaletteMap(const Graphics::Palette &src,
+		const Graphics::Palette &dest);
+	~PaletteMap();
+
+	void map(const byte *src, byte *dest, size_t len);
+};
+
+} // namespace Gfx
+} // namespace MFC
+} // namespace Common
 
 #endif

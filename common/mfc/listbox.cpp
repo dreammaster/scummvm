@@ -19,19 +19,15 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#include "common/textconsole.h"
+#include "common/mfc/afxwin.h"
 
-#include "common/mfc/mfc.h"
-
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
+
+IMPLEMENT_DYNAMIC(CListBox, CWnd)
+BEGIN_MESSAGE_MAP(CListBox, CWnd)
+END_MESSAGE_MAP()
+
 } // namespace MFC
-
-} // namespace Bagel
-
-#endif
+} // namespace Common

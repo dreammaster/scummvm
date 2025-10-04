@@ -19,19 +19,22 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#ifndef COMMON_MFC_MFC_H
+#define COMMON_MFC_MFC_H
 
-#include "common/mfc/mfc.h"
-
-namespace Bagel {
-
-using namespace Common::MFC;
-
-namespace MFC {
-using namespace Common::MFC;
-} // namespace MFC
-
-} // namespace Bagel
+#include "common/mfc/minwindef.h"
+#include "common/mfc/winnt.h"
+#include "common/mfc/wingdi.h"
+#include "common/mfc/atltime.h"
+#include "common/mfc/atltypes.h"
+#include "common/mfc/afx.h"
+#include "common/mfc/afxwin.h"
+#include "common/mfc/afxmsg.h"
+#include "common/mfc/afxext.h"
+#include "common/mfc/afxres.h"
+#include "common/mfc/global_functions.h"
+#include "common/mfc/ifstream.h"
+#include "common/mfc/joystickapi.h"
+#include "common/mfc/keyboard.h"
 
 #endif

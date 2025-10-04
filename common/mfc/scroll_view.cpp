@@ -19,19 +19,22 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#include "common/textconsole.h"
+#include "common/mfc/afxwin.h"
 
-#include "common/mfc/mfc.h"
-
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
+
+IMPLEMENT_DYNAMIC(CScrollView, CView)
+BEGIN_MESSAGE_MAP(CScrollView, CView)
+END_MESSAGE_MAP()
+
+const SIZE CScrollView::sizeNull = { 0, 0 };
+
+void CScrollView::SetScrollSizes(int nMapMode, SIZE sizeTotal,
+                                 const SIZE &sizePage, const SIZE &sizeLine) {
+	error("TODO: CScrollView::SetScrollSizes");
+}
+
 } // namespace MFC
-
-} // namespace Bagel
-
-#endif
+} // namespace Common

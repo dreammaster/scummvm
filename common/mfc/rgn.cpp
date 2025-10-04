@@ -19,19 +19,31 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#include "common/textconsole.h"
+#include "common/mfc/afxwin.h"
 
-#include "common/mfc/mfc.h"
-
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
+
+bool CRgn::CreateRectRgn(int x1, int y1, int x2, int y2) {
+	_rect = Common::Rect(x1, y1, x2, y2);
+	return true;
+}
+
+bool CRgn::CreateRectRgnIndirect(LPCRECT lpRect) {
+	_rect = Common::Rect(lpRect->left, lpRect->top,
+	                     lpRect->right, lpRect->bottom);
+	return true;
+}
+
+bool CRgn::CreatePolygonRgn(const POINT *lpPoints,
+                            int nCount, int nPolyFillMode) {
+	for (; nCount > 0; ++lpPoints, --nCount)
+		_points.push_back(*lpPoints);
+
+	_polyFillMode = nPolyFillMode;
+	return true;
+}
+
 } // namespace MFC
-
-} // namespace Bagel
-
-#endif
+} // namespace Common

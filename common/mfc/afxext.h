@@ -19,19 +19,34 @@
  *
  */
 
-#ifndef BAGEL_AFXWIN_H
-#define BAGEL_AFXWIN_H
+#ifndef COMMON_MFC_AFXEXT_H
+#define COMMON_MFC_AFXEXT_H
 
-#include "common/mfc/mfc.h"
+#include "common/mfc/afxwin.h"
 
-namespace Bagel {
-
-using namespace Common::MFC;
-
+namespace Common {
 namespace MFC {
-using namespace Common::MFC;
-} // namespace MFC
 
-} // namespace Bagel
+class CBitmapButton : public CButton {
+	DECLARE_DYNAMIC(CBitmapButton)
+
+protected:
+	DECLARE_MESSAGE_MAP()
+
+public:
+	CBitmap m_bitmap;           // normal image (REQUIRED)
+	CBitmap m_bitmapSel;        // selected image (OPTIONAL)
+	CBitmap m_bitmapFocus;      // focused but not selected (OPTIONAL)
+	CBitmap m_bitmapDisabled;   // disabled bitmap (OPTIONAL)
+
+public:
+	~CBitmapButton() override {
+	}
+
+	void SizeToContent();
+};
+
+} // namespace MFC
+} // namespace Common
 
 #endif
