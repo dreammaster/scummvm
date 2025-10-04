@@ -20,20 +20,53 @@
  */
 
 #include "spycraft/spycraft.h"
-#include "graphics/framelimiter.h"
+#include "spycraft/afxwin.h"
+#include "spycraft/advmain.h"
+#include "spycraft/advmisc.h"
+#include "spycraft/advmovie.h"
+#include "spycraft/advrect.h"
+#include "spycraft/advscreen.h"
+#include "spycraft/advsound.h"
+#include "spycraft/advsprite.h"
+#include "spycraft/advtime.h"
 #include "spycraft/detection.h"
 #include "spycraft/console.h"
-#include "common/scummsys.h"
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
-#include "common/events.h"
 #include "common/system.h"
 #include "engines/util.h"
-#include "graphics/paletteman.h"
 
 namespace Spycraft {
 
 SpycraftEngine *g_engine;
+extern	int screen_width;
+extern	int screen_height;
+extern HDC hGameDC;
+
+#define APP_NAME        "Spycraft"
+
+#define GAME_WIDTH      512
+#define GAME_HEIGHT     480
+
+//	Instance, Window handles, and DC's used throughout program
+HWND hGameWnd;
+HINSTANCE hInst;
+
+// variables for responding to user's request to quit
+bool UserWantsToQuit = false;
+const char *szAppName = APP_NAME;
+int offsetX = 0;
+int offsetY = 0;
+int window_right;
+int window_bottom;
+int surfaceOK = false;
+MADEEventStamp event;
+
+constexpr HINSTANCE hInstance = nullptr;
+static bool posted = false;
+static bool appActive = false;
+static unsigned yct = 0;
+static SRect screenRect = { 0, 0, 511, 479, 512, 480 };
 
 SpycraftEngine::SpycraftEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Spycraft") {
@@ -65,32 +98,76 @@ Common::Error SpycraftEngine::run() {
 	if (saveSlot != -1)
 		(void)loadGameState(saveSlot);
 
-	// Draw a series of boxes on screen as a sample
-	for (int i = 0; i < 100; ++i)
-		_screen->frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
-	_screen->update();
+	screen_width = GAME_WIDTH;
+	screen_height = GAME_HEIGHT;
 
-	// Simple event handling loop
-	byte pal[256 * 3] = { 0 };
-	Common::Event e;
-	int offset = 0;
+	sfxSetGameDimensions(GAME_WIDTH, GAME_HEIGHT, 356);
+	offsetX = screen_width / 2 - GAME_WIDTH / 2;
+	offsetY = screen_height / 2 - GAME_HEIGHT / 2;
+	window_right = offsetX + GAME_WIDTH;
+	window_bottom = offsetY + GAME_HEIGHT;
 
-	Graphics::FrameLimiter limiter(g_system, 60);
+	hGameWnd = CreateWindow(szAppName,
+		szAppName,
+		WS_POPUP,
+		0,               // x
+		0,               // y
+		GetSystemMetrics(SM_CXSCREEN),   // width
+		GetSystemMetrics(SM_CYSCREEN),   // height
+		nullptr,            // parent
+		nullptr,            // child window id
+		hInstance,       // process instance
+		nullptr);
+	assert(hGameWnd);
+
+	ShowWindow(hGameWnd, SW_SHOWNORMAL);
+	UpdateWindow(hGameWnd);
+
+	/* SETUP THE GAME */
+	hGameDC = GetDC(hGameWnd);
+	sfxSetCacheSize(RES_ATS, 24);
+
+	sfxInitMADE();
+
+	/* instantiates C++ class object for script */
+	StartScript();
+
+	MSG msg;
 	while (!shouldQuit()) {
-		while (g_system->getEventManager()->pollEvent(e)) {
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+			if (msg.message == WM_QUIT)
+				break;
+			else {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 		}
+		if (UserWantsToQuit) {
+			if (!posted) {
+				PostMessage(hGameWnd, WM_CLOSE, 0, 0);
+				posted = true;
+			}
+		} else if (appActive) {
+			//snSystemIdle();
 
-		// Cycle through a simple palette
-		++offset;
-		for (int i = 0; i < 256; ++i)
-			pal[i * 3 + 1] = (i + offset) % 256;
-		g_system->getPaletteManager()->setPalette(pal, 0, 256);
-		// Delay for a bit. All events loops should have a delay
-		// to prevent the system being unduly loaded
-		limiter.delayBeforeSwap();
-		_screen->update();
-		limiter.startFrame();
+			/* UPDATE MADE */
+			if (curBack != -1) {
+				sfxReleaseSprites(backgrounds[curBack]);
+				sfxUpdate();
+			}
+
+			UpdateSound();
+
+			if (((yct++) % 8) == 0)
+				UpdateMovie();
+
+			/* UPDATE FRAMEWORK */
+			event.clock_lo = sfxGetTime();
+			OnIdle((MADEEventStamp *)&event);
+		}
 	}
+
+	sfxCleanMADE();
 
 	return Common::kNoError;
 }

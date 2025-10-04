@@ -121,6 +121,11 @@ extern Common::SeekableReadStream *OpenFile(const char *filename);
 extern bool FileExists(const char *filename);
 extern long FileLength(const char *filename);
 
+extern HWND CreateWindow(const char *lpClassName, const char *lpWindowName,
+	uint32 dwStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent,
+	HMENU hMenu, HINSTANCE hInstance, void *lpParam);
+extern void ShowWindow(HWND hWnd, int nCmdShow);
+extern void UpdateWindow(HWND hWnd);
 extern bool PeekMessage(LPMSG lpMsg, HWND hWnd,
                         unsigned int wMsgFilterMin, unsigned int wMsgFilterMax,
                         unsigned int wRemoveMsg);
