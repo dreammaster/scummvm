@@ -20,11 +20,11 @@
  */
 
 #include "spycraft/ats.h"
-#include "spycraft/adverror.h"
-#include "spycraft/advlib.h"
-#include "spycraft/advdcmp.h"
-#include "spycraft/advfile.h"
-#include "spycraft/advsprite.h"
+#include "spycraft/adv/adverror.h"
+#include "spycraft/adv/advlib.h"
+#include "spycraft/adv/advdcmp.h"
+#include "spycraft/adv/advfile.h"
+#include "spycraft/adv/advsprite.h"
 
 namespace Spycraft {
 

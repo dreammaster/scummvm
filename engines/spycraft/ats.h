@@ -23,8 +23,8 @@
 #define SPYCRAFT_ATS_H
 
 #include "common/stream.h"
-#include "spycraft/advport.h"
-#include "spycraft/advdcmp.h"
+#include "spycraft/adv/advport.h"
+#include "spycraft/adv/advdcmp.h"
 
 namespace Spycraft {
 

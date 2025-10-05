@@ -4,17 +4,17 @@ MODULE_OBJS = \
 	spycraft.o \
 	console.o \
 	metaengine.o \
-	advback.o \
-	advbits.o \
-	advdcmp.o \
-	advlist.o \
-	advmem.o \
-	advport.o \
-	advrect.o \
-	advres.o \
-	advsfx.o \
-	advsprite.o \
-	advtime.o \
+	adv/advback.o \
+	adv/advbits.o \
+	adv/advdcmp.o \
+	adv/advlist.o \
+	adv/advmem.o \
+	adv/advport.o \
+	adv/advrect.o \
+	adv/advres.o \
+	adv/advsfx.o \
+	adv/advsprite.o \
+	adv/advtime.o \
 	ats.o
 
 # This module can be built as a plugin

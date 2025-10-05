@@ -21,21 +21,21 @@
 
 #if 0
 #include "common/str.h"
-#include "spycraft/advlib.h"
-#include "spycraft/advmain.h"
-#include "spycraft/advres.h"
-#include "spycraft/advscreen.h"
-#include "spycraft/advmsg.h"
+#include "spycraft/adv/advlib.h"
+#include "spycraft/adv/advmain.h"
+#include "spycraft/adv/advres.h"
+#include "spycraft/adv/advscreen.h"
+#include "spycraft/adv/advmsg.h"
 #include "spycraft/tgapic.h"
 #include "spycraft/ats.h"
-#include "spycraft/advsound.h"
-#include "spycraft/advmusic.h"
-#include "spycraft/advmem.h"
-#include "spycraft/advvols.h"
-#include "spycraft/advini.h"
-#include "spycraft/advtime.h"
+#include "spycraft/adv/advsound.h"
+#include "spycraft/adv/advmusic.h"
+#include "spycraft/adv/advmem.h"
+#include "spycraft/adv/advvols.h"
+#include "spycraft/adv/advini.h"
+#include "spycraft/adv/advtime.h"
 #include "spycraft/pkware.h"
-#include "spycraft/advdcmp.h"
+#include "spycraft/adv/advdcmp.h"
 
 namespace Spycraft {
 
