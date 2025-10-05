@@ -22,7 +22,7 @@
 #ifndef SPYCRAFT_ADVBITS_H
 #define SPYCRAFT_ADVBITS_H
 
-#include "spycraft/advsprite.h"
+#include "spycraft/adv/advsprite.h"
 
 namespace Spycraft {
 

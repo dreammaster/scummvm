@@ -22,7 +22,7 @@
 #ifndef SPYCRAFT_ADVRES_H
 #define SPYCRAFT_ADVRES_H
 
-#include "spycraft/advlist.h"
+#include "spycraft/adv/advlist.h"
 #include "spycraft/ats.h"
 
 namespace Spycraft {

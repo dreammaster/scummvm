@@ -19,29 +19,52 @@
  *
  */
 
-#include "spycraft/advlib.h"
-#include "spycraft/advdebug.h"
-#include "spycraft/advport.h"
-#include "spycraft/advscreen.h"
-#include "spycraft/advback.h"
-#include "spycraft/advrect.h"
-#include "spycraft/advbits.h"
-#include "spycraft/advscreen.h"
-#include "spycraft/advtime.h"
+#include "common/system.h"
+#include "spycraft/adv/advlib.h"
+#include "spycraft/adv/advtime.h"
 
 namespace Spycraft {
 
-#define numColors 256
+#define InitTimeMD()
+#define CleanTimeMD()
 
-/* this should be declared in advback.h */
-extern Viewport *SparePort;
+struct MADETime {
+	uint oldTime = 0;
+	uint offset = 0;
+	uint startTime = 0;
+	int overflow = 0;
+};
 
-void DoFlip(Background *from, Background *to) {
-	SRect rect;
+static MADETime madeTime;
 
-	SRect_Init(&rect, 0, 0, scene_width - 1, scene_height - 1);
-	DrawBits(to->animPort, to->backPort, &rect);
+void InitTime(void) {
+	uint t;
 
+	InitTimeMD();
+	t = g_system->getMillis();
+	madeTime.startTime = t;
+	madeTime.offset = 0xffffffff - t;
+	madeTime.oldTime = t;
+	madeTime.overflow = false;
+}
+
+void CleanTime(void) {
+	CleanTimeMD();
+}
+
+uint sfxGetTime() {
+	uint t = g_system->getMillis();
+
+	if (t < madeTime.oldTime) {
+		madeTime.overflow = true;
+	}
+	if (madeTime.overflow) {
+		madeTime.oldTime = t + madeTime.offset;
+	} else {
+		madeTime.oldTime = t - madeTime.startTime;
+	}
+
+	return madeTime.oldTime;
 }
 
 } // namespace Spycraft

@@ -20,10 +20,10 @@
  */
 
 #include "common/textconsole.h"
-#include "spycraft/advlib.h"
-#include "spycraft/advbits.h"
-#include "spycraft/advrect.h"
-#include "spycraft/advport.h"
+#include "spycraft/adv/advlib.h"
+#include "spycraft/adv/advbits.h"
+#include "spycraft/adv/advrect.h"
+#include "spycraft/adv/advport.h"
 
 namespace Spycraft {
 

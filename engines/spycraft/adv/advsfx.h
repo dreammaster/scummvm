@@ -22,7 +22,7 @@
 #ifndef SPYCRAFT_ADVSFX_H
 #define SPYCRAFT_ADVSFX_H
 
-#include "spycraft/advback.h"
+#include "spycraft/adv/advback.h"
 
 namespace Spycraft {
 

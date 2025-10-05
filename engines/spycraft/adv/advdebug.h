@@ -19,52 +19,33 @@
  *
  */
 
-#include "common/system.h"
-#include "spycraft/advlib.h"
-#include "spycraft/advtime.h"
+#ifndef SPYCRAFT_ADVDEBUG_H
+#define SPYCRAFT_ADVDEBUG_H
+
+#include "spycraft/adv/adverror.h"
 
 namespace Spycraft {
 
-#define InitTimeMD()
-#define CleanTimeMD()
+//	Function:	sfxPrintf
+//
+//	Purpose:	outputs formatted information
+//
+//	Parameters:	same as printf
+//
+//	Returns:	same as printf
 
-struct MADETime {
-	uint oldTime = 0;
-	uint offset = 0;
-	uint startTime = 0;
-	int overflow = 0;
-};
+int sfxPrintf(const char *format, ...);
 
-static MADETime madeTime;
+/* MADE Internal */
 
-void InitTime(void) {
-	uint t;
-
-	InitTimeMD();
-	t = g_system->getMillis();
-	madeTime.startTime = t;
-	madeTime.offset = 0xffffffff - t;
-	madeTime.oldTime = t;
-	madeTime.overflow = false;
-}
-
-void CleanTime(void) {
-	CleanTimeMD();
-}
-
-uint sfxGetTime() {
-	uint t = g_system->getMillis();
-
-	if (t < madeTime.oldTime) {
-		madeTime.overflow = true;
-	}
-	if (madeTime.overflow) {
-		madeTime.oldTime = t + madeTime.offset;
-	} else {
-		madeTime.oldTime = t - madeTime.startTime;
-	}
-
-	return madeTime.oldTime;
-}
+extern void pAssert(int, const char *, int);
+extern void dbgmsg(const char *sz, ...);
+extern void ErrMsg(const char *sz, ...);
+extern void ShowMon(void);
+extern void MonoOut(const char *format, ...);
+extern void KillMono(void);
+extern int AlertMsg(const char *title, char *sz, ...);
 
 } // namespace Spycraft
+
+#endif

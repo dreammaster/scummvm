@@ -19,33 +19,42 @@
  *
  */
 
-#ifndef SPYCRAFT_ADVDEBUG_H
-#define SPYCRAFT_ADVDEBUG_H
-
-#include "spycraft/adverror.h"
+#include "spycraft/adv/advlib.h"
+#include "spycraft/adv/advport.h"
 
 namespace Spycraft {
 
-//	Function:	sfxPrintf
-//
-//	Purpose:	outputs formatted information
-//
-//	Parameters:	same as printf
-//
-//	Returns:	same as printf
+Viewport *AllocPort(int width, int height, int colors) {
+	Viewport *port;
+	int rowBytes;
 
-int sfxPrintf(const char *format, ...);
+	port = (Viewport *)AllocPtr(sizeof(Viewport));
+	if (port == NULL)
+		return NULL;
 
-/* MADE Internal */
+	rowBytes = width;
+	if (colors == 16)
+		rowBytes *= 2;
+	port->width = width;
+	port->height = height;
+	port->colors = colors;
+	port->rowBytes = (uint16)rowBytes;
+	port->origX = 0;
+	port->origY = 0;
+	port->ptr = AllocPtr(rowBytes * height);
+	if (port->ptr == NULL) {
+		FreePtr(port);
+		return NULL;
+	}
 
-extern void pAssert(int, const char *, int);
-extern void dbgmsg(const char *sz, ...);
-extern void ErrMsg(const char *sz, ...);
-extern void ShowMon(void);
-extern void MonoOut(const char *format, ...);
-extern void KillMono(void);
-extern int AlertMsg(const char *title, char *sz, ...);
+	return port;
+}
+
+void FreePort(Viewport *port) {
+	if (port->ptr != NULL)
+		FreePtr(port->ptr);
+
+	FreePtr(port);
+}
 
 } // namespace Spycraft
-
-#endif

@@ -19,8 +19,8 @@
  *
  */
 
-#include "spycraft/advlib.h"
-#include "spycraft/advlist.h"
+#include "spycraft/adv/advlib.h"
+#include "spycraft/adv/advlist.h"
 
 namespace Spycraft {
 

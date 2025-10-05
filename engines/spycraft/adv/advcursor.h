@@ -22,8 +22,8 @@
 #ifndef SPYCRAFT_ADVCURSOR_H
 #define SPYCRAFT_ADVCURSOR_H
 
-#include "spycraft/advlib.h"
-#include "spycraft/adverror.h"
+#include "spycraft/adv/advlib.h"
+#include "spycraft/adv/adverror.h"
 
 namespace Spycraft {
 
