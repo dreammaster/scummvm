@@ -19,17 +19,17 @@
  *
  */
 
-#include "spycraft/advlib.h"
-#include "spycraft/advscreen.h"
-#include "spycraft/advback.h"
-#include "spycraft/adverror.h"
-#include "spycraft/advport.h"
-#include "spycraft/advsprite.h"
-#include "spycraft/advbits.h"
-#include "spycraft/advlist.h"
-#include "spycraft/advsfx.h"
-#include "spycraft/advcursor.h"
-#include "spycraft/advtext.h"
+#include "spycraft/adv/advlib.h"
+#include "spycraft/adv/advscreen.h"
+#include "spycraft/adv/advback.h"
+#include "spycraft/adv/adverror.h"
+#include "spycraft/adv/advport.h"
+#include "spycraft/adv/advsprite.h"
+#include "spycraft/adv/advbits.h"
+#include "spycraft/adv/advlist.h"
+#include "spycraft/adv/advsfx.h"
+#include "spycraft/adv/advcursor.h"
+#include "spycraft/adv/advtext.h"
 
 namespace Spycraft {
 

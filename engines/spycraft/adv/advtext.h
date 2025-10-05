@@ -22,9 +22,9 @@
 #ifndef SPYCRAFT_ADVTEXT_H
 #define SPYCRAFT_ADVTEXT_H
 
-#include "spycraft/advback.h"
-#include "spycraft/advsprite.h"
-#include "spycraft/advres.h"
+#include "spycraft/adv/advback.h"
+#include "spycraft/adv/advsprite.h"
+#include "spycraft/adv/advres.h"
 
 namespace Spycraft {
 

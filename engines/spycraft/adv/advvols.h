@@ -22,7 +22,7 @@
 #ifndef SPYCRAFT_ADVVOLS_H
 #define SPYCRAFT_ADVVOLS_H
 
-#include "spycraft/advlib.h"
+#include "spycraft/adv/advlib.h"
 
 namespace Spycraft {
 

@@ -22,7 +22,7 @@
 #ifndef SPYCRAFT_ADVMUSIC_H
 #define SPYCRAFT_ADVMUSIC_H
 
-#include "spycraft/advlib.h"
+#include "spycraft/adv/advlib.h"
 
 namespace Spycraft {
 

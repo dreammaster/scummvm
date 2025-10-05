@@ -22,10 +22,10 @@
 #include "common/algorithm.h"
 #include "common/stream.h"
 //include "common/compression/unzip.h"
-#include "spycraft/advlib.h"
-#include "spycraft/advdcmp.h"
-#include "spycraft/advfile.h"
-#include "spycraft/advvols.h"
+#include "spycraft/adv/advlib.h"
+#include "spycraft/adv/advdcmp.h"
+#include "spycraft/adv/advfile.h"
+#include "spycraft/adv/advvols.h"
 
 namespace Spycraft {
 

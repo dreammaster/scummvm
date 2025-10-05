@@ -23,10 +23,10 @@
 #define SPYCRAFT_ADVLIB_H
 
 #include "common/scummsys.h"
-#include "spycraft/advcompat.h"
-#include "spycraft/advdebug.h"
-#include "spycraft/adverror.h"
-#include "spycraft/advmem.h"
+#include "spycraft/adv/advcompat.h"
+#include "spycraft/adv/advdebug.h"
+#include "spycraft/adv/adverror.h"
+#include "spycraft/adv/advmem.h"
 
 namespace Spycraft {
 

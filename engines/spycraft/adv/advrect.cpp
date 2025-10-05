@@ -19,7 +19,7 @@
  *
  */
 
-#include "spycraft/advrect.h"
+#include "spycraft/adv/advrect.h"
 
 namespace Spycraft {
 

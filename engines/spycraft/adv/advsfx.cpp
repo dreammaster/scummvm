@@ -19,9 +19,29 @@
  *
  */
 
-#include "spycraft/advport.h"
-#include "spycraft/afxwin.h"
+#include "spycraft/adv/advlib.h"
+#include "spycraft/adv/advdebug.h"
+#include "spycraft/adv/advport.h"
+#include "spycraft/adv/advscreen.h"
+#include "spycraft/adv/advback.h"
+#include "spycraft/adv/advrect.h"
+#include "spycraft/adv/advbits.h"
+#include "spycraft/adv/advscreen.h"
+#include "spycraft/adv/advtime.h"
 
 namespace Spycraft {
+
+#define numColors 256
+
+/* this should be declared in advback.h */
+extern Viewport *SparePort;
+
+void DoFlip(Background *from, Background *to) {
+	SRect rect;
+
+	SRect_Init(&rect, 0, 0, scene_width - 1, scene_height - 1);
+	DrawBits(to->animPort, to->backPort, &rect);
+
+}
 
 } // namespace Spycraft
