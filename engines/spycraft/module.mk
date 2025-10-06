@@ -15,6 +15,7 @@ MODULE_OBJS = \
 	adv/advsfx.o \
 	adv/advsprite.o \
 	adv/advtime.o \
+	game/dispatch.o \
 	ats.o
 
 # This module can be built as a plugin
