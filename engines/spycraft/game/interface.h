@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SPYCRAFT_ADVBITS_H
-#define SPYCRAFT_ADVBITS_H
+#ifndef SPYCRAFT_DMADE_ADVBITS_H
+#define SPYCRAFT_DMADE_ADVBITS_H
 
 #include "spycraft/game/actor.h"
 #include "spycraft/game/list.h"

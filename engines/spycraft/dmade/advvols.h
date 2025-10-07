@@ -19,20 +19,45 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
+#ifndef SPYCRAFT_DMADE_ADVVOLS_H
+#define SPYCRAFT_DMADE_ADVVOLS_H
 
 #include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+
+namespace Spycraft {
+
+#define MAX_BUFFER_SIZE		1024
+#define MAX_DISC_LIMIT		32
+#define MAX_STREAM_LIMIT	2100
+#define MAX_VOLS_FILE		4096
+
+enum {
+	VOLS_COMMENT,
+	VOLS_SIZE,
+	VOLS_DISC,
+	VOLS_PATH,
+	VOLS_LINE
+};
+
+enum {
+	COMPRESS_NONE,
+	COMPRESS_PKWARE,
+	COMPRESS_ZLIB,
+	COMPRESS_HARC
+};
+
+struct FileChunk {
+	int vid;
+	int offset;
+	unsigned char compressor;
+	unsigned char location;		/* WHICH CD IS ON */
+};
+
+extern int MakeVolsID(int vid, int type);
+extern void GetVolsID(int vid, int *id, int *type);
+extern void sfxMakeVols(char *src);
+extern int sfxGetFileLength(char *filename);
+
+} // namespace Spycraft
 
 #endif

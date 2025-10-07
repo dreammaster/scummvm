@@ -19,20 +19,33 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
+#ifndef SPYCRAFT_DMADE_ADVDEBUG_H
+#define SPYCRAFT_DMADE_ADVDEBUG_H
 
-#include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
 #include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+
+namespace Spycraft {
+
+//	Function:	sfxPrintf
+//
+//	Purpose:	outputs formatted information
+//
+//	Parameters:	same as printf
+//
+//	Returns:	same as printf
+
+int sfxPrintf(const char *format, ...);
+
+/* MADE Internal */
+
+extern void pAssert(int, const char *, int);
+extern void dbgmsg(const char *sz, ...);
+extern void ErrMsg(const char *sz, ...);
+extern void ShowMon(void);
+extern void MonoOut(const char *format, ...);
+extern void KillMono(void);
+extern int AlertMsg(const char *title, char *sz, ...);
+
+} // namespace Spycraft
 
 #endif

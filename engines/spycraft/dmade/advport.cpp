@@ -19,20 +19,42 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
-
 #include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+#include "spycraft/dmade/advport.h"
 
-#endif
+namespace Spycraft {
+
+Viewport *AllocPort(int width, int height, int colors) {
+	Viewport *port;
+	int rowBytes;
+
+	port = (Viewport *)AllocPtr(sizeof(Viewport));
+	if (port == NULL)
+		return NULL;
+
+	rowBytes = width;
+	if (colors == 16)
+		rowBytes *= 2;
+	port->width = width;
+	port->height = height;
+	port->colors = colors;
+	port->rowBytes = (uint16)rowBytes;
+	port->origX = 0;
+	port->origY = 0;
+	port->ptr = AllocPtr(rowBytes * height);
+	if (port->ptr == NULL) {
+		FreePtr(port);
+		return NULL;
+	}
+
+	return port;
+}
+
+void FreePort(Viewport *port) {
+	if (port->ptr != NULL)
+		FreePtr(port->ptr);
+
+	FreePtr(port);
+}
+
+} // namespace Spycraft

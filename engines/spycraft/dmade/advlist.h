@@ -19,20 +19,27 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
+#ifndef SPYCRAFT_DMADE_ADVLIST_H
+#define SPYCRAFT_DMADE_ADVLIST_H
 
-#include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+namespace Spycraft {
+
+#define DEF_ARRAY_SIZE		32
+
+struct ArrayList {
+	int limit;
+	int size;
+	void **elements;
+};
+
+extern ArrayList *ArrayList_Alloc(void);
+extern ArrayList *ArrayList_Calloc(int theLimit);
+extern void ArrayList_Free(ArrayList *list, void (*freeFn)(void *obj));
+extern void ArrayList_Add(ArrayList *list, void *obj, bool (*sort)(void *obj1, void *obj2));
+extern int ArrayList_Del(ArrayList *list, void *obj, void (*freeFn)(void *obj));
+extern int ArrayList_Unlink(ArrayList *list, void *obj);
+extern void ArrayList_Release(ArrayList *list);
+
+} // namespace Spycraft
 
 #endif

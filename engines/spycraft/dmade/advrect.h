@@ -19,20 +19,27 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
+#ifndef SPYCRAFT_DMADE_ADVRECT_H
+#define SPYCRAFT_DMADE_ADVRECT_H
 
-#include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+namespace Spycraft {
+
+struct SRect {
+	int top;
+	int left;
+	int bottom;
+	int right; 
+	int width;
+	int height;
+};
+
+extern int SRect_Intersects(const SRect *rect1, const SRect *rect2);
+extern int SRect_Contains(const SRect *rect1, const SRect *rect2);
+extern void SRect_Copy(SRect *dest, const SRect *src);
+extern void SRect_Union(const SRect *rect1, const SRect *rect2, SRect *out);
+extern void SRect_Init(SRect *rect, int l, int t, int r, int b);
+extern void SRect_GetIntersection(const SRect *r1, const SRect *r2, SRect *out);
+
+} // namespace Spycraft
 
 #endif

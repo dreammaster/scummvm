@@ -22,7 +22,7 @@
 #ifndef SPYCRAFT_GAME_DISPATCH_H
 #define SPYCRAFT_GAME_DISPATCH_H
 
-#include "spycraft/adv/advmain.h"
+#include "spycraft/dmade/advmain.h"
 
 namespace Spycraft {
 

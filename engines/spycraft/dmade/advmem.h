@@ -19,20 +19,38 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
+#ifndef SPYCRAFT_DMADE_ADVMEM_H
+#define SPYCRAFT_DMADE_ADVMEM_H
 
-#include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+namespace Spycraft {
+
+//	Function:	sfxKillBuffer
+//
+//	Purpose:	Release memory allocated by MADE.
+//
+//	Parameters:	buffer - a pointer to the buffer to be killed
+//
+//	Returns:	void
+
+extern void sfxKillBuffer(void *buffer);
+extern int sfxGetClientMem(void);
+extern int sfxGetFreeMem(void);
+
+extern void InitMem(void);
+extern void CleanMem(void);
+
+extern void *AllocPtrEx(int size);
+extern void FreePtrEx(void *ptr);
+extern void FreePtr(void *buffer);
+
+#define AllocPtr(size)  AllocPtrEx(size)
+#define FreePtr(ptr) FreePtrEx(ptr)
+
+extern long GetMemFree(void);
+extern void RegisterMem(long size);
+extern void UnregisterMem(long size);
+
+} // namespace Spycraft
 
 #endif
+
