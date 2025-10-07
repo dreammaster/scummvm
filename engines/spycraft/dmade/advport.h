@@ -19,20 +19,38 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
+#ifndef SPYCRAFT_DMADE_ADVPORT_H
+#define SPYCRAFT_DMADE_ADVPORT_H
 
-#include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+#include "common/scummsys.h"
+
+namespace Spycraft {
+
+/* MADE Internal */
+
+struct Viewport {
+	uint16	width;
+	uint16	height;
+	uint16	rowBytes;
+	int		skipColor;
+	int		origX;
+	int		origY;
+	uint16	colors;
+	void *ptr;
+};
+
+/*
+	Allocate a viewport with dimensions 'width' x 'height' and depth 'colors'
+*/
+extern Viewport *AllocPort(int width, int height, int colors);
+extern Viewport *AllocMDPort(int width, int height, int colors);
+
+/*
+	Free a viewport
+*/
+extern void FreePort(Viewport *port);
+extern void FreeMDPort(Viewport *port);
+
+} // namespace Spycraft
 
 #endif

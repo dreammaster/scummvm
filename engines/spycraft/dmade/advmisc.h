@@ -19,20 +19,29 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
+#ifndef SPYCRAFT_DMADE_ADVMISC_H
+#define SPYCRAFT_DMADE_ADVMISC_H
 
-#include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+namespace Spycraft {
+
+/* MADE External */
+
+/*
+	Let MADE initialize itself.
+*/
+extern void sfxInitMADE(void);
+
+/*
+	Let MADE clean up after itself.
+*/
+extern void sfxCleanMADE(void);
+
+/*
+	Let MADE keep everything going.  If release is FALSE
+	then don't release the sprites.
+*/
+extern void sfxUpdateMADE(int release);
+
+} // namespace Spycraft
 
 #endif

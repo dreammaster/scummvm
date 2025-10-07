@@ -19,20 +19,29 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
-
 #include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
 #include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+#include "spycraft/dmade/advport.h"
+#include "spycraft/dmade/advscreen.h"
+#include "spycraft/dmade/advback.h"
+#include "spycraft/dmade/advrect.h"
+#include "spycraft/dmade/advbits.h"
+#include "spycraft/dmade/advscreen.h"
+#include "spycraft/dmade/advtime.h"
 
-#endif
+namespace Spycraft {
+
+#define numColors 256
+
+/* this should be declared in advback.h */
+extern Viewport *SparePort;
+
+void DoFlip(Background *from, Background *to) {
+	SRect rect;
+
+	SRect_Init(&rect, 0, 0, scene_width - 1, scene_height - 1);
+	DrawBits(to->animPort, to->backPort, &rect);
+
+}
+
+} // namespace Spycraft
