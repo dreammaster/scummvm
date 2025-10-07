@@ -16,6 +16,7 @@ MODULE_OBJS = \
 	dmade/advsprite.o \
 	dmade/advtime.o \
 	game/dispatch.o \
+	game/list.o \
 	ats.o
 
 # This module can be built as a plugin
