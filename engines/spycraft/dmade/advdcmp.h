@@ -19,20 +19,21 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
+#ifndef SPYCRAFT_DMADE_ADVDCMP_H
+#define SPYCRAFT_DMADE_ADVDCMP_H
 
-#include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+namespace Spycraft {
+
+/* MADE Internal */
+
+typedef struct _DcmpInfo *DcmpStream;
+
+DcmpStream OpenDcmpStream(int file, int size, int c_size, uint8 compressor);
+int ReadDcmpStream(DcmpStream dStream, void *buffer, int size);
+uint16 ReadWordDcmpStream(DcmpStream dStream);
+uint32 ReadLongDcmpStream(DcmpStream dStream);
+void CloseDcmpStream(DcmpStream dStream);
+
+} // namespace Spycraft
 
 #endif

@@ -19,20 +19,52 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
-
+#include "common/system.h"
 #include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+#include "spycraft/dmade/advtime.h"
 
-#endif
+namespace Spycraft {
+
+#define InitTimeMD()
+#define CleanTimeMD()
+
+struct MADETime {
+	uint oldTime = 0;
+	uint offset = 0;
+	uint startTime = 0;
+	int overflow = 0;
+};
+
+static MADETime madeTime;
+
+void InitTime(void) {
+	uint t;
+
+	InitTimeMD();
+	t = g_system->getMillis();
+	madeTime.startTime = t;
+	madeTime.offset = 0xffffffff - t;
+	madeTime.oldTime = t;
+	madeTime.overflow = false;
+}
+
+void CleanTime(void) {
+	CleanTimeMD();
+}
+
+uint sfxGetTime() {
+	uint t = g_system->getMillis();
+
+	if (t < madeTime.oldTime) {
+		madeTime.overflow = true;
+	}
+	if (madeTime.overflow) {
+		madeTime.oldTime = t + madeTime.offset;
+	} else {
+		madeTime.oldTime = t - madeTime.startTime;
+	}
+
+	return madeTime.oldTime;
+}
+
+} // namespace Spycraft

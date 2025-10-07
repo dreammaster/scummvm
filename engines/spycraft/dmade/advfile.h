@@ -19,20 +19,44 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
+#ifndef SPYCRAFT_DMADE_ADVFILE_H
+#define SPYCRAFT_DMADE_ADVFILE_H
 
 #include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
 #include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
 #include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+
+namespace Spycraft {
+
+enum {
+	MADE_FILE_WRITE,
+	MADE_FILE_READ,
+	MADE_FILE_APPEND
+};
+
+enum {
+	MADE_SEEK_BEG,
+	MADE_SEEK_CUR,
+	MADE_SEEK_END
+};
+
+extern int sfxOpenFile(const char *filename, int mode);
+extern int sfxReadFile(int hf, void *buffer, int size);
+extern char *sfxReadFileString(int hf);
+extern int sfxGetString(int hf, char *dest);
+extern int sfxWriteFile(int hf, void *buffer, int size);
+extern int sfxWriteASCFile(int hf, const char *, ...);
+extern int sfxSeekFile(int hf, int offset, int mode);
+extern int sfxCloseFile(int hf);
+extern int sfxFileSize(char *filename);
+extern uint8 sfxFileGetBYTE(int hf);
+extern uint16 sfxFileGetWORD(int hf);
+extern void OpenDlg(const char *fileMask);
+extern void SaveDlg(const char *fileMask);
+extern char *sfxGetRestoreFile(void);
+extern char *sfxGetSaveFile(void);
+extern int sfxCopyFile(const char *src, const char *dest);
+
+} // namespace Spycraft
 
 #endif

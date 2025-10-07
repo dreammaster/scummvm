@@ -4,17 +4,17 @@ MODULE_OBJS = \
 	spycraft.o \
 	console.o \
 	metaengine.o \
-	adv/advback.o \
-	adv/advbits.o \
-	adv/advdcmp.o \
-	adv/advlist.o \
-	adv/advmem.o \
-	adv/advport.o \
-	adv/advrect.o \
-	adv/advres.o \
-	adv/advsfx.o \
-	adv/advsprite.o \
-	adv/advtime.o \
+	dmade/advback.o \
+	dmade/advbits.o \
+	dmade/advdcmp.o \
+	dmade/advlist.o \
+	dmade/advmem.o \
+	dmade/advport.o \
+	dmade/advrect.o \
+	dmade/advres.o \
+	dmade/advsfx.o \
+	dmade/advsprite.o \
+	dmade/advtime.o \
 	game/dispatch.o \
 	ats.o
 

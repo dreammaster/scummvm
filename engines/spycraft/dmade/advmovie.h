@@ -19,20 +19,30 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_MADE_H
-#define SPYCRAFT_GAME_MADE_H
+#ifndef SPYCRAFT_DMADE_ADVMOVIE_H
+#define SPYCRAFT_DMADE_ADVMOVIE_H
 
-#include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advcompat.h"
-#include "spycraft/dmade/adverror.h"
-#include "spycraft/dmade/advmem.h"
-#include "spycraft/dmade/advdebug.h"
-#include "spycraft/dmade/advmain.h"
-#include "spycraft/dmade/advtext.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/mcimovie.h"
-#include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/aviread.h"
+namespace Spycraft {
+
+typedef void (*callbackFn)();
+
+extern int InitMovie();
+extern void CleanMovie();
+extern int sfxIsMovieOpen();
+extern int sfxIsMoviePlaying();
+extern int sfxSetMovieRange(int from, int to);
+extern int sfxOpenMovie(const char *filename, int dx, int dy, int size);
+extern int sfxPlayMovie(int close_done, int erase_done, callbackFn theCallBack);
+extern int sfxCloseMovie();
+extern int sfxPauseMovie(int repaint, int doCallBack);
+extern int sfxResumeMovie();
+extern int sfxGetMoviePosn();
+extern int sfxEnableMovieAudio(int tOrF);
+extern int sfxEnableMovieVideo(int tOrF);
+extern int sfxStepMovie(int location);
+
+void UpdateMovie();
+
+} // namespace Spycraft
 
 #endif
