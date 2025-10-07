@@ -35,9 +35,9 @@ class Script;
 
 class Object {
 public:
-	char *name;
+	const char *name;
 	Script *script;
-	unsigned int 	flag;
+	unsigned int flag;
 
 #ifdef DO_DEBUG
 
