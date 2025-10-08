@@ -17,6 +17,7 @@ MODULE_OBJS = \
 	dmade/advtime.o \
 	game/dispatch.o \
 	game/actor.o \
+	game/cursor.o \
 	game/list.o \
 	ats.o
 
