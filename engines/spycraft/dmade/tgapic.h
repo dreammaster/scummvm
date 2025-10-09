@@ -19,29 +19,16 @@
  *
  */
 
-#ifndef SPYCRAFT_DMADE_ADVLIST_H
-#define SPYCRAFT_DMADE_ADVLIST_H
+#ifndef SPYCRAFT_DMADE_TGAPIC_H
+#define SPYCRAFT_DMADE_TGAPIC_H
+
+#include "spycraft/game/dump.h"
+#include "spycraft/dmade/advport.h"
+#include "spycraft/dmade/advdcmp.h"
 
 namespace Spycraft {
 
-#define DEF_ARRAY_SIZE		32
-
-struct ArrayList {
-	int limit;
-	int size;
-	void **elements;
-};
-
-typedef void (*FreeFnPtr)(void *obj);
-typedef bool (*SortFnPtr)(void *obj1, void *obj2);
-
-extern ArrayList *ArrayList_Alloc(void);
-extern ArrayList *ArrayList_Calloc(int theLimit);
-extern void ArrayList_Free(ArrayList *list, FreeFnPtr freeFn);
-extern void ArrayList_Add(ArrayList *list, void *obj, SortFnPtr sort);
-extern int ArrayList_Del(ArrayList *list, void *obj, FreeFnPtr freeFn);
-extern int ArrayList_Unlink(ArrayList *list, void *obj);
-extern void ArrayList_Release(ArrayList *list);
+extern Viewport *OpenPic(DcmpStream dStream);
 
 } // namespace Spycraft
 

@@ -19,29 +19,27 @@
  *
  */
 
-#ifndef SPYCRAFT_DMADE_ADVLIST_H
-#define SPYCRAFT_DMADE_ADVLIST_H
+#ifndef SPYCRAFT_DMADE_PKWARE_H
+#define SPYCRAFT_DMADE_PKWARE_H
+
+#include "spycraft/dmade/implode.h"
 
 namespace Spycraft {
 
-#define DEF_ARRAY_SIZE		32
+typedef struct {
+	char *pSrc;
+	char *pDest;
+	unsigned long srcOffset;
+	unsigned long destOffset;
+	unsigned long compSize;
+	unsigned long unCompSize;
+	unsigned long buffSize;
+	unsigned long crc;
+	unsigned long origCrc;
+} PK_Param;
 
-struct ArrayList {
-	int limit;
-	int size;
-	void **elements;
-};
-
-typedef void (*FreeFnPtr)(void *obj);
-typedef bool (*SortFnPtr)(void *obj1, void *obj2);
-
-extern ArrayList *ArrayList_Alloc(void);
-extern ArrayList *ArrayList_Calloc(int theLimit);
-extern void ArrayList_Free(ArrayList *list, FreeFnPtr freeFn);
-extern void ArrayList_Add(ArrayList *list, void *obj, SortFnPtr sort);
-extern int ArrayList_Del(ArrayList *list, void *obj, FreeFnPtr freeFn);
-extern int ArrayList_Unlink(ArrayList *list, void *obj);
-extern void ArrayList_Release(ArrayList *list);
+char *Compress_PKWARE(char *src, int size, int *outSize);
+void Uncompress_PKWARE(char *dest, char *src, int size, int outSize);
 
 } // namespace Spycraft
 
