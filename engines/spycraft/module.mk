@@ -16,13 +16,14 @@ MODULE_OBJS = \
 	dmade/advsfx.o \
 	dmade/advsprite.o \
 	dmade/advtime.o \
+	dmade/ats.o \
 	dmade/dirmovie.o \
 	dmade/dirscreen.o \
 	game/dispatch.o \
 	game/actor.o \
 	game/cursor.o \
 	game/list.o \
-	ats.o
+	game/user.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_SPYCRAFT), DYNAMIC_PLUGIN)
