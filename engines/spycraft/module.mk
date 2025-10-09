@@ -9,6 +9,7 @@ MODULE_OBJS = \
 	dmade/advdcmp.o \
 	dmade/advlist.o \
 	dmade/advmem.o \
+	dmade/advmisc.o \
 	dmade/advport.o \
 	dmade/advrect.o \
 	dmade/advres.o \
