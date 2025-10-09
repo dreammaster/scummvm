@@ -59,7 +59,7 @@ int offsetX = 0;
 int offsetY = 0;
 int window_right;
 int window_bottom;
-int surfaceOK = false;
+bool surfaceOK = false;
 MADEEventStamp event;
 
 constexpr HINSTANCE hInstance = nullptr;
@@ -86,8 +86,9 @@ Common::String SpycraftEngine::getGameId() const {
 }
 
 Common::Error SpycraftEngine::run() {
-	// Initialize 320x200 paletted graphics mode
-	initGraphics(320, 200);
+	// Initialize graphics mode
+	const Graphics::PixelFormat rgb565(2, 5, 6, 5, 0, 11, 5, 0, 0);
+	initGraphics(GAME_WIDTH, GAME_HEIGHT, &rgb565);
 	_screen = new Graphics::Screen();
 
 	// Set the engine's debugger console
