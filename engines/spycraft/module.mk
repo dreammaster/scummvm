@@ -16,6 +16,7 @@ MODULE_OBJS = \
 	dmade/advsfx.o \
 	dmade/advsprite.o \
 	dmade/advtime.o \
+	dmade/dirmovie.o \
 	game/dispatch.o \
 	game/actor.o \
 	game/cursor.o \

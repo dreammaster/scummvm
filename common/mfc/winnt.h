@@ -27,7 +27,9 @@
 namespace Common {
 namespace MFC {
 
+typedef byte BYTE;
 typedef uint16 SHORT;
+typedef uint32 DWORD;
 
 typedef uint32 COLORREF;
 typedef void *POSITION;
@@ -707,6 +709,10 @@ typedef struct tagSCROLLINFO {
 	int     nTrackPos;
 }   SCROLLINFO, *LPSCROLLINFO;
 typedef const SCROLLINFO *LPCSCROLLINFO;
+
+typedef struct _RTL_CRITICAL_SECTION {
+	void *ptr;
+} CRITICAL_SECTION, *PCRITICAL_SECTION;
 
 } // namespace MFC
 } // namespace Common
