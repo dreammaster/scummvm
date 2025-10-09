@@ -19,23 +19,24 @@
  *
  */
 
-#if 0
 #include "common/str.h"
+#include "common/textconsole.h"
 #include "spycraft/dmade/advlib.h"
 #include "spycraft/dmade/advmain.h"
 #include "spycraft/dmade/advres.h"
 #include "spycraft/dmade/advscreen.h"
 #include "spycraft/dmade/advmsg.h"
-#include "spycraft/tgapic.h"
-#include "spycraft/ats.h"
+#include "spycraft/dmade/tgapic.h"
+#include "spycraft/dmade/ats.h"
 #include "spycraft/dmade/advsound.h"
 #include "spycraft/dmade/advmusic.h"
 #include "spycraft/dmade/advmem.h"
 #include "spycraft/dmade/advvols.h"
 #include "spycraft/dmade/advini.h"
 #include "spycraft/dmade/advtime.h"
-#include "spycraft/pkware.h"
+#include "spycraft/dmade/pkware.h"
 #include "spycraft/dmade/advdcmp.h"
+#include "spycraft/game/dispatch.h"
 
 namespace Spycraft {
 
@@ -48,14 +49,14 @@ int sizeHTM = 0;
 
 ResInfo resInfo;
 static char resourceDir[MAX_VOL_PATH_SIZE];
-static char sysDir[MAX_VOL_PATH_SIZE];
-static char viewDir[MAX_VOL_PATH_SIZE];
-static char picDir[MAX_VOL_PATH_SIZE];
-static char soundDir[MAX_VOL_PATH_SIZE];
-static char fontDir[MAX_VOL_PATH_SIZE];
-static char movieDir[MAX_VOL_PATH_SIZE];
-static char htmDir[MAX_VOL_PATH_SIZE];
-static char faceDir[MAX_VOL_PATH_SIZE];
+char sysDir[MAX_VOL_PATH_SIZE];
+char viewDir[MAX_VOL_PATH_SIZE];
+char picDir[MAX_VOL_PATH_SIZE];
+char soundDir[MAX_VOL_PATH_SIZE];
+char fontDir[MAX_VOL_PATH_SIZE];
+char movieDir[MAX_VOL_PATH_SIZE];
+char htmDir[MAX_VOL_PATH_SIZE];
+char faceDir[MAX_VOL_PATH_SIZE];
 static char patchDir[] = "\\resource";
 
 char ATSEXT[] = ".ats";
@@ -67,7 +68,7 @@ char FONEXT[] = ".msg";
 char FACEEXT[] = ".fnt";
 static char MAP_FILE[] = "resource.map";
 static int curDisc = 0;
-int cacheValide = FALSE;
+bool cacheValide = false;
 ResCache *atsCache = NULL;
 ResCache *picCache = NULL;
 ResCache *wavCache = NULL;
@@ -96,28 +97,43 @@ typedef struct {
 
 static ResourceSize resSize = { 2, 48, 8, 2, 2, 4 };
 
-void GetCDROM ( char *path )
-{
+#define GetLogicalDrives() (4)
+#define DRIVE_CDROM 1
+#define GetDriveType(DRIVE) (DRIVE_CDROM)
+#define GetCurrentDirectory(SIZE, BUFF) *BUFF = '\0'
+
+static char *sc_strupr(char *str) {
+	for (char *s = str; *s; ++s)
+		*s = toupper(*s);
+	return str;
+}
+
+static int strncmpl(char *str1, char *str2, int n) {
+	return (strncmp(sc_strupr(str1), sc_strupr(str2), n));
+}
+
+
+void GetCDROM(char *path) {
 	int i;
 	char drive[8];
 	int mask = GetLogicalDrives();
 
-	for ( i=3; i<26; i++ ) {
-		if ( mask & ( 0x1 << i ) )	{
+	for (i = 3; i < 26; i++) {
+		if (mask & (0x1 << i)) {
 			drive[0] = 'A' + i;
 			drive[1] = ':';
 			drive[2] = '\0';
-			if ( GetDriveType ( drive ) == DRIVE_CDROM ) {
-				Common::strcpy_s ( path, drive );
+			if (GetDriveType(drive) == DRIVE_CDROM) {
+				Common::strcpy_s(path, 256, drive);
 #ifdef _FROMD
-/***************FOR TEST FROM D ONLY!!!**************************/
+				/***************FOR TEST FROM D ONLY!!!**************************/
 #pragma message("_FROMD: LINE 99 -- MUST BE REMOVED IN GTJ VERSION!!!" )
-				Common::strcpy_s ( path, "D:"  );
+				Common::strcpy_s(path, "D:");
 #ifdef _DEBUG
 #pragma message ("_DEBUG\n")
 				DebugBreak();
 #endif
-/***************FOR TEST FROM D ONLY!!!**************************/
+				/***************FOR TEST FROM D ONLY!!!**************************/
 #endif
 				return;
 			}
@@ -133,72 +149,69 @@ void GetCDROM ( char *path )
 	}
 }
 
-void sfxSetCacheSize ( int type, int value )
-{
-	switch ( type ) {
-		case RES_PIC:
-			resSize.picSize = value;
-			break;
+void sfxSetCacheSize(int type, int value) {
+	switch (type) {
+	case RES_PIC:
+		resSize.picSize = value;
+		break;
 
-		case RES_ATS:
-			resSize.atsSize = value;
-			break;
-		
-		case RES_WAVE:
-			resSize.wavSize = value;
-			break;
+	case RES_ATS:
+		resSize.atsSize = value;
+		break;
 
-		case RES_MIDI:
-			resSize.midSize = value;
-			break;
+	case RES_WAVE:
+		resSize.wavSize = value;
+		break;
 
-		case RES_FONT:
-			resSize.fonSize = value;
-			break;
+	case RES_MIDI:
+		resSize.midSize = value;
+		break;
 
-		case RES_FACE:
-			resSize.faceSize = value;
-			break;
+	case RES_FONT:
+		resSize.fonSize = value;
+		break;
+
+	case RES_FACE:
+		resSize.faceSize = value;
+		break;
 	}
 }
 
-static void GetResPath ( char *dest, char *src )
-{
+static void GetResPath(char *dest, char *src) {
 	int i = 0;
 	char *p = src;
 
-	while ( *p ) {
-		if ( *p == '=' ) {
-			p ++;
+	while (*p) {
+		if (*p == '=') {
+			p++;
 			break;
 		}
-		p ++;
+		p++;
 	}
-	while ( *p ) {
-		if ( *p != ' ' )
+	while (*p) {
+		if (*p != ' ')
 			break;
 		else
-			p ++;
+			p++;
 	}
 
-	while ( *p ) {
-		if ( isalpha ( *p ) || ( *p == '.' ) ||
-			  ( *p == '\\' ) || ( *p == ':' ) 
+	while (*p) {
+		if (Common::isAlpha(*p) || (*p == '.') ||
+			(*p == '\\') || (*p == ':')
 			)
 		{
 			dest[i] = *p;
-			i ++;
+			i++;
 		}
-		p ++;
-		
+		p++;
+
 	}
-	dest[i] = '\0';	
+	dest[i] = '\0';
 }
 
 #ifndef _DVD
 #pragma message ("not _DVD:  Line 190.\n")
-_inline void PromptDisk ( int location )
-{
+void PromptDisk ( int location ) {
 	MADEEventStamp evt;
 
 	evt.get_event_message = EVENT_DISKINSERT;
@@ -225,7 +238,7 @@ static int ReadMapFile()
 		return false;
 
 	buffer = (char *)AllocPtr ( size );
-	ASSERT ( buffer, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( buffer, __ERR_MEM_ALLOC_FAIL );
 		 
 	hf = sfxOpenFile ( MAP_FILE, MADE_FILE_READ );
 
@@ -237,12 +250,12 @@ static int ReadMapFile()
 		p += sizeof ( int );
 		if ( mapList == NULL ) {
 			mapList = ArrayList_Calloc ( n );
-			ASSERT ( mapList, __ERR_MEM_ALLOC_FAIL );
+			ADV_ASSERT ( mapList, __ERR_MEM_ALLOC_FAIL );
 		}
 
 		for ( i=0; i<n; i++ ) {
 			fk = (FileChunk *)AllocPtr ( sizeof ( FileChunk ) );
-			ASSERT ( fk, __ERR_MEM_ALLOC_FAIL );
+			ADV_ASSERT ( fk, __ERR_MEM_ALLOC_FAIL );
 			if ( fk ) {
 				/* USE 4 READS INSTEAD OF CHANGE STRUCTURE PACK */
 				fk->vid = *(int *)p;
@@ -265,55 +278,50 @@ static int ReadMapFile()
 	return false;
 }
 
-static char *StrDup ( char *str )
-{
-	char *ret;
-
-	ret = AllocPtr ( strlen ( str ) + 1 );
-	if ( ret == NULL )
+static char *StrDup(char *str) {
+	char *ret = (char *)AllocPtr(strlen(str) + 1);
+	if (ret == NULL)
 		return nullptr;
-	Common::strcpy_s( ret, str );
-	return ( ret );
+
+	Common::strcpy_s(ret, 256, str);
+	return (ret);
 }
 
-char *GetResourceDir ( char *resourceLine )
-{
+char *GetResourceDir(char *resourceLine) {
 	char *p = resourceLine;
 
-	while ( *p ) {
-		if ( *p == '=' ) {
-		   p ++;
+	while (*p) {
+		if (*p == '=') {
+			p++;
 			break;
 		}
-		p ++;
+		p++;
 	}
 
-	while ( *p ) {
-		if ( *p != ' ' )
-			return ( p );
+	while (*p) {
+		if (*p != ' ')
+			return (p);
 		else
-			p ++;
+			p++;
 	}
 
 	return NULL;
 }
 
-char *StrDupPath ( char *volName )
-{
-	int len; 
+char *StrDupPath(char *volName) {
+	int len;
 	char *buffer;
 
-	len = strlen ( volName ) + strlen ( resourceDir ) + 4;
-	buffer = (char *)AllocPtr ( len );
-	ASSERT ( buffer, __ERR_MEM_ALLOC_FAIL );
-	Common::strcpy_s ( buffer, resourceDir );
-	strcat ( buffer, "\\" );
-	strcat ( buffer, volName );
-	return ( buffer );
+	len = strlen(volName) + strlen(resourceDir) + 4;
+	buffer = (char *)AllocPtr(len);
+	ADV_ASSERT(buffer, __ERR_MEM_ALLOC_FAIL);
+	Common::strcpy_s(buffer, 256, resourceDir);
+	Common::strcat_s(buffer, 256, "\\");
+	Common::strcat_s(buffer, 256, volName);
+	return buffer;
 }
 
-static void ReadVols()
-{
+static void ReadVols() {
 	int i, n;
 	char *ptr;
 	int isItVols;
@@ -326,15 +334,15 @@ static void ReadVols()
 	/* Get resource directory from RESOURCE.INI */
 	if ( ( n = sfxGetString ( hi, volName ) ) == -1 )	{
 		ErrMsg ( "Resource.ini is corrupt please reinstall Spycraft.");
-		ASSERT ( FALSE, __ERR_RES_NOT_FOUND );
+		ADV_ASSERT ( false, __ERR_RES_NOT_FOUND );
 	}
 
-	if ( stricmp ( KEYWORD_DRIVE, volName ) )
-		ASSERT ( FALSE, __ERR_CODING );
+	if (scumm_stricmp( KEYWORD_DRIVE, volName ) )
+		ADV_ASSERT ( false, __ERR_CODING );
 
 	if ( ( n = sfxGetString ( hi, volName ) ) == -1 )	{
 		ErrMsg ( "Resource.ini is corrupt please reinstall Spycraft.");
-		ASSERT ( FALSE, __ERR_RES_NOT_FOUND );
+		ADV_ASSERT ( false, __ERR_RES_NOT_FOUND );
 	}
 
 	if ( ( ptr = (char *)GetResourceDir ( volName ) ) ) {
@@ -367,35 +375,35 @@ static void ReadVols()
 /*****************debug*******************/
 #endif
 	volList = ArrayList_Calloc ( MAX_DISC_LIMIT ) ;
-	ASSERT ( volList, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( volList, __ERR_MEM_ALLOC_FAIL );
 
 	streamList = ArrayList_Calloc(MAX_STREAM_LIMIT);
-	ASSERT ( streamList, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( streamList, __ERR_MEM_ALLOC_FAIL );
 
 	i = -1;
-	isItVols = FALSE;
-	while ( TRUE ) {
+	isItVols = false;
+	while ( true ) {
 		if ( ( i >= MAX_DISC_LIMIT) || ( n = sfxGetString ( hi, volName ) ) == -1 ) {
 			sfxCloseFile(hi);
 			break;
 		}
 		else {
 			/* CD Keyword */
-			if ( !strncmp ( strupr ( volName ), KEYWORD_CD, 3 ) ) {
-				isItVols = TRUE;
+			if ( !strncmp ( sc_strupr ( volName ), KEYWORD_CD, 3 ) ) {
+				isItVols = true;
 				i ++;
 			}
 			/* FILE OR EXTRA FILE ON CD */
 			else {
 				if ( isItVols ) {
-					isItVols = FALSE;
+					isItVols = false;
 					ArrayList_Add ( volList, StrDupPath ( volName ), NULL );
 				}
 				else {
 					VolInfo *info = (VolInfo *)AllocPtr ( sizeof ( VolInfo ) );
 
 					if ( info == NULL )
-						ASSERT ( FALSE, __ERR_MEM_ALLOC_FAIL );
+						ADV_ASSERT ( false, __ERR_MEM_ALLOC_FAIL );
 
 					info->filename = StrDupPath ( volName );
 					info->location = i;
@@ -414,152 +422,137 @@ int OpenVols ( int dn )
 
 	/* VALIDATE THE DISK */
 	if ( discHandler == -1 )
-		return FALSE;
+		return false;
 
 	sfxReadFile ( discHandler, &uc, sizeof ( unsigned char ) );
 	if ( uc != dn )
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 
-void ReadWhere()
-{
+void ReadWhere() {
 	int n;
 	int hf;
 	char buffer[128];
-	
-	Common::strcpy_s ( buffer, sysDir );
-	strcat ( buffer, "\\where" );
-	hf = sfxOpenFile ( buffer, MADE_FILE_READ );
+
+	Common::strcpy_s(buffer, sysDir);
+	Common::strcat_s(buffer, "\\where");
+	hf = sfxOpenFile(buffer, MADE_FILE_READ);
 
 	/* FIND DEFAULT WHERE */
-	if ( hf == -1 ) {
-		Common::strcpy_s ( picDir, sysDir );
-		Common::strcpy_s ( viewDir, sysDir );
-		Common::strcpy_s ( soundDir, sysDir );
-		Common::strcpy_s ( fontDir, sysDir );
-		Common::strcpy_s ( movieDir, sysDir );
-		Common::strcpy_s ( htmDir, sysDir );
-		Common::strcpy_s ( faceDir, sysDir );
+	if (hf == -1) {
+		Common::strcpy_s(picDir, sysDir);
+		Common::strcpy_s(viewDir, sysDir);
+		Common::strcpy_s(soundDir, sysDir);
+		Common::strcpy_s(fontDir, sysDir);
+		Common::strcpy_s(movieDir, sysDir);
+		Common::strcpy_s(htmDir, sysDir);
+		Common::strcpy_s(faceDir, sysDir);
 		return;
 	}
 
 	do {
-		n = sfxGetString ( hf, buffer );
+		n = sfxGetString(hf, buffer);
 
-		if ( n != -1 ) {
-			strupr ( buffer );
+		if (n != -1) {
+			sc_strupr(buffer);
 
-			if ( strstr ( buffer, "PIC" ) )
-				GetResPath ( picDir, buffer );
-			else if ( strstr ( buffer, "VIEW" ) )
-				GetResPath ( viewDir, buffer );
-			else if ( strstr ( buffer, "SOUND" ) )
-				GetResPath ( soundDir, buffer );
-			else if ( strstr ( buffer, "TEXT" ) )
-				GetResPath ( fontDir, buffer );
-			else if ( strstr ( buffer, "AVI" ) )
-				GetResPath ( movieDir, buffer );
-			else if ( strstr ( buffer, "HTM" ) ) 
-				GetResPath ( htmDir, buffer );
-			else if ( strstr ( buffer, "FACE" ) )
-				GetResPath ( faceDir, buffer );
+			if (strstr(buffer, "PIC"))
+				GetResPath(picDir, buffer);
+			else if (strstr(buffer, "VIEW"))
+				GetResPath(viewDir, buffer);
+			else if (strstr(buffer, "SOUND"))
+				GetResPath(soundDir, buffer);
+			else if (strstr(buffer, "TEXT"))
+				GetResPath(fontDir, buffer);
+			else if (strstr(buffer, "AVI"))
+				GetResPath(movieDir, buffer);
+			else if (strstr(buffer, "HTM"))
+				GetResPath(htmDir, buffer);
+			else if (strstr(buffer, "FACE"))
+				GetResPath(faceDir, buffer);
 		}
-	} while ( n != -1 );
+	} while (n != -1);
 
-	sfxCloseFile ( hf );
+	sfxCloseFile(hf);
 }
 
-_inline int strncmpl ( char *str1, char *str2, int n )
-{
-	return ( strncmp ( strupr ( str1 ), strupr ( str2 ), n ) );
-}
-
-int sfxGetDir ( char *dest, int id, int type )
-{
+int sfxGetDir(char *dest, int id, int type) {
 	char typeString[8];
-	char buffer[32];
 
-	switch ( type ) {
-		case RES_WAVE:
-			Common::strcpy_s ( typeString, ".WAV" );
-			if ( mapList ) {
-				Common::strcpy_s ( dest, resourceDir );
-			}
-			else {
-				Common::strcpy_s ( dest, soundDir );
-			}
-			break;
+	switch (type) {
+	case RES_WAVE:
+		Common::strcpy_s(typeString, ".WAV");
+		if (mapList) {
+			Common::strcpy_s(dest, 256, resourceDir);
+		} else {
+			Common::strcpy_s(dest, 256, soundDir);
+		}
+		break;
 
-		case RES_MOVIE:
-			Common::strcpy_s ( typeString, ".AVI" );
-			if ( mapList ) {
-				Common::strcpy_s ( dest, resourceDir );
-			}
-			else {
-				Common::strcpy_s ( dest, movieDir );
-			}
-			break;
+	case RES_MOVIE:
+		Common::strcpy_s(typeString, ".AVI");
+		if (mapList) {
+			Common::strcpy_s(dest, 256, resourceDir);
+		} else {
+			Common::strcpy_s(dest, 256, movieDir);
+		}
+		break;
 
-		case RES_HTM:
-			Common::strcpy_s ( typeString, ".HTM" );
-			if ( mapList ) {
-				Common::strcpy_s ( dest, resourceDir );
-			}
-			else {
-				Common::strcpy_s ( dest, htmDir );
-			}
-			break;
-			
+	case RES_HTM:
+		Common::strcpy_s(typeString, ".HTM");
+		if (mapList) {
+			Common::strcpy_s(dest, 256, resourceDir);
+		} else {
+			Common::strcpy_s(dest, 256, htmDir);
+		}
+		break;
+
 	}
 
-	strcat ( dest, "\\" );
-	itoa ( id, buffer, 10 );
-	strcat ( buffer, typeString );
-	strcat ( dest, buffer );
+	Common::String suffix = Common::String::format("\\%d%s", id, typeString);
+	Common::strcat_s(dest, 256, suffix.c_str());
 
-	if ( mapList ) {
+	if (mapList) {
 		int i;
-		VolInfo *info, *tinfo;
-		for ( i=0, tinfo = NULL; i<streamList->size; i++ ) {
-			info = streamList->elements[i];
-	 		if ( strcmp ( dest, info->filename ) == 0 ) {
-				if ( info->location == curDisc )
+		VolInfo *info = nullptr, *tinfo;
+		for (i = 0, tinfo = NULL; i < streamList->size; i++) {
+			info = (VolInfo *)streamList->elements[i];
+			if (strcmp(dest, info->filename) == 0) {
+				if (info->location == curDisc)
 					break;
 				else
 					tinfo = info;
 			}
 		}
-		if ( i == streamList->size ) {
-			if ( tinfo == NULL )	{
-				ErrMsg ( "Can't find %s, please reinstall Spycraft.", dest);
-				ASSERT ( FALSE, __ERR_RES_NOT_FOUND );
+		if (i == streamList->size) {
+			if (tinfo == NULL) {
+				ErrMsg("Can't find %s, please reinstall Spycraft.", dest);
+				ADV_ASSERT(false, __ERR_RES_NOT_FOUND);
 			}
 		}
 		// found only on another disc
-		if ( (tinfo != NULL) && (strcmp ( dest, info->filename ) != 0) )
+		if ((tinfo != NULL) && (strcmp(dest, info->filename) != 0))
 			info = tinfo;
 
 #ifndef _DVD
 #pragma message ("not _DVD:  Line 532.\n")
 		/* CHECK VALID DISC LOCATION */
-		if ( info->location != curDisc ) {
+		if (info->location != curDisc) {
 			do {
-				PromptDisk ( info->location );
-			} while ( !OpenVols ( info->location ) );
+				PromptDisk(info->location);
+			} while (!OpenVols(info->location));
 			curDisc = info->location;
 			return true;
-		}
-		else {
+		} else {
 			return true;
 		}
 #else
 #pragma message ("_DVD:  Line 546.\n")
-	return true;
+		return true;
 #endif
-	}
-	else {
+	} else {
 		return true;
 	}
 }
@@ -595,7 +588,7 @@ void SetRESCache()
 		ReadWhere();
 
 	/* SET GLOBAL CACHE */
-	cacheValide = TRUE;
+	cacheValide = true;
 
 	/* SET INITIAL RESINFO */
 	resInfo.res_pic_size = resSize.picSize * __mem_index;
@@ -607,51 +600,51 @@ void SetRESCache()
 
 	/* RES_ATS */
 	atsCache = (ResCache *)AllocPtr ( sizeof ( ResCache ) );
-	ASSERT ( atsCache, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( atsCache, __ERR_MEM_ALLOC_FAIL );
 	atsCache->list = ArrayList_Calloc ( resInfo.res_ats_size );
-	ASSERT ( atsCache->list, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( atsCache->list, __ERR_MEM_ALLOC_FAIL );
 	atsCache->size = 0;
 
 	/* RES_PIC */
 	picCache = (ResCache *)AllocPtr ( sizeof ( ResCache ) );
-	ASSERT ( picCache, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( picCache, __ERR_MEM_ALLOC_FAIL );
 	picCache->list = ArrayList_Calloc ( resInfo.res_pic_size );
-	ASSERT ( picCache->list, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( picCache->list, __ERR_MEM_ALLOC_FAIL );
 	picCache->size = 0;
 
 	/* RES_WAVE */
 	wavCache = (ResCache *)AllocPtr ( sizeof ( ResCache ) );
-	ASSERT ( wavCache, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( wavCache, __ERR_MEM_ALLOC_FAIL );
 	wavCache->list = ArrayList_Calloc ( resInfo.res_wav_size );
-	ASSERT ( wavCache->list, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( wavCache->list, __ERR_MEM_ALLOC_FAIL );
 	wavCache->size = 0;
 
 	/* RES_HTM */
 	htmCache = (ResCache *)AllocPtr ( sizeof ( ResCache ) );
-	ASSERT ( htmCache, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( htmCache, __ERR_MEM_ALLOC_FAIL );
 	htmCache->list = ArrayList_Alloc();
-	ASSERT ( htmCache->list, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( htmCache->list, __ERR_MEM_ALLOC_FAIL );
 	htmCache->size = 0;
 
 	/* RES_MID */
 	midCache = (ResCache *)AllocPtr ( sizeof ( ResCache ) );
-	ASSERT ( midCache, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( midCache, __ERR_MEM_ALLOC_FAIL );
 	midCache->list = ArrayList_Calloc ( resInfo.res_mid_size );
-	ASSERT ( midCache->list, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( midCache->list, __ERR_MEM_ALLOC_FAIL );
 	midCache->size = 0;
 
 	/* RES_FONT */
 	fonCache = (ResCache *)AllocPtr ( sizeof ( ResCache ) );
-	ASSERT ( fonCache, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( fonCache, __ERR_MEM_ALLOC_FAIL );
 	fonCache->list = ArrayList_Calloc ( resInfo.res_fon_size );
-	ASSERT ( fonCache->list, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( fonCache->list, __ERR_MEM_ALLOC_FAIL );
 	fonCache->size = 0;
 
 	/* RES_FACE */
 	faceCache = (ResCache *)AllocPtr ( sizeof ( ResCache ) );
-	ASSERT ( faceCache, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( faceCache, __ERR_MEM_ALLOC_FAIL );
 	faceCache->list = ArrayList_Calloc ( resInfo.res_face_size );
-	ASSERT ( faceCache->list, __ERR_MEM_ALLOC_FAIL );
+	ADV_ASSERT ( faceCache->list, __ERR_MEM_ALLOC_FAIL );
 	faceCache->size = 0;
 }
 
@@ -703,115 +696,748 @@ static void FreeVolInfo ( VolInfo *data )
 	FreePtr ( data );
 }
 
-void DestroyRESCache()
-{
+void DestroyRESCache() {
 	/* SET GLOBAL CACHE */
-	cacheValide = FALSE;
+	cacheValide = false;
 
 	/* CLOSE VOL FILE */
-	if ( discHandler != -1 )
-		sfxCloseFile ( discHandler );
+	if (discHandler != -1)
+		sfxCloseFile(discHandler);
 
 	/* FREE THE MAP ARRAY */
-	if ( mapList ) {
-		ArrayList_Free ( mapList, NULL );
+	if (mapList) {
+		ArrayList_Free(mapList, NULL);
 		mapList = NULL;
-		if ( discHandler != -1 ) {
-			sfxCloseFile ( discHandler );
+		if (discHandler != -1) {
+			sfxCloseFile(discHandler);
 			discHandler = -1;
 		}
 	}
 
 	/* FREE THE VOL ARRAY */
-	if ( volList ) {
-		ArrayList_Free ( volList, NULL );
+	if (volList) {
+		ArrayList_Free(volList, NULL);
 		volList = NULL;
 	}
 
-	if ( streamList ) {
-		ArrayList_Free ( streamList, FreeVolInfo );
+	if (streamList) {
+		ArrayList_Free(streamList, (FreeFnPtr)FreeVolInfo);
 		streamList = NULL;
 	}
 
 	/* RES_PIC */
-	if ( picCache ) {
-		if ( picCache->list ) {
-			ArrayList_Free ( picCache->list, FreePICNode );
+	if (picCache) {
+		if (picCache->list) {
+			ArrayList_Free(picCache->list, (FreeFnPtr)FreePICNode);
 			picCache->list = NULL;
 		}
-		FreePtr ( picCache );
+		FreePtr(picCache);
 		picCache = NULL;
 	}
 
 	/* RES_ATS */
-	if ( atsCache ) {
-		if ( atsCache->list ) {
-			ArrayList_Free ( atsCache->list, FreeATSNode );
+	if (atsCache) {
+		if (atsCache->list) {
+			ArrayList_Free(atsCache->list, (FreeFnPtr)FreeATSNode);
 			atsCache->list = NULL;
 		}
-		FreePtr ( atsCache );
+		FreePtr(atsCache);
 		atsCache = NULL;
 	}
 
 	/* RES_WAVE */
-	if ( wavCache ) {
-		if ( wavCache->list ) {
-			ArrayList_Free ( wavCache->list, FreeWaveNode );
+	if (wavCache) {
+		if (wavCache->list) {
+			ArrayList_Free(wavCache->list, (FreeFnPtr)FreeWaveNode);
 			wavCache->list = NULL;
 		}
-		FreePtr ( wavCache );
+		FreePtr(wavCache);
 		wavCache = NULL;
 	}
 
 	/* RES_HTM */
-	if ( htmCache ) {
-		if ( htmCache->list ) {
-			ArrayList_Free ( htmCache->list, FreeHTMNode );
+	if (htmCache) {
+		if (htmCache->list) {
+			ArrayList_Free(htmCache->list, (FreeFnPtr)FreeHTMNode);
 			htmCache->list = NULL;
 		}
-		FreePtr ( htmCache );
+		FreePtr(htmCache);
 		htmCache = NULL;
 	}
 
 	/* RES_MIDI */
-	if ( midCache ) {
-		if ( midCache->list ) {
-			ArrayList_Free ( midCache->list, FreeMidiNode );
+	if (midCache) {
+		if (midCache->list) {
+			ArrayList_Free(midCache->list, (FreeFnPtr)FreeMidiNode);
 			midCache->list = NULL;
 		}
-		FreePtr ( midCache );
+		FreePtr(midCache);
 		midCache = NULL;
 	}
 
 	/* RES_FONT */
-	if ( fonCache ) {
-		if ( fonCache->list ) {
-			ArrayList_Free ( fonCache->list, FreeMSGNode );
+	if (fonCache) {
+		if (fonCache->list) {
+			ArrayList_Free(fonCache->list, (FreeFnPtr)FreeMSGNode);
 			fonCache->list = NULL;
 		}
-		FreePtr ( fonCache );
+		FreePtr(fonCache);
 		fonCache = NULL;
 	}
 
 	/* RES_FACE */
-	if ( faceCache ) {
-		if ( faceCache->list ) {
-			ArrayList_Free ( faceCache->list, FreeFaceNode );
+	if (faceCache) {
+		if (faceCache->list) {
+			ArrayList_Free(faceCache->list, (FreeFnPtr)FreeFaceNode);
 			faceCache->list = NULL;
 		}
-		FreePtr ( faceCache );
+		FreePtr(faceCache);
 		faceCache = NULL;
 	}
-
 }
 
-GenericData *SearchRESData ( int type, int id )
-{
+GenericData *SearchRESData(int type, int id) {
 	int i;
 	ArrayList *list = NULL;
 	GenericData *data;
-	
-	switch ( type ) {
+
+	switch (type) {
+	case RES_ATS:
+		list = atsCache->list;
+		break;
+
+	case RES_PIC:
+		list = picCache->list;
+		break;
+
+	case RES_WAVE:
+		list = wavCache->list;
+		break;
+
+	case RES_MIDI:
+		list = midCache->list;
+		break;
+
+	case RES_TEXT:
+		list = fonCache->list;
+		break;
+
+	case RES_HTM:
+		list = htmCache->list;
+		break;
+
+	case RES_FACE:
+		list = faceCache->list;
+		break;
+
+	}
+
+	ADV_ASSERT(list, __ERR_CODING);
+	for (i = 0; i < list->size; i++) {
+		data = (GenericData *)list->elements[i];
+		if (data->id == id)
+			return (data);
+	}
+	return nullptr;
+}
+
+void MakeFilename(char *dest, int src, char *theDir, char *ext) {
+	Common::String fname = Common::String::format("%s\\%d%s", theDir, src, ext);
+	Common::strcpy_s(dest, 256, fname.c_str());
+}
+
+void MakePatchFilename ( char *dest, int src, char *theDir, char *ext ) {
+	Common::String fname = Common::String::format("%s%s\\%d%s", theDir, patchDir, src, ext);
+	Common::strcpy_s(dest, 256, fname.c_str());
+}
+
+void ID2File(char *dest, int src, int type) {
+	switch (type) {
+	case RES_ATS:
+		MakeFilename(dest, src, viewDir, ATSEXT);
+		break;
+
+	case RES_PIC:
+		MakeFilename(dest, src, picDir, PICEXT);
+		break;
+
+	case RES_WAVE:
+		MakeFilename(dest, src, soundDir, WAVEXT);
+		break;
+
+	case RES_MIDI:
+		MakeFilename(dest, src, soundDir, MIDEXT);
+		break;
+
+	case RES_TEXT:
+		MakeFilename(dest, src, fontDir, FONEXT);
+		break;
+
+	case RES_HTM:
+		MakeFilename(dest, src, htmDir, HTMEXT);
+		break;
+
+	case RES_FACE:
+		MakeFilename(dest, src, faceDir, FACEEXT);
+		break;
+
+	default:
+		ADV_ASSERT(false, __ERR_CODING);
+	}
+}
+
+void ID2PatchFile(char *dest, int src, int type) {
+	switch (type) {
+	case RES_ATS:
+		MakePatchFilename(dest, src, sysDir, ATSEXT);
+		break;
+
+	case RES_PIC:
+		MakePatchFilename(dest, src, sysDir, PICEXT);
+		break;
+
+	case RES_WAVE:
+		MakePatchFilename(dest, src, sysDir, WAVEXT);
+		break;
+
+	case RES_MIDI:
+		MakePatchFilename(dest, src, sysDir, MIDEXT);
+		break;
+
+	case RES_TEXT:
+		MakePatchFilename(dest, src, sysDir, FONEXT);
+		break;
+
+	case RES_HTM:
+		MakePatchFilename(dest, src, sysDir, HTMEXT);
+		break;
+
+	case RES_FACE:
+		MakePatchFilename(dest, src, sysDir, FACEEXT);
+		break;
+
+	default:
+		ADV_ASSERT(false, __ERR_CODING);
+	}
+}
+
+void *OpenFace(void *src) {
+	return src;
+}
+
+void *OpenFaceFile(char *filename, int *size) {
+	int hf;
+	void *ret = NULL;
+
+	*size = sfxFileSize(filename);
+	hf = sfxOpenFile(filename, MADE_FILE_READ);
+
+	if (hf == -1)
+		ADV_ASSERT(false, __ERR_FILE_OPEN_FAIL);
+
+	ret = AllocPtr(*size);
+	if (ret == NULL) {
+		sfxCloseFile(hf);
+		return nullptr;
+	}
+
+	sfxReadFile(hf, ret, *size);
+	sfxCloseFile(hf);
+
+	return (ret);
+}
+
+void *Decompress_NONE(int st, int *size) {
+	int c_size;
+	void *buffer;
+
+	sfxSeekFile(discHandler, st, MADE_SEEK_BEG);
+
+	sfxReadFile(discHandler, size, sizeof(int));
+	sfxReadFile(discHandler, &c_size, sizeof(int));
+	if (c_size != *size)
+		ADV_ASSERT(false, __ERR_DECOMPRESS_SIZE_MISMATCH);
+
+	buffer = AllocPtr(*size);
+	if (buffer) {
+		sfxReadFile(discHandler, buffer, *size);
+	}
+
+	return (buffer);
+}
+
+void *Decompress_PKWARE(int st, int *size) {
+	int compSize;
+	void *buffer, *src;
+
+	sfxSeekFile(discHandler, st, MADE_SEEK_BEG);
+	sfxReadFile(discHandler, &compSize, sizeof(int));
+	sfxReadFile(discHandler, size, sizeof(int));
+
+	src = AllocPtr(compSize);
+	buffer = AllocPtr(*size);
+	if (src && buffer) {
+		sfxReadFile(discHandler, src, compSize);
+		error("TODO: Uncompress_PKWARE(buffer, src, compSize, *size)");
+		FreePtr(src);
+	}
+
+	return (buffer);
+}
+
+int ZDecompress ( char *in, char *out, int inLen, int origLen );
+
+void *Decompress_ZLIB(int st, int *size) {
+	int compSize;
+	void *buffer, *src;
+
+	sfxSeekFile(discHandler, st, MADE_SEEK_BEG);
+	sfxReadFile(discHandler, &compSize, sizeof(int));
+	sfxReadFile(discHandler, size, sizeof(int));
+
+	src = AllocPtr(compSize);
+	buffer = AllocPtr(*size);
+	if (src && buffer) {
+		sfxReadFile(discHandler, src, compSize);
+		error("TODO: ZDecompress(src, buffer, compSize, *size)");
+	}
+	if (src != NULL)
+		FreePtr(src);
+
+	return (buffer);
+}
+
+static void *OpenHTM(void *src) {
+	return (src);
+}
+
+static int IsFileExist(char *filename) {
+	int hf = sfxOpenFile(filename, MADE_FILE_READ);
+	if (hf != -1) {
+		sfxCloseFile(hf);
+		return true;
+	}
+	return false;
+}
+
+static void *ReadRawFile(char *filename, int *size) {
+	int hf;
+	char *buffer;
+
+	*size = sfxFileSize(filename);
+	hf = sfxOpenFile(filename, MADE_FILE_READ);
+
+	if (hf == -1) {
+		ErrMsg("Can't open %s, please reinstall Spycraft.", filename);
+		ADV_ASSERT(false, __ERR_FILE_OPEN_FAIL);
+	}
+
+	buffer = (char *)AllocPtr(*size);
+	if (buffer == NULL) {
+		sfxCloseFile(hf);
+		return NULL;
+	}
+	sfxReadFile(hf, buffer, *size);
+
+	sfxCloseFile(hf);
+
+	return (buffer);
+}
+
+static void *VolLoad(int id, int type) {
+	int vid, i, size = 0, compSize;
+	FileChunk *fk = nullptr, *ffk;
+	void *decomp = nullptr, *data = nullptr;
+	char filename[MAX_VOL_NAME_SIZE];
+	DcmpStream dStream;
+	int hFile = 0;
+
+	vid = type << 24 | id;
+
+	dStream = NULL;
+	/* CHECK THE PATCH DIRECTORY FIRST */
+	ID2PatchFile(filename, id, type);
+	if (IsFileExist(filename)) {
+		if ((type != RES_ATS) && (type != RES_PIC)) {
+			decomp = ReadRawFile(filename, &size);
+			if (decomp == NULL)
+				return NULL;
+		} else {
+			decomp = NULL;
+			size = sfxFileSize(filename);
+			hFile = sfxOpenFile(filename, MADE_FILE_READ);
+			dStream = OpenDcmpStream(hFile, size, 0, COMPRESS_NONE);
+			if (dStream == NULL) {
+				sfxCloseFile(hFile);
+				return NULL;
+			}
+		}
+	} else {
+		/* SEARCH FROM THE MAP */
+		for (i = 0, ffk = NULL; i < mapList->size; i++) {
+			fk = (FileChunk *)mapList->elements[i];
+			if (fk->vid == vid) {
+				if (fk->location == curDisc)
+					break;
+				else
+					ffk = fk;
+			}
+		}
+		if (i == mapList->size) {
+			if (ffk == NULL) {
+				ErrMsg("id = %d type = %d not found, please reinstall Spycraft.", (vid & 0xfffffff), (vid >> 24));
+				ADV_ASSERT(false, __ERR_RES_NOT_FOUND);
+			}
+		}
+		// found only on another disc
+		if ((ffk != NULL) && (fk->vid != vid))
+			fk = ffk;
+
+		/* CHECK VALID DISC LOCATION */
+		if (fk->location != curDisc) {
+			do {
+#ifndef _DVD
+#pragma message ("not _DVD:  Line 1113.\n")
+				PromptDisk(fk->location);
+#endif
+			} while (!OpenVols(fk->location));
+			curDisc = fk->location;
+		}
+		if ((type != RES_ATS) && (type != RES_PIC)) {
+			/* DECOMPRESS THE SOURCE IF NECESSARY */
+			switch (fk->compressor) {
+			case COMPRESS_NONE:
+				decomp = Decompress_NONE(fk->offset, &size);
+				break;
+
+			case COMPRESS_PKWARE:
+				decomp = Decompress_PKWARE(fk->offset, &size);
+				break;
+
+			case COMPRESS_ZLIB:
+				decomp = Decompress_ZLIB(fk->offset, &size);
+				break;
+
+			default:
+				ADV_ASSERT(false, __ERR_CODING);
+				break;
+			}
+			if (decomp == NULL)
+				return NULL;
+		} else {
+			hFile = -1;
+			sfxSeekFile(discHandler, fk->offset, MADE_SEEK_BEG);
+			sfxReadFile(discHandler, &compSize, sizeof(int));
+			sfxReadFile(discHandler, &size, sizeof(int));
+			dStream = OpenDcmpStream(discHandler, size, compSize, fk->compressor);
+			if (dStream == NULL)
+				return NULL;
+		}
+	}
+	/* DECODE TO DATA AND FREE BUFFER */
+	switch (type) {
+	case RES_PIC:
+		data = OpenPic(dStream);
+		break;
+
+	case RES_ATS:
+		data = OpenATS(dStream);
+		break;
+
+	case RES_WAVE:
+		data = OpenWave(decomp);
+		break;
+
+	case RES_MIDI:
+		data = OpenMidi(decomp);
+		break;
+
+	case RES_TEXT:
+		data = OpenMSG(decomp, size);
+		break;
+
+	case RES_HTM:
+		sizeHTM = size;
+		data = OpenHTM(decomp);
+		break;
+
+	case RES_FACE:
+		data = OpenFace(decomp);
+		break;
+
+	default:
+		ADV_ASSERT(false, __ERR_CODING);
+		break;
+	}
+	if (dStream != NULL) {
+		CloseDcmpStream(dStream);
+		if (hFile != -1)
+			sfxCloseFile(hFile);
+	}
+
+	return data;
+}
+
+static void *FileLoad(int id, int type) {
+	char filename[MAX_VOL_NAME_SIZE];
+	void *data;
+	int size;
+	DcmpStream dStream;
+	int hFile;
+
+	data = NULL;
+
+	/* TRY THE PATCH DIRECTORY FIRST */
+	ID2PatchFile(filename, id, type);
+	if (!IsFileExist(filename))
+		ID2File(filename, id, type);
+	switch (type) {
+	case RES_ATS:
+	case RES_PIC:
+		size = sfxFileSize(filename);
+		hFile = sfxOpenFile(filename, MADE_FILE_READ);
+		dStream = OpenDcmpStream(hFile, size, 0, COMPRESS_NONE);
+		if (dStream == NULL) {
+			sfxCloseFile(hFile);
+			return NULL;
+		}
+
+		if (type == RES_ATS)
+			data = OpenATS(dStream);
+		else
+			data = OpenPic(dStream);	// used to have , scene_width, scene_height
+		CloseDcmpStream(dStream);
+		sfxCloseFile(hFile);
+		break;
+
+	case RES_TEXT:
+		data = OpenMSGFile(filename);
+		break;
+
+	case RES_WAVE:
+		data = OpenWaveFile(filename, &size);
+		break;
+
+	case RES_MIDI:
+		data = OpenMidiFile(filename, &size);
+		break;
+
+	case RES_HTM:
+		data = ReadRawFile(filename, &size);
+		sizeHTM = size;
+		break;
+
+	case RES_FACE:
+		data = OpenFaceFile(filename, &size);
+		break;
+
+	default:
+		ADV_ASSERT(false, __ERR_CODING);
+	}
+	return data;
+}
+
+void *sfxLoadRes(int id, int type) {
+	ArrayList *list = nullptr;
+	void *data = nullptr;
+	GenericData *node = nullptr;
+	int tries;
+
+	if (!cacheValide)
+		return nullptr;
+
+	/* SEE IF ALREADY LOADED IN CACHE */
+	node = SearchRESData(type, id);
+	if (node) {
+		node->time = sfxGetTime();
+		return (node->data);
+	}
+
+	/* SELECT CACHE LIST */
+	switch (type) {
+	case RES_ATS:
+		list = atsCache->list;
+		break;
+
+	case RES_PIC:
+		list = picCache->list;
+		break;
+
+	case RES_WAVE:
+		list = wavCache->list;
+		break;
+
+	case RES_MIDI:
+		list = midCache->list;
+		break;
+
+	case RES_TEXT:
+		list = fonCache->list;
+		break;
+
+	case RES_HTM:
+		list = htmCache->list;
+		break;
+
+	case RES_FACE:
+		list = faceCache->list;
+		break;
+
+	}
+
+	/* MAKE ROOM FOR RESOURCE */
+	if (list->size == list->limit) {
+		if (!sfxPurgeRes(-1, type)) {
+			sfxPrintf("Reached cache list type: %d, limit: %d", type, list->limit);
+			ADV_ASSERT(false, __ERR_CANNOT_PURGE_RES);
+		}
+	}
+	while (GetMemFree() < 0) {
+		if (!sfxPurgeRes(-1, -1))
+			break;
+	}
+	tries = 100;
+	while (tries-- > 0) {
+		/* TRY TO LOAD RESOURCE */
+		if (mapList != NULL)
+			data = VolLoad(id, type);
+		else
+			data = FileLoad(id, type);
+
+		/* BREAK FROM LOOP ON SUCCESSFUL LOAD */
+		if (data != NULL)
+			break;
+
+		/* MAKE MORE ROOM FOR RESOURCE */
+		if (!sfxPurgeRes(-1, -1))
+			ADV_ASSERT(false, __ERR_CANNOT_PURGE_RES);
+	}
+	if (tries == 0)
+		ADV_ASSERT(false, __ERR_MEM_ALLOC_FAIL);
+
+	/* PUT RESOURCE IN CACHE */
+	node = (GenericData *)AllocPtr(sizeof(GenericData));
+	ADV_ASSERT(node, __ERR_MEM_ALLOC_FAIL);
+	node->locked = false;
+	node->id = id;
+	node->location = RES_IN_MEM;
+	node->time = sfxGetTime();
+	node->data = data;
+	ArrayList_Add(list, node, NULL);
+
+	/* RETURN POINTER TO RESOURCE */
+	return (data);
+}
+
+static void FindOldRes(int *typePtr, ArrayList **listPtr, GenericData **dataPtr) {
+	int i;
+	ArrayList *list;
+	unsigned int min = 0xffffffff;
+	GenericData *data = NULL;
+
+	*dataPtr = NULL;
+
+	/* SEARCH ATS */
+	list = atsCache->list;
+	for (i = 0; i < list->size; i++) {
+		data = (GenericData *)list->elements[i];
+		if ((!data->locked) && (data->time < min)) {
+			min = data->time;
+			*dataPtr = data;
+			*typePtr = RES_ATS;
+			*listPtr = list;
+		}
+	}
+
+	/* SEARCH PIC */
+	list = picCache->list;
+	for (i = 0; i < list->size; i++) {
+		data = (GenericData *)list->elements[i];
+		if ((!data->locked) && (data->time < min)) {
+			min = data->time;
+			*dataPtr = data;
+			*typePtr = RES_PIC;
+			*listPtr = list;
+		}
+	}
+
+	/* SEARCH WAVE */
+	list = wavCache->list;
+	for (i = 0; i < list->size; i++) {
+		data = (GenericData *)list->elements[i];
+		if ((!data->locked) && (data->time < min)) {
+			min = data->time;
+			*dataPtr = data;
+			*typePtr = RES_WAVE;
+			*listPtr = list;
+		}
+	}
+
+	/* SEARCH MIDI */
+	list = midCache->list;
+	for (i = 0; i < list->size; i++) {
+		data = (GenericData *)list->elements[i];
+		if ((!data->locked) && (data->time < min)) {
+			min = data->time;
+			*dataPtr = data;
+			*typePtr = RES_MIDI;
+			*listPtr = list;
+		}
+	}
+
+	/* SEARCH TEXT */
+	list = fonCache->list;
+	for (i = 0; i < list->size; i++) {
+		data = (GenericData *)list->elements[i];
+		if ((!data->locked) && (data->time < min)) {
+			min = data->time;
+			*dataPtr = data;
+			*typePtr = RES_TEXT;
+			*listPtr = list;
+		}
+	}
+
+	/* SEARCH HTM */
+	list = htmCache->list;
+	for (i = 0; i < list->size; i++) {
+		data = (GenericData *)list->elements[i];
+		if ((!data->locked) && (data->time < min)) {
+			min = data->time;
+			*dataPtr = data;
+			*typePtr = RES_HTM;
+			*listPtr = list;
+		}
+	}
+
+	/* SEARCH FACE */
+	list = faceCache->list;
+	for (i = 0; i < list->size; i++) {
+		data = (GenericData *)list->elements[i];
+		if ((!data->locked) && (data->time < min)) {
+			min = data->time;
+			*dataPtr = data;
+			*typePtr = RES_FACE;
+			*listPtr = list;
+		}
+	}
+}
+
+int sfxPurgeRes(int id, int type) {
+	int i;
+	ArrayList *list = nullptr;
+	unsigned min = 0xffffffff;
+	GenericData *data = NULL, *pData = NULL;
+	void (*freeFn) (GenericData * pNode) = nullptr;
+
+	if (!cacheValide)
+		return false;
+
+	/* SELECT RESOURCE TO PURGE */
+	if (type == -1) {
+		FindOldRes(&type, &list, &data);
+	} else {
+		/* SELECT CACHE */
+		switch (type) {
 		case RES_ATS:
 			list = atsCache->list;
 			break;
@@ -840,798 +1466,122 @@ GenericData *SearchRESData ( int type, int id )
 			list = faceCache->list;
 			break;
 
-	}
-
-	ASSERT ( list, __ERR_CODING );
-	for ( i=0; i<list->size; i++ ) {
-		data = (GenericData *)list->elements[i];
-		if ( data->id == id ) 
-			return ( data );
-	}
-	return nullptr;
-}
-
-void MakeFilename ( char *dest, int src, char *theDir, char *ext )
-{
-	char buffer[64];
-
-	Common::strcpy_s ( dest, theDir );
-	itoa ( src, buffer, 10 );
-	strcat ( buffer, ext );
-	strcat ( dest, "\\" );
-	strcat ( dest, buffer );
-}
-
-void MakePatchFilename ( char *dest, int src, char *theDir, char *ext )
-{
-	char buffer[64];
-
-	Common::strcpy_s ( dest, theDir );
-	strcat ( dest, patchDir );
-	itoa ( src, buffer, 10 );
-	strcat ( buffer, ext );
-	strcat ( dest, "\\" );
-	strcat ( dest, buffer );
-}
-
-void ID2File ( char *dest, int src, int type )
-{
-	switch ( type ) {
-		case RES_ATS:
-			MakeFilename ( dest, src, viewDir, ATSEXT );
-			break;
-			
-		case RES_PIC:
-			MakeFilename ( dest, src, picDir, PICEXT );
-			break;
-		
-		case RES_WAVE:
-			MakeFilename ( dest, src, soundDir, WAVEXT );
-			break;
-
-		case RES_MIDI:
-			MakeFilename ( dest, src, soundDir, MIDEXT );
-			break;
-			
-		case RES_TEXT:
-			MakeFilename ( dest, src, fontDir, FONEXT );
-			break;
-			
-		case RES_HTM:
-			MakeFilename ( dest, src, htmDir, HTMEXT );
-			break;
-
-		case RES_FACE:
-			MakeFilename ( dest, src, faceDir, FACEEXT );
-			break;
-
-		default:
-			ASSERT ( FALSE, __ERR_CODING ); 
-	}
-}
-
-void ID2PatchFile ( char *dest, int src, int type )
-{
-	switch ( type ) {
-		case RES_ATS:
-			MakePatchFilename ( dest, src, sysDir, ATSEXT );
-			break;
-			
-		case RES_PIC:
-			MakePatchFilename ( dest, src, sysDir, PICEXT );
-			break;
-		
-		case RES_WAVE:
-			MakePatchFilename ( dest, src, sysDir, WAVEXT );
-			break;
-
-		case RES_MIDI:
-			MakePatchFilename ( dest, src, sysDir, MIDEXT );
-			break;
-			
-		case RES_TEXT:
-			MakePatchFilename ( dest, src, sysDir, FONEXT );
-			break;
-			
-		case RES_HTM:
-			MakePatchFilename ( dest, src, sysDir, HTMEXT );
-			break;
-
-		case RES_FACE:
-			MakePatchFilename ( dest, src, sysDir, FACEEXT );
-			break;
-
-		default:
-			ASSERT ( FALSE, __ERR_CODING ); 
-	}
-}
-
-void *OpenFace ( void *src )
-{
-	return src;
-}
-
-void *OpenFaceFile ( char *filename, int *size )
-{
-	int hf;
-	void *ret = NULL;
-	
-	*size = sfxFileSize ( filename );
-	hf = sfxOpenFile ( filename, MADE_FILE_READ );
-
-	if ( hf == - 1 )	
-		ASSERT ( FALSE, __ERR_FILE_OPEN_FAIL );
-
-	ret = AllocPtr ( *size );
-	if ( ret == NULL ) {
-		sfxCloseFile ( hf );
-		return nullptr;
-	}
-
-	sfxReadFile ( hf, ret, *size );
-	sfxCloseFile ( hf );
-	
-	return ( ret );
-}
-
-void *Decompress_NONE ( int st, int *size )
-{
-	int c_size;
-	void *buffer;
-
-	sfxSeekFile ( discHandler, st, MADE_SEEK_BEG );
-
-	sfxReadFile ( discHandler, size, sizeof ( int ) );
-	sfxReadFile ( discHandler, &c_size, sizeof ( int ) );
-	if ( c_size != *size )
-		ASSERT ( FALSE, __ERR_DECOMPRESS_SIZE_MISMATCH );
-	
-	buffer = AllocPtr ( *size );
-	if ( buffer ) {
-		sfxReadFile ( discHandler, buffer, *size );
-	}
-
-	return ( buffer );
-}
-
-void *Decompress_PKWARE ( int st, int *size )
-{
-	int compSize;
-	void *buffer, *src;
-
-	sfxSeekFile ( discHandler, st, MADE_SEEK_BEG );
-	sfxReadFile ( discHandler, &compSize, sizeof ( int ) );
-	sfxReadFile ( discHandler, size, sizeof ( int ) );
-
-	src = AllocPtr ( compSize );
-	buffer = AllocPtr ( *size );
-	if ( src && buffer ) {
-		sfxReadFile ( discHandler, src, compSize );
-		Uncompress_PKWARE ( buffer, src, compSize, *size );
-		FreePtr ( src );
-	}
-
-	return ( buffer );
-}
-
-int ZDecompress ( char *in, char *out, int inLen, int origLen );
-
-void *Decompress_ZLIB ( int st, int *size )
-{
-	int compSize;
-	void *buffer, *src;
-
-	sfxSeekFile ( discHandler, st, MADE_SEEK_BEG );
-	sfxReadFile ( discHandler, &compSize, sizeof ( int ) );
-	sfxReadFile ( discHandler, size, sizeof ( int ) );
-
-	src = AllocPtr ( compSize );
-	buffer = AllocPtr ( *size );
-	if ( src && buffer ) {
-		sfxReadFile ( discHandler, src, compSize );
-		ZDecompress ( src, buffer, compSize, *size );
-	}
-	if (src != NULL)
-		FreePtr ( src );
-
-	return ( buffer );
-}
-
-static void *OpenHTM ( void *src )
-{
-	return (	src );
-}
-
-static int IsFileExist ( char *filename )
-{
-	int hf = sfxOpenFile ( filename, MADE_FILE_READ );
-	if ( hf != -1 ) {
-		sfxCloseFile ( hf );
-		return true;
-	}
-	return false;
-}
-
-static void *ReadRawFile ( char *filename, int *size )
-{
-	int hf;
-	char *buffer;
-
-	*size = sfxFileSize ( filename );
-	hf = sfxOpenFile ( filename, MADE_FILE_READ );
-
-	if ( hf == -1 ) {
-		ErrMsg( "Can't open %s, please reinstall Spycraft.", filename );
-		ASSERT ( FALSE, __ERR_FILE_OPEN_FAIL );
-	}
-
-	buffer = (char *)AllocPtr ( *size );
-	if (buffer == NULL) {
-		sfxCloseFile ( hf );
-		return NULL;
-	}
-	sfxReadFile ( hf, buffer, *size );
-
-	sfxCloseFile ( hf );
-
-	return ( buffer );
-}
-
-static void *VolLoad ( int id, int type )
-{
-	int vid, i, size, compSize;
-	FileChunk *fk, *ffk;
-	void *decomp, *data;
-	char filename[MAX_VOL_NAME_SIZE];
-	DcmpStream dStream;
-	int hFile;
-
-	vid = type << 24 | id;
-
-	dStream = NULL;
-	/* CHECK THE PATCH DIRECTORY FIRST */
-	ID2PatchFile ( filename, id, type );
-	if ( IsFileExist ( filename ) )	{
-		if ((type != RES_ATS) && (type != RES_PIC)) {
-			decomp = ReadRawFile ( filename, &size );
-			if (decomp == NULL)
-				return NULL;
-		} 
-		else {
-			decomp = NULL;
-			size = sfxFileSize ( filename );
-			hFile = sfxOpenFile ( filename, MADE_FILE_READ );
-			dStream = OpenDcmpStream ( hFile, size, 0, COMPRESS_NONE );
-			if (dStream == NULL) {
-				sfxCloseFile ( hFile );
-				return NULL;
-			}
 		}
-	}
-	else {
-		/* SEARCH FROM THE MAP */
-		for ( i=0, ffk=NULL; i<mapList->size; i++ ) {
-			fk = (FileChunk *)mapList->elements[i];
-			if ( fk->vid == vid ) {
-				if ( fk->location	== curDisc )
-					break;
-				else
-					ffk = fk;
-			}
-		}
-		if ( i == mapList->size ) {
-			if ( ffk == NULL ) {
-				ErrMsg ( "id = %d type = %d not found, please reinstall Spycraft.", ( vid & 0xfffffff ), ( vid >> 24 ) );
-				ASSERT ( FALSE, __ERR_RES_NOT_FOUND );
-			}
-		}
-		// found only on another disc
-		if ( (ffk != NULL) && (fk->vid != vid) )
-			fk = ffk;
-
-		/* CHECK VALID DISC LOCATION */
-		if ( fk->location != curDisc ) {
-			do {
-#ifndef _DVD
-#pragma message ("not _DVD:  Line 1113.\n")
-				PromptDisk	( fk->location );
-#endif
-			} while ( !OpenVols ( fk->location ) );
-			curDisc = fk->location;
-		}
-		if ((type != RES_ATS) && (type != RES_PIC)) {
-			/* DECOMPRESS THE SOURCE IF NECESSARY */
-			switch ( fk->compressor ) {
-				case COMPRESS_NONE:
-					decomp = Decompress_NONE ( fk->offset, &size );
-					break;
-
-				case COMPRESS_PKWARE:
-					decomp = Decompress_PKWARE ( fk->offset, &size );
-					break;
-  			
-				case COMPRESS_ZLIB:
-					decomp = Decompress_ZLIB ( fk->offset, &size );
-					break;
-
-				default:
-					ASSERT ( FALSE, __ERR_CODING );
-					break;
-			}
-			if (decomp == NULL)
-				return NULL;
-		} else {
-			hFile = -1;
-			sfxSeekFile ( discHandler, fk->offset, MADE_SEEK_BEG );
-			sfxReadFile ( discHandler, &compSize, sizeof ( int ) );
-			sfxReadFile ( discHandler, &size, sizeof ( int ) );
-			dStream = OpenDcmpStream ( discHandler, size, compSize, fk->compressor );
-			if (dStream == NULL)
-				return NULL;
-		}
-	}
-	/* DECODE TO DATA AND FREE BUFFER */	
-	switch ( type ) {
-		case RES_PIC:
-			data = OpenPic ( dStream );
-			break;
-
-		case RES_ATS:
-			data = OpenATS ( dStream );
-			break;
-
-		case RES_WAVE:
-			data = OpenWave ( decomp );
-			break;
-
-		case RES_MIDI:
-			data = OpenMidi ( decomp );
-			break;
-
-		case RES_TEXT:
-			data = OpenMSG ( decomp, size );
-			break;
-
-  		case RES_HTM:
-			sizeHTM = size;
-			data = OpenHTM ( decomp );
-			break;
-
-  		case RES_FACE:
-			data = OpenFace ( decomp );
-			break;
-
-		default:
-			ASSERT ( FALSE, __ERR_CODING );
-			break;
-	} 
-	if (dStream != NULL) {
-		CloseDcmpStream ( dStream );
-		if (hFile != -1)
-			sfxCloseFile ( hFile );
-	}
-	return data;
-}
-
-static void *FileLoad(int id, int type)
-{
-	char filename[MAX_VOL_NAME_SIZE];
-	void *data;
-	int size;
-	DcmpStream dStream;
-	int hFile;
-
-	data = NULL;
-
-	/* TRY THE PATCH DIRECTORY FIRST */
-	ID2PatchFile ( filename, id, type );
-	if ( !IsFileExist ( filename ) )
-		ID2File ( filename, id, type );
-	switch ( type ) {
-		case RES_ATS:
-		case RES_PIC:
-			size = sfxFileSize ( filename );
-			hFile = sfxOpenFile ( filename, MADE_FILE_READ );
-			dStream = OpenDcmpStream ( hFile, size, 0, COMPRESS_NONE );
-			if (dStream == NULL) {
-				sfxCloseFile ( hFile );
-				return NULL;
-			}
-
-			if (type == RES_ATS)
-				data = OpenATS(dStream);
-			else
-				data = OpenPic(dStream);	// used to have , scene_width, scene_height
-			CloseDcmpStream(dStream);
-			sfxCloseFile(hFile);
-			break;
-
-		case RES_TEXT:
-			data = OpenMSGFile ( filename );
-			break;
-
-		case RES_WAVE:
-			data = OpenWaveFile ( filename, &size );
-			break;
-				
-		case RES_MIDI:
-			data = OpenMidiFile ( filename, &size );
-			break;
-
-		case RES_HTM:
-			data = ReadRawFile ( filename, &size );
-			sizeHTM = size;
-			break;
-
-		case RES_FACE:
-			data = OpenFaceFile ( filename, &size );
-			break;
-		
-		default:
-			ASSERT ( FALSE, __ERR_CODING );
-	}
-	return data;
-}
-
-void *sfxLoadRes ( int id, int type )
-{
-	ArrayList *list;
-	void *data;
-	GenericData *node;
-	int tries;
-
-	if ( !cacheValide )
-		return false;
-
-	/* SEE IF ALREADY LOADED IN CACHE */
-	node = SearchRESData ( type, id );
-	if ( node ) {
-		node->time = sfxGetTime();
-		return ( node->data );
-	}
-
-	/* SELECT CACHE LIST */
-	switch ( type ) {
-		case RES_ATS:
-			list = atsCache->list;
-			break;
-
-		case RES_PIC:
-	 		list = picCache->list;
-			break;
-
-		case RES_WAVE:
-			list = wavCache->list;
-			break;
-
-		case RES_MIDI:
-			list = midCache->list;
-			break;
-
-		case RES_TEXT:
-			list = fonCache->list;
-			break;
-
-		case RES_HTM:
-			list = htmCache->list;
-			break;
-
-		case RES_FACE:
-			list = faceCache->list;
-			break;
-
-	}
-
-	/* MAKE ROOM FOR RESOURCE */
-	if ( list->size == list->limit ) {
-		if ( !sfxPurgeRes ( -1, type ) )	{
-			sfxPrintf("Reached cache list type: %d, limit: %d", type, list->limit);
-			ASSERT ( FALSE, __ERR_CANNOT_PURGE_RES );
-		}
-	}
-	while ( GetMemFree() < 0 ) {
-		if ( !sfxPurgeRes ( -1 , -1 ) )
-			break;
-	}
-	tries = 100;
-	while ( tries-- > 0 ) {
-		/* TRY TO LOAD RESOURCE */
-		if ( mapList != NULL )
-			data = VolLoad ( id, type );
-		else
-			data = FileLoad ( id , type );
-
-		/* BREAK FROM LOOP ON SUCCESSFUL LOAD */
-		if (data != NULL)
-			break;
-
-		/* MAKE MORE ROOM FOR RESOURCE */
-		if ( ! sfxPurgeRes ( -1, -1 ) )
-			ASSERT ( FALSE, __ERR_CANNOT_PURGE_RES );
-	}
-	if ( tries == 0 )
-		ASSERT ( FALSE, __ERR_MEM_ALLOC_FAIL );
-
-	/* PUT RESOURCE IN CACHE */
-	node = (GenericData *)AllocPtr ( sizeof ( GenericData ) );
-	ASSERT ( node, __ERR_MEM_ALLOC_FAIL );
-	node->locked = FALSE;
-	node->id = id;
-	node->location = RES_IN_MEM;
-	node->time = sfxGetTime();
-	node->data = data;
-	ArrayList_Add ( list, node, NULL );
-
-	/* RETURN POINTER TO RESOURCE */
-	return ( data );
-}
-
-static void FindOldRes( int *typePtr, ArrayList **listPtr, GenericData **dataPtr )
-{
-	int i;
-	ArrayList *list;
-	unsigned int min = 0xffffffff;
-	GenericData *data = NULL;
-
-	*dataPtr = NULL;
-
-	/* SEARCH ATS */
-	list = atsCache->list;
-	for ( i=0; i<list->size; i++ ) {
-		data = (GenericData *)list->elements[i];
-		if ( ( !data->locked ) && ( data->time < min ) ) {
-			min = data->time;
-			*dataPtr = data;
-			*typePtr = RES_ATS;
-			*listPtr = list;
-		}
-	}
-
-	/* SEARCH PIC */
-	list = picCache->list;
-	for ( i=0; i<list->size; i++ ) {
-		data = (GenericData *)list->elements[i];
-		if ( ( !data->locked ) && ( data->time < min ) ) {
-			min = data->time;
-			*dataPtr = data;
-			*typePtr = RES_PIC;
-			*listPtr = list;
-		}
-	}
-
-	/* SEARCH WAVE */
-	list = wavCache->list;
-	for ( i=0; i<list->size; i++ ) {
-		data = (GenericData *)list->elements[i];
-		if ( ( !data->locked ) && ( data->time < min ) ) {
-			min = data->time;
-			*dataPtr = data;
-			*typePtr = RES_WAVE;
-			*listPtr = list;
-		}
-	}
-
-	/* SEARCH MIDI */
-	list = midCache->list;
-	for ( i=0; i<list->size; i++ ) {
-		data = (GenericData *)list->elements[i];
-		if ( ( !data->locked ) && ( data->time < min ) ) {
-			min = data->time;
-			*dataPtr = data;
-			*typePtr = RES_MIDI;
-			*listPtr = list;
-		}
-	}
-
-	/* SEARCH TEXT */
-	list = fonCache->list;
-	for ( i=0; i<list->size; i++ ) {
-		data = (GenericData *)list->elements[i];
-		if ( ( !data->locked ) && ( data->time < min ) ) {
-			min = data->time;
-			*dataPtr = data;
-			*typePtr = RES_TEXT;
-			*listPtr = list;
-		}
-	}
-
-	/* SEARCH HTM */
-	list = htmCache->list;
-	for ( i=0; i<list->size; i++ ) {
-		data = (GenericData *)list->elements[i];
-		if ( ( !data->locked ) && ( data->time < min ) ) {
-			min = data->time;
-			*dataPtr = data;
-			*typePtr = RES_HTM;
-			*listPtr = list;
-		}
-	}
-
-	/* SEARCH FACE */
-	list = faceCache->list;
-	for ( i=0; i<list->size; i++ ) {
-		data = (GenericData *)list->elements[i];
-		if ( ( !data->locked ) && ( data->time < min ) ) {
-			min = data->time;
-			*dataPtr = data;
-			*typePtr = RES_FACE;
-			*listPtr = list;
-		}
-	}
-
-}
-
-int sfxPurgeRes ( int id, int type )
-{
-	int i;
-	ArrayList *list;
-	unsigned min = 0xffffffff;
-	GenericData *data = NULL, *pData = NULL;
-	void (*freeFn) ( GenericData *pNode );
-
-	if ( !cacheValide )
-		return false;
-
-	/* SELECT RESOURCE TO PURGE */
-	if ( type == -1 ) {
-		FindOldRes(&type, &list, &data);
-	}
-	else {
-		/* SELECT CACHE */
-		switch ( type ) {
-			case RES_ATS:
-				list = atsCache->list;
-				break;
-
-			case RES_PIC:
-	 			list = picCache->list;
-				break;
-
-			case RES_WAVE:
-				list = wavCache->list;
-				break;
-
-			case RES_MIDI:
-				list = midCache->list;
-				break;
-
-			case RES_TEXT:
-				list = fonCache->list;
-				break;
-
-			case RES_HTM:
-				list = htmCache->list;
-				break;
-
-			case RES_FACE:
-				list = faceCache->list;
-				break;
-
-		}
-		if ( id < 0 ) {
+		if (id < 0) {
 			/* AUTO PURGE */
 			pData = NULL;
-			for ( i=0; i<list->size; i++ ) {
+			for (i = 0; i < list->size; i++) {
 				data = (GenericData *)list->elements[i];
-				if ( ( !data->locked ) && ( data->time < min ) )	{
+				if ((!data->locked) && (data->time < min)) {
 					min = data->time;
 					pData = data;
 				}
 			}
 			data = pData;
-		}
-		else {
+		} else {
 			/* MAKE THE RESOURCE IS IN CACHE */
-			data = SearchRESData ( type, id );
+			data = SearchRESData(type, id);
 		}
 	}
 
 	if ((data == NULL) || (data->locked))
-		return FALSE;
+		return false;
 
 	/* PURGE RESOURCE */
-	switch ( type ) {
-		case RES_PIC:
-			freeFn = FreePICNode;
-			break;
+	switch (type) {
+	case RES_PIC:
+		freeFn = FreePICNode;
+		break;
 
-		case RES_ATS:
-			freeFn = FreeATSNode;
-			break;
+	case RES_ATS:
+		freeFn = FreeATSNode;
+		break;
 
-		case RES_TEXT:
-			freeFn = FreeMSGNode;
-			break;
+	case RES_TEXT:
+		freeFn = FreeMSGNode;
+		break;
 
-  		case RES_HTM:
-			freeFn = FreeHTMNode;
-			break;
+	case RES_HTM:
+		freeFn = FreeHTMNode;
+		break;
 
-		case RES_WAVE:
-			freeFn = FreeWaveNode;
-			break;
+	case RES_WAVE:
+		freeFn = FreeWaveNode;
+		break;
 
-		case RES_MIDI:
-			freeFn = FreeMidiNode;
-			break;
+	case RES_MIDI:
+		freeFn = FreeMidiNode;
+		break;
 
-		case RES_FACE:
-			freeFn = FreeFaceNode;
-			break;
+	case RES_FACE:
+		freeFn = FreeFaceNode;
+		break;
 
-		default:
-			ASSERT ( FALSE, __ERR_CODING );
+	default:
+		ADV_ASSERT(false, __ERR_CODING);
 	}
- 	ArrayList_Del ( list, data, freeFn );
+	ArrayList_Del(list, data, (FreeFnPtr)freeFn);
 
 	return true;
 }
 
-int sfxLockRes ( int id, int type )
-{
+int sfxLockRes(int id, int type) {
 	GenericData *data;
-	
-	if ( !cacheValide )
+
+	if (!cacheValide)
 		return false;
 
-	data = SearchRESData ( type, id );
+	data = SearchRESData(type, id);
 
-	if ( data )	{
-		data->locked ++;
+	if (data) {
+		data->locked++;
 		return true;
-	}
-	else {
+	} else {
 		return false;
 	}
 }
 
-int sfxUnlockRes ( int id, int type )
-{
+int sfxUnlockRes(int id, int type) {
 	GenericData *data;
-	
-	if ( !cacheValide )
+
+	if (!cacheValide)
 		return false;
 
-	data = SearchRESData ( type, id );
+	data = SearchRESData(type, id);
 
-	if ( data )	{
-		data->locked --;
+	if (data) {
+		data->locked--;
 		return true;
-	}
-	else {
+	} else {
 		return false;
 	}
 }
 
-int sfxCheckRes ( int id, int type )
-{
+int sfxCheckRes(int id, int type) {
 	int i, hf, vid;
 	FileChunk *fk;
 	char filename[256];
-	
-	if ( mapList ) {
+
+	if (mapList) {
 		vid = type << 24 | id;
 		/* SEARCH FROM THE MAP */
-		for ( i=0; i<mapList->size; i++ ) {
+		for (i = 0; i < mapList->size; i++) {
 			fk = (FileChunk *)mapList->elements[i];
-			if ( fk->vid == vid )
+			if (fk->vid == vid)
 				return true;
 		}
 		return false;
-	}
-	else {
-		ID2File ( filename, id, type );
-		hf = sfxOpenFile ( filename, MADE_FILE_READ );
+	} else {
+		ID2File(filename, id, type);
+		hf = sfxOpenFile(filename, MADE_FILE_READ);
 
-		if ( hf == -1 )
+		if (hf == -1)
 			return false;
 		else {
-			sfxCloseFile ( hf );
+			sfxCloseFile(hf);
 			return true;
 		}
 	}
 }
 
 } // namespace Spycraft
-
-#endif

@@ -58,7 +58,7 @@ ArrayList *ArrayList_Calloc(int theLimit) {
 	return list;
 }
 
-void ArrayList_Free(ArrayList *list, void (*freeFn)(void *obj)) {
+void ArrayList_Free(ArrayList *list, FreeFnPtr freeFn) {
 	int i;
 
 	if (list) {
@@ -75,7 +75,7 @@ void ArrayList_Free(ArrayList *list, void (*freeFn)(void *obj)) {
 	}
 }
 
-void ArrayList_Add(ArrayList *list, void *obj, int (*sort)(void *in, void *out)) {
+void ArrayList_Add(ArrayList *list, void *obj, SortFnPtr sort) {
 	int i, j;
 
 	if (list->size >= list->limit) {
@@ -100,7 +100,7 @@ void ArrayList_Add(ArrayList *list, void *obj, int (*sort)(void *in, void *out))
 	}
 }
 
-int ArrayList_Del(ArrayList *list, void *obj, void (*freeFn)(void *)) {
+int ArrayList_Del(ArrayList *list, void *obj, FreeFnPtr freeFn) {
 	int i;
 	bool found = false;
 

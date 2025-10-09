@@ -19,29 +19,39 @@
  *
  */
 
-#ifndef SPYCRAFT_DMADE_ADVLIST_H
-#define SPYCRAFT_DMADE_ADVLIST_H
+#ifndef SPYCRAFT_DMADE_IMPLODE_H
+#define SPYCRAFT_DMADE_IMPLODE_H
 
 namespace Spycraft {
 
-#define DEF_ARRAY_SIZE		32
+unsigned int implode(
+	unsigned int (*read_buf)(char *buf, unsigned int *size, void *param),
+	void         (*write_buf)(char *buf, unsigned int *size, void *param),
+	char *work_buf,
+	void *param,
+	unsigned int *type,
+	unsigned int *dsize);
 
-struct ArrayList {
-	int limit;
-	int size;
-	void **elements;
-};
 
-typedef void (*FreeFnPtr)(void *obj);
-typedef bool (*SortFnPtr)(void *obj1, void *obj2);
+unsigned int explode(
+	unsigned int (*read_buf)(char *buf, unsigned  int *size, void *param),
+	void         (*write_buf)(char *buf, unsigned  int *size, void *param),
+	char *work_buf,
+	void *param);
 
-extern ArrayList *ArrayList_Alloc(void);
-extern ArrayList *ArrayList_Calloc(int theLimit);
-extern void ArrayList_Free(ArrayList *list, FreeFnPtr freeFn);
-extern void ArrayList_Add(ArrayList *list, void *obj, SortFnPtr sort);
-extern int ArrayList_Del(ArrayList *list, void *obj, FreeFnPtr freeFn);
-extern int ArrayList_Unlink(ArrayList *list, void *obj);
-extern void ArrayList_Release(ArrayList *list);
+unsigned long crc32(char *buffer, unsigned int *size, unsigned long *old_crc);
+
+#define CMP_BUFFER_SIZE    36312
+#define EXP_BUFFER_SIZE    12596
+
+#define CMP_BINARY             0
+#define CMP_ASCII              1
+
+#define CMP_NO_ERROR           0
+#define CMP_INVALID_DICTSIZE   1
+#define CMP_INVALID_MODE       2
+#define CMP_BAD_DATA           3
+#define CMP_ABORT              4
 
 } // namespace Spycraft
 

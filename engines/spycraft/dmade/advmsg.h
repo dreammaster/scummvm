@@ -19,29 +19,28 @@
  *
  */
 
-#ifndef SPYCRAFT_DMADE_ADVLIST_H
-#define SPYCRAFT_DMADE_ADVLIST_H
+#ifndef SPYCRAFT_DMADE_ADVMSG_H
+#define SPYCRAFT_DMADE_ADVMSG_H
+
+#include "spycraft/game/dump.h"
+#include "spycraft/dmade/advfile.h"
 
 namespace Spycraft {
 
-#define DEF_ARRAY_SIZE		32
+/* MADE External */
 
-struct ArrayList {
-	int limit;
+extern char *sfxGetMsg(int id, int index, char *dest);
+
+/* MADE Internal */
+
+typedef struct {
 	int size;
-	void **elements;
-};
+	char **data;
+} MSGTag;
 
-typedef void (*FreeFnPtr)(void *obj);
-typedef bool (*SortFnPtr)(void *obj1, void *obj2);
-
-extern ArrayList *ArrayList_Alloc(void);
-extern ArrayList *ArrayList_Calloc(int theLimit);
-extern void ArrayList_Free(ArrayList *list, FreeFnPtr freeFn);
-extern void ArrayList_Add(ArrayList *list, void *obj, SortFnPtr sort);
-extern int ArrayList_Del(ArrayList *list, void *obj, FreeFnPtr freeFn);
-extern int ArrayList_Unlink(ArrayList *list, void *obj);
-extern void ArrayList_Release(ArrayList *list);
+extern MSGTag *OpenMSGFile(char *filename);
+extern MSGTag *OpenMSG(void *buffer, int size);
+extern void FreeMSG(MSGTag *tag);
 
 } // namespace Spycraft
 
