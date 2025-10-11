@@ -56,7 +56,7 @@ public:
 	uint16  	curVolume;
 	int 	  	project_num;
 	bufferNum	display_buffer;
-	char *prevRoomName;   //don't use ptr to room object because it has been disposed
+	const char *prevRoomName;   //don't use ptr to room object because it has been disposed
 	int			isMoviePlaying;
 	short		enableIntrDuringMovie;
 	Game();

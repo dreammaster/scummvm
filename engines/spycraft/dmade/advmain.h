@@ -22,6 +22,7 @@
 #ifndef SPYCRAFT_DMADE_ADVMAIN_H
 #define SPYCRAFT_DMADE_ADVMAIN_H
 
+#include "common/events.h"
 #include "spycraft/dmade/advlib.h"
 
 namespace Spycraft {
@@ -29,17 +30,19 @@ namespace Spycraft {
 #define MADE_VERS			0x0120		// version 1.2.0 11/30/94 djh
 
 // the following #defines are used exclusively for sfxGetEvent()
-#define EVENT_LBUTTONUP     1
-#define EVENT_LBUTTONDOWN   3
-#define EVENT_MBUTTONUP     4
-#define EVENT_MBUTTONDOWN   5
-#define EVENT_RBUTTONUP     6
-#define EVENT_RBUTTONDOWN   7
-#define EVENT_MOUSE			8
-#define EVENT_KEYDOWN       9        // jcd: eliminated EVENT_KEYUP on 6/21/95
-#define EVENT_SYSKEYDOWN    10
-#define EVENT_SYSCHAR       12
-#define EVENT_DISKINSERT	13	
+enum {
+	EVENT_LBUTTONUP		= Common::EVENT_LBUTTONUP,
+	EVENT_LBUTTONDOWN	= Common::EVENT_LBUTTONDOWN,
+	EVENT_MBUTTONUP		= Common::EVENT_MBUTTONUP,
+	EVENT_MBUTTONDOWN	= Common::EVENT_MBUTTONDOWN,
+	EVENT_RBUTTONUP		= Common::EVENT_RBUTTONUP,
+	EVENT_RBUTTONDOWN	= Common::EVENT_RBUTTONDOWN,
+	EVENT_MOUSE			= Common::EVENT_MOUSEMOVE,
+	EVENT_KEYDOWN		= Common::EVENT_KEYDOWN,        // jcd: eliminated EVENT_KEYUP on 6/21/95
+	EVENT_SYSKEYDOWN	= 9001,
+	EVENT_SYSCHAR		= 9002,
+	EVENT_DISKINSERT	= 9003
+};
 
 typedef struct MADEEventStamp {
 	BitField modifiers; 	// Control keys depressed during event

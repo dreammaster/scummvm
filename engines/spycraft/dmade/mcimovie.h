@@ -19,9 +19,10 @@
  *
  */
 
-#ifndef SPYCRAFT_DMADE_ADVERROR_H
-#define SPYCRAFT_DMADE_ADVERROR_H
+#ifndef SPYCRAFT_DMADE_MCIMOVIE_H
+#define SPYCRAFT_DMADE_MCIMOVIE_H
 
+#include "spycraft/afxwin.h"
 #include "spycraft/dmade/advrect.h"
 
 namespace Spycraft {
@@ -35,7 +36,7 @@ struct MCIMovie {
 	UINT movieID;
 	char *aliasName;
 	int	mode;
-	SRect	rect;
+	SRect rect;
 };
 
 // callbackFunc - pointer to a function for directed callbacks

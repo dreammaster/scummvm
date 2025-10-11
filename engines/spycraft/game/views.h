@@ -79,6 +79,6 @@ namespace Spycraft {
 #define	vONYXDOSSIER		903
 #define	vPHOTOPARKER		903
 
-} // naemspace Spycraft
+} // namespace Spycraft
 
 #endif
