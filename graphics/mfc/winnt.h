@@ -30,6 +30,8 @@ namespace MFC {
 typedef byte BYTE;
 typedef uint16 SHORT;
 typedef uint32 DWORD;
+typedef long LONG;
+typedef uint UINT;
 
 typedef uint32 COLORREF;
 typedef void *POSITION;

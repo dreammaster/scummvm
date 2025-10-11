@@ -36,7 +36,7 @@ extern Movie *theMovie;
 unsigned long absoluteTime;
 unsigned long oldTime;
 unsigned long elapsedTime;
-int suspended;
+bool suspended;
 
 void StartScript() {
 	theGame->init();

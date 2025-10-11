@@ -30,6 +30,8 @@
 
 namespace Spycraft {
 
+#define MAX_PATH 256
+
 #define DIALOG_FOCUS 1
 #define PDA_FOCUS 2
 #define MENU_FOCUS 3
