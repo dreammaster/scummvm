@@ -19,19 +19,81 @@
  *
  */
 
+#include "common/memstream.h"
 #include "wizardry/libs/files.h"
 #include "wizardry/data/globals.h"
 
 namespace Wizardry {
 
-void UNITREAD(int unit, void *buffer, int byteCount, int blockNumber, int offset) {
+enum FileType {
+	VOLHEAD, BADBLK, MACH6502, TEXT, DEBUG,
+	DATA, GRAFFILE, FOTOFILE, SUBDIR
+};
+
+struct DirEntry {
+	uint16 FIRSTBLK = 0;
+	uint16 LASTBLK = 0;
+	struct {
+		FileType FT = VOLHEAD;
+	} FILEKIND;
+	Common::String FILENAME;
+	uint16 SIGNATURE = 0;
+	uint16 DISK_FLAGS = 0;
+	uint16 CHECKSUM = 0;
+
+	void load(Common::MemoryReadStream &src) {
+		FIRSTBLK = src.readUint16LE();
+		LASTBLK = src.readUint16LE();
+		FILEKIND.FT = (FileType)src.readByte();
+		src.skip(1);
+
+		byte len = src.readByte();
+		char buf[14];
+		assert(len <= 13);
+		src.read(buf, 13);
+		buf[len] = '\0';
+		FILENAME = Common::String(buf);
+
+		SIGNATURE = src.readUint16LE();
+		DISK_FLAGS = src.readUint16LE();
+		CHECKSUM = src.readUint16LE();
+	}
+};
+
+int UNITREAD(int unit, void *buffer, int byteCount, int blockNumber, int offset) {
 	assert(unit == DRIVE1);
-	assert(blockNumber >= 0 && blockNumber < 640);
+	if (blockNumber < 0 || blockNumber >= 640)
+		return -1;
 
 	auto &f = _G(dsk);
 	f.seek(blockNumber * 512 + offset);
-	if (f.read(buffer, byteCount) != (uint32)byteCount)
-		error("Error reading raw dsk data");
+	return f.read(buffer, byteCount) == (uint32)byteCount ? 0 : -1;
+}
+
+int FINDFILE(int drive, const char *filename) {
+	DirEntry dirEntry;
+	byte buf[BLOCKSZ];
+
+	// Read the index block
+	if (UNITREAD(drive, buf, BLOCKSZ, 2, 0) != 0)
+		return -1;
+
+	Common::MemoryReadStream src(buf, 26 * 20);
+	dirEntry.load(src);		// Skip over the WIZBOOT entry
+
+	for (;;) {
+		dirEntry.load(src);
+		if (dirEntry.SIGNATURE != 0x6776)
+			break;
+
+		if (dirEntry.FILEKIND.FT >= BADBLK && dirEntry.FILEKIND.FT <= FOTOFILE) {
+			if (dirEntry.FILENAME.equalsIgnoreCase(filename))
+				return dirEntry.FIRSTBLK;
+		}
+	}
+
+	// Not found
+	return -9;
 }
 
 } // namespace Wizardry

@@ -20,6 +20,7 @@
  */
 
 #include "wizardry/data/globals.h"
+#include "wizardry/libs/files.h"
 
 namespace Wizardry {
 
@@ -36,6 +37,8 @@ Globals::~Globals() {
 void Globals::setup() {
 	if (!_dsk.open("wiz1.dsk"))
 		error("Could not open wiz1.dsk");
+
+	assert(FINDFILE(DRIVE1, "scenario.data") >= 0);
 }
 
 } // namespace Wizardry

@@ -23,7 +23,7 @@
 #ifndef WIZARDRY_LIBS_FILES_H
 #define WIZARDRY_LIBS_FILES_H
 
-#include "gui/debugger.h"
+#include "common/scummsys.h"
 
 namespace Wizardry {
 
@@ -33,13 +33,24 @@ enum {
 };
 constexpr int BLOCKSZ = 512;
 
-extern void UNITREAD(
-	int unit,			// drive number (0 = DRIVE1, 1 = DRIVE2, etc.)
-	void *buffer,		// pointer to destination memory
-	int byteCount,		// number of bytes to read (usually 512)
-	int blockNumber,	// which 512-byte block to read
-	int offset = 0		// byte offset within block (normally 0)
-);
+/**
+ * Reads blocks from a WIZBOOT DSK file
+ * @param unit			Drive number (0 = DRIVE1, 1 = DRIVE2, etc.)
+ * @param buffer		Pointer to destination memory
+ * @param byteCount		Number of bytes to read (usually 512)
+ * @param blockNumber	Which 512-byte block to read
+ * @param offset		Byte offset within block (normally 0)
+ * @returns				Zero if successful, non-zero if not
+ */
+extern int UNITREAD(int unit, void *buffer, int byteCount, int blockNumber, int offset = 0);
+
+/**
+ * Scan for a given file's start
+ * @param drive 		Drive number (0 = DRIVE1, 1 = DRIVE2, etc.)
+ * @param filename		Filename to find
+ * @return				Block number (>= 0) if found
+ */
+extern int FINDFILE(int drive, const char *filename);
 
 } // namespace Wizardry
 
