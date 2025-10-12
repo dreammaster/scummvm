@@ -19,26 +19,25 @@
  *
  */
 
-#include "wizardry/gfx/surface.h"
-#include "wizardry/data/globals.h"
+#ifndef WIZARDRY_VIEWS_CASTLE_H
+#define WIZARDRY_VIEWS_CASTLE_H
+
+#include "wizardry/views/view.h"
 
 namespace Wizardry {
 
-constexpr int CHAR_SIZE = 8;
+class Castle : public View {
+private:
+	void horzLine(Surface &surf, int line);
 
-void Surface::PRINTCHR(char c) {
-	Common::String str(c);
-	writeString(str);
-}
+public:
+	Castle() : View("Castle") {}
+	virtual ~Castle() {}
 
-void Surface::writeString(const Common::String &str) {
-	_G(font).drawString(this, str, _textPos.x * CHAR_SIZE, _textPos.y * CHAR_SIZE,
-		320 - (_textPos.x * CHAR_SIZE), _textColor);
-	_textPos.x += str.size();
-}
-
-void Surface::CLRRECT(int x1, int y1, int x2, int y2) {
-	fillRect(Common::Rect(x1 * CHAR_SIZE, y1 * CHAR_SIZE, x2 * CHAR_SIZE, y2 * CHAR_SIZE), 0);
-}
+	bool msgKeypress(const KeypressMessage &msg) override;
+	void draw() override;
+};
 
 } // namespace Wizardry
+
+#endif

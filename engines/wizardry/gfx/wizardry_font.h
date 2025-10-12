@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,21 +20,28 @@
  *
  */
 
-#include "common/system.h"
-#include "graphics/paletteman.h"
-#include "wizardry/views/view1.h"
+#ifndef WIZARDRY_GFX_WIZARDRY_FONT_H
+#define WIZARDRY_GFX_WIZARDRY_FONT_H
+
+#include "graphics/font.h"
+#include "graphics/surface.h"
 
 namespace Wizardry {
 
-bool View1::msgKeypress(const KeypressMessage &msg) {
-	// Any keypress to close the view
-	close();
-	return true;
-}
-
-void View1::draw() {
-	auto s = getSurface();
-	s.writeString("0123456789012345678 01234567890123456789");
-}
+class WizardryFont : public Graphics::Font {
+public:
+	int getFontHeight() const override {
+		return 8;
+	}
+	int getMaxCharWidth() const override {
+		return 8;
+	}
+	int getCharWidth(uint32 chr) const override {
+		return 8;
+	}
+	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
+};
 
 } // namespace Wizardry
+
+#endif

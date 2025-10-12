@@ -12,8 +12,9 @@ MODULE_OBJS = \
 	libs/memory.o \
 	gfx/palette.o \
 	gfx/surface.o \
+	gfx/wizardry_font.o \
 	views/view.o \
-	views/view1.o
+	views/castle.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_WIZARDRY), DYNAMIC_PLUGIN)

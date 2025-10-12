@@ -22,12 +22,12 @@
 #ifndef WIZARDRY_VIEWS_H
 #define WIZARDRY_VIEWS_H
 
-#include "wizardry/views/view1.h"
+#include "wizardry/views/castle.h"
 
 namespace Wizardry {
 
 struct Views {
-	View1 _view1;
+	Castle _castle;
 };
 
 } // namespace Wizardry

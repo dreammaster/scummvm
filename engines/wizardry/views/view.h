@@ -23,6 +23,7 @@
 #define WIZARDRY_VIEWS_VIEW_H
 
 #include "wizardry/events.h"
+#include "wizardry/data/globals.h"
 
 namespace Wizardry {
 

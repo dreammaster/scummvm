@@ -19,22 +19,33 @@
  *
  */
 
-#ifndef WIZARDRY_VIEWS_VIEW1_H
-#define WIZARDRY_VIEWS_VIEW1_H
-
-#include "wizardry/views/view.h"
+#include "common/system.h"
+#include "graphics/paletteman.h"
+#include "wizardry/views/castle.h"
 
 namespace Wizardry {
 
-class View1 : public View {
-public:
-	View1() : View("View1") {}
-	virtual ~View1() {}
+bool Castle::msgKeypress(const KeypressMessage &msg) {
+	// Any keypress to close the view
+	close();
+	return true;
+}
 
-	bool msgKeypress(const KeypressMessage &msg) override;
-	void draw() override;
-};
+void Castle::draw() {
+	auto s = getSurface();
+	s.clear();
+
+	s.writeString("ABCDE");
+}
+
+void Castle::horzLine(Surface &surf, int line) {
+	surf.MVCURSOR(0, line);
+	surf.PRINTCHR(39);		// Tilted 'T' on left of line
+#if 0
+	HORZHYPH;
+	PRINTCHR(CHR(40))          (*TILTED "T" ON RIGHT OF LINE *)
+		END;
+#endif
+}
 
 } // namespace Wizardry
-
-#endif

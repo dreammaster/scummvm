@@ -47,7 +47,7 @@ void Events::runGame() {
 	if (saveSlot != -1)
 		g_engine->loadGameState(saveSlot);
 
-	addView("View1");
+	addView("Castle");
 
 	Common::Event e;
 	while (!_views.empty() && !shouldQuit()) {
@@ -193,7 +193,7 @@ void Events::addKeypress(const Common::KeyCode kc) {
 /*------------------------------------------------------------------------*/
 
 Bounds::Bounds(Common::Rect &innerBounds) :
-		_bounds(0, 0, 320, 200),
+		_bounds(0, 0, 320, 192),
 		_innerBounds(innerBounds),
 		left(_bounds.left), top(_bounds.top),
 		right(_bounds.right), bottom(_bounds.bottom) {
@@ -318,7 +318,11 @@ void UIElement::addView() {
 }
 
 Surface UIElement::getSurface() const {
-	return Surface(*g_events->getScreen(), _bounds);
+	// Apple screen is 320x192, so we keep (200-8)/2=4 pixels at the top/bottom
+	Common::Rect r = _bounds;
+	r.translate(0, 4);
+
+	return Surface(*g_events->getScreen(), r);
 }
 
 int UIElement::getRandomNumber(int minNumber, int maxNumber) {

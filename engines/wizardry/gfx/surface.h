@@ -36,15 +36,18 @@ public:
 	Surface(Graphics::ManagedSurface &src, const Common::Rect &bounds) :
 		Graphics::ManagedSurface(src, bounds) {}
 
-	void setTextPos(int x, int y) {
+	void MVCURSOR(int x, int y) {
 		_textPos.x = x;
 		_textPos.y = y;
 	}
+	void PRINTCHR(char c);
 	void writeString(const Common::String &str);
 	void writeString(int x, int y, const Common::String &str) {
-		setTextPos(x, y);
+		MVCURSOR(x, y);
 		writeString(str);
 	}
+
+	void CLRRECT(int x1, int y1, int x2, int y2);
 };
 
 } // namespace Wizardry
