@@ -57,6 +57,10 @@ Common::Error WizardryEngine::run() {
 	// Set the engine's debugger console
 	setDebugger(new Console());
 
+	// Setup globals
+	g_globals->setup();
+
+	// Play the game
 	runGame();
 
 	return Common::kNoError;

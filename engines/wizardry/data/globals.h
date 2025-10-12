@@ -22,19 +22,22 @@
 #ifndef WIZARDRY_DATA_GLOBALS_H
 #define WIZARDRY_DATA_GLOBALS_H
 
-#include "common/scummsys.h"
+#include "common/file.h"
 
 namespace Wizardry {
 
 struct Globals {
+	Common::File _dsk;
 	int _LLBASE04 = -1;
 
 	Globals();
 	~Globals();
+
+	void setup();
 };
 
 extern Globals *g_globals;
-#define _G(X) (g_globals->_X)
+#define _G(FIELD) (g_globals->_##FIELD)
 
 } // namespace Wizardry
 

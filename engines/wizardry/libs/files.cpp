@@ -19,23 +19,19 @@
  *
  */
 
+#include "wizardry/libs/files.h"
 #include "wizardry/data/globals.h"
 
 namespace Wizardry {
 
-Globals *g_globals;
+void UNITREAD(int unit, void *buffer, int byteCount, int blockNumber, int offset) {
+	assert(unit == DRIVE1);
+	assert(blockNumber >= 0 && blockNumber < 640);
 
-Globals::Globals() {
-	g_globals = this;
-}
-
-Globals::~Globals() {
-	g_globals = nullptr;
-}
-
-void Globals::setup() {
-	if (!_dsk.open("wiz1.dsk"))
-		error("Could not open wiz1.dsk");
+	auto &f = _G(dsk);
+	f.seek(blockNumber * 512 + offset);
+	if (f.read(buffer, byteCount) != (uint32)byteCount)
+		error("Error reading raw dsk data");
 }
 
 } // namespace Wizardry

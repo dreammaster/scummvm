@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,23 +20,27 @@
  *
  */
 
-#include "wizardry/data/globals.h"
+#ifndef WIZARDRY_LIBS_FILES_H
+#define WIZARDRY_LIBS_FILES_H
+
+#include "gui/debugger.h"
 
 namespace Wizardry {
 
-Globals *g_globals;
+enum {
+	DRIVE1 = 0,
+	DRIVE2 = 1
+};
+constexpr int BLOCKSZ = 512;
 
-Globals::Globals() {
-	g_globals = this;
-}
-
-Globals::~Globals() {
-	g_globals = nullptr;
-}
-
-void Globals::setup() {
-	if (!_dsk.open("wiz1.dsk"))
-		error("Could not open wiz1.dsk");
-}
+extern void UNITREAD(
+	int unit,			// drive number (0 = DRIVE1, 1 = DRIVE2, etc.)
+	void *buffer,		// pointer to destination memory
+	int byteCount,		// number of bytes to read (usually 512)
+	int blockNumber,	// which 512-byte block to read
+	int offset = 0		// byte offset within block (normally 0)
+);
 
 } // namespace Wizardry
+
+#endif
