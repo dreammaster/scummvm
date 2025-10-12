@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,29 +20,16 @@
  *
  */
 
-#include "wizardry/data/globals.h"
-#include "wizardry/libs/files.h"
-#include "wizardry/gfx/palette.h"
+#ifndef WIZARDRY_GFX_PALETTE_H
+#define WIZARDRY_GFX_PALETTE_H
 
 namespace Wizardry {
 
-Globals *g_globals;
-
-Globals::Globals() {
-	g_globals = this;
-}
-
-Globals::~Globals() {
-	g_globals = nullptr;
-}
-
-void Globals::setup() {
-	if (!_dsk.open("wiz1.dsk"))
-		error("Could not open wiz1.dsk");
-
-	assert(FINDFILE(DRIVE1, "scenario.data") >= 0);
-
-	Gfx::setupPalette();
-}
+class Gfx {
+public:
+	static void setupPalette();
+};
 
 } // namespace Wizardry
+
+#endif

@@ -23,11 +23,13 @@
 #define WIZARDRY_DATA_GLOBALS_H
 
 #include "common/file.h"
+#include "graphics/fonts/dosfont.h"
 
 namespace Wizardry {
 
 struct Globals {
 	Common::File _dsk;
+	Graphics::DosFont _font;
 	int _LLBASE04 = -1;
 
 	Globals();

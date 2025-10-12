@@ -8,8 +8,10 @@ MODULE_OBJS = \
 	metaengine.o \
 	data/globals.o \
 	libs/files.o \
-	view.o \
-	view1.o
+	gfx/palette.o \
+	gfx/surface.o \
+	views/view.o \
+	views/view1.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_WIZARDRY), DYNAMIC_PLUGIN)

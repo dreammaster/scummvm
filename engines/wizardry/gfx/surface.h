@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,29 +20,33 @@
  *
  */
 
-#include "wizardry/data/globals.h"
-#include "wizardry/libs/files.h"
-#include "wizardry/gfx/palette.h"
+#ifndef WIZARDRY_GFX_SURFACE_H
+#define WIZARDRY_GFX_SURFACE_H
+
+#include "graphics/managed_surface.h"
 
 namespace Wizardry {
 
-Globals *g_globals;
+class Surface : public Graphics::ManagedSurface {
+private:
+	Common::Point _textPos;
+	int _textColor = 1;
 
-Globals::Globals() {
-	g_globals = this;
-}
+public:
+	Surface(Graphics::ManagedSurface &src, const Common::Rect &bounds) :
+		Graphics::ManagedSurface(src, bounds) {}
 
-Globals::~Globals() {
-	g_globals = nullptr;
-}
-
-void Globals::setup() {
-	if (!_dsk.open("wiz1.dsk"))
-		error("Could not open wiz1.dsk");
-
-	assert(FINDFILE(DRIVE1, "scenario.data") >= 0);
-
-	Gfx::setupPalette();
-}
+	void setTextPos(int x, int y) {
+		_textPos.x = x;
+		_textPos.y = y;
+	}
+	void writeString(const Common::String &str);
+	void writeString(int x, int y, const Common::String &str) {
+		setTextPos(x, y);
+		writeString(str);
+	}
+};
 
 } // namespace Wizardry
+
+#endif

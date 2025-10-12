@@ -19,29 +19,15 @@
  *
  */
 
+#include "wizardry/gfx/surface.h"
 #include "wizardry/data/globals.h"
-#include "wizardry/libs/files.h"
-#include "wizardry/gfx/palette.h"
 
 namespace Wizardry {
 
-Globals *g_globals;
-
-Globals::Globals() {
-	g_globals = this;
-}
-
-Globals::~Globals() {
-	g_globals = nullptr;
-}
-
-void Globals::setup() {
-	if (!_dsk.open("wiz1.dsk"))
-		error("Could not open wiz1.dsk");
-
-	assert(FINDFILE(DRIVE1, "scenario.data") >= 0);
-
-	Gfx::setupPalette();
+void Surface::writeString(const Common::String &str) {
+	_G(font).drawString(this, str, _textPos.x * 8, _textPos.y * 8,
+		320 - (_textPos.x * 8), _textColor);
+	_textPos.x += str.size();
 }
 
 } // namespace Wizardry

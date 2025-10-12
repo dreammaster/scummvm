@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef WIZARDRY_VIEW_H
-#define WIZARDRY_VIEW_H
+#ifndef WIZARDRY_VIEWS_VIEW_H
+#define WIZARDRY_VIEWS_VIEW_H
 
 #include "wizardry/events.h"
 

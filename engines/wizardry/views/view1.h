@@ -19,15 +19,20 @@
  *
  */
 
-#ifndef WIZARDRY_VIEWS_H
-#define WIZARDRY_VIEWS_H
+#ifndef WIZARDRY_VIEWS_VIEW1_H
+#define WIZARDRY_VIEWS_VIEW1_H
 
-#include "wizardry/view1.h"
+#include "wizardry/views/view.h"
 
 namespace Wizardry {
 
-struct Views {
-	View1 _view1;
+class View1 : public View {
+public:
+	View1() : View("View1") {}
+	virtual ~View1() {}
+
+	bool msgKeypress(const KeypressMessage &msg) override;
+	void draw() override;
 };
 
 } // namespace Wizardry

@@ -19,29 +19,34 @@
  *
  */
 
-#include "wizardry/data/globals.h"
-#include "wizardry/libs/files.h"
+#include "common/system.h"
+#include "graphics/paletteman.h"
 #include "wizardry/gfx/palette.h"
 
 namespace Wizardry {
 
-Globals *g_globals;
+// Apple II lo-res / text mode palette (approximate RGB)
+static const byte APPLE2_PALETTE[16][3] = {
+	{ 0x00, 0x00, 0x00 }, // 0: Black
+	{ 0xFF, 0xFF, 0xFF }, // 1: White
+	{ 0xFF, 0x00, 0x00 }, // 2: Red
+	{ 0x00, 0xFF, 0xFF }, // 3: Cyan
+	{ 0xFF, 0x00, 0xFF }, // 4: Purple
+	{ 0x00, 0xFF, 0x00 }, // 5: Green
+	{ 0x00, 0x00, 0xFF }, // 6: Blue
+	{ 0xFF, 0xFF, 0x00 }, // 7: Yellow
+	{ 0xC0, 0xC0, 0xC0 }, // 8: Light gray (alternate intensity)
+	{ 0x80, 0x80, 0x80 }, // 9: Dark gray
+	{ 0x80, 0x00, 0x00 }, // 10: Dark red
+	{ 0x00, 0x80, 0x80 }, // 11: Dark cyan
+	{ 0x80, 0x00, 0x80 }, // 12: Dark purple
+	{ 0x00, 0x80, 0x00 }, // 13: Dark green
+	{ 0x00, 0x00, 0x80 }, // 14: Dark blue
+	{ 0x80, 0x80, 0x00 }  // 15: Olive / dark yellow
+};
 
-Globals::Globals() {
-	g_globals = this;
-}
-
-Globals::~Globals() {
-	g_globals = nullptr;
-}
-
-void Globals::setup() {
-	if (!_dsk.open("wiz1.dsk"))
-		error("Could not open wiz1.dsk");
-
-	assert(FINDFILE(DRIVE1, "scenario.data") >= 0);
-
-	Gfx::setupPalette();
+void Gfx::setupPalette() {
+	g_system->getPaletteManager()->setPalette(&APPLE2_PALETTE[0][0], 0, 16);
 }
 
 } // namespace Wizardry

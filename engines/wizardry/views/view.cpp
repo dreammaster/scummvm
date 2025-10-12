@@ -19,7 +19,8 @@
  *
  */
 
-#include "wizardry/view.h"
+#include "wizardry/views/view.h"
+#include "wizardry/data/globals.h"
 
 namespace Wizardry {
 

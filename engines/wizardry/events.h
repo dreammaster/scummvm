@@ -26,6 +26,7 @@
 #include "common/stack.h"
 #include "graphics/screen.h"
 #include "wizardry/messages.h"
+#include "wizardry/gfx/surface.h"
 
 namespace Wizardry {
 
@@ -182,7 +183,7 @@ public:
 	/**
 	 * Returns a surface for drawing the element
 	 */
-	Graphics::ManagedSurface getSurface() const;
+	Surface getSurface() const;
 
 	/**
 	 * Clear the surface
