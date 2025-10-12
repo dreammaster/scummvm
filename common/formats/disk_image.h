@@ -227,6 +227,28 @@ private:
 	Common::HashMap<Common::Path, TOCEntry, Common::Path::IgnoreCase_Hash, Common::Path::IgnoreCase_EqualTo> _toc;
 };
 
+class FilesArchive : public Common::Archive {
+private:
+	Files *_files;
+
+public:
+	FilesArchive(Files *files) : _files(files) {
+	};
+
+	int listMembers(Common::ArchiveMemberList &list) const override {
+		return 0;
+	}
+	bool hasFile(const Common::Path &path) const override {
+		return _files->exists(path);
+	}
+	const Common::ArchiveMemberPtr getMember(const Common::Path &path) const override {
+		return Common::ArchiveMemberPtr(new Common::GenericArchiveMember(path, *this));
+	}
+	Common::SeekableReadStream *createReadStreamForMember(const Common::Path &path) const override {
+		return _files->createReadStream(path);
+	}
+};
+
 } // End of namespace Common
 
 #endif
