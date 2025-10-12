@@ -19,33 +19,28 @@
  *
  */
 
-#include "wizardry/data/globals.h"
-#include "wizardry/libs/files.h"
-#include "wizardry/libs/memory.h"
-#include "wizardry/gfx/palette.h"
+#ifndef WIZARDRY_DATA_SCENARIO_H
+#define WIZARDRY_DATA_SCENARIO_H
+
+#include "common/scummsys.h"
 
 namespace Wizardry {
 
-Globals *g_globals;
+struct TSCNTOC {
+	char _title[40] = {};	// "$PROVING GROUNDS..." string
+	uint16 _numLevels = 0;	// usually 10
+	uint16 _monsters = 0;	// block index of monster table
+	uint16 _items = 0;		// block index of item table
+	uint16 _spells = 0;		// block index of spell table
+	uint16 _maze[10] = {};	// block indices for each level's maze data
+	uint16 _messages = 0;	// block for in-game messages
+	uint16 _specials = 0;	// block for special events/traps
+	uint16 _rewards = 0;		// block for reward/treasure tables
+	uint8 _reserved[512 - 0x5E] = {};  // fill remainder of block (optional)
 
-Globals::Globals() {
-	g_globals = this;
-}
-
-Globals::~Globals() {
-	g_globals = nullptr;
-}
-
-void Globals::setup() {
-	Gfx::setupPalette();
-
-	if (!_dsk.open("wiz1.dsk"))
-		error("Could not open wiz1.dsk");
-
-	_SCNTOCBL = FINDFILE(DRIVE1, "scenario.data");
-	assert(_SCNTOCBL >= 0);
-	UNITREAD(DRIVE1, _IOCACHE, sizeof(_IOCACHE), _SCNTOCBL);
-	_SCNTOC.load(_IOCACHE);
-}
+	void load(const byte *src);
+};
 
 } // namespace Wizardry
+
+#endif

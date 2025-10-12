@@ -7,7 +7,9 @@ MODULE_OBJS = \
 	messages.o \
 	metaengine.o \
 	data/globals.o \
+	data/scenario.o \
 	libs/files.o \
+	libs/memory.o \
 	gfx/palette.o \
 	gfx/surface.o \
 	views/view.o \

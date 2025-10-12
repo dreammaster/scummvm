@@ -23,14 +23,24 @@
 #define WIZARDRY_DATA_GLOBALS_H
 
 #include "common/file.h"
+#include "wizardry/data/scenario.h"
 #include "graphics/fonts/dosfont.h"
+#include "wizardry/libs/files.h"
 
 namespace Wizardry {
+
+constexpr int IOBUFSIZE = BLOCKSZ;
 
 struct Globals {
 	Common::File _dsk;
 	Graphics::DosFont _font;
+	byte _IOCACHE[IOBUFSIZE] = {};
+	TSCNTOC _SCNTOC;
 	int _LLBASE04 = -1;
+	int _SCNTOCBL = 0;
+	int _TIMEDLAY = 2000;
+	bool _CACHEWRI = false;
+	int _CACHEBL = 0;
 
 	Globals();
 	~Globals();

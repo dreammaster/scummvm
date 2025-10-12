@@ -19,33 +19,23 @@
  *
  */
 
-#include "wizardry/data/globals.h"
-#include "wizardry/libs/files.h"
-#include "wizardry/libs/memory.h"
-#include "wizardry/gfx/palette.h"
+#include "common/memstream.h"
+#include "wizardry/data/scenario.h"
 
 namespace Wizardry {
 
-Globals *g_globals;
+void TSCNTOC::load(const byte *src) {
+	Common::MemoryReadStream s(src, 512);
 
-Globals::Globals() {
-	g_globals = this;
-}
-
-Globals::~Globals() {
-	g_globals = nullptr;
-}
-
-void Globals::setup() {
-	Gfx::setupPalette();
-
-	if (!_dsk.open("wiz1.dsk"))
-		error("Could not open wiz1.dsk");
-
-	_SCNTOCBL = FINDFILE(DRIVE1, "scenario.data");
-	assert(_SCNTOCBL >= 0);
-	UNITREAD(DRIVE1, _IOCACHE, sizeof(_IOCACHE), _SCNTOCBL);
-	_SCNTOC.load(_IOCACHE);
+	s.read(_title, 40);
+	_numLevels = s.readUint16LE();
+	_monsters = s.readUint16LE();
+	_items = s.readUint16LE();
+	_spells = s.readUint16LE();
+	s.read(_maze, 10);
+	_messages = s.readUint16LE();
+	_specials = s.readUint16LE();
+	_rewards = s.readUint16LE();
 }
 
 } // namespace Wizardry

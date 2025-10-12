@@ -19,33 +19,17 @@
  *
  */
 
-#include "wizardry/data/globals.h"
-#include "wizardry/libs/files.h"
+#include "common/algorithm.h"
 #include "wizardry/libs/memory.h"
-#include "wizardry/gfx/palette.h"
 
 namespace Wizardry {
 
-Globals *g_globals;
-
-Globals::Globals() {
-	g_globals = this;
+void MOVELEFT(const void *src, void *dst, int count) {
+	Common::copy_backward((const byte *)src, (const byte *)src + count, (byte *)dst);
 }
 
-Globals::~Globals() {
-	g_globals = nullptr;
-}
-
-void Globals::setup() {
-	Gfx::setupPalette();
-
-	if (!_dsk.open("wiz1.dsk"))
-		error("Could not open wiz1.dsk");
-
-	_SCNTOCBL = FINDFILE(DRIVE1, "scenario.data");
-	assert(_SCNTOCBL >= 0);
-	UNITREAD(DRIVE1, _IOCACHE, sizeof(_IOCACHE), _SCNTOCBL);
-	_SCNTOC.load(_IOCACHE);
+void MOVERIGHT(const void *src, void *dst, int count) {
+	Common::copy((const byte *)src, (const byte *)src + count, (byte *)dst);
 }
 
 } // namespace Wizardry
