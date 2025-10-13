@@ -2,7 +2,7 @@
  *
  * ScummVM is the legal property of its developers, whose names
  * are too numerous to list here. Please refer to the COPYRIGHT
- * file distributed with this source distribution.
+ * _file distributed with this source distribution.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,36 +19,45 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_DUMP_H
-#define SPYCRAFT_GAME_DUMP_H
-
-#include "common/file.h"
+#include "spycraft/game/macro.h"
+#include "spycraft/game/dump.h"
+#include "spycraft/game/object.h"
 
 namespace Spycraft {
 
-#define DEBUGFILE	"FILEDUMP.XXX"
-#define OBJECTABLE "TABLE"
-#define ERRORFILE	"ERROR"
+int _object_allocated;
+int _static_objects;
+DebugFile *debugFile;
 
-class DebugFile {
-	Common::DumpFile _file;
-	Common::DumpFile _tableFile;
-	Common::DumpFile _errorFile;
+DebugFile::DebugFile() {
+	debugFile = this;
+	_object_allocated = 0;
+	_static_objects = 0;
+#if 0
+	if (!_file.open(DEBUGFILE) || !_tableFile.open(OBJECTABLE) || !_errorFile.open(ERRORFILE))
+		error("Fatal: cannot open debug files");
+#endif
+}
 
-public:
-	DebugFile();
-	~DebugFile();
+DebugFile::~DebugFile() {
+	_file.close();
+	_tableFile.close();
+	_errorFile.close();
+}
 
-	void write(const char *, ...);
-	void writeObj(const void *);
-	void deleteObj(const void *);
-	void stat(const char *, int, const char *);
-	void log_error(int, int, int, const char *);
-};
+void DebugFile::write(const char *msg, ...) {
+}
 
-extern DebugFile *debugFile;
+void DebugFile::writeObj(const void *obj) {
+}
+
+void DebugFile::deleteObj(const void *obj) {
+}
+
+void DebugFile::stat(const char *file_name, int l, const char *df) {
+}
+
+void DebugFile::log_error(int error_num, int x, int l, const char *df) {
+}
 
 } // namespace Spycraft
-
-#endif
-

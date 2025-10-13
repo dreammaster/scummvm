@@ -24,6 +24,7 @@ MODULE_OBJS = \
 	game/cursor.o \
 	game/dialog.o \
 	game/dlgbox.o \
+	game/dump.o \
 	game/feature.o \
 	game/game.o \
 	game/list.o \
