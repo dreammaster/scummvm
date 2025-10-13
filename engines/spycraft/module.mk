@@ -22,6 +22,7 @@ MODULE_OBJS = \
 	game/dispatch.o \
 	game/actor.o \
 	game/cursor.o \
+	game/dialog.o \
 	game/feature.o \
 	game/game.o \
 	game/list.o \
