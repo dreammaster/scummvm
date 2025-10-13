@@ -41,10 +41,10 @@ public:
 		_textPos.y = y;
 	}
 	void PRINTCHR(char c);
-	void writeString(const Common::String &str);
-	void writeString(int x, int y, const Common::String &str) {
+	void PRINTSTR(const Common::String &str);
+	void PRINTSTR(int x, int y, const Common::String &str) {
 		MVCURSOR(x, y);
-		writeString(str);
+		PRINTSTR(str);
 	}
 
 	void CLRRECT(int x1, int y1, int x2, int y2);

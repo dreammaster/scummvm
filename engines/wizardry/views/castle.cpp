@@ -35,17 +35,58 @@ void Castle::draw() {
 	auto s = getSurface();
 	s.clear();
 
-	s.writeString("ABCDE");
+	scrnOutl(s);
+	horzLine(s, 10);
+	horzLine(s, 15);
+
+	s.MVCURSOR(12, 0);
+	s.PRINTCHR(91);			// TILTED "T" TOP OF LINE
+	for (int y = 1; y <= 9; ++y) {
+		s.MVCURSOR(12, y);
+		s.PRINTCHR(92);		// Vertical bar
+	}
+
+	s.MVCURSOR(12, 5);
+	s.PRINTCHR(93);			// TILTED "T" LEFT OF LINE
+	for (int x = 13; x <= 38; ++x)
+		s.PRINTCHR(34);
+	s.PRINTCHR(40);			// TILTED "T" RIGHT OF LINE
+
+	s.MVCURSOR(12, 10);
+	s.PRINTCHR(94);			// TILTED "T" BOTTOM OF LINE
+
+	//UNITREAD(DRIVE1, CHARSET, BLOCKSZ, SCNTOCBL + 1, 0);
+	s.MVCURSOR(1, 16);
+	s.PRINTSTR("# CHARACTER NAME  CLASS AC HITS STATUS");
 }
 
-void Castle::horzLine(Surface &surf, int line) {
-	surf.MVCURSOR(0, line);
-	surf.PRINTCHR(39);		// Tilted 'T' on left of line
-#if 0
-	HORZHYPH;
-	PRINTCHR(CHR(40))          (*TILTED "T" ON RIGHT OF LINE *)
-		END;
-#endif
+void Castle::scrnOutl(Surface &s) {
+	s.PRINTCHR(33);		// Upper left corner
+	for (int x = 1; x <= 38; ++x)
+		s.PRINTCHR(34);
+	s.PRINTCHR(35);		// Upper right corner
+
+	for (int y = 1; y <= 22; ++y) {
+		s.MVCURSOR(0, y);
+		s.PRINTCHR(36);	// Left edge vertical bar
+		s.MVCURSOR(39, y);
+		s.PRINTCHR(36);	// Right edge vertical bar
+	}
+
+	s.MVCURSOR(0, 23);
+	s.PRINTCHR(37);		// Bottom left corner
+	for (int x = 1; x <= 38; ++x)
+		s.PRINTCHR(34);
+	s.PRINTCHR(38);		// Bottom right corner
+}
+
+void Castle::horzLine(Surface &s, int line) {
+	s.MVCURSOR(0, line);
+
+	s.PRINTCHR(39);		// Tilted 'T' on left of line
+	for (int x = 1; x <= 38; ++x)
+		s.PRINTCHR(34);
+	s.PRINTCHR(40);		// TILTED "T" ON RIGHT OF LINE
 }
 
 } // namespace Wizardry

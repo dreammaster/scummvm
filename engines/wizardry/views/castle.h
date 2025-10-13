@@ -28,7 +28,8 @@ namespace Wizardry {
 
 class Castle : public View {
 private:
-	void horzLine(Surface &surf, int line);
+	void horzLine(Surface &s, int line);
+	void scrnOutl(Surface &s);
 
 public:
 	Castle() : View("Castle") {}

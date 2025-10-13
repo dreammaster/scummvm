@@ -28,10 +28,10 @@ constexpr int CHAR_SIZE = 8;
 
 void Surface::PRINTCHR(char c) {
 	Common::String str(c);
-	writeString(str);
+	PRINTSTR(str);
 }
 
-void Surface::writeString(const Common::String &str) {
+void Surface::PRINTSTR(const Common::String &str) {
 	_G(font).drawString(this, str, _textPos.x * CHAR_SIZE, _textPos.y * CHAR_SIZE,
 		320 - (_textPos.x * CHAR_SIZE), _textColor);
 	_textPos.x += str.size();
