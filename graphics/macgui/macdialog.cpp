@@ -106,7 +106,7 @@ void MacDialog::paint() {
 	primitives.drawFilledRect1(_bbox, kColorWhite, &pd);
 	_mactext->drawToPoint(_screen, Common::Point(_bbox.left + (_bbox.width() - _maxTextWidth)/2, _bbox.top + 16));
 	static int boxOutline[] = {1, 0, 0, 1, 1};
-	drawOutline(_bbox, boxOutline, ARRAYSIZE(boxOutline));
+	drawEdgeBorder(_bbox, boxOutline, ARRAYSIZE(boxOutline));
 
 	for (uint i = 0; i < _buttons->size(); i++) {
 		MacDialogButton *button = _buttons->operator[](i);
@@ -134,7 +134,7 @@ void MacDialog::paint() {
 
 		_font->drawString(_screen, button->text, x, y, _bbox.width(), color);
 
-		drawOutline(button->bounds, buttonOutline, ARRAYSIZE(buttonOutline));
+		drawEdgeBorder(button->bounds, buttonOutline, ARRAYSIZE(buttonOutline));
 	}
 
 	g_system->copyRectToScreen(_screen->getBasePtr(_bbox.left, _bbox.top), _screen->pitch,
@@ -143,7 +143,7 @@ void MacDialog::paint() {
 	_needsRedraw = false;
 }
 
-void MacDialog::drawOutline(Common::Rect &bounds, int *spec, int speclen) {
+void MacDialog::drawEdgeBorder(Common::Rect &bounds, int *spec, int speclen) {
 	Primitives &primitives = _wm->getDrawPrimitives();
 
 	MacPlotData pd(_screen, nullptr, &_wm->getPatterns(), 1, 0, 0, 1, _wm->_colorBlack, false);	

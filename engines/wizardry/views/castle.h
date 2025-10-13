@@ -29,7 +29,7 @@ namespace Wizardry {
 class Castle : public View {
 private:
 	void horzLine(Surface &s, int line);
-	void scrnOutl(Surface &s);
+	void drawEdgeBorder(Surface &s);
 
 public:
 	Castle() : View("Castle") {}

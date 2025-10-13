@@ -36,7 +36,7 @@ void Castle::draw() {
 	s.clear();
 	s.setGraphicFont(true);
 
-	scrnOutl(s);
+	drawEdgeBorder(s);
 	horzLine(s, 10);
 	horzLine(s, 15);
 
@@ -61,7 +61,7 @@ void Castle::draw() {
 	s.PRINTSTR("# CHARACTER NAME  CLASS AC HITS STATUS");
 }
 
-void Castle::scrnOutl(Surface &s) {
+void Castle::drawEdgeBorder(Surface &s) {
 	s.PRINTCHR(33);		// Upper left corner
 	for (int x = 1; x <= 38; ++x)
 		s.PRINTCHR(34);
