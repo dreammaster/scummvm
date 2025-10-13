@@ -29,7 +29,14 @@
 namespace Wizardry {
 
 class WizardryFont : public Graphics::Font {
+private:
+	bool _gfxMode = false;
+
 public:
+	void setGfxMode(bool mode) {
+		_gfxMode = mode;
+	}
+
 	int getFontHeight() const override {
 		return 8;
 	}

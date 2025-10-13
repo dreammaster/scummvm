@@ -35,6 +35,9 @@ private:
 public:
 	Surface(Graphics::ManagedSurface &src, const Common::Rect &bounds) :
 		Graphics::ManagedSurface(src, bounds) {}
+	~Surface() override {
+		setGraphicFont(false);
+	}
 
 	void MVCURSOR(int x, int y) {
 		_textPos.x = x;
@@ -46,6 +49,7 @@ public:
 		MVCURSOR(x, y);
 		PRINTSTR(str);
 	}
+	void setGraphicFont(bool gfxMode);
 
 	void CLRRECT(int x1, int y1, int x2, int y2);
 };

@@ -34,6 +34,7 @@ bool Castle::msgKeypress(const KeypressMessage &msg) {
 void Castle::draw() {
 	auto s = getSurface();
 	s.clear();
+	s.setGraphicFont(true);
 
 	scrnOutl(s);
 	horzLine(s, 10);
@@ -55,7 +56,7 @@ void Castle::draw() {
 	s.MVCURSOR(12, 10);
 	s.PRINTCHR(94);			// TILTED "T" BOTTOM OF LINE
 
-	//UNITREAD(DRIVE1, CHARSET, BLOCKSZ, SCNTOCBL + 1, 0);
+	s.setGraphicFont(false);
 	s.MVCURSOR(1, 16);
 	s.PRINTSTR("# CHARACTER NAME  CLASS AC HITS STATUS");
 }

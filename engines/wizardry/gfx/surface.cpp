@@ -41,4 +41,8 @@ void Surface::CLRRECT(int x1, int y1, int x2, int y2) {
 	fillRect(Common::Rect(x1 * CHAR_SIZE, y1 * CHAR_SIZE, x2 * CHAR_SIZE, y2 * CHAR_SIZE), 0);
 }
 
+void Surface::setGraphicFont(bool gfxMode) {
+	_G(font).setGfxMode(gfxMode);
+}
+
 } // namespace Wizardry
