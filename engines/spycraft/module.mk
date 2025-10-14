@@ -6,6 +6,7 @@ MODULE_OBJS = \
 	metaengine.o \
 	dmade/advback.o \
 	dmade/advbits.o \
+	dmade/advcursor.o \
 	dmade/advdcmp.o \
 	dmade/advdebug.o \
 	dmade/advfile.o \
