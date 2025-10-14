@@ -7,6 +7,7 @@ MODULE_OBJS = \
 	dmade/advback.o \
 	dmade/advbits.o \
 	dmade/advdcmp.o \
+	dmade/advfile.o \
 	dmade/advlist.o \
 	dmade/advmem.o \
 	dmade/advmisc.o \
@@ -27,6 +28,7 @@ MODULE_OBJS = \
 	game/dump.o \
 	game/email.o \
 	game/feature.o \
+	game/file.o \
 	game/game.o \
 	game/list.o \
 	game/user.o

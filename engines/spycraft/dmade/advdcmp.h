@@ -22,13 +22,15 @@
 #ifndef SPYCRAFT_DMADE_ADVDCMP_H
 #define SPYCRAFT_DMADE_ADVDCMP_H
 
+#include "spycraft/afxwin.h"
+
 namespace Spycraft {
 
 /* MADE Internal */
 
 typedef struct _DcmpInfo *DcmpStream;
 
-DcmpStream OpenDcmpStream(int file, int size, int c_size, uint8 compressor);
+DcmpStream OpenDcmpStream(HANDLE file, int size, int c_size, uint8 compressor);
 int ReadDcmpStream(DcmpStream dStream, void *buffer, int size);
 uint16 ReadWordDcmpStream(DcmpStream dStream);
 uint32 ReadLongDcmpStream(DcmpStream dStream);

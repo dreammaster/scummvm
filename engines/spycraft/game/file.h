@@ -41,11 +41,11 @@ enum {
 
 class File : public Object {
 public:
-	int hFile;
+	HANDLE hFile;
 	int filesize;
 
 	File();
-	int open(char *filename, int mode);
+	int open(const char *filename, int mode);
 	void seek(int offset, int mode);
 	int read(void *buffer, int size);
 	int readByte(uint8 *value);
