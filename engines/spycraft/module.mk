@@ -7,6 +7,7 @@ MODULE_OBJS = \
 	dmade/advback.o \
 	dmade/advbits.o \
 	dmade/advdcmp.o \
+	dmade/advdebug.o \
 	dmade/advfile.o \
 	dmade/advlist.o \
 	dmade/advmem.o \
