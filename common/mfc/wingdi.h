@@ -624,6 +624,7 @@ enum {
 #define HTSIZEFIRST         HTLEFT
 #define HTSIZELAST          HTBOTTOMRIGHT
 
+#define CLR_INVALID 0xFFFFFFFF
 
 typedef struct tagBITMAPINFOHEADER {
 	uint32      biSize;
@@ -805,6 +806,13 @@ extern uint32 GetSysColor(int nIndex);
 extern HBRUSH GetSysColorBrush(int nIndex);
 extern bool DestroyMenu(HMENU hMenu);
 extern void SetActiveWindow(HWND hWnd);
+
+extern COLORREF SetTextColor(HDC hdc, COLORREF color);
+extern COLORREF SetBkColor(HDC hdc, COLORREF color);
+extern int SetBkMode(HDC hdc, int mode);
+extern bool TextOut(HDC hdc, int x, int y, const char *lpString, int nCount);
+extern int GetMapMode(HDC hdc);
+extern bool GetTextExtentPoint(HDC hdc, const char *lpString, int cchString, LPSIZE lpSize);
 
 } // namespace MFC
 } // namespace Common

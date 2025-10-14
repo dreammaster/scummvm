@@ -456,5 +456,40 @@ void SetActiveWindow(HWND hWnd) {
 	error("TODO: SetActiveWindow");
 }
 
+
+COLORREF SetTextColor(HDC hdc, COLORREF color) {
+	CDC *dc = CDC::FromHandle(hdc);
+	return dc->SetTextColor(color);
+}
+
+COLORREF SetBkColor(HDC hdc, COLORREF color) {
+	CDC *dc = CDC::FromHandle(hdc);
+	return dc->SetBkColor(color);
+}
+
+int SetBkMode(HDC hdc, int mode) {
+	CDC *dc = CDC::FromHandle(hdc);
+	return dc->SetBkMode(mode);
+}
+
+bool TextOut(HDC hdc, int x, int y, const char *lpString, int nCount) {
+	CDC *dc = CDC::FromHandle(hdc);
+	return dc->TextOut(x, y, lpString, nCount);
+}
+
+int GetMapMode(HDC hdc) {
+	CDC *dc = CDC::FromHandle(hdc);
+	return dc->GetMapMode();
+}
+
+bool GetTextExtentPoint(HDC hdc, const char *lpString, int cchString, LPSIZE lpSize) {
+	CDC *dc = CDC::FromHandle(hdc);
+
+	CSize size = dc->GetTextExtent(lpString, cchString);
+	lpSize->cx = size.cx;
+	lpSize->cy = size.cy;
+	return true;
+}
+
 } // namespace MFC
 } // namespace Common
