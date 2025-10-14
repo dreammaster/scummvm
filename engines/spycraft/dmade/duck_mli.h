@@ -272,12 +272,12 @@ int MLI_TakeBack();
 
 // Pause a layer (other Layers (e.g. sprites) continue to play)
 // If Audio Enabled for this layer, audio pauses
-int MLI_Pause(MLI_LAYER_HANDLE pL);
+bool MLI_Pause(MLI_LAYER_HANDLE pL);
 
 // returns TRUE if valid layer
 
 // Resume a layer
-int MLI_Resume(MLI_LAYER_HANDLE pL);
+bool MLI_Resume(MLI_LAYER_HANDLE pL);
 
 // returns TRUE if valid layer
 
@@ -305,7 +305,7 @@ int MLI_GetFrames(MLI_LAYER_HANDLE pL);
 // Seek to Frame.  This actually causes the CD to do Something
 // It's really a "cue", as it loads whichever buffers are needed
 
-int MLI_Seek(MLI_LAYER_HANDLE pL, int frame);
+bool MLI_Seek(MLI_LAYER_HANDLE pL, int frame);
 // NB Seek positions to non-keyframes by decompressing with no Blit
 
 // decompress one frame to screen -- unbuffered read

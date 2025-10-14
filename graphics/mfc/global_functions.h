@@ -149,6 +149,8 @@ extern HFONT CreateFontIndirect(const LOGFONT *lf);
 
 extern bool AfxExtractSubString(CString &rString, const char *lpszFullString,
 	int iSubString, char chSep = '\n');
+extern SHORT GetAsyncKeyState(int vKey);
+extern DWORD timeGetTime();
 
 inline char *strUpper(char *s) {
 	for (char *curr = s; *curr; ++curr)
