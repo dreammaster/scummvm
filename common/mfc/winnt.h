@@ -28,7 +28,8 @@ namespace Common {
 namespace MFC {
 
 typedef byte BYTE;
-typedef uint16 SHORT;
+typedef uint16 WORD;
+typedef int16 SHORT;
 typedef uint32 DWORD;
 typedef long LONG;
 typedef uint UINT;
