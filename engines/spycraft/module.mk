@@ -23,6 +23,7 @@ MODULE_OBJS = \
 	dmade/dirmovie.o \
 	dmade/dirscreen.o \
 	dmade/duck_api.o \
+	dmade/duck_mli.o \
 	game/dispatch.o \
 	game/actor.o \
 	game/cursor.o \

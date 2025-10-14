@@ -297,5 +297,13 @@ bool AfxExtractSubString(CString &rString, const char *lpszFullString,
 	return true;
 }
 
+SHORT GetAsyncKeyState(int vKey) {
+	error("TODO: GetAsyncKeyState");
+}
+
+DWORD timemGetTime() {
+	return g_system->getMillis();
+}
+
 } // namespace MFC
 } // namespace Common
