@@ -26,6 +26,7 @@ MODULE_OBJS = \
 	dmade/duck_dxl.o \
 	dmade/duck_api.o \
 	dmade/duck_mli.o \
+	dmade/mli.o \
 	game/dispatch.o \
 	game/actor.o \
 	game/cursor.o \
