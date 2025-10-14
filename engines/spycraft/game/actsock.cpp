@@ -19,36 +19,37 @@
  *
  */
 
+#include "common/textconsole.h"
 #include "spycraft/game/actsock.h"
 
 namespace Spycraft {
 
-ACTSOCKERRORID   ACTSOCK_FTPSetTimeouts(DWORD datatimeoutms, DWORD generaltimeoutms) { return 0; }
+ACTSOCKERRORID   ACTSOCK_FTPSetTimeouts(DWORD datatimeoutms, DWORD generaltimeoutms) { warning("TODO: actsock"); return  0; }
 
-ACTSOCKERRORID   ACTSOCK_FTPSendDataPacket(HFTP hftp, ACTSOCKPACKETPTR packet, bool lastpacket) { return 0; }
-ACTSOCKERRORID   ACTSOCK_FTPReceiveDataPacket(HFTP hftp, ACTSOCKPACKETPTR packetptr, int packetsize) { return 0; }
-ACTSOCKERRORID   ACTSOCK_FTPStartXfer(HFTP hftp) { return 0; }
-HFTP             ACTSOCK_FTPOpenFile(const char *FTPhost, const char *hostfilepath, int mode) { return 0; }
-ACTSOCKERRORID   ACTSOCK_FTPCloseFile(HFTP FTPhandle) { return 0; }
+ACTSOCKERRORID   ACTSOCK_FTPSendDataPacket(HFTP hftp, ACTSOCKPACKETPTR packet, bool lastpacket) { warning("TODO: actsock"); return  0; }
+ACTSOCKERRORID   ACTSOCK_FTPReceiveDataPacket(HFTP hftp, ACTSOCKPACKETPTR packetptr, int packetsize) { warning("TODO: actsock"); return  0; }
+ACTSOCKERRORID   ACTSOCK_FTPStartXfer(HFTP hftp) { warning("TODO: actsock"); return  0; }
+HFTP             ACTSOCK_FTPOpenFile(const char *FTPhost, const char *hostfilepath, int mode) { warning("TODO: actsock"); return  0; }
+ACTSOCKERRORID   ACTSOCK_FTPCloseFile(HFTP FTPhandle) { warning("TODO: actsock"); return  0; }
 
-ACTSOCKERRORID   ACTSOCK_FTPDownloadFile(const char *FTPhost, const char *hostfilepath, const char *clientfilepath, bool statuswindow) { return 0; }
-ACTSOCKERRORID   ACTSOCK_FTPUploadFile(const char *FTPhost, const char *hostfilepath, const char *clientfilepath, bool statuswindow) { return 0; }
+ACTSOCKERRORID   ACTSOCK_FTPDownloadFile(const char *FTPhost, const char *hostfilepath, const char *clientfilepath, bool statuswindow) { warning("TODO: actsock"); return  0; }
+ACTSOCKERRORID   ACTSOCK_FTPUploadFile(const char *FTPhost, const char *hostfilepath, const char *clientfilepath, bool statuswindow) { warning("TODO: actsock"); return  0; }
 
-ACTSOCKERRORID   ACTSOCK_FTPDownloadDecompressFile(const char *FTPhost, const char *hostfilepath, const char *clientfilepath, bool statuswindow, bool delfile) { return 0; }
+ACTSOCKERRORID   ACTSOCK_FTPDownloadDecompressFile(const char *FTPhost, const char *hostfilepath, const char *clientfilepath, bool statuswindow, bool delfile) { warning("TODO: actsock"); return  0; }
 
-ACTSOCKERRORID   ACTSOCK_FTPDailyDownload(const char *FTPhost, const char *hostpath, const char *clientpath, bool statuswindow, bool delfile, bool downloadall) { return 0; }
+ACTSOCKERRORID   ACTSOCK_FTPDailyDownload(const char *FTPhost, const char *hostpath, const char *clientpath, bool statuswindow, bool delfile, bool downloadall) { warning("TODO: actsock"); return  0; }
 
-ACTSOCKERRORID   ACTSOCK_WWWOpenBrowser(const char *URLname, bool maximized) { return 0; }
-ACTSOCKERRORID   ACTSOCK_WWWCloseBrowser(void) { return 0; }
-ACTSOCKERRORID   ACTSOCK_WWWRunBrowser(const char *URLname, bool maximized) { return 0; }
-ACTSOCKERRORID   ACTSOCK_WWWSetBrowserDir(const char *path) { return 0; }
+ACTSOCKERRORID   ACTSOCK_WWWOpenBrowser(const char *URLname, bool maximized) { warning("TODO: actsock"); return  0; }
+ACTSOCKERRORID   ACTSOCK_WWWCloseBrowser(void) { warning("TODO: actsock"); return  0; }
+ACTSOCKERRORID   ACTSOCK_WWWRunBrowser(const char *URLname, bool maximized) { warning("TODO: actsock"); return  0; }
+ACTSOCKERRORID   ACTSOCK_WWWSetBrowserDir(const char *path) { warning("TODO: actsock"); return  0; }
 
-ACTSOCKERRORID   ACTSOCK_StartService(void) { return 0; }
-ACTSOCKERRORID   ACTSOCK_EndService(void) { return 0; }
+ACTSOCKERRORID   ACTSOCK_StartService(void) { warning("TODO: actsock"); return  0; }
+ACTSOCKERRORID   ACTSOCK_EndService(void) { warning("TODO: actsock"); return  0; }
 
-ACTSOCKERRORID   ACTSOCK_SetParentHWND(HWND hwnd) { return 0; }
-ACTSOCKERRORID   ACTSOCK_EnableErrorDialogs(bool enable) { return 0; }
-ACTSOCKERRORID   ACTSOCK_SetUserInfo(const char *UserName, const char *Password, const char *AuthCode) { return 0; }
-int              ACTSOCK_GetServiceType(void) { return 0; }
+ACTSOCKERRORID   ACTSOCK_SetParentHWND(HWND hwnd) { warning("TODO: actsock"); return  0; }
+ACTSOCKERRORID   ACTSOCK_EnableErrorDialogs(bool enable) { warning("TODO: actsock"); return  0; }
+ACTSOCKERRORID   ACTSOCK_SetUserInfo(const char *UserName, const char *Password, const char *AuthCode) { warning("TODO: actsock"); return  0; }
+int              ACTSOCK_GetServiceType(void) { warning("TODO: actsock"); return  0; }
 
 } // namespace Spycraft
