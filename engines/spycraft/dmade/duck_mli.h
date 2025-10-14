@@ -97,6 +97,9 @@ typedef struct Layer {
 	DXL_XIMAGE_HANDLE  LXImage;	// info about compressed frames
 } MLI_LAYER, *MLI_LAYER_HANDLE;
 
+typedef uint32 clock_t;
+extern clock_t timer_time;
+
 // **********************These API defintions have been implemented...***************
 // describe screen characteristics (x, y, w, h measured in screen space)
 int MLI_Screen(unsigned char *ScreenAddr, int x, int y, int w, int h, int pitch,  /*DONE */
@@ -238,7 +241,7 @@ int MLI_ProcessFrame(int WantedFrame);  // Put next frame up, if appropriate
 */
 
 // Identify Layer from which we get audio
-int MLI_SetAudioLayer(MLI_LAYER_HANDLE pL);
+HANDLE MLI_SetAudioLayer(MLI_LAYER_HANDLE pL);
 // Default (API not Called) is Background (lowest) layer
 
 // returns FALSE if layer does not exist or has no audio

@@ -229,7 +229,7 @@ textNum sfxDrawText(bufferNum display_buffer, channelNum channel_num,
 		ADV_ASSERT(false, __ERR_MEM_ALLOC_FAIL);
 	}
 
-	save_buffer = (char *)AllocPtr((DWORD)(outtext.c_str() + 1));
+	save_buffer = (char *)AllocPtr(outtext.size() + 1);
 	if (save_buffer == NULL) {
 		FreePtr(text);
 		FreePtr(textPort);
