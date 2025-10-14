@@ -22,7 +22,7 @@
 #ifndef SPYCRAFT_DMADE_DUCK_DXL_H
 #define SPYCRAFT_DMADE_DUCK_DXL_H
 
-#include "common/scummsys.h"
+#include "spycraft/dmade/duck_hfb.h"
 
 namespace Spycraft {
 
