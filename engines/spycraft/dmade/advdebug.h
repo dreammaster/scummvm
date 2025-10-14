@@ -44,7 +44,7 @@ extern void ErrMsg(const char *sz, ...);
 extern void ShowMon(void);
 extern void MonoOut(const char *format, ...);
 extern void KillMono(void);
-extern int AlertMsg(const char *title, char *sz, ...);
+extern int AlertMsg(const char *title, const char *sz, ...);
 
 } // namespace Spycraft
 

@@ -95,6 +95,8 @@ public:
 		Common::Serializer s(stream, nullptr);
 		return syncGame(s);
 	}
+
+	void guiMessage(const Common::String &str);
 };
 
 extern SpycraftEngine *g_engine;

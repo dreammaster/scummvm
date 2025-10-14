@@ -184,4 +184,8 @@ Common::Error SpycraftEngine::syncGame(Common::Serializer &s) {
 	return Common::kNoError;
 }
 
+void SpycraftEngine::guiMessage(const Common::String &str) {
+	GUIErrorMessage(str);
+}
+
 } // End of namespace Spycraft
