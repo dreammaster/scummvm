@@ -24,4 +24,46 @@
 
 namespace Spycraft {
 
+static uint memAllocLimit;
+
+void InitMem() {
+	memAllocLimit = 999999;
+}
+
+void CleanMem() {
+}
+
+int sfxGetClientMem() {
+	return 999999;
+}
+
+int sfxGetFreeMem() {
+	return 999999;
+}
+
+long GetMemFree(void) {
+	return memAllocLimit;
+}
+
+void RegisterMem(long size) {
+	memAllocLimit -= size;
+}
+
+void UnregisterMem(long size) {
+	memAllocLimit += size;
+}
+
+void *AllocPtrEx(int size) {
+	size_t totalSize = size + sizeof(size_t);
+	void *p = malloc(totalSize);
+	memAllocLimit -= totalSize;
+	return (size_t *)p + 1;
+}
+
+void FreePtrEx(void *ptr) {
+	size_t *base = (size_t *)ptr - 1;
+	memAllocLimit += *base;
+	free(base);
+}
+
 } // namespace Spycraft
