@@ -79,7 +79,7 @@ ResCache *faceCache = NULL;
 static ArrayList *mapList = NULL;
 static ArrayList *volList = NULL;
 static ArrayList *streamList = NULL;
-static int discHandler = -1;
+static HANDLE discHandler = nullptr;
 static char INI_FILE[] = "resource.ini";
 static char KEYWORD_DRIVE[] = "[RESOURCE_DRIVE]";
 static char KEYWORD_CD[] = "[CD";
@@ -211,67 +211,67 @@ static void GetResPath(char *dest, char *src) {
 
 #ifndef _DVD
 #pragma message ("not _DVD:  Line 190.\n")
-void PromptDisk ( int location ) {
+void PromptDisk(int location) {
 	MADEEventStamp evt;
 
 	evt.get_event_message = EVENT_DISKINSERT;
 	evt.message = location + 1;		// for user ( 0 to 1, 1 to 2, etc. )
 
 	/* CLOSE PREVIOUS FILE */
-	if ( discHandler != -1 )
-		sfxCloseFile ( discHandler );
+	if (discHandler)
+		sfxCloseFile(discHandler);
 
-	OnDiskInsert ( &evt );
+	OnDiskInsert(&evt);
 }
 #endif
 
-static int ReadMapFile()
-{
-	int i, n, hf;
+static int ReadMapFile() {
+	int i, n;
+	HANDLE hf;
 	FileChunk *fk;
 	char *buffer, *p;
 	int size;
-	
-	size = sfxFileSize ( MAP_FILE );
 
-	if ( !size )
+	size = sfxFileSize(MAP_FILE);
+
+	if (!size)
 		return false;
 
-	buffer = (char *)AllocPtr ( size );
-	ADV_ASSERT ( buffer, __ERR_MEM_ALLOC_FAIL );
-		 
-	hf = sfxOpenFile ( MAP_FILE, MADE_FILE_READ );
+	buffer = (char *)AllocPtr(size);
+	ADV_ASSERT(buffer, __ERR_MEM_ALLOC_FAIL);
 
-	if ( hf != -1 ) {
-		sfxReadFile ( hf, buffer, size );
-		
+	hf = sfxOpenFile(MAP_FILE, MADE_FILE_READ);
+
+	if (hf) {
+		sfxReadFile(hf, buffer, size);
+
 		p = buffer;
 		n = *(int *)p;
-		p += sizeof ( int );
-		if ( mapList == NULL ) {
-			mapList = ArrayList_Calloc ( n );
-			ADV_ASSERT ( mapList, __ERR_MEM_ALLOC_FAIL );
+		p += sizeof(int);
+		if (mapList == NULL) {
+			mapList = ArrayList_Calloc(n);
+			ADV_ASSERT(mapList, __ERR_MEM_ALLOC_FAIL);
 		}
 
-		for ( i=0; i<n; i++ ) {
-			fk = (FileChunk *)AllocPtr ( sizeof ( FileChunk ) );
-			ADV_ASSERT ( fk, __ERR_MEM_ALLOC_FAIL );
-			if ( fk ) {
+		for (i = 0; i < n; i++) {
+			fk = (FileChunk *)AllocPtr(sizeof(FileChunk));
+			ADV_ASSERT(fk, __ERR_MEM_ALLOC_FAIL);
+			if (fk) {
 				/* USE 4 READS INSTEAD OF CHANGE STRUCTURE PACK */
 				fk->vid = *(int *)p;
-				p += sizeof ( int );
+				p += sizeof(int);
 				fk->offset = *(int *)p;
-				p += sizeof ( int );
+				p += sizeof(int);
 				fk->compressor = *(unsigned char *)p;
-				p += sizeof ( unsigned char );
+				p += sizeof(unsigned char);
 				fk->location = *(unsigned char *)p;
-				p += sizeof ( unsigned char );
-				ArrayList_Add ( mapList, fk, NULL );
+				p += sizeof(unsigned char);
+				ArrayList_Add(mapList, fk, NULL);
 			}
 		}
 
-		FreePtr ( buffer );
-		sfxCloseFile ( hf );
+		FreePtr(buffer);
+		sfxCloseFile(hf);
 		return true;
 	}
 
@@ -329,7 +329,7 @@ static void ReadVols() {
 #ifdef _NOTROOT
 	char CDROMname[3];
 #endif
-	int hi = sfxOpenFile ( INI_FILE, MADE_FILE_READ );
+	HANDLE hi = sfxOpenFile(INI_FILE, MADE_FILE_READ);
 
 	/* Get resource directory from RESOURCE.INI */
 	if ( ( n = sfxGetString ( hi, volName ) ) == -1 )	{
@@ -421,7 +421,7 @@ int OpenVols ( int dn )
 	discHandler = sfxOpenFile ( (char *)volList->elements[dn], MADE_FILE_READ );
 
 	/* VALIDATE THE DISK */
-	if ( discHandler == -1 )
+	if (!discHandler)
 		return false;
 
 	sfxReadFile ( discHandler, &uc, sizeof ( unsigned char ) );
@@ -433,7 +433,7 @@ int OpenVols ( int dn )
 
 void ReadWhere() {
 	int n;
-	int hf;
+	HANDLE hf;
 	char buffer[128];
 
 	Common::strcpy_s(buffer, sysDir);
@@ -441,7 +441,7 @@ void ReadWhere() {
 	hf = sfxOpenFile(buffer, MADE_FILE_READ);
 
 	/* FIND DEFAULT WHERE */
-	if (hf == -1) {
+	if (!hf) {
 		Common::strcpy_s(picDir, sysDir);
 		Common::strcpy_s(viewDir, sysDir);
 		Common::strcpy_s(soundDir, sysDir);
@@ -701,16 +701,16 @@ void DestroyRESCache() {
 	cacheValide = false;
 
 	/* CLOSE VOL FILE */
-	if (discHandler != -1)
+	if (discHandler)
 		sfxCloseFile(discHandler);
 
 	/* FREE THE MAP ARRAY */
 	if (mapList) {
 		ArrayList_Free(mapList, NULL);
 		mapList = NULL;
-		if (discHandler != -1) {
+		if (discHandler) {
 			sfxCloseFile(discHandler);
-			discHandler = -1;
+			discHandler = nullptr;
 		}
 	}
 
@@ -926,13 +926,13 @@ void *OpenFace(void *src) {
 }
 
 void *OpenFaceFile(char *filename, int *size) {
-	int hf;
+	HANDLE hf;
 	void *ret = NULL;
 
 	*size = sfxFileSize(filename);
 	hf = sfxOpenFile(filename, MADE_FILE_READ);
 
-	if (hf == -1)
+	if (!hf)
 		ADV_ASSERT(false, __ERR_FILE_OPEN_FAIL);
 
 	ret = AllocPtr(*size);
@@ -1012,8 +1012,8 @@ static void *OpenHTM(void *src) {
 }
 
 static int IsFileExist(char *filename) {
-	int hf = sfxOpenFile(filename, MADE_FILE_READ);
-	if (hf != -1) {
+	HANDLE hf = sfxOpenFile(filename, MADE_FILE_READ);
+	if (hf) {
 		sfxCloseFile(hf);
 		return true;
 	}
@@ -1021,13 +1021,13 @@ static int IsFileExist(char *filename) {
 }
 
 static void *ReadRawFile(char *filename, int *size) {
-	int hf;
+	HANDLE hf;
 	char *buffer;
 
 	*size = sfxFileSize(filename);
 	hf = sfxOpenFile(filename, MADE_FILE_READ);
 
-	if (hf == -1) {
+	if (!hf) {
 		ErrMsg("Can't open %s, please reinstall Spycraft.", filename);
 		ADV_ASSERT(false, __ERR_FILE_OPEN_FAIL);
 	}
@@ -1050,7 +1050,7 @@ static void *VolLoad(int id, int type) {
 	void *decomp = nullptr, *data = nullptr;
 	char filename[MAX_VOL_NAME_SIZE];
 	DcmpStream dStream;
-	int hFile = 0;
+	HANDLE hFile = 0;
 
 	vid = type << 24 | id;
 
@@ -1125,7 +1125,7 @@ static void *VolLoad(int id, int type) {
 			if (decomp == NULL)
 				return NULL;
 		} else {
-			hFile = -1;
+			hFile = nullptr;
 			sfxSeekFile(discHandler, fk->offset, MADE_SEEK_BEG);
 			sfxReadFile(discHandler, &compSize, sizeof(int));
 			sfxReadFile(discHandler, &size, sizeof(int));
@@ -1171,7 +1171,7 @@ static void *VolLoad(int id, int type) {
 	}
 	if (dStream != NULL) {
 		CloseDcmpStream(dStream);
-		if (hFile != -1)
+		if (hFile)
 			sfxCloseFile(hFile);
 	}
 
@@ -1183,7 +1183,7 @@ static void *FileLoad(int id, int type) {
 	void *data;
 	int size;
 	DcmpStream dStream;
-	int hFile;
+	HANDLE hFile;
 
 	data = NULL;
 
@@ -1558,7 +1558,8 @@ int sfxUnlockRes(int id, int type) {
 }
 
 int sfxCheckRes(int id, int type) {
-	int i, hf, vid;
+	int i, vid;
+	HANDLE hf;
 	FileChunk *fk;
 	char filename[256];
 
@@ -1575,7 +1576,7 @@ int sfxCheckRes(int id, int type) {
 		ID2File(filename, id, type);
 		hf = sfxOpenFile(filename, MADE_FILE_READ);
 
-		if (hf == -1)
+		if (!hf)
 			return false;
 		else {
 			sfxCloseFile(hf);

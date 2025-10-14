@@ -32,14 +32,14 @@ namespace Spycraft {
 typedef void *voidpf;
 
 struct _DcmpInfo {
-	int file;
+	HANDLE file;
 	uint8 code;
 	int size, c_size;
 	char compressor;
 	Common::SeekableReadStream *stream;
 };
 
-DcmpStream OpenDcmpStream(int file, int size, int c_size, uint8 compressor) {
+DcmpStream OpenDcmpStream(HANDLE file, int size, int c_size, uint8 compressor) {
 	DcmpStream dStream;
 
 	assert((compressor == COMPRESS_NONE) || (compressor == COMPRESS_ZLIB));
