@@ -44,7 +44,7 @@ struct WizardryGameDescription;
 
 class WizardryEngine : public Engine, public Events {
 private:
-	const ADGameDescription *_gameDescription;
+	const WizardryGameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
 	Globals _globals;
 
@@ -60,10 +60,12 @@ protected:
 	}
 
 public:
-	WizardryEngine(OSystem *syst, const ADGameDescription *gameDesc);
+	WizardryEngine(OSystem *syst, const WizardryGameDescription *gameDesc);
 	~WizardryEngine() override;
 
 	uint32 getFeatures() const;
+
+	WizardryVersion getVersion() const;
 
 	/**
 	 * Returns the game Id

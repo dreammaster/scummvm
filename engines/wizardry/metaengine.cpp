@@ -52,7 +52,8 @@ const ADExtraGuiOptionsMap *WizardryMetaEngine::getAdvancedExtraGuiOptions() con
 	return Wizardry::optionsList;
 }
 
-Common::Error WizardryMetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const {
+Common::Error WizardryMetaEngine::createInstance(OSystem *syst, Engine **engine,
+		const Wizardry::WizardryGameDescription *desc) const {
 	*engine = new Wizardry::WizardryEngine(syst, desc);
 	return Common::kNoError;
 }

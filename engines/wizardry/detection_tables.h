@@ -19,6 +19,8 @@
  *
  */
 
+#include "wizardry/detection.h"
+
 namespace Wizardry {
 
 const PlainGameDescriptor wizardryGames[] = {
@@ -26,18 +28,34 @@ const PlainGameDescriptor wizardryGames[] = {
 	{ 0, 0 }
 };
 
-const ADGameDescription gameDescriptions[] = {
+const WizardryGameDescription gameDescriptions[] = {
 	{
-		"wizardry1",
-		nullptr,
-		AD_ENTRY1s("wiz1.dsk", "85fffb1632eccf747b5ac84ad88000a6", 327680),
-		Common::EN_ANY,
-		Common::kPlatformDOS,
-		ADGF_UNSTABLE,
-		GUIO1(GUIO_NONE)
+		{
+			"wizardry1",
+			nullptr,
+			AD_ENTRY1s("Wizardry-Proving-Grounds-Original-Scenario.dsk", "1cde92e99c4543c8d06e22a2bd61a9ec", 143360),
+			Common::EN_ANY,
+			Common::kPlatformApple2,
+			ADGF_UNSTABLE,
+			GUIO1(GUIO_NONE)
+		},
+		kWizardry1V1
 	},
 
-	AD_TABLE_END_MARKER
+	{
+		{
+			"wizardry1",
+			nullptr,
+			AD_ENTRY1s("wiz1.dsk", "85fffb1632eccf747b5ac84ad88000a6", 327680),
+			Common::EN_ANY,
+			Common::kPlatformDOS,
+			ADGF_UNSTABLE,
+			GUIO1(GUIO_NONE)
+		},
+		kWizardry1V2,
+	},
+
+	{ AD_TABLE_END_MARKER, (WizardryVersion)0 }
 };
 
 } // End of namespace Wizardry

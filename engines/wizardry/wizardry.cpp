@@ -34,7 +34,7 @@ namespace Wizardry {
 
 WizardryEngine *g_engine;
 
-WizardryEngine::WizardryEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
+WizardryEngine::WizardryEngine(OSystem *syst, const WizardryGameDescription *gameDesc) : Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Wizardry") {
 	g_engine = this;
 }
@@ -43,11 +43,15 @@ WizardryEngine::~WizardryEngine() {
 }
 
 uint32 WizardryEngine::getFeatures() const {
-	return _gameDescription->flags;
+	return _gameDescription->desc.flags;
+}
+
+WizardryVersion WizardryEngine::getVersion() const {
+	return _gameDescription->version;
 }
 
 Common::String WizardryEngine::getGameId() const {
-	return _gameDescription->gameId;
+	return _gameDescription->desc.gameId;
 }
 
 Common::Error WizardryEngine::run() {

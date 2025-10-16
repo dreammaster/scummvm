@@ -34,15 +34,26 @@ enum WizardryDebugChannels {
 	kDebugScript,
 };
 
+enum WizardryVersion {
+	kWizardry1V1 = 1,
+	kWizardry1V2 = 2
+};
+
+struct WizardryGameDescription {
+	AD_GAME_DESCRIPTION_HELPERS(desc);
+	ADGameDescription desc;
+	WizardryVersion version;
+};
+
 extern const PlainGameDescriptor wizardryGames[];
 
-extern const ADGameDescription gameDescriptions[];
+extern const WizardryGameDescription gameDescriptions[];
 
 #define GAMEOPTION_ORIGINAL_SAVELOAD GUIO_GAMEOPTIONS1
 
 } // End of namespace Wizardry
 
-class WizardryMetaEngineDetection : public AdvancedMetaEngineDetection<ADGameDescription> {
+class WizardryMetaEngineDetection : public AdvancedMetaEngineDetection<Wizardry::WizardryGameDescription> {
 	static const DebugChannelDef debugFlagList[];
 
 public:

@@ -38,7 +38,7 @@ const DebugChannelDef WizardryMetaEngineDetection::debugFlagList[] = {
 	DEBUG_CHANNEL_END
 };
 
-WizardryMetaEngineDetection::WizardryMetaEngineDetection() : AdvancedMetaEngineDetection(
+WizardryMetaEngineDetection::WizardryMetaEngineDetection() : AdvancedMetaEngineDetection<Wizardry::WizardryGameDescription>(
 	Wizardry::gameDescriptions, Wizardry::wizardryGames) {
 }
 

@@ -23,12 +23,14 @@
 #define WIZARDRY_METAENGINE_H
 
 #include "engines/advancedDetector.h"
+#include "wizardry/detection.h"
 
-class WizardryMetaEngine : public AdvancedMetaEngine<ADGameDescription> {
+class WizardryMetaEngine : public AdvancedMetaEngine<Wizardry::WizardryGameDescription> {
 public:
 	const char *getName() const override;
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+	Common::Error createInstance(OSystem *syst, Engine **engine,
+		const Wizardry::WizardryGameDescription *desc) const override;
 
 	/**
 	 * Determine whether the engine supports the specified MetaEngine feature.
