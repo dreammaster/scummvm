@@ -30,14 +30,19 @@ namespace Wizardry {
 
 class WizardryArchive : public Common::Archive {
 protected:
+	enum FileType {
+		VOLHEAD, BADBLK, MACH6502, TEXT, DEBUG,
+		DATA, GRAFFILE, FOTOFILE, SUBDIR
+	};
+
 	struct FileEntry {
 		const Common::String _filename;
-		uint _blockStart = 0, _blockEnd = 0;
+		uint _offset = 0, _size = 0;
 
 		FileEntry() {
 		}
-		FileEntry(const Common::String &filename, uint blockStart, uint blockEnd) :
-			_filename(filename), _blockStart(blockStart), _blockEnd(blockEnd) {
+		FileEntry(const Common::String &filename, uint offset, uint size) :
+			_filename(filename), _offset(offset), _size(size) {
 		}
 	};
 	Common::Array<byte> _data;
@@ -57,16 +62,22 @@ public:
 };
 
 class WizardryV1Archive : public WizardryArchive {
+	const int BLOCK_SIZE = 256;
+
+	struct DirEntry {
+		uint16 _firstBlock;
+		uint16 _lastBlock;
+		uint8 _fileKind;
+		Common::String _name;
+
+		void load(Common::MemoryReadStream &src);
+	};
 public:
 	WizardryV1Archive();
 };
 
 class WizardryV2Archive : public WizardryArchive {
-
-	enum FileType {
-		VOLHEAD, BADBLK, MACH6502, TEXT, DEBUG,
-		DATA, GRAFFILE, FOTOFILE, SUBDIR
-	};
+	const int BLOCK_SIZE = 512;
 
 	struct DirEntry {
 		uint16 FIRSTBLK = 0;

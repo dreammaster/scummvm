@@ -24,8 +24,6 @@
 
 namespace Wizardry {
 
-constexpr int BLOCK_SIZE = 512;
-
 const WizardryArchive::FileEntry *WizardryArchive::findFile(const Common::Path &path) const {
 	for (const FileEntry &fe : _files) {
 		if (fe._filename.equalsIgnoreCase(path.baseName()))
@@ -47,8 +45,7 @@ Common::SeekableReadStream *WizardryArchive::createReadStreamForMember(const Com
 	const FileEntry *fe = findFile(path);
 
 	if (fe) {
-		return new Common::MemoryReadStream(&_data[fe->_blockStart * BLOCK_SIZE],
-			(fe->_blockEnd - fe->_blockStart + 1) * BLOCK_SIZE);
+		return new Common::MemoryReadStream(&_data[fe->_offset], fe->_size);
 	}
 
 	return nullptr;
@@ -56,7 +53,45 @@ Common::SeekableReadStream *WizardryArchive::createReadStreamForMember(const Com
 
 /*------------------------------------------------------------------------*/
 
+void WizardryV1Archive::DirEntry::load(Common::MemoryReadStream &src) {
+	_firstBlock = src.readUint16LE();
+	_lastBlock = src.readUint16LE();
+	_fileKind = src.readUint16LE() & 0xff;
+
+	byte strLen = src.readByte();
+	char buf[15];
+	src.read(buf, 14);
+	buf[strLen] = '\0';
+	_name = Common::String(buf);
+
+	src.skip(5);
+}
+
 WizardryV1Archive::WizardryV1Archive() {
+	// Load the data
+	const char *FILENAME = "Wizardry-Proving-Grounds-Original-Scenario.dsk";
+	Common::File f;
+	if (!f.open(FILENAME))
+		error("Could not open - %s", FILENAME);
+
+	_data.resize(f.size());
+	f.read(&_data[0], f.size());
+
+	// Parse the directory
+	const byte *buf = &_data[11 * BLOCK_SIZE];
+	DirEntry dirEntry;
+
+	Common::MemoryReadStream src(buf + 26, 256 - 26);
+	const int count = READ_LE_UINT16(buf + 16);
+
+	for (int ctr = 0; ctr < count; ++ctr) {
+		dirEntry.load(src);
+
+		if (dirEntry._fileKind >= BADBLK && dirEntry._fileKind <= FOTOFILE)
+			_files.push_back(FileEntry(dirEntry._name,
+				dirEntry._firstBlock * BLOCK_SIZE,
+				(dirEntry._lastBlock - dirEntry._firstBlock + 1) * BLOCK_SIZE));
+	}
 }
 
 /*------------------------------------------------------------------------*/
@@ -101,7 +136,9 @@ WizardryV2Archive::WizardryV2Archive() {
 			break;
 
 		if (dirEntry.FILEKIND.FT >= BADBLK && dirEntry.FILEKIND.FT <= FOTOFILE)
-			_files.push_back(FileEntry(dirEntry.FILENAME, dirEntry.FIRSTBLK, dirEntry.LASTBLK));
+			_files.push_back(FileEntry(dirEntry.FILENAME,
+				dirEntry.FIRSTBLK * BLOCK_SIZE,
+				(dirEntry.LASTBLK - dirEntry.FIRSTBLK + 1) * BLOCK_SIZE));
 	}
 }
 
