@@ -25,16 +25,11 @@
 #include "common/file.h"
 #include "wizardry/data/scenario.h"
 #include "wizardry/gfx/wizardry_font.h"
-#include "wizardry/libs/files.h"
 
 namespace Wizardry {
 
-constexpr int IOBUFSIZE = BLOCKSZ;
-
 struct Globals {
-	Common::File _dsk;
 	WizardryFont _font;
-	byte _IOCACHE[IOBUFSIZE] = {};
 	TSCNTOC _SCNTOC;
 	int _LLBASE04 = -1;
 	int _SCNTOCBL = 0;

@@ -8,8 +8,8 @@ MODULE_OBJS = \
 	metaengine.o \
 	data/globals.o \
 	data/scenario.o \
-	libs/files.o \
 	libs/memory.o \
+	libs/wizardry_archive.o \
 	gfx/palette.o \
 	gfx/surface.o \
 	gfx/wizardry_font.o \

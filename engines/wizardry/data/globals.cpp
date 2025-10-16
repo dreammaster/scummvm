@@ -20,7 +20,6 @@
  */
 
 #include "wizardry/data/globals.h"
-#include "wizardry/libs/files.h"
 #include "wizardry/libs/memory.h"
 #include "wizardry/gfx/palette.h"
 
@@ -38,14 +37,12 @@ Globals::~Globals() {
 
 void Globals::setup() {
 	Gfx::setupPalette();
-
-	if (!_dsk.open("wiz1.dsk"))
-		error("Could not open wiz1.dsk");
-
+#if 0
 	_SCNTOCBL = FINDFILE(DRIVE1, "scenario.data");
 	assert(_SCNTOCBL >= 0);
 	UNITREAD(DRIVE1, _IOCACHE, sizeof(_IOCACHE), _SCNTOCBL);
 	_SCNTOC.load(_IOCACHE);
+#endif
 }
 
 } // namespace Wizardry

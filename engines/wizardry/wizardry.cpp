@@ -29,6 +29,7 @@
 #include "common/system.h"
 #include "engines/util.h"
 #include "graphics/paletteman.h"
+#include "wizardry/libs/wizardry_archive.h"
 
 namespace Wizardry {
 
@@ -63,6 +64,11 @@ Common::Error WizardryEngine::run() {
 
 	// Setup globals
 	g_globals->setup();
+
+	WizardryArchive *arc = getVersion() == kWizardry1V1 ?
+		(WizardryArchive *)new WizardryV1Archive() :
+		(WizardryArchive *)new WizardryV2Archive();
+	SearchMan.add("dsk", arc);
 
 	// Play the game
 	runGame();
