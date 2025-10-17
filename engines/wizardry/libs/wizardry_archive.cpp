@@ -92,6 +92,11 @@ WizardryV1Archive::WizardryV1Archive() {
 				dirEntry._firstBlock * BLOCK_SIZE,
 				(dirEntry._lastBlock - dirEntry._firstBlock + 1) * BLOCK_SIZE));
 	}
+
+	// Add in special entries for subsets of the other files
+	const FileEntry *fe = findFile("scenario.data");
+	_files.push_back(FileEntry("font1", fe->_offset + 256, 256));
+	_files.push_back(FileEntry("font2", fe->_offset + 512, 256));
 }
 
 /*------------------------------------------------------------------------*/

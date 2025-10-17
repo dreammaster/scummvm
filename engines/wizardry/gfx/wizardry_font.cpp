@@ -21,6 +21,7 @@
 
 #include "wizardry/gfx/wizardry_font.h"
 #include "wizardry/data/globals.h"
+#include "wizardry/libs/file.h"
 
 namespace Wizardry {
 
@@ -206,20 +207,46 @@ static const byte WIZARDRY_SPECIAL_FONT[64][8] = {
 	{0}
 };
 
-void WizardryFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+/*------------------------------------------------------------------------*/
+
+void WizardryFont::drawCharData(Graphics::Surface *dst, const byte *data, int x, int y, uint32 color) const {
 	assert(x >= 0 && y >= 0 && (x + 8) <= dst->w && (y + 8) <= dst->h);
-	assert(chr >= 32 && chr < (32 + 64));
-	const byte *CHAR = _gfxMode ? &WIZARDRY_SPECIAL_FONT[chr - 32][0] : &WIZARDRY_FONT[chr - 32][0];
 
 	for (int yp = 0; yp < 8; ++yp, ++y) {
 		byte *lineP = (byte *)dst->getBasePtr(x, y);
-		byte row = CHAR[yp];
+		byte row = data[yp];
 
 		for (int xp = 0; xp < 8; ++xp, ++lineP) {
 			if (row & (1 << (7 - xp)))
 				*lineP = color;
 		}
 	}
+}
+
+/*------------------------------------------------------------------------*/
+
+void WizardryFontV1::setGfxMode(bool mode) {
+	WizardryFont::setGfxMode(mode);
+
+	// Read in the correct font data
+	File f(mode ? "font2" : "font1");
+	f.read(_data, 256);
+}
+
+void WizardryFontV1::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+	assert(chr >= 32 && chr < (32 + 64));
+	const byte *charData = _data + (chr - 32) * 8;
+
+	drawCharData(dst, charData, x, y, color);
+}
+
+/*------------------------------------------------------------------------*/
+
+void WizardryFontV2::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+	assert(chr >= 32 && chr < (32 + 64));
+	const byte *charData = _gfxMode ? &WIZARDRY_SPECIAL_FONT[chr - 32][0] : &WIZARDRY_FONT[chr - 32][0];
+
+	drawCharData(dst, charData, x, y, color);
 }
 
 } // namespace Wizardry

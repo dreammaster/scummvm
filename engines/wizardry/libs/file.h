@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,39 +20,23 @@
  *
  */
 
-#include "wizardry/data/globals.h"
-#include "wizardry/libs/memory.h"
-#include "wizardry/gfx/palette.h"
-#include "wizardry/wizardry.h"
+#ifndef WIZARDRY_LIBS_FILE_H
+#define WIZARDRY_LIBS_FILE_H
+
+#include "common/file.h"
+#include "common/textconsole.h"
 
 namespace Wizardry {
 
-Globals *g_globals;
-
-Globals::Globals() {
-	g_globals = this;
-}
-
-Globals::~Globals() {
-	g_globals = nullptr;
-	delete _font;
-}
-
-void Globals::setup() {
-	Gfx::setupPalette();
-
-	if (g_engine->getVersion() == kWizardry1V1)
-		_font = new WizardryFontV1();
-	else
-		_font = new WizardryFontV2();
-	_font->setGfxMode(false);
-
-#if 0
-	_SCNTOCBL = FINDFILE(DRIVE1, "scenario.data");
-	assert(_SCNTOCBL >= 0);
-	UNITREAD(DRIVE1, _IOCACHE, sizeof(_IOCACHE), _SCNTOCBL);
-	_SCNTOC.load(_IOCACHE);
-#endif
-}
+class File : public Common::File {
+public:
+	File() : Common::File() {}
+	File(const Common::Path &path) {
+		if (!Common::File::open(path))
+			error("Could not open file - %s", path.baseName().c_str());
+	}
+};
 
 } // namespace Wizardry
+
+#endif

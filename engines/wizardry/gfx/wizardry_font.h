@@ -29,11 +29,15 @@
 namespace Wizardry {
 
 class WizardryFont : public Graphics::Font {
-private:
+protected:
 	bool _gfxMode = false;
 
+	void drawCharData(Graphics::Surface *dst, const byte *data, int x, int y, uint32 color) const;
+
 public:
-	void setGfxMode(bool mode) {
+	virtual ~WizardryFont() {}
+
+	virtual void setGfxMode(bool mode) {
 		_gfxMode = mode;
 	}
 
@@ -46,6 +50,24 @@ public:
 	int getCharWidth(uint32 chr) const override {
 		return 8;
 	}
+};
+
+class WizardryFontV1 : public WizardryFont {
+private:
+	byte _data[256] = {};
+
+public:
+	~WizardryFontV1() override {}
+
+	void setGfxMode(bool mode) override;
+
+	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
+};
+
+class WizardryFontV2 : public WizardryFont {
+public:
+	~WizardryFontV2() override {}
+
 	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
 };
 

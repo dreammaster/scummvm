@@ -62,13 +62,14 @@ Common::Error WizardryEngine::run() {
 	// Set the engine's debugger console
 	setDebugger(new Console());
 
-	// Setup globals
-	g_globals->setup();
-
+	// Setup file access
 	WizardryArchive *arc = getVersion() == kWizardry1V1 ?
 		(WizardryArchive *)new WizardryV1Archive() :
 		(WizardryArchive *)new WizardryV2Archive();
 	SearchMan.add("dsk", arc);
+
+	// Setup globals
+	g_globals->setup();
 
 	// Play the game
 	runGame();
