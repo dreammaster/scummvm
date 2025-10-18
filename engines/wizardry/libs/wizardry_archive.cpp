@@ -19,7 +19,7 @@
  *
  */
 
-#include "common/file.h"
+#include "wizardry/libs/file.h"
 #include "wizardry/libs/wizardry_archive.h"
 
 namespace Wizardry {
@@ -43,15 +43,44 @@ const Common::ArchiveMemberPtr WizardryArchive::getMember(const Common::Path &pa
 
 Common::SeekableReadStream *WizardryArchive::createReadStreamForMember(const Common::Path &path) const {
 	const FileEntry *fe = findFile(path);
-
-	if (fe) {
-		return new Common::MemoryReadStream(&_data[fe->_offset], fe->_size);
-	}
+	if (fe)
+		return new Common::MemoryReadStream(&fe->_data[0], fe->_data.size());
 
 	return nullptr;
 }
 
 /*------------------------------------------------------------------------*/
+
+namespace Uncompressed {
+
+Wizardry1V1Archive::Wizardry1V1Archive() {
+	// Cache a copy of the scenario data files
+	if (File::exists("scenario.data")) {
+		File f1("scenario.data");
+		File f2("scenario.mesgs");
+		_files.push_back(FileEntry("scenario.data", f1));
+		_files.push_back(FileEntry("scenario.mesgs", f2));
+
+	} else if (Common::File::exists("scenario.data#050000")) {
+		File f1("scenario.data#050000");
+		File f2("scenario.mesgs#050000");
+		_files.push_back(FileEntry("scenario.data", f1));
+		_files.push_back(FileEntry("scenario.mesgs", f2));
+	} else {
+		error("Could not locate scenario.data");
+	}
+
+	// Create separate file aliases for data subsets
+	const FileEntry *sd = findFile("scenario.data");
+	_files.push_back(FileEntry("font", &sd->_data[0] + 512, 64 * 8));
+	_files.push_back(FileEntry("gfx_font", &sd->_data[1] + 512 + 256, 64 * 8));
+}
+
+} // namespace Uncompressed
+
+/*------------------------------------------------------------------------*/
+
+namespace Compressed {
 
 void WizardryV1Archive::DirEntry::load(Common::MemoryReadStream &src) {
 	_firstBlock = src.readUint16LE();
@@ -68,17 +97,16 @@ void WizardryV1Archive::DirEntry::load(Common::MemoryReadStream &src) {
 }
 
 WizardryV1Archive::WizardryV1Archive() {
-	// Load the data
-	const char *FILENAME = "Wizardry-Proving-Grounds-Original-Scenario.dsk";
-	Common::File f;
-	if (!f.open(FILENAME))
-		error("Could not open - %s", FILENAME);
+	Common::Array<byte> data;
 
-	_data.resize(f.size());
-	f.read(&_data[0], f.size());
+	// Load the data
+	File f("Wizardry-Proving-Grounds-Original-Scenario.dsk");
+
+	data.resize(f.size());
+	f.read(&data[0], data.size());
 
 	// Parse the directory
-	const byte *buf = &_data[11 * BLOCK_SIZE];
+	const byte *buf = &data[3 * BLOCK_SIZE + DISK_OFFSET];
 	DirEntry dirEntry;
 
 	Common::MemoryReadStream src(buf + 26, 256 - 26);
@@ -89,14 +117,14 @@ WizardryV1Archive::WizardryV1Archive() {
 
 		if (dirEntry._fileKind >= BADBLK && dirEntry._fileKind <= FOTOFILE)
 			_files.push_back(FileEntry(dirEntry._name,
-				dirEntry._firstBlock * BLOCK_SIZE,
-				(dirEntry._lastBlock - dirEntry._firstBlock + 1) * BLOCK_SIZE));
+				&data[dirEntry._firstBlock * BLOCK_SIZE - DISK_OFFSET],
+				(dirEntry._lastBlock - dirEntry._firstBlock) * BLOCK_SIZE));
 	}
 
 	// Add in special entries for subsets of the other files
 	const FileEntry *fe = findFile("scenario.data");
-	_files.push_back(FileEntry("font1", fe->_offset + 256, 256));
-	_files.push_back(FileEntry("font2", fe->_offset + 512, 256));
+	_files.push_back(FileEntry("font1", &fe->_data[512], 64 * 8));
+	_files.push_back(FileEntry("font2", &fe->_data[1024], 64 * 8));
 }
 
 /*------------------------------------------------------------------------*/
@@ -120,16 +148,18 @@ void WizardryV2Archive::DirEntry::load(Common::MemoryReadStream &src) {
 }
 
 WizardryV2Archive::WizardryV2Archive() {
+	Common::Array<byte> data;
+
 	// Load the data
 	Common::File f;
 	if (!f.open("wiz1.dsk"))
 		error("Could not open - wiz1.dsk");
 
-	_data.resize(f.size());
-	f.read(&_data[0], f.size());
+	data.resize(f.size());
+	f.read(&data[0], f.size());
 
 	// Parse the directory
-	const byte *buf = &_data[2 * BLOCK_SIZE];
+	const byte *buf = &data[2 * BLOCK_SIZE];
 	DirEntry dirEntry;
 
 	Common::MemoryReadStream src(buf, 26 * 20);
@@ -142,9 +172,10 @@ WizardryV2Archive::WizardryV2Archive() {
 
 		if (dirEntry.FILEKIND.FT >= BADBLK && dirEntry.FILEKIND.FT <= FOTOFILE)
 			_files.push_back(FileEntry(dirEntry.FILENAME,
-				dirEntry.FIRSTBLK * BLOCK_SIZE,
-				(dirEntry.LASTBLK - dirEntry.FIRSTBLK + 1) * BLOCK_SIZE));
+				&data[dirEntry.FIRSTBLK * BLOCK_SIZE],
+				(dirEntry.LASTBLK - dirEntry.FIRSTBLK) * BLOCK_SIZE));
 	}
 }
 
+} // namespace Compressed
 } // namespace Wizardry

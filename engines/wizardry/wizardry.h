@@ -66,6 +66,7 @@ public:
 	uint32 getFeatures() const;
 
 	WizardryVersion getVersion() const;
+	bool isUncompressed() const;
 
 	/**
 	 * Returns the game Id

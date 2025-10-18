@@ -23,6 +23,7 @@
 #include "wizardry/libs/memory.h"
 #include "wizardry/gfx/palette.h"
 #include "wizardry/wizardry.h"
+#include "wizardry/libs/wizardry_archive.h"
 
 namespace Wizardry {
 
@@ -38,8 +39,20 @@ Globals::~Globals() {
 }
 
 void Globals::setup() {
+	// Setup file access
+	WizardryArchive *arc;
+	if (g_engine->getVersion() == kWizardry1V2)
+		arc = new Compressed::WizardryV2Archive();
+	else if (!g_engine->isUncompressed())
+		arc = new Compressed::WizardryV1Archive();
+	else
+		arc = new Uncompressed::Wizardry1V1Archive();
+	SearchMan.add("dsk", arc, 1);
+
+	// Setup palette
 	Gfx::setupPalette();
 
+	// Setup font
 	if (g_engine->getVersion() == kWizardry1V1)
 		_font = new WizardryFontV1();
 	else

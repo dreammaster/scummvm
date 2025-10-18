@@ -229,7 +229,7 @@ void WizardryFontV1::setGfxMode(bool mode) {
 	WizardryFont::setGfxMode(mode);
 
 	// Read in the correct font data
-	File f(mode ? "font2" : "font1");
+	File f(mode ? "gfx_font" : "font");
 	f.read(_data, 256);
 }
 

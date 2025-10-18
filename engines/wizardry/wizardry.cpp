@@ -29,7 +29,6 @@
 #include "common/system.h"
 #include "engines/util.h"
 #include "graphics/paletteman.h"
-#include "wizardry/libs/wizardry_archive.h"
 
 namespace Wizardry {
 
@@ -51,6 +50,10 @@ WizardryVersion WizardryEngine::getVersion() const {
 	return _gameDescription->version;
 }
 
+bool WizardryEngine::isUncompressed() const {
+	return _gameDescription->uncompressed;
+}
+
 Common::String WizardryEngine::getGameId() const {
 	return _gameDescription->desc.gameId;
 }
@@ -61,12 +64,6 @@ Common::Error WizardryEngine::run() {
 
 	// Set the engine's debugger console
 	setDebugger(new Console());
-
-	// Setup file access
-	WizardryArchive *arc = getVersion() == kWizardry1V1 ?
-		(WizardryArchive *)new WizardryV1Archive() :
-		(WizardryArchive *)new WizardryV2Archive();
-	SearchMan.add("dsk", arc);
 
 	// Setup globals
 	g_globals->setup();

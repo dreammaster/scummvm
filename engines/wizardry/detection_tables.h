@@ -32,6 +32,34 @@ const WizardryGameDescription gameDescriptions[] = {
 	{
 		{
 			"wizardry1",
+			"Uncompressed",
+			AD_ENTRY1s("scenario.data#050000", "2bcbf8ed9bfdbc78375b43df87e7b759", 59392),
+			Common::EN_ANY,
+			Common::kPlatformApple2,
+			ADGF_UNSTABLE,
+			GUIO1(GUIO_NONE)
+		},
+		kWizardry1V1,
+		true
+	},
+
+	{
+		{
+			"wizardry1",
+			"Uncompressed",
+			AD_ENTRY1s("scenario.data", "2bcbf8ed9bfdbc78375b43df87e7b759", 59392),
+			Common::EN_ANY,
+			Common::kPlatformApple2,
+			ADGF_UNSTABLE,
+			GUIO1(GUIO_NONE)
+		},
+		kWizardry1V1,
+		true
+	},
+
+	{
+		{
+			"wizardry1",
 			nullptr,
 			AD_ENTRY1s("Wizardry-Proving-Grounds-Original-Scenario.dsk", "1cde92e99c4543c8d06e22a2bd61a9ec", 143360),
 			Common::EN_ANY,
@@ -39,7 +67,8 @@ const WizardryGameDescription gameDescriptions[] = {
 			ADGF_UNSTABLE,
 			GUIO1(GUIO_NONE)
 		},
-		kWizardry1V1
+		kWizardry1V1,
+		false
 	},
 
 	{
@@ -53,9 +82,10 @@ const WizardryGameDescription gameDescriptions[] = {
 			GUIO1(GUIO_NONE)
 		},
 		kWizardry1V2,
+		false
 	},
 
-	{ AD_TABLE_END_MARKER, (WizardryVersion)0 }
+	{ AD_TABLE_END_MARKER, (WizardryVersion)0, false }
 };
 
 } // End of namespace Wizardry

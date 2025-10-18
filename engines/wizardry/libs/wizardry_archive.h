@@ -37,15 +37,19 @@ protected:
 
 	struct FileEntry {
 		const Common::String _filename;
-		uint _offset = 0, _size = 0;
+		Common::Array<byte> _data;
 
-		FileEntry() {
+		FileEntry() {}
+		FileEntry(const Common::String &filename, const byte *data, uint size) : _filename(filename) {
+			_data.resize(size);
+			Common::copy(data, data + size, &_data[0]);
 		}
-		FileEntry(const Common::String &filename, uint offset, uint size) :
-			_filename(filename), _offset(offset), _size(size) {
+		FileEntry(const Common::String &filename, Common::SeekableReadStream &src) : _filename(filename) {
+			_data.resize(src.size());
+			src.read(&_data[0], _data.size());
 		}
+
 	};
-	Common::Array<byte> _data;
 	Common::Array<FileEntry> _files;
 
 	const FileEntry *findFile(const Common::Path &path) const;
@@ -61,8 +65,22 @@ public:
 	Common::SeekableReadStream *createReadStreamForMember(const Common::Path &path) const override;
 };
 
+namespace Uncompressed {
+
+class Wizardry1V1Archive : public WizardryArchive {
+public:
+	Wizardry1V1Archive();
+};
+
+} // namespace Uncompressed
+
+namespace Compressed {
+
+// TODO: Neither of these properly work yet
+
 class WizardryV1Archive : public WizardryArchive {
-	const int BLOCK_SIZE = 256;
+	const int BLOCK_SIZE = 512;
+	const int DISK_OFFSET = 0x500;
 
 	struct DirEntry {
 		uint16 _firstBlock;
@@ -95,6 +113,8 @@ class WizardryV2Archive : public WizardryArchive {
 public:
 	WizardryV2Archive();
 };
+
+} // namespace Compressed
 
 } // namespace Wizardry
 

@@ -35,14 +35,14 @@ enum WizardryDebugChannels {
 };
 
 enum WizardryVersion {
-	kWizardry1V1 = 1,
-	kWizardry1V2 = 2
+	kWizardryNone, kWizardry1V1, kWizardry1V2
 };
 
 struct WizardryGameDescription {
 	AD_GAME_DESCRIPTION_HELPERS(desc);
 	ADGameDescription desc;
 	WizardryVersion version;
+	bool uncompressed;
 };
 
 extern const PlainGameDescriptor wizardryGames[];
