@@ -24,7 +24,10 @@
 
 namespace Wizardry {
 
-constexpr int CHAR_SIZE = 8;
+Surface::Surface(Graphics::ManagedSurface &src, const Common::Rect &bounds) :
+		Graphics::ManagedSurface(src, bounds) {
+	_font = _G(normalFont);
+}
 
 void Surface::PRINTCHR(char c) {
 	Common::String str(c);
@@ -32,7 +35,7 @@ void Surface::PRINTCHR(char c) {
 }
 
 void Surface::PRINTSTR(const Common::String &str) {
-	_G(font)->drawString(this, str, _textPos.x * CHAR_SIZE, _textPos.y * CHAR_SIZE,
+	_font->drawString(this, str, _textPos.x * CHAR_SIZE, _textPos.y * CHAR_SIZE,
 		320 - (_textPos.x * CHAR_SIZE), _textColor);
 	_textPos.x += str.size();
 }
@@ -42,7 +45,7 @@ void Surface::CLRRECT(int x1, int y1, int x2, int y2) {
 }
 
 void Surface::setGraphicFont(bool gfxMode) {
-	_G(font)->setGfxMode(gfxMode);
+	_font = gfxMode ? _G(gfxFont) : _G(normalFont);
 }
 
 } // namespace Wizardry

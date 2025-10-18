@@ -23,52 +23,58 @@
 #ifndef WIZARDRY_GFX_WIZARDRY_FONT_H
 #define WIZARDRY_GFX_WIZARDRY_FONT_H
 
+#include "common/file.h"
 #include "graphics/font.h"
 #include "graphics/surface.h"
 
 namespace Wizardry {
 
-class WizardryFont : public Graphics::Font {
-protected:
-	bool _gfxMode = false;
+constexpr int CHAR_SIZE = 8;
 
-	void drawCharData(Graphics::Surface *dst, const byte *data, int x, int y, uint32 color) const;
+class WizardryFont : public Graphics::Font {
+private:
+	const byte *_data;
 
 public:
+	WizardryFont(const byte *data) : _data(data) {
+	}
 	virtual ~WizardryFont() {}
 
-	virtual void setGfxMode(bool mode) {
-		_gfxMode = mode;
-	}
-
 	int getFontHeight() const override {
-		return 8;
+		return CHAR_SIZE;
 	}
 	int getMaxCharWidth() const override {
-		return 8;
+		return CHAR_SIZE;
 	}
 	int getCharWidth(uint32 chr) const override {
-		return 8;
+		return CHAR_SIZE;
 	}
+	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
 };
 
 class WizardryFontV1 : public WizardryFont {
 private:
-	byte _data[256] = {};
+	byte _data[64 * 8] = {};
 
 public:
+	WizardryFontV1(const byte *data);
+	WizardryFontV1(Common::SeekableReadStream &src);
 	~WizardryFontV1() override {}
 
-	void setGfxMode(bool mode) override;
-
-	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
 };
 
-class WizardryFontV2 : public WizardryFont {
+class WizardryFontNormal : public WizardryFont {
 public:
-	~WizardryFontV2() override {}
+	WizardryFontNormal();
+	~WizardryFontNormal() override {
+	}
+};
 
-	void drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const override;
+class WizardryFontGfx : public WizardryFont {
+public:
+	WizardryFontGfx();
+	~WizardryFontGfx() override {
+	}
 };
 
 } // namespace Wizardry

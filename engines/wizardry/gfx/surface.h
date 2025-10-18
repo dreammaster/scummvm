@@ -24,17 +24,18 @@
 #define WIZARDRY_GFX_SURFACE_H
 
 #include "graphics/managed_surface.h"
+#include "wizardry/gfx/wizardry_font.h"
 
 namespace Wizardry {
 
 class Surface : public Graphics::ManagedSurface {
 private:
+	WizardryFont *_font;
 	Common::Point _textPos;
 	int _textColor = 1;
 
 public:
-	Surface(Graphics::ManagedSurface &src, const Common::Rect &bounds) :
-		Graphics::ManagedSurface(src, bounds) {}
+	Surface(Graphics::ManagedSurface &src, const Common::Rect &bounds);
 	~Surface() override {
 		setGraphicFont(false);
 	}

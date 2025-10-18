@@ -73,7 +73,7 @@ Wizardry1V1Archive::Wizardry1V1Archive() {
 	// Create separate file aliases for data subsets
 	const FileEntry *sd = findFile("scenario.data");
 	_files.push_back(FileEntry("font", &sd->_data[0] + 512, 64 * 8));
-	_files.push_back(FileEntry("gfx_font", &sd->_data[1] + 512 + 256, 64 * 8));
+	_files.push_back(FileEntry("gfx_font", &sd->_data[0] + 1024, 64 * 8));
 }
 
 } // namespace Uncompressed

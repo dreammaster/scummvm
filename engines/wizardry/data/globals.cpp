@@ -20,6 +20,7 @@
  */
 
 #include "wizardry/data/globals.h"
+#include "wizardry/libs/file.h"
 #include "wizardry/libs/memory.h"
 #include "wizardry/gfx/palette.h"
 #include "wizardry/wizardry.h"
@@ -35,7 +36,8 @@ Globals::Globals() {
 
 Globals::~Globals() {
 	g_globals = nullptr;
-	delete _font;
+	delete _normalFont;
+	delete _gfxFont;
 }
 
 void Globals::setup() {
@@ -53,11 +55,15 @@ void Globals::setup() {
 	Gfx::setupPalette();
 
 	// Setup font
-	if (g_engine->getVersion() == kWizardry1V1)
-		_font = new WizardryFontV1();
-	else
-		_font = new WizardryFontV2();
-	_font->setGfxMode(false);
+	if (g_engine->getVersion() == kWizardry1V1) {
+		File f1("font");
+		_normalFont = new WizardryFontV1(f1);
+		File f2("gfx_font");
+		_gfxFont = new WizardryFontV1(f2);
+	} else {
+		_normalFont = new WizardryFontNormal();
+		_gfxFont = new WizardryFontGfx();
+	}
 
 #if 0
 	_SCNTOCBL = FINDFILE(DRIVE1, "scenario.data");

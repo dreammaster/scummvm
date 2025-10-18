@@ -29,7 +29,8 @@
 namespace Wizardry {
 
 struct Globals {
-	WizardryFont *_font = nullptr;
+	WizardryFont *_normalFont = nullptr;
+	WizardryFont *_gfxFont = nullptr;
 	TSCNTOC _SCNTOC;
 	int _LLBASE04 = -1;
 	int _SCNTOCBL = 0;

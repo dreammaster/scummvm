@@ -209,15 +209,17 @@ static const byte WIZARDRY_SPECIAL_FONT[64][8] = {
 
 /*------------------------------------------------------------------------*/
 
-void WizardryFont::drawCharData(Graphics::Surface *dst, const byte *data, int x, int y, uint32 color) const {
+void WizardryFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
 	assert(x >= 0 && y >= 0 && (x + 8) <= dst->w && (y + 8) <= dst->h);
+	assert(chr >= 32 && chr < (32 + 64));
+	const byte *charData = _data + (chr - 32) * 8;
 
 	for (int yp = 0; yp < 8; ++yp, ++y) {
 		byte *lineP = (byte *)dst->getBasePtr(x, y);
-		byte row = data[yp];
+		byte row = charData[yp];
 
 		for (int xp = 0; xp < 8; ++xp, ++lineP) {
-			if (row & (1 << (7 - xp)))
+			if (row & (1 << xp))
 				*lineP = color;
 		}
 	}
@@ -225,28 +227,23 @@ void WizardryFont::drawCharData(Graphics::Surface *dst, const byte *data, int x,
 
 /*------------------------------------------------------------------------*/
 
-void WizardryFontV1::setGfxMode(bool mode) {
-	WizardryFont::setGfxMode(mode);
-
-	// Read in the correct font data
-	File f(mode ? "gfx_font" : "font");
-	f.read(_data, 256);
+WizardryFontV1::WizardryFontV1(const byte *data) : WizardryFont(_data) {
+	Common::copy(data, data + 64 * 8, _data);
 }
 
-void WizardryFontV1::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
-	assert(chr >= 32 && chr < (32 + 64));
-	const byte *charData = _data + (chr - 32) * 8;
+WizardryFontV1::WizardryFontV1(Common::SeekableReadStream &src) : WizardryFont(_data) {
+	src.read(_data, 64 * 8);
+}
 
-	drawCharData(dst, charData, x, y, color);
+
+/*------------------------------------------------------------------------*/
+
+WizardryFontNormal::WizardryFontNormal() : WizardryFont(&WIZARDRY_FONT[0][0]) {
 }
 
 /*------------------------------------------------------------------------*/
 
-void WizardryFontV2::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
-	assert(chr >= 32 && chr < (32 + 64));
-	const byte *charData = _gfxMode ? &WIZARDRY_SPECIAL_FONT[chr - 32][0] : &WIZARDRY_FONT[chr - 32][0];
-
-	drawCharData(dst, charData, x, y, color);
+WizardryFontGfx::WizardryFontGfx() : WizardryFont(&WIZARDRY_SPECIAL_FONT[0][0]) {
 }
 
 } // namespace Wizardry
