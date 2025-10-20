@@ -25,6 +25,16 @@
 
 namespace Wizardry {
 
+bool Castle::msgFocus(const FocusMessage &msg) {
+	View::msgFocus(msg);
+	_G(MAZEX) = 0;
+	_G(MAZEY) = 0;
+	_G(MAZELEV) = 0;
+	_G(PARTYCNT) = 0;
+	_G(DIRECTIO) = 0;
+	_G(ACMOD2) = 0;
+}
+
 bool Castle::msgKeypress(const KeypressMessage &msg) {
 	// Any keypress to close the view
 	close();

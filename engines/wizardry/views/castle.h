@@ -35,6 +35,7 @@ public:
 	Castle() : View("Castle") {}
 	virtual ~Castle() {}
 
+	bool msgFocus(const FocusMessage &msg) override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 	void draw() override;
 };
