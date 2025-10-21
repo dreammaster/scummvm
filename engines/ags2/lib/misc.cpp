@@ -19,34 +19,40 @@
  *
  */
 
-#include "ags2/routefnd.h"
-#include "ags2/vars.h"
+#include "common/file.h"
+#include "ags2/lib/misc.h"
+#include "ags2/lib/allegro/file.h"
 
 namespace AGS2 {
-#if 0
-void print_welcome_text(const char *verno, const char *aciverno) {
-	_G(walk_area_zone5) = 1633;
 
-	if (strcmp(Vars::ac_engine_copyright, "Adventure Game Studio engine & tools (c) 1999-2000 by Chris Jones.") != 0) {
-		quit("Don't screw with my name.");
-		exit(77);
-		abort();
-	}
+Common::SeekableReadStream *ci_fopen(const char *file_name, const char *mode) {
+	assert(!strcmp(mode, "r") || !strcmp(mode, "rb"));
+	Common::File *f = new Common::File();
+	if (f->open(file_name))
+		return f;
 
-	if (strlen(Vars::ac_engine_copyright) != 66) {
-		quit("Leave my name alone.");
-		exit(88);
-		abort();
-	}
-
-	if (get_copyright_crc() != COPYRIGHT_CRC) {
-		quit("Nice try.");
-		exit(89);
-		abort();
-	}
-
-	routex1 = -10;
+	delete f;
+	return nullptr;
 }
-#endif
+
+char *ci_find_file(char *dir_name, char *file_name) {
+	char *diamond = nullptr;
+
+	if (dir_name == nullptr && file_name == nullptr)
+		return nullptr;
+
+	if (dir_name == nullptr) {
+		size_t len = strlen(file_name);
+		diamond = (char *)malloc(len + 3);
+		Common::strcpy_s(diamond, len + 3, file_name);
+	} else {
+		diamond = (char *)malloc(strlen(dir_name) + strlen(file_name) + 2);
+		append_filename(diamond, dir_name, file_name, strlen(dir_name) + strlen(file_name) + 2);
+	}
+
+	fix_filename_case(diamond);
+	fix_filename_slashes(diamond);
+	return diamond;
+}
 
 } // namespace AGS2

@@ -19,25 +19,22 @@
  *
  */
 
-#ifndef AGS2_METAENGINE_H
-#define AGS2_METAENGINE_H
+#ifndef AGS2_LIB_MISC_H
+#define AGS2_LIB_MISC_H
 
-#include "engines/advancedDetector.h"
+#include "common/stream.h"
 
-class AGS2MetaEngine : public AdvancedMetaEngine<ADGameDescription> {
-public:
-	const char *getName() const override;
+namespace AGS2 {
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+Common::SeekableReadStream *ci_fopen(const char *file_name, const char *mode);
 
-	/**
-	 * Determine whether the engine supports the specified MetaEngine feature.
-	 *
-	 * Used by e.g. the launcher to determine whether to enable the Load button.
-	 */
-	bool hasFeature(MetaEngineFeature f) const override;
+char *ci_find_file(char *dir_name, char *file_name);
 
-	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
-};
+inline void ags_strlwr(char *str) {
+	while (*str)
+		*str++ = toupper(*str);
+}
 
-#endif // AGS2_METAENGINE_H
+} // namespace AGS2
+
+#endif

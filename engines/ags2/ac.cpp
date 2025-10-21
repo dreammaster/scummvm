@@ -25,7 +25,7 @@
 namespace AGS2 {
 
 void ags_main(int argc, const char** argv[]) {
-	print_welcome_text(AC_VERSION_TEXT, ACI_VERSION_TEXT);
+//	print_welcome_text(AC_VERSION_TEXT, ACI_VERSION_TEXT);
 }
 
 } // namespace AGS2

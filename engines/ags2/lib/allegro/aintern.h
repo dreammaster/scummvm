@@ -19,25 +19,29 @@
  *
  */
 
-#ifndef AGS2_METAENGINE_H
-#define AGS2_METAENGINE_H
+#ifndef AGS2_LIB_ALLEGRO_AINTERN_H
+#define AGS2_LIB_ALLEGRO_AINTERN_H
 
-#include "engines/advancedDetector.h"
+#include "ags2/lib/allegro/base.h"
+#include "ags2/lib/allegro/color.h"
 
-class AGS2MetaEngine : public AdvancedMetaEngine<ADGameDescription> {
-public:
-	const char *getName() const override;
+/* default truecolor pixel format */
+#define DEFAULT_RGB_R_SHIFT_15  0
+#define DEFAULT_RGB_G_SHIFT_15  5
+#define DEFAULT_RGB_B_SHIFT_15  10
+#define DEFAULT_RGB_R_SHIFT_16  0
+#define DEFAULT_RGB_G_SHIFT_16  5
+#define DEFAULT_RGB_B_SHIFT_16  11
+#define DEFAULT_RGB_R_SHIFT_24  0
+#define DEFAULT_RGB_G_SHIFT_24  8
+#define DEFAULT_RGB_B_SHIFT_24  16
+#define DEFAULT_RGB_R_SHIFT_32  0
+#define DEFAULT_RGB_G_SHIFT_32  8
+#define DEFAULT_RGB_B_SHIFT_32  16
+#define DEFAULT_RGB_A_SHIFT_32  24
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+namespace AGS2 {
 
-	/**
-	 * Determine whether the engine supports the specified MetaEngine feature.
-	 *
-	 * Used by e.g. the launcher to determine whether to enable the Load button.
-	 */
-	bool hasFeature(MetaEngineFeature f) const override;
+} // namespace AGS2
 
-	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
-};
-
-#endif // AGS2_METAENGINE_H
+#endif

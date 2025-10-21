@@ -19,25 +19,22 @@
  *
  */
 
-#ifndef AGS2_METAENGINE_H
-#define AGS2_METAENGINE_H
+#ifndef AGS2_LIB_ALLEGRO_FMATHS_H
+#define AGS2_LIB_ALLEGRO_FMATHS_H
 
-#include "engines/advancedDetector.h"
+#include "ags2/lib/allegro/fixed.h"
 
-class AGS2MetaEngine : public AdvancedMetaEngine<ADGameDescription> {
-public:
-	const char *getName() const override;
+namespace AGS2 {
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+AL_FUNC(fixed, fixsqrt, (fixed x));
+AL_FUNC(fixed, fixhypot, (fixed x, fixed y));
+AL_FUNC(fixed, fixatan, (fixed x));
+AL_FUNC(fixed, fixatan2, (fixed y, fixed x));
 
-	/**
-	 * Determine whether the engine supports the specified MetaEngine feature.
-	 *
-	 * Used by e.g. the launcher to determine whether to enable the Load button.
-	 */
-	bool hasFeature(MetaEngineFeature f) const override;
+AL_ARRAY(const fixed, _cos_tbl);
+AL_ARRAY(const fixed, _tan_tbl);
+AL_ARRAY(const fixed, _acos_tbl);
 
-	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
-};
+} // namespace AGS2
 
-#endif // AGS2_METAENGINE_H
+#endif

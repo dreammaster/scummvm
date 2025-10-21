@@ -19,25 +19,15 @@
  *
  */
 
-#ifndef AGS2_METAENGINE_H
-#define AGS2_METAENGINE_H
+#ifndef AGS2_LIB_ALLEGRO_CONFIG_H
+#define AGS2_LIB_ALLEGRO_CONFIG_H
 
-#include "engines/advancedDetector.h"
+namespace AGS2 {
 
-class AGS2MetaEngine : public AdvancedMetaEngine<ADGameDescription> {
-public:
-	const char *getName() const override;
+extern int *allegro_errno;
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+extern void override_config_data(const char *data, int length);
 
-	/**
-	 * Determine whether the engine supports the specified MetaEngine feature.
-	 *
-	 * Used by e.g. the launcher to determine whether to enable the Load button.
-	 */
-	bool hasFeature(MetaEngineFeature f) const override;
+} // namespace AGS2
 
-	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
-};
-
-#endif // AGS2_METAENGINE_H
+#endif

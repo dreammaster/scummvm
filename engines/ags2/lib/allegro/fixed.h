@@ -19,25 +19,36 @@
  *
  */
 
-#ifndef AGS2_METAENGINE_H
-#define AGS2_METAENGINE_H
+#ifndef AGS2_LIB_ALLEGRO_FIXED_H
+#define AGS2_LIB_ALLEGRO_FIXED_H
 
-#include "engines/advancedDetector.h"
+#include "common/scummsys.h"
+#include "ags2/lib/allegro/alconfig.h"
 
-class AGS2MetaEngine : public AdvancedMetaEngine<ADGameDescription> {
-public:
-	const char *getName() const override;
+namespace AGS2 {
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+typedef int32_t fixed;
 
-	/**
-	 * Determine whether the engine supports the specified MetaEngine feature.
-	 *
-	 * Used by e.g. the launcher to determine whether to enable the Load button.
-	 */
-	bool hasFeature(MetaEngineFeature f) const override;
+extern const fixed _cos_tbl[];
+extern const fixed _tan_tbl[];
+extern const fixed _acos_tbl[];
 
-	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
-};
+extern fixed ftofix(double x);
+extern double fixtof(fixed x);
+extern fixed fixadd(fixed x, fixed y);
+extern fixed fixsub(fixed x, fixed y);
+extern fixed fixmul(fixed x, fixed y);
+extern fixed fixdiv(fixed x, fixed y);
+extern int fixfloor(fixed x);
+extern int fixceil(fixed x);
+extern fixed itofix(int x);
+extern int fixtoi(fixed x);
+extern fixed fixcos(fixed x);
+extern fixed fixsin(fixed x);
+extern fixed fixtan(fixed x);
+extern fixed fixacos(fixed x);
+extern fixed fixasin(fixed x);
 
-#endif // AGS2_METAENGINE_H
+} // namespace AGS2
+
+#endif

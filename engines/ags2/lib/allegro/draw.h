@@ -19,25 +19,30 @@
  *
  */
 
-#ifndef AGS2_METAENGINE_H
-#define AGS2_METAENGINE_H
+#include "ags2/lib/allegro/base.h"
+#include "ags2/lib/allegro/gfx.h"
+#include "ags2/lib/allegro/surface.h"
 
-#include "engines/advancedDetector.h"
+#ifndef AGS2_LIB_ALLEGRO_DRAW_H
+#define AGS2_LIB_ALLEGRO_DRAW_H
 
-class AGS2MetaEngine : public AdvancedMetaEngine<ADGameDescription> {
-public:
-	const char *getName() const override;
+namespace AGS2 {
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+#define DRAW_MODE_SOLID             0        /* flags for drawing_mode() */
+#define DRAW_MODE_XOR               1
+#define DRAW_MODE_COPY_PATTERN      2
+#define DRAW_MODE_SOLID_PATTERN     3
+#define DRAW_MODE_MASKED_PATTERN    4
+#define DRAW_MODE_TRANS             5
 
-	/**
-	 * Determine whether the engine supports the specified MetaEngine feature.
-	 *
-	 * Used by e.g. the launcher to determine whether to enable the Load button.
-	 */
-	bool hasFeature(MetaEngineFeature f) const override;
+AL_FUNC(void, drawing_mode, (int mode, BITMAP *pattern, int x_anchor, int y_anchor));
+AL_FUNC(void, xor_mode, (int on));
+AL_FUNC(void, solid_mode, (void));
 
-	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
-};
+typedef void (*DrawMethod)(BITMAP *, int, int, int);
 
-#endif // AGS2_METAENGINE_H
+extern void do_line(BITMAP *bmp, int x1, int y1, int x2, int y2, int d, DrawMethod proc);
+
+} // namespace AGS2
+
+#endif

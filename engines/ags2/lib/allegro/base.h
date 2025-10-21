@@ -19,25 +19,34 @@
  *
  */
 
-#ifndef AGS2_METAENGINE_H
-#define AGS2_METAENGINE_H
+#ifndef AGS2_LIB_ALLEGRO_BASE_H
+#define AGS2_LIB_ALLEGRO_BASE_H
 
-#include "engines/advancedDetector.h"
+#include "common/scummsys.h"
+#include "common/algorithm.h"
+#include "common/endian.h"
+#include "ags2/lib/allegro/error.h"
 
-class AGS2MetaEngine : public AdvancedMetaEngine<ADGameDescription> {
-public:
-	const char *getName() const override;
+namespace AGS2 {
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+#define ALLEGRO_VERSION          4
+#define ALLEGRO_SUB_VERSION      4
+#define ALLEGRO_WIP_VERSION      2
+#define ALLEGRO_VERSION_STR      "4.4.2"
+#define ALLEGRO_DATE_STR         "2011"
+#define ALLEGRO_DATE             20110519    /* yyyymmdd */
 
-	/**
-	 * Determine whether the engine supports the specified MetaEngine feature.
-	 *
-	 * Used by e.g. the launcher to determine whether to enable the Load button.
-	 */
-	bool hasFeature(MetaEngineFeature f) const override;
+/* Returns the median of x, y, z */
+#define MID(x,y,z)   ((x) > (y) ? ((y) > (z) ? (y) : ((x) > (z) ?    \
+                                   (z) : (x))) : ((y) > (z) ? ((z) > (x) ? (z) : \
+                                           (x)): (y)))
 
-	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
-};
+#define AL_ID MKTAG
 
-#endif // AGS2_METAENGINE_H
+#define AL_FUNC(type, name, args)               type name args
+
+#define SCUMMVM_ID MKTAG('S', 'C', 'V', 'M')
+
+} // namespace AGS2
+
+#endif

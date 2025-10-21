@@ -69,26 +69,7 @@ Common::Error AGS2Engine::run() {
 		_screen->frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
 	_screen->update();
 
-	// Simple event handling loop
-	byte pal[256 * 3] = { 0 };
-	Common::Event e;
-	int offset = 0;
 
-	while (!shouldQuit()) {
-		while (g_system->getEventManager()->pollEvent(e)) {
-		}
-
-		// Cycle through a simple palette
-		++offset;
-		for (int i = 0; i < 256; ++i)
-			pal[i * 3 + 1] = (i + offset) % 256;
-		g_system->getPaletteManager()->setPalette(pal, 0, 256);
-		_screen->update();
-
-		// Delay for a bit. All events loops should have a delay
-		// to prevent the system being unduly loaded
-		g_system->delayMillis(10);
-	}
 
 	return Common::kNoError;
 }

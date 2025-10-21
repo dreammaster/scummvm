@@ -19,25 +19,56 @@
  *
  */
 
-#ifndef AGS2_METAENGINE_H
-#define AGS2_METAENGINE_H
+#ifndef AGS2_LIB_ALLEGRO_ERROR_H
+#define AGS2_LIB_ALLEGRO_ERROR_H
 
-#include "engines/advancedDetector.h"
+#include "common/scummsys.h"
 
-class AGS2MetaEngine : public AdvancedMetaEngine<ADGameDescription> {
-public:
-	const char *getName() const override;
+namespace AGS2 {
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
-
-	/**
-	 * Determine whether the engine supports the specified MetaEngine feature.
-	 *
-	 * Used by e.g. the launcher to determine whether to enable the Load button.
-	 */
-	bool hasFeature(MetaEngineFeature f) const override;
-
-	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
+// Error codes
+enum AllegroError {
+	AL_NOERROR = 0,
+	AL_EPERM = 1,
+	AL_ENOENT = 2,
+	AL_ESRCH = 3,
+	AL_EINTR = 4,
+	AL_EIO = 5,
+	AL_ENXIO = 6,
+	AL_E2BIG = 7,
+	AL_ENOEXEC = 8,
+	AL_EBADF = 9,
+	AL_ECHILD = 10,
+	AL_EAGAIN = 11,
+	AL_ENOMEM = 12,
+	AL_EACCES = 13,
+	AL_EFAULT = 14,
+	AL_EBUSY = 16,
+	AL_EEXIST = 17,
+	AL_EXDEV = 18,
+	AL_ENODEV = 19,
+	AL_ENOTDIR = 20,
+	AL_EISDIR = 21,
+	AL_EINVAL = 22,
+	AL_ENFILE = 23,
+	AL_EMFILE = 24,
+	AL_ENOTTY = 25,
+	AL_EFBIG = 27,
+	AL_ENOSPC = 28,
+	AL_ESPIPE = 29,
+	AL_EROFS = 30,
+	AL_EMLINK = 31,
+	AL_EPIPE = 32,
+	AL_EDOM = 33,
+	AL_ERANGE = 34,
+	AL_EDEADLK = 36,
+	AL_ENAMETOOLONG = 38,
+	AL_ENOLCK = 39,
+	AL_ENOSYS = 40,
+	AL_ENOTEMPTY = 41,
+	AL_EILSEQ = 42
 };
 
-#endif // AGS2_METAENGINE_H
+} // namespace AGS2
+
+#endif

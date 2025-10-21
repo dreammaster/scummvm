@@ -38,8 +38,8 @@ const DebugChannelDef AGS2MetaEngineDetection::debugFlagList[] = {
 	DEBUG_CHANNEL_END
 };
 
-AGS2MetaEngineDetection::AGS2MetaEngineDetection() : AdvancedMetaEngineDetection(AGS2::gameDescriptions,
-	sizeof(ADGameDescription), AGS2::AGS2Games) {
+AGS2MetaEngineDetection::AGS2MetaEngineDetection() : AdvancedMetaEngineDetection<ADGameDescription>(
+	AGS2::gameDescriptions, AGS2::AGS2Games) {
 }
 
 REGISTER_PLUGIN_STATIC(AGS2_DETECTION, PLUGIN_TYPE_ENGINE_DETECTION, AGS2MetaEngineDetection);

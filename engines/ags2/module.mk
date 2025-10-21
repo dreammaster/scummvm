@@ -6,7 +6,9 @@ MODULE_OBJS = \
 	console.o \
 	metaengine.o \
 	routefnd.o \
-	vars.o
+	vars.o \
+	lib\clib32.o \
+	lib\misc.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AGS2), DYNAMIC_PLUGIN)
@@ -18,3 +20,4 @@ include $(srcdir)/rules.mk
 
 # Detection objects
 DETECT_OBJS += $(MODULE)/detection.o
+

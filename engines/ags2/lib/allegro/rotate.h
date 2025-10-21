@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,25 +20,16 @@
  *
  */
 
-#ifndef AGS2_METAENGINE_H
-#define AGS2_METAENGINE_H
+#ifndef AGS2_LIB_ALLEGRO_ROTATE_H
+#define AGS2_LIB_ALLEGRO_ROTATE_H
 
-#include "engines/advancedDetector.h"
+#include "ags2/lib/allegro/surface.h"
+#include "ags2/lib/allegro/fixed.h"
 
-class AGS2MetaEngine : public AdvancedMetaEngine<ADGameDescription> {
-public:
-	const char *getName() const override;
+namespace AGS2 {
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+extern void pivot_scaled_sprite(BITMAP *bmp, const BITMAP *sprite, fixed x, fixed y, fixed cx, fixed cy, fixed angle, fixed scale);
 
-	/**
-	 * Determine whether the engine supports the specified MetaEngine feature.
-	 *
-	 * Used by e.g. the launcher to determine whether to enable the Load button.
-	 */
-	bool hasFeature(MetaEngineFeature f) const override;
+} // namespace AGS2
 
-	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
-};
-
-#endif // AGS2_METAENGINE_H
+#endif

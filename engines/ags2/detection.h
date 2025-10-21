@@ -42,7 +42,7 @@ extern const ADGameDescription gameDescriptions[];
 
 } // namespace AGS2
 
-class AGS2MetaEngineDetection : public AdvancedMetaEngineDetection {
+class AGS2MetaEngineDetection : public AdvancedMetaEngineDetection<ADGameDescription> {
 	static const DebugChannelDef debugFlagList[];
 
 public:
