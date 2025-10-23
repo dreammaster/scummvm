@@ -34,7 +34,6 @@ namespace AGS2 {
 #define CLIB_IS_INSTALLED
 
 int32 last_opened_size;
-char clib32copyright[] = "CLIB32 v1.21 (c) 1995,1996,1998,2001,2007 Chris Jones";
 char lib_file_name[255] = " ";
 char base_path[255] = ".";
 char original_base_filename[255];
