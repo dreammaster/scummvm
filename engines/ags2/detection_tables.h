@@ -23,19 +23,36 @@ namespace AGS2 {
 
 const PlainGameDescriptor AGS2Games[] = {
 	{ "AGS2", "AGS Early Games" },
+	{ "robblanc1", "Rob Blanc 1: Better Days of a Defender Of the Universe" },
 	{ "qfg45", "Quest for Glory 4 1/2: So You Thought You Were a Hero?" },
 	{ 0, 0 }
 };
 
-const ADGameDescription gameDescriptions[] = {
+const AGS2GameDescription gameDescriptions[] = {
 	{
-		"qfg45",
-		nullptr,
-		AD_ENTRY1s("qfg.001", "dadc5de95ba5662fca06957497eaf24d", 1050254),
-		Common::EN_ANY,
-		Common::kPlatformDOS,
-		ADGF_UNSTABLE,
-		GUIO1(GUIO_NONE)
+		{
+			"qfg45",
+			nullptr,
+			AD_ENTRY1s("qfg.001", "dadc5de95ba5662fca06957497eaf24d", 1050254),
+			Common::EN_ANY,
+			Common::kPlatformWindows,
+			ADGF_UNSTABLE,
+			GUIO1(GUIO_NONE)
+		},
+		"2.30.221"
+	},
+
+	{
+		{
+			"robblanc1",
+			"Remastered",
+			AD_ENTRY1s("ac2game.dat", "29c2ced2f2e6ad764e4249b4e4c45bba", 920415),
+			Common::EN_ANY,
+			Common::kPlatformWindows,
+			ADGF_UNSTABLE,
+			GUIO1(GUIO_NONE)
+		},
+		"2.40.325"
 	},
 
 	AD_TABLE_END_MARKER

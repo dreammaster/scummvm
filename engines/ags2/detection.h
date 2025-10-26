@@ -34,15 +34,22 @@ enum AGS2DebugChannels {
 	kDebugScript,
 };
 
+struct AGS2GameDescription {
+	AD_GAME_DESCRIPTION_HELPERS(desc);
+	ADGameDescription desc;
+	const char *acVersion;
+};
+
+
 extern const PlainGameDescriptor AGS2Games[];
 
-extern const ADGameDescription gameDescriptions[];
+extern const AGS2GameDescription gameDescriptions[];
 
 #define GAMEOPTION_ORIGINAL_SAVELOAD GUIO_GAMEOPTIONS1
 
 } // namespace AGS2
 
-class AGS2MetaEngineDetection : public AdvancedMetaEngineDetection<ADGameDescription> {
+class AGS2MetaEngineDetection : public AdvancedMetaEngineDetection<AGS2::AGS2GameDescription> {
 	static const DebugChannelDef debugFlagList[];
 
 public:

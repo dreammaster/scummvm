@@ -19,16 +19,11 @@
  *
  */
 
+#include "common/scummsys.h"
 #include "ags2/ags2.h"
 #include "ags2/detection.h"
 #include "ags2/console.h"
-#include "common/scummsys.h"
-#include "common/config-manager.h"
-#include "common/debug-channels.h"
-#include "common/events.h"
-#include "common/system.h"
-#include "engines/util.h"
-#include "graphics/palette.h"
+#include "ags2/ac.h"
 
 namespace AGS2 {
 
@@ -52,24 +47,10 @@ Common::String AGS2Engine::getGameId() const {
 }
 
 Common::Error AGS2Engine::run() {
-	// Initialize 320x200 paletted graphics mode
-	initGraphics(320, 200);
-	_screen = new Graphics::Screen();
+	const char *filename = _gameDescription->filesDescriptions[0].fileName;
+	const char *argv[] = { nullptr, filename };
 
-	// Set the engine's debugger console
-	setDebugger(new Console());
-
-	// If a savegame was selected from the launcher, load it
-	int saveSlot = ConfMan.getInt("save_slot");
-	if (saveSlot != -1)
-		(void)loadGameState(saveSlot);
-
-	// Draw a series of boxes on screen as a sample
-	for (int i = 0; i < 100; ++i)
-		_screen->frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
-	_screen->update();
-
-
+	ags_main(2, argv);
 
 	return Common::kNoError;
 }
