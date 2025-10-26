@@ -23,15 +23,53 @@
 #ifndef AGS2_VARS_H
 #define AGS2_VARS_H
 
+#include "ags2/lib/allegro/color.h"
+#include "ags2/acruntime.h"
+
 namespace AGS2 {
 	
 class Vars;
 
 extern Vars *g_vars;
+extern GameState play;
+extern GameSetup usetup;
+
+extern int debug_flags;
+extern int force_letterbox;
+extern int game_paused;
+extern int ifacepopped;
+extern color palette[256];
+extern int fps, display_fps;
+
+extern int datafile_argv, change_to_game_dir, force_window;
+extern int override_start_room, force_16bit;
+extern bool justRegisterGame;
+extern bool justUnRegisterGame;
+extern const char *loadSaveGameOnStartup;
+
+extern int use_compiled_folder_as_current_dir;
+extern int editor_debugging_enabled;
+extern int editor_debugging_initialized;
+extern char editor_debugger_instance_token[100];
+extern int break_on_next_script_step;
+extern volatile int game_paused_in_debugger;
+
+extern int in_enters_screen, done_es_error;
+extern int in_leaves_screen;
+extern bool need_to_stop_cd;
+extern bool debug_15bit_mode, debug_24bit_mode;
+extern int said_text;
+extern int convert_16bit_bgr;
+extern int mouse_z_was;
+extern int bg_just_changed;
+extern int loaded_game_file_version;
+extern volatile bool want_exit, abort_engine;
+extern bool check_dynamic_sprites_at_exit;
+extern char return_to_roomedit[30];
+extern char return_to_room[150];
 
 class Vars {
 public:
-	static const char *ac_engine_copyright;
 
 public:
 	// routefnd
@@ -39,7 +77,7 @@ public:
 	int _routex1 = 0;
 
 public:
-	Vars() {}
+	Vars();
 };
 
 #define _G(X) (g_vars->_##X)
