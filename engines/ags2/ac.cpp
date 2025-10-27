@@ -19,12 +19,26 @@
  *
  */
 
-#include "common/str.h"
+#include "common/file.h"
+#include "common/formats/ini-file.h"
 #include "ags2/ac.h"
 #include "ags2/vars.h"
 #include "ags2/routefnd.h"
 
 namespace AGS2 {
+
+#define AC_SETUP_CFG "acsetup.cfg"
+
+static void parse_command_line(int argc, const char *argv[]);
+static void read_config_file();
+
+void ags_main(int argc, const char *argv[]) {
+	parse_command_line(argc, argv);
+	if (debug_flags & DBG_REGONLY)
+		return;
+
+	read_config_file();
+}
 
 static void parse_command_line(int argc, const char *argv[]) {
 	for (int ee = 1; ee < argc; ee++) {
@@ -68,18 +82,14 @@ static void parse_command_line(int argc, const char *argv[]) {
 		else if (scumm_stricmp(argv[ee], "-novideo") == 0) debug_flags |= DBG_NOVIDEO;
 		else if (scumm_stricmp(argv[ee], "-noexceptionhandler") == 0) usetup.disable_exception_handling = 1;
 		else if (scumm_stricmp(argv[ee], "-dbgscript") == 0) debug_flags |= DBG_DBGSCRIPT;
-		else if (scumm_stricmp(argv[ee], "-registergame") == 0)
-		{
+		else if (scumm_stricmp(argv[ee], "-registergame") == 0) {
 			justRegisterGame = true;
-		} else if (scumm_stricmp(argv[ee], "-unregistergame") == 0)
-		{
+		} else if (scumm_stricmp(argv[ee], "-unregistergame") == 0) {
 			justUnRegisterGame = true;
-		} else if ((scumm_stricmp(argv[ee], "-loadsavedgame") == 0) && (argc > ee + 1))
-		{
+		} else if ((scumm_stricmp(argv[ee], "-loadsavedgame") == 0) && (argc > ee + 1)) {
 			loadSaveGameOnStartup = argv[ee + 1];
 			ee++;
-		} else if ((scumm_stricmp(argv[ee], "--enabledebugger") == 0) && (argc > ee + 1))
-		{
+		} else if ((scumm_stricmp(argv[ee], "--enabledebugger") == 0) && (argc > ee + 1)) {
 			Common::strcpy_s(editor_debugger_instance_token, argv[ee + 1]);
 			editor_debugging_enabled = 1;
 			force_window = 1;
@@ -91,13 +101,45 @@ static void parse_command_line(int argc, const char *argv[]) {
 			strncpy(play.takeover_from, argv[ee + 2], 49);
 			play.takeover_from[49] = 0;
 			ee += 2;
-		} else if (argv[ee][0] != '-') datafile_argv = ee;
+		} else if (argv[ee][0] != '-') {
+			datafile_argv = ee;
+		}
 	}
 }
 
-void ags_main(int argc, const char *argv[]) {
-	parse_command_line(argc, argv);
+static void read_config_file() {
+	Common::INIFile ini;
+	if (!ini.loadFromFile(AC_SETUP_CFG))
+		return;
 
+	Common::String tmp;
+	if (ini.getKey("digiwin", "sound", tmp)) {
+		usetup.digicard = atoi(tmp.c_str());
+		if (usetup.digicard < 0)
+			usetup.digicard = -1;
+	}
+	if (ini.getKey("midiwin", "sound", tmp)) {
+		usetup.midicard = atoi(tmp.c_str());
+		if (usetup.midicard < 0)
+			usetup.midicard = -1;
+	}
+	usetup.usevox = ini.getKey("usevox", "sound", tmp) && atoi(tmp.c_str()) != 0;
+	usetup.no_speech_pack = ini.getKey("usespeech", "sound", tmp) && atoi(tmp.c_str()) == 0;
+
+	if (ini.getKey("windowed", "misc", tmp))
+		usetup.windowed = atoi(tmp.c_str()) != 0;
+	if (ini.getKey("screen", "misc", tmp))
+		usetup.screenres = atoi(tmp.c_str());
+
+	if (ini.getKey("datadir", "misc", tmp) && !tmp.empty())
+		error("Separate data folders not yet supported");
+	ini.getKey("translation", "language", usetup.translation);
+
+	if (ini.getKey("cachemax", "misc", tmp)) {
+		int tmpInt = atoi(tmp.c_str());
+		if (tmpInt > 0)
+			spriteset.maxCacheSize = tmpInt * 1024;
+	}
 }
 
 } // namespace AGS2

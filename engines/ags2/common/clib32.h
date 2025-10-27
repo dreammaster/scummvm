@@ -19,12 +19,15 @@
  *
  */
 
-#ifndef AGS2_AC_H
-#define AGS2_AC_H
+#ifndef AGS2_COMMON_CLIB32_H
+#define AGS2_COMMON_CLIB32_H
 
 namespace AGS2 {
 
-extern void ags_main(int argc, const char *argv[]);
+extern int cfopenpriority;
+
+extern int csetlib(char *, char *);
+extern Common::SeekableReadStream *clibfopen(const char *, const char *);
 
 } // namespace AGS2
 

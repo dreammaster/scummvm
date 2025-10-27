@@ -20,18 +20,23 @@
  */
 
 #include "ags2/vars.h"
+#include "ags2/gfx/sprite_cache.h"
 
 namespace AGS2 {
 
 GameState play;
 GameSetup usetup;
+SpriteCache spritset(1);
 
 int force_letterbox;
 int game_paused;
 int ifacepopped;
 color palette[256];
-int fps, display_fps;
 
+// initially size 1, this will be increased by the initFile function
+SpriteCache spriteset(1);
+
+int fps, display_fps;
 int debug_flags;
 
 // Startup flags, set from parameters to engine

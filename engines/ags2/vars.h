@@ -24,6 +24,7 @@
 #define AGS2_VARS_H
 
 #include "ags2/lib/allegro/color.h"
+#include "ags2/gfx/sprite_cache.h"
 #include "ags2/acruntime.h"
 
 namespace AGS2 {
@@ -33,6 +34,7 @@ class Vars;
 extern Vars *g_vars;
 extern GameState play;
 extern GameSetup usetup;
+extern SpriteCache spriteset;
 
 extern int debug_flags;
 extern int force_letterbox;

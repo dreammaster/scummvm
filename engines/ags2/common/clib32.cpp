@@ -23,11 +23,8 @@
 
 #include "common/stream.h"
 #include "common/textconsole.h"
-#include "ags2/lib/clib32.h"
-//#include "ags2/djcompat.h"
-//#include "ags2/allegro.h"
-#include "ags2/lib/misc.h"
-//#include "ags2/bigend.h"
+#include "ags2/common/clib32.h"
+#include "ags2/common/misc.h"
 
 namespace AGS2 {
 
@@ -453,7 +450,7 @@ Common::ReadStream *clibfopen(char *filnamm, char *fmt) {
 
 	} else {
 		// check datafile first, then scan directory
-		if ((cliboffset(filnamm) < 1) | (fmt[0] != 'r'))
+		if ((cliboffset(filnamm) < 1) || (fmt[0] != 'r'))
 			tfil = ci_fopen(filnamm, fmt);
 		else {
 			tfil = clibopenfile(filnamm, fmt);

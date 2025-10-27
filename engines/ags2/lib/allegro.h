@@ -19,12 +19,31 @@
  *
  */
 
-#ifndef AGS2_AC_H
-#define AGS2_AC_H
+#ifndef AGS2_LIB_ALLEGRO_H
+#define AGS2_LIB_ALLEGRO_H
+
+#define ALLEGRO_H
+
+#include "ags2/lib/allegro/alconfig.h"
+#include "ags2/lib/allegro/base.h"
+#include "ags2/lib/allegro/color.h"
+#include "ags2/lib/allegro/config.h"
+#include "ags2/lib/allegro/draw.h"
+#include "ags2/lib/allegro/error.h"
+#include "ags2/lib/allegro/file.h"
+#include "ags2/lib/allegro/fixed.h"
+#include "ags2/lib/allegro/fmaths.h"
+#include "ags2/lib/allegro/gfx.h"
+#include "ags2/lib/allegro/system.h"
+#include "ags2/lib/allegro/unicode.h"
 
 namespace AGS2 {
 
-extern void ags_main(int argc, const char *argv[]);
+inline int install_allegro() {
+	return 0;
+}
+
+inline void allegro_exit() {}
 
 } // namespace AGS2
 

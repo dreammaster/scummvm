@@ -19,12 +19,25 @@
  *
  */
 
-#ifndef AGS2_AC_H
-#define AGS2_AC_H
+#ifndef AGS2_LIB_FILE_H
+#define AGS2_LIB_FILE_H
+
+#include "common/stream.h"
+#include "common/debug.h"
 
 namespace AGS2 {
 
-extern void ags_main(int argc, const char *argv[]);
+inline int16 getw(Common::ReadStream *rs) {
+	return rs->readSint16LE();
+}
+
+inline void putw(int16 val, Common::WriteStream *ws) {
+	ws->writeSint16LE(val);
+}
+
+inline void write_log(const char *msg) {
+	debug(1, "%s", msg);
+}
 
 } // namespace AGS2
 

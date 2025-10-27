@@ -7,9 +7,12 @@ MODULE_OBJS = \
 	metaengine.o \
 	routefnd.o \
 	vars.o \
-	lib\clib32.o \
-	lib\misc.o \
-	lib\allegro\file.o
+	common/clib32.o \
+	common/fmem.o \
+	common/misc.o \
+	common/wgt2allg.o \
+	gfx/sprite_cache.o \
+	lib/allegro/file.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AGS2), DYNAMIC_PLUGIN)

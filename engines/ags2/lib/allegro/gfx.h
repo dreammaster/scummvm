@@ -72,6 +72,7 @@ namespace AGS2 {
 #define blender_mode_screen         13
 #define blender_mode_alpha          14
 
+AL_VAR(BITMAP *, screen);
 
 #define SCREEN_W     (gfx_driver ? gfx_driver->w : 0)
 #define SCREEN_H     (gfx_driver ? gfx_driver->h : 0)

@@ -19,40 +19,32 @@
  *
  */
 
-#include "common/file.h"
-#include "ags2/lib/misc.h"
-#include "ags2/lib/allegro/file.h"
+#ifndef AGS2_COMMON_FMEM_H
+#define AGS2_COMMON_FMEM_H
+
+#include "common/scummsys.h"
 
 namespace AGS2 {
 
-Common::SeekableReadStream *ci_fopen(const char *file_name, const char *mode) {
-	assert(!strcmp(mode, "r") || !strcmp(mode, "rb"));
-	Common::File *f = new Common::File();
-	if (f->open(file_name))
-		return f;
+struct FMEM {
+	char *data;
+	long len;                     // length of data in array
+	long size;                    // size of data array allocated
+	long magic;
+	long pos;                     // current seeked position
+};
 
-	delete f;
-	return nullptr;
-}
-
-char *ci_find_file(char *dir_name, char *file_name) {
-	char *diamond = nullptr;
-
-	if (dir_name == nullptr && file_name == nullptr)
-		return nullptr;
-
-	if (dir_name == nullptr) {
-		size_t len = strlen(file_name);
-		diamond = (char *)malloc(len + 3);
-		Common::strcpy_s(diamond, len + 3, file_name);
-	} else {
-		diamond = (char *)malloc(strlen(dir_name) + strlen(file_name) + 2);
-		append_filename(diamond, dir_name, file_name, strlen(dir_name) + strlen(file_name) + 2);
-	}
-
-	fix_filename_case(diamond);
-	fix_filename_slashes(diamond);
-	return diamond;
-}
+extern FMEM *fmem_create();
+extern FMEM *fmem_open(const char *);
+extern void fmem_close(FMEM *);
+extern void fmem_write(const char *, long, FMEM *);
+extern void fmem_putc(char, FMEM *);
+extern void fmem_puts(char *, FMEM *);
+extern int fmem_getc(FMEM *);
+extern int fmem_peekc(FMEM *);
+extern int fmem_eof(FMEM *);
+extern void fmem_gets(FMEM *, char *);
 
 } // namespace AGS2
+
+#endif

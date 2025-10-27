@@ -19,11 +19,23 @@
  *
  */
 
-#ifndef AGS2_LIB_CLIB32_H
-#define AGS2_LIB_CLIB32_H
+#ifndef AGS2_COMMON_COMPRESS_H
+#define AGS2_COMMON_COMPRESS_H
+
+#include "common/stream.h"
 
 namespace AGS2 {
 
+typedef unsigned char /* far */ *__block;
+
+extern long csavecompressed(const char *finam, __block tobesaved, color pala[256], long exto);
+
+extern void cpackbitl(unsigned char *line, int size, Common::WriteStream *outfile);
+extern void cpackbitl16(unsigned short *line, int size, Common::WriteStream *outfile);
+extern void cpackbitl32(unsigned long *line, int size, Common::WriteStream *outfile);
+extern int  cunpackbitl(unsigned char *line, int size, Common::SeekableReadStream *infile);
+extern int  cunpackbitl16(unsigned short *line, int size, Common::SeekableReadStream *infile);
+extern int  cunpackbitl32(unsigned long *line, int size, Common::SeekableReadStream *infile);
 
 } // namespace AGS2
 
