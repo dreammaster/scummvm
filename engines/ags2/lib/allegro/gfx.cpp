@@ -23,8 +23,8 @@
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/flood.h"
 #include "ags2/lib/allegro/rotate.h"
-#include "ags/ags.h"
-#include "ags/globals.h"
+#include "ags2/ags2.h"
+#include "ags2/vars.h"
 #include "common/textconsole.h"
 #include "common/util.h"
 #include "graphics/screen.h"
@@ -42,15 +42,16 @@ void set_color_conversion(int mode) {
 int get_color_conversion() {
 	return color_conversion;
 }
-
+#if 0
 int set_gfx_mode(int card, int w, int h, int depth) {
 	// Graphics shutdown can be ignored
 	if (card != -1) {
 		assert(card == SCUMMVM_ID);
-		::AGS::g_vm->setGraphicsMode(w, h, depth);
+		::AGS2::g_engine->setGraphicsMode(w, h, depth);
 	}
 	return 0;
 }
+#endif
 
 void set_clip_rect(BITMAP *bitmap, int x1, int y1, int x2, int y2) {
 	// The rect passed to the function in inclusive-inclusive, but

@@ -126,7 +126,7 @@ template<> void fread_data_enc<int32>(int32 *data, int dataCount, Common::ReadSt
 	}
 
 	// Now copy to the passed data pointer
-	const int32 *src = (const int32 *)src;
+	const int32 *src = (const int32 *)dataChar;
 	int32 *dest = data;
 	for (; dataCount > 0; ++src, ++dest, --dataCount)
 		*dest = READ_LE_UINT32(src);
@@ -367,7 +367,7 @@ const char *clibGetFileName(int index) {
 	return &mflib.filenames[index][0];
 }
 
-int clibfindindex(char *fill) {
+int clibfindindex(const char *fill) {
 	if (lib_file_name[0] == ' ')
 		return -1;
 
@@ -379,14 +379,14 @@ int clibfindindex(char *fill) {
 	return -1;
 }
 
-int32 clibfilesize(char *fill) {
+int32 clibfilesize(const char *fill) {
 	int idxx = clibfindindex(fill);
 	if (idxx >= 0)
 		return mflib.length[idxx];
 	return -1;
 }
 
-int32 cliboffset(char *fill) {
+int32 cliboffset(const char *fill) {
 	int idxx = clibfindindex(fill);
 	if (idxx >= 0)
 		return mflib.offset[idxx];
@@ -412,7 +412,7 @@ char *clibgetdatafile(char *fill) {
 }
 
 Common::SeekableReadStream *tfil;
-Common::SeekableReadStream *clibopenfile(char *filly, char *readmode) {
+Common::SeekableReadStream *clibopenfile(const char *filly, const char *readmode) {
 	int bb;
 	for (bb = 0; bb < mflib.num_files; bb++) {
 		if (scumm_stricmp(mflib.filenames[bb], filly) == 0) {
@@ -433,7 +433,7 @@ Common::SeekableReadStream *clibopenfile(char *filly, char *readmode) {
 #define PR_FILEFIRST 2
 int cfopenpriority = PR_DATAFIRST;
 
-Common::ReadStream *clibfopen(char *filnamm, char *fmt) {
+Common::SeekableReadStream *clibfopen(const char *filnamm, const char *fmt) {
 	last_opened_size = -1;
 	if (cfopenpriority == PR_FILEFIRST) {
 		// check for file, otherwise use datafile

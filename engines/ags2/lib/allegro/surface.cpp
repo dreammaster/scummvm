@@ -22,8 +22,8 @@
 #include "ags2/lib/allegro/gfx.h"
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/flood.h"
-#include "ags/ags.h"
-#include "ags/globals.h"
+#include "ags2/ags2.h"
+#include "ags2/vars.h"
 #include "common/textconsole.h"
 #include "graphics/screen.h"
 

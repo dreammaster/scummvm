@@ -23,6 +23,7 @@
 #define AGS2_COMMON_COMPRESS_H
 
 #include "common/stream.h"
+#include "ags2/lib/allegro/color.h"
 
 namespace AGS2 {
 

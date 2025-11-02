@@ -24,6 +24,7 @@
 #define AGS2_VARS_H
 
 #include "ags2/lib/allegro/color.h"
+#include "ags2/lib/allegro/surface.h"
 #include "ags2/gfx/sprite_cache.h"
 #include "ags2/acruntime.h"
 
@@ -72,6 +73,12 @@ extern char return_to_room[150];
 
 class Vars {
 public:
+	BlenderMode __blender_mode = kRgbToRgbBlender;
+	PALETTE _current_palette = {};
+	int _trans_blend_alpha = 0;
+	int _trans_blend_red = 0;
+	int _trans_blend_green = 0;
+	int _trans_blend_blue = 0;
 
 public:
 	// routefnd

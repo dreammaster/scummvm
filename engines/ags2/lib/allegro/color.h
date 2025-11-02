@@ -23,6 +23,7 @@
 #define AGS2_LIB_ALLEGRO_COLOR_H
 
 #include "common/scummsys.h"
+#include "common/stream.h"
 #include "graphics/screen.h"
 #include "ags2/lib/allegro/base.h"
 #include "ags2/lib/allegro/alconfig.h"
@@ -50,8 +51,8 @@ struct color {
 	byte r, g, b;
 	byte filler;
 
-	void readFromFile(AGS::Shared::Stream *file);
-	void writeToFile(AGS::Shared::Stream *file) const;
+	void readFromFile(Common::ReadStream *file);
+	void writeToFile(Common::WriteStream *file) const;
 	void clear() {
 		r = g = b = filler = 0;
 	}

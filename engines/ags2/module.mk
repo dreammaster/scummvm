@@ -8,11 +8,14 @@ MODULE_OBJS = \
 	routefnd.o \
 	vars.o \
 	common/clib32.o \
+	common/compress.o \
 	common/fmem.o \
 	common/misc.o \
 	common/wgt2allg.o \
 	gfx/sprite_cache.o \
-	lib/allegro/file.o
+	lib/allegro/file.o \
+	lib/allegro/gfx.o \
+	lib/allegro/surface.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AGS2), DYNAMIC_PLUGIN)

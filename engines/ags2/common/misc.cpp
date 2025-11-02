@@ -25,6 +25,10 @@
 
 namespace AGS2 {
 
+Common::WriteStream *ci_fopen_w(const char *file_name, const char *mode) {
+	error("TODO: write ci_fopen");
+}
+
 Common::SeekableReadStream *ci_fopen(const char *file_name, const char *mode) {
 	assert(!strcmp(mode, "r") || !strcmp(mode, "rb"));
 	Common::File *f = new Common::File();
@@ -35,7 +39,7 @@ Common::SeekableReadStream *ci_fopen(const char *file_name, const char *mode) {
 	return nullptr;
 }
 
-char *ci_find_file(char *dir_name, char *file_name) {
+char *ci_find_file(const char *dir_name, const char *file_name) {
 	char *diamond = nullptr;
 
 	if (dir_name == nullptr && file_name == nullptr)

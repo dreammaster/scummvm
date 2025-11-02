@@ -26,9 +26,10 @@
 
 namespace AGS2 {
 
+extern Common::WriteStream *ci_fopen_w(const char *file_name, const char *mode);
 Common::SeekableReadStream *ci_fopen(const char *file_name, const char *mode);
 
-char *ci_find_file(char *dir_name, char *file_name);
+char *ci_find_file(const char *dir_name, const char *file_name);
 
 inline void ags_strlwr(char *str) {
 	while (*str)
