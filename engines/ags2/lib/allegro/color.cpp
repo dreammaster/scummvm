@@ -22,9 +22,7 @@
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/system.h"
 #include "ags2/lib/allegro/aintern.h"
-#include "ags/shared/core/types.h"
-#include "ags/shared/util/stream.h"
-#include "ags/globals.h"
+#include "ags2/vars.h"
 #include "common/textconsole.h"
 #include "common/system.h"
 #include "graphics/paletteman.h"
@@ -33,18 +31,18 @@ namespace AGS2 {
 
 #define VGA_COLOR_TRANS(x) ((x) * 255 / 63)
 
-void color::readFromFile(AGS::Shared::Stream *file) {
-	r = file->ReadByte();
-	g = file->ReadByte();
-	b = file->ReadByte();
-	filler = file->ReadByte();
+void color::readFromFile(Common::ReadStream *file) {
+	r = file->readByte();
+	g = file->readByte();
+	b = file->readByte();
+	filler = file->readByte();
 }
 
-void color::writeToFile(AGS::Shared::Stream *file) const {
-	file->WriteByte(r);
-	file->WriteByte(g);
-	file->WriteByte(b);
-	file->WriteByte(filler);
+void color::writeToFile(Common::WriteStream *file) const {
+	file->writeByte(r);
+	file->writeByte(g);
+	file->writeByte(b);
+	file->writeByte(filler);
 }
 
 static void convertPalette(const PALETTE src, byte dest[Graphics::PALETTE_SIZE]) {
@@ -80,34 +78,34 @@ void set_palette_range(const PALETTE p, int from, int to, int retracesync) {
 }
 
 int makecol15(int r, int g, int b) {
-	return (((r >> 3) << _G(_rgb_r_shift_15)) |
-	        ((g >> 3) << _G(_rgb_g_shift_15)) |
-	        ((b >> 3) << _G(_rgb_b_shift_15)));
+	return (((r >> 3) << _G(rgb_r_shift_15)) |
+	        ((g >> 3) << _G(rgb_g_shift_15)) |
+	        ((b >> 3) << _G(rgb_b_shift_15)));
 }
 
 int makecol16(int r, int g, int b) {
-	return (((r >> 3) << _G(_rgb_r_shift_16)) |
-	        ((g >> 2) << _G(_rgb_g_shift_16)) |
-	        ((b >> 3) << _G(_rgb_b_shift_16)));
+	return (((r >> 3) << _G(rgb_r_shift_16)) |
+	        ((g >> 2) << _G(rgb_g_shift_16)) |
+	        ((b >> 3) << _G(rgb_b_shift_16)));
 }
 
 int makecol24(int r, int g, int b) {
-	return ((r << _G(_rgb_r_shift_24)) |
-	        (g << _G(_rgb_g_shift_24)) |
-	        (b << _G(_rgb_b_shift_24)));
+	return ((r << _G(rgb_r_shift_24)) |
+	        (g << _G(rgb_g_shift_24)) |
+	        (b << _G(rgb_b_shift_24)));
 }
 
 int makecol32(int r, int g, int b) {
-	return ((r << _G(_rgb_r_shift_32)) |
-	        (g << _G(_rgb_g_shift_32)) |
-	        (b << _G(_rgb_b_shift_32)));
+	return ((r << _G(rgb_r_shift_32)) |
+	        (g << _G(rgb_g_shift_32)) |
+	        (b << _G(rgb_b_shift_32)));
 }
 
 int makeacol32(int r, int g, int b, int a) {
-	return ((r << _G(_rgb_r_shift_32)) |
-	        (g << _G(_rgb_g_shift_32)) |
-	        (b << _G(_rgb_b_shift_32)) |
-	        (a << _G(_rgb_a_shift_32)));
+	return ((r << _G(rgb_r_shift_32)) |
+	        (g << _G(rgb_g_shift_32)) |
+	        (b << _G(rgb_b_shift_32)) |
+	        (a << _G(rgb_a_shift_32)));
 }
 
 int getr8(int c) {
@@ -123,55 +121,55 @@ int getb8(int c) {
 }
 
 int getr15(int c) {
-	return _rgb_scale_5[(c >> _G(_rgb_r_shift_15)) & 0x1F];
+	return _rgb_scale_5[(c >> _G(rgb_r_shift_15)) & 0x1F];
 }
 
 int getg15(int c) {
-	return _rgb_scale_5[(c >> _G(_rgb_g_shift_15)) & 0x1F];
+	return _rgb_scale_5[(c >> _G(rgb_g_shift_15)) & 0x1F];
 }
 
 int getb15(int c) {
-	return _rgb_scale_5[(c >> _G(_rgb_b_shift_15)) & 0x1F];
+	return _rgb_scale_5[(c >> _G(rgb_b_shift_15)) & 0x1F];
 }
 
 int getr16(int c) {
-	return _rgb_scale_5[(c >> _G(_rgb_r_shift_16)) & 0x1F];
+	return _rgb_scale_5[(c >> _G(rgb_r_shift_16)) & 0x1F];
 }
 
 int getg16(int c) {
-	return _rgb_scale_6[(c >> _G(_rgb_g_shift_16)) & 0x3F];
+	return _rgb_scale_6[(c >> _G(rgb_g_shift_16)) & 0x3F];
 }
 
 int getb16(int c) {
-	return _rgb_scale_5[(c >> _G(_rgb_b_shift_16)) & 0x1F];
+	return _rgb_scale_5[(c >> _G(rgb_b_shift_16)) & 0x1F];
 }
 
 int getr24(int c) {
-	return ((c >> _G(_rgb_r_shift_24)) & 0xFF);
+	return ((c >> _G(rgb_r_shift_24)) & 0xFF);
 }
 
 int getg24(int c) {
-	return ((c >> _G(_rgb_g_shift_24)) & 0xFF);
+	return ((c >> _G(rgb_g_shift_24)) & 0xFF);
 }
 
 int getb24(int c) {
-	return ((c >> _G(_rgb_b_shift_24)) & 0xFF);
+	return ((c >> _G(rgb_b_shift_24)) & 0xFF);
 }
 
 int getr32(int c) {
-	return ((c >> _G(_rgb_r_shift_32)) & 0xFF);
+	return ((c >> _G(rgb_r_shift_32)) & 0xFF);
 }
 
 int getg32(int c) {
-	return ((c >> _G(_rgb_g_shift_32)) & 0xFF);
+	return ((c >> _G(rgb_g_shift_32)) & 0xFF);
 }
 
 int getb32(int c) {
-	return ((c >> _G(_rgb_b_shift_32)) & 0xFF);
+	return ((c >> _G(rgb_b_shift_32)) & 0xFF);
 }
 
 int geta32(int c) {
-	return ((c >> _G(_rgb_a_shift_32)) & 0xFF);
+	return ((c >> _G(rgb_a_shift_32)) & 0xFF);
 }
 
 int makecol(byte r, byte g, byte b) {
@@ -227,7 +225,7 @@ void unselect_palette(void) {
 }
 
 void set_blender_mode(BlenderMode m, int r, int g, int b, int a) {
-	_G(_blender_mode) = m;
+	_G(blender_mode) = m;
 	_G(trans_blend_alpha) = a;
 	_G(trans_blend_red) = r;
 	_G(trans_blend_green) = g;
@@ -398,7 +396,7 @@ int geta_depth(int color_depth, int c) {
  *  being used by the current video mode.
  */
 int getr(int c) {
-	return getr_depth(_G(_color_depth), c);
+	return getr_depth(_G(color_depth), c);
 }
 
 
@@ -408,7 +406,7 @@ int getr(int c) {
  *  being used by the current video mode.
  */
 int getg(int c) {
-	return getg_depth(_G(_color_depth), c);
+	return getg_depth(_G(color_depth), c);
 }
 
 
@@ -418,7 +416,7 @@ int getg(int c) {
  *  being used by the current video mode.
  */
 int getb(int c) {
-	return getb_depth(_G(_color_depth), c);
+	return getb_depth(_G(color_depth), c);
 }
 
 
@@ -428,7 +426,7 @@ int getb(int c) {
  *  being used by the current video mode.
  */
 int geta(int c) {
-	return geta_depth(_G(_color_depth), c);
+	return geta_depth(_G(color_depth), c);
 }
 
 

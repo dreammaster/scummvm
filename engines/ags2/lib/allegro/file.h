@@ -23,7 +23,6 @@
 #define AGS2_LIB_ALLEGRO_FILE_H
 
 #include "ags2/lib/allegro/alconfig.h"
-#include "ags/shared/core/types.h"
 #include "common/file.h"
 
 namespace AGS2 {

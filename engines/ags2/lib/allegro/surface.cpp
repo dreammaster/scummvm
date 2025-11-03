@@ -114,7 +114,7 @@ BITMAP::DrawInnerArgs::DrawInnerArgs(BITMAP *_dstBitmap, const BITMAP *srcBitmap
 		tintRed(_tintRed), tintGreen(_tintGreen), tintBlue(_tintBlue),
 		src(**srcBitmap), shouldDraw(false), dstBitmap(*_dstBitmap),
 		useTint(_tintRed >= 0 && _tintGreen >= 0 && _tintBlue >= 0),
-		blenderMode(_G(_blender_mode)), dstRect(_dstRect) {
+		blenderMode(_G(blender_mode)), dstRect(_dstRect) {
 	// Allegro disables draw when the clipping rect has negative width/height.
 	// Common::Rect instead asserts, which we don't want.
 	if (dstBitmap.cr <= dstBitmap.cl || dstBitmap.cb <= dstBitmap.ct)
@@ -273,7 +273,7 @@ void BITMAP::stretchDraw(const BITMAP *srcBitmap, const Common::Rect &srcRect,
 	delete stretched;
 }
 void BITMAP::blendPixel(uint8 aSrc, uint8 rSrc, uint8 gSrc, uint8 bSrc, uint8 &aDest, uint8 &rDest, uint8 &gDest, uint8 &bDest, uint32 alpha, bool useTint, byte *destVal) const {
-	switch (_G(_blender_mode)) {
+	switch (_G(blender_mode)) {
 	case kSourceAlphaBlender:
 		if (!useTint) format.colorToARGB(getColor(destVal, format.bytesPerPixel), aDest, rDest, gDest, bDest);
 		blendSourceAlpha(aSrc, rSrc, gSrc, bSrc, aDest, rDest, gDest, bDest, alpha);

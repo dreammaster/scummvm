@@ -25,6 +25,7 @@
 
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/surface.h"
+#include "ags2/common/acroom.h"
 #include "ags2/gfx/sprite_cache.h"
 #include "ags2/acruntime.h"
 
@@ -33,10 +34,17 @@ namespace AGS2 {
 class Vars;
 
 extern Vars *g_vars;
+extern GameSetupStruct game;
 extern GameState play;
 extern GameSetup usetup;
+extern BITMAP *screen;
 extern SpriteCache spriteset;
+extern int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];
+extern int current_screen_resolution_multiplier;
 
+extern int our_eip;
+extern int eip_guinum;
+extern int eip_guiobj;
 extern int debug_flags;
 extern int force_letterbox;
 extern int game_paused;
@@ -70,15 +78,26 @@ extern volatile bool want_exit, abort_engine;
 extern bool check_dynamic_sprites_at_exit;
 extern char return_to_roomedit[30];
 extern char return_to_room[150];
+extern int final_col_dep;
 
 class Vars {
 public:
-	BlenderMode __blender_mode = kRgbToRgbBlender;
+	BlenderMode _blender_mode = kRgbToRgbBlender;
 	PALETTE _current_palette = {};
+	PALETTE _prev_current_palette = {};
+	RGB_MAP *_rgb_map = nullptr;
+	int _color_depth = 0;
 	int _trans_blend_alpha = 0;
 	int _trans_blend_red = 0;
 	int _trans_blend_green = 0;
 	int _trans_blend_blue = 0;
+	int _rgb_r_shift_15 = 0, _rgb_g_shift_15 = 0, _rgb_b_shift_15 = 0;
+	int _rgb_r_shift_16 = 0, _rgb_g_shift_16 = 0, _rgb_b_shift_16 = 0;
+	int _rgb_r_shift_24 = 0, _rgb_g_shift_24 = 0, _rgb_b_shift_24 = 0;
+	int _rgb_r_shift_32 = 0, _rgb_g_shift_32 = 0, _rgb_b_shift_32 = 0,
+		_rgb_a_shift_32 = 0;
+	int _errnum = 0;
+	int *const _allegro_errno = &_errnum;
 
 public:
 	// routefnd

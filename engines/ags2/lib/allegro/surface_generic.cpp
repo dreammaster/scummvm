@@ -21,7 +21,7 @@
 
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/surface.h"
-#include "ags/globals.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 

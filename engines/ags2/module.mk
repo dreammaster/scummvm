@@ -12,10 +12,19 @@ MODULE_OBJS = \
 	common/fmem.o \
 	common/misc.o \
 	common/wgt2allg.o \
+	gfx/sprite.o \
 	gfx/sprite_cache.o \
+	lib/allegro/color.o \
 	lib/allegro/file.o \
+	lib/allegro/fixed.o \
+	lib/allegro/flood.o \
 	lib/allegro/gfx.o \
-	lib/allegro/surface.o
+	lib/allegro/graphics.o \
+	lib/allegro/math.o \
+	lib/allegro/rotate.o \
+	lib/allegro/surface.o \
+	lib/allegro/surface_generic.o \
+	lib/allegro/system.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AGS2), DYNAMIC_PLUGIN)

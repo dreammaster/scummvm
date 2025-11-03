@@ -21,7 +21,7 @@
 
 #include "ags2/lib/allegro/system.h"
 #include "ags2/lib/allegro/aintern.h"
-#include "ags/globals.h"
+#include "ags2/vars.h"
 #include "common/system.h"
 
 namespace AGS2 {
@@ -45,11 +45,11 @@ void destroy_gfx_mode_list(GFX_MODE_LIST *list) {
 }
 
 void set_color_depth(int depth) {
-	_G(_color_depth) = depth;
+	_G(color_depth) = depth;
 }
 
 int get_color_depth() {
-	return _G(_color_depth);
+	return _G(color_depth);
 }
 
 int get_desktop_resolution(int32_t *width, int32_t *height) {

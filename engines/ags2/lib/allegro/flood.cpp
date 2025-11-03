@@ -21,7 +21,6 @@
 
 #include "ags2/lib/allegro/flood.h"
 #include "ags2/lib/allegro/gfx.h"
-#include "ags/shared/core/types.h"
 #include "common/array.h"
 
 namespace AGS2 {

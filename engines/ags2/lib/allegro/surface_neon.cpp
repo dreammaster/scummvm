@@ -19,12 +19,12 @@
  *
  */
 
-#include "ags/ags.h"
+#include "ags2/ags.h"
 
 // Without this ifdef the iOS backend breaks, please do not remove
 #ifdef SCUMMVM_NEON
 
-#include "ags/globals.h"
+#include "ags2/vars.h"
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/flood.h"
 #include "ags2/lib/allegro/gfx.h"
@@ -322,7 +322,7 @@ static inline uint32x4_t blendPixelSIMD(uint32x4_t srcCols, uint32x4_t destCols,
 		srcCols = vandq_u32(srcCols, vmovq_n_u32(0x00ffffff));
 		srcCols = vorrq_u32(srcCols, vorrq_u32(srcAlphas, difAlphas));
 	};
-	switch (_G(_blender_mode)) {
+	switch (_G(blender_mode)) {
 	case kSourceAlphaBlender: // see BITMAP member function blendSourceAlpha
 		alphas = vshrq_n_u32(srcCols, 24);
 		return rgbBlendSIMD(srcCols, destCols, alphas, false);
@@ -369,7 +369,7 @@ static inline uint32x4_t blendPixelSIMD(uint32x4_t srcCols, uint32x4_t destCols,
 
 static inline uint16x8_t blendPixelSIMD2Bpp(uint16x8_t srcCols, uint16x8_t destCols, uint16x8_t alphas) {
 	uint16x8_t mask, ch1, ch2;
-	switch (_G(_blender_mode)) {
+	switch (_G(blender_mode)) {
 	case kSourceAlphaBlender:
 	case kOpaqueBlenderMode:
 	case kAdditiveBlenderMode:
@@ -396,8 +396,8 @@ static inline uint16x8_t blendPixelSIMD2Bpp(uint16x8_t srcCols, uint16x8_t destC
 		uint32x4_t destColsHi = simd2BppTo4Bpp(vget_high_u16(destCols));
 		uint32x4_t alphasLo = vmovl_u16(vget_low_u16(alphas));
 		uint32x4_t alphasHi = vmovl_u16(vget_high_u16(alphas));
-		uint16x4_t lo = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsLo, destColsLo, alphasLo, _G(_blender_mode) == kTintLightBlenderMode));
-		uint16x4_t hi = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsHi, destColsHi, alphasHi, _G(_blender_mode) == kTintLightBlenderMode));
+		uint16x4_t lo = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsLo, destColsLo, alphasLo, _G(blender_mode) == kTintLightBlenderMode));
+		uint16x4_t hi = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsHi, destColsHi, alphasHi, _G(blender_mode) == kTintLightBlenderMode));
 		return vcombine_u16(lo, hi);
 	}
 	return srcCols;

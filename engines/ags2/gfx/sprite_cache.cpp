@@ -21,30 +21,16 @@
 
 #define CROOM_NOFUNCTIONS
 #include "common/system.h"
-#include "ags2/gfx/sprite_cache.h"
 #include "ags2/common/clib32.h"
 #include "ags2/common/acroom.h"
 #include "ags2/common/compress.h"
 #include "ags2/common/file.h"
 #include "ags2/common/wgt2allg.h"
+#include "ags2/gfx/sprite.h"
+#include "ags2/gfx/sprite_cache.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
-
-//#define DEBUG_SPRITECACHE
-extern void initialize_sprite(int);
-extern void pre_save_sprite(int);
-extern void quit(const char *);
-
-#ifdef THIS_IS_THE_ENGINE
-extern void get_new_size_for_sprite(int, int, int, int &, int &);
-extern int spritewidth[], spriteheight[];
-#else
-void get_new_size_for_sprite(int ee, int ww, int hh, int &newwid, int &newhit) {
-	newwid = ww;
-	newhit = hh;
-}
-int spritewidth[MAX_SPRITES + 5], spriteheight[MAX_SPRITES + 5];
-#endif
 
 #define SPRITE_LOCKED -1
 #define START_OF_LIST -1

@@ -24,7 +24,7 @@
 
 #include "ags2/lib/allegro/error.h"
 #include "ags2/lib/allegro/fixed.h"
-#include "ags/globals.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 

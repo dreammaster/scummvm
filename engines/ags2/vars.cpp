@@ -24,9 +24,12 @@
 
 namespace AGS2 {
 
+Vars *g_vars;
+GameSetupStruct game;
 GameState play;
 GameSetup usetup;
 SpriteCache spritset(1);
+BITMAP *screen;
 
 int force_letterbox;
 int game_paused;
@@ -35,7 +38,11 @@ color palette[256];
 
 // initially size 1, this will be increased by the initFile function
 SpriteCache spriteset(1);
+int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];
+int current_screen_resolution_multiplier;
 
+int our_eip;
+int eip_guinum, eip_guiobj;
 int fps, display_fps;
 int debug_flags;
 
@@ -64,15 +71,24 @@ int bg_just_changed;
 int loaded_game_file_version;
 volatile bool want_exit, abort_engine;
 bool check_dynamic_sprites_at_exit;
-
 char return_to_roomedit[30];
 char return_to_room[150];
+
+int final_col_dep;
+
 
 Vars::Vars() {
 	force_letterbox = 0;
 	game_paused = 0;
 	ifacepopped = -1;
+	screen = nullptr;
 	Common::fill((byte *)palette, (byte *)palette + 256 * sizeof(color), 0);
+	Common::fill(spritewidth, spritewidth + MAX_SPRITES, 0);
+	Common::fill(spriteheight, spriteheight + MAX_SPRITES, 0);
+
+	current_screen_resolution_multiplier = 0;
+	our_eip = 0;
+	eip_guinum = eip_guiobj = 0;
 	fps = display_fps = 0;
 
 	debug_flags = 0;
@@ -103,6 +119,8 @@ Vars::Vars() {
 	check_dynamic_sprites_at_exit = true;
 	*return_to_roomedit = '\0';
 	*return_to_room = '\0';
+
+	final_col_dep = 0;
 }
 
 } // namespace AGS2

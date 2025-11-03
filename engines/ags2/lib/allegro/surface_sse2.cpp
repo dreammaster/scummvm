@@ -19,8 +19,8 @@
  *
  */
 
-#include "ags/ags.h"
-#include "ags/globals.h"
+#include "ags2/ags.h"
+#include "ags2/vars.h"
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/flood.h"
 #include "ags2/lib/allegro/gfx.h"
@@ -328,7 +328,7 @@ static inline __m128i blendPixelSIMD(__m128i srcCols, __m128i destCols, __m128i 
 		srcCols = _mm_and_si128(srcCols, _mm_set1_epi32(0x00ffffff));
 		srcCols = _mm_or_si128(srcCols, _mm_or_si128(srcAlphas, difAlphas));
 	};
-	switch (_G(_blender_mode)) {
+	switch (_G(blender_mode)) {
 	case kSourceAlphaBlender: // see BITMAP member function blendSourceAlpha
 		alphas = _mm_srli_epi32(srcCols, 24);
 		return rgbBlendSIMD(srcCols, destCols, alphas, false);
@@ -375,7 +375,7 @@ static inline __m128i blendPixelSIMD(__m128i srcCols, __m128i destCols, __m128i 
 
 static inline __m128i blendPixelSIMD2Bpp(__m128i srcCols, __m128i destCols, __m128i alphas) {
 	__m128i mask, ch1, ch2;
-	switch (_G(_blender_mode)) {
+	switch (_G(blender_mode)) {
 	case kSourceAlphaBlender:
 	case kOpaqueBlenderMode:
 	case kAdditiveBlenderMode:
@@ -402,8 +402,8 @@ static inline __m128i blendPixelSIMD2Bpp(__m128i srcCols, __m128i destCols, __m1
 		__m128i destColsHi = simd2BppTo4Bpp(_mm_srli_si128(destCols, 8));
 		__m128i alphasLo = _mm_unpacklo_epi16(_mm_and_si128(alphas, _mm_set_epi32(0, 0, -1, -1)), _mm_setzero_si128());
 		__m128i alphasHi = _mm_unpacklo_epi16(_mm_srli_si128(alphas, 8), _mm_setzero_si128());
-		__m128i lo = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsLo, destColsLo, alphasLo, _G(_blender_mode) == kTintLightBlenderMode));
-		__m128i hi = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsHi, destColsHi, alphasHi, _G(_blender_mode) == kTintLightBlenderMode));
+		__m128i lo = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsLo, destColsLo, alphasLo, _G(blender_mode) == kTintLightBlenderMode));
+		__m128i hi = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsHi, destColsHi, alphasHi, _G(blender_mode) == kTintLightBlenderMode));
 		return _mm_or_si128(lo, _mm_slli_si128(hi, 8));
 	}
 	return _mm_setzero_si128();

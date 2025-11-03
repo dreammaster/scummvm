@@ -21,7 +21,7 @@
 
 #include "common/textconsole.h"
 #include "ags2/lib/allegro/unicode.h"
-#include "ags/globals.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 

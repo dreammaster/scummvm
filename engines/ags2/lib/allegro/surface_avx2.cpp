@@ -22,8 +22,8 @@
 #include "ags2/lib/allegro/gfx.h"
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/flood.h"
-#include "ags/ags.h"
-#include "ags/globals.h"
+#include "ags2/ags.h"
+#include "ags2/vars.h"
 #include "common/textconsole.h"
 #include "graphics/screen.h"
 
@@ -320,7 +320,7 @@ static inline __m256i blendPixelSIMD(__m256i srcCols, __m256i destCols, __m256i 
 		srcCols = _mm256_and_si256(srcCols, _mm256_set1_epi32(0x00ffffff));
 		srcCols = _mm256_or_si256(srcCols, _mm256_or_si256(srcAlphas, difAlphas));
 	};
-	switch (_G(_blender_mode)) {
+	switch (_G(blender_mode)) {
 	case kSourceAlphaBlender: // see BITMAP member function blendSourceAlpha
 		alphas = _mm256_srli_epi32(srcCols, 24);
 		return rgbBlendSIMD(srcCols, destCols, alphas, false);
@@ -367,7 +367,7 @@ static inline __m256i blendPixelSIMD(__m256i srcCols, __m256i destCols, __m256i 
 
 static inline __m256i blendPixelSIMD2Bpp(__m256i srcCols, __m256i destCols, __m256i alphas) {
 	__m256i mask, ch1, ch2;
-	switch (_G(_blender_mode)) {
+	switch (_G(blender_mode)) {
 	case kSourceAlphaBlender:
 	case kOpaqueBlenderMode:
 	case kAdditiveBlenderMode:
@@ -394,8 +394,8 @@ static inline __m256i blendPixelSIMD2Bpp(__m256i srcCols, __m256i destCols, __m2
 		__m256i destColsHi = simd2BppTo4Bpp(_mm256_permute2x128_si256(destCols, destCols, _MM_SHUFFLE(2, 0, 0, 1)));
 		__m256i alphasLo = _mm256_unpacklo_epi16(alphas, _mm256_setzero_si256());
 		__m256i alphasHi = _mm256_unpacklo_epi16(_mm256_permute2x128_si256(alphas, alphas, _MM_SHUFFLE(2, 3, 0, 1)), _mm256_setzero_si256());
-		__m256i lo = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsLo, destColsLo, alphasLo, _G(_blender_mode) == kTintLightBlenderMode));
-		__m256i hi = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsHi, destColsHi, alphasHi, _G(_blender_mode) == kTintLightBlenderMode));
+		__m256i lo = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsLo, destColsLo, alphasLo, _G(blender_mode) == kTintLightBlenderMode));
+		__m256i hi = simd4BppTo2Bpp(blendTintSpriteSIMD(srcColsHi, destColsHi, alphasHi, _G(blender_mode) == kTintLightBlenderMode));
 		return _mm256_or_si256(lo, _mm256_permute2x128_si256(hi, hi, _MM_SHUFFLE(0, 0, 2, 0)));
 	}
 	return _mm256_setzero_si256();

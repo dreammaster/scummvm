@@ -19,22 +19,19 @@
  *
  */
 
-#ifndef AGS2_COMMON_MISC_H
-#define AGS2_COMMON_MISC_H
+#ifndef AGS2_GFX_SPRITE_H
+#define AGS2_GFX_SPRITE_H
 
 #include "common/stream.h"
+#include "ags2/common/wgt2allg.h"
 
 namespace AGS2 {
 
-extern Common::WriteStream *ci_fopen_w(const char *file_name, const char *mode);
-Common::SeekableReadStream *ci_fopen(const char *file_name, const char *mode);
-
-char *ci_find_file(const char *dir_name, const char *file_name);
-
-inline void ags_strlwr(char *str) {
-	while (*str)
-		*str++ = toupper(*str);
-}
+extern void initialize_sprite(int ee);
+extern void get_new_size_for_sprite(int, int, int, int &, int &);
+extern block remove_alpha_channel(block from);
+extern void set_rgb_mask_using_alpha_channel(block image);
+extern void pre_save_sprite(int ee);
 
 } // namespace AGS2
 

@@ -25,7 +25,6 @@
 #include "ags2/lib/allegro/base.h"
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/gfx.h"
-#include "ags/shared/core/types.h"
 
 namespace AGS2 {
 
