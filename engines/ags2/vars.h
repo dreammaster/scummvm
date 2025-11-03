@@ -98,6 +98,7 @@ public:
 		_rgb_a_shift_32 = 0;
 	int _errnum = 0;
 	int *const _allegro_errno = &_errnum;
+	int _utype = 0;
 
 public:
 	// routefnd

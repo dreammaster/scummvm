@@ -2,11 +2,11 @@ MODULE := engines/ags2
 
 MODULE_OBJS = \
 	ags2.o \
-	ac.o \
 	console.o \
 	metaengine.o \
 	routefnd.o \
 	vars.o \
+	ac/main.o \
 	common/clib32.o \
 	common/compress.o \
 	common/fmem.o \
@@ -24,7 +24,8 @@ MODULE_OBJS = \
 	lib/allegro/rotate.o \
 	lib/allegro/surface.o \
 	lib/allegro/surface_generic.o \
-	lib/allegro/system.o
+	lib/allegro/system.o  \
+	lib/allegro/unicode.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AGS2), DYNAMIC_PLUGIN)

@@ -21,7 +21,7 @@
 
 #include "common/file.h"
 #include "common/formats/ini-file.h"
-#include "ags2/ac.h"
+#include "ags2/ac/main.h"
 #include "ags2/vars.h"
 #include "ags2/routefnd.h"
 
@@ -31,6 +31,7 @@ namespace AGS2 {
 
 static void parse_command_line(int argc, const char *argv[]);
 static void read_config_file();
+static void initialize_engine();
 
 void ags_main(int argc, const char *argv[]) {
 	parse_command_line(argc, argv);
@@ -38,6 +39,7 @@ void ags_main(int argc, const char *argv[]) {
 		return;
 
 	read_config_file();
+	initialize_engine();
 }
 
 static void parse_command_line(int argc, const char *argv[]) {
@@ -140,6 +142,12 @@ static void read_config_file() {
 		if (tmpInt > 0)
 			spriteset.maxCacheSize = tmpInt * 1024;
 	}
+}
+
+void initialize_engine() {
+	set_uformat(U_ASCII);
+
+	// TODO
 }
 
 } // namespace AGS2

@@ -23,7 +23,7 @@
 #include "ags2/ags2.h"
 #include "ags2/detection.h"
 #include "ags2/console.h"
-#include "ags2/ac.h"
+#include "ags2/ac/main.h"
 
 namespace AGS2 {
 
