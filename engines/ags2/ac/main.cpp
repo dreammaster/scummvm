@@ -22,8 +22,9 @@
 #include "common/file.h"
 #include "common/formats/ini-file.h"
 #include "ags2/ac/main.h"
+#include "ags2/common/clib32.h"
+#include "ags2/ags2.h"
 #include "ags2/vars.h"
-#include "ags2/routefnd.h"
 
 namespace AGS2 {
 
@@ -147,6 +148,12 @@ static void read_config_file() {
 void initialize_engine() {
 	set_uformat(U_ASCII);
 
+	if (install_allegro())
+		error("Internal error: unable to initialize stripped Allegro 4 library.");
+	game_file_name = g_engine->getFilename();
+
+	int errCode = csetlib(game_file_name);
+	warning("%d", errCode);
 	// TODO
 }
 

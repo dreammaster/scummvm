@@ -21,7 +21,7 @@
 
 #define NATIVESTATIC
 
-#include "common/stream.h"
+#include "common/file.h"
 #include "common/textconsole.h"
 #include "ags2/common/clib32.h"
 #include "ags2/common/misc.h"
@@ -226,7 +226,7 @@ int read_new_format_clib(MultiFileLib *mfl, Common::ReadStream *wout, int libver
 	return 0;
 }
 
-int csetlib(char *namm, char *passw) {
+int csetlib(const char *namm, const char *passw) {
 	original_base_filename[0] = 0;
 
 	if (namm == nullptr) {
@@ -237,32 +237,34 @@ int csetlib(char *namm, char *passw) {
 	Common::strcpy_s(base_path, ".");
 
 	int passwmodifier = 0, cc, aa;
-	Common::SeekableReadStream *fff = ci_fopen(namm, "rb");
-	if (fff == nullptr)
+
+	Common::File fff;
+	if (!fff.open(namm))
 		return -1;
 
 	int32 absoffs = 0;
-	fff->read(&clbuff[0], 5);
 
-	if (strncmp(clbuff, "CLIB", 4) != 0) {
-		fff->seek(-12, SEEK_END);
-		fff->read(&clbuff[0], 12);
+	if (fff.readUint32BE() != MKTAG('C', 'L', 'I', 'B')) {
+		fff.seek(-12, SEEK_END);
+		fff.read(&clbuff[0], 12);
 
 		if (strncmp(clbuff, clibendfilesig, 12) != 0)
 			return -2;
 
-		fff->seek(-16, SEEK_END);  // it's an appended-to-end-of-exe thing
-		absoffs = fff->readUint32LE();
-		fff->seek(absoffs + 5, SEEK_SET);
+		fff.seek(-16, SEEK_END);  // it's an appended-to-end-of-exe thing
+		absoffs = fff.readUint32LE();
+		fff.seek(absoffs + 5, SEEK_SET);
+	} else {
+		fff.skip(1);	// Skip linefeed after CLIB
 	}
 
-	int lib_version = fff->readByte();
+	int lib_version = fff.readByte();
 	if ((lib_version != 6) && (lib_version != 10) &&
 		(lib_version != 11) && (lib_version != 15) &&
 		(lib_version != 20) && (lib_version != 21))
 		return -3;  // unsupported version
 
-	char *nammwas = namm;
+	const char *nammwas = namm;
 	// remove slashes so that the lib name fits in the buffer
 	while ((strchr(namm, '\\') != nullptr) || (strchr(namm, '/') != nullptr))
 		namm++;
@@ -276,18 +278,18 @@ int csetlib(char *namm, char *passw) {
 	}
 
 	if (lib_version >= 10) {
-		if (fff->readByte() != 0)
+		if (fff.readByte() != 0)
 			return -4;  // not first datafile in chain
 
 		if (lib_version >= 21) {
-			if (read_new_new_enc_format_clib(&mflib, fff, lib_version))
+			if (read_new_new_enc_format_clib(&mflib, &fff, lib_version))
 				return -5;
 		} else if (lib_version == 20) {
-			if (read_new_new_format_clib(&mflib, fff, lib_version))
+			if (read_new_new_format_clib(&mflib, &fff, lib_version))
 				return -5;
 		} else {
 			MultiFileLib mflibOld;
-			if (read_new_format_clib(&mflibOld, fff, lib_version))
+			if (read_new_format_clib(&mflibOld, &fff, lib_version))
 				return -5;
 			// convert to newer format
 			mflib.num_files = mflibOld.num_files;
@@ -301,7 +303,7 @@ int csetlib(char *namm, char *passw) {
 				Common::strcpy_s(mflib.filenames[aa], mflibOld.filenames[aa]);
 		}
 
-		delete fff;
+		fff.close();
 		Common::strcpy_s(lib_file_name, namm);
 
 		// make a backup of the original file name
@@ -317,30 +319,30 @@ int csetlib(char *namm, char *passw) {
 		return 0;
 	}
 
-	passwmodifier = fff->readByte();
-	fff->readByte(); // unused byte
+	passwmodifier = fff.readByte();
+	fff.readByte(); // unused byte
 	mflib.num_data_files = 1;
 	Common::strcpy_s(mflib.data_filenames[0], namm);
 
-	mflib.num_files = fff->readUint16LE();
+	mflib.num_files = fff.readUint16LE();
 
 	if (mflib.num_files > MAX_FILES)
 		return -4;
 
-	fff->read(clbuff, 13);  // skip password dooberry
+	fff.read(clbuff, 13);  // skip password dooberry
 	for (aa = 0; aa < mflib.num_files; aa++) {
-		fff->read(&mflib.filenames[aa][0], 13);
+		fff.read(&mflib.filenames[aa][0], 13);
 		for (cc = 0; cc < (int)strlen(mflib.filenames[aa]); cc++)
 			mflib.filenames[aa][cc] -= passwmodifier;
 	}
 
 	for (int ee = 0; ee < mflib.num_files; ++ee)
-		mflib.length[ee] = fff->readUint32LE();
-	fff->seek(2 * mflib.num_files, SEEK_CUR);  // skip flags & ratio
+		mflib.length[ee] = fff.readUint32LE();
+	fff.seek(2 * mflib.num_files, SEEK_CUR);  // skip flags & ratio
 
-	mflib.offset[0] = fff->pos();
+	mflib.offset[0] = fff.pos();
 	Common::strcpy_s(lib_file_name, namm);
-	delete fff;
+	fff.close();
 
 	for (aa = 1; aa < mflib.num_files; aa++) {
 		mflib.offset[aa] = mflib.offset[aa - 1] + mflib.length[aa - 1];

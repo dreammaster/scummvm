@@ -52,7 +52,7 @@ const ADExtraGuiOptionsMap *AGS2MetaEngine::getAdvancedExtraGuiOptions() const {
 	return AGS2::optionsList;
 }
 
-Common::Error AGS2MetaEngine::createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const {
+Common::Error AGS2MetaEngine::createInstance(OSystem *syst, Engine **engine, const AGS2::AGS2GameDescription *desc) const {
 	*engine = new AGS2::AGS2Engine(syst, desc);
 	return Common::kNoError;
 }

@@ -33,8 +33,8 @@
 #include "engines/engine.h"
 #include "engines/savestate.h"
 #include "graphics/screen.h"
-
 #include "ags2/detection.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 
@@ -42,19 +42,21 @@ struct AGS2GameDescription;
 
 class AGS2Engine : public Engine {
 private:
-	const ADGameDescription *_gameDescription;
+	const AGS2GameDescription *_gameDescription;
 	Common::RandomSource _randomSource;
+	Vars _vars;
 protected:
 	// Engine APIs
 	Common::Error run() override;
 public:
 	Graphics::Screen *_screen = nullptr;
 public:
-	AGS2Engine(OSystem *syst, const ADGameDescription *gameDesc);
+	AGS2Engine(OSystem *syst, const AGS2GameDescription *gameDesc);
 	~AGS2Engine() override;
 
 	uint32 getFeatures() const;
-
+	const char *getFilename() const;
+	
 	/**
 	 * Returns the game Id
 	 */

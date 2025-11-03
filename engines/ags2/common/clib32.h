@@ -26,7 +26,7 @@ namespace AGS2 {
 
 extern int cfopenpriority;
 
-extern int csetlib(char *, char *);
+extern int csetlib(const char *filename, const char *passwd = nullptr);
 extern Common::SeekableReadStream *clibfopen(const char *, const char *);
 
 } // namespace AGS2

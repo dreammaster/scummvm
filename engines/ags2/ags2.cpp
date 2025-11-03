@@ -29,7 +29,7 @@ namespace AGS2 {
 
 AGS2Engine *g_engine;
 
-AGS2Engine::AGS2Engine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
+AGS2Engine::AGS2Engine(OSystem *syst, const AGS2GameDescription *gameDesc) : Engine(syst),
 	_gameDescription(gameDesc), _randomSource("AGS2") {
 	g_engine = this;
 }
@@ -39,18 +39,20 @@ AGS2Engine::~AGS2Engine() {
 }
 
 uint32 AGS2Engine::getFeatures() const {
-	return _gameDescription->flags;
+	return _gameDescription->desc.flags;
 }
 
+const char *AGS2Engine::getFilename() const {
+	return _gameDescription->desc.filesDescriptions[0].fileName;
+};
+
 Common::String AGS2Engine::getGameId() const {
-	return _gameDescription->gameId;
+	return _gameDescription->desc.gameId;
 }
 
 Common::Error AGS2Engine::run() {
-	const char *filename = _gameDescription->filesDescriptions[0].fileName;
-	const char *argv[] = { nullptr, filename };
-
-	ags_main(2, argv);
+	const char *argv[] = { nullptr };
+	ags_main(1, argv);
 
 	return Common::kNoError;
 }

@@ -30,6 +30,7 @@ GameState play;
 GameSetup usetup;
 SpriteCache spritset(1);
 BITMAP *screen;
+const char *game_file_name;
 
 int force_letterbox;
 int game_paused;
@@ -78,10 +79,14 @@ int final_col_dep;
 
 
 Vars::Vars() {
+	g_vars = this;
+
 	force_letterbox = 0;
 	game_paused = 0;
 	ifacepopped = -1;
 	screen = nullptr;
+	game_file_name = nullptr;
+
 	Common::fill((byte *)palette, (byte *)palette + 256 * sizeof(color), 0);
 	Common::fill(spritewidth, spritewidth + MAX_SPRITES, 0);
 	Common::fill(spriteheight, spriteheight + MAX_SPRITES, 0);
@@ -121,6 +126,10 @@ Vars::Vars() {
 	*return_to_room = '\0';
 
 	final_col_dep = 0;
+}
+
+Vars::~Vars() {
+	g_vars = nullptr;
 }
 
 } // namespace AGS2

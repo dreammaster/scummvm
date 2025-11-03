@@ -23,12 +23,13 @@
 #define AGS2_METAENGINE_H
 
 #include "engines/advancedDetector.h"
+#include "ags2/detection.h"
 
-class AGS2MetaEngine : public AdvancedMetaEngine<ADGameDescription> {
+class AGS2MetaEngine : public AdvancedMetaEngine<AGS2::AGS2GameDescription> {
 public:
 	const char *getName() const override;
 
-	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+	Common::Error createInstance(OSystem *syst, Engine **engine, const AGS2::AGS2GameDescription *desc) const override;
 
 	/**
 	 * Determine whether the engine supports the specified MetaEngine feature.

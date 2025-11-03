@@ -38,6 +38,7 @@ extern GameSetupStruct game;
 extern GameState play;
 extern GameSetup usetup;
 extern BITMAP *screen;
+extern const char *game_file_name;
 extern SpriteCache spriteset;
 extern int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];
 extern int current_screen_resolution_multiplier;
@@ -107,6 +108,7 @@ public:
 
 public:
 	Vars();
+	~Vars();
 };
 
 #define _G(X) (g_vars->_##X)

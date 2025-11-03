@@ -61,7 +61,7 @@ static UTYPE_INFO utypes[] =
 /* _find_utype:
  *  Helper for locating a string type description.
  */
-static UTYPE_INFO *find_utype(int type) {
+static const UTYPE_INFO *find_utype(int type) {
 	int i;
 
 	if (type == U_CURRENT)
@@ -75,7 +75,7 @@ static UTYPE_INFO *find_utype(int type) {
 }
 
 void set_uformat(int type) {
-	UTYPE_INFO *info = find_utype(type);
+	const UTYPE_INFO *info = find_utype(type);
 	assert(info);
 
 	if (info) {
