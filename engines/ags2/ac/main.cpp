@@ -153,7 +153,15 @@ void initialize_engine() {
 	game_file_name = g_engine->getFilename();
 
 	int errCode = csetlib(game_file_name);
-	warning("%d", errCode);
+	if (errCode != 0) {
+		errCode = csetlib("ac2game.dat");
+		if (errCode != 0)
+			errCode = csetlib("ac2game.ags");
+	}
+	if (errCode != 0)
+		error("Could not locate game data");
+
+
 	// TODO
 }
 
