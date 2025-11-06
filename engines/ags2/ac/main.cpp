@@ -161,7 +161,14 @@ void initialize_engine() {
 	if (errCode != 0)
 		error("Could not locate game data");
 
-
+	roomstats = (RoomStatus *)calloc(sizeof(RoomStatus), MAX_ROOMS);
+	for (int ee = 0; ee < MAX_ROOMS; ee++) {
+		roomstats[ee].beenhere = 0;
+		roomstats[ee].numobj = 0;
+		roomstats[ee].tsdatasize = 0;
+		roomstats[ee].tsdata = NULL;
+	}
+	play.want_speech = -2;
 	// TODO
 }
 
