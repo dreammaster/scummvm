@@ -63,7 +63,7 @@ volatile int game_paused_in_debugger = 0;
 
 int in_enters_screen, done_es_error;
 int in_leaves_screen;
-bool need_to_stop_cd;
+int need_to_stop_cd;
 bool debug_15bit_mode, debug_24bit_mode;
 int said_text;
 int convert_16bit_bgr;
@@ -76,7 +76,7 @@ char return_to_roomedit[30];
 char return_to_room[150];
 
 int final_col_dep;
-
+RoomStatus *roomstats;
 
 Vars::Vars() {
 	g_vars = this;
@@ -126,6 +126,7 @@ Vars::Vars() {
 	*return_to_room = '\0';
 
 	final_col_dep = 0;
+	roomstats = nullptr;
 }
 
 Vars::~Vars() {

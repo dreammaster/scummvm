@@ -22,10 +22,10 @@
 #define CROOM_NOFUNCTIONS
 #include "common/system.h"
 #include "ags2/common/clib32.h"
-#include "ags2/common/acroom.h"
 #include "ags2/common/compress.h"
 #include "ags2/common/file.h"
 #include "ags2/common/wgt2allg.h"
+#include "ags2/ac/acroom.h"
 #include "ags2/gfx/sprite.h"
 #include "ags2/gfx/sprite_cache.h"
 #include "ags2/vars.h"

@@ -6,6 +6,7 @@ MODULE_OBJS = \
 	metaengine.o \
 	routefnd.o \
 	vars.o \
+	ac/acsound.o \
 	ac/main.o \
 	common/clib32.o \
 	common/compress.o \

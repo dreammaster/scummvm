@@ -22,6 +22,7 @@
 #include "common/file.h"
 #include "common/formats/ini-file.h"
 #include "ags2/ac/main.h"
+#include "ags2/ac/acruntime.h"
 #include "ags2/common/clib32.h"
 #include "ags2/ags2.h"
 #include "ags2/vars.h"

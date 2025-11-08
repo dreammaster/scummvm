@@ -1,4 +1,3 @@
-
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -25,9 +24,9 @@
 
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/surface.h"
-#include "ags2/common/acroom.h"
+#include "ags2/ac/acroom.h"
 #include "ags2/gfx/sprite_cache.h"
-#include "ags2/acruntime.h"
+#include "ags2/ac/acruntime.h"
 
 namespace AGS2 {
 	
@@ -68,7 +67,7 @@ extern volatile int game_paused_in_debugger;
 
 extern int in_enters_screen, done_es_error;
 extern int in_leaves_screen;
-extern bool need_to_stop_cd;
+extern int need_to_stop_cd;
 extern bool debug_15bit_mode, debug_24bit_mode;
 extern int said_text;
 extern int convert_16bit_bgr;
@@ -80,6 +79,7 @@ extern bool check_dynamic_sprites_at_exit;
 extern char return_to_roomedit[30];
 extern char return_to_room[150];
 extern int final_col_dep;
+extern RoomStatus *roomstats;
 
 class Vars {
 public:
