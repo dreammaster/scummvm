@@ -23,6 +23,7 @@ MODULE_OBJS = \
 	lib/allegro/graphics.o \
 	lib/allegro/math.o \
 	lib/allegro/rotate.o \
+	lib/allegro/sound.o \
 	lib/allegro/surface.o \
 	lib/allegro/surface_generic.o \
 	lib/allegro/system.o  \

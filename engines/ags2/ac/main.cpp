@@ -24,6 +24,7 @@
 #include "ags2/ac/main.h"
 #include "ags2/ac/acruntime.h"
 #include "ags2/common/clib32.h"
+#include "ags2/lib/allegro/sound.h"
 #include "ags2/ags2.h"
 #include "ags2/vars.h"
 
@@ -169,7 +170,27 @@ void initialize_engine() {
 		roomstats[ee].tsdatasize = 0;
 		roomstats[ee].tsdata = NULL;
 	}
+
 	play.want_speech = -2;
+	if (!usetup.no_speech_pack && Common::File::exists("speech.vox")) {
+		if (csetlib("speech.vox"))
+			error("Unable to initialize speech sample file - check for corruption "
+				"and that it belongs to this game.");
+
+		csetlib(game_file_name);
+	}
+
+	play.want_music = 0;
+	if (!usetup.usevox && Common::File::exists("music.vox")) {
+		if (csetlib("music.vox"))
+			error("Unable to initialize music library - check for corruption and that it belongs to this game.");
+		csetlib(game_file_name);
+		play.want_music = 1;
+	}
+
+	if (opts.mod_player)
+		reserve_voices(14);
+
 	// TODO
 }
 
