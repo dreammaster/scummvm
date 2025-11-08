@@ -25,6 +25,7 @@
 #include "ags2/ac/acruntime.h"
 #include "ags2/common/clib32.h"
 #include "ags2/lib/allegro/sound.h"
+#include "ags2/lib/allegro/timer.h"
 #include "ags2/ags2.h"
 #include "ags2/vars.h"
 
@@ -191,6 +192,7 @@ void initialize_engine() {
 	if (opts.mod_player)
 		reserve_voices(14);
 
+	install_timer();
 	// TODO
 }
 

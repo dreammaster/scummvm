@@ -27,6 +27,7 @@ MODULE_OBJS = \
 	lib/allegro/surface.o \
 	lib/allegro/surface_generic.o \
 	lib/allegro/system.o  \
+	lib/allegro/timer.o \
 	lib/allegro/unicode.o
 
 # This module can be built as a plugin
