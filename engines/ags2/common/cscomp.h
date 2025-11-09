@@ -160,19 +160,19 @@ extern void ccGetCallStack(ccInstance *inst, char *buffer, int maxLines);
 // *
 // ***************** INTERNAL USE ONLY *******************
 // *
-extern void cc_error(char *, ...);
+extern void cc_error(const char *, ...);
 extern int currentline;
 
 extern int is_alphanum(int);
-extern void cc_preprocess(char *, char *);
+extern void cc_preprocess(const char *, const char *);
 extern void preproc_startup(void);
 extern void preproc_shutdown(void);
 
 extern int ccAddObjectReference(long handle);
 extern int ccReleaseObjectReference(long handle);
-extern void fputstring(char *sss, Common::WriteStream *ddd);
-extern void fgetstring_limit(char *sss, Common::SeekableReadStream *ddd, int bufsize);
-extern void fgetstring(char *sss, Common::SeekableReadStream *ddd);
+extern void fputstring(const char *sss, Common::WriteStream *ddd);
+extern void fgetstring_limit(char *sss, Common::ReadStream *ddd, int bufsize);
+extern void fgetstring(char *sss, Common::ReadStream *ddd);
 
 #define FIXUP_GLOBALDATA  1     // code[fixup] += &globaldata[0]
 #define FIXUP_FUNCTION    2     // code[fixup] += &code[0]
@@ -251,8 +251,7 @@ struct ccScript
 #define CC_STACK_SIZE     4000
 #define MAX_CALL_STACK    100
 
-struct ccInstance
-{
+struct ccInstance {
 	long flags;
 	char *globaldata;
 	long globaldatasize;
@@ -350,39 +349,6 @@ struct ccInstance
 #define SCMD_DYNAMICBOUNDS 71   // check reg1 is between 0 and m[MAR-4]
 #define SCMD_NEWARRAY     72    // reg1 = new array of reg1 elements, each of size arg2 (arg3=managed type?)
 
-static const char *sccmdnames[] = {
-  "NULL", "$add", "$sub", "$$mov", "memwritelit", "ret", "$mov",
-  "$memread", "$memwrite", "$$mul", "$$div", "$$add", "$$sub", "$$bit_and", "$$bit_or",
-  "$$cmp", "$$ncmp", "$$gt", "$$lt", "$$gte", "$$lte", "$$and", "$$or",
-  "$call", "$memread.b", "$memread.w", "$memwrite.b", "$memwrite.w", "jz",
-  "$push", "$pop", "jmp", "$mul", "$farcall", "$farpush", "farsubsp", "sourceline",
-  "$callscr", "thisaddr", "setfuncargs", "$$mod", "$$xor", "$not",
-  "$$shl", "$$shr", "$callobj", "$checkbounds", "$memwrite.ptr",
-  "$memread.ptr", "memwrite.ptr.0", "$meminit.ptr", "load.sp.offs",
-  "checknull.ptr", "$f.add", "$f.sub", "$$f.mul", "$$f.div", "$$f.add",
-  "$$f.sub", "$$f.gt", "$$f.lt", "$$f.gte", "$$f.lte",
-  "zeromem", "$newstring", "$$strcmp", "$$strnotcmp", "$checknull",
-  "loopcheckoff", "memwrite.ptr.0.nd", "jnz", "$dynamicbounds", "$newarray"
-};
-
-static const char *regnames[] = { "null", "sp", "mar", "ax", "bx", "cx", "op", "dx" };
-static short sccmdargs[] = {
-  0, 2, 2, 2, 2, 0, 2,
-  1, 1, 2, 2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2, 2, 2, 2,
-  1, 1, 1, 1, 1, 1,
-  1, 1, 1, 2, 1, 1, 1, 1,
-  1, 1, 1, 2, 2, 1,
-  2, 2, 1, 2, 1,
-  1, 0, 1, 1,
-  0, 2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2,
-  1, 1, 2, 2, 1,
-  0, 0, 1, 1, 3
-};
-
-// file signatures
-static char scfilesig[5] = "SCOM";
 #define ENDFILESIG 0xbeefcafe
 
 } // namespace AGS2

@@ -12,6 +12,7 @@ MODULE_OBJS = \
 	ac/main.o \
 	common/clib32.o \
 	common/compress.o \
+	common/csrun.o \
 	common/fmem.o \
 	common/misc.o \
 	common/routefnd.o \

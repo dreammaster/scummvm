@@ -24,15 +24,20 @@
 
 #include "common/stream.h"
 #include "common/debug.h"
+#include "common/textconsole.h"
 
 namespace AGS2 {
 
-inline int16 getw(Common::ReadStream *rs) {
-	return rs->readSint16LE();
+inline void quit(const char *msg) {
+	error("%s", msg);
 }
 
-inline void putw(int16 val, Common::WriteStream *ws) {
-	ws->writeSint16LE(val);
+inline uint16 getw(Common::ReadStream *rs) {
+	return rs->readUint16LE();
+}
+
+inline void putw(uint16 val, Common::WriteStream *ws) {
+	ws->writeUint16LE(val);
 }
 
 inline void write_log(const char *msg) {

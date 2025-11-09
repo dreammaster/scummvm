@@ -30,10 +30,6 @@
 
 namespace AGS2 {
 
-#ifndef quit
-#define quit error
-#endif
-
 #define EXIT_NORMAL 91
 #define EXIT_CRASH  92
 
