@@ -45,6 +45,8 @@ void ags_main(int argc, const char *argv[]) {
 	if (debug_flags & DBG_REGONLY)
 		return;
 
+	platform = AGSPlatformDriver::GetDriver();
+
 	read_config_file();
 	initialize_engine();
 }

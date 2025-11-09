@@ -21,6 +21,7 @@
 
 #include "common/system.h"
 #include "ags2/common/wgt2allg.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 
@@ -34,8 +35,6 @@ char password[16];
 char *wgtlibrary;
 int currentcolor;
 int vesa_xres, vesa_yres;
-block abuf;
-
 
 void vga256() {
 #ifdef TODO

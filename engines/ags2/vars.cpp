@@ -77,6 +77,7 @@ char return_to_room[150];
 
 int final_col_dep;
 RoomStatus *roomstats;
+AGSPlatformDriver *platform;
 
 // routefnd.cpp
 int *pathbackx, *pathbacky;
@@ -85,6 +86,7 @@ int routex1, routey1;
 int suggestx, suggesty;
 fixed move_speed_x, move_speed_y;
 
+block abuf;
 
 Vars::Vars() {
 	g_vars = this;
@@ -135,6 +137,8 @@ Vars::Vars() {
 
 	final_col_dep = 0;
 	roomstats = nullptr;
+	abuf = nullptr;
+	platform = nullptr;
 
 	pathbackx = pathbacky = nullptr;
 	waspossible = 1;

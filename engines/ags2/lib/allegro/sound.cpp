@@ -26,7 +26,7 @@ namespace AGS2 {
 int digi_voices;
 int midi_voices;
 
-int install_sound(int digiCard, int midiCard) {
+int install_sound(int digiCard, int midiCard, const char *cfgPath) {
 	return 0;
 }
 

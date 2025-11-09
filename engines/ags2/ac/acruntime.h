@@ -692,7 +692,7 @@ struct AGSPlatformDriver {
 	virtual void PostAllegroInit(bool windowed);
 	virtual void PostAllegroExit() = 0;
 	virtual void FinishedUsingGraphicsMode();
-	virtual void ReplaceSpecialPaths(const char *sourcePath, char *destPath) = 0;
+	virtual void ReplaceSpecialPaths(const char *sourcePath, char *destPath);
 	virtual int  RunSetup() = 0;
 	virtual void SetGameWindowIcon();
 	virtual void WriteConsole(const char *, ...) = 0;
@@ -853,7 +853,7 @@ extern void domouse(int);
 extern int  mgetbutton();
 
 extern const char *get_engine_version();
-extern void quitprintf(char*texx, ...) ;
+extern void quitprintf(const char *texx, ...) ;
 extern void RefreshMouse();
 extern void PluginSimulateMouseClick(int pluginButtonID);
 extern int  run_script_function_if_exist(ccInstance*sci,char*tsname,int numParam, int iparam, int iparam2, int iparam3 = 0) ;
@@ -871,7 +871,7 @@ extern void scriptDebugHook (ccInstance *ccinst, int linenum);
 extern void invalidate_screen();
 extern int  is_valid_character(int newchar);
 extern int  is_valid_object(int obtest);
-extern void debug_write_console (char *msg, ...);
+extern void debug_write_console (const char *msg, ...);
 extern int  is_route_possible(int,int,int,int,block);
 extern int  find_route(short,short,short,short,block,int,int=0,int=0);
 extern void set_route_move_speed(int x, int y);

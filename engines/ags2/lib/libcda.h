@@ -19,16 +19,34 @@
  *
  */
 
-#ifndef AGS2_LIB_ALLEGRO_MIDI_H
-#define AGS2_LIB_ALLEGRO_MIDI_H
+#ifndef AGS2_LIB_LIBCDA_H
+#define AGS2_LIB_LIBCDA_H
+
+#include "common/scummsys.h"
 
 namespace AGS2 {
 
-extern long midi_pos;
+extern int cd_init(void);
+extern void cd_exit(void);
 
-#define MIDI_AUTODETECT       -1
-#define MIDI_NONE             0
-#define MIDI_DIGMID           AL_ID('D','I','G','I')
+extern int cd_play(int track);
+extern int cd_play_range(int start, int end);
+extern int cd_play_from(int track);
+extern int cd_current_track(void);
+extern void cd_pause(void);
+extern void cd_resume(void);
+extern int cd_is_paused(void);
+extern void cd_stop(void);
+
+extern int cd_get_tracks(int *first, int *last);
+extern int cd_is_audio(int track);
+
+extern void cd_get_volume(int *c0, int *c1);
+extern void cd_set_volume(int c0, int c1);
+
+extern void cd_eject(void);
+extern void cd_close(void);
+
 
 } // namespace AGS2
 

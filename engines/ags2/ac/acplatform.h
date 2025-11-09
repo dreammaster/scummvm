@@ -22,29 +22,20 @@
 #ifndef AGS2_AC_ACPLATFORM_H
 #define AGS2_AC_ACPLATFORM_H
 
-#ifdef DJGPP
-#define DOS_VERSION
-#endif
-
 #define WGT2ALLEGRO_NOFUNCTIONS
-#include "wgt2allg.h"
+#include "ags2/common/wgt2allg.h"
 #define CROOM_NOFUNCTIONS
-#include "acroom.h"
-#include "acruntim.h"
-#include "acsound.h"
-#include "cscomp.h"
-#include "ali3d.h"
-
-#ifdef WINDOWS_VERSION
-#include <ddraw.h>
-#include <dsound.h>
-#endif
+#include "ags2/ac/acroom.h"
+#include "ags2/ac/acruntime.h"
+#include "ags2/ac/acsound.h"
+#include "ags2/common/cscomp.h"
+#include "ags2/gfx/ali3d.h"
 
 #include "agsplugin.h"
 
-#if !defined(BSD_VERSION) && (defined(LINUX_VERSION) || defined(WINDOWS_VERSION))
-#include "libcda.h"
-#endif
+//if !defined(BSD_VERSION) && (defined(LINUX_VERSION) || defined(WINDOWS_VERSION))
+//include "libcda.h"
+//endif
 
 namespace AGS2 {
 
@@ -58,7 +49,7 @@ void pl_startup_plugins();
 int pl_run_plugin_hooks(int event, int data);
 void pl_run_plugin_init_gfx_hooks(const char *driverName, void *data);
 int pl_run_plugin_debug_hooks(const char *scriptfile, int linenum);
-void pl_read_plugins_from_disk(FILE *iii);
+void pl_read_plugins_from_disk(Common::SeekableReadStream *iii);
 int cd_player_init();
 int cd_player_control(int cmdd, int datt);
 

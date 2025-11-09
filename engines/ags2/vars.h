@@ -80,6 +80,8 @@ extern char return_to_roomedit[30];
 extern char return_to_room[150];
 extern int final_col_dep;
 extern RoomStatus *roomstats;
+extern block abuf;
+extern AGSPlatformDriver *platform;
 
 // routefnd.cpp
 extern int *pathbackx, *pathbacky;

@@ -22,6 +22,8 @@
 #ifndef AGS2_AC_AGS_PLUGIN_H
 #define AGS2_AC_AGS_PLUGIN_H
 
+#include "ags2/ac/acruntime.h"
+
 namespace AGS2 {
 
 // If the plugin isn't using DDraw, don't require the headers
@@ -284,20 +286,6 @@ public:
 	virtual void Unserialize(int key, const char *serializedData, int dataSize) = 0;
 };
 
-#ifndef __ACRUNTIME_H
-class IAGSFontRenderer {
-public:
-	virtual bool LoadFromDisk(int fontNumber, int fontSize) = 0;
-	virtual void FreeMemory(int fontNumber) = 0;
-	virtual bool SupportsExtendedCharacters(int fontNumber) = 0;
-	virtual int GetTextWidth(const char *text, int fontNumber) = 0;
-	virtual int GetTextHeight(const char *text, int fontNumber) = 0;
-	virtual void RenderText(const char *text, int fontNumber, BITMAP *destination, int x, int y, int colour) = 0;
-	virtual void AdjustYCoordinateForFont(int *ycoord, int fontNumber) = 0;
-	virtual void EnsureTextValidForFont(char *text, int fontNumber) = 0;
-};
-#endif
-
 // The plugin-to-engine interface
 class IAGSEngine {
 public:
@@ -336,7 +324,7 @@ public:
 	// get screen dimensions
 	AGSIFUNC(void) GetScreenDimensions(int32 *width, int32 *height, int32 *coldepth);
 	// get screen surface to draw on
-	AGSIFUNC(unsigned char **) GetRawBitmapSurface(BITMAP *);
+	AGSIFUNC(byte **) GetRawBitmapSurface(BITMAP *);
 	// release the surface
 	AGSIFUNC(void) ReleaseBitmapSurface(BITMAP *);
 	// get the current mouse co-ordinates
@@ -356,9 +344,9 @@ public:
 
 	// *** BELOW ARE INTERFACE VERSION 5 AND ABOVE ONLY
 	// similar to fwrite - buffer, size, filehandle
-	AGSIFUNC(int)  FWrite(void *, int32, int32);
+	AGSIFUNC(int)  FWrite(void *, int32, intptr);
 	// similar to fread - buffer, size, filehandle
-	AGSIFUNC(int)  FRead(void *, int32, int32);
+	AGSIFUNC(int)  FRead(void *, int32, intptr);
 	// print text, wrapping as usual
 	AGSIFUNC(void) DrawTextWrapped(int32 x, int32 y, int32 width, int32 font, int32 color, const char *text);
 	// set the current active 'screen'

@@ -27,8 +27,8 @@ namespace AGS2 {
 extern int digi_voices;
 extern int midi_voices;
 
-extern int install_sound(int digiCard, int midiCard);
-extern void reserve_voices(int digiVoices, int midiVoices = -1);
+extern int install_sound(int digiCard, int midiCard, const char *cfgPath = nullptr);
+extern void reserve_voices(int digi, int midi = -1);
 extern void set_volume_per_voice(int scale);
 
 } // namespace AGS2

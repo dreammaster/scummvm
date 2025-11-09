@@ -19,17 +19,64 @@
  *
  */
 
-#ifndef AGS2_LIB_ALLEGRO_MIDI_H
-#define AGS2_LIB_ALLEGRO_MIDI_H
+#include "ags2/lib/libcda.h"
 
 namespace AGS2 {
 
-extern long midi_pos;
+int cd_init() {
+	return 0;
+}
 
-#define MIDI_AUTODETECT       -1
-#define MIDI_NONE             0
-#define MIDI_DIGMID           AL_ID('D','I','G','I')
+void cd_exit() {
+}
+
+int cd_play(int track) {
+	return 0;
+}
+
+int cd_play_range(int start, int end) {
+	return 0;
+}
+
+int cd_play_from(int track) {
+	return 0;
+}
+
+int cd_current_track() {
+	return 0;
+}
+
+void cd_pause() {
+}
+
+void cd_resume() {
+}
+
+int cd_is_paused() {
+	return 0;
+}
+
+void cd_stop() {
+}
+
+int cd_get_tracks(int *first, int *last) {
+	return 0;
+}
+
+int cd_is_audio(int track) {
+	return 0;
+}
+
+void cd_get_volume(int *c0, int *c1) {
+}
+
+void cd_set_volume(int c0, int c1) {
+}
+
+void cd_eject() {
+}
+
+void cd_close() {
+}
 
 } // namespace AGS2
-
-#endif

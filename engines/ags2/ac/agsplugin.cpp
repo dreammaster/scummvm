@@ -19,17 +19,9 @@
  *
  */
 
-#ifndef AGS2_LIB_ALLEGRO_MIDI_H
-#define AGS2_LIB_ALLEGRO_MIDI_H
+#include "ags2/ac/agsplugin.h"
 
 namespace AGS2 {
 
-extern long midi_pos;
-
-#define MIDI_AUTODETECT       -1
-#define MIDI_NONE             0
-#define MIDI_DIGMID           AL_ID('D','I','G','I')
 
 } // namespace AGS2
-
-#endif
