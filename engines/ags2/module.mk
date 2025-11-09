@@ -5,6 +5,7 @@ MODULE_OBJS = \
 	console.o \
 	metaengine.o \
 	vars.o \
+	ac/acfonts.o \
 	ac/acplatform.o \
 	ac/acplatform_scummvm.o \
 	ac/acsound.o \
@@ -19,6 +20,7 @@ MODULE_OBJS = \
 	common/wgt2allg.o \
 	gfx/sprite.o \
 	gfx/sprite_cache.o \
+	lib/alfont/alfont.o \
 	lib/allegro/color.o \
 	lib/allegro/digi.o \
 	lib/allegro/file.o \

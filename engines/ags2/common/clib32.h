@@ -28,6 +28,7 @@ extern int cfopenpriority;
 
 extern int csetlib(const char *filename, const char *passwd = nullptr);
 extern Common::SeekableReadStream *clibfopen(const char *, const char *);
+extern int32 clibfilesize(const char *fill);
 
 } // namespace AGS2
 

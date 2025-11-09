@@ -29,7 +29,7 @@ namespace AGS2 {
 
 typedef unsigned char *__block;
 
-extern long cliboffset(char *);
+extern long cliboffset(const char *);
 extern char lib_file_name[13];
 extern void domouse(int);
 extern block wnewblock(int, int, int, int);
