@@ -19,23 +19,23 @@
  *
  */
 
-#include "ags2/lib/allegro/sound.h"
+#ifndef AGS2_PLATFORM_ALWIN_H
+#define AGS2_PLATFORM_ALWIN_H
+
+#include "common/scummsys.h"
 
 namespace AGS2 {
 
-int digi_voices;
-int midi_voices;
-
-int install_sound(int digiCard, int midiCard) {
-	return 0;
-}
-
-void reserve_voices(int digiVoices, int midiVoices) {
-	digi_voices = digiVoices;
-	midi_voices = midiVoices;
-}
-
-void set_volume_per_voice(int scale) {
-}
+/********************************************/
+/*************** sound drivers **************/
+/********************************************/
+#define DIGI_DIRECTX(n)          MKTAG('D','X','A'+(n),' ')
+#define DIGI_DIRECTAMX(n)        MKTAG('A','X','A'+(n),' ')
+#define DIGI_WAVOUTID(n)         MKTAG('W','O','A'+(n),' ')
+#define MIDI_WIN32MAPPER         MKTAG('W','3','2','M')
+#define MIDI_WIN32(n)            MKTAG('W','3','2','A'+(n))
+#define MIDI_WIN32_IN(n)         MKTAG('W','3','2','A'+(n))
 
 } // namespace AGS2
+
+#endif // AGS2_H

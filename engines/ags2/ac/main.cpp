@@ -26,6 +26,7 @@
 #include "ags2/common/clib32.h"
 #include "ags2/lib/allegro/sound.h"
 #include "ags2/lib/allegro/timer.h"
+#include "ags2/platform/alwin.h"
 #include "ags2/ags2.h"
 #include "ags2/vars.h"
 
@@ -193,6 +194,25 @@ void initialize_engine() {
 		reserve_voices(14);
 
 	install_timer();
+	set_volume_per_voice(1);
+
+	if (usetup.digicard == -1 || usetup.digicard == DIGI_DIRECTX(0))
+		usetup.digicard = DIGI_DIRECTAMX(0);
+
+	if (install_sound(usetup.digicard, usetup.midicard)) {
+		reserve_voices(-1, -1);
+		opts.mod_player = 0;
+		opts.mp3_player = 0;
+		if (install_sound(usetup.digicard, usetup.midicard) &&
+			usetup.digicard != 0 && usetup.midicard != 0)
+			error("Unable to initialize your audio hardware");
+
+		reserve_voices(0, 0);
+		install_sound(0, 0);
+		usetup.digicard = 0;
+		usetup.midicard = 0;
+	}
+
 	// TODO
 }
 

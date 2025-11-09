@@ -131,6 +131,9 @@ Vars::Vars() {
 
 Vars::~Vars() {
 	g_vars = nullptr;
+
+	free(roomstats);
+	roomstats = nullptr;
 }
 
 } // namespace AGS2
