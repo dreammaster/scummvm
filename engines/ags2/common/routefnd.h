@@ -20,12 +20,12 @@
  *
  */
 
-#ifndef AGS2_ROUTEFND_H
-#define AGS2_ROUTEFND_H
+#ifndef AGS2_COMMON_ROUTEFND_H
+#define AGS2_COMMON_ROUTEFND_H
 
 namespace AGS2 {
 
-extern void print_welcome_text(const char *verno, const char *aciverno);
+extern void init_pathfinder();
 
 } // namespace AGS2
 

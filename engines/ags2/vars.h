@@ -81,6 +81,13 @@ extern char return_to_room[150];
 extern int final_col_dep;
 extern RoomStatus *roomstats;
 
+// routefnd.cpp
+extern int *pathbackx, *pathbacky;
+extern int waspossible;
+extern int routex1, routey1;
+extern int suggestx, suggesty;
+extern fixed move_speed_x, move_speed_y;
+
 class Vars {
 public:
 	BlenderMode _blender_mode = kRgbToRgbBlender;

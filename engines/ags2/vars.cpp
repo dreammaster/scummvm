@@ -78,6 +78,14 @@ char return_to_room[150];
 int final_col_dep;
 RoomStatus *roomstats;
 
+// routefnd.cpp
+int *pathbackx, *pathbacky;
+int waspossible = 1;
+int routex1, routey1;
+int suggestx, suggesty;
+fixed move_speed_x, move_speed_y;
+
+
 Vars::Vars() {
 	g_vars = this;
 
@@ -127,13 +135,20 @@ Vars::Vars() {
 
 	final_col_dep = 0;
 	roomstats = nullptr;
+
+	pathbackx = pathbacky = nullptr;
+	waspossible = 1;
+	routex1 = routey1 = 0;
+	suggestx = suggesty = 0;
+	move_speed_x = move_speed_y = 0;
 }
 
 Vars::~Vars() {
 	g_vars = nullptr;
 
 	free(roomstats);
-	roomstats = nullptr;
+	free(pathbackx);
+	free(pathbacky);
 }
 
 } // namespace AGS2

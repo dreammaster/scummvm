@@ -21,12 +21,14 @@
 
 #include "common/file.h"
 #include "common/formats/ini-file.h"
+#include "gui/debugger.h"
 #include "ags2/ac/main.h"
 #include "ags2/ac/acruntime.h"
 #include "ags2/common/clib32.h"
+#include "ags2/common/routefnd.h"
 #include "ags2/lib/allegro/sound.h"
 #include "ags2/lib/allegro/timer.h"
-#include "ags2/platform/alwin.h"
+#include "ags2/lib/allegro/platform/alwin.h"
 #include "ags2/ags2.h"
 #include "ags2/vars.h"
 
@@ -212,6 +214,18 @@ void initialize_engine() {
 		usetup.digicard = 0;
 		usetup.midicard = 0;
 	}
+
+	if ((debug_flags & (~DBG_DEBUGMODE)) > 0) {
+		g_engine->getDebugger()->debugPrintf("Engine debugging enabled.\n"
+			"\nNOTE: You have selected to enable one or more engine debugging options.\n"
+			"These options cause many parts of the game to behave abnormally, and you\n"
+			"may not see the game as you are used to it. The point is to test whether\n"
+			"the engine passes a point where it is crashing on you normally.\n"
+			"[Debug flags enabled: 0x%02X]\n");
+		g_engine->getDebugger()->attach();
+	}
+
+	init_pathfinder();
 
 	// TODO
 }

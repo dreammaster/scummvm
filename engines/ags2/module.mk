@@ -4,7 +4,6 @@ MODULE_OBJS = \
 	ags2.o \
 	console.o \
 	metaengine.o \
-	routefnd.o \
 	vars.o \
 	ac/acsound.o \
 	ac/main.o \
@@ -12,6 +11,7 @@ MODULE_OBJS = \
 	common/compress.o \
 	common/fmem.o \
 	common/misc.o \
+	common/routefnd.o \
 	common/wgt2allg.o \
 	gfx/sprite.o \
 	gfx/sprite_cache.o \

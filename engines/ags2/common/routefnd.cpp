@@ -19,34 +19,16 @@
  *
  */
 
-#include "ags2/routefnd.h"
+#include "ags2/common/routefnd.h"
 #include "ags2/vars.h"
 
 namespace AGS2 {
-#if 0
-void print_welcome_text(const char *verno, const char *aciverno) {
-	_G(walk_area_zone5) = 1633;
 
-	if (strcmp(Vars::ac_engine_copyright, "Adventure Game Studio engine & tools (c) 1999-2000 by Chris Jones.") != 0) {
-		quit("Don't screw with my name.");
-		exit(77);
-		abort();
-	}
+#define MAXPATHBACK 1000
 
-	if (strlen(Vars::ac_engine_copyright) != 66) {
-		quit("Leave my name alone.");
-		exit(88);
-		abort();
-	}
-
-	if (get_copyright_crc() != COPYRIGHT_CRC) {
-		quit("Nice try.");
-		exit(89);
-		abort();
-	}
-
-	routex1 = -10;
+void init_pathfinder() {
+	pathbackx = (int *)malloc(sizeof(int) * MAXPATHBACK);
+	pathbacky = (int *)malloc(sizeof(int) * MAXPATHBACK);
 }
-#endif
 
 } // namespace AGS2
