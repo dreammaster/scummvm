@@ -1,0 +1,3 @@
+engines/ags2/ags.cpp
+engines/ags2/dialogs.cpp
+engines/ags2/engine/ac/listbox.cpp
