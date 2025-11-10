@@ -4,7 +4,6 @@ MODULE_OBJS = \
 	ags2.o \
 	dialogs.o \
 	events.o \
-	game_scanner.o \
 	globals.o \
 	metaengine.o \
 	music.o \

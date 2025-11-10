@@ -22,7 +22,6 @@
 #include "ags2/ags2.h"
 #include "ags2/detection.h"
 #include "ags2/events.h"
-#include "ags2/game_scanner.h"
 #include "ags2/music.h"
 #include "ags2/console.h"
 #include "common/scummsys.h"
@@ -61,10 +60,6 @@
 #include "ags2/shared/core/asset_manager.h"
 #include "ags2/shared/util/directory.h"
 #include "ags2/shared/script/cc_common.h"
-
-#ifdef ENABLE_AGS_TESTS
-#include "ags2/tests/test_all.h"
-#endif
 
 // Include translation.h last as some AGS classes have member such as _sc, which clash with
 // macro defined in translation.h.
@@ -138,42 +133,8 @@ Common::String AGSEngine::getGameId() const {
 }
 
 Common::Error AGSEngine::run() {
-#ifdef DETECTION_STATIC
-	// The game scanner is not available when detection is dynamic
-	if (debugChannelSet(-1, kDebugScan)) {
-		// Scan the given folder and subfolders for unknown games
-		AGS2::GameScanner scanner;
-		scanner.scan(ConfMan.getPath("path"));
-		return Common::kNoError;
-	}
-#endif
-
-	if (isUnsupportedPre25()) {
-		GUIErrorMessage(_("The selected game uses a pre-2.5 version of the AGS engine, which is not supported."));
-		return Common::kNoError;
-	}
-
-	if (isUnsupportedAGS4()) {
-		GUIErrorMessage(_("The selected game uses version 4 of the AGS engine, which is not supported."));
-		return Common::kNoError;
-	}
-
-	if (is64BitGame()) {
-		// If the game file was opened and the engine started, but the
-		// size is -1, then it must be a game like Strangeland where
-		// the data file is > 2Gb
-		GUIErrorMessage(_("The selected game has a data file greater than 2Gb, "
-			"which isn't supported by your version of ScummVM yet."));
-		return Common::kNoError;
-	}
-
 	if (debugChannelSet(-1, kDebugScript))
 		AGS2::ccSetOption(SCOPT_DEBUGRUN, 1);
-
-#ifdef ENABLE_AGS_TESTS
-	AGS2::Test_DoAllTests();
-	return Common::kNoError;
-#endif
 
 	setDebugger(new AGSConsole(this));
 
