@@ -26,8 +26,10 @@ namespace AGS2 {
 
 Vars *g_vars;
 GameSetupStruct game;
+GameSetupStruct thisgame;
 GameState play;
 GameSetup usetup;
+
 SpriteCache spritset(1);
 BITMAP *screen;
 BITMAP *virtual_screen;
@@ -49,6 +51,12 @@ int offsetx, offsety;
 int numlines;
 int inside_script;
 int numPluginReaders;
+PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
+char lines[MAXLINE][200];
+int pluginsWantingDebugHooks;
+int use_cdplayer;
+ExecutingScript *curscript;
+ObjectCache objcache[MAX_INIT_SPR];
 
 int force_letterbox;
 int game_paused;
@@ -132,6 +140,9 @@ Vars::Vars() {
 	numlines = 0;
 	inside_script = 0;
 	numPluginReaders = 0;
+	pluginsWantingDebugHooks = 0;
+	use_cdplayer = 0;
+	curscript = nullptr;
 
 	Common::fill((byte *)&thisroom, (byte *)&thisroom + sizeof(roomstruct), 0);
 	Common::fill((byte *)palette, (byte *)palette + 256 * sizeof(color), 0);

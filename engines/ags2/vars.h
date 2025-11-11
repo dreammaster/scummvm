@@ -56,6 +56,10 @@ extern int offsetx, offsety;
 extern int numlines;
 extern int inside_script;
 extern int numPluginReaders;
+extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
+extern char lines[MAXLINE][200];
+extern ExecutingScript *curscript;
+extern ObjectCache objcache[MAX_INIT_SPR];
 
 extern SpriteCache spriteset;
 extern int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];

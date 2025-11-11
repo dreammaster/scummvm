@@ -6,6 +6,7 @@ MODULE_OBJS = \
 	metaengine.o \
 	vars.o \
 	ac/acfonts.o \
+	ac/acmouse.o \
 	ac/acplatform.o \
 	ac/acplatform_scummvm.o \
 	ac/acsound.o \
@@ -38,7 +39,8 @@ MODULE_OBJS = \
 	lib/allegro/system.o  \
 	lib/allegro/timer.o \
 	lib/allegro/unicode.o \
-	lib/libcda.o
+	lib/libcda.o \
+	stubs.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AGS2), DYNAMIC_PLUGIN)
