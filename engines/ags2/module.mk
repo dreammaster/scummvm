@@ -42,6 +42,16 @@ MODULE_OBJS = \
 	lib/libcda.o \
 	stubs.o
 
+ifdef USE_FREETYPE2
+MODULE_OBJS += \
+	lib/freetype-2.1.3/autohint/ahangles.o \
+	lib/freetype-2.1.3/autohint/ahglobal.o \
+	lib/freetype-2.1.3/autohint/ahglyph.o \
+	lib/freetype-2.1.3/autohint/ahhint.o \
+	lib/freetype-2.1.3/ftgloadr.o \
+	lib/freetype-2.1.3/ftutil.o
+endif
+
 # This module can be built as a plugin
 ifeq ($(ENABLE_AGS2), DYNAMIC_PLUGIN)
 PLUGIN := 1
