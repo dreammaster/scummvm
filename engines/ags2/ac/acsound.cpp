@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/textconsole.h"
 #include "ags2/ac/acsound.h"
 #include "ags2/lib/allegro/digi.h"
 
@@ -54,6 +55,36 @@ void SOUNDCLIP::resume() {
 	if (voice >= 0)
 		voice_start(voice);
 	paused = 0;
+}
+
+SOUNDCLIP *my_load_wave(const char *filename, int voll, int loop) {
+	error("TODO: my_load_wave");
+}
+SOUNDCLIP *my_load_mp3(const char *filname, int voll) {
+	error("TODO: my_load_mp3");
+}
+SOUNDCLIP *my_load_static_mp3(const char *filname, int voll, bool loop) {
+	error("TODO: my_load_static_mp3");
+}
+SOUNDCLIP *my_load_static_ogg(const char *filname, int voll, bool loop) {
+	error("TODO: my_load_static_ogg");
+}
+SOUNDCLIP *my_load_ogg(const char *filname, int voll) {
+	error("TODO: my_load_ogg");
+}
+SOUNDCLIP *my_load_midi(const char *filname, int repet) {
+	error("TODO: my_load_midi");
+}
+SOUNDCLIP *my_load_mod(const char *filname, int repet) {
+	error("TODO: my_load_mod");
+}
+
+int  init_mod_player(int numVoices) {
+	warning("TODO: init_mod_player");
+	return 0;
+}
+void remove_mod_player() {
+	warning("TODO: remove_mod_player");
 }
 
 } // namespace AGS2

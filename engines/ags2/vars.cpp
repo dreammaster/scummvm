@@ -30,11 +30,30 @@ GameState play;
 GameSetup usetup;
 SpriteCache spritset(1);
 BITMAP *screen;
+BITMAP *virtual_screen;
+IGraphicsDriver *gfxDriver;
 const char *game_file_name;
+GFXFilter *filter;
+MoveList *mls;
+ViewStruct *views;
+ccInstance *gameinst;
+ccInstance *roominst;
+RoomStatus *croom;
+SOUNDCLIP *channels[MAX_SOUND_CHANNELS + 1];
+CharacterCache *charcache;
+int displayed_room;
+int use_cd_player;
+int scrnwid, scrnhit;
+int mousex, mousey;
+int offsetx, offsety;
+int numlines;
+int inside_script;
+int numPluginReaders;
 
 int force_letterbox;
 int game_paused;
 int ifacepopped;
+roomstruct thisroom;
 color palette[256];
 
 // initially size 1, this will be increased by the initFile function
@@ -95,8 +114,26 @@ Vars::Vars() {
 	game_paused = 0;
 	ifacepopped = -1;
 	screen = nullptr;
+	virtual_screen = nullptr;
+	gfxDriver = nullptr;
 	game_file_name = nullptr;
+	mls = nullptr;
+	views = nullptr;
+	gameinst = nullptr;
+	roominst = nullptr;
+	croom = nullptr;
+	Common::fill(channels, channels + MAX_SOUND_CHANNELS + 1, nullptr);
+	charcache = nullptr;
+	displayed_room = 0;
+	use_cd_player = 0;
+	scrnwid = scrnhit = 0;
+	mousex = mousey = 0;
+	offsetx = offsety = 0;
+	numlines = 0;
+	inside_script = 0;
+	numPluginReaders = 0;
 
+	Common::fill((byte *)&thisroom, (byte *)&thisroom + sizeof(roomstruct), 0);
 	Common::fill((byte *)palette, (byte *)palette + 256 * sizeof(color), 0);
 	Common::fill(spritewidth, spritewidth + MAX_SPRITES, 0);
 	Common::fill(spriteheight, spriteheight + MAX_SPRITES, 0);
