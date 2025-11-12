@@ -19,24 +19,22 @@
  *
  */
 
-#ifndef AGS2_LIB_ALLEGRO_TIMER_H
-#define AGS2_LIB_ALLEGRO_TIMER_H
+#include "ags2/ac/actimer.h"
+#include "ags2/lib/allegro/timer.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 
-#define TIMERS_PER_SECOND     100
-#define SECS_TO_TIMER(x)      ((long)(x) * TIMERS_PER_SECOND)
-#define MSEC_TO_TIMER(x)      ((long)(x) * (TIMERS_PER_SECOND / 1000))
-#define BPS_TO_TIMER(x)       (TIMERS_PER_SECOND / (long)(x))
-#define BPM_TO_TIMER(x)       ((60 * TIMERS_PER_SECOND) / (long)(x))
+void dj_timer_handler() {
+	globalTimerCounter++;
+	if (mvolcounter > 0)
+		mvolcounter++;
+}
 
-typedef void (*TimerProc)();
-
-extern void install_timer();
-extern void remove_timer();
-extern int install_int_ex(TimerProc proc, int speed);
-extern void poll_timers();
+void set_game_speed(int fpsSpeed) {
+	frames_per_second = fpsSpeed;
+	time_between_timers = 1000 / fpsSpeed;
+	install_int_ex(dj_timer_handler, MSEC_TO_TIMER(time_between_timers));
+}
 
 } // namespace AGS2
-
-#endif

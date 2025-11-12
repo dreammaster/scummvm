@@ -24,6 +24,7 @@
 #include "gui/debugger.h"
 #include "ags2/ac/main.h"
 #include "ags2/ac/acruntime.h"
+#include "ags2/ac/actimer.h"
 #include "ags2/common/clib32.h"
 #include "ags2/common/routefnd.h"
 #include "ags2/lib/allegro/sound.h"
@@ -228,6 +229,39 @@ void initialize_engine() {
 	}
 
 	init_pathfinder();
+
+	abuf = create_bitmap_ex(8, 10, 10);
+	usetup.base_width = 320;
+	usetup.base_height = 200;
+	screenresIdx = usetup.screenres + 1;
+
+	switch (usetup.screenres) {
+	case 1:
+		usetup.base_width = 640;
+		usetup.base_height = 400;
+		break;
+	case 2:
+		usetup.base_width = 960;
+		usetup.base_height = 600;
+		break;
+	default:
+		break;
+	}
+
+	scrnwid = usetup.base_width;
+	scrnhit = usetup.base_height;
+	current_screen_resolution_multiplier_x = scrnwid / 320;
+	current_screen_resolution_multiplier_y = scrnhit / 200;
+
+	int width = usetup.base_width;
+	int height = usetup.base_height;
+
+	if (usetup.base_width == 960) {
+		width = 1024;
+		height = 768;
+	}
+
+	set_game_speed(40);
 
 	// TODO
 }

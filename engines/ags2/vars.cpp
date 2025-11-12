@@ -67,7 +67,7 @@ color palette[256];
 // initially size 1, this will be increased by the initFile function
 SpriteCache spriteset(1);
 int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];
-int current_screen_resolution_multiplier;
+int current_screen_resolution_multiplier_x, current_screen_resolution_multiplier_y;
 
 int our_eip;
 int eip_guinum, eip_guiobj;
@@ -114,6 +114,11 @@ int suggestx, suggesty;
 fixed move_speed_x, move_speed_y;
 
 block abuf;
+int screenres, screenresIdx;
+uint32 globalTimerCounter;
+uint32 mvolcounter;
+uint32 frames_per_second;
+uint32 time_between_timers;
 
 Vars::Vars() {
 	g_vars = this;
@@ -149,7 +154,7 @@ Vars::Vars() {
 	Common::fill(spritewidth, spritewidth + MAX_SPRITES, 0);
 	Common::fill(spriteheight, spriteheight + MAX_SPRITES, 0);
 
-	current_screen_resolution_multiplier = 0;
+	current_screen_resolution_multiplier_x = current_screen_resolution_multiplier_y = 0;
 	our_eip = 0;
 	eip_guinum = eip_guiobj = 0;
 	fps = display_fps = 0;
@@ -193,6 +198,10 @@ Vars::Vars() {
 	routex1 = routey1 = 0;
 	suggestx = suggesty = 0;
 	move_speed_x = move_speed_y = 0;
+
+	screenres = screenresIdx = 0;
+	globalTimerCounter = mvolcounter = 0;
+	frames_per_second = time_between_timers = 0;
 }
 
 Vars::~Vars() {

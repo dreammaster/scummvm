@@ -154,23 +154,10 @@ error("TODO: initialize_sprite");
 }
 
 void get_new_size_for_sprite(int ee, int ww, int hh, int &newWidth, int &newHeight) {
-	newWidth = ww * current_screen_resolution_multiplier;
-	newHeight = hh * current_screen_resolution_multiplier;
-	if (game.spriteflags[ee] & SPF_640x400)
-	{
-		if (current_screen_resolution_multiplier == 2) {
-			newWidth = ww;
-			newHeight = hh;
-		} else {
-			newWidth = (ww / 2) * current_screen_resolution_multiplier;
-			newHeight = (hh / 2) * current_screen_resolution_multiplier;
-			// just make sure - could crash if wid or hit is 0
-			if (newWidth < 1)
-				newWidth = 1;
-			if (newHeight < 1)
-				newHeight = 1;
-		}
-	}
+	newWidth = ww * current_screen_resolution_multiplier_x;
+	newHeight = hh * current_screen_resolution_multiplier_y;
+
+	// TODO: Check original logic
 }
 
 block remove_alpha_channel(block from) {

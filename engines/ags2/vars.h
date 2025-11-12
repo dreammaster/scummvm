@@ -63,7 +63,7 @@ extern ObjectCache objcache[MAX_INIT_SPR];
 
 extern SpriteCache spriteset;
 extern int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];
-extern int current_screen_resolution_multiplier;
+extern int current_screen_resolution_multiplier_x, current_screen_resolution_multiplier_y;
 
 extern int our_eip;
 extern int eip_guinum;
@@ -112,6 +112,12 @@ extern int waspossible;
 extern int routex1, routey1;
 extern int suggestx, suggesty;
 extern fixed move_speed_x, move_speed_y;
+
+extern int screenresIdx;
+extern uint32 globalTimerCounter;
+extern uint32 mvolcounter;
+extern uint32 frames_per_second;
+extern uint32 time_between_timers;
 
 class Vars {
 public:

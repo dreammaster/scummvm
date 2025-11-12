@@ -10,6 +10,7 @@ MODULE_OBJS = \
 	ac/acplatform.o \
 	ac/acplatform_scummvm.o \
 	ac/acsound.o \
+	ac/actimer.o \
 	ac/agsplugin.o \
 	ac/main.o \
 	common/clib32.o \
