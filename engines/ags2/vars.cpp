@@ -116,18 +116,29 @@ fixed move_speed_x, move_speed_y;
 
 // acgui.cpp
 DynamicArray<GUIButton> guibuts;
-int numguibuts = 0;
+int numguibuts;
 DynamicArray<GUILabel> guilabels;
-int numguilabels = 0;
+int numguilabels;
 DynamicArray<GUIInv> guiinv;
-int numguiinv = 0;
+int numguiinv;
 DynamicArray<GUISlider> guislider;
-int numguislider = 0;
+int numguislider;
 DynamicArray<GUITextBox> guitext;
-int numguitext = 0;
+int numguitext;
 DynamicArray<GUIListBox> guilist;
-int numguilist = 0;
+int numguilist;
 
+// acdraw.cpp
+SpriteListEntry thingsToDrawList[MAX_THINGS_TO_DRAW];
+int thingsToDrawSize;
+SpriteListEntry sprlist[MAX_SPRITES_ON_SCREEN];
+int sprlistsize;
+int trans_mode;
+
+// acwalkbehind.cpp
+WalkBehindMethodEnum walkBehindMethod;
+
+// Misc
 block abuf;
 int screenres, screenresIdx;
 uint32 globalTimerCounter;
@@ -215,12 +226,21 @@ Vars::Vars() {
 	suggestx = suggesty = 0;
 	move_speed_x = move_speed_y = 0;
 
+	// acgui.cpp
 	numguibuts = 0;
 	numguilabels = 0;
 	numguiinv = 0;
 	numguislider = 0;
 	numguitext = 0;
 	numguilist = 0;
+
+	// acdraw.cpp
+	thingsToDrawSize = 0;
+	sprlistsize = 0;
+	trans_mode = 0;
+
+	// acwalkbehind.cpp
+	walkBehindMethod = DrawOverCharSprite;
 
 	screenres = screenresIdx = 0;
 	globalTimerCounter = mvolcounter = 0;

@@ -5,6 +5,7 @@ MODULE_OBJS = \
 	console.o \
 	metaengine.o \
 	vars.o \
+	ac/acdraw.o \
 	ac/acfonts.o \
 	ac/acgui.o \
 	ac/acmouse.o \
@@ -12,6 +13,7 @@ MODULE_OBJS = \
 	ac/acplatform_scummvm.o \
 	ac/acsound.o \
 	ac/actimer.o \
+	ac/acwalkbehind.o \
 	ac/agsplugin.o \
 	ac/main.o \
 	common/clib32.o \

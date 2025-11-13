@@ -24,6 +24,8 @@
 
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/surface.h"
+#include "ags2/ac/acdraw.h"
+#include "ags2/ac/acwalkbehind.h"
 #include "ags2/ac/acgui.h"
 #include "ags2/ac/acroom.h"
 #include "ags2/gfx/sprite_cache.h"
@@ -129,6 +131,17 @@ extern int numguitext;
 extern DynamicArray<GUIListBox> guilist;
 extern int numguilist;
 
+// acdraw.cpp
+extern SpriteListEntry thingsToDrawList[MAX_THINGS_TO_DRAW];
+extern int thingsToDrawSize;
+extern SpriteListEntry sprlist[MAX_SPRITES_ON_SCREEN];
+extern int sprlistsize;
+extern int trans_mode;
+
+// acwalkbehind.cpp
+extern WalkBehindMethodEnum walkBehindMethod;
+
+// misc
 extern int screenresIdx;
 extern uint32 globalTimerCounter;
 extern uint32 mvolcounter;

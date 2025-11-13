@@ -1428,6 +1428,8 @@ struct MoveList {
   };
 #endif
 
+extern int bmp_bpp(BITMAP *bmpt);
+
 } // namespace AGS2
 
 #endif
