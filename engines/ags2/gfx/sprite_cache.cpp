@@ -734,7 +734,7 @@ bool SpriteCache::loadSpriteIndexFile(int expectedFileID, long spr_initial_offs,
 	}
 	if (fileVersion >= 2)
 	{
-		if (getw(fidx) != expectedFileID) {
+		if ((int)getw(fidx) != expectedFileID) {
 			delete fidx;
 			return false;
 		}
@@ -742,7 +742,7 @@ bool SpriteCache::loadSpriteIndexFile(int expectedFileID, long spr_initial_offs,
 	numspri_index = getw(fidx);
 
 	// end index+1 should be the same as num sprites
-	if (getw(fidx) != numspri_index + 1) {
+	if ((int)getw(fidx) != numspri_index + 1) {
 		delete fidx;
 		return false;
 	}

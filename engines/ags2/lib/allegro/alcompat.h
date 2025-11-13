@@ -19,29 +19,15 @@
  *
  */
 
-#ifndef AGS2_LIB_FILE_H
-#define AGS2_LIB_FILE_H
+#ifndef AGS2_LIB_ALLEGRO_ALCOMPAT_H
+#define AGS2_LIB_ALLEGRO_ALCOMPAT_H
 
-#include "common/stream.h"
-#include "common/debug.h"
-#include "common/textconsole.h"
+#include "ags2/lib/allegro/surface.h"
 
 namespace AGS2 {
 
-inline void quit(const char *msg) {
-	error("%s", msg);
-}
-
-inline uint32 getw(Common::ReadStream *rs) {
-	return rs->readUint16LE();
-}
-
-inline void putw(uint32 val, Common::WriteStream *ws) {
-	ws->writeUint16LE(val);
-}
-
-inline void write_log(const char *msg) {
-	debug(1, "%s", msg);
+/* the weird old clipping API */
+inline void set_clip(BITMAP *bitmap, int x1, int y_1, int x2, int y2) {
 }
 
 } // namespace AGS2

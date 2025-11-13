@@ -27,14 +27,13 @@ namespace AGS2 {
 
 const char *spindexid = "SPRINDEX";
 const char *spindexfilename = "sprindex.dat";
-fpos_t lfpos;
-Common::SeekableReadStream *libf;
-short lresult;
-int lsize;
-char password[16];
-char *wgtlibrary;
-int currentcolor;
-int vesa_xres, vesa_yres;
+static fpos_t lfpos;
+static Common::SeekableReadStream *libf;
+static short lresult;
+static int lsize;
+static char password[16];
+static char *wgtlibrary;
+static int vesa_xres, vesa_yres;
 
 void vga256() {
 #ifdef TODO

@@ -22,11 +22,10 @@
 #ifndef AGS2_AC_ACGUI_H
 #define AGS2_AC_ACGUI_H
 
-#ifndef __WGT4_H
-#ifndef CROOM_NOFUNCTIONS
-#error Must include wgt2allg.h first
-#endif
-#endif
+#include "common/serializer.h"
+#include "common/stream.h"
+#include "ags2/common/wgt2allg.h"
+#include "ags2/ac/acroom.h"
 
 namespace AGS2 {
 
@@ -48,7 +47,6 @@ inline void check_font(int *fontnum) {
 #else
 
 #define wouttext_outline(a, b, c, d) wouttextxy(a, b, c, d)
-extern GameSetupStruct thisgame;
 extern void check_font(int *fontnum);
 #endif
 
@@ -131,8 +129,8 @@ T &DynamicArray<T>::operator[] (int index) {
 #define MAX_GUIOBJ_SCRIPTNAME_LEN 25
 #define MAX_GUIOBJ_EVENTS 10
 #define MAX_GUIOBJ_EVENTHANDLER_LEN 30
-struct GUIObject
-{
+
+struct GUIObject {
 	int guin, objn;    // gui and object number of this object
 	unsigned int flags;
 	int x, y;
@@ -142,7 +140,7 @@ struct GUIObject
 	char scriptName[MAX_GUIOBJ_SCRIPTNAME_LEN + 1];
 	char eventHandlers[MAX_GUIOBJ_EVENTS][MAX_GUIOBJ_EVENTHANDLER_LEN + 1];
 
-	virtual void MouseMove(int, int) = 0; // x,y relative to gui
+	virtual void MouseMove(int nx, int ny) = 0; // x,y relative to gui
 	virtual void MouseOver() = 0; // mouse moves onto object
 	virtual void MouseLeave() = 0;        // mouse moves off object
 	virtual int  MouseDown() { // button down - return 1 to lock focus
@@ -159,8 +157,8 @@ struct GUIObject
 		return 0;
 	}
 	// we can't just fread/fwrite inherited objects because of vtbl, so use:
-	virtual void WriteToFile(FILE *);
-	virtual void ReadFromFile(FILE *, int);
+	virtual void WriteToFile(Common::WriteStream *ooo);
+	virtual void ReadFromFile(Common::SeekableReadStream *, int);
 	// called when the control is resized
 	virtual void Resized() {
 	}
@@ -220,8 +218,7 @@ protected:
 };
 
 
-struct GUISlider :public GUIObject
-{
+struct GUISlider :public GUIObject {
 	int min, max;
 	int value, mpressed;
 	int handlepic, handleoffset, bgimage;
@@ -230,8 +227,8 @@ struct GUISlider :public GUIObject
 	int cached_handtlx, cached_handbrx;
 	int cached_handtly, cached_handbry;
 
-	virtual void WriteToFile(FILE *);
-	virtual void ReadFromFile(FILE *, int);
+	virtual void WriteToFile(Common::WriteStream *ooo);
+	virtual void ReadFromFile(Common::SeekableReadStream *, int);
 	void Draw();
 	void MouseMove(int xp, int yp);
 
@@ -284,22 +281,22 @@ struct GUISlider :public GUIObject
 };
 
 
-struct GUILabel :public GUIObject
-{
+struct GUILabel : public GUIObject {
 private:
+	char emptyStr[1] = { '\0' };
 	char *text;
 	int textBufferLen;
 public:
 	int font, textcol, align;
 
-	virtual void WriteToFile(FILE *);
-	virtual void ReadFromFile(FILE *, int);
+	virtual void WriteToFile(Common::WriteStream *ooo);
+	virtual void ReadFromFile(Common::SeekableReadStream *, int);
 	void Draw();
 	void printtext_align(int yy, char *teptr);
 	void SetText(const char *newText);
 	const char *GetText();
 
-	void MouseMove(int x, int y) {
+	void MouseMove(int, int) {
 	}
 
 	void MouseOver() {
@@ -320,7 +317,7 @@ public:
 		font = 0;
 		textcol = 0;
 		numSupportedEvents = 0;
-		text = "";
+		text = emptyStr;
 		textBufferLen = 0;
 	}
 
@@ -331,17 +328,16 @@ public:
 
 
 #define GTF_NOBORDER  1
-struct GUITextBox :public GUIObject
-{
+struct GUITextBox : public GUIObject {
 	char text[200];
 	int font, textcol, exflags;
 
-	virtual void WriteToFile(FILE *);
-	virtual void ReadFromFile(FILE *, int);
+	virtual void WriteToFile(Common::WriteStream *ooo);
+	virtual void ReadFromFile(Common::SeekableReadStream *, int);
 	void Draw();
 	void KeyPress(int);
 
-	void MouseMove(int x, int y) {
+	void MouseMove(int, int) {
 	}
 
 	void MouseOver() {
@@ -373,8 +369,7 @@ struct GUITextBox :public GUIObject
 #define GLF_NOARROWS     2
 #define GLF_SGINDEXVALID 4
 
-struct GUIListBox :public GUIObject
-{
+struct GUIListBox : public GUIObject {
 	char *items[MAX_LISTBOX_ITEMS];
 	short saveGameIndex[MAX_LISTBOX_ITEMS];
 	int numItems, selected, topItem, mousexp, mouseyp;
@@ -382,8 +377,8 @@ struct GUIListBox :public GUIObject
 	int font, textcol, backcol, exflags;
 	int selectedbgcol;
 	int alignment, reserved1;
-	virtual void WriteToFile(FILE *);
-	virtual void ReadFromFile(FILE *, int);
+	virtual void WriteToFile(Common::WriteStream *ooo);
+	virtual void ReadFromFile(Common::SeekableReadStream *, int);
 	int  AddItem(const char *toadd);
 	int  InsertItem(int index, const char *toadd);
 	void SetItemText(int index, const char *newtext);
@@ -447,8 +442,7 @@ struct GUIListBox :public GUIObject
 };
 
 
-struct GUIInv :public GUIObject
-{
+struct GUIInv : public GUIObject {
 	int isover;
 	int charId;   // whose inventory (-1 = current player)
 	int itemWidth, itemHeight;
@@ -456,7 +450,7 @@ struct GUIInv :public GUIObject
 
 	int itemsPerLine, numLines;  // not persisted
 
-	virtual void WriteToFile(FILE *ooo) {
+	virtual void WriteToFile(Common::WriteStream *ooo) {
 		GUIObject::WriteToFile(ooo);
 		putw(charId, ooo);
 		putw(itemWidth, ooo);
@@ -464,7 +458,7 @@ struct GUIInv :public GUIObject
 		putw(topIndex, ooo);
 	}
 
-	virtual void ReadFromFile(FILE *ooo, int version) {
+	virtual void ReadFromFile(Common::SeekableReadStream *ooo, int version) {
 		GUIObject::ReadFromFile(ooo, version);
 		if (version >= 109) {
 			charId = getw(ooo);
@@ -495,7 +489,7 @@ struct GUIInv :public GUIObject
 
 	void Draw();
 
-	void MouseMove(int x, int y) {
+	void MouseMove(int nx, int ny) {
 	}
 
 	void MouseOver() {
@@ -536,8 +530,7 @@ struct GUIInv :public GUIObject
 #define GBUT_ALIGN_BOTTOMMIDDLE 7
 #define GBUT_ALIGN_BOTTOMRIGHT  8
 
-struct GUIButton :public GUIObject
-{
+struct GUIButton : public GUIObject {
 	char text[50];
 	int pic, overpic, pushedpic;
 	int usepic, ispushed, isover;
@@ -546,12 +539,12 @@ struct GUIButton :public GUIObject
 	int lclickdata, rclickdata;
 	int textAlignment, reserved1;
 
-	virtual void WriteToFile(FILE *ooo);
-	virtual void ReadFromFile(FILE *ooo, int);
+	virtual void WriteToFile(Common::WriteStream *ooo);
+	virtual void ReadFromFile(Common::SeekableReadStream *ooo, int version);
 	void Draw();
 	void MouseUp();
 
-	void MouseMove(int x, int y) {
+	void MouseMove(int nx, int ny) {
 	}
 
 	void MouseOver() {
@@ -632,8 +625,7 @@ extern int numguilist;
 #define GUI_TEXTWINDOW  0x05    // set vtext[0] to this to signify text window
 #define GUIF_NOCLICK    1
 #define MOVER_MOUSEDOWNLOCKED -4000
-struct GUIMain
-{
+struct GUIMain {
 	char vtext[4];                // for compatibility
 	char name[16];                // the name of the GUI
 	char clickEventHandler[20];
@@ -692,17 +684,15 @@ struct GUIMain
 			this->transparency = ((100 - percent) * 25) / 10;
 	}
 
-	void ReadFromFile(FILE *fp, int version) {
-		// read/write everything except drawOrder since
-		// it will be regenerated
-		fread(vtext, sizeof(char), 40, fp);
-		fread(&x, sizeof(int), 27 + 2 * MAX_OBJS_ON_GUI, fp);
+	void ReadFromFile(Common::SeekableReadStream *fp, int version) {
+		Common::Serializer s(fp, nullptr);
+		synchronize(s);
 	}
-
-	void WriteToFile(FILE *fp) {
-		fwrite(vtext, sizeof(char), 40, fp);
-		fwrite(&x, sizeof(int), 27 + 2 * MAX_OBJS_ON_GUI, fp);
+	void WriteToFile(Common::WriteStream *fp) {
+		Common::Serializer s(nullptr, fp);
+		synchronize(s);
 	}
+	void synchronize(Common::Serializer &s);
 };
 
 #define GUIDIS_GREYOUT   1
@@ -714,8 +704,8 @@ extern int guis_need_update;
 extern int all_buttons_disabled, gui_inv_pic;
 extern int gui_disabled_style;
 
-extern void read_gui(FILE *iii, GUIMain *guiread, GameSetupStruct *gss, GUIMain **allocate = NULL);
-extern void write_gui(FILE *ooo, GUIMain *guiwrite, GameSetupStruct *gss);
+extern void read_gui(Common::SeekableReadStream *iii, GUIMain *guiread, GameSetupStruct *gss, GUIMain **allocate = NULL);
+extern void write_gui(Common::WriteStream *ooo, GUIMain *guiwrite, GameSetupStruct *gss);
 
 extern char lines[][200];
 extern int numlines;

@@ -6,6 +6,7 @@ MODULE_OBJS = \
 	metaengine.o \
 	vars.o \
 	ac/acfonts.o \
+	ac/acgui.o \
 	ac/acmouse.o \
 	ac/acplatform.o \
 	ac/acplatform_scummvm.o \

@@ -63,6 +63,7 @@ int game_paused;
 int ifacepopped;
 roomstruct thisroom;
 color palette[256];
+int currentcolor;
 
 // initially size 1, this will be increased by the initFile function
 SpriteCache spriteset(1);
@@ -113,6 +114,20 @@ int routex1, routey1;
 int suggestx, suggesty;
 fixed move_speed_x, move_speed_y;
 
+// acgui.cpp
+DynamicArray<GUIButton> guibuts;
+int numguibuts = 0;
+DynamicArray<GUILabel> guilabels;
+int numguilabels = 0;
+DynamicArray<GUIInv> guiinv;
+int numguiinv = 0;
+DynamicArray<GUISlider> guislider;
+int numguislider = 0;
+DynamicArray<GUITextBox> guitext;
+int numguitext = 0;
+DynamicArray<GUIListBox> guilist;
+int numguilist = 0;
+
 block abuf;
 int screenres, screenresIdx;
 uint32 globalTimerCounter;
@@ -153,6 +168,7 @@ Vars::Vars() {
 	Common::fill((byte *)palette, (byte *)palette + 256 * sizeof(color), 0);
 	Common::fill(spritewidth, spritewidth + MAX_SPRITES, 0);
 	Common::fill(spriteheight, spriteheight + MAX_SPRITES, 0);
+	currentcolor = 0;
 
 	current_screen_resolution_multiplier_x = current_screen_resolution_multiplier_y = 0;
 	our_eip = 0;
@@ -198,6 +214,13 @@ Vars::Vars() {
 	routex1 = routey1 = 0;
 	suggestx = suggesty = 0;
 	move_speed_x = move_speed_y = 0;
+
+	numguibuts = 0;
+	numguilabels = 0;
+	numguiinv = 0;
+	numguislider = 0;
+	numguitext = 0;
+	numguilist = 0;
 
 	screenres = screenresIdx = 0;
 	globalTimerCounter = mvolcounter = 0;

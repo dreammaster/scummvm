@@ -24,6 +24,7 @@
 
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/surface.h"
+#include "ags2/ac/acgui.h"
 #include "ags2/ac/acroom.h"
 #include "ags2/gfx/sprite_cache.h"
 #include "ags2/ac/acruntime.h"
@@ -73,6 +74,7 @@ extern int force_letterbox;
 extern int game_paused;
 extern int ifacepopped;
 extern color palette[256];
+extern int currentcolor;
 extern int fps, display_fps;
 
 extern int datafile_argv, change_to_game_dir, force_window;
@@ -113,11 +115,26 @@ extern int routex1, routey1;
 extern int suggestx, suggesty;
 extern fixed move_speed_x, move_speed_y;
 
+// acgui.cpp
+extern DynamicArray<GUIButton> guibuts;
+extern int numguibuts;
+extern DynamicArray<GUILabel> guilabels;
+extern int numguilabels;
+extern DynamicArray<GUIInv> guiinv;
+extern int numguiinv;
+extern DynamicArray<GUISlider> guislider;
+extern int numguislider;
+extern DynamicArray<GUITextBox> guitext;
+extern int numguitext;
+extern DynamicArray<GUIListBox> guilist;
+extern int numguilist;
+
 extern int screenresIdx;
 extern uint32 globalTimerCounter;
 extern uint32 mvolcounter;
 extern uint32 frames_per_second;
 extern uint32 time_between_timers;
+
 
 class Vars {
 public:
