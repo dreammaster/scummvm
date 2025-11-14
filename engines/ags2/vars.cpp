@@ -69,6 +69,7 @@ int currentcolor;
 SpriteCache spriteset(1);
 int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];
 int current_screen_resolution_multiplier_x, current_screen_resolution_multiplier_y;
+int current_screen_resolution_multiplier;
 
 int our_eip;
 int eip_guinum, eip_guiobj;
@@ -134,9 +135,21 @@ int thingsToDrawSize;
 SpriteListEntry sprlist[MAX_SPRITES_ON_SCREEN];
 int sprlistsize;
 int trans_mode;
+IDriverDependantBitmap **actspswbbmp;
+CachedActSpsData *actspswbcache;
+int actSpsCount;
+block *actsps;
 
 // acwalkbehind.cpp
+char *walkBehindExists;
+int *walkBehindStartY, *walkBehindEndY;
+char noWalkBehindsAtAll;
+int walkBehindLeft[MAX_OBJ], walkBehindTop[MAX_OBJ];
+int walkBehindRight[MAX_OBJ], walkBehindBottom[MAX_OBJ];
+IDriverDependantBitmap *walkBehindBitmap[MAX_OBJ];
+int walkBehindsCachedForBgNum;
 WalkBehindMethodEnum walkBehindMethod;
+block *actspswb;
 
 // Misc
 block abuf;
@@ -182,6 +195,7 @@ Vars::Vars() {
 	currentcolor = 0;
 
 	current_screen_resolution_multiplier_x = current_screen_resolution_multiplier_y = 0;
+	current_screen_resolution_multiplier = 1;
 	our_eip = 0;
 	eip_guinum = eip_guiobj = 0;
 	fps = display_fps = 0;
@@ -238,9 +252,19 @@ Vars::Vars() {
 	thingsToDrawSize = 0;
 	sprlistsize = 0;
 	trans_mode = 0;
+	actspswbbmp = nullptr;
+	actspswbcache = nullptr;
+	actSpsCount = 0;
+	actsps = nullptr;
 
 	// acwalkbehind.cpp
+	walkBehindExists = NULL;
+	walkBehindStartY = walkBehindEndY = NULL;
+	noWalkBehindsAtAll = 0;
+	walkBehindBitmap[MAX_OBJ];
+	walkBehindsCachedForBgNum = 0;
 	walkBehindMethod = DrawOverCharSprite;
+	actspswb = nullptr;
 
 	screenres = screenresIdx = 0;
 	globalTimerCounter = mvolcounter = 0;

@@ -160,4 +160,33 @@ void repair_alpha_channel(block dest, block bgpic) {
 	}
 }
 
+block recycle_bitmap(block bimp, int coldep, int wid, int hit) {
+	if (bimp != NULL) {
+		// same colour depth, width and height -> reuse
+		if ((bitmap_color_depth(bimp) == coldep) && (bimp->w == wid)
+			&& (bimp->h == hit))
+			return bimp;
+
+		destroy_bitmap(bimp);
+	}
+	bimp = create_bitmap_ex(coldep, wid, hit);
+	return bimp;
+}
+
+IDriverDependantBitmap *recycle_ddb_bitmap(IDriverDependantBitmap *bimp, BITMAP *source, bool hasAlpha) {
+	if (bimp != NULL) {
+		// same colour depth, width and height -> reuse
+		if (((bimp->GetColorDepth() + 1) / 8 == bmp_bpp(source)) &&
+			(bimp->GetWidth() == source->w) && (bimp->GetHeight() == source->h))
+		{
+			gfxDriver->UpdateDDBFromBitmap(bimp, source, hasAlpha);
+			return bimp;
+		}
+
+		gfxDriver->DestroyDDB(bimp);
+	}
+	bimp = gfxDriver->CreateDDBFromBitmap(source, hasAlpha, false);
+	return bimp;
+}
+
 } // namespace AGS2

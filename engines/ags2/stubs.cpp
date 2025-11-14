@@ -68,10 +68,6 @@ int rec_getch() {
 	error("TODO: rec_getch");
 }
 
-void update_polled_stuff(bool) {
-	error("TODO: update_polled_stuff");
-}
-
 void invalidate_rect(int, int, int, int) {
 	error("TODO: invalidate_rect");
 }
@@ -103,9 +99,6 @@ int wgettextwidth_compensate(char const *,int) { error("TODO"); }
 void add_dynamic_sprite(int, BITMAP *,bool) { error("TODO"); }
 void free_dynamic_sprite(int) { error("TODO"); }
 char const * CreateNewScriptString(char const *,bool) { error("TODO"); }
-int divide_down_coordinate(int) { error("TODO"); }
-int multiply_up_coordinate(int) { error("TODO"); }
-void multiply_up_coordinates(int *,int *) { error("TODO"); }
 void get_current_dir_path(char *,char const *) { error("TODO"); }
 
 bool ShouldAntiAliasText(void) { error("TODO"); }

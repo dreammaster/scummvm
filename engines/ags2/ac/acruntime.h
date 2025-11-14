@@ -24,6 +24,7 @@
 
 #include "ags2/gfx/ali3d.h"
 #include "ags2/gfx/sprite_cache.h"
+#include "ags2/ac/acresolution.h"
 #include "ags2/ac/acroom.h"
 #include "ags2/ac/acsound.h"
 #include "ags2/ac/acgfx.h"
@@ -861,7 +862,7 @@ extern int  IsChannelPlaying(int chan) ;
 extern void stop_and_destroy_channel (int chid) ;
 extern int  rec_kbhit();
 extern int  rec_getch();
-extern void update_polled_stuff(bool checkForDebugMessages);
+extern void update_polled_stuff(bool checkForDebugMessages = true);
 extern void invalidate_rect(int x1, int y1, int x2, int y2);
 extern int  find_word_in_dictionary (char*);
 extern void break_up_text_into_lines(int wii,int fonnt,char*todis) ;
@@ -1090,13 +1091,6 @@ extern void Character_SetZ(CharacterInfo *chaa, int newval);
 // the linux compiler won't allow extern inline
 #define AGS_INLINE
 #endif
-
-extern AGS_INLINE int divide_down_coordinate(int coord);
-extern AGS_INLINE int multiply_up_coordinate(int coord);
-extern AGS_INLINE void multiply_up_coordinates(int *x, int *y);
-extern AGS_INLINE int get_fixed_pixel_size(int pixels);
-extern AGS_INLINE int convert_to_low_res(int coord);
-extern AGS_INLINE int convert_back_to_high_res(int coord);
 
 } // namespace AGS2
 

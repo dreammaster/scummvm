@@ -351,6 +351,10 @@ BITMAP *create_video_bitmap(int width, int height);
 BITMAP *create_system_bitmap(int width, int height);
 void destroy_bitmap(BITMAP *bitmap);
 
+inline bool is_memory_bitmap(BITMAP *bmp) {
+	return true;
+}
+
 } // namespace AGS2
 
 #endif

@@ -19,32 +19,23 @@
  *
  */
 
-#ifndef AGS2_AC_ACDRAW_H
-#define AGS2_AC_ACDRAW_H
+#ifndef AGS2_AC_ACRESOLUTION_H
+#define AGS2_AC_ACRESOLUTION_H
 
-#include "ags2/ac/acruntime.h"
+#include "ags2/ac/acresolution.h"
 
 namespace AGS2 {
 
-#define MAX_SPRITES_ON_SCREEN 76
-#define MAX_THINGS_TO_DRAW 125
-
-struct CachedActSpsData {
-	int xWas, yWas;
-	int baselineWas;
-	int isWalkBehindHere;
-	int valid;
-};
-
-extern void clear_draw_list();
-extern void add_thing_to_draw(IDriverDependantBitmap *bmp, int x, int y, int trans, bool alphaChannel);
-extern void clear_sprite_list();
-extern void add_to_sprite_list(IDriverDependantBitmap *spp, int xx, int yy, int baseline, int trans, int sprNum, bool isWalkBehind);
-extern void draw_sprite_compensate(int picc, int xx, int yy, int useAlpha);
-extern void put_sprite_256(int xxx, int yyy, block piccy);
-extern void repair_alpha_channel(block dest, block bgpic);
-extern block recycle_bitmap(block bimp, int coldep, int wid, int hit);
-extern IDriverDependantBitmap *recycle_ddb_bitmap(IDriverDependantBitmap *bimp, BITMAP *source, bool hasAlpha);
+// Multiplies up the number of pixels depending on the current 
+// resolution, to give a relatively fixed size at any game res
+extern int get_fixed_pixel_size(int pixels);
+extern int convert_to_low_res(int coord);
+extern int convert_back_to_high_res(int coord);
+extern int multiply_up_coordinate(int coord);
+extern void multiply_up_coordinates(int *x, int *y);
+extern void multiply_up_coordinates_round_up(int *x, int *y);
+extern int divide_down_coordinate(int coord);
+extern int divide_down_coordinate_round_up(int coord);
 
 } // namespace AGS2
 

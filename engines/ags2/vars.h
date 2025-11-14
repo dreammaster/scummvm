@@ -67,6 +67,7 @@ extern ObjectCache objcache[MAX_INIT_SPR];
 extern SpriteCache spriteset;
 extern int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];
 extern int current_screen_resolution_multiplier_x, current_screen_resolution_multiplier_y;
+extern int current_screen_resolution_multiplier;
 
 extern int our_eip;
 extern int eip_guinum;
@@ -137,9 +138,21 @@ extern int thingsToDrawSize;
 extern SpriteListEntry sprlist[MAX_SPRITES_ON_SCREEN];
 extern int sprlistsize;
 extern int trans_mode;
+extern IDriverDependantBitmap **actspswbbmp;
+extern CachedActSpsData *actspswbcache;
+extern int actSpsCount;
+extern block *actsps;
 
 // acwalkbehind.cpp
+extern char *walkBehindExists;  // whether a WB area is in this column
+extern int *walkBehindStartY, *walkBehindEndY;
+extern char noWalkBehindsAtAll;
+extern int walkBehindLeft[MAX_OBJ], walkBehindTop[MAX_OBJ];
+extern int walkBehindRight[MAX_OBJ], walkBehindBottom[MAX_OBJ];
+extern IDriverDependantBitmap *walkBehindBitmap[MAX_OBJ];
+extern int walkBehindsCachedForBgNum;
 extern WalkBehindMethodEnum walkBehindMethod;
+extern block *actspswb;
 
 // misc
 extern int screenresIdx;

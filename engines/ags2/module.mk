@@ -11,6 +11,7 @@ MODULE_OBJS = \
 	ac/acmouse.o \
 	ac/acplatform.o \
 	ac/acplatform_scummvm.o \
+	ac/acresolution.o \
 	ac/acsound.o \
 	ac/actimer.o \
 	ac/acwalkbehind.o \
