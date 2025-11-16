@@ -35,6 +35,7 @@ MODULE_OBJS = \
 	common/fmem.o \
 	common/misc.o \
 	common/routefnd.o \
+	common/text.o \
 	common/wgt2allg.o \
 	gfx/sprite.o \
 	gfx/sprite_cache.o \

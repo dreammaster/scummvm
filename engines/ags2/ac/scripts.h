@@ -101,6 +101,7 @@ extern void RunDialog(int tum);
 extern void do_conversation(int dlgnu);
 extern void can_run_delayed_command();
 extern int run_dialog_script(DialogTopic *dtpp, int dialogID, int offse, int optionIndex);
+extern void replace_macro_tokens(const char *statusbarformat, char *cur_stb_text);
 
 } // namespace AGS2
 

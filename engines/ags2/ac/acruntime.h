@@ -1011,6 +1011,8 @@ extern void Character_SetY(CharacterInfo *chaa, int newval);
 extern int  Character_GetZ(CharacterInfo *chaa);
 extern void Character_SetZ(CharacterInfo *chaa, int newval);
 
+extern void GetLocationName(int xxx, int yyy, char *tempo);
+
 #ifdef WINDOWS_VERSION
 #define AGS_INLINE inline
 #else

@@ -37,10 +37,6 @@
 
 namespace AGS2 {
 
-#ifdef THIS_IS_THE_ENGINE
-#define fopen clibfopen
-#endif
-
 typedef unsigned char *wgtfont;
 
 class WFNFontRenderer : public IAGSFontRenderer {

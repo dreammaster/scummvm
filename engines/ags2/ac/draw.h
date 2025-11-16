@@ -29,6 +29,10 @@ namespace AGS2 {
 #define MAX_SPRITES_ON_SCREEN 76
 #define MAX_THINGS_TO_DRAW 125
 
+#define get_adjusted_spritewidth(x) wgetblockwidth(spriteset[x])
+#define get_adjusted_spriteheight(x) wgetblockheight(spriteset[x])
+#define is_sprite_alpha(x) ((game.spriteflags[x] & SPF_ALPHACHANNEL) != 0)
+
 struct CachedActSpsData {
 	int xWas, yWas;
 	int baselineWas;

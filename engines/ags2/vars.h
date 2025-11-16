@@ -132,6 +132,9 @@ extern DynamicArray<GUIListBox> guilist;
 extern int numguilist;
 extern AnimatingGUIButton animbuts[MAX_ANIMATING_BUTTONS];
 extern int numAnimButs;
+extern int guis_need_update;
+extern int all_buttons_disabled, gui_inv_pic;
+extern int gui_disabled_style;
 
 // ac/draw.cpp
 extern SpriteListEntry thingsToDrawList[MAX_THINGS_TO_DRAW];

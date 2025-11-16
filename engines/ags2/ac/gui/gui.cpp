@@ -27,6 +27,7 @@
 #include "ags2/ac/acruntime.h"
 #include "ags2/common/misc.h"
 #include "ags2/lib/allegro/alcompat.h"
+#include "ags2/common/text.h"
 #include "ags2/vars.h"
 
 namespace AGS2 {
@@ -44,14 +45,6 @@ extern int get_adjusted_spriteheight(int spr);
 #define is_sprite_alpha(x) false
 #endif
 
-//char lines[MAXLINE][200];
-//int  numlines;
-
-
-int guis_need_update = 1;
-int all_buttons_disabled = 0, gui_inv_pic = -1;
-int gui_disabled_style = 0;
-
 extern SpriteCache spriteset;
 extern void draw_sprite_compensate(int spr, int x, int y, int xray);
 extern inline int divide_down_coordinate(int coord);
@@ -61,9 +54,6 @@ extern inline int get_fixed_pixel_size(int pixels);
 
 #ifdef THIS_IS_THE_ENGINE
 
-extern void ensure_text_valid_for_font(char *, int);
-extern void replace_macro_tokens(char*,char*);
-extern void break_up_text_into_lines(int wii,int fonnt,char*todis);
 extern int eip_guinum, eip_guiobj;
 #define SET_EIP(x) our_eip=x;
 #define OUTLINE_ALL_OBJECTS 0

@@ -60,7 +60,7 @@ int prepare_text_script(ccInstance *sci, char **tsname) {
 	scripts[num_scripts].init();
 	scripts[num_scripts].inst = sci;
 	/*  char tempb[300];
-	  sprintf(tempb,"Creating script instance for '%s' room %d",tsname[0],displayed_room);
+	  Common::sprintf_s(tempb,"Creating script instance for '%s' room %d",tsname[0],displayed_room);
 	  write_log(tempb);*/
 	if (sci->pc != 0) {
 		//    write_log("Forking instance");
@@ -555,6 +555,61 @@ int run_dialog_script(DialogTopic *dtpp, int dialogID, int offse, int optionInde
 	}
 
 	return result;
+}
+
+void replace_macro_tokens(const char *statusbarformat, char *cur_stb_text) {
+	const char *curptr = &statusbarformat[0];
+	char tmpm[3];
+	const char *endat = curptr + strlen(statusbarformat);
+	cur_stb_text[0] = 0;
+	char tempo[STD_BUFFER_SIZE];
+
+	while (1) {
+		if (curptr[0] == 0) break;
+		if (curptr >= endat) break;
+		if (curptr[0] == '@') {
+			const char *curptrWasAt = curptr;
+			char macroname[21]; int idd = 0; curptr++;
+			for (idd = 0; idd < 20; idd++) {
+				if (curptr[0] == '@') {
+					macroname[idd] = 0;
+					curptr++;
+					break;
+				}
+				// unterminated macro (eg. "@SCORETEXT"), so abort
+				if (curptr[0] == 0)
+					break;
+				macroname[idd] = curptr[0];
+				curptr++;
+			}
+			macroname[idd] = 0;
+			tempo[0] = 0;
+			if (scumm_stricmp(macroname, "score") == 0)
+				Common::sprintf_s(tempo, "%d", play.score);
+			else if (scumm_stricmp(macroname, "totalscore") == 0)
+				Common::sprintf_s(tempo, "%d", MAXSCORE);
+			else if (scumm_stricmp(macroname, "scoretext") == 0)
+				Common::sprintf_s(tempo, "%d of %d", play.score, MAXSCORE);
+			else if (scumm_stricmp(macroname, "gamename") == 0)
+				Common::strcpy_s(tempo, play.game_name);
+			else if (scumm_stricmp(macroname, "overhotspot") == 0) {
+				// While game is in Wait mode, no overhotspot text
+				if (!IsInterfaceEnabled())
+					tempo[0] = 0;
+				else
+					GetLocationName(divide_down_coordinate(mousex), divide_down_coordinate(mousey), tempo);
+			} else { // not a macro, there's just a @ in the message
+				curptr = curptrWasAt + 1;
+				Common::strcpy_s(tempo, "@");
+			}
+
+			Common::strcat_s(cur_stb_text, 65536, tempo);
+		} else {
+			tmpm[0] = curptr[0]; tmpm[1] = 0;
+			Common::strcat_s(cur_stb_text, 65536, tmpm);
+			curptr++;
+		}
+	}
 }
 
 } // namespace AGS2

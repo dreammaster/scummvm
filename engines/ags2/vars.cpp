@@ -128,6 +128,9 @@ DynamicArray<GUIListBox> guilist;
 int numguilist;
 AnimatingGUIButton animbuts[MAX_ANIMATING_BUTTONS];
 int numAnimButs;
+int guis_need_update;
+int all_buttons_disabled, gui_inv_pic;
+int gui_disabled_style;
 
 // ac/draw.cpp
 SpriteListEntry thingsToDrawList[MAX_THINGS_TO_DRAW];
@@ -285,6 +288,10 @@ Vars::Vars() {
 	numguitext = 0;
 	numguilist = 0;
 	numAnimButs = 0;
+	guis_need_update = 1;
+	all_buttons_disabled = 0;
+	gui_inv_pic = -1;
+	gui_disabled_style = 0;
 
 	// ac/draw.cpp
 	thingsToDrawSize = 0;

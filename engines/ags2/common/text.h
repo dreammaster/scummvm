@@ -19,45 +19,17 @@
  *
  */
 
-#ifndef AGS2_AC_GUI_GUI_H
-#define AGS2_AC_GUI_GUI_H
+#ifndef AGS2_COMMON_TEXT_H
+#define AGS2_COMMON_TEXT_H
 
-#include "common/stream.h"
-#include "ags2/ac/gui/dynamic_array.h"
-#include "ags2/ac/gui/button.h"
-#include "ags2/ac/gui/gui_object.h"
-#include "ags2/ac/gui/interface.h"
-#include "ags2/ac/gui/inv.h"
-#include "ags2/ac/gui/label.h"
-#include "ags2/ac/gui/listbox.h"
-#include "ags2/ac/gui/main.h"
-#include "ags2/ac/gui/slider.h"
-#include "ags2/ac/gui/textbox.h"
+#include "common/str.h"
 
 namespace AGS2 {
 
-#define THIS_IS_THE_ENGINE
-
-#define GUIF_NOCLICK    1
-#define MOVER_MOUSEDOWNLOCKED -4000
-
-#ifndef WOUTTEXT_REVERSE
-#define WOUTTEXT_REVERSE wouttext_outline
-#endif
-
-#define GUIMAGIC          0xcafebeef
-//#define MAX_OBJ_EACH_TYPE 251
-
-
-
-#ifdef THIS_IS_THE_ENGINE
-extern void wouttext_outline(int, int, int, char *);
-inline void check_font(int *fontnum) {}
-#else
-
-#define wouttext_outline(a, b, c, d) wouttextxy(a, b, c, d)
-extern void check_font(int *fontnum);
-#endif
+extern void split_lines_rightleft(char *todis, int wii, int fonnt);
+extern char *reverse_text(const char *text);
+extern void wouttext_reverseifnecessary(int x, int y, int font, char *text);
+extern void break_up_text_into_lines(int wii, int fonnt, char *todis);
 
 } // namespace AGS2
 

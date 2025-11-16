@@ -171,7 +171,7 @@ void ccFreeScript(ccScript *ccs) {
 	ccs->numSections = 0;
 }
 
-void fputstring(char *sss, Common::WriteStream *ddd) {
+void fputstring(const char *sss, Common::WriteStream *ddd) {
 	int b = 0;
 	while (sss[b] != 0) {
 		ddd->writeByte(sss[b]);
