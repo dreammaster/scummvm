@@ -19,32 +19,16 @@
  *
  */
 
-#ifndef AGS2_AC_ACDYNAMIC_H
-#define AGS2_AC_ACDYNAMIC_H
+#ifndef AGS2_AC_INVENTORY_H
+#define AGS2_AC_INVENTORY_H
 
-#include "ags2/common/cscomp.h"
+#include "common/scummsys.h"
 
 namespace AGS2 {
 
-struct AGSCCDynamicObject : ICCDynamicObject {
-public:
-	// default implementation
-	virtual int Dispose(const char *address, bool force);
-
-	virtual void Unserialize(int index, const char *serializedData, int dataSize) = 0;
-
-protected:
-	int bytesSoFar;
-	int totalBytes;
-	char *serbuffer;
-
-	void StartSerialize(char *sbuffer);
-	void SerializeInt(int val);
-	int  EndSerialize();
-	void StartUnserialize(const char *sbuffer, int pTotalBytes);
-	int  UnserializeInt();
-
-};
+extern int invscreen();
+extern void sc_invscreen();
+extern void SetInvDimensions(int ww, int hh);
 
 } // namespace AGS2
 

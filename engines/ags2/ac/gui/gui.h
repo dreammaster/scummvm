@@ -25,7 +25,7 @@
 #include "common/serializer.h"
 #include "common/stream.h"
 #include "ags2/common/wgt2allg.h"
-#include "ags2/ac/acroom.h"
+#include "ags2/ac/room.h"
 
 namespace AGS2 {
 

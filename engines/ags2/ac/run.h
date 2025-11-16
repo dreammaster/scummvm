@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef AGS2_AC_ACRUN_H
-#define AGS2_AC_ACRUN_H
+#ifndef AGS2_AC_RUN_H
+#define AGS2_AC_RUN_H
 
 #include "common/scummsys.h"
 

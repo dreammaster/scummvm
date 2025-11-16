@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef AGS2_AC_ACROOM_H
-#define AGS2_AC_ACROOM_H
+#ifndef AGS2_AC_ROOM_H
+#define AGS2_AC_ROOM_H
 
 #include "common/stream.h"
 #include "common/textconsole.h"

@@ -22,7 +22,7 @@
 #ifndef AGS2_GFX_ALI3D_H
 #define AGS2_GFX_ALI3D_H
 
-#include "ags2/ac/acgfx.h"
+#include "ags2/ac/gfx.h"
 
 namespace AGS2 {
 

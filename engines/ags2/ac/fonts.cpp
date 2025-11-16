@@ -26,7 +26,7 @@
 #define USE_CLIB
 #define WGT2ALLEGRO_NOFUNCTIONS
 #include "ags2/common/wgt2allg.h"
-#include "ags2/ac/acroom.h"
+#include "ags2/ac/room.h"
 #include "ags2/ac/acruntime.h"
 #include "ags2/common/clib32.h"
 #include "ags2/vars.h"

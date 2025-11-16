@@ -19,16 +19,30 @@
  *
  */
 
-#ifndef AGS2_AC_ACINVENTORY_H
-#define AGS2_AC_ACINVENTORY_H
+#ifndef AGS2_AC_DIALOG_H
+#define AGS2_AC_DIALOG_H
 
-#include "common/scummsys.h"
+#include "ags2/ac/room.h"
+#include "ags2/ac/gui/gui.h"
 
 namespace AGS2 {
 
-extern int invscreen();
-extern void sc_invscreen();
-extern void SetInvDimensions(int ww, int hh);
+#define CHOSE_TEXTPARSER -3053
+#define SAYCHOSEN_USEFLAG 1
+#define SAYCHOSEN_YES 2
+#define SAYCHOSEN_NO  3
+
+#define MAX_TOPIC_HISTORY 50
+#define DLG_OPTION_PARSER 99
+
+extern int write_dialog_options(int dlgxp, int curyp, int numdisp, int mouseison, int areawid,
+	int bullet_wid, int usingfont, DialogTopic *dtop, char *disporder, short *dispyp,
+	int txthit, int utextcol);
+extern int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBackground);
+extern void draw_gui_for_dialog_options(GUIMain *guib, int dlgxp, int dlgyp);
+extern bool get_custom_dialog_options_dimensions(int dlgnum);
+extern int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBackground);
+extern void do_conversation(int dlgnum);
 
 } // namespace AGS2
 

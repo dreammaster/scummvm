@@ -19,30 +19,27 @@
  *
  */
 
-#ifndef AGS2_AC_ACDIALOG_H
-#define AGS2_AC_ACDIALOG_H
+#ifndef AGS2_AC_SAVEGAME_H
+#define AGS2_AC_SAVEGAME_H
 
-#include "ags2/ac/acroom.h"
-#include "ags2/ac/gui/gui.h"
+#include "common/scummsys.h"
 
 namespace AGS2 {
 
-#define CHOSE_TEXTPARSER -3053
-#define SAYCHOSEN_USEFLAG 1
-#define SAYCHOSEN_YES 2
-#define SAYCHOSEN_NO  3
-
-#define MAX_TOPIC_HISTORY 50
-#define DLG_OPTION_PARSER 99
-
-extern int write_dialog_options(int dlgxp, int curyp, int numdisp, int mouseison, int areawid,
-	int bullet_wid, int usingfont, DialogTopic *dtop, char *disporder, short *dispyp,
-	int txthit, int utextcol);
-extern int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBackground);
-extern void draw_gui_for_dialog_options(GUIMain *guib, int dlgxp, int dlgyp);
-extern bool get_custom_dialog_options_dimensions(int dlgnum);
-extern int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBackground);
-extern void do_conversation(int dlgnum);
+extern void restore_after_dialog();
+extern void RestoreGameSlot(int slnum);
+extern void get_save_game_path(int slotNum, char *buffer);
+extern void DeleteSaveSlot(int slnum);
+extern int Game_SetSaveGameDirectory(const char *newFolder);
+extern int GetSaveSlotDescription(int slnum, char *desbuf);
+extern const char *Game_GetSaveSlotDescription(int slnum);
+extern int LoadSaveSlotScreenshot(int slnum, int width, int height);
+extern int load_game_and_print_error(int toload);
+extern void restore_game_dialog();
+extern void save_game_dialog();
+extern void restart_game();
+extern void SetRestartPoint();
+extern void save_game(int slotn, const char *descript);
 
 } // namespace AGS2
 

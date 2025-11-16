@@ -19,27 +19,25 @@
  *
  */
 
-#ifndef AGS2_AC_ACSAVEGAME_H
-#define AGS2_AC_ACSAVEGAME_H
+#ifndef AGS2_AC_WALKBEHIND_H
+#define AGS2_AC_WALKBEHIND_H
 
 #include "common/scummsys.h"
 
 namespace AGS2 {
 
-extern void restore_after_dialog();
-extern void RestoreGameSlot(int slnum);
-extern void get_save_game_path(int slotNum, char *buffer);
-extern void DeleteSaveSlot(int slnum);
-extern int Game_SetSaveGameDirectory(const char *newFolder);
-extern int GetSaveSlotDescription(int slnum, char *desbuf);
-extern const char *Game_GetSaveSlotDescription(int slnum);
-extern int LoadSaveSlotScreenshot(int slnum, int width, int height);
-extern int load_game_and_print_error(int toload);
-extern void restore_game_dialog();
-extern void save_game_dialog();
-extern void restart_game();
-extern void SetRestartPoint();
-extern void save_game(int slotn, const char *descript);
+enum WalkBehindMethodEnum {
+	DrawOverCharSprite,
+	DrawAsSeparateSprite,
+	DrawAsSeparateCharSprite
+};
+
+extern void update_walk_behind_images();
+extern void recache_walk_behinds();
+extern int get_walkable_area_pixel(int x, int y);
+extern int sort_out_walk_behinds(block sprit, int xx, int yy, int basel, block copyPixelsFrom = NULL, block checkPixelsFrom = NULL, int zoom = 100);
+extern void invalidate_cached_walkbehinds();
+extern void sort_out_char_sprite_walk_behind(int actspsIndex, int xx, int yy, int basel, int zoom, int width, int height);
 
 } // namespace AGS2
 

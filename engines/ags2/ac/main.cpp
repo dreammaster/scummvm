@@ -24,7 +24,7 @@
 #include "gui/debugger.h"
 #include "ags2/ac/main.h"
 #include "ags2/ac/acruntime.h"
-#include "ags2/ac/actimer.h"
+#include "ags2/ac/timer.h"
 #include "ags2/common/clib32.h"
 #include "ags2/common/routefnd.h"
 #include "ags2/lib/allegro/sound.h"

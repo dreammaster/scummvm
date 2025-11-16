@@ -19,22 +19,15 @@
  *
  */
 
-#include "ags2/ac/actimer.h"
-#include "ags2/lib/allegro/timer.h"
-#include "ags2/vars.h"
+#ifndef AGS2_AC_TIMER_H
+#define AGS2_AC_TIMER_H
+
+#include "common/scummsys.h"
 
 namespace AGS2 {
 
-void dj_timer_handler() {
-	globalTimerCounter++;
-	if (mvolcounter > 0)
-		mvolcounter++;
-}
-
-void set_game_speed(int fpsSpeed) {
-	frames_per_second = fpsSpeed;
-	time_between_timers = 1000 / fpsSpeed;
-	install_int_ex(dj_timer_handler, MSEC_TO_TIMER(time_between_timers));
-}
+extern void set_game_speed(int fps);
 
 } // namespace AGS2
+
+#endif

@@ -24,10 +24,10 @@
 
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/surface.h"
-#include "ags2/ac/acdraw.h"
-#include "ags2/ac/acwalkbehind.h"
+#include "ags2/ac/draw.h"
+#include "ags2/ac/walkbehind.h"
 #include "ags2/ac/gui/gui.h"
-#include "ags2/ac/acroom.h"
+#include "ags2/ac/room.h"
 #include "ags2/gfx/sprite_cache.h"
 #include "ags2/ac/acruntime.h"
 
@@ -117,7 +117,7 @@ extern uint32 mvolcounter;
 extern uint32 frames_per_second;
 extern uint32 time_between_timers;
 
-// acgui.cpp
+// ac/gui.cpp
 extern DynamicArray<GUIButton> guibuts;
 extern int numguibuts;
 extern DynamicArray<GUILabel> guilabels;
@@ -131,7 +131,7 @@ extern int numguitext;
 extern DynamicArray<GUIListBox> guilist;
 extern int numguilist;
 
-// acdraw.cpp
+// ac/draw.cpp
 extern SpriteListEntry thingsToDrawList[MAX_THINGS_TO_DRAW];
 extern int thingsToDrawSize;
 extern SpriteListEntry sprlist[MAX_SPRITES_ON_SCREEN];
@@ -142,19 +142,19 @@ extern CachedActSpsData *actspswbcache;
 extern int actSpsCount;
 extern block *actsps;
 
-// acoverlay.cpp
+// ac/overlay.cpp
 extern int is_complete_overlay,is_text_overlay;
 extern int crovr_id;
 
-// acroom.cpp
+// ac/room.cpp
 extern int in_new_room;
 
-// acsavegame.cpp
+// ac/savegame.cpp
 extern unsigned int load_new_game;
 extern int load_new_game_restore;
 extern int gameHasBeenRestored;
 
-// acscripts.cpp
+// ac/scripts.cpp
 extern int num_scripts, eventClaimed;
 extern ExecutingScript scripts[MAX_SCRIPT_AT_ONCE];
 extern ExecutingScript *curscript;
@@ -176,10 +176,10 @@ extern int post_script_cleanup_stack;
 extern ScriptMouse scmouse;
 extern DialogTopic *dialog;
 
-// acsound.cpp
+// ac/sound.cpp
 extern int said_speech_line;
 
-// acwalkbehind.cpp
+// ac/walkbehind.cpp
 extern char *walkBehindExists;  // whether a WB area is in this column
 extern int *walkBehindStartY, *walkBehindEndY;
 extern char noWalkBehindsAtAll;

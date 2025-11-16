@@ -6,17 +6,17 @@ MODULE_OBJS = \
 	metaengine.o \
 	vars.o \
 	ac/main.o \
-	ac/acdraw.o \
-	ac/acfonts.o \
-	ac/acmouse.o \
-	ac/acplatform.o \
-	ac/acplatform_scummvm.o \
-	ac/acresolution.o \
-	ac/acsound.o \
-	ac/actimer.o \
-	ac/acwalkbehind.o \
 	ac/agsplugin.o \
+	ac/draw.o \
+	ac/fonts.o \
+	ac/mouse.o \
+	ac/platform.o \
+	ac/platform_scummvm.o \
+	ac/resolution.o \
 	ac/scripts.o \
+	ac/sound.o \
+	ac/timer.o \
+	ac/walkbehind.o \
 	ac/gui/acgui.o \
 	common/clib32.o \
 	common/compress.o \

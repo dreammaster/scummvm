@@ -20,7 +20,7 @@
  */
 
 #include "common/system.h"
-#include "ags2/ac/acplatform.h"
+#include "ags2/ac/platform.h"
 
 namespace AGS2 {
 

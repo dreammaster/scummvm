@@ -19,15 +19,15 @@
  *
  */
 
-#ifndef AGS2_AC_ACPLATFORM_H
-#define AGS2_AC_ACPLATFORM_H
+#ifndef AGS2_AC_PLATFORM_H
+#define AGS2_AC_PLATFORM_H
 
 #define WGT2ALLEGRO_NOFUNCTIONS
 #include "ags2/common/wgt2allg.h"
 #define CROOM_NOFUNCTIONS
-#include "ags2/ac/acroom.h"
+#include "ags2/ac/room.h"
 #include "ags2/ac/acruntime.h"
-#include "ags2/ac/acsound.h"
+#include "ags2/ac/sound.h"
 #include "ags2/common/cscomp.h"
 #include "ags2/gfx/ali3d.h"
 

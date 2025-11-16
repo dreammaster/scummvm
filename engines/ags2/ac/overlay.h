@@ -19,10 +19,10 @@
  *
  */
 
-#ifndef AGS2_AC_ACOVERLAY_H
-#define AGS2_AC_ACOVERLAY_H
+#ifndef AGS2_AC_OVERLAY_H
+#define AGS2_AC_OVERLAY_H
 
-#include "ags2/ac/acdynamic.h"
+#include "ags2/ac/dynamic.h"
 
 namespace AGS2 {
 

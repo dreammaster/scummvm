@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef AGS2_AC_ACDRAW_H
-#define AGS2_AC_ACDRAW_H
+#ifndef AGS2_AC_DRAW_H
+#define AGS2_AC_DRAW_H
 
 #include "ags2/ac/acruntime.h"
 

@@ -20,7 +20,7 @@
  */
 
 #include "common/textconsole.h"
-#include "ags2/ac/acsound.h"
+#include "ags2/ac/sound.h"
 #include "ags2/lib/allegro/digi.h"
 
 namespace AGS2 {

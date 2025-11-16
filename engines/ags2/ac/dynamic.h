@@ -19,23 +19,32 @@
  *
  */
 
-#ifndef AGS2_AC_ACRESOLUTION_H
-#define AGS2_AC_ACRESOLUTION_H
+#ifndef AGS2_AC_DYNAMIC_H
+#define AGS2_AC_DYNAMIC_H
 
-#include "common/scummsys.h"
+#include "ags2/common/cscomp.h"
 
 namespace AGS2 {
 
-// Multiplies up the number of pixels depending on the current 
-// resolution, to give a relatively fixed size at any game res
-extern int get_fixed_pixel_size(int pixels);
-extern int convert_to_low_res(int coord);
-extern int convert_back_to_high_res(int coord);
-extern int multiply_up_coordinate(int coord);
-extern void multiply_up_coordinates(int *x, int *y);
-extern void multiply_up_coordinates_round_up(int *x, int *y);
-extern int divide_down_coordinate(int coord);
-extern int divide_down_coordinate_round_up(int coord);
+struct AGSCCDynamicObject : ICCDynamicObject {
+public:
+	// default implementation
+	virtual int Dispose(const char *address, bool force);
+
+	virtual void Unserialize(int index, const char *serializedData, int dataSize) = 0;
+
+protected:
+	int bytesSoFar;
+	int totalBytes;
+	char *serbuffer;
+
+	void StartSerialize(char *sbuffer);
+	void SerializeInt(int val);
+	int  EndSerialize();
+	void StartUnserialize(const char *sbuffer, int pTotalBytes);
+	int  UnserializeInt();
+
+};
 
 } // namespace AGS2
 

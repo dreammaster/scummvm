@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef AGS2_AC_ACGFX_H
-#define AGS2_AC_ACGFX_H
+#ifndef AGS2_AC_GFX_H
+#define AGS2_AC_GFX_H
 
 #include "ags2/lib/allegro/surface.h"
 

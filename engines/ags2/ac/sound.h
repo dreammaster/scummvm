@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef AGS2_AC_ACSOUND_H
-#define AGS2_AC_ACSOUND_H
+#ifndef AGS2_AC_SOUND_H
+#define AGS2_AC_SOUND_H
 
 #include "common/scummsys.h"
 

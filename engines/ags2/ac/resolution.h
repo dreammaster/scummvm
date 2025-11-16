@@ -19,25 +19,23 @@
  *
  */
 
-#ifndef AGS2_AC_ACWALKBEHIND_H
-#define AGS2_AC_ACWALKBEHIND_H
+#ifndef AGS2_AC_RESOLUTION_H
+#define AGS2_AC_RESOLUTION_H
 
 #include "common/scummsys.h"
 
 namespace AGS2 {
 
-enum WalkBehindMethodEnum {
-	DrawOverCharSprite,
-	DrawAsSeparateSprite,
-	DrawAsSeparateCharSprite
-};
-
-extern void update_walk_behind_images();
-extern void recache_walk_behinds();
-extern int get_walkable_area_pixel(int x, int y);
-extern int sort_out_walk_behinds(block sprit, int xx, int yy, int basel, block copyPixelsFrom = NULL, block checkPixelsFrom = NULL, int zoom = 100);
-extern void invalidate_cached_walkbehinds();
-extern void sort_out_char_sprite_walk_behind(int actspsIndex, int xx, int yy, int basel, int zoom, int width, int height);
+// Multiplies up the number of pixels depending on the current 
+// resolution, to give a relatively fixed size at any game res
+extern int get_fixed_pixel_size(int pixels);
+extern int convert_to_low_res(int coord);
+extern int convert_back_to_high_res(int coord);
+extern int multiply_up_coordinate(int coord);
+extern void multiply_up_coordinates(int *x, int *y);
+extern void multiply_up_coordinates_round_up(int *x, int *y);
+extern int divide_down_coordinate(int coord);
+extern int divide_down_coordinate_round_up(int coord);
 
 } // namespace AGS2
 

@@ -113,7 +113,7 @@ uint32 mvolcounter;
 uint32 frames_per_second;
 uint32 time_between_timers;
 
-// acgui.cpp
+// ac/gui.cpp
 DynamicArray<GUIButton> guibuts;
 int numguibuts;
 DynamicArray<GUILabel> guilabels;
@@ -127,7 +127,7 @@ int numguitext;
 DynamicArray<GUIListBox> guilist;
 int numguilist;
 
-// acdraw.cpp
+// ac/draw.cpp
 SpriteListEntry thingsToDrawList[MAX_THINGS_TO_DRAW];
 int thingsToDrawSize;
 SpriteListEntry sprlist[MAX_SPRITES_ON_SCREEN];
@@ -138,20 +138,20 @@ CachedActSpsData *actspswbcache;
 int actSpsCount;
 block *actsps;
 
-// acoverlay.cpp
+// ac/overlay.cpp
 int is_complete_overlay, is_text_overlay;
 ScreenOverlay screenover[MAX_SCREEN_OVERLAYS];
 int crovr_id;
 
-// acroom.cpp
+// ac/room.cpp
 int in_new_room;
 
-// acsavegame.cpp
+// ac/savegame.cpp
 unsigned int load_new_game;
 int load_new_game_restore;
 int gameHasBeenRestored;
 
-// acscripts.cpp
+// ac/scripts.cpp
 int num_scripts, eventClaimed;
 ExecutingScript scripts[MAX_SCRIPT_AT_ONCE];
 ExecutingScript *curscript;
@@ -173,10 +173,10 @@ int post_script_cleanup_stack;
 ScriptMouse scmouse;
 DialogTopic *dialog;
 
-// acsound.cpp
+// ac/sound.cpp
 int said_speech_line;
 
-// acwalkbehind.cpp
+// ac/walkbehind.cpp
 char *walkBehindExists;
 int *walkBehindStartY, *walkBehindEndY;
 char noWalkBehindsAtAll;
@@ -272,7 +272,7 @@ Vars::Vars() {
 	globalTimerCounter = mvolcounter = 0;
 	frames_per_second = time_between_timers = 0;
 
-	// acgui.cpp
+	// ac/gui.cpp
 	numguibuts = 0;
 	numguilabels = 0;
 	numguiinv = 0;
@@ -280,7 +280,7 @@ Vars::Vars() {
 	numguitext = 0;
 	numguilist = 0;
 
-	// acdraw.cpp
+	// ac/draw.cpp
 	thingsToDrawSize = 0;
 	sprlistsize = 0;
 	trans_mode = 0;
@@ -289,19 +289,19 @@ Vars::Vars() {
 	actSpsCount = 0;
 	actsps = nullptr;
 
-	// acoverlay.cpp
+	// ac/overlay.cpp
 	is_complete_overlay = is_text_overlay = 0;
 	crovr_id = 2;
 
-	// acroom.cpp
+	// ac/room.cpp
 	in_new_room = 0;
 
-	// acsavegame.cpp
+	// ac/savegame.cpp
 	load_new_game = 0;
 	load_new_game_restore = -1;
 	gameHasBeenRestored = 0;
 
-	// acscripts.cpp
+	// ac/scripts.cpp
 	num_scripts = 0;
 	eventClaimed = EVENT_NONE;
 	curscript = nullptr;
@@ -318,10 +318,10 @@ Vars::Vars() {
 	scmouse.x = scmouse.y = 0;
 	dialog = nullptr;
 
-	// acsound.cpp
+	// ac/sound.cpp
 	said_speech_line = 0;
 
-	// acwalkbehind.cpp
+	// ac/walkbehind.cpp
 	walkBehindExists = NULL;
 	walkBehindStartY = walkBehindEndY = NULL;
 	noWalkBehindsAtAll = 0;

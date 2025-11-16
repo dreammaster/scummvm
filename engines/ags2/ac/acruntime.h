@@ -19,21 +19,21 @@
  *
  */
 
-#ifndef AGS2_AC_ACRUNTIME_H
-#define AGS2_AC_ACRUNTIME_H
+#ifndef AGS2_AC_RUNTIME_H
+#define AGS2_AC_RUNTIME_H
 
 #include "ags2/gfx/ali3d.h"
 #include "ags2/gfx/sprite_cache.h"
-#include "ags2/ac/acdialog.h"
-#include "ags2/ac/acdynamic.h"
-#include "ags2/ac/acinventory.h"
-#include "ags2/ac/acoverlay.h"
-#include "ags2/ac/acresolution.h"
-#include "ags2/ac/acroom.h"
-#include "ags2/ac/acrun.h"
-#include "ags2/ac/acsavegame.h"
-#include "ags2/ac/acsound.h"
-#include "ags2/ac/acgfx.h"
+#include "ags2/ac/dialog.h"
+#include "ags2/ac/dynamic.h"
+#include "ags2/ac/inventory.h"
+#include "ags2/ac/overlay.h"
+#include "ags2/ac/resolution.h"
+#include "ags2/ac/room.h"
+#include "ags2/ac/run.h"
+#include "ags2/ac/savegame.h"
+#include "ags2/ac/sound.h"
+#include "ags2/ac/gfx.h"
 #include "ags2/ac/events.h"
 #include "ags2/ac/scripts.h"
 #include "ags2/ac/gui/button.h"

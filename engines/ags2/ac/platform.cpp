@@ -21,7 +21,7 @@
 
 #include "common/events.h"
 #include "common/system.h"
-#include "ags2/ac/acplatform.h"
+#include "ags2/ac/platform.h"
 #include "ags2/lib/allegro/sound.h"
 #include "ags2/lib/libcda.h"
 #include "ags2/vars.h"

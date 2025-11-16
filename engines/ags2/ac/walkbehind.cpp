@@ -19,7 +19,7 @@
  *
  */
 
-#include "ags2/ac/acdraw.h"
+#include "ags2/ac/draw.h"
 #include "ags2/vars.h"
 
 namespace AGS2 {

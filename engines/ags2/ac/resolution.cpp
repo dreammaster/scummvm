@@ -19,7 +19,7 @@
  *
  */
 
-#include "ags2/ac/acresolution.h"
+#include "ags2/ac/resolution.h"
 #include "ags2/vars.h"
 
 namespace AGS2 {
