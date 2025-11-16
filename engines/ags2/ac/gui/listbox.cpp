@@ -19,45 +19,19 @@
  *
  */
 
-#ifndef AGS2_AC_GUI_GUI_H
-#define AGS2_AC_GUI_GUI_H
-
-#include "common/stream.h"
-#include "ags2/ac/gui/dynamic_array.h"
-#include "ags2/ac/gui/button.h"
-#include "ags2/ac/gui/gui_object.h"
-#include "ags2/ac/gui/interface.h"
-#include "ags2/ac/gui/inv.h"
-#include "ags2/ac/gui/label.h"
 #include "ags2/ac/gui/listbox.h"
-#include "ags2/ac/gui/main.h"
-#include "ags2/ac/gui/slider.h"
-#include "ags2/ac/gui/textbox.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 
-#define GUIF_NOCLICK    1
-#define MOVER_MOUSEDOWNLOCKED -4000
+void GUIListBox::Resized() {
+	if (rowheight == 0) {
+		check_font(&font);
+		ChangeFont(font);
+	}
 
-#ifndef WOUTTEXT_REVERSE
-#define WOUTTEXT_REVERSE wouttext_outline
-#endif
-
-#define GUIMAGIC          0xcafebeef
-//#define MAX_OBJ_EACH_TYPE 251
-
-
-
-#ifdef THIS_IS_THE_ENGINE
-extern void wouttext_outline(int, int, int, char *);
-inline void check_font(int *fontnum) {
+	if (rowheight > 0)
+		num_items_fit = hit / rowheight;
 }
-#else
-
-#define wouttext_outline(a, b, c, d) wouttextxy(a, b, c, d)
-extern void check_font(int *fontnum);
-#endif
 
 } // namespace AGS2
-
-#endif

@@ -130,6 +130,8 @@ extern DynamicArray<GUITextBox> guitext;
 extern int numguitext;
 extern DynamicArray<GUIListBox> guilist;
 extern int numguilist;
+extern AnimatingGUIButton animbuts[MAX_ANIMATING_BUTTONS];
+extern int numAnimButs;
 
 // ac/draw.cpp
 extern SpriteListEntry thingsToDrawList[MAX_THINGS_TO_DRAW];
@@ -189,6 +191,9 @@ extern IDriverDependantBitmap *walkBehindBitmap[MAX_OBJ];
 extern int walkBehindsCachedForBgNum;
 extern WalkBehindMethodEnum walkBehindMethod;
 extern block *actspswb;
+
+// ac/gui/main.cpp
+extern GUIMain *guis;
 
 // routefnd.cpp
 extern int *pathbackx, *pathbacky;

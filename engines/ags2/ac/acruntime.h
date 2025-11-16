@@ -36,10 +36,7 @@
 #include "ags2/ac/gfx.h"
 #include "ags2/ac/events.h"
 #include "ags2/ac/scripts.h"
-#include "ags2/ac/gui/button.h"
 #include "ags2/ac/gui/gui.h"
-#include "ags2/ac/gui/interface.h"
-#include "ags2/ac/gui/slider.h"
 #include "ags2/common/cscomp.h"
 #include "ags2/lib/allegro/digi.h"
 #include "ags2/lib/allegro/midi.h"
@@ -152,14 +149,6 @@ struct ScriptSystem {
 	int viewport_width, viewport_height;
 	char aci_version[10];
 	int reserved[5];  // so that future scripts don't overwrite data
-};
-
-struct AnimatingGUIButton {
-	// index into guibuts array, GUI, button
-	short buttonid, ongui, onguibut;
-	// current animation status
-	short view, loop, frame;
-	short speed, repeat, wait;
 };
 
 struct EventHappened {

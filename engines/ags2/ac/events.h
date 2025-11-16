@@ -29,6 +29,7 @@ namespace AGS2 {
 // mouse cursor functions:
 // set_mouse_cursor: changes visual appearance to specified cursor
 extern void set_mouse_cursor(int newcurs);
+extern void set_default_cursor();
 
 } // namespace AGS2
 

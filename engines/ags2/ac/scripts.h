@@ -34,6 +34,9 @@ namespace AGS2 {
 #define RUN_DIALOG_STOP_DIALOG   -2
 #define RUN_DIALOG_GOTO_PREVIOUS -4
 
+// Check that a supplied buffer from a text script function was not null
+#define VALIDATE_STRING(strin) if ((intptr)strin <= 4096) quit("!String argument was null: make sure you pass a string, not an int, as a buffer")
+
 enum PostScriptAction {
 	ePSANewRoom,
 	ePSAInvScreen,

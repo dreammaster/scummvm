@@ -126,6 +126,8 @@ DynamicArray<GUITextBox> guitext;
 int numguitext;
 DynamicArray<GUIListBox> guilist;
 int numguilist;
+AnimatingGUIButton animbuts[MAX_ANIMATING_BUTTONS];
+int numAnimButs;
 
 // ac/draw.cpp
 SpriteListEntry thingsToDrawList[MAX_THINGS_TO_DRAW];
@@ -186,6 +188,9 @@ IDriverDependantBitmap *walkBehindBitmap[MAX_OBJ];
 int walkBehindsCachedForBgNum;
 WalkBehindMethodEnum walkBehindMethod;
 block *actspswb;
+
+// ac/gui/main.cpp
+GUIMain *guis;
 
 // routefnd.cpp
 int *pathbackx, *pathbacky;
@@ -279,6 +284,7 @@ Vars::Vars() {
 	numguislider = 0;
 	numguitext = 0;
 	numguilist = 0;
+	numAnimButs = 0;
 
 	// ac/draw.cpp
 	thingsToDrawSize = 0;
@@ -329,6 +335,9 @@ Vars::Vars() {
 	walkBehindsCachedForBgNum = 0;
 	walkBehindMethod = DrawOverCharSprite;
 	actspswb = nullptr;
+
+	// ac/gui/main.cpp
+	guis = nullptr;
 
 	// routefnd.cpp
 	pathbackx = pathbacky = nullptr;

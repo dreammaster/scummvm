@@ -22,7 +22,7 @@
 #ifndef AGS2_AC_GUI_BUTTON_H
 #define AGS2_AC_GUI_BUTTON_H
 
-#include "ags2/ac/gui/gui.h"
+#include "ags2/ac/gui/gui_object.h"
 
 namespace AGS2 {
 
@@ -35,6 +35,8 @@ namespace AGS2 {
 #define GBUT_ALIGN_BOTTOMLEFT   6
 #define GBUT_ALIGN_BOTTOMMIDDLE 7
 #define GBUT_ALIGN_BOTTOMRIGHT  8
+
+#define MAX_ANIMATING_BUTTONS 15
 
 struct GUIButton : public GUIObject {
 	char text[50];
@@ -102,6 +104,14 @@ struct GUIButton : public GUIObject {
 	}
 };
 
+struct AnimatingGUIButton {
+	// index into guibuts array, GUI, button
+	short buttonid, ongui, onguibut;
+	// current animation status
+	short view, loop, frame;
+	short speed, repeat, wait;
+};
+
 extern void Button_Animate(GUIButton *butt, int view, int loop, int speed, int repeat);
 extern const char *Button_GetText_New(GUIButton *butt);
 extern void Button_GetText(GUIButton *butt, char *buffer);
@@ -123,6 +133,11 @@ extern void SetButtonText(int guin, int objn, char *newtx);
 extern void AnimateButton(int guin, int objn, int view, int loop, int speed, int repeat);
 extern int GetButtonPic(int guin, int objn, int ptype);
 extern void SetButtonPic(int guin, int objn, int ptype, int slotn);
+
+// returns 1 if animation finished
+extern int UpdateAnimatingButton(int bu);
+extern void StopButtonAnimation(int idxn);
+extern void FindAndRemoveButtonAnimation(int guin, int objn);
 
 } // namespace AGS2
 

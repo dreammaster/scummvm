@@ -19,26 +19,44 @@
  *
  */
 
-#ifndef AGS2_AC_GUI_SLIDER_H
-#define AGS2_AC_GUI_SLIDER_H
+#ifndef AGS2_AC_GUI_LISTBOX_H
+#define AGS2_AC_GUI_LISTBOX_H
 
 #include "ags2/ac/gui/gui_object.h"
 
 namespace AGS2 {
 
-struct GUISlider :public GUIObject {
-	int min, max;
-	int value, mpressed;
-	int handlepic, handleoffset, bgimage;
-	// The following variables are not persisted on disk
-	// Cached (x1, x2, y1, y2) co-ordinates of slider handle
-	int cached_handtlx, cached_handbrx;
-	int cached_handtly, cached_handbry;
+#define MAX_LISTBOX_ITEMS 200
 
-	virtual void WriteToFile(Common::WriteStream *ooo) override;
-	virtual void ReadFromFile(Common::SeekableReadStream *, int)override;
+#define GLF_NOBORDER     1
+#define GLF_NOARROWS     2
+#define GLF_SGINDEXVALID 4
+
+struct GUIListBox : public GUIObject {
+	char *items[MAX_LISTBOX_ITEMS];
+	short saveGameIndex[MAX_LISTBOX_ITEMS];
+	int numItems, selected, topItem, mousexp, mouseyp;
+	int rowheight, num_items_fit;
+	int font, textcol, backcol, exflags;
+	int selectedbgcol;
+	int alignment, reserved1;
+	virtual void WriteToFile(Common::WriteStream *ooo);
+	virtual void ReadFromFile(Common::SeekableReadStream *, int);
+	int  AddItem(const char *toadd);
+	int  InsertItem(int index, const char *toadd);
+	void SetItemText(int index, const char *newtext);
+	void RemoveItem(int index);
+	void Clear();
 	void Draw() override;
-	void MouseMove(int xp, int yp)override;
+	int  IsInRightMargin(int x);
+	int  GetIndexFromCoordinates(int x, int y);
+	void ChangeFont(int newFont);
+	virtual int MouseDown() override;
+
+	void MouseMove(int nx, int ny) override {
+		mousexp = nx - x;
+		mouseyp = ny - y;
+	}
 
 	void MouseOver() override {
 	}
@@ -46,44 +64,33 @@ struct GUISlider :public GUIObject {
 	void MouseLeave() override {
 	}
 
-	virtual int MouseDown() override {
-		mpressed = 1;
-		// lock focus to ourselves
-		return 1;
-	}
-
 	void MouseUp() override {
-		mpressed = 0;
 	}
 
 	void KeyPress(int kp) override {
 	}
 
-	int IsOverControl(int p_x, int p_y, int p_extra) override {
-		// check the overall boundary
-		if (GUIObject::IsOverControl(p_x, p_y, p_extra))
-			return 1;
-		// now check the handle too
-		if ((p_x >= cached_handtlx) && (p_y >= cached_handtly) &&
-			(p_x < cached_handbrx) && (p_y < cached_handbry))
-			return 1;
-		return 0;
-	}
+	void Resized() override;
 
 	void reset() {
 		GUIObject::init();
-		min = 0;
-		max = 10;
-		value = 0;
+		mousexp = 0;
+		mouseyp = 0;
 		activated = 0;
-		cached_handtlx = cached_handbrx = 0;
-		cached_handtly = cached_handbry = 0;
+		numItems = 0;
+		topItem = 0;
+		selected = 0;
+		font = 0;
+		textcol = 0;
+		selectedbgcol = 16;
+		backcol = 7;
+		exflags = 0;
 		numSupportedEvents = 1;
-		supportedEvents[0] = "Change";
+		supportedEvents[0] = "SelectionChanged";
 		supportedEventArgs[0] = "GUIControl *control";
 	}
 
-	GUISlider() {
+	GUIListBox() {
 		reset();
 	}
 };

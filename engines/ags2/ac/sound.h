@@ -78,6 +78,8 @@ SOUNDCLIP *my_load_mod(const char *filname, int repet);
 int  init_mod_player(int numVoices);
 void remove_mod_player();
 
+extern void CheckViewFrame(int view, int loop, int frame);
+
 } // namespace AGS2
 
 #endif

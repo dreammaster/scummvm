@@ -39,6 +39,8 @@
 
 namespace AGS2 {
 
+#define MAX_PATH 256
+
 struct AGS32BitOSDriver : AGSPlatformDriver {
 	virtual void GetSystemTime(ScriptDateTime *);
 	virtual void YieldCPU();

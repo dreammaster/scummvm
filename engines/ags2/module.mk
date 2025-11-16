@@ -18,6 +18,16 @@ MODULE_OBJS = \
 	ac/timer.o \
 	ac/walkbehind.o \
 	ac/gui/acgui.o \
+	ac/gui/button.o \
+	ac/gui/gui.o \
+	ac/gui/gui_object.o \
+	ac/gui/interface.o \
+	ac/gui/inv.o \
+	ac/gui/label.o \
+	ac/gui/listbox.o \
+	ac/gui/main.o \
+	ac/gui/slider.o \
+	ac/gui/textbox.o \
 	common/clib32.o \
 	common/compress.o \
 	common/cscommon.o \
@@ -67,4 +77,3 @@ include $(srcdir)/rules.mk
 
 # Detection objects
 DETECT_OBJS += $(MODULE)/detection.o
-

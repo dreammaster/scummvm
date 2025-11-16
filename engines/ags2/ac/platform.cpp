@@ -952,6 +952,15 @@ int cd_player_control(int cmdd, int datt) {
 	return 0;
 }
 
+void get_current_dir_path(char *buffer, const char *fileName) {
+	if (use_compiled_folder_as_current_dir) {
+		Common::sprintf_s(buffer, MAX_PATH, "Compiled\\%s", fileName);
+	} else
+	{
+		Common::strcpy_s(buffer, MAX_PATH, fileName);
+	}
+}
+
 } // namespace AGS2
 
 #endif

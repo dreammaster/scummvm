@@ -19,44 +19,59 @@
  *
  */
 
-#ifndef AGS2_AC_GUI_GUI_H
-#define AGS2_AC_GUI_GUI_H
+#ifndef AGS2_AC_GUI_LABEL_H
+#define AGS2_AC_GUI_LABEL_H
 
-#include "common/stream.h"
-#include "ags2/ac/gui/dynamic_array.h"
-#include "ags2/ac/gui/button.h"
 #include "ags2/ac/gui/gui_object.h"
-#include "ags2/ac/gui/interface.h"
-#include "ags2/ac/gui/inv.h"
-#include "ags2/ac/gui/label.h"
-#include "ags2/ac/gui/listbox.h"
-#include "ags2/ac/gui/main.h"
-#include "ags2/ac/gui/slider.h"
-#include "ags2/ac/gui/textbox.h"
 
 namespace AGS2 {
 
-#define GUIF_NOCLICK    1
-#define MOVER_MOUSEDOWNLOCKED -4000
+#define MAX_GUILABEL_TEXT_LEN 2048
 
-#ifndef WOUTTEXT_REVERSE
-#define WOUTTEXT_REVERSE wouttext_outline
-#endif
+struct GUILabel : public GUIObject {
+private:
+	char emptyStr[1] = { '\0' };
+	char *text;
+	int textBufferLen;
+public:
+	int font, textcol, align;
 
-#define GUIMAGIC          0xcafebeef
-//#define MAX_OBJ_EACH_TYPE 251
+	virtual void WriteToFile(Common::WriteStream *ooo);
+	virtual void ReadFromFile(Common::SeekableReadStream *, int);
+	void Draw();
+	void printtext_align(int yy, char *teptr);
+	void SetText(const char *newText);
+	const char *GetText();
 
+	void MouseMove(int, int) override {
+	}
 
+	void MouseOver() override {
+	}
 
-#ifdef THIS_IS_THE_ENGINE
-extern void wouttext_outline(int, int, int, char *);
-inline void check_font(int *fontnum) {
-}
-#else
+	void MouseLeave() override {
+	}
 
-#define wouttext_outline(a, b, c, d) wouttextxy(a, b, c, d)
-extern void check_font(int *fontnum);
-#endif
+	void MouseUp() override {
+	}
+
+	void KeyPress(int kp) override {
+	}
+
+	void reset() {
+		GUIObject::init();
+		align = GALIGN_LEFT;
+		font = 0;
+		textcol = 0;
+		numSupportedEvents = 0;
+		text = emptyStr;
+		textBufferLen = 0;
+	}
+
+	GUILabel() {
+		reset();
+	}
+};
 
 } // namespace AGS2
 
