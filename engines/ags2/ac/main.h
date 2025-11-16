@@ -25,6 +25,7 @@
 namespace AGS2 {
 
 extern void ags_main(int argc, const char *argv[]);
+extern void mainloop();
 
 } // namespace AGS2
 

@@ -26,7 +26,7 @@
 #include "ags2/lib/allegro/surface.h"
 #include "ags2/ac/acdraw.h"
 #include "ags2/ac/acwalkbehind.h"
-#include "ags2/ac/acgui.h"
+#include "ags2/ac/gui/gui.h"
 #include "ags2/ac/acroom.h"
 #include "ags2/gfx/sprite_cache.h"
 #include "ags2/ac/acruntime.h"
@@ -61,7 +61,6 @@ extern int inside_script;
 extern int numPluginReaders;
 extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 extern char lines[MAXLINE][200];
-extern ExecutingScript *curscript;
 extern ObjectCache objcache[MAX_INIT_SPR];
 
 extern SpriteCache spriteset;
@@ -111,12 +110,12 @@ extern RoomStatus *roomstats;
 extern block abuf;
 extern AGSPlatformDriver *platform;
 
-// routefnd.cpp
-extern int *pathbackx, *pathbacky;
-extern int waspossible;
-extern int routex1, routey1;
-extern int suggestx, suggesty;
-extern fixed move_speed_x, move_speed_y;
+// misc
+extern int screenresIdx;
+extern uint32 globalTimerCounter;
+extern uint32 mvolcounter;
+extern uint32 frames_per_second;
+extern uint32 time_between_timers;
 
 // acgui.cpp
 extern DynamicArray<GUIButton> guibuts;
@@ -143,6 +142,43 @@ extern CachedActSpsData *actspswbcache;
 extern int actSpsCount;
 extern block *actsps;
 
+// acoverlay.cpp
+extern int is_complete_overlay,is_text_overlay;
+extern int crovr_id;
+
+// acroom.cpp
+extern int in_new_room;
+
+// acsavegame.cpp
+extern unsigned int load_new_game;
+extern int load_new_game_restore;
+extern int gameHasBeenRestored;
+
+// acscripts.cpp
+extern int num_scripts, eventClaimed;
+extern ExecutingScript scripts[MAX_SCRIPT_AT_ONCE];
+extern ExecutingScript *curscript;
+extern int numanother;
+extern char scfunctionname[30];
+extern bool eventWasClaimed;
+extern int no_blocking_functions;
+extern ccScript *scriptModules[MAX_SCRIPT_MODULES];
+extern ccInstance *moduleInst[MAX_SCRIPT_MODULES];
+extern ccInstance *moduleInstFork[MAX_SCRIPT_MODULES];
+extern char *moduleRepExecAddr[MAX_SCRIPT_MODULES];
+extern int numScriptModules;
+extern ccScript *gamescript;
+extern ccScript *dialogScriptsScript;
+extern ccInstance *gameinst, *roominst;
+extern ccInstance *dialogScriptsInst;
+extern ccInstance *gameinstFork, *roominstFork;
+extern int post_script_cleanup_stack;
+extern ScriptMouse scmouse;
+extern DialogTopic *dialog;
+
+// acsound.cpp
+extern int said_speech_line;
+
 // acwalkbehind.cpp
 extern char *walkBehindExists;  // whether a WB area is in this column
 extern int *walkBehindStartY, *walkBehindEndY;
@@ -154,12 +190,12 @@ extern int walkBehindsCachedForBgNum;
 extern WalkBehindMethodEnum walkBehindMethod;
 extern block *actspswb;
 
-// misc
-extern int screenresIdx;
-extern uint32 globalTimerCounter;
-extern uint32 mvolcounter;
-extern uint32 frames_per_second;
-extern uint32 time_between_timers;
+// routefnd.cpp
+extern int *pathbackx, *pathbacky;
+extern int waspossible;
+extern int routex1, routey1;
+extern int suggestx, suggesty;
+extern fixed move_speed_x, move_speed_y;
 
 
 class Vars {

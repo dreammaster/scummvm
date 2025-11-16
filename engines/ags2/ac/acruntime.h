@@ -24,15 +24,30 @@
 
 #include "ags2/gfx/ali3d.h"
 #include "ags2/gfx/sprite_cache.h"
+#include "ags2/ac/acdialog.h"
+#include "ags2/ac/acdynamic.h"
+#include "ags2/ac/acinventory.h"
+#include "ags2/ac/acoverlay.h"
 #include "ags2/ac/acresolution.h"
 #include "ags2/ac/acroom.h"
+#include "ags2/ac/acrun.h"
+#include "ags2/ac/acsavegame.h"
 #include "ags2/ac/acsound.h"
 #include "ags2/ac/acgfx.h"
+#include "ags2/ac/events.h"
+#include "ags2/ac/scripts.h"
+#include "ags2/ac/gui/button.h"
+#include "ags2/ac/gui/gui.h"
+#include "ags2/ac/gui/interface.h"
+#include "ags2/ac/gui/slider.h"
 #include "ags2/common/cscomp.h"
 #include "ags2/lib/allegro/digi.h"
 #include "ags2/lib/allegro/midi.h"
 
 namespace AGS2 {
+
+#define MAX_TOPIC_HISTORY 50
+#define DLG_OPTION_PARSER 99
 
 enum {
 	DBG_NOIFACE			=     1,
@@ -196,54 +211,9 @@ struct GameSetup {
 #define TRANS_OPAQUE        20001
 #define TRANS_RUN_PLUGIN    20002
 
-struct ScreenOverlay {
-	IDriverDependantBitmap *bmp;
-	block pic;
-	int type, x, y, timeout;
-	int bgSpeechForChar;
-	int associatedOverlayHandle;
-	bool hasAlphaChannel;
-	bool positionRelativeToScreen;
-};
-
 struct ScriptObject {
 	int id;
 	RoomObject *obj;
-};
-
-struct AGSCCDynamicObject : ICCDynamicObject {
-public:
-  // default implementation
-  virtual int Dispose(const char *address, bool force);
-
-  virtual void Unserialize(int index, const char *serializedData, int dataSize) = 0;
-
-protected:
-  int bytesSoFar;
-  int totalBytes;
-  char *serbuffer;
-
-  void StartSerialize(char *sbuffer);
-  void SerializeInt(int val);
-  int  EndSerialize();
-  void StartUnserialize(const char *sbuffer, int pTotalBytes);
-  int  UnserializeInt();
-
-};
-
-
-struct ScriptOverlay : AGSCCDynamicObject {
-  int overlayId;
-  int borderWidth;
-  int borderHeight;
-  int isBackgroundSpeech;
-
-  virtual int Dispose(const char *address, bool force);
-  virtual const char *GetType();
-  virtual int Serialize(const char *address, char *buffer, int bufsize);
-  virtual void Unserialize(int index, const char *serializedData, int dataSize);
-  void Remove();
-  ScriptOverlay();
 };
 
 struct ScriptDateTime : AGSCCDynamicObject {
@@ -609,39 +579,6 @@ struct ObjectCache {
 	short lightlevwas, mirroredWas, zoomWas;
 	// The following are used to determine if the character has moved
 	int   xwas, ywas;
-};
-
-enum PostScriptAction {
-	ePSANewRoom,
-	ePSAInvScreen,
-	ePSARestoreGame,
-	ePSARestoreGameDialog,
-	ePSARunAGSGame,
-	ePSARunDialog,
-	ePSARestartGame,
-	ePSASaveGame,
-	ePSASaveGameDialog
-};
-
-#define MAX_QUEUED_SCRIPTS 4
-#define MAX_QUEUED_ACTIONS 5
-struct ExecutingScript {
-	ccInstance *inst;
-	PostScriptAction postScriptActions[MAX_QUEUED_ACTIONS];
-	const char *postScriptActionNames[MAX_QUEUED_ACTIONS];
-	char postScriptSaveSlotDescription[MAX_QUEUED_ACTIONS][100];
-	int  postScriptActionData[MAX_QUEUED_ACTIONS];
-	int  numPostScriptActions;
-	char script_run_another[MAX_QUEUED_SCRIPTS][30];
-	int  run_another_p1[MAX_QUEUED_SCRIPTS];
-	int  run_another_p2[MAX_QUEUED_SCRIPTS];
-	int  numanother;
-	char forked;
-
-	int queue_action(PostScriptAction act, int data, const char *aname);
-	void run_another(char *namm, int p1, int p2);
-	void init();
-	ExecutingScript();
 };
 
 #ifndef _AGS_PLUGIN_H

@@ -189,4 +189,13 @@ IDriverDependantBitmap *recycle_ddb_bitmap(IDriverDependantBitmap *bimp, BITMAP 
 	return bimp;
 }
 
+// returns bytes per pixel for bitmap's color depth
+int bmp_bpp(BITMAP *bmpt) {
+	if (bitmap_color_depth(bmpt) == 15)
+		return 2;
+
+	return bitmap_color_depth(bmpt) / 8;
+}
+
+
 } // namespace AGS2

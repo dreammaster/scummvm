@@ -23,7 +23,6 @@
 
 namespace AGS2 {
 
-#ifndef CROOM_NOFUNCTIONS
 const char *game_file_sig = "Adventure Creator Game File v2";
 #define GAME_FILE_VERSION 42
 block backups[5];
@@ -1589,7 +1588,42 @@ void Convert272ViewsToNew(int numof, ViewStruct272 *oldv, ViewStruct *newv) {
 	}
 }
 
-#endif		// NOFUNCTIONS
+void new_room(int newnum, CharacterInfo *forchar) {
+	EndSkippingUntilCharStops();
+
+	platform->WriteDebugString("Room change requested to room %d", newnum);
+
+	update_polled_stuff();
+
+	// we are currently running Leaves Screen scripts
+	in_leaves_screen = newnum;
+
+	// player leaves screen event
+	run_room_event(8);
+	// Run the global OnRoomLeave event
+	run_on_event(GE_LEAVE_ROOM, displayed_room);
+
+	platform->RunPluginHooks(AGSE_LEAVEROOM, displayed_room);
+
+	// update the new room number if it has been altered by OnLeave scripts
+	newnum = in_leaves_screen;
+	in_leaves_screen = -1;
+
+	if ((playerchar->following >= 0) &&
+		(game.chars[playerchar->following].room != newnum)) {
+		// the player character is following another character,
+		// who is not in the new room. therefore, abort the follow
+		playerchar->following = -1;
+	}
+	update_polled_stuff();
+
+	// change rooms
+	unload_old_room();
+
+	update_polled_stuff();
+
+	load_new_room(newnum, forchar);
+}
 
 } // namespace AGS2
 

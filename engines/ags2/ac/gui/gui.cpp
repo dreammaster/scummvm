@@ -22,6 +22,7 @@
 #define WGT2ALLEGRO_NOFUNCTIONS
 #include "ags2/common/wgt2allg.h"
 #define CROOM_NOFUNCTIONS
+#include "ags2/ac/gui/acgui.h"
 #include "ags2/ac/acroom.h"
 #include "ags2/ac/acruntime.h"
 #include "ags2/ac/acgui.h"

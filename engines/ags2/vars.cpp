@@ -38,8 +38,6 @@ const char *game_file_name;
 GFXFilter *filter;
 MoveList *mls;
 ViewStruct *views;
-ccInstance *gameinst;
-ccInstance *roominst;
 RoomStatus *croom;
 SOUNDCLIP *channels[MAX_SOUND_CHANNELS + 1];
 CharacterCache *charcache;
@@ -55,7 +53,6 @@ PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 char lines[MAXLINE][200];
 int pluginsWantingDebugHooks;
 int use_cdplayer;
-ExecutingScript *curscript;
 ObjectCache objcache[MAX_INIT_SPR];
 
 int force_letterbox;
@@ -108,12 +105,13 @@ int final_col_dep;
 RoomStatus *roomstats;
 AGSPlatformDriver *platform;
 
-// routefnd.cpp
-int *pathbackx, *pathbacky;
-int waspossible = 1;
-int routex1, routey1;
-int suggestx, suggesty;
-fixed move_speed_x, move_speed_y;
+// Misc
+block abuf;
+int screenres, screenresIdx;
+uint32 globalTimerCounter;
+uint32 mvolcounter;
+uint32 frames_per_second;
+uint32 time_between_timers;
 
 // acgui.cpp
 DynamicArray<GUIButton> guibuts;
@@ -140,6 +138,44 @@ CachedActSpsData *actspswbcache;
 int actSpsCount;
 block *actsps;
 
+// acoverlay.cpp
+int is_complete_overlay, is_text_overlay;
+ScreenOverlay screenover[MAX_SCREEN_OVERLAYS];
+int crovr_id;
+
+// acroom.cpp
+int in_new_room;
+
+// acsavegame.cpp
+unsigned int load_new_game;
+int load_new_game_restore;
+int gameHasBeenRestored;
+
+// acscripts.cpp
+int num_scripts, eventClaimed;
+ExecutingScript scripts[MAX_SCRIPT_AT_ONCE];
+ExecutingScript *curscript;
+int numanother;
+char scfunctionname[30];
+bool eventWasClaimed;
+int no_blocking_functions;
+ccScript *scriptModules[MAX_SCRIPT_MODULES];
+ccInstance *moduleInst[MAX_SCRIPT_MODULES];
+ccInstance *moduleInstFork[MAX_SCRIPT_MODULES];
+char *moduleRepExecAddr[MAX_SCRIPT_MODULES];
+int numScriptModules;
+ccScript *gamescript;
+ccScript *dialogScriptsScript;
+ccInstance *gameinst, *roominst;
+ccInstance *dialogScriptsInst;
+ccInstance *gameinstFork, *roominstFork;
+int post_script_cleanup_stack;
+ScriptMouse scmouse;
+DialogTopic *dialog;
+
+// acsound.cpp
+int said_speech_line;
+
 // acwalkbehind.cpp
 char *walkBehindExists;
 int *walkBehindStartY, *walkBehindEndY;
@@ -151,13 +187,13 @@ int walkBehindsCachedForBgNum;
 WalkBehindMethodEnum walkBehindMethod;
 block *actspswb;
 
-// Misc
-block abuf;
-int screenres, screenresIdx;
-uint32 globalTimerCounter;
-uint32 mvolcounter;
-uint32 frames_per_second;
-uint32 time_between_timers;
+// routefnd.cpp
+int *pathbackx, *pathbacky;
+int waspossible = 1;
+int routex1, routey1;
+int suggestx, suggesty;
+fixed move_speed_x, move_speed_y;
+
 
 Vars::Vars() {
 	g_vars = this;
@@ -171,8 +207,6 @@ Vars::Vars() {
 	game_file_name = nullptr;
 	mls = nullptr;
 	views = nullptr;
-	gameinst = nullptr;
-	roominst = nullptr;
 	croom = nullptr;
 	Common::fill(channels, channels + MAX_SOUND_CHANNELS + 1, nullptr);
 	charcache = nullptr;
@@ -186,7 +220,6 @@ Vars::Vars() {
 	numPluginReaders = 0;
 	pluginsWantingDebugHooks = 0;
 	use_cdplayer = 0;
-	curscript = nullptr;
 
 	Common::fill((byte *)&thisroom, (byte *)&thisroom + sizeof(roomstruct), 0);
 	Common::fill((byte *)palette, (byte *)palette + 256 * sizeof(color), 0);
@@ -234,11 +267,10 @@ Vars::Vars() {
 	abuf = nullptr;
 	platform = nullptr;
 
-	pathbackx = pathbacky = nullptr;
-	waspossible = 1;
-	routex1 = routey1 = 0;
-	suggestx = suggesty = 0;
-	move_speed_x = move_speed_y = 0;
+	// Misc
+	screenres = screenresIdx = 0;
+	globalTimerCounter = mvolcounter = 0;
+	frames_per_second = time_between_timers = 0;
 
 	// acgui.cpp
 	numguibuts = 0;
@@ -257,6 +289,38 @@ Vars::Vars() {
 	actSpsCount = 0;
 	actsps = nullptr;
 
+	// acoverlay.cpp
+	is_complete_overlay = is_text_overlay = 0;
+	crovr_id = 2;
+
+	// acroom.cpp
+	in_new_room = 0;
+
+	// acsavegame.cpp
+	load_new_game = 0;
+	load_new_game_restore = -1;
+	gameHasBeenRestored = 0;
+
+	// acscripts.cpp
+	num_scripts = 0;
+	eventClaimed = EVENT_NONE;
+	curscript = nullptr;
+	numanother = 0;
+	eventWasClaimed = false;
+	no_blocking_functions = 0;
+	numScriptModules = 0;
+	gamescript = NULL;
+	dialogScriptsScript = NULL;
+	gameinst = roominst = NULL;
+	dialogScriptsInst = NULL;
+	gameinstFork = roominstFork = NULL;
+	post_script_cleanup_stack = 0;
+	scmouse.x = scmouse.y = 0;
+	dialog = nullptr;
+
+	// acsound.cpp
+	said_speech_line = 0;
+
 	// acwalkbehind.cpp
 	walkBehindExists = NULL;
 	walkBehindStartY = walkBehindEndY = NULL;
@@ -266,9 +330,12 @@ Vars::Vars() {
 	walkBehindMethod = DrawOverCharSprite;
 	actspswb = nullptr;
 
-	screenres = screenresIdx = 0;
-	globalTimerCounter = mvolcounter = 0;
-	frames_per_second = time_between_timers = 0;
+	// routefnd.cpp
+	pathbackx = pathbacky = nullptr;
+	waspossible = 1;
+	routex1 = routey1 = 0;
+	suggestx = suggesty = 0;
+	move_speed_x = move_speed_y = 0;
 }
 
 Vars::~Vars() {

@@ -19,24 +19,28 @@
  *
  */
 
-#ifndef AGS2_AC_ACRESOLUTION_H
-#define AGS2_AC_ACRESOLUTION_H
-
-#include "common/scummsys.h"
+#include "ags2/ac/gui/interface.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 
-// Multiplies up the number of pixels depending on the current 
-// resolution, to give a relatively fixed size at any game res
-extern int get_fixed_pixel_size(int pixels);
-extern int convert_to_low_res(int coord);
-extern int convert_back_to_high_res(int coord);
-extern int multiply_up_coordinate(int coord);
-extern void multiply_up_coordinates(int *x, int *y);
-extern void multiply_up_coordinates_round_up(int *x, int *y);
-extern int divide_down_coordinate(int coord);
-extern int divide_down_coordinate_round_up(int coord);
+void DisableInterface() {
+	play.disabled_user_interface++;
+	guis_need_update = 1;
+	set_mouse_cursor(CURS_WAIT);
+}
+
+void EnableInterface() {
+	guis_need_update = 1;
+	play.disabled_user_interface--;
+	if (play.disabled_user_interface < 1) {
+		play.disabled_user_interface = 0;
+		set_default_cursor();
+	}
+}
+// Returns 1 if user interface is enabled, 0 if disabled
+int IsInterfaceEnabled() {
+	return (play.disabled_user_interface > 0) ? 0 : 1;
+}
 
 } // namespace AGS2
-
-#endif

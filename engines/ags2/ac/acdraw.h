@@ -45,6 +45,8 @@ extern void put_sprite_256(int xxx, int yyy, block piccy);
 extern void repair_alpha_channel(block dest, block bgpic);
 extern block recycle_bitmap(block bimp, int coldep, int wid, int hit);
 extern IDriverDependantBitmap *recycle_ddb_bitmap(IDriverDependantBitmap *bimp, BITMAP *source, bool hasAlpha);
+extern int bmp_bpp(BITMAP *bmpt);
+extern int LoadImageFile(const char *filename);
 
 } // namespace AGS2
 

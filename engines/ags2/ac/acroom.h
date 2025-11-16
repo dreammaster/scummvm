@@ -1428,7 +1428,7 @@ struct MoveList {
   };
 #endif
 
-extern int bmp_bpp(BITMAP *bmpt);
+extern void new_room(int newnum, CharacterInfo *forchar);
 
 } // namespace AGS2
 

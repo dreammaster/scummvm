@@ -5,9 +5,9 @@ MODULE_OBJS = \
 	console.o \
 	metaengine.o \
 	vars.o \
+	ac/main.o \
 	ac/acdraw.o \
 	ac/acfonts.o \
-	ac/acgui.o \
 	ac/acmouse.o \
 	ac/acplatform.o \
 	ac/acplatform_scummvm.o \
@@ -16,7 +16,8 @@ MODULE_OBJS = \
 	ac/actimer.o \
 	ac/acwalkbehind.o \
 	ac/agsplugin.o \
-	ac/main.o \
+	ac/scripts.o \
+	ac/gui/acgui.o \
 	common/clib32.o \
 	common/compress.o \
 	common/cscommon.o \
@@ -44,8 +45,7 @@ MODULE_OBJS = \
 	lib/allegro/system.o  \
 	lib/allegro/timer.o \
 	lib/allegro/unicode.o \
-	lib/libcda.o \
-	stubs.o
+	lib/libcda.o
 
 ifdef USE_FREETYPE2
 MODULE_OBJS += \

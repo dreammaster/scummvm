@@ -19,23 +19,30 @@
  *
  */
 
-#ifndef AGS2_AC_ACRESOLUTION_H
-#define AGS2_AC_ACRESOLUTION_H
+#ifndef AGS2_AC_ACDIALOG_H
+#define AGS2_AC_ACDIALOG_H
 
-#include "common/scummsys.h"
+#include "ags2/ac/acroom.h"
+#include "ags2/ac/gui/gui.h"
 
 namespace AGS2 {
 
-// Multiplies up the number of pixels depending on the current 
-// resolution, to give a relatively fixed size at any game res
-extern int get_fixed_pixel_size(int pixels);
-extern int convert_to_low_res(int coord);
-extern int convert_back_to_high_res(int coord);
-extern int multiply_up_coordinate(int coord);
-extern void multiply_up_coordinates(int *x, int *y);
-extern void multiply_up_coordinates_round_up(int *x, int *y);
-extern int divide_down_coordinate(int coord);
-extern int divide_down_coordinate_round_up(int coord);
+#define CHOSE_TEXTPARSER -3053
+#define SAYCHOSEN_USEFLAG 1
+#define SAYCHOSEN_YES 2
+#define SAYCHOSEN_NO  3
+
+#define MAX_TOPIC_HISTORY 50
+#define DLG_OPTION_PARSER 99
+
+extern int write_dialog_options(int dlgxp, int curyp, int numdisp, int mouseison, int areawid,
+	int bullet_wid, int usingfont, DialogTopic *dtop, char *disporder, short *dispyp,
+	int txthit, int utextcol);
+extern int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBackground);
+extern void draw_gui_for_dialog_options(GUIMain *guib, int dlgxp, int dlgyp);
+extern bool get_custom_dialog_options_dimensions(int dlgnum);
+extern int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBackground);
+extern void do_conversation(int dlgnum);
 
 } // namespace AGS2
 

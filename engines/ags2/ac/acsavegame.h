@@ -19,23 +19,27 @@
  *
  */
 
-#ifndef AGS2_AC_ACRESOLUTION_H
-#define AGS2_AC_ACRESOLUTION_H
+#ifndef AGS2_AC_ACSAVEGAME_H
+#define AGS2_AC_ACSAVEGAME_H
 
 #include "common/scummsys.h"
 
 namespace AGS2 {
 
-// Multiplies up the number of pixels depending on the current 
-// resolution, to give a relatively fixed size at any game res
-extern int get_fixed_pixel_size(int pixels);
-extern int convert_to_low_res(int coord);
-extern int convert_back_to_high_res(int coord);
-extern int multiply_up_coordinate(int coord);
-extern void multiply_up_coordinates(int *x, int *y);
-extern void multiply_up_coordinates_round_up(int *x, int *y);
-extern int divide_down_coordinate(int coord);
-extern int divide_down_coordinate_round_up(int coord);
+extern void restore_after_dialog();
+extern void RestoreGameSlot(int slnum);
+extern void get_save_game_path(int slotNum, char *buffer);
+extern void DeleteSaveSlot(int slnum);
+extern int Game_SetSaveGameDirectory(const char *newFolder);
+extern int GetSaveSlotDescription(int slnum, char *desbuf);
+extern const char *Game_GetSaveSlotDescription(int slnum);
+extern int LoadSaveSlotScreenshot(int slnum, int width, int height);
+extern int load_game_and_print_error(int toload);
+extern void restore_game_dialog();
+extern void save_game_dialog();
+extern void restart_game();
+extern void SetRestartPoint();
+extern void save_game(int slotn, const char *descript);
 
 } // namespace AGS2
 
