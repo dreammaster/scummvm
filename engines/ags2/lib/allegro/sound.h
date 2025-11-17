@@ -30,6 +30,7 @@ extern int midi_voices;
 extern int install_sound(int digiCard, int midiCard, const char *cfgPath = nullptr);
 extern void reserve_voices(int digi, int midi = -1);
 extern void set_volume_per_voice(int scale);
+extern void remove_sound();
 
 } // namespace AGS2
 

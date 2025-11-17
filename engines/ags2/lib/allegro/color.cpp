@@ -31,6 +31,9 @@ namespace AGS2 {
 
 #define VGA_COLOR_TRANS(x) ((x) * 255 / 63)
 
+RGB_MAP *rgb_map;
+COLOR_MAP *color_map;
+
 void color::readFromFile(Common::ReadStream *file) {
 	r = file->readByte();
 	g = file->readByte();
@@ -230,6 +233,11 @@ void set_blender_mode(BlenderMode m, int r, int g, int b, int a) {
 	_G(trans_blend_red) = r;
 	_G(trans_blend_green) = g;
 	_G(trans_blend_blue) = b;
+}
+
+void set_blender_mode(BLENDER_FUNC b15, BLENDER_FUNC b16, BLENDER_FUNC b32,
+		int r, int g, int b, int a) {
+	warning("TODO: set_blender_mode");
 }
 
 void set_alpha_blender(void) {
@@ -500,12 +508,12 @@ int bestfit_color(AL_CONST PALETTE pal, int r, int g, int b) {
 
 /* makecol8:
  *  Converts R, G, and B values (ranging 0-255) to an 8 bit paletted color.
- *  If the global _G(rgb_map) table is initialised, it uses that, otherwise
+ *  If the global rgb_map table is initialised, it uses that, otherwise
  *  it searches through the current palette to find the best match.
  */
 int makecol8(int r, int g, int b) {
-	if (_G(rgb_map))
-		return _G(rgb_map)->data[r >> 3][g >> 3][b >> 3];
+	if (rgb_map)
+		return rgb_map->data[r >> 3][g >> 3][b >> 3];
 	else
 		return bestfit_color(_G(current_palette), r >> 2, g >> 2, b >> 2);
 }
@@ -842,7 +850,7 @@ void create_light_table(COLOR_MAP *table, AL_CONST PALETTE pal, int r, int g, in
 	assert(g >= 0 && g <= 63);
 	assert(b >= 0 && b <= 63);
 
-	if (_G(rgb_map)) {
+	if (rgb_map) {
 		for (x = 0; x < PAL_SIZE - 1; x++) {
 			t1 = x * 0x010101;
 			t2 = 0xFFFFFF - t1;
@@ -856,7 +864,7 @@ void create_light_table(COLOR_MAP *table, AL_CONST PALETTE pal, int r, int g, in
 				g2 = (g1 + pal[y].g * t1) >> 25;
 				b2 = (b1 + pal[y].b * t1) >> 25;
 
-				table->data[x][y] = _G(rgb_map)->data[r2][g2][b2];
+				table->data[x][y] = rgb_map->data[r2][g2][b2];
 			}
 		}
 		if (callback)
@@ -921,7 +929,7 @@ void create_trans_table(COLOR_MAP *table, AL_CONST PALETTE pal, int r, int g, in
 	if (b > 128)
 		b++;
 
-	if (_G(rgb_map))
+	if (rgb_map)
 		add = 255;
 	else
 		add = 127;
@@ -940,12 +948,12 @@ void create_trans_table(COLOR_MAP *table, AL_CONST PALETTE pal, int r, int g, in
 		p = table->data[x];
 		q = tmp;
 
-		if (_G(rgb_map)) {
+		if (rgb_map) {
 			for (y = 0; y < PAL_SIZE; y++) {
 				tr = (i + * (q++)) >> 9;
 				tg = (j + * (q++)) >> 9;
 				tb = (k + * (q++)) >> 9;
-				p[y] = _G(rgb_map)->data[tr][tg][tb];
+				p[y] = rgb_map->data[tr][tg][tb];
 			}
 		} else {
 			for (y = 0; y < PAL_SIZE; y++) {

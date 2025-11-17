@@ -19,32 +19,19 @@
  *
  */
 
-#ifndef AGS2_LIB_ALLEGRO_MIDI_H
-#define AGS2_LIB_ALLEGRO_MIDI_H
+#ifndef AGS2_COMMON_MOUSE32_H
+#define AGS2_COMMON_MOUSE32_H
+
+#include "common/stream.h"
 
 namespace AGS2 {
 
-extern long midi_pos;
+#define MAXCURSORS 20
 
-#define MIDI_AUTODETECT       -1
-#define MIDI_NONE             0
-#define MIDI_DIGMID           AL_ID('D','I','G','I')
-
-struct MIDI {
-	int dummy = 0;
-};
-
-AL_FUNC(MIDI *, load_midi, (AL_CONST char *filename));
-AL_FUNC(void, destroy_midi, (MIDI *midi));
-AL_FUNC(int, play_midi, (MIDI *midi, int loop));
-AL_FUNC(int, play_looped_midi, (MIDI *midi, int loop_start, int loop_end));
-AL_FUNC(void, stop_midi, (void));
-AL_FUNC(void, midi_pause, (void));
-AL_FUNC(void, midi_resume, (void));
-AL_FUNC(int, midi_seek, (int target));
-AL_FUNC(int, get_midi_length, (MIDI *midi));
-AL_FUNC(void, midi_out, (unsigned char *data, int length));
-AL_FUNC(int, load_midi_patches, (void));
+/**
+ * Set the hotspot position within the cursor
+ */
+extern void msethotspot(int, int);
 
 } // namespace AGS2
 

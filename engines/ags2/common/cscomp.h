@@ -72,9 +72,9 @@ extern ccInstance *ccForkInstance(ccInstance *);
 // free the memory associated with the instance
 extern void ccFreeInstance(ccInstance *);
 // get the address of an exported variable in the script
-extern char *ccGetSymbolAddr(ccInstance *, char *);
+extern char *ccGetSymbolAddr(ccInstance *, const char *);
 // call an exported function in the script (3rd arg is number of params)
-extern int ccCallInstance(ccInstance *, char *, long, ...);
+extern int ccCallInstance(ccInstance *, const char *, long, ...);
 // specifies that when the current function returns to the script, it
 // will stop and return from CallInstance
 extern void ccAbortInstance(ccInstance *);
@@ -92,6 +92,8 @@ extern void ccNotifyScriptStillAlive();
 // OBJECT-BASED SCRIPTING RUNTIME FUNCTIONS
 // interface 
 struct ICCDynamicObject {
+	virtual ~ICCDynamicObject() {}
+
 	// when a ref count reaches 0, this is called with the address
 	// of the object. Return 1 to remove the object from memory, 0 to
 	// leave it
@@ -103,11 +105,14 @@ struct ICCDynamicObject {
 	virtual int Serialize(const char *address, char *buffer, int bufsize) = 0;
 };
 struct ICCObjectReader {
+	virtual ~ICCObjectReader() {}
 	virtual void Unserialize(int index, const char *objectType, const char *serializedData, int dataSize) = 0;
 };
 struct ICCStringClass {
+	virtual ~ICCStringClass() {}
 	virtual void *CreateString(const char *fromText) = 0;
 };
+
 // set the class that will be used for dynamic strings
 extern void  ccSetStringClassImpl(ICCStringClass *theClass);
 // register a memory handle for the object and allow script
@@ -184,6 +189,9 @@ extern void fgetstring(char *sss, Common::ReadStream *ddd);
 #define EXPORT_DATA       2
 
 struct ICompareStrings {
+	virtual ~ICompareStrings() {
+	}
+
 	virtual int compare(const char *left, const char *right) {
 		return strcmp(left, right);
 	}

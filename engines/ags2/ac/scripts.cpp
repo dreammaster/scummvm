@@ -25,7 +25,7 @@
 
 namespace AGS2 {
 
-void ExecutingScript::run_another(char *namm, int p1, int p2) {
+void ExecutingScript::run_another(const char *namm, int p1, int p2) {
 	if (numanother < MAX_QUEUED_SCRIPTS)
 		numanother++;
 
@@ -46,7 +46,7 @@ ExecutingScript::ExecutingScript() {
 	init();
 }
 
-int prepare_text_script(ccInstance *sci, char **tsname) {
+int prepare_text_script(ccInstance *sci, const char **tsname) {
 	ccError = 0;
 	if (sci == NULL) return -1;
 	if (ccGetSymbolAddr(sci, tsname[0]) == NULL) {
@@ -256,7 +256,7 @@ void run_function_on_non_blocking_thread(NonBlockingScriptFunction *funcToRun) {
 	_do_run_script_func_cant_block(roominstFork, funcToRun, &funcToRun->roomHasFunction);
 }
 
-int run_script_function_if_exist(ccInstance *sci, char *tsname, int numParam, int iparam, int iparam2, int iparam3) {
+int run_script_function_if_exist(ccInstance *sci, const char *tsname, int numParam, int iparam, int iparam2, int iparam3) {
 	int oldRestoreCount = gameHasBeenRestored;
 	// First, save the current ccError state
 	// This is necessary because we might be attempting
@@ -311,7 +311,7 @@ int run_script_function_if_exist(ccInstance *sci, char *tsname, int numParam, in
 	return toret;
 }
 
-int run_text_script(ccInstance *sci, char *tsname) {
+int run_text_script(ccInstance *sci, const char *tsname) {
 	if (strcmp(tsname, REP_EXEC_NAME) == 0) {
 		// run module rep_execs
 		int room_changes_was = play.room_changes;
@@ -335,7 +335,7 @@ int run_text_script(ccInstance *sci, char *tsname) {
 	return toret;
 }
 
-int run_claimable_event(char *tsname, bool includeRoom, int numParams, int param1, int param2, bool *evtClaimed) {
+int run_claimable_event(const char *tsname, bool includeRoom, int numParams, int param1, int param2, bool *evtClaimed) {
 	*evtClaimed = true;
 	// Run the room script function, and if it is not claimed,
 	// then run the main one

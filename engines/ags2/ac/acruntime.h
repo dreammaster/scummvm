@@ -26,6 +26,7 @@
 #include "ags2/gfx/sprite_cache.h"
 #include "ags2/ac/dialog.h"
 #include "ags2/ac/dynamic.h"
+#include "ags2/ac/events.h"
 #include "ags2/ac/inventory.h"
 #include "ags2/ac/overlay.h"
 #include "ags2/ac/resolution.h"
@@ -34,14 +35,22 @@
 #include "ags2/ac/savegame.h"
 #include "ags2/ac/sound.h"
 #include "ags2/ac/gfx.h"
-#include "ags2/ac/events.h"
 #include "ags2/ac/scripts.h"
 #include "ags2/ac/gui/gui.h"
 #include "ags2/common/cscomp.h"
+#include "ags2/common/events.h"
+#include "ags2/common/mouse32.h"
+#include "ags2/common/tree_map.h"
+#include "ags2/common/dynamic_array.h"
+#include "ags2/lib/winalleg.h"
+#include "ags2/lib/aastr-0.1.1/aastr.h"
 #include "ags2/lib/allegro/digi.h"
 #include "ags2/lib/allegro/midi.h"
+#include "ags2/lib/allegro/keyboard.h"
 
 namespace AGS2 {
+
+#define IS_ANTIALIAS_SPRITES usetup.enable_antialiasing && (play.disable_antialiasing == 0)
 
 #define MAX_TOPIC_HISTORY 50
 #define DLG_OPTION_PARSER 99
@@ -63,6 +72,23 @@ enum {
 // Max script string length
 #define MAX_MAXSTRLEN 200
 #define MAXGLOBALVARS 50
+
+#define REC_MOUSECLICK 1
+#define REC_MOUSEMOVE  2
+#define REC_MOUSEDOWN  3
+#define REC_KBHIT      4
+#define REC_GETCH      5
+#define REC_KEYDOWN    6
+#define REC_MOUSEWHEEL 7
+#define REC_SPEECHFINISHED 8
+#define REC_ENDOFFILE  0x6f
+
+#define UPDATE_MP3 \
+   while (switching_away_from_game) { }\
+   for (musicPollIterator = 0; musicPollIterator <= MAX_SOUND_CHANNELS; musicPollIterator++) { \
+     if ((channels[musicPollIterator] != NULL) && (channels[musicPollIterator]->done == 0)) \
+       channels[musicPollIterator]->poll();\
+   }
 
 extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
 
@@ -783,7 +809,7 @@ extern const char *get_engine_version();
 extern void quitprintf(const char *texx, ...) ;
 extern void RefreshMouse();
 extern void PluginSimulateMouseClick(int pluginButtonID);
-extern int  run_script_function_if_exist(ccInstance*sci,char*tsname,int numParam, int iparam, int iparam2, int iparam3 = 0) ;
+extern int  run_script_function_if_exist(ccInstance *sci, const char *tsname, int numParam, int iparam, int iparam2, int iparam3 = 0) ;
 extern int  IsChannelPlaying(int chan) ;
 extern void stop_and_destroy_channel (int chid) ;
 extern int  rec_kbhit();
@@ -811,7 +837,7 @@ extern void animate_character(CharacterInfo *,int,int,int,int = 0, int = 0);
 extern void calculate_move_stage (MoveList *, int );
 extern void EndSkippingUntilCharStops();
 extern void MoveToWalkableArea(int charid);
-extern void Display(char*, ...);
+extern void Display(const char *, ...);
 extern int  do_movelist_move(short*,int*,int*);
 extern int  is_char_on_another (int sourceChar, int ww, int*fromxptr, int*cwidptr);
 extern int  find_looporder_index (int curloop);

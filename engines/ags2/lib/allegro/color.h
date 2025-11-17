@@ -84,7 +84,13 @@ enum BlenderMode {
 	kTintLightBlenderMode
 };
 
+typedef unsigned long (*BLENDER_FUNC)(unsigned long, unsigned long, unsigned long);
+
 extern int makecol(byte r, byte g, byte b);
+
+AL_VAR(PALETTE, black_palette);
+AL_VAR(RGB_MAP *, rgb_map);
+AL_VAR(COLOR_MAP *, color_map);
 
 AL_ARRAY(const int, _rgb_scale_5);
 AL_ARRAY(const int, _rgb_scale_6);
@@ -106,6 +112,8 @@ AL_FUNC(void, create_light_table, (COLOR_MAP *table, AL_CONST PALETTE pal, int r
 AL_FUNC(void, create_trans_table, (COLOR_MAP *table, AL_CONST PALETTE pal, int r, int g, int b, AL_METHOD(void, callback, (int pos))));
 
 AL_FUNC(void, set_blender_mode, (BlenderMode, int r, int g, int b, int a));
+AL_FUNC(void, set_blender_mode, (BLENDER_FUNC b15, BLENDER_FUNC b16, BLENDER_FUNC b32,
+	int r, int g, int b, int a));
 AL_FUNC(void, set_alpha_blender, (void));
 AL_FUNC(void, set_trans_blender, (int r, int g, int b, int a));
 

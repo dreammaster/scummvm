@@ -38,4 +38,7 @@ void reserve_voices(int digiVoices, int midiVoices) {
 void set_volume_per_voice(int scale) {
 }
 
+void remove_sound() {
+}
+
 } // namespace AGS2

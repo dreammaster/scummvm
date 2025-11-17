@@ -471,7 +471,8 @@ struct NewInteractionValue {
 };
 
 struct NewInteractionAction {
-  virtual void reset() = 0;
+	virtual ~NewInteractionAction() {}
+	virtual void reset() = 0;
 };
 struct NewInteractionCommandList;
 
@@ -486,6 +487,7 @@ struct NewInteractionCommand: public NewInteractionAction {
     children = NULL;
     parent = NULL;
   }
+  ~NewInteractionCommand() override {}
   NewInteractionCommandList *get_child_list() {
     return (NewInteractionCommandList*)children;
   }
@@ -529,6 +531,7 @@ struct NewInteractionCommandList : public NewInteractionAction {
     numCommands = 0;
     timesRun = 0;
   }
+  ~NewInteractionCommandList() override {}
   void reset();
 };
 
@@ -883,27 +886,6 @@ struct ViewStruct272 {
   int       loopflags[16];
   ViewFrame frames[16][20];
   ViewStruct272() { numloops = 0; numframes[0] = 0; }
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    numloops = __getshort__bigendian(fp);
-    for (int i = 0; i < 16; ++i)
-    {
-      numframes[i] = __getshort__bigendian(fp);
-    }
-    // skip padding if there is any
-    fseek(fp, 2*(2 - ((16+1)%2)), SEEK_CUR);
-    fread(loopflags, sizeof(int), 16, fp);
-    for (int j = 0; j < 16; ++j)
-    {
-      for (int i = 0; i < 20; ++i)
-      {
-        frames[j][i].ReadFromFile(fp);
-      }
-    }
-  }
-#endif
 };
 
 #define MCF_ANIMMOVE 1
@@ -918,20 +900,6 @@ struct MouseCursor {
   char  name[10];
   char  flags;
   MouseCursor() { pic = 2054; hotx = 0; hoty = 0; name[0] = 0; flags = 0; view = -1; }
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    pic = getw(fp);
-    hotx = __getshort__bigendian(fp);
-    hoty = __getshort__bigendian(fp);
-    view = __getshort__bigendian(fp);
-    // may need to read padding?
-    fread(name, sizeof(char), 10, fp);
-    flags = getc(fp);
-    fseek(fp, 3, SEEK_CUR);
-  }
-#endif
 };
 
 #define MAX_INV             301
@@ -961,146 +929,77 @@ struct MouseCursor {
 // remember - if change this struct, also change AGSDEFNS.SH and
 // plugin header file struct
 struct CharacterInfo {
-  int   defview;
-  int   talkview;
-  int   view;
-  int   room, prevroom;
-  int   x, y, wait;
-  int   flags;
-  short following;
-  short followinfo;
-  int   idleview;           // the loop will be randomly picked
-  short idletime, idleleft; // num seconds idle before playing anim
-  short transparency;       // if character is transparent
-  short baseline;
-  int   activeinv;
-  int   talkcolor;
-  int   thinkview;
-  short blinkview, blinkinterval; // design time
-  short blinktimer, blinkframe;   // run time
-  short walkspeed_y, pic_yoffs;
-  int   z;    // z-location, for flying etc
-  int   walkwait;
-  short speech_anim_speed, reserved1;  // only 1 reserved left!!
-  short blocking_width, blocking_height;
-  int   index_id;  // used for object functions to know the id
-  short pic_xoffs, walkwaitcounter;
-  short loop, frame;
-  short walking, animating;
-  short walkspeed, animspeed;
-  short inv[MAX_INV];
-  short actx, acty;
-  char  name[40];
-  char  scrname[MAX_SCRIPT_NAME_LEN];
-  char  on;
+	int   defview;
+	int   talkview;
+	int   view;
+	int   room, prevroom;
+	int   x, y, wait;
+	int   flags;
+	short following;
+	short followinfo;
+	int   idleview;           // the loop will be randomly picked
+	short idletime, idleleft; // num seconds idle before playing anim
+	short transparency;       // if character is transparent
+	short baseline;
+	int   activeinv;
+	int   talkcolor;
+	int   thinkview;
+	short blinkview, blinkinterval; // design time
+	short blinktimer, blinkframe;   // run time
+	short walkspeed_y, pic_yoffs;
+	int   z;    // z-location, for flying etc
+	int   walkwait;
+	short speech_anim_speed, reserved1;  // only 1 reserved left!!
+	short blocking_width, blocking_height;
+	int   index_id;  // used for object functions to know the id
+	short pic_xoffs, walkwaitcounter;
+	short loop, frame;
+	short walking, animating;
+	short walkspeed, animspeed;
+	short inv[MAX_INV];
+	short actx, acty;
+	char  name[40];
+	char  scrname[MAX_SCRIPT_NAME_LEN];
+	char  on;
 
-  int get_effective_y();   // return Y - Z
-  int get_baseline();      // return baseline, or Y if not set
-  int get_blocking_top();    // return Y - BlockingHeight/2
-  int get_blocking_bottom(); // return Y + BlockingHeight/2
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    defview = getw(fp);
-    talkview = getw(fp);
-    view = getw(fp);
-    room = getw(fp);
-    prevroom = getw(fp);
-    x = getw(fp);
-    y = getw(fp);
-    wait = getw(fp);
-    flags = getw(fp);
-    following = __getshort__bigendian(fp);
-    followinfo = __getshort__bigendian(fp);
-    idleview = getw(fp);
-    idletime = __getshort__bigendian(fp);
-    idleleft = __getshort__bigendian(fp);
-    transparency = __getshort__bigendian(fp);
-    baseline = __getshort__bigendian(fp);
-    activeinv = getw(fp);
-    talkcolor = getw(fp);
-    thinkview = getw(fp);
-    blinkview = __getshort__bigendian(fp);
-    blinkinterval = __getshort__bigendian(fp);
-    blinktimer = __getshort__bigendian(fp);
-    blinkframe = __getshort__bigendian(fp);
-    walkspeed_y = __getshort__bigendian(fp);
-    pic_yoffs = __getshort__bigendian(fp);
-    z = getw(fp);
-    reserved[0] = getw(fp);
-    reserved[1] = getw(fp);
-    blocking_width = __getshort__bigendian(fp);
-    blocking_height = __getshort__bigendian(fp);;
-    index_id = getw(fp);
-    pic_xoffs = __getshort__bigendian(fp);
-    walkwaitcounter = __getshort__bigendian(fp);
-    loop = __getshort__bigendian(fp);
-    frame = __getshort__bigendian(fp);
-    walking = __getshort__bigendian(fp);
-    animating = __getshort__bigendian(fp);
-    walkspeed = __getshort__bigendian(fp);
-    animspeed = __getshort__bigendian(fp);
-    fread(inv, sizeof(short), MAX_INV, fp);
-    actx = __getshort__bigendian(fp);
-    acty = __getshort__bigendian(fp);
-    fread(name, sizeof(char), 40, fp);
-    fread(scrname, sizeof(char), MAX_SCRIPT_NAME_LEN, fp);
-    on = getc(fp);
-    // MAX_INV is odd, so need to sweep up padding
-    // skip over padding that makes struct a multiple of 4 bytes long
-    fseek(fp, 4 - (((MAX_INV+2)*sizeof(short)+40+MAX_SCRIPT_NAME_LEN+1)%4), SEEK_CUR);
-  }
-#endif
+	int get_effective_y();   // return Y - Z
+	int get_baseline();      // return baseline, or Y if not set
+	int get_blocking_top();    // return Y - BlockingHeight/2
+	int get_blocking_bottom(); // return Y + BlockingHeight/2
 };
 
 
 struct OldCharacterInfo {
-  int   defview;
-  int   talkview;
-  int   view;
-  int   room, prevroom;
-  int   x, y, wait;
-  int   flags;
-  short following;
-  short followinfo;
-  int   idleview;           // the loop will be randomly picked
-  short idletime, idleleft; // num seconds idle before playing anim
-  short transparency;       // if character is transparent
-  short baseline;
-  int   activeinv;          // this is an INT to support SeeR (no signed shorts)
-  short loop, frame;
-  short walking, animating;
-  short walkspeed, animspeed;
-  short inv[100];
-  short actx, acty;
-  char  name[30];
-  char  scrname[16];
-  char  on;
+	int   defview;
+	int   talkview;
+	int   view;
+	int   room, prevroom;
+	int   x, y, wait;
+	int   flags;
+	short following;
+	short followinfo;
+	int   idleview;           // the loop will be randomly picked
+	short idletime, idleleft; // num seconds idle before playing anim
+	short transparency;       // if character is transparent
+	short baseline;
+	int   activeinv;          // this is an INT to support SeeR (no signed shorts)
+	short loop, frame;
+	short walking, animating;
+	short walkspeed, animspeed;
+	short inv[100];
+	short actx, acty;
+	char  name[30];
+	char  scrname[16];
+	char  on;
 };
 
 #define IFLG_STARTWITH 1
 struct InventoryItemInfo {
-  char name[25];
-  int  pic;
-  int  cursorPic, hotx, hoty;
-  int  reserved[5];
-  char flags;
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    fread(name, sizeof(char), 25, fp);
-    fseek(fp, 3, SEEK_CUR);
-    pic = getw(fp);
-    cursor = getw(fp);
-    hotx = getw(fp);
-    hoty = getw(fp);
-    fread(reserved, sizeof(int), 5, fp);
-    flags = getc(fp);
-    fseek(fp, 3, SEEK_CUR);
-  }
-#endif
+	char name[25];
+	int  pic;
+	int  cursorPic, hotx, hoty;
+	int  reserved[5];
+	char flags;
 };
 
 #define MAXTOPICOPTIONS     30
@@ -1129,29 +1028,16 @@ struct InventoryItemInfo {
 #define DCHAR_NARRATOR  999
 #define DCHAR_PLAYER    998
 #define MAX_DIALOG          500
+
 struct DialogTopic {
-  char          optionnames[MAXTOPICOPTIONS][150];
-  int           optionflags[MAXTOPICOPTIONS];
-  unsigned char *optionscripts;
-  short         entrypoints[MAXTOPICOPTIONS];
-  short         startupentrypoint;
-  short         codesize;
-  int           numoptions;
-  int           topicFlags;
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    fread(optionnames, 150*sizeof(char), MAXTOPICOPTIONS, fp);
-    fread(optionflags, sizeof(int), MAXTOPICOPTIONS, fp);
-    optionscripts = (unsigned char *) getw(fp);
-    fread(entrypoints, sizeof(short), MAXTOPICOPTIONS, fp);
-    startupentrypoint = __getshort__bigendian(fp);
-    codesize = __getshort__bigendian(fp);
-    numoptions = getw(fp);
-    topicFlags = getw(fp);
-  }
-#endif
+	char          optionnames[MAXTOPICOPTIONS][150];
+	int           optionflags[MAXTOPICOPTIONS];
+	unsigned char *optionscripts;
+	short         entrypoints[MAXTOPICOPTIONS];
+	short         startupentrypoint;
+	short         codesize;
+	int           numoptions;
+	int           topicFlags;
 };
 
 #define MAX_SPRITES         30000
@@ -1226,119 +1112,80 @@ struct DialogTopic {
 #define FONT_OUTLINE_AUTO -10
 #define MAX_FONT_SIZE 63
 struct OriGameSetupStruct {
-  char              gamename[30];
-  char              options[20];
-  unsigned char     paluses[256];
-  color             defpal[256];
-  InterfaceElement  iface[10];
-  int               numiface;
-  int               numviews;
-  MouseCursor       mcurs[10];
-  char              *globalscript;
-  int               numcharacters;
-  OldCharacterInfo     *chars;
-  EventBlock        __charcond[50];
-  EventBlock        __invcond[100];
-  ccScript          *compiled_script;
-  int               playercharacter;
-  unsigned char     __old_spriteflags[2100];
-  int               totalscore;
-  short             numinvitems;
-  InventoryItemInfo invinfo[100];
-  int               numdialog, numdlgmessage;
-  int               numfonts;
-  int               color_depth;              // in bytes per pixel (ie. 1 or 2)
-  int               target_win;
-  int               dialog_bullet;            // 0 for none, otherwise slot num of bullet point
-  short             hotdot, hotdotouter;   // inv cursor hotspot dot
-  int               uniqueid;    // random key identifying the game
-  int               reserved[2];
-  short             numlang;
-  char              langcodes[MAXLANGUAGE][3];
-  char              *messages[MAXGLOBALMES];
+	char              gamename[30];
+	char              options[20];
+	unsigned char     paluses[256];
+	color             defpal[256];
+	InterfaceElement  iface[10];
+	int               numiface;
+	int               numviews;
+	MouseCursor       mcurs[10];
+	char *globalscript;
+	int               numcharacters;
+	OldCharacterInfo *chars;
+	EventBlock        __charcond[50];
+	EventBlock        __invcond[100];
+	ccScript *compiled_script;
+	int               playercharacter;
+	unsigned char     __old_spriteflags[2100];
+	int               totalscore;
+	short             numinvitems;
+	InventoryItemInfo invinfo[100];
+	int               numdialog, numdlgmessage;
+	int               numfonts;
+	int               color_depth;              // in bytes per pixel (ie. 1 or 2)
+	int               target_win;
+	int               dialog_bullet;            // 0 for none, otherwise slot num of bullet point
+	short             hotdot, hotdotouter;   // inv cursor hotspot dot
+	int               uniqueid;    // random key identifying the game
+	int               reserved[2];
+	short             numlang;
+	char              langcodes[MAXLANGUAGE][3];
+	char *messages[MAXGLOBALMES];
 };
 
 struct OriGameSetupStruct2 : public OriGameSetupStruct {
-  unsigned char   fontflags[10];
-  char            fontoutline[10];
-  int             numgui;
-  WordsDictionary *dict;
-  int             reserved2[8];
+	unsigned char   fontflags[10];
+	char            fontoutline[10];
+	int             numgui;
+	WordsDictionary *dict;
+	int             reserved2[8];
 };
 
 struct OldGameSetupStruct : public OriGameSetupStruct2 {
-  unsigned char spriteflags[6000];
+	unsigned char spriteflags[6000];
 };
 
 // This struct is written directly to the disk file
 // The GameSetupStruct subclass parts are written individually
 struct GameSetupStructBase {
-  char              gamename[50];
-  int32             options[100];
-  unsigned char     paluses[256];
-  color             defpal[256];
-  int32             numviews;
-  int32             numcharacters;
-  int32             playercharacter;
-  int32             totalscore;
-  short             numinvitems;
-  int32             numdialog, numdlgmessage;
-  int32             numfonts;
-  int32             color_depth;          // in bytes per pixel (ie. 1 or 2)
-  int32             target_win;
-  int32             dialog_bullet;        // 0 for none, otherwise slot num of bullet point
-  unsigned short    hotdot, hotdotouter;  // inv cursor hotspot dot
-  int32             uniqueid;    // random key identifying the game
-  int32             numgui;
-  int32             numcursors;
-  int32             default_resolution; // 0=undefined, 1=320x200, 2=320x240, 3=640x400 etc
-  int32             default_lipsync_frame; // used for unknown chars
-  int32             invhotdotsprite;
-  int32             reserved[17];
-  char             *messages[MAXGLOBALMES];
-  WordsDictionary  *dict;
-  char             *globalscript;
-  CharacterInfo    *chars;
-  ccScript         *compiled_script;
-
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    fread(&gamename[0], sizeof(char), 50, fp);
-    fseek(fp, 2, SEEK_CUR);    // skip the array padding
-    fread(options, sizeof(int), 100, fp);
-    fread(&paluses[0], sizeof(unsigned char), 256, fp);
-    // colors are an array of chars
-    fread(&defpal[0], sizeof(char), sizeof(color)*256, fp);
-    numviews = getw(fp);
-    numcharacters = getw(fp);
-    playercharacter = getw(fp);
-    totalscore = getw(fp);
-    numinvitems = __getshort__bigendian(fp);
-    fseek(fp, 2, SEEK_CUR);    // skip the padding
-    numdialog = getw(fp);
-    numdlgmessage = getw(fp);
-    numfonts = getw(fp);
-    color_depth = getw(fp);
-    target_win = getw(fp);
-    dialog_bullet = getw(fp);
-    hotdot = __getshort__bigendian(fp);
-    hotdotouter = __getshort__bigendian(fp);
-    uniqueid = getw(fp);
-    numgui = getw(fp);
-    numcursors = getw(fp);
-    default_resolution = getw(fp);
-    default_lipsync_frame = getw(fp);
-    invhotdotsprite = getw(fp);
-    fread(reserved, sizeof(int), 17, fp);
-    // read the final ptrs so we know to load dictionary, scripts etc
-    fread(messages, sizeof(int), MAXGLOBALMES, fp);
-    dict = (WordsDictionary *) getw(fp);
-    globalscript = (char *) getw(fp);
-    chars = (CharacterInfo *) getw(fp);
-    compiled_script = (ccScript *) getw(fp);
-  }
-#endif
+	char              gamename[50];
+	int32             options[100];
+	unsigned char     paluses[256];
+	color             defpal[256];
+	int32             numviews;
+	int32             numcharacters;
+	int32             playercharacter;
+	int32             totalscore;
+	short             numinvitems;
+	int32             numdialog, numdlgmessage;
+	int32             numfonts;
+	int32             color_depth;          // in bytes per pixel (ie. 1 or 2)
+	int32             target_win;
+	int32             dialog_bullet;        // 0 for none, otherwise slot num of bullet point
+	unsigned short    hotdot, hotdotouter;  // inv cursor hotspot dot
+	int32             uniqueid;    // random key identifying the game
+	int32             numgui;
+	int32             numcursors;
+	int32             default_resolution; // 0=undefined, 1=320x200, 2=320x240, 3=640x400 etc
+	int32             default_lipsync_frame; // used for unknown chars
+	int32             invhotdotsprite;
+	int32             reserved[17];
+	char *messages[MAXGLOBALMES];
+	WordsDictionary *dict;
+	char *globalscript;
+	CharacterInfo *chars;
+	ccScript *compiled_script;
 };
 
 #define MAXVIEWNAMELENGTH 15
@@ -1347,88 +1194,92 @@ struct GameSetupStructBase {
 #define MAX_SG_EXT_LENGTH 20
 #define MAX_SG_FOLDER_LEN 50
 
-struct GameSetupStruct: public GameSetupStructBase {
-  unsigned char     fontflags[MAX_FONTS];
-  char              fontoutline[MAX_FONTS];
-  unsigned char     spriteflags[MAX_SPRITES];
-  InventoryItemInfo invinfo[MAX_INV];
-  MouseCursor       mcurs[MAX_CURSOR];
-  NewInteraction   **intrChar;
-  NewInteraction   *intrInv[MAX_INV];
-  InteractionScripts **charScripts;
-  InteractionScripts **invScripts;
-  int               filever;  // just used by editor
-  char              lipSyncFrameLetters[MAXLIPSYNCFRAMES][50];
-  CustomPropertySchema propSchema;
-  CustomProperties  *charProps, invProps[MAX_INV];
-  char              **viewNames;
-  char              invScriptNames[MAX_INV][MAX_SCRIPT_NAME_LEN];
-  char              dialogScriptNames[MAX_DIALOG][MAX_SCRIPT_NAME_LEN];
-  char              guid[MAX_GUID_LENGTH];
-  char              saveGameFileExtension[MAX_SG_EXT_LENGTH];
-  char              saveGameFolderName[MAX_SG_FOLDER_LEN];
-  int               roomCount;
-  int              *roomNumbers;
-  char            **roomNames;
-  int               audioClipCount;
-  ScriptAudioClip  *audioClips;
-  int               audioClipTypeCount;
-  AudioClipType    *audioClipTypes;
+struct GameSetupStruct : public GameSetupStructBase {
+	unsigned char     fontflags[MAX_FONTS];
+	char              fontoutline[MAX_FONTS];
+	unsigned char     spriteflags[MAX_SPRITES];
+	InventoryItemInfo invinfo[MAX_INV];
+	MouseCursor       mcurs[MAX_CURSOR];
+	NewInteraction **intrChar;
+	NewInteraction *intrInv[MAX_INV];
+	InteractionScripts **charScripts;
+	InteractionScripts **invScripts;
+	int               filever;  // just used by editor
+	char              lipSyncFrameLetters[MAXLIPSYNCFRAMES][50];
+	CustomPropertySchema propSchema;
+	CustomProperties *charProps, invProps[MAX_INV];
+	char **viewNames;
+	char              invScriptNames[MAX_INV][MAX_SCRIPT_NAME_LEN];
+	char              dialogScriptNames[MAX_DIALOG][MAX_SCRIPT_NAME_LEN];
+	char              guid[MAX_GUID_LENGTH];
+	char              saveGameFileExtension[MAX_SG_EXT_LENGTH];
+	char              saveGameFolderName[MAX_SG_FOLDER_LEN];
+	int               roomCount;
+	int *roomNumbers;
+	char **roomNames;
+	int               audioClipCount;
+	ScriptAudioClip *audioClips;
+	int               audioClipTypeCount;
+	AudioClipType *audioClipTypes;
 };
 
 struct SpeechLipSyncLine {
-  char  filename[14];
-  int  *endtimeoffs;
-  short*frame;
-  short numPhenomes;
+	char  filename[14];
+	int *endtimeoffs;
+	short *frame;
+	short numPhenomes;
 };
 
 // permission flags
 #define SMP_NOEDITINFO    1
 #define SMP_NOEDITSCRIPTS 2
 struct ScriptModule {
-  char *name;
-  char *author;
-  char *version;
-  char *description;
-  char *scriptHeader;
-  char *script;
-  int  uniqueKey;
-  int  permissions;
-  int  weAreOwner;
-  ccScript *compiled;
+	char *name;
+	char *author;
+	char *version;
+	char *description;
+	char *scriptHeader;
+	char *script;
+	int  uniqueKey;
+	int  permissions;
+	int  weAreOwner;
+	ccScript *compiled;
 
-  void init() { 
-    name = NULL;
-    author = NULL;
-    version = NULL;
-    description = NULL;
-    script = NULL;
-    scriptHeader = NULL;
-    uniqueKey = 0;
-    permissions = 0;
-    weAreOwner = 1;
-    compiled = NULL;
-  }
+	void init() {
+		name = NULL;
+		author = NULL;
+		version = NULL;
+		description = NULL;
+		script = NULL;
+		scriptHeader = NULL;
+		uniqueKey = 0;
+		permissions = 0;
+		weAreOwner = 1;
+		compiled = NULL;
+	}
 
-  ScriptModule() { init(); }
+	ScriptModule() {
+		init();
+	}
 };
 
 #ifndef ROOMEDIT
 #define MAXNEEDSTAGES 40
 struct MoveList {
-  int   pos[MAXNEEDSTAGES];
-  int   numstage;
-  fixed xpermove[MAXNEEDSTAGES], ypermove[MAXNEEDSTAGES];
-  int   fromx, fromy;
-  int   onstage, onpart;
-  int   lastx, lasty;
-  char  doneflag;
-  char  direct;  // MoveCharDirect was used or not
-  };
+	int   pos[MAXNEEDSTAGES];
+	int   numstage;
+	fixed xpermove[MAXNEEDSTAGES], ypermove[MAXNEEDSTAGES];
+	int   fromx, fromy;
+	int   onstage, onpart;
+	int   lastx, lasty;
+	char  doneflag;
+	char  direct;  // MoveCharDirect was used or not
+};
 #endif
 
 extern void new_room(int newnum, CharacterInfo *forchar);
+extern void read_string_decrypt(Common::SeekableReadStream *ooo, char *sss);
+extern void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes);
 
 } // namespace AGS2
 

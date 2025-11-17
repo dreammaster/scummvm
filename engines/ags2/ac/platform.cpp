@@ -50,7 +50,7 @@ void AGSPlatformDriver::ShutdownPlugins() {
 }
 void AGSPlatformDriver::StartPlugins() {
 }
-int  AGSPlatformDriver::RunPluginHooks(int event, int data) {
+int  AGSPlatformDriver::RunPluginHooks(int /*event*/, int data) {
 	return 0;
 }
 void AGSPlatformDriver::WriteDebugString(const char *, ...) {
@@ -191,39 +191,39 @@ BITMAP *IAGSEngine::GetVirtualScreen() {
 
 	return gfxDriver->GetMemoryBackBuffer();
 }
-void IAGSEngine::RequestEventHook(int event) {
-	if (event >= AGSE_TOOHIGH)
+void IAGSEngine::RequestEventHook(int evt) {
+	if (evt >= AGSE_TOOHIGH)
 		quit("!IAGSEngine::RequestEventHook: invalid event requested");
 
 	if (plugins[this->pluginId].onEvent == NULL)
 		quit("!IAGSEngine::RequestEventHook: no callback AGS_EngineOnEvent function exported from plugin");
 
-	if ((event & AGSE_SCRIPTDEBUG) &&
+	if ((evt & AGSE_SCRIPTDEBUG) &&
 		((plugins[this->pluginId].wantHook & AGSE_SCRIPTDEBUG) == 0)) {
 		pluginsWantingDebugHooks++;
 		ccSetDebugHook(scriptDebugHook);
 	}
 
-	if (event & AGSE_AUDIODECODE) {
+	if (evt & AGSE_AUDIODECODE) {
 		quit("Plugin requested AUDIODECODE, which is no longer supported");
 	}
 
 
-	plugins[this->pluginId].wantHook |= event;
+	plugins[this->pluginId].wantHook |= evt;
 }
 
-void IAGSEngine::UnrequestEventHook(int event) {
-	if (event >= AGSE_TOOHIGH)
+void IAGSEngine::UnrequestEventHook(int evt) {
+	if (evt >= AGSE_TOOHIGH)
 		quit("!IAGSEngine::UnrequestEventHook: invalid event requested");
 
-	if ((event & AGSE_SCRIPTDEBUG) &&
+	if ((evt & AGSE_SCRIPTDEBUG) &&
 		(plugins[this->pluginId].wantHook & AGSE_SCRIPTDEBUG)) {
 		pluginsWantingDebugHooks--;
 		if (pluginsWantingDebugHooks < 1)
 			ccSetDebugHook(NULL);
 	}
 
-	plugins[this->pluginId].wantHook &= ~event;
+	plugins[this->pluginId].wantHook &= ~evt;
 }
 
 int IAGSEngine::GetSavedData(char *buffer, int bufsize) {
@@ -677,16 +677,16 @@ void IAGSEngine::AddManagedObjectReader(const char *typeName, IAGSManagedObjectR
 	numPluginReaders++;
 }
 
-void IAGSEngine::RegisterUnserializedObject(int key, const void *object, IAGSScriptManagedObject *callback) {
-	ccRegisterUnserializedObject(key, object, (ICCDynamicObject *)callback);
+void IAGSEngine::RegisterUnserializedObject(int objKey, const void *object, IAGSScriptManagedObject *callback) {
+	ccRegisterUnserializedObject(objKey, object, (ICCDynamicObject *)callback);
 }
 
 int IAGSEngine::GetManagedObjectKeyByAddress(const char *address) {
 	return ccGetObjectHandleFromAddress(address);
 }
 
-void *IAGSEngine::GetManagedObjectAddressByKey(int key) {
-	return (void *)ccGetObjectAddressFromHandle(key);
+void *IAGSEngine::GetManagedObjectAddressByKey(int objKey) {
+	return (void *)ccGetObjectAddressFromHandle(objKey);
 }
 
 const char *IAGSEngine::CreateScriptString(const char *fromText) {
@@ -775,11 +775,11 @@ void pl_startup_plugins() {
 	}
 }
 
-int pl_run_plugin_hooks(int event, int data) {
+int pl_run_plugin_hooks(int evt, int data) {
 	int i, retval = 0;
 	for (i = 0; i < numPlugins; i++) {
-		if (plugins[i].wantHook & event) {
-			retval = plugins[i].onEvent(event, data);
+		if (plugins[i].wantHook & evt) {
+			retval = plugins[i].onEvent(evt, data);
 			if (retval)
 				return retval;
 		}

@@ -26,10 +26,18 @@
 
 namespace AGS2 {
 
-// mouse cursor functions:
-// set_mouse_cursor: changes visual appearance to specified cursor
-extern void set_mouse_cursor(int newcurs);
-extern void set_default_cursor();
+enum {
+	EV_TEXTSCRIPT = 1,
+	EV_RUNEVBLOCK = 2,
+	EV_FADEIN     = 3,
+	EV_IFACECLICK = 4,
+	EV_NEWROOM    = 5
+};
+
+enum {
+	EVB_HOTSPOT   = 1,
+	EVB_ROOM      = 2
+};
 
 } // namespace AGS2
 

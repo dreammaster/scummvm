@@ -49,9 +49,22 @@ enum PostScriptAction {
 	ePSASaveGameDialog
 };
 
+struct ScriptGUI {
+	int id;
+	GUIMain *gui;
+};
 
-struct NonBlockingScriptFunction
-{
+struct ScriptHotspot {
+	int id;
+	int reserved;
+};
+
+struct ScriptRegion {
+	int id;
+	int reserved;
+};
+
+struct NonBlockingScriptFunction {
 	const char *functionName;
 	int numParameters;
 	void *param1 = nullptr;
@@ -80,22 +93,22 @@ struct ExecutingScript {
 	char forked;
 
 	int queue_action(PostScriptAction act, int data, const char *aname);
-	void run_another(char *namm, int p1, int p2);
+	void run_another(const char *namm, int p1, int p2);
 	void init();
 	ExecutingScript();
 };
 
-extern int prepare_text_script(ccInstance *sci, char **tsname);
+extern int prepare_text_script(ccInstance *sci, const char **tsname);
 extern void cancel_all_scripts();
 extern void post_script_cleanup();
 extern void quit_with_script_error(const char *functionName);
 extern void _do_run_script_func_cant_block(ccInstance *forkedinst, NonBlockingScriptFunction *funcToRun, bool *hasTheFunc);
 extern void run_function_on_non_blocking_thread(NonBlockingScriptFunction *funcToRun);
-extern int run_script_function_if_exist(ccInstance *sci, char *tsname, int numParam, int iparam, int iparam2, int iparam3);
-extern int run_text_script(ccInstance *sci, char *tsname);
+extern int run_script_function_if_exist(ccInstance *sci, const char *tsname, int numParam, int iparam, int iparam2, int iparam3);
+extern int run_text_script(ccInstance *sci, const char *tsname);
 extern int run_claimable_event(char *tsname, bool includeRoom, int numParams, int param1, int param2, bool *eventWasClaimed);
-extern int run_text_script_iparam(ccInstance *sci, char *tsname, int iparam);
-extern int run_text_script_2iparam(ccInstance *sci, char *tsname, int iparam, int param2);
+extern int run_text_script_iparam(ccInstance *sci, const char *tsname, int iparam);
+extern int run_text_script_2iparam(ccInstance *sci, const char *tsname, int iparam, int param2);
 extern void update_script_mouse_coords();
 extern void RunDialog(int tum);
 extern void do_conversation(int dlgnu);

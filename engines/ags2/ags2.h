@@ -65,8 +65,12 @@ public:
 	/**
 	 * Gets a random number
 	 */
-	uint32 getRandomNumber(uint maxNum) {
+	uint32 getRandomNumber(uint maxNum = 0x7fffffff) {
 		return _randomSource.getRandomNumber(maxNum);
+	}
+
+	void setRandomSeed(uint seed) {
+		_randomSource.setSeed(seed);
 	}
 
 	bool hasFeature(EngineFeature f) const override {

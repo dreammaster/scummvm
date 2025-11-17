@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef AGS2_LIB_FILE_H
-#define AGS2_LIB_FILE_H
+#ifndef AGS2_COMMON_FILE_H
+#define AGS2_COMMON_FILE_H
 
 #include "common/stream.h"
 #include "common/debug.h"

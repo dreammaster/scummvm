@@ -44,6 +44,9 @@ extern bool get_custom_dialog_options_dimensions(int dlgnum);
 extern int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBackground);
 extern void do_conversation(int dlgnum);
 
+extern int loadgamedialog();
+extern int savegamedialog();
+
 } // namespace AGS2
 
 #endif

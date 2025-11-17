@@ -27,6 +27,10 @@
 
 namespace AGS2 {
 
+struct IAGSEditorDebugger {
+	void Shutdown() {}
+};
+
 class Console : public GUI::Debugger {
 private:
 	bool Cmd_test(int argc, const char **argv);

@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef AGS2_AC_GUI_DYNAMIC_ARRAY_H
-#define AGS2_AC_GUI_DYNAMIC_ARRAY_H
+#ifndef AGS2_COMMON_DYNAMIC_ARRAY_H
+#define AGS2_COMMON_DYNAMIC_ARRAY_H
 
 #include "common/scummsys.h"
 

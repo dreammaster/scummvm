@@ -19,32 +19,14 @@
  *
  */
 
-#ifndef AGS2_LIB_ALLEGRO_MIDI_H
-#define AGS2_LIB_ALLEGRO_MIDI_H
+#ifndef AGS2_LIB_ALLEGRO_DATAFILE_H
+#define AGS2_LIB_ALLEGRO_DATAFILE_H
+
+#include "ags2/lib/allegro/color.h"
 
 namespace AGS2 {
 
-extern long midi_pos;
-
-#define MIDI_AUTODETECT       -1
-#define MIDI_NONE             0
-#define MIDI_DIGMID           AL_ID('D','I','G','I')
-
-struct MIDI {
-	int dummy = 0;
-};
-
-AL_FUNC(MIDI *, load_midi, (AL_CONST char *filename));
-AL_FUNC(void, destroy_midi, (MIDI *midi));
-AL_FUNC(int, play_midi, (MIDI *midi, int loop));
-AL_FUNC(int, play_looped_midi, (MIDI *midi, int loop_start, int loop_end));
-AL_FUNC(void, stop_midi, (void));
-AL_FUNC(void, midi_pause, (void));
-AL_FUNC(void, midi_resume, (void));
-AL_FUNC(int, midi_seek, (int target));
-AL_FUNC(int, get_midi_length, (MIDI *midi));
-AL_FUNC(void, midi_out, (unsigned char *data, int length));
-AL_FUNC(int, load_midi_patches, (void));
+extern BITMAP *load_bitmap(const char *filename, RGB *pal);
 
 } // namespace AGS2
 

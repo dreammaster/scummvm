@@ -21,6 +21,7 @@
 
 #include "common/system.h"
 #include "ags2/common/wgt2allg.h"
+#include "ags2/common/mouse32.h"
 #include "ags2/vars.h"
 
 namespace AGS2 {
@@ -33,7 +34,6 @@ static short lresult;
 static int lsize;
 static char password[16];
 static char *wgtlibrary;
-static int vesa_xres, vesa_yres;
 
 void vga256() {
 #ifdef TODO

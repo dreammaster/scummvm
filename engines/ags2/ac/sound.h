@@ -32,6 +32,14 @@ namespace AGS2 {
 #define MUS_MOD  4
 #define MUS_OGG  5
 
+#define SCHAN_SPEECH  0
+#define SCHAN_AMBIENT 1
+#define SCHAN_MUSIC   2
+#define SCHAN_NORMAL  3
+#define AUDIOTYPE_LEGACY_AMBIENT_SOUND 1
+#define AUDIOTYPE_LEGACY_MUSIC 2
+#define AUDIOTYPE_LEGACY_SOUND 3
+
 struct SOUNDCLIP {
 	int done = 0;
 	int priority = 50;
@@ -48,6 +56,9 @@ struct SOUNDCLIP {
 	int directionalVolModifier = 0;
 	bool repeat = false;
 	void *sourceClip = nullptr;
+
+	virtual ~SOUNDCLIP() {
+	}
 
 	virtual int poll() = 0;
 	virtual void destroy() = 0;

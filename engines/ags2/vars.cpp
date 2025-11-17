@@ -29,6 +29,10 @@ GameSetupStruct game;
 GameSetupStruct thisgame;
 GameState play;
 GameSetup usetup;
+RoomStatus *roomstats;
+roomstruct thisroom;
+RoomStatus troom;    // used for non-saveable rooms, eg. intro
+CharacterExtras *charextra;
 
 SpriteCache spritset(1);
 BITMAP *screen;
@@ -40,37 +44,21 @@ MoveList *mls;
 ViewStruct *views;
 RoomStatus *croom;
 SOUNDCLIP *channels[MAX_SOUND_CHANNELS + 1];
-CharacterCache *charcache;
-int displayed_room;
-int use_cd_player;
-int scrnwid, scrnhit;
-int mousex, mousey;
-int offsetx, offsety;
-int numlines;
-int inside_script;
-int numPluginReaders;
-PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
-char lines[MAXLINE][200];
-int pluginsWantingDebugHooks;
-int use_cdplayer;
-ObjectCache objcache[MAX_INIT_SPR];
+SOUNDCLIP *cachedQueuedMusic;
+int numSoundChannels;
 
-int force_letterbox;
-int game_paused;
-int ifacepopped;
-roomstruct thisroom;
-color palette[256];
-int currentcolor;
+char saveGameDirectory[260] = "./";
+char replayfile[MAX_PATH] = "record.dat";
+const char *sgnametemplate = "agssave.%03d";
 
 // initially size 1, this will be increased by the initFile function
 SpriteCache spriteset(1);
 int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];
 int current_screen_resolution_multiplier_x, current_screen_resolution_multiplier_y;
-int current_screen_resolution_multiplier;
 
-int our_eip;
-int eip_guinum, eip_guiobj;
+int our_eip, eip_guinum, eip_guiobj;
 int fps, display_fps;
+int frames_per_second;
 int debug_flags;
 
 // Startup flags, set from parameters to engine
@@ -79,39 +67,160 @@ int override_start_room, force_16bit;
 bool justRegisterGame;
 bool justUnRegisterGame;
 const char *loadSaveGameOnStartup;
-
-int use_compiled_folder_as_current_dir = 0;
-int editor_debugging_enabled = 0;
-int editor_debugging_initialized = 0;
-char editor_debugger_instance_token[100];
-int break_on_next_script_step = 0;
-volatile int game_paused_in_debugger = 0;
-
-int in_enters_screen, done_es_error;
-int in_leaves_screen;
-int need_to_stop_cd;
-bool debug_15bit_mode, debug_24bit_mode;
-int said_text;
-int convert_16bit_bgr;
-int mouse_z_was;
-int bg_just_changed;
-int loaded_game_file_version;
-volatile bool want_exit, abort_engine;
-bool check_dynamic_sprites_at_exit;
-char return_to_roomedit[30];
-char return_to_room[150];
-
-int final_col_dep;
-RoomStatus *roomstats;
 AGSPlatformDriver *platform;
 
 // Misc
 block abuf;
 int screenres, screenresIdx;
-uint32 globalTimerCounter;
-uint32 mvolcounter;
-uint32 frames_per_second;
-uint32 time_between_timers;
+volatile uint32 globalTimerCounter;
+volatile int mvolcounter, timerloop;
+short *recordbuffer;
+int recsize, recbuffersize;
+unsigned long loopcounter, lastcounter;
+unsigned long replay_last_second;
+int replay_time;
+int replay_start_this_time;
+int first_debug_line, last_debug_line, display_console;
+DebugConsoleText debug_line[DEBUG_CONSOLE_NUMLINES];
+char pexbuf[STD_BUFFER_SIZE];
+int current_music_type;
+TreeMap *transtree;
+char transFileName[MAX_PATH];
+long lang_offs_start;
+int source_text_length;
+int update_music_at;
+int time_between_timers;
+bool current_background_is_dirty;
+int longestline;
+block _old_screen, _sub_screen;
+IDriverDependantBitmap *mouseCursor;
+IDriverDependantBitmap *blankImage;
+IDriverDependantBitmap *blankSidebarImage;
+IDriverDependantBitmap *debugConsole;
+ScriptSystem scsystem;
+int oldmouse, oldmousex, oldmousey;
+
+// crossFading is >0 (channel number of new track), or -1 (old
+// track fading out, no new track)
+int crossFading, crossFadeVolumePerStep, crossFadeStep;
+int crossFadeVolumeAtStart;
+int last_sound_played[MAX_SOUND_CHANNELS + 1];
+int current_screen_resolution_multiplier;
+int force_letterbox;
+int ifacepopped;  // currently displayed pop-up GUI (-1 if none)
+//block spriteset[MAX_SPRITES+1];
+//SpriteCache spriteset (MAX_SPRITES+1);
+// initially size 1, this will be increased by the initFile function
+long t1;  // timer for FPS
+int cur_mode, cur_cursor;
+char saveGameSuffix[MAX_SG_EXT_LENGTH + 1];
+//int abort_all_conditions=0;
+RoomObject *objs;
+CharacterInfo *playerchar;
+long _sc_PlayerCharPtr;
+int use_extra_sound_offset;
+block debugConsoleBuffer;
+block blank_mouse_cursor;
+
+PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
+int numPluginReaders;
+COLOR_MAP maincoltable;
+block walkareabackup, walkable_areas_temp;
+int getloctype_index, getloctype_throughgui;
+int user_disabled_for, user_disabled_data, user_disabled_data2;
+int user_disabled_data3;
+int face_talking = -1, facetalkview, facetalkwait, facetalkframe;
+int facetalkloop, facetalkrepeat, facetalkAllowBlink;
+int facetalkBlinkLoop;
+CharacterInfo *facetalkchar;
+int loops_per_character, text_lips_offset, char_speaking = -1;
+char *text_lips_text;
+SpeechLipSyncLine *splipsync;
+int numLipLines, curLipLine = -1, curLipLinePhenome;
+char **characterScriptObjNames;
+char objectScriptObjNames[MAX_INIT_SPR][MAX_SCRIPT_NAME_LEN + 5];
+char **guiScriptObjNames;
+int working_gfx_mode_status = -1;
+int restrict_until;
+int gs_to_newroom = -1;
+int proper_exit;
+int numscreenover;
+int scaddr;
+int walk_behind_baselines_changed;
+int displayed_room, starting_room;
+int mouse_on_iface;
+int mouse_on_iface_button;
+int mouse_pushed_iface;
+int mouse_ifacebut_xoffs, mouse_ifacebut_yoffs;
+IDriverDependantBitmap *roomBackgroundBmp;
+int use_compiled_folder_as_current_dir;
+int editor_debugging_enabled;
+int editor_debugging_initialized;
+char editor_debugger_instance_token[100];
+IAGSEditorDebugger *editor_debugger;
+int break_on_next_script_step;
+volatile int game_paused_in_debugger;
+void *editor_window_handle;
+int in_enters_screen, done_es_error;
+int in_leaves_screen = -1;
+int need_to_stop_cd;
+int said_text;
+int convert_16bit_bgr;
+int mouse_z_was;
+int bg_just_changed;
+int loaded_game_file_version;
+const char *evblockbasename;
+int evblocknum;
+int new_room_pos;
+int new_room_x = SCR_NO_VALUE, new_room_y = SCR_NO_VALUE;
+int inside_script, in_graph_script;
+int in_inv_screen, inv_screen_newroom = -1;
+int mouse_frame, mouse_delay;
+int lastmx = -1, lastmy = -1;
+int new_room_flags;
+int use_cdplayer;
+bool triedToUseCdAudioCommand;
+int final_scrn_wid, final_scrn_hit, final_col_dep;
+IDriverDependantBitmap **actspsbmp;
+CharacterCache *charcache;
+ObjectCache objcache[MAX_INIT_SPR];
+ScriptObject scrObj[MAX_INIT_SPR];
+ScriptGUI *scrGui;
+ScriptHotspot scrHotspot[MAX_HOTSPOTS];
+ScriptRegion scrRegion[MAX_REGIONS];
+ScriptInvItem scrInv[MAX_INV];
+ScriptDialog scrDialog[MAX_DIALOG];
+RGB_MAP rgb_table;
+int want_quit, screen_reset;
+block raw_saved_screen;
+block dotted_mouse_cursor;
+block dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
+int scrlockWasDown;
+int screen_is_dirty;
+int pluginsWantingDebugHooks;
+EventHappened event[MAXEVENTS + 1];
+int numevents;
+volatile bool switching_away_from_game;
+int musicPollIterator;
+char alpha_blend_cursor;
+
+// ac/dialog.cpp
+int windowbackgroundcolor, pushbuttondarkcolor;
+int pushbuttonlightcolor;
+int topwindowhandle;
+int cbuttfont;
+int acdialog_font;
+
+// ac/draw.cpp
+SpriteListEntry thingsToDrawList[MAX_THINGS_TO_DRAW];
+int thingsToDrawSize;
+SpriteListEntry sprlist[MAX_SPRITES_ON_SCREEN];
+int sprlistsize;
+int trans_mode;
+IDriverDependantBitmap **actspswbbmp;
+CachedActSpsData *actspswbcache;
+int actSpsCount;
+block *actsps;
 
 // ac/gui.cpp
 DynamicArray<GUIButton> guibuts;
@@ -132,24 +241,13 @@ int guis_need_update;
 int all_buttons_disabled, gui_inv_pic;
 int gui_disabled_style;
 
-// ac/draw.cpp
-SpriteListEntry thingsToDrawList[MAX_THINGS_TO_DRAW];
-int thingsToDrawSize;
-SpriteListEntry sprlist[MAX_SPRITES_ON_SCREEN];
-int sprlistsize;
-int trans_mode;
-IDriverDependantBitmap **actspswbbmp;
-CachedActSpsData *actspswbcache;
-int actSpsCount;
-block *actsps;
-
 // ac/overlay.cpp
 int is_complete_overlay, is_text_overlay;
 ScreenOverlay screenover[MAX_SCREEN_OVERLAYS];
 int crovr_id;
 
 // ac/room.cpp
-int in_new_room;
+int in_new_room, new_room_was;
 
 // ac/savegame.cpp
 unsigned int load_new_game;
@@ -194,6 +292,16 @@ block *actspswb;
 
 // ac/gui/main.cpp
 GUIMain *guis;
+block *guibg;
+IDriverDependantBitmap **guibgbmp;
+
+// common/mouse32.cpp
+int mousex, mousey, numcurso, hotx, hoty;
+int boundx1, boundx2, boundy1, boundy2;
+int disable_mgetgraphpos;
+char ignore_bounds;
+block savebk, mousecurs[MAXCURSORS];
+int vesa_xres, vesa_yres;
 
 // routefnd.cpp
 int *pathbackx, *pathbacky;
@@ -206,29 +314,6 @@ fixed move_speed_x, move_speed_y;
 Vars::Vars() {
 	g_vars = this;
 
-	force_letterbox = 0;
-	game_paused = 0;
-	ifacepopped = -1;
-	screen = nullptr;
-	virtual_screen = nullptr;
-	gfxDriver = nullptr;
-	game_file_name = nullptr;
-	mls = nullptr;
-	views = nullptr;
-	croom = nullptr;
-	Common::fill(channels, channels + MAX_SOUND_CHANNELS + 1, nullptr);
-	charcache = nullptr;
-	displayed_room = 0;
-	use_cd_player = 0;
-	scrnwid = scrnhit = 0;
-	mousex = mousey = 0;
-	offsetx = offsety = 0;
-	numlines = 0;
-	inside_script = 0;
-	numPluginReaders = 0;
-	pluginsWantingDebugHooks = 0;
-	use_cdplayer = 0;
-
 	Common::fill((byte *)&thisroom, (byte *)&thisroom + sizeof(roomstruct), 0);
 	Common::fill((byte *)palette, (byte *)palette + 256 * sizeof(color), 0);
 	Common::fill(spritewidth, spritewidth + MAX_SPRITES, 0);
@@ -237,11 +322,9 @@ Vars::Vars() {
 
 	current_screen_resolution_multiplier_x = current_screen_resolution_multiplier_y = 0;
 	current_screen_resolution_multiplier = 1;
-	our_eip = 0;
-	eip_guinum = eip_guiobj = 0;
+	our_eip = eip_guinum = eip_guiobj = 0;
 	fps = display_fps = 0;
 
-	debug_flags = 0;
 	change_to_game_dir = 0;
 	datafile_argv = 0;
 	force_window = 0;
@@ -249,36 +332,150 @@ Vars::Vars() {
 	justRegisterGame = justUnRegisterGame = false;
 	loadSaveGameOnStartup = nullptr;
 
-	use_compiled_folder_as_current_dir = 0;
-	editor_debugging_enabled = 0;
-	editor_debugging_initialized = 0;
 	Common::fill(editor_debugger_instance_token, editor_debugger_instance_token + 100, 0);
 	break_on_next_script_step = 0;
-	game_paused_in_debugger = 0;
 
-	in_enters_screen = done_es_error = 0;
-	in_leaves_screen = -1;
-	need_to_stop_cd = false;
-	debug_15bit_mode = debug_24bit_mode = false;
-	said_text = 0;
-	convert_16bit_bgr = 0;
-	mouse_z_was = 0;
-	bg_just_changed = 0;
-	loaded_game_file_version = 0;
-	want_exit = abort_engine = false;
-	check_dynamic_sprites_at_exit = true;
-	*return_to_roomedit = '\0';
-	*return_to_room = '\0';
-
-	final_col_dep = 0;
 	roomstats = nullptr;
 	abuf = nullptr;
 	platform = nullptr;
 
 	// Misc
 	screenres = screenresIdx = 0;
-	globalTimerCounter = mvolcounter = 0;
-	frames_per_second = time_between_timers = 0;
+	globalTimerCounter = mvolcounter = timerloop = 0;
+	recordbuffer = nullptr;
+	recsize = recbuffersize = 0;
+	loopcounter = lastcounter = 0;
+	replay_last_second = 0;
+	replay_time = 0;
+	replay_start_this_time = 0;
+	first_debug_line = last_debug_line = display_console = 0;
+	current_music_type = 0;
+	transtree = nullptr;
+	transFileName[0] = '\0';
+	lang_offs_start = 0;
+	source_text_length = -1;
+	update_music_at = 0;
+	time_between_timers = 25;
+	current_background_is_dirty = false;
+	blank_mouse_cursor = nullptr;
+	longestline = 0;
+	_old_screen = _sub_screen = nullptr;
+	mouseCursor = nullptr;
+	blankImage = nullptr;
+	blankSidebarImage = nullptr;
+	debugConsole = nullptr;
+	oldmouse = oldmousex = oldmousey = 0;
+
+	views = nullptr;
+	croom = nullptr;
+	cachedQueuedMusic = NULL;
+	numSoundChannels = 8;
+	mls = nullptr;
+	walkareabackup = nullptr;
+	walkable_areas_temp = nullptr;
+	num_scripts = 0;
+	getloctype_index = 0;
+	getloctype_throughgui = 0;
+	user_disabled_for = 0;
+	user_disabled_data = 0;
+	user_disabled_data2 = 0;
+	user_disabled_data3 = 0;
+	face_talking = -1;
+	facetalkview = 0;
+	facetalkwait = 0;
+	facetalkframe = 0;
+	facetalkloop = facetalkrepeat = 0;
+	facetalkAllowBlink = 1;
+	facetalkBlinkLoop = 0;
+	facetalkchar = nullptr;
+	loops_per_character = 0;
+	text_lips_offset = 0;
+	char_speaking = -1;
+	text_lips_text = nullptr;
+	splipsync = nullptr;
+	numLipLines = 0;
+	curLipLine = -1;
+	curLipLinePhenome = 0;
+	characterScriptObjNames = nullptr;
+	guiScriptObjNames = nullptr;
+	working_gfx_mode_status = -1;
+	restrict_until = 0;
+	gs_to_newroom = -1;
+	proper_exit = 0;
+	numscreenover = 0;
+	scaddr = 0;
+	walk_behind_baselines_changed = 0;
+	displayed_room = -10;
+	starting_room = -1;
+	mouse_on_iface = -1;
+	mouse_on_iface_button = -1;
+	mouse_pushed_iface = -1;
+	mouse_ifacebut_xoffs = mouse_ifacebut_yoffs = -1;
+	debug_flags = 0;
+	roomBackgroundBmp = nullptr;
+	use_compiled_folder_as_current_dir = 0;
+	editor_debugging_enabled = 0;
+	editor_debugging_initialized = 0;
+	editor_debugger = nullptr;
+	break_on_next_script_step = 0;
+	game_paused_in_debugger = 0;
+	editor_window_handle = nullptr;
+	in_enters_screen = 0;
+	done_es_error = 0;
+	in_leaves_screen = -1;
+	need_to_stop_cd = 0;
+	said_text = 0;
+	convert_16bit_bgr = 0;
+	mouse_z_was = 0;
+	bg_just_changed = 0;
+	loaded_game_file_version = 0;
+	abort_engine = 0;
+	check_dynamic_sprites_at_exit = 1;
+	evblockbasename  = nullptr;
+	evblocknum = 0;
+	frames_per_second = 40;
+	debug_flags = 0;
+	in_new_room = new_room_was = 0;
+	new_room_pos = 0;
+	new_room_x = new_room_y = SCR_NO_VALUE;
+	inside_script = in_graph_script = 0;
+	in_inv_screen = 0;
+	inv_screen_newroom = -1;
+	mouse_frame = mouse_delay = 0;
+	lastmx = lastmy = -1;
+	new_room_flags = 0;
+	use_cdplayer = 0;
+	triedToUseCdAudioCommand = false;
+	final_scrn_wid = final_scrn_hit = final_col_dep = 0;
+	actspsbmp = nullptr;
+	charcache = nullptr;
+	scrGui = nullptr;
+	want_quit = screen_reset = 0;
+	raw_saved_screen = nullptr;
+	dotted_mouse_cursor = nullptr;
+	scrlockWasDown = 0;
+	screen_is_dirty = 0;
+	pluginsWantingDebugHooks = 0;
+	numevents = 0;
+	switching_away_from_game = false;
+	musicPollIterator = 0;
+	alpha_blend_cursor = 0;
+
+	// ac/dialog.cpp
+	windowbackgroundcolor =  pushbuttondarkcolor = 0;
+	pushbuttonlightcolor = 0;
+	topwindowhandle = 0;
+	cbuttfont = 0;
+	acdialog_font = 0;
+
+	// ac/draw.cpp
+	thingsToDrawSize = 0;
+	sprlistsize = 0;
+	trans_mode = 0;
+	actspswbbmp = nullptr;
+	actspswbcache = nullptr;
+	actSpsCount = 0;
+	actsps = nullptr;
 
 	// ac/gui.cpp
 	numguibuts = 0;
@@ -293,21 +490,12 @@ Vars::Vars() {
 	gui_inv_pic = -1;
 	gui_disabled_style = 0;
 
-	// ac/draw.cpp
-	thingsToDrawSize = 0;
-	sprlistsize = 0;
-	trans_mode = 0;
-	actspswbbmp = nullptr;
-	actspswbcache = nullptr;
-	actSpsCount = 0;
-	actsps = nullptr;
-
 	// ac/overlay.cpp
 	is_complete_overlay = is_text_overlay = 0;
 	crovr_id = 2;
 
 	// ac/room.cpp
-	in_new_room = 0;
+	in_new_room = new_room_was = 0;
 
 	// ac/savegame.cpp
 	load_new_game = 0;
@@ -322,11 +510,11 @@ Vars::Vars() {
 	eventWasClaimed = false;
 	no_blocking_functions = 0;
 	numScriptModules = 0;
-	gamescript = NULL;
-	dialogScriptsScript = NULL;
-	gameinst = roominst = NULL;
-	dialogScriptsInst = NULL;
-	gameinstFork = roominstFork = NULL;
+	gamescript = nullptr;
+	dialogScriptsScript = nullptr;
+	gameinst = roominst = nullptr;
+	dialogScriptsInst = nullptr;
+	gameinstFork = roominstFork = nullptr;
 	post_script_cleanup_stack = 0;
 	scmouse.x = scmouse.y = 0;
 	dialog = nullptr;
@@ -335,8 +523,8 @@ Vars::Vars() {
 	said_speech_line = 0;
 
 	// ac/walkbehind.cpp
-	walkBehindExists = NULL;
-	walkBehindStartY = walkBehindEndY = NULL;
+	walkBehindExists = nullptr;
+	walkBehindStartY = walkBehindEndY = nullptr;
 	noWalkBehindsAtAll = 0;
 	walkBehindBitmap[MAX_OBJ];
 	walkBehindsCachedForBgNum = 0;
@@ -345,6 +533,21 @@ Vars::Vars() {
 
 	// ac/gui/main.cpp
 	guis = nullptr;
+	guibg = nullptr;
+	guibgbmp = nullptr;
+
+	// common/mouse32.cpp
+	mousex = mousey = 0;
+	hotx = 0, hoty = 0;
+	numcurso = -1;
+	boundx1 = 0;
+	boundx2 = 99999;
+	boundy1 = 0;
+	boundy2 = 99999;
+	disable_mgetgraphpos = 0;
+	ignore_bounds = 0;
+	savebk = nullptr;
+	vesa_xres = vesa_yres = 0;
 
 	// routefnd.cpp
 	pathbackx = pathbacky = nullptr;

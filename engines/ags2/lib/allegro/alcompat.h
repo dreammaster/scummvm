@@ -22,12 +22,20 @@
 #ifndef AGS2_LIB_ALLEGRO_ALCOMPAT_H
 #define AGS2_LIB_ALLEGRO_ALCOMPAT_H
 
+#include "ags2/lib/allegro/gfx.h"
 #include "ags2/lib/allegro/surface.h"
 
 namespace AGS2 {
 
 /* the weird old clipping API */
 inline void set_clip(BITMAP *bitmap, int x1, int y_1, int x2, int y2) {
+}
+
+inline void clear(BITMAP *bmp) {
+	clear_bitmap(bmp);
+}
+
+inline void SetForegroundWindow(void *) {
 }
 
 } // namespace AGS2

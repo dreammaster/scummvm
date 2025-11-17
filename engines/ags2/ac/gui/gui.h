@@ -23,7 +23,7 @@
 #define AGS2_AC_GUI_GUI_H
 
 #include "common/stream.h"
-#include "ags2/ac/gui/dynamic_array.h"
+#include "ags2/common/dynamic_array.h"
 #include "ags2/ac/gui/button.h"
 #include "ags2/ac/gui/gui_object.h"
 #include "ags2/ac/gui/interface.h"

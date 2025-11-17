@@ -5,6 +5,7 @@ MODULE_OBJS = \
 	console.o \
 	metaengine.o \
 	vars.o \
+	ac/ac.o \
 	ac/main.o \
 	ac/agsplugin.o \
 	ac/draw.o \
@@ -34,11 +35,15 @@ MODULE_OBJS = \
 	common/csrun.o \
 	common/fmem.o \
 	common/misc.o \
+	common/mouse32.o \
 	common/routefnd.o \
 	common/text.o \
 	common/wgt2allg.o \
 	gfx/sprite.o \
 	gfx/sprite_cache.o \
+	lib/aastr-0.1.1/aarot.o \
+	lib/aastr-0.1.1/aastr.o \
+	lib/aastr-0.1.1/aautil.o \
 	lib/alfont/alfont.o \
 	lib/allegro/color.o \
 	lib/allegro/digi.o \

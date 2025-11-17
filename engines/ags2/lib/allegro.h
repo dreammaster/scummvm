@@ -24,22 +24,28 @@
 
 #define ALLEGRO_H
 
+#include "ags2/lib/allegro/alcompat.h"
 #include "ags2/lib/allegro/alconfig.h"
 #include "ags2/lib/allegro/base.h"
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/config.h"
+#include "ags2/lib/allegro/datafile.h"
 #include "ags2/lib/allegro/draw.h"
 #include "ags2/lib/allegro/error.h"
 #include "ags2/lib/allegro/file.h"
 #include "ags2/lib/allegro/fixed.h"
 #include "ags2/lib/allegro/fmaths.h"
 #include "ags2/lib/allegro/gfx.h"
+#include "ags2/lib/allegro/sound.h"
+#include "ags2/lib/allegro/stream.h"
 #include "ags2/lib/allegro/system.h"
+#include "ags2/lib/allegro/timer.h"
 #include "ags2/lib/allegro/unicode.h"
 
 namespace AGS2 {
 
 inline int install_allegro() {
+	Common::fill((byte *)black_palette, (byte *)black_palette + sizeof(PALETTE), 0);
 	return 0;
 }
 
