@@ -894,12 +894,13 @@ struct ViewStruct272 {
 #define MCF_HOTSPOT  8  // only animate when over hotspot
 // this struct is also in the plugin header file
 struct MouseCursor {
-  int   pic;
-  short hotx, hoty;
-  short view;
-  char  name[10];
-  char  flags;
-  MouseCursor() { pic = 2054; hotx = 0; hoty = 0; name[0] = 0; flags = 0; view = -1; }
+	int   pic = 2054;
+	short hotx = 0, hoty = 0;
+	short view = -1;
+	char  name[10] = {};
+	char  flags = 0;
+
+	void load(Common::SeekableReadStream *src);
 };
 
 #define MAX_INV             301
@@ -966,6 +967,8 @@ struct CharacterInfo {
 	int get_baseline();      // return baseline, or Y if not set
 	int get_blocking_top();    // return Y - BlockingHeight/2
 	int get_blocking_bottom(); // return Y + BlockingHeight/2
+
+	void load(Common::SeekableReadStream *src);
 };
 
 
@@ -1000,6 +1003,8 @@ struct InventoryItemInfo {
 	int  cursorPic, hotx, hoty;
 	int  reserved[5];
 	char flags;
+
+	void load(Common::SeekableReadStream *src);
 };
 
 #define MAXTOPICOPTIONS     30
@@ -1038,6 +1043,8 @@ struct DialogTopic {
 	short         codesize;
 	int           numoptions;
 	int           topicFlags;
+
+	void load(Common::SeekableReadStream *src);
 };
 
 #define MAX_SPRITES         30000
@@ -1186,6 +1193,8 @@ struct GameSetupStructBase {
 	char *globalscript;
 	CharacterInfo *chars;
 	ccScript *compiled_script;
+
+	void load(Common::SeekableReadStream *src);
 };
 
 #define MAXVIEWNAMELENGTH 15

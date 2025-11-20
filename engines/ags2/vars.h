@@ -73,6 +73,7 @@ extern int numPluginReaders;
 extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 extern char lines[MAXLINE][200];
 extern ObjectCache objcache[MAX_INIT_SPR];
+extern long _sc_PlayerCharPtr;
 
 extern SpriteCache spriteset;
 extern int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];
@@ -160,6 +161,7 @@ extern int numevents;
 extern volatile bool switching_away_from_game;
 extern int musicPollIterator;
 extern char alpha_blend_cursor;
+extern int engineNeedsAsInt;
 
 // ac/dialog.cpp
 extern int windowbackgroundcolor, pushbuttondarkcolor;
@@ -336,6 +338,7 @@ extern int pluginsWantingDebugHooks;
 
 // ac/sound.cpp
 extern int said_speech_line;
+extern int crossFading;
 
 // ac/walkbehind.cpp
 extern char *walkBehindExists;  // whether a WB area is in this column

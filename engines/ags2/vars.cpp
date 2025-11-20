@@ -148,6 +148,8 @@ int numscreenover;
 int scaddr;
 int walk_behind_baselines_changed;
 int displayed_room, starting_room;
+int scrnwid, scrnhit;
+int offsetx, offsety;
 int mouse_on_iface;
 int mouse_on_iface_button;
 int mouse_pushed_iface;
@@ -203,6 +205,7 @@ int numevents;
 volatile bool switching_away_from_game;
 int musicPollIterator;
 char alpha_blend_cursor;
+int engineNeedsAsInt;
 
 // ac/dialog.cpp
 int windowbackgroundcolor, pushbuttondarkcolor;
@@ -278,6 +281,7 @@ DialogTopic *dialog;
 
 // ac/sound.cpp
 int said_speech_line;
+int crossFading;
 
 // ac/walkbehind.cpp
 char *walkBehindExists;
@@ -407,6 +411,9 @@ Vars::Vars() {
 	walk_behind_baselines_changed = 0;
 	displayed_room = -10;
 	starting_room = -1;
+	scrnwid = scrnhit = 0;
+	offsetx = offsety = 0;
+	_sc_PlayerCharPtr = 0;
 	mouse_on_iface = -1;
 	mouse_on_iface_button = -1;
 	mouse_pushed_iface = -1;
@@ -460,6 +467,7 @@ Vars::Vars() {
 	switching_away_from_game = false;
 	musicPollIterator = 0;
 	alpha_blend_cursor = 0;
+	engineNeedsAsInt = 100;
 
 	// ac/dialog.cpp
 	windowbackgroundcolor =  pushbuttondarkcolor = 0;
@@ -521,6 +529,7 @@ Vars::Vars() {
 
 	// ac/sound.cpp
 	said_speech_line = 0;
+	crossFading = 0;
 
 	// ac/walkbehind.cpp
 	walkBehindExists = nullptr;

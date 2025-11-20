@@ -315,17 +315,21 @@ struct CCAudioClip : AGSCCDynamicObject {
 };
 
 struct ScriptString : AGSCCDynamicObject, ICCStringClass {
-  char *text;
+private:
+	char _emptyString[1] = { '\0' };
 
-  virtual int Dispose(const char *address, bool force);
-  virtual const char *GetType();
-  virtual int Serialize(const char *address, char *buffer, int bufsize);
-  virtual void Unserialize(int index, const char *serializedData, int dataSize);
+public:
+	char *text;
 
-  virtual void* CreateString(const char *fromText);
+	virtual int Dispose(const char *address, bool force);
+	virtual const char *GetType();
+	virtual int Serialize(const char *address, char *buffer, int bufsize);
+	virtual void Unserialize(int index, const char *serializedData, int dataSize);
 
-  ScriptString();
-  ScriptString(const char *fromText);
+	virtual void *CreateString(const char *fromText);
+
+	ScriptString();
+	ScriptString(const char *fromText);
 };
 
 #define INVALID_X  30000

@@ -8073,13 +8073,12 @@ void quit(char *quitmsg) {
 		gfxDriver->UnInit();
 
 	// Tell Allegro that we are no longer in graphics mode
-	set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
+	//set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
 
 	// successful exit displays no messages (because Windoze closes the dos-box
 	// if it is empty).
 	if (qmsg[0] == '|');
-	else if (!handledErrorInEditor)
-	{
+	else if (!handledErrorInEditor) {
 		// Display the message (at this point the window still exists)
 		Common::sprintf_s(pexbuf, "%s\n", qmsg);
 		Common::strcat_s(alertis, pexbuf);
@@ -8089,8 +8088,7 @@ void quit(char *quitmsg) {
 	// remove the game window
 	allegro_exit();
 
-	if (gfxDriver != NULL)
-	{
+	if (gfxDriver != NULL) {
 		delete gfxDriver;
 		gfxDriver = NULL;
 	}
@@ -8110,6 +8108,8 @@ void quit(char *quitmsg) {
 	  /*  // print the FPS if there wasn't an error
 		if ((play.debug_mode!=0) && (qmsg[0]=='|'))
 		  printf("Last cycle fps: %d\n",fps);*/
+
+#ifdef TODO
 	al_ffblk	dfb;
 	int	dun = al_findfirst("~ac*.tmp", &dfb, FA_SEARCH);
 	while (!dun) {
@@ -8117,19 +8117,17 @@ void quit(char *quitmsg) {
 		dun = al_findnext(&dfb);
 	}
 	al_findclose(&dfb);
+#endif
 
 	proper_exit = 1;
 
 	write_log_debug("***** ENGINE HAS SHUTDOWN");
 
 	our_eip = 9904;
-	exit(EXIT_NORMAL);
 }
 
-extern "C" {
-	void quit_c(char *msg) {
-		quit(msg);
-	}
+void quit_c(const char *msg) {
+	quit(msg);
 }
 
 void setup_sierra_interface() {
@@ -8142,7 +8140,7 @@ void setup_sierra_interface() {
 void set_default_glmsg(int msgnum, const char *val) {
 	if (game.messages[msgnum - 500] == NULL) {
 		game.messages[msgnum - 500] = (char *)malloc(strlen(val) + 5);
-		Common::strcpy_s(game.messages[msgnum - 500], val);
+		Common::strcpy_s(game.messages[msgnum - 500], STD_BUFFER_SIZE, val);
 	}
 }
 
@@ -8874,7 +8872,7 @@ void DrawingSurface_DrawString(ScriptDrawingSurface * sds, int xx, int yy, int f
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(displbuf, get_translation(texx), ap);
+	my_sprintf(displbuf, get_translation(texx), ap);
 	va_end(ap);
 	// don't use wtextcolor because it will do a 16->32 conversion
 	textcol = sds->currentColour;
@@ -8974,7 +8972,7 @@ int DrawingSurface_GetPixel(ScriptDrawingSurface * sds, int x, int y) {
 
 	if (rawPixel == maskColor)
 	{
-		rawPixel = SCR_COLOR_TRANSPARENT;
+		rawPixel = (uint)SCR_COLOR_TRANSPARENT;
 	} else if (colDepth > 8)
 	{
 		int r = getr_depth(colDepth, rawPixel);
@@ -9285,10 +9283,10 @@ const char *ScriptString::GetType() {
 
 int ScriptString::Serialize(const char *address, char *buffer, int bufsize) {
 	if (text == NULL)
-		text = "";
+		text = _emptyString;
 	StartSerialize(buffer);
 	SerializeInt(strlen(text));
-	Common::strcpy_s(&serbuffer[bytesSoFar], text);
+	Common::strcpy_s(&serbuffer[bytesSoFar], STD_BUFFER_SIZE, text);
 	bytesSoFar += strlen(text) + 1;
 	return EndSerialize();
 }
@@ -9297,7 +9295,7 @@ void ScriptString::Unserialize(int index, const char *serializedData, int dataSi
 	StartUnserialize(serializedData, dataSize);
 	int textsize = UnserializeInt();
 	text = (char *)malloc(textsize + 1);
-	Common::strcpy_s(text, &serializedData[bytesSoFar]);
+	Common::strcpy_s(text, STD_BUFFER_SIZE, &serializedData[bytesSoFar]);
 	ccRegisterUnserializedObject(index, text, this);
 }
 
@@ -9307,7 +9305,7 @@ ScriptString::ScriptString() {
 
 ScriptString::ScriptString(const char *fromText) {
 	text = (char *)malloc(strlen(fromText) + 1);
-	Common::strcpy_s(text, fromText);
+	Common::strcpy_s(text, STD_BUFFER_SIZE, fromText);
 }
 
 int String_IsNullOrEmpty(const char *thisString) {
@@ -9323,14 +9321,14 @@ const char *String_Copy(const char *srcString) {
 
 const char *String_Append(const char *thisString, const char *extrabit) {
 	char *buffer = (char *)malloc(strlen(thisString) + strlen(extrabit) + 1);
-	Common::strcpy_s(buffer, thisString);
-	Common::strcat_s(buffer, extrabit);
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, thisString);
+	Common::strcat_s(buffer, STD_BUFFER_SIZE, extrabit);
 	return CreateNewScriptString(buffer, false);
 }
 
 const char *String_AppendChar(const char *thisString, char extraOne) {
 	char *buffer = (char *)malloc(strlen(thisString) + 2);
-	Common::sprintf_s(buffer, "%s%c", thisString, extraOne);
+	Common::sprintf_s(buffer, STD_BUFFER_SIZE, "%s%c", thisString, extraOne);
 	return CreateNewScriptString(buffer, false);
 }
 
@@ -9456,7 +9454,7 @@ const char *String_Format(const char *texx, ...) {
 
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(displbuf, get_translation(texx), ap);
+	my_sprintf(displbuf, get_translation(texx), ap);
 	va_end(ap);
 
 	return CreateNewScriptString(displbuf);
@@ -10236,8 +10234,9 @@ int load_game_file() {
 	game_paused = 0;  // reset the game paused flag
 	ifacepopped = -1;
 
-	FILE *iii = clibfopen("game28.dta", "rb");
-	if (iii == NULL) return -1;
+	Common::SeekableReadStream *iii = clibfopen("game28.dta", "rb");
+	if (iii == NULL)
+		return -1;
 
 	our_eip = -18;
 	setup_script_exports();
@@ -10245,21 +10244,23 @@ int load_game_file() {
 	our_eip = -16;
 
 	teststr[30] = 0;
-	fread(&teststr[0], 30, 1, iii);
+	iii->read(&teststr[0], 30);
 	int filever = getw(iii);
 	if (filever < 42) {
-		fclose(iii);
+		delete iii;
 		return -2;
 	}
+
 	int engineverlen = getw(iii);
 	char engineneeds[20];
+
 	// MACPORT FIX 13/6/5: switch 'size' and 'nmemb' so it doesn't treat the string as an int
-	fread(&engineneeds[0], sizeof(char), engineverlen, iii);
+	iii->read(&engineneeds[0], engineverlen);
 	engineneeds[engineverlen] = 0;
 
 	if (filever > GAME_FILE_VERSION) {
 		platform->DisplayAlert("This game requires a newer version of AGS (%s). It cannot be run.", engineneeds);
-		fclose(iii);
+		delete iii;
 		return -2;
 	}
 
@@ -10278,60 +10279,47 @@ int load_game_file() {
 	game.invScripts = NULL;
 	memset(&game.spriteflags[0], 0, MAX_SPRITES);
 
-#ifndef ALLEGRO_BIG_ENDIAN
-	fread(&game, sizeof(GameSetupStructBase), 1, iii);
-#else
-	GameSetupStructBase *gameBase = (GameSetupStructBase *)&game;
-	gameBase->ReadFromFile(iii);
-#endif
+	game.load(iii);
 
 	if (game.numfonts > MAX_FONTS)
 		quit("!This game requires a newer version of AGS. Too many fonts for this version to handle.");
 
-	fread(&game.guid[0], 1, MAX_GUID_LENGTH, iii);
-	fread(&game.saveGameFileExtension[0], 1, MAX_SG_EXT_LENGTH, iii);
-	fread(&game.saveGameFolderName[0], 1, MAX_SG_FOLDER_LEN, iii);
+	iii->read(&game.guid[0], MAX_GUID_LENGTH);
+	iii->read(&game.saveGameFileExtension[0], MAX_SG_EXT_LENGTH);
+	iii->read(&game.saveGameFolderName[0], MAX_SG_FOLDER_LEN);
 
 	if (game.saveGameFileExtension[0] != 0)
 		Common::sprintf_s(saveGameSuffix, ".%s", game.saveGameFileExtension);
 	else
 		saveGameSuffix[0] = 0;
 
-	fread(&game.fontflags[0], 1, game.numfonts, iii);
-	fread(&game.fontoutline[0], 1, game.numfonts, iii);
+	iii->read(&game.fontflags[0], game.numfonts);
+	iii->read(&game.fontoutline[0], game.numfonts);
 
 	int numToRead = getw(iii);
 	if (numToRead > MAX_SPRITES) {
 		quit("Too many sprites; need newer AGS version");
 	}
-	fread(&game.spriteflags[0], 1, numToRead, iii);
-#ifndef ALLEGRO_BIG_ENDIAN
-	fread(&game.invinfo[0], sizeof(InventoryItemInfo), game.numinvitems, iii);
-#else
-	for (int iteratorCount = 0; iteratorCount < game.numinvitems; ++iteratorCount)
-	{
-		game.invinfo[iteratorCount].ReadFromFile(iii);
-	}
-#endif
+	iii->read(&game.spriteflags[0], numToRead);
+
+	for (int i = 0; i < game.numinvitems; ++i)
+		game.invinfo[i].load(iii);
 
 	if (game.numcursors > MAX_CURSOR)
 		quit("Too many cursors: need newer AGS version");
-#ifndef ALLEGRO_BIG_ENDIAN
-	fread(&game.mcurs[0], sizeof(MouseCursor), game.numcursors, iii);
-#else
-	for (int iteratorCount = 0; iteratorCount < game.numcursors; ++iteratorCount)
-	{
-		game.mcurs[iteratorCount].ReadFromFile(iii);
-	}
-#endif
+
+	for (int i = 0; i < game.numcursors; ++i)
+		game.mcurs[i].load(iii);
 
 	numGlobalVars = 0;
 	game.charScripts = new InteractionScripts * [game.numcharacters];
 	game.invScripts = new InteractionScripts * [game.numinvitems];
+
 	for (bb = 0; bb < game.numcharacters; bb++) {
 		game.charScripts[bb] = new InteractionScripts();
 		deserialize_interaction_scripts(iii, game.charScripts[bb]);
 	}
+
 	for (bb = 1; bb < game.numinvitems; bb++) {
 		game.invScripts[bb] = new InteractionScripts();
 		deserialize_interaction_scripts(iii, game.invScripts[bb]);
@@ -10388,17 +10376,13 @@ int load_game_file() {
 	our_eip = -14;
 
 	game.chars = (CharacterInfo *)calloc(1, sizeof(CharacterInfo) * game.numcharacters + 5);
-#ifndef ALLEGRO_BIG_ENDIAN
-	fread(&game.chars[0], sizeof(CharacterInfo), game.numcharacters, iii);
-#else
-	for (int iteratorCount = 0; iteratorCount < game.numcharacters; ++iteratorCount)
-	{
-		game.chars[iteratorCount].ReadFromFile(iii);
-	}
-#endif
+
+	for (int i = 0; i < game.numcharacters; ++i)
+		game.chars[i].load(iii);
+
 	charcache = (CharacterCache *)calloc(1, sizeof(CharacterCache) * game.numcharacters + 5);
 
-	fread(&game.lipSyncFrameLetters[0][0], MAXLIPSYNCFRAMES, 50, iii);
+	iii->read(&game.lipSyncFrameLetters[0][0], MAXLIPSYNCFRAMES * 50);
 
 	for (ee = 0; ee < MAXGLOBALMES; ee++) {
 		if (game.messages[ee] == NULL) continue;
@@ -10422,14 +10406,8 @@ int load_game_file() {
 
 	dialog = (DialogTopic *)malloc(sizeof(DialogTopic) * game.numdialog + 5);
 
-#ifndef ALLEGRO_BIG_ENDIAN
-	fread(&dialog[0], sizeof(DialogTopic), game.numdialog, iii);
-#else
-	for (int iteratorCount = 0; iteratorCount < game.numdialog; ++iteratorCount)
-	{
-		dialog[iteratorCount].ReadFromFile(iii);
-	}
-#endif
+	for (int i = 0; i < game.numdialog; ++i)
+		dialog[i].load(iii);
 
 	read_gui(iii, guis, &game, &guis);
 
@@ -10500,7 +10478,7 @@ int load_game_file() {
 		game.roomCount = 0;
 	}
 
-	fclose(iii);
+	delete iii;
 
 	update_gui_zorder();
 
@@ -11775,7 +11753,7 @@ int CreateTextOverlay(int xx, int yy, int wii, int fontid, int clr, char *texx, 
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(displbuf, get_translation(texx), ap);
+	my_sprintf(displbuf, get_translation(texx), ap);
 	va_end(ap);
 
 	int allowShrink = 0;
@@ -11793,7 +11771,7 @@ void SetTextOverlay(int ovrid, int xx, int yy, int wii, int fontid, int clr, cha
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(displbuf, get_translation(texx), ap);
+	my_sprintf(displbuf, get_translation(texx), ap);
 	va_end(ap);
 	RemoveOverlay(ovrid);
 	crovr_id = ovrid;
@@ -11805,7 +11783,7 @@ void Overlay_SetText(ScriptOverlay * scover, int wii, int fontid, int clr, char 
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(displbuf, get_translation(texx), ap);
+	my_sprintf(displbuf, get_translation(texx), ap);
 	va_end(ap);
 
 	int ovri = find_overlay_of_type(scover->overlayId);
@@ -11905,7 +11883,7 @@ ScriptOverlay *Overlay_CreateTextual(int x, int y, int width, int font, int colo
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;
 	va_start(ap, text);
-	my_Common::sprintf_s(displbuf, get_translation(text), ap);
+	my_sprintf(displbuf, get_translation(text), ap);
 	va_end(ap);
 
 	multiply_up_coordinates(&x, &y);
@@ -12732,7 +12710,7 @@ void __sc_displayspeech(int chid, char *texx, ...) {
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(displbuf, get_translation(texx), ap);
+	my_sprintf(displbuf, get_translation(texx), ap);
 	va_end(ap);
 
 	_DisplaySpeechCore(chid, displbuf);
@@ -12746,7 +12724,7 @@ void DisplayTopBar(int ypos, int ttexcol, int backcol, char *title, char *texx, 
 	char displbuf[3001];
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(displbuf, get_translation(texx), ap);
+	my_sprintf(displbuf, get_translation(texx), ap);
 	va_end(ap);
 
 	if (ypos > 0)
@@ -12808,7 +12786,7 @@ void DisplayThought(int chid, const char *texx, ...) {
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(displbuf, get_translation(texx), ap);
+	my_sprintf(displbuf, get_translation(texx), ap);
 	va_end(ap);
 
 	_DisplayThoughtCore(chid, displbuf);
@@ -13057,7 +13035,7 @@ void RawPrint(int xx, int yy, char *texx, ...) {
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(displbuf, get_translation(texx), ap);
+	my_sprintf(displbuf, get_translation(texx), ap);
 	va_end(ap);
 	// don't use wtextcolor because it will do a 16->32 conversion
 	textcol = play.raw_color;
@@ -14285,7 +14263,7 @@ void play_flc_file(int numb, int playflags) {
 	fseek(iii, 8, SEEK_CUR);
 	fread(&fliwidth, 2, 1, iii);
 	fread(&fliheight, 2, 1, iii);
-	fclose(iii);
+	delete iii;
 	if (game.color_depth > 1) {
 		hicol_buf = create_bitmap_ex(final_col_dep, fliwidth, fliheight);
 		clear(hicol_buf);
@@ -17016,7 +16994,7 @@ int File_Exists(const char *fnmm) {
 	if (iii == NULL)
 		return 0;
 
-	fclose(iii);
+	delete iii;
 	return 1;
 }
 
@@ -19762,7 +19740,7 @@ int _sc_scumm_stricmp (char *s1, char *s2) {
 
 
 // Custom printf, needed because floats are pushed as 8 bytes
-void my_Common::sprintf_s(char *buffer, const char *fmt, va_list ap) {
+void my_sprintf(char *buffer, const char *fmt, va_list ap) {
 	int bufidx = 0;
 	const char *curptr = fmt;
 	const char *endptr;
@@ -19856,7 +19834,7 @@ void _sc_AbortGame(char *texx, ...) {
 	char displbuf[STD_BUFFER_SIZE] = "!?";
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(&displbuf[2], get_translation(texx), ap);
+	my_sprintf(&displbuf[2], get_translation(texx), ap);
 	va_end(ap);
 
 	quit(displbuf);
@@ -19868,7 +19846,7 @@ void _sc_Common::sprintf_s(char *destt, char *texx, ...) {
 	check_strlen(destt);
 	va_list ap;
 	va_start(ap, texx);
-	my_Common::sprintf_s(displbuf, get_translation(texx), ap);
+	my_sprintf(displbuf, get_translation(texx), ap);
 	va_end(ap);
 
 	my_strncpy(destt, displbuf, MAXSTRLEN - 1);
@@ -26444,39 +26422,136 @@ int initialize_engine(int argc, char *argv[]) {
 
 	quit("|bye!");
 	return 0;
-	}
-
-#if defined(WINDOWS_VERSION) || defined(LINUX_VERSION) || defined(MAC_VERSION)
-END_OF_MAIN()
-#endif
+}
 
 int initialize_engine_with_exception_handling(int argc, char *argv[]) {
 	write_log_debug("Installing exception handler");
-
-#ifdef USE_CUSTOM_EXCEPTION_HANDLER
-	__try
-	{
-#endif
-
-		return initialize_engine(argc, argv);
-
-#ifdef USE_CUSTOM_EXCEPTION_HANDLER
-	}
-	__except (CustomExceptionHandler(GetExceptionInformation()))
-	{
-		Common::strcpy_s(tempmsg, "");
-		Common::sprintf_s(printfworkingspace, "An exception 0x%X occurred in ACWIN.EXE at EIP = 0x%08X %s; program pointer is %+d, ACI version " ACI_VERSION_TEXT ", gtags (%d,%d)\n\n"
-			"AGS cannot continue, this exception was fatal. Please note down the numbers above, remember what you were doing at the time and post the details on the AGS Technical Forum.\n\n%s\n\n"
-			"Most versions of Windows allow you to press Ctrl+C now to copy this entire message to the clipboard for easy reporting.\n\n%s (code %d)",
-			excinfo.ExceptionCode, excinfo.ExceptionAddress, tempmsg, our_eip, eip_guinum, eip_guiobj, get_cur_script(5),
-			(miniDumpResultCode == 0) ? "An error file CrashInfo.dmp has been created. You may be asked to upload this file when reporting this problem on the AGS Forums." :
-			"Unable to create an error dump file.", miniDumpResultCode);
-		MessageBoxA(allegro_wnd, printfworkingspace, "Illegal exception", MB_ICONSTOP | MB_OK);
-		proper_exit = 1;
-	}
-	return EXIT_CRASH;
-#endif
+	return initialize_engine(argc, argv);
 }
 
+
+void GameSetupStructBase::load(Common::SeekableReadStream *src) {
+	int i;
+
+	src->read(gamename, 50);
+	for (i = 0; i < 100; ++i)
+		options[i] = src->readUint32LE();
+	src->read(paluses, 256);
+
+	for (i = 0; i < 256; ++i)
+		defpal[i].LoadFromFile(src);
+
+	numviews = src->readUint32LE();
+	numcharacters = src->readUint32LE();
+	playercharacter = src->readUint32LE();
+	totalscore = src->readUint32LE();
+	numinvitems = src->readUint16LE();
+	numdialog = src->readUint32LE();
+	numdlgmessage = src->readUint32LE();
+	numfonts = src->readUint32LE();
+	color_depth = src->readUint32LE();
+	target_win = src->readUint32LE();
+	dialog_bullet = src->readUint32LE();
+	hotdot = src->readUint16LE();
+	hotdotouter = src->readUint16LE();
+	uniqueid = src->readUint32LE();    // random key identifying the game
+	numgui = src->readUint32LE();
+	numcursors = src->readUint32LE();
+	default_resolution = src->readUint32LE(); // 0=undefined, 1=320x200, 2=320x240, 3=640x400 etc
+	default_lipsync_frame = src->readUint32LE(); // used for unknown chars
+	invhotdotsprite = src->readUint32LE();
+
+	for (int i = 0; i < 17; ++i)
+		reserved[i] = src->readUint32LE();
+
+	Common::fill(messages, messages + MAXGLOBALMES, nullptr);
+	src->skip(4 * MAXGLOBALMES);
+	dict = nullptr;
+	globalscript = nullptr;
+	chars = nullptr;
+	compiled_script = nullptr;
+	src->skip(4 * 4);
+}
+
+void InventoryItemInfo::load(Common::SeekableReadStream *src) {
+	src->read(name, 25);
+	pic = src->readUint32LE();
+	cursorPic = src->readUint32LE();
+	hotx = src->readUint32LE();
+	hoty = src->readUint32LE();
+	src->read(reserved, 5);
+	flags = src->readByte();
+}
+
+void MouseCursor::load(Common::SeekableReadStream *src) {
+	pic = src->readUint32LE();
+	hotx = src->readUint16LE();
+	hoty = src->readUint16LE();
+	view = src->readUint16LE();
+	src->read(name, 10);
+	flags = src->readByte();
+}
+
+void CharacterInfo::load(Common::SeekableReadStream *src) {
+	defview = src->readUint32LE();
+	talkview = src->readUint32LE();
+	view = src->readUint32LE();
+	room = src->readUint32LE(), prevroom;
+	x = src->readUint32LE(), y, wait;
+	flags = src->readUint32LE();
+	following = src->readUint16LE();
+	followinfo = src->readUint16LE();
+	idleview = src->readUint32LE();
+	idletime = src->readUint16LE();
+	idleleft = src->readUint16LE();
+	transparency = src->readUint16LE();
+	baseline = src->readUint16LE();
+	activeinv = src->readUint32LE();
+	talkcolor = src->readUint32LE();
+	thinkview = src->readUint32LE();
+	blinkview = src->readUint16LE();
+	blinkinterval = src->readUint16LE();
+	blinktimer = src->readUint16LE();
+	blinkframe = src->readUint16LE();
+	walkspeed_y = src->readUint16LE();
+	pic_yoffs = src->readUint16LE();
+	z = src->readUint32LE();
+	walkwait = src->readUint32LE();
+	speech_anim_speed = src->readUint16LE();
+	reserved1 = src->readUint16LE();
+	blocking_width = src->readUint16LE();
+	blocking_height = src->readUint16LE();
+	index_id = src->readUint32LE();
+	pic_xoffs = src->readUint16LE();
+	walkwaitcounter = src->readUint16LE();
+	loop = src->readUint16LE();
+	frame = src->readUint16LE();
+	walking = src->readUint16LE();
+	animating = src->readUint16LE();
+	walkspeed = src->readUint16LE();
+	animspeed = src->readUint16LE();
+
+	for (int i = 0; i < MAX_INV; ++i)
+		inv[i] = src->readSint16LE();
+	short actx = src->readSint16LE();
+	short acty = src->readSint16LE();
+	src->read(name, 40);
+	src->read(scrname, MAX_SCRIPT_NAME_LEN);
+	on = src->readByte();
+}
+
+void DialogTopic::load(Common::SeekableReadStream *src) {
+	src->read(&optionnames[0][0], MAXTOPICOPTIONS * 150);
+	for (int i = 0; i < MAXTOPICOPTIONS; ++i)
+		optionflags[i] = src->readSint32LE();
+	src->skip(4);
+	optionscripts = nullptr;
+	for (int i = 0; i < MAXTOPICOPTIONS; ++i)
+		entrypoints[i] = src->readSint16LE();
+	startupentrypoint = src->readSint16LE();
+	codesize = src->readSint16LE();
+	numoptions = src->readSint32LE();
+	topicFlags = src->readSint32LE();
+}
 
 } // namespace AGS2
