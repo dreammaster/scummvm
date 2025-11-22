@@ -28,6 +28,10 @@ namespace AGS2 {
 
 #define MAXCURSORS 20
 
+inline bool minstalled() {
+	return true;
+}
+
 /**
  * Set the hotspot position within the cursor
  */

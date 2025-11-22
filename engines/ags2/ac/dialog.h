@@ -46,6 +46,10 @@ extern void do_conversation(int dlgnum);
 
 extern int loadgamedialog();
 extern int savegamedialog();
+extern int quitdialog();
+extern void enterstringwindow(char *, char *);
+extern int enternumberwindow(const char *prompttext);
+extern int roomSelectorWindow(int currentRoom, int numRooms, int *roomNumbers, char **roomNames);
 
 } // namespace AGS2
 

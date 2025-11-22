@@ -41,16 +41,16 @@ typedef unsigned char *wgtfont;
 
 class WFNFontRenderer : public IAGSFontRenderer {
 public:
-	virtual bool LoadFromDisk(int fontNumber, int fontSize);
-	virtual void FreeMemory(int fontNumber);
-	virtual bool SupportsExtendedCharacters(int fontNumber) {
+	bool LoadFromDisk(int fontNumber, int fontSize) override;
+	void FreeMemory(int fontNumber) override;
+	bool SupportsExtendedCharacters(int fontNumber) override {
 		return false;
 	}
-	virtual int GetTextWidth(const char *text, int fontNumber);
-	virtual int GetTextHeight(const char *text, int fontNumber);
-	virtual void RenderText(const char *text, int fontNumber, BITMAP *destination, int x, int y, int colour);
-	virtual void AdjustYCoordinateForFont(int *ycoord, int fontNumber);
-	virtual void EnsureTextValidForFont(char *text, int fontNumber);
+	int GetTextWidth(const char *text, int fontNumber) override;
+	int GetTextHeight(const char *text, int fontNumber) override;
+	void RenderText(const char *text, int fontNumber, BITMAP *destination, int x, int y, int colour) override;
+	void AdjustYCoordinateForFont(int *ycoord, int fontNumber) override;
+	void EnsureTextValidForFont(char *text, int fontNumber) override;
 
 private:
 	int printchar(int xxx, int yyy, wgtfont foo, int charr);
@@ -58,16 +58,16 @@ private:
 
 class TTFFontRenderer : public IAGSFontRenderer {
 public:
-	virtual bool LoadFromDisk(int fontNumber, int fontSize);
-	virtual void FreeMemory(int fontNumber);
-	virtual bool SupportsExtendedCharacters(int fontNumber) {
+	bool LoadFromDisk(int fontNumber, int fontSize) override;
+	void FreeMemory(int fontNumber) override;
+	bool SupportsExtendedCharacters(int fontNumber) override {
 		return true;
 	}
-	virtual int GetTextWidth(const char *text, int fontNumber);
-	virtual int GetTextHeight(const char *text, int fontNumber);
-	virtual void RenderText(const char *text, int fontNumber, BITMAP *destination, int x, int y, int colour);
-	virtual void AdjustYCoordinateForFont(int *ycoord, int fontNumber);
-	virtual void EnsureTextValidForFont(char *text, int fontNumber);
+	int GetTextWidth(const char *text, int fontNumber) override;
+	int GetTextHeight(const char *text, int fontNumber) override;
+	void RenderText(const char *text, int fontNumber, BITMAP *destination, int x, int y, int colour) override;
+	void AdjustYCoordinateForFont(int *ycoord, int fontNumber) override;
+	void EnsureTextValidForFont(char *text, int fontNumber) override;
 };
 
 extern bool ShouldAntiAliasText();

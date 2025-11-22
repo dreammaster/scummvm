@@ -7,7 +7,6 @@ MODULE_OBJS = \
 	vars.o \
 	ac/ac.o \
 	ac/main.o \
-	ac/agsplugin.o \
 	ac/draw.o \
 	ac/fonts.o \
 	ac/mouse.o \
@@ -29,6 +28,7 @@ MODULE_OBJS = \
 	ac/gui/main.o \
 	ac/gui/slider.o \
 	ac/gui/textbox.o \
+	common/agsplugin.o \
 	common/clib32.o \
 	common/compress.o \
 	common/cscommon.o \
@@ -61,6 +61,7 @@ MODULE_OBJS = \
 	lib/allegro/system.o  \
 	lib/allegro/timer.o \
 	lib/allegro/unicode.o \
+	lib/system/datetime.o \
 	lib/libcda.o
 
 ifdef USE_FREETYPE2

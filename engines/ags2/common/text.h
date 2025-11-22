@@ -29,7 +29,7 @@ namespace AGS2 {
 extern void split_lines_rightleft(char *todis, int wii, int fonnt);
 extern char *reverse_text(const char *text);
 extern void wouttext_reverseifnecessary(int x, int y, int font, char *text);
-extern void break_up_text_into_lines(int wii, int fonnt, char *todis);
+extern void break_up_text_into_lines(int wii, int fonnt, const char *todis);
 
 } // namespace AGS2
 

@@ -461,7 +461,7 @@ ManagedObjectPool pool;
 
 struct SystemImports {
 private:
-	char **name;
+	const char **name;
 	char **addr;
 	ccInstance **isScriptImp;
 	int numimports;
@@ -469,12 +469,13 @@ private:
 	ccTreeMap btree;
 
 public:
-	int  add(char *, char *, ccInstance *);
-	void remove(char *);
-	char *get_addr_of(char *);
-	int  get_index_of(char *);
-	ccInstance *is_script_import(char *);
-	void remove_range(char *, unsigned long);
+	int  add(const char *, char *, ccInstance *);
+	void remove(const char *);
+	char *get_addr_of(const char *);
+	int  get_index_of(const char *);
+	ccInstance *is_script_import(const char *);
+	void remove_range(const char *, unsigned long);
+
 	void clear() {
 		numimports = 0;
 		btree.clear();
@@ -532,7 +533,7 @@ void dump_instruction(unsigned long *codeptr, int cps, int spp) {
 	debugCN(1, kDebugScript, "\n");
 }
 
-int SystemImports::add(char *namm, char *add, ccInstance *anotherscr = NULL) {
+int SystemImports::add(const char *namm, char *add, ccInstance *anotherscr = NULL) {
 	int ixof;
 
 	if ((ixof = get_index_of(namm)) >= 0) {
@@ -557,7 +558,7 @@ int SystemImports::add(char *namm, char *add, ccInstance *anotherscr = NULL) {
 		if (this->bufferSize > 50000)
 			return -1;  // something has gone badly wrong
 		this->bufferSize += 1000;
-		this->name = (char **)realloc(this->name, sizeof(char *) * this->bufferSize);
+		this->name = (const char **)realloc(this->name, sizeof(char *) * this->bufferSize);
 		this->addr = (char **)realloc(this->addr, sizeof(char *) * this->bufferSize);
 		this->isScriptImp = (ccInstance **)realloc(this->isScriptImp, sizeof(ccInstance *) * this->bufferSize);
 	}
@@ -572,7 +573,7 @@ int SystemImports::add(char *namm, char *add, ccInstance *anotherscr = NULL) {
 	return 0;
 }
 
-void SystemImports::remove(char *nameToRemove) {
+void SystemImports::remove(const char *nameToRemove) {
 	int idx = get_index_of(nameToRemove);
 	if (idx < 0)
 		return;
@@ -582,7 +583,7 @@ void SystemImports::remove(char *nameToRemove) {
 	isScriptImp[idx] = 0;
 }
 
-char *SystemImports::get_addr_of(char *namw) {
+char *SystemImports::get_addr_of(const char *namw) {
 	int o = get_index_of(namw);
 	if (o < 0)
 		return NULL;
@@ -590,7 +591,7 @@ char *SystemImports::get_addr_of(char *namw) {
 	return addr[o];
 }
 
-int SystemImports::get_index_of(char *namw) {
+int SystemImports::get_index_of(const char *namw) {
 	char altName[200];
 	Common::sprintf_s(altName, "%s$", namw);
 
@@ -616,7 +617,7 @@ int SystemImports::get_index_of(char *namw) {
 	return -1;
 }
 
-ccInstance *SystemImports::is_script_import(char *namw) {
+ccInstance *SystemImports::is_script_import(const char *namw) {
 	if (namw == NULL) {
 		quit("is_script_import: NULL pointer passed");
 	}
@@ -629,7 +630,7 @@ ccInstance *SystemImports::is_script_import(char *namw) {
 }
 
 // Remove all symbols whose addresses are in the supplied range
-void SystemImports::remove_range(char *from, unsigned long dist) {
+void SystemImports::remove_range(const char *from, unsigned long dist) {
 	unsigned long startaddr = (unsigned long)from;
 	for (int o = 0; o < numimports; o++) {
 		if (name[o] == NULL)
@@ -658,7 +659,7 @@ void nullfree(void *data) {
 		free(data);
 }
 
-void ccAddExternalSymbol(char *namof, void *addrof) {
+void ccAddExternalSymbol(const char *namof, void *addrof) {
 	simp.add(namof, (char *)addrof, NULL);
 }
 

@@ -27,6 +27,8 @@
 namespace AGS2 {
 
 extern BITMAP *load_bitmap(const char *filename, RGB *pal);
+extern int save_bitmap(const char *filename, BITMAP *bmp, const RGB *pal);
+extern BITMAP *load_pcx(const char *filename, RGB *pal);
 
 } // namespace AGS2
 

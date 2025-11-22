@@ -19,7 +19,7 @@
  *
  */
 
-#include "ags2/ac/agsplugin.h"
+#include "ags2/common/agsplugin.h"
 
 namespace AGS2 {
 

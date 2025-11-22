@@ -51,7 +51,7 @@ extern GameSetup usetup;
 extern RoomStatus troom;
 extern BITMAP *screen;
 extern BITMAP *virtual_screen;
-extern const char *game_file_name;
+extern char *game_file_name;
 extern IGraphicsDriver *gfxDriver;
 extern GFXFilter *filter;
 extern MoveList *mls;
@@ -158,10 +158,12 @@ extern ScriptSystem scsystem;
 extern int oldmouse, oldmousex, oldmousey;
 extern EventHappened event[MAXEVENTS + 1];
 extern int numevents;
-extern volatile bool switching_away_from_game;
+extern volatile int switching_away_from_game;
 extern int musicPollIterator;
 extern char alpha_blend_cursor;
 extern int engineNeedsAsInt;
+extern char rbuffer[200];
+extern uint32 lastTime;
 
 // ac/dialog.cpp
 extern int windowbackgroundcolor, pushbuttondarkcolor;
@@ -259,7 +261,6 @@ extern char **characterScriptObjNames;
 extern char objectScriptObjNames[MAX_INIT_SPR][MAX_SCRIPT_NAME_LEN + 5];
 extern char **guiScriptObjNames;
 extern int working_gfx_mode_status;
-extern int said_speech_line;
 extern int restrict_until;
 extern int gs_to_newroom;
 extern ScreenOverlay screenover[MAX_SCREEN_OVERLAYS];
@@ -335,10 +336,14 @@ extern block dynamicallyCreatedSurfaces[MAX_DYNAMIC_SURFACES];
 extern int scrlockWasDown;
 extern int screen_is_dirty;
 extern int pluginsWantingDebugHooks;
+extern Common::Stream *valid_handles[MAX_OPEN_SCRIPT_FILES + 1];
+extern int num_open_script_files;
 
 // ac/sound.cpp
 extern int said_speech_line;
-extern int crossFading;
+extern int said_speech_line;
+extern int crossFading, crossFadeVolumePerStep, crossFadeStep;
+extern int crossFadeVolumeAtStart;
 
 // ac/walkbehind.cpp
 extern char *walkBehindExists;  // whether a WB area is in this column
@@ -356,6 +361,10 @@ extern GUIMain *guis;
 extern block *guibg;
 extern IDriverDependantBitmap **guibgbmp;
 
+// common/events.cpp
+extern byte key[KEY_MAX];
+extern int key_shifts;
+
 // common/mouse32.cpp
 extern int mousex, mousey, numcurso, hotx, hoty;
 extern int boundx1, boundx2, boundy1, boundy2;
@@ -363,6 +372,10 @@ extern int disable_mgetgraphpos;
 extern char ignore_bounds;
 extern block savebk, mousecurs[MAXCURSORS];
 extern int vesa_xres, vesa_yres;
+extern int currentcursor;
+
+// lib/allegro
+extern int allegro_error;
 
 // routefnd.cpp
 extern int *pathbackx, *pathbacky;
@@ -377,24 +390,24 @@ public:
 	BlenderMode _blender_mode = kRgbToRgbBlender;
 	PALETTE _current_palette = {};
 	PALETTE _prev_current_palette = {};
-	int _color_depth;
-	int _trans_blend_alpha;
-	int _trans_blend_red;
-	int _trans_blend_green;
-	int _trans_blend_blue;
-	int _rgb_r_shift_15, _rgb_g_shift_15, _rgb_b_shift_15;
-	int _rgb_r_shift_16, _rgb_g_shift_16, _rgb_b_shift_16;
-	int _rgb_r_shift_24, _rgb_g_shift_24, _rgb_b_shift_24;
-	int _rgb_r_shift_32, _rgb_g_shift_32, _rgb_b_shift_32,
-		_rgb_a_shift_32;
-	int _errnum;
-	int *const _allegro_errno = &_errnum;
-	int _utype;
+	int _color_depth = 0;
+	int _trans_blend_alpha = 0;
+	int _trans_blend_red = 0;
+	int _trans_blend_green = 0;
+	int _trans_blend_blue = 0;
+	int _rgb_r_shift_15 = 0, _rgb_g_shift_15 = 0, _rgb_b_shift_15 = 0;
+	int _rgb_r_shift_16 = 0, _rgb_g_shift_16 = 0, _rgb_b_shift_16 = 0;
+	int _rgb_r_shift_24 = 0, _rgb_g_shift_24 = 0, _rgb_b_shift_24 = 0;
+	int _rgb_r_shift_32 = 0, _rgb_g_shift_32 = 0, _rgb_b_shift_32 = 0,
+		_rgb_a_shift_32 = 0;
+	int _places_r = 0, _places_g = 0;
+	int *const _allegro_errno = &allegro_error;
+	int _utype = 0;
 
 public:
 	// routefnd
-	int _walk_area_zone5;
-	int _routex1;
+	int _walk_area_zone5 = 0;
+	int _routex1 = 0;
 
 public:
 	Vars();

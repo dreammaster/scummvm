@@ -62,7 +62,7 @@ extern void ccFreeScript(ccScript *);
 extern ccScript *fread_script(Common::SeekableReadStream *);
 
 // give the script access to a variable or function in your program
-extern void ccAddExternalSymbol(char *, void *);
+extern void ccAddExternalSymbol(const char *, void *);
 // remove the script access to a variable or function in your program
 extern void ccRemoveExternalSymbol(char *);
 // create a runnable instance of the supplied script

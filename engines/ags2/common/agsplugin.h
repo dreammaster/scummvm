@@ -19,12 +19,15 @@
  *
  */
 
-#ifndef AGS2_AC_AGS_PLUGIN_H
-#define AGS2_AC_AGS_PLUGIN_H
+#ifndef AGS2_COMMON_AGSPLUGIN_H
+#define AGS2_COMMON_AGSPLUGIN_H
 
-#include "ags2/ac/acruntime.h"
+#include "common/scummsys.h"
 
 namespace AGS2 {
+
+class IAGSFontRenderer;
+typedef intptr HWND;
 
 // If the plugin isn't using DDraw, don't require the headers
 #ifndef DIRECTDRAW_VERSION

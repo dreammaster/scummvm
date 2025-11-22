@@ -145,6 +145,10 @@ enum {
 
 constexpr int KEY_MAX = Common::KEYCODE_LAST;
 
+inline void install_keyboard() {
+	// No implementation
+}
+
 inline int keyboard_needs_poll() {
 	return 1;
 }
@@ -152,6 +156,11 @@ inline int keyboard_needs_poll() {
 int poll_keyboard() {
 	error("TODO: poll_keyboard");
 }
+
+inline void set_leds(int leds) {
+	// No implementation
+}
+
 
 } // namespace AGS2
 

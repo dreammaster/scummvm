@@ -22,17 +22,24 @@
 #ifndef AGS2_COMMON_EVENTS_H
 #define AGS2_COMMON_EVENTS_H
 
-#include "common/scummsys.h"
+#include "common/keyboard.h"
 #include "ags2/lib/allegro/keyboard.h"
 
 namespace AGS2 {
 
 #define MAXEVENTS 15
-#define TS_REPEAT   1
-#define TS_KEYPRESS 2
-#define TS_MCLICK   3
 
-extern byte key[KEY_MAX];
+enum {
+	TS_REPEAT   = 1,
+	TS_KEYPRESS = 2,
+	TS_MCLICK   = 3
+};
+
+enum {
+	KB_NUMLOCK_FLAG = Common::KBD_NUM,
+	KB_CAPSLOCK_FLAG = Common::KBD_CAPS,
+	KB_SCROLOCK_FLAG = Common::KBD_SCRL
+};
 
 // mouse cursor functions:
 // set_mouse_cursor: changes visual appearance to specified cursor

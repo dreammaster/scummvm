@@ -159,7 +159,7 @@ void initialize_engine() {
 
 	if (install_allegro())
 		error("Internal error: unable to initialize stripped Allegro 4 library.");
-	game_file_name = g_engine->getFilename();
+	game_file_name = scumm_strdup(g_engine->getFilename());
 
 	int errCode = csetlib(game_file_name);
 	if (errCode != 0) {

@@ -221,6 +221,13 @@ AL_FUNC(char *, pack_fgets, (char *p, int max, PACKFILE *f));
 AL_FUNC(int, pack_fputs, (AL_CONST char *p, PACKFILE *f));
 AL_FUNC(void *, pack_get_userdata, (PACKFILE *f));
 
+inline void put_backslash(char *filename) {
+	if (*(filename + strlen(filename) - 1) != '/') {
+		*filename++ = '/';
+		*filename = '\0';
+	}
+}
+
 } // namespace AGS2
 
 #endif

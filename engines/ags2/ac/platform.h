@@ -31,7 +31,7 @@
 #include "ags2/common/cscomp.h"
 #include "ags2/gfx/ali3d.h"
 
-#include "agsplugin.h"
+#include "ags2/common/agsplugin.h"
 
 //if !defined(BSD_VERSION) && (defined(LINUX_VERSION) || defined(WINDOWS_VERSION))
 //include "libcda.h"

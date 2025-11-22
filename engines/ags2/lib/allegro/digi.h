@@ -31,6 +31,7 @@ namespace AGS2 {
 inline void voice_set_pan(int voice, int panning) {}
 inline void voice_start(int voice) {}
 inline void voice_stop(int voice) {}
+extern void set_volume(int voice, int volume);
 
 } // namespace AGS2
 

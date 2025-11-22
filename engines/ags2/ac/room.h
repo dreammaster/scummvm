@@ -639,32 +639,37 @@ struct InteractionScripts {
 #define AUCL_BUNDLE_EXE 1
 #define AUCL_BUNDLE_VOX 2
 enum AudioFileType {
-  eAudioFileOGG = 1,
-  eAudioFileMP3 = 2,
-  eAudioFileWAV = 3,
-  eAudioFileVOC = 4,
-  eAudioFileMIDI = 5,
-  eAudioFileMOD = 6
+	eAudioFileOGG = 1,
+	eAudioFileMP3 = 2,
+	eAudioFileWAV = 3,
+	eAudioFileVOC = 4,
+	eAudioFileMIDI = 5,
+	eAudioFileMOD = 6
 };
 struct ScriptAudioClip {
-  int id;  // not used by editor, set in engine only
-  char scriptName[30];
-  char fileName[15];
-  char bundlingType;
-  char type;
-  char fileType;
-  char defaultRepeat;
-  short defaultPriority;
-  short defaultVolume;
-  int  reserved;
+	int id;  // not used by editor, set in engine only
+	char scriptName[30];
+	char fileName[15];
+	char bundlingType;
+	char type;
+	char fileType;
+	char defaultRepeat;
+	short defaultPriority;
+	short defaultVolume;
+	int  reserved;
+
+	void load(Common::SeekableReadStream *src);
 };
+
 #define AUDIO_CLIP_TYPE_SOUND 1
 struct AudioClipType {
-  int id;
-  int reservedChannels;
-  int volume_reduction_while_speech_playing;
-  int crossfadeSpeed;
-  int reservedForFuture;
+	int id;
+	int reservedChannels;
+	int volume_reduction_while_speech_playing;
+	int crossfadeSpeed;
+	int reservedForFuture;
+
+	void load(Common::SeekableReadStream *src);
 };
 
 #define MAX_ROOMS 300
@@ -1289,6 +1294,8 @@ struct MoveList {
 extern void new_room(int newnum, CharacterInfo *forchar);
 extern void read_string_decrypt(Common::SeekableReadStream *ooo, char *sss);
 extern void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes);
+extern void deserialize_interaction_scripts(Common::SeekableReadStream *iii, InteractionScripts *scripts);
+extern void read_dictionary(WordsDictionary *dict, Common::SeekableReadStream *writeto);
 
 } // namespace AGS2
 

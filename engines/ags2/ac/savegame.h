@@ -42,6 +42,7 @@ extern void save_game_dialog();
 extern void restart_game();
 extern void SetRestartPoint();
 extern void save_game(int slotn, const char *descript);
+extern int do_game_load(const char *nametouse, int slotNumber, char *descrp, int *wantShot);
 
 } // namespace AGS2
 

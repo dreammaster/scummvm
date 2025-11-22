@@ -44,6 +44,10 @@ inline void write_log(const char *msg) {
 	debug(1, "%s", msg);
 }
 
+inline const char *get_filename(const char *path) {
+	return path;
+}
+
 } // namespace AGS2
 
 #endif

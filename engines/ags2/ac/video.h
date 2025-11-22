@@ -19,39 +19,21 @@
  *
  */
 
-#ifndef AGS2_LIB_ALLEGRO_H
-#define AGS2_LIB_ALLEGRO_H
+#ifndef AGS2_AC_VIDEO_H
+#define AGS2_AC_VIDEO_H
 
-#define ALLEGRO_H
-
-#include "ags2/lib/allegro/alcompat.h"
-#include "ags2/lib/allegro/alconfig.h"
-#include "ags2/lib/allegro/base.h"
-#include "ags2/lib/allegro/color.h"
-#include "ags2/lib/allegro/config.h"
-#include "ags2/lib/allegro/datafile.h"
-#include "ags2/lib/allegro/draw.h"
-#include "ags2/lib/allegro/error.h"
-#include "ags2/lib/allegro/file.h"
-#include "ags2/lib/allegro/fixed.h"
-#include "ags2/lib/allegro/flood.h"
-#include "ags2/lib/allegro/fmaths.h"
-#include "ags2/lib/allegro/gfx.h"
-#include "ags2/lib/allegro/sound.h"
-#include "ags2/lib/allegro/stream.h"
-#include "ags2/lib/allegro/system.h"
-#include "ags2/lib/allegro/timer.h"
-#include "ags2/lib/allegro/unicode.h"
+#include "ags2/lib/allegro/surface.h"
 
 namespace AGS2 {
 
-inline int install_allegro() {
-	Common::fill((byte *)black_palette, (byte *)black_palette + sizeof(PALETTE), 0);
-	return 0;
-}
+#define FLI_OK          0              /* FLI player return values */
+#define FLI_EOF         -1
+#define FLI_ERROR       -2
+#define FLI_NOT_OPEN    -3
 
-inline void allegro_exit() {
-}
+typedef int (*fliCallbackFn)();
+extern int play_fli(const char *filename, BITMAP *bmp, int loop, fliCallbackFn callback);
+extern void play_theora_video(const char *name, int skip, int flags);
 
 } // namespace AGS2
 

@@ -34,9 +34,11 @@
 #include "ags2/ac/run.h"
 #include "ags2/ac/savegame.h"
 #include "ags2/ac/sound.h"
+#include "ags2/ac/video.h"
 #include "ags2/ac/gfx.h"
 #include "ags2/ac/scripts.h"
 #include "ags2/ac/gui/gui.h"
+#include "ags2/common/agsplugin.h"
 #include "ags2/common/cscomp.h"
 #include "ags2/common/events.h"
 #include "ags2/common/mouse32.h"
@@ -82,6 +84,12 @@ enum {
 #define REC_MOUSEWHEEL 7
 #define REC_SPEECHFINISHED 8
 #define REC_ENDOFFILE  0x6f
+
+enum {
+	LOCTYPE_HOTSPOT = 1,
+	LOCTYPE_CHAR    = 2,
+	LOCTYPE_OBJ     = 3
+};
 
 #define UPDATE_MP3 \
    while (switching_away_from_game) { }\
@@ -213,7 +221,7 @@ struct GameSetup {
 	bool force_hicolor_mode = false;
 	bool disable_exception_handling;
 	bool enable_side_borders = true;
-	const char *data_files_dir = nullptr;
+	char *data_files_dir = nullptr;
 	const char *main_data_filename = "ac2game.dat";
 	Common::String translation;
 	const char *gfxFilterID = nullptr;
@@ -600,9 +608,17 @@ struct ObjectCache {
 	int   xwas, ywas;
 };
 
-#ifndef _AGS_PLUGIN_H
-#define IAGSManagedObjectReader void
-#endif
+extern int our_eip;
+struct TempEip {
+	int oldval;
+	TempEip(int newval) {
+		oldval = our_eip;
+		our_eip = newval;
+	}
+	~TempEip() {
+		our_eip = oldval;
+	}
+};
 
 struct PluginObjectReader {
 	IAGSManagedObjectReader *reader;
@@ -818,7 +834,7 @@ extern int  IsChannelPlaying(int chan) ;
 extern void stop_and_destroy_channel (int chid) ;
 extern int  rec_kbhit();
 extern int  rec_getch();
-extern void update_polled_stuff(bool checkForDebugMessages = true);
+extern void update_polled_stuff();
 extern void invalidate_rect(int x1, int y1, int x2, int y2);
 extern int  find_word_in_dictionary (char*);
 extern void break_up_text_into_lines(int wii,int fonnt,char*todis) ;

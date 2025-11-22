@@ -26,6 +26,8 @@
 #include "ags2/common/csrun.h"
 #include "ags2/common/misc.h"
 #include "ags2/lib/allegro.h"
+#include "ags2/lib/allegro/platform/alwin.h"
+#include "ags2/lib/system/datetime.h"
 #include "ags2/vars.h"
 #include "ags2/ags2.h"
 
@@ -1480,7 +1482,7 @@ void invalidate_rect(int x1, int y1, int x2, int y2) {
 			dirtyRow[a].numSpans++;
 		} else {
 			// didn't fit in an existing span, and there are none spare
-			int nearestDist = 99999, nearestWas = -1, extendLeft;
+			int nearestDist = 99999, nearestWas = -1, extendLeft = 0;
 			int tleft, tright;
 			// find the nearest span, and enlarge that to include this rect
 			for (s = 0; s < dirtyRow[a].numSpans; s++) {
@@ -2083,7 +2085,7 @@ void _do_run_script_func_cant_block(ccInstance * forkedinst, NonBlockingScriptFu
 		return;
 
 	no_blocking_functions++;
-	int result;
+	int result = 0;
 
 	if (funcToRun->numParameters == 0)
 		result = ccCallInstance(forkedinst, (char *)funcToRun->functionName, 0);
@@ -3476,7 +3478,7 @@ void load_new_room(int newnum, CharacterInfo * forchar) {
 }
 
 char bname[40], bne[40];
-char *make_ts_func_name(char *base, int iii, int subd) {
+char *make_ts_func_name(const char *base, int iii, int subd) {
 	Common::sprintf_s(bname, base, iii);
 	Common::sprintf_s(bne, "%s_%c", bname, subd + 'a');
 	return &bne[0];
@@ -4209,7 +4211,7 @@ void process_interface_click(int ifce, int btn, int mbut) {
 	}
 
 	int btype = (guis[ifce].objrefptr[btn] >> 16) & 0x000ffff;
-	int rtype = 0, rdata;
+	int rtype = 0, rdata = 0;
 	if (btype == GOBJ_BUTTON) {
 		GUIButton *gbuto = (GUIButton *)guis[ifce].objs[btn];
 		rtype = gbuto->leftclick;
@@ -8147,7 +8149,7 @@ void set_default_glmsg(int msgnum, const char *val) {
 void split_lines_rightleft(char *todis, int wii, int fonnt) {
 	// start on the last character
 	char *thisline = todis + strlen(todis) - 1;
-	char prevlwas, *prevline = NULL;
+	char prevlwas = 0, *prevline = NULL;
 	// work backwards
 	while (thisline >= todis) {
 
@@ -8192,7 +8194,7 @@ void split_lines_rightleft(char *todis, int wii, int fonnt) {
 
 
 
-char *reverse_text(char *text) {
+char *reverse_text(const char *text) {
 	int stlen = strlen(text), rr;
 	char *backwards = (char *)malloc(stlen + 1);
 	for (rr = 0; rr < stlen; rr++)
@@ -8215,7 +8217,7 @@ void wouttext_reverseifnecessary(int x, int y, int font, char *text) {
 		free(backwards);
 }
 
-void break_up_text_into_lines(int wii, int fonnt, char *todis) {
+void break_up_text_into_lines(int wii, int fonnt, const char *todis) {
 	if (fonnt == -1)
 		fonnt = play.normal_font;
 
@@ -9337,7 +9339,7 @@ const char *String_ReplaceCharAt(const char *thisString, int index, char newChar
 		quit("!String.ReplaceCharAt: index outside range of string");
 
 	char *buffer = (char *)malloc(strlen(thisString) + 1);
-	Common::strcpy_s(buffer, thisString);
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, thisString);
 	buffer[index] = newChar;
 	return CreateNewScriptString(buffer, false);
 }
@@ -9420,7 +9422,7 @@ const char *String_Replace(const char *thisString, const char *lookForText, cons
 
 		if (matchHere)
 		{
-			Common::strcpy_s(&resultBuffer[outputSize], replaceWithText);
+			Common::strcpy_s(&resultBuffer[outputSize], STD_BUFFER_SIZE,  replaceWithText);
 			outputSize += strlen(replaceWithText);
 			i += strlen(lookForText) - 1;
 		} else
@@ -9437,15 +9439,15 @@ const char *String_Replace(const char *thisString, const char *lookForText, cons
 
 const char *String_LowerCase(const char *thisString) {
 	char *buffer = (char *)malloc(strlen(thisString) + 1);
-	Common::strcpy_s(buffer, thisString);
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, thisString);
 	ags_strlwr(buffer);
 	return CreateNewScriptString(buffer, false);
 }
 
 const char *String_UpperCase(const char *thisString) {
 	char *buffer = (char *)malloc(strlen(thisString) + 1);
-	Common::strcpy_s(buffer, thisString);
-	strupr(buffer);
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, thisString);
+	ags_strupr(buffer);
 	return CreateNewScriptString(buffer, false);
 }
 
@@ -10450,13 +10452,16 @@ int load_game_file() {
 			quit("LoadGame: too many audio types");
 
 		game.audioClipTypes = (AudioClipType *)malloc(game.audioClipTypeCount * sizeof(AudioClipType));
-		fread(&game.audioClipTypes[0], sizeof(AudioClipType), game.audioClipTypeCount, iii);
+		for (int i = 0; i < game.audioClipTypeCount; ++i)
+			game.audioClipTypes[i].load(iii);
+
 		game.audioClipCount = getw(iii);
 		game.audioClips = (ScriptAudioClip *)malloc(game.audioClipCount * sizeof(ScriptAudioClip));
-		fread(&game.audioClips[0], sizeof(ScriptAudioClip), game.audioClipCount, iii);
+		for (int i = 0; i < game.audioClipCount; ++i)
+			game.audioClips[i].load(iii);
+
 		play.score_sound = getw(iii);
-	} else
-	{
+	} else {
 		game.audioClipCount = 0;
 		play.score_sound = -1;
 	}
@@ -10466,15 +10471,14 @@ int load_game_file() {
 		game.roomCount = getw(iii);
 		game.roomNumbers = (int *)malloc(game.roomCount * sizeof(int));
 		game.roomNames = (char **)malloc(game.roomCount * sizeof(char *));
-		for (bb = 0; bb < game.roomCount; bb++)
-		{
+
+		for (bb = 0; bb < game.roomCount; bb++) {
 			game.roomNumbers[bb] = getw(iii);
 			fgetstring_limit(pexbuf, iii, sizeof(pexbuf));
 			game.roomNames[bb] = (char *)malloc(strlen(pexbuf) + 1);
-			Common::strcpy_s(game.roomNames[bb], pexbuf);
+			Common::strcpy_s(game.roomNames[bb], STD_BUFFER_SIZE, pexbuf);
 		}
-	} else
-	{
+	} else {
 		game.roomCount = 0;
 	}
 
@@ -10506,7 +10510,7 @@ int load_game_file() {
 
 		// export the character's script object
 		characterScriptObjNames[ee] = (char *)malloc(strlen(game.chars[ee].scrname) + 5);
-		Common::strcpy_s(characterScriptObjNames[ee], game.chars[ee].scrname);
+		Common::strcpy_s(characterScriptObjNames[ee], STD_BUFFER_SIZE, game.chars[ee].scrname);
 
 		ccAddExternalSymbol(characterScriptObjNames[ee], &game.chars[ee]);
 	}
@@ -10566,7 +10570,7 @@ int load_game_file() {
 		// copy the script name to its own memory location
 		// because ccAddExtSymbol only keeps a reference
 		guiScriptObjNames[ee] = (char *)malloc(21);
-		Common::strcpy_s(guiScriptObjNames[ee], guis[ee].name);
+		Common::strcpy_s(guiScriptObjNames[ee], STD_BUFFER_SIZE, guis[ee].name);
 
 		scrGui[ee].gui = &guis[ee];
 		scrGui[ee].id = ee;
@@ -10943,10 +10947,6 @@ int calculate_max_volume() {
 	return newvol;
 }
 
-void update_polled_stuff() {
-	update_polled_stuff(true);
-}
-
 // add/remove the volume drop to the audio channels while speech is playing
 void apply_volume_drop_modifier(bool applyModifier) {
 	for (int i = 0; i < MAX_SOUND_CHANNELS; i++)
@@ -10965,7 +10965,7 @@ void apply_volume_drop_modifier(bool applyModifier) {
 	}
 }
 
-void update_polled_stuff(bool checkForDebugMessages) {
+void update_polled_stuff() {
 	UPDATE_MP3
 
 		if (want_exit) {
@@ -10979,9 +10979,6 @@ void update_polled_stuff(bool checkForDebugMessages) {
 		mvolcounter = 0;
 		update_ambient_sound_vol();
 	}
-
-	if ((editor_debugging_initialized) && (checkForDebugMessages))
-		check_for_messages_from_editor();
 }
 
 // Update the music, and advance the crossfade on a step
@@ -11255,7 +11252,7 @@ void wouttext_outline(int xxp, int yyp, int usingfont, char *texx) {
 	wouttextxy(xxp, yyp, usingfont, texx);
 }
 
-int GetTextDisplayTime(char *text, int canberel = 0) {
+int GetTextDisplayTime(const char *text, int canberel = 0) {
 	int uselen = strlen(text);
 
 	int fpstimer = frames_per_second;
@@ -11671,7 +11668,7 @@ int _display_main(int xx, int yy, int wii, char *todis, int blocking, int usingf
 	return 0;
 }
 
-void _display_at(int xx, int yy, int wii, const char *todis, int blocking, int asspch, int isThought, int allowShrink, bool overlayPositionFixed) {
+void _display_at(int xx, int yy, int wii, char *todis, int blocking, int asspch, int isThought, int allowShrink, bool overlayPositionFixed) {
 	int usingfont = FONT_NORMAL;
 	if (asspch) usingfont = FONT_SPEECH;
 	int needStopSpeech = 0;
@@ -11687,8 +11684,10 @@ void _display_at(int xx, int yy, int wii, const char *todis, int blocking, int a
 			quit("Display: auto-voice symbol '&' not followed by valid integer");
 		if (play_speech(play.narrator_speech, igr)) {
 			// if Voice Only, then blank out the text
-			if (play.want_speech == 2)
-				todis = "  ";
+			if (play.want_speech == 2) {
+				static char blank[4] = "  ";
+				todis = blank;
+			}
 		}
 		needStopSpeech = 1;
 	}
@@ -11924,7 +11923,7 @@ void DisplayAt(int xxp, int yyp, int widd, const char *texx, ...) {
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;
 	va_start(ap, texx);
-	Common::String msg = Common::String::vformat(texx, ap);
+	Common::vsprintf_s(displbuf, texx, ap);
 	va_end(ap);
 
 	multiply_up_coordinates(&xxp, &yyp);
@@ -11932,7 +11931,7 @@ void DisplayAt(int xxp, int yyp, int widd, const char *texx, ...) {
 
 	if (widd < 1) widd = scrnwid / 2;
 	if (xxp < 0) xxp = scrnwid / 2 - widd / 2;
-	_display_at(xxp, yyp, widd, msg.c_str(), 1, 0, 0, 0, false);
+	_display_at(xxp, yyp, widd, displbuf, 1, 0, 0, 0, false);
 }
 
 int play_speech(int charid, int sndid) {
@@ -11966,7 +11965,7 @@ int play_speech(int charid, int sndid) {
 		Common::strcat_s(finame, "NARR");
 
 	// append the speech number
-	Common::sprintf_s(&finame[strlen(finame)], "%d", sndid);
+	Common::sprintf_s(&finame[strlen(finame)], STD_BUFFER_SIZE, "%d", sndid);
 
 	int ii;  // Compare the base file name to the .pam file name
 	char *basefnptr = strchr(&finame[4], '~') + 1;
@@ -11987,12 +11986,12 @@ int play_speech(int charid, int sndid) {
 	speechmp3 = my_load_wave(finame, play.speech_volume, 0);
 
 	if (speechmp3 == NULL) {
-		Common::strcpy_s(&finame[strlen(finame) - 3], "ogg");
+		Common::strcpy_s(&finame[strlen(finame) - 3], STD_BUFFER_SIZE, "ogg");
 		speechmp3 = my_load_ogg(finame, play.speech_volume);
 	}
 
 	if (speechmp3 == NULL) {
-		Common::strcpy_s(&finame[strlen(finame) - 3], "mp3");
+		Common::strcpy_s(&finame[strlen(finame) - 3], STD_BUFFER_SIZE, "mp3");
 		speechmp3 = my_load_mp3(finame, play.speech_volume);
 	}
 
@@ -12162,11 +12161,11 @@ void _displayspeech(char *texx, int aschar, int xx, int yy, int widd, int isThou
 		return;
 	}
 
-	int textcol = speakingChar->talkcolor;
+	int txtCol = speakingChar->talkcolor;
 
 	// if it's 0, it won't be recognised as speech
-	if (textcol == 0)
-		textcol = 16;
+	if (txtCol == 0)
+		txtCol = 16;
 
 	int allowShrink = 0;
 	int bwidth = widd;
@@ -12212,8 +12211,10 @@ void _displayspeech(char *texx, int aschar, int xx, int yy, int widd, int isThou
 		text_lips_text = texx;
 
 		if (play_speech(aschar, igr)) {
-			if (play.want_speech == 2)
-				texx = "  ";  // speech only, no text.
+			if (play.want_speech == 2) {
+				static char blank[4] = "  ";
+				texx = blank;  // speech only, no text.
+			}
 		}
 	}
 	if (game.options[OPT_SPEECHTYPE] == 3)
@@ -12440,7 +12441,7 @@ void _displayspeech(char *texx, int aschar, int xx, int yy, int widd, int isThou
 			facetalkchar = &game.chars[aschar];
 			if (facetalkchar->blinktimer < 0)
 				facetalkchar->blinktimer = facetalkchar->blinkinterval;
-			textcol = -textcol;
+			txtCol = -txtCol;
 			overlayPositionFixed = true;
 		} else if (useview >= 0) {
 			// Lucasarts-style speech
@@ -12501,7 +12502,7 @@ void _displayspeech(char *texx, int aschar, int xx, int yy, int widd, int isThou
 		allowShrink = 0;
 
 	our_eip = 155;
-	_display_at(tdxp, tdyp, bwidth, texx, 0, textcol, isThought, allowShrink, overlayPositionFixed);
+	_display_at(tdxp, tdyp, bwidth, texx, 0, txtCol, isThought, allowShrink, overlayPositionFixed);
 	our_eip = 156;
 	if ((play.in_conversation > 0) && (game.options[OPT_SPEECHTYPE] == 3))
 		closeupface = NULL;
@@ -12558,7 +12559,7 @@ int Character_GetSpeakingFrame(CharacterInfo * chaa) {
 }
 
 
-void DisplaySpeech(const char *texx, int aschar) {
+void DisplaySpeech(char *texx, int aschar) {
 	_displayspeech(texx, aschar, -1, -1, -1, 0);
 }
 
@@ -12598,7 +12599,7 @@ void SetGlobalString(int index, char *newval) {
 void GetGlobalString(int index, char *strval) {
 	if ((index < 0) | (index >= MAXGLOBALSTRINGS))
 		quit("!GetGlobalString: invalid index");
-	Common::strcpy_s(strval, play.globalstrings[index]);
+	Common::strcpy_s(strval, STD_BUFFER_SIZE, play.globalstrings[index]);
 }
 
 const char *Game_GetGlobalStrings(int index) {
@@ -12650,7 +12651,7 @@ void SetSkipSpeech(int newval) {
 	play.cant_skip_speech = user_to_internal_skip_speech(newval);
 }
 
-void DisplayAtY(int ypos, const char *texx) {
+void DisplayAtY(int ypos, char *texx) {
 	if ((ypos < -1) || (ypos >= GetMaxScreenHeight()))
 		quitprintf("!DisplayAtY: invalid Y co-ordinate supplied (used: %d; valid: 0..%d)", ypos, GetMaxScreenHeight());
 
@@ -12681,9 +12682,9 @@ void Display(const char *texx, ...) {
 	char displbuf[STD_BUFFER_SIZE];
 	va_list ap;
 	va_start(ap, texx);
-	Common::String msg = Common::String::vformat(texx, ap);
+	Common::vsprintf_s(displbuf, texx, ap);
 	va_end(ap);
-	DisplayAtY(-1, msg.c_str());
+	DisplayAtY(-1, displbuf);
 }
 
 void _DisplaySpeechCore(int chid, char *displbuf) {
@@ -12717,7 +12718,7 @@ void __sc_displayspeech(int chid, char *texx, ...) {
 
 }
 
-void DisplayTopBar(int ypos, int ttexcol, int backcol, char *title, char *texx, ...) {
+void DisplayTopBar(int ypos, int ttexcol, int backcol, const char *title, const char *texx, ...) {
 
 	Common::strcpy_s(topBar.text, get_translation(title));
 
@@ -12820,7 +12821,7 @@ void replace_tokens(char *srcmes, char *destm, int maxlen = 99999) {
 					quit("!Display: invalid global int index speicifed in @GI@");
 				Common::sprintf_s(tval, "%d", GetGlobalInt(inx));
 			}
-			Common::strcpy_s(destp, tval);
+			Common::strcpy_s(destp, STD_BUFFER_SIZE, tval);
 			indxdest += strlen(tval);
 		} else {
 			destp[0] = srcp[0];
@@ -12834,8 +12835,11 @@ void replace_tokens(char *srcmes, char *destm, int maxlen = 99999) {
 }
 
 char *get_global_message(int msnum) {
-	if (game.messages[msnum - 500] == NULL)
-		return "";
+	if (game.messages[msnum - 500] == NULL) {
+		static char blank = '\0';
+		return &blank;
+	}
+
 	return get_translation(game.messages[msnum - 500]);
 }
 
@@ -13055,7 +13059,7 @@ void RawPrint(int xx, int yy, char *texx, ...) {
 }
 void RawPrintMessageWrapped(int xx, int yy, int wid, int font, int msgm) {
 	char displbuf[3000];
-	int texthit = wgetfontheight(font);
+	int txthit = wgetfontheight(font);
 	multiply_up_coordinates(&xx, &yy);
 	wid = multiply_up_coordinate(wid);
 
@@ -13069,7 +13073,7 @@ void RawPrintMessageWrapped(int xx, int yy, int wid, int font, int msgm) {
 	RAW_START();
 	wtexttransparent(TEXTFG);
 	for (int i = 0; i < numlines; i++)
-		wouttext_outline(xx, yy + texthit * i, font, lines[i]);
+		wouttext_outline(xx, yy + txthit * i, font, lines[i]);
 	invalidate_screen();
 	mark_current_background_dirty();
 	RAW_END();
@@ -13658,7 +13662,7 @@ int my_getpixel(BITMAP * blk, int x, int y) {
 		return -1;
 
 	// strip the alpha channel
-	return blk->vtable->getpixel(blk, x, y) & 0x00ffffff;
+	return blk->getpixel(x, y) & 0x00ffffff;
 }
 
 block GetCharacterImage(int charid, int *isFlipped) {
@@ -13758,7 +13762,7 @@ enum RoundDirections {
 int FloatToInt(SCRIPT_FLOAT(value), int roundDirection) {
 	INIT_SCRIPT_FLOAT(value);
 
-	int intval;
+	int intval = 0;
 
 	if (value >= 0.0) {
 		if (roundDirection == eRoundDown)
@@ -13927,7 +13931,7 @@ FLOAT_RETURN_TYPE Math_RadiansToDegrees(SCRIPT_FLOAT(value)) {
 }
 
 FLOAT_RETURN_TYPE Math_GetPi() {
-	float pi = M_PI;
+	double pi = M_PI;
 
 	RETURN_FLOAT(pi);
 }
@@ -13984,7 +13988,7 @@ ScriptDrawingSurface *Room_GetDrawingSurfaceForBackground(int backgroundNumber) 
 
 ScriptDateTime *DateTime_Now_Core() {
 	ScriptDateTime *sdt = new ScriptDateTime();
-	sdt->rawUnixTime = time(NULL);
+	sdt->rawUnixTime = getUnixTime();
 
 	platform->GetSystemTime(sdt);
 
@@ -14027,7 +14031,7 @@ int DateTime_GetRawTime(ScriptDateTime * sdt) {
 
 int sc_GetTime(int whatti) {
 	ScriptDateTime *sdt = DateTime_Now_Core();
-	int returnVal;
+	int returnVal = 0;
 
 	if (whatti == 1) returnVal = sdt->hour;
 	else if (whatti == 2) returnVal = sdt->minute;
@@ -14043,7 +14047,7 @@ int sc_GetTime(int whatti) {
 }
 
 int GetRawTime() {
-	return time(NULL);
+	return getUnixTime();
 }
 
 char gamefilenamebuf[200];
@@ -14138,7 +14142,7 @@ static void display_switch_out() {
 		}
 	}
 
-	rest(1000);
+	g_system->delayMillis(1000);
 
 	// restore the callbacks
 	SetMultitasking(0);
@@ -14251,7 +14255,7 @@ void play_flc_file(int numb, int playflags) {
 		clearScreenAtStart = 0;
 
 	char flicnam[20]; Common::sprintf_s(flicnam, "flic%d.flc", numb);
-	FILE *iii = clibfopen(flicnam, "rb");
+	Common::SeekableReadStream *iii = clibfopen(flicnam, "rb");
 	if (iii == NULL) {
 		Common::sprintf_s(flicnam, "flic%d.fli", numb);
 		iii = clibfopen(flicnam, "rb");
@@ -14260,10 +14264,11 @@ void play_flc_file(int numb, int playflags) {
 		debug_log("FLIC animation FLIC%d.FLC not found", numb);
 		return;
 	}
-	fseek(iii, 8, SEEK_CUR);
-	fread(&fliwidth, 2, 1, iii);
-	fread(&fliheight, 2, 1, iii);
+	iii->seek(8, SEEK_CUR);
+	fliwidth = iii->readUint16LE();
+	fliheight = iii->readUint16LE();
 	delete iii;
+
 	if (game.color_depth > 1) {
 		hicol_buf = create_bitmap_ex(final_col_dep, fliwidth, fliheight);
 		clear(hicol_buf);
@@ -14307,60 +14312,6 @@ void play_flc_file(int numb, int playflags) {
 }
 // FLIC player end
 
-int theora_playing_callback(BITMAP * theoraBuffer) {
-	if (theoraBuffer == NULL)
-	{
-		// No video, only sound
-		return check_if_user_input_should_cancel_video();
-	}
-
-	int drawAtX = 0, drawAtY = 0;
-	if (fli_ddb == NULL)
-	{
-		fli_ddb = gfxDriver->CreateDDBFromBitmap(theoraBuffer, false, true);
-	}
-	if (stretch_flc)
-	{
-		drawAtX = scrnwid / 2 - fliTargetWidth / 2;
-		drawAtY = scrnhit / 2 - fliTargetHeight / 2;
-		if (!gfxDriver->HasAcceleratedStretchAndFlip())
-		{
-			stretch_blit(theoraBuffer, fli_target, 0, 0, theoraBuffer->w, theoraBuffer->h,
-				drawAtX, drawAtY, fliTargetWidth, fliTargetHeight);
-			gfxDriver->UpdateDDBFromBitmap(fli_ddb, fli_target, false);
-			drawAtX = 0;
-			drawAtY = 0;
-		} else
-		{
-			gfxDriver->UpdateDDBFromBitmap(fli_ddb, theoraBuffer, false);
-			fli_ddb->SetStretch(fliTargetWidth, fliTargetHeight);
-		}
-	} else
-	{
-		gfxDriver->UpdateDDBFromBitmap(fli_ddb, theoraBuffer, false);
-		drawAtX = scrnwid / 2 - theoraBuffer->w / 2;
-		drawAtY = scrnhit / 2 - theoraBuffer->h / 2;
-	}
-
-	gfxDriver->DrawSprite(drawAtX, drawAtY, fli_ddb);
-	render_to_screen(virtual_screen, 0, 0);
-	update_polled_stuff_and_crossfade();
-
-	return check_if_user_input_should_cancel_video();
-}
-
-APEG_STREAM *get_theora_size(const char *fileName, int *width, int *height) {
-	APEG_STREAM *oggVid = apeg_open_stream(fileName);
-	if (oggVid != NULL)
-	{
-		apeg_get_video_size(oggVid, width, height);
-	} else
-	{
-		*width = 0;
-		*height = 0;
-	}
-	return oggVid;
-}
 
 void calculate_destination_size_maintain_aspect_ratio(int vidWidth, int vidHeight, int *targetWidth, int *targetHeight) {
 	float aspectRatioVideo = (float)vidWidth / (float)vidHeight;
@@ -14380,70 +14331,6 @@ void calculate_destination_size_maintain_aspect_ratio(int vidWidth, int vidHeigh
 		*targetWidth = (float)scrnhit * aspectRatioVideo;
 	}
 
-}
-
-void play_theora_video(const char *name, int skip, int flags) {
-	apeg_set_display_depth(bitmap_color_depth(screen));
-	// we must disable length detection, otherwise it takes ages to start
-	// playing if the file is large because it seeks through the whole thing
-	apeg_disable_length_detection(TRUE);
-	apeg_enable_framedrop(TRUE);
-	update_polled_stuff();
-
-	stretch_flc = (flags % 10);
-	canabort = skip;
-	apeg_ignore_audio((flags >= 10) ? 1 : 0);
-
-	int videoWidth, videoHeight;
-	APEG_STREAM *oggVid = get_theora_size(name, &videoWidth, &videoHeight);
-
-	if (videoWidth == 0)
-	{
-		Display("Unable to load theora video '%s'", name);
-		return;
-	}
-
-	if (flags < 10)
-	{
-		stop_all_sound_and_music();
-	}
-
-	fli_target = NULL;
-	//fli_buffer = create_bitmap_ex(final_col_dep, videoWidth, videoHeight);
-	calculate_destination_size_maintain_aspect_ratio(videoWidth, videoHeight, &fliTargetWidth, &fliTargetHeight);
-
-	if ((fliTargetWidth == videoWidth) && (fliTargetHeight == videoHeight) && (stretch_flc))
-	{
-		// don't need to stretch after all
-		stretch_flc = 0;
-	}
-
-	if ((stretch_flc) && (!gfxDriver->HasAcceleratedStretchAndFlip()))
-	{
-		fli_target = create_bitmap_ex(final_col_dep, scrnwid, scrnhit);
-		clear(fli_target);
-		fli_ddb = gfxDriver->CreateDDBFromBitmap(fli_target, false, true);
-	} else
-	{
-		fli_ddb = NULL;
-	}
-
-	update_polled_stuff();
-
-	clear(virtual_screen);
-
-	if (apeg_play_apeg_stream(oggVid, NULL, 0, theora_playing_callback) == APEG_ERROR)
-	{
-		Display("Error playing theora video '%s'", name);
-	}
-	apeg_close_stream(oggVid);
-
-	//destroy_bitmap(fli_buffer);
-	if (fli_target != NULL)
-		destroy_bitmap(fli_target);
-	gfxDriver->DestroyDDB(fli_ddb);
-	fli_ddb = NULL;
-	invalidate_screen();
 }
 
 void pause_sound_if_necessary_and_play_video(const char *name, int skip, int flags) {
@@ -14677,12 +14564,12 @@ GUIObject *GetGUIControlAtLocation(int xx, int yy) {
 
 	multiply_up_coordinates(&xx, &yy);
 
-	int oldmousex = mousex, oldmousey = mousey;
+	int oldx = mousex, oldy = mousey;
 	mousex = xx - guis[guinum].x;
 	mousey = yy - guis[guinum].y;
 	int toret = guis[guinum].find_object_under_mouse(0, false);
-	mousex = oldmousex;
-	mousey = oldmousey;
+	mousex = oldx;
+	mousey = oldy;
 	if (toret < 0)
 		return NULL;
 
@@ -14718,8 +14605,8 @@ int FindGUIID(const char *GUIName) {
 }
 
 int isposinbox(int mmx, int mmy, int lf, int tp, int rt, int bt) {
-	if ((mmx >= lf) & (mmx <= rt) & (mmy >= tp) & (mmy <= bt)) return TRUE;
-	else return FALSE;
+	if ((mmx >= lf) & (mmx <= rt) & (mmy >= tp) & (mmy <= bt)) return true;
+	else return false;
 }
 
 // xx,yy is the position in room co-ordinates that we are checking
@@ -14728,8 +14615,8 @@ int is_pos_in_sprite(int xx, int yy, int arx, int ary, block sprit, int spww, in
 	if (spww == 0) spww = divide_down_coordinate(sprit->w) - 1;
 	if (sphh == 0) sphh = divide_down_coordinate(sprit->h) - 1;
 
-	if (isposinbox(xx, yy, arx, ary, arx + spww, ary + sphh) == FALSE)
-		return FALSE;
+	if (isposinbox(xx, yy, arx, ary, arx + spww, ary + sphh) == false)
+		return false;
 
 	if (game.options[OPT_PIXPERFECT])
 	{
@@ -14756,9 +14643,9 @@ int is_pos_in_sprite(int xx, int yy, int arx, int ary, block sprit, int spww, in
 		int gpcol = my_getpixel(sprit, xpos, ypos);
 
 		if ((gpcol == bitmap_mask_color(sprit)) || (gpcol == -1))
-			return FALSE;
+			return false;
 	}
-	return TRUE;
+	return true;
 }
 
 // Used for deciding whether a char or obj was closer
@@ -14784,7 +14671,7 @@ int GetObjectAt(int xx, int yy) {
 		block theImage = GetObjectImage(aa, &isflipped);
 
 		if (is_pos_in_sprite(xx, yy, xxx, yyy - spHeight, theImage,
-			spWidth, spHeight, isflipped) == FALSE)
+			spWidth, spHeight, isflipped) == false)
 			continue;
 
 		int usebasel = objs[aa].get_baseline();
@@ -14880,7 +14767,7 @@ int is_pos_on_character(int xx, int yy) {
 
 		if (is_pos_in_sprite(xx, yy, xxx, yyy, theImage,
 			divide_down_coordinate(usewid),
-			divide_down_coordinate(usehit), mirrored) == FALSE)
+			divide_down_coordinate(usehit), mirrored) == false)
 			continue;
 
 		int use_base = chin->get_baseline();
@@ -15145,17 +15032,15 @@ void RunRegionInteraction(int regnum, int mood) {
 	// while another interaction (eg. hotspot) is in a Wait
 	// command, and leaving our basename would call the wrong
 	// script later on
-	char *oldbasename = evblockbasename;
+	const char *oldbasename = evblockbasename;
 	int   oldblocknum = evblocknum;
 
 	evblockbasename = "region%d";
 	evblocknum = regnum;
 
-	if (thisroom.regionScripts != NULL)
-	{
+	if (thisroom.regionScripts != NULL) {
 		run_interaction_script(thisroom.regionScripts[regnum], mood);
-	} else
-	{
+	} else {
 		run_interaction_event(&croom->intrRegion[regnum], mood);
 	}
 
@@ -15190,7 +15075,7 @@ void RunHotspotInteraction(int hotspothere, int mood) {
 
 	// can't use the setevent functions because this ProcessClick is only
 	// executed once in a eventlist
-	char *oldbasename = evblockbasename;
+	const char *oldbasename = evblockbasename;
 	int   oldblocknum = evblocknum;
 
 	evblockbasename = "hotspot%d";
@@ -15363,7 +15248,7 @@ int Game_DoOnceOnly(const char *token) {
 	}
 	play.do_once_tokens = (char **)realloc(play.do_once_tokens, sizeof(char *) * (play.num_do_once_tokens + 1));
 	play.do_once_tokens[play.num_do_once_tokens] = (char *)malloc(strlen(token) + 1);
-	Common::strcpy_s(play.do_once_tokens[play.num_do_once_tokens], token);
+	Common::strcpy_s(play.do_once_tokens[play.num_do_once_tokens], STD_BUFFER_SIZE, token);
 	play.num_do_once_tokens++;
 	return 1;
 }
@@ -15709,7 +15594,7 @@ void get_text_property(CustomProperties * cprop, const char *property, char *buf
 	if (valtemp == NULL) {
 		valtemp = game.propSchema.defaultValue[idx];
 	}
-	Common::strcpy_s(bufer, valtemp);
+	Common::strcpy_s(bufer, STD_BUFFER_SIZE, valtemp);
 }
 
 const char *get_text_property_dynamic_string(CustomProperties * cprop, const char *property) {
@@ -16486,7 +16371,7 @@ void SetPlayerCharacter(int newchar) {
 void FollowCharacterEx(int who, int tofollow, int distaway, int eagerness) {
 	if (!is_valid_character(who))
 		quit("!FollowCharacter: Invalid character specified");
-	CharacterInfo *chtofollow;
+	CharacterInfo *chtofollow = nullptr;
 	if (tofollow == -1)
 		chtofollow = NULL;
 	else if (!is_valid_character(tofollow))
@@ -16515,13 +16400,14 @@ void SetCharacterProperty(int who, int flag, int yesorno) {
 	Character_SetOption(&game.chars[who], flag, yesorno);
 }
 
-void QuitGame(int dialog) {
-	if (dialog) {
+void QuitGame(int dlg) {
+	if (dlg) {
 		int rcode;
 		setup_for_dialog();
 		rcode = quitdialog();
 		restore_after_dialog();
-		if (rcode == 0) return;
+		if (rcode == 0)
+			return;
 	}
 	quit("|You have exited.");
 }
@@ -16566,7 +16452,7 @@ int find_word_in_dictionary(char *lookfor) {
 
 int SaidUnknownWord(char *buffer) {
 	VALIDATE_STRING(buffer);
-	Common::strcpy_s(buffer, play.bad_parsed_word);
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, play.bad_parsed_word);
 	if (play.bad_parsed_word[0] == 0)
 		return 0;
 	return 1;
@@ -16579,7 +16465,7 @@ const char *Parser_SaidUnknownWord() {
 }
 
 int is_valid_word_char(char theChar) {
-	if ((isalnum(theChar)) || (theChar == '\'') || (theChar == '-')) {
+	if ((Common::isAlnum(theChar)) || (theChar == '\'') || (theChar == '-')) {
 		return 1;
 	}
 	return 0;
@@ -16622,7 +16508,7 @@ int FindMatchingMultiWordWord(char *thisword, char **text) {
 		// yes, a word like "pick up" was found
 		*text = (char *)tempptrAtBestMatch;
 		if (thisword != NULL)
-			Common::strcpy_s(thisword, tempword);
+			Common::strcpy_s(thisword, STD_BUFFER_SIZE, tempword);
 	}
 
 	return word;
@@ -16726,7 +16612,7 @@ int parse_sentence(char *text, int *numwords, short *wordarray, short *compareto
 
 						const char *textStart = &text[1];
 
-						while ((text[0] == ',') || (isalnum(text[0]) != 0))
+						while ((text[0] == ',') || (Common::isAlnum(text[0]) != 0))
 							text++;
 
 						continueSearching = 0;
@@ -16808,18 +16694,16 @@ void check_strlen(char *ptt) {
 		MAXSTRLEN = 30;
 }
 
-
-#define MAX_OPEN_SCRIPT_FILES 10
-FILE *valid_handles[MAX_OPEN_SCRIPT_FILES + 1];
-int num_open_script_files = 0;
-int check_valid_file_handle(FILE * hann, char *msg) {
+int check_valid_file_handle(Common::Stream *hann, const char *msg) {
 	int aa;
+
 	if (hann != NULL) {
 		for (aa = 0; aa < num_open_script_files; aa++) {
 			if (hann == valid_handles[aa])
 				return aa;
 		}
 	}
+
 	char exmsg[100];
 	Common::sprintf_s(exmsg, "!%s: invalid file handle; file not previously opened or has been closed", msg);
 	quit(exmsg);
@@ -16830,7 +16714,7 @@ bool validate_user_file_path(const char *fnmm, char *output, bool currentDirOnly
 	if (strncmp(fnmm, "$SAVEGAMEDIR$", 13) == 0)
 	{
 		fnmm += 14;
-		Common::sprintf_s(output, "%s%s", saveGameDirectory, fnmm);
+		Common::sprintf_s(output, STD_BUFFER_SIZE, "%s%s", saveGameDirectory, fnmm);
 	} else if (strncmp(fnmm, "$APPDATADIR$", 12) == 0)
 	{
 		fnmm += 13;
@@ -16838,15 +16722,14 @@ bool validate_user_file_path(const char *fnmm, char *output, bool currentDirOnly
 		if (appDataDir == NULL) appDataDir = ".";
 		if (game.saveGameFolderName[0] != 0)
 		{
-			Common::sprintf_s(output, "%s/%s", appDataDir, game.saveGameFolderName);
+			Common::sprintf_s(output, STD_BUFFER_SIZE, "%s/%s", appDataDir, game.saveGameFolderName);
 			fix_filename_slashes(output);
-			mkdir(output);
-		} else
-		{
-			Common::strcpy_s(output, appDataDir);
+			//mkdir(output);
+		} else {
+			Common::strcpy_s(output, STD_BUFFER_SIZE, appDataDir);
 		}
 		put_backslash(output);
-		Common::strcat_s(output, fnmm);
+		Common::strcat_s(output, STD_BUFFER_SIZE, fnmm);
 	} else
 	{
 		get_current_dir_path(output, fnmm);
@@ -16863,7 +16746,7 @@ bool validate_user_file_path(const char *fnmm, char *output, bool currentDirOnly
 	return true;
 }
 
-FILE *FileOpen(const char *fnmm, const char *mode) {
+Common::Stream *FileOpen(const char *fnmm, const char *mode) {
 	int useindx = 0;
 	char fileToOpen[MAX_PATH];
 
@@ -16877,93 +16760,131 @@ FILE *FileOpen(const char *fnmm, const char *mode) {
 			break;
 	}
 
-	valid_handles[useindx] = fopen(fileToOpen, mode);
+	Common::Stream *stream;
+	if (*mode == 'w') {
+		stream = g_system->getSavefileManager()->openForSaving(fileToOpen, false);
+	} else {
+		Common::File *f = new Common::File();
+		if (f->open(fileToOpen)) {
+			stream = f;
+		} else {
+			delete f;
+			stream = g_system->getSavefileManager()->openForLoading(fileToOpen);
+		}
+	}
 
-	if (valid_handles[useindx] == NULL)
-		return NULL;
+	valid_handles[useindx] = stream;
 
-	if (useindx >= num_open_script_files)
-	{
+	if (valid_handles[useindx] == nullptr)
+		return nullptr;
+
+	if (useindx >= num_open_script_files) {
 		if (num_open_script_files >= MAX_OPEN_SCRIPT_FILES)
 			quit("!FileOpen: tried to open more than 10 files simultaneously - close some first");
 		num_open_script_files++;
 	}
+
 	return valid_handles[useindx];
 }
 
-void FileClose(FILE * hha) {
+void FileClose(Common::Stream *hha) {
 	valid_handles[check_valid_file_handle(hha, "FileClose")] = NULL;
-	fclose(hha);
+	delete hha;
 }
-void FileWrite(FILE * haa, const char *towrite) {
+
+void FileWrite(Common::Stream *haa, const char *towrite) {
 	check_valid_file_handle(haa, "FileWrite");
-	putw(strlen(towrite) + 1, haa);
-	fwrite(towrite, strlen(towrite) + 1, 1, haa);
+	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(haa);
+
+	putw(strlen(towrite) + 1, ws);
+	ws->write(towrite, strlen(towrite) + 1);
 }
-void FileWriteRawLine(FILE * haa, const char *towrite) {
+
+void FileWriteRawLine(Common::Stream * haa, const char *towrite) {
 	check_valid_file_handle(haa, "FileWriteRawLine");
-	fwrite(towrite, strlen(towrite), 1, haa);
-	fputc(13, haa);
-	fputc(10, haa);
+	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(haa);
+
+	ws->write(towrite, strlen(towrite));
+	ws->writeByte(13);
+	ws->writeByte(10);
 }
-void FileRead(FILE * haa, char *toread) {
+
+void FileRead(Common::Stream *haa, char *toread) {
 	VALIDATE_STRING(toread);
 	check_valid_file_handle(haa, "FileRead");
-	if (feof(haa)) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(haa);
+
+	if (rs->eos()) {
 		toread[0] = 0;
 		return;
 	}
-	int lle = getw(haa);
-	if ((lle >= 200) | (lle < 1)) quit("!FileRead: file was not written by FileWrite");
-	fread(toread, lle, 1, haa);
+
+	int lle = getw(rs);
+	if ((lle >= 200) | (lle < 1))
+		quit("!FileRead: file was not written by FileWrite");
+
+	rs->read(toread, lle);
 }
-int FileIsEOF(FILE * haa) {
+
+int FileIsEOF(Common::Stream *haa) {
 	check_valid_file_handle(haa, "FileIsEOF");
-	if (feof(haa))
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(haa);
+
+	if ((rs && rs->eos()) || haa->err())
 		return 1;
-	if (ferror(haa))
-		return 1;
-	if (ftell(haa) >= filelength(fileno(haa)))
-		return 1;
+
 	return 0;
 }
-int FileIsError(FILE * haa) {
+
+int FileIsError(Common::Stream *haa) {
 	check_valid_file_handle(haa, "FileIsError");
-	if (ferror(haa))
-		return 1;
-	return 0;
+	return haa->err() ? 1 : 0;
 }
-void FileWriteInt(FILE * haa, int into) {
+
+void FileWriteInt(Common::Stream *haa, int into) {
 	check_valid_file_handle(haa, "FileWriteInt");
-	fputc('I', haa);
-	putw(into, haa);
+	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(haa);
+	ws->writeByte('I');
+	putw(into, ws);
 }
-int FileReadInt(FILE * haa) {
+
+int FileReadInt(Common::Stream *haa) {
 	check_valid_file_handle(haa, "FileReadInt");
-	if (feof(haa))
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(haa);
+
+	if (rs->eos())
 		return -1;
-	if (fgetc(haa) != 'I')
+	if (rs->readByte() != 'I')
 		quit("!FileReadInt: File read back in wrong order");
-	return getw(haa);
+	return getw(rs);
 }
-char FileReadRawChar(FILE * haa) {
+
+char FileReadRawChar(Common::Stream *haa) {
 	check_valid_file_handle(haa, "FileReadRawChar");
-	if (feof(haa))
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(haa);
+
+	if (rs->eos())
 		return -1;
-	return fgetc(haa);
+	return rs->readByte();
 }
-int FileReadRawInt(FILE * haa) {
+
+int FileReadRawInt(Common::Stream *haa) {
 	check_valid_file_handle(haa, "FileReadRawInt");
-	if (feof(haa))
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(haa);
+
+	if (rs->eos())
 		return -1;
-	return getw(haa);
+	return getw(rs);
 }
-void FileWriteRawChar(FILE * haa, int chartoWrite) {
+
+void FileWriteRawChar(Common::Stream *haa, int chartoWrite) {
 	check_valid_file_handle(haa, "FileWriteRawChar");
+	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(haa);
+
 	if ((chartoWrite < 0) || (chartoWrite > 255))
 		quit("!FileWriteRawChar: can only write values 0-255");
 
-	fputc(chartoWrite, haa);
+	ws->writeByte(chartoWrite);
 }
 
 // object-based File routines
@@ -16990,23 +16911,16 @@ int File_Exists(const char *fnmm) {
 	if (!validate_user_file_path(fnmm, fileToCheck, false))
 		return 0;
 
-	FILE *iii = fopen(fileToCheck, "rb");
-	if (iii == NULL)
-		return 0;
-
-	delete iii;
-	return 1;
+	return Common::File::exists(fileToCheck) || g_system->getSavefileManager()->exists(fileToCheck) ? 1 : 0;
 }
 
 int File_Delete(const char *fnmm) {
-
 	char fileToDelete[MAX_PATH];
 
 	if (!validate_user_file_path(fnmm, fileToDelete, true))
 		return 0;
 
-	unlink(fileToDelete);
-
+	g_system->getSavefileManager()->removeSavefile(fileToDelete);
 	return 1;
 }
 
@@ -17023,91 +16937,95 @@ void *sc_OpenFile(const char *fnmm, int mode) {
 	return scf;
 }
 
-void File_Close(sc_File * fil) {
+void File_Close(sc_File *fil) {
 	fil->Close();
 }
 
-void File_WriteString(sc_File * fil, const char *towrite) {
+void File_WriteString(sc_File *fil, const char *towrite) {
 	FileWrite(fil->handle, towrite);
 }
 
-void File_WriteInt(sc_File * fil, int towrite) {
+void File_WriteInt(sc_File *fil, int towrite) {
 	FileWriteInt(fil->handle, towrite);
 }
 
-void File_WriteRawChar(sc_File * fil, int towrite) {
+void File_WriteRawChar(sc_File *fil, int towrite) {
 	FileWriteRawChar(fil->handle, towrite);
 }
 
-void File_WriteRawLine(sc_File * fil, const char *towrite) {
+void File_WriteRawLine(sc_File *fil, const char *towrite) {
 	FileWriteRawLine(fil->handle, towrite);
 }
 
-void File_ReadRawLine(sc_File * fil, char *buffer) {
+void File_ReadRawLine(sc_File *fil, char *buffer) {
 	check_valid_file_handle(fil->handle, "File.ReadRawLine");
 	check_strlen(buffer);
+	Common::ReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(fil->handle);
+
 	int i = 0;
 	while (i < MAXSTRLEN - 1) {
-		buffer[i] = fgetc(fil->handle);
+		buffer[i] = rs->readByte();
 		if (buffer[i] == 13) {
 			// CR -- skip LF and abort
-			fgetc(fil->handle);
+			(void)rs->readByte();
 			break;
 		}
 		if (buffer[i] == 10)  // LF only -- abort
 			break;
-		if (feof(fil->handle))  // EOF -- abort
+		if (rs->eos())  // EOF -- abort
 			break;
 		i++;
 	}
 	buffer[i] = 0;
 }
 
-const char *File_ReadRawLineBack(sc_File * fil) {
+const char *File_ReadRawLineBack(sc_File *fil) {
 	char readbuffer[MAX_MAXSTRLEN + 1];
 	File_ReadRawLine(fil, readbuffer);
 	return CreateNewScriptString(readbuffer);
 }
 
-void File_ReadString(sc_File * fil, char *toread) {
+void File_ReadString(sc_File *fil, char *toread) {
 	FileRead(fil->handle, toread);
 }
 
-const char *File_ReadStringBack(sc_File * fil) {
+const char *File_ReadStringBack(sc_File *fil) {
 	check_valid_file_handle(fil->handle, "File.ReadStringBack");
-	if (feof(fil->handle)) {
+	Common::ReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(fil->handle);
+
+	if (rs->eos()) {
 		return CreateNewScriptString("");
 	}
 
-	int lle = getw(fil->handle);
+	int lle = getw(rs);
 	if ((lle >= 20000) || (lle < 1))
 		quit("!File.ReadStringBack: file was not written by WriteString");
 
 	char *retVal = (char *)malloc(lle);
-	fread(retVal, lle, 1, fil->handle);
+	rs->read( retVal, lle);
 
 	return CreateNewScriptString(retVal, false);
 }
 
-int File_ReadInt(sc_File * fil) {
+int File_ReadInt(sc_File *fil) {
 	return FileReadInt(fil->handle);
 }
 
-int File_ReadRawChar(sc_File * fil) {
+int File_ReadRawChar(sc_File *fil) {
 	return FileReadRawChar(fil->handle);
 }
 
-int File_ReadRawInt(sc_File * fil) {
+int File_ReadRawInt(sc_File *fil) {
 	return FileReadRawInt(fil->handle);
 }
 
-int File_GetEOF(sc_File * fil) {
+int File_GetEOF(sc_File *fil) {
 	if (fil->handle == NULL)
 		return 1;
 	return FileIsEOF(fil->handle);
 }
 
-int File_GetError(sc_File * fil) {
+int File_GetError(sc_File *fil) {
 	if (fil->handle == NULL)
 		return 1;
 	return FileIsError(fil->handle);
@@ -17553,11 +17471,11 @@ int GetTextHeight(char *text, int fontnum, int width) {
 	if ((fontnum < 0) || (fontnum >= game.numfonts))
 		quit("!GetTextHeight: invalid font number.");
 
-	int texthit = wgetfontheight(fontnum);
+	int h = wgetfontheight(fontnum);
 
 	break_up_text_into_lines(multiply_up_coordinate(width), fontnum, text);
 
-	return divide_down_coordinate(texthit * numlines);
+	return divide_down_coordinate(h * numlines);
 }
 
 
@@ -17568,7 +17486,7 @@ const char *TextBox_GetText_New(GUITextBox * texbox) {
 }
 
 void TextBox_GetText(GUITextBox * texbox, char *buffer) {
-	Common::strcpy_s(buffer, texbox->text);
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, texbox->text);
 }
 
 void TextBox_SetText(GUITextBox * texbox, const char *newtex) {
@@ -17669,6 +17587,7 @@ void ListBox_FillDirList(GUIListBox * listbox, const char *filemask) {
 	validate_user_file_path(filemask, searchPath, false);
 
 	listbox->Clear();
+#ifdef TODO
 	al_ffblk dfb;
 	int	dun = al_findfirst(searchPath, &dfb, FA_SEARCH);
 	while (!dun) {
@@ -17676,6 +17595,10 @@ void ListBox_FillDirList(GUIListBox * listbox, const char *filemask) {
 		dun = al_findnext(&dfb);
 	}
 	al_findclose(&dfb);
+#else
+	warning("TODO: ListBox_FillDirList");
+#endif
+
 	guis_need_update = 1;
 }
 
@@ -17688,7 +17611,7 @@ int ListBox_GetSaveGameSlots(GUIListBox * listbox, int index) {
 
 int ListBox_FillSaveGameList(GUIListBox * listbox) {
 	listbox->Clear();
-
+#ifdef TODO
 	int numsaves = 0;
 	int bufix = 0;
 	al_ffblk ffb;
@@ -17747,6 +17670,10 @@ int ListBox_FillSaveGameList(GUIListBox * listbox) {
 	if (numsaves >= MAXSAVEGAMES)
 		return 1;
 	return 0;
+#else
+warning("TODO: ListBox_FillSaveGameList");
+#endif
+	return 1;
 }
 
 int ListBox_GetItemAtLocation(GUIListBox * listbox, int x, int y) {
@@ -17959,7 +17886,7 @@ const char *Label_GetText_New(GUILabel * labl) {
 }
 
 void Label_GetText(GUILabel * labl, char *buffer) {
-	Common::strcpy_s(buffer, labl->GetText());
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, labl->GetText());
 }
 
 void Label_SetText(GUILabel * labl, const char *newtx) {
@@ -18292,7 +18219,7 @@ const char *Button_GetText_New(GUIButton * butt) {
 }
 
 void Button_GetText(GUIButton * butt, char *buffer) {
-	Common::strcpy_s(buffer, butt->text);
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, butt->text);
 }
 
 void Button_SetText(GUIButton * butt, const char *newtx) {
@@ -19078,7 +19005,7 @@ void GetObjectName(int obj, char *buffer) {
 	if (!is_valid_object(obj))
 		quit("!GetObjectName: invalid object number");
 
-	Common::strcpy_s(buffer, get_translation(thisroom.objectnames[obj]));
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, get_translation(thisroom.objectnames[obj]));
 }
 
 void Object_GetName(ScriptObject * objj, char *buffer) {
@@ -19097,7 +19024,7 @@ void GetHotspotName(int hotspot, char *buffer) {
 	if ((hotspot < 0) || (hotspot >= MAX_HOTSPOTS))
 		quit("!GetHotspotName: invalid hotspot number");
 
-	Common::strcpy_s(buffer, get_translation(thisroom.hotspotnames[hotspot]));
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, get_translation(thisroom.hotspotnames[hotspot]));
 }
 
 void Hotspot_GetName(ScriptHotspot * hss, char *buffer) {
@@ -19121,7 +19048,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 			if (play.get_loc_name_last_time != 1000 + mover)
 				guis_need_update = 1;
 			play.get_loc_name_last_time = 1000 + mover;
-			Common::strcpy_s(tempo, get_translation(game.invinfo[mover].name));
+			Common::strcpy_s(tempo, STD_BUFFER_SIZE, get_translation(game.invinfo[mover].name));
 		} else if ((play.get_loc_name_last_time > 1000) && (play.get_loc_name_last_time < 1000 + MAX_INV)) {
 			// no longer selecting an item
 			guis_need_update = 1;
@@ -19148,7 +19075,7 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 	// on character
 	if (loctype == LOCTYPE_CHAR) {
 		onhs = getloctype_index;
-		Common::strcpy_s(tempo, get_translation(game.chars[onhs].name));
+		Common::strcpy_s(tempo, STD_BUFFER_SIZE, get_translation(game.chars[onhs].name));
 		if (play.get_loc_name_last_time != 2000 + onhs)
 			guis_need_update = 1;
 		play.get_loc_name_last_time = 2000 + onhs;
@@ -19157,14 +19084,14 @@ void GetLocationName(int xxx, int yyy, char *tempo) {
 	// on object
 	if (loctype == LOCTYPE_OBJ) {
 		aa = getloctype_index;
-		Common::strcpy_s(tempo, get_translation(thisroom.objectnames[aa]));
+		Common::strcpy_s(tempo, STD_BUFFER_SIZE, get_translation(thisroom.objectnames[aa]));
 		if (play.get_loc_name_last_time != 3000 + aa)
 			guis_need_update = 1;
 		play.get_loc_name_last_time = 3000 + aa;
 		return;
 	}
 	onhs = getloctype_index;
-	if (onhs > 0) Common::strcpy_s(tempo, get_translation(thisroom.hotspotnames[onhs]));
+	if (onhs > 0) Common::strcpy_s(tempo, STD_BUFFER_SIZE, get_translation(thisroom.hotspotnames[onhs]));
 	if (play.get_loc_name_last_time != onhs)
 		guis_need_update = 1;
 	play.get_loc_name_last_time = onhs;
@@ -19179,7 +19106,7 @@ const char *Game_GetLocationName(int x, int y) {
 void GetInvName(int indx, char *buff) {
 	VALIDATE_STRING(buff);
 	if ((indx < 0) | (indx >= game.numinvitems)) quit("!GetInvName: invalid inventory item specified");
-	Common::strcpy_s(buff, get_translation(game.invinfo[indx].name));
+	Common::strcpy_s(buff, STD_BUFFER_SIZE, get_translation(game.invinfo[indx].name));
 }
 
 void InventoryItem_GetName(ScriptInvItem * iitem, char *buff) {
@@ -19676,7 +19603,7 @@ void my_strncpy(char *dest, const char *src, int len) {
 		strncpy(dest, src, len);
 		dest[len] = 0;
 	} else
-		Common::strcpy_s(dest, src);
+		Common::strcpy_s(dest, STD_BUFFER_SIZE, src);
 }
 
 void _sc_strcat(char *s1, char *s2) {
@@ -19688,7 +19615,7 @@ void _sc_strcat(char *s1, char *s2) {
 	my_strncpy(&s1[strlen(s1)], s2, mosttocopy);
 }
 
-void _sc_Common::strcpy_s(char *s1, char *s2) {
+void _sc_strcpy(char *s1, char *s2) {
 	check_strlen(s1);
 	my_strncpy(s1, s2, MAXSTRLEN - 1);
 }
@@ -19698,8 +19625,8 @@ int StrContains(const char *s1, const char *s2) {
 	VALIDATE_STRING(s2);
 	char *tempbuf1 = (char *)malloc(strlen(s1) + 1);
 	char *tempbuf2 = (char *)malloc(strlen(s2) + 1);
-	Common::strcpy_s(tempbuf1, s1);
-	Common::strcpy_s(tempbuf2, s2);
+	Common::strcpy_s(tempbuf1, strlen(s1) + 1, s1);
+	Common::strcpy_s(tempbuf2, strlen(s2) + 1, s2);
 	ags_strlwr(tempbuf1);
 	ags_strlwr(tempbuf2);
 
@@ -19713,11 +19640,6 @@ int StrContains(const char *s1, const char *s2) {
 	return (offs - tempbuf1);
 }
 
-#ifdef WINDOWS_VERSION
-#define ags_strlwr _ags_strlwr
-#define strupr _strupr
-#endif
-
 void _sc_strlower(char *desbuf) {
 	VALIDATE_STRING(desbuf);
 	check_strlen(desbuf);
@@ -19727,7 +19649,7 @@ void _sc_strlower(char *desbuf) {
 void _sc_strupper(char *desbuf) {
 	VALIDATE_STRING(desbuf);
 	check_strlen(desbuf);
-	strupr(desbuf);
+	ags_strupr(desbuf);
 }
 
 /*int _sc_strcmp (char *s1, char *s2) {
@@ -19798,6 +19720,7 @@ void my_sprintf(char *buffer, const char *fmt, va_list ap) {
 		strncpy(fmtstring, curptr, (endptr - curptr));
 		fmtstring[endptr - curptr] = 0;
 
+		// TODO: Check theArg == (intptr)buffer handling for 64-bits
 		unsigned int theArg = va_arg(ap, unsigned int);
 
 		// use Common::sprintf_s to parse the actual %02d type thing
@@ -19805,7 +19728,7 @@ void my_sprintf(char *buffer, const char *fmt, va_list ap) {
 			// floats are pushed as 8-bytes, so ensure that it knows this is a float
 			float floatArg = *((float *)&theArg);
 			Common::sprintf_s(spfbuffer, fmtstring, floatArg);
-		} else if ((theArg == (int)buffer) && (endptr[-1] == 's'))
+		} else if (((intptr)theArg == (intptr)buffer) && (endptr[-1] == 's'))
 			quit("Cannot use destination as argument to StrFormat");
 		else if ((theArg < 0x10000) && (endptr[-1] == 's'))
 			quit("!One of the string arguments supplied was not a string");
@@ -19822,7 +19745,7 @@ void my_sprintf(char *buffer, const char *fmt, va_list ap) {
 		if (bufidx + strlen(spfbuffer) >= STD_BUFFER_SIZE)
 			quitprintf("!String.Format: buffer overrun: maximum formatted string length %d chars, this string: %d chars", STD_BUFFER_SIZE, bufidx + strlen(spfbuffer));
 
-		Common::strcat_s(buffer, spfbuffer);
+		Common::strcat_s(buffer, STD_BUFFER_SIZE, spfbuffer);
 		bufidx += strlen(spfbuffer);
 		curptr = endptr;
 	}
@@ -19840,7 +19763,7 @@ void _sc_AbortGame(char *texx, ...) {
 	quit(displbuf);
 }
 
-void _sc_Common::sprintf_s(char *destt, char *texx, ...) {
+void _sc_sprintf(char *destt, char *texx, ...) {
 	char displbuf[STD_BUFFER_SIZE];
 	VALIDATE_STRING(destt);
 	check_strlen(destt);
@@ -19988,11 +19911,11 @@ int run_interaction_commandlist(NewInteractionCommandList * nicl, int *timesrun,
 			break;
 		case 9:  // Run Dialog
 		{
-			int room_was = play.room_changes;
+			int oldRoom = play.room_changes;
 			RunDialog(IPARAM1);
 			// if they changed room within the dialog script,
 			// the interaction command list is no longer valid
-			if (room_was != play.room_changes)
+			if (oldRoom != play.room_changes)
 				return -1;
 		}
 		break;
@@ -20413,7 +20336,7 @@ int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBack
 	int usingfont = FONT_NORMAL;
 	int txthit = wgetfontheight(usingfont);
 	int curswas = cur_cursor;
-	int bullet_wid = 0, needheight;
+	int bullet_wid = 0, needheight = 0;
 	IDriverDependantBitmap *ddb = NULL;
 	BITMAP *subBitmap = NULL;
 	GUITextBox *parserInput = NULL;
@@ -20473,10 +20396,10 @@ int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBack
 	// is not enabled.
 	if ((numdisp > 1) || (parserInput != NULL) || (play.show_single_dialog_option)) {
 		wsetcolor(0); //wbar(0,dlgyp-1,scrnwid-1,dlgyp+numdisp*txthit+1);
-		int areawid, is_textwindow = 0;
+		int areawid = 0, is_textwindow = 0;
 		int forecol = 14, savedwid;
 
-		int mouseison = -1, curyp;
+		int mouseison = -1, curyp = 0;
 		int mousewason = -10;
 		int dirtyx = 0, dirtyy = 0;
 		int dirtywidth = virtual_screen->w, dirtyheight = virtual_screen->h;
@@ -21044,7 +20967,7 @@ void do_conversation(int dlgnum) {
 
 // save game functions
 #define SGVERSION 8
-char *sgsig = "Adventure Game Studio saved game";
+static const char *sgsig = "Adventure Game Studio saved game";
 int sgsiglen = 32;
 int find_highest_room_entered() {
 	int qq, fndas = -1;
@@ -21056,17 +20979,18 @@ int find_highest_room_entered() {
 	return fndas;
 }
 
-void serialize_bitmap(block thispic, FILE * ooo) {
+void serialize_bitmap(block thispic, Common::WriteStream *ooo) {
 	if (thispic != NULL) {
 		putw(thispic->w, ooo);
 		putw(thispic->h, ooo);
 		putw(bitmap_color_depth(thispic), ooo);
 		for (int cc = 0; cc < thispic->h; cc++)
-			fwrite(&thispic->line[cc][0], thispic->w, bitmap_color_depth(thispic) / 8, ooo);
+			ooo->write(&thispic->line[cc][0], thispic->w * bitmap_color_depth(thispic) / 8);
 	}
 }
 
-long write_screen_shot_for_vista(FILE * ooo, block screenshot) {
+long write_screen_shot_for_vista(Common::WriteStream *ooo, block screenshot) {
+#ifdef TODO
 	long fileSize = 0;
 	char tempFileName[MAX_PATH];
 	Common::sprintf_s(tempFileName, "%s""_tmpscht.bmp", saveGameDirectory);
@@ -21075,8 +20999,7 @@ long write_screen_shot_for_vista(FILE * ooo, block screenshot) {
 
 	update_polled_stuff();
 
-	if (exists(tempFileName))
-	{
+	if (exists(tempFileName)) {
 		fileSize = file_size(tempFileName);
 		char *buffer = (char *)malloc(fileSize);
 
@@ -21089,231 +21012,10 @@ long write_screen_shot_for_vista(FILE * ooo, block screenshot) {
 		free(buffer);
 	}
 	return fileSize;
-}
-
-#define MAGICNUMBER 0xbeefcafe
-// Write the save game position to the file
-void save_game_data(FILE * ooo, block screenshot) {
-	int bb, cc, dd;
-
-	platform->RunPluginHooks(AGSE_PRESAVEGAME, 0);
-
-	putw(SGVERSION, ooo);
-	// store the screenshot at the start to make it easily accesible
-	putw((screenshot == NULL) ? 0 : 1, ooo);
-
-	if (screenshot)
-		serialize_bitmap(screenshot, ooo);
-
-	fputstring(ACI_VERSION_TEXT, ooo);
-	fputstring(usetup.main_data_filename, ooo);
-	putw(scrnhit, ooo);
-	putw(final_col_dep, ooo);
-	putw(frames_per_second, ooo);
-	putw(cur_mode, ooo);
-	putw(cur_cursor, ooo);
-	putw(offsetx, ooo); putw(offsety, ooo);
-	putw(loopcounter, ooo);
-
-	putw(spriteset.elements, ooo);
-	for (bb = 1; bb < spriteset.elements; bb++) {
-		if (game.spriteflags[bb] & SPF_DYNAMICALLOC) {
-			putw(bb, ooo);
-			fputc(game.spriteflags[bb], ooo);
-			serialize_bitmap(spriteset[bb], ooo);
-		}
-	}
-	// end of dynamic sprite list
-	putw(0, ooo);
-
-	// write the data segment of the global script
-	int gdatasize = gameinst->globaldatasize;
-	putw(gdatasize, ooo);
-	ccFlattenGlobalData(gameinst);
-	// MACPORT FIX: just in case gdatasize is 2 or 4, don't want to swap endian
-	fwrite(&gameinst->globaldata[0], 1, gdatasize, ooo);
-	ccUnFlattenGlobalData(gameinst);
-	// write the script modules data segments
-	putw(numScriptModules, ooo);
-	for (bb = 0; bb < numScriptModules; bb++) {
-		int glsize = moduleInst[bb]->globaldatasize;
-		putw(glsize, ooo);
-		if (glsize > 0) {
-			ccFlattenGlobalData(moduleInst[bb]);
-			fwrite(&moduleInst[bb]->globaldata[0], 1, glsize, ooo);
-			ccUnFlattenGlobalData(moduleInst[bb]);
-		}
-	}
-
-	putw(displayed_room, ooo);
-
-	if (displayed_room >= 0) {
-		// update the current room script's data segment copy
-		if (roominst != NULL)
-			save_room_data_segment();
-
-		// Update the saved interaction variable values
-		for (int ff = 0; ff < thisroom.numLocalVars; ff++)
-			croom->interactionVariableValues[ff] = thisroom.localvars[ff].value;
-
-	}
-
-	// write the room state for all the rooms the player has been in
-	for (bb = 0; bb < MAX_ROOMS; bb++) {
-		if (roomstats[bb].beenhere) {
-			fputc(1, ooo);
-			fwrite(&roomstats[bb], sizeof(RoomStatus), 1, ooo);
-			if (roomstats[bb].tsdatasize > 0)
-				fwrite(&roomstats[bb].tsdata[0], 1, roomstats[bb].tsdatasize, ooo);
-		} else
-			fputc(0, ooo);
-	}
-
-	update_polled_stuff();
-
-	if (play.cur_music_number >= 0) {
-		if (IsMusicPlaying() == 0)
-			play.cur_music_number = -1;
-	}
-
-	fwrite(&play, sizeof(GameState), 1, ooo);
-
-	for (bb = 0; bb < play.num_do_once_tokens; bb++)
-	{
-		fputstring(play.do_once_tokens[bb], ooo);
-	}
-	fwrite(&play.gui_draw_order[0], sizeof(int), game.numgui, ooo);
-
-	fwrite(&mls[0], sizeof(MoveList), game.numcharacters + MAX_INIT_SPR + 1, ooo);
-
-	fwrite(&game, sizeof(GameSetupStructBase), 1, ooo);
-	fwrite(&game.invinfo[0], sizeof(InventoryItemInfo), game.numinvitems, ooo);
-	fwrite(&game.mcurs[0], sizeof(MouseCursor), game.numcursors, ooo);
-
-	if (game.invScripts == NULL)
-	{
-		for (bb = 0; bb < game.numinvitems; bb++)
-			fwrite(&game.intrInv[bb]->timesRun[0], sizeof(int), MAX_NEWINTERACTION_EVENTS, ooo);
-		for (bb = 0; bb < game.numcharacters; bb++)
-			fwrite(&game.intrChar[bb]->timesRun[0], sizeof(int), MAX_NEWINTERACTION_EVENTS, ooo);
-	}
-
-	fwrite(&game.options[0], sizeof(int), OPT_HIGHESTOPTION + 1, ooo);
-	fputc(game.options[OPT_LIPSYNCTEXT], ooo);
-
-	fwrite(&game.chars[0], sizeof(CharacterInfo), game.numcharacters, ooo);
-	fwrite(&charextra[0], sizeof(CharacterExtras), game.numcharacters, ooo);
-	fwrite(&palette[0], sizeof(color), 256, ooo);
-	for (bb = 0; bb < game.numdialog; bb++)
-		fwrite(&dialog[bb].optionflags[0], sizeof(int), MAXTOPICOPTIONS, ooo);
-	putw(mouse_on_iface, ooo);
-	putw(mouse_on_iface_button, ooo);
-	putw(mouse_pushed_iface, ooo);
-	putw(ifacepopped, ooo);
-	putw(game_paused, ooo);
-	//putw(mi.trk,ooo);
-	write_gui(ooo, guis, &game);
-	putw(numAnimButs, ooo);
-	fwrite(&animbuts[0], sizeof(AnimatingGUIButton), numAnimButs, ooo);
-
-	putw(game.audioClipTypeCount, ooo);
-	fwrite(&game.audioClipTypes[0], sizeof(AudioClipType), game.audioClipTypeCount, ooo);
-
-	fwrite(&thisroom.regionLightLevel[0], sizeof(short), MAX_REGIONS, ooo);
-	fwrite(&thisroom.regionTintLevel[0], sizeof(int), MAX_REGIONS, ooo);
-	fwrite(&thisroom.walk_area_zoom[0], sizeof(short), MAX_WALK_AREAS + 1, ooo);
-	fwrite(&thisroom.walk_area_zoom2[0], sizeof(short), MAX_WALK_AREAS + 1, ooo);
-
-	fwrite(&ambient[0], sizeof(AmbientSound), MAX_SOUND_CHANNELS, ooo);
-	putw(numscreenover, ooo);
-	fwrite(&screenover[0], sizeof(ScreenOverlay), numscreenover, ooo);
-	for (bb = 0; bb < numscreenover; bb++) {
-		serialize_bitmap(screenover[bb].pic, ooo);
-	}
-
-	update_polled_stuff();
-
-	for (bb = 0; bb < MAX_DYNAMIC_SURFACES; bb++)
-	{
-		if (dynamicallyCreatedSurfaces[bb] == NULL)
-		{
-			fputc(0, ooo);
-		} else
-		{
-			fputc(1, ooo);
-			serialize_bitmap(dynamicallyCreatedSurfaces[bb], ooo);
-		}
-	}
-
-	update_polled_stuff();
-
-	if (displayed_room >= 0) {
-
-		for (bb = 0; bb < MAX_BSCENE; bb++) {
-			if (play.raw_modified[bb])
-				serialize_bitmap(thisroom.ebscene[bb], ooo);
-		}
-
-		putw((raw_saved_screen == NULL) ? 0 : 1, ooo);
-		if (raw_saved_screen)
-			serialize_bitmap(raw_saved_screen, ooo);
-
-		// save the current troom, in case they save in room 600 or whatever
-		fwrite(&troom, sizeof(RoomStatus), 1, ooo);
-		if (troom.tsdatasize > 0)
-			fwrite(&troom.tsdata[0], troom.tsdatasize, 1, ooo);
-
-	}
-
-	putw(numGlobalVars, ooo);
-	fwrite(&globalvars[0], sizeof(InteractionVariable), numGlobalVars, ooo);
-
-	putw(game.numviews, ooo);
-	for (bb = 0; bb < game.numviews; bb++) {
-		for (cc = 0; cc < views[bb].numLoops; cc++) {
-			for (dd = 0; dd < views[bb].loops[cc].numFrames; dd++)
-			{
-				putw(views[bb].loops[cc].frames[dd].sound, ooo);
-				putw(views[bb].loops[cc].frames[dd].pic, ooo);
-			}
-		}
-	}
-	putw(MAGICNUMBER + 1, ooo);
-
-	putw(game.audioClipCount, ooo);
-	for (bb = 0; bb <= MAX_SOUND_CHANNELS; bb++)
-	{
-		if ((channels[bb] != NULL) && (channels[bb]->done == 0) && (channels[bb]->sourceClip != NULL))
-		{
-			putw(((ScriptAudioClip *)channels[bb]->sourceClip)->id, ooo);
-			putw(channels[bb]->get_pos(), ooo);
-			putw(channels[bb]->priority, ooo);
-			putw(channels[bb]->repeat ? 1 : 0, ooo);
-			putw(channels[bb]->vol, ooo);
-			putw(channels[bb]->panning, ooo);
-			putw(channels[bb]->volAsPercentage, ooo);
-			putw(channels[bb]->panningAsPercentage, ooo);
-		} else
-		{
-			putw(-1, ooo);
-		}
-	}
-	putw(crossFading, ooo);
-	putw(crossFadeVolumePerStep, ooo);
-	putw(crossFadeStep, ooo);
-	putw(crossFadeVolumeAtStart, ooo);
-
-	platform->RunPluginHooks(AGSE_SAVEGAME, (int)ooo);
-	putw(MAGICNUMBER, ooo);  // to verify the plugins
-
-	// save the room music volume
-	putw(thisroom.options[ST_VOLUME], ooo);
-
-	ccSerializeAllObjects(ooo);
-
-	putw(current_music_type, ooo);
-
-	update_polled_stuff();
+#else
+	warning("TODO: write_screen_shot_for_vista");
+	return 0;
+#endif
 }
 
 // Some people have been having crashes with the save game list,
@@ -21355,784 +21057,12 @@ void convert_guid_from_text_to_binary(const char *guidText, unsigned char *buffe
 	temp = buffer[6]; buffer[6] = buffer[7]; buffer[7] = temp;
 }
 
-void save_game(int slotn, const char *descript) {
-
-	// dont allow save in rep_exec_always, because we dont save
-	// the state of blocked scripts
-	can_run_delayed_command();
-
-	if (inside_script) {
-		Common::strcpy_s(curscript->postScriptSaveSlotDescription[curscript->queue_action(ePSASaveGame, slotn, "SaveGameSlot")], descript);
-		return;
-	}
-
-	if (platform->GetDiskFreeSpaceMB() < 2) {
-		Display("ERROR: There is not enough disk space free to save the game. Clear some disk space and try again.");
-		return;
-	}
-
-	VALIDATE_STRING(descript);
-	char nametouse[260];
-	get_save_game_path(slotn, nametouse);
-
-	FILE *ooo = fopen(nametouse, "wb");
-	if (ooo == NULL)
-		quit("save_game: unable to open savegame file for writing");
-
-	// Initialize and write Vista header
-	RICH_GAME_MEDIA_HEADER vistaHeader;
-	memset(&vistaHeader, 0, sizeof(RICH_GAME_MEDIA_HEADER));
-	memcpy(&vistaHeader.dwMagicNumber, RM_MAGICNUMBER, sizeof(long));
-	vistaHeader.dwHeaderVersion = 1;
-	vistaHeader.dwHeaderSize = sizeof(RICH_GAME_MEDIA_HEADER);
-	vistaHeader.dwThumbnailOffsetHigherDword = 0;
-	vistaHeader.dwThumbnailOffsetLowerDword = 0;
-	vistaHeader.dwThumbnailSize = 0;
-	convert_guid_from_text_to_binary(game.guid, &vistaHeader.guidGameId[0]);
-	uconvert(game.gamename, U_ASCII, (char *)&vistaHeader.szGameName[0], U_UNICODE, RM_MAXLENGTH);
-	uconvert(descript, U_ASCII, (char *)&vistaHeader.szSaveName[0], U_UNICODE, RM_MAXLENGTH);
-	vistaHeader.szLevelName[0] = 0;
-	vistaHeader.szComments[0] = 0;
-
-	fwrite(&vistaHeader, sizeof(RICH_GAME_MEDIA_HEADER), 1, ooo);
-
-	fwrite(sgsig, sgsiglen, 1, ooo);
-
-	safeguard_string((unsigned char *)descript);
-
-	fputstring((char *)descript, ooo);
-
-	block screenShot = NULL;
-
-	if (game.options[OPT_SAVESCREENSHOT]) {
-		int usewid = multiply_up_coordinate(play.screenshot_width);
-		int usehit = multiply_up_coordinate(play.screenshot_height);
-		if (usewid > virtual_screen->w)
-			usewid = virtual_screen->w;
-		if (usehit > virtual_screen->h)
-			usehit = virtual_screen->h;
-
-		if ((play.screenshot_width < 16) || (play.screenshot_height < 16))
-			quit("!Invalid game.screenshot_width/height, must be from 16x16 to screen res");
-
-		if (gfxDriver->UsesMemoryBackBuffer())
-		{
-			screenShot = create_bitmap_ex(bitmap_color_depth(virtual_screen), usewid, usehit);
-
-			stretch_blit(virtual_screen, screenShot, 0, 0,
-				virtual_screen->w, virtual_screen->h, 0, 0,
-				screenShot->w, screenShot->h);
-		} else
-		{
-			block tempBlock = create_bitmap_ex(final_col_dep, virtual_screen->w, virtual_screen->h);
-			gfxDriver->GetCopyOfScreenIntoBitmap(tempBlock);
-
-			screenShot = create_bitmap_ex(final_col_dep, usewid, usehit);
-			stretch_blit(tempBlock, screenShot, 0, 0,
-				tempBlock->w, tempBlock->h, 0, 0,
-				screenShot->w, screenShot->h);
-
-			destroy_bitmap(tempBlock);
-		}
-	}
-
-	update_polled_stuff();
-
-	save_game_data(ooo, screenShot);
-
-	if (screenShot != NULL)
-	{
-		long screenShotOffset = ftell(ooo) - sizeof(RICH_GAME_MEDIA_HEADER);
-		long screenShotSize = write_screen_shot_for_vista(ooo, screenShot);
-		fclose(ooo);
-
-		update_polled_stuff();
-
-		ooo = fopen(nametouse, "r+b");
-		fseek(ooo, 12, SEEK_SET);
-		putw(screenShotOffset, ooo);
-		fseek(ooo, 4, SEEK_CUR);
-		putw(screenShotSize, ooo);
-	}
-
-	if (screenShot != NULL)
-		free(screenShot);
-
-	fclose(ooo);
-}
-
-block read_serialized_bitmap(FILE * ooo) {
-	block thispic;
-	int picwid = getw(ooo);
-	int pichit = getw(ooo);
-	int piccoldep = getw(ooo);
-	thispic = create_bitmap_ex(piccoldep, picwid, pichit);
-	if (thispic == NULL)
-		return NULL;
-	for (int vv = 0; vv < pichit; vv++)
-		fread(&thispic->line[vv][0], picwid, piccoldep / 8, ooo);
-	return thispic;
-}
-
-char rbuffer[200];
-
 void first_room_initialization() {
 	starting_room = displayed_room;
-	t1 = time(NULL);
+	lastTime = g_system->getMillis();
 	lastcounter = 0;
 	loopcounter = 0;
 	mouse_z_was = mouse_z;
-}
-
-int restore_game_data(FILE * ooo, const char *nametouse) {
-	int vv, bb;
-
-	if (getw(ooo) != SGVERSION) {
-		fclose(ooo);
-		return -3;
-	}
-	int isScreen = getw(ooo);
-	if (isScreen) {
-		// skip the screenshot
-		wfreeblock(read_serialized_bitmap(ooo));
-	}
-
-	fgetstring_limit(rbuffer, ooo, 200);
-	int vercmp = strcmp(rbuffer, ACI_VERSION_TEXT);
-	if ((vercmp > 0) || (strcmp(rbuffer, LOWEST_SGVER_COMPAT) < 0) ||
-		(strlen(rbuffer) > strlen(LOWEST_SGVER_COMPAT))) {
-		fclose(ooo);
-		return -4;
-	}
-	fgetstring_limit(rbuffer, ooo, 180);
-	rbuffer[180] = 0;
-	if (scumm_stricmp(rbuffer, usetup.main_data_filename)) {
-		fclose(ooo);
-		return -5;
-	}
-	int gamescrnhit = getw(ooo);
-	// a 320x240 game, they saved in a 320x200 room but try to restore
-	// from within a 320x240 room, make it work
-	if (final_scrn_hit == (gamescrnhit * 12) / 10)
-		gamescrnhit = scrnhit;
-	// they saved in a 320x240 room but try to restore from a 320x200
-	// room, fix it
-	else if (gamescrnhit == final_scrn_hit)
-		gamescrnhit = scrnhit;
-
-	if (gamescrnhit != scrnhit) {
-		Display("This game was saved with the interpreter running at a different "
-			"resolution. It cannot be restored.");
-		fclose(ooo);
-		return -6;
-	}
-
-	if (getw(ooo) != final_col_dep) {
-		Display("This game was saved with the engine running at a different colour depth. It cannot be restored.");
-		fclose(ooo);
-		return -7;
-	}
-
-	unload_old_room();
-
-	remove_screen_overlay(-1);
-	is_complete_overlay = 0; is_text_overlay = 0;
-	set_game_speed(getw(ooo));
-	int sg_cur_mode = getw(ooo);
-	int sg_cur_cursor = getw(ooo);
-	offsetx = getw(ooo);
-	offsety = getw(ooo);
-	loopcounter = getw(ooo);
-
-	for (bb = 1; bb < spriteset.elements; bb++) {
-		if (game.spriteflags[bb] & SPF_DYNAMICALLOC) {
-			// do this early, so that it changing guibuts doesn't
-			// affect the restored data
-			free_dynamic_sprite(bb);
-		}
-	}
-	// ensure the sprite set is at least as large as it was
-	// when the game was saved
-	spriteset.enlargeTo(getw(ooo));
-	// get serialized dynamic sprites
-	int sprnum = getw(ooo);
-	while (sprnum) {
-		unsigned char spriteflag = fgetc(ooo);
-		add_dynamic_sprite(sprnum, read_serialized_bitmap(ooo));
-		game.spriteflags[sprnum] = spriteflag;
-		sprnum = getw(ooo);
-	}
-
-	clear_music_cache();
-
-	for (vv = 0; vv < game.numgui; vv++) {
-		if (guibg[vv])
-			wfreeblock(guibg[vv]);
-		guibg[vv] = NULL;
-
-		if (guibgbmp[vv])
-			gfxDriver->DestroyDDB(guibgbmp[vv]);
-		guibgbmp[vv] = NULL;
-	}
-
-	update_polled_stuff();
-
-	ccFreeInstance(gameinstFork);
-	ccFreeInstance(gameinst);
-	gameinstFork = NULL;
-	gameinst = NULL;
-	for (vv = 0; vv < numScriptModules; vv++) {
-		ccFreeInstance(moduleInstFork[vv]);
-		ccFreeInstance(moduleInst[vv]);
-		moduleInst[vv] = NULL;
-	}
-
-	if (dialogScriptsInst != NULL)
-	{
-		ccFreeInstance(dialogScriptsInst);
-		dialogScriptsInst = NULL;
-	}
-
-	update_polled_stuff();
-
-	// read the global script data segment
-	int gdatasize = getw(ooo);
-	char *newglobaldatabuffer = (char *)malloc(gdatasize);
-	fread(newglobaldatabuffer, sizeof(char), gdatasize, ooo);
-	//fread(&gameinst->globaldata[0],gdatasize,1,ooo);
-	//ccUnFlattenGlobalData (gameinst);
-
-	char *scriptModuleDataBuffers[MAX_SCRIPT_MODULES];
-	int scriptModuleDataSize[MAX_SCRIPT_MODULES];
-
-	if (getw(ooo) != numScriptModules)
-		quit("wrong script module count; cannot restore game");
-	for (vv = 0; vv < numScriptModules; vv++) {
-		scriptModuleDataSize[vv] = getw(ooo);
-		scriptModuleDataBuffers[vv] = (char *)malloc(scriptModuleDataSize[vv]);
-		fread(&scriptModuleDataBuffers[vv][0], sizeof(char), scriptModuleDataSize[vv], ooo);
-	}
-
-	displayed_room = getw(ooo);
-
-	// now the rooms
-	for (vv = 0; vv < MAX_ROOMS; vv++) {
-		if (roomstats[vv].tsdata == NULL);
-		else if (roomstats[vv].tsdatasize > 0) {
-			free(roomstats[vv].tsdata);
-			roomstats[vv].tsdatasize = 0; roomstats[vv].tsdata = NULL;
-		}
-		roomstats[vv].beenhere = 0;
-	}
-	long gobackto = ftell(ooo);
-	fclose(ooo);
-	ooo = fopen(nametouse, "rb");
-	fseek(ooo, gobackto, SEEK_SET);
-
-	// read the room state for all the rooms the player has been in
-	for (vv = 0; vv < MAX_ROOMS; vv++) {
-		if ((roomstats[vv].tsdatasize > 0) & (roomstats[vv].tsdata != NULL))
-			free(roomstats[vv].tsdata);
-		roomstats[vv].tsdatasize = 0;
-		roomstats[vv].tsdata = NULL;
-		roomstats[vv].beenhere = fgetc(ooo);
-
-		if (roomstats[vv].beenhere) {
-			fread(&roomstats[vv], sizeof(RoomStatus), 1, ooo);
-			if (roomstats[vv].tsdatasize > 0) {
-				roomstats[vv].tsdata = (char *)malloc(roomstats[vv].tsdatasize + 8);
-				fread(&roomstats[vv].tsdata[0], roomstats[vv].tsdatasize, 1, ooo);
-			}
-		}
-	}
-
-	/*  for (vv=0;vv<MAX_ROOMS;vv++) {
-		if ((roomstats[vv].tsdatasize>0) & (roomstats[vv].tsdata!=NULL))
-		  free(roomstats[vv].tsdata);
-		roomstats[vv].tsdatasize=0;
-		roomstats[vv].tsdata=NULL;
-	  }
-	  int numtoread=getw(ooo);
-	  if ((numtoread < 0) | (numtoread>MAX_ROOMS)) {
-		Common::sprintf_s(rbuffer,"Save game has invalid value for rooms_entered: %d",numtoread);
-		quit(rbuffer);
-		}
-	  fread(&roomstats[0],sizeof(RoomStatus),numtoread,ooo);
-	  for (vv=0;vv<numtoread;vv++) {
-		if (roomstats[vv].tsdatasize>0) {
-		  roomstats[vv].tsdata=(char*)malloc(roomstats[vv].tsdatasize+5);
-		  fread(&roomstats[vv].tsdata[0],roomstats[vv].tsdatasize,1,ooo);
-		  }
-		else roomstats[vv].tsdata=NULL;
-		}*/
-
-	int speech_was = play.want_speech, musicvox = play.seperate_music_lib;
-	// preserve the replay settings
-	int playback_was = play.playback, recording_was = play.recording;
-	int gamestep_was = play.gamestep;
-	int screenfadedout_was = play.screen_is_faded_out;
-	int roomchanges_was = play.room_changes;
-	// make sure the pointer is preserved
-	int *gui_draw_order_was = play.gui_draw_order;
-
-	free_do_once_tokens();
-
-	//fread (&play, 76, 4, ooo);
-	//fread (((char*)&play) + 78*4, sizeof(GameState) - 78*4, 1, ooo);
-	fread(&play, sizeof(GameState), 1, ooo);
-	// Preserve whether the music vox is available
-	play.seperate_music_lib = musicvox;
-	// If they had the vox when they saved it, but they don't now
-	if ((speech_was < 0) && (play.want_speech >= 0))
-		play.want_speech = (-play.want_speech) - 1;
-	// If they didn't have the vox before, but now they do
-	else if ((speech_was >= 0) && (play.want_speech < 0))
-		play.want_speech = (-play.want_speech) - 1;
-
-	play.screen_is_faded_out = screenfadedout_was;
-	play.playback = playback_was;
-	play.recording = recording_was;
-	play.gamestep = gamestep_was;
-	play.room_changes = roomchanges_was;
-	play.gui_draw_order = gui_draw_order_was;
-
-	if (play.num_do_once_tokens > 0)
-	{
-		play.do_once_tokens = (char **)malloc(sizeof(char *) * play.num_do_once_tokens);
-		for (bb = 0; bb < play.num_do_once_tokens; bb++)
-		{
-			fgetstring_limit(rbuffer, ooo, 200);
-			play.do_once_tokens[bb] = (char *)malloc(strlen(rbuffer) + 1);
-			Common::strcpy_s(play.do_once_tokens[bb], rbuffer);
-		}
-	}
-
-	fread(&play.gui_draw_order[0], sizeof(int), game.numgui, ooo);
-	fread(&mls[0], sizeof(MoveList), game.numcharacters + MAX_INIT_SPR + 1, ooo);
-
-	// save pointer members before reading
-	char *gswas = game.globalscript;
-	ccScript *compsc = game.compiled_script;
-	CharacterInfo *chwas = game.chars;
-	WordsDictionary *olddict = game.dict;
-	char *mesbk[MAXGLOBALMES];
-	int numchwas = game.numcharacters;
-	for (vv = 0; vv < MAXGLOBALMES; vv++) mesbk[vv] = game.messages[vv];
-	int numdiwas = game.numdialog, numinvwas = game.numinvitems;
-	int numviewswas = game.numviews;
-	int numGuisWas = game.numgui;
-
-	fread(&game, sizeof(GameSetupStructBase), 1, ooo);
-
-	if (game.numdialog != numdiwas)
-		quit("!Restore_Game: Game has changed (dlg), unable to restore");
-	if ((numchwas != game.numcharacters) || (numinvwas != game.numinvitems))
-		quit("!Restore_Game: Game has changed (inv), unable to restore position");
-	if (game.numviews != numviewswas)
-		quit("!Restore_Game: Game has changed (views), unable to restore position");
-
-	fread(&game.invinfo[0], sizeof(InventoryItemInfo), game.numinvitems, ooo);
-	fread(&game.mcurs[0], sizeof(MouseCursor), game.numcursors, ooo);
-
-	if (game.invScripts == NULL)
-	{
-		for (bb = 0; bb < game.numinvitems; bb++)
-			fread(&game.intrInv[bb]->timesRun[0], sizeof(int), MAX_NEWINTERACTION_EVENTS, ooo);
-		for (bb = 0; bb < game.numcharacters; bb++)
-			fread(&game.intrChar[bb]->timesRun[0], sizeof(int), MAX_NEWINTERACTION_EVENTS, ooo);
-	}
-
-	// restore pointer members
-	game.globalscript = gswas;
-	game.compiled_script = compsc;
-	game.chars = chwas;
-	game.dict = olddict;
-	for (vv = 0; vv < MAXGLOBALMES; vv++) game.messages[vv] = mesbk[vv];
-
-	fread(&game.options[0], sizeof(int), OPT_HIGHESTOPTION + 1, ooo);
-	game.options[OPT_LIPSYNCTEXT] = fgetc(ooo);
-
-	fread(&game.chars[0], sizeof(CharacterInfo), game.numcharacters, ooo);
-	fread(&charextra[0], sizeof(CharacterExtras), game.numcharacters, ooo);
-	if (roominst != NULL) {  // so it doesn't overwrite the tsdata
-		ccFreeInstance(roominstFork);
-		ccFreeInstance(roominst);
-		roominstFork = NULL;
-		roominst = NULL;
-	}
-	fread(&palette[0], sizeof(color), 256, ooo);
-	for (vv = 0; vv < game.numdialog; vv++)
-		fread(&dialog[vv].optionflags[0], sizeof(int), MAXTOPICOPTIONS, ooo);
-	mouse_on_iface = getw(ooo);
-	mouse_on_iface_button = getw(ooo);
-	mouse_pushed_iface = getw(ooo);
-	ifacepopped = getw(ooo);
-	game_paused = getw(ooo);
-
-	for (vv = 0; vv < game.numgui; vv++)
-		unexport_gui_controls(vv);
-
-	read_gui(ooo, guis, &game);
-
-	if (numGuisWas != game.numgui)
-		quit("!Restore_Game: Game has changed (GUIs), unable to restore position");
-
-	for (vv = 0; vv < game.numgui; vv++)
-		export_gui_controls(vv);
-
-	numAnimButs = getw(ooo);
-	fread(&animbuts[0], sizeof(AnimatingGUIButton), numAnimButs, ooo);
-
-	if (getw(ooo) != game.audioClipTypeCount)
-		quit("!Restore_Game: game has changed (audio types), unable to restore");
-
-	fread(&game.audioClipTypes[0], sizeof(AudioClipType), game.audioClipTypeCount, ooo);
-
-	short saved_light_levels[MAX_REGIONS];
-	int   saved_tint_levels[MAX_REGIONS];
-	fread(&saved_light_levels[0], sizeof(short), MAX_REGIONS, ooo);
-	fread(&saved_tint_levels[0], sizeof(int), MAX_REGIONS, ooo);
-
-	short saved_zoom_levels1[MAX_WALK_AREAS + 1];
-	short saved_zoom_levels2[MAX_WALK_AREAS + 1];
-	fread(&saved_zoom_levels1[0], sizeof(short), MAX_WALK_AREAS + 1, ooo);
-	fread(&saved_zoom_levels2[0], sizeof(short), MAX_WALK_AREAS + 1, ooo);
-
-	int doAmbient[MAX_SOUND_CHANNELS], cc, dd;
-	int crossfadeInChannelWas = play.crossfading_in_channel;
-	int crossfadeOutChannelWas = play.crossfading_out_channel;
-
-	for (bb = 0; bb <= MAX_SOUND_CHANNELS; bb++)
-	{
-		stop_and_destroy_channel_ex(bb, false);
-	}
-
-	play.crossfading_in_channel = crossfadeInChannelWas;
-	play.crossfading_out_channel = crossfadeOutChannelWas;
-
-	fread(&ambient[0], sizeof(AmbientSound), MAX_SOUND_CHANNELS, ooo);
-
-	for (bb = 1; bb < MAX_SOUND_CHANNELS; bb++) {
-		if (ambient[bb].channel == 0)
-			doAmbient[bb] = 0;
-		else {
-			doAmbient[bb] = ambient[bb].num;
-			ambient[bb].channel = 0;
-		}
-	}
-
-	numscreenover = getw(ooo);
-	fread(&screenover[0], sizeof(ScreenOverlay), numscreenover, ooo);
-	for (bb = 0; bb < numscreenover; bb++) {
-		if (screenover[bb].pic != NULL)
-		{
-			screenover[bb].pic = read_serialized_bitmap(ooo);
-			screenover[bb].bmp = gfxDriver->CreateDDBFromBitmap(screenover[bb].pic, false);
-		}
-	}
-
-	update_polled_stuff();
-
-	// load into a temp array since ccUnserialiseObjects will destroy
-	// it otherwise
-	block dynamicallyCreatedSurfacesFromSaveGame[MAX_DYNAMIC_SURFACES];
-	for (bb = 0; bb < MAX_DYNAMIC_SURFACES; bb++)
-	{
-		if (fgetc(ooo) == 0)
-		{
-			dynamicallyCreatedSurfacesFromSaveGame[bb] = NULL;
-		} else
-		{
-			dynamicallyCreatedSurfacesFromSaveGame[bb] = read_serialized_bitmap(ooo);
-		}
-	}
-
-	update_polled_stuff();
-
-	block newbscene[MAX_BSCENE];
-	for (bb = 0; bb < MAX_BSCENE; bb++)
-		newbscene[bb] = NULL;
-
-	if (displayed_room >= 0) {
-
-		for (bb = 0; bb < MAX_BSCENE; bb++) {
-			newbscene[bb] = NULL;
-			if (play.raw_modified[bb]) {
-				newbscene[bb] = read_serialized_bitmap(ooo);
-			}
-		}
-		bb = getw(ooo);
-		if (raw_saved_screen != NULL) {
-			wfreeblock(raw_saved_screen);
-			raw_saved_screen = NULL;
-		}
-		if (bb)
-			raw_saved_screen = read_serialized_bitmap(ooo);
-
-		if (troom.tsdata != NULL)
-			free(troom.tsdata);
-		// get the current troom, in case they save in room 600 or whatever
-		fread(&troom, sizeof(RoomStatus), 1, ooo);
-		if (troom.tsdatasize > 0) {
-			troom.tsdata = (char *)malloc(troom.tsdatasize + 5);
-			fread(&troom.tsdata[0], troom.tsdatasize, 1, ooo);
-		} else
-			troom.tsdata = NULL;
-
-	}
-
-	if (getw(ooo) != numGlobalVars)
-		quit("!Game has been modified since save; unable to restore game (GM01)");
-
-	fread(&globalvars[0], sizeof(InteractionVariable), numGlobalVars, ooo);
-
-	if (getw(ooo) != game.numviews)
-		quit("!Game has been modified since save; unable to restore (GV02)");
-
-	for (bb = 0; bb < game.numviews; bb++) {
-		for (cc = 0; cc < views[bb].numLoops; cc++) {
-			for (dd = 0; dd < views[bb].loops[cc].numFrames; dd++)
-			{
-				views[bb].loops[cc].frames[dd].sound = getw(ooo);
-				views[bb].loops[cc].frames[dd].pic = getw(ooo);
-			}
-		}
-	}
-
-	if (getw(ooo) != MAGICNUMBER + 1)
-		quit("!Game has been modified since save; unable to restore (GV03)");
-
-	if (getw(ooo) != game.audioClipCount)
-		quit("Game has changed: different audio clip count");
-
-	play.crossfading_in_channel = 0;
-	play.crossfading_out_channel = 0;
-	int channelPositions[MAX_SOUND_CHANNELS + 1];
-	for (bb = 0; bb <= MAX_SOUND_CHANNELS; bb++)
-	{
-		channelPositions[bb] = 0;
-		int audioClipIndex = getw(ooo);
-		if (audioClipIndex >= 0)
-		{
-			if (audioClipIndex >= game.audioClipCount)
-				quit("save game error: invalid audio clip index");
-
-			channelPositions[bb] = getw(ooo);
-			if (channelPositions[bb] < 0) channelPositions[bb] = 0;
-			int priority = getw(ooo);
-			int repeat = getw(ooo);
-			int vol = getw(ooo);
-			int pan = getw(ooo);
-			int volAsPercent = getw(ooo);
-			int panAsPercent = getw(ooo);
-			play_audio_clip_on_channel(bb, &game.audioClips[audioClipIndex], priority, repeat, channelPositions[bb]);
-			if (channels[bb] != NULL)
-			{
-				channels[bb]->set_panning(pan);
-				channels[bb]->set_volume(vol);
-				channels[bb]->panningAsPercentage = panAsPercent;
-				channels[bb]->volAsPercentage = volAsPercent;
-			}
-		}
-	}
-	if ((crossfadeInChannelWas > 0) && (channels[crossfadeInChannelWas] != NULL))
-		play.crossfading_in_channel = crossfadeInChannelWas;
-	if ((crossfadeOutChannelWas > 0) && (channels[crossfadeOutChannelWas] != NULL))
-		play.crossfading_out_channel = crossfadeOutChannelWas;
-
-	// If there were synced audio tracks, the time taken to load in the
-	// different channels will have thrown them out of sync, so re-time it
-	for (bb = 0; bb <= MAX_SOUND_CHANNELS; bb++)
-	{
-		if ((channelPositions[bb] > 0) && (channels[bb] != NULL) && (channels[bb]->done == 0))
-		{
-			channels[bb]->seek(channelPositions[bb]);
-		}
-	}
-	crossFading = getw(ooo);
-	crossFadeVolumePerStep = getw(ooo);
-	crossFadeStep = getw(ooo);
-	crossFadeVolumeAtStart = getw(ooo);
-
-	recache_queued_clips_after_loading_save_game();
-
-	platform->RunPluginHooks(AGSE_RESTOREGAME, (int)ooo);
-	if (getw(ooo) != (unsigned)MAGICNUMBER)
-		quit("!One of the game plugins did not restore its game data correctly.");
-
-	// save the new room music vol for later use
-	int newRoomVol = getw(ooo);
-
-	if (ccUnserializeAllObjects(ooo, &ccUnserializer))
-		quitprintf("LoadGame: Error during deserialization: %s", ccErrorString);
-
-	// preserve legacy music type setting
-	current_music_type = getw(ooo);
-
-	fclose(ooo);
-
-	// restore these to the ones retrieved from the save game
-	for (bb = 0; bb < MAX_DYNAMIC_SURFACES; bb++)
-	{
-		dynamicallyCreatedSurfaces[bb] = dynamicallyCreatedSurfacesFromSaveGame[bb];
-	}
-
-	if (create_global_script())
-		quitprintf("Unable to recreate global script: %s", ccErrorString);
-
-	if (gameinst->globaldatasize != gdatasize)
-		quit("!Restore_game: Global script changed, cannot restore game");
-
-	// read the global data into the newly created script
-	memcpy(&gameinst->globaldata[0], newglobaldatabuffer, gdatasize);
-	free(newglobaldatabuffer);
-	ccUnFlattenGlobalData(gameinst);
-
-	// restore the script module data
-	for (bb = 0; bb < numScriptModules; bb++) {
-		if (scriptModuleDataSize[bb] != moduleInst[bb]->globaldatasize)
-			quit("!Restore Game: script module global data changed, unable to restore");
-		memcpy(&moduleInst[bb]->globaldata[0], scriptModuleDataBuffers[bb], scriptModuleDataSize[bb]);
-		free(scriptModuleDataBuffers[bb]);
-		ccUnFlattenGlobalData(moduleInst[bb]);
-	}
-
-
-	setup_player_character(game.playercharacter);
-
-	int gstimer = play.gscript_timer;
-	int oldx1 = play.mboundx1, oldx2 = play.mboundx2;
-	int oldy1 = play.mboundy1, oldy2 = play.mboundy2;
-	int musicWasRepeating = play.current_music_repeating;
-	int newms = play.cur_music_number;
-
-	// disable the queue momentarily
-	int queuedMusicSize = play.music_queue_size;
-	play.music_queue_size = 0;
-
-	update_polled_stuff();
-
-	if (displayed_room >= 0)
-		load_new_room(displayed_room, NULL);//&game.chars[game.playercharacter]);
-
-	update_polled_stuff();
-
-	play.gscript_timer = gstimer;
-
-	// restore the correct room volume (they might have modified
-	// it with SetMusicVolume)
-	thisroom.options[ST_VOLUME] = newRoomVol;
-
-	filter->SetMouseLimit(oldx1, oldy1, oldx2, oldy2);
-
-	set_cursor_mode(sg_cur_mode);
-	set_mouse_cursor(sg_cur_cursor);
-	if (sg_cur_mode == MODE_USE)
-		SetActiveInventory(playerchar->activeinv);
-	// ensure that the current cursor is locked
-	spriteset.precache(game.mcurs[sg_cur_cursor].pic);
-
-#if (ALLEGRO_DATE > 19990103)
-	set_window_title(play.game_name);
-#endif
-
-	update_polled_stuff();
-
-	if (displayed_room >= 0) {
-
-		for (bb = 0; bb < MAX_BSCENE; bb++) {
-			if (newbscene[bb]) {
-				wfreeblock(thisroom.ebscene[bb]);
-				thisroom.ebscene[bb] = newbscene[bb];
-			}
-		}
-
-		in_new_room = 3;  // don't run "enters screen" events
-		// now that room has loaded, copy saved light levels in
-		memcpy(&thisroom.regionLightLevel[0], &saved_light_levels[0], sizeof(short) * MAX_REGIONS);
-		memcpy(&thisroom.regionTintLevel[0], &saved_tint_levels[0], sizeof(int) * MAX_REGIONS);
-		generate_light_table();
-
-		memcpy(&thisroom.walk_area_zoom[0], &saved_zoom_levels1[0], sizeof(short) * (MAX_WALK_AREAS + 1));
-		memcpy(&thisroom.walk_area_zoom2[0], &saved_zoom_levels2[0], sizeof(short) * (MAX_WALK_AREAS + 1));
-
-		on_background_frame_change();
-
-	}
-
-	gui_disabled_style = convert_gui_disabled_style(game.options[OPT_DISABLEOFF]);
-	/*
-	  play_sound(-1);
-
-	  stopmusic();
-	  // use the repeat setting when the current track was started
-	  int musicRepeatSetting = play.music_repeat;
-	  SetMusicRepeat(musicWasRepeating);
-	  if (newms>=0) {
-		// restart the background music
-		if (newms == 1000)
-		  PlayMP3File (play.playmp3file_name);
-		else {
-		  play.cur_music_number=2000;  // make sure it gets played
-		  newmusic(newms);
-		}
-	  }
-	  SetMusicRepeat(musicRepeatSetting);
-	  if (play.silent_midi)
-		PlaySilentMIDI (play.silent_midi);
-	  SeekMIDIPosition(midipos);
-	  //SeekMODPattern (modtrack);
-	  //SeekMP3PosMillis (mp3mpos);
-
-	  if (musicpos > 0) {
-		// For some reason, in Prodigal after this Seek line is called
-		// it can cause the next update_polled_stuff to crash;
-		// must be some sort of bug in AllegroMP3
-		if ((crossFading > 0) && (channels[crossFading] != NULL))
-		  channels[crossFading]->seek(musicpos);
-		else if (channels[SCHAN_MUSIC] != NULL)
-		  channels[SCHAN_MUSIC]->seek(musicpos);
-	  }*/
-
-	  // restore the queue now that the music is playing
-	play.music_queue_size = queuedMusicSize;
-
-	if (play.digital_master_volume >= 0)
-		System_SetVolume(play.digital_master_volume);
-
-	for (vv = 1; vv < MAX_SOUND_CHANNELS; vv++) {
-		if (doAmbient[vv])
-			PlayAmbientSound(vv, doAmbient[vv], ambient[vv].vol, ambient[vv].x, ambient[vv].y);
-	}
-
-	for (vv = 0; vv < game.numgui; vv++) {
-		guibg[vv] = create_bitmap_ex(final_col_dep, guis[vv].wid, guis[vv].hit);
-		guibg[vv] = gfxDriver->ConvertBitmapToSupportedColourDepth(guibg[vv]);
-	}
-
-	if (gfxDriver->SupportsGammaControl())
-		gfxDriver->SetGamma(play.gamma_adjustment);
-
-	guis_need_update = 1;
-
-	play.ignore_user_input_until_time = 0;
-	update_polled_stuff();
-
-	platform->RunPluginHooks(AGSE_POSTRESTOREGAME, 0);
-
-	if (displayed_room < 0) {
-		// the restart point, no room was loaded
-		load_new_room(playerchar->room, playerchar);
-		playerchar->prevroom = -1;
-
-		first_room_initialization();
-	}
-
-	if ((play.music_queue_size > 0) && (cachedQueuedMusic == NULL)) {
-		cachedQueuedMusic = load_music_from_disk(play.music_queue[0], 0);
-	}
-
-	return 0;
 }
 
 void add_dynamic_sprite(int gotSlot, block redin, bool hasAlpha) {
@@ -22195,100 +21125,6 @@ void free_dynamic_sprite(int gotSlot) {
 				objcache[tt].sppic = -1;
 		}
 	}
-}
-
-int do_game_load(const char *nametouse, int slotNumber, char *descrp, int *wantShot) {
-	gameHasBeenRestored++;
-
-	FILE *ooo = fopen(nametouse, "rb");
-	if (ooo == NULL)
-		return -1;
-
-	// skip Vista header
-	fseek(ooo, sizeof(RICH_GAME_MEDIA_HEADER), SEEK_SET);
-
-	fread(rbuffer, sgsiglen, 1, ooo);
-	rbuffer[sgsiglen] = 0;
-	if (strcmp(rbuffer, sgsig) != 0) {
-		// not a save game
-		fclose(ooo);
-		return -2;
-	}
-	int oldeip = our_eip;
-	our_eip = 2050;
-
-	fgetstring_limit(rbuffer, ooo, 180);
-	rbuffer[180] = 0;
-	safeguard_string((unsigned char *)rbuffer);
-
-	if (descrp != NULL) {
-		// just want slot description, so return
-		Common::strcpy_s(descrp, rbuffer);
-		fclose(ooo);
-		our_eip = oldeip;
-		return 0;
-	}
-
-	if (wantShot != NULL) {
-		// just want the screenshot
-		if (getw(ooo) != SGVERSION) {
-			fclose(ooo);
-			return -3;
-		}
-		int isScreen = getw(ooo);
-		*wantShot = 0;
-
-		if (isScreen) {
-			int gotSlot = spriteset.findFreeSlot();
-			// load the screenshot
-			block redin = read_serialized_bitmap(ooo);
-			if (gotSlot > 0) {
-				// add it into the sprite set
-				add_dynamic_sprite(gotSlot, gfxDriver->ConvertBitmapToSupportedColourDepth(redin));
-
-				*wantShot = gotSlot;
-			} else
-			{
-				destroy_bitmap(redin);
-			}
-		}
-		fclose(ooo);
-		our_eip = oldeip;
-		return 0;
-	}
-
-	our_eip = 2051;
-
-	// do the actual restore
-	int ress = restore_game_data(ooo, nametouse);
-
-	our_eip = oldeip;
-
-	if (ress == -5) {
-		// saved in different game
-		RunAGSGame(rbuffer, 0, 0);
-		load_new_game_restore = slotNumber;
-		return 0;
-	}
-
-	if (ress)
-		return ress;
-
-	run_on_event(GE_RESTORE_GAME, slotNumber);
-
-	// ensure keyboard buffer is clean
-	// use the raw versions rather than the rec_ versions so we don't
-	// interfere with the replay sync
-	while (keypressed()) readkey();
-
-	return 0;
-}
-
-int load_game(int slotn, char *descrp, int *wantShot) {
-	char nametouse[260];
-	get_save_game_path(slotn, nametouse);
-
-	return do_game_load(nametouse, slotn, descrp, wantShot);
 }
 
 #define ICONSPERLINE 4
@@ -23657,8 +22493,8 @@ void setup_script_exports() {
 	scAdd_External_Symbol("StrCaseComp", (void *)scumm_stricmp);
 	scAdd_External_Symbol("StrComp", (void *)strcmp);
 	scAdd_External_Symbol("StrContains", (void *)StrContains);
-	scAdd_External_Symbol("StrCopy", (void *)_sc_Common::strcpy_s);
-	scAdd_External_Symbol("StrFormat", (void *)_sc_Common::sprintf_s);
+	scAdd_External_Symbol("StrCopy", (void *)_sc_strcpy);
+	scAdd_External_Symbol("StrFormat", (void *)_sc_sprintf);
 	scAdd_External_Symbol("StrGetCharAt", (void *)StrGetCharAt);
 	scAdd_External_Symbol("StringToInt", (void *)StringToInt);
 	scAdd_External_Symbol("StrLen", (void *)strlen);
@@ -24033,8 +22869,8 @@ void mainloop(bool checkControls, IDriverDependantBitmap * extraBitmap, int extr
 		return;
 
 	our_eip = 72;
-	if (time(NULL) != t1) {
-		t1 = time(NULL);
+	if (g_system->getMillis() != lastTime) {
+		lastTime = g_system->getMillis();
 		fps = loopcounter - lastcounter;
 		lastcounter = loopcounter;
 	}
@@ -24049,29 +22885,6 @@ void mainloop(bool checkControls, IDriverDependantBitmap * extraBitmap, int extr
 
 
 int check_write_access() {
-
-	if (platform->GetDiskFreeSpaceMB() < 2)
-		return 0;
-
-	our_eip = -1895;
-
-	// The Save Game Dir is the only place that we should write to
-	char tempPath[MAX_PATH];
-	Common::sprintf_s(tempPath, "%s""tmptest.tmp", saveGameDirectory);
-	FILE *yy = fopen(tempPath, "wb");
-	if (yy == NULL)
-		return 0;
-
-	our_eip = -1896;
-
-	fwrite("just to test the drive free space", 30, 1, yy);
-	fclose(yy);
-
-	our_eip = -1897;
-
-	if (unlink(tempPath))
-		return 0;
-
 	return 1;
 }
 
@@ -24212,7 +23025,7 @@ void setup_exports(char *expfrom) {
 		Common::strcat_s(temphdr, game.chars[aa].scrname);
 		Common::strcat_s(temphdr, " ");
 		char *ptro = &temphdr[strlen(temphdr)];
-		Common::sprintf_s(ptro, "%d\r\n", aa);
+		Common::sprintf_s(ptro, STD_BUFFER_SIZE, "%d\r\n", aa);
 	}
 }
 
@@ -24452,114 +23265,6 @@ void initialize_sprite(int ee) {
 	}
 }
 
-#ifdef WINDOWS_VERSION
-CONTEXT cpustate;
-EXCEPTION_RECORD excinfo;
-int miniDumpResultCode = 0;
-
-typedef enum _MINIDUMP_TYPE {
-	MiniDumpNormal = 0x0000,
-	MiniDumpWithDataSegs = 0x0001,
-	MiniDumpWithFullMemory = 0x0002,
-	MiniDumpWithHandleData = 0x0004,
-	MiniDumpFilterMemory = 0x0008,
-	MiniDumpScanMemory = 0x0010,
-	MiniDumpWithUnloadedModules = 0x0020,
-	MiniDumpWithIndirectlyReferencedMemory = 0x0040,
-	MiniDumpFilterModulePaths = 0x0080,
-	MiniDumpWithProcessThreadData = 0x0100,
-	MiniDumpWithPrivateReadWriteMemory = 0x0200,
-	MiniDumpWithoutOptionalData = 0x0400,
-} MINIDUMP_TYPE;
-
-typedef struct _MINIDUMP_EXCEPTION_INFORMATION {
-	DWORD ThreadId;
-	PEXCEPTION_POINTERS ExceptionPointers;
-	BOOL ClientPointers;
-} MINIDUMP_EXCEPTION_INFORMATION, *PMINIDUMP_EXCEPTION_INFORMATION;
-
-typedef BOOL(WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD ProcessId,
-	HANDLE hFile, MINIDUMP_TYPE DumpType,
-	CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-	CONST void *UserStreamParam,
-	CONST void *CallbackParam);
-
-MINIDUMPWRITEDUMP _MiniDumpWriteDump;
-
-
-void CreateMiniDump(EXCEPTION_POINTERS * pep) {
-	HMODULE dllHandle = LoadLibrary(L"dbghelp.dll");
-	if (dllHandle == NULL)
-	{
-		miniDumpResultCode = 1;
-		return;
-	}
-
-	_MiniDumpWriteDump = (MINIDUMPWRITEDUMP)GetProcAddress(dllHandle, "MiniDumpWriteDump");
-	if (_MiniDumpWriteDump == NULL)
-	{
-		FreeLibrary(dllHandle);
-		miniDumpResultCode = 2;
-		return;
-	}
-
-	char fileName[80];
-	Common::sprintf_s(fileName, "CrashInfo.%s.dmp", ACI_VERSION_TEXT);
-	HANDLE hFile = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE,
-		0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	if ((hFile != NULL) && (hFile != INVALID_HANDLE_VALUE))
-	{
-		MINIDUMP_EXCEPTION_INFORMATION mdei;
-
-		mdei.ThreadId = GetCurrentThreadId();
-		mdei.ExceptionPointers = pep;
-		mdei.ClientPointers = FALSE;
-
-		MINIDUMP_TYPE mdt = MiniDumpNormal; //MiniDumpWithPrivateReadWriteMemory;
-
-		BOOL rv = _MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(),
-			hFile, mdt, (pep != 0) ? &mdei : 0, NULL, NULL);
-
-		if (!rv)
-			miniDumpResultCode = 4;
-
-		CloseHandle(hFile);
-	} else
-		miniDumpResultCode = 3;
-
-	FreeLibrary(dllHandle);
-}
-
-int CustomExceptionHandler(LPEXCEPTION_POINTERS exinfo) {
-	cpustate = exinfo->ContextRecord[0];
-	excinfo = exinfo->ExceptionRecord[0];
-	CreateMiniDump(exinfo);
-
-	return EXCEPTION_EXECUTE_HANDLER;
-}
-
-FILE *logfile;
-int OurReportingFunction(int reportType, char *userMessage, int *retVal) {
-
-	fprintf(logfile, "%s: %s\n", (reportType == _CRT_ASSERT) ? "Assertion failed" : "Warning", userMessage);
-	fflush(logfile);
-	return 0;
-}
-#endif
-
-#if defined(WINDOWS_VERSION)
-#include <new.h>
-char tempmsg[100];
-char *printfworkingspace;
-int malloc_fail_handler(size_t amountwanted) {
-	free(printfworkingspace);
-	Common::sprintf_s(tempmsg, "Out of memory: failed to allocate %ld bytes (at PP=%d)", amountwanted, our_eip);
-	quit(tempmsg);
-	return 0;
-}
-#endif
-
 int init_gfx_mode(int wid, int hit, int cdep) {
 
 	// a mode has already been initialized, so abort
@@ -24604,12 +23309,6 @@ void winclosehook() {
 	want_exit = 1;
 	abort_engine = 1;
 	check_dynamic_sprites_at_exit = 0;
-	/*  while (want_exit == 1)
-		yield_timeslice();
-	  / *if (want_quit == 0)
-		want_quit = 1;
-	  else* / quit("|game aborted");
-	*/
 }
 
 void init_game_settings() {
@@ -24835,8 +23534,8 @@ void init_game_settings() {
 	for (ee = 0; ee < MAX_SOUND_CHANNELS; ee++)
 		last_sound_played[ee] = -1;
 
-	if (usetup.translation)
-		init_translation(usetup.translation);
+	if (!usetup.translation.empty())
+		init_translation(usetup.translation.c_str());
 
 	update_invorder();
 	displayed_room = -10;
@@ -24861,23 +23560,26 @@ void INIgetdirec(char *wasgv, char *inifil) {
 			memcpy(strchr(wasgv, ':') + 1, inifil, strlen(inifil) + 1);
 		// or it's just "acwin.exe" (unlikely)
 		else
-			Common::strcpy_s(wasgv, inifil);
+			Common::strcpy_s(wasgv, STD_BUFFER_SIZE, inifil);
 	}
 
 }
 
 char *INIreaditem(const char *sectn, const char *entry) {
-	FILE *fin = fopen(filetouse, "rt");
-	if (fin == NULL)
+#ifdef TODO
+	Common::File fin;
+
+	if (!fin.open(filetouse))
 		return NULL;
 
-	char templine[200];
 	char wantsect[100];
 	Common::sprintf_s(wantsect, "[%s]", sectn);
 
-	while (!feof(fin)) {
+	while (!fin.eos()) {
+
 		fgets(templine, 199, fin);
 		// find the section
+
 		if (scumm_strnicmp(wantsect, templine, strlen(wantsect)) == 0) {
 			while (!feof(fin)) {
 				// we're in the right section, find the entry
@@ -24898,7 +23600,7 @@ char *INIreaditem(const char *sectn, const char *entry) {
 						while ((pptr[0] == ' ') || (pptr[0] == '\t'))
 							pptr++;
 						char *toret = (char *)malloc(strlen(pptr) + 5);
-						Common::strcpy_s(toret, pptr);
+						Common::strcpy_s(toret, STD_BUFFER_SIZE,, pptr);
 						fclose(fin);
 						return toret;
 					}
@@ -24908,6 +23610,9 @@ char *INIreaditem(const char *sectn, const char *entry) {
 	}
 	fclose(fin);
 	return NULL;
+#else
+	error("TODO: INIreaditem");
+#endif
 }
 
 int INIreadint(const char *sectn, const char *item, int errornosect = 1) {
@@ -24922,7 +23627,7 @@ int INIreadint(const char *sectn, const char *item, int errornosect = 1) {
 
 
 void read_config_file(char *argv0) {
-
+#ifdef TODO
 	// Try current directory for config first; else try exe dir
 	Common::strcpy_s(ac_conf_file_defname, "acsetup.cfg");
 	ac_config_file = &ac_conf_file_defname[0];
@@ -25059,7 +23764,9 @@ void read_config_file(char *argv0) {
 
 	if (usetup.gfxDriverID == NULL)
 		usetup.gfxDriverID = "DX5";
-
+#else
+error("TODO: read_config_file");
+#endif
 }
 
 void start_game() {
@@ -25090,9 +23797,9 @@ void start_game() {
 	first_room_initialization();
 }
 
-void initialize_start_and_play_game(int override_start_room, const char *loadSaveGameOnStartup) {
-	try { // BEGIN try for ALI3DEXception
-
+void initialize_start_and_play_game(int overrideStartRoom, const char *startupSavefile) {
+	//try { // BEGIN try for ALI3DEXception
+	{
 		set_cursor_mode(MODE_WALK);
 
 		if (convert_16bit_bgr) {
@@ -25106,86 +23813,16 @@ void initialize_start_and_play_game(int override_start_room, const char *loadSav
 
 		g_engine->setRandomSeed(play.randseed);
 		play.gamestep = 0;
-		if (override_start_room)
-			playerchar->room = override_start_room;
+		if (overrideStartRoom)
+			playerchar->room = overrideStartRoom;
 
 		write_log_debug("Checking replay status");
 
 		if (play.recording) {
 			start_recording();
 		} else if (play.playback) {
-			FILE *in = fopen(replayfile, "rb");
-			if (in != NULL) {
-				char buffer[100];
-				fread(buffer, 12, 1, in);
-				buffer[12] = 0;
-				if (strcmp(buffer, "AGSRecording") != 0) {
-					Display("ERROR: Invalid recorded data file");
-					play.playback = 0;
-				} else {
-					fgetstring_limit(buffer, in, 12);
-					if (buffer[0] != '2')
-						quit("!Replay file is from an old version of AGS");
-					if (strcmp(buffer, "2.55.553") < 0)
-						quit("!Replay file was recorded with an older incompatible version");
-
-					if (strcmp(buffer, ACI_VERSION_TEXT)) {
-						// Disable text as speech while displaying the warning message
-						// This happens if the user's graphics card does BGR order 16-bit colour
-						int oldalways = game.options[OPT_ALWAYSSPCH];
-						game.options[OPT_ALWAYSSPCH] = 0;
-						play.playback = 0;
-						Display("Warning! replay is from a different version of AGS (%s) - it may not work properly.", buffer);
-						play.playback = 1;
-						g_engine->setRandomSeed(play.randseed);
-						play.gamestep = 0;
-						game.options[OPT_ALWAYSSPCH] = oldalways;
-					}
-
-					int replayver = getw(in);
-
-					if ((replayver < 1) || (replayver > 3))
-						quit("!Unsupported Replay file version");
-
-					if (replayver >= 2) {
-						fgetstring_limit(buffer, in, 99);
-						int uid = getw(in);
-						if ((strcmp(buffer, game.gamename) != 0) || (uid != game.uniqueid)) {
-							char msg[150];
-							Common::sprintf_s(msg, "!This replay is meant for the game '%s' and will not work correctly with this game.", buffer);
-							quit(msg);
-						}
-						// skip the total time
-						getw(in);
-						// replay description, maybe we'll use this later
-						fgetstring_limit(buffer, in, 99);
-					}
-
-					play.randseed = getw(in);
-					int flen = filelength(fileno(in)) - ftell(in);
-					if (replayver >= 3) {
-						flen = getw(in) * sizeof(short);
-					}
-					recordbuffer = (short *)malloc(flen);
-					fread(recordbuffer, flen, 1, in);
-					g_engine->setRandomSeed(play.randseed);
-					recbuffersize = flen / sizeof(short);
-					recsize = 0;
-					disable_mgetgraphpos = 1;
-					replay_time = 0;
-					replay_last_second = loopcounter;
-					if (replayver >= 3) {
-						int issave = getw(in);
-						if (issave) {
-							if (restore_game_data(in, replayfile))
-								quit("!Error running replay... could be incorrect game version");
-							replay_last_second = loopcounter;
-						}
-					}
-					fclose(in);
-				}
-			} else // file not found
-				play.playback = 0;
+			error("TODO: playback not yet supported");
+			play.playback = 0;
 		}
 
 		write_log_debug("Engine initialization complete");
@@ -25207,16 +23844,16 @@ void initialize_start_and_play_game(int override_start_room, const char *loadSav
 			}
 		}
 
-		if (loadSaveGameOnStartup != NULL)
+		if (startupSavefile != NULL)
 		{
 			int saveGameNumber = 1000;
-			const char *sgName = strstr(loadSaveGameOnStartup, "agssave.");
+			const char *sgName = strstr(startupSavefile, "agssave.");
 			if (sgName != NULL)
 			{
 				sscanf(sgName, "agssave.%03d", &saveGameNumber);
 			}
 			current_fade_out_effect();
-			int loadGameErrorCode = do_game_load(loadSaveGameOnStartup, saveGameNumber, NULL, NULL);
+			int loadGameErrorCode = do_game_load(startupSavefile, saveGameNumber, NULL, NULL);
 			if (loadGameErrorCode)
 			{
 				quitprintf("Unable to resume the save game. Try starting the game over. (Error: %s)", load_game_errors[-loadGameErrorCode]);
@@ -25237,11 +23874,10 @@ void initialize_start_and_play_game(int override_start_room, const char *loadSav
 		}
 
 	}
-	catch (Ali3DException gfxException)
+	/*catch (Ali3DException gfxException)
 	{
 		quit((char *)gfxException._message);
-	}
-
+	}*/
 }
 
 int initialize_graphics_filter(const char *filterID, int width, int height, int colDepth) {
@@ -25334,7 +23970,7 @@ int try_widescreen_bordered_graphics_mode_if_appropriate(int initasx, int initas
 	return failed;
 }
 
-int switch_to_graphics_mode(int initasx, int initasy, int scrnwid, int scrnhit, int firstDepth, int secondDepth) {
+int switch_to_graphics_mode(int initasx, int initasy, int width, int height, int firstDepth, int secondDepth) {
 	int failed;
 	int initasyLetterbox = (initasy * 12) / 10;
 
@@ -25358,11 +23994,11 @@ int switch_to_graphics_mode(int initasx, int initasy, int scrnwid, int scrnhit, 
 		failed = init_gfx_mode(initasx, initasyLetterbox, secondDepth);
 	}
 
-	if ((scrnwid != initasx) || (scrnhit != initasy))
+	if ((width != initasx) || (height != initasy))
 	{
 		// now, try the original resolution at 16 then 15 bit
-		failed = init_gfx_mode(scrnwid, scrnhit, firstDepth);
-		failed = init_gfx_mode(scrnwid, scrnhit, secondDepth);
+		failed = init_gfx_mode(width, height, firstDepth);
+		failed = init_gfx_mode(width, height, secondDepth);
 	}
 
 	if (failed)
@@ -25374,20 +24010,12 @@ int switch_to_graphics_mode(int initasx, int initasy, int scrnwid, int scrnhit, 
 void CreateBlankImage() {
 	// this is the first time that we try to use the graphics driver,
 	// so it's the most likey place for a crash
-	try
-	{
-		BITMAP *blank = create_bitmap_ex(final_col_dep, 16, 16);
-		blank = gfxDriver->ConvertBitmapToSupportedColourDepth(blank);
-		clear(blank);
-		blankImage = gfxDriver->CreateDDBFromBitmap(blank, false, true);
-		blankSidebarImage = gfxDriver->CreateDDBFromBitmap(blank, false, true);
-		destroy_bitmap(blank);
-	}
-	catch (Ali3DException gfxException)
-	{
-		quit((char *)gfxException._message);
-	}
-
+	BITMAP *blank = create_bitmap_ex(final_col_dep, 16, 16);
+	blank = gfxDriver->ConvertBitmapToSupportedColourDepth(blank);
+	clear(blank);
+	blankImage = gfxDriver->CreateDDBFromBitmap(blank, false, true);
+	blankSidebarImage = gfxDriver->CreateDDBFromBitmap(blank, false, true);
+	destroy_bitmap(blank);
 }
 
 void show_preload() {
@@ -25419,58 +24047,12 @@ void show_preload() {
 	}
 }
 
-void change_to_directory_of_file(LPCWSTR fileName) {
-	WCHAR wcbuffer[MAX_PATH];
-	Common::strcpy_sW(wcbuffer, fileName);
-
-#if defined(LINUX_VERSION) || defined(MAC_VERSION)
-	if (strrchr(wcbuffer, '/') != NULL) {
-		strrchr(wcbuffer, '/')[0] = 0;
-		chdir(wcbuffer);
-	}
-#else
-	LPWSTR backSlashAt = StrRChrW(wcbuffer, NULL, L'\\');
-	if (backSlashAt != NULL) {
-		wcbuffer[wcslen(wcbuffer) - wcslen(backSlashAt)] = L'\0';
-		SetCurrentDirectoryW(wcbuffer);
-	}
-#endif
-}
-
 // Startup flags, set from parameters to engine
 int datafile_argv = 0, change_to_game_dir = 0, force_window = 0;
 int override_start_room = 0, force_16bit = 0;
 bool justRegisterGame = false;
 bool justUnRegisterGame = false;
 const char *loadSaveGameOnStartup = NULL;
-
-void initialise_game_file_name() {
-#ifdef WINDOWS_VERSION
-	WCHAR buffer[MAX_PATH];
-	LPCWSTR dataFilePath = wArgv[datafile_argv];
-	// Hack for Windows in case there are unicode chars in the path.
-	// The normal argv[] array has ????? instead of the unicode chars
-	// and fails, so instead we manually get the short file name, which
-	// is always using ANSI chars.
-	if (wcschr(dataFilePath, '\\') == NULL)
-	{
-		GetCurrentDirectoryW(MAX_PATH, buffer);
-		wcscat(buffer, L"\\");
-		wcscat(buffer, dataFilePath);
-		dataFilePath = &buffer[0];
-	}
-	if (GetShortPathNameW(dataFilePath, directoryPathBuffer, MAX_PATH) == 0)
-	{
-		platform->DisplayAlert("Unable to determine startup path: GetShortPathNameW failed. The specified game file might be missing.");
-		game_file_name = NULL;
-		return;
-	}
-	game_file_name = (char *)malloc(MAX_PATH);
-	WideCharToMultiByte(CP_ACP, 0, directoryPathBuffer, -1, game_file_name, MAX_PATH, NULL, NULL);
-#else
-	game_file_name = argv[datafile_argv];
-#endif
-}
 
 int main(int argc, char *argv[]) {
 	our_eip = -999;
@@ -25482,26 +24064,11 @@ int main(int argc, char *argv[]) {
 
 	platform = AGSPlatformDriver::GetDriver();
 
-#ifdef WINDOWS_VERSION
-	wArgv = CommandLineToArgvW(GetCommandLineW(), &wArgc);
-	if (wArgv == NULL)
-	{
-		platform->DisplayAlert("CommandLineToArgvW failed, unable to start the game.");
-		return 9;
-	}
-#endif
-
-	print_welcome_text(AC_VERSION_TEXT, ACI_VERSION_TEXT);
 	if ((argc > 1) && (argv[1][1] == '?'))
 		return 0;
 
 	write_log_debug("***** ENGINE STARTUP");
 
-#if defined(WINDOWS_VERSION)
-	_set_new_handler(malloc_fail_handler);
-	_set_new_mode(1);
-	printfworkingspace = (char *)malloc(7000);
-#endif
 	debug_flags = 0;
 
 	for (ee = 1; ee < argc; ee++) {
@@ -25572,56 +24139,9 @@ int main(int argc, char *argv[]) {
 		} else if (argv[ee][0] != '-') datafile_argv = ee;
 	}
 
-
-#ifdef _DEBUG
-	/* logfile=fopen("g:\\ags.log","at");
-	 //_CrtSetReportHook( OurReportingFunction );
-	  int tmpDbgFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-	  //tmpDbgFlag |= _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_DELAY_FREE_MEM_DF;
-
-	  tmpDbgFlag = (tmpDbgFlag & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF | _CRTDBG_DELAY_FREE_MEM_DF;
-
-	  _CrtSetDbgFlag(tmpDbgFlag);
-
-  /*
-  //  _CrtMemState memstart,memnow;
-	_CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_WNDW );
-	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_WNDW );
-	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_WNDW );
-  /*
-  //   _CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDERR );
-  //   _CrtSetReportFile( _CRT_ERROR, _CRTDBG_FILE_STDERR );
-  //   _CrtSetReportFile( _CRT_ASSERT, _CRTDBG_FILE_STDERR );
-
-  //  _CrtMemCheckpoint(&memstart);
-  //  _CrtMemDumpStatistics( &memstart );*/
-#endif
-
-	if ((loadSaveGameOnStartup != NULL) && (argv[0] != NULL))
-	{
-		// When launched by double-clicking a save game file, the curdir will
-		// be the save game folder unless we correct it
-		change_to_directory_of_file(wArgv[0]);
-	}
-
-#ifdef MAC_VERSION
-	getcwd(appDirectory, 512);
-#endif
-
-	//if (change_to_game_dir == 1)  {
-	if (datafile_argv > 0) {
-		// If launched by double-clicking .AGS file, change to that
-		// folder; else change to this exe's folder
-		change_to_directory_of_file(wArgv[datafile_argv]);
-	}
-
-#ifdef MAC_VERSION
-	getcwd(dataDirectory, 512);
-#endif
-
 	// Update shell associations and exit
 	if (debug_flags & DBG_REGONLY)
-		exit(0);
+		return 0;
 
 #ifndef USE_CUSTOM_EXCEPTION_HANDLER
 	usetup.disable_exception_handling = 1;
@@ -25649,7 +24169,7 @@ void create_gfx_driver() {
 }
 
 int initialize_engine(int argc, char *argv[]) {
-	FILE *ppp;
+	//FILE *ppp;
 	int ee;
 
 	write_log_debug("Reading config file");
@@ -25663,13 +24183,8 @@ int initialize_engine(int argc, char *argv[]) {
 
 	our_eip = -199;
 	// Initialize allegro
-#ifdef WINDOWS_VERSION
-	if (install_allegro(SYSTEM_AUTODETECT, &myerrno, atexit)) {
-		platform->DisplayAlert("Unable to initialize graphics subsystem. Make sure you have DirectX 5 or above installed.");
-#else
-	if (allegro_init()) {
+	if (install_allegro()) {
 		platform->DisplayAlert("Unknown error initializing graphics subsystem.");
-#endif
 		return EXIT_NORMAL;
 	}
 
@@ -25700,17 +24215,7 @@ int initialize_engine(int argc, char *argv[]) {
 			if (!platform->RunSetup())
 				return EXIT_NORMAL;
 
-#ifndef WINDOWS_VERSION
-#define _spawnl spawnl
-#define _P_OVERLAY P_OVERLAY
-#endif
-			// Just re-reading the config file seems to cause a caching
-			// problem on Win9x, so let's restart the process.
 			allegro_exit();
-			char quotedpath[255];
-			Common::sprintf_s(quotedpath, "\"%s\"", argv[0]);
-			_spawnl(_P_OVERLAY, argv[0], quotedpath, NULL);
-			//read_config_file(argv[0]);
 		}
 	}
 #endif
@@ -25726,7 +24231,7 @@ int initialize_engine(int argc, char *argv[]) {
 	write_log_debug("Initializing game data");
 
 	// initialize the data file
-	initialise_game_file_name();
+	game_file_name = argv[datafile_argv];
 	if (game_file_name == NULL) return EXIT_NORMAL;
 
 	int errcod = csetlib(game_file_name, "");  // assume it's appended to exe
@@ -25757,8 +24262,7 @@ int initialize_engine(int argc, char *argv[]) {
 			// there is a path in the game file name (and the user
 			// has not specified another one)
 			// save the path, so that it can load the VOX files, etc
-			usetup.data_files_dir = (char *)malloc(strlen(game_file_name) + 1);
-			Common::strcpy_s(usetup.data_files_dir, game_file_name);
+			usetup.data_files_dir = scumm_strdup(game_file_name);
 
 			if (strrchr(usetup.data_files_dir, '/') != NULL)
 				strrchr(usetup.data_files_dir, '/')[0] = 0;
@@ -25801,15 +24305,8 @@ int initialize_engine(int argc, char *argv[]) {
 
 	write_log_debug("Initializing mouse");
 
-#ifdef _DEBUG
-	// Quantify fails with the mouse for some reason
 	minstalled();
-#else
-	if (minstalled() == 0) {
-		platform->DisplayAlert(platform->GetNoMouseErrorString());
-		return EXIT_NORMAL;
-	}
-#endif // DEBUG
+
 	our_eip = -187;
 
 	write_log_debug("Checking memory");
@@ -25823,7 +24320,7 @@ int initialize_engine(int argc, char *argv[]) {
 		return EXIT_NORMAL;
 	}
 	free(memcheck);
-	unlink(replayTempFile);
+	//unlink(replayTempFile);
 
 	write_log_debug("Initializing rooms");
 
@@ -25842,27 +24339,15 @@ int initialize_engine(int argc, char *argv[]) {
 			so that pack functions, etc. will have the right case later */
 		speech_file = ci_find_file(usetup.data_files_dir, "speech.vox");
 
-		ppp = fopen(speech_file, "rb");
-
-		if (ppp == NULL)
-		{
-			// In case they're running in debug, check Compiled folder
-			free(speech_file);
-			speech_file = ci_find_file("Compiled", "speech.vox");
-			ppp = fopen(speech_file, "rb");
-		}
-
-		if (ppp != NULL) {
-			fclose(ppp);
-
+		if (Common::File::exists(speech_file)) {
 			write_log_debug("Initializing speech vox");
 
-			//if (csetlib(useloc,"")!=0) {
 			if (csetlib(speech_file, "") != 0) {
 				platform->DisplayAlert("Unable to initialize speech sample file - check for corruption and that\nit belongs to this game.\n");
 				return EXIT_NORMAL;
 			}
-			FILE *speechsync = clibfopen("syncdata.dat", "rb");
+
+			Common::SeekableReadStream *speechsync = clibfopen("syncdata.dat", "rb");
 			if (speechsync != NULL) {
 				// this game has voice lip sync
 				if (getw(speechsync) != 4)
@@ -25870,17 +24355,20 @@ int initialize_engine(int argc, char *argv[]) {
 				else {
 					numLipLines = getw(speechsync);
 					splipsync = (SpeechLipSyncLine *)malloc(sizeof(SpeechLipSyncLine) * numLipLines);
-					for (ee = 0; ee < numLipLines; ee++)
-					{
+					for (ee = 0; ee < numLipLines; ee++) {
 						splipsync[ee].numPhenomes = getshort(speechsync);
-						fread(splipsync[ee].filename, 1, 14, speechsync);
+						speechsync->read(splipsync[ee].filename, 14);
 						splipsync[ee].endtimeoffs = (int *)malloc(splipsync[ee].numPhenomes * sizeof(int));
-						fread(splipsync[ee].endtimeoffs, sizeof(int), splipsync[ee].numPhenomes, speechsync);
+						for (int i = 0; i < splipsync[ee].numPhenomes; ++i)
+							splipsync[ee].endtimeoffs[i] = speechsync->readSint32LE();
+
 						splipsync[ee].frame = (short *)malloc(splipsync[ee].numPhenomes * sizeof(short));
-						fread(splipsync[ee].frame, sizeof(short), splipsync[ee].numPhenomes, speechsync);
+						for (int i = 0; i < splipsync[ee].numPhenomes; ++i)
+							splipsync[ee].frame[i] = speechsync->readSint16LE();
 					}
 				}
-				fclose(speechsync);
+
+				delete speechsync;
 			}
 			csetlib(game_file_name, "");
 			platform->WriteConsole("Speech sample file found and initialized.\n");
@@ -25897,19 +24385,8 @@ int initialize_engine(int argc, char *argv[]) {
 
 	/* Don't need to use ci_fopen here, because we've used ci_find_file to get
 		the case insensitive matched filename already */
-	ppp = fopen(music_file, "rb");
 
-	if (ppp == NULL)
-	{
-		// In case they're running in debug, check Compiled folder
-		free(music_file);
-		music_file = ci_find_file("Compiled", "audio.vox");
-		ppp = fopen(music_file, "rb");
-	}
-
-	if (ppp != NULL) {
-		fclose(ppp);
-
+	if (Common::File::exists(music_file)) {
 		write_log_debug("Initializing audio vox");
 
 		//if (csetlib(useloc,"")!=0) {
@@ -25943,23 +24420,6 @@ int initialize_engine(int argc, char *argv[]) {
 #endif
 
 	our_eip = -182;
-
-#ifdef WINDOWS_VERSION
-	// don't let it use the hardware mixer verion, crashes some systems
-	//if ((usetup.digicard == DIGI_AUTODETECT) || (usetup.digicard == DIGI_DIRECTX(0)))
-  //    usetup.digicard = DIGI_DIRECTAMX(0);
-
-	if (usetup.digicard == DIGI_DIRECTX(0)) {
-		// DirectX mixer seems to buffer an extra sample itself
-		use_extra_sound_offset = 1;
-	}
-
-	// if the user clicked away to another app while we were
-	// loading, DirectSound will fail to initialize. There doesn't
-	// seem to be a solution to force us back to the foreground,
-	// because we have no actual visible window at this time
-
-#endif
 
 	write_log_debug("Initialize sound drivers");
 
@@ -26006,9 +24466,9 @@ int initialize_engine(int argc, char *argv[]) {
 	write_log_debug("Install exit handler");
 
 	atexit(atexit_handler);
-	unlink("warnings.log");
-	play.randseed = time(NULL);
-	g_engine->setRandomSeed(play.randseed);
+
+	//play.randseed = time(NULL);
+	//g_engine->setRandomSeed(play.randseed);
 
 	write_log_debug("Initialize path finder library");
 
@@ -26018,8 +24478,6 @@ int initialize_engine(int argc, char *argv[]) {
 
 	platform->InitialiseAbufAtStartup();
 
-	LOCK_VARIABLE(timerloop);
-	LOCK_FUNCTION(dj_timer_handler);
 	set_game_speed(40);
 
 	our_eip = -20;
@@ -26068,14 +24526,6 @@ int initialize_engine(int argc, char *argv[]) {
 
 	our_eip = -189;
 
-	if (file_exists("Compiled", FA_ARCH | FA_DIREC, NULL))
-	{
-		// running in debugger
-		use_compiled_folder_as_current_dir = 1;
-		// don't redirect to the game exe folder (_Debug)
-		usetup.data_files_dir = ".";
-	}
-
 	if (game.saveGameFolderName[0] != 0)
 	{
 		char newDirBuffer[MAX_PATH];
@@ -26121,15 +24571,15 @@ int initialize_engine(int argc, char *argv[]) {
 	write_log_debug("Initializing screen settings");
 
 	// default shifts for how we store the sprite data
-	_rgb_r_shift_32 = 16;
-	_rgb_g_shift_32 = 8;
-	_rgb_b_shift_32 = 0;
-	_rgb_r_shift_16 = 11;
-	_rgb_g_shift_16 = 5;
-	_rgb_b_shift_16 = 0;
-	_rgb_r_shift_15 = 10;
-	_rgb_g_shift_15 = 5;
-	_rgb_b_shift_15 = 0;
+	_G(rgb_r_shift_32) = 16;
+	_G(rgb_g_shift_32) = 8;
+	_G(rgb_b_shift_32) = 0;
+	_G(rgb_r_shift_16) = 11;
+	_G(rgb_g_shift_16) = 5;
+	_G(rgb_b_shift_16) = 0;
+	_G(rgb_r_shift_15) = 10;
+	_G(rgb_g_shift_15) = 5;
+	_G(rgb_b_shift_15) = 0;
 
 	usetup.base_width = 320;
 	usetup.base_height = 200;
@@ -26319,27 +24769,27 @@ int initialize_engine(int argc, char *argv[]) {
 
 	// Most cards do 5-6-5 RGB, which is the format the files are saved in
 	// Some do 5-6-5 BGR, or  6-5-5 RGB, in which case convert the gfx
-	if ((final_col_dep == 16) && ((_rgb_b_shift_16 != 0) || (_rgb_r_shift_16 != 11))) {
+	if ((final_col_dep == 16) && ((_G(rgb_b_shift_16) != 0) || (_G(rgb_r_shift_16) != 11))) {
 		convert_16bit_bgr = 1;
-		if (_rgb_r_shift_16 == 10) {
+		if (_G(rgb_r_shift_16) == 10) {
 			// some very old graphics cards lie about being 16-bit when they
 			// are in fact 15-bit ... get around this
-			_places_r = 3;
-			_places_g = 3;
+			_G(places_r) = 3;
+			_G(places_g) = 3;
 		}
 	}
 	if (final_col_dep > 16) {
 		// when we're using 32-bit colour, it converts hi-color images
 		// the wrong way round - so fix that
-		_rgb_r_shift_16 = 11;
-		_rgb_g_shift_16 = 5;
-		_rgb_b_shift_16 = 0;
+		_G(rgb_r_shift_16) = 11;
+		_G(rgb_g_shift_16) = 5;
+		_G(rgb_b_shift_16) = 0;
 	} else if (final_col_dep <= 16) {
 		// ensure that any 32-bit graphics displayed are converted
 		// properly to the current depth
-		_rgb_r_shift_32 = 16;
-		_rgb_g_shift_32 = 8;
-		_rgb_b_shift_32 = 0;
+		_G(rgb_r_shift_32) = 16;
+		_G(rgb_g_shift_32) = 8;
+		_G(rgb_b_shift_32) = 0;
 	}
 
 	platform->PostAllegroInit((usetup.windowed > 0) ? true : false);
@@ -26439,7 +24889,7 @@ void GameSetupStructBase::load(Common::SeekableReadStream *src) {
 	src->read(paluses, 256);
 
 	for (i = 0; i < 256; ++i)
-		defpal[i].LoadFromFile(src);
+		defpal[i].readFromFile(src);
 
 	numviews = src->readUint32LE();
 	numcharacters = src->readUint32LE();
@@ -26461,7 +24911,7 @@ void GameSetupStructBase::load(Common::SeekableReadStream *src) {
 	default_lipsync_frame = src->readUint32LE(); // used for unknown chars
 	invhotdotsprite = src->readUint32LE();
 
-	for (int i = 0; i < 17; ++i)
+	for (i = 0; i < 17; ++i)
 		reserved[i] = src->readUint32LE();
 
 	Common::fill(messages, messages + MAXGLOBALMES, nullptr);
@@ -26533,8 +24983,8 @@ void CharacterInfo::load(Common::SeekableReadStream *src) {
 
 	for (int i = 0; i < MAX_INV; ++i)
 		inv[i] = src->readSint16LE();
-	short actx = src->readSint16LE();
-	short acty = src->readSint16LE();
+	actx = src->readSint16LE();
+	acty = src->readSint16LE();
 	src->read(name, 40);
 	src->read(scrname, MAX_SCRIPT_NAME_LEN);
 	on = src->readByte();

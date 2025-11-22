@@ -38,7 +38,7 @@ SpriteCache spritset(1);
 BITMAP *screen;
 BITMAP *virtual_screen;
 IGraphicsDriver *gfxDriver;
-const char *game_file_name;
+char *game_file_name;
 GFXFilter *filter;
 MoveList *mls;
 ViewStruct *views;
@@ -102,8 +102,6 @@ int oldmouse, oldmousex, oldmousey;
 
 // crossFading is >0 (channel number of new track), or -1 (old
 // track fading out, no new track)
-int crossFading, crossFadeVolumePerStep, crossFadeStep;
-int crossFadeVolumeAtStart;
 int last_sound_played[MAX_SOUND_CHANNELS + 1];
 int current_screen_resolution_multiplier;
 int force_letterbox;
@@ -202,10 +200,12 @@ int screen_is_dirty;
 int pluginsWantingDebugHooks;
 EventHappened event[MAXEVENTS + 1];
 int numevents;
-volatile bool switching_away_from_game;
+volatile int switching_away_from_game;
 int musicPollIterator;
 char alpha_blend_cursor;
 int engineNeedsAsInt;
+char rbuffer[200];
+uint32 lastTime;
 
 // ac/dialog.cpp
 int windowbackgroundcolor, pushbuttondarkcolor;
@@ -278,10 +278,13 @@ ccInstance *gameinstFork, *roominstFork;
 int post_script_cleanup_stack;
 ScriptMouse scmouse;
 DialogTopic *dialog;
+Common::Stream *valid_handles[MAX_OPEN_SCRIPT_FILES + 1];
+int num_open_script_files;
 
 // ac/sound.cpp
 int said_speech_line;
-int crossFading;
+int crossFading, crossFadeVolumePerStep, crossFadeStep;
+int crossFadeVolumeAtStart;
 
 // ac/walkbehind.cpp
 char *walkBehindExists;
@@ -299,6 +302,10 @@ GUIMain *guis;
 block *guibg;
 IDriverDependantBitmap **guibgbmp;
 
+// common/events.cpp
+byte key[KEY_MAX];
+int key_shifts;
+
 // common/mouse32.cpp
 int mousex, mousey, numcurso, hotx, hoty;
 int boundx1, boundx2, boundy1, boundy2;
@@ -306,6 +313,10 @@ int disable_mgetgraphpos;
 char ignore_bounds;
 block savebk, mousecurs[MAXCURSORS];
 int vesa_xres, vesa_yres;
+int currentcursor;
+
+// lib/allegro
+int allegro_error;
 
 // routefnd.cpp
 int *pathbackx, *pathbacky;
@@ -464,10 +475,11 @@ Vars::Vars() {
 	screen_is_dirty = 0;
 	pluginsWantingDebugHooks = 0;
 	numevents = 0;
-	switching_away_from_game = false;
+	switching_away_from_game = 0;
 	musicPollIterator = 0;
 	alpha_blend_cursor = 0;
 	engineNeedsAsInt = 100;
+	lastTime = 0;
 
 	// ac/dialog.cpp
 	windowbackgroundcolor =  pushbuttondarkcolor = 0;
@@ -526,6 +538,8 @@ Vars::Vars() {
 	post_script_cleanup_stack = 0;
 	scmouse.x = scmouse.y = 0;
 	dialog = nullptr;
+	Common::fill(valid_handles, valid_handles + MAX_OPEN_SCRIPT_FILES + 1, nullptr);
+	num_open_script_files = 0;
 
 	// ac/sound.cpp
 	said_speech_line = 0;
@@ -545,6 +559,10 @@ Vars::Vars() {
 	guibg = nullptr;
 	guibgbmp = nullptr;
 
+	// common/events.cpp
+	Common::fill(key, key + KEY_MAX, 0);
+	key_shifts = 0;
+
 	// common/mouse32.cpp
 	mousex = mousey = 0;
 	hotx = 0, hoty = 0;
@@ -557,6 +575,10 @@ Vars::Vars() {
 	ignore_bounds = 0;
 	savebk = nullptr;
 	vesa_xres = vesa_yres = 0;
+	currentcursor = 0;
+
+	// lib/allegro
+	allegro_error = 0;
 
 	// routefnd.cpp
 	pathbackx = pathbacky = nullptr;

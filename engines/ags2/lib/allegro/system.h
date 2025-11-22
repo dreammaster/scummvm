@@ -144,6 +144,9 @@ inline int set_display_switch_callback(int dir, AL_METHOD(void, cb, (void))) {
 inline int set_display_switch_mode(int v) {
 	return -1;
 }
+inline void set_window_title(const char *name) {
+	// No implementation
+}
 
 } // namespace AGS2
 

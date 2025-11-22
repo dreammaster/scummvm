@@ -24,6 +24,8 @@
 
 namespace AGS2 {
 
+#define MAX_OPEN_SCRIPT_FILES 10
+
 #define MAX_SCRIPT_MODULES 50
 #define MAX_QUEUED_SCRIPTS 4
 #define MAX_QUEUED_ACTIONS 5

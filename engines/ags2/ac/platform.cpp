@@ -337,7 +337,7 @@ void IAGSEngine::PollSystem() {
 
 	NEXT_ITERATION();
 	domouse(DOMOUSE_NOCURSOR);
-	update_polled_stuff(true);
+	update_polled_stuff();
 	int mbut = mgetbutton();
 	if (mbut > NONE)
 		pl_run_plugin_hooks(AGSE_MOUSECLICK, mbut);

@@ -33,6 +33,11 @@ char *ci_find_file(const char *dir_name, const char *file_name);
 
 inline void ags_strlwr(char *str) {
 	while (*str)
+		*str++ = tolower(*str);
+}
+
+inline void ags_strupr(char *str) {
+	while (*str)
 		*str++ = toupper(*str);
 }
 
