@@ -67,11 +67,11 @@ extern int displayed_room;
 extern int use_cd_player;
 extern int scrnwid, scrnhit;
 extern int offsetx, offsety;
-extern int numlines;
 extern int inside_script;
 extern int numPluginReaders;
 extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 extern char lines[MAXLINE][200];
+extern int numlines;
 extern ObjectCache objcache[MAX_INIT_SPR];
 extern long _sc_PlayerCharPtr;
 

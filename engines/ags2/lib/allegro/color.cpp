@@ -33,6 +33,7 @@ namespace AGS2 {
 
 RGB_MAP *rgb_map;
 COLOR_MAP *color_map;
+PALETTE black_palette;
 
 void color::readFromFile(Common::ReadStream *file) {
 	r = file->readByte();

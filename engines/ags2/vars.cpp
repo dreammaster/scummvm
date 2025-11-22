@@ -55,6 +55,7 @@ const char *sgnametemplate = "agssave.%03d";
 SpriteCache spriteset(1);
 int spritewidth[MAX_SPRITES], spriteheight[MAX_SPRITES];
 int current_screen_resolution_multiplier_x, current_screen_resolution_multiplier_y;
+int currentcolor;
 
 int our_eip, eip_guinum, eip_guiobj;
 int fps, display_fps;
@@ -106,6 +107,7 @@ int last_sound_played[MAX_SOUND_CHANNELS + 1];
 int current_screen_resolution_multiplier;
 int force_letterbox;
 int ifacepopped;  // currently displayed pop-up GUI (-1 if none)
+color palette[256];
 //block spriteset[MAX_SPRITES+1];
 //SpriteCache spriteset (MAX_SPRITES+1);
 // initially size 1, this will be increased by the initFile function
@@ -164,11 +166,14 @@ void *editor_window_handle;
 int in_enters_screen, done_es_error;
 int in_leaves_screen = -1;
 int need_to_stop_cd;
+bool debug_15bit_mode, debug_24bit_mode;
 int said_text;
 int convert_16bit_bgr;
 int mouse_z_was;
 int bg_just_changed;
 int loaded_game_file_version;
+volatile bool want_exit, abort_engine;
+bool check_dynamic_sprites_at_exit;
 const char *evblockbasename;
 int evblocknum;
 int new_room_pos;
@@ -181,6 +186,8 @@ int new_room_flags;
 int use_cdplayer;
 bool triedToUseCdAudioCommand;
 int final_scrn_wid, final_scrn_hit, final_col_dep;
+char lines[MAXLINE][200];
+int numlines;
 IDriverDependantBitmap **actspsbmp;
 CharacterCache *charcache;
 ObjectCache objcache[MAX_INIT_SPR];
@@ -344,6 +351,9 @@ Vars::Vars() {
 	current_screen_resolution_multiplier = 1;
 	our_eip = eip_guinum = eip_guiobj = 0;
 	fps = display_fps = 0;
+	force_letterbox = 0;
+	ifacepopped = 0;
+	Common::fill((byte *)palette, (byte *)palette + 256 * sizeof(color), 0);
 
 	change_to_game_dir = 0;
 	datafile_argv = 0;
@@ -447,13 +457,15 @@ Vars::Vars() {
 	done_es_error = 0;
 	in_leaves_screen = -1;
 	need_to_stop_cd = 0;
+	debug_15bit_mode = debug_24bit_mode = false;
 	said_text = 0;
 	convert_16bit_bgr = 0;
 	mouse_z_was = 0;
 	bg_just_changed = 0;
 	loaded_game_file_version = 0;
+	want_exit = abort_engine = false;
+	check_dynamic_sprites_at_exit = true;
 	abort_engine = 0;
-	check_dynamic_sprites_at_exit = 1;
 	evblockbasename  = nullptr;
 	evblocknum = 0;
 	frames_per_second = 40;
@@ -470,6 +482,7 @@ Vars::Vars() {
 	use_cdplayer = 0;
 	triedToUseCdAudioCommand = false;
 	final_scrn_wid = final_scrn_hit = final_col_dep = 0;
+	numlines = 0;
 	actspsbmp = nullptr;
 	charcache = nullptr;
 	scrGui = nullptr;
