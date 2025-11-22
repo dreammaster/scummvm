@@ -27,7 +27,7 @@ namespace AGS2 {
 #define MAGICNUMBER 0xbeefcafe
 #define SGVERSION 8
 
-static const char *load_game_errors[9] = {
+const char *load_game_errors[9] = {
 	"No error","File not found","Not an AGS save game",
 	"Invalid save game version","Saved with different interpreter",
 	"Saved under a different game", "Resolution mismatch",

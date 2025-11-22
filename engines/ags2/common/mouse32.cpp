@@ -23,6 +23,5 @@
 
 namespace AGS2 {
 
-int vesa_xres = 320, vesa_yres = 200;
 
 } // namespace AGS2

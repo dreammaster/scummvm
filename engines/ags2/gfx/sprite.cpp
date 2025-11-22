@@ -24,12 +24,7 @@
 
 namespace AGS2 {
 
-// these vars are global to help with debugging
-block tmpdbl, curspr;
-int newwid, newhit;
-
 void initialize_sprite(int ee) {
-#ifdef TODO
 	if ((ee < 0) || (ee > spriteset.elements))
 		error("initialize_sprite: invalid sprite number");
 
@@ -148,9 +143,6 @@ void initialize_sprite(int ee) {
 
 		our_eip = oldeip;
 	}
-#else
-error("TODO: initialize_sprite");
-#endif
 }
 
 void get_new_size_for_sprite(int ee, int ww, int hh, int &newWidth, int &newHeight) {

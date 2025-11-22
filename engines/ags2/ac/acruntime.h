@@ -34,6 +34,7 @@
 #include "ags2/ac/run.h"
 #include "ags2/ac/savegame.h"
 #include "ags2/ac/sound.h"
+#include "ags2/ac/timer.h"
 #include "ags2/ac/video.h"
 #include "ags2/ac/gfx.h"
 #include "ags2/ac/scripts.h"

@@ -204,7 +204,7 @@ extern int gui_disabled_style;
 
 // ac/overlay.cpp
 extern int is_complete_overlay,is_text_overlay;
-extern int crovr_id;
+extern int crovr_id;		// Whether using SetTextOverlay or CreateTextOvelay
 
 // ac/room.cpp
 extern int in_new_room;
@@ -373,6 +373,11 @@ extern char ignore_bounds;
 extern block savebk, mousecurs[MAXCURSORS];
 extern int vesa_xres, vesa_yres;
 extern int currentcursor;
+extern int pluginSimulatedClick;
+
+// gfx/sprite.cpp
+extern block tmpdbl, curspr;
+extern int newwid, newhit;
 
 // lib/allegro
 extern int allegro_error;

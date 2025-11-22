@@ -153,7 +153,7 @@ inline int keyboard_needs_poll() {
 	return 1;
 }
 
-int poll_keyboard() {
+inline int poll_keyboard() {
 	error("TODO: poll_keyboard");
 }
 

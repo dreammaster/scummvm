@@ -314,6 +314,11 @@ char ignore_bounds;
 block savebk, mousecurs[MAXCURSORS];
 int vesa_xres, vesa_yres;
 int currentcursor;
+int pluginSimulatedClick;
+
+// gfx/sprite.cpp
+block tmpdbl, curspr;
+int newwid, newhit;
 
 // lib/allegro
 int allegro_error;
@@ -513,7 +518,6 @@ Vars::Vars() {
 	// ac/overlay.cpp
 	is_complete_overlay = is_text_overlay = 0;
 	crovr_id = 2;
-
 	// ac/room.cpp
 	in_new_room = new_room_was = 0;
 
@@ -574,8 +578,14 @@ Vars::Vars() {
 	disable_mgetgraphpos = 0;
 	ignore_bounds = 0;
 	savebk = nullptr;
-	vesa_xres = vesa_yres = 0;
+	vesa_xres = 320;
+	vesa_yres = 200;
 	currentcursor = 0;
+	pluginSimulatedClick = NONE;
+
+	// gfx/sprite.cpp
+	tmpdbl = curspr = nullptr;
+	newwid = newhit = 0;
 
 	// lib/allegro
 	allegro_error = 0;

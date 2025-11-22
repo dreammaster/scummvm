@@ -53,6 +53,7 @@ extern block recycle_bitmap(block bimp, int coldep, int wid, int hit);
 extern IDriverDependantBitmap *recycle_ddb_bitmap(IDriverDependantBitmap *bimp, BITMAP *source, bool hasAlpha);
 extern int bmp_bpp(BITMAP *bmpt);
 extern int LoadImageFile(const char *filename);
+extern void draw_sprite_list();
 
 } // namespace AGS2
 

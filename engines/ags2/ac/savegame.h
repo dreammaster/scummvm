@@ -28,6 +28,8 @@ namespace AGS2 {
 
 #define RESTART_POINT_SAVE_GAME_NUMBER 999
 
+extern const char *load_game_errors[9];
+
 extern void restore_after_dialog();
 extern void RestoreGameSlot(int slnum);
 extern void get_save_game_path(int slotNum, char *buffer);

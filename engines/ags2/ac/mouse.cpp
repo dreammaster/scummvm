@@ -20,10 +20,10 @@
  */
 
 #include "ags2/ac/acruntime.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 
-int pluginSimulatedClick = NONE;
 void PluginSimulateMouseClick(int pluginButtonID) {
 	pluginSimulatedClick = pluginButtonID - 1;
 }

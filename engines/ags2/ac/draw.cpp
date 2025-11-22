@@ -198,4 +198,47 @@ int bmp_bpp(BITMAP *bmpt) {
 }
 
 
+// function to sort the sprites into baseline order
+int compare_listentries(const void *elem1, const void *elem2) {
+	SpriteListEntry *e1, *e2;
+	e1 = (SpriteListEntry *)elem1;
+	e2 = (SpriteListEntry *)elem2;
+
+	if (e1->baseline == e2->baseline)
+	{
+		if (e1->takesPriorityIfEqual)
+			return 1;
+		if (e2->takesPriorityIfEqual)
+			return -1;
+	}
+
+	// returns >0 if e1 is lower down, <0 if higher, =0 if the same
+	return e1->baseline - e2->baseline;
+}
+
+void draw_sprite_list() {
+	if (walkBehindMethod == DrawAsSeparateSprite)
+	{
+		for (int ee = 1; ee < MAX_OBJ; ee++)
+		{
+			if (walkBehindBitmap[ee] != NULL)
+			{
+				add_to_sprite_list(walkBehindBitmap[ee], walkBehindLeft[ee] - offsetx, walkBehindTop[ee] - offsety,
+					croom->walkbehind_base[ee], 0, -1, true);
+			}
+		}
+	}
+
+	// 2.60.672 - convert horrid bubble sort to use qsort instead
+	qsort(sprlist, sprlistsize, sizeof(SpriteListEntry), compare_listentries);
+
+	clear_draw_list();
+
+	add_thing_to_draw(NULL, AGSE_PRESCREENDRAW, 0, TRANS_RUN_PLUGIN, false);
+
+	// copy the sorted sprites into the Things To Draw list
+	thingsToDrawSize += sprlistsize;
+	memcpy(&thingsToDrawList[1], sprlist, sizeof(SpriteListEntry) * sprlistsize);
+}
+
 } // namespace AGS2
