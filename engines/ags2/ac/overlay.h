@@ -23,6 +23,8 @@
 #define AGS2_AC_OVERLAY_H
 
 #include "ags2/ac/dynamic.h"
+#include "ags2/common/wgt2allg.h"
+#include "ags2/gfx/ali3d.h"
 
 namespace AGS2 {
 

@@ -214,6 +214,13 @@ int engineNeedsAsInt;
 char rbuffer[200];
 uint32 lastTime;
 
+// ac/audio.cpp
+ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
+CCAudioChannel ccDynamicAudio;
+CCAudioClip ccDynamicAudioClip;
+char acaudio_buffer[256];
+int reserved_channel_count;
+
 // ac/dialog.cpp
 int windowbackgroundcolor, pushbuttondarkcolor;
 int pushbuttonlightcolor;
@@ -303,6 +310,19 @@ IDriverDependantBitmap *walkBehindBitmap[MAX_OBJ];
 int walkBehindsCachedForBgNum;
 WalkBehindMethodEnum walkBehindMethod;
 block *actspswb;
+
+// ac/gui/gui.cpp
+CCGUIObject ccDynamicGUIObject;
+CCCharacter ccDynamicCharacter;
+CCHotspot   ccDynamicHotspot;
+CCRegion    ccDynamicRegion;
+CCInventory ccDynamicInv;
+CCGUI       ccDynamicGUI;
+CCObject    ccDynamicObject;
+CCDialog    ccDynamicDialog;
+ScriptString myScriptStringImpl;
+ScriptDialogOptionsRendering ccDialogOptionsRendering;
+ScriptDrawingSurface *dialogOptionsRenderingSurface;
 
 // ac/gui/main.cpp
 GUIMain *guis;
@@ -499,6 +519,10 @@ Vars::Vars() {
 	engineNeedsAsInt = 100;
 	lastTime = 0;
 
+	// ac/audio.cpp
+	Common::fill(acaudio_buffer, acaudio_buffer + 256, 0);
+	reserved_channel_count = 0;
+
 	// ac/dialog.cpp
 	windowbackgroundcolor =  pushbuttondarkcolor = 0;
 	pushbuttonlightcolor = 0;
@@ -570,6 +594,9 @@ Vars::Vars() {
 	walkBehindsCachedForBgNum = 0;
 	walkBehindMethod = DrawOverCharSprite;
 	actspswb = nullptr;
+
+	// ac/gui/gui.cpp
+	dialogOptionsRenderingSurface = nullptr;
 
 	// ac/gui/main.cpp
 	guis = nullptr;

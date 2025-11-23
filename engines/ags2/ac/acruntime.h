@@ -24,6 +24,7 @@
 
 #include "ags2/gfx/ali3d.h"
 #include "ags2/gfx/sprite_cache.h"
+#include "ags2/ac/cc.h"
 #include "ags2/ac/dialog.h"
 #include "ags2/ac/dynamic.h"
 #include "ags2/ac/events.h"
@@ -238,107 +239,6 @@ struct GameSetup {
 struct ScriptObject {
 	int id;
 	RoomObject *obj;
-};
-
-struct ScriptDateTime : AGSCCDynamicObject {
-  int year, month, day;
-  int hour, minute, second;
-  int rawUnixTime;
-
-  virtual int Dispose(const char *address, bool force);
-  virtual const char *GetType();
-  virtual int Serialize(const char *address, char *buffer, int bufsize);
-  virtual void Unserialize(int index, const char *serializedData, int dataSize);
-
-  ScriptDateTime();
-};
-
-struct ScriptDrawingSurface : AGSCCDynamicObject {
-  int roomBackgroundNumber;
-  int dynamicSpriteNumber;
-  int dynamicSurfaceNumber;
-  bool isLinkedBitmapOnly;
-  BITMAP *linkedBitmapOnly;
-  int currentColour;
-  int currentColourScript;
-  int highResCoordinates;
-  int modified;
-  int hasAlphaChannel;
-  BITMAP* abufBackup;
-
-  virtual int Dispose(const char *address, bool force);
-  virtual const char *GetType();
-  virtual int Serialize(const char *address, char *buffer, int bufsize);
-  virtual void Unserialize(int index, const char *serializedData, int dataSize);
-  BITMAP* GetBitmapSurface();
-  void StartDrawing();
-  void MultiplyThickness(int *adjustValue);
-  void UnMultiplyThickness(int *adjustValue);
-  void MultiplyCoordinates(int *xcoord, int *ycoord);
-  void FinishedDrawing();
-  void FinishedDrawingReadOnly();
-
-  ScriptDrawingSurface();
-};
-
-struct ScriptViewFrame : AGSCCDynamicObject {
-  int view, loop, frame;
-
-  virtual int Dispose(const char *address, bool force);
-  virtual const char *GetType();
-  virtual int Serialize(const char *address, char *buffer, int bufsize);
-  virtual void Unserialize(int index, const char *serializedData, int dataSize);
-
-  ScriptViewFrame(int p_view, int p_loop, int p_frame);
-  ScriptViewFrame();
-};
-
-struct ScriptDynamicSprite : AGSCCDynamicObject {
-  int slot;
-
-  virtual int Dispose(const char *address, bool force);
-  virtual const char *GetType();
-  virtual int Serialize(const char *address, char *buffer, int bufsize);
-  virtual void Unserialize(int index, const char *serializedData, int dataSize);
-
-  ScriptDynamicSprite(int slot);
-  ScriptDynamicSprite();
-};
-
-struct ScriptAudioChannel
-{
-  int id;
-  int reserved;
-};
-
-struct CCAudioChannel : AGSCCDynamicObject {
-  virtual const char *GetType();
-  virtual int Serialize(const char *address, char *buffer, int bufsize);
-  virtual void Unserialize(int index, const char *serializedData, int dataSize);
-};
-
-struct CCAudioClip : AGSCCDynamicObject {
-  virtual const char *GetType();
-  virtual int Serialize(const char *address, char *buffer, int bufsize);
-  virtual void Unserialize(int index, const char *serializedData, int dataSize);
-};
-
-struct ScriptString : AGSCCDynamicObject, ICCStringClass {
-private:
-	char _emptyString[1] = { '\0' };
-
-public:
-	char *text;
-
-	virtual int Dispose(const char *address, bool force);
-	virtual const char *GetType();
-	virtual int Serialize(const char *address, char *buffer, int bufsize);
-	virtual void Unserialize(int index, const char *serializedData, int dataSize);
-
-	virtual void *CreateString(const char *fromText);
-
-	ScriptString();
-	ScriptString(const char *fromText);
 };
 
 #define INVALID_X  30000
@@ -1066,6 +966,14 @@ extern void GetLocationName(int xxx, int yyy, char *tempo);
 // the linux compiler won't allow extern inline
 #define AGS_INLINE
 #endif
+
+extern void invalidate_sprite(int x1, int y1, IDriverDependantBitmap *pic);
+extern void draw_fps();
+extern int _display_main(int xx, int yy, int wii, char *todis, int blocking, int usingfont, int asspch, int isThought, int allowShrink, bool overlayPositionFixed);
+extern int GetTextDisplayTime(const char *text, int canberel = 0);
+extern void mark_current_background_dirty();
+extern void debug_log(const char *texx, ...);
+extern void draw_sprite_support_alpha(int xpos, int ypos, block image, int slot);
 
 } // namespace AGS2
 

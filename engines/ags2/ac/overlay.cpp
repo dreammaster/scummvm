@@ -19,7 +19,7 @@
  *
  */
 
-#include "ags2/ac/acinventory.h"
+#include "ags2/ac/overlay.h"
 #include "ags2/vars.h"
 
 namespace AGS2 {
@@ -290,7 +290,7 @@ void draw_screen_overlay() {
 	  if (channels[SCHAN_SPEECH] != NULL) {
 
 		char tbuffer[60];
-		sprintf(tbuffer,"mpos: %d", channels[SCHAN_SPEECH]->get_pos_ms());
+		Common::sprintf_s(tbuffer,"mpos: %d", channels[SCHAN_SPEECH]->get_pos_ms());
 		write_log(tbuffer);
 		int yp = scrnhit - (wgetfontheight(FONT_SPEECH) + 25 * symult);
 		wtextcolor(14);
@@ -302,13 +302,13 @@ void draw_screen_overlay() {
 		wtextcolor(12);
 		//if ((loopcounter % (frames_per_second * 2)) > frames_per_second/2) {
 		char tformat[30];
-		sprintf(tformat, "REC %02d:%02d:%02d", replay_time / 3600, (replay_time % 3600) / 60, replay_time % 60);
+		Common::sprintf_s(tformat, "REC %02d:%02d:%02d", replay_time / 3600, (replay_time % 3600) / 60, replay_time % 60);
 		draw_and_invalidate_text(get_fixed_pixel_size(5), get_fixed_pixel_size(10), FONT_SPEECH, tformat);
 		//}
 	} else if (play.playback) {
 		wtextcolor(10);
 		char tformat[30];
-		sprintf(tformat, "PLAY %02d:%02d:%02d", replay_time / 3600, (replay_time % 3600) / 60, replay_time % 60);
+		Common::sprintf_s(tformat, "PLAY %02d:%02d:%02d", replay_time / 3600, (replay_time % 3600) / 60, replay_time % 60);
 
 		draw_and_invalidate_text(get_fixed_pixel_size(5), get_fixed_pixel_size(10), FONT_SPEECH, tformat);
 	}

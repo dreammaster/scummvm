@@ -6,10 +6,12 @@ MODULE_OBJS = \
 	metaengine.o \
 	vars.o \
 	ac/ac.o \
+	ac/cc.o \
 	ac/main.o \
 	ac/draw.o \
 	ac/fonts.o \
 	ac/mouse.o \
+	ac/overlay.o \
 	ac/platform.o \
 	ac/platform_scummvm.o \
 	ac/resolution.o \

@@ -25,11 +25,13 @@
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/surface.h"
 #include "ags2/ac/acruntime.h"
+#include "ags2/ac/cc.h"
 #include "ags2/ac/draw.h"
 #include "ags2/ac/gui/gui.h"
 #include "ags2/ac/platform.h"
 #include "ags2/ac/room.h"
 #include "ags2/ac/walkbehind.h"
+#include "ags2/ac/gui/gui_object.h"
 #include "ags2/common/dynamic_array.h"
 #include "ags2/common/mouse32.h"
 #include "ags2/gfx/sprite_cache.h"
@@ -164,6 +166,13 @@ extern char alpha_blend_cursor;
 extern int engineNeedsAsInt;
 extern char rbuffer[200];
 extern uint32 lastTime;
+
+// ac/audio.cpp
+extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
+extern CCAudioChannel ccDynamicAudio;
+extern CCAudioClip ccDynamicAudioClip;
+extern char acaudio_buffer[256];
+extern int reserved_channel_count;
 
 // ac/dialog.cpp
 extern int windowbackgroundcolor, pushbuttondarkcolor;
@@ -355,6 +364,19 @@ extern IDriverDependantBitmap *walkBehindBitmap[MAX_OBJ];
 extern int walkBehindsCachedForBgNum;
 extern WalkBehindMethodEnum walkBehindMethod;
 extern block *actspswb;
+
+// ac/gui/gui.cpp
+extern CCGUIObject ccDynamicGUIObject;
+extern CCCharacter ccDynamicCharacter;
+extern CCHotspot   ccDynamicHotspot;
+extern CCRegion    ccDynamicRegion;
+extern CCInventory ccDynamicInv;
+extern CCGUI       ccDynamicGUI;
+extern CCObject    ccDynamicObject;
+extern CCDialog    ccDynamicDialog;
+extern ScriptString myScriptStringImpl;
+extern ScriptDialogOptionsRendering ccDialogOptionsRendering;
+extern ScriptDrawingSurface *dialogOptionsRenderingSurface;
 
 // ac/gui/main.cpp
 extern GUIMain *guis;
