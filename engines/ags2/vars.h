@@ -24,6 +24,7 @@
 
 #include "ags2/lib/allegro/color.h"
 #include "ags2/lib/allegro/surface.h"
+#include "ags2/lib/allegro/system.h"
 #include "ags2/ac/acruntime.h"
 #include "ags2/ac/cc.h"
 #include "ags2/ac/draw.h"
@@ -55,7 +56,6 @@ extern BITMAP *screen;
 extern BITMAP *virtual_screen;
 extern char *game_file_name;
 extern IGraphicsDriver *gfxDriver;
-extern GFXFilter *filter;
 extern MoveList *mls;
 extern ViewStruct *views;
 extern ccInstance *gameinst;
@@ -191,6 +191,11 @@ extern IDriverDependantBitmap **actspswbbmp;
 extern CachedActSpsData *actspswbcache;
 extern int actSpsCount;
 extern block *actsps;
+
+// ac/gfx.cpp
+extern GFXFilter *gfxFilterList[10];
+extern GFXFilter *gfxFilterListD3D[10];
+extern GFXFilter *filter;
 
 // ac/gui.cpp
 extern DynamicArray<GUIButton> guibuts;
@@ -401,9 +406,6 @@ extern int pluginSimulatedClick;
 extern block tmpdbl, curspr;
 extern int newwid, newhit;
 
-// lib/allegro
-extern int allegro_error;
-
 // routefnd.cpp
 extern int *pathbackx, *pathbacky;
 extern int waspossible;
@@ -422,12 +424,6 @@ public:
 	int _trans_blend_red = 0;
 	int _trans_blend_green = 0;
 	int _trans_blend_blue = 0;
-	int _rgb_r_shift_15 = 0, _rgb_g_shift_15 = 0, _rgb_b_shift_15 = 0;
-	int _rgb_r_shift_16 = 0, _rgb_g_shift_16 = 0, _rgb_b_shift_16 = 0;
-	int _rgb_r_shift_24 = 0, _rgb_g_shift_24 = 0, _rgb_b_shift_24 = 0;
-	int _rgb_r_shift_32 = 0, _rgb_g_shift_32 = 0, _rgb_b_shift_32 = 0,
-		_rgb_a_shift_32 = 0;
-	int _places_r = 0, _places_g = 0;
 	int *const _allegro_errno = &allegro_error;
 	int _utype = 0;
 

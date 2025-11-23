@@ -128,6 +128,8 @@ struct GFX_DRIVER {
 	int windowed;                 /* true if driver runs windowed */
 };
 
+extern int allegro_error;
+
 extern void set_color_depth(int depth);
 extern int get_color_depth();
 extern int get_desktop_resolution(int32_t *width, int32_t *height);

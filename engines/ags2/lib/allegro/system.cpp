@@ -26,6 +26,8 @@
 
 namespace AGS2 {
 
+int allegro_error;
+
 GFX_MODE_LIST *get_gfx_mode_list(int card) {
 	GFX_MODE_LIST *list = new GFX_MODE_LIST();
 	list->num_modes = 1;

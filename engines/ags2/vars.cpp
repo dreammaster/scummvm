@@ -39,7 +39,6 @@ BITMAP *screen;
 BITMAP *virtual_screen;
 IGraphicsDriver *gfxDriver;
 char *game_file_name;
-GFXFilter *filter;
 MoveList *mls;
 ViewStruct *views;
 RoomStatus *croom;
@@ -239,6 +238,11 @@ CachedActSpsData *actspswbcache;
 int actSpsCount;
 block *actsps;
 
+// ac/gfx.cpp
+GFXFilter *gfxFilterList[10];
+GFXFilter *gfxFilterListD3D[10];
+GFXFilter *filter;
+
 // ac/gui.cpp
 DynamicArray<GUIButton> guibuts;
 int numguibuts;
@@ -348,7 +352,7 @@ block tmpdbl, curspr;
 int newwid, newhit;
 
 // lib/allegro
-int allegro_error;
+// in allegro.h
 
 // routefnd.cpp
 int *pathbackx, *pathbacky;
@@ -539,6 +543,11 @@ Vars::Vars() {
 	actSpsCount = 0;
 	actsps = nullptr;
 
+	// ac/gfx.cpp
+	Common::fill(gfxFilterList, gfxFilterList + 10, nullptr);
+	Common::fill(gfxFilterListD3D, gfxFilterListD3D + 10, nullptr);
+	filter = nullptr;
+
 	// ac/gui.cpp
 	numguibuts = 0;
 	numguilabels = 0;
@@ -629,6 +638,12 @@ Vars::Vars() {
 
 	// lib/allegro
 	allegro_error = 0;
+	_rgb_r_shift_15 = _rgb_g_shift_15 = _rgb_b_shift_15 = 0;
+	_rgb_r_shift_16 = _rgb_g_shift_16 = _rgb_b_shift_16 = 0;
+	_rgb_r_shift_24 = _rgb_g_shift_24 = _rgb_b_shift_24 = 0;
+	_rgb_r_shift_32 = _rgb_g_shift_32 = _rgb_b_shift_32 = 0,
+	_rgb_a_shift_32 = 0;
+	_places_r = _places_g = 0;
 
 	// routefnd.cpp
 	pathbackx = pathbacky = nullptr;

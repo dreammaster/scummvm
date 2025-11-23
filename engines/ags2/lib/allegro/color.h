@@ -86,6 +86,13 @@ enum BlenderMode {
 
 typedef unsigned long (*BLENDER_FUNC)(unsigned long, unsigned long, unsigned long);
 
+extern int _rgb_r_shift_15, _rgb_g_shift_15, _rgb_b_shift_15;
+extern int _rgb_r_shift_16, _rgb_g_shift_16, _rgb_b_shift_16;
+extern int _rgb_r_shift_24, _rgb_g_shift_24, _rgb_b_shift_24;
+extern int _rgb_r_shift_32, _rgb_g_shift_32, _rgb_b_shift_32;
+extern int _rgb_a_shift_32;
+extern int _places_r, _places_g;
+
 extern int makecol(byte r, byte g, byte b);
 
 AL_VAR(PALETTE, black_palette);

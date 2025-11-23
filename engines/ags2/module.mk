@@ -10,6 +10,7 @@ MODULE_OBJS = \
 	ac/main.o \
 	ac/draw.o \
 	ac/fonts.o \
+	ac/gfx.o \
 	ac/mouse.o \
 	ac/overlay.o \
 	ac/platform.o \
