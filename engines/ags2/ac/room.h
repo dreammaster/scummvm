@@ -22,6 +22,7 @@
 #ifndef AGS2_AC_ROOM_H
 #define AGS2_AC_ROOM_H
 
+#include "common/serializer.h"
 #include "common/stream.h"
 #include "common/textconsole.h"
 #include "ags2/common/file.h"
@@ -132,63 +133,58 @@ extern int cunpackbitl(unsigned char *, int size, Common::SeekableReadStream *in
 #define PCKD
 #endif
 
-#pragma pack(1)
+#include "common/pack-start.h"  // START STRUCT PACKING
+
 struct sprstruc {
-  short sprnum  PCKD;   // number from array
-  short x,y     PCKD;   // x,y co-ords
-  short room    PCKD;   // room number
-  short on      PCKD;
-  sprstruc() { on = 0; }
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    sprnum = __getshort__bigendian(fp);
-    x = __getshort__bigendian(fp);
-    y = __getshort__bigendian(fp);
-    room = __getshort__bigendian(fp);
-    on = __getshort__bigendian(fp);
-  }
-#endif
-};
+	short sprnum = 0;		// number from array
+	short x = 0, y = 0;		// x,y co-ords
+	short room = 0;			// room number
+	short on = 0;
+
+	void ReadFromFile(Common::SeekableReadStream *fp) {
+		sprnum = fp->readSint16BE();
+		x = fp->readSint16BE();
+		y = fp->readSint16BE();
+		room = fp->readSint16BE();
+		on = fp->readSint16BE();
+	}
+} PACKED_STRUCT;
 
 #define MSG_DISPLAYNEXT 1 // supercedes using alt-200 at end of message
 #define MSG_TIMELIMIT   2
 struct MessageInfo {
-  char  displayas  PCKD; // 0 = normal window, 1 = as speech
-  char  flags      PCKD; // combination of MSG_xxx flags
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    displayas = getc(fp);
-    flags = getc(fp);
-  }
-#endif
-};
-#pragma pack()
+	char  displayas  PCKD; // 0 = normal window, 1 = as speech
+	char  flags      PCKD; // combination of MSG_xxx flags
+
+	void ReadFromFile(Common::SeekableReadStream *fp) {
+		displayas = fp->readByte();
+		flags = fp->readByte();
+	}
+} PACKED_STRUCT;
 
 #define AE_WAITFLAG   0x80000000
 #define MAXANIMSTAGES 10
 struct AnimationStruct {
-  int   x, y;
-  int   data;
-  int   object;
-  int   speed;
-  char  action;
-  char  wait;
-  AnimationStruct() { action = 0; object = 0; wait = 1; speed = 5; }
-};
+	int32 x = 0, y = 0;
+	int32 data = 0;
+	int32 object = 0;
+	int32 speed = 5;
+	int8 action = 0;
+	int8 wait = 1;
+
+} PACKED_STRUCT;
 
 struct FullAnimation {
   AnimationStruct stage[MAXANIMSTAGES];
-  int             numstages;
+  int32 numstages;
   FullAnimation() { numstages = 0; }
-};
+} PACKED_STRUCT;
 
 struct _Point {
-  short x, y;
-};
+	int16 x, y;
+} PACKED_STRUCT;
+
+#include "common/pack-end.h"    // END STRUCT PACKING
 
 #define MAXCOMMANDS 8
 struct EventBlock {
@@ -205,27 +201,29 @@ struct EventBlock {
 #define MAX_WALK_AREAS 15
 #define MAXPOINTS 30
 struct PolyPoints {
-  int x[MAXPOINTS];
-  int y[MAXPOINTS];
-  int numpoints;
-  void add_point(int xxx,int yyy) {
-    x[numpoints] = xxx;
-    y[numpoints] = yyy;
-    numpoints++;
+	int x[MAXPOINTS];
+	int y[MAXPOINTS];
+	int numpoints;
+	void add_point(int xxx, int yyy) {
+		x[numpoints] = xxx;
+		y[numpoints] = yyy;
+		numpoints++;
 
-    if (numpoints >= MAXPOINTS)
-      quit("too many poly points added");
-  }
-  PolyPoints() { numpoints = 0; }
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    fread(x, sizeof(int), MAXPOINTS, fp);
-    fread(y, sizeof(int), MAXPOINTS, fp);
-    numpoints = getw(fp);
-  }
-#endif
+		if (numpoints >= MAXPOINTS)
+			quit("too many poly points added");
+	}
+	PolyPoints() {
+		numpoints = 0;
+	}
+
+	void ReadFromFile(Common::SeekableReadStream *fp) {
+		int i;
+		for (i = 0; i < MAXPOINTS; ++i)
+			x[i] = fp->readSint32LE();
+		for (i = 0; i < MAXPOINTS; ++i)
+			y[i] = fp->readSint32LE();
+		numpoints = getw(fp);
+	}
 };
 
 #define POPUP_NONE      0
@@ -414,7 +412,7 @@ struct CustomProperties {
 		numProps++;
 	}
 
-	void Serialize (Common::SeekableReadStream *outto);
+	void Serialize(Common::WriteStream *outto);
 	int  UnSerialize (Common::SeekableReadStream *infrom);
 };
 
@@ -442,32 +440,26 @@ struct CustomProperties {
 #define VALTYPE_CHARNUM    4
 
 struct NewInteractionValue {
-  unsigned char valType;
-  int  val;
-  int  extra;
+	byte valType;
+	int  val;
+	int  extra;
 
-  NewInteractionValue() {
-    valType = VALTYPE_LITERALINT;
-    val = 0;
-    extra = 0;
-  }
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    fread(&valType, sizeof(char), 1, fp);
-    char pad[3]; fread(pad, sizeof(char), 3, fp);
-    val = getw(fp);
-    extra = getw(fp);
-  }
-  void WriteToFile(Common::SeekableReadStream *fp)
-  {
-    fwrite(&valType, sizeof(char), 1, fp);
-    char pad[3]; fwrite(pad, sizeof(char), 3, fp);
-    putw(val, fp);
-    putw(extra, fp);
-  }
-#endif
+	NewInteractionValue() {
+		valType = VALTYPE_LITERALINT;
+		val = 0;
+		extra = 0;
+	}
+
+	void ReadFromFile(Common::SeekableReadStream *fp) {
+		valType = (byte)fp->readUint32LE();
+		val = getw(fp);
+		extra = getw(fp);
+	}
+	void WriteToFile(Common::WriteStream *fp) {
+		fp->writeUint32LE(valType);
+		putw(val, fp);
+		putw(extra, fp);
+	}
 };
 
 struct NewInteractionAction {
@@ -476,50 +468,48 @@ struct NewInteractionAction {
 };
 struct NewInteractionCommandList;
 
-struct NewInteractionCommand: public NewInteractionAction {
-  int32 type;
-  NewInteractionValue data[MAX_ACTION_ARGS];
-  NewInteractionAction * children;
-  NewInteractionCommandList *parent;
+struct NewInteractionCommand : public NewInteractionAction {
+	int32 type;
+	NewInteractionValue data[MAX_ACTION_ARGS];
+	NewInteractionAction *children;
+	NewInteractionCommandList *parent;
 
-  NewInteractionCommand() {
-    type = 0;
-    children = NULL;
-    parent = NULL;
-  }
-  ~NewInteractionCommand() override {}
-  NewInteractionCommandList *get_child_list() {
-    return (NewInteractionCommandList*)children;
-  }
-  void remove();
+	NewInteractionCommand() {
+		type = 0;
+		children = NULL;
+		parent = NULL;
+	}
+	~NewInteractionCommand() override {
+	}
+	NewInteractionCommandList *get_child_list() {
+		return (NewInteractionCommandList *)children;
+	}
+	void remove();
 
-  void reset() { remove(); }
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    getw(fp); // skip the vtbl ptr
-    type = getw(fp);
-    for (int i = 0; i < MAX_ACTION_ARGS; ++i)
-    {
-      data[i].ReadFromFile(fp);
-    }
-    // all that matters is whether or not these are null...
-    children = (NewInteractionAction *) getw(fp);
-    parent = (NewInteractionCommandList *) getw(fp);
-  }
-  void WriteToFile(Common::SeekableReadStream *fp)
-  {
-    putw(0, fp); // write dummy vtbl ptr 
-    putw(type, fp);
-    for (int i = 0; i < MAX_ACTION_ARGS; ++i)
-    {
-      data[i].WriteToFile(fp);
-    }
-    putw((int)children, fp);
-    putw((int)parent, fp);
-  }
-#endif
+	void reset() {
+		remove();
+	}
+
+	void ReadFromFile(Common::SeekableReadStream *fp) {
+		getw(fp); // skip the vtbl ptr
+		type = getw(fp);
+		for (int i = 0; i < MAX_ACTION_ARGS; ++i)
+		{
+			data[i].ReadFromFile(fp);
+		}
+		// all that matters is whether or not these are null...
+		children = (NewInteractionAction *)getw(fp);
+		parent = (NewInteractionCommandList *)getw(fp);
+	}
+	void WriteToFile(Common::WriteStream *fp) {
+		putw(0, fp); // write dummy vtbl ptr 
+		putw(type, fp);
+		for (int i = 0; i < MAX_ACTION_ARGS; ++i) {
+			data[i].WriteToFile(fp);
+		}
+		putw((int)children, fp);
+		putw((int)parent, fp);
+	}
 };
 
 struct NewInteractionCommandList : public NewInteractionAction {
@@ -536,50 +526,62 @@ struct NewInteractionCommandList : public NewInteractionAction {
 };
 
 struct NewInteraction {
-  int numEvents;
-  // the first few event types depend on the item - ID's of 100+ are
-  // custom events (used for subroutines)
-  int eventTypes[MAX_NEWINTERACTION_EVENTS];
-  int timesRun[MAX_NEWINTERACTION_EVENTS];
-  NewInteractionCommandList *response[MAX_NEWINTERACTION_EVENTS];
+	int numEvents;
+
+	// the first few event types depend on the item - ID's of 100+ are
+	// custom events (used for subroutines)
+	int eventTypes[MAX_NEWINTERACTION_EVENTS];
+	int timesRun[MAX_NEWINTERACTION_EVENTS];
+	NewInteractionCommandList *response[MAX_NEWINTERACTION_EVENTS];
 
 
-  NewInteraction() { 
-    numEvents = 0;
-    // NULL all the pointers
-    memset (response, 0, sizeof(NewInteractionCommandList*) * MAX_NEWINTERACTION_EVENTS);
-    memset (&timesRun[0], 0, sizeof(int) * MAX_NEWINTERACTION_EVENTS);
-  }
+	NewInteraction() {
+		numEvents = 0;
+		// NULL all the pointers
+		memset(response, 0, sizeof(NewInteractionCommandList *) * MAX_NEWINTERACTION_EVENTS);
+		memset(&timesRun[0], 0, sizeof(int) * MAX_NEWINTERACTION_EVENTS);
+	}
 
+	void copy_timesrun_from(NewInteraction *nifrom) {
+		memcpy(&timesRun[0], &nifrom->timesRun[0], sizeof(int) * MAX_NEWINTERACTION_EVENTS);
+	}
 
-  void copy_timesrun_from (NewInteraction *nifrom) {
-    memcpy (&timesRun[0], &nifrom->timesRun[0], sizeof(int) * MAX_NEWINTERACTION_EVENTS);
-  }
-  void reset() {
-    for (int i = 0; i < numEvents; i++) {
-      if (response[i] != NULL) {
-        response[i]->reset();
-        delete response[i];
-        response[i] = NULL;
-      }
-    }
-    numEvents = 0;
-  }
-  ~NewInteraction() {
-    reset();
-  }
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    // it's all ints!
-    fread(&numEvents, sizeof(int), sizeof(NewInteraction)/sizeof(int), fp);
-  }
-  void WriteToFile(Common::SeekableReadStream *fp)
-  {
-    fwrite(&numEvents, sizeof(int), sizeof(NewInteraction)/sizeof(int), fp);
-  }
-#endif
+	void reset() {
+		for (int i = 0; i < numEvents; i++) {
+			if (response[i] != NULL) {
+				response[i]->reset();
+				delete response[i];
+				response[i] = NULL;
+			}
+		}
+		numEvents = 0;
+	}
+	~NewInteraction() {
+		reset();
+	}
+
+	void synchronize(Common::Serializer &s) {
+		s.syncAsSint32LE(numEvents);
+		for (int i = 0; i < MAX_NEWINTERACTION_EVENTS; ++i)
+			s.syncAsSint32LE(eventTypes[i]);
+		for (int i = 0; i < MAX_NEWINTERACTION_EVENTS; ++i)
+			s.syncAsSint32LE(timesRun[i]);
+
+		// dummy sync for responses pointers
+		for (int i = 0; i < MAX_NEWINTERACTION_EVENTS; ++i) {
+			int dummy = 0;
+			s.syncAsSint32LE(dummy);
+		}
+	}
+
+	void ReadFromFile(Common::SeekableReadStream *fp) {
+		Common::Serializer s(fp, nullptr);
+		synchronize(s);
+	}
+	void WriteToFile(Common::WriteStream *fp) {
+		Common::Serializer s(nullptr, fp);
+		synchronize(s);
+	}
 };
 
 #define NUM_ACTION_TYPES 48
@@ -610,14 +612,11 @@ struct InteractionVariable {
   char type;
   int  value;
   
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    fread(name, sizeof(char), 23, fp);
-    type = getc(fp);
-    value = getw(fp);
+  void ReadFromFile(Common::SeekableReadStream *fp) {
+	  fp->read(name, 23);
+	  type = fp->readByte();
+	  value = getw(fp);
   }
-#endif
 };
 extern InteractionVariable globalvars[];
 extern int numGlobalVars;
@@ -831,72 +830,76 @@ struct ScriptBlock {
 #define VFLG_FLIPSPRITE 1
 
 struct ViewFrame {
-  int   pic;
-  short xoffs, yoffs;
-  short speed;
-  int   flags;
-  int   sound;  // play sound when this frame comes round
-  int   reserved_for_future[2];
-  ViewFrame() { pic = 0; xoffs = 0; yoffs = 0; speed = 0; }
-  
-#ifdef ALLEGRO_BIG_ENDIAN
-  void ReadFromFile(Common::SeekableReadStream *fp)
-  {
-    pic = getw(fp);
-    xoffs = __getshort__bigendian(fp);
-    yoffs = __getshort__bigendian(fp);
-    speed = __getshort__bigendian(fp);
-    fseek(fp, 2, SEEK_CUR);
-    flags = getw(fp);
-    sound = getw(fp);
-    reserved_for_future[0] = getw(fp);
-    reserved_for_future[1] = getw(fp);
-  }
-#endif
+	int   pic;
+	short xoffs, yoffs;
+	short speed;
+	int   flags;
+	int   sound;  // play sound when this frame comes round
+	int   reserved_for_future[2];
+	ViewFrame() {
+		pic = 0; xoffs = 0; yoffs = 0; speed = 0;
+	}
+
+	void synchronize(Common::Serializer &s) {
+		s.syncAsSint32LE(pic);
+		s.syncAsSint16LE(xoffs);
+		s.syncAsSint16LE(yoffs);
+		s.syncAsSint32LE(speed);
+
+		s.syncAsSint32LE(flags);
+		s.syncAsSint32LE(sound);
+		s.syncAsSint32LE(reserved_for_future[0]);
+		s.syncAsSint32LE(reserved_for_future[1]);
+	}
+	void ReadFromFile(Common::SeekableReadStream *fp) {
+		Common::Serializer s(fp, nullptr);
+		synchronize(s);
+	}
+	void WriteToFile(Common::WriteStream *fp) {
+		Common::Serializer s(nullptr, fp);
+		synchronize(s);
+	}
 };
 
 #define LOOPFLAG_RUNNEXTLOOP 1
 
-struct ViewLoopNew
-{
-  short numFrames;
-  int   flags;
-  ViewFrame *frames;
+struct ViewLoopNew {
+	short numFrames;
+	int   flags;
+	ViewFrame *frames;
 
-  bool RunNextLoop() 
-  {
-    return (flags & LOOPFLAG_RUNNEXTLOOP);
-  }
+	bool RunNextLoop() {
+		return (flags & LOOPFLAG_RUNNEXTLOOP);
+	}
 
-  void Initialize(int frameCount);
-  void Dispose();
-  void WriteToFile(Common::SeekableReadStream *ooo);
-  void ReadFromFile(Common::SeekableReadStream *iii);
+	void Initialize(int frameCount);
+	void Dispose();
+	void WriteToFile(Common::WriteStream *ooo);
+	void ReadFromFile(Common::SeekableReadStream *iii);
 };
 
-struct ViewStruct
-{
-  short numLoops;
-  ViewLoopNew *loops;
+struct ViewStruct {
+	short numLoops;
+	ViewLoopNew *loops;
 
-  void Initialize(int loopCount);
-  void Dispose();
-  void WriteToFile(Common::SeekableReadStream *ooo);
-  void ReadFromFile(Common::SeekableReadStream *iii);
+	void Initialize(int loopCount);
+	void Dispose();
+	void WriteToFile(Common::WriteStream *ooo);
+	void ReadFromFile(Common::SeekableReadStream *iii);
 };
 
 struct ViewStruct272 {
-  short     numloops;
-  short     numframes[16];
-  int       loopflags[16];
-  ViewFrame frames[16][20];
-  ViewStruct272() { numloops = 0; numframes[0] = 0; }
+	short     numloops = 0;
+	short     numframes[16] = {};
+	int       loopflags[16] = {};
+	ViewFrame frames[16][20];
 };
 
 #define MCF_ANIMMOVE 1
 #define MCF_DISABLED 2
 #define MCF_STANDARD 4
 #define MCF_HOTSPOT  8  // only animate when over hotspot
+
 // this struct is also in the plugin header file
 struct MouseCursor {
 	int   pic = 2054;

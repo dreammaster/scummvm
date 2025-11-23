@@ -19,7 +19,11 @@
  *
  */
 
-#include "ags2/common/acroom.h"
+#include "ags2/ac/room.h"
+#include "ags2/ac/acruntime.h"
+#include "ags2/common/clib32.h"
+#include "ags2/common/compress.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 
@@ -57,7 +61,7 @@ int CustomPropertySchema::UnSerialize(Common::SeekableReadStream *infrom) {
 }
 
 // ** OBJECT PROPERTIES LOAD/SAVE FUNCTIONS
-void CustomProperties::Serialize(Common::SeekableReadStream *outto) {
+void CustomProperties::Serialize(Common::WriteStream *outto) {
 	putw(1, outto);
 	putw(numProps, outto);
 	for (int ee = 0; ee < numProps; ee++) {
@@ -91,8 +95,8 @@ void WordsDictionary::sort() {
 				wordnum[aa] = wordnum[bb];
 				wordnum[bb] = temp;
 				Common::strcpy_s(tempst, word[aa]);
-				Common::strcpy_s(word[aa], word[bb]);
-				Common::strcpy_s(word[bb], tempst);
+				Common::strcpy_s(word[aa], STD_BUFFER_SIZE, word[bb]);
+				Common::strcpy_s(word[bb], STD_BUFFER_SIZE, tempst);
 				bb = aa;
 			}
 		}
@@ -271,33 +275,31 @@ ActionTypes actions[NUM_ACTION_TYPES] = {
 InteractionVariable globalvars[MAX_GLOBAL_VARIABLES] = { {"Global 1", 0, 0} };
 int numGlobalVars = 1;
 
-void serialize_command_list(NewInteractionCommandList *nicl, FILE *ooo) {
+void serialize_command_list(NewInteractionCommandList *nicl, Common::WriteStream *ooo) {
 	if (nicl == NULL)
 		return;
 	putw(nicl->numCommands, ooo);
 	putw(nicl->timesRun, ooo);
-#ifndef ALLEGRO_BIG_ENDIAN
-	fwrite(&nicl->command[0], sizeof(NewInteractionCommand), nicl->numCommands, ooo);
-#else
-	for (int iteratorCount = 0; iteratorCount < nicl->numCommands; ++iteratorCount)
-	{
+
+	for (int iteratorCount = 0; iteratorCount < nicl->numCommands; ++iteratorCount) {
 		nicl->command[iteratorCount].WriteToFile(ooo);
 	}
-#endif  // ALLEGRO_BIG_ENDIAN
+
 	for (int k = 0; k < nicl->numCommands; k++) {
 		if (nicl->command[k].children != NULL)
 			serialize_command_list(nicl->command[k].get_child_list(), ooo);
 	}
 }
 
-void serialize_new_interaction(NewInteraction *nint, FILE *ooo) {
+void serialize_new_interaction(NewInteraction *nint, Common::WriteStream *ooo) {
 	int a;
 
 	putw(1, ooo);  // Version
 	putw(nint->numEvents, ooo);
-	fwrite(&nint->eventTypes[0], sizeof(int), nint->numEvents, ooo);
+	for (a = 0; a < nint->numEvents; ++a)
+		ooo->writeSint32LE(nint->eventTypes[a]);
 	for (a = 0; a < nint->numEvents; a++)
-		putw((int)nint->response[a], ooo);
+		ooo->writeUint16LE(nint->response[a] ? 0xffff : 0);
 
 	for (a = 0; a < nint->numEvents; a++) {
 		if (nint->response[a] != NULL)
@@ -309,20 +311,18 @@ NewInteractionCommandList *deserialize_command_list(Common::SeekableReadStream *
 	NewInteractionCommandList *nicl = new NewInteractionCommandList;
 	nicl->numCommands = getw(ooo);
 	nicl->timesRun = getw(ooo);
-#ifndef ALLEGRO_BIG_ENDIAN
-	fread(&nicl->command[0], sizeof(NewInteractionCommand), nicl->numCommands, ooo);
-#else
-	for (int iteratorCount = 0; iteratorCount < nicl->numCommands; ++iteratorCount)
-	{
+
+	for (int iteratorCount = 0; iteratorCount < nicl->numCommands; ++iteratorCount) {
 		nicl->command[iteratorCount].ReadFromFile(ooo);
 	}
-#endif  // ALLEGRO_BIG_ENDIAN
+
 	for (int k = 0; k < nicl->numCommands; k++) {
 		if (nicl->command[k].children != NULL) {
 			nicl->command[k].children = deserialize_command_list(ooo);
 		}
 		nicl->command[k].parent = nicl;
 	}
+
 	return nicl;
 }
 
@@ -332,22 +332,27 @@ NewInteraction *deserialize_new_interaction(Common::SeekableReadStream *ooo) {
 
 	if (getw(ooo) != 1)
 		return NULL;
+
 	nitemp = new NewInteraction;
 	nitemp->numEvents = getw(ooo);
 	if (nitemp->numEvents > MAX_NEWINTERACTION_EVENTS) {
 		quit("Error: this interaction was saved with a newer version of AGS");
 		return NULL;
 	}
-	fread(&nitemp->eventTypes[0], sizeof(int), nitemp->numEvents, ooo);
-	//fread (&nitemp->response[0], sizeof(void*), nitemp->numEvents, ooo);
+
+	for (a = 0; a < nitemp->numEvents; ++a)
+		nitemp->eventTypes[a] = ooo->readSint32LE();
+
+	uint16 response[MAX_NEWINTERACTION_EVENTS];
 	for (a = 0; a < nitemp->numEvents; a++)
-		nitemp->response[a] = (NewInteractionCommandList *)getw(ooo);
+		response[a] = getw(ooo);
 
 	for (a = 0; a < nitemp->numEvents; a++) {
-		if (nitemp->response[a] != NULL)
+		if (response[a] != NULL)
 			nitemp->response[a] = deserialize_command_list(ooo);
 		nitemp->timesRun[a] = 0;
 	}
+
 	return nitemp;
 }
 
@@ -361,8 +366,10 @@ void NewInteractionCommandList::reset() {
 			delete command[j].children;
 			command[j].children = NULL;
 		}
+
 		command[j].remove();
 	}
+
 	numCommands = 0;
 	timesRun = 0;
 }
@@ -421,88 +428,34 @@ void roomstruct::freemessage() {
 struct room_file_header {
 	short version PCKD;
 
-#ifdef ALLEGRO_BIG_ENDIAN
 	void ReadFromFile(Common::SeekableReadStream *fp) {
-		version = __getshort__bigendian(fp);
+		version = fp->readUint16BE();
 	}
-#endif
 };
 
 int _acroom_bpp = 1;  // bytes per pixel of currently loading room
 
-// returns bytes per pixel for bitmap's color depth
-int bmp_bpp(BITMAP *bmpt) {
-	if (bitmap_color_depth(bmpt) == 15)
-		return 2;
-
-	return bitmap_color_depth(bmpt) / 8;
-}
-
-#ifdef LOADROOM_DO_POLL
-extern void update_polled_stuff();
-#else
-static void update_polled_stuff() {
-}
-#endif
-
-#if defined(LINUX_VERSION) || defined(MAC_VERSION) || defined(DJGPP) || defined(_MSC_VER)
 extern void lzwcompress(Common::SeekableReadStream *, Common::SeekableReadStream *);
 extern void lzwexpand(Common::SeekableReadStream *, Common::SeekableReadStream *);
 extern unsigned char *lzwexpand_to_mem(Common::SeekableReadStream *);
 extern long maxsize, outbytes, putbytes;
-char *lztempfnm = "~aclzw.tmp";
-
-long save_lzw(char *fnn, BITMAP *bmpp, color *pall, long offe) {
-	FILE *ooo, *iii;
-	long  fll, toret, gobacto;
-
-	ooo = ci_fopen(lztempfnm, "wb");
-	putw(bmpp->w * bmp_bpp(bmpp), ooo);
-	putw(bmpp->h, ooo);
-	fwrite(&bmpp->line[0][0], bmpp->w * bmp_bpp(bmpp), bmpp->h, ooo);
-	fclose(ooo);
-
-	iii = ci_fopen(fnn, "r+b");
-	fseek(iii, offe, SEEK_SET);
-
-	ooo = ci_fopen(lztempfnm, "rb");
-	fll = filelength(fileno(ooo));
-	fwrite(&pall[0], sizeof(color), 256, iii);
-	fwrite(&fll, 4, 1, iii);
-	gobacto = ftell(iii);
-
-	// reserve space for compressed size
-	fwrite(&fll, 4, 1, iii);
-	lzwcompress(ooo, iii);
-	toret = ftell(iii);
-	fseek(iii, gobacto, SEEK_SET);
-	fll = (toret - gobacto) - 4;
-	fwrite(&fll, 4, 1, iii);      // write compressed size
-	fclose(ooo);
-	fclose(iii);
-	unlink(lztempfnm);
-
-	return toret;
-}
 
 BITMAP *recalced;
-/*long load_lzw(char*fnn,BITMAP*bmm,color*pall,long ooff) {
-  recalced=bmm;
-  FILE*iii=clibfopen(fnn,"rb");
-  fseek(iii,ooff,SEEK_SET);*/
 
 long load_lzw(Common::SeekableReadStream *iii, BITMAP *bmm, color *pall) {
-	long          uncompsiz, *loptr;
+	long uncompsiz, *loptr;
 	unsigned char *membuffer;
-	int           arin;
+	int arin;
+	int i;
 
 	recalced = bmm;
-	// MACPORT FIX (HACK REALLY)
-	fread(&pall[0], 1, sizeof(color) * 256, iii);
-	fread(&maxsize, 4, 1, iii);
-	fread(&uncompsiz, 4, 1, iii);
 
-	uncompsiz += ftell(iii);
+	for (i = 0; i < 256; ++i)
+		pall[i].readFromFile(iii);
+	maxsize = iii->readSint32LE();
+	uncompsiz = iii->readSint32LE();
+
+	uncompsiz += iii->pos();
 	outbytes = 0; putbytes = 0;
 
 	update_polled_stuff();
@@ -511,33 +464,28 @@ long load_lzw(Common::SeekableReadStream *iii, BITMAP *bmm, color *pall) {
 
 	loptr = (long *)&membuffer[0];
 	membuffer += 8;
-#ifdef ALLEGRO_BIG_ENDIAN
-	loptr[0] = __int_swap_endian(loptr[0]);
-	loptr[1] = __int_swap_endian(loptr[1]);
+
+#if defined(SCUMM_BIG_ENDIAN)
+	loptr[0] = FROM_LE_32(loptr[0]);
+	loptr[1] = FROM_LE_32(loptr[1]);
 	int bitmapNumPixels = loptr[0] * loptr[1] / _acroom_bpp;
-	switch (_acroom_bpp) // bytes per pixel!
-	{
-	case 1:
-	{
+	switch (_acroom_bpp) {
+	case 1: {
 		// all done
 		break;
 	}
-	case 2:
-	{
+	case 2: {
 		short *sp = (short *)membuffer;
-		for (int i = 0; i < bitmapNumPixels; ++i)
-		{
-			sp[i] = __short_swap_endian(sp[i]);
+		for (int i = 0; i < bitmapNumPixels; ++i) {
+			sp[i] = FROM_LE_16(sp[i]);
 		}
 		// all done
 		break;
 	}
-	case 4:
-	{
+	case 4: {
 		int *ip = (int *)membuffer;
-		for (int i = 0; i < bitmapNumPixels; ++i)
-		{
-			ip[i] = __int_swap_endian(ip[i]);
+		for (int i = 0; i < bitmapNumPixels; ++i) {
+			ip[i] = FROM_LE_32(ip[i]);
 		}
 		// all done
 		break;
@@ -568,8 +516,8 @@ long load_lzw(Common::SeekableReadStream *iii, BITMAP *bmm, color *pall) {
 
 	free(membuffer - 8);
 
-	if (ftell(iii) != uncompsiz)
-		fseek(iii, uncompsiz, SEEK_SET);
+	if (iii->pos() != uncompsiz)
+		iii->seek(uncompsiz, SEEK_SET);
 
 	update_polled_stuff();
 
@@ -599,8 +547,8 @@ long loadcompressed_allegro(Common::SeekableReadStream *fpp, BITMAP **bimpp, col
 	if (bim != NULL)
 		destroy_bitmap(bim);
 
-	fread(&widd, 2, 1, fpp);
-	fread(&hitt, 2, 1, fpp);
+	widd = fpp->readSint16LE();
+	hitt = fpp->readSint16LE();
 	bim = create_bitmap_ex(8, widd, hitt);
 	if (bim == NULL)
 		quit("!load_room: not enough memory to decompress masks");
@@ -612,11 +560,11 @@ long loadcompressed_allegro(Common::SeekableReadStream *fpp, BITMAP **bimpp, col
 			update_polled_stuff();
 	}
 
-	fseek(fpp, 768, SEEK_CUR);  // skip palette
+	fpp->seek(768, SEEK_CUR);  // skip palette
 
-	return ftell(fpp);
+	return fpp->pos();
 }
-#endif
+
 
 #define BLOCKTYPE_MAIN        1
 #define BLOCKTYPE_SCRIPT      2
@@ -633,7 +581,7 @@ extern void load_script_configuration(Common::SeekableReadStream *);
 extern void save_script_configuration(Common::SeekableReadStream *);
 extern void load_graphical_scripts(Common::SeekableReadStream *, roomstruct *);
 extern void save_graphical_scripts(Common::SeekableReadStream *, roomstruct *);
-static char *passwencstring = "Avis Durgan";
+static const char *passwencstring = "Avis Durgan";
 
 void decrypt_text(char *toenc) {
 	int adx = 0;
@@ -669,26 +617,22 @@ void encrypt_text(char *toenc) {
 	}
 }
 
-void write_string_encrypt(Common::SeekableReadStream *ooo, char *sss) {
+void write_string_encrypt(Common::WriteStream *ooo, char *sss) {
 	int stlent = (int)strlen(sss) + 1;
 
 	putw(stlent, ooo);
 	encrypt_text(sss);
-	fwrite(sss, stlent, 1, ooo);
+	ooo->write(sss, stlent);
 	decrypt_text(sss);
 }
 
-void write_dictionary(WordsDictionary *dict, Common::SeekableReadStream *writeto) {
+void write_dictionary(WordsDictionary *dict, Common::WriteStream *writeto) {
 	int ii;
 
 	putw(dict->num_words, writeto);
 	for (ii = 0; ii < dict->num_words; ii++) {
 		write_string_encrypt(writeto, dict->word[ii]);
-#ifndef ALLEGRO_BIG_ENDIAN
-		fwrite(&dict->wordnum[ii], sizeof(short), 1, writeto);
-#else
-		__putshort__lilendian(dict->wordnum[ii], writeto);
-#endif  // ALLEGRO_BIG_ENDIAN
+		writeto->writeSint16LE(dict->wordnum[ii]);
 	}
 }
 #endif  // NO_SAVE_FUCNTIONS
@@ -699,24 +643,29 @@ void read_string_decrypt(Common::SeekableReadStream *ooo, char *sss) {
 		quit("ReadString: file is corrupt");
 
 	// MACPORT FIX: swap as usual
-	fread(sss, sizeof(char), newlen, ooo);
+	ooo->read(sss, newlen);
 	sss[newlen] = 0;
 	decrypt_text(sss);
 }
 
-void read_dictionary(WordsDictionary *dict, Common::SeekableReadStream *writeto) {
+void read_dictionary(WordsDictionary *dict, Common::SeekableReadStream *iii) {
 	int ii;
 
-	dict->allocate_memory(getw(writeto));
+	dict->allocate_memory(getw(iii));
 	for (ii = 0; ii < dict->num_words; ii++) {
-		read_string_decrypt(writeto, dict->word[ii]);
-		fread(&dict->wordnum[ii], sizeof(short), 1, writeto);
+		read_string_decrypt(iii, dict->word[ii]);
+		dict->wordnum[ii] = iii->readSint16LE();
 	}
 }
 
 void freadmissout(short *pptr, Common::SeekableReadStream *opty) {
-	fread(&pptr[0], 2, 5, opty);
-	fread(&pptr[7], 2, NUM_CONDIT - 7, opty);
+	int i;
+
+	for (i = 0; i < 5; ++i)
+		pptr[i] = opty->readSint16LE();
+	for (i = 7; i < NUM_CONDIT; ++i)
+		pptr[i] = opty->readSint16LE();
+
 	pptr[5] = pptr[6] = 0;
 }
 
@@ -741,25 +690,24 @@ void add_to_eventblock(EventBlock *evpt, int evnt, int whatac, int val1, int dat
 
 int usesmisccond = 0;
 
-void deserialize_interaction_scripts(Common::SeekableReadStream *iii, InteractionScripts *scripts) {
+void deserialize_interaction_scripts(Common::SeekableReadStream *iii, InteractionScripts *iScripts) {
 	int numEvents = getw(iii);
 	if (numEvents > MAX_NEWINTERACTION_EVENTS)
 		quit("Too many interaction script events");
-	scripts->numEvents = numEvents;
+	iScripts->numEvents = numEvents;
 
 	char buffer[200];
-	for (int i = 0; i < numEvents; i++)
-	{
+	for (int i = 0; i < numEvents; i++) {
 		fgetstring_limit(buffer, iii, sizeof(buffer));
-		scripts->scriptFuncNames[i] = new char[strlen(buffer) + 1];
-		Common::strcpy_s(scripts->scriptFuncNames[i], buffer);
+		iScripts->scriptFuncNames[i] = scumm_strdup(buffer);
 	}
 }
 
 void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream *opty, room_file_header rfh) {
-	int   f, gsmod, NUMREAD;
-	char  buffre[3000];
-	long  tesl;
+	int f, gsmod, NUMREAD;
+	char buffre[3000];
+	long tesl;
+	int i;
 
 	usesmisccond = 0;
 	rstruc->width = 320;
@@ -782,10 +730,10 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 			free(rstruc->hotspotnames[f]);
 
 		rstruc->hotspotnames[f] = (char *)malloc(20);
-		sprintf(rstruc->hotspotnames[f], "Hotspot %d", f);
+		Common::sprintf_s(rstruc->hotspotnames[f], 20, "Hotspot %d", f);
 
 		if (f == 0)
-			Common::strcpy_s(rstruc->hotspotnames[f], "No hotspot");
+			Common::strcpy_s(rstruc->hotspotnames[f], 20, "No hotspot");
 	}
 
 	/*  memset(&rstruc->hscond[0], 0, sizeof(EventBlock) * MAX_HOTSPOTS);
@@ -801,87 +749,69 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 		_acroom_bpp = 1;
 
 	rstruc->bytes_per_pixel = _acroom_bpp;
-	fread(&rstruc->numobj, 2, 1, opty);
+	rstruc->numobj = opty->readSint16LE();
 	if (rstruc->numobj > MAX_OBJ)
 		quit("!room newer than this version - too many walk-behinds");
 
 	NUMREAD = NUM_CONDIT;
-	fread(&rstruc->objyval[0], 2, rstruc->numobj, opty);
+
+	for (i = 0; i < rstruc->numobj; ++i)
+		rstruc->objyval[i] = opty->readSint16LE();
 
 	gsmod = 0;
 
-	fread(&rstruc->numhotspots, sizeof(int), 1, opty);
+	rstruc->numhotspots = opty->readSint32LE();
 	if (rstruc->numhotspots == 0)
 		rstruc->numhotspots = 20;
 	if (rstruc->numhotspots > MAX_HOTSPOTS)
 		quit("room has too many hotspots: need newer version of AGS?");
 
-#ifndef ALLEGRO_BIG_ENDIAN
-	fread(&rstruc->hswalkto[0], sizeof(_Point), rstruc->numhotspots, opty);
-#else
 	// Points are a pair of shorts
-	fread(&rstruc->hswalkto[0], sizeof(short), 2 * rstruc->numhotspots, opty);
-#endif
+	for (i = 0; i < rstruc->numhotspots; ++i) {
+		rstruc->hswalkto[i].x = opty->readSint16LE();
+		rstruc->hswalkto[i].y = opty->readSint16LE();
+	}
 
-	for (f = 0; f < rstruc->numhotspots; f++)
-	{
+	for (f = 0; f < rstruc->numhotspots; f++) {
 		free(rstruc->hotspotnames[f]);
-		if (rfh.version >= 28)
-		{
+		if (rfh.version >= 28) {
 			fgetstring_limit(buffre, opty, 2999);
-			rstruc->hotspotnames[f] = (char *)malloc(strlen(buffre) + 1);
-			Common::strcpy_s(rstruc->hotspotnames[f], buffre);
-		} else
-		{
+			rstruc->hotspotnames[f] = scumm_strdup(buffre);
+		} else {
 			rstruc->hotspotnames[f] = (char *)malloc(30);
-			fread(rstruc->hotspotnames[f], 30, 1, opty);
+			opty->read(rstruc->hotspotnames[f], 30);
 		}
 	}
 
 	if (rfh.version >= 24)
-		fread(&rstruc->hotspotScriptNames[0], MAX_SCRIPT_NAME_LEN, rstruc->numhotspots, opty);
+		opty->read(&rstruc->hotspotScriptNames[0], MAX_SCRIPT_NAME_LEN * rstruc->numhotspots);
 
-	fread(&rstruc->numwalkareas, 4, 1, opty);
-	// MACPORT FIX: read polypoints
-#ifndef ALLEGRO_BIG_ENDIAN
-	fread(&rstruc->wallpoints[0], sizeof(PolyPoints), rstruc->numwalkareas, opty);
-#else
-	for (int iteratorCount = 0; iteratorCount < rstruc->numwalkareas; ++iteratorCount)
-	{
-		rstruc->wallpoints[iteratorCount].ReadFromFile(opty);
+	rstruc->numwalkareas = opty->readSint32LE();
+
+	for (i = 0; i < rstruc->numwalkareas; ++i) {
+		rstruc->wallpoints[i].ReadFromFile(opty);
 	}
-#endif
 
 	update_polled_stuff();
 
-	fread(&rstruc->top, 2, 1, opty);
-	fread(&rstruc->bottom, 2, 1, opty);
-	fread(&rstruc->left, 2, 1, opty);
-	fread(&rstruc->right, 2, 1, opty);
+	rstruc->top = opty->readSint16LE();
+	rstruc->bottom = opty->readSint16LE();
+	rstruc->left = opty->readSint16LE();
+	rstruc->right = opty->readSint16LE();
 
-	fread(&rstruc->numsprs, 2, 1, opty);
-	// MACPORT FIX: read sprstrucs
-#ifndef ALLEGRO_BIG_ENDIAN
-	fread(&rstruc->sprs[0], sizeof(sprstruc), rstruc->numsprs, opty);
-#else
-	for (int iteratorCount = 0; iteratorCount < rstruc->numsprs; ++iteratorCount)
-	{
-		rstruc->sprs[iteratorCount].ReadFromFile(opty);
+	rstruc->numsprs = opty->readSint16LE();
+	for (i = 0; i < rstruc->numsprs; ++i) {
+		rstruc->sprs[i].ReadFromFile(opty);
 	}
-#endif
 
 	if (rfh.version >= 19) {
 		rstruc->numLocalVars = getw(opty);
 		if (rstruc->numLocalVars > 0) {
 			rstruc->localvars = (InteractionVariable *)malloc(sizeof(InteractionVariable) * rstruc->numLocalVars);
-#ifndef ALLEGRO_BIG_ENDIAN
-			fread(&rstruc->localvars[0], sizeof(InteractionVariable), rstruc->numLocalVars, opty);
-#else
-			for (int iteratorCount = 0; iteratorCount < rstruc->numLocalVars; ++iteratorCount)
-			{
-				rstruc->localvars[iteratorCount].ReadFromFile(opty);
+
+			for (i = 0; i < rstruc->numLocalVars; ++i) {
+				rstruc->localvars[i].ReadFromFile(opty);
 			}
-#endif
 		}
 	}
 
@@ -898,8 +828,7 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 				rstruc->intrHotspot[f] = NULL;
 			}
 
-			if (rfh.version < 26)
-			{
+			if (rfh.version < 26) {
 				if (f < rstruc->numhotspots)
 					rstruc->intrHotspot[f] = deserialize_new_interaction(opty);
 				else
@@ -913,8 +842,7 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 				rstruc->intrObject[f] = NULL;
 			}
 
-			if (rfh.version < 26)
-			{
+			if (rfh.version < 26) {
 				if (f < rstruc->numsprs)
 					rstruc->intrObject[f] = deserialize_new_interaction(opty);
 				else
@@ -922,8 +850,7 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 			}
 		}
 
-		if (rfh.version < 26)
-		{
+		if (rfh.version < 26) {
 			delete rstruc->intrRoom;
 			rstruc->intrRoom = deserialize_new_interaction(opty);
 		}
@@ -948,8 +875,7 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 			}
 		}
 
-		if (rfh.version >= 26)
-		{
+		if (rfh.version >= 26) {
 			rstruc->hotspotScripts = new InteractionScripts * [rstruc->numhotspots];
 			rstruc->objectScripts = new InteractionScripts * [rstruc->numsprs];
 			rstruc->regionScripts = new InteractionScripts * [rstruc->numRegions];
@@ -968,21 +894,23 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 				rstruc->regionScripts[bb] = new InteractionScripts();
 				deserialize_interaction_scripts(opty, rstruc->regionScripts[bb]);
 			}
-
 		}
 	}
 
 	if (rfh.version >= 9) {
-		fread(&rstruc->objbaseline[0], sizeof(int), rstruc->numsprs, opty);
-		fread(&rstruc->width, 2, 1, opty);
-		fread(&rstruc->height, 2, 1, opty);
+		for (i = 0; i < rstruc->numsprs; ++i)
+			rstruc->objbaseline[i] = opty->readSint32LE();
+		rstruc->width = opty->readSint16LE();
+		rstruc->height = opty->readSint16LE();
 	}
 
-	if (rfh.version >= 23)
-		fread(&rstruc->objectFlags[0], sizeof(short), rstruc->numsprs, opty);
+	if (rfh.version >= 23) {
+		for (i = 0; i < rstruc->numsprs; ++i)
+			rstruc->objectFlags[i] = opty->readSint16LE();
+	}
 
 	if (rfh.version >= 11)
-		fread(&rstruc->resolution, 2, 1, opty);
+		rstruc->resolution = opty->readSint16LE();
 
 	int num_walk_areas = MAX_WALK_AREAS;
 	if (rfh.version >= 14)
@@ -991,19 +919,26 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 	if (num_walk_areas > MAX_WALK_AREAS + 1)
 		quit("load_room: Too many walkable areas, need newer version");
 
-	if (rfh.version >= 10)
-		fread(&rstruc->walk_area_zoom[0], sizeof(short), num_walk_areas, opty);
+	if (rfh.version >= 10) {
+		for (i = 0; i < num_walk_areas; ++i)
+			rstruc->walk_area_zoom[i] = opty->readSint16LE();
+	}
 
-	if (rfh.version >= 13)
-		fread(&rstruc->walk_area_light[0], sizeof(short), num_walk_areas, opty);
+	if (rfh.version >= 13) {
+		for (i = 0; i < num_walk_areas; ++i)
+			rstruc->walk_area_light[i] = opty->readSint16LE();
+	}
 
 	if (rfh.version >= 18) {
-		fread(&rstruc->walk_area_zoom2[0], sizeof(short), num_walk_areas, opty);
-		fread(&rstruc->walk_area_top[0], sizeof(short), num_walk_areas, opty);
-		fread(&rstruc->walk_area_bottom[0], sizeof(short), num_walk_areas, opty);
+		for (i = 0; i < num_walk_areas; ++i)
+			rstruc->walk_area_zoom2[i] = opty->readSint16LE();
+		for (i = 0; i < num_walk_areas; ++i)
+			rstruc->walk_area_top[i] = opty->readSint16LE();
+		for (i = 0; i < num_walk_areas; ++i)
+			rstruc->walk_area_bottom[i] = opty->readSint16LE();
 
 		for (f = 0; f < num_walk_areas; f++) {
-			// if they set a contiuously scaled area where the top
+			// if they set a continuously scaled area where the top
 			// and bottom zoom levels are identical, set it as a normal
 			// scaled area
 			if (rstruc->walk_area_zoom[f] == rstruc->walk_area_zoom2[f])
@@ -1011,26 +946,20 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 		}
 	}
 
-	fread(&rstruc->password[0], 11, 1, opty);
-	fread(&rstruc->options[0], 10, 1, opty);
-	fread(&rstruc->nummes, 2, 1, opty);
+	opty->read(&rstruc->password[0], 11);
+	opty->read(&rstruc->options[0], 10);
+	rstruc->nummes = opty->readSint16LE();
 
 	if (rfh.version >= 25)
 		rstruc->gameId = getw(opty);
 
-	if (rfh.version >= 3)
-#ifndef ALLEGRO_BIG_ENDIAN
-		fread(&rstruc->msgi[0], sizeof(MessageInfo), rstruc->nummes, opty);
-#else
-	{
-		for (int iteratorCount = 0; iteratorCount < rstruc->nummes; ++iteratorCount)
-		{
-			rstruc->msgi[iteratorCount].ReadFromFile(opty);
+	if (rfh.version >= 3) {
+		for (i = 0; i < rstruc->nummes; ++i) {
+			rstruc->msgi[i].ReadFromFile(opty);
 		}
-	}
-#endif
-	else
+	} else {
 		memset(&rstruc->msgi[0], 0, sizeof(MessageInfo) * MAXMESS);
+	}
 
 	for (f = 0; f < rstruc->nummes; f++) {
 		if (rfh.version >= 22)
@@ -1038,8 +967,9 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 		else
 			fgetstring_limit(buffre, opty, 2999);
 
-		rstruc->message[f] = (char *)malloc(strlen(buffre) + 2);
-		Common::strcpy_s(rstruc->message[f], buffre);
+		size_t len = strlen(buffre) + 2;
+		rstruc->message[f] = (char *)malloc(len);
+		Common::strcpy_s(rstruc->message[f], len, buffre);
 
 		if (buffre[strlen(buffre) - 1] == (char)200) {
 			rstruc->message[f][strlen(buffre) - 1] = 0;
@@ -1049,11 +979,11 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 
 	rstruc->numanims = 0;
 	if (rfh.version >= 6) {
-		fread(&rstruc->numanims, 2, 1, opty);
+		rstruc->numanims = opty->readSint16LE();
 
 		if (rstruc->numanims > 0)
-			fseek(opty, sizeof(FullAnimation) * rstruc->numanims, SEEK_CUR);
-		//      fread(&rstruc->anims[0], sizeof(FullAnimation), rstruc->numanims, opty);
+			opty->seek(sizeof(FullAnimation) * rstruc->numanims, SEEK_CUR);
+
 	} else {
 		rstruc->numanims = 0;
 		memset(&rstruc->anims[0], 0, sizeof(FullAnimation) * MAXANIMS);
@@ -1064,12 +994,16 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 		load_graphical_scripts(opty, rstruc);
 	}
 
-	if (rfh.version >= 8)
-		fread(&rstruc->shadinginfo[0], sizeof(short), 16, opty);
+	if (rfh.version >= 8) {
+		for (i = 0; i < 16; ++i)
+			rstruc->shadinginfo[i] = opty->readSint16LE();
+	}
 
 	if (rfh.version >= 21) {
-		fread(&rstruc->regionLightLevel[0], sizeof(short), rstruc->numRegions, opty);
-		fread(&rstruc->regionTintLevel[0], sizeof(int), rstruc->numRegions, opty);
+		for (i = 0; i < rstruc->numRegions; ++i)
+			rstruc->regionLightLevel[i] = opty->readSint16LE();
+		for (i = 0; i < rstruc->numRegions; ++i)
+			rstruc->regionTintLevel[i] = opty->readSint32LE();
 	}
 
 	update_polled_stuff();
@@ -1078,7 +1012,7 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 		tesl = load_lzw(opty, rstruc->ebscene[0], rstruc->pal);
 		rstruc->ebscene[0] = recalced;
 	} else
-		tesl = loadcompressed_allegro(opty, &rstruc->ebscene[0], rstruc->pal, ftell(opty));
+		tesl = loadcompressed_allegro(opty, &rstruc->ebscene[0], rstruc->pal, opty->pos());
 
 	if ((rstruc->ebscene[0]->w > 320) & (rfh.version < 11))
 		rstruc->resolution = 2;
@@ -1125,7 +1059,7 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 }
 
 void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes) {
-	FILE *opty;
+	Common::SeekableReadStream *opty;
 	room_file_header  rfh;
 	int i;
 
@@ -1140,11 +1074,9 @@ void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes) {
 
 	rstruc->compiled_script = NULL;
 	if (rstruc->num_bscenes > 1) {
-		int ff;
-
-		for (ff = 1; ff < rstruc->num_bscenes; ff++) {
-			wfreeblock(rstruc->ebscene[ff]);
-			rstruc->ebscene[ff] = NULL;
+		for (i = 1; i < rstruc->num_bscenes; i++) {
+			wfreeblock(rstruc->ebscene[i]);
+			rstruc->ebscene[i] = NULL;
 		}
 		update_polled_stuff();
 	}
@@ -1213,7 +1145,7 @@ void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes) {
 	opty = clibfopen(files, "rb");
 	if (opty == NULL) {
 		char errbuffr[500];
-		sprintf(errbuffr, "Load_room: Unable to load the room file '%s'\n"
+		Common::sprintf_s(errbuffr, "Load_room: Unable to load the room file '%s'\n"
 			"Make sure that you saved the room to the correct folder (it should be\n"
 			"in your game's sub-folder of the AGS directory).\n"
 			"Also check that the player character's starting room is set correctly.\n", files);
@@ -1221,20 +1153,13 @@ void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes) {
 	}
 	update_polled_stuff();  // it can take a while to load the file sometimes
 
-#ifndef ALLEGRO_BIG_ENDIAN
-	fread(&rfh, sizeof(rfh), 1, opty);
-#else
 	rfh.ReadFromFile(opty);
-#endif
+
 	//fclose(opty);
 	rstruc->wasversion = rfh.version;
-#ifdef THIS_IS_THE_ENGINE
-	if ((rstruc->wasversion < 17) | (rstruc->wasversion > ROOM_FILE_VERSION))
-#else
-	if ((rstruc->wasversion < 15) || (rstruc->wasversion > ROOM_FILE_VERSION))
-#endif
-	{
-		fclose(opty);
+
+	if ((rstruc->wasversion < 17) || (rstruc->wasversion > ROOM_FILE_VERSION)) {
+		delete opty;
 		quit("Load_Room: Bad packed file. Either the file requires a newer or older version of\n"
 			"this program or the file is corrupt.\n");
 	}
@@ -1245,13 +1170,13 @@ void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes) {
 
 	while (thisblock != BLOCKTYPE_EOF) {
 		update_polled_stuff();
-		thisblock = fgetc(opty);
+		thisblock = opty->readByte();
 
 		if (thisblock == BLOCKTYPE_EOF)
 			break;
 
-		fread(&bloklen, 4, 1, opty);
-		bloklen += ftell(opty);  // make it the new position for after block read
+		bloklen = opty->readSint32LE();
+		bloklen += opty->pos();  // make it the new position for after block read
 		optywas = opty;
 
 		if (thisblock == BLOCKTYPE_MAIN)
@@ -1260,10 +1185,10 @@ void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes) {
 			long  lee;
 			int   hh;
 
-			fread(&lee, 4, 1, opty);
+			lee = opty->readSint32LE();
 			rstruc->scripts = (char *)malloc(lee + 5);
-			// MACPORT FIX: swap
-			fread(rstruc->scripts, sizeof(char), lee, opty);
+
+			opty->read(rstruc->scripts, lee);
 			rstruc->scripts[lee] = 0;
 
 			for (hh = 0; hh < lee; hh++)
@@ -1279,28 +1204,29 @@ void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes) {
 			quit("Load_room: old room format. Please upgrade the room.");
 #endif
 		else if (thisblock == BLOCKTYPE_OBJECTNAMES) {
-			if (fgetc(opty) != rstruc->numsprs)
+			if (opty->readByte() != rstruc->numsprs)
 				quit("Load_room: inconsistent blocks for object names");
 
-			fread(&rstruc->objectnames[0][0], MAXOBJNAMELEN, rstruc->numsprs, opty);
+			opty->read(&rstruc->objectnames[0][0], MAXOBJNAMELEN * rstruc->numsprs);
 		} else if (thisblock == BLOCKTYPE_OBJECTSCRIPTNAMES) {
-			if (fgetc(opty) != rstruc->numsprs)
+			if (opty->readByte() != rstruc->numsprs)
 				quit("Load_room: inconsistent blocks for object script names");
 
-			fread(&rstruc->objectscriptnames[0][0], MAX_SCRIPT_NAME_LEN, rstruc->numsprs, opty);
+			opty->read(&rstruc->objectscriptnames[0][0], MAX_SCRIPT_NAME_LEN * rstruc->numsprs);
+
 		} else if (thisblock == BLOCKTYPE_ANIMBKGRND) {
 			int   ct;
 			long  fpos;
 
-			rstruc->num_bscenes = fgetc(opty);
-			rstruc->bscene_anim_speed = fgetc(opty);
+			rstruc->num_bscenes = opty->readByte();
+			rstruc->bscene_anim_speed = opty->readByte();
 
 			if (rfh.version >= 20)
-				fread(&rstruc->ebpalShared[0], 1, rstruc->num_bscenes, opty);
+				opty->read(&rstruc->ebpalShared[0], rstruc->num_bscenes);
 			else
 				memset(&rstruc->ebpalShared[0], 0, rstruc->num_bscenes);
 
-			fpos = ftell(opty);
+			fpos = opty->pos();
 			//        fclose(opty);
 
 			for (ct = 1; ct < rstruc->num_bscenes; ct++) {
@@ -1328,29 +1254,27 @@ void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes) {
 
 			if (errors > 0)
 				quit("LoadRoom: errors encountered reading custom props");
-		} else if (thisblock == -1)
-		{
-			fclose(opty);
+		} else if (thisblock == -1) {
+			delete opty;
 			quit("LoadRoom: unexpected end of file while loading room");
 			return;
 		} else {
-			char  tempbfr[90];
-			sprintf(tempbfr, "LoadRoom: unknown block type %d encountered in '%s'", thisblock, files);
+			char tempbfr[90];
+			Common::sprintf_s(tempbfr, "LoadRoom: unknown block type %d encountered in '%s'", thisblock, files);
 			quit(tempbfr);
 		}
 
 		// The ftell call below has caused crashes
-		if (ftell(opty) != bloklen)
-			fseek(opty, bloklen, SEEK_SET);
+		if (opty->pos() != bloklen)
+			opty->seek(bloklen, SEEK_SET);
 	}
 
 	// sync bpalettes[0] with room.pal
 	memcpy(&rstruc->bpalettes[0][0], &rstruc->pal[0], sizeof(color) * 256);
 
-	fclose(opty);
+	delete opty;
 
-	if ((rfh.version < 29) && (gameIsHighRes))
-	{
+	if ((rfh.version < 29) && (gameIsHighRes)) {
 		// Pre-3.0.3, multiply up co-ordinates
 		// If you change this, also change convert_room_coordinates_to_low_res
 		// function in the engine
@@ -1365,14 +1289,12 @@ void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes) {
 			}
 		}
 
-		for (f = 0; f < rstruc->numhotspots; f++)
-		{
+		for (f = 0; f < rstruc->numhotspots; f++) {
 			rstruc->hswalkto[f].x *= 2;
 			rstruc->hswalkto[f].y *= 2;
 		}
 
-		for (f = 0; f < rstruc->numobj; f++)
-		{
+		for (f = 0; f < rstruc->numobj; f++) {
 			rstruc->objyval[f] *= 2;
 		}
 
@@ -1383,7 +1305,6 @@ void load_room(char *files, roomstruct *rstruc, bool gameIsHighRes) {
 		rstruc->width *= 2;
 		rstruc->height *= 2;
 	}
-
 }
 
 void ViewStruct::Initialize(int loopCount) {
@@ -1402,7 +1323,7 @@ void ViewStruct::Dispose() {
 	}
 }
 
-void ViewStruct::WriteToFile(Common::SeekableReadStream *ooo) {
+void ViewStruct::WriteToFile(Common::WriteStream *ooo) {
 	putshort(numLoops, ooo);
 	for (int i = 0; i < numLoops; i++)
 	{
@@ -1438,34 +1359,22 @@ void ViewLoopNew::Dispose() {
 	}
 }
 
-void ViewLoopNew::WriteToFile(Common::SeekableReadStream *ooo) {
-	fwrite(&numFrames, sizeof(short), 1, ooo);
-	fwrite(&flags, sizeof(int), 1, ooo);
-	fwrite(frames, sizeof(ViewFrame), numFrames, ooo);
+void ViewLoopNew::WriteToFile(Common::WriteStream *ooo) {
+	ooo->writeSint16LE(numFrames);
+	ooo->writeSint32LE(flags);
+
+	for (int i = 0; i < numFrames; ++i)
+		frames[i].WriteToFile(ooo);
 }
 
 
 void ViewLoopNew::ReadFromFile(Common::SeekableReadStream *iii) {
-#ifdef ALLEGRO_BIG_ENDIAN
-
-	STEVE PLEASE VALIDATE THAT THIS CODE IS OK
-
-		Initialize(__getshort__bigendian(fp));
+	Initialize(iii->readSint16LE());
 	flags = getw(iii);
 
-	for (int i = 0; i < numFrames; ++i)
-	{
+	for (int i = 0; i < numFrames; ++i) {
 		frames[i].ReadFromFile(iii);
 	}
-
-#else
-
-	Initialize(getshort(iii));
-	flags = getw(iii);
-
-	fread(frames, sizeof(ViewFrame), numFrames, iii);
-
-#endif
 
 	// an extra frame is allocated in memory to prevent
 	// crashes with empty loops -- set its picture to teh BLUE CUP!!
@@ -1600,6 +1509,7 @@ void new_room(int newnum, CharacterInfo *forchar) {
 
 	// player leaves screen event
 	run_room_event(8);
+
 	// Run the global OnRoomLeave event
 	run_on_event(GE_LEAVE_ROOM, displayed_room);
 
@@ -1626,5 +1536,3 @@ void new_room(int newnum, CharacterInfo *forchar) {
 }
 
 } // namespace AGS2
-
-#endif

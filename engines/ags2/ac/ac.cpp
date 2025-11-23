@@ -2822,44 +2822,6 @@ void run_room_event(int id) {
 	}
 }
 
-// new_room: changes the current room number, and loads the new room from disk
-void new_room(int newnum, CharacterInfo * forchar) {
-	EndSkippingUntilCharStops();
-
-	platform->WriteDebugString("Room change requested to room %d", newnum);
-
-	update_polled_stuff();
-
-	// we are currently running Leaves Screen scripts
-	in_leaves_screen = newnum;
-
-	// player leaves screen event
-	run_room_event(8);
-	// Run the global OnRoomLeave event
-	run_on_event(GE_LEAVE_ROOM, displayed_room);
-
-	platform->RunPluginHooks(AGSE_LEAVEROOM, displayed_room);
-
-	// update the new room number if it has been altered by OnLeave scripts
-	newnum = in_leaves_screen;
-	in_leaves_screen = -1;
-
-	if ((playerchar->following >= 0) &&
-		(game.chars[playerchar->following].room != newnum)) {
-		// the player character is following another character,
-		// who is not in the new room. therefore, abort the follow
-		playerchar->following = -1;
-	}
-	update_polled_stuff();
-
-	// change rooms
-	unload_old_room();
-
-	update_polled_stuff();
-
-	load_new_room(newnum, forchar);
-}
-
 // animation player start
 
 void main_loop_until(int untilwhat, int udata, int mousestuff) {

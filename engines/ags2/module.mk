@@ -16,6 +16,7 @@ MODULE_OBJS = \
 	ac/platform.o \
 	ac/platform_scummvm.o \
 	ac/resolution.o \
+	ac/room.o \
 	ac/scripts.o \
 	ac/sound.o \
 	ac/timer.o \

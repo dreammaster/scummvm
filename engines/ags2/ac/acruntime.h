@@ -974,6 +974,9 @@ extern int GetTextDisplayTime(const char *text, int canberel = 0);
 extern void mark_current_background_dirty();
 extern void debug_log(const char *texx, ...);
 extern void draw_sprite_support_alpha(int xpos, int ypos, block image, int slot);
+extern void run_room_event(int id);
+extern void load_new_room(int newnum, CharacterInfo *forchar);
+extern void unload_old_room();
 
 } // namespace AGS2
 
