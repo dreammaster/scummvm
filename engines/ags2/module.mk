@@ -49,6 +49,7 @@ MODULE_OBJS = \
 	lib/aastr-0.1.1/aautil.o \
 	lib/alfont/alfont.o \
 	lib/allegro/color.o \
+	lib/allegro/datafile.o \
 	lib/allegro/digi.o \
 	lib/allegro/file.o \
 	lib/allegro/fixed.o \
