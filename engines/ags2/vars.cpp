@@ -32,7 +32,6 @@ GameSetup usetup;
 RoomStatus *roomstats;
 roomstruct thisroom;
 RoomStatus troom;    // used for non-saveable rooms, eg. intro
-CharacterExtras *charextra;
 
 SpriteCache spritset(1);
 BITMAP *screen;
@@ -114,8 +113,6 @@ long t1;  // timer for FPS
 int cur_mode, cur_cursor;
 char saveGameSuffix[MAX_SG_EXT_LENGTH + 1];
 //int abort_all_conditions=0;
-RoomObject *objs;
-CharacterInfo *playerchar;
 long _sc_PlayerCharPtr;
 int use_extra_sound_offset;
 block debugConsoleBuffer;
@@ -189,6 +186,9 @@ char lines[MAXLINE][200];
 int numlines;
 IDriverDependantBitmap **actspsbmp;
 CharacterCache *charcache;
+CharacterExtras *charextra;
+RoomObject *objs;
+CharacterInfo *playerchar;
 ObjectCache objcache[MAX_INIT_SPR];
 ScriptObject scrObj[MAX_INIT_SPR];
 ScriptGUI *scrGui;
@@ -212,6 +212,7 @@ char alpha_blend_cursor;
 int engineNeedsAsInt;
 char rbuffer[200];
 uint32 lastTime;
+int turnlooporder[8];
 
 // ac/audio.cpp
 ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
@@ -269,6 +270,8 @@ int crovr_id;
 
 // ac/room.cpp
 int in_new_room, new_room_was;
+InteractionVariable globalvars[MAX_GLOBAL_VARIABLES];
+int numGlobalVars;
 
 // ac/savegame.cpp
 unsigned int load_new_game;
@@ -303,6 +306,7 @@ int num_open_script_files;
 int said_speech_line;
 int crossFading, crossFadeVolumePerStep, crossFadeStep;
 int crossFadeVolumeAtStart;
+AmbientSound ambient[MAX_SOUND_CHANNELS + 1];  // + 1 just for safety on array iterations
 
 // ac/walkbehind.cpp
 char *walkBehindExists;
@@ -509,6 +513,8 @@ Vars::Vars() {
 	numlines = 0;
 	actspsbmp = nullptr;
 	charcache = nullptr;
+	charextra = nullptr;
+	objs = nullptr;
 	scrGui = nullptr;
 	want_quit = screen_reset = 0;
 	raw_saved_screen = nullptr;
@@ -564,8 +570,11 @@ Vars::Vars() {
 	// ac/overlay.cpp
 	is_complete_overlay = is_text_overlay = 0;
 	crovr_id = 2;
+
 	// ac/room.cpp
 	in_new_room = new_room_was = 0;
+	globalvars[0] = { "Global 1", 0, 0 };
+	numGlobalVars = 1;
 
 	// ac/savegame.cpp
 	load_new_game = 0;

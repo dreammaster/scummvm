@@ -22,7 +22,7 @@
 #ifndef AGS2_AC_SOUND_H
 #define AGS2_AC_SOUND_H
 
-#include "common/scummsys.h"
+#include "common/serializer.h"
 
 namespace AGS2 {
 

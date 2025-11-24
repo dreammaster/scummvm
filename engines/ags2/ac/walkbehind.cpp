@@ -284,4 +284,22 @@ void sort_out_char_sprite_walk_behind(int actspsIndex, int xx, int yy, int basel
 	}
 }
 
+void redo_walkable_areas() {
+	// since this is an 8-bit memory bitmap, we can just use direct 
+	// memory access
+	if ((!is_linear_bitmap(thisroom.walls)) || (bitmap_color_depth(thisroom.walls) != 8))
+		quit("Walkable areas bitmap not linear");
+
+	blit(walkareabackup, thisroom.walls, 0, 0, 0, 0, thisroom.walls->w, thisroom.walls->h);
+
+	int hh, ww;
+	for (hh = 0; hh < walkareabackup->h; hh++) {
+		for (ww = 0; ww < walkareabackup->w; ww++) {
+			//      if (play.walkable_areas_on[_getpixel(thisroom.walls,ww,hh)]==0)
+			if (play.walkable_areas_on[thisroom.walls->line[hh][ww]] == 0)
+				_putpixel(thisroom.walls, ww, hh, 0);
+		}
+	}
+}
+
 } // namespace AGS2

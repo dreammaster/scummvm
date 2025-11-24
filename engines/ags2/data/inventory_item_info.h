@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,26 +20,33 @@
  *
  */
 
-#ifndef AGS2_AC_WALKBEHIND_H
-#define AGS2_AC_WALKBEHIND_H
+#ifndef AGS2_DATA_INVENTORY_ITEM_INFO_H
+#define AGS2_DATA_INVENTORY_ITEM_INFO_H
 
-#include "common/scummsys.h"
+#include "common/serializer.h"
+#include "ags2/data/inventory_item_info.h"
 
 namespace AGS2 {
 
-enum WalkBehindMethodEnum {
-	DrawOverCharSprite,
-	DrawAsSeparateSprite,
-	DrawAsSeparateCharSprite
-};
+#define IFLG_STARTWITH 1
 
-extern void update_walk_behind_images();
-extern void recache_walk_behinds();
-extern int get_walkable_area_pixel(int x, int y);
-extern int sort_out_walk_behinds(block sprit, int xx, int yy, int basel, block copyPixelsFrom = NULL, block checkPixelsFrom = NULL, int zoom = 100);
-extern void invalidate_cached_walkbehinds();
-extern void sort_out_char_sprite_walk_behind(int actspsIndex, int xx, int yy, int basel, int zoom, int width, int height);
-extern void redo_walkable_areas();
+struct InventoryItemInfo {
+	char name[25];
+	int  pic;
+	int  cursorPic, hotx, hoty;
+	int  reserved[5];
+	byte flags;
+
+	void synchronize(Common::Serializer &s);
+	void load(Common::SeekableReadStream *rs) {
+		Common::Serializer s(rs, nullptr);
+		synchronize(s);
+	}
+	void save(Common::WriteStream *ws) {
+		Common::Serializer s(nullptr, ws);
+		synchronize(s);
+	}
+};
 
 } // namespace AGS2
 

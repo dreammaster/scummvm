@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,27 +20,22 @@
  *
  */
 
-#ifndef AGS2_AC_WALKBEHIND_H
-#define AGS2_AC_WALKBEHIND_H
-
-#include "common/scummsys.h"
+#include "ags2/data/screen_overlay.h"
 
 namespace AGS2 {
 
-enum WalkBehindMethodEnum {
-	DrawOverCharSprite,
-	DrawAsSeparateSprite,
-	DrawAsSeparateCharSprite
-};
+void ScreenOverlay::synchronize(Common::Serializer &s) {
+	s.skip(4);		// bmp
+	s.skip(4);		// pic
 
-extern void update_walk_behind_images();
-extern void recache_walk_behinds();
-extern int get_walkable_area_pixel(int x, int y);
-extern int sort_out_walk_behinds(block sprit, int xx, int yy, int basel, block copyPixelsFrom = NULL, block checkPixelsFrom = NULL, int zoom = 100);
-extern void invalidate_cached_walkbehinds();
-extern void sort_out_char_sprite_walk_behind(int actspsIndex, int xx, int yy, int basel, int zoom, int width, int height);
-extern void redo_walkable_areas();
+	s.syncAsSint32LE(type);
+	s.syncAsSint32LE(x);
+	s.syncAsSint32LE(y);
+	s.syncAsSint32LE(timeout);
+	s.syncAsSint32LE(bgSpeechForChar);
+	s.syncAsSint32LE(associatedOverlayHandle);
+	s.syncAsByte(hasAlphaChannel);
+	s.syncAsByte(positionRelativeToScreen);
+}
 
 } // namespace AGS2
-
-#endif

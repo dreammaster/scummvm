@@ -22,7 +22,7 @@
 #ifndef AGS2_LIB_ALLEGRO_COLOR_H
 #define AGS2_LIB_ALLEGRO_COLOR_H
 
-#include "common/scummsys.h"
+#include "common/serializer.h"
 #include "common/stream.h"
 #include "graphics/screen.h"
 #include "ags2/lib/allegro/base.h"
@@ -51,8 +51,15 @@ struct color {
 	byte r, g, b;
 	byte filler;
 
-	void readFromFile(Common::ReadStream *file);
-	void writeToFile(Common::WriteStream *file) const;
+	void synchronize(Common::Serializer &s);
+	void readFromFile(Common::SeekableReadStream *rs) {
+		Common::Serializer s(rs, nullptr);
+		synchronize(s);
+	}
+	void writeToFile(Common::WriteStream *ws) {
+		Common::Serializer s(nullptr, ws);
+		synchronize(s);
+	}
 	void clear() {
 		r = g = b = filler = 0;
 	}

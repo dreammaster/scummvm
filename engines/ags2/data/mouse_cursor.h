@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,26 +20,37 @@
  *
  */
 
-#ifndef AGS2_AC_WALKBEHIND_H
-#define AGS2_AC_WALKBEHIND_H
+#ifndef AGS2_DATA_MOUSE_CURSOR_H
+#define AGS2_DATA_MOUSE_CURSOR_H
 
-#include "common/scummsys.h"
+#include "common/serializer.h"
+#include "ags2/data/defines.h"
 
 namespace AGS2 {
 
-enum WalkBehindMethodEnum {
-	DrawOverCharSprite,
-	DrawAsSeparateSprite,
-	DrawAsSeparateCharSprite
-};
+#define MCF_ANIMMOVE 1
+#define MCF_DISABLED 2
+#define MCF_STANDARD 4
+#define MCF_HOTSPOT  8  // only animate when over hotspot
 
-extern void update_walk_behind_images();
-extern void recache_walk_behinds();
-extern int get_walkable_area_pixel(int x, int y);
-extern int sort_out_walk_behinds(block sprit, int xx, int yy, int basel, block copyPixelsFrom = NULL, block checkPixelsFrom = NULL, int zoom = 100);
-extern void invalidate_cached_walkbehinds();
-extern void sort_out_char_sprite_walk_behind(int actspsIndex, int xx, int yy, int basel, int zoom, int width, int height);
-extern void redo_walkable_areas();
+// this struct is also in the plugin header file
+struct MouseCursor {
+	int   pic = 2054;
+	short hotx = 0, hoty = 0;
+	short view = -1;
+	char  name[10] = {};
+	char  flags = 0;
+
+	void synchronize(Common::Serializer &s);
+	void load(Common::SeekableReadStream *rs) {
+		Common::Serializer s(rs, nullptr);
+		synchronize(s);
+	}
+	void save(Common::WriteStream *ws) {
+		Common::Serializer s(nullptr, ws);
+		synchronize(s);
+	}
+};
 
 } // namespace AGS2
 

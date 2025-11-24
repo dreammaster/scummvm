@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,27 +20,38 @@
  *
  */
 
-#ifndef AGS2_AC_WALKBEHIND_H
-#define AGS2_AC_WALKBEHIND_H
-
-#include "common/scummsys.h"
+#include "ags2/data/sound.h"
 
 namespace AGS2 {
 
-enum WalkBehindMethodEnum {
-	DrawOverCharSprite,
-	DrawAsSeparateSprite,
-	DrawAsSeparateCharSprite
+void ScriptAudioClip::synchronize(Common::Serializer &s) {
+	s.syncAsSint32LE(id);
+	s.syncBytes((byte *)scriptName, 30);
+	s.syncBytes((byte *)fileName, 15);
+	s.syncAsByte(bundlingType);
+	s.syncAsByte(type);
+	s.syncAsByte(fileType);
+	s.syncAsByte(defaultRepeat);
+	s.syncAsSint16LE(defaultPriority);
+	s.syncAsSint16LE(defaultVolume);
+	s.syncAsSint32LE(reserved);
 };
 
-extern void update_walk_behind_images();
-extern void recache_walk_behinds();
-extern int get_walkable_area_pixel(int x, int y);
-extern int sort_out_walk_behinds(block sprit, int xx, int yy, int basel, block copyPixelsFrom = NULL, block checkPixelsFrom = NULL, int zoom = 100);
-extern void invalidate_cached_walkbehinds();
-extern void sort_out_char_sprite_walk_behind(int actspsIndex, int xx, int yy, int basel, int zoom, int width, int height);
-extern void redo_walkable_areas();
+void AudioClipType::synchronize(Common::Serializer &s) {
+	s.syncAsSint32LE(id);
+	s.syncAsSint32LE(reservedChannels);
+	s.syncAsSint32LE(volume_reduction_while_speech_playing);
+	s.syncAsSint32LE(crossfadeSpeed);
+	s.syncAsSint32LE(reservedForFuture);
+}
+
+void AmbientSound::synchronize(Common::Serializer &s) {
+	s.syncAsSint32LE(channel);
+	s.syncAsSint32LE(x);
+	s.syncAsSint32LE(y);
+	s.syncAsSint32LE(vol);
+	s.syncAsSint32LE(num);
+	s.syncAsSint32LE(maxdist);
+}
 
 } // namespace AGS2
-
-#endif

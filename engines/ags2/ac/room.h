@@ -25,9 +25,12 @@
 #include "common/serializer.h"
 #include "common/stream.h"
 #include "common/textconsole.h"
+#include "ags2/ac/platform.h"
 #include "ags2/common/file.h"
 #include "ags2/common/cscomp.h"
 #include "ags2/common/wgt2allg.h"
+#include "ags2/data/character_info.h"
+#include "ags2/data/words_dictionary.h"
 
 namespace AGS2 {
 
@@ -36,16 +39,17 @@ namespace AGS2 {
 
 #define ROOM_FILE_VERSION 29
 
-#define MAX_INIT_SPR  40
-#define MAX_OBJ       16  // max walk-behinds
-#define NUM_MISC      20
-#define MAXMESS       100
-#define NUMOTCON      7                 // number of conditions before standing on
-#define NUM_CONDIT    (120 + NUMOTCON)
-#define MAX_HOTSPOTS  50   // v2.62 increased from 20 to 30; v2.8 to 50
-#define MAX_REGIONS   16
+// object flags (currently only a char)
+#define OBJF_NOINTERACT        1  // not clickable
+#define OBJF_NOWALKBEHINDS     2  // ignore walk-behinds
+#define OBJF_HASTINT           4  // the tint_* members are valid
+#define OBJF_USEREGIONTINTS    8  // obey region tints/light areas
+#define OBJF_USEROOMSCALING 0x10  // obey room scaling areas
+#define OBJF_SOLID          0x20  // blocks characters from moving
+#define OBJF_DELETED        0x40  // object has been deleted
 
-#define MAX_SCRIPT_NAME_LEN 20
+#define NOT_VECTOR_SCALED -10000
+#define TINT_IS_ENABLED 0x80000000
 
 //const int MISC_COND = MAX_OBJ * 4 + NUMOTCON + MAX_INIT_SPR * 4;
 
@@ -120,7 +124,6 @@ const int ST_TUNE = 0, ST_SAVELOAD = 1, ST_MANDISABLED = 2, ST_MANVIEW = 3, ST_V
 
 #ifndef CROOM_NOFUNCTIONS
 
-#define GAME_FILE_VERSION 42
 extern block backups[5];
 
 extern int cunpackbitl(unsigned char *, int size, Common::SeekableReadStream *infile);
@@ -198,7 +201,7 @@ struct EventBlock {
 
 // careful with this - the shadinginfo[] array needs to be
 // MAX_WALK_AREAS + 1 if this gets changed
-#define MAX_WALK_AREAS 15
+
 #define MAXPOINTS 30
 struct PolyPoints {
 	int x[MAXPOINTS];
@@ -268,43 +271,8 @@ struct InterfaceElement {
 	char            on = 1;
 };
 
-#define MAX_PARSER_WORD_LENGTH 30
 #define ANYWORD     29999
 #define RESTOFLINE  30000
-
-struct WordsDictionary {
-	int num_words = 0;
-	char **word = nullptr;
-	short *wordnum = nullptr;
-
-	void allocate_memory(int wordCount) {
-		num_words = wordCount;
-		if (num_words > 0)
-		{
-			word = (char **)malloc(wordCount * sizeof(char *));
-			word[0] = (char *)malloc(wordCount * MAX_PARSER_WORD_LENGTH);
-			wordnum = (short *)malloc(wordCount * sizeof(short));
-			for (int i = 1; i < wordCount; i++)
-			{
-				word[i] = word[0] + MAX_PARSER_WORD_LENGTH * i;
-			}
-		}
-	}
-
-	void free_memory() {
-		if (num_words > 0) {
-			free(word[0]);
-			free(word);
-			free(wordnum);
-			word = NULL;
-			wordnum = NULL;
-			num_words = 0;
-		}
-	}
-
-	void sort();
-	int find_index(const char *);
-};
 
 #define MAX_CUSTOM_PROPERTIES 30
 #define MAX_CUSTOM_PROPERTY_VALUE_LENGTH 500
@@ -433,7 +401,6 @@ struct CustomProperties {
 #define MAX_ACTION_ARGS 5
 #define MAX_NEWINTERACTION_EVENTS 30
 #define MAX_COMMANDS_PER_LIST 40
-#define int32 int
 #define VALTYPE_LITERALINT 1
 #define VALTYPE_VARIABLE   2
 #define VALTYPE_BOOLEAN    3
@@ -584,6 +551,75 @@ struct NewInteraction {
 	}
 };
 
+/**
+ * This struct is only used in save games and by plugins
+ */
+struct RoomObject {
+	int   x = 0, y = 0;
+	int   transparent = 0;    // current transparency setting
+	short tint_r = 0, tint_g = 0;   // specific object tint
+	short tint_b = 0, tint_level = 0;
+	short tint_light = 0;
+	short last_zoom = 0;      // zoom level last time
+	short last_width = 0, last_height = 0;   // width/height last time drawn
+	short num = 0;            // sprite slot number
+	short baseline = 0;       // <=0 to use Y co-ordinate; >0 for specific baseline
+	short view = 0, loop = 0, frame = 0; // only used to track animation - 'num' holds the current sprite
+	short wait = 0, moving = 0;
+	char  cycling = 0;        // is it currently animating?
+	char  overall_speed = 0;
+	char  on = 0;
+	char  flags = 0;
+	short blocking_width = 0, blocking_height = 0;
+
+	int get_width() const;
+	int get_height() const;
+	int get_baseline() const;
+
+	void synchronize(Common::Serializer &s);
+	void load(Common::SeekableReadStream *rs) {
+		Common::Serializer s(rs, nullptr);
+		synchronize(s);
+	}
+	void save(Common::WriteStream *ws) {
+		Common::Serializer s(nullptr, ws);
+		synchronize(s);
+	}
+};
+
+
+/**
+ * This struct is saved in the save games - it contains everything about
+ * a room that could change
+ */
+struct RoomStatus {
+	int beenhere = 0;
+	int numobj = 0;
+	RoomObject obj[MAX_INIT_SPR];
+	short flagstates[MAX_FLAGS] = {};
+	int tsdatasize = 0;
+	char *tsdata = nullptr;
+	NewInteraction intrHotspot[MAX_HOTSPOTS];
+	NewInteraction intrObject[MAX_INIT_SPR];
+	NewInteraction intrRegion[MAX_REGIONS];
+	NewInteraction intrRoom;
+
+	char hotspot_enabled[MAX_HOTSPOTS] = {};
+	char region_enabled[MAX_REGIONS] = {};
+	short walkbehind_base[MAX_OBJ] = {};
+	int interactionVariableValues[MAX_GLOBAL_VARIABLES] = {};
+
+	void synchronize(Common::Serializer &s);
+	void load(Common::SeekableReadStream *f) {
+		Common::Serializer s(f, nullptr);
+		synchronize(s);
+	}
+	void save(Common::WriteStream *f) {
+		Common::Serializer s(nullptr, f);
+		synchronize(s);
+	}
+};
+
 #define NUM_ACTION_TYPES 48
 #define ARG_TYPE_INT 1
 #define ARG_TYPE_INV 2
@@ -608,18 +644,25 @@ struct ActionTypes {
 extern ActionTypes actions[NUM_ACTION_TYPES];
 
 struct InteractionVariable {
-  char name[23];
-  char type;
-  int  value;
-  
-  void ReadFromFile(Common::SeekableReadStream *fp) {
-	  fp->read(name, 23);
-	  type = fp->readByte();
-	  value = getw(fp);
-  }
+	char name[23];
+	char type;
+	int  value;
+
+	void synchronize(Common::Serializer &s) {
+		s.syncBytes((byte *)name, 23);
+		s.syncAsByte(type);
+		s.syncAsSint32LE(value);
+	}
+
+	void load(Common::SeekableReadStream *rs) {
+		Common::Serializer s(rs, nullptr);
+		synchronize(s);
+	}
+	void save(Common::WriteStream *ws) {
+		Common::Serializer s(nullptr, ws);
+		synchronize(s);
+	}
 };
-extern InteractionVariable globalvars[];
-extern int numGlobalVars;
 
 struct InteractionScripts {
   int numEvents;
@@ -635,59 +678,6 @@ struct InteractionScripts {
   }
 };
 
-#define AUCL_BUNDLE_EXE 1
-#define AUCL_BUNDLE_VOX 2
-enum AudioFileType {
-	eAudioFileOGG = 1,
-	eAudioFileMP3 = 2,
-	eAudioFileWAV = 3,
-	eAudioFileVOC = 4,
-	eAudioFileMIDI = 5,
-	eAudioFileMOD = 6
-};
-struct ScriptAudioClip {
-	int id;  // not used by editor, set in engine only
-	char scriptName[30];
-	char fileName[15];
-	char bundlingType;
-	char type;
-	char fileType;
-	char defaultRepeat;
-	short defaultPriority;
-	short defaultVolume;
-	int  reserved;
-
-	void load(Common::SeekableReadStream *src);
-};
-
-#define AUDIO_CLIP_TYPE_SOUND 1
-struct AudioClipType {
-	int id;
-	int reservedChannels;
-	int volume_reduction_while_speech_playing;
-	int crossfadeSpeed;
-	int reservedForFuture;
-
-	void load(Common::SeekableReadStream *src);
-};
-
-#define MAX_ROOMS 300
-
-// object flags (currently only a char)
-#define OBJF_NOINTERACT        1  // not clickable
-#define OBJF_NOWALKBEHINDS     2  // ignore walk-behinds
-#define OBJF_HASTINT           4  // the tint_* members are valid
-#define OBJF_USEREGIONTINTS    8  // obey region tints/light areas
-#define OBJF_USEROOMSCALING 0x10  // obey room scaling areas
-#define OBJF_SOLID          0x20  // blocks characters from moving
-#define OBJF_DELETED        0x40  // object has been deleted
-
-#define MAXANIMS      10
-#define MAX_FLAGS     15
-#define MAXOBJNAMELEN 30
-#define MAX_BSCENE    5   // max number of frames in animating bg scene
-#define NOT_VECTOR_SCALED -10000
-#define TINT_IS_ENABLED 0x80000000
 struct roomstruct {
   block         walls, object, lookat;          // 'object' is the walk-behind
   block         regions;
@@ -895,23 +885,6 @@ struct ViewStruct272 {
 	ViewFrame frames[16][20];
 };
 
-#define MCF_ANIMMOVE 1
-#define MCF_DISABLED 2
-#define MCF_STANDARD 4
-#define MCF_HOTSPOT  8  // only animate when over hotspot
-
-// this struct is also in the plugin header file
-struct MouseCursor {
-	int   pic = 2054;
-	short hotx = 0, hoty = 0;
-	short view = -1;
-	char  name[10] = {};
-	char  flags = 0;
-
-	void load(Common::SeekableReadStream *src);
-};
-
-#define MAX_INV             301
 #define CHF_MANUALSCALING   1
 #define CHF_FIXVIEW         2     // between SetCharView and ReleaseCharView
 #define CHF_NOINTERACT      4
@@ -935,49 +908,6 @@ struct MouseCursor {
 #define OCHF_SPEECHCOLSHIFT 24
 #define UNIFORM_WALK_SPEED  0
 #define FOLLOW_ALWAYSONTOP  0x7ffe
-// remember - if change this struct, also change AGSDEFNS.SH and
-// plugin header file struct
-struct CharacterInfo {
-	int   defview;
-	int   talkview;
-	int   view;
-	int   room, prevroom;
-	int   x, y, wait;
-	int   flags;
-	short following;
-	short followinfo;
-	int   idleview;           // the loop will be randomly picked
-	short idletime, idleleft; // num seconds idle before playing anim
-	short transparency;       // if character is transparent
-	short baseline;
-	int   activeinv;
-	int   talkcolor;
-	int   thinkview;
-	short blinkview, blinkinterval; // design time
-	short blinktimer, blinkframe;   // run time
-	short walkspeed_y, pic_yoffs;
-	int   z;    // z-location, for flying etc
-	int   walkwait;
-	short speech_anim_speed, reserved1;  // only 1 reserved left!!
-	short blocking_width, blocking_height;
-	int   index_id;  // used for object functions to know the id
-	short pic_xoffs, walkwaitcounter;
-	short loop, frame;
-	short walking, animating;
-	short walkspeed, animspeed;
-	short inv[MAX_INV];
-	short actx, acty;
-	char  name[40];
-	char  scrname[MAX_SCRIPT_NAME_LEN];
-	char  on;
-
-	int get_effective_y();   // return Y - Z
-	int get_baseline();      // return baseline, or Y if not set
-	int get_blocking_top();    // return Y - BlockingHeight/2
-	int get_blocking_bottom(); // return Y + BlockingHeight/2
-
-	void load(Common::SeekableReadStream *src);
-};
 
 
 struct OldCharacterInfo {
@@ -1002,17 +932,6 @@ struct OldCharacterInfo {
 	char  name[30];
 	char  scrname[16];
 	char  on;
-};
-
-#define IFLG_STARTWITH 1
-struct InventoryItemInfo {
-	char name[25];
-	int  pic;
-	int  cursorPic, hotx, hoty;
-	int  reserved[5];
-	char flags;
-
-	void load(Common::SeekableReadStream *src);
 };
 
 #define MAXTOPICOPTIONS     30
@@ -1055,14 +974,10 @@ struct DialogTopic {
 	void load(Common::SeekableReadStream *src);
 };
 
-#define MAX_SPRITES         30000
-#define MAX_CURSOR          20
 #define PAL_GAMEWIDE        0
 #define PAL_LOCKED          1
 #define PAL_BACKGROUND      2
-#define MAXGLOBALMES        500
-#define MAXLANGUAGE         5
-#define MAX_FONTS           15
+
 #define OPT_DEBUGMODE       0
 #define OPT_SCORESOUND      1
 #define OPT_WALKONLOOK      2
@@ -1126,119 +1041,6 @@ struct DialogTopic {
 #define FFLG_SIZEMASK 0x003f
 #define FONT_OUTLINE_AUTO -10
 #define MAX_FONT_SIZE 63
-struct OriGameSetupStruct {
-	char              gamename[30];
-	char              options[20];
-	unsigned char     paluses[256];
-	color             defpal[256];
-	InterfaceElement  iface[10];
-	int               numiface;
-	int               numviews;
-	MouseCursor       mcurs[10];
-	char *globalscript;
-	int               numcharacters;
-	OldCharacterInfo *chars;
-	EventBlock        __charcond[50];
-	EventBlock        __invcond[100];
-	ccScript *compiled_script;
-	int               playercharacter;
-	unsigned char     __old_spriteflags[2100];
-	int               totalscore;
-	short             numinvitems;
-	InventoryItemInfo invinfo[100];
-	int               numdialog, numdlgmessage;
-	int               numfonts;
-	int               color_depth;              // in bytes per pixel (ie. 1 or 2)
-	int               target_win;
-	int               dialog_bullet;            // 0 for none, otherwise slot num of bullet point
-	short             hotdot, hotdotouter;   // inv cursor hotspot dot
-	int               uniqueid;    // random key identifying the game
-	int               reserved[2];
-	short             numlang;
-	char              langcodes[MAXLANGUAGE][3];
-	char *messages[MAXGLOBALMES];
-};
-
-struct OriGameSetupStruct2 : public OriGameSetupStruct {
-	unsigned char   fontflags[10];
-	char            fontoutline[10];
-	int             numgui;
-	WordsDictionary *dict;
-	int             reserved2[8];
-};
-
-struct OldGameSetupStruct : public OriGameSetupStruct2 {
-	unsigned char spriteflags[6000];
-};
-
-// This struct is written directly to the disk file
-// The GameSetupStruct subclass parts are written individually
-struct GameSetupStructBase {
-	char              gamename[50];
-	int32             options[100];
-	unsigned char     paluses[256];
-	color             defpal[256];
-	int32             numviews;
-	int32             numcharacters;
-	int32             playercharacter;
-	int32             totalscore;
-	short             numinvitems;
-	int32             numdialog, numdlgmessage;
-	int32             numfonts;
-	int32             color_depth;          // in bytes per pixel (ie. 1 or 2)
-	int32             target_win;
-	int32             dialog_bullet;        // 0 for none, otherwise slot num of bullet point
-	unsigned short    hotdot, hotdotouter;  // inv cursor hotspot dot
-	int32             uniqueid;    // random key identifying the game
-	int32             numgui;
-	int32             numcursors;
-	int32             default_resolution; // 0=undefined, 1=320x200, 2=320x240, 3=640x400 etc
-	int32             default_lipsync_frame; // used for unknown chars
-	int32             invhotdotsprite;
-	int32             reserved[17];
-	char *messages[MAXGLOBALMES];
-	WordsDictionary *dict;
-	char *globalscript;
-	CharacterInfo *chars;
-	ccScript *compiled_script;
-
-	void load(Common::SeekableReadStream *src);
-};
-
-#define MAXVIEWNAMELENGTH 15
-#define MAXLIPSYNCFRAMES  20
-#define MAX_GUID_LENGTH   40
-#define MAX_SG_EXT_LENGTH 20
-#define MAX_SG_FOLDER_LEN 50
-
-struct GameSetupStruct : public GameSetupStructBase {
-	unsigned char     fontflags[MAX_FONTS];
-	char              fontoutline[MAX_FONTS];
-	unsigned char     spriteflags[MAX_SPRITES];
-	InventoryItemInfo invinfo[MAX_INV];
-	MouseCursor       mcurs[MAX_CURSOR];
-	NewInteraction **intrChar;
-	NewInteraction *intrInv[MAX_INV];
-	InteractionScripts **charScripts;
-	InteractionScripts **invScripts;
-	int               filever;  // just used by editor
-	char              lipSyncFrameLetters[MAXLIPSYNCFRAMES][50];
-	CustomPropertySchema propSchema;
-	CustomProperties *charProps, invProps[MAX_INV];
-	char **viewNames;
-	char              invScriptNames[MAX_INV][MAX_SCRIPT_NAME_LEN];
-	char              dialogScriptNames[MAX_DIALOG][MAX_SCRIPT_NAME_LEN];
-	char              guid[MAX_GUID_LENGTH];
-	char              saveGameFileExtension[MAX_SG_EXT_LENGTH];
-	char              saveGameFolderName[MAX_SG_FOLDER_LEN];
-	int               roomCount;
-	int *roomNumbers;
-	char **roomNames;
-	int               audioClipCount;
-	ScriptAudioClip *audioClips;
-	int               audioClipTypeCount;
-	AudioClipType *audioClipTypes;
-};
 
 struct SpeechLipSyncLine {
 	char  filename[14];
@@ -1280,7 +1082,6 @@ struct ScriptModule {
 	}
 };
 
-#ifndef ROOMEDIT
 #define MAXNEEDSTAGES 40
 struct MoveList {
 	int   pos[MAXNEEDSTAGES];
@@ -1291,8 +1092,17 @@ struct MoveList {
 	int   lastx, lasty;
 	char  doneflag;
 	char  direct;  // MoveCharDirect was used or not
+
+	void synchronize(Common::Serializer &s);
+	void load(Common::SeekableReadStream *rs) {
+		Common::Serializer s(rs, nullptr);
+		synchronize(s);
+	}
+	void save(Common::WriteStream *ws) {
+		Common::Serializer s(nullptr, ws);
+		synchronize(s);
+	}
 };
-#endif
 
 extern void new_room(int newnum, CharacterInfo *forchar);
 extern void read_string_decrypt(Common::SeekableReadStream *ooo, char *sss);

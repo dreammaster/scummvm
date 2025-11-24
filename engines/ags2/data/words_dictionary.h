@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,26 +20,46 @@
  *
  */
 
-#ifndef AGS2_AC_WALKBEHIND_H
-#define AGS2_AC_WALKBEHIND_H
+#ifndef AGS2_DATA_WORDS_DICTIONARY_H
+#define AGS2_DATA_WORDS_DICTIONARY_H
 
-#include "common/scummsys.h"
+#include "ags2/data/defines.h"
 
 namespace AGS2 {
 
-enum WalkBehindMethodEnum {
-	DrawOverCharSprite,
-	DrawAsSeparateSprite,
-	DrawAsSeparateCharSprite
-};
+struct WordsDictionary {
+	int num_words = 0;
+	char **word = nullptr;
+	short *wordnum = nullptr;
 
-extern void update_walk_behind_images();
-extern void recache_walk_behinds();
-extern int get_walkable_area_pixel(int x, int y);
-extern int sort_out_walk_behinds(block sprit, int xx, int yy, int basel, block copyPixelsFrom = NULL, block checkPixelsFrom = NULL, int zoom = 100);
-extern void invalidate_cached_walkbehinds();
-extern void sort_out_char_sprite_walk_behind(int actspsIndex, int xx, int yy, int basel, int zoom, int width, int height);
-extern void redo_walkable_areas();
+	void allocate_memory(int wordCount) {
+		num_words = wordCount;
+		if (num_words > 0)
+		{
+			word = (char **)malloc(wordCount * sizeof(char *));
+			word[0] = (char *)malloc(wordCount * MAX_PARSER_WORD_LENGTH);
+			wordnum = (short *)malloc(wordCount * sizeof(short));
+			for (int i = 1; i < wordCount; i++)
+			{
+				word[i] = word[0] + MAX_PARSER_WORD_LENGTH * i;
+			}
+		}
+	}
+
+	void free_memory() {
+		if (num_words > 0) {
+			free(word[0]);
+			free(word);
+			free(wordnum);
+			word = NULL;
+			wordnum = NULL;
+			num_words = 0;
+		}
+	}
+
+	void sort();
+	int find_index(const char *);
+};
 
 } // namespace AGS2
 

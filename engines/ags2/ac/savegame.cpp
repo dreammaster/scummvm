@@ -19,13 +19,19 @@
  *
  */
 
-#include "ags2/ac/acsavegame.h"
+#include "common/system.h"
+#include "common/savefile.h"
+#include "ags2/ac/savegame.h"
+#include "ags2/ac/acruntime.h"
+#include "ags2/common/csrun.h"
 #include "ags2/vars.h"
 
 namespace AGS2 {
 
 #define MAGICNUMBER 0xbeefcafe
 #define SGVERSION 8
+
+static char buffer2[60];
 
 const char *load_game_errors[9] = {
 	"No error","File not found","Not an AGS save game",
@@ -57,29 +63,16 @@ void RestoreGameSlot(int slnum) {
 }
 
 void get_save_game_path(int slotNum, char *buffer) {
-	strcpy(buffer, saveGameDirectory);
-	sprintf(&buffer[strlen(buffer)], sgnametemplate, slotNum);
-	strcat(buffer, saveGameSuffix);
+	Common::strcpy_s(buffer, STD_BUFFER_SIZE, saveGameDirectory);
+	Common::sprintf_s(&buffer[strlen(buffer)], STD_BUFFER_SIZE, sgnametemplate, slotNum);
+	Common::strcat_s(buffer, STD_BUFFER_SIZE, saveGameSuffix);
 }
 
 void DeleteSaveSlot(int slnum) {
 	char nametouse[260];
 	get_save_game_path(slnum, nametouse);
-	unlink(nametouse);
-	if ((slnum >= 1) && (slnum <= MAXSAVEGAMES)) {
-		char thisname[260];
-		for (int i = MAXSAVEGAMES; i > slnum; i--) {
-			get_save_game_path(i, thisname);
-			FILE *fin = fopen(thisname, "rb");
-			if (fin != NULL) {
-				fclose(fin);
-				// Rename the highest save game to fill in the gap
-				rename(thisname, nametouse);
-				break;
-			}
-		}
 
-	}
+	g_system->getSavefileManager()->removeSavefile(nametouse);
 }
 
 int Game_SetSaveGameDirectory(const char *newFolder) {
@@ -94,18 +87,13 @@ int Game_SetSaveGameDirectory(const char *newFolder) {
 	platform->ReplaceSpecialPaths(newFolder, newSaveGameDir);
 	fix_filename_slashes(newSaveGameDir);
 
-#ifdef LINUX_VERSION
-	mkdir(newSaveGameDir, 0);
-#else
-	mkdir(newSaveGameDir);
-#endif
-
 	put_backslash(newSaveGameDir);
 
 	char newFolderTempFile[260];
-	strcpy(newFolderTempFile, newSaveGameDir);
-	strcat(newFolderTempFile, "agstmp.tmp");
+	Common::strcpy_s(newFolderTempFile, newSaveGameDir);
+	Common::strcat_s(newFolderTempFile, "agstmp.tmp");
 
+#ifdef TODO
 	FILE *testTemp = fopen(newFolderTempFile, "wb");
 	if (testTemp == NULL) {
 		return 0;
@@ -115,7 +103,7 @@ int Game_SetSaveGameDirectory(const char *newFolder) {
 
 	// copy the Restart Game file, if applicable
 	char restartGamePath[260];
-	sprintf(restartGamePath, "%s""agssave.%d%s", saveGameDirectory, RESTART_POINT_SAVE_GAME_NUMBER, saveGameSuffix);
+	Common::sprintf_s(restartGamePath, "%s""agssave.%d%s", saveGameDirectory, RESTART_POINT_SAVE_GAME_NUMBER, saveGameSuffix);
 	FILE *restartGameFile = fopen(restartGamePath, "rb");
 	if (restartGameFile != NULL) {
 		long fileSize = filelength(fileno(restartGameFile));
@@ -123,14 +111,17 @@ int Game_SetSaveGameDirectory(const char *newFolder) {
 		fread(mbuffer, fileSize, 1, restartGameFile);
 		fclose(restartGameFile);
 
-		sprintf(restartGamePath, "%s""agssave.%d%s", newSaveGameDir, RESTART_POINT_SAVE_GAME_NUMBER, saveGameSuffix);
+		Common::sprintf_s(restartGamePath, "%s""agssave.%d%s", newSaveGameDir, RESTART_POINT_SAVE_GAME_NUMBER, saveGameSuffix);
 		restartGameFile = fopen(restartGamePath, "wb");
 		fwrite(mbuffer, fileSize, 1, restartGameFile);
 		fclose(restartGameFile);
 		free(mbuffer);
 	}
+#else
+	warning("TODO: Game_SetSaveDirectory");
+#endif
 
-	strcpy(saveGameDirectory, newSaveGameDir);
+	Common::strcpy_s(saveGameDirectory, newSaveGameDir);
 	return 1;
 }
 
@@ -138,7 +129,7 @@ int GetSaveSlotDescription(int slnum, char *desbuf) {
 	VALIDATE_STRING(desbuf);
 	if (load_game(slnum, desbuf, NULL) == 0)
 		return 1;
-	sprintf(desbuf, "INVALID SLOT %d", slnum);
+	Common::sprintf_s(desbuf, STD_BUFFER_SIZE, "INVALID SLOT %d", slnum);
 	return 0;
 }
 
@@ -191,40 +182,6 @@ int load_game_and_print_error(int toload) {
 	return ecret;
 }
 
-void restore_game_dialog() {
-	can_run_delayed_command();
-	if (thisroom.options[ST_SAVELOAD] == 1) {
-		DisplayMessage(983);
-		return;
-	}
-	if (inside_script) {
-		curscript->queue_action(ePSARestoreGameDialog, 0, "RestoreGameDialog");
-		return;
-	}
-	setup_for_dialog();
-	int toload = loadgamedialog();
-	restore_after_dialog();
-	if (toload >= 0) {
-		load_game_and_print_error(toload);
-	}
-}
-
-void save_game_dialog() {
-	if (thisroom.options[ST_SAVELOAD] == 1) {
-		DisplayMessage(983);
-		return;
-	}
-	if (inside_script) {
-		curscript->queue_action(ePSASaveGameDialog, 0, "SaveGameDialog");
-		return;
-	}
-	setup_for_dialog();
-	int toload = savegamedialog();
-	restore_after_dialog();
-	if (toload >= 0)
-		save_game(toload, buffer2);
-}
-
 void restart_game() {
 	can_run_delayed_command();
 	if (inside_script) {
@@ -241,13 +198,21 @@ void SetRestartPoint() {
 	save_game(RESTART_POINT_SAVE_GAME_NUMBER, "Restart Game Auto-Save");
 }
 
+
+int load_game(int slotn, char *descrp, int *wantShot) {
+	char nametouse[260];
+	get_save_game_path(slotn, nametouse);
+
+	return do_game_load(nametouse, slotn, descrp, wantShot);
+}
+
 void save_game(int slotn, const char *descript) {
 	// dont allow save in rep_exec_always, because we dont save
 	// the state of blocked scripts
 	can_run_delayed_command();
 
 	if (inside_script) {
-		strcpy(curscript->postScriptSaveSlotDescription[curscript->queue_action(ePSASaveGame, slotn, "SaveGameSlot")], descript);
+		Common::strcpy_s(curscript->postScriptSaveSlotDescription[curscript->queue_action(ePSASaveGame, slotn, "SaveGameSlot")], descript);
 		return;
 	}
 
@@ -260,10 +225,10 @@ void save_game(int slotn, const char *descript) {
 	char nametouse[260];
 	get_save_game_path(slotn, nametouse);
 
-	FILE *ooo = fopen(nametouse, "wb");
+	Common::OutSaveFile *ooo = g_system->getSavefileManager()->openForSaving(nametouse, false);
 	if (ooo == NULL)
 		quit("save_game: unable to open savegame file for writing");
-
+#ifdef TODO
 	// Initialize and write Vista header
 	RICH_GAME_MEDIA_HEADER vistaHeader;
 	memset(&vistaHeader, 0, sizeof(RICH_GAME_MEDIA_HEADER));
@@ -342,58 +307,52 @@ void save_game(int slotn, const char *descript) {
 
 	if (screenShot != NULL)
 		free(screenShot);
+#else
+	warning("TODO: save_game refactored to use engine saveGameStream");
+#endif
 
-	fclose(ooo);
+	ooo->finalize();
+	delete ooo;
 }
 
-int find_highest_room_entered() {
-	int qq, fndas = -1;
-	for (qq = 0; qq < MAX_ROOMS; qq++) {
-		if (roomstats[qq].beenhere != 0) fndas = qq;
-	}
-	// This is actually legal - they might start in room 400 and save
-	//if (fndas<0) quit("find_highest_room: been in no rooms?");
-	return fndas;
-}
-
-void serialize_bitmap(block thispic, FILE *ooo) {
+void serialize_bitmap(block thispic, Common::WriteStream *ooo) {
 	if (thispic != NULL) {
 		putw(thispic->w, ooo);
 		putw(thispic->h, ooo);
 		putw(bitmap_color_depth(thispic), ooo);
 		for (int cc = 0; cc < thispic->h; cc++)
-			fwrite(&thispic->line[cc][0], thispic->w, bitmap_color_depth(thispic) / 8, ooo);
+			ooo->write(&thispic->line[cc][0], thispic->w * bitmap_color_depth(thispic) / 8);
 	}
 }
 
-long write_screen_shot_for_vista(FILE *ooo, block screenshot) {
+long write_screen_shot_for_vista(Common::WriteStream *ooo, block screenshot) {
 	long fileSize = 0;
 	char tempFileName[MAX_PATH];
-	sprintf(tempFileName, "%s""_tmpscht.bmp", saveGameDirectory);
+	Common::sprintf_s(tempFileName, "%s""_tmpscht.bmp", saveGameDirectory);
 
 	save_bitmap(tempFileName, screenshot, palette);
 
 	update_polled_stuff();
 
-	if (exists(tempFileName))
-	{
-		fileSize = file_size(tempFileName);
+	Common::InSaveFile *input;
+	if ((input = g_system->getSavefileManager()->openForLoading(tempFileName)) != nullptr) {
+		fileSize = input->size();
 		char *buffer = (char *)malloc(fileSize);
 
-		FILE *input = fopen(tempFileName, "rb");
-		fread(buffer, fileSize, 1, input);
-		fclose(input);
-		unlink(tempFileName);
+		input->read(buffer, fileSize);
+		delete input;
+		g_system->getSavefileManager()->removeSavefile(tempFileName);
 
-		fwrite(buffer, fileSize, 1, ooo);
+		ooo->write(buffer, fileSize);
 		free(buffer);
 	}
+
 	return fileSize;
 }
 
 // Write the save game position to the file
-void save_game_data(FILE *ooo, block screenshot) {
-	int bb, cc, dd;
+void save_game_data(Common::WriteStream *ooo, block screenshot) {
+	int bb, cc, dd, ff;
 
 	platform->RunPluginHooks(AGSE_PRESAVEGAME, 0);
 
@@ -418,7 +377,7 @@ void save_game_data(FILE *ooo, block screenshot) {
 	for (bb = 1; bb < spriteset.elements; bb++) {
 		if (game.spriteflags[bb] & SPF_DYNAMICALLOC) {
 			putw(bb, ooo);
-			fputc(game.spriteflags[bb], ooo);
+			ooo->writeByte(game.spriteflags[bb]);
 			serialize_bitmap(spriteset[bb], ooo);
 		}
 	}
@@ -429,17 +388,20 @@ void save_game_data(FILE *ooo, block screenshot) {
 	int gdatasize = gameinst->globaldatasize;
 	putw(gdatasize, ooo);
 	ccFlattenGlobalData(gameinst);
+
 	// MACPORT FIX: just in case gdatasize is 2 or 4, don't want to swap endian
-	fwrite(&gameinst->globaldata[0], 1, gdatasize, ooo);
+	ooo->write(&gameinst->globaldata[0], gdatasize);
 	ccUnFlattenGlobalData(gameinst);
+
 	// write the script modules data segments
 	putw(numScriptModules, ooo);
+
 	for (bb = 0; bb < numScriptModules; bb++) {
 		int glsize = moduleInst[bb]->globaldatasize;
 		putw(glsize, ooo);
 		if (glsize > 0) {
 			ccFlattenGlobalData(moduleInst[bb]);
-			fwrite(&moduleInst[bb]->globaldata[0], 1, glsize, ooo);
+			ooo->write(&moduleInst[bb]->globaldata[0], glsize);
 			ccUnFlattenGlobalData(moduleInst[bb]);
 		}
 	}
@@ -460,12 +422,14 @@ void save_game_data(FILE *ooo, block screenshot) {
 	// write the room state for all the rooms the player has been in
 	for (bb = 0; bb < MAX_ROOMS; bb++) {
 		if (roomstats[bb].beenhere) {
-			fputc(1, ooo);
-			fwrite(&roomstats[bb], sizeof(RoomStatus), 1, ooo);
+			ooo->writeByte(1);
+			roomstats[bb].save(ooo);
+
 			if (roomstats[bb].tsdatasize > 0)
-				fwrite(&roomstats[bb].tsdata[0], 1, roomstats[bb].tsdatasize, ooo);
-		} else
-			fputc(0, ooo);
+				ooo->write(&roomstats[bb].tsdata[0], roomstats[bb].tsdatasize);
+		} else {
+			ooo->writeByte(0);
+		}
 	}
 
 	update_polled_stuff();
@@ -475,36 +439,47 @@ void save_game_data(FILE *ooo, block screenshot) {
 			play.cur_music_number = -1;
 	}
 
-	fwrite(&play, sizeof(GameState), 1, ooo);
+	play.save(ooo);
 
 	for (bb = 0; bb < play.num_do_once_tokens; bb++)
-	{
 		fputstring(play.do_once_tokens[bb], ooo);
+	for (bb = 0; bb < game.numgui; ++bb)
+		ooo->writeSint32LE(play.gui_draw_order[bb]);
+	for (bb = 0; bb < game.numcharacters + MAX_INIT_SPR + 1; ++bb)
+		mls[bb].save(ooo);
+
+	game.save(ooo);
+	for (bb = 0; bb < game.numinvitems; ++bb)
+		game.invinfo[bb].save(ooo);
+	for (bb = 0; bb < game.numcursors; ++bb)
+		game.mcurs[bb].save(ooo);
+
+	if (game.invScripts == NULL) {
+		for (bb = 0; bb < game.numinvitems; bb++) {
+			for (cc = 0; cc < MAX_NEWINTERACTION_EVENTS; ++cc)
+				ooo->writeSint32LE(game.intrInv[bb]->timesRun[cc]);
+		}
+		for (bb = 0; bb < game.numcharacters; bb++) {
+			for (cc = 0; cc < MAX_NEWINTERACTION_EVENTS; ++cc)
+				ooo->writeSint32LE(game.intrChar[bb]->timesRun[cc]);
+		}
 	}
-	fwrite(&play.gui_draw_order[0], sizeof(int), game.numgui, ooo);
 
-	fwrite(&mls[0], sizeof(MoveList), game.numcharacters + MAX_INIT_SPR + 1, ooo);
+	for (bb = 0; bb < OPT_HIGHESTOPTION + 1; ++bb)
+		ooo->writeSint32LE(game.options[bb]);
+	ooo->writeSint32LE(game.options[OPT_LIPSYNCTEXT]);
+	for (bb = 0; bb < game.numcharacters; ++bb)
+		game.chars[bb].save(ooo);
+	for (bb = 0; bb < game.numcharacters; ++bb)
+		charextra[bb].save(ooo);
+	for (bb = 0; bb < 256; ++bb)
+		palette[bb].writeToFile(ooo);
 
-	fwrite(&game, sizeof(GameSetupStructBase), 1, ooo);
-	fwrite(&game.invinfo[0], sizeof(InventoryItemInfo), game.numinvitems, ooo);
-	fwrite(&game.mcurs[0], sizeof(MouseCursor), game.numcursors, ooo);
-
-	if (game.invScripts == NULL)
-	{
-		for (bb = 0; bb < game.numinvitems; bb++)
-			fwrite(&game.intrInv[bb]->timesRun[0], sizeof(int), MAX_NEWINTERACTION_EVENTS, ooo);
-		for (bb = 0; bb < game.numcharacters; bb++)
-			fwrite(&game.intrChar[bb]->timesRun[0], sizeof(int), MAX_NEWINTERACTION_EVENTS, ooo);
+	for (bb = 0; bb < game.numdialog; ++bb) {
+		for (cc = 0; cc < MAXTOPICOPTIONS; ++cc)
+			ooo->writeSint32LE(dialog[bb].optionflags[cc]);
 	}
 
-	fwrite(&game.options[0], sizeof(int), OPT_HIGHESTOPTION + 1, ooo);
-	fputc(game.options[OPT_LIPSYNCTEXT], ooo);
-
-	fwrite(&game.chars[0], sizeof(CharacterInfo), game.numcharacters, ooo);
-	fwrite(&charextra[0], sizeof(CharacterExtras), game.numcharacters, ooo);
-	fwrite(&palette[0], sizeof(color), 256, ooo);
-	for (bb = 0; bb < game.numdialog; bb++)
-		fwrite(&dialog[bb].optionflags[0], sizeof(int), MAXTOPICOPTIONS, ooo);
 	putw(mouse_on_iface, ooo);
 	putw(mouse_on_iface_button, ooo);
 	putw(mouse_pushed_iface, ooo);
@@ -513,33 +488,39 @@ void save_game_data(FILE *ooo, block screenshot) {
 	//putw(mi.trk,ooo);
 	write_gui(ooo, guis, &game);
 	putw(numAnimButs, ooo);
-	fwrite(&animbuts[0], sizeof(AnimatingGUIButton), numAnimButs, ooo);
+
+	for (bb = 0; bb < numAnimButs; ++bb)
+		animbuts[bb].save(ooo);
 
 	putw(game.audioClipTypeCount, ooo);
-	fwrite(&game.audioClipTypes[0], sizeof(AudioClipType), game.audioClipTypeCount, ooo);
+	for (bb = 0; bb < game.audioClipTypeCount; ++bb)
+		game.audioClipTypes[bb].save(ooo);
 
-	fwrite(&thisroom.regionLightLevel[0], sizeof(short), MAX_REGIONS, ooo);
-	fwrite(&thisroom.regionTintLevel[0], sizeof(int), MAX_REGIONS, ooo);
-	fwrite(&thisroom.walk_area_zoom[0], sizeof(short), MAX_WALK_AREAS + 1, ooo);
-	fwrite(&thisroom.walk_area_zoom2[0], sizeof(short), MAX_WALK_AREAS + 1, ooo);
+	for (bb = 0; bb < MAX_REGIONS; ++bb)
+		ooo->writeSint16LE(thisroom.regionLightLevel[bb]);
+	for (bb = 0; bb < MAX_REGIONS; ++bb)
+		ooo->writeSint32LE(thisroom.regionTintLevel[bb]);
+	for (bb = 0; bb < MAX_WALK_AREAS + 1; ++bb)
+		ooo->writeSint16LE(thisroom.walk_area_zoom[bb]);
+	for (bb = 0; bb < MAX_WALK_AREAS + 1; ++bb)
+		ooo->writeSint16LE(thisroom.walk_area_zoom[bb]);
 
-	fwrite(&ambient[0], sizeof(AmbientSound), MAX_SOUND_CHANNELS, ooo);
+	for (bb = 0; bb < MAX_SOUND_CHANNELS; ++bb)
+		ambient[bb].save(ooo);
+
 	putw(numscreenover, ooo);
-	fwrite(&screenover[0], sizeof(ScreenOverlay), numscreenover, ooo);
-	for (bb = 0; bb < numscreenover; bb++) {
+	for (bb = 0; bb < numscreenover; ++bb)
+		screenover[bb].save(ooo);
+	for (bb = 0; bb < numscreenover; bb++)
 		serialize_bitmap(screenover[bb].pic, ooo);
-	}
 
 	update_polled_stuff();
 
-	for (bb = 0; bb < MAX_DYNAMIC_SURFACES; bb++)
-	{
-		if (dynamicallyCreatedSurfaces[bb] == NULL)
-		{
-			fputc(0, ooo);
-		} else
-		{
-			fputc(1, ooo);
+	for (bb = 0; bb < MAX_DYNAMIC_SURFACES; bb++) {
+		if (dynamicallyCreatedSurfaces[bb] == NULL) {
+			ooo->writeByte(0);
+		} else {
+			ooo->writeByte(1);
 			serialize_bitmap(dynamicallyCreatedSurfaces[bb], ooo);
 		}
 	}
@@ -547,7 +528,6 @@ void save_game_data(FILE *ooo, block screenshot) {
 	update_polled_stuff();
 
 	if (displayed_room >= 0) {
-
 		for (bb = 0; bb < MAX_BSCENE; bb++) {
 			if (play.raw_modified[bb])
 				serialize_bitmap(thisroom.ebscene[bb], ooo);
@@ -558,14 +538,14 @@ void save_game_data(FILE *ooo, block screenshot) {
 			serialize_bitmap(raw_saved_screen, ooo);
 
 		// save the current troom, in case they save in room 600 or whatever
-		fwrite(&troom, sizeof(RoomStatus), 1, ooo);
+		troom.save(ooo);
 		if (troom.tsdatasize > 0)
-			fwrite(&troom.tsdata[0], troom.tsdatasize, 1, ooo);
-
+			ooo->write(&troom.tsdata[0], troom.tsdatasize);
 	}
 
 	putw(numGlobalVars, ooo);
-	fwrite(&globalvars[0], sizeof(InteractionVariable), numGlobalVars, ooo);
+	for (bb = 0; bb < numGlobalVars; ++bb)
+		globalvars[bb].save(ooo);
 
 	putw(game.numviews, ooo);
 	for (bb = 0; bb < game.numviews; bb++) {
@@ -580,8 +560,7 @@ void save_game_data(FILE *ooo, block screenshot) {
 	putw(MAGICNUMBER + 1, ooo);
 
 	putw(game.audioClipCount, ooo);
-	for (bb = 0; bb <= MAX_SOUND_CHANNELS; bb++)
-	{
+	for (bb = 0; bb <= MAX_SOUND_CHANNELS; bb++) {
 		if ((channels[bb] != NULL) && (channels[bb]->done == 0) && (channels[bb]->sourceClip != NULL))
 		{
 			putw(((ScriptAudioClip *)channels[bb]->sourceClip)->id, ooo);
@@ -592,11 +571,11 @@ void save_game_data(FILE *ooo, block screenshot) {
 			putw(channels[bb]->panning, ooo);
 			putw(channels[bb]->volAsPercentage, ooo);
 			putw(channels[bb]->panningAsPercentage, ooo);
-		} else
-		{
-			putw(-1, ooo);
+		} else {
+			ooo->writeSint32LE(-1);
 		}
 	}
+
 	putw(crossFading, ooo);
 	putw(crossFadeVolumePerStep, ooo);
 	putw(crossFadeStep, ooo);
@@ -652,6 +631,189 @@ void convert_guid_from_text_to_binary(const char *guidText, unsigned char *buffe
 	temp = buffer[1]; buffer[1] = buffer[2]; buffer[2] = temp;
 	temp = buffer[4]; buffer[4] = buffer[5]; buffer[5] = temp;
 	temp = buffer[6]; buffer[6] = buffer[7]; buffer[7] = temp;
+}
+
+void restore_game_dialog() {
+	can_run_delayed_command();
+	if (thisroom.options[ST_SAVELOAD] == 1) {
+		DisplayMessage(983);
+		return;
+	}
+	if (inside_script) {
+		curscript->queue_action(ePSARestoreGameDialog, 0, "RestoreGameDialog");
+		return;
+	}
+	setup_for_dialog();
+	int toload = loadgamedialog();
+	restore_after_dialog();
+	if (toload >= 0) {
+		load_game_and_print_error(toload);
+	}
+}
+
+void save_game_dialog() {
+	if (thisroom.options[ST_SAVELOAD] == 1) {
+		DisplayMessage(983);
+		return;
+	}
+	if (inside_script) {
+		curscript->queue_action(ePSASaveGameDialog, 0, "SaveGameDialog");
+		return;
+	}
+	setup_for_dialog();
+	int toload = savegamedialog();
+	restore_after_dialog();
+	if (toload >= 0)
+		save_game(toload, buffer2);
+}
+
+
+void save_room_data_segment() {
+	if (croom->tsdatasize > 0)
+		free(croom->tsdata);
+	croom->tsdata = NULL;
+	croom->tsdatasize = roominst->globaldatasize;
+	if (croom->tsdatasize > 0) {
+		croom->tsdata = (char *)malloc(croom->tsdatasize + 10);
+		ccFlattenGlobalData(roominst);
+		memcpy(croom->tsdata, &roominst->globaldata[0], croom->tsdatasize);
+		ccUnFlattenGlobalData(roominst);
+	}
+
+}
+
+void unload_old_room() {
+	int ff;
+
+	// if switching games on restore, don't do this
+	if (displayed_room < 0)
+		return;
+
+	platform->WriteDebugString("Unloading room %d", displayed_room);
+
+	current_fade_out_effect();
+
+	clear(abuf);
+	for (ff = 0; ff < croom->numobj; ff++)
+		objs[ff].moving = 0;
+
+	if (!play.ambient_sounds_persist) {
+		for (ff = 1; ff < MAX_SOUND_CHANNELS; ff++)
+			StopAmbientSound(ff);
+	}
+
+	cancel_all_scripts();
+	numevents = 0;  // cancel any pending room events
+
+	if (roomBackgroundBmp != NULL)
+	{
+		gfxDriver->DestroyDDB(roomBackgroundBmp);
+		roomBackgroundBmp = NULL;
+	}
+
+	if (croom == NULL);
+	else if (roominst != NULL) {
+		save_room_data_segment();
+		ccFreeInstance(roominstFork);
+		ccFreeInstance(roominst);
+		roominstFork = NULL;
+		roominst = NULL;
+	} else croom->tsdatasize = 0;
+	memset(&play.walkable_areas_on[0], 1, MAX_WALK_AREAS + 1);
+	play.bg_frame = 0;
+	play.bg_frame_locked = 0;
+	play.offsets_locked = 0;
+	remove_screen_overlay(-1);
+	if (raw_saved_screen != NULL) {
+		wfreeblock(raw_saved_screen);
+		raw_saved_screen = NULL;
+	}
+	for (ff = 0; ff < MAX_BSCENE; ff++)
+		play.raw_modified[ff] = 0;
+	for (ff = 0; ff < thisroom.numLocalVars; ff++)
+		croom->interactionVariableValues[ff] = thisroom.localvars[ff].value;
+
+	// wipe the character cache when we change rooms
+	for (ff = 0; ff < game.numcharacters; ff++) {
+		if (charcache[ff].inUse) {
+			destroy_bitmap(charcache[ff].image);
+			charcache[ff].image = NULL;
+			charcache[ff].inUse = 0;
+		}
+		// ensure that any half-moves (eg. with scaled movement) are stopped
+		charextra[ff].xwas = INVALID_X;
+	}
+
+	play.swap_portrait_lastchar = -1;
+
+	for (ff = 0; ff < croom->numobj; ff++) {
+		// un-export the object's script object
+		if (objectScriptObjNames[ff][0] == 0)
+			continue;
+
+		ccRemoveExternalSymbol(objectScriptObjNames[ff]);
+	}
+
+	for (ff = 0; ff < MAX_HOTSPOTS; ff++) {
+		if (thisroom.hotspotScriptNames[ff][0] == 0)
+			continue;
+
+		ccRemoveExternalSymbol(thisroom.hotspotScriptNames[ff]);
+	}
+
+	// clear the object cache
+	for (ff = 0; ff < MAX_INIT_SPR; ff++) {
+		if (objcache[ff].image != NULL) {
+			destroy_bitmap(objcache[ff].image);
+			objcache[ff].image = NULL;
+		}
+	}
+	// clear the actsps buffers to save memory, since the
+	// objects/characters involved probably aren't on the
+	// new screen. this also ensures all cached data is flushed
+	for (ff = 0; ff < MAX_INIT_SPR + game.numcharacters; ff++) {
+		if (actsps[ff] != NULL)
+			destroy_bitmap(actsps[ff]);
+		actsps[ff] = NULL;
+
+		if (actspsbmp[ff] != NULL)
+			gfxDriver->DestroyDDB(actspsbmp[ff]);
+		actspsbmp[ff] = NULL;
+
+		if (actspswb[ff] != NULL)
+			destroy_bitmap(actspswb[ff]);
+		actspswb[ff] = NULL;
+
+		if (actspswbbmp[ff] != NULL)
+			gfxDriver->DestroyDDB(actspswbbmp[ff]);
+		actspswbbmp[ff] = NULL;
+
+		actspswbcache[ff].valid = 0;
+	}
+
+	// if Hide Player Character was ticked, restore it to visible
+	if (play.temporarily_turned_off_character >= 0) {
+		game.chars[play.temporarily_turned_off_character].on = 1;
+		play.temporarily_turned_off_character = -1;
+	}
+}
+
+int LoadImageFile(const char *filename) {
+	char loadFromPath[MAX_PATH];
+	get_current_dir_path(loadFromPath, filename);
+
+	block loadedFile = load_bitmap(loadFromPath, NULL);
+
+	if (loadedFile == NULL)
+		return 0;
+
+	int gotSlot = spriteset.findFreeSlot();
+	if (gotSlot <= 0)
+		return 0;
+
+	add_dynamic_sprite(gotSlot, gfxDriver->ConvertBitmapToSupportedColourDepth(loadedFile));
+
+	return gotSlot;
 }
 
 } // namespace AGS2

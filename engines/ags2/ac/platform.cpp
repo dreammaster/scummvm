@@ -39,6 +39,8 @@ inline void *GetProcAddress(void *handle, const char *method) {
 	error("Any plugins needed for AGS2 games need to be disassembled");
 }
 
+/*------------------------------------------------------------------*/
+
 // ******** DEFAULT IMPLEMENTATIONS *******
 
 int  AGSPlatformDriver::RunPluginDebugHooks(const char *scriptfile, int linenum) {

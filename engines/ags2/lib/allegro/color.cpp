@@ -41,18 +41,11 @@ int _rgb_r_shift_32, _rgb_g_shift_32, _rgb_b_shift_32,
 _rgb_a_shift_32;
 int _places_r, _places_g;
 
-void color::readFromFile(Common::ReadStream *file) {
-	r = file->readByte();
-	g = file->readByte();
-	b = file->readByte();
-	filler = file->readByte();
-}
-
-void color::writeToFile(Common::WriteStream *file) const {
-	file->writeByte(r);
-	file->writeByte(g);
-	file->writeByte(b);
-	file->writeByte(filler);
+void color::synchronize(Common::Serializer &s) {
+	s.syncAsByte(r);
+	s.syncAsByte(g);
+	s.syncAsByte(b);
+	s.syncAsByte(filler);
 }
 
 static void convertPalette(const PALETTE src, byte dest[Graphics::PALETTE_SIZE]) {

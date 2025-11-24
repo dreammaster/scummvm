@@ -34,7 +34,7 @@ struct GUIInv : public GUIObject {
 
 	int itemsPerLine, numLines;  // not persisted
 
-	virtual void WriteToFile(Common::WriteStream *ooo) override {
+	void WriteToFile(Common::WriteStream *ooo) override {
 		GUIObject::WriteToFile(ooo);
 		putw(charId, ooo);
 		putw(itemWidth, ooo);
@@ -42,7 +42,7 @@ struct GUIInv : public GUIObject {
 		putw(topIndex, ooo);
 	}
 
-	virtual void ReadFromFile(Common::SeekableReadStream *ooo, int version) override {
+	void ReadFromFile(Common::SeekableReadStream *ooo, int version) {
 		GUIObject::ReadFromFile(ooo, version);
 		if (version >= 109) {
 			charId = getw(ooo);

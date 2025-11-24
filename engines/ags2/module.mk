@@ -17,6 +17,7 @@ MODULE_OBJS = \
 	ac/platform_scummvm.o \
 	ac/resolution.o \
 	ac/room.o \
+	ac/savegame.o \
 	ac/scripts.o \
 	ac/sound.o \
 	ac/timer.o \
@@ -43,6 +44,16 @@ MODULE_OBJS = \
 	common/routefnd.o \
 	common/text.o \
 	common/wgt2allg.o \
+	data/animating_gui_button.o \
+	data/character_info.o \
+	data/game_setup_struct_base.o \
+	data/game_state.o \
+	data/inventory_item_info.o \
+	data/mouse_cursor.o \
+	data/queued_audio_item.o \
+	data/screen_overlay.o \
+	data/sound.o \
+	data/words_dictionary.o \
 	gfx/sprite.o \
 	gfx/sprite_cache.o \
 	lib/aastr-0.1.1/aarot.o \

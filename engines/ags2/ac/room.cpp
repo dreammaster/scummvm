@@ -28,7 +28,6 @@
 namespace AGS2 {
 
 const char *game_file_sig = "Adventure Creator Game File v2";
-#define GAME_FILE_VERSION 42
 block backups[5];
 
 int in_interaction_editor = 0;
@@ -81,35 +80,6 @@ int CustomProperties::UnSerialize(Common::SeekableReadStream *infrom) {
 		fgetstring_limit(propVal[ee], infrom, MAX_CUSTOM_PROPERTY_VALUE_LENGTH);
 	}
 	return 0;
-}
-
-void WordsDictionary::sort() {
-	int aa, bb;
-	for (aa = 0; aa < num_words; aa++) {
-		for (bb = aa + 1; bb < num_words; bb++) {
-			if (((wordnum[aa] == wordnum[bb]) && (scumm_stricmp(word[aa], word[bb]) > 0))
-				|| (wordnum[aa] > wordnum[bb])) {
-				short temp = wordnum[aa];
-				char tempst[30];
-
-				wordnum[aa] = wordnum[bb];
-				wordnum[bb] = temp;
-				Common::strcpy_s(tempst, word[aa]);
-				Common::strcpy_s(word[aa], STD_BUFFER_SIZE, word[bb]);
-				Common::strcpy_s(word[bb], STD_BUFFER_SIZE, tempst);
-				bb = aa;
-			}
-		}
-	}
-}
-
-int WordsDictionary::find_index(const char *wrem) {
-	int aa;
-	for (aa = 0; aa < num_words; aa++) {
-		if (scumm_stricmp(wrem, word[aa]) == 0)
-			return aa;
-	}
-	return -1;
 }
 
 // {name, flags, numArgs, {argTypes}, {argNames}, description, textscript}
@@ -272,8 +242,6 @@ ActionTypes actions[NUM_ACTION_TYPES] = {
 	  "Performs child actions if the player has been to room $$1 during the game.",
 	  "if (HasPlayerBeenInRoom($$1)) {"}
 };
-InteractionVariable globalvars[MAX_GLOBAL_VARIABLES] = { {"Global 1", 0, 0} };
-int numGlobalVars = 1;
 
 void serialize_command_list(NewInteractionCommandList *nicl, Common::WriteStream *ooo) {
 	if (nicl == NULL)
@@ -810,7 +778,7 @@ void load_main_block(roomstruct *rstruc, char *files, Common::SeekableReadStream
 			rstruc->localvars = (InteractionVariable *)malloc(sizeof(InteractionVariable) * rstruc->numLocalVars);
 
 			for (i = 0; i < rstruc->numLocalVars; ++i) {
-				rstruc->localvars[i].ReadFromFile(opty);
+				rstruc->localvars[i].load(opty);
 			}
 		}
 	}
@@ -1533,6 +1501,110 @@ void new_room(int newnum, CharacterInfo *forchar) {
 	update_polled_stuff();
 
 	load_new_room(newnum, forchar);
+}
+
+/*------------------------------------------------------------------*/
+
+void RoomStatus::synchronize(Common::Serializer &s) {
+	int i;
+
+	s.syncAsSint32LE(beenhere);
+	s.syncAsSint32LE(numobj);
+
+	for (i = 0; i < MAX_INIT_SPR; ++i)
+		obj[i].synchronize(s);
+
+	for (i = 0; i < MAX_FLAGS; ++i)
+		s.syncAsSint16LE(flagstates[i]);
+	s.syncAsSint32LE(tsdatasize);
+
+	s.skip(4);		// tsdata
+
+	for (i = 0; i < MAX_HOTSPOTS; ++i)
+		intrHotspot[i].synchronize(s);
+	for (i = 0; i < MAX_INIT_SPR; ++i)
+		intrObject[i].synchronize(s);
+	for (i = 0; i < MAX_REGIONS; ++i)
+		intrRegion[i].synchronize(s);
+	intrRoom.synchronize(s);
+
+	s.syncBytes((byte *)hotspot_enabled, MAX_HOTSPOTS);
+	s.syncBytes((byte *)region_enabled, MAX_REGIONS);
+	for (i = 0; i < MAX_OBJ; ++i)
+		s.syncAsSint16LE(walkbehind_base[i]);
+	for (i = 0; i < MAX_GLOBAL_VARIABLES; ++i)
+		s.syncAsSint32LE(interactionVariableValues[i]);
+}
+
+/*------------------------------------------------------------------*/
+
+int RoomObject::get_width() const {
+	if (last_width == 0)
+		return spritewidth[num];
+	return last_width;
+}
+
+int RoomObject::get_height() const {
+	if (last_height == 0)
+		return spriteheight[num];
+	return last_height;
+}
+
+int RoomObject::get_baseline() const {
+	if (baseline < 1)
+		return y;
+	return baseline;
+}
+
+void RoomObject::synchronize(Common::Serializer &s) {
+	s.syncAsSint32LE(x);
+	s.syncAsSint32LE(y);
+	s.syncAsSint32LE(transparent);
+	s.syncAsSint16LE(tint_r);
+	s.syncAsSint16LE(tint_g);
+	s.syncAsSint16LE(tint_b);
+	s.syncAsSint16LE(tint_level);
+	s.syncAsSint16LE(tint_light);
+	s.syncAsSint16LE(last_zoom);
+	s.syncAsSint16LE(last_width);
+	s.syncAsSint16LE(last_height);
+	s.syncAsSint16LE(num);
+	s.syncAsSint16LE(baseline);
+	s.syncAsSint16LE(view);
+	s.syncAsSint16LE(loop);
+	s.syncAsSint16LE(frame);
+	s.syncAsSint16LE(wait);
+	s.syncAsSint16LE(moving);
+	s.syncAsByte(cycling);
+	s.syncAsSint16LE(overall_speed);
+	s.syncAsSint16LE(on);
+	s.syncAsSint16LE(flags);
+	s.syncAsSint16LE(blocking_width);
+	s.syncAsSint16LE(blocking_height);
+}
+
+/*------------------------------------------------------------------*/
+
+void MoveList::synchronize(Common::Serializer &s) {
+	int i;
+
+	for (i = 0; i < MAXNEEDSTAGES; ++i)
+		s.syncAsSint32LE(pos[i]);
+	s.syncAsSint32LE(numstage);
+
+	for (i = 0; i < MAXNEEDSTAGES; ++i)
+		s.syncAsSint32LE(xpermove[i]);
+	for (i = 0; i < MAXNEEDSTAGES; ++i)
+		s.syncAsSint32LE(ypermove[i]);
+
+	s.syncAsSint32LE(fromx);
+	s.syncAsSint32LE(fromy);
+	s.syncAsSint32LE(onstage);
+	s.syncAsSint32LE(onpart);
+	s.syncAsSint32LE(lastx);
+	s.syncAsSint32LE(lasty);
+	s.syncAsByte(doneflag);
+	s.syncAsByte(direct);
 }
 
 } // namespace AGS2

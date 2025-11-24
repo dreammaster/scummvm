@@ -48,12 +48,9 @@ struct GUIButton : public GUIObject {
 	int textAlignment, reserved1;
 
 	void WriteToFile(Common::WriteStream *ooo) override;
-	void ReadFromFile(Common::SeekableReadStream *ooo, int) override;
+	void ReadFromFile(Common::SeekableReadStream *ooo, int);
 	void Draw();
 	void MouseUp();
-
-	void MouseMove(int nx, int ny) override {
-	}
 
 	void MouseOver() override {
 		if (ispushed)
@@ -102,14 +99,6 @@ struct GUIButton : public GUIObject {
 	GUIButton() {
 		reset();
 	}
-};
-
-struct AnimatingGUIButton {
-	// index into guibuts array, GUI, button
-	short buttonid, ongui, onguibut;
-	// current animation status
-	short view, loop, frame;
-	short speed, repeat, wait;
 };
 
 extern void Button_Animate(GUIButton *butt, int view, int loop, int speed, int repeat);

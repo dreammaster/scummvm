@@ -61,21 +61,20 @@ struct GUIObject {
 	char scriptName[MAX_GUIOBJ_SCRIPTNAME_LEN + 1];
 	char eventHandlers[MAX_GUIOBJ_EVENTS][MAX_GUIOBJ_EVENTHANDLER_LEN + 1];
 
-	virtual void MouseMove(int nx, int ny) = 0; // x,y relative to gui
-	virtual void MouseOver() = 0; // mouse moves onto object
-	virtual void MouseLeave() = 0;        // mouse moves off object
-	virtual int  MouseDown() { // button down - return 1 to lock focus
+	virtual void MouseMove(int nx, int ny) {}	// x,y relative to gui
+	virtual void MouseOver() {}			// mouse moves onto object
+	virtual void MouseLeave() {}        // mouse moves off object
+	virtual int  MouseDown() {
+		// button down - return 1 to lock focus
 		return 0;
 	}
-	virtual void MouseUp() = 0;   // button up
-	virtual void KeyPress(int) = 0;
+	virtual void MouseUp() {}			// button up
+	virtual void KeyPress(int) {}
 	virtual void Draw() = 0;
-	// overridable routine to determine whether the mouse is over
-	// the control
-	virtual int  IsOverControl(int p_x, int p_y, int p_extra) {
-		if ((p_x >= x) && (p_y >= y) && (p_x < x + wid + p_extra) && (p_y < y + hit + p_extra))
-			return 1;
-		return 0;
+
+	// overridable routine to determine whether the mouse is over the control
+	virtual int IsOverControl(int p_x, int p_y, int p_extra) {
+		return ((p_x >= x) && (p_y >= y) && (p_x < x + wid + p_extra) && (p_y < y + hit + p_extra)) ? 1 : 0;
 	}
 	// we can't just fread/fwrite inherited objects because of vtbl, so use:
 	virtual void WriteToFile(Common::WriteStream *ooo);

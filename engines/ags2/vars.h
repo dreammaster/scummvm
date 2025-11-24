@@ -35,6 +35,10 @@
 #include "ags2/ac/gui/gui_object.h"
 #include "ags2/common/dynamic_array.h"
 #include "ags2/common/mouse32.h"
+#include "ags2/data/animating_gui_button.h"
+#include "ags2/data/game_state.h"
+#include "ags2/data/game_setup_struct.h"
+#include "ags2/data/screen_overlay.h"
 #include "ags2/gfx/sprite_cache.h"
 #include "ags2/console.h"
 
@@ -52,6 +56,7 @@ extern GameSetupStruct game;
 extern GameState play;
 extern GameSetup usetup;
 extern RoomStatus troom;
+extern roomstruct thisroom;
 extern BITMAP *screen;
 extern BITMAP *virtual_screen;
 extern char *game_file_name;
@@ -65,6 +70,9 @@ extern SOUNDCLIP *channels[MAX_SOUND_CHANNELS + 1];
 extern SOUNDCLIP *cachedQueuedMusic;
 extern int numSoundChannels;
 extern CharacterCache *charcache;
+extern CharacterExtras *charextra;
+extern RoomObject *objs;
+extern CharacterInfo *playerchar;
 extern int displayed_room;
 extern int use_cd_player;
 extern int scrnwid, scrnhit;
@@ -75,6 +83,7 @@ extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 extern char lines[MAXLINE][200];
 extern int numlines;
 extern ObjectCache objcache[MAX_INIT_SPR];
+extern int cur_mode, cur_cursor;
 extern long _sc_PlayerCharPtr;
 
 extern SpriteCache spriteset;
@@ -83,6 +92,7 @@ extern char saveGameDirectory[260];
 extern char replayfile[MAX_PATH];
 extern const char *sgnametemplate;
 extern char saveGameSuffix[MAX_SG_EXT_LENGTH + 1];
+extern int last_sound_played[MAX_SOUND_CHANNELS + 1];
 extern int current_screen_resolution_multiplier_x, current_screen_resolution_multiplier_y;
 extern int current_screen_resolution_multiplier;
 
@@ -166,6 +176,7 @@ extern char alpha_blend_cursor;
 extern int engineNeedsAsInt;
 extern char rbuffer[200];
 extern uint32 lastTime;
+extern int turnlooporder[8];
 
 // ac/audio.cpp
 extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
@@ -222,6 +233,8 @@ extern int crovr_id;		// Whether using SetTextOverlay or CreateTextOvelay
 
 // ac/room.cpp
 extern int in_new_room;
+extern InteractionVariable globalvars[MAX_GLOBAL_VARIABLES];
+extern int numGlobalVars;
 
 // ac/savegame.cpp
 extern unsigned int load_new_game;
@@ -358,6 +371,7 @@ extern int said_speech_line;
 extern int said_speech_line;
 extern int crossFading, crossFadeVolumePerStep, crossFadeStep;
 extern int crossFadeVolumeAtStart;
+extern AmbientSound ambient[MAX_SOUND_CHANNELS + 1];  // + 1 just for safety on array iterations
 
 // ac/walkbehind.cpp
 extern char *walkBehindExists;  // whether a WB area is in this column

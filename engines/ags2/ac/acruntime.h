@@ -30,6 +30,7 @@
 #include "ags2/ac/events.h"
 #include "ags2/ac/inventory.h"
 #include "ags2/ac/overlay.h"
+#include "ags2/ac/platform.h"
 #include "ags2/ac/resolution.h"
 #include "ags2/ac/room.h"
 #include "ags2/ac/run.h"
@@ -46,6 +47,7 @@
 #include "ags2/common/mouse32.h"
 #include "ags2/common/tree_map.h"
 #include "ags2/common/dynamic_array.h"
+#include "ags2/data/sound.h"
 #include "ags2/lib/winalleg.h"
 #include "ags2/lib/aastr-0.1.1/aastr.h"
 #include "ags2/lib/allegro/digi.h"
@@ -58,6 +60,8 @@ namespace AGS2 {
 
 #define MAX_TOPIC_HISTORY 50
 #define DLG_OPTION_PARSER 99
+
+#define ACI_VERSION_TEXT "ScummVM AGS2"
 
 enum {
 	DBG_NOIFACE			=     1,
@@ -72,10 +76,6 @@ enum {
 	DBG_REGONLY			= 0x200,
 	DBG_NOVIDEO			= 0x400
 };
-
-// Max script string length
-#define MAX_MAXSTRLEN 200
-#define MAXGLOBALVARS 50
 
 #define REC_MOUSECLICK 1
 #define REC_MOUSEMOVE  2
@@ -102,73 +102,6 @@ enum {
 
 extern int spritewidth[MAX_SPRITES],spriteheight[MAX_SPRITES];
 
-struct AmbientSound {
-	int  channel;  // channel number, 1 upwards
-	int  x, y;
-	int  vol;
-	int  num;  // sound number, eg. 3 = sound3.wav
-	int  maxdist;
-
-	bool IsPlaying();
-};
-
-
-
-// This struct is only used in save games and by plugins
-struct RoomObject {
-	int   x, y;
-	int   transparent;    // current transparency setting
-	short tint_r, tint_g;   // specific object tint
-	short tint_b, tint_level;
-	short tint_light;
-	short last_zoom;      // zoom level last time
-	short last_width, last_height;   // width/height last time drawn
-	short num;            // sprite slot number
-	short baseline;       // <=0 to use Y co-ordinate; >0 for specific baseline
-	short view, loop, frame; // only used to track animation - 'num' holds the current sprite
-	short wait, moving;
-	char  cycling;        // is it currently animating?
-	char  overall_speed;
-	char  on;
-	char  flags;
-	short blocking_width, blocking_height;
-
-	int get_width() const {
-		if (last_width == 0)
-			return spritewidth[num];
-		return last_width;
-	}
-	int get_height() const {
-		if (last_height == 0)
-			return spriteheight[num];
-		return last_height;
-	}
-	int get_baseline() const {
-		if (baseline < 1)
-			return y;
-		return baseline;
-	}
-};
-
-// This struct is saved in the save games - it contains everything about
-// a room that could change
-struct RoomStatus {
-	int   beenhere = 0;
-	int   numobj = 0;
-	RoomObject obj[MAX_INIT_SPR];
-	short flagstates[MAX_FLAGS] = {};
-	int   tsdatasize = 0;
-	char *tsdata = nullptr;
-	NewInteraction intrHotspot[MAX_HOTSPOTS];
-	NewInteraction intrObject[MAX_INIT_SPR];
-	NewInteraction intrRegion[MAX_REGIONS];
-	NewInteraction intrRoom;
-
-	char  hotspot_enabled[MAX_HOTSPOTS] = {};
-	char  region_enabled[MAX_REGIONS] = {};
-	short walkbehind_base[MAX_OBJ] = {};
-	int   interactionVariableValues[MAX_GLOBAL_VARIABLES] = {};
-};
 
 // The text script's "mouse" struct
 struct ScriptMouse {
@@ -240,209 +173,6 @@ struct ScriptObject {
 	int id;
 	RoomObject *obj;
 };
-
-#define INVALID_X  30000
-#define MAXGSVALUES 500
-#define MAXGLOBALSTRINGS 51
-#define MAX_INVORDER 500
-#define SCALIGN_LEFT     1
-#define SCALIGN_CENTRE   2
-#define SCALIGN_RIGHT    3
-#define DIALOG_NONE      0
-#define DIALOG_RUNNING   1
-#define DIALOG_STOP      2
-#define DIALOG_NEWROOM   100
-#define DIALOG_NEWTOPIC  12000
-#define MAX_TIMERS       21
-#define MAX_PARSED_WORDS 15
-#define MAXSAVEGAMES     50
-#define MAX_QUEUED_MUSIC 10
-#define GLED_INTERACTION 1
-#define GLED_EFFECTS     2 
-#define QUEUED_MUSIC_REPEAT 10000
-#define PLAYMP3FILE_MAX_FILENAME_LEN 50
-#define MAX_AUDIO_TYPES  30
-
-struct CharacterExtras {
-  // UGLY UGLY UGLY!! The CharacterInfo struct size is fixed because it's
-  // used in the scripts, therefore overflowing stuff has to go here
-  short invorder[MAX_INVORDER];
-  short invorder_count;
-  short width,height;
-  short zoom;
-  short xwas, ywas;
-  short tint_r, tint_g;
-  short tint_b, tint_level;
-  short tint_light;
-  char  process_idle_this_time;
-  char  slow_move_counter;
-  short animwait;
-};
-
-struct QueuedAudioItem {
-  short audioClipIndex;
-  short priority;
-  bool  repeat;
-  SOUNDCLIP *cachedClip;
-};
-
-// Adding to this might need to modify AGSDEFNS.SH and AGSPLUGIN.H
-struct GameState {
-	int  score;      // player's current score
-	int  usedmode;   // set by ProcessClick to last cursor mode used
-	int  disabled_user_interface;  // >0 while in cutscene/etc
-	int  gscript_timer;    // obsolete
-	int  debug_mode;       // whether we're in debug mode
-	int  globalvars[MAXGLOBALVARS];  // obsolete
-	int  messagetime;      // time left for auto-remove messages
-	int  usedinv;          // inventory item last used
-	int  inv_top, inv_numdisp, obsolete_inv_numorder, inv_numinline;
-	int  text_speed;       // how quickly text is removed
-	int  sierra_inv_color; // background used to paint defualt inv window
-	int  talkanim_speed;   // animation speed of talking anims
-	int  inv_item_wid, inv_item_hit;  // set by SetInvDimensions
-	int  speech_text_shadow;         // colour of outline fonts (default black)
-	int  swap_portrait_side;         // sierra-style speech swap sides
-	int  speech_textwindow_gui;      // textwindow used for sierra-style speech
-	int  follow_change_room_timer;   // delay before moving following characters into new room
-	int  totalscore;           // maximum possible score
-	int  skip_display;         // how the user can skip normal Display windows
-	int  no_multiloop_repeat;  // for backwards compatibility
-	int  roomscript_finished;  // on_call finished in room
-	int  used_inv_on;          // inv item they clicked on
-	int  no_textbg_when_voice; // no textwindow bgrnd when voice speech is used
-	int  max_dialogoption_width; // max width of dialog options text window
-	int  no_hicolor_fadein;      // fade out but instant in for hi-color
-	int  bgspeech_game_speed;    // is background speech relative to game speed
-	int  bgspeech_stay_on_display; // whether to remove bg speech when DisplaySpeech is used
-	int  unfactor_speech_from_textlength; // remove "&10" when calculating time for text to stay
-	int  mp3_loop_before_end;    // loop this time before end of track (ms)
-	int  speech_music_drop;      // how much to drop music volume by when speech is played
-	int  in_cutscene;            // we are between a StartCutscene and EndCutscene
-	int  fast_forward;           // player has elected to skip cutscene
-	int  room_width;      // width of current room (320-res co-ordinates)
-	int  room_height;     // height of current room (320-res co-ordinates)
-	int  game_speed_modifier;
-	int  score_sound;
-	int  takeover_data;  // value passed to RunAGSGame in previous game
-	int  replay_hotkey;
-	int  dialog_options_x;
-	int  dialog_options_y;
-	int  narrator_speech;
-	int  ambient_sounds_persist;
-	int  lipsync_speed;
-	int  close_mouth_speech_time;
-	int  disable_antialiasing;
-	int  text_speed_modifier;
-	int  text_align;
-	int  speech_bubble_width;
-	int  min_dialogoption_width;
-	int  disable_dialog_parser;
-	int  anim_background_speed;  // the setting for this room
-	int  top_bar_backcolor;
-	int  top_bar_textcolor;
-	int  top_bar_bordercolor;
-	int  top_bar_borderwidth;
-	int  top_bar_ypos;
-	int  screenshot_width;
-	int  screenshot_height;
-	int  top_bar_font;
-	int  speech_text_align;
-	int  auto_use_walkto_points;
-	int  inventory_greys_out;
-	int  skip_speech_specific_key;
-	int  abort_key;
-	int  fade_to_red;
-	int  fade_to_green;
-	int  fade_to_blue;
-	int  show_single_dialog_option;
-	int  keep_screen_during_instant_transition;
-	int  read_dialog_option_colour;
-	int  stop_dialog_at_end;
-	int  reserved[10];  // make sure if a future version adds a var, it doesn't mess anything up
-	// ** up to here is referenced in the script "game." object
-	int   recording;   // user is recording their moves
-	int   playback;    // playing back recording
-	short gamestep;    // step number for matching recordings
-	long  randseed;    // random seed
-	int   player_on_region;    // player's current region
-	int   screen_is_faded_out; // the screen is currently black
-	int   check_interaction_only;
-	int   bg_frame, bg_anim_delay;  // for animating backgrounds
-	int   music_vol_was;  // before the volume drop
-	short wait_counter;
-	short mboundx1, mboundx2, mboundy1, mboundy2;
-	int   fade_effect;
-	int   bg_frame_locked;
-	int   globalscriptvars[MAXGSVALUES];
-	int   cur_music_number, music_repeat;
-	int   music_master_volume;
-	int   digital_master_volume;
-	char  walkable_areas_on[MAX_WALK_AREAS + 1];
-	short screen_flipped;
-	short offsets_locked;
-	int   entered_at_x, entered_at_y, entered_edge;
-	int   want_speech = 0;
-	int   want_music = 0;
-	int   cant_skip_speech;
-	int   script_timers[MAX_TIMERS];
-	int   sound_volume, speech_volume;
-	int   normal_font, speech_font;
-	char  key_skip_wait;
-	int   swap_portrait_lastchar;
-	int   seperate_music_lib;
-	int   in_conversation;
-	int   screen_tint;
-	int   num_parsed_words;
-	short parsed_words[MAX_PARSED_WORDS];
-	char  bad_parsed_word[100];
-	int   raw_color;
-	int   raw_modified[MAX_BSCENE];
-	short filenumbers[MAXSAVEGAMES];
-	int   room_changes;
-	int   mouse_cursor_hidden;
-	int   silent_midi;
-	int   silent_midi_channel;
-	int   current_music_repeating;  // remember what the loop flag was when this music started
-	unsigned long shakesc_delay;  // unsigned long to match loopcounter
-	int   shakesc_amount, shakesc_length;
-	int   rtint_red, rtint_green, rtint_blue, rtint_level, rtint_light;
-	int   end_cutscene_music;
-	int   skip_until_char_stops;
-	int   get_loc_name_last_time;
-	int   get_loc_name_save_cursor;
-	int   restore_cursor_mode_to;
-	int   restore_cursor_image_to;
-	short music_queue_size;
-	short music_queue[MAX_QUEUED_MUSIC];
-	short new_music_queue_size;
-	short crossfading_out_channel;
-	short crossfade_step;
-	short crossfade_out_volume_per_step;
-	short crossfade_initial_volume_out;
-	short crossfading_in_channel;
-	short crossfade_in_volume_per_step;
-	short crossfade_final_volume_in;
-	QueuedAudioItem new_music_queue[MAX_QUEUED_MUSIC];
-	char  takeover_from[50];
-	char  playmp3file_name[PLAYMP3FILE_MAX_FILENAME_LEN];
-	char  globalstrings[MAXGLOBALSTRINGS][MAX_MAXSTRLEN];
-	char  lastParserEntry[MAX_MAXSTRLEN];
-	char  game_name[100];
-	int   ground_level_areas_disabled;
-	int   next_screen_transition;
-	int   gamma_adjustment;
-	short temporarily_turned_off_character;  // Hide Player Charactr ticked
-	short inv_backwards_compatibility;
-	int *gui_draw_order;
-	char **do_once_tokens;
-	int   num_do_once_tokens;
-	int   text_min_display_time_ms;
-	int   ignore_user_input_after_text_timeout_ms;
-	unsigned long ignore_user_input_until_time;
-	int   default_audio_type_volumes[MAX_AUDIO_TYPES];
-};
-
 
 struct ScriptInvItem {
 	int id;
@@ -543,61 +273,6 @@ public:
 };
 #endif
 
-enum eScriptSystemOSID {
-	eOS_DOS = 1,
-	eOS_Win = 2,
-	eOS_Linux = 3,
-	eOS_Mac = 4
-};
-
-struct AGSPlatformDriver {
-	virtual void AboutToQuitGame();
-	virtual void Delay(int millis) = 0;
-	virtual void DisplayAlert(const char *, ...) = 0;
-	virtual const char *GetAllUsersDataDirectory() {
-		return NULL;
-	}
-	virtual unsigned long GetDiskFreeSpaceMB() = 0;
-	virtual const char *GetNoMouseErrorString() = 0;
-	virtual eScriptSystemOSID GetSystemOSID() = 0;
-	virtual void GetSystemTime(ScriptDateTime *) = 0;
-	virtual void PlayVideo(const char *name, int skip, int flags) = 0;
-	virtual void InitialiseAbufAtStartup();
-	virtual void PostAllegroInit(bool windowed);
-	virtual void PostAllegroExit() = 0;
-	virtual void FinishedUsingGraphicsMode();
-	virtual void ReplaceSpecialPaths(const char *sourcePath, char *destPath);
-	virtual int  RunSetup() = 0;
-	virtual void SetGameWindowIcon();
-	virtual void WriteConsole(const char *, ...) = 0;
-	virtual void WriteDebugString(const char *, ...);
-	virtual void YieldCPU() = 0;
-	virtual void DisplaySwitchOut();
-	virtual void DisplaySwitchIn();
-	virtual void RegisterGameWithGameExplorer();
-	virtual void UnRegisterGameWithGameExplorer();
-	virtual int  ConvertKeycodeToScanCode(int keyCode);
-
-	virtual int  InitializeCDPlayer() = 0;  // return 0 on success
-	virtual int  CDPlayerCommand(int cmdd, int datt) = 0;
-	virtual void ShutdownCDPlayer() = 0;
-
-	virtual void ReadPluginsFromDisk(Common::SeekableReadStream *);
-	virtual void StartPlugins();
-	virtual int  RunPluginHooks(int event, int data);
-	virtual void RunPluginInitGfxHooks(const char *driverName, void *data);
-	virtual int  RunPluginDebugHooks(const char *scriptfile, int linenum);
-	virtual void ShutdownPlugins();
-
-	static AGSPlatformDriver *GetDriver();
-
-private:
-	static AGSPlatformDriver *instance;
-};
-
-extern AGSPlatformDriver *platform;
-
-
 extern GFXFilter *filter;
 
 extern IAGSFontRenderer* fontRenderers[MAX_FONTS];
@@ -674,18 +349,14 @@ extern IAGSFontRenderer* fontRenderers[MAX_FONTS];
 
 #define NEXT_ITERATION() play.gamestep++
 
+#if 0
 extern GameSetupStruct game;
 extern GameState play;
 extern GameSetup usetup;
-extern CharacterExtras *charextra;
 extern MoveList *mls;
 extern ViewStruct *views;
-extern roomstruct thisroom;
-extern RoomObject*objs;
-extern CharacterInfo*playerchar;
 extern int displayed_room;
 extern int final_scrn_wid,final_scrn_hit,final_col_dep;
-extern int turnlooporder[8];
 extern int in_enters_screen, done_es_error;
 extern int new_room_pos, new_room_x, new_room_y;
 extern int scrnwid, scrnhit;
@@ -717,6 +388,7 @@ extern CharacterCache *charcache;
 extern ObjectCache objcache[MAX_INIT_SPR];
 extern ExecutingScript *curscript;
 extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
+#endif
 
 #define DOMOUSE_NOCURSOR 5
 #define NONE -1
@@ -977,6 +649,12 @@ extern void draw_sprite_support_alpha(int xpos, int ypos, block image, int slot)
 extern void run_room_event(int id);
 extern void load_new_room(int newnum, CharacterInfo *forchar);
 extern void unload_old_room();
+extern void construct_virtual_screen(bool fullRedraw);
+extern void DisplayMessage(int msnum);
+extern void setup_for_dialog();
+extern int IsMusicPlaying();
+extern void current_fade_out_effect();
+extern void StopAmbientSound(int channel);
 
 } // namespace AGS2
 

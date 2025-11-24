@@ -25,6 +25,7 @@
 
 namespace AGS2 {
 
+
 int SOUNDCLIP::play_from(int position) {
 	int retVal = play();
 	if ((retVal != 0) && (position > 0))
@@ -56,6 +57,8 @@ void SOUNDCLIP::resume() {
 		voice_start(voice);
 	paused = 0;
 }
+
+/*------------------------------------------------------------------*/
 
 SOUNDCLIP *my_load_wave(const char *filename, int voll, int loop) {
 	error("TODO: my_load_wave");
