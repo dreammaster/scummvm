@@ -307,7 +307,7 @@ int IAGSEngine::FWrite(void *buffer, int32 len, intptr handle) {
 	return ws->write(buffer, len);
 }
 void IAGSEngine::DrawTextWrapped(int32 xx, int32 yy, int32 wid, int32 font, int32 color, const char *text) {
-	int texthit = wgetfontheight(font);
+	int height = wgetfontheight(font);
 
 	break_up_text_into_lines(wid, font, (char *)text);
 
@@ -315,7 +315,7 @@ void IAGSEngine::DrawTextWrapped(int32 xx, int32 yy, int32 wid, int32 font, int3
 	wtexttransparent(TEXTFG);
 	multiply_up_coordinates(&xx, &yy);
 	for (int i = 0; i < numlines; i++)
-		draw_and_invalidate_text(xx, yy + texthit * i, font, lines[i]);
+		draw_and_invalidate_text(xx, yy + height * i, font, lines[i]);
 }
 void IAGSEngine::SetVirtualScreen(BITMAP *bmp) {
 	wsetscreen(bmp);

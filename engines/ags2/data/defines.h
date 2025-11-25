@@ -74,6 +74,9 @@ namespace AGS2 {
 #define QUEUED_MUSIC_REPEAT 10000
 #define PLAYMP3FILE_MAX_FILENAME_LEN 50
 
+#define MAX_TOPIC_HISTORY 50
+#define DLG_OPTION_PARSER 99
+
 } // namespace AGS2
 
 #endif

@@ -7,10 +7,11 @@ MODULE_OBJS = \
 	vars.o \
 	ac/ac.o \
 	ac/cc.o \
-	ac/main.o \
+	ac/dialog.o \
 	ac/draw.o \
 	ac/fonts.o \
 	ac/gfx.o \
+	ac/main.o \
 	ac/mouse.o \
 	ac/overlay.o \
 	ac/platform.o \

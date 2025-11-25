@@ -391,9 +391,12 @@ extern PluginObjectReader pluginReaders[MAX_PLUGIN_OBJECT_READERS];
 #endif
 
 #define DOMOUSE_NOCURSOR 5
-#define NONE -1
-#define LEFT  0
-#define RIGHT 1
+enum {
+	NONE = -1,
+	LEFT = 0,
+	RIGHT = 1
+};
+
 extern int  mousex,mousey;
 extern void domouse(int);
 extern int  mgetbutton();
@@ -655,6 +658,96 @@ extern void setup_for_dialog();
 extern int IsMusicPlaying();
 extern void current_fade_out_effect();
 extern void StopAmbientSound(int channel);
+extern void render_graphics(IDriverDependantBitmap *extraBitmap = NULL, int extraX = 0, int extraY = 0);
+extern int rec_misbuttondown(int);
+extern int rec_mgetbutton();
+extern void next_iteration();
+extern void rec_domouse(int);
+extern int check_mouse_wheel();
+extern void update_polled_stuff();
+extern char *get_language_text(int);
+extern void update_polled_stuff_and_crossfade();
+extern char *get_global_message(int);
+extern int GetBaseWidth();
+inline int kbhit() { return rec_kbhit(); }
+inline int getch() { return rec_getch(); }
+extern void push_screen();
+extern void pop_screen();
+extern void draw_text_window(int *xins, int *yins, int *xx, int *yy, int *wii, int ovrheight = 0, int ifnum = -1);
+extern void mainloop(bool checkControls = false, IDriverDependantBitmap *extraBitmap = NULL, int extraX = 0, int extraY = 0);
+extern void ParseText(char *text);
+extern void DisplaySpeech(char *texx, int aschar);
+extern int  Overlay_GetValid(ScriptOverlay *scover);
+extern void set_mouse_cursor(int);
+extern void set_default_cursor();
+extern int  run_text_script(ccInstance *, char *);
+extern int  run_text_script_2iparam(ccInstance *, char *, int, int);
+extern int  run_text_script_iparam(ccInstance *, char *, int);
+extern int  run_interaction_event(NewInteraction *nint, int evnt, int chkAny = -1, int isInv = 0);
+extern int  run_interaction_script(InteractionScripts *nint, int evnt, int chkAny = -1, int isInv = 0);
+extern void new_room(int, CharacterInfo *);
+extern void NewRoom(int);
+extern void AnimateObject(int, int, int, int);
+extern void SetObjectView(int, int);
+extern void GiveScore(int);
+extern void walk_character(int, int, int, int, bool);
+extern void move_object(int, int, int, int, int);
+extern void StopMoving(int);
+extern void MoveCharacterToHotspot(int, int);
+extern int  GetCursorMode();
+extern void GetLocationName(int, int, char *);
+extern void save_game(int, const char *);
+extern int  load_game(int, char *, int *);
+extern void update_music_volume();
+extern int  invscreen();
+extern void process_interface_click(int, int, int);
+extern void DisplayMessage(int);
+extern void do_conversation(int);
+extern void compile_room_script();
+extern int  CreateTextOverlay(int, int, int, int, int, char *, ...);
+extern void RemoveOverlay(int);
+extern void stopmusic();
+extern void play_flc_file(int, int);
+extern void SetCharacterView(int, int);
+extern void ReleaseCharacterView(int);
+extern void setevent(int evtyp, int ev1 = 0, int ev2 = -1000, int ev3 = 0);
+extern void update_events();
+extern void process_event(EventHappened *);
+extern int  GetLocationType(int, int);
+extern int  __GetLocationType(int, int, int);
+extern int  AreCharObjColliding(int charid, int objid);
+extern int  play_speech(int, int);
+extern void stop_speech();
+extern int  play_sound(int);
+extern int  play_sound_priority(int, int);
+extern int  __Rand(int);
+extern int  cd_manager(int, int);
+extern int  DisplaySpeechBackground(int, char *);
+extern void MergeObject(int);
+extern void script_debug(int, int);
+extern void sc_inputbox(const char *, char *);
+extern void ParseText(char *);
+extern void FaceLocation(int, int, int);
+extern void check_debug_keys();
+extern int  IsInterfaceEnabled();
+extern void break_up_text_into_lines(int, int, char *);
+extern void start_game();
+extern void init_game_settings();
+extern void show_preload();
+extern void stop_recording();
+extern void save_game_data(Common::WriteStream *, block screenshot);
+extern void setup_script_exports();
+extern void SetSpeechFont(int);
+extern void SetNormalFont(int);
+extern void tint_image(block source, block dest, int red, int grn, int blu, int light_level, int luminance = 255);
+extern void get_message_text(int msnum, char *buffer, char giveErr = 1);
+extern int  wait_loop_still_valid();
+extern SOUNDCLIP *load_music_from_disk(int mnum, bool repeat);
+extern void play_new_music(int mnum, SOUNDCLIP *music);
+extern int GetGameSpeed();
+extern int check_for_messages_from_editor();
+extern int show_dialog_options(int dlgnum, int sayChosenOption, bool runGameLoopsInBackground);
+extern void add_to_sprite_list(IDriverDependantBitmap *spp, int xx, int yy, int baseline, int trans, int sprNum, bool isWalkBehind = false);
 
 } // namespace AGS2
 

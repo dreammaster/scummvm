@@ -213,6 +213,17 @@ int engineNeedsAsInt;
 char rbuffer[200];
 uint32 lastTime;
 int turnlooporder[8];
+NonBlockingScriptFunction repExecAlways(REP_EXEC_ALWAYS_NAME, 0);
+NonBlockingScriptFunction getDialogOptionsDimensionsFunc("dialog_options_get_dimensions", 1);
+NonBlockingScriptFunction renderDialogOptionsFunc("dialog_options_render", 1);
+NonBlockingScriptFunction getDialogOptionUnderCursorFunc("dialog_options_get_active", 1);
+NonBlockingScriptFunction runDialogOptionMouseClickHandlerFunc("dialog_options_mouse_click", 2);
+int numOnStack;
+block screenstack[10];
+TopBarSettings topBar;
+block screenop = NULL;
+int wantFreeScreenop = 0;
+int texthit;
 
 // ac/audio.cpp
 ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
@@ -528,6 +539,11 @@ Vars::Vars() {
 	alpha_blend_cursor = 0;
 	engineNeedsAsInt = 100;
 	lastTime = 0;
+	numOnStack = 0;
+	Common::fill(screenstack, screenstack + 10, nullptr);
+	screenop = NULL;
+	wantFreeScreenop = 0;
+	texthit = 0;
 
 	// ac/audio.cpp
 	Common::fill(acaudio_buffer, acaudio_buffer + 256, 0);

@@ -39,6 +39,7 @@
 #include "ags2/data/game_state.h"
 #include "ags2/data/game_setup_struct.h"
 #include "ags2/data/screen_overlay.h"
+#include "ags2/data/top_bar_settings.h"
 #include "ags2/gfx/sprite_cache.h"
 #include "ags2/console.h"
 
@@ -177,6 +178,17 @@ extern int engineNeedsAsInt;
 extern char rbuffer[200];
 extern uint32 lastTime;
 extern int turnlooporder[8];
+extern NonBlockingScriptFunction repExecAlways;
+extern NonBlockingScriptFunction getDialogOptionsDimensionsFunc;
+extern NonBlockingScriptFunction renderDialogOptionsFunc;
+extern NonBlockingScriptFunction getDialogOptionUnderCursorFunc;
+extern NonBlockingScriptFunction runDialogOptionMouseClickHandlerFunc;
+extern int numOnStack;
+extern block screenstack[10];
+extern TopBarSettings topBar;
+extern block screenop;
+extern int wantFreeScreenop;
+extern int texthit;
 
 // ac/audio.cpp
 extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];

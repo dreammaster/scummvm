@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,12 +20,19 @@
  *
  */
 
-#ifndef AGS2_AC_H
-#define AGS2_AC_H
+#ifndef AGS2_DATA_TOP_BAR_SETTINGS_H
+#define AGS2_DATA_TOP_BAR_SETTINGS_H
+
+#include "ags2/data/defines.h"
 
 namespace AGS2 {
 
-extern void ags_main(int argc, const char *argv[]);
+struct TopBarSettings {
+	int wantIt = 0;
+	int height = 0;
+	int font = 0;
+	char text[200] = {};
+};
 
 } // namespace AGS2
 
