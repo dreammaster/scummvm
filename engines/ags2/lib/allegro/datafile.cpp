@@ -20,6 +20,8 @@
  */
 
 #include "common/file.h"
+#include "common/system.h"
+#include "common/savefile.h"
 #include "image/bmp.h"
 #include "image/iff.h"
 #include "image/pcx.h"
@@ -115,6 +117,15 @@ bool save_bitmap(Common::WriteStream &out, BITMAP *bmp, const RGB *pal) {
 	} else {
 		return Image::writeBMP(out, src);
 	}
+}
+
+int save_bitmap(const char *filename, BITMAP *bmp, const RGB *pal) {
+	Common::OutSaveFile *sf = g_system->getSavefileManager()->openForSaving(filename, false);
+	if (!sf)
+		return -1;
+
+	save_bitmap(*sf, bmp, pal);
+	return 0;
 }
 
 } // namespace AGS2

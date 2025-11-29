@@ -41,32 +41,24 @@
 
 namespace AGS2 {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Stretching.  */
-void aa_stretch_blit(BITMAP *src, BITMAP *dst,
+extern void aa_stretch_blit(BITMAP *src, BITMAP *dst,
                      int sx, int sy, int sw, int sh,
                      int dx, int dy, int dw, int dh);
-void aa_stretch_sprite(BITMAP *dst, BITMAP *src,
+extern void aa_stretch_sprite(BITMAP *dst, BITMAP *src,
                        int dx, int dy, int dw, int dh);
 
 /* Rotation.  */
-void aa_rotate_scaled_bitmap(BITMAP *src, BITMAP *dst,
+extern void aa_rotate_scaled_bitmap(BITMAP *src, BITMAP *dst,
                              int x, int y, fixed angle,
                              fixed scalex, fixed scaley);
-void aa_rotate_scaled_sprite(BITMAP *dst, BITMAP *src,
+extern void aa_rotate_scaled_sprite(BITMAP *dst, BITMAP *src,
                              int x, int y, fixed angle,
                              fixed scalex, fixed scaley);
-void aa_rotate_bitmap(BITMAP *src, BITMAP *dst,
+extern void aa_rotate_bitmap(BITMAP *src, BITMAP *dst,
                       int x, int y, fixed angle);
-void aa_rotate_sprite(BITMAP *dst, BITMAP *src,
+extern void aa_rotate_sprite(BITMAP *dst, BITMAP *src,
                       int x, int y, fixed angle);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace AGS2
 

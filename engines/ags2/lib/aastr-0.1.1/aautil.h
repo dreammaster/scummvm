@@ -92,10 +92,6 @@ namespace AGS2 {
 	}
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Prepare offsets for direct access to 24bpp bitmap.  */
 void _aa_prepare_for_24bpp(void);
 
@@ -154,10 +150,6 @@ void _aa_masked_put_rgb24(byte *addr, int _x);
 #endif
 #ifdef ALLEGRO_COLOR32
 void _aa_masked_put_rgb32(byte *addr, int _x);
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 } // namespace AGS2

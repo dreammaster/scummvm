@@ -64,6 +64,7 @@ MODULE_OBJS = \
 	lib/allegro/color.o \
 	lib/allegro/datafile.o \
 	lib/allegro/digi.o \
+	lib/allegro/draw.o \
 	lib/allegro/file.o \
 	lib/allegro/fixed.o \
 	lib/allegro/flood.o \

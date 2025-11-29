@@ -35,8 +35,8 @@
  */
 
 #include "ags2/lib/aastr-0.1.1/aautil.h"
-#include "ags/globals.h"
 #include "ags2/lib/allegro/color.h"
+#include "ags2/vars.h"
 
 namespace AGS2 {
 
@@ -53,13 +53,15 @@ static struct {
 	int boffset24;
 } _aa;
 
+uint _t1;
+
 /*
  * Prepare offsets for direct access to 24bpp bitmap.
  */
 void _aa_prepare_for_24bpp() {
-	_aa.roffset24 = _G(_rgb_r_shift_24) / 8;
-	_aa.goffset24 = _G(_rgb_g_shift_24) / 8;
-	_aa.boffset24 = _G(_rgb_b_shift_24) / 8;
+	_aa.roffset24 = _rgb_r_shift_24 / 8;
+	_aa.goffset24 = _rgb_g_shift_24 / 8;
+	_aa.boffset24 = _rgb_b_shift_24 / 8;
 }
 
 /*
@@ -697,10 +699,10 @@ void _aa_masked_add_rgb8(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, u
 		r1 = MUL(getr8(scolor), sx1f);
 		g1 = MUL(getg8(scolor), sx1f);
 		b1 = MUL(getb8(scolor), sx1f);
-		_G(t1) = 0;
+		_t1 = 0;
 	} else {
 		r1 = g1 = b1 = 0;
-		_G(t1) = sx1f;
+		_t1 = sx1f;
 	}
 
 	sx2i = _sx2 >> aa_BITS;
@@ -711,7 +713,7 @@ void _aa_masked_add_rgb8(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, u
 			g1 += getg8(scolor) << aa_BITS;
 			b1 += getb8(scolor) << aa_BITS;
 		} else
-			_G(t1) += aa_SIZE;
+			_t1 += aa_SIZE;
 	}
 
 	sx2f = _sx2 & aa_MASK;
@@ -722,14 +724,14 @@ void _aa_masked_add_rgb8(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, u
 			g1 += MUL(getg8(scolor), sx2f);
 			b1 += MUL(getb8(scolor), sx2f);
 		} else
-			_G(t1) += sx2f;
+			_t1 += sx2f;
 	}
 
 	sy1f = aa_SIZE - (_sy1 & aa_MASK);
 	r1 = MUL(r1, sy1f);
 	g1 = MUL(g1, sy1f);
 	b1 = MUL(b1, sy1f);
-	_G(t1) = MUL(_G(t1), sy1f);
+	_t1 = MUL(_t1, sy1f);
 
 	/* Middle lines.  */
 	sy2i = _sy2 >> aa_BITS;
@@ -771,7 +773,7 @@ void _aa_masked_add_rgb8(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, u
 		r1 += r2 << aa_BITS;
 		g1 += g2 << aa_BITS;
 		b1 += b2 << aa_BITS;
-		_G(t1) += t2 << aa_BITS;
+		_t1 += t2 << aa_BITS;
 	}
 
 	/* Last line.  */
@@ -814,10 +816,10 @@ void _aa_masked_add_rgb8(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, u
 		r1 += MUL(r2, sy2f);
 		g1 += MUL(g2, sy2f);
 		b1 += MUL(b2, sy2f);
-		_G(t1) += MUL(t2, sy2f);
+		_t1 += MUL(t2, sy2f);
 	}
 
-	if (_num >= (2 * _G(t1))) {
+	if (_num >= (2 * _t1)) {
 		if (_num == (aa_SIZE * aa_SIZE)) {
 			_aa.r = r1 >> (2 * aa_BITS);
 			_aa.g = g1 >> (2 * aa_BITS);
@@ -855,10 +857,10 @@ void _aa_masked_add_rgb15(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 = MUL(getr15(scolor), sx1f);
 		g1 = MUL(getg15(scolor), sx1f);
 		b1 = MUL(getb15(scolor), sx1f);
-		_G(t1) = 0;
+		_t1 = 0;
 	} else {
 		r1 = g1 = b1 = 0;
-		_G(t1) = sx1f;
+		_t1 = sx1f;
 	}
 
 	sx2i = _sx2 >> aa_BITS;
@@ -869,7 +871,7 @@ void _aa_masked_add_rgb15(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 			g1 += getg15(scolor) << aa_BITS;
 			b1 += getb15(scolor) << aa_BITS;
 		} else
-			_G(t1) += aa_SIZE;
+			_t1 += aa_SIZE;
 	}
 
 	sx2f = _sx2 & aa_MASK;
@@ -880,14 +882,14 @@ void _aa_masked_add_rgb15(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 			g1 += MUL(getg15(scolor), sx2f);
 			b1 += MUL(getb15(scolor), sx2f);
 		} else
-			_G(t1) += sx2f;
+			_t1 += sx2f;
 	}
 
 	sy1f = aa_SIZE - (_sy1 & aa_MASK);
 	r1 = MUL(r1, sy1f);
 	g1 = MUL(g1, sy1f);
 	b1 = MUL(b1, sy1f);
-	_G(t1) = MUL(_G(t1), sy1f);
+	_t1 = MUL(_t1, sy1f);
 
 	/* Middle lines.  */
 	sy2i = _sy2 >> aa_BITS;
@@ -929,7 +931,7 @@ void _aa_masked_add_rgb15(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 += r2 << aa_BITS;
 		g1 += g2 << aa_BITS;
 		b1 += b2 << aa_BITS;
-		_G(t1) += t2 << aa_BITS;
+		_t1 += t2 << aa_BITS;
 	}
 
 	/* Last line.  */
@@ -972,10 +974,10 @@ void _aa_masked_add_rgb15(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 += MUL(r2, sy2f);
 		g1 += MUL(g2, sy2f);
 		b1 += MUL(b2, sy2f);
-		_G(t1) += MUL(t2, sy2f);
+		_t1 += MUL(t2, sy2f);
 	}
 
-	if (_num >= (2 * _G(t1))) {
+	if (_num >= (2 * _t1)) {
 		if (_num == (aa_SIZE * aa_SIZE)) {
 			_aa.r = r1 >> (2 * aa_BITS);
 			_aa.g = g1 >> (2 * aa_BITS);
@@ -1012,10 +1014,10 @@ void _aa_masked_add_rgb16(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 = MUL(getr16(scolor), sx1f);
 		g1 = MUL(getg16(scolor), sx1f);
 		b1 = MUL(getb16(scolor), sx1f);
-		_G(t1) = 0;
+		_t1 = 0;
 	} else {
 		r1 = g1 = b1 = 0;
-		_G(t1) = sx1f;
+		_t1 = sx1f;
 	}
 
 	sx2i = _sx2 >> aa_BITS;
@@ -1026,7 +1028,7 @@ void _aa_masked_add_rgb16(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 			g1 += getg16(scolor) << aa_BITS;
 			b1 += getb16(scolor) << aa_BITS;
 		} else
-			_G(t1) += aa_SIZE;
+			_t1 += aa_SIZE;
 	}
 
 	sx2f = _sx2 & aa_MASK;
@@ -1037,14 +1039,14 @@ void _aa_masked_add_rgb16(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 			g1 += MUL(getg16(scolor), sx2f);
 			b1 += MUL(getb16(scolor), sx2f);
 		} else
-			_G(t1) += sx2f;
+			_t1 += sx2f;
 	}
 
 	sy1f = aa_SIZE - (_sy1 & aa_MASK);
 	r1 = MUL(r1, sy1f);
 	g1 = MUL(g1, sy1f);
 	b1 = MUL(b1, sy1f);
-	_G(t1) = MUL(_G(t1), sy1f);
+	_t1 = MUL(_t1, sy1f);
 
 	/* Middle lines.  */
 	sy2i = _sy2 >> aa_BITS;
@@ -1086,7 +1088,7 @@ void _aa_masked_add_rgb16(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 += r2 << aa_BITS;
 		g1 += g2 << aa_BITS;
 		b1 += b2 << aa_BITS;
-		_G(t1) += t2 << aa_BITS;
+		_t1 += t2 << aa_BITS;
 	}
 
 	/* Last line.  */
@@ -1129,10 +1131,10 @@ void _aa_masked_add_rgb16(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 += MUL(r2, sy2f);
 		g1 += MUL(g2, sy2f);
 		b1 += MUL(b2, sy2f);
-		_G(t1) += MUL(t2, sy2f);
+		_t1 += MUL(t2, sy2f);
 	}
 
-	if (_num >= (2 * _G(t1))) {
+	if (_num >= (2 * _t1)) {
 		if (_num == (aa_SIZE * aa_SIZE)) {
 			_aa.r = r1 >> (2 * aa_BITS);
 			_aa.g = g1 >> (2 * aa_BITS);
@@ -1178,10 +1180,10 @@ void _aa_masked_add_rgb24(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 = MUL(getr24(scolor), sx1f);
 		g1 = MUL(getg24(scolor), sx1f);
 		b1 = MUL(getb24(scolor), sx1f);
-		_G(t1) = 0;
+		_t1 = 0;
 	} else {
 		r1 = g1 = b1 = 0;
-		_G(t1) = sx1f;
+		_t1 = sx1f;
 	}
 
 	sx2i = _sx2 >> aa_BITS;
@@ -1199,7 +1201,7 @@ void _aa_masked_add_rgb24(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 			g1 += getg24(scolor) << aa_BITS;
 			b1 += getb24(scolor) << aa_BITS;
 		} else
-			_G(t1) += aa_SIZE;
+			_t1 += aa_SIZE;
 	}
 
 	sx2f = _sx2 & aa_MASK;
@@ -1217,14 +1219,14 @@ void _aa_masked_add_rgb24(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 			g1 += MUL(getg24(scolor), sx2f);
 			b1 += MUL(getb24(scolor), sx2f);
 		} else
-			_G(t1) += sx2f;
+			_t1 += sx2f;
 	}
 
 	sy1f = aa_SIZE - (_sy1 & aa_MASK);
 	r1 = MUL(r1, sy1f);
 	g1 = MUL(g1, sy1f);
 	b1 = MUL(b1, sy1f);
-	_G(t1) = MUL(_G(t1), sy1f);
+	_t1 = MUL(_t1, sy1f);
 
 	/* Middle lines.  */
 	sy2i = _sy2 >> aa_BITS;
@@ -1287,7 +1289,7 @@ void _aa_masked_add_rgb24(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 += r2 << aa_BITS;
 		g1 += g2 << aa_BITS;
 		b1 += b2 << aa_BITS;
-		_G(t1) += t2 << aa_BITS;
+		_t1 += t2 << aa_BITS;
 	}
 
 	/* Last line.  */
@@ -1351,10 +1353,10 @@ void _aa_masked_add_rgb24(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 += MUL(r2, sy2f);
 		g1 += MUL(g2, sy2f);
 		b1 += MUL(b2, sy2f);
-		_G(t1) += MUL(t2, sy2f);
+		_t1 += MUL(t2, sy2f);
 	}
 
-	if (_num >= (2 * _G(t1))) {
+	if (_num >= (2 * _t1)) {
 		if (_num == (aa_SIZE * aa_SIZE)) {
 			_aa.r = r1 >> (2 * aa_BITS);
 			_aa.g = g1 >> (2 * aa_BITS);
@@ -1393,10 +1395,10 @@ void _aa_masked_add_rgb32(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 = MUL(getr32(scolor), sx1f);
 		g1 = MUL(getg32(scolor), sx1f);
 		b1 = MUL(getb32(scolor), sx1f);
-		_G(t1) = 0;
+		_t1 = 0;
 	} else {
 		r1 = g1 = b1 = 0;
-		_G(t1) = sx1f;
+		_t1 = sx1f;
 	}
 
 	sx2i = _sx2 >> aa_BITS;
@@ -1407,7 +1409,7 @@ void _aa_masked_add_rgb32(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 			g1 += getg32(scolor) << aa_BITS;
 			b1 += getb32(scolor) << aa_BITS;
 		} else
-			_G(t1) += aa_SIZE;
+			_t1 += aa_SIZE;
 	}
 
 	sx2f = _sx2 & aa_MASK;
@@ -1418,14 +1420,14 @@ void _aa_masked_add_rgb32(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 			g1 += MUL(getg32(scolor), sx2f);
 			b1 += MUL(getb32(scolor), sx2f);
 		} else
-			_G(t1) += sx2f;
+			_t1 += sx2f;
 	}
 
 	sy1f = aa_SIZE - (_sy1 & aa_MASK);
 	r1 = MUL(r1, sy1f);
 	g1 = MUL(g1, sy1f);
 	b1 = MUL(b1, sy1f);
-	_G(t1) = MUL(_G(t1), sy1f);
+	_t1 = MUL(_t1, sy1f);
 
 	/* Middle lines.  */
 	sy2i = _sy2 >> aa_BITS;
@@ -1467,7 +1469,7 @@ void _aa_masked_add_rgb32(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 += r2 << aa_BITS;
 		g1 += g2 << aa_BITS;
 		b1 += b2 << aa_BITS;
-		_G(t1) += t2 << aa_BITS;
+		_t1 += t2 << aa_BITS;
 	}
 
 	/* Last line.  */
@@ -1510,10 +1512,10 @@ void _aa_masked_add_rgb32(BITMAP *_src, int _sx1, int _sx2, int _sy1, int _sy2, 
 		r1 += MUL(r2, sy2f);
 		g1 += MUL(g2, sy2f);
 		b1 += MUL(b2, sy2f);
-		_G(t1) += MUL(t2, sy2f);
+		_t1 += MUL(t2, sy2f);
 	}
 
-	if (_num >= (2 * _G(t1))) {
+	if (_num >= (2 * _t1)) {
 		if (_num == (aa_SIZE * aa_SIZE)) {
 			_aa.r = r1 >> (2 * aa_BITS);
 			_aa.g = g1 >> (2 * aa_BITS);
