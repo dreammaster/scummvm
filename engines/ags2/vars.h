@@ -177,7 +177,7 @@ extern char alpha_blend_cursor;
 extern int engineNeedsAsInt;
 extern char rbuffer[200];
 extern uint32 lastTime;
-extern int turnlooporder[8];
+extern const int turnlooporder[8];
 extern NonBlockingScriptFunction repExecAlways;
 extern NonBlockingScriptFunction getDialogOptionsDimensionsFunc;
 extern NonBlockingScriptFunction renderDialogOptionsFunc;
@@ -189,6 +189,8 @@ extern TopBarSettings topBar;
 extern block screenop;
 extern int wantFreeScreenop;
 extern int texthit;
+extern block wallscreen;
+extern int lastcx, lastcy;
 
 // ac/audio.cpp
 extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];

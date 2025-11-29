@@ -7,6 +7,7 @@ MODULE_OBJS = \
 	vars.o \
 	ac/ac.o \
 	ac/cc.o \
+	ac/characters.o \
 	ac/dialog.o \
 	ac/draw.o \
 	ac/fonts.o \

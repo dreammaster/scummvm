@@ -212,7 +212,7 @@ char alpha_blend_cursor;
 int engineNeedsAsInt;
 char rbuffer[200];
 uint32 lastTime;
-int turnlooporder[8];
+const int turnlooporder[8] = { 0, 6, 1, 7, 3, 5, 2, 4 };	// Order of loops to turn character in circle from down to down
 NonBlockingScriptFunction repExecAlways(REP_EXEC_ALWAYS_NAME, 0);
 NonBlockingScriptFunction getDialogOptionsDimensionsFunc("dialog_options_get_dimensions", 1);
 NonBlockingScriptFunction renderDialogOptionsFunc("dialog_options_render", 1);
@@ -224,6 +224,8 @@ TopBarSettings topBar;
 block screenop = NULL;
 int wantFreeScreenop = 0;
 int texthit;
+block wallscreen;
+int lastcx, lastcy;
 
 // ac/audio.cpp
 ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
@@ -546,6 +548,8 @@ Vars::Vars() {
 	screenop = NULL;
 	wantFreeScreenop = 0;
 	texthit = 0;
+	wallscreen = nullptr;
+	lastcx = lastcy = 0;
 
 	// ac/audio.cpp
 	Common::fill(acaudio_buffer, acaudio_buffer + 256, 0);
