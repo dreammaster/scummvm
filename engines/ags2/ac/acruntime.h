@@ -422,7 +422,6 @@ extern int  is_valid_character(int newchar);
 extern int  is_valid_object(int obtest);
 extern void debug_write_console (const char *msg, ...);
 extern int  is_route_possible(int,int,int,int,block);
-extern int  find_route(short,short,short,short,block,int,int=0,int=0);
 extern void set_route_move_speed(int x, int y);
 extern void init_pathfinder();
 extern block prepare_walkable_areas (int sourceChar);

@@ -20,12 +20,16 @@
  *
  */
 
-#ifndef AGS2_COMMON_ROUTEFND_H
-#define AGS2_COMMON_ROUTEFND_H
+#ifndef AGS2_ENGINE_ROUTEFND_H
+#define AGS2_ENGINE_ROUTEFND_H
+
+#include "ags2/common/wgt2allg.h"
 
 namespace AGS2 {
 
 extern void init_pathfinder();
+extern int find_route(short srcx, short srcy, short xx, short yy, block onscreen, int movlst, int nocross =
+	0, int ignore_walls = 0);
 
 } // namespace AGS2
 

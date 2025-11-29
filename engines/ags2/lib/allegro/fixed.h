@@ -48,6 +48,7 @@ extern fixed fixsin(fixed x);
 extern fixed fixtan(fixed x);
 extern fixed fixacos(fixed x);
 extern fixed fixasin(fixed x);
+extern fixed fixatan(fixed x);
 
 } // namespace AGS2
 

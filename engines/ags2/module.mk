@@ -43,7 +43,6 @@ MODULE_OBJS = \
 	common/fmem.o \
 	common/misc.o \
 	common/mouse32.o \
-	common/routefnd.o \
 	common/text.o \
 	common/wgt2allg.o \
 	data/animating_gui_button.o \
@@ -56,6 +55,7 @@ MODULE_OBJS = \
 	data/screen_overlay.o \
 	data/sound.o \
 	data/words_dictionary.o \
+	engine/routefnd.o \
 	engine/scriptrt.o \
 	gfx/sprite.o \
 	gfx/sprite_cache.o \

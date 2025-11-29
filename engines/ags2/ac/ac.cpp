@@ -25,6 +25,7 @@
 #include "ags2/common/clib32.h"
 #include "ags2/common/csrun.h"
 #include "ags2/common/misc.h"
+#include "ags2/engine/routefnd.h"
 #include "ags2/lib/allegro.h"
 #include "ags2/lib/allegro/platform/alwin.h"
 #include "ags2/lib/system/datetime.h"

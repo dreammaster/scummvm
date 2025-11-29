@@ -224,8 +224,6 @@ TopBarSettings topBar;
 block screenop = NULL;
 int wantFreeScreenop = 0;
 int texthit;
-block wallscreen;
-int lastcx, lastcy;
 
 // ac/audio.cpp
 ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
@@ -366,20 +364,28 @@ int vesa_xres, vesa_yres;
 int currentcursor;
 int pluginSimulatedClick;
 
+// engine/routefnd.cpp
+int *pathbackx, *pathbacky;
+int waspossible = 1;
+int routex1, routey1;
+int suggestx, suggesty;
+fixed move_speed_x, move_speed_y;
+block wallscreen;
+int lastcx, lastcy;
+int line_failed;
+int leftorright;
+int nesting;
+int pathbackstage;
+int finalpartx, finalparty;
+short **beenhere;
+int beenhere_array_size;
+
 // gfx/sprite.cpp
 block tmpdbl, curspr;
 int newwid, newhit;
 
 // lib/allegro
 // in allegro.h
-
-// routefnd.cpp
-int *pathbackx, *pathbacky;
-int waspossible = 1;
-int routex1, routey1;
-int suggestx, suggesty;
-fixed move_speed_x, move_speed_y;
-
 
 Vars::Vars() {
 	g_vars = this;
@@ -548,8 +554,6 @@ Vars::Vars() {
 	screenop = NULL;
 	wantFreeScreenop = 0;
 	texthit = 0;
-	wallscreen = nullptr;
-	lastcx = lastcy = 0;
 
 	// ac/audio.cpp
 	Common::fill(acaudio_buffer, acaudio_buffer + 256, 0);
@@ -665,6 +669,23 @@ Vars::Vars() {
 	currentcursor = 0;
 	pluginSimulatedClick = NONE;
 
+	// engine/routefnd.cpp
+	pathbackx = pathbacky = nullptr;
+	waspossible = 1;
+	routex1 = -10;
+	routey1 = 0;
+	suggestx = suggesty = 0;
+	move_speed_x = move_speed_y = 0;
+	wallscreen = nullptr;
+	lastcx = lastcy = 0;
+	line_failed = 0;
+	leftorright = 0;
+	nesting = 0;
+	pathbackstage = 0;
+	finalpartx = finalparty = 0;
+	beenhere = NULL;
+	beenhere_array_size = 0;
+
 	// gfx/sprite.cpp
 	tmpdbl = curspr = nullptr;
 	newwid = newhit = 0;
@@ -677,13 +698,6 @@ Vars::Vars() {
 	_rgb_r_shift_32 = _rgb_g_shift_32 = _rgb_b_shift_32 = 0,
 	_rgb_a_shift_32 = 0;
 	_places_r = _places_g = 0;
-
-	// routefnd.cpp
-	pathbackx = pathbacky = nullptr;
-	waspossible = 1;
-	routex1 = routey1 = 0;
-	suggestx = suggesty = 0;
-	move_speed_x = move_speed_y = 0;
 }
 
 Vars::~Vars() {

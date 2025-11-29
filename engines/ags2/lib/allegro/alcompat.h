@@ -23,9 +23,20 @@
 #define AGS2_LIB_ALLEGRO_ALCOMPAT_H
 
 #include "ags2/lib/allegro/gfx.h"
+#include "ags2/lib/allegro/fixed.h"
 #include "ags2/lib/allegro/surface.h"
 
 namespace AGS2 {
+
+inline fixed fcos(fixed x) { return fixcos(x); }
+inline fixed fsin(fixed x) { return fixsin(x); }
+inline fixed ftan(fixed x) { return fixtan(x); }
+
+inline fixed fadd(fixed x, fixed y) { return fixadd(x, y); }
+inline fixed fsub(fixed x, fixed y) { return fixsub(x, y); }
+inline fixed fmul(fixed x, fixed y) { return fixmul(x, y); }
+inline fixed fdiv(fixed x, fixed y) { return fixdiv(x, y); }
+inline fixed fatan(fixed x) { return fixatan(x); }
 
 /* the weird old clipping API */
 inline void set_clip(BITMAP *bitmap, int x1, int y_1, int x2, int y2) {

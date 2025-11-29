@@ -26,7 +26,7 @@
 #include "ags2/ac/acruntime.h"
 #include "ags2/ac/timer.h"
 #include "ags2/common/clib32.h"
-#include "ags2/common/routefnd.h"
+#include "ags2/engine/routefnd.h"
 #include "ags2/lib/allegro/sound.h"
 #include "ags2/lib/allegro/timer.h"
 #include "ags2/lib/allegro/platform/alwin.h"

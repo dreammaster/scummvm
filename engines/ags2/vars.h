@@ -189,8 +189,6 @@ extern TopBarSettings topBar;
 extern block screenop;
 extern int wantFreeScreenop;
 extern int texthit;
-extern block wallscreen;
-extern int lastcx, lastcy;
 
 // ac/audio.cpp
 extern ScriptAudioChannel scrAudioChannel[MAX_SOUND_CHANNELS + 1];
@@ -432,17 +430,26 @@ extern int vesa_xres, vesa_yres;
 extern int currentcursor;
 extern int pluginSimulatedClick;
 
-// gfx/sprite.cpp
-extern block tmpdbl, curspr;
-extern int newwid, newhit;
-
-// routefnd.cpp
+// engine/routefnd.cpp
 extern int *pathbackx, *pathbacky;
 extern int waspossible;
 extern int routex1, routey1;
 extern int suggestx, suggesty;
 extern fixed move_speed_x, move_speed_y;
+extern block wallscreen;
+extern int lastcx, lastcy;
+extern int line_failed;
+extern int leftorright;
+extern int leftorright;
+extern int nesting;
+extern int pathbackstage;
+extern int finalpartx, finalparty;
+extern short **beenhere;
+extern int beenhere_array_size;
 
+// gfx/sprite.cpp
+extern block tmpdbl, curspr;
+extern int newwid, newhit;
 
 class Vars {
 public:

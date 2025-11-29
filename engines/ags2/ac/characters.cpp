@@ -24,6 +24,7 @@
 #include "ags2/common/wgt2allg.h"
 #define CROOM_NOFUNCTIONS
 #include "ags2/ac/room.h"
+#include "ags2/engine/routefnd.h"
 #include "ags2/vars.h"
 
 namespace AGS2 {
