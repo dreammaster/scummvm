@@ -247,6 +247,8 @@ extern int crovr_id;		// Whether using SetTextOverlay or CreateTextOvelay
 extern int in_new_room;
 extern InteractionVariable globalvars[MAX_GLOBAL_VARIABLES];
 extern int numGlobalVars;
+extern long maxsize, outbytes, putbytes;
+extern BITMAP *recalced;
 
 // ac/savegame.cpp
 extern unsigned int load_new_game;

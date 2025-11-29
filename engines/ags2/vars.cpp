@@ -283,6 +283,8 @@ int crovr_id;
 int in_new_room, new_room_was;
 InteractionVariable globalvars[MAX_GLOBAL_VARIABLES];
 int numGlobalVars;
+long maxsize, outbytes, putbytes;
+BITMAP *recalced;
 
 // ac/savegame.cpp
 unsigned int load_new_game;
@@ -591,6 +593,8 @@ Vars::Vars() {
 	in_new_room = new_room_was = 0;
 	globalvars[0] = { "Global 1", 0, 0 };
 	numGlobalVars = 1;
+	maxsize = outbytes = putbytes = 0;
+	recalced = nullptr;
 
 	// ac/savegame.cpp
 	load_new_game = 0;

@@ -406,9 +406,6 @@ int _acroom_bpp = 1;  // bytes per pixel of currently loading room
 extern void lzwcompress(Common::SeekableReadStream *, Common::SeekableReadStream *);
 extern void lzwexpand(Common::SeekableReadStream *, Common::SeekableReadStream *);
 extern unsigned char *lzwexpand_to_mem(Common::SeekableReadStream *);
-extern long maxsize, outbytes, putbytes;
-
-BITMAP *recalced;
 
 long load_lzw(Common::SeekableReadStream *iii, BITMAP *bmm, color *pall) {
 	long uncompsiz, *loptr;

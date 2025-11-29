@@ -924,7 +924,7 @@ int loadgamedialog() {
 	return toret;
 }
 
-void enterstringwindow(char *prompttext, char *stouse) {
+void enterstringwindow(const char *prompttext, char *stouse) {
 	int boxleft = 60, boxtop = 80;
 	int wantCancel = 0;
 	if (prompttext[0] == '!') {
@@ -960,7 +960,7 @@ void enterstringwindow(char *prompttext, char *stouse) {
 	Common::strcpy_s(stouse, STD_BUFFER_SIZE, buffer2);
 }
 
-int enternumberwindow(char *prompttext) {
+int enternumberwindow(const char *prompttext) {
 	char ourbuf[200];
 	enterstringwindow(prompttext, ourbuf);
 	if (ourbuf[0] == 0)

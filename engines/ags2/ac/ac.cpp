@@ -453,7 +453,7 @@ void debug_log(const char *texx, ...) {
 }
 
 
-void debug_write_console(char *msg, ...) {
+void debug_write_console(const char *msg, ...) {
 	va_list ap;
 	va_start(ap, msg);
 	Common::String str = Common::String::vformat(msg, ap);

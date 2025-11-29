@@ -55,6 +55,7 @@ MODULE_OBJS = \
 	data/screen_overlay.o \
 	data/sound.o \
 	data/words_dictionary.o \
+	engine/scriptrt.o \
 	gfx/sprite.o \
 	gfx/sprite_cache.o \
 	lib/aastr-0.1.1/aarot.o \
