@@ -397,7 +397,7 @@ int run_claimable_event(const char *tsname, bool includeRoom, int numParams, int
 	return 0;
 }
 
-int run_text_script_iparam(ccInstance *sci, char *tsname, int iparam) {
+int run_text_script_iparam(ccInstance *sci, const char *tsname, int iparam) {
 	if ((strcmp(tsname, "on_key_press") == 0) || (strcmp(tsname, "on_mouse_click") == 0)) {
 		bool evtClaimed;
 		int toret = run_claimable_event(tsname, true, 1, iparam, 0, &evtClaimed);
@@ -409,7 +409,7 @@ int run_text_script_iparam(ccInstance *sci, char *tsname, int iparam) {
 	return run_script_function_if_exist(sci, tsname, 1, iparam, 0);
 }
 
-int run_text_script_2iparam(ccInstance *sci, char *tsname, int iparam, int param2) {
+int run_text_script_2iparam(ccInstance *sci, const char *tsname, int iparam, int param2) {
 	if (strcmp(tsname, "on_event") == 0) {
 		bool evtClaimed;
 		int toret = run_claimable_event(tsname, true, 2, iparam, param2, &evtClaimed);

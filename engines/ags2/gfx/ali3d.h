@@ -126,7 +126,6 @@ public:
 	}
 };
 
-extern IGraphicsDriver *GetD3DGraphicsDriver(GFXFilter *);
 extern IGraphicsDriver *GetSoftwareGraphicsDriver(GFXFilter *);
 
 } // namespace AGS2

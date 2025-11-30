@@ -27,6 +27,37 @@
 namespace AGS2 {
 
 #define RESTART_POINT_SAVE_GAME_NUMBER 999
+#define RM_MAXLENGTH    1024
+
+typedef struct _RICH_GAME_MEDIA_HEADER {
+private:
+	template<class SRC, class DEST>
+	static void uconvert(const SRC *src, DEST *dest, size_t maxSize) {
+		do {
+			*dest++ = *src;
+		} while (*src++ != 0 && --maxSize > 1);
+
+		*dest = '\0';
+	}
+public:
+	int       dwMagicNumber;
+	int       dwHeaderVersion;
+	int       dwHeaderSize;
+	int       dwThumbnailOffsetLowerDword;
+	int       dwThumbnailOffsetHigherDword;
+	int       dwThumbnailSize;
+	unsigned char guidGameId[16];
+	unsigned short szGameName[RM_MAXLENGTH];
+	unsigned short szSaveName[RM_MAXLENGTH];
+	unsigned short szLevelName[RM_MAXLENGTH];
+	unsigned short szComments[RM_MAXLENGTH];
+
+	void ReadFromFile(Common::SeekableReadStream *in);
+	void WriteToFile(Common::WriteStream *out);
+
+	void setSaveName(const Common::String &saveName);
+	Common::String getSaveName() const;
+} RICH_GAME_MEDIA_HEADER;
 
 extern const char *load_game_errors[9];
 

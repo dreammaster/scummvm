@@ -294,7 +294,7 @@ void save_game(int slotn, const char *descript) {
 	{
 		long screenShotOffset = ftell(ooo) - sizeof(RICH_GAME_MEDIA_HEADER);
 		long screenShotSize = write_screen_shot_for_vista(ooo, screenShot);
-		fclose(ooo);
+		delete ooo;
 
 		update_polled_stuff();
 
@@ -814,6 +814,134 @@ int LoadImageFile(const char *filename) {
 	add_dynamic_sprite(gotSlot, gfxDriver->ConvertBitmapToSupportedColourDepth(loadedFile));
 
 	return gotSlot;
+}
+
+int do_game_load(const char *nametouse, int slotNumber, char *descrp, int *wantShot) {
+	gameHasBeenRestored++;
+
+	Common::InSaveFile *ooo = g_system->getSavefileManager()->openForLoading(nametouse);
+	if (ooo == NULL)
+		return -1;
+
+	// skip Vista header
+	RICH_GAME_MEDIA_HEADER hdr;
+	hdr.ReadFromFile(ooo);
+
+	ooo->read(rbuffer, sgsiglen);
+	rbuffer[sgsiglen] = 0;
+	if (strcmp(rbuffer, sgsig) != 0) {
+		// not a save game
+		delete ooo;
+		return -2;
+	}
+
+	int oldeip = our_eip;
+	our_eip = 2050;
+
+	fgetstring_limit(rbuffer, ooo, 180);
+	rbuffer[180] = 0;
+	safeguard_string((unsigned char *)rbuffer);
+
+	if (descrp != NULL) {
+		// just want slot description, so return
+		Common::strcpy_s(descrp, STD_BUFFER_SIZE, rbuffer);
+		delete ooo;
+		our_eip = oldeip;
+		return 0;
+	}
+#ifdef TODO
+	if (wantShot != NULL) {
+		// just want the screenshot
+		if (getw(ooo) != SGVERSION) {
+			delete ooo;
+			return -3;
+		}
+		int isScreen = getw(ooo);
+		*wantShot = 0;
+
+		if (isScreen) {
+			int gotSlot = spriteset.findFreeSlot();
+			// load the screenshot
+			block redin = read_serialized_bitmap(ooo);
+
+			if (gotSlot > 0) {
+				// add it into the sprite set
+				add_dynamic_sprite(gotSlot, gfxDriver->ConvertBitmapToSupportedColourDepth(redin));
+
+				*wantShot = gotSlot;
+			} else
+			{
+				destroy_bitmap(redin);
+			}
+		}
+
+		delete ooo;
+		our_eip = oldeip;
+		return 0;
+	}
+
+	our_eip = 2051;
+
+	// do the actual restore
+	int ress = restore_game_data(ooo, nametouse);
+
+	our_eip = oldeip;
+
+	if (ress == -5) {
+		error("Saved in different game");
+		return 0;
+	}
+
+	if (ress)
+		return ress;
+
+	run_on_event(GE_RESTORE_GAME, slotNumber);
+
+	// ensure keyboard buffer is clean
+	// use the raw versions rather than the rec_ versions so we don't
+	// interfere with the replay sync
+	while (keypressed())
+		readkey();
+#else
+	error("TODO: do_game_load");
+#endif
+	return 0;
+}
+
+void RICH_GAME_MEDIA_HEADER::ReadFromFile(Common::SeekableReadStream *in) {
+#ifdef TODO
+	dwMagicNumber = in->readSint32LE();
+	dwHeaderVersion = in->readSint32LE();
+	dwHeaderSize = in->readSint32LE();
+	dwThumbnailOffsetLowerDword = in->readSint32LE();
+	dwThumbnailOffsetHigherDword = in->readSint32LE();
+	dwThumbnailSize = in->readSint32LE();
+	in->read(guidGameId, 16);
+	in->ReadArrayOfInt16((int16_t *)szGameName, RM_MAXLENGTH);
+	in->ReadArrayOfInt16((int16_t *)szSaveName, RM_MAXLENGTH);
+	in->ReadArrayOfInt16((int16_t *)szLevelName, RM_MAXLENGTH);
+	in->ReadArrayOfInt16((int16_t *)szComments, RM_MAXLENGTH);
+#else
+	error("TODO: header");
+#endif
+}
+
+void RICH_GAME_MEDIA_HEADER::WriteToFile(Common::WriteStream *out) {
+#ifdef TODO
+	out->WriteInt32(dwMagicNumber);
+	out->WriteInt32(dwHeaderVersion);
+	out->WriteInt32(dwHeaderSize);
+	out->WriteInt32(dwThumbnailOffsetLowerDword);
+	out->WriteInt32(dwThumbnailOffsetHigherDword);
+	out->WriteInt32(dwThumbnailSize);
+	out->Write(guidGameId, 16);
+	out->WriteArrayOfInt16((int16_t *)szGameName, RM_MAXLENGTH);
+	out->WriteArrayOfInt16((int16_t *)szSaveName, RM_MAXLENGTH);
+	out->WriteArrayOfInt16((int16_t *)szLevelName, RM_MAXLENGTH);
+	out->WriteArrayOfInt16((int16_t *)szComments, RM_MAXLENGTH);
+#else
+	error("TODO: header");
+#endif
 }
 
 } // namespace AGS2

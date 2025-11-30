@@ -19882,12 +19882,7 @@ int ags_main2(int argc, char *argv[]) {
 }
 
 void create_gfx_driver() {
-#ifdef WINDOWS_VERSION
-	if (scumm_stricmp(usetup.gfxDriverID, "D3D9") == 0)
-		gfxDriver = GetD3DGraphicsDriver(filter);
-	else
-#endif
-		gfxDriver = GetSoftwareGraphicsDriver(filter);
+	gfxDriver = GetSoftwareGraphicsDriver(filter);
 
 	gfxDriver->SetCallbackOnInit(GfxDriverOnInitCallback);
 	gfxDriver->SetTintMethod(TintReColourise);
