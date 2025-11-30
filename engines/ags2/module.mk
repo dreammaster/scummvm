@@ -41,6 +41,7 @@ MODULE_OBJS = \
 	common/cscommon.o \
 	common/csrun.o \
 	common/fmem.o \
+	common/lzw.o \
 	common/misc.o \
 	common/mouse32.o \
 	common/text.o \

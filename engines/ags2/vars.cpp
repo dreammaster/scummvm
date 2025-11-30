@@ -105,6 +105,7 @@ int last_sound_played[MAX_SOUND_CHANNELS + 1];
 int current_screen_resolution_multiplier;
 int force_letterbox;
 int ifacepopped;  // currently displayed pop-up GUI (-1 if none)
+int game_paused;
 color palette[256];
 //block spriteset[MAX_SPRITES+1];
 //SpriteCache spriteset (MAX_SPRITES+1);
@@ -402,6 +403,7 @@ Vars::Vars() {
 	fps = display_fps = 0;
 	force_letterbox = 0;
 	ifacepopped = 0;
+	game_paused = 0;
 	Common::fill((byte *)palette, (byte *)palette + 256 * sizeof(color), 0);
 
 	change_to_game_dir = 0;

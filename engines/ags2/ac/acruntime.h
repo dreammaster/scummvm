@@ -44,6 +44,7 @@
 #include "ags2/common/agsplugin.h"
 #include "ags2/common/cscomp.h"
 #include "ags2/common/events.h"
+#include "ags2/common/lzw.h"
 #include "ags2/common/mouse32.h"
 #include "ags2/common/tree_map.h"
 #include "ags2/common/dynamic_array.h"
