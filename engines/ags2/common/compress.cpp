@@ -35,8 +35,8 @@ extern void domouse(int);
 extern block wnewblock(int, int, int, int);
 
 #ifndef __CJONES_H
-long csavecompressed(char *, __block, color[256], long = 0);
-long cloadcompressed(char *, __block, color *, long = 0);
+long csavecompressed(const char *, __block, color[256], long = 0);
+long cloadcompressed(const char *, __block, color *, long = 0);
 #endif
 
 void cpackbitl(unsigned char *line, int size, Common::WriteStream *outfile) {
@@ -144,7 +144,7 @@ void cpackbitl32(unsigned long *line, int size, Common::WriteStream *outfile) {
 }
 
 
-long csavecompressed(char *finam, __block tobesaved, color pala[256], long exto) {
+long csavecompressed(const char *finam, __block tobesaved, color pala[256], long exto) {
 	Common::WriteStream *outpt;
 
 	if (exto > 0) {

@@ -748,7 +748,6 @@ IAGSFontRenderer *IAGSEngine::ReplaceFontRenderer(int fontNumber, IAGSFontRender
 	return oldOne;
 }
 
-
 // *********** Windows & Mac plugin implementation **********
 
 void pl_stop_plugins() {

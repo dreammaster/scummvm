@@ -680,7 +680,7 @@ extern void DisplaySpeech(char *texx, int aschar);
 extern int  Overlay_GetValid(ScriptOverlay *scover);
 extern void set_mouse_cursor(int);
 extern void set_default_cursor();
-extern int  run_text_script(ccInstance *, char *);
+extern int  run_text_script(ccInstance *, const char *);
 extern int  run_text_script_2iparam(ccInstance *, char *, int, int);
 extern int  run_text_script_iparam(ccInstance *, char *, int);
 extern int  run_interaction_event(NewInteraction *nint, int evnt, int chkAny = -1, int isInv = 0);

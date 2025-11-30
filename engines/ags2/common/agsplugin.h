@@ -419,10 +419,7 @@ public:
 	AGSIFUNC(void)   BlitSpriteRotated(int x, int y, BITMAP *, int angle);
 
 	// *** BELOW ARE INTERFACE VERSION 14 AND ABOVE ONLY
-#ifdef WINDOWS_VERSION
-  // get reference to main DirectSound interface
-	AGSIFUNC(LPDIRECTSOUND) GetDirectSound();
-#endif
+
 	// disable AGS sound engine
 	AGSIFUNC(void)   DisableSound();
 	// check whether a script function can be run now
@@ -485,12 +482,7 @@ public:
 	AGSIFUNC(void)   GetPathToFileInCompiledFolder(const char *fileName, char *buffer);
 
 	// *** BELOW ARE INTERFACE VERSION 23 AND ABOVE ONLY
-#ifdef WINDOWS_VERSION
-  // get reference to keyboard Direct Input device
-	AGSIFUNC(LPDIRECTINPUTDEVICE) GetDirectInputKeyboard();
-	// get reference to mouse Direct Input device
-	AGSIFUNC(LPDIRECTINPUTDEVICE) GetDirectInputMouse();
-#endif
+
 	// install a replacement renderer for the specified font number
 	AGSIFUNC(IAGSFontRenderer *) ReplaceFontRenderer(int fontNumber, IAGSFontRenderer *newRenderer);
 };
