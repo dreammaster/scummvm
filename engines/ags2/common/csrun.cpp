@@ -1914,7 +1914,7 @@ long fget_long(Common::ReadStream *iii) {
 	return iii->readSint32LE();
 }
 
-ccScript *fread_script(Common::ReadStream *ooo) {
+ccScript *fread_script(Common::SeekableReadStream *ooo) {
 	ccScript *scri = (ccScript *)malloc(sizeof(ccScript));
 	scri->instances = 0;
 	int n;
