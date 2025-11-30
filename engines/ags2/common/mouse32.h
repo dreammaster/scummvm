@@ -28,14 +28,16 @@ namespace AGS2 {
 
 #define MAXCURSORS 20
 
-inline bool minstalled() {
-	return true;
-}
-
 /**
  * Set the hotspot position within the cursor
  */
 extern void msethotspot(int, int);
+
+inline int minstalled() {
+	return 3;
+}
+inline void minst() {
+}
 
 } // namespace AGS2
 
