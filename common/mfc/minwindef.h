@@ -110,7 +110,7 @@ typedef LRESULT(CALLBACK *WNDPROC)(HWND, unsigned int, WPARAM, LPARAM);
 typedef intptr(FAR WINAPI *FARPROC)();
 typedef intptr(NEAR WINAPI *NEARPROC)();
 typedef intptr(WINAPI *PROC)();
-typedef intptr(CALLBACK *DLGPROC)(HWND, unsigned int, WPARAM, LPARAM);
+typedef intptr(CALLBACK *DLGPROC)(HWND, UINT, WPARAM, LPARAM);
 
 #ifndef max
 	#define max(a,b)            (((a) > (b)) ? (a) : (b))
