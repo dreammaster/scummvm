@@ -284,6 +284,7 @@ typedef uint32 (*APPLICATION_RECOVERY_CALLBACK)(void *pvParameter);
 #define MB_YESNOCANCEL              0x00000003L
 #define MB_YESNO                    0x00000004L
 #define MB_RETRYCANCEL              0x00000005L
+#define MB_SETFOREGROUND			0x00010000L
 
 /*
  * Scroll Bar Constants
