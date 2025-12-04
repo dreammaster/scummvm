@@ -203,9 +203,39 @@ void ShowWindow(HWND hWnd, int nCmdShow) {
 	wnd->ShowWindow(nCmdShow);
 }
 
+void EnableWindow(HWND hWnd, bool bEnable) {
+	CWnd *wnd = CWnd::FromHandle(hWnd);
+	wnd->EnableWindow(bEnable);
+}
+
 void UpdateWindow(HWND hWnd) {
 	CWnd *wnd = CWnd::FromHandle(hWnd);
 	wnd->UpdateWindow();
+}
+
+void GetWindowRect(HWND hWnd, LPRECT lpRect) {
+	CWnd *wnd = CWnd::FromHandle(hWnd);
+	return wnd->GetWindowRect(lpRect);
+}
+
+bool GetUpdateRect(HWND hWnd, LPRECT lpRect, bool bErase) {
+	CWnd *wnd = CWnd::FromHandle(hWnd);
+	return wnd->GetUpdateRect(lpRect, bErase);
+}
+
+bool GetClientRect(HWND hWnd, LPRECT lpRect) {
+	CWnd *wnd = CWnd::FromHandle(hWnd);
+	return wnd->GetClientRect(lpRect);
+}
+
+void MoveWindow(HWND hWnd, LPCRECT lpRect, bool bRepaint) {
+	CWnd *wnd = CWnd::FromHandle(hWnd);
+	return wnd->MoveWindow(lpRect, bRepaint);
+}
+
+void MoveWindow(HWND hWnd, int x, int y, int nWidth, int nHeight, bool bRepaint) {
+	CWnd *wnd = CWnd::FromHandle(hWnd);
+	return wnd->MoveWindow(x, y, nWidth, nHeight, bRepaint);
 }
 
 bool PeekMessage(LPMSG lpMsg, HWND hWnd,
@@ -303,6 +333,10 @@ SHORT GetAsyncKeyState(int vKey) {
 
 DWORD timemGetTime() {
 	return g_system->getMillis();
+}
+
+intptr DialogBox(HINSTANCE hInstance, const char *lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc) {
+	error("TODO: DialogBox");
 }
 
 } // namespace MFC

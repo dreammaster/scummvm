@@ -125,6 +125,13 @@ extern HWND CreateWindow(const char *lpClassName, const char *lpWindowName,
 	uint32 dwStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent,
 	HMENU hMenu, HINSTANCE hInstance, void *lpParam);
 extern void ShowWindow(HWND hWnd, int nCmdShow);
+extern void EnableWindow(HWND hWnd, bool bEnable);
+extern void GetWindowRect(HWND hWnd, LPRECT lpRect);
+extern bool GetUpdateRect(HWND hWnd, LPRECT lpRect, bool bErase = false);
+extern bool GetClientRect(HWND hWnd, LPRECT lpRect);
+extern void MoveWindow(HWND hWnd, LPCRECT lpRect, bool bRepaint = true);
+extern void MoveWindow(HWND hWnd, int x, int y, int nWidth, int nHeight, bool bRepaint = true);
+
 extern void UpdateWindow(HWND hWnd);
 extern bool PeekMessage(LPMSG lpMsg, HWND hWnd,
                         unsigned int wMsgFilterMin, unsigned int wMsgFilterMax,
@@ -151,6 +158,7 @@ extern bool AfxExtractSubString(CString &rString, const char *lpszFullString,
 	int iSubString, char chSep = '\n');
 extern SHORT GetAsyncKeyState(int vKey);
 extern DWORD timeGetTime();
+extern intptr DialogBox(HINSTANCE hInstance, const char *lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc);
 
 inline char *strUpper(char *s) {
 	for (char *curr = s; *curr; ++curr)
