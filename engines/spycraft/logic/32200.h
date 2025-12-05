@@ -39,4 +39,6 @@ public:
 	int doVerb( int );
 };
 
+} // namespace Spycraft
+
 #endif

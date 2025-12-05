@@ -1,3 +1,24 @@
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef SPYCRAFT_LOGIC_1000_H
 #define SPYCRAFT_LOGIC_1000_H
 
@@ -8,13 +29,14 @@
 #include "timer.h"
 #include "plistobj.h"
 
+namespace Spycraft {
 
-enum 
+enum
 {
 	MAP_WORLD,		// you can't be at this level
 	MAP_CITY,		// you can't be at this level
 	MAP_WASHINGTON,
-	MAP_LONDON, 
+	MAP_LONDON,
 	MAP_MOSCOW,
 	MAP_TUNISIA,
 	MAP_HEIDELBERG,
@@ -51,22 +73,22 @@ enum
 
 class MapTitle : public Object
 {
- public:
+public:
 	MapTitle();
-	void set( int theView, char* theName, int thePosn, int theLoop, int theCell );
-	void reset( void );
+	void set(int theView, char *theName, int thePosn, int theLoop, int theCell);
+	void reset(void);
 	int		posn;	// one of enum POSN_...
-	View*	title;
+	View *title;
 };
 
 class MoviePlayer1000 : public Object
 {
- public:
-	void movieDelayPlay( char* theMovie, Object* whoToCue, int wait, int close, int erase);
-	void cue( void );
-	Timer*  timer;
-	char*	myMovie;
-	Object*	myWhoToCue;
+public:
+	void movieDelayPlay(char *theMovie, Object *whoToCue, int wait, int close, int erase);
+	void cue(void);
+	Timer *timer;
+	char *myMovie;
+	Object *myWhoToCue;
 	int		myWait;
 	int		myClose;
 	int		myErase;
@@ -74,45 +96,45 @@ class MoviePlayer1000 : public Object
 
 /** city triad **/
 
-class CityTitle1000: public View
+class CityTitle1000 : public View
 {
- public:
- 	CityTitle1000();
-	void dispose( void );
-	void update( int city );
-	View*	title;
+public:
+	CityTitle1000();
+	void dispose(void);
+	void update(int city);
+	View *title;
 };
 
 class CityBt1000 : public View
 {
- public:
-	CityBt1000( int side, int city );
-	int doVerb( int );
-	int verifyDestinationDisc( int destination );
+public:
+	CityBt1000(int side, int city);
+	int doVerb(int);
+	int verifyDestinationDisc(int destination);
 	int		myLoop;
 	int		myCity;
 };
 
 class BackBt1000 : public View
 {
- public:
+public:
 	BackBt1000();
-	int doVerb( int );
+	int doVerb(int);
 };
 
 class CityTriad1000 : public Object
 {
- public:
- 	CityTriad1000();
-	void dispose( void );
-	void update( void );
-	void calcTriad( int local, int& here, int& left, int& right );
-	CityTitle1000*	topTitle;
-	View*			wingThing;
-	BackBt1000*		backBt;	
-	CityBt1000*		lBt;
-	CityBt1000*		rBt;
-};	
+public:
+	CityTriad1000();
+	void dispose(void);
+	void update(void);
+	void calcTriad(int local, int &here, int &left, int &right);
+	CityTitle1000 *topTitle;
+	View *wingThing;
+	BackBt1000 *backBt;
+	CityBt1000 *lBt;
+	CityBt1000 *rBt;
+};
 
 class Rm1000 : public Room
 {
@@ -126,29 +148,29 @@ public:
 	int doSeq2;
 	Rm1000();
 	~Rm1000();
-	void init ( void );
-	void fromTo( int theFrom, int theTo);
+	void init(void);
+	void fromTo(int theFrom, int theTo);
 	void seq2(int theFrom, int theTo);
-	void cue ( void );
-	void showRegion( int theRegion );
-	void cleanUp( void );
-	void queryRegion( int theRegion ); 
-	void drawTitle( MapTitle* theTitle );
-	void checkWashington( void );
-	void checkLangley( void );
-	void checkMoscow( void );
-	void checkStationExt( void );
-	void checkStationInt( void );
-	void startMidi( void );
-	void startMidi( int number );
-	void stopMidi( void );
-	int findMidiTableRow( int location );
-	CityTriad1000*	city;
+	void cue(void);
+	void showRegion(int theRegion);
+	void cleanUp(void);
+	void queryRegion(int theRegion);
+	void drawTitle(MapTitle *theTitle);
+	void checkWashington(void);
+	void checkLangley(void);
+	void checkMoscow(void);
+	void checkStationExt(void);
+	void checkStationInt(void);
+	void startMidi(void);
+	void startMidi(int number);
+	void stopMidi(void);
+	int findMidiTableRow(int location);
+	CityTriad1000 *city;
 	MapTitle		title1;
 	MapTitle		title2;
 	MapTitle		title3;
 	MapTitle		title4;
-	MoviePlayer1000*	mPlay;
+	MoviePlayer1000 *mPlay;
 	int  	musicHandle;
 	int		musicNumber;
 };
@@ -158,262 +180,262 @@ class MapBack : public Feature
 {
 public:
 	MapBack();
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 /* map features */
 class MapFeature : public Feature
 {
 public:
-	void verifyDisc( int theDisc );
-	void cutToRoom( Room* theRoom );
-	virtual int doVerb ( int );
+	void verifyDisc(int theDisc);
+	void cutToRoom(Room *theRoom);
+	virtual int doVerb(int);
 };
 
 class TunisiaMap : public MapFeature
 {
 public:
 	TunisiaMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class MapFrank : public MapFeature
 {
 public:
 	MapFrank(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class IAMap : public MapFeature
 {
 public:
 	IAMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class HoltMap : public MapFeature
 {
 public:
 	HoltMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class JaimieMap : public MapFeature
 {
 public:
 	JaimieMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class WashPlayerMap : public MapFeature
 {
 public:
 	WashPlayerMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class DCIMap : public MapFeature
 {
 public:
 	DCIMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class ZoneMap : public MapFeature
 {
 public:
 	ZoneMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class StakeOutMap : public MapFeature
 {
 public:
 	StakeOutMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class KneecapMap : public MapFeature
 {
 public:
 	KneecapMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class HeidelbergMap : public MapFeature
 {
 public:
 	HeidelbergMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class HotelMap : public MapFeature
 {
 public:
 	HotelMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class RefineryShooterMap : public MapFeature
 {
 public:
 	RefineryShooterMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class RefineryDialogMap : public MapFeature
 {
 public:
 	RefineryDialogMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class CrimeaMap : public MapFeature
 {
 public:
 	CrimeaMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class MoscowMap : public MapFeature
 {
 public:
 	MoscowMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class EmbassyIntMap : public MapFeature
 {
 public:
 	EmbassyIntMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
-class AlleyMap  : public MapFeature
+class AlleyMap : public MapFeature
 {
 public:
 	AlleyMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
-class ProcatVanMap  : public MapFeature
+class ProcatVanMap : public MapFeature
 {
 public:
 	ProcatVanMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class MaxOfficeMap : public MapFeature
 {
 public:
 	MaxOfficeMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
-class ThornOfficeMap  : public MapFeature
+class ThornOfficeMap : public MapFeature
 {
 public:
 	ThornOfficeMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
-class InterrogationRoomMap  : public MapFeature
+class InterrogationRoomMap : public MapFeature
 {
 public:
 	InterrogationRoomMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
-class BullpenMap  : public MapFeature
+class BullpenMap : public MapFeature
 {
 public:
 	BullpenMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class VilniusCenterMap : public MapFeature
 {
 public:
 	VilniusCenterMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class BirdsongMap : public MapFeature
 {
 public:
 	BirdsongMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class SchlumpfenMap : public MapFeature
 {
 public:
 	SchlumpfenMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class LubyankaMap : public MapFeature
 {
 public:
 	LubyankaMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class EmbassyMap : public MapFeature
 {
 public:
 	EmbassyMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class LondonMap : public MapFeature
 {
 public:
 	LondonMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class WashingtonMap : public MapFeature
 {
 public:
 	WashingtonMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
-	void checkWashington( void );
+	int doVerb(int);
+	void checkWashington(void);
 };
 
 class Farm : public MapFeature
 {
 public:
 	Farm(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class Langley : public MapFeature
 {
 public:
 	Langley(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class ColbyHouse : public MapFeature
 {
 public:
 	ColbyHouse(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class DachaMap : public MapFeature
 {
 public:
 	DachaMap(int theX, int theY, int theWidth, int theHeight);
-	int doVerb ( int );
+	int doVerb(int);
 };
 
 class AssSuiteMap : public MapFeature
 {
- public:
-	AssSuiteMap( int theX, int theY, int theWidth, int theHeight );
-	int doVerb ( int );
+public:
+	AssSuiteMap(int theX, int theY, int theWidth, int theHeight);
+	int doVerb(int);
 };
 
 /* scripts */
@@ -421,41 +443,47 @@ class MapExit1000 : public Script
 {
 public:
 	int from;
-	int to;						 
-	Room* nextRoom;
+	int to;
+	Room *nextRoom;
 
-	MapExit1000(int theFrom, int theTo, Room* theRoom);
-	void changeState ( int );
+	MapExit1000(int theFrom, int theTo, Room *theRoom);
+	void changeState(int);
 };
 
 class MusicFadeOut1000 : public Script
 {
 public:
-	MusicFadeOut1000( int handle, long msec );
+	MusicFadeOut1000(int handle, long msec);
 	~MusicFadeOut1000();
-	void changeState ( int );
+	void changeState(int);
 	int  myHandle;
 	long myDelay;
-	PermListObject* fadeObj;	
+	PermListObject *fadeObj;
 };
 
 class LenaCallsScript1000 : public Script
 {
- public:
- 	LenaCallsScript1000() { name = "LenaCallsScript1000"; };
-	void changeState( int );
+public:
+	LenaCallsScript1000() {
+		name = "LenaCallsScript1000";
+	};
+	void changeState(int);
 };
 
 class MoscowPlateScript1000 : public Script
 {
- public:
- 	MoscowPlateScript1000() { name = "MoscowPlateScript1000"; };
-	void changeState( int );
-}; 
+public:
+	MoscowPlateScript1000() {
+		name = "MoscowPlateScript1000";
+	};
+	void changeState(int);
+};
 
 extern short curMap;
 extern short drawBackground;	// set to FALSE to suppress TL drawPic, may be temp
-extern Rm1000* rm1000;
+extern Rm1000 *rm1000;
+
+} // namespace Spycraft
 
 #endif
 

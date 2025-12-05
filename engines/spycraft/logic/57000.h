@@ -1,7 +1,23 @@
-//Started by Tom DeSalvo
-//Continued by GS and DCK
-//Birdosng Apt. Cluster
-//Finished by Ka Wah
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef SPYCRAFT_LOGIC_57000_H
 #define SPYCRAFT_LOGIC_57000_H
@@ -13,38 +29,40 @@
 #include "inset.h"
 #include "globals.h"
 
+namespace Spycraft {
+
 class Rm57000 : public Room
 {
 public:
 	Rm57000();
 	~Rm57000();
 	void cue();
-	void init ( void );
-	int handleEvent ( MADEEventStamp * );
+	void init(void);
+	int handleEvent(MADEEventStamp *);
 };
 
 class SouthExit57000 : public SouthExit
 {
 public:
 	SouthExit57000();
-  	void respond ( void );
-	int doVerb ( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class TopWestExit57000 : public ExitFeature
 {
 public:
 	TopWestExit57000();
-  	void respond ( void );
-	int doVerb ( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class BottomWestExit57000 : public ExitFeature
 {
 public:
 	BottomWestExit57000();
-  	void respond ( void );
-	int doVerb ( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 /*class Bedroom57000 : public TextFeature
@@ -82,91 +100,91 @@ class StatueAndLamp57000 : public Feature
 {
 public:
 	StatueAndLamp57000();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class BookOnTable57000 : public Feature
 {
 public:
 	BookOnTable57000();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class BearPhoto57000 : public Feature
 {
 public:
 	BearPhoto57000();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class HorseStatue57000 : public Feature
 {
 public:
 	HorseStatue57000();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class Calendar57000 : public Feature
 {
 public:
 	Calendar57000();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 /* insets */
-class StatueAndLampInset57000 : public Inset		
+class StatueAndLampInset57000 : public Inset
 {
 public:
 	StatueAndLampInset57000();
-	int doVerb( int );
+	int doVerb(int);
 };
 
-class BookOnTableInset57000 : public Inset		
+class BookOnTableInset57000 : public Inset
 {
 public:
 	BookOnTableInset57000();
-	int doVerb( int );
+	int doVerb(int);
 };
 
-class BearPhotoInset57000 : public Inset		
+class BearPhotoInset57000 : public Inset
 {
 public:
 	BearPhotoInset57000();
-	int doVerb( int );
+	int doVerb(int);
 };
 
-class HorseStatueInset57000 : public Inset		
+class HorseStatueInset57000 : public Inset
 {
 public:
 	HorseStatueInset57000();
-	int doVerb( int );
+	int doVerb(int);
 };
 
-class CalendarInset57000 : public Inset		
+class CalendarInset57000 : public Inset
 {
 public:
 	CalendarInset57000();
-	int doVerb( int );
+	int doVerb(int);
 };
 
 /* scripts */
 class EnterScript57000 : public Script
 {
- public:
- 	EnterScript57000(); 
-	void changeState( int );
+public:
+	EnterScript57000();
+	void changeState(int);
 };
 
 class ArrestPlayerScript57000 : public Script
 {
- public:
- 	ArrestPlayerScript57000(); 
-	void changeState( int );
+public:
+	ArrestPlayerScript57000();
+	void changeState(int);
 };
 
 /* dialog */
@@ -174,22 +192,24 @@ class BetrayMaxMafia : public DItem
 {
 public:
 	BetrayMaxMafia();
-	void doit( void );
+	void doit(void);
 };
 
 class BetrayMaxKneecaps : public DItem
 {
 public:
 	BetrayMaxKneecaps();
-	void doit( void );
+	void doit(void);
 };
 
 class LiveMax : public DItem
 {
 public:
 	LiveMax();
-	void doit( void );
+	void doit(void);
 };
+
+} // namespace Spycraft
 
 #endif
 
