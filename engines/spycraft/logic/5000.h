@@ -1,11 +1,23 @@
-/*********************************************
-* Header file.
-* Image Analysis
-* Rooms: 5000, 5100, 5200        
-* Copyright Activision 1995
-* Started by Tom DeSalvo 
-* Continued by:  Daniel Kinzek   July, 1995
-**********************************************/
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef SPYCRAFT_LOGIC_5000_H
 #define SPYCRAFT_LOGIC_5000_H
@@ -16,6 +28,8 @@
 #include "actor.h"
 #include "globals.h"
 #include "inset.h"
+
+namespace Spycraft {
 
 /* rooms */
 
@@ -47,15 +61,15 @@ class SouthExit5000 : public SouthExit
 {
 public:
 	SouthExit5000();
-  void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 class WestExit5000 : public ExitFeature
 {
 public:
 	WestExit5000();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 /* 5100 */
@@ -63,8 +77,8 @@ class SouthExit5100 : public SouthExit
 {
 public:
 	SouthExit5100();
-  void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 /* 5200 */
@@ -72,24 +86,24 @@ class SouthExit5200 : public SouthExit
 {
 public:
 	SouthExit5200();
-  void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 class EastExit5200 : public ExitFeature
 {
 public:
 	EastExit5200();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 /* features */
 class Computer5000 : public Feature
 {
- public:
+public:
 	Computer5000();
-	int	doVerb( int );
-	void respond( void );
+	int	doVerb(int);
+	void respond(void);
 };
 
 /* props */
@@ -97,64 +111,76 @@ class BackMonitorProp5000 : public Prop
 {
 public:
 	BackMonitorProp5000();
-	int	doVerb( int );
-	void respond( void );
-	void cue( void );
+	int	doVerb(int);
+	void respond(void);
+	void cue(void);
 };
 
 class BlankBackMonitorProp5000 : public Prop
 {
- public:
- 	BlankBackMonitorProp5000();
-	int doVerb( int );
-	void cue( void );
+public:
+	BlankBackMonitorProp5000();
+	int doVerb(int);
+	void cue(void);
 };
 
 /* scripts */
-class TimeoutScript5000: public Script
+class TimeoutScript5000 : public Script
 {
- public:
- 	TimeoutScript5000() { name = "TimeoutScript5000"; };
+public:
+	TimeoutScript5000() {
+		name = "TimeoutScript5000";
+	};
 	~TimeoutScript5000();
-	void changeState( int );	
+	void changeState(int);
 };
 
 class IntroScript5100 : public Script
 {
- public:
- 	IntroScript5100() { name = "IntroScript5100"; };
-	void changeState( int );
+public:
+	IntroScript5100() {
+		name = "IntroScript5100";
+	};
+	void changeState(int);
 };
 
 class NewsScript5000Plus : public Script
 {
- public:
- 	NewsScript5000Plus() { name = "NewsScript5000Plus"; };
-	void changeState( int );
+public:
+	NewsScript5000Plus() {
+		name = "NewsScript5000Plus";
+	};
+	void changeState(int);
 };
 
 class LicenseScript5100 : public Script
 {
- public:
- 	LicenseScript5100() { name = "LicenseScript5100"; };
-	void changeState( int );
+public:
+	LicenseScript5100() {
+		name = "LicenseScript5100";
+	};
+	void changeState(int);
 };
 
 class TanksScript5100 : public Script
 {
- public:
- 	TanksScript5100() { name = "TanksScript5100"; };
-	void changeState( int );
+public:
+	TanksScript5100() {
+		name = "TanksScript5100";
+	};
+	void changeState(int);
 };
 
 class AmesScript5100 : public Script
 {
- public:
- 	AmesScript5100() { name = "AmesScript5100"; };
-	void changeState( int );
+public:
+	AmesScript5100() {
+		name = "AmesScript5100";
+	};
+	void changeState(int);
 };
 
-	
+} // namespace Spycraft
 
 #endif
 

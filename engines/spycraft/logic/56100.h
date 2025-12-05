@@ -1,7 +1,23 @@
-//Started by Tom DeSalvo
-//Door to Birdsong
-//Copyright Activision 1995
-//Finished by Ka Wah
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef SPYCRAFT_LOGIC_56100_H
 #define SPYCRAFT_LOGIC_56100_H
@@ -13,13 +29,15 @@
 #include "inset.h"
 #include "flag.h"
 
+namespace Spycraft {
+
 class Rm56100 : public Room
 {
 public:
 	Rm56100();
 	~Rm56100();
 	void init();
-	int handleEvent ( MADEEventStamp * );
+	int handleEvent(MADEEventStamp *);
 };
 
 /* exit features */
@@ -36,8 +54,8 @@ class SouthExit56100 : public SouthExit
 {
 public:
 	SouthExit56100();
-  	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 /* features */
@@ -45,16 +63,16 @@ class Doorknob56100 : public Feature
 {
 public:
 	Doorknob56100();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class KnockDoor56100 : public Feature
 {
 public:
 	KnockDoor56100();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 /*
 class Door56100 : public Feature
@@ -66,7 +84,7 @@ public:
 };
 */
 /* insets */
-class DoorknobInset56100 : public Inset		
+class DoorknobInset56100 : public Inset
 {
 public:
 	DoorknobInset56100();
@@ -78,8 +96,8 @@ class LockInsetFeature56100 : public InsetFeature
 {
 public:
 	LockInsetFeature56100();
-	void respond( void );
-	int doVerb ( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 /* scripts */
@@ -87,15 +105,15 @@ public:
 class DoorScript56100 : public Script
 {
  public:
- 	DoorScript56100();
+	DoorScript56100();
 	void changeState( int );
 };
 */
 class PickLockScript56100 : public Script
 {
- public:
- 	PickLockScript56100();
-	void changeState( int );
+public:
+	PickLockScript56100();
+	void changeState(int);
 };
 
 /*
@@ -121,39 +139,41 @@ public:
 	Rm56101();
 	~Rm56101();
 	void init();
-	int handleEvent ( MADEEventStamp * );
+	int handleEvent(MADEEventStamp *);
 };
 
 class SouthExit56101 : public SouthExit
 {
 public:
 	SouthExit56101();
-  	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class WestExit56101 : public ExitFeature
 {
 public:
 	WestExit56101();
-  	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class EastExit56101 : public ExitFeature
 {
 public:
 	EastExit56101();
-  	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class OpenBSLock56101 : public Feature
 {
 public:
 	OpenBSLock56101();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
+
+} // namespace Spycraft
 
 #endif
