@@ -19,14 +19,14 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/32300.h"
 #include "spycraft/logic/32200.h"
-//#include "movie.h"
-//#include "vlink.h"
+//#include "spycraft/game/movie.h"
+//#include "spycraft/game/vlink.h"
 
 namespace Spycraft {
 
@@ -82,9 +82,9 @@ int SouthExit32300::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm32200 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 /*
 NorthWestExit32300::NorthWestExit32300()
@@ -105,9 +105,9 @@ int NorthWestExit32300::doVerb( int theVerb )
 //    	theGame->newRoom( new Rm32200 );
 			if( !GameFlag.test( fVCRoomEnter ))	   
 				setScript( new EnterScript32300 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 /*******************************

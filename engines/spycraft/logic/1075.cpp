@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/1075.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
-#include "movie.h"
-#include "vlink.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/vlink.h"
 #include "spycraft/logic/60000.h"
 
 namespace Spycraft {
@@ -118,7 +118,7 @@ void Rm1075::cue ( void )
 
 int Rm1075::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 /*
 NorthExit1075::NorthExit1075()
@@ -137,9 +137,9 @@ int NorthExit1075::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm76000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 

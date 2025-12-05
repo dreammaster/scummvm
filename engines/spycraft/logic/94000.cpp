@@ -19,16 +19,16 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/94000.h"
 #include "web.h"
 #include "target.h"
 #include "intrpuzz.h"					 
-#include "movie.h"
-#include "gamebox.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/dmade/gamebox.h"
 #include "save.h"
 
 namespace Spycraft {
@@ -78,7 +78,7 @@ void Rm94000::cue()
 
 int Rm94000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -89,7 +89,7 @@ int Rm94000::handleEvent ( MADEEventStamp *event )
 void Script94000::changeState ( int newState )
 {
 	switchTo
-		user->canInput(FALSE);
+		user->canInput(false);
 		sfxSystemCursor(SYS_ARROW);
 		SaveYes = MessageBox(hGameWnd, "Do you wish to Save before quitting?",
 		                               "Leaving Spycraft", MB_ICONQUESTION | MB_SETFOREGROUND	| MB_YESNO);
@@ -106,7 +106,7 @@ void Script94000::changeState ( int newState )
 	END
 	
 	BEG
-	  	quitting = TRUE;
+	  	quitting = true;
 	  	sfxQuit();
 	END	
 }

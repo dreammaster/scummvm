@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/91000.h"
 #include "web.h"
 #include "target.h"
 #include "intrpuzz.h"					 
-#include "movie.h"
+#include "spycraft/game/movie.h"
 #include "spycraft/logic/1000.h"
 #include "spycraft/logic/60000.h"
 #include "save.h"
@@ -60,7 +60,7 @@ void Rm91000::init()
 {
   	drawPic(-1);
     Room::init();
-	user->canInput(FALSE);
+	user->canInput(false);
 	
 	if (!restoring)	{
 		sfxPrintf("Autosaving in Red Square");
@@ -75,7 +75,7 @@ void Rm91000::init()
 		#endif
 	}
 	else
-		didRestore = TRUE;
+		didRestore = true;
 	curRoom->setScript(new Script91000);
 }
 
@@ -89,7 +89,7 @@ void Rm91000::cue()
 
 int Rm91000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -126,7 +126,7 @@ void Script91000::changeState ( int newState )
 	END
 
 	BEG
-		didRestore = FALSE;
+		didRestore = false;
 		theMovie->stop();
 //		theMovie->fromTo(5250,5487);
 //	   	theMovie->play("250.avi", this, 0, 0, 0);	   	// square flyby
@@ -135,8 +135,8 @@ void Script91000::changeState ( int newState )
 	END
 
 	BEG
-		user->canInput(TRUE);
-		theGame->enableIntrDuringMovie = TRUE;
+		user->canInput(true);
+		theGame->enableIntrDuringMovie = true;
 		intrface->enable();
 		intrface->blink();
 //		theMovie->fromTo(5490,5600);
@@ -162,7 +162,7 @@ void ArrestedScript91000::changeState ( int newState )
 void GoTargetScript::changeState ( int newState )
 {
  	switchTo
-		intrface->blinking = FALSE;
+		intrface->blinking = false;
 		if (pdaProp)
 		{
 			intrface->release(pdaProp);
@@ -171,29 +171,29 @@ void GoTargetScript::changeState ( int newState )
 			delete pdaProp;
 			pdaProp = NULL;
 		}
-		theGame->enableIntrDuringMovie = FALSE;
+		theGame->enableIntrDuringMovie = false;
 		theMovie->stop();
 		theMovie->fromTo(2108,2223);
-		theMovie->play("253.avi", this,FALSE,TRUE,FALSE);
+		theMovie->play("253.avi", this,false,true,false);
 //		theMovie->fromTo(6945,7060);
-//		theMovie->play("250.avi", this,FALSE,TRUE,FALSE);
+//		theMovie->play("250.avi", this,false,true,false);
 	END
 
 	BEG
 		theMovie->stop();
 		theMovie->fromTo(2753,3095);
-		theMovie->play("253.avi", this,FALSE,TRUE,FALSE);
+		theMovie->play("253.avi", this,false,true,false);
 //		theMovie->fromTo(7590,7932);
-//		theMovie->play("250.avi", this,FALSE,TRUE,FALSE);
+//		theMovie->play("250.avi", this,false,true,false);
 	END
 	BEG
 //		if (GameFlag.test(fTargetFreqAvailable))
 //		{
 			theMovie->stop();
 			theMovie->fromTo(2243,2746);
-			theMovie->play("253.avi", this,FALSE,TRUE,FALSE);
+			theMovie->play("253.avi", this,false,true,false);
 //			theMovie->fromTo(7080,7584);
-//			theMovie->play("250.avi", this,FALSE,TRUE,FALSE);
+//			theMovie->play("250.avi", this,false,true,false);
 //		}	
 //		else
 //			cue();

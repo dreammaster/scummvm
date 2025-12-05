@@ -4,17 +4,17 @@
 //Finished by Ka Wah
 
 #include "invent.h"
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/36700.h"
 #include "spycraft/logic/1000.h"
 //#include "spycraft/logic/23000.h"
 //#include "spycraft/logic/25000.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 #include "invent.h"
-#include "movie.h"
+#include "spycraft/game/movie.h"
 
 #define CRSBLINK_SPEED 5
 
@@ -101,7 +101,7 @@ Rm36700::~Rm36700( void )
 
 int Rm36700::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /*******************************

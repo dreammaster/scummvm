@@ -19,13 +19,13 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/36200.h"
 #include "spycraft/logic/36300.h"
-#include "sound.h"
+#include "spycraft/game/sound.h"
 
 namespace Spycraft {
 
@@ -67,7 +67,7 @@ void Rm36200::init()
 
 int Rm36200::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /*********************
@@ -93,9 +93,9 @@ int SouthExit36200::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm36300 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -128,23 +128,23 @@ int Lock36200::doVerb( int theVerb )
 			sound2->play();
 		}
 //		sfxPrintf( "You can't pick a lock with that!" );	
-		return TRUE;
+		return true;
 	}
 	else {
 		theGame->handsOff();
 		inventry->clearCurrentItem();
 
 		curRoom->setScript(new LockPickScript36200);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 */
 	if ( invVerb == LOCKPICK_V ) {
 //		sfxPrintf( "Click" );
 		inventry->clearCurrentItem();
 		theGame->handsOff();
 		curRoom->setScript(new LockPickScript36200);
-		return TRUE;
+		return true;
 	}
 	else if ( invVerb != LOCKPICK_V ){
 		if( sound2->number != 36021  || !sound2->isPlaying()) {
@@ -153,9 +153,9 @@ int Lock36200::doVerb( int theVerb )
 		}
 	}
 	else if ( theVerb == DO_V ) {
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 LockPickScript36200::LockPickScript36200()

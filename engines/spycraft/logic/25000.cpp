@@ -19,17 +19,17 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/25100.h"
 #include "spycraft/logic/25000.h"
 //#include "spycraft/logic/22300.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
-#include "movie.h"
-#include "vlink.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/vlink.h"
 #include "torture.h"
 #include "spycraft/logic/60000.h"
 
@@ -102,7 +102,7 @@ void Rm25000::init()
 
 int Rm25000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit25000::SouthExit25000()
@@ -123,9 +123,9 @@ int SouthExit25000::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //		theGame->newRoom(new Rm22300);
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EastExit25000::EastExit25000()
@@ -145,9 +145,9 @@ int EastExit25000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm25100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 ControlPanel25000::ControlPanel25000()
@@ -167,9 +167,9 @@ int ControlPanel25000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	new(ControlPanelInset25000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 ControlPanelInset25000::ControlPanelInset25000()
@@ -187,9 +187,9 @@ int ControlPanelInset25000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	sfxPrintf("doVerb for Gift inset");
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 

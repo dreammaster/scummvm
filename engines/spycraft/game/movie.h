@@ -56,11 +56,11 @@ public:
 	Movie();
 
 	void cue(void);
-	void play(char *theMovie, int theX, int theY, int theWidth, int theHeight, Object *whoToCue);
-	void play(char *theMovie, Object *whoToCue);
-	void play(char *theMovie, Object *whoToCue, int wait, int close, int erase);
-	void play(char *theMovie, Object *whoToCue, int close); //Vlink play (both interactive and non)
-	void play(char *moviename, int theX, int theY, int width, int height, Object *whoToCue, int wait, int close, int erase);
+	void play(const char *theMovie, int theX, int theY, int theWidth, int theHeight, Object *whoToCue);
+	void play(const char *theMovie, Object *whoToCue);
+	void play(const char *theMovie, Object *whoToCue, int wait, int close, int erase);
+	void play(const char *theMovie, Object *whoToCue, int close); //Vlink play (both interactive and non)
+	void play(const char *moviename, int theX, int theY, int width, int height, Object *whoToCue, int wait, int close, int erase);
 	void stop(void);
 	void seek(int offset, int MODE);
 	void pause(bool, bool);

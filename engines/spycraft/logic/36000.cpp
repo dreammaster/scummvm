@@ -19,9 +19,9 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/36000.h"
 #include "spycraft/logic/36100.h"
@@ -30,10 +30,10 @@
 #include "spycraft/logic/36600.h"
 #include "spycraft/logic/36700.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 #include "invent.h"
-#include "movie.h"
-#include "sound.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/sound.h"
 #include "spycraft/logic/60000.h"
 #include "intrpuzz.h"
 
@@ -70,20 +70,20 @@ void Rm36000::init()
 {
 	Room::init();
 
-int yuriCanPlay = FALSE;
-int birdCanPlay = FALSE;
-int yingCanPlay = FALSE;
+int yuriCanPlay = false;
+int birdCanPlay = false;
+int yingCanPlay = false;
 
 
 	if((!GameFlag.test(fWahKa40)) && (GameFlag.test(fYingCaptured))) {
-		yingCanPlay = TRUE;
+		yingCanPlay = true;
 	}
 	else {
 //		if((!GameFlag.test(fWahKa41)) && (GameFlag.test(fSolvedDubanskyKAT)))
 		if((!GameFlag.test(fWahKa41)) && (GameFlag.test(fPEGBriefing)))
-			yuriCanPlay = TRUE;
+			yuriCanPlay = true;
 		if(!GameFlag.test(fWahKa42))
-			birdCanPlay = TRUE;
+			birdCanPlay = true;
 	}
 
 
@@ -154,7 +154,7 @@ Rm36000::~Rm36000( void )
 
 int Rm36000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 NorthExit36000::NorthExit36000()
@@ -175,9 +175,9 @@ int NorthExit36000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		theGame->newRoom( new Rm36100 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit36000::SouthExit36000()
@@ -235,9 +235,9 @@ int SouthExit36000::doVerb ( int theVerb )
 			theGame->newRoom(new Rm1000);
 		}
 */
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -263,9 +263,9 @@ int Camera36000::doVerb( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		new CameraInset36000();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************

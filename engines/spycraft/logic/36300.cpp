@@ -19,14 +19,14 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/36300.h"
 #include "spycraft/logic/36200.h"
 #include "spycraft/logic/36100.h"
-#include "sound.h"
+#include "spycraft/game/sound.h"
 
 namespace Spycraft {
 
@@ -69,7 +69,7 @@ void Rm36300::init()
 
 int Rm36300::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /*********************
@@ -96,9 +96,9 @@ int SouthExit36300::doVerb( int theVerb )
 	if( theVerb == DO_V ) {
     	GameFlag.clear(fWahKa80);
     	theGame->newRoom( new Rm36100 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -133,15 +133,15 @@ int Drawer36300::doVerb( int theVerb )
 		else													// drawer is empty
 			new EmptyDrawerInset36300;
 		theGame->newRoom( new Rm36301 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 */
 	if( theVerb == DO_V )	{
 		theGame->newRoom( new Rm36301 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 /*
 int	Drawer36300::playerHasAllFolders( Invent *inventory )
@@ -210,9 +210,9 @@ int FolderInsetFeature36300::doVerb ( int theVerb )
 		theInset->dispose();
 //		sfxPrintf("opened folder");
 		new EmptyDrawerInset36300;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PaymentsInsetFeature36300::PaymentsInsetFeature36300()
@@ -235,7 +235,7 @@ int PaymentsInsetFeature36300::doVerb ( int theVerb )
 //		sfxPrintf("got payments folder");
 		dispose();
 	}
-	return FALSE;
+	return false;
 }
 
 OrdersInsetFeature36300::OrdersInsetFeature36300()
@@ -258,7 +258,7 @@ int OrdersInsetFeature36300::doVerb ( int theVerb )
 //		sfxPrintf("got orders folder");
 		dispose();
 	}
-	return FALSE;
+	return false;
 }
 
 CitationInsetFeature36300::CitationInsetFeature36300()
@@ -281,7 +281,7 @@ int CitationInsetFeature36300::doVerb ( int theVerb )
 //		sfxPrintf("got citation folder");
 		dispose();
 	}
-	return FALSE;
+	return false;
 }
 
 ZhironevInsetFeature36300::ZhironevInsetFeature36300()
@@ -304,7 +304,7 @@ int ZhironevInsetFeature36300::doVerb ( int theVerb )
 //		sfxPrintf("got Zhironev Dossier");
 		dispose();
 	}
-	return FALSE;
+	return false;
 }
 
 ShustakInsetFeature36300::ShustakInsetFeature36300()
@@ -327,7 +327,7 @@ int ShustakInsetFeature36300::doVerb ( int theVerb )
 //		sfxPrintf("got Shustak Dossier");
 		dispose();
 	}
-	return FALSE;
+	return false;
 }
 */
 /*********************
@@ -394,7 +394,7 @@ void Rm36301::init()
 
 int Rm36301::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit36301::SouthExit36301()
@@ -414,9 +414,9 @@ int SouthExit36301::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm36100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Rm36302::Rm36302()
@@ -443,7 +443,7 @@ void Rm36302::init()
 
 int Rm36302::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit36302::SouthExit36302()
@@ -474,9 +474,9 @@ int SouthExit36302::doVerb ( int theVerb )
 			}
 		}
     	theGame->newRoom(new Rm36300);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 OpenDrawer36300::OpenDrawer36300()
@@ -508,9 +508,9 @@ int OpenDrawer36300::doVerb( int theVerb )
 
 //		new EmptyDrawerInset36300;
 		theGame->newRoom(new Rm36303);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Rm36303::Rm36303()
@@ -536,7 +536,7 @@ void Rm36303::init()
 
 int Rm36303::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit36303::SouthExit36303()
@@ -569,9 +569,9 @@ int SouthExit36303::doVerb ( int theVerb )
 
 //    	theGame->newRoom(new Rm36301);
 		theGame->newRoom(new Rm36300);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
  
 } // namespace Spycraft 

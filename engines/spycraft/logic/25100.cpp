@@ -19,13 +19,13 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/25000.h"
 #include "spycraft/logic/25100.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 
 namespace Spycraft {
 
@@ -66,7 +66,7 @@ void Rm25100::init()
 int Rm25100::handleEvent ( MADEEventStamp *event )
 {
 
-	return FALSE;
+	return false;
 }
 
 WestExit25100::WestExit25100()
@@ -86,9 +86,9 @@ int WestExit25100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm25000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
  
 } // namespace Spycraft 

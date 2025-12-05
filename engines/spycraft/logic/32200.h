@@ -8,12 +8,12 @@
 #ifndef SPYCRAFT_LOGIC_32200_H
 #define SPYCRAFT_LOGIC_32200_H
 
-#include "made.h"
-#include "game.h"
-#include "feature.h"
-#include "actor.h"
-#include "inset.h"
-#include "flag.h"
+#include "spycraft/game/made.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/feature.h"
+#include "spycraft/game/actor.h"
+#include "spycraft/game/inset.h"
+#include "spycraft/game/flag.h"
 
 class Rm32200 : public Room
 {

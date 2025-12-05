@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/36100.h"
 #include "spycraft/logic/36000.h"
 #include "spycraft/logic/36300.h"
-#include "flag.h"
-#include "movie.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
 
 namespace Spycraft {
 
@@ -90,9 +90,9 @@ int SouthExit36100::doVerb( int theVerb )
 	if( theVerb == DO_V ) {
 	
     	theGame->newRoom( new Rm36000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -119,9 +119,9 @@ int Desk36100::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		GameFlag.set(fGetProcatFile);
 		theGame->newRoom( new Rm36300 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -147,9 +147,9 @@ int Photo36100::doVerb( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		sfxPrintf( "Photo");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 
@@ -170,9 +170,9 @@ int Computer36100::doVerb( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		new ComputerInset36100();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************

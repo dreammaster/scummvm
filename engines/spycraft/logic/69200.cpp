@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/69000.h"
 #include "spycraft/logic/69200.h"
-#include "flag.h"
-#include "roomsnd.h"
-#include "sound.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/roomsnd.h"
+#include "spycraft/game/sound.h"
 
 namespace Spycraft {
 
@@ -79,7 +79,7 @@ int Rm69200::handleEvent ( MADEEventStamp *event )
 //		new(DollInset69200);
 //	}	
 
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -107,9 +107,9 @@ int Doll69200::doVerb( int theVerb )
 		curRoom->zoomTo ( 284, 262 );
 	//	curRoom->zoomTo ( 241, 259 );
 		new DollInset69200();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -131,9 +131,9 @@ int Card69200::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		curRoom->zoomTo ( 138, 272 );
 		new CardInset69200();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -171,9 +171,9 @@ int WestExit69200::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm69002);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
  

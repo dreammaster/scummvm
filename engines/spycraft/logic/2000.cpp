@@ -19,17 +19,17 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"				 
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"				 
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "flag.h"	  
-#include "movie.h"
-#include "sound.h"
-#include "roomsnd.h"
-#include "timer.h"
-#include "vlink.h"
-#include "plistobj.h"
+#include "spycraft/game/flag.h"	  
+#include "spycraft/game/movie.h"
+#include "spycraft/game/sound.h"
+#include "spycraft/game/roomsnd.h"
+#include "spycraft/game/timer.h"
+#include "spycraft/game/vlink.h"
+#include "spycraft/game/plistobj.h"
 #include "spycraft/logic/2000.h"
 #include "spycraft/logic/1000.h"
 
@@ -53,7 +53,7 @@ static HurryUp2000*		hurryUp;	// object for cue of timer
 static PermListObject*	bigPress;	// big phone button press
 static PermListObject*	press1;		// phone button 1 press
 static PermListObject*	fTimerObj;	// F's entrance. Ptr to host allows dispose on room exit 
-static int	blinking;		// flag, LED is blinking.  set to FALSE to stop blinking
+static int	blinking;		// flag, LED is blinking.  set to false to stop blinking
 static int	phoneUp;		// flag, phone inset is up
 static int	heardPhoneWoman;// flag, played 'you have two messages...' 
 static int	messagePlaying;	// flag, phone machine is playing a message
@@ -177,9 +177,9 @@ void Rm2000::init()
 {
 	// frankSad: if finished shooters and not played Frank sad movie
 	if( GameFlag.test( fFarmCODone )  && !GameFlag.test( fFarmDidFrankSad ) )
-		frankSad = TRUE;
+		frankSad = true;
 	else
-		frankSad = FALSE;
+		frankSad = false;
 
 	Room::init();
 	if( frankSad )
@@ -201,7 +201,7 @@ void Rm2000::init()
 	}
 	pictureTouchCt = 0;
 	bt1EggCt = 0;
-	playingFrankEnter = FALSE;			
+	playingFrankEnter = false;			
 }
 
 void Rm2000::furnishRoom( void )
@@ -218,7 +218,7 @@ void Rm2000::furnishRoom( void )
 
 	new MidDesk2100;
 	new RightDesk2100;
-	heardPhoneWoman = FALSE;
+	heardPhoneWoman = false;
 
 	new	PictureColby2200;
 	new PictureHarmonica2200;
@@ -248,7 +248,7 @@ void Rm2100::init()
 	new RightDesk2100;
 	intrface->show();
 	theGame->handsOn();
-	heardPhoneWoman = FALSE;
+	heardPhoneWoman = false;
 }
 
 /*********************
@@ -274,9 +274,9 @@ int SouthExit2000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm1000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // no longer used
@@ -299,9 +299,9 @@ int SouthExit2100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm2000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // no longer used
@@ -324,9 +324,9 @@ int SouthExit2300::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm2000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -356,9 +356,9 @@ int Desk2000::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		curRoom->zoomTo( 273, 311 );
 		theGame->newRoom( new Rm2100 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Door2000::Door2000()
@@ -378,9 +378,9 @@ int Door2000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		theGame->newRoom( new Rm1000 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Target2000::Target2000()
@@ -402,10 +402,10 @@ int Target2000::doVerb( int theVerb )
 	{
 		curRoom->zoomTo( 180, 150 );
 		new TargetInset2000;		
-		return TRUE;
+		return true;
 	}
 	else
-		return FALSE;
+		return false;
 }
 
 GunRack2000::GunRack2000()
@@ -427,10 +427,10 @@ int GunRack2000::doVerb( int theVerb )
 	{
 		curRoom->zoomTo( 450, 235 );
 		new GunRackInset2000;		
-		return TRUE;
+		return true;
 	}
 	else
-		return FALSE;
+		return false;
 }
 
 // 2100 --desk
@@ -453,9 +453,9 @@ int MidDesk2100::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		//curRoom->zoomTo( 153, 231 );
 		new MidDeskInset2100;		
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 RightDesk2100::RightDesk2100() 	// ----phone
@@ -476,9 +476,9 @@ int RightDesk2100::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		curRoom->zoomTo( 388, 220 );
 		new RightDeskInset2100;		
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PictureColby2200::PictureColby2200()
@@ -500,9 +500,9 @@ int PictureColby2200::doVerb( int theVerb )
 	{ 
 		curRoom->zoomTo( 232, 268 );
 		new PictureColbyInset2200;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PictureHarmonica2200::PictureHarmonica2200()
@@ -524,9 +524,9 @@ int PictureHarmonica2200::doVerb( int theVerb )
 	{ 
 		curRoom->zoomTo( 172, 270 );
 		new PictureHarmonicaInset2200;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -553,9 +553,9 @@ int PhoneButton2100::doVerb( int theVerb )
 	if( theVerb == DO_V  && bigPress == NULL)	{
 		bigPress = new PermListObject;
 		bigPress->setScript( new BigButtonPressScript2100 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Button1_2100::Button1_2100()	// phone button 1
@@ -576,9 +576,9 @@ int Button1_2100::doVerb( int theVerb )
 	if( theVerb == DO_V && press1 == NULL )	{
 		press1 = new PermListObject;
 		press1->setScript( new Button1PressScript2100 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 CursorArrowizer2100::CursorArrowizer2100()	// Causes inset cursor to be an arrow
@@ -653,7 +653,7 @@ RightDeskInset2100::RightDeskInset2100() // phone
 {
 	init( 2120, 0, 16, 512, 384 );
 	normalCursor->rest();	// stops respond blink
-	phoneUp = TRUE;
+	phoneUp = true;
 	new PhoneButton2100;
 	new Button1_2100;
 	if( !GameFlag.test( fHeardFranksMessages ) )
@@ -665,7 +665,7 @@ RightDeskInset2100::RightDeskInset2100() // phone
 
 void RightDeskInset2100::dispose( void )	// close phone, stop LED blink script
 {
-	phoneUp = FALSE;
+	phoneUp = false;
 	if( blinker != NULL )
 	{
 		blinker->dispose();
@@ -688,9 +688,9 @@ int MidDeskInset2100::doVerb( int theVerb )
 		dispose();
 		new OpenManualInset2100;
 		new PlayASound( 2211 );	
-		return TRUE;
+		return true;
 	}
-	return FALSE ;
+	return false ;
 }
 
 OpenManualInset2100::OpenManualInset2100()	// open book
@@ -706,15 +706,15 @@ int OpenManualInset2100::doVerb( int theVerb )
 	{
 		dispose();
 		new MidDeskInset2100;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PictureInset2200::PictureInset2200()
 {
 	name = "PictureInset2200";
-	walkingSoundPlaying = FALSE;
+	walkingSoundPlaying = false;
 }
 
 PictureColbyInset2200::PictureColbyInset2200()
@@ -751,7 +751,7 @@ PictureHarmonicaInset2200::PictureHarmonicaInset2200()
 void TravelInScript2001::changeState( int newState )
 {
  	switchTo
-		theMovie->play( "2204.avi", this, FALSE, TRUE, FALSE );
+		theMovie->play( "2204.avi", this, false, true, false );
 	END
 
 	BEG
@@ -877,7 +877,7 @@ void PhoneWomanScript2100::changeState( int newState )
 
  	switchTo
 		stopSound();
-		messagePlaying = TRUE;
+		messagePlaying = true;
 		theGame->handsOff(); 	// blunt fix
 		#pragma message( "hmi ticks before buffered sounds" )
 		ticks = 16;	
@@ -890,8 +890,8 @@ void PhoneWomanScript2100::changeState( int newState )
 
 	BEG
 		theGame->handsOn();
-		messagePlaying = FALSE;
-		heardPhoneWoman = TRUE;		
+		messagePlaying = false;
+		heardPhoneWoman = true;		
 		if( phoneUp )
 			new Button1_2100;
 		startSound( 2000, SOUNDTYPE );
@@ -905,7 +905,7 @@ void PhoneMessagesScript2100::changeState( int newState )
 
  	switchTo
 		stopSound();
-		messagePlaying = TRUE;
+		messagePlaying = true;
 		theGame->handsOff(); 	// blunt fix
 		ticks = 16;	// hmi breather	
 	END
@@ -925,9 +925,9 @@ void PhoneMessagesScript2100::changeState( int newState )
 
 	BEG
 		theGame->handsOn();
-		messagePlaying = FALSE;
+		messagePlaying = false;
 		GameFlag.set( fHeardFranksMessages );	// finished listening to Frank's messages
-		blinking = FALSE;
+		blinking = false;
 		startSound( 2000, SOUNDTYPE );
 		theGame->setScript( NULL );
 	END
@@ -945,14 +945,14 @@ void AdamsPhoneScript2100::changeState( int newState )
 	END
 		  
 	BEG
-		messagePlaying = TRUE;
+		messagePlaying = true;
 		soundptr = new Sound;
 		soundptr->playBuffered( 2114, this );	
 	END
 
 	BEG
 		theGame->handsOn();
-		messagePlaying = FALSE;
+		messagePlaying = false;
 		startSound( 2000, SOUNDTYPE );
 		theGame->setScript( NULL );
 	END
@@ -965,7 +965,7 @@ void FrankSadScript2000::changeState( int newState )
  	switchTo
 		// The following movie was incorporated into the Bruce bites it movie
 		//theGame->handsOff();	
-		//theMovie->play( "68.avi", this, FALSE, TRUE, FALSE );  // Frank sad	
+		//theMovie->play( "68.avi", this, false, true, false );  // Frank sad	
 		ticks = 2;
 	END
    
@@ -980,7 +980,7 @@ void FrankSadScript2000::changeState( int newState )
 		timer = new Timer;
 		timer->setReal( 300, hurryUp );	// 5 minutes
 		curMap = MAP_WASHINGTON;
-		drawBackground = FALSE;	// Travelink
+		drawBackground = false;	// Travelink
 		theGame->newRoom( new Rm1000 );
 	END
 }
@@ -988,7 +988,7 @@ void FrankSadScript2000::changeState( int newState )
 void FrankComingScript2200::changeState( int newState )
 {
  	switchTo
-		playingFrankEnter = TRUE;
+		playingFrankEnter = true;
 		ticks = 10;
 		theGame->handsOff();
 	END
@@ -1004,7 +1004,7 @@ void FrankComingScript2200::changeState( int newState )
 	BEG
 		//walkSnd->dispose();
 		assert( theInset != NULL );
-		//( (PictureInset2200*) theInset )->walkingSoundPlaying = FALSE;
+		//( (PictureInset2200*) theInset )->walkingSoundPlaying = false;
 		theGame->setScript( theInset->script );
 		theInset->script = NULL;
 	END
@@ -1017,7 +1017,7 @@ void ColbyPictScript2200::changeState( int newState )
 	END
 
 	BEG
-		theMovie->play( "2201.avi", this, FALSE, TRUE, FALSE );   // formerly 37.avi
+		theMovie->play( "2201.avi", this, false, true, false );   // formerly 37.avi
 	END
 
 	BEG
@@ -1032,7 +1032,7 @@ void HarmonicaPictScript2200::changeState( int newState )
 	END
 
 	BEG
-		theMovie->play("2202.avi", this, FALSE, TRUE, FALSE );	 // formerly 628.avi
+		theMovie->play("2202.avi", this, false, true, false );	 // formerly 628.avi
 	END
 
 	BEG
@@ -1046,7 +1046,7 @@ void FrankIntroScript2200::changeState( int newState )
 		//theGame->handsOn();
 		theInset->dispose();
 		GameFlag.set( fFarmDidPhotoIntro );
-		playingFrankEnter = FALSE;
+		playingFrankEnter = false;
 		//new SouthExit2000;
 		//new Door2000;
 		theGame->newRoom( new Rm2000 );
@@ -1063,7 +1063,7 @@ void FrankIntroScript2200::changeState( int newState )
 FrankTimer2000::FrankTimer2000()
 {
 	name = "FrankTimer2000";
-	firstTime = TRUE;
+	firstTime = true;
 	fTimerObj = new PermListObject;
 	fTimerObj->setScript( this );	
 }
@@ -1074,7 +1074,7 @@ void FrankTimer2000::changeState( int newState )
  		if( firstTime )
 		{
  			seconds = 120;
-			firstTime = FALSE;
+			firstTime = false;
 		}
 		else
 			seconds = 10;
@@ -1097,7 +1097,7 @@ void FrankTimer2000::changeState( int newState )
 		}
 		else
 		{
-			playingFrankEnter = TRUE;
+			playingFrankEnter = true;
 			theGame->handsOff();
 		 	//walkSnd = new Sound;
 			//walkSnd->number = SND_FRANKCOMING;
@@ -1113,7 +1113,7 @@ void FrankTimer2000::changeState( int newState )
 
 	BEG
 		GameFlag.set( fFarmDidPhotoIntro );
-		playingFrankEnter = FALSE;
+		playingFrankEnter = false;
 		theGame->handsOn();
 		new SouthExit2000;
 		new Door2000;
@@ -1134,7 +1134,7 @@ void Blinker2000::init( void )
 {
  	name = "blinker";
  	LEDViewPtr = new LEDInsetView2100;	
-	blinking = TRUE; 	// has to come before setScript
+	blinking = true; 	// has to come before setScript
 	setScript( new LEDBlinkScript2100 );
 }
 

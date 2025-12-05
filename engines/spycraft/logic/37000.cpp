@@ -19,9 +19,9 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/37000.h"
 #include "spycraft/logic/1000.h"
@@ -30,8 +30,8 @@
 //#include "spycraft/logic/39000.h"
 //#include "spycraft/logic/37100.h"
 #include "spycraft/logic/41100.h"   //rm41300
-#include "flag.h"
-#include "movie.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
 
 namespace Spycraft {
 
@@ -80,7 +80,7 @@ void Rm37000::init()
 
 int Rm37000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit37000::SouthExit37000()
@@ -100,9 +100,9 @@ int SouthExit37000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 /*
 NorthExit37000::NorthExit37000()
@@ -121,9 +121,9 @@ int NorthExit37000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm37100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 
@@ -144,9 +144,9 @@ int KneeRoof37000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
    		theGame->newRoom(new Rm38000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 
@@ -170,9 +170,9 @@ int PanelVan37000::doVerb ( int theVerb )
 //		theGame->newRoom(new Rm41000);
    		theGame->newRoom(new Rm41300);
 	
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PanelSign37000::PanelSign37000()
@@ -192,9 +192,9 @@ int PanelSign37000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
    		new PanelSignInset37000();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 /*
 Tenement37000::Tenement37000()
@@ -207,9 +207,9 @@ int Tenement37000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
    		theGame->newRoom(new Rm39000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 /*******************************

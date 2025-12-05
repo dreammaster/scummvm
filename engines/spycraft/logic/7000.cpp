@@ -19,20 +19,20 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "invent.h"
-#include "flag.h"
-#include "movie.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
 #include "spycraft/logic/7000.h"
 #include "spycraft/logic/2000.h"
 #include "spycraft/logic/95000.h"
 #include "spycraft/logic/95100.h"
 #include "spycraft/logic/1000.h"
 #include "invent.h"
-#include "roomsnd.h"
+#include "spycraft/game/roomsnd.h"
 
 namespace Spycraft {
 
@@ -97,7 +97,7 @@ Rm7000::Rm7000()
 
 void Rm7000::init()
 {
-	int	shootersville = FALSE;	 // somewhere in the shooters, their intros or outros
+	int	shootersville = false;	 // somewhere in the shooters, their intros or outros
 
 	#ifdef _DEBUG
 		if( !GameFlag.test( fFarmIADone ) )
@@ -105,7 +105,7 @@ void Rm7000::init()
 	#endif
 	// in shootersville
 	if( GameFlag.test( fFarmIADone ) && !GameFlag.test( fFarmCODone ) )
-		shootersville = TRUE;
+		shootersville = true;
 
 	if( shootersville )
 		drawPic( -1 );
@@ -159,9 +159,9 @@ int SouthExit7000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm1000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************

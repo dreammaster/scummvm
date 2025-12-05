@@ -88,7 +88,7 @@ extern void sfxCursorPriority(int priority);
 //
 //	Parameters: Game window X and Y coordinates
 //
-//	Returns:	TRUE if successful, else FALSE
+//	Returns:	true if successful, else false
 
 extern int sfxSetCursorPos(int x, int y);
 

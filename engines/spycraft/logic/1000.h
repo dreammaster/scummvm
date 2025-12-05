@@ -22,12 +22,12 @@
 #ifndef SPYCRAFT_LOGIC_1000_H
 #define SPYCRAFT_LOGIC_1000_H
 
-#include "made.h"
-#include "game.h"
-#include "feature.h"
-#include "actor.h"
-#include "timer.h"
-#include "plistobj.h"
+#include "spycraft/game/made.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/feature.h"
+#include "spycraft/game/actor.h"
+#include "spycraft/game/timer.h"
+#include "spycraft/game/plistobj.h"
 
 namespace Spycraft {
 
@@ -75,7 +75,7 @@ class MapTitle : public Object
 {
 public:
 	MapTitle();
-	void set(int theView, char *theName, int thePosn, int theLoop, int theCell);
+	void set(int theView, const char *theName, int thePosn, int theLoop, int theCell);
 	void reset(void);
 	int		posn;	// one of enum POSN_...
 	View *title;
@@ -84,10 +84,10 @@ public:
 class MoviePlayer1000 : public Object
 {
 public:
-	void movieDelayPlay(char *theMovie, Object *whoToCue, int wait, int close, int erase);
+	void movieDelayPlay(const char *theMovie, Object *whoToCue, int wait, int close, int erase);
 	void cue(void);
 	Timer *timer;
-	char *myMovie;
+	const char *myMovie;
 	Object *myWhoToCue;
 	int		myWait;
 	int		myClose;
@@ -480,7 +480,7 @@ public:
 };
 
 extern short curMap;
-extern short drawBackground;	// set to FALSE to suppress TL drawPic, may be temp
+extern short drawBackground;	// set to false to suppress TL drawPic, may be temp
 extern Rm1000 *rm1000;
 
 } // namespace Spycraft

@@ -19,13 +19,13 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/69000.h"
 #include "spycraft/logic/69500.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 
 namespace Spycraft {
 
@@ -69,7 +69,7 @@ void Rm69500::init()
 
 int Rm69500::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit69500::SouthExit69500()
@@ -88,9 +88,9 @@ int SouthExit69500::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm69000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -117,9 +117,9 @@ int Menu69500::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		curRoom->zoomTo ( 302, 296 );
 		new MenuInset69500();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************

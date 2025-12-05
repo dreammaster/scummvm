@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/50000.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
-#include "movie.h"
-#include "vlink.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/vlink.h"
 #include "invent.h"
 
 namespace Spycraft {
@@ -85,7 +85,7 @@ void Rm50000::init()
 		drawPic( 50000 );		   //wide shot with video camera
 		theGame->handsOn();
 
-		if( colbyInfo->slow_system == TRUE )
+		if( colbyInfo->slow_system == true )
 			theMusic->play ( 50000 );
 		else {
 			if( sound1->number != 50000  || !sound1->isPlaying() )	{
@@ -98,7 +98,7 @@ void Rm50000::init()
 
 int Rm50000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit50000::SouthExit50000()
@@ -126,9 +126,9 @@ int SouthExit50000::doVerb ( int theVerb )
 			new VLink( "Check out the camera: Seaton, Jaimie A.", "50002.avi", 0, 10);    //vlink685, Jaimie help about video camer.
 
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -154,9 +154,9 @@ int BloodyCamera50000::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 //		new BloodyCameraInset50000();
 		theGame->newRoom(new Rm50001);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Blanket50000::Blanket50000()
@@ -176,9 +176,9 @@ int Blanket50000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new BlanketInset50000();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Garbage50000::Garbage50000()
@@ -198,9 +198,9 @@ int Garbage50000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new GarbageInset50000();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 JunkyWall50000::JunkyWall50000()
@@ -220,9 +220,9 @@ int JunkyWall50000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new JunkyWallInset50000();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -334,7 +334,7 @@ void Rm50001::init()
 
 int Rm50001::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit50001::SouthExit50001()
@@ -353,9 +353,9 @@ int SouthExit50001::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm50000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 } 
 
 /*******************************
@@ -396,9 +396,9 @@ int CameraChip50001::doVerb ( int theVerb )
 		inventry->get(iVIDEO_CAMERA);		   
 		
 		theGame->newRoom(new Rm50100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*********************
@@ -430,7 +430,7 @@ void Rm50100::init()
 
 int Rm50100::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit50100::SouthExit50100()
@@ -449,9 +449,9 @@ int SouthExit50100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm50200);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /* Room 50200 */
@@ -481,7 +481,7 @@ void Rm50200::init()
 
 int Rm50200::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit50200::SouthExit50200()
@@ -503,9 +503,9 @@ int SouthExit50200::doVerb ( int theVerb )
 		GameFlag.clear(fCanDisplayStakeOut);       	//do not display Stakeout on map
 
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /* Room 50300 */
@@ -535,7 +535,7 @@ void Rm50300::init()
 
 int Rm50300::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 GetCamera50000::GetCamera50000()
@@ -567,9 +567,9 @@ int SouthExit50300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm50000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 } 
 
 NorthExit50300::NorthExit50300()
@@ -588,9 +588,9 @@ int NorthExit50300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		curRoom->setScript( new EnterBlackScreenScript50300 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 } 
  
 } // namespace Spycraft 

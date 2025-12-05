@@ -19,12 +19,12 @@
  *
  */
 
-#include "globals.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "flag.h"
-#include "movie.h"
-#include "roomsnd.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/79000.h"
 #include "spycraft/logic/1000.h"
 #include "spycraft/logic/18000.h"
@@ -157,14 +157,14 @@ void Rm79000::init()
   	intrface->show();
   	theGame->handsOn();
 	// set flags for to support playing multiple times
-	warhurstShootsYou = FALSE;	
-	newsFlash = FALSE;			
+	warhurstShootsYou = false;	
+	newsFlash = false;			
 	curRoom->setScript( new Script79000 );
 }
 
 int Rm79000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit79000::SouthExit79000()
@@ -185,9 +185,9 @@ int SouthExit79000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -199,7 +199,7 @@ void Script79000::changeState ( int newState )
 {
 	switchTo
 		theMovie->fromTo( 0, CANSHOOTW -1 );
-		theMovie->play( "79000.avi", this, FALSE, FALSE, FALSE );
+		theMovie->play( "79000.avi", this, false, false, false );
 	END
 
 	BEG	
@@ -415,7 +415,7 @@ void Script79000::changeState ( int newState )
  DachaDialog::DachaDialog()
  {
  	name = "DachaDialog";
- 	playedLoop = FALSE;
+ 	playedLoop = false;
  }
 
  void DachaDialog::cue( void )  // parent class, passes polymorphic cue() (unnecesary?)
@@ -430,7 +430,7 @@ void Script79000::changeState ( int newState )
 	 case PLAYED_NONE:	// regular movie, shoot Warhurst option
 	 	//Dialog::cue();
 		theMovie->fromTo(from, to);
-		theMovie->play(myTree->resourceID, this, FALSE, FALSE, FALSE);
+		theMovie->play(myTree->resourceID, this, false, false, false);
 		break;
 	 case PLAYED_FIRST:	// option to drop gun added
 	 	//hide(); -- it's a view now
@@ -439,14 +439,14 @@ void Script79000::changeState ( int newState )
 		show();
 		head = head->prev;	// total kludge, restores skipped gun
 		theMovie->fromTo( loopFrom, loopTo );	// not a loop
-		theMovie->play(myTree->resourceID, this, FALSE, FALSE, FALSE);
+		theMovie->play(myTree->resourceID, this, false, false, false);
 		break;
 	 case PLAYED_SECOND:	// you did nothing, Warhurst shoots you	
 	 	hide();
 		goTo2->cue();
 		break;
 	 default:
-	 	assert( FALSE );
+	 	assert( false );
 	}
 
 	++playedLoop;
@@ -454,7 +454,7 @@ void Script79000::changeState ( int newState )
 
  void DachaD2_79000::cue( void )   // you're dead
  {
-	warhurstShootsYou = TRUE;
+	warhurstShootsYou = true;
 	Dialog::cue();
  }
 
@@ -480,10 +480,10 @@ void Script79000::changeState ( int newState )
 	}
 	else  
 	{
-		playedLoop = TRUE;
+		playedLoop = true;
 		Dialog::cue();		// 'loop' finishes movie, gives action options
 		theMovie->fromTo(loopFrom, loopTo);
-		theMovie->play(myTree->resourceID, this, FALSE, FALSE, FALSE);		
+		theMovie->play(myTree->resourceID, this, false, false, false);		
 	}
  }
 
@@ -496,10 +496,10 @@ void Script79000::changeState ( int newState )
 	}
 	else  
 	{
-		playedLoop = TRUE;
+		playedLoop = true;
 		Dialog::cue();		// 'loop' finishes movie, gives action options
 		theMovie->fromTo(loopFrom, loopTo);
-		theMovie->play(myTree->resourceID, this, FALSE, FALSE, FALSE);		
+		theMovie->play(myTree->resourceID, this, false, false, false);		
 	}
  }
 
@@ -510,19 +510,19 @@ void Script79000::changeState ( int newState )
 	 case PLAYED_NONE:	// regular movie
 	 	Dialog::cue();
 		theMovie->fromTo(loopFrom, loopTo);
-		theMovie->play(myTree->resourceID, this, FALSE, FALSE, FALSE);
+		theMovie->play(myTree->resourceID, this, false, false, false);
 		break;
 	 case PLAYED_FIRST:	// option to shoot Yuri
 	//	Dialog::cue();	// either DItem: shoot Yuri, or loop finishes movie
 	//	theMovie->fromTo( 3780, 3795 );
-	//	theMovie->play(myTree->resourceID, this, FALSE, FALSE, FALSE);
+	//	theMovie->play(myTree->resourceID, this, false, false, false);
 	//	break;
 	// case PLAYED_SECOND:	// Yuri gone, end	
 	 	hide();
 		goToExit->cue();
 		break;
 	 default:
-	 	assert( FALSE );
+	 	assert( false );
 	}
 
 	++playedLoop;
@@ -575,14 +575,14 @@ void Script79000::changeState ( int newState )
  void CutDItem::doit( void )
  {										 
 	myDialog->hide();
-	user->canInput( FALSE );
-	theMovie->pause( FALSE );
+	user->canInput( false );
+	theMovie->pause( false );
 	cue();
  }
 
   GrabShootDItem::GrabShootDItem( int whoToShootLoop )
  {
- 	grabbedGun = FALSE;
+ 	grabbedGun = false;
 	shootLoop = whoToShootLoop;
  }
 
@@ -590,7 +590,7 @@ void Script79000::changeState ( int newState )
  {
 	if( !grabbedGun )
 	{
-		grabbedGun = TRUE;
+		grabbedGun = true;
 		// switch gun views
 		myView->dispose();
 		myView = new View;
@@ -609,7 +609,7 @@ void Script79000::changeState ( int newState )
  // used but no longer needed
  void NewsFlash_16_79000::doit( void )
  {
-  	newsFlash = TRUE;	
+  	newsFlash = true;	
   	DItem::doit();	
  }
  

@@ -19,16 +19,16 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/57100.h"
 #include "spycraft/logic/57000.h"
 #include "spycraft/logic/1000.h"
-#include "movie.h"
-#include "flag.h"
-#include "vlink.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/vlink.h"
 #include "spycraft/logic/60000.h"
 
 namespace Spycraft {
@@ -117,7 +117,7 @@ void Rm57100::init()
 
 int Rm57100::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 EastExit57100::EastExit57100()
@@ -137,9 +137,9 @@ int EastExit57100::doVerb( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom( new Rm57000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -165,9 +165,9 @@ int Calendar57100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new CalendarInset57100;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -185,9 +185,9 @@ CalendarInset57100::CalendarInset57100()
 int CalendarInset57100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
  
 /*******************************
@@ -295,7 +295,7 @@ ThornShootLange::ThornShootLange()
 void ThornShootLange::doit()
 {
 	myDialog->hide();
-	theMovie->pause(FALSE);
+	theMovie->pause(false);
 	//cue();
 	DItem::doit();
 }
@@ -330,9 +330,9 @@ int GunLange57100::doVerb ( int theVerb )
 		killLange->addInfo(57100, KILLLANGE, LangeDialog2);
 		killLange->addInfo(	911, 1, 0, 410, 400, LangeDialog2 );
 
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /* Room 57101 */
@@ -366,7 +366,7 @@ void Rm57101::cue( void )
 
 int Rm57101::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 EnterBlackScreenScript57101::EnterBlackScreenScript57101()
