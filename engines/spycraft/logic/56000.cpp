@@ -19,17 +19,17 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/56000.h"
 #include "spycraft/logic/56100.h"
 #include "spycraft/logic/57000.h"
 #include "spycraft/logic/1000.h"		 
-#include "flag.h"
+#include "spycraft/game/flag.h"
 #include "invent.h"
-#include "sound.h"
+#include "spycraft/game/sound.h"
 
 namespace Spycraft {
 
@@ -77,7 +77,7 @@ void Rm56000::init()
 
 int Rm56000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 NorthExit56000::NorthExit56000()
@@ -102,9 +102,9 @@ int NorthExit56000::doVerb ( int theVerb )
 //    	theGame->newRoom(new Rm56100);
 		theGame->handsOff();
 		theGame->newRoom(new Rm56001);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit56000::SouthExit56000()
@@ -124,9 +124,9 @@ int SouthExit56000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm1000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /* Room 56001 */
@@ -157,7 +157,7 @@ void Rm56001::init()
 
 int Rm56001::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 EnterBlackScreenScript56001::EnterBlackScreenScript56001()

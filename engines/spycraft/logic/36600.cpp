@@ -19,17 +19,17 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "movie.h"
+#include "spycraft/game/movie.h"
 #include "spycraft/logic/36000.h"
 #include "spycraft/logic/36600.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 #include "invent.h"
-#include "vlink.h"
+#include "spycraft/game/vlink.h"
 
 namespace Spycraft {
 
@@ -143,7 +143,7 @@ void Rm36600::init()
 
 int Rm36600::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 
@@ -164,9 +164,9 @@ int SouthExit36600::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 /*******************************
  *
@@ -382,7 +382,7 @@ TellAboutBS::TellAboutBS()
 void TellAboutBS::doit()
 {
 //whatBird and aboutBird has different text but same movie
-	whatBird->hasBeenChosen = TRUE;
+	whatBird->hasBeenChosen = true;
 	
 	DItem::doit();
 }

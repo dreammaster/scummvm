@@ -19,9 +19,9 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/32100.h"
 #include "spycraft/logic/32200.h"
@@ -82,9 +82,9 @@ int NorthExit32100::doVerb ( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm32200 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit32100::SouthExit32100()
@@ -104,9 +104,9 @@ int SouthExit32100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm32000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
  
 } // namespace Spycraft 

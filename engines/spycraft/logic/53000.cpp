@@ -19,14 +19,14 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/53000.h"
-#include "flag.h"
-#include "movie.h"
-#include "vlink.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/vlink.h"
 #include "spycraft/logic/1000.h"
 
 namespace Spycraft {
@@ -66,7 +66,7 @@ void Rm53000::init()
 
 int Rm53000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /*******************************

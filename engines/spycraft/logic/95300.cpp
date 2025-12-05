@@ -405,8 +405,8 @@ void Rm95309::init()
 		memset (&E_map,0,(45*sizeof(int)));
 		memset (&P_map,0,(45*sizeof(int)));
 
-		addshooters = FALSE;
-//		addshooters = TRUE;
+		addshooters = false;
+//		addshooters = true;
 /*
 		E_map [2][0] = 2;
 		E_map [2][4] = 2;
@@ -835,9 +835,9 @@ int NorthEastExit95300::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95317);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthWestExit95300::NorthWestExit95300()
@@ -906,9 +906,9 @@ int NorthWestExit95300::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95316);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthExit95300::NorthExit95300()
@@ -979,9 +979,9 @@ int NorthExit95300::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95314);
 				break;
 		}
-	   	return TRUE;
+	   	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthEastExit95300::SouthEastExit95300()
@@ -1049,9 +1049,9 @@ int SouthEastExit95300::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95318);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthWestExit95300::SouthWestExit95300()
@@ -1119,9 +1119,9 @@ int SouthWestExit95300::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95318);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit95300::SouthExit95300()
@@ -1196,9 +1196,9 @@ int SouthExit95300::doVerb ( int theVerb )
 				endPuzzle();
 				break;
 */		}
-	   	return TRUE;
+	   	return true;
 	}
-	return FALSE;
+	return false;
 }
  
 } // namespace Spycraft 

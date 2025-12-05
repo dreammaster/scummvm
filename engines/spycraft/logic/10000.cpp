@@ -19,12 +19,12 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "flag.h"
-#include "roomsnd.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/10000.h"
 #include "spycraft/logic/12000.h"
 #include "spycraft/logic/1000.h"
@@ -142,9 +142,9 @@ int SouthExit10000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // 10100
@@ -165,9 +165,9 @@ int SouthExit10100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // 10200
@@ -188,9 +188,9 @@ int SouthExit10200::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm10100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -215,9 +215,9 @@ int House10000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		theGame->newRoom( new Rm10100 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Door10100::Door10100()
@@ -236,9 +236,9 @@ int Door10100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		theGame->newRoom( new Rm10200 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Knocker10200::Knocker10200()
@@ -262,9 +262,9 @@ int Knocker10200::doVerb( int theVerb )
 		++knockCount;
 		s_ptr = new KnockScript10200;
 		s_ptr->init( s_ptr, NULL, NULL );	// bogus client: this, needed for dispose()	
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -306,7 +306,7 @@ void KnockScript10200::changeState( int newState )
 	switchTo
 		soundptr = new Sound;
 		soundptr->play( SND_COLBYSDOORKNOCK, this );
-		user->canInput( FALSE );	// this wipes out multiknock feature
+		user->canInput( false );	// this wipes out multiknock feature
 	END
 
 	BEG
@@ -314,7 +314,7 @@ void KnockScript10200::changeState( int newState )
 		if( !GameFlag.test( fColbyMoleBriefing ) && knockCount == 1 )
 			theGame->newRoom( new Rm12000);
 		--knockCount;
-		user->canInput( TRUE );
+		user->canInput( true );
 		dispose();
 	END
 }

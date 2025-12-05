@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/35000.h"
 #include "spycraft/logic/35300.h"
 #include "invent.h"
-#include "flag.h"
-#include "vlink.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/vlink.h"
 #include "phone.h"
 #include "advcurs.h"
 
@@ -108,7 +108,7 @@ void Rm35300::init()
 
 int Rm35300::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit35300::SouthExit35300()
@@ -128,9 +128,9 @@ int SouthExit35300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm35100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -157,7 +157,7 @@ int Light35300::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		theGame->newRoom(new PhoneKeyPad(FROM_RUSSIA));
-		return TRUE;
+		return true;
 	}
 /*
 		if( GameFlag.test( fMORoomEnter ) && !GameFlag.test(fOnce35001)) {
@@ -168,10 +168,10 @@ int Light35300::doVerb( int theVerb )
 		else {
 			sfxPrintf("All phone lines are busy, please try again later.");
 		}
-		return TRUE;
+		return true;
 	}
 */
-	return FALSE;
+	return false;
 }
 
 DigitOne35300::DigitOne35300()
@@ -195,9 +195,9 @@ int DigitOne35300::doVerb( int theVerb )
 //		showDigit->size = 24;
 //		showDigit->fore_color = madeRGB(230, 230,230);
 //		showDigit->init( "1");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -235,7 +235,7 @@ void EnterScriptYuriVO35000::changeState( int newState )
 		theGame->handsOn();
 		sfxSystemCursor( 10 );		
 		dialogTree = new DialTree;
-		dialogTree->negativeParam = TRUE;
+		dialogTree->negativeParam = true;
 		yuriphoneDialog1 = new Dialog;
 		yuriphoneDialog2 = new Dialog;
 		yuriphoneDialog3 = new Dialog;

@@ -22,6 +22,9 @@
 #ifndef SPYCRAFT_GAME_GLOBALS_H
 #define SPYCRAFT_GAME_GLOBALS_H
 
+#define FORBIDDEN_SYMBOL_EXCEPTION_rand
+#include "common/forbidden.h"
+#include "spycraft/spycraft.h"
 #include "spycraft/game/views.h"
 #include "spycraft/game/verbs.h"
 #include "spycraft/game/interface.h"
@@ -950,6 +953,11 @@ enum {
 	fMoleSung3,
 	fKilledGrendel
 };
+
+#undef rand
+inline int rand() {
+	return g_engine->getRandomNumber();
+}
 
 } // namespace Spycraft
 

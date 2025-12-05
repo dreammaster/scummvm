@@ -19,14 +19,14 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "flag.h"
-#include "movie.h"
-#include "timer.h"
-#include "vlink.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/timer.h"
+#include "spycraft/game/vlink.h"
 #include "spycraft/logic/18000.h"				   
 #include "spycraft/logic/1000.h"
 
@@ -122,11 +122,11 @@ void Rm18000::init()
 				   "To get DCI2 set flag %d.\n"
 				   "To get DCI3 set flag %d.\n"
 				   "DCI office available %d.\n" ,
-				   fFarmDone, GameFlag.test( fFarmDone )?"TRUE":"FALSE",
-				   fFullBriefing, GameFlag.test( fFullBriefing )?"TRUE":"FALSE",
-				   fSolvedDubanskyKAT, GameFlag.test( fSolvedDubanskyKAT )?"TRUE":"FALSE",
-				   fIDPEG, GameFlag.test( fIDPEG )?"TRUE":"FALSE",
-				   fPEGBriefing, GameFlag.test( fPEGBriefing )?"TRUE":"FALSE",
+				   fFarmDone, GameFlag.test( fFarmDone )?"true":"false",
+				   fFullBriefing, GameFlag.test( fFullBriefing )?"true":"false",
+				   fSolvedDubanskyKAT, GameFlag.test( fSolvedDubanskyKAT )?"true":"false",
+				   fIDPEG, GameFlag.test( fIDPEG )?"true":"false",
+				   fPEGBriefing, GameFlag.test( fPEGBriefing )?"true":"false",
 				   fForceDCI2, fForceDCI3, fDCIOfficeAvailable
 				 );
 		#endif
@@ -143,7 +143,7 @@ void Rm18000::init()
 void FullBriefScript18000::changeState( int newState )
 {
   	switchTo
-		theMovie->play("18000.avi", this, FALSE, TRUE, FALSE );	// fromerly 94.avi
+		theMovie->play("18000.avi", this, false, true, false );	// fromerly 94.avi
 	END
 
 	BEG
@@ -162,13 +162,13 @@ void PEGBriefScript18000::changeState( int newState )
 		if( GameFlag.test( fMetBirdSong ) ) //Find PEG shooter, don't forget about BS.
 		{
 			theMovie->fromTo( 0, 665 );	
-			theMovie->play( "18001.avi", this, FALSE, FALSE, FALSE ); 
+			theMovie->play( "18001.avi", this, false, false, false ); 
 		}
 		else //Find PEG shooter, no Birdsong tag
 		{
 			//theMovie->fromTo( 0, 720 );
 			theMovie->fromTo( 0, 811 );
-			theMovie->play( "18001.avi", this, FALSE, TRUE, FALSE ); 
+			theMovie->play( "18001.avi", this, false, true, false ); 
 		}
 	END
 
@@ -176,7 +176,7 @@ void PEGBriefScript18000::changeState( int newState )
 		if( GameFlag.test( fMetBirdSong ) ) // cut to TL, skips BS tag
 		{
 		 	theMovie->fromTo( 825, 919 );	
-			theMovie->play( "18001.avi", this, FALSE, TRUE, FALSE );	
+			theMovie->play( "18001.avi", this, false, true, false );	
 		}
 		else
 			cue();

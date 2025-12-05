@@ -19,14 +19,14 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/68000.h"
 #include "spycraft/logic/1000.h"
 #include "spycraft/logic/69000.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 
 namespace Spycraft {
 
@@ -74,7 +74,7 @@ void Rm68000::init()
 
 int Rm68000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit68000::SouthExit68000()
@@ -94,9 +94,9 @@ int SouthExit68000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthExit68000::NorthExit68000()
@@ -117,9 +117,9 @@ int NorthExit68000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm69000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -134,7 +134,7 @@ DisguiseKit68000::DisguiseKit68000()
 	name = "Trunk";
 	setHotspot ( DO_V );
 	setView(5);
-	init ( 100, 100, TRUE);
+	init ( 100, 100, true);
 }
 
 void DisguiseKit68000::respond()
@@ -155,9 +155,9 @@ int DisguiseKit68000::doVerb ( int theVerb )
 			GameFlag.set(fDisguiseKitOpen);
 			GameFlag.set(fDisguiseKitFound);
 		}			
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -166,7 +166,7 @@ Suitcase68000::Suitcase68000()
 	name = "Suitcase";
 	setHotspot ( DO_V );
 	setView(5);
-	init ( 250, 150, TRUE);
+	init ( 250, 150, true);
 }
 
 void Suitcase68000::respond()
@@ -179,7 +179,7 @@ int Suitcase68000::doVerb ( int theVerb )
     	sfxPrintf("show close up of open suitcase");
     	new(SuitcaseInset);
 	}
-	return FALSE;
+	return false;
 }
 
 Closet68000::Closet68000()
@@ -187,7 +187,7 @@ Closet68000::Closet68000()
 	name = "Closet";
 	setHotspot ( DO_V );
 	setView(5);
-	init ( 250, 320, TRUE);
+	init ( 250, 320, true);
 }
 
 void Closet68000::respond()
@@ -198,9 +198,9 @@ int Closet68000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	new(ClosetInset);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 /*******************************
@@ -225,9 +225,9 @@ int SuitcaseInset::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		sfxPrintf("Inset do verb");
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 ClosetInset::ClosetInset()
@@ -247,9 +247,9 @@ int ClosetInset::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	sfxPrintf("doVerb for Closet inset");
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 /*******************************
@@ -274,7 +274,7 @@ int Boxers68000::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 		sfxPrintf("move boxers");
 	}
-	return FALSE;
+	return false;
 }
 
 Socks68000::Socks68000()
@@ -293,7 +293,7 @@ int Socks68000::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 		sfxPrintf("Get Socks");
 	}
-	return FALSE;
+	return false;
 }
 
 Handcuffs68000::Handcuffs68000()
@@ -314,7 +314,7 @@ int Handcuffs68000::doVerb ( int theVerb )
 		GameFlag.set(fGotHandcuffs);
 //		sfxPrintf("Onyx' Handcuffs (00384/????) ...really must protest..");
 	}
-	return FALSE;
+	return false;
 }
 
 Casuals68000::Casuals68000()
@@ -330,7 +330,7 @@ void Casuals68000::respond()
 
 int Casuals68000::doVerb ( int theVerb )
 {
-	return FALSE;
+	return false;
 }
 
 Suit68000::Suit68000()
@@ -353,7 +353,7 @@ int Suit68000::doVerb ( int theVerb )
 			GameFlag.set(fMovedSuit);
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 Bonds68000::Bonds68000()
@@ -373,7 +373,7 @@ int Bonds68000::doVerb ( int theVerb )
 		sfxPrintf("Player gets bonds");
 		this->dispose;
 	}
-	return FALSE;
+	return false;
 }
 */
 /*******************************

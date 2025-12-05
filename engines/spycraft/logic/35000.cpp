@@ -19,32 +19,32 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "movie.h"
+#include "spycraft/game/movie.h"
 #include "spycraft/logic/35000.h"
 #include "spycraft/logic/1000.h"
 //#include "spycraft/logic/35300.h"
 #include "spycraft/logic/35400.h"
 #include "invent.h"
 #include "sndanal.h"
-#include "flag.h"
-#include "vlink.h"
-#include "roomsnd.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/vlink.h"
+#include "spycraft/game/roomsnd.h"
 #include "image.h"
 #include "cypher.h"
 //#include "spycraft/logic/37000.h"
 #include "teletalk.h"
 #include "knee.h"
 #include "html.h"
-#include "pcscreen.h"
+#include "spycraft/game/pcscreen.h"
 #include "phone.h"
 #include "spycraft/logic/35700.h"
 #include "advsound.h"
-#include "advmusic.h"
-#include "gamebox.h"
+#include "spycraft/dmade/advmusic.h"
+#include "spycraft/dmade/gamebox.h"
 #include "spycraft/logic/24000.h"
 
 namespace Spycraft {
@@ -183,7 +183,7 @@ void Rm35000::init()
 		new EMail( "Sound Hack is your friend: Seaton, Jaimie A.", 98086 );	// Jaimie: SoundHack
 	}
 
-	/*if( colbyInfo->slow_system == TRUE ) {
+	/*if( colbyInfo->slow_system == true ) {
 		theMusic->play ( 35000 );
 	}
 	else { 
@@ -216,7 +216,7 @@ void Rm35000::doit()
 
 int Rm35000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit35000::SouthExit35000()
@@ -265,14 +265,14 @@ int SouthExit35000::doVerb ( int theVerb )
 
 ////	if(GameFlag.test(fDoneSoundAnal) && !GameFlag.test(fWahKa67)) {
 ////		GameFlag.set(fWahKa67);
-//			pcLastUsed[PC_SNDANAL] = FALSE;				
+//			pcLastUsed[PC_SNDANAL] = false;				
 ////		new VLink( "35101.avi", 0, 20 );	   //vlink674, direct agents after BS
 ////	}
 
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -299,9 +299,9 @@ int FileCabinet35000::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 //		new FileCabinetInset35000();
 		theGame->newRoom( new Rm35400);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Desk35000::Desk35000()
@@ -320,9 +320,9 @@ int Desk35000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		theGame->newRoom( new Rm35100);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 //wahka - take out				   
@@ -347,9 +347,9 @@ int SetYingPath35000::doVerb( int theVerb )
 		GameFlag.set(fYingCaptured);
 		GameFlag.set(fSolvedDubanskyKAT); 
 		sfxPrintf("Captured Ying and finished KAT");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetMoscowMap35000::SetMoscowMap35000()
@@ -388,7 +388,7 @@ int SetMoscowMap35000::doVerb( int theVerb )
 		inventry->get(iMUSICSWAN);
 		sfxPrintf("Done VC - have video camera and swan");
 	}
-	return FALSE;
+	return false;
 }
 
 SetYuriFlag35000::SetYuriFlag35000()
@@ -411,9 +411,9 @@ int SetYuriFlag35000::doVerb( int theVerb )
 		GameFlag.set(fOnce35001);
 
 		sfxPrintf("Done Yuri's dialog");		 
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetMaxFlag35000::SetMaxFlag35000()
@@ -442,9 +442,9 @@ int SetMaxFlag35000::doVerb( int theVerb )
 		inventry->get(iNUMBERTOYURI);
 //		sfxPrintf("Done Max's dialog(asked about Yuri)");		
 		sfxPrintf("Hi, I'm Max Foster");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetBSFlag35000::SetBSFlag35000()
@@ -467,9 +467,9 @@ int SetBSFlag35000::doVerb( int theVerb )
 		GameFlag.set(fBeenTo57000);	
 		GameFlag.set(fMetBirdSong);
 		sfxPrintf("Done Birdsong's dialog");		 
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetWalkPathPart1::SetWalkPathPart1()
@@ -500,9 +500,9 @@ int SetWalkPathPart1::doVerb( int theVerb )
 */
 		GameFlag.set(fSolvedDubanskyKAT);  //test quickly
 		sfxPrintf("Finished KAT puzzle");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetWalkPathPart2::SetWalkPathPart2()
@@ -533,9 +533,9 @@ int SetWalkPathPart2::doVerb( int theVerb )
 		GameFlag.set(fKnowGrendelStolePEG);										 
 		sfxPrintf("Done GrendelStolePEG.");
 
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetWalkPathPart3::SetWalkPathPart3()
@@ -577,9 +577,9 @@ int SetWalkPathPart3::doVerb( int theVerb )
 		
 		inventry->get(iFOLDER_PAYMENTS);
 
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -602,9 +602,9 @@ int FileCabinetInset35000::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 		dispose();
 		new FileCabinetInset35001;
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 FileCabinetInset35001::FileCabinetInset35001()
@@ -640,7 +640,7 @@ WideRoomOrangeSwan35001::WideRoomOrangeSwan35001()
 	name = "WideRoomOrangeSwan35001";
 //	setHotspot ( DO_V );
 	setView(35001);
-//	init(207, 316, TRUE);
+//	init(207, 316, true);
 	init(212, 248);
 	noSkip();
 }
@@ -650,7 +650,7 @@ WideRoomMusicSwan35001::WideRoomMusicSwan35001()
 	name = "WideRoomMusicSwan35001";
 //	setHotspot ( DO_V );
 	setView(35002);
-//	init(207, 316, TRUE);
+//	init(207, 316, true);
 ////init(231, 246);
 	init(236, 247);
 	noSkip();
@@ -661,7 +661,7 @@ WideRoomPresident35001::WideRoomPresident35001()
 	name = "WideRoomPresident35001";
 //	setHotspot ( DO_V );
 	setView(35006);
-//	init(207, 316, TRUE);
+//	init(207, 316, true);
 	init(190, 235);
 	noSkip();
 }
@@ -671,7 +671,7 @@ WideRoomEnvelope35001::WideRoomEnvelope35001()
 	name = "WideRoomEnvelope35001";
 //	setHotspot ( DO_V );
 	setView(35003);
-//	init(207, 316, TRUE);
+//	init(207, 316, true);
 	init(259, 278);
 	noSkip();
 }
@@ -681,7 +681,7 @@ WideRoomVideoCamera35001::WideRoomVideoCamera35001()
 	name = "WideRoomVideoCamera35001";
 //	setHotspot ( DO_V );
 	setView(35007);
-//	init(207, 316, TRUE);
+//	init(207, 316, true);
 	init(243, 251);
 	noSkip();
 }
@@ -823,7 +823,7 @@ void Rm35100::doit()
 
 int Rm35100::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit35100::SouthExit35100()
@@ -844,9 +844,9 @@ int SouthExit35100::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 	
     	theGame->newRoom(new Rm35000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WestExit35100::WestExit35100()
@@ -868,9 +868,9 @@ int WestExit35100::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 	
     	theGame->newRoom(new Rm35400);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -907,9 +907,9 @@ void Computer35100::respond()
 
 int Computer35100::doVerb( int theVerb )
 {
-	pcLastUsed[PC_INTRLINK] = TRUE;
+	pcLastUsed[PC_INTRLINK] = true;
 	if( GameFlag.test( fMaxReportBSDis ) && !GameFlag.test(fDoneSoundAnal)) {	  
-		pcLastUsed[PC_SNDANAL] = TRUE;
+		pcLastUsed[PC_SNDANAL] = true;
 	}
 /*
 	if( invVerb == MUSICSWAN_V )	{
@@ -923,12 +923,12 @@ int Computer35100::doVerb( int theVerb )
 //		new(Web);
 //		new HTMLPage(97150);
 		curRoom->setScript(new UnfoldMusicSwanScript35100);
-		return TRUE;
+		return true;
 	}
 */
 	if( invVerb == VIDEOCAMERA_V ){
 		curRoom->setScript( new IDKneeScript35000);
-		return TRUE;
+		return true;
 	}
 	else if( invVerb == HACKERDISK_V ) {
 /*
@@ -937,7 +937,7 @@ int Computer35100::doVerb( int theVerb )
 		theMusic->stop();
 		sfxDisableSound();
 		sfxDisableMusic();
-		user->canInput( FALSE );
+		user->canInput( false );
 
 		char	prevDir[MAX_PATH];		   // change directory to Hacker under the game directory
 		char	path[MAX_PATH];
@@ -954,14 +954,14 @@ int Computer35100::doVerb( int theVerb )
 		
 		sfxEnableSound();
 		sfxEnableMusic();
-		user->canInput( TRUE );
-		return TRUE;
+		user->canInput( true );
+		return true;
 */		
 		GameFlag.set(fWahKa83);
 		inventry->clearCurrentItem();
 		normalCursor->rest();
 		curRoom->setScript(new UnfoldMusicSwanScript35100);
-		return TRUE;
+		return true;
 	}
 	else if( invVerb == YINGEBMCATALOG_V) {
 		inventry->clearCurrentItem();
@@ -981,19 +981,19 @@ int Computer35100::doVerb( int theVerb )
 		else
 			new HTMLPage( 99485 );
 */
-		return TRUE;
+		return true;
 	}
 	else if( invVerb == SHANGHAIDISK_V )
 	{	
 		inventry->clearCurrentItem();
 		curRoom->setScript(new launchShanghai);
-		return TRUE;
+		return true;
 	}
 	else if( theVerb == DO_V ) {
 		new PCScreen( 35100 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Phone35100::Phone35100()
@@ -1026,7 +1026,7 @@ int Phone35100::doVerb( int theVerb )
 		snd35000->stop();
 //		theGame->newRoom(new Rm35300);
 		theGame->newRoom(new PhoneKeyPad(FROM_RUSSIA));
-		return TRUE;
+		return true;
 	}
 /*
 	if( theVerb == DO_V )	{
@@ -1038,7 +1038,7 @@ int Phone35100::doVerb( int theVerb )
 //		else
 //		 		sfxPrintf("All phone lines are busy, please try again later.");
 		theGame->newRoom( new Rm35300 );
-		return TRUE;
+		return true;
 	}
 	else if (theVerb == NUMBERTOYURI_V)	{
 
@@ -1047,7 +1047,7 @@ int Phone35100::doVerb( int theVerb )
 		intrface->hide();		
 		inventry->clearCurrentItem();
 		theGame->newRoom( new Rm35300 );
-		return TRUE;
+		return true;
 	}
 	else if( theVerb == NUMBERTOBLAKE_V )
 	{
@@ -1056,10 +1056,10 @@ int Phone35100::doVerb( int theVerb )
 		intrface->hide();
 //		curRoom->setScript( new CallScript35100 ); 
 		curRoom->setScript(	new BlakeTeletalkScript ); 
-		return TRUE;
+		return true;
 	}
 */
-	return FALSE;
+	return false;
 }
 
 TopEnvelope35100::TopEnvelope35100()
@@ -1093,9 +1093,9 @@ int TopEnvelope35100::doVerb( int theVerb )
 		new VLink( "It's you and Asai: Warhurst, Eugene J.", "35103.avi", fPlayedParkerReaction, 60, new EMailAttachment("Newscasts ", 98114));	   //vlink 92
 		bottomenvelope35100->dispose();
 		dispose();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BottomEnvelope35100::BottomEnvelope35100()
@@ -1129,9 +1129,9 @@ int BottomEnvelope35100::doVerb( int theVerb )
 		new VLink( "It's you and Asai: Warhurst, Eugene J.", "35103.avi", fPlayedParkerReaction, 60, new EMailAttachment("Newscasts ", 98114));	   //vlink 92
 		topenvelope35100->dispose();
 		dispose();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -1145,7 +1145,7 @@ SwanOne35100::SwanOne35100()
 	name = "SwanOne";
 	setHotspot ( DO_V );
 	setView(35101);
-//	init(207, 316, TRUE);
+//	init(207, 316, true);
 	init(143, 316);
 	noSkip();
 }
@@ -1164,9 +1164,9 @@ int SwanOne35100::doVerb ( int theVerb )
 		
 		new SwanOneInset35100();
 		dispose();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SwanTwo35100::SwanTwo35100()
@@ -1174,7 +1174,7 @@ SwanTwo35100::SwanTwo35100()
 	name = "SwanTwo";
 	setHotspot ( DO_V );
 	setView(35102);
-//	init ( 327, 299, TRUE);
+//	init ( 327, 299, true);
 	init(263, 300);
 	noSkip();
 }
@@ -1204,9 +1204,9 @@ int SwanTwo35100::doVerb ( int theVerb )
 ///		dispose();		
 //		sfxUnlockRes(35102, RES_ATS);
 		theGame->newRoom(new Rm35001);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 President35100::President35100()
@@ -1230,9 +1230,9 @@ int President35100::doVerb ( int theVerb )
 		GameFlag.set(fHavePresidentPicture);
 		new PresidentInset35100();
 		dispose();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Envelope35100::Envelope35100()
@@ -1265,11 +1265,11 @@ int Envelope35100::doVerb ( int theVerb )
 
 		new VLink( "35103.avi", fPlayedParkerReaction, 60);	   //vlink 92
 		dispose();
-		return TRUE;
+		return true;
 */
-    	return FALSE;
+    	return false;
 	}
-	return FALSE;
+	return false;
 }
 
 VideoCamera35100::VideoCamera35100()
@@ -1301,9 +1301,9 @@ int VideoCamera35100::doVerb ( int theVerb )
 		new VideoCamerInset35100();	
 //		sfxUnlockRes(35190, RES_ATS);	
 		dispose();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 VoiceMail35100::VoiceMail35100()
@@ -1354,9 +1354,9 @@ int SwanOneInset35100::doVerb ( int theVerb )
 		dispose();
 		curRoom->setScript( new UnfoldMusicSwanScript35100);
 		new SwanOneInset35101;		 //folded orange swan
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SwanOneInset35101::SwanOneInset35101()
@@ -1387,9 +1387,9 @@ int SwanTwoInset35100::doVerb ( int theVerb )
 			sound2->play();
 		}
 		new SwanTwoInset35101;
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SwanTwoInset35101::SwanTwoInset35101()
@@ -1561,7 +1561,7 @@ void Rm35001::init()
 
 int Rm35001::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit35001::SouthExit35001()
@@ -1582,9 +1582,9 @@ int SouthExit35001::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //		inventry->items[iMUSICSWAN]->activate();
     	theGame->newRoom(new Rm35100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WestExit35001::WestExit35001()
@@ -1605,9 +1605,9 @@ int WestExit35001::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //		inventry->items[iMUSICSWAN]->activate();
     	theGame->newRoom(new Rm35100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 
 }
 
@@ -1629,9 +1629,9 @@ int EastExit35001::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //		inventry->items[iMUSICSWAN]->activate();
     	theGame->newRoom(new Rm35100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 OpenMusciSwan35001::OpenMusciSwan35001()
@@ -1656,9 +1656,9 @@ int OpenMusciSwan35001::doVerb( int theVerb )
 		}
 		theGame->newRoom(new Rm35002);
 
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Rm35002::Rm35002()
@@ -1693,7 +1693,7 @@ void Rm35002::init()
 
 int Rm35002::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 MusicSwanCursor::MusicSwanCursor()

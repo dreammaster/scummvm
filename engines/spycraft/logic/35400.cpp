@@ -19,16 +19,16 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/35000.h"
 #include "spycraft/logic/35400.h"
-#include "flag.h"
-#include "vlink.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/vlink.h"
 #include "invent.h"
-#include "sound.h"
+#include "spycraft/game/sound.h"
 
 namespace Spycraft {
 
@@ -108,7 +108,7 @@ void Rm35400::doit()
 
 int Rm35400::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit35400::SouthExit35400()
@@ -128,9 +128,9 @@ int SouthExit35400::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm35000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EastExit35400::EastExit35400()
@@ -150,9 +150,9 @@ int EastExit35400::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm35100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -193,9 +193,9 @@ int ClosedFile35400::doVerb( int theVerb )
 		}
 		
 		theGame->newRoom( new Rm35500);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 OpenFileScript35400::OpenFileScript35400()
@@ -261,7 +261,7 @@ void Rm35500::doit()
 
 int Rm35500::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 /*	  
 SouthExit35500::SouthExit35500()
@@ -289,9 +289,9 @@ int SouthExit35500::doVerb ( int theVerb )
 			sound2->play();
 		}
     	theGame->newRoom(new Rm35400);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }  
 */
 FileHandle35500::FileHandle35500()
@@ -324,9 +324,9 @@ int FileHandle35500::doVerb ( int theVerb )
 			}
 		}
     	theGame->newRoom(new Rm35400);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 } 
 
 Hacker35500::Hacker35500()
@@ -349,9 +349,9 @@ int Hacker35500::doVerb ( int theVerb )
 //		inventry->get(iHACKERDISK);
 //		new HackerInset35520;
 		theGame->newRoom(new Rm35701);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }  
 
 HackerInset35520::HackerInset35520()
@@ -377,9 +377,9 @@ int Folder35500::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		theGame->newRoom(new Rm35600);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /* Room 35600 */
@@ -456,7 +456,7 @@ void Rm35600::doit()
 
 int Rm35600::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit35600::SouthExit35600()
@@ -477,9 +477,9 @@ int SouthExit35600::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm35500);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }    
 
 LeftPage35600::LeftPage35600()
@@ -573,9 +573,9 @@ int LeftPage35600::doVerb ( int theVerb )
 //			pageone = new(PageOne35600);
 		}
 */
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 RightPage35600::RightPage35600()
@@ -643,9 +643,9 @@ int RightPage35600::doVerb ( int theVerb )
 			GameFlag.clear(fWahKa48);
 			pagesix = new(PageSix35600);
 		}
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BlankPage35600::BlankPage35600()
@@ -667,9 +667,9 @@ void BlankPage35600::respond()
 int BlankPage35600::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
-    	return FALSE;
+    	return false;
 	}
-	return FALSE;
+	return false;
 }
 
 PageOne35600::PageOne35600()
@@ -694,9 +694,9 @@ int PageOne35600::doVerb ( int theVerb )
 //		new(BlankPage35600);
 //		new(PageTwo35600);
 //		dispose();
-    	return FALSE;
+    	return false;
 	}
-	return FALSE;
+	return false;
 }
 
 PageTwo35600::PageTwo35600()
@@ -720,9 +720,9 @@ int PageTwo35600::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //		new(PageThree35600);
 //		dispose();
-    	return FALSE;
+    	return false;
 	}
-	return FALSE;
+	return false;
 }
 
 PageThree35600::PageThree35600()
@@ -746,9 +746,9 @@ int PageThree35600::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //		new(PageFour35600);
 //		dispose();
-    	return FALSE;
+    	return false;
 	}
-	return FALSE;
+	return false;
 }
 
 PageFour35600::PageFour35600()
@@ -772,9 +772,9 @@ int PageFour35600::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //		new(PageFive35600);
 //		dispose();
-    	return FALSE;
+    	return false;
 	}
-	return FALSE;
+	return false;
 }
 
 PageFive35600::PageFive35600()
@@ -796,9 +796,9 @@ void PageFive35600::respond()
 int PageFive35600::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
-    	return FALSE;
+    	return false;
 	}
-	return FALSE;
+	return false;
 }
 
 PageSix35600::PageSix35600()
@@ -821,9 +821,9 @@ void PageSix35600::respond()
 int PageSix35600::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
-    	return FALSE;
+    	return false;
 	}
-	return FALSE;
+	return false;
 }
 
 TurnPageScript35600::TurnPageScript35600()
@@ -892,7 +892,7 @@ void Rm35701::doit()
 
 int Rm35701::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit35701::SouthExit35701()
@@ -912,9 +912,9 @@ int SouthExit35701::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm35500);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 GogDisk35701::GogDisk35701()
@@ -944,9 +944,9 @@ int GogDisk35701::doVerb ( int theVerb )
 		inventry->items[iHACKERDISK]->activate();
 		new GogDiskInset35701();	
 		dispose();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 GogDiskInset35701::GogDiskInset35701()

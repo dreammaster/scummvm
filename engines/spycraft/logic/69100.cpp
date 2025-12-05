@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/69000.h"
 #include "spycraft/logic/69100.h"
-#include "flag.h"
-#include "roomsnd.h"
-#include "sound.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/roomsnd.h"
+#include "spycraft/game/sound.h"
 #include "advsound.h"
 
 namespace Spycraft {
@@ -80,7 +80,7 @@ void Rm69100::init()
 
 int Rm69100::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 EastExit69100::EastExit69100()
@@ -100,9 +100,9 @@ int EastExit69100::doVerb ( int theVerb )
 {
 	if (( theVerb == DO_V ) && !GameFlag.test(fLinus28)) {
 		theGame->newRoom(new Rm69002);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Rm69101::Rm69101()
@@ -139,7 +139,7 @@ void Rm69101::init()
 
 int Rm69101::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 EastExit69101::EastExit69101()
@@ -159,9 +159,9 @@ int EastExit69101::doVerb ( int theVerb )
 {
 	if (( theVerb == DO_V ) && !GameFlag.test(fLinus28)) {
 		theGame->newRoom(new Rm69002);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -195,7 +195,7 @@ int Closet69100::doVerb( int theVerb )
 			curRoom->setScript ( new ClosetOpen69100 );
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 LeftClosetDoor69101::LeftClosetDoor69101()
@@ -220,9 +220,9 @@ int LeftClosetDoor69101::doVerb( int theVerb )
 			GameFlag.clear(fClosetOpen69100);
 			curRoom->setScript ( new ClosetClose69100 );
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 RightClosetDoor69101::RightClosetDoor69101()
@@ -247,9 +247,9 @@ int RightClosetDoor69101::doVerb( int theVerb )
 			GameFlag.clear(fClosetOpen69100);
  			curRoom->setScript ( new ClosetClose69100 );
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Closet69101::Closet69101()
@@ -271,9 +271,9 @@ int Closet69101::doVerb( int theVerb )
 	{
 		if (GameFlag.test(fClosetOpen69100))
 			theGame->newRoom(new Rm69102);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -316,7 +316,7 @@ void Rm69102::init()
 
 int Rm69102::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit69102::SouthExit69102()
@@ -337,9 +337,9 @@ int SouthExit69102::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
     	if (!GameFlag.test(fLinus22))
 			theGame->newRoom(new Rm69101);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -371,9 +371,9 @@ int Handcuffs69100::doVerb ( int theVerb )
 		curRoom->setScript ( new HandcuffSound69100 );
 		new ( Cuffs69000 );
 		dispose();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*********************/

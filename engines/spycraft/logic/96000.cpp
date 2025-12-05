@@ -19,11 +19,11 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "sound.h"
+#include "spycraft/game/sound.h"
 #include "invent.h"
 #include "spycraft/logic/60000.h"
 #include "spycraft/logic/96000.h"
@@ -255,7 +255,7 @@ void Rm96300::update( void )
 		new OutWindow96300;
 	 	break;
 	 default:
-		//assert( FALSE );
+		//assert( false );
 		//use COVEREDFLOOR96300
 		//sfxPrintf( "this woulda caused assert" );
 		drawPic( 96300 );	
@@ -308,9 +308,9 @@ int NorthExit96000::doVerb ( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	setScript( new GrendelStairsScript96000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // 96100
@@ -332,9 +332,9 @@ int NorthExit96100::doVerb ( int theVerb )
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm96300 );
 		GameFlag.set( fMovedForward96000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WestExit96100::WestExit96100()
@@ -354,9 +354,9 @@ int WestExit96100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm96200 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // 96200
@@ -377,9 +377,9 @@ int NorthExit96200::doVerb ( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	curRoom->setScript( new ExitScript96200 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EastExit96200::EastExit96200()
@@ -402,9 +402,9 @@ int EastExit96200::doVerb( int theVerb )
 			theGame->newRoom( new Rm96300 );	// floor view
 		else
     		theGame->newRoom( new Rm96100 );	// standing window view
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // 96300
@@ -425,9 +425,9 @@ int WestExit96300::doVerb ( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm96200 );	// door (exit)
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EastExit96300::EastExit96300()	// Same as west
@@ -447,9 +447,9 @@ int EastExit96300::doVerb ( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm96200 );	// door (exit)
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -488,13 +488,13 @@ int Floor96300::doVerb( int theVerb )  // this has become the floor removed--cas
 			theGame->newRoom( new Rm96300 );
 		}
 		else {
-			//ASSERT( FALSE, 0 );
+			//ASSERT( false, 0 );
 			state96000 = OPENEDFLOOR96300;
 			NULL;
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // click on this to open case
@@ -517,9 +517,9 @@ int ClosedCase96300::doVerb( int theVerb )
 		state96000 = PEGOUT96300;
 		new PlayASound( 96113 );
 		theGame->newRoom( new Rm96300 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // click on this to remove PEG from case, case disappears
@@ -544,9 +544,9 @@ int OpenedCase96300::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		state96000 = PEGOUT96300;
 		theGame->newRoom( new Rm96700 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PEG96300::PEG96300()
@@ -570,13 +570,13 @@ int PEG96300::doVerb( int theVerb )
 		inventry->clearCurrentItem();
 		inventry->put( iNEEDLEPACK );
 		GameFlag.set( fRoundInPEG );
-		return TRUE;
+		return true;
 	}
 	else if( theVerb == DO_V )	{
 		setScript( new PEGUpWindowScript96300 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 OutWindow96300::OutWindow96300()
@@ -596,9 +596,9 @@ int OutWindow96300::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		setScript( new OutWindowScript96300 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }				  
 
 /*******************************
@@ -628,9 +628,9 @@ int CoveredFloorView96300::doVerb( int theVerb )
 		state96000 = OPENEDFLOOR96300;
 		new PlayASound( 96110 );
 		theGame->newRoom( new Rm96300 );		
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PEGTriggerView96300::PEGTriggerView96300()
@@ -667,7 +667,7 @@ void PEGTriggerView96300::cue()
 			theMovie->fromTo( 1080, 1184 );	// aim at president
 		else
 			theMovie->fromTo( 1200, 1293 );	// aim at president
-		theMovie->play( "96000.avi", this, FALSE, FALSE, FALSE );
+		theMovie->play( "96000.avi", this, false, false, false );
 	}
 }
 
@@ -678,7 +678,7 @@ int PEGTriggerView96300::handleEvent( MADEEventStamp *event )
 		if ( event_type & USER_MOUSE_UP ) 
     		return ( doVerb ( user->message ) );
 	}
- 	return FALSE;
+ 	return false;
 }
 
 int PEGTriggerView96300::doVerb( int theVerb )
@@ -689,7 +689,7 @@ int PEGTriggerView96300::doVerb( int theVerb )
 		GameFlag.set( fShotPEG );
 		GameFlag.clear( fRoundInPEG );
 		frame = theMovie->getPosn();
-		theMovie->pause( FALSE );
+		theMovie->pause( false );
 		if( 	frame > 1092  && frame < 1120 ||
 				frame > 1170  && frame < 1200 ||
 				frame > 1260  && frame < 1294	 )	// Hit
@@ -700,9 +700,9 @@ int PEGTriggerView96300::doVerb( int theVerb )
 			curRoom->setScript( new ExitScript96200 );	
 		}
 		dispose();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -737,9 +737,9 @@ int WindowProp96100::doVerb( int theVerb )
 	//if( theVerb == DO_V )
 	//{
 		//sfxPrintf( "look out window" );
-	//	return TRUE;
+	//	return true;
 	//}
-	return FALSE;
+	return false;
 }
 
 // 96300
@@ -768,9 +768,9 @@ int WindowProp96300::doVerb( int theVerb )
 	//if( theVerb == DO_V )	   --we have outWindow for this
 	//{
 	//	sfxPrintf( "look out window" );
-	//	return TRUE;
+	//	return true;
 	//}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -785,7 +785,7 @@ void GrendelStairsScript96000::changeState( int newState )
 	switchTo
 		theGame->handsOff();
 		theMovie->fromTo( 0, 750 );
-		theMovie->play( "96000.avi", this, FALSE, TRUE, FALSE );
+		theMovie->play( "96000.avi", this, false, true, false );
 	END
 
 	BEG
@@ -811,7 +811,7 @@ void ExitScript96200::changeState( int newState )
 			{
 				//theMovie->play( "96201.avi", this );
 				theMovie->fromTo( 1305, 1581 );
-				theMovie->play( "96000.avi", this, FALSE, TRUE, FALSE );
+				theMovie->play( "96000.avi", this, false, true, false );
 			 	GameFlag.set( f2LeaveAttempts96000 );
 			}
 			//++leaveAttempts;
@@ -820,17 +820,17 @@ void ExitScript96200::changeState( int newState )
 		{
 			//theMovie->play( "96201.avi", this );
 			theMovie->fromTo( 1305, 1581 );
-			theMovie->play( "96000.avi", this, FALSE, TRUE, FALSE );
+			theMovie->play( "96000.avi", this, false, true, false );
 		}
 		else if( attempt96000 == SHOOTANDHIT )
 		{
 			//theMovie->play( "96202.avi", this );
 			theMovie->fromTo( 1800, 2169 );
-			theMovie->play( "96000.avi", this, FALSE, TRUE, FALSE );
+			theMovie->play( "96000.avi", this, false, true, false );
 		}
 		else
 		{
-			//ASSERT( FALSE, 0 );
+			//ASSERT( false, 0 );
 			//sfxPrintf( "this woulda caused assert" );
 			attempt96000 = NOATTEMPT;
 		}
@@ -861,7 +861,7 @@ void PEGUpWindowScript96300::changeState( int newState )
 		stopSound();	// you can't get back to room after this--don't restart sound
 		//features->dispose();
 		theMovie->fromTo( 960, 1079 );
-		theMovie->play( "96000.avi", this, FALSE, FALSE, FALSE );
+		theMovie->play( "96000.avi", this, false, false, false );
 	END
 
 	BEG
@@ -889,7 +889,7 @@ void ShootPresidentScript96300::changeState( int newState )
 {
  	switchTo
 		theMovie->fromTo( 765, 938 );
-		theMovie->play( "96000.avi", this, FALSE, FALSE, FALSE );
+		theMovie->play( "96000.avi", this, false, false, false );
 	END
 
 	BEG

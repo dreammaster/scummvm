@@ -32,18 +32,18 @@
 // fLinus25 : used for colby vlink for dacha message
 // fLinus35 : used for checking Grendal killed
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 #include "invent.h"
 #include "spycraft/logic/93000.h"
-#include "movie.h"
+#include "spycraft/game/movie.h"
 #include "spycraft/logic/90000.h"
 #include "spycraft/logic/60000.h"
-#include "sound.h"
-#include "vlink.h"
+#include "spycraft/game/sound.h"
+#include "spycraft/game/vlink.h"
 #include "spycraft/logic/1000.h"
 #include "spycraft/logic/95200.h"
 
@@ -83,7 +83,7 @@ Rm93000::Rm93000()
 
 Rm93000::~Rm93000()
 {
-	canSaveColby = TRUE;
+	canSaveColby = true;
 	sfxUnlockRes( 911, RES_ATS );
 }
 
@@ -91,7 +91,7 @@ void Rm93000::init()
 {
 	drawPic( -1 );
     Room::init();
-	canSaveColby = FALSE;
+	canSaveColby = false;
 	sfxLoadRes( 911, RES_ATS );
 	sfxLockRes( 911, RES_ATS );
 
@@ -105,7 +105,7 @@ void Rm93000::init()
 
 int Rm93000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 Rm93010::Rm93010()
@@ -116,7 +116,7 @@ Rm93010::Rm93010()
 
 Rm93010::~Rm93010()
 {
-	canSaveColby = TRUE;
+	canSaveColby = true;
 	if (!GameFlag.test(fLinus10))
 		backpack->dispose();
 	else
@@ -126,7 +126,7 @@ Rm93010::~Rm93010()
 void Rm93010::init()
 {
 	GameFlag.set(fLinus12);
-	canSaveColby = FALSE;
+	canSaveColby = false;
 	if (!GameFlag.test(fLinus10))
 		drawPic( 93001 );
 	else
@@ -162,7 +162,7 @@ void Rm93010::init()
 
 int Rm93010::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 Rm93020::Rm93020()
@@ -173,7 +173,7 @@ Rm93020::Rm93020()
 
 Rm93020::~Rm93020()
 {
-	canSaveColby = TRUE;
+	canSaveColby = true;
 }
 
 void Rm93020::init()
@@ -182,7 +182,7 @@ void Rm93020::init()
 		drawPic( 93004 );
 	else
 		drawPic( 93005 );
-	canSaveColby = FALSE;
+	canSaveColby = false;
     Room::init();
 
  	intrface->enable();
@@ -200,7 +200,7 @@ void Rm93020::init()
 
 int Rm93020::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 // Oil refinery place
@@ -231,7 +231,7 @@ void Rm93500::init()
 
 int Rm93500::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 
@@ -263,9 +263,9 @@ int Backpack::doVerb( int theVerb )
 	{
 		theGame->newRoom ( new Rm93020 );
 //		curRoom->setScript(new ToHeliTransfer);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BackpackOn::BackpackOn()
@@ -290,9 +290,9 @@ int BackpackOn::doVerb( int theVerb )
 	{
 		theGame->newRoom ( new Rm93020 );
 //		curRoom->setScript(new ToHeliTransfer);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BackpackOff::BackpackOff()
@@ -317,9 +317,9 @@ int BackpackOff::doVerb( int theVerb )
 	{
 		theGame->newRoom ( new Rm93020 );
 //		curRoom->setScript(new ToHeliTransfer);	
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -351,9 +351,9 @@ int DropGunIcon::doVerb ( int theVerb )
 		theMovie->stop();
 		curRoom->setScript ( new DropGunScript );
 		dispose();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }	
 
 DropGogglesIcon::DropGogglesIcon()
@@ -378,9 +378,9 @@ int DropGogglesIcon::doVerb ( int theVerb )
 		GameFlag.set (fLinus5);
 		theMovie->fromTo(10,10);
 		theMovie->play("93000.avi", this, 0, 0, 0);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }	
 
 GetGunIcon::GetGunIcon()
@@ -406,9 +406,9 @@ int GetGunIcon::doVerb ( int theVerb )
 		theMovie->stop();
 		curRoom->setScript ( new BlakeCaughtScript );
 		dispose();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }	
 
 ShootBlakeIcon::ShootBlakeIcon(int who)
@@ -446,9 +446,9 @@ int ShootBlakeIcon::doVerb ( int theVerb )
 			curRoom->setScript ( new ShootGrendal );
 		}
 		dispose();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }	
 
 /*******************************

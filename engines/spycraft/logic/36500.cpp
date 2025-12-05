@@ -20,15 +20,15 @@
  */
 
 #include "invent.h"
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/36500.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
-#include "movie.h"
-#include "vlink.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/vlink.h"
 
 namespace Spycraft {
 
@@ -120,7 +120,7 @@ Rm36500::~Rm36500( void )
 
 int Rm36500::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit36500::SouthExit36500()
@@ -140,9 +140,9 @@ int SouthExit36500::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -302,7 +302,7 @@ AgainThanks3::AgainThanks3()
 
 void AgainThanks3::doit()
 {
-	if(howContact2->hasBeenChosen == TRUE)	
+	if(howContact2->hasBeenChosen == true)	
 		maxwKatDialog6->add(thanksHer3);
 	DItem::doit();
 }

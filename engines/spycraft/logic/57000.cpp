@@ -19,18 +19,18 @@
  *
  */
 
-#include "flag.h"
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/57000.h"
 #include "spycraft/logic/57100.h"
 #include "spycraft/logic/1000.h"
-#include "movie.h"
-#include "sound.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/sound.h"
 #include "spycraft/logic/60000.h"
-#include "vlink.h"
+#include "spycraft/game/vlink.h"
 
 namespace Spycraft {
 
@@ -160,7 +160,7 @@ void Rm57000::init()
 
 int Rm57000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit57000::SouthExit57000()
@@ -180,9 +180,9 @@ int SouthExit57000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 TopWestExit57000::TopWestExit57000()
@@ -203,9 +203,9 @@ int TopWestExit57000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm57100 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BottomWestExit57000::BottomWestExit57000()
@@ -226,9 +226,9 @@ int BottomWestExit57000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm57100 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -255,9 +255,9 @@ int StatueAndLamp57000::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		GameFlag.set(fNoticedWestern);
 		new StatueAndLampInset57000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BookOnTable57000::BookOnTable57000()
@@ -278,9 +278,9 @@ int BookOnTable57000::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		GameFlag.set(fNoticedWestern);
 		new BookOnTableInset57000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BearPhoto57000::BearPhoto57000()
@@ -301,9 +301,9 @@ int BearPhoto57000::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		GameFlag.set(fNoticedWestern);
 		new BearPhotoInset57000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 HorseStatue57000::HorseStatue57000()
@@ -324,9 +324,9 @@ int HorseStatue57000::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		GameFlag.set(fNoticedWestern);
 		new HorseStatueInset57000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Calendar57000::Calendar57000()
@@ -347,9 +347,9 @@ int Calendar57000::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		GameFlag.set(fNoticedWestern);
 		new CalendarInset57100;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -367,9 +367,9 @@ StatueAndLampInset57000::StatueAndLampInset57000()
 int StatueAndLampInset57000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BookOnTableInset57000::BookOnTableInset57000()
@@ -381,9 +381,9 @@ BookOnTableInset57000::BookOnTableInset57000()
 int BookOnTableInset57000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BearPhotoInset57000::BearPhotoInset57000()
@@ -395,9 +395,9 @@ BearPhotoInset57000::BearPhotoInset57000()
 int BearPhotoInset57000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 HorseStatueInset57000::HorseStatueInset57000()
@@ -409,9 +409,9 @@ HorseStatueInset57000::HorseStatueInset57000()
 int HorseStatueInset57000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 CalendarInset57000::CalendarInset57000()
@@ -423,9 +423,9 @@ CalendarInset57000::CalendarInset57000()
 int CalendarInset57000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************

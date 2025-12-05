@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/48000.h"
 #include "spycraft/logic/48400.h"
 #include "spycraft/logic/1000.h"
 //#include "spycraft/logic/45000.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 
 namespace Spycraft {
 
@@ -66,7 +66,7 @@ void Rm48400::init()
 
 int Rm48400::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit48400::SouthExit48400()
@@ -86,9 +86,9 @@ int SouthExit48400::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //    	theGame->newRoom(new Rm45000);
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
  
  

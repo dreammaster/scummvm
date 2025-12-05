@@ -107,12 +107,12 @@ int MLI_Screen(unsigned char *ScreenAddr, int x, int y, int w, int h, int pitch,
 // pitch is sometime referred to as "stride" or RowBytes"
 // distance (in bytes) between two pixels in the same column on adjacent rows
 
-// returns TRUE if worked or FALSE (not enought memory for internal structures)
+// returns true if worked or false (not enought memory for internal structures)
 
 // Specify Max Number of Layers that will be open at any one time   /*DONE*/
 int MLI_Init(int NumberLayers);
 // Default number of Layers is one (this API not Called).
-// FALSE out of memory for control structures
+// false out of memory for control structures
 // or not permitted (previous MLI_Open issued)
 
 // Set up a Layer		     /*DONE*/
@@ -122,11 +122,11 @@ MLI_LAYER_HANDLE MLI_CreateLayer(bool Sprite, 		// Set if Sprite
 	int LbuffPreload, 	// AMount, -1 for 3/4, -2 for full
 	enum HFB_Modes BufferMode, // see HFB_Modes def.
 	int bStreams); 		// set if want streaming data
-// If SPrite set TRUE, there is an associated Dirty Buffer
+// If SPrite set true, there is an associated Dirty Buffer
 
 // Size is Size of buffer to use
 // Default Init for a Layer is Stream, 0.5 Meg (This API Not Called
-// FALSE Invalid Layer
+// false Invalid Layer
 
 // Destroy a layer
 int MLI_DestroyLayer(MLI_LAYER_HANDLE pL);	     /*DONE*/
@@ -156,7 +156,7 @@ MLI_LAYER_HANDLE MLI_Open(MLI_LAYER_HANDLE pL,
 // over interframe background video
 // set Dirty Buffer to False for background video
 // and for sprites that will go over intraframe video
-// returns FALSE for failure
+// returns false for failure
 
 // return current frame number
 int MLI_GetPosition(MLI_LAYER_HANDLE pL);
@@ -216,7 +216,7 @@ int MLI_ProcessFrame(int WantedFrame);  // Put next frame up, if appropriate
 // This API should be called in a game loop
 // returns True if a frame was composited and displayed
 
-// set done = TRUE at end of play range
+// set done = true at end of play range
 
 // Wanted Frame is normally 0, and sync is maintained by the audio sub-system
 // If wanted frame is non-0, 
@@ -224,7 +224,7 @@ int MLI_ProcessFrame(int WantedFrame);  // Put next frame up, if appropriate
 /* Code fragment example of use of MLI_ProcessFrame():
 
 	MLI_PlayRange(from, to);
-	while (TRUE)	{		// game loop
+	while (true)	{		// game loop
 		ddrval = lpDDSPrimary->Lock(NULL,&DDSPriDesc,0,NULL); // lock screen
 		unsigned char *ScrnPtr = (unsigned char *)DDSPriDesc.lpSurface;
 
@@ -244,7 +244,7 @@ int MLI_ProcessFrame(int WantedFrame);  // Put next frame up, if appropriate
 int MLI_SetAudioLayer(MLI_LAYER_HANDLE pL);
 // Default (API not Called) is Background (lowest) layer
 
-// returns FALSE if layer does not exist or has no audio
+// returns false if layer does not exist or has no audio
 
 // COmpletely done with audio...
 void MLI_EndAudio();
@@ -253,23 +253,23 @@ void MLI_EndAudio();
 MLI_LAYER_HANDLE MLI_GetAudioLayer();
 // Default (API not Called) is Background (lowest) layer
 
-// returns FALSE if layer does not exist or has no audio
+// returns false if layer does not exist or has no audio
 
 // Stop Audio.  Set flag so we know layer is off
 int MLI_StartPlaying();
-// returns True if stopped, FALSE if no audio
+// returns True if stopped, false if no audio
 
 // Stop Audio.  Set flag so we know layer is off
 int MLI_StopPlaying();
-// returns True if stopped, FALSE if no audio
+// returns True if stopped, false if no audio
 
-// Returns TRUE if audio is playing.  False if non-existent or off
+// Returns true if audio is playing.  False if non-existent or off
 int MLI_IsAudioPlaying();
 
-// Returns speaker Time in msec. FALSE if not running
+// Returns speaker Time in msec. false if not running
 int MLI_TimeSpeaker();
 
-// returns TRUE if took samples back out of buffer.
+// returns true if took samples back out of buffer.
 int MLI_TakeBack();
 
 
@@ -277,18 +277,18 @@ int MLI_TakeBack();
 // If Audio Enabled for this layer, audio pauses
 bool MLI_Pause(MLI_LAYER_HANDLE pL);
 
-// returns TRUE if valid layer
+// returns true if valid layer
 
 // Resume a layer
 bool MLI_Resume(MLI_LAYER_HANDLE pL);
 
-// returns TRUE if valid layer
+// returns true if valid layer
 
 // Resume plays to the end of the selected frame range
 
 // Sets View to Black
 int MLI_Erase();
-// FALSE No Screen Pointer
+// false No Screen Pointer
 
 // set view	(video top left at top left of view.(x, y, w, h measured in screen space)
 int MLI_View(MLI_LAYER_HANDLE pL, int x, int y, int w, int h);
@@ -328,9 +328,9 @@ int MLI_EnableProfiling(bool Flag);
 void MLI_StopCharacter(char StopChar, bool MouseClick);
 // Keyboard Character that stops (aborts) video
 // NULL means no stopping from keyboard
-// MouseCLick TRUE if any Click also stops Video
+// MouseCLick true if any Click also stops Video
 
-// Default (API not called) no way to stop Video (Null, FALSE)
+// Default (API not called) no way to stop Video (Null, false)
 int MLI_SwapLayers(int Layer1, int Layer2);
 // Layer 1 and Layer 2 (AND ALL THEIR REFERENCES!!)are swapped
 // E.G. After open, Layer1, Swap to 2, CLose using Layer 2.

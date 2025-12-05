@@ -19,17 +19,17 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "movie.h"
-#include "flag.h"
-#include "roomsnd.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/roomsnd.h"
 #include "web.h"
 #include "image.h"
 #include "html.h"
-#include "pcscreen.h"
+#include "spycraft/game/pcscreen.h"
 #include "spycraft/logic/5000.h"
 #include "spycraft/logic/1000.h"
 
@@ -183,7 +183,7 @@ void Rm5100::init()
 
 	intrface->show();
 	//theGame->handsOn();
-	repeatedPz = FALSE;
+	repeatedPz = false;
 	if( !GameFlag.test( fFarmIALicenseDone ) )
 		setScript( new IntroScript5100 );
 	else 
@@ -245,9 +245,9 @@ int SouthExit5000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm1000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WestExit5000::WestExit5000()
@@ -267,9 +267,9 @@ int WestExit5000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm5200 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /* 5100 */
@@ -290,9 +290,9 @@ int SouthExit5100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm5000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /* 5200 */
@@ -313,9 +313,9 @@ int SouthExit5200::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm1000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EastExit5200::EastExit5200()
@@ -335,9 +335,9 @@ int EastExit5200::doVerb( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom( new Rm5000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -362,11 +362,11 @@ void  Computer5000::respond()
 int  Computer5000::doVerb( int theVerb )
 {
 	if ( theVerb == DO_V) {
-		pcLastUsed[PC_INTRLINK] = FALSE;
+		pcLastUsed[PC_INTRLINK] = false;
 		new PCScreen( 5000 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -403,9 +403,9 @@ int BackMonitorProp5000::doVerb( int theVerb )
 		// happens automatically now
 			//if( !GameFlag.test( fShowedIANews ) )
 			//	setScript( new NewsScript5000Plus );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BlankBackMonitorProp5000::BlankBackMonitorProp5000()
@@ -429,9 +429,9 @@ int BlankBackMonitorProp5000::doVerb( int theVerb )
 	//if( theVerb == DO_V )
 	//{
 	//	// do stuff ...
-	//	return TRUE;
+	//	return true;
 	//}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -442,7 +442,7 @@ int BlankBackMonitorProp5000::doVerb( int theVerb )
 
 TimeoutScript5000::~TimeoutScript5000()
 {
- 	timerRunning = FALSE;
+ 	timerRunning = false;
 }
 
 void TimeoutScript5000::changeState( int newState )
@@ -457,7 +457,7 @@ void TimeoutScript5000::changeState( int newState )
 			seconds = 6;
 		++pass;
 		soundptr = NULL;
-		timerRunning = TRUE;
+		timerRunning = true;
 	END
 
 	BEG
@@ -482,7 +482,7 @@ void TimeoutScript5000::changeState( int newState )
 		//soundptr = new Sound;
 		//soundptr->play( 5210, this );	// Frank coming	footsteps
 		ticks = 2;	// instead of sound cue
-		timerRunning = FALSE;
+		timerRunning = false;
 	END
 
 	BEG
@@ -519,14 +519,14 @@ void NewsScript5000Plus::changeState( int newState )
 	END
 
 	BEG
-		showingNews = TRUE;
+		showingNews = true;
 		theMovie->play( "5010.avi", this );	// news cast	
 	END
 
 	BEG
 		GameFlag.set( fShowedIANews );
 		theGame->handsOn();
-		showingNews = FALSE;
+		showingNews = false;
 		// set Frank's timer
 		plobjPtr = new PermListObject;
 		plobjPtr->setScript( new TimeoutScript5000 );
@@ -550,7 +550,7 @@ void IntroScript5100::changeState( int newState )
 
 	BEG
 		theGame->handsOff();
-		theMovie->play( "5000.avi", this, FALSE, TRUE, FALSE );  //Image Analysis intro		
+		theMovie->play( "5000.avi", this, false, true, false );  //Image Analysis intro		
 	END
 
 	BEG
@@ -567,7 +567,7 @@ void LicenseScript5100::changeState( int newState )
 	BEG
 		GameFlag.clear( fSentPuzzleMail );
 		pcLastUsed[PC_IA] = WEB_IMAGEPLATE;
-		pcLastUsed[PC_INTRLINK] = FALSE;
+		pcLastUsed[PC_INTRLINK] = false;
 		new PCScreen( 5100, this );
 	END
 
@@ -575,7 +575,7 @@ void LicenseScript5100::changeState( int newState )
 		theGame->handsOff();
 		if( !GameFlag.test( fFarmIALicenseDone ) )
 		{
-			repeatedPz = TRUE;
+			repeatedPz = true;
 			if( GameFlag.test( fSentPuzzleMail ) )
 				theMovie->play( "5001.avi", this );	 // absolute crap
 			else
@@ -606,14 +606,14 @@ void TanksScript5100::changeState( int newState )
 	BEG
 		GameFlag.clear( fSentPuzzleMail );
 		pcLastUsed[PC_IA] = WEB_IMAGETANK;
-		pcLastUsed[PC_INTRLINK] = FALSE;
+		pcLastUsed[PC_INTRLINK] = false;
 		new PCScreen( 5100, this );
 	END
 
 	BEG
 		theGame->handsOff();
 		if( GameFlag.test( fFarmIATanksDone ) )	 // success
-			theMovie->play( "5004.avi", this, FALSE, TRUE, FALSE ); // takes your picture
+			theMovie->play( "5004.avi", this, false, true, false ); // takes your picture
 		else  // failure
 		{
 			if( GameFlag.test( fSentPuzzleMail ) )
@@ -627,9 +627,9 @@ void TanksScript5100::changeState( int newState )
 		if( GameFlag.test( fFarmIATanksDone ) )
 		{
 			GameFlag.set( fFarmIADone );
-			drawBackground = FALSE;	// Travelink
+			drawBackground = false;	// Travelink
 		 	theGame->newRoom( new Rm1000 );
-			pcLastUsed[PC_IA] = FALSE;
+			pcLastUsed[PC_IA] = false;
 		}
 		else
 		{
@@ -658,7 +658,7 @@ void AmesScript5100::changeState( int newState )
 		theGame->handsOn();
 		lastPuzzle = AMESPUZZLE;
 		pcLastUsed[PC_IA] = WEB_IMAGECOURIER;
-		pcLastUsed[PC_INTRLINK] = FALSE;	
+		pcLastUsed[PC_INTRLINK] = false;	
 		new PCScreen( 5100, this );
 		//normalCursor->rest();
 		//new Web;
@@ -673,8 +673,8 @@ void AmesScript5100::changeState( int newState )
 		 //GameFlag.set( fFarmIAAmesDone );
 		if( GameFlag.test( fFarmIAAmesDone ) )
 		{
-			theMovie->play( "5004.avi", this, FALSE, TRUE, FALSE ); // that's how we got him
-			pcLastUsed[PC_IA] = FALSE;
+			theMovie->play( "5004.avi", this, false, true, false ); // that's how we got him
+			pcLastUsed[PC_IA] = false;
 		}
 		else
 			cue();

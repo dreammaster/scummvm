@@ -19,14 +19,14 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "movie.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "flag.h"
-#include "vlink.h"
-#include "roomsnd.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/vlink.h"
+#include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/1270.h"
 #include "spycraft/logic/1000.h"
 #include "intrface.h"
@@ -58,7 +58,7 @@ Rm1270::~Rm1270()
 	sfxUnlockRes(666, RES_ATS);
 	sfxUnlockRes(667, RES_ATS);*/
 	if (theGame)
-		theGame->flag = FALSE;
+		theGame->flag = false;
 }
 						  
  
@@ -101,9 +101,9 @@ void NewspaperScript1270::changeState ( int newState )
    
 	BEG	
 		#ifndef DIRECTX
-			theMovie->play( "1270.avi", this, FALSE, TRUE, FALSE ); // Credo
+			theMovie->play( "1270.avi", this, false, true, false ); // Credo
 		#else
-			theMovie->play( "1270.avi", this, FALSE, 2, FALSE ); // Credo
+			theMovie->play( "1270.avi", this, false, 2, false ); // Credo
 		#endif
 	END
 
@@ -113,7 +113,7 @@ void NewspaperScript1270::changeState ( int newState )
 
 	BEG
 		theMovie->fromTo(0, 56);
-		theMovie->play( "1271.avi", this, FALSE, FALSE, FALSE ); // newspaper
+		theMovie->play( "1271.avi", this, false, false, false ); // newspaper
 	END
 
 	BEG
@@ -121,7 +121,7 @@ void NewspaperScript1270::changeState ( int newState )
 		theMovie->play("1271.avi", curRoom, 0, 0, 0);
 
 		
-		intrface->isOpen = TRUE;
+		intrface->isOpen = true;
 		theCase = new(Briefcase);
   		//theHolster = new(Holster);
   		thePDA = new(PDA);
@@ -134,12 +134,12 @@ void NewspaperScript1270::changeState ( int newState )
   		thePDA->init(391,480);	//455
 		intrface->enable();
 		
-		theGame->enableIntrDuringMovie = TRUE;
+		theGame->enableIntrDuringMovie = true;
 		setScript(new OpenInterface, this);
 	END
 
 	BEG
-		user->canInput(TRUE);
+		user->canInput(true);
 		ticks = 10;
 	END
 	BEG
@@ -149,14 +149,14 @@ void NewspaperScript1270::changeState ( int newState )
 	END
 	BEG
 		theMovie->stop();
-		theMovie->paused = FALSE;
+		theMovie->paused = false;
 		ticks = 10;
 	END
 	BEG
 		curMap = MAP_WASHINGTON;	// global in 1000.cpp
-		drawBackground = FALSE;
-		theGame->enableIntrDuringMovie = FALSE;
-		theMovie->play("42.avi", this, 0, TRUE, 0);
+		drawBackground = false;
+		theGame->enableIntrDuringMovie = false;
+		theMovie->play("42.avi", this, 0, true, 0);
 	END
 	BEG
 		GameFlag.set(fInitialBriefing);

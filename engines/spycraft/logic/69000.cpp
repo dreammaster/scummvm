@@ -19,9 +19,9 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/69000.h"
 #include "spycraft/logic/69100.h"
@@ -30,12 +30,12 @@
 #include "spycraft/logic/69400.h"
 #include "spycraft/logic/69500.h"
 #include "spycraft/logic/1000.h"
-#include "movie.h"
-#include "flag.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/flag.h"
 #include "advsound.h"
 #include "mcimovie.h"
-#include "roomsnd.h"
-#include "sound.h"
+#include "spycraft/game/roomsnd.h"
+#include "spycraft/game/sound.h"
 
 namespace Spycraft {
 
@@ -150,7 +150,7 @@ void Rm69000::init()
 
 int Rm69000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 Rm69002::Rm69002()
@@ -175,7 +175,7 @@ void Rm69002::init()
   	intrface->enable();
  	theGame->handsOn();
 	
-	if( colbyInfo->slow_system == TRUE )
+	if( colbyInfo->slow_system == true )
 		theMusic->play ( 69000 );
 	else 
 	{
@@ -200,7 +200,7 @@ void Rm69002::init()
 
 int Rm69002::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 Rm69003::Rm69003()
@@ -228,7 +228,7 @@ void Rm69003::init()
 
 int Rm69003::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /* Exit Features */
@@ -255,9 +255,9 @@ int SouthExit69000::doVerb ( int theVerb )
 	//	theGame->setCursor( normalCursor );
 		theGame->handsOn();
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WestExit69000::WestExit69000()
@@ -280,9 +280,9 @@ int WestExit69000::doVerb ( int theVerb )
 		if (GameFlag.test(fClosetOpen69100))
   			theGame->newRoom(new Rm69101);
 		else theGame->newRoom(new Rm69100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EastExit69000::EastExit69000()
@@ -303,9 +303,9 @@ int EastExit69000::doVerb ( int theVerb )
 	if ( theVerb == DO_V )
 	{
 		theGame->newRoom(new Rm69200);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 CuffCursor::CuffCursor()
@@ -344,9 +344,9 @@ int Onyx69000::doVerb ( int theVerb )
 {
   	if ( theVerb == DO_V ) {
 		theGame->newRoom ( new Rm69003 );	
-	   	return TRUE;
+	   	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -544,9 +544,9 @@ void Cuffs69000::respond()
 int Cuffs69000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
-	   	return TRUE;
+	   	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 void DialogFlag::doit()

@@ -40,7 +40,8 @@ MODULE_OBJS = \
 	game/file.o \
 	game/game.o \
 	game/list.o \
-	game/user.o
+	game/user.o \
+	logic/1000.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_SPYCRAFT), DYNAMIC_PLUGIN)

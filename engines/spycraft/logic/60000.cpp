@@ -19,18 +19,18 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "movie.h"
+#include "spycraft/game/movie.h"
 #include "spycraft/logic/60000.h"
-#include "flag.h"
-#include "roomsnd.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/roomsnd.h"
 #include "advfile.h"
 #include "save.h"								  	
 #include "spycraft/logic/1270.h"
-#include "gamebox.h"
+#include "spycraft/dmade/gamebox.h"
 
 namespace Spycraft {
 
@@ -189,7 +189,7 @@ void Rm60500::init()
 	Room::init();
 	stopSound();
 	theGame->handsOn();
-	sfxEnableSaveGame( FALSE );
+	sfxEnableSaveGame( false );
 	
 	if( !GameFlag.test( fInitialBriefing ) )
 		new PlayBt60500;
@@ -236,9 +236,9 @@ int ButtonView60000::handleEvent( MADEEventStamp * event )
 				setCel( 0 );
 			activate();		
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // 60000
@@ -301,7 +301,7 @@ void QuitView60000::activate( void )
 {
 	setCel(1);
 	init( 200, 315 );
-	quitting = TRUE;
+	quitting = true;
 	sfxQuit();
 			
 }
@@ -376,7 +376,7 @@ void QuitBt60500::respond()
 
 void QuitBt60500::activate( void )
 {
-	quitting = TRUE;
+	quitting = true;
 	sfxQuit();
 }
 
@@ -393,7 +393,7 @@ void JailScript60000::changeState( int newState )
 		ticks = 120;
 	END
 	BEG
- 		theMovie->play( "60000.avi", this, FALSE, TRUE, FALSE );
+ 		theMovie->play( "60000.avi", this, false, true, false );
 	END
 
 	BEG
@@ -409,7 +409,7 @@ void FiredScript60000::changeState( int newState )
 	END
 
 	BEG
-		theMovie->play( "60100.avi", this, FALSE, TRUE, FALSE );
+		theMovie->play( "60100.avi", this, false, true, false );
 	END
 
 	BEG
@@ -425,7 +425,7 @@ void DeadScript60000::changeState( int newState )
 	END
 
 	BEG
-		theMovie->play( "60050.avi", this, FALSE, TRUE, FALSE );
+		theMovie->play( "60050.avi", this, false, true, false );
 	END
 
 	BEG
@@ -442,13 +442,13 @@ void EndGameScript60000::changeState( int newState )
 	BEG
 		// Warhurst caught news
 		theMovie->fromTo( 60, 629 );
-		theMovie->play( "60010.avi", this, 	FALSE, FALSE, FALSE );
+		theMovie->play( "60010.avi", this, 	false, false, false );
 	END
 
 	BEG
 		// Goto Langley seque
 		theMovie->fromTo( 0, 56 );
-		theMovie->play( "60010.avi", this, FALSE, FALSE, FALSE );
+		theMovie->play( "60010.avi", this, false, false, false );
 	END
 
 	BEG
@@ -456,12 +456,12 @@ void EndGameScript60000::changeState( int newState )
 		if( GameFlag.test( fEndgameYuriShot ) )
 		{
 			theMovie->fromTo( 645, 1211 );
-			theMovie->play("60010.avi", this, FALSE, FALSE, FALSE );		// medal
+			theMovie->play("60010.avi", this, false, false, false );		// medal
 		}
 		else
 		{
 			theMovie->fromTo( 1275, 2094 );
-			theMovie->play("60010.avi", this, FALSE, FALSE, FALSE );		// fired
+			theMovie->play("60010.avi", this, false, false, false );		// fired
 		}
 	END
 
@@ -470,12 +470,12 @@ void EndGameScript60000::changeState( int newState )
 		if( GameFlag.test( fEndgameYuriShot ) )
 		{
 			theMovie->fromTo( 2130, 2660 );
-			theMovie->play("60010.avi", this, FALSE, FALSE, FALSE );		// Churby wins election
+			theMovie->play("60010.avi", this, false, false, false );		// Churby wins election
 		}
 		else
 		{
 			theMovie->fromTo( 2670, 3111 );
-			theMovie->play("60010.avi", this, FALSE, FALSE, FALSE );		// Chaos in Russia
+			theMovie->play("60010.avi", this, false, false, false );		// Chaos in Russia
 		}
 	END
 	
@@ -484,7 +484,7 @@ void EndGameScript60000::changeState( int newState )
 		if( !GameFlag.test( fEndgamePitStopped ) )
 		{
 			theMovie->fromTo( 3180, 3952 );
-			theMovie->play("60010.avi", this, FALSE, TRUE, FALSE );		// Sterling: Oh my God!
+			theMovie->play("60010.avi", this, false, true, false );		// Sterling: Oh my God!
 		}
 		else
 		{
@@ -497,7 +497,7 @@ void EndGameScript60000::changeState( int newState )
 
 	BEG
 		// credits
-		theMovie->play("200.avi", this, FALSE, 2, FALSE );
+		theMovie->play("200.avi", this, false, 2, false );
 	END
 
 	BEG
