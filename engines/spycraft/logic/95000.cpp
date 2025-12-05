@@ -794,9 +794,9 @@ int NorthEastExit95000::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95017);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthWestExit95000::NorthWestExit95000()
@@ -858,9 +858,9 @@ int NorthWestExit95000::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95016);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthExit95000::NorthExit95000()
@@ -926,9 +926,9 @@ int NorthExit95000::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95014);
 				break;
 		}
-	   	return TRUE;
+	   	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthEastExit95000::SouthEastExit95000()
@@ -990,9 +990,9 @@ int SouthEastExit95000::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95018);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthWestExit95000::SouthWestExit95000()
@@ -1054,9 +1054,9 @@ int SouthWestExit95000::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95018);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit95000::SouthExit95000()
@@ -1118,9 +1118,9 @@ int SouthExit95000::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95018);
 				break;
 		}
-	   	return TRUE;
+	   	return true;
 	}
-	return FALSE;
+	return false;
 }
 void WPScript::changeState ( int newState )
 {

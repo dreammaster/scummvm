@@ -19,9 +19,9 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/92000.h"
 
@@ -64,7 +64,7 @@ void Rm92000::init()
 
 int Rm92000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /*******************************

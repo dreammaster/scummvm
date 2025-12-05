@@ -19,26 +19,26 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "invent.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 #include "pda.h"
-#include "vlink.h"
-#include "roomsnd.h"
+#include "spycraft/game/vlink.h"
+#include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/24000.h"
 #include "spycraft/logic/1000.h"
 #include "advsound.h"
-#include "advmusic.h"
-#include "gamebox.h"
-#include "verbs.h"
+#include "spycraft/dmade/advmusic.h"
+#include "spycraft/dmade/gamebox.h"
+#include "spycraft/game/verbs.h"
 #include "advfile.h"
 #include "spycraft/logic/60000.h"
 
 #include "teletalk.h"
-#include "PCScreen.h"
+#include "spycraft/game/pcscreen.h"
 #include "phone.h"
 
 namespace Spycraft {
@@ -245,9 +245,9 @@ int SouthExit24000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit24100::SouthExit24100()
@@ -268,9 +268,9 @@ int SouthExit24100::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 		inventry->clearCurrentItem(); 	// get rid of EBMC
     	theGame->newRoom(new Rm24000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -295,9 +295,9 @@ int Desk24000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom( new Rm24100 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // not used
@@ -320,9 +320,9 @@ int Rolodex24100::doVerb ( int theVerb )
 {
 	if(theVerb == DO_V) {
 		new RolodexInset24100;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Phone24100::Phone24100()
@@ -343,9 +343,9 @@ int Phone24100::doVerb ( int theVerb )
 {
 	if(theVerb == DO_V) {
 		theGame->newRoom( new PhoneKeyPad( FROM_USA ) );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 void Phone24100::cue( void )
@@ -380,13 +380,13 @@ int Computer24100::doVerb ( int theVerb )
 			inventry->clearCurrentItem();
 			curRoom->setScript( new launchShanghai );
 		}
-		return TRUE;
+		return true;
 	}
 	if( invVerb == HACKERDISK_V )
 	{	
 		//inventry->clearCurrentItem();
 		//launchHacker();
-		return TRUE;
+		return true;
 	}
 	else if( invVerb == YINGEBMCATALOG_V )
 	{
@@ -395,7 +395,7 @@ int Computer24100::doVerb ( int theVerb )
 			inventry->clearCurrentItem();
 			curRoom->setScript( new EBMCatScript24100 );			
 		}
-		return TRUE;
+		return true;
 	}
 	else if( invVerb == YINGBEALEPOSTIT_V )
 	{
@@ -406,30 +406,30 @@ int Computer24100::doVerb ( int theVerb )
 		}
 		//GameFlag.set( fYingCipherLoaded ); // HTM flag 203
 		//new PCScreen( 24100 );
-		return TRUE;
+		return true;
 	}
 	else if( theVerb == DO_V )
 	{
 		if( curRoom->script == NULL )
 		{
-			pcLastUsed[PC_INTRLINK] = TRUE;
+			pcLastUsed[PC_INTRLINK] = true;
 			if( isDemo )
 			{
-				pcLastUsed[PC_KAT] = TRUE;
+				pcLastUsed[PC_KAT] = true;
 				pcLastUsed[PC_IA] = WEB_IMAGEPEG;
-				pcLastUsed[PC_INFOSCI] = TRUE;
-				pcLastUsed[PC_PHOTODOC] = TRUE;
+				pcLastUsed[PC_INFOSCI] = true;
+				pcLastUsed[PC_PHOTODOC] = true;
 				pcLastUsed[PC_SNDANAL] = WEB_SOUND_BIRD;
 				pcLastUsed[PC_CIPHER] = WEB_YINGCYPHER;
-				pcLastUsed[PC_PEGID] = TRUE;
+				pcLastUsed[PC_PEGID] = true;
 				//GameFlag.set( fSecurityModelAvailable );
 			}
 			new PCScreen( 24100 );
 		}
-		return TRUE;
+		return true;
 	}						
 	
-	return FALSE;
+	return false;
 }
 
 WallChart24100::WallChart24100()
@@ -449,9 +449,9 @@ int WallChart24100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		new WallChartInset24100;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WallBox24100::WallBox24100()
@@ -472,9 +472,9 @@ int WallBox24100::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 		curRoom->setScript( new FolderSndScript24100 );
 		new Yellow( 98630 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -512,9 +512,9 @@ int YingPhotoView24100::doVerb (int theVerb)
 		new YingPhotoInset24100;
 		inventry->items[iYINGPHOTO]->activate();
 		dispose();		
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 YingStickyNoteView24100::YingStickyNoteView24100()
@@ -537,9 +537,9 @@ int YingStickyNoteView24100::doVerb (int theVerb)
 		new YingStickyNoteInset24100;
 		inventry->items[iYINGBEALEPOSTIT]->activate();
 		dispose();			
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // removed
@@ -570,9 +570,9 @@ int LockPickView24100::doVerb (int theVerb)
 		sfxLoadRes( 24180, RES_ATS );
 		theGame->handsOn();
 		dispose();		
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 } 
 
 BeowulfView24100::BeowulfView24100()
@@ -595,9 +595,9 @@ int BeowulfView24100::doVerb (int theVerb)
 		new BeowulfInset24100;
 		inventry->items[iYINGBEOWULF]->activate();
 		dispose();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // not currently used
@@ -623,9 +623,9 @@ int InternetGuideView24100::doVerb (int theVerb)
 		new InternetGuideInset24100;
 		inventry->items[iYINGINTERNETGUIDE]->activate();
 		dispose();		
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 YingEBMCatView24100::YingEBMCatView24100()
@@ -649,9 +649,9 @@ int YingEBMCatView24100::doVerb (int theVerb)
 		new YingEBMCatInset24100;
 		inventry->items[iEBMCATALOG]->activate();
 		dispose();		
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 ShanghaiView24100::ShanghaiView24100()
@@ -674,9 +674,9 @@ int ShanghaiView24100::doVerb (int theVerb)
 		new ShanghaiInset24100;
 		inventry->items[iSHANGHAIDISK]->activate();
 		dispose();		
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -720,9 +720,9 @@ int LockPickInset24100::doVerb ( int theVerb )
 		dispose();
 		new LockPickOpenInset24100;
 		//dispose();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 LockPickOpenInset24100::LockPickOpenInset24100()
@@ -745,9 +745,9 @@ int LockPickOpenInset24100::doVerb ( int theVerb )
 		dispose();
 		new LockPickInset24100;
 		//dispose();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // not currently used
@@ -789,9 +789,9 @@ int PhoneInset24100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		//Do something . . .
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;							   
+	return false;							   
 }
 
 // not used
@@ -806,9 +806,9 @@ int RolodexInset24100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		//Do something . . .
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WallChartInset24100::WallChartInset24100()
@@ -1022,7 +1022,7 @@ void launchShanghai::changeState( int newState )
 		}
 		sfxDisableSound();
 		sfxDisableMusic();
-		user->canInput( FALSE );
+		user->canInput( false );
 		//result = WinExec( SHANGHAIEXESTR, SW_SHOWMAXIMIZED	);
 		result = sfxRunProgram( SHANGHAIEXESTR );
 		ticks = 20;
@@ -1044,7 +1044,7 @@ void launchShanghai::changeState( int newState )
 		sfxEnableMusic();
 		if( soundNumber != -1 )
 			startSound( soundNumber, PLAYWAVEMIDI );
-		user->canInput( TRUE );
+		user->canInput( true );
 		soundNumber = -1;
 		dispose();
 	END
@@ -1059,7 +1059,7 @@ void launchShanghai::changeState( int newState )
 
 int	launchHacker( void )
 {
-// returns TRUE if successful, FALSE if not.
+// returns true if successful, false if not.
 #define MAXLINE (MAX_PATH +10)
 #define HACKEREXESTR "C64.EXE GAME05.C64"
 	char	prevDir[MAX_PATH];
@@ -1086,7 +1086,7 @@ int	launchHacker( void )
 	}
 	sfxDisableSound();
 	sfxDisableMusic();
-	user->canInput( FALSE );
+	user->canInput( false );
 	result = sfxRunProgram( HACKEREXESTR );
 
 	// restore
@@ -1104,8 +1104,8 @@ int	launchHacker( void )
 	sfxEnableMusic();
 	if( soundNumber != -1 )
 		startSound( soundNumber, PLAYWAVEMIDI );
-	user->canInput( TRUE );
-	return TRUE;
+	user->canInput( true );
+	return true;
 }
 
 
@@ -1127,7 +1127,7 @@ int	launchHacker( void )
 			GameFlag.set( fYingStuffArrived );
 			//sfxPrintf( "Set fYingStuffArrived" );
 		}
-		return TRUE;
+		return true;
 	}
 #endif	
  

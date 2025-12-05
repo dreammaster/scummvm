@@ -19,13 +19,13 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/37200.h"
 #include "spycraft/logic/37300.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 
 namespace Spycraft {
 
@@ -71,7 +71,7 @@ void Rm37300::init()
 int Rm37300::handleEvent ( MADEEventStamp *event )
 {
 
-	return FALSE;
+	return false;
 }
 EastExit37300::EastExit37300()
 {
@@ -90,9 +90,9 @@ int EastExit37300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm37200);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 /*
 SouthExit37300::SouthExit37300()
@@ -112,9 +112,9 @@ int SouthExit37300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm37200);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 
@@ -140,9 +140,9 @@ int EgyptianPhotos37300::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new EgyptianPhotosInset37300();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************

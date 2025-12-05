@@ -19,17 +19,17 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "feature.h"
+#include "spycraft/game/feature.h"
 #include "spycraft/logic/90000.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 #include "web.h"
 #include "html.h"
-#include "plistobj.h"
+#include "spycraft/game/plistobj.h"
 #include "email.h"
 #include "target.h"
 #include "intrpuzz.h"
@@ -63,8 +63,8 @@ extern BlinkCursor* normalCursor;
 extern SouthCursor* southCursor;
 extern IntrPuzz* intrpuzz;
 extern int canSaveColby; 
-int ExitPermission = TRUE;
-int NoTimeLeft = FALSE;
+int ExitPermission = true;
+int NoTimeLeft = false;
 
 extern short restoring; 
 extern SaveGame* saveGame;
@@ -99,7 +99,7 @@ Rm90000::Rm90000()
 
 Rm90000::~Rm90000()
 {
-	canSaveColby = TRUE;
+	canSaveColby = true;
 }
 
 void Rm90000::init()
@@ -121,12 +121,12 @@ void Rm90000::init()
 				saveGame->save(tmpSave);
 		#endif
 	}
-	canSaveColby = FALSE;	// disable save!
+	canSaveColby = false;	// disable save!
 
 	if (GameFlag.test(fLinus1))
 	{
   		intrface->enable();
-	 	canSaveColby = TRUE;		// Save Turned on 2/23/96
+	 	canSaveColby = true;		// Save Turned on 2/23/96
 	}else intrface->disable();		// added on 2/25/96
 
   	theGame->handsOn();
@@ -158,7 +158,7 @@ void Rm90000::init()
 
 int Rm90000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit90000::SouthExit90000()
@@ -176,11 +176,11 @@ void SouthExit90000::respond()
 
 int SouthExit90000::doVerb ( int theVerb )
 {
-	if (( theVerb == DO_V ) && !GameFlag.test(fLinus36) && (ExitPermission == TRUE)) {
+	if (( theVerb == DO_V ) && !GameFlag.test(fLinus36) && (ExitPermission == true)) {
     	theGame->newRoom(new Rm90001);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 //Room 90001 : Helicopter Seat / Door shot
@@ -192,19 +192,19 @@ Rm90001::Rm90001()
 
 Rm90001::~Rm90001()
 {
-	canSaveColby = TRUE;
+	canSaveColby = true;
 }
 
 void Rm90001::init()
 {
   	drawPic( 90001 );
     Room::init();
-	canSaveColby = FALSE;
+	canSaveColby = false;
 
 	if (GameFlag.test(fLinus1))
 	{
   		intrface->enable();
-	 	canSaveColby = TRUE;	 		// Save Turned on 2/23/96
+	 	canSaveColby = true;	 		// Save Turned on 2/23/96
 	}else intrface->disable();			// added on 2/25/96
 
 	if( sound1->number != 90100  || !sound1->isPlaying() )
@@ -238,7 +238,7 @@ void Rm90001::init()
 
 int Rm90001::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit90001::SouthExit90001()
@@ -256,11 +256,11 @@ void SouthExit90001::respond()
 
 int SouthExit90001::doVerb ( int theVerb )
 {
-	if (( theVerb == DO_V ) && (ExitPermission == TRUE)){
+	if (( theVerb == DO_V ) && (ExitPermission == true)){
     	theGame->newRoom(new Rm90000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WestExit90001::WestExit90001()
@@ -283,17 +283,17 @@ int WestExit90001::doVerb ( int theVerb )
 	{
 		if ( theVerb == DO_V ) {
 			GameFlag.set (fLinus1);
-			canSaveColby = TRUE;		// Save Turned on 2/23/96
+			canSaveColby = true;		// Save Turned on 2/23/96
     		pbkInv->dispose();
 			countSound->stop();
 			pobj->script->dispose();
 			pobj->dispose();
 			theGame->setCursor( normalCursor );
 			curRoom->setScript( new ExplodeSound ); 
-	  	 	return TRUE;
+	  	 	return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 //DownLoad "Room" 
@@ -306,7 +306,7 @@ Rm90002::Rm90002()
 
 Rm90002::~Rm90002()
 {
-	canSaveColby = TRUE;
+	canSaveColby = true;
 }
 
 void Rm90002::init()
@@ -314,7 +314,7 @@ void Rm90002::init()
   	drawPic( 90002 );
 //  sfxLoadRes ( 90004, RES_ATS );
 
-	canSaveColby = FALSE;
+	canSaveColby = false;
     Room::init();
 
 	sound1->stop();
@@ -330,7 +330,7 @@ void Rm90002::init()
 int Rm90002::handleEvent ( MADEEventStamp *event )
 {
 
-	return FALSE;
+	return false;
 }
 
 // room right before transfer movie plays from heli to carrier
@@ -343,7 +343,7 @@ Rm90003::Rm90003()
 
 Rm90003::~Rm90003()
 {
-	canSaveColby = TRUE;
+	canSaveColby = true;
 }
 
 void Rm90003::init()
@@ -357,7 +357,7 @@ void Rm90003::init()
 	}
 
     Room::init();
-	canSaveColby = FALSE;
+	canSaveColby = false;
 
 	theGame->handsOn();
 	intrface->disable();
@@ -374,7 +374,7 @@ void Rm90003::init()
 
 int Rm90003::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 
@@ -387,7 +387,7 @@ Rm90004::Rm90004()
 
 Rm90004::~Rm90004()
 {
-	canSaveColby = TRUE;
+	canSaveColby = true;
 }
 
 void Rm90004::init()
@@ -395,14 +395,14 @@ void Rm90004::init()
 	drawPic( -1 );
     Room::init();
 
-	canSaveColby = FALSE;	// disable save!
+	canSaveColby = false;	// disable save!
 
 	curRoom->setScript ( new HeliBlowupScript );
 }
 
 int Rm90004::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 
@@ -430,9 +430,9 @@ int OkFeature::doVerb( int theVerb )
 		theGame->handsOff();
 		curRoom->setScript ( new OkButtonClick );
 		GameFlag.set(fStartDownLoad);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 CancelFeature::CancelFeature()
@@ -452,9 +452,9 @@ int CancelFeature::doVerb( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		curRoom->setScript ( new CancelButtonClick );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 StopFeature::StopFeature()
@@ -476,9 +476,9 @@ int StopFeature::doVerb( int theVerb )
 		theGame->handsOff();
 		curRoom->setScript ( new StopButtonClick );
 		dispose();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Backpack90001::Backpack90001()
@@ -503,9 +503,9 @@ int Backpack90001::doVerb( int theVerb )
 //		new (EmptyBackpack);
 		curRoom->setScript ( new BackpackSound );
 		dispose();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Window90001::Window90001()
@@ -528,7 +528,7 @@ int Window90001::doVerb( int theVerb )
 	{
 		if ( theVerb == DO_V ) {
     		GameFlag.set (fLinus1);
-			canSaveColby = TRUE;		// Save Turned on 2/23/96
+			canSaveColby = true;		// Save Turned on 2/23/96
     		pbkInv->dispose();
 			countSound->stop();
 			pobj->script->dispose();	
@@ -536,10 +536,10 @@ int Window90001::doVerb( int theVerb )
 			theGame->setCursor( normalCursor );
 			curRoom->setScript( new ExplodeSound );
 			
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -618,7 +618,7 @@ void HeliTransferScript::changeState( int newState )
 void ExplodeSound::changeState( int newState )
 {
 	switchTo
-		ExitPermission = FALSE;
+		ExitPermission = false;
 		seconds = 2;
 	END
 
@@ -648,7 +648,7 @@ void ExplodeSound::changeState( int newState )
 			new EMail ( "INTELINK ERROR: Data Exception", 98322 );
 		else if (GameFlag.test(fPBShortDownload))
 			new EMail ( "INTELINK ERROR: Data Exception", 98321 );
-		ExitPermission = TRUE;
+		ExitPermission = true;
 		dispose();
 	END
 }
@@ -705,7 +705,7 @@ void CountDownScript90000::changeState( int newState )
 {	
 	switchTo
 		theGame->handsOn();
-		if( colbyInfo->slow_system == TRUE )
+		if( colbyInfo->slow_system == true )
 			countSound->play ( 90028, this );	// slow computer long count
 		else 
 			countSound->play ( 45058, this );  	// fast computer short count
@@ -986,9 +986,9 @@ int ClosedPowerBook::doVerb ( int theVerb )
 		new(PowerBook90001);
 		curRoom->setScript(new PowerBookSnd);
 		dispose();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PowerBook90001::PowerBook90001()
@@ -1021,13 +1021,13 @@ int PowerBook90001::doVerb ( int theVerb )
 		pbkInv = new (PowerBookInv);
 		startScreen->dispose();
 		dispose();
-		return TRUE;
+		return true;
 	}else 
 	if ( theVerb == DO_V )	{
 		theGame->newRoom ( new Rm90002 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }				 
 
 HeliDebug::HeliDebug()
@@ -1066,9 +1066,9 @@ int HeliDebug::doVerb ( int theVerb )
 		GameFlag.clear ( fPowerBook5Available );
 		GameFlag.clear ( fPowerBook6Available );
 		GameFlag.clear ( fPowerBook7Available );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PowerBookInv::PowerBookInv()

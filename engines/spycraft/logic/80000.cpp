@@ -19,19 +19,19 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "invent.h"
-#include "movie.h"
+#include "spycraft/game/movie.h"
 #include "spycraft/logic/80000.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"												   
-#include "vlink.h"
-#include "roomsnd.h"
+#include "spycraft/game/flag.h"												   
+#include "spycraft/game/vlink.h"
+#include "spycraft/game/roomsnd.h"
 #include "advcurs.h"
-//#include "timer.h"
+//#include "spycraft/game/timer.h"
 
 namespace Spycraft {
 
@@ -69,7 +69,7 @@ extern DialTree* dialogTree;
 static WaitingTimer80000*	waitingTimer;
 static AnyElseObj80000*		anyElseObj;
 static int	blakeReturning;	// flag: Blake footsteps playing
-static int	firstTimeIn = TRUE;
+static int	firstTimeIn = true;
 
 Patio80000*	patio80000;
 
@@ -131,7 +131,7 @@ void Rm80000::init()
 				sfxPurgeRes( 80100, RES_PIC );
 				sfxPurgeRes( 80200, RES_PIC );
 			}
-			firstTimeIn = FALSE;
+			firstTimeIn = false;
 			drawPic( 80000 );
 		}
 		if( !GameFlag.test( fDCK6/*fBlakePatioStarted*/ ) )	// setup Blake gone--snoop time
@@ -171,7 +171,7 @@ void Rm80200::init()
   	drawPic( 80200 );
     Room::init();
   	new SouthExit80200;
-	blakeReturning = FALSE;
+	blakeReturning = false;
 	if( GameFlag.test( fBlakeGone ) )
 	{
 		new Powerbook80200;
@@ -208,9 +208,9 @@ int NorthExit80000::doVerb ( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm80100 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // not used
@@ -240,9 +240,9 @@ int SouthExit80000::doVerb ( int theVerb )
 		//sfxPrintf("See you Later (8a/80018) Best of luck...");
     	//sfxPrintf( "new room: 1000, the map" );
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit80100::SouthExit80100()
@@ -262,9 +262,9 @@ int SouthExit80100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		theGame->newRoom( new Rm80000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit80200::SouthExit80200()
@@ -284,9 +284,9 @@ int SouthExit80200::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		theGame->newRoom( new Rm80000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -306,13 +306,13 @@ int Blake80000::doVerb ( int theVerb )
 {
 	if (theVerb == GUN_V)	{
 		sfxPrintf("Ouch");
-		return TRUE;
+		return true;
 	}
 	else if (theVerb == LINT_V)	{
 		sfxPrintf( "Hmm...lint!" );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Table80000::Table80000()
@@ -331,9 +331,9 @@ int Table80000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom( new Rm80200 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Table80100::Table80100()
@@ -353,9 +353,9 @@ int Table80100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom( new Rm80200 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Parker_CD80100::Parker_CD80100()
@@ -376,9 +376,9 @@ int Parker_CD80100::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
     	new Parker_CDInset80100;
 		//GameFlag.set(fPlayerExaminingCD);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Powerbook80200::Powerbook80200()
@@ -398,9 +398,9 @@ int Powerbook80200::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		new PowerbookInset80200;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Modem80200::Modem80200()
@@ -421,9 +421,9 @@ int Modem80200::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 	//note: fModemConnected used to be set and checked here (toggle)
 		new ModemInset80200;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 CDPlayer80200::CDPlayer80200()
@@ -444,9 +444,9 @@ int CDPlayer80200::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
     	new CDPlayerInset80200;
 		//GameFlag.set( fPlayerExaminingCD );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Hound80200::Hound80200()
@@ -467,9 +467,9 @@ int Hound80200::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
     	new HoundInset80200;
 		//GameFlag.set( fPlayerExaminingBook );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -491,9 +491,9 @@ int PowerbookInset80200::doVerb( int theVerb )
 	if( theVerb == DO_V ) {
 		//sfxPrintf( "Power Book" );
 		//Do something . . .
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 //void PowerbookInset80200::dispose( void )
@@ -511,9 +511,9 @@ int CDPlayerInset80200::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
 		//Do something . . .
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 ModemInset80200::ModemInset80200()
@@ -526,9 +526,9 @@ int ModemInset80200::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
 		//Do something . . .
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Parker_CDInset80100::Parker_CDInset80100()
@@ -542,9 +542,9 @@ Parker_CDInset80100::Parker_CDInset80100()
 int Parker_CDInset80100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
-    	return TRUE;		   
+    	return true;		   
     }
-	return FALSE;
+	return false;
 }
 
 //void Parker_CDInset80100::dispose( void )
@@ -569,9 +569,9 @@ int HoundInset80200::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		// nothing
-    	return TRUE;		   
+    	return true;		   
     }
-	return FALSE;
+	return false;
 }
 
 //void HoundInset80200::dispose( void )
@@ -591,7 +591,7 @@ void IntroScript80000::changeState ( int newState )
 	switchTo
 		theGame->handsOff();
 		theMovie->fromTo( 0, 717 );
-		theMovie->play( "80010.avi", this, FALSE, TRUE, FALSE );
+		theMovie->play( "80010.avi", this, false, true, false );
 	END
    
     BEG	
@@ -633,14 +633,14 @@ void BlakeReturnsScript80000::changeState( int newState )
 			seconds = 0;	// in case cued externally
 			GameFlag.clear( fBlakeGone );
 			soundptr->play( SND_BLAKERETURNS, this );
-			blakeReturning = TRUE;
+			blakeReturning = true;
 			intrface->disable();
 		}
 	END
 
 	BEG
 		soundptr->dispose();
-		blakeReturning = FALSE;
+		blakeReturning = false;
 		intrface->enable();
 		/* make sure still at Blake's house  (can't leave anymore) */
 		rmName = curRoom->name;
@@ -672,7 +672,7 @@ void BlakeReturnsScript80000::changeState( int newState )
 	END	   
 
 	BEG
-		assert( FALSE );  // debug--just in case dispose, then cue.  possible? let's see.
+		assert( false );  // debug--just in case dispose, then cue.  possible? let's see.
 	END
 }
 
@@ -698,29 +698,29 @@ void BlakeDialogScript80000::changeState( int newState )
 		 default:	// player picking nose, or not looking at anything now
 			NULL;
 		}
-		user->canInput(FALSE);
+		user->canInput(false);
 		if( patio80000->objectTouched != NO_OBJECT80000 )
-			theMovie->play( "80010.avi", this, FALSE, FALSE, FALSE );
+			theMovie->play( "80010.avi", this, false, false, false );
 		else
 			cue();
 	END
 
 	BEG
 		theMovie->fromTo( 990, 1050 -1 ); // here's file, #3 
-		theMovie->play( "80010.avi", this, FALSE, FALSE, FALSE );
+		theMovie->play( "80010.avi", this, false, false, false );
 		inventry->get( iPROCATFILE ); // Blake gives you yellow pages
 	END
 
 	BEG
 		inventry->items[iPROCATFILE]->activate();
 		theMovie->fromTo( 1050, 1479 ); // here's file, #3 cont 
-		theMovie->play( "80010.avi", this, FALSE, FALSE, FALSE );	
+		theMovie->play( "80010.avi", this, false, false, false );	
 	END
 	
 	BEG	
 		//patio80000->cue();
 		// DIALOG
-		user->canInput(TRUE);
+		user->canInput(true);
 		anyElseObj = new AnyElseObj80000;		
 		dialogTree = new DialTree;
 		BlakeDialog3 = new BlakePatioDialog80000;
@@ -810,7 +810,7 @@ void BlakeDialogScript80000::changeState( int newState )
 		inventry->clearCurrentItem();
 		GameFlag.clear( fLondonAvailable );
 		new EMail( "Trust no one: Colby, William", 98110, 0, 4 );
-		drawBackground = FALSE;
+		drawBackground = false;
 		theGame->newRoom( new Rm1000 );
 	END
 }
@@ -827,12 +827,12 @@ void BlakeDialogScript80000::changeState( int newState )
 	int		foundOne; // flag
 
 	// see if there's a DItem up
-	foundOne = FALSE;
+	foundOne = false;
  	while (curNode)
  	{
 		if( !((DItem*)(curNode->data))->hasBeenChosen )
 		{
-			foundOne = TRUE;
+			foundOne = true;
 			break;
 		}
 		curNode = curNode->next;
@@ -860,7 +860,7 @@ void BlakeDialogScript80000::changeState( int newState )
 	if( waitingTimer != NULL )
 	{
 		//permList->release( waitingTimer );
-	 	//waitingTimer->pause( TRUE );
+	 	//waitingTimer->pause( true );
 		//waitingTimer->dispose();
 		delete waitingTimer;
 		waitingTimer = NULL;
@@ -876,27 +876,27 @@ void BlakeDialogScript80000::changeState( int newState )
 
 void WhatPrecaution_3::doit()
 {
-  	whatPrecaution_6->hasBeenChosen = TRUE;
-	whyHideYellow_5->hasBeenChosen = TRUE;
+  	whatPrecaution_6->hasBeenChosen = true;
+	whyHideYellow_5->hasBeenChosen = true;
 	BlakePatioDItem80000::doit();
 }
 
 void WhatPrecaution_6::doit()
 {
-  	whatPrecaution_3->hasBeenChosen = TRUE;
-	whyHideYellow_5->hasBeenChosen = TRUE;
+  	whatPrecaution_3->hasBeenChosen = true;
+	whyHideYellow_5->hasBeenChosen = true;
 	BlakePatioDItem80000::doit();
 }
  
 void YouKillM_3_5::doit()
 {
-  	youKillM_4->hasBeenChosen = TRUE;
+  	youKillM_4->hasBeenChosen = true;
 	BlakePatioDItem80000::doit();
 }
 
 void YouKillM_4::doit()
 {
-  	youKillM_3_5->hasBeenChosen = TRUE;
+  	youKillM_3_5->hasBeenChosen = true;
 	BlakePatioDItem80000::doit();
 }
 
@@ -948,21 +948,21 @@ void	Patio80000::touchObject( int whichObject )
 
  void AnyElseObj80000::cue( void )
  {
- 	static int	firstPass = TRUE; // first cue from timer, second from this movie
+ 	static int	firstPass = true; // first cue from timer, second from this movie
 
 	if( firstPass )
 	{
-		user->canInput( FALSE );
-		firstPass = FALSE;
+		user->canInput( false );
+		firstPass = false;
 		//permList->release( waitingTimer );
 		waitingTimer = NULL;
   		theMovie->fromTo( 2520, 2577 );	// "Anything else?"
-		theMovie->play( "80010.avi", this, FALSE, FALSE, FALSE );
+		theMovie->play( "80010.avi", this, false, false, false );
 	}
 	else
 	{
-		user->canInput( TRUE );
-		firstPass = TRUE;
+		user->canInput( true );
+		firstPass = true;
 	}
  }
  

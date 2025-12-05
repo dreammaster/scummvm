@@ -19,18 +19,18 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/1000.h"
 #include "spycraft/logic/48000.h"
 #include "spycraft/logic/48400.h"
 #include "spycraft/logic/48500.h"
-#include "sound.h"
-#include "movie.h"
+#include "spycraft/game/sound.h"
+#include "spycraft/game/movie.h"
 #include "invent.h"
-#include "vlink.h"
+#include "spycraft/game/vlink.h"
 
 namespace Spycraft {
 
@@ -156,7 +156,7 @@ void Rm48000::init()
 			drawPic( 1 );
 			theGame->handsOn();
 			
-			if( colbyInfo->slow_system == TRUE )
+			if( colbyInfo->slow_system == true )
 				theMusic->play ( 48000 );
 			else {
 				if( sound1->number != 48000  || !sound1->isPlaying() )	{
@@ -171,7 +171,7 @@ void Rm48000::init()
 
 int Rm48000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit48000::SouthExit48000()
@@ -191,9 +191,9 @@ int SouthExit48000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -219,9 +219,9 @@ int Photo48000::doVerb (int theVerb)
 {
 	if ( theVerb == DO_V ) {
   		new(PhotoInset48000);
-		return TRUE;
+		return true;
 	}
-	return FALSE;		
+	return false;		
 }
 
 PhotoHead48000::PhotoHead48000()
@@ -241,9 +241,9 @@ int PhotoHead48000::doVerb (int theVerb)
 {
 	if ( theVerb == DO_V ) {
   		new(PhotoHeadInset48000);
-		return TRUE;
+		return true;
 	}
-	return FALSE;		
+	return false;		
 }
 
 Booze48000::Booze48000()
@@ -263,9 +263,9 @@ int Booze48000::doVerb (int theVerb)
 {
 	if ( theVerb == DO_V ) {
 	  	new(BoozeInset48000);
-		return TRUE;
+		return true;
 	}
-	return FALSE;		
+	return false;		
 }
 
 Shelf48000::Shelf48000()
@@ -285,9 +285,9 @@ int Shelf48000::doVerb (int theVerb)
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm48200);
-		return TRUE;
+		return true;
 	}
-	return FALSE;		
+	return false;		
 }
 
 Desk48000::Desk48000()
@@ -301,9 +301,9 @@ int Desk48000::doVerb (int theVerb)
 {
 	if ( theVerb == DO_V ) {
 //	    theGame->newRoom(new Rm48300);		//showing gift box
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -330,9 +330,9 @@ int GiftBox48000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 //    	new(Harmonica48000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -357,9 +357,9 @@ int PhotoInset48000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 //    	sfxPrintf("doVerb for inset");
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 PhotoHeadInset48000::PhotoHeadInset48000()
@@ -375,9 +375,9 @@ int PhotoHeadInset48000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 //    	sfxPrintf("doVerb for inset");
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 BoozeInset48000::BoozeInset48000()
@@ -393,9 +393,9 @@ int BoozeInset48000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 //    	sfxPrintf("doVerb for inset");
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 /*******************************
@@ -565,9 +565,9 @@ MafiaInfo::MafiaInfo()
 
 void MafiaInfo::doit()
 {
-	tellMafia->hasBeenChosen = TRUE;
-	tellmoreMafia->hasBeenChosen = TRUE;
-	whataboutMafia->hasBeenChosen = TRUE;
+	tellMafia->hasBeenChosen = true;
+	tellmoreMafia->hasBeenChosen = true;
+	whataboutMafia->hasBeenChosen = true;
 	
 	if(problemsRussia->hasBeenChosen)
 		yuriDialog7->add(churbanovCandidate);
@@ -581,8 +581,8 @@ ProblemsInfo::ProblemsInfo()
 
 void ProblemsInfo::doit()
 {
-	problemsRussia->hasBeenChosen = TRUE;
-	corruptionGovernment->hasBeenChosen = TRUE;
+	problemsRussia->hasBeenChosen = true;
+	corruptionGovernment->hasBeenChosen = true;
 	DItem::doit();				  
 }
 /*
@@ -647,9 +647,9 @@ int SouthExit48200::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm48000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Softball48200::Softball48200()
@@ -664,9 +664,9 @@ int Softball48200::doVerb (int theVerb)
 	if ( theVerb == DO_V ) { 
 		GameFlag.set(fSeenSoftball);
 		new BallInset48200;
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BallInset48200::BallInset48200()
@@ -678,9 +678,9 @@ int BallInset48200::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 //    	sfxPrintf("doVerb for inset");
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 /*********************
@@ -729,9 +729,9 @@ int SouthExit48300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Box48300::Box48300()
@@ -754,9 +754,9 @@ int Box48300::doVerb (int theVerb)
 		if( !GameFlag.test( fOnceShocked48000 )) {	    
 			setScript( new EnterScript48300 );
 		}
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 HarmInset48300::HarmInset48300()
@@ -767,9 +767,9 @@ HarmInset48300::HarmInset48300()
 int HarmInset48300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************

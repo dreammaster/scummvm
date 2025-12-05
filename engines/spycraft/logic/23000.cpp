@@ -19,17 +19,17 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/23000.h"
 //#include "spycraft/logic/23100.h"
 //#include "spycraft/logic/22300.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
-#include "movie.h"
-#include "vlink.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/vlink.h"
 
 namespace Spycraft {
 
@@ -243,7 +243,7 @@ void Rm23000::init()
 		drawPic( 23000 );
 		theGame->handsOn();
 	
-		if( colbyInfo->slow_system == TRUE )
+		if( colbyInfo->slow_system == true )
 			theMusic->play ( 23000 );
 		else {
 			if( sound1->number != 23000  || !sound1->isPlaying() )	{
@@ -256,7 +256,7 @@ void Rm23000::init()
 
 int Rm23000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit23000::SouthExit23000()
@@ -278,9 +278,9 @@ int SouthExit23000::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //		theGame->newRoom(new Rm22300);
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 /*
 EastExit23000::EastExit23000()
@@ -301,9 +301,9 @@ int EastExit23000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm22300);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthExit23000::NorthExit23000()
@@ -323,9 +323,9 @@ int NorthExit23000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm23100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 /*******************************
@@ -726,8 +726,8 @@ PegInfo::PegInfo()
 
 void PegInfo::doit()
 {
-	rolepegTheft->hasBeenChosen = TRUE;
-	firstrolePeg->hasBeenChosen = TRUE;
+	rolepegTheft->hasBeenChosen = true;
+	firstrolePeg->hasBeenChosen = true;
 	DItem::doit();
 }
 		   
@@ -738,8 +738,8 @@ PayCheck::PayCheck()
 
 void PayCheck::doit()
 {
-	whoworkFor->hasBeenChosen = TRUE;
-	firstwhoworkFor->hasBeenChosen = TRUE;
+	whoworkFor->hasBeenChosen = true;
+	firstwhoworkFor->hasBeenChosen = true;
 	DItem::doit();
 }
 		   
@@ -820,7 +820,7 @@ void Rm23001::cue( void )
 
 int Rm23001::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 EnterBlackScreenScript23001::EnterBlackScreenScript23001()
@@ -859,7 +859,7 @@ void EnterIntercomScript23000::changeState( int newState )
 
 	BEG
 		dialogTree = new DialTree;
-		dialogTree->negativeParam = TRUE;
+		dialogTree->negativeParam = true;
 		maxonintercomDialog1 = new Dialog;
 		maxonintercomDialog2 = new Dialog;
 		maxonintercomDialog3 = new Dialog;
@@ -978,7 +978,7 @@ void Rm23002::cue( void )
 
 int Rm23002::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
  

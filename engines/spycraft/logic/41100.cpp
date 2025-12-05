@@ -19,17 +19,17 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 //#include "spycraft/logic/41000.h"
 #include "spycraft/logic/41100.h"
 #include "spycraft/logic/37000.h"
 #include "spycraft/logic/37200.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
-#include "vlink.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/vlink.h"
 #include "badman.h"
 #include "spycraft/logic/60000.h"
 #include "invent.h"
@@ -100,7 +100,7 @@ void Rm41100::init()
 
 int Rm41100::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit41100::SouthExit41100()
@@ -121,9 +121,9 @@ int SouthExit41100::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //    	theGame->newRoom(new Rm41000);
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthExit41100::NorthExit41100()
@@ -143,9 +143,9 @@ int NorthExit41100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm41200);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41100::SetFlag41100()
@@ -168,9 +168,9 @@ int SetFlag41100::doVerb( int theVerb )
 		inventry->get( iLOCKPICK );
 		GameFlag.set(fSaw646);					//to do Ying torture
 		sfxPrintf("Captured Ying, lock set, saw 646.avi.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41101::SetFlag41101()
@@ -197,9 +197,9 @@ int SetFlag41101::doVerb( int theVerb )
 		sfxPrintf("Completed KAT and saw 139.avi/98130.htm.");
 //wahka - try removing vlinks and emails.
 		comlinks->removeEMail(98002);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41102::SetFlag41102()
@@ -221,9 +221,9 @@ int SetFlag41102::doVerb( int theVerb )
 		GameFlag.set(fDidPhotoDoc);
 //		GameFlag.set(fWahKa99);
 		sfxPrintf("Completed PhotoDoc.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41103::SetFlag41103()
@@ -248,9 +248,9 @@ int SetFlag41103::doVerb( int theVerb )
 		GameFlag.set(fWahKa43);
 		inventry->get(iNUMBERTOYURI);
 		sfxPrintf("Talked to Max about BS and Yuri.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }	   
 
 SetFlag41104::SetFlag41104()
@@ -272,9 +272,9 @@ int SetFlag41104::doVerb( int theVerb )
 		GameFlag.set(fBlakePatioTalkDone);
 
 		sfxPrintf("Talked to Blake.");	
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41105::SetFlag41105()
@@ -297,9 +297,9 @@ int SetFlag41105::doVerb( int theVerb )
 		GameFlag.set(fBeenTo57000);	
 		GameFlag.set(fMetBirdSong);
 		sfxPrintf("Talked to Birdsong.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41106::SetFlag41106()
@@ -321,9 +321,9 @@ int SetFlag41106::doVerb( int theVerb )
 		GameFlag.set(fYORoomEnter);	
 		GameFlag.set(fOnce35001);
 		sfxPrintf("Talked to Yuri.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41107::SetFlag41107()
@@ -344,9 +344,9 @@ int SetFlag41107::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		GameFlag.set(fMaxReportBSDis);			 		
 		sfxPrintf("Max reports BS disappearance.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41108::SetFlag41108()
@@ -367,9 +367,9 @@ int SetFlag41108::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		GameFlag.set(fDoneSoundAnal);					
 		sfxPrintf("Completed Sound Analysis.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41109::SetFlag41109()
@@ -395,9 +395,9 @@ int SetFlag41109::doVerb( int theVerb )
 		inventry->get(iVIDEO_CAMERA);
 		inventry->get(iMUSICSWAN);
 		sfxPrintf("Visited Vilinius Center.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41110::SetFlag41110()
@@ -427,9 +427,9 @@ int SetFlag41110::doVerb( int theVerb )
 //		new EMail( "Killers for Hire: Seaton, Jaimie A.", 98070);
 		
 		sfxPrintf("Broken Ying.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41111::SetFlag41111()
@@ -457,9 +457,9 @@ int SetFlag41111::doVerb( int theVerb )
 		GameFlag.set(fPlayerTurnsProcat);
 
 		sfxPrintf("Turned Procat.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41112::SetFlag41112()
@@ -550,9 +550,9 @@ int SetFlag41112::doVerb( int theVerb )
 		}
 
 		sfxPrintf("Reset key flags in Russia.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41113::SetFlag41113()
@@ -577,9 +577,9 @@ int SetFlag41113::doVerb( int theVerb )
 
 //		inventry->get(iVIDEO_CAMERA);
 		sfxPrintf("Put video camera on desk.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41114::SetFlag41114()
@@ -603,9 +603,9 @@ int SetFlag41114::doVerb( int theVerb )
 		GameFlag.set(fCarrotPath);
 
 		sfxPrintf("Kneecaps apt available.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41115::SetFlag41115()
@@ -626,9 +626,9 @@ int SetFlag41115::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		GameFlag.set(fDCK1);		
 		sfxPrintf("Make BS apt available in travelink.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }	   
 
 SetFlag41116::SetFlag41116()
@@ -649,9 +649,9 @@ int SetFlag41116::doVerb( int theVerb )
 	if( theVerb == DO_V )	{
 		GameFlag.set(fDCK2);		
 		sfxPrintf("Make Yasevno available in travelink.");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41117::SetFlag41117()
@@ -671,9 +671,9 @@ int SetFlag41117::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{		
 		sfxPrintf(".");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41118::SetFlag41118()
@@ -693,9 +693,9 @@ int SetFlag41118::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{		
 		sfxPrintf(".");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 SetFlag41119::SetFlag41119()
 {
@@ -714,9 +714,9 @@ int SetFlag41119::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{		
 		sfxPrintf(".");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SetFlag41120::SetFlag41120()
@@ -736,9 +736,9 @@ int SetFlag41120::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{		
 		sfxPrintf(".");
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Rm41200::Rm41200()
@@ -768,7 +768,7 @@ void Rm41200::init()
 
 int Rm41200::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit41200::SouthExit41200()
@@ -789,9 +789,9 @@ int SouthExit41200::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm41100);
 ////	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthExit41200::NorthExit41200()
@@ -813,9 +813,9 @@ int NorthExit41200::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm41300);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Rm41300::Rm41300()
@@ -843,7 +843,7 @@ void Rm41300::init()
 
 int Rm41300::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit41300::SouthExit41300()
@@ -864,9 +864,9 @@ int SouthExit41300::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //    	theGame->newRoom(new Rm41200);
 		theGame->newRoom(new Rm37000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthExit41300::NorthExit41300()
@@ -887,9 +887,9 @@ int NorthExit41300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm41400);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Rm41400::Rm41400()
@@ -917,7 +917,7 @@ void Rm41400::init()
 
 int Rm41400::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit41400::SouthExit41400()
@@ -937,9 +937,9 @@ int SouthExit41400::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm41300);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -965,9 +965,9 @@ int Monitor41400::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm41500);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Rm41500::Rm41500()
@@ -996,7 +996,7 @@ void Rm41500::init()
 int Rm41500::handleEvent ( MADEEventStamp *event )
 {
 
-	return FALSE;
+	return false;
 }
 
 SouthExit41500::SouthExit41500()
@@ -1016,9 +1016,9 @@ int SouthExit41500::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm41400);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -1047,9 +1047,9 @@ int Screen41500::doVerb( int theVerb )
 		normalCursor->rest();
 		curRoom->setScript( new EnterBadmanPuzzle41500 );
 //		curRoom->setScript( new EnterScript41500 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -1086,7 +1086,7 @@ void EnterScript41500::changeState( int newState )
 	switchTo
 //		sfxPrintf( "Badman Puzzle-Rescue BS" );  
 		if (pdaProp) {
-				intrface->blinking = FALSE;
+				intrface->blinking = false;
 				intrface->release(pdaProp);
 				pdaProp->setCycle(0);
 				pdaProp->setHotspot(NULL);

@@ -84,9 +84,9 @@ class EMail : public ComData {
 public:
 	unsigned long pageNumber;
 
-	EMail(char *Title, int pagenum, int archive);
-	EMail(char *Title, int pagenum);
-	EMail(char *Title, int pagenum, int flag, int delay);
+	EMail(const char *Title, int pagenum, int archive);
+	EMail(const char *Title, int pagenum);
+	EMail(const char *Title, int pagenum, int flag, int delay);
 
 };
 
@@ -94,8 +94,8 @@ class EMailAttachment : public ComData {
 public:
 	unsigned long pageNumber;
 
-	EMailAttachment(char *Title, int pagenum);
-	EMailAttachment(char *Title, int pagenum, int flag, int delay);
+	EMailAttachment(const char *Title, int pagenum);
+	EMailAttachment(const char *Title, int pagenum, int flag, int delay);
 };
 
 /******************************
@@ -109,9 +109,9 @@ public:
 	unsigned long soundNumber;
 	int idNumber;
 
-	VoiceMail(char *Title, int soundnum, int idNumber, bool archive);
-	VoiceMail(char *Title, int soundnum, int idNumber);
-	VoiceMail(char *Title, int soundnum, int idNumber, int flag, int delay);
+	VoiceMail(const char *Title, int soundnum, int idNumber, bool archive);
+	VoiceMail(const char *Title, int soundnum, int idNumber);
+	VoiceMail(const char *Title, int soundnum, int idNumber, int flag, int delay);
 };
 
 /******************************
@@ -124,22 +124,22 @@ public:
 	char movieName[100];
 	EMailAttachment *emailAttachment;
 
-	VLink(char *moviename, EMailAttachment *attachment);
-	VLink(char *moviename);
-	VLink(char *moviename, int flag, Object *whoToCue);
-	VLink(char *moviename, int flag, int delay);
+	VLink(const char *moviename, EMailAttachment *attachment);
+	VLink(const char *moviename);
+	VLink(const char *moviename, int flag, Object *whoToCue);
+	VLink(const char *moviename, int flag, int delay);
 
-	VLink(char *moviename, int flag, int delay, EMailAttachment *attachment);
-	VLink(char *moviename, EMailAttachment *attachment, bool archive);
+	VLink(const char *moviename, int flag, int delay, EMailAttachment *attachment);
+	VLink(const char *moviename, EMailAttachment *attachment, bool archive);
 
 	//delete above when everyone has there movienames in
-	VLink(char *title, char *moviename, EMailAttachment *attachment);
-	VLink(char *title, char *moviename);
-	VLink(char *title, char *moviename, int flag, Object *whoToCue);
-	VLink(char *title, char *moviename, int flag, int delay);
+	VLink(const char *title, const char *moviename, EMailAttachment *attachment);
+	VLink(const char *title, const char *moviename);
+	VLink(const char *title, const char *moviename, int flag, Object *whoToCue);
+	VLink(const char *title, const char *moviename, int flag, int delay);
 
-	VLink(char *title, char *moviename, int flag, int delay, EMailAttachment *attachment);
-	VLink(char *title, char *moviename, EMailAttachment *attachment, bool archive);
+	VLink(const char *title, const char *moviename, int flag, int delay, EMailAttachment *attachment);
+	VLink(const char *title, const char *moviename, EMailAttachment *attachment, bool archive);
 };
 
 /******************************
@@ -155,7 +155,7 @@ public:
 class ComLinks : public List {
 public:
 	int isEmpty();
-	int removeVLink(char *moviename);
+	int removeVLink(const char *moviename);
 	int removeVoiceMail(unsigned long idNumber);
 	int removeEMail(unsigned long idNumber);
 	int isOnList(Object *obj);

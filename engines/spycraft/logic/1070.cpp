@@ -19,13 +19,13 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/1070.h"
 #include "spycraft/logic/95300.h"
-#include "movie.h"
+#include "spycraft/game/movie.h"
 #include "save.h"
 #include "spycraft/logic/1000.h"
 
@@ -97,7 +97,7 @@ void Rm1070::init()
 
 int Rm1070::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 EnterScript1070::EnterScript1070()
@@ -137,9 +137,9 @@ int SouthExit1070::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Tundra3D1070::Tundra3D1070()
@@ -152,9 +152,9 @@ int Tundra3D1070::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
    		theGame->newRoom(new Rm93000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 JumpJet1070::JumpJet1070()
@@ -167,9 +167,9 @@ int JumpJet1070::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
    	//	theGame->newRoom(new Rm70000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }*/
 
  

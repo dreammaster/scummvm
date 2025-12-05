@@ -19,13 +19,13 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/69000.h"
 #include "spycraft/logic/69300.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 
 namespace Spycraft {
 
@@ -75,16 +75,16 @@ int Rm69300::handleEvent ( MADEEventStamp *event )
 //	if (event_type == USER_LEFT_UP)	{
 //		new(DisguiseKitInset69320);
 //	}	
-	return FALSE;
+	return false;
 }
 /*
 int Rm69300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	new(DisguiseKitInset69320);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 
@@ -111,9 +111,9 @@ int DisguiseKit69300::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new DisguiseKitInset69320();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -139,9 +139,9 @@ int DisguiseKitInset69320::doVerb( int theVerb )
 	if( theVerb == DO_V ) {
 		dispose();
 		new DisguiseKitInset69340();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 DisguiseKitInset69340::DisguiseKitInset69340()
@@ -168,9 +168,9 @@ int SouthExit69300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm69000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
  

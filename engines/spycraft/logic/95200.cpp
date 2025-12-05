@@ -123,7 +123,7 @@ void Rm95201::init()
 		E_map [5][3] = NOGO;
 		E_map [6][2] = NOGO;
 		
-		addshooters = FALSE;
+		addshooters = false;
 
 		theMusic->loop = -1;
 		theMusic->setVolume(5);
@@ -220,7 +220,7 @@ void Rm95203::init()
 		E_map [5][3] = NOGO;
 		E_map [6][2] = NOGO;
 		
-		addshooters = FALSE;
+		addshooters = false;
 
 		theMusic->loop = -1;
 		theMusic->setVolume(5);
@@ -285,7 +285,7 @@ void Rm95204::init()
 		E_map [5][3] = NOGO;
 		E_map [6][2] = NOGO;
 		
-		addshooters = FALSE;
+		addshooters = false;
 
 		theMusic->loop = -1;
 		theMusic->setVolume(5);
@@ -386,7 +386,7 @@ void Rm95206::init()
 		E_map [5][3] = NOGO;
 		E_map [6][2] = NOGO;
 		
-		addshooters = FALSE;
+		addshooters = false;
 
 		theMusic->loop = -1;
 		theMusic->setVolume(5);
@@ -513,7 +513,7 @@ void Rm95209::init()
 		E_map [5][3] = NOGO;
 		E_map [6][2] = NOGO;
 		
-		addshooters = FALSE;
+		addshooters = false;
 
 		theMusic->loop = -1;
 		theMusic->setVolume(5);
@@ -853,7 +853,7 @@ void Rm95218::init()
 		E_map [5][3] = NOGO;
 		E_map [6][2] = NOGO;
 		
-		addshooters = FALSE;
+		addshooters = false;
 		elapsed = NULL;
 	}
 
@@ -975,9 +975,9 @@ int NorthEastExit95200::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95215);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthWestExit95200::NorthWestExit95200()
@@ -1030,9 +1030,9 @@ int NorthWestExit95200::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95216);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthExit95200::NorthExit95200()
@@ -1108,9 +1108,9 @@ int NorthExit95200::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95212);
 				break;
 		}
-	   	return TRUE;
+	   	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthEastExit95200::SouthEastExit95200()
@@ -1153,9 +1153,9 @@ int SouthEastExit95200::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95218);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthWestExit95200::SouthWestExit95200()
@@ -1237,9 +1237,9 @@ int SouthWestExit95200::doVerb ( int theVerb )
 				endPuzzle();
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit95200::SouthExit95200()
@@ -1307,9 +1307,9 @@ int SouthExit95200::doVerb ( int theVerb )
 				endPuzzle();
 				break;
 		}
-	   	return TRUE;
+	   	return true;
 	}
-	return FALSE;
+	return false;
 }
  
 } // namespace Spycraft 

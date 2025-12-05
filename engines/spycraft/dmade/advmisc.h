@@ -37,7 +37,7 @@ extern void sfxInitMADE(void);
 extern void sfxCleanMADE(void);
 
 /*
-	Let MADE keep everything going.  If release is FALSE
+	Let MADE keep everything going.  If release is false
 	then don't release the sprites.
 */
 extern void sfxUpdateMADE(int release);

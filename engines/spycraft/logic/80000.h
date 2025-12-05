@@ -21,14 +21,14 @@
 #ifndef SPYCRAFT_LOGIC_80000_H
 #define SPYCRAFT_LOGIC_80000_H
 
-#include "made.h"
-#include "game.h"
-#include "feature.h"
-#include "actor.h"
-#include "globals.h"
-#include "inset.h"
-#include "timer.h"
-#include "sound.h"
+#include "spycraft/game/made.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/feature.h"
+#include "spycraft/game/actor.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/inset.h"
+#include "spycraft/game/timer.h"
+#include "spycraft/game/sound.h"
 
 namespace Spycraft {
 

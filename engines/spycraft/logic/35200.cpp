@@ -19,14 +19,14 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/35200.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
-#include "movie.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
 
 namespace Spycraft {
 
@@ -98,7 +98,7 @@ void Rm35200::init()
 
 int Rm35200::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /*******************************

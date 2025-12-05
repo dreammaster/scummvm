@@ -19,19 +19,19 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/32000.h"
 #include "spycraft/logic/32100.h"
 #include "spycraft/logic/32200.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
-#include "movie.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
 #include "invent.h"
-#include "timer.h"
-#include "sound.h"
+#include "spycraft/game/timer.h"
+#include "spycraft/game/sound.h"
 #include "spycraft/logic/60000.h"
 
 namespace Spycraft {
@@ -166,7 +166,7 @@ void Rm32000::init()
 		drawPic( 32000 );
 		theGame->handsOn();
 
-		if( colbyInfo->slow_system == TRUE )
+		if( colbyInfo->slow_system == true )
 			theMusic->play ( 32000 );
 		else {
 			if( sound1->number != 32000  || !sound1->isPlaying() )	{
@@ -188,10 +188,10 @@ int Rm32000::handleEvent ( MADEEventStamp *event )
 /*
 	if (event_type == USER_LEFT_UP)	{
 		sfxPrintf("timer");
-		return TRUE;
+		return true;
 	}
 */
-	return FALSE;
+	return false;
 }
 
 /*********************
@@ -217,9 +217,9 @@ int NorthExit32000::doVerb ( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm32100 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit32000::SouthExit32000()
@@ -241,9 +241,9 @@ int SouthExit32000::doVerb ( int theVerb )
 		sound1->stop();
 		theMusic->stop();
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -507,12 +507,12 @@ void HarmDialog::cue( void )
 	int		foundOne; 
 
 	// see if there's a DItem up
-	foundOne = FALSE;
+	foundOne = false;
  	while (curNode)
  	{
 		if( !((DItem*)(curNode->data))->hasBeenChosen )
 		{
-			foundOne = TRUE;
+			foundOne = true;
 			break;
 		}
 		curNode = curNode->next;
@@ -532,7 +532,7 @@ TurnProcat::TurnProcat()
 void TurnProcat::doit()
 {
 	curMap = MAP_STATION_INT;
-	theMovie->pause(FALSE);
+	theMovie->pause(false);
 	GameFlag.set(fPlayerTurnsProcat);       //player turns Procat
 	harmkillplayer->setScript( NULL );
 	DItem::doit();
@@ -545,7 +545,7 @@ NoProcat::NoProcat()
 
 void NoProcat::doit()
 {
-	theMovie->pause(FALSE);
+	theMovie->pause(false);
 	GameFlag.set(fPlayerKilled);		 	//didn't join Procat, the end
 	harmkillplayer->setScript( NULL );
 	DItem::doit();
@@ -559,7 +559,7 @@ SaveYou::SaveYou()
 
 void SaveYou::doit()
 {
-	theMovie->pause(FALSE);
+	theMovie->pause(false);
 	GameFlag.set(fMaxSavesPlayer);   	   //Max saves you from Harmonica
 	harmkillplayer->setScript( NULL );
 	DItem::doit();
@@ -574,7 +574,7 @@ void SaveYou::doit()
 HarmKillPlayer::HarmKillPlayer()
 {
 	name = "HarmKillPlayer";
-//	playingVoice = FALSE;
+//	playingVoice = false;
 }
 
 void HarmKillPlayer::dispose( void )
@@ -585,7 +585,7 @@ void HarmKillPlayer::dispose( void )
 
 void HarmDItem::doit( void )
 {
-	theMovie->pause(FALSE);
+	theMovie->pause(false);
 	harmkillplayer->setScript( NULL );
  	DItem::doit();
 }

@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
-#include "flag.h"
-#include "vlink.h"
-#include "advmusic.h"
-#include "roomsnd.h"
-#include "gamebox.h"
-#include "winscrn.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/vlink.h"
+#include "spycraft/dmade/advmusic.h"
+#include "spycraft/game/roomsnd.h"
+#include "spycraft/dmade/gamebox.h"
+#include "spycraft/dmade/winscreen.h"
 
 #include "spycraft/logic/1000.h"
 #include "spycraft/logic/1070.h"
@@ -60,12 +60,12 @@
 #include "spycraft/logic/69000.h"
 #include "spycraft/logic/79000.h"
 
-#include "pcscreen.h"
+#include "spycraft/game/pcscreen.h"
 
 #ifdef DOS4GW
-	#include "gamebox.h"
+	#include "spycraft/dmade/gamebox.h"
 #else
-	#include "windows.h"
+	//#include "windows.h"
 #endif
 
 namespace Spycraft {
@@ -372,7 +372,7 @@ static DachaMap* dacha;
 
 short 	curMap = MAP_WASHINGTON;
 short	curDisc = USADISC;
-short	drawBackground = TRUE;	// flag: do drawPic in enter.
+short	drawBackground = true;	// flag: do drawPic in enter.
 static short inTransit;	// user requested change, not completed yet.	
 
 static Script*	midiFade;
@@ -409,7 +409,7 @@ Rm1000::Rm1000()
 	loopTo = 0;
 	seq2From = 0;
 	seq2To = 0;
-	doSeq2 = FALSE;
+	doSeq2 = false;
 	city = NULL;
 }
 
@@ -431,10 +431,10 @@ void Rm1000::init()
  //curMap = MAP_MOSCOWPLATE;
  //curDisc = 2;
 
-	sfxEnableSaveGame( TRUE );
+	sfxEnableSaveGame( true );
 	if( drawBackground )
 		drawPic(-1);
-	drawBackground = TRUE;
+	drawBackground = true;
 	Room::init();
 
 //	ASSERT( titleCounter == 0, 0 );	// debug
@@ -452,28 +452,28 @@ void Rm1000::init()
 		startMidi();
 	#endif
 
-///	user->canInput(TRUE);
+///	user->canInput(true);
 	//new CityTriad1000;
 	mPlay = new MoviePlayer1000;
 	//city = new CityTriad1000;	--delayed to cue()
-	theGame->enableIntrDuringMovie = TRUE;
+	theGame->enableIntrDuringMovie = true;
 
 	//ASSERT( currentFocus == 0, 0 );	// if focus not zero timers may not work
 
 	rm1000 = ( Rm1000* )curRoom;
-	goingBackwards = TRUE;
+	goingBackwards = true;
 	sfxSystemCursor( SYS_WAIT );
 	showRegion( curMap );
 }
 
 Rm1000::~Rm1000()
 {
-	sfxEnableSaveGame( FALSE );
-	inTransit = FALSE;
+	sfxEnableSaveGame( false );
+	inTransit = false;
 	intrface->enable();
 	if( !quitting  && !tryingToQuit  && !restoring )
 	{
-		theGame->enableIntrDuringMovie = FALSE;
+		theGame->enableIntrDuringMovie = false;
 		#if BKMIDI == ON  && TRAVELMIDI == ON
 			midiFade = new MusicFadeOut1000( musicHandle, 1500 );
 		#endif
@@ -499,11 +499,11 @@ void Rm1000::fromTo( int theFrom, int theTo)
 	theMovie->fromTo(from, to);
 	sfxSystemCursor(SYS_WAIT);
 	if( curDisc == USADISC )
-		rm1000->mPlay->movieDelayPlay( "1000.avi", this, FALSE, TRUE, FALSE );	
+		rm1000->mPlay->movieDelayPlay( "1000.avi", this, false, true, false );	
 	else if( curDisc == EURODISC )
-		rm1000->mPlay->movieDelayPlay( "1001.avi", this, FALSE, TRUE, FALSE );
+		rm1000->mPlay->movieDelayPlay( "1001.avi", this, false, true, false );
 	else
-		rm1000->mPlay->movieDelayPlay( "1002.avi", this, FALSE, TRUE, FALSE );	
+		rm1000->mPlay->movieDelayPlay( "1002.avi", this, false, true, false );	
 }
 
 void Rm1000::seq2(int theFrom, int theTo)
@@ -516,13 +516,13 @@ void Rm1000::cue()
 {
 	if ( doSeq2 )	{
 		theMovie->fromTo(seq2From, seq2To);
-		doSeq2 = FALSE;
+		doSeq2 = false;
 		if( curDisc == USADISC )
-			rm1000->mPlay->movieDelayPlay( "1000.avi", this, FALSE, TRUE, FALSE );	
+			rm1000->mPlay->movieDelayPlay( "1000.avi", this, false, true, false );	
 		else if( curDisc == EURODISC )
-			rm1000->mPlay->movieDelayPlay( "1001.avi", this, FALSE, TRUE, FALSE );
+			rm1000->mPlay->movieDelayPlay( "1001.avi", this, false, true, false );
 		else
-			rm1000->mPlay->movieDelayPlay( "1002.avi", this, FALSE, TRUE, FALSE );
+			rm1000->mPlay->movieDelayPlay( "1002.avi", this, false, true, false );
 	}
 	else	{
 		AddScreen2Pic();
@@ -533,8 +533,8 @@ void Rm1000::cue()
 		drawTitle( &title2 );
 		drawTitle( &title3 );				
 		drawTitle( &title4 );
-		inTransit = FALSE;
-		user->canInput( TRUE );
+		inTransit = false;
+		user->canInput( true );
 		if( curMap == MAP_STATION_EXT )
 			checkStationExt();
 		else if( curMap == MAP_STATION_INT )		
@@ -549,9 +549,9 @@ void Rm1000::cue()
 void Rm1000::showRegion( int theRegion )
 {
 	// Note: transitions within Travelink are in this function
-	user->canInput(FALSE);
+	user->canInput(false);
 	curMap = theRegion;
-	inTransit = TRUE;
+	inTransit = true;
 	 	
 	switch( theRegion )
 	{
@@ -633,11 +633,11 @@ void Rm1000::showRegion( int theRegion )
 			ASSERT( theColbyHouse == NULL, 0 );*/
 			checkWashington();
 			queryRegion( MAP_WASHINGTON );
-			if( FALSE ) {
+			if( false ) {
 				theMovie->caller = 0;
 				theMovie->stop();
 				fromTo( 510, 524 );
-				//doSeq2 = TRUE;
+				//doSeq2 = true;
 				//seq2(864, 875);
 				theLangley = new Langley( LEFT2_PARAMS );
 				title1.set( 1005, "LangleyTitle", POSN_L2, WASHLOOP, LANGLEYCELL );
@@ -688,7 +688,7 @@ void Rm1000::showRegion( int theRegion )
 				 //	if (goingBackwards)
 				 //		fromTo( 330, 334 );
 				 //	else	{	// coming from World
-				 //		doSeq2 = TRUE; 
+				 //		doSeq2 = true; 
 				 //		seq2( 330, 334 ); 	
 				 //	}
 				 //	break;
@@ -702,7 +702,7 @@ void Rm1000::showRegion( int theRegion )
 					if (goingBackwards)
 						fromTo( 210, 224 );
 					else	{	// coming from World
-						doSeq2 = TRUE; 
+						doSeq2 = true; 
 						seq2( 210, 224 ); 	
 					}
 				 	break;
@@ -715,7 +715,7 @@ void Rm1000::showRegion( int theRegion )
 					if (goingBackwards)
 						fromTo( 0, 14 );
 					else	{	// coming from World
-						doSeq2 = TRUE; 
+						doSeq2 = true; 
 						seq2( 0, 14 ); 	
 					}
 				 	break;
@@ -726,7 +726,7 @@ void Rm1000::showRegion( int theRegion )
 					if (goingBackwards)
 						fromTo( 75, 89 );
 					else	{	// coming from World
-						doSeq2 = TRUE; 
+						doSeq2 = true; 
 						seq2( 75, 89 ); 	
 					}
 				 	break;
@@ -797,7 +797,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 330, 344 );
 				else	{	// coming from World
-					doSeq2 = TRUE; 
+					doSeq2 = true; 
 					seq2( 330, 344 ); 	
 				}
 				break;
@@ -811,7 +811,7 @@ void Rm1000::showRegion( int theRegion )
 				if( goingBackwards )
 					fromTo( 45, 59 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 45, 59 ); 
 				}
 				break;					  
@@ -827,7 +827,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 530, 544 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 530, 544 ); 
 				}
 				break;
@@ -843,7 +843,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 210, 224 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 210, 224 ); 
 				}
 				break;				
@@ -857,7 +857,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 120, 134 );
 				else  {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 120, 134 );
 				} 
 				break;
@@ -870,7 +870,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 375, 389 );
 				else  {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 375, 389 );
 				} 
 				break;
@@ -883,7 +883,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 455, 469 );
 				else  {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 455, 469 );
 				} 
 				break;
@@ -894,7 +894,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 0, 14 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 0, 14 );
 				}
 				break; 
@@ -958,7 +958,7 @@ void Rm1000::showRegion( int theRegion )
 		//	ASSERT( theRefineryDialog == NULL, 0 );
 			if( !goingBackwards ) {
 				fromTo( 1140, 1169 );	// segue
-				doSeq2 = TRUE;
+				doSeq2 = true;
 				seq2( 1170, 1184 );		// intro
 			}
 			else
@@ -978,7 +978,7 @@ void Rm1000::showRegion( int theRegion )
 				if( availWashRegions == WASH_FARM )
 					fromTo( 90, 201 );
 				else	{
-					//ASSERT( FALSE, 0 ); 
+					//ASSERT( false, 0 ); 
 					//fromTo( 345, 456 );	// lang, farm, (colby)--no longer used
 				}
 			}
@@ -991,7 +991,7 @@ void Rm1000::showRegion( int theRegion )
 				if( goingBackwards )
 					fromTo( 765, 779 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 765, 779 );
 				}
 			 	break;
@@ -1004,7 +1004,7 @@ void Rm1000::showRegion( int theRegion )
 				if( goingBackwards )
 					fromTo( 810, 824 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 810, 824 );
 				}
 			 	break;
@@ -1017,7 +1017,7 @@ void Rm1000::showRegion( int theRegion )
 				if( goingBackwards )
 					fromTo( 855, 869 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 855, 869 );
 				}
 			 	break;
@@ -1067,7 +1067,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 675, 689 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 675, 689 ); 
 				}
 			 	break;
@@ -1083,7 +1083,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 525, 539 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 525, 539 ); 
 				}
 			 	break;
@@ -1099,7 +1099,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 720, 734 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 720, 734 ); 
 				}
 			 	break;
@@ -1115,7 +1115,7 @@ void Rm1000::showRegion( int theRegion )
 				if (goingBackwards)
 					fromTo( 570, 584 );
 				else {
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 570, 584 ); 
 				}
 			 	break;
@@ -1133,7 +1133,7 @@ void Rm1000::showRegion( int theRegion )
 			 //	if (goingBackwards)
 			 //		fromTo( 975, 989 );
 			 //	else {
-			 //		doSeq2 = TRUE;
+			 //		doSeq2 = true;
 			 //		seq2( 975, 989 ); 
 			 //	}
 			 //	break;
@@ -1192,7 +1192,7 @@ void Rm1000::showRegion( int theRegion )
 					fromTo( 700, 714 );
 				}
 				else 	{
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 700, 714 );
 				}
 				theAlleyMap = new AlleyMap( LEFT2_PARAMS );			//mid left 2
@@ -1206,7 +1206,7 @@ void Rm1000::showRegion( int theRegion )
 				if( goingBackwards )
 					fromTo( 655, 669 );
 				else 	{
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 655, 669 );
 				}
 				theAlleyMap = new AlleyMap( LEFT2_PARAMS );			//mid left 2
@@ -1218,7 +1218,7 @@ void Rm1000::showRegion( int theRegion )
 				if( goingBackwards )
 					fromTo( 805, 819 );
 				else 	{
-					doSeq2 = TRUE;
+					doSeq2 = true;
 					seq2( 805, 819 );
 				}
 				theProcatVanMap = new ProcatVanMap( LEFT2_PARAMS );			//mid left 2
@@ -1262,7 +1262,7 @@ void Rm1000::showRegion( int theRegion )
 			if( goingBackwards )
 				fromTo( 895, 909 );
 			else {
-				doSeq2 = TRUE;			
+				doSeq2 = true;			
 				seq2( 895, 909 );
 			}
 			theThornOfficeMap = new ThornOfficeMap( TOP_RIGHT4_PARAMS );
@@ -1292,7 +1292,7 @@ void Rm1000::showRegion( int theRegion )
 			NULL;
 	};
 	wentBackwards = goingBackwards;
-	goingBackwards = FALSE;
+	goingBackwards = false;
 }
 
 void Rm1000::queryRegion( int theRegion )
@@ -1486,7 +1486,7 @@ void Rm1000::checkLangley( void )
 		          	new EMailAttachment( "KAT and Dubansky Video", 1111 ) ); 
 		GameFlag.set( fKATAvailable );
 		new EMail( "Congratulations: Holt, David M.", 98083 );
-		//pcLastUsed[PC_KAT] = TRUE;
+		//pcLastUsed[PC_KAT] = true;
 	}
 	// After PEG briefing  Jaimie gives Security Model
 	if( GameFlag.test( fPEGBriefing )  && !GameFlag.test( fSetJaimies139 ) )
@@ -1992,9 +1992,9 @@ void Rm1000::startMidi( void )
 	midiTable[M1000_WASH]			= wash;
 	// Moscow
 	#define MOSZ	4
-	static midiInfo moscow[MOSZ]	= { 0, 1500,	0, 1500,	0, 1501,	0, 1501		};
+	static midiInfo moscow_[MOSZ]	= { 0, 1500,	0, 1500,	0, 1501,	0, 1501		};
 	rowSizes[M1000_MOSCOW] 			= MOSZ;
-	midiTable[M1000_MOSCOW] 		= moscow;
+	midiTable[M1000_MOSCOW] 		= moscow_;
 	// Station House
 	#define STSZ	4
 	static midiInfo staHse[STSZ]	= { 0, 1021,	0, 1022,	0, 1023,	0, 1024		};
@@ -2017,9 +2017,9 @@ void Rm1000::startMidi( void )
 	midiTable[M1000_BIRD] 			= bird;
 	// London
 	#define LOSZ	1
-	static midiInfo london[LOSZ]	= { 0, 1050		};
+	static midiInfo london_[LOSZ]	= { 0, 1050		};
 	rowSizes[M1000_LONDON] 			= LOSZ;								
-	midiTable[M1000_LONDON] 		= london;
+	midiTable[M1000_LONDON] 		= london_;
 	// Heidelberg
 	#define HESZ	1
 	static midiInfo heidel[HESZ]	= { 0, 1060		};
@@ -2070,7 +2070,7 @@ void Rm1000::stopMidi( void )
 
 int  Rm1000::findMidiTableRow( int location )
 {
-	int		row;
+	int row = 0;
 
 	switch( location )
 	{
@@ -2112,7 +2112,7 @@ int  Rm1000::findMidiTableRow( int location )
 		 	row = M1000_STAHSE;
 		
 		 	
-		 	//ASSERT( FALSE, 0 );
+		 	//ASSERT( false, 0 );
 		}
 	 	break;
 	 case MAP_HEIDELBERG:
@@ -2155,7 +2155,7 @@ MapTitle::MapTitle()
 	posn = POSN_NONE;
 }
 
-void MapTitle::set( int theView, char* theName, int thePosn, int theLoop, int theCell )
+void MapTitle::set( int theView, const char *theName, int thePosn, int theLoop, int theCell )
 {
 	//ASSERT( title == NULL, 0 );
 	title = new View;
@@ -2214,7 +2214,7 @@ CityBt1000::CityBt1000( int side, int city )
 	 	break;
 	 default:
 	 	myLoop = CT_MOSCOWLOOP;
-	 //	ASSERT( FALSE, 0 );
+	 //	ASSERT( false, 0 );
 	}
 	setView( 1008 );
 	setLoop( myLoop );
@@ -2242,15 +2242,15 @@ int CityBt1000::doVerb( int theVerb )
 		go = verifyDestinationDisc( myCity );
 		if( go ) {
 			//rm1000->cleanUp(); --moved to verify; happens for transition --moved again:above
-			inTransit = TRUE;
+			inTransit = true;
 			sfxSystemCursor(SYS_WAIT);
-			user->canInput( FALSE );
-			goingBackwards = TRUE;
+			user->canInput( false );
+			goingBackwards = true;
 			rm1000->showRegion( myCity );
 		}
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 int  CityBt1000::verifyDestinationDisc( int destination )
@@ -2258,7 +2258,7 @@ int  CityBt1000::verifyDestinationDisc( int destination )
 	//int		ok;
 	int		change;
 
-	change = FALSE;
+	change = false;
 
 	switch( destination )
 	{
@@ -2279,12 +2279,12 @@ int  CityBt1000::verifyDestinationDisc( int destination )
 				#if BKMIDI == ON  && TRAVELMIDI == ON						
 					rm1000->startMidi();
 				#endif
-				change = TRUE;
+				change = true;
 		//	}
 		//	else
-		//		change = FALSE;
+		//		change = false;
 		}
-		change = TRUE;	// London may be on the same disk.  This is a design problem --dck
+		change = true;	// London may be on the same disk.  This is a design problem --dck
 		break;
 	 case MAP_MOSCOW:
 		if( curDisc != EURODISC )	{
@@ -2302,10 +2302,10 @@ int  CityBt1000::verifyDestinationDisc( int destination )
 				#if BKMIDI == ON  && TRAVELMIDI == ON
 					rm1000->startMidi();
 				#endif
-				change = TRUE;
+				change = true;
 		//	}
 		//	else
-		//		change = FALSE;
+		//		change = false;
 		}
 	 	break;
 	 case MAP_HEIDELBERG:
@@ -2327,18 +2327,18 @@ int  CityBt1000::verifyDestinationDisc( int destination )
 				#if BKMIDI == ON  && TRAVELMIDI == ON
 					rm1000->startMidi();
 				#endif
-				change = TRUE;
+				change = true;
 			//}
 			//else
-			//	change = FALSE;			
+			//	change = false;			
 		}
-		change = TRUE;	// MAP_MOSCOWPLATE doesn't require disk change
+		change = true;	// MAP_MOSCOWPLATE doesn't require disk change
 	 	break;
 	 default:
 	 	#ifdef _DEBUG
 			sfxPrintf( "Unknown destination %d for disc test", destination );
 		#endif
-			change = FALSE;
+			change = false;
 		NULL;
 	}
 	return change; 	
@@ -2393,7 +2393,7 @@ void CityTitle1000::update( int city )
 		break;
 	 default:
 	 	cell = CT_MOSCOWCELL;
-	//	ASSERT( FALSE, 0 );
+	//	ASSERT( false, 0 );
 	}
 	title->setView( 1006 );
 	title->setLoop( CT_TOPTITLELOOP );
@@ -2491,7 +2491,7 @@ void CityTriad1000::calcTriad( int local, int& here, int& left, int& right )
 			right = MAP_TUNISIA; 
 			break;
 		 //default:
-		 //	ASSERT( FALSE, 0 );
+		 //	ASSERT( false, 0 );
 		}
 	 	break;
 
@@ -2537,7 +2537,7 @@ void CityTriad1000::calcTriad( int local, int& here, int& left, int& right )
 			right = MAP_TUNISIA;
 			break;
 		 //default:
-		 //	ASSERT( FALSE, 0 );
+		 //	ASSERT( false, 0 );
 		}
 	 	break;
 
@@ -2563,7 +2563,7 @@ void CityTriad1000::calcTriad( int local, int& here, int& left, int& right )
 	 	break;
 
 	// default:
-		//ASSERT( FALSE, 0 );
+		//ASSERT( false, 0 );
 	}
 }
 
@@ -2579,10 +2579,10 @@ int BackBt1000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V )	{
 	    rm1000->cleanUp();
-		inTransit = TRUE;
+		inTransit = true;
 		sfxSystemCursor(SYS_WAIT);
-		user->canInput( FALSE );
-		goingBackwards = TRUE;
+		user->canInput( false );
+		goingBackwards = true;
 		
 		switch ( curMap )
 		{
@@ -2624,9 +2624,9 @@ int BackBt1000::doVerb ( int theVerb )
 				NULL;
 		}
 		rm1000->showRegion( curMap );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*********************
@@ -2693,8 +2693,8 @@ void MapFeature::cutToRoom( Room* theRoom )
 
 int MapFeature::doVerb( int )
 {
-	inTransit = TRUE;
-	return TRUE;
+	inTransit = true;
+	return true;
 }
 	
 MapFrank::MapFrank(int theX, int theY, int theWidth, int theHeight)
@@ -2710,9 +2710,9 @@ int MapFrank::doVerb ( int theVerb )
 		MapFeature::doVerb( theVerb );
 		cutToRoom( new Rm2001 );
 	#endif
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 IAMap::IAMap(int theX, int theY, int theWidth, int theHeight)
@@ -2728,9 +2728,9 @@ int IAMap::doVerb ( int theVerb )
 		MapFeature::doVerb( theVerb );
 	    curRoom->setScript( new MapExit1000( 825, 854, new Rm5000 ) );
 	#endif
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 ZoneMap::ZoneMap(int theX, int theY, int theWidth, int theHeight)
@@ -2746,9 +2746,9 @@ int ZoneMap::doVerb ( int theVerb )
 		MapFeature::doVerb( theVerb );
 		curRoom->setScript( new MapExit1000( 870, 899, new Rm7000) );
 	#endif
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 JaimieMap::JaimieMap(int theX, int theY, int theWidth, int theHeight)
@@ -2767,9 +2767,9 @@ int JaimieMap::doVerb ( int theVerb )
 	    else
 	    	curRoom->setScript( new MapExit1000( 645, 674, new Rm27000 ) );
 	#endif
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 HoltMap::HoltMap(int theX, int theY, int theWidth, int theHeight)
@@ -2788,9 +2788,9 @@ int HoltMap::doVerb ( int theVerb )
 	    else
 	    	curRoom->setScript( new MapExit1000( 585, 614, new Rm26000 ) );
 	#endif
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WashPlayerMap::WashPlayerMap(int theX, int theY, int theWidth, int theHeight)
@@ -2825,9 +2825,9 @@ int WashPlayerMap::doVerb ( int theVerb )
 			NULL;
 		}
 	#endif
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 DCIMap::DCIMap(int theX, int theY, int theWidth, int theHeight)
@@ -2840,13 +2840,13 @@ int DCIMap::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V )	{
 	#ifdef INCLUDE_USA
-		drawBackground = FALSE;
+		drawBackground = false;
 		MapFeature::doVerb( theVerb );
 		cutToRoom( new Rm18000 );
 	#endif
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
    
 MoscowMap::MoscowMap(int theX, int theY, int theWidth, int theHeight)
@@ -2865,9 +2865,9 @@ int MoscowMap::doVerb ( int theVerb )
 		sfxSystemCursor(SYS_WAIT);
     	rm1000->cleanUp();
 		rm1000->showRegion( MAP_MOSCOW );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 HeidelbergMap::HeidelbergMap( int theX, int theY, int theWidth, int theHeight )
@@ -2894,9 +2894,9 @@ int HeidelbergMap::doVerb ( int theVerb )
 				//curMap = MAP_REFINERY;	// (comes after cut to allow for proper cleanup)
 			}
       	#endif
-        return TRUE;
+        return true;
 	}
-	return FALSE;
+	return false;
 }
 
 RefineryShooterMap::RefineryShooterMap(int theX, int theY, int theWidth, int theHeight)
@@ -2913,9 +2913,9 @@ int RefineryShooterMap::doVerb ( int theVerb )
 			GameFlag.set( fStartCombat );
 			curRoom->setScript( new  MapExit1000( 1090, 1119, new Rm95218 ) );
 		#endif	   
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 RefineryDialogMap::RefineryDialogMap(int theX, int theY, int theWidth, int theHeight)
@@ -2931,9 +2931,9 @@ int RefineryDialogMap::doVerb ( int theVerb )
 			MapFeature::doVerb( theVerb );
 			cutToRoom( new Rm1075 );
 		#endif	   
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // not used
@@ -2951,9 +2951,9 @@ int CrimeaMap::doVerb ( int theVerb )
 			MapFeature::doVerb( theVerb );
 			//curRoom->setScript( new MapExit1000( 32, 61, new Rm1085 ) );
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 VilniusCenterMap::VilniusCenterMap(int theX, int theY, int theWidth, int theHeight)
@@ -2976,9 +2976,9 @@ int VilniusCenterMap::doVerb ( int theVerb )
 				break;
 			}
 		#endif	   
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BirdsongMap::BirdsongMap(int theX, int theY, int theWidth, int theHeight)
@@ -3005,14 +3005,14 @@ int BirdsongMap::doVerb ( int theVerb )
 				default:
 					#ifdef _DEBUG
 						sfxPrintf( "Bad initial state to go to Birdsong's" );
-						return TRUE;
+						return true;
 					#endif
 					NULL;
 			}
 		#endif
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 StakeOutMap::StakeOutMap(int theX, int theY, int theWidth, int theHeight)
@@ -3028,9 +3028,9 @@ int StakeOutMap::doVerb ( int theVerb )
 			MapFeature::doVerb( theVerb );
 			cutToRoom( new Rm50000 );
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 KneecapMap::KneecapMap(int theX, int theY, int theWidth, int theHeight)
@@ -3046,9 +3046,9 @@ int KneecapMap::doVerb ( int theVerb )
 			MapFeature::doVerb( theVerb );
 	 		curRoom->setScript( new  MapExit1000( 390, 424, new Rm37000 ) );
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 LubyankaMap::LubyankaMap(int theX, int theY, int theWidth, int theHeight)
@@ -3069,9 +3069,9 @@ int LubyankaMap::doVerb ( int theVerb )
 				curRoom->setScript( new  MapExit1000( 500, 529, new Rm48000 ) );
 			}
 		#endif
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EmbassyMap::EmbassyMap(int theX, int theY, int theWidth, int theHeight)
@@ -3086,9 +3086,9 @@ int EmbassyMap::doVerb ( int theVerb )
 		MapFeature::doVerb( theVerb );
 		rm1000->cleanUp();
 		rm1000->showRegion( MAP_STATION_EXT );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EmbassyIntMap::EmbassyIntMap(int theX, int theY, int theWidth, int theHeight)
@@ -3122,9 +3122,9 @@ int EmbassyIntMap::doVerb ( int theVerb )
 		 	GameFlag.clear( fPlayerTurnsProcat );
 			GameFlag.clear( fWahKa79 );
 		}	// in case backing out of Procat van choice
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 AlleyMap::AlleyMap(int theX, int theY, int theWidth, int theHeight)
@@ -3146,9 +3146,9 @@ int AlleyMap::doVerb ( int theVerb )
 				curRoom->setScript( new MapExit1000( 670, 699, new Rm32000) );
 			}
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 ProcatVanMap::ProcatVanMap(int theX, int theY, int theWidth, int theHeight)
@@ -3167,9 +3167,9 @@ int ProcatVanMap::doVerb ( int theVerb )
 			MapFeature::doVerb( theVerb );
 			curRoom->setScript( new  MapExit1000( 850, 879, new Rm38000) );
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 MaxOfficeMap::MaxOfficeMap(int theX, int theY, int theWidth, int theHeight)
@@ -3189,11 +3189,11 @@ int MaxOfficeMap::doVerb ( int theVerb )
 			else if( curMap == MAP_STATION_EXT )	// warn Max special case
 				cutToRoom( new Rm35700 );
 			//else
-			//	ASSERT( FALSE, 0 );
+			//	ASSERT( false, 0 );
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // Russia
@@ -3211,9 +3211,9 @@ int ThornOfficeMap::doVerb ( int theVerb )
 			MapFeature::doVerb( theVerb );
 			curRoom->setScript(new  MapExit1000( 1000, 1029, new Rm35000));
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 InterrogationRoomMap::InterrogationRoomMap(int theX, int theY, int theWidth, int theHeight)
@@ -3229,9 +3229,9 @@ int InterrogationRoomMap::doVerb ( int theVerb )
 			MapFeature::doVerb( theVerb );
 			curRoom->setScript(new  MapExit1000( 940, 969, new Rm23000));
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BullpenMap::BullpenMap(int theX, int theY, int theWidth, int theHeight)
@@ -3247,9 +3247,9 @@ int BullpenMap::doVerb ( int theVerb )
 			MapFeature::doVerb( theVerb );
 			curRoom->setScript(new  MapExit1000( 910, 939, new Rm25000));
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WashingtonMap::WashingtonMap(int theX, int theY, int theWidth, int theHeight)
@@ -3269,9 +3269,9 @@ int WashingtonMap::doVerb ( int theVerb )
 		sfxSystemCursor(SYS_WAIT);
 		curMap = MAP_WASHINGTON;
 		rm1000->showRegion(curMap);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Farm::Farm(int theX, int theY, int theWidth, int theHeight)
@@ -3285,9 +3285,9 @@ int Farm::doVerb ( int theVerb )
 		MapFeature::doVerb( theVerb );
 		rm1000->cleanUp();
 		rm1000->showRegion( MAP_FARM );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Langley::Langley(int theX, int theY, int theWidth, int theHeight)
@@ -3304,9 +3304,9 @@ int Langley::doVerb ( int theVerb )
 			rm1000->cleanUp();
 			rm1000->showRegion( MAP_LANGLEY );
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 ColbyHouse::ColbyHouse(int theX, int theY, int theWidth, int theHeight)
@@ -3322,9 +3322,9 @@ int ColbyHouse::doVerb ( int theVerb )
 			MapFeature::doVerb( theVerb );
 			curRoom->setScript(new  MapExit1000( 225, 264, new Rm10200 ));
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 LondonMap::LondonMap(int theX, int theY, int theWidth, int theHeight)
@@ -3345,7 +3345,7 @@ int LondonMap::doVerb ( int theVerb )
 			curRoom->setScript( new  MapExit1000( 1065, 1094, new Rm1090 ) );
 		#endif
 	}
-	return FALSE;
+	return false;
 }
 
 TunisiaMap::TunisiaMap(int theX, int theY, int theWidth, int theHeight)
@@ -3364,9 +3364,9 @@ int TunisiaMap::doVerb( int theVerb )
 			curMap = MAP_MOSCOWPLATE;	// (comes after cut to allow for proper cleanup)
 			//curDisc = EURODISC;
 		#endif
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 AssSuiteMap::AssSuiteMap(int theX, int theY, int theWidth, int theHeight)
@@ -3386,9 +3386,9 @@ int AssSuiteMap::doVerb( int theVerb )
 			verifyDisc( ENDGAMEDISC );
 			cutToRoom( new Rm96000 );
 		#endif
-	    return TRUE;
+	    return true;
 	}
-  return FALSE;
+  return false;
 }
 
 DachaMap::DachaMap(int theX, int theY, int theWidth, int theHeight)
@@ -3405,9 +3405,9 @@ int DachaMap::doVerb ( int theVerb )
 			verifyDisc( ENDGAMEDISC );
 			curRoom->setScript( new MapExit1000( 1245, 1274, new Rm79000 ) );
 		#endif
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -3416,10 +3416,10 @@ int DachaMap::doVerb ( int theVerb )
  *
 /*******************************/
 
-void MoviePlayer1000::movieDelayPlay( char* theMovie, Object* whoToCue,
+void MoviePlayer1000::movieDelayPlay(const char *movie, Object* whoToCue,
      int wait, int close, int erase)
 {
-	myMovie = theMovie;	// note: assumes static char pointer
+	myMovie = movie;	// note: assumes static char pointer
 	myWhoToCue = whoToCue;
 	myWait = wait;
 	myClose = close;
@@ -3430,7 +3430,7 @@ void MoviePlayer1000::movieDelayPlay( char* theMovie, Object* whoToCue,
 
 void MoviePlayer1000::cue( void )
 {
-	//ASSERT( myErase == FALSE, 0 );
+	//ASSERT( myErase == false, 0 );
  	theMovie->play( myMovie, myWhoToCue, myWait, myClose, myErase );
 	//#pragma message( "temp test" )
 	//	if( rm1000->musicHandle == -1 )
@@ -3496,14 +3496,14 @@ void MapExit1000::changeState ( int newState )
 {
 	switchTo
 		rm1000->cleanUp();
-		user->canInput( FALSE );
+		user->canInput( false );
 		theMovie->fromTo( from, to );
 		if( curDisc == USADISC )
-			rm1000->mPlay->movieDelayPlay( "1000.avi", this, FALSE, TRUE, FALSE );	
+			rm1000->mPlay->movieDelayPlay( "1000.avi", this, false, true, false );	
 		else if( curDisc == EURODISC )
-			rm1000->mPlay->movieDelayPlay( "1001.avi", this, FALSE, TRUE, FALSE );
+			rm1000->mPlay->movieDelayPlay( "1001.avi", this, false, true, false );
 		else
-			rm1000->mPlay->movieDelayPlay( "1002.avi", this, FALSE, TRUE, FALSE );
+			rm1000->mPlay->movieDelayPlay( "1002.avi", this, false, true, false );
 	END
 
 	BEG
@@ -3519,7 +3519,7 @@ void LenaCallsScript1000::changeState( int newState )
 	static int		mNumber;
 
 	switchTo
-		user->canInput( FALSE );
+		user->canInput( false );
 		theMovie->caller = 0;
 		theMovie->stop();
 		#if TRAVELMIDI == ON
@@ -3541,7 +3541,7 @@ void LenaCallsScript1000::changeState( int newState )
 		  rm1000->startMidi( mNumber );
 		#endif
 		sfxLoadRes( 960, RES_ATS );
-		user->canInput( TRUE );
+		user->canInput( true );
 		dispose();
 	END
 }

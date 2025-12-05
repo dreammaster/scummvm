@@ -19,13 +19,13 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/23000.h"
 #include "spycraft/logic/23100.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 
 namespace Spycraft {
 
@@ -70,7 +70,7 @@ void Rm23100::init()
 
 int Rm23100::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit23100::SouthExit23100()
@@ -89,9 +89,9 @@ int SouthExit23100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm23000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
   
 /*******************************
@@ -117,9 +117,9 @@ int Microphone23100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new MicrophoneInset23100();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 TapePlayer23100::TapePlayer23100()
@@ -139,9 +139,9 @@ int TapePlayer23100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new TapePlayerInset23100();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PolygraphFinger23100::PolygraphFinger23100()
@@ -161,9 +161,9 @@ int PolygraphFinger23100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new PolygraphFingerInset23100();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 /*
 PolygraphRead23100::PolygraphRead23100()
@@ -184,9 +184,9 @@ int PolygraphRead23100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new PolygraphReadInset23100();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 /*******************************

@@ -19,12 +19,12 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "flag.h"
-#include "roomsnd.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/1090.h"
 #include "spycraft/logic/80000.h"
 #include "spycraft/logic/1000.h"
@@ -115,7 +115,7 @@ void Rm1090::init()
 	new SouthExit1090;
 	//if( blakeHasSpoken )
 	//	new EastExit1090;
-	blakeHasSpoken = FALSE;
+	blakeHasSpoken = false;
 	
   	intrface->show();
   	theGame->handsOn();
@@ -165,9 +165,9 @@ int NorthExit1090::doVerb ( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm1091 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit1090::SouthExit1090()
@@ -187,9 +187,9 @@ int SouthExit1090::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
 		theGame->newRoom( new Rm1000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // no longer used
@@ -211,9 +211,9 @@ int EastExit1090::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 		if( !playingVoice  && !playingDoorbell )
     		theGame->newRoom( new Rm80000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // 1091
@@ -238,9 +238,9 @@ int SouthExit1091::doVerb( int theVerb )
 	if( theVerb == DO_V ) {
 		if( !playingVoice && !playingDoorbell )
     		theGame->newRoom( new Rm1090 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EastExit1091::EastExit1091()
@@ -264,9 +264,9 @@ int EastExit1091::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 		if( !playingVoice && !playingDoorbell )
     		theGame->newRoom( new Rm80000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -304,9 +304,9 @@ int DoorBell_1091::doVerb( int theVerb )
 			else
 				curRoom->setScript( new ISaidHelloScript1091 );
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -320,7 +320,7 @@ void DoorbellScript1091::changeState( int newState )
 	static Sound*	soundptr;
 
 	switchTo
-		playingDoorbell = TRUE;
+		playingDoorbell = true;
 		soundptr = new Sound;
 		soundptr->play( SND_BLAKESDOORBELL, this );
 	END
@@ -328,7 +328,7 @@ void DoorbellScript1091::changeState( int newState )
 	BEG
 		soundptr->dispose();
 		dispose();
-		playingDoorbell = FALSE;
+		playingDoorbell = false;
 	END
 }
 
@@ -337,7 +337,7 @@ void HelloScript1091::changeState( int newState )
 	static Sound*	soundptr;
 
 	switchTo
-		playingVoice = TRUE;
+		playingVoice = true;
 		ticks = 100;
 	END
 
@@ -349,8 +349,8 @@ void HelloScript1091::changeState( int newState )
 	BEG
 		soundptr->dispose;
 		dispose();
-		playingVoice = FALSE;
-		blakeHasSpoken = TRUE;						 
+		playingVoice = false;
+		blakeHasSpoken = true;						 
 	END
 }
 
@@ -360,7 +360,7 @@ void ISaidHelloScript1091::changeState( int newState )
 	static int		annoyed;	// flag
 
 	switchTo
-		playingVoice = TRUE;
+		playingVoice = true;
 		ticks = 40;
 	END
 
@@ -369,7 +369,7 @@ void ISaidHelloScript1091::changeState( int newState )
 		if( !annoyed )
 		{
 			soundptr->play( SND_VO_BLAKEAROUNDBACK2, this );
-			annoyed = TRUE;
+			annoyed = true;
 		}
 		else
 			soundptr->play( SND_VO_BLAKEAROUNDBACK3, this );
@@ -378,7 +378,7 @@ void ISaidHelloScript1091::changeState( int newState )
 	BEG
 		soundptr->dispose;
 		dispose();
-		playingVoice = FALSE;
+		playingVoice = false;
 	END
 }
 

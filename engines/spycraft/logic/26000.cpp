@@ -19,11 +19,11 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "roomsnd.h"
+#include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/26000.h"
 #include "spycraft/logic/1000.h"
 #include "web.h"
@@ -144,9 +144,9 @@ int SouthExit26000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm1000 );
-    	return TRUE;								 
+    	return true;								 
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit26100::SouthExit26100()
@@ -166,9 +166,9 @@ int SouthExit26100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm26000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -194,9 +194,9 @@ int Desk26000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		theGame->newRoom( new Rm26100 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Photos26000::Photos26000()
@@ -216,9 +216,9 @@ int Photos26000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new PhotosInset26000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Map26000::Map26000()
@@ -238,9 +238,9 @@ int Map26000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new MapInset26000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 TravelLetter26100::TravelLetter26100()
@@ -260,9 +260,9 @@ int TravelLetter26100::doVerb( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		new TravelLetterInset26000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Folders26100::Folders26100()
@@ -283,9 +283,9 @@ int Folders26100::doVerb( int theVerb )
 	if ( theVerb == DO_V ) {
 		curRoom->setScript( new FolderSndScript26100 );
 		new Yellow( 98635 );	// may want to move this into script
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -349,9 +349,9 @@ int MelnachovIFeature26000::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 		theInset->dispose();
 		new MelnachovInset26000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************

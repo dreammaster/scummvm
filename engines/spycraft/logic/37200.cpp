@@ -19,16 +19,16 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/37000.h"
 #include "spycraft/logic/1000.h"
 #include "spycraft/logic/37200.h"
 #include "spycraft/logic/37300.h"
-#include "flag.h"
-#include "movie.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/movie.h"
 
 namespace Spycraft {
 
@@ -85,7 +85,7 @@ void Rm37200::init()
 
 int Rm37200::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit37200::SouthExit37200()
@@ -106,9 +106,9 @@ int SouthExit37200::doVerb ( int theVerb )
 	if ( theVerb == DO_V ) {
 //		theGame->newRoom(new Rm37000);
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WestExit37200::WestExit37200()
@@ -128,9 +128,9 @@ int WestExit37200::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm37300);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -211,7 +211,7 @@ void Rm37201::init()
 
 int Rm37201::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 EnterBlackScreenScript37201::EnterBlackScreenScript37201()

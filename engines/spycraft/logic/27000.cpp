@@ -19,13 +19,13 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "movie.h"
-#include "flag.h"
-#include "roomsnd.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/flag.h"
+#include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/27000.h"
 #include "spycraft/logic/1000.h"
 #include "web.h"
@@ -174,9 +174,9 @@ int SouthExit27000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EastExit27000::EastExit27000()
@@ -196,9 +196,9 @@ int EastExit27000::doVerb( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom( new Rm27200 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WestExit27000::WestExit27000()
@@ -218,9 +218,9 @@ int WestExit27000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm27100 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 //27100
@@ -241,9 +241,9 @@ int SouthExit27100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm1000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EastExit27100::EastExit27100()
@@ -263,9 +263,9 @@ int EastExit27100::doVerb( int theVerb )
 {
 	if ( theVerb == DO_V ) {
     	theGame->newRoom( new Rm27000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // 27200
@@ -286,9 +286,9 @@ int SouthExit27200::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm1000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WestExit27200::WestExit27200()
@@ -308,9 +308,9 @@ int WestExit27200::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm27000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -336,9 +336,9 @@ int Photo27000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new PhotoInset27000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Phone27000::Phone27000()
@@ -358,9 +358,9 @@ int Phone27000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new PhoneInset27000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Camera27000::Camera27000()
@@ -380,9 +380,9 @@ int Camera27000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new CameraInset27000;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // 27100
@@ -403,9 +403,9 @@ int Phone27100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new PhoneInset27100;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }	
 
 Camera27100::Camera27100()
@@ -425,9 +425,9 @@ int Camera27100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new CameraInset27100;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Folder27100::Folder27100()
@@ -447,9 +447,9 @@ int Folder27100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V )	{
 		new FolderInset27100;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -473,9 +473,9 @@ int PhotoInset27000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
 		//Do something . . .
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PhoneInset27000::PhoneInset27000()
@@ -498,9 +498,9 @@ int PhoneInset27000::doVerb( int theVerb )
 		//new HTMLPage( 98800 );
 		//comlinkshort->hide();	// hides the receive button
 		//homobutt->setCel( 2 );	// deactivates Home button in Web
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 CameraInset27000::CameraInset27000()
@@ -518,9 +518,9 @@ int CameraInset27000::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
 		//Do something . . .
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // 27100
@@ -544,9 +544,9 @@ int PhoneInset27100::doVerb( int theVerb )
 		//new HTMLPage( 98800 );
 		//comlinkshort->hide();	// hides the receive button
 		//homobutt->setCel( 2 );	// deactivates Home button in Web
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 CameraInset27100::CameraInset27100()
@@ -564,9 +564,9 @@ int CameraInset27100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
 		//Do something . . .
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 FolderInset27100::FolderInset27100()
@@ -603,9 +603,9 @@ int PhoneIFeature27000::doVerb ( int theVerb )
 		new HTMLPage( 98800 );
 		comlinkshort->hide();	// hides the receive button
 		homobutt->setCel( 2 );	// deactivates Home button in Web
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PhoneIFeature27100::PhoneIFeature27100()
@@ -628,9 +628,9 @@ int PhoneIFeature27100::doVerb ( int theVerb )
 		new HTMLPage( 98800 );
 		comlinkshort->hide();	// hides the receive button
 		homobutt->setCel( 2 );	// deactivates Home button in Web
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 CorrTabIFeature27100::CorrTabIFeature27100()
@@ -650,9 +650,9 @@ int CorrTabIFeature27100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		new Yellow( 98634 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 BSTabIFeature27100::BSTabIFeature27100()
@@ -672,9 +672,9 @@ int BSTabIFeature27100::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		new Yellow( 98630 );
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
  
 } // namespace Spycraft 

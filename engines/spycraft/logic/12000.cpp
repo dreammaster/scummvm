@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 #include "cursor.h"
-#include "movie.h"
-#include "vlink.h"
-#include "roomsnd.h"
+#include "spycraft/game/movie.h"
+#include "spycraft/game/vlink.h"
+#include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/12000.h"
 #include "spycraft/logic/10000.h"
 #include "spycraft/logic/1000.h"
@@ -98,9 +98,9 @@ int SouthExit12000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		theGame->newRoom(new Rm10200);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -128,9 +128,9 @@ int SouthExit12000::doVerb ( int theVerb )
 		if ( theVerb == DO_V )
 		{ 
 			new PictureOneInset12000;	
-			return TRUE;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 
 	PictureTwo12000::PictureTwo12000()
@@ -151,9 +151,9 @@ int SouthExit12000::doVerb ( int theVerb )
 		if ( theVerb == DO_V )
 		{ 
 			new PictureTwoInset12000;	
-			return TRUE;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 
 	PictureThree12000::PictureThree12000()
@@ -174,9 +174,9 @@ int SouthExit12000::doVerb ( int theVerb )
 		if ( theVerb == DO_V )
 		{ 
 			new PictureThreeInset12000;	
-			return TRUE;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 
 		PictureFour12000::PictureFour12000()
@@ -197,9 +197,9 @@ int SouthExit12000::doVerb ( int theVerb )
 		if ( theVerb == DO_V )
 		{ 
 			new PictureFourInset12000;	
-			return TRUE;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 
 	PictureFive12000::PictureFive12000()
@@ -220,9 +220,9 @@ int SouthExit12000::doVerb ( int theVerb )
 		if ( theVerb == DO_V )
 		{ 
 			new PictureFiveInset12000;	
-			return TRUE;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 
 
@@ -302,7 +302,7 @@ void PictureFiveInset12000::respond(void)
 	BEG
 		//theGame->handsOff(); not needed--never do handsOn().
 //		theMovie->fromTo( 0, 1150 );
-		theMovie->play( "12100.avi", this, FALSE, /*FALSE*/TRUE, FALSE );
+		theMovie->play( "12100.avi", this, false, /*false*/true, false );
 	END
 
 //	BEG
@@ -312,19 +312,19 @@ void PictureFiveInset12000::respond(void)
 //	BEG
 //		if( GameFlag.test( fMetMaxFoster ) ) {
 //			theMovie->fromTo( 1170, 1325 ); 
-//			theMovie->play( "12100.avi", this, FALSE, TRUE, FALSE  ); // get back to Moscow	
+//			theMovie->play( "12100.avi", this, false, true, false  ); // get back to Moscow	
 //		}
 //		else {
 //			theMovie->caller = NULL;	// necessary?
 //			theMovie->stop();
-//			intrface->enable();	// movie won't enable when done--closeWhenDone FALSE.
+//			intrface->enable();	// movie won't enable when done--closeWhenDone false.
 //			cue();
 //		}
-//		// removed Get back after PEG, 12101.avi (fKnowYingInMoscow FALSE)
+//		// removed Get back after PEG, 12101.avi (fKnowYingInMoscow false)
 //	END
 
 	BEG	
-		drawBackground = FALSE; // Travelink
+		drawBackground = false; // Travelink
 		theGame->newRoom( new Rm1000 );
 	END
  }

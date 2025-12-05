@@ -22,13 +22,13 @@
 #ifndef SPYCRAFT_LOGIC_95400_H
 #define SPYCRAFT_LOGIC_95400_H
 
-#include "made.h"
-#include "game.h"
-#include "feature.h"
-#include "script.h"
-#include "actor.h"
-#include "sound.h"
-#include "colby.h"
+#include "spycraft/game/made.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/feature.h"
+#include "spycraft/game/script.h"
+#include "spycraft/game/actor.h"
+#include "spycraft/game/sound.h"
+#include "spycraft/game/colby.h"
 
 namespace Spycraft {
 

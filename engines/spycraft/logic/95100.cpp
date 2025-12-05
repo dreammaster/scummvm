@@ -908,9 +908,9 @@ int NorthEastExit95100::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95117);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthWestExit95100::NorthWestExit95100()
@@ -975,9 +975,9 @@ int NorthWestExit95100::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95116);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthExit95100::NorthExit95100()
@@ -1041,9 +1041,9 @@ int NorthExit95100::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95114);
 				break;
 		}
-	   	return TRUE;
+	   	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthEastExit95100::SouthEastExit95100()
@@ -1107,9 +1107,9 @@ int SouthEastExit95100::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95118);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthWestExit95100::SouthWestExit95100()
@@ -1173,9 +1173,9 @@ int SouthWestExit95100::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95118);
 				break;
 		}
-	    return TRUE;
+	    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 SouthExit95100::SouthExit95100()
@@ -1239,9 +1239,9 @@ int SouthExit95100::doVerb ( int theVerb )
 				theGame->newRoom(new Rm95118);
 				break;
 		}
-	   	return TRUE;
+	   	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 void CrisisScript::changeState ( int newState )
@@ -1288,9 +1288,9 @@ int seeBeacon::doVerb ( int theVerb )
 		dispose();
 		((Rm95100*)curRoom)->beacon = NULL;
 		GameFlag.set(fGotBeacon);
-		return TRUE;
+		return true;
 //	}
-//	return FALSE;
+//	return false;
 }
 seeBeacon::seeBeacon()
 {

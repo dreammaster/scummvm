@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/38000.h"
 #include "spycraft/logic/1000.h"
-#include "flag.h"
+#include "spycraft/game/flag.h"
 #include "invent.h"
-#include "roomsnd.h"
+#include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/60000.h"
 #include "spycraft/logic/96000.h"
 
@@ -85,7 +85,7 @@ void Rm38000::init()
 
 int Rm38000::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit38000::SouthExit38000()
@@ -105,9 +105,9 @@ int SouthExit38000::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
  		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -136,9 +136,9 @@ int InsideVan38000::doVerb ( int theVerb )
 		sfxSystemCursor( SYS_WAIT );
 		sfxLoadRes(38000, RES_WAVE);
 		theGame->newRoom(new Rm38100);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 } 
 
 Rm38100::Rm38100()
@@ -189,7 +189,7 @@ void Rm38100::init()
 
 int Rm38100::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit38100::SouthExit38100()
@@ -215,9 +215,9 @@ int SouthExit38100::doVerb ( int theVerb )
 			snd38000->stop();				//stop
 			theGame->newRoom(new Rm60000(END_DEAD));
 		}
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 } 
 
 FolderHole38100::FolderHole38100()
@@ -248,18 +248,18 @@ int FolderHole38100::doVerb ( int theVerb )
 				curRoom->setScript(new ProcatTeamScript38100);
 			}
 		}
-		return TRUE;
+		return true;
 	}
 	else if( invVerb != FOLDERPAYMENTS_V ) {
 		inventry->clearCurrentItem();
 		theGame->handsOff();
 		curRoom->setScript(new StupidThornScript38100);
-		return TRUE;
+		return true;
 	}
 	else if( theVerb == DO_V ) {
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 HandOverFileScript38100::HandOverFileScript38100()
@@ -314,7 +314,7 @@ void Rm38200::init()
 
 int Rm38200::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -355,17 +355,17 @@ int VanHole38100::doVerb ( int theVerb )
 				curRoom->setScript(new ProcatTeamScript38100);
 			}
 		}
-		return TRUE;
+		return true;
 	}
 	else if ( theVerb == FOLDERCITATION_V || theVerb == DOSSIERZHIRONEV_V || theVerb == DOSSIERSHUSTAK_V || theVerb == FOLDERORDERS_V) {
 		inventry->clearCurrentItem();
 		theGame->handsOff();
 		curRoom->setScript(new StupidThornScript38100);
-		return TRUE;
+		return true;
 	}
 	else { 		//nothing will happen....must be a folder file from Max's drawer.
 	} 
-	return FALSE;
+	return false;
 */
 	if ( invVerb == FOLDERPAYMENTS_V) {
 		if(!GameFlag.test(fWahKa4)&& (snd38000->number != 38002 || snd38000->isPlaying()) )	{
@@ -381,18 +381,18 @@ int VanHole38100::doVerb ( int theVerb )
 				curRoom->setScript(new ProcatTeamScript38100);
 			}
 		}
-		return TRUE;
+		return true;
 	}
 	else if( invVerb != FOLDERPAYMENTS_V ) {
 		inventry->clearCurrentItem();
 		theGame->handsOff();
 		curRoom->setScript(new StupidThornScript38100);
-		return TRUE;
+		return true;
 	}
 	else if( theVerb == DO_V ) {
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -502,7 +502,7 @@ void Rm38300::init()
 
 int Rm38300::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit38300::SouthExit38300()
@@ -522,9 +522,9 @@ int SouthExit38300::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
  		theGame->newRoom(new Rm38400);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PegBullet38300::PegBullet38300()
@@ -550,9 +550,9 @@ int PegBullet38300::doVerb ( int theVerb )
 		inventry->items[iNEEDLEPACK]->activate();
 		new PegBulletInset38300();	
 		dispose();
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 PegBulletInset38300::PegBulletInset38300()
@@ -585,7 +585,7 @@ void Rm38400::init()
 
 int Rm38400::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit38400::SouthExit38400()
@@ -607,9 +607,9 @@ int SouthExit38400::doVerb ( int theVerb )
 		sound1->stop();
 // 		theGame->newRoom(new Rm96000);
 		theGame->newRoom(new Rm1000);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 NorthExit38400::NorthExit38400()
@@ -629,9 +629,9 @@ int NorthExit38400::doVerb ( int theVerb )
 {
 	if ( theVerb == DO_V ) {
 		theGame->newRoom(new Rm38300);
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 Rm38500::Rm38500()
@@ -656,7 +656,7 @@ void Rm38500::init()
 
 int Rm38500::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
  
 } // namespace Spycraft 

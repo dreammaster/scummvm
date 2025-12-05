@@ -22,12 +22,12 @@
 #ifndef SPYCRAFT_LOGIC_37000_H
 #define SPYCRAFT_LOGIC_37000_H
 
-#include "made.h"
-#include "game.h"
-#include "feature.h"
-#include "actor.h"
-#include "globals.h"
-#include "inset.h"
+#include "spycraft/game/made.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/feature.h"
+#include "spycraft/game/actor.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/inset.h"
 
 namespace Spycraft {
 

@@ -19,15 +19,15 @@
  *
  */
 
-#include "globals.h"
-#include "game.h"
-#include "verbs.h"
+#include "spycraft/game/globals.h"
+#include "spycraft/game/game.h"
+#include "spycraft/game/verbs.h"
 #include "views.h"
 #include "spycraft/logic/56100.h"
 #include "spycraft/logic/57000.h"
 #include "spycraft/logic/1000.h"
 #include "invent.h"
-#include "sound.h"
+#include "spycraft/game/sound.h"
 
 namespace Spycraft {
 
@@ -90,7 +90,7 @@ void Rm56100::init()
 
 int Rm56100::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 /*********************
@@ -121,9 +121,9 @@ int NorthExit56100::doVerb ( int theVerb )
 		if( GameFlag.test( fBSDoorUnlocked ))
 //			setScript( new DoorScript56100 );       //DEBUG wahka
 //			theGame->newRoom( new Rm56200 );		//try this
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 SouthExit56100::SouthExit56100()
@@ -143,9 +143,9 @@ int SouthExit56100::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm1000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -174,13 +174,13 @@ int Doorknob56100::doVerb( int theVerb )
 		inventry->clearCurrentItem();
 		theGame->newRoom( new Rm56101 );	
 ////	new DoorknobInset56100;
-		return TRUE;
+		return true;
 	}
 //	else if( theVerb == GUN_V ) {
 //		GameFlag.set( fBSDoorUnlocked ); //bkdr
-//		return TRUE;
+//		return true;
 //	}
-	return FALSE;
+	return false;
 }
 
 KnockDoor56100::KnockDoor56100()
@@ -208,13 +208,13 @@ int KnockDoor56100::doVerb( int theVerb )
 				GameFlag.clear(fWahKa71);
 			}
 		}
-		return TRUE;
+		return true;
 	}
 //	else if( theVerb == GUN_V ) {
 //		GameFlag.set( fBSDoorUnlocked ); //bkdr
-//		return TRUE;
+//		return true;
 //	}
-	return FALSE;
+	return false;
 }
 
 /*
@@ -238,9 +238,9 @@ int Door56100::doVerb( int theVerb )
 //			setScript( new DoorScript56100 );
 //			theGame->newRoom( new Rm56200 );		   
 			theGame->newRoom( new Rm57000 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 */
 /*******************************
@@ -291,12 +291,12 @@ int LockInsetFeature56100::doVerb ( int theVerb )
 		inventry->clearCurrentItem();
 		theGame->handsOff();
 		curRoom->setScript(new PickLockScript56100);
-		return TRUE;
+		return true;
 	}
 	else if ( theVerb == DO_V ) {
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*******************************
@@ -372,7 +372,7 @@ void Rm56200::init()
 
 int Rm56200::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 RoomEnter56200::RoomEnter56200()
@@ -425,7 +425,7 @@ void Rm56101::init()
 
 int Rm56101::handleEvent ( MADEEventStamp *event )
 {
-	return FALSE;
+	return false;
 }
 
 SouthExit56101::SouthExit56101()
@@ -445,9 +445,9 @@ int SouthExit56101::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm56100 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 WestExit56101::WestExit56101()
@@ -467,9 +467,9 @@ int WestExit56101::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm56100 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 EastExit56101::EastExit56101()
@@ -489,9 +489,9 @@ int EastExit56101::doVerb( int theVerb )
 {
 	if( theVerb == DO_V ) {
     	theGame->newRoom( new Rm56100 );
-    	return TRUE;
+    	return true;
 	}
-	return FALSE;
+	return false;
 }
 
 OpenBSLock56101::OpenBSLock56101()
@@ -517,7 +517,7 @@ int OpenBSLock56101::doVerb( int theVerb )
 		inventry->clearCurrentItem();
 		theGame->handsOff();
 		curRoom->setScript(new PickLockScript56100);
-		return TRUE;
+		return true;
 	}
 	else if ( invVerb != LOCKPICK_V ){
 		if( snd56100->number != 36021  || !snd56100->isPlaying()) {
@@ -526,10 +526,10 @@ int OpenBSLock56101::doVerb( int theVerb )
 		}
 	}
 	else if ( theVerb == DO_V ) {
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
  
 } // namespace Spycraft 
