@@ -23,9 +23,9 @@
 #include "game.h"
 #include "verbs.h"
 #include "views.h"
-#include "36100.h"
-#include "36000.h"
-#include "36300.h"
+#include "spycraft/logic/36100.h"
+#include "spycraft/logic/36000.h"
+#include "spycraft/logic/36300.h"
 #include "flag.h"
 #include "movie.h"
 

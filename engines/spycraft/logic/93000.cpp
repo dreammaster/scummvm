@@ -38,14 +38,14 @@
 #include "views.h"
 #include "flag.h"
 #include "invent.h"
-#include "93000.h"
+#include "spycraft/logic/93000.h"
 #include "movie.h"
-#include "90000.h"
-#include "60000.h"
+#include "spycraft/logic/90000.h"
+#include "spycraft/logic/60000.h"
 #include "sound.h"
 #include "vlink.h"
-#include "1000.h"
-#include "95200.h"
+#include "spycraft/logic/1000.h"
+#include "spycraft/logic/95200.h"
 
 namespace Spycraft {
 

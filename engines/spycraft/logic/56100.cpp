@@ -23,9 +23,9 @@
 #include "game.h"
 #include "verbs.h"
 #include "views.h"
-#include "56100.h"
-#include "57000.h"
-#include "1000.h"
+#include "spycraft/logic/56100.h"
+#include "spycraft/logic/57000.h"
+#include "spycraft/logic/1000.h"
 #include "invent.h"
 #include "sound.h"
 

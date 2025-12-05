@@ -30,8 +30,8 @@
 #include "timer.h"
 #include "vlink.h"
 #include "plistobj.h"
-#include "2000.h"
-#include "1000.h"
+#include "spycraft/logic/2000.h"
+#include "spycraft/logic/1000.h"
 
 namespace Spycraft {
 

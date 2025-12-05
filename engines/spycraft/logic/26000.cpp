@@ -24,8 +24,8 @@
 #include "verbs.h"
 #include "views.h"
 #include "roomsnd.h"
-#include "26000.h"
-#include "1000.h"
+#include "spycraft/logic/26000.h"
+#include "spycraft/logic/1000.h"
 #include "web.h"
 
 namespace Spycraft {
