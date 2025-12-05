@@ -1,11 +1,23 @@
-/*********************************************
-* Cpp source file.
-* Blake's patio
-* Rooms: 80000, 80100, 80200        
-* Copyright Activision 1995
-* Started by Tom DeSalvo 
-* Continued by: Daniel Kinzek   July, 1995
-**********************************************/
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #include "globals.h"
 #include "game.h"
@@ -20,6 +32,8 @@
 #include "roomsnd.h"
 #include "advcurs.h"
 //#include "timer.h"
+
+namespace Spycraft {
 
 /*********************
 *
@@ -951,3 +965,5 @@ void	Patio80000::touchObject( int whichObject )
 		firstPass = TRUE;
 	}
  }
+ 
+} // namespace Spycraft 

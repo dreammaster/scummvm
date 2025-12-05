@@ -1,7 +1,23 @@
-//Started by Tom DeSalvo
-//Ext. Street Kneecap
-//Copyright Activision 1995
-//Finished by Ka Wah
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #include "globals.h"
 #include "game.h"
@@ -16,6 +32,8 @@
 #include "41100.h"   //rm41300
 #include "flag.h"
 #include "movie.h"
+
+namespace Spycraft {
 
 #define CRSBLINK_SPEED 5
 
@@ -229,3 +247,5 @@ void EnterBadmanVanScript37000::changeState( int newState )
 		theGame->newRoom(new Rm41500);
 	END
 }
+ 
+} // namespace Spycraft 
