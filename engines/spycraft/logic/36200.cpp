@@ -23,8 +23,8 @@
 #include "game.h"
 #include "verbs.h"
 #include "views.h"
-#include "36200.h"
-#include "36300.h"
+#include "spycraft/logic/36200.h"
+#include "spycraft/logic/36300.h"
 #include "sound.h"
 
 namespace Spycraft {

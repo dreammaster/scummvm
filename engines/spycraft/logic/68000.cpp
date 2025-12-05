@@ -23,9 +23,9 @@
 #include "game.h"
 #include "verbs.h"
 #include "views.h"
-#include "68000.h"
-#include "1000.h"
-#include "69000.h"
+#include "spycraft/logic/68000.h"
+#include "spycraft/logic/1000.h"
+#include "spycraft/logic/69000.h"
 #include "flag.h"
 
 namespace Spycraft {

@@ -27,8 +27,8 @@
 #include "movie.h"
 #include "timer.h"
 #include "vlink.h"
-#include "18000.h"				   
-#include "1000.h"
+#include "spycraft/logic/18000.h"				   
+#include "spycraft/logic/1000.h"
 
 namespace Spycraft {
 

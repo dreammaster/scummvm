@@ -19,7 +19,7 @@
  *
  */
 
-#include "95200.h"
+#include "spycraft/logic/95200.h"
 
 namespace Spycraft {
 

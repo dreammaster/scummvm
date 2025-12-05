@@ -23,13 +23,13 @@
 #include "game.h"
 #include "verbs.h"
 #include "views.h"
-#include "37000.h"
-#include "1000.h"
-//#include "38000.h"
-//#include "41000.h"
-//#include "39000.h"
-//#include "37100.h"
-#include "41100.h"   //rm41300
+#include "spycraft/logic/37000.h"
+#include "spycraft/logic/1000.h"
+//#include "spycraft/logic/38000.h"
+//#include "spycraft/logic/41000.h"
+//#include "spycraft/logic/39000.h"
+//#include "spycraft/logic/37100.h"
+#include "spycraft/logic/41100.h"   //rm41300
 #include "flag.h"
 #include "movie.h"
 

@@ -23,9 +23,9 @@
 #include "game.h"
 #include "verbs.h"
 #include "views.h"
-#include "32100.h"
-#include "32200.h"
-#include "32000.h"
+#include "spycraft/logic/32100.h"
+#include "spycraft/logic/32200.h"
+#include "spycraft/logic/32000.h"
 
 namespace Spycraft {
 

@@ -25,11 +25,11 @@
 #include "flag.h"
 #include "movie.h"
 #include "roomsnd.h"
-#include "79000.h"
-#include "1000.h"
-#include "18000.h"
-//#include "1085.h"
-#include "60000.h"
+#include "spycraft/logic/79000.h"
+#include "spycraft/logic/1000.h"
+#include "spycraft/logic/18000.h"
+//#include "spycraft/logic/1085.h"
+#include "spycraft/logic/60000.h"
 
 namespace Spycraft {
 
