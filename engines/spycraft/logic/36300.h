@@ -1,7 +1,23 @@
-//Started by Tom DeSalvo
-//Foster's desk, view of drawers.
-//Copyright Activision 1995
-//Finished by Ka Wah
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef SPYCRAFT_LOGIC_36300_H
 #define SPYCRAFT_LOGIC_36300_H
@@ -14,21 +30,23 @@
 #include "flag.h"
 #include "invent.h"
 
+namespace Spycraft {
+
 class Rm36300 : public Room
 {
 public:
 	Rm36300();
 	~Rm36300();
 	void init();
-	int handleEvent ( MADEEventStamp * );
+	int handleEvent(MADEEventStamp *);
 };
 
 class SouthExit36300 : public ExitFeature
 {
 public:
 	SouthExit36300();
-  void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 /* features */
@@ -36,19 +54,19 @@ class Drawer36300 : public Feature
 {
 public:
 	Drawer36300();
-	void respond( void );
-	int doVerb( int );
-	int	playerHasAllFolders( Invent *inventory );
+	void respond(void);
+	int doVerb(int);
+	int	playerHasAllFolders(Invent *inventory);
 };
 
 /* insets */
-class DrawerWFolderInset36300 : public Inset		
+class DrawerWFolderInset36300 : public Inset
 {
 public:
 	DrawerWFolderInset36300();
 };
 /*
-class EmptyDrawerInset36300 : public Inset		
+class EmptyDrawerInset36300 : public Inset
 {
 public:
 	EmptyDrawerInset36300();
@@ -110,15 +128,15 @@ public:
 	Rm36301();
 	~Rm36301();
 	void init();
-	int handleEvent ( MADEEventStamp * );
+	int handleEvent(MADEEventStamp *);
 };
 
 class SouthExit36301 : public ExitFeature
 {
 public:
 	SouthExit36301();
-  void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class Rm36302 : public Room
@@ -127,23 +145,23 @@ public:
 	Rm36302();
 	~Rm36302();
 	void init();
-	int handleEvent ( MADEEventStamp * );
+	int handleEvent(MADEEventStamp *);
 };
 
 class SouthExit36302 : public ExitFeature
 {
 public:
 	SouthExit36302();
-  void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class OpenDrawer36300 : public Feature
 {
 public:
 	OpenDrawer36300();
-	void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
 
 class Rm36303 : public Room
@@ -152,15 +170,17 @@ public:
 	Rm36303();
 	~Rm36303();
 	void init();
-	int handleEvent ( MADEEventStamp * );
+	int handleEvent(MADEEventStamp *);
 };
 
 class SouthExit36303 : public ExitFeature
 {
 public:
 	SouthExit36303();
-  void respond( void );
-	int doVerb( int );
+	void respond(void);
+	int doVerb(int);
 };
+
+} // namespace Spycraft
 
 #endif
