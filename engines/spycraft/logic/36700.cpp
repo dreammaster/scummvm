@@ -242,3 +242,5 @@ void DowntoInterrogation::doit()
 	GameFlag.set(fStartInterrogation);		//Start with the Interrogation first
 	DItem::doit();
 }
+ 
+} // namespace Spycraft 
