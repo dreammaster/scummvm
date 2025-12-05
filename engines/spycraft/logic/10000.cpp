@@ -25,9 +25,9 @@
 #include "views.h"
 #include "flag.h"
 #include "roomsnd.h"
-#include "10000.h"
-#include "12000.h"
-#include "1000.h"
+#include "spycraft/logic/10000.h"
+#include "spycraft/logic/12000.h"
+#include "spycraft/logic/1000.h"
 
 namespace Spycraft {
 

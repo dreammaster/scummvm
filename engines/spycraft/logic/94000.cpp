@@ -23,7 +23,7 @@
 #include "game.h"
 #include "verbs.h"
 #include "views.h"
-#include "94000.h"
+#include "spycraft/logic/94000.h"
 #include "web.h"
 #include "target.h"
 #include "intrpuzz.h"					 

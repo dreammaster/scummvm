@@ -23,8 +23,8 @@
 #include "game.h"
 #include "verbs.h"
 #include "views.h"
-#include "32300.h"
-#include "32200.h"
+#include "spycraft/logic/32300.h"
+#include "spycraft/logic/32200.h"
 //#include "movie.h"
 //#include "vlink.h"
 

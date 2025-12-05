@@ -30,8 +30,8 @@
 #include "image.h"
 #include "html.h"
 #include "pcscreen.h"
-#include "5000.h"
-#include "1000.h"
+#include "spycraft/logic/5000.h"
+#include "spycraft/logic/1000.h"
 
 namespace Spycraft {
 

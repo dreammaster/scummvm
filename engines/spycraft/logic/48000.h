@@ -27,7 +27,7 @@
 #include "feature.h"
 #include "actor.h"
 #include "globals.h"
-//#include "47000.h"
+//#include "spycraft/logic/47000.h"
 #include "inset.h"
 #include "flag.h"
 

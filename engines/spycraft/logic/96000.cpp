@@ -25,8 +25,8 @@
 #include "views.h"
 #include "sound.h"
 #include "invent.h"
-#include "60000.h"
-#include "96000.h"
+#include "spycraft/logic/60000.h"
+#include "spycraft/logic/96000.h"
 
 namespace Spycraft {
 
