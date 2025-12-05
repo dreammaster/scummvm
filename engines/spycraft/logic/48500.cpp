@@ -1,0 +1,148 @@
+//Started by Ka Wah
+//Dialog - Yuri talk about Onyx
+//Copyright Activision 1995
+//Finished by Ka Wah
+
+#include "globals.h"
+#include "game.h"
+#include "verbs.h"
+#include "views.h"
+#include "48500.h"
+#include "48000.h"
+#include "1000.h"
+//#include "45000.h"
+#include "flag.h"
+#include "movie.h"
+#include "vlink.h"
+#include "invent.h"
+
+Dialog* 	yuriaboutonyxDialog1;
+Dialog*		yuriaboutonyxDialog2;
+Dialog*		yuriaboutonyxDialog3;
+
+DItem* ciafileHowit;
+DItem* knowWherethis;
+
+enum	
+{
+	CIAFILEHOWIT,
+	KNOWWHERETHIS,
+};
+
+/*********************
+*
+*		Room Code 
+*
+**********************/
+
+extern Intrface* intrface;
+extern DialTree* dialogTree;
+
+Rm48500::Rm48500()
+{
+	name = "Rm48500";
+	show_style = VE_FLIP;
+}
+
+void Rm48500::cue( void )
+{
+//	theMovie->fromTo(199, 200);				
+//	theMovie->play("48004.avi", this, 0, 0, 0);
+}
+
+Rm48500::~Rm48500()
+{ 
+	if( GameFlag.test( fDisposeDialog48500 )) {
+		yuriaboutonyxDialog1->dispose();
+		yuriaboutonyxDialog2->dispose();
+		yuriaboutonyxDialog3->dispose();
+
+		GameFlag.clear( fDisposeDialog48500 );
+	}	//endif
+}
+	
+void Rm48500::init()
+{
+///	drawPic( 1 );
+    Room::init();
+  
+  	intrface->show();
+///	theGame->handsOn();
+
+	setScript( new EnterScript48500 );
+}
+
+int Rm48500::handleEvent ( MADEEventStamp *event )
+{
+	return FALSE;
+}
+
+
+/*******************************
+ *
+ *	Scripts
+ *
+/*******************************/
+
+EnterScript48500::EnterScript48500()
+{
+	name = "EnterScript48500"; 
+}
+
+void EnterScript48500::changeState( int newState )
+{
+	switchTo
+		GameFlag.set(fDisposeDialog48500);
+///		theGame->handsOff();
+		intrface->disable();
+		theMovie->fromTo(0, 200);				
+		theMovie->play("48004.avi", this, 0, 1, 0);
+		inventry->get(iONYX_DOSSIER);
+	END
+	BEG
+		curRoom->drawPic( -1 );
+		new Yellow(98638);
+		ticks = 2;
+	END
+	BEG
+		theMovie->fromTo(201, 203);				
+		theMovie->play("48004.avi", this, 0, 0, 0);
+	END
+	BEG
+///		curRoom->cue();
+///		theGame->handsOn();
+
+		dialogTree = new DialTree;
+		yuriaboutonyxDialog1 = new Dialog;
+		yuriaboutonyxDialog2 = new Dialog;
+		yuriaboutonyxDialog3 = new Dialog;
+  
+		ciafileHowit = new DItem;
+		ciafileHowit->addInfo(48500, CIAFILEHOWIT, yuriaboutonyxDialog2);
+		knowWherethis = new DItem;
+		knowWherethis->addInfo(48500, KNOWWHERETHIS, yuriaboutonyxDialog3 );
+
+		yuriaboutonyxDialog1->addMovieInfo(0, 200, 199, 200);
+		yuriaboutonyxDialog2->addMovieInfo(201, 427, 426, 427);
+		yuriaboutonyxDialog3->addMovieInfo(428, 635, 634, 635);
+
+		yuriaboutonyxDialog1->add(ciafileHowit);
+		yuriaboutonyxDialog2->add(knowWherethis);
+
+		dialogTree->rootNode = yuriaboutonyxDialog1;
+		dialogTree->resourceID = "48004.avi";
+		dialogTree->show(this);
+	END
+
+	BEG
+		GameFlag.set(fOnceOnyx48000);
+		GameFlag.clear(fDCK2);					//make Yasevno not available in travelink			 
+		intrface->enable();
+		theMovie->caller = 0;
+		theMovie->stop();
+////	new VLink( "48005.avi", fHeidelbergAvailable, 60 );    //DEBUG, vlink681, Holt finds Onyx
+//		theGame->newRoom( new Rm45000 );
+		theGame->newRoom( new Rm1000 );
+	END
+}
+	
