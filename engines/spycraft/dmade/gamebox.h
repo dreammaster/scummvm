@@ -25,7 +25,7 @@
 namespace Spycraft {
 
 extern int sfxGameBox(void);
-extern int sfxRunProgram(char *programName);
+extern int sfxRunProgram(const char *programName);
 extern void sfxEnableReplay(int replay);
 extern void sfxEnableSaveGame(int saveGame);
 extern void sfxEnableRestoreGame(int restoreGame);

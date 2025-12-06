@@ -22,15 +22,15 @@
 #include "spycraft/game/globals.h"
 #include "spycraft/game/game.h"
 #include "spycraft/game/verbs.h"
-#include "views.h"
-#include "invent.h"
+#include "spycraft/game/views.h"
+#include "spycraft/game/invent.h"
 #include "spycraft/game/movie.h"
 #include "spycraft/logic/80000.h"
 #include "spycraft/logic/1000.h"
 #include "spycraft/game/flag.h"												   
 #include "spycraft/game/vlink.h"
 #include "spycraft/game/roomsnd.h"
-#include "advcurs.h"
+#include "spycraft/dmade/advcursor.h"
 //#include "spycraft/game/timer.h"
 
 namespace Spycraft {
@@ -602,7 +602,7 @@ void IntroScript80000::changeState ( int newState )
 
 void BlakeReturnsScript80000::changeState( int newState )
 {
-	char *rmName;
+	const char *rmName;
 
 	switchTo
 		soundptr = new Sound;
@@ -802,7 +802,7 @@ void BlakeDialogScript80000::changeState( int newState )
 		BlakeDialog7->dispose();
 		BlakeDialog8->dispose();
 		if( patio80000 != NULL )
-			patio80000->dispose;
+			patio80000->dispose();
 		anyElseObj->dispose();
 		sfxUnlockRes( 960, RES_ATS );
 		ASSERT( waitingTimer == NULL, 0 );

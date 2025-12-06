@@ -20,7 +20,7 @@
  */
 
 #include "spycraft/logic/95100.h"
-#include "html.h"
+#include "spycraft/game/html.h"
 
 namespace Spycraft {
 

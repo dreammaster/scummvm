@@ -27,7 +27,7 @@
 #include "spycraft/game/actor.h"
 #include "spycraft/game/globals.h"
 #include "spycraft/game/inset.h"
-#include "room1.h"
+#include "spycraft/game/room1.h"
 
 namespace Spycraft {
 

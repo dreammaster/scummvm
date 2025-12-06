@@ -22,8 +22,8 @@
 #include "spycraft/game/globals.h"
 #include "spycraft/game/game.h"
 #include "spycraft/game/verbs.h"
-#include "views.h"
-#include "invent.h"
+#include "spycraft/game/views.h"
+#include "spycraft/game/invent.h"
 #include "spycraft/game/flag.h"
 #include "spycraft/game/movie.h"
 #include "spycraft/logic/7000.h"
@@ -31,7 +31,7 @@
 #include "spycraft/logic/95000.h"
 #include "spycraft/logic/95100.h"
 #include "spycraft/logic/1000.h"
-#include "invent.h"
+#include "spycraft/game/invent.h"
 #include "spycraft/game/roomsnd.h"
 
 namespace Spycraft {

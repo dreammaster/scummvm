@@ -22,13 +22,13 @@
 #include "spycraft/game/globals.h"
 #include "spycraft/game/game.h"
 #include "spycraft/game/verbs.h"
-#include "views.h"
+#include "spycraft/game/views.h"
 #include "spycraft/logic/56000.h"
 #include "spycraft/logic/56100.h"
 #include "spycraft/logic/57000.h"
 #include "spycraft/logic/1000.h"		 
 #include "spycraft/game/flag.h"
-#include "invent.h"
+#include "spycraft/game/invent.h"
 #include "spycraft/game/sound.h"
 
 namespace Spycraft {
