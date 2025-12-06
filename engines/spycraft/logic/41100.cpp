@@ -22,7 +22,7 @@
 #include "spycraft/game/globals.h"
 #include "spycraft/game/game.h"
 #include "spycraft/game/verbs.h"
-#include "views.h"
+#include "spycraft/game/views.h"
 //#include "spycraft/logic/41000.h"
 #include "spycraft/logic/41100.h"
 #include "spycraft/logic/37000.h"
@@ -30,9 +30,9 @@
 #include "spycraft/logic/1000.h"
 #include "spycraft/game/flag.h"
 #include "spycraft/game/vlink.h"
-#include "badman.h"
+#include "spycraft/game/badman.h"
 #include "spycraft/logic/60000.h"
-#include "invent.h"
+#include "spycraft/game/invent.h"
 
 namespace Spycraft {
 

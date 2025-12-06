@@ -58,7 +58,7 @@ extern HWND hGameWnd;
 bool CALLBACK FindRunningPrograms(HWND, LPARAM);
 intptr GameBoxProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
-int sfxRunProgram(char *programName) {
+int sfxRunProgram(const char *programName) {
 #ifdef TODO
 	int ret;
 	STARTUPINFO startInfo;

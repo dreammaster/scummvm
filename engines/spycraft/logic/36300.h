@@ -28,7 +28,7 @@
 #include "spycraft/game/actor.h"
 #include "spycraft/game/inset.h"
 #include "spycraft/game/flag.h"
-#include "invent.h"
+#include "spycraft/game/invent.h"
 
 namespace Spycraft {
 

@@ -22,26 +22,26 @@
 #include "spycraft/game/globals.h"
 #include "spycraft/game/game.h"
 #include "spycraft/game/verbs.h"
-#include "views.h"
+#include "spycraft/game/views.h"
 #include "spycraft/game/feature.h"
 #include "spycraft/logic/90000.h"
 #include "spycraft/logic/1000.h"
 #include "spycraft/game/flag.h"
-#include "web.h"
-#include "html.h"
+#include "spycraft/game/web.h"
+#include "spycraft/game/html.h"
 #include "spycraft/game/plistobj.h"
-#include "email.h"
-#include "target.h"
-#include "intrpuzz.h"
+#include "spycraft/game/email.h"
+#include "spycraft/game/target.h"
+#include "spycraft/game/interface_puzzle.h"
 #include "spycraft/logic/60000.h"
 #include "spycraft/logic/91000.h"
-#include "save.h"
+#include "spycraft/game/save.h"
 
-//DIRECT #include "mcimovie.h"
+//DIRECT #include "spycraft/dmade/mcimovie.h"
 #ifdef DIRECTX
 #include "advmovie.h"
 #else
-#include "mcimovie.h"
+#include "spycraft/dmade/mcimovie.h"
 #endif
 
 namespace Spycraft {
@@ -63,8 +63,8 @@ extern BlinkCursor* normalCursor;
 extern SouthCursor* southCursor;
 extern IntrPuzz* intrpuzz;
 extern int canSaveColby; 
-int ExitPermission = true;
-int NoTimeLeft = false;
+bool ExitPermission = true;
+bool NoTimeLeft = false;
 
 extern short restoring; 
 extern SaveGame* saveGame;

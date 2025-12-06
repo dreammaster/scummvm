@@ -41,7 +41,75 @@ MODULE_OBJS = \
 	game/game.o \
 	game/list.o \
 	game/user.o \
-	logic/1000.o
+	logic/1000.o \
+	logic/10000.o \
+	logic/1070.o \
+	logic/1075.o \
+	logic/1090.o \
+	logic/12000.o \
+	logic/1270.o \
+	logic/18000.o \
+	logic/2000.o \
+	logic/23000.o \
+	logic/23100.o \
+	logic/24000.o \
+	logic/25000.o \
+	logic/25100.o \
+	logic/26000.o \
+	logic/27000.o \
+	logic/32000.o \
+	logic/32100.o \
+	logic/32200.o \
+	logic/32300.o \
+	logic/35000.o \
+	logic/35200.o \
+	logic/35300.o \
+	logic/35400.o \
+	logic/35700.o \
+	logic/36000.o \
+	logic/36100.o \
+	logic/36200.o \
+	logic/36300.o \
+	logic/36400.o \
+	logic/36500.o \
+	logic/36600.o \
+	logic/36700.o \
+	logic/37000.o \
+	logic/37200.o \
+	logic/37300.o \
+	logic/38000.o \
+	logic/41100.o \
+	logic/48000.o \
+	logic/48400.o \
+	logic/48500.o \
+	logic/5000.o \
+	logic/50000.o \
+	logic/53000.o \
+	logic/56000.o \
+	logic/56100.o \
+	logic/57000.o \
+	logic/57100.o \
+	logic/60000.o \
+	logic/68000.o \
+	logic/69000.o \
+	logic/69100.o \
+	logic/69200.o \
+	logic/69300.o \
+	logic/69400.o \
+	logic/69500.o \
+	logic/7000.o \
+	logic/79000.o \
+	logic/80000.o \
+	logic/90000.o \
+	logic/91000.o \
+	logic/92000.o \
+	logic/93000.o \
+	logic/94000.o \
+	logic/95000.o \
+	logic/95100.o \
+	logic/95200.o \
+	logic/95300.o \
+	logic/96000.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_SPYCRAFT), DYNAMIC_PLUGIN)

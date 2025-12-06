@@ -73,7 +73,7 @@ public:
 	int     left;
 	int     bottom;
 	int     right;
-	int 	  hasBeenChosen;
+	bool 	  hasBeenChosen;
 	Dialog *myDialog;
 	Dialog *nextDialog;
 	int 	  iconItem;
@@ -102,7 +102,7 @@ public:
 class DialTree : public Object {
 public:
 	int negativeParam;
-	char *resourceID;
+	const char *resourceID;
 	Dialog *rootNode;
 	Dialog *curNode;
 	char **myArray;
