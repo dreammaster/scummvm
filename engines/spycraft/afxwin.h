@@ -32,6 +32,9 @@ namespace MFC {
 using namespace Common::MFC;
 } // namespace MFC
 
+#undef ASSERT
+#define ASSERT(expr, code)  do { if (!(expr)) error("assert error %d", code); } while(0)
+
 } // namespace Spycraft
 
 #endif

@@ -19,40 +19,20 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_PRINT_H
-#define SPYCRAFT_GAME_PRINT_H
+#ifndef SPYCRAFT_GAME_PUZZTEST_H
+#define SPYCRAFT_GAME_PUZZTEST_H
 
-#include "spycraft/game/made.h"
 #include "spycraft/game/object.h"
 
 namespace Spycraft {
 
-class Print : public Object {
+class HurrySterling : public Object
+{
 public:
-	int16 font = 0;
-	int16 size = 0;
-	styleField style = 0;
-	int32 fore_color = 0;
-	int32 back_color = 0;
-	int32 high_color = 0;
-	int height = 0;
-	int width = 0;
-	int x = 0;
-	int y = 0;
-	const char *myString = nullptr;
-	int priority = 0;
-	rsrcID textNum = 0;
-	bufferNum textBuffer = 0;
-
-	Print();
-	bool init(const char *format);
-	bool init(void);
-	bool highlight(bool hiOrLow);
-	virtual void doit(void);
-	void erase(void);
-	void addToPic(void);
-	void dispose(void);
+	void cue(void);
 };
+
+int	testKATAndPEG(void);
 
 } // namespace Spycraft
 

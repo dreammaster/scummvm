@@ -215,7 +215,7 @@ void Colby::init() {
 		char currentDir[MAX_PATH];
 		unsigned long currentDirLength = MAX_PATH;
 		GetCurrentDirectory(currentDirLength, currentDir);
-		strcat(currentDir, "\\resource\\");
+		Common::strcat_s(currentDir, "\\resource\\");
 		ACTSOCK_SetParentHWND(hGameWnd);
 		ACTSOCK_EnableErrorDialogs(true);
 		ACTSOCK_FTPSetTimeouts(75000, 75000);

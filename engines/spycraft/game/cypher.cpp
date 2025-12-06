@@ -612,7 +612,7 @@ void Cypher::loadDecode ( int id)
 		codePrint->x = theX;
 		codePrint->y = theY;
 		codePrint->size = 8;
-		//strcpy (codePrint->myString, tag->data[index] );
+		//Common::strcpy_s (codePrint->myString, tag->data[index] );
 		codePrint->fore_color = TEXT_COLOR_BLACK;
 
 		codePrint->init(tag->data[index]);
@@ -826,8 +826,8 @@ int CodesPullDown::handleEvent(MADEEventStamp* event)
 			{
 
 				case MONOPD:
-					strcpy(message, "      Key: ");
-					strcat(message, "MonoAlpha");
+					Common::strcpy_s(message, "      Key: ");
+					Common::strcat_s(message, "MonoAlpha");
 					if(messageUp)
 					{
 						codeinfo->dispose();
@@ -845,8 +845,8 @@ int CodesPullDown::handleEvent(MADEEventStamp* event)
 					break;
 
 				case POLYPD:
-					strcpy(message, "      Key: ");
-					strcat(message, "PolyAlpha");
+					Common::strcpy_s(message, "      Key: ");
+					Common::strcat_s(message, "PolyAlpha");
 					if(messageUp)
 					{
 						codeinfo->dispose();
@@ -1008,27 +1008,27 @@ int BookKeyPullDown::handleEvent(MADEEventStamp* event)
 						{
 							if(GameFlag.test(fGotOldElectBook))
 							{
-								strcpy(bealeKeys[8][0], "Croak! goeth the Raven"); 
-								strcpy(bealeKeys[8][1], "The Khan and I"); 
-								strcpy(bealeKeys[8][2], "The Rabid Hound"); 
+								Common::strcpy_s(bealeKeys[8][0], "Croak! goeth the Raven"); 
+								Common::strcpy_s(bealeKeys[8][1], "The Khan and I"); 
+								Common::strcpy_s(bealeKeys[8][2], "The Rabid Hound"); 
 								keypd = new KeyPullDown(229, 270, 22, 3, BIGHILIGHT);
 							}
 							else
 							{
-								strcpy(bealeKeys[8][0], "Croak! goeth the Raven"); 
-								strcpy(bealeKeys[8][1], "The Rabid Hound"); 
+								Common::strcpy_s(bealeKeys[8][0], "Croak! goeth the Raven"); 
+								Common::strcpy_s(bealeKeys[8][1], "The Rabid Hound"); 
 								keypd = new KeyPullDown(229, 270, 19, 2, BIGHILIGHT);
 							}
 						}
 						else if(GameFlag.test(fGotOldElectBook))
 						{
-							strcpy(bealeKeys[8][0], "The Khan and I"); 
-							strcpy(bealeKeys[8][1], "The Rabid Hound"); 
+							Common::strcpy_s(bealeKeys[8][0], "The Khan and I"); 
+							Common::strcpy_s(bealeKeys[8][1], "The Rabid Hound"); 
 							keypd = new KeyPullDown(229, 270, 20, 2, BIGHILIGHT);
 						}
 						else
 						{
-							strcpy(bealeKeys[8][0], "The Rabid Hound"); 
+							Common::strcpy_s(bealeKeys[8][0], "The Rabid Hound"); 
 							keypd = new KeyPullDown(229, 270, 16, 1, BIGHILIGHT);
 						}
 					 	currentCode = OTHER;
@@ -1038,20 +1038,20 @@ int BookKeyPullDown::handleEvent(MADEEventStamp* event)
 					{
 						if(GameFlag.test(fGotOldElectBook))
 						{
-							strcpy(bealeKeys[8][0], "Croak! goeth the Raven"); 
-							strcpy(bealeKeys[8][1], "The Khan and I"); 
+							Common::strcpy_s(bealeKeys[8][0], "Croak! goeth the Raven"); 
+							Common::strcpy_s(bealeKeys[8][1], "The Khan and I"); 
 							keypd = new KeyPullDown(229, 270, 21, 2, BIGHILIGHT);
 						}
 						else
 						{
-							strcpy(bealeKeys[8][0], "Croak! goeth the Raven"); 
+							Common::strcpy_s(bealeKeys[8][0], "Croak! goeth the Raven"); 
 							keypd = new KeyPullDown(229, 270, 17, 1, BIGHILIGHT);
 						}
 					 	currentCode = OTHER;
 					}
 					else
 					{
-						strcpy(bealeKeys[8][0], "The Khan and I"); 
+						Common::strcpy_s(bealeKeys[8][0], "The Khan and I"); 
 						keypd = new KeyPullDown(229, 270, 18, 1, BIGHILIGHT);
 					 	currentCode = OTHER;
 					}	
@@ -1080,12 +1080,12 @@ void KeyPullDown::displayInfo()
 {
 	char message[80];
 
-	strcpy(message, "Code: ");
-	strcat(message, codes[codespd->currentCode]);
-	strcat(message, "  Key: ");
+	Common::strcpy_s(message, "Code: ");
+	Common::strcat_s(message, codes[codespd->currentCode]);
+	Common::strcat_s(message, "  Key: ");
 	if(bookspd)
 	{
-		strcat(message, bealeKeys[bookspd->currentCode][currentKey]);
+		Common::strcat_s(message, bealeKeys[bookspd->currentCode][currentKey]);
 		if(bookspd->currentCode == OTHER)
 		{
 			if(strcmp(bealeKeys[bookspd->currentCode][currentKey], "Croak! goeth the Raven") == 0)
@@ -1105,7 +1105,7 @@ void KeyPullDown::displayInfo()
 	}
 	else
 	{
-		strcat(message, keys[codespd->currentCode][currentKey]);
+		Common::strcat_s(message, keys[codespd->currentCode][currentKey]);
 		thisCode = codespd->currentCode;	   		
 	}
 	glCurrentCode = thisCode;  //we need to set this for dos version, thisCode is getting trashed

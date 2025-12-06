@@ -158,21 +158,21 @@ public:
 
 class ShootBack : public View {
 protected:
-	char *name;
+	const char *name;
 public:
 	ShootBack(int backnum);
 };
 
 class ShootText : public View {
 protected:
-	char *name;
+	const char *name;
 public:
 	ShootText();
 };
 
 class Grid : public View {
 protected:
-	char *name;
+	const char *name;
 public:
 	Grid();
 	int doVerb(int);
@@ -180,7 +180,7 @@ public:
 
 class Rings : public Prop {
 protected:
-	char *name;
+	const char *name;
 public:
 	CursorTrap *trap;
 	Rings();
@@ -190,7 +190,7 @@ public:
 
 class Arrow : public View {
 protected:
-	char *name;
+	const char *name;
 public:
 	ExitFeature *exit;
 	Arrow(int start_loop, int start_x, int start_y, ExitFeature *thisexit);
@@ -199,27 +199,27 @@ public:
 
 class me : public View {
 protected:
-	char *name;
+	const char *name;
 public:
 	me();
 };
 
 class LeftHP : public View {
 protected:
-	char *name;
+	const char *name;
 public:
 	LeftHP();
 };
 class RightHP : public View {
 protected:
-	char *name;
+	const char *name;
 public:
 	RightHP();
 };
 
 class bea : public View {
 protected:
-	char *name;
+	const char *name;
 public:
 	bea();
 	bea(int theX, int theY);
@@ -227,14 +227,14 @@ public:
 
 class eneme : public View {
 protected:
-	char *name;
+	const char *name;
 public:
 	eneme();
 };
 
 class Gunman : public Prop {
 protected:
-	char *name;
+	const char *name;
 public:
 	int dead;
 	Sound *scream;

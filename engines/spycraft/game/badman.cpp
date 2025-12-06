@@ -25,7 +25,7 @@
 #include "spycraft/dmade/advres.h"
 #include "spycraft/game/flag.h"							   														    
 #include "spycraft/game/badman.h"					 
-#include "spycraft/game/advscren.h"
+#include "spycraft/dmade/advscreen.h"
 
 namespace Spycraft {
 
@@ -110,7 +110,6 @@ BadMan::BadMan()
 											 
 void BadMan::init(int pic_num)
 {
-	int count = 0;	
 //	usedbutton = 		true; 
 	
 	micOpen = 			false;	
@@ -532,7 +531,7 @@ void SecondTab::activate(void)
 
 void Tactical::activate(void)
 {
-	int x = 0;
+	int xp = 0;
 	int count = 0;
 	Floor * floor = ((BadMan *)intrpuzz)->Floors[((BadMan *)intrpuzz)->curFloorNum];
 	Movement * strike;
@@ -542,12 +541,12 @@ void Tactical::activate(void)
 	if (oakalydokaly)
 	{	
 		sfxPlaySound (519,100,64,64,NULL);
-		for ( x = 0; x < 20; x++ ) 
+		for ( xp = 0; xp < 20; xp++ ) 
 		{
-			if ((*(floor->fenemy[x]) < DED && *(floor->fenemy[x]))/* || (*(floor->fenemy[x]) == PARTY)*/)
+			if ((*(floor->fenemy[xp]) < DED && *(floor->fenemy[xp]))/* || (*(floor->fenemy[xp]) == PARTY)*/)
 			{
 				oakalydokaly = false;
-				room = floor->room[x];
+				room = floor->room[xp];
 				strike = new (Movement);
 				for (count=0;count<22;count++)
 				{
@@ -958,7 +957,7 @@ void Us::startWalk(void)
 void Us::startJourney(void)
 {
 	BadRoom * thisRoom;
-	int dir;
+	int dirn;
 	here = 0;
 	memset (&path,0,(100 * (sizeof(int))));
 
@@ -978,37 +977,37 @@ void Us::startJourney(void)
 	{
 		if (y < thisRoom->top)
 		{
-			dir = 0;
+			dirn = 0;
 		}
 		else
 		{
-			dir = 1;
+			dirn = 1;
 		}
 	}
 	else  if (x < thisRoom->left)
 	{
 		if (y < thisRoom->top)
 		{
-			dir = 2;
+			dirn = 2;
 		}
 		else
 		{
-			dir = 3;
+			dirn = 3;
 		}
 	}
 	else
 	{
 		if (y < thisRoom->top)
 		{
-			dir = 4;
+			dirn = 4;
 		}
 		else
 		{
-			dir = 5;
+			dirn = 5;
 		}
 	}
 
-	if (buildpath(dir))
+	if (buildpath(dirn))
 	{
 		here = 0;
 		target = path[0];
@@ -1026,19 +1025,20 @@ void Us::startJourney(void)
 		reset();
 	}	
 }
+
 void Us::secondJourney(void)
 {
-	int dir;
+	int dirn;
 
 	here = 0;
 	memset (&path,0,(100 * (sizeof(int))));
 
 	if (room > 20)
-		dir = 0;
+		dirn = 0;
 	else
-		dir = 2;
+		dirn = 2;
 
-	if (buildpath(dir))
+	if (buildpath(dirn))
 	{
 		here = 0;
 		target = path[0];
@@ -1238,10 +1238,7 @@ void Us::cue(int dummy)
 	Us::cue();
 }
 
-void Us::cue(void)
-{
-	int count = 0;
-
+void Us::cue(void) {
 	if (talkingaboutphones)
 	{
 		talkingaboutphones = false;
@@ -1344,15 +1341,14 @@ int Us::talk(int number)
 	return false;	
 }
 
-int Us::checkpath(void)
-{
+int Us::checkpath(void) {
 //	int room = target;
 	BadRoom * thisRoom = ((BadMan *)intrpuzz)->Floors[floor]->room[target];
- 	BadRoom * curRoom = ((BadMan *)intrpuzz)->Floors[floor]->room[room];
+ 	BadRoom * currentRoom = ((BadMan *)intrpuzz)->Floors[floor]->room[room];
 
 	if (x > thisRoom->right)
 	{
-		if (curRoom->w_wall == thisRoom->e_wall)
+		if (currentRoom->w_wall == thisRoom->e_wall)
 		{
 			if (!thisRoom->e_wall)
 			{
@@ -1366,7 +1362,7 @@ int Us::checkpath(void)
 	}
 	else  if (x < thisRoom->left)
 	{
-		if (curRoom->e_wall == thisRoom->w_wall)
+		if (currentRoom->e_wall == thisRoom->w_wall)
 		{
 			if (!thisRoom->w_wall)
 			{
@@ -1380,7 +1376,7 @@ int Us::checkpath(void)
 	}
 	else if (y < thisRoom->top)
 	{
-		if (curRoom->s_wall == thisRoom->n_wall)
+		if (currentRoom->s_wall == thisRoom->n_wall)
 		{
 			if (!thisRoom->n_wall)
 			{
@@ -1394,7 +1390,7 @@ int Us::checkpath(void)
 	}
 	else if (y > thisRoom->bottom)
 	{
-		if (curRoom->n_wall == thisRoom->s_wall)
+		if (currentRoom->n_wall == thisRoom->s_wall)
 		{
 			if (!thisRoom->s_wall)
 			{
@@ -1409,10 +1405,10 @@ int Us::checkpath(void)
 	return false;
 }
 
-int Us::buildpath(int dir)
+int Us::buildpath(int dirn)
 {
 	int count = 0;
-	Floor * thisfloor =  ((BadMan *)intrpuzz)->Floors[floor];
+	//Floor * thisfloor =  ((BadMan *)intrpuzz)->Floors[floor];
 	BadRoom **thisroom = &((BadMan *)intrpuzz)->Floors[floor]->room[0];
 	FloorMap map[22];
 	FloorMap * maproom;
@@ -1420,7 +1416,7 @@ int Us::buildpath(int dir)
 	int curroom = room;
 	int lastroom = -1;
 	int lastdir  = 0;
-	int there = false;
+	//int there = false;
 	here = 0;
 	memset (&path,0,(100 * (sizeof(int))));
 	for (count=0;count<22;count++)
@@ -1437,7 +1433,7 @@ int Us::buildpath(int dir)
 
 		thisroom++;
 	}
-	switch (dir)
+	switch (dirn)
 	{
 		case 0:
 			while (finaltarget != curroom)
@@ -2055,6 +2051,7 @@ int Us::buildpath(int dir)
 	here = 0;
 	return true;
 }
+
 void Us::fight(void)
 {
 	int num = rand() & 4;
@@ -2389,7 +2386,7 @@ int *Schiff::check4wall(void)
 
 void Aguila::special(void)
 {
-	static int flag = 0;
+	static int aguilaFlag = 0;
 
 	if (checkpath() || target == room)
 	{
@@ -2400,15 +2397,15 @@ void Aguila::special(void)
 		}
 		else
 		{
-			if (flag)
+			if (aguilaFlag)
 			{
 				talk(475);
-				flag --;
+				aguilaFlag --;
 			}
 			else
 			{
 				talk(476);
-				flag ++;
+				aguilaFlag ++;
 			}
 		}
 	}
@@ -2421,7 +2418,7 @@ void Aguila::special(void)
 void Schiff::special(void)
 {
 	int * wall;
-	static int flag = 0;
+	static int schiffFlag = 0;
 	boomroom = ((BadMan *)intrpuzz)->Floors[floor]->room[target];
 
 	if (bombs && !bombing)
@@ -2440,7 +2437,7 @@ void Schiff::special(void)
 					talking = false;
 				
 				((BadMan *)intrpuzz)->micOpen = false;
-				((BadMan *)intrpuzz)->speech->stop;
+				((BadMan *)intrpuzz)->speech->stop();
 				talk(508);
 				first = true;
 				((BadMan *)intrpuzz)->setScript(NULL);
@@ -2455,15 +2452,15 @@ void Schiff::special(void)
 					talking = false;
 				
 				((BadMan *)intrpuzz)->micOpen = false;
-				((BadMan *)intrpuzz)->speech->stop;
+				((BadMan *)intrpuzz)->speech->stop();
 				talk(546);
 				first = true;
 				((BadMan *)intrpuzz)->setScript(NULL);
 				((BadMan *)intrpuzz)->done = true;
 			}
-			else if (flag)
+			else if (schiffFlag)
 			{
-				flag --;
+				schiffFlag --;
 				if (!talk(466))
 				{
 					*wall = HOLE;
@@ -2480,7 +2477,7 @@ void Schiff::special(void)
 			}
 			else
 			{
-				flag ++;
+				schiffFlag ++;
 				if (!talk(467))
 				{
 					*wall = HOLE;
@@ -2505,22 +2502,23 @@ void Schiff::special(void)
 	}
 	else
 	{
-			if (flag)
+			if (schiffFlag)
 			{
-				flag --;
+				schiffFlag --;
 				talk(471);
 			}
 			else
 			{
-				flag ++;
+				schiffFlag ++;
 				talk(472);
 			}
 	}
 
 }
+
 void Washington::special(void)
 {
-	static int flag = 0; 
+	static int washingtonFlag = 0; 
 	int count = 0;
 
 	if (grenades)
@@ -2534,7 +2532,7 @@ void Washington::special(void)
 					talking = false;
 				
 				((BadMan *)intrpuzz)->micOpen = false;
-				((BadMan *)intrpuzz)->speech->stop;
+				((BadMan *)intrpuzz)->speech->stop();
 				talk(509);
 				first = true;
 				((BadMan *)intrpuzz)->setScript(NULL);
@@ -2548,20 +2546,20 @@ void Washington::special(void)
 					talking = false;
 				
 				((BadMan *)intrpuzz)->micOpen = false;
-				((BadMan *)intrpuzz)->speech->stop;
+				((BadMan *)intrpuzz)->speech->stop();
 				talk(546);
 				first = true;
 				((BadMan *)intrpuzz)->setScript(NULL);
 				((BadMan *)intrpuzz)->done = true;
 			}
-			else if (flag)
+			else if (washingtonFlag)
 			{
-				flag --;
+				washingtonFlag --;
 				talk(464);
 			}
 			else
 			{
-				flag ++;
+				washingtonFlag ++;
 				talk(465);
 			}
 			grenades --;
@@ -2599,26 +2597,26 @@ void Washington::special(void)
 	}
 	else
 	{
-		if (flag)
+		if (washingtonFlag)
 		{
-			flag --;
+			washingtonFlag --;
 			talk(473);
 		}
 		else
 		{
-			flag ++;
+			washingtonFlag ++;
 			talk(474);
 		}
 	}
 }
-int Henderson::checkpath(void)
-{
+
+int Henderson::checkpath(void) {
 	BadRoom * thisRoom = ((BadMan *)intrpuzz)->Floors[floor]->room[target];
- 	BadRoom * curRoom = ((BadMan *)intrpuzz)->Floors[floor]->room[room];
+ 	BadRoom * currentRoom = ((BadMan *)intrpuzz)->Floors[floor]->room[room];
 
 	if (x > thisRoom->right)
 	{
-		if (curRoom->w_wall == thisRoom->e_wall)
+		if (currentRoom->w_wall == thisRoom->e_wall)
 		{
 			if (*(thisRoom->e_wall) != NONE)
 			{
@@ -2628,7 +2626,7 @@ int Henderson::checkpath(void)
 	}
 	else  if (x < thisRoom->left)
 	{
-		if (curRoom->e_wall == thisRoom->w_wall)
+		if (currentRoom->e_wall == thisRoom->w_wall)
 		{
 			if (*(thisRoom->w_wall) != NONE)
 			{
@@ -2638,7 +2636,7 @@ int Henderson::checkpath(void)
 	}
 	else if (y < thisRoom->top)
 	{
-		if (curRoom->s_wall == thisRoom->n_wall)
+		if (currentRoom->s_wall == thisRoom->n_wall)
 		{
 			if (*(thisRoom->n_wall) != NONE)
 			{
@@ -2648,7 +2646,7 @@ int Henderson::checkpath(void)
 	}
 	else if (y > thisRoom->bottom)
 	{
-		if (curRoom->n_wall == thisRoom->s_wall)
+		if (currentRoom->n_wall == thisRoom->s_wall)
 		{
 			if (*(thisRoom->s_wall) != NONE)
 			{
@@ -2790,7 +2788,7 @@ void Henderson::announce(int what)
 					talking = false;
 				
 				((BadMan *)intrpuzz)->micOpen = false;
-				((BadMan *)intrpuzz)->speech->stop;
+				((BadMan *)intrpuzz)->speech->stop();
 				talk(411);
 				((BadMan *)intrpuzz)->somebodyistalkingaboutphones = true;
 				talkingaboutphones = true;
@@ -2844,7 +2842,7 @@ void Schiff::announce(int what)
 					talking = false;
 				
 				((BadMan *)intrpuzz)->micOpen = false;
-				((BadMan *)intrpuzz)->speech->stop;
+				((BadMan *)intrpuzz)->speech->stop();
 				talk(422);
 				((BadMan *)intrpuzz)->somebodyistalkingaboutphones = true;
 				talkingaboutphones = true;
@@ -2898,7 +2896,7 @@ void Washington::announce(int what)
 					talking = false;
 				
 				((BadMan *)intrpuzz)->micOpen = false;
-				((BadMan *)intrpuzz)->speech->stop;
+				((BadMan *)intrpuzz)->speech->stop();
 				talk(433);
 				((BadMan *)intrpuzz)->somebodyistalkingaboutphones = true;
 				talkingaboutphones = true;
@@ -2953,7 +2951,7 @@ void Aguila::announce(int what)
 					talking = false;
 				
 				((BadMan *)intrpuzz)->micOpen = false;
-				((BadMan *)intrpuzz)->speech->stop;
+				((BadMan *)intrpuzz)->speech->stop();
 				talk(444);
 				((BadMan *)intrpuzz)->somebodyistalkingaboutphones = true;
 				talkingaboutphones = true;
@@ -3070,7 +3068,7 @@ int BadRoom::combat(int* enemy, Us * guy)
 	int num = 0;
 	int count = 0;
 	int enemies = 0;
-	int flag = false;
+	int badCombatFlag = false;
 
 	if (*enemy == DED || *enemy == NULL)
 	{
@@ -3106,7 +3104,7 @@ int BadRoom::combat(int* enemy, Us * guy)
 					else
 					{
 						guy->hitpoints --;
-						flag = true;
+						badCombatFlag = true;
 					}
 
 					if (!guy->hitpoints)
@@ -3115,7 +3113,7 @@ int BadRoom::combat(int* enemy, Us * guy)
 					}
 				}		
 
-				if (flag)
+				if (badCombatFlag)
 				{
 	//				sfxPrintf("I'm Hit!!!");
 				}
@@ -3153,9 +3151,8 @@ void BadRoom::activate(void)
 	Us **guy = &((BadMan *)intrpuzz)->guy[0];
 	int count = 0;
 	int count2 = 0;
-	int flag = 0;
 	int pass = 2;
-	FloorMap* thisroom = &mastermap[room_num];
+	//FloorMap* thisroom = &mastermap[room_num];
 	BadRoom* room = NULL;	
 
 	if (floor_num == ((BadMan *)intrpuzz)->curFloorNum)
@@ -3474,7 +3471,7 @@ Floor1::Floor1()
 {
 	int x;
 	int * int_ptr;
-	int count =	0;
+	//int count =	0;
 
 	int_ptr = &((BadMan *)intrpuzz)->walls[0];
 
@@ -3546,7 +3543,7 @@ Floor2::Floor2()
 {
 	int x;
 	int * int_ptr;
-	int count =	0;
+	//int count =	0;
 
 	int_ptr = &((BadMan *)intrpuzz)->walls[33];
 
@@ -3618,7 +3615,7 @@ Base::Base()
 {
 	int x;
 	int * int_ptr;
-	int count =	0;
+	//int count =	0;
 
 	int_ptr = &((BadMan *)intrpuzz)->walls[66];
 
