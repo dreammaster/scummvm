@@ -126,7 +126,7 @@ public:
 
 	CommandLine() {
 	};
-	CommandLine(int x, int y, int width, int height, char *text);
+	CommandLine(int x, int y, int width, int height, const char *text);
 	~CommandLine();
 	void dispose();
 	void init(int x, int y, int width, int height);
@@ -283,7 +283,7 @@ public:
 	void dispose(void);
 	void quitIntrface(void);
 	int handleEvent(MADEEventStamp *event);
-	int isStateSaved(char *save_name);
+	int isStateSaved(const char *save_name);
 	void remove_MarkedItems();
 	void doit(void);
 

@@ -69,7 +69,7 @@ public:
 	int getPosn(void);
 	bool fromTo(int from, int to);
 	void step(int numSteps);
-	void open(char *theMovie);
+	void open(const char *theMovie);
 };
 
 extern Movie *theMovie;

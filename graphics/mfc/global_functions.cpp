@@ -238,6 +238,10 @@ void MoveWindow(HWND hWnd, int x, int y, int nWidth, int nHeight, bool bRepaint)
 	return wnd->MoveWindow(x, y, nWidth, nHeight, bRepaint);
 }
 
+HWND GetFocus() {
+	return AfxGetApp()->GetFocus()->m_hWnd;
+}
+
 bool PeekMessage(LPMSG lpMsg, HWND hWnd,
                  unsigned int wMsgFilterMin, unsigned int wMsgFilterMax,
                  unsigned int wRemoveMsg) {

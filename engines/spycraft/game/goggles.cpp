@@ -27,7 +27,7 @@
 #include "spycraft/logic/95000.h"
 #include "spycraft/logic/60000.h"
 #include "spycraft/logic/1000.h"
-#include "spycraft/game/advmem.h"
+#include "spycraft/dmade/advmem.h"
 #include "spycraft/game/vlink.h"
 #include "spycraft/game/email.h"
 
@@ -812,12 +812,16 @@ void gogglesStart (int row,int column)
 	else
 		countrooms++;
 
-	if (elapsed)
-	{
-		psecOnes->init(itoa(secOnes,(char*)&psecOnes->buff,10));
-		psecTens->init(itoa(secTens,(char*)&psecTens->buff,10));
-		pminOnes->init(itoa(minOnes,(char*)&pminOnes->buff,10));
-		pminTens->init(itoa(minTens,(char*)&pminTens->buff,10));
+	if (elapsed) {
+		Common::sprintf_s(psecOnes->buff, "%d", secOnes);
+		Common::sprintf_s(psecTens->buff, "%d", secTens);
+		Common::sprintf_s(pminOnes->buff, "%d", secOnes);
+		Common::sprintf_s(pminTens->buff, "%d", secOnes);
+
+		psecOnes->init(psecOnes->buff);
+		psecTens->init(psecTens->buff);
+		pminOnes->init(pminOnes->buff);
+		pminTens->init(pminTens->buff);
 		seperator->init(":");
 	}
 	switch(base)
@@ -1844,10 +1848,14 @@ void TimerScript::changeState ( int newState )
 			secOnes--;
 		} 	
 
-		psecOnes->init(itoa(secOnes,(char*)&psecOnes->buff,10));
-		psecTens->init(itoa(secTens,(char*)&psecTens->buff,10));
-		pminOnes->init(itoa(minOnes,(char*)&pminOnes->buff,10));
-		pminTens->init(itoa(minTens,(char*)&pminTens->buff,10));
+		Common::sprintf_s(psecOnes->buff, "%d", secOnes);
+		Common::sprintf_s(psecTens->buff, "%d", secTens);
+		Common::sprintf_s(pminOnes->buff, "%d", minOnes);
+		Common::sprintf_s(pminTens->buff, "%d", minTens);
+		psecOnes->init(psecOnes->buff);
+		psecTens->init(psecTens->buff);
+		pminOnes->init(pminOnes->buff);
+		pminTens->init(pminTens->buff);
 
 		if (!secOnes && ! secTens && !minOnes)
 		{

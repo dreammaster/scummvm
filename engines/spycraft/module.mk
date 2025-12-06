@@ -28,19 +28,35 @@ MODULE_OBJS = \
 	dmade/duck_mli.o \
 	dmade/gamebox.o \
 	dmade/mli.o \
-	game/actsock.o \
-	game/dispatch.o \
 	game/actor.o \
+	game/actsock.o \
+	game/badman.o \
 	game/colby.o \
 	game/cursor.o \
+	game/cypher.o \
+	game/debugmod.o \
 	game/dialog.o \
+	game/dispatch.o \
 	game/dlgbox.o \
 	game/dump.o \
 	game/email.o \
 	game/feature.o \
 	game/file.o \
 	game/game.o \
+	game/goggles.o \
+	game/gun.o \
+	game/invinset.o \
+	game/kat.o \
 	game/list.o \
+	game/mixmatch.o \
+	game/pcscreen.o \
+	game/phodoc.o \
+	game/phone.o \
+	game/puzztest.o \
+	game/room1.o \
+	game/taget.o \
+	game/teletalk.o \
+	game/torture.o \
 	game/user.o \
 	logic/1000.o \
 	logic/10000.o \

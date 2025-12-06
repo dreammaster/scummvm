@@ -232,7 +232,8 @@ int ButtonView60000::handleEvent( MADEEventStamp * event )
 		}
 		else if ( event_type == USER_LEFT_UP )
 		{
-			if( cel != 0 );
+			// TODO: Check if the if should be kept without the trailing semicolon
+			//if( cel != 0 );
 				setCel( 0 );
 			activate();		
 		}

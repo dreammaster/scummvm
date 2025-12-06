@@ -125,7 +125,7 @@ public:
 
 class Kill : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	Kill();
 	void dispose(void);
@@ -133,7 +133,7 @@ public:
 };
 class Nah : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	Nah();
 	void dispose(void);
@@ -142,7 +142,7 @@ public:
 
 class Guard : public IntrPuzzActor {
 public:
-	char *name;
+	const char *name;
 	int posts[5][2];
 	int curPos;
 	void init(void);
@@ -176,7 +176,7 @@ public:
 class Me : public IntrPuzzActor {
 protected:
 public:
-	char *name;
+	const char *name;
 	int 		destX;
 	int 		destY;
 	int 		tempdestX;
