@@ -31,6 +31,7 @@ MODULE_OBJS = \
 	game/actsock.o \
 	game/dispatch.o \
 	game/actor.o \
+	game/colby.o \
 	game/cursor.o \
 	game/dialog.o \
 	game/dlgbox.o \
