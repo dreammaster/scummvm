@@ -80,7 +80,7 @@ enum {
 
 class InvItem : public IntrView {
 public:
-	char *name;
+	const char *name;
 	int         verb;
 	int         handView;     	//what it looks like in case
 	int         owned;          //does the player own it
@@ -117,7 +117,7 @@ public:
 
 class Invent : public Object {
 public:
-	char *name;
+	const char *name;
 	InvItem *items[MAX_INV];    //Array of InvItems
 	int    		numOwned;
 	InvHand *theHand;
@@ -141,7 +141,7 @@ public:
 
 class InvView : public IntrView {
 public:
-	char *name;
+	const char *name;
 	InvView();
 	void init(int x_start, int y_start);  //where to show it
 	int handleEvent(MADEEventStamp *event);
@@ -154,193 +154,193 @@ public:
 
 class Lint : public InvItem {
 public:
-	char *name;
+	const char *name;
 	Lint();
 };
 
 class ProcatFile : public InvItem {
 public:
-	char *name;
+	const char *name;
 	ProcatFile();
 };
 
 class NeedlePack : public InvItem {
 public:
-	char *name;
+	const char *name;
 	NeedlePack();
 };
 
 class PEG : public InvItem {
 public:
-	char *name;
+	const char *name;
 	PEG();
 };
 
 class LockPick : public InvItem {
 public:
-	char *name;
+	const char *name;
 	LockPick();
 };
 
 class YuriDossier : public InvItem {
 public:
-	char *name;
+	const char *name;
 	YuriDossier();
 };
 
 class FolderCitation : public InvItem {
 public:
-	char *name;
+	const char *name;
 	FolderCitation();
 };
 
 class FolderPayments : public InvItem {
 public:
-	char *name;
+	const char *name;
 	FolderPayments();
 };
 
 class DossierZhironev : public InvItem {
 public:
-	char *name;
+	const char *name;
 	DossierZhironev();
 };
 
 class DossierShustak : public InvItem {
 public:
-	char *name;
+	const char *name;
 	DossierShustak();
 };
 
 class FolderOrders : public InvItem {
 public:
-	char *name;
+	const char *name;
 	FolderOrders();
 };
 
 class OthelloPicture : public InvItem {
 public:
-	char *name;
+	const char *name;
 	OthelloPicture();
 };
 
 class VideoCamera : public InvItem {
 public:
-	char *name;
+	const char *name;
 	VideoCamera();
 };
 
 class SecurityDiagrams : public InvItem {
 public:
-	char *name;
+	const char *name;
 	SecurityDiagrams();
 };
 
 class Rifle : public InvItem {
 public:
-	char *name;
+	const char *name;
 	Rifle();
 };
 
 class Goggles : public InvItem {
 public:
-	char *name;
+	const char *name;
 	Goggles();
 };
 
 class LaserTagGun : public InvItem {
 public:
-	char *name;
+	const char *name;
 	LaserTagGun();
 };
 
 class Handcuffs : public InvItem {
 public:
-	char *name;
+	const char *name;
 	Handcuffs();
 };
 
 class OrangeSwan : public InvItem {
 public:
-	char *name;
+	const char *name;
 	OrangeSwan();
 };
 
 class MusicSwan : public InvItem {
 public:
-	char *name;
+	const char *name;
 	MusicSwan();
 };
 
 class YingPhoto : public InvItem {
 public:
-	char *name;
+	const char *name;
 	YingPhoto();
 };
 
 class YingInternetGuide : public InvItem {
 public:
-	char *name;
+	const char *name;
 	YingInternetGuide();
 };
 
 class YingEBMCatalog : public InvItem {
 public:
-	char *name;
+	const char *name;
 	YingEBMCatalog();
 };
 
 class YingBealePostit : public InvItem {
 public:
-	char *name;
+	const char *name;
 	YingBealePostit();
 };
 
 class YingBeowulf : public InvItem {
 public:
-	char *name;
+	const char *name;
 	YingBeowulf();
 };
 
 class ShanghaiDisk : public InvItem {
 public:
-	char *name;
+	const char *name;
 	ShanghaiDisk();
 };
 
 class NumbertoYuri : public InvItem {
 public:
-	char *name;
+	const char *name;
 	NumbertoYuri();
 };
 
 class NumbertoBlake : public InvItem {
 public:
-	char *name;
+	const char *name;
 	NumbertoBlake();
 };
 
 class HackerDisk : public InvItem {
 public:
-	char *name;
+	const char *name;
 	HackerDisk();
 };
 
 class PhotoDocPicture : public InvItem {
 public:
-	char *name;
+	const char *name;
 	PhotoDocPicture();
 };
 
 class OnyxDossier : public InvItem {
 public:
-	char *name;
+	const char *name;
 	OnyxDossier();
 };
 
 class PhotoParker : public InvItem {
 public:
-	char *name;
+	const char *name;
 	PhotoParker();
 };
 

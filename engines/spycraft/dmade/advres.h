@@ -79,6 +79,8 @@ struct ResInfo {
 };
 
 /* INTERNAL CALLS */
+extern char *sc_strupr(char *str);
+extern char *sc_strlwr(char *str);
 extern void ID2File(char *dest, int id, int type);
 extern GenericData *SearchRESData(int type, int id);
 extern void SetRESCache(void);

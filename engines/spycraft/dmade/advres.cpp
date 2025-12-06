@@ -102,9 +102,15 @@ static ResourceSize resSize = { 2, 48, 8, 2, 2, 4 };
 #define GetDriveType(DRIVE) (DRIVE_CDROM)
 #define GetCurrentDirectory(SIZE, BUFF) *BUFF = '\0'
 
-static char *sc_strupr(char *str) {
+char *sc_strupr(char *str) {
 	for (char *s = str; *s; ++s)
 		*s = toupper(*s);
+	return str;
+}
+
+char *sc_strlwr(char *str) {
+	for (char *s = str; *s; ++s)
+		*s = tolower(*s);
 	return str;
 }
 

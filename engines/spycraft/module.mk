@@ -28,6 +28,7 @@ MODULE_OBJS = \
 	dmade/duck_mli.o \
 	dmade/gamebox.o \
 	dmade/mli.o \
+	game/act.o \
 	game/actor.o \
 	game/actsock.o \
 	game/badman.o \
@@ -42,19 +43,32 @@ MODULE_OBJS = \
 	game/email.o \
 	game/feature.o \
 	game/file.o \
+	game/flag.o \
 	game/game.o \
 	game/goggles.o \
 	game/gun.o \
+	game/html.o \
+	game/image.o \
+	game/inset.o \
+	game/interface.o \
+	game/interface_puzzle.o \
+	game/invent.o \
 	game/invinset.o \
 	game/kat.o \
+	game/knee.o \
 	game/list.o \
+	game/macro.o \
 	game/maptool.o \
 	game/mixmatch.o \
+	game/motion.o \
+	game/movie.o \
 	game/object.o \
 	game/onyxhunt.o \
 	game/pcscreen.o \
+	game/pda.o \
 	game/phodoc.o \
 	game/phone.o \
+	game/plistobj.o \
 	game/puzztest.o \
 	game/room1.o \
 	game/save.o \
@@ -146,3 +160,4 @@ include $(srcdir)/rules.mk
 
 # Detection objects
 DETECT_OBJS += $(MODULE)/detection.o
+

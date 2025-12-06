@@ -57,7 +57,7 @@ public:
 
 class KneeBack : public IntrPuzzView {
 protected:
-	char *name;
+	const char *name;
 
 public:
 	KneeBack();
@@ -65,7 +65,7 @@ public:
 
 class KneeIAButt : public Button {
 protected:
-	char *name;
+	const char *name;
 
 public:
 	KneeIAButt();
@@ -74,7 +74,7 @@ public:
 
 class KneePlayButt : public Button {
 protected:
-	char *name;
+	const char *name;
 
 public:
 	KneePlayButt();
@@ -84,7 +84,7 @@ public:
 
 class KneeStopButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	KneeStopButt();
 	void activate(void);

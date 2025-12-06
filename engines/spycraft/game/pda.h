@@ -36,7 +36,7 @@ extern Movie *theMovie;
 
 class PDA : public IntrView {
 public:
-	char *name;
+	const char *name;
 	DialTree *myDialogTree;
 	int PDAOpen;
 	char *myMovie;
