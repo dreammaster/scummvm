@@ -181,7 +181,7 @@ public:
 };
 class Beacon : public Object {
 protected:
-	char *name;
+	const char *name;
 public:
 	Us *guy;
 	Beacon(Us *guy);
@@ -189,7 +189,7 @@ public:
 };
 class 	Card : public WebView {
 protected:
-	char *name;
+	const char *name;
 public:
 	Us *guy;
 	Card();
@@ -197,14 +197,14 @@ public:
 };
 class 	Selected : public WebView {
 protected:
-	char *name;
+	const char *name;
 public:
 	Us *guy;
 	void doit(void);
 };
 class 	StatButt : public WebView {
 protected:
-	char *name;
+	const char *name;
 public:
 	Us *guy;
 	StatButt();
@@ -212,7 +212,7 @@ public:
 };
 class 	SpecButt : public WebButton {
 protected:
-	char *name;
+	const char *name;
 public:
 	Us *guy;
 	SpecButt();
@@ -221,7 +221,7 @@ public:
 
 class FloorBack : public IntrPuzzView {
 protected:
-	char *name;
+	const char *name;
 public:
 	FloorBack(int num);
 };
@@ -349,7 +349,7 @@ public:
 
 class Us : public IntrPuzzActor {
 protected:
-	char *name;
+	const char *name;
 public:
 
 	int 		first;
@@ -412,7 +412,7 @@ public:
 
 class Henderson : public Us {
 protected:
-	char *name;
+	const char *name;
 public:
 	Henderson();
 	void die(void);
@@ -424,7 +424,7 @@ public:
 
 class Washington : public Us {
 protected:
-	char *name;
+	const char *name;
 public:
 	int 		grenades;
 	Washington();
@@ -436,7 +436,7 @@ public:
 
 class Aguila : public Us {
 protected:
-	char *name;
+	const char *name;
 public:
 	Aguila();
 	void die(void);
@@ -447,7 +447,7 @@ public:
 
 class Schiff : public Us {
 protected:
-	char *name;
+	const char *name;
 public:
 	int 		bombs;
 	Schiff();

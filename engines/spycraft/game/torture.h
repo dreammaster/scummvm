@@ -217,7 +217,7 @@ public:
 class HeartInfo : public Print
 {
 public:
-	HeartInfo(char *);
+	HeartInfo(const char *);
 };
 
 class Torture : public IntrPuzz

@@ -19,7 +19,7 @@
  *
  */
 
-#include "spycraft/game/image.h"
+#include "spycraft/dmade/image.h"
 #include "spycraft/game/math.h"
 #include "spycraft/game/file.h"
 #include "spycraft/game/flag.h"

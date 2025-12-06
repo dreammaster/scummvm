@@ -131,7 +131,7 @@ extern bool GetUpdateRect(HWND hWnd, LPRECT lpRect, bool bErase = false);
 extern bool GetClientRect(HWND hWnd, LPRECT lpRect);
 extern void MoveWindow(HWND hWnd, LPCRECT lpRect, bool bRepaint = true);
 extern void MoveWindow(HWND hWnd, int x, int y, int nWidth, int nHeight, bool bRepaint = true);
-
+extern HWND GetFocus();
 extern void UpdateWindow(HWND hWnd);
 extern bool PeekMessage(LPMSG lpMsg, HWND hWnd,
                         unsigned int wMsgFilterMin, unsigned int wMsgFilterMax,

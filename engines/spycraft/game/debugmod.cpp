@@ -25,7 +25,7 @@
 #include "spycraft/game/user.h"			 
 #include "spycraft/game/game.h"
 #include "spycraft/game/flag.h"
-#include "spycraft/game/advtime.h"
+#include "spycraft/dmade/advtime.h"
 
 #ifdef _DEBUG
 #define DEBUG_CODE
@@ -42,7 +42,7 @@
 #include "spycraft/dmade/advmovie.h"
 #define DEBUG_YAKE_ME     sfxIsMoviePlaying()
 #else
-#define DEBUG_YAKE     sfxIsMCIOpen()
+#define DEBUG_YAKE_ME     sfxIsMCIOpen()
 #endif
 
 
@@ -508,9 +508,8 @@
 #endif
 
 
-#include "spycraft/logic/movie.h"
-#include "spycraft/logic/advfile.h"
-
+#include "spycraft/game/movie.h"
+#include "spycraft/dmade/advfile.h"
 
 namespace Spycraft {
 
@@ -665,7 +664,7 @@ int DebugModule :: handleEvent ( MADEEventStamp* event)	{
 				charCatArray[0] = 'R';
 				charCatArray[1] = 'm';
 				charCatArray[2] = '\0';
-				strcat(charCatArray, charArray);
+				Common::strcat_s(charCatArray, charArray);
 				teleport(charCatArray);
 				charArray[0] = 0;
 				charArray[1] = 0;

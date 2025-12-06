@@ -37,26 +37,23 @@ namespace Spycraft {
 
 extern GunCursor *gunCursor;
 
-class Clip : public View
-{
+class Clip : public View {
 public:
-	char *name;
+	const char *name;
 	Clip();
 	void dispose(void);
 };
 
-class Mags : public View
-{
+class Mags : public View {
 public:
-	char *name;
+	const char *name;
 	Mags();
 	void dispose(void);
 };
 
-class Gun : public View
-{
+class Gun : public View {
 public:
-	char *name;
+	const char *name;
 	Clip *clip;
 	Mags *mags;
 	int shots;
@@ -68,13 +65,11 @@ public:
 	void dispose(void);
 	int handleEvent(MADEEventStamp *event);
 };
-class GunScript : public Script
-{
+class GunScript : public Script {
 public:
 	void changeState(int);
 };
-class ReloadScript : public Script
-{
+class ReloadScript : public Script {
 public:
 	void changeState(int);
 };

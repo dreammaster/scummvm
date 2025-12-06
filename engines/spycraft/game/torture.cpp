@@ -179,7 +179,7 @@ void Torture::cue ( void )
 
 			HeartRate += rateIncrease;
 			heartinfo->dispose();
-			itoa(HeartRate, rate, 10);
+			Common::sprintf_s(rate, "%d", HeartRate);
 			new HeartInfo(rate);
 
 			if(yingBroke)
@@ -498,7 +498,7 @@ void Torture::setRate()
 	rateIncrease = ((cookLevel + 1) * (rand() % 8) + 3);
 	HeartRate += rateIncrease;
 	heartinfo->dispose();
-	itoa(HeartRate, rate, 10);
+	Common::sprintf_s(rate, "%d", HeartRate);
 	new HeartInfo(rate);
 }
 	
@@ -507,8 +507,8 @@ void Torture::setRate()
  *			  Print
  *		      
  **********************************/
-HeartInfo::HeartInfo(char *infoText)
-{
+
+HeartInfo::HeartInfo(const char *infoText) {
 	heartinfo = this;
 
 	fore_color = TEXT_COLOR_GREEN;
@@ -943,7 +943,7 @@ void YingHeart::cue()
 		{	
 			torture->HeartRate -= 2;
 			heartinfo->dispose();
-			itoa(torture->HeartRate, rate, 10);
+			Common::sprintf_s(rate, "%d", torture->HeartRate);
 			new HeartInfo(rate);
 			dropctr = 0;	
 		}
