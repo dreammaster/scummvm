@@ -137,7 +137,7 @@ public:
 
 class WebCommandLine : public CommandLine {
 public:
-	WebCommandLine(int x, int y, int width, int height, char *text);
+	WebCommandLine(int x, int y, int width, int height, const char *text);
 	void dispose();
 	void init(int x, int y, int width, int height);
 };

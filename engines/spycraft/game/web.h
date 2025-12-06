@@ -168,7 +168,7 @@ extern ComLinkShort *comlinkshort;
 
 class ComLink : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	ComLink();
 	void activate(void);
@@ -177,7 +177,7 @@ public:
 
 class DataLink : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	DataLink();
 	void activate(void);
@@ -186,7 +186,7 @@ public:
 
 class NoteLink : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	NoteLink();
 	void activate(void);
@@ -195,7 +195,7 @@ public:
 
 class TravelLink : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	TravelLink();
 	void activate(void);
@@ -214,7 +214,7 @@ public:
 
 class Back : public IntrPuzzView {
 protected:
-	char *name;
+	const char *name;
 public:
 	Back(int num);
 };
@@ -229,7 +229,7 @@ public:
 
 class ATFButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	ATFButt();
 	void activate(void);
@@ -237,7 +237,7 @@ public:
 
 class CIAButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	CIAButt();
 	void activate(void);
@@ -245,7 +245,7 @@ public:
 
 class DEAButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	DEAButt();
 	void activate(void);
@@ -253,7 +253,7 @@ public:
 
 class FBIButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	FBIButt();
 	void activate(void);
@@ -261,7 +261,7 @@ public:
 
 class NROButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	NROButt();
 	void activate(void);
@@ -269,7 +269,7 @@ public:
 
 class NSAButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	NSAButt();
 	void activate(void);
@@ -277,7 +277,7 @@ public:
 
 class USSSButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	USSSButt();
 	void activate(void);

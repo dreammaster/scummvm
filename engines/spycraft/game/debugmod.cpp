@@ -714,8 +714,7 @@ int DebugModule :: handleEvent ( MADEEventStamp* event)	{
 }
 
 
-void DebugModule :: teleport(char* whereTo)	{
-   
+void DebugModule::teleport(const char *whereTo)	{
 	#ifdef TURNON_1
 	if (!strcmp(whereTo, "Rm1"))  {
 	     theGame->newRoom(new Room1);

@@ -65,7 +65,7 @@ public:
 
 class LinkButt : public Button {
 protected:
-	char *name;
+	const char *name;
 
 public:
 	int linkto;
@@ -95,7 +95,7 @@ public:
 
 class PuzzBack : public IntrPuzzView {
 protected:
-	char *name;
+	const char *name;
 
 public:
 	PuzzBack();
@@ -103,21 +103,21 @@ public:
 
 class TextWin : public IntrPuzzView {
 protected:
-	char *name;
+	const char *name;
 public:
 	TextWin();
 };
 
 class MarkPoint : public IntrPuzzView {
 protected:
-	char *name;
+	const char *name;
 public:
 	MarkPoint(int startx, int startcel);
 };
 
 class IdButt : public Button {
 protected:
-	char *name;
+	const char *name;
 
 public:
 	TextWin *textwin;
@@ -133,7 +133,7 @@ public:
 
 class InButt : public Button {
 protected:
-	char *name;
+	const char *name;
 
 public:
 	ABS *abs;
@@ -143,7 +143,7 @@ public:
 
 class CanButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	CanButt();
 	void activate(void);
@@ -151,7 +151,7 @@ public:
 
 class MapButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	MapButt();
 	void activate(void);
@@ -159,7 +159,7 @@ public:
 
 class PlayButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	PlayButt();
 	void cue(void);
@@ -168,7 +168,7 @@ public:
 
 class StopButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	StopButt();
 	void activate(void);
@@ -176,7 +176,7 @@ public:
 
 class LtButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	LtButt();
 	void activate(void);
@@ -185,7 +185,7 @@ public:
 
 class RtButt : public Button {
 protected:
-	char *name;
+	const char *name;
 public:
 	RtButt();
 	void activate(void);
@@ -194,7 +194,7 @@ public:
 
 class SeekSlider : public Slider {
 protected:
-	char *name;
+	const char *name;
 public:
 	SeekSlider();
 	int handleEvent(MADEEventStamp *);
