@@ -48,16 +48,24 @@ MODULE_OBJS = \
 	game/invinset.o \
 	game/kat.o \
 	game/list.o \
+	game/maptool.o \
 	game/mixmatch.o \
+	game/object.o \
+	game/onyxhunt.o \
 	game/pcscreen.o \
 	game/phodoc.o \
 	game/phone.o \
 	game/puzztest.o \
 	game/room1.o \
+	game/save.o \
+	game/sndanal.o \
+	game/sound.o \
 	game/taget.o \
 	game/teletalk.o \
 	game/torture.o \
 	game/user.o \
+	game/vlink.o \
+	game/web.o \
 	logic/1000.o \
 	logic/10000.o \
 	logic/1070.o \

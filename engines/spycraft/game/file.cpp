@@ -90,7 +90,7 @@ int File::writeWord(WORD *value) {
 	return (sfxWriteFile(hFile, value, sizeof(WORD)));
 }
 
-unsigned long File::writeASCFile(char *format, ...) {
+unsigned long File::writeASCFile(const char *format, ...) {
 	return (sfxWriteASCFile(hFile, format));
 }
 

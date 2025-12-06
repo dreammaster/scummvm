@@ -34,7 +34,7 @@ public:
 	~DebugModule();
 
 	int handleEvent(MADEEventStamp *event);
-	void teleport(char *whereTo);
+	void teleport(const char *whereTo);
 };
 
 } // namespace Spycraft

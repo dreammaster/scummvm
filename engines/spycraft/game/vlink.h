@@ -109,7 +109,7 @@ public:
 	unsigned long soundNumber;
 	int idNumber;
 
-	VoiceMail(const char *Title, int soundnum, int idNumber, bool archive);
+	VoiceMail(const char *Title, int soundnum, int idNumber, int archive);
 	VoiceMail(const char *Title, int soundnum, int idNumber);
 	VoiceMail(const char *Title, int soundnum, int idNumber, int flag, int delay);
 };
@@ -130,7 +130,7 @@ public:
 	VLink(const char *moviename, int flag, int delay);
 
 	VLink(const char *moviename, int flag, int delay, EMailAttachment *attachment);
-	VLink(const char *moviename, EMailAttachment *attachment, bool archive);
+	VLink(const char *moviename, EMailAttachment *attachment, int archive);
 
 	//delete above when everyone has there movienames in
 	VLink(const char *title, const char *moviename, EMailAttachment *attachment);
@@ -139,7 +139,7 @@ public:
 	VLink(const char *title, const char *moviename, int flag, int delay);
 
 	VLink(const char *title, const char *moviename, int flag, int delay, EMailAttachment *attachment);
-	VLink(const char *title, const char *moviename, EMailAttachment *attachment, bool archive);
+	VLink(const char *title, const char *moviename, EMailAttachment *attachment, int archive);
 };
 
 /******************************
@@ -154,7 +154,7 @@ public:
 
 class ComLinks : public List {
 public:
-	int isEmpty();
+	int isEmpty() override;
 	int removeVLink(const char *moviename);
 	int removeVoiceMail(unsigned long idNumber);
 	int removeEMail(unsigned long idNumber);
@@ -326,7 +326,7 @@ extern ComLinkInfo *comlinkinfo;
 
 class Vplay : public IntrPuzzPage {
 protected:
-	char *name;
+	const char *name;
 public:
 	bool menuHidden;
 	int textHeight;
