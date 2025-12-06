@@ -100,14 +100,14 @@ public:
 
 class HTMLBack : public IntrPuzzView {
 protected:
-	char *name;
+	const char *name;
 public:
 	HTMLBack(int num);
 };
 
 class HTMLButt : public IntrPuzzView {
 protected:
-	char *name;
+	const char *name;
 public:
 	HTMLButt(int num, int hypX, int hypY, int skip);
 };
