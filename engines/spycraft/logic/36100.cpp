@@ -22,7 +22,7 @@
 #include "spycraft/game/globals.h"
 #include "spycraft/game/game.h"
 #include "spycraft/game/verbs.h"
-#include "views.h"
+#include "spycraft/game/views.h"
 #include "spycraft/logic/36100.h"
 #include "spycraft/logic/36000.h"
 #include "spycraft/logic/36300.h"

@@ -19,15 +19,15 @@
  *
  */
 
-#include "invent.h"
+#include "spycraft/game/invent.h"
 #include "spycraft/game/globals.h"
 #include "spycraft/game/game.h"
 #include "spycraft/game/verbs.h"
-#include "views.h"
+#include "spycraft/game/views.h"
 #include "spycraft/logic/36400.h"
 #include "spycraft/logic/1000.h"
 #include "spycraft/game/flag.h"
-#include "invent.h"
+#include "spycraft/game/invent.h"
 #include "spycraft/game/movie.h"
 
 namespace Spycraft {

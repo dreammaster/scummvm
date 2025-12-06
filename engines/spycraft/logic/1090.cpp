@@ -22,7 +22,7 @@
 #include "spycraft/game/globals.h"
 #include "spycraft/game/game.h"
 #include "spycraft/game/verbs.h"
-#include "views.h"
+#include "spycraft/game/views.h"
 #include "spycraft/game/flag.h"
 #include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/1090.h"
@@ -347,7 +347,7 @@ void HelloScript1091::changeState( int newState )
 	END
 
 	BEG
-		soundptr->dispose;
+		soundptr->dispose();
 		dispose();
 		playingVoice = false;
 		blakeHasSpoken = true;						 
@@ -376,7 +376,7 @@ void ISaidHelloScript1091::changeState( int newState )
 	END
 
 	BEG
-		soundptr->dispose;
+		soundptr->dispose();
 		dispose();
 		playingVoice = false;
 	END

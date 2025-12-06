@@ -30,15 +30,15 @@ namespace Spycraft {
 class SaveGame : public Object {
 public:
 	SaveGame();
-	int save(char *);
-	int restore(char *);
+	int save(const char *);
+	int restore(const char *);
 };
 
 class RestRoom : public Room {
 public:
-	char *theNextRoom;
-	char *nextGame;
-	RestRoom(char *oldGame);
+	const char *theNextRoom;
+	const char *nextGame;
+	RestRoom(const char *oldGame);
 	void init();
 };
 

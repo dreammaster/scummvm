@@ -22,24 +22,24 @@
 #include "spycraft/game/globals.h"
 #include "spycraft/game/game.h"
 #include "spycraft/game/verbs.h"
-#include "views.h"
-#include "invent.h"
+#include "spycraft/game/views.h"
+#include "spycraft/game/invent.h"
 #include "spycraft/game/flag.h"
-#include "pda.h"
+#include "spycraft/game/pda.h"
 #include "spycraft/game/vlink.h"
 #include "spycraft/game/roomsnd.h"
 #include "spycraft/logic/24000.h"
 #include "spycraft/logic/1000.h"
-#include "advsound.h"
+#include "spycraft/dmade/advsound.h"
 #include "spycraft/dmade/advmusic.h"
 #include "spycraft/dmade/gamebox.h"
 #include "spycraft/game/verbs.h"
-#include "advfile.h"
+#include "spycraft/dmade/advfile.h"
 #include "spycraft/logic/60000.h"
 
-#include "teletalk.h"
+#include "spycraft/game/teletalk.h"
 #include "spycraft/game/pcscreen.h"
-#include "phone.h"
+#include "spycraft/game/phone.h"
 
 namespace Spycraft {
 
@@ -56,12 +56,12 @@ extern int isDemo;
 //extern int invVerb;
 
 #ifdef _DEBUG
-	class YingStuffToggle : Feature
-	{
-	 public:
-		YingStuffToggle();
-		int doVerb( int );
-	};
+class YingStuffToggle : Feature
+{
+	public:
+	YingStuffToggle();
+	int doVerb( int );
+};
 #endif
 
 int	launchHacker( void );
@@ -996,17 +996,14 @@ void launchShanghai::changeState( int newState )
 { 	
 #define MAXLINE (MAX_PATH +10)
 #define SHANGHAIEXESTR "SHANGHAI.EXE"
-	static char		prevDir[MAX_PATH];
+
 	static char		path[MAX_PATH];
 	int		result;
 	static int		soundNumber = -1;
 	
 	switchTo
 		// change directories to shanghai directory--it's not smart enough to use win.ini file
-		GetCurrentDirectory( MAX_PATH, prevDir );
-		strcpy( path, prevDir );
-		strcat( path, "\\SHANGHAI" );
-		SetCurrentDirectory( path );
+		AfxGetApp()->setDirectory("shanghai");
 
 		// run Shanghai
 	
@@ -1039,7 +1036,7 @@ void launchShanghai::changeState( int newState )
 				   "                %s"
 				   "\n\n",  result?"OK":"ERROR"  );
 		*/
-		SetCurrentDirectory( prevDir );
+		AfxGetApp()->setDirectory( nullptr );
 		sfxEnableSound();
 		sfxEnableMusic();
 		if( soundNumber != -1 )
@@ -1062,16 +1059,11 @@ int	launchHacker( void )
 // returns true if successful, false if not.
 #define MAXLINE (MAX_PATH +10)
 #define HACKEREXESTR "C64.EXE GAME05.C64"
-	char	prevDir[MAX_PATH];
-	char	path[MAX_PATH];
 	int		result;
 	int		soundNumber = -1;
 	
 	// change directories to hacker directory
-	GetCurrentDirectory( MAX_PATH, prevDir );
-	strcpy( path, prevDir );
-	strcat( path, "\\HACKER" );
-	SetCurrentDirectory( path );
+	AfxGetApp()->setDirectory("hacker");
 
 	// run Hacker
 	if( sound1->isPlaying() )
@@ -1099,7 +1091,7 @@ int	launchHacker( void )
 			   "                %s"
 			   "\n\n",  result?"OK":"ERROR"  );
 	*/
-	SetCurrentDirectory( prevDir );
+	AfxGetApp()->setDirectory(nullptr);
 	sfxEnableSound();
 	sfxEnableMusic();
 	if( soundNumber != -1 )
@@ -1111,24 +1103,23 @@ int	launchHacker( void )
 
 /* DEBUG */
 #ifdef _DEBUG
-	YingStuffToggle::YingStuffToggle()
-	{
-		name = "YingStuffToggle";
-		init( 4, 52, 25, 35 );
-	}
+YingStuffToggle::YingStuffToggle()
+{
+	name = "YingStuffToggle";
+	init( 4, 52, 25, 35 );
+}
 
-	YingStuffToggle::doVerb( int theVerb )
-	{
-		if( GameFlag.test( fYingStuffArrived ) ) {
-			GameFlag.clear( fYingStuffArrived );
-			//sfxPrintf( "Cleared fYingStuffArrived" );
-		}
-		else {
-			GameFlag.set( fYingStuffArrived );
-			//sfxPrintf( "Set fYingStuffArrived" );
-		}
-		return true;
+int YingStuffToggle::doVerb( int theVerb ) {
+	if( GameFlag.test( fYingStuffArrived ) ) {
+		GameFlag.clear( fYingStuffArrived );
+		//sfxPrintf( "Cleared fYingStuffArrived" );
 	}
+	else {
+		GameFlag.set( fYingStuffArrived );
+		//sfxPrintf( "Set fYingStuffArrived" );
+	}
+	return true;
+}
 #endif	
  
 } // namespace Spycraft 
