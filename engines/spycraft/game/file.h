@@ -53,7 +53,7 @@ public:
 	int write(void *buffer, int size);
 	int writeByte(uint8 *value);
 	int writeWord(uint16 *value);
-	unsigned long writeASCFile(char *format, ...);
+	unsigned long writeASCFile(const char *format, ...);
 	int close(void);
 	char *readString();
 };
