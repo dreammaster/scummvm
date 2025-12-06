@@ -209,7 +209,7 @@ public:
 
 class Marker : public IntrPuzzView {
 protected:
-	char *name;
+	const char *name;
 public:
 	int x;
 	int y;

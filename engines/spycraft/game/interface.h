@@ -92,7 +92,7 @@ public:
 
 class Briefcase : public IntrView {
 public:
-	char *name;
+	const char *name;
 	int32  	closed;
 	int32   myTime;
 	BackInv *backButton;

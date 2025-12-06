@@ -42,7 +42,7 @@ namespace Spycraft {
 class Movie : public Object {
 public:
 	int	movieNum;
-	char *movieName;
+	const char *movieName;
 	Object *caller;
 	int		x;
 	int		y;
