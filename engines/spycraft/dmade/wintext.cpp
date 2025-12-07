@@ -28,6 +28,7 @@
 #include "spycraft/dmade/winmade.h"
 #include "spycraft/dmade/winscreen.h"
 #include "spycraft/dmade/winport.h"
+#include "spycraft/afxwin.h"
 
 namespace Spycraft {
 
@@ -36,10 +37,11 @@ namespace Spycraft {
 #define MAX_TEXT_IDS 200
 #define MAX_TEXT_STRING_LENGTH 128
 
-struct TextID {
+typedef struct
+{
 	bufferNum background;
 	Sprite *text;
-};
+} TextID;
 
 extern int pixFormat;
 
@@ -84,8 +86,7 @@ void InitText() {
 }
 
 void CleanText() {
-	if (hFont)
-		DeleteObject(hFont);
+	if (hFont) DeleteObject(hFont);
 }
 
 void FreeTextSlots(bufferNum background_num) {
@@ -103,10 +104,10 @@ textNum get_next_text_slot() {
 	// find an empty slot 
 	for (i = 0; i < MAX_TEXT_IDS; i++) {
 		if (text_ids[i].background == -1)
-			return i;
+			return (i);
 	}
 
-	return -1;
+	return (-1);
 }
 
 
@@ -122,10 +123,10 @@ short tgcharheight() {
 Sprite *sfxGetTextSprite(textNum text_num) {
 
 	if (text_num < 0 || text_num > MAX_TEXT_IDS - 1)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	if (text_ids[text_num].background == -1)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	return(text_ids[text_num].text);
 }
@@ -134,10 +135,10 @@ void sfxKillText(textNum text_num) {
 	Sprite *text;
 
 	if (text_num < 0 || text_num > MAX_TEXT_IDS - 1)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	if (text_ids[text_num].background == -1)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	// erase the text sprite on next update
 	if (cacheValide) {
@@ -149,14 +150,12 @@ void sfxKillText(textNum text_num) {
 
 }
 
-textNum _tgtextwrite(bufferNum display_buffer, channelNum channel_num,
-		const char *format, ...) {
+textNum _tgtextwrite(bufferNum display_buffer, channelNum channel_num, const char *format, ...) {
 	textNum text_num;
 	va_list argptr;
 
-
 	va_start(argptr, format);
-	Common::vsprintf_s((char *)tgtextbuffer, 256, format, argptr);
+	Common::vsprintf_s((char *)tgtextbuffer, 65536, format, argptr);
 	va_end(argptr);
 
 	text_num = sfxDrawText(display_buffer, channel_num, (const char *)tgtextbuffer);
@@ -164,7 +163,7 @@ textNum _tgtextwrite(bufferNum display_buffer, channelNum channel_num,
 }
 
 textNum sfxDrawText(bufferNum display_buffer, channelNum channel_num,
-		const char *format, ...) {
+	const char *format, ...) {
 	textNum slot;
 	Background *background;
 	Viewport *textPort;
@@ -180,34 +179,35 @@ textNum sfxDrawText(bufferNum display_buffer, channelNum channel_num,
 
 	va_list va;
 	va_start(va, format);
-	Common::String outtext = Common::String::vformat(format, va);
+	char outtext[MAX_TEXT_STRING_LENGTH];
+	Common::vsprintf_s(outtext, format, va);
 	va_end(va);
 
-	if (outtext.empty())
-		return -1;
+	if (*outtext == '\0')
+		return (-1);
 
 	if (CurrentFontID < 0)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	background = backgrounds[display_buffer];
 	if (background == NULL)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	slot = get_next_text_slot();
 	if (slot == -1)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	height = sfxGetTextHeight();
-	width = sfxGetTextWidth(outtext.c_str());
+	width = sfxGetTextWidth(outtext);
 	if (width == 0)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	SRect_Init(&textRect, 0, 0, width - 1, height - 1);
 
 	// make a text viewport
 	textPort = (Viewport *)AllocPtr((DWORD)sizeof(Viewport));
 	if (textPort == NULL)
-		ADV_ASSERT(false, __ERR_PORT_ALLOC_FAIL);
+		ASSERT(false, __ERR_PORT_ALLOC_FAIL);
 
 	// set viewport elements
 	textPort->origX = 0;
@@ -218,7 +218,7 @@ textNum sfxDrawText(bufferNum display_buffer, channelNum channel_num,
 
 	textPort->ptr = AllocPtr((DWORD)(width * height * (screen_colors == 8 ? 1 : 2)));
 	if (textPort->ptr == NULL)
-		ADV_ASSERT(false, __ERR_PORT_ALLOC_FAIL);
+		ASSERT(false, __ERR_PORT_ALLOC_FAIL);
 
 	textPort->rowBytes = width * (screen_colors == 8 ? 1 : 2);
 
@@ -226,14 +226,15 @@ textNum sfxDrawText(bufferNum display_buffer, channelNum channel_num,
 	text = (TextType *)AllocPtr((DWORD)sizeof(TextType));
 	if (text == NULL) {
 		FreePtr(textPort);
-		ADV_ASSERT(false, __ERR_MEM_ALLOC_FAIL);
+		ASSERT(false, __ERR_MEM_ALLOC_FAIL);
 	}
 
-	save_buffer = (char *)AllocPtr((DWORD)(outtext.c_str() + 1));
+	size_t strLen = (DWORD)(strlen(outtext) + 1);
+	save_buffer = (char *)AllocPtr(strLen);
 	if (save_buffer == NULL) {
 		FreePtr(text);
 		FreePtr(textPort);
-		ADV_ASSERT(false, __ERR_MEM_ALLOC_FAIL);
+		ASSERT(false, __ERR_MEM_ALLOC_FAIL);
 	}
 
 	// allocate text sprite
@@ -245,7 +246,7 @@ textNum sfxDrawText(bufferNum display_buffer, channelNum channel_num,
 		FreePtr(save_buffer);
 		FreePtr(text);
 		FreePtr(textPort);
-		ADV_ASSERT(false, __ERR_SPRITE_CREATE_FAIL);
+		ASSERT(false, __ERR_SPRITE_CREATE_FAIL);
 	}
 
 	// assign text structure to sprite
@@ -263,7 +264,7 @@ textNum sfxDrawText(bufferNum display_buffer, channelNum channel_num,
 
 	// save original text string, style, color, and pointsize in text sprite
 
-	Common::strcpy_s(save_buffer, 256, outtext.c_str());
+	Common::strcpy_s(save_buffer, strLen, outtext);
 	sprite->text->text_string = save_buffer;
 	sprite->text->textcolor = textcolor;
 	sprite->text->textstyle = textstyle;
@@ -303,7 +304,7 @@ textNum sfxDrawText(bufferNum display_buffer, channelNum channel_num,
 	} else
 		SetTextColor(hSrcDC, textcolor);
 
-	TextOut(hSrcDC, 0, 0, outtext.c_str(), outtext.size());
+	TextOut(hSrcDC, 0, 0, outtext, strlen(outtext));
 
 	// copy text from SparePort bitmap to text sprite's bitmap
 	Port2Buffer16(textPort->ptr, SparePort, &textRect);
@@ -329,16 +330,16 @@ void sfxAddText2Pic(textNum text_num) {
 	Sprite *text;
 
 	if (text_num < 0 || text_num > MAX_TEXT_IDS - 1)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	if (text_ids[text_num].background == -1)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	text = text_ids[text_num].text;
 	if (text)
 		sfxSpriteAddToPic(text);
 	else
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	text_ids[text_num].background = -1;
 }
@@ -390,6 +391,16 @@ void sfxSetTextFont(int16 font_num, int16 pt_size, styleField style_field) {
 		Common::strcpy_s(logfont.lfFaceName, "Symbol");
 	}
 
+#if 0
+#define FNT_CHICAGO			4
+#define FNT_GARAMOND		5
+#define FNT_GENEVA			6
+#define FNT_PALATINO		7
+#define FNT_MONACO			9
+#define FNT_ZCHANCERY		10
+#define FNT_ZDINGBATS		11
+#endif
+
 	hFont = CreateFontIndirect(&logfont);
 	if (hFont)
 	{
@@ -422,8 +433,8 @@ int32 sfxGetTextOutlineColor(void) {
 	return(outlinetextcolor);
 }
 
-long sfxGetTextColor() {
-	return textcolor;
+long sfxGetTextColor(void) {
+	return(textcolor);
 }
 
 void sfxSetTextColor(uint32 color_num) {
@@ -446,10 +457,10 @@ void sfxChangeTextColor(textNum text_num, uint32 color_num) {
 	if (screen_colors == 8 && (color_num < 0 || color_num > 255)) return;
 
 	if (text_num < 0 || text_num > MAX_TEXT_IDS - 1)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	if (text_ids[text_num].background == -1)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	// get pointer to text's background 
 	background = backgrounds[text_ids[text_num].background];
@@ -459,7 +470,7 @@ void sfxChangeTextColor(textNum text_num, uint32 color_num) {
 
 
 	if (text_sprite->port->height > 32)
-		ADV_ASSERT(0, 0);
+		ASSERT(0, 0);
 
 	SRect_Init(&textRect, 0, 0, text_sprite->port->width - 1, text_sprite->port->height - 1);
 
@@ -498,12 +509,11 @@ void sfxChangeTextColor(textNum text_num, uint32 color_num) {
 		green = background->palette[color_num].green;
 		blue = background->palette[color_num].blue;
 		SetTextColor(hSrcDC, RGB(red, green, blue));
-	} else {
+	} else
 		color = SetTextColor(hSrcDC, color_num);
-	}
 
 	if (color == CLR_INVALID)
-		ADV_ASSERT(false, __ERR_CODING);
+		ASSERT(false, __ERR_CODING);
 
 	// save text's new color in sprite structure
 	text_sprite->text->textcolor = color_num;

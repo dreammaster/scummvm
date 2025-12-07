@@ -262,10 +262,18 @@ bool PostMessage(HWND hWnd, unsigned int Msg,
 	return AfxGetApp()->PostMessage(hWnd, Msg, wParam, lParam);
 }
 
+bool PostQuitMessage(WPARAM nExitCode) {
+	return AfxGetApp()->PostMessage(nullptr, WM_QUIT, nExitCode, 0);
+}
+
 LRESULT SendMessage(HWND hWnd, unsigned int Msg,
         WPARAM wParam, LPARAM lParam) {
 	CWnd *wnd = CWnd::FromHandle(hWnd);
 	return wnd->SendMessage(Msg, wParam, lParam);
+}
+
+int GetKeyState(int keycode) {
+	return AfxGetApp()->GetKeyState(keycode);
 }
 
 HINSTANCE AfxGetResourceHandle() {

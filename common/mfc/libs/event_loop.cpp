@@ -23,6 +23,7 @@
 #include "engines/engine.h"
 #include "common/mfc/afxwin.h"
 #include "common/mfc/libs/event_loop.h"
+#include "common/mfc/keyboard.h"
 #include "common/mfc/winnt.h"
 
 namespace Common {
@@ -311,7 +312,27 @@ bool EventLoop::mousePosToClient(CWnd *wnd, POINT &pt) {
 }
 
 bool EventLoop::pollEvents(Common::Event &event) {
-	return g_system->getEventManager()->pollEvent(event);
+	bool result = g_system->getEventManager()->pollEvent(event);
+
+	if (event.type == Common::EVENT_KEYDOWN)
+		_keyDown[event.kbd.keycode] = true;
+	else if (event.type == Common::EVENT_KEYUP)
+		_keyDown[event.kbd.keycode] = false;
+
+	return result;
+}
+
+int EventLoop::GetKeyState(int keycode) {
+	switch (keycode) {
+	case VK_SHIFT:
+		return _keyDown[Common::KEYCODE_LSHIFT] || _keyDown[Common::KEYCODE_RSHIFT] ? -1 : 0;
+	case VK_CONTROL:
+		return _keyDown[Common::KEYCODE_LCTRL] || _keyDown[Common::KEYCODE_RCTRL] ? -1 : 0;
+	case VK_ALT:
+		return _keyDown[Common::KEYCODE_LALT] || _keyDown[Common::KEYCODE_RALT] ? -1 : 0;
+	default:
+		return _keyDown[keycode] ? -1 : 0;
+	}
 }
 
 void EventLoop::checkForFrameUpdate() {

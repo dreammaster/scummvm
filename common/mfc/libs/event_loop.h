@@ -102,6 +102,7 @@ private:
 	int _idleCtr = 0;
 	KeybindProc _keybindProc = nullptr;
 	FocusChangeProc _focusChangeProc = nullptr;
+	bool _keyDown[Common::KEYCODE_LAST] = {};
 
 protected:
 	enum QuitFlag {
@@ -253,6 +254,8 @@ public:
 		assert(_kbdHookProc.contains((HOOKPROC)hook));
 		_kbdHookProc.remove((HOOKPROC)hook);
 	}
+
+	int GetKeyState(int keycode);
 
 	uintptr SetTimer(HWND hWnd, uintptr nIDEvent, unsigned int nElapse,
 		void (CALLBACK *lpfnTimer)(HWND, unsigned int, uintptr, uint32));
