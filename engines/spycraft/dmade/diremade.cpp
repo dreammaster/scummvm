@@ -37,29 +37,10 @@
 #include "spycraft/dmade/advtime.h"
 #include "spycraft/dmade/advmusic.h"
 #include "spycraft/afxwin.h"
+#include "spycraft/vars.h"
 #include "common/mfc/keyboard.h"
 
 namespace Spycraft {
-
-#define APP_NAME        "Spycraft"
-
-
-#define GAME_WIDTH      512
-#define GAME_HEIGHT     480
-
-//	Instance, Window handles, and DC's used throughout program
-HWND hGameWnd;
-HINSTANCE hInst;
-
-// variables for responding to user's request to quit
-short UserWantsToQuit = false;
-const char *szAppName = APP_NAME;
-int offsetX = 0;
-int offsetY = 0;
-int window_right;
-int window_bottom;
-int surfaceOK = false;
-MADEEventStamp event;
 
 static int posted = false;
 static int appActive = false;

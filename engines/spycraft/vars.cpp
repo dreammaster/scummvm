@@ -19,10 +19,28 @@
  *
  */
 
-#include "spycraft/afxwin.h"
+#include "spycraft/vars.h"
 
 namespace Spycraft {
 
-extern void init_vars();
+// dmade/diremade.cpp
+const char *szAppName = APP_NAME;
+HWND hGameWnd;
+HINSTANCE hInst;
+bool UserWantsToQuit;
+int offsetX;
+int offsetY;
+int window_right;
+int window_bottom;
+bool surfaceOK;
+MADEEventStamp event;
+
+void init_vars() {
+	// dmade/diremade.cpp
+	UserWantsToQuit = false;
+	offsetX = offsetY = 0;
+	window_right = window_bottom = 0;
+	surfaceOK = false;
+}
 
 } // End of namespace Spycraft
