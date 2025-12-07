@@ -4,6 +4,7 @@ MODULE_OBJS = \
 	spycraft.o \
 	console.o \
 	metaengine.o \
+	vars.o \
 	dmade/advback.o \
 	dmade/advbits.o \
 	dmade/advcursor.o \
