@@ -20,7 +20,7 @@
  */
 
 #include "spycraft/game/email.h"
-#include "spycraft/game/htm.h"
+#include "spycraft/dmade/htm.h"
 #include "spycraft/game/flag.h"
 #include "spycraft/game/knee.h"
 #include "spycraft/game/sndanal.h"

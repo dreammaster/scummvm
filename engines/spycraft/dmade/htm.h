@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SPYCRAFT_GAME_HTM_H
-#define SPYCRAFT_GAME_HTM_H
+#ifndef SPYCRAFT_DMADE_HTM_H
+#define SPYCRAFT_DMADE_HTM_H
 
 namespace Spycraft {
 
