@@ -33,7 +33,7 @@
 #include "spycraft/game/flag.h"
 #include "spycraft/game/vlink.h"
 #include "spycraft/game/roomsnd.h"
-#include "spycraft/dmade/image.h"
+#include "spycraft/game/image.h"
 #include "spycraft/game/cypher.h"
 //#include "spycraft/logic/37000.h"
 #include "spycraft/game/teletalk.h"

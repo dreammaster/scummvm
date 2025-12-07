@@ -27,7 +27,7 @@
 #include "spycraft/game/flag.h"
 #include "spycraft/game/roomsnd.h"
 #include "spycraft/game/web.h"
-#include "spycraft/dmade/image.h"
+#include "spycraft/game/image.h"
 #include "spycraft/game/html.h"
 #include "spycraft/game/pcscreen.h"
 #include "spycraft/logic/5000.h"

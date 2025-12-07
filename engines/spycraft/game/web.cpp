@@ -32,7 +32,7 @@
 #include "spycraft/game/onyxhunt.h"
 #include "spycraft/game/phodoc.h"
 #include "spycraft/game/cypher.h"
-#include "spycraft/dmade/image.h"						   
+#include "spycraft/game/image.h"						   
 #include "spycraft/game/html.h"
 #include "spycraft/game/htm.h"						     
 #include "spycraft/dmade/advscreen.h"
