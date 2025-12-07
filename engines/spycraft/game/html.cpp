@@ -30,7 +30,7 @@
 namespace Spycraft {
 
 Sound *typeSFX;
-extern"C"{extern void GetCDROM(char*);}
+extern void GetCDROM(char *);
 
 HTMLBack * htmlback;
 HTMLAnnounce* speak= NULL;

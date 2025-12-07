@@ -543,7 +543,7 @@ DebugModule::~DebugModule()
 	//file->close();
 }
 
-extern "C" int allow_heapCheck;
+int allow_heapCheck;
 
 int DebugModule :: handleEvent ( MADEEventStamp* event)	{
 #ifdef DEBUG_CODE

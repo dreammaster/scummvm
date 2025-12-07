@@ -35,9 +35,7 @@ Knee *knee = NULL;
 extern int soundGone;
 #ifdef DIRECTX
 extern void EraseAltLine();
-extern "C" {
-	extern void AddScreen2PicEx(int dx, int dy, int w, int h);
-}
+extern void AddScreen2PicEx(int dx, int dy, int w, int h);
 #endif										  
 KneeBack::KneeBack() {
 	name = "backgrnd";
