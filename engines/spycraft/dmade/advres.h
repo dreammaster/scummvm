@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SPYCRAFT_DMADE_ATS_H
-#define SPYCRAFT_DMADE_ATS_H
+#ifndef SPYCRAFT_DMADE_ADVRES_H
+#define SPYCRAFT_DMADE_ADVRES_H
 
 #include "spycraft/dmade/advlist.h"
 #include "spycraft/dmade/ats.h"
