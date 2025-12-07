@@ -225,7 +225,7 @@ extern styleField sfxGetTextStyle(void);
 //
 //	Returns:	number of the color in the universal palette.
 
-extern int32 sfxGetTextColor();
+extern long sfxGetTextColor();
 
 
 //	Function:	sfxGetTextOutlineColor

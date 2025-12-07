@@ -9,10 +9,13 @@ MODULE_OBJS = \
 	dmade/advcursor.o \
 	dmade/advdcmp.o \
 	dmade/advdebug.o \
+	dmade/adveff.o \
 	dmade/advfile.o \
+	dmade/advline.o \
 	dmade/advlist.o \
 	dmade/advmem.o \
 	dmade/advmisc.o \
+	dmade/advmsg.o \
 	dmade/advport.o \
 	dmade/advrect.o \
 	dmade/advres.o \
@@ -21,13 +24,18 @@ MODULE_OBJS = \
 	dmade/advtext.o \
 	dmade/advtime.o \
 	dmade/ats.o \
+	dmade/diremade.o \
 	dmade/dirmovie.o \
 	dmade/dirscreen.o \
-	dmade/duck_dxl.o \
 	dmade/duck_api.o \
+	dmade/duck_dxl.o \
 	dmade/duck_mli.o \
 	dmade/gamebox.o \
 	dmade/mli.o \
+	dmade/pkface.o \
+	dmade/tgapic.o \
+	dmade/tgaread.o \
+	dmade/wintext.o \
 	game/act.o \
 	game/actor.o \
 	game/actsock.o \
@@ -160,4 +168,3 @@ include $(srcdir)/rules.mk
 
 # Detection objects
 DETECT_OBJS += $(MODULE)/detection.o
-

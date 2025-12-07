@@ -26,7 +26,7 @@
 #include "spycraft/game/interface.h"
 #include "spycraft/game/web.h"
 #include "spycraft/game/globals.h"
-#include "spycraft/dmade/image.h"
+#include "spycraft/game/image.h"
 #include "spycraft/game/sndanal.h"						   
 #include "spycraft/game/kat.h"
 #include "spycraft/game/cypher.h"

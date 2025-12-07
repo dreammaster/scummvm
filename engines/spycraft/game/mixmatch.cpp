@@ -21,7 +21,7 @@
 
 #include "spycraft/game/mixmatch.h"
 #include "spycraft/game/flag.h"
-#include "spycraft/dmade/image.h"
+#include "spycraft/game/image.h"
 #include "spycraft/game/vlink.h"
 #include "spycraft/game/timer.h"
 #include "spycraft/game/puzztest.h"	    

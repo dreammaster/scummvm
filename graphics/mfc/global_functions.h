@@ -140,8 +140,10 @@ extern void TranslateMessage(LPMSG lpMsg);
 extern void DispatchMessage(LPMSG lpMsg);
 extern bool PostMessage(HWND hWnd, unsigned int Msg,
                         WPARAM wParam, LPARAM lParam);
+extern bool PostQuitMessage(WPARAM nExitCode);
 extern LRESULT SendMessage(HWND hWnd, unsigned int Msg,
                            WPARAM wParam, LPARAM lParam);
+extern int GetKeyState(int keycode);
 
 extern HINSTANCE AfxGetResourceHandle();
 extern HINSTANCE AfxFindResourceHandle(const char *lpszName, const char *lpszType);
