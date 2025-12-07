@@ -142,4 +142,10 @@ void EndScript() {
 	}
 }
 
+// Disk has been inserted
+short OnDiskInsert(MADEEventStamp *event) {
+	// No implementation
+	return 0;
+}
+
 } // namespace Spycraft
