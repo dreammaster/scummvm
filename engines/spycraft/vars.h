@@ -22,14 +22,30 @@
 #ifndef SPYCRAFT_VARS_H
 #define SPYCRAFT_VARS_H
 
-#include "spycraft/vars.h"
+#include "spycraft/afxwin.h"
+#include "spycraft/dmade/advmain.h"
 
 namespace Spycraft {
 
+#define APP_NAME        "Spycraft"
 
-void init_vars() {
+#define GAME_WIDTH      512
+#define GAME_HEIGHT     480
 
-}
+// dmade/diremade.cpp
+extern HWND hGameWnd;
+extern HINSTANCE hInst;
+extern bool UserWantsToQuit;
+extern const char *szAppName;
+extern int offsetX;
+extern int offsetY;
+extern int window_right;
+extern int window_bottom;
+extern bool surfaceOK;
+extern MADEEventStamp event;
+
+
+extern void init_vars();
 
 } // End of namespace Spycraft
 

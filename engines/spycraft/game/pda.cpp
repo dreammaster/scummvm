@@ -69,16 +69,16 @@ void PDA::respond( void )
 	sfxSetCursor(970,0,1);
 }
 
-void PDA::VLinkNotify(char* theMovie, unsigned int waitTime)
+void PDA::VLinkNotify(const char *filename, unsigned int waitTime)
 {
-/*	thePDATimer->myMovie = theMovie;
+/*	thePDATimer->myMovie = filename;
 	if (waitTime)
 		thePDATimer->setReal(waitTime);
 	else
 		thePDA->blink();*/
 }
 
-void PDA::VLinkNotify(char* theMovie, unsigned int waitTime, Object* toCue)
+void PDA::VLinkNotify(const char *filename, unsigned int waitTime, Object* toCue)
 {
 /*	whoToCue = toCue;
 	VLinkNotify(theMovie, waitTime);*/
