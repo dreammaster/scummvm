@@ -30,6 +30,8 @@
 namespace Spycraft {
 
 int event_type;
+int mouse_x;
+int mouse_y;
 unsigned long gameTime;
 MADEEventStamp theEvent;
 

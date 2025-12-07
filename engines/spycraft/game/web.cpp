@@ -47,7 +47,7 @@ extern BlinkCursor* normalCursor;
 extern GunCursor* gunCursor;
 extern Colby colby;
 
-extern"C"{extern void GetCDROM(char*);}
+extern void GetCDROM(char *);
 
 extern Flag GameFlag;						 
 

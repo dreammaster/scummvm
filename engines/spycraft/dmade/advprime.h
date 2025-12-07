@@ -24,16 +24,8 @@
 
 namespace Spycraft {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void sfxMDDrawRECT(int x, int y, int w, int h, int c);
 void sfxMDBitBlt(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Spycraft
 
