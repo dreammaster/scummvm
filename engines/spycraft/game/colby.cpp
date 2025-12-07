@@ -53,7 +53,7 @@ namespace Spycraft {
 extern HWND hGameWnd;
 #endif
 #ifdef DOS4GW
-extern "C" {MADEEventStamp *GetDOSMessage(void); }
+MADEEventStamp *GetDOSMessage(void);
 #endif
 
 extern DebugModule *theDebug;
@@ -112,7 +112,7 @@ Print *testPrint; //DEBUG
 
 char szHDRoot[MAX_PATH];
 char theNetPath[MAX_PATH];
-extern "C" { char spycraftPath[MAX_PATH]; }
+char spycraftPath[MAX_PATH];
 
 void flushMessageCue(void) {
 #ifdef DOS4GW

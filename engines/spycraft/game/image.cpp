@@ -36,19 +36,17 @@ namespace Spycraft {
 
 //bool mailFlags[5][80];
 
-extern "C" {
-	void copyRect(SRect *dest, SRect *src)
-	{
-		dest->left = src->left;
-		dest->right = src->right;
-		dest->top = src->top;
-		dest->bottom = src->bottom; 
-		dest->width	= src->width;
-		dest->height = src->height;
-	}
-	
-	void CleanUpSprites();
+void copyRect(SRect *dest, SRect *src)
+{
+	dest->left = src->left;
+	dest->right = src->right;
+	dest->top = src->top;
+	dest->bottom = src->bottom; 
+	dest->width	= src->width;
+	dest->height = src->height;
 }
+	
+void CleanUpSprites();
     
 PictureButton* picBut[MAX_PICS];
 

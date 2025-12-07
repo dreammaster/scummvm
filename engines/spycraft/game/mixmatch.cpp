@@ -36,7 +36,7 @@ namespace Spycraft {
 #define NOSEARCH		0
 bool peopleFound[MAX_PHOTOS];
 
-extern "C" void CleanUpSprites();
+void CleanUpSprites();
 
 int eyeColor;
 int hairColor;
@@ -147,7 +147,7 @@ int sliderWidth;
 int photoView;
 char currentButton[12];
 
-extern "C" void CleanUpSprites();
+extern void CleanUpSprites();
 
 /***********************************
  *		

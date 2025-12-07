@@ -367,14 +367,14 @@ public:
 	};
 	void changeState(int);
 };
-extern "C" {
-	void gogglesStart(int row, int column);
-	void moveEnemy(int row, int column);
-	void gogglesClean(void);
 
-	void clearShot(void);
-	void endPuzzle(void);
-}
+void gogglesStart(int row, int column);
+void moveEnemy(int row, int column);
+void gogglesClean(void);
+
+void clearShot(void);
+void endPuzzle(void);
+
 extern int g1;
 extern int g2;
 extern int g3;
