@@ -36,7 +36,6 @@ MODULE_OBJS = \
 	dmade/pkface.o \
 	dmade/tgapic.o \
 	dmade/tgaread.o \
-	dmade/wintext.o \
 	game/act.o \
 	game/actor.o \
 	game/actsock.o \
@@ -73,18 +72,22 @@ MODULE_OBJS = \
 	game/movie.o \
 	game/object.o \
 	game/onyxhunt.o \
+	game/page.o \
 	game/pcscreen.o \
 	game/pda.o \
 	game/phodoc.o \
 	game/phone.o \
 	game/plistobj.o \
+	game/print.o \
 	game/puzztest.o \
 	game/room1.o \
 	game/save.o \
+	game/script.o \
 	game/sndanal.o \
 	game/sound.o \
 	game/taget.o \
 	game/teletalk.o \
+	game/timer.o \
 	game/torture.o \
 	game/user.o \
 	game/vlink.o \

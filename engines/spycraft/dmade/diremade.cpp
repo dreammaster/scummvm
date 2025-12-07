@@ -28,7 +28,6 @@
 #include "spycraft/dmade/advmain.h"
 #include "spycraft/dmade/advtext.h"
 #include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/wintext.h"
 #include "spycraft/dmade/advsound.h"
 #include "spycraft/dmade/advcursor.h"
 #include "spycraft/dmade/winscreen.h"

@@ -343,7 +343,7 @@ SHORT GetAsyncKeyState(int vKey) {
 	error("TODO: GetAsyncKeyState");
 }
 
-DWORD timemGetTime() {
+DWORD timeGetTime() {
 	return g_system->getMillis();
 }
 
