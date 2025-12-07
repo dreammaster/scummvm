@@ -31,6 +31,7 @@
 #include "spycraft/dmade/advtime.h"
 #include "spycraft/detection.h"
 #include "spycraft/console.h"
+#include "spycraft/vars.h"
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
 #include "common/system.h"
