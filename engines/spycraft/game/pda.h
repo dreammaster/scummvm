@@ -48,8 +48,8 @@ public:
 	void init(int theX, int theY);
 	void blink(void);
 	void playVLink(void);
-	void VLinkNotify(char *theMovie, unsigned int waitTime);
-	void VLinkNotify(char *theMovie, unsigned int waitTime, Object *whoToCue);
+	void VLinkNotify(const char *filename, unsigned int waitTime);
+	void VLinkNotify(const char *filename, unsigned int waitTime, Object *whoToCue);
 	int handleEvent(MADEEventStamp *event);
 	void respond(void);
 };
