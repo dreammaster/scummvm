@@ -32,6 +32,7 @@ MODULE_OBJS = \
 	dmade/duck_dxl.o \
 	dmade/duck_mli.o \
 	dmade/gamebox.o \
+	dmade/htm.o \
 	dmade/mli.o \
 	dmade/pkface.o \
 	dmade/tgapic.o \

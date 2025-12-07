@@ -34,7 +34,7 @@
 #include "spycraft/game/cypher.h"
 #include "spycraft/game/image.h"						   
 #include "spycraft/game/html.h"
-#include "spycraft/game/htm.h"						     
+#include "spycraft/dmade/htm.h"						     
 #include "spycraft/dmade/advscreen.h"
 #include "spycraft/game/target.h"
 #include "spycraft/dmade/advsound.h"
