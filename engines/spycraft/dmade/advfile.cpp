@@ -55,7 +55,12 @@ HANDLE sfxOpenFile(const char *filename, int mode) {
 	return (HANDLE)-1;
 }
 
-int sfxWriteASCFile(HANDLE hf, char *format, ...) {
+int sfxGetFileSize(HANDLE hf) {
+	Common::SeekableReadStream *rs = (Common::SeekableReadStream *)hf;
+	return rs->size();
+}
+
+int sfxWriteASCFile(HANDLE hf, const char *format, ...) {
 	va_list list;
 
 	va_start(list, format);
@@ -297,5 +302,6 @@ bool sfxCopyFile(const char *src, const char *dest) {
 	fOut.writeStream(&fIn);
 	return true;
 }
+
 
 } // namespace Spycraft
