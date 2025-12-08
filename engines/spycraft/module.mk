@@ -21,6 +21,7 @@ MODULE_OBJS = \
 	dmade/advrect.o \
 	dmade/advres.o \
 	dmade/advsfx.o \
+	dmade/advsound.o \
 	dmade/advsprite.o \
 	dmade/advtext.o \
 	dmade/advtime.o \
