@@ -30,34 +30,143 @@ namespace Spycraft {
 
 #define NUM_MUSIC_VOICES	8
 
-/* these could use some descriptions */
+
+/**
+ * Initialize the SFX MIDI system
+ */
+inline int InitMusic() {
+	return 0;
+}
+
+/**
+ * De-Initialize the SFX MIDI system
+ */
+inline int CleanMusic() {
+	return 0;
+}
+
+/**
+ * Start a song playing
+ * @param id				Resource ID
+ * @param volume			Volume to play song at
+ * @param volume_delay		Period till volume is reached
+ * @param tempo				Tempo to play song at
+ * @param tempo_delay		Tempo change period
+ * @param loop_count		Number of times to loop song
+ * @param CallBackFn		Callback function pointer
+ * @return Handle of song
+ */
 extern int sfxPlayMusic(int id, int volume, int volume_delay,
 	int tempo, int tempo_delay,
 	int loop_count, void (*CallBackFn)(int));
+
+/**
+ * Stop a song from playing
+ * @param midi_id		Handle of the song
+ */
 extern int sfxStopMusic(int midi_id);
+
+/**
+ * Pause a song from playing
+ * @param midi_id		Handle of the song
+ */
 extern int sfxPauseMusic(int midi_id);
+
+/**
+ * Resume a song playing
+ * @param midi_id		Handle of the song
+ */
 extern int sfxResumeMusic(int midi_id);
+
+/**
+ * Set the music volume
+ * @param midi_id		Handle of the song
+ * @param new_volume	Volume to set song to
+ * @param delay			Period to fade over
+ * @return 
+*/
 extern int sfxSetMusicVolume(int midi_id, int new_volume, int delay);
+
+/**
+ * Alter the tempo of a song
+ * @param midi_id		Handle of the song
+ * @param new_tempo		Tempo to set song to
+ * @param delay			Period to alter tempo over
+ */
 extern int sfxSetMusicTempo(int midi_id, int new_tempo, int delay);
+
+/**
+ * Set the loop count for a song
+ * @param midi_id		Handle of the song
+ * @param loop_count	Loop count
+ */
 extern int sfxSetMusicLoops(int midi_id, int loop_count);
+
+/**
+ * Return the music volume 
+ * @param midi_id		Handle of the song
+ */
 extern int sfxGetMusicVolume(int midi_id);
+
+/**
+ * Get the tempo for a song
+ * @param midi_id		Handle of the song
+ * @return The tempo
+ */
 extern int sfxGetMusicTempo(int midi_id);
+
+/**
+ * Get the loop count for a song
+ * @param midi_id		Handle of the song
+ * @return Loop count
+ */
 extern int sfxGetRemainingMusicLoops(int midi_id);
-extern int sfxIsMusicPlaying(int midi_id);
+
+/**
+ * Check to see if a song is playing
+ * @param midi_id		Handle of the song
+ * @return Is playing
+ */
+extern bool sfxIsMusicPlaying(int midi_id);
+
+/**
+ * Enable the MIDI system 
+ */
 extern int sfxEnableMusic();
+
+/**
+ * Disable the MIDI system
+ */
 extern int sfxDisableMusic();
-extern void UpdateMusic();
 
-/* MADE Internal */
+/**
+ * Update the playing music.
+ * Not needed in ScummVM, which has audio playback in a separate thread.
+ */
+inline void UpdateMusic() {
+	// No implementation
+}
 
-extern int InitMusic();
-extern int CleanMusic();
-
-/* what about clean and update? */
-
+/**
+ * Reads the content of a MIDI file.
+ * @param filename		Filename
+ * @param size			Pointer to store the file size to
+ * @return Pointer to buffer for the loaded data
+ */
 extern void *OpenMidiFile(const char *filename, int *size);
-extern void *OpenMidi(void *src);
-extern void FreeMidi(void *data);
+
+/**
+ * Reads a MIDI from a source buffer
+ * @param src		Source buffer
+ * @return Pointer to buffer
+ */
+inline void *OpenMidi(void *src) {
+	return src;
+}
+
+inline void FreeMidi(void *data) {
+	free(data);
+}
 
 } // namespace Spycraft
 
