@@ -38,11 +38,11 @@ char sFilter[FILTERSIZE];
 char sFileName[PATHSIZE];
 
 uint16 sfxFileGetWORD(HANDLE hf) {
-	return ((Common::File *)hf)->readUint16LE();
+	return ((Common::SeekableReadStream *)hf)->readUint16LE();
 }
 
 uint8 sfxFileGetBYTE(HANDLE hf) {
-	return ((Common::File *)hf)->readByte();
+	return ((Common::SeekableReadStream *)hf)->readByte();
 }
 
 HANDLE sfxOpenFile(const char *filename, int mode) {
@@ -69,7 +69,7 @@ int sfxWriteASCFile(HANDLE hf, char *format, ...) {
 }
 
 int sfxSeekFile(HANDLE hf, int offset, int mode) {
-	Common::File *f = (Common::File *)hf;
+	Common::SeekableReadStream *f = (Common::SeekableReadStream *)hf;
 
 	switch (mode) {
 	case MADE_SEEK_BEG:
@@ -86,19 +86,19 @@ int sfxSeekFile(HANDLE hf, int offset, int mode) {
 }
 
 int sfxWriteFile(HANDLE hf, void *buffer, int size) {
-	Common::DumpFile *df = (Common::DumpFile *)hf;
+	Common::WriteStream *ws = (Common::WriteStream *)hf;
 
-	return df->write(buffer, size);
+	return ws->write(buffer, size);
 }
 
 int sfxReadFile(HANDLE hf, void *buffer, int size) {
-	Common::File *f = (Common::File *)hf;
+	Common::SeekableReadStream *f = (Common::SeekableReadStream *)hf;
 
 	return f->read(buffer, size);
 }
 
 char *sfxReadFileString(HANDLE hf) {
-	Common::File *f = (Common::File *)hf;
+	Common::SeekableReadStream *f = (Common::SeekableReadStream *)hf;
 	int i = 0;
 	char buffer;
 	bool ret = true;
@@ -129,7 +129,7 @@ char *sfxReadFileString(HANDLE hf) {
 }
 
 int sfxGetString(HANDLE hf, char *dest) {
-	Common::File *f = (Common::File *)hf;
+	Common::SeekableReadStream *f = (Common::SeekableReadStream *)hf;
 	int i = 0;
 	char buffer;
 	int ret = true;
@@ -150,13 +150,23 @@ int sfxGetString(HANDLE hf, char *dest) {
 }
 
 int sfxCloseFile(HANDLE hf) {
-	Common::File *f = (Common::File *)hf;
+	Common::Stream *f = (Common::Stream *)hf;
+
 	delete f;
 	return 0;
 }
 
 size_t sfxFileSize(HANDLE hf) {
-	return ((Common::File *)hf)->size();
+	Common::Stream *s = (Common::Stream *)s;
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(s);
+	Common::SeekableWriteStream *ws = dynamic_cast<Common::SeekableWriteStream *>(s);
+
+	if (rs)
+		return rs->size();
+	if (ws)
+		return ws->size();
+
+	error("Invalid file");
 }
 
 int sfxFileSize(const char *filename) {
