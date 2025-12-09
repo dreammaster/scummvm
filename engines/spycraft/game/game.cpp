@@ -41,6 +41,7 @@
 #include "spycraft/dmade/advmusic.h"
 #include "spycraft/dmade/mcimovie.h"
 #include "spycraft/game/actsock.h"
+#include "spycraft/vars.h"
 
 namespace Spycraft {
 
@@ -56,7 +57,6 @@ extern HWND hGameWnd;
 
 extern SoundList *sounds;
 extern short restoring;
-extern int suspended;
 List *permList;
 Game *theGame = NULL;
 Room *curRoom = NULL;

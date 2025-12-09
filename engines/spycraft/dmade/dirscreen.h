@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SPYCRAFT_DMADE_WINSCREEN_H
-#define SPYCRAFT_DMADE_WINSCREEN_H
+#ifndef SPYCRAFT_DMADE_DIRSCREEN_H
+#define SPYCRAFT_DMADE_DIRSCREEN_H
 
 #include "spycraft/afxwin.h"
 #include "spycraft/dmade/advport.h"
@@ -28,6 +28,10 @@
 #include "spycraft/dmade/advscreen.h"
 
 namespace Spycraft {
+
+#define DEFAULT_WIDTH           640
+#define DEFAULT_HEIGHT          480
+#define DEFAULT_SPRITELIST_SIZE  40
 
 extern HDC hGameDC;
 extern HDC hSrcDC;

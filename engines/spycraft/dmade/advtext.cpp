@@ -26,7 +26,7 @@
 #include "spycraft/dmade/advbits.h"
 #include "spycraft/dmade/advsprite.h"
 #include "spycraft/dmade/winmade.h"
-#include "spycraft/dmade/winscreen.h"
+#include "spycraft/dmade/dirscreen.h"
 #include "spycraft/dmade/winport.h"
 
 namespace Spycraft {

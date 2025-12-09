@@ -25,7 +25,7 @@
 #include "spycraft/logic/1000.h"
 #include "spycraft/logic/91000.h"
 #include "spycraft/game/invent.h"
-#include "spycraft/dmade/winscreen.h"
+#include "spycraft/dmade/dirscreen.h"
 
 namespace Spycraft {
 
