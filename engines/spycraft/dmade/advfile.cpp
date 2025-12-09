@@ -162,7 +162,7 @@ int sfxCloseFile(HANDLE hf) {
 }
 
 size_t sfxFileSize(HANDLE hf) {
-	Common::Stream *s = (Common::Stream *)s;
+	Common::Stream *s = (Common::Stream *)hf;
 	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(s);
 	Common::SeekableWriteStream *ws = dynamic_cast<Common::SeekableWriteStream *>(s);
 
