@@ -814,6 +814,12 @@ extern bool TextOut(HDC hdc, int x, int y, const char *lpString, int nCount);
 extern int GetMapMode(HDC hdc);
 extern bool GetTextExtentPoint(HDC hdc, const char *lpString, int cchString, LPSIZE lpSize);
 
+extern HPEN CreatePen(int fnPenStyle, int nWidth, COLORREF crColor);
+extern int SetMapMode(HDC hdc, int iMode);
+extern int SetROP2(HDC hdc, int fnDrawMode);
+extern bool MoveToEx(HDC hdc, int X, int Y, LPPOINT lpPoint);
+extern bool LineTo(HDC hdc, int X, int Y);
+
 } // namespace MFC
 } // namespace Common
 

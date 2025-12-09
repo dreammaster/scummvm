@@ -491,5 +491,34 @@ bool GetTextExtentPoint(HDC hdc, const char *lpString, int cchString, LPSIZE lpS
 	return true;
 }
 
+HPEN CreatePen(int fnPenStyle, int nWidth, COLORREF crColor) {
+	CPen *pen = new CPen();
+	pen->CreatePen(fnPenStyle, nWidth, crColor);
+	return pen->m_hObject;
+}
+
+int SetMapMode(HDC hdc, int iMode) {
+	CDC *dc = CDC::FromHandle(hdc);
+	return dc->SetMapMode(iMode);
+}
+
+int SetROP2(HDC hdc, int fnDrawMode) {
+	CDC *dc = CDC::FromHandle(hdc);
+	return dc->SetROP2(fnDrawMode);
+}
+
+bool MoveToEx(HDC hdc, int X, int Y, LPPOINT lpPoint) {
+	assert(!lpPoint);
+	CDC *dc = CDC::FromHandle(hdc);
+	dc->MoveTo(X, Y);
+	return true;
+}
+
+bool LineTo(HDC hdc, int X, int Y) {
+	CDC *dc = CDC::FromHandle(hdc);
+	dc->LineTo(X, Y);
+	return true;
+}
+
 } // namespace MFC
 } // namespace Common
