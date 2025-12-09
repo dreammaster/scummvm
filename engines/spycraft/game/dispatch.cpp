@@ -27,102 +27,99 @@
 #include "spycraft/game/game.h"
 #include "spycraft/game/colby.h"
 #include "spycraft/game/movie.h"
+#include "spycraft/vars.h"
 
 namespace Spycraft {
 
 extern int currentFocus;
 extern short restoring;
 extern Movie *theMovie;
-unsigned long absoluteTime;
-unsigned long oldTime;
-unsigned long elapsedTime;
-bool suspended;
 
 void StartScript() {
 	theGame->init();
 }
 
 //DEBUG////////////////////////
-short OnRightButtonDown(MADEEventStamp *event) {
+short OnRightButtonDown(MADEEventStamp *ev) {
 
 	if (!suspended) {
 		event_type = USER_RIGHT_DOWN;
-		return (user->handleEvent(event));
+		return (user->handleEvent(ev));
 	}
 	return false;
 }
 
-short OnRightButtonUp(MADEEventStamp *event) {
+short OnRightButtonUp(MADEEventStamp *ev) {
 
 	if (!suspended) {
 		event_type = USER_RIGHT_UP;
-		return (user->handleEvent(event));
+		return (user->handleEvent(ev));
 	}
 	return false;
 }
 
-short OnMiddleButtonDown(MADEEventStamp *event) {
+short OnMiddleButtonDown(MADEEventStamp *ev) {
 	if (!suspended) {
 		event_type = USER_MID_DOWN;
-		return (user->handleEvent(event));
+		return (user->handleEvent(ev));
 	}
 	return false;
 }
 
-short OnMiddleButtonUp(MADEEventStamp *event) {
+short OnMiddleButtonUp(MADEEventStamp *ev) {
 	event_type = USER_MID_UP;
-	return (user->handleEvent(event));
+	return (user->handleEvent(ev));
 }
 
-short OnLeftDouble(MADEEventStamp *event) {
+short OnLeftDouble(MADEEventStamp *ev) {
 	return true;
 }
 
-short OnLeftButtonDown(MADEEventStamp *event) {
+short OnLeftButtonDown(MADEEventStamp *ev) {
 	if (!suspended) {
 		event_type = USER_LEFT_DOWN;
-		return (user->handleEvent(event));
+		return (user->handleEvent(ev));
 	}
 	return false;
 }
 
-short OnLeftButtonUp(MADEEventStamp *event) {
+short OnLeftButtonUp(MADEEventStamp *ev) {
 	if (!suspended) {
 		event_type = USER_LEFT_UP;
-		return (user->handleEvent(event));
+		return (user->handleEvent(ev));
 	}
 	return false;
 }
 
-short OnKeyDown(MADEEventStamp *event) {
+short OnKeyDown(MADEEventStamp *ev) {
 
 	if (!suspended) {
 		event_type = USER_KEY_DOWN;
-		return (user->handleEvent(event));
+		return (user->handleEvent(ev));
 	}
 	return false;
 }
 
-short OnKeyUp(MADEEventStamp *event) {
+short OnKeyUp(MADEEventStamp *ev) {
 	if (!suspended) {
 		event_type = USER_KEY_UP;
-		return (user->handleEvent(event));
+		return (user->handleEvent(ev));
 	}
 	return false;
 }
 
-short OnIdle(MADEEventStamp *event) {
+short OnIdle(MADEEventStamp *ev) {
 
-	absoluteTime = (event->clock_lo) >> 4;
+	absoluteTime = (ev->clock_lo) >> 4;
 	if ((!restoring) && (!suspended)) {
 
 		elapsedTime = absoluteTime - oldTime;
 		event_type = 0;
-		mouse_x = event->cursor_pt.x;
-		mouse_y = event->cursor_pt.y;
+		mouse_x = ev->cursor_pt.x;
+		mouse_y = ev->cursor_pt.y;
 		gameTime += elapsedTime;
 		if (currentFocus)
-			user->handleEvent(event);
+			user->handleEvent(ev);
 
 		if (theGame)
 			theGame->doit();
@@ -143,7 +140,7 @@ void EndScript() {
 }
 
 // Disk has been inserted
-short OnDiskInsert(MADEEventStamp *event) {
+short OnDiskInsert(MADEEventStamp *ev) {
 	// No implementation
 	return 0;
 }

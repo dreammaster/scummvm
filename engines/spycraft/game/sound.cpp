@@ -38,7 +38,7 @@ extern int quitting;
 
 SoundList *sounds;
 
-extern "C" int resourceIds[];
+int resourceIds[];
 
 void SoundCallBack(int hd) {
 	SoundObject *obj;

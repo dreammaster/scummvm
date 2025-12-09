@@ -27,7 +27,7 @@
 #include "spycraft/dmade/advcursor.h"
 #include "spycraft/game/sound.h"
 #include "spycraft/game/interface.h"
-#include "spycraft/dmade/winscreen.h"
+#include "spycraft/dmade/dirscreen.h"
 #include "spycraft/game/flag.h"
 
 namespace Spycraft {

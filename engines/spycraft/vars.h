@@ -44,6 +44,27 @@ extern int window_bottom;
 extern bool surfaceOK;
 extern MADEEventStamp event;
 
+// dmade/dirscreen.cpp
+extern int screen_width;
+extern int screen_height;
+extern int screen_colors;
+extern int scene_width;
+extern int scene_height;
+extern int spritelist_size;
+extern HDC hGameDC;
+extern HDC hSrcDC;
+
+// dmade/winmemx.cpp
+extern int __mem_index;
+extern long memAllocLimit;
+extern int allow_heapCheck;
+
+// game/dispatch.cpp
+extern unsigned long absoluteTime;
+extern unsigned long oldTime;
+extern unsigned long elapsedTime;
+extern bool suspended;
+
 
 extern void init_vars();
 

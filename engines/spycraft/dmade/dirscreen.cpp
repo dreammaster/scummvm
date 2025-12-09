@@ -23,13 +23,14 @@
 #include "graphics/managed_surface.h"
 #include "spycraft/spycraft.h"
 #include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/winscreen.h"
+#include "spycraft/dmade/dirscreen.h"
 #include "spycraft/dmade/winmade.h"
 #include "spycraft/dmade/advrect.h"
 #include "spycraft/dmade/advlist.h"
 #include "spycraft/dmade/winport.h"
 #include "spycraft/dmade/advback.h"
 #include "spycraft/dmade/advbits.h"
+#include "spycraft/vars.h"
 
 namespace Spycraft {
 
@@ -38,30 +39,15 @@ namespace Spycraft {
 #define DO_STRIPING
 #define DO_BOUNDS
 
-#define DEFAULT_WIDTH           640
-#define DEFAULT_HEIGHT          480
-#define DEFAULT_SPRITELIST_SIZE  40
-
 #define _USEASM
 
-int screen_width;
-int screen_height;
-int screen_colors;
-
-int scene_width = DEFAULT_WIDTH;
-int scene_height = DEFAULT_HEIGHT;
-int spritelist_size = DEFAULT_SPRITELIST_SIZE;
 static int have_set_dimensions = 0;
-
-HDC hGameDC;
-HDC hSrcDC;
 
 static int	Rect_EnlargeEdgeOverlap(SRect *r1, SRect *r2);
 static int	Rect_ClipEdgeOverlap(SRect *r1, SRect *r2);
 
 extern int offsetX;
 extern int offsetY;
-extern int surfaceOK;
 
 void sfxSetSpritelistSize(int listsize) {
 	if (listsize >= DEFAULT_SPRITELIST_SIZE)

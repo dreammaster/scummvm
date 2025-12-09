@@ -26,6 +26,7 @@
 #include "spycraft/game/game.h"
 #include "spycraft/game/flag.h"
 #include "spycraft/dmade/advtime.h"
+#include "spycraft/vars.h"
 
 #ifdef _DEBUG
 #define DEBUG_CODE
@@ -543,9 +544,7 @@ DebugModule::~DebugModule()
 	//file->close();
 }
 
-int allow_heapCheck;
-
-int DebugModule :: handleEvent ( MADEEventStamp* event)	{
+int DebugModule :: handleEvent ( MADEEventStamp* ev)	{
 #ifdef DEBUG_CODE
 
 	static int count, whatFunct, theNum;
@@ -554,7 +553,7 @@ int DebugModule :: handleEvent ( MADEEventStamp* event)	{
 
 #endif
 	int theMsg;
-	theMsg = event->message;
+	theMsg = ev->message;
 
 //	if ((event_type & USER_LEFT_UP ) && (!GameFlag.test(fDCK10) &&  !GameFlag.test(fPatsHTM_125)))
 		//	theMovie->stop();
@@ -612,7 +611,7 @@ int DebugModule :: handleEvent ( MADEEventStamp* event)	{
 		}
 #ifdef DEBUG_CODE
 		if (theMsg == 80)	{  //p
-			sfxPrintf("x: %d, y: %d", event->cursor_pt.x,  event->cursor_pt.y);
+			sfxPrintf("x: %d, y: %d", ev->cursor_pt.x,  ev->cursor_pt.y);
 			return true;
 		}
 
