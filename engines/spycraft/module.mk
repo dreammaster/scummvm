@@ -61,6 +61,7 @@ MODULE_OBJS = \
 	game/game.o \
 	game/goggles.o \
 	game/gun.o \
+	game/help.o \
 	game/html.o \
 	game/image.o \
 	game/inset.o \
