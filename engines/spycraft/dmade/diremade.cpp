@@ -30,7 +30,7 @@
 #include "spycraft/dmade/advsprite.h"
 #include "spycraft/dmade/advsound.h"
 #include "spycraft/dmade/advcursor.h"
-#include "spycraft/dmade/winscreen.h"
+#include "spycraft/dmade/dirscreen.h"
 #include "spycraft/dmade/advmisc.h"
 #include "spycraft/dmade/advmovie.h"
 #include "spycraft/dmade/advtime.h"

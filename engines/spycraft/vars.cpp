@@ -20,6 +20,7 @@
  */
 
 #include "spycraft/vars.h"
+#include "spycraft/dmade/dirscreen.h"
 
 namespace Spycraft {
 
@@ -35,12 +36,52 @@ int window_bottom;
 bool surfaceOK;
 MADEEventStamp event;
 
+// dmade/dirscreen.cpp
+int screen_width;
+int screen_height;
+int screen_colors;
+int scene_width;
+int scene_height;
+int spritelist_size;
+HDC hGameDC;
+HDC hSrcDC;
+
+// dmade/winmemx.cpp
+int __mem_index;
+long memAllocLimit;
+int allow_heapCheck;
+
+// game/dispatch.cpp
+unsigned long absoluteTime;
+unsigned long oldTime;
+unsigned long elapsedTime;
+bool suspended;
+
+
 void init_vars() {
 	// dmade/diremade.cpp
 	UserWantsToQuit = false;
 	offsetX = offsetY = 0;
 	window_right = window_bottom = 0;
 	surfaceOK = false;
+
+	// dmade/winscreen.cpp
+	screen_width = screen_height = 0;
+	screen_colors = 0;
+	scene_width = DEFAULT_WIDTH;
+	scene_height = DEFAULT_HEIGHT;
+	spritelist_size = DEFAULT_SPRITELIST_SIZE;
+	hGameDC = nullptr;
+	hSrcDC = nullptr;
+
+	// dmade/winmemx.cpp
+	__mem_index = 1;
+	memAllocLimit = 4L * 1024 * 1024;
+	allow_heapCheck = 1;
+
+	// game/dispatch.cpp
+	absoluteTime = oldTime = elapsedTime = 0;
+	suspended = false;
 }
 
 } // End of namespace Spycraft

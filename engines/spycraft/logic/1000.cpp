@@ -27,7 +27,7 @@
 #include "spycraft/dmade/advmusic.h"
 #include "spycraft/game/roomsnd.h"
 #include "spycraft/dmade/gamebox.h"
-#include "spycraft/dmade/winscreen.h"
+#include "spycraft/dmade/dirscreen.h"
 
 #include "spycraft/logic/1000.h"
 #include "spycraft/logic/1070.h"
