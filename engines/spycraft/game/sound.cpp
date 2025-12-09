@@ -38,7 +38,14 @@ extern int quitting;
 
 SoundList *sounds;
 
-int resourceIds[];
+// Made's resourceIds stored here
+#define _SOS_MAX_VOICES                0x20
+int resourceIds[_SOS_MAX_VOICES] = {
+   -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1
+};
 
 void SoundCallBack(int hd) {
 	SoundObject *obj;

@@ -296,7 +296,7 @@ int MLI_GetFrames(MLI_LAYER_HANDLE pL)
 	return pInfo->lLength;
 }
 
-MLI_LAYER_HANDLE MLI_Open(MLI_LAYER_HANDLE pL, char *name, DXL_XIMAGE_HANDLE DefaultXImage, bool DirtyBuffer)	// open Movie whose FQP (Fully Qualified Path) is in "name"
+MLI_LAYER_HANDLE MLI_Open(MLI_LAYER_HANDLE pL, const char *name, DXL_XIMAGE_HANDLE DefaultXImage, bool DirtyBuffer)	// open Movie whose FQP (Fully Qualified Path) is in "name"
 {
 	if (!pL) {
 		if (!Default_pL) {

@@ -45,7 +45,7 @@ int dlgOpenProc(int id);
 }
 #define hGameWnd NULL
 #else
-extern "C" HWND hGameWnd;
+extern HWND hGameWnd;
 #endif
 extern Intrface* intrface;
 

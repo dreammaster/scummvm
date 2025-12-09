@@ -92,4 +92,10 @@ void sfxResumeSound() {
 	g_engine->_mixer->pauseAll(false);
 }
 
+void StopStreams() {
+}
+
+void ReStartStreams() {
+}
+
 } // namespace Spycraft

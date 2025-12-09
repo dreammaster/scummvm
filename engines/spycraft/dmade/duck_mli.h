@@ -150,7 +150,7 @@ void MLI_Exit();
 // Note -- After first Movie has been opened, can't call MaxLayers
 
 MLI_LAYER_HANDLE MLI_Open(MLI_LAYER_HANDLE pL,
-	char *name,		  	// open Movie whose FQP (Fully Qualified Path) is in "name"
+	const char *name,		  	// open Movie whose FQP (Fully Qualified Path) is in "name"
 	DXL_XIMAGE_HANDLE DefaultXImage, // NULL to make one up, else pass in handle to pre-made XImage
 	bool DirtyBuffer);  // set Buffer for sprites that will be displayed
 // over interframe background video

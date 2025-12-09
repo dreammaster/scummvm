@@ -193,7 +193,7 @@ int sfxPlayMovie(int closeDone, int eraseDone, callbackFn theCallBack) {
 	return (true);
 }
 
-int sfxOpenMovie(char *filename, int dx, int dy, int size) {
+int sfxOpenMovie(const char *filename, int dx, int dy, int size) {
 	if (mvi.opened) {
 		dbgmsg("Attempt to open a movie while not closing the current movie!!!");
 		return (false);
