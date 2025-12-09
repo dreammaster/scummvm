@@ -24,11 +24,9 @@
 #include "spycraft/dmade/advdebug.h"
 #include "spycraft/dmade/winmade.h"
 #include "spycraft/spycraft.h"
+#include "spycraft/vars.h"
 
 namespace Spycraft {
-
-extern int releaseVersion;
-extern char *debugText;
 
 void pAssert(int theLine, const char *theFile, int theError) {
 	if (releaseVersion) {

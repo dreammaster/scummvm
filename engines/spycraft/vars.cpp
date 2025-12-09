@@ -24,6 +24,10 @@
 
 namespace Spycraft {
 
+// dmade/advini.cpp
+int releaseVersion;
+const char *debugText;
+
 // dmade/diremade.cpp
 const char *szAppName = APP_NAME;
 HWND hGameWnd;
@@ -59,6 +63,10 @@ bool suspended;
 
 
 void init_vars() {
+	// dmade/advini.cpp
+	releaseVersion = 0;
+	debugText = nullptr;
+
 	// dmade/diremade.cpp
 	UserWantsToQuit = false;
 	offsetX = offsetY = 0;

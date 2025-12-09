@@ -32,6 +32,10 @@ namespace Spycraft {
 #define GAME_WIDTH      512
 #define GAME_HEIGHT     480
 
+// dmade/advini.cpp
+extern int releaseVersion;
+extern const char *debugText;
+
 // dmade/diremade.cpp
 extern HWND hGameWnd;
 extern HINSTANCE hInst;
