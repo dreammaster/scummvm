@@ -374,7 +374,7 @@ extern void sfxAddText2Pic(textNum text_num);
 
 extern void InitText();
 extern void CleanText();
-extern void FreeTextSlots(int bufferNum);
+extern void FreeTextSlots(bufferNum background_num);
 
 } // namespace Spycraft
 
