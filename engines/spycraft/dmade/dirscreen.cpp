@@ -25,11 +25,11 @@
 #include "spycraft/dmade/advlib.h"
 #include "spycraft/dmade/dirscreen.h"
 #include "spycraft/dmade/winmade.h"
-#include "spycraft/dmade/advrect.h"
-#include "spycraft/dmade/advlist.h"
-#include "spycraft/dmade/winport.h"
 #include "spycraft/dmade/advback.h"
 #include "spycraft/dmade/advbits.h"
+#include "spycraft/dmade/advlist.h"
+#include "spycraft/dmade/advport.h"
+#include "spycraft/dmade/advrect.h"
 #include "spycraft/vars.h"
 
 namespace Spycraft {
