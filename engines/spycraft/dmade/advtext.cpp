@@ -64,7 +64,7 @@ uint32 textcolor = 0;
 styleField textstyle = 0L;
 int16 pointsize = 12;
 
-extern int cacheValide;
+extern bool cacheValide;
 
 
 void InitText() {
