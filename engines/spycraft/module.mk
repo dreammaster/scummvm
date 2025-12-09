@@ -19,6 +19,7 @@ MODULE_OBJS = \
 	dmade/advmsg.o \
 	dmade/advmusic.o \
 	dmade/advport.o \
+	dmade/advprime.o \
 	dmade/advrect.o \
 	dmade/advres.o \
 	dmade/advsfx.o \
