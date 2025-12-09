@@ -40,10 +40,9 @@ extern int currentFocus;
 extern int soundGone;
 extern void SetMovieErase (int);
 #endif
-extern "C" {
 extern void AddScreen2Pic(void);
 extern void AddScreen2PicEx ( int dx, int dy, int w, int h );
-}
+
 Sndanal * anal = NULL;
 SndInfo * sndinfo[22] = {NULL,NULL,NULL,NULL,NULL,
 						 NULL,NULL,NULL,NULL,NULL,
