@@ -46,7 +46,7 @@ static int appActive = false;
 static unsigned yct = 0;
 static SRect screenRect = { 0, 0, 511, 479, 512, 480 };
 
-extern int cursorHidden;
+extern bool cursorHidden;
 
 // external function definitions for dispatch.cpp 
 extern void StartScript(void);
