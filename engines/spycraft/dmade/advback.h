@@ -22,10 +22,11 @@
 #ifndef SPYCRAFT_DMADE_ADVBACK_H
 #define SPYCRAFT_DMADE_ADVBACK_H
 
-#include "spycraft/dmade/advres.h"
-#include "spycraft/dmade/advport.h"
+#include "spycraft/dmade/advlib.h"
 #include "spycraft/dmade/advlist.h"
+#include "spycraft/dmade/advport.h"
 #include "spycraft/dmade/advrect.h"
+#include "spycraft/dmade/advres.h"
 
 namespace Spycraft {
 

@@ -21,6 +21,7 @@
 
 #include "spycraft/dmade/advlib.h"
 #include "spycraft/dmade/advport.h"
+#include "spycraft/afxwin.h"
 
 namespace Spycraft {
 
@@ -55,6 +56,69 @@ void FreePort(Viewport *port) {
 		FreePtr(port->ptr);
 
 	FreePtr(port);
+}
+
+Viewport *AllocMDPort(int width, int height, int colors) {
+	int i;
+	void *ptr;
+	WinViewport *port;
+	HBITMAP hBitmap;
+
+	struct {
+		BITMAPINFOHEADER bmiHeader;
+		RGBQUAD ctab[256];
+	} bmi;
+
+	if (colors != 8 && colors != 16) {
+		ASSERT(false, __ERR_CODING);
+	}
+
+	port = (WinViewport *)AllocPtr(sizeof(WinViewport));
+	ASSERT(port, __ERR_PORT_ALLOC_FAIL);
+
+	port->vp.width = width;
+	port->vp.height = height;
+	port->vp.colors = colors;
+
+	bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
+	bmi.bmiHeader.biWidth = width;
+	bmi.bmiHeader.biHeight = (-1) * height;
+	bmi.bmiHeader.biPlanes = 1;
+	bmi.bmiHeader.biBitCount = colors;
+	bmi.bmiHeader.biCompression = BI_RGB;
+	bmi.bmiHeader.biSizeImage = 0;
+	bmi.bmiHeader.biXPelsPerMeter = 0;
+	bmi.bmiHeader.biYPelsPerMeter = 0;
+	bmi.bmiHeader.biClrUsed = 0;
+	bmi.bmiHeader.biClrImportant = 0;
+
+	for (i = 0; i < 256; i++) {
+		bmi.ctab[i].rgbRed = 0;
+		bmi.ctab[i].rgbGreen = 0;
+		bmi.ctab[i].rgbBlue = 0;
+	}
+#ifdef TODO
+	hBitmap = CreateDIBSection(hSrcDC, (BITMAPINFO *)&bmi, DIB_RGB_COLORS,
+		&ptr, NULL, 0);
+
+	ASSERT(hBitmap, __ERR_WIN_API_FAIL);
+	ASSERT(ptr, __ERR_WIN_API_FAIL);
+
+	port->vp.ptr = ptr;
+	port->vp.rowBytes = width * (port->vp.colors == 8 ? 1 : 2);
+	port->hBitmap = hBitmap;
+#else
+	error("TODO: AllocMDPort");
+#endif
+	return (Viewport *)port;
+}
+
+void FreeMDPort(Viewport *port) {
+	WinViewport *winport = (WinViewport *)port;
+	if (winport != NULL) {
+		ASSERT((void *)(DeleteObject(winport->hBitmap)), __ERR_WIN_API_FAIL);
+		FreePtr(winport);
+	}
 }
 
 } // namespace Spycraft

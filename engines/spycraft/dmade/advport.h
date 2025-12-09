@@ -22,7 +22,7 @@
 #ifndef SPYCRAFT_DMADE_ADVPORT_H
 #define SPYCRAFT_DMADE_ADVPORT_H
 
-#include "common/scummsys.h"
+#include "spycraft/afxwin.h"
 
 namespace Spycraft {
 
@@ -38,6 +38,15 @@ struct Viewport {
 	uint16	colors;
 	void *ptr;
 };
+
+
+struct WinViewport {
+	Viewport     vp;
+	HBITMAP      hBitmap;
+};
+
+extern void FreeWinPort(Viewport *port);
+
 
 /*
 	Allocate a viewport with dimensions 'width' x 'height' and depth 'colors'
