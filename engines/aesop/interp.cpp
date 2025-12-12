@@ -82,6 +82,7 @@ uint32 heap_size;
 BYTE *pathname;
 
 /*************************************************************/
+#ifdef TODO
 void main(int argc, char *argv[]) {
 	BYTE RES_name[256];
 	BYTE code_name[256];
@@ -184,5 +185,6 @@ void main(int argc, char *argv[]) {
 
 	exit(rtn);
 }
+#endif
 
 } // namespace Aesop
