@@ -19,6 +19,8 @@
  *
  */
 
+#include "common/debug.h"
+#include "common/textconsole.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
 #include "aesop/event.h"
@@ -43,7 +45,7 @@ EVENT EV_queue[EV_QSIZE];
 uint32 EV_head;
 uint32 EV_tail;
 
-static char *strs[] = { "SYS_FREE",
+static const char *strs[] = { "SYS_FREE",
 					   "SYS_TIMER",
 					   "SYS_MOUSEMOVE",
 					   "SYS_ENTER_REGION",
@@ -146,28 +148,18 @@ void init_notify_list(void) {
 
 void add_notify_request(int32 client, int32 message, int32 event, int32
 	parameter) {
-	int32 i, nxt, cur;
+	int32 i, nxt, cur = 0;
 	NREQ *NR;
 
 	DISABLE();
 
 	i = NR_first[SYS_FREE];
 
-	if (i == -1)
-	{
-		FILE *out;
-
-		ENABLE();
-
-		out = fopen("event.dbg", "w+t");
-
+	if (i == -1) {
 		for (i = 0; i < NR_LSIZE; i++)
-			fprintf(out, "Message %5u, Client %5u, Next %5u, Prev %5u, Stat %5u, Parm %ld\n",
+			warning("Message %5u, Client %5u, Next %5u, Prev %5u, Stat %5u, Parm %ld\n",
 				NR_list[i].message, NR_list[i].client, NR_list[i].next,
 				NR_list[i].prev, NR_list[i].status, NR_list[i].parameter);
-
-		fclose(out);
-
 		abend(MSG_NNSL);
 	}
 
@@ -209,14 +201,13 @@ void add_notify_request(int32 client, int32 message, int32 event, int32
 void delete_notify_request(int32 client, int32 message, int32 event,
 	int32 parameter) {
 	int32 nxt, cur, prev;
-	int32 fnxt, fcur;
+	int32 fnxt, fcur = 0;
 	NREQ *NR;
 	int32 all_events;
 
 	DISABLE();
 
-	if (event == -1U)
-	{
+	if (event == (uint32)-1) {
 		event = 1;
 		all_events = 1;
 	} else
@@ -235,7 +226,7 @@ void delete_notify_request(int32 client, int32 message, int32 event,
 
 			if (NR->client != client) continue;      // match specified parms
 
-			if ((message != -1U) && (message != NR->message))
+			if ((message != (uint32)-1) && (message != (int32)NR->message))
 				continue;
 
 			if (!match_parameter(event, NR->parameter, parameter)) continue;
@@ -280,7 +271,7 @@ void delete_notify_request(int32 client, int32 message, int32 event,
 
 void cancel_entity_requests(int32 client) {
 	int32 event, nxt, cur, prev;
-	int32 fnxt, fcur;
+	int32 fnxt, fcur = 0;
 	NREQ *NR;
 
 	DISABLE();
@@ -473,9 +464,9 @@ void dump_event_queue(void) {
 
 	while ((e = fetch_event()) != NULL)
 		if (e->type <= SYS_KEYDOWN)
-			printf("Event %s, parameter %ld\n", strs[e->type], e->parameter);
+			debug("Event %s, parameter %ld\n", strs[e->type], e->parameter);
 		else
-			printf("User event, parameter %ld\n", e->parameter);
+			debug("User event, parameter %ld\n", e->parameter);
 }
 
 /*********************************************************/
@@ -605,7 +596,7 @@ void dispatch_event(void) {
 			RT_arguments(&event_message_descriptor,
 				sizeof(event_message_descriptor));
 
-			RT_execute((int32)NR->client, (int32)NR->message, -1U);
+			RT_execute((int32)NR->client, (int32)NR->message, (uint32)-1);
 		}
 	}
 }

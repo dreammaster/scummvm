@@ -4,6 +4,7 @@ MODULE_OBJS = \
 	aesop.o \
 	console.o \
 	metaengine.o \
+	event.o \
 	eye.o
 
 # This module can be built as a plugin
