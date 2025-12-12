@@ -1,3 +1,3 @@
 begin_section("Aesop");
-	add_person("Name 1", "Handle 1", "");
+	add_person("Paul Gilbert", "DreamMaster", "");
 end_section();

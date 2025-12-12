@@ -31,6 +31,32 @@
 #include "engines/util.h"
 #include "graphics/paletteman.h"
 
+#include "aesop/aesop.h"
+#include "aesop/ail32.h"
+#include "aesop/console.h"
+#include "aesop/defs.h"
+#include "aesop/detection.h"
+#include "aesop/detection_tables.h"
+#include "aesop/event.h"
+#include "aesop/eye.h"
+#include "aesop/gil2vfx.h"
+#include "aesop/gil2vfxa.h"
+#include "aesop/graphics.h"
+#include "aesop/interface.h"
+#include "aesop/metaengine.h"
+#include "aesop/mod32.h"
+#include "aesop/modsnd32.h"
+#include "aesop/names.h"
+#include "aesop/rt.h"
+#include "aesop/rtcode.h"
+#include "aesop/rtlink.h"
+#include "aesop/rtmsg.h"
+#include "aesop/rtobject.h"
+#include "aesop/rtres.h"
+#include "aesop/rtsystem.h"
+#include "aesop/shared.h"
+#include "aesop/sound.h"
+
 namespace Aesop {
 
 AesopEngine *g_engine;
