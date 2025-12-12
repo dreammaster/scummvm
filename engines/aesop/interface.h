@@ -24,10 +24,6 @@
 
 namespace Aesop {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 extern int32 wait_ptr_state;
 
 void init_interface(void);
@@ -41,10 +37,6 @@ void hide_mouse(void);
 void copy_mouse(int window);
 uint32 mouse_in_window(int32 argcnt, uint32 wnd);
 void refresh_window(int32 argcnt, uint32 src, uint32 target);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

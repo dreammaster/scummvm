@@ -19,8 +19,8 @@
  *
  */
 
-#include "aeseop/lib/vfx.h"
-#include "aeseop/lib/gil2vfx.h"
+#include "aesop/lib/vfx.h"
+#include "aesop/gil2vfx.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
 #include "aesop/rtcode.h"
@@ -29,11 +29,12 @@
 #include "aesop/rtobject.h"
 #include "aesop/graphics.h"
 #include "aesop/event.h"
-#include "aesop/intrface.h"
+#include "aesop/interface.h"
 #include "aesop/rtres.h"
 #include "aesop/rt.h"
 #include "aesop/modsnd32.h"
 #include "aesop/sound.h"
+#include "aesop/aesop.h"
 
 namespace Aesop {
 
@@ -41,15 +42,15 @@ namespace Aesop {
 
 #define SAVEDIR_FN        "SAVEGAME\\SAVEGAME.DIR"
 
-BYTE savegame_dir[NUM_SAVEGAMES][SAVE_LEN+1];
+char savegame_dir[NUM_SAVEGAMES][SAVE_LEN+1];
 
-static BYTE items_bin[] = "SAVEGAME\\ITEMS_yy.BIN";
-static BYTE items_txt[] = "SAVEGAME\\ITEMS_yy.TXT";
-static BYTE lvl_bin[] =   "SAVEGAME\\LVLxx_yy.BIN";
-static BYTE lvl_txt[] =   "SAVEGAME\\LVLxx_yy.TXT";
+static char items_bin[] = "SAVEGAME\\ITEMS_yy.BIN";
+static char items_txt[] = "SAVEGAME\\ITEMS_yy.TXT";
+static char lvl_bin[] =   "SAVEGAME\\LVLxx_yy.BIN";
+static char lvl_txt[] =   "SAVEGAME\\LVLxx_yy.TXT";
 
-static BYTE lvl_tmp[] =   "SAVEGAME\\LVLxx.TMP";
-static BYTE itm_tmp[] =   "SAVEGAME\\ITEMS.TMP";
+static char lvl_tmp[] =   "SAVEGAME\\LVLxx.TMP";
+static char itm_tmp[] =   "SAVEGAME\\ITEMS.TMP";
 
 BYTE DX_offset[6][4] = {{ 0, 0, 0 ,0 },
                         { 0, 1, 0,-1 },
@@ -235,39 +236,36 @@ uint32 distance(int32 argcnt, uint32 x1, uint32 y1, uint32 x2, uint32 y2)
 
 #pragma off (unreferenced)
 uint32 seek_direction(int32 argcnt, uint32 cur_x, uint32 cur_y, uint32
-                           dest_x, uint32 dest_y)
+	dest_x, uint32 dest_y)
 #pragma on (unreferenced)
 {
-   int32 dx,dy;
+	int32 dx, dy;
 
-   dx = dest_x - cur_x;
-   dy = dest_y - cur_y;
+	dx = dest_x - cur_x;
+	dy = dest_y - cur_y;
 
-   if (dx < 0)
-      {                 // move west (- in X)
-      if (dy > 0)
-         return 5;      //  (southwest)
-      else if (dy < 0)
-         return 7;      //  (northwest)
-      else
-         return 6;      //  (due west)
-      }
-   else if (dx > 0)
-      {                 // move east (+ in X)
-      if (dy > 0)
-         return 3;      //  (southeast)
-      else if (dy < 0)
-         return 1;      //  (northeast)
-      else
-         return 2;      //  (due east)
-      }
+	if (dx < 0) {                 // move west (- in X)
+		if (dy > 0)
+			return 5;      //  (southwest)
+		else if (dy < 0)
+			return 7;      //  (northwest)
+		else
+			return 6;      //  (due west)
+	} else if (dx > 0) {                 // move east (+ in X)
+		if (dy > 0)
+			return 3;      //  (southeast)
+		else if (dy < 0)
+			return 1;      //  (northeast)
+		else
+			return 2;      //  (due east)
+	}
 
-   if (dy > 0)
-      return 4;         // move south (+ in Y)
-   else if (dy < 0)
-      return 0;         // move north (- in Y)
+	if (dy > 0)
+		return 4;         // move south (+ in Y)
+	else if (dy < 0)
+		return 0;         // move north (- in Y)
 
-   return -1;           // cur == dest, return -1
+	return (uint32)-1;	// cur == dest, return -1
 }
 
 /*********************************************************/
@@ -618,7 +616,7 @@ void do_ice(int32 argcnt, int32 view, int32 scrn, int32 dots, int32 mag,
                         t += v;
                    }
 
-                switch (rand() & 3)
+                switch (arand() & 3)
          {
                         case 0:
                                 xpos[i] = 1 << (ACCUR-1);
@@ -649,7 +647,7 @@ void do_ice(int32 argcnt, int32 view, int32 scrn, int32 dots, int32 mag,
                                 break;
                    }
 
-                if (rand() & 1)
+                if (arand() & 1)
          {
                         xvel[i] *= -1;
                         yvel[i] *= -1;
@@ -762,7 +760,7 @@ void read_save_directory(void)
 BYTE *savegame_title(int32 argcnt, uint32 num)
 #pragma on (unreferenced)
 {
-   return savegame_dir[num];
+   return (BYTE *)savegame_dir[num];
 }
 
 /*********************************************************/
@@ -773,10 +771,10 @@ BYTE *savegame_title(int32 argcnt, uint32 num)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void set_savegame_title(int32 argcnt, BYTE *string, uint32 num)
+void set_savegame_title(int32 argcnt, const char *string, uint32 num)
 #pragma on (unreferenced)
 {
-   strcpy(savegame_dir[num],string);
+   Common::strcpy_s(savegame_dir[num], string);
 }
 
 /*********************************************************/
@@ -808,11 +806,9 @@ void write_save_directory(void)
 //
 /*********************************************************/
 
-void set_save_slotnum(uint32 slot)
-{
-   BYTE num[3];
-
-   sprintf(num,"%02u",slot);
+void set_save_slotnum(uint32 slot) {
+   char num[3];
+   Common::sprintf_s(num, "%02u", slot);
 
    strncpy(&items_bin[15],num,2);
    strncpy(&items_txt[15],num,2);
@@ -830,15 +826,13 @@ void set_save_slotnum(uint32 slot)
 //
 /*********************************************************/
 
-void set_save_lvlnum(uint32 lvl)
-{
-   BYTE num[3];
+void set_save_lvlnum(uint32 lvl) {
+   char num[3];
+   Common::sprintf_s(num,"%02u",lvl);
 
-   sprintf(num,"%02u",lvl);
-
-   strncpy(&lvl_bin[12],num,2);
-   strncpy(&lvl_txt[12],num,2);
-   strncpy(&lvl_tmp[12],num,2);
+   strncpy(&lvl_bin[12], num, 2);
+   strncpy(&lvl_txt[12], num, 2);
+   strncpy(&lvl_tmp[12], num, 2);
 }
 
 /*********************************************************/
@@ -1122,11 +1116,10 @@ void create_initial_binary_files(void)
 //   if (copy_file(items_txt,items_bin) == -1)
 //      abend(MSG_CNTI);
 
-   if (file_time(items_txt) >= file_time(items_bin))
-      {
-      printf("Translating %s to %s\n",items_txt,items_bin);
-      translate_file(items_txt,items_bin,FIRST_ITEM,LAST_ITEM);
-      }
+   if (file_time(items_txt) >= file_time(items_bin)) {
+	   debug("Translating %s to %s\n", items_txt, items_bin);
+	   translate_file(items_txt, items_bin, FIRST_ITEM, LAST_ITEM);
+   }
 
    for (lvl = 1;lvl <= NUM_LEVELS;lvl++)
       {
@@ -1135,7 +1128,7 @@ void create_initial_binary_files(void)
       if (file_time(lvl_txt) < file_time(lvl_bin))
          continue;
 
-      printf("Translating %s to %s\n",lvl_txt,lvl_bin);
+      debug("Translating %s to %s\n",lvl_txt,lvl_bin);
 
       translate_file(lvl_txt,lvl_bin,FIRST_LVL_OBJ,LAST_LVL_OBJ);
       }
@@ -1154,8 +1147,8 @@ void create_initial_binary_files(void)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void launch(int32 argcnt, BYTE *dirname, BYTE *prgname, BYTE *argn1,
-   BYTE *argn2)
+void launch(int32 argcnt, const char *dirname, const char *prgname, const char *argn1,
+   const char *argn2)
 #pragma on (unreferenced)
 {
    typedef struct
@@ -1167,32 +1160,34 @@ void launch(int32 argcnt, BYTE *dirname, BYTE *prgname, BYTE *argn1,
    stag;
 
    stag *s;
-   BYTE dir[128];
+   char dir[128];
 
    s = *(stag **) 0x4fa;
 
-   strcpy(dir,dirname);
-   strcpy(s->prg,prgname);
+   Common::strcpy_s(dir,dirname);
+   Common::strcpy_s(s->prg,prgname);
 
    if (argn1 != NULL)
-      strcpy(s->arg1,argn1);
+      Common::strcpy_s(s->arg1, argn1);
    else
       s->arg1[0] = 0;
 
    if (argn1 != NULL)
-      strcpy(s->arg2,argn2);
+      Common::strcpy_s(s->arg2,argn2);
    else
       s->arg2[0] = 0;
 
-   RT_execute(bootstrap,MSG_DESTROY,-1U);
+   RT_execute(bootstrap,MSG_DESTROY, (uint32)-1);
 
    shutdown_sound();
    RTR_destroy(RTR,RTR_FREEBASE);
 
    locate(0,51);
+#if 0
    chdir(dir);
 
    exit(127);
+#endif
 }
 
 } // namespace Aesop

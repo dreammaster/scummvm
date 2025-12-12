@@ -24,10 +24,6 @@
 
 namespace Aesop {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // For each channel passed to the mixer.
 
 typedef struct
@@ -55,10 +51,6 @@ extern void MergeMod1 (MODSPEC *mod1,char *merge);
 extern void MergeMod2 (MODSPEC *mod1,char *merge);
 extern void MergeMod3 (MODSPEC *mod1,char *merge);
 extern void MergeMod4 (MODSPEC *mod1,char *merge);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

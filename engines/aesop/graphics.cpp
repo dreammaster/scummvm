@@ -30,7 +30,7 @@
 #include "aesop/rtres.h"
 #include "aesop/rtlink.h"
 #include "aesop/rt.h"
-#include "aesop/intrface.h"
+#include "aesop/interface.h"
 #include "aesop/rtobject.h"
 #include "aesop/graphics.h"
 

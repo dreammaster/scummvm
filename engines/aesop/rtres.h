@@ -22,11 +22,9 @@
 #ifndef AESOP_RTRES_H
 #define AESOP_RTRES_H
 
-namespace Aesop {
+#include "aesop/defs.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace Aesop {
 
 #define MAX_OBJ_TYPES  2450      // # of possible resource names
 #define DIR_BLK        256       // # of cache directory entries/block
@@ -180,10 +178,6 @@ void RTR_dump(RTR_class *RTR);
 
 void RTR_HRES_chksum(BYTE *situation);
 uint32 RTR_chksum(HRES entry);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

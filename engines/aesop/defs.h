@@ -22,11 +22,9 @@
 #ifndef AESOP_DEFS_H
 #define AESOP_DEFS_H
 
-namespace Aesop {
+#include "common/scummsys.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace Aesop {
 
 typedef uint16 UWORD;
 typedef byte UBYTE;
@@ -101,10 +99,6 @@ typedef struct
    UWORD fade[11];
 }
 PAL_HDR;                      // Palette resource header
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

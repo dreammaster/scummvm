@@ -29,7 +29,7 @@
 #include "aesop/rtres.h"
 #include "aesop/rt.h"
 #include "aesop/rtcode.h"
-#include "aesop/intrface.h"
+#include "aesop/interface.h"
 #include "aesop/event.h"
 #include "aesop/sound.h"
 #include "aesop/graphics.h"

@@ -114,10 +114,6 @@ sound_buff;
 
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /********************/
 /*                  */
 /* Process services */
@@ -252,11 +248,7 @@ void AIL_map_sequence_channel(HDRIVER driver, HSEQUENCE sequence,
 unsigned AIL_true_sequence_channel(HDRIVER driver, HSEQUENCE sequence,
    unsigned sequence_channel);
 void AIL_release_channel(HDRIVER driver, unsigned channel);
-
-#ifdef __cplusplus
-}
-#endif
-   
+  
 //
 // MetaWare support
 //

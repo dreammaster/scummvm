@@ -22,6 +22,8 @@
 #ifndef AESOP_LIB_VFX_H
 #define AESOP_LIB_VFX_H
 
+#include "aesop/defs.h"
+
 namespace Aesop {
 
 #ifndef TRUE
@@ -43,10 +45,6 @@ namespace Aesop {
 #define _CC(_REVERSE_PARMS | _NEAR_CALL)
 #pragma Global_aliasing_convention("_%r");
 #pragma Align_members(1)
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 #define GIF_SCRATCH_SIZE 20526L   // Temp memory req'd for GIF decompression
@@ -391,10 +389,6 @@ extern void VFX_translate_polygon(PANE *pane, int32 vcnt, SCRNVERTEX *vlist,
 
 extern void VFX_illuminate_polygon(PANE *pane, FIXED16 dither_amount,
 	int32 vcnt, SCRNVERTEX *vlist);
-
-#ifdef __cplusplus
-}
-#endif
 
 //
 // MetaWare support

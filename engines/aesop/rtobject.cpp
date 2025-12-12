@@ -25,7 +25,7 @@
 #include "aesop/rtlink.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
-#include "aesop/intrface.h"
+#include "aesop/interface.h"
 #include "aesop/rtobject.h"
 #include "aesop/rt.h"
 #include "aesop/event.h"

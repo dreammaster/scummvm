@@ -28,10 +28,6 @@
 
 namespace Aesop {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 //
 // MAX_MOUSE_BUFFER_SIZE should be set to the size of the visible area
 // in bytes of the largest mouse cursor to be used
@@ -71,10 +67,6 @@ extern void MOUSE_pane_refresh(PANE *target, int32 x0, int32 y0,
    int32 x1, int32 y1);
 
 extern void MOUSE_pane_list_refresh(PANE_LIST *list);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

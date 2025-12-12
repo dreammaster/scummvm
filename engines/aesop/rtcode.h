@@ -24,10 +24,6 @@
 
 namespace Aesop {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void diagnose(int32 argcnt, uint32 dtype, uint32 parm);
 
 typedef void (*FARPROC)();
@@ -38,10 +34,6 @@ uint32 rnd(int32 argcnt, uint32 low, uint32 high);
 int32 envval(int32 argcnt, BYTE *name);
 
 void beep(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

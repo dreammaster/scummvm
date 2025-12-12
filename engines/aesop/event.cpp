@@ -23,7 +23,7 @@
 #include "aesop/shared.h"
 #include "aesop/event.h"
 #include "aesop/rtres.h"
-#include "aesop/intrface.h"
+#include "aesop/interface.h"
 #include "aesop/rt.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"

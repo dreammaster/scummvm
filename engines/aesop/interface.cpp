@@ -32,7 +32,7 @@
 #include "aesop/rtlink.h"
 #include "aesop/rtcode.h"
 #include "aesop/rt.h"
-#include "aesop/intrface.h"
+#include "aesop/interface.h"
 #include "aesop/event.h"
 #include "aesop/graphics.h"
 

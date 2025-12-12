@@ -26,10 +26,6 @@
 
 namespace Aesop {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define BUFFSIZE 1024           // Size of build buffer in bytes
 
 #define CHANNELS 4              // # of logical channels
@@ -116,10 +112,6 @@ int ChannelState(int channel);
 //
 
 int PhysicalState(int channel); 
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

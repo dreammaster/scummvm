@@ -33,10 +33,6 @@ namespace Aesop {
 #pragma Global_aliasing_convention("_%r");
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef FILE_ERRS
 #define FILE_ERRS
 
@@ -83,10 +79,6 @@ int32 FILE_size(BYTE *filename);
 void * FILE_read(BYTE *filename, void *dest);
 int32 FILE_write(BYTE *filename, void *buf, uint32 len);
 int32 FILE_append(BYTE *filename, void *buf, uint32 len);
-
-#ifdef __cplusplus
-}
-#endif
 
 //
 // MetaWare support

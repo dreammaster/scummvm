@@ -219,7 +219,7 @@ uint32 rnd(int32 argcnt, uint32 low, uint32 high)
 		srand(*(UWORD *)0x0000046c);
 	}
 
-	return low + ((uint32)rand() % (high - low + 1L));
+	return low + ((uint32)arand() % (high - low + 1L));
 }
 
 #pragma off (unreferenced)

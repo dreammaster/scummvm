@@ -26,10 +26,6 @@
 
 namespace Aesop {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 extern UBYTE *fade_tables[5][16];
 extern UWORD first_color[5];
 extern UWORD in_GIL;
@@ -42,10 +38,6 @@ extern void dprint(int32 argcnt, BYTE *format, ...);
 extern void sprint(int32 argcnt, uint32 wndnum, BYTE *format, ...);
 extern void text_color(int32 argcnt, uint32 wndnum, uint32 currentColor, uint32 newColor);
 extern void release_owned_windows(int32 owner);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

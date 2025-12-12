@@ -22,11 +22,9 @@
 #ifndef AESOP_RTSYSTEM_H
 #define AESOP_RTSYSTEM_H
 
-namespace Aesop {
+#include "aesop/defs.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace Aesop {
 
 #define TF_BUFSIZE 4096    // size of buffer allocated by file functions
 
@@ -63,55 +61,51 @@ extern "C" {
 // General file management
 //
 
-	WORD copy_file(BYTE *src_filename, BYTE *dest_filename);
-	WORD delete_file(BYTE *filename);
-	uint32 file_time(BYTE *filename);
+WORD copy_file(const char *src_filename, const char *dest_filename);
+WORD delete_file(const char *filename);
+uint32 file_time(const char *filename);
 
-	//
-	// Text file management
-	//
+//
+// Text file management
+//
 
-	TF_class *TF_construct(BYTE *filename, WORD oflag);
-	WORD TF_destroy(TF_class *TF);
-	WORD TF_wchar(TF_class *TF, BYTE ch);
-	BYTE TF_rchar(TF_class *TF);
-	WORD TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen);
-	WORD TF_writeln(TF_class *TF, BYTE *buffer);
+TF_class *TF_construct(const char *filename, WORD oflag);
+WORD TF_destroy(TF_class *TF);
+WORD TF_wchar(TF_class *TF, BYTE ch);
+BYTE TF_rchar(TF_class *TF);
+WORD TF_readln(TF_class *TF, char *buffer, WORD maxlen);
+WORD TF_writeln(TF_class *TF, const char *buffer);
 
-	//
-	// Binary file management
-	//
+//
+// Binary file management
+//
 
-	int32 file_size(BYTE *filename);
-	BYTE *read_file(BYTE *filename, void *dest);
-	WORD write_file(BYTE *filename, void *buf, uint32 len);
-	WORD append_file(BYTE *filename, void *buf, uint32 len);
+int32 file_size(BYTE *filename);
+BYTE *read_file(BYTE *filename, void *dest);
+WORD write_file(BYTE *filename, void *buf, uint32 len);
+WORD append_file(BYTE *filename, void *buf, uint32 len);
 
-	//
-	// Memory heap management
-	//
+//
+// Memory heap management
+//
 
-	void mem_init(void);
-	void mem_shutdown(void);
-	uint32 mem_avail(void);
-	void *mem_alloc(uint32 bytes);
-	BYTE *str_alloc(BYTE *string);
-	void mem_free(void *ptr);
-	uint32 mem_headroom(void);
+void mem_init(void);
+void mem_shutdown(void);
+uint32 mem_avail(void);
+void *mem_alloc(uint32 bytes);
+BYTE *str_alloc(BYTE *string);
+void mem_free(void *ptr);
+uint32 mem_headroom(void);
 
-	//
-	// Misc. routines
-	//
+//
+// Misc. routines
+//
 
-	int32 ascnum(BYTE *string);
-	void opcode_fault(void *PC, void *stk);
-	void abend(char *msg, ...);
-	void curpos(WORD *x, WORD *y);
-	void locate(WORD x, WORD y);
-
-#ifdef __cplusplus
-}
-#endif
+int32 ascnum(const char *string);
+void opcode_fault(void *PC, void *stk);
+void abend(const char *msg, ...);
+void curpos(WORD *x, WORD *y);
+void locate(WORD x, WORD y);
 
 } // namespace Aesop
 

@@ -22,13 +22,10 @@
 #ifndef AESOP_EVENT_H
 #define AESOP_EVENT_H
 
+#include "aesop/defs.h"
 #include "aesop/shared.h"
 
 namespace Aesop {
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define EV_QSIZE 128             // max # of queued events (circular)
 #define NR_LSIZE 768             // max # of event notification requests
@@ -98,10 +95,6 @@ void send_event(int32 argcnt, uint32 owner, int32 event, int32 parameter);
 uint32 peek_event(void);
 void dispatch_event(void);
 void flush_event_queue(int32 argcnt, int32 owner, int32 event, int32 parameter);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

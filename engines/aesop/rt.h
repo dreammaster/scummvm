@@ -22,11 +22,9 @@
 #ifndef AESOP_RT_H
 #define AESOP_RT_H
 
-namespace Aesop {
+#include "aesop/rtres.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace Aesop {
 
 typedef struct                // fundamental stack value structure
 {
@@ -73,10 +71,6 @@ void RT_init(RTR_class *RTR, uint32 stack_size, HRES *objlist);
 void RT_shutdown(void);
 void RT_arguments(void *base, uint32 size);
 int32 RT_execute(uint32 index, uint32 msg_num, uint32 vector);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

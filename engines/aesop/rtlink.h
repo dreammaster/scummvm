@@ -22,18 +22,12 @@
 #ifndef AESOP_RTLINK_H
 #define AESOP_RTLINK_H
 
+#include "aesop/defs.h"
+
 namespace Aesop {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-	HRES create_instance(RTR_class *RTR, uint32 object);
-	void destroy_instance(RTR_class *RTR, HRES instance);
-
-#ifdef __cplusplus
-}
-#endif
+extern HRES create_instance(RTR_class *RTR, uint32 object);
+extern void destroy_instance(RTR_class *RTR, HRES instance);
 
 } // namespace Aesop
 

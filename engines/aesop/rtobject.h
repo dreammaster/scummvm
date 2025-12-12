@@ -22,11 +22,9 @@
 #ifndef AESOP_RTOBJECT_H
 #define AESOP_RTOBJECT_H
 
-namespace Aesop {
+#include "aesop/defs.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace Aesop {
 
 typedef struct
 {
@@ -47,18 +45,14 @@ extern WORD lvlobj[3][LVL_X][LVL_Y];
 
 void init_object_list(void);
 
-void restore_range(BYTE *filename, uint32 first, uint32 last, uint32 restoring);
-int32 save_range(BYTE *filename, int32 filetype, int32 first, int32 last);
-void translate_file(BYTE *TXT_filename, BYTE *BIN_filename, uint32 first,
+void restore_range(const char *filename, uint32 first, uint32 last, uint32 restoring);
+int32 save_range(const char *filename, int32 filetype, int32 first, int32 last);
+void translate_file(const char *TXT_filename, const char *BIN_filename, uint32 first,
    uint32 last);
 
 int32 create_object(int32 argcnt, uint32 name);
 int32 create_program(int32 argcnt, int32 index, uint32 name);
 int32 destroy_object(int32 argcnt, int32 index);
-
-#ifdef __cplusplus
-}
-#endif
 
 } // namespace Aesop
 

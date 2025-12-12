@@ -99,6 +99,9 @@ public:
 
 extern AesopEngine *g_engine;
 #define SHOULD_QUIT ::Aesop::g_engine->shouldQuit()
+inline int arand() {
+	return g_engine->getRandomNumber(0x7fffffff);
+}
 
 } // End of namespace Aesop
 
