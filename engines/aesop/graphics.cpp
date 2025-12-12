@@ -19,10 +19,13 @@
  *
  */
 
+#include "common/debug.h"
+#include "common/endian.h"
+#include "common/str.h"
 #include "aesop/lib/vfx.h"
 #include "aesop/lib/mouse.h"
-#include "aesop/lib/gil2vfx.h"
-#include "aesop/lib/gil2vfxa.h"
+#include "aesop/gil2vfx.h"
+#include "aesop/gil2vfxa.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
 #include "aesop/rtsystem.h"
@@ -48,8 +51,8 @@ TEXTWINDOW tw[NTW];
 //WINDOW tw_refresh[NTW];
 int32 tw_refresh[NTW];
 
-BYTE strbuf[256];              // used for string resource buffering
-BYTE txtbuf[2402];             // used for word-wrapped text (also used as
+char strbuf[256];              // used for string resource buffering
+char txtbuf[2402];             // used for word-wrapped text (also used as
                                // buffer for dot pattern effects in EYE.C!)
                                // Final 2 bytes used for overflow checking
 #define FBEG 0
@@ -157,24 +160,24 @@ void init_graphics(void)
    txtbuf[sizeof(txtbuf)-1] = 0x69;    // constants for integrity checking
    txtbuf[sizeof(txtbuf)-2] = 0x77;
 
-   for (i=0;i<NTW;i++)
-      {
-      tw[i].font = NULL;
-      tw[i].window = 0;
-      tw[i].htab = tw[i].vtab = 0;
-      tw[i].delay = 0;
-      tw[i].continueFunction = NULL;
-      tw[i].txtbuf = txtbuf;
-      tw[i].txtpnt = txtbuf;
-      tw[i].justify = J_LEFT;
+   for (i = 0; i < NTW; i++)
+   {
+	   tw[i].font = NULL;
+	   tw[i].window = 0;
+	   tw[i].htab = tw[i].vtab = 0;
+	   tw[i].delay = 0;
+	   tw[i].continueFunction = NULL;
+	   tw[i].txtbuf = txtbuf;
+	   tw[i].txtpnt = txtbuf;
+	   tw[i].justify = J_LEFT;
 
-      for (j=0; j<256; j++)
-         tw[i].lookaside[j] = j;
+	   for (j = 0; j < 256; j++)
+		   tw[i].lookaside[j] = j;
 
-      tw_refresh[i] = -1;
+	   tw_refresh[i] = -1;
 
-      tw[i].font = (void *) -1U;
-      }
+	   tw[i].font = (FONT *)-1;
+   }
 }
 
 /*********************************************************/
@@ -246,17 +249,16 @@ void line_to(int32 argcnt, uint32 x, uint32 y, uint32 color, ...)
 
    va_start(argptr,argcnt);
 
-   for (i=0;i<argcnt;i+=3)
-      {
-      cx = va_arg(argptr,uint32);
-      cy = va_arg(argptr,uint32);
-      cc = va_arg(argptr,uint32);
+   for (i = 0; i < (uint32)argcnt; i += 3) {
+	   cx = va_arg(argptr, uint32);
+	   cy = va_arg(argptr, uint32);
+	   cc = va_arg(argptr, uint32);
 
-      GIL2VFX_draw_line(lastg_p,lastg_x,lastg_y,lx=cx,ly=cy,cc);
+	   GIL2VFX_draw_line(lastg_p, lastg_x, lastg_y, lx = cx, ly = cy, cc);
 
-      lastg_x = lx;
-      lastg_y = ly;
-      }
+	   lastg_x = lx;
+	   lastg_y = ly;
+   }
 
    va_end(argptr);
 }
@@ -335,7 +337,7 @@ void draw_bitmap(int32 argcnt, uint32 page, uint32 table, uint32 number,
 
    RTR_lock(RTR,handle);
 
-   GIL2VFX_draw_bitmap(page,x,y,flip,scale,lookaside,RTR_addr(handle),number);
+   GIL2VFX_draw_bitmap(page,x,y,flip,scale,lookaside, (UBYTE *)RTR_addr(handle),number);
 
    RTR_unlock(handle);
 }
@@ -371,9 +373,9 @@ uint32 visible_bitmap_rect(int32 argcnt, int32 x, int32 y, uint32 flip,
 
    RTR_lock(RTR,handle);
 
-   result = GIL2VFX_visible_bitmap_rect(x,y,flip,RTR_addr(handle),number,bounds);
+   result = GIL2VFX_visible_bitmap_rect(x,y,flip, (UBYTE *)RTR_addr(handle),number,bounds);
 
-   new_array = add_ptr(RTR_addr(objlist[current_this]),array_offset);
+   new_array = (BYTE *)add_ptr(RTR_addr(objlist[current_this]),array_offset);
 
    far_memmove(new_array,bounds,sizeof(bounds));
 
@@ -404,7 +406,7 @@ void set_palette(int32 argcnt, uint32 region, uint32 resource)
    handle = RTR_get_resource_handle(RTR,resource,DA_DEFAULT);
    RTR_lock(RTR,handle);
 
-   PHDR = RTR_addr(handle);
+   PHDR = (PAL_HDR *)RTR_addr(handle);
 
    if ((region == PAL_FIXED) ||
        (region == PAL_WALLS) ||
@@ -413,14 +415,14 @@ void set_palette(int32 argcnt, uint32 region, uint32 resource)
       {
       for (i=0;i<11;i++)
          {
-         fade = add_ptr(PHDR,PHDR->fade[i]);
+         fade = (UBYTE *)add_ptr(PHDR,PHDR->fade[i]);
 
          for (j=0;j<PHDR->ncolors;j++)
             fade_tables[region][i][j] = first_color[region] + fade[j];
          }
       }
 
-   array = add_ptr(PHDR,PHDR->RGB);
+   array = (RGB *)add_ptr(PHDR,PHDR->RGB);
 
    for (i=0;i<PHDR->ncolors;i++)
       {
@@ -794,12 +796,11 @@ void text_style(int32 argcnt, uint32 wndnum, uint32 font,
 
    hfont = (HRES) tw[wndnum].font;
 
-   if (hfont != -1U)
-      {
-      RTR_unlock(hfont);
-      }
+   if (hfont != (HRES)-1) {
+	   RTR_unlock(hfont);
+   }
 
-   tw[wndnum].font = (void *) RTR_get_resource_handle(RTR,font,DA_DEFAULT);
+   tw[wndnum].font = (FONT *)RTR_get_resource_handle(RTR,font,DA_DEFAULT);
 
    RTR_lock(RTR,(HRES) tw[wndnum].font);
 
@@ -841,28 +842,28 @@ void home(int32 argcnt, uint32 wndnum)
    HRES hfont;
 
    hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = RTR_addr(hfont);
+   tw[wndnum].font = (FONT *)RTR_addr(hfont);
 
    GIL2VFX_select_text_window(&tw[wndnum]);
    GIL2VFX_home();
 
-   tw[wndnum].font = (void *) hfont;
+   tw[wndnum].font = (FONT *) hfont;
 }
 
 /*********************************************************/
 #pragma off (unreferenced)
-void text_color(int32 argcnt, uint32 wndnum, uint32 current, uint32 new)
+void text_color(int32 argcnt, uint32 wndnum, uint32 currentColor, uint32 newColor)
 #pragma on (unreferenced)
 {
    HRES hfont;
 
    hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = RTR_addr(hfont);
+   tw[wndnum].font = (FONT *)RTR_addr(hfont);
 
    GIL2VFX_select_text_window(&tw[wndnum]);
-   GIL2VFX_remap_font_color(current,new);
+   GIL2VFX_remap_font_color(currentColor,newColor);
 
-   tw[wndnum].font = (void *) hfont;
+   tw[wndnum].font = (FONT *) hfont;
 }
 
 /*********************************************************/
@@ -883,15 +884,16 @@ void text_refresh_window(int32 argcnt, uint32 wndnum, int32 wnd)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void vsprint(int32 argcnt, uint32 wndnum, BYTE *format, va_list argptr)
+void vsprint(int32 argcnt, uint32 wndnum, const char *format, va_list argptr)
 #pragma on (unreferenced)
 {
    HRES hfont,str;
-   BYTE c,*p,*s;
-   BYTE buff[32];
+   char c,*s;
+   const char *p;
+   char buff[32];
 
    hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = RTR_addr(hfont);
+   tw[wndnum].font = (FONT *)RTR_addr(hfont);
 
    GIL2VFX_select_text_window(&tw[wndnum]);
 
@@ -934,25 +936,24 @@ void vsprint(int32 argcnt, uint32 wndnum, BYTE *format, va_list argptr)
 
             RTR_lock(RTR,str);
 
-            s = RTR_addr(str);
+            s = (char *)RTR_addr(str);
 
-            switch (*(UWORD *) s)
-               {
-               case ':S':
-                  GIL2VFX_print(APP,"%s",&s[2]);
-                  break;
+			switch (READ_LE_UINT16(s)) {
+			case ':S':
+				GIL2VFX_print(APP, "%s", &s[2]);
+				break;
 
-               default:
-                  abend(MSG_SRRV);
-               }
+			default:
+				abend(MSG_SRRV);
+			}
 
             RTR_unlock(str);
 
-            tw[wndnum].font = RTR_addr(hfont);
+            tw[wndnum].font = (FONT *)RTR_addr(hfont);
             break;
 
          case 'a':
-            GIL2VFX_print(APP,va_arg(argptr,BYTE *));
+            GIL2VFX_print(APP,va_arg(argptr,const char *));
             break;
 
          case 'c':
@@ -968,7 +969,7 @@ void vsprint(int32 argcnt, uint32 wndnum, BYTE *format, va_list argptr)
 
    GIL2VFX_print_buffer(0);
 
-   tw[wndnum].font = (void *) hfont;
+   tw[wndnum].font = (FONT *) hfont;
 
    if (tw_refresh[wndnum] != -1)
       refresh_window(0,tw[wndnum].window,tw_refresh[wndnum]);
@@ -992,34 +993,32 @@ void print(int32 argcnt, uint32 wndnum, uint32 format, ...)
 {
    va_list argptr;
    HRES hstring;
-   BYTE *p;
+   char *p;
    UWORD *w;
 
    hstring = RTR_get_resource_handle(RTR,format,DA_DEFAULT);
 
    RTR_lock(RTR,hstring);
 
-   p = RTR_addr(hstring);
+   p = (char *)RTR_addr(hstring);
 
    w = (UWORD *) p;
 
-   switch (*w)
-      {
-      case ':S':
-         p += 2;
-         break;
+   switch (*w) {
+   case ':S':
+	   p += 2;
+	   break;
 
-      default:
-         abend(MSG_SRRP);
-      }
+   default:
+	   abend(MSG_SRRP);
+   }
 
    va_start(argptr,format);
 
-   if (strlen(p) < 256)
-      {
-      strcpy(strbuf,p);
+   if (strlen(p) < 256) {
+      Common::strcpy_s(strbuf, p);
       p = strbuf;
-      }
+	}
 
    vsprint(argcnt,wndnum,p,argptr);
 
@@ -1037,10 +1036,10 @@ void print(int32 argcnt, uint32 wndnum, uint32 format, ...)
 //
 /*********************************************************/
 
-void sprint(int32 argcnt, uint32 wndnum, BYTE *format, ...)
+void sprint(int32 argcnt, uint32 wndnum, const char *format, ...)
 {
    va_list argptr;
-   BYTE *p;
+   const char *p;
 
    p = format;
 
@@ -1048,7 +1047,7 @@ void sprint(int32 argcnt, uint32 wndnum, BYTE *format, ...)
 
    if (strlen(p) < 256)
       {
-      strcpy(strbuf,p);
+      Common::strcpy_s(strbuf, p);
       p = strbuf;
       }
 
@@ -1064,10 +1063,9 @@ void sprint(int32 argcnt, uint32 wndnum, BYTE *format, ...)
 //
 /*********************************************************/
 
-void dprint(int32 argcnt, BYTE *format, ...)
-{
+void dprint(int32 argcnt, const char *format, ...) {
    va_list argptr;
-   BYTE *p;
+   const char *p;
 
    p = format;
 
@@ -1096,12 +1094,12 @@ uint32 char_width(int32 argcnt, uint32 wndnum, uint32 ch)
    uint32 w;
 
    hfont = (HRES) tw[wndnum].font;
-   tw[wndnum].font = RTR_addr(hfont);
+   tw[wndnum].font = (FONT *)RTR_addr(hfont);
 
    GIL2VFX_select_text_window(&tw[wndnum]);
    w = GIL2VFX_char_width(ch);
 
-   tw[wndnum].font = (void *) hfont;
+   tw[wndnum].font = (FONT *)hfont;
 
    return w;
 }
@@ -1172,16 +1170,16 @@ void solid_bar_graph(int32 argcnt, int32 x0, int32 y0, int32 x1, int32 y1,
 }
 
 #pragma off (unreferenced)
-void aprint(int32 argcnt, BYTE *format, ...)
+void aprint(int32 argcnt, const char *format, ...)
 #pragma on (unreferenced)
 {
    va_list argptr;
 
    va_start(argptr,format);
-
-   vprintf(format, argptr);
-
+   Common::String msg = Common::String::vformat(format, argptr);
    va_end(argptr);
+
+   debug("%s", msg.c_str());
 }
 
 } // namespace Aesop

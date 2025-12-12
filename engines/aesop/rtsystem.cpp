@@ -21,7 +21,7 @@
 
 #include "aesop/lib/vfx.h"
 #include "aesop/lib/ail32.h"
-#include "aesop/lib/gil2vfx.h"
+#include "aesop/gil2vfx.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
 #include "aesop/rtsystem.h"
