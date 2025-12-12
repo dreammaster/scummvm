@@ -19,6 +19,8 @@
  *
  */
 
+#include "aesop/rtcode.h"
+
 #ifdef __AESOP__
 
 #define PROCDEF
@@ -120,7 +122,7 @@ void text_window(int32 argcnt, uint32 wndnum, uint32 wnd);
 void text_style(int32 argcnt, uint32 wndnum, uint32 font, uint32
 	justify);
 void text_xy(int32 argcnt, uint32 wndnum, uint32 htab, uint32 vtab);
-void text_color(int32 argcnt, uint32 wndnum, uint32 current, uint32 new);
+void text_color(int32 argcnt, uint32 wndnum, uint32 currentColor, uint32 newColor);
 void text_refresh_window(int32 argcnt, uint32 wndnum, int32 wnd);
 
 int32 get_text_x(int32 argcnt, uint32 wndnum);

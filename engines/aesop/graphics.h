@@ -22,6 +22,8 @@
 #ifndef AESOP_GRAPHICS_H
 #define AESOP_GRAPHICS_H
 
+#include "aesop/defs.h"
+
 namespace Aesop {
 
 #ifdef __cplusplus
@@ -36,10 +38,10 @@ extern UWORD in_GIL;
 
 #define NTW 32                   // # of text windows available
 
-void dprint(int32 argcnt, BYTE *format, ...);
-void sprint(int32 argcnt, uint32 wndnum, BYTE *format, ...);
-void text_color(int32 argcnt, uint32 wndnum, uint32 current, uint32 new);
-void release_owned_windows(int32 owner);
+extern void dprint(int32 argcnt, BYTE *format, ...);
+extern void sprint(int32 argcnt, uint32 wndnum, BYTE *format, ...);
+extern void text_color(int32 argcnt, uint32 wndnum, uint32 currentColor, uint32 newColor);
+extern void release_owned_windows(int32 owner);
 
 #ifdef __cplusplus
 }

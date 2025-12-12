@@ -19,6 +19,12 @@
  *
  */
 
+#ifndef AESOP_GIL2VFX_H
+#define AESOP_GIL2VFX_H
+
+#include "aesop/gil2vfx.h"
+#include "aesop/lib/vfx.h"
+
 namespace Aesop {
 
 #define  PAGE1    0
@@ -100,7 +106,7 @@ void GIL2VFX_pixel_fade(int32 src_wnd, int32 dest_wnd, int32 intervals);
 void GIL2VFX_select_text_window(TEXTWINDOW *tw);
 int32 GIL2VFX_char_width(int32 ch);
 void GIL2VFX_home(void);
-void GIL2VFX_remap_font_color(int32 current, int32 new);
+void GIL2VFX_remap_font_color(int32 currentColor, int32 newColor);
 int32 GIL2VFX_test_overlap(int32 wnd, int32 x1, int32 y1, UBYTE *shapes, int32 shape_num);
 void GIL2VFX_print(int32 operation, const char *format, ...);
 void GIL2VFX_scroll_window(int32 wnd, int32 dx, int32 dy, int32 flags, int32 background);
@@ -108,3 +114,5 @@ void GIL2VFX_print_buffer(int32 linenum);
 void GIL2VFX_cout(int32 c);
 
 } // namespace Aesop
+
+#endif

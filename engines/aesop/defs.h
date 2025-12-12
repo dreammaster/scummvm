@@ -28,15 +28,13 @@ namespace Aesop {
 extern "C" {
 #endif
 
-#ifndef TYPEDEFS
-#define TYPEDEFS
-typedef unsigned short UWORD;
-typedef unsigned char UBYTE;
-typedef unsigned long uint32;
-typedef short WORD;
-typedef signed char BYTE;
-typedef long int32;
-#endif
+typedef uint16 UWORD;
+typedef byte UBYTE;
+typedef int8 BYTE;
+typedef int16 WORD;
+typedef float FLOAT;
+typedef int32 FIXED16;   // 16:16 fixed-point type [-32K,+32K]
+typedef int32 FIXED30;   // 2:30 fixed-point type [-1.999,+1.999]
 
 typedef uint32 HRES;           // run-time resource handle
 typedef UWORD HSTR;           // run-time len-prefixed string descriptor
