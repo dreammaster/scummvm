@@ -7,7 +7,8 @@ MODULE_OBJS = \
 	event.o \
 	eye.o \
 	gil2vfx.o \
-	graphics.o
+	graphics.o \
+	interface.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AESOP), DYNAMIC_PLUGIN)

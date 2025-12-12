@@ -24,7 +24,7 @@
 
 #define NO_OLD_SYS_FUNCTIONS
 // LUM include ail32.h instead of mss.h
-#include "aesop/lib/ail32.h"
+#include "aesop/ail32.h"
 #include "aesop/lib/mouse.h"
 
 namespace Aesop {

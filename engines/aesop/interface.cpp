@@ -20,9 +20,9 @@
  */
 
 #include "aesop/lib/vfx.h"
-#include "aesop/lib/ail32.h"
+#include "aesop/ail32.h"
 #include "aesop/gil2vfx.h"
-#include "aesop/lib/gil2vfxa.h"
+#include "aesop/gil2vfxa.h"
 #include "aesop/lib/mouse.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
@@ -284,6 +284,7 @@ static void mouse_button_event_handler(int32 left, int32 right, int32 center)
 
 /*********************************************************/
 void init_interface(void) {
+#if 0
 	union REGS inregs, outregs;
 
 	in_BIOS = 0;
@@ -318,7 +319,7 @@ void init_interface(void) {
 		GIL2VFX_shutdown_driver();
 		abend(MSG_MMR);
 	}
-
+#endif
 	htimer = AIL_register_timer(timer_callback);
 	AIL_set_timer_frequency(htimer, 60);
 	AIL_start_timer(htimer);
@@ -328,6 +329,7 @@ void init_interface(void) {
 
 /*********************************************************/
 void shutdown_interface(void) {
+#if 0
 	union REGS inregs, outregs;
 
 	if (!interface_active) return;
@@ -341,8 +343,8 @@ void shutdown_interface(void) {
 
 	inregs.w.ax = 0;
 	int386(0x33, &inregs, &outregs);
-
-	if (pointer_set != -1U)
+#endif
+	if (pointer_set != (HRES)-1)
 	{
 		RTR_unlock(pointer_set);
 	}
@@ -377,7 +379,7 @@ void set_mouse_pointer(int32 argcnt, uint32 table, uint32 number, int32 hot_X,
 
 	if (table != pointer_set_entry)
 	{
-		if (pointer_set != -1U)
+		if (pointer_set != (HRES)-1)
 		{
 			RTR_unlock(pointer_set);
 		}

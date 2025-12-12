@@ -23,7 +23,7 @@
 #include "aesop/lib/dll.h"
 #include "aesop/lib/mouse.h"
 #include "aesop/gil2vfx.h"
-#include "aesop/lib/gil2vfxa.h"
+#include "aesop/gil2vfxa.h"
 #include "aesop/defs.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
