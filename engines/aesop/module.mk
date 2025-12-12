@@ -10,7 +10,8 @@ MODULE_OBJS = \
 	graphics.o \
 	interface.o \
 	interp.o \
-	rtcode.o
+	rtcode.o \
+	rtlink.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AESOP), DYNAMIC_PLUGIN)

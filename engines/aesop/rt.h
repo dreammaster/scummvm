@@ -61,7 +61,7 @@ extern uint32 current_index;
 // Assorted speed-critical .ASM routines
 
 void *RTD_first(void *dictionary);
-void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def);
+void *RTD_iterate(void *base, void *cur, char **tag, char **def);
 
 BYTE *RTD_lookup(HRES dictionary, void *key);
 

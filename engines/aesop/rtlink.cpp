@@ -81,9 +81,9 @@ int sort_by_class(const void *a, const void *b) {
 //
 /***************************************************/
 
-HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
+HRES construct_thunk(RTR_class *rtr, RTR_class *lnk, uint32 object) {
 	UWORD depth;              // 0..MAX_G = derived object..base class
-	uint32 class, xclass;
+	uint32 theClass, xclass;
 	uint32 tsize;
 	uint32 source;
 	UWORD target;
@@ -92,7 +92,7 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 	PRG_HDR prg, xprg;
 	THDR thdr;
 	UBYTE *dict;
-	BYTE *tag, *tagbase, *def;
+	char *tag, *tagbase, *def;
 	HRES thunk;
 	HRES HCRFD;
 	HRES impt[MAX_G], expt[MAX_G], code[MAX_G];
@@ -115,12 +115,12 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 	// Load programs and dictionaries, calculate thunk size
 	//
 
-	HCRFD = RTR_get_resource_handle(RTR, CRFD, DA_TEMPORARY | DA_EVANESCENT);
-	RTR_lock(RTR, HCRFD);
+	HCRFD = RTR_get_resource_handle(rtr, CRFD, DA_TEMPORARY | DA_EVANESCENT);
+	RTR_lock(rtr, HCRFD);
 
 	thdr.MV_list = sizeof(THDR);
 	thdr.SD_list = sizeof(THDR);
-	thdr.max_msg = -1U;
+	thdr.max_msg = (UWORD)-1;
 	thdr.nprgs = 0;
 	thdr.isize = sizeof(IHDR);
 	thdr.use_cnt = 0;
@@ -133,16 +133,16 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 		s_S[i] = x_S[i] = 0;
 
 	depth = 0;
-	class = object;
+	theClass = object;
 
-	while (class != -1L)
+	while (theClass != -1L)
 	{
-		code[depth] = RTR_get_resource_handle(RTR, class, DA_DEFAULT);
+		code[depth] = RTR_get_resource_handle(rtr, theClass, DA_DEFAULT);
 
 		if (!code[depth])
-			abend(MSG_PONF, class);     // "Program object %lu not found"
+			abend(MSG_PONF, theClass);     // "Program object %lu not found"
 
-		RTR_lock(RTR, code[depth]);
+		RTR_lock(rtr, code[depth]);
 
 		prg = *(PRG_HDR *)RTR_addr(code[depth]);
 
@@ -152,13 +152,13 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 
 		exports[depth] = prg.exports;
 
-		impt[depth] = RTR_get_resource_handle(LNK, prg.imports,
+		impt[depth] = RTR_get_resource_handle(lnk, prg.imports,
 			DA_TEMPORARY | DA_EVANESCENT);
-		RTR_lock(LNK, impt[depth]);
+		RTR_lock(lnk, impt[depth]);
 
-		expt[depth] = RTR_get_resource_handle(LNK, prg.exports,
+		expt[depth] = RTR_get_resource_handle(lnk, prg.exports,
 			DA_TEMPORARY | DA_EVANESCENT);
-		RTR_lock(LNK, expt[depth]);
+		RTR_lock(lnk, expt[depth]);
 
 
 		//
@@ -166,8 +166,8 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 		//
 
 		mcnt = 0;
-		dict = RTD_first(RTR_addr(expt[depth]));
-		while ((dict = RTD_iterate(RTR_addr(expt[depth]), dict, &tag, &def)) != NULL)
+		dict = (UBYTE *)RTD_first(RTR_addr(expt[depth]));
+		while ((dict = (UBYTE *)RTD_iterate(RTR_addr(expt[depth]), dict, &tag, &def)) != NULL)
 		{
 			switch (tag[0])
 			{
@@ -185,8 +185,8 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 		// Calculate Size of External Reference List
 		//
 
-		dict = RTD_first(RTR_addr(impt[depth]));
-		while ((dict = RTD_iterate(RTR_addr(impt[depth]), dict, &tag, &def)) != NULL)
+		dict = (UBYTE *)RTD_first(RTR_addr(impt[depth]));
+		while ((dict = (UBYTE *)RTD_iterate(RTR_addr(impt[depth]), dict, &tag, &def)) != NULL)
 		{
 			switch (tag[0])
 			{
@@ -207,7 +207,7 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 		s_S[depth] += prg.static_size;
 		thdr.isize += prg.static_size;
 
-		class = prg.parent;
+		theClass = prg.parent;
 
 		if (++depth == MAX_G)
 			abend(MSG_AILE);           // "AESOP inheritance limit exceeded"
@@ -222,7 +222,7 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 	// Allocate memory for thunk and construct it
 	//
 
-	thunk = RTR_alloc(RTR, tsize, DA_MOVEABLE | DA_PRECIOUS);
+	thunk = RTR_alloc(rtr, tsize, DA_MOVEABLE | DA_PRECIOUS);
 
 	*(THDR *)RTR_addr(thunk) = thdr;
 
@@ -246,17 +246,17 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 
 		XR = (void *)m;
 
-		dict = RTD_first(RTR_addr(impt[i]));
-		while ((dict = RTD_iterate(RTR_addr(impt[i]), dict, &tag, &def)) != NULL)
+		dict = (UBYTE *)RTD_first(RTR_addr(impt[i]));
+		while ((dict = (UBYTE *)RTD_iterate(RTR_addr(impt[i]), dict, &tag, &def)) != NULL)
 		{
-			BYTE *loRTDLookupResult;
-			tagbase = RTR_addr(impt[i]);
+			const char *loRTDLookupResult;
+			tagbase = (char *)RTR_addr(impt[i]);
 			switch (tag[0])
 			{
 			case 'C':               // Code
 
 				// LUM fixed the testing of the RTD_lookup result
-				loRTDLookupResult = RTD_lookup(HCRFD, &tag[2]);
+				loRTDLookupResult = (const char *)RTD_lookup(HCRFD, &tag[2]);
 				offset = (UWORD)ascnum(loRTDLookupResult);
 				//if (offset == -1U)
 				if (loRTDLookupResult == NULL)
@@ -264,8 +264,8 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 
 				thunk_ptr = RTR_addr(thunk);
 				def_off = ascnum(def);
-				XR_ptr = (void *)((uint32)thunk_ptr + (uint32)XR + def_off);
-				CR_ptr = (void *)((uint32)&code_resources + offset);
+				XR_ptr = (uint32 *)((uint32)thunk_ptr + (uint32)XR + def_off);
+				CR_ptr = (uint32 *)((uint32)&code_resources + offset);
 				*XR_ptr = *CR_ptr;
 
 				break;
@@ -274,7 +274,7 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 			case 'W':               // Word
 			case 'L':               // Long   
 				target = (UWORD)ascnum(def);
-				source = ascnum((BYTE *)strchr((char *)def, ',') + 1);
+				source = ascnum(strchr((char *)def, ',') + 1);
 
 				xclass = source;
 				index = sizeof(IHDR);
@@ -282,14 +282,14 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 
 				while (xclass != -1L)
 				{
-					xcode = RTR_get_resource_handle(RTR, xclass,
+					xcode = RTR_get_resource_handle(rtr, xclass,
 						DA_DEFAULT);
 
 					if (!xcode)
 						abend(MSG_FPNF, xclass); //"Friend program %lu not found"
 
-					RTR_lock(RTR, xcode);
-					tag = tag - tagbase + (BYTE *)RTR_addr(impt[i]);
+					RTR_lock(rtr, xcode);
+					tag = tag - tagbase + (char *)RTR_addr(impt[i]);
 
 					xprg = *(PRG_HDR *)RTR_addr(xcode);
 
@@ -297,14 +297,14 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 
 					if (!found)
 					{
-						xexpt = RTR_get_resource_handle(LNK, xprg.exports,
+						xexpt = RTR_get_resource_handle(lnk, xprg.exports,
 							DA_TEMPORARY | DA_EVANESCENT);
 
-						RTR_lock(LNK, xexpt);
-						tag = tag - tagbase + (BYTE *)RTR_addr(impt[i]);
+						RTR_lock(lnk, xexpt);
+						tag = tag - tagbase + (char *)RTR_addr(impt[i]);
 
 						// LUM fixed the testing of the RTD_lookup result
-						loRTDLookupResult = RTD_lookup(xexpt, tag);
+						loRTDLookupResult = (const char *)RTD_lookup(xexpt, tag);
 						offset = (UWORD)ascnum(loRTDLookupResult);
 						//if (offset != -1U)
 						if (loRTDLookupResult != NULL)
@@ -338,12 +338,12 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 		i--;
 	}
 
-	MV = add_offset(RTR_addr(thunk), thdr.MV_list);
+	MV = (MV_entry *)add_offset(RTR_addr(thunk), thdr.MV_list);
 
 	for (i = m = 0; i < depth; i++)
 	{
-		dict = RTD_first(RTR_addr(expt[i]));
-		while ((dict = RTD_iterate(RTR_addr(expt[i]), dict, &tag, &def)) != NULL)
+		dict = (UBYTE *)RTD_first(RTR_addr(expt[i]));
+		while ((dict = (UBYTE *)RTD_iterate(RTR_addr(expt[i]), dict, &tag, &def)) != NULL)
 			if (tag[0] == 'M')
 			{
 				MV[m].msg = (UWORD)ascnum(&tag[2]);
@@ -399,20 +399,20 @@ HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 //
 /***************************************************/
 
-HRES create_instance(RTR_class *RTR, uint32 object) {
+HRES create_instance(RTR_class *rtr, uint32 object) {
 	HRES thunk, instance;
 	HD_entry *sel;
 	ND_entry *entry;
 	THDR *thdr;
 	IHDR ihdr;
 
-	entry = RTR_search_name_dir(RTR, object);
+	entry = RTR_search_name_dir(rtr, object);
 
-	if ((entry == NULL) || (entry->thunk == -1U))
+	if ((entry == NULL) || (entry->thunk == (HRES)-1))
 	{
-		thunk = construct_thunk(RTR, RTR, object);
+		thunk = construct_thunk(rtr, rtr, object);
 
-		RTR_search_name_dir(RTR, object)->thunk = thunk;
+		RTR_search_name_dir(rtr, object)->thunk = thunk;
 	} else
 		thunk = (HRES)entry->thunk;
 
@@ -421,7 +421,7 @@ HRES create_instance(RTR_class *RTR, uint32 object) {
 	thdr = (THDR *)RTR_addr(thunk);
 	++thdr->use_cnt;
 
-	instance = RTR_alloc(RTR, thdr->isize, DA_MOVEABLE | DA_PRECIOUS);
+	instance = RTR_alloc(rtr, thdr->isize, DA_MOVEABLE | DA_PRECIOUS);
 
 	sel = (HD_entry *)instance;
 
@@ -440,15 +440,15 @@ HRES create_instance(RTR_class *RTR, uint32 object) {
 //
 /***************************************************/
 
-void destroy_instance(RTR_class *RTR, HRES instance) {
+void destroy_instance(RTR_class *rtr, HRES instance) {
 	HRES thunk;
 
 	thunk = ((IHDR *)RTR_addr(instance))->thunk;
 
 	if (!(--(((THDR *)RTR_addr(thunk))->use_cnt)))
-		RTR_free(RTR, thunk);
+		RTR_free(rtr, thunk);
 
-	RTR_free(RTR, instance);
+	RTR_free(rtr, instance);
 }
 
 } // namespace Aesop
