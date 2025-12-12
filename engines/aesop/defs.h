@@ -37,6 +37,8 @@ typedef int32 FIXED30;   // 2:30 fixed-point type [-1.999,+1.999]
 typedef uint32 HRES;           // run-time resource handle
 typedef UWORD HSTR;           // run-time len-prefixed string descriptor
 
+#define FP_OFF(X) ((intptr)X)
+
 #define MSG_CREATE  0         // predefined message tokens (sent by system)
 #define MSG_DESTROY 1
 #define MSG_RESTORE 2

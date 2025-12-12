@@ -103,6 +103,8 @@ inline int arand() {
 	return g_engine->getRandomNumber(0x7fffffff);
 }
 
+extern int kbhit();
+
 } // End of namespace Aesop
 
 #endif // AESOP_H

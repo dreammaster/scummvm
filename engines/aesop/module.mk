@@ -9,7 +9,8 @@ MODULE_OBJS = \
 	gil2vfx.o \
 	graphics.o \
 	interface.o \
-	interp.o
+	interp.o \
+	rtcode.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AESOP), DYNAMIC_PLUGIN)

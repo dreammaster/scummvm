@@ -19,6 +19,8 @@
  *
  */
 
+#include "common/config-manager.h"
+#include "common/str.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"
 #include "aesop/rtsystem.h"
@@ -29,6 +31,8 @@
 #include "aesop/rt.h"
 #include "aesop/rtobject.h"
 #include "aesop/eye.h"               // Application code resource header
+#include "aesop/lib/strings.h"
+#include "aesop/aesop.h"
 
 namespace Aesop {
 
@@ -58,9 +62,9 @@ void load_string(int32 argcnt, BYTE *array, uint32 string)
 
 	RTR_lock(RTR, handle);
 
-	new_array = add_ptr(RTR_addr(objlist[current_this]), array_offset);
+	new_array = (BYTE *)add_ptr(RTR_addr(objlist[current_this]), array_offset);
 
-	ptr = RTR_addr(handle);
+	ptr = (BYTE *)RTR_addr(handle);
 
 	switch (*(UWORD *)ptr)
 	{
@@ -98,7 +102,7 @@ void load_resource(int32 argcnt, BYTE *array, uint32 resource)
 
 	RTR_lock(RTR, handle);
 
-	new_array = add_ptr(RTR_addr(objlist[current_this]), array_offset);
+	new_array = (BYTE *)add_ptr(RTR_addr(objlist[current_this]), array_offset);
 
 	far_memmove(new_array, RTR_addr(handle), RTR_size(handle));
 
@@ -109,21 +113,21 @@ void load_resource(int32 argcnt, BYTE *array, uint32 resource)
 void copy_string(int32 argcnt, BYTE *src, BYTE *dest)
 #pragma on (unreferenced)
 {
-	strcpy((char *)dest, (char *)src);
+	Common::strcpy_s((char *)dest, 256, (char *)src);
 }
 
 #pragma off (unreferenced)
 void string_force_lower(int32 argcnt, BYTE *dest)
 #pragma on (unreferenced)
 {
-	strlwr((char *)dest);
+	aesop_strlwr((char *)dest);
 }
 
 #pragma off (unreferenced)
 void string_force_upper(int32 argcnt, BYTE *dest)
 #pragma on (unreferenced)
 {
-	strupr((char *)dest);
+	aesop_strupr((char *)dest);
 }
 
 #pragma off (unreferenced)
@@ -137,7 +141,7 @@ uint32 string_len(int32 argcnt, BYTE *string)
 uint32 string_compare(int32 argcnt, BYTE *str1, BYTE *str2)
 #pragma on (unreferenced)
 {
-	return stricmp((char *)str1, (char *)str2);
+	return scumm_stricmp((char *)str1, (char *)str2);
 }
 
 //
@@ -145,7 +149,7 @@ uint32 string_compare(int32 argcnt, BYTE *str1, BYTE *str2)
 //
 
 #pragma off (unreferenced)
-int32 strval(int32 argcnt, BYTE *string)
+int32 strval(int32 argcnt, const char *string)
 #pragma on (unreferenced)
 {
 	if (string == NULL)
@@ -162,15 +166,10 @@ int32 strval(int32 argcnt, BYTE *string)
 //
 
 #pragma off (unreferenced)
-int32 envval(int32 argcnt, BYTE *name)
+int32 envval(int32 argcnt, const char *name)
 #pragma on (unreferenced)
 {
-	BYTE *env;
-
-	if ((env = (BYTE *)getenv((char *)name)) == NULL)
-		return -1L;
-
-	return ascnum(env);
+	return ConfMan.hasKey(name) ? ConfMan.getInt(name) : -1;
 }
 
 //
@@ -178,6 +177,7 @@ int32 envval(int32 argcnt, BYTE *name)
 //
 
 void beep(void) {
+#ifdef TODO
 	UWORD dx, ax;
 
 	outp(0x43, 0x0b6);
@@ -190,6 +190,9 @@ void beep(void) {
 		for (ax = 65535; ax > 0; ax--);
 
 	outp(0x61, (inp(0x61) & 0x0fc));
+#else
+	error("TODO: Beep");
+#endif
 }
 
 #pragma off (unreferenced)
@@ -210,6 +213,7 @@ int32 peekmem(int32 argcnt, int32 *addr)
 uint32 rnd(int32 argcnt, uint32 low, uint32 high)
 #pragma on (unreferenced)
 {
+#if 0
 	// LUM add type int
 	static int init = 0;
 
@@ -218,7 +222,7 @@ uint32 rnd(int32 argcnt, uint32 low, uint32 high)
 		init = 1;
 		srand(*(UWORD *)0x0000046c);
 	}
-
+#endif
 	return low + ((uint32)arand() % (high - low + 1L));
 }
 
@@ -251,14 +255,14 @@ uint32 absv(int32 argcnt, int32 val)
 int32 minv(int32 argcnt, int32 val1, int32 val2)
 #pragma on (unreferenced)
 {
-	return min(val1, val2);
+	return MIN(val1, val2);
 }
 
 #pragma off (unreferenced)
 int32 maxv(int32 argcnt, int32 val1, int32 val2)
 #pragma on (unreferenced)
 {
-	return max(val1, val2);
+	return MAX(val1, val2);
 }
 
 #pragma off (unreferenced)
@@ -268,7 +272,7 @@ void diagnose(int32 argcnt, uint32 dtype, uint32 parm)
 	switch (dtype)
 	{
 	case 1:
-		printf("%X ", parm);
+		debugN("%X ", parm);
 		break;
 
 	case 2:

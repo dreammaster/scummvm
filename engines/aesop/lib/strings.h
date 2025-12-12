@@ -19,21 +19,20 @@
  *
  */
 
-#ifndef AESOP_RTCODE_H
-#define AESOP_RTCODE_H
+#ifndef AESOP_LIB_STRINGS_H
+#define AESOP_LIB_STRINGS_H
 
 namespace Aesop {
 
-extern void diagnose(int32 argcnt, uint32 dtype, uint32 parm);
+inline void aesop_strlwr(char *s) {
+	for (; *s; ++s)
+		*s = tolower(*s);
+}
 
-typedef void (*FARPROC)();
-extern FARPROC code_resources[];
-
-extern uint32 absv(int32 argcnt, int32 val);
-extern uint32 rnd(int32 argcnt, uint32 low, uint32 high);
-extern int32 envval(int32 argcnt, const char *name);
-
-void beep(void);
+inline void aesop_strupr(char *s) {
+	for (; *s; ++s)
+		*s = toupper(*s);
+}
 
 } // namespace Aesop
 
