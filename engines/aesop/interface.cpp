@@ -39,51 +39,51 @@
 namespace Aesop {
 
 extern VFX_DESC *VFX;
-LONG interface_active = 0;
+int32 interface_active = 0;
 
 HTIMER htimer;
-ULONG volatile heartbeat;
-ULONG volatile in_BIOS;
+uint32 volatile heartbeat;
+uint32 volatile in_BIOS;
 
-ULONG cur_table;
-ULONG cur_number;
-LONG cur_hot_X;
-LONG cur_hot_Y;
+uint32 cur_table;
+uint32 cur_number;
+int32 cur_hot_X;
+int32 cur_hot_Y;
 
-ULONG wait_number;
-LONG wait_hot_X;
-LONG wait_hot_Y;
+uint32 wait_number;
+int32 wait_hot_X;
+int32 wait_hot_Y;
 
-ULONG save_number;
-LONG save_hot_X;
-LONG save_hot_Y;
+uint32 save_number;
+int32 save_hot_X;
+int32 save_hot_Y;
 
-LONG ptr_valid;
-LONG wait_ptr_valid;
-LONG wait_ptr_state;
+int32 ptr_valid;
+int32 wait_ptr_valid;
+int32 wait_ptr_state;
 
 HRES pointer_set;
-ULONG pointer_set_entry;
-ULONG pointer_num;
-ULONG pointer_fade_table;
-ULONG pointer_fade_level;
-ULONG pointer_scale;
-LONG last_cursor_X, last_cursor_Y;
-LONG volatile point_X, point_Y;
-LONG volatile btn_left, btn_right;
-LONG volatile last_X, last_Y;
-LONG volatile last_left, last_right;
+uint32 pointer_set_entry;
+uint32 pointer_num;
+uint32 pointer_fade_table;
+uint32 pointer_fade_level;
+uint32 pointer_scale;
+int32 last_cursor_X, last_cursor_Y;
+int32 volatile point_X, point_Y;
+int32 volatile btn_left, btn_right;
+int32 volatile last_X, last_Y;
+int32 volatile last_left, last_right;
 
 typedef struct             // DPMI real-mode interrupt structure
 {
-	LONG edi;
-	LONG esi;
-	LONG ebp;
-	LONG reserved;
-	LONG ebx;
-	LONG edx;
-	LONG ecx;
-	LONG eax;
+	int32 edi;
+	int32 esi;
+	int32 ebp;
+	int32 reserved;
+	int32 ebx;
+	int32 edx;
+	int32 ecx;
+	int32 eax;
 	WORD flags;
 	WORD es;
 	WORD ds;
@@ -98,16 +98,16 @@ DPMI_RMI;
 
 
 /*********************************************************/
-void cdecl getkey(void) {
+void getkey(void) {
 	while (!find_event(SYS_KEYDOWN, -1L));
 
 	remove_event(SYS_KEYDOWN, -1L, -1);
 }
 
 /*********************************************************/
-void cdecl add_region_event(LONG type, LONG owner) {
+void add_region_event(int32 type, int32 owner) {
 	WORD nxt;
-	ULONG r;
+	uint32 r;
 	NREQ *NR;
 
 	DISABLE();
@@ -149,7 +149,7 @@ void cdecl add_region_event(LONG type, LONG owner) {
 //
 /*********************************************************/
 
-static void cdecl timer_callback(void)   // Warning: called during IRQ 0
+static void timer_callback(void)   // Warning: called during IRQ 0
 {
 	EVENT *EV;
 	unsigned key, scan, ascii;
@@ -186,10 +186,10 @@ static void cdecl timer_callback(void)   // Warning: called during IRQ 0
 }
 
 /*********************************************************/
-static void cdecl mouse_event_handler(LONG px, LONG py) {
-	static LONG entry = 0;
+static void mouse_event_handler(int32 px, int32 py) {
+	static int32 entry = 0;
 	WORD nxt;
-	LONG r;
+	int32 r;
 	NREQ *NR;
 	EVENT *EV;
 
@@ -200,9 +200,9 @@ static void cdecl mouse_event_handler(LONG px, LONG py) {
 	point_Y = py;
 
 	if ((EV = find_event(SYS_MOUSEMOVE, -1L)) == NULL)
-		add_event(SYS_MOUSEMOVE, ((ULONG)point_Y << 16) | (ULONG)point_X, -1);
+		add_event(SYS_MOUSEMOVE, ((uint32)point_Y << 16) | (uint32)point_X, -1);
 	else
-		EV->parameter = ((ULONG)point_Y << 16) | (ULONG)point_X;
+		EV->parameter = ((uint32)point_Y << 16) | (uint32)point_X;
 
 	nxt = NR_first[SYS_ENTER_REGION];
 	while (nxt != -1)
@@ -244,10 +244,10 @@ static void cdecl mouse_event_handler(LONG px, LONG py) {
 }
 /*********************************************************/
 #pragma off (unreferenced)
-static void cdecl mouse_button_event_handler(LONG left, LONG right, LONG center)
+static void mouse_button_event_handler(int32 left, int32 right, int32 center)
 #pragma on (unreferenced)
 {
-	static LONG entry = 0;
+	static int32 entry = 0;
 
 	if (entry) return;
 	entry = 1;
@@ -283,7 +283,7 @@ static void cdecl mouse_button_event_handler(LONG left, LONG right, LONG center)
 }
 
 /*********************************************************/
-void cdecl init_interface(void) {
+void init_interface(void) {
 	union REGS inregs, outregs;
 
 	in_BIOS = 0;
@@ -327,7 +327,7 @@ void cdecl init_interface(void) {
 }
 
 /*********************************************************/
-void cdecl shutdown_interface(void) {
+void shutdown_interface(void) {
 	union REGS inregs, outregs;
 
 	if (!interface_active) return;
@@ -349,9 +349,9 @@ void cdecl shutdown_interface(void) {
 }
 
 /*********************************************************/
-void cdecl set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
-	LONG hot_Y, ULONG scale, ULONG fade_table,
-	ULONG fade_level) {
+void set_mouse_pointer(int32 argcnt, uint32 table, uint32 number, int32 hot_X,
+	int32 hot_Y, uint32 scale, uint32 fade_table,
+	uint32 fade_level) {
 	ND_entry *entry;
 
 	if ((wait_ptr_state != 0) && (argcnt != 0))
@@ -405,7 +405,7 @@ void cdecl set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl set_wait_pointer(LONG argcnt, ULONG number, LONG hot_X, LONG hot_Y)
+void set_wait_pointer(int32 argcnt, uint32 number, int32 hot_X, int32 hot_Y)
 #pragma on (unreferenced)
 {
 	if (number == -1L)
@@ -423,7 +423,7 @@ void cdecl set_wait_pointer(LONG argcnt, ULONG number, LONG hot_X, LONG hot_Y)
 }
 
 /*********************************************************/
-void cdecl standby_cursor(void) {
+void standby_cursor(void) {
 	if (!wait_ptr_valid) return;
 	if (!ptr_valid) return;
 
@@ -446,7 +446,7 @@ void cdecl standby_cursor(void) {
 //
 /*********************************************************/
 
-void cdecl resume_cursor(void) {
+void resume_cursor(void) {
 	if (!wait_ptr_valid) return;
 	if (!ptr_valid) return;
 
@@ -463,7 +463,7 @@ void cdecl resume_cursor(void) {
 //
 /*********************************************************/
 
-void cdecl lock_mouse(void) {
+void lock_mouse(void) {
 	MOUSE_lock();
 }
 
@@ -475,27 +475,27 @@ void cdecl lock_mouse(void) {
 // 
 /*********************************************************/
 
-void cdecl unlock_mouse(void) {
+void unlock_mouse(void) {
 	MOUSE_unlock();
 }
 
 /*********************************************************/
-void cdecl show_mouse(void) {
+void show_mouse(void) {
 	MOUSE_show();
 }
 
 /*********************************************************/
-void cdecl hide_mouse(void) {
+void hide_mouse(void) {
 	MOUSE_hide();
 }
 
 /*********************************************************/
-ULONG cdecl mouse_XY(void) {
-	ULONG xy;
+uint32 mouse_XY(void) {
+	uint32 xy;
 
 	DISABLE();
 
-	xy = ((ULONG)point_Y << 16) + point_X;
+	xy = ((uint32)point_Y << 16) + point_X;
 
 	ENABLE();
 
@@ -509,10 +509,10 @@ ULONG cdecl mouse_XY(void) {
 /*********************************************************/
 
 #pragma off (unreferenced)
-ULONG cdecl mouse_in_window(LONG argcnt, ULONG wnd)
+uint32 mouse_in_window(int32 argcnt, uint32 wnd)
 #pragma on (unreferenced)
 {
-	ULONG stat;
+	uint32 stat;
 
 	stat = ((point_X >= GIL2VFX_get_x1(wnd)) &&
 		(point_X <= GIL2VFX_get_x2(wnd)) &&
@@ -531,7 +531,7 @@ ULONG cdecl mouse_in_window(LONG argcnt, ULONG wnd)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl refresh_window(LONG argcnt, ULONG src, ULONG target)
+void refresh_window(int32 argcnt, uint32 src, uint32 target)
 #pragma on (unreferenced)
 {
 	GIL2VFX_refresh_window(src, target);

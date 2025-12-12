@@ -28,19 +28,19 @@ namespace Aesop {
 extern "C" {
 #endif
 
-extern LONG wait_ptr_state;
+extern int32 wait_ptr_state;
 
-void cdecl init_interface(void);
-void cdecl shutdown_interface(void);
-void cdecl standby_cursor(void);
-void cdecl resume_cursor(void);
-void cdecl lock_mouse(void);
-void cdecl unlock_mouse(void);
-void cdecl show_mouse(void);
-void cdecl hide_mouse(void);
-void cdecl copy_mouse(int window);
-ULONG cdecl mouse_in_window(LONG argcnt, ULONG wnd);
-void cdecl refresh_window(LONG argcnt, ULONG src, ULONG target);
+void init_interface(void);
+void shutdown_interface(void);
+void standby_cursor(void);
+void resume_cursor(void);
+void lock_mouse(void);
+void unlock_mouse(void);
+void show_mouse(void);
+void hide_mouse(void);
+void copy_mouse(int window);
+uint32 mouse_in_window(int32 argcnt, uint32 wnd);
+void refresh_window(int32 argcnt, uint32 src, uint32 target);
 
 #ifdef __cplusplus
 }

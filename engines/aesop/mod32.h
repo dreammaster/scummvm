@@ -45,16 +45,16 @@ typedef struct
 
 } MODSPEC;
 
-extern void cdecl BuildModStream(MODSPEC *mod);
+extern void BuildModStream(MODSPEC *mod);
 
 // Build mixer data stream for this mod channel.
 // Output buffer has 8 channels of interleaved data to be merged.
 
-extern void cdecl ModSilence(MODSPEC *mod1,char *merge);
-extern void cdecl MergeMod1 (MODSPEC *mod1,char *merge);
-extern void cdecl MergeMod2 (MODSPEC *mod1,char *merge);
-extern void cdecl MergeMod3 (MODSPEC *mod1,char *merge);
-extern void cdecl MergeMod4 (MODSPEC *mod1,char *merge);
+extern void ModSilence(MODSPEC *mod1,char *merge);
+extern void MergeMod1 (MODSPEC *mod1,char *merge);
+extern void MergeMod2 (MODSPEC *mod1,char *merge);
+extern void MergeMod3 (MODSPEC *mod1,char *merge);
+extern void MergeMod4 (MODSPEC *mod1,char *merge);
 
 #ifdef __cplusplus
 }

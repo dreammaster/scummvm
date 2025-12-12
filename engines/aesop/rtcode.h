@@ -28,16 +28,16 @@ namespace Aesop {
 extern "C" {
 #endif
 
-void cdecl diagnose(LONG argcnt, ULONG dtype, ULONG parm);
+void diagnose(int32 argcnt, uint32 dtype, uint32 parm);
 
-typedef void (cdecl *FARPROC)();
+typedef void (*FARPROC)();
 extern FARPROC code_resources[];
 
-ULONG cdecl absv(LONG argcnt, LONG val);
-ULONG cdecl rnd(LONG argcnt, ULONG low, ULONG high);
-LONG cdecl envval(LONG argcnt, BYTE *name);
+uint32 absv(int32 argcnt, int32 val);
+uint32 rnd(int32 argcnt, uint32 low, uint32 high);
+int32 envval(int32 argcnt, BYTE *name);
 
-void cdecl beep(void);
+void beep(void);
 
 #ifdef __cplusplus
 }

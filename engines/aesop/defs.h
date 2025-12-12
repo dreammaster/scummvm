@@ -32,13 +32,13 @@ extern "C" {
 #define TYPEDEFS
 typedef unsigned short UWORD;
 typedef unsigned char UBYTE;
-typedef unsigned long ULONG;
+typedef unsigned long uint32;
 typedef short WORD;
 typedef signed char BYTE;
-typedef long LONG;
+typedef long int32;
 #endif
 
-typedef ULONG HRES;           // run-time resource handle
+typedef uint32 HRES;           // run-time resource handle
 typedef UWORD HSTR;           // run-time len-prefixed string descriptor
 
 #define MSG_CREATE  0         // predefined message tokens (sent by system)
@@ -67,9 +67,9 @@ THDR;                         // Thunk header
 typedef struct
 {
    UWORD static_size;
-   ULONG imports;
-   ULONG exports;
-   ULONG parent;
+   uint32 imports;
+   uint32 exports;
+   uint32 parent;
 }
 PRG_HDR;                      // SOP program header
 
@@ -82,7 +82,7 @@ MHDR;                         // Message handler header
 typedef struct
 {
    UWORD msg;
-   ULONG handler;
+   uint32 handler;
    UWORD SD_offset;
 }
 MV_entry;                     // Thunk message vector list entry
@@ -90,7 +90,7 @@ MV_entry;                     // Thunk message vector list entry
 typedef struct
 {
    HRES SOP;
-   ULONG exports;
+   uint32 exports;
    UWORD static_base;
    UWORD extern_base;
 }

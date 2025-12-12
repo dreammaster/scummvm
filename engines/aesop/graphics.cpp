@@ -38,15 +38,15 @@ namespace Aesop {
 
 VFX_DESC *VFX;
 
-LONG window_owner[256];
+int32 window_owner[256];
 
-ULONG lastg_x;
-ULONG lastg_y;
-ULONG lastg_p;
+uint32 lastg_x;
+uint32 lastg_y;
+uint32 lastg_p;
 
 TEXTWINDOW tw[NTW];
 //WINDOW tw_refresh[NTW];
-LONG tw_refresh[NTW];
+int32 tw_refresh[NTW];
 
 BYTE strbuf[256];              // used for string resource buffering
 BYTE txtbuf[2402];             // used for word-wrapped text (also used as
@@ -143,9 +143,9 @@ UBYTE text_colors[9] =
    };
 
 /*********************************************************/
-void cdecl init_graphics(void)
+void init_graphics(void)
 {
-   ULONG i, j;
+   uint32 i, j;
 
    GIL2VFX_init();
    
@@ -178,7 +178,7 @@ void cdecl init_graphics(void)
 }
 
 /*********************************************************/
-void cdecl shutdown_graphics(void)
+void shutdown_graphics(void)
 {
    GIL2VFX_shutdown_driver();
 }
@@ -193,9 +193,9 @@ void cdecl shutdown_graphics(void)
 //
 /*********************************************************/
 
-void cdecl release_owned_windows(LONG owner)
+void release_owned_windows(int32 owner)
 {
-   LONG i;
+   int32 i;
 
    if (owner == -1)
       {
@@ -220,7 +220,7 @@ void cdecl release_owned_windows(LONG owner)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl draw_dot(LONG argcnt, ULONG page, ULONG x, ULONG y, ULONG color)
+void draw_dot(int32 argcnt, uint32 page, uint32 x, uint32 y, uint32 color)
 #pragma on (unreferenced)
 {
    GIL2VFX_draw_dot(lastg_p=page, lastg_x=x, lastg_y=y, color);
@@ -228,29 +228,29 @@ void cdecl draw_dot(LONG argcnt, ULONG page, ULONG x, ULONG y, ULONG color)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl draw_line(LONG argcnt, ULONG page, ULONG x1, ULONG y1, ULONG x2, ULONG y2,
+void draw_line(int32 argcnt, uint32 page, uint32 x1, uint32 y1, uint32 x2, uint32 y2,
 #pragma on (unreferenced)
-   ULONG color)
+   uint32 color)
 {
    GIL2VFX_draw_line(lastg_p=page, x1, y1, lastg_x=x2, lastg_y=y2, color);
 }
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl line_to(LONG argcnt, ULONG x, ULONG y, ULONG color, ...)
+void line_to(int32 argcnt, uint32 x, uint32 y, uint32 color, ...)
 #pragma on (unreferenced)
 {
-   ULONG i;
+   uint32 i;
    va_list argptr;
-   ULONG cx,cy,cc,lx,ly;
+   uint32 cx,cy,cc,lx,ly;
 
    va_start(argptr,argcnt);
 
    for (i=0;i<argcnt;i+=3)
       {
-      cx = va_arg(argptr,ULONG);
-      cy = va_arg(argptr,ULONG);
-      cc = va_arg(argptr,ULONG);
+      cx = va_arg(argptr,uint32);
+      cy = va_arg(argptr,uint32);
+      cc = va_arg(argptr,uint32);
 
       GIL2VFX_draw_line(lastg_p,lastg_x,lastg_y,lx=cx,ly=cy,cc);
 
@@ -263,8 +263,8 @@ void cdecl line_to(LONG argcnt, ULONG x, ULONG y, ULONG color, ...)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl draw_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
-                          LONG y2, ULONG color)
+void draw_rectangle(int32 argcnt, uint32 wndnum, int32 x1, int32 y1, int32 x2,
+                          int32 y2, uint32 color)
 #pragma on (unreferenced)
 {
    GIL2VFX_draw_rect(wndnum,x1,y1,x2,y2,color);
@@ -272,8 +272,8 @@ void cdecl draw_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl fill_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
-                          LONG y2, ULONG color)
+void fill_rectangle(int32 argcnt, uint32 wndnum, int32 x1, int32 y1, int32 x2,
+                          int32 y2, uint32 color)
 #pragma on (unreferenced)
 {
    GIL2VFX_fill_rect(wndnum,x1,y1,x2,y2,color);
@@ -281,8 +281,8 @@ void cdecl fill_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl hash_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
-                          LONG y2, ULONG color)
+void hash_rectangle(int32 argcnt, uint32 wndnum, int32 x1, int32 y1, int32 x2,
+                          int32 y2, uint32 color)
 #pragma on (unreferenced)
 {
    GIL2VFX_hash_rect(wndnum,x1,y1,x2,y2,color);
@@ -290,11 +290,11 @@ void cdecl hash_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl get_bitmap_height(LONG argcnt, ULONG table, ULONG number)
+uint32 get_bitmap_height(int32 argcnt, uint32 table, uint32 number)
 #pragma on (unreferenced)
 {
    HRES handle;
-   ULONG h;
+   uint32 h;
 
    handle = RTR_get_resource_handle(RTR,table,DA_DEFAULT);
 
@@ -309,14 +309,14 @@ ULONG cdecl get_bitmap_height(LONG argcnt, ULONG table, ULONG number)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
-                       LONG x, LONG y, ULONG scale, ULONG flip,
-                       ULONG fade_table, ULONG fade_level)
+void draw_bitmap(int32 argcnt, uint32 page, uint32 table, uint32 number,
+                       int32 x, int32 y, uint32 scale, uint32 flip,
+                       uint32 fade_table, uint32 fade_level)
 #pragma on (unreferenced)
 {
    HRES handle;
    static HRES last_handle = 0;
-   static ULONG last_table;
+   static uint32 last_table;
    UBYTE *lookaside;
 
    if (table == last_table)
@@ -355,17 +355,17 @@ void cdecl draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
 /*********************************************************/
 
 #pragma off (unreferenced)
-ULONG cdecl visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
-                                ULONG table, ULONG number, WORD *array)
+uint32 visible_bitmap_rect(int32 argcnt, int32 x, int32 y, uint32 flip,
+                                uint32 table, uint32 number, WORD *array)
 #pragma on (unreferenced)
 {
    HRES handle;
-   ULONG array_offset;
+   uint32 array_offset;
    BYTE *new_array;
    WORD bounds[4];
-   ULONG result;
+   uint32 result;
 
-   array_offset = (ULONG) array - (ULONG) RTR_addr(objlist[current_this]);
+   array_offset = (uint32) array - (uint32) RTR_addr(objlist[current_this]);
 
    handle = RTR_get_resource_handle(RTR,table,DA_DEFAULT);
 
@@ -392,13 +392,13 @@ ULONG cdecl visible_bitmap_rect(LONG argcnt, LONG x, LONG y, ULONG flip,
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl set_palette(LONG argcnt, ULONG region, ULONG resource)
+void set_palette(int32 argcnt, uint32 region, uint32 resource)
 #pragma on (unreferenced)
 {
    HRES handle;
    PAL_HDR *PHDR;
    RGB *array;
-   LONG i,j,k,n,f,m,dm,d;
+   int32 i,j,k,n,f,m,dm,d;
    UBYTE *fade;
 
    handle = RTR_get_resource_handle(RTR,resource,DA_DEFAULT);
@@ -597,28 +597,28 @@ void cdecl set_palette(LONG argcnt, ULONG region, ULONG resource)
 }
 
 /*********************************************************/
-void cdecl wait_vertical_retrace(void)
+void wait_vertical_retrace(void)
 {
    VFX_wait_vblank_leading();
 }
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl read_palette(LONG argcnt, ULONG regnum)
+uint32 read_palette(int32 argcnt, uint32 regnum)
 #pragma on (unreferenced)
 {
    RGB triplet;
-   ULONG val;
+   uint32 val;
 
    VFX_DAC_read(regnum, &triplet);
-   val = ((ULONG) triplet.r << 12) | ((ULONG) triplet.g << 6) | ((ULONG) triplet.b);
+   val = ((uint32) triplet.r << 12) | ((uint32) triplet.g << 6) | ((uint32) triplet.b);
 
    return val;
 }
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl write_palette(LONG argcnt, ULONG regnum, ULONG value)
+void write_palette(int32 argcnt, uint32 regnum, uint32 value)
 #pragma on (unreferenced)
 {
    RGB triplet;
@@ -632,7 +632,7 @@ void cdecl write_palette(LONG argcnt, ULONG regnum, ULONG value)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl pixel_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd, ULONG intervals)
+void pixel_fade(int32 argcnt, uint32 src_wnd, uint32 dest_wnd, uint32 intervals)
 #pragma on (unreferenced)
 {
    GIL2VFX_pixel_fade(src_wnd,dest_wnd,intervals);
@@ -640,7 +640,7 @@ void cdecl pixel_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd, ULONG interval
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl color_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd)
+void color_fade(int32 argcnt, uint32 src_wnd, uint32 dest_wnd)
 #pragma on (unreferenced)
 {
    GIL2VFX_color_fade(src_wnd,dest_wnd);
@@ -648,7 +648,7 @@ void cdecl color_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl light_fade(LONG argcnt, ULONG src_wnd, ULONG color)
+void light_fade(int32 argcnt, uint32 src_wnd, uint32 color)
 #pragma on (unreferenced)
 {
    GIL2VFX_light_fade(src_wnd,color);
@@ -656,11 +656,11 @@ void cdecl light_fade(LONG argcnt, ULONG src_wnd, ULONG color)
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl assign_window(LONG argcnt, ULONG owner, ULONG x1, ULONG y1,
-                          ULONG x2, ULONG y2)
+uint32 assign_window(int32 argcnt, uint32 owner, uint32 x1, uint32 y1,
+                          uint32 x2, uint32 y2)
 #pragma on (unreferenced)
 {
-   LONG window;
+   int32 window;
 
    window = GIL2VFX_assign_window(x1,y1,x2,y2);
 
@@ -671,11 +671,11 @@ ULONG cdecl assign_window(LONG argcnt, ULONG owner, ULONG x1, ULONG y1,
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl assign_subwindow(LONG argcnt, ULONG owner, ULONG parent,
-                             ULONG x1, ULONG y1, ULONG x2, ULONG y2)
+uint32 assign_subwindow(int32 argcnt, uint32 owner, uint32 parent,
+                             uint32 x1, uint32 y1, uint32 x2, uint32 y2)
 #pragma on (unreferenced)
 {
-   LONG window;
+   int32 window;
 
    window = GIL2VFX_assign_subwindow(parent,x1,y1,x2,y2);
 
@@ -686,7 +686,7 @@ ULONG cdecl assign_subwindow(LONG argcnt, ULONG owner, ULONG parent,
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl release_window(LONG argcnt, ULONG window)
+void release_window(int32 argcnt, uint32 window)
 #pragma on (unreferenced)
 {
    GIL2VFX_release_window(window);
@@ -695,7 +695,7 @@ void cdecl release_window(LONG argcnt, ULONG window)
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl get_x1(LONG argcnt, ULONG window)
+uint32 get_x1(int32 argcnt, uint32 window)
 #pragma on (unreferenced)
 {
    return GIL2VFX_get_x1(window);
@@ -703,7 +703,7 @@ ULONG cdecl get_x1(LONG argcnt, ULONG window)
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl get_x2(LONG argcnt, ULONG window)
+uint32 get_x2(int32 argcnt, uint32 window)
 #pragma on (unreferenced)
 {
    return GIL2VFX_get_x2(window);
@@ -711,7 +711,7 @@ ULONG cdecl get_x2(LONG argcnt, ULONG window)
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl get_y1(LONG argcnt, ULONG window)
+uint32 get_y1(int32 argcnt, uint32 window)
 #pragma on (unreferenced)
 {
    return GIL2VFX_get_y1(window);
@@ -719,7 +719,7 @@ ULONG cdecl get_y1(LONG argcnt, ULONG window)
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl get_y2(LONG argcnt, ULONG window)
+uint32 get_y2(int32 argcnt, uint32 window)
 #pragma on (unreferenced)
 {
    return GIL2VFX_get_y2(window);
@@ -727,7 +727,7 @@ ULONG cdecl get_y2(LONG argcnt, ULONG window)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl set_x1(LONG argcnt, ULONG window, ULONG x1)
+void set_x1(int32 argcnt, uint32 window, uint32 x1)
 #pragma on (unreferenced)
 {
    GIL2VFX_set_x1(window,x1);
@@ -735,7 +735,7 @@ void cdecl set_x1(LONG argcnt, ULONG window, ULONG x1)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl set_x2(LONG argcnt, ULONG window, ULONG x2)
+void set_x2(int32 argcnt, uint32 window, uint32 x2)
 #pragma on (unreferenced)
 {
    GIL2VFX_set_x2(window,x2);
@@ -743,7 +743,7 @@ void cdecl set_x2(LONG argcnt, ULONG window, ULONG x2)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl set_y1(LONG argcnt, ULONG window, ULONG y1)
+void set_y1(int32 argcnt, uint32 window, uint32 y1)
 #pragma on (unreferenced)
 {
    GIL2VFX_set_y1(window,y1);
@@ -751,7 +751,7 @@ void cdecl set_y1(LONG argcnt, ULONG window, ULONG y1)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl set_y2(LONG argcnt, ULONG window, ULONG y2)
+void set_y2(int32 argcnt, uint32 window, uint32 y2)
 #pragma on (unreferenced)
 {
    GIL2VFX_set_y2(window,y2);
@@ -759,7 +759,7 @@ void cdecl set_y2(LONG argcnt, ULONG window, ULONG y2)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl wipe_window(LONG argcnt, ULONG window, ULONG color)
+void wipe_window(int32 argcnt, uint32 window, uint32 color)
 #pragma on (unreferenced)
 {
    GIL2VFX_wipe_window(window,color);
@@ -767,7 +767,7 @@ void cdecl wipe_window(LONG argcnt, ULONG window, ULONG color)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl text_window(LONG argcnt, ULONG wndnum, ULONG wnd)
+void text_window(int32 argcnt, uint32 wndnum, uint32 wnd)
 #pragma on (unreferenced)
 {
    tw[wndnum].window = wnd;
@@ -783,8 +783,8 @@ void cdecl text_window(LONG argcnt, ULONG wndnum, ULONG wnd)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl text_style(LONG argcnt, ULONG wndnum, ULONG font,
-                      ULONG justify)
+void text_style(int32 argcnt, uint32 wndnum, uint32 font,
+                      uint32 justify)
 #pragma on (unreferenced)
 {
    HRES hfont;
@@ -810,7 +810,7 @@ void cdecl text_style(LONG argcnt, ULONG wndnum, ULONG font,
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl text_xy(LONG argcnt, ULONG wndnum, ULONG htab, ULONG vtab)
+void text_xy(int32 argcnt, uint32 wndnum, uint32 htab, uint32 vtab)
 #pragma on (unreferenced)
 {
    tw[wndnum].htab = htab;
@@ -819,7 +819,7 @@ void cdecl text_xy(LONG argcnt, ULONG wndnum, ULONG htab, ULONG vtab)
 
 /*********************************************************/
 #pragma off (unreferenced)
-LONG cdecl get_text_x(LONG argcnt, ULONG wndnum)
+int32 get_text_x(int32 argcnt, uint32 wndnum)
 #pragma on (unreferenced)
 {
    return tw[wndnum].htab;
@@ -827,7 +827,7 @@ LONG cdecl get_text_x(LONG argcnt, ULONG wndnum)
 
 /*********************************************************/
 #pragma off (unreferenced)
-LONG cdecl get_text_y(LONG argcnt, ULONG wndnum)
+int32 get_text_y(int32 argcnt, uint32 wndnum)
 #pragma on (unreferenced)
 {
    return tw[wndnum].vtab;
@@ -835,7 +835,7 @@ LONG cdecl get_text_y(LONG argcnt, ULONG wndnum)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl home(LONG argcnt, ULONG wndnum)
+void home(int32 argcnt, uint32 wndnum)
 #pragma on (unreferenced)
 {
    HRES hfont;
@@ -851,7 +851,7 @@ void cdecl home(LONG argcnt, ULONG wndnum)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG new)
+void text_color(int32 argcnt, uint32 wndnum, uint32 current, uint32 new)
 #pragma on (unreferenced)
 {
    HRES hfont;
@@ -867,7 +867,7 @@ void cdecl text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG new)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl text_refresh_window(LONG argcnt, ULONG wndnum, LONG wnd)
+void text_refresh_window(int32 argcnt, uint32 wndnum, int32 wnd)
 #pragma on (unreferenced)
 {
    tw_refresh[wndnum] = wnd;
@@ -883,7 +883,7 @@ void cdecl text_refresh_window(LONG argcnt, ULONG wndnum, LONG wnd)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl vsprint(LONG argcnt, ULONG wndnum, BYTE *format, va_list argptr)
+void vsprint(int32 argcnt, uint32 wndnum, BYTE *format, va_list argptr)
 #pragma on (unreferenced)
 {
    HRES hfont,str;
@@ -916,20 +916,20 @@ void cdecl vsprint(LONG argcnt, ULONG wndnum, BYTE *format, va_list argptr)
             break;
 
          case 'd':
-            GIL2VFX_print(APP,"%s",ltoa(va_arg(argptr,LONG),buff,10));
+            GIL2VFX_print(APP,"%s",ltoa(va_arg(argptr,int32),buff,10));
             break;
 
          case 'u':
-            GIL2VFX_print(APP,"%s",ultoa(va_arg(argptr,ULONG),buff,10));
+            GIL2VFX_print(APP,"%s",ultoa(va_arg(argptr,uint32),buff,10));
             break;
 
          case 'x':
          case 'X':
-            GIL2VFX_print(APP,"%s",ltoa(va_arg(argptr,LONG),buff,16));
+            GIL2VFX_print(APP,"%s",ltoa(va_arg(argptr,int32),buff,16));
             break;
 
          case 's':
-            str = RTR_get_resource_handle(RTR,va_arg(argptr,ULONG),
+            str = RTR_get_resource_handle(RTR,va_arg(argptr,uint32),
                DA_DEFAULT);
 
             RTR_lock(RTR,str);
@@ -956,7 +956,7 @@ void cdecl vsprint(LONG argcnt, ULONG wndnum, BYTE *format, va_list argptr)
             break;
 
          case 'c':
-            GIL2VFX_print(APP,"%c",(UBYTE) (va_arg(argptr,ULONG) & 0xffL));
+            GIL2VFX_print(APP,"%c",(UBYTE) (va_arg(argptr,uint32) & 0xffL));
             break;
          }
       }
@@ -988,7 +988,7 @@ void cdecl vsprint(LONG argcnt, ULONG wndnum, BYTE *format, va_list argptr)
 //
 /*********************************************************/
 
-void cdecl print(LONG argcnt, ULONG wndnum, ULONG format, ...)
+void print(int32 argcnt, uint32 wndnum, uint32 format, ...)
 {
    va_list argptr;
    HRES hstring;
@@ -1037,7 +1037,7 @@ void cdecl print(LONG argcnt, ULONG wndnum, ULONG format, ...)
 //
 /*********************************************************/
 
-void cdecl sprint(LONG argcnt, ULONG wndnum, BYTE *format, ...)
+void sprint(int32 argcnt, uint32 wndnum, BYTE *format, ...)
 {
    va_list argptr;
    BYTE *p;
@@ -1064,7 +1064,7 @@ void cdecl sprint(LONG argcnt, ULONG wndnum, BYTE *format, ...)
 //
 /*********************************************************/
 
-void cdecl dprint(LONG argcnt, BYTE *format, ...)
+void dprint(int32 argcnt, BYTE *format, ...)
 {
    va_list argptr;
    BYTE *p;
@@ -1082,18 +1082,18 @@ void cdecl dprint(LONG argcnt, BYTE *format, ...)
 }
 
 /*********************************************************/
-void cdecl crout(LONG argcnt, ULONG wndnum)
+void crout(int32 argcnt, uint32 wndnum)
 {
    sprint(argcnt,wndnum,"\n");
 }
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl char_width(LONG argcnt, ULONG wndnum, ULONG ch)
+uint32 char_width(int32 argcnt, uint32 wndnum, uint32 ch)
 #pragma on (unreferenced)
 {
    HRES hfont;
-   ULONG w;
+   uint32 w;
 
    hfont = (HRES) tw[wndnum].font;
    tw[wndnum].font = RTR_addr(hfont);
@@ -1108,11 +1108,11 @@ ULONG cdecl char_width(LONG argcnt, ULONG wndnum, ULONG ch)
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl font_height(LONG argcnt, ULONG wndnum)
+uint32 font_height(int32 argcnt, uint32 wndnum)
 #pragma on (unreferenced)
 {
    HRES hfont;
-   ULONG w;
+   uint32 w;
 
    hfont = (HRES) tw[wndnum].font;
 
@@ -1123,15 +1123,15 @@ ULONG cdecl font_height(LONG argcnt, ULONG wndnum)
 
 /*********************************************************/
 #pragma off (unreferenced)
-void cdecl solid_bar_graph(LONG argcnt, LONG x0, LONG y0, LONG x1, LONG y1,
-                           ULONG lb_border, ULONG tr_border, ULONG bkgnd,
-                           ULONG grn, ULONG yel, ULONG red, LONG val,
-                           LONG min, LONG crit, LONG max)
+void solid_bar_graph(int32 argcnt, int32 x0, int32 y0, int32 x1, int32 y1,
+                           uint32 lb_border, uint32 tr_border, uint32 bkgnd,
+                           uint32 grn, uint32 yel, uint32 red, int32 val,
+                           int32 min, int32 crit, int32 max)
 #pragma on (unreferenced)
 {
-   LONG btop,bbtm,blft,brgt,grayx;
-   LONG range,point,width;
-   LONG color;
+   int32 btop,bbtm,blft,brgt,grayx;
+   int32 range,point,width;
+   int32 color;
 
    GIL2VFX_draw_line(PAGE2,x0,y0,x0,y1,lb_border);
    GIL2VFX_draw_line(PAGE2,x0,y1,x1,y1,lb_border);
@@ -1172,7 +1172,7 @@ void cdecl solid_bar_graph(LONG argcnt, LONG x0, LONG y0, LONG x1, LONG y1,
 }
 
 #pragma off (unreferenced)
-void cdecl aprint(LONG argcnt, BYTE *format, ...)
+void aprint(int32 argcnt, BYTE *format, ...)
 #pragma on (unreferenced)
 {
    va_list argptr;

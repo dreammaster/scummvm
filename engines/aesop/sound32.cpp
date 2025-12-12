@@ -136,7 +136,7 @@ static void *load_driver(BYTE *filename) {
 //
 /****************************************************************************/
 
-static void *load_global_timbre(ULONG bank, ULONG patch) {
+static void *load_global_timbre(uint32 bank, uint32 patch) {
 	UWORD *timb_ptr;
 	static UWORD len;
 
@@ -144,7 +144,7 @@ static void *load_global_timbre(ULONG bank, ULONG patch) {
 	{
 		BYTE patch;
 		BYTE bank;
-		ULONG offset;
+		uint32 offset;
 	}
 	GTL_hdr;
 
@@ -191,14 +191,14 @@ static void *load_global_timbre(ULONG bank, ULONG patch) {
 /****************************************************************************/
 
 #pragma off (unreferenced)
-void cdecl load_sound_block(LONG argcnt, ULONG first_block, ULONG last_block, ULONG *array)
+void load_sound_block(int32 argcnt, uint32 first_block, uint32 last_block, uint32 *array)
 #pragma on (unreferenced)
 {
-	ULONG index;
-	ULONG i, cur;
-	ULONG size;
-	ULONG end;
-	ULONG res;
+	uint32 index;
+	uint32 i, cur;
+	uint32 size;
+	uint32 end;
+	uint32 res;
 
 	if (!PCM_active)
 		return;
@@ -216,7 +216,7 @@ void cdecl load_sound_block(LONG argcnt, ULONG first_block, ULONG last_block, UL
 
 		for (cur = first_block; cur <= last_block; cur++)
 		{
-			end = (ULONG)EMS_offset[cur] + size - 1L;
+			end = (uint32)EMS_offset[cur] + size - 1L;
 
 			if (end < 65520L)
 				break;
@@ -246,7 +246,7 @@ void cdecl load_sound_block(LONG argcnt, ULONG first_block, ULONG last_block, UL
 /****************************************************************************/
 
 #pragma off (unreferenced)
-void cdecl sound_effect(LONG argcnt, ULONG index)
+void sound_effect(int32 argcnt, uint32 index)
 #pragma on (unreferenced)
 {
 	WORD ch;
@@ -272,12 +272,12 @@ void cdecl sound_effect(LONG argcnt, ULONG index)
 /****************************************************************************/
 
 #pragma off (unreferenced)
-void cdecl play_sequence(LONG argcnt, ULONG LA_version, ULONG AD_version, ULONG PC_version)
+void play_sequence(int32 argcnt, uint32 LA_version, uint32 AD_version, uint32 PC_version)
 #pragma on (unreferenced)
 {
-	ULONG XMI_res;
-	ULONG size;
-	ULONG bank, patch, treq;
+	uint32 XMI_res;
+	uint32 size;
+	uint32 bank, patch, treq;
 	void *timb;
 
 	if (!XMI_active) return;
@@ -327,8 +327,8 @@ void cdecl play_sequence(LONG argcnt, ULONG LA_version, ULONG AD_version, ULONG 
 //
 /****************************************************************************/
 
-void cdecl load_music(void) {
-	LONG tsize;
+void load_music(void) {
+	int32 tsize;
 
 	if ((!XMI_active) || (!sound_on) || (music_resident)) return;
 
@@ -370,8 +370,8 @@ void cdecl load_music(void) {
 //
 /****************************************************************************/
 
-void cdecl unload_music(void) {
-	LONG i;
+void unload_music(void) {
+	int32 i;
 
 	if ((!XMI_active) || (!music_resident)) return;
 
@@ -410,7 +410,7 @@ void cdecl unload_music(void) {
 /****************************************************************************/
 
 #pragma off (unreferenced)
-void cdecl set_sound_status(LONG argcnt, ULONG status)
+void set_sound_status(int32 argcnt, uint32 status)
 #pragma on (unreferenced)
 {
 	if (!(PCM_active || XMI_active)) return;
@@ -449,7 +449,7 @@ void cdecl set_sound_status(LONG argcnt, ULONG status)
 // 
 /****************************************************************************/
 
-void cdecl shutdown_sound(void) {
+void shutdown_sound(void) {
 	if (!(PCM_active || XMI_active)) return;
 
 	if (PCM_active)
@@ -489,7 +489,7 @@ void cdecl shutdown_sound(void) {
 /****************************************************************************/
 
 #pragma off (unreferenced)
-void cdecl init_sound(LONG argcnt, ULONG errprompt)
+void init_sound(int32 argcnt, uint32 errprompt)
 #pragma on (unreferenced)
 {
 	WORD PCM_requested, XMI_requested;

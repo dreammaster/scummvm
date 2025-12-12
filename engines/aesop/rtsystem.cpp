@@ -39,20 +39,20 @@ namespace Aesop {
 void breakpoint(void);
 #pragma aux breakpoint = "int 3";
 
-ULONG headroom;
-ULONG checksum;
-ULONG init;
+uint32 headroom;
+uint32 checksum;
+uint32 init;
 
 WORD disk_err;
 
-void cdecl mem_init(void) {
+void mem_init(void) {
 	headroom = init = mem_avail();
 
 	checksum = 0L;
 }
 
-void cdecl mem_shutdown(void) {
-	ULONG end;
+void mem_shutdown(void) {
+	uint32 end;
 
 	end = mem_avail();
 
@@ -62,23 +62,23 @@ void cdecl mem_shutdown(void) {
 	}
 }
 
-ULONG cdecl mem_avail(void) {
+uint32 mem_avail(void) {
 	union REGS inregs, outregs;
-	ULONG memarray[12];
+	uint32 memarray[12];
 
 	inregs.x.eax = 0x0500;
-	inregs.x.edi = (ULONG)memarray;
+	inregs.x.edi = (uint32)memarray;
 	int386(0x31, &inregs, &outregs);
 
 	return memarray[0];
 }
 
-ULONG cdecl mem_headroom(void) {
+uint32 mem_headroom(void) {
 	return headroom;
 }
 
-void *cdecl mem_alloc(ULONG bytes) {
-	ULONG left;
+void *mem_alloc(uint32 bytes) {
+	uint32 left;
 	void *ptr;
 
 	ptr = (void *)malloc(bytes);
@@ -89,12 +89,12 @@ void *cdecl mem_alloc(ULONG bytes) {
 	if (ptr == NULL)
 		abend(MSG_OODM);
 
-	checksum ^= (ULONG)ptr;
+	checksum ^= (uint32)ptr;
 
 	return ptr;
 }
 
-BYTE *cdecl str_alloc(BYTE *str) {
+BYTE *str_alloc(BYTE *str) {
 	BYTE *ptr;
 
 	ptr = mem_alloc(strlen(str) + 1);
@@ -103,8 +103,8 @@ BYTE *cdecl str_alloc(BYTE *str) {
 	return ptr;
 }
 
-void cdecl mem_free(void *ptr) {
-	checksum ^= (ULONG)ptr;
+void mem_free(void *ptr) {
+	checksum ^= (uint32)ptr;
 
 	free(ptr);
 }
@@ -124,9 +124,9 @@ void cdecl mem_free(void *ptr) {
 // 
 /***************************************************/
 
-LONG cdecl ascnum(BYTE *string) {
-	LONG i, j, len, base, neg, chr;
-	LONG total;
+int32 ascnum(BYTE *string) {
+	int32 i, j, len, base, neg, chr;
+	int32 total;
 
 	while (isspace(*string)) string++;
 
@@ -138,7 +138,7 @@ LONG cdecl ascnum(BYTE *string) {
 	}
 
 	if (*string == '\'')
-		return (LONG)(*(string + 1));
+		return (int32)(*(string + 1));
 
 	switch (*(UWORD *)string)
 	{
@@ -179,7 +179,7 @@ LONG cdecl ascnum(BYTE *string) {
 //
 /***************************************************/
 
-void cdecl opcode_fault(void *PC, void *stk) {
+void opcode_fault(void *PC, void *stk) {
 	abend(MSG_IAO, *(unsigned char *)PC, PC, stk);
 }
 
@@ -193,7 +193,7 @@ void cdecl opcode_fault(void *PC, void *stk) {
 // LUM 070203: added support for storing the error into a file
 /***************************************************/
 
-void cdecl abend(char *msg, ...) {
+void abend(char *msg, ...) {
 	va_list argptr;
 	WORD recover;
 	WORD x, y;
@@ -255,7 +255,7 @@ void cdecl abend(char *msg, ...) {
 //
 /***************************************************/
 
-TF_class *cdecl TF_construct(BYTE *filename, WORD oflag) {
+TF_class *TF_construct(BYTE *filename, WORD oflag) {
 	TF_class *TF;
 	WORD file;
 	HRES hbuf;
@@ -295,7 +295,7 @@ TF_class *cdecl TF_construct(BYTE *filename, WORD oflag) {
 //
 /***************************************************/
 
-WORD cdecl TF_destroy(TF_class *TF) {
+WORD TF_destroy(TF_class *TF) {
 	WORD e, f;
 
 	e = f = TF->p;
@@ -319,7 +319,7 @@ WORD cdecl TF_destroy(TF_class *TF) {
 //
 /***************************************************/
 
-WORD cdecl TF_wchar(TF_class *TF, BYTE ch) {
+WORD TF_wchar(TF_class *TF, BYTE ch) {
 	TF->buffer[TF->p++] = ch;
 
 	if (TF->p == TF_BUFSIZE)
@@ -339,7 +339,7 @@ WORD cdecl TF_wchar(TF_class *TF, BYTE ch) {
 //
 /***************************************************/
 
-BYTE cdecl TF_rchar(TF_class *TF) {
+BYTE TF_rchar(TF_class *TF) {
 	if (TF->pos >= TF->len)
 		return 0;
 
@@ -367,7 +367,7 @@ BYTE cdecl TF_rchar(TF_class *TF) {
 //
 /***************************************************/
 
-WORD cdecl TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen) {
+WORD TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen) {
 	WORD b, c;
 
 	do
@@ -405,7 +405,7 @@ WORD cdecl TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen) {
 //
 /***************************************************/
 
-WORD cdecl TF_writeln(TF_class *TF, BYTE *buffer) {
+WORD TF_writeln(TF_class *TF, BYTE *buffer) {
 	WORD b, c;
 
 	b = 0;
@@ -426,7 +426,7 @@ WORD cdecl TF_writeln(TF_class *TF, BYTE *buffer) {
 //
 /***************************************************/
 
-WORD cdecl delete_file(BYTE *filename) {
+WORD delete_file(BYTE *filename) {
 	if (!unlink(filename))
 		return 1;
 
@@ -445,7 +445,7 @@ WORD cdecl delete_file(BYTE *filename) {
 //
 /***************************************************/
 
-WORD cdecl copy_file(BYTE *src_filename, BYTE *dest_filename) {
+WORD copy_file(BYTE *src_filename, BYTE *dest_filename) {
 	HRES hbuf;
 	BYTE *buffer;
 	WORD status;
@@ -505,9 +505,9 @@ WORD cdecl copy_file(BYTE *src_filename, BYTE *dest_filename) {
 //
 /****************************************************************************/
 
-LONG file_size(BYTE *filename) {
+int32 file_size(BYTE *filename) {
 	WORD handle;
-	ULONG len;
+	uint32 len;
 
 	disk_err = 0;
 
@@ -531,9 +531,9 @@ LONG file_size(BYTE *filename) {
 //
 /****************************************************************************/
 
-BYTE *cdecl read_file(BYTE *filename, void *dest) {
+BYTE *read_file(BYTE *filename, void *dest) {
 	WORD i, handle;
-	ULONG len;
+	uint32 len;
 	BYTE *buf, *mem;
 
 	disk_err = 0;
@@ -592,7 +592,7 @@ BYTE *cdecl read_file(BYTE *filename, void *dest) {
 // 
 /****************************************************************************/
 
-WORD cdecl write_file(BYTE *filename, void *buf, ULONG len) {
+WORD write_file(BYTE *filename, void *buf, uint32 len) {
 	WORD i, handle;
 
 	disk_err = 0;
@@ -645,7 +645,7 @@ WORD cdecl write_file(BYTE *filename, void *buf, ULONG len) {
 //
 /****************************************************************************/
 
-WORD cdecl append_file(BYTE *filename, void *buf, ULONG len) {
+WORD append_file(BYTE *filename, void *buf, uint32 len) {
 	WORD i, handle;
 
 	disk_err = 0;
@@ -697,7 +697,7 @@ WORD cdecl append_file(BYTE *filename, void *buf, ULONG len) {
 //
 /****************************************************************************/
 
-ULONG cdecl file_time(BYTE *filename) {
+uint32 file_time(BYTE *filename) {
 	union REGS in, out;
 	WORD handle;
 
@@ -711,7 +711,7 @@ ULONG cdecl file_time(BYTE *filename) {
 
 	close(handle);
 
-	return (ULONG)out.w.cx + ((ULONG)out.w.dx << 16);
+	return (uint32)out.w.cx + ((uint32)out.w.dx << 16);
 }
 
 /****************************************************************************/
@@ -720,7 +720,7 @@ ULONG cdecl file_time(BYTE *filename) {
 //
 /****************************************************************************/
 
-void cdecl locate(WORD x, WORD y) {
+void locate(WORD x, WORD y) {
 	union REGS inregs, outregs;
 
 	inregs.h.bh = 0x00;
@@ -736,7 +736,7 @@ void cdecl locate(WORD x, WORD y) {
 //
 /****************************************************************************/
 
-void cdecl curpos(WORD *x, WORD *y) {
+void curpos(WORD *x, WORD *y) {
 	union REGS inregs, outregs;
 
 	inregs.h.ah = 0x0f;

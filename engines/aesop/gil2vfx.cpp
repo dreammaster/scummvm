@@ -40,17 +40,17 @@ WINDOW   windows[MAX_WINDOWS];
 PANE     panes[MAX_WINDOWS + MAX_PANES];
 BYTE *bitmap_buffer;
 
-LONG     gil2vfx_active = FALSE;
+int32     gil2vfx_active = FALSE;
 
 TEXTWINDOW *twptr;
 
 extern VFX_DESC *VFX;
 extern BYTE *pathname;
 
-extern LONG eop_reached;
-extern LONG pending_flag;
+extern int32 eop_reached;
+extern int32 pending_flag;
 
-void GIL2VFX_copy_window(ULONG src, ULONG dst) {
+void GIL2VFX_copy_window(uint32 src, uint32 dst) {
 	if (gil2vfx_active != TRUE)
 		return;
 
@@ -58,8 +58,8 @@ void GIL2VFX_copy_window(ULONG src, ULONG dst) {
 }
 
 
-LONG GIL2VFX_assign_window(LONG x1, LONG y1, LONG x2, LONG y2) {
-	LONG i;
+int32 GIL2VFX_assign_window(int32 x1, int32 y1, int32 x2, int32 y2) {
+	int32 i;
 
 	for (i = 0; i < MAX_WINDOWS; i++)
 	{
@@ -89,10 +89,10 @@ LONG GIL2VFX_assign_window(LONG x1, LONG y1, LONG x2, LONG y2) {
 }
 
 void GIL2VFX_init() {
-	LONG dummy;
+	int32 dummy;
 
 	void *DLL, *drvr;
-	LONG w, h;
+	int32 w, h;
 
 	//
 	// Load the driver
@@ -154,7 +154,7 @@ void GIL2VFX_init() {
 }
 
 void GIL2VFX_shutdown_driver() {
-	ULONG i;
+	uint32 i;
 
 	if (gil2vfx_active != TRUE)
 		return;
@@ -172,7 +172,7 @@ void GIL2VFX_shutdown_driver() {
 }
 
 
-void GIL2VFX_release_window(ULONG wnd) {
+void GIL2VFX_release_window(uint32 wnd) {
 	if (wnd < MAX_WINDOWS)
 	{
 		if (windows[wnd].buffer != NULL)
@@ -184,8 +184,8 @@ void GIL2VFX_release_window(ULONG wnd) {
 	GIL2VFX_release_subwindow(wnd);
 }
 
-LONG GIL2VFX_assign_subwindow(ULONG wnd, LONG x1, LONG y1, LONG x2, LONG y2) {
-	ULONG i;
+int32 GIL2VFX_assign_subwindow(uint32 wnd, int32 x1, int32 y1, int32 x2, int32 y2) {
+	uint32 i;
 
 	for (i = MAX_WINDOWS; i < MAX_WINDOWS + MAX_PANES; i++)
 	{
@@ -210,29 +210,29 @@ LONG GIL2VFX_assign_subwindow(ULONG wnd, LONG x1, LONG y1, LONG x2, LONG y2) {
 	return -1;
 }
 
-void GIL2VFX_release_subwindow(ULONG wnd) {
+void GIL2VFX_release_subwindow(uint32 wnd) {
 	panes[wnd].window = NULL;
 }
 
-LONG GIL2VFX_get_bitmap_width(void *shape_table, LONG shape_num) {
+int32 GIL2VFX_get_bitmap_width(void *shape_table, int32 shape_num) {
 	return (VFX_shape_bounds(shape_table, shape_num) >> 16);
 }
 
-LONG GIL2VFX_get_bitmap_height(void *shape_table, LONG shape_num) {
-	return ((LONG)(WORD)VFX_shape_bounds(shape_table, shape_num));
+int32 GIL2VFX_get_bitmap_height(void *shape_table, int32 shape_num) {
+	return ((int32)(WORD)VFX_shape_bounds(shape_table, shape_num));
 }
 
-LONG GIL2VFX_visible_bitmap_rect(LONG x1, LONG y1, LONG mirror,
-	UBYTE *shapes, LONG shape_num, WORD *bounds) {
-	LONG rectangle[4];
-	LONG bm_width, bm_height;
+int32 GIL2VFX_visible_bitmap_rect(int32 x1, int32 y1, int32 mirror,
+	UBYTE *shapes, int32 shape_num, WORD *bounds) {
+	int32 rectangle[4];
+	int32 bm_width, bm_height;
 
 	VFX_shape_visible_rectangle(shapes, shape_num, x1, y1, mirror, rectangle);
 
 	if (mirror)
 	{
 		bm_width = VFX_shape_bounds(shapes, shape_num);
-		bm_height = (LONG)(WORD)bm_width;
+		bm_height = (int32)(WORD)bm_width;
 		bm_width = bm_width >> 16;
 	}
 
@@ -270,13 +270,13 @@ LONG GIL2VFX_visible_bitmap_rect(LONG x1, LONG y1, LONG mirror,
 		return 1;
 }
 
-void GIL2VFX_draw_bitmap(LONG wnd, LONG x, LONG y, LONG mirror, LONG scale,
-	UBYTE *fade_table, UBYTE *shapes, LONG shape_num) {
-	LONG xp = x - panes[wnd].x0;
-	LONG yp = y - panes[wnd].y0;
-	LONG x_scale, y_scale;
-	LONG flags;
-	LONG xs, ys;
+void GIL2VFX_draw_bitmap(int32 wnd, int32 x, int32 y, int32 mirror, int32 scale,
+	UBYTE *fade_table, UBYTE *shapes, int32 shape_num) {
+	int32 xp = x - panes[wnd].x0;
+	int32 yp = y - panes[wnd].y0;
+	int32 x_scale, y_scale;
+	int32 flags;
+	int32 xs, ys;
 
 	if (gil2vfx_active != TRUE)
 		return;
@@ -311,13 +311,13 @@ void GIL2VFX_draw_bitmap(LONG wnd, LONG x, LONG y, LONG mirror, LONG scale,
 			break;
 		case Y_MIRROR:
 			y_scale = -y_scale;
-			yp += ((LONG)(WORD)VFX_shape_bounds(shapes, shape_num));
+			yp += ((int32)(WORD)VFX_shape_bounds(shapes, shape_num));
 			break;
 		case XY_MIRROR:
 			x_scale = -x_scale;
 			y_scale = -y_scale;
 			xp += (VFX_shape_bounds(shapes, shape_num) >> 16) - 1;
-			yp += ((LONG)(WORD)VFX_shape_bounds(shapes, shape_num)) - 1;
+			yp += ((int32)(WORD)VFX_shape_bounds(shapes, shape_num)) - 1;
 			break;
 		case NO_MIRROR:
 		default:
@@ -336,54 +336,54 @@ void GIL2VFX_draw_bitmap(LONG wnd, LONG x, LONG y, LONG mirror, LONG scale,
 	}
 }
 
-LONG GIL2VFX_get_x1(ULONG wnd) {
+int32 GIL2VFX_get_x1(uint32 wnd) {
 	if (panes[wnd].window != NULL)
 		return panes[wnd].x0;
 	else
 		return NULL;
 }
-LONG GIL2VFX_get_y1(ULONG wnd) {
+int32 GIL2VFX_get_y1(uint32 wnd) {
 	if (panes[wnd].window != NULL)
 		return panes[wnd].y0;
 	else
 		return NULL;
 }
-LONG GIL2VFX_get_x2(ULONG wnd) {
+int32 GIL2VFX_get_x2(uint32 wnd) {
 	if (panes[wnd].window != NULL)
 		return panes[wnd].x1;
 	else
 		return NULL;
 }
-LONG GIL2VFX_get_y2(ULONG wnd) {
+int32 GIL2VFX_get_y2(uint32 wnd) {
 	if (panes[wnd].window != NULL)
 		return panes[wnd].y1;
 	else
 		return NULL;
 }
 
-void GIL2VFX_set_x1(ULONG wnd, LONG val) {
+void GIL2VFX_set_x1(uint32 wnd, int32 val) {
 	panes[wnd].x0 = val;
 }
-void GIL2VFX_set_y1(ULONG wnd, LONG val) {
+void GIL2VFX_set_y1(uint32 wnd, int32 val) {
 	panes[wnd].y0 = val;
 }
-void GIL2VFX_set_x2(ULONG wnd, LONG val) {
+void GIL2VFX_set_x2(uint32 wnd, int32 val) {
 	panes[wnd].x1 = val;
 }
-void GIL2VFX_set_y2(ULONG wnd, LONG val) {
+void GIL2VFX_set_y2(uint32 wnd, int32 val) {
 	panes[wnd].y1 = val;
 }
 
-void GIL2VFX_wipe_window(LONG wnd, LONG color) {
+void GIL2VFX_wipe_window(int32 wnd, int32 color) {
 	if (gil2vfx_active != TRUE)
 		return;
 
 	VFX_pane_wipe(&panes[wnd], color);
 }
 
-void GIL2VFX_draw_dot(LONG wnd, LONG x, LONG y, LONG color) {
-	LONG xp = x - panes[wnd].x0;
-	LONG yp = y - panes[wnd].y0;
+void GIL2VFX_draw_dot(int32 wnd, int32 x, int32 y, int32 color) {
+	int32 xp = x - panes[wnd].x0;
+	int32 yp = y - panes[wnd].y0;
 
 	if (gil2vfx_active != TRUE)
 		return;
@@ -391,9 +391,9 @@ void GIL2VFX_draw_dot(LONG wnd, LONG x, LONG y, LONG color) {
 	VFX_pixel_write(&panes[wnd], xp, yp, (UBYTE)color);
 }
 
-LONG GIL2VFX_read_dot(LONG wnd, LONG x, LONG y) {
-	LONG xp = x - panes[wnd].x0;
-	LONG yp = y - panes[wnd].y0;
+int32 GIL2VFX_read_dot(int32 wnd, int32 x, int32 y) {
+	int32 xp = x - panes[wnd].x0;
+	int32 yp = y - panes[wnd].y0;
 
 	if (gil2vfx_active != TRUE)
 		return NULL;
@@ -401,12 +401,12 @@ LONG GIL2VFX_read_dot(LONG wnd, LONG x, LONG y) {
 	return VFX_pixel_read(&panes[wnd], xp, yp);
 }
 
-void GIL2VFX_draw_line(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2,
-	LONG color) {
-	LONG x1p = x1 - panes[wnd].x0;
-	LONG y1p = y1 - panes[wnd].y0;
-	LONG x2p = x2 - panes[wnd].x0;
-	LONG y2p = y2 - panes[wnd].y0;
+void GIL2VFX_draw_line(int32 wnd, int32 x1, int32 y1, int32 x2, int32 y2,
+	int32 color) {
+	int32 x1p = x1 - panes[wnd].x0;
+	int32 y1p = y1 - panes[wnd].y0;
+	int32 x2p = x2 - panes[wnd].x0;
+	int32 y2p = y2 - panes[wnd].y0;
 
 	if (gil2vfx_active != TRUE)
 		return;
@@ -414,11 +414,11 @@ void GIL2VFX_draw_line(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2,
 	VFX_line_draw(&panes[wnd], x1p, y1p, x2p, y2p, LD_DRAW, color);
 }
 
-void GIL2VFX_draw_rect(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2, LONG color) {
-	LONG x1p = x1 - panes[wnd].x0;
-	LONG y1p = y1 - panes[wnd].y0;
-	LONG x2p = x2 - panes[wnd].x0;
-	LONG y2p = y2 - panes[wnd].y0;
+void GIL2VFX_draw_rect(int32 wnd, int32 x1, int32 y1, int32 x2, int32 y2, int32 color) {
+	int32 x1p = x1 - panes[wnd].x0;
+	int32 y1p = y1 - panes[wnd].y0;
+	int32 x2p = x2 - panes[wnd].x0;
+	int32 y2p = y2 - panes[wnd].y0;
 
 	if (gil2vfx_active != TRUE)
 		return;
@@ -429,7 +429,7 @@ void GIL2VFX_draw_rect(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2, LONG color)
 	VFX_line_draw(&panes[wnd], x1p, y2p, x1p, y1p, LD_DRAW, color);
 }
 
-void GIL2VFX_fill_rect(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2, LONG color) {
+void GIL2VFX_fill_rect(int32 wnd, int32 x1, int32 y1, int32 x2, int32 y2, int32 color) {
 	PANE rpane;
 
 	if (gil2vfx_active != TRUE)
@@ -444,11 +444,11 @@ void GIL2VFX_fill_rect(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2, LONG color)
 	VFX_pane_wipe(&rpane, color);
 }
 
-void GIL2VFX_hash_rect(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2, LONG color) {
-	LONG x1p = x1 - panes[wnd].x0;
-	LONG y1p = y1 - panes[wnd].y0;
-	LONG x2p = x2 - panes[wnd].x0;
-	LONG y2p = y2 - panes[wnd].y0;
+void GIL2VFX_hash_rect(int32 wnd, int32 x1, int32 y1, int32 x2, int32 y2, int32 color) {
+	int32 x1p = x1 - panes[wnd].x0;
+	int32 y1p = y1 - panes[wnd].y0;
+	int32 x2p = x2 - panes[wnd].x0;
+	int32 y2p = y2 - panes[wnd].y0;
 
 	if (gil2vfx_active != TRUE)
 		return;
@@ -456,9 +456,9 @@ void GIL2VFX_hash_rect(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2, LONG color)
 	VFX_rectangle_hash(&panes[wnd], x1p, y1p, x2p, y2p, color);
 }
 
-void GIL2VFX_light_fade(LONG src_wnd, LONG color) {
+void GIL2VFX_light_fade(int32 src_wnd, int32 color) {
 	RGB palette[256], clr;
-	LONG i;
+	int32 i;
 
 	if (gil2vfx_active != TRUE)
 		return;
@@ -471,10 +471,10 @@ void GIL2VFX_light_fade(LONG src_wnd, LONG color) {
 	VFX_window_fade(panes[src_wnd].window, palette, FADE_INTERVALS);
 }
 
-void GIL2VFX_color_fade(LONG src_wnd, LONG dst_wnd) {
+void GIL2VFX_color_fade(int32 src_wnd, int32 dst_wnd) {
 	RGB palette[256], clr;
-	ULONG colors[256], num_colors;
-	LONG i;
+	uint32 colors[256], num_colors;
+	int32 i;
 
 	if (gil2vfx_active != TRUE)
 		return;
@@ -499,7 +499,7 @@ void GIL2VFX_color_fade(LONG src_wnd, LONG dst_wnd) {
 	VFX_window_fade(panes[dst_wnd].window, &palette, FADE_INTERVALS);
 }
 
-void GIL2VFX_pixel_fade(LONG src_wnd, LONG dest_wnd, LONG intervals) {
+void GIL2VFX_pixel_fade(int32 src_wnd, int32 dest_wnd, int32 intervals) {
 	if (gil2vfx_active != TRUE)
 		return;
 
@@ -510,7 +510,7 @@ void GIL2VFX_select_text_window(TEXTWINDOW *tw) {
 	twptr = tw;
 }
 
-LONG cdecl GIL2VFX_char_width(LONG ch) {
+int32 GIL2VFX_char_width(int32 ch) {
 	return VFX_character_width(twptr->font, ch);
 }
 
@@ -525,14 +525,14 @@ void GIL2VFX_home(void) {
 	twptr->vtab = panes[twptr->window].y0;
 }
 
-void GIL2VFX_remap_font_color(LONG current, LONG new) {
+void GIL2VFX_remap_font_color(int32 current, int32 new) {
 	twptr->lookaside[current] = new;
 }
 
 
-LONG GIL2VFX_test_overlap(LONG wnd, LONG x1, LONG y1, UBYTE *shapes, LONG shape_num) {
-	LONG x2 = (x1 + (VFX_shape_resolution(shapes, shape_num) >> 16));
-	LONG y2 = (y1 + ((LONG)(WORD)VFX_shape_resolution(shapes, shape_num)));
+int32 GIL2VFX_test_overlap(int32 wnd, int32 x1, int32 y1, UBYTE *shapes, int32 shape_num) {
+	int32 x2 = (x1 + (VFX_shape_resolution(shapes, shape_num) >> 16));
+	int32 y2 = (y1 + ((int32)(WORD)VFX_shape_resolution(shapes, shape_num)));
 
 	if ((x1 <= panes[wnd].x1) && (x2 >= panes[wnd].x0) &&
 		(y1 <= panes[wnd].y1) && (y2 >= panes[wnd].y0))
@@ -541,9 +541,9 @@ LONG GIL2VFX_test_overlap(LONG wnd, LONG x1, LONG y1, UBYTE *shapes, LONG shape_
 		return 0;
 }
 
-void cdecl GIL2VFX_print(LONG operation, const char *format, ...) {
+void GIL2VFX_print(int32 operation, const char *format, ...) {
 	va_list  arglist;
-	LONG     cw;
+	int32     cw;
 
 	va_start(arglist, format);
 
@@ -558,19 +558,19 @@ void cdecl GIL2VFX_print(LONG operation, const char *format, ...) {
 	}
 }
 
-void cdecl GIL2VFX_scroll_window(LONG wnd, LONG dx, LONG dy, LONG flags, LONG background) {
+void GIL2VFX_scroll_window(int32 wnd, int32 dx, int32 dy, int32 flags, int32 background) {
 	if (gil2vfx_active != TRUE)
 		return;
 
 	VFX_pane_scroll(&panes[wnd], dx, dy, flags, background);
 }
 
-void cdecl GIL2VFX_print_buffer(LONG linenum) {
+void GIL2VFX_print_buffer(int32 linenum) {
 	GIL2VFXA_print_buffer(&panes[twptr->window], linenum);
 }
 
-void cdecl GIL2VFX_cout(LONG c) {
-	LONG  cvtab, nvtab, htab;
+void GIL2VFX_cout(int32 c) {
+	int32  cvtab, nvtab, htab;
 
 	if (c == 10)
 	{
@@ -611,7 +611,7 @@ void cdecl GIL2VFX_cout(LONG c) {
 
 }
 
-void GIL2VFX_refresh_window(ULONG source, ULONG target) {
+void GIL2VFX_refresh_window(uint32 source, uint32 target) {
 	//mouse_pane_refresh(&panes[source], &panes[target]);
 	// LUM the function parameter has changed
 	// check whether this is correct!

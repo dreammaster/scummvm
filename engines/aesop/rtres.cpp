@@ -39,39 +39,39 @@ namespace Aesop {
 /******************************************/
 
 #if 0
-ULONG cdecl RTR_chksum(HRES entry)
+uint32 RTR_chksum(HRES entry)
 {
    HD_entry *sel;
    UBYTE *ptr;
-   ULONG chksum;
+   uint32 chksum;
 
    sel = (HD_entry *) entry;
    ptr = sel->seg;
 
    chksum = 0;
-   while ( ((ULONG) ptr) < ((ULONG)(sel->seg) + sel->size) )
+   while ( ((uint32) ptr) < ((uint32)(sel->seg) + sel->size) )
       {
-      chksum += (ULONG) *ptr;
+      chksum += (uint32) *ptr;
       ptr++;
       }
 
-   return (ULONG) chksum;
+   return (uint32) chksum;
 }
 
-void cdecl RTR_double_check(ULONG caller, HRES entry)
+void RTR_double_check(uint32 caller, HRES entry)
 {
    HD_entry *sel;
    UBYTE *ptr;
-   ULONG chksum;
+   uint32 chksum;
    UBYTE *cname;
 
    sel = (HD_entry *) entry;
    ptr = sel->seg;
 
    chksum = 0;
-   while ( ((ULONG) ptr) < ((ULONG)(sel->seg) + sel->size) )
+   while ( ((uint32) ptr) < ((uint32)(sel->seg) + sel->size) )
       {
-      chksum += (ULONG) *ptr;
+      chksum += (uint32) *ptr;
       ptr++;
       }
 
@@ -114,10 +114,10 @@ void cdecl RTR_double_check(ULONG caller, HRES entry)
 
 }
 
-void cdecl resource_chksum(BYTE *situation)
+void resource_chksum(BYTE *situation)
 {
-   ULONG res = CHKRES;
-   LONG i;
+   uint32 res = CHKRES;
+   int32 i;
 
    if (CHKRES == 0)
       return;
@@ -132,17 +132,17 @@ void cdecl resource_chksum(BYTE *situation)
    if (i!=RTR->nentries)
       {
       if ( !(RTR->dir[i].flags & DA_DISCARDED) )
-         RTR_double_check((ULONG)situation, (HRES) &RTR->dir[i]);
+         RTR_double_check((uint32)situation, (HRES) &RTR->dir[i]);
       else
          printf("Resource # %d discarded %s\n",res, situation);
       }
 }
 
-void cdecl RTR_flag_check(BYTE *situation)
+void RTR_flag_check(BYTE *situation)
 {
    HD_entry *sel;
 
-   if ((ULONG) situation > 10)
+   if ((uint32) situation > 10)
       {
       sel = (HD_entry *) HRES_to_check;
 
@@ -156,7 +156,7 @@ void cdecl RTR_flag_check(BYTE *situation)
 
 
 
-void cdecl RTR_HRES_chksum(BYTE *situation)
+void RTR_HRES_chksum(BYTE *situation)
 {
    if (HRES_to_check == 0)
       return;
@@ -166,7 +166,7 @@ void cdecl RTR_HRES_chksum(BYTE *situation)
 
 //   RTR_flag_check(situation);
 
-//   RTR_double_check((ULONG)situation, (HRES) HRES_to_check);
+//   RTR_double_check((uint32)situation, (HRES) HRES_to_check);
 }
 #endif
 
@@ -183,11 +183,11 @@ void cdecl RTR_HRES_chksum(BYTE *situation)
 //
 /***************************************************/
 
-static ULONG cdecl RTR_discard(RTR_class *RTR, ULONG index, ULONG do_move)
+static uint32 RTR_discard(RTR_class *RTR, uint32 index, uint32 do_move)
 {
-   ULONG i,n;
+   uint32 i,n;
    void *dest, *src;
-   ULONG nbytes,size;
+   uint32 nbytes,size;
    HD_entry *sel;
 
    sel = &RTR->dir[index];
@@ -232,10 +232,10 @@ static ULONG cdecl RTR_discard(RTR_class *RTR, ULONG index, ULONG do_move)
 //
 /***************************************************/
 
-static ULONG cdecl RTR_LRU(RTR_class *RTR)
+static uint32 RTR_LRU(RTR_class *RTR)
 {
-   ULONG i,oldest;
-   ULONG n,age;
+   uint32 i,oldest;
+   uint32 n,age;
 
    n = RTR->nentries;
    oldest = age = -1;
@@ -281,12 +281,12 @@ static ULONG cdecl RTR_LRU(RTR_class *RTR)
 //
 /***************************************************/
 
-static ULONG cdecl RTR_make_room(RTR_class *RTR, ULONG goal)
+static uint32 RTR_make_room(RTR_class *RTR, uint32 goal)
 {
-   LONG i;
+   int32 i;
    WORD first,next;
-   ULONG index;
-   ULONG next_seg,size_deleted,nbytes; 
+   uint32 index;
+   uint32 next_seg,size_deleted,nbytes; 
    void *dest,*src,*end;
 
    //
@@ -338,7 +338,7 @@ static ULONG cdecl RTR_make_room(RTR_class *RTR, ULONG goal)
 
       for (next = first-1; next >= 0; next--)
          {
-         next_seg = (ULONG) RTR->dir[next+1].seg;
+         next_seg = (uint32) RTR->dir[next+1].seg;
 
          if (RTR->dir[next].flags &
             (DA_FIXED | DA_PRECIOUS | DA_DISCARDABLE | DA_DISCARDED))
@@ -347,7 +347,7 @@ static ULONG cdecl RTR_make_room(RTR_class *RTR, ULONG goal)
          if (RTR->dir[next].locks > 0)
             break;
 
-         if ( ((ULONG)RTR->dir[next].seg + RTR->dir[next].size) != next_seg )
+         if ( ((uint32)RTR->dir[next].seg + RTR->dir[next].size) != next_seg )
             break;
          }
 
@@ -405,7 +405,7 @@ static ULONG cdecl RTR_make_room(RTR_class *RTR, ULONG goal)
 //
 /***************************************************/
 
-static ULONG cdecl RTR_assign_space(RTR_class *RTR, ULONG bytes, ULONG attrib,
+static uint32 RTR_assign_space(RTR_class *RTR, uint32 bytes, uint32 attrib,
    HRES entry)
 {
    HD_entry *sel;
@@ -441,9 +441,9 @@ static ULONG cdecl RTR_assign_space(RTR_class *RTR, ULONG bytes, ULONG attrib,
 //
 /***************************************************/
 
-static void cdecl RTR_init_dir(RTR_class *RTR, ULONG first)
+static void RTR_init_dir(RTR_class *RTR, uint32 first)
 {
-   ULONG i,j;
+   uint32 i,j;
 
    for (i=0,j=first;i<DIR_BLK;i++,j++)
       {
@@ -463,10 +463,10 @@ static void cdecl RTR_init_dir(RTR_class *RTR, ULONG first)
 //
 /***************************************************/
 
-static HRES cdecl RTR_new_entry(RTR_class *RTR)
+static HRES RTR_new_entry(RTR_class *RTR)
 {
-   ULONG i,f,n;
-   ULONG nbytes;
+   uint32 i,f,n;
+   uint32 nbytes;
    void *dest, *src;
    
    n = RTR->nentries;
@@ -522,13 +522,13 @@ static HRES cdecl RTR_new_entry(RTR_class *RTR)
 //
 /***************************************************/
 
-ULONG cdecl RTR_seek(RTR_class *RTR, ULONG rnum)
+uint32 RTR_seek(RTR_class *RTR, uint32 rnum)
 {
-   ULONG dirblk,next;
+   uint32 dirblk,next;
    UWORD dirent;
 
-   dirblk = (rnum / (ULONG) OD_SIZE);
-   dirent = (UWORD) (rnum % (ULONG) OD_SIZE);
+   dirblk = (rnum / (uint32) OD_SIZE);
+   dirent = (UWORD) (rnum % (uint32) OD_SIZE);
 
    if (RTR->cur_blk != dirblk)
       {
@@ -564,18 +564,18 @@ ULONG cdecl RTR_seek(RTR_class *RTR, ULONG rnum)
 //
 /***************************************************/
 
-static void cdecl RTR_read(RTR_class *RTR, HRES entry)
+static void RTR_read(RTR_class *RTR, HRES entry)
 {
    UBYTE *ptr;
    HD_entry *sel;
-   ULONG len;
+   uint32 len;
 
    sel = (HD_entry *) entry;
 
    ptr = sel->seg;
    len = sel->size;
 
-   while (len > (ULONG) DOS_BUFFSIZE)
+   while (len > (uint32) DOS_BUFFSIZE)
       {
       PollMod();
 
@@ -602,7 +602,7 @@ static void cdecl RTR_read(RTR_class *RTR, HRES entry)
 //
 /***************************************************/
 
-RTR_class *cdecl RTR_construct(void *base, ULONG size, ULONG nnames, BYTE *filename)
+RTR_class *RTR_construct(void *base, uint32 size, uint32 nnames, BYTE *filename)
 {
    RTR_class *RTR;
    void *beg,*end;
@@ -631,9 +631,9 @@ RTR_class *cdecl RTR_construct(void *base, ULONG size, ULONG nnames, BYTE *filen
 
    RTR_init_dir(RTR,0);
 
-   RTR->cur_blk = (ULONG) -1L;
+   RTR->cur_blk = (uint32) -1L;
 
-   RTR->name_dir = RTR_alloc(RTR,(ULONG) ((ULONG) nnames * sizeof(ND_entry)),
+   RTR->name_dir = RTR_alloc(RTR,(uint32) ((uint32) nnames * sizeof(ND_entry)),
       DA_FIXED | DA_PRECIOUS);
    RTR->nd_entries = 0;
 
@@ -648,7 +648,7 @@ RTR_class *cdecl RTR_construct(void *base, ULONG size, ULONG nnames, BYTE *filen
 //
 /***************************************************/
 
-void cdecl RTR_destroy(RTR_class *RTR, ULONG flags)
+void RTR_destroy(RTR_class *RTR, uint32 flags)
 {
    close(RTR->file);
 
@@ -675,7 +675,7 @@ void cdecl RTR_destroy(RTR_class *RTR, ULONG flags)
 //
 /***************************************************/
 
-HRES cdecl RTR_alloc(RTR_class *RTR, ULONG bytes, ULONG attrib)
+HRES RTR_alloc(RTR_class *RTR, uint32 bytes, uint32 attrib)
 {
    HRES entry;
    HD_entry *sel;
@@ -706,9 +706,9 @@ HRES cdecl RTR_alloc(RTR_class *RTR, ULONG bytes, ULONG attrib)
 //
 /***************************************************/
 
-void cdecl RTR_free(RTR_class *RTR, HRES entry)
+void RTR_free(RTR_class *RTR, HRES entry)
 {
-   ULONG i,n;
+   uint32 i,n;
    HD_entry *sel;
    ND_entry *dir;
 
@@ -729,17 +729,17 @@ void cdecl RTR_free(RTR_class *RTR, HRES entry)
       {
       while ( ( !(sel->flags & DA_FIXED) ) &&
               ( !(sel->flags & DA_DISCARDED) ) &&
-              ( (ULONG) sel->seg + sel->size == (ULONG) RTR->next_M )
+              ( (uint32) sel->seg + sel->size == (uint32) RTR->next_M )
             )
          {
-         RTR_discard(RTR, (entry - (ULONG) RTR->dir)/sizeof(HD_entry), 1);
+         RTR_discard(RTR, (entry - (uint32) RTR->dir)/sizeof(HD_entry), 1);
 
          n = RTR->nentries;
          for (i=0;i<n;i++)
             if ( ( !(RTR->dir[i].flags & DA_FIXED)       ) &&
                  (   RTR->dir[i].flags & DA_FREE         ) &&
                  ( !(RTR->dir[i].flags & DA_DISCARDED)   ) &&
-                 (  (ULONG)RTR->dir[i].seg + sel->size == (ULONG)RTR->next_M )
+                 (  (uint32)RTR->dir[i].seg + sel->size == (uint32)RTR->next_M )
                )
                {
                sel = &(RTR->dir[i]);
@@ -781,7 +781,7 @@ void cdecl RTR_free(RTR_class *RTR, HRES entry)
 //
 /***************************************************/
 
-ULONG cdecl RTR_force_discard(RTR_class *RTR, ULONG goal)
+uint32 RTR_force_discard(RTR_class *RTR, uint32 goal)
 {
    return RTR_make_room(RTR,goal);
 }
@@ -799,9 +799,9 @@ ULONG cdecl RTR_force_discard(RTR_class *RTR, ULONG goal)
 //
 /***************************************************/
 
-void cdecl RTR_lock(RTR_class *RTR, HRES entry)
+void RTR_lock(RTR_class *RTR, HRES entry)
 {
-   ULONG i,n;
+   uint32 i,n;
    HD_entry *sel;
 
    PollMod();
@@ -850,7 +850,7 @@ void cdecl RTR_lock(RTR_class *RTR, HRES entry)
 // 
 /***************************************************/
 
-void cdecl RTR_unlock(HRES entry)
+void RTR_unlock(HRES entry)
 {
    HD_entry *sel;
 
@@ -867,7 +867,7 @@ void cdecl RTR_unlock(HRES entry)
 //
 /***************************************************/
 
-ULONG cdecl RTR_size(HRES entry)
+uint32 RTR_size(HRES entry)
 {
    HD_entry *sel;
 
@@ -898,9 +898,9 @@ ULONG cdecl RTR_size(HRES entry)
 
 #ifndef RTR_addr
 
-void *cdecl RTR_addr(HRES entry)
+void *RTR_addr(HRES entry)
 {
-   return (void *) (* (ULONG *)entry);
+   return (void *) (* (uint32 *)entry);
 }
 
 #endif
@@ -914,9 +914,9 @@ void *cdecl RTR_addr(HRES entry)
 //
 /***************************************************/
 
-void cdecl RTR_read_resource(RTR_class *RTR, void *dest, ULONG len)
+void RTR_read_resource(RTR_class *RTR, void *dest, uint32 len)
 {
-   while (len > (ULONG) DOS_BUFFSIZE)
+   while (len > (uint32) DOS_BUFFSIZE)
       {
       read(RTR->file,dest,DOS_BUFFSIZE);
       len -= DOS_BUFFSIZE;
@@ -940,7 +940,7 @@ void cdecl RTR_read_resource(RTR_class *RTR, void *dest, ULONG len)
 //
 /***************************************************/
 
-HRES cdecl RTR_load_resource(RTR_class *RTR, ULONG resource, ULONG attrib)
+HRES RTR_load_resource(RTR_class *RTR, uint32 resource, uint32 attrib)
 {
    HD_entry *sel;
    HRES entry;
@@ -980,12 +980,12 @@ HRES cdecl RTR_load_resource(RTR_class *RTR, ULONG resource, ULONG attrib)
 //
 /***************************************************/
 
-HRES cdecl RTR_get_resource_handle(RTR_class *RTR, ULONG resource, ULONG attrib)
+HRES RTR_get_resource_handle(RTR_class *RTR, uint32 resource, uint32 attrib)
 {
-   LONG i,insert,replace;
+   int32 i,insert,replace;
    ND_entry *dir;
    void *dest,*src;
-   ULONG nbytes;
+   uint32 nbytes;
 
    dir = RTR_search_name_dir(RTR,resource);
 
@@ -1013,8 +1013,8 @@ HRES cdecl RTR_get_resource_handle(RTR_class *RTR, ULONG resource, ULONG attrib)
       if (insert)
          {
          src = dir;
-         dest = add_ptr(src,(ULONG) sizeof(ND_entry));
-         nbytes = (ULONG) ((RTR->nd_entries - i) * sizeof(ND_entry));
+         dest = add_ptr(src,(uint32) sizeof(ND_entry));
+         nbytes = (uint32) ((RTR->nd_entries - i) * sizeof(ND_entry));
 
          PollMod();
          far_memmove(dest,src,nbytes);
@@ -1044,7 +1044,7 @@ HRES cdecl RTR_get_resource_handle(RTR_class *RTR, ULONG resource, ULONG attrib)
 //
 /***************************************************/
 
-void cdecl RTR_free_resource(RTR_class *RTR, ULONG resource)
+void RTR_free_resource(RTR_class *RTR, uint32 resource)
 {
    ND_entry *dir;
 
@@ -1065,11 +1065,11 @@ void cdecl RTR_free_resource(RTR_class *RTR, ULONG resource)
 //
 /***************************************************/
 
-ND_entry *cdecl RTR_search_name_dir(RTR_class *RTR, ULONG resource)
+ND_entry *RTR_search_name_dir(RTR_class *RTR, uint32 resource)
 {
-   LONG min,max,mid;
+   int32 min,max,mid;
    ND_entry *dir,*try;
-   ULONG entry;
+   uint32 entry;
 
    dir = RTR_addr(RTR->name_dir);
 
@@ -1103,14 +1103,14 @@ ND_entry *cdecl RTR_search_name_dir(RTR_class *RTR, ULONG resource)
 //
 /***************************************************/
 
-BYTE *cdecl ASCII_name(ULONG name)
+BYTE *ASCII_name(uint32 name)
 {
    extern HRES HROED;
    static BYTE aname[35];
    UBYTE *dict;
    BYTE *tag,*def;
-   ULONG num;
-   LONG i;
+   uint32 num;
+   int32 i;
 
    dict = RTD_first(RTR_addr(HROED));
    while ((dict = RTD_iterate(RTR_addr(HROED),dict,&tag,&def)) != NULL)
@@ -1140,15 +1140,15 @@ BYTE *cdecl ASCII_name(ULONG name)
 //
 /***************************************************/
 
-void cdecl RTR_dump(RTR_class *RTR)
+void RTR_dump(RTR_class *RTR)
 {
-   ULONG i,j,f;
+   uint32 i,j,f;
    HD_entry R;
-   ULONG cs;
+   uint32 cs;
    UBYTE *ptr;
-   ULONG cnt;
-   extern ULONG heap_size;
-   ULONG present;
+   uint32 cnt;
+   extern uint32 heap_size;
+   uint32 present;
 
    fprintf(stdout," # of entries: %u\n",RTR->nentries);
    fprintf(stdout,"         Size: %lu\n",heap_size);

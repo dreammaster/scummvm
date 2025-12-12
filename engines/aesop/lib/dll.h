@@ -29,7 +29,7 @@ namespace Aesop {
 //
 
 #ifdef __HIGHC__
-#define cdecl _CC(_REVERSE_PARMS | _NEAR_CALL)
+#define _CC(_REVERSE_PARMS | _NEAR_CALL)
 #pragma Global_aliasing_convention("_%r");
 #endif
 
@@ -55,10 +55,10 @@ extern "C" {
 
 typedef unsigned char  UBYTE;
 typedef unsigned short UWORD;
-typedef unsigned long  ULONG;
+typedef unsigned long  uint32;
 typedef char  BYTE;
 typedef short WORD;
-typedef long  LONG;
+typedef long  int32;
 
 #endif
 
@@ -71,18 +71,18 @@ typedef long  LONG;
 #define DLLMEM_USER  2     // *dll -> output memory block alloc'd by user
 #define DLLMEM_ALLOC 4     // *dll = don't care; allocate & return output mem
 
-ULONG cdecl DLL_size(void *source, ULONG flags);
-void * cdecl DLL_load(void *source, ULONG flags, void *dll);
+uint32 DLL_size(void *source, uint32 flags);
+void * DLL_load(void *source, uint32 flags, void *dll);
 
 //
 // File functions
 //
 
-LONG cdecl FILE_error(void);
-LONG cdecl FILE_size(BYTE *filename);
-void * cdecl FILE_read(BYTE *filename, void *dest);
-LONG cdecl FILE_write(BYTE *filename, void *buf, ULONG len);
-LONG cdecl FILE_append(BYTE *filename, void *buf, ULONG len);
+int32 FILE_error(void);
+int32 FILE_size(BYTE *filename);
+void * FILE_read(BYTE *filename, void *dest);
+int32 FILE_write(BYTE *filename, void *buf, uint32 len);
+int32 FILE_append(BYTE *filename, void *buf, uint32 len);
 
 #ifdef __cplusplus
 }

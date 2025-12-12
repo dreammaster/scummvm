@@ -31,7 +31,7 @@ extern "C" {
 typedef struct
 {
    UWORD slot;       // object list index
-   ULONG name;       // code object name
+   uint32 name;       // code object name
    UWORD size;       // size of instance data (unused in text files)
 }
 CDESC;               // static context descriptor
@@ -45,16 +45,16 @@ extern HRES objlist[NUM_OBJECTS];
 extern BYTE lvlmap[LVL_X][LVL_Y];
 extern WORD lvlobj[3][LVL_X][LVL_Y];
 
-void cdecl init_object_list(void);
+void init_object_list(void);
 
-void cdecl restore_range(BYTE *filename, ULONG first, ULONG last, ULONG restoring);
-LONG cdecl save_range(BYTE *filename, LONG filetype, LONG first, LONG last);
-void cdecl translate_file(BYTE *TXT_filename, BYTE *BIN_filename, ULONG first,
-   ULONG last);
+void restore_range(BYTE *filename, uint32 first, uint32 last, uint32 restoring);
+int32 save_range(BYTE *filename, int32 filetype, int32 first, int32 last);
+void translate_file(BYTE *TXT_filename, BYTE *BIN_filename, uint32 first,
+   uint32 last);
 
-LONG cdecl create_object(LONG argcnt, ULONG name);
-LONG cdecl create_program(LONG argcnt, LONG index, ULONG name);
-LONG cdecl destroy_object(LONG argcnt, LONG index);
+int32 create_object(int32 argcnt, uint32 name);
+int32 create_program(int32 argcnt, int32 index, uint32 name);
+int32 destroy_object(int32 argcnt, int32 index);
 
 #ifdef __cplusplus
 }

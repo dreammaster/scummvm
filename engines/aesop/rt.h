@@ -30,7 +30,7 @@ extern "C" {
 
 typedef struct                // fundamental stack value structure
 {
-   ULONG val;
+   uint32 val;
    UWORD type;
 }
 STKVAL;
@@ -44,17 +44,17 @@ enum
    TYP_SVAR,                  // data type: string variable
 };
 
-extern ULONG diag_flag;
-extern ULONG current_this;
-extern ULONG current_msg;
-extern ULONG current_index;
+extern uint32 diag_flag;
+extern uint32 current_this;
+extern uint32 current_msg;
+extern uint32 current_index;
 
 // Pointer and memory block management
 
 #define norm(x) ((void *) (x))
-#define add_offset(s,o) ((void *)((ULONG)(s) + (ULONG)(o)))
+#define add_offset(s,o) ((void *)((uint32)(s) + (uint32)(o)))
 
-#define add_ptr(base,offset) ((void *)((ULONG)(base) + (ULONG)(offset)))
+#define add_ptr(base,offset) ((void *)((uint32)(base) + (uint32)(offset)))
 
 #define ptr_dif(top,bot) (((BYTE *)(top) - (BYTE *)(bot)))
 
@@ -62,17 +62,17 @@ extern ULONG current_index;
 
 // Assorted speed-critical .ASM routines
 
-void *cdecl RTD_first(void *dictionary);
-void *cdecl RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def);
+void *RTD_first(void *dictionary);
+void *RTD_iterate(void *base, void *cur, BYTE **tag, BYTE **def);
 
-BYTE *cdecl RTD_lookup(HRES dictionary, void *key);
+BYTE *RTD_lookup(HRES dictionary, void *key);
 
 // Runtime interpreter calls
 
-void cdecl RT_init(RTR_class *RTR, ULONG stack_size, HRES *objlist);
-void cdecl RT_shutdown(void);
-void cdecl RT_arguments(void *base, ULONG size);
-LONG cdecl RT_execute(ULONG index, ULONG msg_num, ULONG vector);
+void RT_init(RTR_class *RTR, uint32 stack_size, HRES *objlist);
+void RT_shutdown(void);
+void RT_arguments(void *base, uint32 size);
+int32 RT_execute(uint32 index, uint32 msg_num, uint32 vector);
 
 #ifdef __cplusplus
 }

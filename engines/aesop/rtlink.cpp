@@ -31,7 +31,7 @@ namespace Aesop {
 
 typedef struct
 {
-	ULONG val;
+	uint32 val;
 }
 XCR_entry;                    // External code reference entry
 
@@ -81,11 +81,11 @@ int sort_by_class(const void *a, const void *b) {
 //
 /***************************************************/
 
-HRES cdecl construct_thunk(RTR_class *RTR, RTR_class *LNK, ULONG object) {
+HRES construct_thunk(RTR_class *RTR, RTR_class *LNK, uint32 object) {
 	UWORD depth;              // 0..MAX_G = derived object..base class
-	ULONG class, xclass;
-	ULONG tsize;
-	ULONG source;
+	uint32 class, xclass;
+	uint32 tsize;
+	uint32 source;
 	UWORD target;
 	WORD i;
 	UWORD j, k, m, n, mcnt;
@@ -97,7 +97,7 @@ HRES cdecl construct_thunk(RTR_class *RTR, RTR_class *LNK, ULONG object) {
 	HRES HCRFD;
 	HRES impt[MAX_G], expt[MAX_G], code[MAX_G];
 	HRES xexpt, xcode;
-	ULONG exports[MAX_G];
+	uint32 exports[MAX_G];
 	UWORD s_S[MAX_G], x_S[MAX_G];
 	UWORD SD_offset[MAX_G];
 	UWORD index, offset, found;
@@ -108,8 +108,8 @@ HRES cdecl construct_thunk(RTR_class *RTR, RTR_class *LNK, ULONG object) {
 	XDR_entry *xdr_ptr;
 
 	void *thunk_ptr;
-	ULONG def_off;
-	ULONG *XR_ptr, *CR_ptr;
+	uint32 def_off;
+	uint32 *XR_ptr, *CR_ptr;
 
 	//
 	// Load programs and dictionaries, calculate thunk size
@@ -236,7 +236,7 @@ HRES cdecl construct_thunk(RTR_class *RTR, RTR_class *LNK, ULONG object) {
 
 	while (i >= 0)
 	{
-		SDarray = (SD_entry *)((ULONG)RTR_addr(thunk) + (ULONG)SD);
+		SDarray = (SD_entry *)((uint32)RTR_addr(thunk) + (uint32)SD);
 		SDarray[j].SOP = code[i];
 		SDarray[j].exports = exports[i];
 		SDarray[j].static_base = k;
@@ -264,8 +264,8 @@ HRES cdecl construct_thunk(RTR_class *RTR, RTR_class *LNK, ULONG object) {
 
 				thunk_ptr = RTR_addr(thunk);
 				def_off = ascnum(def);
-				XR_ptr = (void *)((ULONG)thunk_ptr + (ULONG)XR + def_off);
-				CR_ptr = (void *)((ULONG)&code_resources + offset);
+				XR_ptr = (void *)((uint32)thunk_ptr + (uint32)XR + def_off);
+				CR_ptr = (void *)((uint32)&code_resources + offset);
 				*XR_ptr = *CR_ptr;
 
 				break;
@@ -324,7 +324,7 @@ HRES cdecl construct_thunk(RTR_class *RTR, RTR_class *LNK, ULONG object) {
 					abend(MSG_UER, tag);  //"Unresolved external reference '%s'"
 
 				thunk_ptr = RTR_addr(thunk);
-				xdr_ptr = (XDR_entry *)((ULONG)thunk_ptr + (ULONG)XR + target);
+				xdr_ptr = (XDR_entry *)((uint32)thunk_ptr + (uint32)XR + target);
 				xdr_ptr->offset = index;
 
 				break;
@@ -347,7 +347,7 @@ HRES cdecl construct_thunk(RTR_class *RTR, RTR_class *LNK, ULONG object) {
 			if (tag[0] == 'M')
 			{
 				MV[m].msg = (UWORD)ascnum(&tag[2]);
-				MV[m].handler = (ULONG)ascnum(def);
+				MV[m].handler = (uint32)ascnum(def);
 				MV[m].SD_offset = SD_offset[i];
 				++m;
 			}
@@ -399,7 +399,7 @@ HRES cdecl construct_thunk(RTR_class *RTR, RTR_class *LNK, ULONG object) {
 //
 /***************************************************/
 
-HRES cdecl create_instance(RTR_class *RTR, ULONG object) {
+HRES create_instance(RTR_class *RTR, uint32 object) {
 	HRES thunk, instance;
 	HD_entry *sel;
 	ND_entry *entry;
@@ -440,7 +440,7 @@ HRES cdecl create_instance(RTR_class *RTR, ULONG object) {
 //
 /***************************************************/
 
-void cdecl destroy_instance(RTR_class *RTR, HRES instance) {
+void destroy_instance(RTR_class *RTR, HRES instance) {
 	HRES thunk;
 
 	thunk = ((IHDR *)RTR_addr(instance))->thunk;

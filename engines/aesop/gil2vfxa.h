@@ -23,8 +23,8 @@
 
 namespace Aesop {
 
-void cdecl GIL2VFXA_print_buffer(PANE *pane, LONG line_number);
-void cdecl GIL2VFX_hook_INT9(void);
-void cdecl GIL2VFX_unhook_INT9(void);
+void GIL2VFXA_print_buffer(PANE *pane, int32 line_number);
+void GIL2VFX_hook_INT9(void);
+void GIL2VFX_unhook_INT9(void);
 
 } // namespace Aesop

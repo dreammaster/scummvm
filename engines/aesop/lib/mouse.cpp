@@ -33,62 +33,62 @@ namespace Aesop {
 // Mouse system variables
 //
             
-static LONG volatile x;
-static LONG volatile y;
-static LONG volatile left;
-static LONG volatile right;
-static LONG volatile center;
+static int32 volatile x;
+static int32 volatile y;
+static int32 volatile left;
+static int32 volatile right;
+static int32 volatile center;
 
-static LONG volatile last_x;
-static LONG volatile last_y;
-static LONG volatile last_left;
-static LONG volatile last_right;
-static LONG volatile last_center;
+static int32 volatile last_x;
+static int32 volatile last_y;
+static int32 volatile last_left;
+static int32 volatile last_right;
+static int32 volatile last_center;
 
-static LONG volatile locked;
-static LONG volatile held;  
+static int32 volatile locked;
+static int32 volatile held;  
 static RECT saved;
 
 #ifdef DPMI
-static LONG   real_event_sel;
+static int32   real_event_sel;
 #endif
 
-static LONG   real_event_seg;
+static int32   real_event_seg;
 static HTIMER timer;
 static WINDOW save;
 static WINDOW work;
 static PANE   workp;
-static LONG   buffer_size;
+static int32   buffer_size;
 static void  *pointer_table;
-static LONG   pointer;
-static LONG   ptr_width;
-static LONG   ptr_height;
-static LONG   hot_x;
-static LONG   hot_y;
-static LONG   scrn_max_x;
-static LONG   scrn_max_y;
-static LONG   hidecnt;
-static LONG   excluded;
+static int32   pointer;
+static int32   ptr_width;
+static int32   ptr_height;
+static int32   hot_x;
+static int32   hot_y;
+static int32   scrn_max_x;
+static int32   scrn_max_y;
+static int32   hidecnt;
+static int32   excluded;
 static RECT   exclude_region;
 // LUM added
-static LONG   mouse_active=0; 
+static int32   mouse_active=0; 
 
-LONG cdecl (*watchdog_callback)(RECT *area);
-void cdecl (*MOUSE_event_callback)(LONG x, LONG y);
-void cdecl (*button_event_callback)(LONG left, LONG right, LONG center);
+int32 (*watchdog_callback)(RECT *area);
+void (*MOUSE_event_callback)(int32 x, int32 y);
+void (*button_event_callback)(int32 left, int32 right, int32 center);
 
 #ifdef DPMI
 
 typedef struct             // DPMI real-mode interrupt structure
 {
-   LONG edi;
-   LONG esi;
-   LONG ebp;
-   LONG reserved;
-   LONG ebx;
-   LONG edx;
-   LONG ecx;
-   LONG eax;
+   int32 edi;
+   int32 esi;
+   int32 ebp;
+   int32 reserved;
+   int32 ebx;
+   int32 edx;
+   int32 ecx;
+   int32 eax;
    WORD flags;
    WORD es;
    WORD ds;
@@ -110,8 +110,8 @@ typedef struct             // INT21 (Phar Lap) real-mode interrupt structure
    WORD es;
    WORD fs;
    WORD gs;
-   LONG eax;
-   LONG edx;
+   int32 eax;
+   int32 edx;
 }
 RMI_STRUCT;
 
@@ -131,7 +131,7 @@ RMI_STRUCT;
 
 static void MOUSE_draw(void)
 {
-   LONG shp_x,shp_y;
+   int32 shp_x,shp_y;
 
    // LUM added
    if (!mouse_active) return;
@@ -271,7 +271,7 @@ static void MOUSE_restore_area(void)
 //==                                                                        ==
 //============================================================================
 
-static void MOUSE_exclude_area(LONG x0, LONG y0, LONG x1, LONG y1)
+static void MOUSE_exclude_area(int32 x0, int32 y0, int32 x1, int32 y1)
 {
    exclude_region.x0 = x0;
    exclude_region.y0 = y0;
@@ -296,7 +296,7 @@ static void MOUSE_exclude_area(LONG x0, LONG y0, LONG x1, LONG y1)
 //==                                                                        ==
 //============================================================================
 
-static LONG MOUSE_install_handler(void)
+static int32 MOUSE_install_handler(void)
 {
    static unsigned char real_stub[] =
       {
@@ -345,8 +345,8 @@ static LONG MOUSE_install_handler(void)
    inregs.x.eax = 0x300;
    inregs.x.ebx = 0x33;
    inregs.x.ecx = 0;
-   inregs.x.edi = FP_OFF((void far *) &RMI);
-   sregs.es = sregs.ds = FP_SEG((void far *) &RMI);
+   inregs.x.edi = FP_OFF((void *) &RMI);
+   sregs.es = sregs.ds = FP_SEG((void *) &RMI);
 
    int386x(0x31,&inregs,&outregs,&sregs);
 
@@ -356,7 +356,7 @@ static LONG MOUSE_install_handler(void)
    // MetaWare / Phar Lap version
    //
 
-   ULONG i;
+   uint32 i;
    FARPTR stub;
    union REGS inregs,outregs;
    static RMI_STRUCT RMI;
@@ -379,7 +379,7 @@ static LONG MOUSE_install_handler(void)
       ((_Far UBYTE *) stub.ptr)[i] = real_stub[i];
       }
 
-   inregs.w.edx = (ULONG) &RMI;
+   inregs.w.edx = (uint32) &RMI;
    inregs.w.ecx = 0x007f;
    RMI.intnum = 0x33;
    RMI.eax = 0x000c;
@@ -422,8 +422,8 @@ static void MOUSE_remove_handler(void)
    inregs.x.eax = 0x300;
    inregs.x.ebx = 0x33;
    inregs.x.ecx = 0;
-   inregs.x.edi = FP_OFF((void far *) &RMI);
-   sregs.es = sregs.ds = FP_SEG((void far *) &RMI);
+   inregs.x.edi = FP_OFF((void *) &RMI);
+   sregs.es = sregs.ds = FP_SEG((void *) &RMI);
 
    int386x(0x31,&inregs,&outregs,&sregs);
 
@@ -432,7 +432,7 @@ static void MOUSE_remove_handler(void)
    union REGS inregs,outregs;
    static RMI_STRUCT RMI;
 
-   inregs.w.edx = (ULONG) &RMI;
+   inregs.w.edx = (uint32) &RMI;
    inregs.w.ecx = 0;
    RMI.intnum = 0x33;
    RMI.eax = 0x000c;
@@ -499,7 +499,7 @@ void MOUSE_release(void)
 //==                                                                        ==
 //============================================================================
 
-LONG MOUSE_visible_area(RECT *area)
+int32 MOUSE_visible_area(RECT *area)
 {
    MOUSE_lock();
 
@@ -523,7 +523,7 @@ LONG MOUSE_visible_area(RECT *area)
 //==                                                                        ==
 //============================================================================
 
-LONG MOUSE_shape_in_area(RECT *area)
+int32 MOUSE_shape_in_area(RECT *area)
 {
    RECT cur;
 
@@ -587,10 +587,10 @@ void MOUSE_hide(void)
 //==                                                                        ==
 //============================================================================
 
-void MOUSE_set_pointer(void *table, LONG shape)
+void MOUSE_set_pointer(void *table, int32 shape)
 {
-   LONG hot,res;
-   LONG w,h;
+   int32 hot,res;
+   int32 w,h;
 
    if ((pointer_table == table) &&
        (pointer       == shape))
@@ -608,8 +608,8 @@ void MOUSE_set_pointer(void *table, LONG shape)
    ptr_width  = w = res >> 16;
    ptr_height = h = res & 0xffff;
 
-   hot_x = (LONG) (WORD) (hot >> 16);
-   hot_y = (LONG) (WORD) (hot & 0xffff);
+   hot_x = (int32) (WORD) (hot >> 16);
+   hot_y = (int32) (WORD) (hot & 0xffff);
 
    //
    // Warning: buffer_size must be <= MAX_MOUSE_BUFFER_SIZE, or memory 
@@ -633,7 +633,7 @@ void MOUSE_set_pointer(void *table, LONG shape)
 //==                                                                        ==
 //============================================================================
 
-void MOUSE_status(LONG *mx, LONG *my, LONG *ml, LONG *mr, LONG *mc)
+void MOUSE_status(int32 *mx, int32 *my, int32 *ml, int32 *mr, int32 *mc)
 {
    MOUSE_lock();
 
@@ -652,7 +652,7 @@ void MOUSE_status(LONG *mx, LONG *my, LONG *ml, LONG *mr, LONG *mc)
 //==                                                                        ==
 //============================================================================
 
-void MOUSE_force_move(LONG new_x, LONG new_y)
+void MOUSE_force_move(int32 new_x, int32 new_y)
 {
    union REGS inregs,outregs;
 
@@ -725,7 +725,7 @@ void MOUSE_force_move(LONG new_x, LONG new_y)
 //== This function should be passed the address of a function with the      ==
 //== following prototype:                                                   ==
 //==                                                                        ==
-//==   void cdecl MOUSE_event_callback(LONG x, LONG y)                      ==
+//==   void MOUSE_event_callback(int32 x, int32 y)                      ==
 //==                                                                        ==
 //== This function will be called whenever the mouse's location changes,    ==
 //== regardless of whether the cursor is hidden or excluded.                ==
@@ -734,7 +734,7 @@ void MOUSE_force_move(LONG new_x, LONG new_y)
 //==                                                                        ==
 //============================================================================
 
-void MOUSE_register_mouse_event_callback(void cdecl (*fn)(LONG x, LONG y))
+void MOUSE_register_mouse_event_callback(void (*fn)(int32 x, int32 y))
 {
    MOUSE_event_callback = fn;
 }
@@ -746,7 +746,7 @@ void MOUSE_register_mouse_event_callback(void cdecl (*fn)(LONG x, LONG y))
 //== This function should be passed the address of a function with the      ==
 //== following prototype:                                                   ==
 //==                                                                        ==
-//==   void cdecl button_event_callback(LONG left, LONG right, LONG center) ==
+//==   void button_event_callback(int32 left, int32 right, int32 center) ==
 //==                                                                        ==
 //== This function will be called whenever the mouse's button status        ==
 //== changes, regardless of whether the cursor is hidden, excluded, or held.==
@@ -755,8 +755,8 @@ void MOUSE_register_mouse_event_callback(void cdecl (*fn)(LONG x, LONG y))
 //==                                                                        ==
 //============================================================================
 
-void MOUSE_register_button_event_callback(void cdecl (*fn)(LONG left,
-   LONG right, LONG center))
+void MOUSE_register_button_event_callback(void (*fn)(int32 left,
+   int32 right, int32 center))
 {
    button_event_callback = fn;
 }
@@ -768,7 +768,7 @@ void MOUSE_register_button_event_callback(void cdecl (*fn)(LONG left,
 //== This function should be passed the address of a function with the      ==
 //== following prototype:                                                   ==
 //==                                                                        ==
-//==   LONG cdecl watchdog_callback(RECT *area)                             ==
+//==   int32 watchdog_callback(RECT *area)                             ==
 //==                                                                        ==
 //== This function will be called whenever the mouse cursor is about to be  ==
 //== drawn to the screen overlaying *area. If it returns a nonzero value,   ==
@@ -779,7 +779,7 @@ void MOUSE_register_button_event_callback(void cdecl (*fn)(LONG left,
 //==                                                                        ==
 //============================================================================
 
-void MOUSE_register_watchdog_callback(LONG cdecl (*fn)(RECT *area))
+void MOUSE_register_watchdog_callback(int32 (*fn)(RECT *area))
 {
    watchdog_callback = fn;
 }
@@ -803,15 +803,15 @@ void MOUSE_register_watchdog_callback(LONG cdecl (*fn)(RECT *area))
 //==                                                                        ==
 //============================================================================
 
-// LUM this function had to be changed for AIL 2 (__cdecl not __pascal and parameter user was removed)!
+// LUM this function had to be changed for AIL 2 (__not __pascal and parameter user was removed)!
 // it is needed, otherwise it crashes when the function is called!
 
-void __cdecl MOUSE_timer_serve()
+void __MOUSE_timer_serve()
 {
    MOUSE_serve();
 }
 
-void __cdecl MOUSE_serve()
+void __MOUSE_serve()
 {
 #ifdef __HIGHC__
    FARPTR loc;
@@ -853,15 +853,15 @@ void __cdecl MOUSE_serve()
    last_y = y;
 
 #ifdef DPMI
-   x = (LONG) (*(WORD *) 0x4f2) >> 3;
-   y = (LONG) (*(WORD *) 0x4f4) >> 3;
+   x = (int32) (*(WORD *) 0x4f2) >> 3;
+   y = (int32) (*(WORD *) 0x4f4) >> 3;
 #else
 #ifdef PHARLAP              
    loc.part.seg = 0x34; loc.part.off = 0x4f2;
-   x = (LONG) (*(_Far UWORD *) loc.ptr) >> 3;
+   x = (int32) (*(_Far UWORD *) loc.ptr) >> 3;
 
    loc.part.seg = 0x34; loc.part.off = 0x4f4;
-   y = (LONG) (*(_Far UWORD *) loc.ptr) >> 3;
+   y = (int32) (*(_Far UWORD *) loc.ptr) >> 3;
 #endif
 #endif
 
@@ -888,12 +888,12 @@ void __cdecl MOUSE_serve()
 //==                                                                        ==
 //============================================================================
 
-void MOUSE_window_refresh(WINDOW *target, LONG x0, LONG y0, LONG x1, LONG y1)
+void MOUSE_window_refresh(WINDOW *target, int32 x0, int32 y0, int32 x1, int32 y1)
 {
-   LONG   shp_x,shp_y;
-   LONG   bw,bh;
+   int32   shp_x,shp_y;
+   int32   bw,bh;
    PANE   bkgnd,client;
-   LONG   mx,my,ml,mr,mt,mb,xr;
+   int32   mx,my,ml,mr,mt,mb,xr;
    UBYTE *in;
 
    //
@@ -979,7 +979,7 @@ void MOUSE_window_refresh(WINDOW *target, LONG x0, LONG y0, LONG x1, LONG y1)
          mx = 0;
 
          in = (UBYTE *) target->stencil +
-            (((ULONG *) target->stencil)[my]);
+            (((uint32 *) target->stencil)[my]);
 
          while (mx <= mr)
             {
@@ -1086,12 +1086,12 @@ void MOUSE_window_refresh(WINDOW *target, LONG x0, LONG y0, LONG x1, LONG y1)
 //==                                                                        ==
 //============================================================================
 
-void MOUSE_pane_refresh(PANE *target, LONG x0, LONG y0, LONG x1, LONG y1)
+void MOUSE_pane_refresh(PANE *target, int32 x0, int32 y0, int32 x1, int32 y1)
 {
-   LONG   shp_x,shp_y;
-   LONG   bw,bh;
+   int32   shp_x,shp_y;
+   int32   bw,bh;
    PANE   bkgnd,client;
-   LONG   mx,my,ml,mr,mt,mb,xr;
+   int32   mx,my,ml,mr,mt,mb,xr;
    UBYTE *in;
 
    //
@@ -1179,7 +1179,7 @@ void MOUSE_pane_refresh(PANE *target, LONG x0, LONG y0, LONG x1, LONG y1)
          mx = 0;
 
          in = (UBYTE *) target->window->stencil +
-            (((ULONG *) target->window->stencil)[my]);
+            (((uint32 *) target->window->stencil)[my]);
 
          while (mx <= mr)
             {
@@ -1288,7 +1288,7 @@ void MOUSE_pane_refresh(PANE *target, LONG x0, LONG y0, LONG x1, LONG y1)
 
 void MOUSE_pane_list_refresh(PANE_LIST *list)
 {
-   ULONG i;
+   uint32 i;
    PANE *a;
 
    for (i=0; i<list->size; i++)
@@ -1308,7 +1308,7 @@ void MOUSE_pane_list_refresh(PANE_LIST *list)
 //==                                                                        ==
 //============================================================================
 
-LONG MOUSE_init(LONG xsize, LONG ysize, LONG background)
+int32 MOUSE_init(int32 xsize, int32 ysize, int32 background)
 {
    union REGS inregs,outregs;
 
@@ -1530,10 +1530,10 @@ void MOUSE_shutdown(void)
 //==                                                                        ==
 //============================================================================
 
-LONG volatile local_X;
-LONG volatile local_Y;
-LONG volatile local_left;
-LONG volatile local_right;
+int32 volatile local_X;
+int32 volatile local_Y;
+int32 volatile local_left;
+int32 volatile local_right;
 
 //
 // Callback functions for simulated mouse event handler
@@ -1542,13 +1542,13 @@ LONG volatile local_right;
 // interrupt handler
 //
 
-void cdecl MOUSE_event_fn(LONG x, LONG y)
+void MOUSE_event_fn(int32 x, int32 y)
 {
    local_X = x;
    local_Y = y;
 }
 
-void cdecl button_event_fn(LONG l, LONG r, LONG c)
+void button_event_fn(int32 l, int32 r, int32 c)
 {
    c++;              // avoid warning
    local_left  = l;
@@ -1558,7 +1558,7 @@ void cdecl button_event_fn(LONG l, LONG r, LONG c)
 void main(int argc, char *argv[])
 {
    VFX_DESC *VFX;
-   LONG w,h;
+   int32 w,h;
    void *DLL,*drvr;
 
    WINDOW window,twnd;
@@ -1566,7 +1566,7 @@ void main(int argc, char *argv[])
 
    void *shapes;
    FONT *font;
-   LONG i;
+   int32 i;
 
    static UBYTE colors[256];
    static BYTE strbuf[256];

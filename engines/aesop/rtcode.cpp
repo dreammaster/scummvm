@@ -32,7 +32,7 @@
 
 namespace Aesop {
 
-ULONG diag_flag = 0;
+uint32 diag_flag = 0;
 
 //
 // Load a string resource into a SOP instance's array
@@ -44,15 +44,15 @@ ULONG diag_flag = 0;
 //
 
 #pragma off (unreferenced)
-void cdecl load_string(LONG argcnt, BYTE *array, ULONG string)
+void load_string(int32 argcnt, BYTE *array, uint32 string)
 #pragma on (unreferenced)
 {
 	HRES handle;
 	BYTE *ptr;
 	BYTE *new_array;
-	ULONG array_offset;
+	uint32 array_offset;
 
-	array_offset = (ULONG)array - (ULONG)RTR_addr(objlist[current_this]);
+	array_offset = (uint32)array - (uint32)RTR_addr(objlist[current_this]);
 
 	handle = RTR_get_resource_handle(RTR, string, DA_DEFAULT);
 
@@ -85,11 +85,11 @@ void cdecl load_string(LONG argcnt, BYTE *array, ULONG string)
 //
 
 #pragma off (unreferenced)
-void cdecl load_resource(LONG argcnt, BYTE *array, ULONG resource)
+void load_resource(int32 argcnt, BYTE *array, uint32 resource)
 #pragma on (unreferenced)
 {
 	HRES handle;
-	ULONG array_offset;
+	uint32 array_offset;
 	BYTE *new_array;
 
 	array_offset = FP_OFF(array) - FP_OFF(RTR_addr(objlist[current_this]));
@@ -106,35 +106,35 @@ void cdecl load_resource(LONG argcnt, BYTE *array, ULONG resource)
 }
 
 #pragma off (unreferenced)
-void cdecl copy_string(LONG argcnt, BYTE *src, BYTE *dest)
+void copy_string(int32 argcnt, BYTE *src, BYTE *dest)
 #pragma on (unreferenced)
 {
 	strcpy((char *)dest, (char *)src);
 }
 
 #pragma off (unreferenced)
-void cdecl string_force_lower(LONG argcnt, BYTE *dest)
+void string_force_lower(int32 argcnt, BYTE *dest)
 #pragma on (unreferenced)
 {
 	strlwr((char *)dest);
 }
 
 #pragma off (unreferenced)
-void cdecl string_force_upper(LONG argcnt, BYTE *dest)
+void string_force_upper(int32 argcnt, BYTE *dest)
 #pragma on (unreferenced)
 {
 	strupr((char *)dest);
 }
 
 #pragma off (unreferenced)
-ULONG cdecl string_len(LONG argcnt, BYTE *string)
+uint32 string_len(int32 argcnt, BYTE *string)
 #pragma on (unreferenced)
 {
 	return strlen((char *)string);
 }
 
 #pragma off (unreferenced)
-ULONG cdecl string_compare(LONG argcnt, BYTE *str1, BYTE *str2)
+uint32 string_compare(int32 argcnt, BYTE *str1, BYTE *str2)
 #pragma on (unreferenced)
 {
 	return stricmp((char *)str1, (char *)str2);
@@ -145,7 +145,7 @@ ULONG cdecl string_compare(LONG argcnt, BYTE *str1, BYTE *str2)
 //
 
 #pragma off (unreferenced)
-LONG cdecl strval(LONG argcnt, BYTE *string)
+int32 strval(int32 argcnt, BYTE *string)
 #pragma on (unreferenced)
 {
 	if (string == NULL)
@@ -162,7 +162,7 @@ LONG cdecl strval(LONG argcnt, BYTE *string)
 //
 
 #pragma off (unreferenced)
-LONG cdecl envval(LONG argcnt, BYTE *name)
+int32 envval(int32 argcnt, BYTE *name)
 #pragma on (unreferenced)
 {
 	BYTE *env;
@@ -177,7 +177,7 @@ LONG cdecl envval(LONG argcnt, BYTE *name)
 // Generate speaker beep
 //
 
-void cdecl beep(void) {
+void beep(void) {
 	UWORD dx, ax;
 
 	outp(0x43, 0x0b6);
@@ -193,21 +193,21 @@ void cdecl beep(void) {
 }
 
 #pragma off (unreferenced)
-void cdecl pokemem(LONG argcnt, LONG *addr, LONG data)
+void pokemem(int32 argcnt, int32 *addr, int32 data)
 #pragma on (unreferenced)
 {
 	*addr = data;
 }
 
 #pragma off (unreferenced)
-LONG cdecl peekmem(LONG argcnt, LONG *addr)
+int32 peekmem(int32 argcnt, int32 *addr)
 #pragma on (unreferenced)
 {
 	return *addr;
 }
 
 #pragma off (unreferenced)
-ULONG cdecl rnd(LONG argcnt, ULONG low, ULONG high)
+uint32 rnd(int32 argcnt, uint32 low, uint32 high)
 #pragma on (unreferenced)
 {
 	// LUM add type int
@@ -219,14 +219,14 @@ ULONG cdecl rnd(LONG argcnt, ULONG low, ULONG high)
 		srand(*(UWORD *)0x0000046c);
 	}
 
-	return low + ((ULONG)rand() % (high - low + 1L));
+	return low + ((uint32)rand() % (high - low + 1L));
 }
 
 #pragma off (unreferenced)
-ULONG cdecl dice(LONG argcnt, ULONG ndice, ULONG nsides, ULONG bonus)
+uint32 dice(int32 argcnt, uint32 ndice, uint32 nsides, uint32 bonus)
 #pragma on (unreferenced)
 {
-	ULONG n, total;
+	uint32 n, total;
 
 	total = bonus;
 
@@ -236,33 +236,33 @@ ULONG cdecl dice(LONG argcnt, ULONG ndice, ULONG nsides, ULONG bonus)
 	return total;
 }
 
-ULONG cdecl inkey(void) {
-	return (ULONG)kbhit();
+uint32 inkey(void) {
+	return (uint32)kbhit();
 }
 
 #pragma off (unreferenced)
-ULONG cdecl absv(LONG argcnt, LONG val)
+uint32 absv(int32 argcnt, int32 val)
 #pragma on (unreferenced)
 {
 	return (val < 0L) ? -val : val;
 }
 
 #pragma off (unreferenced)
-LONG cdecl minv(LONG argcnt, LONG val1, LONG val2)
+int32 minv(int32 argcnt, int32 val1, int32 val2)
 #pragma on (unreferenced)
 {
 	return min(val1, val2);
 }
 
 #pragma off (unreferenced)
-LONG cdecl maxv(LONG argcnt, LONG val1, LONG val2)
+int32 maxv(int32 argcnt, int32 val1, int32 val2)
 #pragma on (unreferenced)
 {
 	return max(val1, val2);
 }
 
 #pragma off (unreferenced)
-void cdecl diagnose(LONG argcnt, ULONG dtype, ULONG parm)
+void diagnose(int32 argcnt, uint32 dtype, uint32 parm)
 #pragma on (unreferenced)
 {
 	switch (dtype)
@@ -277,7 +277,7 @@ void cdecl diagnose(LONG argcnt, ULONG dtype, ULONG parm)
 	}
 }
 
-ULONG cdecl heapfree(void) {
+uint32 heapfree(void) {
 	return RTR->free;
 }
 

@@ -27,182 +27,182 @@
 
 namespace Aesop {
 
-void cdecl load_string(LONG argcnt, BYTE *array, ULONG string);
-void cdecl load_resource(LONG argcnt, BYTE *array, ULONG resource);
-void cdecl copy_string(LONG argcnt, BYTE *src, BYTE *dest);
-void cdecl string_force_lower(LONG argcnt, BYTE *dest);
-void cdecl string_force_upper(LONG argcnt, BYTE *dest);
-ULONG cdecl string_len(LONG argcnt, BYTE *string);
-ULONG cdecl string_compare(LONG argcnt, BYTE *str1, BYTE *str2);
-void cdecl beep(void);
-LONG cdecl strval(LONG argcnt, BYTE *string);
-LONG cdecl envval(LONG argcnt, BYTE *name);
-void cdecl pokemem(LONG argcnt, LONG *addr, LONG data);
-LONG cdecl peekmem(LONG argcnt, LONG *addr);
-ULONG cdecl rnd(LONG argcnt, ULONG low, ULONG high);
-ULONG cdecl dice(LONG argcnt, ULONG ndice, ULONG nsides, ULONG bonus);
-ULONG cdecl absv(LONG argcnt, LONG val);
-LONG cdecl minv(LONG argcnt, LONG val1, LONG val2);
-LONG cdecl maxv(LONG argcnt, LONG val1, LONG val2);
-void cdecl diagnose(LONG argcnt, ULONG dtype, ULONG parm);
-ULONG cdecl heapfree(void);
+void load_string(int32 argcnt, BYTE *array, uint32 string);
+void load_resource(int32 argcnt, BYTE *array, uint32 resource);
+void copy_string(int32 argcnt, BYTE *src, BYTE *dest);
+void string_force_lower(int32 argcnt, BYTE *dest);
+void string_force_upper(int32 argcnt, BYTE *dest);
+uint32 string_len(int32 argcnt, BYTE *string);
+uint32 string_compare(int32 argcnt, BYTE *str1, BYTE *str2);
+void beep(void);
+int32 strval(int32 argcnt, BYTE *string);
+int32 envval(int32 argcnt, BYTE *name);
+void pokemem(int32 argcnt, int32 *addr, int32 data);
+int32 peekmem(int32 argcnt, int32 *addr);
+uint32 rnd(int32 argcnt, uint32 low, uint32 high);
+uint32 dice(int32 argcnt, uint32 ndice, uint32 nsides, uint32 bonus);
+uint32 absv(int32 argcnt, int32 val);
+int32 minv(int32 argcnt, int32 val1, int32 val2);
+int32 maxv(int32 argcnt, int32 val1, int32 val2);
+void diagnose(int32 argcnt, uint32 dtype, uint32 parm);
+uint32 heapfree(void);
 
-void cdecl notify(LONG argcnt, ULONG index, ULONG message, LONG event,
-	LONG parameter);
-void cdecl cancel(LONG argcnt, ULONG index, ULONG message, LONG event,
-	LONG parameter);
-void cdecl drain_event_queue(void);
-void cdecl post_event(LONG argcnt, ULONG owner, LONG event, LONG parameter);
-void cdecl send_event(LONG argcnt, ULONG owner, LONG event, LONG parameter);
-ULONG cdecl peek_event(void);
-void cdecl dispatch_event(void);
-void cdecl flush_event_queue(LONG argcnt, LONG owner, LONG event, LONG parameter);
-void cdecl flush_input_events(void);
+void notify(int32 argcnt, uint32 index, uint32 message, int32 event,
+	int32 parameter);
+void cancel(int32 argcnt, uint32 index, uint32 message, int32 event,
+	int32 parameter);
+void drain_event_queue(void);
+void post_event(int32 argcnt, uint32 owner, int32 event, int32 parameter);
+void send_event(int32 argcnt, uint32 owner, int32 event, int32 parameter);
+uint32 peek_event(void);
+void dispatch_event(void);
+void flush_event_queue(int32 argcnt, int32 owner, int32 event, int32 parameter);
+void flush_input_events(void);
 
-void cdecl init_interface(void);
-void cdecl shutdown_interface(void);
-void cdecl set_mouse_pointer(LONG argcnt, ULONG table, ULONG number, LONG hot_X,
-	LONG hot_Y, ULONG scale, ULONG fade_table, ULONG fade_level);
-void cdecl set_wait_pointer(LONG argcnt, ULONG number, LONG hot_X, LONG hot_Y);
-void cdecl standby_cursor(void);
-void cdecl resume_cursor(void);
-void cdecl show_mouse(void);
-void cdecl hide_mouse(void);
-ULONG cdecl mouse_XY(void);
-ULONG cdecl mouse_in_window(LONG argcnt, ULONG wnd);
-void cdecl lock_mouse(void);
-void cdecl unlock_mouse(void);
-void cdecl getkey(void);
+void init_interface(void);
+void shutdown_interface(void);
+void set_mouse_pointer(int32 argcnt, uint32 table, uint32 number, int32 hot_X,
+	int32 hot_Y, uint32 scale, uint32 fade_table, uint32 fade_level);
+void set_wait_pointer(int32 argcnt, uint32 number, int32 hot_X, int32 hot_Y);
+void standby_cursor(void);
+void resume_cursor(void);
+void show_mouse(void);
+void hide_mouse(void);
+uint32 mouse_XY(void);
+uint32 mouse_in_window(int32 argcnt, uint32 wnd);
+void lock_mouse(void);
+void unlock_mouse(void);
+void getkey(void);
 
-void cdecl init_graphics(void);
-void cdecl draw_dot(LONG argcnt, ULONG page, ULONG x, ULONG y, ULONG color);
-void cdecl draw_line(LONG argcnt, ULONG page,
-	ULONG x1, ULONG y1, ULONG x2, ULONG y2, ULONG color);
-void cdecl line_to(LONG argcnt, ULONG x, ULONG y, ULONG color, ...);
-void cdecl draw_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
-	LONG y2, ULONG color);
-void cdecl fill_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
-	LONG y2, ULONG color);
-void cdecl hash_rectangle(LONG argcnt, ULONG wndnum, LONG x1, LONG y1, LONG x2,
-	LONG y2, ULONG color);
-ULONG cdecl get_bitmap_height(LONG argcnt, ULONG table, ULONG number);
-void cdecl draw_bitmap(LONG argcnt, ULONG page, ULONG table, ULONG number,
-	LONG x, LONG y, ULONG scale, ULONG flip, ULONG fade_table, ULONG
+void init_graphics(void);
+void draw_dot(int32 argcnt, uint32 page, uint32 x, uint32 y, uint32 color);
+void draw_line(int32 argcnt, uint32 page,
+	uint32 x1, uint32 y1, uint32 x2, uint32 y2, uint32 color);
+void line_to(int32 argcnt, uint32 x, uint32 y, uint32 color, ...);
+void draw_rectangle(int32 argcnt, uint32 wndnum, int32 x1, int32 y1, int32 x2,
+	int32 y2, uint32 color);
+void fill_rectangle(int32 argcnt, uint32 wndnum, int32 x1, int32 y1, int32 x2,
+	int32 y2, uint32 color);
+void hash_rectangle(int32 argcnt, uint32 wndnum, int32 x1, int32 y1, int32 x2,
+	int32 y2, uint32 color);
+uint32 get_bitmap_height(int32 argcnt, uint32 table, uint32 number);
+void draw_bitmap(int32 argcnt, uint32 page, uint32 table, uint32 number,
+	int32 x, int32 y, uint32 scale, uint32 flip, uint32 fade_table, uint32
 	fade_level);
-ULONG cdecl visible_bitmap_rect(LONG argcnt, LONG x, LONG y,
-	ULONG flip, ULONG table, ULONG number, WORD *array);
-void cdecl set_palette(LONG argcnt, ULONG region, ULONG resource);
-void cdecl refresh_window(LONG argcnt, ULONG src, ULONG target);
-void cdecl wipe_window(LONG argcnt, ULONG window, ULONG color);
-void cdecl shutdown_graphics(void);
-void cdecl wait_vertical_retrace(void);
-ULONG cdecl read_palette(LONG argcnt, ULONG regnum);
-void cdecl write_palette(LONG argcnt, ULONG regnum, ULONG value);
-void cdecl pixel_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd, ULONG intervals);
-void cdecl color_fade(LONG argcnt, ULONG src_wnd, ULONG dest_wnd);
-void cdecl light_fade(LONG argcnt, ULONG src_wnd, ULONG color);
+uint32 visible_bitmap_rect(int32 argcnt, int32 x, int32 y,
+	uint32 flip, uint32 table, uint32 number, WORD *array);
+void set_palette(int32 argcnt, uint32 region, uint32 resource);
+void refresh_window(int32 argcnt, uint32 src, uint32 target);
+void wipe_window(int32 argcnt, uint32 window, uint32 color);
+void shutdown_graphics(void);
+void wait_vertical_retrace(void);
+uint32 read_palette(int32 argcnt, uint32 regnum);
+void write_palette(int32 argcnt, uint32 regnum, uint32 value);
+void pixel_fade(int32 argcnt, uint32 src_wnd, uint32 dest_wnd, uint32 intervals);
+void color_fade(int32 argcnt, uint32 src_wnd, uint32 dest_wnd);
+void light_fade(int32 argcnt, uint32 src_wnd, uint32 color);
 
-ULONG cdecl assign_window(LONG argcnt, ULONG owner, ULONG x1, ULONG y1,
-	ULONG x2, ULONG y2);
-ULONG cdecl assign_subwindow(LONG argcnt, ULONG owner, ULONG parent,
-	ULONG x1, ULONG y1, ULONG x2, ULONG y2);
-void cdecl release_window(LONG argcnt, ULONG window);
-ULONG cdecl get_x1(LONG argcnt, ULONG window);
-ULONG cdecl get_x2(LONG argcnt, ULONG window);
-ULONG cdecl get_y1(LONG argcnt, ULONG window);
-ULONG cdecl get_y2(LONG argcnt, ULONG window);
-void cdecl set_x1(LONG argcnt, ULONG window, ULONG x1);
-void cdecl set_x2(LONG argcnt, ULONG window, ULONG x2);
-void cdecl set_y1(LONG argcnt, ULONG window, ULONG y1);
-void cdecl set_y2(LONG argcnt, ULONG window, ULONG y2);
+uint32 assign_window(int32 argcnt, uint32 owner, uint32 x1, uint32 y1,
+	uint32 x2, uint32 y2);
+uint32 assign_subwindow(int32 argcnt, uint32 owner, uint32 parent,
+	uint32 x1, uint32 y1, uint32 x2, uint32 y2);
+void release_window(int32 argcnt, uint32 window);
+uint32 get_x1(int32 argcnt, uint32 window);
+uint32 get_x2(int32 argcnt, uint32 window);
+uint32 get_y1(int32 argcnt, uint32 window);
+uint32 get_y2(int32 argcnt, uint32 window);
+void set_x1(int32 argcnt, uint32 window, uint32 x1);
+void set_x2(int32 argcnt, uint32 window, uint32 x2);
+void set_y1(int32 argcnt, uint32 window, uint32 y1);
+void set_y2(int32 argcnt, uint32 window, uint32 y2);
 
-void cdecl text_window(LONG argcnt, ULONG wndnum, ULONG wnd);
-void cdecl text_style(LONG argcnt, ULONG wndnum, ULONG font, ULONG
+void text_window(int32 argcnt, uint32 wndnum, uint32 wnd);
+void text_style(int32 argcnt, uint32 wndnum, uint32 font, uint32
 	justify);
-void cdecl text_xy(LONG argcnt, ULONG wndnum, ULONG htab, ULONG vtab);
-void cdecl text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG new);
-void cdecl text_refresh_window(LONG argcnt, ULONG wndnum, LONG wnd);
+void text_xy(int32 argcnt, uint32 wndnum, uint32 htab, uint32 vtab);
+void text_color(int32 argcnt, uint32 wndnum, uint32 current, uint32 new);
+void text_refresh_window(int32 argcnt, uint32 wndnum, int32 wnd);
 
-LONG cdecl get_text_x(LONG argcnt, ULONG wndnum);
-LONG cdecl get_text_y(LONG argcnt, ULONG wndnum);
+int32 get_text_x(int32 argcnt, uint32 wndnum);
+int32 get_text_y(int32 argcnt, uint32 wndnum);
 
-void cdecl home(LONG argcnt, ULONG wndnum);
+void home(int32 argcnt, uint32 wndnum);
 
-void cdecl print(LONG argcnt, ULONG wndnum, ULONG format, ...);
-void cdecl sprint(LONG argcnt, ULONG wndnum, BYTE *format, ...);
-void cdecl dprint(LONG argcnt, const char *format, ...);
-void cdecl aprint(LONG argcnt, const char *format, ...);
-void cdecl crout(LONG argcnt, ULONG wndnum);
-ULONG cdecl char_width(LONG argcnt, ULONG wndnum, ULONG ch);
-ULONG cdecl font_height(LONG argcnt, ULONG wndnum);
+void print(int32 argcnt, uint32 wndnum, uint32 format, ...);
+void sprint(int32 argcnt, uint32 wndnum, BYTE *format, ...);
+void dprint(int32 argcnt, const char *format, ...);
+void aprint(int32 argcnt, const char *format, ...);
+void crout(int32 argcnt, uint32 wndnum);
+uint32 char_width(int32 argcnt, uint32 wndnum, uint32 ch);
+uint32 font_height(int32 argcnt, uint32 wndnum);
 
-void cdecl solid_bar_graph(LONG argcnt, LONG x0, LONG y0, LONG x1, LONG y1,
-	ULONG lb_border, ULONG tr_border, ULONG bkgnd, ULONG grn, ULONG yel,
-	ULONG red, LONG val, LONG min, LONG crit, LONG max);
+void solid_bar_graph(int32 argcnt, int32 x0, int32 y0, int32 x1, int32 y1,
+	uint32 lb_border, uint32 tr_border, uint32 bkgnd, uint32 grn, uint32 yel,
+	uint32 red, int32 val, int32 min, int32 crit, int32 max);
 
-void cdecl init_sound(LONG argcnt, ULONG errprompt);
-void cdecl shutdown_sound(void);
-void cdecl load_sound_block(LONG argcnt, ULONG first_block, ULONG last_block,
-	ULONG *array);
-void cdecl sound_effect(LONG argcnt, ULONG index);
-void cdecl play_sequence(LONG argcnt, ULONG LA_version, ULONG AD_version, ULONG
+void init_sound(int32 argcnt, uint32 errprompt);
+void shutdown_sound(void);
+void load_sound_block(int32 argcnt, uint32 first_block, uint32 last_block,
+	uint32 *array);
+void sound_effect(int32 argcnt, uint32 index);
+void play_sequence(int32 argcnt, uint32 LA_version, uint32 AD_version, uint32
 	PC_version);
-void cdecl load_music(void);
-void cdecl unload_music(void);
-void cdecl set_sound_status(LONG argcnt, ULONG status);
+void load_music(void);
+void unload_music(void);
+void set_sound_status(int32 argcnt, uint32 status);
 
-LONG cdecl create_object(LONG argcnt, ULONG name);
-LONG cdecl create_program(LONG argcnt, LONG index, ULONG name);
-LONG cdecl destroy_object(LONG argcnt, LONG index);
-void cdecl thrash_cache(void);
-ULONG cdecl flush_cache(LONG argcnt, ULONG goal);
+int32 create_object(int32 argcnt, uint32 name);
+int32 create_program(int32 argcnt, int32 index, uint32 name);
+int32 destroy_object(int32 argcnt, int32 index);
+void thrash_cache(void);
+uint32 flush_cache(int32 argcnt, uint32 goal);
 
-LONG cdecl step_X(LONG argcnt, ULONG x, ULONG fdir, ULONG mtype, ULONG distance);
-LONG cdecl step_Y(LONG argcnt, ULONG y, ULONG fdir, ULONG mtype, ULONG distance);
-ULONG cdecl step_FDIR(LONG argcnt, ULONG fdir, ULONG mtype);
+int32 step_X(int32 argcnt, uint32 x, uint32 fdir, uint32 mtype, uint32 distance);
+int32 step_Y(int32 argcnt, uint32 y, uint32 fdir, uint32 mtype, uint32 distance);
+uint32 step_FDIR(int32 argcnt, uint32 fdir, uint32 mtype);
 
-LONG cdecl step_square_X(LONG argcnt, ULONG x, ULONG r, ULONG dir);
-LONG cdecl step_square_Y(LONG argcnt, ULONG y, ULONG r, ULONG dir);
-LONG cdecl step_region(LONG argcnt, ULONG r, ULONG dir);
+int32 step_square_X(int32 argcnt, uint32 x, uint32 r, uint32 dir);
+int32 step_square_Y(int32 argcnt, uint32 y, uint32 r, uint32 dir);
+int32 step_region(int32 argcnt, uint32 r, uint32 dir);
 
-ULONG cdecl distance(LONG argcnt, ULONG x1, ULONG y1, ULONG x2, ULONG y2);
-ULONG cdecl seek_direction(LONG argcnt, ULONG obj_x, ULONG obj_y, ULONG
-	dest_x, ULONG dest_y);
+uint32 distance(int32 argcnt, uint32 x1, uint32 y1, uint32 x2, uint32 y2);
+uint32 seek_direction(int32 argcnt, uint32 obj_x, uint32 obj_y, uint32
+	dest_x, uint32 dest_y);
 
-ULONG cdecl spell_request(LONG argcnt, BYTE *stat, BYTE *cnt, ULONG typ, ULONG num);
-ULONG cdecl spell_list(LONG argcnt, BYTE *cnt, ULONG typ, ULONG lvl, BYTE *list,
-	ULONG max);
-void cdecl magic_field(LONG argcnt, ULONG p, ULONG redfield, ULONG yelfield,
-	LONG sparkle);
-void cdecl do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
-	LONG scale, LONG power, LONG dots, LONG life, LONG upval, BYTE *colors);
-void cdecl do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
-	LONG grav, LONG life, LONG colors);
+uint32 spell_request(int32 argcnt, BYTE *stat, BYTE *cnt, uint32 typ, uint32 num);
+uint32 spell_list(int32 argcnt, BYTE *cnt, uint32 typ, uint32 lvl, BYTE *list,
+	uint32 max);
+void magic_field(int32 argcnt, uint32 p, uint32 redfield, uint32 yelfield,
+	int32 sparkle);
+void do_dots(int32 argcnt, int32 view, int32 scrn, int32 exp_x, int32 exp_y,
+	int32 scale, int32 power, int32 dots, int32 life, int32 upval, BYTE *colors);
+void do_ice(int32 argcnt, int32 view, int32 scrn, int32 dots, int32 mag,
+	int32 grav, int32 life, int32 colors);
 
-void cdecl read_save_directory(void);
-BYTE *cdecl savegame_title(LONG argcnt, ULONG num);
-void cdecl write_save_directory(void);
+void read_save_directory(void);
+BYTE *savegame_title(int32 argcnt, uint32 num);
+void write_save_directory(void);
 
-ULONG cdecl save_game(LONG argcnt, ULONG slotnum, ULONG lvlnum);
-void cdecl suspend_game(LONG argcnt, ULONG cur_lvl);
-void cdecl resume_items(LONG argcnt, ULONG first, ULONG last, ULONG restoring);
-void cdecl resume_level(LONG argcnt, ULONG cur_lvl);
-void cdecl change_level(LONG argcnt, ULONG old_lvl, ULONG new_lvl);
-void cdecl restore_items(LONG argcnt, ULONG slotnum);
-void cdecl restore_level_objects(LONG argcnt, ULONG slotnum, ULONG lvlnum);
-void cdecl read_initial_items(void);
-void cdecl write_initial_tempfiles(void);
-void cdecl create_initial_binary_files(void);
-void cdecl launch(LONG argcnt, BYTE *dirname, BYTE *prgname, BYTE *argn1,
+uint32 save_game(int32 argcnt, uint32 slotnum, uint32 lvlnum);
+void suspend_game(int32 argcnt, uint32 cur_lvl);
+void resume_items(int32 argcnt, uint32 first, uint32 last, uint32 restoring);
+void resume_level(int32 argcnt, uint32 cur_lvl);
+void change_level(int32 argcnt, uint32 old_lvl, uint32 new_lvl);
+void restore_items(int32 argcnt, uint32 slotnum);
+void restore_level_objects(int32 argcnt, uint32 slotnum, uint32 lvlnum);
+void read_initial_items(void);
+void write_initial_tempfiles(void);
+void create_initial_binary_files(void);
+void launch(int32 argcnt, BYTE *dirname, BYTE *prgname, BYTE *argn1,
 	BYTE *argn2);
 
-void *cdecl open_transfer_file(LONG argcnt, BYTE *filename);
-void cdecl close_transfer_file(void);
-LONG cdecl player_attrib(LONG argcnt, ULONG plrnum, ULONG offset, ULONG size);
-LONG cdecl item_attrib(LONG argcnt, ULONG plrnum, ULONG invslot, ULONG attrib);
-LONG cdecl arrow_count(LONG argcnt, ULONG plrnum);
+void *open_transfer_file(int32 argcnt, BYTE *filename);
+void close_transfer_file(void);
+int32 player_attrib(int32 argcnt, uint32 plrnum, uint32 offset, uint32 size);
+int32 item_attrib(int32 argcnt, uint32 plrnum, uint32 invslot, uint32 attrib);
+int32 arrow_count(int32 argcnt, uint32 plrnum);
 
-//typedef void (cdecl *FARPROC)();
+//typedef void (*FARPROC)();
 #define code_resources FARPROC code_resources[] =
 #define PROCDEF (FARPROC)
 

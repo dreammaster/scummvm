@@ -29,7 +29,7 @@ namespace Aesop {
 //
 
 #ifdef __HIGHC__
-#define cdecl _CC(_REVERSE_PARMS | _NEAR_CALL)
+#define _CC(_REVERSE_PARMS | _NEAR_CALL)
 #pragma Global_aliasing_convention("_%r");
 #pragma Align_members(1)
 
@@ -106,7 +106,7 @@ typedef struct
 {
    unsigned pack_type;
    unsigned sample_rate;
-   void far *sel_data;
+   void *sel_data;
    unsigned seg_data;
    unsigned len;
 }
@@ -124,19 +124,19 @@ extern "C" {
 /*                  */
 /********************/
 
-void cdecl AIL_startup(void);
-void cdecl AIL_shutdown(char *signoff_msg);
-HTIMER cdecl AIL_register_timer(void *callback_fn);
-void cdecl AIL_set_timer_period(HTIMER timer, unsigned long microseconds);
-void cdecl AIL_set_timer_frequency(HTIMER timer, unsigned long hertz);
-void cdecl AIL_set_timer_divisor(HTIMER timer, unsigned PIT_divisor);
-unsigned cdecl AIL_interrupt_divisor(void);
-void cdecl AIL_start_timer(HTIMER timer);
-void cdecl AIL_start_all_timers(void);
-void cdecl AIL_stop_timer(HTIMER timer);
-void cdecl AIL_stop_all_timers(void);
-void cdecl AIL_release_timer_handle(HTIMER timer);
-void cdecl AIL_release_all_timers(void);
+void AIL_startup(void);
+void AIL_shutdown(char *signoff_msg);
+HTIMER AIL_register_timer(void *callback_fn);
+void AIL_set_timer_period(HTIMER timer, unsigned long microseconds);
+void AIL_set_timer_frequency(HTIMER timer, unsigned long hertz);
+void AIL_set_timer_divisor(HTIMER timer, unsigned PIT_divisor);
+unsigned AIL_interrupt_divisor(void);
+void AIL_start_timer(HTIMER timer);
+void AIL_start_all_timers(void);
+void AIL_stop_timer(HTIMER timer);
+void AIL_stop_all_timers(void);
+void AIL_release_timer_handle(HTIMER timer);
+void AIL_release_all_timers(void);
 
 /*************************/
 /*                       */
@@ -144,14 +144,14 @@ void cdecl AIL_release_all_timers(void);
 /*                       */
 /*************************/
 
-HDRIVER cdecl AIL_register_driver(void *driver_base_addr);
-void cdecl AIL_release_driver_handle(HDRIVER driver);
-drvr_desc * cdecl AIL_describe_driver(HDRIVER driver);
-unsigned cdecl AIL_detect_device(HDRIVER driver, unsigned IO_addr, 
+HDRIVER AIL_register_driver(void *driver_base_addr);
+void AIL_release_driver_handle(HDRIVER driver);
+drvr_desc * AIL_describe_driver(HDRIVER driver);
+unsigned AIL_detect_device(HDRIVER driver, unsigned IO_addr, 
     unsigned IRQ, unsigned DMA, unsigned DRQ);
-void cdecl AIL_init_driver(HDRIVER driver, unsigned IO_addr, 
+void AIL_init_driver(HDRIVER driver, unsigned IO_addr, 
     unsigned IRQ, unsigned DMA, unsigned DRQ);
-void cdecl AIL_shutdown_driver(HDRIVER driver, char *signoff_msg);
+void AIL_shutdown_driver(HDRIVER driver, char *signoff_msg);
                     
 /********************************/
 /*                              */
@@ -161,38 +161,38 @@ void cdecl AIL_shutdown_driver(HDRIVER driver, char *signoff_msg);
 
 #ifdef __HIGHC__           /* MetaWare uses different far pointer format */
 
-unsigned cdecl AIL_index_VOC_block(HDRIVER driver, _Far void *VOC_sel, 
+unsigned AIL_index_VOC_block(HDRIVER driver, _Far void *VOC_sel, 
    unsigned VOC_seg, unsigned block_marker, sound_buff *buff);
-void cdecl AIL_format_VOC_file(HDRIVER driver, _Far void *VOC_sel, int
+void AIL_format_VOC_file(HDRIVER driver, _Far void *VOC_sel, int
    block_marker);
-void cdecl AIL_play_VOC_file(HDRIVER driver, _Far void *VOC_sel,
+void AIL_play_VOC_file(HDRIVER driver, _Far void *VOC_sel,
    unsigned VOC_seg, int block_marker);
 
 #else
 
-unsigned cdecl AIL_index_VOC_block(HDRIVER driver, void far *VOC_sel, 
+unsigned AIL_index_VOC_block(HDRIVER driver, void *VOC_sel, 
    unsigned VOC_seg, unsigned block_marker, sound_buff *buff);
-void cdecl AIL_format_VOC_file(HDRIVER driver, void far *VOC_sel, int
+void AIL_format_VOC_file(HDRIVER driver, void *VOC_sel, int
    block_marker);
-void cdecl AIL_play_VOC_file(HDRIVER driver, void far *VOC_sel,
+void AIL_play_VOC_file(HDRIVER driver, void *VOC_sel,
    unsigned VOC_seg, int block_marker);
 
 #endif
 
-void cdecl AIL_register_sound_buffer(HDRIVER driver, unsigned buffer_num,
+void AIL_register_sound_buffer(HDRIVER driver, unsigned buffer_num,
    sound_buff *buff);
-void cdecl AIL_format_sound_buffer(HDRIVER driver, sound_buff *buff);
-unsigned cdecl AIL_sound_buffer_status(HDRIVER driver, unsigned buffer_num);
-unsigned cdecl AIL_VOC_playback_status(HDRIVER driver);
+void AIL_format_sound_buffer(HDRIVER driver, sound_buff *buff);
+unsigned AIL_sound_buffer_status(HDRIVER driver, unsigned buffer_num);
+unsigned AIL_VOC_playback_status(HDRIVER driver);
 
-void cdecl AIL_start_digital_playback(HDRIVER driver);
-void cdecl AIL_stop_digital_playback(HDRIVER driver);
-void cdecl AIL_pause_digital_playback(HDRIVER driver);
-void cdecl AIL_resume_digital_playback(HDRIVER driver);
-void cdecl AIL_set_digital_playback_volume(HDRIVER driver, unsigned volume);
-unsigned cdecl AIL_digital_playback_volume(HDRIVER driver);
-void cdecl AIL_set_digital_playback_panpot(HDRIVER driver, unsigned panpot);
-unsigned cdecl AIL_digital_playback_panpot(HDRIVER driver);
+void AIL_start_digital_playback(HDRIVER driver);
+void AIL_stop_digital_playback(HDRIVER driver);
+void AIL_pause_digital_playback(HDRIVER driver);
+void AIL_resume_digital_playback(HDRIVER driver);
+void AIL_set_digital_playback_volume(HDRIVER driver, unsigned volume);
+unsigned AIL_digital_playback_volume(HDRIVER driver);
+void AIL_set_digital_playback_panpot(HDRIVER driver, unsigned panpot);
+unsigned AIL_digital_playback_panpot(HDRIVER driver);
 
 /******************************/
 /*                            */
@@ -200,58 +200,58 @@ unsigned cdecl AIL_digital_playback_panpot(HDRIVER driver);
 /*                            */
 /******************************/
 
-unsigned cdecl AIL_state_table_size(HDRIVER driver);
-HSEQUENCE cdecl AIL_register_sequence(HDRIVER driver, void *FORM_XMID,
+unsigned AIL_state_table_size(HDRIVER driver);
+HSEQUENCE AIL_register_sequence(HDRIVER driver, void *FORM_XMID,
    unsigned sequence_num, void *state_table, void *controller_table);
-void cdecl AIL_release_sequence_handle(HDRIVER driver, HSEQUENCE sequence);
+void AIL_release_sequence_handle(HDRIVER driver, HSEQUENCE sequence);
 
-unsigned cdecl AIL_default_timbre_cache_size(HDRIVER driver);
-void cdecl AIL_define_timbre_cache(HDRIVER driver, void *cache_addr,
+unsigned AIL_default_timbre_cache_size(HDRIVER driver);
+void AIL_define_timbre_cache(HDRIVER driver, void *cache_addr,
    unsigned cache_size);                     
-unsigned cdecl AIL_timbre_request(HDRIVER driver, HSEQUENCE sequence);
-unsigned cdecl AIL_timbre_status(HDRIVER driver, int bank, int patch);
-void cdecl AIL_install_timbre(HDRIVER driver, int bank, int patch, 
+unsigned AIL_timbre_request(HDRIVER driver, HSEQUENCE sequence);
+unsigned AIL_timbre_status(HDRIVER driver, int bank, int patch);
+void AIL_install_timbre(HDRIVER driver, int bank, int patch, 
    void *src_addr);
-void cdecl AIL_protect_timbre(HDRIVER driver, int bank, int patch);
-void cdecl AIL_unprotect_timbre(HDRIVER driver, int bank, int patch);
+void AIL_protect_timbre(HDRIVER driver, int bank, int patch);
+void AIL_unprotect_timbre(HDRIVER driver, int bank, int patch);
 
-void cdecl AIL_start_sequence(HDRIVER driver, HSEQUENCE sequence);
-void cdecl AIL_stop_sequence(HDRIVER driver, HSEQUENCE sequence);
-void cdecl AIL_resume_sequence(HDRIVER driver, HSEQUENCE sequence);
-unsigned cdecl AIL_sequence_status(HDRIVER driver, HSEQUENCE sequence);
-unsigned cdecl AIL_relative_volume(HDRIVER driver, HSEQUENCE sequence);
-unsigned cdecl AIL_relative_tempo(HDRIVER driver, HSEQUENCE sequence);
-void cdecl AIL_set_relative_volume(HDRIVER driver, HSEQUENCE sequence,
+void AIL_start_sequence(HDRIVER driver, HSEQUENCE sequence);
+void AIL_stop_sequence(HDRIVER driver, HSEQUENCE sequence);
+void AIL_resume_sequence(HDRIVER driver, HSEQUENCE sequence);
+unsigned AIL_sequence_status(HDRIVER driver, HSEQUENCE sequence);
+unsigned AIL_relative_volume(HDRIVER driver, HSEQUENCE sequence);
+unsigned AIL_relative_tempo(HDRIVER driver, HSEQUENCE sequence);
+void AIL_set_relative_volume(HDRIVER driver, HSEQUENCE sequence,
    unsigned percent, unsigned milliseconds);
-void cdecl AIL_set_relative_tempo(HDRIVER driver, HSEQUENCE sequence,
+void AIL_set_relative_tempo(HDRIVER driver, HSEQUENCE sequence,
    unsigned percent, unsigned milliseconds);
-int cdecl AIL_controller_value(HDRIVER driver, HSEQUENCE sequence,
+int AIL_controller_value(HDRIVER driver, HSEQUENCE sequence,
    unsigned channel, unsigned controller_num);
-void cdecl AIL_set_controller_value(HDRIVER driver, HSEQUENCE sequence,
+void AIL_set_controller_value(HDRIVER driver, HSEQUENCE sequence,
    unsigned channel, unsigned controller_num, unsigned value);
-unsigned cdecl AIL_channel_notes(HDRIVER driver, HSEQUENCE sequence,
+unsigned AIL_channel_notes(HDRIVER driver, HSEQUENCE sequence,
    unsigned channel);
-unsigned cdecl AIL_beat_count(HDRIVER driver, HSEQUENCE sequence);
-unsigned cdecl AIL_measure_count(HDRIVER driver, HSEQUENCE sequence);
-void cdecl AIL_branch_index(HDRIVER driver, HSEQUENCE sequence, 
+unsigned AIL_beat_count(HDRIVER driver, HSEQUENCE sequence);
+unsigned AIL_measure_count(HDRIVER driver, HSEQUENCE sequence);
+void AIL_branch_index(HDRIVER driver, HSEQUENCE sequence, 
    unsigned marker_number);
 
-void cdecl AIL_send_channel_voice_message(HDRIVER driver, unsigned status, 
+void AIL_send_channel_voice_message(HDRIVER driver, unsigned status, 
    unsigned data_1, unsigned data_2);
-void cdecl AIL_send_sysex_message(HDRIVER driver, unsigned addr_a, 
+void AIL_send_sysex_message(HDRIVER driver, unsigned addr_a, 
    unsigned addr_b, unsigned addr_c, void *data, unsigned size, 
    unsigned delay);
-void cdecl AIL_write_display(HDRIVER driver, char *string);
-void cdecl AIL_install_callback(HDRIVER driver, 
+void AIL_write_display(HDRIVER driver, char *string);
+void AIL_install_callback(HDRIVER driver, 
    void *callback_fn);
-void cdecl AIL_cancel_callback(HDRIVER driver);
+void AIL_cancel_callback(HDRIVER driver);
 
-unsigned cdecl AIL_lock_channel(HDRIVER driver);
-void cdecl AIL_map_sequence_channel(HDRIVER driver, HSEQUENCE sequence,
+unsigned AIL_lock_channel(HDRIVER driver);
+void AIL_map_sequence_channel(HDRIVER driver, HSEQUENCE sequence,
    unsigned sequence_channel, unsigned physical_channel);
-unsigned cdecl AIL_true_sequence_channel(HDRIVER driver, HSEQUENCE sequence,
+unsigned AIL_true_sequence_channel(HDRIVER driver, HSEQUENCE sequence,
    unsigned sequence_channel);
-void cdecl AIL_release_channel(HDRIVER driver, unsigned channel);
+void AIL_release_channel(HDRIVER driver, unsigned channel);
 
 #ifdef __cplusplus
 }

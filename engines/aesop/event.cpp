@@ -31,17 +31,17 @@
 
 namespace Aesop {
 
-LONG ENABLED;
+int32 ENABLED;
 
 NREQ NR_list[NR_LSIZE];
-LONG NR_first[NUM_EVTYPES];
+int32 NR_first[NUM_EVTYPES];
 
-LONG current_event_type;
+int32 current_event_type;
 
 EVENT EV_queue[EV_QSIZE];
 
-ULONG EV_head;
-ULONG EV_tail;
+uint32 EV_head;
+uint32 EV_tail;
 
 static char *strs[] = { "SYS_FREE",
 					   "SYS_TIMER",
@@ -90,9 +90,9 @@ void DISABLE(void) {
 //
 /*********************************************************/
 
-LONG match_parameter(LONG event_type, LONG event_parameter,
-	LONG test_parameter) {
-	LONG match;
+int32 match_parameter(int32 event_type, int32 event_parameter,
+	int32 test_parameter) {
+	int32 match;
 
 	if (event_type == SYS_FREE)
 		return 0;
@@ -115,8 +115,8 @@ LONG match_parameter(LONG event_type, LONG event_parameter,
 
 
 /*********************************************************/
-void cdecl init_notify_list(void) {
-	ULONG i;
+void init_notify_list(void) {
+	uint32 i;
 
 	DISABLE();
 
@@ -144,9 +144,9 @@ void cdecl init_notify_list(void) {
 //
 /*********************************************************/
 
-void cdecl add_notify_request(LONG client, LONG message, LONG event, LONG
+void add_notify_request(int32 client, int32 message, int32 event, int32
 	parameter) {
-	LONG i, nxt, cur;
+	int32 i, nxt, cur;
 	NREQ *NR;
 
 	DISABLE();
@@ -206,12 +206,12 @@ void cdecl add_notify_request(LONG client, LONG message, LONG event, LONG
 //
 /*********************************************************/
 
-void cdecl delete_notify_request(LONG client, LONG message, LONG event,
-	LONG parameter) {
-	LONG nxt, cur, prev;
-	LONG fnxt, fcur;
+void delete_notify_request(int32 client, int32 message, int32 event,
+	int32 parameter) {
+	int32 nxt, cur, prev;
+	int32 fnxt, fcur;
 	NREQ *NR;
-	LONG all_events;
+	int32 all_events;
 
 	DISABLE();
 
@@ -278,9 +278,9 @@ void cdecl delete_notify_request(LONG client, LONG message, LONG event,
 //
 /*********************************************************/
 
-void cdecl cancel_entity_requests(LONG client) {
-	LONG event, nxt, cur, prev;
-	LONG fnxt, fcur;
+void cancel_entity_requests(int32 client) {
+	int32 event, nxt, cur, prev;
+	int32 fnxt, fcur;
 	NREQ *NR;
 
 	DISABLE();
@@ -336,14 +336,14 @@ void cdecl cancel_entity_requests(LONG client) {
 }
 
 /*********************************************************/
-void cdecl init_event_queue(void) {
+void init_event_queue(void) {
 	EV_head = 0;
 	EV_tail = 0;
 }
 
 /*********************************************************/
-EVENT *cdecl find_event(LONG type, LONG parameter) {
-	ULONG t;
+EVENT *find_event(int32 type, int32 parameter) {
+	uint32 t;
 	EVENT *EV;
 
 	DISABLE();
@@ -369,8 +369,8 @@ EVENT *cdecl find_event(LONG type, LONG parameter) {
 }
 
 /*********************************************************/
-void cdecl remove_event(LONG type, LONG parameter, LONG owner) {
-	ULONG t;
+void remove_event(int32 type, int32 parameter, int32 owner) {
+	uint32 t;
 	EVENT *EV;
 
 	DISABLE();
@@ -394,7 +394,7 @@ void cdecl remove_event(LONG type, LONG parameter, LONG owner) {
 }
 
 /*********************************************************/
-void cdecl add_event(LONG type, LONG parameter, LONG owner) {
+void add_event(int32 type, int32 parameter, int32 owner) {
 	DISABLE();
 
 	EV_queue[EV_head].type = type;
@@ -410,7 +410,7 @@ void cdecl add_event(LONG type, LONG parameter, LONG owner) {
 }
 
 /*********************************************************/
-EVENT *cdecl next_event(void) {
+EVENT *next_event(void) {
 	EVENT *EV;
 
 	DISABLE();
@@ -425,7 +425,7 @@ EVENT *cdecl next_event(void) {
 }
 
 /*********************************************************/
-EVENT *cdecl fetch_event(void) {
+EVENT *fetch_event(void) {
 	EVENT *EV;
 
 	DISABLE();
@@ -443,9 +443,9 @@ EVENT *cdecl fetch_event(void) {
 }
 
 /*********************************************************/
-EVENT *cdecl scan_event_range(LONG first_type, LONG last_type) {
+EVENT *scan_event_range(int32 first_type, int32 last_type) {
 	EVENT *EV;
-	ULONG t;
+	uint32 t;
 
 	DISABLE();
 
@@ -468,7 +468,7 @@ EVENT *cdecl scan_event_range(LONG first_type, LONG last_type) {
 }
 
 /*********************************************************/
-void cdecl dump_event_queue(void) {
+void dump_event_queue(void) {
 	EVENT *e;
 
 	while ((e = fetch_event()) != NULL)
@@ -486,8 +486,8 @@ void cdecl dump_event_queue(void) {
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl notify(LONG argcnt, ULONG index, ULONG message, LONG event,
-	LONG parameter)
+void notify(int32 argcnt, uint32 index, uint32 message, int32 event,
+	int32 parameter)
 #pragma on (unreferenced)
 {
 	add_notify_request(index, message, event, parameter);
@@ -500,8 +500,8 @@ void cdecl notify(LONG argcnt, ULONG index, ULONG message, LONG event,
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl cancel(LONG argcnt, ULONG index, ULONG message, LONG event,
-	LONG parameter)
+void cancel(int32 argcnt, uint32 index, uint32 message, int32 event,
+	int32 parameter)
 #pragma on (unreferenced)
 {
 	delete_notify_request(index, message, event, parameter);
@@ -513,7 +513,7 @@ void cdecl cancel(LONG argcnt, ULONG index, ULONG message, LONG event,
 //
 /*********************************************************/
 
-ULONG cdecl peek_event(void) {
+uint32 peek_event(void) {
 	EVENT *EV;
 
 	PollMod();
@@ -551,17 +551,17 @@ ULONG cdecl peek_event(void) {
 //
 /*********************************************************/
 
-void cdecl dispatch_event(void) {
+void dispatch_event(void) {
 	EVENT *EV;
 	NREQ *NR;
-	LONG nxt;
-	LONG typ;
-	LONG par;
-	LONG own;
+	int32 nxt;
+	int32 typ;
+	int32 par;
+	int32 own;
 	static struct
 	{
-		LONG parameter;
-		LONG owner;
+		int32 parameter;
+		int32 owner;
 	}
 	event_message_descriptor;
 
@@ -581,7 +581,7 @@ void cdecl dispatch_event(void) {
 		(typ <= LAST_SYS_EVENT) &&
 		(scan_event_range(FIRST_APP_EVENT, LAST_APP_EVENT) != NULL))
 	{
-		add_event((LONG)typ, (LONG)par, (LONG)own);
+		add_event((int32)typ, (int32)par, (int32)own);
 		return;
 	}
 
@@ -600,12 +600,12 @@ void cdecl dispatch_event(void) {
 		if (NR->client == -1)              break;
 		if (typ != current_event_type)     break;
 
-		if (match_parameter((LONG)typ, (LONG)par, (LONG)NR->parameter))
+		if (match_parameter((int32)typ, (int32)par, (int32)NR->parameter))
 		{
 			RT_arguments(&event_message_descriptor,
 				sizeof(event_message_descriptor));
 
-			RT_execute((LONG)NR->client, (LONG)NR->message, -1U);
+			RT_execute((int32)NR->client, (int32)NR->message, -1U);
 		}
 	}
 }
@@ -616,7 +616,7 @@ void cdecl dispatch_event(void) {
 //
 /*********************************************************/
 
-void cdecl drain_event_queue(void) {
+void drain_event_queue(void) {
 	while (peek_event()) dispatch_event();
 }
 
@@ -628,7 +628,7 @@ void cdecl drain_event_queue(void) {
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl post_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
+void post_event(int32 argcnt, uint32 owner, int32 event, int32 parameter)
 #pragma on (unreferenced)
 {
 	add_event(event, parameter, owner);
@@ -642,7 +642,7 @@ void cdecl post_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl send_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
+void send_event(int32 argcnt, uint32 owner, int32 event, int32 parameter)
 #pragma on (unreferenced)
 {
 	add_event(event, parameter, owner);
@@ -657,7 +657,7 @@ void cdecl send_event(LONG argcnt, ULONG owner, LONG event, LONG parameter)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl flush_event_queue(LONG argcnt, LONG owner, LONG event, LONG parameter)
+void flush_event_queue(int32 argcnt, int32 owner, int32 event, int32 parameter)
 #pragma on (unreferenced)
 {
 	remove_event(event, parameter, owner);
@@ -672,8 +672,8 @@ void cdecl flush_event_queue(LONG argcnt, LONG owner, LONG event, LONG parameter
 //
 /*********************************************************/
 
-void cdecl flush_input_events(void) {
-	LONG i;
+void flush_input_events(void) {
+	int32 i;
 
 	for (i = FIRST_INPUT_EVENT; i <= LAST_INPUT_EVENT; i++)
 		remove_event(i, -1, -1);

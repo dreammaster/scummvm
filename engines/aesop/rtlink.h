@@ -28,8 +28,8 @@ namespace Aesop {
 extern "C" {
 #endif
 
-	HRES cdecl create_instance(RTR_class *RTR, ULONG object);
-	void cdecl destroy_instance(RTR_class *RTR, HRES instance);
+	HRES create_instance(RTR_class *RTR, uint32 object);
+	void destroy_instance(RTR_class *RTR, HRES instance);
 
 #ifdef __cplusplus
 }

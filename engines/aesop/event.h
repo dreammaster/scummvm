@@ -37,47 +37,47 @@ extern "C" {
 
 typedef struct NREQ
 {
-   LONG  next;
-   LONG  prev;
-   LONG  client;
-   ULONG message;
-   LONG  parameter;
-   LONG  status;
+   int32  next;
+   int32  prev;
+   int32  client;
+   uint32 message;
+   int32  parameter;
+   int32  status;
 }
 NREQ;                            // notification request list entry
 
 typedef struct
 {
-   LONG type;
-   LONG owner;
-   LONG parameter;
+   int32 type;
+   int32 owner;
+   int32 parameter;
 }
 EVENT;
 
-extern LONG ENABLED;
+extern int32 ENABLED;
 
 extern NREQ NR_list[NR_LSIZE];
-extern LONG NR_first[NUM_EVTYPES];
+extern int32 NR_first[NUM_EVTYPES];
 
-extern LONG current_event_type;
+extern int32 current_event_type;
 
 //
 // Internal calls
 //
 
-void cdecl init_notify_list(void);
-void cdecl add_notify_request(LONG client, LONG message, LONG event, LONG
+void init_notify_list(void);
+void add_notify_request(int32 client, int32 message, int32 event, int32
    parameter);
-void cdecl delete_notify_request(LONG client, LONG message, LONG event,
-   LONG parameter);
-void cdecl cancel_entity_requests(LONG client);
-void cdecl init_event_queue(void);
-EVENT *cdecl find_event(LONG type, LONG parameter);
-void cdecl remove_event(LONG type, LONG parameter, LONG owner);
-void cdecl add_event(LONG type, LONG parameter, LONG owner);
-EVENT *cdecl next_event(void);
-EVENT *cdecl fetch_event(void);
-void cdecl dump_event_queue(void);
+void delete_notify_request(int32 client, int32 message, int32 event,
+   int32 parameter);
+void cancel_entity_requests(int32 client);
+void init_event_queue(void);
+EVENT *find_event(int32 type, int32 parameter);
+void remove_event(int32 type, int32 parameter, int32 owner);
+void add_event(int32 type, int32 parameter, int32 owner);
+EVENT *next_event(void);
+EVENT *fetch_event(void);
+void dump_event_queue(void);
 
 void DISABLE(void);
 void ENABLE(void);
@@ -86,16 +86,16 @@ void ENABLE(void);
 // AESOP code resource calls
 //
 
-void cdecl notify(LONG argcnt, ULONG index, ULONG message, LONG event,
-   LONG parameter);
-void cdecl cancel(LONG argcnt, ULONG index, ULONG message, LONG event,
-   LONG parameter);
-void cdecl drain_event_queue(void);
-void cdecl post_event(LONG argcnt, ULONG owner, LONG event, LONG parameter);
-void cdecl send_event(LONG argcnt, ULONG owner, LONG event, LONG parameter);
-ULONG cdecl peek_event(void);
-void cdecl dispatch_event(void);
-void cdecl flush_event_queue(LONG argcnt, LONG owner, LONG event, LONG parameter);
+void notify(int32 argcnt, uint32 index, uint32 message, int32 event,
+   int32 parameter);
+void cancel(int32 argcnt, uint32 index, uint32 message, int32 event,
+   int32 parameter);
+void drain_event_queue(void);
+void post_event(int32 argcnt, uint32 owner, int32 event, int32 parameter);
+void send_event(int32 argcnt, uint32 owner, int32 event, int32 parameter);
+uint32 peek_event(void);
+void dispatch_event(void);
+void flush_event_queue(int32 argcnt, int32 owner, int32 event, int32 parameter);
 
 #ifdef __cplusplus
 }

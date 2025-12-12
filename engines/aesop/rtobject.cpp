@@ -33,7 +33,7 @@
 
 namespace Aesop {
 
-extern ULONG check_on;
+extern uint32 check_on;
 
 //
 // objlist:  List of handles to all entities in "universe"
@@ -56,8 +56,8 @@ static BYTE name[256];
 //
 /***************************************************/
 
-void cdecl init_object_list(void) {
-	LONG i;
+void init_object_list(void) {
+	int32 i;
 
 	for (i = 0; i < NUM_OBJECTS; i++)
 		objlist[i] = -1;
@@ -70,8 +70,8 @@ void cdecl init_object_list(void) {
 //
 /***************************************************/
 
-LONG cdecl find_free_entry(LONG min, LONG end) {
-	LONG i;
+int32 find_free_entry(int32 min, int32 end) {
+	int32 i;
 
 	for (i = min; i < end; i++)
 		if (objlist[i] == -1U)
@@ -89,7 +89,7 @@ LONG cdecl find_free_entry(LONG min, LONG end) {
 //
 /***************************************************/
 
-void cdecl create_SOP_instance(ULONG name, LONG index) {
+void create_SOP_instance(uint32 name, int32 index) {
 	objlist[index] = create_instance(RTR, name);
 
 	RT_execute(index, MSG_CREATE, -1U);
@@ -104,10 +104,10 @@ void cdecl create_SOP_instance(ULONG name, LONG index) {
 /***************************************************/
 
 #pragma off (unreferenced)
-LONG cdecl create_object(LONG argcnt, ULONG name)
+int32 create_object(int32 argcnt, uint32 name)
 #pragma on (unreferenced)
 {
-	LONG index;
+	int32 index;
 
 	index = find_free_entry(0, NUM_ENTITIES);
 
@@ -127,7 +127,7 @@ LONG cdecl create_object(LONG argcnt, ULONG name)
 /***************************************************/
 
 #pragma off (unreferenced)
-LONG cdecl create_program(LONG argcnt, LONG index, ULONG name)
+int32 create_program(int32 argcnt, int32 index, uint32 name)
 #pragma on (unreferenced)
 {
 	if (index == -1)
@@ -149,10 +149,10 @@ LONG cdecl create_program(LONG argcnt, LONG index, ULONG name)
 /***************************************************/
 
 #pragma off (unreferenced)
-LONG cdecl destroy_object(LONG argcnt, LONG index)
+int32 destroy_object(int32 argcnt, int32 index)
 #pragma on (unreferenced)
 {
-	LONG rtn;
+	int32 rtn;
 
 	rtn = RT_execute(index, MSG_DESTROY, -1U);
 
@@ -172,8 +172,8 @@ LONG cdecl destroy_object(LONG argcnt, LONG index)
 //
 /***************************************************/
 
-void cdecl thrash_cache(void) {
-	LONG i, handles[50];
+void thrash_cache(void) {
+	int32 i, handles[50];
 
 	for (i = 0; i < 3; i++)
 	{
@@ -193,7 +193,7 @@ void cdecl thrash_cache(void) {
 /***************************************************/
 
 #pragma off (unreferenced)
-ULONG cdecl flush_cache(LONG argcnt, ULONG goal)
+uint32 flush_cache(int32 argcnt, uint32 goal)
 #pragma on (unreferenced)
 {
 	return RTR_force_discard(RTR, goal);
@@ -205,9 +205,9 @@ ULONG cdecl flush_cache(LONG argcnt, ULONG goal)
 //
 /***************************************************/
 
-void cdecl dump_static_context(ULONG index, TF_class *TF) {
-	LONG i;
-	ULONG n, p, offset, asize;
+void dump_static_context(uint32 index, TF_class *TF) {
+	int32 i;
+	uint32 n, p, offset, asize;
 	HRES instance, thunk, expt;
 	void *tptr;
 	SD_entry *SD;
@@ -297,7 +297,7 @@ void cdecl dump_static_context(ULONG index, TF_class *TF) {
 				{
 				case 'B': ltoa(*(BYTE *)d, (char *)val, 10); d = add_ptr(d, 1L); break;
 				case 'W': ltoa(*(WORD *)d, (char *)val, 10); d = add_ptr(d, 2L); break;
-				case 'L': ltoa(*(LONG *)d, (char *)val, 10); d = add_ptr(d, 4L); break;
+				case 'L': ltoa(*(int32 *)d, (char *)val, 10); d = add_ptr(d, 4L); break;
 				}
 
 				strcat((char *)linbuf, (char *)val);
@@ -331,10 +331,10 @@ void cdecl dump_static_context(ULONG index, TF_class *TF) {
 /***************************************************/
 
 #pragma off (unreferenced)
-LONG cdecl readln(TF_class *TF, BYTE *buffer, LONG maxlen)
+int32 readln(TF_class *TF, BYTE *buffer, int32 maxlen)
 #pragma on (unreferenced)
 {
-	LONG status;
+	int32 status;
 
 	do
 		status = TF_readln(TF, linbuf, sizeof(linbuf));
@@ -351,7 +351,7 @@ LONG cdecl readln(TF_class *TF, BYTE *buffer, LONG maxlen)
 //
 /***************************************************/
 
-CDESC *cdecl read_context_descriptor(TF_class *TF) {
+CDESC *read_context_descriptor(TF_class *TF) {
 	static CDESC c;
 	HRES HROED;
 	BYTE *num;
@@ -369,7 +369,7 @@ CDESC *cdecl read_context_descriptor(TF_class *TF) {
 	name = (BYTE *)strchr((char *)num, '"');
 	if (name == NULL)
 	{
-		c.name = (ULONG)-1L;
+		c.name = (uint32)-1L;
 		return &c;
 	}
 
@@ -397,8 +397,8 @@ CDESC *cdecl read_context_descriptor(TF_class *TF) {
 //
 /***************************************************/
 
-void cdecl restore_static_context(HRES instance, TF_class *TF) {
-	ULONG n, i, p, offset, asize;
+void restore_static_context(HRES instance, TF_class *TF) {
+	uint32 n, i, p, offset, asize;
 	HRES thunk, expt;
 	void *d, *tptr;
 	SD_entry *SD;
@@ -466,7 +466,7 @@ void cdecl restore_static_context(HRES instance, TF_class *TF) {
 			if (def == NULL)
 				abend(MSG_UVR, name);       //"Unresolved variable reference '%s'"
 
-			d = (void *)((ULONG)RTR_addr(instance) + ascnum(def) + offset);
+			d = (void *)((uint32)RTR_addr(instance) + ascnum(def) + offset);
 
 			if ((size = (BYTE *)strchr((char *)def, ',')) != NULL)
 				asize = ascnum(size + 1);
@@ -504,7 +504,7 @@ void cdecl restore_static_context(HRES instance, TF_class *TF) {
 				{
 				case 'B': *(BYTE *)d = (BYTE)ascnum(chrpnt); break;
 				case 'W': *(WORD *)d = (WORD)ascnum(chrpnt); break;
-				case 'L': *(LONG *)d = (LONG)ascnum(chrpnt); break;
+				case 'L': *(int32 *)d = (int32)ascnum(chrpnt); break;
 				}
 
 				if (n != asize - 1)
@@ -532,8 +532,8 @@ void cdecl restore_static_context(HRES instance, TF_class *TF) {
 //
 /*********************************************************/
 
-LONG cdecl save_range(BYTE *filename, LONG filetype, LONG first, LONG last) {
-	LONG good, index;
+int32 save_range(BYTE *filename, int32 filetype, int32 first, int32 last) {
+	int32 good, index;
 	UBYTE typetest;
 	int handle;
 	TF_class *TF;
@@ -579,7 +579,7 @@ LONG cdecl save_range(BYTE *filename, LONG filetype, LONG first, LONG last) {
 			instance = objlist[index];
 			if (instance == -1U)
 			{
-				CD.name = (ULONG)-1L;
+				CD.name = (uint32)-1L;
 				CD.size = 0;
 			} else
 			{
@@ -644,9 +644,9 @@ LONG cdecl save_range(BYTE *filename, LONG filetype, LONG first, LONG last) {
 //
 /*********************************************************/
 
-void cdecl restore_range(BYTE *filename, ULONG first, ULONG last, ULONG restoring) {
-	ULONG bad, txttype;
-	ULONG index;
+void restore_range(BYTE *filename, uint32 first, uint32 last, uint32 restoring) {
+	uint32 bad, txttype;
+	uint32 index;
 	UBYTE typetest;
 	int handle;
 	TF_class *TF;
@@ -656,7 +656,7 @@ void cdecl restore_range(BYTE *filename, ULONG first, ULONG last, ULONG restorin
 	CDESC *CD;
 
 	UWORD CDslot;       // object list index
-	ULONG CDname;       // code object name
+	uint32 CDname;       // code object name
 	UWORD CDsize;       // size of instance data (unused in text files)
 
 	txttype = 0;
@@ -708,7 +708,7 @@ void cdecl restore_range(BYTE *filename, ULONG first, ULONG last, ULONG restorin
 		CDname = CD->name;
 		CDsize = CD->size;
 
-		if (CD->name == (ULONG)-1L)
+		if (CD->name == (uint32)-1L)
 		{
 			if (cur != -1)
 			{
@@ -784,13 +784,13 @@ void cdecl restore_range(BYTE *filename, ULONG first, ULONG last, ULONG restorin
 //
 /*********************************************************/
 
-void cdecl translate_file(BYTE *TXT_filename, BYTE *BIN_filename, ULONG first,
-	ULONG last) {
+void translate_file(BYTE *TXT_filename, BYTE *BIN_filename, uint32 first,
+	uint32 last) {
 	TF_class *TF;
 	CDESC *CD;
 	CDESC CD_out;
 	int handle;
-	LONG index;
+	int32 index;
 	HRES instance, thunk;
 	void *tptr;
 	THDR thdr;
@@ -817,7 +817,7 @@ void cdecl translate_file(BYTE *TXT_filename, BYTE *BIN_filename, ULONG first,
 		CD_out.name = CD->name;
 		CD_out.slot = index;
 
-		if (CD->name != (ULONG)-1L)
+		if (CD->name != (uint32)-1L)
 		{
 			instance = create_instance(RTR, CD->name);
 

@@ -77,7 +77,7 @@ namespace Aesop {
 RTR_class *RTR;
 
 HRES HROED;
-ULONG heap_size;
+uint32 heap_size;
 
 BYTE *pathname;
 
@@ -85,9 +85,9 @@ BYTE *pathname;
 void main(int argc, char *argv[]) {
 	BYTE RES_name[256];
 	BYTE code_name[256];
-	ULONG i;
-	ULONG code;
-	LONG rtn;
+	uint32 i;
+	uint32 code;
+	int32 rtn;
 
 	pathname = (BYTE *)argv[0];
 
@@ -146,15 +146,15 @@ void main(int argc, char *argv[]) {
 	code = ascnum(RTD_lookup(HROED, code_name));
 	RTR_unlock(HROED);
 
-	if (code == (ULONG)-1L)
+	if (code == (uint32)-1L)
 		abend(MSG_SPNF);
 
-	rtn = create_program(1, bootstrap, (ULONG)code);
+	rtn = create_program(1, bootstrap, (uint32)code);
 	rtn = destroy_object(1, rtn);
 
 	for (i = 0; i < RTR->nentries; i++)
 	{
-		ULONG f;
+		uint32 f;
 
 		f = RTR->dir[i].flags;
 

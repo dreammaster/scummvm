@@ -36,10 +36,10 @@ extern UWORD in_GIL;
 
 #define NTW 32                   // # of text windows available
 
-void cdecl dprint(LONG argcnt, BYTE *format, ...);
-void cdecl sprint(LONG argcnt, ULONG wndnum, BYTE *format, ...);
-void cdecl text_color(LONG argcnt, ULONG wndnum, ULONG current, ULONG new);
-void cdecl release_owned_windows(LONG owner);
+void dprint(int32 argcnt, BYTE *format, ...);
+void sprint(int32 argcnt, uint32 wndnum, BYTE *format, ...);
+void text_color(int32 argcnt, uint32 wndnum, uint32 current, uint32 new);
+void release_owned_windows(int32 owner);
 
 #ifdef __cplusplus
 }

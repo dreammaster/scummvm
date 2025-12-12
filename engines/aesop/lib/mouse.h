@@ -39,20 +39,20 @@ extern "C" {
 
 #define MAX_MOUSE_BUFFER_SIZE 16384
 
-extern LONG MOUSE_init(LONG xsize, LONG ysize, LONG background);
+extern int32 MOUSE_init(int32 xsize, int32 ysize, int32 background);
 extern void MOUSE_shutdown(void);
 
 extern void MOUSE_show(void);
 extern void MOUSE_hide(void);
-extern void MOUSE_set_pointer(void *table, LONG shape);
-extern void MOUSE_status(LONG *mx, LONG *my, LONG *ml, LONG *mr, LONG *mc);
-extern void MOUSE_force_move(LONG new_x, LONG new_y);
+extern void MOUSE_set_pointer(void *table, int32 shape);
+extern void MOUSE_status(int32 *mx, int32 *my, int32 *ml, int32 *mr, int32 *mc);
+extern void MOUSE_force_move(int32 new_x, int32 new_y);
 
-extern void MOUSE_register_mouse_event_callback(void cdecl (*fn)
-   (LONG x, LONG y));
-extern void MOUSE_register_button_event_callback(void cdecl (*fn)
-   (LONG left, LONG right, LONG center));
-extern void MOUSE_register_watchdog_callback(LONG cdecl (*fn)
+extern void MOUSE_register_mouse_event_callback(void (*fn)
+   (int32 x, int32 y));
+extern void MOUSE_register_button_event_callback(void (*fn)
+   (int32 left, int32 right, int32 center));
+extern void MOUSE_register_watchdog_callback(int32 (*fn)
    (RECT *area));
 
 extern void MOUSE_lock(void);
@@ -60,15 +60,15 @@ extern void MOUSE_unlock(void);
 extern void MOUSE_hold(void);
 extern void MOUSE_release(void);
 
-extern LONG MOUSE_visible_area(RECT *area);
-extern LONG MOUSE_shape_in_area(RECT *area);
+extern int32 MOUSE_visible_area(RECT *area);
+extern int32 MOUSE_shape_in_area(RECT *area);
 
-extern void __cdecl MOUSE_serve(void);
+extern void __MOUSE_serve(void);
 
-extern void MOUSE_window_refresh(WINDOW *target, LONG x0, LONG y0, 
-   LONG x1, LONG y1);
-extern void MOUSE_pane_refresh(PANE *target, LONG x0, LONG y0, 
-   LONG x1, LONG y1);
+extern void MOUSE_window_refresh(WINDOW *target, int32 x0, int32 y0, 
+   int32 x1, int32 y1);
+extern void MOUSE_pane_refresh(PANE *target, int32 x0, int32 y0, 
+   int32 x1, int32 y1);
 
 extern void MOUSE_pane_list_refresh(PANE_LIST *list);
 

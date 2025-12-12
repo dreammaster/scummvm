@@ -37,8 +37,8 @@ extern "C" {
 		WORD p;
 		WORD file;
 		WORD mode;
-		LONG len;
-		LONG pos;
+		int32 len;
+		int32 pos;
 	}
 	TF_class;
 
@@ -63,51 +63,51 @@ extern "C" {
 // General file management
 //
 
-	WORD cdecl copy_file(BYTE *src_filename, BYTE *dest_filename);
-	WORD cdecl delete_file(BYTE *filename);
-	ULONG cdecl file_time(BYTE *filename);
+	WORD copy_file(BYTE *src_filename, BYTE *dest_filename);
+	WORD delete_file(BYTE *filename);
+	uint32 file_time(BYTE *filename);
 
 	//
 	// Text file management
 	//
 
-	TF_class *cdecl TF_construct(BYTE *filename, WORD oflag);
-	WORD cdecl TF_destroy(TF_class *TF);
-	WORD cdecl TF_wchar(TF_class *TF, BYTE ch);
-	BYTE cdecl TF_rchar(TF_class *TF);
-	WORD cdecl TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen);
-	WORD cdecl TF_writeln(TF_class *TF, BYTE *buffer);
+	TF_class *TF_construct(BYTE *filename, WORD oflag);
+	WORD TF_destroy(TF_class *TF);
+	WORD TF_wchar(TF_class *TF, BYTE ch);
+	BYTE TF_rchar(TF_class *TF);
+	WORD TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen);
+	WORD TF_writeln(TF_class *TF, BYTE *buffer);
 
 	//
 	// Binary file management
 	//
 
-	LONG file_size(BYTE *filename);
-	BYTE *cdecl read_file(BYTE *filename, void *dest);
-	WORD cdecl write_file(BYTE *filename, void *buf, ULONG len);
-	WORD cdecl append_file(BYTE *filename, void *buf, ULONG len);
+	int32 file_size(BYTE *filename);
+	BYTE *read_file(BYTE *filename, void *dest);
+	WORD write_file(BYTE *filename, void *buf, uint32 len);
+	WORD append_file(BYTE *filename, void *buf, uint32 len);
 
 	//
 	// Memory heap management
 	//
 
-	void cdecl mem_init(void);
-	void cdecl mem_shutdown(void);
-	ULONG cdecl mem_avail(void);
-	void *cdecl mem_alloc(ULONG bytes);
-	BYTE *cdecl str_alloc(BYTE *string);
-	void cdecl mem_free(void *ptr);
-	ULONG cdecl mem_headroom(void);
+	void mem_init(void);
+	void mem_shutdown(void);
+	uint32 mem_avail(void);
+	void *mem_alloc(uint32 bytes);
+	BYTE *str_alloc(BYTE *string);
+	void mem_free(void *ptr);
+	uint32 mem_headroom(void);
 
 	//
 	// Misc. routines
 	//
 
-	LONG cdecl ascnum(BYTE *string);
-	void cdecl opcode_fault(void *PC, void *stk);
-	void cdecl abend(char *msg, ...);
-	void cdecl curpos(WORD *x, WORD *y);
-	void cdecl locate(WORD x, WORD y);
+	int32 ascnum(BYTE *string);
+	void opcode_fault(void *PC, void *stk);
+	void abend(char *msg, ...);
+	void curpos(WORD *x, WORD *y);
+	void locate(WORD x, WORD y);
 
 #ifdef __cplusplus
 }

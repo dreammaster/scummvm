@@ -40,71 +40,71 @@ namespace Aesop {
 
 typedef struct
 {
-	LONG window;
-	LONG htab, vtab;
+	int32 window;
+	int32 htab, vtab;
 	FONT *font;
-	LONG delay;
-	LONG(*continueFunction)();
+	int32 delay;
+	int32(*continueFunction)();
 	char *txtbuf;
 	char *txtpnt;
-	LONG justify;
+	int32 justify;
 	UBYTE lookaside[256];
 }
 TEXTWINDOW;
 
-LONG cdecl GIL2VFX_char_width(LONG ch);
-void cdecl GIL2VFX_print(LONG operation, const char *format, ...);
-void cdecl GIL2VFX_print_buffer(LONG linenum);
+int32 GIL2VFX_char_width(int32 ch);
+void GIL2VFX_print(int32 operation, const char *format, ...);
+void GIL2VFX_print_buffer(int32 linenum);
 
-void GIL2VFX_copy_window(ULONG src, ULONG dst);
-LONG GIL2VFX_assign_window(LONG x1, LONG y1, LONG x2, LONG y2);
-void GIL2VFX_release_window(ULONG wnd);
-void GIL2VFX_wipe_window(LONG wnd, LONG color);
-void GIL2VFX_refresh_window(ULONG source, ULONG target);
+void GIL2VFX_copy_window(uint32 src, uint32 dst);
+int32 GIL2VFX_assign_window(int32 x1, int32 y1, int32 x2, int32 y2);
+void GIL2VFX_release_window(uint32 wnd);
+void GIL2VFX_wipe_window(int32 wnd, int32 color);
+void GIL2VFX_refresh_window(uint32 source, uint32 target);
 
-LONG GIL2VFX_assign_subwindow(ULONG wnd, LONG x1, LONG y1, LONG x2, LONG y2);
-void GIL2VFX_release_subwindow(ULONG wnd);
+int32 GIL2VFX_assign_subwindow(uint32 wnd, int32 x1, int32 y1, int32 x2, int32 y2);
+void GIL2VFX_release_subwindow(uint32 wnd);
 
-LONG GIL2VFX_get_x1(ULONG wnd);
-LONG GIL2VFX_get_y1(ULONG wnd);
-LONG GIL2VFX_get_x2(ULONG wnd);
-LONG GIL2VFX_get_y2(ULONG wnd);
-void GIL2VFX_set_x1(ULONG wnd, LONG val);
-void GIL2VFX_set_y1(ULONG wnd, LONG val);
-void GIL2VFX_set_x2(ULONG wnd, LONG val);
-void GIL2VFX_set_y2(ULONG wnd, LONG val);
+int32 GIL2VFX_get_x1(uint32 wnd);
+int32 GIL2VFX_get_y1(uint32 wnd);
+int32 GIL2VFX_get_x2(uint32 wnd);
+int32 GIL2VFX_get_y2(uint32 wnd);
+void GIL2VFX_set_x1(uint32 wnd, int32 val);
+void GIL2VFX_set_y1(uint32 wnd, int32 val);
+void GIL2VFX_set_x2(uint32 wnd, int32 val);
+void GIL2VFX_set_y2(uint32 wnd, int32 val);
 
 
 void GIL2VFX_init();
 void GIL2VFX_shutdown_driver();
 
-LONG GIL2VFX_get_bitmap_width(void *shape_table, LONG shape_num);
-LONG GIL2VFX_get_bitmap_height(void *shape_table, LONG shape_num);
-LONG GIL2VFX_visible_bitmap_rect(LONG x1, LONG y1, LONG mirror,
-	UBYTE *shapes, LONG shape_num, WORD *bounds);
-void GIL2VFX_draw_bitmap(LONG wnd, LONG x, LONG y, LONG mirror, LONG scale,
-	UBYTE *fade_table, UBYTE *shapes, LONG shape_num);
+int32 GIL2VFX_get_bitmap_width(void *shape_table, int32 shape_num);
+int32 GIL2VFX_get_bitmap_height(void *shape_table, int32 shape_num);
+int32 GIL2VFX_visible_bitmap_rect(int32 x1, int32 y1, int32 mirror,
+	UBYTE *shapes, int32 shape_num, WORD *bounds);
+void GIL2VFX_draw_bitmap(int32 wnd, int32 x, int32 y, int32 mirror, int32 scale,
+	UBYTE *fade_table, UBYTE *shapes, int32 shape_num);
 
-void GIL2VFX_draw_dot(LONG wnd, LONG x, LONG y, LONG color);
-LONG GIL2VFX_read_dot(LONG wnd, LONG x, LONG y);
-void GIL2VFX_draw_line(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2,
-	LONG color);
-void GIL2VFX_draw_rect(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2, LONG color);
-void GIL2VFX_fill_rect(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2, LONG color);
-void GIL2VFX_hash_rect(LONG wnd, LONG x1, LONG y1, LONG x2, LONG y2, LONG color);
+void GIL2VFX_draw_dot(int32 wnd, int32 x, int32 y, int32 color);
+int32 GIL2VFX_read_dot(int32 wnd, int32 x, int32 y);
+void GIL2VFX_draw_line(int32 wnd, int32 x1, int32 y1, int32 x2, int32 y2,
+	int32 color);
+void GIL2VFX_draw_rect(int32 wnd, int32 x1, int32 y1, int32 x2, int32 y2, int32 color);
+void GIL2VFX_fill_rect(int32 wnd, int32 x1, int32 y1, int32 x2, int32 y2, int32 color);
+void GIL2VFX_hash_rect(int32 wnd, int32 x1, int32 y1, int32 x2, int32 y2, int32 color);
 
-void GIL2VFX_light_fade(LONG src_wnd, LONG color);
-void GIL2VFX_color_fade(LONG src_wnd, LONG dst_wnd);
-void GIL2VFX_pixel_fade(LONG src_wnd, LONG dest_wnd, LONG intervals);
+void GIL2VFX_light_fade(int32 src_wnd, int32 color);
+void GIL2VFX_color_fade(int32 src_wnd, int32 dst_wnd);
+void GIL2VFX_pixel_fade(int32 src_wnd, int32 dest_wnd, int32 intervals);
 
 void GIL2VFX_select_text_window(TEXTWINDOW *tw);
-LONG cdecl GIL2VFX_char_width(LONG ch);
+int32 GIL2VFX_char_width(int32 ch);
 void GIL2VFX_home(void);
-void GIL2VFX_remap_font_color(LONG current, LONG new);
-LONG GIL2VFX_test_overlap(LONG wnd, LONG x1, LONG y1, UBYTE *shapes, LONG shape_num);
-void cdecl GIL2VFX_print(LONG operation, const char *format, ...);
-void cdecl GIL2VFX_scroll_window(LONG wnd, LONG dx, LONG dy, LONG flags, LONG background);
-void cdecl GIL2VFX_print_buffer(LONG linenum);
-void cdecl GIL2VFX_cout(LONG c);
+void GIL2VFX_remap_font_color(int32 current, int32 new);
+int32 GIL2VFX_test_overlap(int32 wnd, int32 x1, int32 y1, UBYTE *shapes, int32 shape_num);
+void GIL2VFX_print(int32 operation, const char *format, ...);
+void GIL2VFX_scroll_window(int32 wnd, int32 dx, int32 dy, int32 flags, int32 background);
+void GIL2VFX_print_buffer(int32 linenum);
+void GIL2VFX_cout(int32 c);
 
 } // namespace Aesop

@@ -89,7 +89,7 @@ namespace Aesop {
 #define S_SPELL98   44
 
 #ifndef __AESOP__
-void cdecl shutdown_sound(void);
+void shutdown_sound(void);
 #endif
 
 } // namespace Aesop

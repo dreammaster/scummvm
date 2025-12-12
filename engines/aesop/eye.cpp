@@ -69,7 +69,7 @@ extern BYTE txtbuf[2400]; // used as dot buffer -- needs 8 * MAXDOTS words
 
 /*********************************************************/
 #pragma off (unreferenced)
-LONG cdecl step_X(LONG argcnt, ULONG x, ULONG fdir, ULONG mtype, ULONG distance)
+int32 step_X(int32 argcnt, uint32 x, uint32 fdir, uint32 mtype, uint32 distance)
 #pragma on (unreferenced)
 {
    BYTE xx = (BYTE) x;
@@ -101,7 +101,7 @@ LONG cdecl step_X(LONG argcnt, ULONG x, ULONG fdir, ULONG mtype, ULONG distance)
 }
 
 #pragma off (unreferenced)
-LONG cdecl step_Y(LONG argcnt, ULONG y, ULONG fdir, ULONG mtype, ULONG distance)
+int32 step_Y(int32 argcnt, uint32 y, uint32 fdir, uint32 mtype, uint32 distance)
 #pragma on (unreferenced)
 {
    BYTE yy = (BYTE) y;
@@ -133,7 +133,7 @@ LONG cdecl step_Y(LONG argcnt, ULONG y, ULONG fdir, ULONG mtype, ULONG distance)
 }
 
 #pragma off (unreferenced)
-ULONG cdecl step_FDIR(LONG argcnt, ULONG fdir, ULONG mtype)
+uint32 step_FDIR(int32 argcnt, uint32 fdir, uint32 mtype)
 #pragma on (unreferenced)
 {
    UBYTE f = (UBYTE) fdir;
@@ -141,18 +141,18 @@ ULONG cdecl step_FDIR(LONG argcnt, ULONG fdir, ULONG mtype)
    switch (mtype)
       {
       case MTYP_TL:
-         return (f) ? (ULONG) f-1L : 3L;
+         return (f) ? (uint32) f-1L : 3L;
 
       case MTYP_TR:
-         return (f==3) ? 0L : (ULONG) f+1L;
+         return (f==3) ? 0L : (uint32) f+1L;
       }
 
-   return (ULONG) f;
+   return (uint32) f;
 }
 
 /*********************************************************/
 #pragma off (unreferenced)
-LONG cdecl step_square_X(LONG argcnt, ULONG x, ULONG r, ULONG dir)
+int32 step_square_X(int32 argcnt, uint32 x, uint32 r, uint32 dir)
 #pragma on (unreferenced)
 {
    switch (dir)
@@ -165,7 +165,7 @@ LONG cdecl step_square_X(LONG argcnt, ULONG x, ULONG r, ULONG dir)
 }
                                                 
 #pragma off (unreferenced)
-LONG cdecl step_square_Y(LONG argcnt, ULONG y, ULONG r, ULONG dir)
+int32 step_square_Y(int32 argcnt, uint32 y, uint32 r, uint32 dir)
 #pragma on (unreferenced)
 {
    switch (dir)
@@ -178,7 +178,7 @@ LONG cdecl step_square_Y(LONG argcnt, ULONG y, ULONG r, ULONG dir)
 }
 
 #pragma off (unreferenced)
-LONG cdecl step_region(LONG argcnt, ULONG r, ULONG dir)
+int32 step_region(int32 argcnt, uint32 r, uint32 dir)
 #pragma on (unreferenced)
 {
    switch (dir)
@@ -195,11 +195,11 @@ LONG cdecl step_region(LONG argcnt, ULONG r, ULONG dir)
 
 /*********************************************************/
 #pragma off (unreferenced)
-ULONG cdecl distance(LONG argcnt, ULONG x1, ULONG y1, ULONG x2, ULONG y2)
+uint32 distance(int32 argcnt, uint32 x1, uint32 y1, uint32 x2, uint32 y2)
 #pragma on (unreferenced)
 {
-   ULONG dx,dy,root;
-   LONG num;
+   uint32 dx,dy,root;
+   int32 num;
    static WORD square_root[32] =
       {
         0,1,4,9,16,25,36,49,64,81,100,121,144,169,196,225,256,
@@ -213,7 +213,7 @@ ULONG cdecl distance(LONG argcnt, ULONG x1, ULONG y1, ULONG x2, ULONG y2)
 
    for (root=0;root<31;root++)
       {
-      if ( ((LONG) square_root[root]) >= num) break;
+      if ( ((int32) square_root[root]) >= num) break;
       }
 
    return root;
@@ -234,11 +234,11 @@ ULONG cdecl distance(LONG argcnt, ULONG x1, ULONG y1, ULONG x2, ULONG y2)
 /*********************************************************/
 
 #pragma off (unreferenced)
-ULONG cdecl seek_direction(LONG argcnt, ULONG cur_x, ULONG cur_y, ULONG
-                           dest_x, ULONG dest_y)
+uint32 seek_direction(int32 argcnt, uint32 cur_x, uint32 cur_y, uint32
+                           dest_x, uint32 dest_y)
 #pragma on (unreferenced)
 {
-   LONG dx,dy;
+   int32 dx,dy;
 
    dx = dest_x - cur_x;
    dy = dest_y - cur_y;
@@ -285,10 +285,10 @@ ULONG cdecl seek_direction(LONG argcnt, ULONG cur_x, ULONG cur_y, ULONG
 /*********************************************************/
 
 #pragma off (unreferenced)
-ULONG cdecl spell_request(LONG argcnt, BYTE *stat, BYTE *cnt, ULONG typ, ULONG num)
+uint32 spell_request(int32 argcnt, BYTE *stat, BYTE *cnt, uint32 typ, uint32 num)
 #pragma on (unreferenced)
 {
-   ULONG i,toff;
+   uint32 i,toff;
    int n,h; // // LUM changed to int (original BYTE) lead to a warning in on condition below
 
    toff = typ ? 110:10;
@@ -319,11 +319,11 @@ ULONG cdecl spell_request(LONG argcnt, BYTE *stat, BYTE *cnt, ULONG typ, ULONG n
 /*********************************************************/
 
 #pragma off (unreferenced)
-ULONG cdecl spell_list(LONG argcnt, BYTE *cnt, ULONG typ, ULONG lvl, BYTE *list,
-                       ULONG max)
+uint32 spell_list(int32 argcnt, BYTE *cnt, uint32 typ, uint32 lvl, BYTE *list,
+                       uint32 max)
 #pragma on (unreferenced)
 {
-   ULONG i,l,num;
+   uint32 i,l,num;
    int m,n,j;  // LUM changed to int (original BYTE) lead to a warning in on condition below
 
    l = (10 * (lvl-1));
@@ -360,8 +360,8 @@ ULONG cdecl spell_list(LONG argcnt, BYTE *cnt, ULONG typ, ULONG lvl, BYTE *list,
 /*=========================================================================*/
 
 #pragma off (unreferenced)
-void cdecl magic_field(LONG argcnt, ULONG p, ULONG redfield, ULONG yelfield,
-                       LONG sparkle)
+void magic_field(int32 argcnt, uint32 p, uint32 redfield, uint32 yelfield,
+                       int32 sparkle)
 #pragma on (unreferenced)
 {
         static UBYTE _x[]={8,80};
@@ -444,7 +444,7 @@ void cdecl magic_field(LONG argcnt, ULONG p, ULONG redfield, ULONG yelfield,
 /*                              WORD bottom y                                                                                                                                   */
 /*      RETURNS:        none                                                                                                                                                            */
 /*=========================================================================*/
-LONG cdecl Coord_In_Region(LONG x,LONG y,LONG x1,LONG y1,LONG x2,LONG y2)
+int32 Coord_In_Region(int32 x,int32 y,int32 x1,int32 y1,int32 x2,int32 y2)
 {
         if ((x<x1)||(x>x2)) return(0);  /* if it exceeds x bound then false     */
         if ((y<y1)||(y>y2)) return(0);  /* if it exceeds y bound then false     */
@@ -458,8 +458,8 @@ LONG cdecl Coord_In_Region(LONG x,LONG y,LONG x1,LONG y1,LONG x2,LONG y2)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
-   LONG scale, LONG power, LONG dots, LONG life, LONG upval, BYTE *colors)
+void do_dots(int32 argcnt, int32 view, int32 scrn, int32 exp_x, int32 exp_y,
+   int32 scale, int32 power, int32 dots, int32 life, int32 upval, BYTE *colors)
 #pragma on (unreferenced)
 {
         static WORD _floor[]=
@@ -579,8 +579,8 @@ void cdecl do_dots(LONG argcnt, LONG view, LONG scrn, LONG exp_x, LONG exp_y,
 /*=========================================================================*/
 
 #pragma off (unreferenced)
-void cdecl do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag, 
-   LONG grav, LONG life, BYTE *colors)
+void do_ice(int32 argcnt, int32 view, int32 scrn, int32 dots, int32 mag, 
+   int32 grav, int32 life, BYTE *colors)
 #pragma on (unreferenced)
 {
         WORD i,pixcol,active,cx,cy,px,py,mask,count;
@@ -735,9 +735,9 @@ void cdecl do_ice(LONG argcnt, LONG view, LONG scrn, LONG dots, LONG mag,
 //
 /*********************************************************/
 
-void cdecl read_save_directory(void)
+void read_save_directory(void)
 {
-   LONG i;
+   int32 i;
    TF_class *TF;
 
    TF = TF_construct(SAVEDIR_FN,TF_READ);
@@ -759,7 +759,7 @@ void cdecl read_save_directory(void)
 /*********************************************************/
 
 #pragma off (unreferenced)
-BYTE *cdecl savegame_title(LONG argcnt, ULONG num)
+BYTE *savegame_title(int32 argcnt, uint32 num)
 #pragma on (unreferenced)
 {
    return savegame_dir[num];
@@ -773,7 +773,7 @@ BYTE *cdecl savegame_title(LONG argcnt, ULONG num)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl set_savegame_title(LONG argcnt, BYTE *string, ULONG num)
+void set_savegame_title(int32 argcnt, BYTE *string, uint32 num)
 #pragma on (unreferenced)
 {
    strcpy(savegame_dir[num],string);
@@ -785,9 +785,9 @@ void cdecl set_savegame_title(LONG argcnt, BYTE *string, ULONG num)
 //
 /*********************************************************/
 
-void cdecl write_save_directory(void)
+void write_save_directory(void)
 {
-   LONG i;
+   int32 i;
    TF_class *TF;
 
    TF = TF_construct(SAVEDIR_FN,TF_WRITE);
@@ -808,7 +808,7 @@ void cdecl write_save_directory(void)
 //
 /*********************************************************/
 
-void cdecl set_save_slotnum(ULONG slot)
+void set_save_slotnum(uint32 slot)
 {
    BYTE num[3];
 
@@ -830,7 +830,7 @@ void cdecl set_save_slotnum(ULONG slot)
 //
 /*********************************************************/
 
-void cdecl set_save_lvlnum(ULONG lvl)
+void set_save_lvlnum(uint32 lvl)
 {
    BYTE num[3];
 
@@ -849,9 +849,9 @@ void cdecl set_save_lvlnum(ULONG lvl)
 //
 /*********************************************************/
 
-void cdecl remove_temporary_save_files(void)
+void remove_temporary_save_files(void)
 {
-   LONG lvl;
+   int32 lvl;
 
    for (lvl = 1;lvl <= NUM_LEVELS;lvl++)
       {
@@ -870,10 +870,10 @@ void cdecl remove_temporary_save_files(void)
 /*********************************************************/
 
 #pragma off (unreferenced)
-ULONG cdecl save_game(LONG argcnt, ULONG slotnum, ULONG lvlnum)
+uint32 save_game(int32 argcnt, uint32 slotnum, uint32 lvlnum)
 #pragma on (unreferenced)
 {
-   ULONG lvl;
+   uint32 lvl;
 
    if (slotnum == 0)
       abend(MSG_IASS0);
@@ -912,7 +912,7 @@ ULONG cdecl save_game(LONG argcnt, ULONG slotnum, ULONG lvlnum)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl suspend_game(LONG argcnt, ULONG cur_lvl)
+void suspend_game(int32 argcnt, uint32 cur_lvl)
 #pragma on (unreferenced)
 {
    if (!save_range(itm_tmp,SAVETYPE,FIRST_ITEM,LAST_ITEM))
@@ -936,7 +936,7 @@ void cdecl suspend_game(LONG argcnt, ULONG cur_lvl)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl resume_level(LONG argcnt, ULONG cur_lvl)
+void resume_level(int32 argcnt, uint32 cur_lvl)
 #pragma on (unreferenced)
 {
    set_save_lvlnum(cur_lvl);
@@ -961,7 +961,7 @@ void cdecl resume_level(LONG argcnt, ULONG cur_lvl)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl resume_items(LONG argcnt, ULONG first, ULONG last, ULONG restoring)
+void resume_items(int32 argcnt, uint32 first, uint32 last, uint32 restoring)
 #pragma on (unreferenced)
 {
    release_owned_windows(-1);
@@ -983,7 +983,7 @@ void cdecl resume_items(LONG argcnt, ULONG first, ULONG last, ULONG restoring)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl change_level(LONG argcnt, ULONG old_lvl, ULONG new_lvl)
+void change_level(int32 argcnt, uint32 old_lvl, uint32 new_lvl)
 #pragma on (unreferenced)
 {
    set_save_lvlnum(old_lvl);
@@ -1013,7 +1013,7 @@ void cdecl change_level(LONG argcnt, ULONG old_lvl, ULONG new_lvl)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl restore_items(LONG argcnt, ULONG slotnum)
+void restore_items(int32 argcnt, uint32 slotnum)
 #pragma on (unreferenced)
 {
    set_save_slotnum(slotnum);
@@ -1038,10 +1038,10 @@ void cdecl restore_items(LONG argcnt, ULONG slotnum)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl restore_level_objects(LONG argcnt, ULONG slotnum, ULONG lvlnum)
+void restore_level_objects(int32 argcnt, uint32 slotnum, uint32 lvlnum)
 #pragma on (unreferenced)
 {
-   ULONG lvl;
+   uint32 lvl;
 
    set_save_slotnum(slotnum);
    set_save_lvlnum(lvlnum);
@@ -1071,7 +1071,7 @@ void cdecl restore_level_objects(LONG argcnt, ULONG slotnum, ULONG lvlnum)
 //
 /*********************************************************/
 
-void cdecl read_initial_items(void)
+void read_initial_items(void)
 {
    set_save_slotnum(0);
 
@@ -1089,9 +1089,9 @@ void cdecl read_initial_items(void)
 //
 /*********************************************************/
 
-void cdecl write_initial_tempfiles(void)
+void write_initial_tempfiles(void)
 {
-   ULONG lvl;
+   uint32 lvl;
 
    if (!save_range(itm_tmp,SAVETYPE /* SF_TXT */,FIRST_ITEM,LAST_ITEM))
       abend(MSG_CNSI);
@@ -1113,9 +1113,9 @@ void cdecl write_initial_tempfiles(void)
 //
 /*********************************************************/
 
-void cdecl create_initial_binary_files(void)
+void create_initial_binary_files(void)
 {
-   ULONG lvl;
+   uint32 lvl;
 
    set_save_slotnum(0);
 
@@ -1154,7 +1154,7 @@ void cdecl create_initial_binary_files(void)
 /*********************************************************/
 
 #pragma off (unreferenced)
-void cdecl launch(LONG argcnt, BYTE *dirname, BYTE *prgname, BYTE *argn1,
+void launch(int32 argcnt, BYTE *dirname, BYTE *prgname, BYTE *argn1,
    BYTE *argn2)
 #pragma on (unreferenced)
 {

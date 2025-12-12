@@ -63,44 +63,44 @@ typedef struct
 {
    void *seg;                    // pointer to resource data
 
-   ULONG size;                   // size of resource in bytes
-   ULONG flags;                  // DA_ flags
-   ULONG history;                // LRU counter value
-   ULONG locks;                  // locking depth
-   ULONG user;                   // .RES file offset or instance object name
+   uint32 size;                   // size of resource in bytes
+   uint32 flags;                  // DA_ flags
+   uint32 history;                // LRU counter value
+   uint32 locks;                  // locking depth
+   uint32 user;                   // .RES file offset or instance object name
 }
 HD_entry;                        // cached resource entry descriptor
 
 typedef struct
 {
    BYTE  signature[16];
-   ULONG file_size;
-   ULONG lost_space;
-   ULONG FOB;
-   ULONG create_time;
-   ULONG modify_time;
+   uint32 file_size;
+   uint32 lost_space;
+   uint32 FOB;
+   uint32 create_time;
+   uint32 modify_time;
 }
 RF_file_hdr;                     // resource file header
 
 typedef struct
 {
-   ULONG timestamp;
-   ULONG data_attrib;
-   ULONG data_size;
+   uint32 timestamp;
+   uint32 data_attrib;
+   uint32 data_size;
 }
 RF_entry_hdr;                    // resource file entry header
 
 typedef struct OD_block
 {
-   ULONG next;
+   uint32 next;
    UBYTE flags[OD_SIZE];
-   ULONG index[OD_SIZE];
+   uint32 index[OD_SIZE];
 }
 OD_block;
 
 typedef struct                   // name directory entry
 {                                
-   ULONG OE;                     // public
+   uint32 OE;                     // public
    HRES thunk;                   // public
    HRES handle;                  // public
 }
@@ -115,12 +115,12 @@ typedef struct
    RF_file_hdr RFH;              
    RF_entry_hdr REH;             
    OD_block OD;                  
-   ULONG cur_blk;              
+   uint32 cur_blk;              
 
    UWORD LRU_cnt;                    
    void *base;
    void *next_M;                 
-   ULONG free;                   
+   uint32 free;                   
    void *last_F;
 
    HRES name_dir;
@@ -133,7 +133,7 @@ RTR_class;
 // (See comments in RTRES.C)
 //
 
-#define RTR_addr(x) ((void *) (* (ULONG *) (x)))
+#define RTR_addr(x) ((void *) (* (uint32 *) (x)))
 
 //
 // RTR_member macro allows access to HD_entry structure members
@@ -148,38 +148,38 @@ RTR_class;
 extern RTR_class *LNK;
 extern RTR_class *RTR;
 
-RTR_class *cdecl RTR_construct(void *base, ULONG size, ULONG nnames, BYTE *filename);
-void cdecl RTR_destroy(RTR_class *RTR, ULONG flags);
+RTR_class *RTR_construct(void *base, uint32 size, uint32 nnames, BYTE *filename);
+void RTR_destroy(RTR_class *RTR, uint32 flags);
 
-ULONG cdecl RTR_force_discard(RTR_class *RTR, ULONG goal);
+uint32 RTR_force_discard(RTR_class *RTR, uint32 goal);
 
-HRES cdecl RTR_alloc(RTR_class *RTR, ULONG bytes, ULONG attrib);
-void cdecl RTR_free(RTR_class *RTR, HRES entry);
+HRES RTR_alloc(RTR_class *RTR, uint32 bytes, uint32 attrib);
+void RTR_free(RTR_class *RTR, HRES entry);
 
-void cdecl RTR_lock(RTR_class *RTR, HRES entry);
-void cdecl RTR_unlock(HRES entry);
+void RTR_lock(RTR_class *RTR, HRES entry);
+void RTR_unlock(HRES entry);
 
-ULONG cdecl RTR_size(HRES entry);
+uint32 RTR_size(HRES entry);
 
-HRES cdecl RTR_get_resource_handle(RTR_class *RTR, ULONG resource, ULONG attrib);
-void cdecl RTR_free_resource(RTR_class *RTR, ULONG resource);
+HRES RTR_get_resource_handle(RTR_class *RTR, uint32 resource, uint32 attrib);
+void RTR_free_resource(RTR_class *RTR, uint32 resource);
 
-HRES cdecl RTR_load_resource(RTR_class *RTR, ULONG resource, ULONG attrib);
-void cdecl RTR_read_resource(RTR_class *RTR, void *dest, ULONG len);
-ULONG cdecl RTR_seek(RTR_class *RTR, ULONG rnum);
+HRES RTR_load_resource(RTR_class *RTR, uint32 resource, uint32 attrib);
+void RTR_read_resource(RTR_class *RTR, void *dest, uint32 len);
+uint32 RTR_seek(RTR_class *RTR, uint32 rnum);
 
 #ifndef RTR_addr
-void *cdecl RTR_addr(HRES entry);
+void *RTR_addr(HRES entry);
 #endif
-void cdecl RTR_fixup(void **ptr, HRES entry);
+void RTR_fixup(void **ptr, HRES entry);
 
-ND_entry *cdecl RTR_search_name_dir(RTR_class *RTR, ULONG resource);
+ND_entry *RTR_search_name_dir(RTR_class *RTR, uint32 resource);
 
-BYTE *cdecl ASCII_name(ULONG name);
-void cdecl RTR_dump(RTR_class *RTR);
+BYTE *ASCII_name(uint32 name);
+void RTR_dump(RTR_class *RTR);
 
-void cdecl RTR_HRES_chksum(BYTE *situation);
-ULONG cdecl RTR_chksum(HRES entry);
+void RTR_HRES_chksum(BYTE *situation);
+uint32 RTR_chksum(HRES entry);
 
 #ifdef __cplusplus
 }
