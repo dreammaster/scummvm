@@ -22,6 +22,8 @@
 #ifndef AESOP_LIB_DLL_H
 #define AESOP_LIB_DLL_H
 
+#include "aesop/defs.h"
+
 namespace Aesop {
 
 //
@@ -46,18 +48,6 @@ namespace Aesop {
 
 #endif
 
-#ifndef TYPEDEFS
-#define TYPEDEFS
-
-typedef unsigned char  UBYTE;
-typedef unsigned short UWORD;
-typedef unsigned long  uint32;
-typedef char  BYTE;
-typedef short WORD;
-typedef long  int32;
-
-#endif
-
 //
 // DLL loader flags & functions
 //
@@ -75,10 +65,10 @@ void * DLL_load(void *source, uint32 flags, void *dll);
 //
 
 int32 FILE_error(void);
-int32 FILE_size(BYTE *filename);
-void * FILE_read(BYTE *filename, void *dest);
-int32 FILE_write(BYTE *filename, void *buf, uint32 len);
-int32 FILE_append(BYTE *filename, void *buf, uint32 len);
+int32 FILE_size(const char *filename);
+void * FILE_read(const char *filename, void *dest);
+int32 FILE_write(const char *filename, void *buf, uint32 len);
+int32 FILE_append(const char *filename, void *buf, uint32 len);
 
 //
 // MetaWare support

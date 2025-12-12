@@ -19,15 +19,17 @@
  *
  */
 
+#include "common/textconsole.h"
 #include "aesop/lib/vfx.h"
 #include "aesop/lib/dll.h"
-#include "aesop/lib/gil2vfx.h"
-#include "aesop/lib/gil2vfxa.h"
+#include "aesop/gil2vfx.h"
+#include "aesop/gil2vfxa.h"
 #include "aesop/defs.h"
 #include "aesop/rtmsg.h"
 #include "aesop/rtsystem.h"
-#include "aesop/mouse.h"
+#include "aesop/lib/mouse.h"
 #include "aesop/rtres.h"
+#include "aesop/aesop.h"
 
 namespace Aesop {
 
@@ -65,7 +67,7 @@ int32 GIL2VFX_assign_window(int32 x1, int32 y1, int32 x2, int32 y2) {
 	{
 		if (windows[i].buffer == NULL)
 		{
-			windows[i].buffer = mem_alloc((x2 - x1 + 1) * (y2 - y1 + 1));
+			windows[i].buffer = (UBYTE *)mem_alloc((x2 - x1 + 1) * (y2 - y1 + 1));
 			// LUM WINDOW structure changes
 			//windows[i].x0 = x1;
 			//windows[i].y0 = y1;
@@ -101,15 +103,13 @@ void GIL2VFX_init() {
 	DLL = FILE_read("MCGA.DLL", NULL);
 	if (DLL == NULL)
 	{
-		printf("Missing or invalid 386FX driver\n");
-		exit(1);
+		error("Missing or invalid 386FX driver");
 	}
 
 	drvr = DLL_load(DLL, DLLMEM_ALLOC | DLLSRC_MEM, NULL);
 	if (drvr == NULL)
 	{
-		printf("Invalid DLL image\n");
-		exit(1);
+		error("Invalid DLL image");
 	}
 	free(DLL);
 
@@ -132,9 +132,9 @@ void GIL2VFX_init() {
 
 	gil2vfx_active = TRUE;
 
-	bitmap_buffer = mem_alloc(320 * 200);
+	bitmap_buffer = (BYTE *)mem_alloc(320 * 200);
 
-	windows[0].buffer = (void *)0x0a0000;       // Page 1 = 0
+	windows[0].buffer = (UBYTE *)g_engine->_screen->getPixels();
 	// LUM WINDOW structure changes
 	//windows[0].x0 = 0;
 	//windows[0].y0 = 0;
@@ -225,7 +225,7 @@ int32 GIL2VFX_get_bitmap_height(void *shape_table, int32 shape_num) {
 int32 GIL2VFX_visible_bitmap_rect(int32 x1, int32 y1, int32 mirror,
 	UBYTE *shapes, int32 shape_num, WORD *bounds) {
 	int32 rectangle[4];
-	int32 bm_width, bm_height;
+	int32 bm_width = 0, bm_height = 0;
 
 	VFX_shape_visible_rectangle(shapes, shape_num, x1, y1, mirror, rectangle);
 
@@ -487,7 +487,7 @@ void GIL2VFX_color_fade(int32 src_wnd, int32 dst_wnd) {
 	}
 
 	clr = palette[*(panes[dst_wnd].window->buffer)];
-	for (i = 0; i < num_colors; i++)
+	for (i = 0; i < (int32)num_colors; i++)
 	{
 		VFX_DAC_write(colors[i], &clr);
 	}
@@ -496,7 +496,7 @@ void GIL2VFX_color_fade(int32 src_wnd, int32 dst_wnd) {
 
 	VFX_window_refresh(&windows[0], 0, 0, VFX->scrn_width - 1, VFX->scrn_height - 1);
 
-	VFX_window_fade(panes[dst_wnd].window, &palette, FADE_INTERVALS);
+	VFX_window_fade(panes[dst_wnd].window, palette, FADE_INTERVALS);
 }
 
 void GIL2VFX_pixel_fade(int32 src_wnd, int32 dest_wnd, int32 intervals) {
@@ -525,8 +525,8 @@ void GIL2VFX_home(void) {
 	twptr->vtab = panes[twptr->window].y0;
 }
 
-void GIL2VFX_remap_font_color(int32 current, int32 new) {
-	twptr->lookaside[current] = new;
+void GIL2VFX_remap_font_color(int32 currentColor, int32 newColor) {
+	twptr->lookaside[currentColor] = newColor;
 }
 
 
@@ -549,11 +549,11 @@ void GIL2VFX_print(int32 operation, const char *format, ...) {
 
 	if (operation == BUF)
 	{
-		cw = vsprintf(twptr->txtbuf, format, arglist);
+		cw = Common::vsprintf_s(twptr->txtbuf, 65536, format, arglist);
 		twptr->txtpnt = twptr->txtbuf + cw;
 	} else if (operation == APP)
 	{
-		cw = vsprintf(twptr->txtpnt, format, arglist);
+		cw = Common::vsprintf_s(twptr->txtpnt, 65536, format, arglist);
 		twptr->txtpnt += cw;
 	}
 }
@@ -585,8 +585,7 @@ void GIL2VFX_cout(int32 c) {
 		{
 			if (twptr->continueFunction != NULL)
 			{
-				if ((twptr->continueFunction(twptr->htab)) == 0)
-				{
+				if ((twptr->continueFunction(/*twptr->htab*/)) == 0) {
 					twptr->htab = htab;
 					return;
 				}

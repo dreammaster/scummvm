@@ -5,7 +5,8 @@ MODULE_OBJS = \
 	console.o \
 	metaengine.o \
 	event.o \
-	eye.o
+	eye.o \
+	gil2vfx.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AESOP), DYNAMIC_PLUGIN)
