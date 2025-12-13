@@ -13,7 +13,8 @@ MODULE_OBJS = \
 	rtcode.o \
 	rtlink.o \
 	rtobject.o \
-	rtres.o
+	rtres.o \
+	rtsystem.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AESOP), DYNAMIC_PLUGIN)

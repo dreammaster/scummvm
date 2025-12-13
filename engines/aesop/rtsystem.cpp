@@ -19,6 +19,9 @@
  *
  */
 
+#include "common/system.h"
+#include "common/savefile.h"
+#include "common/textconsole.h"
 #include "aesop/lib/vfx.h"
 #include "aesop/ail32.h"
 #include "aesop/gil2vfx.h"
@@ -63,14 +66,7 @@ void mem_shutdown(void) {
 }
 
 uint32 mem_avail(void) {
-	union REGS inregs, outregs;
-	uint32 memarray[12];
-
-	inregs.x.eax = 0x0500;
-	inregs.x.edi = (uint32)memarray;
-	int386(0x31, &inregs, &outregs);
-
-	return memarray[0];
+	return 999999;
 }
 
 uint32 mem_headroom(void) {
@@ -94,13 +90,8 @@ void *mem_alloc(uint32 bytes) {
 	return ptr;
 }
 
-BYTE *str_alloc(BYTE *str) {
-	BYTE *ptr;
-
-	ptr = mem_alloc(strlen(str) + 1);
-	strcpy(ptr, str);
-
-	return ptr;
+char *str_alloc(const char *str) {
+	return scumm_strdup(str);
 }
 
 void mem_free(void *ptr) {
@@ -124,15 +115,14 @@ void mem_free(void *ptr) {
 // 
 /***************************************************/
 
-int32 ascnum(BYTE *string) {
+int32 ascnum(const char *string) {
 	int32 i, j, len, base, neg, chr;
 	int32 total;
 
-	while (isspace(*string)) string++;
+	while (Common::isSpace(*string)) string++;
 
 	neg = 0;
-	switch (*string)
-	{
+	switch (*string) {
 	case '-': neg = 1; string++; break;
 	case '+':          string++; break;
 	}
@@ -148,7 +138,7 @@ int32 ascnum(BYTE *string) {
 	}
 
 	if (base == 10)
-		if (isdigit(*string))
+		if (Common::isDigit(*string))
 			return neg ? -atol(string) : atol(string);
 		else
 			return -1;
@@ -193,60 +183,24 @@ void opcode_fault(void *PC, void *stk) {
 // LUM 070203: added support for storing the error into a file
 /***************************************************/
 
-void abend(char *msg, ...) {
-	va_list argptr;
-	WORD recover;
-	WORD x, y;
-	char loErrorBuffer[1000 + 1]; // max length + 1
-
-	curpos(&x, &y);
-	if (y > 25)
-		locate(0, 0);
-
-	if (msg != NULL)
-	{
-		FILE *loErrorFile;
-		printf("Error: ");
-
+void abend(const char *msg, ...) {
+	if (msg != NULL) {
+		va_list argptr;
 		va_start(argptr, msg);
-		vsnprintf(loErrorBuffer, 1000, msg, argptr);
-		loErrorBuffer[1000] = '\0';  // just to be sure there is a terminator even if limit is filled
+		Common::String str = Common::String::vformat(msg, argptr);
 		va_end(argptr);
-		printf("%s\n", loErrorBuffer);
 
-		// attempt to make an error file
-		loErrorFile = fopen("aesop_e.dbg", "wt");
-		if (loErrorFile != NULL)
-		{
-			// write error
-			fprintf(loErrorFile, "The AESOP/32 engine terminated with the error:\n");
-			fprintf(loErrorFile, "%s\n", loErrorBuffer);
-			if (envval(0, "AESOP_DIAG") == 1)
-			{
-				fprintf(loErrorFile, MSG_MIE, current_msg, current_index, current_event_type);
-			}
-			fclose(loErrorFile);
-		}
-
-		if (envval(0, "AESOP_DIAG") == 1)
-		{
-			printf(MSG_MIE, current_msg, current_index, current_event_type);
-		}
+		error("%s", str.c_str());
 	}
-
-	recover = 0;
 
 	breakpoint();
 
-	if (!recover)
-	{
-		shutdown_sound();
-		shutdown_interface();
-		AIL_shutdown("Abend");
-		GIL2VFX_shutdown_driver();
+	shutdown_sound();
+	shutdown_interface();
+	AIL_shutdown("Abend");
+	GIL2VFX_shutdown_driver();
 
-		exit(1);
-	}
+	error("Abnormal end");
 }
 
 /***************************************************/
@@ -255,34 +209,39 @@ void abend(char *msg, ...) {
 //
 /***************************************************/
 
-TF_class *TF_construct(BYTE *filename, WORD oflag) {
+TF_class *TF_construct(const char *filename, WORD oflag) {
 	TF_class *TF;
-	WORD file;
+	Common::InSaveFile *isf = nullptr;
+	Common::OutSaveFile *osf = nullptr;
+	Common::Stream *file;
 	HRES hbuf;
 
-	if (oflag == TF_WRITE)
-		oflag = O_CREAT | O_TRUNC | O_WRONLY;
-	else
-		oflag = O_RDONLY;
+	if (oflag == TF_WRITE) {
+		osf = g_system->getSavefileManager()->openForSaving(filename);
+		file = osf;
+	} else {
+		isf = g_system->getSavefileManager()->openForLoading(filename);
+		file = isf;
+	}
 
-	file = open(filename, oflag | O_BINARY, S_IREAD | S_IWRITE);
-	if (file == -1) return NULL;
+	if (file == nullptr)
+		return NULL;
 
 	hbuf = RTR_alloc(RTR, TF_BUFSIZE, DA_FIXED | DA_PRECIOUS);
-	if (hbuf == -1U) return NULL;
+	if (hbuf == (HRES)-1) return NULL;
 
-	TF = mem_alloc(sizeof(TF_class));
+	TF = (TF_class *)mem_alloc(sizeof(TF_class));
 
 	TF->file = file;
 	TF->hbuf = hbuf;
-	TF->buffer = RTR_addr(TF->hbuf);
+	TF->buffer = (BYTE *)RTR_addr(TF->hbuf);
 	TF->p = 0;
 	TF->mode = oflag;
-	TF->len = filelength(file);
+	TF->len = isf ? isf->size() : osf->size();
 	TF->pos = 0L;
 
-	if (!(oflag & O_WRONLY))
-		read(TF->file, TF->buffer, TF_BUFSIZE);
+	if (isf)
+		isf->read(TF->buffer, TF_BUFSIZE);
 
 	return TF;
 }
@@ -300,10 +259,12 @@ WORD TF_destroy(TF_class *TF) {
 
 	e = f = TF->p;
 
-	if ((TF->mode & O_WRONLY) && (TF->p != 0))
-		e = write(TF->file, TF->buffer, TF->p);
+	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(TF->file);
+	if (ws && TF->p != 0)
+		ws->write(TF->buffer, TF->p);
 
-	close(TF->file);
+	delete TF->file;
+	TF->file = nullptr;
 
 	RTR_free(RTR, TF->hbuf);
 	mem_free(TF);
@@ -322,10 +283,12 @@ WORD TF_destroy(TF_class *TF) {
 WORD TF_wchar(TF_class *TF, BYTE ch) {
 	TF->buffer[TF->p++] = ch;
 
-	if (TF->p == TF_BUFSIZE)
-	{
+	if (TF->p == TF_BUFSIZE) {
 		TF->p = 0;
-		if (write(TF->file, TF->buffer, TF_BUFSIZE) != TF_BUFSIZE) return 0;
+
+		Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(TF->file);
+		assert(ws);
+		ws->write(TF->buffer, TF_BUFSIZE);
 	}
 
 	return 1;
@@ -348,7 +311,9 @@ BYTE TF_rchar(TF_class *TF) {
 	if (TF->p != TF_BUFSIZE)
 		return TF->buffer[TF->p++];
 
-	read(TF->file, TF->buffer, TF_BUFSIZE);
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(TF->file);
+	assert(rs);
+	rs->read(TF->buffer, TF_BUFSIZE);
 
 	TF->p = 1;
 	return TF->buffer[0];
@@ -367,7 +332,7 @@ BYTE TF_rchar(TF_class *TF) {
 //
 /***************************************************/
 
-WORD TF_readln(TF_class *TF, BYTE *buffer, WORD maxlen) {
+WORD TF_readln(TF_class *TF, char *buffer, WORD maxlen) {
 	WORD b, c;
 
 	do
@@ -426,14 +391,8 @@ WORD TF_writeln(TF_class *TF, BYTE *buffer) {
 //
 /***************************************************/
 
-WORD delete_file(BYTE *filename) {
-	if (!unlink(filename))
-		return 1;
-
-	if (errno == ENOENT)
-		return 0;
-
-	return -1;
+WORD delete_file(const char *filename) {
+	return g_system->getSavefileManager()->removeSavefile(filename) ? 1 : 0;
 }
 
 /***************************************************/
@@ -445,58 +404,23 @@ WORD delete_file(BYTE *filename) {
 //
 /***************************************************/
 
-WORD copy_file(BYTE *src_filename, BYTE *dest_filename) {
-	HRES hbuf;
-	BYTE *buffer;
-	WORD status;
-	WORD s, d, n;
-
-	s = open(src_filename, O_RDONLY | O_BINARY);
-
-	if (s == -1)
+WORD copy_file(const char *src_filename, const char *dest_filename) {
+	Common::InSaveFile *s = g_system->getSavefileManager()->openForLoading(src_filename);
+	if (!s)
 		return 0;
 
-	d = open(dest_filename, O_BINARY | O_CREAT | O_TRUNC | O_WRONLY,
-		S_IREAD | S_IWRITE);
-
-	if (d == -1)
-	{
-		close(s);
+	Common::OutSaveFile *d = g_system->getSavefileManager()->openForSaving(dest_filename);
+	if (!d) {
+		delete s;
 		return -1;
 	}
 
-	hbuf = RTR_alloc(RTR, TF_BUFSIZE, DA_FIXED | DA_PRECIOUS);
-	if (hbuf == -1U)
-	{
-		close(s);
-		close(d);
-		return -1;
-	}
+	d->writeStream(s);
 
-	buffer = RTR_addr(hbuf);
-	status = 1;
+	delete s;
+	delete d;
 
-	while ((n = read(s, buffer, TF_BUFSIZE)) != 0)
-	{
-		if (n == -1)
-		{
-			status = -1;
-			break;
-		}
-
-		if (write(d, buffer, n) != n)
-		{
-			status = -1;
-			break;
-		}
-	}
-
-	close(s);
-	close(d);
-
-	RTR_free(RTR, hbuf);
-
-	return status;
+	return 1;
 }
 
 /****************************************************************************/
@@ -505,23 +429,13 @@ WORD copy_file(BYTE *src_filename, BYTE *dest_filename) {
 //
 /****************************************************************************/
 
-int32 file_size(BYTE *filename) {
-	WORD handle;
-	uint32 len;
+int32 file_size(const char *filename) {
+	Common::InSaveFile *sf = g_system->getSavefileManager()->openForLoading(filename);
+	if (!sf)
+		return -1;
 
-	disk_err = 0;
-
-	handle = open(filename, O_RDONLY | O_BINARY);
-	if (handle == -1)
-	{
-		disk_err = FILE_NOT_FOUND;
-		return -1L;
-	}
-
-	len = filelength(handle);
-	if (len == -1L) disk_err = CANT_READ_FILE;
-
-	close(handle);
+	int32 len = sf->size();
+	delete sf;
 	return len;
 }
 
@@ -531,59 +445,31 @@ int32 file_size(BYTE *filename) {
 //
 /****************************************************************************/
 
-BYTE *read_file(BYTE *filename, void *dest) {
-	WORD i, handle;
+BYTE *read_file(const char *filename, void *dest) {
 	uint32 len;
-	BYTE *buf, *mem;
+	BYTE *buf;
+
+	Common::InSaveFile *sf = g_system->getSavefileManager()->openForLoading(filename);
 
 	disk_err = 0;
 
-	len = file_size(filename);
-	if (len == -1L)
-	{
+	if (!sf) {
 		disk_err = FILE_NOT_FOUND;
 		return NULL;
 	}
 
-	buf = mem = (dest == NULL) ? mem_alloc(len) : dest;
+	len = sf->size();
+	buf = (dest == NULL) ? (BYTE *)mem_alloc(len) : (BYTE *)dest;
 
-	if (buf == NULL)
-	{
+	if (buf == NULL) {
 		disk_err = OUT_OF_MEMORY;
 		return NULL;
 	}
 
-	handle = open(filename, O_RDONLY | O_BINARY);
-	if (handle == -1)
-	{
-		mem_free(mem);
-		disk_err = FILE_NOT_FOUND;
-		return NULL;
-	}
+	sf->read(buf, len);
+	delete sf;
 
-	while (len >= DOS_BUFFSIZE)
-	{
-		i = read(handle, buf, DOS_BUFFSIZE);
-		if (i != (WORD)DOS_BUFFSIZE)
-		{
-			mem_free(mem);
-			disk_err = CANT_READ_FILE;
-			return NULL;
-		}
-		len -= DOS_BUFFSIZE;
-		buf = add_ptr(buf, DOS_BUFFSIZE);
-	}
-
-	i = read(handle, buf, (UWORD)len);
-	if (i != (UWORD)len)
-	{
-		mem_free(mem);
-		disk_err = CANT_READ_FILE;
-		return NULL;
-	}
-
-	close(handle);
-	return mem;
+	return buf;
 }
 
 /****************************************************************************/
@@ -592,49 +478,20 @@ BYTE *read_file(BYTE *filename, void *dest) {
 // 
 /****************************************************************************/
 
-WORD write_file(BYTE *filename, void *buf, uint32 len) {
-	WORD i, handle;
+WORD write_file(const char *filename, void *buf, uint32 len) {
+	Common::OutSaveFile *handle;
 
 	disk_err = 0;
 
-	handle = open(filename, O_CREAT | O_RDWR | O_TRUNC | O_BINARY,
-		S_IREAD | S_IWRITE);
-	if (handle == -1)
-	{
+	handle = g_system->getSavefileManager()->openForSaving(filename, false);
+	if (!handle) {
 		disk_err = CANT_WRITE_FILE;
 		return 0;
 	}
 
-	while (len >= DOS_BUFFSIZE)
-	{
-		i = write(handle, buf, DOS_BUFFSIZE);
-		if (i == -1)
-		{
-			disk_err = CANT_WRITE_FILE;
-			return 0;
-		}
-		if (i != (WORD)DOS_BUFFSIZE)
-		{
-			disk_err = DISK_FULL;
-			return 0;
-		}
-		len -= DOS_BUFFSIZE;
-		buf = add_ptr(buf, DOS_BUFFSIZE);
-	}
-
-	i = write(handle, buf, (UWORD)len);
-	if (i == -1)
-	{
-		disk_err = CANT_WRITE_FILE;
-		return 0;
-	}
-	if (i != (UWORD)len)
-	{
-		disk_err = DISK_FULL;
-		return 0;
-	}
-
-	close(handle);
+	handle->write(buf, len);
+	handle->finalize();
+	delete handle;
 
 	return 1;
 }
@@ -645,48 +502,8 @@ WORD write_file(BYTE *filename, void *buf, uint32 len) {
 //
 /****************************************************************************/
 
-WORD append_file(BYTE *filename, void *buf, uint32 len) {
-	WORD i, handle;
-
-	disk_err = 0;
-
-	handle = open(filename, O_APPEND | O_RDWR | O_BINARY);
-	if (handle == -1)
-	{
-		disk_err = FILE_NOT_FOUND;
-		return 0;
-	}
-
-	while (len >= DOS_BUFFSIZE)
-	{
-		i = write(handle, buf, DOS_BUFFSIZE);
-		if (i == -1)
-		{
-			disk_err = CANT_WRITE_FILE;
-			return 0;
-		}
-		if (i != (WORD)DOS_BUFFSIZE)
-		{
-			disk_err = DISK_FULL;
-			return 0;
-		}
-		len -= DOS_BUFFSIZE;
-		buf = add_ptr(buf, DOS_BUFFSIZE);
-	}
-
-	i = write(handle, buf, (UWORD)len);
-	if (i == -1)
-	{
-		disk_err = CANT_WRITE_FILE;
-		return 0;
-	}
-	if (i != (UWORD)len)
-	{
-		disk_err = DISK_FULL;
-		return 0;
-	}
-
-	close(handle);
+WORD append_file(const char *filename, void *buf, uint32 len) {
+	error("TODO: append_file");
 
 	return 1;
 }
@@ -697,21 +514,13 @@ WORD append_file(BYTE *filename, void *buf, uint32 len) {
 //
 /****************************************************************************/
 
-uint32 file_time(BYTE *filename) {
-	union REGS in, out;
-	WORD handle;
+uint32 file_time(const char *filename) {
+	warning("TODO: file_time");
 
-	handle = open(filename, O_RDONLY);
+	uint16_t cx = 0x0000; // 00:00:00
+	uint16_t dx = 0x5C21; // 1 Jan 2026
 
-	if (handle == -1) return 0L;
-
-	in.w.ax = 0x5700;
-	in.w.bx = handle;
-	intdos(&in, &out);
-
-	close(handle);
-
-	return (uint32)out.w.cx + ((uint32)out.w.dx << 16);
+	return ((uint32_t)dx << 16) | cx;
 }
 
 /****************************************************************************/
@@ -721,6 +530,7 @@ uint32 file_time(BYTE *filename) {
 /****************************************************************************/
 
 void locate(WORD x, WORD y) {
+#if 0
 	union REGS inregs, outregs;
 
 	inregs.h.bh = 0x00;
@@ -728,6 +538,7 @@ void locate(WORD x, WORD y) {
 	inregs.h.dh = y;
 	inregs.h.dl = x;
 	int386(0x10, &inregs, &outregs);
+#endif
 }
 
 /****************************************************************************/
@@ -737,14 +548,8 @@ void locate(WORD x, WORD y) {
 /****************************************************************************/
 
 void curpos(WORD *x, WORD *y) {
-	union REGS inregs, outregs;
-
-	inregs.h.ah = 0x0f;
-	int386(0x10, &inregs, &outregs);
-
-	inregs.h.bh = outregs.h.bh; inregs.h.ah = 0x03;
-	int386(0x10, &inregs, &outregs);
-	*x = outregs.h.dl; *y = outregs.h.dh;
+	warning("TODO: curpos");
+	*x = *y = 0;
 }
 
 } // namespace Aesop

@@ -22,23 +22,22 @@
 #ifndef AESOP_RTSYSTEM_H
 #define AESOP_RTSYSTEM_H
 
+#include "common/stream.h"
 #include "aesop/defs.h"
 
 namespace Aesop {
 
 #define TF_BUFSIZE 4096    // size of buffer allocated by file functions
 
-	typedef struct
-	{
-		HRES hbuf;
-		BYTE *buffer;
-		WORD p;
-		WORD file;
-		WORD mode;
-		int32 len;
-		int32 pos;
-	}
-	TF_class;
+struct TF_class {
+	HRES hbuf;
+	BYTE *buffer;
+	WORD p;
+	Common::Stream *file;
+	WORD mode;
+	int32 len;
+	int32 pos;
+};
 
 #define TF_WRITE 0
 #define TF_READ  1
@@ -93,7 +92,7 @@ void mem_init(void);
 void mem_shutdown(void);
 uint32 mem_avail(void);
 void *mem_alloc(uint32 bytes);
-BYTE *str_alloc(BYTE *string);
+char *str_alloc(const char *string);
 void mem_free(void *ptr);
 uint32 mem_headroom(void);
 

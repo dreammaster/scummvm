@@ -123,7 +123,7 @@ sound_buff;
 typedef void(*AIL_callback)();
 
 void AIL_startup(void);
-void AIL_shutdown(char *signoff_msg);
+void AIL_shutdown(const char *signoff_msg);
 HTIMER AIL_register_timer(AIL_callback callback_fn);
 void AIL_set_timer_period(HTIMER timer, unsigned long microseconds);
 void AIL_set_timer_frequency(HTIMER timer, unsigned long hertz);
