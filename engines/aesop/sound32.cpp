@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/textconsole.h"
 #include "aesop/lib/vfx.h"
 #include "aesop/lib/dll.h"
 #include "aesop/lib/mouse.h"
@@ -67,12 +68,11 @@ drvr_desc XMI_desc;
 
 WORD GTL = -1;
 
-HDRIVER hXMI, hPCM;
+HDRIVER hPCM;
 HSEQUENCE hSEQ;
 
 BYTE XMI_fn[32];
 
-void *XMI_driver;
 HRES hXMI_buffer;
 HRES hXMI_state;
 HRES hXMI_cache;
@@ -83,8 +83,8 @@ WORD  SND_blk[64];                // EMS block of sound effect at index #
 UWORD SND_off[64];                // EMS offset of sound effect at index #
 UWORD SND_size[64];               // Size of sound effect at index #
 
-struct                            // SSI MEL sound system config file
-{
+// SSI MEL sound system config file
+struct MEL {
 	WORD XMI_IO;
 	WORD XMI_IRQ;
 	WORD XMI_DMA;
@@ -103,32 +103,7 @@ struct                            // SSI MEL sound system config file
 	BYTE PCM_fn[14];
 
 	BYTE dummy[32];
-}
-MEL;
-
-/****************************************************************************/
-//
-// Load a .DLL sound driver
-//
-/****************************************************************************/
-
-static void *load_driver(BYTE *filename) {
-	void *DLL, *drvr;
-
-	DLL = FILE_read(filename, NULL);
-
-	if (DLL == NULL)
-		return NULL;
-
-	drvr = DLL_load(DLL, DLLMEM_ALLOC | DLLSRC_MEM, NULL);
-
-	free(DLL);
-
-	if (drvr == NULL)
-		return NULL;
-
-	return drvr;
-}
+};
 
 /****************************************************************************/
 //
@@ -137,6 +112,7 @@ static void *load_driver(BYTE *filename) {
 /****************************************************************************/
 
 static void *load_global_timbre(uint32 bank, uint32 patch) {
+#ifdef TODO
 	UWORD *timb_ptr;
 	static UWORD len;
 
@@ -169,6 +145,9 @@ static void *load_global_timbre(uint32 bank, uint32 patch) {
 	read(GTL, (timb_ptr + 1), len - 2);
 
 	return timb_ptr;               // else return pointer to timbre
+#else
+	return nullptr;
+#endif
 }
 
 
@@ -275,6 +254,7 @@ void sound_effect(int32 argcnt, uint32 index)
 void play_sequence(int32 argcnt, uint32 LA_version, uint32 AD_version, uint32 PC_version)
 #pragma on (unreferenced)
 {
+#ifdef TODO
 	uint32 XMI_res;
 	uint32 size;
 	uint32 bank, patch, treq;
@@ -319,6 +299,9 @@ void play_sequence(int32 argcnt, uint32 LA_version, uint32 AD_version, uint32 PC
 	}
 
 	AIL_start_sequence(hXMI, hSEQ);
+#else
+	warning("TODO: play_sequence");
+#endif
 }
 
 /****************************************************************************/
@@ -328,13 +311,11 @@ void play_sequence(int32 argcnt, uint32 LA_version, uint32 AD_version, uint32 PC
 /****************************************************************************/
 
 void load_music(void) {
+#ifdef TODO
 	int32 tsize;
 
-	if ((!XMI_active) || (!sound_on) || (music_resident)) return;
-
-	XMI_driver = load_driver(XMI_fn);
-
-	hXMI = AIL_register_driver(XMI_driver);
+	if ((!XMI_active) || (!sound_on) || (music_resident))
+		return;
 
 	if (!AIL_detect_device(hXMI, XMI_desc.default_IO, XMI_desc.default_IRQ,
 		XMI_desc.default_DMA, XMI_desc.default_DRQ))
@@ -359,7 +340,7 @@ void load_music(void) {
 		hXMI_cache = RTR_alloc(RTR, tsize, DA_FIXED | DA_PRECIOUS);
 		AIL_define_timbre_cache(hXMI, RTR_addr(hXMI_cache), (UWORD)tsize);
 	}
-
+#endif
 	hSEQ = -1;
 	music_resident = 1;
 }
@@ -371,6 +352,7 @@ void load_music(void) {
 /****************************************************************************/
 
 void unload_music(void) {
+#ifdef TODO
 	int32 i;
 
 	if ((!XMI_active) || (!music_resident)) return;
@@ -401,6 +383,7 @@ void unload_music(void) {
 	mem_free(XMI_driver);
 
 	music_resident = 0;
+#endif
 }
 
 /****************************************************************************/
@@ -415,6 +398,7 @@ void set_sound_status(int32 argcnt, uint32 status)
 {
 	if (!(PCM_active || XMI_active)) return;
 
+#ifdef TODO
 	if (status)
 		sound_on = 1;
 	else
@@ -439,6 +423,9 @@ void set_sound_status(int32 argcnt, uint32 status)
 
 		sound_on = 0;
 	}
+#else
+	warning("TODO: set_sound_status");
+#endif
 }
 
 /****************************************************************************/
@@ -450,6 +437,7 @@ void set_sound_status(int32 argcnt, uint32 status)
 /****************************************************************************/
 
 void shutdown_sound(void) {
+#ifdef TODO
 	if (!(PCM_active || XMI_active)) return;
 
 	if (PCM_active)
@@ -471,6 +459,7 @@ void shutdown_sound(void) {
 		if (GTL != -1)
 			close(GTL);
 	}
+#endif
 
 	PCM_active = XMI_active = music_resident = 0;
 }
@@ -492,6 +481,7 @@ void shutdown_sound(void) {
 void init_sound(int32 argcnt, uint32 errprompt)
 #pragma on (unreferenced)
 {
+#ifdef TODO
 	WORD PCM_requested, XMI_requested;
 	BYTE PCM_fn[32];
 	BYTE GTL_fn[32];
@@ -638,6 +628,7 @@ void init_sound(int32 argcnt, uint32 errprompt)
 		printf(MSG_SND_F);
 		getch();
 	}
+#endif
 }
 
 } // namspace Aesop

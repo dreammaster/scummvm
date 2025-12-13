@@ -14,7 +14,8 @@ MODULE_OBJS = \
 	rtlink.o \
 	rtobject.o \
 	rtres.o \
-	rtsystem.o
+	rtsystem.o \
+	sound32.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AESOP), DYNAMIC_PLUGIN)
