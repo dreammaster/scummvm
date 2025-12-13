@@ -54,7 +54,8 @@ int ModSizeNeeded(void) {
 // Base address of fixed buffer for sound processing.
 //
 
-int StartMod(HDRIVER driver, char *soundbase, char *emsloc) {
+int StartMod(HDRIVER driver, const char *soundbase, const char *emsloc) {
+#ifdef TODO
 	int i;
 	union REGS inregs, outregs;
 
@@ -102,11 +103,12 @@ int StartMod(HDRIVER driver, char *soundbase, char *emsloc) {
 		MOD[i].oneshot = 0;
 		MOD[i].trigger = 0;                 // Sample is inactive.
 	}
-
+#endif
 	return 0;                           // Mod player installed.
 }
 
 void PollMod(void) {
+#ifdef TODO
 	int a1, j, i;
 	int bufnum;
 	sound_buff AILbuf;
@@ -180,6 +182,7 @@ void PollMod(void) {
 	AIL_format_sound_buffer(hPCM, &AILbuf);
 	AIL_register_sound_buffer(hPCM, bufnum, &AILbuf);
 	AIL_start_digital_playback(hPCM);
+#endif
 }
 
 //
@@ -187,13 +190,17 @@ void PollMod(void) {
 //
 
 void SetActive(int channel, int logical) {
+#ifdef TODO
 	if (!Active[channel]) ActiveCount++;   // Increase total active.
 	Active[channel] = logical + 1;               // Set physical channel to this logical channel.
+#endif
 }
 
 void InActive(int channel) {
+#ifdef TODO
 	if (Active[channel]) ActiveCount--;
 	Active[channel] = 0;
+#endif
 }
 
 //
@@ -202,6 +209,7 @@ void InActive(int channel) {
 
 int SetChannel(int ems, unsigned int emsoffset, unsigned int length,
 	int channel, int mode) {
+#ifdef TODO
 	unsigned char *temp;
 
 	temp = (unsigned char *)(basePCM + (ems * 65536) + emsoffset);
@@ -213,7 +221,7 @@ int SetChannel(int ems, unsigned int emsoffset, unsigned int length,
 	MOD[channel].bufflen = BUFFSIZE;
 	MOD[channel].oneshot = mode;
 	MOD[channel].trigger = 1;                     // Sample is inactive.
-
+#endif
 	return(channel);
 }
 

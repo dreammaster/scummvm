@@ -10,6 +10,7 @@ MODULE_OBJS = \
 	graphics.o \
 	interface.o \
 	interp.o \
+	modsnd32.o \
 	rtcode.o \
 	rtlink.o \
 	rtobject.o \
