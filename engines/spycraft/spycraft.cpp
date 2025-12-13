@@ -50,6 +50,67 @@ static bool appActive = false;
 static unsigned yct = 0;
 static SRect screenRect = { 0, 0, 511, 479, 512, 480 };
 
+class CTheApp : public CWinApp {
+private:
+	bool _posted = false;
+
+public:
+	bool InitInstance() override;
+	bool OnIdle(long lCount) override;
+};
+
+bool CTheApp::InitInstance() {
+	hGameWnd = CreateWindow(szAppName,
+		szAppName,
+		WS_POPUP,
+		0,               // x
+		0,               // y
+		GetSystemMetrics(SM_CXSCREEN),   // width
+		GetSystemMetrics(SM_CYSCREEN),   // height
+		nullptr,            // parent
+		nullptr,            // child window id
+		hInstance,       // process instance
+		nullptr);
+	assert(hGameWnd);
+
+	ShowWindow(hGameWnd, SW_SHOWNORMAL);
+	UpdateWindow(hGameWnd);
+
+	/* SETUP THE GAME */
+	hGameDC = GetDC(hGameWnd);
+	sfxSetCacheSize(RES_ATS, 24);
+
+	sfxInitMADE();
+
+	/* instantiates C++ class object for script */
+	StartScript();
+	return true;
+}
+
+bool CTheApp::OnIdle(long lCount) {
+	if (UserWantsToQuit && !_posted) {
+		PostMessage(hGameWnd, WM_CLOSE, 0, 0);
+		_posted = true;
+	} else if (appActive) {
+		/* UPDATE MADE */
+		if (curBack != -1) {
+			sfxReleaseSprites(backgrounds[curBack]);
+			sfxUpdate();
+		}
+
+		UpdateSound();
+
+		if (((yct++) % 8) == 0)
+			UpdateMovie();
+
+		/* UPDATE FRAMEWORK */
+		event.clock_lo = sfxGetTime();
+		Spycraft::OnIdle((MADEEventStamp *)&event);
+	}
+
+	return true;
+}
+
 SpycraftEngine::SpycraftEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Spycraft") {
 	g_engine = this;
@@ -90,65 +151,10 @@ Common::Error SpycraftEngine::run() {
 	window_right = offsetX + GAME_WIDTH;
 	window_bottom = offsetY + GAME_HEIGHT;
 
-	hGameWnd = CreateWindow(szAppName,
-		szAppName,
-		WS_POPUP,
-		0,               // x
-		0,               // y
-		GetSystemMetrics(SM_CXSCREEN),   // width
-		GetSystemMetrics(SM_CYSCREEN),   // height
-		nullptr,            // parent
-		nullptr,            // child window id
-		hInstance,       // process instance
-		nullptr);
-	assert(hGameWnd);
-
-	ShowWindow(hGameWnd, SW_SHOWNORMAL);
-	UpdateWindow(hGameWnd);
-
-	/* SETUP THE GAME */
-	hGameDC = GetDC(hGameWnd);
-	sfxSetCacheSize(RES_ATS, 24);
-
-	sfxInitMADE();
-
-	/* instantiates C++ class object for script */
-	StartScript();
-
-	MSG msg;
-	while (!shouldQuit()) {
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-			if (msg.message == WM_QUIT)
-				break;
-			else {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-		if (UserWantsToQuit) {
-			if (!posted) {
-				PostMessage(hGameWnd, WM_CLOSE, 0, 0);
-				posted = true;
-			}
-		} else if (appActive) {
-			//snSystemIdle();
-
-			/* UPDATE MADE */
-			if (curBack != -1) {
-				sfxReleaseSprites(backgrounds[curBack]);
-				sfxUpdate();
-			}
-
-			UpdateSound();
-
-			if (((yct++) % 8) == 0)
-				UpdateMovie();
-
-			/* UPDATE FRAMEWORK */
-			event.clock_lo = sfxGetTime();
-			OnIdle((MADEEventStamp *)&event);
-		}
-	}
+	CTheApp app;
+	app.InitApplication();
+	app.InitInstance();
+	app.Run();
 
 	sfxCleanMADE();
 

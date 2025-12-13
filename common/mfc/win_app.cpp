@@ -384,6 +384,11 @@ bool CWinApp::GetClassInfo(HINSTANCE hInstance,
 /*--------------------------------------------*/
 
 CWinApp *AfxGetApp() {
+	// If this raises an assert, then you're running an engine using old Windows API
+	// window functions without having created an MFC CWinApp for your game. This is needed,
+	// even if it's a small dummy app. See the bagel and spycraft engines for examples of
+	// how to do this
+	assert(CWinApp::_activeApp);
 	return CWinApp::_activeApp;
 }
 
