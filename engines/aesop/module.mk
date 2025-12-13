@@ -9,7 +9,6 @@ MODULE_OBJS = \
 	gil2vfx.o \
 	graphics.o \
 	interface.o \
-	interp.o \
 	modsnd32.o \
 	rtcode.o \
 	rtlink.o \

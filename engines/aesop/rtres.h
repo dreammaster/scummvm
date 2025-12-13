@@ -147,38 +147,38 @@ struct RTR_class {
 extern RTR_class *LNK;
 extern RTR_class *RTR;
 
-RTR_class *RTR_construct(void *base, uint32 size, uint32 nnames, BYTE *filename);
-void RTR_destroy(RTR_class *RTR, uint32 flags);
+extern RTR_class *RTR_construct(void *base, uint32 size, uint32 nnames, const char *filename);
+extern void RTR_destroy(RTR_class *RTR, uint32 flags);
 
-uint32 RTR_force_discard(RTR_class *RTR, uint32 goal);
+extern uint32 RTR_force_discard(RTR_class *RTR, uint32 goal);
 
-HRES RTR_alloc(RTR_class *RTR, uint32 bytes, uint32 attrib);
-void RTR_free(RTR_class *RTR, HRES entry);
+extern HRES RTR_alloc(RTR_class *RTR, uint32 bytes, uint32 attrib);
+extern void RTR_free(RTR_class *RTR, HRES entry);
 
-void RTR_lock(RTR_class *RTR, HRES entry);
-void RTR_unlock(HRES entry);
+extern void RTR_lock(RTR_class *RTR, HRES entry);
+extern void RTR_unlock(HRES entry);
 
-uint32 RTR_size(HRES entry);
+extern uint32 RTR_size(HRES entry);
 
-HRES RTR_get_resource_handle(RTR_class *RTR, uint32 resource, uint32 attrib);
-void RTR_free_resource(RTR_class *RTR, uint32 resource);
+extern HRES RTR_get_resource_handle(RTR_class *RTR, uint32 resource, uint32 attrib);
+extern void RTR_free_resource(RTR_class *RTR, uint32 resource);
 
-HRES RTR_load_resource(RTR_class *RTR, uint32 resource, uint32 attrib);
-void RTR_read_resource(RTR_class *RTR, void *dest, uint32 len);
-uint32 RTR_seek(RTR_class *RTR, uint32 rnum);
+extern HRES RTR_load_resource(RTR_class *RTR, uint32 resource, uint32 attrib);
+extern void RTR_read_resource(RTR_class *RTR, void *dest, uint32 len);
+extern uint32 RTR_seek(RTR_class *RTR, uint32 rnum);
 
 #ifndef RTR_addr
-void *RTR_addr(HRES entry);
+extern void *RTR_addr(HRES entry);
 #endif
-void RTR_fixup(void **ptr, HRES entry);
+extern void RTR_fixup(void **ptr, HRES entry);
 
-ND_entry *RTR_search_name_dir(RTR_class *RTR, uint32 resource);
+extern ND_entry *RTR_search_name_dir(RTR_class *RTR, uint32 resource);
 
-BYTE *ASCII_name(uint32 name);
-void RTR_dump(RTR_class *RTR);
+extern BYTE *ASCII_name(uint32 name);
+extern void RTR_dump(RTR_class *RTR);
 
-void RTR_HRES_chksum(BYTE *situation);
-uint32 RTR_chksum(HRES entry);
+extern void RTR_HRES_chksum(BYTE *situation);
+extern uint32 RTR_chksum(HRES entry);
 
 } // namespace Aesop
 

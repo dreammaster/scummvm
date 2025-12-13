@@ -26,14 +26,26 @@
 #include "common/scummsys.h"
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
-#include "common/events.h"
-#include "common/system.h"
 #include "engines/util.h"
-#include "graphics/paletteman.h"
+#include "aesop/ail32.h"
+#include "aesop/event.h"
+#include "aesop/rt.h"
+#include "aesop/rtmsg.h"
+#include "aesop/rtobject.h"
+#include "aesop/rtres.h"
+#include "aesop/rtsystem.h"
 
 namespace Aesop {
 
+// Maximum useful AESOP resource cache size (800K)
+#define MAX_RES_SIZE    800000
+// Amount of memory to reserve for AESOP interpreter stack (16K)
+#define STK_SIZE        16384
+
 AesopEngine *g_engine;
+uint32 heap_size;
+HRES HROED;
+
 
 AesopEngine::AesopEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Aesop") {
@@ -53,44 +65,54 @@ Common::String AesopEngine::getGameId() const {
 }
 
 Common::Error AesopEngine::run() {
+	uint32 code;
+	int32 rtn;
+
 	// Initialize 320x200 paletted graphics mode
 	initGraphics(320, 200);
 	_screen = new Graphics::Screen();
 
-	// Set the engine's debugger console
-	setDebugger(new Console());
+	AIL_startup();
+	mem_init();
 
-	// If a savegame was selected from the launcher, load it
-	int saveSlot = ConfMan.getInt("save_slot");
-	if (saveSlot != -1)
-		(void)loadGameState(saveSlot);
+	const char *RES_name = "eye.res";
+	const char *code_name = "start";
 
-	// Draw a series of boxes on screen as a sample
-	for (int i = 0; i < 100; ++i)
-		_screen->frameRect(Common::Rect(i, i, 320 - i, 200 - i), i);
-	_screen->update();
+	heap_size = MAX_RES_SIZE;
+	RTR = RTR_construct(mem_alloc(heap_size), heap_size, MAX_OBJ_TYPES, RES_name);
+	assert(RTR);
 
-	// Simple event handling loop
-	byte pal[256 * 3] = { 0 };
-	Common::Event e;
-	int offset = 0;
+	init_object_list();
+	init_notify_list();
+	init_event_queue();
 
-	Graphics::FrameLimiter limiter(g_system, 60);
-	while (!shouldQuit()) {
-		while (g_system->getEventManager()->pollEvent(e)) {
-		}
+	RT_init(RTR, STK_SIZE, objlist);
 
-		// Cycle through a simple palette
-		++offset;
-		for (int i = 0; i < 256; ++i)
-			pal[i * 3 + 1] = (i + offset) % 256;
-		g_system->getPaletteManager()->setPalette(pal, 0, 256);
-		// Delay for a bit. All events loops should have a delay
-		// to prevent the system being unduly loaded
-		limiter.delayBeforeSwap();
-		_screen->update();
-		limiter.startFrame();
+	HROED = RTR_get_resource_handle(RTR, ROED, DA_TEMPORARY | DA_EVANESCENT);
+	RTR_lock(RTR, HROED);
+	code = ascnum((const char *)RTD_lookup(HROED, code_name));
+	RTR_unlock(HROED);
+
+	if (code == (uint32)-1L)
+		abend(MSG_SPNF);
+
+	rtn = create_program(1, bootstrap, (uint32)code);
+	rtn = destroy_object(1, rtn);
+
+	for (UWORD i = 0; i < RTR->nentries; i++) {
+		uint32 f;
+
+		f = RTR->dir[i].flags;
+
+		if ((f & DA_FREE) && (f & DA_DISCARDED) && (!RTR->dir[i].seg))
+			break;
 	}
+
+	RTR_destroy(RTR, RTR_FREEBASE);
+	RT_shutdown();
+
+	mem_shutdown();
+	AIL_shutdown(MSG_AIL);
 
 	return Common::kNoError;
 }
