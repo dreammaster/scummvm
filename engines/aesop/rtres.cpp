@@ -19,6 +19,8 @@
  *
  */
 
+#include "common/system.h"
+#include "common/savefile.h"
 #include "aesop/defs.h"
 #include "aesop/rtsystem.h"
 #include "aesop/rtmsg.h"
@@ -122,17 +124,17 @@ void resource_chksum(BYTE *situation)
    if (CHKRES == 0)
       return;
 
-   if (RTR==NULL)
+   if (rtr==NULL)
       return;
 
-   for (i=0;i<RTR->nentries;i++)
-      if (RTR->dir[i].user == res)
+   for (i=0;i<rtr->nentries;i++)
+      if (rtr->dir[i].user == res)
          break;
 
-   if (i!=RTR->nentries)
+   if (i!=rtr->nentries)
       {
-      if ( !(RTR->dir[i].flags & DA_DISCARDED) )
-         RTR_double_check((uint32)situation, (HRES) &RTR->dir[i]);
+      if ( !(rtr->dir[i].flags & DA_DISCARDED) )
+         RTR_double_check((uint32)situation, (HRES) &rtr->dir[i]);
       else
          printf("Resource # %d discarded %s\n",res, situation);
       }
@@ -183,28 +185,28 @@ void RTR_HRES_chksum(BYTE *situation)
 //
 /***************************************************/
 
-static uint32 RTR_discard(RTR_class *RTR, uint32 index, uint32 do_move)
+static uint32 RTR_discard(RTR_class *rtr, uint32 index, uint32 do_move)
 {
    uint32 i,n;
    void *dest, *src;
    uint32 nbytes,size;
    HD_entry *sel;
 
-   sel = &RTR->dir[index];
+   sel = &rtr->dir[index];
 
    size = sel->size;
    dest = sel->seg;
    src = add_ptr(dest,size);
-   nbytes = ptr_dif(RTR->next_M, src);
+   nbytes = ptr_dif(rtr->next_M, src);
 
-   n = RTR->nentries;
+   n = rtr->nentries;
    for (i=0;i<n;i++)
       {
-      if (RTR->dir[i].flags & (DA_FIXED | DA_DISCARDED))
+      if (rtr->dir[i].flags & (DA_FIXED | DA_DISCARDED))
          continue;
 
-      if (ptr_dif(RTR->dir[i].seg,dest) > 0L)
-         RTR->dir[i].seg = (BYTE *) RTR->dir[i].seg - size;
+      if (ptr_dif(rtr->dir[i].seg,dest) > 0L)
+         rtr->dir[i].seg = (BYTE *) rtr->dir[i].seg - size;
       }
 
    if (do_move)
@@ -215,12 +217,12 @@ static uint32 RTR_discard(RTR_class *RTR, uint32 index, uint32 do_move)
 
    sel->flags |= DA_DISCARDED;
 
-   RTR->next_M = (BYTE *) RTR->next_M - size;
-   RTR->free = RTR->free + size;
+   rtr->next_M = (BYTE *) rtr->next_M - size;
+   rtr->free = rtr->free + size;
 
    if (sel->flags & DA_EVANESCENT)
       {
-      RTR_free(RTR,(HRES) sel);
+      RTR_free(rtr,(HRES) sel);
       }
 
    return size;
@@ -232,26 +234,26 @@ static uint32 RTR_discard(RTR_class *RTR, uint32 index, uint32 do_move)
 //
 /***************************************************/
 
-static uint32 RTR_LRU(RTR_class *RTR)
+static uint32 RTR_LRU(RTR_class *rtr)
 {
    uint32 i,oldest;
    uint32 n,age;
 
-   n = RTR->nentries;
-   oldest = age = -1;
+   n = rtr->nentries;
+   oldest = age = (uint32)-1;
 
    for (i=0;i<n;i++)
       {
-      if (RTR->dir[i].flags &
+      if (rtr->dir[i].flags &
          (DA_FIXED | DA_PRECIOUS | DA_DISCARDED | DA_FREE))
          continue;
 
-      if (RTR->dir[i].locks > 0)
+      if (rtr->dir[i].locks > 0)
          continue;
 
-      if (RTR->dir[i].history < age)
+      if (rtr->dir[i].history < age)
          {
-         age = RTR->dir[i].history;
+         age = rtr->dir[i].history;
          oldest = i;
          }
       }
@@ -281,7 +283,7 @@ static uint32 RTR_LRU(RTR_class *RTR)
 //
 /***************************************************/
 
-static uint32 RTR_make_room(RTR_class *RTR, uint32 goal)
+static uint32 RTR_make_room(RTR_class *rtr, uint32 goal)
 {
    int32 i;
    WORD first,next;
@@ -293,7 +295,7 @@ static uint32 RTR_make_room(RTR_class *RTR, uint32 goal)
    // 1) If /goal/ bytes already free, return immediately
    //
 
-   if (RTR->free >= goal) return 1;
+   if (rtr->free >= goal) return 1;
 
    standby_cursor();
 
@@ -301,18 +303,18 @@ static uint32 RTR_make_room(RTR_class *RTR, uint32 goal)
    // 2) Discard all MOVABLE FREE entries which are still present
    //
 
-   for (i=RTR->nentries-1;i>=0;i--)
-      if ((RTR->dir[i].flags & DA_FREE) &&
-        (!(RTR->dir[i].flags & (DA_FIXED | DA_DISCARDED))))
+   for (i=rtr->nentries-1;i>=0;i--)
+      if ((rtr->dir[i].flags & DA_FREE) &&
+        (!(rtr->dir[i].flags & (DA_FIXED | DA_DISCARDED))))
          {
-         RTR_discard(RTR,i,1);
+         RTR_discard(rtr,i,1);
          }
 
    //
    // 3) If /goal/ bytes free, return
    //
 
-   if (RTR->free >= goal)
+   if (rtr->free >= goal)
       {
       resume_cursor();
       return 1;
@@ -322,13 +324,13 @@ static uint32 RTR_make_room(RTR_class *RTR, uint32 goal)
    // 4) Discard all unlocked TEMPORARY entries
    //
 
-   for (first=RTR->nentries-1;first>=0;first--)
+   for (first=rtr->nentries-1;first>=0;first--)
       {
-      if (RTR->dir[first].flags &
+      if (rtr->dir[first].flags &
          (DA_FIXED | DA_PRECIOUS | DA_DISCARDABLE | DA_DISCARDED))
          continue;
 
-      if (RTR->dir[first].locks > 0)
+      if (rtr->dir[first].locks > 0)
          continue;
 #if 1
       //
@@ -338,25 +340,25 @@ static uint32 RTR_make_room(RTR_class *RTR, uint32 goal)
 
       for (next = first-1; next >= 0; next--)
          {
-         next_seg = (uint32) RTR->dir[next+1].seg;
+         next_seg = (uint32) rtr->dir[next+1].seg;
 
-         if (RTR->dir[next].flags &
+         if (rtr->dir[next].flags &
             (DA_FIXED | DA_PRECIOUS | DA_DISCARDABLE | DA_DISCARDED))
             break;
 
-         if (RTR->dir[next].locks > 0)
+         if (rtr->dir[next].locks > 0)
             break;
 
-         if ( ((uint32)RTR->dir[next].seg + RTR->dir[next].size) != next_seg )
+         if ( ((uint32)rtr->dir[next].seg + rtr->dir[next].size) != next_seg )
             break;
          }
 
-      end = RTR->next_M;
-      dest = RTR->dir[next+1].seg;
+      end = rtr->next_M;
+      dest = rtr->dir[next+1].seg;
 
       size_deleted = 0L;
       for (i=next+1;i<=first;i++)
-         size_deleted += RTR_discard(RTR,i,0);
+         size_deleted += RTR_discard(rtr,i,0);
 
       src = add_ptr(dest,size_deleted);
       nbytes = ptr_dif(end,src);
@@ -366,7 +368,7 @@ static uint32 RTR_make_room(RTR_class *RTR, uint32 goal)
 
       first = next+1;
 #else
-      RTR_discard(RTR,first,1);
+      RTR_discard(rtr,first,1);
 #endif
       }
 
@@ -374,12 +376,12 @@ static uint32 RTR_make_room(RTR_class *RTR, uint32 goal)
    // 5) While free < goal
    //
 
-   while (RTR->free < goal)
+   while (rtr->free < goal)
       {
       //
       // If no LRU candidates available, return FALSE
       //       
-      index = RTR_LRU(RTR);
+      index = RTR_LRU(rtr);
       if (index == -1)
          {
          resume_cursor();
@@ -389,7 +391,7 @@ static uint32 RTR_make_room(RTR_class *RTR, uint32 goal)
       //       
       // Discard least-recently-used valid candidate
       //
-      RTR_discard(RTR,index,1);
+      RTR_discard(rtr,index,1);
       }
 
    resume_cursor();
@@ -405,31 +407,31 @@ static uint32 RTR_make_room(RTR_class *RTR, uint32 goal)
 //
 /***************************************************/
 
-static uint32 RTR_assign_space(RTR_class *RTR, uint32 bytes, uint32 attrib,
+static uint32 RTR_assign_space(RTR_class *rtr, uint32 bytes, uint32 attrib,
    HRES entry)
 {
    HD_entry *sel;
 
    sel = (HD_entry *) entry;
 
-   if (!RTR_make_room(RTR,bytes)) return 0;
+   if (!RTR_make_room(rtr,bytes)) return 0;
 
    sel->flags = attrib & 0xffffffff;
    sel->locks = 0;
    sel->size = bytes;
-   sel->history = RTR->LRU_cnt;
+   sel->history = rtr->LRU_cnt;
 
-   RTR->free -= bytes;
+   rtr->free -= bytes;
 
    if (attrib & DA_FIXED)
       {
-      RTR->last_F = (UBYTE *) RTR->last_F - bytes;
-      sel->seg = RTR->last_F;
+      rtr->last_F = (UBYTE *) rtr->last_F - bytes;
+      sel->seg = rtr->last_F;
       }                                   
    else
       {
-      sel->seg = RTR->next_M;
-      RTR->next_M = (UBYTE *) RTR->next_M + bytes;
+      sel->seg = rtr->next_M;
+      rtr->next_M = (UBYTE *) rtr->next_M + bytes;
       }
    
    return 1;
@@ -441,18 +443,18 @@ static uint32 RTR_assign_space(RTR_class *RTR, uint32 bytes, uint32 attrib,
 //
 /***************************************************/
 
-static void RTR_init_dir(RTR_class *RTR, uint32 first)
+static void RTR_init_dir(RTR_class *rtr, uint32 first)
 {
    uint32 i,j;
 
    for (i=0,j=first;i<DIR_BLK;i++,j++)
       {
-      RTR->dir[j].size = 0L;
-      RTR->dir[j].flags = DA_FREE | DA_DISCARDED;
-      RTR->dir[j].history = 0;
-      RTR->dir[j].locks = 0;
-      RTR->dir[j].user = -1L;
-      RTR->dir[j].seg = 0;
+      rtr->dir[j].size = 0L;
+      rtr->dir[j].flags = DA_FREE | DA_DISCARDED;
+      rtr->dir[j].history = 0;
+      rtr->dir[j].locks = 0;
+      rtr->dir[j].user = (uint32)-1;
+      rtr->dir[j].seg = 0;
       }
 }
 
@@ -463,48 +465,48 @@ static void RTR_init_dir(RTR_class *RTR, uint32 first)
 //
 /***************************************************/
 
-static HRES RTR_new_entry(RTR_class *RTR)
+static HRES RTR_new_entry(RTR_class *rtr)
 {
    uint32 i,f,n;
    uint32 nbytes;
    void *dest, *src;
    
-   n = RTR->nentries;
+   n = rtr->nentries;
 
-   if (n >= (unsigned) (-DIR_BLK)) return -1U;
+   if (n >= (unsigned) (-DIR_BLK)) return (HRES)-1;
 
    for (i=0;i<n;i++)
       {
-      f = RTR->dir[i].flags;
+      f = rtr->dir[i].flags;
 
       if ((f & DA_FREE) && (f & DA_DISCARDED))
-         return (HRES) &RTR->dir[i];
+         return (HRES) &rtr->dir[i];
       }
 
-   if (!RTR_make_room(RTR,SIZE_DB))
-      return -1U;
+   if (!RTR_make_room(rtr,SIZE_DB))
+      return (HRES)-1;
 
    for (i=0;i<n;i++)
       {
-      if (RTR->dir[i].flags & (DA_DISCARDED | DA_FIXED))
+      if (rtr->dir[i].flags & (DA_DISCARDED | DA_FIXED))
          continue;
-      RTR->dir[i].seg = ((BYTE *) RTR->dir[i].seg) + SIZE_DB;
+      rtr->dir[i].seg = ((BYTE *) rtr->dir[i].seg) + SIZE_DB;
       }
 
-   src    = add_ptr(RTR->dir ,n * sizeof(HD_entry));
+   src    = add_ptr(rtr->dir ,n * sizeof(HD_entry));
    dest   = add_ptr(src, SIZE_DB);
-   nbytes = ptr_dif(RTR->next_M, src);
+   nbytes = ptr_dif(rtr->next_M, src);
 
    PollMod();
    far_memmove(dest,src,nbytes);
 
-   RTR->next_M =(BYTE *) RTR->next_M + SIZE_DB;
-   RTR->free -= SIZE_DB;
-   RTR->nentries += DIR_BLK;
+   rtr->next_M =(BYTE *) rtr->next_M + SIZE_DB;
+   rtr->free -= SIZE_DB;
+   rtr->nentries += DIR_BLK;
 
-   RTR_init_dir(RTR,n);
+   RTR_init_dir(rtr,n);
 
-   return (HRES) &RTR->dir[n];
+   return (HRES) &rtr->dir[n];
 }
 
 /***************************************************/
@@ -513,7 +515,7 @@ static HRES RTR_new_entry(RTR_class *RTR)
 // pointer positioned at start of resource data
 //
 // Maintain copy of current ordinal directory block as part of 
-// RTR structure to reduce excessive seeking
+// rtr structure to reduce excessive seeking
 //
 // Return size of resource in bytes
 //
@@ -522,38 +524,36 @@ static HRES RTR_new_entry(RTR_class *RTR)
 //
 /***************************************************/
 
-uint32 RTR_seek(RTR_class *RTR, uint32 rnum)
-{
-   uint32 dirblk,next;
-   UWORD dirent;
+uint32 RTR_seek(RTR_class *rtr, uint32 rnum) {
+	uint32 dirblk, next;
+	UWORD dirent;
 
-   dirblk = (rnum / (uint32) OD_SIZE);
-   dirent = (UWORD) (rnum % (uint32) OD_SIZE);
+	dirblk = (rnum / (uint32)OD_SIZE);
+	dirent = (UWORD)(rnum % (uint32)OD_SIZE);
 
-   if (RTR->cur_blk != dirblk)
-      {
-      RTR->cur_blk = dirblk;
+	if (rtr->cur_blk != dirblk)
+	{
+		rtr->cur_blk = dirblk;
 
-      next = RTR->RFH.FOB;
+		next = rtr->RFH.FOB;
 
-      do
-         {
-         lseek(RTR->file,next,SEEK_SET);
-         read(RTR->file,&RTR->OD,sizeof(OD_block));
-         next = RTR->OD.next;
+		do
+		{
+			rtr->file->seek(next, SEEK_SET);
+			rtr->OD.load(rtr->file);
+			next = rtr->OD.next;
 
-         PollMod();
-         }
-      while (dirblk--);
-      }
+			PollMod();
+		} while (dirblk--);
+	}
 
-   lseek(RTR->file,RTR->OD.index[dirent],SEEK_SET);
-   read(RTR->file,&RTR->REH,sizeof(RF_entry_hdr));
+	rtr->file->seek(rtr->OD.index[dirent], SEEK_SET);
+	rtr->REH.load(rtr->file);
 
-   if (RTR->REH.data_attrib & DA_PLACEHOLDER)
-      return 0;
+	if (rtr->REH.data_attrib & DA_PLACEHOLDER)
+		return 0;
 
-   return RTR->REH.data_size;
+	return rtr->REH.data_size;
 }
 
 /***************************************************/
@@ -564,7 +564,7 @@ uint32 RTR_seek(RTR_class *RTR, uint32 rnum)
 //
 /***************************************************/
 
-static void RTR_read(RTR_class *RTR, HRES entry)
+static void RTR_read(RTR_class *rtr, HRES entry)
 {
    UBYTE *ptr;
    HD_entry *sel;
@@ -572,18 +572,18 @@ static void RTR_read(RTR_class *RTR, HRES entry)
 
    sel = (HD_entry *) entry;
 
-   ptr = sel->seg;
+   ptr = (UBYTE *)sel->seg;
    len = sel->size;
 
-   while (len > (uint32) DOS_BUFFSIZE)
-      {
-      PollMod();
+   while (len > (uint32)DOS_BUFFSIZE) {
+	   PollMod();
 
-      read(RTR->file,ptr,DOS_BUFFSIZE);
-      len -= DOS_BUFFSIZE;
-      ptr += DOS_BUFFSIZE;
-      }
-   read(RTR->file,ptr,len);
+	   rtr->file->read(ptr, DOS_BUFFSIZE);
+	   len -= DOS_BUFFSIZE;
+	   ptr += DOS_BUFFSIZE;
+   }
+
+   rtr->file->read(ptr, len);
 
    PollMod();
 }
@@ -602,42 +602,41 @@ static void RTR_read(RTR_class *RTR, HRES entry)
 //
 /***************************************************/
 
-RTR_class *RTR_construct(void *base, uint32 size, uint32 nnames, BYTE *filename)
-{
-   RTR_class *RTR;
+RTR_class *RTR_construct(void *base, uint32 size, uint32 nnames, const char *filename) {
+   RTR_class *rtr;
    void *beg,*end;
 
-   RTR = mem_alloc(sizeof(RTR_class));
+   rtr = (RTR_class *)mem_alloc(sizeof(RTR_class));
 
-   RTR->file = open((char *)filename,O_RDONLY | O_BINARY);
-   if (RTR->file == -1) return NULL;
+   rtr->file = g_system->getSavefileManager()->openForLoading(filename);
+   if (rtr->file == nullptr) return NULL;
 
-   read(RTR->file,&RTR->RFH,sizeof(RF_file_hdr));
+   rtr->RFH.load(rtr->file);
 
    end = add_ptr(base,size);
    beg = base;
 
-   RTR->base = base;
+   rtr->base = base;
 
-   RTR->nentries = DIR_BLK;
-   RTR->dir = beg;
+   rtr->nentries = DIR_BLK;
+   rtr->dir = (HD_entry *)beg;
 
-   RTR->next_M = add_ptr(beg,SIZE_DB);
-   RTR->last_F = end;
+   rtr->next_M = add_ptr(beg,SIZE_DB);
+   rtr->last_F = end;
 
-   RTR->free = ptr_dif(RTR->last_F,RTR->next_M);
+   rtr->free = ptr_dif(rtr->last_F,rtr->next_M);
 
-   RTR->LRU_cnt = 0;
+   rtr->LRU_cnt = 0;
 
-   RTR_init_dir(RTR,0);
+   RTR_init_dir(rtr,0);
 
-   RTR->cur_blk = (uint32) -1L;
+   rtr->cur_blk = (uint32) -1L;
 
-   RTR->name_dir = RTR_alloc(RTR,(uint32) ((uint32) nnames * sizeof(ND_entry)),
+   rtr->name_dir = RTR_alloc(rtr,(uint32) ((uint32) nnames * sizeof(ND_entry)),
       DA_FIXED | DA_PRECIOUS);
-   RTR->nd_entries = 0;
+   rtr->nd_entries = 0;
 
-   return RTR;
+   return rtr;
 }
 
 /***************************************************/
@@ -648,16 +647,15 @@ RTR_class *RTR_construct(void *base, uint32 size, uint32 nnames, BYTE *filename)
 //
 /***************************************************/
 
-void RTR_destroy(RTR_class *RTR, uint32 flags)
-{
-   close(RTR->file);
+void RTR_destroy(RTR_class *rtr, uint32 flags) {
+	delete rtr->file;
+	rtr->file = nullptr;
 
-   if (flags & RTR_FREEBASE)
-      {
-      mem_free(RTR->base);
-      }
+	if (flags & RTR_FREEBASE) {
+		mem_free(rtr->base);
+	}
 
-   mem_free(RTR);
+	mem_free(rtr);
 }
 
 /***************************************************/
@@ -675,22 +673,21 @@ void RTR_destroy(RTR_class *RTR, uint32 flags)
 //
 /***************************************************/
 
-HRES RTR_alloc(RTR_class *RTR, uint32 bytes, uint32 attrib)
-{
-   HRES entry;
-   HD_entry *sel;
+HRES RTR_alloc(RTR_class *rtr, uint32 bytes, uint32 attrib) {
+	HRES entry;
+	HD_entry *sel;
 
-   entry = RTR_new_entry(RTR);
-   if (entry == -1U)
-      return -1U;
+	entry = RTR_new_entry(rtr);
+	if (entry == (HRES)-1)
+		return (HRES)-1;
 
-   if (!RTR_assign_space(RTR,bytes,attrib,entry))
-      return -1U;
+	if (!RTR_assign_space(rtr, bytes, attrib, entry))
+		return (HRES)-1;
 
-   sel = (HD_entry *) entry;
-   sel->user = -1L;
+	sel = (HD_entry *)entry;
+	sel->user = (uint32)-1;
 
-   return entry;
+	return entry;
 }
 
 /***************************************************/
@@ -706,43 +703,44 @@ HRES RTR_alloc(RTR_class *RTR, uint32 bytes, uint32 attrib)
 //
 /***************************************************/
 
-void RTR_free(RTR_class *RTR, HRES entry)
+void RTR_free(RTR_class *rtr, HRES entry)
 {
    uint32 i,n;
    HD_entry *sel;
    ND_entry *dir;
 
-   if (entry == -1U) return;
+   if (entry == (HRES)-1)
+	   return;
 
    sel = (HD_entry *) entry;
 
    sel->flags |= DA_FREE;
    sel->locks = 0;
 
-   for (i=0,dir = RTR_addr(RTR->name_dir);i<RTR->nd_entries;i++,dir++)
+   for (i=0,dir = (ND_entry *)RTR_addr(rtr->name_dir); i < (uint32)rtr->nd_entries; i++, dir++)
       if (dir->handle == entry)
          dir->handle = 0;
       else if (dir->thunk == entry)
-         dir->thunk = -1U;
+         dir->thunk = (HRES)-1;
 
    if (!(sel->flags & DA_FIXED))
       {
       while ( ( !(sel->flags & DA_FIXED) ) &&
               ( !(sel->flags & DA_DISCARDED) ) &&
-              ( (uint32) sel->seg + sel->size == (uint32) RTR->next_M )
+              ( (uint32) sel->seg + sel->size == (uint32) rtr->next_M )
             )
          {
-         RTR_discard(RTR, (entry - (uint32) RTR->dir)/sizeof(HD_entry), 1);
+         RTR_discard(rtr, (entry - (uint32) rtr->dir)/sizeof(HD_entry), 1);
 
-         n = RTR->nentries;
+         n = rtr->nentries;
          for (i=0;i<n;i++)
-            if ( ( !(RTR->dir[i].flags & DA_FIXED)       ) &&
-                 (   RTR->dir[i].flags & DA_FREE         ) &&
-                 ( !(RTR->dir[i].flags & DA_DISCARDED)   ) &&
-                 (  (uint32)RTR->dir[i].seg + sel->size == (uint32)RTR->next_M )
+            if ( ( !(rtr->dir[i].flags & DA_FIXED)       ) &&
+                 (   rtr->dir[i].flags & DA_FREE         ) &&
+                 ( !(rtr->dir[i].flags & DA_DISCARDED)   ) &&
+                 (  (uint32)rtr->dir[i].seg + sel->size == (uint32)rtr->next_M )
                )
                {
-               sel = &(RTR->dir[i]);
+               sel = &(rtr->dir[i]);
                entry = (HRES) sel;
                break;
                }
@@ -752,20 +750,20 @@ void RTR_free(RTR_class *RTR, HRES entry)
       {  
       while  ((sel->flags & DA_FIXED)
          && (!(sel->flags & DA_DISCARDED))
-         &&   (sel->seg == RTR->last_F))
+         &&   (sel->seg == rtr->last_F))
          {
-         RTR->last_F = (UBYTE *) RTR->last_F + sel->size;
-         RTR->free += sel->size;
+         rtr->last_F = (UBYTE *) rtr->last_F + sel->size;
+         rtr->free += sel->size;
          sel->flags |= DA_DISCARDED;
 
-         n = RTR->nentries;
+         n = rtr->nentries;
          for (i=0;i<n;i++)
-            if ((RTR->dir[i].flags & DA_FIXED)
-            && (RTR->dir[i].flags & DA_FREE)
-          && (!(RTR->dir[i].flags & DA_DISCARDED))
-            && (RTR->dir[i].seg == RTR->last_F))
+            if ((rtr->dir[i].flags & DA_FIXED)
+            && (rtr->dir[i].flags & DA_FREE)
+          && (!(rtr->dir[i].flags & DA_DISCARDED))
+            && (rtr->dir[i].seg == rtr->last_F))
                {
-               sel = &RTR->dir[i];
+               sel = &rtr->dir[i];
                break;
                }
          }
@@ -781,9 +779,9 @@ void RTR_free(RTR_class *RTR, HRES entry)
 //
 /***************************************************/
 
-uint32 RTR_force_discard(RTR_class *RTR, uint32 goal)
+uint32 RTR_force_discard(RTR_class *rtr, uint32 goal)
 {
-   return RTR_make_room(RTR,goal);
+   return RTR_make_room(rtr,goal);
 }
 
 /***************************************************/
@@ -799,7 +797,7 @@ uint32 RTR_force_discard(RTR_class *RTR, uint32 goal)
 //
 /***************************************************/
 
-void RTR_lock(RTR_class *RTR, HRES entry)
+void RTR_lock(RTR_class *rtr, HRES entry)
 {
    uint32 i,n;
    HD_entry *sel;
@@ -813,31 +811,31 @@ void RTR_lock(RTR_class *RTR, HRES entry)
 
    if ( (sel->flags & DA_DISCARDED) && (sel->user != -1L) )
       {
-      if (RTR_assign_space(RTR,sel->size,sel->flags,entry) == -1U) 
+      if (RTR_assign_space(rtr,sel->size,sel->flags,entry) == (uint32)-1)
          return;
 
 #if FAST_LOCK
-      lseek(RTR->file,sel->user,SEEK_SET);
+      rtr->file->seek(sel->user, SEEK_SET);
 #else
-      RTR_seek(RTR,sel->user);
+      RTR_seek(rtr,sel->user);
 #endif
 
-      RTR_read(RTR,entry);
+      RTR_read(rtr,entry);
 
       sel->flags &= (~DA_DISCARDED);
       }
 
    ++sel->locks;
 
-   sel->history = ++RTR->LRU_cnt;
+   sel->history = ++rtr->LRU_cnt;
 
-   if (RTR->LRU_cnt == 65535U)
+   if (rtr->LRU_cnt == 65535U)
       {
-      n = RTR->nentries;
+      n = rtr->nentries;
       for (i=0;i<n;i++)
-         RTR->dir[i].history >>= 3;
+         rtr->dir[i].history >>= 3;
 
-      RTR->LRU_cnt >>= 3;
+      rtr->LRU_cnt >>= 3;
       }
 }
 
@@ -914,15 +912,14 @@ void *RTR_addr(HRES entry)
 //
 /***************************************************/
 
-void RTR_read_resource(RTR_class *RTR, void *dest, uint32 len)
-{
-   while (len > (uint32) DOS_BUFFSIZE)
-      {
-      read(RTR->file,dest,DOS_BUFFSIZE);
-      len -= DOS_BUFFSIZE;
-      dest = add_ptr(dest,DOS_BUFFSIZE);
-      }
-   read(RTR->file,dest, len);
+void RTR_read_resource(RTR_class *rtr, void *dest, uint32 len) {
+	while (len > (uint32)DOS_BUFFSIZE) {
+		rtr->file->read(dest, DOS_BUFFSIZE);
+		len -= DOS_BUFFSIZE;
+		dest = add_ptr(dest, DOS_BUFFSIZE);
+	}
+
+	rtr->file->read(dest, len);
 }
 
 /***************************************************/
@@ -940,31 +937,29 @@ void RTR_read_resource(RTR_class *RTR, void *dest, uint32 len)
 //
 /***************************************************/
 
-HRES RTR_load_resource(RTR_class *RTR, uint32 resource, uint32 attrib)
-{
-   HD_entry *sel;
-   HRES entry;
+HRES RTR_load_resource(RTR_class *rtr, uint32 resource, uint32 attrib) {
+	HD_entry *sel;
+	HRES entry;
 
-   if (!RTR_seek(RTR,resource))
-      return -1U;
+	if (!RTR_seek(rtr, resource))
+		return (HRES)-1;
 
-   entry = RTR_alloc(RTR, RTR->REH.data_size,
-      (attrib==DA_DEFAULT) ? RTR->REH.data_attrib : attrib);
+	entry = RTR_alloc(rtr, rtr->REH.data_size,
+		(attrib == DA_DEFAULT) ? rtr->REH.data_attrib : attrib);
 
-   if (entry != -1U)
-      {
-      sel = (HD_entry *) entry;
+	if (entry != (HRES)-1) {
+		sel = (HD_entry *)entry;
 
 #if FAST_LOCK
-      sel->user = tell(RTR->file);
+		sel->user = rtr->file->pos();
 #else
-      sel->user = resource;
+		sel->user = resource;
 #endif
 
-      RTR_read(RTR,entry);
-      }
+		RTR_read(rtr, entry);
+	}
 
-   return entry;
+	return entry;
 }
 
 /***************************************************/
@@ -980,58 +975,56 @@ HRES RTR_load_resource(RTR_class *RTR, uint32 resource, uint32 attrib)
 //
 /***************************************************/
 
-HRES RTR_get_resource_handle(RTR_class *RTR, uint32 resource, uint32 attrib)
-{
-   int32 i,insert,replace;
-   ND_entry *dir;
-   void *dest,*src;
-   uint32 nbytes;
+HRES RTR_get_resource_handle(RTR_class *rtr, uint32 resource, uint32 attrib) {
+	int32 i, insert, replace;
+	ND_entry *dir;
+	void *dest, *src;
+	uint32 nbytes;
 
-   dir = RTR_search_name_dir(RTR,resource);
+	dir = RTR_search_name_dir(rtr, resource);
 
-   if (dir == NULL)
-      {
-      dir = RTR_addr(RTR->name_dir);
+	if (dir == NULL) {
+		dir = (ND_entry *)RTR_addr(rtr->name_dir);
 
-      for (i=replace=insert=0;i<RTR->nd_entries;i++)
-         {
-         if (dir->OE > resource)
-            {
-            insert=1;
-            break;
-            }
-         
-         if (dir->OE == resource)
-            {
-            replace=1;
-            break;
-            }
-         
-         dir++;
-         }
+		for (i = replace = insert = 0; i < rtr->nd_entries; i++)
+		{
+			if (dir->OE > resource)
+			{
+				insert = 1;
+				break;
+			}
 
-      if (insert)
-         {
-         src = dir;
-         dest = add_ptr(src,(uint32) sizeof(ND_entry));
-         nbytes = (uint32) ((RTR->nd_entries - i) * sizeof(ND_entry));
+			if (dir->OE == resource)
+			{
+				replace = 1;
+				break;
+			}
 
-         PollMod();
-         far_memmove(dest,src,nbytes);
-         }
+			dir++;
+		}
 
-      if (!replace)
-         ++RTR->nd_entries;
+		if (insert)
+		{
+			src = dir;
+			dest = add_ptr(src, (uint32)sizeof(ND_entry));
+			nbytes = (uint32)((rtr->nd_entries - i) * sizeof(ND_entry));
 
-      dir->OE = resource;
-      dir->handle = RTR_load_resource(RTR,resource,attrib);
-      dir->thunk = -1U;
-      }
+			PollMod();
+			far_memmove(dest, src, nbytes);
+		}
 
-   if (dir->handle == -1U)
-      dir->handle = 0;
+		if (!replace)
+			++rtr->nd_entries;
 
-   return dir->handle;
+		dir->OE = resource;
+		dir->handle = RTR_load_resource(rtr, resource, attrib);
+		dir->thunk = (HRES)-1;
+	}
+
+	if (dir->handle == (HRES)-1)
+		dir->handle = 0;
+
+	return dir->handle;
 }
 
 /***************************************************/
@@ -1044,16 +1037,16 @@ HRES RTR_get_resource_handle(RTR_class *RTR, uint32 resource, uint32 attrib)
 //
 /***************************************************/
 
-void RTR_free_resource(RTR_class *RTR, uint32 resource)
+void RTR_free_resource(RTR_class *rtr, uint32 resource)
 {
    ND_entry *dir;
 
-   dir = RTR_search_name_dir(RTR,resource);
+   dir = RTR_search_name_dir(rtr,resource);
 
    if (dir == NULL)
       return;
 
-   RTR_free(RTR,dir->handle);
+   RTR_free(rtr,dir->handle);
 }
 
 /***************************************************/
@@ -1065,31 +1058,31 @@ void RTR_free_resource(RTR_class *RTR, uint32 resource)
 //
 /***************************************************/
 
-ND_entry *RTR_search_name_dir(RTR_class *RTR, uint32 resource)
+ND_entry *RTR_search_name_dir(RTR_class *rtr, uint32 resource)
 {
    int32 min,max,mid;
-   ND_entry *dir,*try;
+   ND_entry *dir, *try_;
    uint32 entry;
 
-   dir = RTR_addr(RTR->name_dir);
+   dir = (ND_entry *)RTR_addr(rtr->name_dir);
 
    min = 0;
-   max = RTR->nd_entries-1;
+   max = rtr->nd_entries-1;
 
    while (min <= max)
       {
       mid = (min+max) >> 1;
 
-      try = &dir[mid];
+      try_ = &dir[mid];
 
-      entry = try->OE;
+      entry = try_->OE;
 
       if (entry > resource)
          max = mid-1;
       else if (entry < resource)
          min = mid+1;
       else
-         return (try->handle == 0) ? NULL : try;
+         return (try_->handle == 0) ? NULL : try_;
       }
 
    return NULL;
@@ -1140,7 +1133,7 @@ BYTE *ASCII_name(uint32 name)
 //
 /***************************************************/
 
-void RTR_dump(RTR_class *RTR)
+void RTR_dump(RTR_class *rtr)
 {
    uint32 i,j,f;
    HD_entry R;
@@ -1150,32 +1143,32 @@ void RTR_dump(RTR_class *RTR)
    extern uint32 heap_size;
    uint32 present;
 
-   fprintf(stdout," # of entries: %u\n",RTR->nentries);
+   fprintf(stdout," # of entries: %u\n",rtr->nentries);
    fprintf(stdout,"         Size: %lu\n",heap_size);
-   fprintf(stdout,"         Base: %Fp\n\n",RTR->base);
+   fprintf(stdout,"         Base: %Fp\n\n",rtr->base);
 
-   fprintf(stdout,"Next moveable: %Fp\n",RTR->next_M);
-   fprintf(stdout,"   Last fixed: %Fp\n",RTR->last_F);
-   fprintf(stdout,"         Free: %lu\n\n",RTR->free);
+   fprintf(stdout,"Next moveable: %Fp\n",rtr->next_M);
+   fprintf(stdout,"   Last fixed: %Fp\n",rtr->last_F);
+   fprintf(stdout,"         Free: %lu\n\n",rtr->free);
 
    present = 0L;
 
-   for (i=0;i<RTR->nentries;i++)
+   for (i=0;i<rtr->nentries;i++)
       {
-      f = RTR->dir[i].flags;
+      f = rtr->dir[i].flags;
 
-      if ((f & DA_FREE) && (f & DA_DISCARDED) && (!RTR->dir[i].seg))
+      if ((f & DA_FREE) && (f & DA_DISCARDED) && (!rtr->dir[i].seg))
          break;
       }
 
-   fprintf(stdout,"Entries avail: %u\n",RTR->nentries);
+   fprintf(stdout,"Entries avail: %u\n",rtr->nentries);
    fprintf(stdout,"       In use: %u\n\n",i);
 
    for (j=0;j<i;j++)
       {
-      R = RTR->dir[j];
+      R = rtr->dir[j];
 
-      for (cnt=0L,cs=0,ptr = RTR_addr(norm(&RTR->dir[j]));
+      for (cnt=0L,cs=0,ptr = RTR_addr(norm(&rtr->dir[j]));
          cnt<R.size;cnt++)
          cs += ptr[cnt];
 
@@ -1204,5 +1197,33 @@ void RTR_dump(RTR_class *RTR)
 }
 
 #endif
+
+/*--------------------------------------------*/
+
+void RF_file_hdr::load(Common::SeekableReadStream *rs) {
+	rs->read(signature, 16);
+	file_size = rs->readUint32LE();
+	lost_space = rs->readUint32LE();
+	FOB = rs->readUint32LE();
+	create_time = rs->readUint32LE();
+	modify_time = rs->readUint32LE();
+}
+
+/*--------------------------------------------*/
+
+void RF_entry_hdr::load(Common::SeekableReadStream *rs) {
+	timestamp = rs->readUint32LE();
+	data_attrib = rs->readUint32LE();
+	data_size = rs->readUint32LE();
+}
+
+/*--------------------------------------------*/
+
+void OD_block::load(Common::SeekableReadStream *rs) {
+	next = rs->readUint32LE();
+	rs->read(flags, OD_SIZE);
+	for (int i = 0; i < OD_SIZE; ++i)
+		index[i] = rs->readUint32LE();
+}
 
 } // namespace Aesop

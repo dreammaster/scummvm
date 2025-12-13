@@ -22,6 +22,7 @@
 #ifndef AESOP_RTRES_H
 #define AESOP_RTRES_H
 
+#include "common/stream.h"
 #include "aesop/defs.h"
 
 namespace Aesop {
@@ -69,32 +70,34 @@ typedef struct
 }
 HD_entry;                        // cached resource entry descriptor
 
-typedef struct
-{
+// resource file header
+struct RF_file_hdr {
    BYTE  signature[16];
    uint32 file_size;
    uint32 lost_space;
    uint32 FOB;
    uint32 create_time;
    uint32 modify_time;
-}
-RF_file_hdr;                     // resource file header
 
-typedef struct
-{
-   uint32 timestamp;
-   uint32 data_attrib;
-   uint32 data_size;
-}
-RF_entry_hdr;                    // resource file entry header
+   void load(Common::SeekableReadStream *rs);
+};
 
-typedef struct OD_block
-{
+// resource file entry header
+struct RF_entry_hdr {
+	uint32 timestamp;
+	uint32 data_attrib;
+	uint32 data_size;
+
+	void load(Common::SeekableReadStream *rs);
+};
+
+struct OD_block {
    uint32 next;
    UBYTE flags[OD_SIZE];
    uint32 index[OD_SIZE];
-}
-OD_block;
+
+   void load(Common::SeekableReadStream *rs);
+};
 
 typedef struct                   // name directory entry
 {                                
@@ -104,12 +107,11 @@ typedef struct                   // name directory entry
 }
 ND_entry;
 
-typedef struct
-{
+struct RTR_class {
    HD_entry *dir;             // public
    UWORD nentries;            // public
 
-   WORD file;                    
+   Common::SeekableReadStream *file;                    
    RF_file_hdr RFH;              
    RF_entry_hdr REH;             
    OD_block OD;                  
@@ -123,8 +125,7 @@ typedef struct
 
    HRES name_dir;
    WORD nd_entries;
-}
-RTR_class;
+};
 
 //
 // RTR_addr macro returns current address of resource cache entry
