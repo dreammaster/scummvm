@@ -39,7 +39,8 @@ const DebugChannelDef SpycraftMetaEngineDetection::debugFlagList[] = {
 };
 
 SpycraftMetaEngineDetection::SpycraftMetaEngineDetection() : AdvancedMetaEngineDetection(
-	Spycraft::gameDescriptions, Spycraft::spycraftGames) {
+		Spycraft::gameDescriptions, Spycraft::spycraftGames) {
+	_flags = kADFlagMatchFullPaths;
 }
 
 REGISTER_PLUGIN_STATIC(SPYCRAFT_DETECTION, PLUGIN_TYPE_ENGINE_DETECTION, SpycraftMetaEngineDetection);
