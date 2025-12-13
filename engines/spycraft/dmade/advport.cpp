@@ -60,9 +60,7 @@ void FreePort(Viewport *port) {
 
 Viewport *AllocMDPort(int width, int height, int colors) {
 	int i;
-	void *ptr;
 	WinViewport *port;
-	HBITMAP hBitmap;
 
 	struct {
 		BITMAPINFOHEADER bmiHeader;
