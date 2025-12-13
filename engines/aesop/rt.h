@@ -63,7 +63,7 @@ extern uint32 current_index;
 void *RTD_first(void *dictionary);
 void *RTD_iterate(void *base, void *cur, char **tag, char **def);
 
-BYTE *RTD_lookup(HRES dictionary, void *key);
+BYTE *RTD_lookup(HRES dictionary, const char *key);
 
 // Runtime interpreter calls
 

@@ -22,17 +22,20 @@
 #ifndef AESOP_RTOBJECT_H
 #define AESOP_RTOBJECT_H
 
+#include "common/stream.h"
 #include "aesop/defs.h"
 
 namespace Aesop {
 
-typedef struct
-{
-   UWORD slot;       // object list index
-   uint32 name;       // code object name
-   UWORD size;       // size of instance data (unused in text files)
-}
-CDESC;               // static context descriptor
+// static context descriptor
+struct CDESC {
+	UWORD slot;       // object list index
+	uint32 name;       // code object name
+	UWORD size;       // size of instance data (unused in text files)
+
+	void save(Common::WriteStream *ws);
+	void load(Common::SeekableReadStream *rs);
+};
 
 #define SF_TXT 1     // text savetype
 #define SF_BIN 0     // binary savetype

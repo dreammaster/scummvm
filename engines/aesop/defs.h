@@ -45,11 +45,10 @@ typedef UWORD HSTR;           // run-time len-prefixed string descriptor
 
 #define MAX_G 16              // Maximum depth of "family trees"
 
-typedef struct
-{
+// Instance header
+struct IHDR {
    HRES thunk;
-}
-IHDR;                         // Instance header
+};
 
 typedef struct
 {
