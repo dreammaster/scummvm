@@ -30,7 +30,7 @@ const ADGameDescription gameDescriptions[] = {
 	{
 		"spycraft",
 		nullptr,
-		AD_ENTRY1s("file1.bin", "00000000000000000000000000000000", 11111),
+		AD_ENTRY1s("data/vol.001", "4fca25ae3749c68f15f2a37c5e85d8a3", 128191816),
 		Common::EN_ANY,
 		Common::kPlatformDOS,
 		ADGF_UNSTABLE,
