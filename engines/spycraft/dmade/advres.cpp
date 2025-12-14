@@ -48,7 +48,6 @@ namespace Spycraft {
 int sizeHTM = 0;
 
 ResInfo resInfo;
-static char resourceDir[MAX_VOL_PATH_SIZE];
 char sysDir[MAX_VOL_PATH_SIZE];
 char viewDir[MAX_VOL_PATH_SIZE];
 char picDir[MAX_VOL_PATH_SIZE];
@@ -293,27 +292,6 @@ static char *StrDup(char *str) {
 	return (ret);
 }
 
-char *GetResourceDir(char *resourceLine) {
-	char *p = resourceLine;
-
-	while (*p) {
-		if (*p == '=') {
-			p++;
-			break;
-		}
-		p++;
-	}
-
-	while (*p) {
-		if (*p != ' ')
-			return (p);
-		else
-			p++;
-	}
-
-	return NULL;
-}
-
 char *StrDupPath(char *volName) {
 	int len;
 	char *buffer;
@@ -332,9 +310,7 @@ static void ReadVols() {
 	char *ptr;
 	int isItVols;
 	char volName[MAX_VOL_NAME_SIZE];
-#ifdef _NOTROOT
-	char CDROMname[3];
-#endif
+
 	FHANDLE hi = sfxOpenFile(INI_FILE, MADE_FILE_READ);
 
 	/* Get resource directory from RESOURCE.INI */
@@ -351,35 +327,6 @@ static void ReadVols() {
 		ADV_ASSERT ( false, __ERR_RES_NOT_FOUND );
 	}
 
-	if ( ( ptr = (char *)GetResourceDir ( volName ) ) ) {
-		Common::strcpy_s ( resourceDir, ptr );
-	}
-	
-	if ( GetDriveType ( resourceDir ) != DRIVE_CDROM )
-#ifdef _NOTROOT
-#pragma message ("_NOTROOT\n")
-	 {
-	  GetCDROM ( CDROMname );
-	  resourceDir[0]=CDROMname[0];
-	 }
-#else
-#pragma message ("not _NOTROOT\n")
-	  GetCDROM ( resourceDir );
-#endif
-#ifdef _TERRY
-/*****************debug*******************/
-#pragma message ("_TERRY:  Lines 355-365 are debug code.\n")
-	fiel=fopen("c:\\junk.jnk","w");
-/*****************debug*******************/
-	fprintf(fiel,"volName||%s||\n",volName);
-	fprintf(fiel,"resourceDir||%s||\n",resourceDir);
-	fclose (fiel);
-#ifdef _DEBUG
-#pragma message ("_DEBUG\n")
-	DebugBreak();
-#endif
-/*****************debug*******************/
-#endif
 	volList = ArrayList_Calloc ( MAX_DISC_LIMIT ) ;
 	ADV_ASSERT ( volList, __ERR_MEM_ALLOC_FAIL );
 
@@ -388,7 +335,7 @@ static void ReadVols() {
 
 	i = -1;
 	isItVols = false;
-	while ( true ) {
+	for (;;) {
 		if ( ( i >= MAX_DISC_LIMIT) || ( n = sfxGetString ( hi, volName ) ) == -1 ) {
 			sfxCloseFile(hi);
 			break;

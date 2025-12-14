@@ -29,13 +29,12 @@ namespace Spycraft {
 
 extern HWND hGameWnd;
 
-//OPENFILENAME ofn;
-char filter[FILTERSIZE];
-char fileName[PATHSIZE];
-
-//OPENFILENAME sfn;
-char sFilter[FILTERSIZE];
-char sFileName[PATHSIZE];
+#ifdef TODO
+static char filter[FILTERSIZE];
+static char sFilter[FILTERSIZE];
+#endif
+static char fileName[PATHSIZE];
+static char sFileName[PATHSIZE];
 
 FHANDLE sfxOpenFile(const char *filename, int mode) {
 	assert(mode == MADE_FILE_READ);
@@ -44,7 +43,7 @@ FHANDLE sfxOpenFile(const char *filename, int mode) {
 	if (f->open(filename))
 		return f;
 
-	return (FHANDLE)-1;
+	return nullptr;
 }
 
 int sfxGetFileSize(FHANDLE hf) {
@@ -111,23 +110,19 @@ int sfxReadFile(FHANDLE hf, void *buffer, int size) {
 char *sfxReadFileString(FHANDLE hf) {
 	int i = 0;
 	char buffer;
-	bool ret = true;
 	char dest[2048];
 	char *out = nullptr;
 
-	Common::SeekableReadStream *f = dynamic_cast<Common::SeekableReadStream *>(hf);
-	assert(f);
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(hf);
+	assert(rs);
 
-	while (ret) {
-		buffer = f->readByte();
+	while (!rs->eos()) {
+		buffer = rs->readByte();
 
-		if (ret) {
-			if ((buffer == '\0') || (buffer == '\n'))
-				break;
-			if (buffer != '\r' && buffer != 0x09)
-				dest[i++] = buffer;
-		} else
-			return nullptr;
+		if ((buffer == '\0') || (buffer == '\n'))
+			break;
+		if (buffer != '\r' && buffer != 0x09)
+			dest[i++] = buffer;
 
 		if (i == 2048)
 			ADV_ASSERT(false, __ERR_BUFFER_OVERFLOW);
@@ -142,22 +137,22 @@ char *sfxReadFileString(FHANDLE hf) {
 }
 
 int sfxGetString(FHANDLE hf, char *dest) {
-	Common::SeekableReadStream *f = dynamic_cast<Common::SeekableReadStream *>(hf);
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(hf);
 	int i = 0;
 	char buffer;
-	int ret = true;
 
-	while (ret) {
-		buffer = f->readByte();
+	if (rs == nullptr)
+		return -1;
 
-		if (ret) {
-			if ((buffer == '\0') || (buffer == '\n'))
-				break;
-			if (buffer != '\r' && buffer != 0x09)
-				dest[i++] = buffer;
-		} else
-			return (-1);
+	while (!rs->eos()) {
+		buffer = rs->readByte();
+
+		if ((buffer == '\0') || (buffer == '\n'))
+			break;
+		if (buffer != '\r' && buffer != 0x09)
+			dest[i++] = buffer;
 	}
+
 	dest[i] = '\0';
 	return i;
 }
