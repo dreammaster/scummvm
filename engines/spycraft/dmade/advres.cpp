@@ -56,16 +56,19 @@ char fontDir[MAX_VOL_PATH_SIZE];
 char movieDir[MAX_VOL_PATH_SIZE];
 char htmDir[MAX_VOL_PATH_SIZE];
 char faceDir[MAX_VOL_PATH_SIZE];
-static char patchDir[] = "\\resource";
+static const char patchDir[] = "resource";
+static const char MAP_FILE[] = "resource.map";
+static char INI_FILE[] = "resource.ini";
+static char KEYWORD_DRIVE[] = "[RESOURCE_DRIVE]";
+static char KEYWORD_CD[] = "[CD";
+static const char ATSEXT[] = ".ats";
+static const char WAVEXT[] = ".wav";
+static const char HTMEXT[] = ".htm";
+static const char MIDEXT[] = ".mid";
+static const char PICEXT[] = ".tga";
+static const char FONEXT[] = ".msg";
+static const char FACEEXT[] = ".fnt";
 
-char ATSEXT[] = ".ats";
-char WAVEXT[] = ".wav";
-char HTMEXT[] = ".htm";
-char MIDEXT[] = ".mid";
-char PICEXT[] = ".tga";
-char FONEXT[] = ".msg";
-char FACEEXT[] = ".fnt";
-static char MAP_FILE[] = "resource.map";
 static int curDisc = 0;
 bool cacheValide = false;
 ResCache *atsCache = NULL;
@@ -79,9 +82,6 @@ static ArrayList *mapList = NULL;
 static ArrayList *volList = NULL;
 static ArrayList *streamList = NULL;
 static FHANDLE discHandler = nullptr;
-static char INI_FILE[] = "resource.ini";
-static char KEYWORD_DRIVE[] = "[RESOURCE_DRIVE]";
-static char KEYWORD_CD[] = "[CD";
 
 extern int __mem_index;
 
@@ -762,13 +762,13 @@ GenericData *SearchRESData(int type, int id) {
 	return nullptr;
 }
 
-void MakeFilename(char *dest, int src, char *theDir, char *ext) {
-	Common::String fname = Common::String::format("%s\\%d%s", theDir, src, ext);
+void MakeFilename(char *dest, int src, const char *theDir, const char *ext) {
+	Common::String fname = Common::String::format("%s/%d%s", theDir, src, ext);
 	Common::strcpy_s(dest, 256, fname.c_str());
 }
 
-void MakePatchFilename ( char *dest, int src, char *theDir, char *ext ) {
-	Common::String fname = Common::String::format("%s%s\\%d%s", theDir, patchDir, src, ext);
+void MakePatchFilename(char *dest, int src, const char *ext) {
+	Common::String fname = Common::String::format("%s/%d%s", patchDir, src, ext);
 	Common::strcpy_s(dest, 256, fname.c_str());
 }
 
@@ -810,31 +810,31 @@ void ID2File(char *dest, int src, int type) {
 void ID2PatchFile(char *dest, int src, int type) {
 	switch (type) {
 	case RES_ATS:
-		MakePatchFilename(dest, src, sysDir, ATSEXT);
+		MakePatchFilename(dest, src, ATSEXT);
 		break;
 
 	case RES_PIC:
-		MakePatchFilename(dest, src, sysDir, PICEXT);
+		MakePatchFilename(dest, src, PICEXT);
 		break;
 
 	case RES_WAVE:
-		MakePatchFilename(dest, src, sysDir, WAVEXT);
+		MakePatchFilename(dest, src, WAVEXT);
 		break;
 
 	case RES_MIDI:
-		MakePatchFilename(dest, src, sysDir, MIDEXT);
+		MakePatchFilename(dest, src, MIDEXT);
 		break;
 
 	case RES_TEXT:
-		MakePatchFilename(dest, src, sysDir, FONEXT);
+		MakePatchFilename(dest, src, FONEXT);
 		break;
 
 	case RES_HTM:
-		MakePatchFilename(dest, src, sysDir, HTMEXT);
+		MakePatchFilename(dest, src, HTMEXT);
 		break;
 
 	case RES_FACE:
-		MakePatchFilename(dest, src, sysDir, FACEEXT);
+		MakePatchFilename(dest, src, FACEEXT);
 		break;
 
 	default:
@@ -1017,10 +1017,7 @@ static void *VolLoad(int id, int type) {
 		/* CHECK VALID DISC LOCATION */
 		if (fk->location != curDisc) {
 			do {
-#ifndef _DVD
-#pragma message ("not _DVD:  Line 1113.\n")
 				PromptDisk(fk->location);
-#endif
 			} while (!OpenVols(fk->location));
 			curDisc = fk->location;
 		}

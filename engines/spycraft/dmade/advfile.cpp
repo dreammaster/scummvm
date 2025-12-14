@@ -21,6 +21,8 @@
 
 #include "spycraft/afxwin.h"
 #include "spycraft/dmade/advfile.h"
+#include "spycraft/dmade/advdebug.h"
+#include "spycraft/dmade/adverror.h"
 
 namespace Spycraft {
 

@@ -32,14 +32,13 @@ namespace Spycraft {
 typedef void *voidpf;
 
 struct _DcmpInfo {
-	HANDLE file;
+	FHANDLE file;
 	uint8 code;
 	int size, c_size;
 	char compressor;
-	Common::SeekableReadStream *stream;
 };
 
-DcmpStream OpenDcmpStream(HANDLE file, int size, int c_size, uint8 compressor) {
+DcmpStream OpenDcmpStream(FHANDLE file, int size, int c_size, uint8 compressor) {
 	DcmpStream dStream;
 
 	assert((compressor == COMPRESS_NONE) || (compressor == COMPRESS_ZLIB));
@@ -49,14 +48,14 @@ DcmpStream OpenDcmpStream(HANDLE file, int size, int c_size, uint8 compressor) {
 	dStream->size = size;
 	dStream->c_size = c_size;
 	dStream->compressor = compressor;
-	dStream->stream = nullptr; // TODO: How is this achieved?
 
 	return dStream;
 }
 
 int ReadDcmpStream(DcmpStream dStream, void *buffer, int size) {
-	assert(dStream->stream);
-	size_t bytesRead = dStream->stream->read(buffer, size);
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(dStream->file);
+	assert(rs);
+	size_t bytesRead = rs->read(buffer, size);
 	dStream->size -= bytesRead;
 
 	return bytesRead;
@@ -64,6 +63,7 @@ int ReadDcmpStream(DcmpStream dStream, void *buffer, int size) {
 
 uint16 ReadWordDcmpStream(DcmpStream dStream) {
 	uint16 result;
+
 	assert(ReadDcmpStream(dStream, &result, sizeof(result)) == sizeof(result));
 	return FROM_LE_16(result);
 }
@@ -76,7 +76,6 @@ uint32 ReadLongDcmpStream(DcmpStream dStream) {
 }
 
 void CloseDcmpStream(DcmpStream dStream) {
-	delete dStream->stream;
 	FreePtr(dStream);
 }
 
