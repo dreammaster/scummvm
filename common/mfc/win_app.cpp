@@ -76,8 +76,7 @@ CWinApp::~CWinApp() {
 
 bool CWinApp::InitApplication() {
 	_settings.load();
-
-	_defaultFont.CreateFont(8, 0, 0, 0, FW_NORMAL, 0, 0, 0, 0, OUT_RASTER_PRECIS, 0, PROOF_QUALITY, FF_ROMAN, "MS Sans Serif");
+	_defaultFont.CreateFont(8, 0, 0, 0, FW_NORMAL, 0, 0, 0, 0, OUT_RASTER_PRECIS, 0, PROOF_QUALITY, FF_ROMAN, _fonts.getDefaultFontName());
 	_defaultPen.CreatePen(PS_SOLID, 1, 0);
 	_defaultBrush.CreateSolidBrush(RGB(255, 255, 255));
 

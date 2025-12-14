@@ -19,6 +19,7 @@
  *
  */
 
+#include "graphics/fontman.h"
 #include "graphics/fonts/winfont.h"
 #include "common/mfc/gfx/fonts.h"
 #include "common/mfc/afxwin.h"
@@ -103,7 +104,12 @@ HFONT Fonts::createFont(int nHeight, int nWidth, int nEscapement,
 		}
 	}
 
-	if (!font) {
+	if (!font && !strcmp(lpszFacename, "System")) {
+		// Using the ScummVM system font
+		const Graphics::Font *sysFont = FontMan.getFontByUsage(Graphics::FontManager::kGUIFont);
+		font = new Gfx::Font(sysFont, "System", 8, DisposeAfterUse::NO);
+
+	} else if (!font) {
 		// Create the font
 		Graphics::WinFont *winFont = new Graphics::WinFont();
 
@@ -165,7 +171,7 @@ Fonts::FontEntry::~FontEntry() {
 
 /*--------------------------------------------*/
 
-Font::Font(Graphics::Font *font, const Common::String &faceName, int height,
+Font::Font(const Graphics::Font *font, const Common::String &faceName, int height,
 		DisposeAfterUse::Flag disposeAfterUse) :
 		_font(font), _faceName(faceName), _height(height),
 		_charWidth(0), _charHeight(0),

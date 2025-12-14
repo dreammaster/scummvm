@@ -46,7 +46,7 @@ namespace Gfx {
  */
 class Font : public Graphics::Font {
 private:
-	Graphics::Font *_font;
+	const Graphics::Font *_font;
 	DisposeAfterUse::Flag _disposeAfterUse =
 		DisposeAfterUse::YES;
 	Common::String _faceName;
@@ -55,7 +55,7 @@ private:
 	int _charHeight;
 
 public:
-	Font(Graphics::Font *font, const Common::String &faceName, int height,
+	Font(const Graphics::Font *font, const Common::String &faceName, int height,
 		DisposeAfterUse::Flag disposeAfterUse =
 			DisposeAfterUse::YES);
 	~Font() override;
@@ -123,6 +123,12 @@ public:
 		byte nClipPrecision, byte nQuality, byte nPitchAndFamily,
 		const char *lpszFacename);
 	HFONT getFont(const char *lpszFacename, int nHeight);
+	const char *getDefaultFontName() const {
+		return empty() ? "System" : _fonts.front()._faceName.c_str();
+	}
+	bool empty() const {
+		return _fonts.empty();
+	}
 };
 
 } // namespace Gfx
