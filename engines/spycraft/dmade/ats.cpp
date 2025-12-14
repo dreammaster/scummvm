@@ -112,7 +112,7 @@ void DestroyATS(ATS *ats) {
 
 ATS *OpenATS(DcmpStream dStream) {
 	int i, j, fi, fj, r, n, nL, nC, width, height;
-	char version, colors;
+	int8 version, colors;
 	ATS *ats;
 	Viewport *port;
 	int bpp = 0, theColors = 0;
