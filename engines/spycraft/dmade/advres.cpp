@@ -1045,8 +1045,8 @@ static void *VolLoad(int id, int type) {
 		} else {
 			hFile = nullptr;
 			sfxSeekFile(discHandler, fk->offset, MADE_SEEK_BEG);
-			sfxReadFile(discHandler, &compSize, sizeof(int));
-			sfxReadFile(discHandler, &size, sizeof(int));
+			compSize = sfxFileGetInt(discHandler);
+			size = sfxFileGetInt(discHandler);
 			dStream = OpenDcmpStream(discHandler, size, compSize, fk->compressor);
 			if (dStream == NULL)
 				return NULL;
