@@ -137,8 +137,9 @@ Common::Error SpycraftEngine::run() {
 	// Set the engine's debugger console
 	setDebugger(new Console());
 
-	// Set up data folder for file access
+	// Set up sub-folders for file access
 	SearchMan.addDirectory("data");
+	SearchMan.addDirectory("resource");
 
 	// If a savegame was selected from the launcher, load it
 	int saveSlot = ConfMan.getInt("save_slot");
