@@ -179,11 +179,11 @@ void MFP_GetFrameRates(MFP_STREAM_HANDLE vStream, MFP_STREAM_HANDLE aStream, int
  ************************************************************************/
 
 HFB_BUFFER_HANDLE HFB_CreateBuffer(long bSize, long minIndexFrames);
-int HFB_ConditionBuffer(HFB_BUFFER_HANDLE Buffer, long bSize, long minIndexFrames);
-void HFB_InitBuffer(HFB_BUFFER_HANDLE Buffer, MFP_FILE_HANDLE File, int startFrame, int preload);
+int HFB_ConditionBuffer(HFB_BUFFER_HANDLE buffer, long bSize, long minIndexFrames);
+void HFB_InitBuffer(HFB_BUFFER_HANDLE buffer, MFP_FILE_HANDLE File, int startFrame, int preload);
 
-void HFB_DestroyBuffer(HFB_BUFFER_HANDLE Buffer);
-int HFB_SetBufferMode(HFB_BUFFER_HANDLE Buffer, enum HFB_Modes newMode);
+void HFB_DestroyBuffer(HFB_BUFFER_HANDLE buffer);
+int HFB_SetBufferMode(HFB_BUFFER_HANDLE buffer, enum HFB_Modes newMode);
 
 /* open a new TrueMotion/S A/V file and prepare it for reading while playing another file.
  * the original file will close automatically when the last data is released.
