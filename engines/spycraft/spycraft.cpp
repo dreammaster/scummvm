@@ -59,22 +59,21 @@ public:
 	bool OnIdle(long lCount) override;
 };
 
-bool CTheApp::InitInstance() {
-	hGameWnd = CreateWindow(szAppName,
-		szAppName,
-		WS_POPUP,
-		0,               // x
-		0,               // y
-		GetSystemMetrics(SM_CXSCREEN),   // width
-		GetSystemMetrics(SM_CYSCREEN),   // height
-		nullptr,            // parent
-		nullptr,            // child window id
-		hInstance,       // process instance
-		nullptr);
-	assert(hGameWnd);
+class CMainWindow : public CFrameWnd {
+public:
+	CMainWindow();
+};
 
-	ShowWindow(hGameWnd, SW_SHOWNORMAL);
-	UpdateWindow(hGameWnd);
+/*---------------------------------------------------------------------------*/
+
+bool CTheApp::InitInstance() {
+	auto *win = new CMainWindow();
+	win->ShowWindow(SW_SHOWNORMAL);
+	win->UpdateWindow();
+	win->SetActiveWindow();
+
+	hGameWnd = win->m_hWnd;
+	assert(hGameWnd);
 
 	/* SETUP THE GAME */
 	hGameDC = GetDC(hGameWnd);
@@ -110,6 +109,21 @@ bool CTheApp::OnIdle(long lCount) {
 
 	return true;
 }
+
+/*---------------------------------------------------------------------------*/
+
+CMainWindow::CMainWindow() : CFrameWnd() {
+	CString  WndClass;
+	CRect    tmpRect;
+
+	WndClass = AfxRegisterWndClass(CS_DBLCLKS | CS_BYTEALIGNWINDOW | CS_OWNDC, nullptr, nullptr, nullptr);
+	tmpRect.SetRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+	Create(WndClass, "Spycraft", WS_POPUP, tmpRect, nullptr, 0);
+
+	ShowWindow(SW_SHOWNORMAL);
+}
+
+/*---------------------------------------------------------------------------*/
 
 SpycraftEngine::SpycraftEngine(OSystem *syst, const ADGameDescription *gameDesc) : Engine(syst),
 	_gameDescription(gameDesc), _randomSource("Spycraft") {
