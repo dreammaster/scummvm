@@ -750,9 +750,11 @@ extern int GetWindowText(HWND hWnd, char *lpszStringBuf, int nMaxCount);
 extern bool ScreenToClient(HWND hWnd, LPPOINT lpPoint);
 
 HBITMAP CreateDIBitmap(HDC hdc, CONST BITMAPINFOHEADER *pbmih,
-                       uint32 flInit, CONST void *pjBits, CONST BITMAPINFO *pbmi, unsigned int iUsage);
+    uint32 flInit, CONST void *pjBits, CONST BITMAPINFO *pbmi, unsigned int iUsage);
+extern HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *pbmi, UINT usage,
+	void **ppvBits, HANDLE hSection, DWORD offset);
 extern int GetDIBits(HDC hdc, HBITMAP hbm, unsigned int start, unsigned int cLines,
-                     void *lpvBits, LPBITMAPINFO lpbmi, unsigned int usage);
+    void *lpvBits, LPBITMAPINFO lpbmi, unsigned int usage);
 
 extern HGDIOBJ SelectObject(HDC hdc, HGDIOBJ h);
 extern HGDIOBJ GetStockObject(int i);

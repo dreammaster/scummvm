@@ -234,6 +234,59 @@ HBITMAP CreateDIBitmap(HDC hdc, CONST BITMAPINFOHEADER *pbmih, uint32 flInit,
 	return bitmap;
 }
 
+HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *pbmi, UINT usage,
+		void **ppvBits, HANDLE hSection, DWORD offset) {
+	CBitmap::Impl *bitmap = new CBitmap::Impl();
+
+	// Only support top to bottom bitmaps, not the older bottom to top ones
+	assert(pbmi->bmiHeader.biHeight < 0);
+
+	// Figure out the pixel format
+	assert(pbmi->bmiHeader.biSize == 40 && pbmi->bmiHeader.biPlanes == 1);
+	Graphics::PixelFormat format;
+
+	switch (pbmi->bmiHeader.biBitCount) {
+	case 1:
+		// Monochrome. Since ScummVM doesn't support it directly,
+		// I use a standard 8bpp surface, but in the format's
+		// aLoss field, I use a value of 255 as a flag.
+		// This should be okay, as loss & shift aren't used for 8bpp.
+		format = Graphics::PixelFormat::createFormatCLUT8();
+		format.aLoss = 255;
+		break;
+
+	case 8:
+		format = Graphics::PixelFormat::createFormatCLUT8();
+		break;
+	case 16:
+		format = Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0);
+		break;
+	case 32:
+		format = Graphics::PixelFormat(4, 8, 8, 8, 8, 16, 8, 0, 24);
+		break;
+	default:
+		error("Unknown biBitCount");
+		break;
+	}
+
+	// Create the bitmap
+	bitmap->create(pbmi->bmiHeader.biWidth, -pbmi->bmiHeader.biHeight, format);
+
+	// Set the palette
+	Graphics::Palette pal((pbmi && pbmi->bmiHeader.biClrUsed) ? pbmi->bmiHeader.biClrUsed : 0);
+	if (pbmi && pbmi->bmiHeader.biClrUsed) {
+		for (uint i = 0; i < pbmi->bmiHeader.biClrUsed; ++i) {
+			const RGBQUAD &col = pbmi->bmiColors[i];
+			pal.set(i, col.rgbRed, col.rgbGreen, col.rgbBlue);
+		}
+	}
+
+	if (ppvBits)
+		*ppvBits = bitmap->getPixels();
+
+	return bitmap;
+}
+
 int GetDIBits(HDC hdc, HBITMAP hbm, unsigned int start, unsigned int cLines,
               void *lpvBits, LPBITMAPINFO lpbmi, unsigned int usage) {
 	error("TODO: GetDIBits");
