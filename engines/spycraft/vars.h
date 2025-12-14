@@ -59,7 +59,7 @@ extern HDC hGameDC;
 extern HDC hSrcDC;
 
 // dmade/winmemx.cpp
-extern int __mem_index;
+constexpr int __mem_index = 999;
 extern long memAllocLimit;
 extern int allow_heapCheck;
 
