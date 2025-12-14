@@ -54,6 +54,12 @@ int sfxGetFileSize(FHANDLE hf) {
 	return rs->size();
 }
 
+int32 sfxFileGetInt(FHANDLE hf) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(hf);
+	assert(rs);
+	return rs->readSint32LE();
+}
+
 uint16 sfxFileGetWORD(FHANDLE hf) {
 	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(hf);
 	assert(rs);

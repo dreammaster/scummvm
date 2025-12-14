@@ -51,6 +51,7 @@ extern int sfxCloseFile(FHANDLE hf);
 extern int sfxFileSize(const char *filename);
 extern int sfxGetFileSize(FHANDLE hf);
 extern uint8 sfxFileGetBYTE(FHANDLE hf);
+extern int32 sfxFileGetInt(FHANDLE hf);
 extern uint16 sfxFileGetWORD(FHANDLE hf);
 extern void OpenDlg(const char *fileMask);
 extern void SaveDlg(const char *fileMask);

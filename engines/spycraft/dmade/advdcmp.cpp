@@ -33,7 +33,6 @@ typedef void *voidpf;
 
 struct _DcmpInfo {
 	Common::SeekableReadStream *_stream;
-	DisposeAfterUse::Flag _disposeAferUse;
 };
 
 DcmpStream OpenDcmpStream(FHANDLE file, int size, int c_size, uint8 compressor) {
@@ -41,19 +40,19 @@ DcmpStream OpenDcmpStream(FHANDLE file, int size, int c_size, uint8 compressor) 
 
 	assert((compressor == COMPRESS_NONE) || (compressor == COMPRESS_ZLIB));
 	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(file);
-	assert(rs);
+	assert(rs && ((c_size != 0) == (compressor == COMPRESS_ZLIB)));
 
 	dStream = (DcmpStream)AllocPtr(sizeof(*dStream));
 	assert(dStream != NULL);
 
 	if (compressor == COMPRESS_NONE) {
 		// No compression
-		dStream->_stream = rs;
-		dStream->_disposeAferUse = DisposeAfterUse::NO;
+		Common::SeekableReadStream *subStream = rs->readStream(size);
+		dStream->_stream = subStream;
 	} else {
 		// ZLIB compression
-		dStream->_stream = Common::wrapCompressedReadStream(rs, DisposeAfterUse::NO);
-		dStream->_disposeAferUse = DisposeAfterUse::YES;
+		Common::SeekableReadStream *subStream = rs->readStream(c_size);
+		dStream->_stream = Common::wrapCompressedReadStream(subStream, DisposeAfterUse::YES, size);
 	}
 
 	return dStream;
@@ -81,9 +80,7 @@ uint32 ReadLongDcmpStream(DcmpStream dStream) {
 }
 
 void CloseDcmpStream(DcmpStream dStream) {
-	if (dStream->_disposeAferUse == DisposeAfterUse::YES)
-		delete dStream->_stream;
-
+	delete dStream->_stream;
 	FreePtr(dStream);
 }
 
