@@ -24,6 +24,10 @@
 
 namespace Spycraft {
 
+struct tHFBBuffer {
+	int dummy;
+};
+
 int MFP_Init(int MaxOpenFiles, int MaxOpenStreams, int MaxOpenBuffers) {
 	return 0;
 }
@@ -84,22 +88,22 @@ void MFP_GetFrameRates(MFP_STREAM_HANDLE vStream, MFP_STREAM_HANDLE aStream, int
 }
 
 HFB_BUFFER_HANDLE HFB_CreateBuffer(long bSize, long minIndexFrames) {
-	error("TODO: HFB_CreateBuffer");
+	return (HFB_BUFFER_HANDLE)malloc(sizeof(tHFBBuffer));	
 }
 
-int HFB_ConditionBuffer(HFB_BUFFER_HANDLE Buffer, long bSize, long minIndexFrames) {
+int HFB_ConditionBuffer(HFB_BUFFER_HANDLE buffer, long bSize, long minIndexFrames) {
 	error("TODO: HFB_ConditionBuffer");
 }
 
-void HFB_InitBuffer(HFB_BUFFER_HANDLE Buffer, MFP_FILE_HANDLE File, int startFrame, int preload) {
+void HFB_InitBuffer(HFB_BUFFER_HANDLE buffer, MFP_FILE_HANDLE File, int startFrame, int preload) {
 	error("TODO: HFB_InitBuffer");
 }
 
-void HFB_DestroyBuffer(HFB_BUFFER_HANDLE Buffer) {
-	error("TODO: HFB_DestroyBuffer");
+void HFB_DestroyBuffer(HFB_BUFFER_HANDLE buffer) {
+	free(buffer);
 }
 
-int HFB_SetBufferMode(HFB_BUFFER_HANDLE Buffer, enum HFB_Modes newMode) {
+int HFB_SetBufferMode(HFB_BUFFER_HANDLE buffer, enum HFB_Modes newMode) {
 	error("TODO: HFB_SetBufferMode");
 }
 
