@@ -54,7 +54,7 @@ namespace Spycraft {
  * Initialize the SFX DIGI system
  */
 inline int InitSound(int dwRate, int dwChannels, int dwBits, int dwFlags) {
-	return 0;
+	return true;
 }
 
 /**
@@ -62,7 +62,7 @@ inline int InitSound(int dwRate, int dwChannels, int dwBits, int dwFlags) {
  */
 inline int CleanSound() {
 	//
-	return 0;
+	return true;
 }
 
 /**
