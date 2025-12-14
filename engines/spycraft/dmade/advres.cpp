@@ -79,7 +79,7 @@ ResCache *faceCache = NULL;
 static ArrayList *mapList = NULL;
 static ArrayList *volList = NULL;
 static ArrayList *streamList = NULL;
-static HANDLE discHandler = nullptr;
+static FHANDLE discHandler = nullptr;
 static char INI_FILE[] = "resource.ini";
 static char KEYWORD_DRIVE[] = "[RESOURCE_DRIVE]";
 static char KEYWORD_CD[] = "[CD";
@@ -233,7 +233,7 @@ void PromptDisk(int location) {
 
 static int ReadMapFile() {
 	int i, n;
-	HANDLE hf;
+	FHANDLE hf;
 	FileChunk *fk;
 	char *buffer, *p;
 	int size;
@@ -335,7 +335,7 @@ static void ReadVols() {
 #ifdef _NOTROOT
 	char CDROMname[3];
 #endif
-	HANDLE hi = sfxOpenFile(INI_FILE, MADE_FILE_READ);
+	FHANDLE hi = sfxOpenFile(INI_FILE, MADE_FILE_READ);
 
 	/* Get resource directory from RESOURCE.INI */
 	if ( ( n = sfxGetString ( hi, volName ) ) == -1 )	{
@@ -439,7 +439,7 @@ int OpenVols ( int dn )
 
 void ReadWhere() {
 	int n;
-	HANDLE hf;
+	FHANDLE hf;
 	char buffer[128];
 
 	Common::strcpy_s(buffer, sysDir);
@@ -932,7 +932,7 @@ void *OpenFace(void *src) {
 }
 
 void *OpenFaceFile(char *filename, int *size) {
-	HANDLE hf;
+	FHANDLE hf;
 	void *ret = NULL;
 
 	*size = sfxFileSize(filename);
@@ -1018,7 +1018,7 @@ static void *OpenHTM(void *src) {
 }
 
 static int IsFileExist(char *filename) {
-	HANDLE hf = sfxOpenFile(filename, MADE_FILE_READ);
+	FHANDLE hf = sfxOpenFile(filename, MADE_FILE_READ);
 	if (hf) {
 		sfxCloseFile(hf);
 		return true;
@@ -1027,7 +1027,7 @@ static int IsFileExist(char *filename) {
 }
 
 static void *ReadRawFile(char *filename, int *size) {
-	HANDLE hf;
+	FHANDLE hf;
 	char *buffer;
 
 	*size = sfxFileSize(filename);
@@ -1056,7 +1056,7 @@ static void *VolLoad(int id, int type) {
 	void *decomp = nullptr, *data = nullptr;
 	char filename[MAX_VOL_NAME_SIZE];
 	DcmpStream dStream;
-	HANDLE hFile = 0;
+	FHANDLE hFile = 0;
 
 	vid = type << 24 | id;
 
@@ -1189,7 +1189,7 @@ static void *FileLoad(int id, int type) {
 	void *data;
 	int size;
 	DcmpStream dStream;
-	HANDLE hFile;
+	FHANDLE hFile;
 
 	data = NULL;
 
@@ -1565,7 +1565,7 @@ int sfxUnlockRes(int id, int type) {
 
 int sfxCheckRes(int id, int type) {
 	int i, vid;
-	HANDLE hf;
+	FHANDLE hf;
 	FileChunk *fk;
 	char filename[256];
 

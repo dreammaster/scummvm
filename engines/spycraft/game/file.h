@@ -41,7 +41,7 @@ enum {
 
 class File : public Object {
 public:
-	HANDLE hFile;
+	FHANDLE hFile;
 	int filesize;
 
 	File();

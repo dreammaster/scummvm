@@ -37,44 +37,50 @@ char fileName[PATHSIZE];
 char sFilter[FILTERSIZE];
 char sFileName[PATHSIZE];
 
-uint16 sfxFileGetWORD(HANDLE hf) {
-	return ((Common::SeekableReadStream *)hf)->readUint16LE();
-}
-
-uint8 sfxFileGetBYTE(HANDLE hf) {
-	return ((Common::SeekableReadStream *)hf)->readByte();
-}
-
-HANDLE sfxOpenFile(const char *filename, int mode) {
+FHANDLE sfxOpenFile(const char *filename, int mode) {
 	assert(mode == MADE_FILE_READ);
 
 	Common::File *f = new Common::File();
 	if (f->open(filename))
-		return (HANDLE)f;
+		return f;
 
-	return (HANDLE)-1;
+	return (FHANDLE)-1;
 }
 
-int sfxGetFileSize(HANDLE hf) {
-	Common::SeekableReadStream *rs = (Common::SeekableReadStream *)hf;
+int sfxGetFileSize(FHANDLE hf) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(hf);
+	assert(rs);
 	return rs->size();
 }
 
-int sfxWriteASCFile(HANDLE hf, const char *format, ...) {
-	va_list list;
+uint16 sfxFileGetWORD(FHANDLE hf) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(hf);
+	assert(rs);
+	return rs->readUint16LE();
+}
 
+uint8 sfxFileGetBYTE(FHANDLE hf) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(hf);
+	assert(rs);
+	return rs->readByte();
+}
+
+int sfxWriteASCFile(FHANDLE hf, const char *format, ...) {
+	va_list list;
 	va_start(list, format);
 	Common::String str = Common::String::vformat(format, list);
 	va_end(list);
 
-	Common::DumpFile *df = (Common::DumpFile *)hf;
-	df->writeString(str);
+	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(hf);
+	assert(ws);
+	ws->writeString(str);
 
 	return 0;
 }
 
-int sfxSeekFile(HANDLE hf, int offset, int mode) {
-	Common::SeekableReadStream *f = (Common::SeekableReadStream *)hf;
+int sfxSeekFile(FHANDLE hf, int offset, int mode) {
+	Common::SeekableReadStream *f = dynamic_cast<Common::SeekableReadStream *>(hf);
+	assert(f);
 
 	switch (mode) {
 	case MADE_SEEK_BEG:
@@ -90,25 +96,27 @@ int sfxSeekFile(HANDLE hf, int offset, int mode) {
 	return 0;
 }
 
-int sfxWriteFile(HANDLE hf, void *buffer, int size) {
-	Common::WriteStream *ws = (Common::WriteStream *)hf;
-
+int sfxWriteFile(FHANDLE hf, void *buffer, int size) {
+	Common::WriteStream *ws = dynamic_cast<Common::WriteStream *>(hf);
+	assert(ws);
 	return ws->write(buffer, size);
 }
 
-int sfxReadFile(HANDLE hf, void *buffer, int size) {
-	Common::SeekableReadStream *f = (Common::SeekableReadStream *)hf;
-
-	return f->read(buffer, size);
+int sfxReadFile(FHANDLE hf, void *buffer, int size) {
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(hf);
+	assert(rs);
+	return rs->read(buffer, size);
 }
 
-char *sfxReadFileString(HANDLE hf) {
-	Common::SeekableReadStream *f = (Common::SeekableReadStream *)hf;
+char *sfxReadFileString(FHANDLE hf) {
 	int i = 0;
 	char buffer;
 	bool ret = true;
 	char dest[2048];
 	char *out = nullptr;
+
+	Common::SeekableReadStream *f = dynamic_cast<Common::SeekableReadStream *>(hf);
+	assert(f);
 
 	while (ret) {
 		buffer = f->readByte();
@@ -133,8 +141,8 @@ char *sfxReadFileString(HANDLE hf) {
 	return out;
 }
 
-int sfxGetString(HANDLE hf, char *dest) {
-	Common::SeekableReadStream *f = (Common::SeekableReadStream *)hf;
+int sfxGetString(FHANDLE hf, char *dest) {
+	Common::SeekableReadStream *f = dynamic_cast<Common::SeekableReadStream *>(hf);
 	int i = 0;
 	char buffer;
 	int ret = true;
@@ -154,14 +162,12 @@ int sfxGetString(HANDLE hf, char *dest) {
 	return i;
 }
 
-int sfxCloseFile(HANDLE hf) {
-	Common::Stream *f = (Common::Stream *)hf;
-
-	delete f;
+int sfxCloseFile(FHANDLE hf) {
+	delete hf;
 	return 0;
 }
 
-size_t sfxFileSize(HANDLE hf) {
+size_t sfxFileSize(FHANDLE hf) {
 	Common::Stream *s = (Common::Stream *)hf;
 	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(s);
 	Common::SeekableWriteStream *ws = dynamic_cast<Common::SeekableWriteStream *>(s);
