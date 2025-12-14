@@ -141,7 +141,7 @@ int sfxGetString(FHANDLE hf, char *dest) {
 	int i = 0;
 	char buffer;
 
-	if (rs == nullptr)
+	if (rs == nullptr || rs->eos())
 		return -1;
 
 	while (!rs->eos()) {
