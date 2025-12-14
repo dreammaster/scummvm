@@ -38,7 +38,7 @@ typedef struct {
 	char **data;
 } MSGTag;
 
-extern MSGTag *OpenMSGFile(char *filename);
+extern MSGTag *OpenMSGFile(const char *filename);
 extern MSGTag *OpenMSG(void *buffer, int size);
 extern void FreeMSG(MSGTag *tag);
 

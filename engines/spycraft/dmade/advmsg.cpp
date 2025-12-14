@@ -39,7 +39,7 @@ static char *StrDup(char *str) {
 	return scumm_strdup(str);
 }
 
-static char *ReadFileString(HANDLE hf) {
+static char *ReadFileString(FHANDLE hf) {
 	int i;
 	char buffer;
 	char dest[2048];
@@ -62,12 +62,12 @@ static char *ReadFileString(HANDLE hf) {
 	return (StrDup(dest));
 }
 
-MSGTag *OpenMSGFile(char *filename) {
+MSGTag *OpenMSGFile(const char *filename) {
 	int i;
 	char *str;
 	MSGTag *ret;
 	char *strList[2048];
-	HANDLE hf = sfxOpenFile(filename, MADE_FILE_READ);
+	FHANDLE hf = sfxOpenFile(filename, MADE_FILE_READ);
 
 	if (hf == (HANDLE)-1) {
 		ErrMsg("Can't find %s, please reinstall Spycraft.", filename);
