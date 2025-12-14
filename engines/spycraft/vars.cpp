@@ -51,7 +51,6 @@ HDC hGameDC;
 HDC hSrcDC;
 
 // dmade/winmemx.cpp
-int __mem_index;
 long memAllocLimit;
 int allow_heapCheck;
 
@@ -83,7 +82,6 @@ void init_vars() {
 	hSrcDC = nullptr;
 
 	// dmade/winmemx.cpp
-	__mem_index = 1;
 	memAllocLimit = 4L * 1024 * 1024;
 	allow_heapCheck = 1;
 
