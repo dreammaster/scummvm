@@ -24,6 +24,7 @@
 
 #include "spycraft/dmade/advlib.h"
 #include "spycraft/dmade/adverror.h"
+#include "spycraft/dmade/advsprite.h"
 
 namespace Spycraft {
 

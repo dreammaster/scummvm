@@ -23,10 +23,6 @@
 #define SPYCRAFT_DMADE_ADVFILE_H
 
 #include "common/stream.h"
-#include "spycraft/afxwin.h"
-#include "spycraft/dmade/advlib.h"
-#include "spycraft/dmade/advsprite.h"
-#include "spycraft/dmade/advcursor.h"
 
 namespace Spycraft {
 
