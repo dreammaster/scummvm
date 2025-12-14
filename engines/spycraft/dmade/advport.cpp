@@ -22,6 +22,7 @@
 #include "spycraft/dmade/advlib.h"
 #include "spycraft/dmade/advport.h"
 #include "spycraft/afxwin.h"
+#include "spycraft/vars.h"
 
 namespace Spycraft {
 
@@ -61,6 +62,8 @@ void FreePort(Viewport *port) {
 Viewport *AllocMDPort(int width, int height, int colors) {
 	int i;
 	WinViewport *port;
+	void *ptr;
+	HBITMAP hBitmap;
 
 	struct {
 		BITMAPINFOHEADER bmiHeader;
@@ -95,9 +98,8 @@ Viewport *AllocMDPort(int width, int height, int colors) {
 		bmi.ctab[i].rgbGreen = 0;
 		bmi.ctab[i].rgbBlue = 0;
 	}
-#ifdef TODO
-	hBitmap = CreateDIBSection(hSrcDC, (BITMAPINFO *)&bmi, DIB_RGB_COLORS,
-		&ptr, NULL, 0);
+
+	hBitmap = CreateDIBSection(hSrcDC, (BITMAPINFO *)&bmi, DIB_RGB_COLORS, &ptr, NULL, 0);
 
 	ASSERT(hBitmap, __ERR_WIN_API_FAIL);
 	ASSERT(ptr, __ERR_WIN_API_FAIL);
@@ -105,9 +107,7 @@ Viewport *AllocMDPort(int width, int height, int colors) {
 	port->vp.ptr = ptr;
 	port->vp.rowBytes = width * (port->vp.colors == 8 ? 1 : 2);
 	port->hBitmap = hBitmap;
-#else
-	error("TODO: AllocMDPort");
-#endif
+
 	return (Viewport *)port;
 }
 
