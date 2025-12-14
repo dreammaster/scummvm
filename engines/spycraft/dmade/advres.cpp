@@ -284,30 +284,15 @@ static int ReadMapFile() {
 }
 
 static char *StrDup(char *str) {
-	char *ret = (char *)AllocPtr(strlen(str) + 1);
-	if (ret == NULL)
-		return nullptr;
-
-	Common::strcpy_s(ret, 256, str);
-	return (ret);
+	return scumm_strdup(str);
 }
 
 char *StrDupPath(char *volName) {
-	int len;
-	char *buffer;
-
-	len = strlen(volName) + strlen(resourceDir) + 4;
-	buffer = (char *)AllocPtr(len);
-	ADV_ASSERT(buffer, __ERR_MEM_ALLOC_FAIL);
-	Common::strcpy_s(buffer, 256, resourceDir);
-	Common::strcat_s(buffer, 256, "\\");
-	Common::strcat_s(buffer, 256, volName);
-	return buffer;
+	return scumm_strdup(volName);
 }
 
 static void ReadVols() {
 	int i, n;
-	char *ptr;
 	int isItVols;
 	char volName[MAX_VOL_NAME_SIZE];
 
@@ -335,25 +320,23 @@ static void ReadVols() {
 
 	i = -1;
 	isItVols = false;
+
 	for (;;) {
 		if ( ( i >= MAX_DISC_LIMIT) || ( n = sfxGetString ( hi, volName ) ) == -1 ) {
 			sfxCloseFile(hi);
 			break;
-		}
-		else {
-			/* CD Keyword */
+		} else {
 			if ( !strncmp ( sc_strupr ( volName ), KEYWORD_CD, 3 ) ) {
+				// CD Keyword
 				isItVols = true;
 				i ++;
-			}
-			/* FILE OR EXTRA FILE ON CD */
-			else {
+			} else {
+				// FILE OR EXTRA FILE ON CD
 				if ( isItVols ) {
 					isItVols = false;
-					ArrayList_Add ( volList, StrDupPath ( volName ), NULL );
-				}
-				else {
-					VolInfo *info = (VolInfo *)AllocPtr ( sizeof ( VolInfo ) );
+					ArrayList_Add(volList, StrDupPath (volName), NULL);
+				} else {
+					VolInfo *info = (VolInfo *)AllocPtr(sizeof(VolInfo));
 
 					if ( info == NULL )
 						ADV_ASSERT ( false, __ERR_MEM_ALLOC_FAIL );
@@ -437,35 +420,20 @@ int sfxGetDir(char *dest, int id, int type) {
 	switch (type) {
 	case RES_WAVE:
 		Common::strcpy_s(typeString, ".WAV");
-		if (mapList) {
-			Common::strcpy_s(dest, 256, resourceDir);
-		} else {
-			Common::strcpy_s(dest, 256, soundDir);
-		}
 		break;
-
 	case RES_MOVIE:
 		Common::strcpy_s(typeString, ".AVI");
-		if (mapList) {
-			Common::strcpy_s(dest, 256, resourceDir);
-		} else {
-			Common::strcpy_s(dest, 256, movieDir);
-		}
 		break;
-
 	case RES_HTM:
 		Common::strcpy_s(typeString, ".HTM");
-		if (mapList) {
-			Common::strcpy_s(dest, 256, resourceDir);
-		} else {
-			Common::strcpy_s(dest, 256, htmDir);
-		}
 		break;
-
+	default:
+		error("Unknown type");
+		break;
 	}
 
-	Common::String suffix = Common::String::format("\\%d%s", id, typeString);
-	Common::strcat_s(dest, 256, suffix.c_str());
+	Common::String fname = Common::String::format("\\%d%s", id, typeString);
+	Common::strcpy_s(dest, 256, fname.c_str());
 
 	if (mapList) {
 		int i;
