@@ -37,6 +37,7 @@
 #include "spycraft/dmade/pkware.h"
 #include "spycraft/dmade/advdcmp.h"
 #include "spycraft/game/dispatch.h"
+#include "spycraft/vars.h"
 
 namespace Spycraft {
 
@@ -82,8 +83,6 @@ static ArrayList *mapList = NULL;
 static ArrayList *volList = NULL;
 static ArrayList *streamList = NULL;
 static FHANDLE discHandler = nullptr;
-
-extern int __mem_index;
 
 typedef struct {
 	int picSize;
@@ -1201,6 +1200,9 @@ void *sfxLoadRes(int id, int type) {
 		list = faceCache->list;
 		break;
 
+	default:
+		error("Unknown res type: %d", type);
+		break;
 	}
 
 	/* MAKE ROOM FOR RESOURCE */
