@@ -21,7 +21,7 @@
 
 #include "common/algorithm.h"
 #include "common/stream.h"
-//include "common/compression/unzip.h"
+#include "common/compression/deflate.h"
 #include "spycraft/dmade/advlib.h"
 #include "spycraft/dmade/advdcmp.h"
 #include "spycraft/dmade/advfile.h"
@@ -32,33 +32,38 @@ namespace Spycraft {
 typedef void *voidpf;
 
 struct _DcmpInfo {
-	FHANDLE file;
-	uint8 code;
-	int size, c_size;
-	char compressor;
+	Common::SeekableReadStream *_stream;
+	DisposeAfterUse::Flag _disposeAferUse;
 };
 
 DcmpStream OpenDcmpStream(FHANDLE file, int size, int c_size, uint8 compressor) {
 	DcmpStream dStream;
 
 	assert((compressor == COMPRESS_NONE) || (compressor == COMPRESS_ZLIB));
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(file);
+	assert(rs);
+
 	dStream = (DcmpStream)AllocPtr(sizeof(*dStream));
 	assert(dStream != NULL);
-	dStream->file = file;
-	dStream->size = size;
-	dStream->c_size = c_size;
-	dStream->compressor = compressor;
+
+	if (compressor == COMPRESS_NONE) {
+		// No compression
+		dStream->_stream = rs;
+		dStream->_disposeAferUse = DisposeAfterUse::NO;
+	} else {
+		// ZLIB compression
+		dStream->_stream = Common::wrapCompressedReadStream(rs, DisposeAfterUse::NO);
+		dStream->_disposeAferUse = DisposeAfterUse::YES;
+	}
 
 	return dStream;
 }
 
 int ReadDcmpStream(DcmpStream dStream, void *buffer, int size) {
-	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(dStream->file);
+	Common::SeekableReadStream *rs = dynamic_cast<Common::SeekableReadStream *>(dStream->_stream);
 	assert(rs);
-	size_t bytesRead = rs->read(buffer, size);
-	dStream->size -= bytesRead;
 
-	return bytesRead;
+	return rs->read(buffer, size);
 }
 
 uint16 ReadWordDcmpStream(DcmpStream dStream) {
@@ -76,6 +81,9 @@ uint32 ReadLongDcmpStream(DcmpStream dStream) {
 }
 
 void CloseDcmpStream(DcmpStream dStream) {
+	if (dStream->_disposeAferUse == DisposeAfterUse::YES)
+		delete dStream->_stream;
+
 	FreePtr(dStream);
 }
 
