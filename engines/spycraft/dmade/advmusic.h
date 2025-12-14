@@ -35,14 +35,14 @@ namespace Spycraft {
  * Initialize the SFX MIDI system
  */
 inline int InitMusic() {
-	return 0;
+	return true;
 }
 
 /**
  * De-Initialize the SFX MIDI system
  */
 inline int CleanMusic() {
-	return 0;
+	return true;
 }
 
 /**
