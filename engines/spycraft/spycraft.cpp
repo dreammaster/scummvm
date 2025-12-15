@@ -56,6 +56,7 @@ private:
 
 public:
 	bool InitInstance() override;
+	int ExitInstance() override;
 	bool OnIdle(long lCount) override;
 };
 
@@ -67,6 +68,8 @@ public:
 /*---------------------------------------------------------------------------*/
 
 bool CTheApp::InitInstance() {
+	CWinApp::InitInstance();
+
 	auto *win = new CMainWindow();
 	win->ShowWindow(SW_SHOWNORMAL);
 	win->UpdateWindow();
@@ -84,6 +87,11 @@ bool CTheApp::InitInstance() {
 	/* instantiates C++ class object for script */
 	StartScript();
 	return true;
+}
+
+int CTheApp::ExitInstance() {
+	sfxCleanMADE();
+	return CWinApp::ExitInstance();
 }
 
 bool CTheApp::OnIdle(long lCount) {
@@ -173,8 +181,6 @@ Common::Error SpycraftEngine::run() {
 	app.InitApplication();
 	app.InitInstance();
 	app.Run();
-
-	sfxCleanMADE();
 
 	return Common::kNoError;
 }
