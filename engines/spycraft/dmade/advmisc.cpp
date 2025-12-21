@@ -57,7 +57,6 @@ void sfxInitMADE(void) {
 
 void sfxCleanMADE(void) {
 	// these should probably be in the opposite order as in sfxInitMade
-	CleanScreen();
 	CleanBackgrounds();
 	CleanMusic();
 	CleanSound();
