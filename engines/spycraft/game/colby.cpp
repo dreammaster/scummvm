@@ -201,7 +201,7 @@ void Colby::init() {
 
 	user->canInput(false);
 	normalCursor = arrowCursor;
-	intrface = new(Intrface);
+	intrface = new Intrface();
 	theGame->prevRoomName = "None!";
 	sfxLoadRes(vINTERFACE, RES_ATS);
 	sfxLoadRes(909, RES_ATS);

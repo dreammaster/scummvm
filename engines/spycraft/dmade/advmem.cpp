@@ -27,7 +27,7 @@ namespace Spycraft {
 static uint memAllocLimit;
 
 void InitMem() {
-	memAllocLimit = 999999;
+	memAllocLimit = 999999999;
 }
 
 void CleanMem() {
