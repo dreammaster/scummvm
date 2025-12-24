@@ -60,6 +60,7 @@ void ColorFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint3
 	dest.w = dst->w;
 	dest.h = dst->h;
 	dest.pitch = dst->pitch;
+	dest.format = dst->format;
 	dest.setPixels(dst->getPixels());
 	dest.blitFrom(charImage, Common::Point(x, y));
 }
