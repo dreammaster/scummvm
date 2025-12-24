@@ -23,7 +23,7 @@
 #include "common/savefile.h"
 #include "common/textconsole.h"
 #include "aesop/lib/vfx.h"
-#include "aesop/ail32.h"
+#include "aesop/lib/ail32.h"
 #include "aesop/gil2vfx.h"
 #include "aesop/defs.h"
 #include "aesop/shared.h"

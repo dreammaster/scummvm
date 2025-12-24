@@ -22,7 +22,7 @@
 #ifndef AESOP_MODSND_H
 #define AESOP_MODSND_H
 
-#include "aesop/ail32.h"
+#include "aesop/lib/ail32.h"
 
 namespace Aesop {
 

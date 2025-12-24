@@ -20,7 +20,7 @@
  */
 
 #include "aesop/lib/vfx.h"
-#include "aesop/ail32.h"
+#include "aesop/lib/ail32.h"
 #include "aesop/gil2vfx.h"
 #include "aesop/gil2vfxa.h"
 #include "aesop/lib/mouse.h"

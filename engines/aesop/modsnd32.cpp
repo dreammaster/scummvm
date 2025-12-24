@@ -20,7 +20,7 @@
  */
 
 #include "aesop/defs.h"
-#include "aesop/ail32.h"
+#include "aesop/lib/ail32.h"
 #include "aesop/modsnd32.h"   // Common C header for MODSND code.
 #include "aesop/mod32.h"      // Assembly prototypes for mixer code.
 

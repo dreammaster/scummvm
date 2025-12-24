@@ -27,7 +27,7 @@
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
 #include "engines/util.h"
-#include "aesop/ail32.h"
+#include "aesop/lib/ail32.h"
 #include "aesop/event.h"
 #include "aesop/rt.h"
 #include "aesop/rtmsg.h"

@@ -15,7 +15,9 @@ MODULE_OBJS = \
 	rtobject.o \
 	rtres.o \
 	rtsystem.o \
-	sound32.o
+	sound32.o \
+	lib/ail32.o \
+	lib/mouse.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_AESOP), DYNAMIC_PLUGIN)

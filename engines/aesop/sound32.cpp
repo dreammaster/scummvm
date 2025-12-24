@@ -32,7 +32,7 @@
 #include "aesop/rtlink.h"
 #include "aesop/rt.h"
 #include "aesop/rtmsg.h"
-#include "aesop/ail32.h"
+#include "aesop/lib/ail32.h"
 #include "aesop/modsnd32.h"
 #include "aesop/sound.h"
 #include "aesop/graphics.h"
