@@ -53,17 +53,12 @@ void UnregisterMem(long size) {
 	memAllocLimit += size;
 }
 
-void *AllocPtrEx(int size) {
-	size_t totalSize = size + sizeof(size_t);
-	void *p = malloc(totalSize);
-	memAllocLimit -= totalSize;
-	return (size_t *)p + 1;
+void *AllocPtr(int size) {
+	return malloc(size);
 }
 
-void FreePtrEx(void *ptr) {
-	size_t *base = (size_t *)ptr - 1;
-	memAllocLimit += *base;
-	free(base);
+void FreePtr(void *ptr) {
+	free((byte *)ptr);
 }
 
 } // namespace Spycraft
