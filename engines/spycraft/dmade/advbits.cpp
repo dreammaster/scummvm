@@ -30,7 +30,7 @@ namespace Spycraft {
 extern int scene_width;
 extern int pixFormat;
 
-void DrawLines(Viewport *dest, Sprite *sprite, SRect *spriteRect);
+void DrawLines(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect);
 
 void DrawBits(Viewport *dest, Viewport *src, SRect *rect) {
 	int i;
@@ -96,7 +96,7 @@ void MakeScaleTableI(uint *table, int oldLen, int newLen) {
 	}
 }
 
-void DrawScaleSpriteMask(Viewport *dest, Sprite *sprite, SRect *spriteRect) {
+void DrawScaleSpriteMask(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect) {
 	int i, j, skipAddress, skipStart, *colorIndex;
 	byte *address, *startAddress, *start;
 	int l, r, t, b, w, h, lp, tp;
@@ -209,7 +209,7 @@ void DrawScaleSpriteMask(Viewport *dest, Sprite *sprite, SRect *spriteRect) {
 		DrawLines(dest, sprite, spriteRect);
 }
 
-void DrawScaleSprite(Viewport *dest, Sprite *sprite, SRect *spriteRect) {
+void DrawScaleSprite(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect) {
 	int i, j, skipAddress, skipStart, *colorIndex;
 	byte *address, *startAddress, *start;
 	int l, r, t, b, w, h, lp, tp;
@@ -319,7 +319,7 @@ void DrawScaleSprite(Viewport *dest, Sprite *sprite, SRect *spriteRect) {
 
 #define MK_COLOR16X(R,G,B)		( ( R<<11 ) | (G<<6) | B )
 
-void DrawGlassMask(Viewport *dest, Sprite *sprite, SRect *spriteRect) {
+void DrawGlassMask(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect) {
 	int i, j, skipAddress, skipStart;
 	byte *address, *start;
 	int l, r, t, b, w, h, lp, tp;
@@ -599,7 +599,7 @@ void Port2Buffer16(void *dest, Viewport *src, SRect *r) {
 	}
 }
 
-inline void GetSpriteClipRect(Viewport *dest, Sprite *sprite, SRect *spriteRect,
+inline void GetSpriteClipRect(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect,
 	SRect *clipRect) {
 	/* CLIPPING SPRITE RECT */
 	if (spriteRect) {
@@ -748,7 +748,7 @@ inline void MaskScanLines(byte *target, byte *source,
 	}
 }
 
-void DrawSpriteFlip(Viewport *dest, Sprite *sprite, SRect *spriteRect,
+void DrawSpriteFlip(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect,
 	int nFlip, int nMask) {
 	int skipAddress, skipStart, *colorIndex;
 	byte *address, *start;
@@ -899,7 +899,7 @@ inline void CopyScanLines(byte *ucTarget, byte *ucSource,
 	} // End of for (i) loop
 }
 
-void CopyScaleSpriteMask(Viewport *dest, Sprite *sprite, SRect *spriteRect, int newLenX, int newLenY) {
+void CopyScaleSpriteMask(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect, int newLenX, int newLenY) {
 	int i, j, skipAddress, skipStart, *colorIndex;
 	byte *address, *startAddress, *start;
 	int l, r, t, b, w, h, lp, tp;
@@ -985,7 +985,7 @@ void CopyScaleSpriteMask(Viewport *dest, Sprite *sprite, SRect *spriteRect, int 
 	}
 }
 
-void CopyScaleSprite(Viewport *dest, Sprite *sprite, SRect *spriteRect, int newLenX, int newLenY) {
+void CopyScaleSprite(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect, int newLenX, int newLenY) {
 	int i, j, skipAddress, skipStart, *colorIndex;
 	byte *address, *startAddress, *start;
 	int l, r, t, b, w, h, lp, tp;
@@ -1061,7 +1061,7 @@ void CopyScaleSprite(Viewport *dest, Sprite *sprite, SRect *spriteRect, int newL
 	}
 }
 
-void CopySpriteFlip(Viewport *dest, Sprite *sprite, SRect *spriteRect,
+void CopySpriteFlip(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect,
 	int nFlip, int nMask) {
 	int skipAddress, skipStart, *colorIndex;
 	byte *address, *start;

@@ -252,7 +252,7 @@ label_failure1:
 	return nullptr;
 }
 
-void sfxAttachATS2Sprite(Sprite *sprite, ATS *theATS, int theReel, int theFrame) {
+void sfxAttachATS2Sprite(const SpriteSharedPtr &sprite, ATS *theATS, int theReel, int theFrame) {
 	/* GET THE REDUCED PALETTE */
 	sprite->colorIndex = theATS->atsPalette;
 

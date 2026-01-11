@@ -70,7 +70,7 @@ typedef uint32 styleField;		// bitfield describing current style options
 //
 //	Parameters:	textNum ID
 
-extern Sprite *sfxGetTextSprite(textNum text_num);
+extern SpriteSharedPtr sfxGetTextSprite(textNum text_num);
 
 
 //	Function:	sfxSetTextFont

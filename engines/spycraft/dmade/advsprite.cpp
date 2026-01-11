@@ -43,7 +43,45 @@ static int blt2Screen = true;
 void (*finalCompose)( Viewport * ) = nullptr;
 #endif
 
-void sfxSpriteFrame ( Sprite *sprite, Viewport *port )
+Sprite::~Sprite() {
+	if (port) {
+		if (text) {
+			FreePtr(text->text_string);
+			FreePtr(text);
+			text = nullptr;
+			FreePort(port);
+			port = nullptr;
+		}
+		if (state & SPRITE_DISPOSABLE) {
+			if (colorIndex)
+				FreePtr(colorIndex);
+			FreePort(port);
+			port = nullptr;
+		}
+	} else {
+		ADV_ASSERT(0, 0);
+	}
+	if (scaleTableX) {
+		FreePtr(scaleTableX);
+		scaleTableX = nullptr;
+	}
+	if (scaleTableY) {
+		FreePtr(scaleTableY);
+		scaleTableY = nullptr;
+	}
+	if (glassTag) {
+		FreePtr(glassTag);
+		glassTag = nullptr;
+	}
+	if (drawList) {
+		ArrayList_Free(drawList, nullptr);
+		drawList = nullptr;
+	}
+
+	check = 0;
+}
+
+void sfxSpriteFrame (const SpriteSharedPtr &sprite, Viewport *port )
 {
 	if ( !sprite->redraw ) {
 		sprite->redraw = true;
@@ -64,8 +102,7 @@ void sfxSpriteFrame ( Sprite *sprite, Viewport *port )
 	sprite->rect.height = port->height;
 }
 
-void sfxMoveSprite ( Sprite *sprite, int theX, int theY )
-{
+void sfxMoveSprite (const SpriteSharedPtr &sprite, int theX, int theY ) {
 	/* SET THE POSITION */
 	sprite->x = theX;
 	sprite->y = theY;
@@ -76,8 +113,9 @@ void sfxMoveSprite ( Sprite *sprite, int theX, int theY )
 	/* AUTO CHANNELING */
 	if ( ( !( sprite->state & SPRITE_FIXEDPRI ) ) && ( sprite->channel != theY ) ) {
 		sprite->channel = theY;
-		ArrayList_Unlink ( sprite->back->spriteList, sprite );
-		ArrayList_Add ( sprite->back->spriteList, sprite, CompareSprite );
+		Common::SharedPtr<Sprite> spr(sprite);
+		sprite->back->spriteList->remove(spr);
+		sprite->back->spriteList->add(sprite);
 	}
 
 	/* SAVE THE OLD RECT */
@@ -94,8 +132,7 @@ void sfxMoveSprite ( Sprite *sprite, int theX, int theY )
 	sprite->rect.bottom = sprite->rect.top + sprite->rect.height - 1;
 }
 
-void sfxHideSprite ( Sprite *sprite )
-{
+void sfxHideSprite (const SpriteSharedPtr &sprite) {
 	if ( !( sprite->state & SPRITE_HIDDEN ) ) {
 		sprite->changed = true;
 		sprite->state |= SPRITE_HIDDEN;
@@ -109,23 +146,26 @@ void sfxHideSprite ( Sprite *sprite )
 	}
 }
 
-void sfxShowSprite(Sprite *sprite) {
+void sfxShowSprite(const SpriteSharedPtr &sprite) {
 	if (sprite->state & SPRITE_HIDDEN) {
 		if (sprite->back) {
-			if (ArrayList_Unlink(sprite->back->hiddenList, sprite))
-				ArrayList_Add(sprite->back->spriteList, sprite, CompareSprite);
+			if (sprite->back->hiddenList->contains(sprite)) {
+				sprite->back->hiddenList->remove(sprite);
+				sprite->back->spriteList->add(sprite);
+			}
 		}
+
 		sprite->changed = true;
 		sprite->state &= ~SPRITE_HIDDEN;
 	}
 }
 
-void sfxKillSprite(Sprite *sprite) {
+void sfxKillSprite(const SpriteSharedPtr &sprite) {
 	sprite->changed = true;
 	sprite->destroy = true;
 
 	if (sprite->state & SPRITE_HIDDEN) {
-		int ok = ArrayList_Del(sprite->back->hiddenList, sprite, FreeSpriteFn);
+		int ok = sprite->back->hiddenList->remove(sprite);
 		if (ok)
 			return;
 	}
@@ -138,18 +178,18 @@ void sfxKillSprite(Sprite *sprite) {
 	}
 }
 
-void sfxSpriteNoMask(Sprite *sprite) {
+void sfxSpriteNoMask(const SpriteSharedPtr &sprite) {
 	sprite->state &= ~SPRITE_MASK;
 	sprite->changed = true;
 }
 
-void sfxSpriteMask(Sprite *sprite) {
+void sfxSpriteMask(const SpriteSharedPtr &sprite) {
 	sprite->state |= SPRITE_MASK;
 	sprite->changed = true;
 }
 
-Sprite *sfxCreateSprite(int theBack, int theX, int theY, uint16 theScaleX, uint16 theScaleY, Viewport *port) {
-	Sprite *sprite = AllocSprite(backgrounds[theBack], (uint16)theY);
+SpriteSharedPtr sfxCreateSprite(int theBack, int theX, int theY, uint16 theScaleX, uint16 theScaleY, Viewport *port) {
+	SpriteSharedPtr sprite = AllocSprite(backgrounds[theBack], (uint16)theY);
 
 	if (sprite) {
 		sprite->back = backgrounds[theBack];
@@ -204,13 +244,13 @@ Sprite *sfxCreateSprite(int theBack, int theX, int theY, uint16 theScaleX, uint1
 	return sprite;
 }
 
-void sfxReleasePriority(Sprite *sprite) {
+void sfxReleasePriority(const SpriteSharedPtr &sprite) {
 	sprite->state &= ~SPRITE_FIXEDPRI;
 	sprite->changed = true;
 
 	sprite->channel = sprite->y;
-	ArrayList_Unlink(sprite->back->spriteList, sprite);
-	ArrayList_Add(sprite->back->spriteList, sprite, CompareSprite);
+	sprite->back->spriteList->remove(sprite);
+	sprite->back->spriteList->add(sprite);
 
 	if (!sprite->redraw) {
 		sprite->redraw = true;
@@ -218,7 +258,7 @@ void sfxReleasePriority(Sprite *sprite) {
 	}
 }
 
-void sfxSpriteOrig(Sprite *sprite, int theX, int theY) {
+void sfxSpriteOrig(const SpriteSharedPtr &sprite, int theX, int theY) {
 	sprite->changed = true;
 
 	sprite->port->origX = theX;
@@ -245,7 +285,7 @@ void sfxSpriteOrig(Sprite *sprite, int theX, int theY) {
 	sprite->rect.bottom -= sprite->orig_y;
 }
 
-void sfxSpriteScale(Sprite *sprite, uint16 theScaleX, uint16 theScaleY) {
+void sfxSpriteScale(const SpriteSharedPtr &sprite, uint16 theScaleX, uint16 theScaleY) {
 	Viewport *port = sprite->port;
 	int spriteX, spriteY;
 
@@ -319,18 +359,18 @@ void sfxSpriteScale(Sprite *sprite, uint16 theScaleX, uint16 theScaleY) {
 	}
 }
 
-void sfxSpriteChannel(Sprite *sprite, uint16 theChannel) {
+void sfxSpriteChannel(const SpriteSharedPtr &sprite, uint16 theChannel) {
 	if (sprite->back) {
 		sprite->changed = true;
 		sprite->channel = theChannel;
 		sprite->state |= SPRITE_FIXEDPRI;
 
-		ArrayList_Unlink(sprite->back->spriteList, sprite);
-		ArrayList_Add(sprite->back->spriteList, sprite, CompareSprite);
+		sprite->back->spriteList->remove(sprite);
+		sprite->back->spriteList->add(sprite);
 	}
 }
 
-int sfxIsSkip(Sprite *sprite, int theX, int theY) {
+int sfxIsSkip(const SpriteSharedPtr &sprite, int theX, int theY) {
 	if (sprite->state & SPRITE_MASK) {
 		if (sprite->port->colors == 8) {
 			return (
@@ -354,7 +394,7 @@ int sfxIsSkip(Sprite *sprite, int theX, int theY) {
 	}
 }
 
-int sfxGetSpritePixel(Sprite *sprite, int theX, int theY) {
+int sfxGetSpritePixel(const SpriteSharedPtr &sprite, int theX, int theY) {
 	if (sprite->port->colors == 8) {
 		return (
 			*(unsigned char *)((intptr)sprite->port->ptr +
@@ -366,12 +406,12 @@ int sfxGetSpritePixel(Sprite *sprite, int theX, int theY) {
 	}
 }
 
-void sfxInstallSpriteFn(Sprite *sprite, PFDraw thePtr) {
+void sfxInstallSpriteFn(const SpriteSharedPtr &sprite, PFDraw thePtr) {
 	sprite->state |= SPRITE_CUSTOM;
 	sprite->drawFunc = thePtr;
 }
 
-void sfxRemoveSpriteFn(Sprite *sprite) {
+void sfxRemoveSpriteFn(const SpriteSharedPtr &sprite) {
 	sprite->state &= ~SPRITE_CUSTOM;
 	sprite->drawFunc = nullptr;
 }
@@ -399,7 +439,7 @@ inline void UpdateSprites(Background *stage) {
 		pSprite = (PartialSprite *)list->elements[i];
 
 #ifdef __MADE_EXT
-		/* DRAW THE CUSTOM SPRITE */
+		/* DRAW THE CUSTOM SPRTE */
 		if (pSprite->sprite->drawFunc) {
 			(*pSprite->sprite->drawFunc)(stage->animPort, pSprite->sprite, &pSprite->rect);
 			AddBltRect(stage->updateRects, &pSprite->rect);
@@ -429,9 +469,9 @@ inline void UpdateSprites(Background *stage) {
 
 void DirectRelease(Background *stage, int dx, int dy) {
 	int i;
-	Sprite *sprite;
+	SpriteSharedPtr sprite;
 	PartialSprite *pSprite;
-	ArrayList *list = stage->spriteList;
+	SpriteArray *list = stage->spriteList;
 
 	updateBack = stage;
 
@@ -441,10 +481,10 @@ void DirectRelease(Background *stage, int dx, int dy) {
 	ArrayList_Add(stage->underbits, sprite_rect, nullptr);
 
 	/* RELEASE SPRITES */
-	for (i = 0; i < list->size; i++) {
-		sprite = (Sprite *)list->elements[i];
+	for (i = 0; i < (int)list->size(); i++) {
+		sprite = (*list)[i];
 		if ((sprite->destroy) || (sprite->state & SPRITE_HIDDEN)) {
-			ArrayList_Add(stage->deleteList, sprite, nullptr);
+			stage->deleteList->push_back(sprite);
 		} else {
 			if (sprite->state & SPRITE_LOCALIZED) {
 				sprite->rect.left += dx;
@@ -472,16 +512,16 @@ void DirectRelease(Background *stage, int dx, int dy) {
 
 void sfxReleaseSprites(Background *stage) {
 	int i, j, t;
-	Sprite *sprite;
-	Sprite *curSprite;
+	SpriteSharedPtr sprite;
+	SpriteSharedPtr curSprite;
 	PartialSprite *pSprite;
-	ArrayList *list = stage->spriteList;
+	SpriteArray *list = stage->spriteList;
 
 	updateBack = stage;
 
 	/* DRAWS ALL SPRITES BACK TO FRONT */
-	for (i = 0; i < list->size; i++) {
-		curSprite = (Sprite *)list->elements[i];
+	for (i = 0; i < (int)list->size(); i++) {
+		curSprite = (*list)[i];
 
 		if (curSprite->changed) {
 			t = curSprite->state & SPRITE_LOCALIZED;
@@ -495,8 +535,8 @@ void sfxReleaseSprites(Background *stage) {
 					ArrayList_Add(stage->underbits, &curSprite->oldRect, nullptr);
 
 					/* NEED TO CHECK ALL INTERSECTED RECT */
-					for (j = 0; j < list->size; j++) {
-						sprite = (Sprite *)list->elements[j];
+					for (j = 0; j < (int)list->size(); j++) {
+						sprite = (*list)[j];
 
 						if (!sprite->changed && !sprite->destroy && (sprite != curSprite)
 							&& (SRect_Intersects(&sprite->rect, &curSprite->oldRect))
@@ -519,7 +559,7 @@ void sfxReleaseSprites(Background *stage) {
 									break;
 								}
 							}
-							/* ALLOCATE A PARTIAL SPRITE */
+							/* ALLOCATE A PARTIAL SPRTE */
 							if (ok_to_add) {
 								pSprite = (PartialSprite *)AllocPtr(sizeof(PartialSprite));
 								SRect_Copy(&pSprite->rect, &out);
@@ -533,7 +573,7 @@ void sfxReleaseSprites(Background *stage) {
 
 			/* ONLY SPRITE NOT DELETED NEED TO CHECK FOR OTHER SPRITES */
 			if ((curSprite->destroy) || (curSprite->state & SPRITE_HIDDEN)) {
-				ArrayList_Add(stage->deleteList, curSprite, nullptr);
+				stage->deleteList->push_back(curSprite);
 			} else {
 				/* ONLY SPRITE CONTAINED IN CURRENT DISPLAY RECT */
 				if ((!t || (t && SRect_Intersects
@@ -549,9 +589,9 @@ void sfxReleaseSprites(Background *stage) {
 					ArrayList_Add(stage->updateRgn, pSprite, ComparePSprite);
 
 					/* CHECK FOR INTERSECTION OF BACKGROUND RECT WITH ALL SPRITES */
-					for (j = i + 1; j < list->size; j++) {
+					for (j = i + 1; j < (int)list->size(); j++) {
 
-						sprite = (Sprite *)list->elements[j];
+						sprite = (*list)[j];
 
 						/* ONCE INTERSECT WITH OTHER SPRITES ADD THEM TO REGION */
 						if (!sprite->changed && !sprite->destroy &&
@@ -590,16 +630,16 @@ void sfxReleaseSprites(Background *stage) {
 	} // end FOR
 
 	/* CLEAR THE CHANGE FLAG */
-	for (i = 0; i < list->size; i++)
-		((Sprite *)list->elements[i])->changed = false;
+	for (i = 0; i < (int)list->size(); i++)
+		(*list)[i]->changed = false;
 }
 
 void sfxUpdate() {
 	int i;
-	Sprite *sprite;
+	SpriteSharedPtr sprite;
 	ArrayList *list;
 
-	/* UPDATE ALL SPRITE */
+	/* UPDATE ALL SPRITES */
 	if (updateBack == nullptr)
 		return;
 
@@ -618,18 +658,14 @@ void sfxUpdate() {
 	}
 	ArrayList_Release(list);
 
-	/* FREE ALL DESTROYED SPRITE */
-	list = updateBack->deleteList;
-	for (i = 0; i < list->size; i++) {
-		sprite = (Sprite *)list->elements[i];
-		FreeSprite(updateBack, sprite);
-	}
-
-	ArrayList_Release(list);
+	/* FREE ALL DESTROYED SPRITES */
+	for (const SpriteSharedPtr &spr : *updateBack->deleteList)
+		FreeSprite(updateBack, spr);
+	updateBack->deleteList->clear();
 }
 
-Sprite *AllocSprite(Background *stage, uint16 theChannel) {
-	Sprite *sprite = (Sprite *)AllocPtr(sizeof(Sprite));
+SpriteSharedPtr AllocSprite(Background *stage, uint16 theChannel) {
+	SpriteSharedPtr sprite;
 
 	if (sprite) {
 
@@ -656,35 +692,25 @@ Sprite *AllocSprite(Background *stage, uint16 theChannel) {
 
 		/* INSERTING INTO SPRITELIST */
 		if (stage->spriteList) {
-			ArrayList_Add(stage->spriteList, sprite, CompareSprite);
+			stage->spriteList->add(sprite);
 		}
 	}
 
 	return sprite;
 }
 
-bool FreeSprite(Background *stage, Sprite *sprite) {
+bool FreeSprite(Background *stage, const SpriteSharedPtr &sprite) {
 	if (!stage->spriteList)
 		return false;
 
 	if (sprite->destroy) {
-		ArrayList_Del(stage->spriteList, sprite, FreeSpriteFn);
+		stage->spriteList->remove(sprite);
 	} else {
-		ArrayList_Unlink(stage->spriteList, sprite);
-		ArrayList_Add(stage->hiddenList, sprite, nullptr);
+		stage->spriteList->remove(sprite);
+		stage->hiddenList->push_back(sprite);
 	}
 
 	return true;
-}
-
-bool CompareSprite(void *obj1, void *obj2) {
-	Sprite *sp1 = (Sprite *)obj1;
-	Sprite *sp2 = (Sprite *)obj2;
-
-	if (sp1->channel > sp2->channel)
-		return true;
-	else
-		return false;
 }
 
 bool ComparePSprite(void *obj1, void *obj2) {
@@ -697,60 +723,16 @@ bool ComparePSprite(void *obj1, void *obj2) {
 		return false;
 }
 
-void FreeSpriteFn(void *obj) {
-	Sprite *sprite = (Sprite *)obj;
-
-	if (sprite->check != 99999)
-		ADV_ASSERT(0, 0);
-
-	if (sprite->port) {
-		if (sprite->text) {
-			FreePtr(sprite->text->text_string);
-			FreePtr(sprite->text);
-			sprite->text = nullptr;
-			FreePort(sprite->port);
-			sprite->port = nullptr;
-		}
-		if (sprite->state & SPRITE_DISPOSABLE) {
-			if (sprite->colorIndex)
-				FreePtr(sprite->colorIndex);
-			FreePort(sprite->port);
-			sprite->port = nullptr;
-		}
-	} else {
-		ADV_ASSERT(0, 0);
-	}
-	if (sprite->scaleTableX) {
-		FreePtr(sprite->scaleTableX);
-		sprite->scaleTableX = nullptr;
-	}
-	if (sprite->scaleTableY) {
-		FreePtr(sprite->scaleTableY);
-		sprite->scaleTableY = nullptr;
-	}
-	if (sprite->glassTag) {
-		FreePtr(sprite->glassTag);
-		sprite->glassTag = nullptr;
-	}
-	if (sprite->drawList) {
-		ArrayList_Free(sprite->drawList, nullptr);
-		sprite->drawList = nullptr;
-	}
-
-	sprite->check = 0;
-	FreePtr(sprite);
-}
-
 void RealizeSprites(Background *stage) {
 	int i;
-	Sprite *sprite;
-	ArrayList *list = stage->spriteList;
+	SpriteSharedPtr sprite;
+	SpriteArray *list = stage->spriteList;
 
-	for (i = 0; i < list->size; i++) {
-		sprite = (Sprite *)list->elements[i];
+	for (i = 0; i < (int)list->size(); i++) {
+		sprite = (*list)[i];
 
 #ifdef __MADE_EXT
-		/* DRAW THE CUSTOM SPRITE */
+		/* DRAW THE CUSTOM SPRTE */
 		if (sprite->drawFunc) {
 			(*sprite->drawFunc)(stage->animPort, sprite, &sprite->rect);
 			return;
@@ -773,7 +755,7 @@ void RealizeSprites(Background *stage) {
 	}
 }
 
-void sfxSpriteAddToPic(Sprite *sprite) {
+void sfxSpriteAddToPic(const SpriteSharedPtr &sprite) {
 	Background *stage = sprite->back;
 
 	/* DRAW SPRITE TO THE BACKPORT */
@@ -798,7 +780,7 @@ void sfxSpriteAddToPic(Sprite *sprite) {
 	sfxKillSprite(sprite);
 }
 
-void sfxSpriteGlass(Sprite *sprite, int type, int color, int intensity) {
+void sfxSpriteGlass(const SpriteSharedPtr &sprite, int type, int color, int intensity) {
 	GlassTag *tag;
 
 	if (sprite->glassTag == nullptr)
@@ -816,7 +798,7 @@ void sfxSpriteGlass(Sprite *sprite, int type, int color, int intensity) {
 	sprite->redraw = true;
 }
 
-int sfxDrawLine(Sprite *sprite, int x1, int y1, int x2, int y2, int color) {
+int sfxDrawLine(const SpriteSharedPtr &sprite, int x1, int y1, int x2, int y2, int color) {
 	int i;
 	ArrayList *list;
 	DrawPrime *dp;
@@ -859,7 +841,7 @@ int sfxDrawLine(Sprite *sprite, int x1, int y1, int x2, int y2, int color) {
 	return -1;
 }
 
-void sfxEraseLine(Sprite *sprite, int theLine) {
+void sfxEraseLine(const SpriteSharedPtr &sprite, int theLine) {
 	int i;
 	DrawPrime *dp = nullptr;
 	ArrayList *list = sprite->drawList;
@@ -880,7 +862,7 @@ void sfxEraseLine(Sprite *sprite, int theLine) {
 	}
 }
 
-void sfxSpriteFlipX(Sprite *sprite) {
+void sfxSpriteFlipX(const SpriteSharedPtr &sprite) {
 	if (!sprite->redraw) {
 		sprite->redraw = true;
 		SRect_Copy(&sprite->oldRect, &sprite->rect);
@@ -894,7 +876,7 @@ void sfxSpriteFlipX(Sprite *sprite) {
 	sprite->changed = true;
 }
 
-void sfxSpriteFlipY(Sprite *sprite) {
+void sfxSpriteFlipY(const SpriteSharedPtr &sprite) {
 	if (!sprite->redraw) {
 		sprite->redraw = true;
 		SRect_Copy(&sprite->oldRect, &sprite->rect);
@@ -908,7 +890,7 @@ void sfxSpriteFlipY(Sprite *sprite) {
 	sprite->changed = true;
 }
 
-void sfxSpriteFlipXY(Sprite *sprite) {
+void sfxSpriteFlipXY(const SpriteSharedPtr &sprite) {
 	if (!sprite->redraw) {
 		sprite->redraw = true;
 		SRect_Copy(&sprite->oldRect, &sprite->rect);
@@ -951,13 +933,13 @@ void sfxSetDrawInfo(int type, int value) {
 	}
 }
 
-Sprite *sfxClipSprite(Sprite *sprite, int theX, int theY, SRect *theRect) {
+SpriteSharedPtr sfxClipSprite(const SpriteSharedPtr &sprite, int theX, int theY, SRect *theRect) {
 	int needScale;
 	Viewport *port;
 	SRect aRect;
 	int cw, ch;
 	int l, t, r, b, w, h, sw = 0, sh = 0;
-	Sprite *ret = AllocSprite(sprite->back, sprite->channel);
+	SpriteSharedPtr ret = AllocSprite(sprite->back, sprite->channel);
 
 	if (ret) {
 		l = theRect->left;
@@ -1116,7 +1098,7 @@ void Dissolve16(Viewport *dest, Viewport *src,
 		dissolve_index = 0;
 }
 
-void sfxDissolveSprite(Sprite *sprite, int delay) {
+void sfxDissolveSprite(const SpriteSharedPtr &sprite, int delay) {
 	int i;
 	unsigned int oldTime;
 	Viewport *animPort = sprite->back->animPort;
@@ -1136,34 +1118,23 @@ void sfxDissolveSprite(Sprite *sprite, int delay) {
 }
 
 void CleanSpriteList(Background *back) {
-	int i;
-	ArrayList *list = back->spriteList;
-
-	for (i = 0; i < list->size; i++) {
-		FreeSpriteFn(list->elements[i]);
-		list->elements[i] = nullptr;
-	}
-	list->size = 0;
+	back->spriteList->clear();
 }
 
 void CleanUpSprites() {
 	int i;
-	Sprite *sprite;
+	SpriteSharedPtr sprite;
 	Background *back = backgrounds[curBack];
-	ArrayList *delList = back->deleteList;
-	ArrayList *spriteList = back->spriteList;
+	SpriteArray *delList = back->deleteList;
+	SpriteArray *spriteList = back->spriteList;
 
-	for (i = 0; i < spriteList->size; i++) {
-		sprite = (Sprite *)spriteList->elements[i];
+	for (i = 0; i < (int)spriteList->size(); i++) {
+		sprite = (*spriteList)[i];
 		if (sprite->destroy)
-			ArrayList_Add(delList, sprite, nullptr);
+			delList->push_back(sprite);
 	}
 
-	for (i = 0; i < delList->size; i++) {
-		sprite = (Sprite *)delList->elements[i];
-		FreeSprite(back, sprite);
-	}
-	ArrayList_Release(delList);
+	delList->clear();
 }
 
 } // namespace Spycraft

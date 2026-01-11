@@ -22,6 +22,8 @@
 #ifndef SPYCRAFT_DMADE_ADVBACK_H
 #define SPYCRAFT_DMADE_ADVBACK_H
 
+#include "common/array.h"
+#include "common/ptr.h"
 #include "spycraft/dmade/advlib.h"
 #include "spycraft/dmade/advlist.h"
 #include "spycraft/dmade/advport.h"
@@ -61,6 +63,7 @@ typedef int16 bufferNum;		// background buffer magic number
 typedef uint16 visualEffect;	// predefined type for a visual effect
 typedef uint16 channelNum;		// layering of items on a background
 
+class SpriteArray;
 
 //	Function:	sfxMakeDisplayBuffer
 //
@@ -206,12 +209,12 @@ struct Background {
 	Viewport *animPort;
 	Viewport *backPort;
 	SRect displayRect;
-	ArrayList *spriteList;
+	SpriteArray *spriteList;
 	ArrayList *updateRgn;
 	ArrayList *updateRects;
 	ArrayList *underbits;
-	ArrayList *deleteList;
-	ArrayList *hiddenList;
+	SpriteArray *deleteList;
+	SpriteArray *hiddenList;
 	GamePalette palette;
 	int picNum;
 	bool released;

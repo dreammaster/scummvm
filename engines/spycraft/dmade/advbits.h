@@ -27,14 +27,14 @@
 namespace Spycraft {
 
 extern void DrawBits(Viewport *dest, Viewport *src, SRect *r);
-extern void DrawScaleSprite(Viewport *port, Sprite *sprite, SRect *r);
-extern void DrawScaleSpriteMask(Viewport *port, Sprite *sprite, SRect *spriteRect);
-extern void DrawGlassMask(Viewport *port, Sprite *sprite, SRect *spriteRect);
-extern void DrawSpriteFlip(Viewport *dest, Sprite *sprite, SRect *spriteRect,
+extern void DrawScaleSprite(Viewport *port, const SpriteSharedPtr &sprite, SRect *r);
+extern void DrawScaleSpriteMask(Viewport *port, const SpriteSharedPtr &sprite, SRect *spriteRect);
+extern void DrawGlassMask(Viewport *port, const SpriteSharedPtr &sprite, SRect *spriteRect);
+extern void DrawSpriteFlip(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect,
 	int nFlip, int nMask);
-extern void CopyScaleSprite(Viewport *port, Sprite *sprite, SRect *r, int newLenX, int newLenY);
-extern void CopyScaleSpriteMask(Viewport *port, Sprite *sprite, SRect *spriteRect, int newLenX, int LenY);
-extern void CopySpriteFlip(Viewport *dest, Sprite *sprite, SRect *spriteRect,
+extern void CopyScaleSprite(Viewport *port, const SpriteSharedPtr &sprite, SRect *r, int newLenX, int newLenY);
+extern void CopyScaleSpriteMask(Viewport *port, const SpriteSharedPtr &sprite, SRect *spriteRect, int newLenX, int LenY);
+extern void CopySpriteFlip(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect,
 	int nFlip, int nMask);
 
 extern void MakeScaleTableF(uint *table, int oldLen, int newLen);

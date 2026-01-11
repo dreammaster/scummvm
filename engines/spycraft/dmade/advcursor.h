@@ -34,7 +34,7 @@ namespace Spycraft {
 extern int16 turnedOffWindowsCursor;
 extern int16 haveSetGameCursor;
 extern int cursorCount;
-extern Sprite *cursor;
+extern SpriteSharedPtr cursor;
 
 /* MADE External */
 

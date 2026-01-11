@@ -255,7 +255,7 @@ ChoiceBar::ChoiceBar(int maxWidth) {
 	ratioY = (float)512 / (float)14;
 
 	SRect theRect;
-	Sprite *temp;
+	SpriteSharedPtr temp;
 	SRect_Init(&theRect, 0, 0, right - left, bottom - top);
 	int theScaleX = int(ratioX * (float)maxWidth);
 	int theScaleY = int(ratioY * (bottom - top - 1));

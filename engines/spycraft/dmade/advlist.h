@@ -22,6 +22,9 @@
 #ifndef SPYCRAFT_DMADE_ADVLIST_H
 #define SPYCRAFT_DMADE_ADVLIST_H
 
+#include "common/array.h"
+#include "common/ptr.h"
+
 namespace Spycraft {
 
 #define DEF_ARRAY_SIZE		32
@@ -31,6 +34,9 @@ struct ArrayList {
 	int size;
 	void **elements;
 };
+
+struct Sprite;
+typedef Common::Array< Common::SharedPtr<Sprite> > SpriteList;
 
 typedef void (*FreeFnPtr)(void *obj);
 typedef bool (*SortFnPtr)(void *obj1, void *obj2);

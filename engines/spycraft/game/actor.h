@@ -36,7 +36,7 @@ public:
 	int loop = 0;
 	int cel = 0;
 	uint16 priority = 0;		// Z position
-	Sprite *mySprite = nullptr;
+	SpriteSharedPtr mySprite;
 	int height = 0;
 	int width = 0;
 	ATS *myATS = nullptr;

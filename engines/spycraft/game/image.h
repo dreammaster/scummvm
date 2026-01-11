@@ -105,7 +105,7 @@ public:
 	int plateHeight;
 	int currentPlateScanLine;
 
-	Sprite *clipPlate;
+	SpriteSharedPtr clipPlate;
 	IntrPuzzTimer *scanTimer;
 
 	ScanLineDos8();
@@ -231,7 +231,7 @@ public:
 class Picture : public Object
 {
 public:
-	Sprite *scaleSprite;
+	SpriteSharedPtr scaleSprite;
 	IntrPuzzView *photoSprite;
 
 	//	EnhanceText *textSprites[5];

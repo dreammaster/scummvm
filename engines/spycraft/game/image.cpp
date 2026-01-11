@@ -212,9 +212,8 @@ void ImageInfo::save()
 	}		
 }
 
-void ImageInfo::load()
-{
-	Sprite *tempSprite;
+void ImageInfo::load() {
+	SpriteSharedPtr tempSprite;
 	SRect newRect;
 	int i;
 
@@ -880,7 +879,7 @@ ScanLineA::ScanLineA()
 	}
 
  	currentItem = 0;
-	Sprite *s;
+	SpriteSharedPtr s;
     photoHeight = currentPicture->photoSprite->mySprite->port->height;
 	s = currentPicture->photoSprite->mySprite;
 		 	
@@ -899,7 +898,7 @@ ScanLineA::ScanLineA()
 				if(currentItem <= currentPicture->numTextSprites)
 				{
 					SRect clipRect;
-					Sprite* temp;
+					SpriteSharedPtr temp;
 					SRect_Init ( &clipRect, 0, 0, 0, 0);
 					if(textFound[currentItem].clipped)
 					{
@@ -977,7 +976,7 @@ void ScanLineA::cue()
 	int table[] = { 40, 50, 55, 50, 55, 50, 55};
  
  	currentItem = 0;
-	Sprite *s;
+	SpriteSharedPtr s;
     photoHeight = currentPicture->photoSprite->mySprite->port->height;
 	s = currentPicture->photoSprite->mySprite;
 		 	
@@ -1023,7 +1022,7 @@ void ScanLineA::cue()
 					}
 				
 					int theHeight = currentPicture->textSprites[currentItem]->height;
-					Sprite* temp = NULL;
+					SpriteSharedPtr temp = NULL;
 					scanLineCtr++;
 					for(int i = 1; i < theHeight; i++, scanLineCtr++)
 					{
@@ -1231,86 +1230,6 @@ ScanLineDos8::ScanLineDos8()
 			 	
  	scanTimer = new (IntrPuzzTimer);
 	scanTimer->setTicks(2,this);
-/*	for (scanLineCtr = 0; scanLineCtr<s->port->height; scanLineCtr++ )
-	{
-		posn(17, 93 + scanLineCtr);
-		sfxReleaseSprites ( backgrounds[curBack] );
-		sfxUpdate();
-							  
-		if(currentItem != currentPicture->numTextSprites)
-		{
-			if(textFound[currentItem].y == (scanLineCtr + 93))
-			{
-				if(currentItem <= currentPicture->numTextSprites)
-				{
-					SRect clipRect;
-					Sprite* temp;
-					SRect_Init ( &clipRect, 0, 0, 0, 0);
-					if(textFound[currentItem].clipped)
-					{
-						currentPicture->textSprites[currentItem]->hide();
-						clipRect.left = textFound[currentItem].left;
-						clipRect.top = textFound[currentItem].top;
-						if(textFound[currentItem].right)
-						{
-							clipRect.right = currentPicture->textSprites[currentItem]->width - textFound[currentItem].right;
-						}
-						else
-						{		  
-							clipRect.right = currentPicture->textSprites[currentItem]->width;
-						}				
-						if(textFound[currentItem].bottom)
-						{
-							clipRect.bottom = currentPicture->textSprites[currentItem]->height - textFound[currentItem].bottom;
-						}
-						else
-						{
-							clipRect.bottom = currentPicture->textSprites[currentItem]->height;
-						}
-						temp = sfxClipSprite ( currentPicture->textSprites[currentItem]->mySprite, textFound[currentItem].x, textFound[currentItem].y, &clipRect);					
-						sfxKillSprite(currentPicture->textSprites[currentItem]->mySprite);
-						currentPicture->textSprites[currentItem]->mySprite = temp;
-						currentPicture->textSprites[currentItem]->setRect();	
-					}
-				
-					int theHeight = currentPicture->textSprites[currentItem]->height;
-					temp = NULL;
-					scanLineCtr++;
-					for(int i = 1; i < theHeight; i++, scanLineCtr++)
-					{
-					
-						SRect_Init ( &clipRect, 0, 0, 0, 0);
-						clipRect.left = 0;	
-						clipRect.top = 0;	
-						clipRect.right = currentPicture->textSprites[currentItem]->width;	
-						clipRect.bottom = i;
-						sfxSetDrawInfo (ADV_DRAW_SCALEX, 512 );
-						sfxSetDrawInfo (ADV_DRAW_SCALEY, 512 );
-						if(temp)
-							sfxKillSprite(temp);
-						temp = sfxClipSprite ( currentPicture->textSprites[currentItem]->mySprite, textFound[currentItem].x, textFound[currentItem].y, &clipRect);					
-						currentPicture->textSprites[currentItem]->hide();
-						sfxShowSprite(temp);
-					
-						posn(17, 93 + scanLineCtr);
-						sfxReleaseSprites ( backgrounds[curBack] );
-						sfxUpdate();
-					}							 
-					scanLineCtr--;
-					if(temp)
-						sfxKillSprite(temp);
-					currentPicture->textSprites[currentItem]->show();
-					
-					currentItem++;
-				}
-			}					    
-		}		    
-	}
-
-	dispose();
-	imageanal->imageSFX->stop();	//stop scanning sound
-	sfxMadeCursor();
-*/
 }
 
 void ScanLineDos8::cue()
@@ -1327,7 +1246,7 @@ void ScanLineDos8::cue()
 			{
 				if(currentItem <= currentPicture->numTextSprites)
 				{
-					Sprite* temp;
+					SpriteSharedPtr temp;
 					SRect_Init ( &clipRect, 0, 0, 0, 0);
 					if(textFound[currentItem].clipped)
 					{
@@ -1429,7 +1348,7 @@ int ZoomArea::handleEvent ( MADEEventStamp *event )
 		if (event_type == USER_LEFT_DOWN)
 		{
 			SRect newRect;
-			Sprite *tempSprite;
+			SpriteSharedPtr tempSprite;
 
 			if(imageanal->zoomMode == ZOOM_IN)
 			{
@@ -1893,7 +1812,7 @@ void PictureButton::init(int theX, int theY, int theView, int theLoop, int thePi
 void PictureButton::activate()
 {
 	SRect newRect;
-	Sprite *tempSprite;
+	SpriteSharedPtr tempSprite;
 
 	if(currentPicture)
 	{
@@ -1990,7 +1909,7 @@ void unZoomBut::activate()
 {
 //	imageanal->zoomMode = NO_ZOOM;
 	SRect newRect;
-	Sprite *tempSprite;
+	SpriteSharedPtr tempSprite;
 	if(currentPicture->currentZoom > 0)
 	{
 		int i;

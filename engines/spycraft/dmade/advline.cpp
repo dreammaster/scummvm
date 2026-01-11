@@ -267,7 +267,7 @@ static void Line8(int x1, int y1, int x2, int y2, SRect *rect, int color, Viewpo
 	}
 }
 
-void DrawLines(Viewport *dest, Sprite *sprite, SRect *spriteRect) {
+void DrawLines(Viewport *dest, const SpriteSharedPtr &sprite, SRect *spriteRect) {
 	int i;
 	int x1, y1, x2, y2;
 	DrawPrime *dp;

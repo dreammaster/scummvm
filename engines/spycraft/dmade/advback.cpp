@@ -30,6 +30,7 @@
 #include "spycraft/dmade/advsfx.h"
 #include "spycraft/dmade/advcursor.h"
 #include "spycraft/dmade/advtext.h"
+#include "spycraft/dmade/advsprite.h"
 
 namespace Spycraft {
 
@@ -51,8 +52,9 @@ extern bool CompareSprite(void *obj1, void *obj2);
 void InitBackgrounds() {
 	int i;
 	Background *background;
-	ArrayList *spriteList, *updateRgn, *updateRects;
-	ArrayList *underbits, *deleteList, *hiddenList;
+	SpriteArray *spriteList, *hiddenList, *deleteList;
+	ArrayList *updateRgn, *updateRects;
+	ArrayList *underbits;
 
 	// allocate animport
 	animport = (Viewport *)AllocMDPort(scene_width, scene_height, screen_colors);
@@ -77,7 +79,7 @@ void InitBackgrounds() {
 		memset(&background->palette, 0, sizeof(GamePalette));
 
 		// allocate a sprite array list for background
-		spriteList = ArrayList_Calloc(spritelist_size);
+		spriteList = new SpriteArray(spritelist_size);
 		if (spriteList == nullptr) {
 			FreePtr(background);
 			ADV_ASSERT(false, __ERR_MEM_ALLOC_FAIL);
@@ -87,7 +89,7 @@ void InitBackgrounds() {
 		updateRgn = ArrayList_Calloc(4 * spritelist_size);
 		if (updateRgn == nullptr) {
 			FreePtr(background);
-			ArrayList_Free(spriteList, nullptr);
+			delete spriteList;
 			ADV_ASSERT(false, __ERR_MEM_ALLOC_FAIL);
 		}
 
@@ -95,7 +97,7 @@ void InitBackgrounds() {
 		updateRects = ArrayList_Calloc(2 * spritelist_size);
 		if (updateRects == nullptr) {
 			FreePtr(background);
-			ArrayList_Free(spriteList, nullptr);
+			delete spriteList;
 			ArrayList_Free(updateRgn, nullptr);
 			ADV_ASSERT(false, __ERR_MEM_ALLOC_FAIL);
 		}
@@ -104,34 +106,19 @@ void InitBackgrounds() {
 		underbits = ArrayList_Calloc(2 * spritelist_size);
 		if (underbits == nullptr) {
 			FreePtr(background);
-			ArrayList_Free(spriteList, nullptr);
+			delete spriteList;
 			ArrayList_Free(updateRgn, nullptr);
 			ArrayList_Free(updateRects, nullptr);
 			ADV_ASSERT(false, __ERR_MEM_ALLOC_FAIL);
 		}
 
 		// allocate an delete array list for background
-		deleteList = ArrayList_Calloc(spritelist_size);
-		if (deleteList == nullptr) {
-			FreePtr(background);
-			ArrayList_Free(spriteList, nullptr);
-			ArrayList_Free(updateRgn, nullptr);
-			ArrayList_Free(updateRects, nullptr);
-			ArrayList_Free(underbits, nullptr);
-			ADV_ASSERT(false, __ERR_MEM_ALLOC_FAIL);
-		}
+		deleteList = new SpriteArray();
+		assert(deleteList);
 
 		// allocate an hidden array list for background
-		hiddenList = ArrayList_Alloc();
-		if (hiddenList == nullptr) {
-			FreePtr(background);
-			ArrayList_Free(spriteList, nullptr);
-			ArrayList_Free(updateRgn, nullptr);
-			ArrayList_Free(updateRects, nullptr);
-			ArrayList_Free(underbits, nullptr);
-			ArrayList_Free(deleteList, nullptr);
-			ADV_ASSERT(false, __ERR_MEM_ALLOC_FAIL);
-		}
+		hiddenList = new SpriteArray();
+		assert(hiddenList);
 
 		// store pointer to  animPort
 		background->animPort = animport;
@@ -208,10 +195,8 @@ void CleanBackgrounds(void) {
 			FreeTextSlots((bufferNum)i);
 
 			// need to delete each sprite here
-			if (background->spriteList) {
-				ArrayList_Free(background->spriteList, FreeSpriteFn);
-				background->spriteList = nullptr;
-			}
+			delete background->spriteList;
+			background->spriteList = nullptr;
 
 			if (background->updateRgn) {
 				ArrayList_Free(background->updateRgn, nullptr);
@@ -228,16 +213,11 @@ void CleanBackgrounds(void) {
 				background->underbits = nullptr;
 			}
 
-			if (background->hiddenList) {
-				ArrayList_Free(background->hiddenList, FreeSpriteFn);
-				background->hiddenList = nullptr;
-			}
+			delete background->hiddenList;
+			background->hiddenList = nullptr;
 
-			if (background->deleteList) {
-				ArrayList_Release(background->deleteList);
-				ArrayList_Free(background->deleteList, nullptr);
-				background->deleteList = nullptr;
-			}
+			delete background->deleteList;
+			background->deleteList = nullptr;
 
 			FreePtr(background);
 			backgrounds[i] = nullptr;
@@ -347,16 +327,17 @@ void sfxKillDisplayBuffer(bufferNum buffer_num) {
 			sfxUnlockRes(background->picNum, picType);
 
 		FreeTextSlots(buffer_num);
-		if (!ArrayList_Unlink(background->spriteList, cursor))
-			if (!ArrayList_Unlink(background->hiddenList, cursor))
-				ADV_ASSERT(0, 0);
+		assert(background->spriteList->contains(cursor) || background->hiddenList->contains(cursor));
+		background->spriteList->remove(cursor);
+		background->hiddenList->remove(cursor);
+
 		CleanSpriteList(background);
-		ArrayList_Release(background->spriteList);
+		background->spriteList->clear();
 		ArrayList_Release(background->updateRgn);
 		ArrayList_Release(background->underbits);
 		ArrayList_Release(background->updateRects);
-		ArrayList_Release(background->hiddenList);
-		ArrayList_Release(background->deleteList);
+		background->hiddenList->clear();
+		background->deleteList->clear();
 		background->released = true;
 	}
 }
@@ -450,11 +431,11 @@ void sfxVisualEffect(visualEffect effect, bufferNum new_buffer,
 	if (cur_background != nullptr && cursor != nullptr) {
 		cursor->back = new_background;
 		if (cursor->state & SPRITE_HIDDEN) {
-			if (!List_Contains(new_background->hiddenList, cursor))
-				ArrayList_Add(new_background->hiddenList, cursor, nullptr);
+			if (!new_background->hiddenList->contains(cursor))
+				new_background->hiddenList->add(cursor);
 		} else {
-			if (!List_Contains(new_background->spriteList, cursor))
-				ArrayList_Add(new_background->spriteList, cursor, CompareSprite);
+			if (!new_background->spriteList->contains(cursor))
+				new_background->spriteList->add(cursor);
 		}
 	}
 

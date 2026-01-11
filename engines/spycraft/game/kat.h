@@ -229,7 +229,7 @@ public:
 	CameraView *cameraview;
 	WindowClose *windowclose;
 	TitleBar *titlebar;
-	Sprite *minimize;
+	SpriteSharedPtr minimize;
 
 	int currentZoom;
 	int cameraWin_x;
@@ -264,8 +264,8 @@ public:
 class explodeScript : public Script
 {
 public:
-	Sprite *tempsprite;
-	Sprite *newsprite;
+	SpriteSharedPtr tempsprite;
+	SpriteSharedPtr newsprite;
 	int begin_x;
 	int begin_y;
 	int dest_x;

@@ -37,7 +37,7 @@ namespace Spycraft {
 
 struct TextID {
 	bufferNum background;
-	Sprite *text;
+	SpriteSharedPtr text;
 };
 
 extern int pixFormat;
@@ -118,7 +118,7 @@ short tgcharheight() {
 	return((short)charheight);
 }
 
-Sprite *sfxGetTextSprite(textNum text_num) {
+SpriteSharedPtr sfxGetTextSprite(textNum text_num) {
 
 	if (text_num < 0 || text_num > MAX_TEXT_IDS - 1)
 		ADV_ASSERT(false, __ERR_CODING);
@@ -130,7 +130,7 @@ Sprite *sfxGetTextSprite(textNum text_num) {
 }
 
 void sfxKillText(textNum text_num) {
-	Sprite *text;
+	SpriteSharedPtr text;
 
 	if (text_num < 0 || text_num > MAX_TEXT_IDS - 1)
 		ADV_ASSERT(false, __ERR_CODING);
@@ -168,7 +168,7 @@ textNum sfxDrawText(bufferNum display_buffer, channelNum channel_num,
 	Background *background;
 	Viewport *textPort;
 	WinViewport *winTextPort;
-	Sprite *sprite;
+	SpriteSharedPtr sprite;
 	TextType *text;
 	HBITMAP hBitmap;
 	char *save_buffer;
@@ -325,7 +325,7 @@ textNum sfxDrawText(bufferNum display_buffer, channelNum channel_num,
 }
 
 void sfxAddText2Pic(textNum text_num) {
-	Sprite *text;
+	SpriteSharedPtr text;
 
 	if (text_num < 0 || text_num > MAX_TEXT_IDS - 1)
 		ADV_ASSERT(false, __ERR_CODING);
@@ -432,7 +432,7 @@ void sfxSetTextColor(uint32 color_num) {
 }
 
 void sfxChangeTextColor(textNum text_num, uint32 color_num) {
-	Sprite *text_sprite;
+	SpriteSharedPtr text_sprite;
 	WinViewport *winTextPort;
 	Background *background;
 	HBITMAP hBitmap;

@@ -122,50 +122,89 @@ struct Sprite {
 	ArrayList *drawList = nullptr;	/* DRAW PRIMITIVES */
 	int *colorIndex = nullptr;		/* REDUCED COLOR INDEX */
 	Viewport *port = nullptr;
+
+	~Sprite();
 };
 
+typedef Common::SharedPtr<Sprite> SpriteSharedPtr;
+
 struct PartialSprite {
-	Sprite *sprite = nullptr;
+	SpriteSharedPtr sprite;
 	SRect rect;
+};
+
+class SpriteArray : public Common::Array<SpriteSharedPtr> {
+private:
+	static bool compareSprites(const SpriteSharedPtr &s1, const SpriteSharedPtr &s2) {
+		return s1->channel > s2->channel;
+	}
+public:
+	SpriteArray() : Common::Array<SpriteSharedPtr>() {}
+	SpriteArray(size_t arrSize) : Common::Array<SpriteSharedPtr>() {
+		reserve(arrSize);
+	}
+	inline int indexOf(const SpriteSharedPtr &sprite) const {
+		for (uint i = 0; i < size(); ++i) {
+			if ((*this)[i] == sprite)
+				return i;
+		}
+		return -1;
+	}
+
+	inline bool remove(const SpriteSharedPtr &sprite) {
+		uint idx = indexOf(sprite);
+		if (idx != -1) {
+			remove_at(idx);
+			return true;
+		}
+		return false;
+	}
+	inline bool contains(const SpriteSharedPtr &sprite) {
+		return indexOf(sprite) != -1;
+	}
+	inline void add(const SpriteSharedPtr &sprite) {
+		push_back(sprite);
+		Common::sort(begin(), end(), compareSprites);
+	}
 };
 
 /* ANIMATION SYSTEM FUNCTION (EXTERNAL) */
 extern void sfxUpdate(void);
 extern void sfxReleaseSprites(Background *stage);
-extern void sfxHideSprite(Sprite *sprite);
-extern void sfxShowSprite(Sprite *sprite);
-extern void sfxKillSprite(Sprite *sprite);
-extern void sfxMoveSprite(Sprite *sprite, int theX, int theY);
-extern void sfxSpriteOrig(Sprite *sprite, int theX, int theY);
-extern void sfxSpriteChannel(Sprite *sprite, uint16 theChannel);
-extern void sfxReleasePriority(Sprite *sprite);
-extern int sfxIsSkip(Sprite *sprite, int theX, int theY);
-extern void sfxSpriteNoMask(Sprite *sprite);
-extern void sfxSpriteMask(Sprite *sprite);
-extern int sfxGetSpritePixel(Sprite *sprite, int theX, int theY);
-extern Sprite *sfxCreateSprite(int theBack, int theX, int theY, uint16 theScaleX, uint16 theScaleY, Viewport *port);
-extern void sfxSpriteScale(Sprite *sprite, uint16 theScaleX, uint16 theScaleY);
-extern void sfxInstallSpriteFn(Sprite *sprite, PFDraw);
-extern void sfxRemoveSpriteFn(Sprite *sprite);
-extern void sfxSpriteFrame(Sprite *sprite, Viewport *thePort);
-extern void sfxSpriteAddToPic(Sprite *sprite);
-extern void sfxSpriteGlass(Sprite *sprite, int type, int color, int intensity);
-extern int sfxDrawLine(Sprite *sprite, int x1, int y1, int x2, int y2, int color);
-extern void sfxEraseLine(Sprite *sprite, int theLine);
-extern void sfxAttachATS2Sprite(Sprite *sprite, ATS *theAts, int theLoop, int theCel);
-extern void sfxSpriteFlipX(Sprite *sprite);
-extern void sfxSpriteFlipY(Sprite *sprite);
-extern void sfxSpriteFlipXY(Sprite *sprite);
+extern void sfxHideSprite(const SpriteSharedPtr &sprite);
+extern void sfxShowSprite(const SpriteSharedPtr &sprite);
+extern void sfxKillSprite(const SpriteSharedPtr &sprite);
+extern void sfxMoveSprite(const SpriteSharedPtr &sprite, int theX, int theY);
+extern void sfxSpriteOrig(const SpriteSharedPtr &sprite, int theX, int theY);
+extern void sfxSpriteChannel(const SpriteSharedPtr &sprite, uint16 theChannel);
+extern void sfxReleasePriority(const SpriteSharedPtr &sprite);
+extern int sfxIsSkip(const SpriteSharedPtr &sprite, int theX, int theY);
+extern void sfxSpriteNoMask(const SpriteSharedPtr &sprite);
+extern void sfxSpriteMask(const SpriteSharedPtr &sprite);
+extern int sfxGetSpritePixel(const SpriteSharedPtr &sprite, int theX, int theY);
+extern SpriteSharedPtr sfxCreateSprite(int theBack, int theX, int theY, uint16 theScaleX, uint16 theScaleY, Viewport *port);
+extern void sfxSpriteScale(const SpriteSharedPtr &sprite, uint16 theScaleX, uint16 theScaleY);
+extern void sfxInstallSpriteFn(const SpriteSharedPtr &sprite, PFDraw);
+extern void sfxRemoveSpriteFn(const SpriteSharedPtr &sprite);
+extern void sfxSpriteFrame(const SpriteSharedPtr &sprite, Viewport *thePort);
+extern void sfxSpriteAddToPic(const SpriteSharedPtr &sprite);
+extern void sfxSpriteGlass(const SpriteSharedPtr &sprite, int type, int color, int intensity);
+extern int sfxDrawLine(const SpriteSharedPtr &sprite, int x1, int y1, int x2, int y2, int color);
+extern void sfxEraseLine(const SpriteSharedPtr &sprite, int theLine);
+extern void sfxAttachATS2Sprite(const SpriteSharedPtr &sprite, ATS *theAts, int theLoop, int theCel);
+extern void sfxSpriteFlipX(const SpriteSharedPtr &sprite);
+extern void sfxSpriteFlipY(const SpriteSharedPtr &sprite);
+extern void sfxSpriteFlipXY(const SpriteSharedPtr &sprite);
 extern void sfxSetDrawInfo(int type, int value);
-extern void sfxDissolveSprite(Sprite *sprite, int delay);
-extern Sprite *sfxClipSprite(Sprite *sprite, int theX, int theY, SRect *theRect);
+extern void sfxDissolveSprite(const SpriteSharedPtr &sprite, int delay);
+extern SpriteSharedPtr sfxClipSprite(const SpriteSharedPtr &sprite, int theX, int theY, SRect *theRect);
 
 /* ANIMATION SYSTEM FUNCTION (INTERNAL) */
 extern void RealizeSprites(Background *stage);
-extern Sprite *AllocSprite(Background *stage, uint16 theChannel);
+extern SpriteSharedPtr AllocSprite(Background *stage, uint16 theChannel);
 extern void DirectRelease(Background *stage, int dx, int dy);
 extern void UpdateSprites(Background *stage);
-extern bool FreeSprite(Background *stage, Sprite *theSprite);
+extern bool FreeSprite(Background *stage, const SpriteSharedPtr &theSprite);
 extern void FreeSpriteFn(void *obj);
 extern bool CompareSprite(void *obj1, void *obj2);
 extern bool ComparePSprite(void *obj1, void *obj2);

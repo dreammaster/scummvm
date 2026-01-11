@@ -547,8 +547,8 @@ public:
 class maximizeScript : public Script
 {
 public:
-	Sprite *tempsprite;
-	Sprite *newsprite;
+	SpriteSharedPtr tempsprite;
+	SpriteSharedPtr newsprite;
 	int begin_x;
 	int begin_y;
 	int dest_x;
@@ -615,7 +615,7 @@ public:
 	IdAnim *idanim;
 	MatchPhoto *matchphoto;
 	WindowText *windowtext;
-	Sprite *minimize;
+	SpriteSharedPtr minimize;
 	bool closed;
 
 	IdWindow(int x, int y);

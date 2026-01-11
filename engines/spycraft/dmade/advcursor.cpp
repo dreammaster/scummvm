@@ -34,7 +34,7 @@ namespace Spycraft {
 int16 haveSetGameCursor = false;
 int16 turnedOffWindowsCursor = false;
 bool cursorHidden = false;
-Sprite *cursor = nullptr;
+SpriteSharedPtr cursor;
 static int mouse_x, mouse_y;
 rsrcID curCursorID;
 static int hiddenFlag = false;
@@ -90,9 +90,8 @@ MADEErr sfxSetCursor(rsrcID id, int loop, int cell) {
 	port = ats->reels[loop]->frames[cell];
 
 	if (cursor) {
-		int i;
 		int theBack;
-		ArrayList *list;
+		SpriteArray *list;
 
 		sfxKillSprite(cursor);
 
@@ -101,12 +100,8 @@ MADEErr sfxSetCursor(rsrcID id, int loop, int cell) {
 		else
 			theBack = 1;
 		list = backgrounds[theBack]->spriteList;
-		for (i = 0; i < list->size; i++) {
-			if (cursor == list->elements[i]) {
-				if (!ArrayList_Unlink(list, cursor))
-					ArrayList_Unlink(backgrounds[theBack]->hiddenList, cursor);
-			}
-		}
+		list->remove(Common::SharedPtr<Sprite>(cursor));
+
 		sfxUnlockRes(curCursorID, RES_ATS);
 		cursor = sfxCreateSprite(curBack, mouse_x, mouse_y, 512, 512, port);
 	} else {

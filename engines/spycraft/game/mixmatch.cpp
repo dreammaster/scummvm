@@ -630,7 +630,7 @@ void MixMatch::dispose()
 
 void MixMatch::drawPhoto(int photoNumber)
 {
-	Sprite *tempSprite;
+	SpriteSharedPtr tempSprite;
 	SRect newRect;
 	Picture *picture = new(Picture);
 	if(imageinfo->zoomPos[photoNumber] > 0)
@@ -642,7 +642,7 @@ void MixMatch::drawPhoto(int photoNumber)
 			sfxSetDrawInfo (ADV_DRAW_SCALEX, 1024);
 			sfxSetDrawInfo (ADV_DRAW_SCALEY, 1024);
 			SRect_Init ( &newRect, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-			tempSprite = sfxClipSprite ( picture->scaleSprite, 0, 0, &newRect);
+			tempSprite = sfxClipSprite( picture->scaleSprite, 0, 0, &newRect);
 			sfxKillSprite(picture->scaleSprite);
 			picture->scaleSprite = tempSprite;
 
