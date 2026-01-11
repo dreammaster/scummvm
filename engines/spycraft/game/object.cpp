@@ -108,7 +108,7 @@ void *Object::operator new (size_t n) {
 }
 
 void Object::operator delete (void *obj) {
-	FreePtrEx(obj);
+	FreePtr(obj);
 }
 
 #endif
