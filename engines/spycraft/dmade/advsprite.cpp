@@ -32,7 +32,6 @@ namespace Spycraft {
 /* FORWARD DECLARATE CLIPPING FUNCTION */
 extern int SCClipping(int *, int *, int *, int *, SRect *);
 
-static SRect __sprite_rect;
 static Background *updateBack = nullptr;
 static int blt2Screen = true;
 
@@ -437,8 +436,9 @@ void DirectRelease(Background *stage, int dx, int dy) {
 	updateBack = stage;
 
 	/* UPDATE ENTIRE SCREEN */
-	SRect_Init(&__sprite_rect, 0, 0, scene_width - 1, scene_height - 1);
-	ArrayList_Add(stage->underbits, &__sprite_rect, nullptr);
+	SRect *sprite_rect = (SRect *)AllocPtr(sizeof(SRect));
+	SRect_Init(sprite_rect, 0, 0, scene_width - 1, scene_height - 1);
+	ArrayList_Add(stage->underbits, sprite_rect, nullptr);
 
 	/* RELEASE SPRITES */
 	for (i = 0; i < list->size; i++) {

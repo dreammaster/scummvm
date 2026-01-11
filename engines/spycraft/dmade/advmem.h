@@ -38,13 +38,8 @@ extern int sfxGetFreeMem(void);
 
 extern void InitMem(void);
 extern void CleanMem(void);
-
-extern void *AllocPtrEx(int size);
-extern void FreePtrEx(void *ptr);
+extern void *AllocPtr(int size);
 extern void FreePtr(void *buffer);
-
-#define AllocPtr(size)  AllocPtrEx(size)
-#define FreePtr(ptr) FreePtrEx(ptr)
 
 extern long GetMemFree(void);
 extern void RegisterMem(long size);
