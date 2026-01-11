@@ -274,7 +274,7 @@ int Flag::updateBeat(unsigned posn) {
 int Flag::checkBeat(unsigned posn) {
 	int i;
 
-	for (i = 0; i < MAX_BEATS; i++) {
+	for (i = 0; i < MAX_DELAY_BEATS; i++) {
 		if (beatArray[i][0] == posn) {
 			beatArray[i][0] = START_COUNT;
 			beatArray[i][1] += beatCount;
@@ -392,7 +392,7 @@ int Flag::checkBeat(unsigned posn) {
 	}
 
 	while (true) {
-		for (i = 0; i < MAX_BEATS; i++) {
+		for (i = 0; i < MAX_DELAY_BEATS; i++) {
 			//time to open a beat
 			if ((beatArray[i][0] == START_COUNT) && (beatArray[i][1] == beatCount)) {
 				beatArray[i][0] = BEAT_TRIGGERED;
@@ -495,6 +495,7 @@ int Flag::checkBeat(unsigned posn) {
 				}
 			}
 		}
+
 		if (beatClosed && !triggeredOne && pendingBeat) {
 			//sfxPrintf("adding a beat");
 			++iterCount;
