@@ -623,15 +623,12 @@ void DestroyRESCache() {
 	/* CLOSE VOL FILE */
 	if (discHandler)
 		sfxCloseFile(discHandler);
+	discHandler = nullptr;
 
 	/* FREE THE MAP ARRAY */
 	if (mapList) {
 		ArrayList_Free(mapList, NULL);
 		mapList = NULL;
-		if (discHandler) {
-			sfxCloseFile(discHandler);
-			discHandler = nullptr;
-		}
 	}
 
 	/* FREE THE VOL ARRAY */
