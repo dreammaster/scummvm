@@ -46,7 +46,7 @@ public:
 	int _logicNum1 = 211;
 
 	// early/core/memory
-	Common::Array<HANDLE> handles_list;
+	Common::Array<HandleEntry> handles_list;
 	Common::Array<byte> memory_data;
 	Common::Array<void *> handles_master_list;
 

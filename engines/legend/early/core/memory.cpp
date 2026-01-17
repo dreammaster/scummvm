@@ -26,9 +26,10 @@ namespace Legend {
 namespace Early {
 
 static void compact_memory();
-static HANDLE *insert_handle(void *ptr, size_t size);
+static HandleEntry *insert_handle(void *ptr, size_t size);
 static int find_free_handle();
-static HANDLE *get_handle(void *ptr);
+static HandleEntry *get_handle(void *ptr);
+static void delete_handle(HandleEntry *h);
 
 void init_memory() {
 	auto &e = *g_engine;
@@ -43,12 +44,12 @@ void init_memory() {
 	// First handle entry to point to the start of the available memory with 0 size.
 	// The original had space for the handles_list and handles_master_list, but in
 	// ScummVM these are arrays, so don't use the memory block
-	e.handles_list.push_back(HANDLE(&e.memory_data[0], -1, 0, HFLAG_LOCKED));
+	e.handles_list.push_back(HandleEntry(&e.memory_data[0], -1, 0, HFLAG_LOCKED));
 }
 
-HANDLE *get_master(size_t size, bool lowAlloc) {
+HandleEntry *get_master(size_t size, bool lowAlloc) {
 	auto &e = *g_engine;
-	HANDLE *result = nullptr;
+	HandleEntry *result = nullptr;
 
 	/* Align size to 16 bytes */
 	size = (size + 0x0F) & 0xFFF0;
@@ -61,7 +62,7 @@ HANDLE *get_master(size_t size, bool lowAlloc) {
 	// LOW allocation: search from start upward
 	if (lowAlloc) {
 		for (int i = 0; i < (int)e.handles_list.size() - 1; i++) {
-			HANDLE *h = &e.handles_list[i];
+			HandleEntry *h = &e.handles_list[i];
 
 			intptr endPtr = (intptr)h->_ptr + h->_size;
 			intptr startPtr = (intptr)e.handles_list[i + 1]._ptr;
@@ -75,7 +76,7 @@ HANDLE *get_master(size_t size, bool lowAlloc) {
 	} else {
 		// HIGH allocation: search from end downward
 		for (int i = (int)e.handles_list.size() - 1; i > 0; i--) {
-			HANDLE *h = &e.handles_list[i - 1];
+			HandleEntry *h = &e.handles_list[i - 1];
 
 			intptr endPtr = (intptr)h->_ptr + h->_size;
 			intptr startPtr = (intptr)e.handles_list[i]._ptr;
@@ -99,7 +100,7 @@ HANDLE *get_master(size_t size, bool lowAlloc) {
 
 void *new_fixed_handle(size_t size) {
 	compact_memory();
-	HANDLE *h = get_master(size);
+	HandleEntry *h = get_master(size);
 
 	if (h) {
 		h->_masterListIndex = -1;
@@ -110,32 +111,32 @@ void *new_fixed_handle(size_t size) {
 	return h;
 }
 
-void *new_handle(size_t size) {
+HANDLE new_handle(size_t size) {
 	auto &e = *g_engine;
 	int handleIndex = find_free_handle();
 
 	if (handleIndex >= 0) {
 		compact_memory();
-		HANDLE *h = get_master(size);
+		HandleEntry *h = get_master(size);
 		assert(h);
 		h->_masterListIndex = handleIndex;
 		h->_flags = HFLAG_ACTIVE;
 		e.handles_master_list[handleIndex] = h->_ptr;
 
-		return h->_ptr;
+		return (HANDLE)&e.handles_master_list[handleIndex];
 
 	} else {
 		error("new_handle : ERROR: out of handles");
 	}
 }
 
-int lock_handle(void **ptr) {
+int lock_handle(HANDLE ptr) {
 	auto &e = *g_engine;
 
 	if (!ptr)
 		return -1;
 
-	HANDLE *h = get_handle(*ptr);
+	HandleEntry *h = get_handle(*ptr);
 	if (!h || !(h->_flags & HFLAG_ACTIVE))
 		error("lock_handle : ERROR: not a valid handle");
 
@@ -147,13 +148,13 @@ int lock_handle(void **ptr) {
 	return 0;
 }
 
-int unlock_handle(void **ptr) {
+int unlock_handle(HANDLE ptr) {
 	auto &e = *g_engine;
 
 	if (!ptr)
 		return -1;
 
-	HANDLE *h = get_handle(*ptr);
+	HandleEntry *h = get_handle(*ptr);
 	if (!h || !(h->_flags & HFLAG_ACTIVE))
 		error("lock_handle : ERROR: not a valid handle");
 
@@ -162,6 +163,37 @@ int unlock_handle(void **ptr) {
 		error("lock_handle : ERROR: Handle ptr does not match master list ptr");
 
 	h->_flags &= ~HFLAG_LOCKED;
+	return 0;
+}
+
+int kill_handle(HANDLE h) {
+	auto &e = *g_engine;
+	if (!h)
+		return -1;
+
+	HandleEntry *he = get_handle(*h);
+	if (!he || !(he->_flags & HFLAG_ACTIVE))
+		error("lock_handle : ERROR: not a valid handle");
+
+	int masterIndex = he->_masterListIndex;
+	auto &masterPtr = e.handles_master_list[masterIndex];
+	if (masterPtr != he->_ptr)
+		error("lock_handle : ERROR: Handle ptr does not match master list ptr");
+
+	masterPtr = nullptr;
+	delete_handle(he);
+	return 0;
+}
+
+int kill_pointer(void *ptr) {
+	if (!ptr)
+		return -1;
+
+	HandleEntry *he = get_handle(ptr);
+	if (!he || !(he->_flags & HFLAG_ACTIVE))
+		error("kill_pointer : ERROR: ptr is not valid");
+
+	delete_handle(he);
 	return 0;
 }
 
@@ -176,8 +208,8 @@ void compact_memory() {
 		return;
 
 	for (int i = 0; i < (int)e.handles_list.size() - 1; i++) {
-		HANDLE *cur = &e.handles_list[i];
-		HANDLE *next = &e.handles_list[i + 1];
+		HandleEntry *cur = &e.handles_list[i];
+		HandleEntry *next = &e.handles_list[i + 1];
 
 		byte *blockEnd =  (byte *)cur->_ptr + cur->_size;
 		byte *nextPtr = (byte *)next->_ptr;
@@ -215,21 +247,21 @@ void compact_memory() {
  * @param size		Block size
  * @return			Pointer to new HANDLE structure
 */
-HANDLE *insert_handle(void *ptr, size_t size) {
+HandleEntry *insert_handle(void *ptr, size_t size) {
 	auto &e = *g_engine;
 	int insertIndex = 0;
 
 	// Find insertion point (sorted by _ptr)
 	if (!e.handles_list.empty()) {
 		for (; insertIndex < (int)e.handles_list.size(); ++insertIndex) {
-			const HANDLE *h = &e.handles_list[insertIndex];
+			const HandleEntry *h = &e.handles_list[insertIndex];
 			if ((intptr)ptr < (intptr)h->_ptr)
 				break;
 		}
 	}
 
 	// Insert the new entry
-	e.handles_list.insert_at(insertIndex, HANDLE(ptr, -1, size, 0));
+	e.handles_list.insert_at(insertIndex, HandleEntry(ptr, -1, size, 0));
 	return &e.handles_list[insertIndex];
 }
 
@@ -251,14 +283,26 @@ int find_free_handle() {
 /**
  * Scans the handles_list to find the handle matching a given ptr
  */
-HANDLE *get_handle(void *ptr) {
+HandleEntry *get_handle(void *ptr) {
 	auto &e = *g_engine;
-	for (HANDLE &h : e.handles_list) {
+	for (HandleEntry &h : e.handles_list) {
 		if (h._ptr == ptr)
 			return &h;
 	}
 
 	return nullptr;
+}
+
+static void delete_handle(HandleEntry *h) {
+	auto &e = *g_engine;
+	for (uint i = 0; i < e.handles_list.size(); ++i) {
+		if (&e.handles_list[i] == h) {
+			e.handles_list.remove_at(i);
+			return;
+		}
+	}
+
+	error("Could not find matching handle to delete");
 }
 
 } // namespace Early

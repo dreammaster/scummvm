@@ -31,7 +31,6 @@ Engine *g_engine;
 Engine::Engine(OSystem *syst, const LegendGameDescription *gameDesc) :
 		LegendEngine(syst, gameDesc) {
 	g_engine = this;
-	init_memory();
 }
 
 
@@ -44,6 +43,7 @@ Engine::~Engine() {
 bool Engine::initialize() {
 	(void)LegendEngine::initialize();
 
+	init_memory();
 	Legend::Gfx::Font::init();
 	_screen = new Early::Gfx::Screen();
 

@@ -36,14 +36,16 @@ enum HFLAG {
 	HFLAG_ACTIVE = 0x80
 };
 
-struct HANDLE {
+typedef void **HANDLE;
+
+struct HandleEntry {
 	void *_ptr = nullptr;
 	int _masterListIndex = 0;
 	size_t _size = 0;
 	uint16 _flags = 0;
 
-	HANDLE();
-	HANDLE(void *ptr, int masterListIndex, size_t size, uint16 flags) :
+	HandleEntry();
+	HandleEntry(void *ptr, int masterListIndex, size_t size, uint16 flags) :
 		_ptr(ptr), _masterListIndex(masterListIndex), _size(size), _flags(flags) {}
 };
 
@@ -59,7 +61,7 @@ extern void init_memory();
  *						versus the high end (backwards)
  * @return				Pointer to HANDLE structure
 */
-extern HANDLE *get_master(size_t size, bool lowAlloc = true);
+extern HandleEntry *get_master(size_t size, bool lowAlloc = true);
 
 /**
  * Allocates a memory block and returns a pointer to the actual memory.
@@ -73,17 +75,27 @@ extern void *new_fixed_handle(size_t size);
  * The memory isn't marked as locked, so isn't guaranteed to remain in
  * the same place after future allocations and memory compacts.
  */
-extern void *new_handle(size_t size);
+extern HANDLE new_handle(size_t size);
 
 /**
  * Locks a memory block, preventing it from being moved
  */
-extern int lock_handle(void **ptr);
+extern int lock_handle(HANDLE h);
 
 /**
  * Unlocks a memory block, allowing it to be moved in memory over time.
  */
-extern int unlock_handle(void **ptr);
+extern int unlock_handle(HANDLE h);
+
+/**
+ * Deletes a handle
+ */
+extern int kill_handle(HANDLE h);
+
+/**
+ * Deletes a pointer
+ */
+extern int kill_pointer(void *ptr);
 
 } // End of namespace Early
 } // End of namespace Legend
