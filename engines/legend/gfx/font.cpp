@@ -48,7 +48,8 @@ void Font::init() {
 		_fonts[idx] = new Font();
 	_tabWidth = 0;
 	_lineHeight = 0;
-	_fgColor = _bgColor = 0;
+	_fgColor = 15;
+	_bgColor = 0;
 	_overrideColor = 0;
 	_maxCharWidth = 0;
 	_maxCharCenter = 0;

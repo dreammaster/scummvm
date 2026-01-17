@@ -46,12 +46,23 @@ bool Engine::initialize() {
 	init_memory();
 	Legend::Gfx::Font::init();
 	_screen = new Early::Gfx::Screen();
+	loadObjects();
 
 	return true;
 }
 
 void Engine::deinitialize() {
 	Legend::Gfx::Font::deinit();
+}
+
+void Engine::loadObjects() {
+	File f("object.dat");
+	Common::SeekableReadStream *obj = f.readStream(f.readUint16LE());
+	while (!obj->eos())
+		_objects.push_back(obj->readString());
+
+	delete obj;
+	f.close();
 }
 
 bool Engine::msgGame(const GameMessage &msg) {

@@ -37,10 +37,14 @@ namespace Early {
 enum LoadType { LOAD_NONE = 0, LOAD_RESTART = 1, LOAD_SAVE = 2, LOAD_UNDO = 3 };
 
 class Engine : public LegendEngine, virtual public Early::Persisted {
+private:
+	void loadObjects();
+
 public:
 	Logics *_logics = nullptr;
 	Parser::Parser *_parser = nullptr;
 	Parser::Vocab *_vocab = nullptr;
+	Common::StringArray _objects;
 	Room *_currentRoom = nullptr;
 	Queue _queue;
 	int _logicNum1 = 211;
