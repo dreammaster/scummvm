@@ -28,6 +28,7 @@ namespace Early {
 static void compact_memory();
 static HANDLE *insert_handle(void *ptr, size_t size);
 static int find_free_handle();
+static HANDLE *get_handle(void *ptr);
 
 void init_memory() {
 	auto &e = *g_engine;
@@ -128,6 +129,46 @@ void *new_handle(size_t size) {
 	}
 }
 
+int lock_handle(void **ptr) {
+	auto &e = *g_engine;
+
+	if (!ptr)
+		return -1;
+
+	HANDLE *h = get_handle(*ptr);
+	if (!h || !(h->_flags & HFLAG_ACTIVE))
+		error("lock_handle : ERROR: not a valid handle");
+
+	int masterIndex = h->_masterListIndex;
+	if (e.handles_master_list[masterIndex] != h->_ptr)
+		error("lock_handle : ERROR: Handle ptr does not match master list ptr");
+
+	h->_flags |= HFLAG_LOCKED;
+	return 0;
+}
+
+int unlock_handle(void **ptr) {
+	auto &e = *g_engine;
+
+	if (!ptr)
+		return -1;
+
+	HANDLE *h = get_handle(*ptr);
+	if (!h || !(h->_flags & HFLAG_ACTIVE))
+		error("lock_handle : ERROR: not a valid handle");
+
+	int masterIndex = h->_masterListIndex;
+	if (e.handles_master_list[masterIndex] != h->_ptr)
+		error("lock_handle : ERROR: Handle ptr does not match master list ptr");
+
+	h->_flags &= ~HFLAG_LOCKED;
+	return 0;
+}
+
+/**
+ * Compacts the memory, assigning moveable blocks to consecutive memory.
+ * This removes any previously de-allocated memory block space.
+ */
 void compact_memory() {
 	auto &e = *g_engine;
 
@@ -168,6 +209,12 @@ void compact_memory() {
 	}
 }
 
+/**
+ * Inserts a new handle into the handles_list, sorting by ascending ptr address
+ * @param ptr		Block pointer
+ * @param size		Block size
+ * @return			Pointer to new HANDLE structure
+*/
 HANDLE *insert_handle(void *ptr, size_t size) {
 	auto &e = *g_engine;
 	int insertIndex = 0;
@@ -199,6 +246,19 @@ int find_free_handle() {
 	}
 
 	return -1;
+}
+
+/**
+ * Scans the handles_list to find the handle matching a given ptr
+ */
+HANDLE *get_handle(void *ptr) {
+	auto &e = *g_engine;
+	for (HANDLE &h : e.handles_list) {
+		if (h._ptr == ptr)
+			return &h;
+	}
+
+	return nullptr;
 }
 
 } // namespace Early

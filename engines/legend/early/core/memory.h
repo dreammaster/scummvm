@@ -75,6 +75,16 @@ extern void *new_fixed_handle(size_t size);
  */
 extern void *new_handle(size_t size);
 
+/**
+ * Locks a memory block, preventing it from being moved
+ */
+extern int lock_handle(void **ptr);
+
+/**
+ * Unlocks a memory block, allowing it to be moved in memory over time.
+ */
+extern int unlock_handle(void **ptr);
+
 } // End of namespace Early
 } // End of namespace Legend
 
