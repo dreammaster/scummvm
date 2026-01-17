@@ -23,6 +23,7 @@
 #define LEGEND_EARLY_ENGINE_H
 
 #include "legend/legend.h"
+#include "legend/early/core/memory.h"
 #include "legend/early/core/persisted.h"
 #include "legend/early/logic/logics.h"
 #include "legend/early/logic/room.h"
@@ -43,6 +44,11 @@ public:
 	Room *_currentRoom = nullptr;
 	Queue _queue;
 	int _logicNum1 = 211;
+
+	// early/core/memory
+	Common::Array<HANDLE> handles_list;
+	Common::Array<byte> memory_data;
+	Common::Array<void *> handles_master_list;
 
 public:
 	Engine(OSystem *syst, const LegendGameDescription *gameDesc);

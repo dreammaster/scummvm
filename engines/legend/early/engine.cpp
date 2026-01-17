@@ -31,6 +31,7 @@ Engine *g_engine;
 Engine::Engine(OSystem *syst, const LegendGameDescription *gameDesc) :
 		LegendEngine(syst, gameDesc) {
 	g_engine = this;
+	init_memory();
 }
 
 

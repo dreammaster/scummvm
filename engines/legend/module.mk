@@ -15,6 +15,7 @@ MODULE_OBJS = \
 	utils/resources.o \
 	utils/string.o \
 	early/engine.o \
+	early/core/memory.o \
 	early/core/persisted.o \
 	early/gfx/boxed_element.o \
 	early/gfx/button.o \
