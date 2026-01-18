@@ -29,6 +29,7 @@
 #include "legend/early/logic/room.h"
 #include "legend/early/logic/queue.h"
 #include "legend/early/parser/parser.h"
+#include "legend/early/parser/strings.h"
 #include "legend/early/parser/vocab.h"
 
 namespace Legend {
@@ -44,6 +45,7 @@ public:
 	Logics *_logics = nullptr;
 	Parser::Parser *_parser = nullptr;
 	Parser::Vocab *_vocab = nullptr;
+	Parser::Strings *_strings = nullptr;
 	Common::StringArray _objects;
 	Room *_currentRoom = nullptr;
 	Queue _queue;

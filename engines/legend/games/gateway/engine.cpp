@@ -62,6 +62,7 @@ bool GatewayEngine::initialize() {
 	_logics = new Logic::Logics();
 	_parser = new Gateway::Parser::Parser();
 	_vocab = new Gateway::Parser::Vocab();
+	_strings = new Early::Parser::Strings("gatestr.dat");
 	setRoom(LOGIC_STARTING_ROOM);
 
 	return true;

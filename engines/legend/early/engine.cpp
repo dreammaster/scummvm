@@ -33,11 +33,11 @@ Engine::Engine(OSystem *syst, const LegendGameDescription *gameDesc) :
 	g_engine = this;
 }
 
-
 Engine::~Engine() {
 	delete _logics;
 	delete _vocab;
 	delete _parser;
+	delete _strings;
 }
 
 bool Engine::initialize() {
