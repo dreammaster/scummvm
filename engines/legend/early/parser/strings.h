@@ -24,6 +24,7 @@
 #define LEGEND_EARLY_PARSER_STRINGS_H
 
 #include "common/array.h"
+#include "common/file.h"
 #include "legend/utils/string.h"
 
 namespace Legend {
@@ -32,8 +33,9 @@ namespace Parser {
 
 class Strings {
 private:
-	Common::Array<char> _tableData;
-	Common::Array<const char *> _table;
+	Common::File _file;
+	Common::Array<char> _commonData;
+	Common::Array<const char *> _commonStrings;
 	int _maxEntryCount = 0;
 	int _totalStrings = 0;
 	int _strOffset1 = 0, _strOffset2 = 0;

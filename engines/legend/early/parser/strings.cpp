@@ -33,45 +33,46 @@ struct HeaderEntry {
 };
 
 Strings::Strings(const Common::Path &filename) {
-	File f(filename);
-	Common::Array<HeaderEntry> headers;
+	if (!_file.open(filename))
+		error("Could not open - %s", filename.baseName().c_str());
 
 	// Load headers
-	headers.resize(f.readUint16LE());
+	Common::Array<HeaderEntry> headers;
+	headers.resize(_file.readUint16LE());
 	for (HeaderEntry &he : headers) {
-		he._stringsCount = f.readUint16LE();
-		he._size = f.readUint16LE();
+		he._stringsCount = _file.readUint16LE();
+		he._size = _file.readUint16LE();
 
 		_maxEntryCount = MAX(_maxEntryCount, he._stringsCount);
 		_totalStrings += he._stringsCount;
 	}
 
-	_strOffset1 = f.pos();
-	f.seek(_totalStrings * 2, SEEK_CUR);
+	_strOffset1 = _file.pos();
+	_file.seek(_totalStrings * 2, SEEK_CUR);
 
 	// Read in the table
 	Common::Array<int16> huffmanTable;
-	huffmanTable.resize(f.readUint16LE());
+	huffmanTable.resize(_file.readUint16LE());
 	for (uint idx = 0; idx < huffmanTable.size(); ++idx)
-		huffmanTable[idx] = f.readSint16LE();
+		huffmanTable[idx] = _file.readSint16LE();
 
-	int stringsCount = f.readUint16LE();
-	assert(stringsCount <= 128);
+	int commonStringsCount = _file.readUint16LE();
+	assert(commonStringsCount <= 128);
 
-	uint16 indexTable[128];
-	if (stringsCount > 0) {
-		for (int i = 0; i < stringsCount; ++i)
-			indexTable[i] = f.readUint16LE();
+	uint16 strOffsets[128];
+	if (commonStringsCount > 0) {
+		for (int i = 0; i < commonStringsCount; ++i)
+			strOffsets[i] = _file.readUint16LE();
 
-		_tableData.resize(f.readUint16LE());
-		f.read(&_tableData[0], _tableData.size());
+		_commonData.resize(_file.readUint16LE());
+		_file.read(&_commonData[0], _commonData.size());
 
-		_table.resize(stringsCount);
-		for (int i = 0; i < stringsCount; ++i)
-			_table[i] = &_tableData[indexTable[i]];
+		_commonStrings.resize(commonStringsCount);
+		for (int i = 0; i < commonStringsCount; ++i)
+			_commonStrings[i] = &_commonData[strOffsets[i]];
 	}
 
-	_strOffset2 = f.pos();
+	_strOffset2 = _file.pos();
 }
 
 } // namespace Parser
