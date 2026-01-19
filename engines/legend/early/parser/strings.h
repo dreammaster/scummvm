@@ -52,21 +52,13 @@ public:
 };
 
 class Strings {
-	struct SectionEntry {
-		Common::Array<int> _stringOffsets;
-		size_t _size = 0;
-		Common::Array<char> _data;
-	};
-
 private:
 	Common::File _file;
-	Common::Array<SectionEntry> _sections;
+	Common::Array<Common::StringArray> _sections;
 	Common::Array<uint16> _sectionEntries;
 	Common::Array<char> _commonData;
 	Common::Array<const char *> _commonStrings;
 	Common::Array<int16> _huffmanTable;
-	int _maxEntryCount = 0;
-	int _totalStrings = 0;
 	int _sectionsOffset = 0, _huffmanOffset = 0;
 	int _currentSection = -1;
 	int _stringOffset = 0;
