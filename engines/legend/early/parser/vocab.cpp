@@ -45,7 +45,13 @@ Vocab::Vocab() {
 
 	size_t streamSize = f.readUint16LE();
 	Common::SeekableSubReadStream substream(&f, f.pos(), f.pos() + streamSize);
-	Common::MemoryWriteStreamDynamic *data = Huffman::decompress(substream, huffmanTable, nodeCount);
+
+	// Decompress the data
+	Common::MemoryReadStream *data = Huffman::decompress(substream, huffmanTable, nodeCount);
+	Common::Array<char> text;
+	text.resize(data->size());
+	data->read(&text[0], text.size());
+	delete data;
 
 	size_t vocabCount = f.readUint16LE();
 	_items.reserve(vocabCount);
@@ -53,7 +59,7 @@ Vocab::Vocab() {
 	for (size_t vocabIdx = 0; vocabIdx < vocabCount; ++vocabIdx) {
 		uint16 vocabOffset = f.readUint16LE();
 		uint16 flags = f.readUint16LE();
-		_items.push_back(VocabEntry((const char *)data->getData() + vocabOffset, flags));
+		_items.push_back(VocabEntry(&text[vocabOffset], flags));
 	}
 
 	vocabCount = f.readUint16LE();
@@ -70,7 +76,6 @@ Vocab::Vocab() {
 	}
 
 	f.close();
-	delete data;
 }
 
 int Vocab::indexOf(const String &word) const {

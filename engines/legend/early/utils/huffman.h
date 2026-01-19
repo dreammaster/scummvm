@@ -37,8 +37,9 @@ public:
 	/**
 	 * Decompress Huffman encoded stream
 	 */
-	static Common::MemoryWriteStreamDynamic *decompress(Common::SeekableReadStream &stream,
-		const int16 *huffmanTable, size_t nodeCount, byte **symbols = nullptr, int symbolsCount = 0);
+	static Common::MemoryReadStream *decompress(Common::SeekableReadStream &stream,
+		const int16 *huffmanTable, size_t huffmanTableSize, const char **commonStrings = nullptr,
+		int commonStringsCount = 0);
 };
 
 } // End of namespace Early

@@ -25,15 +25,15 @@
 namespace Legend {
 namespace Early {
 
-Common::MemoryWriteStreamDynamic *Huffman::decompress(Common::SeekableReadStream &stream,
-		const int16 *huffmanTable, size_t nodeCount, byte **symbols, int symbolsCount) {
+Common::MemoryReadStream *Huffman::decompress(Common::SeekableReadStream &stream,
+		const int16 *huffmanTable, size_t huffmanTableSize, const char **commonStrings, int commonStringsCount) {
 	int symIndex = -1, bitCtr = 0;
 	int16 huffBase;
 	byte dataByte = 0;
-	Common::MemoryWriteStreamDynamic *dest = new 	Common::MemoryWriteStreamDynamic(DisposeAfterUse::YES);
+	Common::MemoryWriteStreamDynamic dest(DisposeAfterUse::NO);
 
 	while (stream.pos() < stream.size() || symIndex) {
-		huffBase = nodeCount - 2;
+		huffBase = huffmanTableSize - 2;
 
 		// Inner loop to navigate huffman table until a terminator entry is found
 		do {
@@ -58,19 +58,19 @@ Common::MemoryWriteStreamDynamic *Huffman::decompress(Common::SeekableReadStream
 		} while (huffBase >= 0);
 
 		symIndex = ABS(huffBase) - 1;
-		if (symIndex < 0x80 || (symIndex - 0x80) >= symbolsCount) {
-			dest->writeByte(symIndex);
+		if (symIndex < 0x80 || (symIndex - 0x80) >= commonStringsCount) {
+			dest.writeByte(symIndex);
 		} else {
-			byte *symPtr = symbols[symIndex - 0x80];
-			for (; *symPtr; ++symPtr)
-				dest->writeByte(*symPtr);			
+			const char *commonStr = commonStrings[symIndex - 0x80];
+			for (; *commonStr; ++commonStr)
+				dest.writeByte(*commonStr);			
 		}
 		
 	outer:
 		continue;
 	}
 
-	return dest;
+	return new Common::MemoryReadStream(dest.getData(), dest.size(), DisposeAfterUse::YES);
 }
 
 } // End of namespace Early

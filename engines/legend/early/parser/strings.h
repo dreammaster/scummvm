@@ -31,17 +31,50 @@ namespace Legend {
 namespace Early {
 namespace Parser {
 
+constexpr int MAX_CACHE_SIZE = 32;
+
+struct MESSAGE {
+private:
+	bool _isPointer;
+	uint32 _id = 0;
+	const char *_ptr = nullptr;
+
+public:
+	MESSAGE(uint32 id) : _isPointer(false), _id(id) {}
+	MESSAGE(const char *ptr) : _isPointer(true), _ptr(ptr) {}
+
+	operator const char *();
+	operator const char *() const;
+	operator uint32() const;
+	bool isPointer() const {
+		return _isPointer;
+	}
+};
+
 class Strings {
+	struct SectionEntry {
+		Common::Array<int> _stringOffsets;
+		size_t _size = 0;
+		Common::Array<char> _data;
+	};
+
 private:
 	Common::File _file;
+	Common::Array<SectionEntry> _sections;
+	Common::Array<uint16> _sectionEntries;
 	Common::Array<char> _commonData;
 	Common::Array<const char *> _commonStrings;
+	Common::Array<int16> _huffmanTable;
 	int _maxEntryCount = 0;
 	int _totalStrings = 0;
-	int _strOffset1 = 0, _strOffset2 = 0;
+	int _sectionsOffset = 0, _huffmanOffset = 0;
+	int _currentSection = -1;
+	int _stringOffset = 0;
 
 public:
 	Strings(const Common::Path &filename);
+
+	const char *getMessage(const MESSAGE &msg);
 };
 
 } // namespace Parser
