@@ -29,53 +29,53 @@ namespace Early {
 namespace Parser {
 
 Strings::Strings(const Common::Path &filename) {
-	if (!_file.open(filename))
+	Common::File file;
+	Common::Array<char> commonData;
+	Common::Array<const char *> commonStrings;
+	Common::Array<int16> huffmanTable;
+
+	if (!file.open(filename))
 		error("Could not open - %s", filename.baseName().c_str());
 
 	// Load headers
 	typedef Common::Array<int> IntArray;
 	Common::Array<IntArray> sectionStrSizes;
 
-	_sections.resize(_file.readUint16LE());
+	_sections.resize(file.readUint16LE());
 	sectionStrSizes.resize(_sections.size());
 
 	for (auto &sse : sectionStrSizes) {
-		sse.resize(_file.readUint16LE());
-		(void)_file.readUint16LE();		// Skip size
+		sse.resize(file.readUint16LE());
+		(void)file.readUint16LE();		// Skip size
 	}
 
-	_sectionsOffset = _file.pos();
-
 	// Read in the string offsets for each section
-	_file.seek(_sectionsOffset);
 	for (auto &section : sectionStrSizes) {
 		for (uint i = 0; i < section.size(); ++i)
-			section[i] = _file.readUint16LE();
+			section[i] = file.readUint16LE();
 	}
 
 	// Read in the Huffman table
-	_huffmanTable.resize(_file.readUint16LE());
-	for (uint idx = 0; idx < _huffmanTable.size(); ++idx)
-		_huffmanTable[idx] = _file.readSint16LE();
+	huffmanTable.resize(file.readUint16LE());
+	for (uint idx = 0; idx < huffmanTable.size(); ++idx)
+		huffmanTable[idx] = file.readSint16LE();
 
 	// Read in the common strings data
-	int commonStringsCount = _file.readUint16LE();
+	int commonStringsCount = file.readUint16LE();
 	assert(commonStringsCount <= 128);
 
 	uint16 strOffsets[128];
 	if (commonStringsCount > 0) {
 		for (int i = 0; i < commonStringsCount; ++i)
-			strOffsets[i] = _file.readUint16LE();
+			strOffsets[i] = file.readUint16LE();
 
-		_commonData.resize(_file.readUint16LE());
-		_file.read(&_commonData[0], _commonData.size());
+		commonData.resize(file.readUint16LE());
+		file.read(&commonData[0], commonData.size());
 
-		_commonStrings.resize(commonStringsCount);
+		commonStrings.resize(commonStringsCount);
 		for (int i = 0; i < commonStringsCount; ++i)
-			_commonStrings[i] = &_commonData[strOffsets[i]];
+			commonStrings[i] = &commonData[strOffsets[i]];
 	}
-
-	_huffmanOffset = _file.pos();
 
 	// Decompress all the strings
 	for (uint i = 0; i < sectionStrSizes.size(); ++i) {
@@ -85,9 +85,9 @@ Strings::Strings(const Common::Path &filename) {
 
 		for (uint j = 0; j < src.size(); ++j) {
 			// Decompress string data
-			Common::SeekableReadStream *srcStream = _file.readStream(src[j]);
-			auto *decompressed = Huffman::decompress(*srcStream, &_huffmanTable[0], _huffmanTable.size(),
-				&_commonStrings[0], _commonStrings.size());
+			Common::SeekableReadStream *srcStream = file.readStream(src[j]);
+			auto *decompressed = Huffman::decompress(*srcStream, &huffmanTable[0], huffmanTable.size(),
+				&commonStrings[0], commonStrings.size());
 
 			// Get string
 			char *buf = new char[decompressed->size() + 1];

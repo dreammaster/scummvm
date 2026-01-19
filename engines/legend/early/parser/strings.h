@@ -53,15 +53,7 @@ public:
 
 class Strings {
 private:
-	Common::File _file;
 	Common::Array<Common::StringArray> _sections;
-	Common::Array<uint16> _sectionEntries;
-	Common::Array<char> _commonData;
-	Common::Array<const char *> _commonStrings;
-	Common::Array<int16> _huffmanTable;
-	int _sectionsOffset = 0, _huffmanOffset = 0;
-	int _currentSection = -1;
-	int _stringOffset = 0;
 
 public:
 	Strings(const Common::Path &filename);
