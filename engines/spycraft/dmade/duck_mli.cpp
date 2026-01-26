@@ -72,6 +72,15 @@ extern char buf[];
 clock_t timer_time;
 extern int FastSprite;
 extern int FramesUp;
+
+unsigned char *pFFREWFrame;		// frame for FF, REW frames
+HFB_BUFFER_HANDLE pDefaultBuffer;		// frame for FF, REW frames
+DXL_XIMAGE_HANDLE pGenericXImage;
+extern MLI_LAYER_HANDLE LayerObjects;
+extern int maxLayers, LayerIndex;
+extern MLI_LAYER_HANDLE *pLayers;
+int tracenow;
+
 /* prototypes */
 int  IsDone();			// see if done flag set
 void SetDone();
@@ -95,12 +104,12 @@ void StartProfiling();
 void init_GlobalMaxToRead();
 void StartTrace();
 void EndTrace();
-int tracenow;
 int fillBuffer(MLI_LAYER_HANDLE pL, int maxToRead, int skip);
+
 /* Routine plays video to last frame Since it doesn't do message loop processing,
 	it can't be interrupted */
-int MLI_Play(int from, int to)    // from and to refer to background video (lowest non-sprite layer)
-{
+// from and to refer to background video (lowest non-sprite layer)
+int MLI_Play(int from, int to) {
 	int DuckSetup = false;
 	MLI_LAYER_HANDLE pL = MLI_FirstActiveLayer();
 
@@ -782,13 +791,6 @@ int Profile(proftype ptype)		// get number of ticks since last call to profiler.
 	prof_start = prof_time;
 	return elapsed;
 }
-
-unsigned char *pFFREWFrame;		// frame for FF, REW frames
-HFB_BUFFER_HANDLE pDefaultBuffer;		// frame for FF, REW frames
-DXL_XIMAGE_HANDLE pGenericXImage;
-extern MLI_LAYER_HANDLE LayerObjects;
-extern int maxLayers, LayerIndex;
-extern MLI_LAYER_HANDLE *pLayers;
 
 int MLI_DuckInit() {
 	// Set up default Box of Video scenario that won't require
