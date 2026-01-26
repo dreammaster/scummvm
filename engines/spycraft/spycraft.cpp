@@ -159,10 +159,6 @@ Common::Error SpycraftEngine::run() {
 	// Set the engine's debugger console
 	setDebugger(new Console());
 
-	// Set up sub-folders for file access
-	SearchMan.addDirectory("data");
-	SearchMan.addDirectory("resource");
-
 	// If a savegame was selected from the launcher, load it
 	int saveSlot = ConfMan.getInt("save_slot");
 	if (saveSlot != -1)
@@ -183,6 +179,13 @@ Common::Error SpycraftEngine::run() {
 	app.Run();
 
 	return Common::kNoError;
+}
+
+void SpycraftEngine::initializePath(const Common::FSNode &gamePath) {
+	Engine::initializePath(gamePath);
+
+	SearchMan.addDirectory(gamePath.getChild("data"));
+	SearchMan.addDirectory(gamePath.getChild("resource"));
 }
 
 Common::Error SpycraftEngine::syncGame(Common::Serializer &s) {
