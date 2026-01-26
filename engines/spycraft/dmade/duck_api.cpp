@@ -37,7 +37,7 @@ void BlackDuck(DXL_VSCREEN_HANDLE vsp) {
 }
 
 void Announcement(const char *lpszString) {
-	warning("TODO: duck_api");
+	error("%s", lpszString);
 }
 
 void AnnDone() {
@@ -47,9 +47,11 @@ void AnnDone() {
 void longjmpOnAudioErrors(jmp_buf *pErrorContext) {
 	warning("TODO: duck_api");
 }
+
 void ErrorBuffer(char *errorbuf) {
-	warning("TODO: duck_api");
+	// We don't worry about reporting errors to the client
 }
+
 int RestoreDirty(DXL_XIMAGE_HANDLE pXImageint, DXL_VSCREEN_HANDLE dst) {
 	warning("TODO: duck_api");
 	return 0;
