@@ -19,10 +19,18 @@
  *
  */
 
+#include "common/algorithm.h"
 #include "common/textconsole.h"
+#include "graphics/managed_surface.h"
 #include "spycraft/dmade/duck_dxl.h"
 
 namespace Spycraft {
+
+class tXImage : public Graphics::ManagedSurface {
+public:
+	tXImage() : Graphics::ManagedSurface() {}
+	tXImage(int16 w, int16 h) : Graphics::ManagedSurface(w, h) {}
+};
 
 int DXL_InitVideo(int maxScreens, int maxImages) {
 	return 0;
@@ -36,10 +44,12 @@ DXL_VSCREEN_HANDLE DXL_CreateVScreen(byte *addr, BITDEPTH depth, int p, int h) {
 	error("TODO: duck_dxl");
 	return (DXL_VSCREEN_HANDLE)0;
 }
+
 int DXL_AlterVScreen(DXL_VSCREEN_HANDLE dst, byte *addr, BITDEPTH depth, int p, int h) {
 	error("TODO: duck_dxl");
 	return 0;
 }
+
 int DXL_AlterVScreenClip(DXL_VSCREEN_HANDLE dst, int x, int y, int w, int h) {
 	error("TODO: duck_dxl");
 	return 0;
@@ -79,8 +89,11 @@ DXL_XIMAGE_HANDLE DXL_CreateXImage(byte *data) {
 }
 
 DXL_XIMAGE_HANDLE DXL_CreateGenericXImage(byte *data, int height, int width, enum IMAGETYPE iType) {
-	error("TODO: duck_dxl");
-	return (DXL_XIMAGE_HANDLE)0;
+	tXImage *img = new tXImage(width, height);
+	if (data)
+		Common::copy(data, data + width * height, (byte *)img->getPixels());
+
+	return img;
 }
 
 int DXL_CreateDirtyBuffer(DXL_XIMAGE_HANDLE src) {

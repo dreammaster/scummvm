@@ -67,10 +67,10 @@ enum IMAGETYPE {
 	DXL_IMERR2 = -2, DXL_IMERR1 = -1, DXL_INTRAFRAME = 0, DXL_INTERFRAME, DXL_SPRITE
 };
 
-typedef struct vScreen *DXL_VSCREEN_HANDLE;
-typedef struct tXImage *DXL_XIMAGE_HANDLE;
-typedef struct tXAudioSource *DXL_XAUDIOSRC_HANDLE;
-typedef struct tAudioBuff *DXL_AUDIODST_HANDLE;
+typedef class vScreen *DXL_VSCREEN_HANDLE;
+typedef class tXImage *DXL_XIMAGE_HANDLE;
+typedef class tXAudioSource *DXL_XAUDIOSRC_HANDLE;
+typedef class tAudioBuff *DXL_AUDIODST_HANDLE;
 
 extern int DXL_InitVideo(int maxScreens, int maxImages);
 extern void DXL_ExitVideo(void);
