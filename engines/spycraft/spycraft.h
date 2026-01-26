@@ -67,6 +67,11 @@ public:
 		return _randomSource.getRandomNumber(maxNum);
 	}
 
+	/**
+	 * Initialize SearchMan according to the game path.
+	 */
+	void initializePath(const Common::FSNode &gamePath) override;
+
 	bool hasFeature(EngineFeature f) const override {
 		return
 		    (f == kSupportsLoadingDuringRuntime) ||
