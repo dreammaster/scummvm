@@ -25,6 +25,8 @@
 namespace Ultima {
 namespace Ultima0 {
 
+using namespace Shared::Core;
+
 void MonsterLogic::checkForAttacks(PlayerInfo &p, DungeonMapInfo &d) {
 	int attacked;
 	double dist;

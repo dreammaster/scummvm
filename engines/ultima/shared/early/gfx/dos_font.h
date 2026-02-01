@@ -19,43 +19,25 @@
  *
  */
 
-#ifndef ULTIMA0_GFX_SURFACE_H
-#define ULTIMA0_GFX_SURFACE_H
+#ifndef ULTIMA_SHARED_GFX_DOS_FONT_H
+#define ULTIMA_SHARED_GFX_DOS_FONT_H
 
-#include "graphics/font.h"
-#include "graphics/managed_surface.h"
-#include "ultima/ultima0/gfx/font.h"
+#include "ultima/shared/early/gfx/font.h"
 
 namespace Ultima {
-namespace Ultima0 {
+namespace Shared {
 namespace Gfx {
 
-class GfxSurface : public Graphics::ManagedSurface {
-private:
-	Common::Point _textPos;
-	byte _textColor = C_TEXT_DEFAULT;
+extern const byte INT10_FONT_08[256][8];
 
-	void newLine();
-
+class DosFont : public Font {
 public:
-	GfxSurface() : Graphics::ManagedSurface() {}
-	GfxSurface(Graphics::ManagedSurface &surf, const Common::Rect &bounds) : Graphics::ManagedSurface(surf, bounds) {}
-
-	/**
-	 * Write some text to the surface
-	 */
-	void writeString(const Common::Point &pt, const Common::String &str,
-		Graphics::TextAlign align = Graphics::kTextAlignLeft);
-	void writeString(const Common::String &str, Graphics::TextAlign align = Graphics::kTextAlignLeft);
-	void writeChar(uint32 chr);
-
-	void setTextPos(const Common::Point &pt);
-	byte setColor(byte color);
-	byte setColor(byte r, byte g, byte b);
+	DosFont();
+	~DosFont() override {}
 };
 
 } // namespace Gfx
-} // namespace Ultima0
+} // namespace Shared
 } // namespace Ultima
 
 #endif

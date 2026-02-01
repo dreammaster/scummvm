@@ -6,12 +6,20 @@ MODULE_OBJS := \
 	shared/conf/xml_tree.o \
 	shared/engine/data_archive.o
 
+ifdef ENABLE_AKALABETH || ENABLE_ULTIMA2
+MODULE_OBJS += \
+	shared/early/core/events.o \
+	shared/early/core/messages.o \
+	shared/early/gfx/dos_font.o \
+	shared/early/gfx/font.o \
+	shared/early/gfx/gfx_surface.o \
+	shared/early/views/view.o
+endif
+
 ifdef ENABLE_AKALABETH
 MODULE_OBJS += \
 	ultima0/ultima0.o \
 	ultima0/console.o \
-	ultima0/events.o \
-	ultima0/messages.o \
 	ultima0/metaengine.o \
 	ultima0/music.o \
 	ultima0/data/data.o \
@@ -21,7 +29,6 @@ MODULE_OBJS += \
 	ultima0/gfx/gfx_surface.o \
 	ultima0/gfx/map.o \
 	ultima0/gfx/monster.o \
-	ultima0/views/view.o \
 	ultima0/views/acknowledgements.o \
 	ultima0/views/attack.o \
 	ultima0/views/castle.o \

@@ -24,19 +24,18 @@
 
 #include "common/random.h"
 #include "common/serializer.h"
-#include "graphics/palette.h"
 #include "engines/engine.h"
 #include "ultima/detection.h"
+#include "ultima/shared/early/core/events.h"
 #include "ultima/ultima0/data/data.h"
-#include "ultima/ultima0/events.h"
 #include "ultima/ultima0/music.h"
+#include "ultima/ultima0/gfx/font.h"
 
 namespace Ultima {
 namespace Ultima0 {
 
-class Ultima0Engine : public Engine, public Events {
+class Ultima0Engine : public Engine, public Shared::Core::Events {
 private:
-	Common::RandomSource _randomSource;
 	//const UltimaGameDescription *_gameDescription;
 
 	void syncSavegame(Common::Serializer &s);
@@ -46,7 +45,6 @@ protected:
 	Common::Error run() override;
 
 public:
-	Graphics::Palette _palette;
 	PlayerInfo _player;
 	WorldMapInfo _worldMap;
 	DungeonMapInfo _dungeon;
@@ -55,6 +53,8 @@ public:
 
 	Ultima0Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);
 	~Ultima0Engine() override;
+
+	void runGame();
 
 	/**
 	 * Returns true if the game should quit
@@ -67,21 +67,6 @@ public:
 	 * Returns supported engine features
 	 */
 	bool hasFeature(EngineFeature f) const override;
-
-	/**
-	 * Sets the random number seed
-	 */
-	void setRandomSeed(uint seed) {
-		_randomSource.setSeed(seed);
-	}
-
-	/**
-	 * Get a random number
-	 */
-	uint getRandomNumber(uint maxVal = RND_MAX) { return _randomSource.getRandomNumber(maxVal); }
-	uint getRandomNumber(uint minVal, uint maxVal) {
-		return _randomSource.getRandomNumber(maxVal - minVal) + minVal;
-	}
 
 	/**
 	 * Returns true if enhancements are turned on
@@ -130,6 +115,7 @@ public:
 };
 
 extern Ultima0Engine *g_engine;
+using Shared::Core::g_events;
 
 } // End of namespace Ultima4
 } // End of namespace Ultima

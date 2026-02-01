@@ -22,6 +22,7 @@
 #include "ultima/ultima0/views/attack.h"
 #include "ultima/ultima0/data/data.h"
 #include "ultima/ultima0/ultima0.h"
+#include "ultima/ultima0/gfx/font.h"
 
 namespace Ultima {
 namespace Ultima0 {

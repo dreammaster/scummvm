@@ -28,7 +28,7 @@ namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class Intro : public View {
+class Intro : public Shared::Views::View {
 private:
 	int _page = 0;
 

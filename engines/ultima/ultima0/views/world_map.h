@@ -29,7 +29,7 @@ namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class WorldMap : public View {
+class WorldMap : public Shared::Views::View {
 private:
 	OverworldStatus _status = OverworldStatus(this);
 

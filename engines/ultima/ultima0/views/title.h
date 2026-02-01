@@ -28,7 +28,7 @@ namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class Title : public View {
+class Title : public Shared::Views::View {
 	class TitleOption : public UIElement {
 	public:
 		int _index;

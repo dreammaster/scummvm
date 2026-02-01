@@ -29,7 +29,7 @@ namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class Attack : public View {
+class Attack : public Shared::Views::View {
 private:
 	enum Mode {
 		WHICH_WEAPON, AMULET, THROW_SWING, DONE

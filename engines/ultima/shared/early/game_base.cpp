@@ -25,7 +25,7 @@
 #include "ultima/shared/early/game_base.h"
 #include "ultima/shared/engine/messages.h"
 #include "ultima/shared/core/mouse_cursor.h"
-#include "ultima/shared/gfx/font.h"
+#include "ultima/shared/early/gfx/font.h"
 #include "ultima/shared/gfx/text_cursor.h"
 #include "ultima/shared/gfx/text_input.h"
 #include "ultima/shared/gfx/visual_container.h"

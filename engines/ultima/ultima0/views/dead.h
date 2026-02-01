@@ -28,7 +28,7 @@ namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class Dead : public View {
+class Dead : public Shared::Views::View {
 private:
 	void showTitle() {
 		replaceView("Title");

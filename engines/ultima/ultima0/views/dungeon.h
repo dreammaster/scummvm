@@ -29,7 +29,7 @@ namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class Dungeon : public View {
+class Dungeon : public Shared::Views::View {
 private:
 	DungeonStatus _status = DungeonStatus(this);
 

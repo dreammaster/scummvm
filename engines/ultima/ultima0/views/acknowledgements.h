@@ -24,15 +24,16 @@
 
 #include "common/queue.h"
 #include "ultima/ultima0/views/view.h"
+#include "ultima/ultima0/gfx/gfx_surface.h"
 
 namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class Acknowledgements : public View {
+class Acknowledgements : public Shared::Views::View {
 private:
 	Common::Queue<Common::String> _lines;
-	Gfx::GfxSurface _pendingLine;
+	Ultima0::Gfx::GfxSurface _pendingLine;
 	int _ctr = 0;
 
 	void showTitle() {

@@ -28,7 +28,7 @@ namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class CreateCharacter : public View {
+class CreateCharacter : public Shared::Views::View {
 private:
 	enum Mode { LUCKY_NUMBER, LEVEL, STATS, CLASS };
 	Mode _mode = LUCKY_NUMBER;

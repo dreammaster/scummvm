@@ -25,7 +25,7 @@
 #include "common/list.h"
 #include "ultima/shared/core/rect.h"
 #include "graphics/screen.h"
-#include "ultima/shared/gfx/font.h"
+#include "ultima/shared/early/gfx/font.h"
 #include "ultima/shared/engine/messages.h"
 
 namespace Ultima {

@@ -19,55 +19,46 @@
  *
  */
 
-#ifndef ULTIMA_SHARED_GFX_FONT_H
-#define ULTIMA_SHARED_GFX_FONT_H
+#ifndef ULTIMA_SHARED_GFX_SURFACE_H
+#define ULTIMA_SHARED_GFX_SURFACE_H
 
-#include "common/array.h"
-#include "common/stream.h"
+#include "graphics/font.h"
 #include "graphics/managed_surface.h"
-#include "ultima/shared/core/rect.h"
 
 namespace Ultima {
 namespace Shared {
 namespace Gfx {
 
-class Font {
+class GfxSurface : public Graphics::ManagedSurface {
 private:
-	const byte *_data;
-	size_t _startingChar, _endingChar;
+	Common::Point _textPos;
+
+	void newLine();
+
+protected:
+	byte _textColor = 255;
+	Graphics::Font *_font = nullptr;
+
 public:
-	Font(const byte *data, size_t startingChar = 0, size_t charCount = 256);
+	GfxSurface();
+	GfxSurface(Graphics::ManagedSurface &surf, const Common::Rect &bounds);
+	~GfxSurface() override;
 
 	/**
-	 * Write out a string
+	 * Write some text to the surface
 	 */
-	int writeString(Graphics::ManagedSurface &surface, const Common::String &msg,
-		Point &pt, byte color, byte bgColor = 0);
+	void writeString(const Common::Point &pt, const Common::String &str,
+		Graphics::TextAlign align = Graphics::kTextAlignLeft);
+	void writeString(const Common::String &str, Graphics::TextAlign align = Graphics::kTextAlignLeft);
+	virtual void writeChar(uint32 chr);
 
-	/**
-	 * Draw a character
-	 */
-	void writeChar(Graphics::ManagedSurface &surface, unsigned char c, Point &pt,
-		byte color, byte bgColor = 0);
-
-	/**
-	 * Return the width of a character
-	 */
-	uint charWidth(char c) const;
-
-	/**
-	 * Return the width of a string
-	 */
-	uint stringWidth(const Common::String &msg) const;
-
-	/**
-	 * Returns the height of the font
-	 */
-	uint lineHeight() const;
+	void setTextPos(const Common::Point &pt);
+	byte setColor(byte color);
+	byte setColor(byte r, byte g, byte b);
 };
 
-} // End of namespace Gfx
-} // End of namespace Shared
-} // End of namespace Ultima
+} // namespace Gfx
+} // namespace Shared
+} // namespace Ultima
 
 #endif

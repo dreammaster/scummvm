@@ -23,7 +23,7 @@
 #include "ultima/shared/early/font_resources.h"
 #include "ultima/shared/maps/map.h"
 #include "ultima/shared/early/ultima_early.h"
-#include "ultima/shared/gfx/font.h"
+#include "ultima/shared/early/gfx/font.h"
 #include "ultima/shared/gfx/screen.h"
 #include "graphics/palette.h"
 

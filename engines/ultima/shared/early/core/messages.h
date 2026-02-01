@@ -28,7 +28,8 @@
 #include "ultima/ultima0/metaengine.h"
 
 namespace Ultima {
-namespace Ultima0 {
+namespace Shared {
+namespace Core {
 
 class UIElement;
 
@@ -128,7 +129,8 @@ struct ActionMessage : public Message {
 	}
 };
 
-} // namespace Ultima0
+} // namespace Core
+} // namespace Shared
 } // namespace Ultima
 
 #endif

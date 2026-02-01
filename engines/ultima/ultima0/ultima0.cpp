@@ -25,6 +25,7 @@
 #include "graphics/paletteman.h"
 #include "ultima/ultima0/ultima0.h"
 #include "ultima/ultima0/console.h"
+#include "ultima/ultima0/views/views.h"
 
 namespace Ultima {
 namespace Ultima0 {
@@ -48,9 +49,9 @@ static const byte PALETTE[][3] = {
 Ultima0Engine *g_engine;
 
 Ultima0Engine::Ultima0Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc) :
-		Engine(syst), /*_gameDescription(gameDesc), */_randomSource("Ultima0"),
-		_palette(&PALETTE[0][0], sizeof(PALETTE) / 3) {
+		Engine(syst) /*, _gameDescription(gameDesc) */ {
 	g_engine = this;
+	_palette = Graphics::Palette(&PALETTE[0][0], sizeof(PALETTE) / 3);
 }
 
 Ultima0Engine::~Ultima0Engine() {
@@ -70,6 +71,19 @@ Common::Error Ultima0Engine::run() {
 	runGame();
 
 	return Common::kNoError;
+}
+
+void Ultima0Engine::runGame() {
+	Views::Views views;	// Loads all views in the structure
+
+	// Check for savegame
+	int saveSlot = ConfMan.getInt("save_slot");
+	if (saveSlot == -1 || g_engine->loadGameState(saveSlot).getCode() != Common::kNoError)
+		// Except when loading a savegame from the launcher, default to first screen
+		addView("Startup");
+
+	// Delegate to play the game
+	Events::runGame();
 }
 
 bool Ultima0Engine::hasFeature(EngineFeature f) const {

@@ -28,7 +28,7 @@ namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class Status : public View {
+class Status : public Shared::Views::View {
 private:
 	Common::String _message;
 	Common::String _direction;

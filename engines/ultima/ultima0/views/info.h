@@ -29,7 +29,7 @@ namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class Info : public View {
+class Info : public Shared::Views::View {
 	class InfoObject : public UIElement {
 	public:
 		Common::String _text;

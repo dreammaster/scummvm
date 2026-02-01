@@ -19,7 +19,7 @@
  *
  */
 
-#include "ultima/shared/gfx/font.h"
+#include "ultima/shared/early/gfx/font.h"
 #include "graphics/managed_surface.h"
 
 namespace Ultima {
@@ -29,53 +29,19 @@ namespace Gfx {
 Font::Font(const byte *data, size_t startingChar, size_t charCount) :
 	_data(data), _startingChar(startingChar), _endingChar(startingChar + charCount - 1) {}
 
-int Font::writeString(Graphics::ManagedSurface &surface, const Common::String &msg, Point &pt,
-		byte color, byte bgColor) {
-	int total = 0;
-	int xs = pt.x;
+void Font::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
+	assert(chr >= _startingChar && chr <= _endingChar);
+	const byte *charP = _data + (chr - _startingChar) * 8;
 
-	for (const char *msgP = msg.c_str(); *msgP; ++msgP, total += 8) {
-		if (*msgP == '\n') {
-			// Move to next line
-			pt.x = xs;
-			pt.y += lineHeight();
-		} else {
-			// Write out character
-			writeChar(surface, (unsigned char)*msgP, pt, color, bgColor);
-		}
-	}
-
-	return total;
-}
-
-void Font::writeChar(Graphics::ManagedSurface &surface, unsigned char c, Point &pt,
-		byte color, byte bgColor) {
-	assert(c >= _startingChar && c <= _endingChar);
-	const byte *charP = _data + (c - _startingChar) * 8;
-	Graphics::Surface s = surface.getSubArea(Common::Rect(pt.x, pt.y, pt.x + 8, pt.y + 8));
-
-	for (int y = 0; y < 8; ++y) {
-		byte *lineP = (byte *)s.getBasePtr(0, y);
+	for (int yp = 0; yp < 8; ++yp, ++y) {
+		byte *lineP = (byte *)dst->getBasePtr(x, y);
 		byte lineData = charP[y];
 
-		for (int x = 0; x < 8; ++x, lineData <<= 1, ++lineP) {
-			*lineP = (lineData & 0x80) ? color : bgColor;
+		for (int xp = 0; xp < 8; ++xp, lineData <<= 1, ++lineP) {
+			if (lineData & 0x80)
+				*lineP = color;
 		}
 	}
-
-	pt.x += charWidth(c);
-}
-
-uint Font::charWidth(char c) const {
-	return 8;
-}
-
-uint Font::lineHeight() const {
-	return 8;
-}
-
-uint Font::stringWidth(const Common::String &msg) const {
-	return msg.size() * 8;
 }
 
 } // End of namespace Gfx

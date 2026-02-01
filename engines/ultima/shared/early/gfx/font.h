@@ -19,46 +19,24 @@
  *
  */
 
-#ifndef ULTIMA0_GFX_FONT_H
-#define ULTIMA0_GFX_FONT_H
+#ifndef ULTIMA_SHARED_GFX_FONT_H
+#define ULTIMA_SHARED_GFX_FONT_H
 
-#include "common/rect.h"
+#include "common/array.h"
+#include "common/stream.h"
 #include "graphics/font.h"
-#include "graphics/managed_surface.h"
-#include "ultima/ultima0/data/defines.h"
 
 namespace Ultima {
-namespace Ultima0 {
+namespace Shared {
 namespace Gfx {
 
-constexpr int GLYPH_HEIGHT = 16;
-constexpr int GLYPH_WIDTH = 16;
-constexpr int TEXT_WIDTH = DEFAULT_SCX / GLYPH_WIDTH;
-constexpr int TEXT_HEIGHT = DEFAULT_SCY / GLYPH_HEIGHT;
-
-class TextRect : public ::Common::Rect {
-public:
-	TextRect() : ::Common::Rect() {}
-	TextRect(int left_, int top_, int right_, int bottom_) :
-		::Common::Rect(left_ * GLYPH_WIDTH, top_ * GLYPH_HEIGHT,
-			(right_ + 1) * GLYPH_WIDTH, (bottom_ + 1) * GLYPH_HEIGHT) {}
-};
-
-class AkalabethFont : public Graphics::Font {
+class Font : public Graphics::Font {
 private:
-	/**
-	 * Returns true if a pixel is set in the source font data
-	 */
-	static bool _FONTPixelSet(const byte *Data, int x, int y);
-
-	/**
-	 * Draw an angled line - this stops the squared corners on diagonals showing
-	 */
-	static void _FONTAngleDraw(Graphics::Surface *s, Common::Rect *rc,
-		int w, int h, byte colour);
-
+	const byte *_data;
+	uint _startingChar, _endingChar;
 public:
-	~AkalabethFont() override {}
+	Font(const byte *data, size_t startingChar = 0, size_t charCount = 256);
+	~Font() override {}
 
 	/**
 	 * Return the maximum width of the font.
@@ -66,7 +44,7 @@ public:
 	 * @return Maximum font width in pixels.
 	 */
 	int getMaxCharWidth() const override {
-		return 16;
+		return 8;
 	}
 
 	/**
@@ -77,7 +55,7 @@ public:
 	 * @return The width of the character in pixels.
 	 */
 	int getCharWidth(uint32 chr) const {
-		return 16;
+		return 8;
 	}
 
 	/**
@@ -86,7 +64,7 @@ public:
 	 * @return Font height in pixels.
 	 */
 	int getFontHeight() const override {
-		return 16;
+		return 8;
 	}
 
 	/**
@@ -113,7 +91,7 @@ public:
 };
 
 } // namespace Gfx
-} // namespace Ultima0
+} // namespace Shared
 } // namespace Ultima
 
 #endif

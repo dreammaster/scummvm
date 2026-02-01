@@ -23,13 +23,12 @@
 #include "common/config-manager.h"
 #include "graphics/cursorman.h"
 #include "graphics/screen.h"
-#include "ultima/ultima0/events.h"
-#include "ultima/ultima0/gfx/gfx_surface.h"
-#include "ultima/ultima0/views/views.h"
-#include "ultima/ultima0/ultima0.h"
+#include "ultima/shared/early/core/events.h"
+#include "ultima/shared/early/gfx/gfx_surface.h"
 
 namespace Ultima {
-namespace Ultima0 {
+namespace Shared {
+namespace Core {
 
 Events *g_events;
 
@@ -70,15 +69,8 @@ Events::~Events() {
 void Events::runGame() {
 	uint currTime, nextFrameTime = 0;
 	_screen = new Graphics::Screen();
-	Views::Views views;	// Loads all views in the structure
 
 	CursorMan.pushCursor(ARROW_CURSOR, CURSOR_W, CURSOR_H, 0, 0, 9);
-
-	// Run the game
-	int saveSlot = ConfMan.getInt("save_slot");
-	if (saveSlot == -1 || g_engine->loadGameState(saveSlot).getCode() != Common::kNoError)
-		// Except when loading a savegame from the launcher, default to first screen
-		addView("Startup");
 
 	Common::Event e;
 	while (!_views.empty() && !shouldQuit()) {
@@ -229,7 +221,7 @@ void Events::addKeypress(const Common::KeyCode kc) {
 /*------------------------------------------------------------------------*/
 
 Bounds::Bounds(Common::Rect &innerBounds) :
-	_bounds(0, 0, DEFAULT_SCX, DEFAULT_SCY),
+	_bounds(0, 0, g_system->getWidth(), g_system->getHeight()),
 	_innerBounds(innerBounds),
 	left(_bounds.left), top(_bounds.top),
 	right(_bounds.right), bottom(_bounds.bottom) {
@@ -251,8 +243,8 @@ void Bounds::setBorderSize(size_t borderSize) {
 /*------------------------------------------------------------------------*/
 
 UIElement::UIElement(const Common::String &name) :
-	_name(name), _parent(g_engine), _bounds(_innerBounds) {
-	g_engine->_children.push_back(this);
+	_name(name), _parent(g_events), _bounds(_innerBounds) {
+	g_events->_children.push_back(this);
 }
 
 UIElement::UIElement(const Common::String &name, UIElement *uiParent) :
@@ -358,11 +350,11 @@ Gfx::GfxSurface UIElement::getSurface() const {
 }
 
 int UIElement::getRandomNumber(int minNumber, int maxNumber) {
-	return g_engine->getRandomNumber(maxNumber - minNumber + 1) + minNumber;
+	return g_events->getRandomNumber(maxNumber - minNumber + 1) + minNumber;
 }
 
 int UIElement::getRandomNumber(int maxNumber) {
-	return g_engine->getRandomNumber(maxNumber);
+	return g_events->getRandomNumber(maxNumber);
 }
 
 void UIElement::delaySeconds(uint seconds) {
@@ -377,6 +369,6 @@ void UIElement::timeout() {
 	redraw();
 }
 
-} // namespace Ultima0
+} // namespace Core
+} // namespace Shared
 } // namespace Ultima
-

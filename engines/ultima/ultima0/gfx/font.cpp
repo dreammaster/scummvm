@@ -161,15 +161,12 @@ static const byte FONT1[2048] = {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
 
-
-void Font::writeChar(Graphics::ManagedSurface *dst, uint32 chr,
-		const Common::Point &textPos, byte textColor) {
+void AkalabethFont::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 color) const {
 	if (chr == ' ')
 		return;					// Don't do anything for spaces
 
 	const byte *GfxData = FONT1 + chr * 8;
-	Graphics::Surface charArea = dst->getSubArea(Common::Rect(textPos.x, textPos.y,
-		textPos.x + GLYPH_WIDTH, textPos.y + GLYPH_HEIGHT));
+	Graphics::Surface charArea = dst->getSubArea(Common::Rect(x, y, x + GLYPH_WIDTH, y + GLYPH_HEIGHT));
 	const int w = 1;
 	const int h = 1;
 
@@ -179,30 +176,30 @@ void Font::writeChar(Graphics::ManagedSurface *dst, uint32 chr,
 			// Check for whether character has pixel in this position
 			if (_FONTPixelSet(GfxData, x, y)) {
 				Common::Rect rc2(x * 2, y * 2, x * 2 + 2, y * 2 + 2);
-				charArea.fillRect(rc2, textColor);
+				charArea.fillRect(rc2, color);
 
 				// Neaten the diagonals
 				if (_FONTPixelSet(GfxData, x, y + 1) == 0 &&
 					_FONTPixelSet(GfxData, x - 1, y) == 0 &&
 					_FONTPixelSet(GfxData, x - 1, y + 1) != 0)
-					_FONTAngleDraw(&charArea, &rc2, -w, h, textColor);
+					_FONTAngleDraw(&charArea, &rc2, -w, h, color);
 
 				if (_FONTPixelSet(GfxData, x, y + 1) == 0 &&
 					_FONTPixelSet(GfxData, x + 1, y) == 0 &&
 					_FONTPixelSet(GfxData, x + 1, y + 1) != 0)
-					_FONTAngleDraw(&charArea, &rc2, w, h, textColor);
+					_FONTAngleDraw(&charArea, &rc2, w, h, color);
 			}
 		}
 	}
 }
 
-bool Font::_FONTPixelSet(const byte * Data, int x, int y) {
+bool AkalabethFont::_FONTPixelSet(const byte * Data, int x, int y) {
 	if (x < 0 || y < 0 || x > 7 || y > 7)
 		return false;
 	return (Data[y] & (0x80 >> x)) ? 1 : 0;
 }
 
-void Font::_FONTAngleDraw(Graphics::Surface *s, Common::Rect *rc, int w, int h, byte colour) {
+void AkalabethFont::_FONTAngleDraw(Graphics::Surface *s, Common::Rect *rc, int w, int h, byte colour) {
 	int i, m;
 	Common::Rect rc3;
 

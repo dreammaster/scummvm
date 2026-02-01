@@ -19,11 +19,10 @@
  *
  */
 
-#include "ultima/ultima0/views/view.h"
-#include "ultima/ultima0/ultima0.h"
+#include "ultima/shared/early/views/view.h"
 
 namespace Ultima {
-namespace Ultima0 {
+namespace Shared {
 namespace Views {
 
 void View::checkFocusedControl(const Common::Point &mousePos) {
@@ -82,9 +81,9 @@ bool View::msgMouseUp(const MouseUpMessage &msg) {
 }
 
 byte View::getColor(byte r, byte g, byte b) {
-	return g_engine->_palette.findBestColor(r, g, b);
+	return g_events->_palette.findBestColor(r, g, b);
 }
 
 } // namespace Views
-} // namespace Ultima0
+} // namespace Shared
 } // namespace Ultima

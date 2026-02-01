@@ -22,56 +22,13 @@
 #ifndef ULTIMA0_VIEWS_VIEW_H
 #define ULTIMA0_VIEWS_VIEW_H
 
-#include "ultima/ultima0/events.h"
+#include "ultima/shared/early/views/view.h"
 
 namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-/**
- * Base view class for screens and dialogs that appear on-screen.
- * The View class takes care of two important things:
- * 1) By default events get sent to all controls on a view until one
- * handles it. For mouse events, we instead want only the control the
- * mouse cursor is over to receive the events, saving the individual
- * controls from having to check if the mouse is within their bounds.
- * 2) Individual elements will get a Focus/Unfocus message as the
- * mouse enters and leaves them. This allows, for example, buttons
- * that have been pressed to de-select if the mouse leaves their bounds.
- */
-class View : public UIElement {
-private:
-	UIElement *_focusedElement = nullptr;
-
-	/**
-	 * Checks if a control is entered or left
-	 */
-	void checkFocusedControl(const Common::Point &mousePos);
-
-	/**
-	 * Check for an element at the given position
-	 */
-	UIElement *getElementAtPos(const Common::Point &pos) const;
-
-protected:
-	byte getColor(byte r, byte g, byte b);
-
-public:
-	View(const Common::String &name, UIElement *uiParent) :
-		UIElement(name, uiParent) {
-	}
-	View(const Common::String &name) :
-		UIElement(name) {
-	}
-	virtual ~View() {
-	}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	bool msgMouseMove(const MouseMoveMessage &msg) override;
-	bool msgMouseDown(const MouseDownMessage &msg) override;
-	bool msgMouseUp(const MouseUpMessage &msg) override;
-};
+using namespace Shared::Views;
 
 } // namespace Views
 } // namespace Ultima0

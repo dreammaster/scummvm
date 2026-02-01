@@ -22,7 +22,7 @@
 #include "ultima/shared/gfx/visual_surface.h"
 #include "ultima/shared/early/ultima_early.h"
 #include "ultima/shared/early/game.h"
-#include "ultima/shared/gfx/font.h"
+#include "ultima/shared/early/gfx/font.h"
 
 namespace Ultima {
 namespace Shared {
@@ -49,7 +49,8 @@ void VisualSurface::writeString(const Common::String &msg, const Point &pt, int 
 
 void VisualSurface::writeString(const Common::String &msg, int color, int bgColor) {
 	Gfx::Font *font = g_vm->_game->getFont();
-	font->writeString(*this, msg, _textPos, color == -1 ? _textColor : color, bgColor == -1 ? _bgColor : bgColor);
+	//font->writeString(*this, msg, _textPos, color == -1 ? _textColor : color, bgColor == -1 ? _bgColor : bgColor);
+	error("TODO: Refactor to use Graphics::Font");
 }
 
 void VisualSurface::writeChar(unsigned char c, const Point &pt, int color, int bgColor) {
@@ -59,12 +60,13 @@ void VisualSurface::writeChar(unsigned char c, const Point &pt, int color, int b
 
 void VisualSurface::writeChar(unsigned char c, int color, int bgColor) {
 	Gfx::Font *font = g_vm->_game->getFont();
-	font->writeChar(*this, c, _textPos, color == -1 ? _textColor : color, bgColor == -1 ? _bgColor : bgColor);
+//	font->writeChar(*this, c, _textPos, color == -1 ? _textColor : color, bgColor == -1 ? _bgColor : bgColor);
+	error("TODO: Refactor to use Graphics::Font");
 }
 
 size_t VisualSurface::fontHeight() {
 	Gfx::Font *font = g_vm->_game->getFont();
-	return font->lineHeight();
+	return font->getFontHeight();
 }
 
 } // End of namespace Gfx

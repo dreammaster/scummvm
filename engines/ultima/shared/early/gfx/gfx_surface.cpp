@@ -19,13 +19,25 @@
  *
  */
 
-#include "ultima/ultima0/gfx/gfx_surface.h"
-#include "ultima/ultima0/gfx/font.h"
-#include "ultima/ultima0/ultima0.h"
+#include "ultima/shared/early/gfx/gfx_surface.h"
+#include "ultima/shared/early/gfx/dos_font.h"
+#include "ultima/shared/early/core/events.h"
 
 namespace Ultima {
-namespace Ultima0 {
+namespace Shared {
 namespace Gfx {
+
+GfxSurface::GfxSurface() : Graphics::ManagedSurface() {
+	_font = new DosFont();
+}
+
+GfxSurface::GfxSurface(Graphics::ManagedSurface &surf, const Common::Rect &bounds) : Graphics::ManagedSurface(surf, bounds) {
+	_font = new DosFont();
+}
+
+GfxSurface::~GfxSurface() {
+	delete _font;
+}
 
 void GfxSurface::writeString(const Common::Point &pt, const Common::String &str,
 		Graphics::TextAlign align) {
@@ -54,8 +66,6 @@ void GfxSurface::writeString(const Common::String &str, Graphics::TextAlign alig
 		if (*p == '\n') {
 			assert(align == Graphics::kTextAlignLeft);
 			newLine();
-		} else if (*p < 32) {
-			setColor((byte)*p);
 		} else {
 			writeChar(*p);
 		}
@@ -63,28 +73,25 @@ void GfxSurface::writeString(const Common::String &str, Graphics::TextAlign alig
 }
 
 void GfxSurface::writeChar(uint32 chr) {
-	if (chr >= ' ') {
-		Font::writeChar(this, chr, Common::Point(_textPos.x * GLYPH_WIDTH,
-			_textPos.y * GLYPH_HEIGHT), _textColor);
-		++_textPos.x;
-	}
+	_font->drawChar(this, chr, _textPos.x * _font->getMaxCharWidth(), _textPos.y * _font->getFontHeight(), _textColor);
+	++_textPos.x;
 
-	if (_textPos.x >= TEXT_WIDTH || chr == '\n') {
+	if ((_textPos.x * _font->getMaxCharWidth()) >= this->w)
 		newLine();
-	}
 }
 
 void GfxSurface::newLine() {
+	const int LINE_H = _font->getFontHeight();
 	_textPos.x = 0;
 	_textPos.y++;
 
-	if (_textPos.y >= TEXT_HEIGHT) {
-		_textPos.y = TEXT_HEIGHT - 1;
+	if ((_textPos.y * LINE_H) >= this->h) {
+		_textPos.y = (this->h / LINE_H) - 1;
 
 		// Scroll the screen contents up
-		blitFrom(*this, Common::Rect(0, GLYPH_HEIGHT, DEFAULT_SCX, DEFAULT_SCY),
+		blitFrom(*this, Common::Rect(0, LINE_H, this->w, this->h),
 			Common::Point(0, 0));
-		fillRect(Common::Rect(0, DEFAULT_SCX - GLYPH_HEIGHT, DEFAULT_SCX, DEFAULT_SCY), 0);
+		fillRect(Common::Rect(0, this->h - LINE_H, this->w, this->h), 0);
 	}
 }
 
@@ -99,11 +106,10 @@ byte GfxSurface::setColor(byte color) {
 }
 
 byte GfxSurface::setColor(byte r, byte g, byte b) {
-	byte oldColor = _textColor;
-	_textColor = g_engine->_palette.findBestColor(r, g, b);
-	return oldColor;
+	byte color = Core::g_events->_palette.findBestColor(r, g, b);
+	return setColor(color);
 }
 
 } // namespace Gfx
-} // namespace Ultima0
+} // namespace Shared
 } // namespace Ultima

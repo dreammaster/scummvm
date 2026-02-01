@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima0/views/acknowledgements.h"
+#include "ultima/ultima0/gfx/font.h"
 
 namespace Ultima {
 namespace Ultima0 {

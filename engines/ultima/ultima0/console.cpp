@@ -25,6 +25,8 @@
 namespace Ultima {
 namespace Ultima0 {
 
+using namespace Shared::Core;
+
 Console::Console() : GUI::Debugger() {
 	registerCmd("view", WRAP_METHOD(Console, cmdView));
 	registerCmd("food", WRAP_METHOD(Console, cmdFood));

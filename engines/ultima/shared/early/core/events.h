@@ -19,17 +19,20 @@
  *
  */
 
-#ifndef ULTIMA0_EVENTS_H
-#define ULTIMA0_EVENTS_H
+#ifndef ULTIMA_SHARED_EVENTS_H
+#define ULTIMA_SHARED_EVENTS_H
 
 #include "common/array.h"
+#include "common/random.h"
 #include "common/stack.h"
+#include "graphics/palette.h"
 #include "graphics/screen.h"
-#include "ultima/ultima0/messages.h"
-#include "ultima/ultima0/gfx/gfx_surface.h"
+#include "ultima/shared/early/core/messages.h"
+#include "ultima/shared/early/gfx/gfx_surface.h"
 
 namespace Ultima {
-namespace Ultima0 {
+namespace Shared {
+namespace Core {
 
 #define FRAME_RATE 20
 #define FRAME_DELAY (1000 / FRAME_RATE)
@@ -280,6 +283,9 @@ public:
  */
 class Events : public UIElement {
 private:
+	Common::RandomSource _randomSource = Common::RandomSource("Ultima");
+
+private:
 	Graphics::Screen *_screen = nullptr;
 	Common::Stack<UIElement *> _views;
 protected:
@@ -310,6 +316,9 @@ protected:
 	MESSAGE(MouseUp);
 	MESSAGE(MouseMove);
 #undef MESSAGE
+public:
+	Graphics::Palette _palette;
+
 public:
 	Events();
 	virtual ~Events();
@@ -415,11 +424,27 @@ public:
 	void close() override {
 		focusedView()->close();
 	}
+
+	/**
+	 * Sets the random number seed
+	 */
+	void setRandomSeed(uint seed) {
+		_randomSource.setSeed(seed);
+	}
+
+	/**
+	 * Get a random number
+	 */
+	uint getRandomNumber(uint maxVal = 0x7fffffff) { return _randomSource.getRandomNumber(maxVal); }
+	uint getRandomNumber(uint minVal, uint maxVal) {
+		return _randomSource.getRandomNumber(maxVal - minVal) + minVal;
+	}
 };
 
 extern Events *g_events;
 
-} // namespace Ultima0
+} // namespace Core
+} // namespace Shared
 } // namespace Ultima
 
 #endif

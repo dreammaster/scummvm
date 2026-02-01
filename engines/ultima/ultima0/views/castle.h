@@ -28,7 +28,7 @@ namespace Ultima {
 namespace Ultima0 {
 namespace Views {
 
-class Castle : public View {
+class Castle : public Shared::Views::View {
 private:
 	enum Mode {
 		NAMING, GRAND_ADVENTURE, BEGONE, FIRST_TASK, TASK_COMPLETE, TASK_INCOMPLETE
