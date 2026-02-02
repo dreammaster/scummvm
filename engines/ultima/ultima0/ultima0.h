@@ -112,6 +112,8 @@ public:
 	bool isMidiPlaying() const {
 		return _music != nullptr;
 	}
+
+	Shared::Gfx::GfxSurface createSurface(const Common::Rect &bounds) const override;
 };
 
 extern Ultima0Engine *g_engine;

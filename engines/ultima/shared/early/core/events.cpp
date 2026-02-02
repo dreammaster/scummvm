@@ -218,6 +218,10 @@ void Events::addKeypress(const Common::KeyCode kc) {
 	focusedView()->msgKeypress(KeypressMessage(ks));
 }
 
+Gfx::GfxSurface Events::createSurface(const Common::Rect &bounds) const {
+	return Gfx::GfxSurface(*g_events->getScreen(), _bounds);
+}
+
 /*------------------------------------------------------------------------*/
 
 Bounds::Bounds(Common::Rect &innerBounds) :
@@ -346,7 +350,7 @@ void UIElement::addView() {
 }
 
 Gfx::GfxSurface UIElement::getSurface() const {
-	return Gfx::GfxSurface(*g_events->getScreen(), _bounds);
+	return g_events->createSurface(_bounds);
 }
 
 int UIElement::getRandomNumber(int minNumber, int maxNumber) {

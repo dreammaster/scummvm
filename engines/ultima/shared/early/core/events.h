@@ -393,6 +393,11 @@ public:
 	}
 
 	/**
+	 * Returns a surface for drawing the element
+	 */
+	virtual Gfx::GfxSurface createSurface(const Common::Rect &bounds) const;
+
+	/**
 	 * Draws the focused view
 	 */
 	void drawElements() {

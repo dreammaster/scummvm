@@ -61,6 +61,7 @@ Ultima0Engine::~Ultima0Engine() {
 Common::Error Ultima0Engine::run() {
 	// Initialize the graphics
 	initGraphics(DEFAULT_SCX, DEFAULT_SCY);
+	setBounds(Common::Rect(0, 0, DEFAULT_SCX, DEFAULT_SCY));
 	g_system->getPaletteManager()->setPalette(_palette);
 
 	// Set the debugger console
@@ -84,6 +85,13 @@ void Ultima0Engine::runGame() {
 
 	// Delegate to play the game
 	Events::runGame();
+}
+
+
+Shared::Gfx::GfxSurface Ultima0Engine::createSurface(const Common::Rect &bounds) const {
+	Shared::Gfx::GfxSurface surface(*getScreen(), bounds, new Gfx::AkalabethFont());
+	surface.setColor(C_TEXT_DEFAULT);
+	return surface;
 }
 
 bool Ultima0Engine::hasFeature(EngineFeature f) const {

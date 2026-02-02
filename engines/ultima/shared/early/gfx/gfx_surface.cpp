@@ -27,16 +27,12 @@ namespace Ultima {
 namespace Shared {
 namespace Gfx {
 
-GfxSurface::GfxSurface() : Graphics::ManagedSurface() {
-	_font = new DosFont();
+GfxSurface::GfxSurface(Graphics::Font *font) : Graphics::ManagedSurface(),
+	_font(font ? font : new DosFont()) {
 }
 
-GfxSurface::GfxSurface(Graphics::ManagedSurface &surf, const Common::Rect &bounds) : Graphics::ManagedSurface(surf, bounds) {
-	_font = new DosFont();
-}
-
-GfxSurface::~GfxSurface() {
-	delete _font;
+GfxSurface::GfxSurface(Graphics::ManagedSurface &surf, const Common::Rect &bounds, Graphics::Font *font) :
+	Graphics::ManagedSurface(surf, bounds), _font(font ? font : new DosFont()) {
 }
 
 void GfxSurface::writeString(const Common::Point &pt, const Common::String &str,
@@ -73,6 +69,11 @@ void GfxSurface::writeString(const Common::String &str, Graphics::TextAlign alig
 }
 
 void GfxSurface::writeChar(uint32 chr) {
+	if (chr < 32) {
+		setColor((byte)chr);
+		return;
+	}
+
 	_font->drawChar(this, chr, _textPos.x * _font->getMaxCharWidth(), _textPos.y * _font->getFontHeight(), _textColor);
 	++_textPos.x;
 

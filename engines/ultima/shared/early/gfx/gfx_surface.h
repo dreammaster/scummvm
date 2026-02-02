@@ -22,6 +22,7 @@
 #ifndef ULTIMA_SHARED_GFX_SURFACE_H
 #define ULTIMA_SHARED_GFX_SURFACE_H
 
+#include "common/ptr.h"
 #include "graphics/font.h"
 #include "graphics/managed_surface.h"
 
@@ -37,12 +38,12 @@ private:
 
 protected:
 	byte _textColor = 255;
-	Graphics::Font *_font = nullptr;
+	Common::SharedPtr<Graphics::Font> _font;
 
 public:
-	GfxSurface();
-	GfxSurface(Graphics::ManagedSurface &surf, const Common::Rect &bounds);
-	~GfxSurface() override;
+	GfxSurface(Graphics::Font *font = nullptr);
+	GfxSurface(Graphics::ManagedSurface &surf, const Common::Rect &bounds, Graphics::Font *font = nullptr);
+	~GfxSurface() override {}
 
 	/**
 	 * Write some text to the surface

@@ -62,6 +62,9 @@ static const char *LINES[] = {
 	"JUiCEY Bird Productions"
 };
 
+Acknowledgements::Acknowledgements() : View("Acknowledgements"),
+		_pendingLine(new Gfx::AkalabethFont()) {
+}
 
 bool Acknowledgements::msgFocus(const FocusMessage &msg) {
 	// Set up the lines to display

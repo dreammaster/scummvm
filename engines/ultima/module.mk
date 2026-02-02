@@ -26,7 +26,6 @@ MODULE_OBJS += \
 	ultima0/data/monster_logic.o \
 	ultima0/gfx/dungeon.o \
 	ultima0/gfx/font.o \
-	ultima0/gfx/gfx_surface.o \
 	ultima0/gfx/map.o \
 	ultima0/gfx/monster.o \
 	ultima0/views/acknowledgements.o \
