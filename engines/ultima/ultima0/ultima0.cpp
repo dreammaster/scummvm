@@ -20,6 +20,7 @@
  */
 
 #include "common/system.h"
+#include "graphics/cursorman.h"
 #include "common/savefile.h"
 #include "engines/util.h"
 #include "graphics/paletteman.h"
@@ -45,6 +46,31 @@ static const byte PALETTE[][3] = {
 	{ 255, 80, 80 }		// Orange
 };
 
+constexpr int CURSOR_W = 12;
+constexpr int CURSOR_H = 20;
+
+static const byte ARROW_CURSOR[CURSOR_W * CURSOR_H] = {
+	0, 0, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	0, 7, 0, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	0, 7, 7, 0, 9, 9, 9, 9, 9, 9, 9, 9,
+	0, 7, 7, 7, 0, 9, 9, 9, 9, 9, 9, 9,
+	0, 7, 7, 7, 7, 0, 9, 9, 9, 9, 9, 9,
+	0, 7, 7, 7, 7, 7, 0, 9, 9, 9, 9, 9,
+	0, 7, 7, 7, 7, 7, 7, 0, 9, 9, 9, 9,
+	0, 7, 7, 7, 7, 7, 7, 7, 0, 9, 9, 9,
+	0, 7, 7, 7, 7, 7, 7, 7, 7, 0, 9, 9,
+	0, 7, 7, 7, 7, 7, 7, 7, 7, 7, 0, 9,
+	0, 7, 7, 7, 7, 7, 7, 0, 0, 0, 0, 0,
+	0, 7, 7, 7, 0, 7, 7, 0, 9, 9, 9, 9,
+	0, 7, 7, 0, 0, 7, 7, 0, 9, 9, 9, 9,
+	0, 7, 0, 9, 9, 0, 7, 7, 0, 9, 9, 9,
+	0, 0, 9, 9, 9, 0, 7, 7, 0, 9, 9, 9,
+	0, 9, 9, 9, 9, 9, 0, 7, 7, 0, 9, 9,
+	9, 9, 9, 9, 9, 9, 0, 7, 7, 0, 9, 9,
+	9, 9, 9, 9, 9, 9, 9, 0, 7, 7, 0, 9,
+	9, 9, 9, 9, 9, 9, 9, 0, 7, 7, 0, 9,
+	9, 9, 9, 9, 9, 9, 9, 9, 0, 0, 9, 9
+};
 
 Ultima0Engine *g_engine;
 
@@ -67,6 +93,8 @@ Common::Error Ultima0Engine::run() {
 	// Set the debugger console
 	setDebugger(new Console());
 	MetaEngine::setKeybindingMode(KBMODE_MINIMAL);
+
+	CursorMan.pushCursor(ARROW_CURSOR, CURSOR_W, CURSOR_H, 0, 0, 9);
 
 	// Play the game
 	runGame();

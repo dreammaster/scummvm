@@ -32,32 +32,6 @@ namespace Core {
 
 Events *g_events;
 
-constexpr int CURSOR_W = 12;
-constexpr int CURSOR_H = 20;
-
-static const byte ARROW_CURSOR[CURSOR_W * CURSOR_H] = {
-	0, 0, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	0, 7, 0, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	0, 7, 7, 0, 9, 9, 9, 9, 9, 9, 9, 9,
-	0, 7, 7, 7, 0, 9, 9, 9, 9, 9, 9, 9,
-	0, 7, 7, 7, 7, 0, 9, 9, 9, 9, 9, 9,
-	0, 7, 7, 7, 7, 7, 0, 9, 9, 9, 9, 9,
-	0, 7, 7, 7, 7, 7, 7, 0, 9, 9, 9, 9,
-	0, 7, 7, 7, 7, 7, 7, 7, 0, 9, 9, 9,
-	0, 7, 7, 7, 7, 7, 7, 7, 7, 0, 9, 9,
-	0, 7, 7, 7, 7, 7, 7, 7, 7, 7, 0, 9,
-	0, 7, 7, 7, 7, 7, 7, 0, 0, 0, 0, 0,
-	0, 7, 7, 7, 0, 7, 7, 0, 9, 9, 9, 9,
-	0, 7, 7, 0, 0, 7, 7, 0, 9, 9, 9, 9,
-	0, 7, 0, 9, 9, 0, 7, 7, 0, 9, 9, 9,
-	0, 0, 9, 9, 9, 0, 7, 7, 0, 9, 9, 9,
-	0, 9, 9, 9, 9, 9, 0, 7, 7, 0, 9, 9,
-	9, 9, 9, 9, 9, 9, 0, 7, 7, 0, 9, 9,
-	9, 9, 9, 9, 9, 9, 9, 0, 7, 7, 0, 9,
-	9, 9, 9, 9, 9, 9, 9, 0, 7, 7, 0, 9,
-	9, 9, 9, 9, 9, 9, 9, 9, 0, 0, 9, 9
-};
-
 Events::Events() : UIElement("Root", nullptr) {
 	g_events = this;
 }
@@ -69,8 +43,6 @@ Events::~Events() {
 void Events::runGame() {
 	uint currTime, nextFrameTime = 0;
 	_screen = new Graphics::Screen();
-
-	CursorMan.pushCursor(ARROW_CURSOR, CURSOR_W, CURSOR_H, 0, 0, 9);
 
 	Common::Event e;
 	while (!_views.empty() && !shouldQuit()) {
