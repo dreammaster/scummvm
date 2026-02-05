@@ -19,22 +19,19 @@
  *
  */
 
-#ifndef ULTIMA0_H
-#define ULTIMA0_H
+#ifndef ULTIMA2_H
+#define ULTIMA2_H
 
 #include "common/random.h"
 #include "common/serializer.h"
 #include "engines/engine.h"
 #include "ultima/detection.h"
 #include "ultima/shared/early/core/events.h"
-#include "ultima/ultima0/data/data.h"
-#include "ultima/ultima0/music.h"
-#include "ultima/ultima0/gfx/font.h"
 
 namespace Ultima {
-namespace Ultima0 {
+namespace Ultima2 {
 
-class Ultima0Engine : public Engine, public Shared::Core::Events {
+class Ultima2Engine : public Engine, public Shared::Core::Events {
 private:
 	//const UltimaGameDescription *_gameDescription;
 
@@ -45,14 +42,8 @@ protected:
 	Common::Error run() override;
 
 public:
-	PlayerInfo _player;
-	WorldMapInfo _worldMap;
-	DungeonMapInfo _dungeon;
-	bool _showMinimap = false;
-	MusicPlayer *_music = nullptr;
-
-	Ultima0Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);
-	~Ultima0Engine() override;
+	Ultima2Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);
+	~Ultima2Engine() override;
 
 	void runGame();
 
@@ -106,20 +97,12 @@ public:
 	 * Returns true if any savegames exist
 	 */
 	bool savegamesExist() const;
-
-	void playMidi(const char *name);
-	void stopMidi();
-	bool isMidiPlaying() const {
-		return _music != nullptr;
-	}
-
-	Shared::Gfx::GfxSurface createSurface(const Common::Rect &bounds) const override;
 };
 
-extern Ultima0Engine *g_engine;
+extern Ultima2Engine *g_engine;
 using Shared::Core::g_events;
 
-} // End of namespace Ultima0
+} // End of namespace Ultima2
 } // End of namespace Ultima
 
 #endif

@@ -43,6 +43,14 @@ MODULE_OBJS += \
 	ultima0/views/world_map.o
 endif
 
+ifdef ENABLE_ULTIMA2
+MODULE_OBJS += \
+	ultima2/console.o \
+	ultima2/metaengine.o \
+	ultima2/ultima2.o \
+	ultima2/views/startup.o
+endif
+
 ifdef ENABLE_ULTIMA1
 MODULE_OBJS += \
 	shared/actions/action.o \
