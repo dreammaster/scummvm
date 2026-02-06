@@ -22,6 +22,7 @@
 #include "common/system.h"
 #include "common/config-manager.h"
 #include "graphics/cursorman.h"
+#include "graphics/paletteman.h"
 #include "graphics/screen.h"
 #include "ultima/shared/early/core/events.h"
 #include "ultima/shared/early/gfx/gfx_surface.h"
@@ -43,6 +44,10 @@ Events::~Events() {
 void Events::runGame() {
 	uint currTime, nextFrameTime = 0;
 	_screen = new Graphics::Screen();
+
+	// Set WHITE for palette index 255
+	const byte rgb[3] = { 0xff, 0xff, 0xff };
+	g_system->getPaletteManager()->setPalette(rgb, 255, 1);
 
 	Common::Event e;
 	while (!_views.empty() && !shouldQuit()) {

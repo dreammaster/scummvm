@@ -35,7 +35,7 @@ void Font::drawChar(Graphics::Surface *dst, uint32 chr, int x, int y, uint32 col
 
 	for (int yp = 0; yp < 8; ++yp, ++y) {
 		byte *lineP = (byte *)dst->getBasePtr(x, y);
-		byte lineData = charP[y];
+		byte lineData = charP[yp];
 
 		for (int xp = 0; xp < 8; ++xp, lineData <<= 1, ++lineP) {
 			if (lineData & 0x80)
