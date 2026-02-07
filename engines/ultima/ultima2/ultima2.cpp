@@ -33,19 +33,10 @@ namespace Ultima2 {
 
 static const byte PALETTE[][3] = {
 	{ 0, 0, 0 },		// Black
-	{ 0, 0, 255 },		// Blue
-	{ 0, 255, 0 },		// Green,
-	{ 0, 255, 255 },	// Cyan
-	{ 255, 0, 0 },		// Red
-	{ 255, 0, 255 },	// Purple
-	{ 255, 255, 0 },	// Yellow
-	{ 255, 255, 255 },	// White
-	{ 255, 0, 128 },	// Rose
-	{ 80, 80, 255 },	// Violet
-	{ 180, 180, 180 },	// Grey
-	{ 255, 80, 80 }		// Orange
+	{ 85, 255, 255 },	// Light Cyan
+	{ 255, 85, 255 },	// Light Magenta
+	{ 255, 255, 255 }	// White
 };
-
 
 Ultima2Engine *g_engine;
 

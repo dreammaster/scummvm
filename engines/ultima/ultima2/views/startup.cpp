@@ -19,16 +19,53 @@
  *
  */
 
+#include "common/file.h"
 #include "ultima/ultima2/views/startup.h"
+#include "ultima/ultima2/gfx/pic_decoder.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
+bool Startup::msgFocus(const FocusMessage &msg) {
+	_pageCtr = 0;
+	delaySeconds(3);
+	return View::msgFocus(msg);
+}
+
+void Startup::timeout() {
+	if (++_pageCtr == 3) {
+		showTitle();
+	} else {
+		redraw();
+		delaySeconds(3);
+	}
+}
+
 void Startup::draw() {
 	auto s = getSurface();
 	s.clear();
-	s.writeString(Common::Point(5, 10), "Ultima 2");
+
+	Gfx::PicDecoder decoder;
+	Common::File f;
+	if (!f.open("PICDRA") || !decoder.loadStream(f))
+		error("Could not load bitmap");
+
+	s.blitFrom(*decoder.getSurface());
+#ifdef TODO
+	switch (_pageCtr) {
+	case 0:
+		s.writeString(Common::Point(16, 10), "ORIGIN");
+		s.writeString(Common::Point(12, 11), "PROUDLY PRESENTS");
+		break;
+	case 1:
+		s.writeString(Common::Point(16, 8), "PART ][");
+		s.writeString(Common::Point(9, 10), "OF THE #1 BEST SELLING");
+		s.writeString(Common::Point(7, 12), "FANTASY ROLE-PLAYING GAME");
+		s.writeString(Common::Point(12, 14), "BY LORD BRITISH");
+		break;
+	}
+#endif
 }
 
 } // namespace Views

@@ -30,6 +30,8 @@ namespace Views {
 
 class Startup : public Shared::Views::View {
 private:
+	int _pageCtr = 0;
+
 	void showTitle() {
 		replaceView("Title");
 	}
@@ -39,6 +41,8 @@ public:
 
 	void draw() override;
 
+	bool msgFocus(const FocusMessage &msg) override;
+	void timeout() override;
 	bool msgKeypress(const KeypressMessage &msg) override {
 		showTitle();
 		return true;
