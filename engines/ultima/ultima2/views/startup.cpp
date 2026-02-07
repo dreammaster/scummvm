@@ -27,9 +27,11 @@ namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
+#define DELAY_SECONDS 2
+
 bool Startup::msgFocus(const FocusMessage &msg) {
 	_pageCtr = 0;
-	delaySeconds(3);
+	delaySeconds(DELAY_SECONDS);
 	return View::msgFocus(msg);
 }
 
@@ -38,21 +40,16 @@ void Startup::timeout() {
 		showTitle();
 	} else {
 		redraw();
-		delaySeconds(3);
+		delaySeconds(DELAY_SECONDS);
 	}
 }
 
 void Startup::draw() {
+	Gfx::PicDecoder decoder;
+	Common::File f;
 	auto s = getSurface();
 	s.clear();
 
-	Gfx::PicDecoder decoder;
-	Common::File f;
-	if (!f.open("PICDRA") || !decoder.loadStream(f))
-		error("Could not load bitmap");
-
-	s.blitFrom(*decoder.getSurface());
-#ifdef TODO
 	switch (_pageCtr) {
 	case 0:
 		s.writeString(Common::Point(16, 10), "ORIGIN");
@@ -64,8 +61,14 @@ void Startup::draw() {
 		s.writeString(Common::Point(7, 12), "FANTASY ROLE-PLAYING GAME");
 		s.writeString(Common::Point(12, 14), "BY LORD BRITISH");
 		break;
+	case 2:
+		if (!f.open("PICDRA") || !decoder.loadStream(f))
+			error("Could not load bitmap");
+		s.blitFrom(*decoder.getSurface());
+		break;
+	case 3:
+		showTitle();
 	}
-#endif
 }
 
 } // namespace Views
