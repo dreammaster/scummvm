@@ -19,19 +19,23 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA2_VIEWS_TITLE_H
+#define ULTIMA2_VIEWS_TITLE_H
 
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/ultima2/views/view.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views {
-	Startup _startup;
-	Title _title;
+class Title : public Shared::Views::View {
+public:
+	Title() : View("Title") {}
+	~Title() override {}
+
+	void draw() override;
+
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
 } // namespace Views

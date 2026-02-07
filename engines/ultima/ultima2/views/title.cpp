@@ -19,23 +19,34 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
-
-#include "ultima/ultima2/views/startup.h"
 #include "ultima/ultima2/views/title.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views {
-	Startup _startup;
-	Title _title;
-};
+void Title::draw() {
+	auto s = getSurface();
+	s.clear();
+
+	s.writeString(Common::Point(15, 1),  "ULTIMA ][");
+	s.writeString(Common::Point(16, 3),  "REVENGE");
+	s.writeString(Common::Point(16, 5),  "OF  THE");
+	s.writeString(Common::Point(14, 7),  "ENCHANTRESS");
+	s.writeString(Common::Point(6, 22),  "(C)-1983,1989 BY LORD BRITISH");
+	s.writeString(Common::Point(15, 23), "AND ORIGIN");
+	s.writeString(Common::Point(5, 11), "TYPE - ");
+	s.writeString(Common::Point(6, 13), "`D` - FOR A DEMONSTRATION");
+	s.writeString(Common::Point(6, 15), "`P` - PLAY A GAME OF ULTIMA ][");
+	s.writeString(Common::Point(6, 17), "`C` - CREATE A NEW CHARACTER");
+	s.writeString(Common::Point(5, 19), "CHOICE:");
+}
+
+bool Title::msgKeypress(const KeypressMessage &msg) {
+	// TODO
+	return true;
+}
 
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif
