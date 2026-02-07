@@ -49,6 +49,7 @@ MODULE_OBJS += \
 	ultima2/metaengine.o \
 	ultima2/ultima2.o \
 	ultima2/gfx/pic_decoder.o \
+	ultima2/views/demo.o \
 	ultima2/views/startup.o \
 	ultima2/views/title.o
 endif

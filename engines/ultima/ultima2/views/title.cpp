@@ -43,8 +43,16 @@ void Title::draw() {
 }
 
 bool Title::msgKeypress(const KeypressMessage &msg) {
+	switch (msg.keycode) {
+	case Common::KEYCODE_d:
+		replaceView("Demo");
+		return true;
+	default:
+		break;
+	}
+
 	// TODO
-	return true;
+	return false;
 }
 
 } // namespace Views

@@ -19,21 +19,42 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA2_VIEWS_DEMO_H
+#define ULTIMA2_VIEWS_DEMO_H
 
-#include "ultima/ultima2/views/demo.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/ultima2/views/view.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views {
-	Demo _demo;
-	Startup _startup;
-	Title _title;
+class Demo : public Shared::Views::View {
+private:
+	int _pageCtr = 0;
+
+	void showTitle() {
+		replaceView("Title");
+	}
+public:
+	Demo() : View("Demo") {}
+	~Demo() override {}
+
+	void draw() override;
+
+	bool msgFocus(const FocusMessage &msg) override;
+	void timeout() override;
+	bool msgKeypress(const KeypressMessage &msg) override {
+		showTitle();
+		return true;
+	}
+	bool msgMouseDown(const MouseDownMessage &msg) override {
+		showTitle();
+		return true;
+	}
+	bool msgAction(const ActionMessage &msg) override {
+		showTitle();
+		return true;
+	}
 };
 
 } // namespace Views

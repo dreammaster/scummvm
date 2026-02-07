@@ -20,7 +20,7 @@
  */
 
 #include "common/file.h"
-#include "ultima/ultima2/views/startup.h"
+#include "ultima/ultima2/views/demo.h"
 #include "ultima/ultima2/gfx/pic_decoder.h"
 
 namespace Ultima {
@@ -29,45 +29,75 @@ namespace Views {
 
 #define DELAY_SECONDS 3
 
-bool Startup::msgFocus(const FocusMessage &msg) {
+bool Demo::msgFocus(const FocusMessage &msg) {
 	_pageCtr = 0;
 	delaySeconds(DELAY_SECONDS);
 	return View::msgFocus(msg);
 }
 
-void Startup::timeout() {
-	if (++_pageCtr == 3) {
-		showTitle();
-	} else {
-		redraw();
-		delaySeconds(DELAY_SECONDS);
-	}
+void Demo::timeout() {
+	_pageCtr = (_pageCtr + 1) % 8;
+	redraw();
+	delaySeconds(DELAY_SECONDS);
 }
 
-void Startup::draw() {
+void Demo::draw() {
 	Gfx::PicDecoder decoder;
 	Common::File f;
 	auto s = getSurface();
 	s.clear();
 
+	if (_pageCtr < 5) {
+		static const char *FILENAMES[] = { "PICOUT", "PICTWN", "PICDNG", "PICSPA", "PICMIN" };
+
+		if (!f.open(FILENAMES[_pageCtr]) || !decoder.loadStream(f))
+			error("Could not load bitmap");
+		s.blitFrom(*decoder.getSurface());
+	}
+
 	switch (_pageCtr) {
 	case 0:
+		s.writeString(Common::Point(0, 23), "        BATTLE STRANGE CREATURES");
+		s.writeString(Common::Point(0, 24), "      ACROSS THE FACE OF THE EARTH");
+		break;
+
+	case 1:
+		s.writeString(Common::Point(0, 23), "   SEARCH FOR CLUES IN CARELESS WORDS");
+		s.writeString(Common::Point(0, 24), "      SPOKEN AT THE LOCAL PUB");
+		break;
+
+	case 2:
+		s.writeString(Common::Point(0, 23), "   TRAVERSE DEEP DARK DEADLY DUNGEONS");
+		s.writeString(Common::Point(0, 24), "      AND TALL TERRIFYING TOWERS");
+		break;
+
+	case 3:
+		s.writeString(Common::Point(0, 23), "      TRAVEL THROUGHOUT THE GALAXY");
+		s.writeString(Common::Point(0, 24), "  TO THE PLANETS OF OUR SOLAR SYSTEM");
+		break;
+
+	case 4:
+		s.writeString(Common::Point(0, 23), "   AND CONQUER TIME ITSELF TO BATTLE");
+		s.writeString(Common::Point(8, 24), "MINAX THE ENCHANTRESS");
+		break;
+
+	case 5:
 		s.writeString(Common::Point(16, 10), "ORIGIN");
 		s.writeString(Common::Point(12, 11), "PROUDLY PRESENTS");
 		break;
-	case 1:
+
+	case 6:
 		s.writeString(Common::Point(16, 8), "PART ][");
 		s.writeString(Common::Point(9, 10), "OF THE #1 BEST SELLING");
 		s.writeString(Common::Point(7, 12), "FANTASY ROLE-PLAYING GAME");
 		s.writeString(Common::Point(12, 14), "BY LORD BRITISH");
 		break;
-	case 2:
+
+	case 7:
 		if (!f.open("PICDRA") || !decoder.loadStream(f))
 			error("Could not load bitmap");
 		s.blitFrom(*decoder.getSurface());
 		break;
-	case 3:
-		showTitle();
 	}
 }
 
