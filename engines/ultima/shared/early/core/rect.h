@@ -19,33 +19,36 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_TITLE_H
-#define ULTIMA2_VIEWS_TITLE_H
+#ifndef ULTIMA0_SHARED_CORE_RECT_H
+#define ULTIMA0_SHARED_CORE_RECT_H
 
-#include "ultima/ultima2/views/view.h"
-#include "ultima/shared/early/gfx/text_input.h"
+#include "common/rect.h"
+#include "common/system.h"
 
 namespace Ultima {
-namespace Ultima2 {
-namespace Views {
+namespace Shared {
+namespace Core {
 
-class Title : public Shared::Views::View {
-private:
-	Shared::Gfx::TextInput _cursor = Shared::Gfx::TextInput("Cursor", this,
-		Common::Point(12, 19), 1);
-
+class TextPoint : public Common::Point {
 public:
-	Title() : View("Title") {}
-	~Title() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-
-	bool msgGame(const GameMessage &msg) override;
+	TextPoint() : Common::Point() {
+	}
+	TextPoint(int x_, int y_);
 };
 
-} // namespace Views
-} // namespace Ultima2
+class TextRect : public Common::Rect {
+public:
+	TextRect() : Common::Rect() {
+	}
+	TextRect(int left_, int top_, int right_, int bottom_);
+};
+
+} // namespace Core
+
+using Core::TextPoint;
+using Core::TextRect;
+
+} // namespace Shared
 } // namespace Ultima
 
 #endif

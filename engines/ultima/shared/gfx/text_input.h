@@ -31,7 +31,7 @@ namespace Gfx {
 /**
  * Text input control
  */
-class TextInput : public Popup {
+class TextInputOld : public Popup {
 	DECLARE_MESSAGE_MAP;
 	bool KeypressMsg(CKeypressMsg *msg);
 private:
@@ -41,7 +41,7 @@ private:
 	byte _color;
 public:
 	CLASSDEF;
-	TextInput(GameBase *game) : Popup(game), _isNumeric(false), _maxCharacters(0), _color(0) {}
+	TextInputOld(GameBase *game) : Popup(game), _isNumeric(false), _maxCharacters(0), _color(0) {}
 
 	/**
 	 * Draws the visual item on the screen

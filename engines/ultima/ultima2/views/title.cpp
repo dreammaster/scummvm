@@ -25,6 +25,11 @@ namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
+bool Title::msgFocus(const FocusMessage &msg) {
+	_cursor.show();
+	return true;
+}
+
 void Title::draw() {
 	auto s = getSurface();
 	s.clear();
@@ -42,9 +47,11 @@ void Title::draw() {
 	s.writeString(Common::Point(5, 19), "CHOICE:");
 }
 
-bool Title::msgKeypress(const KeypressMessage &msg) {
-	switch (msg.keycode) {
-	case Common::KEYCODE_d:
+bool Title::msgGame(const GameMessage &msg) {
+	char key = msg._stringValue.empty() ? 0 : toupper(msg._stringValue.firstChar());
+
+	switch (key) {
+	case 'D':
 		replaceView("Demo");
 		return true;
 	default:

@@ -196,7 +196,7 @@ void Events::addKeypress(const Common::KeyCode kc) {
 }
 
 Gfx::GfxSurface Events::createSurface(const Common::Rect &bounds) const {
-	return Gfx::GfxSurface(*g_events->getScreen(), _bounds);
+	return Gfx::GfxSurface(*g_events->getScreen(), bounds);
 }
 
 /*------------------------------------------------------------------------*/

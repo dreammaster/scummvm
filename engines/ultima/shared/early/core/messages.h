@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef ULTIMA0_MESSAGES_H
-#define ULTIMA0_MESSAGES_H
+#ifndef ULTIMA_SHARED_CORE_MESSAGES_H
+#define ULTIMA_SHARED_CORE_MESSAGES_H
 
 #include "common/array.h"
 #include "common/events.h"
@@ -94,7 +94,7 @@ typedef MouseMessage MouseMoveMessage;
 
 struct GameMessage : public Message {
 	Common::String _name;
-	int _value;
+	int _value = 0;
 	Common::String _stringValue;
 
 	GameMessage() : Message(), _value(-1) {

@@ -28,11 +28,11 @@ namespace Ultima {
 namespace Shared {
 namespace Gfx {
 
-BEGIN_MESSAGE_MAP(TextInput, Popup)
+BEGIN_MESSAGE_MAP(TextInputOld, Popup)
 	ON_MESSAGE(KeypressMsg)
 END_MESSAGE_MAP()
 
-void TextInput::show(const Point &pt, bool isNumeric, size_t maxCharacters, byte color, TreeItem *respondTo) {
+void TextInputOld::show(const Point &pt, bool isNumeric, size_t maxCharacters, byte color, TreeItem *respondTo) {
 	Popup::show(respondTo);
 	_isNumeric = isNumeric;
 	_maxCharacters = maxCharacters;
@@ -44,7 +44,7 @@ void TextInput::show(const Point &pt, bool isNumeric, size_t maxCharacters, byte
 	_game->_textCursor->setVisible(true);
 }
 
-void TextInput::draw() {
+void TextInputOld::draw() {
 	Popup::draw();
 
 	VisualSurface s = getSurface();
@@ -59,7 +59,7 @@ void TextInput::draw() {
 	s.writeString(text, TextPoint(0, 0), _color);
 }
 
-bool TextInput::KeypressMsg(CKeypressMsg *msg) {
+bool TextInputOld::KeypressMsg(CKeypressMsg *msg) {
 	uint16 c = msg->_keyState.ascii;
 	//TreeItem *respondTo = _respondTo;
 

@@ -39,7 +39,7 @@ namespace Gfx {
 class Font;
 class Popup;
 class TextCursor;
-class TextInput;
+class TextInputOld;
 class VisualItem;
 } // End of namespace Gfx
 

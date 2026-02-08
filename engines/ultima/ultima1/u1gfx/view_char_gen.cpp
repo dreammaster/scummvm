@@ -41,7 +41,7 @@ END_MESSAGE_MAP()
 
 ViewCharacterGeneration::ViewCharacterGeneration(Shared::TreeItem *parent) :
 		Shared::Gfx::VisualItem("CharGen", Rect(0, 0, 320, 200), parent) {
-	_textInput = new Shared::Gfx::TextInput(getGame());
+	_textInput = new Shared::Gfx::TextInputOld(getGame());
 }
 
 ViewCharacterGeneration::~ViewCharacterGeneration() {

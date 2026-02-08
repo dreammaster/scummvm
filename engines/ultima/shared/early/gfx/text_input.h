@@ -19,33 +19,43 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_TITLE_H
-#define ULTIMA2_VIEWS_TITLE_H
+#ifndef ULTIMA_SHARED_TEXT_INPUT_H
+#define ULTIMA_SHARED_TEXT_INPUT_H
 
-#include "ultima/ultima2/views/view.h"
-#include "ultima/shared/early/gfx/text_input.h"
+#include "ultima/shared/early/core/events.h"
 
 namespace Ultima {
-namespace Ultima2 {
-namespace Views {
+namespace Shared {
+namespace Gfx {
 
-class Title : public Shared::Views::View {
+class TextInput : public Shared::Core::UIElement {
 private:
-	Shared::Gfx::TextInput _cursor = Shared::Gfx::TextInput("Cursor", this,
-		Common::Point(12, 19), 1);
+	Common::String _text;
+	bool _isNumeric = false;
+	bool _visible = false;
+	bool _caretVisible = false;
 
 public:
-	Title() : View("Title") {}
-	~Title() override {}
+	TextInput(const Common::String &name, UIElement *parent = nullptr);
+	TextInput(const Common::String &name, UIElement *parent, const Common::Point &pos,
+		int maxChars, bool isNumeric = false);
+	~TextInput() override {}
 
-	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
+	bool msgKeypress(const Core::KeypressMessage &msg) override;
+	void timeout() override;
+	bool msgFocus(const Core::FocusMessage &msg) override;
+	bool msgUnfocus(const Core::UnfocusMessage &msg) override;
 
-	bool msgGame(const GameMessage &msg) override;
+	void show(const Common::Point &pos, int maxChars, bool isNumeric = false);
+	void show();
+	void hide();
+	void clear();
+	void setTextPos(const Common::Point &pt);
 };
 
-} // namespace Views
-} // namespace Ultima2
+} // namespace Gfx
+} // namespace Shared
 } // namespace Ultima
 
 #endif

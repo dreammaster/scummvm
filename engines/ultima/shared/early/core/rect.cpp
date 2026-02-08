@@ -19,33 +19,35 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_TITLE_H
-#define ULTIMA2_VIEWS_TITLE_H
-
-#include "ultima/ultima2/views/view.h"
-#include "ultima/shared/early/gfx/text_input.h"
+#include "common/system.h"
+#include "ultima/shared/early/core/rect.h"
+#include "ultima/ultima0/data/defines.h"
 
 namespace Ultima {
-namespace Ultima2 {
-namespace Views {
+namespace Shared {
+namespace Core {
 
-class Title : public Shared::Views::View {
-private:
-	Shared::Gfx::TextInput _cursor = Shared::Gfx::TextInput("Cursor", this,
-		Common::Point(12, 19), 1);
+constexpr int ULTIMA0_SCX = 640;
+constexpr int ULTIMA0_SCY = 400;
 
-public:
-	Title() : View("Title") {}
-	~Title() override {}
+inline bool isUltima0() {
+	return g_system->getWidth() == ULTIMA0_SCX && g_system->getHeight() == ULTIMA0_SCY;
+}
 
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
+TextPoint::TextPoint(int x_, int y_) : Common::Point() {
+	const int charSize = isUltima0() ? 16 : 8;
+	x = x_ * charSize;
+	y = y_ * charSize;
+}
 
-	bool msgGame(const GameMessage &msg) override;
-};
+TextRect::TextRect(int left_, int top_, int right_, int bottom_) : Common::Rect() {
+	const int charSize = isUltima0() ? 16 : 8;
+	left = left_ * charSize;
+	top = top_ * charSize;
+	right = right_ * charSize;
+	bottom = bottom_ * charSize;
+}
 
-} // namespace Views
-} // namespace Ultima2
+} // namespace Core
+} // namespace Shared
 } // namespace Ultima
-
-#endif

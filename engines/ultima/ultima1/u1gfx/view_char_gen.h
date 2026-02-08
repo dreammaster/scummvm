@@ -58,7 +58,7 @@ private:
 	int _pointsRemaining;
 	int _selectedAttribute;
 	uint *_attributes[ATTRIBUTE_COUNT];
-	Shared::Gfx::TextInput *_textInput;
+	Shared::Gfx::TextInputOld *_textInput;
 private:
 	/**
 	 * Set state within the view

@@ -10,9 +10,11 @@ ifdef ENABLE_AKALABETH || ENABLE_ULTIMA2
 MODULE_OBJS += \
 	shared/early/core/events.o \
 	shared/early/core/messages.o \
+	shared/early/core/rect.o \
 	shared/early/gfx/dos_font.o \
 	shared/early/gfx/font.o \
 	shared/early/gfx/gfx_surface.o \
+	shared/early/gfx/text_input.o \
 	shared/early/views/view.o
 endif
 

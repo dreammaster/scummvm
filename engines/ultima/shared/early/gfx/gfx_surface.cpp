@@ -89,10 +89,12 @@ void GfxSurface::newLine() {
 	if ((_textPos.y * LINE_H) >= this->h) {
 		_textPos.y = (this->h / LINE_H) - 1;
 
-		// Scroll the screen contents up
-		blitFrom(*this, Common::Rect(0, LINE_H, this->w, this->h),
-			Common::Point(0, 0));
-		fillRect(Common::Rect(0, this->h - LINE_H, this->w, this->h), 0);
+		if (_scrollable) {
+			// Scroll the screen contents up
+			blitFrom(*this, Common::Rect(0, LINE_H, this->w, this->h),
+				Common::Point(0, 0));
+			fillRect(Common::Rect(0, this->h - LINE_H, this->w, this->h), 0);
+		}
 	}
 }
 

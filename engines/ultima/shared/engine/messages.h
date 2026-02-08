@@ -40,7 +40,7 @@ enum MessageFlag {
 class CMessage;
 namespace Gfx {
 class VisualItem;
-class TextInput;
+class TextInputOld;
 class Popup;
 }
 

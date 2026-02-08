@@ -47,7 +47,7 @@ class Info : public Gfx::VisualItem {
 	bool KeypressMsg(CKeypressMsg *msg);
 private:
 	Common::StringArray _lines;
-	Gfx::TextInput *_textInput;
+	Gfx::TextInputOld *_textInput;
 	Gfx::CharacterInput *_characterInput;
 	TreeItem *_commandRespondTo;
 protected:

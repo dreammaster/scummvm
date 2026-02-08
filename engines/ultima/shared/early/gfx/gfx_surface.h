@@ -33,6 +33,7 @@ namespace Gfx {
 class GfxSurface : public Graphics::ManagedSurface {
 private:
 	Common::Point _textPos;
+	bool _scrollable = false;
 
 	void newLine();
 
@@ -52,10 +53,19 @@ public:
 		Graphics::TextAlign align = Graphics::kTextAlignLeft);
 	void writeString(const Common::String &str, Graphics::TextAlign align = Graphics::kTextAlignLeft);
 	virtual void writeChar(uint32 chr);
+	int getStringWidth(const Common::String &str) const {
+		return _font->getStringWidth(str);
+	}
+	int getFontHeight() const {
+		return _font->getFontHeight();
+	}
 
 	void setTextPos(const Common::Point &pt);
 	byte setColor(byte color);
 	byte setColor(byte r, byte g, byte b);
+	void setScrollable(bool scrollable) {
+		_scrollable = scrollable;
+	}
 };
 
 } // namespace Gfx

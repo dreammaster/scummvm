@@ -41,7 +41,7 @@ END_MESSAGE_MAP()
 Info::Info(TreeItem *parent, const Rect &bounds) : Gfx::VisualItem("Info", bounds, parent),
 		_commandRespondTo(nullptr) {
 	_characterInput = new Gfx::CharacterInput(getGame());
-	_textInput = new Gfx::TextInput(getGame());
+	_textInput = new Gfx::TextInputOld(getGame());
 }
 
 Info::~Info() {

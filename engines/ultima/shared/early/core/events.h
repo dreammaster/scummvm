@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef ULTIMA_SHARED_EVENTS_H
-#define ULTIMA_SHARED_EVENTS_H
+#ifndef ULTIMA_SHARED_CORE_EVENTS_H
+#define ULTIMA_SHARED_CORE_EVENTS_H
 
 #include "common/array.h"
 #include "common/random.h"
