@@ -54,6 +54,9 @@ bool Title::msgGame(const GameMessage &msg) {
 	case 'D':
 		replaceView("Demo");
 		return true;
+	case 'C':
+		replaceView("CreateCharacter");
+		return true;
 	default:
 		break;
 	}
