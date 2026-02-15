@@ -62,8 +62,7 @@ public:
 	byte _sex = SEX_MALE;
 	byte _class = CLASS_FIGHTER;
 	byte _race = RACE_HUMAN;
-	byte _field13 = 2;
-	byte _field14 = 0;
+	byte _mapNum = 20;
 
 	byte _strength = 0;
 	byte _agility = 0;

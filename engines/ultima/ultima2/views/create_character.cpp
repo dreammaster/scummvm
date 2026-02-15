@@ -46,7 +46,7 @@ void CreateCharacter::done() {
 	Player &p = g_engine->_player;
 	p._field24 = 20;
 	p._field25 = 20;
-	p._field13 = 2;
+	p._mapNum = 2;
 	p._hp = 4;
 	p._food = 4;
 	p._gold = 4;

@@ -42,8 +42,13 @@ void Player::synchronize(Common::Serializer &s) {
 	// Class and race
 	s.syncAsByte(_class);
 	s.syncAsByte(_race);
-	s.syncAsByte(_field13);
-	s.syncAsByte(_field14);
+
+	// Map number is saved as two separate bytes
+	byte map1 = _mapNum / 10, map2 = _mapNum % 10;
+	s.syncAsByte(map1);
+	s.syncAsByte(map2);
+	if (s.isLoading())
+		_mapNum = (map1 * 10) + map2;
 
 	// Attributes
 	syncByte(s, _strength);
