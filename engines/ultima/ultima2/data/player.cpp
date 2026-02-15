@@ -28,5 +28,60 @@ const char *SEX[] = { "MALE", "FEMALE", "YES PLEASE" };
 const char *RACE[] = { nullptr, "HUMAN", "ELF", "DWARF", "HOBBIT" };
 const char *CLASS[] = { nullptr, "FIGHTER", "CLERIC", "WIZARD", "THIEF" };
 
+void Player::synchronize(Common::Serializer &s) {
+	// Sync name
+	s.syncBytes((byte *)_name, MAX_NAME_LENGTH + 1);
+	s.skip(16 - (MAX_NAME_LENGTH + 1));
+
+	// Sex
+	byte sex = (_sex == SEX_MALE) ? 'M' : 'F';
+	s.syncAsByte(sex);
+	if (s.isLoading())
+		_sex = (sex == 'M') ? SEX_MALE : SEX_FEMALE;
+
+	// Class and race
+	s.syncAsByte(_class);
+	s.syncAsByte(_race);
+	s.syncAsByte(_field13);
+	s.syncAsByte(_field14);
+
+	// Attributes
+	syncByte(s, _strength);
+	syncByte(s, _agility);
+	syncByte(s, _stamina);
+	syncByte(s, _charisma);
+	syncByte(s, _wisdom);
+	syncByte(s, _intelligence);
+	syncWord(s, _hp);
+	syncWord(s, _food);
+	s.skip(1);
+	syncWord(s, _experience);
+	syncWord(s, _gold);
+	syncWord(s, _food);
+
+	syncByte(s, _field24);
+	syncByte(s, _field25);
+}
+
+void Player::syncByte(Common::Serializer &s, byte &v) {
+	byte tmp = (v >> 4) | (v & 0xf);
+	s.syncAsByte(tmp);
+	if (s.isLoading())
+		v = ((tmp >> 4) * 10) + (tmp & 0xf);
+}
+
+void Player::syncWord(Common::Serializer &s, uint16 &v) {
+	byte tmp[2];
+	if (s.isLoading()) {
+		s.syncBytes(tmp, 2);
+		v = ((tmp[0] >> 4) * 1000) + ((tmp[0] & 0xf) * 100) +
+			((tmp[1] >> 4) * 10) + (tmp[1] & 0xf);
+	} else {
+		tmp[0] = ((v / 1000) << 4) | ((v % 1000) / 100);
+		tmp[1] = ((v / 10) << 4) | (v % 10);
+		s.syncBytes(tmp, 2);
+	}
+}
+
 } // namespace Ultima2
 } // namespace Ultima

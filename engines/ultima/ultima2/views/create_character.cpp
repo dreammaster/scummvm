@@ -47,9 +47,9 @@ void CreateCharacter::done() {
 	p._field24 = 20;
 	p._field25 = 20;
 	p._field13 = 2;
-	p._field1B = 4;
-	p._field1D = 4;
-	p._field22 = 4;
+	p._hp = 4;
+	p._food = 4;
+	p._gold = 4;
 
 	// Unlike the original that took you back to the title screen after
 	// creating a character, since in ScummVM we allow multiple savegames,

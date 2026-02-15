@@ -22,7 +22,7 @@
 #ifndef ULTIMA2_DATA_PLAYER_H
 #define ULTIMA2_DATA_PLAYER_H
 
-#include "common/scummsys.h"
+#include "common/serializer.h"
 
 namespace Ultima {
 namespace Ultima2 {
@@ -44,23 +44,43 @@ enum Class {
 };
 
 struct Player {
+private:
+	/**
+	 * Synchronizes a byte value. In original Ultima II, byte values store
+	 * the tens in the upper 4 bits, and the 0-9 portion in the low 4 bits.
+	 */
+	void syncByte(Common::Serializer &s, byte &v);
+
+	/**
+	 * Synchronizes a uint16 value. In original Ultima II, uint16 values store
+	 * 4 digits each in 4-bit portions of their own.
+	 */
+	void syncWord(Common::Serializer &s, uint16 &v);
+
+public:
 	char _name[MAX_NAME_LENGTH + 1] = {};
+	byte _sex = SEX_MALE;
+	byte _class = CLASS_FIGHTER;
+	byte _race = RACE_HUMAN;
+	byte _field13 = 2;
+	byte _field14 = 0;
+
 	byte _strength = 0;
 	byte _agility = 0;
 	byte _stamina = 0;
 	byte _charisma = 0;
 	byte _wisdom = 0;
 	byte _intelligence = 0;
-	byte _sex = SEX_MALE;
-	byte _race = RACE_HUMAN;
-	byte _class = CLASS_FIGHTER;
+	uint16 _hp = 4;
+	uint16 _food = 4;
+	uint16 _experience = 0;
+	uint16 _gold = 4;
 
 	byte _field24 = 20;
 	byte _field25 = 20;
-	byte _field13 = 2;
-	byte _field1B = 4;
-	byte _field1D = 4;
-	byte _field22 = 4;
+	byte _field3E = 0xff;
+
+	void synchronize(Common::Serializer &s);
 };
 
 } // namespace Ultima2

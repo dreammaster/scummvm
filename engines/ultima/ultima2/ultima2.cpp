@@ -102,7 +102,7 @@ Common::Error Ultima2Engine::saveGameStream(Common::WriteStream *stream, bool is
 }
 
 void Ultima2Engine::syncSavegame(Common::Serializer &s) {
-	// TODO
+	_player.synchronize(s);
 }
 
 bool Ultima2Engine::savegamesExist() const {
