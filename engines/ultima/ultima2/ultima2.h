@@ -28,22 +28,23 @@
 #include "ultima/detection.h"
 #include "ultima/shared/early/core/events.h"
 #include "ultima/ultima2/data/player.h"
+#include "ultima/ultima2/data/tiles.h"
 
 namespace Ultima {
 namespace Ultima2 {
 
 class Ultima2Engine : public Engine, public Shared::Core::Events {
 private:
-	//const UltimaGameDescription *_gameDescription;
-
 	void syncSavegame(Common::Serializer &s);
+	void loadData();
 
 protected:
 	// Engine APIs
 	Common::Error run() override;
 
 public:
-	Player _player;
+	Data::Player _player;
+	Graphics::ManagedSurface _tiles[Data::TILE_COUNT];
 
 public:
 	Ultima2Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);

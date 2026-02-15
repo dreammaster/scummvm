@@ -23,6 +23,7 @@
 
 namespace Ultima {
 namespace Ultima2 {
+namespace Data {
 
 const char *SEX[] = { "MALE", "FEMALE", "YES PLEASE" };
 const char *RACE[] = { nullptr, "HUMAN", "ELF", "DWARF", "HOBBIT" };
@@ -88,5 +89,6 @@ void Player::syncWord(Common::Serializer &s, uint16 &v) {
 	}
 }
 
+} // namespace Data
 } // namespace Ultima2
 } // namespace Ultima

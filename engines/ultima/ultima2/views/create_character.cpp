@@ -26,6 +26,8 @@ namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
+using namespace Data;
+
 static const byte POS[][2] = {
 	{ 26, 4 }, { 26, 5 }, { 26, 6 }, { 26, 7 }, { 26, 8 }, { 26, 9 },
 	{ 20, 11 }, { 20, 12 }, { 20, 13 }, { 20, 14 }, { 29, 16 }

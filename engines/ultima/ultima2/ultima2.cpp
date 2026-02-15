@@ -20,6 +20,7 @@
  */
 
 #include "common/system.h"
+#include "common/file.h"
 #include "common/savefile.h"
 #include "engines/util.h"
 #include "graphics/paletteman.h"
@@ -59,10 +60,27 @@ Common::Error Ultima2Engine::run() {
 	setDebugger(new Console());
 	MetaEngine::setKeybindingMode(KBMODE_MINIMAL);
 
+	// Load data
+	loadData();
+
 	// Play the game
 	runGame();
 
 	return Common::kNoError;
+}
+
+void Ultima2Engine::loadData() {
+	// Set up default archive for accessing tile data from executable
+	SearchMan.add("Tiles", new Data::Tiles(), 1);
+
+	// Load the tile data
+	Common::File f;
+	if (!f.open("tiles"))
+		error("Could not read tile data");
+	for (Graphics::ManagedSurface &s : _tiles) {
+		s.create(Data::TILE_WIDTH, Data::TILE_HEIGHT);
+		f.read((byte *)s.getPixels(), Data::TILE_WIDTH * Data::TILE_HEIGHT);
+	}
 }
 
 void Ultima2Engine::runGame() {

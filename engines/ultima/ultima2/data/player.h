@@ -26,6 +26,7 @@
 
 namespace Ultima {
 namespace Ultima2 {
+namespace Data {
 
 constexpr int MAX_NAME_LENGTH = 12;
 
@@ -82,6 +83,7 @@ public:
 	void synchronize(Common::Serializer &s);
 };
 
+} // namespace Data
 } // namespace Ultima2
 } // namespace Ultima
 
