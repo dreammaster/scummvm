@@ -74,7 +74,13 @@ void GfxSurface::writeChar(uint32 chr) {
 		return;
 	}
 
-	_font->drawChar(this, chr, _textPos.x * _font->getMaxCharWidth(), _textPos.y * _font->getFontHeight(), _textColor);
+	const int fw = _font->getMaxCharWidth();
+	const int fh = _font->getFontHeight();
+	Common::Rect r(fw, fh);
+	r.translate(_textPos.x * fw, _textPos.y * fh);
+
+	fillRect(r, _bgColor);
+	_font->drawChar(this, chr, r.left, r.top, _fgColor);
 	++_textPos.x;
 
 	if ((_textPos.x * _font->getMaxCharWidth()) >= this->w)
@@ -103,14 +109,30 @@ void GfxSurface::setTextPos(const Common::Point &pt) {
 }
 
 byte GfxSurface::setColor(byte color) {
-	byte oldColor = _textColor;
-	_textColor = color;
+	byte oldColor = _fgColor;
+	_fgColor = color;
 	return oldColor;
 }
 
 byte GfxSurface::setColor(byte r, byte g, byte b) {
 	byte color = Core::g_events->_palette.findBestColor(r, g, b);
 	return setColor(color);
+}
+
+void GfxSurface::setColor(byte fgColor, byte bgColor) {
+	setColor(fgColor);
+	setBgColor(bgColor);
+}
+
+byte GfxSurface::setBgColor(byte color) {
+	byte oldColor = _bgColor;
+	_bgColor = color;
+	return oldColor;
+}
+
+byte GfxSurface::setBgColor(byte r, byte g, byte b) {
+	byte color = Core::g_events->_palette.findBestColor(r, g, b);
+	return setBgColor(color);
 }
 
 } // namespace Gfx

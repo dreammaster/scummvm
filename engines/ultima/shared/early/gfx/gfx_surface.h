@@ -38,7 +38,8 @@ private:
 	void newLine();
 
 protected:
-	byte _textColor = 255;
+	byte _fgColor = 255;
+	byte _bgColor = 0;
 	Common::SharedPtr<Graphics::Font> _font;
 
 public:
@@ -63,6 +64,9 @@ public:
 	void setTextPos(const Common::Point &pt);
 	byte setColor(byte color);
 	byte setColor(byte r, byte g, byte b);
+	void setColor(byte fgColor, byte bgColor);
+	byte setBgColor(byte color);
+	byte setBgColor(byte r, byte g, byte b);
 	void setScrollable(bool scrollable) {
 		_scrollable = scrollable;
 	}

@@ -65,8 +65,10 @@ void CreateCharacter::draw() {
 	s.writeString(Common::Point(0, 0), "          PLAYER GENERATION :");
 	s.writeString(Common::Point(0, 2), "     POINTS LEFT TO DISTRIBUTE : ");
 
-	// TODO: Reverse text
-	s.writeString(Common::String::format("%d", _pointsRemaining));
+	// Display points remaining in reverse text
+	s.setColor(0, 255);
+	s.writeString(Common::String::format("%.2d", _pointsRemaining));
+	s.setColor(255, 0);
 
 	s.writeString(Common::Point(0, 4), "           STRENGTH.......\n"
 		"           AGILITY........\n"
@@ -197,10 +199,9 @@ bool CreateCharacter::msgGame(const GameMessage &msg) {
 		_pointsRemaining -= num;
 		if (_pointsRemaining < 0) {
 			reset();
-			return true;
+		} else {
+			++_cursorIndex;
 		}
-
-		++_cursorIndex;
 		break;
 	}
 
