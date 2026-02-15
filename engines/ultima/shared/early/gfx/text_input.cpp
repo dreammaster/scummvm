@@ -52,6 +52,7 @@ void TextInput::show(const Common::Point &pos, int maxChars, bool isNumeric) {
 void TextInput::show() {
 	// Set to visible, and start timer for blinking the cursor
 	_visible = true;
+	_text.clear();
 	delayFrames(DELAY_FRAMES);
 	redraw();
 }
@@ -93,7 +94,7 @@ bool TextInput::msgKeypress(const Core::KeypressMessage &msg) {
 	if (Common::isPrint(msg.ascii)) {
 		// Printable character
 		if (!_isNumeric || Common::isDigit(msg.keycode)) {
-			_text += msg.ascii;
+			_text += toupper(msg.ascii);
 
 			auto s = getSurface();
 			if (s.getStringWidth(_text) >= _bounds.width())

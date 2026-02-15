@@ -19,38 +19,50 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_CREATE_CHARACTER_H
-#define ULTIMA2_VIEWS_CREATE_CHARACTER_H
+#ifndef ULTIMA2_DATA_PLAYER_H
+#define ULTIMA2_DATA_PLAYER_H
 
-#include "ultima/ultima2/views/view.h"
-#include "ultima/shared/early/gfx/text_input.h"
+#include "common/scummsys.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Views {
 
-constexpr int POINTS_REMAINING = 90;
+constexpr int MAX_NAME_LENGTH = 12;
 
-class CreateCharacter : public Shared::Views::View {
-private:
-	Shared::Gfx::TextInput _cursor = Shared::Gfx::TextInput("Cursor", this);
-	int _pointsRemaining = POINTS_REMAINING;
-	int _cursorIndex = 0;	// Which figure waiting input for
+extern const char *SEX[];
+extern const char *RACE[];
+extern const char *CLASS[];
 
-	void reset();
-	void done();
-
-public:
-	CreateCharacter() : View("CreateCharacter") {}
-	~CreateCharacter() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-
-	bool msgGame(const GameMessage &msg) override;
+enum Sex {
+	SEX_MALE, SEX_FEMALE
+};
+enum Race {
+	RACE_HUMAN = 1, RACE_ELF = 2, RACE_DWARF = 3, RACE_HOBBIT = 4
+};
+enum Class {
+	CLASS_FIGHTER = 1, CLASS_CLERIC = 2, CLASS_WIZARD = 3, CLASS_THIEF = 4
 };
 
-} // namespace Views
+struct Player {
+	char _name[MAX_NAME_LENGTH + 1] = {};
+	byte _strength = 0;
+	byte _agility = 0;
+	byte _stamina = 0;
+	byte _charisma = 0;
+	byte _wisdom = 0;
+	byte _intelligence = 0;
+	byte _sex = SEX_MALE;
+	byte _race = RACE_HUMAN;
+	byte _class = CLASS_FIGHTER;
+
+	byte _field24 = 20;
+	byte _field25 = 20;
+	byte _field13 = 2;
+	byte _field1B = 4;
+	byte _field1D = 4;
+	byte _field22 = 4;
+};
+
 } // namespace Ultima2
 } // namespace Ultima
 

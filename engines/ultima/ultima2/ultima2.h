@@ -27,6 +27,7 @@
 #include "engines/engine.h"
 #include "ultima/detection.h"
 #include "ultima/shared/early/core/events.h"
+#include "ultima/ultima2/data/player.h"
 
 namespace Ultima {
 namespace Ultima2 {
@@ -40,6 +41,9 @@ private:
 protected:
 	// Engine APIs
 	Common::Error run() override;
+
+public:
+	Player _player;
 
 public:
 	Ultima2Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);

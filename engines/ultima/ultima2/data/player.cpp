@@ -19,39 +19,14 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_CREATE_CHARACTER_H
-#define ULTIMA2_VIEWS_CREATE_CHARACTER_H
-
-#include "ultima/ultima2/views/view.h"
-#include "ultima/shared/early/gfx/text_input.h"
+#include "ultima/ultima2/data/player.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Views {
 
-constexpr int POINTS_REMAINING = 90;
+const char *SEX[] = { "MALE", "FEMALE", "YES PLEASE" };
+const char *RACE[] = { nullptr, "HUMAN", "ELF", "DWARF", "HOBBIT" };
+const char *CLASS[] = { nullptr, "FIGHTER", "CLERIC", "WIZARD", "THIEF" };
 
-class CreateCharacter : public Shared::Views::View {
-private:
-	Shared::Gfx::TextInput _cursor = Shared::Gfx::TextInput("Cursor", this);
-	int _pointsRemaining = POINTS_REMAINING;
-	int _cursorIndex = 0;	// Which figure waiting input for
-
-	void reset();
-	void done();
-
-public:
-	CreateCharacter() : View("CreateCharacter") {}
-	~CreateCharacter() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-
-	bool msgGame(const GameMessage &msg) override;
-};
-
-} // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif
