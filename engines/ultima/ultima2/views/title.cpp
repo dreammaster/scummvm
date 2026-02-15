@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima2/views/title.h"
+#include "ultima/ultima2/ultima2.h"
 
 namespace Ultima {
 namespace Ultima2 {
@@ -57,6 +58,14 @@ bool Title::msgGame(const GameMessage &msg) {
 	case 'C':
 		replaceView("CreateCharacter");
 		return true;
+	case 'P':
+		if (!g_engine->savegamesExist()) {
+			replaceView("CreateCharacter");
+		} else {
+			g_engine->loadGameDialog();
+		}
+		break;
+
 	default:
 		break;
 	}

@@ -86,7 +86,7 @@ bool Ultima2Engine::hasFeature(EngineFeature f) const {
 }
 
 bool Ultima2Engine::canSaveGameStateCurrently(Common::U32String *msg) {
-	return true;
+	return focusedView()->getName() == "Game";
 }
 
 Common::Error Ultima2Engine::loadGameStream(Common::SeekableReadStream *stream) {
