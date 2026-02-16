@@ -135,6 +135,10 @@ byte GfxSurface::setBgColor(byte r, byte g, byte b) {
 	return setBgColor(color);
 }
 
+void GfxSurface::reverseColor() {
+	SWAP(_fgColor, _bgColor);
+}
+
 } // namespace Gfx
 } // namespace Shared
 } // namespace Ultima

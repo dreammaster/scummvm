@@ -27,10 +27,27 @@ namespace Ultima2 {
 namespace Views {
 
 void Stats::draw() {
+	const auto &p = g_engine->_player;
 	auto s = getSurface();
 	s.clear();
 
 	s.writeString("H.P.=");
+	if (p._hp < 100) s.reverseColor();
+	s.writeString(Common::String::format("%.4d", p._hp));
+	if (p._hp < 100) s.reverseColor();
+
+	s.writeString(Common::Point(0, 1), "FOOD=");
+	if (p._food < 100) s.reverseColor();
+	s.writeString(Common::String::format("%.4d", p._hp));
+	if (p._food < 100) s.reverseColor();
+
+	s.writeString(Common::Point(0, 1), "FOOD=");
+	if (p._food < 100) s.reverseColor();
+	s.writeString(Common::String::format("%.4d", p._hp));
+	if (p._food < 100) s.reverseColor();
+
+	s.writeString(Common::Point(0, 2), Common::String::format("EXP.=%.4d", p._experience));
+	s.writeString(Common::Point(0, 3), Common::String::format("GOLD=%.4d", p._gold));
 }
 
 } // namespace Views

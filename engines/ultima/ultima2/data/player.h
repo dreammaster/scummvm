@@ -71,10 +71,10 @@ public:
 	byte _charisma = 0;
 	byte _wisdom = 0;
 	byte _intelligence = 0;
-	uint16 _hp = 4;
-	uint16 _food = 4;
+	uint16 _hp = 400;
+	uint16 _food = 400;
 	uint16 _experience = 0;
-	uint16 _gold = 4;
+	uint16 _gold = 400;
 
 	byte _field24 = 20;
 	byte _field25 = 20;

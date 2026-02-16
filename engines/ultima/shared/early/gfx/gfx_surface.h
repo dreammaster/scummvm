@@ -34,13 +34,11 @@ class GfxSurface : public Graphics::ManagedSurface {
 private:
 	Common::Point _textPos;
 	bool _scrollable = false;
-
-	void newLine();
-
-protected:
 	byte _fgColor = 255;
 	byte _bgColor = 0;
 	Common::SharedPtr<Graphics::Font> _font;
+
+	void newLine();
 
 public:
 	GfxSurface(Graphics::Font *font = nullptr);
@@ -67,6 +65,7 @@ public:
 	void setColor(byte fgColor, byte bgColor);
 	byte setBgColor(byte color);
 	byte setBgColor(byte r, byte g, byte b);
+	void reverseColor();
 	void setScrollable(bool scrollable) {
 		_scrollable = scrollable;
 	}
