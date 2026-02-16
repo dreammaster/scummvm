@@ -19,46 +19,24 @@
  *
  */
 
-#include "ultima/ultima2/console.h"
+#include "ultima/ultima2/views/overworld.h"
 #include "ultima/ultima2/ultima2.h"
-#include "ultima/ultima2/data/tiles.h"
+#include "ultima/shared/early/core/rect.h"
 
 namespace Ultima {
 namespace Ultima2 {
+namespace Views {
 
-using namespace Shared::Core;
-
-Console::Console() : GUI::Debugger() {
-	registerCmd("tiles", WRAP_METHOD(Console, cmdTiles));
-	registerCmd("view", WRAP_METHOD(Console, cmdView));
+Overworld::Overworld() : View("Overworld") {
+	_map.setBounds(Shared::Core::TextRect(0, 0, 40, 20));
+	_commands.setBounds(Shared::Core::TextRect(0, 20, 30, 24));
+	_stats.setBounds(Shared::Core::TextRect(30, 20, 40, 24));
 }
 
-Console::~Console() {
+bool Overworld::msgFocus(const FocusMessage &msg) {
+	return true;
 }
 
-bool Console::cmdTiles(int argc, const char **argv) {
-	const auto &tiles = g_engine->_tiles;
-	Graphics::Screen *screen = g_engine->getScreen();
-
-	for (int y = 0; y < 4; ++y) {
-		for (int x = 0; x < 16; ++x) {
-			screen->blitFrom(tiles[y * 16 + x],
-				Common::Point(x * Data::TILE_WIDTH, y * Data::TILE_HEIGHT));
-		}
-	}
-
-	return false;
-}
-
-bool Console::cmdView(int argc, const char **argv) {
-	if (argc == 2) {
-		g_engine->replaceView(argv[1]);
-		return false;
-	} else {
-		debugPrintf("view <view name>\n");
-		return true;
-	}
-}
-
+} // namespace Views
 } // namespace Ultima2
 } // namespace Ultima

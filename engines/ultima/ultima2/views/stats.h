@@ -19,46 +19,25 @@
  *
  */
 
-#include "ultima/ultima2/console.h"
-#include "ultima/ultima2/ultima2.h"
-#include "ultima/ultima2/data/tiles.h"
+#ifndef ULTIMA2_VIEWS_STATS_H
+#define ULTIMA2_VIEWS_STATS_H
+
+#include "ultima/shared/early/core/events.h"
 
 namespace Ultima {
 namespace Ultima2 {
+namespace Views {
 
-using namespace Shared::Core;
+class Stats : public Shared::Core::UIElement {
+public:
+	Stats(UIElement *parent) : Shared::Core::UIElement("Stats", parent) {}
+	~Stats() override {}
 
-Console::Console() : GUI::Debugger() {
-	registerCmd("tiles", WRAP_METHOD(Console, cmdTiles));
-	registerCmd("view", WRAP_METHOD(Console, cmdView));
-}
+	void draw() override;
+};
 
-Console::~Console() {
-}
-
-bool Console::cmdTiles(int argc, const char **argv) {
-	const auto &tiles = g_engine->_tiles;
-	Graphics::Screen *screen = g_engine->getScreen();
-
-	for (int y = 0; y < 4; ++y) {
-		for (int x = 0; x < 16; ++x) {
-			screen->blitFrom(tiles[y * 16 + x],
-				Common::Point(x * Data::TILE_WIDTH, y * Data::TILE_HEIGHT));
-		}
-	}
-
-	return false;
-}
-
-bool Console::cmdView(int argc, const char **argv) {
-	if (argc == 2) {
-		g_engine->replaceView(argv[1]);
-		return false;
-	} else {
-		debugPrintf("view <view name>\n");
-		return true;
-	}
-}
-
+} // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
+
+#endif

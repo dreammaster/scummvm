@@ -24,6 +24,7 @@
 
 #include "ultima/ultima2/views/create_character.h"
 #include "ultima/ultima2/views/demo.h"
+#include "ultima/ultima2/views/overworld.h"
 #include "ultima/ultima2/views/startup.h"
 #include "ultima/ultima2/views/title.h"
 
@@ -34,6 +35,7 @@ namespace Views {
 struct Views {
 	CreateCharacter _createCharacter;
 	Demo _demo;
+	Overworld _overworld;
 	Startup _startup;
 	Title _title;
 };
