@@ -27,6 +27,7 @@
 #include "engines/engine.h"
 #include "ultima/detection.h"
 #include "ultima/shared/early/core/events.h"
+#include "ultima/ultima2/data/map.h"
 #include "ultima/ultima2/data/player.h"
 #include "ultima/ultima2/data/tiles.h"
 
@@ -43,8 +44,11 @@ protected:
 	Common::Error run() override;
 
 public:
+	Data::Map _map;
 	Data::Player _player;
 	Graphics::ManagedSurface _tiles[Data::TILE_COUNT];
+	int8 _outsideMapTile = -1;
+	byte _mapX = 0, _mapY = 0;
 
 public:
 	Ultima2Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);

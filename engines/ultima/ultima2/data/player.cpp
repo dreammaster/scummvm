@@ -65,8 +65,8 @@ void Player::synchronize(Common::Serializer &s) {
 	syncWord(s, _gold);
 	syncWord(s, _food);
 
-	syncByte(s, _field24);
-	syncByte(s, _field25);
+	syncByte(s, _mapX);
+	syncByte(s, _mapY);
 }
 
 void Player::syncByte(Common::Serializer &s, byte &v) {

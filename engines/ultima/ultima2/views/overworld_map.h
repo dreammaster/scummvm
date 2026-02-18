@@ -29,6 +29,9 @@ namespace Ultima2 {
 namespace Views {
 
 class OverworldMap : public Shared::Core::UIElement {
+private:
+	void prepareMapForDrawing();
+
 public:
 	OverworldMap(UIElement *parent) : Shared::Core::UIElement("OverworldMap", parent) {}
 	~OverworldMap() override {}

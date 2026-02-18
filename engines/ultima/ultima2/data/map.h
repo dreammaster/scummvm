@@ -19,32 +19,47 @@
  *
  */
 
-#include "ultima/ultima2/views/overworld.h"
-#include "ultima/ultima2/ultima2.h"
-#include "ultima/shared/early/core/rect.h"
+#ifndef ULTIMA2_DATA_MAP_H
+#define ULTIMA2_DATA_MAP_H
+
+#include "common/archive.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Views {
+namespace Data {
 
-Overworld::Overworld() : View("Overworld") {
-	_map.setBounds(Shared::Core::TextRect(0, 0, 40, 20));
-	_commands.setBounds(Shared::Core::TextRect(0, 20, 30, 24));
-	_stats.setBounds(Shared::Core::TextRect(30, 20, 40, 24));
-}
+constexpr int MAP_WIDTH = 64;
+constexpr int MAP_HEIGHT = 66;
+constexpr int MAP_VISIBLE_WIDTH = 20;
+constexpr int MAP_VISIBLE_HEIGHT = 10;
+constexpr int MAP_VISIBLE_CENTER_X = 9;
+constexpr int MAP_VISIBLE_CENTER_Y = 4;
+constexpr int PLAYER_TILES_OFFSET = 60;
+typedef byte MapTiles[MAP_HEIGHT][MAP_WIDTH];
+typedef byte VisibleTiles[MAP_VISIBLE_HEIGHT][MAP_VISIBLE_WIDTH];
 
-bool Overworld::msgFocus(const FocusMessage &msg) {
-	const auto &player = g_engine->_player;
-	auto &map = g_engine->_map;
-	map.load(player._mapNum);
+struct Map {
+private:
+	int _currentMap = -1;
+public:
+	int _mapX = 0, _mapY = 0;
+	byte _playerTileId = 0;
 
-	map._mapX = player._mapX;
-	map._mapY = player._mapY;
-	map._playerTileId = player._class + Data::PLAYER_TILES_OFFSET;
+	MapTiles _tiles = {};
+	int8 _outsideMapTile = -1;
+	byte _tilePlayerCenter = 0;
+	byte _tilePlayerUp = 0, _tilePlayerDown = 0,
+		_tilePlayerLeft = 0, _tilePlayerRight = 0;
+	VisibleTiles _mapTilesId = {};
+	VisibleTiles _priorTileIds = {};
 
-	return true;
-}
+	const byte _flag1 = 0;
 
-} // namespace Views
+	void load(int mapNum);
+};
+
+} // namespace Data
 } // namespace Ultima2
 } // namespace Ultima
+
+#endif

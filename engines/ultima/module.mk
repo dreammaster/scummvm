@@ -50,6 +50,7 @@ MODULE_OBJS += \
 	ultima2/console.o \
 	ultima2/metaengine.o \
 	ultima2/ultima2.o \
+	ultima2/data/map.o \
 	ultima2/data/player.o \
 	ultima2/data/tiles.o \
 	ultima2/gfx/pic_decoder.o \

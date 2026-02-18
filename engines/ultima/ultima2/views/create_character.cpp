@@ -46,12 +46,12 @@ void CreateCharacter::reset() {
 
 void CreateCharacter::done() {
 	Player &p = g_engine->_player;
-	p._field24 = 20;
-	p._field25 = 20;
-	p._mapNum = 2;
-	p._hp = 4;
-	p._food = 4;
-	p._gold = 4;
+	p._mapX = 20;
+	p._mapY = 20;
+	p._mapNum = 20;
+	p._hp = 400;
+	p._food = 400;
+	p._gold = 400;
 
 	// Unlike the original that took you back to the title screen after
 	// creating a character, since in ScummVM we allow multiple savegames,

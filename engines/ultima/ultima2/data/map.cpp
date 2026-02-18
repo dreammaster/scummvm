@@ -19,32 +19,25 @@
  *
  */
 
-#include "ultima/ultima2/views/overworld.h"
-#include "ultima/ultima2/ultima2.h"
-#include "ultima/shared/early/core/rect.h"
+#include "common/file.h"
+#include "ultima/ultima2/data/map.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Views {
+namespace Data {
 
-Overworld::Overworld() : View("Overworld") {
-	_map.setBounds(Shared::Core::TextRect(0, 0, 40, 20));
-	_commands.setBounds(Shared::Core::TextRect(0, 20, 30, 24));
-	_stats.setBounds(Shared::Core::TextRect(30, 20, 40, 24));
+void Map::load(int mapNum) {
+	if (mapNum == _currentMap)
+		return;
+	_currentMap = mapNum;
+
+	Common::File f;
+	if (!f.open(Common::String::format("MAPX%.2d", mapNum).c_str()))
+		error("Could not open map %d", mapNum);
+
+	f.read(_tiles, MAP_WIDTH * MAP_HEIGHT);
 }
 
-bool Overworld::msgFocus(const FocusMessage &msg) {
-	const auto &player = g_engine->_player;
-	auto &map = g_engine->_map;
-	map.load(player._mapNum);
-
-	map._mapX = player._mapX;
-	map._mapY = player._mapY;
-	map._playerTileId = player._class + Data::PLAYER_TILES_OFFSET;
-
-	return true;
-}
-
-} // namespace Views
+} // namespace Data
 } // namespace Ultima2
 } // namespace Ultima

@@ -76,8 +76,8 @@ public:
 	uint16 _experience = 0;
 	uint16 _gold = 400;
 
-	byte _field24 = 20;
-	byte _field25 = 20;
+	byte _mapX = 20;
+	byte _mapY = 20;
 	byte _field3E = 0xff;
 
 	void synchronize(Common::Serializer &s);
