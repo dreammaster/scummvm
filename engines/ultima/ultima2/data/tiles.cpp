@@ -28,7 +28,7 @@ namespace Ultima2 {
 namespace Data {
 
 // Ultima II has 64 tiles, each 16x16 pixels in CGA Linear format
-const int TILE_DATA_OFFSET = 31811;  // Offset in ultimaii.exe where tile data starts
+const int TILE_DATA_OFFSET = 31808;  // Offset in ultimaii.exe where tile data starts
 
 const Common::ArchiveMemberPtr Tiles::getMember(const Common::Path &path) const {
 	if (!hasFile(path))
@@ -52,9 +52,13 @@ Common::SeekableReadStream *Tiles::createReadStreamForMember(const Common::Path 
 
 	// Process each tile
 	for (int tileNumber = 0; tileNumber < TILE_COUNT; tileNumber++) {
+		byte tileW = f.readByte() * 4;
+		byte tileH = f.readByte();
+		assert(tileW == TILE_WIDTH && tileH == TILE_HEIGHT);
+
 		// Read the tile data (16 rows, 4 bytes per row)
 		for (int y = 0; y < TILE_HEIGHT; y++) {
-			for (int x = 0; x < 4; x++) {
+			for (int x = 0; x < TILE_WIDTH / 4; x++) {
 				// Read one byte (contains 4 pixels in CGA Linear format)
 				byte pixelByte = f.readByte();
 
@@ -78,9 +82,6 @@ Common::SeekableReadStream *Tiles::createReadStreamForMember(const Common::Path 
 				}
 			}
 		}
-
-		// Skip 2 bytes after each tile (padding)
-		f.readUint16LE();
 	}
 
 	f.close();
