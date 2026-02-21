@@ -40,9 +40,9 @@ bool Overworld::msgFocus(const FocusMessage &msg) {
 
 	map._mapX = player._mapX;
 	map._mapY = player._mapY;
-	map._playerTileId = player._class + Data::PLAYER_TILES_OFFSET;
+	map._playerTileId = (player._class + Data::PLAYER_TILES_OFFSET) * 2;
 
-	return true;
+	return View::msgFocus(msg);
 }
 
 } // namespace Views

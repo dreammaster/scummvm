@@ -450,6 +450,9 @@ extern Events *g_events;
 
 } // namespace Core
 } // namespace Shared
+
+using namespace Shared::Core;
+
 } // namespace Ultima
 
 #endif

@@ -28,15 +28,18 @@ namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-class OverworldMap : public Shared::Core::UIElement {
+class OverworldMap : public UIElement {
 private:
 	void prepareMapForDrawing();
+	void animateTile(Graphics::ManagedSurface &tile);
 
 public:
-	OverworldMap(UIElement *parent) : Shared::Core::UIElement("OverworldMap", parent) {}
+	OverworldMap(UIElement *parent) : UIElement("OverworldMap", parent) {}
 	~OverworldMap() override {}
 
+	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
+	void timeout() override;
 };
 
 } // namespace Views

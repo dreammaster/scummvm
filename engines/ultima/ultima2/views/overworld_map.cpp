@@ -26,10 +26,47 @@ namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
+bool OverworldMap::msgFocus(const FocusMessage &msg) {
+	delayFrames(1);
+	return UIElement::msgFocus(msg);
+}
+
+void OverworldMap::timeout() {
+	// Animate the water and forcefield tiles
+	animateTile(g_engine->_tiles[0]);
+	animateTile(g_engine->_tiles[23]);
+	redraw();
+
+	// Wait briefly before next tile animation
+	delayFrames(1);
+}
+
+void OverworldMap::animateTile(Graphics::ManagedSurface &tile) {
+	assert(tile.w == Data::TILE_WIDTH && tile.h == Data::TILE_HEIGHT);
+
+	// Rotate 2 rows upward (top 2 rows move to bottom)
+	const int ROWS_TO_ROTATE = 2;
+	const int BYTES_TO_ROTATE = Data::TILE_WIDTH * ROWS_TO_ROTATE;
+
+	// Temporary buffer to hold the rows being rotated
+	byte tempBuffer[Data::TILE_WIDTH * ROWS_TO_ROTATE];
+
+	byte *pixels = (byte *)tile.getPixels();
+
+	// Save the first ROWS_TO_ROTATE rows to temp buffer
+	memcpy(tempBuffer, pixels, BYTES_TO_ROTATE);
+
+	// Shift all remaining rows up
+	int remainingBytes = (tile.w * tile.h) - BYTES_TO_ROTATE;
+	memmove(pixels, pixels + BYTES_TO_ROTATE, remainingBytes);
+
+	// Copy saved rows to the end
+	memcpy(pixels + remainingBytes, tempBuffer, BYTES_TO_ROTATE);
+}
+
 void OverworldMap::draw() {
 	auto &map = g_engine->_map;
 	auto s = getSurface();
-	s.clear();
 
 	prepareMapForDrawing();
 
@@ -38,7 +75,7 @@ void OverworldMap::draw() {
 		for (int ox = 0; ox < Data::MAP_VISIBLE_WIDTH; ox++) {
 			uint8 tileId = map._mapTilesId[oy][ox];
 			if (!(tileId & 0x80)) {
-				const Graphics::ManagedSurface &tileImg = g_engine->_tiles[tileId];
+				const Graphics::ManagedSurface &tileImg = g_engine->_tiles[tileId / 2];
 				s.blitFrom(tileImg, Common::Point(ox * Data::TILE_WIDTH, oy * Data::TILE_HEIGHT));
 			}
 		}
@@ -52,7 +89,6 @@ void OverworldMap::draw() {
 
 void OverworldMap::prepareMapForDrawing() {
 	// Load the map if it's not already active
-	const auto &player = g_engine->_player;
 	auto &map = g_engine->_map;
 
 	//int mapOffsetX = 0, mapOffsetY = 0;
@@ -73,8 +109,7 @@ void OverworldMap::prepareMapForDrawing() {
 					// Out of bounds: fill with the designated outside tile
 					tile = map._outsideMapTile;
 				} else {
-					tile = map._tiles[y][x];
-					tile = (tile >> 1) & 0xFE;
+					tile = (map._tiles[y][x] / 2) & 0xfe;
 				}
 
 				if (tile == map._priorTileIds[oy][ox]) {
@@ -87,7 +122,7 @@ void OverworldMap::prepareMapForDrawing() {
 					}
 				}
 
-				map._mapTilesId[oy][ox] = tile / 2;
+				map._mapTilesId[oy][ox] = tile;
 			}
 		}
 
@@ -100,8 +135,7 @@ void OverworldMap::prepareMapForDrawing() {
 			for (int ox = 0; ox < Data::MAP_VISIBLE_WIDTH; ox++) {
 				uint8 x = (mapLeft + ox) & 63;
 				uint8 y = (mapTop + oy) & 63;
-				uint8 tile = map._tiles[y][x];
-				tile = (tile >> 1) & 0xFE;
+				uint8 tile = (map._tiles[y][x] / 2) & 0xfe;
 
 				if (tile == map._priorTileIds[oy][ox]) {
 					if (tile == 0) {
@@ -113,7 +147,7 @@ void OverworldMap::prepareMapForDrawing() {
 					}
 				}
 
-				map._mapTilesId[oy][ox] = tile / 2;
+				map._mapTilesId[oy][ox] = tile;
 			}
 		}
 	}
