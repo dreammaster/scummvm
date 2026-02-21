@@ -38,6 +38,11 @@ void Map::load(int mapNum) {
 	f.read(_tiles, MAP_WIDTH * MAP_HEIGHT);
 }
 
+void Map::clearTiles() {
+	Common::fill(&_mapTilesId[0][0], &_mapTilesId[0][0] + sizeof(VisibleTiles), 0);
+	Common::fill(&_priorTileIds[0][0], &_priorTileIds[0][0] + sizeof(VisibleTiles), 0);
+}
+
 } // namespace Data
 } // namespace Ultima2
 } // namespace Ultima

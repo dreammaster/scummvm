@@ -50,12 +50,13 @@ public:
 	byte _tilePlayerCenter = 0;
 	byte _tilePlayerUp = 0, _tilePlayerDown = 0,
 		_tilePlayerLeft = 0, _tilePlayerRight = 0;
-	VisibleTiles _mapTilesId = {};
-	VisibleTiles _priorTileIds = {};
+	VisibleTiles _mapTilesId = {};		// Calculated visible on-screen tiles
+	VisibleTiles _priorTileIds = {};	// Prior on-screen tiles, used to determine which to draw
 
 	const byte _flag1 = 0;
 
 	void load(int mapNum);
+	void clearTiles();
 };
 
 } // namespace Data
