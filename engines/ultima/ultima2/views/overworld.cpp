@@ -54,9 +54,11 @@ bool Overworld::msgGame(const GameMessage &msg) {
 	const auto &player = g_engine->_player;
 
 	if (msg._name == "COMMAND") {
-		_mode = kModeCommand;
-		_commands.prompt();
-		delayFrames(Data::FRAMES_BEFORE_COMMAND_TIMEOUT);
+		// Scroll the command area, and pause briefly so users can tell
+		// when multiple commands in sequence are happening
+		_mode = kModePreCommand;
+		_commands.writeString("\n");
+		delayFrames(1);
 		return true;
 	} else if (msg._name == "INFO") {
 		_commands.writeString(msg._stringValue);
@@ -79,8 +81,19 @@ bool Overworld::msgGame(const GameMessage &msg) {
 }
 
 void Overworld::timeout() {
-	if (_mode == kModeCommand) {
+	switch (_mode) {
+	case kModePreCommand:
+		// Display new command prompt
+		_mode = kModeCommand;
+		_commands.prompt();
+		delayFrames(Data::FRAMES_BEFORE_COMMAND_TIMEOUT);
+		break;
+	case kModeCommand:
+		// Timeout happened, so automatically select pass command
 		g_engine->_game.doCommand(KEYBIND_PASS);
+		break;
+	default:
+		break;
 	}
 }
 

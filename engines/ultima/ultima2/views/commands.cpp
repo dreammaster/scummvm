@@ -41,7 +41,7 @@ void Commands::writeString(const Common::String &msg) {
 }
 
 void Commands::prompt() {
-	writeString("\nCMD: ");
+	writeString("CMD: ");
 }
 
 } // namespace Views

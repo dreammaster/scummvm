@@ -32,7 +32,7 @@ namespace Ultima2 {
 namespace Views {
 
 class Overworld : public Shared::Views::View {
-	enum Mode { kModeCommand, kModeAttackDirection };
+	enum Mode { kModePreCommand, kModeCommand, kModeAttackDirection };
 private:
 	OverworldMap _map = OverworldMap(this);
 	Commands _commands = Commands(this);
