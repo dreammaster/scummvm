@@ -38,12 +38,7 @@ void Stats::draw() {
 
 	s.writeString(Common::Point(0, 1), "FOOD=");
 	if (p._food < 100) s.reverseColor();
-	s.writeString(Common::String::format("%.4d", p._hp));
-	if (p._food < 100) s.reverseColor();
-
-	s.writeString(Common::Point(0, 1), "FOOD=");
-	if (p._food < 100) s.reverseColor();
-	s.writeString(Common::String::format("%.4d", p._hp));
+	s.writeString(Common::String::format("%.4d", p._food));
 	if (p._food < 100) s.reverseColor();
 
 	s.writeString(Common::Point(0, 2), Common::String::format("EXP.=%.4d", p._experience));

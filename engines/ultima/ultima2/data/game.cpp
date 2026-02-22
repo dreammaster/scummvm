@@ -68,7 +68,7 @@ void Game::endOfTurn() {
 
 	bool foodFlag = player._foodSubCtr < 10;
 	player._foodSubCtr -= 10;
-	if (foodFlag && player._food-- == 0) {
+	if (foodFlag && --player._food == 0) {
 		dead();
 	} else {
 		g_engine->focusedView()->redraw();
