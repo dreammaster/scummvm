@@ -73,6 +73,7 @@ public:
 	byte _intelligence = 0;
 	uint16 _hp = 400;
 	uint16 _food = 400;
+	byte _foodSubCtr = 87;
 	uint16 _experience = 0;
 	uint16 _gold = 400;
 

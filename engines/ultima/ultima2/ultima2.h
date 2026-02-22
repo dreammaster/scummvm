@@ -27,6 +27,7 @@
 #include "engines/engine.h"
 #include "ultima/detection.h"
 #include "ultima/shared/early/core/events.h"
+#include "ultima/ultima2/data/game.h"
 #include "ultima/ultima2/data/map.h"
 #include "ultima/ultima2/data/player.h"
 #include "ultima/ultima2/data/tiles.h"
@@ -44,6 +45,7 @@ protected:
 	Common::Error run() override;
 
 public:
+	Data::Game _game;
 	Data::Map _map;
 	Data::Player _player;
 	Graphics::ManagedSurface _tiles[Data::TILE_COUNT];

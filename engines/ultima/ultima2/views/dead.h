@@ -19,39 +19,27 @@
  *
  */
 
-#include "common/file.h"
-#include "ultima/ultima2/data/map.h"
-#include "ultima/ultima2/ultima2.h"
+#ifndef ULTIMA2_VIEWS_DEAD_H
+#define ULTIMA2_VIEWS_DEAD_H
+
+#include "ultima/ultima2/views/view.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Data {
+namespace Views {
 
-void Map::load(int mapNum) {
-	const auto &player = g_engine->_player;
+/**
+ * Dummy view to go to when the player dies. This allows the game to know
+ * not to allow saving anymore, and to stop on-screen map animations.
+ */
+class Dead : public Shared::Views::View {
+public:
+	Dead();
+	~Dead() override {}
+};
 
-	if (mapNum == _currentMap)
-		return;
-	_currentMap = mapNum;
-
-	Common::File f;
-	if (!f.open(Common::String::format("MAPX%.2d", mapNum).c_str()))
-		error("Could not open map %d", mapNum);
-
-	f.read(_tiles, MAP_WIDTH * MAP_HEIGHT);
-
-	// Set up copies of the map position and player tile to use
-	_mapX = player._mapX;
-	_mapY = player._mapY;
-	_playerTileId = (player._class + Data::PLAYER_TILES_OFFSET) * 2;
-	clearTiles();
-}
-
-void Map::clearTiles() {
-	Common::fill(&_mapTilesId[0][0], &_mapTilesId[0][0] + sizeof(VisibleTiles), 0);
-	Common::fill(&_priorTileIds[0][0], &_priorTileIds[0][0] + sizeof(VisibleTiles), 0);
-}
-
-} // namespace Data
+} // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
+
+#endif

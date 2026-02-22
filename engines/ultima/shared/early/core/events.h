@@ -286,9 +286,10 @@ private:
 	Common::RandomSource _randomSource = Common::RandomSource("Ultima");
 
 private:
-	Graphics::Screen *_screen = nullptr;
 	Common::Stack<UIElement *> _views;
 protected:
+	Graphics::Screen *_screen = nullptr;
+
 	/**
 	 * Process an event
 	 */

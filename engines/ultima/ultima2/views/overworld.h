@@ -32,16 +32,21 @@ namespace Ultima2 {
 namespace Views {
 
 class Overworld : public Shared::Views::View {
+	enum Mode { kModeCommand, kModeAttackDirection };
 private:
 	OverworldMap _map = OverworldMap(this);
 	Commands _commands = Commands(this);
 	Stats _stats = Stats(this);
+	Mode _mode = kModeCommand;
 
 public:
 	Overworld();
 	~Overworld() override {}
 
+	void draw() override;
 	bool msgFocus(const FocusMessage &msg) override;
+	bool msgGame(const GameMessage &msg) override;
+	void timeout() override;
 };
 
 } // namespace Views

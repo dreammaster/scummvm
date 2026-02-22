@@ -23,6 +23,7 @@
 #define ULTIMA2_VIEWS_H
 
 #include "ultima/ultima2/views/create_character.h"
+#include "ultima/ultima2/views/dead.h"
 #include "ultima/ultima2/views/demo.h"
 #include "ultima/ultima2/views/overworld.h"
 #include "ultima/ultima2/views/startup.h"
@@ -34,6 +35,7 @@ namespace Views {
 
 struct Views {
 	CreateCharacter _createCharacter;
+	Dead _dead;
 	Demo _demo;
 	Overworld _overworld;
 	Startup _startup;

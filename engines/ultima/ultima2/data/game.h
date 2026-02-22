@@ -19,39 +19,54 @@
  *
  */
 
-#include "common/file.h"
-#include "ultima/ultima2/data/map.h"
-#include "ultima/ultima2/ultima2.h"
+#ifndef ULTIMA2_DATA_GAME_H
+#define ULTIMA2_DATA_GAME_H
+
+#include "ultima/ultima2/metaengine.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Data {
 
-void Map::load(int mapNum) {
-	const auto &player = g_engine->_player;
+/*
+ * The number of game frames before prompting the user for a command times out,
+ * and it's treated as a pass
+ */
+constexpr int FRAMES_BEFORE_COMMAND_TIMEOUT = 10;
 
-	if (mapNum == _currentMap)
-		return;
-	_currentMap = mapNum;
+class Game {
+private:
+	void message(const Common::String &name, const char *param = nullptr);
 
-	Common::File f;
-	if (!f.open(Common::String::format("MAPX%.2d", mapNum).c_str()))
-		error("Could not open map %d", mapNum);
+public:
+	/**
+	 * Called to start the game, both for new characters, and when a savegame is loaded
+	 */
+	void startGame();
 
-	f.read(_tiles, MAP_WIDTH * MAP_HEIGHT);
+	/**
+	 * Prompt the player for a command
+	 */
+	void promptForCommand();
 
-	// Set up copies of the map position and player tile to use
-	_mapX = player._mapX;
-	_mapY = player._mapY;
-	_playerTileId = (player._class + Data::PLAYER_TILES_OFFSET) * 2;
-	clearTiles();
-}
+	/**
+	 * Implements an in-game command
+	 */
+	void doCommand(KeybindingAction action);
 
-void Map::clearTiles() {
-	Common::fill(&_mapTilesId[0][0], &_mapTilesId[0][0] + sizeof(VisibleTiles), 0);
-	Common::fill(&_priorTileIds[0][0], &_priorTileIds[0][0] + sizeof(VisibleTiles), 0);
-}
+	/**
+	 * Called after actions are done
+	 */
+	void endOfTurn();
+
+	/**
+	 * Player has died
+	 */
+	void dead();
+};
 
 } // namespace Data
 } // namespace Ultima2
 } // namespace Ultima
+
+#endif

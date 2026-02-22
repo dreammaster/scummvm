@@ -33,16 +33,55 @@ Overworld::Overworld() : View("Overworld") {
 	_stats.setBounds(Shared::Core::TextRect(30, 20, 40, 24));
 }
 
+void Overworld::draw() {
+	// Clear map tiles so entire map is redrawn
+	auto &map = g_engine->_map;
+	map.clearTiles();
+
+	// Allow the child controls to draw
+	return View::draw();
+}
+
 bool Overworld::msgFocus(const FocusMessage &msg) {
 	const auto &player = g_engine->_player;
 	auto &map = g_engine->_map;
 	map.load(player._mapNum);
 
-	map._mapX = player._mapX;
-	map._mapY = player._mapY;
-	map._playerTileId = (player._class + Data::PLAYER_TILES_OFFSET) * 2;
-
 	return View::msgFocus(msg);
+}
+
+bool Overworld::msgGame(const GameMessage &msg) {
+	const auto &player = g_engine->_player;
+
+	if (msg._name == "COMMAND") {
+		_mode = kModeCommand;
+		_commands.prompt();
+		delayFrames(Data::FRAMES_BEFORE_COMMAND_TIMEOUT);
+		return true;
+	} else if (msg._name == "INFO") {
+		_commands.writeString(msg._stringValue);
+		return true;
+	} else if (msg._name == "DEAD") {
+		// Update the stats view immediately to reflect the deadness
+		_stats.draw();
+
+		// Add message to the commands view that the player died
+		_commands.writeString("\0x8d\0x8d\0x8d");
+		_commands.writeString(player._name);
+		_commands.writeString(" IS DEAD!");
+
+		// Switch to the invisible Dead view to freeze the screen
+		g_engine->replaceView("Dead");
+		return true;
+	}
+
+	return View::msgGame(msg);
+}
+
+void Overworld::timeout() {
+	if (_mode == kModeCommand) {
+		g_engine->_game.doCommand(KEYBIND_PASS);
+	}
 }
 
 } // namespace Views

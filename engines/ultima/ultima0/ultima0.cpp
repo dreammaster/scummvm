@@ -87,6 +87,7 @@ Ultima0Engine::~Ultima0Engine() {
 Common::Error Ultima0Engine::run() {
 	// Initialize the graphics
 	initGraphics(DEFAULT_SCX, DEFAULT_SCY);
+	_screen = new Graphics::Screen();
 	setBounds(Common::Rect(0, 0, DEFAULT_SCX, DEFAULT_SCY));
 	g_system->getPaletteManager()->setPalette(_palette);
 

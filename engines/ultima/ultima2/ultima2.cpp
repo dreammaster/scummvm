@@ -53,6 +53,7 @@ Ultima2Engine::~Ultima2Engine() {
 Common::Error Ultima2Engine::run() {
 	// Initialize the graphics
 	initGraphics(320, 200);
+	_screen = new Graphics::Screen();
 	setBounds(Common::Rect(0, 0, 320, 200));
 	g_system->getPaletteManager()->setPalette(_palette);
 
@@ -88,7 +89,7 @@ void Ultima2Engine::runGame() {
 
 	// Check for savegame
 	int saveSlot = ConfMan.getInt("save_slot");
-	if (saveSlot == -1 || g_engine->loadGameState(saveSlot).getCode() != Common::kNoError)
+	if (saveSlot == -1 || loadGameState(saveSlot).getCode() != Common::kNoError)
 		// Except when loading a savegame from the launcher, default to first screen
 		addView("Startup");
 
@@ -104,12 +105,17 @@ bool Ultima2Engine::hasFeature(EngineFeature f) const {
 }
 
 bool Ultima2Engine::canSaveGameStateCurrently(Common::U32String *msg) {
-	return focusedView()->getName() == "Game";
+	auto *view = focusedView();
+	return view && (view->getName() == "Overworld" || view->getName() == "Dungeon");
 }
 
 Common::Error Ultima2Engine::loadGameStream(Common::SeekableReadStream *stream) {
 	Common::Serializer s(stream, nullptr);
 	syncSavegame(s);
+
+	// Signal to game logic that a new game is starting
+	_game.startGame();
+
 	return Common::kNoError;
 }
 

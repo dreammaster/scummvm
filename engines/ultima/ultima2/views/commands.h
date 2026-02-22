@@ -29,11 +29,17 @@ namespace Ultima2 {
 namespace Views {
 
 class Commands : public Shared::Core::UIElement {
+private:
+	Shared::Gfx::GfxSurface _surface;
+
 public:
 	Commands(UIElement *parent) : Shared::Core::UIElement("Commands", parent) {}
 	~Commands() override {}
 
-	void draw() override;
+	bool msgFocus(const FocusMessage &msg) override;
+	void writeString(const Common::String &msg);
+
+	void prompt();
 };
 
 } // namespace Views

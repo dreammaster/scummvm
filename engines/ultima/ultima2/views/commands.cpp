@@ -25,11 +25,23 @@ namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-void Commands::draw() {
-	auto s = getSurface();
-	s.clear();
+bool Commands::msgFocus(const FocusMessage &msg) {
+	// Get a surface. We'll maintain a persistent copy to maintain
+	// the text pos across multiple calls
+	_surface = getSurface();
+	_surface.clear();
+	_surface.setTextPos(Common::Point(0, 3));
+	_surface.setScrollable(true);
 
-	s.writeString("ULTIMA ][");
+	return true;
+}
+
+void Commands::writeString(const Common::String &msg) {
+	_surface.writeString(msg);
+}
+
+void Commands::prompt() {
+	writeString("\nCMD: ");
 }
 
 } // namespace Views

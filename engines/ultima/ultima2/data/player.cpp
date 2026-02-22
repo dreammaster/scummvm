@@ -60,6 +60,7 @@ void Player::synchronize(Common::Serializer &s) {
 	syncByte(s, _intelligence);
 	syncWord(s, _hp);
 	syncWord(s, _food);
+	s.syncAsByte(_foodSubCtr);
 	s.skip(1);
 	syncWord(s, _experience);
 	syncWord(s, _gold);
@@ -70,7 +71,7 @@ void Player::synchronize(Common::Serializer &s) {
 }
 
 void Player::syncByte(Common::Serializer &s, byte &v) {
-	byte tmp = (v >> 4) | (v & 0xf);
+	byte tmp = ((v / 10) << 4) | (v % 10);
 	s.syncAsByte(tmp);
 	if (s.isLoading())
 		v = ((tmp >> 4) * 10) + (tmp & 0xf);
