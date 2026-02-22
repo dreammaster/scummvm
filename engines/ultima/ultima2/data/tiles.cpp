@@ -28,7 +28,8 @@ namespace Ultima2 {
 namespace Data {
 
 // Ultima II has 64 tiles, each 16x16 pixels in CGA Linear format
-const int TILE_DATA_OFFSET = 31808;  // Offset in ultimaii.exe where tile data starts
+const int TILE_DATA_OFFSET = 31808;
+const int TILE2_DATA_OFFSET = 21640;
 
 const Common::ArchiveMemberPtr Tiles::getMember(const Common::Path &path) const {
 	if (!hasFile(path))
@@ -52,6 +53,9 @@ Common::SeekableReadStream *Tiles::createReadStreamForMember(const Common::Path 
 
 	// Process each tile
 	for (int tileNumber = 0; tileNumber < TILE_COUNT; tileNumber++) {
+		if (tileNumber == (TILE_COUNT - 1))
+			f.seek(TILE2_DATA_OFFSET);
+
 		byte tileW = f.readByte() * 4;
 		byte tileH = f.readByte();
 		assert(tileW == TILE_WIDTH && tileH == TILE_HEIGHT);

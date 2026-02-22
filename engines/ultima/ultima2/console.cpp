@@ -39,10 +39,10 @@ Console::~Console() {
 bool Console::cmdTiles(int argc, const char **argv) {
 	const auto &tiles = g_engine->_tiles;
 	Graphics::Screen *screen = g_engine->getScreen();
-	screen->fillRect(Common::Rect(0, 0, (Data::TILE_WIDTH + 2) * 16, (Data::TILE_HEIGHT + 2) * 4), 1);
+	screen->fillRect(Common::Rect(0, 0, (Data::TILE_WIDTH + 2) * 16, (Data::TILE_HEIGHT + 2) * 5), 1);
 
-	for (int y = 0; y < 4; ++y) {
-		for (int x = 0; x < 16; ++x) {
+	for (int y = 0; y < 5; ++y) {
+		for (int x = 0; x < (y == 4 ? 1 : 16); ++x) {
 			screen->blitFrom(tiles[y * 16 + x],
 				Common::Point(x * (Data::TILE_WIDTH + 2) + 1, y * (Data::TILE_HEIGHT + 2) + 1));
 		}
