@@ -22,7 +22,7 @@
 #ifndef ULTIMA2_DATA_GAME_H
 #define ULTIMA2_DATA_GAME_H
 
-#include "ultima/ultima2/metaengine.h"
+#include "common/str.h"
 
 namespace Ultima {
 namespace Ultima2 {
@@ -35,9 +35,6 @@ namespace Data {
 constexpr int FRAMES_BEFORE_COMMAND_TIMEOUT = 10;
 
 class Game {
-private:
-	void message(const Common::String &name, const char *param = nullptr);
-
 public:
 	/**
 	 * Called to start the game, both for new characters, and when a savegame is loaded
@@ -52,7 +49,7 @@ public:
 	/**
 	 * Implements an in-game command
 	 */
-	void doCommand(KeybindingAction action);
+	void doCommand(int action);
 
 	/**
 	 * Called after actions are done
@@ -60,9 +57,19 @@ public:
 	void endOfTurn();
 
 	/**
+	 * Remove HP from the player
+	 */
+	void subtractHp(int amount);
+
+	/**
 	 * Player has died
 	 */
 	void dead();
+
+	/**
+	 * Triggers a message to the game view
+	 */
+	void message(const Common::String &name, const char *param = nullptr);
 };
 
 } // namespace Data

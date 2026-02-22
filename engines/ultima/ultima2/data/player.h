@@ -81,6 +81,8 @@ public:
 	byte _mapY = 20;
 	byte _field3E = 0xff;
 
+	bool _hasRing = false;
+
 	void synchronize(Common::Serializer &s);
 };
 

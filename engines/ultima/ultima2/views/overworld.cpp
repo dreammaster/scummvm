@@ -21,6 +21,7 @@
 
 #include "ultima/ultima2/views/overworld.h"
 #include "ultima/ultima2/ultima2.h"
+#include "ultima/ultima2/metaengine.h"
 #include "ultima/shared/early/core/rect.h"
 
 namespace Ultima {
@@ -95,6 +96,21 @@ void Overworld::timeout() {
 	default:
 		break;
 	}
+}
+
+bool Overworld::msgAction(const ActionMessage &msg) {
+	auto &game = g_engine->_game;
+
+	// Stop command timeout
+	cancelDelay();
+
+	if (_mode == kModeAttackDirection) {
+		// TODO
+	} else {
+		game.doCommand(msg._action);
+	}
+
+	return true;
 }
 
 } // namespace Views

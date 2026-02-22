@@ -68,6 +68,8 @@ void Player::synchronize(Common::Serializer &s) {
 
 	syncByte(s, _mapX);
 	syncByte(s, _mapY);
+
+	s.syncAsByte(_hasRing);
 }
 
 void Player::syncByte(Common::Serializer &s, byte &v) {

@@ -21,6 +21,7 @@
 
 #include "ultima/ultima2/data/game.h"
 #include "ultima/ultima2/ultima2.h"
+#include "ultima/ultima2/metaengine.h"
 
 namespace Ultima {
 namespace Ultima2 {
@@ -29,11 +30,10 @@ namespace Data {
 void Game::startGame() {
 	const auto &player = g_engine->_player;
 
-	if ((player._mapNum % 10) < 4)
-		// Planet overworld or town map
-		g_engine->replaceView("Overworld");
-	else
+	if (IS_DUNGEON(player._mapNum))
 		g_engine->replaceView("Dungeon");
+	else
+		g_engine->replaceView("Overworld");
 
 	promptForCommand();
 }
@@ -49,11 +49,14 @@ void Game::promptForCommand() {
 	g_engine->focusedView()->send(GameMessage("COMMAND"));
 }
 
-void Game::doCommand(KeybindingAction action) {
+void Game::doCommand(int action) {
 	switch (action) {
 	case KEYBIND_PASS:
 		message("INFO", "PASS");
 		break;
+
+	case KEYBIND_UP:
+
 
 	default:
 		message("INFO", "-ILLEGAL COMMAND!");
@@ -65,6 +68,8 @@ void Game::doCommand(KeybindingAction action) {
 
 void Game::endOfTurn() {
 	auto &player = g_engine->_player;
+	if (player._hp == 0)
+		return;		// Already dead
 
 	bool foodFlag = player._foodSubCtr < 10;
 	player._foodSubCtr -= 10;
@@ -74,6 +79,14 @@ void Game::endOfTurn() {
 		g_engine->focusedView()->redraw();
 		promptForCommand();
 	}
+}
+
+void Game::subtractHp(int amount) {
+	auto &player = g_engine->_player;
+	player._hp = MAX((int)player._hp - amount, 0);
+
+	if (player._hp == 0)
+		dead();
 }
 
 void Game::dead() {

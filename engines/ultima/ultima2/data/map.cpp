@@ -52,6 +52,31 @@ void Map::clearTiles() {
 	Common::fill(&_priorTileIds[0][0], &_priorTileIds[0][0] + sizeof(VisibleTiles), 0);
 }
 
+bool Map::canMoveToTile(int tileNum) {
+	auto &game = g_engine->_game;
+	const auto &player = g_engine->_player;
+	int tileId = (tileNum & 0x7f) / 2;
+
+	if (IS_PLANET(player._mapNum) || (_mapX < Data::MAP_WIDTH && _mapY < Data::MAP_HEIGHT)) {
+		if (tileId == kTileSwamp) {
+			game.subtractHp(5);
+		} else if (tileId == kTileForcefield) {
+			if (player._hasRing) {
+				game.message("INFO", "\x8D""FIELD CAUSES 1000 DAMAGE!");
+				// TODO
+
+				game.subtractHp(1000);
+			} else {
+				// TODO
+			}
+		}
+	} else {
+		// TODO
+	}
+
+	return true;
+}
+
 } // namespace Data
 } // namespace Ultima2
 } // namespace Ultima
