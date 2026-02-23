@@ -451,7 +451,7 @@ public:
 	 * This shouldn't normally be used directly, since it freezes the
 	 * entire event loop and screen updates.
 	 */
-	void pauseMillis(uint millis);
+	void pauseMillis(uint millis = 10);
 };
 
 extern Events *g_events;

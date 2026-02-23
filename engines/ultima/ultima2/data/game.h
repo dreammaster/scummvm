@@ -57,6 +57,11 @@ public:
 	void endOfTurn();
 
 	/**
+	 * Subtract food fraction from the player
+	 */
+	void subtractFoodCtr(int amount);
+
+	/**
 	 * Remove HP from the player
 	 */
 	void subtractHp(int amount);

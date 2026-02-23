@@ -70,6 +70,10 @@ void Player::synchronize(Common::Serializer &s) {
 	syncByte(s, _mapY);
 
 	s.syncAsByte(_hasRing);
+
+	if (s.isLoading()) {
+		_paralyzedFlag = 0;
+	}
 }
 
 void Player::syncByte(Common::Serializer &s, byte &v) {

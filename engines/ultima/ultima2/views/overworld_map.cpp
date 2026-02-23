@@ -174,7 +174,7 @@ void OverworldMap::flashCircle(int deltaX, int deltaY) {
 	g_engine->getScreen()->update();
 
 	// Brief pause
-	g_engine->pauseMillis(10);
+	g_engine->pauseMillis();
 
 	// Remove it
 	s.xorBlitFrom(g_engine->_tiles[Data::kTileCircle], pt);

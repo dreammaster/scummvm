@@ -57,24 +57,56 @@ bool Map::canMoveToTile(int tileNum) {
 	const auto &player = g_engine->_player;
 	int tileId = (tileNum & 0x7f) / 2;
 
-	if (IS_PLANET(player._mapNum) || (_mapX < Data::MAP_WIDTH && _mapY < Data::MAP_HEIGHT)) {
+	if (IS_PLANET(player._mapNum) || ((uint)_mapX < Data::MAP_WIDTH && (uint)_mapY < Data::MAP_HEIGHT)) {
+		// Within the bounds of the map
 		if (tileId == kTileSwamp) {
 			game.subtractHp(5);
 		} else if (tileId == kTileForcefield) {
 			if (player._hasRing) {
 				game.message("INFO", "\x8D""FIELD CAUSES 1000 DAMAGE!");
-				// TODO
+				game.message("CIRCLE");		// Flash damage circle
 
 				game.subtractHp(1000);
 			} else {
-				// TODO
+				game.message("INFO", "RING PROTECTS FROM FIELD!");
+				g_engine->pauseMillis();
 			}
+		}
+
+		// Check paralyzed
+		if (player._paralyzedFlag) {
+			game.message("INFO", "--PARALIZED!");
+			return true;
+		}
+
+		switch (_playerTileId / 2) {
+		case kTileRocket * 2:
+			return true;
+		case kTileAirplane:
+			// TODO
+			error("TODO: airplane");
+			break;
+		case kTileShip:
+			if (tileId != kTileWater)
+				return true;
+
+			goto update_xy;
+		case kTileHorse:
+			// TODO
+			break;
+		default:
+			// TODO
+			break;
 		}
 	} else {
 		// TODO
 	}
 
-	return true;
+update_xy:
+	_mapX &= 63;
+	_mapY &= 63;
+
+	return false;
 }
 
 } // namespace Data

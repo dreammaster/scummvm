@@ -68,17 +68,23 @@ void Game::doCommand(int action) {
 
 void Game::endOfTurn() {
 	auto &player = g_engine->_player;
-	if (player._hp == 0)
-		return;		// Already dead
 
-	bool foodFlag = player._foodSubCtr < 10;
-	player._foodSubCtr -= 10;
-	if (foodFlag && --player._food == 0) {
-		dead();
-	} else {
+	subtractFoodCtr(10);
+	if (!player.isDead()) {
 		g_engine->focusedView()->redraw();
 		promptForCommand();
 	}
+}
+
+void Game::subtractFoodCtr(int amount) {
+	auto &player = g_engine->_player;
+	if (player._hp == 0)
+		return;		// Already dead
+
+	bool foodFlag = player._foodSubCtr < amount;
+	player._foodSubCtr -= amount;
+	if (foodFlag && --player._food == 0)
+		dead();
 }
 
 void Game::subtractHp(int amount) {

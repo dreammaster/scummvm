@@ -83,7 +83,13 @@ public:
 
 	bool _hasRing = false;
 
+	// Runtime only fields
+	byte _paralyzedFlag = 0;
+
 	void synchronize(Common::Serializer &s);
+	bool isDead() const {
+		return _hp > 0;
+	}
 };
 
 } // namespace Data
