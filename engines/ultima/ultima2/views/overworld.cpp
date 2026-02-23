@@ -76,6 +76,18 @@ bool Overworld::msgGame(const GameMessage &msg) {
 		// Switch to the invisible Dead view to freeze the screen
 		g_engine->replaceView("Dead");
 		return true;
+	} else if (msg._name == "CIRCLE") {
+		if (msg._stringValue == "UP")
+			_map.flashCircle(0, -1);
+		else if (msg._stringValue == "DOWN")
+			_map.flashCircle(0, 1);
+		else if (msg._stringValue == "LEFT")
+			_map.flashCircle(-1, 0);
+		else if (msg._stringValue == "RIGHT")
+			_map.flashCircle(1, 0);
+		else
+			_map.flashCircle(0, 0);
+		return true;
 	}
 
 	return View::msgGame(msg);

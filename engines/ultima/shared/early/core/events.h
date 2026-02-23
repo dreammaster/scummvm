@@ -445,6 +445,13 @@ public:
 	uint getRandomNumber(uint minVal, uint maxVal) {
 		return _randomSource.getRandomNumber(maxVal - minVal) + minVal;
 	}
+
+	/**
+	 * Delays by a given number of milliseconds.
+	 * This shouldn't normally be used directly, since it freezes the
+	 * entire event loop and screen updates.
+	 */
+	void pauseMillis(uint millis);
 };
 
 extern Events *g_events;

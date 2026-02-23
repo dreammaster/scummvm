@@ -69,6 +69,8 @@ public:
 	void setScrollable(bool scrollable) {
 		_scrollable = scrollable;
 	}
+
+	void xorBlitFrom(const ManagedSurface &src, const Common::Point &destPos);
 };
 
 } // namespace Gfx

@@ -164,6 +164,24 @@ void OverworldMap::prepareMapForDrawing() {
 	map._mapTilesId[Data::MAP_VISIBLE_CENTER_Y][Data::MAP_VISIBLE_CENTER_X] = map._playerTileId;
 }
 
+void OverworldMap::flashCircle(int deltaX, int deltaY) {
+	Common::Point pt((Data::MAP_VISIBLE_CENTER_X + deltaX) * Data::TILE_WIDTH,
+		(Data::MAP_VISIBLE_CENTER_Y + deltaY) * Data::TILE_HEIGHT);
+	auto s = getSurface();
+
+	// Show the circle
+	s.xorBlitFrom(g_engine->_tiles[Data::kTileCircle], pt);
+	g_engine->getScreen()->update();
+
+	// Brief pause
+	g_engine->pauseMillis(10);
+
+	// Remove it
+	s.xorBlitFrom(g_engine->_tiles[Data::kTileCircle], pt);
+	g_engine->getScreen()->update();
+}
+
+
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima

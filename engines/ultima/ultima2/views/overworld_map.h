@@ -40,6 +40,11 @@ public:
 	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
 	void timeout() override;
+
+	/**
+	 * Flash a circle at a specified tile delta to the map center
+	 */
+	void flashCircle(int deltaX, int deltaY);
 };
 
 } // namespace Views

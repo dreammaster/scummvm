@@ -198,6 +198,10 @@ Gfx::GfxSurface Events::createSurface(const Common::Rect &bounds) const {
 	return Gfx::GfxSurface(*g_events->getScreen(), bounds);
 }
 
+void Events::pauseMillis(uint millis) {
+	g_system->delayMillis(millis);
+}
+
 /*------------------------------------------------------------------------*/
 
 Bounds::Bounds(Common::Rect &innerBounds) :
