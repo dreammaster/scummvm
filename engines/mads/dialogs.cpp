@@ -26,9 +26,6 @@
 #include "mads/screen.h"
 #include "mads/msurface.h"
 #include "mads/nebular/dialogs_nebular.h"
-#ifdef ENABLE_MADSV2
-#include "mads/phantom/dialogs_phantom.h"
-#endif
 
 namespace MADS {
 
@@ -458,8 +455,6 @@ Dialogs *Dialogs::init(MADSEngine *vm) {
 	case GType_RexNebular:
 		return new Nebular::DialogsNebular(vm);
 #ifdef ENABLE_MADSV2
-	case GType_Phantom:
-		return new Phantom::DialogsPhantom(vm);
 	case GType_Dragonsphere:
 		// return new DragonSphere::DialogsDragonSphere(vm);
 	case GType_Forest:

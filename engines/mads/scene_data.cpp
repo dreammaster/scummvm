@@ -29,7 +29,6 @@
 #ifdef ENABLE_MADSV2
 #include "mads/dragonsphere/dragonsphere_scenes.h"
 #include "mads/forest/forest_scenes.h"
-#include "mads/phantom/phantom_scenes.h"
 #endif
 
 namespace MADS {
@@ -122,7 +121,7 @@ SceneInfo *SceneInfo::init(MADSEngine *vm) {
 	case GType_Dragonsphere:
 		return new Dragonsphere::SceneInfoDragonsphere(vm);
 	case GType_Phantom:
-		return new Phantom::SceneInfoPhantom(vm);
+		return nullptr; // new Phantom::SceneInfoPhantom(vm);
 	case GType_Forest:
 		return new Forest::SceneInfoForest(vm);
 #endif

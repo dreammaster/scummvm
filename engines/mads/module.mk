@@ -59,16 +59,7 @@ MODULE_OBJS += \
 	forest/game_forest.o \
 	forest/forest_scenes.o \
 	forest/globals_forest.o \
-	phantom/dialogs_phantom.o \
-	phantom/game_phantom.o \
-	phantom/globals_phantom.o \
-	phantom/menu_phantom.o \
-	phantom/phantom_scenes.o \
-	phantom/phantom_scenes1.o \
-	phantom/phantom_scenes2.o \
-	phantom/phantom_scenes3.o \
-	phantom/phantom_scenes4.o \
-	phantom/phantom_scenes5.o
+	madsv2/phantom/main_menu.o
 endif
 
 # This module can be built as a plugin
