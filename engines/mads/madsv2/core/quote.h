@@ -19,36 +19,29 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MAIN_MENU_H
-#define MADS_PHANTOM_MAIN_MENU_H
+#ifndef MADS_CORE_QUOTE_H
+#define MADS_CORE_QUOTE_H
 
-#include "common/str.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
 
-#define COMMAND_LINE_MAX        10
+#define QUOTE_MAX_LIST_LENGTH           200
 
-#define FRAME_RATE              1
-#define MENU_FRAME_RATE         3
+extern int quote_emergency;
 
-#define NUM_MENU_ITEMS          7
+/* quote_1.c */
+char *quote_load(int quote_id, ...);
 
-#define MENU_APPEARING          0
-#define MENU_ACCEPTING_COMMANDS 1
-#define MENU_DISAPPEARING       2
+/* quote_2.c */
+char *quote_string(const char *quote_list, int quote_id);
 
-#define MENU_HIGH_SPRITE        15
+/* quote_3.c */
+void quote_split_string(char *source,
+	char *target1,
+	char *target2);
 
-
-typedef struct {
-	int handle;           /* Sprite series handle */
-	int active;           /* Menu item is active  */
-	int status;           /* Current status       */
-} MenuItem;
-
-} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 

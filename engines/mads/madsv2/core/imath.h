@@ -19,36 +19,29 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MAIN_MENU_H
-#define MADS_PHANTOM_MAIN_MENU_H
+#ifndef MADS_CORE_IMATH_H
+#define MADS_CORE_IMATH_H
 
-#include "common/str.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
 
-#define COMMAND_LINE_MAX        10
-
-#define FRAME_RATE              1
-#define MENU_FRAME_RATE         3
-
-#define NUM_MENU_ITEMS          7
-
-#define MENU_APPEARING          0
-#define MENU_ACCEPTING_COMMANDS 1
-#define MENU_DISAPPEARING       2
-
-#define MENU_HIGH_SPRITE        15
+/*
+/* imath_1.asm: integer math routines out of the MPS libraries
+*/
+int  imath_distance(int side_a, int side_b, int threshold);
+int  imath_hypot(int side_a, int side_b);
+word imath_isqrt(long square);
 
 
-typedef struct {
-	int handle;           /* Sprite series handle */
-	int active;           /* Menu item is active  */
-	int status;           /* Current status       */
-} MenuItem;
+/* imath_2.c */
+void imath_circular_arc(word *buffer, int radius);
 
-} // namespace Phantom
+
+/* imath_3.c */
+int imath_random(int from, int unto);
+
 } // namespace MADSV2
 } // namespace MADS
 

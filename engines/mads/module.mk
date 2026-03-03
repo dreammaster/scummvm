@@ -59,6 +59,7 @@ MODULE_OBJS += \
 	forest/game_forest.o \
 	forest/forest_scenes.o \
 	forest/globals_forest.o \
+	madsv2/core/speech.o \
 	madsv2/phantom/main_menu.o
 endif
 

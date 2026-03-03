@@ -19,36 +19,25 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MAIN_MENU_H
-#define MADS_PHANTOM_MAIN_MENU_H
+#ifndef MADS_CORE_LIB_H
+#define MADS_CORE_LIB_H
 
-#include "common/str.h"
+#include "common/scummsys.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
 
-#define COMMAND_LINE_MAX        10
+#define lib_version          "4.35"
+#define lib_date             "10-Aug-93"
 
-#define FRAME_RATE              1
-#define MENU_FRAME_RATE         3
+#ifndef lib_data_segment
+extern char mads_dev_lib_version[5];
+extern char mads_dev_lib_date[11];
+#endif
 
-#define NUM_MENU_ITEMS          7
+/* lib.c */
+void lib_show_version(void);
 
-#define MENU_APPEARING          0
-#define MENU_ACCEPTING_COMMANDS 1
-#define MENU_DISAPPEARING       2
-
-#define MENU_HIGH_SPRITE        15
-
-
-typedef struct {
-	int handle;           /* Sprite series handle */
-	int active;           /* Menu item is active  */
-	int status;           /* Current status       */
-} MenuItem;
-
-} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 

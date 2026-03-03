@@ -19,36 +19,18 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MAIN_MENU_H
-#define MADS_PHANTOM_MAIN_MENU_H
+#ifndef MADS_CORE_SOUND_H
+#define MADS_CORE_SOUND_H
 
-#include "common/str.h"
+#include "common/scummsys.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
 
-#define COMMAND_LINE_MAX        10
+constexpr int sound_board_roland = 1;
 
-#define FRAME_RATE              1
-#define MENU_FRAME_RATE         3
+extern void sound_queue(int soundNum);
 
-#define NUM_MENU_ITEMS          7
-
-#define MENU_APPEARING          0
-#define MENU_ACCEPTING_COMMANDS 1
-#define MENU_DISAPPEARING       2
-
-#define MENU_HIGH_SPRITE        15
-
-
-typedef struct {
-	int handle;           /* Sprite series handle */
-	int active;           /* Menu item is active  */
-	int status;           /* Current status       */
-} MenuItem;
-
-} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 

@@ -19,36 +19,33 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MAIN_MENU_H
-#define MADS_PHANTOM_MAIN_MENU_H
+#ifndef MADS_CORE_HEAP_H
+#define MADS_CORE_HEAP_H
 
-#include "common/str.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
-
-#define COMMAND_LINE_MAX        10
-
-#define FRAME_RATE              1
-#define MENU_FRAME_RATE         3
-
-#define NUM_MENU_ITEMS          7
-
-#define MENU_APPEARING          0
-#define MENU_ACCEPTING_COMMANDS 1
-#define MENU_DISAPPEARING       2
-
-#define MENU_HIGH_SPRITE        15
-
 
 typedef struct {
-	int handle;           /* Sprite series handle */
-	int active;           /* Menu item is active  */
-	int status;           /* Current status       */
-} MenuItem;
+	byte module;		/* Identifier for heap module   */
+	byte destruct;		/* Flag if can be destroyed     */
+	char *base;			/* Base memory pointer for heap */
+	char *marker;		/* Pointer to free area         */
+	long base_size;		/* Original size of the heap    */
+	long size;			/* Free space remaining         */
+} Heap;
 
-} // namespace Phantom
+/* heap_1.c */
+int heap_create(Heap *heap, int module_id,
+	long heap_size, char *heap_name);
+void heap_destroy(Heap *heap);
+void heap_declare(Heap *heap, int module_id,
+	char *buffer, long heap_size);
+
+/* heap_1.c */
+void *heap_get(Heap *heap, long size);
+
 } // namespace MADSV2
 } // namespace MADS
 

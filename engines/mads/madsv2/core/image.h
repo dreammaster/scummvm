@@ -19,36 +19,31 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MAIN_MENU_H
-#define MADS_PHANTOM_MAIN_MENU_H
+#ifndef MADS_CORE_IMAGE_H
+#define MADS_CORE_IMAGE_H
 
-#include "common/str.h"
+#include "common/scummsys.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
 
-#define COMMAND_LINE_MAX        10
+struct ImageBuf {
+	int  flags;         /* refers to the index of the corresponding frame in the anim struct */
+	/* ^^ only true for images which have been anim_loaded...            */
+	/* anim_view dumps these images into lists using flags to tell       */
+	/* when they should be put; the flags then become actual flags       */
+	/* like IMAGE_INCOMING, IMAGE_STATIC, or about to be erased, or ...  */
+	byte segment_id;    /* i'm a part of this segment                                        */
+	byte series_id;     /* this is my series                                                 */
+	int  sprite_id;     /* sprite within the series                                          */
+	int  x, y;
+	byte depth;
+	byte scale;
+};
 
-#define FRAME_RATE              1
-#define MENU_FRAME_RATE         3
+typedef struct ImageBuf Image;
+typedef Image *ImagePtr;
 
-#define NUM_MENU_ITEMS          7
-
-#define MENU_APPEARING          0
-#define MENU_ACCEPTING_COMMANDS 1
-#define MENU_DISAPPEARING       2
-
-#define MENU_HIGH_SPRITE        15
-
-
-typedef struct {
-	int handle;           /* Sprite series handle */
-	int active;           /* Menu item is active  */
-	int status;           /* Current status       */
-} MenuItem;
-
-} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 

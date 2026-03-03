@@ -19,36 +19,32 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MAIN_MENU_H
-#define MADS_PHANTOM_MAIN_MENU_H
+#ifndef MADS_CORE_SPEECH_H
+#define MADS_CORE_SPEECH_H
 
-#include "common/str.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
 
-#define COMMAND_LINE_MAX        10
+struct SpeechBuffer {
+	int sample_rate;
+	int decompress_size;
+};
 
-#define FRAME_RATE              1
-#define MENU_FRAME_RATE         3
+typedef void *SpeechDirPtr;
 
-#define NUM_MENU_ITEMS          7
+extern bool speech_system_active;
+extern bool speech_on;
+extern int speech_ems_handle;
+extern SpeechBuffer speech_main_buffer;
 
-#define MENU_APPEARING          0
-#define MENU_ACCEPTING_COMMANDS 1
-#define MENU_DISAPPEARING       2
+extern SpeechDirPtr speech_load(const char *resName, int id, bool);
+extern void speech_ems_play(const char *resName, int id);
+extern void speech_all_off();
+extern void speech_sample_rate(int rate);
+extern void speech_ems_go(int handle, int size);
 
-#define MENU_HIGH_SPRITE        15
-
-
-typedef struct {
-	int handle;           /* Sprite series handle */
-	int active;           /* Menu item is active  */
-	int status;           /* Current status       */
-} MenuItem;
-
-} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 

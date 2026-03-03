@@ -19,36 +19,28 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MAIN_MENU_H
-#define MADS_PHANTOM_MAIN_MENU_H
+#ifndef MADS_CORE_CYCLE_H
+#define MADS_CORE_CYCLE_H
 
-#include "common/str.h"
+#include "mads/madsv2/core/color.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
 
-#define COMMAND_LINE_MAX        10
+extern Palette cycling_palette;         /* Palette being used for cycling */
 
-#define FRAME_RATE              1
-#define MENU_FRAME_RATE         3
+extern CycleList cycle_list;            /* List of cycles being performed */
+extern int cycling_active;              /* Flag if cycling active         */
+extern int cycling_delay;               /* Cycling delay countdown        */
+extern int cycling_threshold;           /* Cycling reset threshold        */
+extern int total_cycle_colors;          /* Total # of colors being cycled */
 
-#define NUM_MENU_ITEMS          7
+extern long cycle_timing[COLOR_MAX_CYCLES];     /* Timing for each cycle  */
 
-#define MENU_APPEARING          0
-#define MENU_ACCEPTING_COMMANDS 1
-#define MENU_DISAPPEARING       2
+/* cycle_1.c */
+void cycle_init(CycleListPtr new_cycle_list, int activate);
+void cycle_colors(void);
 
-#define MENU_HIGH_SPRITE        15
-
-
-typedef struct {
-	int handle;           /* Sprite series handle */
-	int active;           /* Menu item is active  */
-	int status;           /* Current status       */
-} MenuItem;
-
-} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 

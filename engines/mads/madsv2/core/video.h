@@ -19,36 +19,41 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MAIN_MENU_H
-#define MADS_PHANTOM_MAIN_MENU_H
+#ifndef MADS_CORE_VIDEO_H
+#define MADS_CORE_VIDEO_H
 
-#include "common/str.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
 
-#define COMMAND_LINE_MAX        10
+int video_mode;
 
-#define FRAME_RATE              1
-#define MENU_FRAME_RATE         3
+/* video.asm */
+void video_init(int mode, int set_mode);
 
-#define NUM_MENU_ITEMS          7
+void video_update(Buffer *from, int from_x, int from_y,
+	int unto_x, int unto_y,
+	int size_x, int size_y);
 
-#define MENU_APPEARING          0
-#define MENU_ACCEPTING_COMMANDS 1
-#define MENU_DISAPPEARING       2
-
-#define MENU_HIGH_SPRITE        15
+void video_flush_ega(int start_y, int size_y);
 
 
-typedef struct {
-	int handle;           /* Sprite series handle */
-	int active;           /* Menu item is active  */
-	int status;           /* Current status       */
-} MenuItem;
 
-} // namespace Phantom
+/* Mode-specific versions */
+
+void video_update_vga(Buffer *from, int from_x, int from_y,
+	int unto_x, int unto_y,
+	int size_x, int size_y);
+
+void video_update_ega(Buffer *from, int from_x, int from_y,
+	int unto_x, int unto_y,
+	int size_x, int size_y);
+
+void video_update_tandy(Buffer *from, int from_x, int from_y,
+	int unto_x, int unto_y,
+	int size_x, int size_y);
+
 } // namespace MADSV2
 } // namespace MADS
 
