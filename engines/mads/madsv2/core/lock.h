@@ -19,40 +19,46 @@
  *
  */
 
-#ifndef MADS_CORE_VIDEO_H
-#define MADS_CORE_VIDEO_H
+#ifndef MADS_CORE_LOCK_H
+#define MADS_CORE_LOCK_H
 
 #include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern int video_mode;
+extern char *lock_program_name;
+extern char *lock_search_mark;
+extern int  lock_search_length;
+extern word *lock_hash_value;
 
-/* video.asm */
-void video_init(int mode, int set_mode);
+/* lock_2.cpp */
+word lock_get_disk_hash(void);
 
-void video_update(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+/* lock_3.cpp */
+long lock_search_hash_offset(void);
 
-void video_flush_ega(int start_y, int size_y);
+/* lock_4.cpp */
+void lock_write_new_hash(void);
 
+/* lock_5.cpp */
+int lock_get_copy_code(void);
 
+/* lock_6.cpp */
+void lock_short_protection_check(void);
 
-/* Mode-specific versions */
+/* lock_7.cpp */
+int  lock_verification(void);
+void lock_sabotage(void);
 
-void video_update_vga(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+/* lock_8.cpp */
+void lock_long_protection_check(void);
 
-void video_update_ega(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+/* lock_9.cpp */
+void lock_secret_protection_check(void);
 
-void video_update_tandy(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+/* lock_a.cpp */
+void lock_preliminary_check(void);
 
 } // namespace MADSV2
 } // namespace MADS

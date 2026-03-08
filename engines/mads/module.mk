@@ -60,6 +60,14 @@ MODULE_OBJS += \
 	forest/forest_scenes.o \
 	forest/globals_forest.o \
 	madsv2/engine.o \
+	madsv2/core/kernel_3.o \
+	madsv2/core/kernel_8.o \
+	madsv2/core/kernel_b.o \
+	madsv2/core/kernel_d.o \
+	madsv2/core/kernel_f.o \
+	madsv2/core/matte_1.o \
+	madsv2/core/mouse_1.o \
+	madsv2/core/mouse_2.o \
 	madsv2/core/speech.o \
 	madsv2/phantom/mads/mads.o \
 	madsv2/phantom/main_menu.o \

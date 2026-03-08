@@ -134,6 +134,16 @@ typedef struct {                        /* Video buffer structure         */
 
 #define sgn_in(x,s) ( ((s) >= 0) ? (x) : (neg(x)) )            /* Incorporate sign */
 
+inline void mads_strupr(char *s) {
+	for (; *s; ++s)
+		*s = toupper(*s);
+}
+
+inline void mads_strlwr(char *s) {
+	for (; *s; ++s)
+		*s = tolower(*s);
+}
+
 } // namespace MADSV2
 } // namespace MADS
 

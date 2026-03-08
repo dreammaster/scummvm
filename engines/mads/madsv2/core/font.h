@@ -51,7 +51,7 @@ extern FontPtr font_menu;               /* Font handle for menu stuff      */
 extern FontPtr font_misc;               /* Font handle for symbols & icons */
 
 /* font_1.cpp */
-FontPtr font_load(char *name);
+FontPtr font_load(const char *name);
 
 /* font_2.cpp */
 int font_write(FontPtr font, Buffer *target,

@@ -19,40 +19,20 @@
  *
  */
 
-#ifndef MADS_CORE_VIDEO_H
-#define MADS_CORE_VIDEO_H
-
-#include "mads/madsv2/core/general.h"
+#ifndef MADS_CORE_KERNEL_N_H
+#define MADS_CORE_KERNEL_N_H
 
 namespace MADS {
 namespace MADSV2 {
 
-extern int video_mode;
-
-/* video.asm */
-void video_init(int mode, int set_mode);
-
-void video_update(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_flush_ega(int start_y, int size_y);
-
-
-
-/* Mode-specific versions */
-
-void video_update_vga(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_ega(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_tandy(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+extern void kernel_random_messages_init(int max_messages_at_once,
+	int min_x, int max_x, int min_y, int max_y, int min_y_spacing,
+	int teletype_rate, int color, int duration, int quote_id, ...);
+extern int  kernel_check_random(void);
+extern void kernel_random_message_server(void);
+extern int kernel_generate_random_message(int chance_major,
+	int chance_minor);
+extern void kernel_random_purge(void);
 
 } // namespace MADSV2
 } // namespace MADS

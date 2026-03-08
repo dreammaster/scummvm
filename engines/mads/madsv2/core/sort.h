@@ -19,40 +19,22 @@
  *
  */
 
-#ifndef MADS_CORE_VIDEO_H
-#define MADS_CORE_VIDEO_H
+#ifndef MADS_CORE_SORT_H
+#define MADS_CORE_SORT_H
 
 #include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern int video_mode;
+/* sort_1.cpp */
+extern void sort_insertion(int elements, int *id, long *value);
 
-/* video.asm */
-void video_init(int mode, int set_mode);
+/* sort_2.cpp */
+extern void sort_insertion_16(int elements, byte *id, word *value);
 
-void video_update(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_flush_ega(int start_y, int size_y);
-
-
-
-/* Mode-specific versions */
-
-void video_update_vga(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_ega(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_tandy(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+/* sort_3.cpp */
+extern void fastcall sort_insertion_8(int elements, byte *id, byte *value);
 
 } // namespace MADSV2
 } // namespace MADS

@@ -19,10 +19,10 @@
  *
  */
 
-#ifndef MADS_CORE_SPEECH_H
-#define MADS_CORE_SPEECH_H
+#ifndef MADS_CORE_SCREEN_H
+#define MADS_CORE_SCREEN_H
 
-#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/window.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -76,76 +76,75 @@ extern Buffer  scr_live;
 
 extern Window     screen_active;
 
-/* screen_1.c */
+/* screen_1.cpp */
 void  screen_set_size(short numlines);
 
-/* screen_2.c */
+/* screen_2.cpp */
 void  screen_wipe_line(short ul_x, short ul_y, short len,
 	short wipe_color, byte wipe_char);
 
-/* screen_3.c */
+/* screen_3.cpp */
 short screen_out(char *outstring, short strcolor,
 	short selcolor, short str_x, short str_y);
 
-/* screen_4.c */
+/* screen_4.cpp */
 short screen_put(char *outstring,
 	short strcolor, short selcolor,
 	short str_x, short str_y);
 
-/* screen_5.c */
+/* screen_5.cpp */
 void  screen_set_colors(int normal_color, int hilite_color);
 void  screen_set_line_width(int line_width);
 
 /* screen_6.c ... DO NOT USE */
 short screen_show(char *outstring, short locx, short locy);
 
-/* screen_7.c */
+/* screen_7.cpp */
 short screen_show_line(char *outstring,
 	short locx, short locy);
 
-/* screen_8.c */
+/* screen_8.cpp */
 short screen_write(char *outstring);
 
-/* screen_9.c */
+/* screen_9.cpp */
 short screen_write_line(char *outstring);
 
-/* screen_a.c */
+/* screen_a.cpp */
 void  screen_clear(int clear_color);
 
-/* screen_b.c */
+/* screen_b.cpp */
 void  screen_dominant_mode(int dominant_mode);
 
-/* screen_c.c */
+/* screen_c.cpp */
 void  screen_init(int video_mode);
 
-/* screen_d.c */
+/* screen_d.cpp */
 void  screen_init_dual(int mono_left);
 void  screen_shutdown_dual(int clear_flag);
 
-/* screen_e.c */
+/* screen_e.cpp */
 void  screen_init_graphics(int which_mode);
 void  screen_shutdown_graphics(int clear_flag);
 
-/* screen_f.c */
-void  screen_show_spot(char *message, int wx, int wy,
-	int class, int num);
+/* screen_f.cpp */
+void  screen_show_spot(char *message, int wx, int wy, int class_, int num);
 
 /* screen_g.c ... DO NOT USE */
 int  screen_printf(int x, int y, char *string, ...);
 int  screen_print(char *string, ...);
 
 
-/* screen_h.c */
+/* screen_h.cpp */
 void screen_init_text(int which_mode);
 void screen_shutdown_text(int clear_flag);
 
 
-/* screen_i.c */
+/* screen_i.cpp */
 void screen_save(void);
 void screen_restore(void);
 
 
-/* screen_j.c */
+/* screen_j.cpp */
 short screen_show_wide(char *outstring,
 	short locx,
 	short locy,

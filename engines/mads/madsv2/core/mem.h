@@ -51,29 +51,28 @@ extern long umb_min_free;               /* Least UMB that was ever free    */
 extern void (*mem_manager_update)();    /* Called at memory updates        */
 extern int  mem_manager_active;         /* Flag if memory manager active   */
 
-/* mem_1.c */
-void *fastcall mem_normalize(void *in);
+/* mem_1.cpp */
+extern void *mem_normalize(void *in);
 
-/* mem_2.c */
-void *fastcall mem_get(long size);
-void *fastcall mem_get_name(long size, char *block_name);
-int        mem_free(void *block);
-int        mem_adjust(void *target, long size);
-void       mem_save_free(void);
-void       mem_restore_free(void);
-void       mem_get_block_name(byte *block,
-	char *block_name);
+/* mem_2.cpp */
+extern void *mem_get(long size);
+extern void *mem_get_name(long size, const char *block_name);
+extern int mem_free(void *block);
+extern int mem_adjust(void *target, long size);
+extern void mem_save_free();
+extern void mem_restore_free();
+extern void mem_get_block_name(byte *block, char *block_name);
 
-/* mem_3.c */
-void *fastcall mem_check_overflow(void *in);
+/* mem_3.cpp */
+void *mem_check_overflow(void *in);
 
-/* mem_4.c */
-long    mem_get_avail(void);
-long    mem_conv_get_avail(void);
-void    mem_set_video_mode(int mode);
+/* mem_4.cpp */
+extern long mem_get_avail();
+extern long mem_conv_get_avail();
+extern void mem_set_video_mode(int mode);
 
-/* mem_5.c */
-long mem_program_block(void);
+/* mem_5.cpp */
+extern long mem_program_block();
 
 } // namespace MADSV2
 } // namespace MADS

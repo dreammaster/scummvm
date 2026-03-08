@@ -19,40 +19,26 @@
  *
  */
 
-#ifndef MADS_CORE_VIDEO_H
-#define MADS_CORE_VIDEO_H
+#ifndef MADS_CORE_KERNEL_D_H
+#define MADS_CORE_KERNEL_D_H
 
-#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/kernel.h"
+#include "mads/madsv2/core/font.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern int video_mode;
+extern KernelMessage kernel_message[KERNEL_MAX_MESSAGES];
+extern FontPtr kernel_message_font;
+extern int kernel_message_spacing;
 
-/* video.asm */
-void video_init(int mode, int set_mode);
-
-void video_update(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_flush_ega(int start_y, int size_y);
-
-
-
-/* Mode-specific versions */
-
-void video_update_vga(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_ega(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_tandy(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+extern void kernel_message_init(void);
+extern int kernel_message_add(char far *text, int x, int y,
+	int color, long time_on_screen, int trigger_code, int flags);
+extern void kernel_message_teletype(int id, int rate, int quote);
+extern void kernel_message_attach(int id, int sequence);
+extern void kernel_message_delete(int id);
+extern void kernel_message_purge(void);
 
 } // namespace MADSV2
 } // namespace MADS

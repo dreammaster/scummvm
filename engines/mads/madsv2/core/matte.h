@@ -71,7 +71,7 @@ typedef struct MatteBuf {
 
 typedef Matte *MattePtr;
 
-extern SeriesPtr series_list[SERIES_LIST_SIZE]; /* Master sprite list     */
+extern SeriesPtr series_list[SERIES_LIST_SIZE + SERIES_BONUS_SIZE]; /* Master sprite list     */
 
 extern char series_name[SERIES_LIST_SIZE][9];   /* Master sprite name list*/
 extern byte series_user[SERIES_LIST_SIZE];      /* Master sprite user list*/
@@ -133,7 +133,7 @@ int  matte_map_work_screen(void);
 void matte_frame(int special_effect, int full_screen);
 
 /* matte_1.c */
-void matte_init_series(void);
+//void matte_init_series(void);
 int  matte_load_series(char *name,
 	int load_flags,
 	int bonus_series_number);
@@ -142,7 +142,7 @@ int  matte_allocate_series(SeriesPtr series,
 	int bonus_series_number);
 
 /* matte_1.c */
-void matte_init_messages(void);
+//void matte_init_messages(void);
 int  matte_add_message(FontPtr font, char *text,
 	int x, int y, int message_color,
 	int auto_spacing);

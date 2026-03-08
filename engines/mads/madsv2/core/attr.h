@@ -19,40 +19,38 @@
  *
  */
 
-#ifndef MADS_CORE_VIDEO_H
-#define MADS_CORE_VIDEO_H
+#ifndef MADS_CORE_ATTR_H
+#define MADS_CORE_ATTR_H
 
-#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/buffer.h"
+#include "mads/madsv2/core/room.h"
+#include "mads/madsv2/core/tile.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern int video_mode;
+#define ATTR_WALK_MASK         0x80
+#define ATTR_SPECIAL_MASK      0x70
+#define ATTR_DEPTH_MASK        0x0f
 
-/* video.asm */
-void video_init(int mode, int set_mode);
+#define ATTR_PACKED_ATTR_MASK  0x03
+#define ATTR_PACKED_WALK_MASK  0x02
+#define ATTR_PACKED_DEPTH_MASK 0x01
 
-void video_update(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+/* attr_1.cpp */
+extern int attr_walk(Buffer *attr, int x, int y);
 
-void video_flush_ega(int start_y, int size_y);
+/* attr_2.cpp */
+extern int attr_depth(TileMapHeader *depth_map, int x, int y);
 
+/* attr_3.cpp */
+extern int attr_special(Buffer *attr, int x, int y);
 
+/* attr_4.c */
+extern int attr_load(char *base_name, int item_type, int variant,
+	Buffer *target, int size_x, int size_y);
 
-/* Mode-specific versions */
-
-void video_update_vga(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_ega(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_tandy(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+extern int attr_load_error;
 
 } // namespace MADSV2
 } // namespace MADS

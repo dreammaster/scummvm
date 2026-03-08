@@ -44,93 +44,92 @@ namespace MADSV2 {
 extern int buffer_restore_keep_flag;
 
 
-/* buffer_1.c */
+/* buffer_1.cpp */
 int buffer_init(Buffer *buf, word x, word y);
-int buffer_init_name(Buffer *buf, word x, word y,
-	char *block_name);
+int buffer_init_name(Buffer *buf, word x, word y, const char *block_name);
 
-/* buffer_2.c */
+/* buffer_2.cpp */
 int buffer_free(Buffer *buf);
 
-/* buffer_3.c */
-int buffer_fill(Buffer target, byte   value);
+/* buffer_3.cpp */
+int buffer_fill(Buffer target, byte value);
 
-/* buffer_4.c */
+/* buffer_4.cpp */
 int buffer_rect_copy(Buffer from, Buffer unto,
 	int    ul_x, int    ul_y,
 	int    size_x, int    size_y);
 
-/* buffer_5.c */
+/* buffer_5.cpp */
 int buffer_rect_fill(Buffer target,
 	int    ul_x, int    ul_y,
 	int    size_x, int    size_y,
 	byte   value);
-/* buffer_6.c */
+/* buffer_6.cpp */
 int buffer_rect_copy_2(Buffer from, Buffer unto,
 	int    from_x, int    from_y,
 	int    unto_x, int    unto_y,
 	int    size_x, int    size_y);
 
-/* buffer_7.c */
+/* buffer_7.cpp */
 void buffer_put_pixel(Buffer buf, word x,
 	word y, byte c);
 
-/* buffer_8.c */
+/* buffer_8.cpp */
 byte buffer_get_pixel(Buffer buf, word x, word y);
 
-/* buffer_9.c */
+/* buffer_9.cpp */
 void buffer_hline(Buffer buf, word x1, word x2,
 	word y, byte color);
 
-/* buffer_a.c */
+/* buffer_a.cpp */
 void buffer_vline(Buffer buf, word x, word y1,
 	word y2, byte color);
 
-/* buffer_b.c */
+/* buffer_b.cpp */
 void buffer_draw_box(Buffer buf, word x1, word y1,
 	word x2, word y2, byte color);
 
-/* buffer_d.c */
+/* buffer_d.cpp */
 void buffer_hline_xor(Buffer buf, int x1, int x2, int y);
 
-/* buffer_e.c */
+/* buffer_e.cpp */
 void buffer_vline_xor(Buffer buf, int x, int y1, int y2);
 
-/* buffer_f.c */
+/* buffer_f.cpp */
 void buffer_draw_crosshair(Buffer buf, int x, int y);
 
-/* buffer_g.c */
+/* buffer_g.cpp */
 void buffer_draw_box_xor(Buffer buf, int x1, int y1, int x2, int y2);
 
-/* buffer_h.c */
+/* buffer_h.cpp */
 int buffer_get_delta_bounds(Buffer buf1, Buffer buf2,
 	byte newcol, word *xl, word *xh,
 	word *yl, word *yh);
 
-/* buffer_i.c */
+/* buffer_i.cpp */
 byte *fastcall buffer_pointer(Buffer *buf, int x, int y);
 int buffer_conform(Buffer *buffer, int *x, int *y,
 	int *xs, int *ys);
 
-/* buffer_j.c */
+/* buffer_j.cpp */
 int  buffer_inter_merge_2(Buffer from, Buffer unto,
 	int    from_x, int    from_y,
 	int    unto_x, int    unto_y,
 	int    size_x, int    size_y);
 
-/* buffer_k.c */
+/* buffer_k.cpp */
 void buffer_line(Buffer target, int x1, int y1, int x2, int y2,
 	int color);
 
-/* buffer_l.c */
+/* buffer_l.cpp */
 void buffer_line_xor(Buffer target, int x1, int y1,
 	int x2, int y2);
 
-/* buffer_m.c */
+/* buffer_m.cpp */
 int buffer_legal(Buffer walk, int orig_wrap,
 	int x1, int y1, int x2, int y2);
 
-/* buffer_n.c */
+/* buffer_n.cpp */
 extern word pattern_control_value;
 extern int  auto_pattern;
 
@@ -144,20 +143,20 @@ word buffer_rect_fill_pattern(Buffer target,
 	word   note_line);
 
 
-/* buffer_o.c */
+/* buffer_o.cpp */
 int buffer_rect_fill_swap(Buffer target,
 	int    ul_x, int    ul_y,
 	int    size_x, int    size_y,
 	byte   value1, byte   value2);
 
-/* buffer_p.c */
+/* buffer_p.cpp */
 void buffer_peel_horiz(Buffer *target, int peel);
 
-/* buffer_q.c */
+/* buffer_q.cpp */
 void buffer_peel_vert(Buffer *target, int peel,
 	byte *work_memory, long work_size);
 
-/* buffer_r.c */
+/* buffer_r.cpp */
 int  buffer_to_disk(Buffer *source, int x, int y,
 	int xs, int ys);
 void buffer_from_disk(Buffer *source, int buffer_id,
@@ -165,7 +164,7 @@ void buffer_from_disk(Buffer *source, int buffer_id,
 	int x, int y,
 	int xs, int ys);
 
-/* buffer_s.c */
+/* buffer_s.cpp */
 int buffer_to_ems(Buffer *source, int page_handle,
 	int source_ems_handle,
 	int x, int y, int xs, int ys);
@@ -173,7 +172,7 @@ int buffer_from_ems(Buffer *source, int page_handle,
 	int target_ems_handle,
 	int x, int y, int xs, int ys);
 
-/* buffer_t.c */
+/* buffer_t.cpp */
 int  buffer_preserve(Buffer *source, int flags,
 	int source_ems_handle,
 	int x, int y, int xs, int ys);
@@ -182,7 +181,7 @@ void buffer_restore(Buffer *source, int preserve_handle,
 	int x, int y, int xs, int ys);
 
 
-/* buffer_u.c */
+/* buffer_u.cpp */
 int buffer_rect_translate(Buffer from, Buffer unto,
 	int    from_x, int    from_y,
 	int    unto_x, int    unto_y,
@@ -190,12 +189,12 @@ int buffer_rect_translate(Buffer from, Buffer unto,
 	byte *table);
 
 
-/* buffer_w.c */
+/* buffer_w.cpp */
 int buffer_scan(Buffer *buffer, int magic,
 	int base_x, int base_y,
 	int size_x, int size_y);
 
-/* buffer_w.c */
+/* buffer_w.cpp */
 int buffer_compare(Buffer *buffer0, Buffer *buffer1,
 	int base_x, int base_y,
 	int base_x2, int base_y2,

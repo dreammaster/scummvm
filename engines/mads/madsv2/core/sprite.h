@@ -283,56 +283,56 @@ typedef Series *SeriesPtr;
 extern byte *sprite_force_memory;
 extern long      sprite_force_size;
 
-/* sprite_1.c */
+/* sprite_1.cpp */
 void sprite_draw(SeriesPtr series, int id, Buffer *buf,
 	int target_x, int target_y);
 
 
-/* sprite_2.c */
+/* sprite_2.cpp */
 void sprite_draw_scaled(SeriesPtr series, int id, Buffer *buf,
 	int target_x, int target_y, int scale_factor);
 
 
-/* sprite_3.c */
+/* sprite_3.cpp */
 void sprite_draw_3d_scaled(SeriesPtr series, int id,
 	Buffer *buf, Buffer *attr,
 	int target_x, int target_y,
 	int target_depth, int scale_factor);
 
-/* sprite_4.c */
+/* sprite_4.cpp */
 void sprite_draw_3d_big(SeriesPtr series, int id,
 	Buffer *buf, Buffer *attr,
 	int target_x, int target_y, int target_depth,
 	int view_port_x, int view_port_y);
 
 
-/* sprite_5.c */
+/* sprite_5.cpp */
 void sprite_draw_3d_scaled_big(SeriesPtr series, int id,
 	Buffer *buf, Buffer *attr,
 	int target_x, int target_y,
 	int target_depth, int scale_factor,
 	int view_port_x, int view_port_y);
 
-/* sprite_6.c */
+/* sprite_6.cpp */
 void sprite_draw_3d_x16(SeriesPtr series, int id,
 	Buffer *buf, Buffer *attr,
 	int target_x, int target_y, int target_depth);
 
-/* sprite_7.c */
+/* sprite_7.cpp */
 void sprite_draw_3d_scaled_x16(SeriesPtr series, int id,
 	Buffer *buf, Buffer *attr,
 	int target_x, int target_y,
 	int target_depth, int scale_factor);
 
 
-/* sprite_8.c */
+/* sprite_8.cpp */
 void sprite_draw_3d_big_x16(SeriesPtr series, int id,
 	Buffer *buf, Buffer *attr,
 	int target_x, int target_y, int target_depth,
 	int view_port_x, int view_port_y);
 
 
-/* sprite_9.c */
+/* sprite_9.cpp */
 void sprite_draw_3d_scaled_big_x16(SeriesPtr series, int id,
 	Buffer *buf, Buffer *attr,
 	int target_x, int target_y,
@@ -340,18 +340,18 @@ void sprite_draw_3d_scaled_big_x16(SeriesPtr series, int id,
 	int view_port_x, int view_port_y);
 
 
-/* sprite_a.c */
+/* sprite_a.cpp */
 void sprite_draw_x16(SeriesPtr series, int id, Buffer *buf,
 	int target_x, int target_y);
 
 
-/* sprite_b.c */
+/* sprite_b.cpp */
 void sprite_draw_interface(SeriesPtr series, int id,
 	Buffer *buf,
 	int target_x, int target_y);
 
 
-/* sprite_c.c */
+/* sprite_c.cpp */
 void sprite_draw_3d_scaled_to_attr
 (SeriesPtr series, int id,
 	Buffer *buf, Buffer *attr,
@@ -359,7 +359,7 @@ void sprite_draw_3d_scaled_to_attr
 	int scale_factor, int view_port_x, int view_port_y);
 
 
-/* sprite_d.c */
+/* sprite_d.cpp */
 void sprite_draw_3d_scaled_mono
 (SeriesPtr series, int id,
 	Buffer *buf, Buffer *attr,
@@ -367,19 +367,19 @@ void sprite_draw_3d_scaled_mono
 	int scale_factor, byte color);
 
 
-/* sprite_e.c */
-SeriesPtr sprite_series_load(char *filename, int load_flags);
+/* sprite_e.cpp */
+SeriesPtr sprite_series_load(const char *filename, int load_flags);
 
 extern int sprite_error;
 
 
-/* sprite_f.c */
+/* sprite_f.cpp */
 void sprite_get_scaled_matte(SeriesPtr series, int id,
 	int target_x, int target_y,
 	int scale_factor, SpritePtr matte);
 
 
-/* sprite_g.c */
+/* sprite_g.cpp */
 word sprite_pack_line_rle(byte *target, Buffer *source,
 	byte *palette_map, byte transparent,
 	int x1, int x2, int y);
@@ -407,16 +407,16 @@ long sprite_pack_image(byte *target,
 	byte transparent);
 
 
-/* sprite_h.c */
+/* sprite_h.cpp */
 void sprite_color_translate(SeriesPtr series, ColorListPtr list);
 
-/* sprite_i.c */
+/* sprite_i.cpp */
 void sprite_single_color_translate(SeriesPtr series, int id);
 
-/* sprite_j.c */
+/* sprite_j.cpp */
 int sprite_data_load(SeriesPtr series, int id, byte *target);
 
-/* sprite_k.c */
+/* sprite_k.cpp */
 /* if called, wont remove the colors from the palette list. It is */
 /* used during kernel_abort_animation. */
 void dont_frag_the_palette(void);

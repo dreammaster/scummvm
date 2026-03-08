@@ -19,40 +19,21 @@
  *
  */
 
-#ifndef MADS_CORE_VIDEO_H
-#define MADS_CORE_VIDEO_H
+#ifndef MADS_CORE_DEMO_H
+#define MADS_CORE_DEMO_H
 
 #include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern int video_mode;
+/* demo_1.asm */
+int demo_checksum(byte **source, int *pack_size, int *unpack_size);
+int demo_check(void);
 
-/* video.asm */
-void video_init(int mode, int set_mode);
-
-void video_update(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_flush_ega(int start_y, int size_y);
-
-
-
-/* Mode-specific versions */
-
-void video_update_vga(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_ega(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_tandy(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+/* demo_2.cpp */
+void fastcall demo_log_in(char *release_version, char *release_date);
+void fastcall demo_verify(void);
 
 } // namespace MADSV2
 } // namespace MADS

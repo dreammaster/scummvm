@@ -19,40 +19,16 @@
  *
  */
 
-#ifndef MADS_CORE_VIDEO_H
-#define MADS_CORE_VIDEO_H
+#ifndef MADS_CORE_KERNEL_I_H
+#define MADS_CORE_KERNEL_I_H
 
-#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/kernel.h"
+#include "mads/madsv2/core/image.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern int video_mode;
-
-/* video.asm */
-void video_init(int mode, int set_mode);
-
-void video_update(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_flush_ega(int start_y, int size_y);
-
-
-
-/* Mode-specific versions */
-
-void video_update_vga(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_ega(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_tandy(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+extern void kernel_seq_image(SequencePtr sequence, ImagePtr image, int sequence_id);
 
 } // namespace MADSV2
 } // namespace MADS

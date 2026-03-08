@@ -19,40 +19,23 @@
  *
  */
 
-#ifndef MADS_CORE_VIDEO_H
-#define MADS_CORE_VIDEO_H
+#ifndef MADS_CORE_DIGI_H
+#define MADS_CORE_DIGI_H
 
 #include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern int video_mode;
-
-/* video.asm */
-void video_init(int mode, int set_mode);
-
-void video_update(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_flush_ega(int start_y, int size_y);
-
-
-
-/* Mode-specific versions */
-
-void video_update_vga(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_ega(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
-
-void video_update_tandy(Buffer *from, int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+void digi_install(void);
+void digi_play(char name[30], int slot);
+void digi_play_build(int room, char thing, int num, int slot);
+void digi_play_build_ii(char thing, int num, int slot);
+void digi_stop(int which_one);
+void digi_uninstall(void);
+void digi_read_another_chunk(void);
+void digi_initial_volume(int vol);
+void digi_set_volume(int vol, int slot);
 
 } // namespace MADSV2
 } // namespace MADS
