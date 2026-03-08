@@ -79,8 +79,8 @@ extern byte series_user[SERIES_LIST_SIZE];      /* Master sprite user list*/
 extern Image image_list[IMAGE_LIST_SIZE];      /* Master image list      */
 extern Matte matte_list[MATTE_LIST_SIZE];      /* Master matte list      */
 
-byte depth_list_id[MATTE_LIST_SIZE];            /* Depth list for sorting */
-word depth_list[MATTE_LIST_SIZE];
+extern byte depth_list_id[MATTE_LIST_SIZE];            /* Depth list for sorting */
+extern word depth_list[MATTE_LIST_SIZE];
 
 extern Message message_list[MESSAGE_LIST_SIZE];
 

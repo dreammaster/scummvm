@@ -136,7 +136,7 @@ int  selected_item = -1;
 #define LEFT_EYE   0
 #define RIGHT_EYE  1
 
-char *quotes = NULL;
+extern char *quotes;
 int  eye_message[2];
 int  eye_pokes   = 0;
 int  recent_eye  = 0;

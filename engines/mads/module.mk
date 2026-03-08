@@ -59,8 +59,11 @@ MODULE_OBJS += \
 	forest/game_forest.o \
 	forest/forest_scenes.o \
 	forest/globals_forest.o \
+	madsv2/engine.o \
 	madsv2/core/speech.o \
-	madsv2/phantom/main_menu.o
+	madsv2/phantom/mads/mads.o \
+	madsv2/phantom/main_menu.o \
+	madsv2/phantom/main.o
 endif
 
 # This module can be built as a plugin

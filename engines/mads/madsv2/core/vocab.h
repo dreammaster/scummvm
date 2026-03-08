@@ -57,8 +57,8 @@ namespace MADSV2 {
 #define VC_ERR_NOSUCHWORD       -13     /* Word not in list          */
 
 
-int vocab_allocation;
-char *vocab;
+extern int vocab_allocation;
+extern char *vocab;
 
 /* vocab_1.c */
 int         vocab_destroy(void);

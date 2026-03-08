@@ -19,38 +19,29 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MAIN_MENU_H
-#define MADS_PHANTOM_MAIN_MENU_H
+#ifndef MADSV2_ENGINE_H
+#define MADSV2_ENGINE_H
 
-#include "common/str.h"
+#include "engines/engine.h"
+#include "mads/detection.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
 
-#define COMMAND_LINE_MAX        10
+class MADSV2Engine : public Engine {
+private:
+	const MADSGameDescription *_gameDescription;
 
-#define FRAME_RATE              1
-#define MENU_FRAME_RATE         3
+public:
+	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);
+	~MADSV2Engine() override {
+	}
 
-#define NUM_MENU_ITEMS          7
+	Common::Error run() override;
+};
 
-#define MENU_APPEARING          0
-#define MENU_ACCEPTING_COMMANDS 1
-#define MENU_DISAPPEARING       2
+extern MADSV2Engine *g_engine;
 
-#define MENU_HIGH_SPRITE        15
-
-typedef struct {
-	int handle;           /* Sprite series handle */
-	int active;           /* Menu item is active  */
-	int status;           /* Current status       */
-} MenuItem;
-
-extern void global_speech_load(int id);
-extern void menu_control();
-
-} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 
