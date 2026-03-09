@@ -113,11 +113,10 @@ extern long pack_read_count;            /* Size read so              */
 extern long pack_write_size;            /* Size left to write            */
 extern long pack_write_count;           /* Size written so           */
 
-extern word(*pack_read_routine)(char *buffer, word *size);
 /* Pointer to read routine  */
-extern void (*pack_write_routine)
-(char *buffer, word *size);
+extern word (*pack_read_routine)(char *buffer, word *size);
 /* Pointer to write routine */
+extern void (*pack_write_routine)(char *buffer, word *size);
 
 extern word pack_mode;                  /* Packing mode (zip/none)       */
 extern byte *pack_buffer;           /* Packing scrap buffer          */
@@ -226,7 +225,7 @@ extern int pack_ems_page_marker;
 extern int pack_ems_page_offset;
 
 /* pack_d.c */
-word pack_write_ems(char *buffer, word *mysize);
+void pack_write_ems(char *buffer, word *mysize);
 
 } // namespace MADSV2
 } // namespace MADS

@@ -22,7 +22,7 @@
 #ifndef MADS_CORE_GENERAL_H
 #define MADS_CORE_GENERAL_H
 
-#include "common/scummsys.h"
+#include "common/str.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -142,6 +142,11 @@ inline void mads_strupr(char *s) {
 inline void mads_strlwr(char *s) {
 	for (; *s; ++s)
 		*s = tolower(*s);
+}
+inline char *mads_itoa(int value, char *buffer, int radix) {
+	assert(radix == 10);
+	Common::strcpy_s(buffer, 16, Common::String::format("%d", value).c_str());
+	return buffer;
 }
 
 } // namespace MADSV2

@@ -19,41 +19,36 @@
  *
  */
 
-#ifndef MADSV2_ENGINE_H
-#define MADSV2_ENGINE_H
-
-#include "common/random.h"
-#include "engines/engine.h"
-#include "graphics/screen.h"
-#include "mads/detection.h"
+#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/video.h"
+#include "mads/madsv2/core/mouse.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-class MADSV2Engine : public Engine {
-private:
-	const MADSGameDescription *_gameDescription;
-	Graphics::Screen *_screen = nullptr;
-	Common::RandomSource _random = Common::RandomSource("MADS");
+extern Buffer scr_work;
 
-public:
-	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);
-	~MADSV2Engine() override;
+void mouse_video_init() {
+	mouse_set_work_buffer(scr_work.data, scr_work.x);
+	mouse_set_view_port_loc(0, 0, scr_work.x - 1, scr_work.y - 1);
+	mouse_set_view_port(0, 0);
+}
 
-	Common::Error run() override;
+void mouse_video_update(int from_x, int from_y, int unto_x, int unto_y,
+		int size_x, int size_y) {
+	int refresh_flag;
 
-	uint getRandomNumber(uint max) {
-		return _random.getRandomNumber(max);
-	}
+	mouse_freeze();
+	refresh_flag = mouse_refresh_view_port();
 
-	Graphics::Screen *getScreen() const {
-		return _screen;
-	}
-};
+	video_update(&scr_work, from_x, from_y, unto_x, unto_y, size_x, size_y);
 
-extern MADSV2Engine *g_engine;
+	if (refresh_flag) mouse_refresh_done();
+	mouse_thaw();
+}
 
 } // namespace MADSV2
 } // namespace MADS
 
-#endif
+
+

@@ -1,12 +1,31 @@
-/*
-/*      kernel_1.c      by Brian Reynolds       5-Nov-91
-*/
+/* ScummVM - Graphic Adventure Engine
+ *
+ * ScummVM is the legal property of its developers, whose names
+ * are too numerous to list here. Please refer to the COPYRIGHT
+ * file distributed with this source distribution.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-#include <general.mac>
-#include <room.mac>
-#include <color.mac>
+#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/room.h"
+#include "mads/madsv2/core/color.h"
+#include "mads/madsv2/core/kernel.h"
 
-#include "kernel.mac"
+namespace MADS {
+namespace MADSV2 {
 
 RoomPtr room     = NULL;
 int room_id      = KERNEL_STARTING_GAME;
@@ -36,34 +55,14 @@ int kernel_screen_fade   = 0;
 
 Animation kernel_anim[KERNEL_MAX_ANIMATIONS];
 
-/*
-AnimPtr kernel_animation        = NULL;
-int     kernel_animation_cycled = false;
-int     kernel_repeat_animation = false;
-
-int     kernel_animation_sprite_loaded;
-int     kernel_animation_buffer_id;
-byte *kernel_animation_buffer[2];
-
-int     kernel_animation_messages;
-
-int     kernel_animation_frame;
-int     kernel_animation_image;
-int     kernel_animation_doomed = false;
-int     kernel_animation_trigger_code;
-int     kernel_animation_trigger_mode;
-int     kernel_animation_trigger_words[3];
-long    kernel_animation_next_clock;
-*/
-
 ShadowList kernel_shadow_main  = { 0 };
 ShadowList kernel_shadow_inter = { 1, { 15 } };
 
 int kernel_ok_to_fail_load = false;
 
-byte kernel_mode = KERNEL_GAME_LOAD;
+int kernel_mode = KERNEL_GAME_LOAD;
 
-char kernel_cheating_password[64];
+char kernel_cheating_password[16];
 int  kernel_cheating_allowed   = 0;
 int  kernel_cheating_forbidden = 0;
 
@@ -80,4 +79,5 @@ int cursor_last = -1;
 Kernel     kernel;                      /* Kernel data            */
 KernelGame game;                        /* Kernel level game data */
 
-
+} // namespace MADSV2
+} // namespace MADS

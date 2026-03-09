@@ -19,39 +19,40 @@
  *
  */
 
-#ifndef MADSV2_ENGINE_H
-#define MADSV2_ENGINE_H
+#ifndef MADS_CORE_IMPLODE_H
+#define MADS_CORE_IMPLODE_H
 
-#include "common/random.h"
-#include "engines/engine.h"
-#include "graphics/screen.h"
-#include "mads/detection.h"
+#include "common/scummsys.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-class MADSV2Engine : public Engine {
-private:
-	const MADSGameDescription *_gameDescription;
-	Graphics::Screen *_screen = nullptr;
-	Common::RandomSource _random = Common::RandomSource("MADS");
+extern unsigned short implode(
+	unsigned (*read_buff)(char *buffer, unsigned short *size),
+	void (*write_buff)(char *buffer, unsigned short *size),
+	char *work_buff,
+	unsigned short int *type,
+	unsigned short int *dsize);
 
-public:
-	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);
-	~MADSV2Engine() override;
+extern unsigned explode(
+	unsigned (*read_buff)(char *buffer, unsigned short *size),
+	void (*write_buff)(char *buffer, unsigned short *size),
+	char *work_buff);
 
-	Common::Error run() override;
+extern unsigned long crc32(
+	unsigned char *buffer,
+	unsigned short int *size,
+	unsigned long *old_crc);
 
-	uint getRandomNumber(uint max) {
-		return _random.getRandomNumber(max);
-	}
 
-	Graphics::Screen *getScreen() const {
-		return _screen;
-	}
-};
+#define CMP_BINARY             0
+#define CMP_ASCII              1
 
-extern MADSV2Engine *g_engine;
+#define CMP_NO_ERROR           0
+#define CMP_INVALID_DICTSIZE   1
+#define CMP_INVALID_MODE       2
+#define CMP_BAD_DATA           3
+#define CMP_ABORT              4
 
 } // namespace MADSV2
 } // namespace MADS

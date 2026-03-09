@@ -19,41 +19,51 @@
  *
  */
 
-#ifndef MADSV2_ENGINE_H
-#define MADSV2_ENGINE_H
-
-#include "common/random.h"
-#include "engines/engine.h"
-#include "graphics/screen.h"
-#include "mads/detection.h"
+#include "common/textconsole.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-class MADSV2Engine : public Engine {
-private:
-	const MADSGameDescription *_gameDescription;
-	Graphics::Screen *_screen = nullptr;
-	Common::RandomSource _random = Common::RandomSource("MADS");
+void *mem_get_name(long size, const char *) {
+	void *memory_block = nullptr;
+	if (size > 0)
+		memory_block = malloc(size);
 
-public:
-	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);
-	~MADSV2Engine() override;
+	return memory_block;
+}
 
-	Common::Error run() override;
+void *mem_get(long size) {
+	return (mem_get_name(size, "$sys$"));
+}
 
-	uint getRandomNumber(uint max) {
-		return _random.getRandomNumber(max);
-	}
+void mem_get_block_name(byte *block, char *block_name) {
+	// TODO: See if the block_name is needed. If so, we'll need to simulate the
+	// original by allocating extra space to store it
+	error("TODO: mem_get_block_name");
+}
 
-	Graphics::Screen *getScreen() const {
-		return _screen;
-	}
-};
 
-extern MADSV2Engine *g_engine;
+bool mem_free(void *memory_block) {
+	free(memory_block);
+	return false;
+}
+
+int mem_adjust_impl(void *&target, long size) {
+	void *p = realloc(target, size);
+	if (p == NULL)
+		return -1;
+	target = p;
+	return 0;
+}
+
+void mem_save_free(void) {
+	// No implementation
+}
+
+void mem_restore_free(void) {
+	// No implementation
+}
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

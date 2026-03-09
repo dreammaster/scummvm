@@ -19,6 +19,7 @@
  *
  */
 
+#include "engines/util.h"
 #include "mads/madsv2/engine.h"
 #include "mads/madsv2/phantom/main.h"
 
@@ -31,7 +32,14 @@ MADSV2Engine::MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc) {
 }
 
+MADSV2Engine::~MADSV2Engine() {
+	delete _screen;
+}
+
 Common::Error MADSV2Engine::run() {
+	initGraphics(320, 200);
+	_screen = new Graphics::Screen();
+
 	Phantom::phantom_main();
 
 	return Common::kNoError;

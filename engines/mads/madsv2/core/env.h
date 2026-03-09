@@ -22,6 +22,7 @@
 #ifndef MADS_CORE_ENV_H
 #define MADS_CORE_ENV_H
 
+#include "common/stream.h"
 #include "mads/madsv2/core/general.h"
 
 namespace MADS {
@@ -76,17 +77,15 @@ extern long env_concat_file_size; /* Size of last concat file opened */
 
 
 /* env_0.c */
-int         env_verify(void);
+int env_verify(void);
 
 /* env_1.c */
-Common::Stream * env_open(char *file_path, char *options);
-int         env_exist(char *file_name);
-long        env_get_file_size(Common::Stream *handle);
-
+Common::SeekableReadStream *env_open(const char *file_path, const char *options);
+int env_exist(const char *file_name);
+long env_get_file_size(Common::Stream *handle);
 
 /* env_1.c */
-char *env_get_path(char *madspath,
-	char *infile);
+char *env_get_path(char *madspath, char *infile);
 
 /* env_1.c */
 char *env_catint(char *out, int value, int digits);

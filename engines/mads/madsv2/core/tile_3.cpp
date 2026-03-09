@@ -19,41 +19,42 @@
  *
  */
 
-#ifndef MADSV2_ENGINE_H
-#define MADSV2_ENGINE_H
-
-#include "common/random.h"
-#include "engines/engine.h"
-#include "graphics/screen.h"
-#include "mads/detection.h"
+#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/ems.h"
+#include "mads/madsv2/core/dialog.h"
+#include "mads/madsv2/core/matte.h"
+#include "mads/madsv2/core/tile.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-class MADSV2Engine : public Engine {
-private:
-	const MADSGameDescription *_gameDescription;
-	Graphics::Screen *_screen = nullptr;
-	Common::RandomSource _random = Common::RandomSource("MADS");
+int tile_ems_available = false;
+int tile_picture_handle = -1;
+int tile_attribute_handle = -1;
 
-public:
-	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);
-	~MADSV2Engine() override;
 
-	Common::Error run() override;
+int tile_setup(void) {
+	int error_flag = true;
 
-	uint getRandomNumber(uint max) {
-		return _random.getRandomNumber(max);
+	picture_map.map = NULL;
+	depth_map.map = NULL;
+
+	tile_picture_handle = ems_get_page_handle(TILE_MAX_PAGES);
+	if (tile_picture_handle < 0) goto done;
+
+	tile_attribute_handle = ems_get_page_handle(TILE_MAX_PAGES >> 1);
+	if (tile_attribute_handle < 0) goto done;
+
+	tile_ems_available = true;
+	error_flag = false;
+
+done:
+	if (error_flag) {
+		if (tile_picture_handle >= 0) ems_free_page_handle(tile_picture_handle);
 	}
 
-	Graphics::Screen *getScreen() const {
-		return _screen;
-	}
-};
-
-extern MADSV2Engine *g_engine;
+	return error_flag;
+}
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

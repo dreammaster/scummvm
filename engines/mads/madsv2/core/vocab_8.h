@@ -19,39 +19,25 @@
  *
  */
 
-#ifndef MADSV2_ENGINE_H
-#define MADSV2_ENGINE_H
+#ifndef MADS_CORE_VOCAB_8_H
+#define MADS_CORE_VOCAB_8_H
 
-#include "common/random.h"
-#include "engines/engine.h"
-#include "graphics/screen.h"
-#include "mads/detection.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-class MADSV2Engine : public Engine {
-private:
-	const MADSGameDescription *_gameDescription;
-	Graphics::Screen *_screen = nullptr;
-	Common::RandomSource _random = Common::RandomSource("MADS");
+extern void vocab_unload_active();  /* vocab_8.c */
+extern void vocab_init_active();
+extern int vocab_active_id(word id);
+extern int vocab_make_active(word id);
+extern int vocab_load_active();
 
-public:
-	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);
-	~MADSV2Engine() override;
-
-	Common::Error run() override;
-
-	uint getRandomNumber(uint max) {
-		return _random.getRandomNumber(max);
-	}
-
-	Graphics::Screen *getScreen() const {
-		return _screen;
-	}
-};
-
-extern MADSV2Engine *g_engine;
+extern char *vocab_text;
+extern word vocab_size;
+extern word vocab_active;
+extern word vocab_list_id[VOCAB_MAX_ACTIVE];
+extern word vocab_list_pointer[VOCAB_MAX_ACTIVE];
 
 } // namespace MADSV2
 } // namespace MADS

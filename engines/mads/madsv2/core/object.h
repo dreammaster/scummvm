@@ -95,22 +95,22 @@ extern int       num_objects;
 extern int object_ems_handle;
 
 
-/* object_1.cpp */
-int  fastcall object_load(void);
-void fastcall object_unload(void);
+extern int object_load(void);
+extern void object_unload(void);
 
-/* object_2.cpp */
-int fastcall object_named(int vocab_id);
-int fastcall object_is_here(int object_id);
+extern int object_named(int vocab_id);
+extern int object_is_here(int object_id);
 
 /* object_3.cpp */
-int  fastcall object_has_quality(int object_id, int quality_id);
-long fastcall object_check_quality(int object_id, int quality_id);
-void fastcall object_set_quality(int object_id, int quality_id,
-	long quality_value);
+extern int object_has_quality(int object_id, int quality_id);
+extern long object_check_quality(int object_id, int quality_id);
+extern void object_set_quality(int object_id, int quality_id, long quality_value);
 
-/* object_4.cpp */
-int  fastcall object_examine(int number, long message, int speech);
+/**
+ * Called when the player examines an object from his inventory;
+ * greys out main area, then loads & displays object sprite.
+ */
+extern int object_examine(int number, long message, int speech);
 
 } // namespace MADSV2
 } // namespace MADS

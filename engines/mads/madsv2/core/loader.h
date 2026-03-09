@@ -69,8 +69,7 @@ extern char loader_last[14];
 
 
 /* loader_1.c */
-int  loader_open(LoadHandle handle, char *filename,
-	char *options, int flags);
+int  loader_open(LoadHandle handle, const char *filename, const char *options, int flags);
 
 int  loader_close(LoadHandle handle);
 

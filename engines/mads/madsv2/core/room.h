@@ -25,7 +25,6 @@
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/vocab.h"
 #include "mads/madsv2/core/color.h"
-#include "mads/madsv2/core/anim.h"
 #include "mads/madsv2/core/image.h"
 #include "mads/madsv2/core/loader.h"
 #include "mads/madsv2/core/tile.h"

@@ -23,6 +23,7 @@
 #define MADS_CORE_MOUSE_H
 
 #include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/sprite.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -54,30 +55,30 @@ extern int mouse_old_y;         /* Cursor Y position on previous round       */
 extern long mouse_clock;        /* Timing clock to insure at least 1 tick    */
 
 
-/* mouse_1.asm */
-int   mouse_init(int driver_flag, int mouse_video_mode);
+/* mouse_1.cpp */
+extern int mouse_init(int driver_flag, int mouse_video_mode);
 
-/* mouse_1.asm */
-int   mouse_set_hotspot(int spot_x, int spot_y);
+/* mouse_1.cpp */
+extern int mouse_set_hotspot(int spot_x, int spot_y);
 
-void  mouse_change_cursor_begin(void);
-void  mouse_change_cursor_end(void);
+void mouse_change_cursor_begin();
+void mouse_change_cursor_end();
 
-/* mouse_1.asm */
-void  mouse_screen_swap(int mouse_video_mode);
-int   mouse_get_video_mode(void);
+/* mouse_1.cpp */
+extern void mouse_screen_swap(int mouse_video_mode);
+extern int mouse_get_video_mode();
 
-/* mouse_1.asm */
-void  mouse_begin_double(int first_video_mode, int second_video_mode,
+/* mouse_1.cpp */
+extern void mouse_begin_double(int first_video_mode, int second_video_mode,
 	int mono_to_right, int auto_freedom);
-void  mouse_check_double(void);
-void  mouse_end_double(void);
-void  mouse_double_freedom(int freedom_flag);
+extern void mouse_check_double();
+extern void mouse_end_double();
+extern void mouse_double_freedom(int freedom_flag);
 
-/* mouse_1.asm */
-void  mouse_show(void);
-void  mouse_hide(void);
-int   mouse_get_status(int *x, int *y);
+/* mouse_1.cpp */
+extern void mouse_show();
+extern void mouse_hide();
+extern int mouse_get_status(int *x, int *y);
 
 /*
 int   mouse_press_info    (int button, int *status, int *x, int *y);
@@ -86,57 +87,53 @@ int   mouse_release_info  (int button, int *status, int *x, int *y);
 int   mouse_in_box_now    (int ul_x, int ul_y, int lr_x, int lr_y);
 */
 
-/* mouse_1.asm */
-void  mouse_timing(void);
+/* mouse_1.cpp */
+extern void mouse_timing();
 
-/* mouse_1.asm */
-void  mouse_freeze(void);
-void  mouse_thaw(void);
-
-
-/* mouse_1.asm */
-void  mouse_horiz_bound(int min_x, int max_x);
-void  mouse_vert_bound(int min_y, int max_y);
-
-/* mouse_1.asm */
-void  mouse_force(int x, int y);
-
-/* mouse_1.asm */
-void  mouse_set_work_buffer(byte *work_buffer,
-	int wrap_value);
-void  mouse_set_view_port_loc(int x1, int y1, int x2, int y2);
-void  mouse_set_view_port(int dx, int dy);
-
-/* mouse_1.asm */
-int   mouse_refresh_view_port(void);
-void  mouse_refresh_done(void);
-
-/* mouse_1.asm */
-void mouse_disable_scale(void);
-
-/* mouse_1.asm */
-void mouse_hard_cursor_mode(int mode, Palette *mypal);
-
-byte *mouse_get_stack(void);
+/* mouse_1.cpp */
+extern void mouse_freeze();
+extern void mouse_thaw();
 
 
+/* mouse_1.cpp */
+extern void mouse_horiz_bound(int min_x, int max_x);
+extern void mouse_vert_bound(int min_y, int max_y);
 
-/* mouse_2.c */
-int  mouse_in_box(int ul_x, int ul_y, int lr_x, int lr_y);
-void mouse_init_cycle(void);
-void mouse_begin_cycle(int double_flag);
-void mouse_end_cycle(int double_flag, int timing_flag);
+/* mouse_1.cpp */
+extern void mouse_force(int x, int y);
+
+/* mouse_1.cpp */
+extern void mouse_set_work_buffer(byte *work_buffer, int wrap_value);
+extern void mouse_set_view_port_loc(int x1, int y1, int x2, int y2);
+extern void mouse_set_view_port(int dx, int dy);
+
+/* mouse_1.cpp */
+extern int mouse_refresh_view_port();
+extern void mouse_refresh_done();
+
+/* mouse_1.cpp */
+extern void mouse_disable_scale();
+
+/* mouse_1.cpp */
+extern void mouse_hard_cursor_mode(int mode, Palette *mypal);
+
+extern const byte *mouse_get_stack();
+
+/* mouse_2.cpp */
+extern int  mouse_in_box(int ul_x, int ul_y, int lr_x, int lr_y);
+extern void mouse_init_cycle();
+extern void mouse_begin_cycle(int double_flag);
+extern void mouse_end_cycle(int double_flag, int timing_flag);
 
 
-/* mouse_3.c */
-void mouse_cursor_sprite(void *series, int id);
+/* mouse_3.cpp */
+extern void mouse_cursor_sprite(SeriesPtr series, int id);
 
 
-/* mouse_4.c */
-void mouse_video_init(void);
-void mouse_video_update(int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y);
+/* mouse_4.cpp */
+extern void mouse_video_init();
+extern void mouse_video_update(int from_x, int from_y,
+	int unto_x, int unto_y, int size_x, int size_y);
 
 } // namespace MADSV2
 } // namespace MADS

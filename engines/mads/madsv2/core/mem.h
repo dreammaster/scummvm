@@ -52,15 +52,40 @@ extern void (*mem_manager_update)();    /* Called at memory updates        */
 extern int  mem_manager_active;         /* Flag if memory manager active   */
 
 /* mem_1.cpp */
-extern void *mem_normalize(void *in);
+inline void *mem_normalize(void *in) {
+	return in;
+}
 
 /* mem_2.cpp */
 extern void *mem_get(long size);
-extern void *mem_get_name(long size, const char *block_name);
-extern int mem_free(void *block);
-extern int mem_adjust(void *target, long size);
+
+/**
+ * Allocates the specified amount of memory and returns a pointer to it.
+ */
+extern void *mem_get_name(long size, const char * /*block_name */= nullptr);
+
+/**
+ * Deallocates a previously allocated chunk of memory.  Returns
+ * true if an error occurred (?!), false otherwise.
+ */
+extern bool mem_free(void *block);
+
+/**
+ * Adjusts allocated block size
+ */
+extern int mem_adjust_impl(void *&target, long size);
+
+template <typename T>
+inline int mem_adjust(T *&target, long size) {
+	return mem_adjust_impl(reinterpret_cast<void *&>(target), size);
+}
+
 extern void mem_save_free();
 extern void mem_restore_free();
+
+/**
+ * Returns the string label of the memory block
+ */
 extern void mem_get_block_name(byte *block, char *block_name);
 
 /* mem_3.cpp */

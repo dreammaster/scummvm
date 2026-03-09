@@ -19,41 +19,26 @@
  *
  */
 
-#ifndef MADSV2_ENGINE_H
-#define MADSV2_ENGINE_H
-
-#include "common/random.h"
-#include "engines/engine.h"
-#include "graphics/screen.h"
-#include "mads/detection.h"
+#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/mem.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-class MADSV2Engine : public Engine {
-private:
-	const MADSGameDescription *_gameDescription;
-	Graphics::Screen *_screen = nullptr;
-	Common::RandomSource _random = Common::RandomSource("MADS");
+bool buffer_free(Buffer *buf) {
+	bool flag = false;
 
-public:
-	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);
-	~MADSV2Engine() override;
-
-	Common::Error run() override;
-
-	uint getRandomNumber(uint max) {
-		return _random.getRandomNumber(max);
+	if (buf->data != NULL) {
+		mem_free(buf->data);
+		flag = true;
 	}
 
-	Graphics::Screen *getScreen() const {
-		return _screen;
-	}
-};
+	buf->data = NULL;
+	buf->x = 0;
+	buf->y = 0;
 
-extern MADSV2Engine *g_engine;
+	return flag;
+}
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif
