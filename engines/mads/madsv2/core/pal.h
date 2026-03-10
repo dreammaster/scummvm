@@ -85,45 +85,84 @@ extern int pal_manager_active;
 extern int pal_manager_colors;
 
 
-/* pal_1.c  */
+/**
+ * Initializes an empty palette with no owners.  Reserves the
+ * first <reserve_bottom> colors and last <reserve_top> colors
+ * for the system.  Color 0 is always reserved.
+ */
+extern void pal_init(int reserve_bottom, int reserve_top);
 
-void pal_init(int reserve_bottom, int reserve_top);
+extern void pal_lock(void);
+extern void pal_unlock(void);
 
-void pal_lock(void);
-void pal_unlock(void);
+/**
+ * Given a color list, allocates all its colors in the global palette.
+ * Function returns a color usage handle which can be used later by
+ * pal_deallocate.  A negative result signifies an error.
+ * The color list pointed to by new_list is udpated such that when
+ * a color is allocated, its new value is stored in the X16 byte.
+ *
+ * Flags available include:
+ *
+ * PAL_MAP_BACKGROUND      set when loading the initial color list
+ *                         for the room background; allows new cycling
+ *                         ranges to be created.
+ *
+ * PAL_MAP_RESERVED        allows colors to map to the reserved
+ *                         color areas.
+ *
+ * PAL_MAP_ANY_TO_CLOSEST  allows any color to map to the closest
+ *                         available color instead of an exact match.
+ *
+ * PAL_MAP_ALL_TO_CLOSEST  forces any color that is allowed to map
+ *                         to the closest color to do so even if free
+ *                         color slots exist.  If combined with the
+ *                         previous flag, no new colors will be added
+ *                         to the palette.
+ */
+extern int pal_allocate(ColorListPtr new_list, ShadowListPtr shadow_list, int pal_flags);
 
-int  pal_allocate(ColorListPtr  new_list,
-	ShadowListPtr shadow_list,
-	int pal_flags);
+/**
+ * Erases usage of of colors marked by use_flag, and returns that
+ * flag to availability.  Returns PAL_ error code if failure.
+ *
+ * NOTE: If the FLAGNOTUSED error is returned, the flag's colors
+ * (if any) have ALREADY been removed from the list by the function.
+ * This allows the pal_allocate function to clean up after an
+ * OUTOFCOLORS error.
+ */
+extern int  pal_deallocate(int use_flag);
 
-int  pal_deallocate(int use_flag);
-void pal_compact(word master_handle, int num_slaves, word *slave);
+/**
+ * Compresses a list of handles to a single handle (designed for use
+ * by room loader so that background sprites don't take up lots of handles)
+ */
+extern void pal_compact(word master_handle, int num_slaves, word *slave);
 
-int  pal_get_hash(RGBcolor *one, RGBcolor *two);
-void pal_shadow_sort(ShadowListPtr shadow, ColorListPtr list);
-void pal_init_shadow(ShadowListPtr shadow, ColorListPtr new_list);
-void pal_activate_shadow(ShadowListPtr shadow);
+/**
+ * Computes the sum of squared differences between the two colors
+ */
+extern int  pal_get_hash(RGBcolor *one, RGBcolor *two);
 
+/**
+ * Sorts a shadow color list by intensity.
+ */
+extern void pal_shadow_sort(ShadowListPtr shadow, ColorListPtr list);
 
-/* pal_2.c */
-int  pal_get_flags(void);
-
-/* pal_3.c */
-int  pal_get_colors(void);
-
-/* pal_4.c */
-void pal_interface(Palette fixpal);
-void pal_white(Palette fixpal);
-void pal_grey(Palette fixpal, int base_color, int num_colors,
+/**
+ * Local routine to find the colors in a list for which shadow mapping is requested.
+ */
+extern void pal_init_shadow(ShadowListPtr shadow, ColorListPtr new_list);
+extern void pal_activate_shadow(ShadowListPtr shadow);
+extern int pal_get_flags(void);
+extern int pal_get_colors(void);
+extern void pal_interface(Palette fixpal);
+extern void pal_white(Palette fixpal);
+extern void pal_grey(Palette fixpal, int base_color, int num_colors,
 	int low_grey, int high_grey);
-
-/* pal_5.c */
-int pal_get_color(RGBcolor color, int color_handle,
+extern int pal_get_color(RGBcolor color, int color_handle,
 	int override_reserved, int *color_number);
-
-
-/* pal_6.c */
-void pal_change_color(int color, int r, int g, int b);
+extern void pal_change_color(int color, int r, int g, int b);
 
 } // namespace MADSV2
 } // namespace MADS

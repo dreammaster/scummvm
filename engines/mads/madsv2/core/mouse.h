@@ -44,12 +44,12 @@ extern byte mouse_showing;      /* Mouse cursor showing status (0 = show)    */
 extern int mouse_button;        /* Last button pressed (0 = left, 1 = right) */
 extern int mouse_status;        /* Button status flags                       */
 extern int mouse_x, mouse_y;    /* Most recent cursor position               */
-extern int mouse_start_stroke;  /* True if new button press this round       */
-extern int mouse_stroke_going;  /* True if any button currently down         */
-extern int mouse_changed;       /* True if position or any button changed    */
-extern int mouse_latched;       /* Internal use (same as mouse_stroke_going) */
-extern int mouse_stop_stroke;   /* True if button released this round        */
-extern int mouse_any_stroke;    /* True if button down or just now released  */
+extern bool mouse_start_stroke;  /* True if new button press this round       */
+extern bool mouse_stroke_going;  /* True if any button currently down         */
+extern bool mouse_changed;       /* True if position or any button changed    */
+extern bool mouse_latched;       /* Internal use (same as mouse_stroke_going) */
+extern bool mouse_stop_stroke;   /* True if button released this round        */
+extern bool mouse_any_stroke;    /* True if button down or just now released  */
 extern int mouse_old_x;         /* Cursor X position on previous round       */
 extern int mouse_old_y;         /* Cursor Y position on previous round       */
 extern long mouse_clock;        /* Timing clock to insure at least 1 tick    */

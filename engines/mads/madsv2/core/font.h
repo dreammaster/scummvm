@@ -54,8 +54,7 @@ extern FontPtr font_misc;               /* Font handle for symbols & icons */
 FontPtr font_load(const char *name);
 
 /* font_2.cpp */
-int font_write(FontPtr font, Buffer *target,
-	char *out_string, int x, int y,
+int font_write(FontPtr font, Buffer *target, const char *out_string, int x, int y,
 	int auto_spacing);
 
 /* font_3.cpp */
@@ -65,9 +64,7 @@ void font_set_colors(int background,
 	int low_intense);
 
 /* font_4.cpp */
-int font_string_width(FontPtr font,
-	char *out_string,
-	int auto_spacing);
+int font_string_width(FontPtr font, const char *out_string, int auto_spacing);
 
 /* font_5.cpp */
 void font_init(FontPtr font);

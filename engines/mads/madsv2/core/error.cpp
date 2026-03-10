@@ -62,13 +62,9 @@ static void error_explode(char *error_buf, char *module_buf, char *data1_buf, ch
 	::error("Execution aborted");
 }
 
-
-#pragma optimize ("egl", on)
-
 void error_report(int error, int severity, int module, long data1, long data2) {
 	char error_buf[40], module_buf[40], data1_buf[12], data2_buf[12];
 	int handled = false;
-	int key;
 
 	if (severity >= error_abort) {
 		mads_itoa(error, error_buf, 10);

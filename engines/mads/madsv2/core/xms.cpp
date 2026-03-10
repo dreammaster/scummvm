@@ -19,23 +19,16 @@
  *
  */
 
-#ifndef MADS_CORE_IMATH_H
-#define MADS_CORE_IMATH_H
-
-#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/xms.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-int  imath_distance(int side_a, int side_b, int threshold);
-int  imath_hypot(int side_a, int side_b);
-word imath_isqrt(long square);
-
-void imath_circular_arc(word *buffer, int radius);
-
-int imath_random(int from, int unto);
+word xms_version = 0;
+dword xms_controller = 0;
+word xms_chain_seg = 0;
+word xms_umb_list[XMS_MAX_UMB] = {};
+word xms_umb_mark = 0;
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

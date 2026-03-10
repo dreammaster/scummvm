@@ -61,12 +61,12 @@ typedef struct {
 } EmsPtr;
 
 
-extern int  ems_driver;         /* Flag if EMS driver is installed      */
-extern int  ems_exists;         /* Flag if we've got some EMS available */
+constexpr bool ems_driver = false;	/* Flag if EMS driver is installed      */
+constexpr bool ems_exists = false;	/* Flag if we've got some EMS available */
 extern word ems_page_frame;     /* Segment address of EMS page frame    */
 extern word ems_handle;         /* EMS handle of our allocated pages    */
 extern word ems_pages;          /* # of pages EMS allocated for us      */
-extern int  ems_disabled;       /* Flag if EMS disabled altogether      */
+extern int ems_disabled;       /* Flag if EMS disabled altogether      */
 
 extern word ems_high_version;   /* High (integer) part of EMS version # */
 extern word ems_low_version;    /* Low (fraction) part of EMS version # */
@@ -81,55 +81,53 @@ extern byte *ems_page_flag; /* Page allocation flag array           */
 extern word ems_paging_reserve[EMS_PAGING_CLASSES]; /* Reserve pages    */
 
 
-extern int  ems_mapping_changed;/* EMS mapping has changed */
+extern int ems_mapping_changed;/* EMS mapping has changed */
 
-extern int  ems_page_mapped[4];
-extern int  ems_page_stack[4];
+extern int ems_page_mapped[4];
+extern int ems_page_stack[4];
 
+/**
+ * Detects whether or not EMS memory is present.  If EMS is detected,
+ * attempts to allocate all available pages.
+ * @return	"true" if one or more pages were successfully allocated.
+ * Returns "false" if EMS did not exist, if no pages were available,
+ * or if an error occurred.
+ */
+inline bool ems_detect() {
+	return false;
+}
 
+/**
+ * Frees up any EMS memory that might have been allocated by ems_detect().
+ */
+inline void ems_shutdown() {
+}
 
-/* ems_1.c */
-int  ems_detect(void);
-void ems_shutdown(void);
-int           ems_map_page(word physical, word logical);
-void          ems_unmap_all(void);
-void          ems_push(void);
-void          ems_pop(void);
+/**
+ * Maps a logical page (0 - (ems_pages-1)) to a physical page (0-3).
+ * Does not actually generate an EMS interrupt if the page is already
+ * mapped. Call only if EMS memory was detected.
+ */
+inline int ems_map_page(word physical, word logical);
 
-
-
-/* ems_2.c */
-int  ems_activate_directory(void);
-int  ems_activate_page_map(void);
-int  ems_paging_setup(void);
-void ems_free_page_handle(word handle);
-int  ems_get_page_handle(word pages_needed);
-int  ems_next_handle_page(int handle, int page_marker);
-void ems_paging_mode(int paging_mode);
-void ems_paging_shutdown(void);
-
-/* ems_3.c */
-int ems_copy_it_up(int  ems_paging_handle,
-	int  *ems_page_marker,
-	int  *ems_page_offset,
-	byte *source,
-	long read_size);
-
-/* ems_4.c */
-int ems_copy_it_down(int  ems_paging_handle,
-	int  *ems_page_marker,
-	int  *ems_page_offset,
-	byte *target,
-	long write_size);
-
-/* ems_5.c */
-int  ems_map_buffer(int buffer_page_handle);
-
-/* ems_6.c */
-int ems_search_page(int ems_handle, int page_number);
-
-/* ems_7.c */
-void ems_buffer_to_buffer(int source_handle, int target_handle);
+inline void ems_unmap_all() {}
+inline void ems_push() {}
+inline void ems_pop() {}
+inline int ems_activate_directory() { return 0; }
+inline int ems_activate_page_map() { return 0; }
+inline int ems_paging_setup() { return 0; }
+inline void ems_free_page_handle(word handle) {}
+inline int ems_get_page_handle(word pages_needed) { return 0; }
+inline int ems_next_handle_page(int handle, int page_marker) { return 0; }
+inline void ems_paging_mode(int paging_mode) {}
+inline void ems_paging_shutdown() {}
+inline int ems_copy_it_up(int ems_paging_handle, int *ems_page_marker,
+	int *ems_page_offset, byte *source, long read_size) { return 0; }
+inline int ems_copy_it_down(int ems_paging_handle, int *ems_page_marker,
+	int *ems_page_offset, byte *target, long write_size) { return 0; }
+inline int ems_map_buffer(int buffer_page_handle) { return 0; }
+inline int ems_search_page(int ems_handle_, int page_number) { return 0; }
+inline void ems_buffer_to_buffer(int source_handle, int target_handle) {}
 
 } // namespace MADSV2
 } // namespace MADS

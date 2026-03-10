@@ -93,7 +93,7 @@ namespace MADSV2 {
 #define DEBUGGER_MAX_WATCH      12
 
 
-int int_sprite[6];
+extern int int_sprite[6];
 
 extern int selected_intro;
 
@@ -112,8 +112,8 @@ extern int selected_intro;
 
 
 /* Declared by Taranjeet for OUAF Journal */
-Player journal_player;
-int journal_room;
+extern Player journal_player;
+extern int journal_room;
 
 #define GAME_MAIN_MENU        1       /* Game menus */
 #define GAME_SAVE_MENU        2

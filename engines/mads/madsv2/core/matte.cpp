@@ -24,6 +24,7 @@
 #include "mads/madsv2/core/buffer.h"
 #include "mads/madsv2/core/mouse.h"
 #include "mads/madsv2/core/font.h"
+#include "mads/madsv2/core/inter.h"
 #include "mads/madsv2/core/sort.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/pal.h"
@@ -93,6 +94,16 @@ int work_screen_ems_handle = -1;        /* Work screen in EMS        */
 
 TileMapHeader picture_map,      depth_map;      /* Tile maps         */
 TileResource  picture_resource, depth_resource; /* Tile resources    */
+
+ImageInter image_inter_list[IMAGE_INTER_LIST_SIZE];
+Matte      matte_inter_list[IMAGE_INTER_LIST_SIZE];
+
+int inter_viewing_at_y = 0;             /* Interface base Y loc.     */
+
+byte image_inter_marker = 0;            /* Interface image list mark */
+
+Buffer scr_inter = { 0, 0, NULL }; /* Interface work buffer     */
+Buffer scr_inter_orig = { 0, 0, NULL }; /* Interface original buffer */
 
 
 int matte_map_work_screen() {
@@ -1097,6 +1108,289 @@ void matte_frame(int special_effect, int full_screen) {
 		}
 		message++;
 	}
+}
+
+
+int matte_allocate_inter_image(void) {
+	int result;
+
+	if (image_inter_marker >= IMAGE_INTER_LIST_SIZE) {
+#if !defined(disable_error_check)
+		error_report(ERROR_IMAGE_INTER_LIST_FULL, ERROR, MODULE_MATTE, IMAGE_INTER_LIST_SIZE, image_inter_marker);
+#endif
+		result = -1;
+	} else {
+		result = image_inter_marker++;
+	}
+
+	return (result);
+}
+
+
+void matte_refresh_inter(void) {
+	int id;
+
+	id = matte_allocate_inter_image();
+	image_inter_list[id].flags = IMAGE_REFRESH;
+	image_inter_list[id].segment_id = (byte)-1;
+}
+
+
+static void make_inter_matte(ImageInterPtr image, MattePtr matte) {
+	SpritePtr sprite;
+	int xs, ys;
+	int flags;
+
+	flags = image->flags;
+	if (flags <= IMAGE_UPDATE_ONLY)  flags -= IMAGE_UPDATE_ONLY;
+	if (flags >= IMAGE_UPDATE_READY) flags &= ~IMAGE_UPDATE_READY;
+
+	if (flags == IMAGE_REFRESH) {
+		matte->x = 0;
+		matte->y = 0;
+		xs = scr_inter.x;
+		ys = scr_inter.y;
+	} else if (flags == IMAGE_OVERPRINT) {
+		matte->x = image->x;
+		matte->y = image->y;
+		xs = image->sprite_id;
+		ys = image->series_id;
+	} else {
+
+		sprite = &series_list[image->series_id]->index[(image->sprite_id & HALF_SPRITE_MASK) - 1];
+
+		xs = sprite->xs;
+		ys = sprite->ys;
+
+		if (image->segment_id == INTER_SPINNING_OBJECT) {
+			matte->x = image->x;
+			matte->y = image->y;
+		} else {
+			matte->x = image->x - (xs >> 1);
+			matte->y = image->y - (ys - 1);
+		}
+
+	}
+
+	bound_matte(matte, xs, ys, scr_inter.x, scr_inter.y);
+}
+
+
+
+void matte_inter_frame(int update_live, int clear_chaff) {
+	register int id;
+	int x, y;
+	int flags;
+	word mirror;
+	word which;
+	SeriesPtr series;
+	int beware_the_mouse = false;
+	byte new_marker;
+	register MattePtr matte;
+	register MattePtr matte2;
+	MattePtr i_am_the_dog_master = NULL;
+	ImageInter *image;
+	ImageInter *image2;
+#ifdef show_mattes
+	char temp_buf[80];
+	int count;
+#endif
+
+	/* Make sure work buffer is mapped into the page frame */
+	matte_map_work_screen();
+
+	/* Before performing erasures, make a matte for each potential erasure */
+	/* image.                                                              */
+
+	image = image_inter_list;
+	matte = matte_inter_list;
+	for (id = 0; id < (int)image_inter_marker; id++) {
+		if (image->flags < IMAGE_STATIC) {
+			make_inter_matte(image, matte);
+			matte->changed = true;
+			if (image->segment_id == INTER_SPINNING_OBJECT) {
+				if (image->flags == IMAGE_FULLUPDATE) {
+					matte->valid = false;
+					i_am_the_dog_master = matte;
+				}
+			}
+		} else {
+			matte->valid = false;
+		}
+		image++;
+		matte++;
+	}
+
+	filter_matte_list(matte_inter_list, image_inter_marker, 1);
+
+	if (i_am_the_dog_master != NULL) i_am_the_dog_master->valid = true;
+
+	/* Erasures */
+
+	matte = matte_inter_list;
+	image = image_inter_list;
+	for (id = 0; id < (int)image_inter_marker; id++) {
+
+		if (matte->valid) {
+
+			if ((matte->xs > 0) && (matte->ys > 0)) {
+
+				if (image->flags > IMAGE_UPDATE_ONLY) {
+					if (image->flags < IMAGE_ERASE) {
+						buffer_rect_copy(scr_inter_orig, scr_inter,
+							matte->x, matte->y,
+							matte->xs, matte->ys);
+					} else {
+						buffer_inter_merge_2(scr_inter_orig, scr_inter,
+							matte->x, matte->y,
+							matte->x, matte->y,
+							matte->xs, matte->ys);
+					}
+				}
+			}
+		}
+		matte++;
+		image++;
+	}
+
+	matte = matte_inter_list;
+	image = image_inter_list;
+	for (id = 0; id < (int)image_inter_marker; id++) {
+		flags = image->flags;
+		if (flags >= IMAGE_STATIC) {
+			make_inter_matte(image, matte);
+			if (!update_live) flags &= ~IMAGE_UPDATE_READY;
+			matte->changed = (byte)(flags > IMAGE_STATIC);
+			image->flags &= IMAGE_UPDATE_READY;
+		}
+		matte++;
+		image++;
+	}
+
+	/* Check our new matte list for collisions */
+
+	filter_matte_list(matte_inter_list, (int)image_inter_marker, 1);
+
+	/* Now, run through our depth list, and for each entry, draw the    */
+	/* indicated sprite into the work buffer.                           */
+
+	image = image_inter_list;
+	matte = matte_inter_list;
+	for (id = 0; id < (int)image_inter_marker; id++) {
+
+		if ((image->flags >= IMAGE_STATIC) && !(image->flags & IMAGE_UPDATE_READY)) {
+
+			/* Search through the matte list to find the matte of which this */
+			/* image is a part.                                              */
+
+			for (matte2 = matte; !matte2->valid; matte2 = (MattePtr)matte2->y);
+
+			if (matte2->changed) {
+				series = series_list[image->series_id];
+				which = image->sprite_id;
+				mirror = (which & HALF_MIRROR_MASK) ? MIRROR_MASK : 0;
+				which &= HALF_SPRITE_MASK;
+				if (image->segment_id == INTER_SPINNING_OBJECT) {
+					sprite_draw(series, which, &scr_inter, image->x, image->y);
+				} else {
+					x = image->x - (series->index[which - 1].xs >> 1);
+					y = image->y - (series->index[which - 1].ys - 1);
+					sprite_draw_interface(series,
+						which | mirror,
+						&scr_inter,
+						x, y);
+				}
+			}
+		}
+		image++;
+		matte++;
+	}
+
+	if (update_live) {
+
+		/* Finally, run through our combined matte list, and update any */
+		/* areas of the screen flagged as "changed" by copying from the */
+		/* work screen to the live video screen.                        */
+
+		mouse_set_work_buffer(scr_inter.data, scr_inter.x);
+		mouse_set_view_port_loc(0, inter_viewing_at_y, 319, inter_viewing_at_y + scr_inter.y - 1);
+
+		mouse_freeze();                                /* Lock out mouse driver  */
+
+		if (video_mode != ega_mode) {
+			beware_the_mouse = mouse_refresh_view_port(); /* Prepare cursor overlay */
+		}
+
+		matte = matte_inter_list;
+		for (id = 0; id < (int)image_inter_marker; id++) {
+
+			/* Get next matte */
+
+#ifdef show_mattes
+			sprintf(temp_buf, "(%d, %d) => (%d, %d)   valid: %d   changed: %d      ",
+				matte->x, matte->y, matte->xs, matte->ys, matte->valid, matte->changed);
+			screen_show(temp_buf, 0, id);
+#endif
+
+			/* Ignore empty mattes, or images which did not change */
+
+			if (matte->valid && matte->changed && (matte->xs > 0) && (matte->ys > 0)) {
+
+				video_update(&scr_inter,
+					matte->x, matte->y,
+					matte->x, matte->y + inter_viewing_at_y,
+					matte->xs, matte->ys);
+
+			}
+
+			matte++;
+		}
+
+#ifdef sixteen_colors
+		if (video_mode == ega_mode) {
+			beware_the_mouse = mouse_refresh_view_port(); /* Prepare cursor overlay */
+			video_flush_ega(inter_viewing_at_y, scr_inter.y);    /* Update the EGA screen  */
+		}
+#endif
+
+#ifdef show_mattes
+		keys_get();
+#endif
+
+		if (beware_the_mouse) {
+			mouse_refresh_done();       /* Remove cursor image from work buffer */
+		}
+
+		mouse_thaw();                 /* Release the mouse driver             */
+	}
+
+	/* Delete erasures from image list */
+
+	new_marker = 0;
+	image = image_inter_list;
+	image2 = image_inter_list;
+	for (id = 0; id < (int)image_inter_marker; id++) {
+		if (image->flags >= IMAGE_STATIC) {
+			if (update_live) {
+				image->flags &= ~IMAGE_UPDATE_READY;
+			} else {
+				image->flags |= IMAGE_UPDATE_READY;
+			}
+			if (id != (int)new_marker) {
+				*image2 = *image;
+			}
+			new_marker++;
+			image2++;
+		} else if (!update_live && !clear_chaff) {
+			if (image->flags > IMAGE_UPDATE_ONLY) {
+				image->flags += IMAGE_UPDATE_ONLY;
+			}
+			new_marker++;
+			image2++;
+		}
+		image++;
+	}
+	image_inter_marker = new_marker;
 }
 
 } // namespace MADSV2

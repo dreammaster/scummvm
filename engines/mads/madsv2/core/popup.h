@@ -170,7 +170,7 @@ typedef struct {
 	int ask_x, ask_y;
 	int cursor_x;
 	word tab[POPUP_MAX_LINES];
-	byte *text[POPUP_MAX_LINES];
+	char *text[POPUP_MAX_LINES];
 
 	int dont_add_space;
 
@@ -306,8 +306,7 @@ typedef struct {
 
 #define ITEM_STATUS_INERT     0x100
 
-
-typedef struct {
+struct PopupItem {
 	byte type;                  /* Type of item    */
 
 	word status;                /* Status of item  */
@@ -332,9 +331,8 @@ typedef struct {
 	SeriesPtr series;           /* Sprite series   */
 	int sprite;                 /* Sprite id       */
 
-	void (*vector[POPUP_ITEM_VECTORS])(); /* Vectors */
-
-} PopupItem;
+	int (*vector[POPUP_ITEM_VECTORS])(PopupItem *item); /* Vectors */
+};
 
 
 #define POPUP_MOUSE_SCROLL    0x8000  /* Mouse in scroll bar       */
@@ -404,7 +402,7 @@ extern int popup_available;
 
 extern int popup_preserve_initiator[3];
 
-extern byte popup_colors[8];
+extern byte popup_colors[24];
 extern byte popup_num_colors;
 
 extern BoxParam box_param;
@@ -419,8 +417,8 @@ void popup_destroy(void);
 /* popup_1.c */
 void popup_next_line(void);
 void popup_set_ask(void);
-void popup_add_string(char *string);
-void popup_write_string(char *string);
+void popup_add_string(const char *string);
+void popup_write_string(const char *string);
 void popup_bar(void);
 void popup_underline(void);
 void popup_downpixel(void);
@@ -453,20 +451,15 @@ int popup_alert(int width, char *message_line, ...);
 int popup_box_load(void);
 
 /* popup_5.c */
-Popup *popup_activate(Popup *newpop);
-int popup_exec_function(PopupItem *item, int function);
-char *popup_heap(long mem_to_get);
-
-/* popup_5.c */
 Popup *popup_dialog_create(void *memory,
 	long heap_size,
 	int max_items);
 Popup *popup_dialog_destroy(void);
 
 /* popup_5.c */
-PopupItem *popup_button(char *prompt, int x);
-PopupItem *popup_cancel_button(char *prompt);
-PopupItem *popup_message(char *prompt, int x, int y);
+PopupItem *popup_button(const char *prompt, int x);
+PopupItem *popup_cancel_button(const char *prompt);
+PopupItem *popup_message(const char *prompt, int x, int y);
 PopupItem *popup_execute(void);
 
 /* popup_5.c */

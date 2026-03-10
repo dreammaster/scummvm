@@ -76,79 +76,45 @@ extern Buffer  scr_live;
 
 extern Window     screen_active;
 
-/* screen_1.cpp */
+/**
+ * Sets # of lines in VGA text mode
+ */
 void  screen_set_size(short numlines);
 
-/* screen_2.cpp */
-void  screen_wipe_line(short ul_x, short ul_y, short len,
-	short wipe_color, byte wipe_char);
+/**
+ * Sets uniform color & character for specified line
+ */
+void screen_wipe_line(short ul_x, short ul_y, short len, short wipe_color, byte wipe_char);
 
-/* screen_3.cpp */
-short screen_out(char *outstring, short strcolor,
-	short selcolor, short str_x, short str_y);
-
-/* screen_4.cpp */
-short screen_put(char *outstring,
-	short strcolor, short selcolor,
-	short str_x, short str_y);
-
-/* screen_5.cpp */
+short screen_out(const char *outstring, short strcolor, short selcolor, short str_x, short str_y);
+short screen_put(const char *outstring, short strcolor, short selcolor, short str_x, short str_y);
 void  screen_set_colors(int normal_color, int hilite_color);
 void  screen_set_line_width(int line_width);
 
-/* screen_6.c ... DO NOT USE */
-short screen_show(char *outstring, short locx, short locy);
+/* DO NOT USE */
+//short screen_show(const char *outstring, short locx, short locy);
 
-/* screen_7.cpp */
-short screen_show_line(char *outstring,
-	short locx, short locy);
-
-/* screen_8.cpp */
-short screen_write(char *outstring);
-
-/* screen_9.cpp */
-short screen_write_line(char *outstring);
-
-/* screen_a.cpp */
+short screen_show_line(const char *outstring, short locx, short locy);
+short screen_write(const char *outstring);
+short screen_write_line(const char *outstring);
 void  screen_clear(int clear_color);
-
-/* screen_b.cpp */
 void  screen_dominant_mode(int dominant_mode);
-
-/* screen_c.cpp */
 void  screen_init(int video_mode);
-
-/* screen_d.cpp */
 void  screen_init_dual(int mono_left);
 void  screen_shutdown_dual(int clear_flag);
-
-/* screen_e.cpp */
 void  screen_init_graphics(int which_mode);
 void  screen_shutdown_graphics(int clear_flag);
+void  screen_show_spot(const char *message, int wx, int wy, int class_, int num);
 
-/* screen_f.cpp */
-void  screen_show_spot(char *message, int wx, int wy, int class_, int num);
+/* DO NOT USE */
+//int  screen_printf(int x, int y, char *string, ...);
+//int  screen_print(char *string, ...);
 
-/* screen_g.c ... DO NOT USE */
-int  screen_printf(int x, int y, char *string, ...);
-int  screen_print(char *string, ...);
-
-
-/* screen_h.cpp */
 void screen_init_text(int which_mode);
 void screen_shutdown_text(int clear_flag);
-
-
-/* screen_i.cpp */
 void screen_save(void);
 void screen_restore(void);
-
-
-/* screen_j.cpp */
-short screen_show_wide(char *outstring,
-	short locx,
-	short locy,
-	short width);
+short screen_show_wide(const char *outstring, short locx, short locy, short width);
 
 } // namespace MADSV2
 } // namespace MADS

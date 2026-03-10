@@ -19,21 +19,24 @@
  *
  */
 
-#ifndef MADS_CORE_IMATH_H
-#define MADS_CORE_IMATH_H
+#ifndef MADS_CORE_LBM_H
+#define MADS_CORE_LBM_H
 
 #include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/color.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-int  imath_distance(int side_a, int side_b, int threshold);
-int  imath_hypot(int side_a, int side_b);
-word imath_isqrt(long square);
+/* lbm_1.c */
+void lbm_read_page(const char *filename, byte *image, Palette *pal);
 
-void imath_circular_arc(word *buffer, int radius);
+/* lbm_2.c */
+Buffer lbm_read_buffer(const char *filename, Palette *pal, CycleListPtr cycle);
 
-int imath_random(int from, int unto);
+/* lbm_3.c */
+int lbm_read_buffer_main(const char *name, Buffer *target, int reserved_flag,
+	CycleListPtr cycle_list);
 
 } // namespace MADSV2
 } // namespace MADS

@@ -19,23 +19,27 @@
  *
  */
 
-#ifndef MADS_CORE_IMATH_H
-#define MADS_CORE_IMATH_H
-
-#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/ems.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-int  imath_distance(int side_a, int side_b, int threshold);
-int  imath_hypot(int side_a, int side_b);
-word imath_isqrt(long square);
+word ems_page_frame = 0;
+word ems_handle = 0;
+word ems_pages = 0;
+int ems_disabled = 0;
+word ems_high_version = 0;
+word ems_low_version = 0;
+byte *ems_page[4] = {};
+word ems_paging_active = 0;
+word ems_pages_free = 0;
+word ems_pages_reserved = 0;
+byte *ems_page_flag = nullptr;
+word ems_paging_reserve[EMS_PAGING_CLASSES] = {};
 
-void imath_circular_arc(word *buffer, int radius);
-
-int imath_random(int from, int unto);
+int ems_mapping_changed = 0;
+int ems_page_mapped[4] = {};
+int ems_page_stack[4] = {};
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

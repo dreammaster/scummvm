@@ -31,7 +31,10 @@ namespace MADSV2 {
 word pattern_control_value = 0x181d;
 word pattern_initial_value = 0xb78e;
 int  auto_pattern = true;
+int buffer_restore_keep_flag = false;
+
 static word accum;                    /* Pattern accumulator */
+static Buffer buffer_preserve_conventional;
 
 
 bool buffer_init(Buffer *buf, word x, word y) {
@@ -722,6 +725,87 @@ void buffer_peel_vert(Buffer *target, int peel, byte *work_memory, long work_siz
 
 	if (work_area != NULL && work_memory == NULL)
 		mem_free(work_area);
+}
+
+int buffer_preserve(Buffer *source, int flags, int source_ems_handle, int x, int y, int xs, int ys) {
+	int preserve_handle = BUFFER_NOT_PRESERVED;
+	int disk_number;
+
+	if (buffer_conform(source, &x, &y, &xs, &ys)) {
+		goto done;
+	}
+
+	/* Try to preserve in conventional memory, if requested */
+
+	if (flags == BUFFER_ATTEMPT_CONVENTIONAL) {
+		buffer_init_name(&buffer_preserve_conventional, xs, ys, "$preserv");
+		if (buffer_preserve_conventional.data != NULL) {
+			buffer_rect_copy_2(*source, buffer_preserve_conventional,
+				x, y, 0, 0, xs, ys);
+			preserve_handle = BUFFER_PRESERVED_CONVENTIONAL;
+			goto done;
+		}
+	}
+
+	/* Try to preserve in EMS memory */
+
+	preserve_handle = buffer_to_ems(source, flags, source_ems_handle, x, y, xs, ys);
+	if (preserve_handle >= 0) {
+		goto done;
+	}
+
+	/* Try to preserve on disk */
+
+	if (flags != BUFFER_PRESERVE_RAM) {
+		disk_number = buffer_to_disk(source, x, y, xs, ys);
+		if (disk_number >= 0) {
+			preserve_handle = BUFFER_PRESERVED_DISK - disk_number;
+			goto done;
+		}
+	}
+
+	preserve_handle = BUFFER_NOT_PRESERVED;
+
+done:
+	return (preserve_handle);
+}
+
+void buffer_restore(Buffer *source, int preserve_handle, int target_ems_handle, int x, int y, int xs, int ys) {
+	if (buffer_conform(source, &x, &y, &xs, &ys)) {
+		goto done;
+	}
+
+	switch (preserve_handle) {
+	case BUFFER_PRESERVED_CONVENTIONAL:
+		buffer_rect_copy_2(buffer_preserve_conventional, *source,
+			0, 0, x, y, xs, ys);
+		if (!buffer_restore_keep_flag) buffer_free(&buffer_preserve_conventional);
+		break;
+
+	case BUFFER_PRESERVED_DISK:
+	case BUFFER_PRESERVED_DISK - 1:
+	case BUFFER_PRESERVED_DISK - 2:
+	case BUFFER_PRESERVED_DISK - 3:
+	case BUFFER_PRESERVED_DISK - 4:
+	case BUFFER_PRESERVED_DISK - 5:
+	case BUFFER_PRESERVED_DISK - 6:
+	case BUFFER_PRESERVED_DISK - 7:
+	case BUFFER_PRESERVED_DISK - 8:
+	case BUFFER_PRESERVED_DISK - 9:
+		buffer_from_disk(source, neg(preserve_handle - BUFFER_PRESERVED_DISK), buffer_restore_keep_flag, x, y, xs, ys);
+		break;
+
+	case BUFFER_NOT_PRESERVED:
+		break;
+
+	default:
+		if (buffer_restore_keep_flag) preserve_handle &= ~BUFFER_CREATED_PAGE_HANDLE;
+		buffer_from_ems(source, preserve_handle, target_ems_handle, x, y, xs, ys);
+		break;
+	}
+
+done:
+	;
 }
 
 } // namespace MADSV2

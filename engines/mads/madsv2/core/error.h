@@ -136,33 +136,32 @@ extern void (*error_service_routine_2)();
 
 
 /* error_1.cpp */
-void error_report(int error, int severity, int module,
-	long data1, long data2);
+extern void error_report(int error, int severity, int module, long data1, long data2);
 
 int error_scan(char *target, char *name, int number);
 
-void error_dump_file(char *file_name);
+extern void error_dump_file(char *file_name);
 
 /* error_2.cpp */
-void error_break_point(int data1, int data2);
+extern void error_break_point(int data1, int data2);
 
 
 /* error_3.cpp */
-void error_watch_point(char *message, long data1, long data2);
+extern void error_watch_point(char *message, long data1, long data2);
 
 
 /* error_4.cpp */
-void error_check_memory(void);
+extern void error_check_memory(void);
 
 
 /* error_5.cpp */
-void error_file_point(char *message, long data1, long data2);
+extern void error_file_point(char *message, long data1, long data2);
 
 
 /* error_6.cpp */
-void error_entry(char *name, char *message);
-void error_exit(char *name, char *message);
-void error_put(char *name, int item);
+extern void error_entry(char *name, char *message);
+extern void error_exit(char *name, char *message);
+extern void error_put(char *name, int item);
 
 } // namespace MADSV2
 } // namespace MADS

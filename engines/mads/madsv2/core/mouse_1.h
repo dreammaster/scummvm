@@ -41,8 +41,8 @@ extern int  mouse_video_mode;
 extern byte mouse_showing;
 
 extern int mouse_button, mouse_status, mouse_x, mouse_y;
-extern int mouse_start_stroke, mouse_stroke_going, mouse_changed;
-extern int mouse_latched, mouse_stop_stroke;
+extern bool mouse_start_stroke, mouse_stroke_going, mouse_changed;
+extern bool mouse_latched, mouse_stop_stroke;
 extern int mouse_old_x, mouse_old_y;
 
 /* mouse_1.cpp */

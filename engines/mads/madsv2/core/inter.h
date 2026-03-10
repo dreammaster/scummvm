@@ -269,27 +269,26 @@ extern void (*inter_object_routine)();
 
 
 /* inter_1.c */
-void inter_prepare_background(void);
-void inter_setup_hotspots(void);
-void inter_set_active_inven(int inven_id);
-void inter_give_to_player(int this_);
-void inter_move_object(int object_id, int location);
-void inter_init_sentence(void);
-void inter_main_loop(int allow_input);
+extern void inter_prepare_background(void);
+extern void inter_setup_hotspots(void);
+extern void inter_set_active_inven(int inven_id);
+extern void inter_give_to_player(int this_);
+extern void inter_move_object(int object_id, int location);
+extern void inter_init_sentence(void);
+extern void inter_main_loop(int allow_input);
 
-void inter_refresh(void);
-void inter_screen_update(void);
+extern void inter_screen_update(void);
 
-void inter_turn_off_object(void);
-void inter_spin_object(int object_id);
-int  inter_allocate_objects(void);
-void inter_deallocate_objects(void);
+extern void inter_turn_off_object(void);
+extern void inter_spin_object(int object_id);
+extern int  inter_allocate_objects(void);
+extern void inter_deallocate_objects(void);
 
-void inter_reset_dialog(void);
-int  inter_add_dialog(char *string, int result);
+extern void inter_reset_dialog(void);
+extern int inter_add_dialog(char *string, int result);
 
 /* inter_2.c */
-int inter_load_background(char *name, Buffer *target);
+extern int inter_load_background(char *name, Buffer *target);
 
 } // namespace MADSV2
 } // namespace MADS

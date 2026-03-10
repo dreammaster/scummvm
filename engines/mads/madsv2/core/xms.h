@@ -40,30 +40,39 @@ extern word  xms_chain_seg;        /* First UMB MCB segment for us       */
 extern word xms_umb_list[XMS_MAX_UMB];
 extern word xms_umb_mark;
 
-/* xms_1.c */
-int xms_detect(void);
+inline int xms_detect() { return 0; }
+inline long xms_umb_get_avail() {}
+inline void *xms_umb_get(long mem_to_get) { return nullptr; }
+inline void xms_umb_free(void *mem_to_free) {}
+inline void xms_umb_purge() {}
 
-/* xms_2.c */
-long         xms_umb_get_avail(void);
+/**
+ * Returns the size of the largest free XMS block.
+ */
+inline long xms_get_avail() { return 0; }
 
-/* xms_3.c */
-void *xms_umb_get(long mem_to_get);
-void         xms_umb_free(void *mem_to_free);
+/**
+ * Allocates an XMS block of the appropriate size, and returns a handle for it.
+ */
+inline int  xms_get(long size_in_bytes) { return 0; }
 
-/* xms_4.c */
-void         xms_umb_purge(void);
+/**
+ * Deallocates an XMS block
+ */
+inline void xms_free(int xms_handle) {}
 
-/* xms_5.c */
-long         xms_get_avail(void);
-
-/* xms_6.c */
-int  xms_get(long size_in_bytes);
-void xms_free(int xms_handle);
-
-/* xms_7.c */
-int          xms_copy(long copy_size,
-	word source_handle, void *source,
-	word dest_handle, void *dest);
+/**
+ * Copy data to/from/between XMS memory blocks.  Note that the parameter
+ * stack format corresponds precisely to the XMS function spec, so we
+ * can just point directly at the parameter stack and call XMS.
+ *
+ * For conventional memory, use handle "0", and a traditional
+ * segmented far pointer.
+ *
+ * For extended memory, use the proper handle number, and a full
+ * 32-bit (unsegmented) pointer.
+ */
+inline int xms_copy(long copy_size, word source_handle, void *source, word dest_handle, void *dest) { return 0; }
 
 } // namespace MADSV2
 } // namespace MADS
