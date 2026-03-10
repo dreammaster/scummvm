@@ -22,13 +22,19 @@
 #ifndef MADS_CORE_ECHO_H
 #define MADS_CORE_ECHO_H
 
-#include "common/scummsys.h"
+#include "gui/debugger.h"
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-/* echo_1.cpp */
-void echo(char *item, int carriage_return);
+inline void echo(const char *item, bool carriage_return) {
+	auto &dbg = *g_engine->getDebugger();
+
+	dbg.debugPrintf(item);
+	if (carriage_return)
+		dbg.debugPrintf("\n");
+}
 
 } // namespace MADSV2
 } // namespace MADS

@@ -61,6 +61,7 @@ MODULE_OBJS += \
 	forest/globals_forest.o \
 	madsv2/engine.o \
 	madsv2/core/buffer.o \
+	madsv2/core/error.o \
 	madsv2/core/font_1.o \
 	madsv2/core/kernel_1.o \
 	madsv2/core/kernel_3.o \

@@ -425,7 +425,7 @@ void popup_bar(void);
 void popup_underline(void);
 void popup_downpixel(void);
 void popup_tab(int tab_level);
-void popup_center_string(char *string, int underline);
+void popup_center_string(const char *string, int underline);
 
 /* popup_1.c */
 int  popup_and_wait(int save_screen);
