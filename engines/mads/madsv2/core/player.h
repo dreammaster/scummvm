@@ -22,7 +22,7 @@
 #ifndef MADS_CORE_PLAYER_H
 #define MADS_CORE_PLAYER_H
 
-#include "common/scummsys.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -163,58 +163,173 @@ extern byte player_counter_clockwise[10];
 #define player_said_3(aa, bb, cc) (player_parse (words_##aa, words_##bb, words_##cc, 0) )
 
 
-/* player_1.c */
-void player_new_stop_walker(void);
-void player_stationary_update(void);
-void player_set_facing(void);
-void player_set_final_facing(void);
-void player_select_series(void);
-void player_set_sprite(void);
-void player_keep_walking(void);
-int  player_search_image(void);
-void player_set_image(void);
+/**
+ * Loads up the next designated sprite for the active stop walker sequence.
+ */
+extern void player_new_stop_walker();
 
-/* player_2.c */
-int  player_load_series(char *name);
-void player_himem_preload(char *name, int level);
-void player_dump_walker(void);
-void player_preserve_palette(void);
+/**
+ * Player sprite update daemon for when the player is not walking.
+ * Inserts appropriate stop walker frames from the stop walker queue.
+ */
+extern void player_stationary_update();
 
-/* player_3.c */
-void player_new_command(void);
-void player_new_walk(void);
-int           player_parse(int vocab_word, ...);
+/**
+ * When the player is scheduled to move down a certain line,
+ * this routine determines which of the player's series should
+ * be used to represent his movement.  (I.e. it decides which
+ * facing most closely approximates his actual direction of movement).
+ */
+extern void player_set_facing();
 
-/* player_4.c */
-void player_cancel_walk(void);
-void player_cancel_command(void);
+/**
+ * When the player arrives at his destination, begin turning him
+ * to face any designated target facing.
+ */
+extern void player_set_final_facing();
 
-/* player_5.c */
-int  player_has_been_in_room(int id);
-void player_discover_room(int id);
+/**
+ * Loads up the walker control parameters for the currently
+ * active walker series (i.e. for the player's current facing)
+ */
+extern void player_select_series();
 
-/* player_6.c */
-int player_has(int object_id);
+/**
+ * Picks an appropriate sprite for the current player frame.
+ */
+extern void player_set_sprite();
 
-/* player_7.c */
-void player_clear_stop_walkers(void);
-void player_init(void);
-void player_start_walking(int walk_x, int walk_y,
-	int walk_facing);
+/**
+ * If the player is walking somewhere, this routine determines the
+ * proper motion for the current frame.
+ */
+extern void player_keep_walking();
 
-/* player_7.c */
-int  player_add_stop_walker(int walker, int trigger);
-void player_walk(int x, int y, int facing);
-void player_walk_trigger(int trigger);
+/**
+ * Digs through the image list to find the current player image.
+ */
+extern int  player_search_image();
 
-/* player_7.c */
-void player_demand_facing(int facing);
-void player_demand_location(int x, int y);
+/**
+ * Actually makes an image list entry for this frame's player sprite.
+ */
+extern void player_set_image();
 
-/* player_7.c */
-void player_first_walk(int from_x, int from_y, int from_facing,
-	int to_x, int to_y, int to_facing,
-	int enable_at_target);
+/**
+ * Loads a full set of player walkers into memory.
+ */
+extern int  player_load_series(const char *name);
+
+/**
+ * Preloads a full set of player walkers to high memory.
+ */
+extern void player_himem_preload(const char *name, int level);
+
+extern void player_dump_walker();
+extern void player_preserve_palette();
+
+/**
+ * Accepts a new sentence from the interface routines; copies all
+ * the necessary data into the player data structure.  Sets up
+ * structures and semaphores to process a brand new sentence.  Checks
+ * to see if the player needs to walk anywhere based on the command
+ * he has issued.
+ */
+extern void player_new_command();
+
+/**
+ * If a new walk instruction is waiting, and has been cleared
+ * by the preparser, start the ball rolling.
+ */
+extern void player_new_walk();
+
+/**
+ * Returns true if the player's sentence contains all of the passed
+ * vocabulary word numbers (parameter list should be terminated with a 0).
+ */
+extern int player_parse(int vocab_word, ...);
+
+/**
+ * Aborts any ongoing player walk; stops him dead in his tracks.
+ */
+extern void player_cancel_walk();
+
+/**
+ * Cancels any currently outstanding player command sentence.  The
+ * sentence will no longer be processed by parser code.
+ */
+extern void player_cancel_command();
+
+/**
+ * Returns true if the player has been in the specified room during the game.
+ */
+extern int player_has_been_in_room(int id);
+
+/**
+ * Makes a note of the fact that the player has been in the current
+ * room (so that henceforth the routine above will return true for this room).
+ */
+extern void player_discover_room(int id);
+
+/**
+ * Returns true if the player is carrying the specified object number.
+ * Negative(invalid) object numbers are permitted (they return false),
+ * so it is safe to form statements such as...
+ *
+ * if (player_has(object_named(player_main_noun))) {
+ *
+ * ...even though it cannot be guaranteed that player_main_noun
+ * actually names a valid object.
+ */
+extern int player_has(int object_id);
+
+/**
+ * Flushes the stop walker stack.
+ */
+extern void player_clear_stop_walkers();
+
+/**
+ * Initializes player data structures (for use at the beginning of the game).
+ */
+extern void player_init();
+
+/**
+ * Computes a rail solution for the player to walk to the
+ * designated location, and starts him walking there.
+ */
+extern void player_start_walking(int walk_x, int walk_y, int walk_facing);
+
+/**
+ * Add a stop walker to the current queue.
+ */
+extern int player_add_stop_walker(int walker, int trigger);
+
+/**
+ * Used by game code to request that the player walk to the
+ * designated location as soon as possible.  Should be used
+ * in preference to player_start_walking(), which bypasses
+ * several layers of checking.
+ */
+extern void player_walk(int x, int y, int facing);
+
+extern void player_walk_trigger(int trigger);
+
+/**
+ * Resets the player's facing.
+ */
+extern void player_demand_facing(int facing);
+
+extern void player_demand_location(int x, int y);
+
+/**
+ * Used at room init time to request that the player begin by performing
+ * the specified walk (usually from offscreen).  Commands are disabled
+ * during the walk (because the player may be walking over walk code areas).
+ * If "enable_at_target" is true, player commands will be enabled once
+ * he reaches his target.
+ */
+extern void player_first_walk(int from_x, int from_y, int from_facing,
+	int to_x, int to_y, int to_facing, int enable_at_target);
 
 } // namespace MADSV2
 } // namespace MADS

@@ -27,7 +27,7 @@
 namespace MADS {
 namespace MADSV2 {
 
-extern int video_mode;
+extern byte video_mode;
 
 /* video.asm */
 void video_init(int mode, int set_mode);

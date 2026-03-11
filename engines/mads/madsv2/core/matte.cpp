@@ -153,7 +153,7 @@ int matte_allocate_series(SeriesPtr series, int bonus_series_number) {
 	return handle;
 }
 
-int matte_load_series(char *name, int load_flags, int bonus_series_number) {
+int matte_load_series(const char *name, int load_flags, int bonus_series_number) {
 	int found = false;
 	int valid_name = true;
 	int handle = -1;

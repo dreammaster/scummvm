@@ -19,16 +19,30 @@
  *
  */
 
-#ifndef MADS_CORE_KERNEL_G_H
-#define MADS_CORE_KERNEL_G_H
+#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/room.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern int kernel_dynamic_consecutive(int id);
-extern void kernel_refresh_dynamic();
+#define RAIL_MAX_NODES          ROOM_MAX_RAILS + 2
+
+extern word rail_solution_stack_pointer;
+extern word rail_solution_stack_weight;
+
+extern byte rail_visited[RAIL_MAX_NODES];
+extern byte rail_working_stack[RAIL_MAX_NODES];
+extern byte rail_solution_stack[RAIL_MAX_NODES];
+
+extern word rail_num_nodes;
+extern byte *rail_base;
+
+extern void rail_add_node(int id, int x, int y);
+extern void rail_connect_node(int id);
+extern void rail_connect_all_nodes(void);
+extern void rail_disconnect_line(int from, int unto);
+extern void rail_disconnect_node(int id);
+extern void rail_check_path (int allow_one_illegal);
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

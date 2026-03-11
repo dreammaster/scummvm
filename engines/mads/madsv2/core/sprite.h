@@ -282,148 +282,96 @@ typedef Series *SeriesPtr;
 
 extern byte *sprite_force_memory;
 extern long      sprite_force_size;
-
-/* sprite_1.cpp */
-void sprite_draw(SeriesPtr series, int id, Buffer *buf,
-	int target_x, int target_y);
-
-
-/* sprite_2.cpp */
-void sprite_draw_scaled(SeriesPtr series, int id, Buffer *buf,
-	int target_x, int target_y, int scale_factor);
-
-
-/* sprite_3.cpp */
-void sprite_draw_3d_scaled(SeriesPtr series, int id,
-	Buffer *buf, Buffer *attr,
-	int target_x, int target_y,
-	int target_depth, int scale_factor);
-
-/* sprite_4.cpp */
-void sprite_draw_3d_big(SeriesPtr series, int id,
-	Buffer *buf, Buffer *attr,
-	int target_x, int target_y, int target_depth,
-	int view_port_x, int view_port_y);
-
-
-/* sprite_5.cpp */
-void sprite_draw_3d_scaled_big(SeriesPtr series, int id,
-	Buffer *buf, Buffer *attr,
-	int target_x, int target_y,
-	int target_depth, int scale_factor,
-	int view_port_x, int view_port_y);
-
-/* sprite_6.cpp */
-void sprite_draw_3d_x16(SeriesPtr series, int id,
-	Buffer *buf, Buffer *attr,
-	int target_x, int target_y, int target_depth);
-
-/* sprite_7.cpp */
-void sprite_draw_3d_scaled_x16(SeriesPtr series, int id,
-	Buffer *buf, Buffer *attr,
-	int target_x, int target_y,
-	int target_depth, int scale_factor);
-
-
-/* sprite_8.cpp */
-void sprite_draw_3d_big_x16(SeriesPtr series, int id,
-	Buffer *buf, Buffer *attr,
-	int target_x, int target_y, int target_depth,
-	int view_port_x, int view_port_y);
-
-
-/* sprite_9.cpp */
-void sprite_draw_3d_scaled_big_x16(SeriesPtr series, int id,
-	Buffer *buf, Buffer *attr,
-	int target_x, int target_y,
-	int target_depth, int scale_factor,
-	int view_port_x, int view_port_y);
-
-
-/* sprite_a.cpp */
-void sprite_draw_x16(SeriesPtr series, int id, Buffer *buf,
-	int target_x, int target_y);
-
-
-/* sprite_b.cpp */
-void sprite_draw_interface(SeriesPtr series, int id,
-	Buffer *buf,
-	int target_x, int target_y);
-
-
-/* sprite_c.cpp */
-void sprite_draw_3d_scaled_to_attr
-(SeriesPtr series, int id,
-	Buffer *buf, Buffer *attr,
-	int target_x, int target_y, int target_depth,
-	int scale_factor, int view_port_x, int view_port_y);
-
-
-/* sprite_d.cpp */
-void sprite_draw_3d_scaled_mono
-(SeriesPtr series, int id,
-	Buffer *buf, Buffer *attr,
-	int target_x, int target_y, int target_depth,
-	int scale_factor, byte color);
-
-
-/* sprite_e.cpp */
-SeriesPtr sprite_series_load(const char *filename, int load_flags);
-
 extern int sprite_error;
 
 
-/* sprite_f.cpp */
-void sprite_get_scaled_matte(SeriesPtr series, int id,
-	int target_x, int target_y,
+void sprite_draw(SeriesPtr series, int id, Buffer *buf, int target_x, int target_y);
+void sprite_draw_scaled(SeriesPtr series, int id, Buffer *buf,
+	int target_x, int target_y, int scale_factor);
+void sprite_draw_3d_scaled(SeriesPtr series, int id, Buffer *buf, Buffer *attr,
+	int target_x, int target_y, int target_depth, int scale_factor);
+void sprite_draw_3d_big(SeriesPtr series, int id, Buffer *buf, Buffer *attr,
+	int target_x, int target_y, int target_depth, int view_port_x, int view_port_y);
+void sprite_draw_3d_scaled_big(SeriesPtr series, int id, Buffer *buf, Buffer *attr,
+	int target_x, int target_y, int target_depth, int scale_factor,
+	int view_port_x, int view_port_y);
+void sprite_draw_3d_x16(SeriesPtr series, int id, Buffer *buf, Buffer *attr,
+	int target_x, int target_y, int target_depth);
+void sprite_draw_3d_scaled_x16(SeriesPtr series, int id, Buffer *buf, Buffer *attr,
+	int target_x, int target_y, int target_depth, int scale_factor);
+void sprite_draw_3d_big_x16(SeriesPtr series, int id, Buffer *buf, Buffer *attr,
+	int target_x, int target_y, int target_depth, int view_port_x, int view_port_y);
+void sprite_draw_3d_scaled_big_x16(SeriesPtr series, int id, Buffer *buf, Buffer *attr,
+	int target_x, int target_y, int target_depth, int scale_factor,
+	int view_port_x, int view_port_y);
+void sprite_draw_x16(SeriesPtr series, int id, Buffer *buf, int target_x, int target_y);
+void sprite_draw_interface(SeriesPtr series, int id, Buffer *buf, int target_x, int target_y);
+void sprite_draw_3d_scaled_to_attr(SeriesPtr series, int id, Buffer *buf, Buffer *attr,
+	int target_x, int target_y, int target_depth, int scale_factor,
+	int view_port_x, int view_port_y);
+void sprite_draw_3d_scaled_mono(SeriesPtr series, int id, Buffer *buf, Buffer *attr,
+	int target_x, int target_y, int target_depth, int scale_factor, byte color);
+SeriesPtr sprite_series_load(const char *filename, int load_flags);
+void sprite_get_scaled_matte(SeriesPtr series, int id, int target_x, int target_y,
 	int scale_factor, SpritePtr matte);
 
-
-/* sprite_g.cpp */
-word sprite_pack_line_rle(byte *target, Buffer *source,
-	byte *palette_map, byte transparent,
+/**
+ * Packs line (read from source) to buffer pointer to by BUF,
+ * and returns size.  X1,X2 and Y are line on screen to read.
+ * "Transparent" defines the background "skip" color.  "Palette_map"
+ * defines the palette-to-color-list mappings.
+ */
+word sprite_pack_line_rle(byte *target, Buffer *source, byte *palette_map, byte transparent,
 	int x1, int x2, int y);
 
+/**
+ * Packs line (read from source) to buffer pointer to by BUF,
+ * and returns size.  X1,X2 and Y are line of buffer to read.
+ * "Transparent" defines transparent color (instances of which
+ * are converted to "SS_SKIP").  "Palette_map" defines the
+ * palette-to-color-list mappings for the series.
+ */
 word sprite_pack_line_irle(byte *target, Buffer *source,
-	byte *palette_map, byte transparent,
-	int x1, int x2, int y);
+	byte *palette_map, byte transparent, int x1, int x2, int y);
 
-void sprite_set_bounds(HagSpritePtr sprite, int x, int y,
-	int xs, int ys);
+void sprite_set_bounds(HagSpritePtr sprite, int x, int y, int xs, int ys);
 
-void sprite_merge_background(Buffer *source, Buffer *background,
-	byte transparent);
+/**
+ * Given a foreground buffer and a background buffer, merges
+ * background image into transparent areas of foreground image.
+ */
+void sprite_merge_background(Buffer *source, Buffer *background, byte transparent);
 
-void sprite_delta_compute(HagSpritePtr sprite,
-	Buffer *source, Buffer *delta);
+/**
+ * Finds differences between "source" and "delta" buffers.  When pixels
+ * are different, "source" pixel is copied down to "delta" buffer (to
+ * prepare buffer for next round), and "source" buffer is whited out
+ * to show changes.  "sprite"'s boundaries are set to conform to minimum
+ * rectangle needed to contain all changes.
+ */
+void sprite_delta_compute(HagSpritePtr sprite, Buffer *source, Buffer *delta);
 
-void sprite_remove_non_delta(Buffer *source, Buffer *delta,
-	byte transparent);
+/**
+ * Compares "source" and "delta" buffers.  If a pixel is the same,
+ * "source" buffer is changed to "transparent"; if pixel is different,
+ * "source" pixel is copied to "delta" pixel, which prepares the delta
+ * buffer for use on next round.
+ */
+void sprite_remove_non_delta(Buffer *source, Buffer *delta, byte transparent);
 
-long sprite_pack_image(byte *target,
-	FileSpritePtr sprite,
-	Buffer *source,
-	byte *palette_map,
-	byte transparent);
+/**
+ * Given sprite, packs it and writes it to buffer target.
+ * Returns # of bytes output.
+ */
+long sprite_pack_image(byte *target, FileSpritePtr sprite, Buffer *source,
+	byte *palette_map, byte transparent);
 
-
-/* sprite_h.cpp */
 void sprite_color_translate(SeriesPtr series, ColorListPtr list);
-
-/* sprite_i.cpp */
 void sprite_single_color_translate(SeriesPtr series, int id);
-
-/* sprite_j.cpp */
 int sprite_data_load(SeriesPtr series, int id, byte *target);
 
-/* sprite_k.cpp */
-/* if called, wont remove the colors from the palette list. It is */
-/* used during kernel_abort_animation. */
-void dont_frag_the_palette(void);
-/* this will be called from the end of kernel_abort_animation to */
-/* make it so the colors will be freed from the palette. */
-void go_ahead_and_frag_the_palette(void);
-
+void dont_frag_the_palette();
+void go_ahead_and_frag_the_palette();
 void sprite_free(SeriesPtr *series, int free_memory);
 
 } // namespace MADSV2

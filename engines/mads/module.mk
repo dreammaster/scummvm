@@ -61,6 +61,7 @@ MODULE_OBJS += \
 	forest/globals_forest.o \
 	madsv2/engine.o \
 	madsv2/core/buffer.o \
+	madsv2/core/camera.o \
 	madsv2/core/cycle.o \
 	madsv2/core/ems.o \
 	madsv2/core/error.o \
@@ -68,12 +69,7 @@ MODULE_OBJS += \
 	madsv2/core/font_1.o \
 	madsv2/core/himem.o \
 	madsv2/core/inter.o \
-	madsv2/core/kernel_1.o \
-	madsv2/core/kernel_3.o \
-	madsv2/core/kernel_8.o \
-	madsv2/core/kernel_b.o \
-	madsv2/core/kernel_d.o \
-	madsv2/core/kernel_f.o \
+	madsv2/core/kernel.o \
 	madsv2/core/matte.o \
 	madsv2/core/mcga.o \
 	madsv2/core/mem_2.o \
@@ -84,8 +80,10 @@ MODULE_OBJS += \
 	madsv2/core/object.o \
 	madsv2/core/pack_6.o \
 	madsv2/core/pal.o \
+	madsv2/core/player.o \
 	madsv2/core/popup.o \
 	madsv2/core/quote_1.o \
+	madsv2/core/rail.o \
 	madsv2/core/screen.o \
 	madsv2/core/speech.o \
 	madsv2/core/sprite.o \

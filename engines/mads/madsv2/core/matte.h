@@ -134,9 +134,7 @@ void matte_frame(int special_effect, int full_screen);
 
 /* matte_1.c */
 //void matte_init_series(void);
-int  matte_load_series(char *name,
-	int load_flags,
-	int bonus_series_number);
+int  matte_load_series(const char *name, int load_flags, int bonus_series_number);
 void matte_deallocate_series(int id, int free_memory);
 int  matte_allocate_series(SeriesPtr series,
 	int bonus_series_number);

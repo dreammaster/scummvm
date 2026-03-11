@@ -405,240 +405,210 @@ extern int cursor_last;
 
 extern Kernel kernel;
 extern KernelGame game;                 /* Kernel level game data */
+extern KernelMessage kernel_message[KERNEL_MAX_MESSAGES];
+extern FontPtr kernel_message_font;
+extern int kernel_message_spacing;
 
 
+extern int kernel_load_vocab();
 
+/**
+ * Game level system shutdown.
+ */
+extern void kernel_game_shutdown();
 
+extern void kernel_force_refresh();
 
-/* kernel_2.cpp */
-int kernel_load_vocab();
+/**
+ * Game level system startup.
+ */
+extern int kernel_game_startup(int game_video_mode, int load_flag,
+	const char *release_version, const char *release_date);
 
-/* kernel_3.cpp */
-void kernel_game_shutdown();
-void kernel_force_refresh();
-int kernel_game_startup(int game_video_mode, int load_flag,
-	char *release_version, char *release_date);
+/**
+ * Section level system shutdown.
+ */
+extern void kernel_section_shutdown();
 
-/* kernel_4.cpp */
-void kernel_section_shutdown();
-int  kernel_section_startup(int new_section);
+/**
+ * Section level system startup.
+ */
+extern int kernel_section_startup(int new_section);
 
-/* kernel_5.cpp */
-void kernel_room_shutdown();
-int  kernel_room_startup(int new_room, int initial_variant,
+/**
+ * Room level system shutdown.
+ */
+extern void kernel_room_shutdown();
+
+extern int kernel_room_startup(int new_room, int initial_variant,
 	char *interface, int new_palette);
 
-/* kernel_6.cpp */
-void kernel_unload_all_series();
-int  kernel_load_series(const char *name, int load_flags);
+/**
+ * Unloads all room series.
+ */
+extern void kernel_unload_all_series();
 
-/* kernel_7.cpp */
-void kernel_flip_hotspot(int vocab_code, int active);
-void kernel_flip_hotspot_loc(int vocab_code, int active,
-	int x, int y);
+/**
+ * Loads a sprite series for the room.
+ */
+extern int kernel_load_series(const char *name, int load_flags);
 
-/* kernel_8.cpp */
+extern void kernel_flip_hotspot(int vocab_code, int active);
+
+/**
+ * Toggles an interface hotspot (referenced by its vocabulary word)
+ * on or off.  Hotspots that are off do not interact with the mouse cursor.
+ *
+ * Only hotspots which contain the point (X, Y) are affected.
+ */
+extern void kernel_flip_hotspot_loc(int vocab_code, int active, int x, int y);
+
 extern Sequence sequence_list[KERNEL_MAX_SEQUENCES];
-
-/* kernel_8.cpp */
-void kernel_seq_init();
-void kernel_seq_correction(long old_clock, long new_clock);
-
-/* kernel_8.cpp */
-int  kernel_seq_add(int series_id, int mirror,
-	int initial_sprite,
-	int low_sprite, int high_sprite,
-	int loop_mode, int loop_direction,
-	int depth, int scale,
-	int auto_locating,
-	int x, int y,
-	word ticks, word interval_ticks,
-	word start_ticks,
-	int expire);
-
-/* kernel_8.cpp */
-int kernel_seq_forward(int series_id, int mirror,
-	word ticks, word interval_ticks,
-	word start_ticks, int expire);
-
-int kernel_seq_forward_scroll(int series_id, int mirror,
-	word ticks, word interval_ticks,
-	word start_ticks, int expire);
-
-/* kernel_8.cpp */
-int kernel_seq_pingpong(int series_id, int mirror,
-	word ticks, word interval_ticks,
-	word start_ticks, int expire);
-
-int kernel_seq_pingpong_scroll(int series_id, int mirror,
-	word ticks, word interval_ticks,
-	word start_ticks, int expire);
-
-/* kernel_8.cpp */
-int kernel_seq_backward(int series_id, int mirror,
-	word ticks, word interval_ticks,
-	word start_ticks, int expire);
-
-int kernel_seq_backward_scroll(int series_id, int mirror,
-	word ticks, word interval_ticks,
-	word start_ticks, int expire);
-
-/* kernel_8.cpp */
-int  kernel_seq_stamp(int series_id, int mirror, int sprite);
-int  kernel_seq_stamp_scroll(int series_id, int mirror, int sprite);
-
-/* kernel_8.cpp */
-void kernel_synch(int slave_type, int slave_id,
+extern void kernel_seq_init();
+extern void kernel_seq_correction(long old_clock, long new_clock);
+extern int kernel_seq_add(int series_id, int mirror, int initial_sprite,
+	int low_sprite, int high_sprite, int loop_mode, int loop_direction,
+	int depth, int scale, int auto_locating, int x, int y,
+	word ticks, word interval_ticks, word start_ticks, int expire);
+extern int kernel_seq_forward(int series_id, int mirror,
+	word ticks, word interval_ticks, word start_ticks, int expire);
+extern int kernel_seq_forward_scroll(int series_id, int mirror,
+	word ticks, word interval_ticks, word start_ticks, int expire);
+extern int kernel_seq_pingpong(int series_id, int mirror,
+	word ticks, word interval_ticks, word start_ticks, int expire);
+extern int kernel_seq_pingpong_scroll(int series_id, int mirror,
+	word ticks, word interval_ticks, word start_ticks, int expire);
+extern int kernel_seq_backward(int series_id, int mirror,
+	word ticks, word interval_ticks, word start_ticks, int expire);
+extern int kernel_seq_backward_scroll(int series_id, int mirror,
+	word ticks, word interval_ticks, word start_ticks, int expire);
+extern int kernel_seq_stamp(int series_id, int mirror, int sprite);
+extern int kernel_seq_stamp_scroll(int series_id, int mirror, int sprite);
+extern void kernel_synch(int slave_type, int slave_id,
 	int master_type, int master_id);
-void kernel_player_expire(int sequence_id);
-
-/* kernel_8.cpp */
-void kernel_seq_depth(int sequence_id, int depth);
-void kernel_seq_scale(int sequence_id, int scale);
-void kernel_seq_loc(int sequence_id, int x, int y);
-void kernel_seq_range(int sequence_id,
-	int first, int last);
-
-/* kernel_8.cpp */
+extern void kernel_player_expire(int sequence_id);
+extern void kernel_seq_depth(int sequence_id, int depth);
+extern void kernel_seq_scale(int sequence_id, int scale);
+extern void kernel_seq_loc(int sequence_id, int x, int y);
+extern void kernel_seq_range(int sequence_id, int first, int last);
 void kernel_seq_motion(int sequence_id, int flags,
-	int delta_x_times_100,
-	int delta_y_times_100);
-
-
-/* kernel_8.cpp */
-extern int kernel_seq_trigger(int sequence_id,
-	int trigger_type,
-	int trigger_sprite,
-	int trigger_code);
-
-/* kernel_8.cpp */
+	int delta_x_times_100, int delta_y_times_100);
+extern int kernel_seq_trigger(int sequence_id, int trigger_type,
+	int trigger_sprite, int trigger_code);
 extern int kernel_timing_trigger(int ticks, int trigger_code);
-
-/* kernel_8.cpp */
 extern int kernel_seq_purge(int sequence_id);
 extern void kernel_seq_full_update();
-
-/* kernel_8.cpp */
 extern void kernel_draw_to_background(int series_id, int sprite_id,
 	int x, int y, int depth, int scale);
-
-
-/* kernel_9.cpp */
 extern void kernel_seq_delete(int sequence_id);
-extern int  kernel_seq_update(SequencePtr sequence, int sequence_id);
 extern void kernel_seq_update_all();
-
-/* kernel_a.cpp */
 extern void kernel_seq_player(int sequence_id, int synch_me);
-
-/* kernel_b.cpp */
 extern void kernel_animation_init();
 extern int  kernel_run_animation(const char *name, int trigger_code);
-extern int kernel_run_animation_disp(char thing, int num, int trigger_code);
-extern int kernel_run_animation_talk(char thing, int num, int trigger_code);
-extern int kernel_run_animation_write(int trigger_code);
-extern int kernel_run_animation_point(int num, int trigger_code);
 
-/* kernel_c.cpp */
+/**
+ * Run a displacement animation
+ */
+extern int kernel_run_animation_disp(char thing, int num, int trigger_code);
+
+/**
+ * Run a talking animation
+ */
+extern int kernel_run_animation_talk(char thing, int num, int trigger_code);
+
+/**
+ * Run a writing anim (always edgar)
+ */
+extern int kernel_run_animation_write(int trigger_code);
+
+/**
+ * Run a pointing animation (always abigail)
+ */
+extern int kernel_run_animation_point(int num, int trigger_code);
 extern void kernel_reset_animation(int handle, int frame);
 extern void kernel_abort_animation(int handle);
 extern void kernel_abort_all_animations();
 extern void kernel_doom_all_animations();
 extern void kernel_abort_doomed_animations();
 extern void kernel_process_all_animations();
-
-
-/* kernel_d.cpp */
-extern KernelMessage kernel_message[KERNEL_MAX_MESSAGES];
-extern FontPtr kernel_message_font;
-extern int kernel_message_spacing;
-
-/* kernel_d.cpp */
 extern void kernel_message_init();
 extern int  kernel_message_add(char *text, int x, int y, int color,
 	long time_on_screen, int trigger_code, int flags);
-
-/* kernel_d.cpp */
 extern void kernel_message_teletype(int id, int rate, int quote);
 extern void kernel_message_attach(int id, int sequence);
 extern void kernel_message_delete(int id);
 extern void kernel_message_purge();
-
-/* kernel_d.cpp */
 extern void kernel_message_anim(int id, int anim, int segment);
 extern int kernel_message_player(int quote_id, long delay, int trigger);
-
-
-/* kernel_e.cpp */
-extern void kernel_message_update(KernelMessagePtr my_message);
 extern void kernel_message_update_all();
 extern void kernel_message_correction(long old_clock, long new_clock);
-
-
-/* kernel_f.cpp */
 extern int  kernel_add_dynamic(int vocab_id, int verb_id, byte syntax,
 	int auto_sequence, int x, int y, int xs, int ys);
-
-/* kernel_f.cpp */
-extern int  kernel_dynamic_walk(int id, int feet_x, int feet_y,
-	int facing);
+extern int  kernel_dynamic_walk(int id, int feet_x, int feet_y, int facing);
 extern void kernel_dynamic_anim(int id, int anim_id, int segment);
-
-/* kernel_f.cpp */
-int  kernel_dynamic_cursor(int id, int cursor);
-void kernel_delete_dynamic(int id);
-void kernel_purge_dynamic();
-void kernel_init_dynamic();
-
-/* kernel_g.cpp */
+extern int  kernel_dynamic_cursor(int id, int cursor);
+extern void kernel_delete_dynamic(int id);
+extern void kernel_purge_dynamic();
+extern void kernel_init_dynamic();
 extern int kernel_dynamic_consecutive(int id);
 extern void kernel_refresh_dynamic();
-
-/* kernel_h.cpp */
 extern char *kernel_full_name(int my_room, char type, int num, char *text, int ext);
 extern char *kernel_name(char type, int num);
 extern char *kernel_interface_name(int num);
-
-/* kernel_i.cpp */
 extern void kernel_unload_sound_driver();
-extern int  kernel_load_sound_driver(const char *name, char sound_card,
-	int sound_board_address, int sound_board_type, int sound_board_irq);
-
-/* kernel_j.cpp */
+extern int  kernel_load_sound_driver(const char *name, char sound_card_,
+	int sound_board_address_, int sound_board_type_, int sound_board_irq_);
 extern void kernel_load_variant(int variant);
-
-/* kernel_k.cpp */
 extern void kernel_new_palette();
-
-/* kernel_l.cpp */
 extern void kernel_dump_quotes();
 extern void kernel_dump_all();
 extern void kernel_dump_walker_only();
-
-/* kernel_m.cpp */
 extern int kernel_save_game(char *filename);
 extern int kernel_load_game(char *filename);
 
-/* kernel_n.cpp */
+/**
+ * Initializes a random chatter sequence.  (Parameters end with
+ * a zero-terminated list of already loaded quote id's to be
+ * used for messages).
+ */
 extern void kernel_random_messages_init(int max_messages_at_once,
 	int min_x, int max_x, int min_y, int max_y,
 	int min_y_spacing, int teletype_rate, int color,
 	int duration, int quote_id, ...);
 
-/* kernel_n.cpp */
+/**
+ * Returns the number of idle chatter messages currently being displayed.
+ */
 extern int kernel_check_random();
-extern void kernel_random_message_server();
-extern int kernel_generate_random_message(int chance_major, int chance_minor);
-extern void kernel_random_purge();
 
-/* kernel_o.cpp */
+/**
+ * Should be called regularly from daemon code whenever a random
+ * message sequence is running (intercepts triggers from terminating
+ * messages to determine when to free up control space).
+ */
+extern void kernel_random_message_server();
+
+/**
+ * Called occasionally to (possibly) generate a random message.
+ *
+ * (generated whenever random(chance_major) <= chance_minor)
+ */
+extern int kernel_generate_random_message(int chance_major, int chance_minor);
+
+extern void kernel_random_purge();
 extern void kernel_load_interface();
+
+/**
+ * Switches interface modes (INTER_BUILDING_SENTENCES is the normal mode;
+ * INTER_CONVERSATION is for dialog scenes), and properly updates the graphic structures.
+ */
 extern void kernel_set_interface_mode(int mode);
 
-/* kernel_q.cpp */
 extern void kernel_room_scale(int front_y, int front_scale, int back_y, int back_scale);
 
-/* kernel_r.cpp */
+/**
+ * Room level system shutdown.
+ */
 extern void kernel_background_shutdown();
 extern int kernel_background_startup(int new_room, int initial_variant);
 
