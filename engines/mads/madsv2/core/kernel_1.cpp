@@ -27,6 +27,7 @@
 namespace MADS {
 namespace MADSV2 {
 
+byte video_mode;
 RoomPtr room     = NULL;
 int room_id      = KERNEL_STARTING_GAME;
 int section_id   = KERNEL_STARTING_GAME;

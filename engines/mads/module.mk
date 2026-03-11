@@ -88,8 +88,7 @@ MODULE_OBJS += \
 	madsv2/core/quote_1.o \
 	madsv2/core/screen.o \
 	madsv2/core/speech.o \
-	madsv2/core/sprite_e.o \
-	madsv2/core/sprite_k.o \
+	madsv2/core/sprite.o \
 	madsv2/core/text.o \
 	madsv2/core/tile_3.o \
 	madsv2/core/timer.o \
